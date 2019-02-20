@@ -58,6 +58,6 @@ def build(env):
     else:
         ignore.append("*backend/zeromq*")
 
-    env.copy(".", ignore=env.ignore_patterns(*ignore))
+    env.copy(".", ignore=env.ignore_paths(*ignore))
     env.copy("../xpcc.hpp")
     env.template("dispatcher.hpp.in")

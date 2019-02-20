@@ -37,7 +37,7 @@ def build(env):
     properties["target"] = target = device.identifier
     properties["driver"] = driver
     properties["core"] = driver["type"]
-    properties["systick_frequency"] = int(env.get_option(":freertos:frequency", 1000))
+    properties["systick_frequency"] = int(env.get(":freertos:frequency", 1000))
     if (properties["systick_frequency"] % 1000 != 0):
         raise BuildException("SysTick frequency must be a multiple of 1000Hz!")
 

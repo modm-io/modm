@@ -22,6 +22,8 @@ jobs:
             avr-g++ --version
             which arm-none-eabi-g++
             arm-none-eabi-g++ --version
+            which lbuild
+            lbuild --version
       - run:
           name: Hosted Unittests
           command: |

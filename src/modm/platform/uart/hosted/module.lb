@@ -53,4 +53,4 @@ def build(env):
     if env[":target"].identifier["family"] == "linux":
         env.collect(":build:library", "pthread")
 
-    env.copy(".", ignore=env.ignore_patterns(*ignore))
+    env.copy(".", ignore=env.ignore_paths(*ignore))

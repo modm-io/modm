@@ -50,5 +50,5 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "modm/src/modm/ui/display"
-    env.copy(".", ignore=env.ignore_patterns("*.font", "*.pbm"))
+    env.copy(".", ignore=env.ignore_files("*.font", "*.pbm"))
     env.copy("../display.hpp")

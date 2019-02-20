@@ -35,7 +35,7 @@ common_build_flag_names = [
             for profile in ([""] + ["."+p for p in common_build_profiles])
 ]
 
-def common_source_files(buildlog):
+def common_source_files(env):
     """
     Builds a list of files that need to be compiled per repository.
 
@@ -44,13 +44,9 @@ def common_source_files(buildlog):
     """
     files_to_build = defaultdict(list)
 
-    for operation in buildlog:
-        repo = operation.module_name.split(":")[0]
-        filename = operation.local_filename_out()
-        _, extension = os.path.splitext(filename)
-
-        if extension in [".c", ".cpp", ".cc", ".sx", ".S"]:
-            files_to_build[repo].append(filename.replace('\\','\\\\')) #windows path compatibility hack
+    for operation in env.buildlog:
+        if os.path.splitext(operation.filename)[-1] in [".c", ".cpp", ".cc", ".sx", ".S"]:
+            files_to_build[operation.repository].append(operation.filename)
 
     for repo in files_to_build:
         files_to_build[repo].sort()

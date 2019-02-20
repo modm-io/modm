@@ -371,7 +371,7 @@ def prepare(module, options):
 def build(env):
     env.outbasepath = "modm/src/modm/architecture"
 
-    headers = env.get_generated_local_files(filterfunc=lambda path: re.match(r"interface/.*\.hpp", path))
+    headers = env.generated_local_files(filterfunc=lambda path: re.match(r"interface/.*\.hpp", path))
     env.template("interface.hpp.in", substitutions={"headers": sorted(headers)})
 
     env.copy("utils.hpp")

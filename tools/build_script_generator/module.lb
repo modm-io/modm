@@ -59,7 +59,7 @@ def prepare(module, options):
 
     # Queries
     module.add_query(
-        Query(name="source_files", function=common_source_files))
+        EnvironmentQuery(name="source_files", factory=common_source_files))
     module.add_query(
         EnvironmentQuery(name="device", factory=common_target))
     module.add_query(
@@ -125,7 +125,7 @@ def prepare(module, options):
 
 def build(env):
     # Append custom openocd config file to metadata
-    openocd_cfg = env.get_option(":build:openocd.cfg", "")
+    openocd_cfg = env.get(":build:openocd.cfg", "")
     if len(openocd_cfg):
         env.collect(":build:openocd.source", openocd_cfg)
 
@@ -140,7 +140,7 @@ def build(env):
 
 def post_build(env, buildlog):
     target = env[":target"]
-    gitignore = [env.reloutpath(ignore, "modm") for ignore in
+    gitignore = [env.relative_outpath(ignore, "modm") for ignore in
                  env.collector_values("gitignore", filterfunc=lambda s: s.repository == "modm")]
     elf_files = {
         "release": env.collector_values("elf.release")[0],

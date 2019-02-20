@@ -30,7 +30,7 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "modm/src/modm/processing/resumable"
-    env.copy(".", ignore=env.ignore_patterns("*.md", "*.in"))
+    env.copy(".", ignore=env.ignore_files("*.md", "*.in"))
     env.copy("../resumable.hpp")
     env.template("nested_resumable.hpp.in")
 

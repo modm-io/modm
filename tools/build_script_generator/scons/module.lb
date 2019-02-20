@@ -69,16 +69,16 @@ def build(env):
     env.collect("flag_format", flag_format)
 
 
-def post_build(env, buildlog):
+def post_build(env):
     is_unittest = env.has_module(":test")
     has_xpcc_generator = env.has_module(":communication:xpcc:generator")
     has_image_source = len(env["image.source"])
-    repositories = [p for p in buildlog.repositories if isdir(env.outpath(p, basepath="."))]
+    repositories = [p for p in env.buildlog.repositories if isdir(env.real_outpath(p, basepath="."))]
     repositories = sorted(repositories, key=lambda name: "0" if name == "modm" else name)
 
     target = env["modm:target"]
     subs = env.query("::device")
-    sources = env.query("::source_files")(buildlog)
+    sources = env.query("::source_files")
 
     build_tools = [
         "settings_buildpath",
@@ -177,7 +177,7 @@ def post_build(env, buildlog):
         env.outbasepath = repo
         env.template("resources/SConscript.in", "SConscript",
                      filters={"flags_format": flags_format,
-                              "relocate": lambda p: env.reloutpath(p, repo)})
+                              "relocate": lambda p: env.relative_outpath(p, repo)})
 
     env.outbasepath = "modm"
     # Copy the scons-build-tools

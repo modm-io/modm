@@ -38,12 +38,12 @@ def build(env):
     env.collect("::elf.debug",   join(build_path, "cmake-build-debug",   project_name + ".elf"))
 
 
-def post_build(env, buildlog):
+def post_build(env):
     target = env["modm:target"]
     # get CPU information
     subs = env.query("::device")
     # Extract all source code files
-    subs["sources"] = sorted(p for sources in env.query("::source_files")(buildlog).values() for p in sources)
+    subs["sources"] = sorted(p for sources in env.query("::source_files").values() for p in sources)
     # get memory information
     subs["memories"] = env.query("::memories")
     # get generic build flags information

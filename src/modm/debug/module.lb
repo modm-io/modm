@@ -38,7 +38,7 @@ def build(env):
     if target["platform"] != "hosted":
         ignore_patterns.append("*logger/hosted/*")
 
-    env.copy(".", ignore=env.ignore_patterns(*ignore_patterns))
+    env.copy(".", ignore=env.ignore_paths(*ignore_patterns))
 
     env.outbasepath = "modm/src/modm"
     env.copy("debug.hpp")

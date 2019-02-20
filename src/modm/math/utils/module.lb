@@ -30,5 +30,5 @@ def build(env):
         ignore.append("*avr*")
         env.copy("operator_impl.hpp")
 
-    env.copy('.', ignore=env.ignore_patterns(*ignore))
+    env.copy('.', ignore=env.ignore_paths(*ignore))
     env.copy("../utils.hpp")
