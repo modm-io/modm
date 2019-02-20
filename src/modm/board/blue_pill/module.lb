@@ -44,4 +44,4 @@ def build(env):
 
     env.outbasepath = "modm/openocd/modm/board/"
     env.copy(repopath("tools/openocd/modm/stm32f103_blue_pill.cfg"), "stm32f103_blue_pill.cfg")
-    env.add_metadata("openocd.configfile", "modm/board/stm32f103_blue_pill.cfg");
+    env.collect(":build:openocd.source", "modm/board/stm32f103_blue_pill.cfg");

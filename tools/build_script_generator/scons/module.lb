@@ -36,6 +36,9 @@ def prepare(module, options):
         BooleanOption(name="info.build", default=False,
                       description=descr_info_build))
 
+    module.add_collector(
+        CallableCollector(name="flag_format",
+                          description="Formatting compile flags for SCons"))
 
     return True
 
@@ -43,13 +46,13 @@ def prepare(module, options):
 def build(env):
     project_name = env[":build:project.name"]
     build_path = env[":build:build.path"]
-    env.add_metadata("elf.release", join(build_path, "release", project_name + ".elf"))
-    env.add_metadata("elf.debug",   join(build_path, "debug",   project_name + ".elf"))
+    env.collect("::elf.release", join(build_path, "release", project_name + ".elf"))
+    env.collect("::elf.debug",   join(build_path, "debug",   project_name + ".elf"))
 
     if env["info.git"] != "Disabled":
-        env.add_metadata("gitignore", "modm/src/info_git.h")
+        env.collect(":build:gitignore", "modm/src/info_git.h")
     if env["info.build"]:
-        env.add_metadata("gitignore", "modm/src/info_build.h")
+        env.collect(":build:gitignore", "modm/src/info_build.h")
 
     def flag_format(flag):
         subs = {
@@ -63,7 +66,7 @@ def build(env):
             return flag
         return None
 
-    env.add_metadata("flag_format", flag_format)
+    env.collect("flag_format", flag_format)
 
 
 def post_build(env, buildlog):
@@ -111,53 +114,70 @@ def post_build(env, buildlog):
     subs["memories"] = env.query("::memories")
     # Add SCons specific data
     subs.update({
-        "metadata": buildlog.metadata,
+        "cache_dir": cache_dir,
         "generated_paths": repositories,
         "build_tools": build_tools,
         "is_unittest": is_unittest,
+
         "has_image_source": has_image_source,
-        "image_source": env["image.source"],
-        "cache_dir": cache_dir,
         "has_xpcc_generator": has_xpcc_generator,
-        "generator_source": env.get_option(":communication:xpcc:generator:source", ""),
-        "generator_container": env.get_option(":communication:xpcc:generator:container", ""),
-        "generator_path": env.get_option(":communication:xpcc:generator:path", ""),
-        "generator_namespace": env.get_option(":communication:xpcc:generator:namespace", ""),
-        "avrdude_programmer": env.get_option(":build:avrdude.programmer", ""),
-        "avrdude_port": env.get_option(":build:avrdude.port", ""),
-        "avrdude_options": env.get_option(":build:avrdude.options", ""),
-        "avrdude_baudrate": env.get_option(":build:avrdude.baudrate", 0),
     })
+    if has_image_source:
+        subs["image_source"] = env["image.source"]
+    if has_xpcc_generator:
+        subs.update({
+            "generator_source": env.get(":communication:xpcc:generator:source", ""),
+            "generator_container": env.get(":communication:xpcc:generator:container", ""),
+            "generator_path": env.get(":communication:xpcc:generator:path", ""),
+            "generator_namespace": env.get(":communication:xpcc:generator:namespace", ""),
+        })
+    if subs["platform"] == "avr":
+        default_programmer = env.collector_values(":build:default.avrdude.programmer", "")[0]
+        default_port = env.collector_values(":build:default.avrdude.port", "")[0]
+        default_baudrate = env.collector_values(":build:default.avrdude.baudrate", 0)[0]
+        subs.update({
+            "avrdude_programmer": env.get(":build:avrdude.programmer", default_programmer),
+            "avrdude_port": env.get(":build:avrdude.port", default_port),
+            "avrdude_baudrate": env.get(":build:avrdude.baudrate", default_baudrate),
+            "avrdude_options": env.get(":build:avrdude.options", ""),
+        })
     # Set these substitutions for all templates
     env.substitutions = subs
 
-    common_file_flags = env.query("::file_flags")
-    common_metadata_flags = env.query("::metadata_flags")
     for repo in repositories:
         files = []
+        repo_filter = lambda scope: scope.repository == repo
+        repo_flags = env.query("::collect_flags")(env, repo_filter)
+
         for f in sources[repo]:
-            flags = common_file_flags(buildlog, f)
-            for key, profiles in flags.items():
-                if "" not in profiles: profiles[""] = []
-                profiles[""].insert(0, "${}".format(key))
-            files.append( (env.reloutpath(f, repo), flags) )
+            for flag, profiles in repo_flags[f].items():
+                profiles[""].insert(0, "${}".format(flag.upper()))
+            files.append( (f, repo_flags[f]) )
+
+        include_paths = env.collector_values("::path.include", filterfunc=repo_filter)
+        libary_paths = env.collector_values("::path.library", filterfunc=repo_filter)
+        libaries = env.collector_values("::library", filterfunc=repo_filter)
+        packages = env.collector_values("::pkg-config", filterfunc=repo_filter)
 
         subs.update({
             "repo": repo,
-            "flags": common_metadata_flags(buildlog, repo),
+            "flags": repo_flags[None],
             "sources": files,
-            "libraries": buildlog.repo_metadata["required_library"][repo],
-            "library_paths": [env.reloutpath(p, repo) for p in buildlog.repo_metadata["required_library_path"][repo]],
-            "include_paths": [env.reloutpath(p, repo) for p in buildlog.repo_metadata["include_path"][repo]],
+            "libraries": libaries,
+            "library_paths": libary_paths,
+            "include_paths": include_paths,
+            "packages": packages,
         })
         def flags_format(flag):
-            for fmt in buildlog.metadata["flag_format"]:
+            for fmt in env.collector_values("flag_format"):
                 nflag = fmt(flag)
                 if nflag: return nflag;
             return '"{}"'.format(flag)
         # Generate library SConscript
         env.outbasepath = repo
-        env.template("resources/SConscript.in", "SConscript", filters={"flags_format": flags_format})
+        env.template("resources/SConscript.in", "SConscript",
+                     filters={"flags_format": flags_format,
+                              "relocate": lambda p: env.reloutpath(p, repo)})
 
     env.outbasepath = "modm"
     # Copy the scons-build-tools

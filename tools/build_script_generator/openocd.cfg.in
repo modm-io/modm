@@ -1,7 +1,7 @@
-%% for path in metadata.get("openocd.search", []) | sort
+%% for path in collector_values["path.openocd"] | sort
 add_script_search_dir {{ path }}
 %% endfor
-%% for file in metadata.get("openocd.configfile", []) | sort
+%% for file in collector_values["openocd.source"] | sort
 source [find {{ file }}]
 %% endfor
 
@@ -12,11 +12,9 @@ proc modm_program { SOURCE } {
 	shutdown
 }
 
-%% for profile in ["release", "debug"]
-%% if "elf." ~ profile in metadata
+%% for profile, path in elf_files.items()
 proc program_{{ profile }} {} {
-	modm_program {{ metadata["elf." ~ profile][0]  | modm.windowsify }}
+	modm_program {{ path | modm.windowsify }}
 }
-%% endif
 %% endfor
 

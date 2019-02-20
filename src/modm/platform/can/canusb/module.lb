@@ -42,7 +42,7 @@ def build(env):
     env.outbasepath = "modm/src/modm/platform/can"
 
     if env[":target"].partname == "hosted-linux":
-        env.add_metadata("required_library", "pthread")
+        env.collect(":build:library", "pthread")
 
     env.copy("canusb.hpp")
     env.copy("canusb_impl.hpp")

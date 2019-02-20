@@ -25,7 +25,7 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.add_metadata("include_path", "modm/ext/cmsis_device")
+    env.collect(":build:path.include", "modm/ext/cmsis_device")
 
     device = env[":target"]
 

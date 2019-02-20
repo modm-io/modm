@@ -1,10 +1,8 @@
-%% for profile in ["release", "debug"]
-%% if "elf." ~ profile in metadata
+%% for profile, path in elf_files.items()
 define file_{{profile}}
     file
-    file {{ metadata["elf." ~ profile][0] | modm.windowsify }}
+    file {{ path | modm.windowsify }}
 end
-%% endif
 %% endfor
 
 layout split

@@ -26,7 +26,9 @@ def prepare(module, options):
     _, default_project_name = os.path.split(os.getcwd())
     default_project_name = default_project_name.replace(".", "_").replace(" ", "_")
     platform = options[":target"].identifier["platform"]
+    is_cortex_m = options[":target"].has_driver("core:cortex-m*")
 
+    # Options
     module.add_option(
         StringOption(name="project.name", default=default_project_name,
                      description=descr_project_name))
@@ -50,11 +52,12 @@ def prepare(module, options):
             StringOption(name="avrdude.options", default="",
                          description="AvrDude programmer options"))
 
-    if options[":target"].has_driver("core:cortex-m*"):
+    elif is_cortex_m:
         module.add_option(
             StringOption(name="openocd.cfg", default="",
                          description=descr_openocd_cfg))
 
+    # Queries
     module.add_query(
         Query(name="source_files", function=common_source_files))
     module.add_query(
@@ -62,9 +65,60 @@ def prepare(module, options):
     module.add_query(
         EnvironmentQuery(name="memories", factory=common_memories))
     module.add_query(
-        Query(name="metadata_flags", function=common_metadata_flags))
-    module.add_query(
-        Query(name="file_flags", function=common_file_flags))
+        Query(name="collect_flags", function=common_collect_flags_for_scope))
+
+    # Collections
+    module.add_collector(
+        PathCollector(name="path.include",
+                      description="Search path for header files"))
+    module.add_collector(
+        PathCollector(name="path.library",
+                      description="Search path for static libraries"))
+    module.add_collector(
+        StringCollector(name="library",
+                        description="Libraries to link against"))
+    module.add_collector(
+        StringCollector(name="pkg-config",
+                        description="Packages to configure against"))
+
+    module.add_collector(
+        PathCollector(name="elf.release",
+                      description="Path to the compiled .elf file for the release profile"))
+    module.add_collector(
+        PathCollector(name="elf.debug",
+                      description="Path to the compiled .elf file for the debug profile"))
+    module.add_collector(
+        PathCollector(name="gitignore",
+                      description="Generated files that need to be ignored by Git"))
+
+    if is_cortex_m:
+        module.add_collector(
+            PathCollector(name="openocd.source",
+                          description="Additional OpenOCD source files."))
+        module.add_collector(
+            PathCollector(name="path.openocd",
+                          description="Search path for OpenOCD configuration files"))
+
+    elif platform in ["avr"]:
+        module.add_collector(
+            StringCollector(name="default.avrdude.programmer",
+                            description="Default AvrDude programmer"))
+        module.add_collector(
+            NumericCollector(name="default.avrdude.baudrate", minimum=0,
+                             description="Default AvrDude baudrate"))
+        module.add_collector(
+            StringCollector(name="default.avrdude.port",
+                            description="Default AvrDude port"))
+
+    # Compile flag collectors
+    def flag_validate(flag):
+        if not flag.startswith("-"):
+            raise ValueError("Flag '{}' must start with '-'!".format(flag))
+        return flag
+    for name in common_build_flag_names:
+        module.add_collector(
+            StringCollector(name=name, description=None,
+                            validate=flag_validate if "flags" in name else None))
 
     return True
 
@@ -73,29 +127,37 @@ def build(env):
     # Append custom openocd config file to metadata
     openocd_cfg = env.get_option(":build:openocd.cfg", "")
     if len(openocd_cfg):
-        env.add_metadata("openocd.configfile", openocd_cfg)
+        env.collect(":build:openocd.source", openocd_cfg)
 
     # Append common search paths to metadata
-    env.add_metadata("openocd.search", "modm/openocd")
+    if env.has_collector(":build:path.openocd"):
+        env.collect(":build:path.openocd", "modm/openocd")
 
     # Add compiler flags to metadata
     for flag, values in common_compiler_flags("gcc", env[":target"]).items():
-        env.add_metadata(flag, *values)
+        env.collect(flag, *values)
 
 
 def post_build(env, buildlog):
     target = env[":target"]
+    gitignore = [env.reloutpath(ignore, "modm") for ignore in
+                 env.collector_values("gitignore", filterfunc=lambda s: s.repository == "modm")]
+    elf_files = {
+        "release": env.collector_values("elf.release")[0],
+        "debug": env.collector_values("elf.debug")[0],
+    }
+
     env.substitutions = {
-        "metadata": buildlog.metadata,
-        "gitignore": [env.reloutpath(i, "modm") for i in buildlog.repo_metadata["gitignore"]["modm"]],
+        "gitignore": gitignore,
+        "elf_files": elf_files,
     }
     env.outbasepath = "modm"
 
     # Currently a modm only feature
-    if len(env.substitutions["gitignore"]):
+    if len(gitignore):
         env.template("gitignore.in", ".gitignore")
 
-    if env[":target"].has_driver("core:cortex-m*"):
+    if target.has_driver("core:cortex-m*"):
         env.template("openocd.cfg.in")
         env.template("gdbinit.in")
 

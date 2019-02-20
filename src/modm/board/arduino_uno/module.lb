@@ -33,5 +33,5 @@ def prepare(module, options):
 def build(env):
     env.outbasepath = "modm/src/modm/board"
     env.copy('.')
-    env.add_metadata("avrdude.programmer", "arduino");
-    env.add_metadata("avrdude.baudrate", "115200");
+    env.collect(":build:default.avrdude.programmer", "arduino");
+    env.collect(":build:default.avrdude.baudrate", "115200");

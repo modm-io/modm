@@ -50,11 +50,11 @@ def build(env):
         ignore.append("*postman/dynamic*")
 
     if env[":target"].identifier["platform"] in ["hosted"]:
-        env.add_metadata("required_library", "zmqpp")
-        env.add_metadata("required_library", "zmq")
+        env.collect(":build:library", "zmqpp")
+        env.collect(":build:library", "zmq")
 
         if env[":target"].identifier["family"] in ["linux"]:
-            env.add_metadata("required_library", "pthread")
+            env.collect(":build:library", "pthread")
     else:
         ignore.append("*backend/zeromq*")
 

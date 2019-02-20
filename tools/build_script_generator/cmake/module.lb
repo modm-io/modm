@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2018, Sergiy Yevtushenko
+# Copyright (c) 2018-2019, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -33,8 +34,8 @@ def prepare(module, options):
 def build(env):
     project_name = env[":build:project.name"]
     build_path = env[":build:build.path"]
-    env.add_metadata("elf.release", join(build_path, "cmake-build-release", project_name + ".elf"))
-    env.add_metadata("elf.debug",   join(build_path, "cmake-build-debug",   project_name + ".elf"))
+    env.collect("::elf.release", join(build_path, "cmake-build-release", project_name + ".elf"))
+    env.collect("::elf.debug",   join(build_path, "cmake-build-debug",   project_name + ".elf"))
 
 
 def post_build(env, buildlog):
@@ -45,16 +46,16 @@ def post_build(env, buildlog):
     subs["sources"] = sorted(p for sources in env.query("::source_files")(buildlog).values() for p in sources)
     # get memory information
     subs["memories"] = env.query("::memories")
-    # get memory information
-    subs["flags"] = env.query("::metadata_flags")(buildlog, "modm")
+    # get generic build flags information
+    subs["flags"] = env.query("::collect_flags")(env)[None]
 
     # Add SCons specific data
     subs.update({
         "project_path": os.getcwd(),
-        "metadata": buildlog.metadata,
         "compiler": "gcc",
         "project_name": env[":build:project.name"],
         "build_path": env[":build:build.path"],
+        "include_paths": env.collector_values(":build:path.include"),
     })
     # Set these substitutions for all templates
     env.substitutions = subs

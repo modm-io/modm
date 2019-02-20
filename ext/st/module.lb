@@ -104,8 +104,8 @@ def validate(env):
     })
 
 def build(env):
-    env.add_metadata("include_path", "modm/ext")
-    env.add_metadata("include_path", "modm/ext/cmsis/device")
+    env.collect(":build:path.include", "modm/ext")
+    env.collect(":build:path.include", "modm/ext/cmsis/device")
 
     env.outbasepath = "modm/ext/cmsis/device"
     env.copy(localpath(bprops["folder"], bprops["device_header"]), bprops["device_header"])

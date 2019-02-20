@@ -24,8 +24,7 @@ See https://github.com/modm-io/avr-libstdcpp.
 
 
 def prepare(module, options):
-    target = options[":target"].identifier
-    if target["platform"] != "avr":
+    if options[":target"].identifier.platform != "avr":
         return False
 
     module.add_option(
@@ -38,7 +37,7 @@ def prepare(module, options):
 
 
 def build(env):
-    env.add_metadata("include_path", "modm/ext/gcc/libstdc++/include")
+    env.collect(":build:path.include", "modm/ext/gcc/libstdc++/include")
 
     env.outbasepath = "modm/ext/gcc"
     env.copy(".", ignore=env.ignore_files("*.lb", "*.md", "*.in", "examples"))

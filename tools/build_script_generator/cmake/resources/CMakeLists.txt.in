@@ -14,7 +14,7 @@ SET_SOURCE_FILES_PROPERTIES(${APP_STARTUP} PROPERTIES LANGUAGE CXX)
 FILE(GLOB APP_SOURCE_FILES *.c *.cpp *.hpp *.h)
 
 SET(SOURCE_FILES
-%% for file in sources
+%% for file in sources | sort
     {{ file }}
 %% endfor
     ${APP_SOURCE_FILES}
@@ -22,7 +22,7 @@ SET(SOURCE_FILES
 
 INCLUDE_DIRECTORIES(
     ${CMAKE_CURRENT_SOURCE_DIR}
-%% for path in metadata.include_path
+%% for path in include_paths | sort
     {{ path }}
 %% endfor
 )
@@ -46,12 +46,12 @@ endif ()
 ADD_EXECUTABLE(${CMAKE_PROJECT_NAME} ${SOURCE_FILES})
 SET_TARGET_PROPERTIES(${CMAKE_PROJECT_NAME} PROPERTIES SUFFIX ".elf")
 
-%% for define in flags["CPPDEFINES"][""]
+%% for define in flags["cppdefines"][""]
 TARGET_COMPILE_DEFINITIONS(${CMAKE_PROJECT_NAME} PUBLIC "{{ define }}")
 %% endfor
-%% if flags["CPPDEFINES"]["debug"] | length
+%% if flags["cppdefines"]["debug"] | length
 IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
-%% for define in flags["CPPDEFINES"]["debug"]
+%% for define in flags["cppdefines"]["debug"]
 	TARGET_COMPILE_DEFINITIONS(${CMAKE_PROJECT_NAME} PUBLIC "{{ define }}")
 %% endfor
 ENDIF()

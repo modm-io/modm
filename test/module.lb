@@ -24,7 +24,7 @@ def prepare(module, options):
 def build(env):
     env.outbasepath = "modm-test/src"
 
-    env.add_metadata("include_path", "modm-test/src")
+    env.collect(":build:path.include", "modm-test/src")
 
     platform = env[":target"].identifier["platform"]
     if platform in ["hosted"]:

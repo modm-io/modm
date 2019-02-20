@@ -35,7 +35,7 @@ env.InfoBuild()
 %% endif
 
 %% macro generate_flags_for_profile(name, profile, append=False)
-env{% if append %}.Append({{name}}{% else %}["{{name}}"]{% endif %} = [
+env{% if append %}.Append({{name | upper}}{% else %}["{{name | upper}}"]{% endif %} = [
 %% for flag in flags[name][profile] | sort
     {{ flag | flags_format }},
 %% endfor
@@ -55,13 +55,13 @@ if profile == "{{ profile }}":
 %% endmacro
 
 # Toolchain configuration
-{{ generate_flags("CPPDEFINES", True) }}
-{{ generate_flags("CCFLAGS", repo != "modm") }}
-{{ generate_flags("CFLAGS", repo != "modm") }}
-{{ generate_flags("CXXFLAGS", repo != "modm") }}
-{{ generate_flags("ASFLAGS", repo != "modm") }}
-{{ generate_flags("LINKFLAGS", repo != "modm") }}
-{{ generate_flags("ARCHFLAGS", repo != "modm") }}
+{{ generate_flags("cppdefines", True) }}
+{{ generate_flags("ccflags", repo != "modm") }}
+{{ generate_flags("cflags", repo != "modm") }}
+{{ generate_flags("cxxflags", repo != "modm") }}
+{{ generate_flags("asflags", repo != "modm") }}
+{{ generate_flags("linkflags", repo != "modm") }}
+{{ generate_flags("archflags", repo != "modm") }}
 
 %% if repo == "modm"
 # ARCHFLAGS must be known for compiling *and* linking
@@ -122,24 +122,24 @@ env.AppendUnique(CPPPATH=[
 	"/usr/local/include",
 %% endif
 %% for path in include_paths | sort
-    abspath("{{ path }}"),
+    abspath("{{ path | relocate }}"),
 %% endfor
 ])
 
 files = [
 %% for file, flags in sources if not flags | length
-    env.File("{{ file }}"),
+    env.File("{{ file | relocate }}"),
 %% endfor
 ]
 %% for file, flags in sources
     %% if flags | length
-flags = { {%- for key, profiles in flags.items() if "" in profiles %}"{{key}}": {{profiles[""]}}, {% endfor -%} }
+flags = { {%- for key, profiles in flags.items() if "" in profiles %}"{{ key | upper }}": {{profiles[""]}}, {% endfor -%} }
     %% for key, profiles in flags.items()
         %% for profile, flags in profiles.items() if "" != profile
-if profile == "{{profile}}": flags["{{key}}"].extend({{flags}});
+if profile == "{{profile}}": flags["{{ key | upper }}"].extend({{flags}});
         %% endfor
     %% endfor
-files.append(env.Object("{{ file }}", **flags))
+files.append(env.Object("{{ file | relocate }}", **flags))
     %% endif
 %% endfor
 
@@ -157,11 +157,11 @@ env.AppendUnique(LIBPATH=[
 %% endif
     abspath(str(library[0].get_dir())),
 %% for library in library_paths | sort
-    abspath("{{ library }}"),
+    abspath("{{ library | relocate }}"),
 %% endfor
 ])
-%% if "required_pkg" in metadata
-env.ParseConfig("pkg-config --cflags --libs {{ metadata.required_pkg | sort | join(" ") }}")
+%% if packages | length
+env.ParseConfig("pkg-config --cflags --libs {{ packages | sort | join(" ") }}")
 %% endif
 
 Return("library")

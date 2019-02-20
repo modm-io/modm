@@ -47,7 +47,7 @@ CONFIGURE_FILE(modm/link/${LINKER_SCRIPT_NAME} ${LINKER_SCRIPT})
 
 # Toolchain configuration
 %% macro generate_flags_for_profile(name, profile, suffix="")
-SET({{name}}{{ "_" ~ (suffix | upper) if suffix | length else "" }} "\
+SET({{ name | upper }}{{ "_" ~ (suffix | upper) if suffix | length else "" }} "\
 %% for flag in flags[name][profile] | sort
     {{ flag | flag_format }} \
 %% endfor
@@ -63,12 +63,12 @@ SET({{name}}{{ "_" ~ (suffix | upper) if suffix | length else "" }} "\
 %% endfor
 %% endmacro
 
-{{ generate_flags("CCFLAGS") }}
-{{ generate_flags("CFLAGS") }}
-{{ generate_flags("CXXFLAGS") }}
-{{ generate_flags("ASFLAGS") }}
-{{ generate_flags("ARCHFLAGS") }}
-{{ generate_flags("LINKFLAGS") }}
+{{ generate_flags("ccflags") }}
+{{ generate_flags("cflags") }}
+{{ generate_flags("cxxflags") }}
+{{ generate_flags("asflags") }}
+{{ generate_flags("archflags") }}
+{{ generate_flags("linkflags") }}
 
 # Set flags for CMake
 SET(CMAKE_C_FLAGS "${ARCHFLAGS} ${CCFLAGS} ${CFLAGS}" CACHE INTERNAL "c compiler flags")

@@ -39,4 +39,4 @@ def build(env):
     env.substitutions = {"board_has_logger": False}
     env.template("../board.cpp.in", "board.cpp")
     env.copy('.')
-    env.add_metadata("openocd.configfile", "board/stm32f429discovery.cfg");
+    env.collect(":build:openocd.source", "board/stm32f429discovery.cfg");
