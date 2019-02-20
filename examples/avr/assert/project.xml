@@ -1,5 +1,5 @@
 <library>
-  <extends>modm:board:al-avreb-can</extends>
+  <extends>modm:al-avreb-can</extends>
   <options>
     <option name="modm:build:build.path">../../../build/avr/assert</option>
   </options>

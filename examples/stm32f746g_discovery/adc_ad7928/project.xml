@@ -1,5 +1,5 @@
 <library>
-  <extends>modm:board:disco-f746ng</extends>
+  <extends>modm:disco-f746ng</extends>
   <options>
     <option name="modm:build:build.path">../../../build/stm32f746g_discovery/adc_ad7928</option>
   </options>

@@ -1,5 +1,5 @@
 <library>
-  <extends>modm:board:nucleo-l476rg</extends>
+  <extends>modm:nucleo-l476rg</extends>
   <options>
     <option name="modm:build:build.path">../../../build/generic/resumable</option>
   </options>

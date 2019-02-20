@@ -1,5 +1,5 @@
 <library>
-  <extends>modm:board:blue-pill</extends>
+  <extends>modm:blue-pill</extends>
   <options>
     <option name="modm:build:build.path">../../../../build/generic/ros/can_bridge</option>
     <option name="modm:platform:uart:2:buffer.tx">512</option>

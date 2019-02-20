@@ -1,5 +1,5 @@
 <library>
-  <extends>modm:board:nucleo-l432kc</extends>
+  <extends>modm:nucleo-l432kc</extends>
   <options>
     <option name="modm:build:build.path">../../../build/nucleo_l432kc/pwm</option>
   </options>

@@ -1,5 +1,5 @@
 <library>
-  <extends>modm:board:olimexino-stm32</extends>
+  <extends>modm:olimexino-stm32</extends>
   <options>
     <option name="modm:build:build.path">../../../build/olimexino_stm32/blink</option>
   </options>

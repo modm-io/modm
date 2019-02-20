@@ -1,5 +1,5 @@
 <library>
-  <extends>modm:board:disco-l476vg</extends>
+  <extends>modm:disco-l476vg</extends>
   <options>
     <option name="modm:build:build.path">../../../build/stm32l476_discovery/blink</option>
   </options>

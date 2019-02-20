@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <library>
-  <extends>modm:board:nucleo-f411re</extends>
+  <extends>modm:nucleo-f411re</extends>
   <modules>
     <module>modm-test:test:**</module>
   </modules>

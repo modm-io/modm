@@ -1,5 +1,5 @@
 <library>
-  <extends>modm:board:disco-f407vg</extends>
+  <extends>modm:disco-f407vg</extends>
   <options>
     <option name="modm:build:build.path">../../../build/stm32f4_discovery/timer_test</option>
   </options>

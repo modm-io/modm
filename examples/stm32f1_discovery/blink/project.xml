@@ -1,5 +1,5 @@
 <library>
-  <extends>modm:board:disco-f100rb</extends>
+  <extends>modm:disco-f100rb</extends>
   <options>
     <option name="modm:build:build.path">../../../build/stm32f1_discovery/blink</option>
   </options>

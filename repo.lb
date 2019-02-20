@@ -34,7 +34,7 @@ except Exception as e:
     exit(1)
 
 import lbuild
-min_lbuild_version = "1.7.0"
+min_lbuild_version = "1.7.1"
 if StrictVersion(getattr(lbuild, "__version__", "0.1.0")) < StrictVersion(min_lbuild_version):
     print("modm requires at least lbuild v{}, please upgrade!\n"
           "    pip3 install -U lbuild".format(min_lbuild_version))
@@ -169,8 +169,13 @@ def init(repo):
 
     # Add the board configuration files as their module name aliases
     for config in Path(repopath("src/modm/board")).glob("*/board.xml"):
-        name = re.search("<module>(modm:board:.*?)</module>", config.read_text()).group(1).replace("modm:", "")
-        repo.add_configuration(name, config)
+        name = re.search(r"<module>modm:board:(.*?)</module>", config.read_text()).group(1)
+        if (config.parent / "module.md").exists():
+            description = FileReader(str(config.parent / "module.md"))
+        else:
+            description = re.search(r'\.description += +""?"?\\?(.*?)""?"?', (config.parent / "module.lb").read_text(), flags=re.S|re.M)
+            description = description.group(1) if description else None
+        repo.add_configuration(name, config, description)
 
     # Add Jinja2 filters commonly used in this repository
     def windowsify(path):

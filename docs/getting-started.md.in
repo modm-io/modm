@@ -16,8 +16,23 @@ we still recommend adding modm as a git submodule for reproducibility.
 ### Using a Board Support Package
 
 To build on a BSP, inherit from an existing project configuration using the
-`<extends>` element.
-Our BSPs declare a minimal set of modules as dependencies as well as pre-define several important options for this board.
+`<extends>` element. You can discover the available configuration aliases using
+lbuild:
+
+```
+ $ lbuild --repository ../modm/repo.lb discover
+Parser(lbuild)
+╰── Repository(modm @ ../modm)   modm: a barebone embedded library generator
+    ├── Configuration(modm:arduino-uno)   Arduino UNO
+    ├── Configuration(modm:blue-pill)   Blue Pill
+    ├── Configuration(modm:disco-f469ni)   STM32F469IDISCOVERY
+    ├── Configuration(modm:nucleo-f401re)   NUCLEO-F401RE
+    ├── Configuration(modm:olimexino-stm32)   Olimexino STM32
+    ╰── Configuration(modm:stm32f030_demo)   STM32F030 Demo Board
+```
+
+Our BSPs declare a minimal set of modules as dependencies as well as pre-define
+several important options for this board.
 You can then add all the modules you need and configure them as you want.
 
 ```xml
@@ -29,7 +44,7 @@ You can then add all the modules you need and configure them as you want.
     </repository>
   </repositories>
   <!-- extend this board configuration -->
-  <extends>modm:board:disco-f469ni</extends>
+  <extends>modm:disco-f469ni</extends>
   <options>
     <!-- give this project a custom name -->
     <option name="modm:build:project.name">test</option>

@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <library>
-  <extends>modm:board:nucleo-f103rb</extends>
+  <extends>modm:nucleo-f103rb</extends>
   <modules>
     <!-- Not everything fits -->
     <!-- <module>modm-test:test:architecture</module>

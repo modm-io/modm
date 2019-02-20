@@ -1,5 +1,5 @@
 <library>
-  <extends>modm:board:blue-pill</extends>
+  <extends>modm:blue-pill</extends>
   <options>
     <option name="modm:build:build.path">../../../build/stm32f103c8t6_blue_pill/blink.cmake</option>
   </options>

@@ -1,5 +1,5 @@
 <library>
-  <extends>modm:board:disco-f769ni</extends>
+  <extends>modm:disco-f769ni</extends>
   <options>
     <option name="modm:build:build.path">../../../build/stm32f769i_discovery/blink</option>
   </options>

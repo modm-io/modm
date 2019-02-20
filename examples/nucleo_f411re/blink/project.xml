@@ -1,5 +1,5 @@
 <library>
-  <extends>modm:board:nucleo-f411re</extends>
+  <extends>modm:nucleo-f411re</extends>
   <options>
     <option name="modm:build:build.path">../../../build/nucleo_f411re/blink</option>
   </options>

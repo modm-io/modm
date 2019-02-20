@@ -1,5 +1,5 @@
 <library>
-  <extends>modm:board:disco-f407vg</extends>
+  <extends>modm:disco-f407vg</extends>
   <options>
     <option name="modm:build:build.path">../../../build/zmq/1_stm32</option>
     <option name="modm:communication:xpcc:generator:source">../../xpcc/xml/communication.xml</option>

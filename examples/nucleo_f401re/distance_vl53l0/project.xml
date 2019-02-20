@@ -1,5 +1,5 @@
 <library>
-  <extends>modm:board:nucleo-f401re</extends>
+  <extends>modm:nucleo-f401re</extends>
   <options>
     <option name="modm:build:build.path">../../../build/nucleo_f401re/distance_vl53l0</option>
   </options>

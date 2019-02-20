@@ -1,5 +1,5 @@
 <library>
-  <extends>modm:board:disco-f429zi</extends>
+  <extends>modm:disco-f429zi</extends>
   <options>
     <option name="modm:build:build.path">../../../build/stm32f429_discovery/blink</option>
   </options>
