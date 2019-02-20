@@ -17,7 +17,7 @@ we still recommend adding modm as a git submodule for reproducibility.
 
 To build on a BSP, inherit from an existing project configuration using the
 `<extends>` element. You can discover the available configuration aliases using
-lbuild:
+[lbuild][]:
 
 ```
  $ lbuild --repository ../modm/repo.lb discover
@@ -59,7 +59,7 @@ You can then add all the modules you need and configure them as you want.
 !!! info "Choose a build system"
     Our BSPs do not specify a build system generator, so you need to add the
     module yourself if you want. Here we use the SCons build system generator,
-    but you [can choose others as well](../reference/build-systems).
+    but you [can choose others as well](../../reference/build-systems).
 
 Our board support packages provide their configuration in the `Board` namespace,
 which you can use to initialize the target and several board subsystems.
@@ -120,23 +120,24 @@ for this specific repository option:
 Parser(lbuild)
 ╰── Repository(modm @ ../modm)   modm: a barebone embedded library generator
     ├── EnumerationOption(target) = stm32f407vgt in [at90can128, at90can32, at90can64, ...]
-    ├── Module(modm:board)
-    │   ╰── Module(modm:board:disco-f407vg)
-    ├── Module(modm:build)
+    ├── Configuration(modm:disco-f407vg)   STM32F4DISCOVERY
+    ├── Module(modm:board)   Board Support Packages
+    │   ╰── Module(modm:board:disco-f407vg)   STM32F4DISCOVERY
+    ├── Module(modm:build)   Build System Generators
     │   ├── Option(build.path) = build/parent-folder in [String]
     │   ├── Option(project.name) = parent-folder in [String]
     │   ╰── Module(modm:build:scons)  SCons Build Script Generator
     │       ├── BooleanOption(info.build) = False in [True, False]
     │       ╰── EnumerationOption(info.git) = Disabled in [Disabled, Info, Info+Status]
-    ├── Module(modm:platform)
-    │   ├── Module(modm:platform:can)
-    │   │   ╰── Module(modm:platform:can:1) CAN 1 instance
+    ├── Module(modm:platform)   Platform HAL
+    │   ├── Module(modm:platform:can)   Controller Area Network (CAN)
+    │   │   ╰── Module(modm:platform:can:1) Instance 1
     │   │       ├── NumericOption(buffer.rx) = 32 in [1 .. 32 .. 65534]
     │   │       ╰── NumericOption(buffer.tx) = 32 in [1 .. 32 .. 65534]
-    │   ├── Module(modm:platform:core)
+    │   ├── Module(modm:platform:core)   ARM Cortex-M Core
     │   │   ├── EnumerationOption(allocator) = newlib in [block, newlib, tlsf]
     │   │   ├── NumericOption(main_stack_size) = 3040 in [256 .. 3040 .. 65536]
-    │   │   ╰── EnumerationOption(vector_table_location) = fastest in [fastest, ram, rom]
+    │   │   ╰── EnumerationOption(vector_table_location) = rom in [ram, rom]
 ```
 
 You can now discover all module options in more detail:
@@ -160,14 +161,15 @@ Or check out specific module and option descriptions:
 
 ```
  $ lbuild -r ../modm/repo.lb -D modm:target=stm32f407vgt discover -n :build
->> modm:build
+>> modm:build  [Module]
 
 # Build System Generators
 
 This parent module defines a common set of functionality that is independent of
 the specific build system generator implementation.
 
->>>> modm:build:project.name
+
+>>>> modm:build:project.name  [StringOption]
 
 # Project Name
 
@@ -176,7 +178,8 @@ The project name defaults to the folder name you're calling lbuild from.
 Value: parent-folder
 Inputs: [String]
 
->>>> modm:build:build.path
+
+>>>> modm:build:build.path  [StringOption]
 
 # Build Path
 
@@ -186,7 +189,7 @@ Value: build/parent-folder
 Inputs: [String]
 ```
 
-The complete lbuild command line interface is available with `lbuild -h`.
+The complete [lbuild command line interface][lbuild] is available with `lbuild -h`.
 
 !!! info "Options are checked"
     `lbuild` checks all your project options against the possible values in the
@@ -223,6 +226,12 @@ source code.
 </library>
 ```
 
+!!! tip "Check your repository path"
+    Make sure you've set the correct path to the modm `repo.lb` file, otherwise
+    lbuild cannot help you much. **This is especially important when copying
+    from our examples, which have the repository path set in the inherited 
+    common configuration file located in `modm/examples/lbuild.xml`!**
+
 A minimal `main.cpp` for this configuration would look like this:
 
 ```cpp
@@ -249,7 +258,7 @@ Once you have your `project.xml` set up, you can call `lbuild build`, which
 generates the target and configuration specific library from modm.
 This will create a few files and folders:
 
-```sh
+```
  $ ls
 main.cpp    project.xml
  $ lbuild build
@@ -294,7 +303,7 @@ Heap:     197520B (98.4% available)
 ```
 
 You can program your target by calling `scons program`. Additional tools are
-documented in [module documentation](../reference/module/modm-build-scons).
+documented in [SCons module documentation](../../reference/module/modm-build-scons).
 
 If you have any questions, [open an issue][issues] or ping
 [@salkinium](https://github.com/salkinium).

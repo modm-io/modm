@@ -34,7 +34,7 @@ Please help us [keep these instructions up-to-date][contribute]!
 We will use [Homebrew](http://brew.sh/) to install the minimal build system:
 
 	brew install python3 scons git doxygen
-	pip3 install --user lbuild jinja2 pyelftools
+	pip3 install --user modm
 	pip install --user pathlib pyelftools
 
 Install the [AVR toolchain from source](https://github.com/osx-cross/homebrew-avr):
@@ -60,7 +60,7 @@ For Ubuntu 18.04LTS, these commands install the basic build system:
 
 	sudo apt-get install python3 python3-pip scons git
 	sudo apt-get --no-install-recommends install doxygen
-	pip3 install --user lbuild jinja2 pyelftools
+	pip3 install --user modm
 	pip install --user pathlib pyelftools
 
 Install the AVR toochain:
