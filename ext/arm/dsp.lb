@@ -72,19 +72,19 @@ def build(env):
 
 
 # ============================ Option Descriptions ============================
-globals()["descr_unaligned_data"] = """# Allow unaligned data storage
+descr_unaligned_data = """# Allow unaligned data storage
 
 If the core supports it, this options enables storing data in unaligned memory.
 This may reduce data size, but cost some speed.
 """
 
-globals()["descr_matrix_sizes"] = """# Check input/output matrix size
+descr_matrix_sizes = """# Check input/output matrix size
 
 Check the input and output sizes of matrices and return
 `ARM_MATH_SIZE_MISMATCH` on failure.
 """
 
-globals()["descr_round_floats"] = """# Round float inputs
+descr_round_floats = """# Round float inputs
 
 Rounds float inputs properly during all conversions.
 """

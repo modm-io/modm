@@ -36,7 +36,7 @@ def build(env):
 
 
 # ============================ Option Descriptions ============================
-globals()["descr_nesting_depth"] = """# Check nesting call depth
+descr_nesting_depth = """# Check nesting call depth
 
 Nested resumable functions protect against memory corruption by checking if the
 nesting level is within the allocated nesting level depth, on first entry to

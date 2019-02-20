@@ -175,23 +175,23 @@ def post_build(env, buildlog):
 
 
 # ============================ Option Descriptions ============================
-globals()["descr_include_sconstruct"] = """# Generate a SConstruct file
+descr_include_sconstruct = """# Generate a SConstruct file
 
 !!! warning "This overwrites any top-level `SConstruct` file!"
 """
 
-globals()["descr_cache_dir"] = """# Path to SConstruct CacheDir
+descr_cache_dir = """# Path to SConstruct CacheDir
 
 If value is `/cache`, the cache is placed into the top-level `build/` folder.
 You can disable CacheDir by setting an empty string.
 """
 
-globals()["descr_image_source"] = """# Path to directory containing .pbm files"""
+descr_image_source = """# Path to directory containing .pbm files"""
 
-globals()["descr_info_git"] = """# Generate git repository state information
+descr_info_git = """# Generate git repository state information
 
 - `Info`: generates information about the last commit.
 - `Info+Status`: like `Info` plus git file status.
 """
 
-globals()["descr_info_build"] = """# Generate build state information"""
+descr_info_build = """# Generate build state information"""

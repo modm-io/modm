@@ -90,7 +90,7 @@ def post_build(env, buildlog):
 
 
 # ============================ Option Descriptions ============================
-globals()["descr_project_name"] = """# Project Name
+descr_project_name = """# Project Name
 
 The project name defaults to the folder name you're calling lbuild from.
 
@@ -98,7 +98,7 @@ It's used by your build system to name the executable and it may also be passed
 to your application via a string constant or CPP define.
 """
 
-globals()["descr_build_path"] = """# Build Path
+descr_build_path = """# Build Path
 
 The build path is defaulted to `build/{modm:build:project.name}`.
 
@@ -110,7 +110,7 @@ You should use a relative path instead of an absolute one, so that this option
 still works for other developers.
 """
 
-globals()["descr_openocd_cfg"] = """# Path to a custom OpenOCD configuration file
+descr_openocd_cfg = """# Path to a custom OpenOCD configuration file
 
 If you have a custom configuration file for your target, it will get included
 by the generated `modm/openocd.cfg`.

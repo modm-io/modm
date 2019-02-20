@@ -81,7 +81,7 @@ def post_build(env, buildlog):
         env.template("resources/Makefile.in", "Makefile")
 
 # ============================ Option Descriptions ============================
-globals()["descr_include_makefile"] = """# Generate a wrapper Makefile
+descr_include_makefile = """# Generate a wrapper Makefile
 
 !!! warning "This overwrites any top-level `Makefile` file!"
 """
