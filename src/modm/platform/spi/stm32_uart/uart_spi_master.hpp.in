@@ -60,10 +60,6 @@ public:
 		using Sck = typename Connector::template GetSignal<Gpio::Signal::Ck>;
 		using Mosi = typename Connector::template GetSignal<Gpio::Signal::Tx>;
 		using Miso = typename Connector::template GetSignal<Gpio::Signal::Rx>;
-		static_assert(Connector::template IsValid<Sck> and Connector::template IsValid<Mosi> and
-					  ((not Connector::template IsValid<Miso> and sizeof...(Signals) == 2) or
-					   (    Connector::template IsValid<Miso> and sizeof...(Signals) == 3)),
-					  "UartSpiMaster{{id}}::connect() requires one Ck and one Tx and optionally one Rx signal!");
 
 		// Connector::disconnect();
 		Sck::setOutput(Gpio::OutputType::PushPull);
