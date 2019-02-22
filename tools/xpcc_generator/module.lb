@@ -17,14 +17,14 @@ def init(module):
 
 def prepare(module, options):
     module.add_option(
-        StringOption(name="source", default="",
-                     description="Path to the XPCC source file"))
+        PathOption(name="source", default="", empty_ok=True,
+                   description="Path to the XPCC source file"))
     module.add_option(
         StringOption(name="container", default="",
                      description="Name of the XPCC container to generate for"))
     module.add_option(
-        StringOption(name="path", default="generated/xpcc",
-                     description="Path to the XPCC generated folder"))
+        PathOption(name="path", default="generated/xpcc",
+                   description="Path to the XPCC generated folder"))
     module.add_option(
         StringOption(name="namespace", default="robot",
                      description="Namespace of the generated XPCC communications"))

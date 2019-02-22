@@ -23,11 +23,11 @@ def prepare(module, options):
         BooleanOption(name="include_sconstruct", default=True,
                       description=descr_include_sconstruct))
     module.add_option(
-        StringOption(name="cache_dir", default="/cache",
-                     description=descr_cache_dir))
+        PathOption(name="cache_dir", default="/cache", empty_ok=True,
+                   description=descr_cache_dir))
     module.add_option(
-        StringOption(name="image.source", default="",
-                     description=descr_image_source))
+        PathOption(name="image.source", default="", empty_ok=True,
+                   description=descr_image_source))
     module.add_option(
         EnumerationOption(name="info.git", default="Disabled",
                           enumeration=["Disabled", "Info", "Info+Status"],

@@ -33,8 +33,8 @@ def prepare(module, options):
         StringOption(name="project.name", default=default_project_name,
                      description=descr_project_name))
     module.add_option(
-        StringOption(name="build.path", default="build/"+default_project_name,
-                     description=descr_build_path))
+        PathOption(name="build.path", default="build/"+default_project_name,
+                   description=descr_build_path))
 
     if platform in ["avr"]:
         # we need the clock:f_cpu option!
@@ -54,8 +54,8 @@ def prepare(module, options):
 
     elif is_cortex_m:
         module.add_option(
-            StringOption(name="openocd.cfg", default="",
-                         description=descr_openocd_cfg))
+            PathOption(name="openocd.cfg", default="", empty_ok=True,
+                       description=descr_openocd_cfg))
 
     # Queries
     module.add_query(
