@@ -19,24 +19,27 @@ def init(module):
 
 def prepare(module, options):
 
-    module.add_option(
-        SetOption(
+    module.add_set_option(
+        NumericOption(
             name="gamma",
             description="Gamma correction of values",
-            enumeration=[1.8, 1.9, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5],
-            default=2.2))
-    module.add_option(
-        SetOption(
+            minimum=1.0,
+            maximum=3.0),
+        default=2.2)
+    module.add_set_option(
+        NumericOption(
             name="bit",
             description="Resolution of target values",
-            enumeration=[4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
-            default=[7, 8, 10, 12, 16]))
-    module.add_option(
-        SetOption(
+            minimum=2,
+            maximum=16),
+        default=[7, 8, 12, 16])
+    module.add_set_option(
+        NumericOption(
             name="range",
             description="Range of input values",
-            enumeration=[10, 16, 20, 32, 50, 64, 100, 128, 200, 256, 500, 512, 1000, 1024],
-            default=256))
+            minimum=2,
+            maximum=1024),
+        default=256)
 
     module.depends(
         ":architecture:accessor",

@@ -139,12 +139,12 @@ def prepare(module, options):
     bprops["ranges"] = port_ranges(device.get_driver("gpio")["gpio"])
     bprops["ports"] = OrderedDict([(k, i) for i, k in enumerate([p["name"] for p in bprops["ranges"]])])
 
-    module.add_option(
-        SetOption(
+    module.add_set_option(
+        EnumerationOption(
             name="enable_ports",
             description="Enable clock for these GPIO ports during startup",
-            enumeration=list(bprops["ports"].keys()),
-            default=list(bprops["ports"].keys())))
+            enumeration=list(bprops["ports"].keys())),
+        default=list(bprops["ports"].keys()))
 
     module.depends(
         ":architecture:gpio",
