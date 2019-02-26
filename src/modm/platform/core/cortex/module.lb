@@ -11,8 +11,10 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
+
 def common_vector_table_location(env):
     return env.get(":platform:cortex-m:vector_table_location", "rom")
+
 
 def common_vector_table(env):
     """
@@ -73,11 +75,34 @@ def common_memories(env):
     """
     device = env[":target"]
     memories = listify(device.get_driver("core")["memory"])
+
+    # Convert from string to int and add offsets
+    flash_offset = env.get_option(":platform:cortex-m:linkerscript.flash_offset", 0)
+    for m in memories:
+        if m["name"] == "flash" and flash_offset != 0:
+            # The offset needs to be aligned regarding the number of interrupts
+            # in order for the vector table relocation to work. Every interrupt
+            # requires 4 bytes, and therefore two additional bits of alignment.
+            number_of_interrupts = env.query(":::vector_table")["highest_irq"] + 16
+            bit_alignment = number_of_interrupts.bit_length() + 2
+            mask = (1 << bit_alignment) - 1
+            if flash_offset & mask:
+                raise ValidateException("Invalid flash offset in option '{}'. "
+                                        "The offset needs to be {} bit aligned."
+                                        .format("linkerscript.flash_offset",
+                                                bit_alignment))
+
+            m["start"] = int(m["start"], 0) + flash_offset
+            m["size"] = int(m["size"], 0) - flash_offset
+        else:
+            m["start"] = int(m["start"], 0)
+            m["size"] = int(m["size"], 0)
+
     properties = {
         "memories": memories,
         "regions": [m["name"] for m in memories],
-        "ram_origin": min(int(m["start"], 16) for m in memories if "sram" in m["name"]),
-        "ram_size": sum(int(m["size"]) for m in memories if "sram" in m["name"]),
+        "ram_origin": min(m["start"] for m in memories if "sram" in m["name"]),
+        "ram_size": sum(m["size"] for m in memories if "sram" in m["name"]),
     }
     return properties
 
@@ -129,6 +154,7 @@ def init(module):
     module.parent = "platform"
     module.description = FileReader("module.md")
 
+
 def prepare(module, options):
     if not options[":target"].has_driver("core:cortex-m*"):
         return False
@@ -166,9 +192,10 @@ def prepare(module, options):
             maximum=2 ** 16,
             default=2 ** 10 * 3 - 32))
 
+    memories = listify(options[":target"].get_driver("core")["memory"])
+
     # Cortex-M0 does not have remappable vector table, so it will remain in Flash
     if not options[":target"].has_driver("core:cortex-m0*"):
-        memories = listify(options[":target"].get_driver("core")["memory"])
         default_location = "rom"
         if any((m["name"] == "ccm" and "x" in m["access"]) or m["name"] == "dtcm" for m in memories):
             default_location = "ram"
@@ -178,6 +205,19 @@ def prepare(module, options):
                 description=FileReader("option/vector_table_location.md"),
                 enumeration=["rom", "ram"],
                 default=default_location))
+
+    # Find the size of the flash memory
+    flash_size = next(int(x['size']) for x in memories if x['name'] == 'flash')
+    module.add_option(
+        NumericOption(
+            name="linkerscript.flash_offset",
+            description="Add an offset to the default start address of the "
+                        "flash memory. This might be required for bootloaders "
+                        "located there. WARNING: Not all offsets are compatible with "
+                        "the vector table relocation.",
+            minimum=0,
+            maximum=flash_size,
+            default=0))
 
     module.add_collector(
         StringCollector(
@@ -210,6 +250,7 @@ def prepare(module, options):
         EnvironmentQuery(name="linkerscript", factory=common_linkerscript))
 
     return True
+
 
 def build(env):
     env.substitutions = env.query("vector_table")
