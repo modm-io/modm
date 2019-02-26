@@ -131,7 +131,7 @@ private:
 	bool
 	checkRepeat();
 
-	Animation<T> *animator[size];
+	Animation<T> *animators[size];
 	const KeyFrame<T, size> *frames;
 	uint16_t length;
 	uint16_t currentFrame;

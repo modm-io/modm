@@ -47,7 +47,7 @@ update function with intervals of up to 250ms.
 You can also pass the `modm::ui::Led` class directly into the
 `modm::ui::KeyFrameAnimation` class and it's derivatives, to animate it's
 brightness by interpolating between key frames.
-Note that you need to call the `update()` members of both classes!
+Note that you only need to call the `update()` member of the animator!
 
 <!--
 .. compile::
@@ -63,7 +63,6 @@ indicator.start();
 while(1)
 {
     indicator.update();
-    led.update();
 }
 ```
 

@@ -12,8 +12,65 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
-#include "leds.hpp"
-#include "animations.hpp"
+#include <modm/ui/led.hpp>
+#include <modm/ui/animation.hpp>
+
+// create the leds with these lambda callbacks
+modm::ui::Led orange([](uint8_t brightness)
+{
+	Timer4::setCompareValue(2, modm::ui::table22_16_256[brightness]);
+});
+
+modm::ui::Led red([](uint8_t brightness)
+{
+	Timer4::setCompareValue(3, modm::ui::table22_16_256[brightness]);
+});
+
+modm::ui::Led green([](uint8_t brightness)
+{
+	Timer4::setCompareValue(1, modm::ui::table22_16_256[brightness]);
+});
+
+modm::ui::Led blue([](uint8_t brightness)
+{
+	Timer4::setCompareValue(4, modm::ui::table22_16_256[brightness]);
+});
+// ----------------------------------------------------------------------------
+
+// apply some animations to the leds
+modm::ui::Pulse<uint8_t> pulse(red);
+modm::ui::Indicator<uint8_t> indicator(blue);
+modm::ui::Strobe<uint8_t> strobe(green);
+
+// Now for some custom animators
+using KeyFrame = modm::ui::KeyFrame<uint8_t>;
+using KeyFrameAnimation = modm::ui::KeyFrameAnimation<uint8_t>;
+
+// custom keyframes (time, value) for the orange led
+const KeyFrame frames[] =
+{
+	KeyFrame(1000, 50),
+	KeyFrame(900, 0),
+	KeyFrame(800, 100),
+	KeyFrame(700, 0),
+	KeyFrame(600, 150),
+	KeyFrame(500, 0),
+	KeyFrame(400, 200),
+	KeyFrame(300, 0),
+	KeyFrame(200, 250),
+	KeyFrame(100, 0)
+};
+// create a new keyframe animator for the orange led
+KeyFrameAnimation keyFrames(frames, orange);
+
+// animate the period of the red pulse (Aniception?)
+static uint16_t period = 500;
+modm::ui::Animation<uint16_t> periodAnimator(period, [](uint16_t period)
+{
+	pulse.setPeriod(period);
+});
+// wrap it in a pulse
+modm::ui::Pulse<uint16_t> pulsePeriod(periodAnimator);
 
 // ----------------------------------------------------------------------------
 int
@@ -45,7 +102,7 @@ main()
 	Timer4::start();
 
 	// set the animation mode for autoreverse the keyframes
-	animator.setMode(modm::ui::KeyFrameAnimationMode::Autoreverse);
+	keyFrames.setMode(modm::ui::KeyFrameAnimationMode::Autoreverse);
 	// set the indicator period change to 15s
 	pulsePeriod.setPeriod(10000);
 	// pulse between 0.5s and 5s.
@@ -56,7 +113,7 @@ main()
 	pulse.start();
 	indicator.start();
 	strobe.start();
-	animator.start();
+	keyFrames.start();
 	pulsePeriod.start();
 
 	while (1)
@@ -66,22 +123,9 @@ main()
 		indicator.update();
 		strobe.update();
 
-		// udpate the custoom animations
-		animator.update();
+		// update the custom animations
+		keyFrames.update();
 		pulsePeriod.update();
-
-		// update all leds
-		blue.update();
-		red.update();
-		orange.update();
-		green.update();
-
-		// udpate the custom animator
-		if (periodAnimator.update())
-		{
-			// a new value is available
-			pulse.setPeriod(period);
-		}
 	}
 
 	return 0;
