@@ -1,7 +1,7 @@
 %# This File includes platform independent macros for Cortex-M linkerscripts
 %% macro copyright()
 /*
- * Copyright (c) 2011-2012, Fabian Greif
+ * Copyright (c) 2011-2012, 2019, Fabian Greif
  * Copyright (c) 2012, 2015-2018, Niklas Hauser
  * Copyright (c) 2013, Sascha Schade
  * Copyright (c) 2013, 2015, Kevin Läufer
@@ -18,9 +18,9 @@
 MEMORY
 {
 %% for memory in memories
-	{{ memory.name | upper }} ({{ memory.access }}) : ORIGIN = {{ memory.start }}, LENGTH = {{ memory.size }}
+	{{ memory.name | upper }} ({{ memory.access }}) : ORIGIN = {{ "0x%08X" % memory.start }}, LENGTH = {{ memory.size }}
 %% endfor
-	RAM (rwx) : ORIGIN = 0x{{ "%08x" % ram_origin }}, LENGTH = {{ ram_size }}
+	RAM (rwx) : ORIGIN = {{ "0x%08X" % ram_origin }}, LENGTH = {{ ram_size }}
 {{ linkerscript_memory | indent(first=True) }}
 }
 
