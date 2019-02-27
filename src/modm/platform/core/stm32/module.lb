@@ -26,13 +26,16 @@ def prepare(module, options):
     module.depends(":platform:cortex-m")
     return True
 
+
 def build(env):
     env.substitutions = {"target": env[":target"].identifier}
     env.outbasepath = "modm/src/modm/platform/core"
     # startup helper code
     env.template("startup_platform.c.in")
 
-    properties = env.query("::cortex-m:memories")
+
+def post_build(env):
+    properties = env.query("::cortex-m:linkerscript")
     target = env[":target"].identifier
 
     if target.family in ["l4"]: # FIXME!

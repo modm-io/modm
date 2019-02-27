@@ -59,3 +59,4 @@ def build(env):
     env.template("hard_fault.sx.in")
     if env["led"] != "disabled":
         env.template("hard_fault_handler.cpp.in")
+        env.collect(":::linkerscript.process_stack_size", 32)

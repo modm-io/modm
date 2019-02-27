@@ -21,7 +21,7 @@ MEMORY
 	{{ memory.name | upper }} ({{ memory.access }}) : ORIGIN = {{ memory.start }}, LENGTH = {{ memory.size }}
 %% endfor
 	RAM (rwx) : ORIGIN = 0x{{ "%08x" % ram_origin }}, LENGTH = {{ ram_size }}
-{{ options[":platform:cortex-m:linkerscript.memory"] }}
+{{ linkerscript_memory | indent(first=True) }}
 }
 
 OUTPUT_FORMAT("elf32-littlearm")
@@ -108,6 +108,9 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 
 
 %% macro section_table_copy(sections)
+	%% if vector_table_location == "ram"
+		%% do sections.append("vector_table_ram")
+	%% endif
 	.table.copy.intern : ALIGN(4)
 	{
 		__table_copy_intern_start = .;
@@ -125,14 +128,14 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 	.table.zero.extern : ALIGN(4)
 	{
 		__table_zero_extern_start = .;
-{{ options[":platform:cortex-m:linkerscript.table_extern.zero"] }}
+{{ linkerscript_extern_zero | indent(8, first=True) }}
 		__table_zero_extern_end = .;
 	} >FLASH
 
 	.table.copy.extern : ALIGN(4)
 	{
 		__table_copy_extern_start = .;
-{{ options[":platform:cortex-m:linkerscript.table_extern.copy"] }}
+{{ linkerscript_extern_copy | indent(8, first=True) }}
 		__table_copy_extern_end = .;
 	} >FLASH
 %% endmacro
@@ -153,7 +156,7 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 	 * - 0x4000: non-volatile (or battery backed) memory
 	 * - 0x8000: external memory
 	 */
-	.table.section_heap : ALIGN(4)
+	.table.heap : ALIGN(4)
 	{
 		__table_heap_start = .;
 	%% for section in sections
@@ -161,7 +164,7 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		LONG(__{{ section.name }}_start)
 		LONG(__{{ section.name }}_end)
 	%% endfor
-{{ options[":platform:cortex-m:linkerscript.table_extern.heap"] }}
+{{ linkerscript_extern_heap | indent(8, first=True) }}
 		__table_heap_end = .;
 	} >FLASH
 %% endmacro

@@ -38,7 +38,7 @@ SECTIONS
 {{ linker.section_heap("SRAM3", "heap3") }}
 %% endif
 
-{{ options[":platform:cortex-m:linkerscript.sections"] }}
+{{ linkerscript_sections | indent(first=True) }}
 
 	/* TABLES! TABLES! ALL THE TABLES YOU COULD EVER WANT! TABLES! */
 {{ linker.section_table_zero(["bss"]) }}
@@ -46,9 +46,6 @@ SECTIONS
 %% set copy_table = ["data", "fastdata"]
 %% if "backup" in regions
 	%% do copy_table.append("backup")
-%% endif
-%% if vector_table_location == "ram"
-	%% do copy_table.append("vector_table_ram")
 %% endif
 {{ linker.section_table_copy(copy_table) }}
 

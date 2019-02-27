@@ -68,25 +68,61 @@ def common_memories(env):
       - regions: memory region names
       - ram_origin: Lowest SRAM origin address
       - ram_origin: Total size of all SRAM regions
-      - process_stack_size: requested process stack
-      - vector_table_location: ram or rom
 
     :returns: dictionary of memory properties
     """
     device = env[":target"]
     memories = listify(device.get_driver("core")["memory"])
-    process_stack_size = 0
-    if env.get(":platform:fault.cortex:led", "disabled") == "disabled":
-        process_stack_size = 32
     properties = {
         "memories": memories,
         "regions": [m["name"] for m in memories],
         "ram_origin": min(int(m["start"], 16) for m in memories if "sram" in m["name"]),
         "ram_size": sum(int(m["size"]) for m in memories if "sram" in m["name"]),
-        "process_stack_size": process_stack_size,
-        "vector_table_location": common_vector_table_location(env),
     }
     return properties
+
+
+def common_linkerscript(env):
+    """
+    Computes linkerscript properties *post-build*:
+      - process_stack_size: largest requested process stack size by any module
+      - vector_table_location: ram or rom
+
+    Stripped and newline-joined collector values of:
+      - linkerscript_memory
+      - linkerscript_sections
+      - linkerscript_extern_zero
+      - linkerscript_extern_copy
+      - linkerscript_extern_heap
+
+    Additional memory properties:
+      - memories: unfiltered memory regions
+      - regions: memory region names
+      - ram_origin: Lowest SRAM origin address
+      - ram_origin: Total size of all SRAM regions
+
+    :returns: dictionary of linkerscript properties
+    """
+    properties = {
+        "process_stack_size":
+            max(env.collector_values(":platform:cortex-m:linkerscript.process_stack_size", 0)),
+        "vector_table_location":
+            common_vector_table_location(env),
+
+        "linkerscript_memory": "\n".join([m.strip() for m in
+            env.collector_values(":platform:cortex-m:linkerscript.memory")]),
+        "linkerscript_sections": "\n".join([m.strip() for m in
+            env.collector_values(":platform:cortex-m:linkerscript.sections")]),
+        "linkerscript_extern_zero": "\n".join([m.strip() for m in
+            env.collector_values(":platform:cortex-m:linkerscript.table_extern.zero")]),
+        "linkerscript_extern_copy": "\n".join([m.strip() for m in
+            env.collector_values(":platform:cortex-m:linkerscript.table_extern.copy")]),
+        "linkerscript_extern_heap": "\n".join([m.strip() for m in
+            env.collector_values(":platform:cortex-m:linkerscript.table_extern.heap")]),
+    }
+    properties.update(common_memories(env))
+    return properties
+
 
 def init(module):
     module.name = "cortex-m"
@@ -143,36 +179,35 @@ def prepare(module, options):
                 enumeration=["rom", "ram"],
                 default=default_location))
 
-    module.add_option(
-        StringOption(
+    module.add_collector(
+        StringCollector(
             name="linkerscript.memory",
-            description="",
-            default=""))
-    module.add_option(
-        StringOption(
+            description="Additions to the linkerscript's 'MEMORY'"))
+    module.add_collector(
+        StringCollector(
             name="linkerscript.sections",
-            description="",
-            default=""))
-    module.add_option(
-        StringOption(
+            description="Additions to the linkerscript's 'SECTIONS'"))
+    module.add_collector(
+        StringCollector(
             name="linkerscript.table_extern.zero",
-            description="",
-            default=""))
-    module.add_option(
-        StringOption(
+            description="Additions to the linkerscript's '.table.zero.extern' section"))
+    module.add_collector(
+        StringCollector(
             name="linkerscript.table_extern.copy",
-            description="",
-            default=""))
-    module.add_option(
-        StringOption(
+            description="Additions to the linkerscript's '.table.copy.extern' section"))
+    module.add_collector(
+        StringCollector(
             name="linkerscript.table_extern.heap",
-            description="",
-            default=""))
+            description="Additions to the linkerscript's '.table.heap' section"))
+    module.add_collector(
+        NumericCollector(
+            name="linkerscript.process_stack_size",
+            description="Maximum required size of the process stack"))
 
     module.add_query(
         EnvironmentQuery(name="vector_table", factory=common_vector_table))
     module.add_query(
-        EnvironmentQuery(name="memories", factory=common_memories))
+        EnvironmentQuery(name="linkerscript", factory=common_linkerscript))
 
     return True
 

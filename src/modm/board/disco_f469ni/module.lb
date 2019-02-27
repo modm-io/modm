@@ -39,4 +39,47 @@ def build(env):
     env.substitutions = {"board_has_logger": True}
     env.template("../board.cpp.in", "board.cpp")
     env.copy('.')
-    env.collect(":build:openocd.source", "board/stm32f469discovery.cfg");
+    env.collect(":build:openocd.source", "board/stm32f469discovery.cfg")
+
+    env.collect(":platform:cortex-m:linkerscript.memory", linkerscript_memory)
+    env.collect(":platform:cortex-m:linkerscript.sections", linkerscript_sections)
+    env.collect(":platform:cortex-m:linkerscript.table_extern.copy", linkerscript_extern_copy)
+    env.collect(":platform:cortex-m:linkerscript.table_extern.heap", linkerscript_extern_heap)
+
+
+# =============================================================================
+linkerscript_memory = """\
+SDRAM (rwx) : ORIGIN = 0xC0000000, LENGTH = 16M
+"""
+
+linkerscript_sections = """\
+.sdramdata :
+{
+    __sdramdata_load = LOADADDR (.sdramdata);   /* address in FLASH */
+    __sdramdata_start = .;                      /* address in RAM */
+
+    KEEP(*(.sdramdata))
+
+    . = ALIGN(4);
+    __sdramdata_end = .;
+} >SDRAM AT >FLASH
+
+.heap_extern (NOLOAD) : ALIGN(4)
+{
+    __heap_extern_start = .;
+    . = ORIGIN(SDRAM) + LENGTH(SDRAM);
+    __heap_extern_end = .;
+} >SDRAM
+"""
+
+linkerscript_extern_copy = """\
+LONG (__sdramdata_load)
+LONG (__sdramdata_start)
+LONG (__sdramdata_end)
+"""
+
+linkerscript_extern_heap = """\
+LONG (0x801f)
+LONG (__heap_extern_start)
+LONG (__heap_extern_end)
+"""
