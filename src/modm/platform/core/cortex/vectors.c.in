@@ -9,15 +9,9 @@
  */
 // ----------------------------------------------------------------------------
 
-%# Include Target Specific Files
-%% import 'platform.macros' as platform with context
-
 #include <stdint.h>
 #include <modm/architecture/utils.hpp>
 #include <modm/architecture/interface/assert.h>
-#include "../device.hpp"
-
-{{ platform.defines() }}
 
 // ----------------------------------------------------------------------------
 void Undefined_Handler(void)
@@ -32,9 +26,9 @@ void Undefined_Handler(void)
 void Reset_Handler(void)						__attribute__((noreturn));
 void NMI_Handler(void)							__attribute__((weak, alias("Undefined_Handler")));
 void HardFault_Handler(void)					__attribute__((weak, alias("Undefined_Handler")));
-%% for pos in range(4 - 16, number_of_interrupts + 1)
-%% 	if pos in interrupt_table
-{{ ("void " ~ interrupt_table[pos] ~ "(void)") | lbuild.pad(47)}}__attribute__((weak, alias("Undefined_Handler")));
+%% for pos in range(4 - 16, highest_irq + 1)
+%% 	if pos in vector_table
+{{ ("void " ~ vector_table[pos] ~ "(void)") | lbuild.pad(47)}}__attribute__((weak, alias("Undefined_Handler")));
 %%	endif
 %% endfor
 
@@ -53,9 +47,9 @@ FunctionPointer vectorsRom[] =
 	Reset_Handler,							// -15: code entry point
 	NMI_Handler,							// -14: Non Maskable Interrupt handler
 	HardFault_Handler,						// -13: hard fault handler
-%% for pos in range(4 - 16, number_of_interrupts)
-%% 	if pos in interrupt_table
-	{{ (interrupt_table[pos] ~ ",") | lbuild.pad(39) }}// {{ (pos|string).rjust(3) }}
+%% for pos in range(4 - 16, highest_irq)
+%% 	if pos in vector_table
+	{{ (vector_table[pos] ~ ",") | lbuild.pad(39) }}// {{ (pos|string).rjust(3) }}
 %% 	else
 	Undefined_Handler,						// {{ (pos|string).rjust(3) }}
 %% 	endif

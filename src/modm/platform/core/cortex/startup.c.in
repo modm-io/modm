@@ -13,15 +13,10 @@
  */
 // ----------------------------------------------------------------------------
 
-%# Include Target Specific Files
-%% import 'platform.macros' as platform with context
-
 #include <stdint.h>
 #include <modm/architecture/utils.hpp>
 #include <modm/architecture/interface/assert.h>
 #include "../device.hpp"
-
-{{ platform.defines() }}
 
 // ----------------------------------------------------------------------------
 // Interrupt vectors
@@ -62,6 +57,9 @@ __libc_init_array(void);
 extern void
 __modm_initialize_memory(void);
 
+extern void
+__modm_initialize_platform(void);
+
 static void
 table_copy(uint32_t **table, uint32_t **end)
 {
@@ -92,17 +90,10 @@ table_zero(uint32_t **table, uint32_t **end)
 }
 
 // ----------------------------------------------------------------------------
-// This is the code that gets called when the processor first starts execution
-// following a reset event.  Only the absolutely necessary set is performed,
-// after which the application supplied main() routine is called.  Any fancy
-// actions (such as making decisions based on the reset cause register, and
-// resetting the bits in that register) are left solely in the hands of the
-// application.
 void
 Reset_Handler(void)
 {
-%# Enables all required internal memories
-{{ platform.enableInternalMemory() }}
+	__modm_initialize_platform();
 
 %% if options["stack_execution_guard"]
 	// fill the stack with relative branches to __stack_start
@@ -159,7 +150,7 @@ Reset_Handler(void)
 	SCB->CCR |= SCB_CCR_BFHFNMIGN_Msk | SCB_CCR_DIV_0_TRP_Msk;
 
 	// Lower priority level for all peripheral interrupts to lowest possible
-	for (uint32_t i = 0; i < {{ number_of_interrupts }}; i++) {
+	for (uint32_t i = 0; i < {{ highest_irq }}; i++) {
 		NVIC->IP[i] = 0xff;
 	}
 

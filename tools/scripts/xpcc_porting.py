@@ -218,10 +218,10 @@ if project_file:
                 subs["options"]["modm:platform:i2c:{}:transaction_buffer".format(k[2])] = config["parameters"][key]
             if k[0] in ["core"]:
                 if k[3] == "vector_table_in_ram":
-                    subs["options"]["modm:platform:core:vector_table_location"] = \
+                    subs["options"]["modm:platform:cortex-m:vector_table_location"] = \
                         "ram" if config["parameters"].getboolean(key) else "fastest"
                 if k[3] == "main_stack_size":
-                    subs["options"]["modm:platform:core:main_stack_size"] = config["parameters"][key]
+                    subs["options"]["modm:platform:cortex-m:main_stack_size"] = config["parameters"][key]
 
     subs["options"] = OrderedDict(sorted(subs["options"].items(), key=lambda t: t[0]))
     subs["modules"] = modules

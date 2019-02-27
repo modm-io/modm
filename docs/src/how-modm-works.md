@@ -347,7 +347,7 @@ sensible default size for its purpose.
 ```
  $ lbuild discover-module-options
 ...
-modm:platform:core:main_stack_size = 3040  [256 ... 65536]
+modm:platform:cortex-m:main_stack_size = 3040  [256 ... 65536]
 
   Minimum size of the application main stack
 ...

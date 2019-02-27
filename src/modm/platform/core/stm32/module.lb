@@ -1,0 +1,58 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2019, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = "core"
+    module.parent = "platform"
+    module.description = """\
+# STM32 core module
+
+Provides STM32 specific linkerscripts and startup code.
+"""
+
+def prepare(module, options):
+    if options[":target"].identifier.platform != "stm32":
+        return False
+
+    module.depends(":platform:cortex-m")
+    return True
+
+def build(env):
+    env.substitutions = {"target": env[":target"].identifier}
+    env.outbasepath = "modm/src/modm/platform/core"
+    # startup helper code
+    env.template("startup_platform.c.in")
+
+    properties = env.query("::cortex-m:memories")
+    target = env[":target"].identifier
+
+    if target.family in ["l4"]: # FIXME!
+        properties["regions"].remove("sram2")
+    if "backup" in properties["regions"]:
+        properties["regions"].remove("backup")
+
+    linkerscript = "ram"
+    for memory in properties["memories"]:
+        if memory["name"] == "ccm":
+            if "x" in memory["access"]:
+                # Executable CCM (Instruction Core-Coupled Memory)
+                linkerscript = "iccm"
+            else:
+                # Non-executable CCM (Data Core-Coupled Memory)
+                linkerscript = "dccm"
+        elif memory["name"] == "dtcm":
+            # Executable ITCM and DTCM (Tightly-Coupled Memory)
+            linkerscript = "idtcm"
+
+    env.substitutions = properties
+    env.outbasepath = "modm/link"
+    env.template("linkerscript/stm32_{}.ld.in".format(linkerscript), "linkerscript.ld")

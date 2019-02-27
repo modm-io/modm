@@ -1,4 +1,4 @@
-%% import "linker.macros" as linker with context
+%% import "../../cortex/linker.macros" as linker with context
 {{ linker.copyright() }}
 
 {{ linker.prefix() }}
@@ -24,7 +24,7 @@ SECTIONS
 
 {{ linker.section_heap("RAM", "heap1") }}
 
-{{ options["linkerscript.sections"] }}
+{{ options[":platform:cortex-m:linkerscript.sections"] }}
 
 	/* TABLES! TABLES! ALL THE TABLES YOU COULD EVER WANT! TABLES! */
 {{ linker.section_table_zero(["bss"]) }}

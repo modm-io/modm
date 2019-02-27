@@ -21,7 +21,7 @@ MEMORY
 	{{ memory.name | upper }} ({{ memory.access }}) : ORIGIN = {{ memory.start }}, LENGTH = {{ memory.size }}
 %% endfor
 	RAM (rwx) : ORIGIN = 0x{{ "%08x" % ram_origin }}, LENGTH = {{ ram_size }}
-{{ options["linkerscript.memory"] }}
+{{ options[":platform:cortex-m:linkerscript.memory"] }}
 }
 
 OUTPUT_FORMAT("elf32-littlearm")
@@ -33,7 +33,7 @@ ENTRY(Reset_Handler)
 /* the thread stack is used only for reporting hard fault conditions! It may therefore be small. */
 PROCESS_STACK_SIZE  = {{ process_stack_size }};
 /* the handler stack is used for main program as well as interrupts */
-MAIN_STACK_SIZE     = {{ options.main_stack_size }};
+MAIN_STACK_SIZE     = {{ options[":platform:cortex-m:main_stack_size"] }};
 /* combined stack size */
 TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 %% endmacro
@@ -125,14 +125,14 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 	.table.zero.extern : ALIGN(4)
 	{
 		__table_zero_extern_start = .;
-{{ options["linkerscript.table_extern.zero"] }}
+{{ options[":platform:cortex-m:linkerscript.table_extern.zero"] }}
 		__table_zero_extern_end = .;
 	} >FLASH
 
 	.table.copy.extern : ALIGN(4)
 	{
 		__table_copy_extern_start = .;
-{{ options["linkerscript.table_extern.copy"] }}
+{{ options[":platform:cortex-m:linkerscript.table_extern.copy"] }}
 		__table_copy_extern_end = .;
 	} >FLASH
 %% endmacro
@@ -161,7 +161,7 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		LONG(__{{ section.name }}_start)
 		LONG(__{{ section.name }}_end)
 	%% endfor
-{{ options["linkerscript.table_extern.heap"] }}
+{{ options[":platform:cortex-m:linkerscript.table_extern.heap"] }}
 		__table_heap_end = .;
 	} >FLASH
 %% endmacro

@@ -11,10 +11,85 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-import os
+def common_vector_table_location(env):
+    return env.get(":platform:cortex-m:vector_table_location", "rom")
+
+def common_vector_table(env):
+    """
+    Computes vector table properties:
+      - vector_table: [position] = Full vector name (ie. *with* _Handler or _IRQHandler suffix)
+      - vector_table_location: rom or ram
+      - highest_irq: highest IRQ number + 1
+      - core: cortex-m{0,3,4,7}{,+,f,fd}
+
+    The system vectors start at -16, so you must add 16 to `highest_irq` to get
+    the total number of vectors in the table!
+
+    :returns: a dictionary of vector table properties
+    """
+    device = env[":target"]
+    driver = device.get_driver("core")
+    core = driver["type"]
+
+    # Add common ARM Cortex-M exceptions
+    interrupts = {
+        -15: "Reset_Handler",
+        -14: "NMI_Handler",
+        -13: "HardFault_Handler",
+        -5: "SVC_Handler",
+        -2: "PendSV_Handler",
+        -1: "SysTick_Handler"
+    }
+    # The fault and debug handlers are ARMv7-M only
+    if "m0" not in core:
+        interrupts.update({
+            -12: "MemManage_Handler",
+            -11: "BusFault_Handler",
+            -10: "UsageFault_Handler",
+            -4: "DebugMon_Handler"
+        })
+    # Append `_IRQHandler` to all
+    for vector in driver["vector"]:
+        interrupts[int(vector["position"])] = vector["name"] + "_IRQHandler"
+
+    properties = {
+        "core": core,
+        "vector_table_location": common_vector_table_location(env),
+        "vector_table": interrupts,
+        "highest_irq": max(interrupts.keys()) + 1,
+    }
+    return properties
+
+
+def common_memories(env):
+    """
+    Computes memory properties:
+      - memories: unfiltered memory regions
+      - regions: memory region names
+      - ram_origin: Lowest SRAM origin address
+      - ram_origin: Total size of all SRAM regions
+      - process_stack_size: requested process stack
+      - vector_table_location: ram or rom
+
+    :returns: dictionary of memory properties
+    """
+    device = env[":target"]
+    memories = listify(device.get_driver("core")["memory"])
+    process_stack_size = 0
+    if env.get(":platform:fault.cortex:led", "disabled") == "disabled":
+        process_stack_size = 32
+    properties = {
+        "memories": memories,
+        "regions": [m["name"] for m in memories],
+        "ram_origin": min(int(m["start"], 16) for m in memories if "sram" in m["name"]),
+        "ram_size": sum(int(m["size"]) for m in memories if "sram" in m["name"]),
+        "process_stack_size": process_stack_size,
+        "vector_table_location": common_vector_table_location(env),
+    }
+    return properties
 
 def init(module):
-    module.name = "core"
+    module.name = "cortex-m"
     module.parent = "platform"
     module.description = FileReader("module.md")
 
@@ -47,6 +122,15 @@ def prepare(module, options):
             enumeration=["newlib", "block", "tlsf"],
             default="newlib",
             dependencies=lambda value: ":tlsf" if value == "tlsf" else None))
+    module.add_option(
+        NumericOption(
+            name="main_stack_size",
+            description=FileReader("option/main_stack_size.md"),
+            minimum=2 ** 8,
+            maximum=2 ** 16,
+            default=2 ** 10 * 3 - 32))
+
+    # Cortex-M0 does not have remappable vector table, so it will remain in Flash
     if not options[":target"].has_driver("core:cortex-m0*"):
         memories = listify(options[":target"].get_driver("core")["memory"])
         default_location = "rom"
@@ -58,13 +142,6 @@ def prepare(module, options):
                 description=FileReader("option/vector_table_location.md"),
                 enumeration=["rom", "ram"],
                 default=default_location))
-    module.add_option(
-        NumericOption(
-            name="main_stack_size",
-            description=FileReader("option/main_stack_size.md"),
-            minimum=2 ** 8,
-            maximum=2 ** 16,
-            default=2 ** 10 * 3 - 32))
 
     module.add_option(
         StringOption(
@@ -92,71 +169,15 @@ def prepare(module, options):
             description="",
             default=""))
 
+    module.add_query(
+        EnvironmentQuery(name="vector_table", factory=common_vector_table))
+    module.add_query(
+        EnvironmentQuery(name="memories", factory=common_memories))
+
     return True
 
 def build(env):
-    device = env[":target"]
-    driver = device.get_driver("core")
-
-    properties = device.properties
-    properties["target"] = target = device.identifier
-    properties["driver"] = driver
-    # Cortex-M0 does not have remappable vector table, so it will remain in Flash
-    properties["vector_table_location"] = env.get("vector_table_location", "rom")
-    properties["core"] = driver["type"]
-    properties["process_stack_size"] = 0
-    if env.get(":platform:fault.cortex:led", None):
-        properties["process_stack_size"] = 32
-
-    # Add ARM Cortex-M exceptions
-    interrupts = {
-        -15: "Reset_Handler",
-        -14: "NMI_Handler",
-        -13: "HardFault_Handler",
-        -5: "SVC_Handler",
-        -2: "PendSV_Handler",
-        -1: "SysTick_Handler"
-    }
-    if properties["core"] != "cortex-m0":
-        interrupts.update({
-            -12: "MemManage_Handler",
-            -11: "BusFault_Handler",
-            -10: "UsageFault_Handler",
-            -4: "DebugMon_Handler"
-        })
-    # Append `_IRQHandler` to all
-    for vector in driver["vector"]:
-        interrupts[int(vector["position"])] = vector["name"] + "_IRQHandler"
-
-    memories = [m for m in listify(driver["memory"]) if m["name"] != "backup"]
-    properties.update({
-        "interrupt_table": interrupts,
-        "number_of_interrupts": max(interrupts.keys()) + 1,
-        "memories": memories,
-        "regions": [m["name"] for m in memories],
-        "ram_origin": min(int(m["start"], 16) for m in memories if "sram" in m["name"]),
-        "ram_size": sum(int(m["size"]) for m in memories if "sram" in m["name"]),
-    })
-    if target["family"] in ["l4"]: # FIXME!
-        properties["regions"].remove("sram2")
-
-    linkerscript = "ram"
-    for memory in memories:
-        if memory["name"] == "ccm":
-            if "x" in memory["access"]:
-                # Executable CCM (Instruction Core-Coupled Memory)
-                linkerscript = "iccm"
-            else:
-                # Non-executable CCM (Data Core-Coupled Memory)
-                linkerscript = "dccm"
-        elif memory["name"] == "dtcm":
-            # Executable ITCM and DTCM (Tightly-Coupled Memory)
-            linkerscript = "idtcm"
-
-    env.substitutions = properties
-    env.outbasepath = "modm/link"
-    env.template("linkerscript/stm32_{}.ld.in".format(linkerscript), "linkerscript.ld")
-
+    env.substitutions = env.query("vector_table")
     env.outbasepath = "modm/src/modm/platform/core"
 
     # dealing with runtime assertions

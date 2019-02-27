@@ -23,14 +23,8 @@ modm_gpio_enable(void)
 %% elif target["family"] in ["f1"]
 %%	set clock_tree = "APB2"
 %%	set prefix = "IOP"
-	RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
 %% elif target["family"] in ["l4"]
 %%  set clock_tree = 'AHB2'
-%% endif
-
-%% if target["family"] not in ["f1"]
-	// Enable SYSCFG
-	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
 %% endif
 
 %% if target["family"] in ["f2", "f4", "f7"]
