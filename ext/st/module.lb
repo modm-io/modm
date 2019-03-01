@@ -83,7 +83,7 @@ def common_rcc_map(env):
     # print("\n".join([s+" -> "+hex(a) for (s,k,a) in peripherals]))
 
     # Find all RCC enable and reset definitions
-    match = re.findall(r"RCC_([A-Z0-9]+?)_([A-Z0-9]+?)_(EN|RST) ", content)
+    match = re.findall(r"RCC_([A-Z0-9]*?)_([A-Z0-9]+?)(EN|RST) ", content)
     rcc_map = defaultdict(dict)
     for (reg, per, typ) in match:
         rcc_map[per][typ] = reg
