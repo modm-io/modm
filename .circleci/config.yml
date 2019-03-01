@@ -246,7 +246,7 @@ jobs:
           command: |
             (git submodule sync && git submodule update --init --jobs 8) &
             pip3 install -U lbuild &
-            git clone git@github.com:modm-io/modm.io.git docs/modm.io &
+            git clone git@github.com:modm-ext/modm.io.git docs/modm.io &
             wait
       - run:
           name: Build Homepage

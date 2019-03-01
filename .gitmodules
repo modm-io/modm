@@ -12,7 +12,7 @@
 	url = https://github.com/modm-io/ros-lib
 [submodule "ext/arm/cmsis"]
 	path = ext/arm/cmsis
-	url = https://github.com/modm-io/cmsis-5-partial.git
+	url = https://github.com/modm-ext/cmsis-5-partial.git
 [submodule "ext/gcc/libstdc++"]
 	path = ext/gcc/libstdc++
 	url = https://github.com/modm-io/avr-libstdcpp.git
