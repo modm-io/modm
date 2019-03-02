@@ -34,7 +34,7 @@ int
 main()
 {
 	SPI::connect<Sck::BitBang, Mosi::BitBang>();
-	SPI::initialize<systemClock, 1000000>();
+	SPI::initialize<systemClock, 1_MHz>();
 
 	Backlight::setOutput();
 	Backlight::set();

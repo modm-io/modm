@@ -12,6 +12,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
+using namespace modm::literals;
 
 // If you use a different SPI instance, you may have to also choose different
 // GPIOs to connect to.
@@ -30,7 +31,7 @@ main()
 	// Connect the GPIOs to the SPIs alternate function
 	SpiMaster::connect<Miso::Miso, Mosi::Mosi, Sck::Sck>();
 	// Initialize the SPI with a 20MHz clock
-	SpiMaster::initialize<Board::systemClock, MHz20>();
+	SpiMaster::initialize<Board::systemClock, 20_MHz>();
 
 	uint8_t data = 0;
 	while (1)

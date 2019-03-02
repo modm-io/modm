@@ -17,6 +17,7 @@
 #include <modm/architecture/interface/clock.hpp>
 
 using namespace modm::platform;
+using namespace modm::literals;
 using systemClock = SystemClock;
 
 namespace touch
@@ -83,7 +84,7 @@ main()
 	led::B::setOutput();
 
 	lcd::SPI::connect<lcd::Scl::BitBang, lcd::Mosi::BitBang>();
-	lcd::SPI::initialize<systemClock, MHz2>();
+	lcd::SPI::initialize<systemClock, 2_MHz>();
 
 	display.initialize();
 
@@ -96,7 +97,7 @@ main()
 
 	display.update();
 
-	Adc::initialize<systemClock, 115000>();
+	Adc::initialize<systemClock, 115_kHz>();
 	Adc::setReference(Adc::Reference::Internal2V56);
 
 	touch::Bottom::setInput();

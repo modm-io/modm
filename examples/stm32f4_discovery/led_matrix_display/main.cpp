@@ -57,7 +57,7 @@ main()
 	Clk::setOutput();
 
 	Spi::connect<Clk::BitBang, Data::BitBang>();
-	Spi::initialize< Board::systemClock, 10000000 >();
+	Spi::initialize< Board::systemClock, 10_MHz>();
 
 	ledMatrixDisplay.initialize();
 

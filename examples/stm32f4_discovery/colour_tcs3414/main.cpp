@@ -128,7 +128,7 @@ main()
 	Usart2::initialize<Board::systemClock, modm::Uart::B115200>();
 
 	MyI2cMaster::connect<GpioB11::Sda, GpioB10::Scl>();
-	MyI2cMaster::initialize<Board::systemClock, 100000>();
+	MyI2cMaster::initialize<Board::systemClock, 100_kHz>();
 
 	stream << "\n\nWelcome to TCS3414 demo!\n\n";
 

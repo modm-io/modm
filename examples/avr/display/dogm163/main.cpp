@@ -37,7 +37,7 @@ int
 main()
 {
 	SPI::connect<lcd::Scl::BitBang, lcd::Mosi::BitBang, lcd::Miso::BitBang>();
-	SPI::initialize<systemClock, 1000000>();
+	SPI::initialize<systemClock, 1_MHz>();
 	lcd::Cs::setOutput();
 	lcd::Rs::setOutput();
 

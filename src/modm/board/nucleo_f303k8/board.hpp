@@ -24,11 +24,12 @@ using namespace modm::platform;
 /// @ingroup modm_board_nucleo_f303k8
 namespace Board
 {
+	using namespace modm::literals;
 
 /// STM32F303K8 running at 64MHz generated from the internal 8MHz clock
 // Dummy clock for devices
 struct systemClock {
-	static constexpr uint32_t Frequency = 64 * MHz1;
+	static constexpr uint32_t Frequency = 64_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency / 2;
 	static constexpr uint32_t Apb2 = Frequency;

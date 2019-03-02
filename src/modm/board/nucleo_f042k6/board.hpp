@@ -25,11 +25,12 @@ using namespace modm::platform;
 /// @ingroup modm_board_nucleo_f042k6
 namespace Board
 {
+	using namespace modm::literals;
 
 /// STM32F042K6 running at 48MHz generated from the internal 8MHz crystal
 // Dummy clock for devices
 struct systemClock {
-	static constexpr uint32_t Frequency = MHz48;
+	static constexpr uint32_t Frequency = 48_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb = Frequency;
 

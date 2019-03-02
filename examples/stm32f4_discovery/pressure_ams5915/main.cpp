@@ -103,7 +103,7 @@ main()
 	Usart2::initialize<Board::systemClock, modm::Uart::B115200>(10);
 
 	MyI2cMaster::connect<GpioB10::Scl, GpioB11::Sda>();
-	MyI2cMaster::initialize<Board::systemClock, 400000>();
+	MyI2cMaster::initialize<Board::systemClock, 400_kHz>();
 
 	MODM_LOG_INFO << "\n\nWelcome to AMSYS 5915 pressure sensor demo!\n\n";
 

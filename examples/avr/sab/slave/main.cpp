@@ -31,7 +31,7 @@ public:
 	AnalogDigital()
 	{
 		// initialize the analog to digital converter
-		Adc::initialize<systemClock, 115000>();
+		Adc::initialize<systemClock, 115_kHz>();
 		Adc::setReference(Adc::Reference::InternalVcc);
 	}
 

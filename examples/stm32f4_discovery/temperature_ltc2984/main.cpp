@@ -150,7 +150,7 @@ main()
 	// Connect the GPIOs to the SPIs alternate function
 	SpiMaster::connect<Sck::Sck, Mosi::Mosi, Miso::Miso>();
 	// Initialize the SPI with a 1.3MHz clock
-	SpiMaster::initialize<Board::systemClock, 1312500>();
+	SpiMaster::initialize<Board::systemClock, 1.3125_MHz>();
 
 	logger << "\n\nWelcome to LTC2983/LTC2984 demo!\n\n";
 

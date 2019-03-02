@@ -27,11 +27,12 @@ using namespace modm::platform;
 /// @ingroup modm_board_disco_f769ni
 namespace Board
 {
+	using namespace modm::literals;
 
 /// STM32F7 running at 216MHz from the external 25MHz clock
 struct systemClock
 {
-	static constexpr uint32_t Frequency = MHz216;
+	static constexpr uint32_t Frequency = 216_MHz;
 	static constexpr uint32_t Apb1 = Frequency / 8;
 	static constexpr uint32_t Apb2 = Frequency / 4;
 

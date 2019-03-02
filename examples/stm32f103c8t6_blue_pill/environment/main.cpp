@@ -52,10 +52,10 @@ main()
 	// ------------------------------------------------------------------------
 	// I2C for sensors
 	SensorsAI2cMaster::connect<GpioB6::Scl, GpioB7::Sda>();
-	SensorsAI2cMaster::initialize<Board::systemClock, 10000>();
+	SensorsAI2cMaster::initialize<Board::systemClock, 10_kHz>();
 
 	SensorsBI2cMaster::connect<GpioB10::Scl, GpioB11::Sda>();
-	SensorsBI2cMaster::initialize<Board::systemClock, 10000>();
+	SensorsBI2cMaster::initialize<Board::systemClock, 10_kHz>();
 
 	// ------------------------------------------------------------------------
 	// initialize Uart2 for MODM_LOG_*

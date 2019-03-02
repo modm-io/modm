@@ -22,16 +22,17 @@ using namespace modm::platform;
 /// @ingroup modm_board_stm32f030_demo
 namespace Board
 {
+	using namespace modm::literals;
 
 /// STM32F030 running at 48MHz generated from the external 8MHz crystal
 // Dummy clock for devices
 struct systemClock {
-	static constexpr uint32_t Frequency = MHz48;
+	static constexpr uint32_t Frequency = 48_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb = Frequency;
 
-	static constexpr uint32_t Hsi = MHz8;
-	static constexpr uint32_t Hsi14 = 14 * MHz1;
+	static constexpr uint32_t Hsi = 8_MHz;
+	static constexpr uint32_t Hsi14 = 14_MHz;
 
 	static constexpr uint32_t Adc1 = Hsi14;
 

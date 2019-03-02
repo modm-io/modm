@@ -22,11 +22,12 @@ using namespace modm::platform;
 /// @ingroup modm_board_disco_f051r8
 namespace Board
 {
+	using namespace modm::literals;
 
 /// STM32F0 running at 48MHz generated from the internal 8MHz with PLL.
 struct systemClock
 {
-	static constexpr int Frequency = MHz48;
+	static constexpr int Frequency = 48_MHz;
 	static constexpr int Usart1 = Frequency;
 	static constexpr int Usart2 = Frequency;
 	static constexpr int Spi2 = Frequency;

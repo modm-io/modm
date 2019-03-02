@@ -88,7 +88,7 @@ public:
 		Cs::setOutput(modm::Gpio::High);
 
 		SpiMaster1::connect<GpioOutputA7::Mosi, GpioOutputA5::Sck, GpioInputA6::Miso>();
-		SpiMaster1::initialize<Board::systemClock, 2250000ul>();
+		SpiMaster1::initialize<Board::systemClock, 2.25_MHz>();
 		SpiMaster1::setDataMode(SpiMaster1::DataMode::Mode3);
 
 		adns9800::initialise();

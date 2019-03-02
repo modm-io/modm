@@ -59,10 +59,10 @@ modm::platform::Rcc::enableExternalCrystal(uint32_t f_kHz, uint32_t)
 {
 	LPC_SYSCON->PDRUNCFG &= ~PDRUNCFG_SYSOSC_PD;	// powerup
 	LPC_SYSCON->SYSOSCCTRL &= ~SYSOSCCTRL_BYPASS;	// do not bypass
-	if(f_kHz >= u32kHz(MHz1) && f_kHz <= u32kHz(MHz17)) {
+	if(f_kHz >= u32kHz(1_MHz) && f_kHz <= u32kHz(17_MHz)) {
 		LPC_SYSCON->SYSOSCCTRL &= ~SYSOSCCTRL_FREQRANGE; // 1-20MHz
 	}
-	else if (f_kHz >= u32kHz(MHz17) && f_kHz <= u32kHz(MHz25)) {
+	else if (f_kHz >= u32kHz(17_MHz) && f_kHz <= u32kHz(25_MHz)) {
 		LPC_SYSCON->SYSOSCCTRL |= SYSOSCCTRL_FREQRANGE; // 15-25MHz
 	}
 	else return false;	// should not get here

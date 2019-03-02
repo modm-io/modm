@@ -15,6 +15,7 @@
 #include <modm/driver/radio/nrf24/nrf24_phy.hpp>
 #include <modm/debug/logger.hpp>
 #include <inttypes.h>
+using namespace modm::literals;
 
 /*
  * Test SPI communication by writing and reading out registers on the
@@ -64,7 +65,7 @@ main()
 
 	// Enable SPI 2
 	SpiMaster2::connect<GpioB15::Mosi, GpioB14::Miso, GpioB13::Sck>();
-	SpiMaster2::initialize<Board::systemClock, MHz10>();
+	SpiMaster2::initialize<Board::systemClock, 10_MHz>();
 
 	// Enable UART 2
 	Usart2::connect<GpioA2::Tx>();

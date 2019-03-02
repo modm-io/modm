@@ -24,13 +24,14 @@ using namespace modm::platform;
 /// @ingroup modm_board_disco_l476vg
 namespace Board
 {
+	using namespace modm::literals;
 
 /// STM32L4 running at 48MHz generated from the
 /// internal Multispeed oscillator
 
 // Dummy clock for devices
 struct systemClock {
-	static constexpr uint32_t Frequency = 48 * MHz1;
+	static constexpr uint32_t Frequency = 48_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency;
 	static constexpr uint32_t Apb2 = Frequency;

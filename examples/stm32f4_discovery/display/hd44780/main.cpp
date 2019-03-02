@@ -196,7 +196,7 @@ main()
 	MODM_LOG_INFO << "\n\nWelcome to HD44780 I2C demo!\n\n";
 
 	MyI2cMaster::connect<GpioB11::Sda, GpioB10::Scl>(MyI2cMaster::PullUps::Internal);
-	MyI2cMaster::initialize<Board::systemClock, 100000>();
+	MyI2cMaster::initialize<Board::systemClock, 100_kHz>();
 
 	modm::ShortPeriodicTimer tmr(500);
 

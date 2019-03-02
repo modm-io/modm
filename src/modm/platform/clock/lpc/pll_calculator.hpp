@@ -15,7 +15,6 @@
 
 #include "../generic/common_clock.hpp"
 
-using namespace modm::clock;
 
 namespace modm
 {
@@ -27,8 +26,8 @@ namespace modm
 		Lpc11PllSettings
 		{
 		private:
-			static constexpr int64_t InputMin  = MHz10;
-			static constexpr int64_t InputMax  = MHz25;
+			static constexpr int64_t InputMin  = 10_MHz;
+			static constexpr int64_t InputMax  = 25_MHz;
 			// Pll Constant Range
 			static constexpr int64_t Mmin =   1;
 			static constexpr int64_t Mmax =  32;

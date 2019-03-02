@@ -40,7 +40,7 @@ main()
 	Backlight::set();
 
 	SPI::connect<Sck::BitBang, Mosi::BitBang>();
-	SPI::initialize<systemClock, 1000000>();
+	SPI::initialize<systemClock, 1_MHz>();
 
 	display.initialize();
 	display.setFont(modm::font::Assertion);

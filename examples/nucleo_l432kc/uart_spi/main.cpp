@@ -21,7 +21,7 @@ main()
 
 	// Enable Uart SPI 1
 	UartSpiMaster1::connect<GpioA8::Ck, GpioA9::Tx, GpioA10::Rx>();
-	UartSpiMaster1::initialize<Board::systemClock, 1'000'000, modm::Tolerance::Exact>();
+	UartSpiMaster1::initialize<Board::systemClock, 1_MHz, modm::Tolerance::Exact>();
 
 	while (1)
 	{

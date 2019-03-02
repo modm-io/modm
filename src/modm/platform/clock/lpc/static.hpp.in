@@ -23,7 +23,6 @@
 #include "pll_calculator.hpp"
 #include "clock.hpp"
 
-using namespace modm::clock;
 
 namespace modm
 {

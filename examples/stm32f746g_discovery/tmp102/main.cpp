@@ -104,7 +104,7 @@ main()
 	Board::LedD13::setOutput(modm::Gpio::Low);
 
 	MyI2cMaster::connect<Board::D14::Sda, Board::D15::Scl>();
-	MyI2cMaster::initialize<Board::systemClock, 400'000>();
+	MyI2cMaster::initialize<Board::systemClock, 400_kHz>();
 
 	MODM_LOG_INFO << "\n\nRESTART\n\n";
 

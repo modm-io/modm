@@ -111,7 +111,7 @@ main()
 	Usart2::initialize<Board::systemClock, modm::Uart::B38400>();
 
 	MyI2cMaster::connect<GpioB7::Sda, GpioB8::Scl>(MyI2cMaster::PullUps::Internal);
-	MyI2cMaster::initialize<Board::systemClock, 100000>();
+	MyI2cMaster::initialize<Board::systemClock, 100_kHz>();
 
 	stream << "\n\nRESTART\n\n";
 

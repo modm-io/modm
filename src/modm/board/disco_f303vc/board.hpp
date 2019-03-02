@@ -24,11 +24,12 @@ using namespace modm::platform;
 /// @ingroup modm_board_disco_f303vc
 namespace Board
 {
+	using namespace modm::literals;
 
 /// STM32F303 running at 72MHz generated from the external 8MHz clock
 /// supplied by the on-board st-link
 struct systemClock {
-	static constexpr uint32_t Frequency = 72 * MHz1;
+	static constexpr uint32_t Frequency = 72_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency / 2;
 	static constexpr uint32_t Apb2 = Frequency;
@@ -196,7 +197,7 @@ initializeL3g()
 	l3g::Cs::setOutput(modm::Gpio::High);
 
 	l3g::SpiMaster::connect<l3g::Sck::Sck, l3g::Mosi::Mosi, l3g::Miso::Miso>();
-	l3g::SpiMaster::initialize<systemClock, 9000000>();
+	l3g::SpiMaster::initialize<systemClock, 9_MHz>();
 	l3g::SpiMaster::setDataMode(l3g::SpiMaster::DataMode::Mode3);
 }
 
@@ -220,7 +221,7 @@ initializeLsm3()
 //	lsm3::Drdy::enableExternalInterruptVector(12);
 
 	lsm3::I2cMaster::connect<lsm3::Scl::Scl, lsm3::Sda::Sda>();
-	lsm3::I2cMaster::initialize<systemClock, 400000>();
+	lsm3::I2cMaster::initialize<systemClock, 400_kHz>();
 }
 
 

@@ -24,11 +24,12 @@ using namespace modm::platform;
 /// @ingroup modm_board_nucleo_f401re
 namespace Board
 {
+	using namespace modm::literals;
 
 /// STM32F401RE running at 84MHz generated from the internal 16MHz crystal
 // Dummy clock for devices
 struct systemClock {
-	static constexpr uint32_t Frequency = 84 * MHz1;
+	static constexpr uint32_t Frequency = 84_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency / 2;
 	static constexpr uint32_t Apb2 = Frequency;

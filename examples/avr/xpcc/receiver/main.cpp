@@ -19,6 +19,7 @@
 #include <modm/driver/can/mcp2515.hpp>
 
 using namespace modm::platform;
+using namespace modm::literals;
 using systemClock = SystemClock;
 
 // set new log level
@@ -91,12 +92,12 @@ main()
 	// Initialize SPI interface and the other pins
 	// needed by the MCP2515
 	SPI::connect<Sclk::BitBang, Mosi::BitBang, Miso::BitBang>();
-	SPI::initialize<systemClock, 1000000>();
+	SPI::initialize<systemClock, 1_MHz>();
 	Cs::setOutput();
 	Int::setInput(Gpio::InputType::PullUp);
 
 	// Configure MCP2515 and set the filters
-	device.initialize<modm::clock::MHz8, modm::Can::Bitrate::kBps125>();
+	device.initialize<8_MHz, modm::Can::Bitrate::kBps125>();
 	device.setFilter(modm::accessor::asFlash(canFilter));
 
 	// Enable Interrupts

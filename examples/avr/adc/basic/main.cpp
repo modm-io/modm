@@ -36,7 +36,7 @@ main()
 	// Initialize the analog to digital converter
 	// With the AVR running at 14.7456Mhz and a prescaler of 128 the
 	// ADC is running at 115kHz.
-	Adc::initialize<systemClock, 115000>();
+	Adc::initialize<systemClock, 115_kHz>();
 	Adc::setReference(Adc::Reference::InternalVcc);
 
 	// read the value of channel 0 (=> ADC0 => PA0) and wait until

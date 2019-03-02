@@ -15,6 +15,7 @@
 #include <modm/driver/can/mcp2515.hpp>
 
 using namespace modm::platform;
+using namespace modm::literals;
 using systemClock = SystemClock;
 
 typedef GpioOutputB4 Cs;
@@ -50,12 +51,12 @@ main()
 	// Initialize SPI interface and the other pins
 	// needed by the MCP2515
 	SPI::connect<Sclk::Sck, Mosi::Mosi, Miso::Miso>();
-	SPI::initialize<systemClock, 921600>();
+	SPI::initialize<systemClock, 921.6_kHz>();
 	Cs::setOutput();
 	Int::setInput(Gpio::InputType::PullUp);
 
 	// Configure MCP2515 and set the filters
-	mcp2515.initialize<modm::clock::MHz8, modm::Can::Bitrate::kBps125>();
+	mcp2515.initialize<8_MHz, modm::Can::Bitrate::kBps125>();
 	mcp2515.setFilter(modm::accessor::asFlash(canFilter));
 
 	// Create a new message

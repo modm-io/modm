@@ -15,7 +15,6 @@
 #include <stdint.h>
 #include "common.hpp"
 
-using namespace modm::clock;
 
 namespace modm
 {

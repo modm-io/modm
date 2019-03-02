@@ -18,6 +18,7 @@
 #include <modm/processing/timer.hpp>
 
 using namespace modm::platform;
+using namespace modm::literals;
 using systemClock = SystemClock;
 
 typedef GpioOutputB0 LedGreen;
@@ -83,12 +84,12 @@ main()
 	// Initialize SPI interface and the other pins
 	// needed by the MCP2515
 	SPI::connect<Sclk::BitBang, Mosi::BitBang, Miso::BitBang>();
-	SPI::initialize<systemClock, 1000000>();
+	SPI::initialize<systemClock, 1_MHz>();
 	Cs::setOutput();
 	Int::setInput(Gpio::InputType::PullUp);
 
 	// Configure MCP2515 and set the filters
-	mcp2515.initialize<modm::clock::MHz8, modm::Can::Bitrate::kBps125>();
+	mcp2515.initialize<8_MHz, modm::Can::Bitrate::kBps125>();
 	mcp2515.setFilter(modm::accessor::asFlash(canFilter));
 
 	// Create a new message

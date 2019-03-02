@@ -28,11 +28,12 @@ using namespace modm::platform;
 /// @ingroup modm_board_disco_f469ni
 namespace Board
 {
+	using namespace modm::literals;
 
 /// STM32F469 running at 180MHz from the external 8MHz crystal
 struct systemClock
 {
-	static constexpr uint32_t Frequency = MHz180;
+	static constexpr uint32_t Frequency = 180_MHz;
 	static constexpr uint32_t Apb1 = Frequency / 4;
 	static constexpr uint32_t Apb2 = Frequency / 2;
 
@@ -165,7 +166,7 @@ initializeTouchscreen()
 //	ft6::Int::enableExternalInterruptVector(12);
 
 	ft6::I2cMaster::connect<ft6::Scl::Scl, ft6::Sda::Sda>();
-	ft6::I2cMaster::initialize<systemClock, 360000>();
+	ft6::I2cMaster::initialize<systemClock, 360_kHz>();
 }
 
 void

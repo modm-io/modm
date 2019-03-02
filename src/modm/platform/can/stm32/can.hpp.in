@@ -24,7 +24,6 @@
 #include "error_code.hpp"
 #include "can_filter.hpp"
 
-using namespace modm::clock; // for MHzxx
 
 namespace modm
 {

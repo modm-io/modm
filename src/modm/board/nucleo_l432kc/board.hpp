@@ -23,11 +23,12 @@ using namespace modm::platform;
 /// @ingroup modm_board_nucleo_l432kc
 namespace Board
 {
+	using namespace modm::literals;
 
 /// STM32L4 running at 80MHz generated with the PLL from 4MHz MSI clock
 
 struct systemClock {
-	static constexpr uint32_t Frequency = 80 * MHz1;
+	static constexpr uint32_t Frequency = 80_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency;
 	static constexpr uint32_t Apb2 = Frequency;

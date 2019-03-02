@@ -17,6 +17,12 @@
 namespace modm
 {
 
+namespace literals
+{
+	constexpr uint16_t operator "" _percent(long double percent)
+	{ return percent * 10; }
+}
+
 /**
  * This class checks if values are within a certain tolerance.
  *

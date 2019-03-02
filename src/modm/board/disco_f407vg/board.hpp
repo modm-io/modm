@@ -24,10 +24,11 @@ using namespace modm::platform;
 /// @ingroup modm_board_disco_f407vg
 namespace Board
 {
+	using namespace modm::literals;
 
 /// STM32F407 running at 168MHz generated from the external 8MHz crystal
 struct systemClock {
-	static constexpr uint32_t Frequency = 168 * MHz1;
+	static constexpr uint32_t Frequency = 168_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency / 4;
 	static constexpr uint32_t Apb2 = Frequency / 2;
@@ -192,7 +193,7 @@ initializeLis3()
 	lis3::Cs::setOutput(modm::Gpio::High);
 
 	lis3::SpiMaster::connect<lis3::Sck::Sck, lis3::Mosi::Mosi, lis3::Miso::Miso>();
-	lis3::SpiMaster::initialize<systemClock, MHz10>();
+	lis3::SpiMaster::initialize<systemClock, 10_MHz>();
 	lis3::SpiMaster::setDataMode(lis3::SpiMaster::DataMode::Mode3);
 }
 

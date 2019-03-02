@@ -19,7 +19,6 @@
 #include <modm/platform/device.hpp>
 // #include "static.hpp"
 
-using namespace modm::clock;
 
 namespace modm
 {
@@ -119,16 +118,16 @@ namespace modm
 			static inline uint32_t
 			setFlashLatency(const uint32_t CPU_Frequency, const uint16_t /*mV*/ = 3300)
 			{
-				if (CPU_Frequency <= MHz20) {
+				if (CPU_Frequency <= 20_MHz) {
 					LPC_FLASHCTRL->FLASHCFG = 0;
 				}
-				else if (CPU_Frequency <= MHz40) {
+				else if (CPU_Frequency <= 40_MHz) {
 					LPC_FLASHCTRL->FLASHCFG = 1;
 				}
 				else {
 					LPC_FLASHCTRL->FLASHCFG = 2;
 				}
-				return MHz50;
+				return 50_MHz;
 			}
 
 			static inline uint32_t

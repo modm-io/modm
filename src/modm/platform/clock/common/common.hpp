@@ -28,6 +28,5 @@ extern uint16_t ns_per_loop;
 
 }
 
-using namespace modm::clock;
 
 #endif	// MODM_COMMON_CLOCK_HPP

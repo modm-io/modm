@@ -22,11 +22,12 @@ using namespace modm::platform;
 /// @ingroup modm_board_disco_f100rb
 namespace Board
 {
+	using namespace modm::literals;
 
 /// STM32F100 running at 24MHz generated from the external 8MHz crystal
 /// supplied by the on-board st-link
 struct systemClock {
-	static constexpr uint32_t Frequency = 24 * MHz1;
+	static constexpr uint32_t Frequency = 24_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency;
 	static constexpr uint32_t Apb2 = Frequency;
