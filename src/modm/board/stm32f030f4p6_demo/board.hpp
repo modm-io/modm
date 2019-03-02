@@ -50,22 +50,22 @@ struct systemClock {
 	static bool inline
 	enable()
 	{
-		ClockControl::enableExternalCrystal();
+		Rcc::enableExternalCrystal();
 
 		// external clock / 1 * 6 = 48MHz
-		ClockControl::enablePll(ClockControl::PllSource::ExternalCrystal, 6, 1);
+		Rcc::enablePll(Rcc::PllSource::ExternalCrystal, 6, 1);
 
 		// set flash latency for 48MHz
-		ClockControl::setFlashLatency(Frequency);
+		Rcc::setFlashLatency(Frequency);
 
 		// switch system clock to PLL output
-		ClockControl::enableSystemClock(ClockControl::SystemClockSource::Pll);
+		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
 
 		// AHB has max 48MHz
-		ClockControl::setAhbPrescaler(ClockControl::AhbPrescaler::Div1);
+		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
 
 		// APB1 has max. 48MHz
-		ClockControl::setApbPrescaler(ClockControl::ApbPrescaler::Div1);
+		Rcc::setApbPrescaler(Rcc::ApbPrescaler::Div1);
 
 
 		// update frequencies for busy-wait delay functions

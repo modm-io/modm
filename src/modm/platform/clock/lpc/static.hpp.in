@@ -32,7 +32,7 @@ namespace modm
 		/*
 		 * Used to setup pll with constants
 		 */
-		template<int InputFrequency, int OutputFrequency, ClockControl::PllSource Source>
+		template<int InputFrequency, int OutputFrequency, Rcc::PllSource Source>
 		class PllSetup
 		{
 		private:
@@ -41,7 +41,7 @@ namespace modm
 			static StartupError
 			enable()
 			{
-				ClockControl::enablePll(Source, p::PllM, p::PllP);
+				Rcc::enablePll(Source, p::PllM, p::PllP);
 				modm::clock::fcpu     = OutputFrequency;
 				modm::clock::fcpu_kHz = OutputFrequency / 1000;
 				modm::clock::fcpu_MHz = OutputFrequency / 1000000;

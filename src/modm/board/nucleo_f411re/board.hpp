@@ -64,21 +64,21 @@ struct systemClock {
 	static bool inline
 	enable()
 	{
-		ClockControl::enableInternalClock();	// 16MHz
-		ClockControl::enablePll(
-			ClockControl::PllSource::InternalClock,
+		Rcc::enableInternalClock();	// 16MHz
+		Rcc::enablePll(
+			Rcc::PllSource::InternalClock,
 			4,	// 16MHz / N=4 -> 4MHz
 			96,	// 4MHz * M=96 -> 384MHz
 			4	// 384MHz / P=4 -> 96MHz = F_cpu
 		);
 		// set flash latency for 96MHz
-		ClockControl::setFlashLatency(Frequency);
+		Rcc::setFlashLatency(Frequency);
 		// switch system clock to PLL output
-		ClockControl::enableSystemClock(ClockControl::SystemClockSource::Pll);
-		ClockControl::setAhbPrescaler(ClockControl::AhbPrescaler::Div1);
+		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
+		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
 		// APB1 has max. 50MHz
-		ClockControl::setApb1Prescaler(ClockControl::Apb1Prescaler::Div2);
-		ClockControl::setApb2Prescaler(ClockControl::Apb2Prescaler::Div1);
+		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div2);
+		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div1);
 		// update frequencies for busy-wait delay functions
 		modm::clock::fcpu     = Frequency;
 		modm::clock::fcpu_kHz = Frequency / 1000;

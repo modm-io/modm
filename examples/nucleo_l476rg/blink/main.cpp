@@ -21,9 +21,9 @@ main()
 
 	// Output MSI Clock at MCO
 	// 48 MHz / 16 = 3 MHz expected at PA8
-	ClockControl::enableClockOutput(
-		ClockControl::ClockOutputSource::MultiSpeedInternalClock,
-		ClockControl::ClockOutputPrescaler::Div16);
+	Rcc::enableClockOutput(
+		Rcc::ClockOutputSource::MultiSpeedInternalClock,
+		Rcc::ClockOutputPrescaler::Div16);
 
 	GpioConnector<Peripheral::Rcc, GpioA8::Mco>::connect();
 

@@ -77,19 +77,19 @@ struct systemClock
 	static bool inline
 	enable()
 	{
-		ClockControl::enableExternalClock(); // 8 MHz
-		ClockControl::enablePll(
-			ClockControl::PllSource::ExternalClock,
+		Rcc::enableExternalClock(); // 8 MHz
+		Rcc::enablePll(
+			Rcc::PllSource::ExternalClock,
 			4,		// 8MHz / N=4 -> 2MHz
 			180,	// 2MHz * M=180 -> 360MHz
 			2		// 360MHz / P=2 -> 180MHz = F_cpu
 		);
 		PWR->CR |= PWR_CR_ODEN; // Enable overdrive mode
 		while (not (PWR->CSR & PWR_CSR_ODRDY)) ;
-		ClockControl::setFlashLatency(Frequency);
-		ClockControl::enableSystemClock(ClockControl::SystemClockSource::Pll);
-		ClockControl::setApb1Prescaler(ClockControl::Apb1Prescaler::Div4);
-		ClockControl::setApb2Prescaler(ClockControl::Apb2Prescaler::Div2);
+		Rcc::setFlashLatency(Frequency);
+		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
+		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div4);
+		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div2);
 		// update clock frequencies
 		modm::clock::fcpu     = Frequency;
 		modm::clock::fcpu_kHz = Frequency / 1000;

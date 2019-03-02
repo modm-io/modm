@@ -46,23 +46,23 @@ struct systemClock {
 	enable()
 	{
 		// set flash latency first because system already runs from MSI
-		ClockControl::setFlashLatency(Frequency);
+		Rcc::setFlashLatency(Frequency);
 
-		ClockControl::enableMultiSpeedInternalClock(ClockControl::MsiFrequency::MHz48);
+		Rcc::enableMultiSpeedInternalClock(Rcc::MsiFrequency::MHz48);
 
-		// ClockControl::enablePll(
-		// 	ClockControl::PllSource::MultiSpeedInternalClock,
+		// Rcc::enablePll(
+		// 	Rcc::PllSource::MultiSpeedInternalClock,
 		// 	1,	// 4MHz / N=1 -> 4MHz
 		// 	16,	// 4MHz * M=16 -> 64MHz <= 344MHz = PLL VCO output max, >= 64 MHz = PLL VCO out min
 		// 	1,	// 64MHz / P=1 -> 64MHz = F_cpu
 		// 	2	// 64MHz / Q=2 -> 32MHz = F_usb
 		// );
 		// switch system clock to PLL output
-		// ClockControl::enableSystemClock(ClockControl::SystemClockSource::Pll);
-		// ClockControl::setAhbPrescaler(ClockControl::AhbPrescaler::Div1);
+		// Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
+		// Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
 		// APB1 has max. 50MHz
-		// ClockControl::setApb1Prescaler(ClockControl::Apb1Prescaler::Div2);
-		// ClockControl::setApb2Prescaler(ClockControl::Apb2Prescaler::Div1);
+		// Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div2);
+		// Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div1);
 		// update frequencies for busy-wait delay functions
 		modm::clock::fcpu     = Frequency;
 		modm::clock::fcpu_kHz = Frequency / 1000;

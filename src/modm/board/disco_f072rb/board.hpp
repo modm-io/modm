@@ -63,11 +63,11 @@ struct systemClock
 	enable()
 	{
 		// Enable the interal 48MHz clock
-		ClockControl::enableInternalClockMHz48();
+		Rcc::enableInternalClockMHz48();
 		// set flash latency for 48MHz
-		ClockControl::setFlashLatency(Frequency);
+		Rcc::setFlashLatency(Frequency);
 		// Switch to the 48MHz clock
-		ClockControl::enableSystemClock(ClockControl::SystemClockSource::InternalClockMHz48);
+		Rcc::enableSystemClock(Rcc::SystemClockSource::InternalClockMHz48);
 		// update frequencies for busy-wait delay functions
 		modm::clock::fcpu     = Frequency;
 		modm::clock::fcpu_kHz = Frequency / 1000;

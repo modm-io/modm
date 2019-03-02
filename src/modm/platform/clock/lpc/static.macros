@@ -46,25 +46,25 @@ public:
 	{
 %% if target["family"] == "lpc"
 	%%	if s.fixedFrequency|length > 0
-		if (!ClockControl::enable{{ s.name }}({{ s.fixedFrequency }}/1000, waitCycles))
+		if (!Rcc::enable{{ s.name }}({{ s.fixedFrequency }}/1000, waitCycles))
 	%% else
-		if (!ClockControl::enable{{ s.name }}(InputFrequency/1000, waitCycles))
+		if (!Rcc::enable{{ s.name }}(InputFrequency/1000, waitCycles))
 	%% endif
 %% else
-		if (!ClockControl::enable{{ s.name }}(waitCycles))
+		if (!Rcc::enable{{ s.name }}(waitCycles))
 %% endif
 			return StartupError::{{ s.name }};
 
 
 %% if target["platform"] == "stm32" and target["family"] in ["f2", "f4"]
-		ClockControl::setApb1Prescaler(ClockControl::Apb1Prescaler::Div4);
-		ClockControl::setApb2Prescaler(ClockControl::Apb2Prescaler::Div2);
+		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div4);
+		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div2);
 %% elif partname.startswith("stm32f100")
-		ClockControl::setApb1Prescaler(ClockControl::Apb1Prescaler::Div1);
-		ClockControl::setApb2Prescaler(ClockControl::Apb2Prescaler::Div1);
+		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div1);
+		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div1);
 %% elif target["platform"] == "stm32" and target["family"] in ["f1", "f3"]
-		ClockControl::setApb1Prescaler(ClockControl::Apb1Prescaler::Div2);
-		ClockControl::setApb2Prescaler(ClockControl::Apb2Prescaler::Div1);
+		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div2);
+		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div1);
 %% endif
 
 		return StartupError::None;
@@ -105,7 +105,7 @@ public:
 		if (err != StartupError::None) return err;
 		return PllSetup<InputFrequency,
 				OutputFrequency{{ template }},
-				ClockControl::PllSource::{{ src.name }}>::enable();
+				Rcc::PllSource::{{ src.name }}>::enable();
 	}
 	static constexpr int
 	outputFrequency = OutputFrequency;
@@ -170,9 +170,9 @@ public:
 	{
 		StartupError err =  {{ src.name }}<{{ template }}>::enable(waitCycles);
 		if (err != StartupError::None) return err;
-		ClockControl::setFlashLatency(OutputFrequency);
-		if(ClockControl::enable{{ s.name }}(
-				ClockControl::{{ s.name }}Source::{{ src.name }}, waitCycles))
+		Rcc::setFlashLatency(OutputFrequency);
+		if(Rcc::enable{{ s.name }}(
+				Rcc::{{ s.name }}Source::{{ src.name }}, waitCycles))
 			return StartupError::None;
 		return StartupError::{{ src.name }};
 	}
@@ -195,7 +195,7 @@ public:
 	static xpcc_always_inline void
 	setDivision(Division)
 	{
-		//ClockControl::enable{{ o.name }}(static_cast<int>(d));
+		//Rcc::enable{{ o.name }}(static_cast<int>(d));
 	}
 %% endif
 };
