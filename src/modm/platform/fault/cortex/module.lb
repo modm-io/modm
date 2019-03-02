@@ -31,7 +31,7 @@ def prepare(module, options):
 
     module.depends(
         ":architecture:clock",
-        ":platform:clock",
+        ":platform:rcc",
         ":platform:gpio",
         ":cmsis:device")
 

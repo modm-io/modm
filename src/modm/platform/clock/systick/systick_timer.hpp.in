@@ -17,10 +17,7 @@
 #include <cmath>
 #include <modm/architecture/interface/peripheral.hpp>
 
-namespace modm
-{
-
-namespace cortex
+namespace modm::cortex
 {
 
 typedef void (*InterruptHandler)(void);
@@ -102,8 +99,6 @@ private:
 	static void
 	enable(uint32_t reload);
 };
-
-}
 
 }
 

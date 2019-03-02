@@ -13,23 +13,18 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_STM32_CLOCK_HPP
-#define MODM_STM32_CLOCK_HPP
+#ifndef MODM_STM32_RCC_HPP
+#define MODM_STM32_RCC_HPP
 
 #include <stdint.h>
 #include "../device.hpp"
-#include "common_clock.hpp"
+#include <modm/platform/core/peripherals.hpp>
 
-using namespace modm::clock;
-
-namespace modm
-{
-
-namespace platform
+namespace modm::platform
 {
 
 /**
- * Clock Control for STM32 devices.
+ * Reset and Clock Control for STM32 devices.
  *
  * This class abstracts access to clock settings on the STM32.
  * You need to use this class to enable internal and external clock
@@ -37,9 +32,9 @@ namespace platform
  * Don't forget to set the flash latencies.
  *
  * @author		Niklas Hauser
- * @ingroup		modm_platform_clock
+ * @ingroup		modm_platform_rcc
  */
-class ClockControl
+class Rcc
 {
 public:
 	enum class
@@ -428,28 +423,26 @@ public:
 	static uint32_t
 	setFlashLatency(const uint32_t CPU_Frequency, const uint16_t mV = 3300);
 
+
 public:
-	static inline uint32_t
-	getCpuFrequency()
-	{
-		return modm::clock::fcpu;
-	}
+	template< Peripheral peripheral >
+	static void
+	enable();
 
-	static inline uint32_t
-	getCpuFrequencykHz()
-	{
-		return modm::clock::fcpu_kHz;
-	}
+	template< Peripheral peripheral >
+	static void
+	disable();
 
-	static inline uint32_t
-	getCpuFrequencyMHz()
-	{
-		return modm::clock::fcpu_MHz;
-	}
+	template< Peripheral peripheral >
+	static void
+	reset();
 };
 
-}   // namespace platform
+using ClockControl [[deprecated("Please use `modm::platform:Rcc` instead")]] = Rcc;
 
-}   // namespace modm
+}   // namespace modm::platform
 
-#endif	//  MODM_STM32_CLOCK_HPP
+
+#include "rcc_impl.hpp"
+
+#endif	//  MODM_STM32_RCC_HPP

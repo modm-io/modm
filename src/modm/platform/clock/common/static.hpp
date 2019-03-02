@@ -13,7 +13,7 @@
 #define MODM_AVR_CLOCK_HPP
 
 #include <stdint.h>
-#include "common_clock.hpp"
+#include "common.hpp"
 
 using namespace modm::clock;
 
@@ -47,11 +47,11 @@ public:
 
 	static constexpr uint32_t Adc = Frequency;
 
-	static StartupError
+	static bool
 	enable()
 	{
 		// do nothing
-		return StartupError::None;
+		return true;
 	}
 
 };

@@ -13,7 +13,6 @@
 
 #include <modm/architecture/interface/atomic_lock.hpp>
 #include <modm/architecture/interface/clock.hpp>
-#include <modm/utils/dummy.hpp>
 #include <modm/platform/device.hpp>
 
 #include "systick_timer.hpp"

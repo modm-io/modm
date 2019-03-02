@@ -157,8 +157,8 @@ def prepare(module, options):
         ":architecture:interrupt",
         ":architecture:memory",
         ":architecture:unaligned",
-        ":cmsis:device",
-        ":platform:clock.cortex")
+        ":platform:clock",
+        ":cmsis:device")
 
     module.add_option(
         BooleanOption(
@@ -260,6 +260,7 @@ def validate(env):
 
 def build(env):
     env.substitutions = env.query("vector_table")
+    env.substitutions["partname"] = env[":target"].partname
     env.outbasepath = "modm/src/modm/platform/core"
 
     # dealing with runtime assertions
@@ -272,6 +273,14 @@ def build(env):
     env.template("startup.c.in")
     env.template("vectors.c.in")
     env.copy("default_handler.sx")
+
+    # busy-waiting delays
+    env.template("delay.cpp.in")
+    env.copy("delay.hpp")
+
+    # modm-test implements the clock methods itself
+    if not env.has_module(":test:architecture"):
+        env.copy("clock.cpp")
 
     # everything to do with dynamic memory
     env.copy("heap_table.c")

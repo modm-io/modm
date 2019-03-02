@@ -43,7 +43,7 @@ delayMilliseconds(uint16_t ms);
 
 // These functions may be implemented as header files, so we cannot rely on
 // there being a link-able function and delegate this choice to the platform.
-#include <modm/platform/clock/delay.hpp>
+#include <modm/platform/core/delay.hpp>
 
 #endif
 

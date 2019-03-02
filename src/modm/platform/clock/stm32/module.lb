@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2016-2018, Niklas Hauser
+# Copyright (c) 2016-2019, Niklas Hauser
 # Copyright (c) 2017, Fabian Greif
 #
 # This file is part of the modm project.
@@ -13,17 +13,17 @@
 
 
 def init(module):
-    module.name = "clock"
-    module.parent = "platform"
+    module.parent = ":platform"
+    module.name = "rcc"
     module.description = "Reset and Clock Control (RCC)"
 
 def prepare(module, options):
     if not options[":target"].has_driver("rcc:stm32*"):
         return False
 
-    module.depends(":cmsis:device", ":utils", ":platform:clock.cortex", ":platform:rcc")
-    if "stm32f100" in options[":target"].partname:
-        module.depends(":architecture:clock")
+    module.depends(":cmsis:device", ":utils", ":platform:clock")
+    # FIXME: Move Peripherals enum somewhere better
+    module.depends(":platform:gpio")
     return True
 
 def build(env):
@@ -115,6 +115,26 @@ def build(env):
     env.substitutions = properties
     env.outbasepath = "modm/src/modm/platform/clock"
 
-    env.template("latency.cpp.in")
-    env.template("clock.cpp.in")
-    env.template("clock.hpp.in")
+    env.template("rcc_latency.cpp.in")
+    env.template("rcc.cpp.in")
+    env.template("rcc.hpp.in")
+
+    all_peripherals = []
+    all_drivers = [d for d in device._properties["driver"] if d["name"] not in ["gpio", "core"]]
+    translate = lambda s: "".join(p.capitalize() for p in s.split("_"))
+    for d in all_drivers:
+        dname = translate(d["name"])
+        if "instance" in d:
+            all_peripherals.extend([dname + translate(i) for i in d["instance"]])
+        else:
+            all_peripherals.append(dname)
+    all_peripherals = sorted(list(set(all_peripherals)))
+
+    rcc_map = env.query(":cmsis:device:rcc-map")
+    rcc_map = {per:v for per,v in rcc_map.items() if per.capitalize() in all_peripherals}
+
+    env.substitutions = {
+        "peripherals": rcc_map.keys(),
+        "rcc_map": rcc_map,
+    }
+    env.template("rcc_impl.hpp.in")

@@ -10,9 +10,9 @@
 // ----------------------------------------------------------------------------
 
 #include "../device.hpp"
-#include "common_clock.hpp"
+#include <modm/platform/clock/common.hpp>
 
-%% if core.startswith("cortex-m0"):
+%% if core == "cortex-m0":
 	%% set loop = 4
 %% elif core.startswith("cortex-m7"):
 	%# Cortex-M7 is superscalar with dual issue ALU and a 6-stage pipeline
@@ -24,9 +24,9 @@
 
 %# TODO: These numbers were measured from a few example applications.
 %#       A statistical analysis of the average overhead cycles is required!
-%% if target["platform"] == "stm32" and target["family"] == "f4"
+%% if partname.startswith("stm32f4")
 	%% set overhead = 25
-%% elif target["platform"] == "stm32" and target["family"] == "f1"
+%% elif partname.startswith("stm32f1")
 	%% set overhead = 12
 %% else
 	%% set overhead = 30

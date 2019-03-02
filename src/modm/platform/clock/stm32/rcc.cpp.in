@@ -3,7 +3,7 @@
  * Copyright (c) 2009-2012, Fabian Greif
  * Copyright (c) 2011, Georgi Grinshpun
  * Copyright (c) 2012, 2016, Sascha Schade
- * Copyright (c) 2012, 2014-2017, Niklas Hauser
+ * Copyright (c) 2012, 2014-2019, Niklas Hauser
  * Copyright (c) 2013-2014, Kevin Läufer
  * Copyright (c) 2018, Christopher Durand
  *
@@ -15,17 +15,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "clock.hpp"
+#include "rcc.hpp"
+#include "common.hpp"
 
-namespace modm
+namespace modm::clock
 {
-namespace clock
-{
-
 uint32_t modm_fastdata fcpu({{ hsi_frequency|int * 1000000 }});
 uint32_t modm_fastdata fcpu_kHz({{ hsi_frequency|int * 1000 }});
 uint16_t modm_fastdata fcpu_MHz({{ hsi_frequency }});
-%% if core.startswith("cortex-m0")
+%% if core == "cortex-m0"
 	%% set loops = 4000.0
 %% elif core.startswith("cortex-m7")
 	%% set loops = 1000.0
@@ -33,14 +31,12 @@ uint16_t modm_fastdata fcpu_MHz({{ hsi_frequency }});
 	%% set loops = 3000.0
 %% endif
 uint16_t modm_fastdata ns_per_loop({{ loops / hsi_frequency|int}});
-
-}
 }
 
 // ----------------------------------------------------------------------------
 %% if target["family"] == "f0"
 bool
-modm::platform::ClockControl::enableInternalClockMHz14(uint32_t waitCycles)
+modm::platform::Rcc::enableInternalClockMHz14(uint32_t waitCycles)
 {
 	bool retval;
 	RCC->CR2 |= RCC_CR2_HSI14ON;
@@ -52,7 +48,7 @@ modm::platform::ClockControl::enableInternalClockMHz14(uint32_t waitCycles)
 
 %% if hsi48
 bool
-modm::platform::ClockControl::enableInternalClockMHz48(uint32_t waitCycles)
+modm::platform::Rcc::enableInternalClockMHz48(uint32_t waitCycles)
 {
 	bool retval;
 	RCC->CR2 |= RCC_CR2_HSI48ON;
@@ -63,7 +59,7 @@ modm::platform::ClockControl::enableInternalClockMHz48(uint32_t waitCycles)
 %% endif
 
 bool
-modm::platform::ClockControl::enableInternalClock(uint32_t waitCycles)
+modm::platform::Rcc::enableInternalClock(uint32_t waitCycles)
 {
 	bool retval;
 	RCC->CR |= RCC_CR_HSION;
@@ -74,7 +70,7 @@ modm::platform::ClockControl::enableInternalClock(uint32_t waitCycles)
 
 %% if target["family"] in ["l4"]
 bool
-modm::platform::ClockControl::enableMultiSpeedInternalClock(MsiFrequency msi_frequency, uint32_t waitCycles)
+modm::platform::Rcc::enableMultiSpeedInternalClock(MsiFrequency msi_frequency, uint32_t waitCycles)
 {
 	bool retval;
 	RCC->CR = (RCC->CR & ~RCC_CR_MSIRANGE) | static_cast<uint32_t>(msi_frequency) | RCC_CR_MSIRGSEL | RCC_CR_MSION;
@@ -85,7 +81,7 @@ modm::platform::ClockControl::enableMultiSpeedInternalClock(MsiFrequency msi_fre
 %% endif
 
 bool
-modm::platform::ClockControl::enableExternalClock(uint32_t waitCycles)
+modm::platform::Rcc::enableExternalClock(uint32_t waitCycles)
 {
 	bool retval;
 	RCC->CR |= RCC_CR_HSEBYP | RCC_CR_HSEON;
@@ -95,7 +91,7 @@ modm::platform::ClockControl::enableExternalClock(uint32_t waitCycles)
 }
 
 bool
-modm::platform::ClockControl::enableExternalCrystal(uint32_t waitCycles)
+modm::platform::Rcc::enableExternalCrystal(uint32_t waitCycles)
 {
 	bool retval;
 	RCC->CR = (RCC->CR & ~RCC_CR_HSEBYP) | RCC_CR_HSEON;
@@ -105,7 +101,7 @@ modm::platform::ClockControl::enableExternalCrystal(uint32_t waitCycles)
 }
 
 bool
-modm::platform::ClockControl::enableLowSpeedInternalClock(uint32_t waitCycles)
+modm::platform::Rcc::enableLowSpeedInternalClock(uint32_t waitCycles)
 {
 	bool retval;
 	RCC->CSR |= RCC_CSR_LSION;
@@ -115,7 +111,7 @@ modm::platform::ClockControl::enableLowSpeedInternalClock(uint32_t waitCycles)
 }
 
 bool
-modm::platform::ClockControl::enableLowSpeedExternalClock(uint32_t waitCycles)
+modm::platform::Rcc::enableLowSpeedExternalClock(uint32_t waitCycles)
 {
 	bool retval;
 	RCC->BDCR |= RCC_BDCR_LSEBYP | RCC_BDCR_LSEON;
@@ -125,7 +121,7 @@ modm::platform::ClockControl::enableLowSpeedExternalClock(uint32_t waitCycles)
 }
 
 bool
-modm::platform::ClockControl::enableLowSpeedExternalCrystal(uint32_t waitCycles)
+modm::platform::Rcc::enableLowSpeedExternalCrystal(uint32_t waitCycles)
 {
 	bool retval;
 	RCC->BDCR = (RCC->BDCR & ~RCC_BDCR_LSEBYP) | RCC_BDCR_LSEON;
@@ -137,7 +133,7 @@ modm::platform::ClockControl::enableLowSpeedExternalCrystal(uint32_t waitCycles)
 %% if target["family"] in ["f2", "f4", "f7"]
 // ----------------------------------------------------------------------------
 bool
-modm::platform::ClockControl::enablePll(PllSource source, uint8_t pllM, uint16_t pllN, uint8_t pllP, uint32_t waitCycles)
+modm::platform::Rcc::enablePll(PllSource source, uint8_t pllM, uint16_t pllN, uint8_t pllP, uint32_t waitCycles)
 {
 	// Read reserved values and clear all other values
 	uint32_t tmp = RCC->PLLCFGR & ~(RCC_PLLCFGR_PLLSRC | RCC_PLLCFGR_PLLM
@@ -171,7 +167,7 @@ modm::platform::ClockControl::enablePll(PllSource source, uint8_t pllM, uint16_t
 %% elif target["family"] in ["l4"]
 // ----------------------------------------------------------------------------
 bool
-modm::platform::ClockControl::enablePll(PllSource source,
+modm::platform::Rcc::enablePll(PllSource source,
 	uint8_t pllM, uint16_t pllN, uint8_t pllR, uint32_t waitCycles)
 {
 	// Read reserved values and clear all other values
@@ -215,7 +211,7 @@ modm::platform::ClockControl::enablePll(PllSource source,
 %% else
 // ----------------------------------------------------------------------------
 bool
-modm::platform::ClockControl::enablePll(PllSource source,
+modm::platform::Rcc::enablePll(PllSource source,
 %% if pllprediv2
 			uint8_t pllMul, uint8_t pllPrediv, uint8_t pllPrediv2, uint32_t waitCycles)
 %% elif pllprediv
@@ -266,7 +262,7 @@ modm::platform::ClockControl::enablePll(PllSource source,
 
 // ----------------------------------------------------------------------------
 bool
-modm::platform::ClockControl::enableSystemClock(SystemClockSource src, uint32_t waitCycles)
+modm::platform::Rcc::enableSystemClock(SystemClockSource src, uint32_t waitCycles)
 {
 	RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_SW) | uint32_t(src);
 
