@@ -420,8 +420,9 @@ public:
 	 * @retval	<=CPU_Frequency flash latency has been set correctly.
 	 * @retval	>CPU_Frequency requested frequency too high for voltage.
 	 */
+	template< uint32_t Core_Hz, uint16_t Core_mV = 3300>
 	static uint32_t
-	setFlashLatency(const uint32_t CPU_Frequency, const uint16_t mV = 3300);
+	setFlashLatency();
 
 
 public:
@@ -436,6 +437,16 @@ public:
 	template< Peripheral peripheral >
 	static void
 	reset();
+
+private:
+	struct flash_latency
+	{
+		uint32_t latency;
+		uint32_t max_frequency;
+	};
+
+	static constexpr flash_latency
+	computeFlashLatency(uint32_t Core_Hz, uint16_t Core_mV);
 };
 
 using ClockControl [[deprecated("Please use `modm::platform:Rcc` instead")]] = Rcc;

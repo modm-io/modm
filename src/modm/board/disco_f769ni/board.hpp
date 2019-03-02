@@ -89,7 +89,7 @@ struct systemClock
 		);
 		PWR->CR1 |= PWR_CR1_ODEN; // Enable overdrive mode
 		while (not (PWR->CSR1 & PWR_CSR1_ODRDY)) ;
-		Rcc::setFlashLatency(Frequency);
+		Rcc::setFlashLatency<Frequency>();
 		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
 		// APB1 is running only at 27MHz, since AHB / 4 = 54MHz > 45MHz limit!
 		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div8);

@@ -58,8 +58,7 @@ struct systemClock {
 	enable()
 	{
 		// set flash latency first because system already runs from MSI
-		Rcc::setFlashLatency(Frequency);
-
+		Rcc::setFlashLatency<Frequency>();
 		Rcc::enableMultiSpeedInternalClock(Rcc::MsiFrequency::MHz48);
 
 		modm::clock::fcpu     = Frequency;

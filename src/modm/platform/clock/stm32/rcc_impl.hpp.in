@@ -12,6 +12,69 @@
 namespace modm::platform
 {
 
+constexpr Rcc::flash_latency
+Rcc::computeFlashLatency(uint32_t CPU_Frequency, uint16_t mV)
+{
+	%% for mV, table_MHz in table.items() | sort
+	constexpr uint32_t flash_latency_{{ mV }}[] =
+	{
+		%% for mhz in table_MHz
+		{{ mhz * 1000000 }},
+		%% endfor
+	};
+	%% endfor
+
+	const uint32_t *lut(flash_latency_{{ (table|sort)[-1] }});
+	uint8_t lut_size(sizeof(flash_latency_{{ (table|sort)[-1] }}) / sizeof(uint32_t));
+	%% if table|length > 1
+	// find the right table for the voltage
+		%% for mV in (table|sort)[:-1]
+	{% if not loop.first %}else {% endif %}if (mV < {{ mV }}) {
+		lut = flash_latency_{{ mV }};
+		lut_size = sizeof(flash_latency_{{ mV }}) / sizeof(uint32_t);
+	}
+		%% endfor
+	%% else
+	(void) mV;
+	%% endif
+	// find the next highest frequency in the table
+	uint8_t latency(0);
+	uint32_t max_freq(0);
+	while (latency < lut_size)
+	{
+		if (CPU_Frequency <= (max_freq = lut[latency]))
+			break;
+		latency++;
+	}
+	return {latency, max_freq};
+}
+
+template< uint32_t Core_Hz, uint16_t Core_mV = 3300>
+uint32_t
+Rcc::setFlashLatency()
+{
+	constexpr flash_latency fl = computeFlashLatency(Core_Hz, Core_mV);
+	static_assert(Core_Hz <= fl.max_frequency, "CPU Frequency is too high for this core voltage!");
+
+%% if not target.string.startswith("stm32f100")
+	uint32_t acr = FLASH->ACR & ~FLASH_ACR_LATENCY;
+	// set flash latency
+	acr |= fl.latency;
+%% if target["family"] in ["f2", "f4", "l4"]
+	// enable flash prefetch and data and instruction cache
+	acr |= FLASH_ACR_PRFTEN | FLASH_ACR_DCEN | FLASH_ACR_ICEN;
+%% elif target["family"] == "f7"
+	// enable flash prefetch and flash accelerator
+	acr |= FLASH_ACR_PRFTEN | FLASH_ACR_ARTEN;
+%% else
+	// enable flash prefetch
+	acr |= FLASH_ACR_PRFTBE;
+%% endif
+	FLASH->ACR = acr;
+%% endif
+
+	return fl.max_frequency;
+}
 template< Peripheral peripheral >
 inline void
 Rcc::enable()

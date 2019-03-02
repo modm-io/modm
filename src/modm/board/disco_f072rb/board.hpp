@@ -65,7 +65,7 @@ struct systemClock
 		// Enable the interal 48MHz clock
 		Rcc::enableInternalClockMHz48();
 		// set flash latency for 48MHz
-		Rcc::setFlashLatency(Frequency);
+		Rcc::setFlashLatency<Frequency>();
 		// Switch to the 48MHz clock
 		Rcc::enableSystemClock(Rcc::SystemClockSource::InternalClockMHz48);
 		// update frequencies for busy-wait delay functions

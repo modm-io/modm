@@ -115,7 +115,6 @@ def build(env):
     env.substitutions = properties
     env.outbasepath = "modm/src/modm/platform/clock"
 
-    env.template("rcc_latency.cpp.in")
     env.template("rcc.cpp.in")
     env.template("rcc.hpp.in")
 
@@ -133,8 +132,8 @@ def build(env):
     rcc_map = env.query(":cmsis:device:rcc-map")
     rcc_map = {per:v for per,v in rcc_map.items() if per.capitalize() in all_peripherals}
 
-    env.substitutions = {
+    env.substitutions.update({
         "peripherals": rcc_map.keys(),
         "rcc_map": rcc_map,
-    }
+    })
     env.template("rcc_impl.hpp.in")

@@ -48,7 +48,7 @@ struct systemClock {
 			40,	// 4MHz * N=40 -> 160MHz <= 344MHz = PLL VCO output max, >= 64 MHz = PLL VCO out min
 			2	// 160MHz / P=2 -> 80MHz = F_cpu
 		);
-		Rcc::setFlashLatency(Frequency);
+		Rcc::setFlashLatency<Frequency>();
 
 		// switch system clock to PLL output
 		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);

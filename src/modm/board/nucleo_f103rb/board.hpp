@@ -70,7 +70,7 @@ struct systemClock {
 		// internal clock / 2 * 16 = 64MHz, => 64/1.5 = 42.6 => bad for USB
 		Rcc::enablePll(Rcc::PllSource::InternalClock, 16);
 		// set flash latency for 64MHz
-		Rcc::setFlashLatency(Frequency);
+		Rcc::setFlashLatency<Frequency>();
 		// switch system clock to PLL output
 		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
 		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);

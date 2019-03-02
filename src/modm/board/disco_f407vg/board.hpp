@@ -85,7 +85,7 @@ struct systemClock {
 			2		// 336MHz / P=2 -> 168MHz = F_cpu
 		);
 		// set flash latency for 168MHz
-		Rcc::setFlashLatency(Frequency);
+		Rcc::setFlashLatency<Frequency>();
 		// switch system clock to PLL output
 		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
 		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);

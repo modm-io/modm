@@ -90,7 +90,7 @@ struct systemClock
 		);
 		PWR->CR |= PWR_CR_ODEN; // Enable overdrive mode
 		while (not (PWR->CSR & PWR_CSR_ODRDY)) ;
-		Rcc::setFlashLatency(Frequency);
+		Rcc::setFlashLatency<Frequency>();
 		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
 		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div4);
 		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div2);

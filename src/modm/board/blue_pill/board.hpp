@@ -66,7 +66,7 @@ struct systemClock {
 		Rcc::enablePll(Rcc::PllSource::ExternalCrystal, 9);
 
 		// set flash latency for 72MHz
-		Rcc::setFlashLatency(Frequency);
+		Rcc::setFlashLatency<Frequency>();
 
 		// switch system clock to PLL output
 		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
