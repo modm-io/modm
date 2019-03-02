@@ -109,11 +109,11 @@ main()
 
 #ifndef MODM_BOARD_HAS_LOGGER
 	LoggerUsart::connect<LoggerUsartTx::Tx, LoggerUsartRx::Rx>();
-	LoggerUsart::initialize<Board::systemClock, 115200_Bd>(12);
+	LoggerUsart::initialize<Board::SystemClock, 115200_Bd>(12);
 #endif
 
 	modm::platform::I2cMaster1::connect<modm::platform::GpioB7::Sda, modm::platform::GpioB6::Scl>();
-	modm::platform::I2cMaster1::initialize<Board::systemClock, modm::platform::I2cMaster1::Baudrate::Standard>();
+	modm::platform::I2cMaster1::initialize<Board::SystemClock, modm::platform::I2cMaster1::Baudrate::Standard>();
 
 	constexpr uint32_t rate = 1; // Hz
 	constexpr float interval = 1000.0 / rate; // msec

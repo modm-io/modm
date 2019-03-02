@@ -27,7 +27,7 @@ namespace Board
 	using namespace modm::literals;
 
 /// STM32F429 running at 180MHz from the external 8MHz STLink clock
-struct systemClock
+struct SystemClock
 {
 	static constexpr uint32_t Frequency = 180_MHz;
 	static constexpr uint32_t Apb1 = Frequency / 4;
@@ -121,11 +121,11 @@ using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockI
 inline void
 initialize()
 {
-    systemClock::enable();
-    SysTickTimer::initialize<systemClock>();
+    SystemClock::enable();
+    SysTickTimer::initialize<SystemClock>();
 
     stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>();
-    stlink::Uart::initialize<systemClock, 115200_Bd>();
+    stlink::Uart::initialize<SystemClock, 115200_Bd>();
 
     LedGreen::setOutput(modm::Gpio::Low);
     LedBlue::setOutput(modm::Gpio::Low);

@@ -25,7 +25,7 @@ namespace Board
 	using namespace modm::literals;
 
 /// STM32F0 running at 48MHz generated from the internal 8MHz with PLL.
-struct systemClock
+struct SystemClock
 {
 	static constexpr int Frequency = 48_MHz;
 	static constexpr int Usart1 = Frequency;
@@ -64,8 +64,8 @@ using Leds = SoftwareGpioPort< LedGreen, LedBlue >;
 inline void
 initialize()
 {
-	systemClock::enable();
-	SysTickTimer::initialize<systemClock>();
+	SystemClock::enable();
+	SysTickTimer::initialize<SystemClock>();
 
 	LedGreen::setOutput(modm::Gpio::Low);
 	LedBlue::setOutput(modm::Gpio::Low);

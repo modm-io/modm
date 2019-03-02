@@ -16,13 +16,12 @@
 using namespace modm::literals;
 
 using namespace modm::platform;
-using systemClock = SystemClock;
 
 int
 main()
 {
 	Uart0::connect<GpioOutputD1::Txd, GpioInputD0::Rxd>();
-	Uart0::initialize<systemClock, 115200_Bd>();
+	Uart0::initialize<SystemClock, 115200_Bd>();
 
 	// Enable interrupts, this is needed for every buffered UART
 	enableInterrupts();

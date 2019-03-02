@@ -26,7 +26,7 @@ namespace Board
 
 /// STM32F100 running at 24MHz generated from the external 8MHz crystal
 /// supplied by the on-board st-link
-struct systemClock {
+struct SystemClock {
 	static constexpr uint32_t Frequency = 24_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency;
@@ -103,8 +103,8 @@ using Leds = SoftwareGpioPort< LedBlue, LedGreen >;
 inline void
 initialize()
 {
-	systemClock::enable();
-	SysTickTimer::initialize<systemClock>();
+	SystemClock::enable();
+	SysTickTimer::initialize<SystemClock>();
 
 	LedGreen::setOutput(modm::Gpio::Low);
 	LedBlue::setOutput(modm::Gpio::Low);

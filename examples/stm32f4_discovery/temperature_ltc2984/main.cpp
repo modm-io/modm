@@ -146,12 +146,12 @@ main()
 	Board::initialize();
 
 	Usart2::connect<GpioOutputA2::Tx>();
-	Usart2::initialize<Board::systemClock, 115200_Bd>(10);
+	Usart2::initialize<Board::SystemClock, 115200_Bd>(10);
 
 	// Connect the GPIOs to the SPIs alternate function
 	SpiMaster::connect<Sck::Sck, Mosi::Mosi, Miso::Miso>();
 	// Initialize the SPI with a 1.3MHz clock
-	SpiMaster::initialize<Board::systemClock, 1.3125_MHz>();
+	SpiMaster::initialize<Board::SystemClock, 1.3125_MHz>();
 
 	logger << "\n\nWelcome to LTC2983/LTC2984 demo!\n\n";
 

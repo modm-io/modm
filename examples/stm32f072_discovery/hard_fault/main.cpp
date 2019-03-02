@@ -35,7 +35,7 @@ main()
 
 	// initialize Uart for MODM_LOG
 	Usart1::connect<GpioOutputA9::Tx>();
-	Usart1::initialize<Board::systemClock, 115200_Bd>();
+	Usart1::initialize<Board::SystemClock, 115200_Bd>();
 
 	MODM_LOG_INFO << "Causing a Hardfault now!" << modm::endl;
 

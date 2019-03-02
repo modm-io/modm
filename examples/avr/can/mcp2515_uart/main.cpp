@@ -19,7 +19,6 @@
 
 using namespace modm::platform;
 using namespace modm::literals;
-using systemClock = SystemClock;
 
 typedef GpioOutputB0 LedGreen;
 typedef GpioOutputB1 LedRed;
@@ -70,7 +69,7 @@ main()
 	OCR2A = 230;
 
 	Uart0::connect<GpioD1::Txd, GpioD0::Rxd>();
-	Uart0::initialize<systemClock, 115200_Bd>();
+	Uart0::initialize<SystemClock, 115200_Bd>();
 
 	// Create a IOStream for complex formatting tasks
 	modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull > device;
@@ -84,7 +83,7 @@ main()
 	// Initialize SPI interface and the other pins
 	// needed by the MCP2515
 	SPI::connect<Sclk::BitBang, Mosi::BitBang, Miso::BitBang>();
-	SPI::initialize<systemClock, 1_MHz>();
+	SPI::initialize<SystemClock, 1_MHz>();
 	Cs::setOutput();
 	Int::setInput(Gpio::InputType::PullUp);
 

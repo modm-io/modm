@@ -27,7 +27,7 @@ namespace Board
 
 /// STM32L4 running at 80MHz generated with the PLL from 4MHz MSI clock
 
-struct systemClock {
+struct SystemClock {
 	static constexpr uint32_t Frequency = 80_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency;
@@ -109,11 +109,11 @@ using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockI
 inline void
 initialize()
 {
-	systemClock::enable();
-	SysTickTimer::initialize<systemClock>();
+	SystemClock::enable();
+	SysTickTimer::initialize<SystemClock>();
 
 	stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>(Gpio::InputType::PullUp);
-	stlink::Uart::initialize<systemClock, 115200_Bd>();
+	stlink::Uart::initialize<SystemClock, 115200_Bd>();
 }
 
 }

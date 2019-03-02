@@ -30,7 +30,7 @@ namespace Board
 /// internal Multispeed oscillator
 
 // Dummy clock for devices
-struct systemClock {
+struct SystemClock {
 	static constexpr uint32_t Frequency = 48_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency;
@@ -90,8 +90,8 @@ using Leds = SoftwareGpioPort< LedRed, LedGreen >;
 inline void
 initialize()
 {
-	systemClock::enable();
-	SysTickTimer::initialize<systemClock>();
+	SystemClock::enable();
+	SysTickTimer::initialize<SystemClock>();
 
 	LedGreen::setOutput(modm::Gpio::Low);
 	LedRed::setOutput(modm::Gpio::Low);

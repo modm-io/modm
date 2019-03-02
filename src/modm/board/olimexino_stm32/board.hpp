@@ -26,7 +26,7 @@ namespace Board
 
 /// STM32F103RB running at 64MHz generated from the internal 8MHz crystal
 // Dummy clock for devices
-struct systemClock {
+struct SystemClock {
 	static constexpr uint32_t Frequency = 64_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency / 2;
@@ -138,11 +138,11 @@ using LoggerDevice = modm::IODeviceWrapper< uext::Uart, modm::IOBuffer::BlockIfF
 inline void
 initialize()
 {
-	systemClock::enable();
-	SysTickTimer::initialize<systemClock>();
+	SystemClock::enable();
+	SysTickTimer::initialize<SystemClock>();
 
 	uext::Uart::connect<uext::Tx::Tx, uext::Rx::Rx>();
-	uext::Uart::initialize<systemClock, 115200_Bd>(12);
+	uext::Uart::initialize<SystemClock, 115200_Bd>(12);
 
 }
 

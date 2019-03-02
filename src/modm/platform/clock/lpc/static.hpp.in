@@ -61,7 +61,7 @@ namespace modm
 							 'setup': "PllSetup",
 							 'sources': [internalClock,
 										externalClock, externalCrystal] }
-%% set systemClock =		{'name': "SystemClock",
+%% set SystemClock =		{'name': "SystemClock",
 							 'minFrequency': "MHz1",
 							 'maxFrequency': "MHz48",
 							 'sources': [ internalClock, externalClock,
@@ -70,7 +70,7 @@ namespace modm
 %% set clockOut =			{'name': "ClockOutput",
 							 'divisions': range(1,255),
 							 'sources': [externalClock,
-										 externalCrystal, systemClock] }
+										 externalCrystal, SystemClock] }
 
 	// Static Clocks/Plls/Osciallators
 {{ static.source(internalClock, "modm::platform") }}
@@ -81,7 +81,7 @@ namespace modm
 
 {{ static.pll(pll, "modm::platform") }}
 
-{{ static.sink(systemClock, "modm::platform")}}
+{{ static.sink(SystemClock, "modm::platform")}}
 
 {{ static.output(clockOut, "modm::platform")}}
 

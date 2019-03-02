@@ -18,7 +18,6 @@
 
 using namespace modm::platform;
 using namespace modm::literals;
-using systemClock = SystemClock;
 
 namespace touch
 {
@@ -64,7 +63,7 @@ int
 main()
 {
 	Uart0::connect<GpioOutputD1::Txd, GpioInputD0::Rxd>();
-	Uart0::initialize<systemClock, 115200_Bd>();
+	Uart0::initialize<SystemClock, 115200_Bd>();
 
 	// Enable interrupts, this is needed for every buffered UART
 	enableInterrupts();
@@ -84,7 +83,7 @@ main()
 	led::B::setOutput();
 
 	lcd::SPI::connect<lcd::Scl::BitBang, lcd::Mosi::BitBang>();
-	lcd::SPI::initialize<systemClock, 2_MHz>();
+	lcd::SPI::initialize<SystemClock, 2_MHz>();
 
 	display.initialize();
 
@@ -97,7 +96,7 @@ main()
 
 	display.update();
 
-	Adc::initialize<systemClock, 115_kHz>();
+	Adc::initialize<SystemClock, 115_kHz>();
 	Adc::setReference(Adc::Reference::Internal2V56);
 
 	touch::Bottom::setInput();

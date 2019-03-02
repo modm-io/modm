@@ -18,7 +18,6 @@
 using namespace modm::platform;
 using namespace modm::literals;
 
-using systemClock = SystemClock;
 
 typedef GpioOutputA0 Mosi;
 typedef GpioOutputA1 Sck;
@@ -35,7 +34,7 @@ int
 main()
 {
 	SPI::connect<Sck::BitBang, Mosi::BitBang>();
-	SPI::initialize<systemClock, 1_MHz>();
+	SPI::initialize<SystemClock, 1_MHz>();
 
 	Backlight::setOutput();
 	Backlight::set();

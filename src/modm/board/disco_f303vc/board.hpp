@@ -28,7 +28,7 @@ namespace Board
 
 /// STM32F303 running at 72MHz generated from the external 8MHz clock
 /// supplied by the on-board st-link
-struct systemClock {
+struct SystemClock {
 	static constexpr uint32_t Frequency = 72_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency / 2;
@@ -162,8 +162,8 @@ using Dp = GpioA12;		// DP: USB_DP
 inline void
 initialize()
 {
-	systemClock::enable();
-	SysTickTimer::initialize<systemClock>();
+	SystemClock::enable();
+	SysTickTimer::initialize<SystemClock>();
 
 	LedNorth::setOutput(modm::Gpio::Low);
 	LedNorthEast::setOutput(modm::Gpio::Low);
@@ -197,7 +197,7 @@ initializeL3g()
 	l3g::Cs::setOutput(modm::Gpio::High);
 
 	l3g::SpiMaster::connect<l3g::Sck::Sck, l3g::Mosi::Mosi, l3g::Miso::Miso>();
-	l3g::SpiMaster::initialize<systemClock, 9_MHz>();
+	l3g::SpiMaster::initialize<SystemClock, 9_MHz>();
 	l3g::SpiMaster::setDataMode(l3g::SpiMaster::DataMode::Mode3);
 }
 
@@ -221,7 +221,7 @@ initializeLsm3()
 //	lsm3::Drdy::enableExternalInterruptVector(12);
 
 	lsm3::I2cMaster::connect<lsm3::Scl::Scl, lsm3::Sda::Sda>();
-	lsm3::I2cMaster::initialize<systemClock, 400_kHz>();
+	lsm3::I2cMaster::initialize<SystemClock, 400_kHz>();
 }
 
 

@@ -123,7 +123,7 @@ initTouchscreen()
 	IntTouchscreen::setInput(Gpio::InputType::PullUp);
 
 	SpiMaster2::connect<GpioB13::Sck, GpioB14::Miso, GpioB15::Mosi>();
-	SpiMaster2::initialize<Board::systemClock, 1312500ul>();
+	SpiMaster2::initialize<Board::SystemClock, 1312500ul>();
 	SpiMaster2::setDataMode(SpiMaster2::DataMode::Mode0);
 
 }

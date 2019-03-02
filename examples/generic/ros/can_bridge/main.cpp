@@ -96,7 +96,7 @@ main()
 
 	// Reinit onboard UART to 1 Mbps
 	// Do not use it for logging because this will destroy ROS serial messages.
-	RosSerialUart::initialize<Board::systemClock, 250_kBd>(12);
+	RosSerialUart::initialize<Board::SystemClock, 250_kBd>(12);
 
 	CanFilter::setStartFilterBankForCan2(14);
 
@@ -106,7 +106,7 @@ main()
 	} else {
 		Can::connect<GpioInputB8::Rx, GpioOutputB9::Tx>(Gpio::InputType::PullUp);
 	}
-	Can::initialize<Board::systemClock, Can::Bitrate::kBps250>(9);
+	Can::initialize<Board::SystemClock, Can::Bitrate::kBps250>(9);
 
 	// Receive every message
 	CanFilter::setFilter(0, CanFilter::FIFO0,

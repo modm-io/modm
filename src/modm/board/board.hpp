@@ -10,3 +10,7 @@
 // ----------------------------------------------------------------------------
 
 #include "board/board.hpp"
+
+namespace Board {
+	using systemClock [[deprecated("Use `Board::SystemClock` instead!")]] = SystemClock;
+}

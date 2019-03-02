@@ -17,7 +17,6 @@
 
 using namespace modm::platform;
 using namespace modm::literals;
-using systemClock = SystemClock;
 
 typedef GpioOutputD2 Cs;
 typedef GpioOutputB6 Mosi;
@@ -41,7 +40,7 @@ main()
 	Backlight::set();
 
 	SPI::connect<Sck::BitBang, Mosi::BitBang>();
-	SPI::initialize<systemClock, 1_MHz>();
+	SPI::initialize<SystemClock, 1_MHz>();
 
 	display.initialize();
 	display.setFont(modm::font::Assertion);

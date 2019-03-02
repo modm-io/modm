@@ -96,7 +96,7 @@ main()
 	Board::initialize();
 
 	UartSpi::Master::connect<UartSpi::Ck::Ck, UartSpi::Tx::Tx, UartSpi::Rx::Rx>();
-	UartSpi::Master::initialize<Board::systemClock, 8_MHz, modm::Tolerance::Exact>();
+	UartSpi::Master::initialize<Board::SystemClock, 8_MHz, modm::Tolerance::Exact>();
 
 	while (1) {
 		reader.update();

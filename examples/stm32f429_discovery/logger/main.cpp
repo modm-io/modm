@@ -38,7 +38,7 @@ main()
 
 	// initialize Uart2 for MODM_LOG_
 	Usart1::connect<GpioOutputA9::Tx>();
-	Usart1::initialize<Board::systemClock, 115200_Bd>();
+	Usart1::initialize<Board::SystemClock, 115200_Bd>();
 
 	// Use the logging streams to print some messages.
 	// Change MODM_LOG_LEVEL above to enable or disable these messages

@@ -84,7 +84,7 @@ main()
 	// Periodically report progress
 	modm::PeriodicTimer blinkTimer(250);
 
-	MODM_LOG_DEBUG.printf("CPU frequency is %ld Hz\n", Board::systemClock::Frequency);
+	MODM_LOG_DEBUG.printf("CPU frequency is %ld Hz\n", Board::SystemClock::Frequency);
 
 	uint8_t cc[] = "|/-\\";
 	uint8_t cycle(0);

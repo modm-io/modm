@@ -102,15 +102,15 @@ main()
 
 	// Enable SPI 1
 	SpiMaster1::connect<GpioB5::Mosi, GpioB4::Miso, GpioB3::Sck>();
-	SpiMaster1::initialize<Board::systemClock, 10.5_MHz, modm::Tolerance::Exact>();
+	SpiMaster1::initialize<Board::SystemClock, 10.5_MHz, modm::Tolerance::Exact>();
 
 	// Enable SPI 2
 	SpiMaster2::connect<GpioB15::Mosi, GpioB14::Miso, GpioB13::Sck>();
-	SpiMaster2::initialize<Board::systemClock, 10.5_MHz, modm::Tolerance::Exact>();
+	SpiMaster2::initialize<Board::SystemClock, 10.5_MHz, modm::Tolerance::Exact>();
 
 	// Enable UART 2
 	Usart2::connect<GpioA2::Tx>();
-	Usart2::initialize<Board::systemClock, 115200_Bd>();
+	Usart2::initialize<Board::SystemClock, 115200_Bd>();
 
 	/* Configuration values for nRF24 */
 

@@ -20,7 +20,6 @@
 
 using namespace modm::platform;
 using namespace modm::literals;
-using systemClock = SystemClock;
 
 // set new log level
 #undef MODM_LOG_LEVEL
@@ -87,12 +86,12 @@ int
 main()
 {
 	Uart0::connect<GpioOutputD1::Txd, GpioInputD0::Rxd>();
-	Uart0::initialize<systemClock, 115200_Bd>();
+	Uart0::initialize<SystemClock, 115200_Bd>();
 
 	// Initialize SPI interface and the other pins
 	// needed by the MCP2515
 	SPI::connect<Sclk::BitBang, Mosi::BitBang, Miso::BitBang>();
-	SPI::initialize<systemClock, 1_MHz>();
+	SPI::initialize<SystemClock, 1_MHz>();
 	Cs::setOutput();
 	Int::setInput(Gpio::InputType::PullUp);
 

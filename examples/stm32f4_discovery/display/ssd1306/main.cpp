@@ -34,7 +34,7 @@ main()
 	Board::initialize();
 
 	MyI2cMaster::connect<Scl::Scl, Sda::Sda>();
-	MyI2cMaster::initialize<Board::systemClock, 420_kHz>();
+	MyI2cMaster::initialize<Board::SystemClock, 420_kHz>();
 
 	display.initializeBlocking();
 	display.setFont(modm::font::Assertion);

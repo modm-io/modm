@@ -28,7 +28,7 @@ namespace Board
 
 /// STM32F303K8 running at 64MHz generated from the internal 8MHz clock
 // Dummy clock for devices
-struct systemClock {
+struct SystemClock {
 	static constexpr uint32_t Frequency = 64_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency / 2;
@@ -101,11 +101,11 @@ using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockI
 inline void
 initialize()
 {
-	systemClock::enable();
-	SysTickTimer::initialize<systemClock>();
+	SystemClock::enable();
+	SysTickTimer::initialize<SystemClock>();
 
 	stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>();
-	stlink::Uart::initialize<systemClock, 115200_Bd>();
+	stlink::Uart::initialize<SystemClock, 115200_Bd>();
 }
 
 }

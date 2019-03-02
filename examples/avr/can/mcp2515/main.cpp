@@ -16,7 +16,6 @@
 
 using namespace modm::platform;
 using namespace modm::literals;
-using systemClock = SystemClock;
 
 typedef GpioOutputB4 Cs;
 typedef GpioInputB2 Int;
@@ -51,7 +50,7 @@ main()
 	// Initialize SPI interface and the other pins
 	// needed by the MCP2515
 	SPI::connect<Sclk::Sck, Mosi::Mosi, Miso::Miso>();
-	SPI::initialize<systemClock, 921.6_kHz>();
+	SPI::initialize<SystemClock, 921.6_kHz>();
 	Cs::setOutput();
 	Int::setInput(Gpio::InputType::PullUp);
 

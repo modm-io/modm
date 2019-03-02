@@ -25,7 +25,7 @@ namespace Board
 
 /// STM32F103 running at 72MHz generated from the external 8MHz crystal
 // Dummy clock for devices
-struct systemClock {
+struct SystemClock {
 	static constexpr uint32_t Frequency = 72_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency / 2;
@@ -96,8 +96,8 @@ using Button = GpioUnused;
 inline void
 initialize()
 {
-	systemClock::enable();
-	SysTickTimer::initialize<systemClock>();
+	SystemClock::enable();
+	SysTickTimer::initialize<SystemClock>();
 
 	LedGreen::setOutput(modm::Gpio::Low);
 }

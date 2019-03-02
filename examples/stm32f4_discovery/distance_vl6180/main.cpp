@@ -147,10 +147,10 @@ main()
 	Board::initialize();
 
 	Usart2::connect<GpioA2::Tx>();
-	Usart2::initialize<Board::systemClock, 115200_Bd>();
+	Usart2::initialize<Board::SystemClock, 115200_Bd>();
 
 	MyI2cMaster::connect<GpioB11::Sda, GpioB10::Scl>();
-	MyI2cMaster::initialize<Board::systemClock, 400_kHz>();
+	MyI2cMaster::initialize<Board::SystemClock, 400_kHz>();
 
 	MODM_LOG_INFO << "\n\nWelcome to VL6180X demo!\n\n";
 

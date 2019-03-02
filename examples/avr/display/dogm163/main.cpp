@@ -17,7 +17,6 @@
 
 using namespace modm::platform;
 using namespace modm::literals;
-using systemClock = SystemClock;
 
 // Graphic LCD
 namespace lcd
@@ -38,7 +37,7 @@ int
 main()
 {
 	SPI::connect<lcd::Scl::BitBang, lcd::Mosi::BitBang, lcd::Miso::BitBang>();
-	SPI::initialize<systemClock, 1_MHz>();
+	SPI::initialize<SystemClock, 1_MHz>();
 	lcd::Cs::setOutput();
 	lcd::Rs::setOutput();
 

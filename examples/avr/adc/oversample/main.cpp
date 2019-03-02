@@ -17,7 +17,6 @@ using namespace modm::platform;
 using namespace modm::literals;
 
 // Create a new UART object
-using systemClock = SystemClock;
 
 #include <modm/io/iostream.hpp>
 // Create a IOStream for complex formatting tasks
@@ -39,12 +38,12 @@ int
 main()
 {
 	Uart0::connect<GpioOutputD1::Txd, GpioInputD0::Rxd>();
-	Uart0::initialize<systemClock, 115200_Bd>();
+	Uart0::initialize<SystemClock, 115200_Bd>();
 
 	// Initialize the analog to digital converter
 	// With the AVR running at 14.7456Mhz and a prescaler of 128 the
 	// ADC is running at 115kHz.
-	Adc::initialize<systemClock, 115_kHz>();
+	Adc::initialize<SystemClock, 115_kHz>();
 	Adc::setReference(Adc::Reference::InternalVcc);
 	Adc::enableInterrupt();
 

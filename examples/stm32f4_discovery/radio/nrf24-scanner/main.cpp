@@ -69,11 +69,11 @@ main()
 
 	// Enable SPI 2
 	SpiMaster2::connect<GpioB15::Mosi, GpioB14::Miso, GpioB13::Sck>();
-	SpiMaster2::initialize<Board::systemClock, 10_MHz>();
+	SpiMaster2::initialize<Board::SystemClock, 10_MHz>();
 
 	// Enable UART 2
 	Usart2::connect<GpioA2::Tx>();
-	Usart2::initialize<Board::systemClock, 115200_Bd>();
+	Usart2::initialize<Board::SystemClock, 115200_Bd>();
 
 
 	// Initialize nRF24-HAL

@@ -33,7 +33,7 @@ main()
 
 	// initialize Uart2 for MODM_LOG_INFO
 	Usart2::connect<GpioOutputA2::Tx>();
-	Usart2::initialize<Board::systemClock, 115200_Bd>();
+	Usart2::initialize<Board::SystemClock, 115200_Bd>();
 
 	// initialize Adc4
 	Adc4::initialize(Adc4::ClockMode::Asynchronous, Adc4::Prescaler::Div256,

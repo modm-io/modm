@@ -30,7 +30,7 @@ namespace Board
 	using namespace modm::literals;
 
 /// STM32F7 running at 216MHz from the external 25MHz clock
-struct systemClock
+struct SystemClock
 {
 	static constexpr uint32_t Frequency = 216_MHz;
 	static constexpr uint32_t Apb1 = Frequency / 8;
@@ -147,11 +147,11 @@ using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockI
 inline void
 initialize()
 {
-	systemClock::enable();
-	SysTickTimer::initialize<systemClock>();
+	SystemClock::enable();
+	SysTickTimer::initialize<SystemClock>();
 
 	stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>();
-	stlink::Uart::initialize<systemClock, 115200_Bd>();
+	stlink::Uart::initialize<SystemClock, 115200_Bd>();
 
 	Button::setInput();
 	Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);

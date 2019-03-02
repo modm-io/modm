@@ -28,9 +28,9 @@ namespace Board
 
 /// STM32F072 running at 48MHz generated from the internal 48MHz clock
 // TODO: enable once clock driver is implemented
-//using systemClock = SystemClock<InternalClock<48_MHz>, 48_MHz>;
+//using SystemClock = SystemClock<InternalClock<48_MHz>, 48_MHz>;
 
-struct systemClock
+struct SystemClock
 {
 	static constexpr int Frequency = 48_MHz;
 	static constexpr uint32_t Ahb = Frequency;
@@ -106,8 +106,8 @@ using Gyroscope = modm::L3gd20< Transport >;
 inline void
 initialize()
 {
-	systemClock::enable();
-	SysTickTimer::initialize<systemClock>();
+	SystemClock::enable();
+	SysTickTimer::initialize<SystemClock>();
 
 	LedUp::setOutput(modm::Gpio::Low);
 	LedDown::setOutput(modm::Gpio::Low);
@@ -137,7 +137,7 @@ initializeL3g()
 	l3g::Cs::setOutput(modm::Gpio::High);
 
 	l3g::SpiMaster::connect<l3g::Sck::Sck, l3g::Mosi::Mosi, l3g::Miso::Miso>();
-	l3g::SpiMaster::initialize<systemClock, 3_MHz>();
+	l3g::SpiMaster::initialize<SystemClock, 3_MHz>();
 	l3g::SpiMaster::setDataMode(l3g::SpiMaster::DataMode::Mode3);
 }
 

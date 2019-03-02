@@ -134,7 +134,7 @@ main()
 	Board::initialize();
 
 	MyI2cMaster::connect<Board::D14::Sda, Board::D15::Scl>();
-	MyI2cMaster::initialize<Board::systemClock, MyI2cMaster::Baudrate::Standard>();
+	MyI2cMaster::initialize<Board::SystemClock, MyI2cMaster::Baudrate::Standard>();
 
 	LedGreen::set();
 

@@ -102,7 +102,7 @@ main()
 	// initialize board and SPI
 	Board::initialize();
 	SpiMaster::connect<Mosi::Mosi, Miso::Miso, Sck::Sck>();
-	SpiMaster::initialize<Board::systemClock, 11_MHz>();
+	SpiMaster::initialize<Board::SystemClock, 11_MHz>();
 
 	std::memset(bufferA, 0xAA, BlockSize);
 	std::memset(bufferB, 0x55, BlockSize);

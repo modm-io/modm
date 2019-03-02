@@ -53,7 +53,7 @@ void
 initLogger()
 {
 	Usart2::connect<GpioA2::Tx>();
-	Usart2::initialize<Board::systemClock, 115200_Bd>();
+	Usart2::initialize<Board::SystemClock, 115200_Bd>();
 }
 
 // ----------------------------------------------------------------------------
@@ -166,7 +166,7 @@ initTouchscreen()
 	IntTouchscreen::setInput(Gpio::InputType::PullUp);
 
 	SpiMaster2::connect<GpioB13::Sck, GpioB14::Miso, GpioB15::Mosi>();
-	SpiMaster2::initialize<Board::systemClock, 656250ul>();
+	SpiMaster2::initialize<Board::SystemClock, 656250ul>();
 	SpiMaster2::setDataMode(SpiMaster2::DataMode::Mode0);
 
 }

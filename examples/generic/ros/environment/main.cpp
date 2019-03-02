@@ -63,10 +63,10 @@ main()
 
 	// Reinit onboard UART to 1 Mbps
 	// Do not use it for logging because this will destroy ROS serial messages.
-	Board::stlink::Uart::initialize<Board::systemClock, 1_MBd>(12);
+	Board::stlink::Uart::initialize<Board::SystemClock, 1_MBd>(12);
 
     MyI2cMaster::connect<Board::D14::Sda, Board::D15::Scl>();
-    MyI2cMaster::initialize<Board::systemClock, MyI2cMaster::Baudrate::Standard>();
+    MyI2cMaster::initialize<Board::SystemClock, MyI2cMaster::Baudrate::Standard>();
 
 	Board::LedGreen::set();
 

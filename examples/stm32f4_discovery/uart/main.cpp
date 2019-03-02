@@ -31,7 +31,7 @@ main()
 
 	// Enable USART 2
 	Usart2::connect<GpioA2::Tx>();
-	Usart2::initialize<Board::systemClock, 9600_Bd>();
+	Usart2::initialize<Board::SystemClock, 9600_Bd>();
 
 	while (1)
 	{

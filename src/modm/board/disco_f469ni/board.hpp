@@ -31,7 +31,7 @@ namespace Board
 	using namespace modm::literals;
 
 /// STM32F469 running at 180MHz from the external 8MHz crystal
-struct systemClock
+struct SystemClock
 {
 	static constexpr uint32_t Frequency = 180_MHz;
 	static constexpr uint32_t Apb1 = Frequency / 4;
@@ -166,7 +166,7 @@ initializeTouchscreen()
 //	ft6::Int::enableExternalInterruptVector(12);
 
 	ft6::I2cMaster::connect<ft6::Scl::Scl, ft6::Sda::Sda>();
-	ft6::I2cMaster::initialize<systemClock, 360_kHz>();
+	ft6::I2cMaster::initialize<SystemClock, 360_kHz>();
 }
 
 void
@@ -185,11 +185,11 @@ inline void
 initialize()
 {
 	// initialized in `modm_board_init()`
-	// systemClock::enable();
-	SysTickTimer::initialize<systemClock>();
+	// SystemClock::enable();
+	SysTickTimer::initialize<SystemClock>();
 
 	stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>();
-	stlink::Uart::initialize<systemClock, 115200_Bd>();
+	stlink::Uart::initialize<SystemClock, 115200_Bd>();
 
 	LedGreen::setOutput(modm::Gpio::Low);
 	LedRed::setOutput(modm::Gpio::Low);

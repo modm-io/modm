@@ -87,15 +87,15 @@ main()
 
 	// Enable USART 2: To / from PC
 	Usart2::connect<GpioOutputA2::Tx, GpioInputA3::Rx>();
-	Usart2::initialize<Board::systemClock, 115200_Bd>();
+	Usart2::initialize<Board::SystemClock, 115200_Bd>();
 
 	// Enable USART 1 Host To Node
 	Usart1::connect<GpioInputA10::Rx>();
-	Usart1::initialize<Board::systemClock, 115200_Bd>();
+	Usart1::initialize<Board::SystemClock, 115200_Bd>();
 
 	// Enable USART 3 Node to Host
 	Usart3::connect<GpioInputD9::Rx>();
-	Usart3::initialize<Board::systemClock, 115200_Bd>();
+	Usart3::initialize<Board::SystemClock, 115200_Bd>();
 
 	MODM_LOG_INFO.printf("\e[H\e[J\e[39m");
 	MODM_LOG_INFO.printf("Welcome to MODM Bidirectional UART Sniffer.\n\n");

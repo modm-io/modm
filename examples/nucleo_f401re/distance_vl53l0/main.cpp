@@ -160,7 +160,7 @@ main()
 	LedD13::setOutput();
 
 	MyI2cMaster::connect<GpioB8::Scl, GpioB9::Sda>();
-	MyI2cMaster::initialize<systemClock, 400_kHz>();
+	MyI2cMaster::initialize<SystemClock, 400_kHz>();
 
 	MODM_LOG_INFO << "\n\nWelcome to VL53L0X demo!\n\n";
 

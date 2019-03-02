@@ -15,13 +15,12 @@
 
 using namespace modm::platform;
 using namespace modm::literals;
-using systemClock = SystemClock;
 
 int
 main()
 {
 	// Set-up the I2C device as master and configure it to a baudrate of 100.000
-	I2cMaster::initialize<systemClock, 100_kHz>();
+	I2cMaster::initialize<SystemClock, 100_kHz>();
 
 	// Enable interrupts
 	enableInterrupts();

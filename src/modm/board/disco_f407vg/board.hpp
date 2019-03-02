@@ -27,7 +27,7 @@ namespace Board
 	using namespace modm::literals;
 
 /// STM32F407 running at 168MHz generated from the external 8MHz crystal
-struct systemClock {
+struct SystemClock {
 	static constexpr uint32_t Frequency = 168_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency / 4;
@@ -168,8 +168,8 @@ using VBus = GpioInputA9;	// VBUS_FS: USB_OTG_HS_VBUS
 inline void
 initialize()
 {
-	systemClock::enable();
-	SysTickTimer::initialize<systemClock>();
+	SystemClock::enable();
+	SysTickTimer::initialize<SystemClock>();
 
 	LedOrange::setOutput(modm::Gpio::Low);
 	LedGreen::setOutput(modm::Gpio::Low);
@@ -193,7 +193,7 @@ initializeLis3()
 	lis3::Cs::setOutput(modm::Gpio::High);
 
 	lis3::SpiMaster::connect<lis3::Sck::Sck, lis3::Mosi::Mosi, lis3::Miso::Miso>();
-	lis3::SpiMaster::initialize<systemClock, 10_MHz>();
+	lis3::SpiMaster::initialize<SystemClock, 10_MHz>();
 	lis3::SpiMaster::setDataMode(lis3::SpiMaster::DataMode::Mode3);
 }
 
@@ -209,7 +209,7 @@ initializeCs43()
 	cs43::Reset::setOutput(modm::Gpio::High);
 
 	cs43::I2cMaster::connect<cs43::Scl::Scl, cs43::Sda::Sda>();
-	cs43::I2cMaster::initialize<systemClock, cs43::I2cMaster::Baudrate::Standard>();
+	cs43::I2cMaster::initialize<SystemClock, cs43::I2cMaster::Baudrate::Standard>();
 }
 
 /// not supported yet, due to missing I2S driver

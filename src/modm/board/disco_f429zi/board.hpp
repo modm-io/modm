@@ -25,7 +25,7 @@ namespace Board
 	using namespace modm::literals;
 
 /// STM32F429 running at 180MHz from the external 8MHz crystal
-struct systemClock
+struct SystemClock
 {
 	static constexpr uint32_t Frequency = 180_MHz;
 	static constexpr uint32_t Apb1 = Frequency / 4;
@@ -221,8 +221,8 @@ using VBus = GpioB13;			// VBUS_FS: USB_OTG_HS_VBUS
 inline void
 initialize()
 {
-	systemClock::enable();
-	SysTickTimer::initialize<systemClock>();
+	SystemClock::enable();
+	SysTickTimer::initialize<SystemClock>();
 
 	LedGreen::setOutput(modm::Gpio::Low);
 	LedRed::setOutput(modm::Gpio::Low);
@@ -250,7 +250,7 @@ initializeL3g()
 	l3g::Cs::setOutput(modm::Gpio::High);
 
 	l3g::SpiMaster::connect<l3g::Sck::Sck, l3g::Mosi::Mosi, l3g::Miso::Miso>();
-	l3g::SpiMaster::initialize<systemClock, 11250000ul>();
+	l3g::SpiMaster::initialize<SystemClock, 11250000ul>();
 	l3g::SpiMaster::setDataMode(l3g::SpiMaster::DataMode::Mode3);
 }
 

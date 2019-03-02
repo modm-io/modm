@@ -31,7 +31,7 @@ main()
 	// Connect the GPIOs to the SPIs alternate function
 	SpiMaster::connect<Miso::Miso, Mosi::Mosi, Sck::Sck>();
 	// Initialize the SPI with a 20MHz clock
-	SpiMaster::initialize<Board::systemClock, 20_MHz>();
+	SpiMaster::initialize<Board::SystemClock, 20_MHz>();
 
 	uint8_t data = 0;
 	while (1)

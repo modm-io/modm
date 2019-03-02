@@ -95,7 +95,7 @@ main()
 
 	// Initialize Can1
 	Can1::connect<GpioB8::Rx, GpioB9::Tx>(Gpio::InputType::PullUp);
-	Can1::initialize<Board::systemClock, Can1::Bitrate::kBps125>(10);
+	Can1::initialize<Board::SystemClock, Can1::Bitrate::kBps125>(10);
 	CanFilter::setFilter(0, CanFilter::FIFO0,
 						CanFilter::ExtendedIdentifier(0),
 						CanFilter::ExtendedFilterMask(0));
