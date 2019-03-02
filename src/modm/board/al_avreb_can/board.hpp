@@ -25,6 +25,7 @@ using namespace modm::platform;
 /// @ingroup modm_board_al_avreb_can
 namespace Board
 {
+using namespace modm::literals;
 
 using systemClock = modm::platform::SystemClock;
 
@@ -44,7 +45,7 @@ initialize()
 	systemClock::enable();
 
 	Uart1::connect<GpioD3::Txd, GpioD2::Rxd>();
-	Uart1::initialize<systemClock, 38400>();
+	Uart1::initialize<systemClock, 38400_Bd>();
 
 	// modm::Clock initialization
 	// Clear Timer on Compare Match Mode

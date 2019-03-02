@@ -15,6 +15,7 @@
 #include <modm/debug/logger.hpp>
 
 using namespace modm::platform;
+using namespace modm::literals;
 using systemClock = SystemClock;
 
 // Create a new UART object and configure it to a baudrate of 115200
@@ -34,7 +35,7 @@ int
 main()
 {
 	Uart0::connect<GpioD1::Txd, GpioD0::Rxd>();
-	Uart0::initialize<systemClock, 115200>();
+	Uart0::initialize<systemClock, 115200_Bd>();
 
 	// Enable interrupts, this is needed for every buffered UART
 	enableInterrupts();

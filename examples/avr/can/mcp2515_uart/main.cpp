@@ -70,7 +70,7 @@ main()
 	OCR2A = 230;
 
 	Uart0::connect<GpioD1::Txd, GpioD0::Rxd>();
-	Uart0::initialize<systemClock, 115200>();
+	Uart0::initialize<systemClock, 115200_Bd>();
 
 	// Create a IOStream for complex formatting tasks
 	modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull > device;

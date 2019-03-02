@@ -16,6 +16,7 @@
 #include <modm/ui/display/font.hpp>
 
 using namespace modm::platform;
+using namespace modm::literals;
 using systemClock = SystemClock;
 
 // Graphic LCD

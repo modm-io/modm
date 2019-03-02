@@ -16,6 +16,7 @@
 #include <modm/io/iostream.hpp>
 
 using namespace modm::platform;
+using namespace modm::literals;
 
 using OneWirePin = GpioC2;
 using OneWireMaster = BitBangOneWireMaster<OneWirePin>;
@@ -25,7 +26,7 @@ main()
 {
 	using systemClock = SystemClock;
 	Uart0::connect<GpioD1::Txd, GpioD0::Rxd>();
-	Uart0::initialize<systemClock, 9600>();
+	Uart0::initialize<systemClock, 9600_Bd>();
 
 	// Enable interrupts, this is needed for every buffered UART
 	enableInterrupts();

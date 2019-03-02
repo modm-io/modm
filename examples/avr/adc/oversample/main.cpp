@@ -14,6 +14,7 @@
 #include <modm/processing/timer.hpp>
 
 using namespace modm::platform;
+using namespace modm::literals;
 
 // Create a new UART object
 using systemClock = SystemClock;
@@ -38,7 +39,7 @@ int
 main()
 {
 	Uart0::connect<GpioOutputD1::Txd, GpioInputD0::Rxd>();
-	Uart0::initialize<systemClock, 115200>();
+	Uart0::initialize<systemClock, 115200_Bd>();
 
 	// Initialize the analog to digital converter
 	// With the AVR running at 14.7456Mhz and a prescaler of 128 the

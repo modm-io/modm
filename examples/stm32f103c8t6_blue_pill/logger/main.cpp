@@ -16,6 +16,7 @@
 #include <modm/debug/logger.hpp>
 #include <modm/processing/timer.hpp>
 #include <modm/processing/protothread.hpp>
+using namespace modm::literals;
 
 // ----------------------------------------------------------------------------
 // Set the log level
@@ -79,7 +80,7 @@ main()
 
 	// initialize Uart2 for MODM_LOG_*
 	Usart2::connect<GpioOutputA2::Tx>();
-	Usart2::initialize<Board::systemClock, 115200>();
+	Usart2::initialize<Board::systemClock, 115200_Bd>();
 
 	// Use the logging streams to print some messages.
 	// Change MODM_LOG_LEVEL above to enable or disable these messages

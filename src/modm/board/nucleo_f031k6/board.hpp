@@ -94,7 +94,7 @@ initialize()
 	SysTickTimer::initialize<systemClock>();
 
 	stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>();
-	stlink::Uart::initialize<systemClock, 115200_Baud>();
+	stlink::Uart::initialize<systemClock, 115200_Bd>();
 }
 
 }

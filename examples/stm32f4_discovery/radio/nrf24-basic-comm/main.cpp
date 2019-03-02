@@ -17,6 +17,7 @@
 #include <modm/processing/timer.hpp>
 
 #include <modm/driver/radio/nrf24/nrf24_definitions.hpp>
+using namespace modm::literals;
 
 using modm::Nrf24Register;
 using modm::Nrf24Phy;
@@ -109,7 +110,7 @@ main()
 
 	// Enable UART 2
 	Usart2::connect<GpioA2::Tx>();
-	Usart2::initialize<Board::systemClock, 115200>();
+	Usart2::initialize<Board::systemClock, 115200_Bd>();
 
 	/* Configuration values for nRF24 */
 

@@ -142,7 +142,7 @@ initialize()
 	SysTickTimer::initialize<systemClock>();
 
 	uext::Uart::connect<uext::Tx::Tx, uext::Rx::Rx>();
-	uext::Uart::initialize<systemClock, modm::Uart::Baudrate::B115200>(12);
+	uext::Uart::initialize<systemClock, 115200_Bd>(12);
 
 }
 

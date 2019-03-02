@@ -10,6 +10,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
+using namespace modm::literals;
 
 #include <modm/processing/timer.hpp>
 #include <modm/processing/protothread.hpp>

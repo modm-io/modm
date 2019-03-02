@@ -14,6 +14,7 @@
 #include <modm/driver/pwm/pca9685.hpp>
 
 using namespace modm::platform;
+using namespace modm::literals;
 using systemClock = SystemClock;
 
 int

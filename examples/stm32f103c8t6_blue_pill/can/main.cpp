@@ -11,7 +11,7 @@
 
 #include <modm/board.hpp>
 #include <modm/debug/logger.hpp>
-#include <modm/board.hpp>
+using namespace modm::literals;
 
 modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice;
 modm::log::Logger modm::log::info(loggerDevice);
@@ -58,7 +58,7 @@ main()
 
 	// Initialize Usart
 	Usart2::connect<GpioOutputA2::Tx>();
-	Usart2::initialize<Board::systemClock, 115200>();
+	Usart2::initialize<Board::systemClock, 115200_Bd>();
 
 	MODM_LOG_INFO << "CAN Test Program" << modm::endl;
 

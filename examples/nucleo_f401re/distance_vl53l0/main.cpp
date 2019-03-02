@@ -12,6 +12,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
+using namespace modm::literals;
 
 #include <modm/processing/protothread.hpp>
 #include <modm/driver/position/vl53l0.hpp>

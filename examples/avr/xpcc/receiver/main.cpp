@@ -87,7 +87,7 @@ int
 main()
 {
 	Uart0::connect<GpioOutputD1::Txd, GpioInputD0::Rxd>();
-	Uart0::initialize<systemClock, 115200>();
+	Uart0::initialize<systemClock, 115200_Bd>();
 
 	// Initialize SPI interface and the other pins
 	// needed by the MCP2515

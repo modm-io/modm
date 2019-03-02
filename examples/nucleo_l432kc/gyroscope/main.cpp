@@ -16,6 +16,7 @@
 #include <modm/driver/inertial/l3gd20.hpp>
 #include <modm/processing.hpp>
 #include <modm/math/filter.hpp>
+using namespace modm::literals;
 
 // Example for L3gd20 gyroscope connected to SPI USART interface
 

@@ -13,6 +13,7 @@
 
 #include <modm/board.hpp>
 #include <modm/debug/logger.hpp>
+using namespace modm::literals;
 
 // ----------------------------------------------------------------------------
 // Set the log level
@@ -62,7 +63,7 @@ main()
 
 	// initialize Uart2 for MODM_LOG_INFO
 	Usart2::connect<GpioOutputA2::Tx>();
-	Usart2::initialize<Board::systemClock, 115200>();
+	Usart2::initialize<Board::systemClock, 115200_Bd>();
 
 	// initialize Adc
 	Adc1::initialize(Adc1::ClockMode::Asynchronous, Adc1::Prescaler::Div128,

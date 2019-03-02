@@ -16,6 +16,7 @@
 #include <modm/io/iostream.hpp>
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/driver/pressure/bmp085.hpp>
+using namespace modm::literals;
 
 modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > device;
 modm::IOStream stream(device);
@@ -127,7 +128,7 @@ main()
 	Board::initialize();
 
 	Usart2::connect<GpioA2::Tx>();
-	Usart2::initialize<Board::systemClock, modm::Uart::B115200>();
+	Usart2::initialize<Board::systemClock, 115200_Bd>();
 
 	MyI2cMaster::connect<GpioB9::Sda, GpioB8::Scl>();
 	MyI2cMaster::initialize<Board::systemClock, MyI2cMaster::Baudrate::Standard>();

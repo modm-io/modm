@@ -35,7 +35,7 @@ using Uart = Uart0;
 // connect both pins with a pullup on the Rx
 Uart::connect<GpioOutputD1::Tx, GpioInputD0::Rx>(Gpio::InputType::PullUp);
 // initialize to 115.2kBaud from the BSP clock configuration
-Uart::initialize<Board::systemClock, 115200>();
+Uart::initialize<Board::systemClock, 115200_Bd>();
 
 Uart::write('H');  // Ohai there
 Uart::write('i');
@@ -59,7 +59,7 @@ modm::IODeviceWrapper<Uart> device;
 modm::IOStream stream(device);
 
 Uart::connect<GpioOutputD1::Tx>();
-Uart::initialize<Board::systemClock, 115200>();
+Uart::initialize<Board::systemClock, 115200_Bd>();
 
 // similar to std::ostream but without formatting features
 stream << 42 << " is a nice number!" << modm::endl;

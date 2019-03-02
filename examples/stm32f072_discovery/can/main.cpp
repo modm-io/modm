@@ -14,6 +14,7 @@
 #include <modm/board.hpp>
 #include <modm/processing/timer.hpp>
 #include <modm/debug/logger.hpp>
+using namespace modm::literals;
 
 /**
  * Example of CAN Hardware on STM32 F0 Discovery Board.
@@ -75,7 +76,7 @@ main()
 
 	// Initialize Usart
 	Usart1::connect<GpioOutputA9::Tx>();
-	Usart1::initialize<Board::systemClock, 115200>();
+	Usart1::initialize<Board::systemClock, 115200_Bd>();
 
 	MODM_LOG_INFO << "CAN Test Program" << modm::endl;
 

@@ -11,6 +11,7 @@
 
 #include <modm/board.hpp>
 #include <modm/debug/logger.hpp>
+using namespace modm::literals;
 
 /* This example showcases the hard fault handler LED blinking and UART logging.
  * You can trigger the hard fault by pressing the blue button, which will execute an undefined instruction.
@@ -54,7 +55,7 @@ main()
 
 	// initialize Uart2 for MODM_LOG_
 	Usart2::connect<GpioA2::Tx>();
-	Usart2::initialize<Board::systemClock, 115200>();
+	Usart2::initialize<Board::systemClock, 115200_Bd>();
 
 	MODM_LOG_INFO << "Press Button to cause a Hardfault!" << modm::endl;
 

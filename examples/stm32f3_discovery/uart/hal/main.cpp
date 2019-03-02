@@ -12,6 +12,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
+using namespace modm::literals;
 
 int
 main()
@@ -21,7 +22,7 @@ main()
 	// Initialize Usart Hal
 	GpioInputA3::configure(Gpio::InputType::PullUp);
 	GpioConnector<Peripheral::Usart2, GpioOutputA2::Tx, GpioInputA3::Rx>::connect();
-//	UsartHal2::initialize<Board::systemClock, 115200>(UsartHal2::Parity::Odd);
+//	UsartHal2::initialize<Board::systemClock, 115200_Bd>(UsartHal2::Parity::Odd);
 	UsartHal2::enableInterruptVector(true, 14);
 	UsartHal2::enableInterrupt(UsartHal2::Interrupt::TxEmpty);
 	UsartHal2::setTransmitterEnable(true);

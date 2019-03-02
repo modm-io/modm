@@ -28,6 +28,7 @@
 #include "touchscreen_calibrator.hpp"
 
 #include "images/bluetooth_12x16.hpp"
+using namespace modm::literals;
 
 // ----------------------------------------------------------------------------
 /*
@@ -52,7 +53,7 @@ void
 initLogger()
 {
 	Usart2::connect<GpioA2::Tx>();
-	Usart2::initialize<Board::systemClock, 115200>();
+	Usart2::initialize<Board::systemClock, 115200_Bd>();
 }
 
 // ----------------------------------------------------------------------------

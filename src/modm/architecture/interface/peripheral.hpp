@@ -21,6 +21,21 @@
 namespace modm
 {
 
+using baudrate_t = uint32_t;
+namespace literals
+{
+	constexpr baudrate_t operator "" _Bd(unsigned long long int baudrate)
+	{ return baudrate; }
+	constexpr baudrate_t operator "" _kBd(unsigned long long int baudrate)
+	{ return baudrate * 1'000; }
+	constexpr baudrate_t operator "" _kBd(long double baudrate)
+	{ return baudrate * 1'000; }
+	constexpr baudrate_t operator "" _MBd(unsigned long long int baudrate)
+	{ return baudrate * 1'000'000; }
+	constexpr baudrate_t operator "" _MBd(long double baudrate)
+	{ return baudrate * 1'000'000; }
+}
+
 /**
  * Peripheral class
  *
@@ -82,7 +97,7 @@ public:
 	 * This method checks if the user requested baudrate is within error
 	 * tolerance of the system achievable baudrate.
 	 */
-	template< uint32_t available, uint32_t requested, uint16_t tolerance >
+	template< baudrate_t available, baudrate_t requested, uint16_t tolerance >
 	static void
 	assertBaudrateInTolerance()
 	{

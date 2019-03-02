@@ -21,6 +21,7 @@
 #include <modm/communication/sab/slave.hpp>
 
 using namespace modm::platform;
+using namespace modm::literals;
 using systemClock = SystemClock;
 
 // ----------------------------------------------------------------------------

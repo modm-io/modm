@@ -16,6 +16,7 @@
 #include <modm/driver/pressure/ams5915.hpp>
 #include <modm/io/iostream.hpp>
 #include <modm/debug/logger.hpp>
+using namespace modm::literals;
 
 modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > device;
 
@@ -100,7 +101,7 @@ main()
 	Board::initialize();
 
 	Usart2::connect<GpioOutputA2::Tx>();
-	Usart2::initialize<Board::systemClock, modm::Uart::B115200>(10);
+	Usart2::initialize<Board::systemClock, 115200_Bd>(10);
 
 	MyI2cMaster::connect<GpioB10::Scl, GpioB11::Sda>();
 	MyI2cMaster::initialize<Board::systemClock, 400_kHz>();

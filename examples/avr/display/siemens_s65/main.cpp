@@ -16,6 +16,7 @@
 #include <modm/ui/button_group.hpp>
 
 using namespace modm::platform;
+using namespace modm::literals;
 
 using systemClock = SystemClock;
 

@@ -16,6 +16,7 @@
 #include <modm/driver/temperature/ltc2984.hpp>
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/io/iostream.hpp>
+using namespace modm::literals;
 
 modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > device;
 modm::IOStream logger(device);
@@ -145,7 +146,7 @@ main()
 	Board::initialize();
 
 	Usart2::connect<GpioOutputA2::Tx>();
-	Usart2::initialize<Board::systemClock, modm::Uart::B115200>(10);
+	Usart2::initialize<Board::systemClock, 115200_Bd>(10);
 
 	// Connect the GPIOs to the SPIs alternate function
 	SpiMaster::connect<Sck::Sck, Mosi::Mosi, Miso::Miso>();

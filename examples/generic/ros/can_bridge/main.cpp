@@ -14,6 +14,7 @@
 #include <can_msgs/Frame.h>
 #include <ros/node_handle.h>
 #include <modm/communication/ros.hpp>
+using namespace modm::literals;
 
 namespace modm {
 namespace can {
@@ -95,7 +96,7 @@ main()
 
 	// Reinit onboard UART to 1 Mbps
 	// Do not use it for logging because this will destroy ROS serial messages.
-	RosSerialUart::initialize<Board::systemClock, modm::Uart::Baudrate::kBps250>(12);
+	RosSerialUart::initialize<Board::systemClock, 250_kBd>(12);
 
 	CanFilter::setStartFilterBankForCan2(14);
 

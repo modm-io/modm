@@ -30,6 +30,7 @@
 
 #include <ros/node_handle.h>
 #include <modm/communication/ros.hpp>
+using namespace modm::literals;
 
 #undef	MODM_LOG_LEVEL
 #define	MODM_LOG_LEVEL modm::log::DISABLED
@@ -62,7 +63,7 @@ main()
 
 	// Reinit onboard UART to 1 Mbps
 	// Do not use it for logging because this will destroy ROS serial messages.
-	Board::stlink::Uart::initialize<Board::systemClock, modm::Uart::Baudrate::MBps1>(12);
+	Board::stlink::Uart::initialize<Board::systemClock, 1_MBd>(12);
 
     MyI2cMaster::connect<Board::D14::Sda, Board::D15::Scl>();
     MyI2cMaster::initialize<Board::systemClock, MyI2cMaster::Baudrate::Standard>();

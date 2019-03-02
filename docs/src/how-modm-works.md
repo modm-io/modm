@@ -259,8 +259,8 @@ for keeping code size in check on very resource constrained targets, like the AV
 
 ```cpp
 Uart4::connect<GpioA0::Tx, GpioA1::Rx>(Gpio::InputType::PullUp); // pull-up in RX pin
-Uart4::initialize<Board::systemClock, 115'200>(); // Within 1% default tolerance
-Uart4::initialize<Board::systemClock, 115'200, Tolerance::Exact>();
+Uart4::initialize<Board::systemClock, 115'200_Bd>(); // Within 1% default tolerance
+Uart4::initialize<Board::systemClock, 115'200_Bd> Tolerance::Exact>();
 // error: The closest available baudrate exceeds the tolerance of the requested baudrate!
 ```
 

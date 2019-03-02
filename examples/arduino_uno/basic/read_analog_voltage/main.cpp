@@ -14,6 +14,7 @@
 // Inspired by: http://arduino.cc/en/Tutorial/ReadAnalogVoltage
 
 #include <modm/board.hpp>
+using namespace modm::literals;
 
 int
 main()

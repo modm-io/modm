@@ -14,6 +14,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
+using namespace modm::literals;
 
 // ----------------------------------------------------------------------------
 /**
@@ -30,7 +31,7 @@ main()
 
 	// Enable USART 2
 	Usart2::connect<GpioA2::Tx>();
-	Usart2::initialize<Board::systemClock, 9600>();
+	Usart2::initialize<Board::systemClock, 9600_Bd>();
 
 	while (1)
 	{

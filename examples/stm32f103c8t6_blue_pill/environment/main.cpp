@@ -15,6 +15,7 @@
 
 #include <modm/processing/timer.hpp>
 #include <modm/processing/protothread.hpp>
+using namespace modm::literals;
 
 #include "hardware.hpp"
 
@@ -60,7 +61,7 @@ main()
 	// ------------------------------------------------------------------------
 	// initialize Uart2 for MODM_LOG_*
 	Usart2::connect<GpioOutputA2::Tx>();
-	Usart2::initialize<Board::systemClock, 115200>();
+	Usart2::initialize<Board::systemClock, 115200_Bd>();
 
 	MODM_LOG_DEBUG << "Welcome to Environment Sensor Test" << modm::endl;
 
