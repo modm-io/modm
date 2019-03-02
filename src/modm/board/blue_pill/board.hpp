@@ -79,14 +79,9 @@ struct systemClock {
 
 		// APB2 has max. 72MHz
 		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div1);
-		// update frequencies for busy-wait delay functions
-
 
 		// update frequencies for busy-wait delay functions
-		modm::clock::fcpu     = Frequency;
-		modm::clock::fcpu_kHz = Frequency / 1000;
-		modm::clock::fcpu_MHz = Frequency / 1000000;
-		modm::clock::ns_per_loop = ::round(3000.f / (Frequency / 1000000));
+		Rcc::updateCoreFrequency<Frequency>();
 
 		return true;
 	}

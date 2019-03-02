@@ -95,11 +95,7 @@ struct systemClock
 		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div8);
 		// APB2 is running only at 54MHz, since AHB / 2 = 108MHz > 90MHz limit!
 		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div4);
-		// update clock frequencies
-		modm::clock::fcpu     = Frequency;
-		modm::clock::fcpu_kHz = Frequency / 1000;
-		modm::clock::fcpu_MHz = Frequency / 1000000;
-		modm::clock::ns_per_loop = ::round(1000.f / (Frequency / 1000000));
+		Rcc::updateCoreFrequency<Frequency>();
 
 		return true;
 	}

@@ -424,6 +424,9 @@ public:
 	static uint32_t
 	setFlashLatency();
 
+	template< uint32_t Core_Hz >
+	static void
+	updateCoreFrequency();
 
 public:
 	template< Peripheral peripheral >
