@@ -15,7 +15,6 @@
 #include <modm/processing/rtos.hpp>
 
 using namespace modm::platform;
-using namespace modm::cortex;
 
 /**
  * Check FPU support in FreeRTOS for STM32F4.

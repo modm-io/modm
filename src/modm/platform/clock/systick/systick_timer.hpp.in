@@ -17,7 +17,7 @@
 #include <cmath>
 #include <modm/architecture/interface/peripheral.hpp>
 
-namespace modm::cortex
+namespace modm::platform
 {
 
 typedef void (*InterruptHandler)(void);
@@ -100,6 +100,11 @@ private:
 	enable(uint32_t reload);
 };
 
+}
+
+namespace modm::cortex {
+	using SysTickTimer [[deprecated("Please use `modm::platform:SysTickTimer` instead")]] =
+		::modm::platform::SysTickTimer;
 }
 
 #endif	//  MODM_STM32_CORTEX_TIMER_HPP

@@ -93,7 +93,7 @@ inline void
 initialize()
 {
 	systemClock::enable();
-	modm::cortex::SysTickTimer::initialize<systemClock>();
+	SysTickTimer::initialize<systemClock>();
 
 	LedGreen::setOutput(modm::Gpio::Low);
 	LedRed::setOutput(modm::Gpio::Low);

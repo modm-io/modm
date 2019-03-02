@@ -141,7 +141,7 @@ inline void
 initialize()
 {
 	systemClock::enable();
-	modm::cortex::SysTickTimer::initialize<systemClock>();
+	SysTickTimer::initialize<systemClock>();
 
 	uext::Uart::connect<uext::Tx::Tx, uext::Rx::Rx>();
 	uext::Uart::initialize<systemClock, modm::Uart::Baudrate::B115200>(12);

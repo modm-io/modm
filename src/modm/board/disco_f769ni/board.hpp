@@ -154,7 +154,7 @@ inline void
 initialize()
 {
 	systemClock::enable();
-	modm::cortex::SysTickTimer::initialize<systemClock>();
+	SysTickTimer::initialize<systemClock>();
 
 	stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>();
 	stlink::Uart::initialize<systemClock, 115200>();
