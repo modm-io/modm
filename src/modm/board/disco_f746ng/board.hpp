@@ -87,6 +87,8 @@ struct systemClock
 			432,	// 1MHz * M=432 -> 432MHz
 			2		// 432MHz / P=2 -> 216MHz = F_cpu
 		);
+		PWR->CR1 |= PWR_CR1_ODEN; // Enable overdrive mode
+		while (not (PWR->CSR1 & PWR_CSR1_ODRDY)) ;
 		ClockControl::setFlashLatency(Frequency);
 		ClockControl::enableSystemClock(ClockControl::SystemClockSource::Pll);
 		// APB1 is running only at 27MHz, since AHB / 4 = 54MHz > 45MHz limit!

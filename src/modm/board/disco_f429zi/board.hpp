@@ -82,6 +82,8 @@ struct systemClock
 			180,	// 2MHz * M=180 -> 360MHz
 			2		// 360MHz / P=2 -> 180MHz = F_cpu
 		);
+		PWR->CR |= PWR_CR_ODEN; // Enable overdrive mode
+		while (not (PWR->CSR & PWR_CSR_ODRDY)) ;
 		ClockControl::setFlashLatency(Frequency);
 		ClockControl::enableSystemClock(ClockControl::SystemClockSource::Pll);
 		ClockControl::setApb1Prescaler(ClockControl::Apb1Prescaler::Div4);
