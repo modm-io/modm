@@ -13,36 +13,36 @@ namespace modm::platform
 {
 
 constexpr Rcc::flash_latency
-Rcc::computeFlashLatency(uint32_t CPU_Frequency, uint16_t mV)
+Rcc::computeFlashLatency(uint32_t Core_Hz, uint16_t Core_mV)
 {
-	%% for mV, table_MHz in table.items() | sort
+	%% for mV, table_Hz in table.items() | sort
 	constexpr uint32_t flash_latency_{{ mV }}[] =
 	{
-		%% for mhz in table_MHz
-		{{ mhz * 1000000 }},
+		%% for hz in table_Hz
+		{{ hz }},
 		%% endfor
 	};
 	%% endfor
 
-	const uint32_t *lut(flash_latency_{{ (table|sort)[-1] }});
-	uint8_t lut_size(sizeof(flash_latency_{{ (table|sort)[-1] }}) / sizeof(uint32_t));
+	const uint32_t *lut(flash_latency_{{ (table|sort)[0] }});
+	uint8_t lut_size(sizeof(flash_latency_{{ (table|sort)[0] }}) / sizeof(uint32_t));
 	%% if table|length > 1
 	// find the right table for the voltage
-		%% for mV in (table|sort)[:-1]
-	{% if not loop.first %}else {% endif %}if (mV < {{ mV }}) {
+		%% for mV in (table|sort)[1:]|reverse
+	{% if not loop.first %}else {% endif %}if ({{ mV }} <= Core_mV) {
 		lut = flash_latency_{{ mV }};
 		lut_size = sizeof(flash_latency_{{ mV }}) / sizeof(uint32_t);
 	}
 		%% endfor
 	%% else
-	(void) mV;
+	(void) Core_mV;
 	%% endif
 	// find the next highest frequency in the table
 	uint8_t latency(0);
 	uint32_t max_freq(0);
 	while (latency < lut_size)
 	{
-		if (CPU_Frequency <= (max_freq = lut[latency]))
+		if (Core_Hz <= (max_freq = lut[latency]))
 			break;
 		latency++;
 	}

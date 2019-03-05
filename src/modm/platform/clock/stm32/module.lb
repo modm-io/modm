@@ -55,61 +55,9 @@ def build(env):
         target["family"] == "f0" and target["name"] in ["42", "48", "71", "72", "78", "91", "98"]
     properties["pll_p"] = target["family"] == "l4" and target["name"] not in ["12", "22"]
 
-    if target["family"] in ["f0"]:
-        flash_latencies = {3600: [24, 48]}
-    elif target["family"] in ["f1", "f3"]:
-        if target["family"] in ["f1"] and target["name"] in ["00"]:
-            flash_latencies = {3600: [24]}
-        else:
-            flash_latencies = {3600: [24, 48, 72]}
-    elif target["family"] in ["f2"]:
-        flash_latencies = {
-            3600: [30, 60, 90, 120],
-            2700: [24, 48, 72, 96, 120],
-            2400: [18, 36, 54, 72, 90, 108, 120],
-            2100: [16, 32, 48, 64, 80, 96, 112, 120]
-        }
-    elif target["family"] in ["f4"]:
-        if target["name"] in ["10", "11", "12", "13", "23"]:
-            flash_latencies = {
-                3600: [30, 60, 90, 100],
-                2700: [24, 48, 72, 96, 100],
-                2400: [18, 36, 54, 72, 90, 100],
-                2100: [16, 32, 48, 64, 80, 96, 100]
-            }
-        elif target["name"] in ["01"]:
-            flash_latencies = {
-                3600: [30, 60, 84],
-                2700: [24, 48, 72, 84],
-                2400: [18, 36, 54, 72, 84],
-                2100: [16, 32, 48, 64, 80, 84]
-            }
-        elif target["name"] in ["05", "07", "15", "17"]:
-            flash_latencies = {
-                3600: [30, 60, 90, 120, 150, 168],
-                2700: [24, 48, 72, 96, 120, 144, 168],
-                2400: [22, 44, 66, 88, 110, 132, 154, 168],
-                2100: [20, 40, 60, 80, 100, 120, 140, 160]
-            }
-        elif target["name"] in ["27", "29", "37", "39", "46", "69", "79"]:
-            flash_latencies = {
-                3600: [30, 60, 90, 120, 150, 180],
-                2700: [24, 48, 72, 96, 120, 144, 168, 180],
-                2400: [22, 44, 66, 88, 110, 132, 154, 176, 180],
-                2100: [20, 40, 60, 80, 100, 120, 140, 160, 168]
-            }
-    elif target["family"] in ["f7"]:
-            flash_latencies = {
-                3600: [30, 60, 90, 120, 150, 180, 216],
-                2700: [24, 48, 72, 96, 120, 144, 168, 192, 216],
-                2400: [22, 44, 66, 88, 110, 132, 154, 176, 198, 216],
-                2100: [20, 40, 60, 80, 100, 120, 140, 160, 180]
-            }
-    elif target["family"] in ["l4"]:
-        flash_latencies = {
-            1200: [16, 32, 48, 64, 80],
-            1000: [6, 12, 18, 26]
-        }
+    flash_latencies = {}
+    for vcore in device.get_driver("flash")["latency"]:
+        flash_latencies[int(vcore["vcore-min"])] = sorted([int(f["hclk-max"]) for f in vcore["wait-state"]])
 
     properties["table"] = flash_latencies
     env.substitutions = properties
