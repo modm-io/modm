@@ -9,8 +9,24 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "board/board.hpp"
+#ifndef MODM_COMMON_CLOCK_HPP
+#define MODM_COMMON_CLOCK_HPP
 
-namespace Board {
-	using systemClock [[deprecated("Use `Board::SystemClock` instead!")]] = SystemClock;
+#include <stdint.h>
+#include <modm/architecture/utils.hpp>
+#include <modm/architecture/interface/clock.hpp>
+
+namespace modm::clock
+{
+
+/// @cond
+extern uint32_t fcpu;
+extern uint32_t fcpu_kHz;
+extern uint16_t fcpu_MHz;
+extern uint16_t ns_per_loop;
+/// @endcond
+
 }
+
+
+#endif	// MODM_COMMON_CLOCK_HPP

@@ -22,11 +22,12 @@ using namespace modm::platform;
 /// @ingroup modm_board_disco_f051r8
 namespace Board
 {
+	using namespace modm::literals;
 
 /// STM32F0 running at 48MHz generated from the internal 8MHz with PLL.
-struct systemClock
+struct SystemClock
 {
-	static constexpr int Frequency = MHz48;
+	static constexpr int Frequency = 48_MHz;
 	static constexpr int Usart1 = Frequency;
 	static constexpr int Usart2 = Frequency;
 	static constexpr int Spi2 = Frequency;
@@ -35,20 +36,17 @@ struct systemClock
 	enable()
 	{
 		// enable internal 8 MHz HSI RC clock
-		ClockControl::enableInternalClock();
+		Rcc::enableInternalClock();
 		// (internal clock / 2) * 12 = 48MHz
-		ClockControl::enablePll(ClockControl::PllSource::InternalClock, 12, 1);
+		Rcc::enablePll(Rcc::PllSource::InternalClock, 12, 1);
 		// set flash latency for 48MHz
-		ClockControl::setFlashLatency(Frequency);
+		Rcc::setFlashLatency<Frequency>();
 		// switch system clock to PLL output
-		ClockControl::enableSystemClock(ClockControl::SystemClockSource::Pll);
-		ClockControl::setAhbPrescaler(ClockControl::AhbPrescaler::Div1);
-		ClockControl::setApbPrescaler(ClockControl::ApbPrescaler::Div1);
+		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
+		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
+		Rcc::setApbPrescaler(Rcc::ApbPrescaler::Div1);
 		// update frequencies for busy-wait delay functions
-		modm::clock::fcpu     = Frequency;
-		modm::clock::fcpu_kHz = Frequency / 1000;
-		modm::clock::fcpu_MHz = Frequency / 1000000;
-		modm::clock::ns_per_loop = ::round(4000.f / (Frequency / 1000000));
+		Rcc::updateCoreFrequency<Frequency>();
 
 		return true;
 	}
@@ -66,8 +64,8 @@ using Leds = SoftwareGpioPort< LedGreen, LedBlue >;
 inline void
 initialize()
 {
-	systemClock::enable();
-	modm::cortex::SysTickTimer::initialize<systemClock>();
+	SystemClock::enable();
+	SysTickTimer::initialize<SystemClock>();
 
 	LedGreen::setOutput(modm::Gpio::Low);
 	LedBlue::setOutput(modm::Gpio::Low);

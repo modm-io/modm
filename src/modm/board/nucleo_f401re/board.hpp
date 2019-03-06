@@ -24,11 +24,12 @@ using namespace modm::platform;
 /// @ingroup modm_board_nucleo_f401re
 namespace Board
 {
+	using namespace modm::literals;
 
 /// STM32F401RE running at 84MHz generated from the internal 16MHz crystal
 // Dummy clock for devices
-struct systemClock {
-	static constexpr uint32_t Frequency = 84 * MHz1;
+struct SystemClock {
+	static constexpr uint32_t Frequency = 84_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency / 2;
 	static constexpr uint32_t Apb2 = Frequency;
@@ -62,26 +63,23 @@ struct systemClock {
 	static bool inline
 	enable()
 	{
-		ClockControl::enableInternalClock();	// 16MHz
-		ClockControl::enablePll(
-			ClockControl::PllSource::InternalClock,
+		Rcc::enableInternalClock();	// 16MHz
+		Rcc::enablePll(
+			Rcc::PllSource::InternalClock,
 			4,	//  16MHz / N= 4 -> 4MHz
 			84,	//   4MHz * M=84 -> 336MHz
 			4	// 336MHz / P= 4 -> 84MHz = F_cpu
 		);
 		// set flash latency for 96MHz
-		ClockControl::setFlashLatency(Frequency);
+		Rcc::setFlashLatency<Frequency>();
 		// switch system clock to PLL output
-		ClockControl::enableSystemClock(ClockControl::SystemClockSource::Pll);
-		ClockControl::setAhbPrescaler(ClockControl::AhbPrescaler::Div1);
+		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
+		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
 		// APB1 has max. 50MHz
-		ClockControl::setApb1Prescaler(ClockControl::Apb1Prescaler::Div2);
-		ClockControl::setApb2Prescaler(ClockControl::Apb2Prescaler::Div1);
+		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div2);
+		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div1);
 		// update frequencies for busy-wait delay functions
-		modm::clock::fcpu     = Frequency;
-		modm::clock::fcpu_kHz = Frequency / 1000;
-		modm::clock::fcpu_MHz = Frequency / 1000000;
-		modm::clock::ns_per_loop = ::round(3000.f / (Frequency / 1000000));
+		Rcc::updateCoreFrequency<Frequency>();
 
 		return true;
 	}
@@ -109,11 +107,11 @@ using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockI
 inline void
 initialize()
 {
-	systemClock::enable();
-	modm::cortex::SysTickTimer::initialize<systemClock>();
+	SystemClock::enable();
+	SysTickTimer::initialize<SystemClock>();
 
 	stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>();
-	stlink::Uart::initialize<systemClock, 115200>();
+	stlink::Uart::initialize<SystemClock, 115200_Bd>();
 
 	Button::setInput();
 	Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);

@@ -25,8 +25,8 @@ using namespace modm::platform;
 /// @ingroup modm_board_al_avreb_can
 namespace Board
 {
-
-using systemClock = modm::platform::SystemClock;
+using namespace modm::literals;
+using SystemClock = modm::platform::SystemClock;
 
 using Led0 = GpioInverted<GpioOutputF0>;
 using Led1 = GpioInverted<GpioOutputF1>;
@@ -41,10 +41,10 @@ using LoggerDevice = modm::IODeviceWrapper< Uart1, modm::IOBuffer::BlockIfFull >
 inline void
 initialize()
 {
-	systemClock::enable();
+	SystemClock::enable();
 
 	Uart1::connect<GpioD3::Txd, GpioD2::Rxd>();
-	Uart1::initialize<systemClock, 38400>();
+	Uart1::initialize<SystemClock, 38400_Bd>();
 
 	// modm::Clock initialization
 	// Clear Timer on Compare Match Mode

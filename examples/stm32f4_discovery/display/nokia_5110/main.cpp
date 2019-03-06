@@ -25,6 +25,7 @@
 #include <modm/driver/display/nokia5110.hpp>
 
 #include <modm/board.hpp>
+using namespace modm::literals;
 
 modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > device;
 modm::IOStream stream(device);
@@ -114,7 +115,7 @@ main()
 	Board::initialize();
 
 	Usart2::connect<GpioA2::Tx>();
-	Usart2::initialize<Board::systemClock, modm::Uart::B115200>();
+	Usart2::initialize<Board::SystemClock, 115200_Bd>();
 
 	MODM_LOG_INFO << "\n\nWelcome to Nokia 5110 display demo!\n\n";
 
@@ -124,7 +125,7 @@ main()
 
 	// Hardware SPI Master
 	SpiMaster2::connect<GpioB15::Mosi, GpioB13::Sck>();
-	mySpiMaster::initialize<Board::systemClock, 2625000ul>();
+	mySpiMaster::initialize<Board::SystemClock, 2625000ul>();
 
 	modm::ShortPeriodicTimer tmr(500);
 

@@ -16,6 +16,7 @@
 #include <modm/driver/inertial/l3gd20.hpp>
 #include <modm/processing.hpp>
 #include <modm/math/filter.hpp>
+using namespace modm::literals;
 
 // Example for L3gd20 gyroscope connected to SPI USART interface
 
@@ -95,7 +96,7 @@ main()
 	Board::initialize();
 
 	UartSpi::Master::connect<UartSpi::Ck::Ck, UartSpi::Tx::Tx, UartSpi::Rx::Rx>();
-	UartSpi::Master::initialize<Board::systemClock, 8'000'000, modm::Tolerance::Exact>();
+	UartSpi::Master::initialize<Board::SystemClock, 8_MHz, modm::Tolerance::Exact>();
 
 	while (1) {
 		reader.update();

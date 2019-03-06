@@ -10,6 +10,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
+using namespace modm::literals;
 
 #include <modm/processing/timer.hpp>
 #include <modm/processing/protothread.hpp>
@@ -85,7 +86,7 @@ main()
 	MODM_LOG_INFO << "\n\nPAT9125EL I2C example\n\n";
 
 	I2c::connect<Sda::Sda, Scl::Scl>();
-	I2c::initialize<Board::systemClock, 400'000, modm::Tolerance::TwentyPercent>();
+	I2c::initialize<Board::SystemClock, 400_kHz, modm::Tolerance::TwentyPercent>();
 
 	while (1) {
 		thread.update();

@@ -25,13 +25,14 @@ using namespace modm::platform;
 /// @ingroup modm_board_nucleo_l476rg
 namespace Board
 {
+	using namespace modm::literals;
 
 /// STM32L4 running at 48MHz generated from the
 /// internal Multispeed oscillator
 
 // Dummy clock for devices
-struct systemClock {
-	static constexpr uint32_t Frequency = 48 * MHz1;
+struct SystemClock {
+	static constexpr uint32_t Frequency = 48_MHz;
 	static constexpr uint32_t Ahb  = Frequency;
 	static constexpr uint32_t Apb1 = Frequency;
 	static constexpr uint32_t Apb2 = Frequency;
@@ -58,14 +59,9 @@ struct systemClock {
 	enable()
 	{
 		// set flash latency first because system already runs from MSI
-		ClockControl::setFlashLatency(Frequency);
-
-		ClockControl::enableMultiSpeedInternalClock(ClockControl::MsiFrequency::MHz48);
-
-		modm::clock::fcpu     = Frequency;
-		modm::clock::fcpu_kHz = Frequency / 1000;
-		modm::clock::fcpu_MHz = Frequency / 1000000;
-		modm::clock::ns_per_loop = ::round(3000.f / (Frequency / 1000000));
+		Rcc::setFlashLatency<Frequency>();
+		Rcc::enableMultiSpeedInternalClock(Rcc::MsiFrequency::MHz48);
+		Rcc::updateCoreFrequency<Frequency>();
 
 		return true;
 	}
@@ -94,11 +90,11 @@ using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockI
 inline void
 initialize()
 {
-	systemClock::enable();
-	modm::cortex::SysTickTimer::initialize<systemClock>();
+	SystemClock::enable();
+	SysTickTimer::initialize<SystemClock>();
 
 	stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>();
-	stlink::Uart::initialize<systemClock, 115200>();
+	stlink::Uart::initialize<SystemClock, 115200_Bd>();
 
 	LedGreen::setOutput(modm::Gpio::Low);
 

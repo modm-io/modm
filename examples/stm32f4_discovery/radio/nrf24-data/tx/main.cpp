@@ -19,6 +19,7 @@
 #include <modm/driver/radio/nrf24/nrf24_config.hpp>
 #include <modm/driver/radio/nrf24/nrf24_data.hpp>
 
+using namespace modm::literals;
 
 /*
  * This example showcases a simple usage of the data layer implementation for
@@ -75,11 +76,11 @@ main()
 
 	// Enable SPI 2
 	Spi::connect<GpioB15::Mosi, GpioB14::Miso, GpioB13::Sck>();
-	Spi::initialize<Board::systemClock, MHz10>();
+	Spi::initialize<Board::SystemClock, 10_MHz>();
 
 	// Enable UART 2
 	Usart2::connect<GpioA2::Tx>();
-	Usart2::initialize<Board::systemClock, 115200>();
+	Usart2::initialize<Board::SystemClock, 115200_Bd>();
 
 	MODM_LOG_INFO << "Hello from nrf24-data-tx example" << modm::endl;
 

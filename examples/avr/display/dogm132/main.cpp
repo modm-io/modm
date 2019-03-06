@@ -16,7 +16,7 @@
 #include <modm/ui/button_group.hpp>
 
 using namespace modm::platform;
-using systemClock = SystemClock;
+using namespace modm::literals;
 
 typedef GpioOutputD2 Cs;
 typedef GpioOutputB6 Mosi;
@@ -40,7 +40,7 @@ main()
 	Backlight::set();
 
 	SPI::connect<Sck::BitBang, Mosi::BitBang>();
-	SPI::initialize<systemClock, 1000000>();
+	SPI::initialize<SystemClock, 1_MHz>();
 
 	display.initialize();
 	display.setFont(modm::font::Assertion);

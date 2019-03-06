@@ -28,11 +28,12 @@ using namespace modm::platform;
 /// @ingroup modm_board_disco_f469ni
 namespace Board
 {
+	using namespace modm::literals;
 
 /// STM32F469 running at 180MHz from the external 8MHz crystal
-struct systemClock
+struct SystemClock
 {
-	static constexpr uint32_t Frequency = MHz180;
+	static constexpr uint32_t Frequency = 180_MHz;
 	static constexpr uint32_t Apb1 = Frequency / 4;
 	static constexpr uint32_t Apb2 = Frequency / 2;
 
@@ -81,24 +82,20 @@ struct systemClock
 	static bool inline
 	enable()
 	{
-		ClockControl::enableExternalCrystal(); // 8 MHz
-		ClockControl::enablePll(
-		ClockControl::PllSource::ExternalCrystal,
+		Rcc::enableExternalCrystal(); // 8 MHz
+		Rcc::enablePll(
+		Rcc::PllSource::ExternalCrystal,
 			8,		// 8MHz / N=8 -> 1MHz   !!! Must be 1 MHz for PLLSAI !!!
 			360,	// 1MHz * M=360 -> 360MHz
 			2		// 360MHz / P=2 -> 180MHz = F_cpu
 		);
 		PWR->CR |= PWR_CR_ODEN; // Enable overdrive mode
 		while (not (PWR->CSR & PWR_CSR_ODRDY)) ;
-		ClockControl::setFlashLatency(Frequency);
-		ClockControl::enableSystemClock(ClockControl::SystemClockSource::Pll);
-		ClockControl::setApb1Prescaler(ClockControl::Apb1Prescaler::Div4);
-		ClockControl::setApb2Prescaler(ClockControl::Apb2Prescaler::Div2);
-		// update clock frequencies
-		modm::clock::fcpu     = Frequency;
-		modm::clock::fcpu_kHz = Frequency / 1000;
-		modm::clock::fcpu_MHz = Frequency / 1000000;
-		modm::clock::ns_per_loop = ::round(3000.f / (Frequency / 1000000));
+		Rcc::setFlashLatency<Frequency>();
+		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
+		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div4);
+		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div2);
+		Rcc::updateCoreFrequency<Frequency>();
 
 		return true;
 	}
@@ -169,7 +166,7 @@ initializeTouchscreen()
 //	ft6::Int::enableExternalInterruptVector(12);
 
 	ft6::I2cMaster::connect<ft6::Scl::Scl, ft6::Sda::Sda>();
-	ft6::I2cMaster::initialize<systemClock, 360000>();
+	ft6::I2cMaster::initialize<SystemClock, 360_kHz>();
 }
 
 void
@@ -188,11 +185,11 @@ inline void
 initialize()
 {
 	// initialized in `modm_board_init()`
-	// systemClock::enable();
-	modm::cortex::SysTickTimer::initialize<systemClock>();
+	// SystemClock::enable();
+	SysTickTimer::initialize<SystemClock>();
 
 	stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>();
-	stlink::Uart::initialize<systemClock, 115200>();
+	stlink::Uart::initialize<SystemClock, 115200_Bd>();
 
 	LedGreen::setOutput(modm::Gpio::Low);
 	LedRed::setOutput(modm::Gpio::Low);

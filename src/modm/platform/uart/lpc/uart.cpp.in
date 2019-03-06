@@ -62,7 +62,7 @@ modm::platform::Uart1::initialize(uint32_t baudrate)
 
 	LPC_UART->LCR = LCR_DLAB;
 	uint32_t regVal = LPC_SYSCON->UARTCLKDIV;
-	uint32_t   Fdiv = (((modm::platform::ClockControl::getCpuFrequency() * LPC_SYSCON->SYSAHBCLKDIV)/regVal)/16)/baudrate ; //390;
+	uint32_t   Fdiv = (((modm::platform::Rcc::getCpuFrequency() * LPC_SYSCON->SYSAHBCLKDIV)/regVal)/16)/baudrate ; //390;
 	LPC_UART->DLM = Fdiv >>    8;
 	LPC_UART->DLL = Fdiv  & 0xff;
 	//LPC_UART->DLM = 0;

@@ -25,11 +25,12 @@ using namespace modm::platform;
 /// @ingroup modm_board_nucleo_f042k6
 namespace Board
 {
+	using namespace modm::literals;
 
 /// STM32F042K6 running at 48MHz generated from the internal 8MHz crystal
 // Dummy clock for devices
-struct systemClock {
-	static constexpr uint32_t Frequency = MHz48;
+struct SystemClock {
+	static constexpr uint32_t Frequency = 48_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb = Frequency;
 
@@ -52,20 +53,17 @@ struct systemClock {
 	static bool inline
 	enable()
 	{
-		ClockControl::enableInternalClock();	// 8MHz
+		Rcc::enableInternalClock();	// 8MHz
 		// (internal clock / 2) * 12 = 48MHz
-		ClockControl::enablePll(ClockControl::PllSource::InternalClock, 12, 2, 1);
+		Rcc::enablePll(Rcc::PllSource::InternalClock, 12, 2, 1);
 		// set flash latency for 48MHz
-		ClockControl::setFlashLatency(Frequency);
+		Rcc::setFlashLatency<Frequency>();
 		// switch system clock to PLL output
-		ClockControl::enableSystemClock(ClockControl::SystemClockSource::Pll);
-		ClockControl::setAhbPrescaler(ClockControl::AhbPrescaler::Div1);
-		ClockControl::setApbPrescaler(ClockControl::ApbPrescaler::Div1);
+		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
+		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
+		Rcc::setApbPrescaler(Rcc::ApbPrescaler::Div1);
 		// update frequencies for busy-wait delay functions
-		modm::clock::fcpu     = Frequency;
-		modm::clock::fcpu_kHz = Frequency / 1000;
-		modm::clock::fcpu_MHz = Frequency / 1000000;
-		modm::clock::ns_per_loop = ::round(4000.f / (Frequency / 1000000));
+		Rcc::updateCoreFrequency<Frequency>();
 
 		return true;
 	}
@@ -94,11 +92,11 @@ using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockI
 inline void
 initialize()
 {
-	systemClock::enable();
-	modm::cortex::SysTickTimer::initialize<systemClock>();
+	SystemClock::enable();
+	SysTickTimer::initialize<SystemClock>();
 
 	stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>();
-	stlink::Uart::initialize<systemClock, 115200>();
+	stlink::Uart::initialize<SystemClock, 115200_Bd>();
 }
 
 }

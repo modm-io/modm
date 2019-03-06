@@ -23,8 +23,8 @@ using namespace modm::platform;
 /// @ingroup modm_board_arduino_uno
 namespace Board
 {
-
-using systemClock = modm::platform::SystemClock;
+using namespace modm::literals;
+using SystemClock = modm::platform::SystemClock;
 
 // Arduino Footprint
 using A0 = GpioC0;
@@ -59,11 +59,11 @@ using LoggerDevice = modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull >
 inline void
 initialize()
 {
-	systemClock::enable();
+	SystemClock::enable();
 
 	// Uart0 is connected to onboard USB bridge
 	Uart0::connect<D1::Txd, D0::Rxd>();
-	Uart0::initialize<systemClock, 9600>();
+	Uart0::initialize<SystemClock, 9600_Bd>();
 
 	// modm::Clock initialization
 	// Clear Timer on Compare Match Mode

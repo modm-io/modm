@@ -39,7 +39,7 @@ testTimerAdvancedStart()
 	TIMER::enable();
 	TIMER::setMode(TIMER::Mode::UpCounter);
 
-	TIMER::template setPeriod<Board::systemClock>(250000);
+	TIMER::template setPeriod<Board::SystemClock>(250000);
 	TIMER::enableInterruptVector(TIMER::Interrupt::Update, true, 10);
 	TIMER::enableInterrupt(TIMER::Interrupt::Update);
 
@@ -54,7 +54,7 @@ testTimerStart()
 	TIMER::enable();
 	TIMER::setMode(TIMER::Mode::UpCounter);
 
-	TIMER::template setPeriod<Board::systemClock>(250000);
+	TIMER::template setPeriod<Board::SystemClock>(250000);
 	TIMER::enableInterruptVector(true, 10);
 	TIMER::enableInterrupt(TIMER::Interrupt::Update);
 

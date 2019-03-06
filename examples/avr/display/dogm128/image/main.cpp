@@ -27,8 +27,8 @@
 #include "images/image_64x64_9.hpp"
 
 using namespace modm::platform;
+using namespace modm::literals;
 
-using systemClock = SystemClock;
 
 namespace led
 {
@@ -211,7 +211,7 @@ main()
 	led::B::setOutput();
 
 	lcd::SPI::connect<lcd::Sck::BitBang, lcd::Mosi::BitBang>();
-	lcd::SPI::initialize<systemClock, MHz2>();
+	lcd::SPI::initialize<SystemClock, 2_MHz>();
 
 	display.initialize();
 

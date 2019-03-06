@@ -24,7 +24,7 @@ modm_board_init(void)
 	modm::delayMilliseconds(10);
 
 	// initialize system clock and external SDRAM before accessing external memories
-	Board::systemClock::enable();
+	Board::SystemClock::enable();
 	board_initialize_sdram();
 }
 

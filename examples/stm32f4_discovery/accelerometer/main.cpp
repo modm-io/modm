@@ -15,6 +15,7 @@
 #include <modm/driver/inertial/lis302dl.hpp>
 #include <modm/processing.hpp>
 #include <modm/math/filter.hpp>
+using namespace modm::literals;
 
 
 // ST changed the accelerometer in the C revision (MB997C)
@@ -117,7 +118,7 @@ main()
 	Board::lis3::Mosi::setOutput(modm::Gpio::High);
 
 	lis::I2cMaster::connect<lis::Scl::BitBang, lis::Sda::BitBang>(lis::I2cMaster::PullUps::Internal);
-	lis::I2cMaster::initialize<Board::systemClock, 400000>();
+	lis::I2cMaster::initialize<Board::SystemClock, 400_kHz>();
 #else
 	Board::initializeLis3();
 #endif

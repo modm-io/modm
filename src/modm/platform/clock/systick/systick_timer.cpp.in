@@ -13,12 +13,11 @@
 
 #include <modm/architecture/interface/atomic_lock.hpp>
 #include <modm/architecture/interface/clock.hpp>
-#include <modm/utils/dummy.hpp>
 #include <modm/platform/device.hpp>
 
 #include "systick_timer.hpp"
 
-static modm::cortex::InterruptHandler sysTickHandler(nullptr);
+static modm::platform::InterruptHandler sysTickHandler(nullptr);
 %% if systick_frequency > 1000
 static uint8_t counter;
 %% endif
@@ -40,7 +39,7 @@ SysTick_Handler(void)
 
 // ----------------------------------------------------------------------------
 void
-modm::cortex::SysTickTimer::enable(uint32_t reload)
+modm::platform::SysTickTimer::enable(uint32_t reload)
 {
 %% if systick_frequency > 1000
 	counter = {{ systick_frequency // 1000 }};
@@ -58,21 +57,21 @@ modm::cortex::SysTickTimer::enable(uint32_t reload)
 }
 
 void
-modm::cortex::SysTickTimer::disable()
+modm::platform::SysTickTimer::disable()
 {
 	SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk;
 }
 
 // ----------------------------------------------------------------------------
 void
-modm::cortex::SysTickTimer::attachInterruptHandler(InterruptHandler handler)
+modm::platform::SysTickTimer::attachInterruptHandler(InterruptHandler handler)
 {
 	atomic::Lock lock;
 	sysTickHandler = handler;
 }
 
 void
-modm::cortex::SysTickTimer::detachInterruptHandler()
+modm::platform::SysTickTimer::detachInterruptHandler()
 {
 	atomic::Lock lock;
 	sysTickHandler = nullptr;

@@ -19,8 +19,8 @@
 #include "images/rca_logo_128x64.hpp"
 
 using namespace modm::platform;
+using namespace modm::literals;
 
-using systemClock = SystemClock;
 
 namespace led
 {
@@ -64,7 +64,7 @@ setup()
 	led::B::setOutput();
 
 	lcd::SPI::connect<lcd::Sck::BitBang, lcd::Mosi::BitBang>();
-	lcd::SPI::initialize<systemClock, MHz2>();
+	lcd::SPI::initialize<SystemClock, 2_MHz>();
 
 	// timer initialization
 	// compare-match-interrupt every 1 ms at 14.7456 MHz

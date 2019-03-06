@@ -13,6 +13,7 @@
 #include <modm/debug/logger.hpp>
 #include <modm/processing/timer.hpp>
 #include <modm/driver/adc/adc_sampler.hpp>
+using namespace modm::literals;
 
 // ----------------------------------------------------------------------------
 // Set the log level
@@ -46,11 +47,11 @@ main()
 
 	// initialize Uart2 for MODM_LOG_INFO
 	Usart2::connect<GpioOutputA2::Tx>();
-	Usart2::initialize<Board::systemClock, 115200>();
+	Usart2::initialize<Board::SystemClock, 115200_Bd>();
 
 	// initialize Adc2
 	Adc2::connect<AdcIn0::In7, AdcIn1::In4, AdcIn2::In2>();
-	Adc2::initialize<Board::systemClock>();
+	Adc2::initialize<Board::SystemClock>();
 
 	Adc2::enableInterruptVector(5);
 	Adc2::enableInterrupt(Adc2::Interrupt::EndOfRegularConversion);

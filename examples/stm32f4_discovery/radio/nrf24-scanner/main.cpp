@@ -16,6 +16,7 @@
 #include <modm/debug/logger.hpp>
 #include <modm/processing/timer.hpp>
 #include <inttypes.h>
+using namespace modm::literals;
 
 /*
  * A simple 2.4GHz "spectrum analyzer". Please use a terminal
@@ -68,11 +69,11 @@ main()
 
 	// Enable SPI 2
 	SpiMaster2::connect<GpioB15::Mosi, GpioB14::Miso, GpioB13::Sck>();
-	SpiMaster2::initialize<Board::systemClock, MHz10>();
+	SpiMaster2::initialize<Board::SystemClock, 10_MHz>();
 
 	// Enable UART 2
 	Usart2::connect<GpioA2::Tx>();
-	Usart2::initialize<Board::systemClock, 115200>();
+	Usart2::initialize<Board::SystemClock, 115200_Bd>();
 
 
 	// Initialize nRF24-HAL

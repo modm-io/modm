@@ -21,11 +21,12 @@ using namespace modm::platform;
 /// @ingroup modm_board_black_pill
 namespace Board
 {
+	using namespace modm::literals;
 
 /// STM32F103 running at 72MHz generated from the external 8MHz crystal
 // Dummy clock for devices
-struct systemClock {
-	static constexpr uint32_t Frequency = MHz72;
+struct SystemClock {
+	static constexpr uint32_t Frequency = 72_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency / 2;
 	static constexpr uint32_t Apb2 = Frequency;
@@ -59,33 +60,28 @@ struct systemClock {
 	static bool inline
 	enable()
 	{
-		ClockControl::enableExternalCrystal();
+		Rcc::enableExternalCrystal();
 
 		// external clock * 9 = 72MHz, => 72/1.5 = 48 => good for USB
-		ClockControl::enablePll(ClockControl::PllSource::ExternalCrystal, 9);
+		Rcc::enablePll(Rcc::PllSource::ExternalCrystal, 9);
 
 		// set flash latency for 72MHz
-		ClockControl::setFlashLatency(Frequency);
+		Rcc::setFlashLatency<Frequency>();
 
 		// switch system clock to PLL output
-		ClockControl::enableSystemClock(ClockControl::SystemClockSource::Pll);
+		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
 
 		// AHB has max 72MHz
-		ClockControl::setAhbPrescaler(ClockControl::AhbPrescaler::Div1);
+		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
 
 		// APB1 has max. 36MHz
-		ClockControl::setApb1Prescaler(ClockControl::Apb1Prescaler::Div2);
+		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div2);
 
 		// APB2 has max. 72MHz
-		ClockControl::setApb2Prescaler(ClockControl::Apb2Prescaler::Div1);
-		// update frequencies for busy-wait delay functions
-
+		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div1);
 
 		// update frequencies for busy-wait delay functions
-		modm::clock::fcpu     = Frequency;
-		modm::clock::fcpu_kHz = Frequency / 1000;
-		modm::clock::fcpu_MHz = Frequency / 1000000;
-		modm::clock::ns_per_loop = ::round(3000.f / (Frequency / 1000000));
+		Rcc::updateCoreFrequency<Frequency>();
 
 		return true;
 	}
@@ -100,8 +96,8 @@ using Button = GpioUnused;
 inline void
 initialize()
 {
-	systemClock::enable();
-	modm::cortex::SysTickTimer::initialize<systemClock>();
+	SystemClock::enable();
+	SysTickTimer::initialize<SystemClock>();
 
 	LedGreen::setOutput(modm::Gpio::Low);
 }

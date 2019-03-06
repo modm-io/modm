@@ -14,6 +14,7 @@
 #include <modm/board.hpp>
 #include <modm/debug/logger.hpp>
 #include <modm/board.hpp>
+using namespace modm::literals;
 
 modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice;
 modm::log::Logger modm::log::info(loggerDevice);
@@ -60,7 +61,7 @@ main()
 
 	// Initialize Usart
 	Usart2::connect<GpioA2::Tx>();
-	Usart2::initialize<Board::systemClock, 115200>();
+	Usart2::initialize<Board::SystemClock, 115200_Bd>();
 
 	MODM_LOG_INFO << "CAN Test Program" << modm::endl;
 
@@ -70,7 +71,7 @@ main()
 	MODM_LOG_INFO << "Initializing Can1..." << modm::endl;
 	// Initialize Can1
 	Can1::connect<GpioB8::Rx, GpioB9::Tx>(Gpio::InputType::PullUp);
-	Can1::initialize<Board::systemClock, Can1::Bitrate::kBps125>(9);
+	Can1::initialize<Board::SystemClock, Can1::Bitrate::kBps125>(9);
 
 	MODM_LOG_INFO << "Setting up Filter for Can1..." << modm::endl;
 	// Receive every message
@@ -81,7 +82,7 @@ main()
 	MODM_LOG_INFO << "Initializing Can2..." << modm::endl;
 	// Initialize Can2
 	Can2::connect<GpioB5::Rx, GpioB6::Tx>(Gpio::InputType::PullUp);
-	Can2::initialize<Board::systemClock, Can2::Bitrate::kBps125>(12);
+	Can2::initialize<Board::SystemClock, Can2::Bitrate::kBps125>(12);
 
 	MODM_LOG_INFO << "Setting up Filter for Can2..." << modm::endl;
 	// Receive every message

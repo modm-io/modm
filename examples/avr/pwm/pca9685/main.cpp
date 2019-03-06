@@ -14,13 +14,13 @@
 #include <modm/driver/pwm/pca9685.hpp>
 
 using namespace modm::platform;
-using systemClock = SystemClock;
+using namespace modm::literals;
 
 int
 main()
 {
 	// Set-up the I2C device as master and configure it to a baudrate of 100.000
-	I2cMaster::initialize<systemClock, 100000>();
+	I2cMaster::initialize<SystemClock, 100_kHz>();
 
 	// Enable interrupts
 	enableInterrupts();

@@ -15,6 +15,7 @@
 
 #include <modm/processing/timer.hpp>
 #include <modm/processing/protothread.hpp>
+using namespace modm::literals;
 
 #include "hardware.hpp"
 
@@ -52,15 +53,15 @@ main()
 	// ------------------------------------------------------------------------
 	// I2C for sensors
 	SensorsAI2cMaster::connect<GpioB6::Scl, GpioB7::Sda>();
-	SensorsAI2cMaster::initialize<Board::systemClock, 10000>();
+	SensorsAI2cMaster::initialize<Board::SystemClock, 10_kHz>();
 
 	SensorsBI2cMaster::connect<GpioB10::Scl, GpioB11::Sda>();
-	SensorsBI2cMaster::initialize<Board::systemClock, 10000>();
+	SensorsBI2cMaster::initialize<Board::SystemClock, 10_kHz>();
 
 	// ------------------------------------------------------------------------
 	// initialize Uart2 for MODM_LOG_*
 	Usart2::connect<GpioOutputA2::Tx>();
-	Usart2::initialize<Board::systemClock, 115200>();
+	Usart2::initialize<Board::SystemClock, 115200_Bd>();
 
 	MODM_LOG_DEBUG << "Welcome to Environment Sensor Test" << modm::endl;
 

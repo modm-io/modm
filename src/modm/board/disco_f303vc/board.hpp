@@ -24,11 +24,12 @@ using namespace modm::platform;
 /// @ingroup modm_board_disco_f303vc
 namespace Board
 {
+	using namespace modm::literals;
 
 /// STM32F303 running at 72MHz generated from the external 8MHz clock
 /// supplied by the on-board st-link
-struct systemClock {
-	static constexpr uint32_t Frequency = 72 * MHz1;
+struct SystemClock {
+	static constexpr uint32_t Frequency = 72_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency / 2;
 	static constexpr uint32_t Apb2 = Frequency;
@@ -83,25 +84,22 @@ struct systemClock {
 	static bool inline
 	enable()
 	{
-		ClockControl::enableExternalClock();	// 8MHz
-		ClockControl::enablePll(
-			ClockControl::PllSource::ExternalClock,
+		Rcc::enableExternalClock();	// 8MHz
+		Rcc::enablePll(
+			Rcc::PllSource::ExternalClock,
 			9,
 			1
 		);
 		// set flash latency for 72MHz
-		ClockControl::setFlashLatency(Frequency);
+		Rcc::setFlashLatency<Frequency>();
 		// switch system clock to PLL output
-		ClockControl::enableSystemClock(ClockControl::SystemClockSource::Pll);
-		ClockControl::setAhbPrescaler(ClockControl::AhbPrescaler::Div1);
+		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
+		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
 		// APB1 has max. 36MHz
-		ClockControl::setApb1Prescaler(ClockControl::Apb1Prescaler::Div2);
-		ClockControl::setApb2Prescaler(ClockControl::Apb2Prescaler::Div1);
+		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div2);
+		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div1);
 		// update frequencies for busy-wait delay functions
-		modm::clock::fcpu     = Frequency;
-		modm::clock::fcpu_kHz = Frequency / 1000;
-		modm::clock::fcpu_MHz = Frequency / 1000000;
-		modm::clock::ns_per_loop = ::round(3000.f / (Frequency / 1000000));
+		Rcc::updateCoreFrequency<Frequency>();
 
 		return true;
 	}
@@ -164,8 +162,8 @@ using Dp = GpioA12;		// DP: USB_DP
 inline void
 initialize()
 {
-	systemClock::enable();
-	modm::cortex::SysTickTimer::initialize<systemClock>();
+	SystemClock::enable();
+	SysTickTimer::initialize<SystemClock>();
 
 	LedNorth::setOutput(modm::Gpio::Low);
 	LedNorthEast::setOutput(modm::Gpio::Low);
@@ -199,7 +197,7 @@ initializeL3g()
 	l3g::Cs::setOutput(modm::Gpio::High);
 
 	l3g::SpiMaster::connect<l3g::Sck::Sck, l3g::Mosi::Mosi, l3g::Miso::Miso>();
-	l3g::SpiMaster::initialize<systemClock, 9000000>();
+	l3g::SpiMaster::initialize<SystemClock, 9_MHz>();
 	l3g::SpiMaster::setDataMode(l3g::SpiMaster::DataMode::Mode3);
 }
 
@@ -223,7 +221,7 @@ initializeLsm3()
 //	lsm3::Drdy::enableExternalInterruptVector(12);
 
 	lsm3::I2cMaster::connect<lsm3::Scl::Scl, lsm3::Sda::Sda>();
-	lsm3::I2cMaster::initialize<systemClock, 400000>();
+	lsm3::I2cMaster::initialize<SystemClock, 400_kHz>();
 }
 
 

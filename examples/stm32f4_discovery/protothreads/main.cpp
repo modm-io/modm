@@ -17,6 +17,7 @@
 #include <modm/driver/temperature/tmp102.hpp>
 
 #include <modm/io/iostream.hpp>
+using namespace modm::literals;
 
 modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > device;
 modm::IOStream stream(device);
@@ -108,10 +109,10 @@ main()
 	Board::initialize();
 
 	Usart2::connect<GpioA2::Tx>();
-	Usart2::initialize<Board::systemClock, modm::Uart::B38400>();
+	Usart2::initialize<Board::SystemClock, 38400_Bd>();
 
 	MyI2cMaster::connect<GpioB7::Sda, GpioB8::Scl>(MyI2cMaster::PullUps::Internal);
-	MyI2cMaster::initialize<Board::systemClock, 100000>();
+	MyI2cMaster::initialize<Board::SystemClock, 100_kHz>();
 
 	stream << "\n\nRESTART\n\n";
 

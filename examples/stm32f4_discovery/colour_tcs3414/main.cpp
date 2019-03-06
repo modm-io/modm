@@ -18,6 +18,7 @@
 #include <modm/io/iostream.hpp>
 
 #include <modm/architecture/interface/gpio.hpp>
+using namespace modm::literals;
 
 modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > device;
 modm::IOStream stream(device);
@@ -125,10 +126,10 @@ main()
 	Board::initialize();
 
 	Usart2::connect<GpioA2::Tx>();
-	Usart2::initialize<Board::systemClock, modm::Uart::B115200>();
+	Usart2::initialize<Board::SystemClock, 115200_Bd>();
 
 	MyI2cMaster::connect<GpioB11::Sda, GpioB10::Scl>();
-	MyI2cMaster::initialize<Board::systemClock, 100000>();
+	MyI2cMaster::initialize<Board::SystemClock, 100_kHz>();
 
 	stream << "\n\nWelcome to TCS3414 demo!\n\n";
 

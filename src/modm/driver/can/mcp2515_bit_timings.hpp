@@ -33,27 +33,31 @@ private:
 	};
 
 	static constexpr uint8_t calcSJW() {
-		return (Clk ==  modm::clock::MHz8)? 1 :
-			   (Clk == modm::clock::MHz16)? 1 :
-			   (Clk == modm::clock::MHz20)? ( (Bitrate == modm::Can::Bitrate::MBps1) ? 1 : 3 ) : 0;
+		using namespace modm::literals;
+		return (Clk ==  8_MHz)? 1 :
+			   (Clk == 16_MHz)? 1 :
+			   (Clk == 20_MHz)? ( (Bitrate == modm::Can::Bitrate::MBps1) ? 1 : 3 ) : 0;
 	}
 
 	static constexpr uint8_t calcProp() {
-		return (Clk ==  modm::clock::MHz8)? 1 :
-			   (Clk == modm::clock::MHz16)? ( (Bitrate == modm::Can::Bitrate::MBps1) ? 1 : 3 ) :
-			   (Clk == modm::clock::MHz20)? ( (Bitrate == modm::Can::Bitrate::MBps1) ? 3 : 5 ) : 0;
+		using namespace modm::literals;
+		return (Clk ==  8_MHz)? 1 :
+			   (Clk == 16_MHz)? ( (Bitrate == modm::Can::Bitrate::MBps1) ? 1 : 3 ) :
+			   (Clk == 20_MHz)? ( (Bitrate == modm::Can::Bitrate::MBps1) ? 3 : 5 ) : 0;
 	}
 
 	static constexpr uint8_t calcPS1() {
-		return (Clk ==  modm::clock::MHz8)? ( (Bitrate == modm::Can::Bitrate::MBps1) ? 1 : 4 ) :
-			   (Clk == modm::clock::MHz16)? ( (Bitrate == modm::Can::Bitrate::MBps1) ? 4 : 8 ) :
-			   (Clk == modm::clock::MHz20)? ( (Bitrate == modm::Can::Bitrate::MBps1) ? 4 : 8 ) : 0;
+		using namespace modm::literals;
+		return (Clk ==  8_MHz)? ( (Bitrate == modm::Can::Bitrate::MBps1) ? 1 : 4 ) :
+			   (Clk == 16_MHz)? ( (Bitrate == modm::Can::Bitrate::MBps1) ? 4 : 8 ) :
+			   (Clk == 20_MHz)? ( (Bitrate == modm::Can::Bitrate::MBps1) ? 4 : 8 ) : 0;
 	}
 
 	static constexpr uint8_t calcPS2() {
-		return (Clk ==  modm::clock::MHz8)? ( (Bitrate == modm::Can::Bitrate::MBps1) ? 1 : 2) :
-			   (Clk == modm::clock::MHz16)? ( (Bitrate == modm::Can::Bitrate::MBps1) ? 2 : 4 ) :
-			   (Clk == modm::clock::MHz20)? ( (Bitrate == modm::Can::Bitrate::MBps1) ? 2 : 4 ) : 0;
+		using namespace modm::literals;
+		return (Clk ==  8_MHz)? ( (Bitrate == modm::Can::Bitrate::MBps1) ? 1 : 2) :
+			   (Clk == 16_MHz)? ( (Bitrate == modm::Can::Bitrate::MBps1) ? 2 : 4 ) :
+			   (Clk == 20_MHz)? ( (Bitrate == modm::Can::Bitrate::MBps1) ? 2 : 4 ) : 0;
 	}
 
 	static constexpr uint8_t calcPrescaler(uint8_t sjw, uint8_t prop, uint8_t ps1, uint8_t ps2) {

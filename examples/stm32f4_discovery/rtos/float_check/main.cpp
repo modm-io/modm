@@ -15,7 +15,6 @@
 #include <modm/processing/rtos.hpp>
 
 using namespace modm::platform;
-using namespace modm::cortex;
 
 /**
  * Check FPU support in FreeRTOS for STM32F4.
@@ -99,7 +98,7 @@ main()
 	Board::initialize();
 
 	Usart2::connect<GpioA2::Tx>();
-	Usart2::initialize<Board::systemClock, Usart2::B115200>();
+	Usart2::initialize<Board::SystemClock, Usart2::B115200>();
 
 	while (1)
 	{

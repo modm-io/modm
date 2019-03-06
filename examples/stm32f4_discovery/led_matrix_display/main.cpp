@@ -13,6 +13,7 @@
 #include <modm/board.hpp>
 #include <modm/processing/timer.hpp>
 #include <modm/driver/display/max7219matrix.hpp>
+using namespace modm::literals;
 
 /**
  * Example to demonstrate a MODM graphics display made
@@ -57,7 +58,7 @@ main()
 	Clk::setOutput();
 
 	Spi::connect<Clk::BitBang, Data::BitBang>();
-	Spi::initialize< Board::systemClock, 10000000 >();
+	Spi::initialize< Board::SystemClock, 10_MHz>();
 
 	ledMatrixDisplay.initialize();
 

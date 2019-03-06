@@ -17,8 +17,8 @@
 #include <modm/architecture/interface/clock.hpp>
 
 using namespace modm::platform;
+using namespace modm::literals;
 
-using systemClock = SystemClock;
 
 // LCD Backlight
 namespace led
@@ -57,7 +57,7 @@ main()
 	led::B::setOutput();
 
 	SPI::connect< lcd::Scl::BitBang, lcd::Mosi::BitBang, lcd::Miso::BitBang >();
-	SPI::initialize<systemClock, MHz2>();
+	SPI::initialize<SystemClock, 2_MHz>();
 
 	display.initialize();
 

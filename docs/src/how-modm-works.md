@@ -259,8 +259,8 @@ for keeping code size in check on very resource constrained targets, like the AV
 
 ```cpp
 Uart4::connect<GpioA0::Tx, GpioA1::Rx>(Gpio::InputType::PullUp); // pull-up in RX pin
-Uart4::initialize<Board::systemClock, 115'200>(); // Within 1% default tolerance
-Uart4::initialize<Board::systemClock, 115'200, Tolerance::Exact>();
+Uart4::initialize<Board::SystemClock, 115'200_Bd>(); // Within 1% default tolerance
+Uart4::initialize<Board::SystemClock, 115'200_Bd> Tolerance::Exact>();
 // error: The closest available baudrate exceeds the tolerance of the requested baudrate!
 ```
 
@@ -320,7 +320,7 @@ using GpioExpander = modm::Mcp23x17< Transport >;
 GpioExpander expander;
 // Connect and initialize the peripherals
 SpiMaster1::connect<GpioA0::Sck, GpioA1::Mosi, GpioA2::Miso>();
-SpiMaster1::initialize<Board::systemClock, 1MHz>();
+SpiMaster1::initialize<Board::SystemClock, 1MHz>();
 expander.initialize();
 // Bind the expander pins to a simpler name
 using Pin0 = GpioExpander::P0< expander >;

@@ -150,7 +150,8 @@ def prepare(module, options):
         ":architecture:gpio",
         ":cmsis:device",
         ":math:utils",
-        ":platform:gpio.common")
+        ":platform:gpio.common",
+        ":platform:rcc")
     return True
 
 def validate(env):

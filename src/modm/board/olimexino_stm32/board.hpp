@@ -22,11 +22,12 @@ using namespace modm::platform;
 /// @ingroup modm_board_olimexino_stm32
 namespace Board
 {
+	using namespace modm::literals;
 
 /// STM32F103RB running at 64MHz generated from the internal 8MHz crystal
 // Dummy clock for devices
-struct systemClock {
-	static constexpr uint32_t Frequency = MHz64;
+struct SystemClock {
+	static constexpr uint32_t Frequency = 64_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency / 2;
 	static constexpr uint32_t Apb2 = Frequency;
@@ -64,22 +65,19 @@ struct systemClock {
 	static bool inline
 	enable()
 	{
-		ClockControl::enableInternalClock();	// 8MHz
+		Rcc::enableInternalClock();	// 8MHz
 		// internal clock / 2 * 16 = 64MHz, => 64/1.5 = 42.6 => bad for USB
-		ClockControl::enablePll(ClockControl::PllSource::InternalClock, 16);
+		Rcc::enablePll(Rcc::PllSource::InternalClock, 16);
 		// set flash latency for 64MHz
-		ClockControl::setFlashLatency(Frequency);
+		Rcc::setFlashLatency<Frequency>();
 		// switch system clock to PLL output
-		ClockControl::enableSystemClock(ClockControl::SystemClockSource::Pll);
-		ClockControl::setAhbPrescaler(ClockControl::AhbPrescaler::Div1);
+		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
+		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
 		// APB1 has max. 36MHz
-		ClockControl::setApb1Prescaler(ClockControl::Apb1Prescaler::Div2);
-		ClockControl::setApb2Prescaler(ClockControl::Apb2Prescaler::Div1);
+		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div2);
+		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div1);
 		// update frequencies for busy-wait delay functions
-		modm::clock::fcpu     = Frequency;
-		modm::clock::fcpu_kHz = Frequency / 1000;
-		modm::clock::fcpu_MHz = Frequency / 1000000;
-		modm::clock::ns_per_loop = ::round(3000.f / (Frequency / 1000000));
+		Rcc::updateCoreFrequency<Frequency>();
 
 		return true;
 	}
@@ -140,11 +138,11 @@ using LoggerDevice = modm::IODeviceWrapper< uext::Uart, modm::IOBuffer::BlockIfF
 inline void
 initialize()
 {
-	systemClock::enable();
-	modm::cortex::SysTickTimer::initialize<systemClock>();
+	SystemClock::enable();
+	SysTickTimer::initialize<SystemClock>();
 
 	uext::Uart::connect<uext::Tx::Tx, uext::Rx::Rx>();
-	uext::Uart::initialize<systemClock, modm::Uart::Baudrate::B115200>(12);
+	uext::Uart::initialize<SystemClock, 115200_Bd>(12);
 
 }
 

@@ -15,14 +15,14 @@
 #include <modm/io/iostream.hpp>
 
 using namespace modm::platform;
-using systemClock = SystemClock;
+using namespace modm::literals;
 
 int
 main()
 {
 	// Create a new UART object and configure it to a baudrate of 115200
 	Uart0::connect<GpioOutputD1::Txd, GpioInputD0::Rxd>();
-	Uart0::initialize<systemClock, 115200>();
+	Uart0::initialize<SystemClock, 115200_Bd>();
 
 	// Enable interrupts, this is needed for every buffered UART
 	enableInterrupts();
@@ -36,7 +36,7 @@ main()
 	// Initialize the analog to digital converter
 	// With the AVR running at 14.7456Mhz and a prescaler of 128 the
 	// ADC is running at 115kHz.
-	Adc::initialize<systemClock, 115000>();
+	Adc::initialize<SystemClock, 115_kHz>();
 	Adc::setReference(Adc::Reference::InternalVcc);
 
 	// read the value of channel 0 (=> ADC0 => PA0) and wait until

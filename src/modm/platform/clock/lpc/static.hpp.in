@@ -23,7 +23,6 @@
 #include "pll_calculator.hpp"
 #include "clock.hpp"
 
-using namespace modm::clock;
 
 namespace modm
 {
@@ -32,7 +31,7 @@ namespace modm
 		/*
 		 * Used to setup pll with constants
 		 */
-		template<int InputFrequency, int OutputFrequency, ClockControl::PllSource Source>
+		template<int InputFrequency, int OutputFrequency, Rcc::PllSource Source>
 		class PllSetup
 		{
 		private:
@@ -41,7 +40,7 @@ namespace modm
 			static StartupError
 			enable()
 			{
-				ClockControl::enablePll(Source, p::PllM, p::PllP);
+				Rcc::enablePll(Source, p::PllM, p::PllP);
 				modm::clock::fcpu     = OutputFrequency;
 				modm::clock::fcpu_kHz = OutputFrequency / 1000;
 				modm::clock::fcpu_MHz = OutputFrequency / 1000000;
@@ -62,7 +61,7 @@ namespace modm
 							 'setup': "PllSetup",
 							 'sources': [internalClock,
 										externalClock, externalCrystal] }
-%% set systemClock =		{'name': "SystemClock",
+%% set SystemClock =		{'name': "SystemClock",
 							 'minFrequency': "MHz1",
 							 'maxFrequency': "MHz48",
 							 'sources': [ internalClock, externalClock,
@@ -71,7 +70,7 @@ namespace modm
 %% set clockOut =			{'name': "ClockOutput",
 							 'divisions': range(1,255),
 							 'sources': [externalClock,
-										 externalCrystal, systemClock] }
+										 externalCrystal, SystemClock] }
 
 	// Static Clocks/Plls/Osciallators
 {{ static.source(internalClock, "modm::platform") }}
@@ -82,7 +81,7 @@ namespace modm
 
 {{ static.pll(pll, "modm::platform") }}
 
-{{ static.sink(systemClock, "modm::platform")}}
+{{ static.sink(SystemClock, "modm::platform")}}
 
 {{ static.output(clockOut, "modm::platform")}}
 

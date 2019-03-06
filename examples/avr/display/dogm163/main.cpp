@@ -16,7 +16,7 @@
 #include <modm/ui/display/font.hpp>
 
 using namespace modm::platform;
-using systemClock = SystemClock;
+using namespace modm::literals;
 
 // Graphic LCD
 namespace lcd
@@ -37,7 +37,7 @@ int
 main()
 {
 	SPI::connect<lcd::Scl::BitBang, lcd::Mosi::BitBang, lcd::Miso::BitBang>();
-	SPI::initialize<systemClock, 1000000>();
+	SPI::initialize<SystemClock, 1_MHz>();
 	lcd::Cs::setOutput();
 	lcd::Rs::setOutput();
 

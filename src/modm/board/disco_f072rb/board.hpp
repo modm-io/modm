@@ -24,14 +24,15 @@ using namespace modm::platform;
 /// @ingroup modm_board_disco_f072rb
 namespace Board
 {
+	using namespace modm::literals;
 
 /// STM32F072 running at 48MHz generated from the internal 48MHz clock
 // TODO: enable once clock driver is implemented
-//using systemClock = SystemClock<InternalClock<MHz48>, MHz48>;
+//using SystemClock = SystemClock<InternalClock<48_MHz>, 48_MHz>;
 
-struct systemClock
+struct SystemClock
 {
-	static constexpr int Frequency = MHz48;
+	static constexpr int Frequency = 48_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb = Frequency;
 
@@ -63,16 +64,13 @@ struct systemClock
 	enable()
 	{
 		// Enable the interal 48MHz clock
-		ClockControl::enableInternalClockMHz48();
+		Rcc::enableInternalClockMHz48();
 		// set flash latency for 48MHz
-		ClockControl::setFlashLatency(Frequency);
+		Rcc::setFlashLatency<Frequency>();
 		// Switch to the 48MHz clock
-		ClockControl::enableSystemClock(ClockControl::SystemClockSource::InternalClockMHz48);
+		Rcc::enableSystemClock(Rcc::SystemClockSource::InternalClockMHz48);
 		// update frequencies for busy-wait delay functions
-		modm::clock::fcpu     = Frequency;
-		modm::clock::fcpu_kHz = Frequency / 1000;
-		modm::clock::fcpu_MHz = Frequency / 1000000;
-		modm::clock::ns_per_loop = ::round(4000.f / (Frequency / 1000000));
+		Rcc::updateCoreFrequency<Frequency>();
 
 		return true;
 	}
@@ -108,8 +106,8 @@ using Gyroscope = modm::L3gd20< Transport >;
 inline void
 initialize()
 {
-	systemClock::enable();
-	modm::cortex::SysTickTimer::initialize<systemClock>();
+	SystemClock::enable();
+	SysTickTimer::initialize<SystemClock>();
 
 	LedUp::setOutput(modm::Gpio::Low);
 	LedDown::setOutput(modm::Gpio::Low);
@@ -139,7 +137,7 @@ initializeL3g()
 	l3g::Cs::setOutput(modm::Gpio::High);
 
 	l3g::SpiMaster::connect<l3g::Sck::Sck, l3g::Mosi::Mosi, l3g::Miso::Miso>();
-	l3g::SpiMaster::initialize<systemClock, 3000000>();
+	l3g::SpiMaster::initialize<SystemClock, 3_MHz>();
 	l3g::SpiMaster::setDataMode(l3g::SpiMaster::DataMode::Mode3);
 }
 

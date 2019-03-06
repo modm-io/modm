@@ -17,10 +17,7 @@
 #include <cmath>
 #include <modm/architecture/interface/peripheral.hpp>
 
-namespace modm
-{
-
-namespace cortex
+namespace modm::platform
 {
 
 typedef void (*InterruptHandler)(void);
@@ -105,6 +102,9 @@ private:
 
 }
 
+namespace modm::cortex {
+	using SysTickTimer [[deprecated("Please use `modm::platform:SysTickTimer` instead")]] =
+		::modm::platform::SysTickTimer;
 }
 
 #endif	//  MODM_STM32_CORTEX_TIMER_HPP

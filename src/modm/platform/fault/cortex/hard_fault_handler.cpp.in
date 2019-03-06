@@ -16,9 +16,6 @@
 
 #include <stdint.h>
 
-#include "../device.hpp"
-#include "../clock/common_clock.hpp"
-
 #include "../gpio/gpio_{{ options.led }}.hpp"
 
 extern "C" void _initHardFaultHandlerLed() __attribute__((optimize("Os")));

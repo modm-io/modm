@@ -24,10 +24,11 @@ using namespace modm::platform;
 /// @ingroup modm_board_disco_f407vg
 namespace Board
 {
+	using namespace modm::literals;
 
 /// STM32F407 running at 168MHz generated from the external 8MHz crystal
-struct systemClock {
-	static constexpr uint32_t Frequency = 168 * MHz1;
+struct SystemClock {
+	static constexpr uint32_t Frequency = 168_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency / 4;
 	static constexpr uint32_t Apb2 = Frequency / 2;
@@ -77,27 +78,24 @@ struct systemClock {
 	static bool inline
 	enable()
 	{
-		ClockControl::enableExternalCrystal();	// 8MHz
-		ClockControl::enablePll(
-			ClockControl::PllSource::ExternalCrystal,
+		Rcc::enableExternalCrystal();	// 8MHz
+		Rcc::enablePll(
+			Rcc::PllSource::ExternalCrystal,
 			4,		// 8MHz / N=2 -> 2MHz
 			168,	// 2MHz * M=168 -> 336MHz
 			2		// 336MHz / P=2 -> 168MHz = F_cpu
 		);
 		// set flash latency for 168MHz
-		ClockControl::setFlashLatency(Frequency);
+		Rcc::setFlashLatency<Frequency>();
 		// switch system clock to PLL output
-		ClockControl::enableSystemClock(ClockControl::SystemClockSource::Pll);
-		ClockControl::setAhbPrescaler(ClockControl::AhbPrescaler::Div1);
+		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
+		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
 		// APB1 has max. 42MHz
 		// APB2 has max. 84MHz
-		ClockControl::setApb1Prescaler(ClockControl::Apb1Prescaler::Div4);
-		ClockControl::setApb2Prescaler(ClockControl::Apb2Prescaler::Div2);
+		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div4);
+		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div2);
 		// update frequencies for busy-wait delay functions
-		modm::clock::fcpu     = Frequency;
-		modm::clock::fcpu_kHz = Frequency / 1000;
-		modm::clock::fcpu_MHz = Frequency / 1000000;
-		modm::clock::ns_per_loop = ::round(3000.f / (Frequency / 1000000));
+		Rcc::updateCoreFrequency<Frequency>();
 
 		return true;
 	}
@@ -170,8 +168,8 @@ using VBus = GpioInputA9;	// VBUS_FS: USB_OTG_HS_VBUS
 inline void
 initialize()
 {
-	systemClock::enable();
-	modm::cortex::SysTickTimer::initialize<systemClock>();
+	SystemClock::enable();
+	SysTickTimer::initialize<SystemClock>();
 
 	LedOrange::setOutput(modm::Gpio::Low);
 	LedGreen::setOutput(modm::Gpio::Low);
@@ -195,7 +193,7 @@ initializeLis3()
 	lis3::Cs::setOutput(modm::Gpio::High);
 
 	lis3::SpiMaster::connect<lis3::Sck::Sck, lis3::Mosi::Mosi, lis3::Miso::Miso>();
-	lis3::SpiMaster::initialize<systemClock, MHz10>();
+	lis3::SpiMaster::initialize<SystemClock, 10_MHz>();
 	lis3::SpiMaster::setDataMode(lis3::SpiMaster::DataMode::Mode3);
 }
 
@@ -211,7 +209,7 @@ initializeCs43()
 	cs43::Reset::setOutput(modm::Gpio::High);
 
 	cs43::I2cMaster::connect<cs43::Scl::Scl, cs43::Sda::Sda>();
-	cs43::I2cMaster::initialize<systemClock, cs43::I2cMaster::Baudrate::Standard>();
+	cs43::I2cMaster::initialize<SystemClock, cs43::I2cMaster::Baudrate::Standard>();
 }
 
 /// not supported yet, due to missing I2S driver

@@ -11,6 +11,7 @@
 
 #include <modm/board.hpp>
 #include <modm/debug/logger.hpp>
+using namespace modm::literals;
 
 // ----------------------------------------------------------------------------
 // Set the log level
@@ -34,7 +35,7 @@ main()
 
 	// initialize Uart for MODM_LOG
 	Usart1::connect<GpioOutputA9::Tx>();
-	Usart1::initialize<Board::systemClock, 115200>();
+	Usart1::initialize<Board::SystemClock, 115200_Bd>();
 
 	MODM_LOG_INFO << "Causing a Hardfault now!" << modm::endl;
 

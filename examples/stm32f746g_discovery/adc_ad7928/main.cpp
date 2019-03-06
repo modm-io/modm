@@ -108,7 +108,7 @@ main()
 
 	SpiMaster::connect<Sck::Sck, Mosi::Mosi, Miso::Miso>();
 	// Initialize the SPI with a 13.5MHz clock (core frequency / 16)
-	SpiMaster::initialize<Board::systemClock, 13500000ul>();
+	SpiMaster::initialize<Board::SystemClock, 13500000ul>();
 
 	MODM_LOG_INFO << "AD7928/AD7918/AD7908 Example" << modm::endl;
 

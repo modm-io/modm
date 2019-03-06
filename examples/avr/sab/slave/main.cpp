@@ -21,7 +21,7 @@
 #include <modm/communication/sab/slave.hpp>
 
 using namespace modm::platform;
-using systemClock = SystemClock;
+using namespace modm::literals;
 
 // ----------------------------------------------------------------------------
 // wrapper class for the A/D converter
@@ -31,7 +31,7 @@ public:
 	AnalogDigital()
 	{
 		// initialize the analog to digital converter
-		Adc::initialize<systemClock, 115000>();
+		Adc::initialize<SystemClock, 115_kHz>();
 		Adc::setReference(Adc::Reference::InternalVcc);
 	}
 

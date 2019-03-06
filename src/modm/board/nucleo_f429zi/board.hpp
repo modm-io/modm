@@ -24,11 +24,12 @@ using namespace modm::platform;
 /// @ingroup modm_board_nucleo_f429zi
 namespace Board
 {
+	using namespace modm::literals;
 
 /// STM32F429 running at 180MHz from the external 8MHz STLink clock
-struct systemClock
+struct SystemClock
 {
-	static constexpr uint32_t Frequency = MHz180;
+	static constexpr uint32_t Frequency = 180_MHz;
 	static constexpr uint32_t Apb1 = Frequency / 4;
 	static constexpr uint32_t Apb2 = Frequency / 2;
 
@@ -77,24 +78,21 @@ struct systemClock
 	static bool inline
 	enable()
 	{
-		ClockControl::enableExternalClock(); // 8 MHz
-		ClockControl::enablePll(
-			ClockControl::PllSource::ExternalClock,
+		Rcc::enableExternalClock(); // 8 MHz
+		Rcc::enablePll(
+			Rcc::PllSource::ExternalClock,
 			4,		// 8MHz / N=4 -> 2MHz
 			180,	// 2MHz * M=180 -> 360MHz
 			2		// 360MHz / P=2 -> 180MHz = F_cpu
 		);
 		PWR->CR |= PWR_CR_ODEN; // Enable overdrive mode
 		while (not (PWR->CSR & PWR_CSR_ODRDY)) ;
-		ClockControl::setFlashLatency(Frequency);
-		ClockControl::enableSystemClock(ClockControl::SystemClockSource::Pll);
-		ClockControl::setApb1Prescaler(ClockControl::Apb1Prescaler::Div4);
-		ClockControl::setApb2Prescaler(ClockControl::Apb2Prescaler::Div2);
+		Rcc::setFlashLatency<Frequency>();
+		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
+		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div4);
+		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div2);
 		// update clock frequencies
-		modm::clock::fcpu     = Frequency;
-		modm::clock::fcpu_kHz = Frequency / 1000;
-		modm::clock::fcpu_MHz = Frequency / 1000000;
-		modm::clock::ns_per_loop = ::round(3000.f / (Frequency / 1000000));
+		Rcc::updateCoreFrequency<Frequency>();
 
 		return true;
 	}
@@ -123,11 +121,11 @@ using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockI
 inline void
 initialize()
 {
-    systemClock::enable();
-    modm::cortex::SysTickTimer::initialize<systemClock>();
+    SystemClock::enable();
+    SysTickTimer::initialize<SystemClock>();
 
     stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>();
-    stlink::Uart::initialize<systemClock, 115200>();
+    stlink::Uart::initialize<SystemClock, 115200_Bd>();
 
     LedGreen::setOutput(modm::Gpio::Low);
     LedBlue::setOutput(modm::Gpio::Low);

@@ -70,6 +70,11 @@ def build(env):
     env.copy("atomic_lock.hpp")
     env.copy("unaligned.hpp")
     env.copy("flash_reader.hpp")
+    env.copy("delay.hpp")
+
+    # modm-test implements the clock methods itself
+    if not env.has_module(":test:architecture"):
+        env.copy("clock.cpp")
 
     env.template("ram.cpp.in")
     env.template("interrupts.hpp.in")

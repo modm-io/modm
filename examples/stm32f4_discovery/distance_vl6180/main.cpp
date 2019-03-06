@@ -16,6 +16,7 @@
 #include <modm/driver/position/vl6180.hpp>
 #include <modm/io/iostream.hpp>
 #include <modm/debug/logger.hpp>
+using namespace modm::literals;
 
 modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > device;
 
@@ -146,10 +147,10 @@ main()
 	Board::initialize();
 
 	Usart2::connect<GpioA2::Tx>();
-	Usart2::initialize<Board::systemClock, modm::Uart::B115200>();
+	Usart2::initialize<Board::SystemClock, 115200_Bd>();
 
 	MyI2cMaster::connect<GpioB11::Sda, GpioB10::Scl>();
-	MyI2cMaster::initialize<Board::systemClock, 400000>();
+	MyI2cMaster::initialize<Board::SystemClock, 400_kHz>();
 
 	MODM_LOG_INFO << "\n\nWelcome to VL6180X demo!\n\n";
 

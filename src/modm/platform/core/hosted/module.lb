@@ -49,7 +49,6 @@ def build(env):
     env.copy("../avr/unaligned.hpp", "unaligned.hpp")
     env.copy("../cortex/flash_reader.hpp", "flash_reader.hpp")
 
-    env.outbasepath = "modm/src/modm/platform/clock"
     if not env.has_module(":test"):
         env.template("clock.cpp.in")
     env.template("delay.hpp.in")

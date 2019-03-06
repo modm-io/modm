@@ -18,7 +18,7 @@
 #include <modm/processing/timer.hpp>
 
 using namespace modm::platform;
-using systemClock = SystemClock;
+using namespace modm::literals;
 
 typedef GpioOutputB0 LedGreen;
 typedef GpioOutputB1 LedRed;
@@ -69,7 +69,7 @@ main()
 	OCR2A = 230;
 
 	Uart0::connect<GpioD1::Txd, GpioD0::Rxd>();
-	Uart0::initialize<systemClock, 115200>();
+	Uart0::initialize<SystemClock, 115200_Bd>();
 
 	// Create a IOStream for complex formatting tasks
 	modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull > device;
@@ -83,12 +83,12 @@ main()
 	// Initialize SPI interface and the other pins
 	// needed by the MCP2515
 	SPI::connect<Sclk::BitBang, Mosi::BitBang, Miso::BitBang>();
-	SPI::initialize<systemClock, 1000000>();
+	SPI::initialize<SystemClock, 1_MHz>();
 	Cs::setOutput();
 	Int::setInput(Gpio::InputType::PullUp);
 
 	// Configure MCP2515 and set the filters
-	mcp2515.initialize<modm::clock::MHz8, modm::Can::Bitrate::kBps125>();
+	mcp2515.initialize<8_MHz, modm::Can::Bitrate::kBps125>();
 	mcp2515.setFilter(modm::accessor::asFlash(canFilter));
 
 	// Create a new message

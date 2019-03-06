@@ -20,6 +20,7 @@
 #include <modm/driver/motion/adns9800.hpp>
 
 #include <inttypes.h>
+using namespace modm::literals;
 
 // ----------------------------------------------------------------------------
 // Set the log level
@@ -88,7 +89,7 @@ public:
 		Cs::setOutput(modm::Gpio::High);
 
 		SpiMaster1::connect<GpioOutputA7::Mosi, GpioOutputA5::Sck, GpioInputA6::Miso>();
-		SpiMaster1::initialize<Board::systemClock, 2250000ul>();
+		SpiMaster1::initialize<Board::SystemClock, 2.25_MHz>();
 		SpiMaster1::setDataMode(SpiMaster1::DataMode::Mode3);
 
 		adns9800::initialise();
@@ -134,7 +135,7 @@ main()
 
 	// initialize Uart2 for MODM_LOG_*
 	Usart2::connect<GpioOutputA2::Tx>();
-	Usart2::initialize<Board::systemClock, 115200>();
+	Usart2::initialize<Board::SystemClock, 115200_Bd>();
 
 	// Use the logging streams to print some messages.
 	// Change MODM_LOG_LEVEL above to enable or disable these messages

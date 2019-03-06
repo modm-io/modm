@@ -11,6 +11,7 @@
 
 #include <modm/board.hpp>
 #include <modm/driver/display/ssd1306.hpp>
+using namespace modm::literals;
 
 /**
  * Example to demonstrate a MODM graphics display SSD1306.
@@ -33,7 +34,7 @@ main()
 	Board::initialize();
 
 	MyI2cMaster::connect<Scl::Scl, Sda::Sda>();
-	MyI2cMaster::initialize<Board::systemClock, 420000>();
+	MyI2cMaster::initialize<Board::SystemClock, 420_kHz>();
 
 	display.initializeBlocking();
 	display.setFont(modm::font::Assertion);

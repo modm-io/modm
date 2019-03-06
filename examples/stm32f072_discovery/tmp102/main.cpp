@@ -11,6 +11,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
+using namespace modm::literals;
 
 #include <modm/processing/timer.hpp>
 #include <modm/processing/protothread.hpp>
@@ -108,10 +109,10 @@ main()
 	Board::initialize();
 
 	Usart1::connect<GpioA9::Tx>();
-	Usart1::initialize<Board::systemClock, 115'200>();
+	Usart1::initialize<Board::SystemClock, 115'200_Bd>();
 
 	MyI2cMaster::connect<GpioB7::Sda, GpioB8::Scl>();
-	MyI2cMaster::initialize<Board::systemClock, 400'000>();
+	MyI2cMaster::initialize<Board::SystemClock, 400_kHz>();
 
 	stream << "\n\nRESTART\n\n";
 

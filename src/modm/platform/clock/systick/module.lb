@@ -15,7 +15,7 @@ import os
 
 def init(module):
     module.parent = "platform"
-    module.name = "clock.cortex"
+    module.name = "systick"
     module.description = "ARM Cortex-M SysTick"
 
 def prepare(module, options):
@@ -24,10 +24,13 @@ def prepare(module, options):
 
     module.depends(
         ":architecture:clock",
-        ":architecture:delay",
         ":cmsis:device")
 
     return True
+
+def validate(env):
+    if (env.get(":freertos:frequency", 1000) % 1000 != 0):
+        raise ValidateException("SysTick frequency must be a multiple of 1000Hz!")
 
 def build(env):
     device = env[":target"]
@@ -37,20 +40,11 @@ def build(env):
     properties["target"] = target = device.identifier
     properties["driver"] = driver
     properties["core"] = driver["type"]
-    properties["systick_frequency"] = int(env.get(":freertos:frequency", 1000))
-    if (properties["systick_frequency"] % 1000 != 0):
-        raise BuildException("SysTick frequency must be a multiple of 1000Hz!")
+    properties["systick_frequency"] = env.get(":freertos:frequency", 1000)
 
     env.substitutions = properties
     env.outbasepath = "modm/src/modm/platform/clock"
 
-    env.template("delay.cpp.in")
-    env.copy("delay.hpp")
-
-    if not env.has_module(":test:architecture"):
-        env.copy("modm_clock.cpp")
-
     # Systick Timer
     env.template("systick_timer.hpp.in")
     env.template("systick_timer.cpp.in")
-    env.copy("../common/common_clock.hpp", "common_clock.hpp")

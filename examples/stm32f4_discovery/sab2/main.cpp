@@ -12,6 +12,7 @@
 #include <modm/board.hpp>
 #include <modm/communication/sab.hpp>
 #include <modm/communication/sab2.hpp>
+using namespace modm::literals;
 
 // ----------------------------------------------------------------------------
 //
@@ -27,10 +28,10 @@ main()
 	Board::initialize();
 
 	Usart1::connect<GpioB6::Tx, GpioB7::Rx>();
-	Usart1::initialize<Board::systemClock, 115200>();
+	Usart1::initialize<Board::SystemClock, 115200_Bd>();
 
 	Uart4::connect<GpioC10::Tx, GpioC11::Rx>();
-	Uart4::initialize<Board::systemClock, 115200>();
+	Uart4::initialize<Board::SystemClock, 115200_Bd>();
 
 	while (1)
 	{

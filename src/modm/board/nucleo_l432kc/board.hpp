@@ -23,11 +23,12 @@ using namespace modm::platform;
 /// @ingroup modm_board_nucleo_l432kc
 namespace Board
 {
+	using namespace modm::literals;
 
 /// STM32L4 running at 80MHz generated with the PLL from 4MHz MSI clock
 
-struct systemClock {
-	static constexpr uint32_t Frequency = 80 * MHz1;
+struct SystemClock {
+	static constexpr uint32_t Frequency = 80_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency;
 	static constexpr uint32_t Apb2 = Frequency;
@@ -42,25 +43,22 @@ struct systemClock {
 	static bool inline
 	enable()
 	{
-		ClockControl::enablePll(
-			ClockControl::PllSource::MultiSpeedInternalClock,
+		Rcc::enablePll(
+			Rcc::PllSource::MultiSpeedInternalClock,
 			1,	// 4MHz / M=1 -> 4MHz
 			40,	// 4MHz * N=40 -> 160MHz <= 344MHz = PLL VCO output max, >= 64 MHz = PLL VCO out min
 			2	// 160MHz / P=2 -> 80MHz = F_cpu
 		);
-		ClockControl::setFlashLatency(Frequency);
+		Rcc::setFlashLatency<Frequency>();
 
 		// switch system clock to PLL output
-		ClockControl::enableSystemClock(ClockControl::SystemClockSource::Pll);
-		ClockControl::setAhbPrescaler(ClockControl::AhbPrescaler::Div1);
+		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
+		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
 		// APB1 has max. 80MHz
-		ClockControl::setApb1Prescaler(ClockControl::Apb1Prescaler::Div1);
-		ClockControl::setApb2Prescaler(ClockControl::Apb2Prescaler::Div1);
+		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div1);
+		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div1);
 		// update frequencies for busy-wait delay functions
-		modm::clock::fcpu     = Frequency;
-		modm::clock::fcpu_kHz = Frequency / 1000;
-		modm::clock::fcpu_MHz = Frequency / 1000000;
-		modm::clock::ns_per_loop = ::round(3000.f / (Frequency / 1000000));
+		Rcc::updateCoreFrequency<Frequency>();
 
 		return true;
 	}
@@ -111,11 +109,11 @@ using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockI
 inline void
 initialize()
 {
-	systemClock::enable();
-	modm::cortex::SysTickTimer::initialize<systemClock>();
+	SystemClock::enable();
+	SysTickTimer::initialize<SystemClock>();
 
 	stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>(Gpio::InputType::PullUp);
-	stlink::Uart::initialize<systemClock, 115200>();
+	stlink::Uart::initialize<SystemClock, 115200_Bd>();
 }
 
 }
