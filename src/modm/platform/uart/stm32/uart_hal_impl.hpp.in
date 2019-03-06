@@ -322,6 +322,9 @@ modm::platform::{{ name }}::acknowledgeInterruptFlags(InterruptFlag_t flags)
 {
 %% if "extended" in driver["type"]
 	// Not all flags can be cleared by writing to this reg
+#ifdef USART_ICR_NECF
+#define USART_ICR_NCF USART_ICR_NECF
+#endif
 	%% if target["family"] == "f0" and target["name"] in ["30", "70"]
 	const uint32_t mask = USART_ICR_PECF  | USART_ICR_FECF   |
 		USART_ICR_NCF   | USART_ICR_ORECF | USART_ICR_IDLECF |

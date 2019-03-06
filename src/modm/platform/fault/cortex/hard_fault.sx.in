@@ -30,7 +30,7 @@
 	.func	HardFault_Handler
 HardFault_Handler:
 
-%% if target.platform == "stm32" and not target.family == "f0"
+%% if "m0" not in core
 	/* When a hard fault occurs, this handler will move the stack pointer around.
  	 * This makes it harder to debug a hard fault with a real debugger, so if one is connected we would
 	 * like to trigger a software breakpoint before moving the stack pointer.

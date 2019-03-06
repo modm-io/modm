@@ -68,7 +68,7 @@ git clone --recurse-submodules https://github.com/modm-io/modm.git
 
 ## Targets
 
-modm can generate code for <!--avrcount-->76<!--/avrcount--> AVR and <!--stmcount-->886<!--/stmcount-->
+modm can generate code for <!--avrcount-->76<!--/avrcount--> AVR and <!--stmcount-->917<!--/stmcount-->
 STM32 devices, however, there are different levels of support and testing.
 
 <center>
@@ -134,10 +134,11 @@ documentation.
 <td align="center">NUCLEO-F411RE</td>
 </tr><tr>
 <td align="center">NUCLEO-F429ZI</td>
+<td align="center">NUCLEO-G071RB</td>
 <td align="center">NUCLEO-L432KC</td>
 <td align="center">NUCLEO-L476RG</td>
-<td align="center">OLIMEXINO-STM32</td>
 </tr><tr>
+<td align="center">OLIMEXINO-STM32</td>
 <td align="center">STM32F030F4P6-DEMO</td>
 </tr>
 </table>

@@ -40,7 +40,7 @@ public:
 	enum class
 	PllSource : uint32_t
 	{
-%% if target["family"] in ["f2", "f4", "f7", "l4"]
+%% if target["family"] in ["f2", "f4", "f7", "l4", "g0"]
 		/// High speed internal clock (16 MHz)
 		Hsi = RCC_PLLCFGR_PLLSRC_HSI,
 		/// High speed external clock (see HseConfig)
@@ -129,7 +129,7 @@ public:
 		Div512 = RCC_CFGR_HPRE_DIV512
 	};
 
-%% if target["family"] == "f0"
+%% if target["family"] in ["f0", "g0"]
 	enum class
 	ApbPrescaler : uint32_t
 	{
@@ -181,13 +181,15 @@ public:
 		Pll = RCC_CFGR_MCO2_1 | RCC_CFGR_MCO2_0,
 	};
 	%% endif
-%% elif target["family"] in ["l4"]
+%% elif target["family"] in ["l4", "g0"]
 	enum class
 	ClockOutputSource : uint32_t
 	{
 		Disable = 0,
 		SystemClock = (1 << RCC_CFGR_MCOSEL_Pos), // SYSCLK
+%% if target["family"] in ["l4"]
 		MultiSpeedInternalClock = (2 << RCC_CFGR_MCOSEL_Pos), // MSI
+%% endif
 		InternalClock = (3 << RCC_CFGR_MCOSEL_Pos), // HSI16
 		ExternalClock = (4 << RCC_CFGR_MCOSEL_Pos), // HSE
 		ExternalCrystal = (4 << RCC_CFGR_MCOSEL_Pos), // HSE
@@ -269,7 +271,7 @@ public:
 	enableLowSpeedExternalCrystal(uint32_t waitCycles = 2048);
 
 	// plls
-%% if target["family"] in ["f2", "f4", "f7", "l4"]
+%% if target["family"] in ["f2", "f4", "f7", "l4", "g0"]
 	/**
 	 * Enable PLL.
 	 *
@@ -301,7 +303,7 @@ public:
 	 */
 	static bool
 	enablePll(PllSource source, uint8_t pllM, uint16_t pllN,
-%% if target["family"] in ["l4"]
+%% if target["family"] in ["l4", "g0"]
 	          uint8_t pllR,
 %% else
 			  uint8_t pllP,
@@ -354,7 +356,7 @@ public:
 		return true;
 	}
 	%% endif
-%% elif target["family"] in ["l4"]
+%% elif target["family"] in ["l4", "g0"]
 	enum class
 	ClockOutputPrescaler : uint32_t
 	{
@@ -363,6 +365,11 @@ public:
 		Div4 = (2 << RCC_CFGR_MCOPRE_Pos),
 		Div8 = (3 << RCC_CFGR_MCOPRE_Pos),
 		Div16 = (4 << RCC_CFGR_MCOPRE_Pos),
+%% if target["family"] in ["g0"]
+		Div32 = (5 << RCC_CFGR_MCOPRE_Pos),
+		Div64 = (6 << RCC_CFGR_MCOPRE_Pos),
+		Div128 = (7 << RCC_CFGR_MCOPRE_Pos),
+%% endif
 	};
 
 	static inline bool
@@ -388,7 +395,7 @@ public:
 		return true;
 	}
 
-%% if target["family"] == "f0"
+%% if target["family"] in ["f0", "g0"]
 	static inline bool
 	setApbPrescaler(ApbPrescaler prescaler)
 	{

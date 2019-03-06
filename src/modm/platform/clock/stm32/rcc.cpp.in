@@ -157,7 +157,7 @@ modm::platform::Rcc::enablePll(PllSource source, uint8_t pllM, uint16_t pllN, ui
 
 	return tmp;
 }
-%% elif target["family"] in ["l4"]
+%% elif target["family"] in ["g0", "l4"]
 // ----------------------------------------------------------------------------
 bool
 modm::platform::Rcc::enablePll(PllSource source,
@@ -182,11 +182,17 @@ modm::platform::Rcc::enablePll(PllSource source,
 	tmp |= (uint32_t(pllN) << RCC_PLLCFGR_PLLN_Pos) & RCC_PLLCFGR_PLLN;
 
 	// PLLR divider for CPU frequency
+%% if target["family"] in ["g0"]
+	tmp |= ((uint32_t(pllR) - 1) << RCC_PLLCFGR_PLLR_Pos) & RCC_PLLCFGR_PLLR;
+	// PLLP divider for P frequency
+	// tmp |= ((uint32_t(pllP) - 1) << RCC_PLLCFGR_PLLP_Pos) & RCC_PLLCFGR_PLLP;
+%% else
 	tmp |= ((uint32_t(pllR / 2) - 1) << RCC_PLLCFGR_PLLR_Pos) & RCC_PLLCFGR_PLLR;
 	// PLLQ (21) divider for USB frequency; (00: PLLQ = 2, 01: PLLQ = 4, etc.)
 	// tmp |= (((uint32_t) (pllQ / 2) - 1) << RCC_PLLCFGR_PLLQ_Pos) & RCC_PLLCFGR_PLLQ;
 	// enable pll USB clock output
 	// tmp |= RCC_PLLCFGR_PLLQEN;
+%% endif
 
 	// enable pll CPU clock output
 	tmp |= RCC_PLLCFGR_PLLREN;

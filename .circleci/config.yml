@@ -80,6 +80,10 @@ jobs:
           command: |
             (cd examples && ../tools/scripts/examples_compile.py stm32f746g_discovery)
       - run:
+          name: Examples STM32G0 Series
+          command: |
+            (cd examples && ../tools/scripts/examples_compile.py nucleo_g071rb)
+      - run:
           name: Examples STM32L4 Series
           command: |
             (cd examples && ../tools/scripts/examples_compile.py stm32l476_discovery nucleo_l476rg nucleo_l432kc)
@@ -234,6 +238,20 @@ jobs:
           path: test/all/log
           destination: log
 
+  stm32g0-compile-all:
+    docker:
+      - image: modm/modm-build:latest
+    steps:
+      - checkout
+      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
+      - run:
+          name: Compile HAL for all STM32G0
+          command: |
+            (cd test/all && python3 run_all.py stm32g0)
+      - store_artifacts:
+          path: test/all/log
+          destination: log
+
   build-docs:
     docker:
       - image: modm/modm-build:latest
@@ -302,6 +320,10 @@ workflows:
           requires:
             - unittests
             - stm32-examples
+      - stm32g0-compile-all:
+          requires:
+            - unittests
+            - stm32-examples
       - stm32l4-compile-all:
           requires:
             - unittests
@@ -315,5 +337,6 @@ workflows:
             - stm32f3-compile-all
             - stm32f4-compile-all
             - stm32f7-compile-all
+            - stm32g0-compile-all
             - stm32l4-compile-all
 

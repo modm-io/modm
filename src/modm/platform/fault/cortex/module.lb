@@ -23,10 +23,11 @@ Dealing with Fault handlers.
 """
 
 def prepare(module, options):
-    if not options[":target"].has_driver("core:cortex-m*"):
+    device = options[":target"]
+    if not device.has_driver("core:cortex-m*"):
         return False
 
-    if options[":target"].identifier["platform"] not in ["stm32"]:
+    if device.identifier["platform"] not in ["stm32"]:
         return False
 
     module.depends(
@@ -35,7 +36,7 @@ def prepare(module, options):
         ":platform:gpio",
         ":cmsis:device")
 
-    pins = [p["port"].upper() + p["pin"] for p in options[":target"].get_driver("gpio")["gpio"]]
+    pins = [p["port"].upper() + p["pin"] for p in device.get_driver("gpio")["gpio"]]
     module.add_option(
         EnumerationOption(
             name="led",

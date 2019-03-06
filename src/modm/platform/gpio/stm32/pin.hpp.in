@@ -117,7 +117,11 @@ public:
 		constexpr uint8_t bit_pos = (pin & 0b0011) << 2;
 		constexpr uint16_t syscfg_mask = (0b1111) << bit_pos;
 		constexpr uint16_t syscfg_value = (port_nr & (0b1111)) << bit_pos;
+%% if target.family in ["g0"]
+		EXTI->EXTICR[index] = (EXTI->EXTICR[index] & ~syscfg_mask) | syscfg_value;
+%% else
 		SYSCFG->EXTICR[index] = (SYSCFG->EXTICR[index] & ~syscfg_mask) | syscfg_value;
+%% endif
 		EXTI->IMR{{pf}} |= mask;
 	}
 	inline static void disableExternalInterrupt() { EXTI->IMR{{pf}} &= ~mask; }
@@ -145,8 +149,15 @@ public:
 			break;
 		}
 	}
+%% if target.family in ["g0"]
+	inline static bool getExternalInterruptFlag()
+	{ return (EXTI->FPR1 & mask) | (EXTI->RPR1 & mask); }
+	inline static void acknowledgeExternalInterruptFlag()
+	{ EXTI->FPR1 |= mask; EXTI->RPR1 |= mask; }
+%% else
 	inline static bool getExternalInterruptFlag() { return (EXTI->PR{{pf}} & mask); }
 	inline static void acknowledgeExternalInterruptFlag() { EXTI->PR{{pf}} |= mask; }
+%% endif
 	// GpioIO
 	// start documentation inherited
 	inline static Direction getDirection() {

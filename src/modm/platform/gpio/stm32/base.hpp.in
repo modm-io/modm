@@ -54,7 +54,21 @@ struct Gpio
 	enum class
 	OutputSpeed
 	{
-%% if target["family"] in ["f2", "f4", "f7", "l4"]
+%% if target["family"] in ["f1"]
+		Low    = 0x2,
+		Medium = 0x1,
+		High   = 0x3,
+		MHz2   = Low,
+		MHz10  = Medium,
+		MHz50  = High,
+%% elif target["family"] in ["f0", "f3"]
+		Low    = 0,
+		Medium = 0x1,
+		High   = 0x3,
+		MHz2   = Low,
+		MHz10  = Medium,
+		MHz50  = High,
+%% else
 		Low      = 0,
 		Medium   = 0x1,
 		High     = 0x2,
@@ -63,20 +77,6 @@ struct Gpio
 		MHz25    = Medium,
 		MHz50    = High,
 		MHz100   = VeryHigh,
-%% elif target["family"] in ["f0", "f3"]
-		Low    = 0,
-		Medium = 0x1,
-		High   = 0x3,
-		MHz2   = Low,
-		MHz10  = Medium,
-		MHz50  = High,
-%% elif target["family"] in ["f1"]
-		Low    = 0x2,
-		Medium = 0x1,
-		High   = 0x3,
-		MHz2   = Low,
-		MHz10  = Medium,
-		MHz50  = High,
 %% endif
 	};
 
