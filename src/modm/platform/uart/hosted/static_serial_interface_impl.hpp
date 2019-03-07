@@ -21,7 +21,7 @@ modm::platform::SerialInterface*
 modm::platform::StaticSerialInterface<N>::backend = 0;
 
 template<int N>
-template<uint32_t baudrate>
+template<modm::baudrate_t baudrate>
 bool
 modm::platform::StaticSerialInterface<N>::initialize(SerialInterface& interface)
 {

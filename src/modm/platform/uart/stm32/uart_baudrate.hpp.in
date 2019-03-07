@@ -45,7 +45,7 @@ public:
 	 * Returns the highest Oversampling Mode that is possible for this configuration.
 	 */
 	static constexpr UartBase::OversamplingMode
-	getOversamplingMode(uint32_t clockrate, uint32_t baudrate)
+	getOversamplingMode(frequency_t clockrate, baudrate_t baudrate)
 	{
 		return (baudrate <= clockrate / 16) ? UartBase::OversamplingMode::By16 : UartBase::OversamplingMode::By8;
 	}
@@ -61,7 +61,7 @@ public:
 	 * @tparam	tolerance
 	 * 		the allowed absolute tolerance for the resulting baudrate
 	 */
-	template< uint32_t clockrate, uint32_t baudrate, uint16_t tolerance = 1000 >
+	template< frequency_t clockrate, baudrate_t baudrate, percent_t tolerance=pct(10) >
 	static uint16_t modm_always_inline
 	getBrr()
 	{

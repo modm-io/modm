@@ -38,7 +38,7 @@ modm::platform::SocketCan::~SocketCan()
 }
 
 bool
-modm::platform::SocketCan::open(std::string deviceName /*, modm::Can::Bitrate canBitrate */)
+modm::platform::SocketCan::open(std::string deviceName /*, bitrate_t canBitrate */)
 {
 	skt = socket(PF_CAN, SOCK_RAW, CAN_RAW);
 

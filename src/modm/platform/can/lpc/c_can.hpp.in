@@ -60,8 +60,7 @@ class Can : public ::modm::Can
 {
 public:
 
-	template< class SystemClock, uint32_t bitrate = Bitrate::kBps125,
-			uint16_t tolerance = Tolerance::OnePercent >
+	template< class SystemClock, bitrate_t bitrate=kbps(125), percent_t tolerance=pct(1) >
 	static inline void
 	initialize()
 	{

@@ -1,0 +1,77 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2019, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.parent = ":math"
+    module.name = "units"
+    module.description = """\
+# SI Units
+
+modm uses a couple of common SI units for configuration of peripherals:
+
+- `frequency_t` in Hertz: `Hz`, `kHz` and `MHz`.
+- `baudrate_t` in Baud: `Bd`, `kBd`, `MBd`.
+- `bitrate_t` in bit/s, `bps`.
+
+These are integral units, so 1 Hz/Bd/bps cannot be split further, and are cast
+directly to `uint32_t` type, so they can be used as a non-type template argument.
+
+Conversion can be done via constexpr functions from *any* numerical type:
+
+- `modm::Hz(T value)`, `modm::kHz(T value)`, `modm::MHz(T value)`.
+- `modm::Bd(T value)`, `modm::kBd(T value)`, `modm::MBd(T value)`.
+- `modm::bps(T value)`, `modm::kbps(T value)`, `modm::Mbps(T value)`.
+
+In addition, user-defined literals are provided in the `modm::literals` namespace:
+
+```cpp
+using namespace modm::literals;
+
+frequency_t frequency = modm::Mhz(10.5);
+            frequency = 10.5_MHz;
+baudrate_t baudrate = 115.2_kBd;
+           baudrate = modm::kBd(115.2);
+bitrate_t bitrate = modm::kbps(125);
+          bitrate = 125_kbps;
+
+frequency = 4295_MHz; // OVERFLOW at 2^32 units!
+```
+
+## Integral Percentages
+
+Since `float` cannot be used as a non-type template argument, an integer type
+for providing tolerances in `percent_t` is available.
+Note that `percent_t` is implemented as an enum class, which prevents implicit
+conversions, since the base for this is not 1.
+You must therefore use the `modm::pct(T value)` or `_pct` constructors.
+
+```cpp
+using namespace modm::literals;
+
+percent_t tolerance = modm::pct(10);
+          tolerance = 10_pct;
+
+// convert back to float. *internal use only*
+float percent = modm::pct2f(tolerance);
+```
+
+!!! warning "This type is not guaranteed to hold more than 100 percent!"
+
+"""
+
+def prepare(module, options):
+    module.depends(":architecture")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/math"
+    env.copy("units.hpp")

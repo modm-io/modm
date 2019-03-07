@@ -53,8 +53,7 @@ public:
 	connect(PullUps pullups = PullUps::External);
 
 	/// Initializes the hardware, with the baudrate limited to about 250kbps.
-	template< class SystemClock, uint32_t baudrate=Baudrate::Standard,
-			uint16_t tolerance = modm::Tolerance::FivePercent >
+	template< class SystemClock, baudrate_t baudrate=kHz(100), percent_t tolerance=pct(5) >
 	static void
 	initialize();
 

@@ -35,20 +35,6 @@ public:
 		ListenOnlyLoopBack	= 0b11,	///< combination of both modes
 	};
 
-	/// Supported CAN bitrates; maybe different on a per device basis
-	enum
-	Bitrate : uint32_t
-	{
-		kBps10  =   10000,
-		kBps20  =   20000,
-		kBps50  =   50000,
-		kBps100 =  100000,
-		kBps125 =  125000,
-		kBps250 =  250000,
-		kBps500 =  500000,
-		MBps1   = 1000000,
-	};
-
 	enum class
 	BusState : uint8_t
 	{
@@ -92,8 +78,7 @@ public:
 	 * @tparam	tolerance
 	 * 		the allowed relative tolerance for the resulting baudrate
 	 */
-	template< class SystemClock, uint32_t bitrate = Bitrate::kBps125,
-			uint16_t tolerance = Tolerance::OnePercent >
+	template< class SystemClock, bitrate_t bitrate = 125_kbps, percent_t tolerance = 1_pct >
 	static void
 	initialize(Mode startupMode);
 

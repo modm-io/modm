@@ -61,8 +61,7 @@ public:
 	static constexpr size_t TxBufferSize = {{ option["buffer.tx"] }};
 
 public:
-	template< class SystemClock, uint32_t baudrate,
-			uint16_t tolerance = modm::Tolerance::OnePercent >
+	template< class SystemClock, baudrate_t baudrate, percent_t tolerance=pct(1) >
 	static void modm_always_inline
 	initialize()
 	{

@@ -14,6 +14,7 @@
 #include <modm/processing/protothread.hpp>
 #include <modm/processing/resumable.hpp>
 #include <modm/architecture/interface/i2c_device.hpp>
+using namespace modm::literals;
 
 /*
  * Test of I2C transaction with STM32L4
@@ -134,7 +135,7 @@ main()
 	Board::initialize();
 
 	MyI2cMaster::connect<Board::D14::Sda, Board::D15::Scl>();
-	MyI2cMaster::initialize<Board::SystemClock, MyI2cMaster::Baudrate::Standard>();
+	MyI2cMaster::initialize<Board::SystemClock, 100_kHz>();
 
 	LedGreen::set();
 

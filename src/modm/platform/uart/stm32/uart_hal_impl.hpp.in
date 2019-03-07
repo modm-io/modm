@@ -65,7 +65,7 @@ modm::platform::{{ name }}::disable()
 	Rcc::disable<Peripheral::{{ uart_name ~ id }}>();
 }
 %% if target["family"] != "f1"
-template<class SystemClock, uint32_t baudrate,
+template<class SystemClock, modm::baudrate_t baudrate,
 		modm::platform::{{ name }}::OversamplingMode oversample>
 void modm_always_inline
 modm::platform::{{ name }}::initialize(Parity parity)
@@ -76,7 +76,7 @@ modm::platform::{{ name }}::initialize(Parity parity)
 }
 %% endif
 
-template<class SystemClock, uint32_t baudrate>
+template<class SystemClock, modm::baudrate_t baudrate>
 void modm_always_inline
 modm::platform::{{ name }}::initialize(Parity parity)
 {

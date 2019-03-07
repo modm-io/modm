@@ -50,8 +50,7 @@ public:
 	connect();
 
 	/// Baudrate is limited to 500kbps.
-	template< class SystemClock, uint32_t baudrate,
-			uint16_t tolerance = Tolerance::FivePercent >
+	template< class SystemClock, baudrate_t baudrate, percent_t tolerance=pct(5) >
 	static void
 	initialize();
 

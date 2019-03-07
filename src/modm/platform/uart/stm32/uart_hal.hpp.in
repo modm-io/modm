@@ -64,7 +64,7 @@ public:
 	* Enables clocks, the UART peripheral (but neither TX nor RX)
 	* Sets baudrate and parity.
 	*/
-	template<	class SystemClock, uint32_t baudrate >
+	template<	class SystemClock, baudrate_t baudrate >
 	static void
 	initialize(	Parity parity = Parity::Disabled);
 
@@ -75,7 +75,7 @@ public:
 	 * Enables clocks, the UART peripheral (but neither TX nor RX)
 	 * Sets baudrate and parity.
 	 */
-	template<	class SystemClock, uint32_t baudrate,
+	template<	class SystemClock, baudrate_t baudrate,
 				OversamplingMode oversample = OversamplingMode::By16 >
 	static void
 	initialize(	Parity parity = Parity::Disabled);

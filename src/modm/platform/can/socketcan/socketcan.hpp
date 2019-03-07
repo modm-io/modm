@@ -32,7 +32,7 @@ public:
 	~SocketCan();
 
 	bool
-	open(std::string deviceName /*, modm::Can::Bitrate canBitrate = modm::Can::kBps125 */);
+	open(std::string deviceName /*, bitrate_t canBitrate = kbps(125) */);
 
 	void
 	close();

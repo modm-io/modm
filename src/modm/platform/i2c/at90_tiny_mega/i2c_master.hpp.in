@@ -61,8 +61,7 @@ public:
 		Connector::connect();
 	}
 
-	template< class SystemClock, uint32_t baudrate=Baudrate::Standard,
-			uint16_t tolerance = modm::Tolerance::FivePercent >
+	template< class SystemClock, baudrate_t baudrate=kHz(100), percent_t tolerance=pct(5) >
 	static modm_always_inline void
 	initialize()
 	{

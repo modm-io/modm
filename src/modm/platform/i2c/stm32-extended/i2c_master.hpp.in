@@ -42,7 +42,7 @@ public:
 	static constexpr size_t TransactionBufferSize = {{ options["buffer.transaction"] }};
 
 private:
-	template<class SystemClock, uint32_t baudrate, uint16_t tolerance>
+	template<class SystemClock, baudrate_t baudrate, percent_t tolerance>
 	static constexpr std::optional<uint32_t>
 	calculateTimings()
 	{
@@ -95,8 +95,7 @@ public:
 	 * @param	rate
 	 *		`Standard` or `Fast`, `High` datarate is not supported
 	 */
-	template<class SystemClock, uint32_t baudrate=Baudrate::Standard,
-			uint16_t tolerance = modm::Tolerance::FivePercent >
+	template<class SystemClock, baudrate_t baudrate=kBd(100), percent_t tolerance=pct(5)>
 	static modm_always_inline void
 	initialize()
 	{

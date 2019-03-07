@@ -55,8 +55,7 @@ public:
 	 * @tparam	tolerance
 	 * 		the allowed relative tolerance for the resulting baudrate
 	 */
-	template< class SystemClock, uint32_t baudrate,
-			uint16_t tolerance = Tolerance::FivePercent >
+	template< class SystemClock, baudrate_t baudrate, percent_t tolerance=5_pct >
 	static void
 	initialize();
 

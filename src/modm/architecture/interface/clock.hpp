@@ -64,22 +64,6 @@ protected:
 	static Type time;
 };
 
-
-using frequency_t = uint32_t;
-namespace literals
-{
-	constexpr frequency_t operator "" _Hz(unsigned long long int frequency)
-	{ return frequency; }
-	constexpr frequency_t operator "" _kHz(unsigned long long int frequency)
-	{ return frequency * 1'000; }
-	constexpr frequency_t operator "" _kHz(long double frequency)
-	{ return frequency * 1'000; }
-	constexpr frequency_t operator "" _MHz(unsigned long long int frequency)
-	{ return frequency * 1'000'000; }
-	constexpr frequency_t operator "" _MHz(long double frequency)
-	{ return frequency * 1'000'000; }
-}
-
 }	// namespace modm
 
 #endif	// MODM_INTERFACE_CLOCK_HPP

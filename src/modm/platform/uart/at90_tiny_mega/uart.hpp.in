@@ -60,8 +60,7 @@ public:
 	}
 
 	// start documentation inherited
-	template< class SystemClock, uint32_t baudrate,
-			uint16_t tolerance = modm::Tolerance::TwoPercent >
+	template< class SystemClock, baudrate_t baudrate, percent_t tolerance=pct(2) >
 	static modm_always_inline void
 	initialize()
 	{

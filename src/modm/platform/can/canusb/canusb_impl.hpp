@@ -51,8 +51,9 @@ modm::platform::CanUsb<SerialPort>::~CanUsb()
 
 template <typename SerialPort>
 bool
-modm::platform::CanUsb<SerialPort>::open(modm::Can::Bitrate canBitrate)
+modm::platform::CanUsb<SerialPort>::open(bitrate_t canBitrate)
 {
+	using namespace literals;
 	if (this->serialPort.open())
 	{
 		MODM_LOG_DEBUG << MODM_FILE_INFO << "SerialPort opened in canusb" << modm::endl;
@@ -73,28 +74,28 @@ modm::platform::CanUsb<SerialPort>::open(modm::Can::Bitrate canBitrate)
 
 		switch (canBitrate)
 		{
-			case kBps10:
+			case 10_kbps:
 				this->serialPort.write("S0\r");
 			break;
-			case kBps20:
+			case 20_kbps:
 				this->serialPort.write("S1\r");
 			break;
-			case kBps50:
+			case 50_kbps:
 				this->serialPort.write("S2\r");
 			break;
-			case kBps100:
+			case 100_kbps:
 				this->serialPort.write("S3\r");
 			break;
-			case kBps125:
+			case 125_kbps:
 				this->serialPort.write("S4\r");
 			break;
-			case kBps250:
+			case 250_kbps:
 				this->serialPort.write("S5\r");
 			break;
-			case kBps500:
+			case 500_kbps:
 				this->serialPort.write("S6\r");
 			break;
-			case MBps1:
+			case 1_Mbps:
 				this->serialPort.write("S8\r");
 			break;
 		}

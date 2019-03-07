@@ -341,7 +341,7 @@ All hardware peripherals with common interfaces.
 """
 
 def prepare(module, options):
-    module.depends(":math") # for tolerance.hpp
+    module.depends(":math:units")
 
     module.add_submodule(Accessor())
     module.add_submodule(Adc())

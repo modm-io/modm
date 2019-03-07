@@ -66,7 +66,7 @@ main()
 	Board::stlink::Uart::initialize<Board::SystemClock, 1_MBd>(12);
 
     MyI2cMaster::connect<Board::D14::Sda, Board::D15::Scl>();
-    MyI2cMaster::initialize<Board::SystemClock, MyI2cMaster::Baudrate::Standard>();
+    MyI2cMaster::initialize<Board::SystemClock, 100_kHz>();
 
 	Board::LedGreen::set();
 

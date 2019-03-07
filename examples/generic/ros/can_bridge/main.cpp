@@ -106,7 +106,7 @@ main()
 	} else {
 		Can::connect<GpioInputB8::Rx, GpioOutputB9::Tx>(Gpio::InputType::PullUp);
 	}
-	Can::initialize<Board::SystemClock, Can::Bitrate::kBps250>(9);
+	Can::initialize<Board::SystemClock, 250_kbps>(9);
 
 	// Receive every message
 	CanFilter::setFilter(0, CanFilter::FIFO0,

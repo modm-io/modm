@@ -16,6 +16,7 @@
 #define MODM_COMMON_CAN_BIT_TIMINGS_HPP
 
 #include <modm/architecture/interface/clock.hpp>
+#include <modm/math/units.hpp>
 #include <cmath>
 
 namespace modm
@@ -98,10 +99,10 @@ public:
 	static constexpr uint8_t getSJW() { return BestConfig.sjw; }
 	static constexpr uint8_t getPrescaler() { return BestConfig.prescaler; }
 
-	template<uint16_t tolerance>
+	template<percent_t tolerance>
 	static constexpr void assertBitrateInTolerance()
 	{
-		static_assert(tolerance >= static_cast<uint16_t>(BestConfig.minError * 1000.f),
+		static_assert(pct2f(tolerance) >= BestConfig.minError,
 			"The closest available bitrate exceeds the specified maximum tolerance!");
 	}
 

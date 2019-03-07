@@ -118,9 +118,7 @@ namespace modm
     class Mcp2515 : public ::modm::Can
 	{
 	public:
-		template< int32_t ExternalClockFrequency,
-			   uint32_t bitrate = Bitrate::kBps125,
-			   uint16_t tolerance = Tolerance::OnePercent >
+		template<frequency_t ExternalClock, bitrate_t bitrate=kbps(125), percent_t tolerance=pct(1) >
 		static inline bool
 		initialize();
 

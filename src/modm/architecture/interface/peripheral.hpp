@@ -17,37 +17,10 @@
 #include <stdint.h>
 #include <cstddef>
 #include <modm/math/tolerance.hpp>
+#include <modm/math/units.hpp>
 
 namespace modm
 {
-
-using baudrate_t = uint32_t;
-using bitrate_t = uint32_t;
-
-namespace literals
-{
-	constexpr baudrate_t operator "" _Bd(unsigned long long int baudrate)
-	{ return baudrate; }
-	constexpr baudrate_t operator "" _kBd(unsigned long long int baudrate)
-	{ return baudrate * 1'000; }
-	constexpr baudrate_t operator "" _kBd(long double baudrate)
-	{ return baudrate * 1'000; }
-	constexpr baudrate_t operator "" _MBd(unsigned long long int baudrate)
-	{ return baudrate * 1'000'000; }
-	constexpr baudrate_t operator "" _MBd(long double baudrate)
-	{ return baudrate * 1'000'000; }
-
-	constexpr baudrate_t operator "" _bps(unsigned long long int baudrate)
-	{ return baudrate; }
-	constexpr baudrate_t operator "" _kbps(unsigned long long int baudrate)
-	{ return baudrate * 1'000; }
-	constexpr baudrate_t operator "" _kbps(long double baudrate)
-	{ return baudrate * 1'000; }
-	constexpr baudrate_t operator "" _Mbps(unsigned long long int baudrate)
-	{ return baudrate * 1'000'000; }
-	constexpr baudrate_t operator "" _Mbps(long double baudrate)
-	{ return baudrate * 1'000'000; }
-}
 
 /**
  * Peripheral class
@@ -110,7 +83,7 @@ public:
 	 * This method checks if the user requested baudrate is within error
 	 * tolerance of the system achievable baudrate.
 	 */
-	template< baudrate_t available, baudrate_t requested, uint16_t tolerance >
+	template< baudrate_t available, baudrate_t requested, percent_t tolerance >
 	static void
 	assertBaudrateInTolerance()
 	{

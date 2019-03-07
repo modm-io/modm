@@ -165,8 +165,7 @@ public:
 		Connector::connect();
 	}
 
-	template< class SystemClock, uint32_t frequency=100000,
-			uint16_t tolerance = modm::Tolerance::TenPercent >
+	template< class SystemClock, frequency_t frequency=kHz(100), percent_t tolerance=pct(10) >
 	static void
 	initialize()
 	{

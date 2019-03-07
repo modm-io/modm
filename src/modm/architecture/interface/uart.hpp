@@ -30,40 +30,6 @@ namespace modm
  */
 class Uart : public ::modm::PeripheralDriver
 {
-public:
-	/**
-	 * Commonly used baudrates.
-	 *
-	 * Most Serial-to-USB converters only support baudrates up to 115200 Baud
-	 */
-	enum
-	Baudrate : uint32_t
-	{
-#ifndef B300	// termios.h defines B300 .. B38400
-		    B300 =     300,
-		    B600 =     600,
-		   B1200 =    1200,
-		   B1800 =    1800,
-		   B2400 =    2400,
-		   B4800 =    4800,
-		   B9600 =    9600,
-		  B14400 =   14400,
-		  B19200 =   19200,
-		  B28800 =   28800,
-		  B38400 =   38400,
-		  B57600 =   57600,
-		  B76800 =   76800,
-		 B115200 =  115200,
-		 B230400 =  230400,
-		 B250000 =  250000,
-		 kBps250 =  250000,
-		 B500000 =  500000,
-		 kBps500 =  500000,
-		B1000000 = 1000000,
-		   MBps1 = 1000000
-#endif
-	};
-
 #ifdef __DOXYGEN__
 public:
 	/// Size of the receive buffer.
@@ -95,8 +61,7 @@ public:
 	 * @tparam	tolerance
 	 * 		the allowed absolute tolerance for the resulting baudrate
 	 */
-	template< class SystemClock, uint32_t baudrate,
-			uint16_t tolerance = Tolerance::OnePercent >
+	template< class SystemClock, baudrate_t baudrate, percent_t tolerance=10_pct >
 	static void
 	initialize();
 

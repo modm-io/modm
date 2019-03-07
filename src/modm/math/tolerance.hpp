@@ -13,15 +13,10 @@
 #define MODM_MATH_TOLERANCE_HPP
 
 #include <stdint.h>
+#include <modm/math/units.hpp>
 
 namespace modm
 {
-
-namespace literals
-{
-	constexpr uint16_t operator "" _percent(long double percent)
-	{ return percent * 10; }
-}
 
 /**
  * This class checks if values are within a certain tolerance.
@@ -35,19 +30,6 @@ class
 Tolerance
 {
 public:
-	///@{
-	/// Common tolerances in percent
-	static constexpr uint16_t Exact			=    0;
-	static constexpr uint16_t ZeroPercent	=    0;
-	static constexpr uint16_t HalfPercent	=    5;
-	static constexpr uint16_t OnePercent	=   10;
-	static constexpr uint16_t TwoPercent	=   20;
-	static constexpr uint16_t FivePercent	=   50;
-	static constexpr uint16_t TenPercent	=  100;
-	static constexpr uint16_t TwentyPercent	=  200;
-	static constexpr uint16_t DontCare		= 1000;
-	///@}
-
 	static constexpr int64_t
 	absoluteError(uint32_t reference, uint32_t actual)
 	{
@@ -61,18 +43,18 @@ public:
 	}
 
 	static constexpr bool
-	isErrorInTolerance(float error, uint16_t tolerance)
+	isErrorInTolerance(float error, percent_t tolerance)
 	{
-		return (error == 0) or (((error > 0) ? error : -error) * 1000 <= tolerance);
+		return (error == 0) or (((error > 0) ? error : -error) <= pct2f(tolerance));
 	}
 
 	static constexpr bool
-	isValueInTolerance(uint32_t reference, uint32_t actual, uint16_t tolerance)
+	isValueInTolerance(uint32_t reference, uint32_t actual, percent_t tolerance)
 	{
 		return isErrorInTolerance(relativeError(reference, actual), tolerance);
 	}
 
-	template< uint32_t reference, uint32_t actual, uint16_t tolerance >
+	template< uint32_t reference, uint32_t actual, percent_t tolerance >
 	static void
 	assertValueInTolerance()
 	{

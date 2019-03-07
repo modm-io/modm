@@ -48,17 +48,6 @@ public:
 		Unknown				///< Unknown error condition
 	};
 
-	/// Baudrate of the I2C bus. Most slaves only work in Standard or Fast mode.
-	enum
-	Baudrate : uint32_t
-	{
-		LowSpeed =   10000,	///< Low-Speed datarate of 10kHz
-		Standard =  100000,	///< Standard datarate of 100kHz
-		Fast     =  400000,	///< Fast datarate of 400kHz
-		FastPlus = 1000000,	///< Fast Plus datarate of 1.0MHz (rarely supported)
-		High     = 3400000	///< Super datarate of 3.4MHz (rarely supported)
-	};
-
 	enum class
 	PullUps
 	{
@@ -111,8 +100,7 @@ public:
 	 * @tparam	tolerance
 	 * 		the allowed absolute tolerance for the resulting baudrate
 	 */
-	template< class SystemClock, uint32_t baudrate = Baudrate::Standard,
-			uint16_t tolerance = Tolerance::FivePercent >
+	template< class SystemClock, baudrate_t baudrate=100_kBd, percent_t tolerance=5_pct >
 	static void
 	initialize();
 

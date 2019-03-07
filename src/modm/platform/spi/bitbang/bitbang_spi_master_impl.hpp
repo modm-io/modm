@@ -61,11 +61,11 @@ modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::connect()
 
 
 template <typename Sck, typename Mosi, typename Miso>
-template< class SystemClock, uint32_t baudrate, uint16_t tolerance >
+template< class SystemClock, modm::baudrate_t baudrate, modm::percent_t tolerance >
 void
 modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::initialize()
 {
-	delayTime = 500000000 / baudrate;
+	delayTime = 500'000'000ul / baudrate;
 	if (delayTime == 0) delayTime = 1;
 
 	Sck::reset();

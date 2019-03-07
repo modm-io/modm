@@ -45,7 +45,7 @@ public:
 	~CanUsb();
 
 	bool
-	open(modm::Can::Bitrate canBitrate = modm::Can::kBps125);
+	open(bitrate_t canBitrate = kbps(125));
 
 	void
 	close();

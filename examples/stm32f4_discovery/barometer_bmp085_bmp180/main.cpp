@@ -131,7 +131,7 @@ main()
 	Usart2::initialize<Board::SystemClock, 115200_Bd>();
 
 	MyI2cMaster::connect<GpioB9::Sda, GpioB8::Scl>();
-	MyI2cMaster::initialize<Board::SystemClock, MyI2cMaster::Baudrate::Standard>();
+	MyI2cMaster::initialize<Board::SystemClock, 100_kHz>();
 
 	stream << "\n\nWelcome to BMP085 demo!\n\n";
 

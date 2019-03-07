@@ -15,7 +15,7 @@
 #	error 	"Don't include this file directly, use 'adc_{{ id }}.hpp' instead!"
 #endif
 
-template< class SystemClock, uint32_t frequency, uint16_t tolerance >
+template< class SystemClock, modm::frequency_t frequency, modm::percent_t tolerance >
 void
 modm::platform::Adc{{ id }}::initialize()
 {

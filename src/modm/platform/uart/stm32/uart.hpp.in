@@ -72,8 +72,7 @@ public:
 		Connector::connect();
 	}
 
-	template< class SystemClock, uint32_t baudrate,
-		uint16_t tolerance = modm::Tolerance::OnePercent >
+	template< class SystemClock, baudrate_t baudrate, percent_t tolerance=pct(1) >
 	static void modm_always_inline
 %% if options["buffered"]
 	initialize(uint32_t interruptPriority = 12, Parity parity = Parity::Disabled)

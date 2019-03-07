@@ -96,7 +96,7 @@ main()
 	Int::setInput(Gpio::InputType::PullUp);
 
 	// Configure MCP2515 and set the filters
-	device.initialize<8_MHz, modm::Can::Bitrate::kBps125>();
+	device.initialize<8_MHz, 125_kbps>();
 	device.setFilter(modm::accessor::asFlash(canFilter));
 
 	// Enable Interrupts

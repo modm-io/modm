@@ -84,7 +84,7 @@ main()
 	MODM_LOG_INFO << "Initializing Can ..." << modm::endl;
 	// Initialize Can
 	Can::connect<GpioInputB8::Rx, GpioOutputB9::Tx>(Gpio::InputType::PullUp);
-	Can::initialize<Board::SystemClock, Can::Bitrate::kBps125>(9);
+	Can::initialize<Board::SystemClock, 125_kbps>(9);
 
 	MODM_LOG_INFO << "Setting up Filter for Can ..." << modm::endl;
 	// Receive every message

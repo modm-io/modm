@@ -21,6 +21,7 @@
 
 #include <modm/communication/xpcc/backend/can/connector.hpp>
 #include <modm/communication/xpcc/backend/zeromq/connector.hpp>
+using namespace modm::literals;
 
 /**
  * Listens to a CAN bus connected by a CAN2USB and publishes modm messages with zeromq.
@@ -38,7 +39,7 @@
  */
 
 // Default CAN bitrate
-static constexpr modm::Can::Bitrate canBusBitRate = modm::Can::kBps125;
+static constexpr modm::bitrate_t canBusBitRate = 125_kbps;
 
 /* Either use an USB CAN2USB adaptor with modm Lawicel interpreter
    or use a CAN controller supported by Linux' SocketCAN.

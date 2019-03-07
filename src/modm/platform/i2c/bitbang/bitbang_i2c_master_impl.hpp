@@ -46,11 +46,11 @@ template <class Scl, class Sda>
 modm::I2cTransaction::Reading modm::platform::BitBangI2cMaster<Scl, Sda>::reading(nullptr, 0, modm::I2c::OperationAfterRead::Stop);
 
 template <class Scl, class Sda>
-template< class SystemClock, uint32_t baudrate, uint16_t tolerance >
+template< class SystemClock, modm::baudrate_t baudrate, modm::percent_t tolerance >
 void
 modm::platform::BitBangI2cMaster<Scl, Sda>::initialize()
 {
-	delayTime = uint32_t(250000000) / baudrate;
+	delayTime = 250'000'000ul / baudrate;
 	if (delayTime == 0) delayTime = 1;
 
 	SCL::set();

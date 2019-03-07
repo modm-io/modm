@@ -46,7 +46,7 @@ public:
 	 * @tparam	tolerance
 	 * 		the allowed absolute tolerance for the resulting clock rate
 	 */
-	template< class SystemClock, uint16_t tolerance = modm::Tolerance::ZeroPercent >
+	template< class SystemClock, percent_t tolerance=pct(0) >
 	static void
 	initialize()
 	{

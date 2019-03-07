@@ -79,8 +79,7 @@ public:
 	 * @tparam	tolerance
 	 * 		the allowed relative tolerance for the resulting clock frequency
 	 */
-	template< class SystemClock, uint32_t frequency=200000,
-			uint16_t tolerance = Tolerance::TenPercent >
+	template< class SystemClock, frequency_t frequency=200_kHz, percent_t tolerance=10_pct >
 	static void
 	initialize();
 

@@ -17,6 +17,7 @@
 #include <modm/platform/can/canusb.hpp>
 
 using namespace modm::platform;
+using namespace modm::literals;
 
 /**
  * Simple example that listens to a CAN bus connected by a CAN2USB.
@@ -33,7 +34,7 @@ using namespace modm::platform;
  * - All CAN messages on the bus should appear on the screen.
  */
 
-static constexpr modm::Can::Bitrate canBusBitRate = modm::Can::kBps125;
+static constexpr modm::bitrate_t canBusBitRate = 125_kbps;
 
 SerialInterface port("/dev/ttyUSB0", 115200);
 CanUsb<SerialInterface> canUsb(port);

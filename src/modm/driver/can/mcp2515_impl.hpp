@@ -111,9 +111,7 @@ modm::Mcp2515<SPI, CS, INT>::initializeWithPrescaler(
 
 
 template <typename SPI, typename CS, typename INT>
-template <int32_t externalClockFrequency,
-			uint32_t bitrate,
-			uint16_t tolerance>
+template <modm::frequency_t externalClockFrequency, modm::bitrate_t bitrate, modm::percent_t tolerance>
 bool
 modm::Mcp2515<SPI, CS, INT>::initialize()
 {

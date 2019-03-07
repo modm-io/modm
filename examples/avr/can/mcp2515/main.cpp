@@ -55,7 +55,7 @@ main()
 	Int::setInput(Gpio::InputType::PullUp);
 
 	// Configure MCP2515 and set the filters
-	mcp2515.initialize<8_MHz, modm::Can::Bitrate::kBps125>();
+	mcp2515.initialize<8_MHz, 125_kbps>();
 	mcp2515.setFilter(modm::accessor::asFlash(canFilter));
 
 	// Create a new message

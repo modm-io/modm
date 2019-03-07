@@ -86,7 +86,7 @@ main()
 	MODM_LOG_INFO << "\n\nPAT9125EL I2C example\n\n";
 
 	I2c::connect<Sda::Sda, Scl::Scl>();
-	I2c::initialize<Board::SystemClock, 400_kHz, modm::Tolerance::TwentyPercent>();
+	I2c::initialize<Board::SystemClock, 400_kHz, 20_pct>();
 
 	while (1) {
 		thread.update();

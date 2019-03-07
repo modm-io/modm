@@ -16,6 +16,7 @@ def init(module):
     module.description = "Math"
 
 def prepare(module, options):
+    module.depends(":math:units")
     return True
 
 def build(env):

@@ -197,8 +197,7 @@ public:
 	 * The ADC clock must not exceed 14 MHz.
 %% endif
 	 */
-	template< class SystemClock, uint32_t frequency=10000000,
-			uint16_t tolerance = modm::Tolerance::TenPercent >
+	template< class SystemClock, frequency_t frequency=MHz(10), percent_t tolerance=pct(10) >
 	static void
 	initialize();
 

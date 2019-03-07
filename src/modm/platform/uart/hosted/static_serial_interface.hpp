@@ -42,7 +42,7 @@ namespace modm
 			 * @tparam	baudrate
 			 *		desired baud rate in Hz
 			 */
-			template<uint32_t baudrate>
+			template<baudrate_t baudrate>
 			static bool
 			initialize(SerialInterface& interface);
 
