@@ -15,11 +15,13 @@
 #    error     "Don't include this file directly, use 'adc.hpp' instead!"
 #endif
 
+#include <modm/platform/clock/rcc.hpp>
+
 uint16_t
 modm::platform::Adc::initialize(const ClockMode clk,
                              const CalibrationMode cal)
 {
-    RCC->APB2ENR |= RCC_APB2ENR_ADC1EN;
+    Rcc::enable<Peripheral::Adc>();
 
     if (clk == ClockMode::Dedicated14MHzClock) {
         RCC->CR2 |= RCC_CR2_HSI14ON;

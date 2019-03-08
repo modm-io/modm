@@ -10,6 +10,7 @@
 // ----------------------------------------------------------------------------
 
 #include "board.hpp"
+#include <modm/platform/clock/rcc.hpp>
 
 extern void
 otm8009a_init(uint8_t);
@@ -18,15 +19,11 @@ otm8009a_init(uint8_t);
 void
 board_initialize_display(uint8_t ColorCoding)
 {
-	if (RCC->APB2ENR & RCC_APB2ENR_LTDCEN) return;
-	// Enable clock to LTDC interface
-	RCC->APB2ENR |= RCC_APB2ENR_LTDCEN;
-	RCC->APB2RSTR |=  RCC_APB2RSTR_LTDCRST;
-	RCC->APB2RSTR &= ~RCC_APB2RSTR_LTDCRST;
-	// Enable clock to DSI interface
-	RCC->APB2ENR |= RCC_APB2ENR_DSIEN;
-	RCC->APB2RSTR |=  RCC_APB2RSTR_DSIRST;
-	RCC->APB2RSTR &= ~RCC_APB2RSTR_DSIRST;
+	using namespace modm::platform;
+	if (Rcc::isEnabled<Peripheral::Ltdc>()) return;
+	// Enable clock to LTDC, DSI interface
+	Rcc::enable<Peripheral::Ltdc>();
+	Rcc::enable<Peripheral::Dsihost>();
 
 	{
 		// Expanded `HAL_DSI_Init()`:

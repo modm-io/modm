@@ -29,7 +29,6 @@ void
 modm::platform::Dma{{ id }}::enable()
 {
 	Rcc::enable<Peripheral::Dma{{id}}>();
-	Rcc::reset<Peripheral::Dma{{id}}>();
 }
 
 void

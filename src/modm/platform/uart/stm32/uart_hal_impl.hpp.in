@@ -53,7 +53,6 @@ void
 modm::platform::{{ name }}::enable()
 {
 	Rcc::enable<Peripheral::{{ uart_name ~ id }}>();
-	Rcc::reset<Peripheral::{{ uart_name ~ id }}>();
 	{{ peripheral }}->CR1 |= USART_CR1_UE;		// Uart Enable
 }
 

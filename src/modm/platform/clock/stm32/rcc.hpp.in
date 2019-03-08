@@ -441,12 +441,12 @@ public:
 	enable();
 
 	template< Peripheral peripheral >
-	static void
-	disable();
+	static bool
+	isEnabled();
 
 	template< Peripheral peripheral >
 	static void
-	reset();
+	disable();
 
 private:
 	struct flash_latency
@@ -454,7 +454,6 @@ private:
 		uint32_t latency;
 		uint32_t max_frequency;
 	};
-
 	static constexpr flash_latency
 	computeFlashLatency(uint32_t Core_Hz, uint16_t Core_mV);
 };

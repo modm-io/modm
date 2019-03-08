@@ -497,7 +497,6 @@ void
 modm::platform::I2cMaster{{ id }}::initializeWithPrescaler(uint32_t timingRegisterValue)
 {
 	Rcc::enable<Peripheral::I2c{{id}}>();
-	Rcc::reset<Peripheral::I2c{{id}}>();
 
 	// Disable the I2C peripheral which causes a software reset
 	I2C{{ id }}->CR1 &= ~I2C_CR1_PE;

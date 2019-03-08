@@ -74,22 +74,44 @@ def build(env):
     env.template("rcc.cpp.in")
     env.template("rcc.hpp.in")
 
-    all_peripherals = []
+    all_peripherals = set()
     all_drivers = [d for d in device._properties["driver"] if d["name"] not in ["gpio", "core"]]
     translate = lambda s: "".join(p.capitalize() for p in s.split("_"))
     for d in all_drivers:
         dname = translate(d["name"])
         if "instance" in d:
-            all_peripherals.extend([dname + translate(i) for i in d["instance"]])
+            all_peripherals.update(dname + translate(i) for i in d["instance"])
         else:
-            all_peripherals.append(dname)
-    all_peripherals = sorted(list(set(all_peripherals)))
+            all_peripherals.add(dname)
+    all_peripherals = sorted(list(all_peripherals))
 
     rcc_map = env.query(":cmsis:device:rcc-map")
-    rcc_map = {per:v for per,v in rcc_map.items() if per.capitalize() in all_peripherals}
+    rcc_enable = {}
+    rcc_reset = {}
+
+    for per, mode in rcc_map.items():
+        nper = per
+        # Fix CAN vs CAN1
+        if "Can" in all_peripherals and per == "CAN1":
+            per = "CAN"
+            nper = "CAN1"
+        # Fix ADC vs ADC1
+        if "Adc1" in all_peripherals and per == "ADC":
+            per = "ADC1"
+            nper = "ADC"
+        # Fix DSIHOST vs DSI
+        if "Dsihost" in all_peripherals and per == "DSI":
+            per = "Dsihost"
+            nper = "DSI"
+        if per.capitalize() not in all_peripherals:
+            continue
+        if "EN" in mode:
+            rcc_enable[per.capitalize()] = (nper, mode["EN"])
+        if "RST" in mode:
+            rcc_reset[nper] = mode["RST"]
 
     env.substitutions.update({
-        "peripherals": rcc_map.keys(),
-        "rcc_map": rcc_map,
+        "rcc_enable": rcc_enable,
+        "rcc_reset": rcc_reset,
     })
     env.template("rcc_impl.hpp.in")

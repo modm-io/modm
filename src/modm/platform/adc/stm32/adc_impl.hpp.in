@@ -15,6 +15,8 @@
 #	error 	"Don't include this file directly, use 'adc_{{ id }}.hpp' instead!"
 #endif
 
+#include <modm/platform/clock/rcc.hpp>
+
 template< class SystemClock, modm::frequency_t frequency, modm::percent_t tolerance >
 void
 modm::platform::Adc{{ id }}::initialize()
@@ -59,7 +61,7 @@ modm::platform::Adc{{ id }}::initialize()
 						 Prescaler::Div2
 			)));
 
-	RCC->APB2ENR |= RCC_APB2ENR_ADC{{ id }}EN;	// start ADC Clock
+	Rcc::enable<Peripheral::Adc{{id}}>();
 	ADC{{ id }}->CR2 |= ADC_CR2_ADON;			// switch on ADC
 
 	setPrescaler(prescaler);

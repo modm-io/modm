@@ -16,6 +16,7 @@
 #endif
 
 #include <modm/architecture/interface/delay.hpp>	// modm::delayMicroseconds
+#include <modm/platform/clock/rcc.hpp>
 
 void
 modm::platform::Adc{{ id }}::initialize(const ClockMode clk,
@@ -31,7 +32,7 @@ modm::platform::Adc{{ id }}::initialize(const ClockMode clk,
 %% if target["family"] in ["f3"]
 	RCC->AHBENR |= RCC_AHBENR_ADC{{ id_common }}EN;
 %% elif target["family"] in ["l4"]
-	RCC->AHB2ENR |= RCC_AHB2ENR_ADCEN;
+	Rcc::enable<Peripheral::Adc1>();
 %% endif
 
 %% if clock_mux
@@ -47,8 +48,6 @@ modm::platform::Adc{{ id }}::initialize(const ClockMode clk,
 	// reset ADC
 	// FIXME: not a good idea since you can only reset both
 	// ADC1/ADC2 or ADC3/ADC4 at once ....
-	// RCC->APB2RSTR |=  RCC_APB2RSTR_ADC{{ id }}RST;
-	// RCC->APB2RSTR &= ~RCC_APB2RSTR_ADC{{ id }}RST;
 
 	// set ADC "analog" clock source
 	if (clk != ClockMode::DoNotChange) {
@@ -90,7 +89,7 @@ modm::platform::Adc{{ id }}::disable(const bool blocking)
 %% if target["family"] in ["f3"]
 	RCC->AHBENR &= ~RCC_AHBENR_ADC{{ id_common }}EN;
 %% elif target["family"] in ["l4"]
-	RCC->AHB2ENR &= ~RCC_AHB2ENR_ADCEN;
+	Rcc::disable<Peripheral::Adc1>();
 %% endif
 }
 

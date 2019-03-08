@@ -300,7 +300,6 @@ namespace modm
 			enable()
 			{
 				Rcc::enable<Peripheral::{{ FMC | capitalize }}>();
-				Rcc::reset<Peripheral::{{ FMC | capitalize }}>();
 			}
 
 			static inline void

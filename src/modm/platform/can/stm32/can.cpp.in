@@ -20,6 +20,7 @@
 #include <modm/architecture/interface/assert.hpp>
 #include <modm/architecture/interface/interrupt.hpp>
 #include <modm/architecture/interface/delay.hpp>
+#include <modm/platform/clock/rcc.hpp>
 
 %% if id == ""
 #include "can.hpp"
@@ -49,26 +50,21 @@ modm::platform::Can{{ id }}::initializeWithPrescaler(
 		uint32_t interruptPriority, Mode startupMode, bool overwriteOnOverrun)
 {
 %% macro enable_reset(instance)
-	// enable clock
-	RCC->APB1ENR{{ apb_post }}  |=  RCC_APB1ENR{{ apb_post }}_{{ instance }}EN;
-
-	// reset controller
-	RCC->APB1RSTR{{ apb_post }} |=  RCC_APB1RSTR{{ apb_post }}_{{ instance }}RST;
-	RCC->APB1RSTR{{ apb_post }} &= ~RCC_APB1RSTR{{ apb_post }}_{{ instance }}RST;
+	Rcc::enable<Peripheral::Can{{ instance }}>();
 %% endmacro
 %% if type == "Slave"
 	// enable and reset master if disabled
-	if (!(RCC->APB1ENR{{ apb_post }} & RCC_APB1ENR{{ apb_post }}_{{ reg_other }}EN)) {
-	{{ enable_reset(reg_other) | lbuild.indent(4) }}
+	if (not Rcc::isEnabled<Peripheral::Can{{ other_instance }}>()) {
+	{{ enable_reset(other_instance) | lbuild.indent(4) }}
 	}
 %% endif
 %% if type == "Master"
 	// skip enable and reset if device has already been enabled by slave
-	if (!(RCC->APB1ENR{{ apb_post }} & RCC_APB1ENR{{ apb_post }}_{{ reg }}EN)) {
-	{{ enable_reset(reg) | lbuild.indent(4) }}
+	if (not Rcc::isEnabled<Peripheral::Can{{ own_instance }}>()) {
+	{{ enable_reset(own_instance) | lbuild.indent(4) }}
 	}
 %% else
-	{{ enable_reset(reg) }}
+	{{ enable_reset(id) }}
 %% endif
 
 	// CAN Master Reset

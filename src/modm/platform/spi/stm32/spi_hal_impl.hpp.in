@@ -20,7 +20,6 @@ void inline
 modm::platform::SpiHal{{ id }}::enable()
 {
 	Rcc::enable<Peripheral::Spi{{id}}>();
-	Rcc::reset<Peripheral::Spi{{id}}>();
 	SPI{{ id }}->CR1 |= SPI_CR1_SPE;		// SPI Enable
 }
 

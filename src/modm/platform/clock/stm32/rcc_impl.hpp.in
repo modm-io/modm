@@ -91,46 +91,64 @@ Rcc::updateCoreFrequency()
 	modm::clock::ns_per_loop = ::round({{loops}}000.f / (Core_Hz / 1'000'000));
 }
 
+constexpr bool
+rcc_check_enable(Peripheral peripheral)
+{
+	switch(peripheral) {
+	%% for peripheral in rcc_enable | sort
+		case Peripheral::{{ peripheral }}:
+	%% endfor
+			return true;
+		default:
+			return false;
+	}
+}
+
 template< Peripheral peripheral >
-inline void
+void
 Rcc::enable()
 {
+	static_assert(rcc_check_enable(peripheral),
+		"Rcc::enable() doesn't know this peripheral!");
+
 	__DSB();
-	%% for peripheral in peripherals | sort if "EN" in rcc_map[peripheral]
-	%% set register = rcc_map[peripheral]["EN"]
-	if constexpr (peripheral == Peripheral::{{ peripheral | capitalize }})
-	{ RCC->{{register}} |= RCC_{{register}}_{{peripheral}}EN; }
+	%% for peripheral, (st_per, bus) in rcc_enable.items() | sort
+	if constexpr (peripheral == Peripheral::{{ peripheral }})
+		if (not Rcc::isEnabled<peripheral>()) {
+			RCC->{{bus}} |= RCC_{{bus}}_{{st_per}}EN;{% if st_per in rcc_reset %} __DSB();
+			RCC->{{rcc_reset[st_per]}} |= RCC_{{rcc_reset[st_per]}}_{{st_per}}RST; __DSB();
+			RCC->{{rcc_reset[st_per]}} &= ~RCC_{{rcc_reset[st_per]}}_{{st_per}}RST;{% endif %}
+		}
 	%% endfor
 	__DSB();
 }
 
 template< Peripheral peripheral >
-inline void
+void
 Rcc::disable()
 {
+	static_assert(rcc_check_enable(peripheral),
+		"Rcc::disable() doesn't know this peripheral!");
+
 	__DSB();
-	%% for peripheral in peripherals | sort if "EN" in rcc_map[peripheral]
-	%% set register = rcc_map[peripheral]["EN"]
-	if constexpr (peripheral == Peripheral::{{ peripheral | capitalize }})
-	{ RCC->{{register}} &= ~RCC_{{register}}_{{peripheral}}EN; }
+	%% for peripheral, (st_per, bus) in rcc_enable.items() | sort
+	if constexpr (peripheral == Peripheral::{{ peripheral }})
+		RCC->{{bus}} &= ~RCC_{{bus}}_{{st_per}}EN;
 	%% endfor
 	__DSB();
 }
 
 template< Peripheral peripheral >
-inline void
-Rcc::reset()
+bool
+Rcc::isEnabled()
 {
-	__DSB();
-	%% for peripheral in peripherals | sort if "RST" in rcc_map[peripheral]
-	%% set register = rcc_map[peripheral]["RST"]
-	if constexpr (peripheral == Peripheral::{{ peripheral | capitalize }})
-	{
-		RCC->{{register}} |=  RCC_{{register}}_{{peripheral}}RST; __DSB();
-		RCC->{{register}} &= ~RCC_{{register}}_{{peripheral}}RST;
-	}
+	static_assert(rcc_check_enable(peripheral),
+		"Rcc::isEnabled() doesn't know this peripheral!");
+
+	%% for peripheral, (st_per, bus) in rcc_enable.items() | sort
+	if constexpr (peripheral == Peripheral::{{ peripheral }})
+		return RCC->{{bus}} & RCC_{{bus}}_{{st_per}}EN;
 	%% endfor
-	__DSB();
 }
 
 }   // namespace modm::platform

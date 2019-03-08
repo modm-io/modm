@@ -111,7 +111,8 @@ def prepare(module, options):
         ":architecture:delay",
         ":architecture:register",
         ":cmsis:device",
-        ":platform:gpio")
+        ":platform:gpio",
+        ":platform:rcc")
 
     for instance in listify(device.get_driver("adc")["instance"]):
         module.add_submodule(Instance(int(instance)))

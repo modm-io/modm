@@ -21,7 +21,6 @@ void
 modm::platform::Timer{{ id }}::enable()
 {
 	Rcc::enable<Peripheral::Tim{{id}}>();
-	Rcc::reset<Peripheral::Tim{{id}}>();
 }
 
 void

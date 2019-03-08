@@ -87,9 +87,9 @@ def get_substitutions(instance, device, env):
 
     subs = {
         "id": "" if instance == 0 else str(instance),
-        "apb_post": "1" if target["family"] in ["l4"] else "",
+        "own_instance": cm[instance].register,
+        "other_instance": cm[other].register if other in cm else None,
         "reg": "CAN" + cm[instance].register,
-        "reg_other": ("CAN" + cm[other].register) if other in cm else None,
         "type": cm[instance].type.name if not is_single else CanType.Single.name
     }
 
@@ -145,6 +145,7 @@ def prepare(module, options):
         ":debug",
         ":platform:can.common",
         ":platform:gpio",
+        ":platform:rcc",
         ":utils")
 
     driver = device.get_driver("can")

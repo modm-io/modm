@@ -76,6 +76,7 @@ def prepare(module, options):
         ":architecture:register",
         ":cmsis:device",
         ":platform:gpio",
+        ":platform:rcc",
         ":utils")
 
     for instance in listify(device.get_driver("adc")["instance"]):

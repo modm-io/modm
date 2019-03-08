@@ -25,7 +25,8 @@ def prepare(module, options):
         ":architecture:delay",
         ":architecture:register",
         ":cmsis:device",
-        ":platform:gpio")
+        ":platform:gpio",
+        ":platform:rcc")
     return True
 
 def build(env):

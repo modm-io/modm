@@ -39,7 +39,6 @@ public:
 	enable()
 	{
 		Rcc::enable<Peripheral::Rng>();
-		Rcc::reset<Peripheral::Rng>();
 		RNG->CR = RNG_CR_RNGEN;
 	}
 

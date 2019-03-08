@@ -26,6 +26,7 @@ def prepare(module, options):
         ":debug",
         ":driver:ft6x06",
         ":platform:clock",
+        ":platform:rcc",
         ":platform:core",
         ":platform:gpio",
         ":platform:i2c:1",
