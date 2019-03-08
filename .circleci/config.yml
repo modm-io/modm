@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  unittests:
+  unittests-linux-generic:
     docker:
       - image: modm/modm-build:latest
     steps:
@@ -37,6 +37,14 @@ jobs:
           name: Compile AVR Unittests
           command: |
             (cd test && make compile-al-avreb-can)
+      - run:
+          name: Linux Examples
+          command: |
+            (cd examples && ../tools/scripts/examples_compile.py linux zmq)
+      - run:
+          name: Generic Examples
+          command: |
+            (cd examples && ../tools/scripts/examples_compile.py generic)
       - run:
           name: Execute Python Scripts
           command: |
@@ -110,21 +118,6 @@ jobs:
           name: Examples AVR Series
           command: |
             (cd examples && ../tools/scripts/examples_compile.py avr arduino_uno)
-
-  linux-generic-examples:
-    docker:
-      - image: modm/modm-build:latest
-    steps:
-      - checkout
-      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
-      - run:
-          name: Linux Examples
-          command: |
-            (cd examples && ../tools/scripts/examples_compile.py linux zmq)
-      - run:
-          name: Generic Examples
-          command: |
-            (cd examples && ../tools/scripts/examples_compile.py generic)
 
   avr-compile-all:
     docker:
@@ -257,6 +250,22 @@ jobs:
       - image: modm/modm-build:latest
     steps:
       - checkout
+      - run:
+          command: |
+            (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
+      - run:
+          name: Build Homepage
+          command: |
+            python3 tools/scripts/synchronize_docs.py
+            (cd examples/stm32f469_discovery/blink; lbuild -D ::generate_module_docs=True build -m "modm:**")
+            (cd docs/src/reference && ln -s ../../../examples/stm32f469_discovery/blink/modm/docs/module)
+            (cd docs && mkdocs build)
+
+  build-docs-upload:
+    docker:
+      - image: modm/modm-build:latest
+    steps:
+      - checkout
       - add_ssh_keys:
           fingerprints:
             - "8c:e7:b6:51:2a:40:66:e6:e9:50:ea:fe:38:49:1d:3f"
@@ -288,47 +297,49 @@ workflows:
   build:
     jobs:
       - stm32f4-examples
-      - linux-generic-examples
-      - unittests
+      - unittests-linux-generic
       - avr-examples
       - stm32-examples
 
       - avr-compile-all:
           requires:
-            - unittests
+            - unittests-linux-generic
             - avr-examples
       - stm32f0-compile-all:
           requires:
-            - unittests
+            - unittests-linux-generic
             - stm32-examples
       - stm32f1-compile-all:
           requires:
-            - unittests
+            - unittests-linux-generic
             - stm32-examples
       - stm32f2-compile-all:
           requires:
-            - unittests
+            - unittests-linux-generic
       - stm32f3-compile-all:
           requires:
-            - unittests
+            - unittests-linux-generic
             - stm32-examples
       - stm32f4-compile-all:
           requires:
-            - unittests
+            - unittests-linux-generic
             - stm32f4-examples
       - stm32f7-compile-all:
           requires:
-            - unittests
+            - unittests-linux-generic
             - stm32-examples
       - stm32g0-compile-all:
           requires:
-            - unittests
+            - unittests-linux-generic
             - stm32-examples
       - stm32l4-compile-all:
           requires:
-            - unittests
+            - unittests-linux-generic
             - stm32-examples
-      - build-docs:
+      - build-docs-upload:
+          filters:
+            branches:
+              only: develop
           requires:
             - avr-compile-all
             - stm32f0-compile-all
@@ -339,4 +350,14 @@ workflows:
             - stm32f7-compile-all
             - stm32g0-compile-all
             - stm32l4-compile-all
-
+      - build-docs:
+          filters:
+            branches:
+              only: /^pull\/.*$/
+          requires:
+            - avr-compile-all
+            - stm32f0-compile-all
+            - stm32f1-compile-all
+            - stm32f2-compile-all
+            - stm32f3-compile-all
+            - stm32g0-compile-all
