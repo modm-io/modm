@@ -16,12 +16,15 @@ def init(module):
     module.name = "max7219"
     module.description = "MAX7219 Display"
 
+
 def prepare(module, options):
     module.depends(
         ":architecture:spi",
         ":ui:display")
     return True
 
+
 def build(env):
     env.outbasepath = "modm/src/modm/driver/display"
+    env.copy("max7219.hpp")
     env.copy("max7219matrix.hpp")
