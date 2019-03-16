@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2014, Niklas Hauser
  * Copyright (c) 2014, Sascha Schade
+ * Copyright (c) 2019, Fabian Greif
  *
  * This file is part of the modm project.
  *
@@ -8,7 +9,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-// ----------------------------------------------------------------------------
 
 #ifndef MODM_MAX7219_HPP
 #define MODM_MAX7219_HPP
@@ -17,7 +17,6 @@
 
 namespace modm
 {
-
 /**
  * Some light hardware abstractions of MAX7219
  *
@@ -30,18 +29,36 @@ namespace modm
  * @author	Sascha Schade
  * @ingroup	modm_driver_max7219
  */
-template < typename SPI, typename CS, uint8_t MODULES = 1 >
+template <typename SPI, typename CS, uint8_t MODULES = 1>
 class Max7219
 {
 public:
+    static constexpr uint8_t MAX7219_REG_NOOP = 0x0;
+    static constexpr uint8_t MAX7219_REG_DIGIT0 = 0x1;
+    static constexpr uint8_t MAX7219_REG_DIGIT1 = 0x2;
+    static constexpr uint8_t MAX7219_REG_DIGIT2 = 0x3;
+    static constexpr uint8_t MAX7219_REG_DIGIT3 = 0x4;
+    static constexpr uint8_t MAX7219_REG_DIGIT4 = 0x5;
+    static constexpr uint8_t MAX7219_REG_DIGIT5 = 0x6;
+    static constexpr uint8_t MAX7219_REG_DIGIT6 = 0x7;
+    static constexpr uint8_t MAX7219_REG_DIGIT7 = 0x8;
+    static constexpr uint8_t MAX7219_REG_DECODEMODE = 0x9;
+    static constexpr uint8_t MAX7219_REG_INTENSITY = 0xA;
+    static constexpr uint8_t MAX7219_REG_SCANLIMIT = 0xB;
+    static constexpr uint8_t MAX7219_REG_SHUTDOWN = 0xC;
+    static constexpr uint8_t MAX7219_REG_DISPLAYTEST = 0xF;
+
+    /**
+     * Initialize as an 8x8 led matrix.
+     */
     static void
-    initialize()
+    initializeMatrix()
     {
         // show all 8 digits
         sendByte(MAX7219_REG_SCANLIMIT, 7);
 
         // using a LED matrix (not digits)
-        sendByte(MAX7219_REG_DECODEMODE, 0);    
+        sendByte(MAX7219_REG_DECODEMODE, 0);
 
         // no display test
         sendByte(MAX7219_REG_DISPLAYTEST, 0);
@@ -58,8 +75,9 @@ public:
     static void
     clear()
     {
-    	// Iterate column 0 to 7 which is addressed 1 to 8
-        for (uint8_t col = 1; col <= 8; ++col) {
+        // Iterate column 0 to 7 which is addressed 1 to 8
+        for (uint8_t col = 1; col <= 8; ++col)
+        {
             sendByte(col, 0);
         };
     }
@@ -70,13 +88,13 @@ public:
      * @param	data	A pointer to the data, at least MODULES bytes long
      */
     static void
-    setRow(uint8_t col, uint8_t * data)
+    setRow(uint8_t col, uint8_t* data)
     {
         CS::reset();
         for (uint8_t ii = 0; ii < MODULES; ++ii)
         {
-			SPI::transferBlocking(col + 1);
-			SPI::transferBlocking(*data++);
+            SPI::transferBlocking(col + 1);
+            SPI::transferBlocking(*data++);
         }
         CS::set();
     }
@@ -93,21 +111,6 @@ public:
     }
 
 private:
-    static constexpr uint8_t MAX7219_REG_NOOP        = 0x0;
-    static constexpr uint8_t MAX7219_REG_DIGIT0      = 0x1;
-    static constexpr uint8_t MAX7219_REG_DIGIT1      = 0x2;
-    static constexpr uint8_t MAX7219_REG_DIGIT2      = 0x3;
-    static constexpr uint8_t MAX7219_REG_DIGIT3      = 0x4;
-    static constexpr uint8_t MAX7219_REG_DIGIT4      = 0x5;
-    static constexpr uint8_t MAX7219_REG_DIGIT5      = 0x6;
-    static constexpr uint8_t MAX7219_REG_DIGIT6      = 0x7;
-    static constexpr uint8_t MAX7219_REG_DIGIT7      = 0x8;
-    static constexpr uint8_t MAX7219_REG_DECODEMODE  = 0x9;
-    static constexpr uint8_t MAX7219_REG_INTENSITY   = 0xA;
-    static constexpr uint8_t MAX7219_REG_SCANLIMIT   = 0xB;
-    static constexpr uint8_t MAX7219_REG_SHUTDOWN    = 0xC;
-    static constexpr uint8_t MAX7219_REG_DISPLAYTEST = 0xF;
-
     static void
     sendByte(uint8_t cmd, uint8_t data)
     {
@@ -116,12 +119,12 @@ private:
         // Write the command multiple times, for each MODULES
         for (uint8_t ii = 0; ii < MODULES; ++ii)
         {
-			SPI::transferBlocking(cmd);
-			SPI::transferBlocking(data);
+            SPI::transferBlocking(cmd);
+            SPI::transferBlocking(data);
         }
         CS::set();
     }
 };
-}
+}  // namespace modm
 
 #endif
