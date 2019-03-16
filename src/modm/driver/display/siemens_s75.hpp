@@ -17,8 +17,7 @@
 
 #include <modm/architecture/interface/delay.hpp>
 #include <modm/driver/bus/bitbang_memory_interface.hpp>
-
-#include <modm/ui/display/buffered_graphic_display.hpp>
+#include <modm/ui/display/monochrome_graphic_display_buffered_vertical.hpp>
 
 namespace modm
 {
@@ -39,7 +38,7 @@ namespace modm
 		uint16_t  HEIGHT,
 		modm::Orientation ORIENTATION>
 	class SiemensS75Common :
-			public BufferedGraphicDisplay<WIDTH, HEIGHT>
+			public MonochromeGraphicDisplayBufferedVertical<WIDTH, HEIGHT>
 	{
 	public:
 		SiemensS75Common(MEMORY& interface) :

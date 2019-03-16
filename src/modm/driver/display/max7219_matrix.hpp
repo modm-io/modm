@@ -13,9 +13,9 @@
 #ifndef MODM_MAX7219_MATRIX_HPP
 #define MODM_MAX7219_MATRIX_HPP
 
-#include <modm/ui/display/buffered_graphic_display.hpp>
-
 #include "max7219.hpp"
+
+#include <modm/ui/display/monochrome_graphic_display_buffered_vertical.hpp>
 
 namespace modm
 {
@@ -49,68 +49,69 @@ namespace modm
  * 8x8 LED modules with MAX7219 are easily and cheaply available.
  * @ingroup modm_driver_max7219
  */
-template < typename SPI, typename CS, uint8_t COLUMNS = 1, uint8_t ROWS = 1 >
-class Max7219matrix : public BufferedGraphicDisplay< 8 * COLUMNS, 8 * ROWS >
+template <typename SPI, typename CS, uint8_t COLUMNS = 1, uint8_t ROWS = 1>
+class Max7219Matrix : public MonochromeGraphicDisplayBufferedVertical<8 * COLUMNS, 8 * ROWS>
 {
 public:
-	/**
-	 * \brief	Initialize the display
-	 */
-	void
-	initialize();
+    virtual ~Max7219Matrix() = default;
 
-	/**
-	 * \brief	Update the display with the content of the RAM buffer
-	 */
-	virtual void
-	update();
+    /**
+     * \brief	Initialize the display
+     */
+    void
+    initialize();
+
+    /**
+     * \brief	Update the display with the content of the RAM buffer
+     */
+    virtual void
+    update() override;
 
 protected:
-	// Instance of a daisy chain of COLUMNS * ROWS modules.
-	Max7219< SPI, CS, COLUMNS * ROWS > max;
-
+    // Instance of a daisy chain of COLUMNS * ROWS modules.
+    Max7219<SPI, CS, COLUMNS * ROWS> max;
 };
-} // modm namespace
+}  // namespace modm
 
 /* ------------------- Implementation --------------------- */
 
-template < typename SPI, typename CS, uint8_t COLUMNS, uint8_t ROWS >
+template <typename SPI, typename CS, uint8_t COLUMNS, uint8_t ROWS>
 void
-modm::Max7219matrix< SPI, CS, COLUMNS, ROWS >::initialize()
+modm::Max7219Matrix<SPI, CS, COLUMNS, ROWS>::initialize()
 {
-	max.initialize();
-	max.clear();
+    max.initializeMatrix();
+    this->clear();
 }
 
-template < typename SPI, typename CS, uint8_t COLUMNS, uint8_t ROWS >
+template <typename SPI, typename CS, uint8_t COLUMNS, uint8_t ROWS>
 void
-modm::Max7219matrix< SPI, CS, COLUMNS, ROWS >::update()
+modm::Max7219Matrix<SPI, CS, COLUMNS, ROWS>::update()
 {
-	// Iterate column 0 to 7 of MAX LED driver
-	for (uint8_t ledCol = 0; ledCol < 8; ++ledCol)
-	{
-		uint8_t buf[COLUMNS * ROWS];
-		uint8_t idx = 0;
+    // Iterate column 0 to 7 of MAX LED driver
+    for (uint8_t ledCol = 0; ledCol < 8; ++ledCol)
+    {
+        uint8_t buf[COLUMNS * ROWS];
+        uint8_t idx = 0;
 
-		// Iterate over display buffer
-		// Luckily each LED Matrix has as many pixels vertical
-		// as pixels are stored in one byte.
+        // Iterate over display buffer
+        // Luckily each LED Matrix has as many pixels vertical
+        // as pixels are stored in one byte.
 
-		// col is the column of LED modules and
-		// a group of eight pixels horizontal
-		for (uint8_t col = 0; col < COLUMNS; ++col)
-		{
-			// row is the row of LED modules and
-			// a group of eight pixels vertical
-			for (uint8_t row = 0; row < ROWS; ++row)
-			{
-				buf[idx] = this->display_buffer[col * 8 + ledCol][row];
-				++idx;
-			}
-		}
+        // col is the column of LED modules and
+        // a group of eight pixels horizontal
+        for (uint8_t col = 0; col < COLUMNS; ++col)
+        {
+            // row is the row of LED modules and
+            // a group of eight pixels vertical
+            for (uint8_t row = 0; row < ROWS; ++row)
+            {
+                buf[idx] = this->display_buffer[col * 8 + ledCol][row];
+                ++idx;
+            }
+        }
 
-		max.setRow(ledCol, buf);
-	}
+        max.setRow(ledCol, buf);
+    }
 }
 
-#endif	// MODM_MAX7219_MATRIX_HPP
+#endif  // MODM_MAX7219_MATRIX_HPP

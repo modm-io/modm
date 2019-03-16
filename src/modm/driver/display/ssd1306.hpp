@@ -13,10 +13,10 @@
 #ifndef MODM_SSD1306_HPP
 #define MODM_SSD1306_HPP
 
-#include <modm/ui/display/buffered_graphic_display.hpp>
 #include <modm/architecture/interface/i2c_device.hpp>
 #include <modm/architecture/utils.hpp>
 #include <modm/processing/timer.hpp>
+#include <modm/ui/display/monochrome_graphic_display_buffered_vertical.hpp>
 
 namespace modm
 {
@@ -153,7 +153,7 @@ public:
  * @ingroup	modm_driver_ssd1306
  */
 template < class I2cMaster, uint8_t Height = 64 >
-class Ssd1306 : public ssd1306, public BufferedGraphicDisplay<128, Height>,
+class Ssd1306 : public ssd1306, public MonochromeGraphicDisplayBufferedVertical<128, Height>,
 				public I2cDevice<I2cMaster, 2, ssd1306::DataTransmissionAdapter<Height>>
 {
 	static_assert((Height == 64) or (Height == 32), "Display height must be either 32 or 64 pixel!");

@@ -12,7 +12,7 @@
 #ifndef MODM_NOKIA5110_HPP
 #define MODM_NOKIA5110_HPP
 
-#include <modm/ui/display/buffered_graphic_display.hpp>
+#include <modm/ui/display/monochrome_graphic_display_buffered_vertical.hpp>
 
 namespace modm
 {
@@ -28,7 +28,7 @@ namespace modm
  * \ingroup modm_driver_nokia5110
  */
 template < typename Spi, typename Ce, typename Dc, typename Reset >
-class Nokia5110 : public BufferedGraphicDisplay< 84, 48 >
+class Nokia5110 : public MonochromeGraphicDisplayBufferedVertical< 84, 48 >
 {
 public:
 	void

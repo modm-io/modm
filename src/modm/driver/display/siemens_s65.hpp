@@ -16,8 +16,7 @@
 #define MODM_SIEMENS_S65_HPP
 
 #include <modm/architecture/interface/delay.hpp>
-
-#include <modm/ui/display/buffered_graphic_display.hpp>
+#include <modm/ui/display/monochrome_graphic_display_buffered_vertical.hpp>
 
 // to enable this define add it to your ``project.cfg`` and
 // include <modm_config.hpp> before including this file.
@@ -68,7 +67,7 @@ namespace modm
 	/// \ingroup	modm_driver_siemens_s65
 	template <typename SPI, typename CS, typename RS, typename Reset>
 	class SiemensS65Portrait :
-		public BufferedGraphicDisplay<132, 176>,
+		public MonochromeGraphicDisplayBufferedVertical<132, 176>,
 		public SiemensS65Common<SPI, CS, RS, Reset>
 	{
 	public:
@@ -91,7 +90,7 @@ namespace modm
 	 */
 	template <typename SPI, typename CS, typename RS, typename Reset>
 	class SiemensS65Landscape :
-		public BufferedGraphicDisplay<176, 136>,
+		public MonochromeGraphicDisplayBufferedVertical<176, 136>,
 		public SiemensS65Common<SPI, CS, RS, Reset>
 	{
 	public:

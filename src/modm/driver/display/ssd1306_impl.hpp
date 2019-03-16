@@ -59,7 +59,10 @@ modm::Ssd1306<I2cMaster, Height>::startWriteDisplay()
 {
 	RF_BEGIN();
 
-	RF_WAIT_UNTIL( this->transaction.configureDisplayWrite(this->display_buffer, (this->DisplayBufferWidth * this->DisplayBufferHeight)) and this->startTransaction() );
+	RF_WAIT_UNTIL(
+	    this->transaction.configureDisplayWrite(this->display_buffer,
+                                                (this->displayBufferWidth * this->displayBufferHeight))
+	              and this->startTransaction());
 
 	RF_END();
 }
