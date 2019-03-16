@@ -12,7 +12,7 @@
 
 #include <modm/board.hpp>
 #include <modm/processing/timer.hpp>
-#include <modm/driver/display/max7219matrix.hpp>
+#include <modm/driver/display/max7219_matrix.hpp>
 using namespace modm::literals;
 
 /**
@@ -43,7 +43,7 @@ typedef GpioOutputE5 Clk;
 typedef BitBangSpiMaster< Clk, Data > Spi;
 
 // The array of 3 modules which all are placed horizontally
-modm::Max7219matrix<Spi, Cs, 3, 1> ledMatrixDisplay;
+modm::Max7219Matrix<Spi, Cs, 3, 1> ledMatrixDisplay;
 
 // ----------------------------------------------------------------------------
 int

@@ -38,7 +38,7 @@ class MonochromeGraphicDisplayBufferedHorizontal : public GraphicDisplay
     static_assert((Width % 8) == 0, "width must be a multiple of 8");
 
     static_assert(Width > 0, "width must be greater than 0");
-    static_assert(Height > 0, "width must be greater than 0");
+    static_assert(Height > 0, "height must be greater than 0");
 
 public:
     static constexpr int16_t displayBufferWidth = Width / 8;

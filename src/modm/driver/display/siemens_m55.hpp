@@ -16,8 +16,7 @@
 #define MODM_SIEMENS_M55_HPP
 
 #include <modm/architecture/interface/delay.hpp>
-
-#include <modm/ui/display/buffered_graphic_display.hpp>
+#include <modm/ui/display/monochrome_graphic_display_buffered_vertical.hpp>
 
 namespace modm
 {
@@ -29,7 +28,7 @@ namespace modm
 	 * \ingroup	modm_driver_siemens_m55
 	 */
 	template <typename SPI, typename CS, typename RS, typename Reset>
-	class SiemensM55 : public BufferedGraphicDisplay<101, 80>
+	class SiemensM55 : public MonochromeGraphicDisplayBufferedVertical<101, 80>
 	{
 	public:
 		void

@@ -53,7 +53,8 @@ public:
     inline void
     initialize()
     {
-        mDriver.initialize();
+        mDriver.initializeMatrix();
+        this->clear();
     }
 
     /**
