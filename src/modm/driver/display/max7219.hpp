@@ -33,20 +33,23 @@ template <typename SPI, typename CS, uint8_t MODULES = 1>
 class Max7219
 {
 public:
-    static constexpr uint8_t MAX7219_REG_NOOP = 0x0;
-    static constexpr uint8_t MAX7219_REG_DIGIT0 = 0x1;
-    static constexpr uint8_t MAX7219_REG_DIGIT1 = 0x2;
-    static constexpr uint8_t MAX7219_REG_DIGIT2 = 0x3;
-    static constexpr uint8_t MAX7219_REG_DIGIT3 = 0x4;
-    static constexpr uint8_t MAX7219_REG_DIGIT4 = 0x5;
-    static constexpr uint8_t MAX7219_REG_DIGIT5 = 0x6;
-    static constexpr uint8_t MAX7219_REG_DIGIT6 = 0x7;
-    static constexpr uint8_t MAX7219_REG_DIGIT7 = 0x8;
-    static constexpr uint8_t MAX7219_REG_DECODEMODE = 0x9;
-    static constexpr uint8_t MAX7219_REG_INTENSITY = 0xA;
-    static constexpr uint8_t MAX7219_REG_SCANLIMIT = 0xB;
-    static constexpr uint8_t MAX7219_REG_SHUTDOWN = 0xC;
-    static constexpr uint8_t MAX7219_REG_DISPLAYTEST = 0xF;
+    enum class Register : uint8_t
+    {
+        noop = 0x0,
+        digit0 = 0x1,
+        digit1 = 0x2,
+        digit2 = 0x3,
+        digit3 = 0x4,
+        digit4 = 0x5,
+        digit5 = 0x6,
+        digit6 = 0x7,
+        digit7 = 0x8,
+        decodeMode = 0x9,
+        intensity = 0xA,
+        scanLimit = 0xB,
+        shutdown = 0xC,
+        displayTest = 0xF,
+    };
 
     /**
      * Initialize as an 8x8 led matrix.
@@ -55,13 +58,13 @@ public:
     initializeMatrix()
     {
         // show all 8 digits
-        sendByte(MAX7219_REG_SCANLIMIT, 7);
+        setRegister(Register::scanLimit, 7);
 
         // using a LED matrix (not digits)
-        sendByte(MAX7219_REG_DECODEMODE, 0);
+        setRegister(Register::decodeMode, 0);
 
         // no display test
-        sendByte(MAX7219_REG_DISPLAYTEST, 0);
+        setRegister(Register::displayTest, 0);
 
         clear();
 
@@ -69,16 +72,22 @@ public:
         setBrightness(15);
 
         // not in shutdown mode (i.e start it up)
-        sendByte(MAX7219_REG_SHUTDOWN, 1);
+        setRegister(Register::shutdown, 1);
     }
 
     static void
     clear()
     {
         // Iterate column 0 to 7 which is addressed 1 to 8
-        for (uint8_t col = 1; col <= 8; ++col)
+        for (uint8_t col = 0; col < 8; ++col)
         {
-            sendByte(col, 0);
+            CS::reset();
+            for (uint8_t i = 0; i < MODULES; ++i)
+            {
+                SPI::transferBlocking(col + 1);
+                SPI::transferBlocking(0);
+            }
+            CS::set();
         };
     }
 
@@ -91,7 +100,7 @@ public:
     setRow(uint8_t col, uint8_t* data)
     {
         CS::reset();
-        for (uint8_t ii = 0; ii < MODULES; ++ii)
+        for (uint8_t i = 0; i < MODULES; ++i)
         {
             SPI::transferBlocking(col + 1);
             SPI::transferBlocking(*data++);
@@ -107,19 +116,18 @@ public:
     static void
     setBrightness(uint8_t intensity)
     {
-        sendByte(MAX7219_REG_INTENSITY, intensity % 16);
+        setRegister(Register::intensity, intensity % 16);
     }
 
-private:
     static void
-    sendByte(uint8_t cmd, uint8_t data)
+    setRegister(Register reg, uint8_t data)
     {
         CS::reset();
 
         // Write the command multiple times, for each MODULES
-        for (uint8_t ii = 0; ii < MODULES; ++ii)
+        for (uint8_t i = 0; i < MODULES; ++i)
         {
-            SPI::transferBlocking(cmd);
+            SPI::transferBlocking(static_cast<uint8_t>(reg));
             SPI::transferBlocking(data);
         }
         CS::set();
