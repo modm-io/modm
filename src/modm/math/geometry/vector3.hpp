@@ -205,7 +205,7 @@ namespace modm
 	template<typename T, typename U>
 	static inline Vector<U, 3> operator * (const Matrix<T, 3, 3> &lhs, const Vector<U, 3> &rhs)
 	{
-		return lhs * rhs.asTMatrix();
+		return lhs * rhs.asMatrix();
 	}
 
 
