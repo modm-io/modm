@@ -42,6 +42,8 @@ class SpiMaster{{ id }} : public modm::SpiMaster
 	static void *context;
 	static ConfigurationHandler configuration;
 public:
+	using Hal = SpiHal{{ id }};
+
 	/// Spi Data Mode, Mode0 is the most common mode
 	enum class
 	DataMode : uint32_t

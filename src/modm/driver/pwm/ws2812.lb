@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2019, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.parent = "driver"
+    module.name = "ws2812"
+    module.description = """\
+# WS2812 Driver
+
+Drives any number of chained WS2812 LEDs using a 3-bit SPI encoding
+(0 -> 100, 1 -> 110) running at 3 MHz.
+Thus, writing one LED takes 24µs and 9 bytes of memory.
+
+There are several caveats:
+
+1. This only provides a blocking write API, due to technical limitations.
+2. Atomicity is not enforced, this should be done externally if required.
+3. The memory footprint is 3x as large, due to the bit stuffing for SPI.
+4. There is no enforced reset period of at least 50µs after the write is finished,
+   it is up to the user to not trigger another write too early.
+
+This driver directly accesses the STM32 HAL to keep the transmit register full,
+due to a lack of DMA capability in modm, thus this driver is STM32-only for now.
+"""
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:spi",
+        ":math:units")
+    return options[":target"].identifier.platform == "stm32"
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/pwm"
+    env.copy("ws2812b.hpp")

@@ -214,6 +214,7 @@ can easily configure them for you specific needs.
 <td align="center">VL53L0</td>
 </tr><tr>
 <td align="center">VL6180</td>
+<td align="center">WS2812</td>
 </tr>
 </table>
 <!--/drivertable-->
