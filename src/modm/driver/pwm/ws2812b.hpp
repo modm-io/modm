@@ -38,12 +38,7 @@ public:
 
 	Ws2812b()
 	{
-		size_t ii=0;
-		for (;ii < length; ii += 3)
-		{
-			*reinterpret_cast<uint32_t*>(rgb + ii) = base_mask;
-		}
-		rgb[length] = 0;
+		clear();
 	}
 
 	template< class SystemClock >
@@ -54,6 +49,17 @@ public:
 		SpiMaster::template initialize<SystemClock, MHz(3), pct(10)>();
 		SpiMaster::setDataOrder(SpiMaster::DataOrder::LsbFirst);
 		SpiMaster::Hal::write(uint8_t(0));
+	}
+
+	void
+	clear()
+	{
+		size_t ii=0;
+		for (;ii < length; ii += 3)
+		{
+			*reinterpret_cast<uint32_t*>(rgb + ii) = base_mask;
+		}
+		rgb[length] = 0;
 	}
 
 	void
