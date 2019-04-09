@@ -44,7 +44,7 @@ namespace modm
 	{
 		/// @ingroup modm_math_units
 		/// @{
-		constexpr operator""_Hz(unsigned long long int value);
+		constexpr operator""_Hz(T value);
 		constexpr operator""_kHz(T value);
 		constexpr operator""_MHz(T value);
 

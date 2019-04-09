@@ -14,12 +14,18 @@
 def init(module):
     module.parent = "driver"
     module.name = "pca9548a"
+    module.description = """\
+PCA9548A/TCA9548A I2C Switch
+
+This bidirectional 8-channel switch with reset
+can be used to multiplex I2C busses.
+"""
 
 def prepare(module, options):
     module.depends(
         ":architecture:i2c.device",
         ":architecture:i2c.multiplexer",
-        ":processing:resumable",)
+        ":processing:resumable")
     return True
 
 def build(env):
