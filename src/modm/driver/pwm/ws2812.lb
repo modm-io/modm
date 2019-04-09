@@ -36,7 +36,8 @@ due to a lack of DMA capability in modm, thus this driver is STM32-only for now.
 def prepare(module, options):
     module.depends(
         ":architecture:spi",
-        ":math:units")
+        ":math:units",
+        ":ui:color")
     return options[":target"].identifier.platform == "stm32"
 
 def build(env):

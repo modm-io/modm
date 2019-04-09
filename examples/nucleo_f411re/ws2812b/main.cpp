@@ -35,9 +35,9 @@ main()
 		for (size_t ii=0; ii < leds.size; ii++)
 		{
 			leds.setColor(ii,
-						  modm::ui::table22_8_256[r*3/2],
-						  modm::ui::table22_8_256[g*3/2],
-						  modm::ui::table22_8_256[b*3/2]);
+						  {modm::ui::table22_8_256[r*3/2],
+						   modm::ui::table22_8_256[g*3/2],
+						   modm::ui::table22_8_256[b*3/2]});
 			if (r++ >= max) r = 0;
 			if (g++ >= max) g = 0;
 			if (b++ >= max) b = 0;

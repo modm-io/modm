@@ -12,6 +12,7 @@
 #pragma once
 #include <modm/math/units.hpp>
 #include <modm/architecture/interface/spi_master.hpp>
+#include <modm/ui/color.hpp>
 
 namespace modm
 {
@@ -24,13 +25,20 @@ class Ws2812b
 	static constexpr uint32_t clear_mask = base_mask << 1;
 
 	static constexpr size_t length = LEDs * 9;
-	uint8_t rgb[length + 1]; // +1 for zero byte for reset
+	uint8_t data[length + 1]; // +1 for zero byte for reset
 
 	static constexpr uint16_t
 	spread(uint8_t nibble)
 	{
 		return ((nibble & 0b0001) << 10) | ((nibble & 0b0010) << 6) |
 			   ((nibble & 0b0100) <<  5) | ((nibble & 0b1000) << 1);
+	}
+
+	static constexpr uint8_t
+	gather(uint32_t pattern)
+	{
+		return ((pattern >> 10) & 0b0001) | ((pattern >> 6) & 0b0010) |
+			   ((pattern >> 5) & 0b0100) | ((pattern >> 1) & 0b1000);
 	}
 
 public:
@@ -57,31 +65,46 @@ public:
 		size_t ii=0;
 		for (;ii < length; ii += 3)
 		{
-			*reinterpret_cast<uint32_t*>(rgb + ii) = base_mask;
+			*reinterpret_cast<uint32_t*>(data + ii) = base_mask;
 		}
-		rgb[length] = 0;
+		data[length] = 0;
 	}
 
-	void
-	setColor(size_t index, uint8_t r, uint8_t g, uint8_t b)
+	void inline
+	setColor(size_t index, const color::Rgb &color)
 	{
 		if (index >= LEDs) return;
 
-		const uint8_t color[3] = {g, r, b};
+		const uint8_t colors[3] = {color.green, color.red, color.blue};
 		for (size_t ii = 0; ii < 3; ii++)
 		{
-			const uint32_t c = (spread(color[ii]) << 12) | spread(color[ii] >> 4);
-			uint32_t *const value = reinterpret_cast<uint32_t*>(rgb + index * 9 + ii*3);
+			const uint32_t c = (spread(colors[ii]) << 12) | spread(colors[ii] >> 4);
+			uint32_t *const value = reinterpret_cast<uint32_t*>(data + index * 9 + ii*3);
 			*value = (*value & ~clear_mask) | c;
 		}
+	}
+
+	color::Rgb
+	getColor(size_t index) const
+	{
+		if (index >= LEDs) return {};
+
+		uint8_t color[3];
+		for (size_t ii = 0; ii < 3; ii++)
+		{
+			const uint32_t value = *reinterpret_cast<const uint32_t*>(data + index * 9 + ii*3);
+			const uint8_t c = (gather(value) << 4) | gather(value >> 12);
+			color[ii] = c;
+		}
+		return {color[1], color[0], color[2]};
 	}
 
 	void
 	write()
 	{
-		for (const auto data : rgb) {
+		for (const auto value : data) {
 			while (not SpiMaster::Hal::isTransmitRegisterEmpty()) ;
-			SpiMaster::Hal::write(data);
+			SpiMaster::Hal::write(value);
 		}
 	}
 };
