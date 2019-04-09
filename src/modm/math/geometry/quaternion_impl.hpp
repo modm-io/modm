@@ -28,6 +28,16 @@ modm::Quaternion<T>::Quaternion()
 {
 }
 
+template<typename T>
+template<typename U>
+modm::Quaternion<T>::Quaternion(const U *array) :
+	w(array[0]),
+	x(array[1]),
+	y(array[2]),
+	z(array[3])
+{
+}
+
 // ----------------------------------------------------------------------------
 template<class T>
 modm::Quaternion<T>::Quaternion(T inW, T inX, T inY, T inZ)

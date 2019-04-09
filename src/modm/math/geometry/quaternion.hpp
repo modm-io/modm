@@ -40,6 +40,8 @@ namespace modm
 	{
 	public:
 		Quaternion();
+		template<typename U>
+		explicit Quaternion(const U *array);
 		Quaternion(T inW, T inX, T inY, T inZ);
 		Quaternion(const Vector<T, 3> &axis, T angle);
 		Quaternion(const Matrix<T, 4, 1> &rhs);
