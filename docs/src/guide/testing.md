@@ -116,9 +116,9 @@ Total:  209
 	You can access them in [the Artifacts tab of a build][logs].
 
 
-## Continous Integration
+## Continuous Integration
 
-modm uses [CircleCI as a Continous Integration service][circleci]. It compiles
+modm uses [CircleCI as a Continuous Integration service][circleci]. It compiles
 all the examples and executes the unit tests on Linux, then generates and
 compiles the full library for a blinky example for all targets that we support.
 

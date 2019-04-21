@@ -4,30 +4,50 @@
 
 {{module.description}}
 
-{% if module.options | length %}
+%% if module.options | length
 ## Options
-{% for o in module.options %}
+%% for o in module.options
 #### {{o.name | replace(module.name + ":", "")}}
 
 {{o.title if o.title else ("Default" if o.default else "Values")}}: {% if o.default %}`{{o.default}}` ∈ {% endif %}`{ {{ o.possibles }} }`
 
 {{o.description}}
-{% endfor %}
-{% endif %}
+%% endfor
+%% endif
 
-{% if objects | length %}
+%% if objects | length
 ## Content
 
 ```cpp
-{% for kind, objs in objects.items() %}
+%% for kind, objs in objects.items()
 // {{ kind | capitalize }}{% for obj in objs %}
 {{ obj }}{% endfor %}
-{% endfor %}
+%% endfor
 ```
-{% endif %}
+%% endif
 
-{% if (module.dependencies | length or module.dependents | length) %}
+%% if module.collectors | length
+## Collectors
+%% for c in module.collectors
+#### {{c.name | replace(module.name + ":", "")}}
+
+{{c.title}} ∈ `{{c.type}}`
+
+{{c.description}}
+%% endfor
+%% endif
+
+%% if module.queries | length
+## Queries
+%% for q in module.queries
+#### {{q.name | replace(module.name + ":", "")}}
+
+{{q.description}}
+%% endfor
+%% endif
+
+%% if (module.dependencies | length or module.dependents | length)
 ## Dependencies
 
 {{module.graph}}
-{% endif %}
+%% endif

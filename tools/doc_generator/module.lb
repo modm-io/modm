@@ -173,7 +173,7 @@ def post_build(env, buildlog):
                   "pref": ref_name(m.parent.fullname),
                   "ref": ref_name(m.fullname),
                   "dependencies": sorted([d.fullname for d in m.dependencies]),
-                  "options": []}
+                  "options": [], "collectors": [], "queries": []}
         for o in m.options:
             title, descr = split_description(o._description)
             oprops = {"name": o.fullname,
@@ -182,6 +182,19 @@ def post_build(env, buildlog):
                       "default": str(o._default) if o._default is not None else None,
                       "possibles": o.format_values()}
             mprops["options"].append(oprops)
+        for c in m.collectors:
+            title, descr = split_description(c._description)
+            cprops = {"name": c.fullname,
+                      "title": title,
+                      "description": descr,
+                      "type": c.format_values()}
+            mprops["collectors"].append(cprops)
+        mprops["collectors"].sort(key=lambda c: c["name"])
+        for q in m.queries:
+            qprops = {"name": q.fullname,
+                      "description": q._description}
+            mprops["queries"].append(qprops)
+        mprops["queries"].sort(key=lambda c: c["name"])
         modules.append(mprops)
 
     for m in modules:
