@@ -42,6 +42,7 @@ def build_target(env, sources):
 %% endif
 
 	env.Default("all")
+	return program
 
 
 def generate(env, **kw):
