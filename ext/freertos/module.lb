@@ -41,3 +41,6 @@ def build(env):
     env.outbasepath = "modm/ext/freertos"
     env.copy(".", ignore=env.ignore_files("*.in"))
     env.template("portable/FreeRTOSConfig.h.in", "portable/FreeRTOSConfig.h")
+
+    if env[":target"].identifier.family in ["f4"]:
+        env.collect(":build:cppdefines", "STM32F4XX")
