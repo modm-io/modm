@@ -36,7 +36,7 @@ namespace modm
 			 * 'take' or 'wait' in other implementations.
 			 */
 			bool
-			acquire(portTickType timeout = portMAX_DELAY);
+			acquire(TickType_t timeout = portMAX_DELAY);
 
 			/**
 			 * \brief	Release the semaphore
@@ -61,7 +61,7 @@ namespace modm
 			{
 			}
 
-			xSemaphoreHandle handle;
+			SemaphoreHandle_t handle;
 
 		private:
 			// disable copy constructor

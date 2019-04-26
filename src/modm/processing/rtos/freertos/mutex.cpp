@@ -26,7 +26,7 @@ modm::rtos::Mutex::~Mutex()
 
 // ----------------------------------------------------------------------------
 bool
-modm::rtos::Mutex::acquire(portTickType timeout)
+modm::rtos::Mutex::acquire(TickType_t timeout)
 {
 	return (xSemaphoreTake(this->handle, timeout) == pdTRUE);
 }

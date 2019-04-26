@@ -48,7 +48,7 @@ modm::rtos::Thread::Thread(uint32_t priority,
 {
 	xTaskCreate(
 			&wrapper,
-			(const signed char*) name,
+			name ? name : "anon",
 			(stackDepth / 4) + 1,
 			this,
 			priority,

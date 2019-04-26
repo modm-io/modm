@@ -71,7 +71,7 @@ namespace modm
 			}
 
 			/// The count of ticks since Scheduler::schedule() was called
-			static inline portTickType
+			static inline TickType_t
 			getTicks()
 			{
 				return xTaskGetTickCount();

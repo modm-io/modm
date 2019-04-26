@@ -42,7 +42,7 @@ namespace modm
 			~Mutex();
 
 			bool
-			acquire(portTickType timeout = portMAX_DELAY);
+			acquire(TickType_t timeout = portMAX_DELAY);
 
 			void
 			release();
@@ -55,7 +55,7 @@ namespace modm
 			Mutex&
 			operator = (const Mutex& other);
 
-			xSemaphoreHandle handle;
+			SemaphoreHandle_t handle;
 		};
 
 		/**
