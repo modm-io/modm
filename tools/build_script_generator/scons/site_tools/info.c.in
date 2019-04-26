@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Niklas Hauser
+ * Copyright (c) 2019, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -9,11 +9,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_INFO_{{ type | upper }}_HPP
-#define MODM_INFO_{{ type | upper }}_HPP
+#include "info_{{ type }}.h"
 
 %% for name, value in defines.items()
-#define {{ name | upper }} {{ value }}
+const char *{{ name | upper }} = {{ value }};
 %% endfor
-
-#endif // MODM_INFO_{{ type | upper }}_HPP

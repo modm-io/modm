@@ -49,10 +49,14 @@ def build(env):
     env.collect("::elf.release", join(build_path, "release", project_name + ".elf"))
     env.collect("::elf.debug",   join(build_path, "debug",   project_name + ".elf"))
 
+    env.outbasepath = "modm/src/"
     if env["info.git"] != "Disabled":
-        env.collect(":build:gitignore", "modm/src/info_git.h")
+        env.collect(":build:gitignore", "modm/src/info_git.c")
+        env.template("resources/info_git.h.in", "info_git.h",
+                     substitutions={"with_status": "Status" in env["info.git"]},)
     if env["info.build"]:
-        env.collect(":build:gitignore", "modm/src/info_build.h")
+        env.collect(":build:gitignore", "modm/src/info_build.c")
+        env.copy("resources/info_build.h", "info_build.h")
 
     def flag_format(flag):
         subs = {
@@ -79,6 +83,10 @@ def post_build(env):
     target = env["modm:target"]
     subs = env.query("::device")
     sources = env.query("::source_files")
+    if env["info.git"] != "Disabled":
+        sources["modm"].append("modm/src/info_git.c")
+    if env["info.build"]:
+        sources["modm"].append("modm/src/info_build.c")
 
     build_tools = [
         "settings_buildpath",

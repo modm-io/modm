@@ -21,7 +21,7 @@ import re
 from collections import defaultdict
 from os.path import join, dirname, abspath
 
-TEMPLATE_SOURCE = join(dirname(abspath(__file__)), "info.h.in")
+TEMPLATE_SOURCE = join(dirname(abspath(__file__)), "info.c.in")
 
 def is_git_available():
 	git_exists = subprocess.call(['which', 'git'], cwd=os.getcwd(), stdout=open(os.devnull, 'wb')) is 0
@@ -102,7 +102,7 @@ def git_info_defines(env, with_status=False):
 		return
 
 	env.AppendUnique(CPPDEFINES=defines)
-	target = join(env['BASEPATH'], 'src', 'info_git.h')
+	target = join(env['BASEPATH'], 'src', 'info_git.c')
 	subs = {"type": "git", "defines": {k:u"\"{}\"".format(v) for k, v in subs.items()}}
 	return env.Jinja2Template(target=target, source=TEMPLATE_SOURCE, substitutions=subs)
 
@@ -137,7 +137,7 @@ def build_info_defines(env):
 	subs['MODM_BUILD_COMPILER'] = comp
 
 	env.AppendUnique(CPPDEFINES=defines)
-	target = join(env['BASEPATH'], 'src', 'info_build.h')
+	target = join(env['BASEPATH'], 'src', 'info_build.c')
 	subs = {"type": "build", "defines": {k:u"\"{}\"".format(v) for k, v in subs.items()}}
 	return env.Jinja2Template(target=target, source=TEMPLATE_SOURCE, substitutions=subs)
 

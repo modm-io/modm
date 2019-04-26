@@ -293,22 +293,6 @@ this define to the command line CPP options:
 
 You can enable this by setting the `modm:build:scons:info.build` option.
 
-!!! danger "Only include in source files"
-    Since this information may change often, you must only `#include` the
-    generated header files in source files, not in header files. Otherwise
-    **you risk a complete rebuild of your project every time this information
-    changes**! If you need to use the information in a header file, expose it
-    as a `extern const char *info_git_{name};` and initialize it with
-    the defines in a separate source file. Then only this source file needs to
-    be rebuild and the project relinked, which is significantly faster:
-
-    ```c
-    // In header file
-    extern const char *info_git_sha;
-    // In source file
-    const char info_git_sha[] = MODM_GIT_SHA;
-    ```
-
 !!! warning "Respect developers privacy"
     This information is placed into the firmware in **cleartext**, so it will
     be trivial to extract from a memory dump. Consider this information public
@@ -318,7 +302,7 @@ You can enable this by setting the `modm:build:scons:info.build` option.
 
 ### Git Information
 
-These are the values defines as strings in `<info_git.h>`:
+These are the values defined as `const char *` strings in `<info_git.h>`:
 
 - `MODM_GIT_SHA`: commit hash: `%H`.
 - `MODM_GIT_SHA_ABBR`: short commit hash: `%h`.
@@ -381,7 +365,7 @@ Info:    Untracked: 6
 
 ### Build Information
 
-These are the values defines as strings in `<info_build.h>`:
+These are the values defined as `const char *` strings in `<info_build.h>`:
 
 - `MODM_BUILD_PROJECT_NAME`: as defined in the `modm:build:project.name` option.
 - `MODM_BUILD_MACHINE`: machine information.
