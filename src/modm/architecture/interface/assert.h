@@ -13,10 +13,6 @@
 #ifndef MODM_ASSERT_H
 #define MODM_ASSERT_H
 
-#if defined(__cplusplus) && !defined(MODM_ASSERT_HPP)
-#	error  "Don't include this file directly, use 'assert.hpp' instead!"
-#endif
-
 #include <stdint.h>
 #include <stdbool.h>
 #include <modm/architecture/utils.hpp>

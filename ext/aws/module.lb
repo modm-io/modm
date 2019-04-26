@@ -1,0 +1,68 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2016-2017, Niklas Hauser
+# Copyright (c) 2017, Fabian Greif
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = "freertos"
+    module.description = """\
+# a:FreeRTOS
+
+Amazon FreeRTOS port for modm to be used with via the `modm:processing:rtos` module.
+"""
+
+def prepare(module, options):
+    device = options[":target"]
+    core = device.get_driver("core")
+    if not (core and core["type"].startswith("cortex-m")):
+        return False
+
+    module.add_option(
+        NumericOption(
+            name="frequency",
+            description="Context switch frequency in Hz",
+            minimum=1, maximum=1000,
+            default=1000))
+
+    module.depends(
+        ":architecture:assert",
+        ":cmsis:device",
+        ":platform:clock")
+
+    return True
+
+def build(env):
+    # Figure out the core and correct path in portable/
+    core = env[":target"].get_driver("core")["type"]
+    env.substitutions = {"core": core}
+    path = core.replace("cortex-m", "ARM_CM").replace("+", "").replace("fd", "").upper()
+    path = path.replace("CM7F", "CM7/r0p1") # use subfolder for M7
+    path = "freertos/FreeRTOS/Source/portable/GCC/{}".format(path)
+
+    env.outbasepath = "modm/ext"
+    # Copy our own modm-specific port
+    env.copy("modm_port.cpp", "freertos/modm_port.cpp")
+    # Copy the entire source folder, minus portable folder and some files.
+    env.copy("freertos/FreeRTOS/Source", "freertos",
+             ignore=env.ignore_files("*.txt", "*.readme", "portable", "include"))
+    env.copy("freertos/FreeRTOS/Source/include", "freertos/inc/freertos")
+    # Copy the port.c file
+    env.copy("{}/port.c".format(path), "freertos/port.c")
+    # Copy the portmacro.h file
+    env.copy("{}/portmacro.h".format(path), "freertos/inc/freertos/portmacro.h")
+    # Copy the head_3.c file that just wraps the libc malloc
+    env.copy("freertos/FreeRTOS/Source/portable/MemMang/heap_3.c", "freertos/heap_3.c")
+
+    # Generate the FreeRTOSConfig.h file
+    env.template("FreeRTOSConfig.h.in", "freertos/inc/freertos/FreeRTOSConfig.h")
+
+    env.collect(":build:path.include", "modm/ext/freertos/inc/freertos")
+    env.collect(":build:path.include", "modm/ext/freertos/inc")

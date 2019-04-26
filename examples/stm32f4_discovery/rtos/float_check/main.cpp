@@ -73,7 +73,7 @@ public:
 	void run() {
 		Gpio::setOutput();
 		while (1) {
-			sleep(SleepTime);
+			sleep(SleepTime * MILLISECONDS);
 
 			Gpio::toggle();
 			Usart2::writeBlocking(i + c);
