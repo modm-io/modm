@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013, Kevin Läufer
- * Copyright (c) 2014-2017, Niklas Hauser
+ * Copyright (c) 2014-2019, Niklas Hauser
  * Copyright (c) 2017, Fabian Greif
  *
  * This file is part of the modm project.
@@ -18,22 +18,15 @@
 #include "systick_timer.hpp"
 
 static modm::platform::InterruptHandler sysTickHandler(nullptr);
-%% if systick_frequency > 1000
-static uint8_t counter;
-%% endif
 
 extern "C" void
-SysTick_Handler(void)
-{
-%% if systick_frequency > 1000
-	if (--counter == 0)
-	{
-		modm::Clock::increment();
-		counter = {{ systick_frequency // 1000 }};
-	}
+%% if has_freertos
+vApplicationTickHook()
 %% else
-	modm::Clock::increment();
+SysTick_Handler(void)
 %% endif
+{
+	modm::Clock::increment({{ 1000 // systick_frequency }});
 	if (sysTickHandler) sysTickHandler();
 }
 
@@ -41,10 +34,7 @@ SysTick_Handler(void)
 void
 modm::platform::SysTickTimer::enable(uint32_t reload)
 {
-%% if systick_frequency > 1000
-	counter = {{ systick_frequency // 1000 }};
-%% endif
-
+%% if not has_freertos
 	SysTick->LOAD = reload;
 	// Lower systick interrupt priority to lowest level
 	NVIC_SetPriority(SysTick_IRQn, 0xf);
@@ -54,12 +44,17 @@ modm::platform::SysTickTimer::enable(uint32_t reload)
 			SysTick_CTRL_CLKSOURCE_Msk |
 			SysTick_CTRL_ENABLE_Msk |
 			SysTick_CTRL_TICKINT_Msk;
+%% else
+	static_cast<void>(reload);
+%% endif
 }
 
 void
 modm::platform::SysTickTimer::disable()
 {
+%% if not has_freertos
 	SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk;
+%% endif
 }
 
 // ----------------------------------------------------------------------------
