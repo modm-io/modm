@@ -16,3 +16,6 @@
 [submodule "ext/gcc/libstdc++"]
 	path = ext/gcc/libstdc++
 	url = https://github.com/modm-io/avr-libstdcpp.git
+[submodule "ext/mpaland/printf"]
+	path = ext/mpaland/printf
+	url = https://github.com/modm-ext/printf.git
