@@ -40,13 +40,13 @@ def prepare(module, options):
         # we need the clock:f_cpu option!
         module.depends(":platform:clock")
         module.add_option(
-            StringOption(name="avrdude.programmer", default="avrispmkII",
+            StringOption(name="avrdude.programmer", default="",
                          description="AvrDude programmer"))
         module.add_option(
-            StringOption(name="avrdude.port", default="usb",
+            StringOption(name="avrdude.port", default="",
                          description="AvrDude programmer port"))
         module.add_option(
-            NumericOption(name="avrdude.baudrate", default=-1,
+            NumericOption(name="avrdude.baudrate", default=0,
                           description="AvrDude programmer baudrate"))
         module.add_option(
             StringOption(name="avrdude.options", default="",
