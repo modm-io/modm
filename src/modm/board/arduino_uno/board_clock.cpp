@@ -9,10 +9,6 @@
  */
 // ----------------------------------------------------------------------------
 
-//
-// Arduino UNO
-//
-
 #include "board.hpp"
 #include <modm/architecture/interface/clock.hpp>
 #include <modm/architecture/interface/interrupt.hpp>

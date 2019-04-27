@@ -10,8 +10,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_ARDUINO_UNO_HPP
-#define MODM_ARDUINO_UNO_HPP
+#pragma once
 
 #include <modm/platform.hpp>
 #include <modm/debug/logger.hpp>
@@ -93,5 +92,3 @@ initialize()
 
 using namespace Board;
 extern modm::IOStream serialStream;
-
-#endif	// MODM_ARDUINO_UNO_HPP

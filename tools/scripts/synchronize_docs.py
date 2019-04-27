@@ -50,7 +50,8 @@ def name(raw_name):
     # Rename some things to be more accurate
     result = result.replace("BLUE-PILL", "Blue Pill")\
                    .replace("BLACK-PILL", "Black Pill")\
-                   .replace("ARDUINO-UNO", "Arduino Uno")\
+                   .replace("ARDUINO-UNO", "Arduino UNO")\
+                   .replace("ARDUINO-NANO", "Arduino NANO")\
                    .replace("GENERIC", "Generic")\
                    .replace("LINUX", "Linux")\
                    .replace("WINDOWS", "Windows")\

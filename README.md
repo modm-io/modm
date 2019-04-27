@@ -108,35 +108,36 @@ documentation.
 <table>
 <tr>
 <td align="center">AL-AVREB-CAN</td>
-<td align="center">Arduino Uno</td>
+<td align="center">Arduino NANO</td>
+<td align="center">Arduino UNO</td>
 <td align="center">Black Pill</td>
-<td align="center">Blue Pill</td>
 </tr><tr>
+<td align="center">Blue Pill</td>
 <td align="center">DISCO-F051R8</td>
 <td align="center">DISCO-F072RB</td>
 <td align="center">DISCO-F100RB</td>
-<td align="center">DISCO-F303VC</td>
 </tr><tr>
+<td align="center">DISCO-F303VC</td>
 <td align="center">DISCO-F407VG</td>
 <td align="center">DISCO-F429ZI</td>
 <td align="center">DISCO-F469NI</td>
-<td align="center">DISCO-F746NG</td>
 </tr><tr>
+<td align="center">DISCO-F746NG</td>
 <td align="center">DISCO-F769NI</td>
 <td align="center">DISCO-L476VG</td>
 <td align="center">NUCLEO-F031K6</td>
-<td align="center">NUCLEO-F042K6</td>
 </tr><tr>
+<td align="center">NUCLEO-F042K6</td>
 <td align="center">NUCLEO-F103RB</td>
 <td align="center">NUCLEO-F303K8</td>
 <td align="center">NUCLEO-F401RE</td>
-<td align="center">NUCLEO-F411RE</td>
 </tr><tr>
+<td align="center">NUCLEO-F411RE</td>
 <td align="center">NUCLEO-F429ZI</td>
 <td align="center">NUCLEO-G071RB</td>
 <td align="center">NUCLEO-L432KC</td>
-<td align="center">NUCLEO-L476RG</td>
 </tr><tr>
+<td align="center">NUCLEO-L476RG</td>
 <td align="center">OLIMEXINO-STM32</td>
 <td align="center">STM32F030F4P6-DEMO</td>
 </tr>
