@@ -33,10 +33,13 @@ jobs:
           command: |
             (cd test && make compile-nucleo-f411)
             (cd test && make compile-nucleo-f103)
+            (cd test && make compile-nucleo-l432)
       - run:
           name: Compile AVR Unittests
           command: |
             (cd test && make compile-al-avreb-can)
+            (cd test && make compile-arduino-uno)
+            (cd test && make compile-arduino-nano)
       - run:
           name: Linux Examples
           command: |

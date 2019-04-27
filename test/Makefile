@@ -40,6 +40,12 @@ run-nucleo-f411:
 	$(call run-test,nucleo-f411,size)
 
 
+compile-nucleo-l432:
+	$(call compile-test,nucleo-l432,size)
+run-nucleo-l432:
+	$(call run-test,nucleo-l432,size)
+
+
 compile-nucleo-f103:
 	$(call compile-test,nucleo-f103,size)
 run-nucleo-f103:
@@ -50,3 +56,15 @@ compile-al-avreb-can:
 	$(call compile-test,al-avreb-can)
 run-al-avreb-can:
 	$(call run-test,al-avreb-can)
+
+
+compile-arduino-uno:
+	$(call compile-test,arduino-uno)
+run-arduino-uno:
+	$(call run-test,arduino-uno)
+
+
+compile-arduino-nano:
+	$(call compile-test,arduino-nano)
+run-arduino-nano:
+	$(call run-test,arduino-nano)

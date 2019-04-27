@@ -21,7 +21,7 @@
 void
 MatrixVectorTest::testMatrixVectorMultiplication()
 {
-	const float_t m[] = {
+	const float m[] = {
 		5.,
 		8.,
 		-4.,
@@ -33,13 +33,13 @@ MatrixVectorTest::testMatrixVectorMultiplication()
 		-2.
 	};
 
-	const float_t v[] = {
+	const float v[] = {
 		2.,
 		-3.,
 		1.
 	};
 
-	const modm::Matrix<float_t, 3, 3> a(m);
+	const modm::Matrix<float, 3, 3> a(m);
 	const modm::Vector3f b(v);
 
 	modm::Vector3f c = a * b;

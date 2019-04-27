@@ -366,6 +366,10 @@ MODM_ASSERTION_HANDLER(resumable_test_nesting_handler);
 void
 ResumableTest::testNesting()
 {
+#ifdef MODM_CPU_AVR
+	// this test blows the stack of any AVR :_(
+	return;
+#endif
 	TestingNestedThread thread;
 	// sanity checks
 	TEST_ASSERT_FALSE(thread.isResumableRunning());
