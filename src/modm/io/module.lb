@@ -19,11 +19,44 @@ def prepare(module, options):
     module.depends(
         ":architecture:accessor",
         ":math:utils")
+
+    is_avr = options[":target"].identifier.platform in ["avr"]
+    module.add_option(
+            BooleanOption(name="with_long_long",
+                          description="Support for 64-bit integer formatting",
+                          default=not is_avr))
+    module.add_option(
+            BooleanOption(name="with_float",
+                          description="Support for floating point formatting",
+                          default=not is_avr))
+    module.add_option(
+            BooleanOption(name="with_ptrdiff",
+                          description="Support for pointer difference formatting",
+                          default=not is_avr))
+    module.add_option(
+            BooleanOption(name="with_printf",
+                          description="Support for printf-style formatting",
+                          default=not is_avr))
+
     return True
 
 def build(env):
     env.outbasepath = "modm/src/modm/io"
-    env.copy(".", ignore=env.ignore_files("io.hpp"))
+    env.copy(".", ignore=env.ignore_files("io.hpp", "iostream_printf.cpp.in", "iostream.hpp.in"))
+    env.substitutions = {
+        "family": env[":target"].identifier.family,
+        "core": env[":target"].get_driver("core")["type"],
+    }
+    env.template("iostream_printf.cpp.in")
+    env.template("iostream.hpp.in")
+
     env.outbasepath = "modm/src/modm"
     env.copy("io.hpp")
+
+    env.outbasepath = "modm/ext/printf"
+    # Copy custom printf header
+    env.copy(repopath("ext/mpaland/printf.h"), "printf.h")
+    # Copy source file but without .c suffix so it doesn't get indexed for compilation.
+    env.copy(repopath("ext/mpaland/printf/printf.c"), "printf.source")
+    env.collect(":build:path.include", "modm/ext")
 

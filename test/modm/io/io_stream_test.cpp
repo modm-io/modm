@@ -20,18 +20,7 @@
 #include <modm/architecture/utils.hpp> // MODM_ARRAY_SIZE
 #include <stdio.h>	// snprintf
 #include <string.h>	// memset
-
-#if not defined(MODM_CPU_AVR)
 #include <limits>
-#else
-#include <math.h>
-namespace std {
-template <typename T> struct numeric_limits {
-	static constexpr T quiet_NaN() { return NAN; }
-	static constexpr T infinity() { return INFINITY; }
-};
-}
-#endif
 
 // ----------------------------------------------------------------------------
 // simple IODevice which stores all data in a memory buffer
@@ -108,14 +97,12 @@ IoStreamTest::testString()
 	TEST_ASSERT_EQUALS(device.bytesWritten, 6U);
 }
 
-FLASH_STORAGE_STRING(flashString) = "abc";
-
 void
 IoStreamTest::testFlashString()
 {
 	char string[] = "abc";
 
-	(*stream) << modm::accessor::asFlash(flashString);
+	(*stream) << IFSS("abc");
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 3);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 3U);
@@ -252,27 +239,23 @@ IoStreamTest::testStreamInt32_3()
 void
 IoStreamTest::testStreamUint64()
 {
-#ifndef __AVR__
 	char string[] = "12345678901234";
 
 	(*stream) << static_cast<uint64_t>(12345678901234ULL);
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 14);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 14U);
-#endif
 }
 
 void
 IoStreamTest::testStreamInt64()
 {
-#ifndef __AVR__
 	char string[] = "-12345678901234";
 
 	(*stream) << static_cast<int64_t>(-12345678901234LL);
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 15);
 	TEST_ASSERT_EQUALS(device.bytesWritten, 15U);
-#endif
 }
 
 // ----------------------------------------------------------------------------
@@ -343,6 +326,72 @@ IoStreamTest::testFloat6()
 }
 
 void
+IoStreamTest::testFloatPrintf()
+{
+	char string[] = "1.23000e+00";
+
+	stream->printf("%e", double(1.23));
+
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 11);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 11U);
+}
+
+void
+IoStreamTest::testFloatPrintf2()
+{
+	char string[] = "4.57000e+02";
+
+	stream->printf("%e", double(457.0));
+
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 11);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 11U);
+}
+
+void
+IoStreamTest::testFloatPrintf3()
+{
+	char string[] = "-5.12314e+07";
+
+	stream->printf("%e", double(-51231400.0));
+
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 12);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 12U);
+}
+
+void
+IoStreamTest::testFloatPrintf4()
+{
+	char string[] = "-7.23400e-04";
+
+	stream->printf("%e", double(-0.0007234));
+
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 12);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 12U);
+}
+
+void
+IoStreamTest::testFloatPrintf5()
+{
+	char string[] = "nan";
+
+	stream->printf("%e", std::numeric_limits<double>::quiet_NaN());
+
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 3);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 3U);
+}
+
+void
+IoStreamTest::testFloatPrintf6()
+{
+	char string[] = "inf";
+
+	stream->printf("%e", std::numeric_limits<double>::infinity());
+
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 3);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 3U);
+}
+
+void
 IoStreamTest::testBool1()
 {
 	char string[] = "true";
@@ -385,14 +434,14 @@ IoStreamTest::testHex1()
 void
 IoStreamTest::testHex2()
 {
-	char string[] = "48616C6C6F04";
+	char string[] = "48616C6C6F00";
 
 	char s[] = "Hallo";
+	(*stream) << modm::hex;
+	for (char c : s) (*stream) << c;
 
-	(*stream) << modm::hex << s;
-
-	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 10);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 10U);
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 12);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 12U);
 }
 
 void
@@ -454,14 +503,14 @@ IoStreamTest::testBin1()
 void
 IoStreamTest::testBin2()
 {
-	char string[] = "0100100001100001011011000110110001101111";
+	char string[] = "010010000110000101101100011011000110111100000000";
 
 	char s[] = "Hallo";
+	(*stream) << modm::bin;
+	for (char c : s) (*stream) << c;
 
-	(*stream) << modm::bin << s;
-
-	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 40);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 40U);
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 48);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 48U);
 }
 
 void
@@ -493,7 +542,7 @@ IoStreamTest::testBin4()
 void
 IoStreamTest::testBin5()
 {
-	char string[] = "0000000100000000";
+	char string[] = "10";
 
 	bool boo = true;
 
@@ -502,8 +551,8 @@ IoStreamTest::testBin5()
 	boo = false;
 	(*stream) << modm::bin << boo;
 
-	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 16);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 16U);
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 2);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 2U);
 }
 
 void
@@ -565,10 +614,9 @@ IoStreamTest::testPrintf2()
 void
 IoStreamTest::testPrintf3()
 {
-#if not defined(MODM_CPU_AVR)
 	// Test for 64 bit uints and ints on printf
 	unsigned long long unsignedlonglong = 0xFEDCBA9876543210;
-	(*stream).printf("%llx", unsignedlonglong);
+	(*stream).printf("%llX", unsignedlonglong);
 	TEST_ASSERT_EQUALS_ARRAY("FEDCBA9876543210", device.buffer, 16);
 	(*stream).flush();
 
@@ -576,7 +624,6 @@ IoStreamTest::testPrintf3()
 	(*stream).printf("%lld", longlong);
 	TEST_ASSERT_EQUALS_ARRAY("-9223372036854775806", device.buffer, 20);
 	(*stream).flush();
-#endif
 }
 
 int myFunc1(void) { return -1; };
@@ -615,7 +662,7 @@ IoStreamTest::testPointer()
 	const size_t bytesWritten = 18;
 #endif
 
-	(*stream).printf("%p", p);
+	(*stream).printf("0x%p", p);
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, bytesWritten);
 	TEST_ASSERT_EQUALS(device.bytesWritten, bytesWritten);

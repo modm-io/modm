@@ -3,6 +3,7 @@
     <option name="modm:target">atmega644</option>
     <option name="modm:platform:clock:f_cpu">14745600</option>
     <option name="modm:build:build.path">../../../build/avr/block_device_mirror</option>
+    <option name="modm:io:with_printf">True</option>
   </options>
   <modules>
     <module>modm:debug</module>

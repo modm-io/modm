@@ -4,6 +4,9 @@
   <options>
     <option name="modm:build:scons:info.git">Disabled</option>
     <option name="modm:build:avrdude.port">/dev/tty.usbserial-1410</option>
+    <option name="modm:io:with_float">True</option>
+    <option name="modm:io:with_long_long">True</option>
+    <option name="modm:io:with_printf">True</option>
   </options>
 
   <modules>

@@ -95,6 +95,25 @@ public:
 	void
 	testFloat6();
 
+	// float via printf
+	void
+	testFloatPrintf();
+
+	void
+	testFloatPrintf2();
+
+	void
+	testFloatPrintf3();
+
+	void
+	testFloatPrintf4();
+
+	void
+	testFloatPrintf5();
+
+	void
+	testFloatPrintf6();
+
 	// bool
 	void
 	testBool1();

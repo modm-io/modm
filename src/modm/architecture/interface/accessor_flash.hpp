@@ -37,7 +37,7 @@
 
 /// Declare a flash string inline
 /// @ingroup modm_architecture_accessor
-#define PSTR(s) ((const char *)(s))
+#define IFSS(s) ((const char *)(s))
 
 #else // !__DOXYGEN__
 

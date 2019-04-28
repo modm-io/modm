@@ -24,7 +24,7 @@
 #define	FLASH_STORAGE_STRING(s)			extern const char s[] PROGMEM; const char s[]
 #define	EXTERN_FLASH_STORAGE_STRING(s)	extern const char s[] PROGMEM
 
-#define	INLINE_FLASH_STORAGE_STRING(s)	PSTR(s)
+#define	IFSS(s)	(modm::accessor::Flash<char>(PSTR(s)))
 
 namespace modm
 {

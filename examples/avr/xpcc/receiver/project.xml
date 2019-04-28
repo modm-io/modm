@@ -5,6 +5,8 @@
     <option name="modm:build:build.path">../../../../build/avr/xpcc/receiver</option>
     <option name="modm::xpcc:generator:source">../../../xpcc/xml/communication.xml</option>
     <option name="modm::xpcc:generator:container">receiver</option>
+    <option name="modm:io:with_printf">True</option>
+    <option name="modm:io:with_float">True</option>
   </options>
   <modules>
     <module>modm:communication:xpcc:generator</module>
