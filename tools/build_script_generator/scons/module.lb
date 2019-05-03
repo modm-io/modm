@@ -23,7 +23,7 @@ def prepare(module, options):
         BooleanOption(name="include_sconstruct", default=True,
                       description=descr_include_sconstruct))
     module.add_option(
-        PathOption(name="cache_dir", default="/cache", empty_ok=True,
+        PathOption(name="cache_dir", default="", empty_ok=True,
                    description=descr_cache_dir))
     module.add_option(
         PathOption(name="image.source", default="", empty_ok=True,
