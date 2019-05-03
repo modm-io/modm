@@ -19,8 +19,8 @@ def build_target(env, sources):
 	env.Alias("symbols", env.Symbols(program))
 	env.Alias("listing", env.Listing(program))
 	env.Alias("bin", env.Bin(program))
-%% if platform in ["hosted"]
 	env.Alias("build", program)
+%% if platform in ["hosted"]
 	env.Alias("run", env.Run(program))
 	env.Alias("all", ["build", "run"])
 %% else
@@ -33,7 +33,6 @@ def build_target(env, sources):
 	env.Alias("program", env.Avrdude(program))
     %% endif
 
-	env.Alias("build", [program, "listing"])
 	%% if platform in ["stm32"]
 	env.Alias("all", ["build", "size"])
 	%% else
