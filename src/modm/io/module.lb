@@ -27,7 +27,7 @@ def prepare(module, options):
                           default=not is_avr))
     module.add_option(
             BooleanOption(name="with_float",
-                          description="Support for floating point formatting",
+                          description=descr_with_float,
                           default=not is_avr))
     module.add_option(
             BooleanOption(name="with_ptrdiff",
@@ -60,3 +60,9 @@ def build(env):
     env.copy(repopath("ext/mpaland/printf/printf.c"), "printf.source")
     env.collect(":build:path.include", "modm/ext")
 
+
+descr_with_float = """# Support for floating point formatting
+
+On AVRs floating point values can be printed, however, the formatting cannot be
+specified and all values are printed as *scientific-notation exponential floating point*
+"""

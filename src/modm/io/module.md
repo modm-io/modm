@@ -12,86 +12,80 @@ stream << modm::endl;
 stream.printf("format number 8: %u or as signed -100: %d", 8, -100);
 ```
 
+!!! warning "AVR supported features"
+    All expensive features incl. printf are disabled by default! Check the options.
+
+
 ## Using printf
 
-The format string is composed of zero or more directives: ordinary
-characters (not %), which are copied unchanged to the output stream;
-and conversion specifications, each of which results in fetching zero
-or more subsequent arguments. Each conversion specification is
-introduced by the % character. The arguments must properly correspond
-(after type promotion) with the conversion specifier. After the %,
-the following appear in sequence:
+This module uses the printf implementation from [`mpaland/printf`](https://github.com/mpaland/printf).
 
-Zero or more of the following flags:
+### Format Specifiers
 
-- `-` A negative field width flag; the converted value is to be
-  left adjusted on the field boundary. The converted value is
-  padded on the right with blanks, rather than on the left with
-  blanks.
-- `' '` (space) A blank should be left before a positive number
-  produced by a signed conversion (d).
-- `+` A sign must always be placed before a number produced by a
-  signed conversion. A `+` overrides a space if both are used.
-- An optional decimal digit string specifying a minimum field width.
-  If the converted value has fewer characters than the field width,
-  it will be padded with spaces on the left (or right, if the
-  left-adjustment flag has been given) to fill out the field width.
-- An optional `h`, `l` or `ll` length modifier, that specifies that the argument
-  for the `d`, `u`, or `x` conversion is a 8-bit ("h"), 32-bit ("l") or
-  64-bit ("ll") rather than 16-bit.
+A format specifier follows this prototype: `%[flags][width][.precision][length]type`
+The following format specifiers are supported:
 
-The conversion specifiers and their meanings are:
 
-- `c`: char (8-bit)
-- `s`: string (`char *`)
-- `p`: pointer (`void *`)
-- `d`: signed  decimal
-- `u`: unsigned decimal
-- `x`: hex
-- `f`: float
-- `%`: %
+#### Supported Types
 
-Combined with the length modifiers you get:
+| Type   | Output |
+|--------|--------|
+| d or i | Signed decimal integer |
+| u      | Unsigned decimal integer |
+| b      | Unsigned binary |
+| o      | Unsigned octal |
+| x      | Unsigned hexadecimal integer (lowercase) |
+| X      | Unsigned hexadecimal integer (uppercase) |
+| f or F | Decimal floating point (`with_float` option) |
+| e or E | Scientific-notation (exponential) floating point (`with_float` option) |
+| g or G | Scientific or decimal floating point (`with_float` option) |
+| c      | Single character |
+| s      | String of characters |
+| p      | Pointer address |
+| %      | A % followed by another % character will write a single % |
 
-- `d`:    signed 16-bit
-- `ld`:   signed 32-bit
-- `lld`:  signed 64-bit (not yet)
-- `u`:    unsigned 16-bit
-- `lu`:   unsigned 32-bit
-- `llu`:  unsigned 64-bit (not yet)
-- `hx`:    8-bit hex
-- `x`:    16-bit hex
-- `lx`:   32-bit hex
-- `llx`:  64-bit hex (not yet)
 
-Examples, given `-100` as argument in the right type:
+#### Supported Flags
 
-```
-%c:
-%s:
-%p:  0x0100
-%d:  -100
-%ld: -100
-%u:  65436
-%lu:
-%hx: 0x9c
-%x:  0xff9c
-%lx: 0xffffff9c
-```
+| Flags | Description |
+|-------|-------------|
+| -     | Left-justify within the given field width; Right justification is the default. |
+| +     | Forces to precede the result with a plus or minus sign (+ or -) even for positive numbers.<br>By default, only negative numbers are preceded with a - sign. |
+| (space) | If no sign is going to be written, a blank space is inserted before the value. |
+| #     | Used with o, b, x or X specifiers the value is preceded with 0, 0b, 0x or 0X respectively for values different than zero.<br>Used with f, F it forces the written output to contain a decimal point even if no more digits follow. By default, if no digits follow, no decimal point is written. |
+| 0     | Left-pads the number with zeros (0) instead of spaces when padding is specified (see width sub-specifier). |
 
-- `s`: The "char *" argument is expected to be a pointer to an array
-  of character type (pointer to a string). Characters from the array
-  are written up to (but not including) a terminating NULL character;
-  if a precision is specified, no more than the number specified are
-  written. If a precision is given, no null character need be present;
-  if the precision is not specified, or is greater than the size of
-  the array, the array must contain a terminating NULL character.
-- `%`: A `%` is written. No argument is converted. The complete conversion
-  specification is `%%`.
 
-In no case does a non-existent or small field width cause truncation
-of a numeric field; if the result of a conversion is wider than the
-field width, the field is expanded to contain the conversion result.
+#### Supported Width
+
+| Width    | Description |
+|----------|-------------|
+| (number) | Minimum number of characters to be printed. If the value to be printed is shorter than this number, the result is padded with blank spaces. The value is not truncated even if the result is larger. |
+| *        | The width is not specified in the format string, but as an additional integer value argument preceding the argument that has to be formatted. |
+
+
+#### Supported Precision
+
+| Precision | Description |
+|-----------|-------------|
+| .number   | For integer specifiers (d, i, o, u, x, X): precision specifies the minimum number of digits to be written. If the value to be written is shorter than this number, the result is padded with leading zeros. The value is not truncated even if the result is longer. A precision of 0 means that no character is written for the value 0.<br>For f and F specifiers: this is the number of digits to be printed after the decimal point. **By default, this is 6, maximum is 9**.<br>For s: this is the maximum number of characters to be printed. By default all characters are printed until the ending null character is encountered.<br>If the period is specified without an explicit value for precision, 0 is assumed. |
+| .*        | The precision is not specified in the format string, but as an additional integer value argument preceding the argument that has to be formatted. |
+
+
+#### Supported Length
+
+The length sub-specifier modifies the length of the data type.
+
+| Length | d i  | u o x X |
+|--------|------|---------|
+| (none) | int  | unsigned int |
+| hh     | char | unsigned char |
+| h      | short int | unsigned short int |
+| l      | long int | unsigned long int |
+| ll     | long long int | unsigned long long int (`with_long_long` option) |
+| j      | intmax_t | uintmax_t |
+| z      | size_t | size_t |
+| t      | ptrdiff_t | ptrdiff_t (`with_ptrdiff` option) |
 
 
 ## Redirecting IOStreams
