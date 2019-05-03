@@ -54,6 +54,7 @@ extern "C"
 %% endif
 }
 
+%% if not core.startswith("avr") or options["with_printf"]
 namespace
 {
 void out_char(char character, void* buffer, size_t, size_t)
@@ -62,6 +63,7 @@ void out_char(char character, void* buffer, size_t, size_t)
 		reinterpret_cast<modm::IOStream*>(buffer)->write(character);
 }
 }
+%% endif
 
 namespace modm
 {
