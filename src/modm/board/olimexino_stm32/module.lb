@@ -12,8 +12,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.parent = "board"
-    module.name = "olimexino-stm32"
+    module.name = ":board:olimexino-stm32"
     module.description = """\
 # Olimexino STM32
 

@@ -42,8 +42,7 @@ class Instance(Module):
         env.template("i2c_master.cpp.in", "i2c_master_{}.cpp".format(self.instance.lower()))
 
 def init(module):
-    module.name = "i2c"
-    module.parent = "platform"
+    module.name = ":platform:i2c"
 
 def prepare(module, options):
     device = options[":target"]

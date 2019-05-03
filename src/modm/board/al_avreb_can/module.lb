@@ -11,8 +11,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.parent = "board"
-    module.name = "al-avreb-can"
+    module.name = ":board:al-avreb-can"
     module.description = """\
 # AL-AVREB_CAN Board
 

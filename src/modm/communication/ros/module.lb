@@ -11,8 +11,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.parent = "communication"
-    module.name = "ros"
+    module.name = ":communication:ros"
     module.description = "Drivers for rosserial"
 
 def prepare(module, options):

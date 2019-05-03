@@ -12,7 +12,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = "ui"
+    module.name = ":ui"
     module.description = """\
 # User interface
 

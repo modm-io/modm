@@ -12,8 +12,7 @@
 
 
 def init(module):
-    module.name = "math"
-    module.parent = "test"
+    module.name = ":test:math"
 
 
 def prepare(module, options):

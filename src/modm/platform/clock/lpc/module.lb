@@ -12,8 +12,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = "clock"
-    module.parent = "platform"
+    module.name = ":platform:clock"
 
 def prepare(module, options):
     if not options[":target"].has_driver("clock:lpc"):

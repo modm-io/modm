@@ -43,8 +43,7 @@ class Instance(Module):
         env.template("uart_spi_master.cpp.in", "uart_spi_master_{}.cpp".format(self.instance))
 
 def init(module):
-    module.name = "uart.spi"
-    module.parent = "platform"
+    module.name = ":platform:uart.spi"
     module.description = "USART in SPI Mode"
 
 def prepare(module, options):

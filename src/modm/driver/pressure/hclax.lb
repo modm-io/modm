@@ -12,8 +12,7 @@
 
 
 def init(module):
-    module.parent = "driver"
-    module.name = "hclax"
+    module.name = ":driver:hclax"
     module.description = """\
 # HCLA Pressure Sensor
 

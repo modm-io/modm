@@ -12,8 +12,7 @@
 
 
 def init(module):
-    module.parent = "driver"
-    module.name = "drv832x_spi"
+    module.name = ":driver:drv832x_spi"
     module.description = """\
 # DRV832xS: Three-Phase Smart Gate Driver
 

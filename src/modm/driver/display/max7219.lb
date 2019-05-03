@@ -12,8 +12,7 @@
 
 
 def init(module):
-    module.parent = "driver"
-    module.name = "max7219"
+    module.name = ":driver:max7219"
     module.description = "MAX7219 Display"
 
 

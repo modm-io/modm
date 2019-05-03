@@ -333,7 +333,7 @@ class Unaligned(Module):
 import re
 
 def init(module):
-    module.name = "architecture"
+    module.name = ":architecture"
     module.description = """\
 # Architecture Interfaces
 

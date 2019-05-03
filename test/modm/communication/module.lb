@@ -12,8 +12,7 @@
 
 
 def init(module):
-    module.name = "communication"
-    module.parent = "test"
+    module.name = ":test:communication"
 
 
 def prepare(module, options):

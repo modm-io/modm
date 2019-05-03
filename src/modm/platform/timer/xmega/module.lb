@@ -12,8 +12,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = "timer"
-    module.parent = "platform"
+    module.name = ":platform:timer"
 
 def prepare(module, options):
     if not options[":target"].has_driver("timer:xmega"):

@@ -12,8 +12,7 @@
 
 
 def init(module):
-    module.parent = "driver"
-    module.name = "ws2812"
+    module.name = ":driver:ws2812"
     module.description = """\
 # WS2812 Driver
 

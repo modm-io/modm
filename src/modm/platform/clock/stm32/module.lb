@@ -13,8 +13,7 @@
 
 
 def init(module):
-    module.parent = ":platform"
-    module.name = "rcc"
+    module.name = ":platform:rcc"
     module.description = "Reset and Clock Control (RCC)"
 
 def prepare(module, options):

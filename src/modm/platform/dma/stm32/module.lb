@@ -37,8 +37,7 @@ class Instance(Module):
         env.template("dma_impl.hpp.in", "dma_{}_impl.hpp".format(self.instance))
 
 def init(module):
-    module.name = "dma"
-    module.parent = "platform"
+    module.name = ":platform:dma"
     module.description = "Direct Memory Access (DMA)"
 
 def prepare(module, options):

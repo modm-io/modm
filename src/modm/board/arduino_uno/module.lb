@@ -12,8 +12,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.parent = "board"
-    module.name = "arduino-uno"
+    module.name = ":board:arduino-uno"
     module.description = "Arduino UNO"
 
 def prepare(module, options):

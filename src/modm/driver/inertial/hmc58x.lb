@@ -12,8 +12,7 @@
 
 
 def init(module):
-    module.parent = "driver"
-    module.name = "hmc58x"
+    module.name = ":driver:hmc58x"
     module.description = """\
 # HMC58x3 3-Axis Digital Magnetometer
 

@@ -11,8 +11,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.parent = "communication:xpcc"
-    module.name = "generator"
+    module.name = ":communication:xpcc:generator"
     module.description = "XPCC Generator"
 
 def prepare(module, options):

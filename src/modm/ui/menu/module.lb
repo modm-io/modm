@@ -11,8 +11,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.parent = "ui"
-    module.name = "menu"
+    module.name = ":ui:menu"
     module.description = """\
 # Display Menu
 

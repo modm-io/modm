@@ -12,8 +12,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.parent = "board"
-    module.name = "disco-f303vc"
+    module.name = ":board:disco-f303vc"
     module.description = """\
 # STM32F3DISCOVERY
 

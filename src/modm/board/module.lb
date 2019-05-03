@@ -11,7 +11,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = "board"
+    module.name = ":board"
     module.description = "Board Support Packages"
 
 def prepare(module, options):

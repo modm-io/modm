@@ -12,8 +12,7 @@
 
 
 def init(module):
-    module.parent = "driver"
-    module.name = "bme280"
+    module.name = ":driver:bme280"
     module.description = """\
 # BME280 Pressure Sensor
 

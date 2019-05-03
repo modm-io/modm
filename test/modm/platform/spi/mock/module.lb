@@ -11,8 +11,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = "spi"
-    module.parent = "test:platform"
+    module.name = ":test:platform:spi"
 
 def prepare(module, options):
     module.depends(

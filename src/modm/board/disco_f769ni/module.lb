@@ -12,8 +12,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.parent = "board"
-    module.name = "disco-f769ni"
+    module.name = ":board:disco-f769ni"
     module.description = """\
 # STM32F769IDISCOVERY
 

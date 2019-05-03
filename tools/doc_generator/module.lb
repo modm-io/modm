@@ -138,7 +138,7 @@ def replace(text, key, content):
 
 # -----------------------------------------------------------------------------
 def init(module):
-    module.name = "docs"
+    module.name = ":docs"
     module.description = FileReader("module.md")
 
 def prepare(module, options):

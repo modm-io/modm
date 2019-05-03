@@ -12,8 +12,7 @@
 
 
 def init(module):
-    module.parent = "driver"
-    module.name = "ssd1306"
+    module.name = ":driver:ssd1306"
     module.description = "SSD1306 Display"
 
 def prepare(module, options):

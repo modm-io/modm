@@ -18,7 +18,7 @@ with open(localpath("common.py")) as common:
 
 
 def init(module):
-    module.name = "build"
+    module.name = ":build"
     module.description = FileReader("module.md")
 
 
@@ -46,7 +46,7 @@ def prepare(module, options):
             StringOption(name="avrdude.port", default="",
                          description="AvrDude programmer port"))
         module.add_option(
-            NumericOption(name="avrdude.baudrate", default=0,
+            NumericOption(name="avrdude.baudrate", minimum=0, default=0,
                           description="AvrDude programmer baudrate"))
         module.add_option(
             StringOption(name="avrdude.options", default="",
@@ -113,7 +113,7 @@ def prepare(module, options):
     # Compile flag collectors
     def flag_validate(flag):
         if not flag.startswith("-"):
-            raise ValueError("Flag '{}' must start with '-'!".format(flag))
+            raise ValueError("Flags must start with '-'!")
         return flag
     for name in common_build_flag_names:
         module.add_collector(

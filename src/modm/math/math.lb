@@ -12,7 +12,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = "math"
+    module.name = ":math"
     module.description = "Math"
 
 def prepare(module, options):

@@ -46,8 +46,7 @@ class Instance(Module):
 
 
 def init(module):
-    module.name = "spi"
-    module.parent = "platform"
+    module.name = ":platform:spi"
     module.description = "Serial Peripheral Interface (SPI)"
 
 def prepare(module, options):

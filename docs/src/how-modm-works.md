@@ -46,8 +46,8 @@ properties and calling `env.template` with the input and output file names.
 
 ```python
 def init(module):
-    module.name = "uart"
-    module.parent = "platform"
+    module.name = ":platform:uart"
+    module.description = "UART driver"
 
 def prepare(module, options):
     module.depends(":architecture:interrupt", ":architecture:register",

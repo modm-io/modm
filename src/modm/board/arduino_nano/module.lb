@@ -12,8 +12,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.parent = "board"
-    module.name = "arduino-nano"
+    module.name = ":board:arduino-nano"
     module.description = "Arduino NANO"
 
 def prepare(module, options):

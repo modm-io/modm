@@ -13,8 +13,7 @@
 import os
 
 def init(module):
-    module.parent = "cmsis"
-    module.name = "device"
+    module.name = ":cmsis:device"
 
 def prepare(module, options):
     device = options[":target"]

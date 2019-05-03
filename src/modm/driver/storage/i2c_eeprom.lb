@@ -12,8 +12,7 @@
 
 
 def init(module):
-    module.parent = "driver"
-    module.name = "i2c.eeprom"
+    module.name = ":driver:i2c.eeprom"
     module.description = """\
 # I2C Eeprom
 

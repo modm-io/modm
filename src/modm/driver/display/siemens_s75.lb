@@ -12,8 +12,7 @@
 
 
 def init(module):
-    module.parent = "driver"
-    module.name = "siemens_s75"
+    module.name = ":driver:siemens_s75"
     module.description = FileReader("siemens_s75.md")
 
 def prepare(module, options):

@@ -12,8 +12,7 @@
 
 
 def init(module):
-    module.parent = "driver"
-    module.name = "mcp23x17"
+    module.name = ":driver:mcp23x17"
     module.description = """\
 # MCP23x17 16-Bit I/O Expander
 

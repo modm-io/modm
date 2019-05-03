@@ -11,8 +11,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.parent = ":math"
-    module.name = "units"
+    module.name = ":math:units"
     module.description = """\
 # SI Units
 

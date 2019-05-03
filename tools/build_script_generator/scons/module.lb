@@ -13,8 +13,7 @@
 from os.path import join, relpath, isdir
 
 def init(module):
-    module.parent = "build"
-    module.name = "scons"
+    module.name = ":build:scons"
     module.description = FileReader("module.md")
 
 

@@ -12,8 +12,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = "spi"
-    module.parent = "platform"
+    module.name = ":platform:spi"
 
 def prepare(module, options):
     target = options[":target"]

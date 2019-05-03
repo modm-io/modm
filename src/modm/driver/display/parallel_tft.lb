@@ -12,8 +12,7 @@
 
 
 def init(module):
-    module.parent = "driver"
-    module.name = "parallel_tft_display"
+    module.name = ":driver:parallel_tft_display"
     module.description = "Parallel Bus TFT Display"
 
 def prepare(module, options):

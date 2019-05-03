@@ -11,8 +11,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.parent = "math"
-    module.name = "filter"
+    module.name = ":math:filter"
     module.description = "Filters"
 
 def prepare(module, options):

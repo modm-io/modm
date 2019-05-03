@@ -14,8 +14,7 @@
 import os
 
 def init(module):
-    module.parent = "platform"
-    module.name = "fault.cortex"
+    module.name = ":platform:fault.cortex"
     module.description = """\
 # ARM Cortex-M Fault Handling
 

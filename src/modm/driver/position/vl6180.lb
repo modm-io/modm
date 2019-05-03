@@ -12,8 +12,7 @@
 
 
 def init(module):
-    module.parent = "driver"
-    module.name = "vl6180"
+    module.name = ":driver:vl6180"
     module.description = "VL6180X Proximity Sensor"
 
 def prepare(module, options):

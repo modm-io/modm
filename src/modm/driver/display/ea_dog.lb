@@ -12,8 +12,7 @@
 
 
 def init(module):
-    module.parent = "driver"
-    module.name = "ea_dog"
+    module.name = ":driver:ea_dog"
     module.description = "EA-DOG Displays"
 
 def prepare(module, options):

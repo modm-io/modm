@@ -72,8 +72,7 @@ Microchip SST26VF064B 64MBit flash chip in SOIJ-8, WDFN-8 or SOIC-16.
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.parent = "driver"
-    module.name = "block.device"
+    module.name = ":driver:block.device"
     module.description = "Block Devices"
 
 def prepare(module, options):

@@ -127,8 +127,7 @@ bprops = {}
 
 # -----------------------------------------------------------------------------
 def init(module):
-    module.name = "gpio"
-    module.parent = "platform"
+    module.name = ":platform:gpio"
     module.description = "General Purpose I/O (GPIO)"
 
 def prepare(module, options):

@@ -11,8 +11,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = "gpio.common"
-    module.parent = "platform"
+    module.name = ":platform:gpio.common"
     module.description = "GPIO Common"
 
 def prepare(module, options):

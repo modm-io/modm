@@ -14,8 +14,7 @@
 from collections import defaultdict
 
 def init(module):
-    module.parent = "cmsis"
-    module.name = "dsp"
+    module.name = ":cmsis:dsp"
     module.description = FileReader("dsp.md")
 
 def prepare(module, options):

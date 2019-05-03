@@ -39,8 +39,7 @@ class Instance(Module):
 
 
 def init(module):
-    module.name = "comp"
-    module.parent = "platform"
+    module.name = ":platform:comp"
     module.description = "Comparator (COMP)"
 
 def prepare(module, options):

@@ -11,8 +11,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.parent = "math"
-    module.name = "saturated"
+    module.name = ":math:saturated"
     module.description = "Saturated Arithmetics"
 
 def prepare(module, options):

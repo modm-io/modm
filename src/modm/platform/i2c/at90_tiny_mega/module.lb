@@ -12,8 +12,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = "i2c"
-    module.parent = "platform"
+    module.name = ":platform:i2c"
     module.description = "Inter-Integrated Circuit (I²C)"
 
 def prepare(module, options):

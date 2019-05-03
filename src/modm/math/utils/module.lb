@@ -11,8 +11,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.parent = "math"
-    module.name = "utils"
+    module.name = ":math:utils"
     module.description = "Utilities"
 
 def prepare(module, options):

@@ -12,8 +12,7 @@
 
 
 def init(module):
-    module.parent = "driver"
-    module.name = "pca9535"
+    module.name = ":driver:pca9535"
     module.description = """\
 # PCA9535 16-Bit I/O Expander
 

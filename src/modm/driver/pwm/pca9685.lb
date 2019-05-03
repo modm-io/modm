@@ -12,8 +12,7 @@
 
 
 def init(module):
-    module.parent = "driver"
-    module.name = "pca9685"
+    module.name = ":driver:pca9685"
     module.description = """\
 # PCA9685 12-bit PWM Driver
 

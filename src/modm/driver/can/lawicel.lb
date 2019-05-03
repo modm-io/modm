@@ -12,8 +12,7 @@
 
 
 def init(module):
-    module.parent = "driver"
-    module.name = "lawicel"
+    module.name = ":driver:lawicel"
     module.description = """\
 # Lawicel Format Converter
 

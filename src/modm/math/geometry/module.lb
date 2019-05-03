@@ -11,8 +11,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.parent = "math"
-    module.name = "geometry"
+    module.name = ":math:geometry"
     module.description = "Geometric Operations"
 
 def prepare(module, options):

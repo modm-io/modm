@@ -12,8 +12,7 @@
 
 
 def init(module):
-    module.parent = "driver"
-    module.name = "lis3.transport"
+    module.name = ":driver:lis3.transport"
     module.description = "LIS3xx Transport Layer"
 
 def prepare(module, options):

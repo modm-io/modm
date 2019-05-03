@@ -13,8 +13,7 @@
 
 
 def init(module):
-    module.parent = "driver"
-    module.name = "adc_sampler"
+    module.name = ":driver:adc_sampler"
     module.description = """\
 # Oversampling of ADC inputs
 

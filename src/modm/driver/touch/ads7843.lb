@@ -12,8 +12,7 @@
 
 
 def init(module):
-    module.parent = "driver"
-    module.name = "ads7843"
+    module.name = ":driver:ads7843"
     module.description = """\
 # ADS7843 Resistive Touch Controller
 

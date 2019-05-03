@@ -12,8 +12,7 @@
 
 
 def init(module):
-    module.parent = "driver"
-    module.name = "lm75"
+    module.name = ":driver:lm75"
     module.description = """\
 # LM75 Thermometer
 

@@ -43,8 +43,7 @@ class Instance(Module):
 
 
 def init(module):
-    module.name = "timer"
-    module.parent = "platform"
+    module.name = ":platform:timer"
 
 def prepare(module, options):
     device = options[":target"]

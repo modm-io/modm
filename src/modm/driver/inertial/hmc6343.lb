@@ -12,8 +12,7 @@
 
 
 def init(module):
-    module.parent = "driver"
-    module.name = "hmc6343"
+    module.name = ":driver:hmc6343"
     module.description = """\
 # HMC6343 3-Axis Compass
 

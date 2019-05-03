@@ -12,8 +12,7 @@
 
 
 def init(module):
-    module.parent = "driver"
-    module.name = "ltc2984"
+    module.name = ":driver:ltc2984"
     module.description = """\
 # LTC298x Thermometer
 

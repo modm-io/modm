@@ -125,8 +125,7 @@ class Instance(Module):
 
 
 def init(module):
-    module.name = "can"
-    module.parent = "platform"
+    module.name = ":platform:can"
     module.description = "Controller Area Network (CAN)"
 
 def prepare(module, options):

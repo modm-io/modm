@@ -11,8 +11,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.parent = "ui"
-    module.name = "animation"
+    module.name = ":ui:animation"
     module.description = """\
 # Animators
 

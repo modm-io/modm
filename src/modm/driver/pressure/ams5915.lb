@@ -12,8 +12,7 @@
 
 
 def init(module):
-    module.parent = "driver"
-    module.name = "ams5915"
+    module.name = ":driver:ams5915"
     module.description = """\
 # AMS 5915 Pressure Sensor
 

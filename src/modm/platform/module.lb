@@ -14,7 +14,7 @@
 from os.path import join
 
 def init(module):
-    module.name = "platform"
+    module.name = ":platform"
     module.description = """\
 # Platform HAL
 

@@ -65,8 +65,7 @@ class Instance(Module):
 
 
 def init(module):
-    module.name = "uart"
-    module.parent = "platform"
+    module.name = ":platform:uart"
     module.description = "Universal Asynchronous Receiver Transmitter (UART)"
 
 def prepare(module, options):

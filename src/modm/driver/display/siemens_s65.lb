@@ -12,8 +12,7 @@
 
 
 def init(module):
-    module.parent = "driver"
-    module.name = "siemens_s65"
+    module.name = ":driver:siemens_s65"
     module.description = "Siemens S65 Display"
 
 def prepare(module, options):

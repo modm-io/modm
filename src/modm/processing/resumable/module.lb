@@ -13,8 +13,7 @@
 
 
 def init(module):
-    module.parent = "processing"
-    module.name = "resumable"
+    module.name = ":processing:resumable"
     module.description = FileReader("module.md")
 
 def prepare(module, options):

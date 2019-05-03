@@ -12,8 +12,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = "fsmc"
-    module.parent = "platform"
+    module.name = ":platform:fsmc"
     module.description = "Flexible (Static) Memory Controller (FSMC/FMC)"
 
 def prepare(module, options):

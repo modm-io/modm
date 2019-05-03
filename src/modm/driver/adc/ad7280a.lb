@@ -12,8 +12,7 @@
 
 
 def init(module):
-    module.parent = "driver"
-    module.name = "ad7280a"
+    module.name = ":driver:ad7280a"
     module.description = """\
 # AD7280A Lithium Ion Battery Monitoring System
 

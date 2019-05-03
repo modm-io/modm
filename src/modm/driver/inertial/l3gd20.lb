@@ -12,8 +12,7 @@
 
 
 def init(module):
-    module.parent = "driver"
-    module.name = "l3gd20"
+    module.name = ":driver:l3gd20"
     module.description = """\
 # L3GD20 3-Axis Gyroscope
 

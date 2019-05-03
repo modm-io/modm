@@ -100,8 +100,7 @@ def common_rcc_map(env):
 
 # -----------------------------------------------------------------------------
 def init(module):
-    module.parent = "cmsis"
-    module.name = "device"
+    module.name = ":cmsis:device"
     module.description = FileReader("module.md")
 
 def prepare(module, options):

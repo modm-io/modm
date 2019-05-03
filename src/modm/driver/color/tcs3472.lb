@@ -12,8 +12,7 @@
 
 
 def init(module):
-    module.parent = "driver"
-    module.name = "tcs3472"
+    module.name = ":driver:tcs3472"
     module.description = "TCS3472X Digital Color Sensor"
 
 

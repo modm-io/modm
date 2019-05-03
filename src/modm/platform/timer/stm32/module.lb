@@ -82,8 +82,7 @@ class Instance(Module):
 
 
 def init(module):
-    module.name = "timer"
-    module.parent = "platform"
+    module.name = ":platform:timer"
     module.description = "Timers (TIM)"
 
 def prepare(module, options):

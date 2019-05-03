@@ -12,8 +12,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.parent = "processing"
-    module.name = "timer"
+    module.name = ":processing:timer"
     module.description = FileReader("module.md")
 
 def prepare(module, options):

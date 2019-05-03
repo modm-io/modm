@@ -13,8 +13,7 @@
 
 
 def init(module):
-    module.parent = "driver"
-    module.name = "hd44780"
+    module.name = ":driver:hd44780"
     module.description = "HD44780 Displays"
 
 def prepare(module, options):

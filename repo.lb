@@ -35,7 +35,7 @@ except Exception as e:
     exit(1)
 
 import lbuild
-min_lbuild_version = "1.8.0"
+min_lbuild_version = "1.11.1"
 if StrictVersion(getattr(lbuild, "__version__", "0.1.0")) < StrictVersion(min_lbuild_version):
     print("modm requires at least lbuild v{}, please upgrade!\n"
           "    pip3 install -U lbuild".format(min_lbuild_version))
@@ -190,9 +190,9 @@ def init(repo):
     else:
         def windowsify(path, escape_level):
             return normpath(path)
-    repo.add_filter("windowsify", windowsify)
-    repo.add_filter("ord", lambda letter: ord(letter[0].lower()) - ord("a"))
-    repo.add_filter("chr", lambda num: chr(num + ord("A")))
+    repo.add_filter("modm.windowsify", windowsify)
+    repo.add_filter("modm.ord", lambda letter: ord(letter[0].lower()) - ord("a"))
+    repo.add_filter("modm.chr", lambda num: chr(num + ord("A")))
 
     # Compute the available data from modm-devices
     devices = DevicesCache()

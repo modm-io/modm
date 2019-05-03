@@ -12,8 +12,7 @@
 
 
 def init(module):
-    module.parent = "driver"
-    module.name = "lis3dsh"
+    module.name = ":driver:lis3dsh"
     module.description = """\
 # LIS3DSH 3-Axis Accelerometer
 

@@ -11,8 +11,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = "id"
-    module.parent = "platform"
+    module.name = ":platform:id"
     module.description = "Unique ID"
 
 def prepare(module, options):

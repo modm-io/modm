@@ -12,8 +12,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = "adc"
-    module.parent = "platform"
+    module.name = ":platform:adc"
     module.description = "Analog-to-Digital Converter (ADC)"
 
 def prepare(module, options):

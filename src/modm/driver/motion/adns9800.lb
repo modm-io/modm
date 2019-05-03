@@ -12,8 +12,7 @@
 
 
 def init(module):
-    module.parent = "driver"
-    module.name = "adns9800"
+    module.name = ":driver:adns9800"
     module.description = """\
 # ADNS-9800 Laser Motion Sensor
 

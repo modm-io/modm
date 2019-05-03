@@ -12,8 +12,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.parent = "board"
-    module.name = "blue-pill"
+    module.name = ":board:blue-pill"
     module.description = """\
 # Blue Pill
 

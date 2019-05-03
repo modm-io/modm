@@ -12,8 +12,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.parent = "board"
-    module.name = "disco-f407vg"
+    module.name = ":board:disco-f407vg"
     module.description = """\
 # STM32F4DISCOVERY
 

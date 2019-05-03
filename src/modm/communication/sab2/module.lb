@@ -11,8 +11,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.parent = "communication"
-    module.name = "sab2"
+    module.name = ":communication:sab2"
     description = str(FileReader("../sab/module.md")).replace(
                       "# Sensor Actuator Bus (SAB)",
                       "# Sensor Actuator Bus Version 2 (SAB2)")

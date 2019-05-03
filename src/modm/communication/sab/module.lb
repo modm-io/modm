@@ -11,8 +11,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.parent = "communication"
-    module.name = "sab"
+    module.name = ":communication:sab"
     module.description = FileReader("module.md")
 
 def prepare(module, options):

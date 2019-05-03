@@ -11,8 +11,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = "spi.bitbang"
-    module.parent = "platform"
+    module.name = ":platform:spi.bitbang"
     module.description = "Software Serial Peripheral Interface (SPI)"
 
 def prepare(module, options):

@@ -11,8 +11,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = "i2c.bitbang"
-    module.parent = "platform"
+    module.name = ":platform:i2c.bitbang"
     module.description = "Software Inter-Integrated Circuit (I²C)"
 
 def prepare(module, options):

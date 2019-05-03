@@ -14,8 +14,7 @@
 import os
 
 def init(module):
-    module.parent = "platform"
-    module.name = "systick"
+    module.name = ":platform:systick"
     module.description = "ARM Cortex-M SysTick"
 
 def prepare(module, options):

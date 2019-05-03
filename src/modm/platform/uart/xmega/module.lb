@@ -64,8 +64,7 @@ class Instance(Module):
 
 
 def init(module):
-    module.name = "uart"
-    module.parent = "platform"
+    module.name = ":platform:uart"
 
 def prepare(module, options):
     device = options[":target"]

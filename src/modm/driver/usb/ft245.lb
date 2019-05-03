@@ -10,10 +10,8 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-
 def init(module):
-    module.parent = "driver"
-    module.name = "ft245"
+    module.name = ":driver:ft245"
     module.description = """\
 # FT245 USB FIFO
 

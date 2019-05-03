@@ -77,7 +77,7 @@ def common_memories(env):
     memories = listify(device.get_driver("core")["memory"])
 
     # Convert from string to int and add offsets
-    flash_offset = env.get_option(":platform:cortex-m:linkerscript.flash_offset", 0)
+    flash_offset = env.get(":platform:cortex-m:linkerscript.flash_offset", 0)
     for m in memories:
         if m["name"] == "flash":
             m["start"] = int(m["start"], 0) + flash_offset
@@ -138,8 +138,7 @@ def common_linkerscript(env):
 
 
 def init(module):
-    module.name = "cortex-m"
-    module.parent = "platform"
+    module.name = ":platform:cortex-m"
     module.description = FileReader("module.md")
 
 

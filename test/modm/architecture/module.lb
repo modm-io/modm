@@ -12,8 +12,7 @@
 
 
 def init(module):
-    module.name = "architecture"
-    module.parent = "test"
+    module.name = ":test:architecture"
 
 
 def prepare(module, options):

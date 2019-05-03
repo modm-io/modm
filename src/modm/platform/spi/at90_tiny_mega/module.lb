@@ -53,8 +53,7 @@ class Instance(Module):
         env.template("spi_master.cpp.in", "spi_master{}.cpp".format(self.instance))
 
 def init(module):
-    module.name = "spi"
-    module.parent = "platform"
+    module.name = ":platform:spi"
     module.description = "Serial Peripheral Interface (SPI)"
 
 def prepare(module, options):

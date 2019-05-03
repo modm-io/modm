@@ -11,8 +11,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.parent = "math"
-    module.name = "interpolation"
+    module.name = ":math:interpolation"
     module.description = FileReader("module.md")
 
 def prepare(module, options):

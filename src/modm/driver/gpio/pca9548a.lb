@@ -12,8 +12,7 @@
 
 
 def init(module):
-    module.parent = "driver"
-    module.name = "pca9548a"
+    module.name = ":driver:pca9548a"
     module.description = """\
 PCA9548A/TCA9548A I2C Switch
 

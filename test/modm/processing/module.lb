@@ -12,8 +12,7 @@
 
 
 def init(module):
-    module.name = "processing"
-    module.parent = "test"
+    module.name = ":test:processing"
 
 
 def prepare(module, options):

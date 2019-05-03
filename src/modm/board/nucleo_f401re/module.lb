@@ -12,8 +12,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.parent = "board"
-    module.name = "nucleo-f401re"
+    module.name = ":board:nucleo-f401re"
     module.description = """\
 # NUCLEO-F401RE
 

@@ -15,8 +15,7 @@ import os
 from os.path import join
 
 def init(module):
-    module.parent = "build"
-    module.name = "cmake"
+    module.name = ":build:cmake"
     module.description = FileReader("module.md")
 
 

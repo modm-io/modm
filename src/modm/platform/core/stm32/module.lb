@@ -11,8 +11,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = "core"
-    module.parent = "platform"
+    module.name = ":platform:core"
     module.description = """\
 # STM32 core module
 

@@ -12,8 +12,7 @@
 
 
 def init(module):
-    module.parent = "driver"
-    module.name = "mcp2515"
+    module.name = ":driver:mcp2515"
     module.description = "MPC2515 External CAN Controller"
 
 
