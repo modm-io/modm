@@ -137,8 +137,12 @@ def build(env):
     for flag, values in common_compiler_flags("gcc", env[":target"]).items():
         env.collect(flag, *values)
 
+def post_build(env):
+    if env.buildlog._buildlog._metadata:
+        env.log.error("'env.add_metadata(key, *values)' is not supported anymore!\n\n"
+              "Hint: Use 'env.collect(key, *values)' instead! To discover available\n"
+              "      collectors, use 'lbuild discover --developer -t modm:build'.")
 
-def post_build(env, buildlog):
     target = env[":target"]
     gitignore = [env.relative_outpath(ignore, "modm") for ignore in
                  env.collector_values("gitignore", filterfunc=lambda s: s.repository == "modm")]
