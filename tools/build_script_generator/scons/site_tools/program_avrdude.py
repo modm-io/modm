@@ -23,7 +23,7 @@ def avrdude_flash(env, source, eeprom_source="", alias="avrdude_program"):
 		#
 		# To avoid this problem we try to use relative path names if
 		# possible.
-		def relpath(path):
+		def relpath(filename):
 			if os.path.isabs(filename):
 				filename = os.path.relpath(filename)
 			return filename.replace("\\", "/")
