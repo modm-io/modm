@@ -15,7 +15,7 @@ from SCons.Script import *
 
 # -----------------------------------------------------------------------------
 def avrdude_flash(env, source, eeprom_source="", alias="avrdude_program"):
-	actionString = "$AVRDUDE -V -p $CONFIG_AVRDUDE_DEVICE -c $CONFIG_AVRDUDE_PROGRAMMER -P $CONFIG_AVRDUDE_PORT $CONFIG_AVRDUDE_OPTIONS -U flash:w:"
+	actionString = "$AVRDUDE -V -p $CONFIG_AVRDUDE_DEVICE -c $CONFIG_AVRDUDE_PROGRAMMER $CONFIG_AVRDUDE_OPTIONS -U flash:w:"
 	if platform.system() == "Windows":
 		# avrdude on Windows has problems with absolute path names.
 		# The leading drive letter plus colon backslash (e.g. "c:\path")
@@ -38,6 +38,10 @@ def avrdude_flash(env, source, eeprom_source="", alias="avrdude_program"):
 
 	if (len(eeprom_source)):
 		actionString += " -U eeprom:w:" + eeprom_source
+
+	if env.get("CONFIG_AVRDUDE_PORT", False):
+		actionString += " -P $CONFIG_AVRDUDE_PORT"
+
 	if env.get("CONFIG_AVRDUDE_BAUDRATE", False):
 		actionString += " -b $CONFIG_AVRDUDE_BAUDRATE"
 
@@ -46,7 +50,10 @@ def avrdude_flash(env, source, eeprom_source="", alias="avrdude_program"):
 
 def avrdude_fuse(env, alias="avrdude_fuse"):
 	fusebits = ["-U {}:w:0x{:02x}:m".format(key, int(value, 0)) for key, value in env["CONFIG_AVR_FUSEBITS"].items()]
-	actionString = "$AVRDUDE -p $AVRDUDE_DEVICE -c $CONFIG_AVRDUDE_PROGRAMMER -P $CONFIG_AVRDUDE_PORT $CONFIG_AVRDUDE_OPTIONS -u {}".format(" ".join(fusebits))
+	actionString = "$AVRDUDE -p $AVRDUDE_DEVICE -c $CONFIG_AVRDUDE_PROGRAMMER $CONFIG_AVRDUDE_OPTIONS -u {}".format(" ".join(fusebits))
+
+	if env.get("CONFIG_AVRDUDE_PORT", False):
+		actionString += " -P $CONFIG_AVRDUDE_PORT"
 
 	if env.get("CONFIG_AVRDUDE_BAUDRATE", False):
 		actionString += " -b $CONFIG_AVRDUDE_BAUDRATE"
