@@ -1,8 +1,8 @@
 %% for path in collector_values["path.openocd"] | sort
-add_script_search_dir {{ path }}
+add_script_search_dir {{ path | modm.windowsify(escape_level=1) }}
 %% endfor
 %% for file in collector_values["openocd.source"] | sort
-source [find {{ file }}]
+source [find {{ file | modm.windowsify(escape_level=1) }}]
 %% endfor
 
 proc modm_program { SOURCE } {
@@ -14,7 +14,7 @@ proc modm_program { SOURCE } {
 
 %% for profile, path in elf_files.items()
 proc program_{{ profile }} {} {
-	modm_program {{ path | modm.windowsify }}
+	modm_program {{ path | modm.windowsify(escape_level=1) }}
 }
 %% endfor
 

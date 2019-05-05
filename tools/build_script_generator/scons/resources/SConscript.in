@@ -122,13 +122,13 @@ env.AppendUnique(CPPPATH=[
 	"/usr/local/include",
 %% endif
 %% for path in include_paths | sort
-    abspath("{{ path | relocate }}"),
+    abspath(r"{{ path | relocate | modm.windowsify(escape_level=0) }}"),
 %% endfor
 ])
 
 files = [
 %% for file, flags in sources if not flags | length
-    env.File("{{ file | relocate }}"),
+    env.File(r"{{ file | relocate | modm.windowsify(escape_level=0) }}"),
 %% endfor
 ]
 %% for file, flags in sources
@@ -139,7 +139,7 @@ flags = { {%- for key, profiles in flags.items() if "" in profiles %}"{{ key | u
 if profile == "{{profile}}": flags["{{ key | upper }}"].extend({{flags}});
         %% endfor
     %% endfor
-files.append(env.Object("{{ file | relocate }}", **flags))
+files.append(env.Object(r"{{ file | relocate | modm.windowsify(escape_level=0) }}", **flags))
     %% endif
 %% endfor
 
@@ -157,7 +157,7 @@ env.AppendUnique(LIBPATH=[
 %% endif
     abspath(str(library[0].get_dir())),
 %% for library in library_paths | sort
-    abspath("{{ library | relocate }}"),
+    abspath(r"{{ library | relocate | modm.windowsify(escape_level=0) }}"),
 %% endfor
 ])
 %% if packages | length

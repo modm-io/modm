@@ -1,7 +1,7 @@
 %% for profile, path in elf_files.items()
 define file_{{profile}}
     file
-    file {{ path | modm.windowsify }}
+    file {{ path | modm.windowsify(escape_level=1) }}
 end
 %% endfor
 

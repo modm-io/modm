@@ -20,6 +20,7 @@ import platform
 from pathlib import Path
 from distutils.version import StrictVersion
 from git import Repo
+from os.path import normpath
 
 sys.path.append(repopath("ext/modm-devices/tools/device"))
 try:
@@ -181,10 +182,14 @@ def init(repo):
         repo.add_configuration(name, config, description)
 
     # Add Jinja2 filters commonly used in this repository
-    def windowsify(path):
-        if 'Windows' in platform.platform():
-            path = path.replace('/','\\').replace("\\", "\\\\")
-        return path
+    if 'Windows' in platform.platform():
+        def windowsify(path, escape_level):
+            path = normpath(path)
+            escaped = "\\" * (2 ** escape_level)
+            return path.replace("\\", escaped)
+    else:
+        def windowsify(path, escape_level):
+            return normpath(path)
     repo.add_filter("windowsify", windowsify)
     repo.add_filter("ord", lambda letter: ord(letter[0].lower()) - ord("a"))
     repo.add_filter("chr", lambda num: chr(num + ord("A")))
