@@ -12,18 +12,26 @@ from os.path import join, abspath
 
 Import("env")
 profile = ARGUMENTS.get("profile", "release")
-%% if repo == "modm"
+%% if is_modm
 env["BUILDPATH"] = join(env["CONFIG_BUILD_BASE"], profile)
 
 %% if family == "darwin"
 # Using homebrew gcc-8 on macOS
 env["COMPILERSUFFIX"] = "-8"
 %% endif
+%% endif
 
-env.Append(toolpath=[abspath("scons/site_tools"), abspath("ext/dlr/scons-build-tools/site_tools")])
-%% for tool in build_tools | sort
+# SCons tools
+env.Append(toolpath=[
+%% for toolpath in toolpaths | sort
+    abspath(r"{{ toolpath | modm.windowsify(escape_level=0) }}"),
+%% endfor
+])
+%% for tool in tools | sort
 env.Tool("{{tool}}")
 %% endfor
+
+%% if is_modm
 env["BASEPATH"] = abspath(".")
 
 %% if options["info.git"] != "Disabled"
@@ -56,14 +64,14 @@ if profile == "{{ profile }}":
 
 # Toolchain configuration
 {{ generate_flags("cppdefines", True) }}
-{{ generate_flags("ccflags", repo != "modm") }}
-{{ generate_flags("cflags", repo != "modm") }}
-{{ generate_flags("cxxflags", repo != "modm") }}
-{{ generate_flags("asflags", repo != "modm") }}
-{{ generate_flags("linkflags", repo != "modm") }}
-{{ generate_flags("archflags", repo != "modm") }}
+{{ generate_flags("ccflags", not is_modm) }}
+{{ generate_flags("cflags", not is_modm) }}
+{{ generate_flags("cxxflags", not is_modm) }}
+{{ generate_flags("asflags", not is_modm) }}
+{{ generate_flags("linkflags", not is_modm) }}
+{{ generate_flags("archflags", not is_modm) }}
 
-%% if repo == "modm"
+%% if is_modm
 # ARCHFLAGS must be known for compiling *and* linking
 env.Append(CCFLAGS="$ARCHFLAGS")
 env.Append(ASFLAGS="$ARCHFLAGS")
