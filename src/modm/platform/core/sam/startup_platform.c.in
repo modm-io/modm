@@ -1,0 +1,53 @@
+/*
+ * Copyright (c) 2019, Ethan Slattery
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#include "../device.hpp"
+
+/**
+ * This code should _only_ enable internal memories and nothing else.
+ * Since this is the first code executed after a reset, you do not
+ * have access to _any_ data stored in RAM, since it has not yet been
+ * initialized.
+ * In the worst case you won't even have access to the stack, if the
+ * memory containing the stack is not physically enabled yet.
+ * In that case, consider using inline assembly to manage stack access
+ * manually, until the memory is enabled.
+ */
+void
+__modm_initialize_platform(void)
+{
+%% if target.family == "d"
+%% if target.series == "21"
+
+	// Overwriting the default value of the NVMCTRL.CTRLB.MANW bit (errata reference 13134)
+	NVMCTRL->CTRLB.bit.MANW = 1;
+
+	// Change default QOS values to have the best performance and correct USB behaviour
+	SBMATRIX->SFR[SBMATRIX_SLAVE_HMCRAMC0].reg = 2;
+
+#ifdef USB
+	USB->DEVICE.QOSCTRL.bit.CQOS = 2;
+	USB->DEVICE.QOSCTRL.bit.DQOS = 2;
+#endif
+
+	DMAC->QOSCTRL.bit.DQOS = 2;
+	DMAC->QOSCTRL.bit.FQOS = 2;
+	DMAC->QOSCTRL.bit.WRBQOS = 2;
+
+%% elif target.series == "21"
+%% endif
+
+%% elif target.family == "l"
+%% if target.series == "21"
+%% endif
+%% endif
+
+}
