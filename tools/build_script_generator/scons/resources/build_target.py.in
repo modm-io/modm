@@ -24,16 +24,16 @@ def build_target(env, sources):
 	env.Alias("run", env.Run(program))
 	env.Alias("all", ["build", "run"])
 %% else
-    %% if platform in ["stm32"]
+    %% if core.startswith("cortex-m")
 	env.Alias("size", env.Size(program))
 	env.Alias("program", env.OpenOcd(program, commands=["modm_program $SOURCE"]))
 	env.Alias("bmp", env.BlackMagicProbe(program))
 	env.Alias("gdb", env.OpenOcdGdb(program))
-    %% elif platform in ["avr"]
+    %% elif core.startswith("avr")
 	env.Alias("program", env.Avrdude(program))
     %% endif
 
-	%% if platform in ["stm32"]
+	%% if core.startswith("cortex-m")
 	env.Alias("all", ["build", "size"])
 	%% else
 	env.Alias("all", ["build"])
