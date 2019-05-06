@@ -1,0 +1,15 @@
+<library>
+  <repositories>
+    <repository>
+      <path>../../../../repo.lb</path>
+    </repository>
+  </repositories>
+
+  <options>
+    <option name="modm:target">samd21g18a-uu</option>
+    <option name="modm:platform:cortex-m:linkerscript.flash_offset">0x2000</option>
+  </options>
+  <modules>
+    <module>modm:board:samd21-mini</module>
+  </modules>
+</library>
