@@ -13,7 +13,7 @@
 
 def get_properties(env):
     device = env[":target"]
-    driver = device.get_driver("uart")
+    driver = device.get_driver("usart:avr")
     properties = device.properties
     properties["target"] = device.identifier
     properties["driver"] = driver
@@ -84,12 +84,12 @@ def prepare(module, options):
         ":architecture:uart",
         ":platform:gpio")
 
-    driver = device.get_driver("usart")
+    driver = device.get_driver("usart:avr")
     if "instance" in driver:
         for instance in listify(driver["instance"]):
             module.add_submodule(Instance(int(instance)))
     else:
-        return False
+        load_options(module)
 
     return True
 
@@ -97,7 +97,15 @@ def build(env):
     properties = get_properties(env)
     driver = properties["driver"]
 
+    if "instance" not in driver:
+        properties["id"] = ""
+
     env.substitutions = properties
     env.outbasepath = "modm/src/modm/platform/uart"
 
     env.template("uart_defines.h")
+
+    if "instance" not in driver:
+        env.template("uart.hpp.in")
+        env.template("uart_tx.cpp.in")
+        env.template("uart_rx.cpp.in")
