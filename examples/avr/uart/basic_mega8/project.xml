@@ -1,0 +1,14 @@
+<library>
+  <options>
+    <option name="modm:target">atmega8</option>
+    <option name="modm:platform:clock:f_cpu">1000000</option>
+    <option name="modm:build:build.path">../../../../build/avr/uart/basic_mega8</option>
+  </options>
+  <modules>
+    <module>modm:platform:clock</module>
+    <module>modm:platform:core</module>
+    <module>modm:platform:gpio</module>
+    <module>modm:platform:uart</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>
