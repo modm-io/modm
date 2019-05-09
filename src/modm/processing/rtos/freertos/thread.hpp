@@ -42,9 +42,9 @@
  * \ingroup	modm_processing_rtos
  */
 #define	TIME_LOOP(frequency)										\
-		for(portTickType lastTime = xTaskGetTickCount() ;			\
+		for(TickType_t lastTime = xTaskGetTickCount() ;			\
 			vTaskDelayUntil(&lastTime,								\
-					static_cast<portTickType>(frequency)), true ;	\
+					static_cast<TickType_t>(frequency)), true ;	\
 			)
 
 /**
@@ -61,7 +61,7 @@
  *
  * For non constant value use the following formula:
  * \code
- * static_cast<portTickType>((time * configTICK_RATE_HZ) / 1000)
+ * static_cast<TickType_t>((time * configTICK_RATE_HZ) / 1000)
  * \endcode
  * The parentheses are important because otherwise the division might be done
  * first which will lead to wrong results.
@@ -124,7 +124,7 @@ namespace modm
 			 */
 			Thread(uint32_t priority = 0,
 					uint16_t stackDepth = minimalStackSize,
-					const char* name = NULL);
+					const char* name = nullptr);
 
 			/// Delete the thread
 			virtual ~Thread();
@@ -182,7 +182,7 @@ namespace modm
 			 * \see		MILLISECONDS
 			 */
 			static inline void
-			sleep(portTickType ticks)
+			sleep(TickType_t ticks)
 			{
 				vTaskDelay(ticks);
 			}
@@ -220,7 +220,7 @@ namespace modm
 			Thread&
 			operator = (const Thread& other);
 
-			xTaskHandle handle;
+			TaskHandle_t handle;
 		};
 	}
 }

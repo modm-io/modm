@@ -22,7 +22,7 @@ modm::rtos::SemaphoreBase::~SemaphoreBase()
 
 // ----------------------------------------------------------------------------
 bool
-modm::rtos::SemaphoreBase::acquire(portTickType timeout)
+modm::rtos::SemaphoreBase::acquire(TickType_t timeout)
 {
 
 	return (xSemaphoreTake(this->handle, timeout) == pdTRUE);

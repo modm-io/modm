@@ -27,25 +27,25 @@ modm::rtos::QueueBase::~QueueBase()
 
 // ----------------------------------------------------------------------------
 bool
-modm::rtos::QueueBase::append(const void *item, portTickType timeout)
+modm::rtos::QueueBase::append(const void *item, TickType_t timeout)
 {
 	return (xQueueSendToBack(this->handle, item, timeout) == pdTRUE);
 }
 
 bool
-modm::rtos::QueueBase::prepend(const void *item, portTickType timeout)
+modm::rtos::QueueBase::prepend(const void *item, TickType_t timeout)
 {
 	return (xQueueSendToFront(this->handle, item, timeout) == pdTRUE);
 }
 
 bool
-modm::rtos::QueueBase::peek(void *item, portTickType timeout) const
+modm::rtos::QueueBase::peek(void *item, TickType_t timeout) const
 {
 	return (xQueuePeek(this->handle, item, timeout) == pdTRUE);
 }
 
 bool
-modm::rtos::QueueBase::get(void *item, portTickType timeout)
+modm::rtos::QueueBase::get(void *item, TickType_t timeout)
 {
 	return (xQueueReceive(this->handle, item, timeout) == pdTRUE);
 }

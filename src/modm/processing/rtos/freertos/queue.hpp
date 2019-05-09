@@ -55,16 +55,16 @@ namespace modm
 			 * routine. Use appendFromInterrupt() for this purpose.
 			 */
 			bool
-			append(const void *item, portTickType timeout = portMAX_DELAY);
+			append(const void *item, TickType_t timeout = portMAX_DELAY);
 
 			bool
-			prepend(const void *item, portTickType timeout = portMAX_DELAY);
+			prepend(const void *item, TickType_t timeout = portMAX_DELAY);
 
 			bool
-			peek(void *item, portTickType timeout = portMAX_DELAY) const;
+			peek(void *item, TickType_t timeout = portMAX_DELAY) const;
 
 			bool
-			get(void *item, portTickType timeout = portMAX_DELAY);
+			get(void *item, TickType_t timeout = portMAX_DELAY);
 
 			bool
 			appendFromInterrupt(const void *item);
@@ -76,7 +76,7 @@ namespace modm
 			getFromInterrupt(void *item);
 
 		protected:
-			xQueueHandle handle;
+			QueueHandle_t handle;
 
 		private:
 			// disable copy constructor
@@ -105,25 +105,25 @@ namespace modm
 			using QueueBase::getSize;
 
 			inline bool
-			append(const T& item, portTickType timeout = portMAX_DELAY)
+			append(const T& item, TickType_t timeout = portMAX_DELAY)
 			{
 				return QueueBase::append(&item, timeout);
 			}
 
 			inline bool
-			prepend(const T& item, portTickType timeout = portMAX_DELAY)
+			prepend(const T& item, TickType_t timeout = portMAX_DELAY)
 			{
 				return QueueBase::prepend(&item, timeout);
 			}
 
 			inline bool
-			peek(T& item, portTickType timeout = portMAX_DELAY)
+			peek(T& item, TickType_t timeout = portMAX_DELAY)
 			{
 				return QueueBase::peek(&item, timeout);
 			}
 
 			inline bool
-			get(T& item, portTickType timeout = portMAX_DELAY)
+			get(T& item, TickType_t timeout = portMAX_DELAY)
 			{
 				return QueueBase::get(&item, timeout);
 			}

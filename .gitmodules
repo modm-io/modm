@@ -19,3 +19,6 @@
 [submodule "ext/mpaland/printf"]
 	path = ext/mpaland/printf
 	url = https://github.com/modm-ext/printf.git
+[submodule "ext/aws/freertos"]
+	path = ext/aws/freertos
+	url = https://github.com/modm-ext/freertos-partial.git
