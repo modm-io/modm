@@ -94,7 +94,7 @@ make gdb
 
 ## Interesting Examples
 
-We have a lot of examples, <!--examplecount-->171<!--/examplecount--> to be
+We have a lot of examples, <!--examplecount-->175<!--/examplecount--> to be
 exact, but here are some of our favorite examples for our supported development
 boards:
 

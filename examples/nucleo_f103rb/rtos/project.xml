@@ -1,0 +1,10 @@
+<library>
+  <extends>modm:nucleo-f103rb</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_f103rb/rtos</option>
+  </options>
+  <modules>
+    <module>modm:processing:rtos</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>
