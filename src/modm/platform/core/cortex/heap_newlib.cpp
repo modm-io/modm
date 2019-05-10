@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Niklas Hauser
+ * Copyright (c) 2016, 2019 Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -15,17 +15,20 @@
 #include <reent.h>
 #include <errno.h>
 #include <modm/architecture/interface/assert.h>
+#include "heap_table.hpp"
 
 // ----------------------------------------------------------------------------
-extern void modm_heap_table_find_largest(const uint32_t, uint32_t **, uint32_t **);
+extern "C"
+{
 
-uint8_t *__brkval = 0;
-uint8_t *heap_end = 0;
+const uint8_t *__brkval = 0;
+const uint8_t *heap_end = 0;
 
 void __modm_initialize_memory(void)
 {
 	// find the largest heap that is DMA-able and S-Bus accessible
-	modm_heap_table_find_largest(0x9, (uint32_t **) &__brkval, (uint32_t **) &heap_end);
+	modm::platform::HeapTable::find_largest(
+		(const uint32_t **) &__brkval, (const uint32_t **) &heap_end);
 	modm_assert(__brkval, "core", "heap", "init");
 }
 
@@ -47,13 +50,13 @@ _sbrk_r(struct _reent *r,  ptrdiff_t size)
 {
 	(void) r;
 	// move heap pointer
-	uint8_t *heap = __brkval;
+	const uint8_t *heap = __brkval;
 	__brkval += size;
 
 	modm_assert(__brkval < heap_end, "core", "heap", "sbrk", size);
 
 	//  Return pointer to start of new heap area.
-	return heap;
+	return (void*)heap;
 }
 void *__real__malloc_r(struct _reent *r, size_t size);
 void *__wrap__malloc_r(struct _reent *r, size_t size) {
@@ -83,4 +86,6 @@ void *malloc_tr(size_t size, uint32_t traits)
 {
 	(void) traits;
 	return malloc(size);
+}
+
 }

@@ -15,6 +15,7 @@
 #include <reent.h>
 #include <errno.h>
 #include <modm/architecture/interface/assert.h>
+#include "heap_table.hpp"
 
 // ----------------------------------------------------------------------------
 #include <tlsf/tlsf.h>
@@ -25,52 +26,45 @@
 
 typedef struct
 {
-	uint32_t traits;
+	uint16_t traits;
 	tlsf_t tlsf;
-	uint32_t * end;
+	const uint32_t* end;
 } mem_pool_t;
 
 static mem_pool_t mem_pools[MODM_TLSF_MAX_MEM_POOL_COUNT];
 
-
-extern uint32_t __table_heap_start[];
-extern uint32_t __table_heap_end[];
+extern "C"
+{
 
 void
 __modm_initialize_memory(void)
 {
-	typedef struct
-	{
-		uint32_t traits;
-		uint32_t * start;
-		uint32_t * end;
-	} modm_packed table_pool_t;
-
-	uint32_t current_traits = 0;
+	uint16_t current_traits = 0;
 	mem_pool_t *current_pool = mem_pools;
 
 	// iterate over the entire table but not longer than mem_pools
-	for (table_pool_t *table = (table_pool_t *)__table_heap_start;
-		 (table < (table_pool_t *)__table_heap_end) && (current_pool < (mem_pools + MODM_TLSF_MAX_MEM_POOL_COUNT));
-		 table++)
+	for (const auto [ttraits, tstart, tend, tsize] : modm::platform::HeapTable())
 	{
+		if (current_pool >= (mem_pools + MODM_TLSF_MAX_MEM_POOL_COUNT))
+			break;
+
 		// if the pool has a new trait than the previous one, or
 		// if the pool has the same trait, but is non-continous
-		if ((table->traits != current_traits) || (table->start != (current_pool - 1)->end))
+		if ((ttraits.value != current_traits) || (tstart != (current_pool - 1)->end))
 		{
-			// create a new allocator in this pool with these new traits.
-			current_traits = table->traits;
-			current_pool->traits = current_traits;
-			current_pool->tlsf = tlsf_create_with_pool(table->start, (size_t) table->end - (size_t) table->start);
-			current_pool->end = table->end;
+			if (tlsf_t pool = tlsf_create_with_pool((void*)tstart, tsize); pool) {
+				// create a new allocator in this pool with these new traits.
+				current_traits = ttraits.value;
+				current_pool->traits = current_traits;
+				current_pool->tlsf = pool;
+				current_pool->end = tend;
 
-			current_pool++;
+				current_pool++;
+			}
 		}
-		else
-		{
-			// otherwise add this pool to the existing allocator
-			tlsf_add_pool((current_pool - 1)->tlsf, table->start, (size_t) table->end - (size_t) table->start);
-			(current_pool - 1)->end = table->end;
+		// otherwise add this pool to the existing allocator
+		else if (tlsf_add_pool((current_pool - 1)->tlsf, (void*)tstart, tsize)) {
+			(current_pool - 1)->end = tend;
 		}
 	}
 }
@@ -166,4 +160,6 @@ _sbrk_r(struct _reent *r,  ptrdiff_t size)
 	(void) r;
 	(void) size;
 	return NULL;
+}
+
 }
