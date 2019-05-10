@@ -39,7 +39,8 @@ modm_abandon(const char *,
 %% endif
 
 	Board::Leds::setOutput();
-	while(1) {
+	for(int times=10; times>=0; times--)
+	{
 		Board::Leds::write(1);
 		modm::delayMilliseconds(20);
 		Board::Leds::write(0);
