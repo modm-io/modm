@@ -88,6 +88,14 @@ public:
 		return *this;
 	}
 
+	inline IOStream&
+	endl()
+	{
+		mode = Mode::Ascii;
+		device->write('\n');
+		return *this;
+	}
+
 	/// set the output mode to binary style for integer types
 	inline IOStream&
 	bin()
@@ -269,10 +277,10 @@ inline IOStream&
 flush(IOStream& ios)
 { return ios.flush(); }
 
-//// Write a newline and flush the stream.
+//// Write a newline. **DOES NOT FLUSH THE STREAM!**
 inline IOStream&
 endl(IOStream& ios)
-{ return flush(ios.write('\n')); }
+{ return ios.endl(); }
 
 /// set the output mode to binary style
 inline IOStream&

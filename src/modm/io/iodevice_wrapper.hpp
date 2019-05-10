@@ -40,62 +40,29 @@ template< class Device, IOBuffer behavior >
 class IODeviceWrapper : public IODevice
 {
 public:
-	/**
-	 * Constructor
-	 *
-	 * @param	device	configured object
-	 */
-	IODeviceWrapper(const Device& /*device*/)
-	{
-	}
-	IODeviceWrapper()
-	{
-	}
+	IODeviceWrapper(const Device&) {}
+	IODeviceWrapper() = default;
+	using IODevice::write;
 
-	virtual void
-	write(char c)
+	void
+	write(char c) override
 	{
-		// this branch will be optimized away, since `behavior` is a template argument
-		if (behavior == IOBuffer::DiscardIfFull)
-		{
+		if constexpr (behavior == IOBuffer::DiscardIfFull) {
 			Device::write(static_cast<uint8_t>(c));
 		}
-		else
-		{
-			while( !Device::write(static_cast<uint8_t>(c)) )
-				;
+		else {
+			while(not Device::write(static_cast<uint8_t>(c))) ;
 		}
 	}
 
-	virtual void
-	write(const char *s)
+	void
+	flush() override
 	{
-		// this branch will be optimized away, since `behavior` is a template argument
-		if (behavior == IOBuffer::DiscardIfFull)
-		{
-			while (*s)
-			{
-				Device::write(static_cast<uint8_t>(*s));
-				s++;
-			}
-		}
-		else
-		{
-			while (*s) {
-				while( !Device::write(static_cast<uint8_t>(*s)) )
-					;
-				s++;
-			}
-		}
+		Device::flushWriteBuffer();
 	}
 
-	virtual void
-	flush()
-	{
-	}
-
-	virtual bool
-	read(char& c)
+	bool
+	read(char& c) override
 	{
 		return Device::read(reinterpret_cast<uint8_t&>(c));
 	}

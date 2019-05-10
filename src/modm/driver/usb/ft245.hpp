@@ -46,6 +46,9 @@ namespace modm
 		static void
 		write(const uint8_t *buffer, uint8_t nbyte);
 
+		static void
+		flushWriteBuffer() {};
+
 		/**
 		 * Read a single byte from the FIFO
 		 *
