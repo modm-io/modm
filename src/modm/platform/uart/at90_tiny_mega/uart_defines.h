@@ -85,12 +85,19 @@
 #	define USART0_TX_vect		USART_TX_vect
 #endif
 
-// ATMega162 is crazy about USART0/1 RX and TX which have an extra 'C' for 'complete'
+// ATmega16, ATmega162, ATmega32, ATmega323 and ATmega8 USART interrupts have
+// an extra 'C' for 'complete'
+#if defined(USART_RXC_vect) and not defined(USART_RX_vect)
+#	define USART_RX_vect		USART_RXC_vect
+#endif
 #if defined(USART0_RXC_vect) and not defined(USART0_RX_vect)
 #	define USART0_RX_vect		USART0_RXC_vect
 #endif
 #if defined(USART1_RXC_vect) and not defined(USART1_RX_vect)
 #	define USART1_RX_vect		USART1_RXC_vect
+#endif
+#if defined(USART_TXC_vect) and not defined(USART_TX_vect)
+#	define USART_TX_vect		USART_TXC_vect
 #endif
 #if defined(USART0_TXC_vect) and not defined(USART0_TX_vect)
 #	define USART0_TX_vect		USART0_TXC_vect
