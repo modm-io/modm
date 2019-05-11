@@ -13,6 +13,9 @@ SECTIONS
 {{ linker.section("ITCM AT >FLASH", "fastcode") }}
 
 {{ linker.section_heap("ITCM", "heap4") }}
+%% if with_crashcatcher
+	g_crashCatcherStack = . - 500;
+%% endif
 
 {{ linker.section_stack("DTCM") }}
 

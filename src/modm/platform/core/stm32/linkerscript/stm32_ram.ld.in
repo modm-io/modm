@@ -31,6 +31,9 @@ SECTIONS
 %% if "sram2" in regions
 {{ linker.section_heap("SRAM2", "heap2") }}
 %% endif
+%% if with_crashcatcher
+	g_crashCatcherStack = . - 500;
+%% endif
 
 {{ linkerscript_sections | indent(first=True) }}
 

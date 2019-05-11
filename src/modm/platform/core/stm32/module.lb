@@ -36,6 +36,7 @@ def build(env):
 def post_build(env):
     properties = env.query("::cortex-m:linkerscript")
     target = env[":target"].identifier
+    properties["with_crashcatcher"] = env.has_module(":crashcatcher")
 
     if target.family in ["l4"]: # FIXME!
         properties["regions"].remove("sram2")

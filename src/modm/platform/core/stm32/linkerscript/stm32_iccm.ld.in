@@ -15,6 +15,9 @@ SECTIONS
 {{ linker.section("CCM AT >FLASH", "fastdata") }}
 
 {{ linker.section_heap("CCM", "heap4") }}
+%% if with_crashcatcher
+	g_crashCatcherStack = . - 500;
+%% endif
 
 {{ linker.section_rom("FLASH") }}
 
