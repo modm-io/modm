@@ -72,6 +72,9 @@ def build(env):
     env.substitutions["upload_with_artifact"] = env.has_module(":crashcatcher")
     env.outbasepath = "modm/scons/site_tools"
     env.template("resources/build_target.py.in", "build_target.py")
+    if env.has_module(":crashcatcher"):
+        env.outbasepath = "modm/ext/crashcatcher"
+        env.copy(repopath("ext/adamgreen/crashcatcher/CrashDebug/bins/"), "bins/")
 
     def flag_format(flag):
         subs = {
@@ -118,7 +121,7 @@ def build(env):
     device = env.query("::device")
     if device["core"].startswith("cortex-m"):
         tools.update({"compiler_arm_none_eabi_gcc", "program_openocd",
-                      "black_magic_probe", "utils_buildsize"})
+                      "black_magic_probe", "utils_buildsize", "postmortem_gdb"})
     elif device["core"].startswith("avr"):
         tools.update({"compiler_avr_gcc", "program_avrdude"})
     else: # hosted

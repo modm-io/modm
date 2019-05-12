@@ -39,6 +39,7 @@ def build_target(env, sources):
 	env.Alias("bmp", env.BlackMagicProbe(program))
 	%% endif
 	env.Alias("gdb", env.OpenOcdGdb(program))
+	env.Alias("postmortem", env.PostMortemGdb(program))
     %% elif core.startswith("avr")
 	env.Alias("program", env.Avrdude(program))
     %% endif

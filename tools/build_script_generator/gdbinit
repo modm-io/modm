@@ -1,0 +1,6 @@
+layout split
+focus cmd
+set print pretty
+set print asm-demangle on
+set mem inaccessible-by-default off
+refresh

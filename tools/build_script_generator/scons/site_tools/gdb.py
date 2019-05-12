@@ -23,7 +23,7 @@ def run_openocd_gdb(target, source, env):
 	openocd = subprocess.Popen("openocd {} -c \"log_output /dev/null\"".format(config),
 	                           cwd=os.getcwd(), shell=True, preexec_fn=os.setsid)
 	# This call is blocking
-	config = env.get("MODM_GDBINIT", [])
+	config = env.get("MODM_GDBINIT", []) + env.get("MODM_OPENOCD_GDBINIT", [])
 	config = " ".join(map("-x \"{}\"".format, map(env.subst, config)))
 	subprocess.call("arm-none-eabi-gdb {} {}".format(config, source[0]),
 	                cwd=os.getcwd(), shell=True)

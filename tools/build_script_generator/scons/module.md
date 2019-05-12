@@ -75,7 +75,7 @@ Linking········ build/release/game_of_life.elf
 #### scons size
 
 Displays the static Flash and RAM consumption of your target.
-(\* *only STM32 targets*)
+(\* *only Cortex-M targets*)
 
 Example for a STM32 target with 16MB external heap:
 
@@ -101,7 +101,7 @@ Heap:     16.4 MiB
 Writes the executable onto your target via Avrdude or OpenOCD.
 This is a convenience wrapper around the programming options and methods
 defined in the `modm:build` module.
-(\* *only AVR and STM32 targets*)
+(\* *only AVR and Cortex-M targets*)
 
 Example for a STM32 target:
 
@@ -140,7 +140,7 @@ Executes your project on your computer.
 
 Launches OpenOCD in the background, then launches GDB in foreground with the
 correct executable. When GDB exits, it stops the OpenOCD process.
-(\* *only STM32 targets*)
+(\* *only Cortex-M targets*)
 
 This is just a convenience wrapper for the debug functionality defined in the
 `modm:build` module.
@@ -153,6 +153,16 @@ This is just a convenience wrapper for the debug functionality defined in the
     compiled with the release profile, since that's the default.
     First try to `scons gdb profile=release`, and if that doesn't help, compile
     and `scons program profile=debug` and try `scons gdb profile=debug` again.
+
+
+#### scons postmortem
+
+Launches GDB for post-mortem debugging with the firmware identified by the
+`firmware={hash}` argument using the data from the `coredump={filepath}`
+argument.
+(\* *only Cortex-M targets*)
+
+See the `:platform:fault` module for details how to receive the coredump data.
 
 
 #### scons symbols

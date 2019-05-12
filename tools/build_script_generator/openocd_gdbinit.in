@@ -1,22 +1,16 @@
-%% for profile, path in elf_files.items()
-define file_{{profile}}
-    file
-    file {{ path | modm.windowsify(escape_level=1) }}
-end
-%% endfor
-
-layout split
-focus cmd
-set print pretty
-set print asm-demangle on
-set mem inaccessible-by-default off
-
 # Doesn't work correctly since Ctrl-C will kill openocd
 # See https://github.com/RIOT-OS/RIOT/pull/3619
 # Launch with `openocd -f openocd.cfg & arm-none-eabi-gdb; kill $!` in shell instead
 # target extended-remote | openocd -f openocd.cfg -c "gdb_port pipe"
 
 target extended-remote :3333
+
+%% for profile, path in elf_files.items()
+define file_{{profile}}
+    file
+    file {{ path | modm.windowsify(escape_level=1) }}
+end
+%% endfor
 
 define restart
   mon reset halt
