@@ -63,6 +63,16 @@ def build(env):
         env.collect(":build:gitignore", "modm/src/info_build.c")
         env.copy("resources/info_build.h", "info_build.h")
 
+    env.outbasepath = "modm/"
+    # Copy the scons-build-tools
+    env.copy(repopath("ext/dlr/scons-build-tools"), "ext/dlr/scons-build-tools")
+    env.copy("site_tools", "scons/site_tools")
+    # Generate the env.BuildTarget tool
+    env.substitutions = env.query("::device")
+    env.substitutions["upload_with_artifact"] = env.has_module(":crashcatcher")
+    env.outbasepath = "modm/scons/site_tools"
+    env.template("resources/build_target.py.in", "build_target.py")
+
     def flag_format(flag):
         subs = {
             "target_base": "\"${TARGET.base}\"",
@@ -94,6 +104,7 @@ def build(env):
         "qtcreator",
         "gdb",
         "build_target",
+        "artifact",
     }
     if has_xpcc_generator:
         tools.add("xpcc_generator")
@@ -217,14 +228,6 @@ def post_build(env):
         env.template("resources/SConscript.in", "SConscript",
                      filters={"flags_format": flags_format,
                               "relocate": lambda p: env.relative_outpath(p, repo)})
-
-    env.outbasepath = "modm"
-    # Copy the scons-build-tools
-    env.copy(repopath("ext/dlr/scons-build-tools"), "ext/dlr/scons-build-tools")
-    env.copy("site_tools", "scons/site_tools")
-    # Generate the env.BuildTarget tool
-    env.outbasepath = "modm/scons/site_tools"
-    env.template("resources/build_target.py.in", "build_target.py")
 
     # these are the ONLY files that are allowed to NOT be namespaced with modm!
     env.outbasepath = "."

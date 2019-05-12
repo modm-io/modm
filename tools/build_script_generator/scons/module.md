@@ -217,6 +217,17 @@ Binary File···· build/release/game_of_life.bin
 ```
 
 
+#### scons artifact
+
+Caches the ELF and binary file of the newest compiled executable identified by
+the hash of the binary file in `{build_path}/artifacts/{hash}.elf`.
+
+```
+ $ scons artifact
+Cache Artifact· build/release/game_of_life.elf
+```
+
+
 #### scons -c
 
 Cleans the build artifacts.
