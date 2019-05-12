@@ -20,7 +20,6 @@ MEMORY
 %% for memory in memories
 	{{ memory.name | upper }} ({{ memory.access }}) : ORIGIN = {{ "0x%08X" % memory.start }}, LENGTH = {{ memory.size }}
 %% endfor
-	RAM (rwx) : ORIGIN = {{ "0x%08X" % ram_origin }}, LENGTH = {{ ram_size }}
 {{ linkerscript_memory | indent(first=True) }}
 }
 

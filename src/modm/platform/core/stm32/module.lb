@@ -55,6 +55,16 @@ def post_build(env):
             # Executable ITCM and DTCM (Tightly-Coupled Memory)
             linkerscript = "idtcm"
 
+    # Add the RAM section for a poor-mans flood filling of all SRAMs
+    ram_origin = min(m["start"] for m in properties["memories"] if "sram" in m["name"]),
+    ram_size, = sum(m["size"] for m in properties["memories"] if "sram" in m["name"]),
+    properties["memories"].append({
+        "name": "ram",
+        "start": ram_origin,
+        "size": ram_size,
+        "access": "rwx",
+    })
+
     env.substitutions = properties
     env.outbasepath = "modm/link"
     env.template("linkerscript/stm32_{}.ld.in".format(linkerscript), "linkerscript.ld")

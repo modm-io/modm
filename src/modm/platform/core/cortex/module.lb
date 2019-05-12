@@ -68,8 +68,6 @@ def common_memories(env):
     Computes memory properties:
       - memories: unfiltered memory regions
       - regions: memory region names
-      - ram_origin: Lowest SRAM origin address
-      - ram_origin: Total size of all SRAM regions
 
     :returns: dictionary of memory properties
     """
@@ -89,8 +87,6 @@ def common_memories(env):
     properties = {
         "memories": memories,
         "regions": [m["name"] for m in memories],
-        "ram_origin": min(m["start"] for m in memories if "sram" in m["name"]),
-        "ram_size": sum(m["size"] for m in memories if "sram" in m["name"]),
     }
     return properties
 
