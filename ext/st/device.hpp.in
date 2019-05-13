@@ -29,11 +29,13 @@
 #include <{{ header }}>
 %% endfor
 
+/// @cond
 // This is a hack to make the *_Typedef's known to GDB, so that you can debug
 // the peripherals directly in GDB in any context.
 // Otherwise GDB would throw a "no symbol 'GPIO_TypeDef' in current context".
 %% for (name, type) in peripherals
 extern {{ type | lbuild.pad(19) }}	___{{ name | lbuild.pad(15) }};
 %% endfor
+/// @endcond
 
 #endif  // MODM_DEVICE_HPP
