@@ -22,6 +22,16 @@ extern AssertionHandler __assertion_table_end;
 extern "C"
 {
 
+modm_weak void
+modm_undefined_handler(int32_t irqn)
+{
+	// Set the currently executing interrupt to the lowest priority to allow
+	// reporting of the assertion failure and disable it from firing again.
+	NVIC_SetPriority(IRQn_Type(irqn), (1ul << __NVIC_PRIO_BITS) - 1ul);
+	NVIC_DisableIRQ(IRQn_Type(irqn));
+	modm_assert(0, "core", "nvic", "undefined", irqn);
+}
+
 void
 modm_assert_fail(const char * identifier)
 {
