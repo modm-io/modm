@@ -20,7 +20,7 @@ CacheDir("{{ cache_dir }}")
 %% endif
 
 # SCons environment with all tools
-env = Environment(ENV=os.environ)
+env = DefaultEnvironment(tools=[], ENV=os.environ)
 env["CONFIG_BUILD_BASE"] = abspath(build_path)
 env["CONFIG_PROJECT_NAME"] = project_name
 
