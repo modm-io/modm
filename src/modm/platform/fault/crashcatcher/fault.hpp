@@ -44,6 +44,8 @@ public:
 
 	/// @returns report size > 0
 	static inline bool hasReport() { return begin() != end(); }
+	/// @returns a 32-bit hash of the firmware for identification
+	static inline uint32_t firmware() { return FaultStorage::firmwareHash(); }
 	/// Clears the report
 	static inline void clear() { FaultStorage::closeRead(); }
 	/// Clears the report and reboots the device

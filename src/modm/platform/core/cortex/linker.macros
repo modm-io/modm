@@ -64,11 +64,11 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 %% endmacro
 
 
-%% macro section_fastcode_in_flash()
+%% macro section_fastcode(memory)
 	.fastcode : ALIGN(4)
 	{
 		*(.fastcode)
-	} >FLASH
+	} >{{memory}}
 %% endmacro
 
 
@@ -313,9 +313,14 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 %% endmacro
 
 
-%% macro section_end()
-%% if 0
+%% macro section_rom_start()
+	__rom_start = ORIGIN(FLASH);
+%% endmacro
+
+%% macro section_rom_end()
 	. = ALIGN(4);
+	__rom_end = .;
+%% if 0
 	_end = . ;
 	__end = . ;
 	PROVIDE(end = .);
