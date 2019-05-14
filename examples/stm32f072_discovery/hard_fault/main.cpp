@@ -37,6 +37,17 @@ main()
 	Usart1::connect<GpioOutputA9::Tx>();
 	Usart1::initialize<Board::SystemClock, 115200_Bd>();
 
+	if (FaultReporter::hasReport())
+	{
+		MODM_LOG_ERROR << "\n\nHardFault! Copy the data into a 'coredump.txt' file, ";
+		MODM_LOG_ERROR << "then execute 'scons postmortem firmware=";
+		MODM_LOG_ERROR << modm::hex << FaultReporter::firmware() << "'.\n\n";
+		for (const uint8_t data : FaultReporter())
+			MODM_LOG_ERROR << modm::hex << data << modm::flush;
+		MODM_LOG_ERROR << "\n\n\n" << modm::flush;
+		FaultReporter::clearAndReboot();
+	}
+
 	MODM_LOG_INFO << "Causing a Hardfault now!" << modm::endl;
 
 	// simulate some stack usage
