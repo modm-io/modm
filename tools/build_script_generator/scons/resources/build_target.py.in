@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2018, Niklas Hauser
+# Copyright (c) 2018-2019, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -8,6 +8,8 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
+
+from os.path import abspath
 
 def build_target(env, sources):
 	# Building application
@@ -24,6 +26,8 @@ def build_target(env, sources):
 	env.Alias("run", env.Run(program))
 	env.Alias("all", ["build", "run"])
 %% else
+	# The executable depends on the linkerscript
+	env.Depends(target=program, dependency=abspath("modm/link/linkerscript.ld"))
     %% if core.startswith("cortex-m")
 	env.Alias("size", env.Size(program))
 	env.Alias("program", env.OpenOcd(program, commands=["modm_program $SOURCE"]))
