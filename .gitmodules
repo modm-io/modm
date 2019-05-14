@@ -22,3 +22,6 @@
 [submodule "ext/aws/freertos"]
 	path = ext/aws/freertos
 	url = https://github.com/modm-ext/freertos-partial.git
+[submodule "ext/adamgreen/crashcatcher"]
+	path = ext/adamgreen/crashcatcher
+	url = https://github.com/modm-ext/CrashCatcher-partial.git

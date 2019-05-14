@@ -6,6 +6,8 @@
 
 SECTIONS
 {
+{{ linker.section_rom_start() }}
+
 {{ linker.section_vector_rom("FLASH") }}
 
 {{ linker.section_vector_ram("ITCM") }}
@@ -13,6 +15,9 @@ SECTIONS
 {{ linker.section("ITCM AT >FLASH", "fastcode") }}
 
 {{ linker.section_heap("ITCM", "heap4") }}
+%% if with_crashcatcher
+	g_crashCatcherStack = . - 500;
+%% endif
 
 {{ linker.section_stack("DTCM") }}
 
@@ -55,7 +60,7 @@ SECTIONS
 %% endif
 {{ linker.section_table_heap(heap_table) }}
 
-{{ linker.section_end() }}
+{{ linker.section_rom_end() }}
 
 {{ linker.section_debug() }}
 }

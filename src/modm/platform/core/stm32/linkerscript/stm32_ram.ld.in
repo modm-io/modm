@@ -14,6 +14,8 @@ VECTOR_TABLE_OFFSET = TOTAL_STACK_SIZE;
 
 SECTIONS
 {
+{{ linker.section_rom_start() }}
+
 {{ linker.section_vector_rom("FLASH") }}
 
 {{ linker.section_stack("RAM", "VECTOR_TABLE_OFFSET - TOTAL_STACK_SIZE") }}
@@ -22,14 +24,19 @@ SECTIONS
 
 {{ linker.section_rom("FLASH") }}
 
-{{ linker.section_fastcode_in_flash() }}
+{{ linker.section_fastcode("FLASH") }}
 
 {{ linker.section_ram("RAM") }}
+
+{{ linker.section("RAM AT >FLASH", "fastdata") }}
 
 {{ linker.section_heap("SRAM1", "heap1") }}
 
 %% if "sram2" in regions
 {{ linker.section_heap("SRAM2", "heap2") }}
+%% endif
+%% if with_crashcatcher
+	g_crashCatcherStack = . - 500;
 %% endif
 
 {{ linkerscript_sections | indent(first=True) }}
@@ -48,7 +55,7 @@ SECTIONS
 %% endif
 {{ linker.section_table_heap(heap_table) }}
 
-{{ linker.section_end() }}
+{{ linker.section_rom_end() }}
 
 {{ linker.section_debug() }}
 }

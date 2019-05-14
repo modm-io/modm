@@ -106,7 +106,8 @@ boards:
 - NUCLEO-F031K6:
 [Blinky & Serial](https://github.com/modm-io/modm/tree/develop/examples/nucleo_f031k6/blink/main.cpp).
 - NUCLEO-F103RB:
-[Blinky & Serial](https://github.com/modm-io/modm/blob/develop/examples/nucleo_f103rb/blink/main.cpp).
+[Blinky & Serial](https://github.com/modm-io/modm/blob/develop/examples/nucleo_f103rb/blink/main.cpp),
+[Debugging hard faults](https://github.com/modm-io/modm/blob/develop/examples/nucleo_f103rb/hard_fault/main.cpp).
 - STM32F072 Discovery:
 [Blinky](https://github.com/modm-io/modm/blob/develop/examples/stm32f072_discovery/blink/main.cpp),
 [CAN](https://github.com/modm-io/modm/blob/develop/examples/stm32f072_discovery/can/main.cpp),
@@ -120,8 +121,7 @@ boards:
 [Blinky](https://github.com/modm-io/modm/blob/develop/examples/stm32f4_discovery/blink/main.cpp),
 [CAN](https://github.com/modm-io/modm/blob/develop/examples/stm32f4_discovery/can/main.cpp),
 [Accelerometer](https://github.com/modm-io/modm/blob/develop/examples/stm32f4_discovery/accelerometer/main.cpp),
-[Timer & LED Animations](https://github.com/modm-io/modm/blob/develop/examples/stm32f4_discovery/timer/main.cpp),
-[Debugging hard faults](https://github.com/modm-io/modm/blob/develop/examples/stm32f4_discovery/hard_fault/main.cpp).
+[Timer & LED Animations](https://github.com/modm-io/modm/blob/develop/examples/stm32f4_discovery/timer/main.cpp).
 - STM32F469 Discovery:
 [Blinky](https://github.com/modm-io/modm/blob/develop/examples/stm32f469_discovery/blink/main.cpp),
 [Drawing on display](https://github.com/modm-io/modm/blob/develop/examples/stm32f469_discovery/display/main.cpp),

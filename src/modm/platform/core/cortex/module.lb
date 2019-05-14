@@ -256,6 +256,7 @@ def validate(env):
 def build(env):
     env.substitutions = env.query("vector_table")
     env.substitutions["partname"] = env[":target"].partname
+    env.substitutions["with_fault_storage"] = env.has_module(":platform:fault")
     env.outbasepath = "modm/src/modm/platform/core"
 
     # dealing with runtime assertions
@@ -277,14 +278,15 @@ def build(env):
     if not env.has_module(":test:architecture"):
         env.copy("clock.cpp")
 
+    env.template("heap_table.cpp.in")
+    env.template("heap_table.hpp.in")
     # everything to do with dynamic memory
-    env.copy("heap_table.c")
     if env["allocator"] == "newlib":
-        env.template("heap_newlib.c.in")
-    if env["allocator"] == "tlsf":
-        env.template("heap_tlsf.c.in")
-    if env["allocator"] == "block":
-        env.template("heap_block_allocator.cpp.in")
+        env.copy("heap_newlib.cpp")
+    elif env["allocator"] == "tlsf":
+        env.copy("heap_tlsf.cpp")
+    elif env["allocator"] == "block":
+        env.copy("heap_block_allocator.cpp")
 
     env.copy("atomic_lock.hpp")
     env.template("unaligned.hpp.in")

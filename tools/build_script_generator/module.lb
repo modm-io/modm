@@ -163,7 +163,8 @@ def post_build(env):
 
     if target.has_driver("core:cortex-m*"):
         env.template("openocd.cfg.in")
-        env.template("gdbinit.in")
+        env.template("openocd_gdbinit.in")
+        env.template("gdbinit")
 
 
 # ============================ Option Descriptions ============================

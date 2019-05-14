@@ -15,6 +15,7 @@
 #include <reent.h>
 #include <errno.h>
 #include <modm/architecture/interface/assert.hpp>
+#include "heap_table.hpp"
 
 // ----------------------------------------------------------------------------
 // Using the MODM Block Allocator
@@ -36,20 +37,18 @@ const size_t max_heap_size = (1 << (sizeof(MODM_MEMORY_BLOCK_ALLOCATOR_TYPE) * 8
 
 extern "C"
 {
-extern void modm_heap_table_find_largest(const uint32_t, uint32_t **, uint32_t **);
-
 void __modm_initialize_memory(void)
 {
-	uint32_t *heap_start, *heap_end;
+	const uint32_t *heap_start, *heap_end;
 	// find the largest heap that is DMA-able and S-Bus accessible
-	modm_heap_table_find_largest(0x9, &heap_start, &heap_end);
+	modm::platform::HeapTable::find_largest(&heap_start, &heap_end);
 	modm_assert(heap_start, "core", "heap", "init");
 	// clamp the heap size to the maximum
 	if ((size_t) heap_end - (size_t) heap_start > max_heap_size) {
-		heap_end = (uint32_t *) ((char *) heap_start + max_heap_size);
+		heap_end = (const uint32_t *) ((char *) heap_start + max_heap_size);
 	}
 	// initialize the heap
-	allocator.initialize(heap_start, heap_end);
+	allocator.initialize((void*)heap_start, (void*)heap_end);
 }
 
 void *__wrap__malloc_r(struct _reent *r, size_t size)
