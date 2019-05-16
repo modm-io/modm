@@ -40,6 +40,12 @@ run-nucleo-f411:
 	$(call run-test,nucleo-f411,size)
 
 
+compile-nucleo-f446:
+	$(call compile-test,nucleo-f446,size)
+run-nucleo-f446:
+	$(call run-test,nucleo-f446,size)
+
+
 compile-nucleo-l432:
 	$(call compile-test,nucleo-l432,size)
 run-nucleo-l432:
