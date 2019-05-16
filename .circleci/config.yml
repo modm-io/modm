@@ -109,7 +109,7 @@ jobs:
           name: Examples STM32F4 Series
           command: |
             (cd examples && ../tools/scripts/examples_compile.py stm32f4_discovery)
-            (cd examples && ../tools/scripts/examples_compile.py stm32f429_discovery stm32f469_discovery nucleo_f401re nucleo_f411re nucleo_f429zi)
+            (cd examples && ../tools/scripts/examples_compile.py stm32f429_discovery stm32f469_discovery nucleo_f401re nucleo_f411re nucleo_f429zi nucleo_f446re)
 
   avr-examples:
     docker:
