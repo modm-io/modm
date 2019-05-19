@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:nucleo-f103rb</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_f103rb/itm</option>
+    <option name="modm:platform:itm:buffer.tx">250</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:itm</module>
+  </modules>
+</library>
