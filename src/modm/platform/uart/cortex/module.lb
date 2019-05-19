@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2019, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":platform:itm"
+    module.description = FileReader("module.md")
+
+def prepare(module, options):
+    device = options[":target"]
+    if not device.has_driver("core:cortex-m*"):
+        return False
+    if device.has_driver("core:cortex-m0*"):
+        return False
+
+    module.depends(
+        ":architecture:uart",
+        ":cmsis:device")
+
+    module.add_option(
+        NumericOption(name="buffer.tx", description=descr_buffer_tx,
+            minimum=0, maximum=2**16 - 2, default=0))
+
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/platform/itm"
+    env.template("itm.hpp.in")
+    env.template("itm.cpp.in")
+
+
+descr_buffer_tx = """# Transmit buffer size
+
+You must call the `update()` function repeatedly when a transmit buffer is
+used, otherwise you have to call `flushWriteBuffer()` to empty the buffer.
+"""

@@ -1,0 +1,120 @@
+/*
+ * Copyright (c) 2019, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <modm/architecture/interface/uart.hpp>
+// #include <modm/platform/gpio/connector.hpp>
+// #include <cmath>
+
+namespace modm::platform
+{
+
+/**
+ * Instruction Trace Macrocell (ITM) Uart Interface
+ *
+ * @author		Niklas Hauser
+ * @ingroup		modm_platform_itm
+ */
+class Itm : public ::modm::Uart
+{
+public:
+	static constexpr size_t RxBufferSize = 0;
+	static constexpr size_t TxBufferSize = {{ options["buffer.tx"] }};
+
+public:
+	/* Initialized by OpenOCD 'tpiu config'
+	template< class SystemClock, baudrate_t baudrate, percent_t tolerance=pct(2) >
+	static void
+	initialize()
+	{
+		constexpr float desired = float(SystemClock::Frequency) / baudrate;
+
+		// calculate the possible rates above and below the requested rate
+		constexpr uint32_t rate_lower = SystemClock::Frequency / std::ceil(desired);
+		constexpr uint32_t rate_upper = SystemClock::Frequency / std::floor(desired);
+
+		// calculate the half-point between the upper and lower rate
+		constexpr uint32_t rate_middle = (rate_upper + rate_lower) / 2;
+		// decide which reload value is closer to a possible rate
+		constexpr uint32_t prescaler = (1000 < rate_middle) ? std::ceil(desired) : std::floor(desired);
+
+		// check if within rate tolerance
+		constexpr uint32_t generated_rate = SystemClock::Frequency / prescaler;
+		PeripheralDriver::assertBaudrateInTolerance< generated_rate, baudrate, tolerance >();
+
+		enable(prescaler - 1);
+	}
+	*/
+
+	/* Trace pins can only be assigned by debugger on External Private Peripheral Bus
+	 * !!! THIS IS DEVICE SPECIFIC!
+	template< template<Peripheral _> class... Signals >
+	static void
+	connect()
+	{
+		using Connector = GpioConnector<Peripheral::Sys, Signals...>;
+		using Tx = typename Connector::template GetSignal< Gpio::Signal::Traceswo >;
+		static_assert(((Connector::template IsValid<Tx>) and sizeof...(Signals) == 1),
+					  "Itm::connect() requires one SWO signal!");
+
+		// Enable the Trace SWO output
+		DBGMCU->CR |= DBGMCU_CR_TRACE_IOEN;
+		Connector::connect();
+	}
+	*/
+
+	static void
+	writeBlocking(uint8_t data);
+
+	static inline void
+	writeBlocking(const uint8_t *data, std::size_t length)
+	{ while (length--) writeBlocking(*data++); }
+
+	static void
+	flushWriteBuffer();
+
+	static bool
+	write(uint8_t data);
+
+	static std::size_t
+	write(const uint8_t *data, std::size_t length);
+
+	static bool
+	isWriteFinished();
+
+	static std::size_t
+	discardTransmitBuffer();
+
+	static inline bool
+	read(uint8_t&)
+	{ return false; }
+
+	static inline std::size_t
+	read(uint8_t*, std::size_t)
+	{ return 0; }
+
+	static inline std::size_t
+	discardReceiveBuffer()
+	{ return 0; }
+
+	static void
+	update();
+
+protected:
+	static void
+	enable(uint8_t prescaler);
+
+	static bool
+	write_itm(uint32_t data, uint8_t size=1);
+};
+
+}	// namespace modm::platform
