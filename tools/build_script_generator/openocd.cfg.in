@@ -5,10 +5,17 @@ add_script_search_dir {{ path | modm.windowsify(escape_level=1) }}
 source [find {{ file | modm.windowsify(escape_level=1) }}]
 %% endfor
 
+proc modm_itm_log { OUTPUT F_CPU {BAUDRATE ""} } {
+	if {$BAUDRATE eq ""} {
+		tpiu config internal $OUTPUT uart off $F_CPU
+	} else {
+		tpiu config internal $OUTPUT uart off $F_CPU $BAUDRATE
+	}
+}
+
 proc modm_program { SOURCE } {
 	program $SOURCE verify
-	reset halt
-	mww 0xE000EDF0 0xA05F0000
+	reset run
 	shutdown
 }
 
@@ -17,4 +24,3 @@ proc program_{{ profile }} {} {
 	modm_program {{ path | modm.windowsify(escape_level=1) }}
 }
 %% endfor
-
