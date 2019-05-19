@@ -165,6 +165,16 @@ argument.
 See the `:platform:fault` module for details how to receive the coredump data.
 
 
+#### scons itm
+
+Configures OpenOCD in tracing mode to output ITM channel 0 on SWO pin and
+displays the serial output stream.
+(\* *only Cortex-M targets*)
+
+See the `:platform:itm` module for details how to use the ITM as a logging
+output.
+
+
 #### scons symbols
 
 Dumps the symbol table for your executable.

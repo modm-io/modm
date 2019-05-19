@@ -108,6 +108,7 @@ def build(env):
         "gdb",
         "build_target",
         "artifact",
+        "log_itm",
     }
     if has_xpcc_generator:
         tools.add("xpcc_generator")

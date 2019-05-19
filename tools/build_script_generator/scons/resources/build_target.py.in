@@ -38,6 +38,7 @@ def build_target(env, sources):
 	env.Alias("program", env.OpenOcd(program, commands=["modm_program $SOURCE"]))
 	env.Alias("bmp", env.BlackMagicProbe(program))
 	%% endif
+	env.Alias("itm", env.OpenOcdItm())
 	env.Alias("gdb", env.OpenOcdGdb(program))
 	env.Alias("postmortem", env.PostMortemGdb(program))
     %% elif core.startswith("avr")
