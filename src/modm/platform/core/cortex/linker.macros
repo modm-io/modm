@@ -287,6 +287,12 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		KEEP(*(.assertion))
 		__assertion_table_end = .;
 	} >{{memory}}
+
+	.build_id :
+	{
+		__build_id = .;
+		KEEP(*(.note.gnu.build-id))
+	} > {{memory}}
 %% endmacro
 
 

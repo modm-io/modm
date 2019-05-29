@@ -152,6 +152,7 @@ def prepare(module, options):
         ":architecture:interrupt",
         ":architecture:memory",
         ":architecture:unaligned",
+        ":architecture:build_id",
         ":platform:clock",
         ":cmsis:device")
 
@@ -273,6 +274,9 @@ def build(env):
     # busy-waiting delays
     env.template("delay.cpp.in")
     env.copy("delay.hpp")
+
+    # GNU Build ID
+    env.copy("build_id.cpp")
 
     # modm-test implements the clock methods itself
     if not env.has_module(":test:architecture"):

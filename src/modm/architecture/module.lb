@@ -88,6 +88,19 @@ class BlockDevice(Module):
         env.copy("interface/block_device.hpp")
 # -----------------------------------------------------------------------------
 
+class BuildId(Module):
+    def init(self, module):
+        module.name = "build_id"
+        module.description = "GNU Build ID"
+
+    def prepare(self, module, options):
+        return True
+
+    def build(self, env):
+        env.outbasepath = "modm/src/modm/architecture"
+        env.copy("interface/build_id.hpp")
+# -----------------------------------------------------------------------------
+
 class Can(Module):
     def init(self, module):
         module.name = "can"
@@ -348,6 +361,7 @@ def prepare(module, options):
     module.add_submodule(Assert())
     module.add_submodule(Atomic())
     module.add_submodule(BlockDevice())
+    module.add_submodule(BuildId())
     module.add_submodule(Can())
     module.add_submodule(Clock())
     module.add_submodule(Delay())
