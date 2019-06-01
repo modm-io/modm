@@ -242,7 +242,7 @@ namespace
 		if (queue.isNotEmpty())
 		{
 			// wait until the stop condition has been generated
-			uint_fast32_t deadlockPreventer = 100000;
+			uint_fast32_t deadlockPreventer = 100'000;
 			while ((I2C{{ id }}->ISR & I2C_ISR_STOPF) and (deadlockPreventer-- > 0))
 				{};
 

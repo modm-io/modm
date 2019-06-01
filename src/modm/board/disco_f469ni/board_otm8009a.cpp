@@ -14,7 +14,7 @@
 static void dsi_write_command(uint32_t count, uint8_t const * const p)
 {
 	/* Wait for Command FIFO Empty */
-	for (int t = 1024; not (DSI->GPSR & DSI_GPSR_CMDFE) and t; t--) {
+	for (int t = 1'024; not (DSI->GPSR & DSI_GPSR_CMDFE) and t; t--) {
 		modm::delayMilliseconds(1);
 	}
 
@@ -30,7 +30,7 @@ static void dsi_write_command(uint32_t count, uint8_t const * const p)
 					(p[2] << 24);
 		uint16_t counter = 3;
 
-		for (int t = 1024; not (DSI->GPSR & DSI_GPSR_CMDFE) and t; t--) {
+		for (int t = 1'024; not (DSI->GPSR & DSI_GPSR_CMDFE) and t; t--) {
 			modm::delayMilliseconds(1);
 		}
 
@@ -42,7 +42,7 @@ static void dsi_write_command(uint32_t count, uint8_t const * const p)
 						(p[counter + 3] << 24);
 			counter += 4;
 
-			for (int t = 1024; not (DSI->GPSR & DSI_GPSR_CMDFE) and t; t--) {
+			for (int t = 1'024; not (DSI->GPSR & DSI_GPSR_CMDFE) and t; t--) {
 				modm::delayMilliseconds(1);
 			}
 		}

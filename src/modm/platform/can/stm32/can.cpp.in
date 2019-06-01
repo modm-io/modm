@@ -95,7 +95,7 @@ modm::platform::Can{{ id }}::initializeWithPrescaler(
 
 	// Request initialization
 	{{ reg }}->MCR |= CAN_MCR_INRQ;
-	int deadlockPreventer = 10000; // max ~10ms
+	int deadlockPreventer = 10'000; // max ~10ms
 	while ((({{ reg }}->MSR & CAN_MSR_INAK) == 0) and (deadlockPreventer-- > 0)) {
 		modm::delayMicroseconds(1);
 		// Wait until the initialization mode is entered.
@@ -148,7 +148,7 @@ modm::platform::Can{{ id }}::initializeWithPrescaler(
 
 	// Request leave initialization
 	{{ reg }}->MCR &= ~(uint32_t)CAN_MCR_INRQ;
-	deadlockPreventer = 10000; // max ~10ms
+	deadlockPreventer = 10'000; // max ~10ms
 	while ((({{ reg }}->MSR & CAN_MSR_INAK) == CAN_MSR_INAK) and (deadlockPreventer-- > 0))  {
 		// wait for the normal mode
 	}

@@ -20,10 +20,10 @@
 
 namespace modm::clock
 {
-uint32_t modm_fastdata fcpu({{ hsi_frequency|int * 1000000 }});
-uint32_t modm_fastdata fcpu_kHz({{ hsi_frequency|int * 1000 }});
+uint32_t modm_fastdata fcpu({{ "{0:,}".format(hsi_frequency|int * 1000000).replace(',', "'") }});
+uint32_t modm_fastdata fcpu_kHz({{ "{0:,}".format(hsi_frequency|int * 1000).replace(',', "'") }});
 uint16_t modm_fastdata fcpu_MHz({{ hsi_frequency }});
-uint16_t modm_fastdata ns_per_loop({{ loops * 1000.0 / hsi_frequency|int}});
+uint16_t modm_fastdata ns_per_loop({{ "{0:,}".format((loops * 1000.0 / hsi_frequency)|int).replace(',', "'") }});
 }
 
 // ----------------------------------------------------------------------------

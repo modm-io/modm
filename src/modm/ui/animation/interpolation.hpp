@@ -32,7 +32,7 @@ namespace ui
  *
  * Be aware that the algortihm for 8bit types is optimized for low computational costs.
  * Therefore the steps are limited to `128 steps * value_difference`, which is
- * 32768 steps over the full 8bit range.
+ * 32'768 steps over the full 8bit range.
  * If you specify a more steps in this case, the ramp simply is 'steeper'.
  * If this is a problem, consider using a 16bit type, which does not have
  * this limitation.
@@ -97,7 +97,7 @@ private:
 	 * The maximum change can be +-255 since the value type is 8 bit wide.
 	 * The remaining 7 bits are used for fractional delta value:
 	 * 1 value difference can take at most 128 steps, which is equivalent
-	 * to 2^15 (32768) steps over the whole 8bit range.
+     * to 2^15 (32'768) steps over the whole 8bit range.
 	 */
 	template< typename Type >
 	struct Computations <Type, uint8_t>
@@ -138,7 +138,7 @@ private:
 	 * uint16_t implementation using signed 16.15 fixed point arithmetic.
 	 * The maximum change can be +-65535 since the value type is 16 bit wide.
 	 * The remaining 15 bits are used for fractional delta value:
-	 * 1 value difference can take at most 32768 steps, which is equivalent
+	 * 1 value difference can take at most 32'768 steps, which is equivalent
 	 * to 2^31 steps over the whole 16bit range.
 	 */
 	template< typename Type >

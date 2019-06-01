@@ -41,7 +41,7 @@ template <typename Device>
 void
 modm::sab::Interface<Device>::initialize()
 {
-	//Device::setBaudrate(115200UL);
+	//Device::setBaudrate(115'200UL);
 	state = SYNC;
 }
 

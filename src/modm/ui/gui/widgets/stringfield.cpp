@@ -50,7 +50,7 @@ modm::gui::StringField::render(View* view)
 	out->setCursor(box_x + 10, box_y + (box_height - stringHeight) / 2);
 
 //	int beforeComma = static_cast<int>(this->getValue());
-//	int afterComma = std::abs(static_cast<int>((this->getValue() - beforeComma) * 1000));
+//	int afterComma = std::abs(static_cast<int>((this->getValue() - beforeComma) * 1'000));
 //
 //	*out << beforeComma << ".";
 //	out->printf("%03ld", afterComma);

@@ -268,7 +268,7 @@ main()
 		j = rand() % 16 + 15;
 		l = rand() % 80 + 7;
 
-		for (i = s = 0; i < j && s < 4096; i++)
+		for (i = s = 0; i < j && s < 4'096; i++)
 		{
 			sizes[i] = rand() % l + 1;
 			s += sizes[i];
@@ -276,7 +276,7 @@ main()
 
 		j = i;
 
-		for (m = om = 1, p = 1, f = 0; m < 1000; m++)
+		for (m = om = 1, p = 1, f = 0; m < 1'000; m++)
 		{
 			for (i = s = 0; i < j; i++) {
 				if (handles[i])

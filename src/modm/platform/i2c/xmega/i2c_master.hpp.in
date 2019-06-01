@@ -50,7 +50,7 @@ public:
 	static modm_always_inline void
 	initialize()
 	{
-		static_assert(baudrate <= 400000, "The Xmega does not support I2C baudrates above 400kHz.");
+		static_assert(baudrate <= 400'000, "The Xmega does not support I2C baudrates above 400kHz.");
 		static_assert(F_CPU/10 >= baudrate, "The CPU frequency needs to be at least 10x higher than I2C baudrate.");
 
 		// set the baud rate register

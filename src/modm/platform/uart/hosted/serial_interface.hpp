@@ -90,13 +90,13 @@ namespace modm
 			 * Set the baud rate of the device.
 			 *
 			 * Possible values for the baudrate:
-			 * - 2400
-			 * - 4800
-			 * - 9600
-			 * - 19200
-			 * - 38400
-			 * - 57600
-			 * - 115200
+			 * - 2'400
+			 * - 4'800
+			 * - 9'600
+			 * - 19'200
+			 * - 38'400
+			 * - 57'600
+			 * - 115'200
 			 */
 			bool
 			setBaudRate(unsigned int baudRate);

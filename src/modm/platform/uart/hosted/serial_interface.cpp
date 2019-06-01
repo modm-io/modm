@@ -83,13 +83,13 @@ modm::platform::SerialInterface::setBaudRate(unsigned int rate)
 	this->baudRate = rate;
 
 	speed_t baudRateConstant =
-		(rate == 2400) ? B2400 :
-		(rate == 4800) ? B4800 :
-		(rate == 9600) ? B9600 :
-		(rate == 19200) ? B19200 :
-		(rate == 38400) ? B38400 :
-		(rate == 57600) ? B57600 :
-		(rate == 115200) ? B115200 : B0;
+		(rate == 2'400) ? B2400 :
+		(rate == 4'800) ? B4800 :
+		(rate == 9'600) ? B9600 :
+		(rate == 19'200) ? B19200 :
+		(rate == 38'400) ? B38400 :
+		(rate == 57'600) ? B57600 :
+		(rate == 115'200) ? B115200 : B0;
 
 	// Change the configuration structure
 	int result1 = cfsetispeed(&configuration, baudRateConstant);

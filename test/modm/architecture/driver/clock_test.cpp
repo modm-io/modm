@@ -26,14 +26,14 @@ ClockTest::testClock()
 	TestingClock::time = 10;
 	TEST_ASSERT_EQUALS(modm::Clock::nowShort(), modm::ShortTimestamp(10));
 
-	TestingClock::time = 65000;
-	TEST_ASSERT_EQUALS(modm::Clock::nowShort(), modm::ShortTimestamp(65000));
+	TestingClock::time = 65'000;
+	TEST_ASSERT_EQUALS(modm::Clock::nowShort(), modm::ShortTimestamp(65'000));
 
-	TestingClock::time = 65535;
-	TEST_ASSERT_EQUALS(modm::Clock::nowShort(), modm::ShortTimestamp(65535));
+	TestingClock::time = 65'535;
+	TEST_ASSERT_EQUALS(modm::Clock::nowShort(), modm::ShortTimestamp(65'535));
 
 	// overflow in timestamp, but not the Clock!
-	TestingClock::time = 65536;
+	TestingClock::time = 65'536;
 	TEST_ASSERT_EQUALS(modm::Clock::nowShort(), modm::ShortTimestamp(0));
 
 
@@ -44,13 +44,13 @@ ClockTest::testClock()
 	TestingClock::time = 10;
 	TEST_ASSERT_EQUALS(modm::Clock::now(), modm::Timestamp(10));
 
-	TestingClock::time = 65536;
-	TEST_ASSERT_EQUALS(modm::Clock::now(), modm::Timestamp(65536));
+	TestingClock::time = 65'536;
+	TEST_ASSERT_EQUALS(modm::Clock::now(), modm::Timestamp(65'536));
 
-	TestingClock::time = 4294967295;
-	TEST_ASSERT_EQUALS(modm::Clock::now(), modm::Timestamp(4294967295));
+	TestingClock::time = 4'294'967'295;
+	TEST_ASSERT_EQUALS(modm::Clock::now(), modm::Timestamp(4'294'967'295));
 
 	// overflow in both timestamp and Clock!
-	TestingClock::time = uint32_t(4294967296);
+	TestingClock::time = uint32_t(4'294'967'296);
 	TEST_ASSERT_EQUALS(modm::Clock::now(), modm::Timestamp(0));
 }

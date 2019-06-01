@@ -63,7 +63,7 @@ Data::calculateCalibratedPressure()
 	calculateCalibratedTemperature();
 
 	uint32_t up = ( (uint32_t(raw[2]) << 16) | (uint16_t(raw[3]) << 8) | raw[4] ) >> (8 - oss);
-	b6 = int16_t(b5 - 4000);
+	b6 = int16_t(b5 - 4'000);
 	x1 = modm::math::mul(calibration.b2, modm::math::mul(b6, b6) >> 12) >> 11;
 	x2 = modm::math::mul(calibration.ac2, b6) >> 11;
 	x3 = x1 + x2;
@@ -72,17 +72,17 @@ Data::calculateCalibratedPressure()
 	x1 = modm::math::mul(calibration.ac3, b6) >> 13;
 	x2 = modm::math::mul(calibration.b1, modm::math::mul(b6, b6) >> 12) >> 16;
 	x3 = ((x1 + x2) + 2) >> 2;
-	b4 = modm::math::mul(calibration.ac4, uint16_t(x3 + 32768)) >> 15;
-	b7 = (up - b3) * (50000 >> oss);
+	b4 = modm::math::mul(calibration.ac4, uint16_t(x3 + 32'768)) >> 15;
+    b7 = (up - b3) * (50'000 >> oss);
 	if (b7 < 0x80000000)
 		p = (b7 << 1) / b4;
 	else
 		p = (b7 / b4) << 1;
 
 	x1 = modm::math::mul(uint16_t(p >> 8), uint16_t(p >> 8));
-	x1 = (x1 * 3038) >> 16;
-	x2 = (-7357 * p) >> 16;
-	calibratedPressure = p + ((x1 + x2 + 3791) >> 4);
+	x1 = (x1 * 3'038) >> 16;
+	x2 = (-7'357 * p) >> 16;
+	calibratedPressure = p + ((x1 + x2 + 3'791) >> 4);
 	meta |= PRESSURE_CALCULATED;
 }
 

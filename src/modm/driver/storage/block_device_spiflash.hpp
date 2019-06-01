@@ -148,7 +148,7 @@ public:
 public:
 	static constexpr bd_size_t BlockSizeRead = 1;
 	static constexpr bd_size_t BlockSizeWrite = 256;
-	static constexpr bd_size_t BlockSizeErase = 4 * 1024;
+	static constexpr bd_size_t BlockSizeErase = 4 * 1'024;
 	static constexpr bd_size_t DeviceSize = flashSize;
 
 private:

@@ -58,10 +58,10 @@ public:
 	enum class
 	ResetDevices : uint32_t
 	{
-		NoReset  =       0,	///< Do not reset devices
-		LowSpeed =   10000,	///< Low-Speed datarate of 10kHz
-		Standard =  100000,	///< Standard datarate of 100kHz
-		Fast     =  400000,	///< Fast datarate of 400kHz
+		NoReset  =        0,	///< Do not reset devices
+		LowSpeed =   10'000,	///< Low-Speed datarate of 10kHz
+		Standard =  100'000,	///< Standard datarate of 100kHz
+		Fast     =  400'000,	///< Fast datarate of 400kHz
 	};
 
 #ifdef __DOXYGEN__

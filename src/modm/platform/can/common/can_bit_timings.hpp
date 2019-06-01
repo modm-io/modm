@@ -70,7 +70,7 @@ private:
 		constexpr uint8_t minBs1Bs2 = 14;
 		constexpr uint8_t maxBs1Bs2 = 20;
 
-		float minError = 10000;
+		float minError = 10'000.0;
 		uint16_t bestPrescaler = 0;
 		uint8_t bestBs1Bs2 = 0;
 

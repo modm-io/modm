@@ -86,7 +86,7 @@ Data::calculateCalibratedPressure()
 	int64_t P8 = calibration.P8;
 	int64_t P9 = calibration.P9;
 
-	int64_t var1 = t_fine - 128000;
+	int64_t var1 = t_fine - 128'000;
 	int64_t var2 = var1 * var1 * P6;
 	var2 = var2 + ((var1 * P5) << 17);
 	var2 = var2 + (P4 << 35);
@@ -125,16 +125,16 @@ Data::calculateCalibratedHumidity()
 	int32_t H5 = calibration.H5;
 	int32_t H6 = calibration.H6;
 
-  	int32_t v = (t_fine - int32_t(76800));
+  	int32_t v = (t_fine - int32_t(76'800));
 
-	v = (((((adc << 14) - (H4 << 20) - (H5 * v)) + (int32_t(16384))) >> 15) *
-		  (((((((v * H6) >> 10) * (((v * (H3)) >> 11) + (int32_t(32768)))) >> 10) +
-		  	(int32_t(2097152))) * H2 + 8192) >> 14));
+    v = (((((adc << 14) - (H4 << 20) - (H5 * v)) + (int32_t(16'384))) >> 15) *
+		  (((((((v * H6) >> 10) * (((v * (H3)) >> 11) + (int32_t(32'768)))) >> 10) +
+		  	(int32_t(2'097'152))) * H2 + 8'192) >> 14));
 
 	v = (v - (((((v >> 15) * (v >> 15)) >> 7) * H1) >> 4));
 
 	v = (v < 0) ? 0 : v;
-	v = (v > 419430400) ? 419430400 : v;
+	v = (v > 419'430'400) ? 419'430'400 : v;
 
 	calibratedHumidity = (v >> 12);
 	meta |= HUMIDITY_CALCULATED;

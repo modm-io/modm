@@ -72,10 +72,10 @@ struct ltc2984
 		float
 		getTemperatureFloat() const
 		{
-			return getTemperatureFixed() / 1024.f;
+			return getTemperatureFixed() / 1'024.f;
 		}
 
-		/// @return the temperature in the configured unit divided by 1024
+		/// @return the temperature in the configured unit divided by 1'024
 		int32_t
 		getTemperatureFixed() const
 		{
@@ -87,7 +87,7 @@ struct ltc2984
 		int16_t
 		getTemperatureInteger() const
 		{
-			return ((getTemperatureFixed() + (1ul << 9)) / 1024);
+			return ((getTemperatureFixed() + (1ul << 9)) / 1'024);
 		}
 
 	public:
@@ -295,7 +295,7 @@ struct ltc2984
 			};*/
 
 			// Rsense resistance value in Resistance_t has a width of 27 bits
-			// Unit: 1/1024 ohms
+			// Unit: 1/1'024 ohms
 			typedef uint32_t Resistance_t;
 		};
 

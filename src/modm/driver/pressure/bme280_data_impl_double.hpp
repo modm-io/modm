@@ -83,24 +83,24 @@ DataDouble::calculateCalibratedPressure()
 	double P8 = double(calibration.P8);
 	double P9 = double(calibration.P9);
 
-	double var1 = (t_fine / double(2.0)) - double(64000.0);
+	double var1 = (t_fine / double(2.0)) - double(64'000.0);
 
-	double var2 = var1 * var1 * P6 / double(32768.0);
+	double var2 = var1 * var1 * P6 / double(32'768.0);
 	var2 = var2 + var1 * P5 * double(2.0);
-	var2 = var2 / double(4.0) + (P4 * double(65636.0));
+	var2 = var2 / double(4.0) + (P4 * double(65'636.0));
 
-	var1 = (P3 * var1 * var1 / double(524288.0) + P2 * var1) / double(524288.0);
-	var1 = (double(1.0) + var1 / double(32768.0)) * P1;
+	var1 = (P3 * var1 * var1 / double(524'288.0) + P2 * var1) / double(524'288.0);
+	var1 = (double(1.0) + var1 / double(32'768.0)) * P1;
 	if (var1 == double(0.0)) {
 		calibratedPressureDouble = double(0.0);
 		return;
 	}
 
-	double p = double(1048576.0) - double(adc);
-	p = (p - (var2 / double(4096.0))) * double(6250.0) / var1;
+	double p = double(1'048'576.0) - double(adc);
+	p = (p - (var2 / double(4'096.0))) * double(6'250.0) / var1;
 
-	var1 = P9 * p * p / double(2147483648.0);
-	var2 = p * P8 / double(32768.0);
+	var1 = P9 * p * p / double(2'147'483'648.0);
+	var2 = p * P8 / double(32'768.0);
 
 	p = p + (var1 + var2 + P7) / double(16.0);
 

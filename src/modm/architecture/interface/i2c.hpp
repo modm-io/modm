@@ -112,12 +112,12 @@ struct I2c
 	 *
 	 * @tparam	Scl		The clock pin of the bus to be reset.
  	 */
-	template< class Scl, uint32_t baudrate = 100000 >
+	template< class Scl, uint32_t baudrate = 100'000 >
 	static void
 	resetDevices()
 	{
-		static_assert(baudrate <= 500000, "I2c::resetDevices() can only do max. 500kHz!");
-		constexpr uint32_t delay = 500000 / baudrate;
+		static_assert(baudrate <= 500'000, "I2c::resetDevices() can only do max. 500kHz!");
+		constexpr uint32_t delay = 500'000 / baudrate;
 
 		for (uint_fast8_t ii = 0; ii < 9; ++ii) {
 			Scl::reset();

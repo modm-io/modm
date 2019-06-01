@@ -91,7 +91,7 @@ void
 IOStream::writeInteger(int16_t value)
 {
 %% if core.startswith("avr") and not options["with_printf"]
-	// hard coded for -32768
+	// hard coded for -32'768
 	char str[7 + 1]; // +1 for '\0'
 	itoa(value, str, 10);
 	device->write(str);
@@ -109,7 +109,7 @@ void
 IOStream::writeInteger(uint16_t value)
 {
 %% if core.startswith("avr") and not options["with_printf"]
-	// hard coded for 32768
+	// hard coded for 32'768
 	char str[6 + 1]; // +1 for '\0'
 	utoa(value, str, 10);
 	device->write(str);

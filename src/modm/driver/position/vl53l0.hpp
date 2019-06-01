@@ -263,8 +263,8 @@ public:
 	static constexpr uint8_t ModelID[2] = { 0xEE, 0xAA };
 	static constexpr uint8_t RevisionID = 0x10;
 
-	// 30000 us = 30 ms
-	static constexpr uint32_t DefaultMeasurementTime = 30000;
+    // 30'000 us = 30 ms
+	static constexpr uint32_t DefaultMeasurementTime = 30'000;
 
 	// required signal rate per time period (unknown unit)
 	// this is the default value used by ST and will probably work fine
@@ -273,7 +273,7 @@ public:
 	struct TimeOverhead
 	{
 		// in microseconds
-		static constexpr uint16_t Start = 1910;
+		static constexpr uint16_t Start = 1'910;
 		static constexpr uint16_t End = 960;
 		static constexpr uint16_t MSRC = 660;
 		static constexpr uint16_t TCC = 590;
@@ -385,9 +385,9 @@ public:
 	/// Set the maximum measurement time.
 	///
 	/// Increasing this value will improve the accuracy.
-	/// The default is ~30ms. ST recommends 2000000us = 200ms for high precision.
+	/// The default is ~30ms. ST recommends 2'000'000us = 200ms for high precision.
 	///
-	/// useful range of values: ~20000us - 2000000us (20ms - 2s)
+	/// useful range of values: ~20'000us - 2'000'000us (20ms - 2s)
 	modm::ResumableResult<bool>
 	setMaxMeasurementTime(uint32_t timeUs);
 
@@ -497,7 +497,7 @@ private:
 	// Maximum argument value for setMaxMeasurementTime()
 	// Its only purpose is to prevent int overflows.
 	// The maximum value the sensor accepts is probably lower (~ 2*10^6 us = 2s).
-	static constexpr uint32_t MaxMeasurementTimeUs = 4000000;
+	static constexpr uint32_t MaxMeasurementTimeUs = 4'000'000;
 
 	Data &data;
 

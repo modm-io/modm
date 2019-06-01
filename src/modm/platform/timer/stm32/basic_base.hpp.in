@@ -93,7 +93,7 @@ public:
 	 * Set new prescaler
 	 *
 	 * The prescaler can divide the counter clock frequency by any
-	 * factor between 1 and 65536. The new prescaler ratio is taken
+	 * factor between 1 and 65'536. The new prescaler ratio is taken
 	 * into account at the next update event.
 	 *
 	 * @see		applyAndReset()

@@ -44,25 +44,25 @@ initialize()
 	SystemClock::enable();
 
 	Uart1::connect<GpioD3::Txd, GpioD2::Rxd>();
-	Uart1::initialize<SystemClock, 38400_Bd>();
+	Uart1::initialize<SystemClock, 38'400_Bd>();
 
 	// modm::Clock initialization
 	// Clear Timer on Compare Match Mode
 	TCCR0A = (1 << WGM01);
 	TIMSK0 = (1 << OCIE0A);
-#if F_CPU > 16000000
+#if F_CPU > 16'000'000
 	// Set and enable output compare A
-	OCR0A = F_CPU / (1000ul * 256);
+	OCR0A = F_CPU / (1'000ul * 256);
 	// Set prescaler 256 and enable timer
 	TCCR0A = (1 << CS02);
-#elif F_CPU > 2000000
+#elif F_CPU > 2'000'000
 	// Set and enable output compare A
-	OCR0A = F_CPU / (1000ul * 64);
+	OCR0A = F_CPU / (1'000ul * 64);
 	// Set prescaler 64 and enable timer
 	TCCR0A = (1 << CS01) | (1 << CS00);
-#elif F_CPU > 1000000
+#elif F_CPU > 1'000'000
 	// Set and enable output compare A
-	OCR0A = F_CPU / (1000ul * 8);
+	OCR0A = F_CPU / (1'000ul * 8);
 	// Set prescaler 8 and enable timer
 	TCCR0A = (1 << CS01);
 #endif

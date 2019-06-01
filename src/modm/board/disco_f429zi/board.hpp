@@ -250,7 +250,7 @@ initializeL3g()
 	l3g::Cs::setOutput(modm::Gpio::High);
 
 	l3g::SpiMaster::connect<l3g::Sck::Sck, l3g::Mosi::Mosi, l3g::Miso::Miso>();
-	l3g::SpiMaster::initialize<SystemClock, 11250000ul>();
+	l3g::SpiMaster::initialize<SystemClock, 11.25_MHz>();
 	l3g::SpiMaster::setDataMode(l3g::SpiMaster::DataMode::Mode3);
 }
 
