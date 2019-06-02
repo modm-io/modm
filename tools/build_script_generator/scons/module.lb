@@ -22,11 +22,21 @@ def prepare(module, options):
         BooleanOption(name="include_sconstruct", default=True,
                       description=descr_include_sconstruct))
     module.add_option(
+        BooleanOption(name="info.comp_db", default=False,
+                      description=descr_info_com_db))
+    module.add_option(
         PathOption(name="cache_dir", default="", empty_ok=True,
                    description=descr_cache_dir))
     module.add_option(
         PathOption(name="image.source", default="", empty_ok=True,
                    description=descr_image_source))
+
+    module.add_option(
+        PathOption(name="unittest.source", default="modm-test/src/modm", empty_ok=False,
+                   description=descr_unittest_source))
+    module.add_option(
+        PathOption(name="unittest.runner_template", default="modm-test/src/runner.cpp.in",
+                   empty_ok=False, description=descr_unittest_runner_template))
     module.add_option(
         EnumerationOption(name="info.git", default="Disabled",
                           enumeration=["Disabled", "Info", "Info+Status"],
@@ -136,8 +146,15 @@ def post_build(env):
     is_unittest = env.has_module(":test")
     has_xpcc_generator = env.has_module(":communication:xpcc:generator")
     has_image_source = len(env["image.source"])
-    repositories = [p for p in env.buildlog.repositories if isdir(env.real_outpath(p, basepath="."))]
+    def test(p):
+        print(p)
+        print(env.real_outpath(p, basepath="."))
+        ret = isdir(env.real_outpath(p, basepath="."))
+        print(ret)
+        return ret
+    repositories = [p for p in env.buildlog.repositories if test(p)]
     repositories = sorted(repositories, key=lambda name: "0" if name == "modm" else name)
+    print(repositories)
 
     target = env["modm:target"]
     subs = env.query("::device")
@@ -165,6 +182,10 @@ def post_build(env):
     })
     if has_image_source:
         subs["image_source"] = env["image.source"]
+    if is_unittest:
+        subs["unittest_source"] = env["unittest.source"]
+        subs["unittest_runner_template"] = env["unittest.runner_template"]
+    subs["should_generate_comp_db"] = env["info.comp_db"]
     if has_xpcc_generator:
         subs.update({
             "generator_source": env.get(":communication:xpcc:generator:source", ""),
@@ -245,6 +266,8 @@ descr_include_sconstruct = """# Generate a SConstruct file
 !!! warning "This overwrites any top-level `SConstruct` file!"
 """
 
+descr_info_com_db = """# Generate compilation database (compile_commands.json) """
+
 descr_cache_dir = """# Path to SConstruct CacheDir
 
 If value is `/cache`, the cache is placed into the top-level `build/` folder.
@@ -253,6 +276,13 @@ You can disable CacheDir by setting an empty string.
 
 descr_image_source = """# Path to directory containing .pbm files"""
 
+descr_unittest_source = """# Path to directory containing unittests"""
+
+descr_unittest_runner_template = """# Filename for unittests runner template
+
+See modm/test/runners/*.cpp.in
+"""
+
 descr_info_git = """# Generate git repository state information
 
 - `Info`: generates information about the last commit.
@@ -260,3 +290,4 @@ descr_info_git = """# Generate git repository state information
 """
 
 descr_info_build = """# Generate build state information"""
+

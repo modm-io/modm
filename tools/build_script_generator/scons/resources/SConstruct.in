@@ -29,13 +29,18 @@ env.SConscript(dirs=generated_paths, exports="env")
 
 %% if is_unittest
 # Building unit tests
-headers = env.FindHeaderFiles("modm-test/src/modm")
-sources = env.UnittestRunner(target="main.cpp", source=headers, template="modm-test/src/runner.cpp.in")
+headers = env.FindHeaderFiles("{{ unittest_source }}")
+sources = [env.UnittestRunner(target="main.cpp", source=headers, template="{{ unittest_runner_template }}")]
 %% else
 env.Append(CPPPATH=".")
 ignored = ["cmake-*", ".lbuild_cache", build_path] + generated_paths
 sources = []
 %% endif
+
+%% if options["info.comp_db"]
+env.Alias("comp_db", env.CompilationDatabase('compile_commands.json'))
+%% endif
+
 
 %% if has_image_source
 # Generating image sources

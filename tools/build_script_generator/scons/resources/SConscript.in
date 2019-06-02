@@ -31,6 +31,10 @@ env.Append(toolpath=[
 env.Tool("{{tool}}")
 %% endfor
 
+%%if should_generate_comp_db
+env.Tool("compilation_db")
+%%endif
+
 %% if is_modm
 env["BASEPATH"] = abspath(".")
 
