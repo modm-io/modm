@@ -46,9 +46,9 @@ SECTIONS
 {{ linkerscript_sections | indent(first=True) }}
 
 	/* TABLES! TABLES! ALL THE TABLES YOU COULD EVER WANT! TABLES! */
-{{ linker.section_table_zero(["bss"]) }}
+{{ linker.section_table_zero() }}
 
-%% set copy_table = ["data", "fastdata"]
+%% set copy_table = []
 %% if "backup" in regions
 	%% do copy_table.append("backup")
 %% endif

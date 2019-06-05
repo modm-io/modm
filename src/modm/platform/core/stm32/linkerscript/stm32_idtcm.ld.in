@@ -42,10 +42,9 @@ SECTIONS
 {{ linkerscript_sections | indent(first=True) }}
 
 	/* TABLES! TABLES! ALL THE TABLES YOU COULD EVER WANT! TABLES! */
-{{ linker.section_table_zero(["bss"]) }}
+{{ linker.section_table_zero() }}
 
-%% set copy_table = ["data", "fastdata", "fastcode"]
-{{ linker.section_table_copy(copy_table) }}
+{{ linker.section_table_copy(["fastcode"]) }}
 
 {{ linker.section_table_extern() }}
 

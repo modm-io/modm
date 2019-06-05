@@ -93,10 +93,12 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 %% endmacro
 
 
-%% macro section_table_zero(sections)
+%% macro section_table_zero(sections=[])
 	.table.zero.intern : ALIGN(4)
 	{
 		__table_zero_intern_start = .;
+		LONG(__bss_start)
+		LONG(__bss_end)
 	%% for section in sections
 		LONG(__{{section}}_start)
 		LONG(__{{section}}_end)
@@ -106,13 +108,19 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 %% endmacro
 
 
-%% macro section_table_copy(sections)
+%% macro section_table_copy(sections=[])
 	%% if vector_table_location == "ram"
 		%% do sections.append("vector_table_ram")
 	%% endif
 	.table.copy.intern : ALIGN(4)
 	{
 		__table_copy_intern_start = .;
+		LONG(__data_load)
+		LONG(__data_start)
+		LONG(__data_end)
+		LONG(__fastdata_load)
+		LONG(__fastdata_start)
+		LONG(__fastdata_end)
 	%% for section in sections
 		LONG(__{{section}}_load)
 		LONG(__{{section}}_start)
