@@ -11,7 +11,6 @@
 
 #include "fault_storage.hpp"
 #include <modm/architecture/utils.hpp>
-#include <modm/math/utils/crc32.hpp>
 
 typedef struct
 {
@@ -22,8 +21,6 @@ typedef struct
 
 extern "C" const table_pool_t __table_heap_start[];
 extern "C" const table_pool_t __table_heap_end[];
-extern "C" const uint8_t __rom_start[];
-extern "C" const uint8_t __rom_end[];
 
 static constexpr uint32_t magic_start = 0xBAADC0DE;
 static constexpr uint32_t magic_end = 0xC0FFEEEE;
@@ -74,13 +71,6 @@ FaultStorage::closeRead()
 {
 	marker_start = 0;
 	marker_end_ptr = nullptr;
-}
-
-uint32_t
-FaultStorage::firmwareHash()
-{
-	// Compute the CRC32 of the loaded binary image
-	return modm::math::crc32(__rom_start, __rom_end - __rom_start);
 }
 
 void

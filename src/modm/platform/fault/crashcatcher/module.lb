@@ -25,7 +25,7 @@ def prepare(module, options):
             enumeration=["core", "core+stack", "core+stack+data"],
             default="core+stack+data"))
 
-    module.depends(":crashcatcher", ":cmsis:device", ":math:utils")
+    module.depends(":crashcatcher", ":cmsis:device", ":architecture:build_id")
 
     return True
 

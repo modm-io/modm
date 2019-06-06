@@ -73,8 +73,9 @@ int main()
     if (FaultReporter::hasReport()) // Check first after boot
     {
         Application::partialInitialize(); // Initialize only the necessary
-        uint32_t id = FaultReporter::firmware();
-        reportBegin(id); // start your report with the firmware hash
+        reportBegin();
+        for (const uint8_t data : FaultReporter::buildId())
+            reportBuildId(data); // send each byte of Build ID
         for (const uint8_t data : FaultReporter())
             reportData(data); // send each byte of data
         reportEnd(); // end the report
@@ -108,7 +109,7 @@ int main()
         if (faultReport and applicationReady)
         {
             // Still valid AFTER clear, but BEFORE reboot
-            const uint32_t id = FaultReporter::firmware();
+            const auto id = FaultReporter::buildId();
             auto begin = FaultReporter::begin();
             auto end = FaultReporter::end();
             //
@@ -133,8 +134,17 @@ arm-none-eabi-gdb -tui executable.elf -ex "set target-charset ASCII" \
     -ex "target remote | CrashDebug --elf executable.elf --dump coredump.txt"
 ```
 
-Note that the firmware identifier is the CRC32 hash of the ROM section, this can
-help you find the right ELF file.
+Note that the `FaultReporter::buildId()` contains the GNU Build ID, which can
+help you find the right ELF file:
+
+```
+arm-none-eabi-readelf -n executable.elf
+
+Displaying notes found in: .build_id
+  Owner                 Data size Description
+  GNU                  0x00000014 NT_GNU_BUILD_ID (unique build ID bitstring)
+    Build ID: 59f08f7a37a7340799d9dba6b0c092bc3c9515c5
+```
 
 
 ### Post-Mortem Debugging with SCons
@@ -143,14 +153,14 @@ The `:build:scons` module provides a few helper methods for working with fault
 reports. You still need to copy the coredump data manually, however, the firmware
 selection is automated.
 
-The SCons build system will automatically cache both the ELF and binary files
-for the firmware ID for every firmware upload (using `scons artifact`).
-When a fault is reported, you can tell SCons the firmware hash and it will use
+The SCons build system will automatically cache the ELF file for the build id for
+every firmware upload (using `scons artifact`).
+When a fault is reported, you can tell SCons the firmware build id and it will use
 the corresponding ELF file automatically.
 
 ```sh
 # Copy data into coredump.txt
 touch coredump.txt
-# Start postmortem debugging of {hash}
-scons postmortem firmware={hash}
+# Start postmortem debugging of executable with this build id
+scons postmortem firmware=59f08f7a37a7340799d9dba6b0c092bc3c9515c5
 ```

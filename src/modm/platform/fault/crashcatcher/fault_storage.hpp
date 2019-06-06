@@ -24,7 +24,6 @@ class FaultStorage
 public:
 	static size_t openRead();
 	static void closeRead();
-	static uint32_t firmwareHash();
 
 	class Iterator
 	{

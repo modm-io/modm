@@ -23,6 +23,7 @@ def run_post_mortem_gdb(target, source, env):
 		print("\n> Using the newest firmware may be inaccurate!\n"
 		      "> Use 'firmware={hash}' argument to specify a specific firmware.\n")
 	else:
+		artifact = artifact.lower()
 		artifactpath = os.path.join(env["CONFIG_BUILD_BASE"], "artifacts", "{}.elf".format(artifact))
 		if os.path.isfile(artifactpath):
 			source = artifactpath
