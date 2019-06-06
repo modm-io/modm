@@ -38,8 +38,13 @@
 %% if options["buffer.tx"] > 0
 static modm::atomic::Queue<modm::can::Message, {{ options["buffer.tx"] }}> txQueue;
 %% endif
+
+struct RxMessage {
+    modm::can::Message message;
+    uint8_t filter_id;
+};
 %% if options["buffer.rx"] > 0
-static modm::atomic::Queue<modm::can::Message, {{ options["buffer.rx"] }}> rxQueue;
+static modm::atomic::Queue<RxMessage, {{ options["buffer.rx"] }}> rxQueue;
 %% endif
 
 
@@ -185,7 +190,7 @@ sendMailbox(const modm::can::Message& message, uint32_t mailboxId)
 // Low level function to receive a message from mailbox.
 // Called by Rx Interrupt or by getMessage.
 static void
-readMailbox(modm::can::Message& message, uint32_t mailboxId)
+readMailbox(modm::can::Message& message, uint32_t mailboxId, uint8_t* filter_id)
 {
 	CAN_FIFOMailBox_TypeDef* mailbox = &{{ reg }}->sFIFOMailBox[mailboxId];
 
@@ -201,6 +206,8 @@ readMailbox(modm::can::Message& message, uint32_t mailboxId)
 	message.setRemoteTransmitRequest(rir & CAN_RI0R_RTR);
 
 	message.length = mailbox->RDTR & CAN_TDT1R_DLC;
+	if(filter_id != nullptr)
+        (*filter_id) = (mailbox->RDTR & CAN_RDT1R_FMI) >> CAN_RDT1R_FMI_Pos;
 
 	uint8_t * modm_may_alias data = message.data;
 	reinterpret_cast<uint32_t *>(data)[0] = mailbox->RDLR;
@@ -256,13 +263,13 @@ MODM_ISR({{ reg }}_RX0)
 	}
 
 %% if options["buffer.rx"] > 0
-	modm::can::Message message;
-	readMailbox(message, 0);
+	RxMessage rxMessage;
+	readMailbox(rxMessage.message, 0, &(rxMessage.filter_id));
 
 	// Release FIFO (access the next message)
 	{{ reg }}->RF0R = CAN_RF0R_RFOM0;
 
-	if (!rxQueue.push(message)) {
+	if (!rxQueue.push(rxMessage)) {
 		modm::ErrorReport::report(modm::platform::CAN{{ id }}_FIFO0_OVERFLOW);
 	}
 %% endif
@@ -283,13 +290,13 @@ MODM_ISR({{ reg }}_RX1)
 	}
 
 %% if options["buffer.rx"] > 0
-	modm::can::Message message;
-	readMailbox(message, 1);
+	RxMessage rxMessage;
+	readMailbox(rxMessage.message, 1, &(rxMessage.filter_id));
 
 	// Release FIFO (access the next message)
 	{{ reg }}->RF1R = CAN_RF1R_RFOM1;
 
-	if (!rxQueue.push(message)) {
+	if (!rxQueue.push(rxMessage)) {
 		modm::ErrorReport::report(modm::platform::CAN{{ id }}_FIFO1_OVERFLOW);
 	}
 %% endif
@@ -365,7 +372,7 @@ modm::platform::Can{{ id }}::isMessageAvailable()
 
 // ----------------------------------------------------------------------------
 bool
-modm::platform::Can{{ id }}::getMessage(can::Message& message)
+modm::platform::Can{{ id }}::getMessage(can::Message& message, uint8_t *filter_id)
 {
 %% if options["buffer.rx"] > 0
 	if (rxQueue.isEmpty())
@@ -374,14 +381,16 @@ modm::platform::Can{{ id }}::getMessage(can::Message& message)
 		return false;
 	}
 	else {
-		memcpy(&message, &rxQueue.get(), sizeof(message));
+        auto& rxMessage = rxQueue.get();
+		memcpy(&message, &rxMessage.message, sizeof(message));
+        if(filter_id != nullptr) (*filter_id) = rxMessage.filter_id;
 		rxQueue.pop();
 		return true;
 	}
 %% else
 	if (({{ reg }}->RF0R & CAN_RF0R_FMP0) > 0)
 	{
-		readMailbox(message, 0);
+		readMailbox(message, 0, filter_id);
 
 		// Release FIFO (access the next message)
 		{{ reg }}->RF0R = CAN_RF0R_RFOM0;
@@ -389,7 +398,7 @@ modm::platform::Can{{ id }}::getMessage(can::Message& message)
 	}
 	else if (({{ reg }}->RF1R & CAN_RF1R_FMP1) > 0)
 	{
-		readMailbox(message, 1);
+		readMailbox(message, 1, filter_id);
 
 		// Release FIFO (access the next message)
 		{{ reg }}->RF1R = CAN_RF1R_RFOM1;

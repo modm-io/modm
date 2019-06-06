@@ -21,11 +21,11 @@ modm::log::Logger modm::log::info(loggerDevice);
 #define	MODM_LOG_LEVEL modm::log::INFO
 
 static void
-displayMessage(const modm::can::Message& message)
+displayMessage(const modm::can::Message& message, const uint8_t& filter_id)
 {
 	static uint32_t receiveCounter = 0;
 	receiveCounter++;
-
+    MODM_LOG_INFO<< "filter_id  =" << filter_id;
 	MODM_LOG_INFO<< "id  =" << message.getIdentifier();
 	if (message.isExtended()) {
 		MODM_LOG_INFO<< " extended";
@@ -98,8 +98,9 @@ main()
 		{
 			MODM_LOG_INFO << "Can1: Message is available..." << modm::endl;
 			modm::can::Message message;
-			Can::getMessage(message);
-			displayMessage(message);
+			uint8_t filter_id;
+			Can::getMessage(message, &filter_id);
+			displayMessage(message, filter_id);
 
 			Board::LedGreen::toggle();
 		}

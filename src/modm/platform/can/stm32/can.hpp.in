@@ -141,7 +141,7 @@ public:
 	isMessageAvailable();
 
 	static bool
-	getMessage(can::Message& message);
+	getMessage(can::Message& message, uint8_t *filter_id=nullptr);
 
 	static bool
 	isReadyToSend();
