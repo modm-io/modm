@@ -254,6 +254,7 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Update submodules and install lbuild
           command: |
             (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
       - run:
@@ -263,37 +264,35 @@ jobs:
             (cd examples/stm32f469_discovery/blink; lbuild -D ::generate_module_docs=True build -m "modm:**")
             (cd docs/src/reference && ln -s ../../../examples/stm32f469_discovery/blink/modm/docs/module)
             (cd docs && mkdocs build)
+      - persist_to_workspace:
+          root: docs
+          paths:
+            - modm.io
 
-  build-docs-upload:
+  upload-docs:
     docker:
       - image: modm/modm-build:latest
     steps:
       - checkout
+      - attach_workspace:
+          at: /tmp/docs
       - add_ssh_keys:
           fingerprints:
             - "8c:e7:b6:51:2a:40:66:e6:e9:50:ea:fe:38:49:1d:3f"
       - run:
+          name: Clone Old Docs
           command: |
-            (git submodule sync && git submodule update --init --jobs 8) &
-            pip3 install -U lbuild &
-            git clone git@github.com:modm-ext/modm.io.git docs/modm.io &
-            wait
+            git clone --depth 1 --no-checkout git@github.com:modm-ext/modm.io.git docs/modm.io
+            cp -R /tmp/docs/modm.io/ docs/
       - run:
-          name: Build Homepage
+          name: Push New Docs to Github
           command: |
-            python3 tools/scripts/synchronize_docs.py
-            (cd examples/stm32f469_discovery/blink; lbuild -D ::generate_module_docs=True build -m "modm:**")
-            (cd docs/src/reference && ln -s ../../../examples/stm32f469_discovery/blink/modm/docs/module)
-            (cd docs && mkdocs build)
-            if [ "$CIRCLE_BRANCH" = "develop" ]; then
-              cd docs/modm.io
-
-              git config user.email "rca@circleci.com"
-              git config user.name "CircleCI Deployment Bot"
-              git add -A
-              git diff-index --quiet HEAD || git commit -m "Update"
-              git push origin master
-            fi
+            cd docs/modm.io
+            git config user.email "rca@circleci.com"
+            git config user.name "CircleCI Deployment Bot"
+            git add -A
+            git diff-index --quiet HEAD || git commit -m "Update"
+            git push origin master
 
 workflows:
   version: 2
@@ -339,11 +338,12 @@ workflows:
           requires:
             - unittests-linux-generic
             - stm32-examples
-      - build-docs-upload:
+      - upload-docs:
           filters:
             branches:
               only: develop
           requires:
+            - build-docs
             - avr-compile-all
             - stm32f0-compile-all
             - stm32f1-compile-all
@@ -354,9 +354,6 @@ workflows:
             - stm32g0-compile-all
             - stm32l4-compile-all
       - build-docs:
-          filters:
-            branches:
-              only: /^pull\/.*$/
           requires:
             - avr-compile-all
             - stm32f0-compile-all
