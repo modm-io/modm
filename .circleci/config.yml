@@ -254,15 +254,20 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Update submodules and install lbuild
           command: |
-            (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
+            if [ ! -z "$CIRCLE_PULL_REQUESTS" ]; then
+              (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
+            fi
       - run:
           name: Build Homepage
           command: |
-            python3 tools/scripts/synchronize_docs.py
-            (cd examples/stm32f469_discovery/blink; lbuild -D ::generate_module_docs=True build -m "modm:**")
-            (cd docs/src/reference && ln -s ../../../examples/stm32f469_discovery/blink/modm/docs/module)
-            (cd docs && mkdocs build)
+            if [ ! -z "$CIRCLE_PULL_REQUESTS" ]; then
+              python3 tools/scripts/synchronize_docs.py
+              (cd examples/stm32f469_discovery/blink; lbuild -D ::generate_module_docs=True build -m "modm:**")
+              (cd docs/src/reference && ln -s ../../../examples/stm32f469_discovery/blink/modm/docs/module)
+              (cd docs && mkdocs build)
+            fi
 
   build-docs-upload:
     docker:
@@ -354,9 +359,6 @@ workflows:
             - stm32g0-compile-all
             - stm32l4-compile-all
       - build-docs:
-          filters:
-            branches:
-              only: /^pull\/.*$/
           requires:
             - avr-compile-all
             - stm32f0-compile-all
