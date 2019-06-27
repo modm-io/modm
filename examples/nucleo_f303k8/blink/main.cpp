@@ -28,7 +28,7 @@ main()
 
 	uint32_t counter(0);
 
-	while (1)
+	while (true)
 	{
 		LedD13::toggle();
 		modm::delayMilliseconds(Button::read() ? 100 : 500);

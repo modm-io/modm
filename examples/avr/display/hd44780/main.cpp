@@ -55,7 +55,7 @@ main()
 	display << "Hello World!\n";
 
 	uint8_t counter = 0;
-	while (1)
+	while (true)
 	{
 		// Go to the beginning of the second line of the display and
 		// write the value of 'counter'

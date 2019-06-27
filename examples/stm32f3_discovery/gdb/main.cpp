@@ -107,7 +107,7 @@ main()
 	int a = 30;
 	(void)a;
 
-	while (1)
+	while (true)
 	{
 		rec_itr();
 		function_chaos();

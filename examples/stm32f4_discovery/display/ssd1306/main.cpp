@@ -44,7 +44,7 @@ main()
 	modm::ShortPeriodicTimer timer(1000);
 	uint16_t counter(0);
 
-	while (1)
+	while (true)
 	{
 		if (timer.execute())
 		{

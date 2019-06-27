@@ -97,7 +97,7 @@ main()
 	Board::initialize();
 	Board::initializeL3g();
 
-	while (1)
+	while (true)
 	{
 		reader.update();
 	}

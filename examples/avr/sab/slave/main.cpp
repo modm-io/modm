@@ -103,7 +103,7 @@ main()
 	// enable interrupts
 	enableInterrupts();
 
-	while (1)
+	while (true)
 	{
 		// decode received messages etc.
 		slave.update();

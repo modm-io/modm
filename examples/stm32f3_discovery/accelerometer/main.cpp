@@ -83,7 +83,7 @@ main()
 	Board::initialize();
 	Board::initializeLsm3();
 
-	while (1)
+	while (true)
 	{
 		reader.update();
 	}

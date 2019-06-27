@@ -222,7 +222,7 @@ main()
 
 	uint8_t units = 0;
 	uint8_t tens = 0;
-	while (1)
+	while (true)
 	{
 		units++;
 		if (units >= 10) {

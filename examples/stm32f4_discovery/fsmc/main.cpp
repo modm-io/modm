@@ -79,7 +79,7 @@ main()
 		data[offset] = *(out + offset);
 	}
 
-	while (1)
+	while (true)
 	{
 		static uint8_t ii = 0;
 		++ii;

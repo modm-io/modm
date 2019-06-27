@@ -83,7 +83,7 @@ public:
 	 * @code
 	 * modm::ButtonGroup<> buttons;
 	 * ...
-	 * while (1) {
+	 * while (true) {
 	 *		...
 	 * 	if (buttons.isPressed(modm::ButtonGroup::BUTTON0)) {
 	 * 		// do something
@@ -105,7 +105,7 @@ public:
 	 * @code
 	 * modm::ButtonGroup<> buttons(modm::ButtonGroup::BUTTON0);
 	 * ...
-	 * while (1) {
+	 * while (true) {
 	 *		...
 	 * 	if (buttons.isPressed(modm::ButtonGroup::BUTTON0) ||
 	 *		buttons.isRepeated(modm::ButtonGroup::BUTTON0))
@@ -126,7 +126,7 @@ public:
 	 * @code
 	 * modm::ButtonGroup<> buttons(modm::ButtonGroup::BUTTON0);
 	 * ...
-	 * while (1) {
+	 * while (true) {
 	 * 	...
 	 * 	if (buttons.isPressedShort(modm::ButtonGroup::BUTTON0)) {
 	 * 		// do something

@@ -24,7 +24,7 @@ main()
 	Board::initialize();
 	PushButton::setInput();
 
-	while (1)
+	while (true)
 	{
 		// read the input pin
 		bool buttonState = PushButton::read();

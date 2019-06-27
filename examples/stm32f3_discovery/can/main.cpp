@@ -101,7 +101,7 @@ main()
 
 	modm::ShortPeriodicTimer pTimer(100);
 
-	while (1)
+	while (true)
 	{
 		if (Can::isMessageAvailable())
 		{

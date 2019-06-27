@@ -46,7 +46,7 @@ main()
 
 	out = blub[2];
 
-	while (1) {
+	while (true) {
 
 	}
 }

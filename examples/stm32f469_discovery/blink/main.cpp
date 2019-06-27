@@ -32,7 +32,7 @@ main()
 
 	uint32_t counter(0);
 
-	while (1)
+	while (true)
 	{
 		LedGreen::toggle();
 		modm::delayMilliseconds(Button::read() ? 125 : 500);

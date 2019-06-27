@@ -33,7 +33,7 @@ main()
 	display.drawRectangle(791, -1, 10, 10);
 	display.drawRectangle(791,471, 10, 10);
 
-	while (1)
+	while (true)
 	{
 		modm::delayMilliseconds(50);
 

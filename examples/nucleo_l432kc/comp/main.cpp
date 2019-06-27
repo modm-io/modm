@@ -38,7 +38,7 @@ main()
 			Comparator::Polarity::NonInverted,
 			false);
 
-	while (1)
+	while (true)
 	{
 		modm::delayMilliseconds(250);
 		MODM_LOG_INFO << "Comparator: " << Comparator::getOutput() << modm::endl;

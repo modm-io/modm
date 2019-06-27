@@ -23,7 +23,7 @@ main()
 	UartSpiMaster2::connect<GpioA4::Ck, GpioA2::Tx, GpioA3::Rx>();
 	UartSpiMaster2::initialize<Board::SystemClock, 5.25_MHz, 0_pct>();
 
-	while (1)
+	while (true)
 	{
 		UartSpiMaster2::transferBlocking(0xF0);
 	}

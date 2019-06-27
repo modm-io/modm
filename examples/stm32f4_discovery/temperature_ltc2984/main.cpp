@@ -105,7 +105,7 @@ public:
 		logger << "Device configured" << modm::endl;
 
 
-		while (1)
+		while (true)
 		{
 			//PT_CALL(tempSensor.initiateMeasurements());
 			PT_CALL(tempSensor.initiateSingleMeasurement(modm::ltc2984::Channel::Ch4));
@@ -155,7 +155,7 @@ main()
 
 	logger << "\n\nWelcome to LTC2983/LTC2984 demo!\n\n";
 
-	while (1)
+	while (true)
 	{
 		one.update();
 		Board::LedOrange::toggle();

@@ -33,7 +33,7 @@ public:
 	virtual void
 	run()
 	{
-		while (1)
+		while (true)
 		{
 			MODM_LOG_INFO << "ping" << modm::endl;
 
@@ -56,7 +56,7 @@ public:
 	virtual void
 	run()
 	{
-		while (1)
+		while (true)
 		{
 			MODM_LOG_INFO << "pong" << modm::endl;
 

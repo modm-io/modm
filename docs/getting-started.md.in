@@ -74,7 +74,7 @@ int main()
     Board::initialize();
     Board::Leds::setOutput();
 
-    while (1)
+    while (true)
     {
         Board::Leds::toggle();
         modm::delayMilliseconds(Board::Button::read() ? 250 : 500);
@@ -229,7 +229,7 @@ source code.
 !!! tip "Check your repository path"
     Make sure you've set the correct path to the modm `repo.lb` file, otherwise
     lbuild cannot help you much. **This is especially important when copying
-    from our examples, which have the repository path set in the inherited 
+    from our examples, which have the repository path set in the inherited
     common configuration file located in `modm/examples/lbuild.xml`!**
 
 A minimal `main.cpp` for this configuration would look like this:
@@ -241,7 +241,7 @@ using namespace modm::platform;
 int main()
 {
     GpioA0::setOutput();
-    while(1) {
+    while (true) {
         GpioA0::toggle();
         modm::delayMilliseconds(500);
     }

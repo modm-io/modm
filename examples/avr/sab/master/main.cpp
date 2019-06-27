@@ -26,7 +26,7 @@ main()
 	// enable interrupts
 	enableInterrupts();
 
-	while(1)
+	while (true)
 	{
 		// decode received messages
 		interface.update();

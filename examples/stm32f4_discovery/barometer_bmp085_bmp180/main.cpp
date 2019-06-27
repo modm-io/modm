@@ -135,7 +135,7 @@ main()
 
 	stream << "\n\nWelcome to BMP085 demo!\n\n";
 
-	while (1)
+	while (true)
 	{
 		one.update();
 		Board::LedOrange::toggle();

@@ -30,7 +30,7 @@ main()
 	constexpr uint8_t max = 62;
 	uint8_t r=0, g=max/3, b=max/3*2;
 
-	while (1)
+	while (true)
 	{
 		for (size_t ii=0; ii < leds.size; ii++)
 		{

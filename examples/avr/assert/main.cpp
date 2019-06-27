@@ -36,7 +36,7 @@ modm_abandon(const char * module,
 			<< IFS(" failed! Abandoning.") << modm::endl;
 
 	Leds::setOutput();
-	while(1) {
+	while (true) {
 		Leds::write(1);
 		modm::delayMilliseconds(20);
 		Leds::write(0);
@@ -92,7 +92,7 @@ int main()
 
 	modm_assert(false, MODM_UART_MODULE_NAME, "init", "mode");
 
-	while (1)
+	while (true)
 	{
 		Led3::toggle();
 		modm::delayMilliseconds(500);

@@ -28,7 +28,7 @@ main()
 
 	uint32_t counter(0);
 
-	while (1)
+	while (true)
 	{
 		Leds::write(1 << (counter % (Leds::width+1) ));
 		modm::delayMilliseconds(Button::read() ? 100 : 500);

@@ -128,7 +128,7 @@ main()
 		initializeSuccess = true;
 	}
 
-	while (1)
+	while (true)
 	{
 		if(initializeSuccess && Button::read())
 		{

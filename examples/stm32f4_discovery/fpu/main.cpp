@@ -22,7 +22,7 @@ main()
 {
 	Board::initialize();
 
-	while (1)
+	while (true)
 	{
 		modm::Vector<float, 2> v(1.0f, 2.0f);
 		v.getLength();

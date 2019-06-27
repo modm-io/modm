@@ -34,7 +34,7 @@ public:
 		// Configure the touchscreen to sample with 60Hz in active and monitor mode.
 		PT_CALL(touch.configure(Touch::InterruptMode::Trigger, 60, 60));
 
-		while (1)
+		while (true)
 		{
 			do {
 				// Wait for either touchscreen interrupt or clear screen button
@@ -99,7 +99,7 @@ main()
 	Board::initializeDisplay();
 	Board::initializeTouchscreen();
 
-	while(1)
+	while (true)
 	{
 		drawer.update();
 	}

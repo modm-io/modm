@@ -175,7 +175,7 @@ main()
 	/* Buffer for received payload */
 	uint8_t received_data[payload_length];
 
-	while (1)
+	while (true)
 	{
 		// ------------------------- Primary sender ---------------------------
 

@@ -103,7 +103,7 @@ main()
 	MODM_LOG_INFO.printf("ctr   time  relati data\n");
 	MODM_LOG_INFO.printf("==== ====== ====== ===== ...\n");
 
-	while (1)
+	while (true)
 	{
 		uint8_t c;
 		while (Usart3::read(c)) {

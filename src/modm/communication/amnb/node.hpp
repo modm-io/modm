@@ -217,7 +217,7 @@ namespace modm
 		 *               modm::accessor::asFlash(errorHandlerList),
 		 *               sizeof(errorHandlerList) / sizeof(modm::amnb::ErrorHandler));
 		 *
-		 *     while(1)
+		 *     while (true)
 		 *     {
 		 *         node.update();
 		 *     }

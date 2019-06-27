@@ -69,7 +69,7 @@ main()
 		MODM_LOG_INFO << "Debugger connected!" << modm::endl;
 	}
 
-	while (1)
+	while (true)
 	{
 		Board::Leds::toggle();
 

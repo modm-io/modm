@@ -37,7 +37,7 @@ main()
 	Timer1::enableOutput();
 
 	uint8_t i = 0;
-	while (1){
+	while (true){
 		Timer1::setCompareValue(1, ++i);
 		modm::delayMilliseconds(10);
 	}

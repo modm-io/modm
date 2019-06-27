@@ -100,7 +100,7 @@ main()
 	mcp2515.sendMessage(message);
 
 	modm::ShortPeriodicTimer timer(200);
-	while (1)
+	while (true)
 	{
 		if (mcp2515.isMessageAvailable())
 		{

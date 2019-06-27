@@ -64,7 +64,7 @@ main()
 	uint8_t x = 15;
 	uint8_t y = 15;
 	const uint8_t radius = 5;
-	while (1)
+	while (true)
 	{
 		display.clear();
 		display.drawRectangle(Point(10, 10), 104, 44);

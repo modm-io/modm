@@ -16,7 +16,7 @@ int main(void)
     using LedRed = modm::platform::GpioOutputB0;
     LedRed::setOutput();
 
-    while(1)
+    while (true)
     {
         LedRed::toggle();
         modm::delayMilliseconds(500);

@@ -45,7 +45,7 @@ int main()
 		MODM_LOG_INFO << modm::endl;
 	}
 
-	while (1)
+	while (true)
 	{
 		Board::Leds::toggle();
 		modm::delayMilliseconds(500);

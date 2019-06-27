@@ -41,7 +41,7 @@ main()
 	Adc4::connect<AdcIn0::In3>();
 	Adc4::setPinChannel<AdcIn0>(Adc4::SampleTime::Cycles182);
 
-	while (1)
+	while (true)
 	{
 		Adc4::startConversion();
 		// wait for conversion to finish

@@ -281,7 +281,7 @@ void game_of_life()
 	modm::PeriodicTimer timer(33);
 	bool touch_read = false;
 
-	while (1)
+	while (true)
 	{
 		// generate random input by pressing the button
 		if (Button::read()) {

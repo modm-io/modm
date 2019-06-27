@@ -112,7 +112,7 @@ main()
 
 	MODM_LOG_INFO << "AD7928/AD7918/AD7908 Example" << modm::endl;
 
-	while (1) {
+	while (true) {
 		thread.update();
 	}
 

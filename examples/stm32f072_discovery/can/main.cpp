@@ -105,7 +105,7 @@ main()
 	MODM_LOG_INFO << "Can silent mode: " << silent << modm::endl;
 	MODM_LOG_INFO << "Can loop back mode: " << loop_back << modm::endl;
 
-	while (1)
+	while (true)
 	{
 		if (Can::isMessageAvailable())
 		{

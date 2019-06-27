@@ -47,7 +47,7 @@ main()
 
 	bool dir = true;
 	uint8_t y = 0;
-	while (1)
+	while (true)
 	{
 		display.clear();
 		display.setCursor(46, 2);

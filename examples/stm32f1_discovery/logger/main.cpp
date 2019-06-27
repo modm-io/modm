@@ -51,7 +51,7 @@ main()
 	uint32_t ii(1);
 	modm::Timeout timeout;
 
-	while (1)
+	while (true)
 	{
 		Board::LedBlue::set();
 		timeout.restart(100);

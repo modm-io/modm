@@ -108,7 +108,7 @@ main()
 
 	uint16_t counter = 0;
 
-	while (1)
+	while (true)
 	{
 		modm::delayMilliseconds(100);
 		LedStatus::toggle();

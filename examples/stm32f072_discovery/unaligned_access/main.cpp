@@ -22,7 +22,7 @@ uint32_t output;
 
 void error()
 {
-	while(1)
+	while (true)
 	{
 		LedUp::toggle();
 		modm::delayMilliseconds(100);
@@ -42,7 +42,7 @@ main()
 
 	// if an unaligned access is trapped, the blue led will blink
 
-	while (1)
+	while (true)
 	{
 		{
 			// "smart" pointer is created on the heap

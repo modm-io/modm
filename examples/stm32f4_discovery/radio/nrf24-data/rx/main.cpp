@@ -114,7 +114,7 @@ main()
 	// one. It's automatically allocated with the max. payload length configured.
 	nrf24data::Packet packet;
 
-	while(1)
+	while (true)
 	{
 		if (nrf24data::getPacket(packet))
 		{

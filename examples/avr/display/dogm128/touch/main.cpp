@@ -108,7 +108,7 @@ main()
 	touch::Right::setInput();
 	touch::Right::reset();
 
-	while (1)
+	while (true)
 	{
 		// read x value
 		touch::Left::reset();

@@ -22,7 +22,7 @@ main()
 
 	Board::LedNorth::set();
 
-	while (1)
+	while (true)
 	{
 		Board::LedNorth::toggle();
 		modm::delayMilliseconds(100);

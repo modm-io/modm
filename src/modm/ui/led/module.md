@@ -60,7 +60,7 @@ modm::ui::Led led;
 modm::ui::Indicator<uint8_t> indicator(led);
 indicator.start();
 
-while(1)
+while (true)
 {
     indicator.update();
 }
@@ -81,7 +81,7 @@ methods inside a 1ms `modm::PeriodicTimer`:
 ```cpp
 modm::PeriodicTimer update_timer(1);
 
-while(1)
+while (true)
 {
     if (update_timer.execute())
     {

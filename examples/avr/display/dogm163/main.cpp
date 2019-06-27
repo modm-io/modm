@@ -48,7 +48,7 @@ main()
 	display << "abcdefghijklmnop" << modm::endl;
 	display << 0 << 12 << 345 << 6789 << "!\"§$%" << modm::endl;
 
-	while (1)
+	while (true)
 	{
 	}
 }

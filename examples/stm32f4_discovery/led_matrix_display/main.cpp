@@ -67,7 +67,7 @@ main()
 
 	modm::ShortPeriodicTimer countdownTimer(100);
 
-	while (1)
+	while (true)
 	{
 		if (countdownTimer.execute())
 		{

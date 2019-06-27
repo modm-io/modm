@@ -48,7 +48,7 @@ public:
 	void run()
 	{
 		Gpio::setOutput();
-		while (1)
+		while (true)
 		{
 			sleep(SleepTime * MILLISECONDS);
 

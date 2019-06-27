@@ -82,7 +82,7 @@ main()
 	uint64_t addr;
 
 
-	while (1)
+	while (true)
 	{
 
 		nrf24phy::setRxAddress(nrf24phy::Pipe::PIPE_0, 0xdeadb33f05);

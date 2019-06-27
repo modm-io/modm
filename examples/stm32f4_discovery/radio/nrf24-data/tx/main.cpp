@@ -121,7 +121,7 @@ main()
 	// over time
 	uint32_t* data = reinterpret_cast<uint32_t*>(packet.payload.data);
 
-	while(1)
+	while (true)
 	{
 		if(sendTimer.execute())
 		{

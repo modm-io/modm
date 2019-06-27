@@ -83,7 +83,7 @@ int main()
 		serialStream << modm::bin << PinGroup::read() << modm::endl; modm::delayMilliseconds(200);
 	};
 
-	while (1)
+	while (true)
 	{
 		PinGroup::write(0b00000); fn_report();
 		PinGroup::write(0b00001); fn_report();
@@ -100,6 +100,6 @@ int main()
 		Pin3::set(); fn_report();
 		serialStream << modm::endl;
 
-		// while (1);
+		// while (true);
 	}
 }

@@ -64,7 +64,7 @@ int main()
 	MODM_LOG_INFO << "Push the Button to trigger EXTI interrupts!" << modm::endl;
 	int ii{0};
 
-	while (1)
+	while (true)
 	{
 		if(Button::read())
 		{

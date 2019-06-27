@@ -64,7 +64,7 @@ def resolve_comment_style(style_or_filename):
                 break
     if style is not None:
         # resolve until done
-        while 1:
+        while True:
             style = comment_styles[style]
             if isinstance(style, tuple): return style;
             if style not in comment_styles: break;

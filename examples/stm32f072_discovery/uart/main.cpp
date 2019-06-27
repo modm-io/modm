@@ -33,7 +33,7 @@ main()
 	Usart1::connect<GpioOutputA9::Tx>();
 	Usart1::initialize<Board::SystemClock, 9600_Bd>();
 
-	while (1)
+	while (true)
 	{
 		static uint8_t c = 'A';
 		Board::LedUp::toggle();

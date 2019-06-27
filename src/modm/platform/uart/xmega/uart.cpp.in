@@ -48,7 +48,7 @@ modm::platform::Uart{{ id }}::initializeWithFractionalBaudrate(uint16_t bsel, ui
 void
 modm::platform::Uart{{ id }}::write(uint8_t c)
 {
-	while (!(USART{{ id }}_STATUS & USART_DREIF_bm))
+	while (not (USART{{ id }}_STATUS & USART_DREIF_bm))
 		;
 
 	USART{{ id }}_DATA = c;
@@ -110,7 +110,7 @@ modm::platform::Uart{{ id }}::read(uint8_t *b, uint8_t n)
 	uint8_t rcvd = 0;
 	uint16_t const delayStart = (F_CPU / 69282);		// TODO Make depend on baudrate
 	uint16_t delay = delayStart;
-	while (1)
+	while (true)
 	{
 		if (USART{{ id }}_STATUS & USART_RXCIF_bm)
 		{

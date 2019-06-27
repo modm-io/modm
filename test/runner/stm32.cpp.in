@@ -80,5 +80,5 @@ ${tests}
 	unittest::Controller::instance().getReporter().printSummary();
 
 	Board::Leds::write(0b111);
-	while (true) ;
+	for (;;) {}
 }

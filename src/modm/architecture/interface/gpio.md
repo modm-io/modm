@@ -24,7 +24,7 @@ using Led = GpioOutputB0;
 Led::setOutput();
 Led::set();
 
-while (1)
+while (true)
 {
     Led::toggle();
     modm::delayMilliseconds(500);

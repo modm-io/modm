@@ -40,7 +40,7 @@ main()
 
 	typedef modm::Ft245<myPort, Rd, Wr, Rxf, Txe> myFt;
 
-	while (1)
+	while (true)
 	{
 		uint8_t c;
 		if (myFt::read(c)) {

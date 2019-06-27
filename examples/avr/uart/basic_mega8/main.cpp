@@ -33,7 +33,7 @@ main()
 	Uart::write('o');
 	Uart::write('\n');
 
-	while (1)
+	while (true)
 	{
 	}
 }

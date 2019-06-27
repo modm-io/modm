@@ -88,7 +88,7 @@ main()
 	I2c::connect<Sda::Sda, Scl::Scl>();
 	I2c::initialize<Board::SystemClock, 400_kHz, 20_pct>();
 
-	while (1) {
+	while (true) {
 		thread.update();
 	}
 

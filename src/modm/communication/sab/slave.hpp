@@ -167,7 +167,7 @@ namespace modm
 		 *             modm::accessor::asFlash(actionList),
 		 *             sizeof(actionList) / sizeof(modm::sab::Action));
 		 *
-		 *     while(1)
+		 *     while (true)
 		 *     {
 		 *         slave.update();
 		 *     }

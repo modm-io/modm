@@ -25,7 +25,7 @@ main()
 	Adc::connect<AdcIn1::In0>();
 	Adc::initialize(Adc::ClockMode::PCLKDividedBy4, Adc::CalibrationMode::DoNotCalibrate);
 
-	while (1)
+	while (true)
 	{
 		LedD13::toggle();
 		modm::delayMilliseconds(250);

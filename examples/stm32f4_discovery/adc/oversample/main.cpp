@@ -59,7 +59,7 @@ main()
 	sensors::initialize(sensorMapping, sensorData);
 	sensors::startReadout();
 
-	while (1)
+	while (true)
 	{
 		if (timeout.isExpired() && sensors::isReadoutFinished())
 		{

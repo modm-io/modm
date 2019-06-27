@@ -106,7 +106,7 @@ main()
 
 	// Board::D15::setOutput();
 
-	while (1)
+	while (true)
 	{
 		one.update();
 		if(tmr.execute()) {

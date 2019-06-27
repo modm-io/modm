@@ -47,7 +47,7 @@ main()
 
 	enableInterrupts();
 
-	while (1)
+	while (true)
 	{
 		if (buttons.isPressed(BUTTON_1))
 		{

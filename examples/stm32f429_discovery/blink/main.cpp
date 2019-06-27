@@ -23,7 +23,7 @@ main()
 	usb::VBus::setOutput(modm::Gpio::Low);
 	usb::Overcurrent::setOutput(modm::Gpio::Low);
 
-	while (1)
+	while (true)
 	{
 		LedRed::toggle();
 		LedGreen::toggle();

@@ -104,7 +104,7 @@ main()
 
 	MODM_LOG_INFO << "Welcome to the communication test!" << modm::endl;
 
-	while (1)
+	while (true)
 	{
 		// deliver received messages
 		dispatcher.update();

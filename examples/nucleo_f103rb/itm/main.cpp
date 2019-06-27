@@ -34,7 +34,7 @@ main()
 	stream << "error"   << modm::endl;
 
 
-	while (1)
+	while (true)
 	{
 		static modm::PeriodicTimer tmr{500};
 		if (tmr.execute())

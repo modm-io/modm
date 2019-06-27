@@ -43,7 +43,7 @@ main()
 	if (!OneWireMaster::touchReset()) {
 		output << "No devices found!" << modm::endl;
 		modm::delayMilliseconds(100);
-		while (1) {
+		while (true) {
 			// wait forever
 		}
 	}
@@ -67,7 +67,7 @@ main()
 
 	ds18b20.startConversion();
 
-	while (1)
+	while (true)
 	{
 		if (ds18b20.isConversionDone())
 		{

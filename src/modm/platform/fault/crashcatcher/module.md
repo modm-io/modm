@@ -103,7 +103,7 @@ int main()
     FaultReporter::clear(); // only clear report but do not reboot
     Application::initialize();
 
-    while(1)
+    while (true)
     {
         doOtherStuff();
         if (faultReport and applicationReady)

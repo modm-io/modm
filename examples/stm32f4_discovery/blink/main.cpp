@@ -26,7 +26,7 @@ main()
 	LedOrange::set();
 	LedRed::set();
 
-	while (1)
+	while (true)
 	{
 		LedBlue::toggle();
 		LedGreen::toggle();

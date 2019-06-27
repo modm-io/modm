@@ -25,7 +25,7 @@ modm::rtos::Scheduler::schedule()
 		list = list->next;
 	}
 
-	while (1)
+	while (true)
 	{
 		// Threads are started and will do all the work. Just
 		// sleep a bit here when there is nothing else to do.

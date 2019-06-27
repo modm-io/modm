@@ -207,7 +207,7 @@ main()
 
 	tft.setColor(modm::glcd::Color::lime());
 
-	while (1)
+	while (true)
 	{
 		modm::glcd::Point raw;
 		if (ads7843.read(&raw))

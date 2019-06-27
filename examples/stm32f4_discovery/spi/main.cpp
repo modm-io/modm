@@ -34,7 +34,7 @@ main()
 	SpiMaster::initialize<Board::SystemClock, 20_MHz>();
 
 	uint8_t data = 0;
-	while (1)
+	while (true)
 	{
 		// Connect Mosi to Miso to create a loopback
 		data = SpiMaster::transferBlocking(data);

@@ -56,7 +56,7 @@ modm::Ft245<PORT, RD, WR, RXF, TXE>::read(uint8_t *buffer, uint8_t n)
 {
 	uint8_t rcvd = 0;
 	uint8_t delay = 20;		// TODO Make depend on CPU frequency
-	while (1)
+	while (true)
 	{
 		if (rxf.read())
 		{

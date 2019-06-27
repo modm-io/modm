@@ -110,7 +110,7 @@ main()
 
 	modm::ShortPeriodicTimer tmr(500);
 
-	while (1)
+	while (true)
 	{
 		one.update();
 		if (tmr.execute()) {

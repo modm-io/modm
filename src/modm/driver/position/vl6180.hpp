@@ -359,7 +359,7 @@ public:
 	/// Constructor, requires an vl6180::Data object, sets address to default of 0x29
 	Vl6180(Data &data, uint8_t address=0x29);
 
-	/// Ping the I2C devide.
+	/// Ping the I2C device.
 	/// This overwrites the build-in ping method of I2cDevice with a read of the model number.
 	modm::ResumableResult<bool>
 	ping();

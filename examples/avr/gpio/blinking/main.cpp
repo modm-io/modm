@@ -21,7 +21,7 @@ main()
 {
 	Led::setOutput();
 
-	while(1)
+	while (true)
 	{
 		Led::toggle();
 

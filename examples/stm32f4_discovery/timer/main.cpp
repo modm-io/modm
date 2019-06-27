@@ -116,7 +116,7 @@ main()
 	keyFrames.start();
 	pulsePeriod.start();
 
-	while (1)
+	while (true)
 	{
 		// update all standard animations
 		pulse.update();

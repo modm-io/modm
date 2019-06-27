@@ -80,7 +80,7 @@ main()
 
 	display.update();
 
-	while (1)
+	while (true)
 	{
 	}
 }

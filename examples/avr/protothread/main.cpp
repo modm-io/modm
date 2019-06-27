@@ -115,7 +115,7 @@ main()
 
 	BlinkingLightGreen greenLight;
 	BlinkingLightRed redLight;
-	while (1)
+	while (true)
 	{
 		greenLight.run();
 		redLight.run();

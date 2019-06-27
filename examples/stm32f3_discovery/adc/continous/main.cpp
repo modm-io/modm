@@ -94,7 +94,7 @@ main()
 	Adc4::setPinChannel<Adc4In>(Adc4::SampleTime::Cycles2);
 	Adc4::startConversion();
 
-	while (1)
+	while (true)
 	{
 		modm::delayMilliseconds(200);
 		printAdc();

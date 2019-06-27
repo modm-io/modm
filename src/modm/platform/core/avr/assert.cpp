@@ -46,7 +46,7 @@ void modm_assert_fail_context(const char * identifier, uintptr_t context)
 		state & (uint8_t) Abandonment::Fail)
 	{
 		modm_abandon(module, location, failure, context);
-		while(1) ;
+		for (;;) {}
 	}
 }
 

@@ -83,7 +83,7 @@ main()
 	Irq::enableExternalInterrupt();
 	Irq::enableExternalInterruptVector(14);
 
-	while (1)
+	while (true)
 	{
 		LedRed::toggle();
 		LedGreen::toggle();

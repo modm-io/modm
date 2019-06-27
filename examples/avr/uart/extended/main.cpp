@@ -35,7 +35,7 @@ main()
 	// the number formatted as ASCII text.
 	stream << 24 << " is a nice number!" << modm::endl;
 
-	while (1)
+	while (true)
 	{
 	}
 }

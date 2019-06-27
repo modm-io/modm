@@ -57,7 +57,7 @@ modm::Scheduler::scheduleInterupt()
 			else {
 				TaskListItem *list = readyList;
 
-				while (1)
+				while (true)
 				{
 					if ((list->nextReady == 0) ||
 						(list->nextReady->priority < item->priority))

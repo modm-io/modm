@@ -46,7 +46,7 @@ main()
 	MODM_LOG_WARNING << "warning" << modm::endl;
 	MODM_LOG_ERROR   << "error"   << modm::endl;
 
-	while (1)
+	while (true)
 	{
 	}
 }

@@ -27,7 +27,7 @@ main()
 	UsartHal2::enableInterrupt(UsartHal2::Interrupt::TxEmpty);
 	UsartHal2::setTransmitterEnable(true);
 
-	while (1)
+	while (true)
 	{
 	}
 

@@ -77,9 +77,11 @@ main()
 	asm volatile (".short 0xde00");
 
 	// stack overflow
-	while(1) asm volatile ("push {r0-r7}");
+	while(true) {
+		asm volatile ("push {r0-r7}");
+	}
 
-	while (1)
+	while (true)
 	{
 		modm::delayMilliseconds(1000);
 		Board::LedUp::toggle();

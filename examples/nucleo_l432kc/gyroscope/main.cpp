@@ -98,7 +98,7 @@ main()
 	UartSpi::Master::connect<UartSpi::Ck::Ck, UartSpi::Tx::Tx, UartSpi::Rx::Rx>();
 	UartSpi::Master::initialize<Board::SystemClock, 8_MHz, 0_pct>();
 
-	while (1) {
+	while (true) {
 		reader.update();
 	}
 

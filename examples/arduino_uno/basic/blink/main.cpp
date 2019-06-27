@@ -21,7 +21,7 @@ main()
 	Board::initialize();
 	LedD13::setOutput();
 
-	while (1)
+	while (true)
 	{
 		LedD13::set();
 		modm::delayMilliseconds(1000);

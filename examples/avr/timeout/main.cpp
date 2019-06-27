@@ -43,7 +43,7 @@ main()
 	enableInterrupts();
 
 	modm::ShortTimeout timeout(200);
-	while (1)
+	while (true)
 	{
 		if (timeout.isExpired())
 		{

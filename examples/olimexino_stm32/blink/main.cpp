@@ -16,7 +16,7 @@ int main()
 	Board::LedD3::setOutput();
 
 
-	while (1)
+	while (true)
 	{
 		Board::LedD3::toggle();
 		modm::delayMilliseconds(200);

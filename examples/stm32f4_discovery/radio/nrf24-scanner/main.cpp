@@ -123,7 +123,7 @@ main()
 	MODM_LOG_INFO.printf("\033[1;10H");
 	MODM_LOG_INFO.printf("2.4GHz scanner");
 
-	while (1)
+	while (true)
 	{
 		if(divide_timer.execute())
 			divide_now = true;

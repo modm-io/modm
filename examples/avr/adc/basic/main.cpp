@@ -51,7 +51,7 @@ main()
 	Adc::setChannel(0);
 	Adc::startConversion();
 
-	while (1)
+	while (true)
 	{
 		if (Adc::isConversionFinished())
 		{

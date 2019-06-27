@@ -97,7 +97,7 @@ main()
 	display << "0123456789!\"§$%&/\n()=?`´,;:-<>";
 	display.update();
 
-	while (1)
+	while (true)
 	{
 	}
 }

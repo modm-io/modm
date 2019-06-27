@@ -33,7 +33,7 @@ main()
 	Uart4::connect<GpioC10::Tx, GpioC11::Rx>();
 	Uart4::initialize<Board::SystemClock, 115200_Bd>();
 
-	while (1)
+	while (true)
 	{
 		// sender
 		// payload depends on Button state

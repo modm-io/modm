@@ -27,7 +27,7 @@ main()
 	Adc::initialize<Board::SystemClock, 125_kHz>();
 	Adc::setReference(Adc::Reference::InternalVcc);
 
-	while (1)
+	while (true)
 	{
 		// read the input on analog pin 0
 		int sensorValue = Adc::readChannel(0);

@@ -40,7 +40,7 @@ main()
 	Adc2::initialize<Board::SystemClock>();
 	Adc2::setPinChannel<AdcIn>();
 
-	while (1)
+	while (true)
 	{
 		Adc2::startConversion();
 		// wait for conversion to finish

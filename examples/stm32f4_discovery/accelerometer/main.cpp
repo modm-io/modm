@@ -123,7 +123,7 @@ main()
 	Board::initializeLis3();
 #endif
 
-	while (1)
+	while (true)
 	{
 		reader.update();
 	}

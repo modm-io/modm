@@ -71,7 +71,7 @@ main()
 		MODM_LOG_INFO << "Debugger connected!" << modm::endl;
 	}
 
-	while (1)
+	while (true)
 	{
 		LedGreen::toggle();
 		LedOrange::toggle();

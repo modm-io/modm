@@ -82,9 +82,9 @@ template <class Scl, class Sda>
 bool
 modm::platform::BitBangI2cMaster<Scl, Sda>::start(modm::I2cTransaction *transaction, ConfigurationHandler handler)
 {
-	if (!transactionObject and transaction)
+	if ((not transactionObject) and transaction)
 	{
-		if (!transaction->attaching())
+		if (not transaction->attaching())
 		{
 			transaction->detaching(modm::I2c::DetachCause::FailedToAttach);
 			// return false; // done at the end of the function
@@ -101,10 +101,10 @@ modm::platform::BitBangI2cMaster<Scl, Sda>::start(modm::I2cTransaction *transact
 			// save the transaction object
 			transactionObject = transaction;
 
-			while (1)
+			while (true)
 			{
 				// generate (Re-)Start condition
-				if (!startCondition()) return true;
+				if (not startCondition()) return true;
 
 				// ask the transaction object about address and next operation.
 				starting = transactionObject->starting();
@@ -116,7 +116,7 @@ modm::platform::BitBangI2cMaster<Scl, Sda>::start(modm::I2cTransaction *transact
 					address |= modm::I2c::Read;
 
 				// write address
-				if (!write(address)) return true;
+				if (not write(address)) return true;
 				// we use address=0 as a hint for error management that write errors are now *data* NACKs
 				starting.address = 0;
 
@@ -135,11 +135,11 @@ modm::platform::BitBangI2cMaster<Scl, Sda>::start(modm::I2cTransaction *transact
 							while (reading.length > 1)
 							{
 								// continue reading, by sending ACKs
-								if (!read(*reading.buffer++, ACK)) return true;
+								if (not read(*reading.buffer++, ACK)) return true;
 								reading.length--;
 							}
 							// read last byte, conclude with NACK
-							if (!read(*reading.buffer, NACK)) return true;
+							if (not read(*reading.buffer, NACK)) return true;
 							// what next?
 							nextOperation = static_cast<modm::I2c::Operation>(reading.next);
 							break;
@@ -150,7 +150,7 @@ modm::platform::BitBangI2cMaster<Scl, Sda>::start(modm::I2cTransaction *transact
 							while (writing.length > 0)
 							{
 								// write the entire buffer
-								if (!write(*writing.buffer++)) return true;
+								if (not write(*writing.buffer++)) return true;
 								writing.length--;
 							}
 							// what next?
@@ -197,7 +197,7 @@ modm::platform::BitBangI2cMaster<Scl, Sda>::error(Error error)
 	SDA::reset();
 	delay2();
 	// attempt a stop condition, if it fails there is nothing else we can do
-	if (!stopCondition()) {
+	if (not stopCondition()) {
 		errorState = error;
 		return;
 	}
@@ -232,7 +232,7 @@ modm::platform::BitBangI2cMaster<Scl, Sda>::startCondition()
 		return false;
 	}
 	// release the clock line
-	if (!sclSetAndWait())
+	if (not sclSetAndWait())
 	{
 		// could not release clock line
 		errorState = Error::BusBusy;
@@ -263,7 +263,7 @@ modm::platform::BitBangI2cMaster<Scl, Sda>::stopCondition()
 	SDA::reset();
 
 	// first release clock line
-	if (!sclSetAndWait())
+	if (not sclSetAndWait())
 	{
 		// could not release clock line
 		errorState = Error::BusCondition;
@@ -317,7 +317,7 @@ modm::platform::BitBangI2cMaster<Scl, Sda>::write(uint8_t data)
 	// shift through all 8 bits
 	for(uint_fast8_t i = 0; i < 8; ++i)
 	{
-		if (!writeBit(data & 0x80))
+		if (not writeBit(data & 0x80))
 		{
 			// arbitration error
 			error(Error::ArbitrationLost);
@@ -331,7 +331,7 @@ modm::platform::BitBangI2cMaster<Scl, Sda>::write(uint8_t data)
 	delay2();
 
 	// rising clock edge for acknowledge bit
-	if (!sclSetAndWait())
+	if (not sclSetAndWait())
 	{
 		// the slave is allowed to stretch the clock, but not unreasonably long!
 		error(Error::BusCondition);
@@ -367,7 +367,7 @@ modm::platform::BitBangI2cMaster<Scl, Sda>::read(uint8_t &data, bool ack)
 	for(uint_fast8_t i = 0; i < 8; ++i)
 	{
 		data <<= 1;
-		if (!readBit(data))
+		if (not readBit(data))
 		{
 			// slaves don't stretch the clock here
 			// this must be arbitration.
@@ -378,7 +378,7 @@ modm::platform::BitBangI2cMaster<Scl, Sda>::read(uint8_t &data, bool ack)
 
 	DEBUG_SW_I2C(ack ? 'A' : 'N');
 	// generate acknowledge bit
-	if (!writeBit(!ack))
+	if (not writeBit(not ack))
 	{
 		// arbitration too
 		error(Error::ArbitrationLost);

@@ -20,7 +20,7 @@ main()
 
 	LedBlue::set();
 
-	while (1)
+	while (true)
 	{
 		LedGreen::toggle();
 		modm::delayMilliseconds(Button::read() ? 100 : 300);

@@ -35,7 +35,7 @@ namespace modm
 		/**
 		 * This clock should run at 10kHz. It is used to provide the back-off
 		 * timer with finer control over timing, which enabled much higher
-		 * thoughput.
+		 * throughput.
 		 * When using a very high datarate and short message length this clock
 		 * can be run at higher speeds than the recommended 10kHz.
 		 */

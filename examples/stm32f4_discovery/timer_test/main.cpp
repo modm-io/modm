@@ -93,7 +93,7 @@ main()
 	uint16_t state = 0;
 	bool restart = false;
 
-	while (1)
+	while (true)
 	{
 		LedBlue::set();
 		modm::delayMilliseconds(20);

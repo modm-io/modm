@@ -116,7 +116,7 @@ main()
 
 	stream << "\n\nRESTART\n\n";
 
-	while (1)
+	while (true)
 	{
 		one.update();
 		Board::LedUp::toggle();

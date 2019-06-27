@@ -27,7 +27,7 @@ main()
 
 	LedInverted::setOutput(modm::Gpio::Low);
 
-	while (1)
+	while (true)
 	{
 	}
 }

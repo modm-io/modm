@@ -103,7 +103,7 @@ main()
 	Can2::sendMessage(msg1);
 
 
-	while (1)
+	while (true)
 	{
 		if (Can1::isMessageAvailable())
 		{

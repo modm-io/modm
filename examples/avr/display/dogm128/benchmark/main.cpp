@@ -165,7 +165,7 @@ main()
 	display.setFont(modm::font::FixedWidth5x8);
 
 	modm::ShortPeriodicTimer timer(1000);
-	while (1)
+	while (true)
 	{
 		uint8_t iter = 0;
 		while (!timer.execute())

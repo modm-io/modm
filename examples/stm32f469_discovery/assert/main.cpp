@@ -20,7 +20,7 @@ test_assertion_handler(const char * module,
 					   const char * /* failure */,
 					   uintptr_t /* context */)
 {
-	if (!strcmp(module, "iobuffer")) {
+	if (not strcmp(module, "iobuffer")) {
 		MODM_LOG_ERROR << "Ignoring iobuffer full!" << modm::endl;
 		return modm::Abandonment::Ignore;
 	}
@@ -34,11 +34,11 @@ core_assertion_handler(const char * module,
 					   const char * failure,
 					   uintptr_t context)
 {
-	if (!memcmp(module, "core\0nvic\0undefined", 19)) {
+	if (not memcmp(module, "core\0nvic\0undefined", 19)) {
 		MODM_LOG_ERROR.printf("Ignoring undefined IRQ handler %d!\n", context);
 		return modm::Abandonment::Ignore;
 	}
-	if (!memcmp(module, "core\0heap", 9)) {
+	if (not memcmp(module, "core\0heap", 9)) {
 		MODM_LOG_ERROR.printf("Ignoring 'core.heap.%s' of size 0x%x!\n", failure, context);
 		return modm::Abandonment::Ignore;
 	}
@@ -75,6 +75,7 @@ main()
 
 	// "accidentally" return from main, without even returning properly!
 	// This should be caught by the debug assert core.main.exit!
-	// while(1) ;
+	// while (true)
+	//     {};
 	// return 0;
 }

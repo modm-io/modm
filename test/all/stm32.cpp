@@ -15,7 +15,7 @@
 int
 main(void)
 {
-    while(1)
+    while (true)
     {
         modm::delayMilliseconds(500);
     }

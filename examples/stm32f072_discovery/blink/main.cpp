@@ -22,7 +22,7 @@ main()
 	LedUp::set();
 	LedDown::set();
 
-	while (1) {
+	while (true) {
 		LedRight::toggle();
 		LedUp::toggle();
 		LedLeft::toggle();

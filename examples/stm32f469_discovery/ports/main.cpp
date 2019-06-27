@@ -87,7 +87,7 @@ main()
 		MODM_LOG_INFO << modm::bin << PinGroup::read() << modm::endl; modm::delayMilliseconds(200);
 	};
 
-	while (1)
+	while (true)
 	{
 		PinGroup::write(0b0000000); fn_report();
 		PinGroup::write(0b0000001); fn_report();
@@ -108,7 +108,7 @@ main()
 		Pin5::set(); fn_report();
 		MODM_LOG_INFO << modm::endl;
 
-		// while (1);
+		// while (true);
 	}
 	return 0;
 }

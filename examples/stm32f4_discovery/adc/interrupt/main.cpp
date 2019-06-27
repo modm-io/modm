@@ -58,7 +58,7 @@ main()
 	Adc2::enableInterrupt(Adc2::Interrupt::EndOfRegularConversion);
 	AdcInterrupt2::attachInterruptHandler(printAdc);
 
-	while (1)
+	while (true)
 	{
 		Adc2::startConversion();
 

@@ -41,7 +41,7 @@ Uart::write('H');  // Ohai there
 Uart::write('i');
 
 uint8_t buffer;
-while(1) {
+while (true) {
     // create a simple loopback
     if (Uart::read(buffer)) {
         Uart::write(buffer);
@@ -77,7 +77,7 @@ modm::PeriodicTimer timer(250); // 250ms period
 
 Led::setOutput(modm::Gpio::High);
 
-while(1) {
+while (true) {
     if (timeout.execute()) {
         // executes just once
         timer.stop();
