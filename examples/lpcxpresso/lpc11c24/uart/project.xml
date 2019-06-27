@@ -1,0 +1,10 @@
+<library>
+  <extends>modm:lpcxpresso-lpc11c24</extends>
+  <options>
+    <option name="modm:build:build.path">../../../../build/lpcxpresso_lpc11c24/uart</option>
+  </options>
+  <modules>
+    <module>modm:platform:uart:1</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>
