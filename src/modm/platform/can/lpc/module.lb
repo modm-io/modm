@@ -33,7 +33,12 @@ def prepare(module, options):
             maximum=256,	# FIXME
             default=16))
 
-    module.depends(":platform:core", ":debug", ":platform:clock.generic")
+    module.depends(
+        ":architecture:can",
+        ":platform:core",
+        ":platform:clock",
+        ":debug",
+    )
     return True
 
 def build(env):

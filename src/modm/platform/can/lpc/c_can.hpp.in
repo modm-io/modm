@@ -17,6 +17,7 @@
 
 #include <modm/architecture/interface/can.hpp>
 #include <modm/architecture/interface/clock.hpp>
+using namespace modm::literals;
 
 #define CONFIG_ENABLE_DRIVER_ROMCAN   1
 #define CONFIG_ENABLE_DRIVER_ROMUSB   0
@@ -26,9 +27,7 @@
 
 #define LPC11C_ROM_CAN (*((ROM **)0x1fff1ff8))
 
-namespace modm
-{
-namespace platform
+namespace modm::platform
 {
 /**
  * \brief	The CAN bus driver for LPC11Cxx devices.
@@ -77,21 +76,21 @@ public:
 		 *
 		 */
 
-		static_assert(SystemClock::Can == modm::clock::Frequency::MHz48,
+		static_assert(SystemClock::Can == 48_MHz,
 				"Other main clocks than 48 MHz are not yet supported.");
 
 		uint16_t prescaler;
 		uint32_t canclkdiv = 0;
 		switch (bitrate)
 		{
-			case Bitrate::kBps10:	prescaler =  39; canclkdiv = 9; break;
-			case Bitrate::kBps20:	prescaler =  39; canclkdiv = 4; break;
-			case Bitrate::kBps50:	prescaler =   7; canclkdiv = 9; break;
-			case Bitrate::kBps100:	prescaler =  39; break;
-			case Bitrate::kBps125:	prescaler =  31; break;
-			case Bitrate::kBps250:	prescaler =  15; break;
-			case Bitrate::kBps500:	prescaler =   7; break;
-			case Bitrate::MBps1:	prescaler =   3; break;
+			case 10_kHz:	prescaler =  39; canclkdiv = 9; break;
+			case 20_kHz:	prescaler =  39; canclkdiv = 4; break;
+			case 50_kHz:	prescaler =   7; canclkdiv = 9; break;
+			case 100_kHz:	prescaler =  39; break;
+			case 125_kHz:	prescaler =  31; break;
+			case 250_kHz:	prescaler =  15; break;
+			case 500_kHz:	prescaler =   7; break;
+			case 1_MHz:	prescaler =   3; break;
 			default: prescaler = 31; break;		// 125 kbps
 		}
 
@@ -196,7 +195,6 @@ protected:
 	CAN_error(uint32_t error_info);
 };
 
-} // namespace platform
-} // modm namespace
+} // namespace modm::platform
 
 #endif // MODM_LPC11C_C_CAN_HPP
