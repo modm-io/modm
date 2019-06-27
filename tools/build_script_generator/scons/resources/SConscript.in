@@ -115,7 +115,7 @@ env["CONFIG_AVRDUDE_OPTIONS"] = "{{ avrdude_options }}"
 %% if avrdude_baudrate > 0
 env["CONFIG_AVRDUDE_BAUDRATE"] = "{{ avrdude_baudrate }}"
 %% endif
-%% elif platform in ["stm32"]
+%% elif platform in ["stm32"] or platform in ["lpc"]
 env.Append(MODM_OPENOCD_CONFIGFILES=["$BASEPATH/openocd.cfg"])
 env.SetDefault(MODM_OPENOCD_GDBINIT=["$BASEPATH/openocd_gdbinit"])
 env.SetDefault(MODM_GDBINIT=["$BASEPATH/gdbinit"])

@@ -73,6 +73,7 @@ class DevicesCache(dict):
                      "stm32g0",
                      "stm32l4",
                      "at90", "attiny", "atmega",
+                     "lpc",
                      "hosted"]
         device_file_names = [dfn for dfn in device_file_names if any(s in dfn for s in supported)]
 
