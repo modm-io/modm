@@ -111,6 +111,17 @@ jobs:
             (cd examples && ../tools/scripts/examples_compile.py stm32f4_discovery)
             (cd examples && ../tools/scripts/examples_compile.py stm32f429_discovery stm32f469_discovery nucleo_f401re nucleo_f411re nucleo_f429zi nucleo_f446re)
 
+  lpc11-examples:
+    docker:
+      - image: modm/modm-build:latest
+    steps:
+      - checkout
+      - run: (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
+      - run:
+          name: Examples NXP LPC11 Series
+          command: |
+            (cd examples && ../tools/scripts/examples_compile.py lpcxpresso)
+
   avr-examples:
     docker:
       - image: modm/modm-build:latest
@@ -302,6 +313,7 @@ workflows:
       - unittests-linux-generic
       - avr-examples
       - stm32-examples
+      - lpc11-examples
 
       - avr-compile-all:
           requires:
