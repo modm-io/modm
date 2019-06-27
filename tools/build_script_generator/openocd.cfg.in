@@ -18,7 +18,7 @@ proc modm_itm_log { OUTPUT F_CPU {BAUDRATE ""} } {
 }
 
 proc modm_program { SOURCE } {
-	program $SOURCE verify
+	program $SOURCE
 	reset run
 	shutdown
 }
