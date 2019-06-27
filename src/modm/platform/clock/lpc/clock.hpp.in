@@ -15,140 +15,129 @@
 #define MODM_LPC_CLOCK_HPP
 
 #include <stdint.h>
-#include "common_clock.hpp"
+#include "common.hpp"
 #include <modm/platform/device.hpp>
-// #include "static.hpp"
 
-
-namespace modm
+namespace modm::platform
 {
-	namespace platform
+/**
+ * Clock management
+ *
+ * \ingroup
+ */
+class ClockControl
+{
+public:
+	enum class
+	PllSource
 	{
-		/**
-		 * Clock management
-		 *
-		 * \ingroup
-		 */
-		class ClockControl
-		{
-		public:
-			enum class
-			PllSource
-			{
-				IRC = 0,
-				SystemOscillator = 1,
-				InternalClock = IRC,
-				ExternalClock = SystemOscillator,
-				ExternalCrystal = SystemOscillator,
-			};
+		IRC = 0,
+		SystemOscillator = 1,
+		InternalClock = IRC,
+		ExternalClock = SystemOscillator,
+		ExternalCrystal = SystemOscillator,
+	};
 
-			enum class
-			SystemClockSource : uint32_t
-			{
-				IRC = 0x0,
-				SystemPllInput = 0x1,
-				WatchdogOscillator = 0x2,
-				SystemPllOutput = 0x3,
-				InternalClock = IRC,
-				ExternalClock = SystemPllInput, // FIXME: not quite hitting it
-				ExternalCrystal = ExternalClock,
-				Pll = SystemPllOutput,
-			};
+	enum class
+	SystemClockSource : uint32_t
+	{
+		IRC = 0x0,
+		SystemPllInput = 0x1,
+		WatchdogOscillator = 0x2,
+		SystemPllOutput = 0x3,
+		InternalClock = IRC,
+		ExternalClock = SystemPllInput, // FIXME: not quite hitting it
+		ExternalCrystal = ExternalClock,
+		Pll = SystemPllOutput,
+	};
 
-			enum class
-			ClockOutputSource : uint32_t
-			{
-				IRC = 0x0,
-				SystemOscillator = 0x1,
-				WatchdogOscillator = 0x2,
-				MainClock = 0x3,
-				InternalClock = IRC,
-				ExternalClock = SystemOscillator,
-				ExternalCrystal = SystemOscillator,
-				SystemClock = MainClock,
-			};
+	enum class
+	ClockOutputSource : uint32_t
+	{
+		IRC = 0x0,
+		SystemOscillator = 0x1,
+		WatchdogOscillator = 0x2,
+		MainClock = 0x3,
+		InternalClock = IRC,
+		ExternalClock = SystemOscillator,
+		ExternalCrystal = SystemOscillator,
+		SystemClock = MainClock,
+	};
 
-		public:
-			static bool
-			enableInternalClock(uint32_t kHz, uint32_t waitCycles = 2048);
+	using AhbPrescaler = uint8_t;
 
-			static bool
-			enableExternalClock(uint32_t kHz, uint32_t waitCycles = 2048);
+public:
+	static bool
+	enableExternalClock();
 
-			static bool
-			enableExternalCrystal(uint32_t kHz, uint32_t waitCycles = 2048);
+	template< uint32_t External_Crystal_Hz >
+	static bool
+	enableExternalCrystal();
 
-			/**
-			 * Enable PLL.
-			 *
-			 * \param	source
-			 * 		Source select for PLL
-			 *
-			 * \param	pllM
-			 * 		???
-			 *
-			 * \param	pllP
-			 * 		???
-			 *
-			 * Example:
-			 *
-			 */
-			static bool
-			enablePll(PllSource source, uint8_t pllM, uint8_t pllP);
+	/**
+	 * Enable PLL.
+	 *
+	 * \param	source
+	 * 		Source select for PLL
+	 *
+	 * \param	pllM
+	 * 		???
+	 *
+	 * \param	pllP
+	 * 		???
+	 *
+	 * Example:
+	 *
+	 */
+	static bool
+	enablePll(PllSource source, uint8_t pllM, uint8_t pllP, uint32_t waitCycles = 2'048);
 
-			static bool
-			enableSystemClock(SystemClockSource src, uint32_t waitCycles = 2048);
+	static bool
+	enableSystemClock(SystemClockSource src, uint32_t waitCycles = 2'048);
 
-			static bool
-			enableClockOutput(ClockOutputSource src, uint8_t div = 1, uint32_t waitCycles = 2048)
-			{
-				bool retval;
-				LPC_SYSCON->CLKOUTCLKSEL = 0x3 & static_cast<uint32_t>(src);
-				LPC_SYSCON->CLKOUTUEN = 0x01;	// toggle update enable register
-				LPC_SYSCON->CLKOUTUEN = 0x00;
-				LPC_SYSCON->CLKOUTUEN = 0x01;
-				LPC_SYSCON->CLKOUTDIV = 0xff & static_cast<uint8_t>(div);
+	static bool
+	enableClockOutput(ClockOutputSource src, uint8_t div = 1, uint32_t waitCycles = 2'048)
+	{
+		bool retval;
+		LPC_SYSCON->CLKOUTCLKSEL = 0x3 & static_cast<uint32_t>(src);
+		LPC_SYSCON->CLKOUTUEN = 0x01;	// toggle update enable register
+		LPC_SYSCON->CLKOUTUEN = 0x00;
+		LPC_SYSCON->CLKOUTUEN = 0x01;
+		LPC_SYSCON->CLKOUTDIV = 0xff & static_cast<uint8_t>(div);
 
-				while (not (retval = LPC_SYSCON->CLKOUTUEN & 0x01) and --waitCycles)
-					;
+		while (not (retval = LPC_SYSCON->CLKOUTUEN & 0x01) and --waitCycles)
+			;
 
-				return retval;
-			}
-
-			static inline uint32_t
-			setFlashLatency(const uint32_t CPU_Frequency, const uint16_t /*mV*/ = 3300)
-			{
-				if (CPU_Frequency <= 20_MHz) {
-					LPC_FLASHCTRL->FLASHCFG = 0;
-				}
-				else if (CPU_Frequency <= 40_MHz) {
-					LPC_FLASHCTRL->FLASHCFG = 1;
-				}
-				else {
-					LPC_FLASHCTRL->FLASHCFG = 2;
-				}
-				return 50_MHz;
-			}
-
-			static inline uint32_t
-			getCpuFrequency()
-			{
-				return modm::clock::fcpu;
-			}
-
-			static inline uint32_t
-			getCpuFrequencykHz()
-			{
-				return modm::clock::fcpu_kHz;
-			}
-
-			static inline uint32_t
-			getCpuFrequencyMHz()
-			{
-				return modm::clock::fcpu_MHz;
-			}
-		};
+		return retval;
 	}
-}
+
+public:
+	static inline bool
+	setAhbPrescaler(AhbPrescaler prescaler)
+	{
+		LPC_SYSCON->SYSAHBCLKDIV = prescaler;
+		return true;
+	}
+
+public:
+	/** Set flash latency for CPU frequency and voltage.
+	 * Does nothing if CPU frequency is too high for the available
+	 * voltage.
+	 *
+	 * @returns maximum CPU frequency for voltage.
+	 * @retval	<=CPU_Frequency flash latency has been set correctly.
+	 * @retval	>CPU_Frequency requested frequency too high for voltage.
+	 */
+	template< uint32_t Core_Hz, uint16_t Core_mV = 3'300>
+	static uint32_t
+	setFlashLatency();
+
+	template< uint32_t Core_Hz >
+	static void
+	updateCoreFrequency();
+};
+} // modm::platform namespace
+
+#include "clock_impl.hpp"
 
 #endif	//  MODM_LPC_CLOCK_HPP

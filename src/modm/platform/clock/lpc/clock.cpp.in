@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2013-2014, Kevin Läufer
  * Copyright (c) 2014-2017, Niklas Hauser
+ * Copyright (c) 2019, Sascha Schade
  *
  * This file is part of the modm project.
  *
@@ -13,6 +14,13 @@
 #include "../device.hpp"
 #include "clock.hpp"
 
+namespace modm::clock
+{
+uint32_t modm_fastdata fcpu({{ "{0:,}".format(irc_frequency_mhz|int * 1000000).replace(',', "'") }});
+uint32_t modm_fastdata fcpu_kHz({{ "{0:,}".format(irc_frequency_mhz|int * 1000).replace(',', "'") }});
+uint16_t modm_fastdata fcpu_MHz({{ irc_frequency_mhz }});
+uint16_t modm_fastdata ns_per_loop({{ "{0:,}".format((loops * 1000.0 / irc_frequency_mhz)|int).replace(',', "'") }});
+}
 
 // TODO: Move to common file
 #define PDRUNCFG_SYSOSC_PD		(1<<5)
@@ -41,63 +49,60 @@
 
 // ----------------------------------------------------------------------------
 bool
-modm::platform::Rcc::enableInternalClock(uint32_t, uint32_t)
-{
-	return true;
-}
-
-bool
-modm::platform::Rcc::enableExternalClock(uint32_t, uint32_t)
+modm::platform::ClockControl::enableExternalClock()
 {
 	LPC_SYSCON->PDRUNCFG &= ~PDRUNCFG_SYSOSC_PD;	// powerup
 	LPC_SYSCON->SYSOSCCTRL |= SYSOSCCTRL_BYPASS;	// enable bypass
 	return true;
 }
 
-bool
-modm::platform::Rcc::enableExternalCrystal(uint32_t f_kHz, uint32_t)
-{
-	LPC_SYSCON->PDRUNCFG &= ~PDRUNCFG_SYSOSC_PD;	// powerup
-	LPC_SYSCON->SYSOSCCTRL &= ~SYSOSCCTRL_BYPASS;	// do not bypass
-	if(f_kHz >= u32kHz(1_MHz) && f_kHz <= u32kHz(17_MHz)) {
-		LPC_SYSCON->SYSOSCCTRL &= ~SYSOSCCTRL_FREQRANGE; // 1-20MHz
-	}
-	else if (f_kHz >= u32kHz(17_MHz) && f_kHz <= u32kHz(25_MHz)) {
-		LPC_SYSCON->SYSOSCCTRL |= SYSOSCCTRL_FREQRANGE; // 15-25MHz
-	}
-	else return false;	// should not get here
-	return true;
-}
-
 // ----------------------------------------------------------------------------
 bool
-modm::platform::Rcc::enablePll(PllSource source, uint8_t pllM, uint8_t pllP)
+modm::platform::ClockControl::enablePll(PllSource source, uint8_t pllM, uint8_t pllP, uint32_t waitCycles)
 {
 	// SYSPLLCLKSEL
 	LPC_SYSCON->SYSPLLCLKSEL = (LPC_SYSCON->SYSPLLCLKSEL & 0b11)
 								| static_cast<uint32_t>(source);
-	LPC_SYSCON->SYSPLLCLKUEN = 0x01;	// toggle update enable register
+
+	// toggle update enable register
+	LPC_SYSCON->SYSPLLCLKUEN = 0x01;
 	LPC_SYSCON->SYSPLLCLKUEN = 0x00;
 	LPC_SYSCON->SYSPLLCLKUEN = 0x01;
-	while (!(LPC_SYSCON->SYSPLLCLKUEN & 0x01));		// wait until updated
-	LPC_SYSCON->SYSPLLCTRL = (0x1f & (pllM-1)) | (0x60 & pllP);
+
+	// wait until updated
+	while (not(LPC_SYSCON->SYSPLLCLKUEN & 0x01)) {
+		if (not --waitCycles)
+			return false;
+	};
+
+	LPC_SYSCON->SYSPLLCTRL = (0x1f & (pllM-1)) | (0x60 & (pllP << 4));
 	LPC_SYSCON->PDRUNCFG &= ~PDRUNCFG_SYSPLL_PD;	// power up pll
-	while (!(LPC_SYSCON->SYSPLLSTAT & SYSPLLSTAT_LOCK));// wait for pll to be locked
+
+	// wait for pll to be locked
+	while (not(LPC_SYSCON->SYSPLLSTAT & SYSPLLSTAT_LOCK)) {
+		if (not --waitCycles)
+			return false;
+	};
 	return true;
 }
 
 // ----------------------------------------------------------------------------
 bool
-modm::platform::Rcc::enableSystemClock(SystemClockSource src, uint32_t /*waitCycles*/)
+modm::platform::ClockControl::enableSystemClock(SystemClockSource src, uint32_t waitCycles)
 {
 	LPC_SYSCON->MAINCLKSEL = static_cast<uint32_t>(src);
-	LPC_SYSCON->MAINCLKUEN = 0x01;	// toggle update enable register
+
+	// toggle update enable register
+	LPC_SYSCON->MAINCLKUEN = 0x01;
 	LPC_SYSCON->MAINCLKUEN = 0x00;
 	LPC_SYSCON->MAINCLKUEN = 0x01;
-	while (!(LPC_SYSCON->MAINCLKUEN & 0x01));	// wait until updated
 
-	// Set AHB Frequency
-	LPC_SYSCON->SYSAHBCLKDIV  = 0x1;	// device ahb frequency by 1 (max 255)
+	// wait until updated
+	while (not(LPC_SYSCON->MAINCLKUEN & 0x01)) {
+		if (not --waitCycles)
+			return false;
+	}
+
 	// TODO: do not enable gpio clock here but in startup.c.in form gpio driver
 	LPC_SYSCON->SYSAHBCLKCTRL =   SYSAHBCLKCTRL_SYS | SYSAHBCLKCTRL_ROM
 								| SYSAHBCLKCTRL_RAM | SYSAHBCLKCTRL_FLASHREG

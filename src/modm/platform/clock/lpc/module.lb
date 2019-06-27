@@ -11,31 +11,54 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
+from pprint import pprint as pp
+
 def init(module):
-    module.name = ":platform:clock"
+    module.name = ":platform:lpc"
+    module.description = "System Clock"
 
 def prepare(module, options):
     if not options[":target"].has_driver("clock:lpc"):
+        print('lpc_clock FALSE')
         return False
 
-    module.depends(":platform:core")
+    # module.depends(":platform:core")
+    module.depends(":cmsis:device", ":utils", ":platform:clock")
+    print('lpc_clock TRUEE')
     return True
 
 def build(env):
+    print('clock/lpc build')
     device = env[":target"]
     driver = device.get_driver("clock")
 
     properties = device.properties
+    # pp(properties)
+
     properties["target"] = target = device.identifier
+    properties["partname"] = device.partname
+    properties["core"] = core = device.get_driver("core")["type"]
     properties["driver"] = driver
+
+    if target["family"] in ["11"]:
+        properties["irc_frequency_mhz"] = 12 # MHz
+    else:
+        print("Internal RC oscillator frequency unknown.")
+        raise Exception("Internal RC oscillator frequency yet unknown for family {}".format(family))
+
+    if core == "cortex-m0":
+        loops = 4
+    else:
+        raise Exception("Delay loop count yet unknown for core {}".format(core))
+    properties["loops"] = loops
+
 
     env.substitutions = properties
     env.outbasepath = "modm/src/modm/platform/clock"
 
-    env.template("static.hpp.in")
+    # env.template("static.hpp.in")
     env.template("clock.cpp.in")
     env.template("clock.hpp.in")
+    env.template("clock_impl.hpp.in")
 
     env.copy("pll_calculator.hpp")
-    env.copy("common_clock.cpp")
-    env.copy("../common/common_clock.hpp", "common_clock.hpp")

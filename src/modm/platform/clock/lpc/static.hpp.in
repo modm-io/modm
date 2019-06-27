@@ -1,91 +1,109 @@
-/*
- * Copyright (c) 2013-2014, Kevin Läufer
- * Copyright (c) 2014-2017, Niklas Hauser
- * Copyright (c) 2016-2017, Fabian Greif
+// coding: utf-8
+// ----------------------------------------------------------------------------
+/* Copyright (c) 2013, Roboterclub Aachen e.V.
+ * All rights reserved.
  *
- * This file is part of the modm project.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Roboterclub Aachen e.V. nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // ----------------------------------------------------------------------------
 
 %%	import 'static.macros' as static with context
 
-#ifndef MODM_LPC_STATIC_HPP
-#define MODM_LPC_STATIC_HPP
+#ifndef MODM_LPC__STATIC_HPP
+#define MODM_LPC__STATIC_HPP
 
 #include <stdint.h>		// uint32_t
+#include <modm/math/units.hpp>
 #include "../device.hpp"
-
-#include "../common_clock.hpp"
+// #include "../../../type_ids.hpp"
+// #include "../generic/common_clock.hpp"
 #include "pll_calculator.hpp"
 #include "clock.hpp"
 
+using namespace modm::clock;
 
-namespace modm
+namespace modm::lpc
 {
-	namespace platform
+	using namespace modm::literals;
+
+	/*
+	 * Used to setup pll with constants
+	 */
+	template<int InputFrequency, int OutputFrequency, ClockControl::PllSource Source>
+	class PllSetup
 	{
-		/*
-		 * Used to setup pll with constants
-		 */
-		template<int InputFrequency, int OutputFrequency, Rcc::PllSource Source>
-		class PllSetup
+	private:
+		typedef Lpc11PllSettings<InputFrequency, OutputFrequency> p;
+	public:
+		static StartupError
+		enable()
 		{
-		private:
-			typedef Lpc11PllSettings<InputFrequency, OutputFrequency> p;
-		public:
-			static StartupError
-			enable()
-			{
-				Rcc::enablePll(Source, p::PllM, p::PllP);
-				modm::clock::fcpu     = OutputFrequency;
-				modm::clock::fcpu_kHz = OutputFrequency / 1'000;
-				modm::clock::fcpu_MHz = OutputFrequency / 1'000'000;
-				modm::clock::ns_per_loop = ::round(1'000'000'000.f / OutputFrequency * 4.f);
-				return StartupError::None;
-			}
-		};
+			ClockControl::enablePll(Source, p::PllM, p::PllP);
+			modm::clock::fcpu     = OutputFrequency;
+			modm::clock::fcpu_kHz = OutputFrequency / 1'000;
+			modm::clock::fcpu_MHz = OutputFrequency / 1'000'000;
+			modm::clock::ns_per_loop = ::round(1'000'000'000.f / OutputFrequency * 4.f);
+			return StartupError::None;
+		}
+	};
 
 %% set internalClock =		{'name': "InternalClock",
-							 'fixedFrequency': "MHz12" }
+							 'fixedFrequency': "12_MHz" }
 %% set externalClock =		{'name': "ExternalClock",
-							 'minFrequency': "MHz1",
-							 'maxFrequency': "MHz25" }
+							 'minFrequency': "1_MHz",
+							 'maxFrequency': "25_MHz" }
 %% set externalCrystal =	{'name': "ExternalCrystal",
-							 'minFrequency': "MHz1",
-							 'maxFrequency': "MHz25" }
+							 'minFrequency': "1_MHz",
+							 'maxFrequency': "25_MHz" }
 %% set pll =				{'name': "Pll",
 							 'setup': "PllSetup",
 							 'sources': [internalClock,
 										externalClock, externalCrystal] }
-%% set SystemClock =		{'name': "SystemClock",
-							 'minFrequency': "MHz1",
-							 'maxFrequency': "MHz48",
+%% set systemClock =		{'name': "SystemClock",
+							 'minFrequency': "1_MHz",
+							 'maxFrequency': "48_MHz",
 							 'sources': [ internalClock, externalClock,
 										  externalCrystal, pll ],
 							 'sinks': ["Can"] }
 %% set clockOut =			{'name': "ClockOutput",
 							 'divisions': range(1,255),
 							 'sources': [externalClock,
-										 externalCrystal, SystemClock] }
+										 externalCrystal, systemClock] }
 
-	// Static Clocks/Plls/Osciallators
-{{ static.source(internalClock, "modm::platform") }}
+// Static Clocks/Plls/Osciallators
+{{ static.source(internalClock, "modm::lpc") }}
 
-{{ static.source(externalClock, "modm::platform") }}
+{{ static.source(externalClock, "modm::lpc") }}
 
-{{ static.source(externalCrystal, "modm::platform") }}
+{{ static.source(externalCrystal, "modm::lpc") }}
 
-{{ static.pll(pll, "modm::platform") }}
+{{ static.pll(pll, "modm::lpc") }}
 
-{{ static.sink(SystemClock, "modm::platform")}}
+{{ static.sink(systemClock, "modm::lpc")}}
 
-{{ static.output(clockOut, "modm::platform")}}
+{{ static.output(clockOut, "modm::lpc")}}
 
-	}
 }
 
-#endif	//  MODM_LPC_STATIC_HPP
+#endif	//  MODM_LPC__STATIC_HPP

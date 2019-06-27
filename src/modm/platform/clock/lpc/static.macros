@@ -55,18 +55,6 @@ public:
 %% endif
 			return StartupError::{{ s.name }};
 
-
-%% if target["platform"] == "stm32" and target["family"] in ["f2", "f4"]
-		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div4);
-		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div2);
-%% elif partname.startswith("stm32f100")
-		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div1);
-		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div1);
-%% elif target["platform"] == "stm32" and target["family"] in ["f1", "f3"]
-		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div2);
-		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div1);
-%% endif
-
 		return StartupError::None;
 	}
 
@@ -192,7 +180,7 @@ public:
 %%	endfor
 	};
 
-	static xpcc_always_inline void
+	static modm_always_inline void
 	setDivision(Division)
 	{
 		//Rcc::enable{{ o.name }}(static_cast<int>(d));

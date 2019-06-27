@@ -1,0 +1,78 @@
+/*
+ * Copyright (c) 2019, Niklas Hauser
+ * Copyright (c) 2019, Sascha Schade
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_LPC_CLOCK_HPP
+#error "Do not include this file directly."
+#endif
+
+#include <modm/math/units.hpp>
+#include "common.hpp"
+
+namespace modm::platform
+{
+using namespace modm::literals;
+
+#define PDRUNCFG_SYSOSC_PD		(1<<5)
+#define SYSOSCCTRL_BYPASS		(1<<0)
+#define SYSOSCCTRL_FREQRANGE	(1<<1)
+
+template< uint32_t External_Crystal_Hz >
+bool
+ClockControl::enableExternalCrystal()
+{
+	static_assert(External_Crystal_Hz >=  1_MHz, "External Crystal frequency must be least 1 MHz.");
+	static_assert(External_Crystal_Hz <= 25_MHz, "External Crystal frequency must not exeed 25 MHz.");
+	LPC_SYSCON->PDRUNCFG &= ~PDRUNCFG_SYSOSC_PD;	// powerup
+	LPC_SYSCON->SYSOSCCTRL &= ~SYSOSCCTRL_BYPASS;	// do not bypass
+	if ((External_Crystal_Hz >= 1_MHz) and (External_Crystal_Hz <= 17_MHz)) {
+		LPC_SYSCON->SYSOSCCTRL &= ~SYSOSCCTRL_FREQRANGE; // 1-20MHz
+	}
+	else if ((External_Crystal_Hz >= 17_MHz) and (External_Crystal_Hz <= 25_MHz)) {
+		LPC_SYSCON->SYSOSCCTRL |= SYSOSCCTRL_FREQRANGE; // 15-25MHz
+	}
+	else
+	{
+		return false;	// should not get here
+	}
+	return true;
+}
+
+template< uint32_t Core_Hz, uint16_t Core_mV = 3'300 >
+uint32_t
+ClockControl::setFlashLatency()
+{
+	// constexpr flash_latency fl = computeFlashLatency(Core_Hz, Core_mV);
+	// static_assert(Core_Hz <= fl.max_frequency, "CPU Frequency is too high for this core voltage!");
+
+	if (Core_Hz <= 20_MHz) {
+		LPC_FLASHCTRL->FLASHCFG = 0;
+	}
+	else if (Core_Hz <= 40_MHz) {
+		LPC_FLASHCTRL->FLASHCFG = 1;
+	}
+	else {
+		LPC_FLASHCTRL->FLASHCFG = 2;
+	}
+	return 50_MHz;
+}
+
+template< uint32_t Core_Hz >
+void
+ClockControl::updateCoreFrequency()
+{
+	modm::clock::fcpu     = Core_Hz;
+	modm::clock::fcpu_kHz = Core_Hz / 1'000;
+	modm::clock::fcpu_MHz = Core_Hz / 1'000'000;
+	modm::clock::ns_per_loop = ::round({{loops}}000.f / (Core_Hz / 1'000'000));
+}
+
+}   // namespace modm::platform
