@@ -12,14 +12,16 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/driver/atomic/queue.hpp>
-#include <modm/architecture/interface/atomic_lock.hpp>
+%% set name = uart_name ~ id
 
 #include "../device.hpp"
-#include "../clock/clock.hpp"
-
-#include "uart_1.hpp"
+#include "uart_{{ id }}.hpp"
 #include "lpc11_uart_registers.hpp"
+
+%% if options["buffer.rx"] > 16 or options["buffer.tx"] > 16
+#include <modm/architecture/interface/atomic_lock.hpp>
+#include <modm/architecture/driver/atomic/queue.hpp>
+%% endif
 
 // ----------------------------------------------------------------------------
 
@@ -28,10 +30,10 @@ namespace
 // If requested buffer size is larger than hardware buffer size create a
 // software queue for the remaining bytes.
 %% if options["buffer.rx"] > 16
-	static modm::atomic::Queue<uint8_t, modm::lpc::Uart1::RxBufferSize - 16> rxBuffer;
+	static modm::atomic::Queue<uint8_t, {{ options["buffer.rx"] - 16}}> rxBuffer;
 %% endif
 %% if options["buffer.tx"] > 16
-	static modm::atomic::Queue<uint8_t, modm::lpc::Uart1::TxBufferSize - 16> txBuffer;
+	static modm::atomic::Queue<uint8_t, {{ options["buffer.tx"] - 16 }}> txBuffer;
 %% endif
 
 	/**
@@ -46,7 +48,7 @@ namespace
 
 // ----------------------------------------------------------------------------
 void
-modm::platform::Uart1::initialize(uint32_t baudrate)
+modm::platform::{{ name }}::initialize(uint32_t baudrate)
 {
 	atomic::Lock lock;
 
@@ -62,7 +64,7 @@ modm::platform::Uart1::initialize(uint32_t baudrate)
 
 	LPC_UART->LCR = LCR_DLAB;
 	uint32_t regVal = LPC_SYSCON->UARTCLKDIV;
-	uint32_t   Fdiv = (((modm::platform::Rcc::getCpuFrequency() * LPC_SYSCON->SYSAHBCLKDIV)/regVal)/16)/baudrate ; //390;
+	uint32_t   Fdiv = (((48'000'000 * LPC_SYSCON->SYSAHBCLKDIV)/regVal)/16)/baudrate ; //390;
 	LPC_UART->DLM = Fdiv >>    8;
 	LPC_UART->DLL = Fdiv  & 0xff;
 	//LPC_UART->DLM = 0;
@@ -98,13 +100,13 @@ modm::platform::Uart1::initialize(uint32_t baudrate)
 }
 
 void
-modm::platform::Uart1::writeBlocking(uint8_t data)
+modm::platform::{{ name }}::writeBlocking(uint8_t data)
 {
 	while (not write(data));
 }
 
 void
-modm::platform::Uart1::writeBlocking(const uint8_t *data, std::size_t length)
+modm::platform::{{ name }}::writeBlocking(const uint8_t *data, std::size_t length)
 {
 	while (length--)
 	{
@@ -113,15 +115,15 @@ modm::platform::Uart1::writeBlocking(const uint8_t *data, std::size_t length)
 }
 
 void
-modm::platform::Uart1::flushWriteBuffer()
+modm::platform::{{ name }}::flushWriteBuffer()
 {
-	while(!isWriteFinished())
+	while(not isWriteFinished())
 		;
 }
 
 // ----------------------------------------------------------------------------
 bool
-modm::platform::Uart1::write(uint8_t data)
+modm::platform::{{ name }}::write(uint8_t data)
 {
 %% if options["buffer.tx"] <= 16
 	// No software buffer necessary, use hardware buffer only.
@@ -170,7 +172,7 @@ modm::platform::Uart1::write(uint8_t data)
 
 // ----------------------------------------------------------------------------
 std::size_t
-modm::platform::Uart1::write(const uint8_t *buffer, std::size_t length)
+modm::platform::{{ name }}::write(const uint8_t *buffer, std::size_t length)
 {
 	std::size_t written(0);
 
@@ -220,7 +222,7 @@ modm::platform::Uart1::write(const uint8_t *buffer, std::size_t length)
 }
 
 bool
-modm::platform::Uart1::isWriteFinished()
+modm::platform::{{ name }}::isWriteFinished()
 {
 %% if options["buffer.tx"] > 16
 	return txBuffer.isEmpty() and (LPC_UART->LSR & LSR_THRE);
@@ -230,14 +232,14 @@ modm::platform::Uart1::isWriteFinished()
 }
 
 std::size_t
-modm::platform::Uart1::discardTransmitBuffer()
+modm::platform::{{ name }}::discardTransmitBuffer()
 {
 %% if options["buffer.tx"] > 16
 	atomic::Lock lock;
 	std::size_t count(0);
 	// disable interrupt since buffer will be cleared
 	LPC_UART->IER &= ~IER_THREIE;
-	while(not txBuffer.isEmpty())
+	while(txBuffer.isNotEmpty())
 	{
 		++count;
 		txBuffer.pop();
@@ -249,10 +251,10 @@ modm::platform::Uart1::discardTransmitBuffer()
 }
 
 bool
-modm::platform::Uart1::read(uint8_t& data)
+modm::platform::{{ name }}::read(uint8_t& data)
 {
 %% if options["buffer.rx"] > 16
-	if (not rxBuffer.isEmpty())
+	if (rxBuffer.isNotEmpty())
 	{
 		data = rxBuffer.get();
 		rxBuffer.pop();
@@ -280,7 +282,7 @@ modm::platform::Uart1::read(uint8_t& data)
 }
 
 std::size_t
-modm::platform::Uart1::read(uint8_t *buffer, std::size_t length)
+modm::platform::{{ name }}::read(uint8_t *buffer, std::size_t length)
 {
 	std::size_t ret = 0;
 
@@ -294,11 +296,11 @@ modm::platform::Uart1::read(uint8_t *buffer, std::size_t length)
 }
 
 std::size_t
-modm::platform::Uart1::discardReceiveBuffer()
+modm::platform::{{ name }}::discardReceiveBuffer()
 {
 	std::size_t count(0);
 %% if options["buffer.rx"] > 16
-	while(!rxBuffer.isEmpty())
+	while(rxBuffer.isNotEmpty())
 	{
 		++count;
 		rxBuffer.pop();
@@ -346,7 +348,7 @@ MODM_ISR(UART)
 			return;
 		}
 
-		while (!txBuffer.isEmpty() and (charsLeft-- > 0))
+		while (txBuffer.isNotEmpty() and (charsLeft-- > 0))
 		{
 			// Write to the hardware buffer
 			LPC_UART->THR = txBuffer.get();

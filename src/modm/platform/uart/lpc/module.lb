@@ -11,18 +11,12 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-def get_properties(env):
-    device = env[":target"]
-    driver = device.get_driver("uart")
-    properties = device.properties
-    properties["target"] = device.identifier
-    properties["driver"] = driver
-    return properties
-
+props = {}
 
 class Instance(Module):
-    def __init__(self, instance):
-        self.instance = instance
+    def __init__(self, driver, instance):
+        self.driver = driver
+        self.instance = int(instance)
 
     def init(self, module):
         module.name = str(self.instance)
@@ -47,10 +41,14 @@ class Instance(Module):
         return True
 
     def build(self, env):
-        properties = get_properties(env)
-        properties["id"] = self.instance
+        device = env[":target"].identifier
+        global props
+        props["id"] = self.instance
+        props["driver"] = self.driver
+        props["features"] = self.driver["feature"] if "feature" in self.driver else []
+        props["uart_name"] = self.driver["name"].capitalize()
 
-        env.substitutions = properties
+        env.substitutions = props
         env.outbasepath = "modm/src/modm/platform/uart"
 
         env.template("uart.hpp.in", "uart_{}.hpp".format(self.instance))
@@ -59,21 +57,36 @@ class Instance(Module):
 
 def init(module):
     module.name = ":platform:uart"
+    module.description = "Universal Asynchronous Receiver Transmitter (UART)"
 
 def prepare(module, options):
     device = options[":target"]
     if not device.has_driver("uart:lpc"):
         return False
 
-    module.depends(":platform:core")
+    module.depends(
+        ":platform:core",
+        ":architecture:uart",
+        ":cmsis:device",
+        )
 
-    for instance in listify(device.get_driver("uart")["instance"]):
-        module.add_submodule(Instance(instance))
+    global props
+    drivers = (device.get_all_drivers("uart") + device.get_all_drivers("usart"))
+    props["instances"] = []
+
+    for driver in drivers:
+        for instance in driver["instance"]:
+            module.add_submodule(Instance(driver, instance))
+
+    props["target"] = device.identifier
 
     return True
 
 def build(env):
-    env.substitutions = get_properties(env)
+    device = env[":target"]
+
+    global props
+    env.substitutions = props
     env.outbasepath = "modm/src/modm/platform/uart"
 
     env.copy("lpc11_uart_registers.hpp")

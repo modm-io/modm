@@ -12,18 +12,17 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_LPC11_UART_1_HPP
-#define MODM_LPC11_UART_1_HPP
+%% set name = uart_name ~ id
+
+#ifndef MODM_LPC11_UART_{{ id }}_HPP
+#define MODM_LPC11_UART_{{ id }}_HPP
 
 #include <modm/architecture/interface/uart.hpp>
+#include <modm/platform/gpio/connector.hpp>
+#include <modm/architecture/interface/interrupt.hpp>
 
-
-namespace modm
+namespace modm::platform
 {
-
-namespace platform
-{
-
 /**
  * Universal asynchronous receiver transmitter (UART1)
  *
@@ -50,17 +49,34 @@ namespace platform
  * @author		Strongly Typed
  * @author		Niklas Hauser
  */
-class Uart1 : public modm::Uart
+class {{ name }} : public modm::Uart
 {
 	static void
 	initialize(uint32_t baudrate);
 
 public:
 	// Expose jinja template parameters to be checked by e.g. drivers or application
-	static constexpr size_t RxBufferSize = {{ option["buffer.rx"] }};
-	static constexpr size_t TxBufferSize = {{ option["buffer.tx"] }};
+	static constexpr size_t RxBufferSize = {{ options["buffer.rx"] }};
+	static constexpr size_t TxBufferSize = {{ options["buffer.tx"] }};
 
 public:
+	template< template<Peripheral _> class... Signals >
+	static void
+	connect(Gpio::InputType InputTypeRx = Gpio::InputType::PullUp)
+	{
+		using Connector = GpioConnector<Peripheral::{{ name }}, Signals...>;
+		using Tx = typename Connector::template GetSignal< Gpio::Signal::Tx >;
+		using Rx = typename Connector::template GetSignal< Gpio::Signal::Rx >;
+		static_assert(((Connector::template IsValid<Tx> and Connector::template IsValid<Rx>) and sizeof...(Signals) == 2) or
+					  ((Connector::template IsValid<Tx> or  Connector::template IsValid<Rx>) and sizeof...(Signals) == 1),
+					  "{{ name }}::connect() requires one Tx and/or one Rx signal!");
+
+		// Connector::disconnect();
+		Tx::setOutput(Gpio::OutputType::PushPull);
+		Rx::setInput(InputTypeRx);
+		Connector::connect();
+	}
+
 	template< class SystemClock, baudrate_t baudrate, percent_t tolerance=pct(1) >
 	static void modm_always_inline
 	initialize()
@@ -99,8 +115,6 @@ public:
 	discardReceiveBuffer();
 };
 
-}	// namespace platform
+}	// modm::platform namespace
 
-}	// modm namespace
-
-#endif // MODM_LPC11_UART_1_HPP
+#endif // MODM_LPC11_UART_{{ id }}_HPP
