@@ -1,0 +1,14 @@
+<library>
+  <repositories>
+    <repository>
+      <path>../../../../repo.lb</path>
+    </repository>
+  </repositories>
+
+  <options>
+    <option name="modm:target">lpc11c24</option>
+  </options>
+  <modules>
+    <module>modm:board:lpcxpresso-lpc11c24</module>
+  </modules>
+</library>
