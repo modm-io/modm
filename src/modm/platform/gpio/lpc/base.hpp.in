@@ -1,0 +1,95 @@
+/*
+ * Copyright (c) 2016-2018, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_LPC_GPIO_BASE_HPP
+#define MODM_LPC_GPIO_BASE_HPP
+
+#include "../device.hpp"
+#include <modm/architecture/interface/gpio.hpp>
+#include <modm/math/utils/bit_operation.hpp>
+#include <modm/platform/core/peripherals.hpp>
+
+namespace modm::platform
+{
+
+/// @ingroup modm_platform_gpio
+struct Gpio
+{
+	/// @ingroup	lpc11xx
+	/// Each Input Pin can be configured in one of these states.
+	enum class
+	InputType
+	{
+		Floating = (0 << 3),	///< The input pin is left floating
+		PullDown = (1 << 3),
+		PullUp   = (2 << 3),	///< The input pin is pulled to Vcc
+		Repeater = (3 << 3),
+	};
+
+	/// @ingroup	lpc11xx
+	enum class
+	OutputType
+	{
+		PushPull  = (0 << 10),	///< push-pull on output
+		OpenDrain = (1 << 10),	///< open-drain on output
+	};
+
+	/// @ingroup	lpc11xx
+	enum class
+	I2cMode
+	{
+		StandardMode = (0 << 8),
+		StandardIO   = (1 << 8),
+		FastMode     = (2 << 8),
+	};
+
+
+	/// Each External Interrupt can be configured to trigger on these conditions.
+	enum class
+	InputTrigger : uint8_t
+	{
+		LowLevel = 0b00,	///< triggers **continuously** during low level
+		BothEdges = 0b01,	///< triggers on both rising and falling edge
+		FallingEdge = 0b10,	///< triggers on falling edge
+		RisingEdge = 0b11,	///< triggers on rising edge
+	};
+
+	/// Available ports on this device.
+	enum class
+	Port
+	{
+%% for port in ports
+		{{ port }} = {{ port | modm.ord }},
+%% endfor
+	};
+
+	enum class
+	Signal
+	{
+		BitBang,
+%% for signal in all_signals
+		{{ signal }},
+%% endfor
+	};
+
+protected:
+	/// @cond
+	static constexpr uint8_t
+	i(InputType config) { return uint8_t(config); }
+	static constexpr uint8_t
+	i(InputTrigger trigger) { return uint8_t(trigger); }
+	/// @endcond};
+
+};
+
+} // namespace modm::platform
+
+#endif // MODM_LPC_GPIO_BASE_HPP

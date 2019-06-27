@@ -1,0 +1,235 @@
+/*
+ * Copyright (c) 2017-2018, Niklas Hauser
+ * Copyright (c) 2019, Sascha Schade
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+%% set port = gpio["port"]
+%% set pin  = gpio["pin"]
+
+%% if "define" in gpio
+	%% set conf_reg  = "LPC_IOCON->" ~ gpio.define
+%% elif 'reserved' in gpio.functions
+	%% set conf_reg  = "LPC_IOCON->R_PIO" ~ port ~ "_" ~ pin
+%% else
+	%% set conf_reg  = "LPC_IOCON->PIO" ~ port ~ "_" ~ pin
+%% endif
+
+%% set gpio_reg  = "LPC_GPIO" ~ port
+
+#ifndef MODM_LPC_GPIO_PIN_{{ port }}_{{ pin }}_HPP
+#define MODM_LPC_GPIO_PIN_{{ port }}_{{ pin }}_HPP
+
+#include "../device.hpp"
+
+namespace modm::platform
+{
+
+/// @cond
+class Gpio{{ port }}_{{ pin }};
+using GpioOutput{{ port }}_{{ pin }} = Gpio{{ port }}_{{ pin }};
+using GpioInput{{ port }}_{{ pin }}  = Gpio{{ port }}_{{ pin }};
+/// @endcond
+
+
+class GpioSet{{ port }}_{{ pin }} : public Gpio, public ::modm::GpioIO
+{
+public:
+	// GPIO Output
+	static void configure(OutputType type) {
+		if (type == OutputType::PushPull) {
+			{{ conf_reg }} &= ~static_cast<uint32_t>(OutputType::OpenDrain);
+		} else {
+			{{ conf_reg }} |=  static_cast<uint32_t>(OutputType::OpenDrain);
+		}
+	}
+
+	static void setOutput() {
+		{{ gpio_reg }}->DIR |= (1 << {{ pin }});
+	}
+
+	static void setOutput(bool status) {
+		setOutput();
+		set(status);
+	}
+
+	static void setOutput(OutputType type) {
+		configure(type);
+		setOutput();
+	}
+
+	static void set() {
+		{{ gpio_reg }}->MASKED_ACCESS[1 << {{ pin }}] = (1 << {{ pin }});
+	}
+
+	static void reset() {
+		{{ gpio_reg }}->MASKED_ACCESS[1 << {{ pin }}] = 0;
+	}
+
+	static void set(bool status) {
+		if (status) { set(); }
+		else { reset(); }
+	}
+
+public:
+	// GPIO Input
+	static void configure(const InputType type) {
+		uint32_t temp;
+		temp = {{ conf_reg }} & ~static_cast<uint32_t>(InputType::Repeater);
+		temp |= static_cast<uint32_t>(type);
+		{{ conf_reg }} = temp;
+	}
+
+	static void setInput() {
+		// setAlternateFunction(0);
+		{{ gpio_reg }}->DIR &= ~(1 << {{ pin}});
+	}
+
+	static void setInput(const InputType type) {
+		configure(type);
+		setInput();
+	}
+
+	static bool read() {
+		return ({{ gpio_reg }}->MASKED_ACCESS[1 << {{ pin }}]) >> {{ pin }};
+	}
+
+public:
+	// template< Periph
+};
+
+/// IO class for Pin {{port }}_{{ pin}}
+/// @ingroup	modm_platform_gpio
+class Gpio{{ port }}_{{ pin }} : public Gpio, public ::modm::GpioIO
+{
+	// template<class... Gpios>
+	// friend class GpioSet;
+	// using PinSet = GpioSet<Gpio{{ port ~ pin }}>;
+	using PinSet = GpioSet{{ port }}_{{ pin }};
+	// friend class Adc;
+	// friend class Adc1; friend class Adc2;
+	// friend class Adc3; friend class Adc4;
+public:
+	using Output = Gpio{{ port }}_{{ pin }};
+	using Input = Gpio{{ port }}_{{ pin }};
+	using IO = Gpio{{ port }}_{{ pin }};
+	using Type = Gpio{{ port }}_{{ pin }};
+	static constexpr Port port = Port::PIO_{{ port }}; ///< Port name
+	static constexpr uint8_t pin = {{ pin }}; ///< Pin number
+
+protected:
+	inline static void setAlternateFunction(const uint8_t af) {
+		uint32_t temp;
+		temp = {{ conf_reg }} & ~(0b111 << 0);	// FUNC REG is 3 bits wide and start at index 0
+		temp |= af;
+		{{ conf_reg }} = temp;
+	}
+
+public:
+	// GpioOutput
+	// start documentation inherited
+	inline static void setOutput()            { PinSet::setOutput();       }
+	inline static void setOutput(bool status) { PinSet::setOutput(status); }
+	inline static void set()                  { PinSet::set();             }
+	inline static void set(bool status)       { PinSet::set(status);       }
+	inline static void reset()                { PinSet::reset();           }
+	inline static void toggle() {
+		if (isSet()) { reset(); }
+		else         { set();   }
+	}
+	inline static bool isSet() { return (({{ gpio_reg }}->MASKED_ACCESS[1 << {{ pin }}]) >> {{ pin }}); }
+	// stop documentation inherited
+	inline static void configure(OutputType type) { PinSet::configure(type); }
+	inline static void setOutput(OutputType type) { PinSet::setOutput(type); }
+
+	// GpioInput
+	// start documentation inherited
+	inline static void setInput() { PinSet::setInput(); }
+	inline static bool read() { return true; }
+	// end documentation inherited
+	inline static void configure(InputType type) { PinSet::configure(type); }
+	inline static void setInput(InputType type) { PinSet::setInput(type); }
+
+	// External Interrupts
+	// Todo
+
+	inline static void disconnect() {
+		setInput(InputType::Floating);
+		setAlternateFunction(0);
+	}
+
+public:
+#ifdef __DOXYGEN__
+	/// @{
+	/// Connect to any software peripheral
+	using BitBang = GpioSignal;
+	%% for name, group in signals.items()
+	/// Connect to {% for sig in group %}{{ sig.driver }}{{ "" if loop.last else " or "}}{% endfor %}
+	using {{ name }} = GpioSignal;
+	%% endfor
+	/// @}
+#endif
+	/// @cond
+	template< Peripheral peripheral >
+	struct BitBang { static void connect();
+		static_assert(
+			(peripheral == Peripheral::BitBang),
+			"Gpio{{ port }}_{{ pin }}::BitBang only connects to software drivers!");
+	};
+	%% for signal_name, signal_group in signals.items()
+	template< Peripheral peripheral >
+	struct {{ signal_name }} { static void connect();
+		static_assert(
+		%% for signal in signal_group
+			(peripheral == Peripheral::{{ signal.driver }}){% if loop.last %},{% else %} ||{% endif %}
+		%% endfor
+			"Gpio{{ port }}_{{ pin }}::{{ signal_name }} only connects to {% for signal in signal_group %}{{signal.driver}}{% if not loop.last %} or {% endif %}{% endfor %}!");
+	};
+	%% endfor
+	/// @endcond
+}; // class Gpio
+
+/// @cond
+template<>
+struct Gpio{{ port }}_{{ pin }}::BitBang<Peripheral::BitBang>
+{
+	using Gpio = Gpio{{ port }}_{{ pin }};
+	static constexpr Gpio::Signal Signal = Gpio::Signal::BitBang;
+	static constexpr int af = -1;
+	inline static void connect() {}
+};
+%% for signal_group in signals.values()
+	%% for signal in signal_group
+template<>
+struct Gpio{{ port }}_{{ pin }}::{{ signal.name }}<Peripheral::{{ signal.driver }}>
+{
+	using Gpio = Gpio{{ port }}_{{ pin }};
+	static constexpr Gpio::Signal Signal = Gpio::Signal::{{ signal.name }};
+	static constexpr uint8_t af = {{ signal.af[0] if signal.af | length else -1 }};
+	inline static void
+	connect()
+	{
+		%% if signal.af | length
+		setAlternateFunction(af);
+		%% else
+		static_assert(False, "Alternate Function not defined");
+		%% endif
+	}
+};
+
+	%% endfor
+
+%% endfor
+
+
+/// @endcond
+
+} // namespace modm::platform
+
+#endif // MODM_LPC_GPIO_PIN_{{ port }}_{{ pin }}_HPP
