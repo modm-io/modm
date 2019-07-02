@@ -33,6 +33,13 @@ def prepare(module, options):
         ":platform:clock",
         ":platform:core",
         ":platform:gpio")
+
+    module.add_option(
+        EnumerationOption(
+            name="stlink_version", enumeration=["2", "2-1"],
+            default="2",
+            description="# Version of stlink to use"
+        ))
     return True
 
 def build(env):
@@ -42,5 +49,5 @@ def build(env):
     env.copy('.')
 
     env.outbasepath = "modm/openocd/modm/board/"
-    env.copy(repopath("tools/openocd/modm/stm32f103_blue_pill.cfg"), "stm32f103_blue_pill.cfg")
-    env.collect(":build:openocd.source", "modm/board/stm32f103_blue_pill.cfg");
+    env.template(repopath("tools/openocd/modm/stm32f103_blue_pill.cfg"), "stm32f103_blue_pill.cfg")
+    env.collect(":build:openocd.source", "modm/board/stm32f103_blue_pill.cfg")

@@ -1,6 +1,6 @@
 # Cheap STM32F103C8T6 "Blue Pill" Minimum System Development Board
 
-source [find interface/stlink-v2.cfg]
+source [find interface/stlink-v{{ options["stlink_version"] }}.cfg]
 
 transport select hla_swd
 
