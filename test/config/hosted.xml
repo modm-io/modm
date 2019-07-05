@@ -1,5 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <library>
+  <options>
+    <option name="modm:build:scons:unittest.source">../../build/unittest/hosted/modm-test</option>
+    <option name="modm:build:scons:unittest.runner">../runner/hosted.cpp.in</option>
+  </options>
   <modules>
     <module>modm:platform:core</module>
     <module>modm-test:test:**</module>

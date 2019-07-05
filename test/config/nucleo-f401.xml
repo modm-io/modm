@@ -1,6 +1,10 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <library>
   <extends>modm:nucleo-f401re</extends>
+  <options>
+    <option name="modm:build:scons:unittest.source">../../build/unittest/nucleo-f401/modm-test</option>
+    <option name="modm:build:scons:unittest.runner">../runner/stm32.cpp.in</option>
+  </options>
   <modules>
     <module>modm-test:test:**</module>
   </modules>
