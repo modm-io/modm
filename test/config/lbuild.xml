@@ -8,7 +8,7 @@
     <option name="modm:build:scons:include_sconstruct">True</option>
     <option name="modm:build:scons:info.build">True</option>
     <option name="modm:build:scons:info.git">Info+Status</option>
-    <option name="modm:build:scons:cache_dir">../../cache</option>
+    <option name="modm:build:scons:cache_dir">../../build/cache</option>
   </options>
   <modules>
     <module>modm:build:scons</module>

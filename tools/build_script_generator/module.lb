@@ -33,7 +33,7 @@ def prepare(module, options):
         StringOption(name="project.name", default=default_project_name,
                      description=descr_project_name))
     module.add_option(
-        PathOption(name="build.path", default="build/"+default_project_name,
+        PathOption(name="build.path", default="build/"+default_project_name, absolute=True,
                    description=descr_build_path))
 
     if platform in ["avr"]:
@@ -54,7 +54,7 @@ def prepare(module, options):
 
     elif is_cortex_m:
         module.add_option(
-            PathOption(name="openocd.cfg", default="", empty_ok=True,
+            PathOption(name="openocd.cfg", default="", empty_ok=True, absolute=True,
                        description=descr_openocd_cfg))
 
     # Queries
@@ -83,10 +83,12 @@ def prepare(module, options):
 
     module.add_collector(
         PathCollector(name="elf.release",
-                      description="Path to the compiled .elf file for the release profile"))
+                      description="Path to the compiled .elf file for the release profile",
+                      absolute=True))
     module.add_collector(
         PathCollector(name="elf.debug",
-                      description="Path to the compiled .elf file for the debug profile"))
+                      description="Path to the compiled .elf file for the debug profile",
+                      absolute=True))
     module.add_collector(
         PathCollector(name="gitignore",
                       description="Generated files that need to be ignored by Git"))
@@ -147,8 +149,8 @@ def post_build(env):
     gitignore = [env.relative_outpath(ignore, "modm") for ignore in
                  env.collector_values("gitignore", filterfunc=lambda s: s.repository == "modm")]
     elf_files = {
-        "release": env.collector_values("elf.release")[0],
-        "debug": env.collector_values("elf.debug")[0],
+        "release": env.relative_outpath(env.collector_values("elf.release")[0], "modm/"),
+        "debug": env.relative_outpath(env.collector_values("elf.debug")[0], "modm/"),
     }
 
     env.substitutions = {

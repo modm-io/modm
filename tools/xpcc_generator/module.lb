@@ -16,13 +16,13 @@ def init(module):
 
 def prepare(module, options):
     module.add_option(
-        PathOption(name="source", default="", empty_ok=True,
+        PathOption(name="source", default="", empty_ok=True, absolute=True,
                    description="Path to the XPCC source file"))
     module.add_option(
         StringOption(name="container", default="",
                      description="Name of the XPCC container to generate for"))
     module.add_option(
-        PathOption(name="path", default="generated/xpcc",
+        PathOption(name="path", default="generated/xpcc", absolute=True,
                    description="Path to the XPCC generated folder"))
     module.add_option(
         StringOption(name="namespace", default="robot",

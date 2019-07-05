@@ -86,6 +86,7 @@ class TestRun:
                 lbuild_command.append("-D:::cache_dir={}".format(self.cache_dir))
 
             lbuild_command.extend(["-D:target={}".format(self.device),
+                                   "-D:build:build.path={}/build".format(tempdir),
                                    "-p", str(tempdir),
                                    "build",
                                    "--no-log"])

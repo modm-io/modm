@@ -22,10 +22,10 @@ def prepare(module, options):
         BooleanOption(name="include_sconstruct", default=True,
                       description=descr_include_sconstruct))
     module.add_option(
-        PathOption(name="cache_dir", default="", empty_ok=True,
+        PathOption(name="cache_dir", default="", empty_ok=True, absolute=True,
                    description=descr_cache_dir))
     module.add_option(
-        PathOption(name="image.source", default="", empty_ok=True,
+        PathOption(name="image.source", default="", empty_ok=True, absolute=True,
                    description=descr_image_source))
     module.add_option(
         EnumerationOption(name="info.git", default="Disabled",
@@ -148,7 +148,7 @@ def post_build(env):
         sources["modm"].append("modm/src/info_build.c")
 
     cache_dir = env["cache_dir"]
-    if cache_dir == "/cache":
+    if cache_dir.endswith("$cache"):
         cache_dir = env[":build:build.path"] + "/cache"
         if "build/" in cache_dir:
             cache_dir = "{}build/cache".format(cache_dir.split("build/")[0])
@@ -156,7 +156,8 @@ def post_build(env):
     subs["memories"] = env.query("::memories")
     # Add SCons specific data
     subs.update({
-        "cache_dir": cache_dir,
+        "build_path": env.relative_outpath(env[":build:build.path"]),
+        "cache_dir": env.relative_outpath(cache_dir),
         "generated_paths": repositories,
         "is_unittest": is_unittest,
 
@@ -164,12 +165,12 @@ def post_build(env):
         "has_xpcc_generator": has_xpcc_generator,
     })
     if has_image_source:
-        subs["image_source"] = env["image.source"]
+        subs["image_source"] = env.relative_outpath(env["image.source"])
     if has_xpcc_generator:
         subs.update({
-            "generator_source": env.get(":communication:xpcc:generator:source", ""),
+            "generator_source": env.relative_outpath(env.get(":communication:xpcc:generator:source", "")),
             "generator_container": env.get(":communication:xpcc:generator:container", ""),
-            "generator_path": env.get(":communication:xpcc:generator:path", ""),
+            "generator_path": env.relative_outpath(env.get(":communication:xpcc:generator:path", "")),
             "generator_namespace": env.get(":communication:xpcc:generator:namespace", ""),
         })
     if subs["platform"] == "avr":
@@ -247,7 +248,7 @@ descr_include_sconstruct = """# Generate a SConstruct file
 
 descr_cache_dir = """# Path to SConstruct CacheDir
 
-If value is `/cache`, the cache is placed into the top-level `build/` folder.
+If value is `$cache`, the cache is placed into the top-level `build/` folder.
 You can disable CacheDir by setting an empty string.
 """
 
