@@ -35,7 +35,6 @@ def prepare(module, options):
 
     module.depends(
         ":architecture:can",
-        ":platform:core",
         ":platform:clock",
         ":debug",
     )

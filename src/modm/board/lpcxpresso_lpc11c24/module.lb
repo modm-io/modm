@@ -27,7 +27,6 @@ def prepare(module, options):
 
     module.depends(
         ":platform:lpc",
-        ":platform:core",
         ":platform:gpio",
         ":platform:clock",
         ":architecture:clock")

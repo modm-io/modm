@@ -53,10 +53,10 @@ ClockControl::setFlashLatency()
 	// constexpr flash_latency fl = computeFlashLatency(Core_Hz, Core_mV);
 	// static_assert(Core_Hz <= fl.max_frequency, "CPU Frequency is too high for this core voltage!");
 
-	if (Core_Hz <= 20_MHz) {
+	if constexpr(Core_Hz <= 20_MHz) {
 		LPC_FLASHCTRL->FLASHCFG = 0;
 	}
-	else if (Core_Hz <= 40_MHz) {
+	else if constexpr(Core_Hz <= 40_MHz) {
 		LPC_FLASHCTRL->FLASHCFG = 1;
 	}
 	else {

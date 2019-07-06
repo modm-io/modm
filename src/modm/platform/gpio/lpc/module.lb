@@ -65,7 +65,6 @@ def prepare(module, options):
         ":utils",
         ":platform:gpio.common",
         ) # ":platform:gpio.common") #, ":platform:i2c.generic")
-    print('Return truee')
     return True
 
 def validate(env):

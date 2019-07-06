@@ -309,11 +309,12 @@ workflows:
   version: 2
   build:
     jobs:
+      # It would be nice to only have 4 initial jobs (as CircleCI only gives us 4 parallel jobs),
+      # so they all start and finish within 3mins or so.
       - stm32f4-examples
       - unittests-linux-generic
       - avr-examples
       - stm32-examples
-      - lpc11-examples
 
       - avr-compile-all:
           requires:
@@ -347,6 +348,10 @@ workflows:
             - unittests-linux-generic
             - stm32-examples
       - stm32l4-compile-all:
+          requires:
+            - unittests-linux-generic
+            - stm32-examples
+      - lpc11-examples:
           requires:
             - unittests-linux-generic
             - stm32-examples

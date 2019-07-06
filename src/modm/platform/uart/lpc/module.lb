@@ -65,7 +65,6 @@ def prepare(module, options):
         return False
 
     module.depends(
-        ":platform:core",
         ":architecture:uart",
         ":cmsis:device",
         )
