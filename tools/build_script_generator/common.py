@@ -14,26 +14,46 @@ import os
 import itertools
 from collections import defaultdict
 
-common_build_flags = [
-    "ccflags",
-    "cflags",
-    "cxxflags",
-    "asflags",
-    "archflags",
-    "linkflags",
-    "cppdefines",
-]
+common_build_flags = {
+    "ccflags": ("Compiler flags for both C and C++ sources",
+                ["See [Options that Control Optimization](https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html)",
+                 "See [Options to Request or Suppress Warnings](https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html)",
+                 "See [Options for Debugging Your Program](https://gcc.gnu.org/onlinedocs/gcc/Debugging-Options.html)"]),
+    "cflags": ("Compiler flags only for C sources",
+               ["See [Options Controlling C Dialect](https://gcc.gnu.org/onlinedocs/gcc/C-Dialect-Options.html)"]),
+    "cxxflags": ("Compiler flags only for C++ sources",
+                 ["See [Options Controlling C++ Dialect](https://gcc.gnu.org/onlinedocs/gcc/C_002b_002b-Dialect-Options.html)"]),
+    "asflags": ("Assembler flags",
+                ["See [Assembler Options](https://gcc.gnu.org/onlinedocs/gcc/Assembler-Options.html)"]),
+    "archflags": ("Compiler flags related to the target architecture",
+                  ["See [Machine-Dependent Options](https://gcc.gnu.org/onlinedocs/gcc/Submodel-Options.html)"]),
+    "linkflags": ("Linker flags",
+                  ["See [Options for Linking](https://gcc.gnu.org/onlinedocs/gcc/Link-Options.html)"]),
+    "cppdefines": ("Preprocessor definitions",
+                   ["Accepted values are `NAME` or `NAME=DEFINITION`.",
+                    "See `-D name=definition` in [Preprocessor Options](https://gcc.gnu.org/onlinedocs/gcc/Preprocessor-Options.html)"]),
+}
 
 common_build_profiles = [
     "release",
     "debug",
 ]
 
-common_build_flag_names = [
-    flag+profile
+def _fmt_flag_descr(flag, profile):
+    flags = common_build_flags[flag]
+    descr = [flags[0], ""]
+    if len(profile):
+        descr[0] += " ({} profile)".format(profile[1:])
+    if "flags" in flag:
+        descr.append("Flags must start with '-'!")
+    descr += flags[1]
+    return "\n".join(descr)
+
+common_build_flag_names = {
+    flag+profile: _fmt_flag_descr(flag, profile)
         for flag in common_build_flags
             for profile in ([""] + ["."+p for p in common_build_profiles])
-]
+}
 
 def common_source_files(env):
     """

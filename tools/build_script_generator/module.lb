@@ -117,9 +117,9 @@ def prepare(module, options):
         if not flag.startswith("-"):
             raise ValueError("Flags must start with '-'!")
         return flag
-    for name in common_build_flag_names:
+    for name, descr in common_build_flag_names.items():
         module.add_collector(
-            StringCollector(name=name, description=None,
+            StringCollector(name=name, description=descr,
                             validate=flag_validate if "flags" in name else None))
 
     return True

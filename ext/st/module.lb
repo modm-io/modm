@@ -47,6 +47,15 @@ def getDefineForDevice(device_id, familyDefines):
 
 bprops = {}
 def common_rcc_map(env):
+    """
+    Finds all CMSIS bit fields related to enabling and resetting peripherals
+    in the RCC of the format `RCC_(REGISTER)_(PERIPHERAL)_(TYPE)` where:
+      - REGISTER: a variation of `(BUS)(ID?)(ENR|RSTR)`, e.g. `AHB1ENR`
+      - PERIPHERAL: typical peripheral name, e.g. `GPIOA`
+      - TYPE: either `EN` or `RST`.
+
+    :returns: a 2D-dictionary: map[PERIPHERAL][TYPE] = REGISTER
+    """
     device = env[":target"]
 
     core = device.get_driver("core")["type"]
