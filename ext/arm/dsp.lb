@@ -12,7 +12,72 @@
 # -----------------------------------------------------------------------------
 
 from collections import defaultdict
+from pathlib import Path
 
+class CmsisDspModule(Module):
+
+    def __init__(self, path):
+        self.path = str(path.name)
+        self.name = self.path.replace("Functions", "").replace("Common", "") \
+                             .replace("Math", "_math").lower()
+
+    def init(self, module):
+        module.name = ":cmsis:dsp:{}".format(self.name)
+        module.description = "DSP {}".format(" ".join(s.capitalize()
+                                             for s in self.name.split("_")))
+
+    def prepare(self, module, options):
+        dependencies = {
+            "basic_math": [],
+            "complex_math": [":cmsis:dsp:fast_math"],
+            "controller": [":cmsis:dsp:tables"],
+            "fast_math": [":cmsis:dsp:tables"],
+            "filtering": [":cmsis:dsp:tables", ":cmsis:dsp:support"],
+            "matrix": [],
+            "statistics": [":cmsis:dsp:fast_math"],
+            "support": [],
+            "tables": [],
+            "transform": [":cmsis:dsp:tables"],
+        }
+        module.depends(*dependencies[self.name])
+        return True
+
+    def build(self, env):
+        metadata = defaultdict(list)
+        metadata[":build:cflags"].append("-fno-strict-aliasing")
+        metadata[":build:cflags"].append("-Wno-nested-externs")
+        metadata[":build:ccflags"].append("-Wno-sign-compare")
+        metadata[":build:ccflags"].append("-Wno-double-promotion")
+
+        core = env[":target"].get_driver("core")["type"]
+        if "f" in core:
+            metadata[":build:cppdefines"].append("__FPU_PRESENT=1")
+
+        if env[":cmsis:dsp:check_matrix_sizes"]:
+            metadata[":build:cppdefines"].append("ARM_MATH_MATRIX_CHECK")
+        else:
+            metadata[":build:cppdefines.debug"].append("ARM_MATH_MATRIX_CHECK")
+
+        if env[":cmsis:dsp:round_float_inputs"]:
+            metadata[":build:cppdefines"].append("ARM_MATH_ROUNDING")
+
+        if not env.get(":cmsis:dsp:unaligned_data", False):
+            metadata[":build:cppdefines"].append("UNALIGNED_SUPPORT_DISABLE")
+
+        env.outbasepath = "modm/ext/cmsis/dsp"
+        if "tables" in self.name:
+            env.copy("cmsis/CMSIS/DSP/Include/arm_common_tables.h", "arm_common_tables.h")
+            env.copy("cmsis/CMSIS/DSP/Include/arm_const_structs.h", "arm_const_structs.h")
+        operations = env.copy("cmsis/CMSIS/DSP/Source/{}".format(self.path), "{}".format(self.path),
+                              ignore=env.ignore_files("arm_bitreversal2.c", "CMakeLists.txt",
+                                                      "*Functions.c", "*Tables.c"))
+
+        # For all sources add these compile flags
+        for key, values in metadata.items():
+            env.collect(key, *values, operations=operations)
+
+
+# =============================================================================
 def init(module):
     module.name = ":cmsis:dsp"
     module.description = FileReader("dsp.md")
@@ -39,39 +104,20 @@ def prepare(module, options):
             description=descr_round_floats,
             default=True))
 
+    for path in Path(localpath("cmsis/CMSIS/DSP/Source")).iterdir():
+        if path.is_dir():
+            module.add_submodule(CmsisDspModule(path))
+
     return True
 
 def build(env):
-    metadata = defaultdict(list)
-    metadata[":build:cflags"].append("-fno-strict-aliasing")
-
     core = env[":target"].get_driver("core")["type"]
-    if "f" in core:
-        metadata[":build:cppdefines"].append("__FPU_PRESENT=1")
-
     core = core.replace("cortex-m", "CM").replace("+", "PLUS").replace("f", "").replace("d", "")
     env.collect(":build:cppdefines", "ARM_MATH_{}".format(core))
-
-    if env["check_matrix_sizes"]:
-        metadata[":build:cppdefines"].append("ARM_MATH_MATRIX_CHECK")
-    else:
-        metadata[":build:cppdefines.debug"].append("ARM_MATH_MATRIX_CHECK")
-
-    if env["round_float_inputs"]:
-        metadata[":build:cppdefines"].append("ARM_MATH_ROUNDING")
-
-    if not env.get("unaligned_data", False):
-        metadata[":build:cppdefines"].append("UNALIGNED_SUPPORT_DISABLE")
-
     env.collect(":build:path.include", "modm/ext/cmsis/dsp")
 
     env.outbasepath = "modm/ext/cmsis/dsp"
-    env.copy("cmsis/CMSIS/DSP/Include", ".")
-    operations = env.copy("cmsis/CMSIS/DSP/Source", ".")
-
-    # For all sources add these compile flags
-    for key, values in metadata.items():
-        env.collect(key, *values, operations=operations)
+    env.copy("cmsis/CMSIS/DSP/Include/arm_math.h", "arm_math.h")
 
 
 # ============================ Option Descriptions ============================

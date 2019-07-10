@@ -18,4 +18,4 @@ We use only use these parts of CMSIS:
   via CMSIS-DSP.
 
 [cmsis]: https://developer.arm.com/embedded/cmsis
-[overview]: https://developer.arm.com/-/media/developer/Block%20Diagrams/CMSIS%20Diagram%20v2.png
+[overview]: https://developer.arm.com/-/media/Arm%20Developer%20Community/Images/Block%20Diagrams/Cortex%20Microcontroller%20Software%20Interface%20Standard%20-%20CMSIS/CMSIS%20Diagram%20v2.png
