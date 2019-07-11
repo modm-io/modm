@@ -750,6 +750,25 @@ constexpr ::modm::Flags<Enum> operator^(Enum const &a, Enum const &b) { return :
 #define MODM_TYPE_FLAGS(Parent) \
 	MODM_INTERNAL_FLAGS(Parent,)
 
+/**
+ * @details
+ * This macro creates a `Config_t` type out of the `Parent` and `Config` enum.
+ * The mask is taken from a `Parent::Config_Mask` field containing the ORed bits
+ * of the configuration.
+ *
+ * @note This macro does not allow using the configuration position.
+ *       Please use the `modm::Configuration` class manually in that case.
+ *
+ * @param	Parent	a Flags Enum
+ * @param	Config	a Config Enum
+ *
+ * @ingroup modm_architecture_register
+ * @hideinitializer
+ */
+#define MODM_FLAGS_CONFIG(Parent, Config) \
+	using MODM_CONCAT(Config, _t) = \
+		::modm::Configuration< MODM_CONCAT(Parent, _t), Config, \
+		MODM_CONCAT(Parent, _t)::UnderlyingType(MODM_CONCAT(Parent::Config, _Mask)) >
 
 /// @cond
 #define MODM_INT_TYPE_FLAGS(Parent) \
