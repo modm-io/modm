@@ -22,6 +22,36 @@ Cheap and bread-board-friendly board for STM32 F1 series.
 Sold for less than 2 USD on well known Internet shops from China.
 
 http://wiki.stm32duino.com/index.php?title=Black_Pill
+""" + descr_programming
+
+descr_programming = """
+## Programming
+
+Since the board doesn't have a programmer on-board, you need to use your
+own and *specify* which one you're using in a custom `openocd.cfg` file:
+
+```
+# Replace this with your custom programmer
+source [find interface/stlink-v2.cfg]
+
+# If you use the clone CKS32F103C8T6 chip you need to overwrite this ID
+#set CPUTAPID 0x2ba01477
+
+# To select a specific programmer you can specify its serial number
+#hla_serial "\x53\x3f\x6f\x06\x50\x77\x50\x57\x12\x17\x14\x3f"
+# You can discover the serial via `stlink --hla-serial` or `st-info --hla-serial`.
+```
+
+Then include this file in your build options like so:
+
+```xml
+<library>
+  <extends>modm:black-pill</extends>
+  <options>
+    <option name="modm:build:openocd.cfg">openocd.cfg</option>
+  </options>
+</library>
+```
 """
 
 def prepare(module, options):
@@ -43,4 +73,8 @@ def build(env):
 
     env.outbasepath = "modm/openocd/modm/board/"
     env.copy(repopath("tools/openocd/modm/stm32f103_blue_pill.cfg"), "stm32f103_blue_pill.cfg")
-    env.collect(":build:openocd.source", "modm/board/stm32f103_blue_pill.cfg");
+    env.collect(":build:openocd.source", "modm/board/stm32f103_blue_pill.cfg")
+
+    # Warn the user if they forgot to set a custom openocd config
+    if env.has_option(":build:openocd.cfg") and not len(env.get(":build:openocd.cfg", "")):
+        env.log.warning("You need to provide the programmer via a custom OpenOCD config!\n" + descr_programming)

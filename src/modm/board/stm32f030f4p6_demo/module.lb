@@ -23,6 +23,33 @@ Sold for less than 1.5 USD on well known Internet shops from China.
 
 http://www.hotmcu.com/stm32f030f4p6-minimum-systerm-boardcortexm0-p-208.html
 http://www.haoyuelectronics.com/Attachment/STM32F030-Dev-Board/STM32F030F4P6.pdf
+""" + descr_programming
+
+descr_programming = """
+## Programming
+
+Since the board doesn't have a programmer on-board, you need to use your
+own and *specify* which one you're using in a custom `openocd.cfg` file:
+
+```
+# Replace this with your custom programmer
+source [find interface/stlink-v2.cfg]
+
+# To select a specific programmer you can specify its serial number
+#hla_serial "\x53\x3f\x6f\x06\x51\x77\x50\x57\x12\x17\x13\x3f"
+# You can discover the serial via `stlink --hla-serial` or `st-info --hla-serial`.
+```
+
+Then include this file in your build options like so:
+
+```xml
+<library>
+  <extends>modm:stm32f030_demo</extends>
+  <options>
+    <option name="modm:build:openocd.cfg">openocd.cfg</option>
+  </options>
+</library>
+```
 """
 
 def prepare(module, options):
@@ -43,4 +70,8 @@ def build(env):
 
     env.outbasepath = "modm/openocd/modm/board/"
     env.copy(repopath("tools/openocd/modm/stm32f030_demo_board.cfg"), "stm32f030_demo_board.cfg")
-    env.collect(":build:openocd.source", "modm/board/stm32f030_demo_board.cfg");
+    env.collect(":build:openocd.source", "modm/board/stm32f030_demo_board.cfg")
+
+    # Warn the user if they forgot to set a custom openocd config
+    if env.has_option(":build:openocd.cfg") and not len(env.get(":build:openocd.cfg", "")):
+        env.log.warning("You need to provide the programmer via a custom OpenOCD config!\n" + descr_programming)

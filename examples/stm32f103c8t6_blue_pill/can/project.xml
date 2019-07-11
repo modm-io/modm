@@ -2,6 +2,7 @@
   <extends>modm:blue-pill</extends>
   <options>
     <option name="modm:build:build.path">../../../build/stm32f103c8t6_blue_pill/can</option>
+    <option name="modm:build:openocd.cfg">openocd.cfg</option>
   </options>
   <modules>
     <module>modm:debug</module>

@@ -1,6 +1,10 @@
 %% for path in collector_values["path.openocd"] | sort
 add_script_search_dir {{ path | modm.windowsify(escape_level=1) }}
 %% endfor
+%# Include the users config before the modm config
+%% if openocd_user_path is defined
+source [find {{ openocd_user_path | modm.windowsify(escape_level=1) }}]
+%% endif
 %% for file in collector_values["openocd.source"] | sort
 source [find {{ file | modm.windowsify(escape_level=1) }}]
 %% endfor
