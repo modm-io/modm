@@ -1,0 +1,15 @@
+<library>
+  <extends>modm:nucleo-f411re</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_f411re/bno055</option>
+  </options>
+  <modules>
+    <module>modm:debug</module>
+    <module>modm:driver:bno055</module>
+    <module>modm:platform:gpio</module>
+    <module>modm:platform:i2c:1</module>
+    <module>modm:platform:i2c.bitbang</module>
+    <module>modm:processing:protothread</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>
