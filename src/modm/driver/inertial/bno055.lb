@@ -1,0 +1,38 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2018, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:bno055"
+    module.description = """\
+# BNO055 9-DOF Inertial Measurement Unit
+
+The BNO055 is a System in Package (SiP), integrating a triaxial 14-bit
+accelerometer, a triaxial 16-bit gyroscope with a range of ±2000 degrees per
+second, a triaxial geomagnetic sensor and a 32-bit ARM Cortex-M0+ microcontroller
+running Bosch Sensortec sensor fusion software, in a single package.
+"""
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:register",
+        ":architecture:i2c.device",
+        ":math:utils",
+        ":processing:resumable",
+        ":processing:timer",
+        ":math:geometry")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/inertial"
+    env.copy("bno055.hpp")
+    # env.copy("bno055_impl.hpp")
