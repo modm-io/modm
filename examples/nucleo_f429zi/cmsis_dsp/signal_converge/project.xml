@@ -1,0 +1,12 @@
+<library>
+  <extends>modm:nucleo-f429zi</extends>
+  <options>
+    <option name="modm:build:build.path">../../../../build/nucleo_f429zi/cmsis_dsp/signal_converge</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:cmsis:dsp:filtering</module>
+    <module>modm:cmsis:dsp:basic_math</module>
+    <module>modm:cmsis:dsp:statistics</module>
+  </modules>
+</library>

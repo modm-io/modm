@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:nucleo-f429zi</extends>
+  <options>
+    <option name="modm:build:build.path">../../../../build/nucleo_f429zi/cmsis_dsp/graphic_equalizer</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:cmsis:dsp:filtering</module>
+    <module>modm:cmsis:dsp:basic_math</module>
+  </modules>
+</library>
