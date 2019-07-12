@@ -164,7 +164,7 @@ def post_build(env):
     # Add SCons specific data
     subs.update({
         "build_path": env.relative_outpath(env[":build:build.path"]),
-        "cache_dir": env.relative_outpath(cache_dir),
+        "cache_dir": env.relative_outpath(cache_dir) if len(cache_dir) else "",
         "generated_paths": repositories,
         "is_unittest": is_unittest,
 
