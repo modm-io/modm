@@ -212,9 +212,10 @@ can easily configure them for you specific needs.
 <td align="center">SSD1306</td>
 <td align="center">TCS3414</td>
 <td align="center">TCS3472</td>
+<td align="center">TLC594X</td>
 <td align="center">TMP102</td>
-<td align="center">TMP175</td>
 </tr><tr>
+<td align="center">TMP175</td>
 <td align="center">VL53L0</td>
 <td align="center">VL6180</td>
 <td align="center">WS2812</td>

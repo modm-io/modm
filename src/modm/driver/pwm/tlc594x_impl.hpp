@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2012-2013, 2015, Niklas Hauser
  * Copyright (c) 2014, Sascha Schade
+ * Copyright (c) 2019, Linas Nikiperavicius
  *
  * This file is part of the modm project.
  *
@@ -15,40 +16,40 @@
 #endif
 
 // ----------------------------------------------------------------------------
-template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Vprog, typename Xerr>
-uint8_t modm::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::status[CHANNELS*3/2];
-template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Vprog, typename Xerr>
-uint8_t modm::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::gs[CHANNELS*3/2];
-template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Vprog, typename Xerr>
-uint8_t modm::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::dc[CHANNELS*3/4];
-
-// ----------------------------------------------------------------------------
-template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Vprog, typename Xerr>
+template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Xblank, typename Vprog, typename Xerr>
 void
-modm::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::initialize(uint16_t channels, uint8_t dots, bool writeCH, bool writeDC)
+modm::TLC594X<CHANNELS, Spi, Xlat, Xblank, Vprog, Xerr>::initialize(uint16_t channels, uint8_t dots, bool writeCH, bool writeDC, bool enable)
 {
 	Xlat::setOutput(modm::Gpio::Low);
+	Xblank::setOutput(modm::Gpio::High);
 	Vprog::setOutput(modm::Gpio::Low);
 	Xerr::setInput();
 
-	if (dots != 0xff) setAllDotCorrection(dots, writeDC);
-	if (channels != 0xffff) setAllChannels(channels, writeCH);
+	if (channels != 0xffff) setAllChannels(channels);
+	if (dots != 0xff) setAllDotCorrection(dots);
+
+	if (writeCH) RF_CALL_BLOCKING(writeChannels());
+	if (writeDC) RF_CALL_BLOCKING(writeDotCorrection());
+
+	if (enable) this->enable();
 }
 
-template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Vprog, typename Xerr>
+template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Xblank, typename Vprog, typename Xerr>
 void
-modm::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::latch()
+modm::TLC594X<CHANNELS, Spi, Xlat, Xblank, Vprog, Xerr>::latch()
 {
+	if (enabled) Xblank::set();
 	Xlat::set();
 	// datasheet says 20ns but that is unreliable
-	// => wait for at least 900ns
-	modm::delayMicroseconds(0.9);
+	// => wait for at least 1000ns
+	modm::delayMicroseconds(1);
 	Xlat::reset();
+	if (enabled) Xblank::reset();
 }
 
-template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Vprog, typename Xerr>
+template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Xblank, typename Vprog, typename Xerr>
 void
-modm::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::setChannel(uint16_t channel, uint16_t value)
+modm::TLC594X<CHANNELS, Spi, Xlat, Xblank, Vprog, Xerr>::setChannel(uint16_t channel, uint16_t value)
 {
 	if (channel > CHANNELS-1) return;
 
@@ -78,9 +79,9 @@ modm::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::setChannel(uint16_t channel, ui
 	}
 }
 
-template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Vprog, typename Xerr>
+template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Xblank, typename Vprog, typename Xerr>
 void
-modm::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::setAllChannels(uint16_t value, bool update)
+modm::TLC594X<CHANNELS, Spi, Xlat, Xblank, Vprog, Xerr>::setAllChannels(uint16_t value)
 {
 	uint8_t first  = static_cast<uint8_t>(value >> 4);
 	uint8_t second = static_cast<uint8_t>(value << 4) | (static_cast<uint8_t>(value >> 8) & 0x0f);
@@ -90,12 +91,11 @@ modm::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::setAllChannels(uint16_t value, 
 		gs[i++] = second;
 		gs[i++] = static_cast<uint8_t>(value);
 	}
-	if (update) writeChannels(true);
 }
 
-template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Vprog, typename Xerr>
+template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Xblank, typename Vprog, typename Xerr>
 uint16_t
-modm::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::getChannel(uint16_t channel)
+modm::TLC594X<CHANNELS, Spi, Xlat, Xblank, Vprog, Xerr>::getChannel(uint16_t channel)
 {
 	if (channel > CHANNELS-1) return 0;
 
@@ -112,9 +112,9 @@ modm::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::getChannel(uint16_t channel)
 	return value;
 }
 
-template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Vprog, typename Xerr>
+template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Xblank, typename Vprog, typename Xerr>
 void
-modm::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::setDotCorrection(uint16_t channel, uint8_t value)
+modm::TLC594X<CHANNELS, Spi, Xlat, Xblank, Vprog, Xerr>::setDotCorrection(uint16_t channel, uint8_t value)
 {
 	if (channel > CHANNELS-1) return;
 
@@ -159,9 +159,9 @@ modm::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::setDotCorrection(uint16_t chann
 	}
 }
 
-template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Vprog, typename Xerr>
+template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Xblank, typename Vprog, typename Xerr>
 void
-modm::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::setAllDotCorrection(uint8_t value, bool update)
+modm::TLC594X<CHANNELS, Spi, Xlat, Xblank, Vprog, Xerr>::setAllDotCorrection(uint8_t value)
 {
 	uint8_t first  = (value << 2) | (value >> 4);
 	uint8_t second = (value << 4) | (value >> 2);
@@ -172,12 +172,11 @@ modm::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::setAllDotCorrection(uint8_t val
 		dc[i++] = second;
 		dc[i++] = third;
 	}
-	if (update) writeDotCorrection();
 }
 
-template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Vprog, typename Xerr>
+template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Xblank, typename Vprog, typename Xerr>
 uint8_t
-modm::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::getDotCorrection(uint16_t channel)
+modm::TLC594X<CHANNELS, Spi, Xlat, Xblank, Vprog, Xerr>::getDotCorrection(uint16_t channel)
 {
 	if (channel > CHANNELS-1) return 0;
 
@@ -205,25 +204,31 @@ modm::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::getDotCorrection(uint16_t chann
 	return value;
 }
 
-template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Vprog, typename Xerr>
-void
-modm::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::writeChannels(bool flush)
+template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Xblank, typename Vprog, typename Xerr>
+modm::ResumableResult<void>
+modm::TLC594X<CHANNELS, Spi, Xlat, Xblank, Vprog, Xerr>::writeChannels(bool flush)
 {
-	Spi::transferBlocking(gs, status, CHANNELS*3/2);
+	RF_BEGIN();
 
+	RF_CALL(Spi::transfer(gs, status, CHANNELS*3/2));
 	if (flush) latch();
+
+	RF_END();
 }
 
-template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Vprog, typename Xerr>
-void
-modm::TLC594X<CHANNELS, Spi, Xlat, Vprog, Xerr>::writeDotCorrection()
+template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Xblank, typename Vprog, typename Xerr>
+modm::ResumableResult<void>
+modm::TLC594X<CHANNELS, Spi, Xlat, Xblank, Vprog, Xerr>::writeDotCorrection(bool flush)
 {
+	RF_BEGIN();
+
 	Vprog::set();
 
 	// transfer
-	Spi::transferBlocking(dc, 0, CHANNELS*3/4);
-
-	latch();
+	RF_CALL(Spi::transfer(dc, nullptr, CHANNELS*3/4));
+	if (flush) latch();
 
 	Vprog::reset();
+
+	RF_END();
 }

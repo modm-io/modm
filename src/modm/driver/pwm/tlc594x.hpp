@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2012-2017, Niklas Hauser
  * Copyright (c) 2015, Sascha Schade
+ * Copyright (c) 2019, Linas Nikiperavicius
  *
  * This file is part of the modm project.
  *
@@ -13,10 +14,10 @@
 #ifndef MODM_TLC594X_HPP
 #define MODM_TLC594X_HPP
 
-#include <stdint.h>
-#include <modm/architecture/platform.hpp>
-#include <modm/architecture/interface/gpio.hpp>
+#include <cstdint>
 #include <modm/architecture/interface/delay.hpp>
+#include <modm/architecture/interface/gpio.hpp>
+#include <modm/architecture/interface/spi.hpp>
 
 namespace modm
 {
@@ -28,10 +29,6 @@ namespace modm
  * 22V to be applied to Vprog, requiring additional external circuits.
  * Use of any EEPROM functions is therefore not implemented here.
  * Make sure that pin is connected to Vcc, otherwise Dot Correction does not work.
- *
- * This class also does not control the BLANK pin, as the setup of the timer
- * to drive that pin is platform and configuration specific.
- * Switching off all LEDs using one command is not implemented here.
  *
  * This driver can be used for the 16-channel TLC5940 and 24-channel TLC5947
  * and probably similar TLC59s as well, simply by adjusting the number of
@@ -53,6 +50,7 @@ namespace modm
  * @tparam CHANNELS	Number of channels must be multiples of 4, adjust for daisy-chained chips
  * @tparam	Spi		Spi interface
  * @tparam	Xlat	Level triggered latch pin
+ * @tparam	Xblank	Level triggered blank pin, use modm::platform::GpioUnused if not connected
  * @tparam	Vprog	Vprog pin, use modm::platform::GpioUnused if not connected
  * @tparam	Xerr	Error pin, use modm::platform::GpioUnused if not connected
  *
@@ -63,9 +61,10 @@ template<
 	uint16_t CHANNELS,
 	typename Spi,
 	typename Xlat,
+	typename Xblank=modm::platform::GpioUnused,
 	typename Vprog=modm::platform::GpioUnused,
 	typename Xerr=modm::platform::GpioUnused >
-class TLC594X
+class TLC594X : private modm::NestedResumable< 1 >
 {
 public:
 	static_assert(CHANNELS % 4 ==  0, "Template parameter CHANNELS must be a multiple of 4.");
@@ -76,86 +75,107 @@ public:
 	 * @param dots		initialize dot correction buffer with value, disable with -1
 	 * @param writeCH	write channels value to chip
 	 * @param writeDC	write dots value to chip
+	 * @param enable set blank pin low after initialization
 	 */
-	static void
-	initialize(uint16_t channels=0, uint8_t dots=63, bool writeCH=true, bool writeDC=true);
+	void
+	initialize(uint16_t channels=0, uint8_t dots=63, bool writeCH=true, bool writeDC=true, bool enable=true);
 
 	/// set the 12bit value of a channel
-	/// call transfer() to update the chip
-	static void
+	/// call writeChannels() to update the chip
+	void
 	setChannel(uint16_t channel, uint16_t value);
 
 	/// @param value	the 12bit value of all channels
-	/// @param update	write data to chip
-	static void
-	setAllChannels(uint16_t value, bool update=false);
+	void
+	setAllChannels(uint16_t value);
 
 	/// get the stored 12bit value of a channel
 	/// this does reflect the actual value in the chip
-	static uint16_t
+	uint16_t
 	getChannel(uint16_t channel);
 
 	/// set the 6bit dot correction value of a channel
-	/// call transfer() to update the chip
-	static void
+	/// call writeChannels() to update the chip
+	void
 	setDotCorrection(uint16_t channel, uint8_t value);
 
 	/// @param value the 6bit dot correction value of all channels
 	/// @param update write data to chip
-	static void
-	setAllDotCorrection(uint8_t value, bool update=false);
+	void
+	setAllDotCorrection(uint8_t value);
 
 	/// get the stored 6bit dot correction value of a channel
 	/// this does reflect the actual value in the chip
-	static uint8_t
+	uint8_t
 	getDotCorrection(uint16_t channel);
 
 	/// transfer channel data to driver chip
-	static void
+	modm::ResumableResult<void>
 	writeChannels(bool flush=true);
 
 	/// transfer dot correction data to driver chip
-	static void
-	writeDotCorrection();
+	modm::ResumableResult<void>
+	writeDotCorrection(bool flush=true);
 
-	/// writes data from the input shift register to either GS  or DC register.
-	inline static void
+	/// writes data from the input shift register to either GS or DC register.
+	void
 	latch();
 
+	/// sets the blank pin low
+	void
+	enable()
+	{
+		enabled=true;
+		Xblank::reset();
+	}
+
+	/// sets the blank pin high
+	void
+	disable()
+	{
+		enabled=false;
+		Xblank::set();
+	}
+
 	/// @return true if LOD or TEF is detected
-	modm_always_inline
-	static bool
+	bool
 	isError()
 	{
 		return !Xerr::read();
 	}
 
-	modm_always_inline
-	static uint8_t*
+	uint8_t*
 	getGrayscaleData()
 	{
 		return gs;
 	}
-	modm_always_inline
-	static uint8_t*
+
+	uint8_t*
 	getDotCorrectionData()
 	{
 		return dc;
 	}
-	modm_always_inline
-	static uint8_t*
+
+	uint8_t*
 	getStatusData()
 	{
 		return status;
 	}
 
-private:
-	static uint8_t status[CHANNELS*3/2];
-	static uint8_t gs[CHANNELS*3/2];
-	static uint8_t dc[CHANNELS*3/4];
+	bool
+	isEnabled()
+	{
+		return enabled;
+	}
 
+private:
+	uint8_t status[CHANNELS*3/2];
+	uint8_t gs[CHANNELS*3/2];
+	uint8_t dc[CHANNELS*3/4];
+	bool enabled = false;
 };
-}
+
+} //namespace modm
 
 #include "tlc594x_impl.hpp"
 
