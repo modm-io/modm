@@ -137,7 +137,7 @@ public:
 		}
 	}
 	inline static bool getExternalInterruptFlag() { return (EXTI->PR & mask); }
-	inline static void acknowledgeExternalInterruptFlag() { EXTI->PR |= mask; }
+	inline static void acknowledgeExternalInterruptFlag() { EXTI->PR = mask; }
 	// GpioIO
 	// start documentation inherited
 	inline static Direction getDirection() {

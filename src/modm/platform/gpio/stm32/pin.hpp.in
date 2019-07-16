@@ -156,7 +156,7 @@ public:
 	{ EXTI->FPR1 |= mask; EXTI->RPR1 |= mask; }
 %% else
 	inline static bool getExternalInterruptFlag() { return (EXTI->PR{{pf}} & mask); }
-	inline static void acknowledgeExternalInterruptFlag() { EXTI->PR{{pf}} |= mask; }
+	inline static void acknowledgeExternalInterruptFlag() { EXTI->PR{{pf}} = mask; }
 %% endif
 	// GpioIO
 	// start documentation inherited
