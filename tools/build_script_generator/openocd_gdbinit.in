@@ -5,13 +5,6 @@
 
 target extended-remote :3333
 
-%% for profile, path in elf_files.items()
-define file_{{profile}}
-    file
-    file {{ path | modm.windowsify(escape_level=1) }}
-end
-%% endfor
-
 define restart
   mon reset halt
 end

@@ -56,11 +56,6 @@ def prepare(module, options):
 
 
 def build(env):
-    project_name = env[":build:project.name"]
-    build_path = env[":build:build.path"]
-    env.collect("::elf.release", join(build_path, "release", project_name + ".elf"))
-    env.collect("::elf.debug",   join(build_path, "debug",   project_name + ".elf"))
-
     env.outbasepath = "modm/src/"
     if env["info.git"] != "Disabled":
         env.collect(":build:gitignore", "modm/src/info_git.c")

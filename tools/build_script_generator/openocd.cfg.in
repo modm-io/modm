@@ -22,9 +22,3 @@ proc modm_program { SOURCE } {
 	reset run
 	shutdown
 }
-
-%% for profile, path in elf_files.items()
-proc program_{{ profile }} {} {
-	modm_program {{ path | modm.windowsify(escape_level=1) }}
-}
-%% endfor

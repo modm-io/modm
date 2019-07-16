@@ -82,14 +82,6 @@ def prepare(module, options):
                         description="Packages to configure against"))
 
     module.add_collector(
-        PathCollector(name="elf.release",
-                      description="Path to the compiled .elf file for the release profile",
-                      absolute=True))
-    module.add_collector(
-        PathCollector(name="elf.debug",
-                      description="Path to the compiled .elf file for the debug profile",
-                      absolute=True))
-    module.add_collector(
         PathCollector(name="gitignore",
                       description="Generated files that need to be ignored by Git"))
 
@@ -143,14 +135,9 @@ def post_build(env):
     target = env[":target"]
     gitignore = [env.relative_outpath(ignore, "modm") for ignore in
                  env.collector_values("gitignore", filterfunc=lambda s: s.repository == "modm")]
-    elf_files = {
-        "release": env.relative_outpath(env.collector_values("elf.release")[0], "modm/"),
-        "debug": env.relative_outpath(env.collector_values("elf.debug")[0], "modm/"),
-    }
 
     env.substitutions = {
         "gitignore": gitignore,
-        "elf_files": elf_files,
     }
     # prepare custom path
     openocd_cfg = env.get(":build:openocd.cfg", "")
