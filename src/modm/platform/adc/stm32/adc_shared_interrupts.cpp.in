@@ -12,20 +12,25 @@
 // ----------------------------------------------------------------------------
 
 #include "../device.hpp"
+#include <modm/architecture/interface/interrupt.hpp>
 
 // this should be able to be generated instead of using Macros for this.
-%% for id in instances
+%% for id in shared_irq_ids
+%% if id in instances
 #include "adc_interrupt_{{ id }}.hpp"
+%% endif
 %% endfor
 
-extern "C" void
-ADC_IRQHandler(void)
-{
+%% for name, irqs in shared_irqs.items()
 
-%% for id in instances
+MODM_ISR({{ name }})
+{
+%% for id in irqs
+%% if id in instances
 	if (modm::platform::AdcInterrupt{{ id }}::getInterruptFlags()) {
 		modm::platform::AdcInterrupt{{ id }}::handler();
 	}
+%% endif
 %% endfor
-
 }
+%%endfor
