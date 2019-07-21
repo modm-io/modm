@@ -7,5 +7,6 @@
     <module>modm:platform:core</module>
     <module>modm:debug</module>
     <module>modm:build:scons</module>
+    <module>modm:build:cmake</module>
   </modules>
 </library>

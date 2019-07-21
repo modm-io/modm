@@ -5,6 +5,7 @@
   </options>
   <modules>
     <module>modm:build:scons</module>
+    <module>modm:build:cmake</module>
     <module>modm:cmsis:dsp:matrix</module>
     <module>modm:cmsis:dsp:statistics</module>
   </modules>

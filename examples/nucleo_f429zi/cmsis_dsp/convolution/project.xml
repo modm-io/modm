@@ -5,6 +5,7 @@
   </options>
   <modules>
     <module>modm:build:scons</module>
+    <module>modm:build:cmake</module>
     <module>modm:cmsis:dsp:transform</module>
     <module>modm:cmsis:dsp:support</module>
     <module>modm:cmsis:dsp:complex_math</module>

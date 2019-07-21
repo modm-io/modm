@@ -9,5 +9,6 @@
     <module>modm:driver:sdl_display</module>
     <module>modm:platform:core</module>
     <module>modm:build:scons</module>
+    <module>modm:build:cmake</module>
   </modules>
 </library>
