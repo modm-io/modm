@@ -6,5 +6,6 @@
   <modules>
     <module>modm:platform:fault</module>
     <module>modm:build:scons</module>
+    <module>modm:build:cmake</module>
   </modules>
 </library>

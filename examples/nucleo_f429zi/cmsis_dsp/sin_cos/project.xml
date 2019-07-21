@@ -5,6 +5,7 @@
   </options>
   <modules>
     <module>modm:build:scons</module>
+    <module>modm:build:cmake</module>
     <module>modm:cmsis:dsp:basic_math</module>
     <module>modm:cmsis:dsp:fast_math</module>
   </modules>
