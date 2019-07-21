@@ -194,7 +194,7 @@ def common_compiler_flags(compiler, target):
     # flags only for C
     flags["cflags"] = [
         "-Wimplicit",
-        "-Wnested-externs",
+        # "-Wnested-externs",
         "-Wredundant-decls",
         "-Wstrict-prototypes",
         "-Wbad-function-cast",

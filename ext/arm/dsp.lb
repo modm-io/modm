@@ -45,7 +45,6 @@ class CmsisDspModule(Module):
     def build(self, env):
         metadata = defaultdict(list)
         metadata[":build:cflags"].append("-fno-strict-aliasing")
-        metadata[":build:cflags"].append("-Wno-nested-externs")
         metadata[":build:ccflags"].append("-Wno-sign-compare")
         metadata[":build:ccflags"].append("-Wno-double-promotion")
 

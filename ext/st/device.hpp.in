@@ -24,17 +24,10 @@
 // Defines for example the modm_always_inline macro
 #include <modm/architecture/utils.hpp>
 
-#ifndef __cplusplus
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wnested-externs"
-#endif
 // Include external device headers:
 %% for header in headers
 #include <{{ header }}>
 %% endfor
-#ifndef __cplusplus
-#pragma GCC diagnostic pop
-#endif
 
 /// @cond
 // This is a hack to make the *_Typedef's known to GDB, so that you can debug
