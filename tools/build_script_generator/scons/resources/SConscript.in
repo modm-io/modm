@@ -9,12 +9,12 @@
 #!/usr/bin/env python3
 
 from os.path import join, abspath
-
 Import("env")
+
 profile = ARGUMENTS.get("profile", "release")
 %% if is_modm
 env["BUILDPATH"] = join(env["CONFIG_BUILD_BASE"], profile)
-
+env["BASEPATH"] = abspath(".")
 %% if family == "darwin"
 # Using homebrew gcc-8 on macOS
 env["COMPILERSUFFIX"] = "-8"
@@ -30,17 +30,6 @@ env.Append(toolpath=[
 %% for tool in tools | sort
 env.Tool("{{tool}}")
 %% endfor
-
-%% if is_modm
-env["BASEPATH"] = abspath(".")
-
-%% if options["info.git"] != "Disabled"
-env.InfoGit(with_status={{ "True" if "Status" in options["info.git"] else "False" }})
-%% endif
-%% if options["info.build"]
-env.InfoBuild()
-%% endif
-%% endif
 
 %% macro generate_flags_for_profile(name, profile, append=False)
 env{% if append %}.Append({{name | upper}}{% else %}["{{name | upper}}"]{% endif %} = [
