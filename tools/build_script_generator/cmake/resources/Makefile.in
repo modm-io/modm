@@ -1,11 +1,21 @@
-### CMake
-CMAKE_BUILD_TYPE = Debug
+# Copyright (c) 2018, Sergiy Yevtushenko
+# Copyright (c) 2018-2019, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
 BUILD_DIR = {{ build_path }}
 
 CMAKE_GENERATOR = Unix Makefiles
 CMAKE_FLAGS = -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=ON -DCMAKE_RULE_MESSAGES:BOOL=ON -DCMAKE_VERBOSE_MAKEFILE:BOOL=OFF
+%% if core.startswith("avr")
+AVRDUDE_FLAGS = -V -p {{ mcu }} -c {{ avrdude_programmer }} {% if avrdude_port %}-P {{ avrdude_port }}{% endif %} {% if avrdude_baudrate > 0 %}-b {{ avrdude_baudrate }}{% endif %} {{ avrdude_options }}
+%% endif
 
-.PHONY: build-release build-debug cmake clean cleanall upload-debug upload-release gdb
+.PHONY: build-release build-debug cmake clean cleanall upload-debug upload-release gdb gdb-release openocd killopenocd
 
 .DEFAULT_GOAL := all
 
@@ -33,6 +43,14 @@ cleanall:
 	@rm -rf $(BUILD_DIR)/cmake-build-release
 	@rm -rf $(BUILD_DIR)/cmake-build-debug
 
+%% if core.startswith("avr")
+upload-debug: build-debug
+	@avrdude $(AVRDUDE_FLAGS) -U flash:w:$(BUILD_DIR)/cmake-build-debug/{{ project_name }}.elf
+
+upload-release: build-release
+	@avrdude $(AVRDUDE_FLAGS) -U flash:w:$(BUILD_DIR)/cmake-build-release/{{ project_name }}.elf
+
+%% elif core.startswith("cortex-m")
 upload-debug: build-debug
 	@openocd -f modm/openocd.cfg -c "modm_program $(BUILD_DIR)/cmake-build-release/{{ project_name }}.elf"
 
@@ -47,5 +65,9 @@ gdb-release: build-release
 	@arm-none-eabi-gdb -x modm/gdbinit -x modm/openocd_gdbinit $(BUILD_DIR)/cmake-build-release/{{ project_name }}.elf
 	@killall openocd || true
 
+openocd:
+	@openocd -f modm/openocd.cfg
+
 killopenocd:
 	@killall openocd || true
+%% endif

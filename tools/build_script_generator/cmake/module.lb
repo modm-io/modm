@@ -11,8 +11,11 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-import os
-from os.path import join
+with open(localpath("../common.py")) as common:
+    exec(common.read())
+
+from os.path import join, isdir
+
 
 def init(module):
     module.name = ":build:cmake"
@@ -20,62 +23,120 @@ def init(module):
 
 
 def prepare(module, options):
-    if options[":target"].identifier["platform"] != "stm32":
-        return False
-
     module.add_option(
         BooleanOption(name="include_makefile", default=True,
                       description=descr_include_makefile))
+    module.add_option(
+        BooleanOption(name="include_cmakelists", default=True,
+                      description=descr_include_cmakelists))
+
+    module.add_collector(
+        CallableCollector(name="flag_format",
+                          description="Formatting compile flags for CMake"))
 
     return True
 
 
 def build(env):
-    pass
-
-
-def post_build(env):
-    target = env["modm:target"]
-    # get CPU information
-    subs = env.query("::device")
-    # Extract all source code files
-    subs["sources"] = sorted(p for sources in env.query("::source_files").values() for p in sources)
-    # get memory information
-    subs["memories"] = env.query("::memories")
-    # get generic build flags information
-    subs["flags"] = env.query("::collect_flags")(env)[None]
-
-    # Add SCons specific data
-    subs.update({
-        "project_path": os.getcwd(),
-        "compiler": "gcc",
-        "project_name": env[":build:project.name"],
-        "build_path": env[":build:build.path"],
-        "include_paths": env.collector_values(":build:path.include"),
-    })
-    # Set these substitutions for all templates
-    env.substitutions = subs
+    env.substitutions = env.query("::device")
+    env.outbasepath = "modm/cmake"
+    env.template("cmake_scripts/configure-gcc.cmake.in", "configure-gcc.cmake")
 
     def flag_format(flag):
         subs = {
             "target_base": "${CMAKE_PROJECT_NAME}",
-            "linkdir": "link"
+            "linkdir": "${CMAKE_CURRENT_LIST_DIR}/link",
         }
-        flag = flag.format(**subs)
+        if "{" in flag:
+            return flag.format(**subs)
+        return None
+    env.collect("flag_format", flag_format)
+
+
+def post_build(env):
+    repositories = [p for p in env.buildlog.repositories if isdir(env.real_outpath(p, basepath="."))]
+    repositories.sort(key=lambda name: "0" if name == "modm" else name)
+
+    subs = env.query("::device")
+    # Add CMake specific data
+    subs.update({
+        "build_path": env.relative_outpath(env[":build:build.path"]),
+        "generated_paths": repositories,
+        "project_name": env[":build:project.name"],
+        "project_path": os.getcwd(),
+    })
+    if subs["platform"] == "avr":
+        subs.update(env.query("::avrdude_options"))
+    # Set these substitutions for all templates
+    env.substitutions = subs
+
+    sources = env.query("::source_files")
+    def flags_format(flag):
+        for fmt in env.collector_values("flag_format"):
+            nflag = fmt(flag)
+            if nflag: return nflag;
         return flag
 
-    env.outbasepath = "modm/cmake"
-    env.copy("cmake_scripts/report-build-options.cmake", "report-build-options.cmake")
-    env.template("cmake_scripts/configure-stm32-gcc.cmake.in", "configure-stm32-gcc.cmake", filters={"flag_format": flag_format})
+    # Generate one repo.cmake per repository
+    for repo in repositories:
+        files = []
+        repo_filter = lambda scope: scope.repository == repo
+        repo_flags = env.query("::collect_flags")(env, repo_filter)
+
+        # Prepends -D to all CPP defines for this repo
+        for filename, fileflags in repo_flags.items():
+            for profile, flags in fileflags.get("cppdefines", {}).items():
+                repo_flags[filename]["cppdefines"][profile] = ["-D"+f for f in flags]
+
+        # Flatten the flags into one list for the specific file suffix
+        for sfile in sources[repo]:
+            fprofs = [p for (pat, pro) in common_source_flag_map.values()
+                        for p in pro if re.match(pat, os.path.splitext(sfile)[-1])]
+            profiles = defaultdict(list)
+            for name, fprofiles in repo_flags[sfile].items():
+                if name in fprofs:
+                    for profile, flags in fprofiles.items():
+                        profiles[profile].extend(flags)
+            files.append( (sfile, profiles) )
+
+        include_paths = env.collector_values("::path.include", filterfunc=repo_filter)
+        libary_paths = env.collector_values("::path.library", filterfunc=repo_filter)
+        libaries = env.collector_values("::library", filterfunc=repo_filter)
+        packages = env.collector_values("::pkg-config", filterfunc=repo_filter)
+        asm_sources = [f[0] for f in files if re.match(common_source_flag_map["asm"][0],
+                                                       os.path.splitext(f[0])[-1])]
+        subs.update({
+            "repo": repo,
+            "flags": repo_flags[None],
+            "sources": files,
+            "asm_sources": asm_sources,
+            "libraries": libaries,
+            "library_paths": libary_paths,
+            "include_paths": include_paths,
+            "packages": packages,
+            "is_modm": repo == "modm",
+        })
+
+        env.outbasepath = repo
+        env.template("resources/repo.cmake.in", "repo.cmake",
+                     filters={"flags_format": flags_format,
+                              "relocate": lambda p: env.relative_outpath(p, repo)})
 
     # these are the ONLY files that are allowed to NOT be namespaced with modm!
     env.outbasepath = "."
-    env.template("resources/CMakeLists.txt.in", "CMakeLists.txt")
+    if env["include_cmakelists"]:
+        env.template("resources/CMakeLists.txt.in", "CMakeLists.txt")
     if env["include_makefile"]:
         env.template("resources/Makefile.in", "Makefile")
+
 
 # ============================ Option Descriptions ============================
 descr_include_makefile = """# Generate a wrapper Makefile
 
 !!! warning "This overwrites any top-level `Makefile` file!"
+"""
+
+descr_include_cmakelists = """# Generate a CMakeLists.txt
+
+!!! warning "This overwrites any top-level `CMakeLists.txt` file!"
 """
