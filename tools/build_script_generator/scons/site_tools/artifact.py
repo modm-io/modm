@@ -14,7 +14,12 @@ import os
 import shutil
 from SCons.Script import *
 import subprocess
-from elftools.elf.elffile import ELFFile
+
+try:
+    from elftools.elf.elffile import ELFFile
+except:
+    print("elftools are missing, you need to `pip install pyelftools`!")
+    exit(1)
 
 def run_store_artifact(target, source, env):
 	artifactpath = os.path.join(env["CONFIG_BUILD_BASE"], "artifacts")

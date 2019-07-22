@@ -29,20 +29,22 @@ def build_target(env, sources):
 	env.Depends(target=program, dependency=abspath("modm/link/linkerscript.ld"))
 	env.Alias("size", env.Size(program))
 	%% if core.startswith("cortex-m")
-	env.Alias("artifact", env.CacheArtifact(program))
-	%% if upload_with_artifact
-	env.Alias("program", [env.OpenOcd(program, commands=["modm_program $SOURCE"]), "artifact"])
-	env.Alias("bmp", [env.BlackMagicProbe(program), "artifact"])
-	%% else
-	env.Alias("program", env.OpenOcd(program, commands=["modm_program $SOURCE"]))
-	env.Alias("bmp", env.BlackMagicProbe(program))
-	%% endif
 	env.Alias("itm", env.OpenOcdItm())
 	env.Alias("gdb", env.OpenOcdGdb(program))
 	env.Alias("postmortem", env.PostMortemGdb(program))
-    %% elif core.startswith("avr")
+	env.Alias("artifact", env.CacheArtifact(program))
+
+		%% if upload_with_artifact
+	env.Alias("program", [env.OpenOcd(program, commands=["modm_program $SOURCE"]), "artifact"])
+	env.Alias("bmp", [env.BlackMagicProbe(program), "artifact"])
+		%% else
+	env.Alias("program", env.OpenOcd(program, commands=["modm_program $SOURCE"]))
+	env.Alias("bmp", env.BlackMagicProbe(program))
+		%% endif
+
+	%% elif core.startswith("avr")
 	env.Alias("program", env.Avrdude(program))
-    %% endif
+	%% endif
 
 	%% if platform == "hosted"
 	env.Alias("all", ["build"])

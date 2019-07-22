@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2018, Niklas Hauser
+# Copyright (c) 2017-2019, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -67,9 +67,10 @@ env.Append(ASFLAGS="$ARCHFLAGS")
 env.Append(LINKFLAGS="$ARCHFLAGS")
 
 %% if family != "darwin"
+# Search all linked static libraries multiple times
 env["_LIBFLAGS"] = "-Wl,--start-group " + env["_LIBFLAGS"] + " -Wl,--end-group"
 %% endif
-%% if platform not in ["hosted"]
+%% if platform != "hosted"
 # We need to link libmodm.a with --whole-archive, so that all weak symbols are visible to the linker.
 # Functions placed in a linker section list (like modm_section(".hardware_init")) are typically not
 # referenced externally, so the linker will discard them when searching.
@@ -77,12 +78,12 @@ env["_LIBFLAGS"] = "-Wl,--start-group " + env["_LIBFLAGS"] + " -Wl,--end-group"
 #     For each archive mentioned on the command line after the --whole-archive option, include every object
 #     file in the archive in the link, rather than searching the archive for the required object files.
 env["_LIBFLAGS"] = "-Wl,--whole-archive " + env["_LIBFLAGS"] + " -Wl,--no-whole-archive"
-# alternative workarounds
-# env["LINKCOM"] = env["LINKCOM"].replace("$_LIBFLAGS", "-Wl,--whole-archive $_LIBFLAGS -Wl,--no-whole-archive")
-# workaround for one individual library
-# whole_archive = env.Command(join(env.Dir("#").path, "-Wl,--whole-archive"), [], "")
-# no_whole_archive = env.Command(join(env.Dir("#").path, "-Wl,--no-whole-archive"), [], "")
-# library = whole_archive + library + no_whole_archive
+%# alternative workarounds
+%# env["LINKCOM"] = env["LINKCOM"].replace("$_LIBFLAGS", "-Wl,--whole-archive $_LIBFLAGS -Wl,--no-whole-archive")
+%# workaround for one individual library
+%# whole_archive = env.Command(join(env.Dir("#").path, "-Wl,--whole-archive"), [], "")
+%# no_whole_archive = env.Command(join(env.Dir("#").path, "-Wl,--no-whole-archive"), [], "")
+%# library = whole_archive + library + no_whole_archive
 %% endif
 
 # Device configuration
@@ -96,7 +97,7 @@ env["CONFIG_DEVICE_MEMORY"] = [
 %% endif
 
 # Programming configuration
-%% if platform in ["avr"]
+%% if core.startswith("avr")
 env["CONFIG_AVRDUDE_DEVICE"] = "{{ mcu }}"
 env["CONFIG_AVRDUDE_PROGRAMMER"] = "{{ avrdude_programmer }}"
 env["CONFIG_AVRDUDE_PORT"] = "{{ avrdude_port }}"
@@ -104,7 +105,7 @@ env["CONFIG_AVRDUDE_OPTIONS"] = "{{ avrdude_options }}"
 %% if avrdude_baudrate > 0
 env["CONFIG_AVRDUDE_BAUDRATE"] = "{{ avrdude_baudrate }}"
 %% endif
-%% elif platform in ["stm32"]
+%% elif core.startswith("cortex-m")
 env.Append(MODM_OPENOCD_CONFIGFILES="$BASEPATH/openocd.cfg")
 env.Append(MODM_OPENOCD_GDBINIT="$BASEPATH/openocd_gdbinit")
 env.Append(MODM_GDBINIT="$BASEPATH/gdbinit")
@@ -116,7 +117,7 @@ env["XPCC_SYSTEM_DESIGN"] = join(abspath("."), "tools", "xpcc_generator")
 
 
 env.AppendUnique(CPPPATH=[
-%% if family == "darwin"
+%% if is_modm and family == "darwin"
 	"/usr/local/include",
 %% endif
 %% for path in include_paths | sort
@@ -150,7 +151,7 @@ env.AppendUnique(LIBS=[
 %% endfor
 ])
 env.AppendUnique(LIBPATH=[
-%% if family == "darwin"
+%% if is_modm and family == "darwin"
 	"/usr/local/lib",
 %% endif
     abspath(str(library[0].get_dir())),
