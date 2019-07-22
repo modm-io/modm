@@ -102,7 +102,6 @@ def build(env):
         "utils_buildformat",
         "find_files",
         "template",
-        "cmake_wrapper",
         "qtcreator",
         "gdb",
         "build_target",
