@@ -57,6 +57,13 @@ sources += env.XpccCommunication(
     include_paths=["."])
 %% endif
 
+%% if options["info.git"] != "Disabled"
+sources.append(env.InfoGit(with_status={{ "True" if "Status" in options["info.git"] else "False" }}))
+%% endif
+%% if options["info.build"]
+sources.append(env.InfoBuild())
+%% endif
+
 %% if not is_unittest
 # Finding application sources
 sources += env.FindSourceFiles(".", ignorePaths=ignored)

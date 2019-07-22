@@ -140,10 +140,6 @@ def post_build(env):
     target = env["modm:target"]
     subs = env.query("::device")
     sources = env.query("::source_files")
-    if env["info.git"] != "Disabled":
-        sources["modm"].append("modm/src/info_git.c")
-    if env["info.build"]:
-        sources["modm"].append("modm/src/info_build.c")
 
     cache_dir = env["cache_dir"]
     if cache_dir.endswith("$cache"):
