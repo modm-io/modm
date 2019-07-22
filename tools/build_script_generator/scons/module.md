@@ -75,7 +75,6 @@ Linking········ build/release/game_of_life.elf
 #### scons size
 
 Displays the static Flash and RAM consumption of your target.
-(\* *only Cortex-M targets*)
 
 Example for a STM32 target with 16MB external heap:
 
@@ -101,7 +100,7 @@ Heap:     16.4 MiB
 Writes the executable onto your target via Avrdude or OpenOCD.
 This is a convenience wrapper around the programming options and methods
 defined in the `modm:build` module.
-(\* *only AVR and Cortex-M targets*)
+(\* *only AVR and ARM Cortex-M targets*)
 
 Example for a STM32 target:
 
@@ -130,6 +129,56 @@ shutdown command invoked
 ```
 
 
+#### scons bmp
+
+[Black Magic Probe][bmp] is convenient tool to convert cheap USB ST-LINK V2 clones
+to a fully functional GDB compatible debug adaptor for ARM Cortex microcontrollers.
+GDB can directly communicate with the debug adaptor making debugging easy and
+accessible. Currently, only uploading code to the target is supported.
+(\* *only ARM Cortex-M targets*)
+
+Black Magic Probe creates two serial devices, the first being the GDB interface
+and the second a plain serial adaptor for debugging purposes.
+
+```
+$ ls -l /dev/tty.usb*
+crw-rw-rw-  1 root  wheel   21, 104 Feb 19 09:46 /dev/tty.usbmodemDEADBEEF
+crw-rw-rw-  1 root  wheel   21, 106 Feb 19 09:46 /dev/tty.usbmodemDEADBEF1
+```
+
+You can upload your code using a Black Magic Probe with specifying the GDB
+interface as `port` parameter.
+
+```
+$ scons bmp port=/dev/cu.usbmodemDEADBEEF verbose=1
+scons: Reading SConscript files ...
+bmp port iss = /dev/cu.usbmodemDEADBEEF
+scons: done reading SConscript files.
+scons: Building targets ...
+arm-none-eabi-gdb -ex "target extended-remote /dev/cu.usbmodemDEADBEEF" \
+                  -ex "monitor swdp_scan" -ex "attach 1" -ex "load path/to/project.elf" \
+                  -ex "detach" -ex "quit"
+[...]
+Remote debugging using /dev/cu.usbmodemDEADBEEF
+Target voltage: unknown
+Available Targets:
+No. Att Driver
+ 1      STM32F1 medium density
+Attaching to Remote target
+warning: No executable has been specified and target does not support
+determining executable automatically.  Try using the "file" command.
+0x0800038e in ?? ()
+Loading section .vector_rom, size 0xec lma 0x8000000
+[...]
+Loading section .table.section_heap, size 0xc lma 0x80013f8
+Start address 0x8000e6c, load size 5120
+Transfer rate: 10 KB/sec, 365 bytes/write.
+Detaching from program: , Remote target
+[Inferior 1 (Remote target) detached]
+scons: done building targets.
+```
+
+
 #### scons run
 
 Executes your project on your computer.
@@ -140,7 +189,7 @@ Executes your project on your computer.
 
 Launches OpenOCD in the background, then launches GDB in foreground with the
 correct executable. When GDB exits, it stops the OpenOCD process.
-(\* *only Cortex-M targets*)
+(\* *only ARM Cortex-M targets*)
 
 This is just a convenience wrapper for the debug functionality defined in the
 `modm:build` module.
@@ -160,7 +209,7 @@ This is just a convenience wrapper for the debug functionality defined in the
 Launches GDB for post-mortem debugging with the firmware identified by the
 `firmware={hash}` argument using the data from the `coredump={filepath}`
 argument.
-(\* *only Cortex-M targets*)
+(\* *only ARM Cortex-M targets*)
 
 See the `:platform:fault` module for details how to receive the coredump data.
 
@@ -169,7 +218,7 @@ See the `:platform:fault` module for details how to receive the coredump data.
 
 Configures OpenOCD in tracing mode to output ITM channel 0 on SWO pin and
 displays the serial output stream.
-(\* *only Cortex-M targets*)
+(\* *only ARM Cortex-M targets*)
 
 See the `:platform:itm` module for details how to use the ITM as a logging
 output.
@@ -265,14 +314,6 @@ Removed build/release/game_of_life.lss
 ```
 
 
-#### scons cmakewrapper
-
-Generates a `CMakeLists.txt` file that wraps the scons commands so
-that the project can be imported into IDE with CMake support, like CLion.
-
-!!! warning "Consider this an unstable feature"
-
-
 #### scons qtcreator
 
 Generates several files so that the project can be imported into Qt Creator via
@@ -306,8 +347,8 @@ The generated files are available as a top-level `#include <identifiers.hpp>`.
 
 ## Information Tool
 
-Our `info` SCons tool generates a set of header files containing preprocessor
-defines with the repository state.
+Our `info` SCons tool generates a set of header files containing information
+about the repository state.
 
 A call to `env.InfoGit(with_status={True, False})` will generate a `<info_git.h>`
 header file and add these two defines to the command line CPP options:
