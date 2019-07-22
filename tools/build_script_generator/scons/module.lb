@@ -123,9 +123,9 @@ def build(env):
         tools.update({"compiler_arm_none_eabi_gcc", "program_openocd",
                       "black_magic_probe", "utils_buildsize", "postmortem_gdb"})
     elif device["core"].startswith("avr"):
-        tools.update({"compiler_avr_gcc", "program_avrdude"})
+        tools.update({"compiler_avr_gcc", "utils_buildsize", "program_avrdude"})
     else: # hosted
-        tools.update({"utils_buildsize", "compiler_hosted_gcc"})
+        tools.update({"compiler_hosted_gcc"})
 
     env.collect("path.tools", *toolpaths)
     env.collect("tools", *tools)
@@ -151,8 +151,11 @@ def post_build(env):
         cache_dir = env[":build:build.path"] + "/cache"
         if "build/" in cache_dir:
             cache_dir = "{}build/cache".format(cache_dir.split("build/")[0])
-    # get memory information
-    subs["memories"] = env.query("::memories")
+    if subs["core"].startswith("cortex-m"):
+        # get memory information
+        subs["memories"] = env.query("::memories")
+    else:
+        subs["memories"] = []
     # Add SCons specific data
     subs.update({
         "build_path": env.relative_outpath(env[":build:build.path"]),
