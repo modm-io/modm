@@ -10,7 +10,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-import os
+import os, re
 import itertools
 from collections import defaultdict
 
@@ -55,17 +55,24 @@ common_build_flag_names = {
             for profile in ([""] + ["."+p for p in common_build_profiles])
 }
 
+common_source_flag_map = {
+    "c": (r"\.[ci]$", ["ccflags", "archflags", "cppdefines", "cflags"]),
+    "cpp": (r"\.[cC][pxci+]+$", ["ccflags", "archflags", "cppdefines", "cxxflags"]),
+    "asm": (r"(\.[sS]x?|\.asm)$", ["archflags", "cppdefines", "asflags"]),
+}
+
 def common_source_files(env):
     """
     Builds a list of files that need to be compiled per repository.
 
-    :param buildlog: the buildlog object available in the post_build step
+    **POST-BUILD ONLY**
     :returns: a dictionary of sorted lists of filenames, keyed by repository.
     """
     files_to_build = defaultdict(list)
 
     for operation in env.buildlog:
-        if os.path.splitext(operation.filename)[-1] in [".c", ".cpp", ".cc", ".sx", ".S"]:
+        suffix = os.path.splitext(operation.filename)[-1]
+        if any(re.search(pattern[0], suffix) for pattern in common_source_flag_map.values()):
             files_to_build[operation.repository].append(operation.filename)
 
     for repo in files_to_build:
@@ -120,6 +127,35 @@ def common_memories(env):
         ])
     return memories
 
+def common_avrdude_options(env):
+    """
+    Merges the default AvrDude options with the user options:
+    - `avrdude_programmer`
+    - `avrdude_port`
+    - `avrdude_baudrate`
+    - `avrdude_options`
+
+    **POST-BUILD ONLY**
+    :returns: options dictionary
+    """
+    option_programmer = env.get(":build:avrdude.programmer")
+    option_port = env.get(":build:avrdude.port")
+    option_baudrate = env.get(":build:avrdude.baudrate")
+    option_options = env.get(":build:avrdude.options")
+
+    if not len(option_programmer):
+        option_programmer = env.collector_values(":build:default.avrdude.programmer", option_programmer)[0]
+    if not len(option_port):
+        option_port = env.collector_values(":build:default.avrdude.port", option_port)[0]
+    if not option_baudrate:
+        option_baudrate = env.collector_values(":build:default.avrdude.baudrate", option_baudrate)[0]
+    options = {
+        "avrdude_programmer": option_programmer,
+        "avrdude_port": option_port,
+        "avrdude_baudrate": option_baudrate,
+        "avrdude_options": option_options,
+    }
+    return options
 
 def common_collect_flags_for_scope(env, scope_filter=None):
     """
@@ -127,6 +163,7 @@ def common_collect_flags_for_scope(env, scope_filter=None):
     Converts them into SCons-compatible names and places them into a dictionary
     of the form: flags[filename][name][profile] = list(values).
 
+    **POST-BUILD ONLY**
     :param env: the post_build step env
     :param scope_filter: the collection scope filter
     :returns: compile flags dictionary

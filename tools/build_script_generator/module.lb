@@ -65,6 +65,8 @@ def prepare(module, options):
     module.add_query(
         EnvironmentQuery(name="memories", factory=common_memories))
     module.add_query(
+        EnvironmentQuery(name="avrdude_options", factory=common_avrdude_options))
+    module.add_query(
         Query(name="collect_flags", function=common_collect_flags_for_scope))
 
     # Collections
@@ -118,6 +120,11 @@ def prepare(module, options):
 
 
 def build(env):
+    # Copy crashcatcher binaries
+    if env.has_module(":crashcatcher"):
+        env.outbasepath = "modm/ext/crashcatcher"
+        env.copy(repopath("ext/adamgreen/crashcatcher/CrashDebug/bins/"), "bins/")
+
     # Append common search paths to metadata
     if env.has_collector(":build:path.openocd"):
         env.collect(":build:path.openocd", "modm/openocd")
