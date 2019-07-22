@@ -18,12 +18,13 @@ import signal
 def run_openocd_gdb(target, source, env):
 	# We have to start openocd in its own session ID, so that Ctrl-C in GDB
 	# does not kill OpenOCD. See https://github.com/RIOT-OS/RIOT/pull/3619.
-	config = env.get("MODM_OPENOCD_CONFIGFILES", [])
+	config = env.Listify(env.get("MODM_OPENOCD_CONFIGFILES", []))
 	config = " ".join(map("-f \"{}\"".format, map(env.subst, config)))
 	openocd = subprocess.Popen("openocd {} -c \"log_output /dev/null\"".format(config),
 	                           cwd=os.getcwd(), shell=True, preexec_fn=os.setsid)
 	# This call is blocking
-	config = env.get("MODM_GDBINIT", []) + env.get("MODM_OPENOCD_GDBINIT", [])
+	config =  env.Listify(env.get("MODM_GDBINIT", []))
+	config += env.Listify(env.get("MODM_OPENOCD_GDBINIT", []))
 	config = " ".join(map("-x \"{}\"".format, map(env.subst, config)))
 	subprocess.call("arm-none-eabi-gdb {} {}".format(config, source[0]),
 	                cwd=os.getcwd(), shell=True)
