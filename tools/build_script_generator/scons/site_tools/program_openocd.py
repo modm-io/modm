@@ -26,13 +26,13 @@ def openocd_run(env, source, commands=[], alias="openocd_run"):
 	# See http://openocd.org/doc/html/Running.html
 	env["ENV"]["OPENOCD_SCRIPTS"] = os.environ.get("OPENOCD_SCRIPTS", "")
 
-	search = env.get("MODM_OPENOCD_SEARCHDIRS", [])
-	config = env.get("MODM_OPENOCD_CONFIGFILES", [])
+	search = env.Listify(env.get("MODM_OPENOCD_SEARCHDIRS", []))
+	config = env.Listify(env.get("MODM_OPENOCD_CONFIGFILES", []))
 
 	openocdcmd = "$OPENOCD {} {} {}".format(
 		" ".join(map("-s \"{}\"".format, search)),
 		" ".join(map("-f \"{}\"".format, config)),
-		" ".join(map("-c \"{}\"".format, commands))
+		" ".join(map("-c \"{}\"".format, env.Listify(commands)))
 	)
 	action = Action(openocdcmd, cmdstr="$OPENOCDSTR")
 	return env.AlwaysBuild(env.Alias(alias, source, action))
