@@ -16,7 +16,6 @@ def build_target(env, sources):
 	program = env.Program(target=env["CONFIG_PROJECT_NAME"]+".elf", source=sources)
 
 	# SCons functions
-	env.Alias("cmakewrapper", env.CMakeWrapper())
 	env.Alias("qtcreator", env.QtCreatorProject(sources))
 	env.Alias("symbols", env.Symbols(program))
 	env.Alias("listing", env.Listing(program))

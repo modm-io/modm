@@ -33,7 +33,7 @@ headers = env.FindHeaderFiles("{{ unittest_source }}")
 sources = [env.UnittestRunner(target="main.cpp", source=headers, template="{{ unittest_runner }}")]
 %% else
 env.Append(CPPPATH=".")
-ignored = ["cmake-*", ".lbuild_cache", build_path] + generated_paths
+ignored = [".lbuild_cache", build_path] + generated_paths
 sources = []
 %% endif
 
