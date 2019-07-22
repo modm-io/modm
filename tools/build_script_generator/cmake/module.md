@@ -2,18 +2,20 @@
 
 [CMake][] is a widely used build tool supported by almost every IDE.
 
-This module generates two files:
+This module generates three files:
 
+- a `modm/repo.cmake` file: configures all required CMake tools with
+  the right settings (also using information from the `modm:build` module) to
+  compile the modm library.
 - a top-level `CMakeLists.txt`: configures CMake to build modm and your
   application.
 - a top-level `Makefile`: provides a convenience wrapper for calling CMake from
   the command line.
 
 This module is intended to be used for integration with IDEs that natively only
-support CMake. It therefore only provides the bare minimum of features and
-can only be used to compile for ARM Cortex-M targets.
-
-*The `modm:build:scons` module is the preferred build system for modm.*
+support CMake. It therefore only provides the bare minimum of features to compile
+and upload your application to your target. For additional build tools features
+see the `modm:build:scons` module.
 
 
 ## Make Methods
@@ -28,13 +30,6 @@ Generates the CMake build folders and initializes the build system.
 ```
  $ make cmake
     ...
--- Project : blink_cmake
--- Platform: stm32
--- Compiler: gcc
--- Part    : stm32f103c8t
--- Family  : f1
--- Core    : cortex-m3
--- Path    : build/{project.name}
 -- Configuring done
 -- Generating done
 -- Build files have been written to: build/{project.name}/cmake-build-release
@@ -77,9 +72,10 @@ Scanning dependencies of target blink_cmake
 #### make upload-release
 #### make upload-debug
 
-Writes the executable onto your target via OpenOCD.
+Writes the executable onto your target via AvrDude or OpenOCD.
 This is a convenience wrapper around the programming options and methods
 defined in the `modm:build` module.
+(\* *only AVR and ARM Cortex-M targets*)
 
 ```
  $ make upload-release
@@ -104,7 +100,6 @@ wrote 2048 bytes from file build/cmake-build-release/blink_cmake.elf in 0.187893
 verified 1652 bytes in 0.104584s (15.426 KiB/s)
 ** Verified OK **
 shutdown command invoked
-
 ```
 
 
@@ -114,13 +109,15 @@ shutdown command invoked
 Launches GDB with the debug or release executable.
 This is just a convenience wrapper for the debug functionality defined in the
 `modm:build` module.
+(\* *only ARM Cortex-M targets*)
 
 **OpenOCD must already be running in the background**. Launch it by manually
-calling it in another terminal:
+calling `make openocd` in another terminal.
 
-```
-openocd -f modm/openocd.cfg
-```
+
+#### make openocd
+
+Starts OpenOCD with the modm specific configuration.
 
 
 #### make clean
@@ -130,8 +127,8 @@ Removes the CMake build artifacts.
 
 #### make cleanall
 
-Removes the entire build folders. You must then first call `make cmake` before
-being able to build again
+Removes the entire build folder. You must then first call `make cmake` before
+being able to build again.
 
 
 [cmake]: http://cmake.org

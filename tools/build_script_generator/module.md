@@ -4,11 +4,12 @@ This parent module defines a common set of functionality that is independent of
 the specific build system generator implementation.
 This includes straight-forward options like project name and build path
 but also more complicated configuration for programming your target via
-AvrDude/OpenOCD/Black Magic Probe and debugging via GDB.
+AvrDude or OpenOCD and debugging via GDB.
 
 **Note that this module does not compile your project, you will need to choose
 the `modm:build:scons` or `modm:build:cmake` submodule for that, or provide
 your own build system.**
+
 
 ## Using OpenOCD
 
@@ -18,15 +19,12 @@ For accessing your ARM Cortex-M based device, we use OpenOCD by default and gene
 - Search directories passed via the `openocd.search` metadata key.
 - User configuration files passed via the `openocd.configfile` metadata key.
   Your custom `modm:build:openocd.cfg` is added here too.
-- Two programming commands:
-    + `program_release` for uploading the release profile.
-    + `program_debug` for uploading your debug profile.
+- The target specific programming command `modm_program elffile`
 
 You can now upload your program in a one-line command:
 
 ```sh
-openocd -f modm/openocd.cfg -c "program_release"
-openocd -f modm/openocd.cfg -c "program_debug"
+openocd -f modm/openocd.cfg -c "modm_program path/to/project.elf"
 ```
 ```
 Open On-Chip Debugger 0.10.0
@@ -60,28 +58,25 @@ shutdown command invoked
 ## Using GDB
 
 For debugging your program on ARM Cortex-M device, we provide the `modm/gdbinit`
-file for the `arm-none-eabi-gdb` debugger connected to your target via OpenOCD.
+and `modm/openocd_gdbinit` files for the `arm-none-eabi-gdb` debugger connected
+to your target via OpenOCD.
 
-Four commands are provided for convenience:
+Two commands are provided for convenience:
 
-- `file_debug` loads the debug profile ELF file.
-- `file_release` loads the release profile ELF file.
 - `restart` resets the device and halts.
 - `rerun` resets the device and continues execution.
 
 GDB is configured in TUI mode and continues running the target after attaching,
-but *does not* load an ELF file! Please call `file_{debug, release}` first or
-pass the ELF file as a command line argument.
+but *does not* load an ELF file! Please pass the ELF file as a command line
+argument.
 
 You can start your debug session by launching OpenOCD and then GDB:
 
 ```sh
 # Run OpenOCD without any commands in the background
 openocd -f modm/openocd.cfg
-# Open another terminal
-arm-none-eabi-gdb -x modm/gdbinit
-# OR optionally with your custom ELF file
-arm-none-eabi-gdb -x modm/gdbinit path/to/project.elf
+# Open another shell with your projects ELF file
+arm-none-eabi-gdb -x modm/gdbinit -x modm/openocd_gdbinit path/to/project.elf
 ```
 
 ```
@@ -120,54 +115,11 @@ Program received signal SIGINT, Interrupt.
     milliseconds to hundreds. Make sure your hardware can handle that!
 
 
-## Using Black Magic Probe
-
-[Black Magic Probe][bmp] is convenient tool to convert cheap USB ST-LINK V2 clones to a fully functional GDB compatible debug adaptor for ARM Cortex microcontrollers. GDB can directly communicate with the debug adaptor making debugging easy and accessible. Currently, only uploading code to the target is supported with this modm module.
-
-Black Magic Probe creates two serial devices, the first being the GDB interface and the second a plain serial adaptor for debugging purposes.
-
-```
-$ ls -l /dev/tty.usb*
-crw-rw-rw-  1 root  wheel   21, 104 Feb 19 09:46 /dev/tty.usbmodemDEADBEEF
-crw-rw-rw-  1 root  wheel   21, 106 Feb 19 09:46 /dev/tty.usbmodemDEADBEF1
-```
-
-You can upload your code using a Black Magic Probe with specifying the GDB interface as `port` parameter.
-
-```
-$ scons bmp port=/dev/cu.usbmodemDEADBEEF verbose=1
-scons: Reading SConscript files ...
-bmp port iss = /dev/cu.usbmodemDEADBEEF
-scons: done reading SConscript files.
-scons: Building targets ...
-arm-none-eabi-gdb -ex "target extended-remote /dev/cu.usbmodemDEADBEEF" -ex "monitor swdp_scan" -ex "attach 1" -ex "load path/to/project.elf" -ex "detach" -ex "quit"
-[...]
-Remote debugging using /dev/cu.usbmodemDEADBEEF
-Target voltage: unknown
-Available Targets:
-No. Att Driver
- 1      STM32F1 medium density
-Attaching to Remote target
-warning: No executable has been specified and target does not support
-determining executable automatically.  Try using the "file" command.
-0x0800038e in ?? ()
-Loading section .vector_rom, size 0xec lma 0x8000000
-[...]
-Loading section .table.section_heap, size 0xc lma 0x80013f8
-Start address 0x8000e6c, load size 5120
-Transfer rate: 10 KB/sec, 365 bytes/write.
-Detaching from program: , Remote target
-[Inferior 1 (Remote target) detached]
-scons: done building targets.
-
-```
-
-
 ## Using AvrDude
 
 Unfortunately AvrDude does not support a user configuration file like OpenOCD
 does, so there is no convenient one-line command to issue.
-You have to use the support of the specific build system.
+You have to use the wrapper support of the specific build system.
 
 
 ## Compiler Options
@@ -198,7 +150,6 @@ For *debug builds*:
 #### Only C
 
 - `-std=gnu11`: use C11 with GNU extensions (for `asm volatile`).
-- `-Wnested-externs`: shouldn't use `extern` inside a function body.
 
 #### Only C++
 
