@@ -10,7 +10,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-from os.path import join, relpath, isdir
+from os.path import join, relpath, isdir, exists
 
 def init(module):
     module.name = ":build:scons"
@@ -65,16 +65,6 @@ def build(env):
         env.collect(":build:gitignore", "modm/src/info_build.c")
         env.copy("resources/info_build.h", "info_build.h")
 
-    env.outbasepath = "modm/"
-    # Copy the scons-build-tools
-    env.copy(repopath("ext/dlr/scons-build-tools"), "ext/dlr/scons-build-tools")
-    env.copy("site_tools", "scons/site_tools")
-    # Generate the env.BuildTarget tool
-    env.substitutions = env.query("::device")
-    env.substitutions["upload_with_artifact"] = env.has_module(":crashcatcher")
-    env.outbasepath = "modm/scons/site_tools"
-    env.template("resources/build_target.py.in", "build_target.py")
-
     def flag_format(flag):
         subs = {
             "target_base": "\"${TARGET.base}\"",
@@ -89,32 +79,30 @@ def build(env):
 
     env.collect("flag_format", flag_format)
 
-    is_unittest = env.has_module(":test")
-    has_xpcc_generator = env.has_module(":communication:xpcc:generator")
-    has_image_source = len(env["image.source"])
+    has_info_tool = (env["info.git"] != "Disabled" or env["info.build"])
     # SCons tools and toolpaths
     toolpaths = {
         "scons/site_tools",
-        "ext/dlr/scons-build-tools/site_tools"
+        "ext/dlr/scons/site_tools"
     }
     tools = {
-        "settings_buildpath",
-        "utils_buildformat",
-        "find_files",
-        "template",
-        "qtcreator",
-        "gdb",
-        "build_target",
         "artifact",
+        "build_target",
+        "find_files",
+        "gdb",
         "log_itm",
+        "qtcreator",
+        "settings_buildpath",
+        "template",
+        "utils_buildformat",
     }
-    if has_xpcc_generator:
+    if env.has_module(":communication:xpcc:generator"):
         tools.add("xpcc_generator")
-    if has_image_source:
+    if len(env["image.source"]):
         tools.add("bitmap")
-    if env["info.git"] != "Disabled" or env["info.build"]:
+    if has_info_tool:
         tools.add("info")
-    if is_unittest:
+    if len(env["unittest.source"]):
         tools.add("unittest")
 
     device = env.query("::device")
@@ -129,18 +117,44 @@ def build(env):
     env.collect("path.tools", *toolpaths)
     env.collect("tools", *tools)
 
+    # Add common DLR SCons build tools
+    tools.update({
+        "settings_gcc_default_internal",
+        "utils_common",
+        "utils_gcc_version",
+    })
+    env.outbasepath = "modm/ext/dlr/scons/site_tools"
+    for tool in tools:
+        path = repopath("ext/dlr/scons-build-tools/site_tools/{}.py".format(tool))
+        if exists(path):
+            env.copy(path, "{}.py".format(tool))
+
+    # Copy only these modm SCons build tools
+    env.outbasepath = "modm/scons/"
+    for tool in tools:
+        path = "site_tools/{}.py".format(tool)
+        if exists(localpath(path)):
+            env.copy(path)
+    # Copy support files
+    env.copy("site_tools/qtcreator/")
+    if has_info_tool:
+        env.copy("site_tools/info.c.in")
+
+    # Generate the env.BuildTarget tool
+    env.substitutions = env.query("::device")
+    env.substitutions["upload_with_artifact"] = env.has_module(":crashcatcher")
+    env.outbasepath = "modm/scons/site_tools"
+    env.template("resources/build_target.py.in", "build_target.py")
+
 
 def post_build(env):
     is_unittest = len(env["unittest.source"])
     has_xpcc_generator = env.has_module(":communication:xpcc:generator")
     has_image_source = len(env["image.source"])
     repositories = [p for p in env.buildlog.repositories if isdir(env.real_outpath(p, basepath="."))]
-    repositories = sorted(repositories, key=lambda name: "0" if name == "modm" else name)
+    repositories.sort(key=lambda name: "0" if name == "modm" else name)
 
-    target = env["modm:target"]
     subs = env.query("::device")
-    sources = env.query("::source_files")
-
     cache_dir = env["cache_dir"]
     if cache_dir.endswith("$cache"):
         cache_dir = env[":build:build.path"] + "/cache"
@@ -178,6 +192,13 @@ def post_build(env):
     # Set these substitutions for all templates
     env.substitutions = subs
 
+    sources = env.query("::source_files")
+    def flags_format(flag):
+        for fmt in env.collector_values("flag_format"):
+            nflag = fmt(flag)
+            if nflag: return nflag;
+        return '"{}"'.format(flag)
+
     for repo in repositories:
         files = []
         repo_filter = lambda scope: scope.repository == repo
@@ -207,11 +228,6 @@ def post_build(env):
             "tools": tools,
             "is_modm": repo == "modm",
         })
-        def flags_format(flag):
-            for fmt in env.collector_values("flag_format"):
-                nflag = fmt(flag)
-                if nflag: return nflag;
-            return '"{}"'.format(flag)
         # Generate library SConscript
         env.outbasepath = repo
         env.template("resources/SConscript.in", "SConscript",
