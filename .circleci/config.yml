@@ -12,7 +12,6 @@ jobs:
             env
             locale -a
             python --version  || true
-            python2 --version || true
             python3 --version || true
             which scons
             scons --version
@@ -51,9 +50,7 @@ jobs:
       - run:
           name: Execute Python Scripts
           command: |
-            python2 tools/scripts/authors.py --handles --count --shoutout --since 2017-01-01
             python3 tools/scripts/authors.py --handles --count --shoutout --since 2017-01-01
-            python2 tools/xpcc_generator/builder/system_layout.py examples/xpcc/xml/communication.xml -o /tmp
             python3 tools/xpcc_generator/builder/system_layout.py examples/xpcc/xml/communication.xml -o /tmp
       - run:
           name: Check for Trailing Whitespace
