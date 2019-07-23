@@ -20,6 +20,7 @@ def prepare(module, options):
         ":architecture:delay",
         ":architecture:register",
         ":architecture:spi",
+        ":architecture:clock",
         ":debug",
         ":processing:timer",
         ":math:utils")
@@ -28,3 +29,4 @@ def prepare(module, options):
 def build(env):
     env.outbasepath = "modm/src/modm/driver/radio/nrf24"
     env.copy(".")
+    env.copy("../nrf24.hpp")

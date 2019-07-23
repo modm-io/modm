@@ -2,6 +2,7 @@
  * Copyright (c) 2014, Niklas Hauser
  * Copyright (c) 2014-2015, Daniel Krebs
  * Copyright (c) 2015, Sascha Schade
+ * Copyright (c) 2019, Stefan Voigt
  *
  * This file is part of the modm project.
  *
@@ -269,11 +270,6 @@ struct Nrf24Register
 	};
 	MODM_FLAGS8(Feature);
 
-	typedef FlagsGroup<
-			Feature_t, DynPd_t, FifoStatus_t, Rpd_t, ObserveTx_t, Status_t,
-			RfSetup_t, SetupRetr_t, SetupAw_t, EnRxAddr_t, EnAA_t, Config_t
-	> Flags_t;
-
 	enum class
 	InterruptFlag : uint8_t
 	{
@@ -283,6 +279,12 @@ struct Nrf24Register
 		ALL    = Bit4 | Bit5 | Bit6
 	};
 	MODM_FLAGS8(InterruptFlag);
+
+	typedef FlagsGroup<
+			Feature_t, DynPd_t, FifoStatus_t, Rpd_t, ObserveTx_t, Status_t,
+	        RfSetup_t, SetupRetr_t, SetupAw_t, EnRxAddr_t, EnAA_t, Config_t,
+	        InterruptFlag_t
+	> Flags_t;
 };
 
 }   // namespace modm

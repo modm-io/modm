@@ -1,7 +1,8 @@
 /*
- * Copyright (c) 2014-2015, Daniel Krebs
+ * Copyright (c) 2014-2015, 2018, Daniel Krebs
  * Copyright (c) 2014, 2016, Niklas Hauser
  * Copyright (c) 2015, Sascha Schade
+ * Copyright (c) 2019, Stefan Voigt
  *
  * This file is part of the modm project.
  *
@@ -17,13 +18,11 @@
 #include <stdint.h>
 #include <modm/debug/logger.hpp>
 #include <modm/processing/timer.hpp>
+#include <modm/architecture/interface/clock.hpp>
 
 #include "nrf24_phy.hpp"
 #include "nrf24_config.hpp"
 #include "nrf24_definitions.hpp"
-
-#undef  MODM_LOG_LEVEL
-#define MODM_LOG_LEVEL modm::log::DISABLED
 
 namespace modm
 {
@@ -37,83 +36,115 @@ namespace modm
  * ===== 4 ===== :  | Separate connections to neighbouring nodes
  * ===== 5 ===== : /
  *
+ * NOTE: connections on pipe 3-5 not yet implemented
  */
 
 /// @ingroup	modm_driver_nrf24
 /// @author		Daniel Krebs
-template<typename Nrf24Phy>
+template<typename Nrf24Phy, typename Clock = modm::Clock>
 class Nrf24Data : modm::Nrf24Register
 {
 public:
+	using BaseAddress = uint64_t;
+	using Address     = uint8_t;
+	using Timestamp   = modm::Timestamp;
+	using ClockLower  = Clock;
 
-	/// @{
-	/// @ingroup	nrf24
-	typedef uint64_t    BaseAddress;
-	typedef uint8_t     Address;
-	/// @}
-
-	/// @ingroup	nrf24
-	enum class SendingState
+	enum class SendingFeedback
 	{
 		Busy,           ///< Waiting for ACK
 		FinishedAck,    ///< Packet sent and ACK received
 		FinishedNack,   ///< Packet sent but no ACK received in time
-		DontKnow,       ///< When a packet was sent without requesting ACK
+		DontKnow,       ///< Packet was sent without requesting ACK
 		Failed,         ///< Packet could not be sent
 		Undefined       ///< Initial state before a packet has been handled
 	};
 
-	/// @{
-	/// @ingroup	nrf24
-	/// Data structure that user uses to pass data to the data layer
-	struct modm_packed Packet
-	{
-		Packet() :
-			dest(0), src(0)
-		{
-			payload.length = Nrf24Phy::getMaxPayload();
-		}
+	static const char*
+	toStr(SendingFeedback feedback) {
+		switch(feedback) {
+		case SendingFeedback::Busy:			return "Busy";
+		case SendingFeedback::FinishedAck:	return "FinishedAck";
+		case SendingFeedback::FinishedNack:	return "FinishedNack";
+		case SendingFeedback::DontKnow:		return "DontKnow";
+		case SendingFeedback::Failed:		return "Failed";
+		default:
+		case SendingFeedback::Undefined:	return "Undefined"; }
+	}
 
-		struct modm_packed Payload
-		{
-			uint8_t data[Nrf24Phy::getMaxPayload()];
-			uint8_t length;      // max. 30!
-		};
+	struct Feedback {
+		// TX feedback
+		/// only valid for sent packets
+		SendingFeedback	sendingFeedback;
 
-		Payload     payload;
-		Address     dest;
-		Address     src;         // will be ignored when sending
+		// RX feedback
+		/// only valid for received packets
+		Timestamp timestamp;
+		/// whether the corresponding interrupt has been missed or not
+		bool timestampTrusted;
 	};
-
 
 	/// Header of Frame
 	struct modm_packed Header
 	{
-		uint8_t     src;
-		uint8_t     dest;
+		Address	src;
+		Address	dest;
 	};
 
 	/// Data that will be sent over the air
-	struct modm_packed Frame
+	class modm_packed Packet
 	{
-		Header      header;
-		uint8_t     data[30];   // max. possible payload size (32 byte) - 2 byte (src + dest)
+		friend Nrf24Data;
+
+	private:
+		Header	header;
+	public:
+		uint8_t	payload[Nrf24Phy::getMaxPayload() - sizeof (Header)];
+
+	public:
+		static constexpr uint8_t
+		getPayloadLength()
+		{ return sizeof(payload); }
+
+		inline void
+		setDestination(Address dest)
+		{ header.dest = dest; }
+
+		inline Address
+		getDestination() const
+		{ return header.dest; }
+
+		inline Address
+		getSource() const
+		{ return header.src; }
+
+	private:
+		inline void
+		setSource(Address src)
+		{ header.src = src; }
 	};
 	/// @}
 
+	static constexpr uint8_t
+	getFrameOverhead()
+	{ return sizeof (Header); }
+
+	static uint8_t
+	getDynamicPayloadLength()
+	{ return Phy::getPayloadLength() - getFrameOverhead(); }
+
 public:
 
-	/* typedef config and physical layer for simplicity */
-	typedef modm::Nrf24Config<Nrf24Phy> Config;
-	typedef Nrf24Phy Phy;
-
+	/* type alias config and physical layer for simplicity */
+	using Config = modm::Nrf24Config<Nrf24Phy>;
+	using Phy = Nrf24Phy;
 
 	static void
-	initialize(BaseAddress base_address, Address own_address, Address broadcast_address = 0xFF);
+	initialize(BaseAddress base_address,
+	           Address own_address,
+	           Address broadcast_address = 0xFF);
 
 public:
-
-	/* general data layer interface */
 
 	static bool
 	sendPacket(Packet& packet);
@@ -122,74 +153,48 @@ public:
 	getPacket(Packet& packet);
 
 	static bool
-	isReadyToSend();
+	isReadyToSend()
+	{ return feedbackLastPacket.sendingFeedback != SendingFeedback::Busy; }
 
 	static bool
 	isPacketAvailable();
 
-	/*
-	 * Returns true if the last packet has been fully processed, i.e. sending
-	 * process is over (successful or not). Only return true one time per packet
-	 */
-	static bool
-	isPacketProcessed()
-	{
-		if(packetProcessed)
-		{
-			packetProcessed = false;
-			return true;
-		}
+	/// Feedback of last transaction, i.e. calls to `sendPacket()` and
+	/// `getPacket()`.
+	static const Feedback&
+	getFeedback()
+	{ return feedbackLastPacket; }
 
-		return false;
-	}
-
-	/*
-	 * Call this function in your main loop
-	 */
+	/// Call this function in your main loop
 	static void
 	update();
 
-	/** Returns feedback for the last packet sent
-	 *
-	 */
-	static SendingState
-	getSendingFeedback()
-	{ return state; }
+	/// Call this function from within IRQ pin interrupt
+	/// You have to setup the IRQ pin yourself!
+	static void
+	interruptHandler();
 
 	static Address
 	getAddress()
 	{ return ownAddress; }
 
-	/** Set own address
-	 *
-	 */
+	/// Set own address
 	static void
 	setAddress(Address address);
 
-	static uint8_t
-	getPayloadLength()
-	{ return Phy::getPayloadLength() - sizeof(Header); }
+	static void
+	setBroadcastAddress(Address address);
 
 	static Address
 	getBroadcastAddress()
 	{ return broadcastAddress; }
 
-	/* nrf24 specific */
-
-// not yet implemented
-private:
-	static bool
-	establishConnection();
-
-	static bool
-	destroyConnection();
-
-
 private:
 
-	static inline uint64_t
-	assembleAddress(Address address)
-	{ return static_cast<uint64_t>((uint64_t)baseAddress | (uint64_t)address); }
+	static uint64_t
+	assembleAddress(Address address) {
+		return static_cast<uint64_t>((uint64_t)baseAddress | (uint64_t)address);
+	}
 
 	static bool
 	updateSendingState();
@@ -198,7 +203,7 @@ private:
 
 	/**  Base address of the network
 	 *
-	 *   The first 3 byte will be truncated, so the address is actually 5 bytes
+	 *   The first 3 bytes will be truncated, so the address is actually 5 bytes
 	 *   long. The last byte will be used to address individual modules or
 	 *   connections between them respectively. Use different base address for
 	 *   separate networks, although it may impact performance seriously to run
@@ -210,24 +215,33 @@ private:
 	 *   | ---------------------------------- |
 	 *   |   3 byte  |    4 byte    |  1 byte |
 	 */
-	static BaseAddress baseAddress;
+	static inline BaseAddress baseAddress;
 
-	static Address broadcastAddress;
+	/// Packet with this destination will be sent without acknowledgements and
+	/// delivered to all stations in vicinity.
+	static inline Address broadcastAddress;
 
-	static Address ownAddress;
+	/// Network address of this station
+	static inline Address ownAddress;
 
-	static Address connections[3];
+	/// Internal state of feedback. Is double-buffered by `feedbackLastPacket`
+	static inline Feedback feedbackCurrentPacket;
 
-	static Frame assemblyFrame;
+	/// Feedback for the last sent or received packet (refers to calls to
+	/// `getPacket()` and `sendPacket()`).
+	static inline Feedback feedbackLastPacket;
 
-	static SendingState state;
+	/// Workaround when nrf24 module doesn't indicate finished transmission. The
+	/// reason is still unknown, but without this timeout, the internal state
+	/// machine of the driver would get stuck.
+	static inline modm::Timeout sendingInterruptTimeout;
 
-	static bool packetProcessed;
-
-	/* This is a workaround because some times the radio module doesn't
-	 * throw an interrupt after sending */
-	static modm::Timeout sendingInterruptTimeout;
-	static constexpr int interruptTimeoutAfterSending = 15; // in ms
+	/// How long to wait for a finished transmission before aborting (see
+	/// `sendingInterruptTimeout` for more details).
+	/// Depending on the amount of retransmissions and the auto retransmit delay
+	/// this timeout can become quite large. Worst case is 4000us * 15 = 60ms
+	/// plus some processing times. We consider the worst case here.
+	static constexpr int sendingInterruptTimeoutMs = 65;
 };
 
 }	// namespace modm

@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2014, Niklas Hauser
- * Copyright (c) 2014-2015, Daniel Krebs
+ * Copyright (c) 2014-2015, 2018, Daniel Krebs
  * Copyright (c) 2015, Sascha Schade
  *
  * This file is part of the modm project.
@@ -20,56 +19,41 @@
 #include "nrf24_phy.hpp"
 #include "nrf24_definitions.hpp"
 
-#undef  MODM_LOG_LEVEL
-#define MODM_LOG_LEVEL modm::log::DISABLED
-
 namespace modm
 {
 
-/**
- * Configuration interface for nRF24L01+
- *
- * This class allows for configuration of some aspects of the nRF24L01+
- * wireless modules. It doesn't implement every aspect, but hopefully
- * all the often used ones.
- *
- * @ingroup	modm_driver_nrf24
- * @author		Daniel Krebs
- */
-template<typename Nrf24Phy>
-class Nrf24Config : public Nrf24Register
+/// @ingroup modm_driver_nrf24
+struct Nrf24ConfigParameters
 {
-
-public:
-
 	enum class
 	Mode
 	{
 		Rx,
-		Tx
+		Tx,
+		Invalid
 	};
 
 	enum class
-	Speed
+	Speed : uint32_t
 	{
-		kBps250,
-		MBps1,
-		MBps2
+		kBps250 = 250000,
+		MBps1 =	1000000,
+		MBps2 =	2000000
 	};
 
 	enum class
 	Crc
 	{
-		NoCrc,
-		Crc1Byte,
-		Crc2Byte
+		NoCrc = 0,
+		Crc1Byte = 1,
+		Crc2Byte = 2
 	};
 
 	enum class
 	AddressWidth : uint8_t
 	{
 		/* 2 byte works in hardware but is illegal according to datasheet */
-		/* Byte2 = 0x00, */
+		Byte2 = 0x00,
 		Byte3 = 0x01,
 		Byte4 = 0x02,
 		Byte5 = 0x03
@@ -125,8 +109,21 @@ public:
 		Retransmit14    = 0x0E,
 		Retransmit15    = 0x0F
 	};
+};
 
-
+/**
+ * Configuration interface for nRF24L01+
+ *
+ * This class allows for configuration of some aspects of the nRF24L01+
+ * wireless modules. It doesn't implement every aspect, but hopefully
+ * all the often used ones.
+ *
+ * @ingroup	modm_driver_nrf24
+ * @author	Daniel Krebs
+ */
+template<typename Nrf24Phy>
+class Nrf24Config : public Nrf24Register, public Nrf24ConfigParameters
+{
 public:
 	static void
 	powerUp()
@@ -146,12 +143,21 @@ public:
 	static void
 	setSpeed(Speed speed);
 
+	static Speed
+	getSpeed();
+
 	static void
 	setCrc(Crc crc);
 
 	static void
 	setAddressWidth(AddressWidth width)
 	{ Nrf24Phy::writeRegister(NrfRegister::SETUP_AW, static_cast<uint8_t>(width)); }
+
+	static AddressWidth
+	getAddressWidth()
+	{ return static_cast<AddressWidth>(
+		            Nrf24Register::SetupAw::AW &
+		            Nrf24Phy::readRegister(NrfRegister::SETUP_AW)); }
 
 	static void
 	setRfPower(RfPower power);
@@ -161,6 +167,14 @@ public:
 
 	static void
 	setAutoRetransmitCount(AutoRetransmitCount count);
+
+	static void
+	enableInterrupt(InterruptFlag irq)
+	{ Nrf24Phy::clearBits(NrfRegister::CONFIG, irq); }
+
+	static void
+	disableInterrupt(InterruptFlag irq)
+	{ Nrf24Phy::setBits(NrfRegister::CONFIG, irq); }
 
 	static void
 	enableFeatureNoAck()
@@ -183,17 +197,31 @@ public:
 	 */
 	static void
 	disablePipe(Pipe_t pipe)
-	{ Nrf24Phy::clearBits(NrfRegister::EN_RX_ADDR, (1 << pipe.value)); }
+	{ Nrf24Phy::clearBits(NrfRegister::EN_RX_ADDR, Flags_t(1 << pipe.value)); }
 
-	/** @brief Return number of pipe number that has payload available
-	 */
+	/// Return number of pipe that has payload available
 	static Pipe_t
 	getPayloadPipe();
 
 	static uint8_t
 	getRetryCount()
-	{ return (Nrf24Phy::readRegister(NrfRegister::OBSERVE_TX) & (uint8_t)ObserveTx::ARC_CNT); }
+	{ return (Nrf24Phy::readRegister(NrfRegister::OBSERVE_TX) &
+		      static_cast<uint8_t>(ObserveTx::ARC_CNT)); }
 
+	static constexpr uint32_t
+	toNum(Speed speed)
+	{ return static_cast<uint32_t>(speed); }
+
+	static constexpr uint8_t
+	toNum(AddressWidth addressWidth)
+	{ return (static_cast<uint8_t>(addressWidth) + 2); }
+
+	static constexpr uint8_t
+	toNum(Crc crc)
+	{ return static_cast<uint8_t>(crc); }
+
+public:
+	static inline Mode currentMode{Mode::Invalid};
 };
 
 }   // namespace modm

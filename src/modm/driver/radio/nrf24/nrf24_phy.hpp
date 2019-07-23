@@ -21,14 +21,9 @@
 #include <modm/architecture/interface/delay.hpp>
 #include "nrf24_definitions.hpp"
 
-#undef  MODM_LOG_LEVEL
-#define MODM_LOG_LEVEL modm::log::DISABLED
 
 namespace modm
 {
-
-//namespace nrf24
-//{
 
 /**
  * Hardware abstraction layer for nRF24L01+
@@ -295,36 +290,27 @@ private:
 	static void
 	writeCommandMultiData(Command_t cmd, uint8_t* argv, uint8_t* retv, uint8_t argc);
 
-/*
-	static Command_t
-	toCommand(nrf24::Command cmd, nrf24::Register reg, uint8_t offset)
-	{
-		return static_cast<nrf24::Command>((cmd | reg) + offset);
-	}
-
-	static nrf24::Command
-	toCommand(nrf24::Command cmd, uint8_t offset)
-	{
-		return static_cast<nrf24::Command>(cmd + offset);
-	}
-
-	static nrf24::Register
-	toRegister(nrf24::Register reg, uint8_t offset)
-	{
-		return static_cast<nrf24::Register>(reg + offset);
-	}
-*/
+	/// Read content any address register. Special handling is needed since sizes
+	/// differ: 40-bit vs 8-bit
+	static uint64_t
+	readAddressRegister(NrfRegister_t reg);
 
 private:
+	/// How much payload is allowed at maximum
 	static constexpr uint8_t max_payload_length = 32;
-	static constexpr uint8_t address_size = 5;          /** Size of Rx/Tx addresses in bytes */
-	static constexpr uint8_t rx_pipe_count = 6;         /** Number of Rx pipes (0 to 5) */
-	static uint8_t status;
-	static uint8_t payload_len;                         /** Fixed length of payload in bytes. 0 means dynamic payload*/
 
+	/// Max. size of Rx/Tx addresses in bytes
+	static constexpr uint8_t max_address_size = 5;
+
+	/// Number of Rx pipes (0 to 5)
+	static constexpr uint8_t rx_pipe_count = 6;
+
+	/// Current content of status register, will be updated during most commands
+	static inline uint8_t status;
+
+	/// Fixed length of payload in bytes. 0 means dynamic payload
+	static inline uint8_t payload_len;
 };
-
-//} // namespace nrf24
 
 } // namespace modm
 
