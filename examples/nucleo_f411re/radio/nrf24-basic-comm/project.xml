@@ -1,0 +1,8 @@
+<library>
+  <options>
+    <option name="modm:build:build.path">../../../../build/nucleo_f411re/radio/nrf24-basic-comm</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

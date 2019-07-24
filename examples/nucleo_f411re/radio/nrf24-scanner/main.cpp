@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2014, Daniel Krebs
  * Copyright (c) 2014, 2017, Sascha Schade
- * Copyright (c) 2014-2018, Niklas Hauser
+ * Copyright (c) 2014-2019, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -11,75 +11,20 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/board.hpp>
-#include <modm/driver/radio/nrf24/nrf24_phy.hpp>
-#include <modm/debug/logger.hpp>
-#include <modm/processing/timer.hpp>
-#include <inttypes.h>
-using namespace modm::literals;
+#include "../radio.hpp"
 
-/*
- * A simple 2.4GHz "spectrum analyzer". Please use a terminal
- * application for UART monitoring such as picocom or screen
- *
- * Connect as follows
- *
- * STM32  NRF24
- * ------------
- * PB13 - SCK
- * PB14 - MISO
- * PB15 - MOSI
- * PE12 - CSN
- *
- * STM32  USB2UART
- * ---------------
- * PA2  - TXD
- */
+// A simple 2.4GHz "spectrum analyzer". Please use a terminal
+// application for UART monitoring such as picocom or screen
 
-#undef	MODM_LOG_LEVEL
-#define	MODM_LOG_LEVEL modm::log::INFO
-
-
-// Create an IODeviceWrapper around the Uart Peripheral we want to use
-modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice;
-
-// Set all four logger streams to use the UART
-modm::log::Logger modm::log::debug(loggerDevice);
-modm::log::Logger modm::log::info(loggerDevice);
-modm::log::Logger modm::log::warning(loggerDevice);
-modm::log::Logger modm::log::error(loggerDevice);
-
-typedef GpioOutputE11 Ce;
-typedef GpioOutputE12 Csn;
-
-
-
-typedef modm::Nrf24Phy<SpiMaster2, Csn, Ce> nrf24phy;
-
-
-int
-main()
+int main()
 {
 	Board::initialize();
-
-	Csn::setOutput(modm::Gpio::High);
-	Ce::setOutput(modm::Gpio::Low);
-
-	Board::LedOrange::setOutput(modm::Gpio::Low);
-
-	// Enable SPI 2
-	SpiMaster2::connect<GpioB15::Mosi, GpioB14::Miso, GpioB13::Sck>();
-	SpiMaster2::initialize<Board::SystemClock, 10_MHz>();
-
-	// Enable UART 2
-	Usart2::connect<GpioA2::Tx>();
-	Usart2::initialize<Board::SystemClock, 115200_Bd>();
+//	MODM_LOG_INFO << "Hello from nRF24 scanner example" << modm::endl;
 
 
+	initializeSpi(1);
 	// Initialize nRF24-HAL
-	nrf24phy::initialize();
-
-//	MODM_LOG_INFO << "Hello from nRF24-HAL example" << modm::endl;
+	Nrf1Phy::initialize();
 
 
 	/*
@@ -89,11 +34,11 @@ main()
 	 * puts("\033[5A");  // move cursor up 5 lines
 	 */
 
-	nrf24phy::setBits(nrf24phy::NrfRegister::CONFIG, nrf24phy::Config::PWR_UP);
-	nrf24phy::setBits(nrf24phy::NrfRegister::CONFIG, nrf24phy::Config::PRIM_RX);
+	Nrf1Phy::setBits(Nrf1Phy::NrfRegister::CONFIG, Nrf1Phy::Config::PWR_UP);
+	Nrf1Phy::setBits(Nrf1Phy::NrfRegister::CONFIG, Nrf1Phy::Config::PRIM_RX);
 
-	nrf24phy::writeRegister(nrf24phy::NrfRegister::EN_AA, 0x00);
-	nrf24phy::writeRegister(nrf24phy::NrfRegister::RF_SETUP, 0x0f);
+	Nrf1Phy::writeRegister(Nrf1Phy::NrfRegister::EN_AA, 0x00);
+	Nrf1Phy::writeRegister(Nrf1Phy::NrfRegister::RF_SETUP, 0x0f);
 
 
 	constexpr const uint8_t channel_start = 25;
@@ -131,19 +76,19 @@ main()
 		max = 0;
 		for(i = 0; i < max_channel; i++)
 		{
-			nrf24phy::writeRegister(nrf24phy::NrfRegister::RF_CH, i + channel_start);
+			Nrf1Phy::writeRegister(Nrf1Phy::NrfRegister::RF_CH, i + channel_start);
 
-			Ce::set();
+			Nrf1Ce::set();
 			modm::delayMicroseconds(rx_settle);
-			Ce::reset();
+			Nrf1Ce::reset();
 			modm::delayMicroseconds(2);
-			channel_info[i] += 5*nrf24phy::readRegister(nrf24phy::NrfRegister::RPD);
+			channel_info[i] += 5*Nrf1Phy::readRegister(Nrf1Phy::NrfRegister::RPD);
 
 			if(channel_info[i] > max)
 				max = channel_info[i];
 
 			if(channel_info[i])
-				Board::LedOrange::toggle();
+				Board::LedD13::toggle();
 
 			if(divide_now)
 				channel_info[i] /= divider;

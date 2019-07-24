@@ -1,0 +1,10 @@
+<library>
+  <extends>modm:nucleo-f411re</extends>
+  <modules>
+    <module>modm:driver:nrf24</module>
+    <module>modm:platform:spi:2</module>
+    <module>modm:platform:spi:3</module>
+    <module>modm:platform:timer:2</module>
+    <module>modm:processing:timer</module>
+  </modules>
+</library>
