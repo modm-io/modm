@@ -44,7 +44,7 @@ def build(project):
 	project_cfg = project.read_text()
 	commands = []
 	if ":build:scons" in project_cfg:
-		commands.append("scons build --cache-show --random")
+		commands.append("python3 `which scons` build --cache-show --random")
 	if ":build:cmake" in project_cfg:
 		commands.append("make")
 

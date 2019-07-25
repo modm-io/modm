@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2010, Fabian Greif
@@ -20,12 +20,12 @@ if __name__ == '__main__':
 	filename = os.sys.argv[1]
 
 	if not filename.endswith('.pbm'):
-		print "usage: %s *.pbm" % os.sys.argv[0]
+		print("usage: %s *.pbm" % os.sys.argv[0])
 		exit(1)
 
 	input = open(filename).read()
 	if input[0:3] != "P1\n":
-		print "Format needs to be a portable bitmap in ascii format (file descriptor 'P1')!"
+		print("Format needs to be a portable bitmap in ascii format (file descriptor 'P1')!")
 		exit(1)
 
 	input = input[3:]
@@ -36,7 +36,7 @@ if __name__ == '__main__':
 
 	result = re.match("^(\d+) (\d+)\n", input)
 	if not result:
-		print "bad format!"
+		print("bad format!")
 
 	width = int(result.group(1))
 	height = int(result.group(2))
@@ -64,4 +64,4 @@ if __name__ == '__main__':
 			line.append("0x%02x," % data[y][x])
 		output.append(" ".join(line))
 
-	print "\n".join(output)
+	print("\n".join(output))

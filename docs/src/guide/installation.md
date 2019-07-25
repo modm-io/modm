@@ -34,8 +34,7 @@ Please help us [keep these instructions up-to-date][contribute]!
 We will use [Homebrew](http://brew.sh/) to install the minimal build system:
 
 	brew install python3 scons git doxygen
-	pip3 install --user modm
-	pip install --user pathlib pyelftools
+	pip3 install modm
 
 Install the [AVR toolchain from source](https://github.com/osx-cross/homebrew-avr):
 
@@ -49,6 +48,12 @@ well:
 	brew install arm-gcc-bin
 	brew install openocd --HEAD
 
+scons now works with Python 3. Unfortunately, macOS still defaults to Python 2.
+For a less intrusive way to run all scons scripts with Python 3 add this to your
+~/.bashrc or ~/.zshrc
+
+	alias scons="/usr/bin/env python3 $(which scons)"
+
 To compile modm for macOS you need to install these libraries:
 
 	brew install boost gtkmm sdl zmqpp gcc
@@ -61,7 +66,12 @@ For Ubuntu 18.04LTS, these commands install the basic build system:
 	sudo apt-get install python3 python3-pip scons git
 	sudo apt-get --no-install-recommends install doxygen
 	pip3 install --user modm
-	pip install --user pathlib pyelftools
+
+scons now works with Python 3. Unfortunately, Ubuntu still defaults to Python 2.
+For a less intrusive way to run all scons scripts with Python 3 add this to your
+~/.bashrc or ~/.zshrc
+
+	alias scons="/usr/bin/env python3 $(which scons)"
 
 Install the AVR toochain:
 
