@@ -1,0 +1,11 @@
+<library>
+  <options>
+    <option name="modm:target">hosted-darwin</option>
+    <option name="modm:build:build.path">../../../build/darwin/logger</option>
+  </options>
+  <modules>
+    <module>modm:debug</module>
+    <module>modm:platform:core</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>
