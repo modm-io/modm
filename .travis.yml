@@ -1,0 +1,13 @@
+os: osx
+osx_image: xcode11
+
+before_install:
+  - brew update
+  - brew upgrade python3 || true
+  - brew install scons git doxygen || true
+  - pip3 install modm
+
+script:
+  - cd examples/darwin/logger
+  - lbuild build
+  - /usr/bin/env python3 $(which scons)
