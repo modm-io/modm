@@ -9,8 +9,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_BNO055_HPP
-#define MODM_BNO055_HPP
+#pragma once
 
 #include <modm/architecture/interface/register.hpp>
 #include <modm/architecture/interface/i2c_device.hpp>
@@ -28,6 +27,7 @@ class Bno055;
 /// @ingroup modm_driver_bno055
 struct bno055
 {
+	/// Available I2C addresses
 	static constexpr uint8_t
 	addr(uint8_t offset = 1)
 	{
@@ -465,18 +465,6 @@ public:
 	};
 	MODM_FLAGS8(Interrupt);
 
-	using Registers_t = FlagsGroup<
-		SelfTestResult_t,
-		InterruptStatus_t,
-		SystemClockStatus_t,
-		UnitSelection_t,
-		SystemTrigger_t,
-		AccConfig_t,
-		MagConfig_t,
-		GyrConfig0_t,
-		GyrConfig1_t,
-		Interrupt_t >;
-
 public:
 	enum class
 	TemperatureSource : uint8_t
@@ -540,6 +528,25 @@ public:
 	};
 
 public:
+	using Registers_t = FlagsGroup<
+		SelfTestResult_t,
+		InterruptStatus_t,
+		SystemClockStatus_t,
+		UnitSelection_t,
+		SystemTrigger_t,
+		AccConfig_t,
+		MagConfig_t,
+		GyrConfig0_t,
+		GyrConfig1_t,
+		Interrupt_t,
+		modm::Flags8<TemperatureSource>,
+		modm::Flags8<OperationMode>,
+		modm::Flags8<PowerMode>,
+		modm::Flags8<StatusCode>,
+		modm::Flags8<StatusError>
+	>;
+
+public:
 	struct modm_packed
 	Data
 	{
@@ -579,66 +586,56 @@ public:
  * @author	Niklas Hauser
  */
 template < class I2cMaster >
-class Bno055 : public bno055, public modm::I2cDevice<I2cMaster, 2>
+class Bno055 : public bno055, public modm::I2cDevice<I2cMaster, 4>
 {
 public:
 	/// Constructor, requires a bno055::Data object.
-	/// For I2c this also sets the address to 0b110101 (alternative: 0x1C).
 	inline Bno055(Data &data, uint8_t address=addr()):
-		I2cDevice<I2cMaster,2>(address), data(data) {}
-
-	bool inline
-	configureBlocking(OperationMode mode=OperationMode::NDOF)
-	{
-		return RF_CALL_BLOCKING(configure(mode));
-	}
+		I2cDevice<I2cMaster,4>(address), data(data) {}
 
 	inline modm::ResumableResult<bool>
 	configure(OperationMode mode=OperationMode::NDOF)
 	{
-		return updateRegister(Register::OPR_MODE, uint8_t(mode));
+		return updateRegister(Register::OPR_MODE, mode);
 	}
 
 	inline modm::ResumableResult<bool>
 	readData()
 	{
-		const uint8_t reg = uint8_t(Register::ACCEL_DATA_X_LSB);
+		return readRegister(Register::ACCEL_DATA_X_LSB, (uint8_t*)&data.r, Data::size);
+	}
+
+	inline modm::ResumableResult<bool>
+	enableExternalClock()
+	{
+		return updateRegister(Register::SYS_TRIGGER, SystemTrigger::CLK_SEL, Registers_t(0));
+	}
+
+public:
+	inline modm::ResumableResult<bool>
+	updateRegister(Register reg, Registers_t setMask, Registers_t clearMask = Registers_t(0xff))
+	{
 		RF_BEGIN();
+		RF_CALL(setPageId(reg));
 
-		if ((reg ^ prev_reg) & 0x80) {
-			buffer[0] = uint8_t(Register::PAGE_ID);
-			buffer[1] = reg >> 7;
-			this->transaction.configureWrite(buffer, 2);
-			RF_CALL( this->runTransaction() );
-			prev_reg = reg;
-		}
+		buffer[0] = uint8_t(reg);
+		this->transaction.configureWriteRead(buffer, 1, buffer, 1);
+		RF_CALL( this->runTransaction() );
 
-		buffer[0] = reg;
-		this->transaction.configureWriteRead(buffer, 1, (uint8_t*)&data, Data::size);
+		buffer[1] = (buffer[0] & ~clearMask.value) | setMask.value;
+		buffer[0] = uint8_t(reg);
+		this->transaction.configureWrite(buffer, 2);
 		RF_END_RETURN_CALL( this->runTransaction() );
 	}
 
 	inline modm::ResumableResult<bool>
-	updateRegister(Register regi, uint8_t setMask, uint8_t clearMask = 0xff)
+	readRegister(Register reg, uint8_t *output, size_t length=1)
 	{
-		const uint8_t reg = uint8_t(regi);
 		RF_BEGIN();
+		RF_CALL(setPageId(reg));
 
-		if ((reg ^ prev_reg) & 0x80) {
-			buffer[0] = uint8_t(Register::PAGE_ID);
-			buffer[1] = reg >> 7;
-			this->transaction.configureWrite(buffer, 2);
-			RF_CALL( this->runTransaction() );
-			prev_reg = reg;
-		}
-
-		buffer[0] = reg;
-		this->transaction.configureWriteRead(buffer, 1, buffer, 1);
-		RF_CALL( this->runTransaction() );
-
-		buffer[1] = (buffer[0] & ~clearMask) | setMask;
-		buffer[0] = reg;
-		this->transaction.configureWrite(buffer, 2);
+		buffer[0] = uint8_t(reg);
+		this->transaction.configureWriteRead(buffer, 1, output, length);
 		RF_END_RETURN_CALL( this->runTransaction() );
 	}
 
@@ -647,6 +644,25 @@ public:
 	getData()
 	{ return data; }
 
+protected:
+	inline modm::ResumableResult<bool>
+	setPageId(Register regi)
+	{
+		const uint8_t reg = uint8_t(regi);
+		RF_BEGIN();
+
+		if ((reg ^ prev_reg) & 0x80) {
+			buffer[0] = uint8_t(Register::PAGE_ID);
+			buffer[1] = reg >> 7;
+			this->transaction.configureWrite(buffer, 2);
+			buffer[2] = RF_CALL( this->runTransaction() );
+			if (buffer[2]) prev_reg = reg;
+			RF_RETURN(buffer[2]);
+		}
+
+		RF_END_RETURN(true);
+	}
+
 private:
 	Data &data;
 	uint8_t buffer[3];
@@ -654,7 +670,3 @@ private:
 };
 
 } // namespace modm
-
-// #include "bno055_impl.hpp"
-
-#endif	// MODM_BNO055_HPP
