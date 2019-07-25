@@ -70,9 +70,9 @@ public:
 			averageZ.update(gyro.getData().getZ());
 
 			MODM_LOG_INFO.printf("x: %.2f, y: %.2f, z: %.2f \n",
-								 averageX.getValue(),
-								 averageY.getValue(),
-								 averageZ.getValue());
+								 double(averageX.getValue()),
+								 double(averageY.getValue()),
+								 double(averageZ.getValue()));
 
 			this->timeout.restart(50);
 			PT_WAIT_UNTIL(this->timeout.isExpired());

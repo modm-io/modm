@@ -124,7 +124,7 @@ main()
 			display_thread.setHumi(humi);
 
 			// Do not enable when STlink UART is used for rosserial
-			MODM_LOG_DEBUG.printf("Temp = %6.2f\n", temp / 100.0);
+			MODM_LOG_DEBUG.printf("Temp = %6.2f\n", temp / double(100.0));
 		}
 
 		nh.spinOnce();
