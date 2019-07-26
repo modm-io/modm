@@ -139,24 +139,23 @@ def post_build(env):
               "Hint: Use 'env.collect(key, *values)' instead! To discover available\n"
               "      collectors, use 'lbuild discover --developer -t modm:build'.")
 
-    target = env[":target"]
-    gitignore = [env.relative_outpath(ignore, "modm") for ignore in
-                 env.collector_values("gitignore", filterfunc=lambda s: s.repository == "modm")]
+    # Generate a gitignore for every repository
+    repositories = [p for p in env.buildlog.repositories if os.path.isdir(env.real_outpath(p, basepath="."))]
+    for repo in repositories:
+        gitignore = [env.relative_outpath(ignore, repo) for ignore in
+                     env.collector_values("gitignore", filterfunc=lambda s: s.repository == repo)]
+        if len(gitignore):
+            env.substitutions["gitignore"] = gitignore
+            env.outbasepath = repo
+            env.template("gitignore.in", ".gitignore")
 
-    env.substitutions = {
-        "gitignore": gitignore,
-    }
-    # prepare custom path
-    openocd_cfg = env.get(":build:openocd.cfg", "")
-    if len(openocd_cfg):
-        env.substitutions["openocd_user_path"] = env.relative_outpath(openocd_cfg)
     env.outbasepath = "modm"
 
-    # Currently a modm only feature
-    if len(gitignore):
-        env.template("gitignore.in", ".gitignore")
-
-    if target.has_driver("core:cortex-m*"):
+    if env[":target"].has_driver("core:cortex-m*"):
+        # prepare custom path
+        openocd_cfg = env.get(":build:openocd.cfg", "")
+        if len(openocd_cfg):
+            env.substitutions["openocd_user_path"] = env.relative_outpath(openocd_cfg)
         env.template("openocd.cfg.in")
         env.template("openocd_gdbinit.in")
         env.template("gdbinit")
