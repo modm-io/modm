@@ -76,14 +76,6 @@ modm::Vector<T, 2>::Vector(const modm::Matrix<T, 2, 1> &rhs) :
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 2>::Vector(const Vector &rhs) :
-	x(rhs.x),
-	y(rhs.y)
-{
-}
-
-// ----------------------------------------------------------------------------
-template<typename T>
 void
 modm::Vector<T, 2>::set(const T& newX, const T& newY)
 {
@@ -317,15 +309,6 @@ modm::Vector<T, 2>::ccw(const Vector& a, const Vector& b,
 			}
 		}
 	}
-}
-
-// ----------------------------------------------------------------------------
-template<typename T>
-modm::Vector<T, 2>& modm::Vector<T, 2>::operator = (const modm::Vector<T, 2> &rhs)
-{
-	x = rhs.x;
-	y = rhs.y;
-	return *this;
 }
 
 // ----------------------------------------------------------------------------

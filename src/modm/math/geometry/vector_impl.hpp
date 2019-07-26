@@ -32,12 +32,6 @@ modm::Vector<T, N>::Vector(const modm::Matrix<T, N, 1> &rhs)
 	memcpy(coords, &rhs, sizeof(T) * N);
 }
 
-template<typename T, uint8_t N>
-modm::Vector<T, N>::Vector(const modm::Vector<T, N> &rhs)
-{
-	memcpy(coords, rhs.coords, sizeof(T) * N);
-}
-
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
 uint8_t
@@ -52,15 +46,6 @@ modm::Vector<T, N>&
 modm::Vector<T, N>::operator = (const modm::Matrix<T, N, 1> &rhs)
 {
 	memcpy(coords, &rhs, sizeof(T) * N);
-	return *this;
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t N>
-modm::Vector<T, N>&
-modm::Vector<T, N>::operator = (const modm::Vector<T, N> &rhs)
-{
-	memcpy(coords, rhs.coords, sizeof(T)*N);
 	return *this;
 }
 

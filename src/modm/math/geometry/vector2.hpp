@@ -76,7 +76,6 @@ namespace modm
 		Vector(const Vector<T, 1> &inX, const T &inY);
 		explicit Vector(T inVal);
 		Vector(const Matrix<T, 2, 1> &rhs);
-		Vector(const Vector &rhs);
 
 		inline void
 		setX(const T& value);
@@ -231,7 +230,6 @@ namespace modm
 		static int_fast8_t
 		ccw(const Vector& a, const Vector& b, const Vector& c);
 
-		Vector& operator = (const Vector &rhs);
 		Vector& operator = (const Matrix<T, 2, 1> &rhs);
 
 		bool operator == (const Vector &rhs) const;

@@ -420,17 +420,6 @@ modm::Vector<T, 4>::Vector(const modm::Matrix<T, 4, 1> &rhs)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>::Vector(const modm::Vector<T, 4> &rhs)
-:
-	x(rhs.x),
-	y(rhs.y),
-	z(rhs.z),
-	w(rhs.w)
-{
-}
-
-// ----------------------------------------------------------------------------
-template<typename T>
 modm::Vector<T, 4>::Vector(T inVal)
 :
 	x(inVal),
@@ -518,19 +507,6 @@ modm::Vector<T, 4>::operator = (const modm::Matrix<T, 4, 1> &rhs)
 	y = reinterpret_cast<const T*>(&rhs)[1];
 	z = reinterpret_cast<const T*>(&rhs)[2];
 	w = reinterpret_cast<const T*>(&rhs)[3];
-
-	return *this;
-}
-
-// ----------------------------------------------------------------------------
-template<typename T>
-modm::Vector<T, 4>&
-modm::Vector<T, 4>::operator = (const modm::Vector<T, 4> &rhs)
-{
-	x = rhs.x;
-	y = rhs.y;
-	z = rhs.z;
-	w = rhs.w;
 
 	return *this;
 }

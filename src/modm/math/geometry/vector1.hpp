@@ -39,7 +39,6 @@ namespace modm
 		Vector();
 		Vector(T inX);
 		Vector(const Matrix<T, 1, 1> &rhs);
-		Vector(const Vector &rhs);
 
 		inline void
 		set(const T& x);
@@ -50,8 +49,6 @@ namespace modm
 		inline const T&
 		getX() const;
 
-
-		Vector& operator = (const Vector &rhs);
 		Vector& operator = (const Matrix<T, 1, 1> &rhs);
 
 		bool operator == (const Vector &rhs) const;

@@ -62,10 +62,7 @@ namespace modm
 		Vector(const T *ptData);
 
 		Vector(const Matrix<T, N, 1> &rhs);
-		Vector(const Vector &rhs);
-
 		Vector& operator = (const Matrix<T, N, 1> &rhs);
-		Vector& operator = (const Vector &rhs);
 
 		bool operator == (const Vector &rhs) const;
 		bool operator != (const Vector &rhs) const;

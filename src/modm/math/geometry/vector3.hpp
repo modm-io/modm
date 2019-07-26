@@ -93,7 +93,6 @@ namespace modm
 
 
 		Vector& operator = (const Matrix<T, 3, 1> &rhs);
-		Vector& operator = (const Vector &rhs);
 
 		bool operator == (const Vector &rhs) const;
 		bool operator != (const Vector &rhs) const;

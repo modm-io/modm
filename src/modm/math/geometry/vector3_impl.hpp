@@ -242,18 +242,6 @@ modm::Vector<T, 3>::operator = (const modm::Matrix<T, 3, 1> &rhs)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 3>&
-modm::Vector<T, 3>::operator = (const Vector &rhs)
-{
-	x = rhs.x;
-	y = rhs.y;
-	z = rhs.z;
-
-	return *this;
-}
-
-// ----------------------------------------------------------------------------
-template<typename T>
 bool
 modm::Vector<T, 3>::operator == (const Vector &rhs) const
 {

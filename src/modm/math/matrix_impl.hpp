@@ -32,28 +32,6 @@ modm::Matrix<T, ROWS, COLUMNS>::Matrix(const T *data)
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-modm::Matrix<T, ROWS, COLUMNS>::Matrix(const Matrix &m)
-{
-	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
-		element[i] = m.element[i];
-	}
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-template<typename U>
-modm::Matrix<T, ROWS, COLUMNS>&
-modm::Matrix<T, ROWS, COLUMNS>::operator = (const modm::Matrix<U, ROWS, COLUMNS> &m)
-{
-	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
-		element[i] = m.element[i];
-	}
-
-	return *this;
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
 const modm::Matrix<T, ROWS, COLUMNS>&
 modm::Matrix<T, ROWS, COLUMNS>::identityMatrix()
 {

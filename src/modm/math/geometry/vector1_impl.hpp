@@ -34,12 +34,6 @@ modm::Vector<T, 1>::Vector(const modm::Matrix<T, 1, 1> &rhs) :
 {
 }
 
-template<typename T>
-modm::Vector<T, 1>::Vector(const modm::Vector<T, 1> &rhs) :
-	x(rhs.x)
-{
-}
-
 // ----------------------------------------------------------------------------
 template<typename T>
 void
@@ -62,15 +56,6 @@ const T&
 modm::Vector<T, 1>::getX() const
 {
 	return this->x;
-}
-
-// ----------------------------------------------------------------------------
-template<typename T>
-modm::Vector<T, 1>&
-modm::Vector<T, 1>::operator = (const modm::Vector<T, 1> &rhs)
-{
-	x = rhs.x;
-	return *this;
 }
 
 // ----------------------------------------------------------------------------

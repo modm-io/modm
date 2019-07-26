@@ -82,7 +82,6 @@ namespace modm
 		Vector(const T &inX, const Vector<T, 3> &inYZW);
 
 		Vector(const Matrix<T, 4, 1> &rhs);
-		Vector(const Vector &rhs);
 
 
 		inline void
@@ -116,7 +115,6 @@ namespace modm
 
 
 		Vector& operator = (const Matrix<T, 4, 1> &rhs);
-		Vector& operator = (const Vector &rhs);
 
 		bool operator == (const Vector &rhs) const;
 		bool operator != (const Vector &rhs) const;

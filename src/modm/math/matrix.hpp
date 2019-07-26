@@ -76,14 +76,6 @@ namespace modm
 		 */
 		Matrix(const T *data);
 
-		/// Copy constructor
-		Matrix(const Matrix &m);
-
-		// TODO replace with a explicit convert function
-		template<typename U>
-		Matrix&
-		operator = (const Matrix<U, ROWS, COLUMNS> &m);
-
 		/**
 		 * \brief	Get a zero matrix
 		 *

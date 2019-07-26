@@ -46,11 +46,6 @@ public:
 	{
 	}
 
-	GenericTimestamp(const GenericTimestamp<T> &other) :
-		time(other.time)
-	{
-	}
-
 	inline Type
 	getTime() const
 	{
