@@ -16,8 +16,8 @@ profile = ARGUMENTS.get("profile", "release")
 env["BUILDPATH"] = join(env["CONFIG_BUILD_BASE"], profile)
 env["BASEPATH"] = abspath(".")
 %% if family == "darwin"
-# Using homebrew gcc-8 on macOS
-env["COMPILERSUFFIX"] = "-8"
+# Using homebrew gcc on macOS instead of clang
+env["COMPILERSUFFIX"] = env.Detect(["gcc-9", "gcc-8", "gcc-7"])[3:]
 %% endif
 %% endif
 
