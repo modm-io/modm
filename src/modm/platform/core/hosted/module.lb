@@ -42,7 +42,6 @@ def build(env):
     env.substitutions = properties
     env.outbasepath = "modm/src/modm/platform/core"
 
-    env.copy("assert.cpp")
     env.copy("memory.cpp")
     env.copy("atomic_lock.hpp")
     env.copy("../avr/unaligned.hpp", "unaligned.hpp")
@@ -51,6 +50,7 @@ def build(env):
     if not env.has_module(":test"):
         env.template("clock.cpp.in")
     env.template("delay.hpp.in")
+    env.template("assert.cpp.in")
 
     if target["family"] in ["windows"]:
         env.log.warning("Delay functions are not implemented!")

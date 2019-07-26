@@ -21,33 +21,35 @@
 #include <stdint.h>
 #include <modm/architecture/utils.hpp>
 
-%% if target["family"] in ["darwin", "linux"]
+%% if target.family in ["darwin", "linux"]
+extern "C" {
 #include <unistd.h>
+}
 
 namespace modm
 {
 
 /// @cond
-void modm_always_inline
+inline void
 delayNanoseconds(uint16_t /*ns*/)
 {
 	usleep(1);
 }
 
-modm_always_inline void
+inline void
 delayMicroseconds(uint16_t us)
 {
 	usleep(us);
 }
 
-modm_always_inline void
+inline void
 delayMilliseconds(uint16_t ms)
 {
 	usleep(uint32_t(ms) * 1000);
 }
 /// @endcond
 
-%% elif target["family"] in ["windows"]
+%% elif target.family == "windows"
 
 namespace modm
 {

@@ -17,13 +17,13 @@
 using modm::AssertionHandler;
 using modm::Abandonment;
 
-#ifdef MODM_OS_OSX
+%% if target.family == "darwin"
 extern AssertionHandler __assertion_table_start __asm("section$start$__DATA$modm_assertion");
 extern AssertionHandler __assertion_table_end __asm("section$end$__DATA$modm_assertion");
-#else
+%% else
 extern AssertionHandler __assertion_table_start __asm("__start_modm_assertion");
 extern AssertionHandler __assertion_table_end __asm("__stop_modm_assertion");
-#endif
+%% endif
 
 // Since we use the default linker script on hosted, the above linker section are
 // only included if something is put into these sections. Therefore we are placing
@@ -51,11 +51,11 @@ void modm_assert_fail_context(const char * identifier, uintptr_t context)
 	const char * module = identifier;
 	const char * location = module + strlen(module) + 1;
 	const char * failure = location + strlen(location) + 1;
-#ifdef MODM_OS_WIN64
+%% if target.family == "windows"
 	// __assertion_table is not implemented
 	modm_abandon(module, location, failure, context);
 	exit(1);
-#else
+%% else
 	uint8_t state((uint8_t) Abandonment::DontCare);
 
 	AssertionHandler * handler = &__assertion_table_start;
@@ -70,7 +70,7 @@ void modm_assert_fail_context(const char * identifier, uintptr_t context)
 		modm_abandon(module, location, failure, context);
 		exit(1);
 	}
-#endif
+%% endif
 }
 
 modm_weak
