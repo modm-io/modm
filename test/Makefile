@@ -11,11 +11,12 @@
 
 # LBUILD = python3 ../../library-builder/scripts/lbuild
 LBUILD = lbuild
+SCONS = python3 `which scons`
 
 define compile-test
 	@$(RM) -r ../build/unittest/$(1)/modm
 	$(LBUILD) -c config/$(1).xml $(3) -p ../build/unittest/$(1) build --no-log
-	scons -C ../build/unittest/$(1) $(2)
+	$(SCONS) -C ../build/unittest/$(1) $(2)
 endef
 define run-test
 	$(call compile-test,$(1),$(2) program,$(3))
