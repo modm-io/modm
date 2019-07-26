@@ -6,6 +6,7 @@
   <modules>
     <module>modm:debug</module>
     <module>modm:platform:canusb</module>
+    <module>modm:platform:uart</module>
     <module>modm:platform:core</module>
     <module>modm:build:scons</module>
   </modules>

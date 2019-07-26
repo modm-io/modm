@@ -14,6 +14,7 @@
 #include <modm/platform.hpp>
 #include <modm/debug/logger.hpp>
 #include <info_build.h>
+#include <cstdio>
 
 // Set the log level
 #undef	MODM_LOG_LEVEL

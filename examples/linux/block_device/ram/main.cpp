@@ -12,6 +12,7 @@
 #include <modm/debug/logger.hpp>
 
 #include <modm/driver/storage/block_device_heap.hpp>
+#include <stdlib.h>
 
 // Set the log level
 #undef	MODM_LOG_LEVEL

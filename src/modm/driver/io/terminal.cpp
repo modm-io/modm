@@ -18,25 +18,25 @@
 
 // ----------------------------------------------------------------------------
 void
-modm::pc::Terminal::write(char c)
+modm::Terminal::write(char c)
 {
 	std::cout << c;
 }
 
 void
-modm::pc::Terminal::write(const char* s)
+modm::Terminal::write(const char* s)
 {
 	std::cout << s;
 }
 
 void
-modm::pc::Terminal::flush()
+modm::Terminal::flush()
 {
 	std::cout << std::flush;
 }
 
 bool
-modm::pc::Terminal::read(char& value)
+modm::Terminal::read(char& value)
 {
 	std::cin.get(value);
 	return std::cin.good();

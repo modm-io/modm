@@ -6,6 +6,7 @@
   </options>
   <modules>
     <module>modm:platform:core</module>
+    <module>modm:driver:terminal</module>
     <module>modm-test:test:**</module>
   </modules>
 </library>

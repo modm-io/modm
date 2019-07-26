@@ -18,11 +18,12 @@
 
 #include <modm/debug/logger.hpp>
 #include <modm/platform.hpp>
+#include <modm/driver/io/terminal.hpp>
 
 #include <info_git.h>
 #include <info_build.h>
 
-modm::pc::Terminal outputDevice;
+modm::Terminal outputDevice;
 
 modm::log::StyleWrapper< modm::log::Prefix< char[10] > > loggerDeviceDebug( \
 		modm::log::Prefix< char[10] >("Debug  : ", outputDevice ));
