@@ -157,8 +157,8 @@ whoweare_path.write_text(whoweare)
 
 # Read the examples README.md and replace these keys
 readme = examples_readme_path.read_text()
-readme = replace(readme, "examplecount", len(examples))
-examples_readme_path.write_text(readme)
+# readme = replace(readme, "examplecount", len(examples))
+# examples_readme_path.write_text(readme)
 
 getting_started = Environment().from_string(getting_started_in_path.read_text()).render({"examples": extract(readme, "examples")})
 getting_started_path.write_text(getting_started)
@@ -170,7 +170,7 @@ if "-d" in sys.argv:
         subprocess.run("git --no-pager diff", shell=True, cwd=repopath("."))
         print("\nPlease synchronize the modm documentation:\n\n"
               "    $ python3 tools/scripts/synchronize_docs.py\n\n"
-              " and then commit the results!")
+              "and then commit the results!")
         exit(1)
 
 exit(0)

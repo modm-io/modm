@@ -94,9 +94,8 @@ make gdb
 
 ## Interesting Examples
 
-We have a lot of examples, <!--examplecount-->190<!--/examplecount--> to be
-exact, but here are some of our favorite examples for our supported development
-boards:
+We have hundreds of examples but here are some of our favorite ones for our
+supported development boards:
 
 <!--checkrepourls-->
 - Arduino Uno:
