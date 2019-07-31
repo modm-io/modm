@@ -43,7 +43,7 @@
  */
 #define RF_END_RETURN(result) \
 			RF_RETURN(result); \
-			MODM_FALLTHROUGH; \
+			modm_fallthrough; \
 		default: \
 			this->popRf(); \
 			return {modm::rf::WrongState}; \
@@ -74,7 +74,7 @@
  */
 #define RF_END_RETURN_CALL(resumable) \
 			RF_RETURN_CALL(resumable); \
-			MODM_FALLTHROUGH; \
+			modm_fallthrough; \
 		default: \
 			this->popRf(); \
 			return {modm::rf::WrongState}; \
@@ -164,7 +164,7 @@
 // Required macro to set the same unique number twice
 #define RF_INTERNAL_SET_CASE(counter) \
 			this->setRf((counter % 255) + 1, rfIndex); \
-			MODM_FALLTHROUGH; \
+			modm_fallthrough; \
 		case ((counter % 255) + 1): ;
 
 // Internal macro for yield

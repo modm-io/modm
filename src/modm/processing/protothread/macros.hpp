@@ -55,7 +55,7 @@
 #define PT_WAIT_WHILE(condition) \
     do { \
 		this->ptState = __LINE__; \
-		MODM_FALLTHROUGH; \
+		modm_fallthrough; \
 		case __LINE__: \
 			if (condition) \
 				return true; \
@@ -87,7 +87,7 @@
 #define PT_CALL(resumable) \
 	({ \
 		this->ptState = __LINE__; \
-		MODM_FALLTHROUGH; \
+		modm_fallthrough; \
 		case __LINE__: \
 			auto rfResult = resumable; \
 			if (rfResult.getState() > modm::rf::NestingError) { \
