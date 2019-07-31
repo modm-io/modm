@@ -37,12 +37,20 @@ def run_post_mortem_gdb(target, source, env):
 		crashdebug = "win32/CrashDebug.exe"
 	elif "Darwin" in platform.platform():
 		crashdebug = "osx64/CrashDebug"
+	crashdebug = env.subst("$BASEPATH/ext/crashcatcher/bins/{}".format(crashdebug))
 
+	coredump_txt = os.path.relpath(ARGUMENTS.get("coredump", "coredump.txt"))
+	if not os.path.isfile(coredump_txt):
+		print("\n> Unable to find coredump file!"
+		      "\n> Path '{}' is not a file!\n".format(coredump_txt))
+		return 1
+
+	config = map(env.subst, env.Listify(env.get("MODM_GDBINIT", [])))
 	subst = {
-		"config": " ".join(map('-x "{}"'.format, map(env.subst, env.get("MODM_GDBINIT", [])))),
+		"config": " ".join(map('-x "{}"'.format, config)),
 		"source": source,
-		"crashdebug": env.subst("$BASEPATH/ext/crashcatcher/bins/{}".format(crashdebug)),
-		"coredump": ARGUMENTS.get("coredump", "coredump.txt"),
+		"crashdebug": crashdebug,
+		"coredump": coredump_txt,
 	}
 	cmd = ('arm-none-eabi-gdb {config} {source} -ex "set target-charset ASCII" '
 		   '-ex "target remote | {crashdebug} --elf {source} --dump {coredump}"')
