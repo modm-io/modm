@@ -28,5 +28,4 @@ modm_board_init(void)
 	board_initialize_sdram();
 }
 
-modm_section(".hardware_init.modm_board_init")
-uint32_t modm_board_init_ptr = (uint32_t) &modm_board_init;
+MODM_HARDWARE_INIT(modm_board_init);

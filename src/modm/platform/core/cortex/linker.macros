@@ -258,7 +258,8 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 	{
 		__hardware_init_start = .;
 		/* Table symbols are alphabetically sorted! */
-		KEEP(*(SORT(.hardware_init*)))
+		KEEP(*(SORT(.hardware_init.order_*)))
+		KEEP(*(SORT(.hardware_init)))
 		__hardware_init_end = .;
 	} >{{memory}}
 

@@ -11,6 +11,7 @@
 
 #include "../device.hpp"
 #include <modm/platform/clock/common.hpp>
+#include "hardware_init.hpp"
 
 %% if core == "cortex-m0":
 	%% set loop = 4
@@ -105,8 +106,5 @@ modm_dwt_enable(void)
 	DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
 }
 
-// .A000100 postfix since .hardware_init is sorted alphabetically and
-// this should be executed before application inits. Totally not a hack.
-modm_section(".hardware_init.A000100_modm_dwt_enable")
-uint32_t modm_dwt_enable_ptr = (uint32_t) &modm_dwt_enable;
+MODM_HARDWARE_INIT_ORDER(modm_dwt_enable, 100);
 %% endif

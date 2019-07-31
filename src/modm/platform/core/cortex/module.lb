@@ -261,6 +261,9 @@ def build(env):
     # dealing with runtime assertions
     env.copy("assert.cpp")
 
+    # hardware init section
+    env.copy("hardware_init.hpp")
+
     # busy-waiting delays
     if env.has_module(":architecture:delay"):
         env.template("delay.cpp.in")

@@ -11,6 +11,7 @@
 
 #include "fault_storage.hpp"
 #include <modm/architecture/utils.hpp>
+#include <modm/platform/core/hardware_init.hpp>
 
 typedef struct
 {
@@ -189,5 +190,4 @@ FaultStorage::Iterator::operator!=(const Iterator& other) const
 
 }
 
-modm_section(".hardware_init.modm_platform_fault_storage_init")
-auto modm_platform_fault_storage_init_ptr = &modm::platform::FaultStorage::openRead;
+MODM_HARDWARE_INIT_NAME(fault_open_read, modm::platform::FaultStorage::openRead);
