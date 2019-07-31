@@ -150,11 +150,6 @@ def prepare(module, options):
         ":cmsis:device")
 
     module.add_option(
-        BooleanOption(
-            name="stack_execution_guard",
-            description="Fill the stack with relative jumps to fault handler to prevent accidental execution.",
-            default=False))
-    module.add_option(
         EnumerationOption(
             name="allocator",
             description=FileReader("option/allocator.md"),
@@ -259,9 +254,9 @@ def build(env):
     env.copy("cxxabi.cpp")
 
     # startup script
+    env.copy("reset_handler.sx")
     env.template("startup.c.in")
     env.template("vectors.c.in")
-    env.copy("default_handler.sx")
 
     # dealing with runtime assertions
     env.copy("assert.cpp")

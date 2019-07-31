@@ -19,176 +19,116 @@
 #include "../device.hpp"
 
 // ----------------------------------------------------------------------------
-// Interrupt vectors
-typedef void (* const FunctionPointer)(void);
+// Linker section start and end pointers
+extern const uint32_t __table_copy_intern_start[];
+extern const uint32_t __table_copy_intern_end[];
+
+extern const uint32_t __table_zero_intern_start[];
+extern const uint32_t __table_zero_intern_end[];
+
+extern const uint32_t __table_copy_extern_start[];
+extern const uint32_t __table_copy_extern_end[];
+
+extern const uint32_t __table_zero_extern_start[];
+extern const uint32_t __table_zero_extern_end[];
+
+extern const uint32_t __vector_table_{{ vector_table_location }}_start[];
 
 // ----------------------------------------------------------------------------
-// The following are constructs created by the linker, indicating where the
-// the "data" and "bss" segments reside in memory.
-extern uint32_t __stack_start[];
-extern uint32_t __stack_end[];
+// Linker section start and end pointers for function hooks
+typedef void (* const FunctionPointer)(void);
 
-extern uint32_t __table_copy_intern_start[];
-extern uint32_t __table_copy_intern_end[];
+extern const FunctionPointer __hardware_init_start[];
+extern const FunctionPointer __hardware_init_end[];
 
-extern uint32_t __table_zero_intern_start[];
-extern uint32_t __table_zero_intern_end[];
+extern const FunctionPointer __init_array_start[];
+extern const FunctionPointer __init_array_end[];
 
-extern uint32_t __table_copy_extern_start[];
-extern uint32_t __table_copy_extern_end[];
-
-extern uint32_t __table_zero_extern_start[];
-extern uint32_t __table_zero_extern_end[];
-
-extern uint32_t __vector_table_rom_start[];
-extern uint32_t __vector_table_ram_start[];
-
-extern FunctionPointer __hardware_init_start[];
-extern FunctionPointer __hardware_init_end[];
-
-// Application's main function
-int __attribute__((noreturn))
-main(void);
-
-// calls CTORS of static objects
-void
-__libc_init_array(void);
-
-extern void
-__modm_initialize_memory(void);
-
-extern void
-__modm_initialize_platform(void);
-
-static void
-table_copy(uint32_t **table, uint32_t **end)
+// ----------------------------------------------------------------------------
+// Calls every function pointer in the section range
+static inline void
+table_call(const FunctionPointer *const start, const FunctionPointer *const end)
 {
-	while(table < end)
+	for (const FunctionPointer *entry = start; entry < end; entry++)
+		(*entry)();
+}
+
+// Copies the section defined by a table of {loadaddr, dest start, dest end}
+static inline void
+table_copy(const uint32_t *const start, const uint32_t *const end)
+{
+	uint32_t **table = (uint32_t **)start;
+	while(table < (uint32_t **)end)
 	{
-		uint32_t *src  = table[0]; // load address
-		uint32_t *dest = table[1]; // destination start
-		while (dest < table[2])    // destination end
-		{
+		const uint32_t *src  = table[0]; // load address
+		      uint32_t *dest = table[1]; // destination start
+		while (dest < table[2])          // destination end
 			*(dest++) = *(src++);
-		}
 		table += 3;
 	}
 }
 
-static void
-table_zero(uint32_t **table, uint32_t **end)
+// Zeros the section defined by a table of {start, end}
+static inline void
+table_zero(const uint32_t *const start, const uint32_t *const end)
 {
-	while(table < end)
+	uint32_t **table = (uint32_t **)start;
+	while(table < (uint32_t **)end)
 	{
 		uint32_t *dest = table[0]; // destination start
 		while (dest < table[1])    // destination end
-		{
 			*(dest++) = 0;
-		}
 		table += 2;
 	}
 }
 
 // ----------------------------------------------------------------------------
-void
-Reset_Handler(void)
+// Called by Reset_Handler in reset_handler.s
+void __modm_startup(void)
 {
-	__modm_initialize_platform();
-
-%% if options["stack_execution_guard"]
-	// fill the stack with relative branches to __stack_start
-	// where the undefined instruction is waiting to trigger the hard fault
-	asm volatile (
-		"ldr   r0, =__stack_start"      "\n\t"
-
-		"ldr   r1, =0xE7FDDE00"         "\n\t" // b __stack_start, undef. instruction
-		"stmia r0!, {r1}"               "\n\t"
-
-		"ldr   r1, =__stack_end+4"      "\n\t"
-		"ldr   r2, =0xE7FC"             "\n\t" // the 2's complement offset of -8/2 = -4
-		"ldr   r3, =0xE401"             "\n\t" // largest negative relative branch value!
-
-	"1:  strh  r2, [r0]"                "\n\t" // store the 16bit value into ram
-		"add   r0, #2"                  "\n\t" // add sizeof(uint16_t) to the pointer
-
-		"cmp   r2, r3"                  "\n\t" // compare value with 0xE401
-		"beq   2f"                      "\n\t" // branch forward if equal
-		"sub   r2, #1"                  "\n\t" // subtract only if not equal
-
-	"2:  cmp   r0, r1"                  "\n\t" // compare pointer with end of stack address
-		"bne   1b"                      "\n\t" // continue loop if not equal
-	);
-%% endif
-	// copy all internal memory declared in linkerscript table
-	table_copy(	(uint32_t**)__table_copy_intern_start,
-				(uint32_t**)__table_copy_intern_end);
-	table_zero(	(uint32_t**)__table_zero_intern_start,
-				(uint32_t**)__table_zero_intern_end);
+	// Copy and zero all internal memory
+	table_copy(__table_copy_intern_start, __table_copy_intern_end);
+	table_zero(__table_zero_intern_start, __table_zero_intern_end);
 
 %% if "m7" in core
-	// enable instruction cache
+	// Enable instruction cache
 	SCB_EnableICache();
 %% endif
 
 %% if "f" in core
 	// Enable FPU in privileged and user mode
-	SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));  // set CP10 and CP11 Full Access
+	SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));
 %% endif
 
 %% if "m0" not in core
-	// Setup NVIC
-	// Set vector table
-	%% if vector_table_location == "ram"
-	SCB->VTOR = (uint32_t)(__vector_table_ram_start);
-	%% else
-	SCB->VTOR = (uint32_t)(__vector_table_rom_start);
-	%% endif
-	// Enables handlers with priority -1 or -2 to ignore data BusFaults caused by load and store instructions.
-	// This applies to the hard fault, NMI, and FAULTMASK escalated handlers.
-	// We use this to opportunistically restore LR, PC and xPSR in the hard fault handler.
-	// Also enables trapping of divide by zero. Otherwise it would just be ignored.
-	SCB->CCR |= SCB_CCR_BFHFNMIGN_Msk | SCB_CCR_DIV_0_TRP_Msk;
+	// Set the vector table location
+	SCB->VTOR = (uint32_t)__vector_table_{{ vector_table_location }}_start;
 
-	// Lower priority level for all peripheral interrupts to lowest possible
-	for (uint32_t i = 0; i < {{ highest_irq }}; i++) {
-		NVIC->IP[i] = 0xff;
-	}
-
-	// Set the PRIGROUP[10:8] bits to
-	// - 4 bits for pre-emption priority,
-	// - 0 bits for subpriority
-	NVIC_SetPriorityGrouping(3);
-
-	// Enable fault handlers
-	/*SCB->SHCSR |=
-			SCB_SHCSR_BUSFAULTENA_Msk |
-			SCB_SHCSR_USGFAULTENA_Msk |
-			SCB_SHCSR_MEMFAULTENA_Msk;*/
+	// Enable trapping of divide by zero for UDIV/SDIV instructions.
+	SCB->CCR |= SCB_CCR_DIV_0_TRP_Msk;
 %% endif
 
-	// Call all hardware initialize hooks.
-	for (FunctionPointer *init_hook = __hardware_init_start;
-			init_hook < __hardware_init_end;
-			init_hook++) {
-		(*init_hook)();
-	}
+	// Call all hardware initialize hooks
+	table_call(__hardware_init_start, __hardware_init_end);
 
-	// copy all external memory declared in linkerscript table
-	table_copy(	(uint32_t**)__table_copy_extern_start,
-				(uint32_t**)__table_copy_extern_end);
-	table_zero(	(uint32_t**)__table_zero_extern_start,
-				(uint32_t**)__table_zero_extern_end);
+	// Copy and zero all external memory
+	table_copy(__table_copy_extern_start, __table_copy_extern_end);
+	table_zero(__table_zero_extern_start, __table_zero_extern_end);
 
-	// initialize heap
-	// needs to be done before calling the CTORS of static objects
+	// Initialize heap as implemented by the heap option
+	extern void __modm_initialize_memory(void);
 	__modm_initialize_memory();
 
-	// Call CTORS of static objects
-	__libc_init_array();
+	// Call all constructors of static objects
+	table_call(__init_array_start, __init_array_end);
 
 	// Call the application's entry point
+	extern int main(void);
 	main();
 
+	// If main exits, assert here in debug mode
 	modm_assert_debug(0, "core", "main", "exit");
-	for (;;) {}
+
+	// Otherwise reboot
+	NVIC_SystemReset();
 }
