@@ -6,6 +6,7 @@
     <option name="modm:communication:xpcc:generator:container">sender receiver</option>
   </options>
   <modules>
+    <module>modm:architecture:delay</module>
     <module>modm:platform:core</module>
     <module>modm:communication:xpcc:generator</module>
     <module>modm:debug</module>

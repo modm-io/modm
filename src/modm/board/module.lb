@@ -15,6 +15,8 @@ def init(module):
     module.description = "Board Support Packages"
 
 def prepare(module, options):
+	# The modm_abandon function uses delay functions
+    module.depends(":architecture:delay")
     return True
 
 def build(env):

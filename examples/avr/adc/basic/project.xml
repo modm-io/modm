@@ -6,6 +6,7 @@
   </options>
   <modules>
     <module>modm:io</module>
+    <module>modm:architecture:delay</module>
     <module>modm:platform:adc</module>
     <module>modm:platform:clock</module>
     <module>modm:platform:core</module>

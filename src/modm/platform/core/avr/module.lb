@@ -20,14 +20,9 @@ def prepare(module, options):
         return False
 
     module.depends(
-        ":architecture:assert",
-        ":architecture:atomic",
-        ":architecture:clock",
-        ":architecture:memory",
-        ":architecture:delay",
-        ":architecture:accessor",
         ":architecture:interrupt",
-        ":architecture:unaligned",
+        ":architecture:assert",
+        ":architecture:memory",
         ":stdc++",
         )
 
@@ -61,21 +56,35 @@ def build(env):
     env.substitutions = properties
     env.outbasepath = "modm/src/modm/platform/core"
 
+    env.copy("main.hpp")
+    # dealing with C++
     env.copy("cxxabi.cpp")
+
+    # everything to do with dynamic memory
     env.copy("newdelete.cpp")
     env.copy("ram.hpp")
-    env.copy("main.hpp")
-    env.copy("assert.cpp")
-    env.copy("atomic_lock.hpp")
-    env.copy("unaligned.hpp")
-    env.copy("flash_reader.hpp")
-    env.copy("delay.hpp")
-
-    # modm-test implements the clock methods itself
-    if not env.has_module(":test:architecture"):
-        env.copy("clock.cpp")
-
     env.template("ram.cpp.in")
+
+    # dealing with runtime assertions
+    env.copy("assert.cpp")
+
+    if env.has_module(":architecture:atomic"):
+        env.copy("atomic_lock.hpp")
+
+    if env.has_module(":architecture:unaligned"):
+        env.copy("unaligned.hpp")
+
+    if env.has_module(":architecture:accessor"):
+        env.copy("flash_reader.hpp")
+
+    if env.has_module(":architecture:delay"):
+        env.copy("delay.hpp")
+
+    if env.has_module(":architecture:clock"):
+        # modm-test implements the clock methods itself
+        if not env.has_module(":test:architecture"):
+            env.copy("clock.cpp")
+
     env.template("interrupts.hpp.in")
 
     if "xmega" in driver["type"]:

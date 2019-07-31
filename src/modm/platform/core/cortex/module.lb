@@ -143,16 +143,9 @@ def prepare(module, options):
         return False
 
     module.depends(
-        ":architecture:accessor",
-        ":architecture:assert",
-        ":architecture:atomic",
-        ":architecture:clock",
-        ":architecture:delay",
-        ":architecture:heap",
         ":architecture:interrupt",
+        ":architecture:assert",
         ":architecture:memory",
-        ":architecture:unaligned",
-        ":architecture:build_id",
         ":platform:clock",
         ":cmsis:device")
 
@@ -167,7 +160,9 @@ def prepare(module, options):
             description=FileReader("option/allocator.md"),
             enumeration=["newlib", "block", "tlsf"],
             default="newlib",
-            dependencies=lambda value: ":tlsf" if value == "tlsf" else None))
+            dependencies=lambda v: {"newlib": None,
+                                    "block": ":architecture:heap",
+                                    "tlsf": ":tlsf"}[v]))
     module.add_option(
         NumericOption(
             name="main_stack_size",
@@ -260,9 +255,6 @@ def build(env):
     env.substitutions["with_fault_storage"] = env.has_module(":platform:fault")
     env.outbasepath = "modm/src/modm/platform/core"
 
-    # dealing with runtime assertions
-    env.copy("assert.cpp")
-
     # dealing with C++
     env.copy("cxxabi.cpp")
 
@@ -271,16 +263,22 @@ def build(env):
     env.template("vectors.c.in")
     env.copy("default_handler.sx")
 
+    # dealing with runtime assertions
+    env.copy("assert.cpp")
+
     # busy-waiting delays
-    env.template("delay.cpp.in")
-    env.copy("delay.hpp")
+    if env.has_module(":architecture:delay"):
+        env.template("delay.cpp.in")
+        env.copy("delay.hpp")
 
     # GNU Build ID
-    env.copy("build_id.cpp")
+    if env.has_module(":architecture:build_id"):
+        env.copy("build_id.cpp")
 
-    # modm-test implements the clock methods itself
-    if not env.has_module(":test:architecture"):
-        env.copy("clock.cpp")
+    if env.has_module(":architecture:clock"):
+        # modm-test implements the clock methods itself
+        if not env.has_module(":test:architecture"):
+            env.copy("clock.cpp")
 
     env.template("heap_table.cpp.in")
     env.template("heap_table.hpp.in")
@@ -292,7 +290,11 @@ def build(env):
     elif env["allocator"] == "block":
         env.copy("heap_block_allocator.cpp")
 
-    env.copy("atomic_lock.hpp")
-    env.template("unaligned.hpp.in")
-    env.copy("flash_reader.hpp")
+    if env.has_module(":architecture:atomic"):
+        env.copy("atomic_lock.hpp")
 
+    if env.has_module(":architecture:accessor"):
+        env.copy("flash_reader.hpp")
+
+    if env.has_module(":architecture:unaligned"):
+        env.template("unaligned.hpp.in")

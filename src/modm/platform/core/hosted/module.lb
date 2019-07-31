@@ -16,42 +16,42 @@ def init(module):
     module.description = "Hosted Core"
 
 def prepare(module, options):
-    device = options[":target"]
-    target = device.identifier
-    if target["platform"] != "hosted":
+    if options[":target"].identifier.platform != "hosted":
         return False
 
     module.depends(
-        ":architecture:accessor",
         ":architecture:assert",
-        ":architecture:atomic",
-        ":architecture:clock",
-        ":architecture:delay",
         ":architecture:memory",
-        ":architecture:unaligned",
         ":debug")
 
     return True
 
 def build(env):
-    device = env[":target"]
-    properties = device.properties
-    properties["target"] = target = device.identifier
-    properties["driver"] = device.get_driver("core")
-
-    env.substitutions = properties
+    target = env[":target"].identifier
+    env.substitutions = {"target": target}
     env.outbasepath = "modm/src/modm/platform/core"
 
     env.copy("memory.cpp")
-    env.copy("atomic_lock.hpp")
-    env.copy("../avr/unaligned.hpp", "unaligned.hpp")
-    env.copy("../cortex/flash_reader.hpp", "flash_reader.hpp")
 
-    if not env.has_module(":test"):
-        env.template("clock.cpp.in")
-    env.template("delay.hpp.in")
-    env.template("assert.cpp.in")
+    if env.has_module(":architecture:atomic"):
+        env.copy("atomic_lock.hpp")
 
-    if target["family"] in ["windows"]:
-        env.log.warning("Delay functions are not implemented!")
-        env.log.warning("Assertions are not implemented!")
+    if env.has_module(":architecture:unaligned"):
+        env.copy("../avr/unaligned.hpp", "unaligned.hpp")
+
+    if env.has_module(":architecture:accessor"):
+        env.copy("../cortex/flash_reader.hpp", "flash_reader.hpp")
+
+    if env.has_module(":architecture:clock"):
+        # modm-test implements the clock methods itself
+        if not env.has_module(":test:architecture"):
+            env.template("clock.cpp.in")
+
+    if target.family == "windows":
+        env.log.error("Assertions are not implemented!")
+        if env.has_module(":architecture:delay"):
+            env.log.error("Delay functions are not implemented!")
+    else:
+        env.template("assert.cpp.in")
+        if env.has_module(":architecture:delay"):
+            env.template("delay.hpp.in")

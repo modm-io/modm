@@ -4,6 +4,7 @@
     <option name="modm:build:build.path">../../../build/generic/resumable</option>
   </options>
   <modules>
+    <module>modm:architecture:delay</module>
     <module>modm:processing:protothread</module>
     <module>modm:processing:resumable</module>
     <module>modm:processing:timer</module>

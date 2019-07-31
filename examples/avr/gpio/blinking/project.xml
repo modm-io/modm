@@ -5,6 +5,7 @@
     <option name="modm:build:build.path">../../../../build/avr/gpio/blinking</option>
   </options>
   <modules>
+    <module>modm:architecture:delay</module>
     <module>modm:platform:core</module>
     <module>modm:platform:gpio</module>
     <module>modm:build:scons</module>

@@ -4,7 +4,7 @@
     <option name=":build:build.path">../../../build/nucleo_f042k6/adc</option>
   </options>
   <modules>
-    <module>:build:scons</module>
-    <module>:platform:adc</module>
+    <module>modm:build:scons</module>
+    <module>modm:platform:adc</module>
   </modules>
 </library>

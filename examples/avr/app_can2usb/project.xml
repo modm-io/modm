@@ -5,6 +5,7 @@
     <option name="modm:build:build.path">../../../build/avr/app_can2usb</option>
   </options>
   <modules>
+    <module>modm:architecture:delay</module>
     <module>modm:debug</module>
     <module>modm:driver:ft245</module>
     <module>modm:platform:core</module>

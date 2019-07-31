@@ -4,6 +4,7 @@
     <option name="modm:build:build.path">../../../build/zmq/2_zmq_gateway</option>
   </options>
   <modules>
+    <module>modm:architecture:delay</module>
     <module>modm:communication:xpcc</module>
     <module>modm:debug</module>
     <module>modm:platform:canusb</module>
