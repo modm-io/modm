@@ -7,6 +7,7 @@
     <module>modm:architecture:memory</module>
     <module>modm:processing:timer</module>
     <module>modm:processing:resumable</module>
+    <module>modm:platform:random</module>
     <module>modm:build:scons</module>
   </modules>
 </library>

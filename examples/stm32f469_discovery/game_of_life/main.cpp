@@ -250,8 +250,9 @@ static inline void evolve(framebuffer_t before, framebuffer_t next)
 static inline void init(framebuffer_t *buffers)
 {
 	for_xy(bw, bh) {
-		int ra = rand();
-		if (ra < RAND_MAX / 10) {
+		while(not RandomNumberGenerator::isReady()) ;
+		const uint32_t ra = RandomNumberGenerator::getValue();
+		if (ra < uint32_t(-1) / 8) {
 			buffers[0][y][x] = TRAIL_BIRTH(uint8_t(ra) % MAX_PALETTES);
 		} else {
 			buffers[0][y][x] = 0;
@@ -265,6 +266,7 @@ void game_of_life()
 	// for raw performance we draw to our own buffer without modm::ui::GraphicDisplay!
 	displayBuffer = new (modm::MemoryExternal) uint16_t[800*480];
 	Board::setDisplayBuffer((void *) displayBuffer);
+	RandomNumberGenerator::enable();
 
 	// overallocating two rows and two coloums to make it possible
 	// to count neighbours without bounds checking!
@@ -279,16 +281,20 @@ void game_of_life()
 
 	// 30 Hz max refresh rate, or lower
 	modm::PeriodicTimer timer(33);
+	// Reseed after a few minutes
+	modm::PeriodicTimer reseed(60'000 * 3);
 	bool touch_read = false;
+	init(framebuffers);
 
 	while (true)
 	{
 		// generate random input by pressing the button
-		if (Button::read()) {
+		if (Button::read() or reseed.execute()) {
 			init(framebuffers);
 			evolve(framebuffers[0], framebuffers[1]);
 			while(Button::read())
 				modm::delayMilliseconds(10);
+			reseed.restart();
 		}
 		// read touch sensor during frame rate delay
 		do {
