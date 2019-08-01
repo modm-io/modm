@@ -63,6 +63,12 @@ extern "C"
 	}
 
 	extern void * malloc_tr(size_t, uint32_t);
+
+	extern void _exit(int);
+	void _exit(int status)
+	{
+		modm_assert(false, "core", "libc", "exit", status);
+	}
 }
 
 // ----------------------------------------------------------------------------
