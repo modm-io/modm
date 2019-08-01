@@ -1,0 +1,75 @@
+# {{module.name}}{% if module.title %}: {{module.title}}{% endif %}
+
+{{module.description}}
+
+%% if module.targets | length
+*Module only available for {{module.targets}}.*
+%% endif
+
+%% if module.options | length
+## Options
+%% for o in module.options
+#### {{o.name | replace(module.name + ":", "")}}
+
+{{o.description}}
+
+%% if o.targets | length
+*Option only available for {{o.targets}}.*
+
+%% endif
+
+%% for value, targets in o.default.items() | sort
+Default: `{{value}}`{% if targets | length %} *{{targets}}*{% endif %}  
+%% endfor
+%% for input, targets in o.inputs.items() | sort
+Inputs: `[{{input}}]`{% if targets | length %} *{{targets}}*{% endif %}  
+%% endfor
+%% for dependency, targets in o.dependencies.items() | sort
+Input Dependency: `{{dependency}}`{% if targets | length %} *{{targets}}*{% endif %}  
+%% endfor
+
+%% endfor
+%% endif
+
+%% if module.collectors | length
+## Collectors
+%% for c in module.collectors
+#### {{c.name | replace(module.name + ":", "")}}
+
+{{c.description}}
+
+%% if c.targets | length
+*Collector only available for {{c.targets}}.*
+
+%% endif
+
+%% for input, targets in c.inputs.items() | sort
+Inputs: `[{{input}}]`{% if targets | length %} *{{targets}}*{% endif %}
+%% endfor
+
+%% endfor
+%% endif
+
+%% if module.queries | length
+## Queries
+%% for q in module.queries
+#### {{q.name | replace(module.name + ":", "")}}
+
+{{q.description}}
+
+%% if q.targets | length
+*Query only available for {{q.targets}}.*
+%% endif
+
+%% endfor
+%% endif
+
+%% if (module.dependencies | length)
+## Dependencies
+
+{{module.graph}}
+%% endif
+
+%% if module.is_limited
+!!! warning "Limited availability: Check with 'lbuild discover' if this module is available for your target!"
+%% endif

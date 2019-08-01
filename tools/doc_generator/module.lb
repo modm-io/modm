@@ -24,79 +24,6 @@ from pathlib import Path
 from collections import defaultdict, OrderedDict
 import lbuild
 
-def cleanHtml(docstr):
-    descr = docstr.decode("utf-8")
-    descr = re.sub(r"<programlisting>", "\n\n```cpp\n", descr)
-    descr = re.sub(r"</programlisting>", "\n```\n\n", descr)
-    descr = re.sub(r"</?computeroutput>", "`", descr)
-    descr = re.sub(r"<parametername>", "1. `", descr)
-    descr = re.sub(r"</parametername>", "`", descr)
-    descr = re.sub(r"<parameterdescription>\n", "  ", descr)
-    descr = re.sub(r"<(/?para|sp/)>", " ", descr)
-    descr = re.sub(r"(<simplesect>.*?</simplesect>|<.*?>)", "", descr)
-    descr = re.sub(r"&lt;", "<", descr)
-    descr = re.sub(r"&gt;", ">", descr)
-    return descr.strip(" ")
-
-def getText(obj, tag):
-    otag = obj.find(tag)
-    if otag is not None:
-        if len(otag):
-            descr = etree.tostring(otag)
-            return cleanHtml(descr)
-        if otag.text is not None:
-            return otag.text
-    return ""
-
-class RObject:
-    def __init__(self, obj):
-        self._obj = obj
-        self.kind = obj.get("kind")
-
-        if self.kind in ["class", "struct"]:
-            self.signature = "{} {}".format(self.kind, getText(obj, "compoundname"))
-            templargs = obj.find("templateparamlist")
-            if templargs is not None and "<" not in self.signature:
-                args = []
-                for p in templargs:
-                    # print(etree.tostring(p, pretty_print=True))
-                    arg = "{} {}".format(getText(p, "type"), getText(p, "defname"))
-                    defval = getText(p, "defval")
-                    if len(defval):
-                        arg += "={}".format(defval)
-                    args.append(arg)
-                self.signature = "{}< {} >".format(self.signature, ", ".join(args))
-            self.signature += ";"
-
-        elif self.kind in ["function", "typedef"]:
-            self.signature = "{}{};".format(getText(obj, "definition"), getText(obj, "argsstring"))
-
-        elif self.kind in ["enum"]:
-            self.signature = "enum{} {};".format(" class" if obj.get("strong") == "yes" else "", getText(obj, "name"))
-
-        elif self.kind in ["define"]:
-            self.signature = "#define " + getText(obj, "name")
-            params = obj.xpath(".//param/defname/text()")
-            if len(params):
-                self.signature += "({})".format(", ".join(params))
-
-        elif self.kind in ["variable"]:
-            self.signature = "{} {};".format(getText(obj, "definition"), getText(obj, "initializer"))
-
-        else:
-            raise Exception()
-
-        self.signature = self.signature \
-                            .replace("\n", "") \
-                            .replace("&lt;", "<") \
-                            .replace("&gt;", "<") \
-                            .replace("&amp;", "&") \
-                            .strip(" ")
-
-    def render(self):
-        return self.signature
-
-
 def _name(name, replace):
     new_name = ""
     for c in name:
@@ -142,17 +69,14 @@ def init(module):
     module.description = FileReader("module.md")
 
 def prepare(module, options):
-    module.add_option(BooleanOption(name="generate_module_docs",
-                                    description="Generate the module docs (alpha)",
-                                    default=False))
-    module.add_option(BooleanOption(name="generate_module_docs_as_qch",
-                                    description="Generate the module docs as qch (Qt Help format) (alpha)",
+    module.add_option(BooleanOption(name="enable_qch",
+                                    description="Generate the Doxygen docs as Qt Help format (qch)",
                                     default=False))
     return True
 
 def build(env):
     env.outbasepath = "modm/docs"
-    env.substitutions = {"xml": env["generate_module_docs"], "qch": env["generate_module_docs_as_qch"]}
+    env.substitutions = {"xml": False, "qch": env["enable_qch"]}
     env.template("doxyfile.cfg.in")
     env.copy(repopath("README.md"), "README.md")
 
@@ -172,174 +96,20 @@ def post_build(env, buildlog):
                   "description": descr,
                   "pref": ref_name(m.parent.fullname),
                   "ref": ref_name(m.fullname),
-                  "dependencies": sorted([d.fullname for d in m.dependencies]),
-                  "options": [], "collectors": [], "queries": []}
+                  "options": []}
         for o in m.options:
             title, descr = split_description(o._description)
-            oprops = {"name": o.fullname,
-                      "title": title,
-                      "description": descr,
-                      "default": str(o._default) if o._default is not None else None,
-                      "possibles": o.format_values()}
-            mprops["options"].append(oprops)
-        for c in m.collectors:
-            title, descr = split_description(c._description)
-            cprops = {"name": c.fullname,
-                      "title": title,
-                      "description": descr,
-                      "type": c.format_values()}
-            mprops["collectors"].append(cprops)
-        mprops["collectors"].sort(key=lambda c: c["name"])
-        for q in m.queries:
-            qprops = {"name": q.fullname,
-                      "description": q._description}
-            mprops["queries"].append(qprops)
-        mprops["queries"].sort(key=lambda c: c["name"])
+            value = lbuild.format.format_option_value_description(o, single_line=False)
+            mprops["options"].append({
+                "name": o.fullname,
+                "title": title,
+                "description": descr,
+                "value": value
+            })
         modules.append(mprops)
-
-    for m in modules:
-        m["dependents"] = []
-        for d in modules:
-            if m["name"] in d["dependencies"]:
-                m["dependents"].append(d["name"])
-        m["dependents"].sort()
 
     env.log.debug("Generating doxygen group documentation...")
     env.outbasepath = "modm/docs/dox"
     for m in modules:
         env.substitutions = {"module": m}
         env.template("group.dox.in", "{}.dox".format(url_name(m["name"])), filters={"doxify": doxify})
-
-
-
-
-
-
-    # INTERNAL DOCUMENTATION GENERATOR
-    if not env["generate_module_docs"]:
-        return
-
-    env.log.debug("Building module dependency graph...")
-    import graphviz as gv
-    for m in modules:
-        graph = gv.Digraph(name=m["name"],
-                           format="svg",
-                           graph_attr={"rankdir": "BT"},
-                           node_attr={"style": "filled,solid", "shape": "box"})
-        graph.node(ref_name(m["name"]), node_name(m["name"]), style="filled,bold")
-
-        for mod in (m["dependencies"] + m["dependents"]):
-            graph.node(ref_name(mod), node_name(mod), URL=("../" + url_name(mod)))
-        for mod in m["dependencies"]:
-            graph.edge(ref_name(m["name"]), ref_name(mod))
-        for mod in m["dependents"]:
-            graph.edge(ref_name(mod), ref_name(m["name"]))
-
-        m["graph"] = graph.pipe().decode("utf-8")
-
-    build_dir = Path(env.outpath("modm/docs", basepath="."))
-    env.log.info("Running doxygen may take a minute or two...")
-    subprocess.check_call("doxygen doxyfile.cfg", cwd=build_dir, shell=True)
-
-    env.log.info("Parse doxygen")
-    doxobjs = defaultdict(list)
-    for compound in etree.parse(str(build_dir / "xml/index.xml")).xpath('//compound'):
-        tree = etree.parse(str(build_dir / "xml/{}.xml".format(compound.get("refid"))))
-        for obj in tree.xpath("//compounddef"):
-            kind = obj.get("kind")
-            if kind in ["dir", "group", "page"]: continue;
-
-            name = obj.find("compoundname").text
-            location = obj.find("location").get("file")
-
-            if kind in ["struct", "class"]:
-                doxobjs[location].append(obj)
-                continue
-
-            for member in obj.xpath("//memberdef"):
-                kind = member.get("kind")
-                name = member.find("name").text
-                location = member.find("location").get("file")
-                doxobjs[location].append(member)
-
-
-    env.outbasepath = "modm/docs"
-    modtable = []
-    for m in modules:
-        env.log.info("Render {}".format(m["name"]))
-        outfiles = [os.path.abspath(op.filename_out) for op in buildlog.get_operations_per_module(m["name"])]
-        outfiles = [o for o in outfiles if (o.endswith(".hpp") and not o.endswith("_impl.hpp"))]
-        tmpobjects = OrderedDict({"class": [], "struct": [], "function": [], "enum": [], "variable": [], "typedef": [], "define": []})
-        for of in outfiles:
-            if of not in doxobjs:
-                env.log.warning("Not documented: {}".format(os.path.relpath(of)))
-                continue
-
-            for obj in doxobjs[of]:
-                try:
-                    robj = RObject(obj)
-                    # print(robj.render())
-                    tmpobjects[robj.kind].append(robj.render())
-                except:
-                    traceback.print_exc()
-                    print(etree.tostring(obj, pretty_print=True).decode('utf-8'))
-                    return
-
-        objects = OrderedDict()
-        for kind, values in tmpobjects.items():
-            if not len(values): continue;
-            objects[kind] = sorted(values)
-
-        env.substitutions = {"module": m, "objects": objects}
-        env.template("module.md.in", "module/{}.md".format(url_name(m["name"])))
-        modtable.append("      - {}: reference/module/{}.md".format(m["name"], url_name(m["name"])))
-
-    config_path = Path(repopath("docs/mkdocs.yml"))
-    modtable = "\n".join(modtable)
-    config = config_path.read_text()
-    if extract(config, "moduletable") != modtable:
-        config = replace(config, "moduletable", modtable)
-        config_path.write_text(config)
-
-    # kinds:
-    #   - author
-    #   - class
-    #   - define
-    #   - dir
-    #   - enum
-    #   - file
-    #   - friend
-    #   - func
-    #   - function
-    #   - group
-    #   - namespace
-    #   - note
-    #   - page
-    #   - param
-    #   - private-attrib
-    #   - private-func
-    #   - private-static-attrib
-    #   - private-static-func
-    #   - private-type
-    #   - protected-attrib
-    #   - protected-func
-    #   - protected-static-attrib
-    #   - protected-static-func
-    #   - protected-type
-    #   - public-attrib
-    #   - public-func
-    #   - public-static-attrib
-    #   - public-static-func
-    #   - public-type
-    #   - return
-    #   - retval
-    #   - see
-    #   - struct
-    #   - templateparam
-    #   - typedef
-    #   - user-defined
-    #   - var
-    #   - variable
-    #   - warning
-
-    lbuild.format.PLAIN = lbuild_plain

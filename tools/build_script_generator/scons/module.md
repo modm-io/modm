@@ -473,3 +473,4 @@ can be accessed as `#include <image.hpp>`.
 
 [scons]: http://scons.org
 [scons_tools]: https://github.com/modm-io/scons-build-tools
+[bmp]: https://github.com/blacksphere/blackmagic

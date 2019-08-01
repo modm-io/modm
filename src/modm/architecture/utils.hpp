@@ -64,6 +64,9 @@
 	/// Specifies that a variable (or function) lives in a particular section.
 	#define modm_section(s)
 
+	/// Marks a declaration as deprecated and displays a message.
+	#define modm_deprecated(msg)
+
 	/// Specifies that a function is placed in fastest executable memory.
 	/// @note This is not always SRAM, since Flash accelerators can be faster.
 	#define modm_fastcode

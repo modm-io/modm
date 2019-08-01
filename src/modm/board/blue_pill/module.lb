@@ -38,7 +38,7 @@ source [find interface/stlink-v2.cfg]
 #set CPUTAPID 0x2ba01477
 
 # To select a specific programmer you can specify its serial number
-#hla_serial "\x53\x3f\x6f\x06\x50\x77\x50\x57\x12\x17\x13\x3f"
+#hla_serial "\\x53\\x3f\\x6f\\x06\\x50\\x77\\x50\\x57\\x12\\x17\\x13\\x3f"
 # You can discover the serial via `stlink --hla-serial` or `st-info --hla-serial`.
 ```
 

@@ -23,6 +23,7 @@
 	%% set loop = 3
 %% endif
 
+%# FIXME: Move out of this modules, maybe remove completely
 %# TODO: These numbers were measured from a few example applications.
 %#       A statistical analysis of the average overhead cycles is required!
 %% if partname.startswith("stm32f4")

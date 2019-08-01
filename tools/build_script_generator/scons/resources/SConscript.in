@@ -71,9 +71,9 @@ env.Append(LINKFLAGS="$ARCHFLAGS")
 env["_LIBFLAGS"] = "-Wl,--start-group " + env["_LIBFLAGS"] + " -Wl,--end-group"
 %% endif
 %% if platform != "hosted"
-# We need to link libmodm.a with --whole-archive, so that all weak symbols are visible to the linker.
-# Functions placed in a linker section list (like modm_section(".hardware_init")) are typically not
-# referenced externally, so the linker will discard them when searching.
+# We need to link libmodm.a with --whole-archive, so that all weak symbols are
+# visible to the linker. Functions placed in a linker section list are typically
+# not referenced externally, so the linker will discard them when searching.
 # From https://sourceware.org/binutils/docs/ld/Options.html#Options:
 #     For each archive mentioned on the command line after the --whole-archive option, include every object
 #     file in the archive in the link, rather than searching the archive for the required object files.

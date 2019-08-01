@@ -8,10 +8,10 @@ with modm:
 - [Library Builder][lbuild]
 - AVR toolchain: [avr-gcc][] and [avrdude][]
 - ARM toolchain: [gcc-arm-toolchain][] and [OpenOCD][].
-- [Doxygen](http://www.stack.nl/~dimitri/doxygen)
+- [Doxygen](http://www.doxygen.nl)
 
 Note that the modm examples use the SCons build system by default, however,
-you are not *required* to use it. See [the reference manual](../reference) for
+you are not *required* to use it. See [the reference manual](../../reference/build-systems) for
 additional build system documentation.
 
 !!! info "Use GCC 7 or newer"
@@ -50,13 +50,14 @@ well:
 
 scons now works with Python 3. Unfortunately, macOS still defaults to Python 2.
 For a less intrusive way to run all scons scripts with Python 3 add this to your
-~/.bashrc or ~/.zshrc
+`.bashrc` or `.zshrc`:
 
 	alias scons="/usr/bin/env python3 $(which scons)"
 
-To compile modm for macOS you need to install these libraries:
+To compile modm *for macOS* (and not the embedded target) you need to install
+some of these libraries as well, depending on what modm modules you use:
 
-	brew install boost gtkmm sdl zmqpp gcc
+	brew install boost zmqpp gcc
 
 
 ## Linux
@@ -65,11 +66,11 @@ For Ubuntu 18.04LTS, these commands install the basic build system:
 
 	sudo apt-get install python3 python3-pip scons git
 	sudo apt-get --no-install-recommends install doxygen
-	pip3 install --user modm
+	pip3 install modm
 
 scons now works with Python 3. Unfortunately, Ubuntu still defaults to Python 2.
 For a less intrusive way to run all scons scripts with Python 3 add this to your
-~/.bashrc or ~/.zshrc
+`.bashrc` or `.zshrc`:
 
 	alias scons="/usr/bin/env python3 $(which scons)"
 
@@ -78,26 +79,19 @@ Install the AVR toochain:
 	sudo apt-get install gcc-avr binutils-avr avr-libc avrdude
 
 !!! bug "avr-gcc on Ubuntu"
-	Ubuntu does not provide a more recent avr-gcc than v4.9, which does not
-	support C++17 (not even C++14). For our CI we've created a [precompiled
-	version of avr-gcc 7 for Ubuntu](https://github.com/salkinium/docker-avr-gcc-7).
+	Ubuntu does not provide an up-to-date version of avr-gcc that supports C++17.
+	For our CI we've created a [precompiled version of avr-gcc for Ubuntu][avr-gcc-latest].
 	Use at your own risk.
 
-And the official ARM toolchain as well:
+Install the ARM toochain by downloading [the pre-built version][gcc-arm-toolchain]
+for 64-bit Linux and adding its `/bin` directory to your path.
+Even though your distribution may ship their own ARM toolchain, we *very strongly
+recommend* using the official toolchain, since all of modm is tested with it.
 
-	sudo add-apt-repository ppa:team-gcc-arm-embedded/ppa
-	sudo apt-get update
-	sudo apt-get install gcc-arm-embedded openocd
+To compile modm *for Linux* (and not the embedded target) you need to install
+some of these libraries as well, depending on what modm modules you use:
 
-!!! tip "Manual installation on 64-bit Linux"
-	You can also download [a precompiled version of the toolchain for 64-bit
-	Linux][gcc-arm-toolchain] and manually add the `/bin` directory to your path.
-	Use this if your distro does not provide you with an up-to-date ARM toolchain.
-
-To compile modm for Linux you need to install these packages:
-
-	sudo apt-get install gcc build-essential libboost-all-dev libzmqpp-dev \
-						 libsdl1.2-dev libsdl-image1.2-dev libgtkmm-2.4-dev
+	sudo apt-get install gcc build-essential libboost-all-dev libzmqpp-dev
 
 
 ## Windows
@@ -130,3 +124,4 @@ You'll need to add both `/bin` paths to your `PATH` variable manually.
 [avr-gcc]: http://www.nongnu.org/avr-libc
 [avrdude]: http://www.nongnu.org/avrdude
 [lbuild]: https://github.com/modm-io/lbuild
+[avr-gcc-latest]: https://github.com/salkinium/docker-avr-gcc/releases

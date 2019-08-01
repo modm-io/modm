@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:pat9125el"
-    module.description = "Driver for PAT9125EL motion sensor"
+    module.description = "PAT9125EL Motion Sensor"
 
 def prepare(module, options):
     module.depends(

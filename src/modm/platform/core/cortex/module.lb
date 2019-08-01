@@ -19,10 +19,11 @@ def common_vector_table_location(env):
 def common_vector_table(env):
     """
     Computes vector table properties:
-      - vector_table: [position] = Full vector name (ie. *with* _Handler or _IRQHandler suffix)
-      - vector_table_location: rom or ram
-      - highest_irq: highest IRQ number + 1
-      - core: cortex-m{0,3,4,7}{,+,f,fd}
+
+      - `vector_table`: [position] = Full vector name (ie. *with* `_Handler` or `_IRQHandler` suffix)
+      - `vector_table_location`: rom or ram
+      - `highest_irq`: highest IRQ number + 1
+      - `core`: cortex-m{0,3,4,7}{,+,f,fd}
 
     The system vectors start at -16, so you must add 16 to `highest_irq` to get
     the total number of vectors in the table!
@@ -66,8 +67,9 @@ def common_vector_table(env):
 def common_memories(env):
     """
     Computes memory properties:
-      - memories: unfiltered memory regions
-      - regions: memory region names
+
+      - `memories`: unfiltered memory regions
+      - `regions`: memory region names
 
     :returns: dictionary of memory properties
     """
@@ -93,22 +95,26 @@ def common_memories(env):
 
 def common_linkerscript(env):
     """
-    Computes linkerscript properties *post-build*:
-      - process_stack_size: largest requested process stack size by any module
-      - vector_table_location: ram or rom
+    Computes linkerscript properties
+    (\\* *post-build only*):
+
+      - `process_stack_size`: largest requested process stack size by any module
+      - `vector_table_location`: ram or rom
 
     Stripped and newline-joined collector values of:
-      - linkerscript_memory
-      - linkerscript_sections
-      - linkerscript_extern_zero
-      - linkerscript_extern_copy
-      - linkerscript_extern_heap
+
+      - `linkerscript_memory`
+      - `linkerscript_sections`
+      - `linkerscript_extern_zero`
+      - `linkerscript_extern_copy`
+      - `linkerscript_extern_heap`
 
     Additional memory properties:
-      - memories: unfiltered memory regions
-      - regions: memory region names
-      - ram_origin: Lowest SRAM origin address
-      - ram_origin: Total size of all SRAM regions
+
+      - `memories`: unfiltered memory regions
+      - `regions`: memory region names
+      - `ram_origin`: Lowest SRAM origin address
+      - `ram_origin`: Total size of all SRAM regions
 
     :returns: dictionary of linkerscript properties
     """
@@ -185,12 +191,9 @@ def prepare(module, options):
     module.add_option(
         NumericOption(
             name="linkerscript.flash_offset",
-            description="Add an offset to the default start address of the "
-                        "flash memory. This might be required for bootloaders "
-                        "located there. WARNING: Not all offsets are compatible with "
-                        "the vector table relocation.",
+            description=FileReader("option/flash_offset.md"),
             minimum=0,
-            maximum=flash_size,
+            maximum=hex(flash_size),
             default=0))
 
     module.add_collector(
@@ -216,7 +219,8 @@ def prepare(module, options):
     module.add_collector(
         NumericCollector(
             name="linkerscript.process_stack_size",
-            description="Maximum required size of the process stack"))
+            description="Maximum required size of the process stack",
+            minimum=0))
 
     module.add_query(
         EnvironmentQuery(name="vector_table", factory=common_vector_table))
@@ -296,3 +300,4 @@ def build(env):
 
     if env.has_module(":architecture:unaligned"):
         env.template("unaligned.hpp.in")
+

@@ -170,5 +170,5 @@ Delay_t::reset(control);
 uint8_t delay = Delay_t::get(control);
 ```
 
-See [Typesafe Register Access in C++](http://blog.modm.io/2015/02/25/typesafe-register-access-in-c++)
+See [Typesafe Register Access in C++](https://blog.salkinium.com/typesafe-register-access-in-c++/)
 for a more detailed background on this implementation.

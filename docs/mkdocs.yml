@@ -72,9 +72,10 @@ nav:
     - Getting Started: guide/getting-started.md
     - Installation: guide/installation.md
     # - Qt Creator: guide/qtcreator.md
-    - Cookbook: guide/cookbook.md
+    # - Cookbook: guide/cookbook.md
     - Testing: guide/testing.md
   - Reference:
+    - Documentation: reference/documentation.md
     - Build Systems: reference/build-systems.md
     # - Overview: reference/overview.md
     # - Concepts: reference/concepts.md

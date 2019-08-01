@@ -17,7 +17,7 @@ def init(module):
 # ITG3200 Digital Gyroscope
 
 For further information on the special sensing functions, consult the
-[datasheet](http://invensense.com/mems/gyro/documents/PS-ITG-3200-00-01.4.pdf).
+[product homepage](https://www.invensense.com/products/motion-tracking/3-axis/itg-3200/).
 """
 
 def prepare(module, options):
