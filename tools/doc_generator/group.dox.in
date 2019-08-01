@@ -7,4 +7,17 @@
 
 {{ module.description | doxify }}
 
+
+%% if module.options | length
+## Module Options
+
+%% for o in module.options
+### {{ o.name }}: {{ o.title }}
+
+{{ o.description | doxify }}
+
+Generated with: `{{ o.value }}`
+%% endfor
+%% endif
+
  */

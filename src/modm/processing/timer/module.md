@@ -52,6 +52,8 @@ Stopped:         \____________________/            \_________________________...
 Handle:   ___________________/ \_______________________________/ \___________...
 
 Remaining:   0  |   +   |      -      |     0      |     +     |   -
+
+     time ——————>
 ```
 
 The default constructor initializes the timeout in the `Stopped` state,
@@ -80,6 +82,7 @@ negative after expiration. This means `Clock::now() + Timeout::remaining()`
 will yield the timestamp of the expiration.
 If the timeout is stopped, `remaining()` returns zero.
 
+
 ## Periodic Timers
 
 The `modm::GenericPeriodicTimer` class allows for periodic code execution.
@@ -105,34 +108,34 @@ Stopped:  ______________________________________________________________/  ...
 Handle:   __________/ \___________________/ \_____________/ \_______/ \____...
 
 Remaining:     +    |0|   +   |     -     |0|  +  | -|  + |0| +| -  |0|+| 0
+
+     time ——————>
 ```
- *
- * If you want to execute code once per period interval, poll the
- * `execute()` method, which returns `true` exactly once after expiration.
- *
- * @code
- * if (timer.execute())
- * {
- *     // periodically called once
- *     Led::toggle();
- * }
- * @endcode
- *
- * Be aware, however, that since this method is polled, it cannot execute
- * exactly at the time of expiration, but some time after expiration, as
- * indicated in the above waveform graph.
- * If one or several periods are missed when polling `execute()`, these
- * code executions are discarded and will not be caught up.
- * Instead, `execute()` returns `true` once and then reschedules itself
- * for the next period, without any period skewing.
- *
- * @warning	Never use this class when a precise timebase is needed!
- *
- * Notice, that the `PeriodicTimerState::Expired` is reset to
- * `PeriodicTimerState::Armed` only after `execute()` has returned `true`.
- * This is different to the behavior of GenericTimeout, where calls to
- * `GenericTimeout::execute()` have no impact on class state.
- *
- * The `remaining()` time until period expiration is signed positive before,
- * and negative after period expiration until `execute()` is called.
- * If the timer is stopped, `remaining()` returns zero.
+
+If you want to execute code once per period interval, poll the
+`execute()` method, which returns `true` exactly once after expiration.
+
+```cpp
+if (timer.execute())
+{
+    // periodically called once
+    Led::toggle();
+}
+```
+
+Be aware, however, that since this method is polled, it cannot execute
+exactly at the time of expiration, but some time after expiration, as
+indicated in the above waveform graph.
+If one or several periods are missed when polling `execute()`, these
+code executions are discarded and will not be caught up.
+Instead, `execute()` returns `true` once and then reschedules itself
+for the next period, without any period skewing.
+
+Notice, that the `PeriodicTimerState::Expired` is reset to
+`PeriodicTimerState::Armed` only after `execute()` has returned `true`.
+This is different to the behavior of GenericTimeout, where calls to
+`GenericTimeout::execute()` have no impact on class state.
+
+The `remaining()` time until period expiration is signed positive before,
+and negative after period expiration until `execute()` is called.
+If the timer is stopped, `remaining()` returns zero.

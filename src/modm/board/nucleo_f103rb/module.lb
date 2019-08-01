@@ -16,8 +16,7 @@ def init(module):
     module.description = """\
 # NUCLEO-F103RB
 
-Nucleo kit for STM32F103RB
-http://www.st.com/en/evaluation-tools/nucleo-f103rb.html
+[Nucleo kit for STM32F103RB](https://www.st.com/en/evaluation-tools/nucleo-f103rb.html)
 """
 
 def prepare(module, options):

@@ -16,9 +16,12 @@ from collections import defaultdict
 import argparse
 
 author_handles = {
+    "Amar": "fb39ca4",
+    "Amarok McLion": "amarokmclion",
     "Andre Gilerson": "AndreGilerson",
     "Antal Szabó": "Sh4rK",
     "Arjun Sarin": None,
+    "Benjamin Weps": "nesos",
     "Carl Treudler": "cajt",
     "Christian Menard": "chrism333",
     "Christoph Rüdi": None,
@@ -28,8 +31,10 @@ author_handles = {
     "Fabian Greif": "dergraaf",
     "Georgi Grinshpun": "georgi-g",
     "Hans Schily": "RzwoDzwo",
+    "Jörg Hoffmann": "19joho66",
     "Julia Gutheil": None,
     "Kevin Läufer": "ekiwi",
+    "Linas Nikiperavicius": "linasnikis",
     "Lucas Mösch": "lmoesch",
     "Marten Junga": "Maju-Ketchup",
     "Martin Esser": "Scabber",
@@ -38,11 +43,18 @@ author_handles = {
     "Nick Sarten": "genbattle",
     "Niclas Rohrer": None,
     "Niklas Hauser": "salkinium",
+    "Niklas Meyer": "Zweistein885",
+    "Thomas Figueroa": "OperativeF",
+    "Zawadniak Pedro": "PDR5",
+    "Patrick Servello": "patrick--",
     "Raphael Lehmann": "rleh",
     "Sascha Schade": "strongly-typed",
+    "Sebastian Birke": "se-bi",
+    "Sergiy Yevtushenko": "siy",
     "Tarik TIRE": "7Kronos",
     "Thorsten Lajewski": "TheTh0r",
     "Tomasz Chyrowicz": "tomchy",
+    "Pavel Pletenev": "ASMfreaK",
     "Álan Crístoffer": "acristoffers",
 }
 

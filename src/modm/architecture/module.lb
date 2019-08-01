@@ -64,7 +64,6 @@ class Atomic(Module):
 
     def prepare(self, module, options):
         module.depends(":utils", ":architecture:accessor")
-        # module.depends(":platform:core")
         return True
 
     def build(self, env):
@@ -165,7 +164,8 @@ class GpioExpander(Module):
         module.description = "GPIO Expanders"
 
     def prepare(self, module, options):
-        module.depends(":architecture:gpio", ":architecture:register", ":processing:resumable", ":math:utils")
+        module.depends(":architecture:gpio", ":architecture:register",
+                       ":processing:resumable", ":math:utils")
         return True
 
     def build(self, env):
@@ -225,7 +225,8 @@ class I2cMultiplexer(Module):
         module.description = "I²C Multiplexer"
 
     def prepare(self, module, options):
-        module.depends(":architecture:i2c", ":architecture:register", ":processing:resumable", ":math:utils")
+        module.depends(":architecture:i2c", ":architecture:register",
+                       ":processing:resumable", ":math:utils")
         return True
 
     def build(self, env):

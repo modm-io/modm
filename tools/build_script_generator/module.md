@@ -13,11 +13,11 @@ your own build system.**
 
 ## Using OpenOCD
 
-For accessing your ARM Cortex-M based device, we use OpenOCD by default and generate a
-`modm/openocd.cfg` file with the target specific configuration:
+For accessing your ARM Cortex-M based device, we use OpenOCD by default and
+generate a `modm/openocd.cfg` file with the target specific configuration:
 
-- Search directories passed via the `openocd.search` metadata key.
-- User configuration files passed via the `openocd.configfile` metadata key.
+- Search directories passed via the `path.openocd` collector.
+- User configuration files passed via the `openocd.source` collector.
   Your custom `modm:build:openocd.cfg` is added here too.
 - The target specific programming command `modm_program elffile`
 
@@ -138,6 +138,7 @@ project, the options presented here are only the most important ones.
 - `-Werror={format, maybe-uninitialized, overflow, sign-compare}`: these warnings are treated as errors.
 - `-f{data, function}-sections`: puts data and functions into their own linker section.
 - `-funsigned-{char, bitfields}`: modm tries to use `stdint.h` types everywhere, but just in case.
+- `-fwrapv`: integer overflows wrap around according to 2s complement.
 
 For *release builds*:
 
@@ -184,6 +185,3 @@ In addition, these linker options are added:
 
 
 [options]: https://gcc.gnu.org/onlinedocs/gcc/Option-Summary.html
-
-<!--Links-->
-[bmp]: https://github.com/blacksphere/blackmagic

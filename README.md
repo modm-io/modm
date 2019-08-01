@@ -15,7 +15,7 @@ process that you can fine-tune to your needs.
 - [This project has a homepage](http://modm.io).<!--/webignore-->
 - Check out our [install instructions][install] and our [getting started guide][guide].
 - Feast your eyes on [lots of working examples][examples].
-- Our CI checks every contribution for regressions: <a href="https://circleci.com/gh/modm-io/workflows/modm/tree/develop" style="border-bottom:none">![Build Status](https://circleci.com/gh/modm-io/modm/tree/develop.svg?style=shield)</a>
+- Our CI checks every contribution for regressions: ![Build Status](https://circleci.com/gh/modm-io/modm/tree/develop.svg?style=shield)
 - We care [about testing modm][testing].
 
 <!-- - [API reference is available here][reference]. -->
@@ -35,11 +35,12 @@ without a lot of resources, so modm needs to fulfill a diverse set of objectives
 like small code size with small memory consumption, predictable program flow,
 extreme portability.
 
-The source code is freely available under the MPLv2 license, so feel
-free to fork this project and adapt it to your needs.
-The only thing we ask of you is to contribute your changes back so everyone benefits.
+The library source code is licensed as MPLv2 with any external source code under
+compatible licenses (BSD, Apache2, MIT). So feel free to fork this project and
+adapt it to your needs. The only thing we ask of you is to contribute your changes
+back so everyone can benefit.
 
-Please clone modm recursively, you will need all the submodules.
+Please clone modm recursively, you need all the submodules:
 
 ```sh
 git clone --recurse-submodules https://github.com/modm-io/modm.git
@@ -49,8 +50,8 @@ git clone --recurse-submodules https://github.com/modm-io/modm.git
 
 - Efficient and fast object-oriented C++17 API.
 - Support for hundreds of AVR and ARM Cortex-M microcontrollers from Atmel and ST.
-- Build system agnostic: We use SCons by default, but you don't have to.
-- Data-driven HAL generation using the library-builder engine.
+- Build system agnostic: Choose SCons, CMake or use your own.
+- Data-driven, target-specific HAL generation using the lbuild engine.
 - No memory allocations in HAL with very low overall RAM consumption.
 - Highly-configurable modules with sensible defaults and lots of documentation.
 - Cross platform peripheral interfaces incl. bit banging:
@@ -58,11 +59,12 @@ git clone --recurse-submodules https://github.com/modm-io/modm.git
     - ADC and Analog.
     - UART, I<sup>2</sup>C, SPI, CAN.
 - Interfaces and drivers for many external I<sup>2</sup>C and SPI sensors and devices.
-- Debug/logging system with IOStream interface.
+- Debug/logging system with IOStream and printf interface.
 - Lightweight, stackless threads and resumable functions using cooperative multitasking.
+- Functional (partial) libstdc++ implementation for AVRs.
+- Integration of useful third-party software: FreeRTOS, ROSserial, CMSIS-DSP.
 - Useful filter, interpolation and geometric algorithms.
 - Lightweight unit testing system (suitable for AVRs).
-- Graphical user interface for small binary and color displays.
 - Hundreds of tests to ensure correct functionality.
 
 
@@ -245,7 +247,7 @@ Kevin Läufer ([\@ekiwi](https://github.com/ekiwi)),
 Martin Rosekeit ([\@thundernail](https://github.com/thundernail)),
 Daniel Krebs ([\@daniel-k](https://github.com/daniel-k)),
 Georgi Grinshpun ([\@georgi-g](https://github.com/georgi-g)) and
-[<!--authorcount-->20<!--/authorcount-->  more contributors](https://github.com/modm-io/modm/blob/develop/AUTHORS).
+<!--authorcount-->33<!--/authorcount-->  more contributors.
 <!--/authors-->
 
 ## Folder structure
@@ -284,7 +286,7 @@ Georgi Grinshpun ([\@georgi-g](https://github.com/georgi-g)) and
 <!--/webignore-->
 
 <!--links-->
-[blog]:            http://blog.salkinium.com
+[blog]:            https://blog.salkinium.com
 [changelog]:       https://github.com/modm-io/modm/tree/develop/docs/CHANGELOG.md
 [circle_ci]:       https://circleci.com/gh/modm-io/workflows/modm/tree/develop
 [contrib]:         https://github.com/modm-io/modm/tree/develop/CONTRIBUTING.md
@@ -292,15 +294,15 @@ Georgi Grinshpun ([\@georgi-g](https://github.com/georgi-g)) and
 [drivers]:         https://github.com/modm-io/modm/tree/develop/src/modm/driver
 [eurobot]:         http://www.eurobot.org/
 [examples]:        https://github.com/modm-io/modm/tree/develop/examples
-[guide]:           http://modm.io/guide/getting-started
-[install]:         http://modm.io/guide/installation
+[guide]:           https://modm.io/guide/getting-started
+[install]:         https://modm.io/guide/installation
 [issues]:          https://github.com/modm-io/modm/issues
 [library-builder]: https://github.com/dergraaf/library-builder
 [modm-devices]:    https://github.com/modm-io/modm-devices
 [porting]:         https://github.com/modm-io/modm/tree/develop/docs/PORTING.md
 [prs]:             https://github.com/modm-io/modm/pulls
 [rca_ev]:          http://www.roboterclub.rwth-aachen.de/
-[reference]:       http://modm.io/reference/api
+[reference]:       https://modm.io/reference/api
 [releases]:        https://github.com/modm-io/modm/releases
-[testing]:         http://modm.io/guide/testing
+[testing]:         https://modm.io/guide/testing
 <!--/links-->

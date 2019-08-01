@@ -16,8 +16,7 @@ def init(module):
     module.description = """\
 # NUCLEO-L432KC
 
-Nucleo kit for STM32L432KC
-http://www.st.com/en/evaluation-tools/nucleo-l432kc.html
+[Nucleo kit for STM32L432KC](https://www.st.com/en/evaluation-tools/nucleo-l432kc.html)
 """
 
 def prepare(module, options):

@@ -13,13 +13,13 @@ For devices with very small memories, we recommend using the block allocator
 strategy, which uses a very light-weight and simple algorithm. This also only
 operates on one continuous memory region as heap.
 
-!!! note
+!!! note "Memory traits"
     Memories can have different traits, such as DMA-ability or access time. The
     default memory allocator functions (malloc, new, etc) only return DMA-able
     memories, ordered by fastest access time. Similarly the search for the
     largest memory region only considers DMA-able memory.
 
-!!! warning
+!!! warning "On multi-SRAM devices"
     For devices which contain separate memories laid out in a continuous way
     (often called SRAM1, SRAM2, etc.) the `newlib` and `block` strategies choose
     the largest continuous memory region, *even though* unaligned accesses
@@ -33,7 +33,7 @@ all internal memories as separate regions, so unaligned accesses across memory
 boundaries are not an issue. To request heap memory of different traits, see
 `modm::MemoryTraits`.
 
-!!! note
+!!! note "TLSF has static overhead"
     The TLSF implementation has a static overhead of about 1kB per memory trait
     group, however, these can then contain multiple non-continuous memory
     regions. The upside of this large static allocation is very fast allocation

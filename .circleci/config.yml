@@ -297,9 +297,15 @@ jobs:
           name: Build Homepage
           command: |
             python3 tools/scripts/synchronize_docs.py
-            (cd examples/stm32f469_discovery/blink; lbuild -D ::generate_module_docs=True build -m "modm:**")
-            (cd docs/src/reference && ln -s ../../../examples/stm32f469_discovery/blink/modm/docs/module)
+            python3 tools/scripts/generate_module_docs.py
             (cd docs && mkdocs build)
+      # FIXME: Allow localhost:port to work with Docker
+      # - run:
+      #     name: Check Homepage
+      #     command: |
+      #       apt install -y nodejs npm
+      #       npm install -g broken-link-checker-local
+      #       blcl modm/docs/modm.io/docs -ro --host-requests 100 --filter-level 1
       - persist_to_workspace:
           root: docs
           paths:

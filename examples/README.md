@@ -133,7 +133,7 @@ supported development boards:
 
 Here are some additional examples of displays and sensors we like:
 
-- [SSD1306 OLED display](https://github.com/modm-io/modm/blob/develop/examples/stm32f4_discovery/oled_display/main.cpp): Draws text and graphics onto I2C display.
+- [SSD1306 OLED display](https://github.com/modm-io/modm/blob/develop/examples/stm32f4_discovery/display/ssd1306/main.cpp): Draws text and graphics onto I2C display.
 - [BMP085/BMP180 barometer](https://github.com/modm-io/modm/blob/develop/examples/stm32f4_discovery/barometer_bmp085_bmp180/main.cpp): Reads atmospheric pressure and temperature from I2C sensor.
 - [BMP180/BME280 barometer](https://github.com/modm-io/modm/tree/develop/examples/stm32f103c8t6_blue_pill/environment): Reads atmospheric pressure and temperature from multiple I2C sensors.
 - [VL6180 time-of-flight distance sensor](https://github.com/modm-io/modm/blob/develop/examples/stm32f4_discovery/distance_vl6180/main.cpp): Reads distance and ambient light from I2C sensor.
@@ -143,4 +143,19 @@ Here are some additional examples of displays and sensors we like:
 - [HD44780 over I2C-GPIO expander](https://github.com/modm-io/modm/blob/develop/examples/stm32f4_discovery/display/hd44780/main.cpp): Draws text via native GPIO port or I2C-GPIO expander port onto character display.
 
 <!--/checkrepourls-->
+
+### Copy Carefully
+
+When copying from our examples make sure to set the repository path correctly!
+All example `modm/examples/**/project.xml` files are missing this path, since we
+set it in the inherited base `modm/examples/lbuild.xml` configuration.
+
+```xml
+<library>
+  <repositories>
+  	<repository><path>path/to/modm/repo.lb</path></repository>
+  </repositories>
+</library>
+```
+
 <!--/examples-->

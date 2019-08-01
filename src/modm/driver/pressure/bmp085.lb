@@ -22,10 +22,10 @@ when there is traffic on the I2C during either temperature or pressure
 conversion. So during that time make sure no other sensors on the bus
 are read out.
 
-For further information, consult the [datasheet][].
+For further information, consult the [product homepage][].
 Also compatible to and tested with BMP180.
 
-[datasheet]: http://www.bosch-sensortec.com/content/language1/downloads/BST-BMP085-DS000-06.pdf
+[product homepage]: https://www.bosch-sensortec.com/bst/products/all_products/bmp180
 """
 
 def prepare(module, options):

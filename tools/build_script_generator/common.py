@@ -63,9 +63,9 @@ common_source_flag_map = {
 
 def common_source_files(env):
     """
-    Builds a list of files that need to be compiled per repository.
+    Builds a list of files that need to be compiled per repository
+    (\\* *post-build only*).
 
-    **POST-BUILD ONLY**
     :returns: a dictionary of sorted lists of filenames, keyed by repository.
     """
     files_to_build = defaultdict(list)
@@ -82,6 +82,7 @@ def common_source_files(env):
 def common_target(env):
     """
     Extracts common properties from a modm:target device:
+
       - platform
       - family
       - partname
@@ -107,6 +108,7 @@ def common_memories(env):
     """
     Extracts the memory map of the device.
     A memory region is a dictionary containing:
+
       - `name` of region
       - `start` address of region
       - `size` of region
@@ -129,13 +131,14 @@ def common_memories(env):
 
 def common_avrdude_options(env):
     """
-    Merges the default AvrDude options with the user options:
+    Merges the default AvrDude options with the user options
+    (\\* *post-build only*):
+
     - `avrdude_programmer`
     - `avrdude_port`
     - `avrdude_baudrate`
     - `avrdude_options`
 
-    **POST-BUILD ONLY**
     :returns: options dictionary
     """
     option_programmer = env.get(":build:avrdude.programmer")
@@ -161,9 +164,8 @@ def common_collect_flags_for_scope(env, scope_filter=None):
     """
     Scans the collections for module compile flags.
     Converts them into SCons-compatible names and places them into a dictionary
-    of the form: flags[filename][name][profile] = list(values).
+    of the form: `flags[filename][name][profile] = list(values)` (\\* *post-build only*).
 
-    **POST-BUILD ONLY**
     :param env: the post_build step env
     :param scope_filter: the collection scope filter
     :returns: compile flags dictionary

@@ -16,7 +16,7 @@ def init(module):
 # AL-AVREB_CAN Board
 
 AVR breakout board with AT90CAN128:
-https://www.alvidi.de/products/DE/AVR_Entwicklungsboards/avr_modul_avreb_can.phpAl-avreb-can
+https://www.alvidi.de/products/DE/AVR_Entwicklungsboards/avr_modul_avreb_can.php
 """
 
 def prepare(module, options):

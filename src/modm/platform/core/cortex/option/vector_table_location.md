@@ -21,7 +21,7 @@ From the ARM Cortex-M4 Technical Reference Manual on exception handling:
 > - The vector is fetched in parallel to the state saving, enabling efficient
 >   interrupt entry.
 
-!!! warning
+!!! warning "On Interrupt Latency"
     Placing main stack and vector table into the same memory can significantly
     slow down interrupt latency, since both I-Code and D-Code memory interface
     need to fetch from the same access port.

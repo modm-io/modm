@@ -27,8 +27,8 @@ All xpcc authors agreed to relicense their contributions from BSD to MPLv2 in mo
 ## Eurobot and Team RCA
 
 Most of our contributors are or used to be members of the
-[Roboterclub Aachen e.V.](http://roboterclub.rwth-aachen.de).
-We've been building robots for the [Eurobot competition][eurobot] for many years
+Roboterclub Aachen e.V..
+We've been building robots for the Eurobot competition for many years
 now and all of them have been running xpcc or modm successfully as their only OS
 on dozens of different AVR and STM32 targets each.
 So modm is truly battle-tested in real-world conditions and has passed through

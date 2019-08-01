@@ -445,8 +445,7 @@ int main() // Execution entry point.
 ```
 
 
-[accel]: https://github.com/roboterclubaachen/modm/blob/develop/examples/stm32f4_discovery/accelerometer/main.cpp
-[device_files]: https://github.com/roboterclubaachen/modm/tree/develop/src/modm/architecture/platform/devices
+[accel]: https://github.com/modm-io/modm/blob/develop/examples/stm32f4_discovery/accelerometer/main.cpp
 [eurobot]: http://www.eurobot.org/
 [hal_drivers]: https://github.com/modm-io/modm/tree/develop/src/modm/platform
 [jinja2]: http://jinja.pocoo.org

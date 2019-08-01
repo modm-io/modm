@@ -16,8 +16,7 @@ def init(module):
     module.description = """\
 # STM32F4DISCOVERY
 
-Discovery kit for STM32F407/417 lines
-http://www.st.com/en/evaluation-tools/stm32f4discovery.html
+[Discovery kit for STM32F407](https://www.st.com/en/evaluation-tools/stm32f4discovery.html)
 """
 
 def prepare(module, options):

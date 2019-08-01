@@ -25,4 +25,4 @@ You can enable and use the on-board display in two ways:
 Access to the capacitive touchscreen is provided in the `Board::ft6` namespace.
 Call `Board::initializeTouchscreen()` to setup the peripherals.
 
-Product Link: http://www.st.com/en/evaluation-tools/32f469idiscovery.html
+[Product Link](https://www.st.com/en/evaluation-tools/32f469idiscovery.html)

@@ -15,7 +15,6 @@ from jinja2 import Environment
 from os import listdir
 from os.path import isfile, join, abspath
 
-
 TABLE_TEMPLATE = \
 r"""
 <table>
@@ -92,7 +91,6 @@ root = repopath(".")
 board_path = root / "src/modm/board"
 example_path = root / "examples"
 ignored_path = root / "test/all/ignored.txt"
-author_path = root / "AUTHORS"
 
 examples_readme_path = root / "examples/README.md"
 readme_path = root / "README.md"
@@ -126,7 +124,8 @@ avr_count = len([t for t in targets if t.startswith("at")])
 stm_count = len([t for t in targets if t.startswith("stm32")])
 
 # get the author count
-author_count = len(author_path.read_text().strip().splitlines())
+from authors import author_handles
+author_count = len(author_handles)
 
 # Get all the modules that are available for the STM32
 # Get all drivers, we assume they are available for all devices
@@ -145,7 +144,7 @@ readme_path.write_text(readme)
 
 # extract these keys
 links = extract(readme, "links")
-authors = extract(readme, "authors")
+authors = extract(readme, "authors").replace("\\@", "@")
 # remove
 readme = re.sub(r"((<!--webignore-->.*?<!--/webignore-->)|(<!--links-->.*?<!--/links-->)|(<!--/?bsptable-->))\n", "", readme, flags=re.DOTALL | re.MULTILINE)
 

@@ -1,6 +1,6 @@
 <library>
   <!-- This is the default lbuild configuration file for every
-       example in this folder. It only sets the repository path,
+       example in this folder. It only defaults the common settings,
        so that this isn't duplicated in every single example.
        When you write your own application, you must set this
        path yourself! -->

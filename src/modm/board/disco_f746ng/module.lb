@@ -16,8 +16,7 @@ def init(module):
     module.description = """\
 # STM32F7DISCOVERY
 
-Discovery kit for STM32F746 line
-http://www.st.com/en/evaluation-tools/32f746gdiscovery.html
+[Discovery kit for STM32F746](https://www.st.com/en/evaluation-tools/32f746gdiscovery.html)
 """
 
 def prepare(module, options):
