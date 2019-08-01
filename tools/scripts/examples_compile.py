@@ -10,6 +10,7 @@
 import os
 import sys
 import re
+import platform
 import subprocess
 import multiprocessing
 from pathlib import Path
@@ -35,6 +36,9 @@ def generate(project):
 	path = project.parent
 	output = ["=" * 90, "Generating: {}".format(path)]
 	options = " ".join("-D{}={}".format(k, v) for k,v in global_options.items())
+	# Compile Linux examples under macOS with hosted-darwin target
+	if "Darwin" in platform.platform() and "hosted-linux" in project.read_text():
+		options += " -D:target=hosted-darwin"
 	rc, ro = run(path, "lbuild {} build".format(options))
 	print("\n".join(output + [ro]))
 	return None if rc else project
@@ -46,11 +50,12 @@ def build(project):
 	if ":build:scons" in project_cfg:
 		commands.append("python3 `which scons` build --cache-show --random")
 	if ":build:cmake" in project_cfg:
-		commands.append("make")
+		commands.append("make cmake && make build-release")
 
 	rcs = 0
 	for command in commands:
-		output = ["=" * 90, "Building: {} with {}".format(path, "SCons" if "scons" in command else "CMake")]
+		output = ["=" * 90, "Building: {} with {}".format(
+		          path, "SCons" if "scons" in command else "CMake")]
 		rc, ro = run(path, command)
 		rcs += rc
 		print("\n".join(output + [ro]))
