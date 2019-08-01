@@ -2,7 +2,7 @@
 %% macro copyright()
 /*
  * Copyright (c) 2011-2012, 2019, Fabian Greif
- * Copyright (c) 2012, 2015-2018, Niklas Hauser
+ * Copyright (c) 2012, 2015-2019, Niklas Hauser
  * Copyright (c) 2013, Sascha Schade
  * Copyright (c) 2013, 2015, Kevin Läufer
  *
@@ -51,23 +51,13 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 
 
 %% macro section_vector_ram(memory)
-	.vector_ram (NOLOAD) :  /* Vector table in RAM, only if remapped */
+	.vector_ram (NOLOAD) :
 	{
 		__vector_table_ram_start = .;
-
-		/* used for vectors remapped to RAM */
+		/* Vector table in RAM, only if remapped */
 		KEEP(*(.vector_ram))
-
 		. = ALIGN(4);
 		__vector_table_ram_end = .;
-	} >{{memory}}
-%% endmacro
-
-
-%% macro section_fastcode(memory)
-	.fastcode : ALIGN(4)
-	{
-		*(.fastcode)
 	} >{{memory}}
 %% endmacro
 
@@ -93,7 +83,7 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 %% endmacro
 
 
-%% macro section_table_zero(sections=[])
+%% macro section_table_zero(memory, sections=[])
 	.table.zero.intern : ALIGN(4)
 	{
 		__table_zero_intern_start = .;
@@ -104,11 +94,11 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		LONG(__{{section}}_end)
 	%% endfor
 		__table_zero_intern_end = .;
-	} >FLASH
+	} >{{memory}}
 %% endmacro
 
 
-%% macro section_table_copy(sections=[])
+%% macro section_table_copy(memory, sections=[])
 	%% if vector_table_location == "ram"
 		%% do sections.append("vector_table_ram")
 	%% endif
@@ -127,28 +117,28 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		LONG(__{{section}}_end)
 	%% endfor
 		__table_copy_intern_end = .;
-	} >FLASH
+	} >{{memory}}
 %% endmacro
 
 
-%% macro section_table_extern()
+%% macro section_table_extern(memory)
 	.table.zero.extern : ALIGN(4)
 	{
 		__table_zero_extern_start = .;
 {{ linkerscript_extern_zero | indent(8, first=True) }}
 		__table_zero_extern_end = .;
-	} >FLASH
+	} >{{memory}}
 
 	.table.copy.extern : ALIGN(4)
 	{
 		__table_copy_extern_start = .;
 {{ linkerscript_extern_copy | indent(8, first=True) }}
 		__table_copy_extern_end = .;
-	} >FLASH
+	} >{{memory}}
 %% endmacro
 
 
-%% macro section_table_heap(sections)
+%% macro section_table_heap(memory, sections)
 	/* SRAM properties bit mask (16-bit):
 	 *
 	 * - 0x0001: accessible via S-Bus
@@ -173,7 +163,7 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 	%% endfor
 {{ linkerscript_extern_heap | indent(8, first=True) }}
 		__table_heap_end = .;
-	} >FLASH
+	} >{{memory}}
 %% endmacro
 
 
@@ -182,23 +172,20 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 	{
 		__{{name}}_load = LOADADDR(.{{name}});
 		__{{name}}_start = .;
-
 		*(.{{name}})
-
 		. = ALIGN(4);
 		__{{name}}_end = .;
 	} >{{memory}}
 %% endmacro
 
 
-%% macro section_heap(memory, name)
+%% macro section_heap(memory, name, placement=None)
 	.{{name}} (NOLOAD) :
 	{
 		__{{name}}_start = .;
-
 		. = ORIGIN({{memory}}) + LENGTH({{memory}});
 		__{{name}}_end = .;
-	} >{{ "RAM" if "RAM" in memory else memory }}
+	} >{{ placement if placement else memory }}
 %% endmacro
 
 
@@ -214,27 +201,21 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		KEEP(*(.init))
 
 		. = ALIGN(4);
-		PROVIDE_HIDDEN(__init_array_start = .);
-		KEEP(*(.preinit_array))
+		__init_array_start = .;
 		KEEP(*(SORT(.init_array.*)))
 		KEEP(*(.init_array))
-		PROVIDE_HIDDEN(__init_array_end = .);
-
+		__init_array_end = .;
 %% if 0
 		/* These are for static constructors and destructors under ELF */
 		%# We never call destructors
-		KEEP(*(.fini))
-
-		PROVIDE_HIDDEN(__fini_array_start = .);
+		__fini_array_start = .;
 		KEEP(*(.fini_array))
 		KEEP(*(SORT(.fini_array.*)))
-		PROVIDE_HIDDEN(__fini_array_end = .);
+		__fini_array_end = .;
 %% endif
 	} >{{memory}}
 
 %% if 0
-	/* Unwind tables are used to unwind the stack for C++ exceptions. */
-	%# On modm these are disabled by default, so these sections are empty.
 	.ARM.extab : ALIGN(4)
 	{
 		*(.ARM.extab* .gnu.linkonce.armextab.*)
@@ -251,6 +232,17 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 	{
 		KEEP(*(.eh_frame*))
 	} >{{memory}}
+%% else
+	/* Unwind tables are used to unwind the stack for C++ exceptions. Even
+	 * though we disabled exceptions, pre-compiled libraries such as libstdc++
+	 * still have to raise exceptions. We still force discard all tables
+	 * though and hook these exception throwers in code. */
+	/DISCARD/ :
+	{
+		*(.ARM.extab* .gnu.linkonce.armextab.*)
+		*(.ARM.exidx* .gnu.linkonce.armexidx.*)
+		*(.eh_frame*)
+	}
 %% endif
 
 	/* Hardware init table */
@@ -279,7 +271,7 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 %% endmacro
 
 
-%% macro section_ram(memory)
+%% macro section_ram(memory, rom)
 	/* initialized variables */
 	.data : ALIGN(4)
 	{
@@ -288,7 +280,7 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		*(.data .data.* .gnu.linkonce.d.*)
 		. = ALIGN(4);
 		__data_end = .;
-	} >{{memory}} AT >FLASH
+	} >{{memory}} AT >{{rom}}
 
 	/* uninitialized variables */
 	.bss (NOLOAD) :
@@ -310,11 +302,11 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 %% endmacro
 
 
-%% macro section_rom_start()
-	__rom_start = ORIGIN(FLASH);
+%% macro section_rom_start(rom)
+	__rom_start = ORIGIN({{rom}});
 %% endmacro
 
-%% macro section_rom_end()
+%% macro section_rom_end(rom)
 	. = ALIGN(4);
 	__rom_end = .;
 %% if 0

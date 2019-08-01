@@ -6,7 +6,7 @@
 
 SECTIONS
 {
-{{ linker.section_rom_start() }}
+{{ linker.section_rom_start("FLASH") }}
 
 {{ linker.section_vector_rom("FLASH") }}
 
@@ -25,25 +25,25 @@ SECTIONS
 
 {{ linker.section_stack("RAM") }}
 
-{{ linker.section_ram("RAM") }}
+{{ linker.section_ram("RAM", "FLASH") }}
 
 {{ linker.section_heap("RAM", "heap1") }}
 
 {{ linkerscript_sections | indent(first=True) }}
 
 	/* TABLES! TABLES! ALL THE TABLES YOU COULD EVER WANT! TABLES! */
-{{ linker.section_table_zero() }}
+{{ linker.section_table_zero("FLASH") }}
 
-{{ linker.section_table_copy(["fastcode"]) }}
+{{ linker.section_table_copy("FLASH", ["fastcode"]) }}
 
-{{ linker.section_table_extern() }}
+{{ linker.section_table_extern("FLASH") }}
 
 %% set heap_table = [
 		{'name': 'heap1', 'prop': '0x000f'},
 		{'name': 'heap4', 'prop': '0x2006'}]
-{{ linker.section_table_heap(heap_table) }}
+{{ linker.section_table_heap("FLASH", heap_table) }}
 
-{{ linker.section_rom_end() }}
+{{ linker.section_rom_end("FLASH") }}
 
 {{ linker.section_debug() }}
 }

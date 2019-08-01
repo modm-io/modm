@@ -14,7 +14,7 @@ VECTOR_TABLE_OFFSET = TOTAL_STACK_SIZE;
 
 SECTIONS
 {
-{{ linker.section_rom_start() }}
+{{ linker.section_rom_start("FLASH") }}
 
 {{ linker.section_vector_rom("FLASH") }}
 
@@ -24,16 +24,16 @@ SECTIONS
 
 {{ linker.section_rom("FLASH") }}
 
-{{ linker.section_fastcode("FLASH") }}
+{{ linker.section("FLASH", "fastcode") }}
 
-{{ linker.section_ram("RAM") }}
+{{ linker.section_ram("RAM", "FLASH") }}
 
 {{ linker.section("RAM AT >FLASH", "fastdata") }}
 
-{{ linker.section_heap("SRAM1", "heap1") }}
+{{ linker.section_heap("SRAM1", "heap1", "RAM") }}
 
 %% if "sram2" in regions
-{{ linker.section_heap("SRAM2", "heap2") }}
+{{ linker.section_heap("SRAM2", "heap2", "RAM") }}
 %% endif
 %% if with_crashcatcher
 	g_crashCatcherStack = . - 500;
@@ -42,19 +42,19 @@ SECTIONS
 {{ linkerscript_sections | indent(first=True) }}
 
 	/* TABLES! TABLES! ALL THE TABLES YOU COULD EVER WANT! TABLES! */
-{{ linker.section_table_zero() }}
+{{ linker.section_table_zero("FLASH") }}
 
-{{ linker.section_table_copy() }}
+{{ linker.section_table_copy("FLASH") }}
 
-{{ linker.section_table_extern() }}
+{{ linker.section_table_extern("FLASH") }}
 
 %% set heap_table = [{"name": "heap1", "prop": "0x000f"}]
 %% if "sram2" in regions
 	%% do heap_table.append({"name": "heap2", "prop": "0x000f"})
 %% endif
-{{ linker.section_table_heap(heap_table) }}
+{{ linker.section_table_heap("FLASH", heap_table) }}
 
-{{ linker.section_rom_end() }}
+{{ linker.section_rom_end("FLASH") }}
 
 {{ linker.section_debug() }}
 }
