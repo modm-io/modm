@@ -30,11 +30,18 @@ There are several caveats:
 
 This driver directly accesses the STM32 HAL to keep the transmit register full,
 due to a lack of DMA capability in modm, thus this driver is STM32-only for now.
+
+!!! warning "SystemClock Limitations"
+    This driver requires a 3 MHz ±10% SPI clock in order to get the protocol
+    timing right. Depending on your device clock tree and the SPI prescalers,
+    this might require *lowering* the frequency of the entire device! If this is
+    unacceptable, consider using APA102.
 """
 
 def prepare(module, options):
     module.depends(
         ":architecture:spi",
+        ":architecture:unaligned",
         ":math:units",
         ":ui:color")
     return options[":target"].identifier.platform == "stm32"

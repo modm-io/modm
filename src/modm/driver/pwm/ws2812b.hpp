@@ -12,6 +12,7 @@
 #pragma once
 #include <modm/math/units.hpp>
 #include <modm/architecture/interface/spi_master.hpp>
+#include <modm/architecture/interface/unaligned.hpp>
 #include <modm/ui/color.hpp>
 
 namespace modm
@@ -20,7 +21,8 @@ namespace modm
 /// @ingroup modm_driver_ws2812
 template< class SpiMaster, class Output, size_t LEDs >
 class Ws2812b
-{										  // 7654 3210 7654 3210 7654 3210
+{
+protected:								  // 7654 3210 7654 3210 7654 3210
 	static constexpr uint32_t base_mask  = 0b0010'0100'1001'0010'0100'1001;
 	static constexpr uint32_t clear_mask = base_mask << 1;
 
@@ -62,15 +64,14 @@ public:
 	void
 	clear()
 	{
-		size_t ii=0;
-		for (;ii < length; ii += 3)
+		for (size_t ii=0; ii < length; ii += 3)
 		{
-			*reinterpret_cast<uint32_t*>(data + ii) = base_mask;
+			*modm::asUnaligned<uint32_t*>(data + ii) = base_mask;
 		}
 		data[length] = 0;
 	}
 
-	void inline
+	void
 	setColor(size_t index, const color::Rgb &color)
 	{
 		if (index >= LEDs) return;
@@ -79,8 +80,8 @@ public:
 		for (size_t ii = 0; ii < 3; ii++)
 		{
 			const uint32_t c = (spread(colors[ii]) << 12) | spread(colors[ii] >> 4);
-			uint32_t *const value = reinterpret_cast<uint32_t*>(data + index * 9 + ii*3);
-			*value = (*value & ~clear_mask) | c;
+			auto *value = modm::asUnaligned<uint32_t*>(data + index * 9 + ii*3);
+			*value = (uint32_t(*value) & ~clear_mask) | c;
 		}
 	}
 
@@ -92,7 +93,7 @@ public:
 		uint8_t color[3];
 		for (size_t ii = 0; ii < 3; ii++)
 		{
-			const uint32_t value = *reinterpret_cast<const uint32_t*>(data + index * 9 + ii*3);
+			const auto value = *modm::asUnaligned<const uint32_t*>(data + index * 9 + ii*3);
 			const uint8_t c = (gather(value) << 4) | gather(value >> 12);
 			color[ii] = c;
 		}
