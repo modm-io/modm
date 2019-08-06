@@ -1,0 +1,51 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2019, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:sk6812"
+    module.description = """\
+# SK6812 RGBW Driver
+
+Drives any number of chained SK6812 RGBW LEDs using a 3-bit SPI encoding
+(0 -> 100, 1 -> 110) running at 3 MHz.
+Thus, writing one LED takes 32µs and 12 bytes of memory.
+
+There are several caveats:
+
+1. This only provides a blocking write API, due to technical limitations.
+2. Atomicity is not enforced, this should be done externally if required.
+3. The memory footprint is 4x as large, due to the bit stuffing for SPI.
+4. There is no enforced reset period of at least 50µs after the write is finished,
+   it is up to the user to not trigger another write too early.
+
+This driver directly accesses the STM32 HAL to keep the transmit register full,
+due to a lack of DMA capability in modm, thus this driver is STM32-only for now.
+
+!!! warning "SystemClock Limitations"
+    This driver requires a 3 MHz ±10% SPI clock in order to get the protocol
+    timing right. Depending on your device clock tree and the SPI prescalers,
+    this might require *lowering* the frequency of the entire device! If this is
+    unacceptable, consider using APA102.
+"""
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:spi",
+        ":architecture:unaligned",
+        ":math:units",
+        ":ui:color")
+    return options[":target"].identifier.platform == "stm32"
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/pwm"
+    env.copy("sk6812w.hpp")
