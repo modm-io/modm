@@ -12,6 +12,8 @@
 #ifndef MODM_INTERFACE_UNALIGNED_ACCESS_HPP
 #define MODM_INTERFACE_UNALIGNED_ACCESS_HPP
 
+#include <type_traits>
+
 #ifndef __DOXYGEN__
 // These functions may be implemented as header files, so we cannot rely on
 // there being a link-able function and delegate this choice to the platform.
@@ -27,11 +29,11 @@ namespace modm
  *
  * This wrapper manages unaligned access to memory, by copying
  * the memory to and from the stack, which is always correctly aligned.
- * Use this with teh `asUnaligned` helper:
+ * Use this with the `asUnaligned` helper:
  * @code
  * uint8_t *buffer;
- * // `u32` is a pointer to a unaligned_t<uint32_t> !
- * auto *u32 = modm::asUnaligned<uint32_t>(buffer);
+ * // `u32` is a pointer to a unaligned_t<uint32_t*> !
+ * auto *u32 = modm::asUnaligned<uint32_t*>(buffer);
  * // write to the unaligned location
  * *u32 = input;
  * // read from the unaligned location
@@ -65,10 +67,11 @@ protected:
  * @ingroup	modm_architecture_unaligned
  */
 template< typename T, typename U>
-modm_always_inline unaligned_t<T>*
+modm_always_inline
+unaligned_t< typename std::remove_pointer<T>::type >*
 asUnaligned(U* value)
 {
-	return reinterpret_cast< unaligned_t<T>* >(value);
+	return reinterpret_cast< unaligned_t< typename std::remove_pointer<T>::type >* >(value);
 }
 
 }	// namespace modm

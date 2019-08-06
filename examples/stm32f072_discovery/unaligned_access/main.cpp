@@ -58,8 +58,8 @@ main()
 		}
 
 		{
-			// `u32` is a pointer to a modm::unaligned_t<uint32_t> !
-			auto *u32 = modm::asUnaligned<uint32_t>(buffer + offset);
+			// `u32` is a pointer to a modm::unaligned_t<uint32_t*> !
+			auto *u32 = modm::asUnaligned<uint32_t*>(buffer + offset);
 			// this is short for:
 			// modm::unaligned_t<uint32_t> *u32 = reinterpret_cast<modm::unaligned_t<uint32_t>*>(buffer + offset);
 			// write to the unaligned location
@@ -70,7 +70,7 @@ main()
 
 			// Anonymous form
 			*modm::asUnaligned<uint32_t>(buffer + offset) = input;
-			output = *modm::asUnaligned<uint32_t>(buffer + offset);
+			output = *modm::asUnaligned<uint32_t*>(buffer + offset);
 			if (output != input) error();
 		}
 
