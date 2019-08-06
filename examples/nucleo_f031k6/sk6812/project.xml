@@ -1,0 +1,12 @@
+<library>
+  <extends>modm:nucleo-f031k6</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_f031k6/sk6812</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:driver:sk6812</module>
+    <module>modm:platform:spi:1</module>
+    <module>modm:ui:led</module>
+  </modules>
+</library>
