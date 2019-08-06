@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2019, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:apa102"
+    module.description = """\
+# APA102 RGB LED Driver
+
+Drives any number of chained APA102 RGB LEDs using SPI signals SCK and MOSI up
+to a few dozen MHz. Due to the synchronous clock, there are no special
+restrictions on protocol timing, making this driver safe to use with interrupts
+enabled and/or with an RTOS.
+
+The internal data buffer size is 4B for start of frame, 4B for every LED and 1B
+for every 16 LEDs as end of frame.
+
+References:
+
+- ["APA102 aka Superled"][led].
+- ["Understanding the APA102 Superled"][protocol].
+
+[led]: https://cpldcpu.wordpress.com/2014/08/27/apa102/
+[protocol]: https://cpldcpu.wordpress.com/2014/11/30/understanding-the-apa102-superled
+"""
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:spi",
+        ":processing:resumable",
+        ":ui:color")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/pwm"
+    env.copy("apa102.hpp")
