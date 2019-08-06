@@ -5,9 +5,9 @@
     <option name=":build:build.path">../../../build/nucleo_f411re/ws2812b</option>
   </options>
   <modules>
-    <module>:driver:ws2812</module>
-    <module>:platform:spi:1</module>
-    <module>:ui:led</module>
-    <module>:build:scons</module>
+    <module>modm:driver:ws2812</module>
+    <module>modm:platform:spi:1</module>
+    <module>modm:ui:led</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>
