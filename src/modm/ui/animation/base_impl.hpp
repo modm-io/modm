@@ -40,6 +40,7 @@ modm::ui::Animation<T>::setValue(T value)
 {
 	animationTime = 0;
 	currentValue = value;
+	endValue = value;
 	interpolation.stop();
 	if (handler) handler(currentValue);
 }
@@ -62,7 +63,6 @@ template< typename T >
 void inline
 modm::ui::Animation<T>::stop()
 {
-	endValue = currentValue;
 	setValue(currentValue);
 }
 
