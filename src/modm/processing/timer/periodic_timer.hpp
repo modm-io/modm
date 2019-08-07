@@ -49,19 +49,22 @@ template< class Clock, typename TimestampType = modm::Timestamp >
 class GenericPeriodicTimer
 {
 public:
+	/// Create a stopped timer
+	GenericPeriodicTimer();
+
 	/// Create and start the timer
-	GenericPeriodicTimer(const TimestampType period);
+	GenericPeriodicTimer(TimestampType period);
 
 	/// Restart the timer with the current period.
-	inline void
+	void
 	restart();
 
 	/// Restart the timer with a new period value.
-	inline void
-	restart(const TimestampType period);
+	void
+	restart(TimestampType period);
 
 	/// Stops the timer and sets isStopped() to `true`, and isExpired() to `false`.
-	inline void
+	void
 	stop();
 
 
@@ -71,8 +74,12 @@ public:
 
 
 	/// @return the time until (positive time) or since (negative time) expiration, or 0 if stopped
-	inline typename TimestampType::SignedType
+	typename TimestampType::SignedType
 	remaining() const;
+
+	/// @return the set time period or zero if unset
+	TimestampType
+	getPeriod() const;
 
 
 	/// @return the current state of the timer
@@ -80,7 +87,7 @@ public:
 	getState() const;
 
 	/// @return `true` if the timer has been stopped, `false` otherwise
-	inline bool
+	bool
 	isStopped() const;
 
 private:

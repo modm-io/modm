@@ -17,7 +17,13 @@
 #endif
 
 template< class Clock , typename TimestampType >
-modm::GenericPeriodicTimer<Clock, TimestampType>::GenericPeriodicTimer(const TimestampType period) :
+modm::GenericPeriodicTimer<Clock, TimestampType>::GenericPeriodicTimer() :
+	period(0)
+{
+}
+
+template< class Clock , typename TimestampType >
+modm::GenericPeriodicTimer<Clock, TimestampType>::GenericPeriodicTimer(TimestampType period) :
 	period(period), timeout(period)
 {
 }
@@ -31,7 +37,7 @@ modm::GenericPeriodicTimer<Clock, TimestampType>::restart()
 
 template< class Clock , typename TimestampType >
 void
-modm::GenericPeriodicTimer<Clock, TimestampType>::restart(const TimestampType period)
+modm::GenericPeriodicTimer<Clock, TimestampType>::restart(TimestampType period)
 {
 	this->period = period;
 	restart();
@@ -83,5 +89,12 @@ typename TimestampType::SignedType
 modm::GenericPeriodicTimer<Clock, TimestampType>::remaining() const
 {
 	return timeout.remaining();
+}
+
+template< class Clock, class TimestampType >
+TimestampType
+modm::GenericPeriodicTimer<Clock, TimestampType>::getPeriod() const
+{
+	return period;
 }
 
