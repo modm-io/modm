@@ -22,18 +22,7 @@ from distutils.version import StrictVersion
 from git import Repo
 from os.path import normpath
 
-sys.path.append(repopath("ext/modm-devices/tools/device"))
-try:
-    import modm_devices.parser
-except Exception as e:
-    print(e, "\n")
-    print("You might be missing the git submodules in `ext/`.\n"
-          "Try:\n"
-          "    cd modm\n"
-          "    git submodule update --init\n"
-          "then build again.")
-    exit(1)
-
+# Check for miminum required lbuild version
 import lbuild
 min_lbuild_version = "1.12.1"
 if StrictVersion(getattr(lbuild, "__version__", "0.1.0")) < StrictVersion(min_lbuild_version):
@@ -41,6 +30,29 @@ if StrictVersion(getattr(lbuild, "__version__", "0.1.0")) < StrictVersion(min_lb
           "    pip3 install -U lbuild".format(min_lbuild_version))
     exit(1)
 
+# Check for submodule existance and their version
+def check_submodules():
+    repo = Repo(localpath("."))
+    has_error = True
+    if any(not sm.module_exists() for sm in repo.submodules):
+        print("\n>> modm: One or more git submodules in `modm/ext/` is missing!\n"
+              ">> modm: Please checkout the submodules:\n\n"
+              "    cd modm\n"
+              "    git submodule update --init\n")
+        exit(1)
+    elif any(sm.hexsha != sm.module().commit().hexsha for sm in repo.submodules):
+        print("\n>> modm: One or more git submodules in `modm/ext/` is not up-to-date!\n"
+              ">> modm: Please update the submodules:\n\n"
+              "    cd modm\n"
+              "    git submodule sync\n"
+              "    git submodule update --init\n")
+
+# Import modm-device tools
+sys.path.append(repopath("ext/modm-devices/tools/device"))
+try:
+    import modm_devices.parser
+except ModuleNotFoundError:
+    check_submodules()
 
 # =============================================================================
 class DevicesCache(dict):
@@ -123,7 +135,8 @@ class DevicesCache(dict):
             recompute_required = True
 
         if recompute_required:
-            print("Recomputing device cache...")
+            check_submodules()
+            print(">> modm: Recomputing device cache...")
             content = self.parse_all()
             # prefix the files with a / so we can distinguish them from partnames
             files = ["/{} {}".format(Path(f).relative_to(repopath(".")),
