@@ -30,14 +30,6 @@ def prepare(module, options):
 
 
 def build(env):
-    device = env[":target"]
-    driver = device.get_driver("can:canusb")
-
-    properties = device.properties
-    properties["target"] = target = device.identifier
-    properties["driver"] = driver
-
-    env.substitutions = properties
     env.outbasepath = "modm/src/modm/platform/can"
 
     if env[":target"].partname == "hosted-linux":
