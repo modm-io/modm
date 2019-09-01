@@ -24,9 +24,11 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_executable(${CMAKE_PROJECT_NAME} ${SOURCE_FILES})
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES SUFFIX ".elf")
 
+%% if platform != "hosted"
 add_custom_target(${CMAKE_PROJECT_NAME}.bin ALL DEPENDS ${CMAKE_PROJECT_NAME} COMMAND ${CMAKE_OBJCOPY} -Obinary ${CMAKE_PROJECT_NAME}.elf ${CMAKE_PROJECT_NAME}.bin)
 add_custom_target(${CMAKE_PROJECT_NAME}.hex ALL DEPENDS ${CMAKE_PROJECT_NAME} COMMAND ${CMAKE_OBJCOPY} -Oihex ${CMAKE_PROJECT_NAME}.elf ${CMAKE_PROJECT_NAME}.hex)
 add_custom_target(${CMAKE_PROJECT_NAME}.lss ALL DEPENDS ${CMAKE_PROJECT_NAME} COMMAND ${CMAKE_OBJDUMP}  -x -s -S -l -w ${CMAKE_PROJECT_NAME}.elf > ${CMAKE_PROJECT_NAME}.lss)
+%% endif
 
 %% if core.startswith("avr")
 add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_SIZE} ARGS -C -d --mcu={{ partname }} ${CMAKE_PROJECT_NAME}.elf)
