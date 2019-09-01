@@ -40,23 +40,26 @@ set({{ name | upper }}{{ "_" ~ (profile | upper) if profile | length else "" }} 
 string(APPEND CCFLAGS "${ARCHFLAGS}")
 string(APPEND ASFLAGS "${ARCHFLAGS}")
 string(APPEND LINKFLAGS "${ARCHFLAGS}")
+%% set set_flag = "set("
+%% else
+%% set set_flag = "string(APPEND "
 %% endif
 
-string(APPEND CMAKE_C_FLAGS         "${CCFLAGS} ${CFLAGS}")
-string(APPEND CMAKE_C_FLAGS_RELEASE "${CCFLAGS_RELEASE}")
-string(APPEND CMAKE_C_FLAGS_DEBUG   "${CCFLAGS_DEBUG}")
+{{ set_flag }}CMAKE_C_FLAGS         "${CCFLAGS} ${CFLAGS}")
+{{ set_flag }}CMAKE_C_FLAGS_RELEASE "${CCFLAGS_RELEASE}")
+{{ set_flag }}CMAKE_C_FLAGS_DEBUG   "${CCFLAGS_DEBUG}")
 
-string(APPEND CMAKE_CXX_FLAGS         "${CCFLAGS} ${CXXFLAGS}")
-string(APPEND CMAKE_CXX_FLAGS_RELEASE "${CCFLAGS_RELEASE}")
-string(APPEND CMAKE_CXX_FLAGS_DEBUG   "${CCFLAGS_DEBUG}")
+{{ set_flag }}CMAKE_CXX_FLAGS         "${CCFLAGS} ${CXXFLAGS}")
+{{ set_flag }}CMAKE_CXX_FLAGS_RELEASE "${CCFLAGS_RELEASE}")
+{{ set_flag }}CMAKE_CXX_FLAGS_DEBUG   "${CCFLAGS_DEBUG}")
 
-string(APPEND CMAKE_ASM_FLAGS         "${ASFLAGS}")
-string(APPEND CMAKE_ASM_FLAGS_RELEASE "${ASFLAGS_RELEASE}")
-string(APPEND CMAKE_ASM_FLAGS_DEBUG   "${ASFLAGS_DEBUG}")
+{{ set_flag }}CMAKE_ASM_FLAGS         "${ASFLAGS}")
+{{ set_flag }}CMAKE_ASM_FLAGS_RELEASE "${ASFLAGS_RELEASE}")
+{{ set_flag }}CMAKE_ASM_FLAGS_DEBUG   "${ASFLAGS_DEBUG}")
 
-string(APPEND CMAKE_EXE_LINKER_FLAGS         "${LINKFLAGS}")
-string(APPEND CMAKE_EXE_LINKER_FLAGS_RELEASE "${LINKFLAGS_RELEASE}")
-string(APPEND CMAKE_EXE_LINKER_FLAGS_DEBUG   "${LINKFLAGS_DEBUG}")
+{{ set_flag }}CMAKE_EXE_LINKER_FLAGS         "${LINKFLAGS}")
+{{ set_flag }}CMAKE_EXE_LINKER_FLAGS_RELEASE "${LINKFLAGS_RELEASE}")
+{{ set_flag }}CMAKE_EXE_LINKER_FLAGS_DEBUG   "${LINKFLAGS_DEBUG}")
 
 add_definitions("${CPPDEFINES}")
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
