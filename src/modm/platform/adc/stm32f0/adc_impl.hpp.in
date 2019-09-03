@@ -154,7 +154,7 @@ modm::platform::Adc::startConversion(void)
 bool
 modm::platform::Adc::isConversionFinished(void)
 {
-    return static_cast<bool>(getInterruptFlags() & InterruptFlag::EndOfSampling);
+    return static_cast<bool>(getInterruptFlags() & InterruptFlag::EndOfConversion);
 }
 
 void

@@ -193,7 +193,7 @@ modm::platform::Adc{{ id }}::startConversion(void)
 bool
 modm::platform::Adc{{ id }}::isConversionFinished(void)
 {
-	return static_cast<bool>(getInterruptFlags() & InterruptFlag::EndOfSampling);
+	return static_cast<bool>(getInterruptFlags() & InterruptFlag::EndOfConversion);
 }
 
 // ----------------------------------------------------------------------------
