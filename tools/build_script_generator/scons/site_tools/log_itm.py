@@ -21,8 +21,8 @@ def run_openocd_itm(target, source, env):
     # Provide additional search paths via the OPENOCD_SCRIPTS environment variable
     # See http://openocd.org/doc/html/Running.html
     env["ENV"]["OPENOCD_SCRIPTS"] = os.environ.get("OPENOCD_SCRIPTS", "")
-    search = env.get("MODM_OPENOCD_SEARCHDIRS", [])
-    config = env.get("MODM_OPENOCD_CONFIGFILES", [])
+    search = env.Listify(env.get("MODM_OPENOCD_SEARCHDIRS", []))
+    config = env.Listify(env.get("MODM_OPENOCD_CONFIGFILES", []))
     openocdcmd = '{} {}'.format(
             " ".join(map('-s "{}"'.format, map(env.subst, search))),
             " ".join(map('-f "{}"'.format, map(env.subst, config))))
