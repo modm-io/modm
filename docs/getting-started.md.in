@@ -12,6 +12,29 @@ repository and module options and of course which modules you want to have
 generated. Even though modm will generate a library that is self-contained,
 we still recommend adding modm as a git submodule for reproducibility.
 
+This guide assumes the following project layout:
+
+```
+ $ tree
+.
+├── modm
+│   ├── repo.lb
+│   └── {a lot of stuff}
+└── project_name
+    ├── main.cpp
+    └── project.xml
+```
+
+!!! warning "Place your applications into their own folder!"
+    All modm build systems search *recursively* for application sources inside
+    the current folder. If you place the modm library repository into your
+    application folder you will see build errors related to building sources
+    twice:
+
+    ```
+    scons: *** Multiple ways to build the same target were specified for: ...
+    ```
+
 
 ### Using a Board Support Package
 
