@@ -336,6 +336,12 @@ jobs:
           command: |
             (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
       - run:
+          name: Test run of docs.modm.io-generator-script
+          command: |
+            export TERM=xterm-256color
+            export COLUMNS=120
+            python3 tools/scripts/docs_modm_io_generator.py -t -c
+      - run:
           name: Build Homepage
           command: |
             python3 tools/scripts/synchronize_docs.py
@@ -378,6 +384,26 @@ jobs:
             git diff-index --quiet HEAD || git commit -m "Update"
             git push origin master
 
+  api-docs-all:
+    docker:
+      - image: modm/modm-build:latest
+    steps:
+      - checkout
+      - run:
+          name: Update submodules and install lbuild
+          command: |
+            (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
+      - run:
+          name: Full run of docs.modm.io-generator-script with upload
+          command: |
+            export TERM=xterm-256color
+            export COLUMNS=120
+            python3 tools/scripts/docs_modm_io_generator.py -c -j4
+      - run:
+          name: Upload api documentation to docs.modm.io
+          command: |
+            curl https://docs.modm.io/upload/compressed --upload-file modm-api-docs.tar.gz --user $MODM_UPLOAD
+
 workflows:
   version: 2
   build:
@@ -387,6 +413,10 @@ workflows:
       - avr-examples
       - stm32-examples
 
+      - api-docs-all:
+          filters:
+            branches:
+              only: develop
       - avr-compile-all:
           requires:
             - unittests-linux-generic
