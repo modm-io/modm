@@ -35,10 +35,10 @@ def build_target(env, sources):
 	env.Alias("artifact", env.CacheArtifact(program))
 
 		%% if upload_with_artifact
-	env.Alias("program", [env.OpenOcd(program, commands=["modm_program $SOURCE"]), "artifact"])
+	env.Alias("program", [env.OpenOcd(program, commands=["modm_program {$SOURCE}"]), "artifact"])
 	env.Alias("bmp", [env.BlackMagicProbe(program), "artifact"])
 		%% else
-	env.Alias("program", env.OpenOcd(program, commands=["modm_program $SOURCE"]))
+	env.Alias("program", env.OpenOcd(program, commands=["modm_program {$SOURCE}"]))
 	env.Alias("bmp", env.BlackMagicProbe(program))
 		%% endif
 
