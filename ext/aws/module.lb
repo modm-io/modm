@@ -43,7 +43,7 @@ def build(env):
     # Figure out the core and correct path in portable/
     core = env[":target"].get_driver("core")["type"]
     env.substitutions = {"core": core}
-    path = core.replace("cortex-m", "ARM_CM").replace("+", "").replace("fd", "").upper()
+    path = core.replace("cortex-m", "ARM_CM").replace("+", "").replace("fd", "f").upper()
     path = path.replace("CM7F", "CM7/r0p1") # use subfolder for M7
     path = "freertos/FreeRTOS/Source/portable/GCC/{}".format(path)
 
