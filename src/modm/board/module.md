@@ -72,11 +72,11 @@ This is great for just quickly prototyping something, however, when you want to
 use custom hardware, or even just change a few settings, it's better to use your
 own BSP:
 
-1. Generate the BSP closest to your custom hardware, then copy the files from
-   `modm/src/modm/board/{name}` to your own project and modify them.
-2. In your `project.xml` remove the board config inheritance (`<extends>`) and
+1. Generate the BSP closest to your custom hardware (using `lbuild build`).
+2. Copy the files from `modm/src/modm/board` to your own project and modify them.
+3. In your `project.xml` remove the board config inheritance (`<extends>`) and
    instead copy the pre-defined options into your own config.
-3. Check what modm modules you need to depend on and add them to your own project
+4. Check what modm modules you need to depend on and add them to your own project
    (check for `module.depends(...)` in the BSPs `module.lb`).
-4. You may need to manually add the pre-defined collector values to your project
+5. You may need to manually add the pre-defined collector values to your project
    configuration (check for `env.collect(...)` in the BSPs `module.lb`).
