@@ -94,7 +94,7 @@ using Int2 = GpioInputC2;	// MEMS_INT2 [L3GD20_DRDY/INT2]: GPXTI1
 
 using Cs   = GpioOutputC0;	// CS_I2C/SPI [L3GD20_CS_I2C/SPI]
 using Sck  = GpioOutputB13;	// SPI2_SCK [L3GD20_SCL/SPC]
-using Mosi = GpioOutputB15;	// SPI2_MISO [L3GD20_SDA/SDI/SDO]
+using Mosi = GpioOutputB15;	// SPI2_MOSI [L3GD20_SDA/SDI/SDO]
 using Miso = GpioInputB14;	// SPI2_MISO [L3GD20_SA0/SDO]
 
 using SpiMaster = SpiMaster2;
