@@ -63,7 +63,7 @@ def build(env):
     properties["pllprediv2"] = False    # FIXME: not sure what value this should have
     properties["hsi48"] = \
         target["family"] == "f0" and target["name"] in ["42", "48", "71", "72", "78", "91", "98"]
-    properties["pll_p"] = target["family"] == "l4" and target["name"] not in ["12", "22"]
+    properties["pll_p"] = ((target["family"] == "l4" and target["name"] not in ["12", "22"]) or target["family"] == "g4")
 
     flash_latencies = {}
     for vcore in device.get_driver("flash")["latency"]:

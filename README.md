@@ -70,7 +70,7 @@ git clone --recurse-submodules https://github.com/modm-io/modm.git
 
 ## Targets
 
-modm can generate code for <!--avrcount-->78<!--/avrcount--> AVR and <!--stmcount-->1039<!--/stmcount-->
+modm can generate code for <!--avrcount-->78<!--/avrcount--> AVR and <!--stmcount-->1158<!--/stmcount-->
 STM32 devices, however, there are different levels of support and testing.
 
 <center>
@@ -80,7 +80,7 @@ STM32 devices, however, there are different levels of support and testing.
 | AVR           | ★★★     | STM32F0       | ★★★★    | STM32F1       | ★★★★    |
 | STM32F2       | ★★★★    | STM32F3       | ★★★★★   | STM32F4       | ★★★★★   |
 | STM32F7       | ★★★★    | STM32L1       | ★★★★    | STM32L4       | ★★★★    |
-| STM32L4+      | ★★★★    | STM32G0       | ★★★★    |
+| STM32L4+      | ★★★★    | STM32G0       | ★★★★    | STM32G4       | ★★★★    |
 
 </center>
 
@@ -141,10 +141,11 @@ documentation.
 <td align="center">NUCLEO-F446RE</td>
 </tr><tr>
 <td align="center">NUCLEO-G071RB</td>
+<td align="center">NUCLEO-G474RE</td>
 <td align="center">NUCLEO-L152RE</td>
 <td align="center">NUCLEO-L432KC</td>
-<td align="center">NUCLEO-L476RG</td>
 </tr><tr>
+<td align="center">NUCLEO-L476RG</td>
 <td align="center">OLIMEXINO-STM32</td>
 <td align="center">STM32F030F4P6-DEMO</td>
 </tr>
