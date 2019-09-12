@@ -29,8 +29,8 @@ modm::platform::Adc{{ id }}::initialize(const ClockMode clk,
 	uint32_t tmp = 0;
 
 	// enable clock
-%% if target["family"] in ["f3"]
-	RCC->AHBENR |= RCC_AHBENR_ADC{{ id_common }}EN;
+%% if target["family"] in ["f3", "g4"]
+	RCC->{{ ahb }}ENR |= RCC_{{ ahb }}ENR_ADC{{ id_common }}EN;
 %% elif target["family"] in ["l4"]
 	Rcc::enable<Peripheral::Adc1>();
 %% endif
@@ -40,7 +40,7 @@ modm::platform::Adc{{ id }}::initialize(const ClockMode clk,
 	RCC->CCIPR |= static_cast<uint32_t>(clk_src);
 %% endif
 
-%% if target["family"] in ["l4"]
+%% if target["family"] in ["l4", "g4"]
 	// Disable deep power down
 	ADC{{ id }}->CR &= ~ADC_CR_DEEPPWD;
 %% endif
@@ -86,8 +86,8 @@ modm::platform::Adc{{ id }}::disable(const bool blocking)
 		while(ADC{{ id }}->CR & ADC_CR_ADDIS);
 	}
 	// disable clock
-%% if target["family"] in ["f3"]
-	RCC->AHBENR &= ~RCC_AHBENR_ADC{{ id_common }}EN;
+%% if target["family"] in ["f3", "g4"]
+	RCC->{{ ahb }}ENR &= ~RCC_{{ ahb }}ENR_ADC{{ id_common }}EN;
 %% elif target["family"] in ["l4"]
 	Rcc::disable<Peripheral::Adc1>();
 %% endif
@@ -102,7 +102,7 @@ modm::platform::Adc{{ id }}::setPrescaler(const Prescaler pre)
 	tmp &= ~static_cast<uint32_t>(Prescaler::Div256AllBits);
 	tmp |=  static_cast<uint32_t>(pre);
 	RCC->CFGR2 = tmp;
-%% elif target["family"] in ["l4"]
+%% elif target["family"] in ["l4", "g4"]
 	tmp  = ADC{{ id_common_u }}->CCR;
 	tmp &= ~static_cast<uint32_t>(Prescaler::Div256AllBits);
 	tmp |=  static_cast<uint32_t>(pre);
@@ -224,9 +224,9 @@ void
 modm::platform::Adc{{ id }}::enableInterruptVector(const uint32_t priority,
 												const bool enable)
 {
-%% if id < 3
+%% if id <= 2
 	const IRQn_Type INTERRUPT_VECTOR = ADC1_2_IRQn;
-%% elif id < 5
+%% elif id <= 5
 	const IRQn_Type INTERRUPT_VECTOR = ADC{{ id }}_IRQn;
 %% endif
 

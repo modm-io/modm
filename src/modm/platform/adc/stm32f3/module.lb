@@ -39,6 +39,9 @@ class Instance(Module):
             elif target["family"] == "l4":
                 # ADC1 is connected to 16 external channels + 3 internal channels
                 channels = range(1,17)
+            elif target["family"] == "g4":
+                # ADC1 is connected to 14 external channels + 4 internal channels
+                channels = range(1,15)
             else:
                 # 11-14 reserved
                 channels = [1,2,3,4,5,6,7,8,9,10,15,16,17,18]
@@ -46,21 +49,38 @@ class Instance(Module):
             if target["family"] == "f3":
                 # 13-16 reserved
                 channels = [1,2,3,4,5,6,7,8,9,10,11,12,17,18]
+            elif target["family"] == "g4":
+                # ADC2 is connected to 16 external channels + 2 internal channels
+                channels = range(1,17)
             else:
                 # ADC2 is connected to 16 external channels + 2 internal channels
                 channels = range(1,17)
         elif instance_id == 3:
             if target["family"] == "f3":
                 channels = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]
+            elif target["family"] == "g4":
+                # ADC3 is connected to 15 external channels + 3 internal channels
+                channels = range(1,16)
             else:
                 # ADC3 is connected to 12 external channels + 4 internal channels
                 channels = [1,2,3,4,6,7,8,9,10,11,12,13]
         elif instance_id == 4:
-            # 14-16 reserved
-            channels = [1,2,3,4,5,6,7,8,9,10,11,12,13,17,18]
+            if target["family"] == "g4":
+                # ADC4 is connected to 16 external channels + 2 internal channels
+                channels = range(1,17)
+            else:
+                # 14-16 reserved
+                channels = [1,2,3,4,5,6,7,8,9,10,11,12,13,17,18]
+        elif instance_id == 5:
+            if target["family"] == "g4":
+                # ADC5 is connected to 13 external channels + 5 internal channels
+                channels = range(1,14)
+            else:
+                raise NotImplementedError
         properties["channels"] = sorted(channels)
 
         if target["family"] == "f3":
+            properties["ahb"] = "AHB"
             if len(driver["instance"]) == 1:
                 properties["adc_ccr"] = "ADC1_CCR"
                 properties["adc_pre"] = "ADC1PRES"
@@ -77,7 +97,7 @@ class Instance(Module):
                 properties["id_common"] = "34"
                 properties["id_common_u"] = "3_4_COMMON"
             properties["clock_mux"] = False
-        else: # L4
+        elif target["family"] == "l4":
             properties["adc_ccr"] = "ADC_CCR"
             if len(driver["instance"]) == 1:
                 properties["id_common"] = "1"
@@ -89,6 +109,18 @@ class Instance(Module):
                 properties["id_common"] = "123"
                 properties["id_common_u"] = "123_COMMON"
             properties["clock_mux"] = (target["name"] not in ("12", "22"))
+        elif target["family"] == "g4":
+            properties["ahb"] = "AHB2"
+            properties["adc_ccr"] = "ADC_CCR"
+            if instance_id in [1, 2]:
+                properties["id_common"] = "12"
+                properties["id_common_u"] = "12_COMMON"
+            else:
+                properties["id_common"] = "345"
+                properties["id_common_u"] = "345_COMMON"
+            properties["clock_mux"] = True
+        else:
+            raise NotImplementedError
 
         env.substitutions = properties
         env.outbasepath = "modm/src/modm/platform/adc"
