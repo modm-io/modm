@@ -286,5 +286,86 @@ def common_compiler_flags(compiler, target):
         "MODM_DEBUG_BUILD",
     ]
 
+    # Architecture flags for C, C++, Assembly and **Linker**
+    flags["archflags"] = []
+
+    # Target specific flags
+    core = target.get_driver("core")["type"]
+    if core.startswith("cortex-m"):
+        cpu = core.replace("fd", "").replace("f", "").replace("+", "plus")
+        flags["archflags"] += [
+            "-mcpu={}".format(cpu),
+            "-mthumb",
+        ]
+        single_precision = True
+        fpu = core.replace("cortex-m", "").replace("+", "")
+        if "f" in fpu:
+            fpu_spec = {
+                "4f": "-mfpu=fpv4-sp-d16",
+                "7f": "-mfpu=fpv5-sp-d16",
+                "7fd": "-mfpu=fpv5-d16",
+            }[fpu]
+            flags["archflags"] += [
+                "-mfloat-abi=hard",
+                fpu_spec
+            ]
+            single_precision = ("-sp-" in fpu_spec)
+        if single_precision:
+            flags["ccflags"] += [
+                "-fsingle-precision-constant",
+                "-Wdouble-promotion",
+            ]
+        flags["cxxflags"] += [
+            "-fno-exceptions",
+            "-fno-unwind-tables",
+            "-fno-rtti",
+            "-fno-threadsafe-statics",
+            "-fuse-cxa-atexit",
+        ]
+        flags["linkflags"] += [
+            "-Wl,--no-wchar-size-warning",
+            "-Wl,-wrap,_calloc_r",
+            "-Wl,-wrap,_free_r",
+            "-Wl,-wrap,_malloc_r",
+            "-Wl,-wrap,_realloc_r",
+            "--specs=nano.specs",
+            "--specs=nosys.specs",
+            "-nostartfiles",
+            "-L{linkdir}",
+            "-Tlinkerscript.ld",
+        ]
+
+    elif core.startswith("avr"):
+        flags["archflags"] += [
+            "-mmcu={}".format(target.partname),
+        ]
+        flags["cxxflags"] += [
+            "-fno-exceptions",
+            "-fno-unwind-tables",
+            "-fno-rtti",
+            "-fno-threadsafe-statics",
+        ]
+        flags["linkflags"] += [
+            "-L{linkdir}",
+            "-Tlinkerscript.ld",
+        ]
+    elif core.startswith("e31"):
+        flags["archflags"] += [
+            "-march=rv32imac",
+            "-mabi=ilp32",
+        ]
+        flags["cxxflags"] += [
+            "-fno-exceptions",
+            "-fno-unwind-tables",
+            "-fno-rtti",
+            "-fno-threadsafe-statics",
+        ]
+        flags["linkflags"] += [
+            "-L{linkdir}",
+            "-Tlinkerscript.ld",
+            "--specs=nano.specs",
+            "--specs=nosys.specs",
+        ]
+
     return flags
 
