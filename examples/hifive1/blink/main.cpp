@@ -10,7 +10,7 @@
  */
 
 #include <modm/board.hpp>
-
+#include <modm/processing/timer.hpp>
 
 #define GPIO_OUT_EN  (*(reinterpret_cast<uint32_t*>(0x10012000+0x08)))
 #define GPIO_OUT_VAL (*(reinterpret_cast<uint32_t*>(0x10012000+0x0C)))
@@ -30,9 +30,23 @@ main()
 	GPIO_XOR = ALL_LEDS;
 	GPIO_OUT_VAL = ALL_LEDS;
 
+	modm::ShortPeriodicTimer timer(500);
+
+	bool ledon = true;
 	while (true)
 	{
-
+		if(timer.execute())
+		{
+			if(ledon)
+			{
+				GPIO_OUT_VAL = ALL_LEDS;
+			}
+			else
+			{
+				GPIO_OUT_VAL = 0;
+			}
+			ledon = !ledon;	
+		}
 	}
 
 	return 0;

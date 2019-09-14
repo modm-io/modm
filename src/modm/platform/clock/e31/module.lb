@@ -11,35 +11,27 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = ":platform:core"
-    module.description = "SiFive E31 Core"
+    module.name = ":platform:prci"
+    module.description= "PRCI controller of the E31 core"
 
 def prepare(module, options):
-    if not options[":target"].has_driver("core:e31"):
+    if not options[":target"].has_driver("clock:e31"):
         return False
-    module.depends(
-        )
 
+    module.depends(":platform:core")
     return True
 
 def build(env):
     device = env[":target"]
-    driver = device.get_driver("core")
+    driver = device.get_driver("clock")
 
     properties = device.properties
-
     properties["target"] = target = device.identifier
     properties["driver"] = driver
 
-    env.outbasepath = "modm/link"
-    env.copy("linkerscript/linkerscript.ld", "linkerscript.ld")
-
     env.substitutions = properties
-    env.outbasepath = "modm/src/modm/platform/core"
+    env.outbasepath = "modm/src/modm/platform/clock"
 
-    env.copy("startup.S")
-    env.copy("flash_reader.hpp")
-    env.copy("clock.cpp")
-    
-
+    env.template("clock.cpp")
+    env.template("clock.hpp")
 

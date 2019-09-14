@@ -18,10 +18,6 @@
 
 namespace Board{
 
-//using RedLed   = GpioD22;
-//using GreenLed = GpioD19;
-//using BlueLed  = GpioD21;
-
 struct SystemClock {
 	static constexpr uint32_t Frequency = 320'000'000;
 
