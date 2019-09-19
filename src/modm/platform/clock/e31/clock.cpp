@@ -54,17 +54,18 @@ void
 modm::platform::PRCI::setupPll(PllSource src,
 							   bool bypass,
 							   PllPrediv pll_r,
-							   uint8_t pll_f,
+							   uint8_t multiplier,
 							   PllPostDiv pll_q)
 {
 	uint32_t config = PRCI_PLL_CONF;
-	//turn off the pll output first
+	//turn off the pll output first and enable the bypass
 	config &= ~(1<<16);
+	config |= (1<<18);
 	PRCI_PLL_CONF = config;
 
 	//configure the new pll settings
-	config  = (static_cast<uint32_t>(pll_r));
-	config |= (static_cast<uint32_t>(pll_f)) << 4;
+	config = (static_cast<uint32_t>(pll_r));
+	config |= (static_cast<uint32_t>((multiplier/2)-1) & 0x3F ) <<4;
 	config |= (static_cast<uint32_t>(pll_q)) << 10;
 	//enable the pll
 	config |= (1<<16);
