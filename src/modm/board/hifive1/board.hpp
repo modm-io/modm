@@ -12,8 +12,9 @@
 #define MODM_HIFIVE1_HPP
 
 #include <modm/platform.hpp>
+
 #include <cstdint>
-//#include <modm/architecture/interface/clock.hpp>
+
 /// @ingroup modm_hifive1
 
 namespace Board{
@@ -24,14 +25,35 @@ struct SystemClock {
 	static bool inline
 	enable()
 	{
+		//Configure the clock to use the PLL driven by the external Oscillator
+		modm::platform::PRCI::enableExternalOscillator();
+		modm::platform::PRCI::setupPll(modm::platform::PRCI::PllSource::ExternalOscillator,
+									   false,
+									   modm::platform::PRCI::PllPrediv::Div2,
+									   80,
+									   modm::platform::PRCI::PllPostDiv::Div2);
+		//modm::platform::PRCI::disableInternalOscillator();
 		return true;
 	}
 };
 
+using LedRed   = modm::platform::GpioA22;
+using LedGreen = modm::platform::GpioA19;
+using LedBlue  = modm::platform::GpioA21;
+
 inline void
 initialize()
 {
+	SystemClock::enable();
 
+	LedRed::setOutput();
+	LedRed::setInverted(true);
+
+	LedGreen::setOutput();
+	LedGreen::setInverted(true);
+	
+	LedBlue::setOutput();
+	LedBlue::setInverted(true);
 }
 
 }
