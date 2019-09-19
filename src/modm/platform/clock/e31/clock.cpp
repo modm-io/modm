@@ -79,7 +79,7 @@ modm::platform::PRCI::setupPll(PllSource src,
 	}
 	// write the new config;
 	PRCI_PLL_CONF = config;
-	
+
 	//wait until we got a lock
 	while((PRCI_PLL_CONF & (1<<31)) == 0){}
 }

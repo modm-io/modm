@@ -40,6 +40,6 @@ def build(env):
     env.copy("startup.S")
     env.copy("flash_reader.hpp")
     env.copy("clock.cpp")
-    
+
 
 

@@ -12,7 +12,7 @@
     </driver>
 
     <driver name="clock" type="e31"/>
-    
+
     <driver name="gpio" type="e31">
       <port name="A" base="0x10012000"/>
     </driver>

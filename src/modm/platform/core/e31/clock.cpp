@@ -10,7 +10,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/architecture/interface/clock.hpp>
-                                            
+
 #define RTC_COUNT_LO *((volatile uint32_t *)0x10000048)
 #define RTC_COUNT_HI *((volatile uint32_t *)0x1000004C)
 

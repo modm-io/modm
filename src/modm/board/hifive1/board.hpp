@@ -51,7 +51,7 @@ initialize()
 
 	LedGreen::setOutput();
 	LedGreen::setInverted(true);
-	
+
 	LedBlue::setOutput();
 	LedBlue::setInverted(true);
 }

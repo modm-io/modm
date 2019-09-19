@@ -34,7 +34,7 @@ struct Gpio
 /// @endcond
 
 template<uint32_t portBaseAddress>
-class GpioPort : public ::modm::GpioPort 
+class GpioPort : public ::modm::GpioPort
 {
 
 private:
@@ -60,7 +60,7 @@ private:
 
 public:
 
-    template<uint8_t pinOffset> 
+    template<uint8_t pinOffset>
     class GpioPin : public Gpio ,public ::modm::GpioIO
     {
 	public:
@@ -70,7 +70,7 @@ public:
             *REG_INPUT_EN  &= ~(1<<pinOffset);
             *REG_OUTPUT_EN |=  (1<<pinOffset);
         }
-        inline static void set() 
+        inline static void set()
         {
             *REG_OUTPUT_VAL |= (1<<pinOffset);
         }
@@ -80,7 +80,7 @@ public:
             *REG_OUTPUT_VAL &= ~(1<<pinOffset);
         }
 
-        inline static void set(bool status) 
+        inline static void set(bool status)
         {
             if(status)
             {
@@ -90,7 +90,7 @@ public:
             {
                 reset();
             }
-            
+
         }
 
 	    inline static void setOutput(bool status)
@@ -109,26 +109,26 @@ public:
 			{
 				*REG_OUTPUT_INV &= ~(1<<pinOffset);
 			}
-			
+
 		}
-	
+
 	    inline static void toggle() {
 		    if (isSet()) { reset(); }
 		    else         { set();   }
 	    }
 
 	    inline static bool isSet() {
-            return (*REG_OUTPUT_VAL & (1<<pinOffset)); 
+            return (*REG_OUTPUT_VAL & (1<<pinOffset));
         }
-	
-	    inline static void setInput() 
+
+	    inline static void setInput()
         {
             *REG_OUTPUT_EN &= ~(1<<pinOffset);
             *REG_INPUT_EN  |=  (1<pinOffset);
         }
 
 
-	    inline static bool read() 
+	    inline static bool read()
         {
             return (*REG_INPUT_VAL & (1<pinOffset));
         }
@@ -201,7 +201,7 @@ public:
 					return (*REG_LOW_IP & (1<<pinOffset));
 			}
         }
-		
+
         inline static void acknowledgeExternalInterruptFlag(const InputTrigger trigger)
 		{
 			switch(trigger)

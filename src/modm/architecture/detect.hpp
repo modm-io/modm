@@ -229,9 +229,9 @@
 
 #if defined __riscv
 #	define MODM_CPU_RISCV 1
-#	if __riscv_xlen == 32 
+#	if __riscv_xlen == 32
 #		define MODM_CPU_STRING      "RISCV32"
-#	endif	 
+#	endif
 #endif
 
 #if !defined MODM_CPU_STRING
