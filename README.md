@@ -140,11 +140,12 @@ documentation.
 <td align="center">NUCLEO-F446RE</td>
 <td align="center">NUCLEO-G071RB</td>
 </tr><tr>
+<td align="center">NUCLEO-L152RE</td>
 <td align="center">NUCLEO-L432KC</td>
 <td align="center">NUCLEO-L476RG</td>
 <td align="center">OLIMEXINO-STM32</td>
-<td align="center">STM32F030F4P6-DEMO</td>
 </tr><tr>
+<td align="center">STM32F030F4P6-DEMO</td>
 </tr>
 </table>
 <!--/bsptable-->
