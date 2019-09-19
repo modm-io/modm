@@ -1,0 +1,29 @@
+/*
+ * Copyright (c) 2019, Benjamin Weps
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_E31_GPIO_HPP
+#define MODM_E31_GPIO_HPP
+
+#include "gpio_base.hpp"
+
+namespace modm::platform{
+
+%% for port in driver.port
+    %% for pin in range(0,31)
+        using Gpio{{port.name}}{{pin}} = modm::platform::GpioPort<{{port.base}}>::GpioPin<{{pin}}>;
+    %% endfor
+
+%% endfor
+
+}
+
+
+#endif

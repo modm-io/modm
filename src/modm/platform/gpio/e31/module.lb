@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2019, Benjamin Weps
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":platform:gpio"
+    module.description = "SiFive E31 GPIO"
+
+def prepare(module, options):
+    if not options[":target"].has_driver("gpio:e31"):
+        return False
+
+    module.depends(":architecture:gpio")
+    return True
+
+def build(env):
+    device = env[":target"]
+    driver = device.get_driver("gpio")
+
+    properties = device.properties
+    properties["target"] = target = device.identifier
+    properties["driver"] = driver
+
+    env.substitutions = properties
+    env.outbasepath = "modm/src/modm/platform/gpio"
+
+    env.copy("gpio_base.hpp")
+    env.template("gpio.hpp.in")
