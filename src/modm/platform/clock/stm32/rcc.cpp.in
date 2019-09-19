@@ -61,13 +61,19 @@ modm::platform::Rcc::enableInternalClock(uint32_t waitCycles)
 	return retval;
 }
 
-%% if target["family"] in ["l4"]
+%% if target["family"] in ["l1", "l4"]
 bool
 modm::platform::Rcc::enableMultiSpeedInternalClock(MsiFrequency msi_frequency, uint32_t waitCycles)
 {
 	bool retval;
+%% if target["family"] in ["l1"]
+	RCC->ICSCR = (RCC->ICSCR & ~RCC_ICSCR_MSIRANGE) | static_cast<uint32_t>(msi_frequency);
+	RCC->CR |= RCC_CR_MSION;
+	while (not (retval = (RCC->CR & RCC_CR_MSIRDY)) and --waitCycles)
+%% else
 	RCC->CR = (RCC->CR & ~RCC_CR_MSIRANGE) | static_cast<uint32_t>(msi_frequency) | RCC_CR_MSIRGSEL | RCC_CR_MSION;
 	while (not (retval = (RCC->CR & RCC_CR_MSIRDY)) and --waitCycles)
+%% endif
 		;
 	return retval;
 }
@@ -107,8 +113,13 @@ bool
 modm::platform::Rcc::enableLowSpeedExternalClock(uint32_t waitCycles)
 {
 	bool retval;
+%% if target["family"] in ["l1"]
+	RCC->CSR |= RCC_CSR_LSEBYP | RCC_CSR_LSEON;
+	while (not (retval = (RCC->CSR & RCC_CSR_LSERDY)) and --waitCycles)
+%% else
 	RCC->BDCR |= RCC_BDCR_LSEBYP | RCC_BDCR_LSEON;
 	while (not (retval = (RCC->BDCR & RCC_BDCR_LSERDY)) and --waitCycles)
+%% endif
 		;
 	return retval;
 }
@@ -117,8 +128,13 @@ bool
 modm::platform::Rcc::enableLowSpeedExternalCrystal(uint32_t waitCycles)
 {
 	bool retval;
+%% if target["family"] in ["l1"]
+	RCC->CSR = (RCC->CSR & ~RCC_CSR_LSEBYP) | RCC_CSR_LSEON;
+	while (not (retval = (RCC->CSR & RCC_CSR_LSERDY)) and --waitCycles)
+%% else
 	RCC->BDCR = (RCC->BDCR & ~RCC_BDCR_LSEBYP) | RCC_BDCR_LSEON;
 	while (not (retval = (RCC->BDCR & RCC_BDCR_LSERDY)) and --waitCycles)
+%% endif
 		;
 	return retval;
 }
@@ -202,6 +218,26 @@ modm::platform::Rcc::enablePll(PllSource source,
 	// enable pll
 	RCC->CR |= RCC_CR_PLLON;
 
+	while (not (tmp = (RCC->CR & RCC_CR_PLLRDY)) and --waitCycles)
+		;
+
+	return tmp;
+}
+%% elif target["family"] in ["l1"]
+// ----------------------------------------------------------------------------
+bool
+modm::platform::Rcc::enablePll(PllSource source, PllMultiplier pllMul, uint8_t pllDiv, uint32_t waitCycles)
+{
+	uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_PLLMUL | RCC_CFGR_PLLSRC | RCC_CFGR_PLLDIV);
+	// PLLSRC source for pll
+	tmp |= static_cast<uint32_t>(source);
+	// Pll multiplication factor
+	tmp |= static_cast<uint32_t>(pllMul);
+	tmp |= (static_cast<uint32_t>(pllDiv - 1) << RCC_CFGR_PLLDIV_Pos) & RCC_CFGR_PLLDIV;
+	RCC->CFGR = tmp;
+
+	// enable pll
+	RCC->CR |= RCC_CR_PLLON;
 	while (not (tmp = (RCC->CR & RCC_CR_PLLRDY)) and --waitCycles)
 		;
 

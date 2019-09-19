@@ -33,8 +33,10 @@ public:
 		CaptureCompare2 = TIM_DIER_CC2DE,
 		CaptureCompare3 = TIM_DIER_CC3DE,
 		CaptureCompare4 = TIM_DIER_CC4DE,
+%% if target.family not in ["l1"]
 		COM = TIM_DIER_COMDE,
 		Trigger = TIM_DIER_TDE,
+%% endif
 	};
 
 	enum class Interrupt : uint32_t
@@ -44,9 +46,11 @@ public:
 		CaptureCompare2 = TIM_DIER_CC2IE,
 		CaptureCompare3 = TIM_DIER_CC3IE,
 		CaptureCompare4= TIM_DIER_CC4IE,
-		COM = TIM_DIER_COMIE,
 		Trigger = TIM_DIER_TIE,
+%% if target.family not in ["l1"]
+		COM = TIM_DIER_COMIE,
 		Break = TIM_DIER_BIE,
+%% endif
 	};
 	MODM_FLAGS32(Interrupt);
 
@@ -57,13 +61,15 @@ public:
 		CaptureCompare2 = TIM_SR_CC2IF,
 		CaptureCompare3 = TIM_SR_CC3IF,
 		CaptureCompare4 = TIM_SR_CC4IF,
-		COM = TIM_SR_COMIF,
 		Trigger = TIM_SR_TIF,
-		Break = TIM_SR_BIF,
 		Overcapture1 = TIM_SR_CC1OF,
 		Overcapture2 = TIM_SR_CC2OF,
 		Overcapture3 = TIM_SR_CC3OF,
 		Overcapture4 = TIM_SR_CC4OF,
+%% if target.family not in ["l1"]
+		COM = TIM_SR_COMIF,
+		Break = TIM_SR_BIF,
+%% endif
 	};
 	MODM_FLAGS32(InterruptFlag);
 
@@ -183,6 +189,7 @@ public:
 		Enable = 1,
 	};
 
+%% if target.family not in ["l1"]
 	/* Different Resolution Depending on DeadTime[7:5]: */
 	enum class DeadTimeResolution : uint32_t
 	{
@@ -192,6 +199,7 @@ public:
 		From64usWith2usStep  = TIM_BDTR_DTG_7 | TIM_BDTR_DTG_6	//111
 											| TIM_BDTR_DTG_5,
 	};
+%% endif
 
 public:
 	/**

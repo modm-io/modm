@@ -250,6 +250,23 @@ jobs:
           path: test/all/log
           destination: log
 
+  stm32l1-compile-all:
+    docker:
+      - image: modm/modm-build:latest
+    steps:
+      - checkout
+      - run:
+          name: Checkout code and update modm tools
+          command: |
+            (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade modm & wait
+      - run:
+          name: Compile HAL for all STM32L1
+          command: |
+            (cd test/all && python3 run_all.py stm32l1)
+      - store_artifacts:
+          path: test/all/log
+          destination: log
+
   stm32l4-compile-all:
     docker:
       - image: modm/modm-build:latest
@@ -376,6 +393,10 @@ workflows:
           requires:
             - unittests-linux-generic
             - stm32-examples
+      - stm32l1-compile-all:
+          requires:
+            - unittests-linux-generic
+            - stm32-examples
       - stm32l4-compile-all:
           requires:
             - unittests-linux-generic
@@ -394,6 +415,7 @@ workflows:
             - stm32f4-compile-all
             - stm32f7-compile-all
             - stm32g0-compile-all
+            - stm32l1-compile-all
             - stm32l4-compile-all
       - build-docs:
           requires:

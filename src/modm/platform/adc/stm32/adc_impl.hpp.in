@@ -62,7 +62,7 @@ modm::platform::Adc{{ id }}::initialize()
 			)));
 
 	Rcc::enable<Peripheral::Adc{{id}}>();
-	ADC{{ id }}->CR2 |= ADC_CR2_ADON;			// switch on ADC
+	ADC{{ per }}->CR2 |= ADC_CR2_ADON;			// switch on ADC
 
 	setPrescaler(prescaler);
 }
@@ -70,8 +70,8 @@ modm::platform::Adc{{ id }}::initialize()
 void
 modm::platform::Adc{{ id }}::setPrescaler(const Prescaler prescaler)
 {
-%% if target["family"] in ["f2", "f4", "f7"]
-	ADC->CCR = (ADC->CCR & ~(0b11 << 17)) | (uint32_t(prescaler) << 17);
+%% if target["family"] in ["f2", "f4", "f7", "l1"]
+	ADC->CCR = (ADC->CCR & ~ADC_CCR_ADCPRE) | (uint32_t(prescaler) << ADC_CCR_ADCPRE_Pos);
 %% elif target["family"] in ["f1", "f3"]
 	RCC->CFGR = (RCC->CFGR & ~(0b11 << 14)) | (uint32_t(prescaler) << 14);
 %% endif
@@ -84,7 +84,7 @@ modm::platform::Adc{{ id }}::enableTemperatureRefVMeasurement()
 	%% if target["family"] in ["f2", "f4", "f7"]
 	ADC->CCR |= ADC_CCR_TSVREFE;
 	%% elif target["family"] == "f1"
-	ADC{{ id }}->CR2 |= ADC_CR2_TSVREFE;
+	ADC{{ per }}->CR2 |= ADC_CR2_TSVREFE;
 	%% endif
 }
 
@@ -94,7 +94,7 @@ modm::platform::Adc{{ id }}::disableTemperatureRefVMeasurement()
 	%% if target["family"] in ["f2", "f4", "f7"]
 	ADC->CCR &= ~ADC_CCR_TSVREFE;
 	%% elif target["family"] == "f1"
-	ADC{{ id }}->CR2 &= ~ADC_CR2_TSVREFE;
+	ADC{{ per }}->CR2 &= ~ADC_CR2_TSVREFE;
 	%% endif
 }
 %% endif
@@ -102,13 +102,13 @@ modm::platform::Adc{{ id }}::disableTemperatureRefVMeasurement()
 void
 modm::platform::Adc{{ id }}::setLeftAdjustResult()
 {
-	ADC{{ id }}->CR2 |= ADC_CR2_ALIGN;
+	ADC{{ per }}->CR2 |= ADC_CR2_ALIGN;
 }
 
 void
 modm::platform::Adc{{ id }}::setRightAdjustResult()
 {
-	ADC{{ id }}->CR2 &= ~ADC_CR2_ALIGN;
+	ADC{{ per }}->CR2 &= ~ADC_CR2_ALIGN;
 }
 
 bool
@@ -118,9 +118,9 @@ modm::platform::Adc{{ id }}::setChannel(const Channel channel,
 	if (uint32_t(channel) > 18) return false;
 	// clear number of conversions in the sequence
 	// and set number of conversions to 1
-	ADC{{ id }}->SQR1 = 0;
-	ADC{{ id }}->SQR2 = 0;
-	ADC{{ id }}->SQR3 = uint32_t(channel) & 0x1f;
+	ADC{{ per }}->SQR1 = 0;
+	ADC{{ per }}->SQR2 = 0;
+	ADC{{ per }}->SQR3 = uint32_t(channel) & 0x1f;
 
 	setSampleTime(channel, sampleTime);
 	return true;
@@ -129,7 +129,7 @@ modm::platform::Adc{{ id }}::setChannel(const Channel channel,
 modm::platform::Adc{{ id }}::Channel
 modm::platform::Adc{{ id }}::getChannel()
 {
-	return Channel(ADC{{ id }}->SQR3 & 0x1f);
+	return Channel(ADC{{ per }}->SQR3 & 0x1f);
 }
 
 bool
@@ -137,22 +137,22 @@ modm::platform::Adc{{ id }}::addChannel(const Channel channel,
 									const SampleTime sampleTime)
 {
 	// read channel count
-	uint8_t channel_count = (ADC{{ id }}->SQR1 & ADC_SQR1_L) >> 20;
+	uint8_t channel_count = (ADC{{ per }}->SQR1 & ADC_SQR1_L) >> 20;
 	++channel_count;
 	if(channel_count > 0x0f) return false; // emergency exit
 	// write channel number
 	if(channel_count < 6) {
-		ADC{{ id }}->SQR3 |=
+		ADC{{ per }}->SQR3 |=
 			(uint32_t(channel) & 0x1f) << (channel_count*5);
 	} else 	if(channel_count < 12) {
-		ADC{{ id }}->SQR2 |=
+		ADC{{ per }}->SQR2 |=
 			(uint32_t(channel) & 0x1f) << ((channel_count-6)*5);
 	} else {
-		ADC{{ id }}->SQR1 |=
+		ADC{{ per }}->SQR1 |=
 			(uint32_t(channel) & 0x1f) << ((channel_count-12)*5);
 	}
 	// update channel count
-	ADC{{ id }}->SQR1 = (ADC{{ id }}->SQR1 & ~ADC_SQR1_L) | (channel_count << 20);
+	ADC{{ per }}->SQR1 = (ADC{{ per }}->SQR1 & ~ADC_SQR1_L) | (channel_count << 20);
 
 	setSampleTime(channel, sampleTime);
 	return true;
@@ -163,11 +163,11 @@ modm::platform::Adc{{ id }}::setSampleTime(const Channel channel,
 										const SampleTime sampleTime)
 {
 	if (uint32_t(channel) < 10) {
-		ADC{{ id }}->SMPR2 |= uint32_t(sampleTime)
+		ADC{{ per }}->SMPR2 |= uint32_t(sampleTime)
 								<< (uint32_t(channel) * 3);
 	}
 	else {
-		ADC{{ id }}->SMPR1 |= uint32_t(sampleTime)
+		ADC{{ per }}->SMPR1 |= uint32_t(sampleTime)
 								<< ((uint32_t(channel)-10) * 3);
 	}
 }
@@ -175,20 +175,20 @@ modm::platform::Adc{{ id }}::setSampleTime(const Channel channel,
 void
 modm::platform::Adc{{ id }}::enableFreeRunningMode()
 {
-	ADC{{ id }}->CR2 |= ADC_CR2_CONT;	// set to continuous mode
+	ADC{{ per }}->CR2 |= ADC_CR2_CONT;	// set to continuous mode
 }
 
 void
 modm::platform::Adc{{ id }}::disableFreeRunningMode()
 {
-	ADC{{ id }}->CR2 &= ~ADC_CR2_CONT;		// set to single mode
+	ADC{{ per }}->CR2 &= ~ADC_CR2_CONT;		// set to single mode
 }
 
 void
 modm::platform::Adc{{ id }}::disable()
 {
-	ADC{{ id }}->CR2 &= ~(ADC_CR2_ADON);		// switch off ADC
-	RCC->APB2ENR &= ~RCC_APB2ENR_ADC{{ id }}EN; // stop ADC Clock
+	ADC{{ per }}->CR2 &= ~(ADC_CR2_ADON);		// switch off ADC
+	RCC->APB2ENR &= ~RCC_APB2ENR_ADC{{ per }}EN; // stop ADC Clock
 }
 
 void
@@ -198,22 +198,22 @@ modm::platform::Adc{{ id }}::startConversion()
 %% if target["family"] == "f1"
 	// select the SWSTART event used to trigger the start of
 	// conversion of a regular group
-	ADC{{ id }}->CR2 |= ADC_CR2_EXTTRIG | ADC_CR2_EXTSEL_0 | ADC_CR2_EXTSEL_1 | ADC_CR2_EXTSEL_2;
+	ADC{{ per }}->CR2 |= ADC_CR2_EXTTRIG | ADC_CR2_EXTSEL_0 | ADC_CR2_EXTSEL_1 | ADC_CR2_EXTSEL_2;
 %% endif
 	// starts single conversion for the regular group
-	ADC{{ id }}->CR2 |= ADC_CR2_SWSTART;
+	ADC{{ per }}->CR2 |= ADC_CR2_SWSTART;
 }
 
 bool
 modm::platform::Adc{{ id }}::isConversionFinished()
 {
-	return (ADC{{ id }}->SR & ADC_SR_EOC);
+	return (ADC{{ per }}->SR & ADC_SR_EOC);
 }
 
 uint16_t
 modm::platform::Adc{{ id }}::getValue()
 {
-	return ADC{{ id }}->DR;
+	return ADC{{ per }}->DR;
 }
 
 
@@ -231,34 +231,14 @@ modm::platform::Adc{{ id }}::readChannel(Channel channel)
 }
 
 // ----------------------------------------------------------------------------
-// TODO: move this to some shared header for all cortex m3 platforms
-// Re-implemented here to save some code space. As all arguments in the calls
-// below are constant the compiler is able to calculate everything at
-// compile time.
-
-#ifndef MODM_CUSTOM_NVIC_FUNCTIONS
-#define MODM_CUSTOM_NVIC_FUNCTIONS
-
-static modm_always_inline void
-nvicEnableInterrupt(const IRQn_Type IRQn)
-{
-	NVIC->ISER[(uint32_t(IRQn) >> 5)] = (1 << (uint32_t(IRQn) & 0x1F));
-}
-
-static modm_always_inline void
-nvicDisableInterrupt(IRQn_Type IRQn)
-{
-	NVIC_DisableIRQ(IRQn);
-}
-
-#endif // MODM_CUSTOM_NVIC_FUNCTIONS
-
 void
 modm::platform::Adc{{ id }}::enableInterruptVector(const uint32_t priority,
-												const bool enable)
+												   const bool enable)
 {
 %% if target["family"] in ["f2", "f4", "f7"]
 	const IRQn_Type InterruptVector = ADC_IRQn;
+%% elif  target["family"] in ["l1"]
+	const IRQn_Type InterruptVector = ADC1_IRQn;
 %% elif target["family"] in ["f1", "f3"]
 	%% if id < 3
 	const IRQn_Type InterruptVector = ADC1_2_IRQn;
@@ -269,7 +249,7 @@ modm::platform::Adc{{ id }}::enableInterruptVector(const uint32_t priority,
 
 	if (enable) {
 		NVIC_SetPriority(InterruptVector, priority);
-		nvicEnableInterrupt(InterruptVector);
+		NVIC_EnableIRQ(InterruptVector);
 	} else {
 		NVIC_DisableIRQ(InterruptVector);
 	}
@@ -278,19 +258,19 @@ modm::platform::Adc{{ id }}::enableInterruptVector(const uint32_t priority,
 void
 modm::platform::Adc{{ id }}::enableInterrupt(const Interrupt_t interrupt)
 {
-	ADC{{ id }}->CR1 |= interrupt.value;
+	ADC{{ per }}->CR1 |= interrupt.value;
 }
 
 void
 modm::platform::Adc{{ id }}::disableInterrupt(const Interrupt_t interrupt)
 {
-	ADC{{ id }}->CR1 &= ~interrupt.value;
+	ADC{{ per }}->CR1 &= ~interrupt.value;
 }
 
 modm::platform::Adc{{ id }}::InterruptFlag_t
 modm::platform::Adc{{ id }}::getInterruptFlags()
 {
-	return InterruptFlag_t(ADC{{ id }}->SR);
+	return InterruptFlag_t(ADC{{ per }}->SR);
 }
 
 void
@@ -298,5 +278,5 @@ modm::platform::Adc{{ id }}::acknowledgeInterruptFlags(const InterruptFlag_t fla
 {
 	// Flags are cleared by writing a one to the flag position.
 	// Writing a zero is ignored.
-	ADC{{ id }}->SR = flags.value;
+	ADC{{ per }}->SR = flags.value;
 }

@@ -22,8 +22,12 @@
 /// @cond
 %% if not extended_driver
 // STM has some weird ideas about continuity
+#ifndef USART_BRR_DIV_MANTISSA
 #define	USART_BRR_DIV_MANTISSA	USART_BRR_DIV_Mantissa
+#endif
+#ifndef USART_BRR_DIV_FRACTION
 #define	USART_BRR_DIV_FRACTION	USART_BRR_DIV_Fraction
+#endif
 %% endif
 %% if tcbgt
 #define USART_CR1_TXEIE   USART_CR1_TXEIE_TXFNFIE

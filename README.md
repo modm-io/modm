@@ -70,16 +70,17 @@ git clone --recurse-submodules https://github.com/modm-io/modm.git
 
 ## Targets
 
-modm can generate code for <!--avrcount-->78<!--/avrcount--> AVR and <!--stmcount-->958<!--/stmcount-->
+modm can generate code for <!--avrcount-->78<!--/avrcount--> AVR and <!--stmcount-->1039<!--/stmcount-->
 STM32 devices, however, there are different levels of support and testing.
 
 <center>
 
 | Device Family | Support | Device Family | Support | Device Family | Support |
 |:--------------|:--------|:--------------|:--------|:--------------|:--------|
-| AVR           | ★★★     | STM32F2       | ★★★     | STM32F7       | ★★★★    |
-| STM32F0       | ★★★★    | STM32F3       | ★★★★★   | STM32L4       | ★★★★    |
-| STM32F1       | ★★★★    | STM32F4       | ★★★★★   | STM32G0       | ★★★★    |
+| AVR           | ★★★     | STM32F0       | ★★★★    | STM32F1       | ★★★★    |
+| STM32F2       | ★★★★    | STM32F3       | ★★★★★   | STM32F4       | ★★★★★   |
+| STM32F7       | ★★★★    | STM32L1       | ★★★★    | STM32L4       | ★★★★    |
+| STM32L4+      | ★★★★    | STM32G0       | ★★★★    |
 
 </center>
 

@@ -71,11 +71,17 @@ Rcc::setFlashLatency()
 %% elif target["family"] == "f7"
 	// enable flash prefetch and flash accelerator
 	acr |= FLASH_ACR_PRFTEN | FLASH_ACR_ARTEN;
+%% elif target["family"] in ["l1"]
+	// enable 64-bit access, must be enabled *before* prefetch and latency!
+	FLASH->ACR |= FLASH_ACR_ACC64;
+	// enable flash prefetch
+	acr |= FLASH_ACR_PRFTEN;
 %% else
 	// enable flash prefetch
 	acr |= FLASH_ACR_PRFTBE;
 %% endif
 	FLASH->ACR = acr;
+	__DSB(); __ISB();
 %% endif
 
 	return fl.max_frequency;

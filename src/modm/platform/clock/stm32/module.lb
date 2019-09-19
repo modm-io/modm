@@ -37,6 +37,9 @@ def build(env):
     if target["family"] in ["f1", "f3", "f4"]:
         properties["hsi_frequency"] = 8
         properties["lsi_frequency"] = 40
+    elif target["family"] in ["l1"]:
+        properties["hsi_frequency"] = 2.097
+        properties["lsi_frequency"] = 37
     else:
         properties["hsi_frequency"] = 16
         properties["lsi_frequency"] = 32

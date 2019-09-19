@@ -90,3 +90,8 @@ attiny4
 attiny40
 attiny5
 attiny9
+# FIXME: modm-devices cannot deal with -A/-X variants
+stm32l151qch
+stm32l151zct
+stm32l152qch
+stm32l152zct

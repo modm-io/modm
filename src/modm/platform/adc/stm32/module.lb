@@ -11,30 +11,26 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-instances = []
-
 class Instance(Module):
     def __init__(self, instance):
-        self.instance = instance
+        self.instance = "" if instance is None else instance
+        self.peripheral = 1 if instance is None else instance
 
     def init(self, module):
         module.name = str(self.instance)
         module.description = "Instance {}".format(self.instance)
 
     def prepare(self, module, options):
-        module.depends(":platform:adc")
         return True
-
-    def validate(self, env):
-        instances.append(self.instance)
 
     def build(self, env):
         device = env[":target"]
         driver = device.get_driver("adc")
 
-        properties = device.properties
+        properties = {}
         properties["target"] = target = device.identifier
         properties["id"] = self.instance
+        properties["per"] = self.peripheral
 
         # TODO: Consider moving this data to device file!
         properties["temperature_available"] = (target["family"] in ["f2", "f4", "f7"] or
@@ -73,7 +69,7 @@ def prepare(module, options):
     if not device.has_driver("adc:stm32"):
         return False
     global props
-    props = device.properties
+    props = {}
     driver = device.get_driver("adc")
     props["target"] = target = device.identifier
     props["driver"] = driver
@@ -102,7 +98,7 @@ def prepare(module, options):
         ":platform:rcc",
         ":utils")
 
-    for instance in listify(device.get_driver("adc")["instance"]):
+    for instance in listify(device.get_driver("adc").get("instance", [])):
         module.add_submodule(Instance(int(instance)))
 
     return True
@@ -115,5 +111,9 @@ def build(env):
 
     env.substitutions = props
     env.outbasepath = "modm/src/modm/platform/adc"
+
+    if device.get_driver("adc").get("instance", None) is None:
+        Instance(None).build(env)
+
     if any(i in props["shared_irq_ids"] for i in props["instances"]):
         env.template("adc_shared_interrupts.cpp.in")

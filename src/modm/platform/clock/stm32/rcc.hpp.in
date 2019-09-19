@@ -54,7 +54,7 @@ public:
 	%% endif
 		/// High speed external clock (see HseConfig)
 		Hse = RCC_CFGR_PLLSRC_HSE_PREDIV,
-%% elif target["family"] == "f1"
+%% elif target["family"] in ["f1", "l1"]
 		/// High speed internal clock (8 MHz)
 		Hsi = 0,
 		/// High speed external clock (see HseConfig)
@@ -74,6 +74,22 @@ public:
 		ExternalClock = Hse,
 		ExternalCrystal = Hse,
 	};
+
+%% if target["family"] in ["l1"]
+	enum class
+	PllMultiplier : uint32_t
+	{
+		Mul3 = RCC_CFGR_PLLMUL3,
+		Mul4 = RCC_CFGR_PLLMUL4,
+		Mul6 = RCC_CFGR_PLLMUL6,
+		Mul8 = RCC_CFGR_PLLMUL8,
+		Mul12 = RCC_CFGR_PLLMUL12,
+		Mul16 = RCC_CFGR_PLLMUL16,
+		Mul24 = RCC_CFGR_PLLMUL24,
+		Mul32 = RCC_CFGR_PLLMUL32,
+		Mul48 = RCC_CFGR_PLLMUL48,
+	};
+%% endif
 
 	enum class
 	SystemClockSource : uint32_t
@@ -98,9 +114,15 @@ public:
 	enum class
 	RealTimeClockSource : uint32_t
 	{
+%% if target["family"] in ["l1"]
+		Lsi = RCC_CSR_RTCSEL_1,
+		Lse = RCC_CSR_RTCSEL_0,
+		Hse = RCC_CSR_RTCSEL_0 | RCC_CSR_RTCSEL_1,
+%% else
 		Lsi = RCC_BDCR_RTCSEL_1,
 		Lse = RCC_BDCR_RTCSEL_0,
 		Hse = RCC_BDCR_RTCSEL_0 | RCC_BDCR_RTCSEL_1,
+%% endif
 
 		ExternalClock = Hse,
 		ExternalCrystal = Hse,
@@ -181,7 +203,7 @@ public:
 		Pll = RCC_CFGR_MCO2_1 | RCC_CFGR_MCO2_0,
 	};
 	%% endif
-%% elif target["family"] in ["l4", "g0"]
+%% elif target["family"] in ["l1", "l4", "g0"]
 	enum class
 	ClockOutputSource : uint32_t
 	{
@@ -190,7 +212,12 @@ public:
 %% if target["family"] in ["l4"]
 		MultiSpeedInternalClock = (2 << RCC_CFGR_MCOSEL_Pos), // MSI
 %% endif
+%% if target["family"] in ["l1"]
+		InternalClock = (2 << RCC_CFGR_MCOSEL_Pos), // HSI16
+		MultiSpeedInternalClock = (3 << RCC_CFGR_MCOSEL_Pos), // MSI
+%% else
 		InternalClock = (3 << RCC_CFGR_MCOSEL_Pos), // HSI16
+%% endif
 		ExternalClock = (4 << RCC_CFGR_MCOSEL_Pos), // HSE
 		ExternalCrystal = (4 << RCC_CFGR_MCOSEL_Pos), // HSE
 		Pll = (5 << RCC_CFGR_MCOSEL_Pos), // Main PLL
@@ -233,10 +260,19 @@ public:
 	enableInternalClockMHz48(uint32_t waitCycles = 2048);
 %% endif
 
-%% if target["family"] in ["l4"]
+%% if target["family"] in ["l1", "l4"]
 	enum class
 	MsiFrequency : uint32_t
 	{
+%% if target["family"] in ["l1"]
+		kHz65  = RCC_ICSCR_MSIRANGE_0,
+		kHz131 = RCC_ICSCR_MSIRANGE_1,
+		kHz262 = RCC_ICSCR_MSIRANGE_2,
+		kHz524 = RCC_ICSCR_MSIRANGE_3,
+		MHz1   = RCC_ICSCR_MSIRANGE_4,
+		MHz2   = RCC_ICSCR_MSIRANGE_5,
+		MHz4   = RCC_ICSCR_MSIRANGE_6,
+%% elif target["family"] in ["l4"]
 		kHz100 = RCC_CR_MSIRANGE_0,
 		kHz200 = RCC_CR_MSIRANGE_1,
 		kHz400 = RCC_CR_MSIRANGE_2,
@@ -249,6 +285,7 @@ public:
 		MHz24  = RCC_CR_MSIRANGE_9,
 		MHz32  = RCC_CR_MSIRANGE_10,
 		MHz48  = RCC_CR_MSIRANGE_11,
+%% endif
 	};
 
 	static bool
@@ -309,6 +346,10 @@ public:
 			  uint8_t pllP,
 %% endif
 			  uint32_t waitCycles = 2048);
+%% elif target["family"] in ["l1"]
+	static bool
+	enablePll(PllSource source, PllMultiplier pllMul, uint8_t pllDiv,
+	          uint32_t waitCycles = 2048);
 %% else
 	static bool
 	enablePll(PllSource source,
@@ -328,7 +369,11 @@ public:
 	static inline bool
 	enableRealTimeClock(RealTimeClockSource src)
 	{
+%% if target["family"] in ["l1"]
+		RCC->CSR = (RCC->CSR & ~RCC_CSR_RTCSEL) | RCC_CSR_RTCEN | uint32_t(src);
+%% else
 		RCC->BDCR = (RCC->BDCR & ~RCC_BDCR_RTCSEL) | RCC_BDCR_RTCEN | uint32_t(src);
+%% endif
 		return true;
 	}
 
@@ -356,7 +401,7 @@ public:
 		return true;
 	}
 	%% endif
-%% elif target["family"] in ["l4", "g0"]
+%% elif target["family"] in ["l1", "l4", "g0"]
 	enum class
 	ClockOutputPrescaler : uint32_t
 	{
@@ -375,7 +420,7 @@ public:
 	static inline bool
 	enableClockOutput(ClockOutputSource src, ClockOutputPrescaler div = ClockOutputPrescaler::Div1)
 	{
-		RCC->CFGR = (RCC->CFGR & ~(RCC_CFGR_MCOSEL)) | uint32_t(src) | uint32_t(div);
+		RCC->CFGR = (RCC->CFGR & ~(RCC_CFGR_MCOPRE)) | uint32_t(src) | uint32_t(div);
 		return true;
 	}
 %% else
