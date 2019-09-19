@@ -1,0 +1,9 @@
+<library>
+  <extends>modm:nucleo-l152re</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_l152re/blink</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

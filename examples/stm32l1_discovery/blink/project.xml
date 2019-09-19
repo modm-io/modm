@@ -1,0 +1,9 @@
+<library>
+  <extends>modm:disco-l152rc</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/disco_l152rc/blink</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

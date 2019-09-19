@@ -98,6 +98,10 @@ jobs:
           command: |
             (cd examples && ../tools/scripts/examples_compile.py nucleo_g071rb)
       - run:
+          name: Examples STM32L1 Series
+          command: |
+            (cd examples && ../tools/scripts/examples_compile.py nucleo_l152re)
+      - run:
           name: Examples STM32L4 Series
           command: |
             (cd examples && ../tools/scripts/examples_compile.py stm32l476_discovery nucleo_l476rg nucleo_l432kc)
