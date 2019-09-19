@@ -6,5 +6,6 @@
   <modules>
     <module>modm:build:scons</module>
     <module>modm:processing:timer</module>
+    <module>modm:platform:gpio</module>
   </modules>
 </library>

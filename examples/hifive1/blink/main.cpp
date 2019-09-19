@@ -12,40 +12,53 @@
 #include <modm/board.hpp>
 #include <modm/processing/timer.hpp>
 
-#define GPIO_OUT_EN  (*(reinterpret_cast<uint32_t*>(0x10012000+0x08)))
-#define GPIO_OUT_VAL (*(reinterpret_cast<uint32_t*>(0x10012000+0x0C)))
-#define GPIO_XOR     (*(reinterpret_cast<uint32_t*>(0x10012000+0x40)))
-
 using namespace Board;
-
 
 int
 main()
 {
 	Board::initialize();
 
-	constexpr uint32_t ALL_LEDS = 1<<19 | 1<<21 | 1<<22;
-
-	GPIO_OUT_EN = ALL_LEDS;
-	GPIO_XOR = ALL_LEDS;
-	GPIO_OUT_VAL = ALL_LEDS;
-
 	modm::ShortPeriodicTimer timer(500);
 
-	bool ledon = true;
+	LedRed::set();
+	LedGreen::set();
+	LedBlue::set();
+
+	int phase = 1;
 	while (true)
 	{
 		if(timer.execute())
 		{
-			if(ledon)
+			switch(phase)
 			{
-				GPIO_OUT_VAL = ALL_LEDS;
+				case 0:
+				{
+					LedRed::set();
+					LedGreen::set();
+					LedBlue::set();
+				}
+				break;
+				case 1:
+				{
+					LedGreen::reset();
+					LedBlue::reset();
+				}
+				break;
+				case 2:
+				{
+					LedRed::reset();
+					LedGreen::set();
+				}
+				break;
+				case 3:
+				{
+					LedGreen::reset();
+					LedBlue::set();
+				}
+				break;
 			}
-			else
-			{
-				GPIO_OUT_VAL = 0;
-			}
-			ledon = !ledon;	
+			phase = (phase + 1)%4;
 		}
 	}
 
