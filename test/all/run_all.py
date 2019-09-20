@@ -27,23 +27,26 @@ LBUILD_COMMAND = ["lbuild"]
 cpus = 4 if os.getenv("CIRCLECI") else os.cpu_count()
 
 class CommandException(Exception):
-    pass
+    def __init__(self, output, errors):
+        super().__init__()
+        self.output = output
+        self.errors = errors
 
 
 def run_command(cmdline):
     try:
         cmdline = " ".join(cmdline)
-        p = subprocess.run(cmdline, shell=True, stdout=subprocess.PIPE, universal_newlines=True)
-        return (p.stdout, p.returncode)
+        p = subprocess.run(cmdline, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+        return (p.stdout, p.stderr, p.returncode)
     except KeyboardInterrupt:
         raise multiprocessing.ProcessError()
 
 def run_lbuild(command):
     cmdline = LBUILD_COMMAND + command
     LOGGER.debug(" ".join(cmdline))
-    output, retval = run_command(cmdline)
+    output, errors, retval = run_command(cmdline)
     if retval != 0:
-        raise CommandException(output)
+        raise CommandException(output, errors)
     return output
 
 def run_scons(tempdir):
@@ -51,9 +54,9 @@ def run_scons(tempdir):
     return run_command(cmdline)
 
 def build_code(tempdir):
-    output, retval = run_scons(tempdir)
+    output, errors, retval = run_scons(tempdir)
     if retval != 0:
-        raise CommandException(output)
+        raise CommandException(output, errors)
     return output
 
 
@@ -67,6 +70,7 @@ class TestRun:
     def __init__(self, device, cache_dir=None):
         self.device = device
         self.output = ""
+        self.errors = ""
         self.result = TestRunResult.FAIL_BUILD
         self.time = None
         self.cache_dir = cache_dir
@@ -79,7 +83,7 @@ class TestRun:
                 lbuild_command = ["-c", "avr.xml"]
                 shutil.copyfile("avr.cpp", os.path.join(tempdir, "main.cpp"))
             elif self.device.startswith("stm32"):
-                lbuild_command = ["-c", "stm32.xml"]
+                lbuild_command = ["-c", "stm32.xml", "-D:::main_stack_size=512"]
                 shutil.copyfile("stm32.cpp", os.path.join(tempdir, "main.cpp"))
 
             if self.cache_dir:
@@ -97,19 +101,23 @@ class TestRun:
                 self.output += build_code(tempdir)
                 self.result = TestRunResult.SUCCESS
             except CommandException as error:
-                self.output += str(error)
+                self.output += error.output
+                self.errors = error.errors
 
         end_time = time.time()
         self.time = end_time - start_time
 
         sys.stdout.write("{:5}{:20} {:=3.1f}s\n".format(self.format_result(), self.device, self.time))
+        if self.errors:
+            sys.stdout.write(self.errors)
         sys.stdout.flush()
 
         with open(os.path.join("log", "{}.log".format(self.device)), "w") as logfile:
             logfile.write("{}\n"
                           "Device: {}\n"
                           "{}\n"
-                          "{}".format(" ".join(LBUILD_COMMAND + lbuild_command), self.device, self.format_result(), self.output))
+                          "{}".format(" ".join(LBUILD_COMMAND + lbuild_command), self.device,
+                                      self.format_result(), self.output + self.errors))
 
     def format_result(self):
         return self.result.value
@@ -124,8 +132,7 @@ def build_device(run):
 
 def main():
     if len(sys.argv) == 2 and sys.argv[1] == "failed":
-        with open("failed.txt", "r") as failed_file:
-            devices = failed_file.read().strip().split("\n")
+        devices = Path("failed.txt").read_text().strip().split("\n")
     else:
         try:
             stdout = run_lbuild(["-c", "avr.xml", "discover", "--values", "--name :target"])
@@ -138,9 +145,8 @@ def main():
             print(error)
             exit(1)
 
-    with open("ignored.txt", "r") as ignored_file:
-        ignored_devices = ignored_file.read().strip().split("\n")
-        ignored_devices = [d for d in ignored_devices if "#" not in d]
+    ignored_devices = Path("ignored.txt").read_text().strip().split("\n")
+    ignored_devices = [d for d in ignored_devices if "#" not in d]
     # filter out non-supported devices
     devices = [d for d in devices if d not in ignored_devices]
 
@@ -174,9 +180,7 @@ def main():
         print("Total: ", len(succeded) + len(failed))
         print()
 
-        with open("failed.txt", "w") as failed_file:
-            failed_file.write("\n".join(failed))
-
+        Path("failed.txt").write_text("\n".join(failed))
         if len(failed) > 0:
             sys.exit(2)
     except KeyboardInterrupt:
