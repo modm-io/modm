@@ -15,31 +15,35 @@
 
 #include <cstdint>
 
+using namespace modm::platform;
+
 /// @ingroup modm_hifive1
 
-namespace Board{
+namespace Board
+{
 
-struct SystemClock {
+struct SystemClock
+{
 	static constexpr uint32_t Frequency = 320'000'000;
 
 	static bool inline
 	enable()
 	{
 		//Configure the clock to use the PLL driven by the external Oscillator
-		modm::platform::PRCI::enableExternalOscillator();
-		modm::platform::PRCI::setupPll(modm::platform::PRCI::PllSource::ExternalOscillator,
+		PRCI::enableExternalOscillator();
+		PRCI::setupPll(PRCI::PllSource::ExternalOscillator,
 									   false,
-									   modm::platform::PRCI::PllPrediv::Div2,
+									   PRCI::PllPrediv::Div2,
 									   80,
-									   modm::platform::PRCI::PllPostDiv::Div2);
-		//modm::platform::PRCI::disableInternalOscillator();
+									   PRCI::PllPostDiv::Div2);
+		PRCI::disableInternalOscillator();
 		return true;
 	}
 };
 
-using LedRed   = modm::platform::GpioA22;
-using LedGreen = modm::platform::GpioA19;
-using LedBlue  = modm::platform::GpioA21;
+using LedRed   = GpioA22;
+using LedGreen = GpioA19;
+using LedBlue  = GpioA21;
 
 inline void
 initialize()

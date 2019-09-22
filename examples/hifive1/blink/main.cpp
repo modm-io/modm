@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2016-2017, Niklas Hauser
- * Copyright (c) 2017, Nick Sarten
+ * Copyright (c) 2019, Benjamin Weps
  *
  * This file is part of the modm project.
  *
