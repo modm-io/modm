@@ -127,24 +127,25 @@ documentation.
 </tr><tr>
 <td align="center">DISCO-F746NG</td>
 <td align="center">DISCO-F769NI</td>
+<td align="center">DISCO-L152RC</td>
 <td align="center">DISCO-L476VG</td>
-<td align="center">NUCLEO-F031K6</td>
 </tr><tr>
+<td align="center">NUCLEO-F031K6</td>
 <td align="center">NUCLEO-F042K6</td>
 <td align="center">NUCLEO-F103RB</td>
 <td align="center">NUCLEO-F303K8</td>
-<td align="center">NUCLEO-F401RE</td>
 </tr><tr>
+<td align="center">NUCLEO-F401RE</td>
 <td align="center">NUCLEO-F411RE</td>
 <td align="center">NUCLEO-F429ZI</td>
 <td align="center">NUCLEO-F446RE</td>
-<td align="center">NUCLEO-G071RB</td>
 </tr><tr>
+<td align="center">NUCLEO-G071RB</td>
 <td align="center">NUCLEO-L152RE</td>
 <td align="center">NUCLEO-L432KC</td>
 <td align="center">NUCLEO-L476RG</td>
-<td align="center">OLIMEXINO-STM32</td>
 </tr><tr>
+<td align="center">OLIMEXINO-STM32</td>
 <td align="center">STM32F030F4P6-DEMO</td>
 </tr>
 </table>
