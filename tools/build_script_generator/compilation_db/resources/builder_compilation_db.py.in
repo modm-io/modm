@@ -1,0 +1,115 @@
+# Copyright (c) 2019, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+import os, re, json, sys
+from collections import defaultdict
+from pathlib import Path
+
+env = defaultdict(list)
+
+env["CONFIG_PROJECT_NAME"] = "{{ options[":build:project.name"] }}"
+env["CONFIG_BUILD_BASE"] = "{{ build_path }}"
+env["CONFIG_BUILD_PROFILE"] = "debug" if "--debug" in sys.argv else "release"
+
+env["BUILDPATH"] = os.path.join(env["CONFIG_BUILD_BASE"], env["CONFIG_BUILD_PROFILE"])
+env["BASEPATH"] = os.path.abspath(".")
+
+generated_paths = {{ generated_paths }}
+
+for path in generated_paths:
+    with open("{}/compilation_db.py".format(path)) as compfile:
+        exec(compfile.read())
+
+source_flag_map = {{common_source_flag_map}}
+env["CPPDEFINES"] = map(lambda d: "-D"+d, env["CPPDEFINES"])
+
+# Search for application files
+project_files = set(sys.argv[1:])
+project_files.update(set(str(f) for p in project_files for f in Path(p).glob("**/*")))
+project_files = set(f for f in project_files if os.path.isfile(f) and
+                     any(re.search(pat, os.path.splitext(f)[-1]) for (pat, _) in source_flag_map.items()))
+project_files -= set(str(f) for p in generated_paths for f in Path(p).glob("**/*"))
+print("Generating CompilationDB with these application sources:\n- " + "\n- ".join(sorted(list(project_files))))
+
+commands = []
+env["FILES"].extend([(f, {}) for f in sorted(list(project_files))])
+# Compile all files to object files
+for file, fileflags in env["FILES"]:
+    suffix = os.path.splitext(file)[-1]
+    ftype, flagkeys = [(t,list(map(lambda s: s.upper(), f)))
+                        for t,(p,f) in source_flag_map.items()
+                            if re.search(p, suffix)][0]
+    if "CPPDEFINES" in fileflags:
+        fileflags["CPPDEFINES"] = map(lambda d: "-D"+d, fileflags["CPPDEFINES"])
+    flags = [f for key in flagkeys for f in env[key]]
+    flags.extend([f for key,flags in fileflags.items() if key in flagkeys
+                    for f in flags])
+
+    # print(fileflags, ftype, flagkeys, flags)
+
+    subs = {
+        "TOOL": {"c": env["CC"], "cpp": env["CXX"], "asm": env["CC"]}[ftype],
+        "BUILDPATH": env["BUILDPATH"],
+        "OBJECT": os.path.splitext(file)[0] + ".o",
+        "FILE": file,
+        "INCLUDE_PATHS": " ".join(map(lambda p: "-I"+os.path.relpath(p), env["CPPPATH"])),
+        "FLAGS": " ".join(flags),
+    }
+
+    command = "{TOOL} -o {BUILDPATH}/{OBJECT} -c {FLAGS} {INCLUDE_PATHS} {FILE}".format(**subs)
+    commands.append({
+        "command": command,
+        "directory": env["BASEPATH"],
+        "file": file,
+    })
+
+# CompilationDB does not support linking yet!
+"""
+# Archive all static libraries
+for lib, files in env["STATIC_LIBS"]:
+    subs = {
+        "TOOL": env["AR"],
+        "BUILDPATH": env["BUILDPATH"],
+        "LIBRARY": lib,
+        "FILES": " ".join(map(lambda file: "{}/{}.o".format(env["BUILDPATH"], os.path.splitext(file)[0]), files)),
+    }
+    command = "{TOOL} rc {BUILDPATH}/{LIBRARY} {FILES}".format(**subs)
+    commands.append({
+        "command": command,
+        "directory": env["BASEPATH"],
+        "file": join(env["BUILDPATH"], lib),
+    })
+
+    subs["TOOL"] = env["RANLIB"]
+    command = "{TOOL} {BUILDPATH}/{LIBRARY}".format(**subs)
+    commands.append({
+        "command": command,
+        "directory": env["BASEPATH"],
+        "file": join(env["BUILDPATH"], lib),
+    })
+
+# Link the entire executable
+subs = {
+    "TOOL": env["LINK"],
+    "BUILDPATH": env["BUILDPATH"],
+    "CONFIG_PROJECT_NAME": env["CONFIG_PROJECT_NAME"],
+    "FLAGS": " ".join(env["LINKFLAGS"]),
+    "FILES": " ".join(map(lambda file: "{}/{}.o".format(env["BUILDPATH"], os.path.splitext(file)[0]), project_files)),
+    "LIBPATHS": " ".join(map(lambda path: "{}/{}".format(env["BUILDPATH"], path), env["LIBPATH"])),
+    "LIBS": " ".join(map(lambda lib: "lib{}.a".format(lib), env["LIBS"])),
+}
+command = "{TOOL} {BUILDPATH}/{CONFIG_PROJECT_NAME}.elf {FLAGS} {FILES} {LIBPATHS} " \
+          "-Wl,--whole-archive -Wl,--start-group {LIBS} -Wl,--end-group -Wl,--no-whole-archive"
+commands.append({
+    "command": command.format(**subs),
+    "directory": env["BASEPATH"],
+    "file": join(env["BUILDPATH"], env["CONFIG_PROJECT_NAME"]+".elf"),
+})
+"""
+
+Path("compile_commands.json").write_text(json.dumps(commands, indent=4, sort_keys=True))

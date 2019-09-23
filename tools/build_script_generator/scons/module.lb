@@ -143,6 +143,7 @@ def build(env):
     # Generate the env.BuildTarget tool
     env.substitutions = env.query("::device")
     env.substitutions["upload_with_artifact"] = env.has_module(":crashcatcher")
+    env.substitutions["with_compilation_db"] = env.has_module(":build:compilation_db")
     env.outbasepath = "modm/scons/site_tools"
     env.template("resources/build_target.py.in", "build_target.py")
 

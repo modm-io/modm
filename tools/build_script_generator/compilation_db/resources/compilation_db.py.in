@@ -1,0 +1,124 @@
+# Copyright (c) 2019, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+from os.path import join, abspath
+import sys, shutil
+
+profile = env["CONFIG_BUILD_PROFILE"]
+
+%% if is_modm
+%% if core.startswith("avr")
+env["COMPILERPREFIX"] = "avr-"
+%% elif core.startswith("cortex-m")
+env["COMPILERPREFIX"] = "arm-none-eabi-"
+%% else
+%% if family == "darwin"
+# Using homebrew gcc on macOS instead of clang
+env["COMPILERSUFFIX"] = next(c[3:] for c in ["gcc-9", "gcc-8", "gcc-7"] if shutil.which(c) is not None)
+%% endif
+%% endif
+
+path = env.get("COMPILERPATH", "")
+prefix = env.get("COMPILERPREFIX", "")
+suffix = env.get("COMPILERSUFFIX", "")
+if suffix != "" and not suffix.startswith("-"):
+    suffix = "-" + suffix
+prefix = path + prefix
+env["CC"] = prefix + "gcc" + suffix
+env["CXX"] = prefix + "g++" + suffix
+env["AR"] = prefix + "ar"
+env["RANLIB"] = prefix + "ranlib"
+if suffix == "":
+    env["AS"] = prefix + "as"
+    env["NM"] = prefix + "nm"
+else:
+    env["AS"] = prefix + "gcc" + suffix
+    env["NM"] = prefix + "gcc-nm" + suffix
+    if sys.platform != "darwin":
+        env["AR"] = prefix + "gcc-ar" + suffix
+        env["RANLIB"] = prefix + "gcc-ranlib" + suffix
+env["OBJCOPY"] = prefix + "objcopy"
+env["OBJDUMP"] = prefix + "objdump"
+env["SIZE"] = prefix + "size"
+env["STRIP"] = prefix + "strip"
+env["LINK"] = env["CXX"]
+
+%% endif
+
+%% macro generate_flags_for_profile(name, profile, append=False)
+env["{{name | upper}}"]{% if append %}.extend({% else %} = {% endif %}[
+%% for flag in flags[name][profile] | sort
+    {{ flag | flags_format }},
+%% endfor
+]{% if append %}){% endif -%}
+%% endmacro
+
+%% macro generate_flags(name, append=False)
+%% if not append or flags[name][""] | length
+{{ generate_flags_for_profile(name, "", append) }}
+%% endif
+%% for profile in flags[name].keys()
+%% if profile != "" and flags[name][profile] | length
+if profile == "{{ profile }}":
+    {{ generate_flags_for_profile(name, profile, True) | lbuild.indent(4) }}
+%% endif
+%% endfor
+%% endmacro
+
+# Toolchain configuration
+{{ generate_flags("cppdefines", True) }}
+{{ generate_flags("ccflags", not is_modm) }}
+{{ generate_flags("cflags", not is_modm) }}
+{{ generate_flags("cxxflags", not is_modm) }}
+{{ generate_flags("asflags", not is_modm) }}
+{{ generate_flags("linkflags", not is_modm) }}
+{{ generate_flags("archflags", not is_modm) }}
+
+env["CPPPATH"].extend([
+%% for path in include_paths | sort
+    abspath(r"{{ path | modm.windowsify(escape_level=0) }}"),
+%% endfor
+])
+
+env["FILES"].extend([
+%% for file, flags in sources if not flags | length
+    (r"{{ file | modm.windowsify(escape_level=0) }}", {}),
+%% endfor
+])
+%% for file, flags in sources
+    %% if flags | length
+flags = { {%- for key, profiles in flags.items() if "" in profiles %}"{{ key | upper }}": {{profiles[""]}}, {% endfor -%} }
+    %% for key, profiles in flags.items()
+        %% for profile, flags in profiles.items() if "" != profile
+if profile == "{{profile}}": flags["{{ key | upper }}"].extend({{flags}});
+        %% endfor
+    %% endfor
+env["FILES"].append( (r"{{ file | modm.windowsify(escape_level=0) }}", flags) )
+    %% endif
+%% endfor
+
+env["STATIC_LIBS"].append(
+    ("{{repo}}/lib{{repo}}.a", [
+%% for file, flags in sources
+        r"{{ file | modm.windowsify(escape_level=0) }}",
+%% endfor
+    ])
+)
+
+env["LIBS"].extend([
+    "{{repo}}",
+%% for library in libraries | sort
+    "{{ library }}",
+%% endfor
+])
+env["LIBPATH"].extend([
+    abspath(join(env["BUILDPATH"], "{{repo}}")),
+%% for library in library_paths | sort
+    abspath(r"{{ library | modm.windowsify(escape_level=0) }}"),
+%% endfor
+])

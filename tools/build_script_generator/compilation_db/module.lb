@@ -1,0 +1,100 @@
+# Copyright (c) 2019, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+from os.path import join, relpath, isdir, exists
+
+with open(localpath("../common.py")) as common:
+    exec(common.read())
+
+def init(module):
+    module.name = ":build:compilation_db"
+    module.description = FileReader("module.md")
+
+def prepare(module, options):
+    module.add_collector(
+        CallableCollector(name="flag_format",
+                          description="Formatting compile flags for CompilationDB"))
+    return True
+
+
+def build(env):
+    def flag_format(flag):
+        subs = {
+            "target_base": "\"${TARGET.base}\"",
+            "linkdir": "\"modm/link\""
+        }
+        flag = '"{}"'.format(flag)
+        vals = ["{}={}".format(t, r) for t, r in subs.items() if "{{{}}}".format(t) in flag]
+        if len(vals):
+            flag = "{}.format({})".format(flag, ", ".join(vals))
+            return flag
+        return None
+
+    env.collect("flag_format", flag_format)
+
+
+def post_build(env):
+    repositories = [p for p in env.buildlog.repositories if isdir(env.real_outpath(p, basepath="."))]
+    repositories.sort(key=lambda name: "0" if name == "modm" else name)
+
+    subs = env.query("::device")
+
+    if subs["core"].startswith("cortex-m"):
+        # get memory information
+        subs["memories"] = env.query("::memories")
+    else:
+        subs["memories"] = []
+    # Add SCons specific data
+    subs.update({
+        "build_path": env.relative_outpath(env[":build:build.path"]),
+        "generated_paths": repositories,
+        "common_source_flag_map": common_source_flag_map,
+    })
+    if subs["platform"] == "avr":
+        subs.update(env.query("::avrdude_options"))
+    # Set these substitutions for all templates
+    env.substitutions = subs
+
+    sources = env.query("::source_files")
+    def flags_format(flag):
+        for fmt in env.collector_values("flag_format"):
+            nflag = fmt(flag)
+            if nflag: return nflag;
+        return '"{}"'.format(flag)
+
+    for repo in repositories:
+        files = []
+        repo_filter = lambda scope: scope.repository == repo
+        repo_flags = env.query("::collect_flags")(env, repo_filter)
+
+        for f in sources[repo]:
+            files.append( (f, repo_flags[f]) )
+
+        include_paths = env.collector_values("::path.include", filterfunc=repo_filter)
+        libary_paths = env.collector_values("::path.library", filterfunc=repo_filter)
+        libaries = env.collector_values("::library", filterfunc=repo_filter)
+
+        subs.update({
+            "repo": repo,
+            "flags": repo_flags[None],
+            "sources": files,
+            "libraries": libaries,
+            "library_paths": libary_paths,
+            "include_paths": include_paths,
+            "is_modm": repo == "modm",
+        })
+        # Generate library SConscript
+        env.outbasepath = repo
+        env.template("resources/compilation_db.py.in", "compilation_db.py",
+                     filters={"flags_format": flags_format,
+                              "relocate": lambda p: env.relative_outpath(p, repo)})
+
+    # these are the ONLY files that are allowed to NOT be namespaced with modm!
+    env.outbasepath = "modm/tools"
+    env.template("resources/builder_compilation_db.py.in", "builder_compilation_db.py")

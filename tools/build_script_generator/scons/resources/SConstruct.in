@@ -23,6 +23,7 @@ CacheDir("{{ cache_dir }}")
 env = DefaultEnvironment(tools=[], ENV=os.environ)
 env["CONFIG_BUILD_BASE"] = abspath(build_path)
 env["CONFIG_PROJECT_NAME"] = project_name
+env["CONFIG_PROFILE"] = ARGUMENTS.get("profile", "release")
 
 # Building all libraries
 env.SConscript(dirs=generated_paths, exports="env")

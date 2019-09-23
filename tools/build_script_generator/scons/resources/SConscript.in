@@ -11,7 +11,7 @@
 from os.path import join, abspath
 Import("env")
 
-profile = ARGUMENTS.get("profile", "release")
+profile = env["CONFIG_PROFILE"]
 %% if is_modm
 env["BUILDPATH"] = join(env["CONFIG_BUILD_BASE"], profile)
 env["BASEPATH"] = abspath(".")
