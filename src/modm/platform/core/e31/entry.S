@@ -4,13 +4,13 @@ _entry:
     .cfi_startproc
     .cfi_undefined ra
 
-.option push
-.option norelax
-    la gp, __global_pointer$
-.option pop
+#.option push
+#.option norelax
+#    la gp, __global_pointer$
+#.option pop
 
     # init the stack pointer
-    la sp, _sp
+    la sp, __main_stack_top
 
     #set up the isr for the trap interrupt
     #TODO: set this to a proper ISR
@@ -30,10 +30,11 @@ _entry:
     sw t1,   0x00(t0)   #and store it
 
     #init the c runtime
-    csrr a0, mhartid
-    li a1, 0
-    li a2, 0
-    call _start
+    #csrr a0, mhartid
+    #li a1, 0
+    #li a2, 0
+    #call _start
+    call __modm_startup
 
 # we should never reach this point
 fault_loop:

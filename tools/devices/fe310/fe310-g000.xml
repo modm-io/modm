@@ -7,8 +7,8 @@
     <attribute-core value="e31"/>
 
     <driver name="core" type="e31">
-      <memory name="flash" access="rx" start="0x20000000" size="16384"/>
-      <memory name="dtim" access="rwx" start="0x80000000" size="16"/>
+      <memory name="flash" access="rx" start="0x20000000" size="16777216"/>
+      <memory name="ram" access="rwx" start="0x80000000" size="16384"/>
     </driver>
 
     <driver name="clock" type="e31"/>

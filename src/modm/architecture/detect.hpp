@@ -231,6 +231,7 @@
 #	define MODM_CPU_RISCV 1
 #	if __riscv_xlen == 32
 #		define MODM_CPU_STRING      "RISCV32"
+#       define MODM_ALIGNMENT	4
 #	endif
 #endif
 

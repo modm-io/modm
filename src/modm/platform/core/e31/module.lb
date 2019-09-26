@@ -14,11 +14,73 @@ def init(module):
     module.name = ":platform:core"
     module.description = "SiFive E31 Core"
 
+def common_memories(env):
+    """
+    Computes memory properties:
+
+      - `memories`: unfiltered memory regions
+      - `regions`: memory region names
+
+    :returns: dictionary of memory properties
+    """
+    device = env[":target"]
+    memories = listify(device.get_driver("core")["memory"])
+
+    # Convert from string to int and add offsets
+    flash_offset = env.get(":platform:core:linkerscript.flash_offset", 0)
+    for m in memories:
+        if m["name"] == "flash":
+            m["start"] = int(m["start"], 0) + flash_offset
+            m["size"] = int(m["size"], 0) - flash_offset
+        else:
+            m["start"] = int(m["start"], 0)
+            m["size"] = int(m["size"], 0)
+
+    properties = {
+        "memories": memories,
+        "regions": [m["name"] for m in memories],
+    }
+    return properties
+
+
 def prepare(module, options):
     if not options[":target"].has_driver("core:e31"):
         return False
+
     module.depends(
+            ":architecture:assert",
+            ":architecture:memory"
         )
+
+    module.add_option(
+    EnumerationOption(
+        name="allocator",
+        description=FileReader("option/allocator.md"),
+        enumeration=["newlib", "block", "tlsf"],
+        default="newlib",
+        dependencies=lambda v: {"newlib": None,
+                                "block": ":architecture:heap",
+                                "tlsf": ":tlsf"}[v]))
+
+    module.add_option(
+    NumericOption(
+        name="main_stack_size",
+        description=FileReader("option/main_stack_size.md"),
+        minimum=2 ** 8,
+        maximum=2 ** 14,
+        default=2 ** 10 * 3 - 32))
+
+    memories = listify(options[":target"].get_driver("core")["memory"])
+
+    # Find the size of the flash memory
+    flash_size = next(int(x['size']) for x in memories if x['name'] == 'flash')
+    module.add_option(
+        NumericOption(
+            name="linkerscript.flash_offset",
+            description=FileReader("option/flash_offset.md"),
+            minimum=0,
+            maximum=hex(flash_size),
+            default=0))
 
     return True
 
@@ -30,16 +92,35 @@ def build(env):
 
     properties["target"] = target = device.identifier
     properties["driver"] = driver
+    properties["process_stack_size"] = 0
 
-    env.outbasepath = "modm/link"
-    env.copy("linkerscript/linkerscript.ld", "linkerscript.ld")
+    properties.update(common_memories(env))
 
     env.substitutions = properties
+    env.substitutions["with_fault_storage"] = env.has_module(":platform:fault")
+
+    env.outbasepath = "modm/link"
+
+    env.template("linkerscript.ld.in")
+
+
     env.outbasepath = "modm/src/modm/platform/core"
 
-    env.copy("startup.S")
+    env.copy("entry.S")
+    env.copy("startup.c")
     env.copy("flash_reader.hpp")
     env.copy("clock.cpp")
+    env.copy("assert.cpp")
 
+    env.template("heap_table.cpp.in")
+    env.template("heap_table.hpp.in")
+
+    # everything to do with dynamic memory
+    if env["allocator"] == "newlib":
+        env.copy("heap_newlib.cpp")
+    elif env["allocator"] == "tlsf":
+        env.copy("heap_tlsf.cpp")
+    elif env["allocator"] == "block":
+        env.copy("heap_block_allocator.cpp")
 
 

@@ -1,0 +1,248 @@
+/*
+ * Copyright (c) 2011-2012, 2019, Fabian Greif
+ * Copyright (c) 2012, 2015-2019, Niklas Hauser
+ * Copyright (c) 2013, Sascha Schade
+ * Copyright (c) 2013, 2015, Kevin Läufer
+ * Copyright (c) 2019, Benjamin Weps
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * ------------------------------------------------------------------------- */
+
+MEMORY
+{
+%% for memory in memories
+	{{ memory.name | upper }} ({{ memory.access }}) : ORIGIN = {{ "0x%08X" % memory.start }}, LENGTH = {{ memory.size }}
+%% endfor
+}
+
+OUTPUT_ARCH("riscv")
+
+ENTRY(_entry)
+
+/* the thread stack is used only for reporting hard fault conditions! It may therefore be small. */
+PROCESS_STACK_SIZE  = {{ process_stack_size }};
+/* the handler stack is used for main program as well as interrupts */
+MAIN_STACK_SIZE     = {{ options[":platform:core:main_stack_size"] }};
+/* combined stack size */
+TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
+
+SECTIONS
+{
+	__rom_start = ORIGIN(FLASH);
+
+	.text : ALIGN(4)
+	{
+		KEEP (*(.text.init.entry))
+		*(.text .text.* .gnu.linkonce.t.*)
+	} >FLASH
+
+	.rodata : ALIGN(4)
+	{
+		*(.rodata .rodata.* .gnu.linkonce.r.*)
+		KEEP(*(.init))
+
+		. = ALIGN(4);
+		__init_array_start = .;
+		KEEP(*(SORT(.init_array.*)))
+		KEEP(*(.init_array))
+		__init_array_end = .;
+	} >FLASH
+
+	/* Unwind tables are used to unwind the stack for C++ exceptions. Even
+	 * though we disabled exceptions, pre-compiled libraries such as libstdc++
+	 * still have to raise exceptions. We still force discard all tables
+	 * though and hook these exception throwers in code. */
+	/DISCARD/ :
+	{
+		*(.ARM.extab* .gnu.linkonce.armextab.*)
+		*(.ARM.exidx* .gnu.linkonce.armexidx.*)
+		*(.eh_frame*)
+	}
+	/* Hardware init table */
+	.hardware_init : ALIGN(4)
+	{
+		__hardware_init_start = .;
+		/* Table symbols are alphabetically sorted! */
+		KEEP(*(SORT(.hardware_init.order_*)))
+		KEEP(*(SORT(.hardware_init)))
+		__hardware_init_end = .;
+	} >FLASH
+
+	/* Assertion handler table */
+	.assertion : ALIGN(4)
+	{
+		__assertion_table_start = .;
+		KEEP(*(.assertion))
+		__assertion_table_end = .;
+	} >FLASH
+
+	.build_id :
+	{
+		__build_id = .;
+		KEEP(*(.note.gnu.build-id))
+	} > FLASH
+
+
+	.fastcode : ALIGN(4)
+	{
+		__fastcode_load = LOADADDR(.fastcode);
+		__fastcode_start = .;
+		*(.fastcode)
+		. = ALIGN(4);
+		__fastcode_end = .;
+	} >FLASH
+
+
+	/* initialized variables */
+	.data : ALIGN(4)
+	{
+		__data_load = LOADADDR(.data);
+		__data_start = .;
+		*(.data .data.* .gnu.linkonce.d.*)
+		. = ALIGN(4);
+		__data_end = .;
+	} >RAM AT >FLASH
+
+	.stack (NOLOAD) :
+	{
+		__stack_start = .;
+
+		. += MAIN_STACK_SIZE;
+		. = ALIGN(8);
+		__main_stack_top = .;
+
+		. += PROCESS_STACK_SIZE;
+		. = ALIGN(8);
+		__process_stack_top = .;
+
+		__stack_end = .;
+	} >RAM
+
+	/* uninitialized variables */
+	.bss (NOLOAD) :
+	{
+		__bss_start = . ;
+		*(.bss .bss.* .gnu.linkonce.b.*)
+		. = ALIGN(4);
+		__bss_end = .;
+	} >RAM
+
+	/* Global data not cleared after reset.  */
+	.noinit (NOLOAD) :
+	{
+		__noinit_start = .;
+		*(.noinit*)
+		. = ALIGN(4);
+		__noinit_end = .;
+	} >RAM
+
+
+	.fastdata : ALIGN(4)
+	{
+		__fastdata_load = LOADADDR(.fastdata);
+		__fastdata_start = .;
+		*(.fastdata)
+		. = ALIGN(4);
+		__fastdata_end = .;
+	} >RAM AT >FLASH
+
+
+	.heap1 (NOLOAD) :
+	{
+		__heap1_start = .;
+		. = ORIGIN(RAM) + LENGTH(RAM);
+		__heap1_end = .;
+	} >RAM
+
+
+
+
+	/* TABLES! TABLES! ALL THE TABLES YOU COULD EVER WANT! TABLES! */
+	.table.zero.intern : ALIGN(4)
+	{
+		__table_zero_intern_start = .;
+		LONG(__bss_start)
+		LONG(__bss_end)
+		__table_zero_intern_end = .;
+	} >FLASH
+
+
+	.table.copy.intern : ALIGN(4)
+	{
+		__table_copy_intern_start = .;
+		LONG(__data_load)
+		LONG(__data_start)
+		LONG(__data_end)
+		LONG(__fastdata_load)
+		LONG(__fastdata_start)
+		LONG(__fastdata_end)
+		__table_copy_intern_end = .;
+	} >FLASH
+
+
+	.table.zero.extern : ALIGN(4)
+	{
+		__table_zero_extern_start = .;
+
+		__table_zero_extern_end = .;
+	} >FLASH
+
+	.table.copy.extern : ALIGN(4)
+	{
+		__table_copy_extern_start = .;
+
+		__table_copy_extern_end = .;
+	} >FLASH
+
+
+	/* SRAM properties bit mask (16-bit):
+	 *
+	 * - 0x0001: accessible via S-Bus
+	 * - 0x0002: accessible via D-Bus
+	 * - 0x0004: accessible via I-Bus
+	 * - 0x0008: accessible via DMA
+	 * - 0x0010: accessible via DMA2D
+	 *
+	 * - 0x1FE0: reserved
+	 *
+	 * - 0x2000: Fast memory (Core- or Tightly-Coupled)
+	 * - 0x4000: non-volatile (or battery backed) memory
+	 * - 0x8000: external memory
+	 */
+	.table.heap : ALIGN(4)
+	{
+		__table_heap_start = .;
+		LONG(0x000f)
+		LONG(__heap1_start)
+		LONG(__heap1_end)
+
+		__table_heap_end = .;
+	} >FLASH
+
+
+	. = ALIGN(4);
+	__rom_end = .;
+
+
+	/* DWARF debug sections */
+	.debug_abbrev   0 : { *(.debug_abbrev) }
+	.debug_aranges  0 : { *(.debug_aranges) }
+	.debug_frame    0 : { *(.debug_frame) }
+	.debug_info     0 : { *(.debug_info) }
+	.debug_line     0 : { *(.debug_line) }
+	.debug_loc      0 : { *(.debug_loc) }
+	.debug_macinfo  0 : { *(.debug_macinfo) }
+	.debug_pubnames 0 : { *(.debug_pubnames) }
+	.debug_pubtypes 0 : { *(.debug_pubtypes) }
+	.debug_ranges   0 : { *(.debug_ranges) }
+	.debug_str      0 : { *(.debug_str) }
+
+	.comment 0 : { *(.comment) }
+	.ARM.attributes 0 : { KEEP(*(.ARM.attributes)) }
+	/DISCARD/ : { *(.note.GNU-stack)  }
+
+}
