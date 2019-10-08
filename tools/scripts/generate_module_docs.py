@@ -49,7 +49,7 @@ def get_modules(builder, limit=None):
     num_options = []
 
     print("Querying for {} targets...".format(len(targets)))
-    mtargets = []
+    mfinal = None
     for target in targets:
         option.value = target
         target = option.value._identifier
@@ -107,13 +107,12 @@ def get_modules(builder, limit=None):
                 qp.setAttribute("type", type(c).__name__)
                 qp.setAttribute("_description", q._description)
 
+        if mfinal is None:
+            mfinal = modules["modm"]
+        else:
+            mfinal.merge(modules["modm"])
 
-        mtargets.append(modules["modm"])
 
-    print("Merging module tree...")
-    mfinal = mtargets[0]
-    for mtarg in mtargets[1:]:
-        mfinal.merge(mtarg)
     print("Sorting module tree...")
     mfinal._sortTree()
 
