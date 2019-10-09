@@ -1,0 +1,14 @@
+<library>
+  <repositories>
+    <repository>
+      <path>../../../../repo.lb</path>
+    </repository>
+  </repositories>
+
+  <options>
+    <option name="modm:target">stm32f401ccu</option>
+  </options>
+  <modules>
+    <module>modm:board:mini-f401</module>
+  </modules>
+</library>
