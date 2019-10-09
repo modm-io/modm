@@ -55,7 +55,7 @@ public:
 		BatDiv2   = 17,
 		InternalReference = 18,
 		// TODO: Add internal connections
-%% elif target["family"] in ["l4"]
+%% elif target["family"] in ["l4", "g4"]
 		Temperature = 17,
 		BatDiv3     = 18,
 %% endif
@@ -63,7 +63,7 @@ public:
 %% if target["family"] in ["f3"]
 		Opamp2 = 17,
 		InternalReference = 18,
-%% elif target["family"] in ["l4"]
+%% elif target["family"] in ["l4", "g4"]
 		Dac1 = 17,
 		Dac2 = 18,
 %% endif
@@ -72,7 +72,7 @@ public:
 		Vss    =  4,	// ADC3_IN4 not bonded and connected to VSS
 		Opamp3 = 17,
 		InternalReference = 18,
-%% elif target["family"] in ["l4"]
+%% elif target["family"] in ["l4", "g4"]
 		Dac1 = 14,
 		Dac2 = 15,
 		Vss  = 16,
@@ -101,9 +101,21 @@ public:
 	enum class ClockSource : uint32_t
 	{
 		NoClock = 0, // No clock selected.
+%% if target["family"] in ["g4"]
+%% if id in [1, 2]
+		PllSai1 = RCC_CCIPR_ADC12SEL_0, // PLLSAI1 "R" clock (PLLADC1CLK) selected as ADCs clock
+		PllSai2 = RCC_CCIPR_ADC12SEL_1, // PLLSAI2 "R" clock (PLLADC2CLK) selected as ADCs clock
+		SystemClock = RCC_CCIPR_ADC12SEL_1 | RCC_CCIPR_ADC12SEL_0, // System clock selected as ADCs clock
+%% elif id in [3, 4, 5]
+		PllSai1 = RCC_CCIPR_ADC345SEL_0, // PLLSAI1 "R" clock (PLLADC1CLK) selected as ADCs clock
+		PllSai2 = RCC_CCIPR_ADC345SEL_1, // PLLSAI2 "R" clock (PLLADC2CLK) selected as ADCs clock
+		SystemClock = RCC_CCIPR_ADC345SEL_1 | RCC_CCIPR_ADC345SEL_0, // System clock selected as ADCs clock
+%% endif
+%% else
 		PllSai1 = RCC_CCIPR_ADCSEL_0, // PLLSAI1 "R" clock (PLLADC1CLK) selected as ADCs clock
 		PllSai2 = RCC_CCIPR_ADCSEL_1, // PLLSAI2 "R" clock (PLLADC2CLK) selected as ADCs clock
 		SystemClock = RCC_CCIPR_ADCSEL_1 | RCC_CCIPR_ADCSEL_0, // System clock selected as ADCs clock
+%% endif
 	};
 %% endif
 
@@ -125,7 +137,7 @@ public:
 		Div128 				= RCC_CFGR2_{{ adc_pre }}_DIV128,
 		Div256 				= RCC_CFGR2_{{ adc_pre }}_DIV256,
 		Div256AllBits 		= RCC_CFGR2_{{ adc_pre }},	// for bit clear
-%% elif target["family"] in ["l4"]
+%% elif target["family"] in ["l4", "g4"]
 		Div1 				= 0,
 		Div2 				= ADC_CCR_PRESC_0,
 		Div4 				= ADC_CCR_PRESC_1,
@@ -163,7 +175,7 @@ public:
 
 	enum class VoltageRegulatorState : uint32_t
 	{
-%% if target["family"] in ["l4"]
+%% if target["family"] in ["l4", "g4"]
 		Enabled 		= ADC_CR_ADVREGEN,
 %% elif target["family"] in ["f3"]
 		// Intermediate state is needed to move from enabled to disabled
@@ -177,16 +189,16 @@ public:
 	enum class Interrupt : uint32_t
 	{
 		Ready 								= ADC_IER_ADRDYIE,
-		EndOfSampling 						= ADC_IER_EOSMP,
-		EndOfRegularConversion 				= ADC_IER_EOC,
-		EndOfRegularSequenceOfConversions 	= ADC_IER_EOS,
-		Overrun 							= ADC_IER_OVR,
-		EndOfInjectedConversion 			= ADC_IER_JEOC,
-		EndOfInjectedSequenceOfConversions 	= ADC_IER_JEOS,
-		AnalogWatchdog1 					= ADC_IER_AWD1,
-		AnalogWatchdog2 					= ADC_IER_AWD2,
-		AnalogWatchdog3 					= ADC_IER_AWD3,
-		InjectedContextQueueOverflow 		= ADC_IER_JQOVF,
+		EndOfSampling 						= ADC_IER_EOSMPIE,
+		EndOfRegularConversion 				= ADC_IER_EOCIE,
+		EndOfRegularSequenceOfConversions 	= ADC_IER_EOSIE,
+		Overrun 							= ADC_IER_OVRIE,
+		EndOfInjectedConversion 			= ADC_IER_JEOCIE,
+		EndOfInjectedSequenceOfConversions 	= ADC_IER_JEOSIE,
+		AnalogWatchdog1 					= ADC_IER_AWD1IE,
+		AnalogWatchdog2 					= ADC_IER_AWD2IE,
+		AnalogWatchdog3 					= ADC_IER_AWD3IE,
+		InjectedContextQueueOverflow 		= ADC_IER_JQOVFIE,
 	};
 	MODM_FLAGS32(Interrupt);
 

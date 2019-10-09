@@ -62,7 +62,7 @@ Rcc::setFlashLatency()
 	uint32_t acr = FLASH->ACR & ~FLASH_ACR_LATENCY;
 	// set flash latency
 	acr |= fl.latency;
-%% if target["family"] in ["f2", "f4", "l4"]
+%% if target["family"] in ["f2", "f4", "l4", "g4"]
 	// enable flash prefetch and data and instruction cache
 	acr |= FLASH_ACR_PRFTEN | FLASH_ACR_DCEN | FLASH_ACR_ICEN;
 %% elif target["family"] in ["g0"]

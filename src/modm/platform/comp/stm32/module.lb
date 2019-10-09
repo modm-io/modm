@@ -30,7 +30,27 @@ class Instance(Module):
         properties["target"] = device.identifier
         instance_id = int(self.instance)
         properties["id"] = instance_id
-        properties["csr"] = "COMP_CSR_" if device.identifier["family"] in ["l4"] else "COMP_CSR_COMPx"
+        properties["driver"] = driver
+        properties["csr"] = "COMP_CSR_" if device.identifier["family"] in ["l4", "g4"] else "COMP_CSR_COMPx"
+        properties["blanking_source"] = dict()
+        if device.identifier["family"] in ["g4"]:
+            properties["blanking_source"]["b001"] = ["Tim1Oc5", "Tim1Oc5", "Tim1Oc5", "Tim3Oc4", "Tim2Oc3", "Tim8Oc5", "Tim1Oc5"][instance_id - 1]
+            properties["blanking_source"]["b010"] = ["Tim2Oc3", "Tim2Oc3", "Tim3Oc3", "Tim8Oc5", "Tim8Oc5", "Tim2Oc4", "Tim8Oc5"][instance_id - 1]
+            properties["blanking_source"]["b011"] = ["Tim3Oc3", "Tim3Oc3", "Tim2Oc4", "Tim15Oc1_2", "Tim3Oc3", "Tim15Oc2", "Tim3Oc3"][instance_id - 1]
+            properties["blanking_source"]["b100"] = ["Tim8Oc5", "Tim8Oc5", "Tim8Oc5", "Tim1Oc5", "Tim1Oc5", "Tim1Oc5", "Tim15Oc2"][instance_id - 1]
+            properties["blanking_source"]["b101"] = ["Tim20Oc5", "Tim20Oc5", "Tim20Oc5", "Tim20Oc5", "Tim20Oc5", "Tim20Oc5", "Tim20Oc5"][instance_id - 1]
+            properties["blanking_source"]["b110"] = ["Tim15Oc1", "Tim15Oc1", "Tim15Oc1", "Tim15Oc1", "Tim15Oc1", "Tim15Oc1", "Tim15Oc1"][instance_id - 1]
+            properties["blanking_source"]["b111"] = ["Tim4Oc3", "Tim4Oc3", "Tim4Oc3", "Tim4Oc3", "Tim4Oc3", "Tim4Oc3", "Tim4Oc3"][instance_id - 1]
+        elif device.identifier["family"] in ["l4"]:
+            properties["blanking_source"]["b001"] = ["Tim1Oc5", None][instance_id - 1]
+            properties["blanking_source"]["b010"] = ["Tim2Oc3", None][instance_id - 1]
+            properties["blanking_source"]["b100"] = [None, "Tim15Oc1"][instance_id - 1]
+        elif device.identifier["family"] in ["f3"]:
+            properties["blanking_source"]["b001"] = "Tim1Oc5"
+            properties["blanking_source"]["b010"] = "Tim2Oc3"
+            properties["blanking_source"]["b011"] = "Tim3Oc3"
+
+
 
         env.substitutions = properties
         env.outbasepath = "modm/src/modm/platform/comp"
@@ -48,7 +68,22 @@ def prepare(module, options):
     if not device.has_driver("comp:stm32*"):
         return False
 
-    if not device.get_driver("comp")["type"] in ["stm32-v1.3", "stm32-tsmc90_cube"]:
+    """
+    Existing comparator IPs:
+        "stm32-tsmc90_cube"
+        "stm32-tsmc90_dory_cube"
+        "stm32-tsmc90_g4_rockfish_cube"
+        "stm32-tsmc90_h7_cube"
+        "stm32-tsmc90_orca128_cube"
+        "stm32-tsmc90_orca512_cube"
+        "stm32-tsmc90_orcazero_cube"
+        "stm32-v1.0"
+        "stm32-v1.2"
+        "stm32-v1.3"
+        "stm32-v3.4"
+        "stm32-v3.6"
+    """
+    if not device.get_driver("comp")["type"] in ["stm32-v1.3", "stm32-tsmc90_cube", "stm32-tsmc90_g4_rockfish_cube"]:
         return False
 
     # Only some STM32F3 and STM32L4
@@ -58,6 +93,8 @@ def prepare(module, options):
     elif device.identifier["family"] == "l4":
         if not device.identifier["name"] in ["31", "32", "33", "42", "43", "51", "52", "62"]:
             return False
+    elif device.identifier["family"] == "g4":
+        pass
     else:
         return False
 
@@ -75,7 +112,7 @@ def build(env):
     properties = device.properties
     properties["target"] = device.identifier
     properties["driver"] = driver
-    properties["csr"] = "COMP_CSR_" if device.identifier["family"] in ["l4"] else "COMP_CSR_COMPx"
+    properties["csr"] = "COMP_CSR_" if device.identifier["family"] in ["l4", "g4"] else "COMP_CSR_COMPx"
 
     env.substitutions = properties
     env.outbasepath = "modm/src/modm/platform/comp"

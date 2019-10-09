@@ -53,7 +53,7 @@ namespace modm::platform
 			Vref1Div4		= (0b000 << 4) | (0b11 << 22),
 			Vref1Div2		= (0b001 << 4) | (0b11 << 22),
 			Vref3Div4		= (0b010 << 4) | (0b11 << 22),
-			Vref			= 0b011 << 4,
+			Vref			= (0b011 << 4) | (0b10 << 22),
 			DacChannel1		= 0b100 << 4,
 			DacChannel2		= 0b101 << 4,
 			{% if id == 1 -%}
@@ -67,13 +67,56 @@ namespace modm::platform
 			{% endif -%}
 			GpioA4			= (0b111 << 4) | (0b10 << 25),
 			GpioA5			= (0b111 << 4) | (0b11 << 25),
+			{% elif target.family == "g4" -%}
+			Vref1Div4		= (0b000 << 4) | (0b11 << 22),
+			Vref1Div2		= (0b001 << 4) | (0b11 << 22),
+			Vref3Div4		= (0b010 << 4) | (0b11 << 22),
+			Vref			= (0b011 << 4) | (0b10 << 22),
+			{% if id == 1 -%}
+			Dac3Ch1			= 0b100 << 4,
+			Dac1Ch1			= 0b101 << 4,
+			GpioA4			= 0b110 << 4,
+			GpioA0			= 0b111 << 4,
+			{% elif id == 2 -%}
+			Dac3Ch2			= 0b100 << 4,
+			Dac1Ch2			= 0b101 << 4,
+			GpioA5			= 0b110 << 4,
+			GpioA2			= 0b111 << 4,
+			{% elif id == 3 -%}
+			Dac3Ch1			= 0b100 << 4,
+			Dac1Ch1			= 0b101 << 4,
+			GpioF1			= 0b110 << 4,
+			GpioC0			= 0b111 << 4,
+			{% elif id == 4 -%}
+			Dac3Ch2			= 0b100 << 4,
+			Dac1Ch1			= 0b101 << 4,
+			GpioE8			= 0b110 << 4,
+			GpioB2			= 0b111 << 4,
+			{% elif id == 5 -%}
+			Dac4Ch1			= 0b100 << 4,
+			Dac1Ch2			= 0b101 << 4,
+			GpioB10			= 0b110 << 4,
+			GpioD13			= 0b111 << 4,
+			{% elif id == 6 -%}
+			Dac4Ch2			= 0b100 << 4,
+			Dac2Ch1			= 0b101 << 4,
+			GpioD10			= 0b110 << 4,
+			GpioB15			= 0b111 << 4,
+			{% elif id == 7 -%}
+			Dac4Ch1			= 0b100 << 4,
+			Dac2Ch1			= 0b101 << 4,
+			GpioD15			= 0b110 << 4,
+			GpioB12			= 0b111 << 4,
+			{% endif -%}
 			{% endif -%}
 		};
 	protected:
 		{% if target.family == "f3" -%}
 		static constexpr uint32_t InvertingInputMask = (0b111 << 4) | (0b1 << 22);
-		{% elif target.family == "l4" -%}
+		{% elif target.family in ["l4"] -%}
 		static constexpr uint32_t InvertingInputMask = (0b111 << 4) | (0b11 << 22) | (0b11 << 25);
+		{% elif target.family in ["g4"] -%}
+		static constexpr uint32_t InvertingInputMask = (0b1111 << 4) | (0b11 << 22);
 		{% endif -%}
 
 	public:
@@ -84,7 +127,7 @@ namespace modm::platform
 			// TODO: Gpio names (with data from parsed datasheets
 			BitUnset	= 0b0 << 7,
 			BitSet		= 0b1 << 7,
-			{% elif target.family == "l4" -%}
+			{% elif target.family in ["l4"] -%}
 			{% if id == 1 -%}
 			GpioC5		= 0b00 << 7,
 			GpioB2		= 0b01 << 7,
@@ -94,12 +137,37 @@ namespace modm::platform
 			GpioB6		= 0b01 << 7,
 			GpioA3		= 0b10 << 7,
 			{% endif -%}
+			{% elif target.family in ["g4"] -%}
+			{% if id == 1 -%}
+			GpioA1			= 0b0 << 8,
+			GpioB1			= 0b1 << 8,
+			{% elif id == 2 -%}
+			GpioA7			= 0b0 << 8,
+			GpioA3			= 0b1 << 8,
+			{% elif id == 3 -%}
+			GpioA0			= 0b0 << 8,
+			GpioC1			= 0b1 << 8,
+			{% elif id == 4 -%}
+			GpioB0			= 0b0 << 8,
+			GpioE7			= 0b1 << 8,
+			{% elif id == 5 -%}
+			GpioB13			= 0b0 << 8,
+			GpioD12			= 0b1 << 8,
+			{% elif id == 6 -%}
+			GpioB11			= 0b0 << 8,
+			GpioD11			= 0b1 << 8,
+			{% elif id == 7 -%}
+			GpioB14			= 0b0 << 8,
+			GpioD14			= 0b1 << 8,
+			{% endif -%}
 			{% endif -%}
 		};
 	protected:
 		{% if target.family == "f3" -%}
 		static constexpr uint32_t NonInvertingInputMask = 0b1 << 7;
-		{% elif target.family == "l4" -%}
+		{% elif target.family in ["g4"] -%}
+		static constexpr uint32_t NonInvertingInputMask = 0b1 << 8;
+		{% elif target.family in ["l4"] -%}
 		static constexpr uint32_t NonInvertingInputMask = 0b11 << 7;
 		{% endif -%}
 
@@ -137,21 +205,15 @@ namespace modm::platform
 		BlankingSource
 		{
 			NoBlanking		= 0b000 << 18,
-			{% if target.family == "f3" -%}
-			Tim1Oc5			= 0b001 << 18,
-			Tim2Oc3			= 0b010 << 18,
-			Tim3Oc3			= 0b011 << 18,
-			{% elif target.family == "l4" -%}
-			{% if id == 1 -%}
-			Tim1Oc5			= 0b001 << 18,
-			Tim2Oc3			= 0b010 << 18,
-			{% elif id == 2 -%}
-			Tim15Oc1		= 0b100 << 18,
+
+			{% for k, v in blanking_source.items() -%}
+			{% if k is not none and v is not none -%}
+			{{ v }}			= 0{{ k }} << {{ csr }}BLANKING_Pos,
 			{% endif -%}
-			{% endif -%}
+			{% endfor -%}
 		};
 	protected:
-		static constexpr uint32_t BlankingSourceMask = 0b111 << 18;
+		static constexpr uint32_t BlankingSourceMask = {{ csr }}BLANKING_Msk;
 
 	public:
 		/**
@@ -165,26 +227,30 @@ namespace modm::platform
 		static inline void
 		initialize(
 					InvertingInput n_in,
-				{% if (target.family == "f3" and id > 1) or target.family == "l4" -%}
+				{% if (target.family == "f3" and id > 1) or target.family in ["l4", "g4"] -%}
 					NonInvertingInput p_in,
 				{% endif -%}
 				{% if target.family == "f3" -%}
 					Output out = Output::NoSelection,
 				{% endif -%}
 					Hysteresis hyst = Hysteresis::NoHysteresis,
+				{% if driver.type not in ["stm32-tsmc90_g4_rockfish_cube"] -%}
 					Mode mode = Mode::HighSpeed,
+				{% endif -%}
 					Polarity pol = Polarity::NonInverted,
 					bool lock_comp = false)
 		{
 			setInvertingInput(n_in);
-		{% if (target.family == "f3" and id > 1) or target.family == "l4" -%}
+		{% if (target.family == "f3" and id > 1) or target.family in ["l4", "g4"] -%}
 			setNonInvertingInput(p_in);
 		{% endif -%}
 		{% if target.family == "f3" -%}
 			setOutputSelection(out);
 		{% endif -%}
 			setHysteresis(hyst);
+		{% if driver.type not in ["stm32-tsmc90_g4_rockfish_cube"] -%}
 			setMode(mode);
+		{% endif -%}
 			setPolarity(pol);
 			setEnabled(true);	// enable comparator
 			if(lock_comp) {
@@ -242,6 +308,7 @@ namespace modm::platform
 		}
 	{% endif -%}
 
+	{% if driver.type not in ["stm32-tsmc90_g4_rockfish_cube"] -%}
 		/**
 		 * \brief	Sets the mode that determins speed/power consumption.
 		 *
@@ -263,6 +330,7 @@ namespace modm::platform
 		{
 			return static_cast<Mode>(COMP{{ id }}->CSR & ModeMask);
 		}
+	{% endif -%}
 
 		/**
 		 * \brief	Selects what the inverting input is connected to.
@@ -282,7 +350,7 @@ namespace modm::platform
 			return static_cast<InvertingInput>(COMP{{ id }}->CSR & InvertingInputMask);
 		}
 
-	{% if (target.family == "f3" and id > 1) or target.family == "l4" -%}
+	{% if (target.family == "f3" and id > 1) or target.family in ["l4", "g4"] -%}
 		/**
 		 * \brief	Selects what the non-inverting input is connected to.
 		 */
@@ -308,7 +376,6 @@ namespace modm::platform
 		{% elif target.family == "l4" -%}
 		{% set windowmode = "WINMODE" %}
 		{% endif -%}
-
 		/**
 		 * \brief Enable/Disable window mode for COMP{{ (id-1) }}/{{ id }}.
 		 */
@@ -414,7 +481,7 @@ namespace modm::platform
 		{
 		{% if target.family == "f3" -%}
 			return COMP{{ id }}->CSR & {{ csr }}OUT;
-		{% elif target.family == "l4" -%}
+		{% elif target.family in ["l4", "g4"] -%}
 			return COMP{{ id }}->CSR & {{ csr }}VALUE;
 		{% endif -%}
 		}
