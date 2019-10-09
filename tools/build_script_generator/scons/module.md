@@ -129,6 +129,62 @@ shutdown command invoked
 ```
 
 
+#### scons dfu
+
+Writes the executable onto your target via Device Firmware Update (DFU) over USB.
+A DFU bootloader is available on many STM32 microcontrollers
+and can be accessed by pressing the BOOT0-Button during startup.
+(\* *only ARM Cortex-M targets*)
+
+Example:
+
+```
+$ scons dfu
+scons: Reading SConscript files ...
+scons: done reading SConscript files.
+scons: Building targets ...
+dfu_stm32_programmer: program [...]/blink/release/blink.bin
+dfu-util 0.9
+
+Copyright 2005-2009 Weston Schmidt, Harald Welte and OpenMoko Inc.
+Copyright 2010-2016 Tormod Volden and Stefan Schmidt
+This program is Free Software and has ABSOLUTELY NO WARRANTY
+Please report bugs to http://sourceforge.net/p/dfu-util/tickets/
+
+dfu-util: Invalid DFU suffix signature
+dfu-util: A valid DFU suffix will be required in a future dfu-util release!!!
+Opening DFU capable USB device...
+ID 0483:df11
+Run-time device DFU version 011a
+Claiming USB DFU Interface...
+Setting Alternate Setting #0 ...
+Determining device status: state = dfuERROR, status = 10
+dfuERROR, clearing status
+Determining device status: state = dfuIDLE, status = 0
+dfuIDLE, continuing
+DFU mode device DFU version 011a
+Device returned transfer size 2048
+DfuSe interface name: "Internal Flash  "
+Memory segment at 0x08000000   4 x 16384 = 65536 (rew)
+Memory segment at 0x08010000   1 x 65536 = 65536 (rew)
+Memory segment at 0x08020000   1 x 131072 = 131072 (rew)
+Downloading to address = 0x08000000, size = 2060
+Download        [                         ]   0%            0 bytes   Poll timeout 100 ms
+   Poll timeout 0 ms
+ Download from image offset 00000000 to memory 08000000-080007ff, size 2048
+   Poll timeout 104 ms
+   Poll timeout 0 ms
+ Download from image offset 00000800 to memory 08000800-0800080b, size 12
+   Poll timeout 104 ms
+   Poll timeout 0 ms
+File downloaded successfully
+   Poll timeout 104 ms
+   Poll timeout 0 ms
+Transitioning to dfuMANIFEST state
+scons: done building targets.
+```
+
+
 #### scons bmp
 
 [Black Magic Probe][bmp] is convenient tool to convert cheap USB ST-LINK V2 clones

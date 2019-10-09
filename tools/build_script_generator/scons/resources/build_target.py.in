@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2018-2019, Niklas Hauser
+# Copyright (c) 2019, Raphael Lehmann
 #
 # This file is part of the modm project.
 #
@@ -43,9 +44,11 @@ def build_target(env, sources):
 		%% if upload_with_artifact
 	env.Alias("program", [env.OpenOcd(program, commands=["modm_program {$SOURCE}"]), "artifact"])
 	env.Alias("bmp", [env.BlackMagicProbe(program), "artifact"])
+	env.Alias('dfu', [env.DfuStm32Programmer(env.Bin(program)), "artifact"])
 		%% else
 	env.Alias("program", env.OpenOcd(program, commands=["modm_program {$SOURCE}"]))
 	env.Alias("bmp", env.BlackMagicProbe(program))
+	env.Alias('dfu', env.DfuStm32Programmer(env.Bin(program)))
 		%% endif
 
 	%% elif core.startswith("avr")

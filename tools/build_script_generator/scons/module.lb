@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2017-2018, Niklas Hauser
+# Copyright (c) 2019, Raphael Lehmann
 #
 # This file is part of the modm project.
 #
@@ -108,7 +109,8 @@ def build(env):
     device = env.query("::device")
     if device["core"].startswith("cortex-m"):
         tools.update({"compiler_arm_none_eabi_gcc", "program_openocd",
-                      "black_magic_probe", "utils_buildsize", "postmortem_gdb"})
+                      "black_magic_probe", "dfu_stm32_programmer",
+                      "utils_buildsize", "postmortem_gdb"})
     elif device["core"].startswith("avr"):
         tools.update({"compiler_avr_gcc", "utils_buildsize", "program_avrdude"})
     else: # hosted

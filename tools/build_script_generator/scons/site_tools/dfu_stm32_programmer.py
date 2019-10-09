@@ -4,6 +4,7 @@
 # Copyright (c) 2013, Sascha Schade
 # Copyright (c) 2014, 2016, Daniel Krebs
 # Copyright (c) 2017, Michael Thies
+# Copyright (c) 2019, Raphael Lehmann
 #
 # This file is part of the modm project.
 #
@@ -14,11 +15,10 @@
 #
 # Usage:
 # Add to your SConstruct file
-# binfile = env.Bin(program)
-# env.Alias('program', env.DfuStm32Programmer(binfile))
+# env.Alias('dfu', env.DfuStm32Programmer(env.Bin(program)))
 #
 # Call
-#   scons program
+#   scons dfu
 # from your command line
 
 import platform
