@@ -1,0 +1,77 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2019, Raphael Lehmann
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":board:mini-f411"
+    module.description = """\
+# Mini-F411
+
+STM32F411CEU "Mini-F411" Minimum System Development Board
+
+Cheap and bread-board-friendly board for STM32F411 series.
+Sold for less than 5 USD on well known Internet shops from China.
+Attention: There are two variants: Mini-F411 and the cheaper Mini-F401.
+
+[Schematic](https://pbs.twimg.com/media/EGcCd4NWsAUkWFx?format=jpg&name=orig)
+""" + descr_programming
+
+descr_programming = """
+## Programming
+
+Since the board has no St-Link programmer on the board,
+you must use DFU (Device Firmware Update (via USB)) to program the board.
+A DFU command is integrated into the modm:build:scons tool and can be called as follows:
+
+```
+scons dfu
+```
+
+Alternatively you can go for an external programmer
+and *specify* which one you're using in a custom `openocd.cfg` file:
+
+```
+# Replace this with your custom programmer
+source [find interface/stlink-v2.cfg]
+```
+
+Then include this file in your build options like so:
+
+```xml
+<library>
+  <extends>modm:mini-f411</extends>
+  <options>
+    <option name="modm:build:openocd.cfg">openocd.cfg</option>
+  </options>
+</library>
+```
+"""
+
+def prepare(module, options):
+    if options[":target"].partname != "stm32f411ceu":
+        return False
+
+    module.depends(
+        ":architecture:clock",
+        ":platform:clock",
+        ":platform:core",
+        ":platform:gpio")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/board"
+    env.substitutions = {"board_has_logger": False}
+    env.template("../board.cpp.in", "board.cpp")
+    env.copy('.')
+
+    env.outbasepath = "modm/openocd/modm/board/"
+    env.copy(repopath("tools/openocd/modm/stm32f4x1_mini_f4x1.cfg"), "stm32f4x1_mini_f4x1.cfg")
+    env.collect(":build:openocd.source", "modm/board/stm32f4x1_mini_f4x1.cfg")
