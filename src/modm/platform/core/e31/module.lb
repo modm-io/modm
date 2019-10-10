@@ -55,7 +55,7 @@ def prepare(module, options):
     module.add_option(
     EnumerationOption(
         name="allocator",
-        description=FileReader("option/allocator.md"),
+        description=FileReader("../cortex/option/allocator.md"),
         enumeration=["newlib", "block", "tlsf"],
         default="newlib",
         dependencies=lambda v: {"newlib": None,
@@ -65,7 +65,7 @@ def prepare(module, options):
     module.add_option(
     NumericOption(
         name="main_stack_size",
-        description=FileReader("option/main_stack_size.md"),
+        description=FileReader("../cortex/option/main_stack_size.md"),
         minimum=2 ** 8,
         maximum=2 ** 14,
         default=2 ** 10 * 3 - 32))
@@ -77,7 +77,7 @@ def prepare(module, options):
     module.add_option(
         NumericOption(
             name="linkerscript.flash_offset",
-            description=FileReader("option/flash_offset.md"),
+            description=FileReader("../cortex/option/flash_offset.md"),
             minimum=0,
             maximum=hex(flash_size),
             default=0))
@@ -112,15 +112,15 @@ def build(env):
     env.copy("clock.cpp")
     env.copy("assert.cpp")
 
-    env.template("heap_table.cpp.in")
-    env.template("heap_table.hpp.in")
+    env.template("../cortex/heap_table.cpp.in","heap_table.cpp")
+    env.template("../cortex/heap_table.hpp.in","heap_table.hpp")
 
     # everything to do with dynamic memory
     if env["allocator"] == "newlib":
-        env.copy("heap_newlib.cpp")
+        env.copy("../cortex/heap_newlib.cpp","heap_newlib.cpp")
     elif env["allocator"] == "tlsf":
-        env.copy("heap_tlsf.cpp")
+        env.copy("../cortex/heap_tlsf.cpp","heap_tlsf.cpp")
     elif env["allocator"] == "block":
-        env.copy("heap_block_allocator.cpp")
+        env.copy("../cortex/heap_block_allocator.cpp","heap_block_allocator.cpp")
 
 
