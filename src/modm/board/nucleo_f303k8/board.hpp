@@ -41,11 +41,13 @@ struct SystemClock {
 
 	static constexpr uint32_t Spi1   = Apb2;
 
-	static constexpr uint32_t Usart1 = Apb2;
+	// USART1 is on APB2 bus, but default clock is PCLK1
+	static constexpr uint32_t Usart1 = Apb1;
 	static constexpr uint32_t Usart2 = Apb1;
 	static constexpr uint32_t Usart3 = Apb1;
 
-	static constexpr uint32_t I2c1   = Apb1;
+	// I2C1 clock source is HSI per default
+	static constexpr uint32_t I2c1   = 8_MHz;
 
 	static constexpr uint32_t Apb1Timer = Apb1 * 2;
 	static constexpr uint32_t Apb2Timer = Apb2 * 1;
