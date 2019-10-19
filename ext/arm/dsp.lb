@@ -29,13 +29,16 @@ class CmsisDspModule(Module):
     def prepare(self, module, options):
         dependencies = {
             "basic_math": [],
+            "bayes": [":cmsis:dsp:statistics"],
             "complex_math": [":cmsis:dsp:fast_math"],
             "controller": [":cmsis:dsp:tables"],
+            "distance": [":cmsis:dsp:basic_math", ":cmsis:dsp:statistics"],
             "fast_math": [":cmsis:dsp:tables"],
             "filtering": [":cmsis:dsp:tables", ":cmsis:dsp:support"],
             "matrix": [],
             "statistics": [":cmsis:dsp:fast_math"],
             "support": [],
+            "svm": [],
             "tables": [],
             "transform": [":cmsis:dsp:tables"],
         }
