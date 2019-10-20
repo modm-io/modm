@@ -6,7 +6,7 @@
   </repositories>
 
   <options>
-    <option name="modm:target">stm32f303vct</option>
+    <option name="modm:target">stm32f303vct6</option>
   </options>
   <modules>
     <module>modm:board:disco-f303vc</module>

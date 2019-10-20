@@ -33,7 +33,28 @@ def get_modules(builder, limit=None):
     builder._load_repositories(repopath("repo.lb"))
     option = builder.parser.find_option(":target")
 
-    targets = list(set(option.values) - set(d for d in repopath("test/all/ignored.txt").read_text().strip().splitlines() if "#" not in d))
+    raw_targets = list(set(option.values) - set(d for d in repopath("test/all/ignored.txt").read_text().strip().splitlines() if "#" not in d))
+
+    # Reduce device set a little to keep RAM usage in check
+    # this should ~half the considered devices
+    short_targets = set()
+    targets = []
+    for d in raw_targets:
+        if d.startswith("stm32"):
+            # filter out temperature key
+            sd = d[:12] + d[13:]
+            if sd not in short_targets:
+                targets.append(d)
+                short_targets.add(sd)
+        elif d.startswith("at"):
+            # filter out package
+            sd = d.split("-")[0]
+            if sd not in short_targets:
+                targets.append(d)
+                short_targets.add(sd)
+        else:
+            targets.append(d)
+
     if limit is not None:
         targets = targets[:limit]
     targets = sorted(targets)

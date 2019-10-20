@@ -132,14 +132,14 @@ def build_device(run):
 
 def main():
     if len(sys.argv) == 2 and sys.argv[1] == "failed":
-        devices = Path("failed.txt").read_text().strip().split("\n")
+        raw_devices = Path("failed.txt").read_text().strip().split("\n")
     else:
         try:
             stdout = run_lbuild(["-c", "avr.xml", "discover", "--values", "--name :target"])
-            devices = stdout.strip().splitlines()
+            raw_devices = stdout.strip().splitlines()
             # filter for only the devices specified
             for arg in sys.argv[1:]:
-                devices = [d for d in devices if d.startswith(arg)]
+                raw_devices = (d for d in raw_devices if d.startswith(arg))
             # print(devices)
         except CommandException as error:
             print(error)
@@ -148,7 +148,23 @@ def main():
     ignored_devices = Path("ignored.txt").read_text().strip().split("\n")
     ignored_devices = [d for d in ignored_devices if "#" not in d]
     # filter out non-supported devices
-    devices = [d for d in devices if d not in ignored_devices]
+    raw_devices = filter(lambda d: not any(d.startswith(i) for i in ignored_devices), raw_devices)
+
+    # Filter out the temperature key for STM32, which has no impact on HAL generation
+    short_devices = set()
+    devices = []
+    for d in raw_devices:
+        if d.startswith("stm32"):
+            sd = d[:12] + d[13:]
+            if sd not in short_devices:
+                devices.append(d)
+                short_devices.add(sd)
+        else:
+            devices.append(d)
+
+    if not len(devices):
+        print("No devices found to build! Check your input and 'ignored.txt'.")
+        exit(1)
 
     os.makedirs("log", exist_ok=True)
 

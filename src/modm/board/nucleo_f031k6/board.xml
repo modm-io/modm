@@ -6,7 +6,7 @@
   </repositories>
 
   <options>
-    <option name="modm:target">stm32f031k6t</option>
+    <option name="modm:target">stm32f031k6t6</option>
 
     <option name="modm:platform:uart:1:buffer.tx">256</option>
     <option name="modm:platform:cortex-m:main_stack_size">992</option>

@@ -1,6 +1,6 @@
 <library>
   <options>
-    <option name="modm:target">atmega644</option>
+    <option name="modm:target">atmega644-20au</option>
     <option name="modm:platform:clock:f_cpu">14745600</option>
     <option name="modm:build:build.path">../../../../../build/avr/display/dogm128/touch</option>
   </options>

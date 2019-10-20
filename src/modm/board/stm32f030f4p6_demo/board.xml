@@ -6,7 +6,7 @@
   </repositories>
 
   <options>
-    <option name="modm:target">stm32f030f4p</option>
+    <option name="modm:target">stm32f030f4p6</option>
   </options>
   <modules>
     <module>modm:board:stm32f030_demo</module>

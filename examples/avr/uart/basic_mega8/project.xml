@@ -1,6 +1,6 @@
 <library>
   <options>
-    <option name="modm:target">atmega8</option>
+    <option name="modm:target">atmega8-16au</option>
     <option name="modm:platform:clock:f_cpu">1000000</option>
     <option name="modm:build:build.path">../../../../build/avr/uart/basic_mega8</option>
   </options>

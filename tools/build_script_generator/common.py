@@ -320,8 +320,14 @@ def common_compiler_flags(compiler, target):
         ]
 
     elif core.startswith("avr"):
+        # avr-gcc only accepts certain device strings for its -mmcu flag
+        # See https://gcc.gnu.org/onlinedocs/gcc/AVR-Options.html
+        mmcu = target.partname.split("-")[0]
+        for suffix in {"v", "f", "l", "rc"}:
+            mmcu = mmcu[:-2] + mmcu[-2:].replace(suffix, "")
+
         flags["archflags"] += [
-            "-mmcu={}".format(target.partname),
+            "-mmcu={}".format(mmcu),
         ]
         flags["cxxflags"] += [
             "-fno-exceptions",

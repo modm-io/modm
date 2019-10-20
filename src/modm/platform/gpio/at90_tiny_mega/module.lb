@@ -112,7 +112,7 @@ def validate(env):
 def build(env):
     device = env[":target"]
     driver = device.get_driver("gpio")
-    properties = device.properties
+    properties = {}
     properties["target"] = target = device.identifier
     properties["driver"] = driver
     properties.update(bprops)
@@ -134,7 +134,7 @@ def build(env):
     else:
         properties["eicra"] = "EICRA"
 
-    if target["family"] == "mega" and target["name"] in ["8", "16", "32", "8515", "8535"] and target["type"] not in ["u2", "u4"]:
+    if target["family"] == "mega" and target["name"] in ["8", "16", "32", "8515", "8535"] and target["type"] not in ["u2", "u4", "u4rc"]:
         properties["isc2"] = "MCUCSR"
     if target["family"] == "mega" and target["name"] in ["162"]:
         properties["isc2"] = "EMCUCR"

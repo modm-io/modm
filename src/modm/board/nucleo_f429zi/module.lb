@@ -20,7 +20,7 @@ def init(module):
 """
 
 def prepare(module, options):
-    if options[":target"].partname != "stm32f429zit":
+    if not options[":target"].partname.startswith("stm32f429zit"):
         return False
 
     module.depends(":platform:core", ":platform:gpio", ":platform:clock", ":platform:uart:3",

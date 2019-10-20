@@ -6,7 +6,7 @@
   </repositories>
 
   <options>
-    <option name="modm:target">at90can128</option>
+    <option name="modm:target">at90can128-16au</option>
     <option name="modm:platform:clock:f_cpu">16000000</option>
   </options>
   <modules>

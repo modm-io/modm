@@ -20,7 +20,7 @@ https://www.alvidi.de/products/DE/AVR_Entwicklungsboards/avr_modul_avreb_can.php
 """
 
 def prepare(module, options):
-    if options[":target"].partname != "at90can128":
+    if not options[":target"].partname.startswith("at90can128"):
         return False
 
     module.depends(

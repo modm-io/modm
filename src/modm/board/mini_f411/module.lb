@@ -56,7 +56,7 @@ Then include this file in your build options like so:
 """
 
 def prepare(module, options):
-    if options[":target"].partname != "stm32f411ceu":
+    if not options[":target"].partname.startswith("stm32f411ceu"):
         return False
 
     module.depends(

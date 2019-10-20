@@ -6,7 +6,7 @@
   </repositories>
 
   <options>
-    <option name="modm:target">stm32f429zit</option>
+    <option name="modm:target">stm32f429zit6</option>
   </options>
   <modules>
     <module>modm:board:disco-f429zi</module>

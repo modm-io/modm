@@ -6,7 +6,7 @@
   </repositories>
 
   <options>
-    <option name="modm:target">stm32f051r8t</option>
+    <option name="modm:target">stm32f051r8t6</option>
   </options>
   <modules>
     <module>modm:board:disco-f051r8</module>

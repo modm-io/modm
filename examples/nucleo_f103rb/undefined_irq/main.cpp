@@ -27,6 +27,7 @@ MODM_ISR(EXTI3)
 // MODM_ISR(EXTI4)
 // { MODM_LOG_DEBUG << "EXTI4 called!" << modm::endl; }
 
+[[maybe_unused]]
 static modm::Abandonment
 core_assertion_handler(const char * module,
 					   const char * /*location*/,

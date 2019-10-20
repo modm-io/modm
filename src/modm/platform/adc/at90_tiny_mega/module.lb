@@ -36,7 +36,7 @@ def build(env):
     device = env[":target"]
     driver = device.get_driver("adc")
 
-    properties = device.properties
+    properties = {}
     properties["target"] = target = device.identifier
     properties["driver"] = driver
 
@@ -66,7 +66,7 @@ def build(env):
         if target["name"] in ['8', '16', '32'] and target["type"] in ['hva', 'hvab', 'hvabrevb', 'hvb', 'hvbrevb']:
             properties["vadc"] = True
 
-        if target["name"] in ['8', '128'] and target["type"] in ['a', '']:
+        if target["name"] in ['8', '128'] and target["type"] in ['a', 'l', '']:
             properties["adfr"] = True
 
         if (target["name"] in ['16', '32'] and target["type"] in ['u4']) or \
@@ -77,11 +77,11 @@ def build(env):
         if target["name"] in ['8', '48', '88', '168', '328'] and target["type"] in ['a', '', 'p', 'pa']:
             properties["nomux4"] = True
 
-        if target["name"] in ['16', '32', '8535'] and target["type"] in ['a', '']:
+        if target["name"] in ['16', '32', '8535'] and target["type"] in ['a', 'l', '']:
             properties["sfior"] = True
 
         # ADC High Speed Mode has been removed from some chips
-        if target["name"] in ['8', '16', '32', '64'] and target["type"] in ['m1', 'u4', 'c1', 'u6']:
+        if target["name"] in ['8', '16', '32', '64'] and target["type"] in ['m1', 'u4', 'u4rc', 'c1', 'u6']:
             properties["adhsm"] = True
 
     env.substitutions = properties

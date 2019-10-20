@@ -6,7 +6,7 @@
   </repositories>
 
   <options>
-    <option name="modm:target">stm32f769nih</option>
+    <option name="modm:target">stm32f769nih6</option>
 
     <option name="modm:platform:uart:1:buffer.tx">2048</option>
   </options>

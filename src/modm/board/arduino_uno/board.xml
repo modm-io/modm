@@ -6,7 +6,7 @@
   </repositories>
 
   <options>
-    <option name="modm:target">atmega328p</option>
+    <option name="modm:target">atmega328p-au</option>
     <option name="modm:platform:clock:f_cpu">16000000</option>
   </options>
   <modules>
