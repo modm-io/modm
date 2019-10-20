@@ -159,7 +159,34 @@ class DevicesCache(dict):
             return self[item]
         return value
 
+# =============================================================================
+class TargetOption(EnumerationOption):
+    """
+    Allows the target string to be longer than required by selecting the best
+    fitting target string
+    """
+    def as_enumeration(self, value):
+        targets = self._enumeration.keys()
+        target = self._obj_to_str(value)
+        # check if input string is part of keys OR longer
+        while(len(target) > len("attiny4-")):
+            if target in targets:
+                return self._enumeration[target]
+            else:
+                # cut off last character and try again
+                target = target[:-1]
 
+        # check if input string yields ambiguous results
+        target = self._obj_to_str(value)
+        targets = [t for t in targets if t.startswith(target)]
+        if len(targets):
+            from lbuild.exception import _bp, _hl
+            raise ValueError(_hl("Ambiguous target!\n") + "Multiple devices found:\n\n" + _bp(targets))
+
+        # Otherwise completely unknown target
+        raise TypeError("Target is unknown!")
+
+# =============================================================================
 from lbuild.format import ansi_escape as c
 def modm_format_description(node, description):
     # Remove the HTML comments we use for describing doc tests
@@ -216,9 +243,9 @@ def init(repo):
         exit(1)
 
     repo.add_option(
-        EnumerationOption(name="target",
-                          description="Meta-HAL target device",
-                          enumeration=devices))
+        TargetOption(name="target",
+                     description="Meta-HAL target device",
+                     enumeration=devices))
 
 def prepare(repo, options):
     repo.add_modules_recursive("ext", modulefile="*.lb")
