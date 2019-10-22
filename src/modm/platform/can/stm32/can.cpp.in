@@ -5,6 +5,7 @@
  * Copyright (c) 2014, Georgi Grinshpun
  * Copyright (c) 2014, 2016-2018, Niklas Hauser
  * Copyright (c) 2018, Christopher Durand
+ * Copyright (c) 2019, Benjamin Weps
  *
  * This file is part of the modm project.
  *
@@ -214,13 +215,18 @@ readMailbox(modm::can::Message& message, uint32_t mailboxId, uint8_t* filter_id)
 	reinterpret_cast<uint32_t *>(data)[1] = mailbox->RDHR;
 }
 
+
+extern "C"
+{
+
 // ----------------------------------------------------------------------------
 /* Transmit Interrupt
  *
  * Generated when Transmit Mailbox 0..2 becomes empty.
  */
 
-MODM_ISR({{ reg }}_TX)
+void
+Can{{ id }}_Tx()
 {
 %% if options["buffer.tx"] > 0
 	uint32_t mailbox;
@@ -253,7 +259,8 @@ MODM_ISR({{ reg }}_TX)
  * Generated on a new received message, FIFO0 full condition and Overrun
  * Condition.
  */
-MODM_ISR({{ reg }}_RX0)
+void
+Can{{ id }}_Rx0()
 {
 	if ({{ reg }}->RF0R & CAN_RF0R_FOVR0) {
 		modm::ErrorReport::report(modm::platform::CAN{{ id }}_FIFO0_OVERFLOW);
@@ -280,7 +287,8 @@ MODM_ISR({{ reg }}_RX0)
  *
  * See FIFO0 Interrupt
  */
-MODM_ISR({{ reg }}_RX1)
+void
+Can{{ id }}_Rx1()
 {
 	if ({{ reg }}->RF1R & CAN_RF1R_FOVR1) {
 		modm::ErrorReport::report(modm::platform::CAN{{ id }}_FIFO1_OVERFLOW);
@@ -308,24 +316,26 @@ MODM_ISR({{ reg }}_RX1)
 // the interrupt source and call the correct interrupts function defined above.
 // Sources for the different interrupts are specified in the Reference Manual
 // in the "bxCAN interrupts" section.
-MODM_ISR(CEC_CAN)
+void
+Can{{ id }}_GenericIsr()
 {
 	if({{ reg }}->TSR & (CAN_TSR_RQCP0 | CAN_TSR_RQCP1 | CAN_TSR_RQCP2)) {
-		MODM_ISR_CALL({{ reg }}_TX);
+		Can{{ id }}_Tx();
 	}
 
 	if({{ reg }}->RF0R & (CAN_RF0R_FMP0 | CAN_RF0R_FULL0 | CAN_RF0R_FOVR0)) {
-		MODM_ISR_CALL({{ reg }}_RX0);
+		Can{{ id }}_Rx0();
 	}
 
 	if({{ reg }}->RF1R & (CAN_RF1R_FMP1 | CAN_RF1R_FULL1 | CAN_RF1R_FOVR1)) {
-		MODM_ISR_CALL({{ reg }}_RX1);
+		Can{{ id }}_Rx1();
 	}
 
 	// TODO: we do not handle status changes at the moment.
 }
 %% endif
 
+}
 // ----------------------------------------------------------------------------
 void
 modm::platform::Can{{ id }}::setMode(Mode mode)
