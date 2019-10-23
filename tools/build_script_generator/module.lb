@@ -128,6 +128,9 @@ def build(env):
     # Append common search paths to metadata
     if env.has_collector(":build:path.openocd"):
         env.collect(":build:path.openocd", "modm/openocd")
+        env.outbasepath = "modm"
+        env.copy("openocd_gdbinit")
+        env.copy("gdbinit")
 
     # Add compiler flags to metadata
     for flag, values in common_compiler_flags("gcc", env[":target"]).items():
@@ -157,8 +160,6 @@ def post_build(env):
         if len(openocd_cfg):
             env.substitutions["openocd_user_path"] = env.relative_outpath(openocd_cfg)
         env.template("openocd.cfg.in")
-        env.template("openocd_gdbinit.in")
-        env.template("gdbinit")
 
 
 # ============================ Option Descriptions ============================
