@@ -10,7 +10,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-import os
+import os, sys
 
 # import all common code
 with open(localpath("common.py")) as common:
@@ -20,6 +20,8 @@ with open(localpath("common.py")) as common:
 def init(module):
     module.name = ":build"
     module.description = FileReader("module.md")
+    # Force post-build steps of this submodule tree to be built last
+    module.order = sys.maxsize
 
 
 def prepare(module, options):
