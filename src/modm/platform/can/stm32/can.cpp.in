@@ -226,7 +226,7 @@ extern "C"
  */
 
 void
-Can{{ id }}_Tx()
+Can{{ id }}_Tx(void)
 {
 %% if options["buffer.tx"] > 0
 	uint32_t mailbox;
@@ -260,7 +260,7 @@ Can{{ id }}_Tx()
  * Condition.
  */
 void
-Can{{ id }}_Rx0()
+Can{{ id }}_Rx0(void)
 {
 	if ({{ reg }}->RF0R & CAN_RF0R_FOVR0) {
 		modm::ErrorReport::report(modm::platform::CAN{{ id }}_FIFO0_OVERFLOW);
@@ -288,7 +288,7 @@ Can{{ id }}_Rx0()
  * See FIFO0 Interrupt
  */
 void
-Can{{ id }}_Rx1()
+Can{{ id }}_Rx1(void)
 {
 	if ({{ reg }}->RF1R & CAN_RF1R_FOVR1) {
 		modm::ErrorReport::report(modm::platform::CAN{{ id }}_FIFO1_OVERFLOW);
@@ -317,7 +317,7 @@ Can{{ id }}_Rx1()
 // Sources for the different interrupts are specified in the Reference Manual
 // in the "bxCAN interrupts" section.
 void
-Can{{ id }}_GenericIsr()
+Can{{ id }}_GenericIsr(void)
 {
 	if({{ reg }}->TSR & (CAN_TSR_RQCP0 | CAN_TSR_RQCP1 | CAN_TSR_RQCP2)) {
 		Can{{ id }}_Tx();

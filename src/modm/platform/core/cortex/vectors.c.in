@@ -13,6 +13,20 @@
 #include <modm/architecture/utils.hpp>
 #include <modm/architecture/interface/assert.h>
 
+
+// ----------------------------------------------------------------------------
+/*
+ *	Default Interrupt Vectors for Peripherals
+ */
+%% for isr in custom_vectors
+extern void {{custom_vectors[isr]}}(void);
+void {{isr}}_forwarder(void)
+{
+	{{custom_vectors[isr]}}();
+}
+
+%% endfor
+
 // ----------------------------------------------------------------------------
 extern void modm_undefined_handler(int32_t);
 void Undefined_Handler(void)
@@ -29,7 +43,11 @@ void NMI_Handler(void)							__attribute__((weak, alias("Undefined_Handler")));
 void HardFault_Handler(void)					__attribute__((weak, alias("Undefined_Handler")));
 %% for pos in range(4 - 16, highest_irq + 1)
 %% 	if pos in vector_table
+%%   if vector_table[pos] in custom_vectors
+{{ ("void " ~ vector_table[pos] ~ "(void)") | lbuild.pad(47)}}__attribute__((weak, alias("{{vector_table[pos]}}_forwarder")));
+%%   else
 {{ ("void " ~ vector_table[pos] ~ "(void)") | lbuild.pad(47)}}__attribute__((weak, alias("Undefined_Handler")));
+%%   endif
 %%	endif
 %% endfor
 

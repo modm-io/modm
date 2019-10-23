@@ -128,9 +128,6 @@ class Instance(Module):
                     "CAN{0}_RX0:Can{0}_Rx0".format(self.instance),
                     "CAN{0}_RX1:Can{0}_Rx1".format(self.instance))
 
-        print (self.instance)
-
-
 def init(module):
     module.name = ":platform:can"
     module.description = "Controller Area Network (CAN)"

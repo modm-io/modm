@@ -52,7 +52,7 @@ def common_vector_table(env):
         })
     # Append `_IRQHandler` to all
     for vector in driver["vector"]:
-        interrupts[int(vector["position"])] = vector["name"]
+        interrupts[int(vector["position"])] = vector["name"] + "_IRQHandler"
 
 
     properties = {
@@ -141,9 +141,10 @@ def common_linkerscript(env):
 
 def common_default_vectors(env):
     vectors = dict()
+
     for vectorString in env.collector_values(":platform:cortex-m:vector_defaults"):
         tokens = vectorString.split(':')
-        vectors[tokens[0]]=tokens[1]
+        vectors[tokens[0]+"_IRQHandler"]=tokens[1]
 
     return vectors
 
@@ -313,7 +314,6 @@ def build(env):
         env.template("unaligned.hpp.in")
 
 def post_build(env):
-
     env.substitutions = env.query("vector_table")
     env.substitutions["partname"] = env[":target"].partname
     env.substitutions["with_fault_storage"] = env.has_module(":platform:fault")
