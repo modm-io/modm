@@ -142,7 +142,7 @@ def common_linkerscript(env):
 def common_default_vectors(env):
     vectors = dict()
 
-    for vectorString in env.collector_values(":platform:cortex-m:vector_defaults"):
+    for vectorString in env.collector_values(":platform:cortex-m:vector_hooks"):
         tokens = vectorString.split(':')
         vectors[tokens[0]+"_IRQHandler"]=tokens[1]
 
@@ -244,7 +244,7 @@ def prepare(module, options):
 
     module.add_collector(
         StringCollector(
-            name="vector_defaults",
+            name="vector_hooks",
             description="Default interrupt vectors for the enabled peripherals",
             validate=validate_vector))
 
@@ -330,7 +330,7 @@ def post_build(env):
     env.substitutions = env.query("vector_table")
     env.substitutions["partname"] = env[":target"].partname
     env.substitutions["with_fault_storage"] = env.has_module(":platform:fault")
-    env.substitutions["custom_vectors"] = common_default_vectors(env)
+    env.substitutions["vector_hooks"] = common_default_vectors(env)
     env.outbasepath = "modm/src/modm/platform/core"
 
     env.template("vectors.c.in")
