@@ -77,14 +77,6 @@ def common_source_files(env):
 
     for repo in files_to_build:
         files_to_build[repo].sort()
-
-    #Workaround to add the vector table which is build in a post-build step (only for the cortex processors)
-    device = env["modm:target"]
-    core = device.get_driver("core")["type"]
-    if "cortex" in core:
-        if("modm/src/modm/platform/core/vectors.c" not in files_to_build["modm"]):
-            files_to_build["modm"].append("modm/src/modm/platform/core/vectors.c")
-
     return files_to_build
 
 def common_target(env):
