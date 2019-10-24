@@ -19,10 +19,10 @@
  *	Default Interrupt Vectors for Peripherals
  */
 %% for isr in vector_hooks
-extern void {{vector_hooks[isr]}}(void);
-void {{isr}}_forwarder(void)
+extern void {{vector_hooks[isr]['call']}}(void);
+void {{vector_hooks[isr]['name']}}_forwarder(void)
 {
-	{{vector_hooks[isr]}}();
+	{{vector_hooks[isr]['call']}}();
 }
 
 %% endfor
@@ -44,7 +44,7 @@ void HardFault_Handler(void)					__attribute__((weak, alias("Undefined_Handler")
 %% for pos in range(4 - 16, highest_irq + 1)
 %% 	if pos in vector_table
 %%   if vector_table[pos] in vector_hooks
-{{ ("void " ~ vector_table[pos] ~ "(void)") | lbuild.pad(47)}}__attribute__((weak, alias("{{vector_table[pos]}}_forwarder")));
+{{ ("void " ~ vector_table[pos] ~ "(void)") | lbuild.pad(47)}}__attribute__((weak, alias("{{vector_hooks[vector_table[pos]]['name']}}_forwarder")));
 %%   else
 {{ ("void " ~ vector_table[pos] ~ "(void)") | lbuild.pad(47)}}__attribute__((weak, alias("Undefined_Handler")));
 %%   endif

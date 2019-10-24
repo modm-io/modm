@@ -141,11 +141,9 @@ def common_linkerscript(env):
 
 def common_default_vectors(env):
     vectors = dict()
-
     for vectorString in env.collector_values(":platform:cortex-m:vector_hooks"):
         tokens = vectorString.split(':')
-        vectors[tokens[0]+"_IRQHandler"]=tokens[1]
-
+        vectors[tokens[0]+"_IRQHandler"]={'name':tokens[0],'call':tokens[1]}
     return vectors
 
 def init(module):
