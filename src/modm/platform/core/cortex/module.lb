@@ -230,10 +230,23 @@ def prepare(module, options):
             name="linkerscript.process_stack_size",
             description="Maximum required size of the process stack",
             minimum=0))
+
+
+    vectors = [v["name"] for v in options[":target"].get_driver("core")["vector"]]
+    def validate_vector(value):
+        if ":" not in value:
+            raise ValueError("Input must be formatted as 'vector:function[:priority]'!")
+        name = value.split(":")[0]
+        if name not in vectors:
+            from lbuild.exception import _bp, _hl
+            raise ValueError(_hl("Vector '{}' is unknown!\n".format(name)) +
+                             "Available vectors are:\n\n" + _bp(vectors))
+
     module.add_collector(
         StringCollector(
             name="vector_defaults",
-            description="Default interrupt vectors for the enabled peripherals"))
+            description="Default interrupt vectors for the enabled peripherals",
+            validate=validate_vector))
 
     module.add_query(
         EnvironmentQuery(name="vector_table", factory=common_vector_table))
