@@ -220,7 +220,7 @@ readMailbox(modm::can::Message& message, uint32_t mailboxId, uint8_t* filter_id)
  * Generated when Transmit Mailbox 0..2 becomes empty.
  */
 
-MODM_ISR({{ reg }}_TX)
+MODM_ISR_HOOKS({{ reg }}_TX)
 {
 %% if options["buffer.tx"] > 0
 	uint32_t mailbox;
@@ -253,7 +253,7 @@ MODM_ISR({{ reg }}_TX)
  * Generated on a new received message, FIFO0 full condition and Overrun
  * Condition.
  */
-MODM_ISR({{ reg }}_RX0)
+MODM_ISR_HOOKS({{ reg }}_RX0)
 {
 	if ({{ reg }}->RF0R & CAN_RF0R_FOVR0) {
 		modm::ErrorReport::report(modm::platform::CAN{{ id }}_FIFO0_OVERFLOW);
@@ -280,7 +280,7 @@ MODM_ISR({{ reg }}_RX0)
  *
  * See FIFO0 Interrupt
  */
-MODM_ISR({{ reg }}_RX1)
+MODM_ISR_HOOKS({{ reg }}_RX1)
 {
 	if ({{ reg }}->RF1R & CAN_RF1R_FOVR1) {
 		modm::ErrorReport::report(modm::platform::CAN{{ id }}_FIFO1_OVERFLOW);
@@ -308,7 +308,7 @@ MODM_ISR({{ reg }}_RX1)
 // the interrupt source and call the correct interrupts function defined above.
 // Sources for the different interrupts are specified in the Reference Manual
 // in the "bxCAN interrupts" section.
-MODM_ISR(CEC_CAN)
+MODM_ISR_HOOKS(CEC_CAN)
 {
 	if({{ reg }}->TSR & (CAN_TSR_RQCP0 | CAN_TSR_RQCP1 | CAN_TSR_RQCP2)) {
 		MODM_ISR_CALL({{ reg }}_TX);

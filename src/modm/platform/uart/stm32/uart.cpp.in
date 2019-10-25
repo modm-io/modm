@@ -200,7 +200,7 @@ modm::platform::{{ name }}::discardReceiveBuffer()
 void
 modm::platform::{{ name }}::irq()
 %% else
-MODM_ISR({{ name | upper }})
+MODM_ISR_HOOKS({{ name | upper }})
 %% endif
 {
 	if ({{ hal }}::isReceiveRegisterNotEmpty()) {
