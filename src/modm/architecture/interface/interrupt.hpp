@@ -88,6 +88,19 @@
  */
 #define MODM_ISR(vector, ...)
 
+/**
+ * Declare an interrupt handler with enter and leave hooks.
+ *
+ *
+ * @param vector
+ *        The name of the interrupt without any suffix (neither `_vect`, nor `_IRQHandler`).
+ * @param ...
+ *        Multiple compiler attributes can be added to an interrupt. For example `modm_fastcode`.
+ *
+ * @ingroup	modm_architecture_interrupt
+ */
+#define MODM_ISR_HOOKS(vector, ...)
+
 #else
 
 #ifdef MODM_CPU_AVR
@@ -113,6 +126,23 @@
 		modm_extern_c void vector ## _IRQHandler(void) \
 			__attribute__((externally_visible)) __VA_ARGS__; \
 		void vector ## _IRQHandler(void)
+#	define MODM_ISR_HOOKS(vector, ...) \
+		modm_extern_c __attribute__((weak)) void vector ## _ISR_Entry(void){} \
+		modm_extern_c __attribute__((weak)) void vector ## _ISR_Exit(void){} \
+		void vector ## _ISR_Main(); \
+		modm_extern_c void vector ## _IRQHandler(void) \
+			__attribute__((externally_visible)) __VA_ARGS__; \
+		void vector ## _IRQHandler(void) \
+		{ \
+			vector ## _ISR_Entry(); \
+			vector ## _ISR_Main(); \
+			vector ## _ISR_Exit(); \
+		} \
+		void vector ## _ISR_Main()
+# define MODM_ISR_ENTRY_HOOK(vector) \
+		modm_extern_c void vector ## _ISR_Entry(void)
+# define MODM_ISR_EXIT_HOOK(vector) \
+		modm_extern_c void vector ## _ISR_Exit(void)
 
 #else
 
