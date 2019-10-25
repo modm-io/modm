@@ -127,9 +127,9 @@
 			__attribute__((externally_visible)) __VA_ARGS__; \
 		void vector ## _IRQHandler(void)
 #	define MODM_ISR_HOOKS(vector, ...) \
-		modm_extern_c __attribute__((weak)) void vector ## _ISR_Entry(void){} \
-		modm_extern_c __attribute__((weak)) void vector ## _ISR_Exit(void){} \
-		void vector ## _ISR_Main(); \
+		modm_extern_c modm_weak void vector ## _ISR_Entry(void){} \
+		modm_extern_c modm_weak void vector ## _ISR_Exit(void){} \
+		static void vector ## _ISR_Main(); \
 		modm_extern_c void vector ## _IRQHandler(void) \
 			__attribute__((externally_visible)) __VA_ARGS__; \
 		void vector ## _IRQHandler(void) \
@@ -138,7 +138,7 @@
 			vector ## _ISR_Main(); \
 			vector ## _ISR_Exit(); \
 		} \
-		void vector ## _ISR_Main()
+		static void inline vector ## _ISR_Main()
 # define MODM_ISR_ENTRY_HOOK(vector) \
 		modm_extern_c void vector ## _ISR_Entry(void)
 # define MODM_ISR_EXIT_HOOK(vector) \
