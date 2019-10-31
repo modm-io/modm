@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2014, 2016, Niklas Hauser
  * Copyright (c) 2015-2016, Sascha Schade
+ * Copyright (c) 2019, Benjamin Weps
  *
  * This file is part of the modm project.
  *
@@ -16,6 +17,7 @@
 #include <stdint.h>
 #include <modm/io/iostream.hpp>
 #include <modm/architecture/utils.hpp>
+#include <modm/processing/timer/timestamp.hpp>
 
 namespace modm
 {
@@ -80,6 +82,18 @@ struct Message
 		length = len;
 	}
 
+	inline Timestamp
+	getTimestamp()
+	{
+		return timestamp;
+	}
+
+	inline void
+	setTimestamp(Timestamp ts)
+	{
+		timestamp = ts;
+	}
+
 public:
 	uint32_t identifier;
 	uint8_t modm_aligned(4) data[8];
@@ -94,6 +108,7 @@ public:
 		bool extended : 1;
 	} flags;
 	uint8_t length;
+	Timestamp timestamp;
 
 public:
 	bool

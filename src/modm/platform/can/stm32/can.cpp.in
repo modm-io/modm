@@ -20,6 +20,7 @@
 #include <modm/architecture/interface/assert.hpp>
 #include <modm/architecture/interface/interrupt.hpp>
 #include <modm/architecture/interface/delay.hpp>
+#include <modm/architecture/interface/clock.hpp>
 #include <modm/platform/clock/rcc.hpp>
 
 %% if id == ""
@@ -264,6 +265,7 @@ MODM_ISR({{ reg }}_RX0)
 
 %% if options["buffer.rx"] > 0
 	RxMessage rxMessage;
+	rxMessage.message.setTimestamp(modm::Clock::now());
 	readMailbox(rxMessage.message, 0, &(rxMessage.filter_id));
 
 	// Release FIFO (access the next message)
@@ -291,6 +293,7 @@ MODM_ISR({{ reg }}_RX1)
 
 %% if options["buffer.rx"] > 0
 	RxMessage rxMessage;
+	rxMessage.message.setTimestamp(modm::Clock::now());
 	readMailbox(rxMessage.message, 1, &(rxMessage.filter_id));
 
 	// Release FIFO (access the next message)
