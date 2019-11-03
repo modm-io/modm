@@ -1,0 +1,37 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2019, Christopher Durand
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:lp503x"
+    module.description = """\
+# LP503x 30/36 channel LED PWM driver
+
+LP5030/LP5036 30/36-channel, 12-bit PWM LED driver with I2C interface.
+"""
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:i2c.device")
+    module.add_option(
+        BooleanOption(
+            name="multichannel_write",
+            description="Allow setting multiple channels in one I2C transaction. "
+                        "This feature requires additional 34 bytes of static storage. "
+                        "It can be disabled for very small devices",
+            default=True))
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/pwm"
+    env.template("lp503x.hpp.in", "lp503x.hpp")
+    env.template("lp503x_impl.hpp.in", "lp503x_impl.hpp")

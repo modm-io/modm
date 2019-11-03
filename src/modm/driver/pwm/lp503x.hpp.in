@@ -1,0 +1,245 @@
+/*
+ * Copyright (c) 2019, Christopher Durand
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_LP503x_HPP
+#define MODM_LP503x_HPP
+
+#include <modm/architecture/interface/i2c_device.hpp>
+
+namespace modm
+{
+
+/// @ingroup modm_driver_lp503x
+struct lp503x
+{
+	enum class Register : uint8_t
+	{
+		DeviceConfig0	= 0x00,
+		DeviceConfig1	= 0x01,
+		LedConfig0		= 0x02,
+		LedConfig1		= 0x03,
+		BankBrightness	= 0x04,
+		BankAColor		= 0x05,
+		BankBColor		= 0x06,
+		BankCColor		= 0x07,
+		Led0Brightness	= 0x08,
+		// Led1...11Brightness = 0x09...0x13
+		Out0Color		= 0x14,
+		// Out1...35Color = 0x15...0x37
+
+		Reset			= 0x38
+	};
+
+	enum class DeviceConfig0 : uint8_t
+	{
+		ChipEnable = (1 << 6)
+	};
+	MODM_FLAGS8(DeviceConfig0);
+
+	enum class DeviceConfig1 : uint8_t
+	{
+		LedGlobalOff 	= (1 << 0),
+		HighCurrent		= (1 << 1),
+		PwmDithering	= (1 << 2),
+		AutoIncrement	= (1 << 3),
+		PowerSave		= (1 << 4),
+		LogScale		= (1 << 5)
+	};
+	MODM_FLAGS8(DeviceConfig1);
+
+	enum class LedBankMode : uint16_t
+	{
+		Led0  = (1 << 0),
+		Led1  = (1 << 1),
+		Led2  = (1 << 2),
+		Led3  = (1 << 3),
+		Led4  = (1 << 4),
+		Led5  = (1 << 5),
+		Led6  = (1 << 6),
+		Led7  = (1 << 7),
+		Led8  = (1 << 8),
+		Led9  = (1 << 9),
+		Led10 = (1 << 10),
+		Led11 = (1 << 11)
+	};
+	MODM_FLAGS16(LedBankMode);
+
+	enum class Reset : uint8_t
+	{
+		ResetDevice = 0xff
+	};
+	MODM_FLAGS8(Reset);
+
+	using RegisterValue_t = FlagsGroup<DeviceConfig0_t, DeviceConfig1_t, Reset_t>;
+};	// struct lp503x
+
+/**
+ * LP5030/LP5036 30/36-channel, 12-bit PWM LED controller
+ *
+ * @tparam I2cMaster I2C interface
+ *
+ * @author Christopher Durand
+ * @ingroup modm_driver_lp503x
+ */
+template<typename I2cMaster, size_t Channels>
+class Lp503x : public lp503x, public modm::I2cDevice<I2cMaster, 3>
+{
+public:
+	static_assert(Channels == 30 || Channels == 36);
+
+	DeviceConfig1_t DefaultConfiguration =
+		DeviceConfig1::HighCurrent	|
+		DeviceConfig1::PwmDithering	|
+		DeviceConfig1::PowerSave	|
+		DeviceConfig1::LogScale;
+
+	Lp503x(uint8_t i2cAddress);
+
+	/// Initialize device, call before using any other function
+	modm::ResumableResult<bool>
+	initialize();
+
+	/// Enable device
+	modm::ResumableResult<bool>
+	enable();
+
+	/// Disable device
+	modm::ResumableResult<bool>
+	disable();
+
+	/// Set device configuration
+	/// AutoIncrement is always set
+	modm::ResumableResult<bool>
+	setConfiguration(DeviceConfig1_t configuration);
+
+	/**
+	 * Set brightness value for individual output channel.
+	 *
+	 * This writes to the OutXColor registers.
+	 *
+	 * If the LogScale flag is set these values are scaled
+	 * logithmically to 12 bit pwm duty-cycles (default).
+	 *
+	 * @param channel output channel index
+	 * @param value   8-bit brightness value
+	 */
+	modm::ResumableResult<bool>
+	setChannelBrightness(uint8_t channel, uint8_t value);
+
+%% if options.multichannel_write
+	/**
+	 * Set brightness values for multiple output channels
+	 * in one transaction.
+	 *
+	 * This writes the OutXColor registers.
+	 *
+	 * @param channel     output channel start index
+	 * @param numChannels number of values to write
+	 * @param value       8-bit brightness value
+	 */
+	modm::ResumableResult<bool>
+	setChannelBrightnessValues(uint8_t startChannel,
+							   const uint8_t* values, uint8_t numChannels);
+%% endif
+
+	/**
+	 * Set brightness multiplicator for output channel
+	 * group (3n, 3n+1, 3n+2). Intended for dimming RGB Leds.
+	 *
+	 * When this feature is not required, this function can be ignored.
+	 * The default of 0xFF corresponds to full on. Then the resulting LED
+	 * brightness only depends on the individual channel settings.
+	 *
+	 * This setting has no effect when the LED group is configured
+	 * in bank mode. Then the value from the BankBrightness register
+	 * is used.
+	 *
+	 * Default value is 0xFF.
+	 *
+	 * @param value 8-bit brightness value
+	 */
+	modm::ResumableResult<bool>
+	setLedGroupBrightness(uint8_t index, uint8_t value);
+
+	/**
+	 * Enable bank mode for a led group. This allows to
+	 * simultaniously dim multiple RGB leds by accessing
+	 * the global bank registers.
+	 *
+	 * If bank mode is enabled for a led group
+	 * (3n, 3n+1, 3n+2) its brightnesses are controlled by
+	 * the global BankAColor, BankBColor, BankCColor registers
+	 * and the BankBrightness register.
+	 * The inidividual channel settings are ignored then.
+	 */
+	modm::ResumableResult<bool>
+	setBankModeEnabled(LedBankMode_t bankMode);
+
+	/**
+	 * Set bank brightness multiplicator. This controls
+	 * all channels in bank mode.
+	 */
+	modm::ResumableResult<bool>
+	setBankBrightness(uint8_t value);
+
+	/**
+	 * Set brightness for all channels 3n
+	 * configured in bank mode.
+	 */
+	modm::ResumableResult<bool>
+	setBankABrightness(uint8_t value);
+
+	/**
+	 * Set brightness for all channels 3n+1
+	 * configured in bank mode.
+	 */
+	modm::ResumableResult<bool>
+	setBankBBrightness(uint8_t value);
+
+	/**
+	 * Set brightness for all channels 3n+2
+	 * configured in bank mode.
+	 */
+	modm::ResumableResult<bool>
+	setBankCBrightness(uint8_t value);
+
+private:
+	modm::ResumableResult<bool>
+	writeRegister(Register reg, uint8_t value);
+
+	modm::ResumableResult<bool>
+	writeRegister(Register reg, RegisterValue_t value);
+
+%% if options.multichannel_write
+	modm::ResumableResult<bool>
+	writeRegisters(Register startRegister, const uint8_t* values,
+				   uint8_t numValues);
+%% endif
+
+	bool success = false;
+%% if options.multichannel_write
+	uint8_t buffer[Channels + 1];
+%% else
+	uint8_t buffer[3];
+%% endif
+};
+
+template<typename I2cMaster>
+using Lp5030 = Lp503x<I2cMaster, 30>;
+
+template<typename I2cMaster>
+using Lp5036 = Lp503x<I2cMaster, 36>;
+
+}	// namespace modm
+
+#include "lp503x_impl.hpp"
+
+#endif // MODM_LP503x_HPP

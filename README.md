@@ -207,34 +207,35 @@ can easily configure them for you specific needs.
 <td align="center">LIS3DSH</td>
 <td align="center">LM75</td>
 </tr><tr>
+<td align="center">LP503X</td>
 <td align="center">LSM303A</td>
 <td align="center">LTC2984</td>
 <td align="center">MAX6966</td>
 <td align="center">MAX7219</td>
 <td align="center">MCP23X17</td>
-<td align="center">MCP2515</td>
 </tr><tr>
+<td align="center">MCP2515</td>
 <td align="center">NOKIA5110</td>
 <td align="center">NRF24</td>
 <td align="center">TFT-DISPLAY</td>
 <td align="center">PAT9125EL</td>
 <td align="center">PCA8574</td>
-<td align="center">PCA9535</td>
 </tr><tr>
+<td align="center">PCA9535</td>
 <td align="center">PCA9548A</td>
 <td align="center">PCA9685</td>
 <td align="center">SIEMENS-S65</td>
 <td align="center">SIEMENS-S75</td>
 <td align="center">SK6812</td>
-<td align="center">SK9822</td>
 </tr><tr>
+<td align="center">SK9822</td>
 <td align="center">SSD1306</td>
 <td align="center">TCS3414</td>
 <td align="center">TCS3472</td>
 <td align="center">TLC594X</td>
 <td align="center">TMP102</td>
-<td align="center">TMP175</td>
 </tr><tr>
+<td align="center">TMP175</td>
 <td align="center">VL53L0</td>
 <td align="center">VL6180</td>
 <td align="center">WS2812</td>
