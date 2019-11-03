@@ -198,7 +198,7 @@ modm::platform::Rcc::enablePll(PllSource source,
 	tmp |= (uint32_t(pllN) << RCC_PLLCFGR_PLLN_Pos) & RCC_PLLCFGR_PLLN;
 
 	// PLLR divider for CPU frequency
-%% if target["family"] in ["g0", "g4"]
+%% if target["family"] in ["g0"]
 	tmp |= ((uint32_t(pllR) - 1) << RCC_PLLCFGR_PLLR_Pos) & RCC_PLLCFGR_PLLR;
 	// PLLP divider for P frequency
 	// tmp |= ((uint32_t(pllP) - 1) << RCC_PLLCFGR_PLLP_Pos) & RCC_PLLCFGR_PLLP;
