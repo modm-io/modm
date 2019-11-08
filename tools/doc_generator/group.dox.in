@@ -5,8 +5,9 @@
 %% endif
 @defgroup {{ module.ref }} {{ module.title if module.title else module.name }}
 
-{{ module.description | doxify }}
+lbuild module: `{{module.name}}`
 
+{{ module.description | doxify }}
 
 %% if module.options | length
 ## Module Options

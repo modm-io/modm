@@ -1,4 +1,6 @@
-# {{module.name}}{% if module.title %}: {{module.title}}{% endif %}
+# {{ module.title if module.title else module.name }}
+
+lbuild module: `{{module.name}}`
 
 {{module.description}}
 
