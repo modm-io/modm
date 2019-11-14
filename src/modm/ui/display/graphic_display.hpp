@@ -314,7 +314,7 @@ namespace modm
 		/**
 		 * Fill a rectangle.
 		 */
-		void
+		virtual void
 		fillRectangle(glcd::Point upperLeft, uint16_t width, uint16_t height);
 
 		inline void
@@ -326,7 +326,7 @@ namespace modm
 		/**
 		 * Fill a circle.
 		 */
-		void
+		virtual void
 		fillCircle(glcd::Point center, uint16_t radius);
 
 	public:
