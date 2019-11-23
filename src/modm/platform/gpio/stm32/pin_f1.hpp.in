@@ -222,7 +222,7 @@ struct Gpio{{ port ~ pin }}::{{ signal.name }}<Peripheral::{{ signal.driver }}>
 		%% if signal.driver.startswith("Adc") and signal.name.startswith("In")
 template<>
 constexpr int8_t
-Gpio{{ port ~ pin }}::AdcChannel<Peripheral::{{ signal.driver }}> = {{ signal.name.replace("In", "") }};
+Gpio{{ port ~ pin }}::AdcChannel<Peripheral::{{ signal.driver }}> = {{ signal.name | to_adc_channel }};
 		%% endif
 	%% endfor
 

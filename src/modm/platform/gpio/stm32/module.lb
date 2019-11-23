@@ -260,7 +260,7 @@ def build(env):
         po, pi = gpio["port"], gpio["pin"]
         properties.update(bprops[po + pi])
         header_name = "gpio_{}{}.hpp".format(po.upper(), pi)
-        env.template(gpio_source, header_name)
+        env.template(gpio_source, header_name, filters={ "to_adc_channel" : lambda name : "".join(filter(str.isdigit, name)) })
 
     env.template("port.hpp.in")
     env.template("software_port.hpp.in")
