@@ -1,0 +1,40 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2019, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:sk9822"
+    module.description = """\
+# SK9822 RGB LED Driver
+
+Drives any number of chained SK9822 RGB LEDs using SPI signals SCK and MOSI up
+to a few dozen MHz. Due to the synchronous clock, there are no special
+restrictions on protocol timing, making this driver safe to use with interrupts
+enabled and/or with an RTOS.
+
+The internal data buffer size is 4B for start of frame, 4B for every LED and 1B
+for every 16 LEDs as end of frame.
+
+References:
+
+- ["SK9822 – a clone of the APA102?"][led]
+
+[led]: https://cpldcpu.wordpress.com/2016/12/13/sk9822-a-clone-of-the-apa102/
+"""
+
+def prepare(module, options):
+    module.depends(":driver:apa102")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/pwm"
+    env.copy("sk9822.hpp")

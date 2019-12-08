@@ -30,9 +30,9 @@ public:
 	Apa102() : data{0,0,0,0}
 	{
 		clear();
-		// set the flushing bits correctly
+		// using 0x00 as flushing bits makes this compatible with sk9822
 		for (size_t ii=4 + 4*LEDs; ii < length; ii++)
-			data[ii] = 0xff;
+			data[ii] = 0x00;
 	}
 
 	void
