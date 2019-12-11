@@ -16,6 +16,7 @@
 
 #include <modm/architecture/interface/adc.hpp>
 #include <modm/platform/gpio/connector.hpp>
+#include <modm/math/algorithm/prescaler.hpp>
 //#include "../device.hpp"
 
 #if defined (__AVR_ATmega64HVE__) || defined(__AVR_ATmega64HVE2__)
@@ -123,37 +124,11 @@ public:
 	static void
 	initialize()
 	{
-		// calculate the nearest prescaler from the frequency
-		constexpr float desired = float(SystemClock::Adc) / frequency;
-		constexpr uint16_t nearest = (
-				(desired >= ( 64 * 4.f/3)) ? 128 : (
-				(desired >= ( 32 * 4.f/3)) ?  64 : (
-				(desired >= ( 16 * 4.f/3)) ?  32 : (
-				(desired >= (  8 * 4.f/3)) ?  16 : (
-				(desired >= (  4 * 4.f/3)) ?   8 : (
-				(desired >= (  2 * 4.f/3)) ?   4 :
-											   2
-				))))));
-
-		// check if we found a prescaler which generates a frequency within the tolerance
-		assertBaudrateInTolerance<
-				SystemClock::Adc / nearest,
-				frequency,
-				tolerance >();
-
-		// translate the prescaler into the bitmapping
-		constexpr Prescaler prescaler = (
-				(nearest >= 128) ? Prescaler::Div128 : (
-				(nearest >=  64) ? Prescaler::Div64  : (
-				(nearest >=  32) ? Prescaler::Div32  : (
-				(nearest >=  16) ? Prescaler::Div16  : (
-				(nearest >=   8) ? Prescaler::Div8   : (
-				(nearest >=   4) ? Prescaler::Div4   :
-								   Prescaler::Div2
-				))))));
+		constexpr auto result = modm::Prescaler::from_power(SystemClock::Adc, frequency, 2, 128);
+		assertBaudrateInTolerance< result.frequency, frequency, tolerance >();
 
 		disable();
-		setPrescaler(prescaler);
+		setPrescaler(Prescaler{result.index});
 		// enable the module
 		ADCSRA |= (1<<ADEN);
 	}

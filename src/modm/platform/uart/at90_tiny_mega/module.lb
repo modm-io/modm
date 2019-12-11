@@ -82,6 +82,7 @@ def prepare(module, options):
         ":architecture:atomic",
         ":architecture:interrupt",
         ":architecture:uart",
+        ":math:algorithm",
         ":platform:gpio")
 
     driver = device.get_driver("usart:avr")

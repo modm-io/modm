@@ -78,6 +78,7 @@ def prepare(module, options):
         ":architecture:interrupt",
         ":architecture:register",
         ":architecture:uart",
+        ":math:algorithm",
         ":cmsis:device",
         ":platform:gpio",
         ":platform:rcc")

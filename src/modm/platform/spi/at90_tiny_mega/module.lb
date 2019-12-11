@@ -72,6 +72,7 @@ def prepare(module, options):
         ":architecture:atomic",
         ":architecture:spi",
         ":platform:gpio",
+        ":math:algorithm",
         ":math:utils")
     return True
 

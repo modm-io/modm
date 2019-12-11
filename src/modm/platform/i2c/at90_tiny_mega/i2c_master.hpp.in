@@ -77,10 +77,10 @@ public:
 
 		// calculate the fractional prescaler value
 		constexpr float pre_part_raw = float(SystemClock::I2c) / ( 2 * baudrate );
-		constexpr float pre_raw = std::floor(pre_part_raw) < 8 ? 0 : (pre_part_raw - 8) / pre;
+		constexpr float pre_raw = std::floorf(pre_part_raw) < 8 ? 0 : (pre_part_raw - 8) / pre;
 		// respect the prescaler range of 0 to 255
-		constexpr uint32_t pre_ceil = std::ceil(pre_raw) > 255 ? 255 : std::ceil(pre_raw);
-		constexpr uint32_t pre_floor = std::floor(pre_raw);
+		constexpr uint32_t pre_ceil = std::min(uint32_t(std::ceilf(pre_raw)), 255ul);
+		constexpr uint32_t pre_floor = std::floorf(pre_raw);
 
 		// calculate the possible baudrates above and below the requested baudrate
 		constexpr uint32_t baud_lower = SystemClock::I2c / ( 16 + 2 * pre_ceil  * pre );

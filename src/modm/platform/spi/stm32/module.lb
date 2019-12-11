@@ -58,6 +58,7 @@ def prepare(module, options):
         ":architecture:register",
         ":architecture:spi",
         ":cmsis:device",
+        ":math:algorithm",
         ":platform:gpio",
         ":platform:rcc")
 

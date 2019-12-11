@@ -14,6 +14,7 @@
 
 #include "uart_base.hpp"
 #include <modm/architecture/interface/peripheral.hpp>
+#include <modm/math/algorithm/prescaler.hpp>
 #include <cmath>
 
 namespace modm
@@ -61,8 +62,8 @@ public:
 	 * @tparam	tolerance
 	 * 		the allowed absolute tolerance for the resulting baudrate
 	 */
-	template< frequency_t clockrate, baudrate_t baudrate, percent_t tolerance=pct(10) >
-	static uint16_t modm_always_inline
+	template<frequency_t clockrate, baudrate_t baudrate, percent_t tolerance=pct(10)>
+	static uint16_t
 	getBrr()
 	{
 %% if target["family"] == "f1"
@@ -70,35 +71,15 @@ public:
 %% else
 		constexpr uint32_t scalar = (baudrate * 16l > clockrate) ? 8 : 16;
 %% endif
-		constexpr uint32_t max = (scalar == 16) ? 65'536 : 32'768;
-
-		// calculate the fractional prescaler value
-		constexpr float pre_raw = static_cast<float>(clockrate) / (baudrate);
-		// respect the prescaler range of 1 to 4096
-		constexpr uint32_t pre_ceil = std::ceil(pre_raw) > max ? max : std::ceil(pre_raw);
-		constexpr uint32_t pre_floor = std::floor(pre_raw) < 1 ? 1 : std::floor(pre_raw);
-
-		// calculate the possible baudrates above and below the requested baudrate
-		constexpr uint32_t baud_lower = clockrate / ( pre_ceil );
-		constexpr uint32_t baud_upper = clockrate / ( pre_floor );
-
-		// calculate the half-point between the upper and lower baudrate
-		constexpr uint32_t baud_middle = (baud_upper + baud_lower) / 2;
-		// decide which prescaler value is closer to a possible baudrate
-		constexpr uint32_t prescaler = (baudrate < baud_middle) ? pre_ceil : pre_floor;
-
-		// brr needs to be formatted right for scalar == 8
-		constexpr uint16_t brr = (scalar == 16) ? prescaler :
-				(((prescaler & ~0b111) << 1) | (prescaler & 0b111));
-
-		// check if within baudrate tolerance
-		constexpr uint32_t generated_baudrate = clockrate / ( prescaler );
-		assertBaudrateInTolerance<
-				/* nearest possible value */ generated_baudrate,
-				/* desired = */ baudrate,
-				tolerance >();
-
-		return brr;
+		constexpr uint32_t max = ((scalar == 16) ? (1ul << 16) : (1ul << 15)) - 1ul;
+		constexpr auto result = Prescaler::from_range(clockrate, baudrate, 1, max);
+		assertBaudrateInTolerance< result.frequency, baudrate, tolerance >();
+		// When OVER8 = 0:, BRR[3:0] = USARTDIV[3:0].
+		if (scalar == 16) return result.prescaler;
+		// When OVER8 = 1:
+		// BRR[15:4] = USARTDIV[15:4]
+		// BRR[2:0] = USARTDIV[3:0] shifted 1 bit to the right. BRR[3] must be kept cleared.
+		return (result.prescaler & ~0b1111) | ((result.prescaler & 0b1111) >> 1);
 	}
 
 };

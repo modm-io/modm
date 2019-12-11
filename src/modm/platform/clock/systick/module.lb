@@ -24,6 +24,7 @@ def prepare(module, options):
     module.depends(
         ":architecture:clock",
         ":architecture:atomic",
+        ":math:algorithm",
         ":cmsis:device")
 
     return True

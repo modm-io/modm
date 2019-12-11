@@ -29,6 +29,7 @@ def prepare(module, options):
         ":architecture:adc",
         ":architecture:interrupt",
         ":platform:gpio",
+        ":math:algorithm",
         ":utils")
     return True
 

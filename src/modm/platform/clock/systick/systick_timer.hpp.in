@@ -16,6 +16,7 @@
 #include <stdint.h>
 #include <cmath>
 #include <modm/architecture/interface/peripheral.hpp>
+#include <modm/math/algorithm/prescaler.hpp>
 
 namespace modm::platform
 {
@@ -50,25 +51,11 @@ public:
 	static void
 	initialize()
 	{
-		constexpr float desired = float(SystemClock::Frequency) / {{ systick_frequency }};
+		constexpr auto result = Prescaler::from_range(
+				SystemClock::Frequency, {{ systick_frequency }}, 1, (1ul << 24)-1);
+		PeripheralDriver::assertBaudrateInTolerance< result.frequency, {{ systick_frequency }}, tolerance >();
 
-		// calculate the possible rates above and below the requested rate
-		constexpr uint32_t rate_lower = SystemClock::Frequency / std::ceil(desired);
-		constexpr uint32_t rate_upper = SystemClock::Frequency / std::floor(desired);
-
-		// calculate the half-point between the upper and lower rate
-		constexpr uint32_t rate_middle = (rate_upper + rate_lower) / 2;
-		// decide which reload value is closer to a possible rate
-		constexpr uint32_t reload = (1000 < rate_middle) ? std::ceil(desired) : std::floor(desired);
-
-		// check if within rate tolerance
-		constexpr uint32_t generated_rate = SystemClock::Frequency / reload;
-		PeripheralDriver::assertBaudrateInTolerance<
-				/* nearest possible value */ generated_rate,
-				/* desired = */ {{ systick_frequency }},
-				tolerance >();
-
-		enable(reload - 1);
+		enable(result.index);
 	}
 
 	/**

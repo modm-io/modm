@@ -60,6 +60,7 @@ def prepare(module, options):
         ":architecture:atomic",
         ":architecture:i2c",
         ":architecture:interrupt",
+        ":math:algorithm",
         ":cmsis:device",
         ":container",
         ":platform:gpio")

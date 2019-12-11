@@ -69,9 +69,7 @@ template<class SystemClock, modm::baudrate_t baudrate,
 void modm_always_inline
 modm::platform::{{ name }}::initialize(Parity parity)
 {
-	initializeWithBrr(UartBaudrate::getBrr<SystemClock::{{ uart_name ~ id }}, baudrate>(),
-			parity,
-			oversample);
+	initializeWithBrr(UartBaudrate::getBrr<SystemClock::{{ uart_name ~ id }}, baudrate>(), parity, oversample);
 }
 %% endif
 
