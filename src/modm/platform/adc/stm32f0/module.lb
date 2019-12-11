@@ -18,30 +18,47 @@ def init(module):
 
 def prepare(module, options):
     device = options[":target"]
-    if not device.has_driver("adc:stm32-f0"):
+    if not (device.has_driver("adc:stm32-f0") or
+            device.has_driver("adc:stm32-g0")):
         return False
     module.depends(
         ":architecture:delay",
+        ":architecture:adc",
         ":architecture:register",
         ":cmsis:device",
         ":platform:gpio",
-        ":platform:rcc")
+        ":platform:rcc",
+        ":math:algorithm")
     return True
 
 def build(env):
     device = env[":target"]
     driver = device.get_driver("adc")
 
-    properties = device.properties
-    properties["target"] = device.identifier
-    properties["driver"] = driver
-    #properties["id"] = 1
+    properties = {}
+    properties["target"] = target = device.identifier
+    properties["id"] = driver.get("instance", [""])[0]
 
-    channels = range(0,16)
-    properties["channels"] = sorted(channels)
+    channels = {i:"In{}".format(i) for i in reversed(range(0,19))}
+    if target.family in ["g0"]:
+        channels[12] = "Temperature"
+        channels[13] = "InternalReference"
+        channels[14] = "Battery"
+    else:
+        channels[16] = "Temperature"
+        channels[17] = "InternalReference"
+        if target.name.endswith("0"):
+            del channels[18]
+        else:
+            channels[18] = "Battery"
+    properties["channels"] = channels
+
+    irq = next(v["name"] for v in device.get_driver("core")["vector"]
+               if v["name"].startswith("ADC1"))
+    properties["irq"] = irq
 
     env.substitutions = properties
     env.outbasepath = "modm/src/modm/platform/adc"
 
-    env.template("adc.hpp.in", "adc.hpp")
-    env.template("adc_impl.hpp.in", "adc_impl.hpp")
+    env.template("adc.hpp.in")
+    env.template("adc_impl.hpp.in")

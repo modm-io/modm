@@ -2,6 +2,7 @@
 /*
  * Copyright (c) 2018, Álan Crístoffer
  * Copyright (c) 2018, Carl Treudler
+ * Copyright (c) 2019, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -11,196 +12,341 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_STM32F0_ADC_HPP
-#    error     "Don't include this file directly, use 'adc.hpp' instead!"
+#ifndef MODM_STM32{{ target.family | upper }}_ADC{{ id }}_HPP
+#	error "Don't include this file directly, use 'adc{{ id }}.hpp' instead!"
 #endif
 
 #include <modm/platform/clock/rcc.hpp>
+#include <modm/architecture/interface/delay.hpp>
+#include <modm/math/algorithm/prescaler.hpp>
+
+
+template< class SystemClock, modm::platform::Adc{{ id }}::ClockMode mode,
+		  modm::frequency_t frequency, modm::percent_t tolerance >
+void
+modm::platform::Adc{{ id }}::initialize()
+{
+	Rcc::enable<Peripheral::Adc{{ id }}>();
+
+	if constexpr (mode == ClockMode::Synchronous) {
+		constexpr auto result = Prescaler::from_power(
+				SystemClock::Apb, frequency, {{2 if target.family in ["f0"] else 1}}, 4);
+		assertBaudrateInTolerance< result.frequency, frequency, tolerance >();
+
+		constexpr uint32_t prescaler = (
+				(result.prescaler == 4) ? ADC_CFGR2_CKMODE_1 : (
+				(result.prescaler == 2) ? ADC_CFGR2_CKMODE_0 :
+					ADC_CFGR2_CKMODE_0 | ADC_CFGR2_CKMODE_1));
+		ADC1->CFGR2 = (ADC1->CFGR2 & ~ADC_CFGR2_CKMODE) | prescaler;
+	}
+	else {
+		ADC1->CFGR2 &= ~ADC_CFGR2_CKMODE;
+%% if target.family in ["f0"]
+		Rcc::enableInternalClockMHz14();
+		// There are no prescalers for the asynchronous clock
+		assertBaudrateInTolerance<MHz(14), frequency, tolerance >();
+%% else
+		constexpr auto result = Prescaler::from_list(
+				SystemClock::Adc1, frequency, {1,2,4,6,8,10,12,16,32,64,128,256});
+		static_assert(kHz(140) <= result.frequency, "Generated ADC frequency is below minimum frequency!");
+		static_assert(result.frequency <= MHz(35), "Generated ADC frequency is above maximum frequency!");
+		assertBaudrateInTolerance< result.frequency, frequency, tolerance >();
+		ADC1_COMMON->CCR = (ADC1_COMMON->CCR & ~ADC_CCR_PRESC) | (result.index << ADC_CCR_PRESC_Pos);
+%% endif
+	}
+
+	calibrate();
+
+	ADC1->ISR = ADC_ISR_ADRDY; // ISR is cleared by setting 1 to the bit
+	ADC1->CR |= ADC_CR_ADEN;
+	while (not (ADC1->ISR & ADC_ISR_ADRDY)) ;
+}
+
+void
+modm::platform::Adc{{ id }}::disable()
+{
+	if (ADC1->CR & ADC_CR_ADSTART) {
+		ADC1->CR |= ADC_CR_ADSTP;
+		while (ADC1->CR & ADC_CR_ADSTP) ;
+	}
+
+	ADC1->CR |= ADC_CR_ADDIS;
+	while (ADC1->CR & ADC_CR_ADEN) ;
+	Rcc::disable<Peripheral::Adc{{ id }}>();
+}
+
+void
+modm::platform::Adc{{ id }}::setAutoOffMode(const bool enable)
+{
+	if (enable) {
+		ADC1->CFGR1 |= ADC_CFGR1_AUTOFF;
+	} else {
+		ADC1->CFGR1 &= ~ADC_CFGR1_AUTOFF;
+	}
+}
+
+bool
+modm::platform::Adc{{ id }}::isReady()
+{
+	return bool(getInterruptFlags() & InterruptFlag::Ready);
+}
 
 uint16_t
-modm::platform::Adc::initialize(const ClockMode clk,
-                             const CalibrationMode cal)
+modm::platform::Adc{{ id }}::calibrate()
 {
-    Rcc::enable<Peripheral::Adc>();
+	ADC1->CR |= ADC_CR_ADCAL;
+	while (ADC1->CR & ADC_CR_ADCAL) ;
 
-    if (clk == ClockMode::Dedicated14MHzClock) {
-        RCC->CR2 |= RCC_CR2_HSI14ON;
-        while ((RCC->CR2 & RCC_CR2_HSI14RDY) == 0)
-            ;
-        ADC1->CFGR2 &= (~ADC_CFGR2_CKMODE);
-    } else if (clk != ClockMode::DoNotChange) {
-        ADC1->CFGR2 |= static_cast<uint32_t>(clk);
-    }
-
-    uint16_t calibrationResult = modm::platform::Adc::calibrate(cal);
-
-    ADC1->ISR |= ADC_ISR_ADRDY; // ISR is cleared by setting 1 to the bit
-    ADC1->CR  |= ADC_CR_ADEN;
-
-    while ( (ADC1->ISR & ADC_ISR_ADRDY) == 0 )
-        ;
-
-    return calibrationResult;
+	return ADC1->DR;
 }
 
 void
-modm::platform::Adc::disable(const bool blocking)
+modm::platform::Adc{{ id }}::setResolution(const Resolution res)
 {
-    ADC1->CR |= ADC_CR_ADDIS;
-    while ( blocking && (ADC1->CR & ADC_CR_ADEN) != 0 )
-        ;
+	ADC1->CFGR1 = (ADC1->CFGR1 & ~ADC_CFGR1_RES) | uint32_t(res);
 }
 
 void
-modm::platform::Adc::setAutoOffMode(const bool enable)
+modm::platform::Adc{{ id }}::setLeftAdjustResult()
 {
-    if (enable) {
-        ADC1->CFGR1 |= ADC_CFGR1_AUTOFF;
-    } else {
-        ADC1->CFGR1 &= ~ADC_CFGR1_AUTOFF;
-    }
+	ADC1->CFGR1 |= ADC_CFGR1_ALIGN;
+}
+void
+modm::platform::Adc{{ id }}::setRightAdjustResult()
+{
+	ADC1->CFGR1 &= ~ADC_CFGR1_ALIGN;
 }
 
 bool
-modm::platform::Adc::isReady()
+%% if target.family in ["f0"]
+modm::platform::Adc{{ id }}::setChannel(const Channel channel)
+%% else
+modm::platform::Adc{{ id }}::setChannel(const Channel channel, const SampleTimeGroup group)
+%% endif
 {
-    return static_cast<bool>(getInterruptFlags() & InterruptFlag::Ready);
+	if(uint32_t(channel) > {{channels | max}})
+		return false;
+
+	if (channel == Channel::InternalReference and
+	    not (ADC1_COMMON->CCR & ADC_CCR_VREFEN))
+	{
+%% if target.family in ["g0"]
+		ADC1->CR |= ADC_CR_ADVREGEN;
+		modm::delayMicroseconds(30);
+%% endif
+		ADC1_COMMON->CCR |= ADC_CCR_VREFEN;
+	}
+%% if "Battery" in channels.values()
+	else if (channel == Channel::Battery) {
+		ADC1_COMMON->CCR |= ADC_CCR_VBATEN;
+	}
+%% endif
+	else if (channel == Channel::Temperature and
+	         not (ADC1_COMMON->CCR & ADC_CCR_TSEN))
+	{
+		ADC1_COMMON->CCR |= ADC_CCR_TSEN;
+		modm::delayMicroseconds(135);
+	}
+
+%% if target.family in ["g0"]
+	if (group == SampleTimeGroup::Group1) {
+		ADC1->SMPR &= ~(0x100ul << uint32_t(channel));
+	} else {
+		ADC1->SMPR |=  (0x100ul << uint32_t(channel));
+	}
+%% else
+%% endif
+
+	// clear Channel Configuration Ready flag
+%% if target.family in ["g0"]
+	ADC1->ISR = ADC_ISR_CCRDY;
+	ADC1->CHSELR = 1 << uint32_t(channel);
+	while(not (ADC1->ISR & ADC_ISR_CCRDY)) ;
+%% else
+	ADC1->CHSELR = 1 << uint32_t(channel);
+%% endif
+
+	return true;
+}
+
+%% if target.family in ["g0"]
+void
+modm::platform::Adc{{ id }}::enableOversampling(OversampleRatio ratio, OversampleShift shift)
+{
+	uint32_t cfg = ADC1->CFGR2;
+	cfg = (cfg & ~ADC_CFGR2_OVSR) | uint32_t(ratio);
+	cfg = (cfg & ~ADC_CFGR2_OVSS) | uint32_t(shift);
+	ADC1->CFGR2 = (cfg | ADC_CFGR2_OVSE);
+}
+
+void
+modm::platform::Adc{{ id }}::disableOversampling()
+{
+	ADC1->CFGR2 &= ~ADC_CFGR2_OVSE;
+}
+%% endif
+
+
+void
+%% if target.family in ["g0"]
+modm::platform::Adc{{ id }}::setSampleTime(const SampleTime sampleTime, const SampleTimeGroup group)
+{
+	if (group == SampleTimeGroup::Group1) {
+		ADC1->SMPR = (ADC1->SMPR & ~ADC_SMPR_SMP1) | uint32_t(sampleTime);
+	} else {
+		ADC1->SMPR = (ADC1->SMPR & ~ADC_SMPR_SMP2) | (uint32_t(sampleTime) << 4);
+	}
+%% else
+modm::platform::Adc{{ id }}::setSampleTime(const SampleTime sampleTime)
+{
+	ADC1->SMPR = (ADC1->SMPR & ~ADC_SMPR_SMP) | uint32_t(sampleTime);
+%% endif
+}
+
+void
+modm::platform::Adc{{ id }}::clearChannel(const Channel channel)
+{
+	if(uint32_t(channel) > {{channels | max}})
+		return;
+
+%% if target.family in ["g0"]
+	ADC1->ISR = ADC_ISR_CCRDY;
+	ADC1->CHSELR = 0;
+	while(not (ADC1->ISR & ADC_ISR_CCRDY)) ;
+%% else
+	ADC1->CHSELR = 0;
+%% endif
+
+	if (channel == Channel::InternalReference) {
+%% if target.family in ["g0"]
+		ADC1->CR &= ~ADC_CR_ADVREGEN;
+%% endif
+		ADC1_COMMON->CCR &= ~ADC_CCR_VREFEN;
+	} else if (channel == Channel::Temperature) {
+		ADC1_COMMON->CCR &= ~ADC_CCR_TSEN;
+	}
+%% if "Battery" in channels.values()
+	else if (channel == Channel::Battery) {
+		ADC1_COMMON->CCR &= ~ADC_CCR_VBATEN;
+	}
+%% endif
+}
+
+int16_t
+modm::platform::Adc{{ id }}::readTemperature(uint16_t Vref)
+{
+%% if target.family in ["f0"]
+	setSampleTime(SampleTime::Cycles239_5);
+%% else
+	setSampleTime(SampleTime::Cycles160_5);
+%% endif
+	setResolution(Resolution::Bits12);
+	setRightAdjustResult();
+	// Sample time must be at least 5us!!!
+	const int32_t TS_DATA = readChannel(Channel::Temperature);
+
+	const int32_t value = int32_t(TS_CAL2_TEMP - TS_CAL1_TEMP) * (TS_DATA * Vref / VDDA_CAL - *TS_CAL1);
+	return value / (*TS_CAL2 - *TS_CAL1) + TS_CAL1_TEMP;
 }
 
 uint16_t
-modm::platform::Adc::calibrate(const CalibrationMode mode)
+modm::platform::Adc{{ id }}::readInternalVoltageReference()
 {
-    if (mode != CalibrationMode::DoNotCalibrate) {
-        if ( (ADC1->CR & ADC_CR_ADEN) != 0 ) {
-            ADC1->CR |= ADC_CR_ADDIS;
-            while ( (ADC1->CR & ADC_CR_ADEN) != 0 )
-                ;
-        }
+%% if target.family in ["f0"]
+	setSampleTime(SampleTime::Cycles239_5);
+%% else
+	setSampleTime(SampleTime::Cycles160_5);
+%% endif
+	setResolution(Resolution::Bits12);
+	setRightAdjustResult();
+	const uint32_t VREFINT_DATA = readChannel(Channel::InternalReference);
 
-        ADC1->CFGR1 &= ~ADC_CFGR1_DMAEN;
-        ADC1->CR    |= ADC_CR_ADCAL;
-
-        while ( (ADC1->CR & ADC_CR_ADCAL) != 0 )
-            ;
-
-        return ADC1->DR;
-    }
-
-    return 0;
+	return (VDDA_CAL * uint32_t(*VREFINT_CAL)) / VREFINT_DATA;
 }
 
 void
-modm::platform::Adc::setDataAlignmentAndResolution(const DataAlignment align,
-                                                const Resolution res)
+modm::platform::Adc{{ id }}::enableFreeRunningMode()
 {
-    ADC1->CFGR1 = static_cast<uint32_t>(align) |
-                  static_cast<uint32_t>(res)   |
-                  (ADC1->CFGR1 & ~(ADC_CFGR1_ALIGN | ADC_CFGR1_RES));
+	ADC1->CFGR1 |= ADC_CFGR1_CONT;
+}
+
+void
+modm::platform::Adc{{ id }}::disableFreeRunningMode()
+{
+	ADC1->CFGR1 &= ~ADC_CFGR1_CONT;
+}
+
+void
+modm::platform::Adc{{ id }}::startConversion()
+{
+	ADC1->ISR = uint32_t(-1);
+	// starts single conversion for the regular group
+	ADC1->CR |= ADC_CR_ADSTART;
 }
 
 bool
-modm::platform::Adc::setChannel(const Channel channel,
-                             const SampleTime sampleTime)
+modm::platform::Adc{{ id }}::isConversionFinished()
 {
-    if(static_cast<uint32_t>(channel) > 18) {
-        return false;
-    }
+	return bool(getInterruptFlags() & InterruptFlag::EndOfConversion);
+}
 
-    ADC1->CHSELR |= 1 << static_cast<uint32_t>(channel);
-    ADC1->SMPR   = static_cast<uint32_t>(sampleTime);
+uint16_t
+modm::platform::Adc{{ id }}::readChannel(const Channel channel)
+{
+	if (!setChannel(channel)) return 0;
 
-    if (channel == Channel::InternalReference) {
-        ADC1_COMMON->CCR |= ADC_CCR_VREFEN;
-    } else if (channel == Channel::Temperature) {
-        ADC1_COMMON->CCR |= ADC_CCR_TSEN;
-    }
+	startConversion();
+	// wait until the conversion is finished
+	while (!isConversionFinished())
+		;
 
-    return true;
+	return getValue();
 }
 
 void
-modm::platform::Adc::clearChannel(const Channel channel)
+modm::platform::Adc{{ id }}::enableInterruptVector(const uint32_t priority,
+												   const bool enable)
 {
-    ADC1->CHSELR &= ~(1 << static_cast<uint32_t>(channel));
-    if (channel == Channel::InternalReference) {
-        ADC1_COMMON->CCR &= ~ADC_CCR_VREFEN;
-    } else if (channel == Channel::Temperature) {
-        ADC1_COMMON->CCR &= ~ADC_CCR_TSEN;
-    }
+	if (enable) {
+		NVIC_EnableIRQ({{irq}}_IRQn);
+		NVIC_SetPriority({{irq}}_IRQn, priority);
+	} else {
+		NVIC_DisableIRQ({{irq}}_IRQn);
+	}
 }
 
 void
-modm::platform::Adc::setFreeRunningMode(const bool enable)
+modm::platform::Adc{{ id }}::enableInterrupt(const Interrupt_t interrupt)
 {
-    if (enable) {
-        ADC1->CFGR1 |= ADC_CFGR1_CONT;
-    } else {
-        ADC1->CFGR1 &= ~ADC_CFGR1_CONT;
-    }
+	ADC1->IER |= interrupt.value;
 }
 
 void
-modm::platform::Adc::startConversion(void)
+modm::platform::Adc{{ id }}::disableInterrupt(const Interrupt_t interrupt)
 {
-    acknowledgeInterruptFlag(InterruptFlag::EndOfConversion |
-                             InterruptFlag::EndOfSampling   |
-                             InterruptFlag::EndOfSequence   |
-                             InterruptFlag::Overrun         |
-                             InterruptFlag::AnalogWatchdog);
-    // starts single conversion for the regular group
-    ADC1->CR |= ADC_CR_ADSTART;
+	ADC1->IER &= ~interrupt.value;
 }
 
-bool
-modm::platform::Adc::isConversionFinished(void)
+modm::platform::Adc{{ id }}::InterruptFlag_t
+modm::platform::Adc{{ id }}::getInterruptFlags()
 {
-    return static_cast<bool>(getInterruptFlags() & InterruptFlag::EndOfConversion);
+	return InterruptFlag_t(ADC1->ISR);
 }
 
 void
-modm::platform::Adc::enableInterruptVector(const uint32_t priority,
-                                                const bool enable)
+modm::platform::Adc{{ id }}::acknowledgeInterruptFlag(const InterruptFlag_t flags)
 {
-    if (enable) {
-        NVIC_EnableIRQ(ADC1_COMP_IRQn);
-        NVIC_SetPriority(ADC1_COMP_IRQn, priority);
-    } else {
-        NVIC_DisableIRQ(ADC1_COMP_IRQn);
-    }
+	// Flags are cleared by writing a one to the flag position.
+	// Writing a zero is ignored.
+	ADC1->ISR = flags.value;
 }
 
 void
-modm::platform::Adc::enableInterrupt(const Interrupt_t interrupt)
+modm::platform::Adc{{ id }}::setWaitMode(const bool enable)
 {
-    ADC1->IER |= interrupt.value;
-}
-
-void
-modm::platform::Adc::disableInterrupt(const Interrupt_t interrupt)
-{
-    ADC1->IER &= ~interrupt.value;
-}
-
-modm::platform::Adc::InterruptFlag_t
-modm::platform::Adc::getInterruptFlags()
-{
-    return InterruptFlag_t(ADC1->ISR);
-}
-
-void
-modm::platform::Adc::acknowledgeInterruptFlag(const InterruptFlag_t flags)
-{
-    // Flags are cleared by writing a one to the flag position.
-    // Writing a zero is ignored.
-    ADC1->ISR = flags.value;
-}
-
-void
-modm::platform::Adc::setWaitMode(const bool enable)
-{
-    if (enable) {
-        ADC1->CFGR1 |= ADC_CFGR1_WAIT;
-    } else {
-        ADC1->CFGR1 &= ~ADC_CFGR1_WAIT;
-    }
+	if (enable) {
+		ADC1->CFGR1 |= ADC_CFGR1_WAIT;
+	} else {
+		ADC1->CFGR1 &= ~ADC_CFGR1_WAIT;
+	}
 }
