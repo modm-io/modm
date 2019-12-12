@@ -48,7 +48,7 @@ struct SystemClock {
 	static constexpr uint32_t Spi1		= Apb;
 	static constexpr uint32_t I2s1		= Apb;
 	static constexpr uint32_t Timer1	= Apb;
-	static constexpr uint32_t Adc		= Apb;
+	static constexpr uint32_t Adc1		= Apb;
 	static constexpr uint32_t Comp		= Apb;
 	static constexpr uint32_t ItLine	= Apb;
 	static constexpr uint32_t VrefBuf	= Apb;

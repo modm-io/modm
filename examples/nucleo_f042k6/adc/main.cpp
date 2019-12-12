@@ -23,17 +23,30 @@ main()
 	LedD13::setOutput();
 
 	Adc::connect<AdcIn1::In0>();
-	Adc::initialize(Adc::ClockMode::PCLKDividedBy4, Adc::CalibrationMode::DoNotCalibrate);
+	Adc::initialize<Board::SystemClock, Adc::ClockMode::Synchronous, 12_MHz>();
+
+	uint16_t Vref = Adc::readInternalVoltageReference();
+	int16_t Temp = Adc::readTemperature(Vref);
+	MODM_LOG_INFO << "Vref=" << Vref << modm::endl;
+	MODM_LOG_INFO << "Temp=" << Temp << modm::endl;
+
+	MODM_LOG_INFO << "TS_CAL1=" << uint16_t(*((volatile uint16_t *)0x1FFF77B8)) << modm::endl;
+	MODM_LOG_INFO << "TS_CAL2=" << uint16_t(*((volatile uint16_t *)0x1FFF77C2)) << modm::endl;
+	MODM_LOG_INFO << "VREFINT_CAL=" << uint16_t(*((volatile uint16_t *)0x1FFFF7BA)) << modm::endl;
+
+	Adc::setPinChannel<AdcIn1>();
+	Adc::setResolution(Adc::Resolution::Bits12);
+	Adc::setRightAdjustResult();
+	Adc::setSampleTime(Adc::SampleTime::Cycles239_5);
+	Adc::enableFreeRunningMode();
+	Adc::startConversion();
 
 	while (true)
 	{
 		LedD13::toggle();
-		modm::delayMilliseconds(250);
+		modm::delayMilliseconds(100);
 
-		Adc::setPinChannel<AdcIn1>();
-		Adc::startConversion();
-		while(!Adc::isConversionFinished()) { }
-		MODM_LOG_INFO << "ADC A0: " << Adc::getValue() << modm::endl;
+		MODM_LOG_INFO << "mV=" << (Vref * Adc::getValue() / 4095ul) << modm::endl;
 
 	}
 
