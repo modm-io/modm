@@ -154,6 +154,19 @@ public:
 %% endif
 	};
 
+%% if target["family"] in ["l4", "g4"]
+	enum class SampleTime : uint8_t	// TODO: What is the best type?
+	{
+		Cycles2 	= 0b000,	//!   1.5 ADC clock cycles
+		Cycles7 	= 0b001,	//!   6.5 ADC clock cycles
+		Cycles13 	= 0b010,	//!  12.5 ADC clock cycles
+		Cycles25	= 0b011,	//!  24.5 ADC clock cycles
+		Cycles48 	= 0b100,	//!  47.5 ADC clock cycles
+		Cycles93 	= 0b101,	//!  92.5 ADC clock cycles
+		Cycles248 	= 0b110,	//! 247.5 ADC clock cycles
+		Cycles641 	= 0b111,	//! 640.5 ADC clock cycles
+	};
+%% else
 	enum class SampleTime : uint8_t	// TODO: What is the best type?
 	{
 		Cycles2 	= 0b000,	//!   1.5 ADC clock cycles
@@ -165,7 +178,7 @@ public:
 		Cycles182 	= 0b110,	//! 181.5 ADC clock cycles
 		Cycles602 	= 0b111,	//! 601.5 ADC clock cycles
 	};
-
+%% endif
 	enum class CalibrationMode : uint32_t
 	{
 		SingleEndedInputsMode = 0,
