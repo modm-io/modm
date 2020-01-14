@@ -119,7 +119,7 @@ You'll need to add both `/bin` paths to your `PATH` variable manually.
 
 [contribute]: https://github.com/modm-io/modm/blob/develop/CONTRIBUTING.md
 [examples]: https://github.com/modm-io/modm/tree/develop/examples
-[gcc-arm-toolchain]: https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads
+[gcc-arm-toolchain]: https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm
 [openocd]: http://openocd.org
 [avr-gcc]: http://www.nongnu.org/avr-libc
 [avrdude]: http://www.nongnu.org/avrdude

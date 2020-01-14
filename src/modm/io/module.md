@@ -15,7 +15,7 @@ stream.printf("format number 8: %u or as signed -100: %d", 8, -100);
 !!! warning "AVR supported features"
     All expensive features incl. printf are disabled by default! Check the options.
 
-!!! note "`modm::endl` does implicitly flush!"
+!!! note "`modm::endl` does NOT implicitly flush!"
     Flushing is *extremely expensive* on embedded systems, therefore `modm::endl`
     does not implicitly flush the stream. Please call `modm::flush` explicitly.
 
