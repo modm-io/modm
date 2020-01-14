@@ -47,6 +47,7 @@ public:
 	static constexpr bool isInverted = false;
 	static constexpr Port port = Port::{{port}}; ///< Port name
 	static constexpr uint8_t pin = {{pin}}; ///< Pin number
+	static constexpr IRQn_Type ExternalInterruptIRQ = EXTI{{ exti_irqn }}_IRQn;
 
 protected:
 	/// Bitmask for registers that contain a 1bit value for every pin.
@@ -61,8 +62,6 @@ protected:
 	static constexpr uint8_t af_offset = (pin * 4) % 32;
 	/// Alternate Function register mask.
 	static constexpr uint32_t af_mask  = 0xf << af_offset;
-	/// ExternalInterruptIRQ
-	static constexpr IRQn_Type ExternalInterruptIRQ = EXTI{{ exti_irqn }}_IRQn;
 
 public:
 	/// @cond
