@@ -1,0 +1,32 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2020, Mike Wolfram
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:cat24aa"
+    module.description = """\
+# CAT24AAxx I2C Eeprom
+
+Compatible with the OnSemi CAT24AA I2C eeprom (1 kBit to 16 kBit).
+It  uses a 8-bit address pointer, the top 3 bits of the address pointer
+are added to the the slave address, which is fixed to 0x50.
+"""
+
+def prepare(module, options):
+    module.depends(":architecture:i2c.device")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/storage"
+    env.copy("cat24aa.hpp")
+    env.copy("cat24aa.cpp")
+    env.copy("cat24aa_impl.hpp")
