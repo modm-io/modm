@@ -57,7 +57,12 @@ For a less intrusive way to run all scons scripts with Python 3 add this to your
 To compile modm *for macOS* (and not the embedded target) you need to install
 some of these libraries as well, depending on what modm modules you use:
 
-	brew install boost zmqpp gcc
+	brew install boost zmqpp gcc cmake
+
+For all example code that is also run by the CI, you need additional dependencies:
+
+	pip3 install numpy pyx
+	MacTeX
 
 
 ## Linux
