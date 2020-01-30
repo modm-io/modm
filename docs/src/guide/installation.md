@@ -64,7 +64,7 @@ some of these libraries as well, depending on what modm modules you use:
 
 For Ubuntu 18.04LTS, these commands install the basic build system:
 
-	sudo apt-get install python3 python3-pip scons git
+	sudo apt-get install python3 python3-pip scons git openocd
 	sudo apt-get --no-install-recommends install doxygen
 	pip3 install modm
 
