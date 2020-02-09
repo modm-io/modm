@@ -2,6 +2,7 @@
  * Copyright (c) 2013-2014, Kevin Läufer
  * Copyright (c) 2014, Sascha Schade
  * Copyright (c) 2014, 2016-2017, Niklas Hauser
+ * Copyright (c) 2020, Raphael Lehmann
  *
  * This file is part of the modm project.
  *
@@ -17,6 +18,7 @@
 
 #include <modm/architecture/interface/delay.hpp>	// modm::delayMicroseconds
 #include <modm/platform/clock/rcc.hpp>
+#include <modm/math/algorithm/enumerate.hpp>
 
 void
 modm::platform::Adc{{ id }}::initialize(const ClockMode clk,
@@ -146,30 +148,104 @@ modm::platform::Adc{{ id }}::setLeftAdjustResult(const bool enable)
 }
 
 bool
-modm::platform::Adc{{ id }}::setChannel(	const Channel channel,
-										const SampleTime sampleTime)
+modm::platform::Adc{{ id }}::setChannel(const nonstd::span<const Channel> channels)
+{
+	if(channels.size() >= maxSequenceLength) {
+		return false;
+	}
+
+	// Clear temporary variables
+	sqr1 = 0;
+	sqr2 = 0;
+	sqr3 = 0;
+	sqr4 = 0;
+
+	for (auto [i, channel] : enumerate(channels))
+	{
+		if(!setSequenceChannel(i, channel)) {
+			return false;
+		}
+	}
+
+	sqr1 |= channels.size();
+
+	// Write SQRx registers
+	ADC{{ id }}->SQR1 = sqr1;
+	ADC{{ id }}->SQR2 = sqr2;
+	ADC{{ id }}->SQR3 = sqr3;
+	ADC{{ id }}->SQR4 = sqr4;
+
+	return true;
+}
+
+bool
+modm::platform::Adc{{ id }}::setInjectedChannel(const nonstd::span<const Channel> channels)
+{
+	if(channels.size() >= maxInjectedSequenceLength) {
+		return false;
+	}
+	// clear JSQR register except for JEXTEN and JEXTSEL bits
+	ADC{{ id }}->JSQR &= ADC_JSQR_JEXTEN_Msk | ADC_JSQR_JEXTSEL_Msk;
+
+	// Set channels and seqeunce length
+	uint32_t reg{0};
+	for (auto [i, channel] : enumerate(channels))
+	{
+		reg |= (static_cast<uint8_t>(channel) & 0b11111) << (9 + (6 * i));
+	}
+	ADC{{ id }}->JSQR |= reg | channels.size();
+
+	return true;
+}
+
+
+bool
+modm::platform::Adc{{ id }}::setSequenceChannel(const int index, const Channel channel)
 {
 	if(static_cast<uint8_t>(channel) > 18) {
 		return false;
 	}
 
-	uint32_t tmpreg;
-	// SQR1[10:6] contain SQ1[4:0]
-	ADC{{ id }}->SQR1 = (static_cast<uint8_t>(channel) & 0b11111) << 6;
+	// index==0 -> SQR1
+	if(index <= 4) {
+		sqr1 |= (static_cast<uint8_t>(channel) & 0b11111) << (6 * (index + 1));
+	}
+	else if(index <= 9) {
+		sqr2 |= (static_cast<uint8_t>(channel) & 0b11111) << (6 * (index - 4));
+	}
+	else if(index <= 14) {
+		sqr3 |= (static_cast<uint8_t>(channel) & 0b11111) << (6 * (index - 9));
+	}
+	else if(index <= 16) {
+		sqr4 |= (static_cast<uint8_t>(channel) & 0b11111) << (6 * (index - 14));
+	}
+	else {
+		return false;
+	}
+	return true;
+}
 
-	if (static_cast<uint8_t>(channel) < 10) {
+bool
+modm::platform::Adc{{ id }}::setChannelSampleTime(const Channel channel,
+	const SampleTime sampleTime)
+{
+	uint32_t tmpreg;
+	if (static_cast<uint8_t>(channel) <= 9) {
 		tmpreg = ADC{{ id }}->SMPR1
 			& ((~ADC_SMPR1_SMP0) << (static_cast<uint8_t>(channel) * 3));
 		tmpreg |= static_cast<uint32_t>(sampleTime) <<
 						(static_cast<uint8_t>(channel) * 3);
 		ADC{{ id }}->SMPR1 = tmpreg;
 	}
-	else {
+	else if (static_cast<uint8_t>(channel) <= 18) {
 		tmpreg = ADC{{ id }}->SMPR2
 			& ((~ADC_SMPR2_SMP10) << ((static_cast<uint8_t>(channel)-10) * 3));
 		tmpreg |= static_cast<uint32_t>(sampleTime) <<
 						((static_cast<uint8_t>(channel)-10) * 3);
 		ADC{{ id }}->SMPR2 = tmpreg;
+	}
+	else {
+		return false;
 	}
 	return true;
 }
@@ -184,6 +260,26 @@ modm::platform::Adc{{ id }}::setFreeRunningMode(const bool enable)
 	}
 }
 
+void
+modm::platform::Adc{{ id }}::setTrigger(const TriggerMode mode,
+	const TriggerSourceRegular source)
+{
+	ADC{{ id }}->CFGR =
+		(ADC{{ id }}->CFGR & ~(ADC_CFGR_EXTSEL_Msk | ADC_CFGR_EXTEN_Msk))
+		| (static_cast<uint32_t>(mode) << ADC_CFGR_EXTEN_Pos)
+		| (static_cast<uint32_t>(source) << ADC_CFGR_EXTSEL_Pos);
+}
+
+void
+modm::platform::Adc{{ id }}::setInjectedTrigger(const TriggerMode mode,
+	const TriggerSourceInjected source)
+{
+	ADC{{ id }}->JSQR =
+		(ADC{{ id }}->JSQR & ~(ADC_JSQR_JEXTSEL_Msk | ADC_JSQR_JEXTEN_Msk))
+		| (static_cast<uint32_t>(mode) << ADC_JSQR_JEXTEN_Pos)
+		| (static_cast<uint32_t>(source) << ADC_JSQR_JEXTSEL_Pos);
+}
+
 
 void
 modm::platform::Adc{{ id }}::startConversion(void)
@@ -195,10 +291,58 @@ modm::platform::Adc{{ id }}::startConversion(void)
 	ADC{{ id }}->CR |= ADC_CR_ADSTART;
 }
 
+
+void
+modm::platform::Adc{{ id }}::startInjectedConversion(void)
+{
+	// TODO: maybe add more interrupt flags
+	acknowledgeInterruptFlag(InterruptFlag::EndOfSampling | InterruptFlag::Overrun);
+	// starts single conversion for the regular group
+	ADC{{ id }}->CR |= ADC_CR_JADSTART;
+}
+
 bool
 modm::platform::Adc{{ id }}::isConversionFinished(void)
 {
 	return static_cast<bool>(getInterruptFlags() & InterruptFlag::EndOfRegularConversion);
+}
+
+uint16_t
+modm::platform::Adc{{ id }}::getInjectedValue(uint8_t index)
+{
+	switch(index){
+		case 1:
+			return ADC{{ id }}->JDR1;
+		case 2:
+			return ADC{{ id }}->JDR2;
+		case 3:
+			return ADC{{ id }}->JDR3;
+		case 4:
+			return ADC{{ id }}->JDR4;
+		default:
+			return 0;
+	}
+}
+
+template<uint8_t index>
+uint16_t
+modm::platform::Adc{{ id }}::getInjectedValue()
+{
+	static_assert(maxInjectedSequenceLength == 4, "Invalid maxInjectedSequenceLength");
+	static_assert(index <= 4, "There are only 4 injected ADC values.");
+
+	if constexpr(index == 1) {
+		return ADC{{ id }}->JDR1;
+	}
+	else if constexpr(index == 2){
+		return ADC{{ id }}->JDR2;
+	}
+	else if constexpr(index == 3){
+		return ADC{{ id }}->JDR3;
+	}
+	else if constexpr(index == 4){
+		return ADC{{ id }}->JDR4;
+	}
 }
 
 // ----------------------------------------------------------------------------
