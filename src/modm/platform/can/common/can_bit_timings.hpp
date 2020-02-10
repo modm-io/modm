@@ -45,7 +45,7 @@ namespace modm
  * @author	Kevin Laeufer
  * @ingroup	modm_platform_can_common
  */
-template<int32_t Clk, int32_t Bitrate>
+template<int32_t Clk, int32_t Bitrate, uint8_t prescaler_width = 10, uint8_t bs1_width = 4, uint8_t bs2_width = 3, uint8_t sjw_width = 2>
 class CanBitTiming
 {
 private:
@@ -78,11 +78,14 @@ private:
 		for(uint8_t bs1Bs2 = minBs1Bs2; bs1Bs2 <= maxBs1Bs2; ++bs1Bs2) {
 			float idealPrescaler = float(Clk) / (Bitrate * (1 + bs1Bs2));
 			uint32_t intPrescaler = round_uint32(idealPrescaler);
-			float error = constexpr_fabs(1 - intPrescaler/idealPrescaler);
-			if(error <= minError) {
-				bestPrescaler = intPrescaler;
-				minError = error;
-				bestBs1Bs2 = bs1Bs2;
+
+			if(intPrescaler < ((1 << prescaler_width) - 1)) {
+				float error = constexpr_fabs(1 - intPrescaler/idealPrescaler);
+				if(error <= minError) {
+					bestPrescaler = intPrescaler;
+					minError = error;
+					bestBs1Bs2 = bs1Bs2;
+				}
 			}
 		}
 
@@ -110,7 +113,10 @@ public:
 private:
 	// check assertions
 	static_assert(getPrescaler() > 0, "CAN bitrate is too high for standard bit timings!");
-	static_assert(getPrescaler() < ((1 << 10) - 1), "Prescaler value too large"); // 10 bit prescaler on STM32
+	static_assert(getPrescaler() <= (1 << prescaler_width), "Prescaler value too large");
+	static_assert(getBS1() <= (1 << bs1_width), "BS1 value too large");
+	static_assert(getBS2() <= (1 << bs2_width), "BS2 value too large");
+	static_assert(getSJW() <= (1 << sjw_width), "SJW value too large");
 };
 
 }	// namespace modm
