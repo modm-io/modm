@@ -15,6 +15,7 @@
 
 #include <stdint.h>
 #include <modm/architecture/utils.hpp>
+#include <array>
 
 namespace modm::can
 {
@@ -76,6 +77,26 @@ struct Message
 		length = len;
 	}
 
+	inline uint8_t
+	getDLC() const
+	{
+		if(length <= 8) {
+			return length;
+		}
+		else if(length <= 24) {
+			return 8 + ((length - 8) / 4);
+		}
+		else {
+			return 12 + ((length - 24) / 8);
+		}
+	}
+
+	inline void
+	setDLC(uint8_t dlc)
+	{
+		length = dlcLookup.at(dlc);
+	}
+
 public:
 	uint32_t identifier;
 	uint8_t modm_aligned(4) data[8];
@@ -94,6 +115,12 @@ public:
 public:
 	bool
 	operator == (const modm::can::Message& rhs) const;
+
+	bool
+	operator < (const modm::can::Message& rhs) const;
+
+private:
+	static constexpr std::array<uint8_t, 16> dlcLookup = {{0, 1, 2, 3, 4, 5, 6, 7, 8, 12, 16, 20, 24, 32, 48, 64}};
 };
 
 }	// namespace modm::can
