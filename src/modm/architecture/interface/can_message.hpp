@@ -113,6 +113,13 @@ public:
 				(this->flags.extended == rhs.flags.extended) and
 				std::equal(data, data + length, rhs.data));
 	}
+
+	inline bool
+	operator < (const modm::can::Message& rhs) const
+	{
+		return (this->identifier << (this->flags.extended ? 0 : 18))
+			< (rhs.identifier << (rhs.flags.extended ? 0 : 18));
+	}
 };
 
 }	// namespace modm::can
