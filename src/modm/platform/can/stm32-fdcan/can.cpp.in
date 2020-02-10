@@ -1,0 +1,460 @@
+/*
+ * Copyright (c) 2019, Raphael Lehmann
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+#include <queue>
+#include <array>
+#include <algorithm>
+
+#include <modm/architecture/driver/atomic/queue.hpp>
+#include <modm/platform/clock/rcc.hpp>
+#include <modm/architecture/interface/delay.hpp>
+#include <modm/architecture/interface/assert.hpp>
+
+#include "can_{{ id }}.hpp"
+
+
+%% if options["buffer.tx"] > 0
+static std::priority_queue<modm::can::Message> txQueue;
+%% endif
+
+struct RxMessage {
+    modm::can::Message message;
+    uint8_t filter_id;
+    uint16_t timestamp;
+};
+%% if options["buffer.rx"] > 0
+static modm::atomic::Queue<RxMessage, {{ options["buffer.rx"] }}> rxQueue;
+%% endif
+
+
+void
+modm::platform::Fdcan{{ id }}::initializeWithPrescaler(
+		uint16_t prescaler, uint8_t bs1, uint8_t bs2, uint8_t sjw,
+		uint16_t dataPrescaler, uint8_t dataBs1, uint8_t dataBs2, uint8_t dataSjw,
+		Preprescaler preprescaler,
+		uint32_t interruptPriority, Mode startupMode, bool overwriteOnOverrun)
+{
+	if(!Rcc::isEnabled<Peripheral::Fdcan1>()) {
+		Rcc::enable<Peripheral::Fdcan1>();
+	}
+
+	// Enter init mode, stops all FDCAN activities
+	{{ reg }}->CCCR = FDCAN_CCCR_INIT;
+	int deadlockPreventer = 10'000; // max ~10ms
+	while ((({{ reg }}->CCCR & FDCAN_CCCR_INIT) == 0) and (deadlockPreventer-- > 0)) {
+		modm::delayMicroseconds(1);
+		// Wait until the initialization mode is entered.
+	}
+	modm_assert(deadlockPreventer > 0, "can", "init", "timeout", {{ id }});
+	{{ reg }}->CCCR |= FDCAN_CCCR_CCE;
+
+	// Configure pre-prescaler (common for all three FDCAN instances)
+	// Fixme: TODO!!!!!
+	FDCAN_CONFIG->CKDIV = static_cast<uint8_t>(preprescaler);
+
+	// Configure nominal and data bitrates
+	{{ reg }}->NBTP =
+			((sjw - 1) << FDCAN_NBTP_NSJW_Pos) |
+			((bs2 - 1) << FDCAN_NBTP_NTSEG2_Pos) |
+			((bs1 - 1) << FDCAN_NBTP_NTSEG1_Pos) |
+			((prescaler - 1) << FDCAN_NBTP_NBRP_Pos);
+	{{ reg }}->DBTP =
+			((dataSjw - 1) << FDCAN_DBTP_DSJW_Pos) |
+			((dataBs2 - 1) << FDCAN_DBTP_DTSEG2_Pos) |
+			((dataBs1 - 1) << FDCAN_DBTP_DTSEG1_Pos) |
+			((dataPrescaler - 1) << FDCAN_DBTP_DBRP_Pos) |
+			FDCAN_DBTP_TDC; // enable "Transceiver Delay Compensation"
+
+
+	// Timestamp: FDCAN internal counter with prescaler=1
+	// In CAN FD mode the internal timestamp counter TCP does not provide a constant time
+	//  base due to the different CAN bit times between arbitration phase and data phase.
+	{{ reg }}->TSCC = (1 << FDCAN_TSCC_TSS_Pos);
+
+	// Set vector priority
+	NVIC_SetPriority({{ reg }}_IT0_IRQn, interruptPriority);
+	NVIC_SetPriority({{ reg }}_IT1_IRQn, interruptPriority);
+
+	// Register Interrupts at the NVIC
+	NVIC_EnableIRQ({{ reg }}_IT0_IRQn);
+	NVIC_EnableIRQ({{ reg }}_IT1_IRQn);
+
+	{{ reg }}->ILE = FDCAN_ILE_EINT1 | FDCAN_ILE_EINT0;
+	// TODO: assign interrupts to interrupt lines
+
+	{{ reg }}->RXGFC = overwriteOnOverrun ? 0 : (FDCAN_RXGFC_F1OM | FDCAN_RXGFC_F0OM); // TODO: or inverted?
+
+	// Reject frames not matching any filter
+	{{ reg }}->RXGFC |= FDCAN_RXGFC_ANFE | FDCAN_RXGFC_ANFS;
+
+	// Tx buffer: queue mode
+	{{ reg }}->TXBC = FDCAN_TXBC_TFQM;
+
+	_setMode(startupMode);
+
+	// Switch to normal operation
+	{{ reg }}->CCCR &= ~FDCAN_CCCR_INIT;
+}
+
+
+// Configure the mailbox to send a CAN message.
+// Low level function called by sendMessage and by Tx Interrupt.
+static bool
+sendMsg(const modm::can::Message& message)
+{
+	using namespace modm::platform;
+	if(!Fdcan{{ id }}::isReadyToSend()) {
+		return false;
+	}
+
+	// Retrieve the Tx queue put index
+	uint8_t putIndex = ({{ reg }}->TXFQS & FDCAN_TXFQS_TFQPI_Msk) >> FDCAN_TXFQS_TFQPI_Pos;
+
+	uint32_t* msgRam = (uint32_t*)(Fdcan{{ id }}::TxFifo + (putIndex * Fdcan{{ id }}::TxFifoElementSize));
+	*msgRam++ = ((message.isExtended() ? 1 : 0) << 30)
+		| ((message.isRemoteTransmitRequest() ? 1 : 0) << 30)
+		| (message.isExtended() ? message.getIdentifier() : (message.getIdentifier() << 18));
+	*msgRam++ = /* ((message.isLFM() ? 1 : 0) << 21) */ 0
+		/*| ((message.isFFM() ? 1 : 0) << 20)*/
+		| (message.getDLC() << 16);
+
+	// copy data (max. 64 bytes)
+	std::memcpy(msgRam, message.data, std::min(message.getLength(), uint8_t(64)));
+
+	// Activate the corresponding transmission request
+	{{ reg }}->TXBAR = ((uint32_t)1 << putIndex);
+
+	return true;
+}
+
+
+// Low level function to receive a message from mailbox.
+// Called by Rx Interrupt or by getMessage.
+static void
+readMsg(modm::can::Message& message, uint8_t* filter_id, uint16_t *timestamp)
+{
+	using namespace modm::platform;
+	uint8_t getIndex;
+	uint32_t* msgRam;
+	if(true /* fifo 0 or 1? */) {
+		getIndex = ({{ reg }}->RXF0S & FDCAN_RXF0S_F0GI_Msk) >> FDCAN_RXF0S_F0GI_Pos;
+		msgRam = (uint32_t*)(Fdcan{{ id }}::RxFifo0 + (getIndex * Fdcan{{ id }}::RxFifoElementSize));
+	}
+	else {
+		getIndex = ({{ reg }}->RXF1S & FDCAN_RXF1S_F1GI_Msk) >> FDCAN_RXF1S_F1GI_Pos;
+		msgRam = (uint32_t*)(Fdcan{{ id }}::RxFifo1 + (getIndex * Fdcan{{ id }}::RxFifoElementSize));
+	}
+
+	message.setExtended(*msgRam & (1 << 30));
+	message.setRemoteTransmitRequest(*msgRam & (1 << 29));
+	message.setIdentifier((*msgRam & ((1 << 29) - 1)) >> message.isExtended() ? 0 : 18);
+
+	msgRam++;
+
+	//message.setFilterId((*msgRam >> 24) & (1 << 7));
+	if(filter_id != nullptr) {
+		*filter_id = (*msgRam >> 24) & (1 << 7);
+	}
+	//message.setLFM(*msgRam & (1 << 21));
+	//message.setFFM(*msgRam & (1 << 20));
+	message.setDLC((*msgRam >> 16) & (1 << 20));
+	//message.setTimestamp(*msgRam & ((1 << 16) -1 ));
+	if(timestamp != nullptr) {
+		*timestamp = *msgRam & ((1 << 16) -1 );
+	}
+
+	msgRam++;
+
+	// copy data (max. 8 (64) bytes)
+	std::memcpy(message.data, msgRam, std::min(message.getLength(), uint8_t(8) /* 64 */));
+
+	if(true /* fifo 0 or 1? */) {
+		{{ reg }}->RXF0A = getIndex;
+	}
+	else {
+		{{ reg }}->RXF1A = getIndex;
+	}
+}
+
+
+/* Transmit Interrupt
+ *
+ * Generated when Transmit Mailbox 0..2 becomes empty.
+ */
+
+/*
+MODM_ISR({{ reg }}_TX)
+{
+%% if options["buffer.tx"] > 0
+	uint32_t mailbox;
+	uint32_t tsr = {{ reg }}->TSR;
+
+	if (tsr & CAN_TSR_RQCP2) {
+		mailbox = 2;
+		{{ reg }}->TSR = CAN_TSR_RQCP2;
+	}
+	else if (tsr & CAN_TSR_RQCP1) {
+		mailbox = 1;
+		{{ reg }}->TSR = CAN_TSR_RQCP1;
+	}
+	else {
+		mailbox = 0;
+		{{ reg }}->TSR = CAN_TSR_RQCP0;
+	}
+
+	if (txQueue.isNotEmpty())
+	{
+		sendMailbox(txQueue.get(), mailbox);
+		txQueue.pop();
+	}
+%% endif
+}
+*/
+
+
+/* FIFO0 Interrupt
+ *
+ * Generated on a new received message, FIFO0 full condition and Overrun
+ * Condition.
+ */
+/*
+MODM_ISR({{ reg }}_RX0)
+{
+	if ({{ reg }}->RF0R & CAN_RF0R_FOVR0) {
+		modm::ErrorReport::report(modm::platform::Fdcan{{ id }}_FIFO0_OVERFLOW);
+
+		// release overrun flag & access the next message
+		{{ reg }}->RF0R = CAN_RF0R_FOVR0 | CAN_RF0R_RFOM0;
+	}
+
+%% if options["buffer.rx"] > 0
+	RxMessage rxMessage;
+	readMailbox(rxMessage.message, 0, &(rxMessage.filter_id));
+
+	// Release FIFO (access the next message)
+	{{ reg }}->RF0R = CAN_RF0R_RFOM0;
+
+	if (!rxQueue.push(rxMessage)) {
+		modm::ErrorReport::report(modm::platform::Fdcan{{ id }}_FIFO0_OVERFLOW);
+	}
+%% endif
+}
+*/
+
+
+/* FIFO1 Interrupt
+ *
+ * See FIFO0 Interrupt
+ */
+/*
+MODM_ISR({{ reg }}_RX1)
+{
+	if ({{ reg }}->RF1R & CAN_RF1R_FOVR1) {
+		modm::ErrorReport::report(modm::platform::Fdcan{{ id }}_FIFO1_OVERFLOW);
+
+		// release overrun flag & access the next message
+		{{ reg }}->RF1R = CAN_RF1R_FOVR1 | CAN_RF1R_RFOM1;
+	}
+
+%% if options["buffer.rx"] > 0
+	RxMessage rxMessage;
+	readMailbox(rxMessage.message, 1, &(rxMessage.filter_id));
+
+	// Release FIFO (access the next message)
+	{{ reg }}->RF1R = CAN_RF1R_RFOM1;
+
+	if (!rxQueue.push(rxMessage)) {
+		modm::ErrorReport::report(modm::platform::Fdcan{{ id }}_FIFO1_OVERFLOW);
+	}
+%% endif
+}
+*/
+
+
+void
+modm::platform::Fdcan{{ id }}::setMode(Mode mode)
+{
+
+	// Enter init mode, stops all FDCAN activities
+	{{ reg }}->CCCR = FDCAN_CCCR_INIT;
+	int deadlockPreventer = 10'000; // max ~10ms
+	while ((({{ reg }}->CCCR & FDCAN_CCCR_INIT) == 0) and (deadlockPreventer-- > 0)) {
+		modm::delayMicroseconds(1);
+		// Wait until the initialization mode is entered.
+	}
+	modm_assert(deadlockPreventer > 0, "can", "setmode", "timeout", {{ id }});
+	{{ reg }}->CCCR |= FDCAN_CCCR_CCE | FDCAN_CCCR_TEST;
+
+	_setMode(mode);
+
+	// Switch back to normal operation
+	{{ reg }}->CCCR &= ~FDCAN_CCCR_INIT;
+}
+
+void
+modm::platform::Fdcan{{ id }}::_setMode(Mode mode)
+{
+	// Reset all mode register bits
+	{{ reg }}->TEST = 0;
+	{{ reg }}->CCCR &= ~(FDCAN_CCCR_ASM | FDCAN_CCCR_MON | FDCAN_CCCR_CSR | FDCAN_CCCR_TEST);
+
+	// set mode
+	switch(mode) {
+		case Mode::Normal:
+			break;
+		case Mode::Restricted:
+			{{ reg }}->CCCR |= FDCAN_CCCR_ASM;
+			break;
+		case Mode::Monitoring:
+			{{ reg }}->CCCR |= FDCAN_CCCR_MON;
+			break;
+		case Mode::Sleep:
+			{{ reg }}->CCCR |= FDCAN_CCCR_CSR;
+			break;
+		case Mode::TestExternalLoopback:
+			{{ reg }}->CCCR |= FDCAN_CCCR_TEST;
+			{{ reg }}->TEST = FDCAN_TEST_LBCK;
+			break;
+		case Mode::TestInternalLoopback:
+			{{ reg }}->CCCR |= FDCAN_CCCR_TEST | FDCAN_CCCR_MON;
+			{{ reg }}->TEST = FDCAN_TEST_LBCK;
+			break;
+	}
+}
+
+
+void
+modm::platform::Fdcan{{ id }}::setAutomaticRetransmission(bool retransmission)
+{
+	if (retransmission) {
+		// Enable retransmission
+		{{ reg }}->CCCR = ({{ reg }}->CCCR & ~FDCAN_CCCR_DAR);
+	} else {
+		// Disable retransmission
+		{{ reg }}->CCCR = ({{ reg }}->CCCR | FDCAN_CCCR_DAR);
+	}
+}
+
+
+bool
+modm::platform::Fdcan{{ id }}::isMessageAvailable()
+{
+%% if options["buffer.rx"] > 0
+	return rxQueue.isNotEmpty();
+%% else
+	// Check if there are any messages pending in the receive registers
+	return (({{ reg }}->RXF0S & FDCAN_RXF0S_F0FL_Msk) > 0 || ({{ reg }}->RXF1S & FDCAN_RXF1S_F1FL_Msk) > 0);
+%% endif
+}
+
+
+bool
+modm::platform::Fdcan{{ id }}::getMessage(can::Message& message, uint8_t *filter_id, uint16_t *timestamp)
+{
+%% if options["buffer.rx"] > 0
+	if (rxQueue.isEmpty())
+	{
+		// no message in the receive buffer
+		return false;
+	}
+	else {
+		auto& rxMessage = rxQueue.get();
+		std::memcpy(&message, &rxMessage.message, sizeof(message));
+		if(filter_id != nullptr) {
+			(*filter_id) = rxMessage.filter_id;
+		}
+		if(timestamp != nullptr) {
+			(*timestamp) = rxMessage.timestamp;
+		}
+		rxQueue.pop();
+		return true;
+	}
+%% else
+	if (({{ reg }}->RXF0S & FDCAN_RXF0S_F0FL_Msk) > 0)
+	{
+		readMsg(message, filter_id, timestamp);
+
+		// Release FIFO (access the next message)
+		{{ reg }}->RF0R = CAN_RF0R_RFOM0;
+		return true;
+	}
+	else if (({{ reg }}->RXF1S & FDCAN_RXF1S_F1FL_Msk) > 0)
+	{
+		readMsg(message, filter_id, timestamp);
+
+		// Release FIFO (access the next message)
+		{{ reg }}->RF1R = CAN_RF1R_RFOM1;
+		return true;
+	}
+	return false;
+%% endif
+}
+
+
+bool
+modm::platform::Fdcan{{ id }}::isReadyToSend()
+{
+%% if options["buffer.tx"] > 0
+	return txQueue.size() < {{ options["buffer.tx"] }};
+%% else
+	return (({{ reg }}->TXFQS & FDCAN_TXFQS_TFQF) != 0);
+%% endif
+}
+
+
+bool
+modm::platform::Fdcan{{ id }}::sendMessage(const can::Message& message)
+{
+	// This function is not reentrant. If one of the buffers is not full it
+	// means that the software buffer is empty too. Therefore the buffer
+	// will stay empty and won't be taken by an interrupt.
+	if (({{ reg }}->TXFQS & FDCAN_TXFQS_TFQF) == 0)
+	{
+		// Buffer completely filled at the moment
+%% if options["buffer.tx"] > 0
+		if (txQueue.size() < {{ options["buffer.tx"] }}) {
+			return false;
+		}
+		txQueue.push(message);
+		return true;
+%% else
+		return false;
+%% endif
+	}
+	else {
+		sendMsg(message);
+		return true;
+	}
+}
+
+
+modm::platform::Fdcan{{ id }}::BusState
+modm::platform::Fdcan{{ id }}::getBusState()
+{
+	if ({{ reg }}->PSR & FDCAN_PSR_BO) {
+		return BusState::Off;
+	}
+	else if ({{ reg }}->PSR & FDCAN_PSR_EP) {
+		return BusState::ErrorPassive;
+	}
+	else if ({{ reg }}->PSR & FDCAN_PSR_EP) {
+		return BusState::ErrorWarning;
+	}
+	else {
+		return BusState::Connected;
+	}
+}
+
+
+void
+modm::platform::Fdcan{{ id }}::enableStatusChangeInterrupt(uint32_t interruptEnable, uint32_t interruptPriority)
+{
+	// TODO
+}
