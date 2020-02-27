@@ -54,31 +54,36 @@ available for {target}*". Additionally the view does not show peripheral
 instance submodule to reduce visual noise.
 
 
-## Doxygen
+## Doxypress / Doxygen
 
-The generated C/C++ API is documented using Doxygen and therefore only available
-*after* code generation.
+The generated C/C++ API is documented using Doxypress or Doxygen and therefore only
+available *after* code generation.
 
 To view this documentation, include the `modm:docs` module in your `project.xml`
 configuration and run `lbuild build`. A `modm/docs` folder is created containing
-the `doxyfile.cfg` for modm as well as all the `@defgroup`s mirroring the
-module structure.
+the `doxypress.json` and `doxyfile.cfg` for modm as well as all the `@defgroup`s
+mirroring the module structure.
 
 You must then call Doxygen manually, which can take several minutes, and
 compiles the target-specific documentation into `modm/docs/html`:
 
 ```sh
 lbuild build -m "modm:docs"
+
+# With Doxypress
+(cd modm/docs && doxypress doxypress.json)
+# Or Doxygen
 (cd modm/docs && doxygen doxyfile.cfg)
+
 # then open: modm/docs/html/index.html
 ```
 
-The generated Doxygen documentation contains the original module documentation
+The generated Doxypress/Doxygen documentation contains the original module documentation
 *including the option choices you made*. This makes it easier to map the
 lbuild options to changes in the generated source code.
 
 
-!!! bug "No online API docs available (yet)"
-	Due to the complexity of creating a superimposed API documentation for
-	hundreds of different targets, we currently do not have an online API browser
-	available. Please generate the Doxygen API documentation locally for now.
+### Online API documentation
+
+API documentation is available at https://docs.modm.io/ for a large and representative
+number of targets with all modules enabled.

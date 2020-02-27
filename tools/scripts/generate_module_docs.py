@@ -32,8 +32,8 @@ import lbuild
 def get_modules(builder, limit=None):
     builder._load_repositories(repopath("repo.lb"))
     option = builder.parser.find_option(":target")
-
-    raw_targets = list(set(option.values) - set(d for d in repopath("test/all/ignored.txt").read_text().strip().splitlines() if "#" not in d))
+    ignored = list(filter(lambda d: "#" not in d, repopath("test/all/ignored.txt").read_text().strip().splitlines()))
+    raw_targets = sorted(d for d in option.values if not any(d.startswith(i) for i in ignored))
 
     # Reduce device set a little to keep RAM usage in check
     # this should ~half the considered devices

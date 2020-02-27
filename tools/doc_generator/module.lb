@@ -76,8 +76,13 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "modm/docs"
-    env.substitutions = {"xml": False, "qch": env["enable_qch"]}
+    env.substitutions = {
+        "xml": False,
+        "qch": env["enable_qch"],
+        "device": str(env[":target"].identifier).upper(),
+    }
     env.template("doxyfile.cfg.in")
+    env.template("doxypress.json.in")
     env.copy(repopath("README.md"), "README.md")
 
 def post_build(env, buildlog):
