@@ -17,8 +17,8 @@ process that you can fine-tune to your needs.
 - Feast your eyes on [lots of working examples][examples].
 - Our CI checks every contribution for regressions: ![Build Status](https://circleci.com/gh/modm-io/modm/tree/develop.svg?style=shield)
 - We care [about testing modm][testing].
+- [API reference is available here][api-docs].
 
-<!-- - [API reference is available here][reference]. -->
 <!-- - [Check out our latest quarterly release][releases] with a [beautiful changelog][changelog]. -->
 
 This project also has a [technical blog][blog] to document larger design concepts.
@@ -304,7 +304,7 @@ Georgi Grinshpun ([\@georgi-g](https://github.com/georgi-g)) and
 [contrib]:         https://github.com/modm-io/modm/tree/develop/CONTRIBUTING.md
 [devboards]:       https://github.com/modm-io/modm/tree/develop/src/modm/board
 [drivers]:         https://github.com/modm-io/modm/tree/develop/src/modm/driver
-[eurobot]:         http://www.eurobot.org/
+[eurobot]:         https://www.eurobot.org/
 [examples]:        https://github.com/modm-io/modm/tree/develop/examples
 [guide]:           https://modm.io/guide/getting-started
 [install]:         https://modm.io/guide/installation
@@ -313,8 +313,9 @@ Georgi Grinshpun ([\@georgi-g](https://github.com/georgi-g)) and
 [modm-devices]:    https://github.com/modm-io/modm-devices
 [porting]:         https://github.com/modm-io/modm/tree/develop/docs/PORTING.md
 [prs]:             https://github.com/modm-io/modm/pulls
-[rca_ev]:          http://www.roboterclub.rwth-aachen.de/
+[rca_ev]:          https://www.roboterclub.rwth-aachen.de/
 [reference]:       https://modm.io/reference/api
 [releases]:        https://github.com/modm-io/modm/releases
 [testing]:         https://modm.io/guide/testing
+[api-docs]:        https://docs.modm.io/
 <!--/links-->
