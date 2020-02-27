@@ -280,13 +280,6 @@ namespace
 			I2C{{ id }}->ICR |= I2C_ICR_BERRCF;
 			error = modm::I2cMaster::Error::BusCondition;
 		}
-		else if (sr1 & I2C_ISR_NACKF)
-		{	// acknowledge fail
-			I2C{{ id }}->ICR |= I2C_ICR_NACKCF;
-			DEBUG_STREAM("ACK FAIL");
-			// may also be ADDRESS_NACK
-			error = starting.address ? modm::I2cMaster::Error::AddressNack : modm::I2cMaster::Error::DataNack;
-		}
 		else if (sr1 & I2C_ISR_ARLO)
 		{	// arbitration lost
 			I2C{{ id }}->ICR |= I2C_ICR_ARLOCF;
@@ -395,21 +388,28 @@ MODM_ISR(I2C{{ id }}_EV)
 		}
 	}
 
+	if (isr & I2C_ISR_NACKF)
+	{
+		// acknowledge fail
+		I2C{{ id }}->ICR |= I2C_ICR_NACKCF;
+		DEBUG_STREAM("ACK FAIL");
+		// may also be ADDRESS_NACK
+		error = starting.address ? modm::I2cMaster::Error::AddressNack : modm::I2cMaster::Error::DataNack;
+		if (transaction) {
+			transaction->detaching(modm::I2c::DetachCause::ErrorCondition);
+			transaction = nullptr;
+		}
+	}
+
 	if (isr & I2C_ISR_STOPF)
 	{
 		// Stop condition was generated
 		if (nextOperation == modm::I2c::Operation::Stop)
 		{
 			if (transaction) {
-				if (isr & I2C_ISR_NACKF) {
-					DEBUG_STREAM("ACK FAIL");
-					I2C{{ id }}->ICR |= I2C_ICR_NACKCF;
-					transaction->detaching(modm::I2c::DetachCause::ErrorCondition);
-				} else {
-					transaction->detaching(modm::I2c::DetachCause::NormalStop);
-				}
+				transaction->detaching(modm::I2c::DetachCause::NormalStop);
+				transaction = nullptr;
 			}
-			transaction = nullptr;
 			DEBUG_STREAM("transaction finished");
 			callNextTransaction();
 		}
