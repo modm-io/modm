@@ -245,6 +245,7 @@ source code.
     <module>modm:platform:clock</module>
     <module>modm:platform:core</module>
     <module>modm:platform:gpio</module>
+    <module>modm:architecture:delay</module>
   </modules>
 </library>
 ```
