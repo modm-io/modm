@@ -340,7 +340,7 @@ jobs:
           command: |
             export TERM=xterm-256color
             export COLUMNS=120
-            python3 tools/scripts/docs_modm_io_generator.py -t -c
+            python3 tools/scripts/docs_modm_io_generator.py -t -c -j4
       - run:
           name: Build Homepage
           command: |

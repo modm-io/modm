@@ -36,14 +36,16 @@ from modm_devices.device_identifier import *
 def get_targets():
     builder = lbuild.api.Builder()
     builder._load_repositories(repopath("repo.lb"))
-    option = builder.parser.find_option(":target")
+
+    # Get me a condensed list of targets
+    target_option = builder.parser.find_option(":target")
     ignored = list(filter(lambda d: "#" not in d, repopath("test/all/ignored.txt").read_text().strip().splitlines()))
-    raw_targets = sorted(d for d in option.values if not any(d.startswith(i) for i in ignored))
+    raw_targets = sorted(d for d in target_option.values if not any(d.startswith(i) for i in ignored))
     minimal_targets = defaultdict(list)
 
     for target in raw_targets:
-        option.value = target
-        target = option.value._identifier
+        target_option.value = target
+        target = target_option.value._identifier
         short_id = target.copy()
 
         if target.platform == "avr":
@@ -65,6 +67,8 @@ def get_targets():
     # Force "hosted-linux" for hosted target family
     minimal_targets["hosted"] = list(filter(lambda d: "linux" in d.string, minimal_targets["hosted"]))
 
+    # Sort the targets by name in their category
+    # And choose the last one (assumed to be the "largest" devices)
     for key, values in minimal_targets.items():
         target_list.append(sorted(values, key=lambda d: d.string)[-1])
 
@@ -85,7 +89,7 @@ def main():
     device_list = []
     if args.test:
         # test list
-        device_list = ["hosted-linux", "at90can128-16ai", "stm32g474cet6"]
+        device_list = ["hosted-linux", "atmega328p-au", "stm32f103c8t6", "stm32g474cet6"]
     else:
         device_list = get_targets()
 
@@ -132,27 +136,26 @@ def main():
 def create_target(argument):
     modm_path, tempdir, device = argument.split("|")
     try:
-        tempdir = Path(tempdir)
         print("Generating documentation for {} ...".format(device))
-        lbuild_options = '-r {1}/repo.lb -D "modm:target={0}" -p {0}/'.format(device, modm_path)
-        options = ''
-        if device.startswith("stm32"):
-            options += ' -m"modm:architecture:**" -m"modm:build:**" -m"modm:cmsis:**" -m"modm:communication:**" -m"modm:container:**" -m"modm:debug:**" -m"modm:docs:**" -m"modm:driver:**" -m"modm:fatfs:**" -m"modm:freertos:**" -m"modm:io:**" -m"modm:math:**" -m"modm:platform:**" -m"modm:processing:**" -m"modm:ros:**" -m"modm:tlsf:**" -m"modm:ui:**" -m"modm:unittest:**" -m"modm:utils"'
-        elif device.startswith("at"):
-            lbuild_options += ' -D"modm:platform:clock:f_cpu=16000000"'
-            options += ' -m"modm:**"'
-        else:
-            options += ' -m"modm:**"'
-        lbuild_command = 'lbuild {} build {}'.format(lbuild_options, options)
-        print('Executing: ' + lbuild_command)
-        os.system(lbuild_command)
+
+        options = ["modm:target={0}".format(device)]
+        if device.startswith("at"):
+            options.append("modm:platform:clock:f_cpu=16000000")
+        builder = lbuild.api.Builder(options=options)
+        builder.load(Path(modm_path) / "repo.lb")
+        modules = sorted(builder.parser.modules.keys())
+        # Only allow the first board module to be built (they overwrite each others files)
+        first_board = next((m for m in modules if ":board:" in m), None)
+        modules = [m for m in modules if ":board" not in m or m == first_board]
+        builder.build(device, modules)
+
         print('Executing: (cd {}/modm/docs/ && doxypress doxypress.json)'.format(device))
         os.system('(cd {}/modm/docs/ && doxypress doxypress.json > /dev/null 2>&1)'.format(device))
-        (tempdir / device / "modm/docs/html").rename(tempdir / 'output/develop/api' / device)
+        (Path(tempdir) / device / "modm/docs/html").rename(Path(tempdir) / 'output/develop/api' / device)
         print("Finished generating documentation for device {}.".format(device))
         return True
-    except:
-        print("Error generating documentation for device {}.".format(device))
+    except Exception as e:
+        print("Error generating documentation for device {}: {}".format(device, e))
         return False
 
 
