@@ -394,94 +394,94 @@ jobs:
           command: |
             (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
       - run:
-          name: Full run of docs.modm.io-generator-script with upload
+          name: Full run of docs.modm.io-generator-script
           command: |
             export TERM=xterm-256color
             export COLUMNS=120
             python3 tools/scripts/docs_modm_io_generator.py -c -j4
       - run:
           name: Upload api documentation to docs.modm.io
+          when: always
           command: |
-            curl https://docs.modm.io/upload/compressed --upload-file modm-api-docs.tar.gz --user $MODM_UPLOAD
+            curl https://docs.modm.io/upload/compressed --upload-file modm-api-docs.tar.gz
+#            --user $MODM_UPLOAD
 
 workflows:
   version: 2
   build:
     jobs:
-      - stm32f4-examples
-      - unittests-linux-generic
-      - avr-examples
-      - stm32-examples
+      # - stm32f4-examples
+      # - unittests-linux-generic
+      # - avr-examples
+      # - stm32-examples
 
-      - api-docs-all:
-          filters:
-            branches:
-              only: develop
-      - avr-compile-all:
-          requires:
-            - unittests-linux-generic
-            - avr-examples
-      - stm32f0-compile-all:
-          requires:
-            - unittests-linux-generic
-            - stm32-examples
-      - stm32f1-compile-all:
-          requires:
-            - unittests-linux-generic
-            - stm32-examples
-      - stm32f2-compile-all:
-          requires:
-            - unittests-linux-generic
-      - stm32f3-compile-all:
-          requires:
-            - unittests-linux-generic
-            - stm32-examples
-      - stm32f4-compile-all:
-          requires:
-            - unittests-linux-generic
-            - stm32f4-examples
-      - stm32f7-compile-all:
-          requires:
-            - unittests-linux-generic
-            - stm32-examples
-      - stm32g0-compile-all:
-          requires:
-            - unittests-linux-generic
-            - stm32-examples
-      - stm32l1-compile-all:
-          requires:
-            - unittests-linux-generic
-            - stm32-examples
-      - stm32l4-compile-all:
-          requires:
-            - unittests-linux-generic
-            - stm32-examples
-      - stm32g4-compile-all:
-          requires:
-            - unittests-linux-generic
-            - stm32-examples
-      - upload-docs:
-          filters:
-            branches:
-              only: develop
-          requires:
-            - build-docs
-            - avr-compile-all
-            - stm32f0-compile-all
-            - stm32f1-compile-all
-            - stm32f2-compile-all
-            - stm32f3-compile-all
-            - stm32f4-compile-all
-            - stm32f7-compile-all
-            - stm32g0-compile-all
-            - stm32l1-compile-all
-            - stm32l4-compile-all
-      - build-docs:
-          requires:
-            - avr-compile-all
-            - stm32f0-compile-all
-            - stm32f1-compile-all
-            - stm32f2-compile-all
-            - stm32f3-compile-all
-            - stm32g0-compile-all
-            - stm32g4-compile-all
+      - api-docs-all
+
+      # - avr-compile-all:
+      #     requires:
+      #       - unittests-linux-generic
+      #       - avr-examples
+      # - stm32f0-compile-all:
+      #     requires:
+      #       - unittests-linux-generic
+      #       - stm32-examples
+      # - stm32f1-compile-all:
+      #     requires:
+      #       - unittests-linux-generic
+      #       - stm32-examples
+      # - stm32f2-compile-all:
+      #     requires:
+      #       - unittests-linux-generic
+      # - stm32f3-compile-all:
+      #     requires:
+      #       - unittests-linux-generic
+      #       - stm32-examples
+      # - stm32f4-compile-all:
+      #     requires:
+      #       - unittests-linux-generic
+      #       - stm32f4-examples
+      # - stm32f7-compile-all:
+      #     requires:
+      #       - unittests-linux-generic
+      #       - stm32-examples
+      # - stm32g0-compile-all:
+      #     requires:
+      #       - unittests-linux-generic
+      #       - stm32-examples
+      # - stm32l1-compile-all:
+      #     requires:
+      #       - unittests-linux-generic
+      #       - stm32-examples
+      # - stm32l4-compile-all:
+      #     requires:
+      #       - unittests-linux-generic
+      #       - stm32-examples
+      # - stm32g4-compile-all:
+      #     requires:
+      #       - unittests-linux-generic
+      #       - stm32-examples
+      # - upload-docs:
+      #     filters:
+      #       branches:
+      #         only: develop
+      #     requires:
+      #       - build-docs
+      #       - avr-compile-all
+      #       - stm32f0-compile-all
+      #       - stm32f1-compile-all
+      #       - stm32f2-compile-all
+      #       - stm32f3-compile-all
+      #       - stm32f4-compile-all
+      #       - stm32f7-compile-all
+      #       - stm32g0-compile-all
+      #       - stm32l1-compile-all
+      #       - stm32l4-compile-all
+      # - build-docs:
+      #     requires:
+      #       - avr-compile-all
+      #       - stm32f0-compile-all
+      #       - stm32f1-compile-all
+      #       - stm32f2-compile-all
+      #       - stm32f3-compile-all
+      #       - stm32g0-compile-all
+      #       - stm32g4-compile-all
