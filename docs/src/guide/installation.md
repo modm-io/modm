@@ -96,7 +96,7 @@ some of these libraries as well, depending on what modm modules you use:
 
 ## Windows
 
-We will use Anaconda to create a new Python 3 environment and install all
+We will use [Anaconda](https://www.anaconda.com/) ([Miniconda](http://conda.pydata.org/miniconda.html) [Windows installation](https://docs.conda.io/en/latest/miniconda.html#windows-installers) is sufficient) to create a new Python 3 environment and install all
 necessary packages:
 
     conda create --name modm python=3 pip
