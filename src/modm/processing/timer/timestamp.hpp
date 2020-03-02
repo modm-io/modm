@@ -40,9 +40,9 @@ public:
 	typedef modm::SignedType<T> SignedType;
 
 public:
-	/// @param time in ms
-	GenericTimestamp(const Type time = 0) :
-		time(time)
+	/// @param initialTime in ms
+	GenericTimestamp(const Type initialTime = 0) :
+		time(initialTime)
 	{
 	}
 
