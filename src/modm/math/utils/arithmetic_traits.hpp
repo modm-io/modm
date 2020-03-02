@@ -135,7 +135,7 @@ namespace detail
 
 	template<typename T, typename = std::enable_if_t<
 		std::is_integral_v<T> && !std::is_same_v<std::decay_t<T>, bool>
-	>>
+	> >
 	using enable_if_int = T;
 
 	template<typename T>
