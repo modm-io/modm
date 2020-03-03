@@ -44,7 +44,8 @@ modm::platform::Timer{{ id }}::disable()
 void
 modm::platform::Timer{{ id }}::setMode(Mode mode, SlaveMode slaveMode,
 		SlaveModeTrigger slaveModeTrigger, MasterMode masterMode,
-		bool enableOnePulseMode)
+		bool enableOnePulseMode, bool bufferAutoReloadRegister,
+		bool limitUpdateEventRequestSource)
 {
 	// disable timer
 	TIM{{ id }}->CR1 = 0;
@@ -60,13 +61,19 @@ modm::platform::Timer{{ id }}::setMode(Mode mode, SlaveMode slaveMode,
 	}
 	%% endif
 
-	// ARR Register is buffered, only Under/Overflow generates update interrupt
+	uint32_t cr1 = static_cast<uint32_t>(mode);
+	if(bufferAutoReloadRegister)
+	{
+		cr1 |= TIM_CR1_ARPE;
+	}
+	if(limitUpdateEventRequestSource)
+	{
+		cr1 |= TIM_CR1_URS;
+	}
 	if (enableOnePulseMode) {
-		TIM{{ id }}->CR1 = TIM_CR1_ARPE | TIM_CR1_URS | TIM_CR1_OPM
-										| static_cast<uint32_t>(mode);
+		TIM{{ id }}->CR1 = cr1 | TIM_CR1_OPM;
 	} else {
-		TIM{{ id }}->CR1 = TIM_CR1_ARPE | TIM_CR1_URS
-										| static_cast<uint32_t>(mode);
+		TIM{{ id }}->CR1 = cr1;
 	}
 	TIM{{ id }}->CR2 = static_cast<uint32_t>(masterMode);
 	TIM{{ id }}->SMCR = static_cast<uint32_t>(slaveMode)

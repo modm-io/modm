@@ -152,7 +152,9 @@ public:
 			SlaveMode slaveMode = SlaveMode::Disabled,
 			SlaveModeTrigger slaveModeTrigger = static_cast<SlaveModeTrigger>(0),
 			MasterMode masterMode = MasterMode::Reset,
-			bool enableOnePulseMode = false);
+			bool enableOnePulseMode = false,
+			bool bufferAutoReloadRegister = true,
+			bool limitUpdateEventRequestSource = true);
 
 	static inline void
 	setPrescaler(uint16_t prescaler)
