@@ -376,6 +376,12 @@ public:
 		TIM{{ id }}->DIER &= ~interrupt.value;
 	}
 
+	static inline InterruptFlag_t
+	getEnabledInterrupts()
+	{
+		return InterruptFlag_t(TIM{{ id }}->DIER);
+	}
+
 	static inline void
 	enableDmaRequest(DmaRequestEnable dmaRequests)
 	{
