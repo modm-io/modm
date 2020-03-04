@@ -179,3 +179,31 @@ modm::platform::Timer{{ id }}::enableInterruptVector(bool enable, uint32_t prior
 	}
 %% endfor
 }
+
+// ----------------------------------------------------------------------------
+%% if ((id <= 5) or (id in [8, 9, 12]))
+bool
+modm::platform::Timer{{ id }}::isChannelConfiguredAsInput(uint32_t channel)
+{
+	bool isInput = false;
+	switch (channel) {
+		case 1:
+			isInput = TIM{{ id }}->CCMR1 & TIM_CCMR1_CC1S;
+			break;
+		case 2:
+			isInput = TIM{{ id }}->CCMR1 & TIM_CCMR1_CC2S;
+			break;
+%% if (id <= 5)
+		case 3:
+			isInput = TIM{{ id }}->CCMR2 & TIM_CCMR2_CC3S;
+			break;
+		case 4:
+			isInput = TIM{{ id }}->CCMR2 & TIM_CCMR2_CC4S;
+			break;
+%% endif
+		default:
+			break;
+	}
+	return isInput;
+}
+%% endif

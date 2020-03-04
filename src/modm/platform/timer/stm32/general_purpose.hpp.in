@@ -349,7 +349,29 @@ public:
 		}
 	}
 
+	%% if (id !=6 and id != 7)
+	/// Returns if the capture/compare channel of the timer is configured as input.
+	///
+	%% if (id <= 5)
+	/// @param channel may be [1..4]
+	%% elif (id in [8, 9, 12])
+	/// @param channel may be [1..2]
+	%% endif
+	/// @return `false` if configured as *output*; `true` if configured as *input*
+	%% if (id in [10, 11, 13, 14])
+	static inline bool
+	isChannelConfiguredAsInput()
+	{
+		return TIM{{ id }}->CCMR1 & TIM_CCMR1_CC1S;
+	}
 
+	%% else
+	static bool
+	isChannelConfiguredAsInput(uint32_t channel);
+
+	%% endif
+
+	%% endif
 	static inline void
 	setCompareValue(uint32_t channel, Value value)
 	{
