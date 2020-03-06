@@ -8,6 +8,8 @@
   <options>
     <option name="modm:target">atmega328p-au</option>
     <option name="modm:platform:clock:f_cpu">16000000</option>
+    <option name="modm:build:avrdude.programmer">arduino</option>
+    <option name="modm:build:avrdude.baudrate">115200</option>
   </options>
   <modules>
     <module>modm:board:arduino-uno</module>

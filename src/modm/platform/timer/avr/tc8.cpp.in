@@ -1,0 +1,15 @@
+/*
+ * Copyright (c) 2019, Pavel Pletenev
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+#include <avr/io.h>
+#include "timer_{{ id }}.hpp"
+
+modm::platform::Timer{{ id }}::Control_t modm::platform::Timer{{ id }}::tccr{0};
+uint8_t modm::platform::Timer{{ id }}::overflow{0};
