@@ -4,6 +4,7 @@
  * Copyright (c) 2014-2018, Niklas Hauser
  * Copyright (c) 2017, Fabian Greif
  * Copyright (c) 2018, Christopher Durand
+ * Copyright (c) 2019, Benjamin Weps
  *
  * This file is part of the modm project.
  *
@@ -213,6 +214,7 @@ public:
 	static void
 	enableStatusChangeInterrupt(uint32_t interruptEnable,
 			uint32_t interruptPriority);
+
 };
 
 }	// namespace platform

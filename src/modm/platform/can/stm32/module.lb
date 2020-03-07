@@ -123,6 +123,10 @@ class Instance(Module):
         env.template("can.hpp.in", "can_{}.hpp".format(self.instance))
         env.template("can.cpp.in", "can_{}.cpp".format(self.instance))
 
+        env.collect(":platform:cortex-m:vector_hooks",
+                    "CAN{0}_TX:Can{0}_Tx".format(self.instance),
+                    "CAN{0}_RX0:Can{0}_Rx0".format(self.instance),
+                    "CAN{0}_RX1:Can{0}_Rx1".format(self.instance))
 
 def init(module):
     module.name = ":platform:can"
@@ -179,3 +183,7 @@ def build(env):
     if "instance" not in driver:
         env.template("can.hpp.in")
         env.template("can.cpp.in")
+
+    if device.identifier.family == "f0":
+        env.collect(":platform:cortex-m:vector_hooks",
+                    "CEC_CAN:Can_GenericIsr")

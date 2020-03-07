@@ -15,7 +15,6 @@
 def common_vector_table_location(env):
     return env.get(":platform:cortex-m:vector_table_location", "rom")
 
-
 def common_vector_table(env):
     """
     Computes vector table properties:
@@ -55,12 +54,14 @@ def common_vector_table(env):
     for vector in driver["vector"]:
         interrupts[int(vector["position"])] = vector["name"] + "_IRQHandler"
 
+
     properties = {
         "core": core,
         "vector_table_location": common_vector_table_location(env),
         "vector_table": interrupts,
         "highest_irq": max(interrupts.keys()) + 1,
     }
+
     return properties
 
 
@@ -138,6 +139,12 @@ def common_linkerscript(env):
     properties.update(common_memories(env))
     return properties
 
+def common_default_vectors(env):
+    vectors = dict()
+    for vectorString in env.collector_values(":platform:cortex-m:vector_hooks"):
+        tokens = vectorString.split(':')
+        vectors[tokens[0]+"_IRQHandler"]={'name':tokens[0],'call':tokens[1]}
+    return vectors
 
 def init(module):
     module.name = ":platform:cortex-m"
@@ -222,6 +229,23 @@ def prepare(module, options):
             description="Maximum required size of the process stack",
             minimum=0))
 
+
+    vectors = [v["name"] for v in options[":target"].get_driver("core")["vector"]]
+    def validate_vector(value):
+        if ":" not in value:
+            raise ValueError("Input must be formatted as 'vector:function[:priority]'!")
+        name = value.split(":")[0]
+        if name not in vectors:
+            from lbuild.exception import _bp, _hl
+            raise ValueError(_hl("Vector '{}' is unknown!\n".format(name)) +
+                             "Available vectors are:\n\n" + _bp(vectors))
+
+    module.add_collector(
+        StringCollector(
+            name="vector_hooks",
+            description="Default interrupt vectors for the enabled peripherals",
+            validate=validate_vector))
+
     module.add_query(
         EnvironmentQuery(name="vector_table", factory=common_vector_table))
     module.add_query(
@@ -260,7 +284,6 @@ def build(env):
     # startup script
     env.copy("reset_handler.sx")
     env.template("startup.c.in")
-    env.template("vectors.c.in")
 
     # dealing with runtime assertions
     env.copy("assert.cpp")
@@ -301,3 +324,11 @@ def build(env):
     if env.has_module(":architecture:unaligned"):
         env.template("unaligned.hpp.in")
 
+def post_build(env):
+    env.substitutions = env.query("vector_table")
+    env.substitutions["partname"] = env[":target"].partname
+    env.substitutions["with_fault_storage"] = env.has_module(":platform:fault")
+    env.substitutions["vector_hooks"] = common_default_vectors(env)
+    env.outbasepath = "modm/src/modm/platform/core"
+
+    env.template("vectors.c.in")
