@@ -354,26 +354,27 @@ jobs:
       #       apt install -y nodejs npm
       #       npm install -g broken-link-checker-local
       #       blcl modm/docs/modm.io/docs -ro --host-requests 100 --filter-level 1
-      - persist_to_workspace:
-          root: docs
-          paths:
-            - modm.io
 
-  upload-docs:
+
+  build-upload-docs:
     docker:
       - image: modm/modm-build:latest
     steps:
-      - checkout
-      - attach_workspace:
-          at: /tmp/docs
       - add_ssh_keys:
           fingerprints:
             - "8c:e7:b6:51:2a:40:66:e6:e9:50:ea:fe:38:49:1d:3f"
+      - checkout
       - run:
-          name: Clone Old Docs
+          name: Update submodules and install lbuild
+          command: |
+            (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
+      - run:
+          name: Build Homepage
           command: |
             git clone --depth 1 --no-checkout git@github.com:modm-ext/modm.io.git docs/modm.io
-            cp -R /tmp/docs/modm.io/ docs/
+            python3 tools/scripts/synchronize_docs.py
+            python3 tools/scripts/generate_module_docs.py
+            (cd docs && mkdocs build)
       - run:
           name: Push New Docs to Github
           command: |
@@ -409,75 +410,107 @@ workflows:
   version: 2
   build:
     jobs:
-      - stm32f4-examples
-      - unittests-linux-generic
-      - avr-examples
-      - stm32-examples
-
-      - api-docs-all:
+      # Examples
+      - stm32f4-examples:
           filters:
             branches:
-              only: develop
+              ignore: /^develop.*/
+      - unittests-linux-generic:
+          filters:
+            branches:
+              ignore: /^develop.*/
+      - avr-examples:
+          filters:
+            branches:
+              ignore: /^develop.*/
+      - stm32-examples:
+          filters:
+            branches:
+              ignore: /^develop.*/
+
+      # Compile all targets
       - avr-compile-all:
           requires:
             - unittests-linux-generic
             - avr-examples
+          filters:
+            branches:
+              ignore: /^develop.*/
       - stm32f0-compile-all:
           requires:
             - unittests-linux-generic
             - stm32-examples
+          filters:
+            branches:
+              ignore: /^develop.*/
       - stm32f1-compile-all:
           requires:
             - unittests-linux-generic
             - stm32-examples
+          filters:
+            branches:
+              ignore: /^develop.*/
       - stm32f2-compile-all:
           requires:
             - unittests-linux-generic
+          filters:
+            branches:
+              ignore: /^develop.*/
       - stm32f3-compile-all:
           requires:
             - unittests-linux-generic
             - stm32-examples
+          filters:
+            branches:
+              ignore: /^develop.*/
       - stm32f4-compile-all:
           requires:
             - unittests-linux-generic
             - stm32f4-examples
+          filters:
+            branches:
+              ignore: /^develop.*/
       - stm32f7-compile-all:
           requires:
             - unittests-linux-generic
             - stm32-examples
+          filters:
+            branches:
+              ignore: /^develop.*/
       - stm32g0-compile-all:
           requires:
             - unittests-linux-generic
             - stm32-examples
+          filters:
+            branches:
+              ignore: /^develop.*/
       - stm32l1-compile-all:
           requires:
             - unittests-linux-generic
             - stm32-examples
+          filters:
+            branches:
+              ignore: /^develop.*/
       - stm32l4-compile-all:
           requires:
             - unittests-linux-generic
             - stm32-examples
+          filters:
+            branches:
+              ignore: /^develop.*/
       - stm32g4-compile-all:
           requires:
             - unittests-linux-generic
             - stm32-examples
-      - upload-docs:
           filters:
             branches:
-              only: develop
-          requires:
-            - build-docs
-            - avr-compile-all
-            - stm32f0-compile-all
-            - stm32f1-compile-all
-            - stm32f2-compile-all
-            - stm32f3-compile-all
-            - stm32f4-compile-all
-            - stm32f7-compile-all
-            - stm32g0-compile-all
-            - stm32l1-compile-all
-            - stm32l4-compile-all
+              ignore: /^develop.*/
+
+      # Build test of docs
       - build-docs:
+          filters:
+            branches:
+              ignore: /^develop.*/
           requires:
             - avr-compile-all
             - stm32f0-compile-all
@@ -486,3 +519,14 @@ workflows:
             - stm32f3-compile-all
             - stm32g0-compile-all
             - stm32g4-compile-all
+
+
+      # Build all docs only on develop
+      - api-docs-all:
+          filters:
+            branches:
+              only: /^develop.*/
+      - build-upload-docs:
+          filters:
+            branches:
+              only: /^develop.*/
