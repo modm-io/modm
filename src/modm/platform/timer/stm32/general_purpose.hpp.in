@@ -221,7 +221,8 @@ public:
 
 	static void
 	configureOutputChannel(uint32_t channel, OutputCompareMode_t mode,
-			Value compareValue, PinState out = PinState::Enable);
+			Value compareValue, PinState out = PinState::Enable,
+			bool enableComparePreload = true);
 
 	/// Switch to Pwm Mode 2
 	///

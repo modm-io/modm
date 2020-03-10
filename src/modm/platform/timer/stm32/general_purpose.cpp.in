@@ -128,7 +128,8 @@ modm::platform::Timer{{ id }}::configureInputChannel(uint32_t channel,
 // ----------------------------------------------------------------------------
 void
 modm::platform::Timer{{ id }}::configureOutputChannel(uint32_t channel,
-		OutputCompareMode_t mode, Value compareValue, PinState out)
+		OutputCompareMode_t mode, Value compareValue, PinState out,
+		bool enableComparePreload)
 {
 	channel -= 1;	// 1..4 -> 0..3
 
@@ -137,8 +138,12 @@ modm::platform::Timer{{ id }}::configureOutputChannel(uint32_t channel,
 
 	setCompareValue(channel + 1, compareValue);
 
-	// enable preload (the compare value is loaded at each update event)
-	uint32_t flags = mode.value | TIM_CCMR1_OC1PE;
+	uint32_t flags = mode.value;
+	if(enableComparePreload)
+	{
+		// enable preload (the compare value is loaded at each update event)
+		flags |= TIM_CCMR1_OC1PE;
+	}
 
 	if (channel <= 1)
 	{
