@@ -134,6 +134,8 @@ def common_linkerscript(env):
             env.collector_values(":platform:cortex-m:linkerscript.table_extern.copy")]),
         "linkerscript_extern_heap": "\n".join([m.strip() for m in
             env.collector_values(":platform:cortex-m:linkerscript.table_extern.heap")]),
+
+        "with_cpp_exceptions": env.get(":stdc++:exceptions", False),
     }
     properties.update(common_memories(env))
     return properties

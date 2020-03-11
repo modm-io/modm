@@ -215,7 +215,7 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 %% endif
 	} >{{memory}}
 
-%% if 0
+%% if with_cpp_exceptions
 	.ARM.extab : ALIGN(4)
 	{
 		*(.ARM.extab* .gnu.linkonce.armextab.*)

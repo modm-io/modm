@@ -19,10 +19,15 @@ def init(module):
 # C++ Standard Environment
 
 Refines the C++ language to make it easier to use on embedded targets.
-The compiler options are appended with:
+Depending on the module options, the compiler options are appended with either:
 
 - `-fno-exceptions`: no C++ exceptions.
 - `-fno-rtti`: no C++ run-time type information.
+
+or:
+
+- `-fexceptions`: with C++ exceptions.
+- `-frtti`: with C++ run-time type information.
 
 ## AVR
 
@@ -34,7 +39,7 @@ See https://github.com/modm-io/avr-libstdcpp.
 Additional compiler options:
 
 - `-fno-threadsafe-statics`: No thread-safe static initialization provided.
-- `--specs=nano.specs`: use Newlib Nano.
+- `--specs=nano.specs`: use Newlib Nano (when not using exceptions).
 - `--specs=nosys.specs`: No additional C library features are implemented.
 """
 
@@ -50,6 +55,16 @@ def prepare(module, options):
             BooleanOption(
                 name="use_modm_assert", default=True,
                 description="Assert on exception in stdlib. Set to False to save flash."))
+
+    elif is_cortex_m:
+        module.add_option(
+            BooleanOption(
+                name="exceptions", default=False,
+                description=descr_exceptions))
+        module.add_option(
+            BooleanOption(
+                name="rtti", default=False,
+                description=descr_rtti))
 
     module.depends(":architecture:assert",
                    ":architecture:memory")
@@ -76,8 +91,38 @@ def build(env):
         env.copy("newdelete_cortex.cpp", "newdelete.cpp")
 
     # Compilation flags
-    env.collect(":build:cxxflags", "-fuse-cxa-atexit", "-fno-threadsafe-statics",
-                                   "-fno-exceptions", "-fno-unwind-tables", "-fno-rtti")
+    env.collect(":build:cxxflags", "-fuse-cxa-atexit", "-fno-threadsafe-statics")
+    if env.get("exceptions", False):
+        env.collect(":build:cxxflags", "-fexceptions", "-funwind-tables")
+    else:
+        env.collect(":build:cxxflags", "-fno-exceptions", "-fno-unwind-tables")
+    if env.get("rtti", False):
+        env.collect(":build:cxxflags", "-frtti")
+    else:
+        env.collect(":build:cxxflags", "-fno-rtti")
 
     if is_cortex_m:
-        env.collect(":build:linkflags", "--specs=nosys.specs", "--specs=nano.specs")
+        env.collect(":build:linkflags", "--specs=nosys.specs")
+        if not env.get("exceptions", False):
+            # Newlib Nano does not support C++ exceptions at all
+            env.collect(":build:linkflags", "--specs=nano.specs")
+
+# ============================ Option Descriptions ============================
+
+descr_exceptions = """# C++ Exceptions
+
+Enables the full use of C++ exception handling.
+
+!!! warning "Check your code size"
+    The inclusion of the stack unwind tables will increase your code size quite
+    a bit. Check whether your target has enough memory for this!
+"""
+
+descr_rtti = """# C++ Runtime Type Information
+
+Enables the full use of C++ runtime type information.
+
+!!! warning "Check your code size"
+    The inclusion of the RTTI information will increase your code size quite a
+    bit. Check whether your target has enough memory for this!
+"""
