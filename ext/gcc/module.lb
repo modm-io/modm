@@ -16,29 +16,49 @@
 def init(module):
     module.name = ":stdc++"
     module.description = """\
-# C++ Standard Library
+# C++ Standard Environment
 
-A partial port of GCC 8 libstdc++ for AVR.
+Refines the C++ language to make it easier to use on embedded targets.
+
+## AVR
+
+A partial port of GCC 8 libstdc++ is provided:
 See https://github.com/modm-io/avr-libstdcpp.
 """
 
 
 def prepare(module, options):
-    if options[":target"].identifier.platform != "avr":
+    is_avr = options[":target"].identifier.platform == "avr"
+    is_cortex_m = options[":target"].has_driver("core:cortex-m*")
+    if not (is_avr or is_cortex_m):
         return False
 
-    module.add_option(
-        BooleanOption(
-            name="use_modm_assert",
-            description="Assert on error in stdlib. Set to False to save flash.",
-            default=True))
+    if is_avr:
+        module.add_option(
+            BooleanOption(
+                name="use_modm_assert", default=True,
+                description="Assert on exception in stdlib. Set to False to save flash."))
+
+    module.depends(":architecture:assert",
+                   ":architecture:memory")
 
     return True
 
 
 def build(env):
-    env.collect(":build:path.include", "modm/ext/gcc/libstdc++/include")
-
+    is_avr = env[":target"].identifier.platform == "avr"
+    is_cortex_m = env[":target"].has_driver("core:cortex-m*")
+    env.substitutions = {"target": env[":target"].identifier}
     env.outbasepath = "modm/ext/gcc"
-    env.copy(".", ignore=env.ignore_files("*.lb", "*.md", "*.in", "examples"))
-    env.template("assert.cpp.in", "assert.cpp")
+    env.template("cxxabi.cpp.in")
+
+    if is_avr:
+        env.collect(":build:path.include", "modm/ext/gcc/libstdc++/include")
+        env.copy("libstdc++", ignore=env.ignore_files("*.lb", "*.md", "*.in", "examples"))
+        env.template("assert.cpp.in", "assert.cpp")
+
+        env.copy("newdelete_avr.cpp", "newdelete.cpp")
+
+    elif is_cortex_m:
+        env.copy("libcabi_cortex.cpp", "libcabi.cpp")
+        env.copy("newdelete_cortex.cpp", "newdelete.cpp")

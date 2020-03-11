@@ -153,7 +153,8 @@ def prepare(module, options):
         ":architecture:assert",
         ":architecture:memory",
         ":platform:clock",
-        ":cmsis:device")
+        ":cmsis:device",
+        ":stdc++")
 
     module.add_option(
         EnumerationOption(
@@ -253,9 +254,6 @@ def build(env):
     env.substitutions["partname"] = env[":target"].partname
     env.substitutions["with_fault_storage"] = env.has_module(":platform:fault")
     env.outbasepath = "modm/src/modm/platform/core"
-
-    # dealing with C++
-    env.copy("cxxabi.cpp")
 
     # startup script
     env.copy("reset_handler.sx")

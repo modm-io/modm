@@ -334,6 +334,7 @@ def common_compiler_flags(compiler, target):
             "-fno-unwind-tables",
             "-fno-rtti",
             "-fno-threadsafe-statics",
+            "-fuse-cxa-atexit",
         ]
         flags["linkflags"] += [
             "-L{linkdir}",

@@ -12,10 +12,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "ram.hpp"
 #include <new>
 #include <modm/architecture/interface/memory.hpp>
 #include <modm/architecture/interface/assert.hpp>
+#include <modm/platform/core/ram.hpp>
 
 void *
 operator new(size_t size)

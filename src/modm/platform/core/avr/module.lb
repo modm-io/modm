@@ -57,11 +57,6 @@ def build(env):
     env.outbasepath = "modm/src/modm/platform/core"
 
     env.copy("main.hpp")
-    # dealing with C++
-    env.copy("cxxabi.cpp")
-
-    # everything to do with dynamic memory
-    env.copy("newdelete.cpp")
     env.copy("ram.hpp")
     env.template("ram.cpp.in")
 
