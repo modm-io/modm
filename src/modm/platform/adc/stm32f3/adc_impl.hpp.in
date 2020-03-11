@@ -167,7 +167,7 @@ modm::platform::Adc{{ id }}::setChannel(const nonstd::span<const Channel> channe
 		}
 	}
 
-	sqr1 |= channels.size();
+	sqr1 |= (channels.size() - 1);
 
 	// Write SQRx registers
 	ADC{{ id }}->SQR1 = sqr1;
@@ -193,7 +193,7 @@ modm::platform::Adc{{ id }}::setInjectedChannel(const nonstd::span<const Channel
 	{
 		reg |= (static_cast<uint8_t>(channel) & 0b11111) << (9 + (6 * i));
 	}
-	ADC{{ id }}->JSQR |= reg | channels.size();
+	ADC{{ id }}->JSQR |= reg | (channels.size() - 1);
 
 	return true;
 }

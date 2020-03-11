@@ -483,10 +483,10 @@ private:
 	static inline bool
 	setSequenceChannel(const int index, const Channel channel);
 
-	static uint32_t sqr1;
-	static uint32_t sqr2;
-	static uint32_t sqr3;
-	static uint32_t sqr4;
+	static inline uint32_t sqr1 = 0;
+	static inline uint32_t sqr2 = 0;
+	static inline uint32_t sqr3 = 0;
+	static inline uint32_t sqr4 = 0;
 
 public:
 	template< template<Peripheral _> class... Signals >
