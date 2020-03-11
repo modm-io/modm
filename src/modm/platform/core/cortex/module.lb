@@ -259,6 +259,7 @@ def build(env):
     env.copy("reset_handler.sx")
     env.template("startup.c.in")
     env.template("vectors.c.in")
+    env.collect(":build:linkflags", "-nostartfiles")
 
     # dealing with runtime assertions
     env.copy("assert.cpp")
@@ -274,6 +275,7 @@ def build(env):
     # GNU Build ID
     if env.has_module(":architecture:build_id"):
         env.copy("build_id.cpp")
+        env.collect(":build:linkflags", "-Wl,--build-id=sha1")
 
     if env.has_module(":architecture:clock"):
         # modm-test implements the clock methods itself
@@ -289,6 +291,10 @@ def build(env):
         env.copy("heap_tlsf.cpp")
     elif env["allocator"] == "block":
         env.copy("heap_block_allocator.cpp")
+    env.collect(":build:linkflags", "-Wl,-wrap,_calloc_r",
+                                    "-Wl,-wrap,_free_r",
+                                    "-Wl,-wrap,_malloc_r",
+                                    "-Wl,-wrap,_realloc_r")
 
     if env.has_module(":architecture:atomic"):
         env.copy("atomic_lock.hpp")
@@ -298,4 +304,27 @@ def build(env):
 
     if env.has_module(":architecture:unaligned"):
         env.template("unaligned.hpp.in")
+
+    # Linkerscript
+    env.collect(":build:linkflags", "-L{linkdir}", "-Tlinkerscript.ld",
+                                    "-Wl,--no-wchar-size-warning")
+
+    # Compilation for FPU
+    core = env[":target"].get_driver("core")["type"]
+    cpu = core.replace("fd", "").replace("f", "").replace("+", "plus")
+    env.collect(":build:archflags", "-mcpu={}".format(cpu), "-mthumb")
+
+    single_precision = True
+    fpu = core.replace("cortex-m", "").replace("+", "")
+    if "f" in fpu:
+        fpu_spec = {
+            "4f": "-mfpu=fpv4-sp-d16",
+            "7f": "-mfpu=fpv5-sp-d16",
+            "7fd": "-mfpu=fpv5-d16",
+        }[fpu]
+        env.collect(":build:archflags", "-mfloat-abi=hard", fpu_spec)
+        single_precision = ("-sp-" in fpu_spec)
+    if single_precision:
+        env.collect(":build:ccflags", "-fsingle-precision-constant",
+                                      "-Wdouble-promotion")
 

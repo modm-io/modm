@@ -13,7 +13,13 @@
 
 def init(module):
     module.name = ":platform:core"
-    module.description = "AVR Core"
+    module.description = """\
+# AVR Core
+
+Implements the interfaces defined in the `:architecture` modules.
+Adds the `-mmcu={target}` compile flag.
+
+"""
 
 def prepare(module, options):
     if not options[":target"].has_driver("core:avr*"):
@@ -43,17 +49,14 @@ def prepare(module, options):
     return True
 
 def build(env):
-    device = env[":target"]
-    driver = device.get_driver("core")
-
-    properties = device.properties
-    properties["target"] = target = device.identifier
-    properties["driver"] = driver
+    target = env[":target"]
+    is_xmega = "xmega" in target.get_driver("core")["type"]
 
     env.outbasepath = "modm/link"
     env.copy("linkerscript/linkerscript.ld", "linkerscript.ld")
+    env.collect(":build:linkflags", "-L{linkdir}", "-Tlinkerscript.ld")
 
-    env.substitutions = properties
+    env.substitutions = {"target": target.identifier}
     env.outbasepath = "modm/src/modm/platform/core"
 
     env.copy("main.hpp")
@@ -82,6 +85,15 @@ def build(env):
 
     env.template("interrupts.hpp.in")
 
-    if "xmega" in driver["type"]:
+    if is_xmega:
         env.copy("utils.hpp")
         env.copy("utils.cpp")
+
+    # avr-gcc only accepts certain device strings for its -mmcu flag
+    # See https://gcc.gnu.org/onlinedocs/gcc/AVR-Options.html
+    mmcu = target.partname.split("-")[0]
+    for suffix in {"v", "f", "l", "rc"}:
+        mmcu = mmcu[:-2] + mmcu[-2:].replace(suffix, "")
+    env.collect(":build:archflags","-mmcu={}".format(mmcu))
+
+

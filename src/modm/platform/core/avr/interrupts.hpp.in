@@ -39,7 +39,7 @@ disableInterrupts()
 	cli();
 }
 
-%% if "xmega" in driver["type"]
+%% if target.family in ["xmega"]
 /// Used to set the interrupt level of all modules.
 enum class
 InterruptLevel : uint8_t

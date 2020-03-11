@@ -19,11 +19,23 @@ def init(module):
 # C++ Standard Environment
 
 Refines the C++ language to make it easier to use on embedded targets.
+The compiler options are appended with:
+
+- `-fno-exceptions`: no C++ exceptions.
+- `-fno-rtti`: no C++ run-time type information.
 
 ## AVR
 
 A partial port of GCC 8 libstdc++ is provided:
 See https://github.com/modm-io/avr-libstdcpp.
+
+## ARM Cortex-M
+
+Additional compiler options:
+
+- `-fno-threadsafe-statics`: No thread-safe static initialization provided.
+- `--specs=nano.specs`: use Newlib Nano.
+- `--specs=nosys.specs`: No additional C library features are implemented.
 """
 
 
@@ -62,3 +74,10 @@ def build(env):
     elif is_cortex_m:
         env.copy("libcabi_cortex.cpp", "libcabi.cpp")
         env.copy("newdelete_cortex.cpp", "newdelete.cpp")
+
+    # Compilation flags
+    env.collect(":build:cxxflags", "-fuse-cxa-atexit", "-fno-threadsafe-statics",
+                                   "-fno-exceptions", "-fno-unwind-tables", "-fno-rtti")
+
+    if is_cortex_m:
+        env.collect(":build:linkflags", "--specs=nosys.specs", "--specs=nano.specs")

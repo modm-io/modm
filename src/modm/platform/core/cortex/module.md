@@ -288,3 +288,22 @@ env.collect(":platform:cortex-m:linkerscript.table_extern.heap", linkerscript_he
     and paste the result *as is* into the linkerscripts. No input validation is
     performed, so if you receive linker errors with your additions, please check
     the GNU LD documentation first.
+
+
+### Compiler Options
+
+This module adds these architecture specific [compiler options][options]:
+
+- `-mcpu=cortex-m{type}`: the target to compile for.
+- `-mthumb`: only Thumb2 instruction set is supported.
+- `-mfloat-abi=hard`: if FPU available use the fastest ABI available.
+- `-mfpu=fpv{4, 5}-{sp}-d16`: single or double precision FPU.
+- `-fsingle-precision-constant`: if SP-FPU, treat all FP constants as SP.
+- `-Wdouble-promotion`: if SP-FPU, warn if FPs are promoted to doubles.
+
+In addition, these linker options are added:
+
+- `-nostartfiles`: modm implements its own startup script.
+- `-wrap,_{calloc, malloc, realloc, free}_r`: reimplemented Newlib with our own allocator.
+
+[options]: https://gcc.gnu.org/onlinedocs/gcc/Option-Summary.html

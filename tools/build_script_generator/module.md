@@ -155,33 +155,15 @@ For *debug builds*:
 #### Only C++
 
 - `-std=c++17`: use C++17
-- `-fno-exceptions`: no exceptions.
-- `-fno-rtti`: no run-time type information.
+
+For exception and RTTI flags, see `modm:stdc++` module.
 
 #### Linker
 
 - `--gc-section`: garbage collecting sections throws out a lot of unused data/code.
 - `-L{linkdir} -Tlinkerscript.ld`: modm uses a custom linkerscript.
 
-### Only AVR
-
-- `-mmcu={target}`: the target to compile for.
-
-### Only ARM Cortex-M
-
-- `-mcpu=cortex-m{type}`: the target to compile for.
-- `-mthumb`: only Thumb2 instruction set is supported.
-- `-mfloat-abi=hard`: if FPU available use the fastest ABI available.
-- `-mfpu=fpv{4, 5}-{sp}-d16`: single or double precision FPU.
-- `-fsingle-precision-constant`: if SP-FPU, treat all FP constants as SP.
-- `-Wdouble-promotion`: if SP-FPU, warn if FPs are promoted to doubles.
-
-In addition, these linker options are added:
-
-- `-nostartfiles`: modm implements its own startup script.
-- `--specs=nano.specs`: use Newlib Nano.
-- `--specs=nosys.specs`: modm does not use C stdlib features.
-- `-wrap,_{calloc, malloc, realloc, free}_r`: reimplemented Newlib with our own allocator.
+For target specific flags, see the `modm:platform:core` and related modules.
 
 
 [options]: https://gcc.gnu.org/onlinedocs/gcc/Option-Summary.html
