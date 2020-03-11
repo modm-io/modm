@@ -357,11 +357,13 @@ public:
 	/// @param channel may be [1..4]
 	%% elif (id in [8, 9, 12])
 	/// @param channel may be [1..2]
+	%% else
+	/// @param channel is not used
 	%% endif
 	/// @return `false` if configured as *output*; `true` if configured as *input*
 	%% if (id in [10, 11, 13, 14])
 	static inline bool
-	isChannelConfiguredAsInput()
+	isChannelConfiguredAsInput([[maybe_unused]] uint32_t channel = 1)
 	{
 		return TIM{{ id }}->CCMR1 & TIM_CCMR1_CC1S;
 	}
