@@ -185,7 +185,8 @@ void
 modm::platform::Adc{{ id }}::startConversion(void)
 {
 	// TODO: maybe add more interrupt flags
-	acknowledgeInterruptFlag(InterruptFlag::EndOfSampling | InterruptFlag::Overrun);
+	acknowledgeInterruptFlag(InterruptFlag::EndOfRegularConversion |
+			InterruptFlag::EndOfSampling | InterruptFlag::Overrun);
 	// starts single conversion for the regular group
 	ADC{{ id }}->CR |= ADC_CR_ADSTART;
 }
