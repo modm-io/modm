@@ -13,7 +13,7 @@
 #include <bits/functexcept.h>
 #include <modm/math/utils/bit_constants.hpp>
 
-%% if options["use_modm_assert"]
+%% if options["assert_on_exception"]
 #include <modm/architecture/interface/assert.hpp>
 
 #define __modm_stdcpp_failure(failure) modm_assert(false, "stdc++", "stdc++", failure);__builtin_abort();

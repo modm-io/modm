@@ -17,18 +17,12 @@
 extern "C"
 {
 
-/**
- * \brief Pure-virtual workaround.
- *
- * The libc does not support a default implementation for handling
- * possible pure-virtual calls. This is a short and empty workaround for this.
- */
-void
-__cxa_pure_virtual()
-{
-	modm_assert_debug(0, "cxa", "virtual", "pure");
-}
+void __cxa_pure_virtual()
+{ modm_assert_debug(0, "cxa", "virtual", "pure"); __builtin_trap(); }
+void __cxa_deleted_virtual()
+{ modm_assert_debug(0, "cxa", "virtual", "deleted"); __builtin_trap(); }
 
+void* __dso_handle = (void*) &__dso_handle;
 %% if core.startswith("avr")
 int __cxa_atexit(void (*)(void *), void *, void *)
 %% else
@@ -38,7 +32,46 @@ int __aeabi_atexit(void (*)(void *), void *, void *)
 {
 	return 0;
 }
-
-void* __dso_handle = (void*) &__dso_handle;
-
 }
+
+%% if with_threadsafe_statics
+#include <atomic>
+/* One-time construction API, see ARM IHI0041D section 3.2.3.
+ * The ARM C++ ABI mandates the guard to be 32-bit aligned, 32-bit values.
+ */
+enum
+{
+	UNINITIALIZED = 0,
+	INITIALIZED = 1,
+	INITIALIZING = 0x100,
+};
+
+// This function is only called when `(guard & 1) != 1`!
+extern "C" int __cxa_guard_acquire(int *guard)
+{
+	std::atomic_int *atomic_guard = reinterpret_cast<std::atomic_int *>(guard);
+	if (atomic_guard->exchange(INITIALIZING) == INITIALIZING)
+	{
+		modm_assert_debug(0, "cxa", "guard", "recursion", guard);
+		return 0;
+	}
+	return 1;
+}
+
+// After this function the compiler expects `(guard & 1) == 1`!
+extern "C" void __cxa_guard_release(int *guard) noexcept
+{
+	std::atomic_int *atomic_guard = reinterpret_cast<std::atomic_int *>(guard);
+	atomic_guard->store(INITIALIZED);
+}
+
+// Called if the initialization terminates by throwing an exception.
+// After this function the compiler expects `(guard & 3) == 0`!
+extern "C" void __cxa_guard_abort([[maybe_unused]] int *guard) noexcept
+{
+%% if with_exceptions
+	std::atomic_int *atomic_guard = reinterpret_cast<std::atomic_int *>(guard);
+	atomic_guard->store(UNINITIALIZED);
+%% endif
+}
+%% endif

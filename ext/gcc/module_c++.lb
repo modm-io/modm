@@ -33,12 +33,6 @@ or:
 
 A partial port of GCC 8 libstdc++ is provided:
 See https://github.com/modm-io/avr-libstdcpp.
-
-## ARM Cortex-M
-
-Additional compiler options:
-
-- `-fno-threadsafe-statics`: No thread-safe static initialization provided.
 """
 
 
@@ -52,7 +46,7 @@ def prepare(module, options):
     if is_avr:
         module.add_option(
             BooleanOption(
-                name="use_modm_assert", default=True,
+                name="assert_on_exception", default=True,
                 description="Assert on exception in stdlib. Set to False to save flash."))
 
     elif is_cortex_m:
@@ -64,6 +58,10 @@ def prepare(module, options):
             BooleanOption(
                 name="rtti", default=False,
                 description=descr_rtti))
+        module.add_option(
+            BooleanOption(
+                name="safe_statics", default=True,
+                description=descr_safe_statics))
 
     module.depends(":architecture:assert", ":architecture:memory", ":stdc")
     return True
@@ -73,8 +71,14 @@ def build(env):
     core = env[":target"].get_driver("core")["type"]
     is_avr = core.startswith("avr")
     is_cortex_m = core.startswith("cortex-m")
+    with_exceptions = env.get("exceptions", False)
+    with_threadsafe_statics = env.get("safe_statics", False)
 
-    env.substitutions = {"core": core}
+    env.substitutions = {
+        "core": core,
+        "with_exceptions": with_exceptions,
+        "with_threadsafe_statics": with_threadsafe_statics
+    }
     env.outbasepath = "modm/ext/gcc"
     env.template("cxxabi.cpp.in")
 
@@ -87,12 +91,16 @@ def build(env):
     elif is_cortex_m:
         env.copy("newdelete_cortex.cpp", "newdelete.cpp")
 
-    # Compilation flags
-    env.collect(":build:cxxflags", "-fuse-cxa-atexit", "-fno-threadsafe-statics")
-    if env.get("exceptions", False):
+    env.collect(":build:cxxflags", "-fuse-cxa-atexit")
+    # Threadsafe statics
+    if not with_threadsafe_statics:
+        env.collect(":build:cxxflags", "-fno-threadsafe-statics")
+    # Compiler options for C++ Exceptions
+    if with_exceptions:
         env.collect(":build:cxxflags", "-fexceptions", "-funwind-tables")
     else:
         env.collect(":build:cxxflags", "-fno-exceptions", "-fno-unwind-tables")
+    # Compiler options for C++ RTTI
     if env.get("rtti", False):
         env.collect(":build:cxxflags", "-frtti")
     else:
@@ -117,4 +125,16 @@ Enables the full use of C++ runtime type information.
 !!! warning "Check your code size"
     The inclusion of the RTTI information will increase your code size quite a
     bit. Check whether your target has enough memory for this!
+"""
+
+descr_safe_statics = """# C++ Safe Statics Initialization
+
+Enables safe initialization of statics inside functions and interrupts.
+In case of recursive initialization the debug assertion `cxa.guard.recursion`
+is raised.
+
+Further reading on this topic:
+- [C++ ABI for the ARM Architecture](https://static.docs.arm.com/ihi0041/d/IHI0041D_cppabi.pdf)
+- https://manishearth.github.io/blog/2015/06/26/adventures-in-systems-programming-c-plus-plus-local-statics/
+- https://iamroman.org/blog/2017/04/cpp11-static-init/
 """
