@@ -29,7 +29,7 @@ __cxa_pure_virtual()
 	modm_assert_debug(0, "cxa", "virtual", "pure");
 }
 
-%% if target.platform in ["avr"]
+%% if core.startswith("avr")
 int __cxa_atexit(void (*)(void *), void *, void *)
 %% else
 // ARM EABI specifies __aeabi_atexit instead of __cxa_atexit

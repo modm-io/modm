@@ -1,0 +1,49 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2016-2017, Niklas Hauser
+# Copyright (c) 2017-2018, Fabian Greif
+# Copyright (c) 2018, Christopher Durand
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":stdc"
+    module.description = """\
+# C Standard Environment
+
+Refines the C language to make it easier to use on embedded targets.
+
+## ARM Cortex-M
+
+Additional compiler options:
+
+- `--specs=nano.specs`: use Newlib Nano (when not using exceptions).
+- `--specs=nosys.specs`: No additional C library features are implemented.
+"""
+
+def prepare(module, options):
+    core = options[":target"].get_driver("core")["type"]
+    if not (core.startswith("avr") or core.startswith("cortex-m")):
+        return False
+    module.depends(":architecture:assert")
+    return True
+
+def build(env):
+    core = env[":target"].get_driver("core")["type"]
+    env.outbasepath = "modm/ext/gcc"
+
+    if core.startswith("cortex-m"):
+        env.copy("cabi_cortex.c", "cabi.c")
+
+        # Compiler options for targets
+        env.collect(":build:linkflags", "--specs=nosys.specs")
+        if not env.get(":stdc++:exceptions", False):
+            # Newlib Nano does not support C++ exceptions at all
+            env.collect(":build:linkflags", "--specs=nano.specs")

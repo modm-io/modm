@@ -39,14 +39,13 @@ See https://github.com/modm-io/avr-libstdcpp.
 Additional compiler options:
 
 - `-fno-threadsafe-statics`: No thread-safe static initialization provided.
-- `--specs=nano.specs`: use Newlib Nano (when not using exceptions).
-- `--specs=nosys.specs`: No additional C library features are implemented.
 """
 
 
 def prepare(module, options):
-    is_avr = options[":target"].identifier.platform == "avr"
-    is_cortex_m = options[":target"].has_driver("core:cortex-m*")
+    core = options[":target"].get_driver("core")["type"]
+    is_avr = core.startswith("avr")
+    is_cortex_m = core.startswith("cortex-m")
     if not (is_avr or is_cortex_m):
         return False
 
@@ -66,16 +65,16 @@ def prepare(module, options):
                 name="rtti", default=False,
                 description=descr_rtti))
 
-    module.depends(":architecture:assert",
-                   ":architecture:memory")
-
+    module.depends(":architecture:assert", ":architecture:memory", ":stdc")
     return True
 
 
 def build(env):
-    is_avr = env[":target"].identifier.platform == "avr"
-    is_cortex_m = env[":target"].has_driver("core:cortex-m*")
-    env.substitutions = {"target": env[":target"].identifier}
+    core = env[":target"].get_driver("core")["type"]
+    is_avr = core.startswith("avr")
+    is_cortex_m = core.startswith("cortex-m")
+
+    env.substitutions = {"core": core}
     env.outbasepath = "modm/ext/gcc"
     env.template("cxxabi.cpp.in")
 
@@ -83,11 +82,9 @@ def build(env):
         env.collect(":build:path.include", "modm/ext/gcc/libstdc++/include")
         env.copy("libstdc++", ignore=env.ignore_files("*.lb", "*.md", "*.in", "examples"))
         env.template("assert.cpp.in", "assert.cpp")
-
         env.copy("newdelete_avr.cpp", "newdelete.cpp")
 
     elif is_cortex_m:
-        env.copy("libcabi_cortex.cpp", "libcabi.cpp")
         env.copy("newdelete_cortex.cpp", "newdelete.cpp")
 
     # Compilation flags
@@ -101,11 +98,6 @@ def build(env):
     else:
         env.collect(":build:cxxflags", "-fno-rtti")
 
-    if is_cortex_m:
-        env.collect(":build:linkflags", "--specs=nosys.specs")
-        if not env.get("exceptions", False):
-            # Newlib Nano does not support C++ exceptions at all
-            env.collect(":build:linkflags", "--specs=nano.specs")
 
 # ============================ Option Descriptions ============================
 
