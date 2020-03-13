@@ -22,6 +22,8 @@ Refines the C language to make it easier to use on embedded targets.
 
 ## ARM Cortex-M
 
+For ARMv6-M, C11 atomics are implemented via atomic lock.
+
 Additional compiler options:
 
 - `--specs=nano.specs`: use Newlib Nano (when not using exceptions).
@@ -32,7 +34,11 @@ def prepare(module, options):
     core = options[":target"].get_driver("core")["type"]
     if not (core.startswith("avr") or core.startswith("cortex-m")):
         return False
+
     module.depends(":architecture:assert")
+    if core.startswith("cortex-m0"):
+        module.depends(":architecture:atomic")
+
     return True
 
 def build(env):
@@ -41,6 +47,8 @@ def build(env):
 
     if core.startswith("cortex-m"):
         env.copy("cabi_cortex.c", "cabi.c")
+        if core.startswith("cortex-m0"):
+            env.template("atomics_c11_cortex.cpp.in")
 
         # Compiler options for targets
         env.collect(":build:linkflags", "--specs=nosys.specs")

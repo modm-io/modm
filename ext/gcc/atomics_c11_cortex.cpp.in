@@ -1,0 +1,150 @@
+/*
+ * Copyright (c) 2020, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+
+#include <cstring>
+#include <modm/platform/core/atomic_lock.hpp>
+
+/* Cortex-M0 does not have hardware support for true atomics, like STREX/LDREX.
+ * The toolchain does not implement the intrinsics, instead linking to them, so
+ * that an external library can implement them as they wish.
+ * Here we wrap all operations into an atomic lock, which globally disables
+ * interrupts. This isn't high performance, but we have no other choice here.
+ *
+ * See https://gcc.gnu.org/onlinedocs/gcc/_005f_005fatomic-Builtins.html
+ */
+
+using _a8 = uint8_t;
+using _a16 = uint16_t;
+using _a32 = unsigned int;
+using _a64 = uint64_t;
+
+// =========================== atomics for >64 bits ===========================
+%% macro atomic_load(len)
+extern "C" _a{{len}}
+__atomic_load_{{len//8}}(const volatile void *ptr, int /*memorder*/)
+{
+    modm::atomic::Lock _;
+    return *reinterpret_cast<const volatile _a{{len}}*>(ptr);
+}
+%% endmacro
+
+extern "C" void
+__atomic_load_c(size_t size, const void *src, void *dest, int /*memorder*/)
+{
+    modm::atomic::Lock _;
+    std::memcpy(dest, src, size);
+}
+
+
+%% macro atomic_store(len)
+extern "C" void
+__atomic_store_{{len//8}}(volatile void *ptr, _a{{len}} value, int /*memorder*/)
+{
+    modm::atomic::Lock _;
+    *reinterpret_cast<volatile _a{{len}}*>(ptr) = value;
+}
+%% endmacro
+
+extern "C" void
+__atomic_store_c(size_t size, void *dest, const void *src, int /*memorder*/)
+{
+    modm::atomic::Lock _;
+    std::memcpy(dest, src, size);
+}
+
+
+%% macro atomic_exchange(len)
+extern "C" _a{{len}}
+__atomic_exchange_{{len//8}}(volatile void *ptr, _a{{len}} desired, int /*memorder*/)
+{
+    modm::atomic::Lock _;
+    const _a{{len}} previous = *reinterpret_cast<const volatile _a{{len}}*>(ptr);
+    *reinterpret_cast<volatile _a{{len}}*>(ptr) = desired;
+    return previous;
+}
+%% endmacro
+
+extern "C" void
+__atomic_exchange_c(size_t size, void *ptr, void *val, void *ret, int /*memorder*/)
+{
+    modm::atomic::Lock _;
+    std::memcpy(ret, ptr, size);
+    std::memcpy(ptr, val, size);
+}
+
+
+%% macro atomic_compare_exchange(len)
+extern "C" bool
+__atomic_compare_exchange_{{len//8}}(volatile void *ptr, void *expected, _a{{len}} desired,
+                                    bool /*weak*/, int /*success_memorder*/, int /*failure_memorder*/)
+{
+    modm::atomic::Lock _;
+    const _a{{len}} current = *reinterpret_cast<const volatile _a{{len}}*>(ptr);
+    if (current != *reinterpret_cast<_a{{len}}*>(expected))
+    {
+        *reinterpret_cast<_a{{len}}*>(expected) = current;
+        return false;
+    }
+    *reinterpret_cast<volatile _a{{len}}*>(ptr) = desired;
+    return true;
+}
+%% endmacro
+
+extern "C" bool
+__atomic_compare_exchange_c(size_t len, void *ptr, void *expected, void *desired,
+                            bool /*weak*/, int /*success_memorder*/, int /*failure_memorder*/)
+{
+    modm::atomic::Lock _;
+    if (std::memcmp(ptr, expected, len) == 0)
+    {
+        std::memcpy(ptr, desired, len);
+        return true;
+    }
+    std::memcpy(expected, ptr, len);
+    return false;
+}
+
+
+%% macro atomic_fetch(len)
+    %% for name, op in [("add", "+"), ("sub", "-"), ("and", "&"), ("or", "|"), ("xor", "^"), ("nand", "&")]
+        %% set prefix = "~" if name == "nand" else ""
+extern "C" _a{{len}}
+__atomic_fetch_{{name}}_{{len//8}}(volatile void *ptr, _a{{len}} value, int /*memorder*/)
+{
+    modm::atomic::Lock _;
+    const _a{{len}} previous = *reinterpret_cast<const volatile _a{{len}}*>(ptr);
+    *reinterpret_cast<volatile _a{{len}}*>(ptr) = {{prefix}}(previous {{op}} value);
+    return previous;
+}
+extern "C" _a{{len}}
+__atomic_{{name}}_fetch_{{len//8}}(volatile void *ptr, _a{{len}} value, int /*memorder*/)
+{
+    modm::atomic::Lock _;
+    const _a{{len}} current = {{prefix}}(*reinterpret_cast<const volatile _a{{len}}*>(ptr) {{op}} value);
+    *reinterpret_cast<volatile _a{{len}}*>(ptr) = current;
+    return current;
+}
+    %% endfor
+%% endmacro
+
+%% for length in [8, 16, 32, 64]
+// ============================ atomics for {{length}} bits ============================
+{{ atomic_load(length) }}
+
+{{ atomic_store(length) }}
+
+{{ atomic_exchange(length) }}
+
+{{ atomic_compare_exchange(length) }}
+
+{{ atomic_fetch(length) }}
+%% endfor
