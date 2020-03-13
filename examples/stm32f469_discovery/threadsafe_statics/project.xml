@@ -1,0 +1,10 @@
+<library>
+  <extends>modm:disco-f469ni</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/stm32f469_discovery/threadsafe_statics</option>
+  </options>
+  <modules>
+    <module>modm:platform:gpio</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>
