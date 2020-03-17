@@ -177,7 +177,7 @@ def template_overview(output_dir, device_list, template_path):
     with open(str(output_dir) + "/index.html","w+") as f:
         f.write(html)
     with open(str(output_dir) + "/robots.txt","w+") as f:
-        robots_txt = "User-agent: *\nDisallow: /\n"""
+        robots_txt = "User-agent: *\n"
         f.write(robots_txt)
 
 
