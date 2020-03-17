@@ -14,6 +14,7 @@
 
 #include <unittest/testsuite.hpp>
 
+/// @ingroup modm_test_test_math
 class Polygon2DTest : public unittest::TestSuite
 {
 public:

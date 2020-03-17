@@ -15,6 +15,7 @@
 
 #include <unittest/testsuite.hpp>
 
+/// @ingroup modm_test_test_math
 class MatrixVectorTest : public unittest::TestSuite
 {
 public:

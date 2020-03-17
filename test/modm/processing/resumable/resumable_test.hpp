@@ -15,6 +15,7 @@
 #include <unittest/testsuite.hpp>
 
 // @author Niklas Hauser
+/// @ingroup modm_test_test_processing
 class ResumableTest : public unittest::TestSuite
 {
 public:

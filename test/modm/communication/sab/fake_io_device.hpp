@@ -16,6 +16,7 @@
 
 #include <stdint.h>
 
+/// @ingroup modm_test_test_communication
 class FakeIODevice
 {
 public:

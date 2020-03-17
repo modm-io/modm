@@ -13,6 +13,7 @@
 
 #include <unittest/testsuite.hpp>
 
+/// @ingroup modm_test_test_processing
 class TimeoutTest : public unittest::TestSuite
 {
 public:

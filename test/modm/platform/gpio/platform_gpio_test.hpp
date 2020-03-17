@@ -11,6 +11,7 @@
 
 #include <unittest/testsuite.hpp>
 
+/// @ingroup modm_test_test_platform_gpio
 class PlatformGpioTest : public unittest::TestSuite
 {
 public:

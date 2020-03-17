@@ -14,6 +14,7 @@
 
 #include <unittest/testsuite.hpp>
 
+/// @ingroup modm_test_test_container
 class DynamicArrayTest : public unittest::TestSuite
 {
 public:

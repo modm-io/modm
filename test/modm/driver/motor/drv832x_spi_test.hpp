@@ -10,6 +10,7 @@
 
 #include <unittest/testsuite.hpp>
 
+/// @ingroup modm_test_test_driver
 class Drv832xSpiTest : public unittest::TestSuite
 {
 public:

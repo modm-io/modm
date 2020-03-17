@@ -14,6 +14,7 @@
 
 #include <unittest/testsuite.hpp>
 
+/// @ingroup modm_test_test_platform
 class CanBitTimingsTest : public unittest::TestSuite
 {
 public:

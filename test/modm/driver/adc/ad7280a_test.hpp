@@ -16,6 +16,7 @@
 
 #include <unittest/testsuite.hpp>
 
+/// @ingroup modm_test_test_driver
 class Ad7280aTest : public unittest::TestSuite
 {
 public:

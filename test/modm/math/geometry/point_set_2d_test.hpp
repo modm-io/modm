@@ -14,6 +14,7 @@
 
 #include <unittest/testsuite.hpp>
 
+/// @ingroup modm_test_test_math
 class PointSet2DTest : public unittest::TestSuite
 {
 public:

@@ -16,6 +16,7 @@
 
 #include <unittest/testsuite.hpp>
 
+/// @ingroup modm_test_test_driver
 class CanLawicelFormatterTest : public unittest::TestSuite
 {
 public:

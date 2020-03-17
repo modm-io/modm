@@ -10,6 +10,7 @@
 
 #include <unittest/testsuite.hpp>
 
+/// @ingroup modm_test_test_driver
 class Ltc2984Test : public unittest::TestSuite
 {
 public:

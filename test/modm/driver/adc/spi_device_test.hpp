@@ -16,6 +16,7 @@
 
 #include <unittest/testsuite.hpp>
 
+/// @ingroup modm_test_test_driver
 class SpiDeviceTest : public unittest::TestSuite
 {
 public:

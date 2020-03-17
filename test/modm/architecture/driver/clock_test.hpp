@@ -19,6 +19,8 @@
 
 // The only purpose of the test is to ensure that MODM_CLOCK_TESTMODE is
 // set to 1 when running the other tests.
+//
+/// @ingroup modm_test_test_architecture
 class ClockTest : public unittest::TestSuite
 {
 public:

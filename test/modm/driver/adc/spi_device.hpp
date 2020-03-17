@@ -16,6 +16,7 @@
 #include <cstddef>
 #include <stdint.h>
 
+/// @ingroup modm_test_test_driver
 namespace test
 {
 	#ifdef ENABLE_MACRO_EXPORT
@@ -32,6 +33,8 @@ namespace test
 	 * \code
 	 *
 	 * \endcode
+	 *
+	 * @ingroup modm_test_test_driver
 	 */
 	struct Transmission
 	{
@@ -53,6 +56,8 @@ namespace test
 	 * to allow the usage with static classes.
 	 *
 	 * \author	Fabian Greif
+	 *
+	 * @ingroup modm_test_test_driver
 	 */
 	class SpiDevice
 	{

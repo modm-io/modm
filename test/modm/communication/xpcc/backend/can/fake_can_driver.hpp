@@ -17,6 +17,7 @@
 #include <modm/container/linked_list.hpp>
 #include <modm/architecture/interface/can.hpp>
 
+/// @ingroup modm_test_test_communication
 class FakeCanDriver : public modm::Can
 {
 public:

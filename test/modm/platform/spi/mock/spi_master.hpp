@@ -25,7 +25,8 @@ namespace platform
  * Mock serial peripheral interface for unittests.
  *
  * @author	Raphael Lehmann
- * @ingroup	test
+ *
+ * @ingroup modm_test_test_platform_spi
  */
 class SpiMasterMock : public modm::SpiMaster
 {

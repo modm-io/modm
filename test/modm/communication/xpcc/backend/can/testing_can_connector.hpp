@@ -19,6 +19,7 @@
 
 #include "fake_can_driver.hpp"
 
+/// @ingroup modm_test_test_communication
 class TestingCanConnector : public xpcc::CanConnector<FakeCanDriver>
 {
 public:

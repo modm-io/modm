@@ -20,6 +20,7 @@
 
 #include "message.hpp"
 
+/// @ingroup modm_test_test_communication
 class FakeBackend : public xpcc::BackendInterface
 {
 public:

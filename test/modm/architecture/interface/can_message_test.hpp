@@ -18,7 +18,7 @@
 #include <unittest/testsuite.hpp>
 #include <modm/architecture/interface/can_message.hpp>
 
-// @author strogly-typed
+/// @ingroup modm_test_test_architecture
 class CanMessageTest : public unittest::TestSuite
 {
 public:

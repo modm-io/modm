@@ -16,6 +16,7 @@
 #include <modm/communication/sab/slave.hpp>
 #include "fake_io_device.hpp"
 
+/// @ingroup modm_test_test_communication
 class SlaveTest : public unittest::TestSuite
 {
 public:

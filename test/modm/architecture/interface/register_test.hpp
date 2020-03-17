@@ -19,6 +19,7 @@
 namespace modm
 {
 
+/// @ingroup modm_test_test_architecture
 template<typename T>
 struct testing
 {
@@ -95,6 +96,7 @@ protected:
 	typedef Flags8<> Test5_t;
 };
 
+/// @ingroup modm_test_test_architecture
 enum class
 Test4
 {
@@ -116,6 +118,7 @@ MODM_TYPE_FLAGS(Test4_t)
 }
 
 // @author Niklas Hauser
+/// @ingroup modm_test_test_architecture
 class RegisterTest : public unittest::TestSuite, public modm::testing<void>
 {
 public:

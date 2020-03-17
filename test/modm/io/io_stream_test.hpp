@@ -17,6 +17,7 @@
 #include <unittest/testsuite.hpp>
 #include <modm/io/iostream.hpp>
 
+/// @ingroup modm_test_test_io
 class IoStreamTest : public unittest::TestSuite
 {
 public:

@@ -30,6 +30,7 @@
  * Component 1 and 2 implemented locally, Component 10 somewhere outside.
  *
  *
+ * @ingroup modm_test_test_communication
  */
 class DispatcherTest : public unittest::TestSuite
 {

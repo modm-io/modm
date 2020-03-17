@@ -23,9 +23,9 @@
 #include "message.hpp"
 
 /**
- *
- *
  * \see	DispatcherTest
+ *
+ * @ingroup modm_test_test_communication
  */
 class FakePostman : public xpcc::Postman
 {

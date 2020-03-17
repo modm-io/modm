@@ -18,6 +18,7 @@
 #include <modm/container/linked_list.hpp>
 #include <modm/container/smart_pointer.hpp>
 
+/// @ingroup modm_test_test_communication
 class Timeline
 {
 public:
