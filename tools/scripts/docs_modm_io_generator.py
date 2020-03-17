@@ -148,9 +148,15 @@ def create_target(argument):
         builder = lbuild.api.Builder(options=options)
         builder.load([Path(modm_path) / "repo.lb", Path(modm_path) / "test/repo.lb"])
         modules = sorted(builder.parser.modules.keys())
+
         # Only allow the first board module to be built (they overwrite each others files)
         first_board = next((m for m in modules if ":board:" in m), None)
         modules = [m for m in modules if ":board" not in m or m == first_board]
+
+        # Remove :architecture modules. Only the :architecture modules for which actual implementations
+        #  exist are include as dependencies of the :platform modules.
+        modules = [m for m in modules if ":architecture" not in m]
+
         builder.build(device, modules)
 
         print('Executing: (cd {}/modm/docs/ && doxypress doxypress.json)'.format(device))
