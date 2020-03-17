@@ -77,7 +77,9 @@ def get_targets():
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--test", "-t", action='store_true', help="Test mode: generate only a few targets")
+    test_group = parser.add_mutually_exclusive_group()
+    test_group.add_argument("--test", "-t", action='store_true', help="Test mode: generate only a few targets. List includes targets with multiple board modules.")
+    test_group.add_argument("--test2", "-t2", action='store_true', help="Test mode: generate only a few targets. List has targets from the real target list.")
     parser.add_argument("--jobs", "-j", type=int, default=2, help="Number of parallel doxygen processes")
     parser.add_argument("--local-temp", "-l", action='store_true', help="Create temporary directory inside current working directory")
     group = parser.add_mutually_exclusive_group(required=True)
@@ -90,6 +92,8 @@ def main():
     if args.test:
         # test list
         device_list = ["hosted-linux", "atmega328p-au", "stm32f103c8t6", "stm32g474cet6"]
+    elif args.test2:
+        device_list = ["hosted-linux", "atmega328p-pu", "stm32f103zgt7", "stm32g474vet7"]
     else:
         device_list = get_targets()
 
