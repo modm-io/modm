@@ -1,7 +1,9 @@
 PROJECT_NAME           = modm
 INPUT                  = dox/ \
-                         ../src/
-STRIP_FROM_INC_PATH    = ../src/
+                         ../src/ \
+                         ../../modm-test/src/
+STRIP_FROM_INC_PATH    = ../src/ \
+                         ../../modm-test/src/
 RECURSIVE              = YES
 FILE_PATTERNS          = *.hpp \
                          *.h \

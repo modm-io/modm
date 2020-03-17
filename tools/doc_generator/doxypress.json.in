@@ -226,6 +226,7 @@
         "input-recursive": true,
         "input-source": [
             "dox/",
+            "../../modm-test/src/",
             "../src/"
         ],
         "mdfile-mainpage": "README.md"
