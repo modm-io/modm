@@ -348,15 +348,10 @@ public:
 static bool testing_nesting_assertion(false);
 
 modm::Abandonment
-resumable_test_nesting_handler(const char * module,
-							   const char * location,
-							   const char * function,
-							   uintptr_t)
+resumable_test_nesting_handler(const modm::AssertionInfo &info)
 {
 	if (testing_nesting_assertion) {
-		TEST_ASSERT_EQUALS_STRING(module, MODM_RESUMABLE_MODULE_NAME);
-		TEST_ASSERT_EQUALS_STRING(location, "begin");
-		TEST_ASSERT_EQUALS_STRING(function, "nesting");
+		TEST_ASSERT_EQUALS_STRING(info.name, "rf.nesting");
 		return modm::Abandonment::Ignore;
 	}
 	return modm::Abandonment::DontCare;

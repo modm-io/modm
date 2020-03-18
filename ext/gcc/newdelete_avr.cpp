@@ -17,36 +17,37 @@
 #include <modm/architecture/interface/assert.hpp>
 #include <modm/platform/core/ram.hpp>
 
+static inline void *
+modm_new(size_t size)
+{
+	void * ptr = modm::platform::allocateMemory(size);
+	modm_assert_continue_fail(ptr, "new",
+			"C++ new() operator failed to allocate!", size);
+	return ptr;
+}
+
 void *
 operator new(size_t size)
 {
-	void * ptr = modm::platform::allocateMemory(size);
-	modm_assert(ptr, "core", "heap", "new", size);
-	return ptr;
+	return modm_new(size);
 }
 
 void *
 operator new[](size_t size)
 {
-	void * ptr = modm::platform::allocateMemory(size);
-	modm_assert(ptr, "core", "heap", "new", size);
-	return ptr;
+	return modm_new(size);
 }
 
 void *
 operator new(size_t size, modm::MemoryTraits)
 {
-	void * ptr = modm::platform::allocateMemory(size);
-	modm_assert(ptr, "core", "heap", "new", size);
-	return ptr;
+	return modm_new(size);
 }
 
 void *
 operator new[](size_t size, modm::MemoryTraits)
 {
-	void * ptr = modm::platform::allocateMemory(size);
-	modm_assert(ptr, "core", "heap", "new", size);
-	return ptr;
+	return modm_new(size);
 }
 
 void*

@@ -193,8 +193,7 @@
 	constexpr uint16_t rfCounter = __COUNTER__; \
 	this->template checkRfType<true>(); \
 	constexpr uint8_t rfIndex = 0; \
-	if (!this->nestingOkRf()) { \
-		modm_assert(false, MODM_RESUMABLE_MODULE_NAME, "begin", "nesting", this); \
+	if (not this->nestingOkRf()) { \
 		return {modm::rf::NestingError}; \
 	} \
 	switch (this->pushRf(0)) { \

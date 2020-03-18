@@ -82,8 +82,9 @@ initializeMemory(void)
 void *
 modm::platform::allocateMemory(std::size_t requestedSize)
 {
-	if (!modm_assert_debug(requestedSize > 0 && requestedSize <= MAX_BLOCK_PARTS * BLOCK_SIZE,
-						   "core", "heap", "malloc", requestedSize))
+	if (!modm_assert_continue_fail_debug(
+			(requestedSize > 0 && requestedSize <= MAX_BLOCK_PARTS * BLOCK_SIZE),
+			 "malloc", "No memory left in heap!", requestedSize))
 		return 0;
 
 	requestedSize += 2;	// bytes needed for the mangement
@@ -143,7 +144,8 @@ modm::platform::allocateMemory(std::size_t requestedSize)
 	avail = cp - __brkval;
 	*/
 
-	if (!modm_assert_debug(slotsAvailable >= neededSlots, "core", "heap", "malloc", requestedSize))
+	if (!modm_assert_continue_fail_debug(slotsAvailable >= neededSlots, "malloc2",
+			"No memory left in heap! Cannot enlarge heap!", requestedSize))
 		return 0;
 
 	*p = neededSlots;

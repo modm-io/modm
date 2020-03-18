@@ -14,7 +14,6 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/debug/error_report.hpp>
 #include <modm/architecture/driver/atomic/queue.hpp>
 #include <modm/utils.hpp>
 #include <modm/architecture/interface/assert.hpp>
@@ -49,7 +48,7 @@ static modm::atomic::Queue<RxMessage, {{ options["buffer.rx"] }}> rxQueue;
 
 
 // ----------------------------------------------------------------------------
-void
+bool
 modm::platform::Can{{ id }}::initializeWithPrescaler(
 		uint16_t prescaler, uint8_t bs1, uint8_t bs2,
 		uint32_t interruptPriority, Mode startupMode, bool overwriteOnOverrun)
@@ -102,7 +101,9 @@ modm::platform::Can{{ id }}::initializeWithPrescaler(
 		// The CAN hardware waits until the current CAN activity (transmission
 		// or reception) is completed before entering the initialization mode.
 	}
-	modm_assert(deadlockPreventer > 0, "can", "init", "timeout", {{ 0 if id == '' else id }});
+	if (not modm_assert_continue_fail_debug(deadlockPreventer > 0, "can.init",
+			"CAN::initialize() timed out on entering initialization!", {{ 0 if id == '' else id }}))
+		return false;
 
 	// Enable Interrupts:
 	// FIFO1 Overrun, FIFO0 Overrun
@@ -152,7 +153,8 @@ modm::platform::Can{{ id }}::initializeWithPrescaler(
 	while ((({{ reg }}->MSR & CAN_MSR_INAK) == CAN_MSR_INAK) and (deadlockPreventer-- > 0))  {
 		// wait for the normal mode
 	}
-	modm_assert(deadlockPreventer > 0, "can", "init", "timeout2", {{ 0 if id == '' else id }});
+	return modm_assert_continue_fail_debug(deadlockPreventer > 0, "can.init2",
+		"CAN::initialize() timed out on leaving initialization!", {{ 0 if id == '' else id }});
 }
 
 // ----------------------------------------------------------------------------
@@ -255,9 +257,9 @@ MODM_ISR({{ reg }}_TX)
  */
 MODM_ISR({{ reg }}_RX0)
 {
-	if ({{ reg }}->RF0R & CAN_RF0R_FOVR0) {
-		modm::ErrorReport::report(modm::platform::CAN{{ id }}_FIFO0_OVERFLOW);
-
+	if (not modm_assert_continue_ignore(not ({{ reg }}->RF0R & CAN_RF0R_FOVR0),
+			"can.rx.hw0", "CAN receive hardware buffer overflowed!", {{ 0 if id == '' else id }}))
+	{
 		// release overrun flag & access the next message
 		{{ reg }}->RF0R = CAN_RF0R_FOVR0 | CAN_RF0R_RFOM0;
 	}
@@ -269,9 +271,8 @@ MODM_ISR({{ reg }}_RX0)
 	// Release FIFO (access the next message)
 	{{ reg }}->RF0R = CAN_RF0R_RFOM0;
 
-	if (!rxQueue.push(rxMessage)) {
-		modm::ErrorReport::report(modm::platform::CAN{{ id }}_FIFO0_OVERFLOW);
-	}
+	modm_assert_continue_ignore(rxQueue.push(rxMessage), "can.rx.sw0",
+		"CAN receive software buffer overflowed!", {{ 0 if id == '' else id }});
 %% endif
 }
 
@@ -282,9 +283,9 @@ MODM_ISR({{ reg }}_RX0)
  */
 MODM_ISR({{ reg }}_RX1)
 {
-	if ({{ reg }}->RF1R & CAN_RF1R_FOVR1) {
-		modm::ErrorReport::report(modm::platform::CAN{{ id }}_FIFO1_OVERFLOW);
-
+	if (not modm_assert_continue_ignore(not ({{ reg }}->RF1R & CAN_RF1R_FOVR1),
+			"can.rx.hw1", "CAN receive hardware buffer overflowed!", {{ 0 if id == '' else id }}))
+	{
 		// release overrun flag & access the next message
 		{{ reg }}->RF1R = CAN_RF1R_FOVR1 | CAN_RF1R_RFOM1;
 	}
@@ -296,9 +297,8 @@ MODM_ISR({{ reg }}_RX1)
 	// Release FIFO (access the next message)
 	{{ reg }}->RF1R = CAN_RF1R_RFOM1;
 
-	if (!rxQueue.push(rxMessage)) {
-		modm::ErrorReport::report(modm::platform::CAN{{ id }}_FIFO1_OVERFLOW);
-	}
+	modm_assert_continue_ignore(rxQueue.push(rxMessage), "can.rx.sw1",
+		"CAN receive software buffer overflowed!", {{ 0 if id == '' else id }});
 %% endif
 }
 
@@ -430,8 +430,8 @@ modm::platform::Can{{ id }}::sendMessage(const can::Message& message)
 	{
 		// All mailboxes used at the moment
 %% if options["buffer.tx"] > 0
-		if (!txQueue.push(message)) {
-			modm::ErrorReport::report(modm::platform::CAN{{ id }}_TX_OVERFLOW);
+		if (not modm_assert_continue_ignore(txQueue.push(message), "can.tx",
+				"CAN transmit software buffer overflowed!", {{ 0 if id == '' else id }})) {
 			return false;
 		}
 		return true;

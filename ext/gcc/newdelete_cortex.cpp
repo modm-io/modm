@@ -20,12 +20,19 @@
 
 extern "C" void * malloc_tr(size_t, uint32_t);
 
+static inline void
+assert_ptr(void *ptr, size_t size)
+{
+	modm_assert(ptr, "new",
+		"C++ new() operator failed to allocate!", size);
+}
+
 // ----------------------------------------------------------------------------
 void *
 operator new(size_t size) throw ()
 {
 	void * ptr = malloc(size);
-	modm_assert(ptr, "core", "heap", "new", size);
+	assert_ptr(ptr, size);
 	return ptr;
 }
 
@@ -33,18 +40,18 @@ void *
 operator new[](size_t size) throw ()
 {
 	void * ptr = malloc(size);
-	modm_assert(ptr, "core", "heap", "new", size);
+	assert_ptr(ptr, size);
 	return ptr;
 }
 
 void *
-operator new(size_t size, std::nothrow_t) noexcept
+operator new(size_t size, const std::nothrow_t&) noexcept
 {
 	return malloc(size);
 }
 
 void *
-operator new[](size_t size, std::nothrow_t) noexcept
+operator new[](size_t size, const std::nothrow_t&) noexcept
 {
 	return malloc(size);
 }
@@ -53,7 +60,7 @@ void *
 operator new(size_t size, modm::MemoryTraits traits) noexcept
 {
 	void * ptr = malloc_tr(size, traits.value);
-	modm_assert(ptr, "core", "heap", "new", size);
+	assert_ptr(ptr, size);
 	return ptr;
 }
 
@@ -61,7 +68,7 @@ void *
 operator new[](size_t size, modm::MemoryTraits traits) noexcept
 {
 	void * ptr = malloc_tr(size, traits.value);
-	modm_assert(ptr, "core", "heap", "new", size);
+	assert_ptr(ptr, size);
 	return ptr;
 }
 

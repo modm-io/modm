@@ -97,7 +97,9 @@ modm::Mcp2515<SPI, CS, INT>::initializeWithPrescaler(
 	// check if we could read back some of the values
 	uint8_t readback = readRegister(CNF2);
 
-	modm_assert(readback == cnf[CNF2_idx], "mcp2515", "init", "readback");
+	if (not modm_assert_continue_fail_debug(readback == cnf[CNF2_idx], "mcp2515.init",
+				"Cannot read the CNF2 register of the MCP2515!", readback))
+		return false;
 
 	// reset device to normal mode and disable the clkout pin and
 	// wait until the new mode is active

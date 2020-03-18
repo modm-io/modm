@@ -14,13 +14,7 @@
 #include <modm/architecture/interface/assert.h>
 
 // ----------------------------------------------------------------------------
-extern void modm_undefined_handler(int32_t);
-void Undefined_Handler(void)
-{
-	int32_t irqn;
-	asm volatile("mrs %[irqn], ipsr" :[irqn] "=r" (irqn));
-	modm_undefined_handler(irqn - 16);
-}
+void Undefined_Handler(void);
 /* Provide weak aliases for each Exception handler to Undefined_Handler.
  * As they are weak aliases, any function with the same name will override
  * this definition. */
@@ -61,3 +55,21 @@ FunctionPointer vectorsRom[] =
 modm_section(".vector_ram")
 FunctionPointer vectorsRam[sizeof(vectorsRom) / sizeof(FunctionPointer)];
 %% endif
+
+// ----------------------------------------------------------------------------
+// Explicitly include this BELOW the vector table to *not deal* with potential
+// re-#defines of interrupt vector names! Bad vendors!! BAD!!!
+#include <modm/platform/device.hpp>
+
+void Undefined_Handler(void)
+{
+	int32_t irqn;
+	asm volatile("mrs %[irqn], ipsr" :[irqn] "=r" (irqn));
+	irqn -= 16;
+	// Set the currently executing interrupt to the lowest priority to allow
+	// reporting of the assertion failure and disable it from firing again.
+	NVIC_SetPriority((IRQn_Type)irqn, (1ul << __NVIC_PRIO_BITS) - 1ul);
+	NVIC_DisableIRQ((IRQn_Type)irqn);
+	modm_assert_continue_fail(0, "nvic.undef",
+			"An undefined NVIC interrupt was raised!", irqn);
+}

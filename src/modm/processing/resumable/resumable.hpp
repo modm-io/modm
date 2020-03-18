@@ -18,8 +18,6 @@
 #include <stdint.h>
 #include <initializer_list>
 
-#define MODM_RESUMABLE_MODULE_NAME "resumable"
-
 namespace modm
 {
 

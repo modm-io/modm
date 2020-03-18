@@ -82,7 +82,8 @@ get_tlsf_for_ptr(void *p)
 			return pool->tlsf;
 		}
 	}
-	modm_assert_debug(0, "core", "heap", "pool");
+	modm_assert_continue_fail_debug(0, "tlsf.pool",
+			"Cannot find the right TLSF pool for pointer!", p);
 	return NULL;
 }
 
@@ -113,7 +114,8 @@ try_again:
 		goto try_again;
 	}
 	// there is no memory left even after fallback.
-	modm_assert_debug(0, "core", "heap", "malloc", size);
+	modm_assert_continue_fail_debug(0, "malloc",
+			"No memory left in any TLSF pools!", size);
 	return NULL;
 }
 
@@ -140,7 +142,8 @@ void *__wrap__realloc_r(struct _reent *r, void *p, size_t size)
 	if (!pool) return NULL;
 
 	void *ptr = tlsf_realloc(pool, p, size);
-	modm_assert_debug(p, "core", "heap", "realloc", size);
+	modm_assert_continue_fail_debug(0, "realloc",
+			"Unable to realloc in TLSF pool!", size);
 	return ptr;
 }
 

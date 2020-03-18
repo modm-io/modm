@@ -18,9 +18,9 @@ extern "C"
 {
 
 void __cxa_pure_virtual()
-{ modm_assert_debug(0, "cxa", "virtual", "pure"); __builtin_trap(); }
+{ modm_assert(0, "virt.pure", "A pure virtual function was called!"); }
 void __cxa_deleted_virtual()
-{ modm_assert_debug(0, "cxa", "virtual", "deleted"); __builtin_trap(); }
+{ modm_assert(0, "virt.del", "A deleted virtual function was called!"); }
 
 void* __dso_handle = (void*) &__dso_handle;
 %% if core.startswith("avr")
@@ -52,8 +52,8 @@ extern "C" int __cxa_guard_acquire(int *guard)
 	std::atomic_int *atomic_guard = reinterpret_cast<std::atomic_int *>(guard);
 	if (atomic_guard->exchange(INITIALIZING) == INITIALIZING)
 	{
-		modm_assert_debug(0, "cxa", "guard", "recursion", guard);
-		return 0;
+		modm_assert(0, "stat.rec",
+				"Recursive initialization of a function static!", guard);
 	}
 	return 1;
 }
