@@ -68,7 +68,10 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "modm/src/modm/board"
-    env.substitutions = {"board_has_logger": False}
+    env.substitutions = {
+        "with_logger": False,
+        "with_assert": env.has_module(":architecture:assert")
+    }
     env.template("../board.cpp.in", "board.cpp")
     env.copy('../mini_f411/board.hpp', 'board.hpp')
     env.copy('board.xml')
