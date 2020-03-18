@@ -11,29 +11,23 @@
 
 #include <modm/board.hpp>
 #include <modm/architecture/interface/assert.hpp>
-#include <avr/pgmspace.h>
 
 using modm::accessor::asFlash;
 
 // Flash support on avr-gcc is so horribly broken.
 #define IFS(s) asFlash(PSTR(s))
 
-#define MODM_CAN_MODULE_NAME 		"can"
-#define MODM_IOBUFFER_MODULE_NAME 	"iobuffer"
-#define MODM_UART_MODULE_NAME 		"uart"
-
 extern "C" void
-modm_abandon(const char * module,
-			 const char * location,
-			 const char * failure,
-			 uintptr_t context)
+modm_abandon(const modm::AssertionInfo &info)
 {
-	serialStream << IFS("Assertion '")
-			<< asFlash(module) << '.'
-			<< asFlash(location) << '.'
-			<< asFlash(failure)
-			<< IFS("' @ ") << (void *) context
-			<< IFS(" failed! Abandoning.") << modm::endl;
+	serialStream << IFS("Assertion '") << asFlash(info.name) << '\'';
+	if (info.context != uintptr_t(-1))
+		serialStream << IFS(" @ ") << (void *)info.context << IFS(" (") << (uint32_t)info.context << IFS(")");
+#if MODM_ASSERTION_INFO_HAS_DESCRIPTION
+	serialStream << IFS(" failed!\n  ") << asFlash(info.description) << IFS("\nAbandoning...\n");
+#else
+	serialStream << IFS(" failed!\nAbandoning...\n");
+#endif
 
 	Leds::setOutput();
 	while (true) {
@@ -44,57 +38,55 @@ modm_abandon(const char * module,
 	}
 }
 
+
 static modm::Abandonment
-test_assertion_handler(const char * module,
-					   const char * /* location */,
-					   const char * /* failure */,
-					   uintptr_t /* context */)
+test_assertion_handler(const modm::AssertionInfo &info)
 {
-	serialStream << IFS("#1: '") << asFlash(module) << IFS("'!") << modm::endl;
+	serialStream << IFS("#1: '") << asFlash(info.name) << IFS("'!") << modm::endl;
 	// The strings are located in FLASH!!!
-	if (strcmp_P(module, PSTR(MODM_IOBUFFER_MODULE_NAME)) == 0)
+	if (strncmp_P("io.", info.name, 3) == 0) {
+		serialStream << IFS("Ignoring assertion!") << modm::endl;
 		return modm::Abandonment::Ignore;
+	}
 	return modm::Abandonment::DontCare;
 }
 MODM_ASSERTION_HANDLER(test_assertion_handler);
 
 static modm::Abandonment
-test_assertion_handler2(const char * /* module */,
-						const char * location,
-						const char * /* failure */,
-						uintptr_t /* context */)
+test_assertion_handler2(const modm::AssertionInfo &info)
 {
-	serialStream << IFS("#2: '") << asFlash(location) << IFS("'!") << modm::endl;
+	serialStream << IFS("#2: '") << asFlash(info.name) << IFS("'!") << modm::endl;
 	return modm::Abandonment::DontCare;
 }
 MODM_ASSERTION_HANDLER(test_assertion_handler2);
 
 static modm::Abandonment
-test_assertion_handler3(const char * /* module */,
-						const char * /* location */,
-						const char * failure,
-						uintptr_t /* context */)
+test_assertion_handler3(const modm::AssertionInfo &info)
 {
-	serialStream << IFS("#3: '") << asFlash(failure) << IFS("'!") << modm::endl;
+	serialStream << IFS("#3: '") << asFlash(info.name) << IFS("'!") << modm::endl;
 	return modm::Abandonment::DontCare;
 }
 MODM_ASSERTION_HANDLER(test_assertion_handler3);
+
 
 // ----------------------------------------------------------------------------
 int main()
 {
 	Board::initialize();
 	Leds::setOutput();
+	serialStream << IFS("Starting test...\n");
 
-	modm_assert(true, MODM_CAN_MODULE_NAME, "init", "timeout");
+	// only fails for debug builds, but is ignored anyways
+	modm_assert_continue_fail(false, "io.tx",
+			"The IO transmit buffer is full!");
 
-	modm_assert_debug(false, MODM_IOBUFFER_MODULE_NAME, "tx", "full");
+	modm_assert_continue_fail_debug(false, "uart.init", "UART init failed!");
 
-	modm_assert(false, MODM_UART_MODULE_NAME, "init", "mode");
+	modm_assert(false, "can.init", "CAN init timed out!");
 
 	while (true)
 	{
-		Led3::toggle();
+		LedD13::toggle();
 		modm::delayMilliseconds(500);
 	}
 }

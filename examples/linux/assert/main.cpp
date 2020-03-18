@@ -11,32 +11,36 @@
 
 #include <modm/platform.hpp>
 #include <modm/architecture/interface/assert.hpp>
-
-#define MODM_CAN_MODULE_NAME "can"
-#define MODM_IOBUFFER_MODULE_NAME "iobuffer"
-#define MODM_UART_MODULE_NAME "uart"
+#include <modm/debug.hpp>
 
 static modm::Abandonment
-test_assertion_handler(const char * module,
-					   const char * /* location */,
-					   const char * /* failure */,
-					   uintptr_t /* context */)
+test_assertion_handler(const modm::AssertionInfo &info)
 {
-	if (strcmp(module, MODM_IOBUFFER_MODULE_NAME) == 0)
+	if (strncmp(info.name, "io.", 3) == 0) {
+		MODM_LOG_WARNING << "Ignoring all 'io.*' assertions!" << modm::endl;
 		return modm::Abandonment::Ignore;
+	}
 	return modm::Abandonment::DontCare;
 }
 MODM_ASSERTION_HANDLER(test_assertion_handler);
+
+static modm::Abandonment
+log_assertion_handler(const modm::AssertionInfo &info)
+{
+	MODM_LOG_DEBUG.printf("Assertion '%s' failed!\n", info.name);
+	return modm::Abandonment::DontCare;
+}
+MODM_ASSERTION_HANDLER_DEBUG(log_assertion_handler);
 
 // ----------------------------------------------------------------------------
 int
 main()
 {
-	modm_assert(true, MODM_CAN_MODULE_NAME, "init", "timeout");
+	modm_assert_continue_fail_debug(false, "io.tx", "IO transmit buffer is full!");
 
-	modm_assert_debug(false, MODM_IOBUFFER_MODULE_NAME, "tx", "full");
+	modm_assert_continue_fail_debug(false, "uart.init", "UART init failed!");
 
-	modm_assert(false, MODM_UART_MODULE_NAME, "init", "mode");
+	modm_assert(false, "can.init", "CAN init timed out!");
 
 	return 0;
 }
