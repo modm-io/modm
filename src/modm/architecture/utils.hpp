@@ -120,6 +120,8 @@
 	#define modm_unlikely(x)		__builtin_expect(!!(x), 0)
 	#define modm_section(s)			__attribute__((section(s)))
 	#define modm_fallthrough		__attribute__((fallthrough))
+	#define modm_noreturn			__attribute__((noreturn))
+	#define modm_warn_unused_result	__attribute__((warn_unused_result))
 
 	#ifdef MODM_COMPILER_MINGW
 	 	// FIXME: Windows Object Format PE does not support weak symbols

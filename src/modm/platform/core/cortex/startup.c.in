@@ -127,8 +127,8 @@ void __modm_startup(void)
 	main();
 
 	// If main exits, assert here in debug mode
-	modm_assert_debug(0, "core", "main", "exit");
-
+	(void) modm_assert_continue_fail_debug(0,
+			"main.exit", "The main() function returned!");
 	// Otherwise reboot
 	NVIC_SystemReset();
 }

@@ -20,7 +20,6 @@ def prepare(module, options):
         return False
 
     module.depends(
-        ":architecture:assert",
         ":architecture:memory",
         ":debug")
 
@@ -28,7 +27,7 @@ def prepare(module, options):
 
 def build(env):
     target = env[":target"].identifier
-    env.substitutions = {"target": target}
+    env.substitutions = {"target": target, "core": "hosted"}
     env.outbasepath = "modm/src/modm/platform/core"
 
     env.copy("memory.cpp")
@@ -48,10 +47,13 @@ def build(env):
             env.template("clock.cpp.in")
 
     if target.family == "windows":
-        env.log.error("Assertions are not implemented!")
+        if env.has_module(":architecture:assert"):
+            env.log.error("Assertions are not implemented!")
         if env.has_module(":architecture:delay"):
             env.log.error("Delay functions are not implemented!")
     else:
-        env.template("assert.cpp.in")
+        if env.has_module(":architecture:assert"):
+            env.template("../cortex/assert.cpp.in", "assert.cpp")
+            env.template("../cortex/assert.hpp.in", "assert.hpp")
         if env.has_module(":architecture:delay"):
             env.template("delay.hpp.in")
