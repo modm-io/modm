@@ -10,8 +10,11 @@
 // ----------------------------------------------------------------------------
 
 #include "board.hpp"
+%% if with_assert
+#include <modm/architecture/interface/assert.hpp>
+%% endif
 
-%% if board_has_logger
+%% if with_logger
 Board::LoggerDevice loggerDevice;
 
 // Set all four logger streams to use the UART
@@ -19,23 +22,25 @@ modm::log::Logger modm::log::debug(loggerDevice);
 modm::log::Logger modm::log::info(loggerDevice);
 modm::log::Logger modm::log::warning(loggerDevice);
 modm::log::Logger modm::log::error(loggerDevice);
+%% endif
 
+%% if with_assert
 modm_extern_c void
-modm_abandon(const char * module,
-			 const char * location,
-			 const char * failure,
-			 uintptr_t context)
+modm_abandon(const modm::AssertionInfo &info)
 {
-	MODM_LOG_ERROR << "Assertion '" << module << "." << location << "." << failure << "'";
-	if (context) { MODM_LOG_ERROR << " @ " << (void *) context << " (" << (uint32_t) context << ")"; }
-	MODM_LOG_ERROR << " failed! Abandoning..." << modm::endl;
+%% if with_logger
+	MODM_LOG_ERROR << "Assertion '" << info.name << "'";
+	if (info.context != uintptr_t(-1)) {
+		MODM_LOG_ERROR << " @ " << (void *) info.context <<
+						 " (" << (uint32_t) info.context << ")";
+	}
+	%% if options.get(":architecture:assert:with_description", False)
+	MODM_LOG_ERROR << " failed!\n  " << info.description << "\nAbandoning...\n";
+	%% else
+	MODM_LOG_ERROR << " failed!\nAbandoning...\n";
+	%% endif
 %% else
-modm_extern_c void
-modm_abandon(const char *,
-			 const char *,
-			 const char *,
-			 uintptr_t)
-{
+	(void)info;
 %% endif
 
 	Board::Leds::setOutput();
@@ -46,4 +51,11 @@ modm_abandon(const char *,
 		Board::Leds::write(0);
 		modm::delayMilliseconds(180);
 	}
+%% if with_logger
+	// Do not flush here otherwise you may deadlock due to waiting on the UART
+	// interrupt which may never be executed when abandoning in a higher
+	// priority Interrupt!!!
+	// MODM_LOG_ERROR << modm::flush;
+%% endif
 }
+%% endif

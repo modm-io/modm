@@ -21,7 +21,6 @@
 #include "../device.hpp"
 
 #include "can_bit_timings.hpp"
-#include "error_code.hpp"
 #include "can_filter.hpp"
 
 
@@ -71,7 +70,7 @@ public:
 
 private:
 	/// Private Initializer with computed prescaler and timing constants
-	static void
+	static bool
 	initializeWithPrescaler(uint16_t prescaler, uint8_t bs1, uint8_t bs2,
 			uint32_t interruptPriority, Mode startupMode, bool overwriteOnOverrun);
 public:
@@ -107,7 +106,7 @@ public:
 	 * 			other function from this class!
 	 */
 	template< class SystemClock, bitrate_t bitrate=kbps(125), percent_t tolerance=pct(1) >
-	static inline void
+	static inline bool
 	initialize(	uint32_t interruptPriority, Mode startupMode = Mode::Normal,
 				bool overwriteOnOverrun = true)
 	{

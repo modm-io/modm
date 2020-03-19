@@ -15,11 +15,11 @@ SECTIONS
 	.modm_assertion : AT( ADDR(.text) + SIZEOF(.text) + SIZEOF(.data))
 	{
 		. = ALIGN(2);
-		__assertion_table_start = . + SIZEOF(.data);
+		__assertion_table_start = .;
 
 		KEEP(*(.assertion))
 
-		__assertion_table_end = . + SIZEOF(.data);
+		__assertion_table_end = .;
 	}
 }
 INSERT AFTER .data

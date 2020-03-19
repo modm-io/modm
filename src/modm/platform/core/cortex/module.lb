@@ -253,8 +253,10 @@ def validate(env):
 
 def build(env):
     env.substitutions = env.query("vector_table")
-    env.substitutions["partname"] = env[":target"].partname
-    env.substitutions["with_fault_storage"] = env.has_module(":platform:fault")
+    env.substitutions.update({
+        "target": env[":target"].identifier,
+        "with_fault_storage": env.has_module(":platform:fault"),
+    })
     env.outbasepath = "modm/src/modm/platform/core"
 
     # startup script
@@ -264,7 +266,9 @@ def build(env):
     env.collect(":build:linkflags", "-nostartfiles")
 
     # dealing with runtime assertions
-    env.copy("assert.cpp")
+    if env.has_module(":architecture:assert"):
+        env.template("assert.cpp.in")
+        env.template("assert.hpp.in")
 
     # hardware init section
     env.copy("hardware_init.hpp")

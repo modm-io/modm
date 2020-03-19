@@ -56,7 +56,10 @@ def build(env):
     env.copy("linkerscript/linkerscript.ld", "linkerscript.ld")
     env.collect(":build:linkflags", "-L{linkdir}", "-Tlinkerscript.ld")
 
-    env.substitutions = {"target": target.identifier}
+    env.substitutions = {
+        "target": target.identifier,
+        "core": target.get_driver("core")["type"]
+    }
     env.outbasepath = "modm/src/modm/platform/core"
 
     env.copy("main.hpp")
@@ -64,7 +67,9 @@ def build(env):
     env.template("ram.cpp.in")
 
     # dealing with runtime assertions
-    env.copy("assert.cpp")
+    if env.has_module(":architecture:assert"):
+        env.template("../cortex/assert.cpp.in", "assert.cpp")
+        env.template("../cortex/assert.hpp.in", "assert.hpp")
 
     if env.has_module(":architecture:atomic"):
         env.copy("atomic_lock.hpp")

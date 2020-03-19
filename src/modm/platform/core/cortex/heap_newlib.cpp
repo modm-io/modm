@@ -29,7 +29,7 @@ void __modm_initialize_memory(void)
 	// find the largest heap that is DMA-able and S-Bus accessible
 	modm::platform::HeapTable::find_largest(
 		(const uint32_t **) &__brkval, (const uint32_t **) &heap_end);
-	modm_assert(__brkval, "core", "heap", "init");
+	modm_assert(__brkval, "heap.init", "Could not find main heap memory!");
 }
 
 /* Support function. Adjusts end of heap to provide more memory to
@@ -53,7 +53,8 @@ _sbrk_r(struct _reent *r,  ptrdiff_t size)
 	const uint8_t *heap = __brkval;
 	__brkval += size;
 
-	modm_assert(__brkval < heap_end, "core", "heap", "sbrk", size);
+	modm_assert(__brkval < heap_end, "heap.sbrk",
+			"Heap could not be enlarged!", size);
 
 	//  Return pointer to start of new heap area.
 	return (void*)heap;
@@ -61,19 +62,22 @@ _sbrk_r(struct _reent *r,  ptrdiff_t size)
 void *__real__malloc_r(struct _reent *r, size_t size);
 void *__wrap__malloc_r(struct _reent *r, size_t size) {
 	void * ptr = __real__malloc_r(r, size);
-	modm_assert_debug(ptr, "core", "heap", "malloc", size);
+	modm_assert_continue_fail_debug(ptr, "malloc",
+			"No memory left in Newlib heap!", size);
 	return ptr;
 }
 void *__real__calloc_r(struct _reent *r, size_t size);
 void *__wrap__calloc_r(struct _reent *r, size_t size) {
 	void * ptr = __real__calloc_r(r, size);
-	modm_assert_debug(ptr, "core", "heap", "calloc", size);
+	modm_assert_continue_fail_debug(ptr, "calloc",
+			"No memory left in Newlib heap!", size);
 	return ptr;
 }
 void *__real__realloc_r(struct _reent *r, void *p, size_t size);
 void *__wrap__realloc_r(struct _reent *r, void *p, size_t size) {
 	void * ptr = __real__realloc_r(r, p, size);
-	modm_assert_debug(ptr, "core", "heap", "realloc", size);
+	modm_assert_continue_fail_debug(ptr, "realloc",
+			"No memory left in Newlib heap!", size);
 	return ptr;
 }
 void __real__free_r(struct _reent *r, void *p);

@@ -26,9 +26,9 @@
 %# FIXME: Move out of this modules, maybe remove completely
 %# TODO: These numbers were measured from a few example applications.
 %#       A statistical analysis of the average overhead cycles is required!
-%% if partname.startswith("stm32f4")
+%% if target.family in ["f4"]
 	%% set overhead = 25
-%% elif partname.startswith("stm32f1")
+%% elif target.family in ["f1"]
 	%% set overhead = 12
 %% else
 	%% set overhead = 30

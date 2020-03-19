@@ -17,5 +17,5 @@
 	.func   Reset_Handler
 Reset_Handler:
 	bl __modm_initialize_platform
-	bl __modm_startup
+	b __modm_startup
 	.endfunc

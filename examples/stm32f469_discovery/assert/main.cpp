@@ -11,17 +11,17 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
+#include <modm/architecture/interface/assert.hpp>
+#include <string>
 
+using namespace std::string_literals;
 using namespace Board;
 
 static modm::Abandonment
-test_assertion_handler(const char * module,
-					   const char * /* location */,
-					   const char * /* failure */,
-					   uintptr_t /* context */)
+test_assertion_handler(const modm::AssertionInfo &info)
 {
-	if (not strcmp(module, "iobuffer")) {
-		MODM_LOG_ERROR << "Ignoring iobuffer full!" << modm::endl;
+	if (not strncmp(info.name, "io.", 3)) {
+		MODM_LOG_ERROR << "Ignoring all io.* assertions!" << modm::endl;
 		return modm::Abandonment::Ignore;
 	}
 	return modm::Abandonment::DontCare;
@@ -29,17 +29,14 @@ test_assertion_handler(const char * module,
 MODM_ASSERTION_HANDLER(test_assertion_handler);
 
 static modm::Abandonment
-core_assertion_handler(const char * module,
-					   const char * /* location */,
-					   const char * failure,
-					   uintptr_t context)
+core_assertion_handler(const modm::AssertionInfo &info)
 {
-	if (not memcmp(module, "core\0nvic\0undefined", 19)) {
-		MODM_LOG_ERROR.printf("Ignoring undefined IRQ handler %d!\n", context);
+	if (info.name == "nvic.undef"s) {
+		MODM_LOG_ERROR.printf("Ignoring undefined IRQ handler %d!\n", info.context);
 		return modm::Abandonment::Ignore;
 	}
-	if (not memcmp(module, "core\0heap", 9)) {
-		MODM_LOG_ERROR.printf("Ignoring 'core.heap.%s' of size 0x%x!\n", failure, context);
+	if ((info.name == "new"s) or (info.name == "malloc"s)) {
+		MODM_LOG_ERROR.printf("Ignoring '%s' of size 0x%x!\n", info.name, info.context);
 		return modm::Abandonment::Ignore;
 	}
 	return modm::Abandonment::DontCare;
@@ -51,10 +48,12 @@ int
 main()
 {
 	Board::initialize();
+	MODM_LOG_INFO << "\n=== RESTART ===\n" << modm::flush;
 
 	// trigger an IRQ with undefined handler
-	NVIC_EnableIRQ(RTC_Alarm_IRQn);
-	NVIC_SetPendingIRQ(RTC_Alarm_IRQn);
+	NVIC_EnableIRQ(OTG_FS_WKUP_IRQn);
+	NVIC_SetPendingIRQ(OTG_FS_WKUP_IRQn);
+
 
 	// trigger an out of memory
 	// we definitely don't have 32MB RAM on this board
@@ -68,13 +67,16 @@ main()
 
 	// does not fail, should not be optimized away
 	volatile bool true_condition = true;
-	modm_assert(true_condition, "can", "init", "timeout");
+	modm_assert(true_condition, "can.init",
+	            "Can::init() function has timed out!");
 
 	// only fails for debug builds, but is ignored anyways
-	modm_assert_debug(false, "iobuffer", "tx", "full");
+	modm_assert_continue_fail_debug(false, "io.tx",
+			"The IO transmit buffer is full!");
 
+	MODM_LOG_ERROR << modm::flush;
 	// "accidentally" return from main, without even returning properly!
-	// This should be caught by the debug assert core.main.exit!
+	// This should be caught by the debug assert main.exit!
 	// while (true)
 	//     {};
 	// return 0;

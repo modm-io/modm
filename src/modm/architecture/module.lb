@@ -48,13 +48,29 @@ class Assert(Module):
         module.description = FileReader("interface/assert.md")
 
     def prepare(self, module, options):
-        module.depends(":math:utils", ":architecture:accessor")
+        module.add_option(
+            BooleanOption(name="with_description",
+                          default=options[":target"].identifier.platform in ["hosted"],
+                          description=Assert.with_description_descr))
+
+        module.depends(":architecture:register")
+        if options[":target"].identifier.platform in ["avr"]:
+            module.depends(":architecture:accessor")
         return True
 
     def build(self, env):
         env.outbasepath = "modm/src/modm/architecture"
-        env.copy("interface/assert.hpp")
-        env.copy("interface/assert.h")
+        env.substitutions = {"core": env[":target"].get_driver("core")["type"]}
+        env.template("interface/assert.hpp.in")
+        env.template("interface/assert.h.in")
+
+    with_description_descr = """# Include assertion description
+
+Places the full description of a `modm_assert()` into the firmware image instead
+of only into the ELF file. This makes printing assertion information a simple
+standalone feature, fully independent of any additional script for decoding
+logging output, however, it may increase binary size considerably!
+"""
 # -----------------------------------------------------------------------------
 
 class Atomic(Module):

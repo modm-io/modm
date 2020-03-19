@@ -8,5 +8,5 @@ extern "C" void vApplicationStackOverflowHook(TaskHandle_t, const char *);
 
 void vApplicationStackOverflowHook(TaskHandle_t /*pxTask*/, const char *pcTaskName)
 {
-	modm_assert(false, "freertos", "stack", "overflow", pcTaskName);
+	modm_assert(false, "freertos.stack", "FreeRTOS detected a stack overflow!", pcTaskName);
 }

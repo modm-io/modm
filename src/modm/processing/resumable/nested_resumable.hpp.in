@@ -121,7 +121,8 @@ protected:
 	nestingOkRf() const
 	{
 %% if options["check_nesting_depth"]
-		return (rfLevel < Levels);
+		return modm_assert_continue_fail_debug(rfLevel < Levels, "rf.nest",
+		    	"Called too many nested ResumableFunctions of the same class!", this);
 %% else
 		return true;
 %% endif

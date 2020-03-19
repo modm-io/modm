@@ -39,10 +39,10 @@ extern "C"
 {
 void __modm_initialize_memory(void)
 {
-	const uint32_t *heap_start, *heap_end;
+	const uint32_t *heap_start{nullptr}, *heap_end;
 	// find the largest heap that is DMA-able and S-Bus accessible
 	modm::platform::HeapTable::find_largest(&heap_start, &heap_end);
-	modm_assert(heap_start, "core", "heap", "init");
+	modm_assert(heap_start, "heap.init", "Could not find main heap memory!");
 	// clamp the heap size to the maximum
 	if ((size_t) heap_end - (size_t) heap_start > max_heap_size) {
 		heap_end = (const uint32_t *) ((char *) heap_start + max_heap_size);
@@ -55,14 +55,17 @@ void *__wrap__malloc_r(struct _reent *r, size_t size)
 {
 	(void) r;
 	void *ptr = allocator.allocate(size);
-	modm_assert_debug(ptr, "core", "heap", "malloc", size);
+	modm_assert_continue_fail_debug(ptr, "malloc",
+			"No memory left in Block heap!", size);
 	return ptr;
 }
 
 void *__wrap__calloc_r(struct _reent *r, size_t size)
 {
 	void *ptr = __wrap__malloc_r(r, size);
-	if (modm_assert_debug(ptr, "core", "heap", "calloc", size)) {
+
+	if (modm_assert_continue_fail_debug(ptr, "calloc",
+			"No memory left in Block heap!", size)) {
 		memset(ptr, 0, size);
 	}
 	return ptr;
@@ -74,7 +77,8 @@ void *__wrap__realloc_r(struct _reent *r, void *p, size_t size)
 	(void) p;
 	(void) size;
 	// NOT IMPLEMENTED!
-	modm_assert_debug(0, "core", "heap", "realloc", size);
+	modm_assert_continue_fail_debug(0, "realloc",
+			"Not implemented for Block heap!", size);
 	return NULL;
 }
 
