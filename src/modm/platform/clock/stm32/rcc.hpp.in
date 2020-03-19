@@ -307,7 +307,93 @@ public:
 	static bool
 	enableLowSpeedExternalCrystal(uint32_t waitCycles = 2048);
 
-	// plls
+	/**
+%% if target["family"] in ["f2", "f4", "f7", "l4", "g0", "g4"]
+	 * \code
+	 * VCO input frequency = PLL input clock frequency / PLLM [with 2 <= PLLM <= 63]
+	 * VCO output frequency = VCO input frequency × PLLN [with 64 <= PLLN <= 432]
+	 * \endcode
+	 *
+	 * \param	pllM
+	 * 		Division factor for the main PLL (PLL) and
+	 * 		audio PLL (PLLI2S) input clock (with 2 <= pllM <= 63).
+	 *		The software has to set these bits correctly to ensure
+	 *		that frequency of selected source divided by pllM
+	 *		is in ranges from 1 to 2 MHz.
+	 *
+	 * \param	pllN
+	 * 		Main PLL (PLL) multiplication factor for VCO (with 64 <= pllN <= 432).
+	 * 		The software has to set these bits correctly to ensure
+	 * 		that the VCO output frequency is
+	 * 		 - 336 MHz for ST32F4. Core will run at 168 MHz.
+	 *		 - 240 MHz for ST32F2. Core will run at 120 MHz.
+	 *
+%% if target["family"] in ["l4", "g0", "g4"]
+	 * \param	pllR
+	 *
+%% else
+	 * \param	pllP
+	 *
+%% endif
+%% elif target["family"] in ["l1"]
+	 * \param	pllMul
+	 *
+	 * \param	pllDiv
+	 *
+%% else
+	 * \param	pllMul
+	 *
+%% if pllprediv2
+	 * \param	pllPrediv
+	 *
+	 * \param	pllPrediv2
+	 *
+%% elif pllprediv
+	 * \param	pllPrediv
+	 *
+%% endif
+%% endif
+	 */
+	struct PllFactors
+	{
+%% if target["family"] in ["f2", "f4", "f7", "l4", "g0", "g4"]
+		const uint8_t pllM;
+		const uint16_t pllN;
+ %% if target["family"] in ["l4", "g0", "g4"]
+		const uint8_t pllR;
+ %% else
+		const uint8_t pllP;
+ %% endif
+%% elif target["family"] in ["l1"]
+		const PllMultiplier pllMul;
+		const uint8_t pllDiv;
+%% else
+		uint8_t pllMul;
+ %% if pllprediv2
+		const uint8_t pllPrediv;
+		const uint8_t pllPrediv2;
+ %% elif pllprediv
+		const uint8_t pllPrediv;
+ %% endif
+%% endif
+	};
+
+	/**
+	 * Enable PLL.
+	 *
+	 * \param	source
+	 * 		Source select for PLL. If you are using HSE you must
+	 * 		enable it first (see enableHse()).
+	 *
+	 * \param	factors
+	 * 		Struct with all pll factors. \see PllFactors.
+	 *
+	 * \param	waitCycles
+	 * 		Number of cycles to wait for the pll to stabilise. Default: 2048.
+	 */
+	static bool
+	enablePll(PllSource source, const PllFactors& pllFactors, uint32_t waitCycles = 2048);
+
 %% if target["family"] in ["f2", "f4", "f7", "l4", "g0", "g4"]
 	/**
 	 * Enable PLL.
@@ -338,20 +424,39 @@ public:
 	 * Example:
 	 *
 	 */
-	static bool
+	[[deprecated("Use PllFactors as argument instead")]] static bool
 	enablePll(PllSource source, uint8_t pllM, uint16_t pllN,
 %% if target["family"] in ["l4", "g0", "g4"]
 	          uint8_t pllR,
 %% else
 			  uint8_t pllP,
 %% endif
-			  uint32_t waitCycles = 2048);
-%% elif target["family"] in ["l1"]
-	static bool
-	enablePll(PllSource source, PllMultiplier pllMul, uint8_t pllDiv,
-	          uint32_t waitCycles = 2048);
+			  uint32_t waitCycles = 2048)
+	{
+		PllFactors pllFactors{
+			.pllM = pllM,
+			.pllN = pllN,
+%% if target["family"] in ["l4", "g0", "g4"]
+	          .pllR = pllR,
 %% else
-	static bool
+			  .pllP = pllP,
+%% endif
+		};
+		return enablePll(source, pllFactors, waitCycles);
+	}
+%% elif target["family"] in ["l1"]
+	[[deprecated("Use PllFactors as argument instead")]] static bool
+	enablePll(PllSource source, PllMultiplier pllMul, uint8_t pllDiv,
+	          uint32_t waitCycles = 2048)
+	{
+		PllFactors pllFactors{
+			.pllMul = pllMul,
+			.pllDiv = pllDiv,
+		};
+		return enablePll(source, pllFactors, waitCycles);
+	}
+%% else
+	[[deprecated("Use PllFactors as argument instead")]] static bool
 	enablePll(PllSource source,
 	          uint8_t pllMul,
 	%% if pllprediv2
@@ -359,7 +464,19 @@ public:
 	%% elif pllprediv
 				uint8_t pllPrediv,
 	%% endif
-				uint32_t waitCycles = 2048);
+				uint32_t waitCycles = 2048)
+	{
+		PllFactors pllFactors{
+			.pllMul = pllMul,
+	%% if pllprediv2
+				.pllPrediv = pllPrediv,
+				.pllPrediv2 = pllPrediv2,
+	%% elif pllprediv
+				.pllPrediv = pllPrediv,
+	%% endif
+		};
+		return enablePll(source, pllFactors, waitCycles);
+	}
 %% endif
 
 	// sinks

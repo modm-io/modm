@@ -139,11 +139,10 @@ modm::platform::Rcc::enableLowSpeedExternalCrystal(uint32_t waitCycles)
 	return retval;
 }
 
-%% if target["family"] in ["f2", "f4", "f7"]
-// ----------------------------------------------------------------------------
 bool
-modm::platform::Rcc::enablePll(PllSource source, uint8_t pllM, uint16_t pllN, uint8_t pllP, uint32_t waitCycles)
+modm::platform::Rcc::enablePll(PllSource source, const PllFactors& pllFactors, uint32_t waitCycles)
 {
+%% if target["family"] in ["f2", "f4", "f7"]
 	// Read reserved values and clear all other values
 	uint32_t tmp = RCC->PLLCFGR & ~(RCC_PLLCFGR_PLLSRC | RCC_PLLCFGR_PLLM
 			| RCC_PLLCFGR_PLLN | RCC_PLLCFGR_PLLP | RCC_PLLCFGR_PLLQ);
@@ -152,13 +151,13 @@ modm::platform::Rcc::enablePll(PllSource source, uint8_t pllM, uint16_t pllN, ui
 	tmp |= static_cast<uint32_t>(source);
 
 	// PLLM (0) = factor is user defined VCO input frequency must be configured to 2MHz
-	tmp |= ((uint32_t) pllM) & RCC_PLLCFGR_PLLM;
+	tmp |= ((uint32_t) pllFactors.pllM) & RCC_PLLCFGR_PLLM;
 
 	// PLLN (6) = factor is user defined
-	tmp |= (((uint32_t) pllN) << RCC_PLLCFGR_PLLN_Pos) & RCC_PLLCFGR_PLLN;
+	tmp |= (((uint32_t) pllFactors.pllN) << RCC_PLLCFGR_PLLN_Pos) & RCC_PLLCFGR_PLLN;
 
 	// PLLP (16) divider for CPU frequency; (00: PLLP = 2, 01: PLLP = 4, etc.)
-	tmp |= (((uint32_t) (pllP / 2) - 1) << RCC_PLLCFGR_PLLP_Pos) & RCC_PLLCFGR_PLLP;
+	tmp |= (((uint32_t) (pllFactors.pllP / 2) - 1) << RCC_PLLCFGR_PLLP_Pos) & RCC_PLLCFGR_PLLP;
 
 	// PLLQ (24) divider for USB frequency; (0-15)
 	// tmp |= (((uint32_t) pllQ) << RCC_PLLCFGR_PLLQ_Pos) & RCC_PLLCFGR_PLLQ;
@@ -172,13 +171,9 @@ modm::platform::Rcc::enablePll(PllSource source, uint8_t pllM, uint16_t pllN, ui
 		;
 
 	return tmp;
-}
+
 %% elif target["family"] in ["g0", "l4", "g4"]
-// ----------------------------------------------------------------------------
-bool
-modm::platform::Rcc::enablePll(PllSource source,
-	uint8_t pllM, uint16_t pllN, uint8_t pllR, uint32_t waitCycles)
-{
+
 	// Read reserved values and clear all other values
 	uint32_t tmp = RCC->PLLCFGR & ~(
 			RCC_PLLCFGR_PLLSRC | RCC_PLLCFGR_PLLM | RCC_PLLCFGR_PLLN |
@@ -192,18 +187,18 @@ modm::platform::Rcc::enablePll(PllSource source,
 	tmp |= static_cast<uint32_t>(source);
 
 	// PLLM factor is user defined VCO input frequency must be configured between 4MHz and 16Mhz
-	tmp |= (uint32_t(pllM - 1) << RCC_PLLCFGR_PLLM_Pos) & RCC_PLLCFGR_PLLM;
+	tmp |= (uint32_t(pllFactors.pllM - 1) << RCC_PLLCFGR_PLLM_Pos) & RCC_PLLCFGR_PLLM;
 
 	// PLLN factor is user defined: between 64 and 344 MHz
-	tmp |= (uint32_t(pllN) << RCC_PLLCFGR_PLLN_Pos) & RCC_PLLCFGR_PLLN;
+	tmp |= (uint32_t(pllFactors.pllN) << RCC_PLLCFGR_PLLN_Pos) & RCC_PLLCFGR_PLLN;
 
 	// PLLR divider for CPU frequency
 %% if target["family"] in ["g0"]
-	tmp |= ((uint32_t(pllR) - 1) << RCC_PLLCFGR_PLLR_Pos) & RCC_PLLCFGR_PLLR;
+	tmp |= ((uint32_t(pllFactors.pllR) - 1) << RCC_PLLCFGR_PLLR_Pos) & RCC_PLLCFGR_PLLR;
 	// PLLP divider for P frequency
 	// tmp |= ((uint32_t(pllP) - 1) << RCC_PLLCFGR_PLLP_Pos) & RCC_PLLCFGR_PLLP;
 %% else
-	tmp |= ((uint32_t(pllR / 2) - 1) << RCC_PLLCFGR_PLLR_Pos) & RCC_PLLCFGR_PLLR;
+	tmp |= ((uint32_t(pllFactors.pllR / 2) - 1) << RCC_PLLCFGR_PLLR_Pos) & RCC_PLLCFGR_PLLR;
 	// PLLQ (21) divider for USB frequency; (00: PLLQ = 2, 01: PLLQ = 4, etc.)
 	// tmp |= (((uint32_t) (pllQ / 2) - 1) << RCC_PLLCFGR_PLLQ_Pos) & RCC_PLLCFGR_PLLQ;
 	// enable pll USB clock output
@@ -222,18 +217,15 @@ modm::platform::Rcc::enablePll(PllSource source,
 		;
 
 	return tmp;
-}
+
 %% elif target["family"] in ["l1"]
-// ----------------------------------------------------------------------------
-bool
-modm::platform::Rcc::enablePll(PllSource source, PllMultiplier pllMul, uint8_t pllDiv, uint32_t waitCycles)
-{
+
 	uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_PLLMUL | RCC_CFGR_PLLSRC | RCC_CFGR_PLLDIV);
 	// PLLSRC source for pll
 	tmp |= static_cast<uint32_t>(source);
 	// Pll multiplication factor
-	tmp |= static_cast<uint32_t>(pllMul);
-	tmp |= (static_cast<uint32_t>(pllDiv - 1) << RCC_CFGR_PLLDIV_Pos) & RCC_CFGR_PLLDIV;
+	tmp |= static_cast<uint32_t>(pllFactors.pllMul);
+	tmp |= (static_cast<uint32_t>(pllFactors.pllDiv - 1) << RCC_CFGR_PLLDIV_Pos) & RCC_CFGR_PLLDIV;
 	RCC->CFGR = tmp;
 
 	// enable pll
@@ -242,19 +234,10 @@ modm::platform::Rcc::enablePll(PllSource source, PllMultiplier pllMul, uint8_t p
 		;
 
 	return tmp;
-}
+
+
 %% else
-// ----------------------------------------------------------------------------
-bool
-modm::platform::Rcc::enablePll(PllSource source,
-%% if pllprediv2
-			uint8_t pllMul, uint8_t pllPrediv, uint8_t pllPrediv2, uint32_t waitCycles)
-%% elif pllprediv
-			uint8_t pllMul, uint8_t pllPrediv, uint32_t waitCycles)
-%% else
-			uint8_t pllMul, uint32_t waitCycles)
-%% endif
-{
+
 %% set pullmul = 'RCC_CFGR_PLLMULL' if target["family"] == "f1" else 'RCC_CFGR_PLLMUL'
 	// Read reserved values and clear all other values
 %% if usbprescaler
@@ -270,20 +253,20 @@ modm::platform::Rcc::enablePll(PllSource source,
 	tmp |= static_cast<uint32_t>(source);
 
 	// Pll multiplication factor
-	tmp |= (static_cast<uint32_t>(pllMul - 2) << 18) & {{pullmul}};
+	tmp |= (static_cast<uint32_t>(pllFactors.pllMul - 2) << 18) & {{pullmul}};
 
 %% if pllprediv
 	%% set mask = 'RCC_CFGR2_PREDIV1' if target["family"] == "f1" else 'RCC_CFGR2_PREDIV'
 #ifdef {{mask}}
 	// HSE PREDIV division factor
-	RCC->CFGR2 = (RCC->CFGR2 & ~({{mask}})) | (uint32_t(pllPrediv - 1) & {{mask}});
+	RCC->CFGR2 = (RCC->CFGR2 & ~({{mask}})) | (uint32_t(pllFactors.pllPrediv - 1) & {{mask}});
 #else
-	if (uint32_t(pllPrediv - 1) & 0x1) tmp |= RCC_CFGR_PLLXTPRE;
+	if (uint32_t(pllFactors.pllPrediv - 1) & 0x1) tmp |= RCC_CFGR_PLLXTPRE;
 #endif
 %% endif
 	RCC->CFGR = tmp;
 %% if pllprediv2
-	RCC->CFGR2 = (RCC->CFGR2 & ~(RCC_CFGR2_PREDIV2)) | ((uint32_t(pllPrediv2 - 1) << 4) & RCC_CFGR2_PREDIV2);
+	RCC->CFGR2 = (RCC->CFGR2 & ~(RCC_CFGR2_PREDIV2)) | ((uint32_t(pllFactors.pllPrediv2 - 1) << 4) & RCC_CFGR2_PREDIV2);
 %% endif
 	// enable pll
 	RCC->CR |= RCC_CR_PLLON;
@@ -292,8 +275,8 @@ modm::platform::Rcc::enablePll(PllSource source,
 		;
 
 	return tmp;
-}
 %%endif
+}
 
 // ----------------------------------------------------------------------------
 bool
