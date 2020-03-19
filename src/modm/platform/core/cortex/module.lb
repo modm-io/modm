@@ -165,7 +165,7 @@ def prepare(module, options):
             enumeration=["newlib", "block", "tlsf"],
             default="newlib",
             dependencies=lambda v: {"newlib": None,
-                                    "block": ":architecture:heap",
+                                    "block": ":driver:block.allocator",
                                     "tlsf": ":tlsf"}[v]))
     module.add_option(
         NumericOption(

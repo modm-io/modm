@@ -27,6 +27,7 @@ def prepare(module, options):
         ":driver:ltc2984",
         ":driver:drv832x_spi",
         ":driver:mcp2515",
+        ":driver:block.allocator",
         "modm-test:test:platform:spi",
         ":platform:gpio")
     return True

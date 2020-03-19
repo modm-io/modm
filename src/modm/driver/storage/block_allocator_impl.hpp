@@ -2,7 +2,7 @@
  * Copyright (c) 2009-2013, Fabian Greif
  * Copyright (c) 2010, Martin Rosekeit
  * Copyright (c) 2012, Sascha Schade
- * Copyright (c) 2012, 2016, Niklas Hauser
+ * Copyright (c) 2012, 2016, 2020, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -12,9 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	MODM_BLOCK_ALLOCATOR_HPP
-	#error	"Don't include this file directly use 'block_allocator.hpp' instead!"
-#endif
+#pragma once
 
 // ----------------------------------------------------------------------------
 /*
@@ -58,7 +56,7 @@
  *                             \-- end
  */
 template <typename T, unsigned int BLOCK_SIZE >
-modm_always_inline void
+void
 modm::BlockAllocator<T, BLOCK_SIZE>::initialize(void * heapStart, void * heapEnd)
 {
 	start = alignPointer(heapStart);
@@ -83,7 +81,7 @@ modm::BlockAllocator<T, BLOCK_SIZE>::initialize(void * heapStart, void * heapEnd
  *
  */
 template <typename T, unsigned int BLOCK_SIZE >
-modm_always_inline void *
+void *
 modm::BlockAllocator<T, BLOCK_SIZE>::allocate(std::size_t requestedSize)
 {
 	requestedSize += 4;	// bytes needed for the management
@@ -130,7 +128,7 @@ modm::BlockAllocator<T, BLOCK_SIZE>::allocate(std::size_t requestedSize)
 
 // ----------------------------------------------------------------------------
 template <typename T, unsigned int BLOCK_SIZE >
-modm_always_inline void
+void
 modm::BlockAllocator<T, BLOCK_SIZE>::free(void *ptr)
 {
 	if (ptr == 0) {
@@ -183,7 +181,7 @@ modm::BlockAllocator<T, BLOCK_SIZE>::free(void *ptr)
 
 // ----------------------------------------------------------------------------
 template <typename T, unsigned int BLOCK_SIZE >
-modm_always_inline std::size_t
+std::size_t
 modm::BlockAllocator<T, BLOCK_SIZE>::getAvailableSize() const
 {
 	T *p = start;
@@ -208,7 +206,7 @@ modm::BlockAllocator<T, BLOCK_SIZE>::getAvailableSize() const
 
 // ----------------------------------------------------------------------------
 template<typename T, unsigned int BLOCK_SIZE >
-modm_always_inline T *
+T *
 modm::BlockAllocator<T, BLOCK_SIZE>::alignPointer(void * ptr) const
 {
 	// (MODM_ALIGNMENT - 1) is used as a bitmask

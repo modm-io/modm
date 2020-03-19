@@ -189,21 +189,6 @@ class GpioExpander(Module):
         env.copy("interface/gpio_expander.hpp")
 # -----------------------------------------------------------------------------
 
-class Heap(Module):
-    def init(self, module):
-        module.name = "heap"
-        module.description = "Memory Allocators"
-
-    def prepare(self, module, options):
-        module.depends(":utils")
-        return True
-
-    def build(self, env):
-        env.outbasepath = "modm/src/modm/architecture"
-        env.copy("driver/heap/block_allocator.hpp")
-        env.copy("driver/heap/block_allocator_impl.hpp")
-# -----------------------------------------------------------------------------
-
 class I2c(Module):
     def init(self, module):
         module.name = "i2c"
@@ -384,7 +369,6 @@ def prepare(module, options):
     module.add_submodule(Delay())
     module.add_submodule(Gpio())
     module.add_submodule(GpioExpander())
-    module.add_submodule(Heap())
     module.add_submodule(I2c())
     module.add_submodule(I2cDevice())
     module.add_submodule(I2cMultiplexer())

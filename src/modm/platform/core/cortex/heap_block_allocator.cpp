@@ -19,7 +19,7 @@
 
 // ----------------------------------------------------------------------------
 // Using the MODM Block Allocator
-#include <modm/architecture/driver/heap/block_allocator.hpp>
+#include <modm/driver/storage/block_allocator.hpp>
 
 #ifndef MODM_MEMORY_BLOCK_ALLOCATOR_TYPE
 #define MODM_MEMORY_BLOCK_ALLOCATOR_TYPE uint16_t
