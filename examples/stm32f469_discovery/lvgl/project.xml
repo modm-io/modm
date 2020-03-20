@@ -1,0 +1,16 @@
+<library>
+  <extends>modm:disco-f469ni</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/stm32f469_discovery/lvgl</option>
+    <option name="modm:lvgl:resolution_horizontal_max">800</option>
+    <option name="modm:lvgl:resolution_vertical_max">480</option>
+    <option name="modm:lvgl:color_depth">RGB565</option>
+    <!-- <option name="modm:lvgl:dpi">100</option> -->
+
+  </options>
+  <modules>
+    <module>modm:platform:fault</module>
+    <module>modm:build:scons</module>
+    <module>modm:lvgl</module>
+  </modules>
+</library>
