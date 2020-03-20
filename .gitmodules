@@ -25,3 +25,6 @@
 [submodule "ext/adamgreen/crashcatcher"]
 	path = ext/adamgreen/crashcatcher
 	url = https://github.com/modm-ext/CrashCatcher-partial.git
+[submodule "ext/lvgl/lvgl"]
+	path = ext/lvgl/lvgl
+	url = https://github.com/littlevgl/lvgl.git
