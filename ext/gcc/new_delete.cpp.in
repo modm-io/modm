@@ -85,8 +85,11 @@ void* operator new  (std::size_t size, const std::nothrow_t&) noexcept { return 
 void* operator new[](std::size_t size, const std::nothrow_t&) noexcept { return malloc(size); }
 
 %% if with_memory_traits
-void* operator new  (std::size_t size, modm::MemoryTraits traits) noexcept { return new_assert<true>(size, traits); }
-void* operator new[](std::size_t size, modm::MemoryTraits traits) noexcept { return new_assert<true>(size, traits); }
+void* operator new  (std::size_t size, modm::MemoryTraits traits) { return new_assert<true>(size, traits); }
+void* operator new[](std::size_t size, modm::MemoryTraits traits) { return new_assert<true>(size, traits); }
+
+void* operator new  (std::size_t size, modm::MemoryTraits traits, const std::nothrow_t&) noexcept { return malloc_traits(size, traits.value); }
+void* operator new[](std::size_t size, modm::MemoryTraits traits, const std::nothrow_t&) noexcept { return malloc_traits(size, traits.value); }
 %% endif
 
 // ----------------------------------------------------------------------------

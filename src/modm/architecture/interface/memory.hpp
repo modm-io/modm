@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Niklas Hauser
+ * Copyright (c) 2016, 2020, Niklas Hauser
  * Copyright (c) 2017, Fabian Greif
  *
  * This file is part of the modm project.
@@ -10,10 +10,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_MEMORY_HPP
-#define MODM_MEMORY_HPP
+#pragma once
 
 #include <stdint.h>
+#include <new>
 #include <modm/architecture/utils.hpp>
 #include <modm/architecture/interface/register.hpp>
 
@@ -83,21 +83,39 @@ constexpr MemoryTraits MemoryDefault = MemoryDMA;
  *    Foo *p = new (modm::MemoryFastData) Foo;
  * @endcode
  *
- * @note Memory traits are ignored on AVRs.
  * @ingroup modm_architecture_memory
  */
 void *
-operator new(size_t size, modm::MemoryTraits traits) noexcept;
+operator new(std::size_t size, modm::MemoryTraits traits);
 
 /** Request array memory with defined traits.
  * @code
  *    uint32_t *p = new (modm::MemoryFastData) uint32_t[200];
  * @endcode
  *
- * @note Memory traits are ignored on AVRs.
  * @ingroup modm_architecture_memory
  */
 void *
-operator new[](size_t size, modm::MemoryTraits traits) noexcept;
+operator new[](std::size_t size, modm::MemoryTraits traits);
 
-#endif // MODM_MEMORY_HPP
+/** Request object memory with defined traits and return nullptr if out-of-memory!
+ * @code
+ *    Foo *p = new (modm::MemoryFastData, std::nothrow) Foo;
+ * @endcode
+ *
+ * @ingroup modm_architecture_memory
+ */
+void *
+operator new(std::size_t size, modm::MemoryTraits traits,
+             const std::nothrow_t&) noexcept;
+
+/** Request array memory with defined traits and return nullptr if out-of-memory!
+ * @code
+ *    uint32_t *p = new (modm::MemoryFastData, std::nothrow) uint32_t[200];
+ * @endcode
+ *
+ * @ingroup modm_architecture_memory
+ */
+void *
+operator new[](std::size_t size, modm::MemoryTraits traits,
+               const std::nothrow_t&) noexcept;
