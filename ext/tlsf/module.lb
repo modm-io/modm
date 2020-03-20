@@ -12,6 +12,23 @@
 
 import math
 
+def max_ram_size(target):
+    memories = listify(target.get_driver("core")["memory"])
+    rams = ((int(m["start"], 16), int(m["start"], 16) + int(m["size"]))
+            for m in memories if "rw" in m["access"] and "backup" not in m["name"])
+    rams = sorted(rams, key=lambda m: m[0])
+
+    pools = [rams[0]]
+    for ram in rams[1:]:
+        # is the end address of the last pool the start address of the new pool
+        if pools[-1][1] == ram[0]:
+            # Set the pool end to the section end
+            pools[-1] = (pools[-1][0], ram[1])
+        else:
+            pools.append(ram)
+
+    return max(p[1] - p[0] for p in pools)
+
 def init(module):
     module.name = ":tlsf"
     module.description = FileReader("README.md")
@@ -37,7 +54,7 @@ def prepare(module, options):
             description="Minimum pool size in byte",
             minimum=2**12,
             maximum=2**29,
-            default=2**19))
+            default=max_ram_size(options[":target"])))
 
     return True
 
@@ -45,6 +62,6 @@ def build(env):
     env.outbasepath = "modm/ext/tlsf"
     env.copy("tlsf.h")
     env.template("tlsf.c.in", substitutions={
-        "sl_index_count_log2": math.ceil(math.log2(env["::subdivisions"])),
-        "fl_index_max": math.ceil(math.log2(env["::minimum_pool_size"]))
+        "sl_index_count_log2": math.ceil(math.log2(env["subdivisions"])),
+        "fl_index_max": math.ceil(math.log2(env["minimum_pool_size"]))
         })
