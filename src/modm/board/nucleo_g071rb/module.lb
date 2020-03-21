@@ -35,11 +35,6 @@ def build(env):
     env.template("../board.cpp.in", "board.cpp")
     env.copy('.')
 
-    # Waiting on OpenOCD to add support for STM32G0
-    env.log.warning("\nUploading firmware and debugging for STM32G0 via OpenOCD requires this patch: http://openocd.zylin.com/#/c/4807"
-                    "\nAlternatively you may copy the compiled binary onto the Nucleo USB Mass-Storage Device manually:"
-                    "\n    $ scons bin && cp path/to/build/release/project.bin /Volumes/NODE_G071RB")
-
     # The patch doesn't include board config file though
     env.outbasepath = "modm/openocd/modm/board/"
     env.copy(repopath("tools/openocd/modm/st_nucleo_g0.cfg"), "st_nucleo_g0.cfg")
