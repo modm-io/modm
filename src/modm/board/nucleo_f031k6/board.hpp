@@ -54,7 +54,11 @@ struct SystemClock {
 	{
 		Rcc::enableInternalClock();	// 8MHz
 		// (internal clock / 2) * 12 = 48MHz
-		Rcc::enablePll(Rcc::PllSource::InternalClock, 12, 1);
+		const Rcc::PllFactors pllFactors{
+			.pllMul = 12,
+			.pllPrediv = 1
+		};
+		Rcc::enablePll(Rcc::PllSource::InternalClock, pllFactors);
 		// set flash latency for 48MHz
 		Rcc::setFlashLatency<Frequency>();
 		// switch system clock to PLL output

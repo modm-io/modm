@@ -51,10 +51,14 @@ struct SystemClock {
 	static bool inline
 	enable()
 	{
-		Rcc::enableExternalCrystal();
+		Rcc::enableExternalCrystal(); // 8MHz
 
 		// external clock / 1 * 6 = 48MHz
-		Rcc::enablePll(Rcc::PllSource::ExternalCrystal, 6, 1);
+		const Rcc::PllFactors pllFactors{
+			.pllMul = 6,
+			.pllPrediv = 1
+		};
+		Rcc::enablePll(Rcc::PllSource::ExternalCrystal, pllFactors);
 
 		// set flash latency for 48MHz
 		Rcc::setFlashLatency<Frequency>();

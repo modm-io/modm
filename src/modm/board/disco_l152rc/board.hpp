@@ -89,8 +89,12 @@ struct SystemClock
 		Rcc::updateCoreFrequency<16_MHz>();
 		modm::delayMicroseconds(5);
 
-		// internal clock 8MHz * 8 / 2 = 32MHz => bad for USB
-		Rcc::enablePll(Rcc::PllSource::InternalClock, Rcc::PllMultiplier::Mul4, 2);
+		// internal clock 16MHz * 4 / 2 = 32MHz => bad for USB
+		const Rcc::PllFactors pllFactors{
+			.pllMul = Rcc::PllMultiplier::Mul4,
+			.pllDiv = 2,
+		};
+		Rcc::enablePll(Rcc::PllSource::InternalClock, pllFactors);
 		// set flash latency
 		Rcc::setFlashLatency<Frequency>();
 		// switch system clock to PLL output

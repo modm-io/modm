@@ -82,12 +82,12 @@ struct SystemClock
 	enable()
 	{
 		Rcc::enableExternalClock(); // 25 MHz
-		Rcc::enablePll(
-			Rcc::PllSource::ExternalClock,
-			25,		// 25MHz / N=25 -> 1MHz
-			432,	// 1MHz * M=432 -> 432MHz
-			2		// 432MHz / P=2 -> 216MHz = F_cpu
-		);
+		const Rcc::PllFactors pllFactors{
+			.pllM = 25,		// 25MHz / M=25 -> 1MHz
+			.pllN = 432,	// 1MHz * N=432 -> 432MHz
+			.pllP = 2		// 432MHz / P=2 -> 216MHz = F_cpu
+		};
+		Rcc::enablePll(Rcc::PllSource::ExternalClock, pllFactors);
 		PWR->CR1 |= PWR_CR1_ODEN; // Enable overdrive mode
 		while (not (PWR->CSR1 & PWR_CSR1_ODRDY)) ;
 		Rcc::setFlashLatency<Frequency>();

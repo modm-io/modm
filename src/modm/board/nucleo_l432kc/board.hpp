@@ -43,12 +43,12 @@ struct SystemClock {
 	static bool inline
 	enable()
 	{
-		Rcc::enablePll(
-			Rcc::PllSource::MultiSpeedInternalClock,
-			1,	// 4MHz / M=1 -> 4MHz
-			40,	// 4MHz * N=40 -> 160MHz <= 344MHz = PLL VCO output max, >= 64 MHz = PLL VCO out min
-			2	// 160MHz / P=2 -> 80MHz = F_cpu
-		);
+		const Rcc::PllFactors pllFactors{
+			.pllM = 1,	//   4MHz /  1 -> 4MHz
+			.pllN = 40,	//   4MHz * 40 -> 160MHz <= 344MHz = PLL VCO output max, >= 64 MHz = PLL VCO out min
+			.pllR = 2,	// 160MHz /  2 -> 80MHz = F_cpu
+		};
+		Rcc::enablePll(Rcc::PllSource::MultiSpeedInternalClock, pllFactors);
 		Rcc::setFlashLatency<Frequency>();
 
 		// switch system clock to PLL output

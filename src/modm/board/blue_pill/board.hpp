@@ -62,7 +62,10 @@ struct SystemClock {
 		Rcc::enableExternalCrystal();
 
 		// external clock * 9 = 72MHz, => 72/1.5 = 48 => good for USB
-		Rcc::enablePll(Rcc::PllSource::ExternalCrystal, 9);
+		const Rcc::PllFactors pllFactors{
+			.pllMul = 9
+		};
+		Rcc::enablePll(Rcc::PllSource::ExternalCrystal, pllFactors);
 
 		// set flash latency for 72MHz
 		Rcc::setFlashLatency<Frequency>();

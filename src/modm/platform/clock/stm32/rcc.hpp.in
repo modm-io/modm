@@ -368,7 +368,7 @@ public:
 		const PllMultiplier pllMul;
 		const uint8_t pllDiv;
 %% else
-		uint8_t pllMul;
+		const uint8_t pllMul;
  %% if pllprediv2
 		const uint8_t pllPrediv;
 		const uint8_t pllPrediv2;

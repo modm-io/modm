@@ -62,13 +62,12 @@ struct SystemClock {
 	enable()
 	{
 		Rcc::enableExternalCrystal();
-		Rcc::enablePll(
-			Rcc::PllSource::ExternalCrystal,
-			25,		// 25MHz / N=25 -> 1MHz
-			336,	// 1MHz * M=336 -> 336MHz
-			4,		// 336MHz / P=4 -> 84MHz = F_cpu
-			7		// 336MHz / Q=7 -> 48MHz for USB
-		);
+		const Rcc::PllFactors pllFactors{
+			.pllM = 25,		// 25MHz / M=25 -> 1MHz
+			.pllN = 336,	// 1MHz * N=336 -> 336MHz
+			.pllP = 4,		// 336MHz / P=4 -> 84MHz = F_cpu
+		};
+		Rcc::enablePll(Rcc::PllSource::ExternalCrystal, pllFactors);
 
 		// set flash latency
 		Rcc::setFlashLatency<Frequency>();
