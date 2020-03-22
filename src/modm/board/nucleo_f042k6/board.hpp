@@ -31,6 +31,7 @@ namespace Board
 // Dummy clock for devices
 struct SystemClock {
 	static constexpr uint32_t Frequency = 48_MHz;
+	static constexpr uint32_t Hsi = 8_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb = Frequency;
 
@@ -41,7 +42,7 @@ struct SystemClock {
 	static constexpr uint32_t Usart1 = Apb;
 	static constexpr uint32_t Usart2 = Apb;
 
-	static constexpr uint32_t I2c1   = Apb;
+	static constexpr uint32_t I2c1   = Hsi;
 
 	static constexpr uint32_t Timer1  = Apb;
 	static constexpr uint32_t Timer2  = Apb;
