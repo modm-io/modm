@@ -26,6 +26,9 @@ CMakeLists.txt
 #Clion
 **/.idea/
 
+# Codium/Code
+**/.vscode/
+
 # ignore generated code in the example folder
 examples/**/modm
 examples/**/compile_commands.json
