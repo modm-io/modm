@@ -19,7 +19,18 @@
 namespace modm::platform
 {
 
-/// @cond
+/**
+ * Provides information about the unused memory sections in RAM listed by
+ * size and memory traits.
+ *
+ * The iterator returns a tuple of values for each memory section:
+ * 1. MemoryTraits traits,
+ * 2. const uint32_t *start_addr,
+ * 3. const uint32_t *end_addr,
+ * 4. size_t size in Bytes.
+ *
+ * @ingroup modm_platform_cortex_m
+ */
 class HeapTable
 {
 public:
@@ -27,15 +38,18 @@ public:
 	Iterator begin();
 	Iterator end();
 
-	static void
-	find_largest(const uint32_t **start,
-				 const uint32_t **end,
+	/// Find the largest *continuous* memory section which satisfies *at least*
+	/// the selected memory traits.
+	static bool
+	find_largest(const uint8_t **start,
+				 const uint8_t **end,
 				 MemoryTraits trait_mask = MemoryDefault);
 
+	/// @cond
 public:
 	class Iterator
 	{
-		using Type = std::tuple<MemoryTraits, const uint32_t*, const uint32_t*, size_t>;
+		using Type = std::tuple<MemoryTraits, const uint8_t*, const uint8_t*, size_t>;
 		const void* table;
 %% if with_fault_storage
 		friend class HeapTable;
@@ -56,7 +70,7 @@ public:
 		bool operator==(const Iterator& other) const;
 		bool operator!=(const Iterator& other) const;
 	};
+	/// @endcond
 };
-/// @endcond
 
 }

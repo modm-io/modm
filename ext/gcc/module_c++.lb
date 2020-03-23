@@ -63,7 +63,7 @@ def prepare(module, options):
                 name="safe_statics", default=True,
                 description=descr_safe_statics))
 
-    module.depends(":architecture:assert", ":architecture:memory", ":stdc")
+    module.depends(":architecture:assert", ":stdc")
     return True
 
 
@@ -77,19 +77,18 @@ def build(env):
     env.substitutions = {
         "core": core,
         "with_exceptions": with_exceptions,
-        "with_threadsafe_statics": with_threadsafe_statics
+        "with_threadsafe_statics": with_threadsafe_statics,
+        "with_memory_traits": env.has_module(":architecture:memory"),
+        "is_avr": is_avr,
     }
     env.outbasepath = "modm/ext/gcc"
     env.template("cxxabi.cpp.in")
+    env.template("new_delete.cpp.in")
 
     if is_avr:
         env.collect(":build:path.include", "modm/ext/gcc/libstdc++/include")
         env.copy("libstdc++", ignore=env.ignore_files("*.lb", "*.md", "*.in", "examples"))
         env.template("assert.cpp.in", "assert.cpp")
-        env.copy("newdelete_avr.cpp", "newdelete.cpp")
-
-    elif is_cortex_m:
-        env.copy("newdelete_cortex.cpp", "newdelete.cpp")
 
     env.collect(":build:cxxflags", "-fuse-cxa-atexit")
     # Threadsafe statics

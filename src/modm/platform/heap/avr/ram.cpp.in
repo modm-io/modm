@@ -16,8 +16,6 @@
 #include <stdlib.h>
 #include <modm/architecture/interface/assert.hpp>
 
-#include "ram.hpp"
-
 // ----------------------------------------------------------------------------
 // must be a power of two!
 #define	BLOCK_SIZE			{{ options["ram_block_length"] }}
@@ -80,7 +78,7 @@ initializeMemory(void)
  * TODO description
  */
 void *
-modm::platform::allocateMemory(std::size_t requestedSize)
+allocateMemory(std::size_t requestedSize)
 {
 	if (!modm_assert_continue_fail_debug(
 			(requestedSize > 0 && requestedSize <= MAX_BLOCK_PARTS * BLOCK_SIZE),
@@ -158,7 +156,7 @@ modm::platform::allocateMemory(std::size_t requestedSize)
 
 // ----------------------------------------------------------------------------
 void
-modm::platform::freeMemory(void *ptr)
+freeMemory(void *ptr)
 {
 	if (ptr == 0) {
 		return;
@@ -202,6 +200,16 @@ modm::platform::freeMemory(void *ptr)
 	if (p < freeHint) {
 		freeHint = p;
 	}
+}
+
+extern "C"
+{
+
+void* malloc(size_t size)
+{ return allocateMemory(size); }
+void free(void *ptr)
+{ return freeMemory(ptr); }
+
 }
 
 // ----------------------------------------------------------------------------

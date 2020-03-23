@@ -15,7 +15,8 @@
 #include <reent.h>
 #include <errno.h>
 #include <modm/architecture/interface/assert.h>
-#include "heap_table.hpp"
+#include <modm/architecture/interface/memory.hpp>
+#include <modm/platform/core/heap_table.hpp>
 
 // ----------------------------------------------------------------------------
 #include <tlsf/tlsf.h>
@@ -28,7 +29,7 @@ typedef struct
 {
 	uint16_t traits;
 	tlsf_t tlsf;
-	const uint32_t* end;
+	const uint8_t* end;
 } mem_pool_t;
 
 static mem_pool_t mem_pools[MODM_TLSF_MAX_MEM_POOL_COUNT];
@@ -87,7 +88,7 @@ get_tlsf_for_ptr(void *p)
 	return NULL;
 }
 
-void * malloc_tr(size_t size, uint32_t traits)
+void * malloc_traits(size_t size, uint32_t traits)
 {
 try_again:
 	for (mem_pool_t *pool = mem_pools;
@@ -102,13 +103,14 @@ try_again:
 	}
 
 	// clear the types core coupled and external, but not non-volatile
-	const uint32_t clear_mask = 0x8000 | 0x2000;
+	const uint32_t clear_mask = (modm::MemoryTrait::TypeExternal |
+	                             modm::MemoryTrait::TypeCoreCoupled).value;
 	if (traits & clear_mask) {
 		traits &= ~clear_mask;
 		goto try_again;
 	}
 	// set the SBus and try again
-	const uint32_t set_mask = 0x0001;
+	const uint32_t set_mask = uint32_t(modm::MemoryTrait::AccessSBus);
 	if (!(traits & set_mask)) {
 		traits |= set_mask;
 		goto try_again;
@@ -119,24 +121,21 @@ try_again:
 	return NULL;
 }
 
-void *__wrap__malloc_r(struct _reent *r, size_t size)
+void *__wrap__malloc_r(struct _reent *, size_t size)
 {
-	(void) r;
 	// default is accessible by S-Bus and DMA-able
-	return malloc_tr(size, 0x8 | 0x1);
+	return malloc_traits(size, 0x8 | 0x1);
 }
 
 void *__wrap__calloc_r(struct _reent *r, size_t size)
 {
-	(void) r;
 	void *ptr = __wrap__malloc_r(r, size);
 	if (ptr) memset(ptr, 0, size);
 	return ptr;
 }
 
-void *__wrap__realloc_r(struct _reent *r, void *p, size_t size)
+void *__wrap__realloc_r(struct _reent *, void *p, size_t size)
 {
-	(void) r;
 	tlsf_t pool = get_tlsf_for_ptr(p);
 	// if pointer belongs to no pool, exit.
 	if (!pool) return NULL;
@@ -147,22 +146,12 @@ void *__wrap__realloc_r(struct _reent *r, void *p, size_t size)
 	return ptr;
 }
 
-void __wrap__free_r(struct _reent *r, void *p)
+void __wrap__free_r(struct _reent *, void *p)
 {
-	(void) r;
 	tlsf_t pool = get_tlsf_for_ptr(p);
 	// if pointer belongs to no pool, exit.
 	if (!pool) return;
 	tlsf_free(pool, p);
 }
 
-// _sbrk_r is empty
-void *
-_sbrk_r(struct _reent *r,  ptrdiff_t size)
-{
-	(void) r;
-	(void) size;
-	return NULL;
-}
-
-}
+} // extern "C"

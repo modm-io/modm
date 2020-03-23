@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2016-2018, 2020, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":platform:heap"
+    module.description = FileReader("module.md")
+
+def prepare(module, options):
+    if not options[":target"].has_driver("core:cortex-m*"):
+        return False
+
+    module.add_option(
+        EnumerationOption(
+            name="allocator",
+            description="Heap allocator algorithms",
+            enumeration=["newlib", "block", "tlsf"],
+            default="newlib",
+            dependencies=lambda v: {"newlib": None,
+                                    "block": ":driver:block.allocator",
+                                    "tlsf": ":tlsf"}[v]))
+
+    module.depends(":architecture:assert", ":architecture:memory")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/platform/heap"
+    env.copy("heap_{}.cpp".format(env["allocator"]))
+
+    if env["allocator"] != "newlib":
+        env.collect(":build:linkflags", "-Wl,-wrap,_malloc_r",
+                                        "-Wl,-wrap,_calloc_r",
+                                        "-Wl,-wrap,_realloc_r",
+                                        "-Wl,-wrap,_free_r")
+
+    # Note: no_heap.c.in is used by :platform:cortex-m

@@ -11,10 +11,8 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-
 def common_vector_table_location(env):
     return env.get(":platform:cortex-m:vector_table_location", "rom")
-
 
 def common_vector_table(env):
     """
@@ -92,6 +90,9 @@ def common_memories(env):
     }
     return properties
 
+# See :platform:heap for explanation
+common_no_heap_section = (".Heap_is_not_implemented!__"
+        "Please_include_the__modm:platform:heap__module_in_your_project!")
 
 def common_linkerscript(env):
     """
@@ -136,6 +137,8 @@ def common_linkerscript(env):
             env.collector_values(":platform:cortex-m:linkerscript.table_extern.heap")]),
 
         "with_cpp_exceptions": env.get(":stdc++:exceptions", False),
+        "with_heap": env.has_module(":platform:heap"),
+        "no_heap_section": common_no_heap_section,
     }
     properties.update(common_memories(env))
     return properties
@@ -153,27 +156,17 @@ def prepare(module, options):
     module.depends(
         ":architecture:interrupt",
         ":architecture:assert",
-        ":architecture:memory",
         ":platform:clock",
         ":cmsis:device",
         ":stdc++")
 
-    module.add_option(
-        EnumerationOption(
-            name="allocator",
-            description=FileReader("option/allocator.md"),
-            enumeration=["newlib", "block", "tlsf"],
-            default="newlib",
-            dependencies=lambda v: {"newlib": None,
-                                    "block": ":driver:block.allocator",
-                                    "tlsf": ":tlsf"}[v]))
     module.add_option(
         NumericOption(
             name="main_stack_size",
             description=FileReader("option/main_stack_size.md"),
             minimum=2 ** 8,
             maximum=2 ** 16,
-            default=2 ** 10 * 3 - 32))
+            default="3*1024"))
 
     memories = listify(options[":target"].get_driver("core")["memory"])
 
@@ -256,6 +249,7 @@ def build(env):
     env.substitutions.update({
         "target": env[":target"].identifier,
         "with_fault_storage": env.has_module(":platform:fault"),
+        "with_memory_traits": env.has_module(":architecture:memory"),
     })
     env.outbasepath = "modm/src/modm/platform/core"
 
@@ -288,19 +282,14 @@ def build(env):
         if not env.has_module(":test:architecture"):
             env.copy("clock.cpp")
 
-    env.template("heap_table.cpp.in")
-    env.template("heap_table.hpp.in")
-    # everything to do with dynamic memory
-    if env["allocator"] == "newlib":
-        env.copy("heap_newlib.cpp")
-    elif env["allocator"] == "tlsf":
-        env.copy("heap_tlsf.cpp")
-    elif env["allocator"] == "block":
-        env.copy("heap_block_allocator.cpp")
-    env.collect(":build:linkflags", "-Wl,-wrap,_calloc_r",
-                                    "-Wl,-wrap,_free_r",
-                                    "-Wl,-wrap,_malloc_r",
-                                    "-Wl,-wrap,_realloc_r")
+    # Heap table from linkerscript
+    if env.has_module(":architecture:memory"):
+        env.template("heap_table.cpp.in")
+        env.template("heap_table.hpp.in")
+    # Deprecate malloc and new if no heap is implemented!
+    if not env.has_module(":platform:heap"):
+        env.substitutions["no_heap_section"] = common_no_heap_section
+        env.template("../../heap/cortex/no_heap.c.in", "no_heap.c")
 
     if env.has_module(":architecture:atomic"):
         env.copy("atomic_lock.hpp")
