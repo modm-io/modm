@@ -13,6 +13,7 @@
     <module>modm:platform:fsmc</module>
     <module>modm:platform:spi:2</module>
     <module>modm:platform:uart:2</module>
+    <module>modm:platform:heap</module>
     <module>modm:ui:display</module>
     <module>modm:ui:gui</module>
     <module>modm:utils</module>

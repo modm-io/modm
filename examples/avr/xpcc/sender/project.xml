@@ -15,6 +15,7 @@
     <module>modm:platform:clock</module>
     <module>modm:platform:core</module>
     <module>modm:platform:gpio</module>
+    <module>modm:platform:heap</module>
     <module>modm:platform:spi.bitbang</module>
     <module>modm:platform:uart:0</module>
     <module>modm:build:scons</module>

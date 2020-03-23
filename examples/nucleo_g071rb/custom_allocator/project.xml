@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:nucleo-g071rb</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_g071rb/custom_allocator</option>
+  </options>
+  <modules>
+    <module>modm:platform:gpio</module>
+    <module>modm:architecture:memory</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

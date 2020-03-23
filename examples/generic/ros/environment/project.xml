@@ -14,5 +14,6 @@
     <module>modm:processing:protothread</module>
     <module>modm:platform:i2c:1</module>
     <module>modm:build:scons</module>
+    <module>modm:platform:heap</module>
   </modules>
 </library>

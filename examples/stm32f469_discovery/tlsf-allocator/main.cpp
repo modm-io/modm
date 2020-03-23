@@ -45,6 +45,15 @@ int main()
 		MODM_LOG_INFO << modm::endl;
 	}
 
+	size_t total_size{0};
+	for (const auto [traits, start, end, size] : modm::platform::HeapTable())
+	{
+		MODM_LOG_INFO.printf("Memory section %#x @[0x%p,0x%p](%u)\n",
+							 traits.value, start, end, size);
+		total_size += size;
+	}
+	MODM_LOG_INFO << "Total heap size (kB): " << (total_size >> 10) << modm::endl;
+
 	while (true)
 	{
 		Board::Leds::toggle();

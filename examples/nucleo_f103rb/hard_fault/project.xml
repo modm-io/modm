@@ -5,6 +5,7 @@
   </options>
   <modules>
     <module>modm:platform:fault</module>
+    <module>modm:platform:heap</module>
     <module>modm:build:scons</module>
   </modules>
 </library>
