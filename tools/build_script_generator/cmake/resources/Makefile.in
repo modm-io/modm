@@ -52,18 +52,42 @@ upload-release: build-release
 
 %% elif core.startswith("cortex-m")
 upload-debug: build-debug
-	@openocd -f modm/openocd.cfg -c "modm_program $(BUILD_DIR)/cmake-build-release/{{ project_name }}.elf"
+	@openocd -f modm/openocd.cfg -c "modm_program $(BUILD_DIR)/cmake-build-debug/{{ project_name }}.elf"
 
 upload-release: build-release
 	@openocd -f modm/openocd.cfg -c "modm_program $(BUILD_DIR)/cmake-build-release/{{ project_name }}.elf"
 
-gdb: build-debug
-	@arm-none-eabi-gdb -x modm/gdbinit -x modm/openocd_gdbinit $(BUILD_DIR)/cmake-build-debug/{{ project_name }}.elf
-	@killall openocd || true
+gdbtui: build-debug
+	@python modm/modm_tools/openocd_gdb.py \
+				--config-openocd modm/openocd.cfg \
+				--config-gdb modm/gdbinit \
+				--config-gdb modm/openocd_gdbinit \
+				--mode=tui \
+				$(BUILD_DIR)/cmake-build-debug/{{ project_name }}.elf
 
-gdb-release: build-release
-	@arm-none-eabi-gdb -x modm/gdbinit -x modm/openocd_gdbinit $(BUILD_DIR)/cmake-build-release/{{ project_name }}.elf
-	@killall openocd || true
+gdbtui-release: build-release
+	@python modm/modm_tools/openocd_gdb.py \
+				--config-openocd modm/openocd.cfg \
+				--config-gdb modm/gdbinit \
+				--config-gdb modm/openocd_gdbinit \
+				--mode=tui \
+				$(BUILD_DIR)/cmake-build-release/{{ project_name }}.elf
+
+gdbgui: build-debug
+	@python modm/modm_tools/openocd_gdb.py \
+				--config-openocd modm/openocd.cfg \
+				--config-gdb modm/gdbinit \
+				--config-gdb modm/openocd_gdbinit \
+				--mode=gui \
+				$(BUILD_DIR)/cmake-build-debug/{{ project_name }}.elf
+
+gdbgui-release: build-release
+	@python modm/modm_tools/openocd_gdb.py \
+				--config-openocd modm/openocd.cfg \
+				--config-gdb modm/gdbinit \
+				--config-gdb modm/openocd_gdbinit \
+				--mode=gui \
+				$(BUILD_DIR)/cmake-build-release/{{ project_name }}.elf
 
 openocd:
 	@openocd -f modm/openocd.cfg

@@ -103,16 +103,20 @@ shutdown command invoked
 ```
 
 
-#### make gdb
-#### make gdb-release
+#### make gdbtui
+#### make gdbtui-release
+#### make gdbgui
+#### make gdbgui-release
 
-Launches GDB with the debug or release executable.
+Launches GDB with the text-based or with the [web-based GDBGUI](gdbgui) UI.
 This is just a convenience wrapper for the debug functionality defined in the
 `modm:build` module.
 (\* *only ARM Cortex-M targets*)
 
 **OpenOCD must already be running in the background**. Launch it by manually
 calling `make openocd` in another terminal.
+
+To use GDBGUI you must have it installed via `pip install gdbgui`.
 
 
 #### make openocd
@@ -132,3 +136,4 @@ being able to build again.
 
 
 [cmake]: http://cmake.org
+[gdbgui]: https://www.gdbgui.com

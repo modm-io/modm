@@ -133,6 +133,10 @@ def build(env):
     for flag, values in common_compiler_flags("gcc", env[":target"]).items():
         env.collect(flag, *values)
 
+    # Copy python tools folder
+    env.outbasepath = "modm/"
+    env.copy("../modm_tools", "modm_tools")
+
 def post_build(env):
     if env.buildlog._buildlog._metadata:
         env.log.error("'env.add_metadata(key, *values)' is not supported anymore!\n\n"

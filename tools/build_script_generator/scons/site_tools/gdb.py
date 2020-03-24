@@ -12,39 +12,47 @@
 
 import os
 from SCons.Script import *
-import subprocess
-import signal
+from modm_tools import openocd_gdb
 
-def run_openocd_gdb(target, source, env):
-	# We have to start openocd in its own session ID, so that Ctrl-C in GDB
-	# does not kill OpenOCD. See https://github.com/RIOT-OS/RIOT/pull/3619.
-	config = env.Listify(env.get("MODM_OPENOCD_CONFIGFILES", []))
-	config = " ".join(map("-f \"{}\"".format, map(env.subst, config)))
-	openocd = subprocess.Popen("openocd {} -c \"log_output /dev/null\"".format(config),
-	                           cwd=os.getcwd(), shell=True, preexec_fn=os.setsid)
-	# This call is blocking
-	config =  env.Listify(env.get("MODM_GDBINIT", []))
-	config += env.Listify(env.get("MODM_OPENOCD_GDBINIT", []))
-	config = " ".join(map("-x \"{}\"".format, map(env.subst, config)))
-	subprocess.call("arm-none-eabi-gdb {} {}".format(config, source[0]),
-	                cwd=os.getcwd(), shell=True)
-	# Then kill just the background OpenOCD process
-	os.killpg(os.getpgid(openocd.pid), signal.SIGTERM)
-	return 0
+def execute_action(env, source, mode):
+    # Build tool environment
+    config_openocd = env.Listify(env.get("MODM_OPENOCD_CONFIGFILES", []))
+    config_gdb  = env.Listify(env.get("MODM_OPENOCD_GDBINIT", []))
+    config_gdb += env.Listify(env.get("MODM_GDBINIT", []))
+    tool_env = {
+        "CONFIG_OPENOCD": map(env.subst, config_openocd),
+        "CONFIG_GDB": map(env.subst, config_gdb),
+        "CONFIG_SOURCES": [source[0]],
+    }
+    return openocd_gdb.execute(tool_env, mode)
 
-def gdb_arm_none_eabi_debug(env, source, alias="gdb_arm_none_eabi_debug"):
-	action = Action(run_openocd_gdb, cmdstr="$OPENOCDGDBSTR")
-	return env.AlwaysBuild(env.Alias(alias, source, action))
+# -----------------------------------------------------------------------------
+def execute_gdbtui(target, source, env):
+    return execute_action(env, source, mode="tui")
+
+def execute_gdbgui(target, source, env):
+    return execute_action(env, source, mode="gui")
+
+# -----------------------------------------------------------------------------
+def build_gdbtui(env, source, alias="build_gdbtui"):
+    action = Action(execute_gdbtui, cmdstr="$OPENOCDGDBSTR")
+    return env.AlwaysBuild(env.Alias(alias, source, action))
+
+def build_gdbgui(env, source, alias="build_gdbgui"):
+    action = Action(execute_gdbgui, cmdstr="$OPENOCDGDBSTR")
+    return env.AlwaysBuild(env.Alias(alias, source, action))
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
-	# build messages
-	if not ARGUMENTS.get("verbose"):
-		env["OPENOCDGDBSTR"] = "%s.------GDB----> %s$SOURCE\n" \
-	                           "%s'----OpenOCD--> %s$CONFIG_DEVICE_NAME%s" % \
-	                           ("\033[;0;32m", "\033[;0;33m", "\033[;0;32m", "\033[;1;33m", "\033[;0;0m")
+    # build messages
+    if not ARGUMENTS.get("verbose"):
+        env["OPENOCDGDBSTR"] = \
+            "%s.------GDB----> %s$SOURCE\n" \
+            "%s'----OpenOCD--> %s$CONFIG_DEVICE_NAME%s" % \
+            ("\033[;0;32m", "\033[;0;33m", "\033[;0;32m", "\033[;1;33m", "\033[;0;0m")
 
-	env.AddMethod(gdb_arm_none_eabi_debug, "OpenOcdGdb")
+    env.AddMethod(build_gdbtui, "OpenOcdGdbTui")
+    env.AddMethod(build_gdbgui, "OpenOcdGdbGui")
 
 def exists(env):
-	return env.Detect("openocd") and env.Detect("arm-none-eabi-gdb")
+    return env.Detect("openocd") and env.Detect("arm-none-eabi-gdb")

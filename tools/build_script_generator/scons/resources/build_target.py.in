@@ -37,7 +37,8 @@ def build_target(env, sources):
 	env.Alias("size", env.Size(program))
 	%% if core.startswith("cortex-m")
 	env.Alias("itm", env.OpenOcdItm())
-	env.Alias("gdb", env.OpenOcdGdb(program))
+	env.Alias("gdbtui", env.OpenOcdGdbTui(program))
+	env.Alias("gdbgui", env.OpenOcdGdbGui(program))
 	env.Alias("postmortem", env.PostMortemGdb(program))
 	env.Alias("artifact", env.CacheArtifact(program))
 

@@ -16,5 +16,3 @@ end
 
 mon init
 mon poll on
-refresh
-c

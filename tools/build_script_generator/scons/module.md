@@ -50,7 +50,7 @@ module documentation.
 !!! tip "Debug Profile"
     When working with the debug profile, make sure to add `profile=debug` to all
     commands, especially `scons program profile=debug` and
-    `scons gdb profile=debug`!
+    `scons gdbtui profile=debug`!
 
 
 #### scons build
@@ -241,23 +241,27 @@ Executes your project on your computer.
 (\* *only Hosted targets*)
 
 
-#### scons gdb
+#### scons gdbtui
+#### scons gdbgui
 
 Launches OpenOCD in the background, then launches GDB in foreground with the
-correct executable. When GDB exits, it stops the OpenOCD process.
+correct executable with text-based or [web-based GDBGUI](gdbgui) UI. When GDB
+exits, it stops the OpenOCD process.
 (\* *only ARM Cortex-M targets*)
 
 This is just a convenience wrapper for the debug functionality defined in the
 `modm:build` module.
 
+To use GDBGUI you must have it installed via `pip install gdbgui`.
+
 !!! tip "Choose the correct profile"
-    When debugging, make sure to select the correct compilation profile.
-    The firmware and the executable given to GDB have to be the some or you'll
-    see GDB translate the program counter to the wrong code locations.
-    When you suspect a bug in your firmware, consider that it was most likely
-    compiled with the release profile, since that's the default.
-    First try to `scons gdb profile=release`, and if that doesn't help, compile
-    and `scons program profile=debug` and try `scons gdb profile=debug` again.
+    When debugging, make sure to select the correct compilation profile. The
+    firmware and the executable given to GDB have to be the some or you'll see
+    GDB translate the program counter to the wrong code locations. When you
+    suspect a bug in your firmware, consider that it was most likely compiled
+    with the release profile, since that's the default. First try to `scons
+    gdbtui profile=release`, and if that doesn't help, compile and `scons
+    program profile=debug` and try `scons gdbtui profile=debug` again.
 
 
 #### scons postmortem

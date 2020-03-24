@@ -109,10 +109,10 @@ Program received signal SIGINT, Interrupt.
 ```
 
 !!! warning "Be careful attaching to a running target"
-    Due to the OpenOCD implementation, the target is halted for a very short
-    period of time, while the device's debug peripheral is initialized.
-    This time is dependent on the debug adapter and may range from just a few
-    milliseconds to hundreds. Make sure your hardware can handle that!
+    The OpenOCD implementation halts the target at least while the device's
+    debug peripheral is initialized. Only connect to systems that cannot create
+    any damage while being halted! For example halting motor controllers may
+    result in literal burning motors!!
 
 
 ## Using AvrDude
