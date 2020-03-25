@@ -21,7 +21,6 @@ def prepare(module, options):
         ":architecture:atomic",
         ":architecture:can",
         ":architecture:clock",
-        ":architecture:heap",
         ":architecture:register")
     return True
 

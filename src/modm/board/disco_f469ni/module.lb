@@ -61,7 +61,7 @@ linkerscript_sections = """\
     __sdramdata_load = LOADADDR (.sdramdata);   /* address in FLASH */
     __sdramdata_start = .;                      /* address in RAM */
 
-    KEEP(*(.sdramdata))
+    *(.sdramdata)
 
     . = ALIGN(4);
     __sdramdata_end = .;
@@ -69,6 +69,9 @@ linkerscript_sections = """\
 
 .heap_extern (NOLOAD) : ALIGN(4)
 {
+    *(.heap_extern)
+    . = ALIGN(4);
+
     __heap_extern_start = .;
     . = ORIGIN(SDRAM) + LENGTH(SDRAM);
     __heap_extern_end = .;

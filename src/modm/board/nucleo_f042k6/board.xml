@@ -8,8 +8,7 @@
   <options>
     <option name="modm:target">stm32f042k6t6</option>
     <option name="modm:platform:uart:2:buffer.tx">256</option>
-    <option name="modm:platform:cortex-m:main_stack_size">992</option>
-    <option name="modm:platform:cortex-m:allocator">block</option>
+    <option name="modm:platform:cortex-m:main_stack_size">1024</option>
   </options>
   <modules>
     <module>modm:board:nucleo-f042k6</module>

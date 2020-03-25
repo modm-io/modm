@@ -1,0 +1,103 @@
+/*
+ * Copyright (c) 2009-2010, Martin Rosekeit
+ * Copyright (c) 2009-2011, Fabian Greif
+ * Copyright (c) 2011-2012, 2014, 2016, 2020, Niklas Hauser
+ * Copyright (c) 2012, Sascha Schade
+ * Copyright (c) 2013, Kevin Läufer
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#include <new>
+#include <stdlib.h> // for prototypes of malloc() and free()
+%% if with_memory_traits
+#include <modm/architecture/interface/memory.hpp>
+%% endif
+#include <modm/architecture/interface/assert.hpp>
+
+%% if with_memory_traits
+%% if is_avr
+static inline
+%% else
+extern "C" modm_weak
+%% endif
+void* malloc_traits(std::size_t size, uint32_t)
+{ return malloc(size); }
+%% endif
+
+template<bool with_traits>
+static inline void*
+%% if with_memory_traits
+new_assert(size_t size, modm_unused modm::MemoryTraits traits = modm::MemoryDefault)
+%% else
+new_assert(size_t size)
+%% endif
+{
+	void *ptr;
+%% if not is_avr
+	while(1)
+	{
+%% if with_memory_traits
+		if constexpr (with_traits) {
+			ptr = malloc_traits(size, traits.value);
+		} else {
+			ptr = malloc(size);
+		}
+%% else
+		ptr = malloc(size);
+%% endif
+		if (ptr) break;
+		/* See footnote 1) in https://en.cppreference.com/w/cpp/memory/new/operator_new
+		 *
+		 * In case of failure, the standard library implementation calls the
+		 * function pointer returned by std::get_new_handler and repeats
+		 * allocation attempts until new handler does not return or becomes a
+		 * null pointer, at which time it throws std::bad_alloc.
+		 */
+		if (std::get_new_handler()) std::get_new_handler()();
+		else break;
+	}
+%% else
+	ptr = malloc(size);
+%% endif
+
+	if (ptr == nullptr) {
+%% if options.get("with_exceptions", False)
+		throw std::bad_alloc();
+%% else
+		modm_assert(0, "new",
+			"C++ new() operator failed to allocate!", size);
+%% endif
+	}
+	return ptr;
+}
+
+// ----------------------------------------------------------------------------
+void* operator new  (std::size_t size) { return new_assert<false>(size); }
+void* operator new[](std::size_t size) { return new_assert<false>(size); }
+
+void* operator new  (std::size_t size, const std::nothrow_t&) noexcept { return malloc(size); }
+void* operator new[](std::size_t size, const std::nothrow_t&) noexcept { return malloc(size); }
+
+%% if with_memory_traits
+void* operator new  (std::size_t size, modm::MemoryTraits traits) { return new_assert<true>(size, traits); }
+void* operator new[](std::size_t size, modm::MemoryTraits traits) { return new_assert<true>(size, traits); }
+
+void* operator new  (std::size_t size, modm::MemoryTraits traits, const std::nothrow_t&) noexcept { return malloc_traits(size, traits.value); }
+void* operator new[](std::size_t size, modm::MemoryTraits traits, const std::nothrow_t&) noexcept { return malloc_traits(size, traits.value); }
+%% endif
+
+// ----------------------------------------------------------------------------
+void operator delete  (void *ptr) noexcept { free(ptr); }
+void operator delete[](void* ptr) noexcept { free(ptr); }
+
+void operator delete  (void* ptr, std::size_t) noexcept { free(ptr); }
+void operator delete[](void* ptr, std::size_t) noexcept { free(ptr); }
+
+void operator delete  (void* ptr, const std::nothrow_t&) noexcept { free(ptr); }
+void operator delete[](void* ptr, const std::nothrow_t&) noexcept { free(ptr); }

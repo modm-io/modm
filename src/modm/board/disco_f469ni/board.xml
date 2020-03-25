@@ -8,10 +8,11 @@
   <options>
     <option name="modm:target">stm32f469nih6</option>
     <option name="modm:platform:uart:3:buffer.tx">2048</option>
-    <option name="modm:platform:cortex-m:allocator">tlsf</option>
-    <option name="modm:tlsf:minimum_pool_size">16777216</option>
+    <option name="modm:platform:heap:allocator">tlsf</option>
+    <option name="modm:tlsf:minimum_pool_size">2**24</option>
   </options>
   <modules>
     <module>modm:board:disco-f469ni</module>
+    <module>modm:platform:heap</module>
   </modules>
 </library>

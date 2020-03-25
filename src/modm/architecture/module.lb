@@ -189,21 +189,6 @@ class GpioExpander(Module):
         env.copy("interface/gpio_expander.hpp")
 # -----------------------------------------------------------------------------
 
-class Heap(Module):
-    def init(self, module):
-        module.name = "heap"
-        module.description = "Memory Allocators"
-
-    def prepare(self, module, options):
-        module.depends(":utils")
-        return True
-
-    def build(self, env):
-        env.outbasepath = "modm/src/modm/architecture"
-        env.copy("driver/heap/block_allocator.hpp")
-        env.copy("driver/heap/block_allocator_impl.hpp")
-# -----------------------------------------------------------------------------
-
 class I2c(Module):
     def init(self, module):
         module.name = "i2c"
@@ -266,7 +251,22 @@ class Interrupt(Module):
 class Memory(Module):
     def init(self, module):
         module.name = "memory"
-        module.description = "Memory Traits"
+        module.description = """
+# Memory Traits
+
+Memories have different traits, such as DMA-ability or access time. The memory
+allocator functions (`malloc()`, `operator new`, etc) by default only return
+DMA-able memories, ordered by fastest access time. To allocate memory with
+specific traits, use the overloaded `operator new`:
+
+```cpp
+auto *p = new (modm::MemoryFastData) Foo;
+auto *q = new (modm::MemoryExternal, std::nothrow) Foo;
+```
+
+!!! tip "You need to choose a heap implementation!"
+    You can include the `:platform:heap` module or supply your own implementation.
+"""
 
     def prepare(self, module, options):
         module.depends(":architecture:register")
@@ -384,7 +384,6 @@ def prepare(module, options):
     module.add_submodule(Delay())
     module.add_submodule(Gpio())
     module.add_submodule(GpioExpander())
-    module.add_submodule(Heap())
     module.add_submodule(I2c())
     module.add_submodule(I2cDevice())
     module.add_submodule(I2cMultiplexer())

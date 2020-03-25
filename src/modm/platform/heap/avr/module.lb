@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2017-2018, 2020 Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":platform:heap"
+    module.description = "Dynamic Memory"
+
+def prepare(module, options):
+    if not options[":target"].has_driver("core:avr*"):
+        return False
+
+    module.depends(
+        ":architecture:assert",
+        ":architecture:memory")
+
+    module.add_option(
+        EnumerationOption(
+            name="ram_block_length",
+            description="",
+            enumeration=["2", "4", "8", "16", "32", "64"],
+            default="16"))
+    module.add_option(
+        NumericOption(
+            name="ram_length",
+            description="",
+            minimum=64,
+            maximum=32768,
+            default=1024))
+
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/platform/heap"
+    env.template("ram.cpp.in")

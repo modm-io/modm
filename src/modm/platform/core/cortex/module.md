@@ -22,11 +22,11 @@ implemented as follows:
 6. Execute shared hardware initialization functions.
 7. Copy data from internal flash to *external* RAM.
 8. Zero sections in *external* RAM.
-9. Initialize heap via `__modm_initialize_memory()` (provided by the
-   `modm:platform:cortex-m:allocator` option).
+9. Initialize heap via `__modm_initialize_memory()` (implemented by the
+   `modm:platform:heap` module).
 10. Call static constructors.
 11. Call `main()` application entry point.
-12. If `main()` returns, assert on `core.main.exit` (only in debug profile).
+12. If `main()` returns, assert on `main.exit` (only in debug profile).
 13. Reboot if assertion returns.
 
 
@@ -101,7 +101,7 @@ linkerscript and the `Reset_Handler` is defined by the startup script.
 All handlers are weakly aliased to `Undefined_Handler`, which is called if an
 IRQ is enabled, but no handler is defined for it. This default handler
 determines the currectly active IRQ, sets its priority to the lowest level, and
-disables the IRQ from firing again and then asserts on `core.nvic.undefined`
+disables the IRQ from firing again and then asserts on `nvic.undef`
 with the (signed) IRQ number as context.
 
 The lowering of the priority is necessary, since the assertion handlers (see

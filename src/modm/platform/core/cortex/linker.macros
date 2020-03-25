@@ -182,6 +182,8 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 %% macro section_heap(memory, name, placement=None)
 	.{{name}} (NOLOAD) :
 	{
+		*(.{{name}})
+		. = ALIGN(4);
 		__{{name}}_start = .;
 		. = ORIGIN({{memory}}) + LENGTH({{memory}});
 		__{{name}}_end = .;
@@ -242,6 +244,13 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		*(.ARM.extab* .gnu.linkonce.armextab.*)
 		*(.ARM.exidx* .gnu.linkonce.armexidx.*)
 		*(.eh_frame*)
+	}
+%% endif
+%% if not with_heap
+	/DISCARD/ :
+	{
+		/* See `modm:platform:heap` module for an explanation! */
+		*({{no_heap_section}})
 	}
 %% endif
 

@@ -1,0 +1,69 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2016-2018, 2020, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def continuous_ram_sizes(target):
+    memories = listify(target.get_driver("core")["memory"])
+    rams = ((int(m["start"], 16), int(m["start"], 16) + int(m["size"]))
+            for m in memories if "rw" in m["access"] and "backup" not in m["name"])
+    rams = sorted(rams, key=lambda m: m[0])
+
+    pools = [rams[0]]
+    for ram in rams[1:]:
+        # is the end address of the last pool the start address of the new pool
+        if pools[-1][1] == ram[0]:
+            # Set the pool end to the section end
+            pools[-1] = (pools[-1][0], ram[1])
+        else:
+            pools.append(ram)
+
+    return [p[1] - p[0] for p in pools]
+
+
+def init(module):
+    module.name = ":platform:heap"
+    module.description = FileReader("module.md")
+
+def prepare(module, options):
+    if not options[":target"].has_driver("core:cortex-m*"):
+        return False
+
+    ram_sizes = continuous_ram_sizes(options[":target"])
+    default_allocator = "newlib"
+    if len(ram_sizes):
+        default_allocator = "tlsf"
+    elif ram_sizes[0] <= 4096:
+        default_allocator = "block"
+
+    module.add_option(
+        EnumerationOption(
+            name="allocator",
+            description="Heap allocator algorithms",
+            enumeration=["newlib", "block", "tlsf"],
+            default=default_allocator,
+            dependencies=lambda v: {"newlib": None,
+                                    "block": ":driver:block.allocator",
+                                    "tlsf": ":tlsf"}[v]))
+
+    module.depends(":architecture:assert", ":architecture:memory")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/platform/heap"
+    env.copy("heap_{}.cpp".format(env["allocator"]))
+
+    if env["allocator"] != "newlib":
+        env.collect(":build:linkflags", "-Wl,-wrap,_malloc_r",
+                                        "-Wl,-wrap,_calloc_r",
+                                        "-Wl,-wrap,_realloc_r",
+                                        "-Wl,-wrap,_free_r")
+
+    # Note: no_heap.c.in is used by :platform:cortex-m

@@ -60,7 +60,7 @@ def name(raw_name):
                    .replace("BLOCK-DEVICE-", "")\
                    .replace("BLOCK-", "")\
                    .replace("-SPI", "")
-    if result in ["DEVICE", "LIS3-TRANSPORT", "MEMORY-BUS", "TERMINAL",
+    if result in ["DEVICE", "LIS3-TRANSPORT", "MEMORY-BUS", "TERMINAL", "ALLOCATOR",
                   "MIRROR", "ADC-SAMPLER", "FAT", "HEAP", "--PYCACHE--"]:
         return None
     return result

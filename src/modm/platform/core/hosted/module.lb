@@ -30,7 +30,8 @@ def build(env):
     env.substitutions = {"target": target, "core": "hosted"}
     env.outbasepath = "modm/src/modm/platform/core"
 
-    env.copy("memory.cpp")
+    if env.has_module(":architecture:memory"):
+        env.copy("memory.cpp")
 
     if env.has_module(":architecture:atomic"):
         env.copy("atomic_lock.hpp")
