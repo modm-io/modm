@@ -3,7 +3,6 @@
   <extends>modm:nucleo-l432kc</extends>
   <options>
     <option name="modm:build:scons:unittest.source">../../build/unittest/nucleo-l432/modm-test</option>
-    <option name="modm:build:scons:unittest.runner">../runner/stm32.cpp.in</option>
   </options>
   <modules>
     <module>modm:platform:heap</module>

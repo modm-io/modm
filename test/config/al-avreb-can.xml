@@ -3,7 +3,6 @@
   <extends>modm:al-avreb-can</extends>
   <options>
     <option name="modm:build:scons:unittest.source">../../build/unittest/al-avreb-can/modm-test</option>
-    <option name="modm:build:scons:unittest.runner">../runner/avr.cpp.in</option>
     <!-- <option name="modm:build:avrdude.programmer">avrispmkII</option> -->
     <option name="modm:build:avrdude.programmer">usbasp-clone</option>
     <option name="modm:build:scons:info.git">Disabled</option>
