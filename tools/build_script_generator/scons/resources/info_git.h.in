@@ -10,8 +10,7 @@
 // ----------------------------------------------------------------------------
 
 #pragma once
-
-#define MODM_GIT_INFO 1
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,15 +31,12 @@ extern const char *MODM_GIT_CONFIG_USER_NAME;
 extern const char *MODM_GIT_CONFIG_USER_EMAIL;
 
 %% if with_status
-#define MODM_GIT_STATUS 1
-
-extern const char *MODM_GIT_MODIFIED;
-extern const char *MODM_GIT_ADDED;
-extern const char *MODM_GIT_DELETED;
-extern const char *MODM_GIT_RENAMED;
-extern const char *MODM_GIT_COPIED;
-extern const char *MODM_GIT_UPDATED_NOT_MERGED;
-extern const char *MODM_GIT_UNTRACKED;
+extern const int16_t MODM_GIT_MODIFIED;
+extern const int16_t MODM_GIT_ADDED;
+extern const int16_t MODM_GIT_DELETED;
+extern const int16_t MODM_GIT_RENAMED;
+extern const int16_t MODM_GIT_COPIED;
+extern const int16_t MODM_GIT_UNTRACKED;
 %% endif
 
 #ifdef __cplusplus

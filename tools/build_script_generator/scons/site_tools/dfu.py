@@ -42,7 +42,7 @@ def generate(env, **kw):
 	# Name of the binary program to run
 	env['DFU_STM32_PROGRAMMER'] = 'dfu-util'
 
-	env.AddMethod(dfu_stm32_programmer_flash, 'DfuStm32Programmer')
+	env.AddMethod(dfu_stm32_programmer_flash, 'ProgramDFU')
 
 def exists(env):
 	return env.Detect('dfu_stm32_programmer')

@@ -1,10 +1,3 @@
-# Doesn't work correctly since Ctrl-C will kill openocd
-# See https://github.com/RIOT-OS/RIOT/pull/3619
-# Launch with `openocd -f openocd.cfg & arm-none-eabi-gdb; kill $!` in shell instead
-# target extended-remote | openocd -f openocd.cfg -c "gdb_port pipe"
-
-target extended-remote :3333
-
 define restart
   mon reset halt
 end
@@ -16,5 +9,3 @@ end
 
 mon init
 mon poll on
-refresh
-c

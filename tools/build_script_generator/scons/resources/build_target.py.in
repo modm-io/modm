@@ -36,30 +36,30 @@ def build_target(env, sources):
 	env.Depends(target=program, dependency=abspath("modm/link/linkerscript.ld"))
 	env.Alias("size", env.Size(program))
 	%% if core.startswith("cortex-m")
-	env.Alias("itm", env.OpenOcdItm())
-	env.Alias("gdb", env.OpenOcdGdb(program))
-	env.Alias("postmortem", env.PostMortemGdb(program))
-	env.Alias("artifact", env.CacheArtifact(program))
+	env.Alias("log-itm", env.LogItmOpenOcd())
 
-		%% if upload_with_artifact
-	env.Alias("program", [env.OpenOcd(program, commands=["modm_program {$SOURCE}"]), "artifact"])
-	env.Alias("bmp", [env.BlackMagicProbe(program), "artifact"])
-	env.Alias('dfu', [env.DfuStm32Programmer(env.Bin(program)), "artifact"])
-		%% else
-	env.Alias("program", env.OpenOcd(program, commands=["modm_program {$SOURCE}"]))
-	env.Alias("bmp", env.BlackMagicProbe(program))
-	env.Alias('dfu', env.DfuStm32Programmer(env.Bin(program)))
-		%% endif
+	env.Alias("artifact", env.CacheArtifact(program))
+		%% set artifact = ', "artifact"' if upload_with_artifact else ''
+	env.Alias("program", [env.ProgramOpenOcd(program){{ artifact }}])
+	env.Alias("program-remote", [env.ProgramGdbRemote(program){{ artifact }}])
+	env.Alias("program-bmp", [env.ProgramBMP(program){{ artifact }}])
+	env.Alias('program-dfu', [env.ProgramDFU(env.Bin(program)){{ artifact }}])
+
+	env.Alias("debug", env.DebugOpenOcd(program))
+	env.Alias("debug-remote", env.DebugGdbRemote(program))
+	env.Alias("debug-bmp", env.DebugBMP(program))
+	env.Alias("debug-coredump", env.DebugCoredump(program))
+
+	env.Alias("reset", env.ResetOpenOcd())
+	env.Alias("reset-bmp", env.ResetBMP())
+	env.Alias("reset-remote", env.ResetGdbRemote())
 
 	%% elif core.startswith("avr")
-	env.Alias("program", env.Avrdude(program))
+	env.Alias("program", env.ProgramAvrdude(program))
+	env.Alias("program-fuses", env.ProgramAvrdudeFuses(program))
 	%% endif
 
-	%% if platform == "hosted"
-	env.Alias("all", ["build"])
-	%% else
 	env.Alias("all", ["build", "size"])
-	%% endif
 %% endif
 
 	env.Default("all")

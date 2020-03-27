@@ -29,7 +29,8 @@ def font_action(target, source, env):
 	os.system('python3 "%s" "%s" "%s"' % (command, infile, outfile))
 
 def font_string(target, source, env):
-	return "Create Font: '%s'" % (str(source[0]))
+	return "{0}Create Font···· {1}{3}{2}" \
+	       .format("\033[;0;32m", "\033[;0;33m", "\033[;0;0m", str(source[0]))
 
 def font_emitter(target, source, env):
 	header = os.path.splitext(str(target[0]))[0] + ".hpp"

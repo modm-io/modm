@@ -23,8 +23,7 @@ def init(module):
 
 
 def prepare(module, options):
-    _, default_project_name = os.path.split(os.getcwd())
-    default_project_name = default_project_name.replace(".", "_").replace(" ", "_")
+    default_project_name = os.path.split(os.getcwd())[1].replace(".", "_").replace(" ", "_")
     platform = options[":target"].identifier["platform"]
     is_cortex_m = options[":target"].has_driver("core:cortex-m*")
 

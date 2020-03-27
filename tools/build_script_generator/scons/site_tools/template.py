@@ -37,10 +37,13 @@ def template_emitter(target, source, env):
 	Depends(target, SCons.Node.Python.Value(env['substitutions']))
 	return target, source
 
-def template_string(target, source, env):
-	return "Jinja2 Template: '%s' to '%s'" % (str(source[0]), str(target[0]))
-
 def generate(env, **kw):
+	def template_string(target, source, env):
+		return "{0}.----Jinja2---- {1}{4}\n" \
+			   "{0}'---Template--> {2}{5}{3}" \
+			   .format("\033[;0;32m", "\033[;0;33m", "\033[;1;33m", "\033[;0;0m",
+			           str(source[0]), str(target[0]))
+
 	env.Append(
 		BUILDERS = {
 		'Jinja2Template':  env.Builder(

@@ -67,6 +67,11 @@ def post_build(env):
     })
     if subs["platform"] == "avr":
         subs.update(env.query("::avrdude_options"))
+    if subs["core"].startswith("cortex-m"):
+        # get memory information
+        subs["memories"] = env.query("::memories")
+    else:
+        subs["memories"] = []
     # Set these substitutions for all templates
     env.substitutions = subs
 
