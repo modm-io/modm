@@ -133,6 +133,28 @@ def build(env):
     for flag, values in common_compiler_flags("gcc", env[":target"]).items():
         env.collect(flag, *values)
 
+    # Copy python tools folder
+    platform = env[":target"].identifier["platform"]
+    is_cortex_m = env[":target"].has_driver("core:cortex-m*")
+    tools = {
+        "bitmap",
+        "find_files",
+        "info",
+        "unittest",
+        "utils",
+    }
+    if is_cortex_m:
+        tools.update({"bmp", "openocd", "crashdebug", "gdb", "backend",
+                      "log", "build_id", "size"})
+    elif platform in ["avr"]:
+        tools.update({"avrdude"})
+
+    env.outbasepath = "modm/"
+    env.substitutions = {"tools": tools}
+    env.template("../modm_tools/__init__.py.in", "modm_tools/__init__.py")
+    for tool in ("modm_tools/{}.py".format(t) for t in tools):
+        env.copy(localpath("..", tool), tool)
+
 def post_build(env):
     if env.buildlog._buildlog._metadata:
         env.log.error("'env.add_metadata(key, *values)' is not supported anymore!\n\n"
