@@ -7,9 +7,6 @@
   <repositories>
   	<repository><path>../repo.lb</path></repository>
   </repositories>
-  <options>
-    <option name="modm:build:scons:cache_dir">$cache</option>
-  </options>
   <modules>
   	<module>modm:docs</module>
   </modules>
