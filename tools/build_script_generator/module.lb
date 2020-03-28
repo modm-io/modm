@@ -10,16 +10,41 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-import os
+import os, sys
+from pathlib import Path
 
 # import all common code
 with open(localpath("common.py")) as common:
     exec(common.read())
 
+class BuildModuleDocs:
+    def __init__(self):
+        self._content = None
 
+    def __str__(self):
+        if self._content is None:
+            self._content = Path(localpath("module.md")).read_text().strip()
+            tools = ["avrdude", "openocd", "bmp", "gdb", "size",
+                     "unittest", "log", "build_id", "bitmap"]
+
+            for tool in tools:
+                tpath = Path(repopath("tools/modm_tools/{}.py".format(tool)))
+                doc = None
+                if tpath.with_suffix(".md").exists():
+                    doc = tpath.with_suffix(".md").read_text()
+                elif tpath.exists():
+                    co = compile(tpath.read_bytes(), tpath, 'exec')
+                    if co.co_consts and isinstance(co.co_consts[0], str):
+                        doc = co.co_consts[0]
+                if doc is not None:
+                    self._content += "\n\n\n" + doc.strip()
+
+        return self._content
+
+# -----------------------------------------------------------------------------
 def init(module):
     module.name = ":build"
-    module.description = FileReader("module.md")
+    module.description = BuildModuleDocs()
 
 
 def prepare(module, options):

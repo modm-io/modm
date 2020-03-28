@@ -122,10 +122,11 @@ def get_modules(builder, limit=None):
                 cp.setAttribute("_description", c._description)
                 opvals = cp.addChild("inputs")
                 opvals.setValue(c.format_values())
+
             for q in init._queries:
                 qp = m.addChild(q.fullname.split(":")[-1])
                 qp.addSortKey(lambda qq: (qq.name))
-                qp.setAttribute("type", type(c).__name__)
+                qp.setAttribute("type", type(q).__name__)
                 qp.setAttribute("_description", q._description)
 
         if mfinal is None:
@@ -230,37 +231,39 @@ def format_module(modules, node):
         "options": [], "collectors": [], "queries": []
     }
 
-    for deps in (c for c in node.children if c.name == "dependency"):
-        mprops["dependencies"][deps["value"]] = deps.ids == node.ids
+    for child in node.children:
+        ctype = child.get("type", "")
+        if child.name == "dependency":
+            mprops["dependencies"][child["value"]] = (child.ids == node.ids)
 
-    for option in (c for c in node.children if "Option" in c.get("type", "")):
-        op = {"name": option.name,
-              "description": option["_description"].strip().strip("#").strip(),
-              "targets": target_diff(option.ids, compare=node.ids),
-              "default": {c["value"]: target_diff(c.ids, compare=option.ids) for c in option.children if c.name == "default"},
-              "inputs": {c["value"]: target_diff(c.ids, compare=option.ids) for c in option.children if c.name == "inputs"},
-              "dependencies": {c["value"]: target_diff(c.ids, compare=option.ids) for c in option.children if c.name == "dependency"},
-        }
-        # print(fullname, op["dependencies"])
-        for name, targets in op["dependencies"].items():
-            name = name.split("-> ")[1]
-            mprops["dependencies"][name] = mprops["dependencies"].get(name, False)
-        mprops["options"].append(op)
+        elif "Option" in ctype:
+            op = {"name": child.name,
+                  "description": child["_description"].strip().strip("#").strip(),
+                  "targets": target_diff(child.ids, compare=node.ids),
+                  "default": {c["value"]: target_diff(c.ids, compare=child.ids) for c in child.children if c.name == "default"},
+                  "inputs": {c["value"]: target_diff(c.ids, compare=child.ids) for c in child.children if c.name == "inputs"},
+                  "dependencies": {c["value"]: target_diff(c.ids, compare=child.ids) for c in child.children if c.name == "dependency"},
+            }
+            # print(fullname, op["dependencies"])
+            for name, targets in op["dependencies"].items():
+                name = name.split("-> ")[1]
+                mprops["dependencies"][name] = mprops["dependencies"].get(name, False)
+            mprops["options"].append(op)
 
-    for collector in (c for c in node.children if "Collector" in c.get("type", "")):
-        op = {"name": collector.name,
-              "description": collector["_description"].strip().strip("#").strip(),
-              "targets": target_diff(collector.ids, compare=node.ids),
-              "inputs": {c["value"]: target_diff(c.ids, compare=collector.ids) for c in collector.children if c.name == "inputs"},
-        }
-        mprops["collectors"].append(op)
+        elif "Collector" in ctype:
+            op = {"name": child.name,
+                  "description": child["_description"].strip().strip("#").strip(),
+                  "targets": target_diff(child.ids, compare=node.ids),
+                  "inputs": {c["value"]: target_diff(c.ids, compare=child.ids) for c in child.children if c.name == "inputs"},
+            }
+            mprops["collectors"].append(op)
 
-    for query in (c for c in node.children if "Query" in c.get("type", "")):
-        op = {"name": query.name,
-              "description": query["_description"].strip().strip("#").strip(),
-              "targets": target_diff(query.ids, compare=node.ids),
-        }
-        mprops["queries"].append(op)
+        elif "Query" in ctype:
+            op = {"name": child.name,
+                  "description": child["_description"].strip().strip("#").strip(),
+                  "targets": target_diff(child.ids, compare=node.ids),
+            }
+            mprops["queries"].append(op)
 
     mprops["graph"] = render_dependency_graphs(mprops)
     modules[fullname].append(mprops)
