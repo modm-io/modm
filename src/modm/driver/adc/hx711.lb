@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2020, Sascha Schade
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:hx711"
+    module.description = """\
+# HX711 Load Cell Amplifier and ADC
+
+The HX711 is an integrated load cell amplifier designed for weight scales and
+industrial control applications to interface directly with a bridge sensor.
+The interface is bit-bang and timing based, so only GPIO is needed.
+In a complete system the SCK pin's timing while reading must be met.
+"""
+
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:delay",
+        ":architecture:gpio",
+        ":processing:resumable")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/adc"
+    env.copy("hx711.hpp")
+    env.copy("hx711_impl.hpp")
