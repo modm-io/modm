@@ -54,7 +54,11 @@ main()
 	if (FaultReporter::hasReport())
 	{
 		MODM_LOG_ERROR << "\n\nHardFault! Copy the data into a 'coredump.txt' file, ";
-		MODM_LOG_ERROR << "then execute\n\n\tscons postmortem firmware=" << modm::hex;
+		MODM_LOG_ERROR << "then execute\n\n\tscons debug-coredump ";
+#ifdef MODM_DEBUG_BUILD
+		MODM_LOG_ERROR << "profile=debug ";
+#endif
+		MODM_LOG_ERROR << "firmware=" << modm::hex;
 		for (const auto data : FaultReporter::buildId()) MODM_LOG_ERROR << data;
 		MODM_LOG_ERROR << "\n\n";
 		for (const auto data : FaultReporter())

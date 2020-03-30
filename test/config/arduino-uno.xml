@@ -3,7 +3,6 @@
   <extends>modm:arduino-uno</extends>
   <options>
     <option name="modm:build:scons:unittest.source">../../build/unittest/arduino-uno/modm-test</option>
-    <option name="modm:build:scons:unittest.runner">../runner/avr.cpp.in</option>
     <option name="modm:build:scons:info.git">Disabled</option>
     <option name="modm:build:avrdude.port">/dev/tty.usbserial-1410</option>
     <option name="modm:io:with_float">True</option>

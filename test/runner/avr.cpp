@@ -13,15 +13,9 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
-
-#include <unittest/reporter.hpp>
 #include <unittest/controller.hpp>
 
 using namespace modm::platform;
-
-${includes}
-
-${names}
 
 extern Board::LoggerDevice loggerDevice;
 
@@ -34,15 +28,9 @@ main()
 
 	loggerDevice.write("Unittests (" __DATE__ ", " __TIME__")\n");
 
-	unittest::Reporter reporter(loggerDevice);
-	unittest::Controller::instance().setReporter(reporter);
-
 	Board::Leds::write(0b110);
 
-	// run tests
-${tests}
-
-	unittest::Controller::instance().getReporter().printSummary();
+	unittest::Controller::run(loggerDevice);
 
 	Board::Leds::write(0b111);
 	for (;;) {}

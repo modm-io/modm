@@ -83,7 +83,7 @@ The generated Doxypress/Doxygen documentation contains the original module docum
 lbuild options to changes in the generated source code.
 
 
-### Online API documentation
+## Online API Docs
 
-API documentation is available at https://docs.modm.io/ for a large and representative
-number of targets with all modules enabled.
+API documentation is available at [docs.modm.io](https://docs.modm.io/) for a
+large and representative number of targets with all modules enabled.

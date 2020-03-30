@@ -50,10 +50,14 @@ module documentation.
 !!! tip "Debug Profile"
     When working with the debug profile, make sure to add `profile=debug` to all
     commands, especially `scons program profile=debug` and
-    `scons gdb profile=debug`!
+    `scons debug profile=debug`!
 
 
 #### scons build
+
+```
+scons build profile={debug|release}
+```
 
 Compiles your application into an executable.
 
@@ -73,6 +77,10 @@ Linking········ build/release/game_of_life.elf
 
 
 #### scons size
+
+```
+scons size profile={debug|release}
+```
 
 Displays the static Flash and RAM consumption of your target.
 
@@ -96,6 +104,10 @@ Heap:     16.4 MiB
 
 
 #### scons program
+
+```
+scons program profile={debug|release} [port={serial-port}]
+```
 
 Writes the executable onto your target via Avrdude or OpenOCD.
 This is a convenience wrapper around the programming options and methods
@@ -129,17 +141,19 @@ shutdown command invoked
 ```
 
 
-#### scons dfu
+#### scons program-dfu
+
+```
+scons program-dfu profile={debug|release}
+```
 
 Writes the executable onto your target via Device Firmware Update (DFU) over USB.
 A DFU bootloader is available on many STM32 microcontrollers
 and can be accessed by pressing the BOOT0-Button during startup.
 (\* *only ARM Cortex-M targets*)
 
-Example:
-
 ```
-$ scons dfu
+$ scons program-dfu
 scons: Reading SConscript files ...
 scons: done reading SConscript files.
 scons: Building targets ...
@@ -185,12 +199,16 @@ scons: done building targets.
 ```
 
 
-#### scons bmp
+#### scons program-bmp
+
+```
+scons program-bmp profile={debug|release} [port={serial-port}]
+```
 
 [Black Magic Probe][bmp] is convenient tool to convert cheap USB ST-LINK V2 clones
 to a fully functional GDB compatible debug adaptor for ARM Cortex microcontrollers.
 GDB can directly communicate with the debug adaptor making debugging easy and
-accessible. Currently, only uploading code to the target is supported.
+accessible.
 (\* *only ARM Cortex-M targets*)
 
 Black Magic Probe creates two serial devices, the first being the GDB interface
@@ -202,18 +220,13 @@ crw-rw-rw-  1 root  wheel   21, 104 Feb 19 09:46 /dev/tty.usbmodemDEADBEEF
 crw-rw-rw-  1 root  wheel   21, 106 Feb 19 09:46 /dev/tty.usbmodemDEADBEF1
 ```
 
-You can upload your code using a Black Magic Probe with specifying the GDB
-interface as `port` parameter.
+You can let the tool guess the port or explicitly specify it:
 
 ```
-$ scons bmp port=/dev/cu.usbmodemDEADBEEF verbose=1
+$ scons program-bmp port=/dev/cu.usbmodemDEADBEEF
 scons: Reading SConscript files ...
-bmp port iss = /dev/cu.usbmodemDEADBEEF
 scons: done reading SConscript files.
 scons: Building targets ...
-arm-none-eabi-gdb -ex "target extended-remote /dev/cu.usbmodemDEADBEEF" \
-                  -ex "monitor swdp_scan" -ex "attach 1" -ex "load path/to/project.elf" \
-                  -ex "detach" -ex "quit"
 [...]
 Remote debugging using /dev/cu.usbmodemDEADBEEF
 Target voltage: unknown
@@ -235,32 +248,63 @@ scons: done building targets.
 ```
 
 
+#### scons program-remote
+
+```
+scons program-remote profile={debug|release} [host={ip or hostname}]
+```
+
+Writes the executable onto your target connected to a remote OpenOCD process
+running on your own computer (host=`localhost`) or somewhere else.
+
+
 #### scons run
 
 Executes your project on your computer.
 (\* *only Hosted targets*)
 
 
-#### scons gdb
+#### scons debug
+
+```
+scons debug profile={debug|release} ui={tui|web}
+```
 
 Launches OpenOCD in the background, then launches GDB in foreground with the
-correct executable. When GDB exits, it stops the OpenOCD process.
+correct executable with text-based or [web-based GDBGUI](gdbgui) UI. When GDB
+exits, it stops the OpenOCD process.
 (\* *only ARM Cortex-M targets*)
 
 This is just a convenience wrapper for the debug functionality defined in the
-`modm:build` module.
+`modm:build` module. To use GDBGUI you must have it installed via
+`pip install gdbgui`.
 
 !!! tip "Choose the correct profile"
-    When debugging, make sure to select the correct compilation profile.
-    The firmware and the executable given to GDB have to be the some or you'll
-    see GDB translate the program counter to the wrong code locations.
-    When you suspect a bug in your firmware, consider that it was most likely
-    compiled with the release profile, since that's the default.
-    First try to `scons gdb profile=release`, and if that doesn't help, compile
-    and `scons program profile=debug` and try `scons gdb profile=debug` again.
+    When debugging, make sure to select the correct compilation profile. The
+    firmware and the executable given to GDB have to be the some or you'll see
+    GDB translate the program counter to the wrong code locations. When you
+    suspect a bug in your firmware, consider that it was most likely compiled
+    with the release profile, since that's the default. First try to `scons
+    debug profile=release`, and if that doesn't help, compile and `scons
+    program profile=debug` and try `scons debug profile=debug` again.
 
 
-#### scons postmortem
+#### scons debug-bmp
+
+```
+scons debug-bmp profile={debug|release} ui={tui|web} port={serial-port}
+```
+
+Launches GDB to debug via Black Magic Probe.
+(\* *only ARM Cortex-M targets*)
+
+
+#### scons debug-coredump
+
+```
+scons debug-coredump profile={debug|release} ui={tui|web} \
+                     firmware={GNU Build ID} coredump={path/to/coredump.txt}
+```
 
 Launches GDB for post-mortem debugging with the firmware identified by the
 `firmware={hash}` argument using the data from the `coredump={filepath}`
@@ -269,18 +313,83 @@ argument.
 
 See the `:platform:fault` module for details how to receive the coredump data.
 
+#### scons program-remote
 
-#### scons itm
+```
+scons debug-remote profile={debug|release} ui={tui|web} [host={ip or hostname}]
+```
+
+Debugs the executable via a remote OpenOCD process running on your own computer
+(localhost is default) or somewhere else.
+(\* *only ARM Cortex-M targets*)
+
+
+#### scons reset
+
+```
+scons reset
+```
+
+Resets the executable via OpenOCD.
+(\* *only ARM Cortex-M targets*)
+
+
+#### scons reset-bmp
+
+```
+scons reset-bmp [port={serial}]
+```
+
+Resets the executable via Black Magic Probe.
+(\* *only ARM Cortex-M targets*)
+
+
+#### scons reset-remote
+
+```
+scons reset-remote [host={ip or hostname}]
+```
+
+Resets the executable via a remote OpenOCD process running on your own computer
+(localhost is default) or somewhere else.
+(\* *only ARM Cortex-M targets*)
+
+
+#### scons log-itm
+
+```
+scons log-itm fcpu={HCLK in Hz}
+```
 
 Configures OpenOCD in tracing mode to output ITM channel 0 on SWO pin and
 displays the serial output stream.
 (\* *only ARM Cortex-M targets*)
 
+```
+ $ scons log-itm fcpu=64000000
+scons: Reading SConscript files ...
+scons: done reading SConscript files.
+scons: Building targets ...
+.----OpenOCD--> Single Wire Viewer
+'------SWO----- stm32f103rbt6
+Open On-Chip Debugger 0.10.0
+Licensed under GNU GPL v2
+Info : The selected transport took over low-level target control.
+loop: 57
+loop: 58
+loop: 59
+loop: 60
+loop: 61
+```
+
 See the `:platform:itm` module for details how to use the ITM as a logging
 output.
 
-
 #### scons symbols
+
+```
+scons symbols profile={debug|release}
+```
 
 Dumps the symbol table for your executable.
 
@@ -300,6 +409,10 @@ Show symbols for 'build/release/game_of_life.elf':
 
 
 #### scons listing
+
+```
+scons listing profile={debug|release}
+```
 
 Decompiles your executable into an annotated assembly listing.
 This is very useful for checking and learning how the compiler translates C++
@@ -334,6 +447,10 @@ main()
 
 #### scons bin
 
+```
+scons bin profile={debug|release}
+```
+
 Creates a binary file of your executable.
 
 ```
@@ -343,6 +460,10 @@ Binary File···· build/release/game_of_life.bin
 
 
 #### scons artifact
+
+```
+scons artifact profile={debug|release}
+```
 
 Caches the ELF and binary file of the newest compiled executable identified by
 the hash of the binary file in `{build_path}/artifacts/{hash}.elf`.
@@ -354,6 +475,10 @@ Cache Artifact· build/release/game_of_life.elf
 
 
 #### scons -c
+
+```
+scons -c profile={debug|release}
+```
 
 Cleans the build artifacts.
 
@@ -453,7 +578,6 @@ If called `with_status=True`, this information is added as well:
 - `MODM_GIT_DELETED`: number of deleted files: `D`.
 - `MODM_GIT_RENAMED`: number of renamed files: `R`.
 - `MODM_GIT_COPIED`: number of copied files: `C`.
-- `MODM_GIT_UPDATED_NOT_MERGED`: number of updated, but not merged files: `U`.
 - `MODM_GIT_UNTRACKED`: number of untracked files: `?`.
 
 This is the output of the `example/linux/git` project showing an unclean

@@ -1,5 +1,5 @@
 # Copyright (c) 2018, Sergiy Yevtushenko
-# Copyright (c) 2018-2019, Niklas Hauser
+# Copyright (c) 2018-2020, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -31,5 +31,6 @@ add_custom_target(${CMAKE_PROJECT_NAME}.lss ALL DEPENDS ${CMAKE_PROJECT_NAME} CO
 %% if core.startswith("avr")
 add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_SIZE} ARGS -C -d --mcu={{ partname }} ${CMAKE_PROJECT_NAME}.elf)
 %% elif core.startswith("cortex-m")
-add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_SIZE} ARGS -B ${CMAKE_PROJECT_NAME}.elf)
+#% FIXME: build path does not contain python tools of course
+#% add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD COMMAND python3 ./modm/modm_tools/size.py ${CMAKE_PROJECT_NAME}.elf "{{memories}}")
 %% endif

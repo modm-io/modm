@@ -11,117 +11,6 @@ the `modm:build:scons` or `modm:build:cmake` submodule for that, or provide
 your own build system.**
 
 
-## Using OpenOCD
-
-For accessing your ARM Cortex-M based device, we use OpenOCD by default and
-generate a `modm/openocd.cfg` file with the target specific configuration:
-
-- Search directories passed via the `path.openocd` collector.
-- User configuration files passed via the `openocd.source` collector.
-  Your custom `modm:build:openocd.cfg` is added here too.
-- The target specific programming command `modm_program elffile`
-
-You can now upload your program in a one-line command:
-
-```sh
-openocd -f modm/openocd.cfg -c "modm_program path/to/project.elf"
-```
-```
-Open On-Chip Debugger 0.10.0
-adapter speed: 2000 kHz
-adapter_nsrst_delay: 100
-none separate
-srst_only separate srst_nogate srst_open_drain connect_deassert_srst
-program_debug
-Info : clock speed 1800 kHz
-Info : STLINK v2 JTAG v28 API v2 SWIM v18 VID 0x0483 PID 0x374B
-Info : using stlink api v2
-Info : Target voltage: 3.260972
-Info : stm32f4x.cpu: hardware has 6 breakpoints, 4 watchpoints
-adapter speed: 1800 kHz
-** Programming Started **
-auto erase enabled
-Info : device id = 0x10006434
-Info : flash size = 2048kbytes
-wrote 16384 bytes from file path/to/project.elf in 0.589551s (27.139 KiB/s)
-** Programming Finished **
-** Verify Started **
-verified 13064 bytes in 0.328969s (38.781 KiB/s)
-** Verified OK **
-adapter speed: 1800 kHz
-target halted due to debug-request, current mode: Thread
-xPSR: 0x01000000 pc: 0x0800263c msp: 0x10000be0
-shutdown command invoked
-```
-
-
-## Using GDB
-
-For debugging your program on ARM Cortex-M device, we provide the `modm/gdbinit`
-and `modm/openocd_gdbinit` files for the `arm-none-eabi-gdb` debugger connected
-to your target via OpenOCD.
-
-Two commands are provided for convenience:
-
-- `restart` resets the device and halts.
-- `rerun` resets the device and continues execution.
-
-GDB is configured in TUI mode and continues running the target after attaching,
-but *does not* load an ELF file! Please pass the ELF file as a command line
-argument.
-
-You can start your debug session by launching OpenOCD and then GDB:
-
-```sh
-# Run OpenOCD without any commands in the background
-openocd -f modm/openocd.cfg
-# Open another shell with your projects ELF file
-arm-none-eabi-gdb -x modm/gdbinit -x modm/openocd_gdbinit path/to/project.elf
-```
-
-```
-   ┌——main.cpp———————————————————————————————————————————————————————┐
-  >│194             DRAW(x+1, y+3);                                  │
-   │195             DRAW(x+2, y+3);                                  │
-   │196     #else                                                    │
-   │197             DRAW(x  , y  );                                  │
-   │198     #endif                                                   │
-   │199     #undef DRAW                                              │
-   │200     }                                                        │
-   │201                                                              │
-   │202     static inline void drawScreen(framebuffer_t before, frame│
-   └—————————————————————————————————————————————————————————————————┘
-  >│0x80017a0 <game_of_life()+1692> strh.w r3, [r4, r12, lsl #1]     │
-   │0x80017a4 <game_of_life()+1696> add    r0, lr                    │
-   │0x80017a6 <game_of_life()+1698> ldr    r2, [r2, #0]              │
-   │0x80017a8 <game_of_life()+1700> strh.w r3, [r2, r0, lsl #1]      │
-   │0x80017ac <game_of_life()+1704> ldr    r3, [sp, #12]             │
-   │0x80017ae <game_of_life()+1706> ldr    r2, [sp, #0]              │
-   │0x80017b0 <game_of_life()+1708> add    r2, r3                    │
-   │0x80017b2 <game_of_life()+1710> ldrb   r3, [r7, r1]              │
-   │0x80017b4 <game_of_life()+1712> strb   r3, [r2, r1]              │
-   └—————————————————————————————————————————————————————————————————┘
-extended-r Remote target In: game_of_life         L194  PC: 0x80017a0
-
-Program received signal SIGINT, Interrupt.
-0x080017a0 in drawPixel (color=<optimized out>, y=42, x=578) at main.c
-(gdb)
-```
-
-!!! warning "Be careful attaching to a running target"
-    Due to the OpenOCD implementation, the target is halted for a very short
-    period of time, while the device's debug peripheral is initialized.
-    This time is dependent on the debug adapter and may range from just a few
-    milliseconds to hundreds. Make sure your hardware can handle that!
-
-
-## Using AvrDude
-
-Unfortunately AvrDude does not support a user configuration file like OpenOCD
-does, so there is no convenient one-line command to issue.
-You have to use the wrapper support of the specific build system.
-
-
 ## Compiler Options
 
 We maintain a common set of compiler options for all build system generator, so
@@ -165,5 +54,71 @@ For exception and RTTI flags, see `modm:stdc++` module.
 
 For target specific flags, see the `modm:platform:core` and related modules.
 
-
 [options]: https://gcc.gnu.org/onlinedocs/gcc/Option-Summary.html
+
+
+## Configuration
+
+This module generates a common set of configuration files that are used by the
+common tooling. Please note that these files are the *foundation* of more
+extensive tooling available as Python scripts which are then again wrapped by
+your chosen build system for convenience.
+
+
+### OpenOCD
+
+For accessing your ARM Cortex-M based device, we use OpenOCD by default and
+generate a `modm/openocd.cfg` file with the target specific configuration:
+
+- Search directories passed via the `path.openocd` collector.
+- User configuration files passed via the `openocd.source` collector.
+  Your custom `modm:build:openocd.cfg` is added here too.
+
+You need to start openocd with this configuration file:
+
+```sh
+openocd -f modm/openocd.cfg
+```
+
+!!! warning "Be careful attaching to a running target"
+    The OpenOCD implementation halts the target at least while the device's
+    debug peripheral is initialized. Only connect to systems that cannot create
+    any damage while being halted! For example halting motor controllers may
+    damage motors!!
+
+
+### AvrDude
+
+Unfortunately AvrDude does not support a *project-specific* configuration file
+like OpenOCD does (only a undocumented user config in `~/.avrduderc`), so there
+is no convenient one-line command to issue. You have to use the wrapper support
+of the specific build system or simply call AvrDude yourself via its command
+line.
+
+
+### GDB
+
+Two commands are provided for convenience via the `modm/gdbinit` configuration:
+
+- `restart` resets the device and halts.
+- `rerun` resets the device and continues execution.
+
+GDB continues running the target after attaching, but *does not* load an ELF
+file! Please pass the ELF file as a command line argument.
+
+You can start your GDB session like so:
+
+```sh
+arm-none-eabi-gdb -x modm/gdbinit path/to/project.elf
+```
+
+
+## Generic Python Tools
+
+We have written a number of pure Python tools to provide common functionality
+that get wrapped by the build system.
+
+Here is a selection of tools that have a command line interface, so you can call
+them even without build system support in case you have a special setup.
+Note that there are even more tools that can be called in Python only, so have
+a look in your generated `modm/modm_tools` folder.

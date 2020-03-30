@@ -11,8 +11,6 @@
 
 #pragma once
 
-#define MODM_BUILD_INFO 1
-
 #ifdef __cplusplus
 extern "C" {
 #endif

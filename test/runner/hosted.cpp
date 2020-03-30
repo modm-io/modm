@@ -13,7 +13,6 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <unittest/reporter.hpp>
 #include <unittest/controller.hpp>
 
 #include <modm/debug/logger.hpp>
@@ -41,16 +40,8 @@ modm::log::StyleWrapper< modm::log::Prefix< char[10] > > loggerDeviceError( \
 		modm::log::Prefix< char[10] >("Error  : ", outputDevice ));
 modm::log::Logger modm::log::error(loggerDeviceError);
 
-${includes}
-
-${names}
-
-int
-main()
+int main()
 {
-	unittest::Reporter reporter(outputDevice);
-	unittest::Controller::instance().setReporter(reporter);
-
     MODM_LOG_INFO << "Machine:  " << MODM_BUILD_MACHINE  << modm::endl;
     MODM_LOG_INFO << "User:     " << MODM_BUILD_USER     << modm::endl;
     MODM_LOG_INFO << "Os:       " << MODM_BUILD_OS       << modm::endl;
@@ -81,8 +72,5 @@ main()
     MODM_LOG_INFO << "Copied:    " << MODM_GIT_COPIED    << modm::endl;
     MODM_LOG_INFO << "Untracked: " << MODM_GIT_UNTRACKED << modm::endl;
 
-	// run tests
-${tests}
-
-	return unittest::Controller::instance().getReporter().printSummary();
+    return unittest::Controller::run(outputDevice);
 }

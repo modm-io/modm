@@ -22,3 +22,6 @@ def prepare(module, options):
 
 def build(env):
     env.collect("modm:build:path.include", "modm-test/src")
+    env.outbasepath = "."
+    env.copy("runner/{}.cpp".format(env[":target"].identifier.platform),
+             "main.cpp")

@@ -11,29 +11,19 @@ BUILD_DIR = {{ build_path }}
 
 CMAKE_GENERATOR = Unix Makefiles
 CMAKE_FLAGS = -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=ON -DCMAKE_RULE_MESSAGES:BOOL=ON -DCMAKE_VERBOSE_MAKEFILE:BOOL=OFF
-%% if core.startswith("avr")
-AVRDUDE_FLAGS = -V -p {{ mcu }} -c {{ avrdude_programmer }} {% if avrdude_port %}-P {{ avrdude_port }}{% endif %} {% if avrdude_baudrate > 0 %}-b {{ avrdude_baudrate }}{% endif %} {{ avrdude_options }}
-%% endif
 
-.PHONY: build-release build-debug cmake clean cleanall upload-debug upload-release gdb gdb-release openocd killopenocd
+.PHONY: cmake build clean cleanall program program-bmp debug debug-bmp debug-coredump log-itm
 
 .DEFAULT_GOAL := all
 
 ### Targets
-
-all: cmake build-release
+all: cmake build
 
 cmake:
 	@cmake -E make_directory $(BUILD_DIR)/cmake-build-debug
 	@cmake -E make_directory $(BUILD_DIR)/cmake-build-release
 	@cd $(BUILD_DIR)/cmake-build-debug && cmake $(CMAKE_FLAGS) -DCMAKE_BUILD_TYPE=Debug -G "$(CMAKE_GENERATOR)" {{ project_path }}
 	@cd $(BUILD_DIR)/cmake-build-release && cmake $(CMAKE_FLAGS) -DCMAKE_BUILD_TYPE=Release -G "$(CMAKE_GENERATOR)" {{ project_path }}
-
-build-release:
-	@cmake --build $(BUILD_DIR)/cmake-build-release
-
-build-debug:
-	@cmake --build $(BUILD_DIR)/cmake-build-debug
 
 clean:
 	@cmake --build $(BUILD_DIR)/cmake-build-release --target clean
@@ -43,31 +33,46 @@ cleanall:
 	@rm -rf $(BUILD_DIR)/cmake-build-release
 	@rm -rf $(BUILD_DIR)/cmake-build-debug
 
-%% if core.startswith("avr")
-upload-debug: build-debug
-	@avrdude $(AVRDUDE_FLAGS) -U flash:w:$(BUILD_DIR)/cmake-build-debug/{{ project_name }}.elf
+profile?=release
+build:
+	@cmake --build $(BUILD_DIR)/cmake-build-$(profile)
 
-upload-release: build-release
-	@avrdude $(AVRDUDE_FLAGS) -U flash:w:$(BUILD_DIR)/cmake-build-release/{{ project_name }}.elf
+port?=auto
+ELF_FILE=$(BUILD_DIR)/cmake-build-$(profile)/{{ project_name }}.elf
+%% if core.startswith("avr")
+program: build
+	@python3 modm/modm_tools/avrdude.py -p {{ mcu }} -c {{ avrdude_programmer }} \
+			-P {% if avrdude_port %}{{ avrdude_port }}{% else %}$(port){% endif %} {% if avrdude_baudrate > 0 %}-b {{ avrdude_baudrate }}{% endif %} \
+			$(ELF_FILE)
 
 %% elif core.startswith("cortex-m")
-upload-debug: build-debug
-	@openocd -f modm/openocd.cfg -c "modm_program $(BUILD_DIR)/cmake-build-release/{{ project_name }}.elf"
+MEMORIES = "{{ memories }}"
+size: build
+	@python3 modm/modm_tools/size.py $(ELF_FILE) $(MEMORIES)
 
-upload-release: build-release
-	@openocd -f modm/openocd.cfg -c "modm_program $(BUILD_DIR)/cmake-build-release/{{ project_name }}.elf"
+program: build
+	@python3 modm/modm_tools/openocd.py -f modm/openocd.cfg $(ELF_FILE)
 
-gdb: build-debug
-	@arm-none-eabi-gdb -x modm/gdbinit -x modm/openocd_gdbinit $(BUILD_DIR)/cmake-build-debug/{{ project_name }}.elf
-	@killall openocd || true
+program-bmp: build
+	@python3 modm/modm_tools/bmp.py -p $(port) $(ELF_FILE)
 
-gdb-release: build-release
-	@arm-none-eabi-gdb -x modm/gdbinit -x modm/openocd_gdbinit $(BUILD_DIR)/cmake-build-release/{{ project_name }}.elf
-	@killall openocd || true
+ui?=tui
+debug: build
+	@python3 modm/modm_tools/gdb.py -x modm/gdbinit -x modm/openocd_gdbinit \
+			$(ELF_FILE) -ui=$(ui) \
+			openocd -f modm/openocd.cfg
 
-openocd:
-	@openocd -f modm/openocd.cfg
+debug-bmp: build
+	@python3 modm/modm_tools/bmp.py -x modm/gdbinit \
+			$(ELF_FILE) -ui=$(ui) \
+			bmp -p $(port)
 
-killopenocd:
-	@killall openocd || true
+debug-coredump: build
+	@python3 modm/modm_tools/gdb.py -x modm/gdbinit \
+			$(ELF_FILE) -ui=$(ui) \
+			crashdebug --binary-path modm/ext/crashcatcher/bins
+
+fcpu?=0
+log-itm:
+	@python3 modm/modm_tools/log.py itm openocd -f modm/openocd.cfg -fcpu $(fcpu)
 %% endif

@@ -41,19 +41,33 @@ Generates the CMake build folders and initializes the build system.
     If you forget to call this first, the build will fail with this error message:
 
     ```
-     $ make build-release
+     $ make build
     Error: build/cmake-build-release is not a directory
     make: *** [build-release] Error 1
     ```
 
 
-#### make build-release
-#### make build-debug
+#### make clean
+
+Removes the CMake build artifacts.
+
+
+#### make cleanall
+
+Removes the entire build folder. You must then first call `make cmake` before
+being able to build again.
+
+
+#### make build
+
+```
+make build profile={debug|release}
+```
 
 Compiles your application into an executable using the release or debug profile.
 
 ```
- $ make build-release
+ $ make build profile=release
 Scanning dependencies of target blink_cmake
 [  3%] Building C object CMakeFiles/blink_cmake.dir/modm/ext/cmsis/device/peripherals.c.o
 [  7%] Building CXX object CMakeFiles/blink_cmake.dir/modm/src/modm/architecture/driver/atomic/flag.cpp.o
@@ -69,16 +83,41 @@ Scanning dependencies of target blink_cmake
 ```
 
 
-#### make upload-release
-#### make upload-debug
-
-Writes the executable onto your target via AvrDude or OpenOCD.
-This is a convenience wrapper around the programming options and methods
-defined in the `modm:build` module.
-(\* *only AVR and ARM Cortex-M targets*)
+#### make size
 
 ```
- $ make upload-release
+make size profile={debug|release}
+```
+
+Displays the static Flash and RAM consumption of your target.
+
+Example for the Blue Pill target:
+
+```
+ $ make size
+
+Program:   1.4 KiB (2.2% used)
+(.build_id + .fastcode + .fastdata + .hardware_init + .rodata +
+ .table.copy.intern + .table.heap + .table.zero.intern + .text + .vector_rom)
+
+Data:      3.0 KiB (15.1% used) = 20 B static (0.1%) + 3072 B stack (15.0%)
+(.bss + .fastdata + .stack)
+
+Heap:     17.0 KiB (84.9% available)
+(.heap1)
+```
+
+
+#### make program
+
+```
+make program profile={debug|release} [port={serial-port}]
+```
+
+Writes the executable onto your target via AvrDude or OpenOCD.
+
+```
+ $ make program
 [100%] Built target blink_cmake
 [100%] Built target blink_cmake.bin
 [100%] Built target blink_cmake.hex
@@ -102,33 +141,64 @@ verified 1652 bytes in 0.104584s (15.426 KiB/s)
 shutdown command invoked
 ```
 
+#### make program-bmp
 
-#### make gdb
-#### make gdb-release
+```
+make program-bmp profile={debug|release} [port={serial-port}]
+```
 
-Launches GDB with the debug or release executable.
-This is just a convenience wrapper for the debug functionality defined in the
-`modm:build` module.
+Writes the executable onto your target via Black Magic Probe.
 (\* *only ARM Cortex-M targets*)
 
-**OpenOCD must already be running in the background**. Launch it by manually
-calling `make openocd` in another terminal.
+
+#### make debug
+
+```
+make debug profile={debug|release} ui={tui|web}
+```
+
+Launches OpenOCD in the background, then launches GDB in foreground with the
+correct executable with text-based or [web-based gdbgui](gdbgui) UI. When GDB
+exits, it stops the OpenOCD process.
+(\* *only ARM Cortex-M targets*)
+
+To use gdbgui you must have it installed via `pip install gdbgui`.
+
+!!! tip "Choose the correct profile"
+    When debugging, make sure to select the correct compilation profile. The
+    firmware and the executable given to GDB have to be the some or you'll see
+    GDB translate the program counter to the wrong code locations. When you
+    suspect a bug in your firmware, consider that it was most likely compiled
+    with the release profile, since that's the default. First try to
+    `make debug profile=release`, and if that doesn't help, compile and
+    `make program profile=debug` and try `make debug profile=debug` again.
 
 
-#### make openocd
+#### make debug-coredump
 
-Starts OpenOCD with the modm specific configuration.
+```
+make debug-coredump profile={debug|release} ui={tui|web}
+```
+
+Launches GDB for post-mortem debugging with the using the data in the
+`coredump.txt` argument.
+(\* *only ARM Cortex-M targets*)
+
+See the `:platform:fault` module for details how to receive the coredump data.
 
 
-#### make clean
+#### make log-itm
 
-Removes the CMake build artifacts.
+```
+make log-itm fcpu={HCLK in Hz}
+```
 
+Configures OpenOCD in tracing mode to output ITM channel 0 on SWO pin and
+displays the serial output stream.
 
-#### make cleanall
-
-Removes the entire build folder. You must then first call `make cmake` before
-being able to build again.
+See the `:platform:itm` module for details how to use the ITM as a logging
+output.
 
 
 [cmake]: http://cmake.org
+[gdbgui]: https://www.gdbgui.com

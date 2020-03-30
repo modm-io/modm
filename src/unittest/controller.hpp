@@ -58,6 +58,10 @@ namespace unittest
 		void
 		nextTestSuite(modm::accessor::Flash<char> name) const;
 
+		/// Run the generated unittest
+		static int
+		run(Reporter reporter);
+
 	private:
 		Controller();
 

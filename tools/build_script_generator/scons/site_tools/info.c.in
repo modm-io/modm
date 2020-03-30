@@ -12,5 +12,9 @@
 #include "info_{{ type }}.h"
 
 %% for name, value in defines.items()
-const char *{{ name | upper }} = {{ value }};
+%% if value is number
+const int16_t {{ name | upper }} = {{ value }};
+%% else
+const char *{{ name | upper }} = "{{ value }}";
+%% endif
 %% endfor

@@ -4,11 +4,12 @@ This is the required software for generating, compiling and programming projects
 with modm:
 
 - [Python 3](http://www.python.org/)
-- [Software Construct](http://www.scons.org/)
+- [Software Construct][scons] or [CMake][]
 - [Library Builder][lbuild]
 - AVR toolchain: [avr-gcc][] and [avrdude][]
 - ARM toolchain: [gcc-arm-toolchain][] and [OpenOCD][].
-- [Doxygen](http://www.doxygen.nl)
+- Optional: [Doxygen][] or [Doxypress][]
+- Optional: [gdbgui][] for IDE-independent debugging
 
 Note that the modm examples use the SCons build system by default, however,
 you are not *required* to use it. See [the reference manual](../../reference/build-systems) for
@@ -48,11 +49,17 @@ well:
 	brew install arm-gcc-bin
 	brew install openocd --HEAD
 
-scons now works with Python 3. Unfortunately, macOS still defaults to Python 2.
+We recommend the use of a graphical frontend for GDB called [gdbgui][]:
+
+	pip3 install gdbgui
+
+SCons now works with Python 3. Unfortunately, macOS still defaults to Python 2.
 For a less intrusive way to run all scons scripts with Python 3 add this to your
 `.bashrc` or `.zshrc`:
 
 	alias scons="/usr/bin/env python3 $(which scons)"
+	# or if your using scons elsewhere too:
+	alias scons3="/usr/bin/env python3 $(which scons)"
 
 To compile modm *for macOS* (and not the embedded target) you need to install
 some of these libraries as well, depending on what modm modules you use:
@@ -81,12 +88,16 @@ Install the AVR toochain:
 !!! bug "avr-gcc on Ubuntu"
 	Ubuntu does not provide an up-to-date version of avr-gcc that supports C++17.
 	For our CI we've created a [precompiled version of avr-gcc for Ubuntu][avr-gcc-latest].
-	Use at your own risk.
+	Unfortunately its path is hardcoded to `/work/avr-gcc`.
 
 Install the ARM toochain by downloading [the pre-built version][gcc-arm-toolchain]
 for 64-bit Linux and adding its `/bin` directory to your path.
-Even though your distribution may ship their own ARM toolchain, we *very strongly
-recommend* using the official toolchain, since all of modm is tested with it.
+**Even though your distribution may ship their own ARM toolchain, we very strongly
+recommend using the official toolchain, since all of modm is tested with it.**
+
+We recommend the use of a graphical frontend for GDB called [gdbgui][]:
+
+	pip3 install gdbgui
 
 To compile modm *for Linux* (and not the embedded target) you need to install
 some of these libraries as well, depending on what modm modules you use:
@@ -96,32 +107,49 @@ some of these libraries as well, depending on what modm modules you use:
 
 ## Windows
 
-We will use [Anaconda](https://www.anaconda.com/) ([Miniconda](http://conda.pydata.org/miniconda.html) [Windows installation](https://docs.conda.io/en/latest/miniconda.html#windows-installers) is sufficient) to create a new Python 3 environment and install all
-necessary packages:
+We will use [Anaconda][] ([Miniconda Windows installation][miniconda] is
+sufficient) to create a new Python 3 environment and install all necessary
+packages:
 
     conda create --name modm python=3 pip
     activate modm
     conda install -c conda-forge git
-    pip install jinja2 scons future pyelftools lbuild
+    pip install jinja2 scons future pyelftools lbuild gdbgui
 
 For ARM development install the Windows 32-bit build of the [GNU Arm Embedded
 Toolchain][gcc-arm-toolchain]. For programming and debugging ARM Cortex-M
-devices install the pre-build [OpenOCD binaries](http://gnutoolchains.com/arm-eabi/openocd/).
+devices install the pre-build [OpenOCD binaries][openocd_binaries].
 You'll need to add both `/bin` paths to your `PATH` variable manually.
 
 !!! warning "For non-English speakers"
-	For now project and build paths containing non-ASCII characters are not parsed correctly.
+	For now project and build paths containing non-ASCII characters are not
+	parsed correctly.
+
+!!! warning "Windows paths"
+	Windows created maximal incompatibility with it's `\` path separator.
+	Even though we try hard to not hardcode the path separator, there may still
+	be issues related to this. [Please open an issue][newissue] in that case.
 
 !!! info "Dear Windows users"
-	We don't regularly use Windows with modm, so we rely on YOU to keep these install instructions
-	working and up-to-date. Please [open a PR with improvements][contribute].
+	We don't regularly use Windows with modm, so we rely on YOU to keep these
+	install instructions working and up-to-date. Please [open a PR with
+	improvements][contribute].
 
 
 [contribute]: https://github.com/modm-io/modm/blob/develop/CONTRIBUTING.md
+[newissue]: https://github.com/modm-io/modm/issues/new
 [examples]: https://github.com/modm-io/modm/tree/develop/examples
 [gcc-arm-toolchain]: https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm
 [openocd]: http://openocd.org
-[avr-gcc]: http://www.nongnu.org/avr-libc
-[avrdude]: http://www.nongnu.org/avrdude
+[avr-gcc]: https://www.nongnu.org/avr-libc
+[avrdude]: https://www.nongnu.org/avrdude
 [lbuild]: https://github.com/modm-io/lbuild
-[avr-gcc-latest]: https://github.com/salkinium/docker-avr-gcc/releases
+[scons]: https://www.scons.org
+[cmake]: https://www.cmake.org
+[anaconda]: https://www.anaconda.com
+[miniconda]: https://docs.conda.io/en/latest/miniconda.html#windows-installers
+[avr-gcc-latest]: https://github.com/modm-ext/docker-avr-gcc/releases
+[openocd_binaries]: https://gnutoolchains.com/arm-eabi/openocd
+[doxygen]: http://www.doxygen.nl
+[doxypress]: https://www.copperspice.com/documentation-doxypress.html
+[gdbgui]: https://www.gdbgui.com

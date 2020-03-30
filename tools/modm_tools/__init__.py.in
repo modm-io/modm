@@ -1,0 +1,10 @@
+# modm Python tools
+__all__ = [
+%% for tool in tools | sort
+    "{{ tool }}",
+%% endfor
+]
+
+%% for tool in tools | sort
+from . import {{ tool }}
+%% endfor

@@ -11,6 +11,11 @@
 from os.path import join, abspath
 Import("env")
 
+%% if is_modm
+import sys
+sys.path.append(join(env.Dir("#").abspath, "modm"))
+%% endif
+
 profile = env["CONFIG_PROFILE"]
 %% if is_modm
 env["BUILDPATH"] = join(env["CONFIG_BUILD_BASE"], profile)
@@ -99,9 +104,15 @@ env["CONFIG_DEVICE_MEMORY"] = [
 # Programming configuration
 %% if core.startswith("avr")
 env["CONFIG_AVRDUDE_DEVICE"] = "{{ mcu }}"
+%% if avrdude_programmer
 env["CONFIG_AVRDUDE_PROGRAMMER"] = "{{ avrdude_programmer }}"
+%% endif
+%% if avrdude_port
 env["CONFIG_AVRDUDE_PORT"] = "{{ avrdude_port }}"
+%% endif
+%% if avrdude_options
 env["CONFIG_AVRDUDE_OPTIONS"] = "{{ avrdude_options }}"
+%% endif
 %% if avrdude_baudrate > 0
 env["CONFIG_AVRDUDE_BAUDRATE"] = "{{ avrdude_baudrate }}"
 %% endif

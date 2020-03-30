@@ -15,15 +15,10 @@
 #include <modm/board.hpp>
 #include <modm/debug/logger.hpp>
 
-#include <unittest/reporter.hpp>
 #include <unittest/controller.hpp>
 
 #include <info_git.h>
 #include <info_build.h>
-
-${includes}
-
-${names}
 
 using namespace modm::platform;
 
@@ -69,15 +64,9 @@ main()
 	MODM_LOG_INFO << "Copied:    " << MODM_GIT_COPIED    << modm::endl;
 	MODM_LOG_INFO << "Untracked: " << MODM_GIT_UNTRACKED << modm::endl << modm::endl;
 
-	unittest::Reporter reporter(loggerDevice);
-	unittest::Controller::instance().setReporter(reporter);
-
 	Board::Leds::write(0b110);
 
-	// run tests
-${tests}
-
-	unittest::Controller::instance().getReporter().printSummary();
+	unittest::Controller::run(loggerDevice);
 
 	Board::Leds::write(0b111);
 	for (;;) {}

@@ -273,9 +273,9 @@ def build(env):
         env.copy("delay.hpp")
 
     # GNU Build ID
+    env.collect(":build:linkflags", "-Wl,--build-id=sha1")
     if env.has_module(":architecture:build_id"):
         env.copy("build_id.cpp")
-        env.collect(":build:linkflags", "-Wl,--build-id=sha1")
 
     if env.has_module(":architecture:clock"):
         # modm-test implements the clock methods itself
