@@ -34,7 +34,7 @@ def prepare(module, options):
 
 
 def build(env):
-    env.outbasepath = "modm-test/src/modm/driver"
+    env.outbasepath = "modm-test/src/modm-test/driver"
     patterns = []
     if env[":target"].identifier["platform"] == "avr":
         patterns += ["*pressure*"]
