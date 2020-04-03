@@ -2,9 +2,9 @@
 <library>
   <extends>modm:arduino-nano</extends>
   <options>
-    <option name="modm:build:scons:unittest.source">../../build/unittest/arduino-nano/modm-test</option>
+    <option name="modm:build:build.path">../../build/generated-unittest/arduino-nano/</option>
+    <option name="modm:build:scons:unittest.source">../../build/generated-unittest/arduino-nano/modm-test</option>
     <option name="modm:build:scons:info.git">Disabled</option>
-    <option name="modm:build:avrdude.port">/dev/tty.usbserial-1410</option>
     <option name="modm:io:with_float">True</option>
     <option name="modm:io:with_long_long">True</option>
     <option name="modm:io:with_printf">True</option>
@@ -12,17 +12,29 @@
 
   <modules>
     <!-- ATmega328p only has 32kB of Flash -->
+
     <!-- <module>modm-test:test:architecture</module>
-    <module>modm-test:test:communication</module>
-    <module>modm-test:test:container</module>
-    <module>modm-test:test:driver</module>
+    <module>modm-test:test:communication:sab</module> -->
+
+
+    <!-- <module>modm-test:test:communication:xpcc</module> -->
+
+
+    <!-- <module>modm-test:test:container</module> -->
+
+
+    <!-- <module>modm-test:test:driver</module>
     <module>modm-test:test:stdc++</module> -->
+
 
     <module>modm-test:test:io</module>
     <module>modm-test:test:platform:**</module>
-    <!-- <module>modm-test:test:processing</module> -->
-    <module>modm-test:test:ui</module>
 
-    <!-- <module>modm-test:test:math</module> -->
+
+    <!-- <module>modm-test:test:processing</module> -->
+
+
+    <!-- <module>modm-test:test:ui</module>
+    <module>modm-test:test:math</module> -->
   </modules>
 </library>
