@@ -10,16 +10,39 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+class Sab(Module):
+    def init(self, module):
+        module.name = "sab"
+
+    def prepare(self, module, options):
+        module.depends("modm:communication:sab", ":mock:io.device")
+        return True
+
+    def build(self, env):
+        env.outbasepath = "modm-test/src/modm-test/communication"
+        env.copy("sab")
+
+
+class Xpcc(Module):
+    def init(self, module):
+        module.name = "xpcc"
+
+    def prepare(self, module, options):
+        module.depends("modm:communication:xpcc", ":mock:clock.testing")
+        return True
+
+    def build(self, env):
+        env.outbasepath = "modm-test/src/modm-test/communication"
+        env.copy("xpcc")
+
+
 def init(module):
     module.name = ":test:communication"
 
-
 def prepare(module, options):
-    module.depends(":communication:sab", ":communication:xpcc",
-                   ":mock:io.device", ":mock:clock.testing")
+    module.add_submodule(Sab())
+    module.add_submodule(Xpcc())
     return True
 
-
 def build(env):
-    env.outbasepath = "modm-test/src/modm/communication"
-    env.copy('.')
+    pass
