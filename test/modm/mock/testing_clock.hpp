@@ -19,7 +19,7 @@
 /**
  * Gain full access to modm::Clock::time.
  */
-/// @ingroup modm_test_test_architecture
+/// @ingroup modm_test_mock_testing_clock
 class TestingClock : public modm::Clock
 {
 public:

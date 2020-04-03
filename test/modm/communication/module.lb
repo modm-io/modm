@@ -10,13 +10,13 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-
 def init(module):
     module.name = ":test:communication"
 
 
 def prepare(module, options):
-    module.depends(":communication:sab", ":communication:xpcc", ":test:architecture")
+    module.depends(":communication:sab", ":communication:xpcc",
+                   ":mock:io.device", ":mock:clock.testing")
     return True
 
 

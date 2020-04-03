@@ -17,11 +17,12 @@ def init(module):
 
 def prepare(module, options):
     module.depends(
-        ":architecture:accessor",
-        ":architecture:atomic",
-        ":architecture:can",
-        ":architecture:clock",
-        ":architecture:register")
+        ":mock:clock.testing",
+        "modm:architecture:accessor",
+        "modm:architecture:atomic",
+        "modm:architecture:can",
+        "modm:architecture:clock",
+        "modm:architecture:register")
     return True
 
 

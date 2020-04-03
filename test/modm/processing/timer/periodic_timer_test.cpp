@@ -13,8 +13,8 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/processing/timer.hpp>
+#include <modm-test/mock/clock_dummy.hpp>
 
-#include "clock_dummy.hpp"
 #include "periodic_timer_test.hpp"
 
 void

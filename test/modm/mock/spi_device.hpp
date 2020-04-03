@@ -16,8 +16,7 @@
 #include <cstddef>
 #include <stdint.h>
 
-/// @ingroup modm_test_test_driver
-namespace test
+namespace modm_test
 {
 	#ifdef ENABLE_MACRO_EXPORT
 	#	define ANONYMOUS_ARRAY(type, ...)	((type []) { __VA_ARGS__ })
@@ -34,7 +33,7 @@ namespace test
 	 *
 	 * \endcode
 	 *
-	 * @ingroup modm_test_test_driver
+	 * @ingroup modm_test_mock_spi_device
 	 */
 	struct Transmission
 	{
@@ -57,7 +56,7 @@ namespace test
 	 *
 	 * \author	Fabian Greif
 	 *
-	 * @ingroup modm_test_test_driver
+	 * @ingroup modm_test_mock_spi_device
 	 */
 	class SpiDevice
 	{

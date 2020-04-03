@@ -14,7 +14,7 @@
 #define	UNITTEST_RETURN_ON_FAIL
 #include "dispatcher_test.hpp"
 
-#include <modm/architecture/driver/testing_clock.hpp>
+#include <modm-test/mock/testing_clock.hpp>
 
 // ----------------------------------------------------------------------------
 void

@@ -17,13 +17,14 @@ def init(module):
 
 def prepare(module, options):
     module.depends(
-        ":architecture",
-        ":math:utils",
-        ":math:filter",
-        ":processing:protothread",
-        ":processing:resumable",
-        ":processing:timer",
-        ":processing:scheduler")
+        "modm:architecture",
+        "modm:math:utils",
+        "modm:math:filter",
+        "modm:processing:protothread",
+        "modm:processing:resumable",
+        "modm:processing:timer",
+        "modm:processing:scheduler",
+        ":mock:clock.dummy")
     return True
 
 

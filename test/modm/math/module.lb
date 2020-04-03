@@ -17,13 +17,13 @@ def init(module):
 
 def prepare(module, options):
     module.depends(
-        ":math:filter",
-        ":math:geometry",
-        ":math:interpolation",
-        ":math:saturated",
-        ":math:matrix",
-        ":math:algorithm",
-        ":math:utils")
+        "modm:math:filter",
+        "modm:math:geometry",
+        "modm:math:interpolation",
+        "modm:math:saturated",
+        "modm:math:matrix",
+        "modm:math:algorithm",
+        "modm:math:utils")
     return True
 
 

@@ -14,8 +14,8 @@
 
 #include <modm/processing/timer.hpp>
 #include <type_traits>
+#include <modm-test/mock/clock_dummy.hpp>
 
-#include "clock_dummy.hpp"
 #include "timeout_test.hpp"
 
 // ----------------------------------------------------------------------------

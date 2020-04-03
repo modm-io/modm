@@ -13,9 +13,10 @@
 
 #include <modm/communication/sab/interface.hpp>
 
-#include "fake_io_device.hpp"
+#include <modm-test/mock/io_device.hpp>
 #include "interface_test.hpp"
 
+using FakeIODevice = modm_test::FakeIODevice;
 typedef modm::sab::Interface<FakeIODevice> TestingInterface;
 
 void

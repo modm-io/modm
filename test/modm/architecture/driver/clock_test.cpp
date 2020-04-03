@@ -12,9 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "testing_clock.hpp"
-
 #include "clock_test.hpp"
+#include <modm-test/mock/testing_clock.hpp>
 
 void
 ClockTest::testClock()

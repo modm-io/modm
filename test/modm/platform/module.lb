@@ -17,9 +17,9 @@ def init(module):
 
 def prepare(module, options):
     module.depends(
-        ":architecture:can",
-        ":architecture:clock",
-        ":platform:can.common")
+        "modm:architecture:can",
+        "modm:architecture:clock",
+        "modm:platform:can.common")
     return True
 
 

@@ -18,7 +18,7 @@
 #include "spi_device.hpp"
 
 // ----------------------------------------------------------------------------
-test::SpiDevice::SpiDevice() :
+modm_test::SpiDevice::SpiDevice() :
 	transmissions(0),
 	transmissionCount(0),
 	currentTransmission(0),
@@ -31,14 +31,14 @@ test::SpiDevice::SpiDevice() :
 {
 }
 
-test::SpiDevice::~SpiDevice()
+modm_test::SpiDevice::~SpiDevice()
 {
 	delete rxBuffer;
 }
 
 // ----------------------------------------------------------------------------
 void
-test::SpiDevice::select()
+modm_test::SpiDevice::select()
 {
 	if (!selected) {
 		selected = true;
@@ -50,7 +50,7 @@ test::SpiDevice::select()
 }
 
 void
-test::SpiDevice::deselect()
+modm_test::SpiDevice::deselect()
 {
 	std::size_t expectedLength = 0;
 
@@ -107,7 +107,7 @@ test::SpiDevice::deselect()
 }
 
 uint8_t
-test::SpiDevice::write(uint8_t data)
+modm_test::SpiDevice::write(uint8_t data)
 {
 	uint8_t out = 0xff;
 
@@ -133,7 +133,7 @@ test::SpiDevice::write(uint8_t data)
 
 // ----------------------------------------------------------------------------
 void
-test::SpiDevice::start(const Transmission* transmissions,
+modm_test::SpiDevice::start(const Transmission* transmissions,
 		std::size_t transmissionCount, std::size_t lineNumber, bool reportErrors)
 {
 	complete = (transmissionCount == 0);
@@ -167,7 +167,7 @@ test::SpiDevice::start(const Transmission* transmissions,
 
 // ----------------------------------------------------------------------------
 void
-test::SpiDevice::finish()
+modm_test::SpiDevice::finish()
 {
 	unittest::Reporter& reporter = unittest::Controller::instance().getReporter();
 
