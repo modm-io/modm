@@ -118,8 +118,8 @@ namespace modm
 			static QueryStatus queryStatus;
 			static uint8_t expectedResponseLength;
 			static modm::ShortTimeout timer;
-
-			static const uint8_t timeout = 10;		///< timeout value in milliseconds
+			/// timeout value in milliseconds
+			static constexpr std::chrono::milliseconds timeout{10};
 		};
 	}
 }

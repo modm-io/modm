@@ -399,8 +399,8 @@ namespace modm
 			uint8_t expectedAddress;
 			uint8_t expectedResponseLength;
 			modm::ShortTimeout timer;
-
-			static const uint8_t timeout = 10;		///< timeout value in milliseconds
+			/// timeout value in milliseconds
+			static constexpr std::chrono::milliseconds timeout{10};
 		};
 	}
 }

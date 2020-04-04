@@ -42,8 +42,8 @@ public:
 				break;
 			}
 			// otherwise, try again in 100ms
-			this->timeout.restart(100);
-			PT_WAIT_UNTIL(this->timeout.isExpired());
+			timeout.restart(100ms);
+			PT_WAIT_UNTIL(timeout.isExpired());
 		}
 		MODM_LOG_INFO << "Ping successful" << modm::endl;
 

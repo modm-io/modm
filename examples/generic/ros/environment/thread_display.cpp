@@ -31,7 +31,7 @@ DisplayThread::update()
 	PT_BEGIN();
 
 	// Wait for 100 msec unitl display powered up.
-	boot_timeout.restart(100);
+	boot_timeout.restart(100ms);
 	PT_WAIT_UNTIL(boot_timeout.isExpired());
 
 	display.initializeBlocking();

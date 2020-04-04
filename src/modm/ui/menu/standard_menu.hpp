@@ -116,7 +116,7 @@ namespace modm
 		inline void setUpdateTime(uint16_t ms)
 		{
 			this->display_update_time = ms;
-			this->timer.restart(ms);
+			this->timer.restart(std::chrono::milliseconds(ms));
 		}
 
 	private:

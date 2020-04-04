@@ -66,7 +66,7 @@ namespace component
 	Odometry odometry(robot::component::ODOMETRY, dispatcher);
 }
 
-modm::ShortPeriodicTimer tmr(50);
+modm::ShortPeriodicTimer tmr(50ms);
 
 int
 main()

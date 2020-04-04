@@ -64,8 +64,7 @@ public:
 
     unsigned long
     time() {
-      modm::Timestamp ts = modm::Clock::now<>();
-      return ts.getTime();
+      return modm::Clock::now().time_since_epoch().count();
     }
 };
 

@@ -17,7 +17,7 @@
 // ----------------------------------------------------------------------------
 template < class I2cMaster >
 modm::Hmc6343<I2cMaster>::Hmc6343(Data &data, uint8_t address)
-:	I2cDevice<I2cMaster,2>(address), data(data), timeout(500)
+:	I2cDevice<I2cMaster,2>(address), data(data), timeout(500ms)
 {
 }
 
@@ -33,7 +33,7 @@ modm::Hmc6343<I2cMaster>::writeCommand(Command command, uint16_t timeout)
 	buffer[0] = i(command);
 	RF_WAIT_UNTIL( this->timeout.isExpired() and this->startWrite(buffer, 1) );
 
-	this->timeout.restart(timeout);
+	this->timeout.restart(std::chrono::milliseconds(timeout));
 	RF_WAIT_WHILE( this->isTransactionRunning() );
 
 	RF_END_RETURN( this->wasTransactionSuccessful() );
@@ -52,7 +52,7 @@ modm::Hmc6343<I2cMaster>::writeRegister(Register reg, uint8_t value)
 
 	RF_WAIT_UNTIL( timeout.isExpired() and this->startWrite(buffer, 3) );
 
-	timeout.restart(10);
+	timeout.restart(10ms);
 	RF_WAIT_WHILE( this->isTransactionRunning() );
 
 	RF_END_RETURN( this->wasTransactionSuccessful() );
@@ -91,7 +91,7 @@ modm::Hmc6343<I2cMaster>::readRegister(Register reg, uint8_t &value)
 	buffer[1] = i(reg);
 	RF_WAIT_UNTIL( timeout.isExpired() and this->startWrite(buffer, 2) );
 
-	timeout.restart(10);
+	timeout.restart(10ms);
 	RF_WAIT_WHILE( this->isTransactionRunning() );
 
 	if( this->wasTransactionSuccessful() )

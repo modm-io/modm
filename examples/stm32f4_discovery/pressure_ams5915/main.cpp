@@ -64,8 +64,8 @@ public:
 			 	break;
 			}
 			// otherwise, try again in 10ms
-			this->timeout.restart(10);
-			PT_WAIT_UNTIL(this->timeout.isExpired());
+			timeout.restart(10ms);
+			PT_WAIT_UNTIL(timeout.isExpired());
 		}
 
 		MODM_LOG_DEBUG << "Device responded" << modm::endl;
@@ -81,8 +81,8 @@ public:
 			MODM_LOG_INFO << "Temperature [degree centigrade]: " << data.getTemperature() << modm::endl;
 
 			// read next pressure measurement in 1ms
-			this->timeout.restart(1);
-			PT_WAIT_UNTIL(this->timeout.isExpired());
+			timeout.restart(1ms);
+			PT_WAIT_UNTIL(timeout.isExpired());
 		}
 
 		PT_END();
@@ -107,7 +107,7 @@ main()
 
 	MODM_LOG_INFO << "\n\nWelcome to AMSYS 5915 pressure sensor demo!\n\n";
 
-	modm::ShortPeriodicTimer tmr(500);
+	modm::ShortPeriodicTimer tmr(500ms);
 
 	while (true)
 	{

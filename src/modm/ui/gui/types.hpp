@@ -99,7 +99,7 @@ public:
 	AsyncEvent(uint16_t delayMilliseconds, genericCallback cb, void* cb_data) :
 		cb(cb),
 		cb_data(cb_data),
-		timeout(delayMilliseconds),
+		timeout(std::chrono::milliseconds(delayMilliseconds)),
 		already_run(false)
 	{
 	}

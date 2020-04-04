@@ -1,8 +1,5 @@
 /*
- * Copyright (c) 2011, Fabian Greif
- * Copyright (c) 2013, Kevin Läufer
- * Copyright (c) 2013-2017, Niklas Hauser
- * Copyright (c) 2014, Sascha Schade
+ * Copyright (c) 2020, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -15,24 +12,19 @@
 #include <modm/board.hpp>
 #include <modm/processing.hpp>
 
-using namespace Board;
-
-// ----------------------------------------------------------------------------
-int
-main()
+int main()
 {
 	Board::initialize();
 
-	// Use the logging streams to print some messages.
-	// Change MODM_LOG_LEVEL above to enable or disable these messages
-	MODM_LOG_DEBUG   << "debug"   << modm::endl;
-	MODM_LOG_INFO    << "info"    << modm::endl;
-	MODM_LOG_WARNING << "warning" << modm::endl;
-	MODM_LOG_ERROR   << "error"   << modm::endl;
-
 	uint32_t counter(0);
-	modm::PrecisePeriodicTimer tmr(0.500990s);
-	modm::PeriodicTimer tmrS(0.500990s);
+	modm::PrecisePeriodicTimer ptmr(0.500990s);
+	modm::PeriodicTimer tmr(0.500990s);
+
+	for (int ii=0; ii<20; ii++)
+	{
+		LedD13::toggle();
+		modm::delay(std::chrono::milliseconds(10*ii));
+	}
 
 	uint32_t ms_counter{0};
 	uint32_t us_counter{0};
@@ -53,18 +45,14 @@ main()
 			us_counter = us;
 		}
 
-		if (tmr.execute())
+		if (ptmr.execute())
 		{
-			LedBlue::toggle();
-
+			LedD13::set();
 			MODM_LOG_INFO << "loop: " << counter++ << modm::endl;
 		}
-
-		if (tmrS.execute())
+		if (tmr.execute())
 		{
-			LedGreen::toggle();
+			LedD13::reset();
 		}
 	}
-
-	return 0;
 }

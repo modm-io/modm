@@ -19,7 +19,8 @@
 template < typename I2cMaster >
 modm::Tmp175<I2cMaster>::Tmp175(Data &data, uint8_t address)
 :	Lm75<I2cMaster>(reinterpret_cast<lm75::Data&>(data), address),
-	periodTimeout(250), conversionTimeout(250), updateTime(250), conversionTime(232)
+	updateTime(250), conversionTime(232),
+	periodTimeout(updateTime), conversionTimeout(conversionTime)
 {
 	this->stop();
 }
@@ -62,7 +63,7 @@ modm::Tmp175<I2cMaster>::setUpdateRate(uint8_t rate)
 	if (rate == 0) rate = 1;
 	if (rate > 33) rate = 33;
 
-	updateTime = (1000/rate - 29);
+	updateTime = modm::ShortDuration(1000/rate - 29);
 	periodTimeout.restart(updateTime);
 
 	this->restart();
@@ -76,7 +77,7 @@ modm::Tmp175<I2cMaster>::setResolution(Resolution resolution)
 
 	Resolution_t::set(reinterpret_cast<Config1_t&>(this->config_msb), resolution);
 
-	conversionTime = (uint8_t(resolution) + 1) * 29;
+	conversionTime = modm::ShortDuration((uint8_t(resolution) + 1) * 29);
 
 	RF_END_RETURN_CALL( writeConfiguration() );
 }

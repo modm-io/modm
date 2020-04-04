@@ -17,6 +17,7 @@
 #include <modm/processing/timer.hpp>
 
 using namespace modm::platform;
+using namespace std::chrono_literals;
 
 typedef GpioOutputB0 LedGreen;
 typedef GpioOutputB1 LedRed;
@@ -37,13 +38,13 @@ public:
 		{
 			LedGreen::set();
 
-			this->timeout.restart(100);
-			PT_WAIT_UNTIL(this->timeout.isExpired());
+			timeout.restart(100ms);
+			PT_WAIT_UNTIL(timeout.isExpired());
 
 			LedGreen::reset();
 
-			this->timeout.restart(600);
-			PT_WAIT_UNTIL(this->timeout.isExpired());
+			timeout.restart(600ms);
+			PT_WAIT_UNTIL(timeout.isExpired());
 		}
 
 		PT_END();
@@ -69,23 +70,23 @@ public:
 		{
 			LedRed::set();
 
-			this->timeout.restart(200);
-			PT_WAIT_UNTIL(this->timeout.isExpired());
+			timeout.restart(200ms);
+			PT_WAIT_UNTIL(timeout.isExpired());
 
 			LedRed::reset();
 
-			this->timeout.restart(300);
-			PT_WAIT_UNTIL(this->timeout.isExpired());
+			timeout.restart(300ms);
+			PT_WAIT_UNTIL(timeout.isExpired());
 
 			LedRed::set();
 
-			this->timeout.restart(200);
-			PT_WAIT_UNTIL(this->timeout.isExpired());
+			timeout.restart(200ms);
+			PT_WAIT_UNTIL(timeout.isExpired());
 
 			LedRed::reset();
 
-			this->timeout.restart(1000);
-			PT_WAIT_UNTIL(this->timeout.isExpired());
+			timeout.restart(1s);
+			PT_WAIT_UNTIL(timeout.isExpired());
 		}
 
 		PT_END();
@@ -95,22 +96,10 @@ private:
 	modm::ShortTimeout timeout;
 };
 
-// timer interrupt routine
-MODM_ISR(TIMER2_COMPA)
-{
-	modm::Clock::increment();
-}
-
 int
 main()
 {
-	// timeout initialization
-	// compare-match-interrupt every 1 ms at 14.7456 MHz
-	TCCR2A = (1 << WGM21);
-	TCCR2B = (1 << CS22);
-	TIMSK2 = (1 << OCIE2A);
-	OCR2A = 230;
-
+	SystemClock::enable();
 	enableInterrupts();
 
 	BlinkingLightGreen greenLight;

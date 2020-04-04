@@ -46,16 +46,16 @@ setDirection(Direction dir)
 	} else {
 		direction = dir;
 		static uint16_t counter = 0;
-		static modm::Timestamp lastTimestamp = modm::Clock::now();
+		static modm::Duration lastTimestamp = modm::Clock::now().time_since_epoch();
 
-		modm::Timestamp timestamp = modm::Clock::now();
+		modm::Duration timestamp = modm::Clock::now().time_since_epoch();
 
 		MODM_LOG_INFO.printf("\e[39m\n%04" PRId16 " %02" PRId32 ":%03" PRId32 " +%01" PRId32 ":%03" PRId32 " ",
 				counter,
-				timestamp.getTime() / 1000,
-				timestamp.getTime() % 1000,
-				(timestamp.getTime() - lastTimestamp.getTime()) / 1000,
-				(timestamp.getTime() - lastTimestamp.getTime()) % 1000);
+				timestamp.count() / 1000,
+				timestamp.count() % 1000,
+				(timestamp.count() - lastTimestamp.count()) / 1000,
+				(timestamp.count() - lastTimestamp.count()) % 1000);
 
 		switch (direction)
 		{

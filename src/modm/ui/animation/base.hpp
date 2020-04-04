@@ -45,12 +45,9 @@ public:
 	using Handler = void(*)(T);
 
 public:
-	/// @param	value	a reference to the value to be animated
-	Animation(T &value);
-
 	/// @param	value		a reference to the value to be animated
 	/// @param	handler		this function will be called whenever the value has been changed
-	Animation(T &value, Handler handler);
+	Animation(T &value, Handler handler=nullptr);
 
 	/// @param	handler		this function will be called whenever the value has been changed
 	void
@@ -89,8 +86,8 @@ public:
 private:
 	Handler handler;
 	T &currentValue;
-	T endValue;
-	TimeType animationTime;
+	T endValue{0};
+	TimeType animationTime{0};
 	modm::ShortTimestamp previous;
 	FastRamp<T> interpolation;
 };

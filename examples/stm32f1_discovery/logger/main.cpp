@@ -53,11 +53,11 @@ main()
 	while (true)
 	{
 		Board::LedBlue::set();
-		timeout.restart(100);
+		timeout.restart(100ms);
 		while(not timeout.isExpired()) ;
 
 		Board::LedBlue::reset();
-		timeout.restart(900);
+		timeout.restart(900ms);
 		while(not timeout.isExpired()) ;
 		MODM_LOG_INFO << "Seconds since reboot: " << ii++ << modm::endl;
 	}

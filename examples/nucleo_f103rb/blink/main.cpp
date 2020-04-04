@@ -10,6 +10,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
+#include <modm/processing.hpp>
 
 using namespace Board;
 
@@ -27,13 +28,16 @@ main()
 	MODM_LOG_ERROR   << "error"   << modm::endl;
 
 	uint32_t counter(0);
+	modm::PrecisePeriodicTimer tmr(1.23456789s);
 
 	while (true)
 	{
-		LedD13::toggle();
-		modm::delayMilliseconds(Button::read() ? 100 : 500);
+		if (tmr.execute())
+		{
+			LedD13::toggle();
 
-		MODM_LOG_INFO << "loop: " << counter++ << modm::endl;
+			MODM_LOG_INFO << "loop: " << counter++ << modm::endl;
+		}
 	}
 
 	return 0;

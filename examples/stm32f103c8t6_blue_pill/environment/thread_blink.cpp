@@ -23,7 +23,7 @@
 
 // ----------------------------------------------------------------------------
 BlinkThread::BlinkThread() :
-	timer(5000),
+	timer(5s),
 	uptime(0)
 {
 }
@@ -36,7 +36,7 @@ BlinkThread::update()
 	while (true)
 	{
 		PT_WAIT_UNTIL(timer.execute());
-		timeout.restart(100);
+		timeout.restart(100ms);
 		Board::LedGreen::set();
 
 		bmp180Thread.startMeasurement();

@@ -15,6 +15,7 @@
 
 using namespace modm::platform;
 using namespace modm::literals;
+using namespace std::chrono_literals;
 
 // Create a new UART object
 
@@ -32,7 +33,7 @@ typedef modm::AdcSampler< AdcInterrupt, 3, 32 > sensors;
 // the results are up to 16 bit wide
 sensors::DataType sensorData[3];
 
-modm::ShortTimeout timeout(100);
+modm::ShortTimeout timeout(100ms);
 
 int
 main()
@@ -67,7 +68,7 @@ main()
 
 			// start another readout
 			sensors::startReadout();
-			timeout.restart(200);
+			timeout.restart(200ms);
 		}
 	}
 }

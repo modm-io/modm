@@ -18,7 +18,7 @@ using namespace Board;
 
 using Output = Board::D11;
 modm::Ws2812b<SpiMaster1, Output, 8*8> leds;
-modm::ShortPeriodicTimer tmr{33};
+modm::ShortPeriodicTimer tmr{33ms};
 
 int
 main()

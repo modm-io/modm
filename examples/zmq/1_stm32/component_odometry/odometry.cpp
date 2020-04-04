@@ -27,7 +27,7 @@
 // ----------------------------------------------------------------------------
 component::Odometry::Odometry(uint8_t id, xpcc::Dispatcher &communication) :
 	xpcc::AbstractComponent(id, communication),
-	timer(50)
+	timer(50ms)
 {
 }
 

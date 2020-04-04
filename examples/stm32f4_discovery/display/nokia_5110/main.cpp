@@ -94,8 +94,8 @@ public:
 
 			counter++;
 
-			this->timeout.restart(1000);
-			PT_WAIT_UNTIL(this->timeout.isExpired());
+			timeout.restart(1s);
+			PT_WAIT_UNTIL(timeout.isExpired());
 		}
 
 		PT_END();
@@ -126,7 +126,7 @@ main()
 	SpiMaster2::connect<GpioB15::Mosi, GpioB13::Sck>();
 	mySpiMaster::initialize<Board::SystemClock, 2625000ul>();
 
-	modm::ShortPeriodicTimer tmr(500);
+	modm::ShortPeriodicTimer tmr(500ms);
 
 	while(true)
 	{

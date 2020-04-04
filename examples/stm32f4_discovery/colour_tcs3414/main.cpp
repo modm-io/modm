@@ -61,8 +61,8 @@ public:
 			 	break;
 			}
 			// otherwise, try again in 100ms
-			this->timeout.restart(100);
-			PT_WAIT_UNTIL(this->timeout.isExpired());
+			timeout.restart(100ms);
+			PT_WAIT_UNTIL(timeout.isExpired());
 		}
 
 		stream << "Device responded" << modm::endl;
@@ -73,8 +73,8 @@ public:
 				break;
 			}
 			// otherwise, try again in 100ms
-			this->timeout.restart(100);
-			PT_WAIT_UNTIL(this->timeout.isExpired());
+			timeout.restart(100ms);
+			PT_WAIT_UNTIL(timeout.isExpired());
 		}
 
 		stream << "Device initialized" << modm::endl;
@@ -89,8 +89,8 @@ public:
 				break;
 			}
 			// otherwise, try again in 100ms
-			this->timeout.restart(100);
-			PT_WAIT_UNTIL(this->timeout.isExpired());
+			timeout.restart(100ms);
+			PT_WAIT_UNTIL(timeout.isExpired());
 		}
 
 		stream << "Device configured" << modm::endl;
@@ -104,8 +104,8 @@ public:
 				colors.toHsv(&hsv);
 				stream.printf("  %5d\n", hsv.hue);
 			}
-			this->timeout.restart(500);
-			PT_WAIT_UNTIL(this->timeout.isExpired());
+			timeout.restart(500ms);
+			PT_WAIT_UNTIL(timeout.isExpired());
 		}
 
 		PT_END();
@@ -132,7 +132,7 @@ main()
 
 	stream << "\n\nWelcome to TCS3414 demo!\n\n";
 
-	modm::ShortPeriodicTimer tmr(500);
+	modm::ShortPeriodicTimer tmr(500ms);
 
 	while (true)
 	{

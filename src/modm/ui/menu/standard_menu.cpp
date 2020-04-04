@@ -22,7 +22,7 @@ modm::MenuEntry::MenuEntry(const char* text, uint16_t space, MenuEntryCallback f
 modm::StandardMenu::StandardMenu(modm::ViewStack* stack, uint8_t identifier) :
 	modm::AbstractMenu(stack, identifier),
 	display_update_time(500),
-	timer(display_update_time),
+	timer(std::chrono::milliseconds(display_update_time)),
 	buttonAction(false),
 	title(""),
 	homePosition(0),
@@ -34,7 +34,7 @@ modm::StandardMenu::StandardMenu(modm::ViewStack* stack, uint8_t identifier) :
 modm::StandardMenu::StandardMenu(modm::ViewStack* stack, uint8_t identifier, const char* title) :
 	modm::AbstractMenu(stack, identifier),
 	display_update_time(500),
-	timer(display_update_time),
+	timer(std::chrono::milliseconds(display_update_time)),
 	buttonAction(false),
 	title(title),
 	homePosition(0),

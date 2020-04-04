@@ -36,10 +36,10 @@ main()
 
 	while (true)
 	{
-		static modm::PeriodicTimer tmr{500};
+		static modm::PeriodicTimer tmr{500ms};
 		if (tmr.execute())
 		{
-			tmr.restart(Button::read() ? 100 : 500);
+			tmr.restart(Button::read() ? 100ms : 500ms);
 			LedD13::toggle();
 
 			static uint32_t counter{0};

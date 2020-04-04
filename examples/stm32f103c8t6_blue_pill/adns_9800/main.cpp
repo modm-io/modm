@@ -40,7 +40,7 @@ class BlinkThread : public modm::pt::Protothread
 public:
 	BlinkThread()
 	{
-		timeout.restart(100);
+		timeout.restart(100ms);
 	}
 
 	bool
@@ -53,12 +53,12 @@ public:
 			Board::LedGreen::reset();
 
 			PT_WAIT_UNTIL(timeout.isExpired());
-			timeout.restart(100);
+			timeout.restart(100ms);
 
 			Board::LedGreen::set();
 
 			PT_WAIT_UNTIL(timeout.isExpired()) ;
-			timeout.restart(4900);
+			timeout.restart(4.9s);
 
 			MODM_LOG_INFO << "Seconds since reboot: " << uptime << modm::endl;
 
@@ -76,7 +76,7 @@ private:
 class Adns9800Thread : public modm::pt::Protothread
 {
 public:
-	Adns9800Thread() : timer(10), x(0), y(0)
+	Adns9800Thread() : timer(10ms), x(0), y(0)
 	{
 	}
 

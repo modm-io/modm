@@ -76,8 +76,8 @@ public:
 			}
 
 			// repeat every 5 ms
-			this->timeout.restart(5);
-			PT_WAIT_UNTIL(this->timeout.isExpired());
+			timeout.restart(5ms);
+			PT_WAIT_UNTIL(timeout.isExpired());
 		}
 
 		PT_END();

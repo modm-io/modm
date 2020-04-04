@@ -13,6 +13,7 @@
 
 #include <modm/board.hpp>
 
+#include <modm/architecture/interface/clock.hpp>
 #include <modm/processing/protothread.hpp>
 #include <modm/driver/position/vl53l0.hpp>
 #include <modm/debug/logger.hpp>
@@ -63,8 +64,8 @@ public:
 			}
 
 			// otherwise, try again in 100ms
-			this->timeout.restart(100);
-			PT_WAIT_UNTIL(this->timeout.isExpired());
+			timeout.restart(100ms);
+			PT_WAIT_UNTIL(timeout.isExpired());
 		}
 
 		MODM_LOG_DEBUG << "Device responded" << modm::endl;
@@ -76,8 +77,8 @@ public:
 			}
 
 			// otherwise, try again in 200ms
-			this->timeout.restart(200);
-			PT_WAIT_UNTIL(this->timeout.isExpired());
+			timeout.restart(200ms);
+			PT_WAIT_UNTIL(timeout.isExpired());
 		}
 
 		MODM_LOG_DEBUG << "Device initialized" << modm::endl;
@@ -89,7 +90,7 @@ public:
 			this->highAccuracyMode = true;
 		}
 
-		this->timeout.restart(1000);
+		timeout.restart(1s);
 
 		while (true)
 		{
@@ -110,8 +111,8 @@ public:
 			}
 			MODM_LOG_DEBUG << ", t = " << (modm::Clock::now() - stamp) << "ms" << modm::endl;
 
-			// query button state every 1000ms
-			if(this->timeout.isExpired())
+			// query button state every 1s
+			if(timeout.isExpired())
 			{
 				// toggle between fast and high accuracy mode when button is pressed
 				if(Button::read())
@@ -136,7 +137,7 @@ public:
 					}
 				}
 
-				this->timeout.restart(1000);
+				timeout.restart(1s);
 			}
 		}
 
@@ -163,7 +164,7 @@ main()
 
 	MODM_LOG_INFO << "\n\nWelcome to VL53L0X demo!\n\n";
 
-	modm::ShortPeriodicTimer tmr(500);
+	modm::ShortPeriodicTimer tmr(500ms);
 
 	while (true)
 	{

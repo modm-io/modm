@@ -59,8 +59,8 @@ int main()
 	}
 
 //	modm::ShortPeriodicTimer divide_timer((max_channel*rx_settle)/1000 * divider);
-	modm::ShortPeriodicTimer divide_timer(500);
-	modm::ShortPeriodicTimer refreshTerminal(500);
+	modm::ShortPeriodicTimer divide_timer(500ms);
+	modm::ShortPeriodicTimer refreshTerminal(500ms);
 
 	bool divide_now = false;
 

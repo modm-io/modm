@@ -6,6 +6,7 @@
   </options>
   <modules>
     <module>modm:platform:core</module>
+    <module>modm:platform:clock</module>
     <module>modm:platform:gpio</module>
     <module>modm:processing:protothread</module>
     <module>modm:processing:timer</module>

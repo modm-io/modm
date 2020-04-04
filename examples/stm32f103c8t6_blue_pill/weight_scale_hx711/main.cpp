@@ -82,7 +82,7 @@ public:
 	}
 
 protected:
-	modm::ShortPeriodicTimer timer{1'000};
+	modm::ShortPeriodicTimer timer{1s};
 };
 
 BlinkThread blink_thread;

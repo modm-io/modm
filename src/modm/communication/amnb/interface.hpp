@@ -33,30 +33,6 @@ namespace modm
 	namespace amnb
 	{
 		/**
-		 * This clock should run at 10kHz. It is used to provide the back-off
-		 * timer with finer control over timing, which enabled much higher
-		 * throughput.
-		 * When using a very high datarate and short message length this clock
-		 * can be run at higher speeds than the recommended 10kHz.
-		 */
-		class Clock
-		{
-		public:
-			static Timestamp
-			now();
-
-			/// \brief	Set the current time
-			static inline void
-			increment(uint_fast16_t step = 1)
-			{
-				time += step;
-			}
-
-		protected:
-			static uint_fast16_t time;
-		};
-
-		/**
 		 * \internal
 		 * \brief	Universal base class for the AMNB interface
 		 *
@@ -74,7 +50,7 @@ namespace modm
 		 *
 		 * \ingroup	amnb
 		 */
-		template <typename Device, uint8_t PROBABILITY=50, uint8_t TIMEOUT=4>
+		template <typename Device, uint8_t PROBABILITY=50, uint8_t TIMEOUT=400>
 		class Interface
 		{
 		public:
@@ -191,7 +167,7 @@ namespace modm
 			update();
 
 #if AMNB_TIMING_DEBUG
-			static modm::Timestamp latency;
+			static modm::ShortDuration latency;
 			static uint8_t collisions;
 #endif
 
@@ -220,7 +196,7 @@ namespace modm
 			static bool hasMessageToSend;
 			static bool messageSent;
 			static bool transmitting;
-			static modm::Timeout<modm::amnb::Clock> rescheduleTimer;
+			static modm::PreciseTimeout rescheduleTimer;
 			static uint8_t rescheduleTimeout;
 
 			static State state;

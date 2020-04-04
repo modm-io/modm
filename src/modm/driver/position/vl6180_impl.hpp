@@ -65,6 +65,7 @@ template < typename I2cMaster >
 modm::ResumableResult<bool>
 modm::Vl6180<I2cMaster>::readSensor(bool isDistance)
 {
+	using namespace std::chrono;
 	// for this relatively complicated sequence, see the datasheet page 17
 	RF_BEGIN();
 
@@ -75,7 +76,7 @@ modm::Vl6180<I2cMaster>::readSensor(bool isDistance)
 	{
 		// Measurement will take 7.5ms + convergence time (< ~10ms) for ranging
 		// or the analog integration time for ALS
-		timeout.restart(isDistance ? 10 : data.time);
+		timeout.restart(milliseconds(isDistance ? 10 : data.time));
 		RF_WAIT_UNTIL(timeout.isExpired());
 
 		// When the measurement is completed, the interrupt source of ALS or range
@@ -98,7 +99,7 @@ modm::Vl6180<I2cMaster>::readSensor(bool isDistance)
 			}
 
 			// otherwise wait 2ms longer on every try
-			timeout.restart(logicBuffer.byte[0]);
+			timeout.restart(milliseconds(logicBuffer.byte[0]));
 			logicBuffer.byte[0] += 2;
 
 			// 168ms timeout
@@ -140,7 +141,7 @@ modm::Vl6180<I2cMaster>::readSensor(bool isDistance)
 					}
 
 					// otherwise wait 4ms and try again
-					timeout.restart(4);
+					timeout.restart(4ms);
 					RF_WAIT_UNTIL(timeout.isExpired());
 
 					if (i2cBuffer[3]++ > 15)

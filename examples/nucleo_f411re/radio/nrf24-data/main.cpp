@@ -28,7 +28,7 @@ int main()
 		Nrf1Data::update();
 		Nrf2Data::update();
 
-		static modm::PeriodicTimer sendTimer{1000};
+		static modm::PeriodicTimer sendTimer{1s};
 		if (Nrf1Data::Packet packet; sendTimer.execute())
 		{
 			static uint8_t counter{0};
