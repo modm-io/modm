@@ -64,11 +64,6 @@ def build(env):
     if env.has_module(":architecture:delay"):
         env.template("delay_impl.hpp.in")
 
-    if env.has_module(":architecture:clock"):
-        # modm-test implements the clock methods itself
-        if not env.has_module(":test:architecture"):
-            env.copy("clock.cpp")
-
     env.template("interrupts.hpp.in")
 
     if is_xmega:

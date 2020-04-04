@@ -43,9 +43,7 @@ def build(env):
         env.copy("../cortex/flash_reader_impl.hpp", "flash_reader_impl.hpp")
 
     if env.has_module(":architecture:clock"):
-        # modm-test implements the clock methods itself
-        if not env.has_module(":test:architecture"):
-            env.template("clock.cpp.in")
+        env.copy("clock.cpp")
 
     if target.family == "windows":
         if env.has_module(":architecture:assert"):

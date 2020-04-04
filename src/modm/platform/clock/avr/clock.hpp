@@ -45,13 +45,7 @@ public:
 
 	static constexpr uint32_t Adc = Frequency;
 
-	static bool
-	enable()
-	{
-		// do nothing
-		return true;
-	}
-
+	static bool enable();
 };
 
 } // namespace platform
