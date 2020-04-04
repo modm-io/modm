@@ -11,7 +11,6 @@
 
 #include <modm/board.hpp>
 #include <modm/debug/logger.hpp>
-using namespace modm::literals;
 
 #include <modm/platform/comp/comp_2.hpp>
 

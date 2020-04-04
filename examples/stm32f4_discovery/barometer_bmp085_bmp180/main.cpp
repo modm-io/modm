@@ -16,7 +16,6 @@
 #include <modm/io/iostream.hpp>
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/driver/pressure/bmp085.hpp>
-using namespace modm::literals;
 
 modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > device;
 modm::IOStream stream(device);

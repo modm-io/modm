@@ -14,7 +14,6 @@
 // Inspired by: http://arduino.cc/en/Tutorial/AnalogReadSerial
 
 #include <modm/board.hpp>
-using namespace modm::literals;
 
 int
 main()

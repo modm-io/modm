@@ -13,7 +13,6 @@
 #include <modm/architecture/interface/i2c_device.hpp>
 #include <modm/architecture/interface/i2c_multiplexer.hpp>
 #include <modm/driver/gpio/pca9548a.hpp>
-using namespace modm::literals;
 
 using MyI2cMaster = modm::platform::I2cMaster1;
 using Mpx = modm::Pca9548a<MyI2cMaster>;

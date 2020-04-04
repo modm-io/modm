@@ -12,7 +12,6 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
-using namespace modm::literals;
 
 int
 main()

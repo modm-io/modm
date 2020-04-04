@@ -30,7 +30,6 @@
 
 #include <ros/node_handle.h>
 #include <modm/communication/ros.hpp>
-using namespace modm::literals;
 
 #undef	MODM_LOG_LEVEL
 #define	MODM_LOG_LEVEL modm::log::DISABLED

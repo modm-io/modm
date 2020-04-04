@@ -28,7 +28,6 @@
 #include "touchscreen_calibrator.hpp"
 
 #include "images/bluetooth_12x16.hpp"
-using namespace modm::literals;
 
 // ----------------------------------------------------------------------------
 /*

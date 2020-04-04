@@ -14,7 +14,6 @@
 #include <modm/board.hpp>
 #include <modm/processing/timer.hpp>
 #include <modm/debug/logger.hpp>
-using namespace modm::literals;
 
 /**
  * Example of CAN Hardware on STM32 F0 Discovery Board.

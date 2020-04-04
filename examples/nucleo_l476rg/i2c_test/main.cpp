@@ -14,7 +14,6 @@
 #include <modm/processing/protothread.hpp>
 #include <modm/processing/resumable.hpp>
 #include <modm/architecture/interface/i2c_device.hpp>
-using namespace modm::literals;
 
 /*
  * Test of I2C transaction with STM32L4

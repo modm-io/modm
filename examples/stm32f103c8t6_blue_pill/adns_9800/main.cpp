@@ -20,7 +20,6 @@
 #include <modm/driver/motion/adns9800.hpp>
 
 #include <inttypes.h>
-using namespace modm::literals;
 
 // ----------------------------------------------------------------------------
 // Set the log level

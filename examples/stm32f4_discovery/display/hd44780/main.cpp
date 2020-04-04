@@ -30,7 +30,6 @@
 #include <modm/driver/gpio/pca8574.hpp>
 
 #include <modm/board.hpp>
-using namespace modm::literals;
 
 modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > device;
 modm::IOStream stream(device);

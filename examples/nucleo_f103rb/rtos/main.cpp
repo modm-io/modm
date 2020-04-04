@@ -15,7 +15,6 @@
 #include <modm/processing/rtos.hpp>
 
 using namespace modm::platform;
-using namespace modm::literals;
 
 /**
  * This example uses four threads to check if task switching works correctly.

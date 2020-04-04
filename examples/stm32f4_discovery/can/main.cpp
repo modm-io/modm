@@ -14,7 +14,6 @@
 #include <modm/board.hpp>
 #include <modm/debug/logger.hpp>
 #include <modm/board.hpp>
-using namespace modm::literals;
 
 modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice;
 modm::log::Logger modm::log::info(loggerDevice);

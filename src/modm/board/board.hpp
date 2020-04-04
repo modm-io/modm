@@ -11,6 +11,10 @@
 
 #include "board/board.hpp"
 
+#ifndef MODM_BOARD_DO_NOT_USE_LITERALS
+using namespace modm::literals;
+#endif
+
 namespace Board {
 	using systemClock [[deprecated("Use `Board::SystemClock` instead!")]] = SystemClock;
 }

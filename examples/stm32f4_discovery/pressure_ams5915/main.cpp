@@ -16,7 +16,6 @@
 #include <modm/driver/pressure/ams5915.hpp>
 #include <modm/io/iostream.hpp>
 #include <modm/debug/logger.hpp>
-using namespace modm::literals;
 
 modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > device;
 

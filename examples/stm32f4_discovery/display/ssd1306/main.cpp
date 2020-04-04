@@ -11,7 +11,6 @@
 
 #include <modm/board.hpp>
 #include <modm/driver/display/ssd1306.hpp>
-using namespace modm::literals;
 
 /**
  * Example to demonstrate a MODM graphics display SSD1306.

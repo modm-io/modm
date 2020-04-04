@@ -12,7 +12,6 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
-using namespace modm::literals;
 
 // If you use a different SPI instance, you may have to also choose different
 // GPIOs to connect to.

@@ -14,7 +14,6 @@
 #include <can_msgs/Frame.h>
 #include <ros/node_handle.h>
 #include <modm/communication/ros.hpp>
-using namespace modm::literals;
 
 namespace modm {
 namespace can {

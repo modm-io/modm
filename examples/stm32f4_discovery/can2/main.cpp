@@ -12,10 +12,9 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/board/board.hpp>
+#include <modm/board.hpp>
 #include <modm/processing/timer.hpp>
 #include <modm/debug/logger.hpp>
-using namespace modm::literals;
 
 /**
  * Example of CAN Hardware on STM32 F3/F4 Discovery Board.

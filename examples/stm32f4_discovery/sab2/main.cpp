@@ -12,7 +12,6 @@
 #include <modm/board.hpp>
 #include <modm/communication/sab.hpp>
 #include <modm/communication/sab2.hpp>
-using namespace modm::literals;
 
 // ----------------------------------------------------------------------------
 //

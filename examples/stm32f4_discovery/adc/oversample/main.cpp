@@ -13,7 +13,6 @@
 #include <modm/debug/logger.hpp>
 #include <modm/processing/timer.hpp>
 #include <modm/driver/adc/adc_sampler.hpp>
-using namespace modm::literals;
 
 // ----------------------------------------------------------------------------
 // Set the log level

@@ -14,7 +14,6 @@
 #include <modm/processing/timer.hpp>
 #include <modm/processing/protothread.hpp>
 #include <modm/driver/adc/hx711.hpp>
-using namespace modm::literals;
 
 using namespace Board;
 

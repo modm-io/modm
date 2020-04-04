@@ -16,7 +16,6 @@
 #include <modm/driver/position/vl6180.hpp>
 #include <modm/io/iostream.hpp>
 #include <modm/debug/logger.hpp>
-using namespace modm::literals;
 
 modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > device;
 

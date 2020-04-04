@@ -13,7 +13,6 @@
 #include <modm/board.hpp>
 #include <modm/processing/timer.hpp>
 #include <modm/driver/display/max7219_matrix.hpp>
-using namespace modm::literals;
 
 /**
  * Example to demonstrate a MODM graphics display made

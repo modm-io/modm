@@ -20,6 +20,7 @@
 
 using namespace modm::platform;
 using namespace modm::literals;
+using namespace std::chrono_literals;
 
 
 namespace led
@@ -87,7 +88,7 @@ introScreen()
 			modm::accessor::asFlash(bitmap::rca_logo_128x64));
 	display.update();
 
-	modm::delayMilliseconds(2000);
+	modm::delay(2s);
 
 	display.clear();
 
@@ -108,28 +109,28 @@ introScreen()
 
 	display.update();
 
-	modm::delayMilliseconds(1000);
+	modm::delay(1s);
 	display.setCursor(Point(40, 55));
 
 	display << "5 ";
 	display.update();
-	modm::delayMilliseconds(1000);
+	modm::delay(1s);
 
 	display << "4 ";
 	display.update();
-	modm::delayMilliseconds(1000);
+	modm::delay(1s);
 
 	display << "3 ";
 	display.update();
-	modm::delayMilliseconds(1000);
+	modm::delay(1s);
 
 	display << "2 ";
 	display.update();
-	modm::delayMilliseconds(1000);
+	modm::delay(1s);
 
 	display << "1";
 	display.update();
-	modm::delayMilliseconds(1000);
+	modm::delay(1s);
 
 	display.clear();
 }

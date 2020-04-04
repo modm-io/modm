@@ -15,7 +15,6 @@
 #include <modm/debug/logger.hpp>
 #include <modm/processing/timer.hpp>
 #include <inttypes.h>
-using namespace modm::literals;
 
 modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice;
 

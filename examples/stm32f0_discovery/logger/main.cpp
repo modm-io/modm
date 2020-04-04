@@ -11,7 +11,6 @@
 #include <modm/board.hpp>
 #include <modm/debug/logger.hpp>
 #include <modm/processing/timer.hpp>
-using namespace modm::literals;
 
 // ----------------------------------------------------------------------------
 // Set the log level

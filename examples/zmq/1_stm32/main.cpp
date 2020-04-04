@@ -23,7 +23,6 @@
 #include <identifier.hpp>
 
 using namespace Board;
-using namespace modm::literals;
 
 namespace Led
 {

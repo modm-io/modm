@@ -16,7 +16,6 @@
 #include <modm/driver/temperature/ltc2984.hpp>
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/io/iostream.hpp>
-using namespace modm::literals;
 
 modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > device;
 modm::IOStream logger(device);

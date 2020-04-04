@@ -17,7 +17,6 @@
 #include <modm/driver/temperature/tmp102.hpp>
 
 #include <modm/io/iostream.hpp>
-using namespace modm::literals;
 
 modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > device;
 modm::IOStream stream(device);

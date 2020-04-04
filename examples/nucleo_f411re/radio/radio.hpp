@@ -14,7 +14,6 @@
 #include <modm/board.hpp>
 #include <modm/driver/radio/nrf24.hpp>
 #include <modm/processing/timer.hpp>
-using namespace modm::literals;
 
 
 class ClockUs

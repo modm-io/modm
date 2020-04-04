@@ -9,7 +9,6 @@
  */
 
 #include <modm/board.hpp>
-using namespace modm::literals;
 
 #include <modm/driver/storage/block_device_spiflash.hpp>
 

@@ -15,7 +15,6 @@
 
 #include <modm/processing/timer.hpp>
 #include <modm/processing/protothread.hpp>
-using namespace modm::literals;
 
 #include "hardware.hpp"
 

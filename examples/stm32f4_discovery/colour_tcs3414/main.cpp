@@ -18,7 +18,6 @@
 #include <modm/io/iostream.hpp>
 
 #include <modm/architecture/interface/gpio.hpp>
-using namespace modm::literals;
 
 modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > device;
 modm::IOStream stream(device);
