@@ -11,7 +11,7 @@
 
 
 #include <cstring>
-#include <modm/platform/core/atomic_lock.hpp>
+#include <modm/platform/core/atomic_lock_impl.hpp>
 
 /* Cortex-M0 does not have hardware support for true atomics, like STREX/LDREX.
  * The toolchain does not implement the intrinsics, instead linking to them, so

@@ -262,7 +262,7 @@ def build(env):
     # dealing with runtime assertions
     if env.has_module(":architecture:assert"):
         env.template("assert.cpp.in")
-        env.template("assert.hpp.in")
+        env.template("assert_impl.hpp.in")
 
     # hardware init section
     env.copy("hardware_init.hpp")
@@ -270,7 +270,7 @@ def build(env):
     # busy-waiting delays
     if env.has_module(":architecture:delay"):
         env.template("delay.cpp.in")
-        env.copy("delay.hpp")
+        env.copy("delay_impl.hpp")
 
     # GNU Build ID
     env.collect(":build:linkflags", "-Wl,--build-id=sha1")
@@ -292,13 +292,13 @@ def build(env):
         env.template("../../heap/cortex/no_heap.c.in", "no_heap.c")
 
     if env.has_module(":architecture:atomic"):
-        env.copy("atomic_lock.hpp")
+        env.copy("atomic_lock_impl.hpp")
 
     if env.has_module(":architecture:accessor"):
-        env.copy("flash_reader.hpp")
+        env.copy("flash_reader_impl.hpp")
 
     if env.has_module(":architecture:unaligned"):
-        env.template("unaligned.hpp.in")
+        env.template("unaligned_impl.hpp.in")
 
     # Linkerscript
     env.collect(":build:linkflags", "-L{linkdir}", "-Tlinkerscript.ld",

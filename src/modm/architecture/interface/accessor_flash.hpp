@@ -41,7 +41,7 @@
 
 #else // !__DOXYGEN__
 
-#include <modm/platform/core/flash_reader.hpp>
+#include <modm/platform/core/flash_reader_impl.hpp>
 
 #endif
 

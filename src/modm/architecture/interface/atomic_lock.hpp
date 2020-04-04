@@ -78,7 +78,7 @@ public:
 
 // These functions may be implemented as header files, so we cannot rely on
 // there being a link-able function and delegate this choice to the platform.
-#include <modm/platform/core/atomic_lock.hpp>
+#include <modm/platform/core/atomic_lock_impl.hpp>
 
 #endif
 

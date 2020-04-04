@@ -174,4 +174,4 @@ modm_abandon(const modm::AssertionInfo &info) modm_weak;
 
 
 // Core must implement MODM_ASSERTION_HANDLER(handler)
-#include <modm/platform/core/assert.hpp>
+#include <modm/platform/core/assert_impl.hpp>

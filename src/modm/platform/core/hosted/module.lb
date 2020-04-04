@@ -34,13 +34,13 @@ def build(env):
         env.copy("memory.cpp")
 
     if env.has_module(":architecture:atomic"):
-        env.copy("atomic_lock.hpp")
+        env.copy("atomic_lock_impl.hpp")
 
     if env.has_module(":architecture:unaligned"):
-        env.copy("../avr/unaligned.hpp", "unaligned.hpp")
+        env.copy("../avr/unaligned_impl.hpp", "unaligned_impl.hpp")
 
     if env.has_module(":architecture:accessor"):
-        env.copy("../cortex/flash_reader.hpp", "flash_reader.hpp")
+        env.copy("../cortex/flash_reader_impl.hpp", "flash_reader_impl.hpp")
 
     if env.has_module(":architecture:clock"):
         # modm-test implements the clock methods itself
@@ -55,6 +55,6 @@ def build(env):
     else:
         if env.has_module(":architecture:assert"):
             env.template("../cortex/assert.cpp.in", "assert.cpp")
-            env.template("../cortex/assert.hpp.in", "assert.hpp")
+            env.template("../cortex/assert_impl.hpp.in", "assert_impl.hpp")
         if env.has_module(":architecture:delay"):
-            env.template("delay.hpp.in")
+            env.template("delay_impl.hpp.in")
