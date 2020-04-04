@@ -15,63 +15,64 @@
 #include <type_traits>
 
 #include "timestamp_test.hpp"
+using namespace std::chrono_literals;
 
 // ----------------------------------------------------------------------------
 void
-TimestampTest::testConstructors()
+DurationTest::testConstructors()
 {
-	modm::ShortTimestamp t1Short;
-	TEST_ASSERT_TRUE(t1Short == 0);
+	modm::ShortDuration t1Short;
+	TEST_ASSERT_TRUE(t1Short == 0ms);
 
-	modm::Timestamp t1;
-	TEST_ASSERT_TRUE(t1 == 0);
+	modm::Duration t1;
+	TEST_ASSERT_TRUE(t1 == 0ms);
 
-	modm::ShortTimestamp t2Short(1000);
-	TEST_ASSERT_TRUE(t2Short == 1000);
+	modm::ShortDuration t2Short(1s);
+	TEST_ASSERT_TRUE(t2Short == 1000ms);
 
-	modm::Timestamp t2(1000);
-	TEST_ASSERT_TRUE(t2 == 1000);
+	modm::Duration t2(1s);
+	TEST_ASSERT_TRUE(t2 == 1000ms);
 
-	t1Short = 500;
-	TEST_ASSERT_TRUE(t1Short == 500);
+	t1Short = modm::ShortDuration(500ms);
+	TEST_ASSERT_TRUE(t1Short == 500ms);
 
-	t1 = 500;
-	TEST_ASSERT_TRUE(t1 == 500);
+	t1 = modm::Duration(500ms);
+	TEST_ASSERT_TRUE(t1 == 500ms);
 }
 
 void
-TimestampTest::testArithmetics()
+DurationTest::testArithmetics()
 {
-	modm::ShortTimestamp t1Short(200);
-	modm::ShortTimestamp t2Short(500);
-	modm::ShortTimestamp t3Short;
+	modm::ShortDuration t1Short(200ms);
+	modm::ShortDuration t2Short(500ms);
+	modm::ShortDuration t3Short;
 
 	t3Short = t1Short + t2Short;
-	TEST_ASSERT_TRUE(t3Short == 700);
+	TEST_ASSERT_TRUE(t3Short == 700ms);
 
-	modm::Timestamp t1(200);
-	modm::Timestamp t2(500);
-	modm::Timestamp t3;
+	modm::Duration t1(200ms);
+	modm::Duration t2(500ms);
+	modm::Duration t3;
 
 	t3 = t1 + t2;
-	TEST_ASSERT_TRUE(t3 == 700);
+	TEST_ASSERT_TRUE(t3 == 0.7s);
 }
 
 void
-TimestampTest::testComparisons()
+DurationTest::testComparisons()
 {
-	modm::ShortTimestamp t1Short;
-	modm::ShortTimestamp t2Short;
-	modm::Timestamp t1;
-	modm::Timestamp t2;
+	modm::ShortDuration t1Short{};
+	modm::ShortDuration t2Short{};
+	modm::Duration t1{};
+	modm::Duration t2{};
 
 	TEST_ASSERT_TRUE(t1Short == t2Short);
 	TEST_ASSERT_FALSE(t1Short != t2Short);
 	TEST_ASSERT_TRUE(t1 == t2);
 	TEST_ASSERT_FALSE(t1 != t2);
 
-	t1Short = std::numeric_limits<modm::ShortTimestamp::Type>::max() / 2;
-	t1 = std::numeric_limits<modm::Timestamp::Type>::max() / 2;
+	t1Short = modm::ShortDuration::max();
+	t1 = modm::Duration::max();
 
 	TEST_ASSERT_FALSE(t1Short == t2Short);
 	TEST_ASSERT_TRUE(t1Short != t2Short);
@@ -83,11 +84,11 @@ TimestampTest::testComparisons()
 	TEST_ASSERT_TRUE(t1 > t2);
 	TEST_ASSERT_TRUE(t1 >= t2);
 
-	t1Short = std::numeric_limits<modm::ShortTimestamp::Type>::max() / 2 + 1;
-	t1 = std::numeric_limits<modm::Timestamp::Type>::max() / 2 + 1;
+	t1Short = std::chrono::milliseconds(modm::ShortDuration::max() + 1ms);
+	t1 = std::chrono::milliseconds(modm::Duration::max() + 1ms);
 
-	TEST_ASSERT_TRUE(t1Short < t2Short);
-	TEST_ASSERT_TRUE(t1Short <= t2Short);
-	TEST_ASSERT_TRUE(t1 < t2);
-	TEST_ASSERT_TRUE(t1 <= t2);
+	TEST_ASSERT_TRUE(t1Short == t2Short);
+	TEST_ASSERT_FALSE(t1Short != t2Short);
+	TEST_ASSERT_TRUE(t1 == t2);
+	TEST_ASSERT_FALSE(t1 != t2);
 }

@@ -17,7 +17,7 @@ def init(module):
 
 def prepare(module, options):
     module.depends(
-        ":mock:clock.testing",
+        ":mock:clock",
         "modm:architecture:accessor",
         "modm:architecture:atomic",
         "modm:architecture:can",
@@ -28,11 +28,5 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "modm-test/src/modm-test/architecture"
+    env.copy('.')
 
-    ignore_patterns = []
-    target = env[":target"].identifier
-    if target["platform"] == "hosted":
-        # Test does not work on hosted
-        ignore_patterns.append("*driver/clock_test.*")
-
-    env.copy('.', ignore=env.ignore_patterns(*ignore_patterns))

@@ -14,7 +14,8 @@
 #define	UNITTEST_RETURN_ON_FAIL
 #include "dispatcher_test.hpp"
 
-#include <modm-test/mock/testing_clock.hpp>
+#include <modm-test/mock/clock.hpp>
+using test_clock = modm_test::chrono::milli_clock;
 
 // ----------------------------------------------------------------------------
 void
@@ -399,7 +400,7 @@ DispatcherTest::testActionRetransmissionWithAbort()
 		backend->messagesSend.removeAll();
 
 		// reset time so that the timeout is expired
-		TestingClock::time += 500;
+		test_clock::increment(500);
 
 		dispatcher->update();
 	}
@@ -427,7 +428,7 @@ DispatcherTest::testActionRetransmission()
 
 		if (i == 0) {
 			// reset time so that the timeout is expired
-			TestingClock::time += 500;
+			test_clock::increment(500);
 		}
 
 		dispatcher->update();
@@ -439,7 +440,7 @@ DispatcherTest::testActionRetransmission()
 					modm::SmartPointer()));
 
 	// reset time so that the timeout is expired
-	TestingClock::time += 500;
+	test_clock::increment(500);
 
 	dispatcher->update();
 
@@ -477,7 +478,7 @@ DispatcherTest::testResponseRetransmissionWithAbort()
 		backend->messagesSend.removeFront();
 
 		// reset time so that the timeout is expired
-		TestingClock::time += 500;
+		test_clock::increment(500);
 
 		dispatcher->update();
 	}
@@ -509,7 +510,7 @@ DispatcherTest::testResponseRetransmission()
 
 		if (i == 0) {
 			// reset time so that the timeout is expired
-			TestingClock::time += 500;
+			test_clock::increment(500);
 		}
 
 		dispatcher->update();
@@ -521,7 +522,7 @@ DispatcherTest::testResponseRetransmission()
 					modm::SmartPointer()));
 
 	// reset time so that the timeout is expired if still active
-	TestingClock::time += 100;
+	test_clock::increment(100);
 
 	dispatcher->update();
 
