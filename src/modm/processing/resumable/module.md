@@ -138,7 +138,7 @@ public:
     {
         RF_BEGIN();
 
-        timeout.restart(new_timeout);
+        timeout.restart(std::chrono::milliseconds(new_timeout));
 
         if(timeout.isArmed()) {
             RF_RETURN(true);

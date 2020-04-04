@@ -51,11 +51,11 @@ public:
 
         while (true)
         {
-            timeout.restart(100);
+            timeout.restart(100ms);
             Led::set();
             PT_WAIT_UNTIL(timeout.isExpired());
 
-            timeout.restart(200);
+            timeout.restart(200ms);
             Led::reset();
             PT_WAIT_UNTIL(timeout.isExpired());
         }

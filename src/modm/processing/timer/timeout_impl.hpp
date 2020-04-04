@@ -2,7 +2,8 @@
  * Copyright (c) 2009-2010, Fabian Greif
  * Copyright (c) 2009, 2011, Martin Rosekeit
  * Copyright (c) 2012, Sascha Schade
- * Copyright (c) 2012, 2015, Niklas Hauser
+ * Copyright (c) 2012, 2015, 2020, Niklas Hauser
+ * Copyright (c) 2019, Raphael Lehmann
  *
  * This file is part of the modm project.
  *
@@ -12,48 +13,61 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	MODM_TIMEOUT_HPP
-#	error	"Don't include this file directly, use 'timeout.hpp' instead!"
-#endif
-
-template< class Clock, class TimestampType >
-modm::GenericTimeout<Clock, TimestampType>::GenericTimeout() :
-	endTime(0), state(STOPPED)
+template< class Clock, class Duration >
+template< typename Rep, typename Period >
+modm::GenericTimeout<Clock, Duration>::GenericTimeout(std::chrono::duration<Rep, Period> interval)
 {
+	restart(interval);
 }
 
-template< class Clock, class TimestampType >
-modm::GenericTimeout<Clock, TimestampType>::GenericTimeout(const TimestampType time)
-{
-	restart(time);
-}
-
-template< class Clock, class TimestampType >
+template< class Clock, class Duration >
 void
-modm::GenericTimeout<Clock, TimestampType>::restart(TimestampType time)
+modm::GenericTimeout<Clock, Duration>::restart()
 {
-	endTime = Clock::template now<TimestampType>() + time;
-	state = ARMED;
+	restart(_interval);
 }
 
-template< class Clock, class TimestampType >
+template< class Clock, class Duration >
+template< typename Rep, typename Period >
 void
-modm::GenericTimeout<Clock, TimestampType>::stop()
+modm::GenericTimeout<Clock, Duration>::restart(std::chrono::duration<Rep, Period> interval)
 {
-	state = STOPPED;
+	if (0 <= interval.count())
+	{
+		const auto cast_interval = std::chrono::duration_cast<duration>(interval);
+		modm_assert_continue_fail_debug(interval.count() <= duration::max().count(), "tmr.size",
+				"Timer interval must be smaller than the maximal duration!", interval.count());
+
+		_start = std::chrono::time_point_cast<duration>(Clock::now());
+		_interval = cast_interval;
+		_state = ARMED;
+	}
+	else {
+		modm_assert_continue_fail_debug(false, "tmr.neg",
+			"Timer interval must be larger than zero!", interval.count());
+		stop();
+	}
+}
+
+template< class Clock, class Duration >
+void
+modm::GenericTimeout<Clock, Duration>::stop()
+{
+	_state = STOPPED;
+	_interval = duration{0};
 }
 
 // ----------------------------------------------------------------------------
-template< class Clock, class TimestampType >
+template< class Clock, class Duration >
 bool
-modm::GenericTimeout<Clock, TimestampType>::execute()
+modm::GenericTimeout<Clock, Duration>::execute()
 {
-	if (state & EXECUTED)
+	if (_state & (EXECUTED | STOPPED))
 		return false;
 
-	if (state == EXPIRED || checkExpiration())
+	if ((_state == EXPIRED) or checkExpiration())
 	{
-		state = EXPIRED | EXECUTED;
+		_state = (EXPIRED | EXECUTED);
 		return true;
 	}
 
@@ -61,56 +75,54 @@ modm::GenericTimeout<Clock, TimestampType>::execute()
 	return false;
 }
 
-template< class Clock, class TimestampType >
-typename TimestampType::SignedType
-modm::GenericTimeout<Clock, TimestampType>::remaining() const
+template< class Clock, class Duration >
+typename modm::GenericTimeout<Clock, Duration>::wide_signed_duration
+modm::GenericTimeout<Clock, Duration>::remaining() const
 {
-	if (state != STOPPED)
-		return (endTime - Clock::template now<TimestampType>()).getTime();
-
-	return 0;
+	if (_state == STOPPED)
+		return wide_signed_duration{0};
+	return  std::chrono::duration_cast<wide_signed_duration>(_interval) +
+			std::chrono::time_point_cast<wide_signed_duration>(_start) -
+			std::chrono::time_point_cast<wide_signed_duration>(Clock::now());
 }
 
 // ----------------------------------------------------------------------------
-template< class Clock, class TimestampType >
-modm::TimeoutState
-modm::GenericTimeout<Clock, TimestampType>::getState() const
+template< class Clock, class Duration >
+modm::TimerState
+modm::GenericTimeout<Clock, Duration>::state() const
 {
 	if (checkExpiration())
-	{
-		state &= ~ARMED;
-		state |= EXPIRED;
-	}
-	return TimeoutState(state & STATUS_MASK);
+		_state = (_state & ~ARMED) | EXPIRED;
+	return TimerState(_state & STATUS_MASK);
 }
 
-template< class Clock, class TimestampType >
+template< class Clock, class Duration >
 bool
-modm::GenericTimeout<Clock, TimestampType>::isStopped() const
+modm::GenericTimeout<Clock, Duration>::isStopped() const
 {
 	// we do not need to use `getState()` here, since stopping a timeout
 	// has to be done by the user, it will not stop itself.
-	return state == STOPPED;
+	return _state == STOPPED;
 }
 
-template< class Clock, class TimestampType >
+template< class Clock, class Duration >
 bool
-modm::GenericTimeout<Clock, TimestampType>::isArmed() const
+modm::GenericTimeout<Clock, Duration>::isArmed() const
 {
-	return getState() == TimeoutState::Armed;
+	return state() == TimerState::Armed;
 }
 
-template< class Clock, class TimestampType >
+template< class Clock, class Duration >
 bool
-modm::GenericTimeout<Clock, TimestampType>::isExpired() const
+modm::GenericTimeout<Clock, Duration>::isExpired() const
 {
-	return getState() == TimeoutState::Expired;
+	return state() == TimerState::Expired;
 }
 
 // ----------------------------------------------------------------------------
-template< class Clock, class TimestampType >
+template< class Clock, class Duration >
 bool
-modm::GenericTimeout<Clock, TimestampType>::checkExpiration() const
+modm::GenericTimeout<Clock, Duration>::checkExpiration() const
 {
-	return (state & ARMED) and (Clock::template now<TimestampType>() >= endTime);
+	return (_state & ARMED) and (Clock::now() - _start) >= _interval;
 }
