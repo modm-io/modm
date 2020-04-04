@@ -97,14 +97,15 @@ modm::SiemensS65Common<SPI, CS, RS, Reset>::writeData(uint16_t data)
 
 template <typename SPI, typename CS, typename RS, typename Reset>
 void
-modm::SiemensS65Common<SPI, CS, RS, Reset>::lcdSettings(bool landscape) {
+modm::SiemensS65Common<SPI, CS, RS, Reset>::lcdSettings(bool landscape)
+{
 	// Hardware reset is low from initialize
-	modm::delayMilliseconds(50);
+	modm::delay_ms(50);
 	Reset::set();
-	modm::delayMilliseconds(50);
+	modm::delay_ms(50);
 
 	writeCmd(0x07, 0x0000); //display off
-	modm::delayMilliseconds(10);
+	modm::delay_ms(10);
 
 	//power on sequence
 	writeCmd(0x02, 0x0400); //lcd drive control
@@ -117,11 +118,11 @@ modm::SiemensS65Common<SPI, CS, RS, Reset>::lcdSettings(bool landscape) {
 	writeCmd(0x03, 0x0000); //power control 1: BT        //step 2
 	writeCmd(0x03, 0x0000); //power control 1: DC
 	writeCmd(0x03, 0x000C); //power control 1: AP
-	modm::delayMilliseconds(40);
+	modm::delay_ms(40);
 	writeCmd(0x0E, 0x2D1F); //power control 5: VCOMG     //step 3
-	modm::delayMilliseconds(40);
+	modm::delay_ms(40);
 	writeCmd(0x0D, 0x0616); //power control 4: PON       //step 4
-	modm::delayMilliseconds(100);
+	modm::delay_ms(100);
 
 	//display options
 	if (landscape) {
@@ -141,7 +142,7 @@ modm::SiemensS65Common<SPI, CS, RS, Reset>::lcdSettings(bool landscape) {
 	writeCmd(0x07, 0x0025); //display control: GON
 	writeCmd(0x07, 0x0027); //display control: D1
 	writeCmd(0x07, 0x0037); //display control: DTE
-	modm::delayMilliseconds(10);
+	modm::delay_ms(10);
 	lcdCls(0x03e0);
 }
 

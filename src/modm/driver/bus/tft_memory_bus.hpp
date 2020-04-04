@@ -153,13 +153,13 @@ public:
 		PORT::write(data);
 
 		// t_AS
-		modm::delayMicroseconds(1);
+		modm::delay_us(1);
 		WR::reset();
 
-		modm::delayMicroseconds(1);
+		modm::delay_us(1);
 		WR::set();
 
-		modm::delayMicroseconds(1);
+		modm::delay_us(1);
 		PORT::setInput();
 
 		CS::set();
@@ -172,11 +172,11 @@ public:
 		CS::reset();
 		WR::set();
 
-		modm::delayMicroseconds(1);
+		modm::delay_us(1);
 
 		RD::reset();
 
-		modm::delayMicroseconds(1);
+		modm::delay_us(1);
 		ret = PORT::read();
 
 		RD::set();

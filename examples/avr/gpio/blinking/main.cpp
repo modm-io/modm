@@ -13,6 +13,7 @@
 #include <modm/platform.hpp>
 
 using namespace modm::platform;
+using namespace std::chrono_literals;
 
 typedef GpioOutputB0 Led;
 
@@ -25,7 +26,7 @@ main()
 	{
 		Led::toggle();
 
-		modm::delayMilliseconds(1000);
+		modm::delay(1s);
 	}
 }
 

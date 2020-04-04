@@ -217,5 +217,5 @@ template <typename Sck, typename Mosi, typename Miso>
 void modm_always_inline
 modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::delay()
 {
-	modm::delayNanoseconds(delayTime);
+	modm::delay_ns(delayTime);
 }

@@ -28,12 +28,12 @@ main()
 		LedRed::toggle();
 		LedGreen::toggle();
 
-		modm::delayMilliseconds(Button::read() ? 125 : 500);
+		modm::delay(Button::read() ? 125ms : 500ms);
 
 		usb::VBus::toggle();
 		usb::Overcurrent::toggle();
 
-		modm::delayMilliseconds(Button::read() ? 125 : 500);
+		modm::delay(Button::read() ? 125ms : 500ms);
 	}
 
 	return 0;

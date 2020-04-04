@@ -59,11 +59,12 @@ modm::SiemensM55<SPI, CS, RS, Reset>::initialize()
 
 template <typename SPI, typename CS, typename RS, typename Reset>
 void
-modm::SiemensM55<SPI, CS, RS, Reset>::lcdSettings() {
+modm::SiemensM55<SPI, CS, RS, Reset>::lcdSettings()
+{
 	// Hardware reset is low from initialize
-	modm::delayMilliseconds(10);
+	modm::delay_ms(10);
 	Reset::set();
-	modm::delayMilliseconds(10);
+	modm::delay_ms(10);
 
 	RS::set();	// command mode
 	CS::reset();	// select display
@@ -72,10 +73,10 @@ modm::SiemensM55<SPI, CS, RS, Reset>::lcdSettings() {
 	{
 	  SPI::write(initData_lm15[ii]);   // send initialization data
 	}
-	modm::delayMilliseconds(1);
+	modm::delay_ms(1);
 	CS::set();	// deactivate LCD CS
 
-	modm::delayMilliseconds(1);
+	modm::delay_ms(1);
 	CS::reset();	// activate LCD CS
 
 	SPI::write(0xF0);
@@ -98,7 +99,7 @@ modm::SiemensM55<SPI, CS, RS, Reset>::lcdSettings() {
 	CS::set();	 // deactivate LCD CS
 	RS::reset();	// set LCD to data mode
 
-	modm::delayMilliseconds(10);
+	modm::delay_ms(10);
 
 
 	static uint8_t contrast = 22;

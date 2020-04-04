@@ -29,6 +29,7 @@
 #include <modm/debug/logger.hpp>
 
 using namespace modm::platform;
+using namespace std::chrono_literals;
 
 // LED1 Status
 typedef GpioOutputD7 LedStatus;
@@ -110,7 +111,7 @@ main()
 
 	while (true)
 	{
-		modm::delayMilliseconds(100);
+		modm::delay(100ms);
 		LedStatus::toggle();
 		LedRxHigh::toggle();
 		LedRxLow::toggle();

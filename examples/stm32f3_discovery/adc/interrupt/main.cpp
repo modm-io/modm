@@ -61,7 +61,7 @@ main()
 		Adc4::startConversion();
 		while(!Adc4::isConversionFinished);
 		printAdc();
-		modm::delayMilliseconds(500);
+		modm::delay(500ms);
 	}
 
 	return 0;

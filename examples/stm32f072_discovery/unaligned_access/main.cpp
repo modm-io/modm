@@ -25,7 +25,7 @@ void error()
 	while (true)
 	{
 		LedUp::toggle();
-		modm::delayMilliseconds(100);
+		modm::delay(100ms);
 	}
 }
 
@@ -79,7 +79,7 @@ main()
 
 		LedRight::toggle();
 		LedLeft::toggle();
-		modm::delayMilliseconds(Button::read() ? 250 : 500);
+		modm::delay(Button::read() ? 250ms : 500ms);
 	}
 
 	return 0;

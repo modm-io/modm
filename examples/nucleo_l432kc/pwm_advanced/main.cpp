@@ -109,7 +109,7 @@ main()
 		if(++state > 3) {
 			state = 0;
 		}
-		modm::delayMilliseconds(250);
+		modm::delay(250ms);
 
 		TriggerOut::reset();
 	}

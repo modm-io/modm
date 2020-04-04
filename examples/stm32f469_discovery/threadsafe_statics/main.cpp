@@ -38,7 +38,7 @@ main()
 	while (true)
 	{
 		Board::LedGreen::toggle();
-		modm::delayMilliseconds(Board::Button::read() ? 125 : 500);
+		modm::delay(Board::Button::read() ? 125ms : 500ms);
 
 		MODM_LOG_INFO << "loop: " << counter++ << modm::endl;
 		constructDummy();

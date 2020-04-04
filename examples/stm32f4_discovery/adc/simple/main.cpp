@@ -49,7 +49,7 @@ main()
 		MODM_LOG_INFO << "adcValue=" << adcValue;
 		float voltage = adcValue * 3.3 / 0xfff;
 		MODM_LOG_INFO << " voltage=" << voltage << modm::endl;
-		modm::delayMilliseconds(500);
+		modm::delay(500ms);
 	}
 
 	return 0;

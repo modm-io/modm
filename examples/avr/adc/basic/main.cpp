@@ -16,6 +16,7 @@
 
 using namespace modm::platform;
 using namespace modm::literals;
+using namespace std::chrono_literals;
 
 int
 main()
@@ -62,7 +63,7 @@ main()
 			// receiving the UART output on a PC. If you want to do further
 			// calculations with the results instead of sending it
 			// you do not need this.
-			modm::delayMilliseconds(300);
+			modm::delay(300ms);
 
 			// restart the conversion
 			Adc::setChannel(0);

@@ -58,9 +58,9 @@ template <typename Spi, typename Cs, typename Ldac>
 void
 modm::Mcp4922<Spi, Cs, Ldac>::update()
 {
-	modm::delayMicroseconds(1); // 40 nanoseconds
+	modm::delay_us(1); // 40 nanoseconds
 	Ldac::reset();
-	modm::delayMicroseconds(1); // 100 nanoseconds
+	modm::delay_us(1); // 100 nanoseconds
 	Ldac::set();
 }
 

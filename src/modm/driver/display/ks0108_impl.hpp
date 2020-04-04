@@ -124,13 +124,13 @@ modm::Ks0108<E, RW, RS, PIN_CS1, PIN_CS2, PORT>::writeByte(uint8_t data)
 	port.write(data);
 	rw.reset();
 
-	delayMicroseconds(DATA_SET_UP_TIME);
+	modm::delay(DATA_SET_UP_TIME);
 
 	e.set();
-	delayMicroseconds(MIN_E_HIGH_TIME);
+	modm::delay(MIN_E_HIGH_TIME);
 
 	e.reset();
-	delayMicroseconds(MIN_E_LOW_TIME);
+	modm::delay(MIN_E_LOW_TIME);
 }
 
 // ----------------------------------------------------------------------------
@@ -142,15 +142,15 @@ modm::Ks0108<E, RW, RS, PIN_CS1, PIN_CS2, PORT>::readByte()
 	port.setInput();
 	rw.set();
 
-	delayMicroseconds(DATA_SET_UP_TIME);
+	modm::delay(DATA_SET_UP_TIME);
 
 	e.set();
-	delayMicroseconds(MIN_E_HIGH_TIME);
+	modm::delay(MIN_E_HIGH_TIME);
 
 	uint8_t data = port.read();
 
 	e.reset();
-	delayMicroseconds(MIN_E_LOW_TIME);
+	modm::delay(MIN_E_LOW_TIME);
 
 	return data;
 }

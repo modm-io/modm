@@ -23,10 +23,10 @@ main()
 	while (true)
 	{
 		LedGreen::toggle();
-		modm::delayMilliseconds(Button::read() ? 100 : 300);
+		modm::delay(Button::read() ? 100ms : 300ms);
 
 		LedBlue::toggle();
-		modm::delayMilliseconds(Button::read() ? 100 : 300);
+		modm::delay(Button::read() ? 100ms : 300ms);
 	}
 
 	return 0;

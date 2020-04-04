@@ -13,6 +13,7 @@
 
 #ifndef MODM_BOARD_DO_NOT_USE_LITERALS
 using namespace modm::literals;
+using namespace std::chrono_literals;
 #endif
 
 namespace Board {

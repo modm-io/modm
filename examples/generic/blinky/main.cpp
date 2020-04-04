@@ -18,7 +18,7 @@ int main()
 	while (true)
 	{
 		Board::Leds::toggle();
-		modm::delayMilliseconds(Board::Button::read() ? 250 : 500);
+		modm::delay(Board::Button::read() ? 250ms : 500ms);
 #ifdef MODM_BOARD_HAS_LOGGER
 		static uint32_t counter(0);
 		MODM_LOG_INFO << "Loop counter: " << (counter++) << modm::endl;

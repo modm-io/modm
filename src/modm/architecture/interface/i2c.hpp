@@ -116,14 +116,14 @@ struct I2c
 	static void
 	resetDevices()
 	{
-		static_assert(baudrate <= 500'000, "I2c::resetDevices() can only do max. 500kHz!");
-		constexpr uint32_t delay = 500'000 / baudrate;
+		static_assert(baudrate <= 500'000ul, "I2c::resetDevices() can only do max. 500kHz!");
+		constexpr auto delay = 500'000ul / baudrate;
 
 		for (uint_fast8_t ii = 0; ii < 9; ++ii) {
 			Scl::reset();
-			modm::delayMicroseconds(delay);
+			modm::delay_us(delay);
 			Scl::set();
-			modm::delayMicroseconds(delay);
+			modm::delay_us(delay);
 		}
 	}
 

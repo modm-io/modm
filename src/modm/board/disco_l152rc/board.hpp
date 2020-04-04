@@ -79,7 +79,7 @@ struct SystemClock
 		Rcc::setFlashLatency<4.1_MHz>();
 		Rcc::updateCoreFrequency<4.1_MHz>();
 		Rcc::enableMultiSpeedInternalClock(Rcc::MsiFrequency::MHz4);
-		modm::delayMicroseconds(5);
+		modm::delay_us(5);
 
 		Rcc::enableInternalClock();	// 16MHz
 		// set flash latency
@@ -87,7 +87,7 @@ struct SystemClock
 		// switch system clock to HSE output
 		Rcc::enableSystemClock(Rcc::SystemClockSource::Hsi);
 		Rcc::updateCoreFrequency<16_MHz>();
-		modm::delayMicroseconds(5);
+		modm::delay_us(5);
 
 		// internal clock 16MHz * 4 / 2 = 32MHz => bad for USB
 		const Rcc::PllFactors pllFactors{

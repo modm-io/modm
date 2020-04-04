@@ -29,15 +29,16 @@ modm::Hd44780Base<DATA, RW, RS, E>::initialize(LineMode lineMode)
 
 	Bus<DATA, E, DATA::width>::writeHighNibble(Set8BitBus);
 
-	modm::delayMilliseconds(5);
+	modm::delay_ms(5);
 
 	Bus<DATA, E, DATA::width>::writeHighNibble(Set8BitBus);
 
-	modm::delayMicroseconds(100);
+	modm::delay_us(100);
 
 	Bus<DATA, E, DATA::width>::writeHighNibble(Set8BitBus);
 
-	if (DATA::width == 4) {
+	if constexpr (DATA::width == 4)
+	{
 		while(isBusy())
 			;
 		RW::set(RW_Write);
@@ -163,7 +164,7 @@ modm::Hd44780Base<DATA, RW, RS, E>::isBusy()
 
 	if (read() & BusyFlagMask)
 	{
-		modm::delayMicroseconds(2);
+		modm::delay_us(2);
 		return true;
 	}
 	return false;
@@ -192,16 +193,16 @@ modm::Hd44780Base<DATA, RW, RS, E>::Bus<Data, Enable, 4>::write(uint8_t data)
 	DATA::write(data >> 4);
 
 	E::set();
-	modm::delayMicroseconds(1);
+	modm::delay_us(1);
 	E::reset();
-	modm::delayNanoseconds(10);
+	modm::delay_ns(10);
 
 	DATA::write(data);
 
 	E::set();
-	modm::delayMicroseconds(1);
+	modm::delay_us(1);
 	E::reset();
-	modm::delayNanoseconds(10);
+	modm::delay_ns(10);
 }
 
 template <typename DATA, typename RW, typename RS, typename E>
@@ -221,18 +222,18 @@ modm::Hd44780Base<DATA, RW, RS, E>::Bus<Data, Enable, 4>::read()
 	DATA::setInput();
 
 	E::set();
-	modm::delayMicroseconds(1);
+	modm::delay_us(1);
 	data = DATA::read();
 	E::reset();
-	modm::delayNanoseconds(10);
+	modm::delay_ns(10);
 
 	data <<= 4;
 
 	E::set();
-	modm::delayMicroseconds(1);
+	modm::delay_us(1);
 	data |= DATA::read();
 	E::reset();
-	modm::delayNanoseconds(10);
+	modm::delay_ns(10);
 
 	return data;
 }
@@ -247,9 +248,9 @@ modm::Hd44780Base<DATA, RW, RS, E>::Bus<Data, Enable, 8>::write(uint8_t data)
 	DATA::write(data);
 
 	E::set();
-	modm::delayMicroseconds(1);
+	modm::delay_us(1);
 	E::reset();
-	modm::delayNanoseconds(500);
+	modm::delay_ns(500);
 }
 
 template <typename DATA, typename RW, typename RS, typename E>
@@ -269,10 +270,10 @@ modm::Hd44780Base<DATA, RW, RS, E>::Bus<Data, Enable, 8>::read()
 	DATA::setInput();
 
 	E::set();
-	modm::delayMicroseconds(1);
+	modm::delay_us(1);
 	data = DATA::read();
 	E::reset();
-	modm::delayNanoseconds(500);
+	modm::delay_ns(500);
 
 	return data;
 }

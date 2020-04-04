@@ -58,7 +58,6 @@ template <	typename Cclk,
 bool
 modm::XilinxSpartan3<Cclk, Din, ProgB, InitB, Done, DataSource>::configure(const FpgaType fpgaType)
 {
-
 	configurePins();
 
 	MODM_LOG_DEBUG << MODM_FILE_INFO;
@@ -72,7 +71,7 @@ modm::XilinxSpartan3<Cclk, Din, ProgB, InitB, Done, DataSource>::configure(const
 		while (InitB::read() == modm::Gpio::High ||
 				Done::read() == modm::Gpio::High)
 		{
-			modm::delayMicroseconds(1);
+			modm::delay_us(1);
 			if (counter++ > 1000) {
 				// Timeout (1ms) reached, FPGA is not responding abort configuration
 				MODM_LOG_ERROR << MODM_FILE_INFO;
@@ -83,14 +82,14 @@ modm::XilinxSpartan3<Cclk, Din, ProgB, InitB, Done, DataSource>::configure(const
 	}
 	// Led1::reset();
 
-	modm::delayMicroseconds(1);
+	modm::delay_us(1);
 	ProgB::set();
 
 	// Wait until INIT_B goes high
 	uint32_t counter = 0;
 	while (InitB::read() == modm::Gpio::Low)
 	{
-		modm::delayMicroseconds(1);
+		modm::delay_us(1);
 		if (counter++ > 1000) {
 			// Timeout (1ms) reached, FPGA is not responding abort configuration
 			MODM_LOG_ERROR << MODM_FILE_INFO;
@@ -101,7 +100,7 @@ modm::XilinxSpartan3<Cclk, Din, ProgB, InitB, Done, DataSource>::configure(const
 	// Led2::reset();
 
 	// wait 0.5..4us before starting the configuration
-	modm::delayMicroseconds(4);
+	modm::delay_us(4);
 
 	uint8_t buffer[256];
 

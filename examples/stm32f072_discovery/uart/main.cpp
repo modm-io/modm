@@ -42,7 +42,7 @@ main()
 		if (c > 'Z') {
 			c = 'A';
 		}
-		modm::delayMilliseconds(500);
+		modm::delay(500ms);
 	}
 
 	return 0;

@@ -31,9 +31,9 @@ modm::Nokia6610<SPI, CS, Reset, GE12>::initialize()
 	// Reset pin
 	Reset::setOutput();
 	Reset::reset();
-	modm::delayMilliseconds(1);
+	modm::delay_ms(1);
 	Reset::set();
-	modm::delayMilliseconds(10);
+	modm::delay_ms(10);
 
 
 	lcdSettings();
@@ -99,7 +99,8 @@ modm::Nokia6610<SPI, CS, Reset, GE12>::setContrast(uint8_t contrast) {
 
 template <typename SPI, typename CS, typename Reset, bool GE12>
 void
-modm::Nokia6610<SPI, CS, Reset, GE12>::lcdSettings() {
+modm::Nokia6610<SPI, CS, Reset, GE12>::lcdSettings()
+{
 	CS::reset();
 
 	if( GE12){
@@ -107,9 +108,9 @@ modm::Nokia6610<SPI, CS, Reset, GE12>::lcdSettings() {
 	else{
 		// Hardware reset
 		Reset::reset();
-		modm::delayMilliseconds(50);
+		modm::delay_ms(50);
 		Reset::set();
-		modm::delayMilliseconds(50);
+		modm::delay_ms(50);
 
 		// Display vontrol
 		writeSpiCommand(nokia::NOKIA_GE8_DISCTL);
@@ -128,7 +129,7 @@ modm::Nokia6610<SPI, CS, Reset, GE12>::lcdSettings() {
 
 		CS::set();
 		// wait aproximetly 100ms
-		modm::delayMilliseconds(100);
+		modm::delay_ms(100);
 		CS::reset();
 
 		// Sleep out
@@ -170,7 +171,8 @@ modm::Nokia6610<SPI, CS, Reset, GE12>::lcdSettings() {
 
 template <typename SPI, typename CS, typename Reset, bool GE12>
 void
-modm::Nokia6610<SPI, CS, Reset, GE12>::update() {
+modm::Nokia6610<SPI, CS, Reset, GE12>::update()
+{
 	CS::reset();
 
 	if (GE12)
@@ -219,7 +221,7 @@ modm::Nokia6610<SPI, CS, Reset, GE12>::update() {
 	else
 	{
 		// wait approximately 100ms
-		modm::delayMilliseconds(100);
+		modm::delay_ms(100);
 
 		// Display On
 		writeSpiCommand(nokia::NOKIA_GE8_DISON);

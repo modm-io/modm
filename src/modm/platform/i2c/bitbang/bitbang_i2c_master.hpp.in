@@ -118,13 +118,13 @@ private:
 	/// busy waits a **half** clock cycle
 	static modm_always_inline void
 	delay2()
-	{ modm::delayNanoseconds(delayTime*2); }
+	{ modm::delay_ns(delayTime*2); }
 
 	// timings
 	/// busy waits **quarter** clock cycle
 	static modm_always_inline void
 	delay4()
-	{ modm::delayNanoseconds(delayTime); }
+	{ modm::delay_ns(delayTime); }
 
 	enum
 	{

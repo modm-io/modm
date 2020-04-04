@@ -82,7 +82,7 @@ main()
 
 	while (true)
 	{
-		modm::delayMilliseconds(1000);
+		modm::delay(1000ms);
 		Board::LedUp::toggle();
 	}
 

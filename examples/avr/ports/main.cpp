@@ -77,10 +77,10 @@ int main()
 	PinGroup4::setInput(); serialStream << modm::bin << PinGroup4::read() << modm::endl;
 	serialStream << modm::endl;
 
-	PinGroup::setOutput(modm::Gpio::High); modm::delayMilliseconds(1000);
+	PinGroup::setOutput(modm::Gpio::High); modm::delay(1s);
 
 	const auto fn_report = []() {
-		serialStream << modm::bin << PinGroup::read() << modm::endl; modm::delayMilliseconds(200);
+		serialStream << modm::bin << PinGroup::read() << modm::endl; modm::delay(200ms);
 	};
 
 	while (true)

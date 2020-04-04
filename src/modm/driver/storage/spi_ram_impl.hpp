@@ -39,14 +39,14 @@ modm::SpiRam<Spi, Cs, Hold>::initialize()
 	hold.set();
 	hold.setOutput();
 
-	modm::delayMicroseconds(1);
+	modm::delay_us(1);
 
 	cs.reset();
 	spi.write(WRITE_STATUS_REGISTER);
 	spi.write(SEQUENTIAL_MODE);
 	cs.set();
 
-	modm::delayMicroseconds(1);
+	modm::delay_us(1);
 
 	// Check if the status register has the right content. This also used
 	// as a general check that the device is available.

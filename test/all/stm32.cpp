@@ -11,13 +11,14 @@
 
 #include <modm/platform.hpp>
 #include <modm/architecture/interface/delay.hpp>
+using namespace std::chrono_literals;
 
 int
 main(void)
 {
     while (true)
     {
-        modm::delayMilliseconds(500);
+        modm::delay(500ms);
     }
 
     return 0;

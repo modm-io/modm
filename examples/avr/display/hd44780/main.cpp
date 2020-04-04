@@ -15,6 +15,7 @@
 #include <modm/driver/display/hd44780.hpp>
 
 using namespace modm::platform;
+using namespace std::chrono_literals;
 
 // define the pins used by the LCD
 namespace lcd
@@ -46,7 +47,7 @@ main()
 
 	// The LCD needs at least 50ms after power-up until it can be
 	// initialized. To make sure this is met we wait here
-	modm::delayMilliseconds(50);
+	modm::delay(50ms);
 
 	display.initialize();
 	display.setCursor(0, 0);
@@ -64,6 +65,6 @@ main()
 
 		counter++;
 
-		modm::delayMilliseconds(200);
+		modm::delay(200ms);
 	}
 }

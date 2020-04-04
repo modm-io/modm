@@ -24,25 +24,25 @@ Hx711<Cfg>::singleConversion()
 
 	RF_WAIT_UNTIL(Data::read() == modm::Gpio::Low);
 
-	modm::delayMicroseconds(1);
+	modm::delay_us(1);
 
 	data = 0;
 	for (uint8_t ii = 0; ii < 24; ++ii)
 	{
 		Sck::set();
-		modm::delayMicroseconds(1);
+		modm::delay_us(1);
 		data = (data << 1) | Data::read();
-		modm::delayMicroseconds(1);
+		modm::delay_us(1);
 		Sck::reset();
-		modm::delayMicroseconds(1);
+		modm::delay_us(1);
 	}
 
 	// Additional pulses for mode of next conversion
 	for (uint8_t ii = 0; ii < static_cast<uint8_t>(Cfg::mode); ++ii) {
 		Sck::set();
-		modm::delayMicroseconds(1);
+		modm::delay_us(1);
 		Sck::reset();
-		modm::delayMicroseconds(1);
+		modm::delay_us(1);
 	}
 
 	// Fill up MSBs for negative numbers

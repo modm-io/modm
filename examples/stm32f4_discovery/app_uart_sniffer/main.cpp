@@ -116,7 +116,7 @@ main()
 			Board::LedGreen::toggle();
 		}
 
-		modm::delayMicroseconds(100);
+		modm::delay(100us);
 	}
 
 	return 0;

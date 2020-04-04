@@ -55,7 +55,7 @@ modm::XilinxSpartan6Parallel<Cclk, DataLow, DataHigh, ProgB, InitB, Done, DataSo
 		while (InitB::read() == modm::Gpio::High ||
 				Done::read() == modm::Gpio::High)
 		{
-			modm::delayMicroseconds(1);
+			modm::delay_us(1);
 			if (counter++ > 1000) {
 				// Timeout (1ms) reached, FPGA is not responding abort configuration
 				MODM_LOG_ERROR << MODM_FILE_INFO;
@@ -74,7 +74,7 @@ modm::XilinxSpartan6Parallel<Cclk, DataLow, DataHigh, ProgB, InitB, Done, DataSo
 
 	Led0::reset();
 
-	modm::delayMicroseconds(1);
+	modm::delay_us(1);
 	// Release reset
 	ProgB::set();
 
@@ -82,7 +82,7 @@ modm::XilinxSpartan6Parallel<Cclk, DataLow, DataHigh, ProgB, InitB, Done, DataSo
 	uint32_t counter = 0;
 	while (InitB::read() == modm::Gpio::Low)
 	{
-		modm::delayMicroseconds(1);
+		modm::delay_us(1);
 		if (counter++ > 1000) {
 			// Timeout (1ms) reached, FPGA is not responding abort configuration
 			MODM_LOG_ERROR << MODM_FILE_INFO;

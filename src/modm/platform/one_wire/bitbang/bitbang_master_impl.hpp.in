@@ -31,16 +31,16 @@ template <typename Pin>
 bool
 modm::platform::BitBangOneWireMaster<Pin>::touchReset()
 {
-	delayMicroseconds(G);
+	modm::delay(G);
 	PIN::reset();	// drives the bus low
-	delayMicroseconds(H);
+	modm::delay(H);
 	PIN::set();		// releases the bus
-	delayMicroseconds(I);
+	modm::delay(I);
 
 	// sample for presence pulse from slave
 	bool result = !PIN::read();
 
-	delayMicroseconds(J);			// complete the reset sequence recovery
+	modm::delay(J);			// complete the reset sequence recovery
 
 	return result;
 }
@@ -52,16 +52,16 @@ modm::platform::BitBangOneWireMaster<Pin>::writeBit(bool bit)
 	if (bit)
 	{
 		PIN::reset();	// Drives bus low
-		delayMicroseconds(A);
+		modm::delay(A);
 		PIN::set();		// Releases the bus
-		delayMicroseconds(B);		// Complete the time slot and 10us recovery
+		modm::delay(B);		// Complete the time slot and 10us recovery
 	}
 	else
 	{
 		PIN::reset();
-		delayMicroseconds(C);
+		modm::delay(C);
 		PIN::set();
-		delayMicroseconds(D);
+		modm::delay(D);
 	}
 }
 
@@ -70,14 +70,14 @@ bool
 modm::platform::BitBangOneWireMaster<Pin>::readBit()
 {
 	PIN::reset();	// drives the bus low
-	delayMicroseconds(A);
+	modm::delay(A);
 	PIN::set();		// releases the bus
-	delayMicroseconds(E);
+	modm::delay(E);
 
 	// Sample the bit value from the slave
 	bool result = PIN::read();
 
-	delayMicroseconds(F);			// complete the reset sequence recovery
+	modm::delay(F);			// complete the reset sequence recovery
 
 	return result;
 }

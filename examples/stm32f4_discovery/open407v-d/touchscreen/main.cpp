@@ -167,7 +167,7 @@ calibrateTouchscreen(modm::GraphicDisplay& display)
 		display << "Touch crosshair to calibrate";
 
 		drawCross(display, calibrationPoint[i]);
-		modm::delayMilliseconds(500);
+		modm::delay(500ms);
 
 		while (!ads7843.read(&sample[i])) {
 			// wait until a valid sample can be taken

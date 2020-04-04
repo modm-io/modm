@@ -15,7 +15,7 @@ static void dsi_write_command(uint32_t count, uint8_t const * const p)
 {
 	/* Wait for Command FIFO Empty */
 	for (int t = 1'024; not (DSI->GPSR & DSI_GPSR_CMDFE) and t; t--) {
-		modm::delayMilliseconds(1);
+		modm::delay_ms(1);
 	}
 
 	if(count <= 1)
@@ -31,7 +31,7 @@ static void dsi_write_command(uint32_t count, uint8_t const * const p)
 		uint16_t counter = 3;
 
 		for (int t = 1'024; not (DSI->GPSR & DSI_GPSR_CMDFE) and t; t--) {
-			modm::delayMilliseconds(1);
+			modm::delay_ms(1);
 		}
 
 		while(counter < count)
@@ -43,7 +43,7 @@ static void dsi_write_command(uint32_t count, uint8_t const * const p)
 			counter += 4;
 
 			for (int t = 1'024; not (DSI->GPSR & DSI_GPSR_CMDFE) and t; t--) {
-				modm::delayMilliseconds(1);
+				modm::delay_ms(1);
 			}
 		}
 
@@ -245,11 +245,11 @@ void otm8009a_init(uint8_t ColorCoding)
 	/* -> Source output level during porch and non-display area to GND */
 	dsi_write_command(0, ShortRegData2);
 	dsi_write_command(0, ShortRegData3);
-	modm::delayMilliseconds(10);
+	modm::delay_ms(10);
 	/* Not documented */
 	dsi_write_command(0, ShortRegData4);
 	dsi_write_command(0, ShortRegData5);
-	modm::delayMilliseconds(10);
+	modm::delay_ms(10);
 	/////////////////////////////////////////////////////////////////////
 
 	/* PWR_CTRL4 - 0xC4B0h - 178th parameter - Default 0xA8 */
@@ -414,7 +414,7 @@ void otm8009a_init(uint8_t ColorCoding)
 	dsi_write_command(0, ShortRegData36);
 
 	/* Wait for sleep out exit */
-	modm::delayMilliseconds(120);
+	modm::delay_ms(120);
 
 	if (ColorCoding == 0) {
 		dsi_write_command(0, ShortRegData38);

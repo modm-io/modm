@@ -27,7 +27,7 @@ main()
 	while (true)
 	{
 		LedBlue::toggle();
-		modm::delayMilliseconds(500);
+		modm::delay(500ms);
 
 		try {
 			throw counter++;

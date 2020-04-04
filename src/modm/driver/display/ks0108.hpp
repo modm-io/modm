@@ -57,9 +57,10 @@ namespace modm
 
 	protected:
 		// Timing constants form the datasheet
-		static constexpr float DATA_SET_UP_TIME = 0.14f;
-		static constexpr float MIN_E_HIGH_TIME = 0.45f;
-		static constexpr float MIN_E_LOW_TIME = 0.45f;
+		static constexpr std::chrono::nanoseconds ADDRESS_SET_UP_TIME{140};
+		static constexpr std::chrono::nanoseconds DATA_SET_UP_TIME{200};
+		static constexpr std::chrono::nanoseconds MIN_E_HIGH_TIME{450};
+		static constexpr std::chrono::nanoseconds MIN_E_LOW_TIME{450};
 
 	protected:
 		/// Write one byte (Sets RW and E)

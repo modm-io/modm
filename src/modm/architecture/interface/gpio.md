@@ -27,7 +27,7 @@ Led::set();
 while (true)
 {
     Led::toggle();
-    modm::delayMilliseconds(500);
+    modm::delay(500ms);
 }
 ```
 

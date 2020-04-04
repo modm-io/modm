@@ -24,8 +24,8 @@ main()
 	while (true)
 	{
 		LedD13::set();
-		modm::delayMilliseconds(1000);
+		modm::delay(1s);
 		LedD13::reset();
-		modm::delayMilliseconds(1000);
+		modm::delay(1s);
 	}
 }

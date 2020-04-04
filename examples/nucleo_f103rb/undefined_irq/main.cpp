@@ -72,7 +72,7 @@ int main()
 			NVIC_SetPendingIRQ(IRQn_Type(int(EXTI0_IRQn) + ii));
 			ii = (ii + 1) % 5;
 			// wait one second for debounce
-			modm::delayMilliseconds(500);
+			modm::delay(500ms);
 		}
 	}
 

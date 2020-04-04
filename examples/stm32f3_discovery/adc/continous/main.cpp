@@ -95,7 +95,7 @@ main()
 
 	while (true)
 	{
-		modm::delayMilliseconds(200);
+		modm::delay(200ms);
 		printAdc();
 	}
 

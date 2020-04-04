@@ -79,9 +79,9 @@ int main()
 			Nrf1Phy::writeRegister(Nrf1Phy::NrfRegister::RF_CH, i + channel_start);
 
 			Nrf1Ce::set();
-			modm::delayMicroseconds(rx_settle);
+			modm::delay_us(rx_settle);
 			Nrf1Ce::reset();
-			modm::delayMicroseconds(2);
+			modm::delay(2us);
 			channel_info[i] += 5*Nrf1Phy::readRegister(Nrf1Phy::NrfRegister::RPD);
 
 			if(channel_info[i] > max)

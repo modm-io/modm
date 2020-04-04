@@ -35,7 +35,7 @@ main()
 
 	while (true)
 	{
-		modm::delayMilliseconds(50);
+		modm::delay(50ms);
 
 		if (Button::read()) {
 			display.clear();

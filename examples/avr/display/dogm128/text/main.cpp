@@ -18,6 +18,7 @@
 
 using namespace modm::platform;
 using namespace modm::literals;
+using namespace std::chrono_literals;
 
 
 // LCD Backlight
@@ -76,7 +77,7 @@ main()
 	display << 0 << 12 << 345 << 6789 << "!\"§$%&/()=?`´,;:-<>";
 	display.update();
 
-	modm::delayMilliseconds(2000);
+	modm::delay(2s);
 
 	display.clear();
 	display.setFont(modm::font::Assertion);
@@ -87,7 +88,7 @@ main()
 	display << "0123456789!\"§$%&/()=?`´,;:-<>";
 	display.update();
 
-	modm::delayMilliseconds(2000);
+	modm::delay(2s);
 
 	display.clear();
 	display.setFont(modm::font::ArcadeClassic);

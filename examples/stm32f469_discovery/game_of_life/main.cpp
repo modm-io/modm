@@ -293,7 +293,7 @@ void game_of_life()
 			init(framebuffers);
 			evolve(framebuffers[0], framebuffers[1]);
 			while(Button::read())
-				modm::delayMilliseconds(10);
+				modm::delay(10ms);
 			reseed.restart();
 		}
 		// read touch sensor during frame rate delay

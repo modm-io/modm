@@ -10,6 +10,7 @@
 // ----------------------------------------------------------------------------
 
 #include "board.hpp"
+#include <modm/architecture/interface/delay.hpp>
 %% if with_assert
 #include <modm/architecture/interface/assert.hpp>
 %% endif
@@ -47,9 +48,9 @@ modm_abandon(const modm::AssertionInfo &info)
 	for(int times=10; times>=0; times--)
 	{
 		Board::Leds::write(1);
-		modm::delayMilliseconds(20);
+		modm::delay_ms(20);
 		Board::Leds::write(0);
-		modm::delayMilliseconds(180);
+		modm::delay_ms(180);
 	}
 %% if with_logger
 	// Do not flush here otherwise you may deadlock due to waiting on the UART

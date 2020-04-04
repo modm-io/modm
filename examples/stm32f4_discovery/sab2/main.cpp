@@ -58,7 +58,7 @@ main()
 		}
 
 		Board::LedGreen::toggle();
-		modm::delayMilliseconds(100);
+		modm::delay(100ms);
 	}
 
 	return 0;

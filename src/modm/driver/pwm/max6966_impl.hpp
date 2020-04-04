@@ -164,7 +164,7 @@ modm::MAX6966<Spi, Cs, DRIVERS>::readFromDriver(uint8_t driver, max6966::Registe
 	Cs::set();
 
 	// TODO: Add delay here?
-//	modm::delayMilliseconds(1);
+//	modm::delay_ms(1);
 
 	// send dummy data and get the right register
 	uint8_t data=0;

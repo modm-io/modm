@@ -29,10 +29,10 @@ main()
 	while (true)
 	{
 		LedGreen::set();
-		modm::delayMilliseconds(900);
+		modm::delay(900ms);
 
 		LedGreen::reset();
-		modm::delayMilliseconds(100);
+		modm::delay(100ms);
 	}
 
 	return 0;

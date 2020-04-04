@@ -43,12 +43,12 @@ void
 modm::Adns9800< Spi, Cs>::getDeltaXY(int16_t &delta_x, int16_t &delta_y)
 {
 	Cs::reset();
-	modm::delayMicroseconds(100); // tSRAD
+	modm::delay_us(100); // tSRAD
 
 	Spi::transferBlocking(static_cast<uint8_t>(Register::Motion_Burst));
 
 	// Delay tSRAD
-	modm::delayMicroseconds(100);
+	modm::delay_us(100);
 
 	static constexpr uint8_t buf_size = 6;
 	uint8_t tx_buf[buf_size];
@@ -56,7 +56,7 @@ modm::Adns9800< Spi, Cs>::getDeltaXY(int16_t &delta_x, int16_t &delta_y)
 
 	Spi::transferBlocking(tx_buf, rx_buf, buf_size);
 
-	modm::delayNanoseconds(120); // tSCLK-NCS for read operation is 120ns
+	modm::delay_ns(120); // tSCLK-NCS for read operation is 120ns
 	Cs::set();
 
 	uint8_t delta_x_l = rx_buf[2];
@@ -78,14 +78,14 @@ modm::Adns9800< Spi, Cs>::readReg(Register const reg)
 
 	// send adress of the register, with MSBit = 0 to indicate it's a read
 	Spi::transferBlocking(address & 0x7f);
-	modm::delayMicroseconds(100); // tSRAD
+	modm::delay_us(100); // tSRAD
 
 	// read data
 	uint8_t data = Spi::transferBlocking(0);
 
-	modm::delayNanoseconds(120); // tSCLK-NCS for read operation is 120ns
+	modm::delay_ns(120); // tSCLK-NCS for read operation is 120ns
 	Cs::set();
-	modm::delayMicroseconds(19); // tSRW/tSRR (=20us) minus tSCLK-NCS
+	modm::delay_us(19); // tSRW/tSRR (=20us) minus tSCLK-NCS
 
 	return data;
 }
@@ -104,9 +104,9 @@ modm::Adns9800< Spi, Cs>::writeReg(Register const reg, uint8_t const data)
 	//send data
 	Spi::transferBlocking(data);
 
-	modm::delayMicroseconds(20); // tSCLK-NCS for write operation
+	modm::delay_us(20); // tSCLK-NCS for write operation
 	Cs::set();
-	modm::delayMicroseconds(100); // tSWW/tSWR (=120us) minus tSCLK-NCS. Could be shortened, but is looks like a safe lower bound
+	modm::delay_us(100); // tSWW/tSWR (=120us) minus tSCLK-NCS. Could be shortened, but is looks like a safe lower bound
 }
 
 template < typename Spi, typename Cs >
@@ -120,7 +120,7 @@ modm::Adns9800< Spi, Cs >::uploadFirmware()
 	writeReg(Register::SROM_Enable, 0x1d);
 
 	// wait for more than one frame period
-	modm::delayMilliseconds(10); // assume that the frame rate is as low as 100fps... even if it should never be that low
+	modm::delay_ms(10); // assume that the frame rate is as low as 100fps... even if it should never be that low
 
 	// write 0x18 to SROM_enable to start SROM download
 	writeReg(Register::SROM_Enable, 0x18);
@@ -131,13 +131,13 @@ modm::Adns9800< Spi, Cs >::uploadFirmware()
 	// write burst destination address
 	uint8_t address = static_cast<uint8_t>(Register::SROM_Load_Burst) | 0x80;
 	Spi::transferBlocking(address);
-	modm::delayMicroseconds(15);
+	modm::delay_us(15);
 
 	// send all bytes of the firmware
 	for(int ii = 0; ii < firmware_length; ++ii)
 	{
 		Spi::transferBlocking(firmware_data[ii]);
-		modm::delayMicroseconds(15);
+		modm::delay_us(15);
 	}
 
 	Cs::set();
@@ -155,7 +155,7 @@ modm::Adns9800< Spi, Cs >::initialise()
 	Cs::set();
 
 	writeReg(Register::Power_Up_Reset, 0x5a); // force reset
-	modm::delayMilliseconds(50); // wait for it to reboot
+	modm::delay_ms(50); // wait for it to reboot
 
 	// Read Product ID
 	uint8_t id = readReg(Register::Product_ID);
@@ -191,7 +191,7 @@ modm::Adns9800< Spi, Cs >::initialise()
 	readReg(Register::Delta_Y_H);
 
 	uploadFirmware();
-	modm::delayMilliseconds(10);
+	modm::delay_ms(10);
 
 	// enable laser(bit 0 = 0b), in normal mode (bits 3,2,1 = 000b)
 	// reading the actual value of the register is important because the real
@@ -214,7 +214,7 @@ modm::Adns9800< Spi, Cs >::initialise()
 	writeReg(Register::Frame_Period_Max_Bound_Lower, 0x20);
 	writeReg(Register::Frame_Period_Max_Bound_Upper, 0x1b);
 
-	modm::delayMilliseconds(1);
+	modm::delay_ms(1);
 
 	return success;
 }

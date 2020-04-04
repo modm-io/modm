@@ -53,7 +53,7 @@ int main()
 		MODM_LOG_INFO << "Testing PHY2" << modm::endl;
 		test<Nrf2Phy>();
 
-		modm::delayMilliseconds(1000);
+		modm::delay(1s);
 	}
 
 	return 0;

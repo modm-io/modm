@@ -17,6 +17,7 @@
 
 using namespace modm::platform;
 using namespace modm::literals;
+using namespace std::chrono_literals;
 
 
 namespace led
@@ -82,6 +83,6 @@ main()
 		display.drawCircle(Point(x, y), radius);
 		display.update();
 
-		modm::delayMilliseconds(50);
+		modm::delay(50ms);
 	}
 }

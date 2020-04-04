@@ -20,6 +20,7 @@
 
 using namespace modm::platform;
 using namespace modm::literals;
+using namespace std::chrono_literals;
 
 // set new log level
 #undef MODM_LOG_LEVEL
@@ -111,6 +112,6 @@ main()
 
 		component::receiver.update();
 
-		modm::delayMicroseconds(100);
+		modm::delay(100us);
 	}
 }

@@ -90,9 +90,9 @@ modm::St7036<SPI, CS, RS, Width, Heigth>::writeCommand(uint8_t inCommand)
 	// check if the command is 'clear display' oder 'return home', these
 	// commands take a bit longer until they are finished.
 	if ((inCommand & 0xfc) == 0) {
-		modm::delayMicroseconds(1200);
+		modm::delay_us(1200);
 	}
 	else {
-		modm::delayMicroseconds(27);
+		modm::delay_us(27);
 	}
 }

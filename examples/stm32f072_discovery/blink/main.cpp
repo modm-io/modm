@@ -27,6 +27,6 @@ main()
 		LedUp::toggle();
 		LedLeft::toggle();
 		LedDown::toggle();
-		modm::delayMilliseconds(1000);
+		modm::delay(1000ms);
 	}
 }

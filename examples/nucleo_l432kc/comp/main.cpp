@@ -40,7 +40,7 @@ main()
 
 	while (true)
 	{
-		modm::delayMilliseconds(250);
+		modm::delay(250ms);
 		MODM_LOG_INFO << "Comparator: " << Comparator::getOutput() << modm::endl;
 		Board::LedD13::set(Comparator::getOutput());
 	}

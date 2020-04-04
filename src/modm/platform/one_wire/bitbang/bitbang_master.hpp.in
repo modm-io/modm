@@ -167,16 +167,16 @@ protected:
 	performSearch();
 
 	// standard delay times in microseconds
-	static constexpr unsigned int A = 6;
-	static constexpr unsigned int B = 64;
-	static constexpr unsigned int C = 60;
-	static constexpr unsigned int D = 10;
-	static constexpr unsigned int E = 9;
-	static constexpr unsigned int F = 55;
-	static constexpr unsigned int G = 0;
-	static constexpr unsigned int H = 480;
-	static constexpr unsigned int I = 70;
-	static constexpr unsigned int J = 410;
+	static constexpr std::chrono::microseconds A{6};
+	static constexpr std::chrono::microseconds B{64};
+	static constexpr std::chrono::microseconds C{60};
+	static constexpr std::chrono::microseconds D{10};
+	static constexpr std::chrono::microseconds E{9};
+	static constexpr std::chrono::microseconds F{55};
+	static constexpr std::chrono::microseconds G{0};
+	static constexpr std::chrono::microseconds H{480};
+	static constexpr std::chrono::microseconds I{70};
+	static constexpr std::chrono::microseconds J{410};
 
 	// state of the search
 	static uint8_t lastDiscrepancy;

@@ -22,6 +22,7 @@
 #include <modm/communication/xpcc/backend/can/connector.hpp>
 #include <modm/communication/xpcc/backend/zeromq/connector.hpp>
 using namespace modm::literals;
+using namespace std::chrono_literals;
 
 /**
  * Listens to a CAN bus connected by a CAN2USB and publishes modm messages with zeromq.
@@ -105,7 +106,7 @@ main()
 			zmqConnector.dropPacket();
 		}
 
-		modm::delayMilliseconds(10);
+		modm::delay(10ms);
 	}
 
 	canUsb.close();

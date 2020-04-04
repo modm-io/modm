@@ -14,8 +14,6 @@
 #error "Do not include ds1302_impl.hpp. Only include ds1302.hpp"
 #endif
 
-#include <modm/architecture/interface/delay.hpp>
-
 template < class PinSet >
 void
 modm::Ds1302< PinSet >::initialize()
@@ -29,20 +27,20 @@ template< class PinSet >
 void
 modm::Ds1302< PinSet >::writeByte(uint8_t byte)
 {
-	modm::delayMicroseconds(delay_ce);
+	modm::delay(DELAY_CE);
 	Io::setOutput();
 
 	for (uint8_t ii = 8; ii > 0; --ii)
 	{
-		modm::delayMicroseconds(delay_clk);
+		modm::delay(DELAY_CLK);
 		Sclk::reset();
 		Io::set(byte & 0x01);
-		modm::delayMicroseconds(delay_clk);
+		modm::delay(DELAY_CLK);
 		Sclk::set();
 
 		byte >>= 1;
 	}
-	modm::delayMicroseconds(delay_clk);
+	modm::delay(DELAY_CLK);
 }
 
 template< class PinSet >
@@ -55,10 +53,10 @@ modm::Ds1302< PinSet >::write(const uint8_t addr, const uint8_t data)
 
 	// Cleanup
 	Sclk::reset();
-	modm::delayMicroseconds(delay_clk);
+	modm::delay(DELAY_CLK);
 	Io::setInput();
 	Ce::reset();
-	modm::delayMicroseconds(delay_ce);
+	modm::delay(DELAY_CE);
 }
 
 template< class PinSet >
@@ -71,16 +69,16 @@ modm::Ds1302< PinSet >::read(const uint8_t addr)
 	uint8_t ret = 0;
 
 	Io::setInput();
-	modm::delayMicroseconds(delay_clk);
+	modm::delay(DELAY_CLK);
 	for (uint8_t ii = 8; ii > 0; --ii)
 	{
 		bool rr = Io::read();
 		ret >>= 1;
 		ret |= (rr << 7);
 		Sclk::set();
-		modm::delayMicroseconds(delay_clk);
+		modm::delay(DELAY_CLK);
 		Sclk::reset();
-		modm::delayMicroseconds(delay_clk);
+		modm::delay(DELAY_CLK);
 	}
 
 	Ce::reset();
@@ -101,7 +99,7 @@ modm::Ds1302< PinSet >::readRtc(ds1302::Data &storage)
 	Sclk::reset();
 
 	// Wait for stable output
-	modm::delayMicroseconds(delay_ce);
+	modm::delay(DELAY_CE);
 
 	for (uint8_t jj = 0; jj < MODM_ARRAY_SIZE(storage.data); ++jj)
 	{
@@ -112,11 +110,11 @@ modm::Ds1302< PinSet >::readRtc(ds1302::Data &storage)
 			ret >>= 1;
 			ret |= (rr << 7);
 			Sclk::set();
-			modm::delayMicroseconds(delay_clk);
+			modm::delay(DELAY_CLK);
 
 			// Falling edge of SCLK will trigger DS1302 output
 			Sclk::reset();
-			modm::delayMicroseconds(delay_clk);
+			modm::delay(DELAY_CLK);
 		}
 		storage.data[jj] = ret;
 	}

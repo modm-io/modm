@@ -71,11 +71,11 @@ modm::Mcp2515<SPI, CS, INT>::initializeWithPrescaler(
 	// configuration mode
 	chipSelect.reset();
 	spi.transferBlocking(RESET);
-	modm::delayMilliseconds(1);
+	modm::delay_ms(1);
 	chipSelect.set();
 
 	// wait a bit to give the MCP2515 some time to restart
-	modm::delayMilliseconds(30);
+	modm::delay_ms(30);
 
 	chipSelect.reset();
 	spi.transferBlocking(WRITE);
@@ -295,7 +295,7 @@ modm::Mcp2515<SPI, CS, INT>::sendMessage(const can::Message& message)
 	}
 	chipSelect.set();
 
-	modm::delayMicroseconds(1);
+	modm::delay_us(1);
 
 	// send message via RTS command
 	chipSelect.reset();

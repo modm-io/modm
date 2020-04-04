@@ -25,21 +25,21 @@ main()
 	while (true)
 	{
 		Board::LedNorth::toggle();
-		modm::delayMilliseconds(100);
+		modm::delay(100ms);
 		Board::LedNorthEast::toggle();
-		modm::delayMilliseconds(100);
+		modm::delay(100ms);
 		Board::LedEast::toggle();
-		modm::delayMilliseconds(100);
+		modm::delay(100ms);
 		Board::LedSouthEast::toggle();
-		modm::delayMilliseconds(100);
+		modm::delay(100ms);
 		Board::LedSouth::toggle();
-		modm::delayMilliseconds(100);
+		modm::delay(100ms);
 		Board::LedSouthWest::toggle();
-		modm::delayMilliseconds(100);
+		modm::delay(100ms);
 		Board::LedWest::toggle();
-		modm::delayMilliseconds(100);
+		modm::delay(100ms);
 		Board::LedNorthWest::toggle();
-		modm::delayMilliseconds(100);
+		modm::delay(100ms);
 	}
 
 	return 0;

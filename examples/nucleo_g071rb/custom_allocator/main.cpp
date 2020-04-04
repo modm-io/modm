@@ -52,7 +52,7 @@ int main()
 	while (true)
 	{
 		LedD13::toggle();
-		modm::delayMilliseconds(200);
+		modm::delay(200ms);
 
 		// leak memory until heap is exhausted
 		ptr = malloc(1024);

@@ -32,9 +32,9 @@ modm_abandon(const modm::AssertionInfo &info)
 	Leds::setOutput();
 	while (true) {
 		Leds::write(1);
-		modm::delayMilliseconds(20);
+		modm::delay(20ms);
 		Leds::write(0);
-		modm::delayMilliseconds(180);
+		modm::delay(180ms);
 	}
 }
 
@@ -87,6 +87,6 @@ int main()
 	while (true)
 	{
 		LedD13::toggle();
-		modm::delayMilliseconds(500);
+		modm::delay(500ms);
 	}
 }

@@ -47,17 +47,17 @@ void modm::BitbangMemoryInterface<PORT, CS, CD, WR>::writeRegister(uint8_t reg)
 	WR::reset();
 	PORT::write(0);
 
-	modm::delayMicroseconds(1);
+	modm::delay_us(1);
 	WR::set();		// Low-to-High strobe
-	modm::delayMicroseconds(1);
+	modm::delay_us(1);
 
 
 	WR::reset();
 	PORT::write(reg);
 
-	modm::delayMicroseconds(1);
+	modm::delay_us(1);
 	WR::set();		// Low-to-High strobe
-	modm::delayMicroseconds(1);
+	modm::delay_us(1);
 
 
 	CS::set();
@@ -73,17 +73,17 @@ void modm::BitbangMemoryInterface<PORT, CS, CD, WR>::writeData(const uint16_t da
 	WR::reset();
 	PORT::write(data >> 8);
 
-	modm::delayMicroseconds(1);
+	modm::delay_us(1);
 	WR::set();		// Low-to-High strobe
-	modm::delayMicroseconds(1);
+	modm::delay_us(1);
 
 
 	WR::reset();
 	PORT::write(data);
 
-	modm::delayMicroseconds(1);
+	modm::delay_us(1);
 	WR::set();		// Low-to-High strobe
-	modm::delayMicroseconds(1);
+	modm::delay_us(1);
 
 	CS::set();
 }
@@ -99,15 +99,15 @@ void modm::BitbangMemoryInterface<PORT, CS, CD, WR>::writeDataMult(const uint16_
 	{
 		WR::reset();
 		PORT::write(data >> 8);
-		modm::delayMicroseconds(1);
+		modm::delay_us(1);
 		WR::set();		// Low-to-High strobe
 
 		WR::reset();
 		PORT::write(data);
 
-		modm::delayMicroseconds(1);
+		modm::delay_us(1);
 		WR::set();		// Low-to-High strobe
-		modm::delayMicroseconds(1);
+		modm::delay_us(1);
 
 	}
 
@@ -134,9 +134,9 @@ void modm::BitbangMemoryInterface<PORT, CS, CD, WR>::writeRam(uint8_t * addr, co
 		WR::reset();
 		PORT::write( *(addr++) );
 
-		modm::delayMicroseconds(1);
+		modm::delay_us(1);
 		WR::set();		// Low-to-high strobe
-		modm::delayMicroseconds(1);
+		modm::delay_us(1);
 	}
 
 	CS::set();

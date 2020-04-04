@@ -36,7 +36,7 @@ main()
 
 	while (true)
 	{
-		modm::delayMilliseconds(Button::read() ? 250 : 1000);
+		modm::delay(Button::read() ? 250ms : 1s);
 		LedJ13::toggle();
 		LedJ5::toggle();
 		LedA12::toggle();

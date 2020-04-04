@@ -37,7 +37,7 @@ void modm_hardfault_entry()
 	// Put hardware in safe mode here
 	Board::Leds::set();
 	// But do not wait forever
-	modm::delayMilliseconds(100);
+	modm::delay(100ms);
 	// Do not depend on interrupts in this function (buffered UART etc!)
 }
 
@@ -82,7 +82,7 @@ main()
 
 		function2(23, 43);
 
-		modm::delayMilliseconds(250);
+		modm::delay(250ms);
 	}
 
 	return 0;

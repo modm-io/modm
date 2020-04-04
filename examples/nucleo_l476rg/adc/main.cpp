@@ -40,7 +40,7 @@ main()
 	while (true)
 	{
 		LedGreen::toggle();
-		modm::delayMilliseconds(Button::read() ? 250 : 500);
+		modm::delay(Button::read() ? 250ms : 500ms);
 
 		Adc1::startConversion();
 		// wait for conversion to finish

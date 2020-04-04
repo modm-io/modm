@@ -43,7 +43,7 @@ main()
 	while (true)
 	{
 		LedD13::toggle();
-		modm::delayMilliseconds(100);
+		modm::delay(100ms);
 
 		MODM_LOG_INFO << "mV=" << (Vref * Adc1::getValue() / 4095ul) << modm::endl;
 	}

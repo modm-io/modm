@@ -19,9 +19,9 @@ modm_board_init(void)
 {
 	// Reset LCD
 	Board::DisplayReset::setOutput(modm::Gpio::Low);
-	modm::delayMilliseconds(20);
+	modm::delay_ms(20);
 	Board::DisplayReset::set();
-	modm::delayMilliseconds(10);
+	modm::delay_ms(10);
 
 	// initialize system clock and external SDRAM before accessing external memories
 	Board::SystemClock::enable();

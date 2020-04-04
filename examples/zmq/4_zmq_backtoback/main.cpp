@@ -15,6 +15,7 @@
 #include <modm/processing/timer.hpp>
 
 #include <modm/communication/xpcc/backend/zeromq/connector.hpp>
+using namespace std::chrono_literals;
 
 modm::PeriodicTimer pt(2000);
 
@@ -70,6 +71,6 @@ main()
 			zmqConnectorServer.sendPacket(header, payload);
 		}
 
-		modm::delayMilliseconds(100);
+		modm::delay(100ms);
 	}
 }

@@ -96,7 +96,7 @@ modm::platform::Can{{ id }}::initializeWithPrescaler(
 	{{ reg }}->MCR |= CAN_MCR_INRQ;
 	int deadlockPreventer = 10'000; // max ~10ms
 	while ((({{ reg }}->MSR & CAN_MSR_INAK) == 0) and (deadlockPreventer-- > 0)) {
-		modm::delayMicroseconds(1);
+		modm::delay_us(1);
 		// Wait until the initialization mode is entered.
 		// The CAN hardware waits until the current CAN activity (transmission
 		// or reception) is completed before entering the initialization mode.

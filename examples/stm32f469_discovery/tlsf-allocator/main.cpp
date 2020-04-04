@@ -57,7 +57,7 @@ int main()
 	while (true)
 	{
 		Board::Leds::toggle();
-		modm::delayMilliseconds(500);
+		modm::delay(500ms);
 	}
 	return 0;
 }

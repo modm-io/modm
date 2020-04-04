@@ -18,6 +18,7 @@
 
 using namespace modm::platform;
 using namespace modm::literals;
+using namespace std::chrono_literals;
 
 namespace touch
 {
@@ -115,7 +116,7 @@ main()
 		touch::Left::setOutput();
 		touch::Right::set();
 		touch::Right::setOutput();
-		modm::delayMilliseconds(2);
+		modm::delay(2ms);
 
 		int16_t xAdc = Adc::readChannel(0);
 
@@ -128,7 +129,7 @@ main()
 		touch::Bottom::setOutput();
 		touch::Top::set();
 		touch::Top::setOutput();
-		modm::delayMilliseconds(2);
+		modm::delay(2ms);
 
 		int16_t yAdc = Adc::readChannel(1);
 

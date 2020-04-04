@@ -12,6 +12,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/platform.hpp>
+using namespace std::chrono_literals;
 
 #include <modm/communication/xpcc.hpp>
 // #include <modm/communication/xpcc/backend/tipc.hpp>
@@ -65,6 +66,6 @@ main()
 		component::receiver.update();
 		component::sender.update();
 
-		modm::delayMicroseconds(100);
+		modm::delay(100us);
 	}
 }

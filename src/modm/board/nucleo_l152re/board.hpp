@@ -94,7 +94,7 @@ struct SystemClock
 		Rcc::enablePll(Rcc::PllSource::ExternalClock, pllFactors);
 		// set flash latency
 		Rcc::setFlashLatency<Frequency>();
-		modm::delayMicroseconds(5);
+		modm::delay_us(5);
 		// switch system clock to PLL output
 		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
 		// update frequencies for busy-wait delay functions

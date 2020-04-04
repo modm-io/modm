@@ -44,7 +44,7 @@ MODM_ISR(EXTI0)
 {
 	Button::acknowledgeExternalInterruptFlag();
 	LedBlue::set();
-	modm::delayMicroseconds(1000);
+	modm::delay(1ms);
 	LedBlue::reset();
 }
 
@@ -53,7 +53,7 @@ MODM_ISR(EXTI15_10)
 {
 	Irq::acknowledgeExternalInterruptFlag();
 	LedOrange::set();
-	modm::delayMicroseconds(1000);
+	modm::delay(1ms);
 	LedOrange::reset();
 }
 
@@ -87,7 +87,7 @@ main()
 	{
 		LedRed::toggle();
 		LedGreen::toggle();
-		modm::delayMilliseconds(500);
+		modm::delay(500ms);
 	}
 
 	return 0;

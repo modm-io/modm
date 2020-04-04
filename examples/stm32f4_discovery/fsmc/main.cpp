@@ -85,7 +85,7 @@ main()
 		++ii;
 		Board::LedOrange::toggle();
 		Board::LedGreen::toggle();
-		modm::delayMilliseconds(data[ii]);
+		modm::delay_ms(data[ii]);
 	}
 
 	return 0;

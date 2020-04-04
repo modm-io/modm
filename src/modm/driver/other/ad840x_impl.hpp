@@ -33,7 +33,7 @@ inline void
 modm::AD840x<Spi, Cs, Rs, Shdn>::reset()
 {
 	Rs::reset();
-	modm::delayMicroseconds(1);		// wait at least 50ns
+	modm::delay_us(1);		// wait at least 50ns
 	Rs::set();
 }
 

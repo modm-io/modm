@@ -63,7 +63,7 @@ modm::platform::Adc{{ id }}::initialize(const ClockMode clk,
 	// enable regulator
 	ADC{{ id }}->CR &= ~ADC_CR_ADVREGEN;
 	ADC{{ id }}->CR |= static_cast<uint32_t>(VoltageRegulatorState::Enabled);
-	modm::delayMicroseconds(10);	// FIXME: this is ugly -> find better solution
+	modm::delay_us(10);	// FIXME: this is ugly -> find better solution
 
 	// Clear ready flag
 	ADC{{ id }}->ISR |= ADC_ISR_ADRDY;

@@ -96,9 +96,9 @@ main()
 	while (true)
 	{
 		LedBlue::set();
-		modm::delayMilliseconds(20);
+		modm::delay(20ms);
 		LedBlue::reset();
-		modm::delayMilliseconds(150);
+		modm::delay(150ms);
 
 		if (restart) {
 			restart = false;

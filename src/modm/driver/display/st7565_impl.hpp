@@ -78,7 +78,7 @@ modm::St7565<SPI, CS, A0, Reset, Width, Height, TopView>::initialize(
 	// reset the controller
 	reset.setOutput();
 	reset.reset();
-	modm::delayMilliseconds(50);
+	modm::delay_ms(50);
 	reset.set();
 
 	cs.reset();

@@ -52,7 +52,7 @@ main()
 	while (true)
 	{
 		LedD13::toggle();
-		modm::delayMilliseconds(500);
+		modm::delay(500ms);
 		MODM_LOG_INFO << "loop: " << counter++ << modm::endl;
 		MODM_LOG_INFO << "Timer1 counter: " << Timer1::getValue() << modm::endl;
 	}

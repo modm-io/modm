@@ -28,6 +28,7 @@
 
 using namespace modm::platform;
 using namespace modm::literals;
+using namespace std::chrono_literals;
 
 
 namespace led
@@ -218,7 +219,7 @@ main()
 	display.drawImage(modm::glcd::Point(0, 0), modm::accessor::asFlash(bootscreen));
 	display.update();
 
-	modm::delayMilliseconds(1500);
+	modm::delay(1.5s);
 
 	uint8_t units = 0;
 	uint8_t tens = 0;
@@ -237,6 +238,6 @@ main()
 		drawNumber(modm::glcd::Point(64, 0), units);
 		display.update();
 
-		modm::delayMilliseconds(200);
+		modm::delay(200ms);
 	}
 }

@@ -19,6 +19,7 @@
 
 #include <postman.hpp>
 #include <identifier.hpp>
+using namespace std::chrono_literals;
 
 /**
  * Simple subscriber with zeromq.
@@ -52,6 +53,6 @@ main()
 		dispatcher.update();
 		component::gui.update();
 
-		modm::delayMilliseconds(25);
+		modm::delay(25ms);
 	}
 }

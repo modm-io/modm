@@ -19,7 +19,7 @@ int main()
 	while (true)
 	{
 		Board::LedD3::toggle();
-		modm::delayMilliseconds(200);
+		modm::delay(200ms);
 	}
 	return 0;
 }

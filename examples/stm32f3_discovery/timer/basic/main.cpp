@@ -39,7 +39,7 @@ main()
 	uint8_t i = 0;
 	while (true){
 		Timer1::setCompareValue(1, ++i);
-		modm::delayMilliseconds(10);
+		modm::delay(10ms);
 	}
 
 	return 0;

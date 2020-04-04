@@ -13,6 +13,8 @@
 #ifndef MODM_DS1302_HPP
 #define MODM_DS1302_HPP
 
+#include <modm/architecture/interface/delay.hpp>
+
 namespace modm
 {
 
@@ -150,10 +152,10 @@ public:
 
 protected:
 	/// Required CE to CLK Setup Time can be as long as 4 usec and 2 Volts.
-	static constexpr uint8_t delay_ce = 4; // microseconds
+	static constexpr std::chrono::microseconds DELAY_CE{4};
 
 	/// Required CLK Low/High Time can be as long as 1 usec and 2 Volts.
-	static constexpr uint8_t delay_clk = 1; // microsecond
+	static constexpr std::chrono::microseconds DELAY_CLK{1};
 };
 
 }

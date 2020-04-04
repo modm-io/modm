@@ -17,6 +17,7 @@
 
 using namespace modm::platform;
 using namespace modm::literals;
+using namespace std::chrono_literals;
 
 using OneWirePin = GpioC2;
 using OneWireMaster = BitBangOneWireMaster<OneWirePin>;
@@ -35,14 +36,14 @@ main()
 	modm::IOStream output(device);
 
 	output << "Welcome" << modm::endl;
-	modm::delayMilliseconds(100);
+	modm::delay(100ms);
 
 	OneWireMaster::connect<OneWirePin::BitBang>();
 	OneWireMaster::initialize<SystemClock>();
 
 	if (!OneWireMaster::touchReset()) {
 		output << "No devices found!" << modm::endl;
-		modm::delayMilliseconds(100);
+		modm::delay(100ms);
 		while (true) {
 			// wait forever
 		}
@@ -58,7 +59,7 @@ main()
 			output << rom[i];
 		}
 		output << modm::ascii << modm::endl;
-		modm::delayMilliseconds(100);
+		modm::delay(100ms);
 	}
 	output << "finished!" << modm::endl;
 
@@ -74,7 +75,7 @@ main()
 			int16_t temperature = ds18b20.readTemperature();
 
 			output << "Temperature: " << temperature << modm::endl;
-			modm::delayMilliseconds(100);
+			modm::delay(100ms);
 
 			ds18b20.startConversion();
 		}

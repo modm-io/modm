@@ -30,7 +30,7 @@ main()
 	while (true)
 	{
 		LedD13::toggle();
-		modm::delayMilliseconds(Button::read() ? 100 : 500);
+		modm::delay(Button::read() ? 100ms : 500ms);
 
 		MODM_LOG_INFO << "loop: " << counter++ << modm::endl;
 	}

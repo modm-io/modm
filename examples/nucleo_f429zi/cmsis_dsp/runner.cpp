@@ -29,7 +29,7 @@ int main()
 		} else {
 			Board::LedRed::toggle();
 		}
-		modm::delayMilliseconds(1000);
+		modm::delay(1s);
 	}
 
 	return 0;

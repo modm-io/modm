@@ -81,10 +81,10 @@ main()
 	PinGroup4::setInput(); MODM_LOG_INFO << modm::bin << PinGroup4::read() << modm::endl;
 	MODM_LOG_INFO << modm::endl;
 
-	PinGroup::setOutput(modm::Gpio::High); modm::delayMilliseconds(1000);
+	PinGroup::setOutput(modm::Gpio::High); modm::delay(1s);
 
 	const auto fn_report = []() {
-		MODM_LOG_INFO << modm::bin << PinGroup::read() << modm::endl; modm::delayMilliseconds(200);
+		MODM_LOG_INFO << modm::bin << PinGroup::read() << modm::endl; modm::delay(200ms);
 	};
 
 	while (true)

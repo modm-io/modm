@@ -132,7 +132,7 @@ modm::platform::Adc{{ id }}::setChannel(const Channel channel, const SampleTimeG
 	{
 %% if target.family in ["g0"]
 		ADC1->CR |= ADC_CR_ADVREGEN;
-		modm::delayMicroseconds(30);
+		modm::delay_us(30);
 %% endif
 		ADC1_COMMON->CCR |= ADC_CCR_VREFEN;
 	}
@@ -145,7 +145,7 @@ modm::platform::Adc{{ id }}::setChannel(const Channel channel, const SampleTimeG
 	         not (ADC1_COMMON->CCR & ADC_CCR_TSEN))
 	{
 		ADC1_COMMON->CCR |= ADC_CCR_TSEN;
-		modm::delayMicroseconds(135);
+		modm::delay_us(135);
 	}
 
 %% if target.family in ["g0"]

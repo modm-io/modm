@@ -37,7 +37,7 @@ Ad7928<SpiMaster, Cs>::initialize()
 	RF_BEGIN();
 
 	Cs::setOutput(modm::Gpio::High);
-	delayMicroseconds(1);
+	modm::delay_us(1);
 
 	// reset device
 	RF_CALL(transfer(Register_t(0xFF)));
@@ -201,7 +201,7 @@ Ad7928<SpiMaster, Cs>::wakeup()
 	RF_CALL(transfer(config));
 
 	// Wait for the device to power up
-	delayMicroseconds(1);
+	modm::delay_us(1);
 
 	currentPowerMode = PowerMode::Normal;
 
