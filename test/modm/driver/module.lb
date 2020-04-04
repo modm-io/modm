@@ -18,23 +18,24 @@ def init(module):
 
 def prepare(module, options):
     module.depends(
-        ":architecture:clock",
-        ":debug",
-        ":driver:ad7280a",
-        ":driver:bme280",
-        ":driver:bmp085",
-        ":driver:lawicel",
-        ":driver:ltc2984",
-        ":driver:drv832x_spi",
-        ":driver:mcp2515",
-        ":driver:block.allocator",
-        "modm-test:test:platform:spi",
-        ":platform:gpio")
+        "modm:architecture:clock",
+        "modm:debug",
+        "modm:driver:ad7280a",
+        "modm:driver:bme280",
+        "modm:driver:bmp085",
+        "modm:driver:lawicel",
+        "modm:driver:ltc2984",
+        "modm:driver:drv832x_spi",
+        "modm:driver:mcp2515",
+        "modm:driver:block.allocator",
+        "modm:platform:gpio",
+        ":mock:spi.device",
+        ":mock:spi.master")
     return True
 
 
 def build(env):
-    env.outbasepath = "modm-test/src/modm/driver"
+    env.outbasepath = "modm-test/src/modm-test/driver"
     patterns = []
     if env[":target"].identifier["platform"] == "avr":
         patterns += ["*pressure*"]

@@ -14,14 +14,14 @@
 #include "spi_device_test.hpp"
 
 #define ENABLE_MACRO_EXPORT
-#include "spi_device.hpp"
+#include <modm-test/mock/spi_device.hpp>
 #undef ENABLE_MACRO_EXPORT
 
 // ----------------------------------------------------------------------------
 void
 SpiDeviceTest::testInitialState()
 {
-	test::SpiDevice device;
+	modm_test::SpiDevice device;
 
 	TEST_ASSERT_TRUE(device.isSuccessful());
 }
@@ -29,7 +29,7 @@ SpiDeviceTest::testInitialState()
 void
 SpiDeviceTest::testEmptyTransmission()
 {
-	test::SpiDevice device;
+	modm_test::SpiDevice device;
 
 	device.start(0, 0, __LINE__, false);
 
@@ -42,11 +42,11 @@ SpiDeviceTest::testSingleTransmission()
 	uint8_t arg1Rx[] = {1, 2, 3, 4};
 	uint8_t arg1Tx[] = {4, 3, 2, 1};
 
-	test::Transmission transmissions[] = {
-		test::Transmission(MODM_ARRAY_SIZE(arg1Rx), arg1Rx, arg1Tx),
+	modm_test::Transmission transmissions[] = {
+		modm_test::Transmission(MODM_ARRAY_SIZE(arg1Rx), arg1Rx, arg1Tx),
 	};
 
-	test::SpiDevice device;
+	modm_test::SpiDevice device;
 	device.start(transmissions, ARRAY_SIZE(transmissions), __LINE__, false);
 
 	TEST_ASSERT_FALSE(device.isSuccessful());
@@ -87,12 +87,12 @@ SpiDeviceTest::testMultipleTransmissions()
 	uint8_t arg2Rx[] = {5, 6};
 	uint8_t arg2Tx[] = {100, 101};
 
-	test::Transmission transmissions[] = {
-		test::Transmission(MODM_ARRAY_SIZE(arg1Rx), arg1Rx, arg1Tx),
-		test::Transmission(MODM_ARRAY_SIZE(arg2Rx), arg2Rx, arg2Tx),
+	modm_test::Transmission transmissions[] = {
+		modm_test::Transmission(MODM_ARRAY_SIZE(arg1Rx), arg1Rx, arg1Tx),
+		modm_test::Transmission(MODM_ARRAY_SIZE(arg2Rx), arg2Rx, arg2Tx),
 	};
 
-	test::SpiDevice device;
+	modm_test::SpiDevice device;
 	device.start(transmissions, ARRAY_SIZE(transmissions), __LINE__, false);
 
 	TEST_ASSERT_FALSE(device.isSuccessful());

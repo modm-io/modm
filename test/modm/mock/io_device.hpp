@@ -16,7 +16,10 @@
 
 #include <stdint.h>
 
-/// @ingroup modm_test_test_communication
+namespace modm_test
+{
+
+/// @ingroup modm_test_mock_io_device
 class FakeIODevice
 {
 public:
@@ -36,12 +39,14 @@ public:
 	static void
 	moveSendToReceiveBuffer();
 
-	static uint8_t sendBuffer[40];
-	static uint8_t bytesSend;
+	static inline uint8_t sendBuffer[40];
+	static inline uint8_t bytesSend{0};
 
-	static uint8_t receiveBuffer[40];
-	static uint8_t receivePosition;
-	static uint8_t bytesReceived;
+	static inline uint8_t receiveBuffer[40];
+	static inline uint8_t receivePosition{0};
+	static inline uint8_t bytesReceived{0};
 };
+
+}
 
 #endif	// FAKE_IO_DEVICE_HPP

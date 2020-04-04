@@ -12,31 +12,7 @@
 #include "spi_master.hpp"
 
 uint8_t
-modm::platform::SpiMasterMock::count = 0;
-
-void *
-modm::platform::SpiMasterMock::context = nullptr;
-
-modm::Spi::ConfigurationHandler
-modm::platform::SpiMasterMock::configuration = nullptr;
-
-modm::Spi::DataMode
-modm::platform::SpiMasterMock::dataMode = modm::Spi::DataMode::Mode0;
-
-modm::Spi::DataOrder
-modm::platform::SpiMasterMock::dataOrder = modm::Spi::DataOrder::MsbFirst;
-
-modm::DoublyLinkedList<uint8_t>
-modm::platform::SpiMasterMock::txBuffer;
-
-modm::DoublyLinkedList<uint8_t>
-modm::platform::SpiMasterMock::rxBuffer;
-
-uint8_t
-modm::platform::SpiMasterMock::tmp = 0;
-
-uint8_t
-modm::platform::SpiMasterMock::acquire(void *ctx, ConfigurationHandler handler)
+modm_test::platform::SpiMaster::acquire(void *ctx, ConfigurationHandler handler)
 {
 	if (context == nullptr)
 	{
@@ -57,7 +33,7 @@ modm::platform::SpiMasterMock::acquire(void *ctx, ConfigurationHandler handler)
 }
 
 uint8_t
-modm::platform::SpiMasterMock::release(void *ctx)
+modm_test::platform::SpiMaster::release(void *ctx)
 {
 	if (ctx == context)
 	{
@@ -69,7 +45,7 @@ modm::platform::SpiMasterMock::release(void *ctx)
 // ----------------------------------------------------------------------------
 
 modm::ResumableResult<uint8_t>
-modm::platform::SpiMasterMock::transfer(uint8_t data)
+modm_test::platform::SpiMaster::transfer(uint8_t data)
 {
 	txBuffer.append(data);
 
@@ -85,7 +61,7 @@ modm::platform::SpiMasterMock::transfer(uint8_t data)
 }
 
 modm::ResumableResult<void>
-modm::platform::SpiMasterMock::transfer(uint8_t * tx, uint8_t * rx, std::size_t length)
+modm_test::platform::SpiMaster::transfer(uint8_t * tx, uint8_t * rx, std::size_t length)
 {
 	for(std::size_t i = 0; i < length; ++i) {
 		//if(tx != nullptr)

@@ -21,7 +21,7 @@ namespace modm
 /**
  * Dummy clock implementation for testing.
  *
- * @ingroup modm_test_test_processing
+ * @ingroup modm_test_mock_clock_dummy
  */
 class ClockDummy
 {

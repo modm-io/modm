@@ -13,28 +13,21 @@
 // ----------------------------------------------------------------------------
 
 #include <cstring>
-#include "fake_io_device.hpp"
-
-uint8_t FakeIODevice::sendBuffer[40];
-uint8_t FakeIODevice::bytesSend = 0;
-
-uint8_t FakeIODevice::receiveBuffer[40];
-uint8_t FakeIODevice::receivePosition = 0;
-uint8_t FakeIODevice::bytesReceived = 0;
+#include "io_device.hpp"
 
 void
-FakeIODevice::setBaudrate(uint32_t)
+modm_test::FakeIODevice::setBaudrate(uint32_t)
 {
 }
 
 void
-FakeIODevice::write(uint8_t data)
+modm_test::FakeIODevice::write(uint8_t data)
 {
 	sendBuffer[bytesSend++] = data;
 }
 
 bool
-FakeIODevice::read(uint8_t& byte)
+modm_test::FakeIODevice::read(uint8_t& byte)
 {
 	if (receivePosition >= bytesReceived) {
 		return false;
@@ -47,7 +40,7 @@ FakeIODevice::read(uint8_t& byte)
 
 
 void
-FakeIODevice::reset()
+modm_test::FakeIODevice::reset()
 {
 	bytesReceived = 0;
 	receivePosition = 0;
@@ -55,7 +48,7 @@ FakeIODevice::reset()
 }
 
 void
-FakeIODevice::moveSendToReceiveBuffer()
+modm_test::FakeIODevice::moveSendToReceiveBuffer()
 {
 	std::memcpy(receiveBuffer, sendBuffer, bytesSend);
 	bytesReceived = bytesSend;

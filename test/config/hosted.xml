@@ -1,7 +1,8 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <library>
   <options>
-    <option name="modm:build:scons:unittest.source">../../build/unittest/hosted/modm-test</option>
+  	<option name="modm:build:build.path">../../build/generated-unittest/hosted/</option>
+    <option name="modm:build:scons:unittest.source">../../build/generated-unittest/hosted/modm-test</option>
   </options>
   <modules>
     <module>modm:platform:core</module>

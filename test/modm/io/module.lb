@@ -14,12 +14,10 @@
 def init(module):
     module.name = ":test:io"
 
-
 def prepare(module, options):
-    module.depends(":io")
+    module.depends("modm:io")
     return True
 
-
 def build(env):
-    env.outbasepath = "modm-test/src/modm/io"
+    env.outbasepath = "modm-test/src/modm-test/io"
     env.copy('.')

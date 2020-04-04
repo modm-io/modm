@@ -10,9 +10,8 @@
 
 #include <modm/driver/motor/drv832x_spi.hpp>
 #include <modm/debug/logger/logger.hpp>
-
-#include <modm/platform/spi/mock/spi_master.hpp>
 #include <modm/platform/gpio/unused.hpp>
+#include <modm-test/mock/spi_master.hpp>
 
 #include "drv832x_spi_test.hpp"
 
@@ -24,7 +23,7 @@ Drv832xSpiTest::testRegister()
 {
 	// Some random tests
 	// Todo (?): Add systematic tests
-	using SpiMaster = modm::platform::SpiMasterMock;
+	using SpiMaster = modm_test::platform::SpiMaster;
 	modm::Drv832xSpi<SpiMaster, modm::platform::GpioUnused> gateDriver;
 
 	gateDriver.driverControl().value = 0b1111111111; // All bits set
@@ -66,7 +65,7 @@ void
 Drv832xSpiTest::testSpi()
 {
 	// Test Spi with MockSpiMaster
-	using SpiMaster = modm::platform::SpiMasterMock;
+	using SpiMaster = modm_test::platform::SpiMaster;
 	modm::Drv832xSpi<SpiMaster, modm::platform::GpioUnused> gateDriver;
 
 	// Real DRV832x device has default register values, but we expect all flags zero because SpiMasterMock reads zero per default
@@ -103,5 +102,5 @@ Drv832xSpiTest::testSpi()
 
 void
 Drv832xSpiTest::tearDown() {
-	modm::platform::SpiMasterMock::clearBuffers();
+	modm_test::platform::SpiMaster::clearBuffers();
 }

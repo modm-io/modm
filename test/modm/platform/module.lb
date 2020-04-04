@@ -17,13 +17,13 @@ def init(module):
 
 def prepare(module, options):
     module.depends(
-        ":architecture:can",
-        ":architecture:clock",
-        ":platform:can.common")
+        "modm:architecture:can",
+        "modm:architecture:clock",
+        "modm:platform:can.common")
     return True
 
 
 def build(env):
-    env.outbasepath = "modm-test/src/modm/platform"
+    env.outbasepath = "modm-test/src/modm-test/platform"
     env.copy("can_bit_timings_test.hpp")
     env.copy("can_bit_timings_test.cpp")

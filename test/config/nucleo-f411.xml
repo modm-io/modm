@@ -2,7 +2,8 @@
 <library>
   <extends>modm:nucleo-f411re</extends>
   <options>
-    <option name="modm:build:scons:unittest.source">../../build/unittest/nucleo-f411/modm-test</option>
+    <option name="modm:build:build.path">../../build/generated-unittest/nucleo-f411/</option>
+    <option name="modm:build:scons:unittest.source">../../build/generated-unittest/nucleo-f411/modm-test</option>
   </options>
   <modules>
     <module>modm:platform:heap</module>

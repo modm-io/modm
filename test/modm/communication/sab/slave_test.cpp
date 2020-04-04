@@ -88,6 +88,7 @@ namespace
 	};
 }
 
+using FakeIODevice = modm_test::FakeIODevice;
 // ----------------------------------------------------------------------------
 void
 SlaveTest::setUp()

@@ -122,6 +122,6 @@ def build(env):
     }
 
     env.substitutions = properties
-    env.outbasepath = "modm-test/src/modm/platform/gpio"
+    env.outbasepath = "modm-test/src/modm-test/platform/gpio"
     env.copy("platform_gpio_test.hpp")
     env.template("platform_gpio_test_{}.cpp.in".format(identifier["platform"]))

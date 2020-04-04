@@ -15,7 +15,7 @@
 #include <modm/architecture/interface/spi_master.hpp>
 #include <modm/container/doubly_linked_list.hpp>
 
-namespace modm
+namespace modm_test
 {
 
 namespace platform
@@ -26,26 +26,26 @@ namespace platform
  *
  * @author	Raphael Lehmann
  *
- * @ingroup modm_test_test_platform_spi
+ * @ingroup modm_test_mock_spi_master
  */
-class SpiMasterMock : public modm::SpiMaster
+class SpiMaster : public modm::SpiMaster
 {
 private:
-	static uint8_t count;
-	static void* context;
-	static ConfigurationHandler configuration;
+	static inline uint8_t count{0};
+	static inline void* context{nullptr};
+	static inline ConfigurationHandler configuration{nullptr};
 
-	static DataMode dataMode;
-	static DataOrder dataOrder;
+	static inline DataMode dataMode{DataMode::Mode0};
+	static inline DataOrder dataOrder{DataOrder::MsbFirst};
 
 public:
 	using ArrayContainer = modm::DoublyLinkedList<uint8_t>;
 
 private:
-	static ArrayContainer rxBuffer;
-	static ArrayContainer txBuffer;
+	static inline ArrayContainer rxBuffer;
+	static inline ArrayContainer txBuffer;
 
-	static uint8_t tmp;
+	static inline uint8_t tmp{0};
 
 public:
 	static void

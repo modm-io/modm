@@ -16,10 +16,10 @@ def init(module):
 
 
 def prepare(module, options):
-    module.depends(":container")
+    module.depends("modm:container")
     return True
 
 
 def build(env):
-    env.outbasepath = "modm-test/src/modm/container"
+    env.outbasepath = "modm-test/src/modm-test/container"
     env.copy('.')

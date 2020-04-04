@@ -11,9 +11,8 @@
 
 #include <modm/driver/temperature/ltc2984.hpp>
 #include <modm/debug/logger/logger.hpp>
-
-#include <modm/platform/spi/mock/spi_master.hpp>
 #include <modm/platform/gpio/unused.hpp>
+#include <modm-test/mock/spi_master.hpp>
 
 #include "ltc2984_test.hpp"
 #include "math.h"
@@ -107,7 +106,7 @@ void
 Ltc2984Test::testSpi()
 {
 	// Test Spi with MockSpiMaster
-	using SpiMaster = modm::platform::SpiMasterMock;
+	using SpiMaster = modm_test::platform::SpiMaster;
 	modm::Ltc2984<SpiMaster, modm::platform::GpioUnused> tempSensor;
 
 	uint32_t channelConfigurationTest = (0b11101ul << 27) | (2000ul*1024);
@@ -176,5 +175,5 @@ Ltc2984Test::testSpi()
 
 void
 Ltc2984Test::tearDown() {
-	modm::platform::SpiMasterMock::clearBuffers();
+	modm_test::platform::SpiMaster::clearBuffers();
 }

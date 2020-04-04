@@ -17,11 +17,11 @@ def init(module):
 
 def prepare(module, options):
     module.depends(
-        ":ui:button",
-        ":ui:time")
+        "modm:ui:button",
+        "modm:ui:time")
     return True
 
 
 def build(env):
-    env.outbasepath = "modm-test/src/modm/ui"
+    env.outbasepath = "modm-test/src/modm-test/ui"
     env.copy('.')
