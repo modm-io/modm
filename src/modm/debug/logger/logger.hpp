@@ -46,40 +46,9 @@ namespace modm
 		class Logger : public ::modm::IOStream
 		{
 			public:
-				Logger(::modm::IODevice& outputDevice) :
+				inline Logger(::modm::IODevice& outputDevice) :
 					IOStream(outputDevice)
 				{
-				}
-
-				/**
-				 * @brief	Output forwarding
-				 *
-				 * We must use modm_always_inline here to prevent the generation of
-				 * specialized functions for every type. Especially for strings
-				 * this might cause a lot of code size bloat.
-				 *
-				 * Example without modm_always_inline or only \c inline:
-				 * \code
-				 * $ scons symbols | grep "Logger"
-				 * ...
-				 * 01049436 00000016 W modm::log::Logger& modm::log::Logger::operator<< <char [12]>(char const (&) [12])
-				 * 01050808 00000016 W modm::log::Logger& modm::log::Logger::operator<< <char [13]>(char const (&) [13])
-				 * 01050744 00000016 W modm::log::Logger& modm::log::Logger::operator<< <char [15]>(char const (&) [15])
-				 * 01050792 00000016 W modm::log::Logger& modm::log::Logger::operator<< <char [16]>(char const (&) [16])
-				 * 01050728 00000016 W modm::log::Logger& modm::log::Logger::operator<< <char [19]>(char const (&) [19])
-				 * 01050760 00000016 W modm::log::Logger& modm::log::Logger::operator<< <char [22]>(char const (&) [22])
-				 * 01050712 00000016 W modm::log::Logger& modm::log::Logger::operator<< <char [26]>(char const (&) [26])
-				 * ...
-				 * \endcode
-				 *
-				 * With modm_always_inline all these functions are gone.
-				 */
-				template<typename T>
-				modm_always_inline Logger&
-				operator << (const T& msg)
-				{
-					*(modm::IOStream *) this << msg;
-					return *this;
 				}
 
 			private:
