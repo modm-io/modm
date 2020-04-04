@@ -7,7 +7,7 @@
   </repositories>
 
   <options>
-    <option name="modm:platform:clock:f_cpu">8000000</option>
+    <option name="modm:platform:core:f_cpu">8000000</option>
     <option name="modm:build:scons:cache_dir">$cache</option>
   </options>
   <modules>

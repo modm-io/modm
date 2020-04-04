@@ -144,7 +144,7 @@ def create_target(argument):
 
         options = ["modm:target={0}".format(device)]
         if device.startswith("at"):
-            options.append("modm:platform:clock:f_cpu=16000000")
+            options.append("modm:platform:core:f_cpu=16000000")
         builder = lbuild.api.Builder(options=options)
         builder.load([Path(modm_path) / "repo.lb", Path(modm_path) / "test/repo.lb"])
         modules = sorted(builder.parser.modules.keys())

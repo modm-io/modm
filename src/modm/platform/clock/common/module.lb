@@ -20,13 +20,6 @@ def prepare(module, options):
         module.depends(
             ":architecture:atomic",
             ":architecture:clock")
-
-        module.add_option(
-            NumericOption(
-                name="f_cpu",
-                description="CPU clock frequency",
-                minimum=1,
-                maximum=32000000))
     return True
 
 def build(env):
@@ -34,5 +27,4 @@ def build(env):
     env.copy("common.hpp")
 
     if env[":target"].has_driver("clock:avr"):
-        env.collect(":build:cppdefines", "F_CPU={}".format(env["f_cpu"]))
         env.copy("static.hpp")

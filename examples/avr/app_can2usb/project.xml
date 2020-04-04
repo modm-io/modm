@@ -1,7 +1,7 @@
 <library>
   <options>
     <option name="modm:target">at90can128-16au</option>
-    <option name="modm:platform:clock:f_cpu">16000000</option>
+    <option name="modm:platform:core:f_cpu">16000000</option>
     <option name="modm:build:build.path">../../../build/avr/app_can2usb</option>
   </options>
   <modules>

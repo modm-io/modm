@@ -25,6 +25,13 @@ def prepare(module, options):
     if not options[":target"].has_driver("core:avr*"):
         return False
 
+    module.add_option(
+        NumericOption(
+            name="f_cpu",
+            description="CPU clock frequency",
+            minimum=1,
+            maximum=32000000))
+
     module.depends(
         ":architecture:interrupt",
         ":architecture:assert",
@@ -82,5 +89,6 @@ def build(env):
     for suffix in {"v", "f", "l", "rc"}:
         mmcu = mmcu[:-2] + mmcu[-2:].replace(suffix, "")
     env.collect(":build:archflags","-mmcu={}".format(mmcu))
+    env.collect(":build:cppdefines", "F_CPU={}".format(env["f_cpu"]))
 
 
