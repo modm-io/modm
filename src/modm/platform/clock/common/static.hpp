@@ -13,7 +13,6 @@
 #define MODM_AVR_CLOCK_HPP
 
 #include <stdint.h>
-#include "common.hpp"
 
 
 namespace modm

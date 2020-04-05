@@ -13,13 +13,7 @@
 
 def init(module):
     module.name = ":platform:core"
-    module.description = """\
-# AVR Core
-
-Implements the interfaces defined in the `:architecture` modules.
-Adds the `-mmcu={target}` compile flag.
-
-"""
+    module.description = FileReader("module.md")
 
 def prepare(module, options):
     if not options[":target"].has_driver("core:avr*"):
@@ -49,7 +43,9 @@ def build(env):
 
     env.substitutions = {
         "target": target.identifier,
-        "core": target.get_driver("core")["type"]
+        "core": target.get_driver("core")["type"],
+        "f_cpu": env["f_cpu"],
+        "shift": int(3e9/env["f_cpu"]).bit_length() - 1,
     }
     env.outbasepath = "modm/src/modm/platform/core"
 
@@ -70,7 +66,7 @@ def build(env):
         env.copy("flash_reader_impl.hpp")
 
     if env.has_module(":architecture:delay"):
-        env.copy("delay_impl.hpp")
+        env.template("delay_impl.hpp.in")
 
     if env.has_module(":architecture:clock"):
         # modm-test implements the clock methods itself

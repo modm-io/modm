@@ -9,10 +9,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "common.hpp"
+#include <cmath>
 
 namespace modm::platform
 {
+
+extern uint16_t delay_fcpu_MHz;
+extern uint16_t delay_ns_per_loop;
 
 constexpr Rcc::flash_latency
 Rcc::computeFlashLatency(uint32_t Core_Hz, uint16_t Core_mV)
@@ -91,10 +94,8 @@ template< uint32_t Core_Hz >
 void
 Rcc::updateCoreFrequency()
 {
-	modm::clock::fcpu     = Core_Hz;
-	modm::clock::fcpu_kHz = Core_Hz / 1'000;
-	modm::clock::fcpu_MHz = Core_Hz / 1'000'000;
-	modm::clock::ns_per_loop = ::round({{loops}}000.f / (Core_Hz / 1'000'000));
+	delay_fcpu_MHz = Core_Hz / 1'000'000;
+	delay_ns_per_loop = std::round({{loops}}000.f / (Core_Hz / 1'000'000));
 }
 
 constexpr bool

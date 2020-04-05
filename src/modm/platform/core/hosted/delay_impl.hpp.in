@@ -14,12 +14,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	MODM_PLATFORM_DELAY_HPP
-#define	MODM_PLATFORM_DELAY_HPP
+#pragma once
 
 /// @cond
 #include <stdint.h>
 #include <modm/architecture/utils.hpp>
+
+#define MODM_DELAY_NS_IS_ACCURATE 0
 
 %% if target.family in ["darwin", "linux"]
 extern "C" {
@@ -29,70 +30,45 @@ extern "C" {
 namespace modm
 {
 
-/// @cond
-inline void
-delayNanoseconds(uint16_t /*ns*/)
-{
-	usleep(1);
-}
-
-inline void
-delayMicroseconds(uint16_t us)
-{
-	usleep(us);
-}
-
-inline void
-delayMilliseconds(uint16_t ms)
-{
-	usleep(uint32_t(ms) * 1000);
-}
-/// @endcond
+inline void delay_ns(uint32_t ns) { usleep(ns / 1000ul); }
+inline void delay_us(uint32_t us) { usleep(us); }
+inline void delay_ms(uint32_t ms) { usleep(ms * 1000ul); }
 
 %% elif target.family == "windows"
+#include <windows.h>
 
 namespace modm
 {
 
-/// @cond
-/*inline void
-delayMicroseconds(int us)
-{
-	int ms = us / 1000;
-	if (ms <= 0) {
-		ms = 1;
-	}
-	Sleep(ms);
-}
+inline void delay_ns(uint32_t ns) { Sleep(ns / 1000'000ul); }
+inline void delay_us(uint32_t us) { Sleep(us / 1000ul); }
+inline void delay_ms(uint32_t ms) { Sleep(ms); }
 
-inline void
-delay_ms(int ms)
+template< class Rep >
+void
+delay(std::chrono::duration<Rep, std::milli> ms_)
 {
-	Sleep(ms);
-}*/
-
-inline void
-delayNanoseconds(int)
-{
-	// TODO
+	const auto ms{std::chrono::duration_cast<std::chrono::milliseconds>(ms_)};
+	delay_ms(ms.count());
 }
-
-inline void
-delayMicroseconds(int)
-{
-	// TODO
-}
-
-inline void
-delayMilliseconds(int)
-{
-	// TODO
-}
-/// @endcond
 
 %% endif
 
-}	// namespace modm
+template< class Rep >
+void
+delay(std::chrono::duration<Rep, std::nano> ns_)
+{
+	const auto ns{std::chrono::duration_cast<std::chrono::nanoseconds>(ns_)};
+	delay_ns(ns.count());
+}
 
+template< class Rep >
+void
+delay(std::chrono::duration<Rep, std::micro> us_)
+{
+	const auto us{std::chrono::duration_cast<std::chrono::microseconds>(us_)};
+	delay_us(us.count());
+}
+
+}	// namespace modm
 /// @endcond
-#endif	// MODM_PLATFORM_DELAY_HPP

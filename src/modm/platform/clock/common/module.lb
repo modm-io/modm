@@ -24,7 +24,6 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "modm/src/modm/platform/clock"
-    env.copy("common.hpp")
 
     if env[":target"].has_driver("clock:avr"):
         env.copy("static.hpp")

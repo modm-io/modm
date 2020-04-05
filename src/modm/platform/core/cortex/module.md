@@ -290,7 +290,20 @@ env.collect(":platform:cortex-m:linkerscript.table_extern.heap", linkerscript_he
     the GNU LD documentation first.
 
 
-### Compiler Options
+## Blocking Delay
+
+The delay functions as defined by `modm:architecture:delay` are implemented via
+software loop or hardware cycle counter (via DWT->CYCCNT, not available on
+ARMv6-M devices) and have the following limitations:
+
+- nanosecond delay is implemented as a tight loop with better than 100ns
+  resolution and accuracy at any CPU frequency.
+- microsecond delay has a maximum delay of 10 seconds.
+- millisecond delay is implemented via `modm::delay_us(ms * 1000)`, thus also
+  has a maximum delay of 10 seconds.
+
+
+## Compiler Options
 
 This module adds these architecture specific [compiler options][options]:
 

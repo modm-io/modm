@@ -250,6 +250,7 @@ def build(env):
         "target": env[":target"].identifier,
         "with_fault_storage": env.has_module(":platform:fault"),
         "with_memory_traits": env.has_module(":architecture:memory"),
+        "with_assert": env.has_module(":architecture:assert"),
     })
     env.outbasepath = "modm/src/modm/platform/core"
 
@@ -269,8 +270,29 @@ def build(env):
 
     # busy-waiting delays
     if env.has_module(":architecture:delay"):
+        core = env.substitutions["core"]
+        if core == "cortex-m0":
+            loop = 4
+        elif core.startswith("cortex-m7"):
+            # Cortex-M7 is superscalar with dual issue ALU and a 6-stage pipeline
+            # _and_ branches in 1 cycle => The entire loop is in the pipeline.
+            loop = 1
+        else:
+            loop = 3
+        env.substitutions["loop"] = loop
+        # FIXME: Move out of this modules, maybe remove completely
+        # TODO: These numbers were measured from a few example applications.
+        #       A statistical analysis of the average overhead cycles is required!
+        target = env.substitutions["target"]
+        if target.family in ["f4"]:
+            overhead = 25
+        elif target.family in ["f1"]:
+            overhead = 12
+        else:
+            overhead = 30
+        env.substitutions["overhead"] = overhead
         env.template("delay.cpp.in")
-        env.copy("delay_impl.hpp")
+        env.template("delay_impl.hpp.in")
 
     # GNU Build ID
     env.collect(":build:linkflags", "-Wl,--build-id=sha1")

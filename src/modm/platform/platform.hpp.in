@@ -10,13 +10,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_PLATFORM_HPP
-#define MODM_PLATFORM_HPP
-
-#include <modm/architecture/utils.hpp>
+#include <modm/architecture.hpp>
 
 %% for header in headers
 #include "{{header}}"
 %% endfor
-
-#endif // MODM_PLATFORM_HPP

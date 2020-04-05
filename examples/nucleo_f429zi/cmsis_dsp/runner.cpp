@@ -18,7 +18,7 @@ int main()
 	const uint32_t diff{DWT->CYCCNT - start};
 
 	if (status != ARM_MATH_TEST_FAILURE) {
-		MODM_LOG_INFO << "Example '" << example_name << "' passed in ~" << (diff / modm::clock::fcpu_MHz) << "us!" << modm::endl;
+		MODM_LOG_INFO << "Example '" << example_name << "' passed in ~" << (diff / modm::platform::delay_fcpu_MHz) << "us!" << modm::endl;
 	} else {
 		MODM_LOG_ERROR << "Example '" << example_name << "' failed!" << modm::endl;
 	}
