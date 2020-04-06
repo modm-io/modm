@@ -40,8 +40,6 @@ def prepare(module, options):
     core = options[":target"].get_driver("core")["type"]
     is_avr = core.startswith("avr")
     is_cortex_m = core.startswith("cortex-m")
-    if not (is_avr or is_cortex_m):
-        return False
 
     if is_avr:
         module.add_option(
@@ -63,7 +61,9 @@ def prepare(module, options):
                 name="safe_statics", default=True,
                 description=descr_safe_statics))
 
-    module.depends(":architecture:assert", ":stdc")
+    if is_avr or is_cortex_m:
+        module.depends(":architecture:assert", ":stdc")
+
     return True
 
 
@@ -71,6 +71,9 @@ def build(env):
     core = env[":target"].get_driver("core")["type"]
     is_avr = core.startswith("avr")
     is_cortex_m = core.startswith("cortex-m")
+    if not (is_avr or is_cortex_m):
+        return
+
     with_exceptions = env.get("exceptions", False)
     with_threadsafe_statics = env.get("safe_statics", False)
 

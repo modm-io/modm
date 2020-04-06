@@ -32,17 +32,18 @@ Additional compiler options:
 
 def prepare(module, options):
     core = options[":target"].get_driver("core")["type"]
-    if not (core.startswith("avr") or core.startswith("cortex-m")):
-        return False
-
-    module.depends(":architecture:assert")
-    if core.startswith("cortex-m0"):
-        module.depends(":architecture:atomic")
+    if core.startswith("avr") or core.startswith("cortex-m"):
+        module.depends(":architecture:assert")
+        if core.startswith("cortex-m0"):
+            module.depends(":architecture:atomic")
 
     return True
 
 def build(env):
     core = env[":target"].get_driver("core")["type"]
+    if not (core.startswith("avr") or core.startswith("cortex-m")):
+        return
+
     env.outbasepath = "modm/ext/gcc"
 
     if core.startswith("cortex-m"):
