@@ -92,7 +92,7 @@ jobs:
       - run:
           name: Examples STM32F7 Series
           command: |
-            (cd examples && ../tools/scripts/examples_compile.py stm32f746g_discovery)
+            (cd examples && ../tools/scripts/examples_compile.py stm32f746g_discovery stm32f769i_discovery)
       - run:
           name: Examples STM32G0 Series
           command: |
@@ -100,7 +100,7 @@ jobs:
       - run:
           name: Examples STM32L1 Series
           command: |
-            (cd examples && ../tools/scripts/examples_compile.py nucleo_l152re)
+            (cd examples && ../tools/scripts/examples_compile.py nucleo_l152re stm32l1_discovery)
       - run:
           name: Examples STM32L4 Series
           command: |
