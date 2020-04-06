@@ -90,6 +90,7 @@ namespace literals
 	constexpr percent_t operator""_pct(long double value) { return pct(value); }
 	constexpr percent_t operator""_pct(unsigned long long int value) { return pct(value); }
 }
+using namespace ::modm::literals;
 }
 
 #endif	// __DOXYGEN__

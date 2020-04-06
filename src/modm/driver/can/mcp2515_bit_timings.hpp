@@ -33,28 +33,24 @@ private:
 	};
 
 	static constexpr uint8_t calcSJW() {
-		using namespace modm::literals;
 		return (Clk ==  8_MHz)? 1 :
 			   (Clk == 16_MHz)? 1 :
 			   (Clk == 20_MHz)? ( (Bitrate == 1_Mbps) ? 1 : 3 ) : 0;
 	}
 
 	static constexpr uint8_t calcProp() {
-		using namespace modm::literals;
 		return (Clk ==  8_MHz)? 1 :
 			   (Clk == 16_MHz)? ( (Bitrate == 1_Mbps) ? 1 : 3 ) :
 			   (Clk == 20_MHz)? ( (Bitrate == 1_Mbps) ? 3 : 5 ) : 0;
 	}
 
 	static constexpr uint8_t calcPS1() {
-		using namespace modm::literals;
 		return (Clk ==  8_MHz)? ( (Bitrate == 1_Mbps) ? 1 : 4 ) :
 			   (Clk == 16_MHz)? ( (Bitrate == 1_Mbps) ? 4 : 8 ) :
 			   (Clk == 20_MHz)? ( (Bitrate == 1_Mbps) ? 4 : 8 ) : 0;
 	}
 
 	static constexpr uint8_t calcPS2() {
-		using namespace modm::literals;
 		return (Clk ==  8_MHz)? ( (Bitrate == 1_Mbps) ? 1 : 2) :
 			   (Clk == 16_MHz)? ( (Bitrate == 1_Mbps) ? 2 : 4 ) :
 			   (Clk == 20_MHz)? ( (Bitrate == 1_Mbps) ? 2 : 4 ) : 0;

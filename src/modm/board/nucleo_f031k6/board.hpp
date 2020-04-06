@@ -20,7 +20,6 @@
 #define MODM_BOARD_HAS_LOGGER
 
 using namespace modm::platform;
-using namespace modm::literals;
 
 /// @ingroup modm_board_nucleo_f031k6
 namespace Board
