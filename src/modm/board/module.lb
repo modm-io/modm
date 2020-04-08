@@ -16,7 +16,7 @@ def init(module):
 
 def prepare(module, options):
 	# The modm_abandon function uses delay functions
-    module.depends(":architecture:delay")
+    module.depends(":architecture:delay", ":architecture:assert")
     return True
 
 def build(env):

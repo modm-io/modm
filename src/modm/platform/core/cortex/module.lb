@@ -155,7 +155,6 @@ def prepare(module, options):
 
     module.depends(
         ":architecture:interrupt",
-        ":architecture:assert",
         ":platform:clock",
         ":cmsis:device",
         ":stdc++")
