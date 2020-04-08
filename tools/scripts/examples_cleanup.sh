@@ -11,8 +11,6 @@ find ${@:1} -name project.xml.log -delete
 find ${@:1} -name SConstruct -delete
 find ${@:1} -name Makefile -delete
 find ${@:1} -name CMakeLists.txt -delete
-find ${@:1} -name openocd.cfg -delete
-find ${@:1} -name gdbinit -delete
 
 find ${@:1} -type d -name modm -exec rm -rf "{}" \;
 find ${@:1} -type d -name generated -exec rm -rf "{}" \;

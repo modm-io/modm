@@ -55,7 +55,7 @@ def build(project):
 	rcs = 0
 	for command in commands:
 		output = ["=" * 90, "Building: {} with {}".format(
-		          path, "SCons" if "scons" in command else "CMake")]
+		          path / "main.cpp", "SCons" if "scons" in command else "CMake")]
 		rc, ro = run(path, command)
 		rcs += rc
 		print("\n".join(output + [ro]))
