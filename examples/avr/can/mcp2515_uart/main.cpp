@@ -12,13 +12,12 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/platform.hpp>
-#include <modm/architecture/interface/interrupt.hpp>
-
 #include <modm/driver/can/mcp2515.hpp>
 #include <modm/processing/timer.hpp>
 
 using namespace modm::platform;
 using namespace modm::literals;
+using namespace std::chrono_literals;
 
 typedef GpioOutputB0 LedGreen;
 typedef GpioOutputB1 LedRed;
@@ -49,24 +48,12 @@ FLASH_STORAGE(uint8_t canFilter[]) =
 	MCP2515_FILTER_EXTENDED(0),	// Mask 1
 };
 
-// timer interrupt routine
-MODM_ISR(TIMER2_COMPA)
-{
-	modm::Clock::increment();
-}
-
 int
 main()
 {
+	SystemClock::enable();
 	LedGreen::setOutput(modm::Gpio::High);
 	LedRed::setOutput(modm::Gpio::Low);
-
-	// timer initialization
-	// compare-match-interrupt every 1 ms at 14.7456 MHz
-	TCCR2A = (1 << WGM21);
-	TCCR2B = (1 << CS22);
-	TIMSK2 = (1 << OCIE2A);
-	OCR2A = 230;
 
 	Uart0::connect<GpioD1::Txd, GpioD0::Rxd>();
 	Uart0::initialize<SystemClock, 115200_Bd>();
@@ -99,7 +86,7 @@ main()
 
 	mcp2515.sendMessage(message);
 
-	modm::ShortPeriodicTimer timer(200);
+	modm::ShortPeriodicTimer timer(200ms);
 	while (true)
 	{
 		if (mcp2515.isMessageAvailable())

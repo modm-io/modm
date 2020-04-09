@@ -79,10 +79,10 @@ main()
 
 	uint16_t tt = 9995; // Milliseconds
 	modm::Timeout timeout;
-	timeout.restart(tt);
+	timeout.restart(std::chrono::milliseconds(tt));
 
 	// Periodically report progress
-	modm::PeriodicTimer blinkTimer(250);
+	modm::PeriodicTimer blinkTimer(250ms);
 
 	MODM_LOG_DEBUG.printf("CPU frequency is %ld Hz\n", Board::SystemClock::Frequency);
 

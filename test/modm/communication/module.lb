@@ -28,7 +28,7 @@ class Xpcc(Module):
         module.name = "xpcc"
 
     def prepare(self, module, options):
-        module.depends("modm:communication:xpcc", ":mock:clock.testing")
+        module.depends("modm:communication:xpcc", ":mock:clock")
         return True
 
     def build(self, env):

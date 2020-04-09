@@ -66,9 +66,9 @@ public:
 			if (PT_CALL(accel.ping()))
 				break;
 			// otherwise, try again in 100ms
-			this->timeout.restart(100);
+			timeout.restart(100ms);
 			Board::LedOrange::set();
-			PT_WAIT_UNTIL(this->timeout.isExpired());
+			PT_WAIT_UNTIL(timeout.isExpired());
 			Board::LedOrange::reset();
 		}
 
@@ -92,8 +92,8 @@ public:
 			Board::LedGreen::set(averageY.getValue() < -0.2);
 			Board::LedRed::set(averageY.getValue() > 0.2);
 
-			this->timeout.restart(5);
-			PT_WAIT_UNTIL(this->timeout.isExpired());
+			timeout.restart(5ms);
+			PT_WAIT_UNTIL(timeout.isExpired());
 		}
 
 		PT_END();

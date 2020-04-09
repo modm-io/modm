@@ -93,7 +93,7 @@ namespace modm{
 		openNextScreen() = 0;
 
 	private:
-		uint16_t display_update_time;
+		modm::ShortDuration display_update_time;
 
 		modm::ShortPeriodicTimer timer;
 		bool buttonAction;

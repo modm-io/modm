@@ -12,17 +12,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	MODM_PLATFORM_ATOMIC_LOCK_HPP
-#define	MODM_PLATFORM_ATOMIC_LOCK_HPP
+#pragma once
 
-/// @cond
 #include "../device.hpp"
 #include <modm/architecture/utils.hpp>
 
-namespace modm
-{
-
-namespace atomic
+/// @cond
+namespace modm::atomic
 {
 
 class Lock
@@ -63,9 +59,34 @@ private:
 	uint32_t cpsr;
 };
 
-}	// namespace atomic
+%% if "m0" in core
+class LockPriority : Lock
+{
+public:
+	modm_always_inline
+	LockPriority(uint32_t) : Lock() {}
+};
+%% else
+class LockPriority
+{
+public:
+	modm_always_inline
+	LockPriority(uint32_t priority) : basepri(__get_BASEPRI())
+	{
+		__set_BASEPRI_MAX(priority << (8u - __NVIC_PRIO_BITS));
+	}
 
-}	// namespace modm
+	modm_always_inline
+	~LockPriority()
+	{
+		__set_BASEPRI(basepri);
+	}
 
+private:
+	uint32_t basepri;
+};
+%% endif
+
+}	// namespace modm::atomic
 /// @endcond
-#endif	// MODM_PLATFORM_ATOMIC_LOCK_HPP
+

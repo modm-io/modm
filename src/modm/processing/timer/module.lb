@@ -18,6 +18,7 @@ def init(module):
 def prepare(module, options):
     module.depends(
         ":architecture:clock",
+        ":architecture:assert",
         ":io",
         ":math:utils")
     return True

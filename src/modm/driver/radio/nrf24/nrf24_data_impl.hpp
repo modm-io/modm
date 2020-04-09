@@ -192,8 +192,8 @@ modm::Nrf24Data<Nrf24Phy, Clock>::getPacket(Packet& packet)
 		// Best effort approach: return average between now and last timestamp,
 		// divide individually to avoid overflow
 		feedbackLastPacket.timestamp = Timestamp(
-		                        (feedbackCurrentPacket.timestamp.getTime() / 2) +
-		                        (modm::Clock::now().getTime() / 2));
+			(feedbackCurrentPacket.timestamp.time_since_epoch() / 2) +
+			(modm::Clock::now().time_since_epoch() / 2));
 	}
 
 	// `currentFeedback` has now been migrated to `feedbackLastPacket` so we

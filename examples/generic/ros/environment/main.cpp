@@ -78,7 +78,7 @@ main()
 	Bme280Thread bme280thread;
 	DisplayThread display_thread;
 
-	modm::ShortPeriodicTimer timer(1000);
+	modm::ShortPeriodicTimer timer(1s);
 	bool bme_sampling(false);
 
 	while (true)

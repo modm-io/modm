@@ -1,10 +1,6 @@
 /*
- * Copyright (c) 2009, Georgi Grinshpun
- * Copyright (c) 2009-2012, Fabian Greif
- * Copyright (c) 2010-2011, Martin Rosekeit
- * Copyright (c) 2012-2013, Sascha Schade
- * Copyright (c) 2012, 2015, Niklas Hauser
- * Copyright (c) 2013, Kevin Läufer
+ * Copyright (c) 2019, Raphael Lehmann
+ * Copyright (c) 2020, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -14,113 +10,43 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	MODM_TIMESTAMP_HPP
-#define	MODM_TIMESTAMP_HPP
-
-#include <stdint.h>
-
-#include <modm/io/iostream.hpp>
-#include <modm/math/utils/arithmetic_traits.hpp>
+#pragma once
+#include <modm/architecture/interface/clock.hpp>
 
 namespace modm
 {
 
-/**
- * Generic timestamp for 16bit and 32bit timestamps of variable timebase.
- *
- * @author	Fabian Greif
- * @author	Niklas Hauser
- * @ingroup	modm_processing_timer
- */
-template< typename T >
-class GenericTimestamp
-{
-public:
-	typedef T Type;
-	typedef modm::SignedType<T> SignedType;
-
-public:
-	/// @param initialTime in ms
-	GenericTimestamp(const Type initialTime = 0) :
-		time(initialTime)
-	{
-	}
-
-	inline Type
-	getTime() const
-	{
-		return time;
-	}
-
-	inline GenericTimestamp<T>
-	operator + (const GenericTimestamp<T>& other) const
-	{
-		return GenericTimestamp<T>(time + other.time);
-	}
-
-	inline GenericTimestamp<T>
-	operator - (const GenericTimestamp<T>& other) const
-	{
-		return GenericTimestamp<T>(time - other.time);
-	}
-
-	inline bool
-	operator == (const GenericTimestamp<T>& other) const
-	{
-		return (time == other.time);
-	}
-
-	inline bool
-	operator != (const GenericTimestamp<T>& other) const
-	{
-		return (time != other.time);
-	}
-
-	inline bool
-	operator < (const GenericTimestamp<T>& other) const
-	{
-		return SignedType(time - other.time) < 0;
-	}
-
-	inline bool
-	operator > (const GenericTimestamp<T>& other) const
-	{
-		return SignedType(time - other.time) > 0;
-	}
-
-	inline bool
-	operator <= (const GenericTimestamp<T>& other) const
-	{
-		return SignedType(time - other.time) <= 0;
-	}
-
-	inline bool
-	operator >= (const GenericTimestamp<T>& other) const
-	{
-		return SignedType(time - other.time) >= 0;
-	}
-
-private:
-	Type time;
-};
-
-/// 16bit timestamp, which can hold up to 65 seconds at millisecond resolution.
+/// 16bit duration, which can hold up to 65 seconds at millisecond resolution.
 /// @ingroup	modm_processing_timer
-using ShortTimestamp = GenericTimestamp<uint16_t>;
+using        ShortDuration = std::chrono::duration<uint16_t, std::milli>;
 
-/// 32bit timestamp, which can hold up to 49 days at millisecond resolution.
+/// 32bit duration, which can hold up to 49 days at millisecond resolution.
 /// @ingroup	modm_processing_timer
-using Timestamp      = GenericTimestamp<uint32_t>;
+using             Duration = std::chrono::duration<uint32_t, std::milli>;
 
-// ------------------------------------------------------------------------
-template< typename T >
-inline IOStream&
-operator << (IOStream& os, const GenericTimestamp<T>& t)
-{
-	os << t.getTime();
-	return os;
-}
+/// 16bit precise duration, which can hold up to 65 milliseconds at microsecond resolution.
+/// @ingroup	modm_processing_timer
+using ShortPreciseDuration = std::chrono::duration<uint16_t, std::micro>;
+
+/// 32bit precise duration, which can hold up to 71 minutes at microsecond resolution.
+/// @ingroup	modm_processing_timer
+using      PreciseDuration = std::chrono::duration<uint32_t, std::micro>;
+
+
+/// 16bit time point, which can hold up to 65 seconds at millisecond resolution.
+/// @ingroup	modm_processing_timer
+using        ShortTimestamp = std::chrono::time_point<modm::chrono::milli_clock, ShortDuration>;
+
+/// 32bit time point, which can hold up to 49 days at millisecond resolution.
+/// @ingroup	modm_processing_timer
+using             Timestamp = modm::chrono::milli_clock::time_point;
+
+/// 16bit precise time point, which can hold up to 65 milliseconds at microsecond resolution.
+/// @ingroup	modm_processing_timer
+using ShortPreciseTimestamp = std::chrono::time_point<modm::chrono::micro_clock, ShortPreciseDuration>;
+
+/// 32bit precise time point, which can hold up to 71 minutes at microsecond resolution.
+/// @ingroup	modm_processing_timer
+using      PreciseTimestamp = modm::chrono::micro_clock::time_point;
 
 }	// namespace modm
-
-#endif	// MODM_TIMESTAMP_HPP

@@ -1,0 +1,105 @@
+/*
+ * Copyright (c) 2016, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#include "clock.hpp"
+#include <modm/architecture/interface/clock.hpp>
+#include <modm/architecture/interface/interrupt.hpp>
+#include <modm/architecture/interface/atomic_lock.hpp>
+
+#ifndef TCCR0B
+#	define TCCR0B TCCR0A
+#endif
+
+#ifndef OCR0A
+#	define OCR0A OCR0
+#endif
+
+#ifndef TCCR0A
+#	define TCCR0A TCCR0
+#endif
+
+#ifndef TIMER0_COMPA_vect
+#	define TIMER0_COMPA_vect TIMER0_COMP_vect
+#endif
+
+#ifndef TIMSK0
+#	define TIMSK0 TIMSK
+#endif
+
+bool
+modm::platform::SystemClock::enable()
+{
+	// modm::Clock initialization
+	// Clear Timer on Compare Match Mode
+	TCCR0B = 0;
+	TCCR0A = (1 << WGM01);
+	TIMSK0 = (1 << OCIE0A);
+	// Set and enable output compare A
+	OCR0A = {{overflow}};
+
+%% if div == 256
+	// Set prescaler 256 and enable timer
+	TCCR0B |= (1 << CS02);
+%% elif div == 64
+	// Set prescaler 64 and enable timer
+	TCCR0B |= (1 << CS01) | (1 << CS00);
+%% elif div == 8
+	// Set prescaler 8 and enable timer
+	TCCR0B |= (1 << CS01);
+%% else
+	// Set prescaler 1 and enable timer
+	TCCR0B |= (1 << CS00);
+%% endif
+	return true;
+}
+
+static volatile uint32_t milli_time{0};
+static volatile uint32_t micro_time{0};
+static volatile uint8_t interrupt{false};
+
+MODM_ISR(TIMER0_COMPA)
+{
+	milli_time++;
+	micro_time += 1000ul;
+	interrupt = true;
+}
+
+modm::chrono::milli_clock::time_point modm_weak
+modm::chrono::milli_clock::now() noexcept
+{
+	uint32_t time;
+	do
+	{	// load opportunistically instead of with an atomic lock
+		interrupt = false;
+		time = milli_time;
+	}
+	while(interrupt);
+	return time_point{duration{time}};
+}
+
+modm::chrono::micro_clock::time_point modm_weak
+modm::chrono::micro_clock::now() noexcept
+{
+	uint32_t time;
+	uint8_t val;
+	do	// We cannot use an atomic lock here, the counter still overflows even
+	{	// if the interrupt hasn't happened yet. And then micro_time is 1000us
+		// behind thus giving a wrong time.
+		interrupt = false;
+		val = TCNT0;
+		time = micro_time;
+	}
+	while(interrupt);
+
+	time += uint16_t(val * uint16_t({{scaler}})) >> {{shift}};
+
+	return time_point{duration{time}};
+}

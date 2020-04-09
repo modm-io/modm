@@ -19,7 +19,7 @@
 template < typename I2cMaster >
 modm::Tmp102<I2cMaster>::Tmp102(Data &data, uint8_t address)
 :	Lm75<I2cMaster>(reinterpret_cast<lm75::Data&>(data), address),
-	timeout(250), updateTime(250),
+	updateTime(250), timeout(modm::ShortDuration(updateTime)),
 	config_lsb(ConversionRate_t(ConversionRate::Hz4))
 {
 	this->stop();
@@ -38,11 +38,11 @@ modm::Tmp102<I2cMaster>::run()
 		if (updateTime & (1 << 15))
 		{
 			PT_CALL(startConversion());
-			timeout.restart(29);
+			timeout.restart(29ms);
 		}
 
 		PT_WAIT_UNTIL(timeout.isExpired());
-		timeout.restart(updateTime & ~(1 << 15));
+		timeout.restart(std::chrono::milliseconds(updateTime & ~(1 << 15)));
 
 		PT_CALL(this->readTemperature());
 	}
@@ -86,14 +86,14 @@ modm::Tmp102<I2cMaster>::setUpdateRate(uint8_t rate)
 		{
 			if (rate == 0) updateTime = 4000;
 			else updateTime = 1000/rate;
-			timeout.restart(updateTime & ~(1 << 15));
+			timeout.restart(std::chrono::milliseconds(updateTime & ~(1 << 15)));
 			RF_RETURN(true);
 		}
 	}
 	else
 	{
 		updateTime = (1000/rate - 29) | (1 << 15);
-		timeout.restart(updateTime & ~(1 << 15));
+		timeout.restart(std::chrono::milliseconds(updateTime & ~(1 << 15)));
 		RF_RETURN(true);
 	}
 

@@ -61,8 +61,6 @@ def prepare(module, options):
                    description=descr_build_path))
 
     if platform in ["avr"]:
-        # we need the clock:f_cpu option!
-        module.depends(":platform:clock")
         module.add_option(
             StringOption(name="avrdude.programmer", default="",
                          description="AvrDude programmer"))

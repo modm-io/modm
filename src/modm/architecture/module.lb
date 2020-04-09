@@ -136,15 +136,16 @@ class Can(Module):
 class Clock(Module):
     def init(self, module):
         module.name = "clock"
-        module.description = "System Tick"
+        module.description = FileReader("interface/clock.md")
 
     def prepare(self, module, options):
-        module.depends(":processing:timer")
+        module.depends(":stdc++")
         return True
 
     def build(self, env):
+        env.substitutions = {"with_io": env.has_module(":io")}
         env.outbasepath = "modm/src/modm/architecture"
-        env.copy("interface/clock.hpp")
+        env.template("interface/clock.hpp.in")
 # -----------------------------------------------------------------------------
 
 class Delay(Module):

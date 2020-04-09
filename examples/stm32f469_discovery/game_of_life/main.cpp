@@ -280,9 +280,9 @@ void game_of_life()
 	framebuffers[1] = framebuffer_t(uint32_t(framebuffers[1]) + bw+1);
 
 	// 30 Hz max refresh rate, or lower
-	modm::PeriodicTimer timer(33);
+	modm::PeriodicTimer timer(33ms);
 	// Reseed after a few minutes
-	modm::PeriodicTimer reseed(60'000 * 3);
+	modm::PeriodicTimer reseed(180s);
 	bool touch_read = false;
 	init(framebuffers);
 

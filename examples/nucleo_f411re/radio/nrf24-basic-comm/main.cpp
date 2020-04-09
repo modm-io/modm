@@ -86,8 +86,8 @@ int main()
 	Nrf2Phy::setBits(Register::CONFIG, Config::PWR_UP);
 
 
-	/* Timer to send packets every 1000ms */
-	modm::ShortPeriodicTimer sendPacket(1000);
+	/* Timer to send packets every 1s */
+	modm::ShortPeriodicTimer sendPacket(1s);
 
 	/* Buffer for received payload */
 	uint8_t received_data[payload_length];
@@ -96,7 +96,7 @@ int main()
 	{
 		// ------------------------- Primary sender ---------------------------
 
-		/* Send packet every 1000ms */
+		/* Send packet every 1s */
 		if(sendPacket.execute())
 		{
 			/* Copy packet into ptx device. Because CE is always high here, the

@@ -12,42 +12,31 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/platform.hpp>
-#include <modm/architecture/interface/interrupt.hpp>
 #include <modm/processing/timer.hpp>
 
 using namespace modm::platform;
+using namespace std::chrono_literals;
 
 // create a output device for the led
 typedef GpioOutputB0 Led;
 
-// timer interrupt routine
-MODM_ISR(TIMER2_COMPA)
-{
-	modm::Clock::increment();
-}
 
 int
 main()
 {
+	SystemClock::enable();
 	Led::setOutput();
 	Led::reset();
-
-	// timer initialization
-	// compare-match-interrupt every 1 ms at 14.7456 MHz
-	TCCR2A = (1 << WGM21);
-	TCCR2B = (1 << CS22);
-	TIMSK2 = (1 << OCIE2A);
-	OCR2A = 230;
 
 	// enable interrupts
 	enableInterrupts();
 
-	modm::ShortTimeout timeout(200);
+	modm::ShortTimeout timeout(200ms);
 	while (true)
 	{
 		if (timeout.isExpired())
 		{
-			timeout.restart(200);
+			timeout.restart(200ms);
 			Led::toggle();
 		}
 	}

@@ -41,8 +41,8 @@ public:
 			if (PT_CALL(temp.ping()))
 				break;
 			// otherwise, try again in 100ms
-			this->timeout.restart(100);
-			PT_WAIT_UNTIL(this->timeout.isExpired());
+			timeout.restart(100ms);
+			PT_WAIT_UNTIL(timeout.isExpired());
 		}
 
 
@@ -79,8 +79,8 @@ public:
 				if (result) { MODM_LOG_INFO << " Heat me up!"; }
 				MODM_LOG_INFO << modm::endl;
 			}
-			this->timeout.restart(200);
-			PT_WAIT_UNTIL(this->timeout.isExpired());
+			timeout.restart(200ms);
+			PT_WAIT_UNTIL(timeout.isExpired());
 			Board::LedD13::toggle();
 		}
 

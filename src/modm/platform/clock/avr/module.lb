@@ -1,0 +1,72 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2020, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":platform:clock"
+    module.description = """
+# System Clock via Timer/Counter 0
+
+The TC0 timer is used to provide a time point at milli- and microsecond
+resolution to implement the `modm::Clock::now()` and `modm::PreciseClock::now()`
+interfaces defined in the `modm:architecture:clock` module.
+
+For this, the timer is configured to trigger a 1ms interrupt to increment the
+millisecond counter. To compute the microsecond counter, the 8-bit timer counter
+is used to interpolate between milliseconds via a 16x16=16-bit multiplication
+and shift to avoid a division. This is very fast, however, the resolution of the
+`modm::PreciseClock` is limited to *at best* ~4us (1000us/8-bit) and *at worst*
+~32us ((2MHz/64)/1000us).
+"""
+
+def prepare(module, options):
+    if not options[":target"].has_driver("tc:tc8"):
+        return False
+
+    # FIXME: Clock is only implemented for a specific version of TC0
+    target = options[":target"].identifier
+    if target.family in {"tiny"} and target.name in {"861", "88"}:
+        return False
+    if target.family in {"mega"} and target.name in {"8", "16", "32", "64", "128"}:
+        return False
+
+    module.depends(":architecture:atomic", ":architecture:clock")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/platform/clock"
+    env.copy("clock.hpp")
+
+    f_cpu = env.get(":platform:core:f_cpu", 8e6)
+    # Max out the 8-bit counter: F_CPU / div < 256
+    if f_cpu <= 250e3:
+        div = 1
+    elif f_cpu <= 2e6:
+        div = 8
+    elif f_cpu <= 16e6:
+        div = 64
+    else:
+        div = 256
+    overflow = int(f_cpu // (div * 1e3))
+    shift = 6 # the result is <100us, so <10-bit => 16-bit >> 6 = 10-bit
+    scaler = int((div * 1e6 * 2**shift) // f_cpu)
+
+    # Never an issue in range 1e3 to 32e6!
+    # if not (scaler < 2**16 and overflow * scaler < 2**16):
+    #     env.log.error("`modm::PreciseClock` scalar overflowed!")
+
+    env.substitutions = {
+        "div": div,
+        "overflow": overflow,
+        "shift": shift,
+        "scaler": scaler,
+    }
+    env.template("clock.cpp.in")

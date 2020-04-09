@@ -122,8 +122,8 @@ public:
 			MODM_LOG_DEBUG << "Device did not respond" << modm::endl;
 
 			// otherwise, try again in 100ms
-			this->timeout.restart(1000);
-			PT_WAIT_UNTIL(this->timeout.isExpired());
+			timeout.restart(1s);
+			PT_WAIT_UNTIL(timeout.isExpired());
 		}
 
 		MODM_LOG_DEBUG << "Device responded" << modm::endl;
@@ -167,8 +167,8 @@ public:
 
 			counter++;
 
-			this->timeout.restart(1000);
-			PT_WAIT_UNTIL(this->timeout.isExpired());
+			timeout.restart(1s);
+			PT_WAIT_UNTIL(timeout.isExpired());
 		}
 
 		PT_END();
@@ -198,7 +198,7 @@ main()
 	MyI2cMaster::connect<GpioB11::Sda, GpioB10::Scl>(MyI2cMaster::PullUps::Internal);
 	MyI2cMaster::initialize<Board::SystemClock, 100_kHz>();
 
-	modm::ShortPeriodicTimer tmr(500);
+	modm::ShortPeriodicTimer tmr(500ms);
 
 	while(true)
 	{

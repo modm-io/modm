@@ -24,7 +24,7 @@ def prepare(module, options):
         "modm:processing:resumable",
         "modm:processing:timer",
         "modm:processing:scheduler",
-        ":mock:clock.dummy")
+        ":mock:clock")
     return True
 
 

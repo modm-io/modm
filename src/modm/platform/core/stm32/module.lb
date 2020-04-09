@@ -22,7 +22,7 @@ def prepare(module, options):
     if options[":target"].identifier.platform != "stm32":
         return False
 
-    module.depends(":platform:cortex-m", ":platform:systick")
+    module.depends(":platform:cortex-m")
     return True
 
 

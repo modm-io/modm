@@ -20,7 +20,8 @@
 template <typename I2cMaster>
 modm::Ds1631<I2cMaster>::Ds1631(Data &data, uint8_t address) :
 	I2cDevice<I2cMaster,2>(address), data(data), config(0),
-	periodTimeout(250), conversionTimeout(250), updateTime(250), conversionTime(232)
+	updateTime(250), conversionTime(232),
+	periodTimeout(updateTime), conversionTimeout(conversionTime)
 {
 	this->stop();
 }
@@ -79,7 +80,7 @@ modm::Ds1631<I2cMaster>::setUpdateRate(uint8_t rate)
 			RF_RETURN(false);
 	}
 
-	updateTime = (1000/rate - 29);
+	updateTime = modm::ShortDuration(1000/rate - 29);
 	periodTimeout.restart(updateTime);
 	this->restart();
 

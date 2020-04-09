@@ -87,7 +87,7 @@ public:
 		{
 			MODM_LOG_INFO << PT_CALL(adc.nextSequenceConversion()) << modm::endl;
 
-			timeout.restart(500);
+			timeout.restart(500ms);
 			PT_WAIT_UNTIL(timeout.isExpired());
 		}
 

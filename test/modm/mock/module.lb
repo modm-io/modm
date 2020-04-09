@@ -10,9 +10,10 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 
-class ClockDummy(Module):
+class Clock(Module):
     def init(self, module):
-        module.name = "clock.dummy"
+        module.name = "clock"
+        module.description = "System Tick Mockup"
 
     def prepare(self, module, options):
         module.depends(":architecture:clock")
@@ -20,21 +21,8 @@ class ClockDummy(Module):
 
     def build(self, env):
         env.outbasepath = "modm-test/src/modm-test/mock"
-        env.copy("clock_dummy.hpp")
-        env.copy("clock_dummy.cpp")
-
-class ClockTesting(Module):
-    def init(self, module):
-        module.name = "clock.testing"
-
-    def prepare(self, module, options):
-        module.depends(":architecture:clock")
-        return True
-
-    def build(self, env):
-        env.outbasepath = "modm-test/src/modm-test/mock"
-        env.copy("testing_clock.hpp")
-        env.copy("testing_clock.cpp")
+        env.copy("clock.hpp")
+        env.copy("clock.cpp")
 
 class SpiDevice(Module):
     def init(self, module):
@@ -79,8 +67,7 @@ def init(module):
     module.name = ":mock"
 
 def prepare(module, options):
-    module.add_submodule(ClockDummy())
-    module.add_submodule(ClockTesting())
+    module.add_submodule(Clock())
     module.add_submodule(SpiDevice())
     module.add_submodule(SpiMaster())
     module.add_submodule(IoDevice())

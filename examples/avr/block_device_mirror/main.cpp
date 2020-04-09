@@ -17,7 +17,6 @@
 #include <stdlib.h>
 
 using namespace modm::platform;
-typedef modm::platform::SystemClock clock;
 
 // Create a new UART object and configure it to a baudrate of 115200
 Uart0 uart;

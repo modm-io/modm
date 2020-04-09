@@ -18,20 +18,6 @@
 
 #include <modm/architecture/interface/atomic_lock.hpp>
 
-uint_fast16_t modm::amnb::Clock::time = 0;
-
-modm::Timestamp
-modm::amnb::Clock::now()
-{
-	uint_fast16_t tempTime;
-	{
-		atomic::Lock lock;
-		tempTime = time;
-	}
-
-	return Timestamp(tempTime);
-}
-
 // ----------------------------------------------------------------------------
 #ifdef __AVR__
 #	include <util/crc16.h>
@@ -105,7 +91,7 @@ bool modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::messageSent = false;
 
 #if AMNB_TIMING_DEBUG
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
-modm::Timestamp modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::latency;
+modm::ShortDuration modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::latency;
 
 template <typename Device, uint8_t PROBABILITY, uint8_t TIMEOUT>
 uint8_t modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::collisions;
@@ -118,7 +104,7 @@ void
 modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::initialize(int seed)
 {
 	srand(seed);
-	rescheduleTimeout = static_cast<uint8_t>(rand());
+	rescheduleTimeout = static_cast<uint16_t>(rand()) % TIMEOUT;
 	state = SYNC;
 }
 
@@ -146,7 +132,7 @@ modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::writeMessage()
 			rescheduleTransmit = true;
 			Device::resetErrorFlags();
 			// and wait for a random amount of time before sending again
-			rescheduleTimer.restart(rescheduleTimeout % TIMEOUT);
+			rescheduleTimer.restart(std::chrono::microseconds(rescheduleTimeout));
 #if AMNB_TIMING_DEBUG
 			++collisions;
 #endif
@@ -338,8 +324,8 @@ modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::update()
 			Device::flushReceiveBuffer();
 
 			// and wait for a random amount of time before sending again
-			rescheduleTimeout = static_cast<uint8_t>(rand());
-			rescheduleTimer.restart(rescheduleTimeout % TIMEOUT);
+			rescheduleTimeout = static_cast<uint16_t>(rand()) % TIMEOUT;
+			rescheduleTimer.restart(std::chrono::microseconds(rescheduleTimeout));
 			state = SYNC;
 #if AMNB_TIMING_DEBUG
 			++collisions;
@@ -381,7 +367,7 @@ modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::update()
 				break;
 		}
 
-		resetTimer.restart(resetTimeout);
+		resetTimer.restart(std::chrono::microseconds(resetTimeout));
 	}
 	if ((state != SYNC) && resetTimer.isExpired()) state = SYNC;
 
@@ -396,7 +382,7 @@ modm::amnb::Interface<Device,PROBABILITY,TIMEOUT>::update()
 		// otherwise reschedule
 		else {
 			rescheduleTransmit = true;
-			rescheduleTimer.restart(rescheduleTimeout % TIMEOUT);
+			rescheduleTimer.restart(std::chrono::microseconds(rescheduleTimeout % TIMEOUT));
 		}
 		rescheduleTimeout = static_cast<uint8_t>(rand());
 	}

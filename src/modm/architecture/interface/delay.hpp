@@ -97,6 +97,8 @@ inline void delayMicroseconds(uint32_t us) { delay_us(us); }
 [[deprecated("Use `modm::delay_ms(uint32_t ms)` instead!")]]
 inline void delayMilliseconds(uint32_t ms) { delay_ms(ms); }
 
+using namespace ::std::chrono_literals;
+
 } // namespace modm
 
 #endif

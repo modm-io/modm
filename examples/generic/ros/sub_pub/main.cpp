@@ -97,7 +97,7 @@ main()
 	// Make sure to publish on boot
 	bool button_state = not Board::Button::read();
 
-	modm::ShortPeriodicTimer heartbeat(1000);
+	modm::ShortPeriodicTimer heartbeat(1s);
 	while(true)
 	{
 		bool button_read = Board::Button::read();

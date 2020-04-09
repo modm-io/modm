@@ -17,7 +17,7 @@
 #include <modm/communication/xpcc/backend/zeromq/connector.hpp>
 using namespace std::chrono_literals;
 
-modm::PeriodicTimer pt(2000);
+modm::PeriodicTimer pt(2s);
 
 int
 main()

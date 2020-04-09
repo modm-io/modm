@@ -98,7 +98,7 @@ main()
 	msg1.data[0] = 0x11;
 	Can::sendMessage(msg1);
 
-	modm::ShortPeriodicTimer pTimer(100);
+	modm::ShortPeriodicTimer pTimer(100ms);
 
 	while (true)
 	{

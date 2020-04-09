@@ -13,43 +13,29 @@
 // ----------------------------------------------------------------------------
 
 #include "clock_test.hpp"
-#include <modm-test/mock/testing_clock.hpp>
+#include <modm/architecture/interface/clock.hpp>
+#include <modm-test/mock/clock.hpp>
+using test_clock = modm_test::chrono::milli_clock;
 
 void
 ClockTest::testClock()
 {
-	// test 16bit timestamp "ShortTimestamp"
-	TestingClock::time = 0;
-	TEST_ASSERT_EQUALS(modm::Clock::nowShort(), modm::ShortTimestamp(0));
-
-	TestingClock::time = 10;
-	TEST_ASSERT_EQUALS(modm::Clock::nowShort(), modm::ShortTimestamp(10));
-
-	TestingClock::time = 65'000;
-	TEST_ASSERT_EQUALS(modm::Clock::nowShort(), modm::ShortTimestamp(65'000));
-
-	TestingClock::time = 65'535;
-	TEST_ASSERT_EQUALS(modm::Clock::nowShort(), modm::ShortTimestamp(65'535));
-
-	// overflow in timestamp, but not the Clock!
-	TestingClock::time = 65'536;
-	TEST_ASSERT_EQUALS(modm::Clock::nowShort(), modm::ShortTimestamp(0));
-
-
+	using time_point = modm::Clock::time_point;
+	using duration = modm::Clock::duration;
 	// test 32bit timestamp "Timestamp"
-	TestingClock::time = 0;
-	TEST_ASSERT_EQUALS(modm::Clock::now(), modm::Timestamp(0));
+	test_clock::setTime(0);
+	TEST_ASSERT_EQUALS(modm::Clock::now(), time_point(duration(0)));
 
-	TestingClock::time = 10;
-	TEST_ASSERT_EQUALS(modm::Clock::now(), modm::Timestamp(10));
+	test_clock::setTime(10);
+	TEST_ASSERT_EQUALS(modm::Clock::now(), time_point(duration(10)));
 
-	TestingClock::time = 65'536;
-	TEST_ASSERT_EQUALS(modm::Clock::now(), modm::Timestamp(65'536));
+	test_clock::setTime(65'536);
+	TEST_ASSERT_EQUALS(modm::Clock::now(), time_point(duration(65'536)));
 
-	TestingClock::time = 4'294'967'295;
-	TEST_ASSERT_EQUALS(modm::Clock::now(), modm::Timestamp(4'294'967'295));
+	test_clock::setTime(4'294'967'295);
+	TEST_ASSERT_EQUALS(modm::Clock::now(), time_point(duration(4'294'967'295)));
 
 	// overflow in both timestamp and Clock!
-	TestingClock::time = uint32_t(4'294'967'296);
-	TEST_ASSERT_EQUALS(modm::Clock::now(), modm::Timestamp(0));
+	test_clock::setTime(uint32_t(4'294'967'296));
+	TEST_ASSERT_EQUALS(modm::Clock::now(), time_point(duration(0)));
 }

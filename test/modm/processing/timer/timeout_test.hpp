@@ -20,12 +20,17 @@ public:
 	virtual void
 	setUp();
 
+	void
+	testDefaultConstructor();
+
+	void
+	testZeroConstructor();
+
+	void
+	testNegativeConstructor();
 
 	void
 	testBasics();
-
-	void
-	testDefaultConstructor();
 
 	void
 	testTimeOverflow();

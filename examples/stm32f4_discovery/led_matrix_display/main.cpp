@@ -64,7 +64,7 @@ main()
 	ledMatrixDisplay.setFont(modm::font::FixedWidth5x8);
 	ledMatrixDisplay.setCursor(0, 0);
 
-	modm::ShortPeriodicTimer countdownTimer(100);
+	modm::ShortPeriodicTimer countdownTimer(100ms);
 
 	while (true)
 	{

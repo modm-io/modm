@@ -20,12 +20,13 @@
 #include <identifier.hpp>
 
 #include "sender.hpp"
+using namespace std::chrono_literals;
 
 // ----------------------------------------------------------------------------
 component::Sender::Sender(uint8_t id, xpcc::Dispatcher &communication) :
 	xpcc::AbstractComponent(id, communication),
 	positionCallback(this, &Sender::getPositionCallback),
-	timer(2000)
+	timer(2s)
 {
 }
 

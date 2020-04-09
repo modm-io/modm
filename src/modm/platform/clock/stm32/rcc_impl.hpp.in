@@ -13,9 +13,10 @@
 
 namespace modm::platform
 {
-
+/// @cond
 extern uint16_t delay_fcpu_MHz;
 extern uint16_t delay_ns_per_loop;
+/// @endcond
 
 constexpr Rcc::flash_latency
 Rcc::computeFlashLatency(uint32_t Core_Hz, uint16_t Core_mV)

@@ -76,7 +76,7 @@ modm::Bmp085<I2cMaster>::readout()
 		RF_RETURN(false);
 
 	// Wait until temperature reading is succeeded
-	timeout.restart(5);
+	timeout.restart(5ms);
 	RF_WAIT_UNTIL(timeout.isExpired());
 
 	// Get the temperature from sensor
@@ -101,7 +101,7 @@ modm::Bmp085<I2cMaster>::readout()
 		RF_RETURN(false);
 
 	// Wait until sensor has converted the pressure
-	timeout.restart(conversionDelay[bufferedMode >> 6]);
+	timeout.restart(std::chrono::milliseconds(conversionDelay[bufferedMode >> 6]));
 	RF_WAIT_UNTIL(timeout.isExpired());
 
 	// Get the pressure from sensor

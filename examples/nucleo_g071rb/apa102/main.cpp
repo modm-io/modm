@@ -17,7 +17,7 @@
 using namespace Board;
 
 modm::Apa102<SpiMaster1, 8*8> leds;
-modm::ShortPeriodicTimer tmr{33};
+modm::ShortPeriodicTimer tmr{33ms};
 
 int
 main()

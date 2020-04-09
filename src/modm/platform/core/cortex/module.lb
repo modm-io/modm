@@ -155,7 +155,6 @@ def prepare(module, options):
 
     module.depends(
         ":architecture:interrupt",
-        ":platform:clock",
         ":cmsis:device",
         ":stdc++")
 
@@ -298,11 +297,6 @@ def build(env):
     if env.has_module(":architecture:build_id"):
         env.copy("build_id.cpp")
 
-    if env.has_module(":architecture:clock"):
-        # modm-test implements the clock methods itself
-        if not env.has_module(":test:architecture"):
-            env.copy("clock.cpp")
-
     # Heap table from linkerscript
     if env.has_module(":architecture:memory"):
         env.template("heap_table.cpp.in")
@@ -313,7 +307,7 @@ def build(env):
         env.template("../../heap/cortex/no_heap.c.in", "no_heap.c")
 
     if env.has_module(":architecture:atomic"):
-        env.copy("atomic_lock_impl.hpp")
+        env.template("atomic_lock_impl.hpp.in")
 
     if env.has_module(":architecture:accessor"):
         env.copy("flash_reader_impl.hpp")

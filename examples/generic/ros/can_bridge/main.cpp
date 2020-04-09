@@ -122,7 +122,7 @@ main()
 	nh.subscribe(sub_can);
 	nh.advertise(pub_can);
 
-	modm::ShortPeriodicTimer heartbeat(1000);
+	modm::ShortPeriodicTimer heartbeat(1s);
 	while (true)
 	{
 		if (Can::isMessageAvailable())

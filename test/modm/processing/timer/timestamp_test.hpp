@@ -14,7 +14,7 @@
 #include <unittest/testsuite.hpp>
 
 /// @ingroup modm_test_test_processing
-class TimestampTest : public unittest::TestSuite
+class DurationTest : public unittest::TestSuite
 {
 public:
 	void

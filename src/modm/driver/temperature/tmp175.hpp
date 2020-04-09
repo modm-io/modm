@@ -112,10 +112,10 @@ private:
 	modm::ResumableResult<bool>
 	setLimitRegister(Register reg, float temperature);
 
+	modm::ShortDuration updateTime;
+	modm::ShortDuration conversionTime;
 	modm::ShortTimeout periodTimeout;
 	modm::ShortTimeout conversionTimeout;
-	uint16_t updateTime;
-	uint8_t conversionTime;
 };
 
 } // namespace modm

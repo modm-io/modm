@@ -94,8 +94,8 @@ DeviceThread::update()
 		MODM_LOG_DEBUG.printf("[dev  ] ping3\n");
 		MODM_LOG_DEBUG.printf("[dev  ] ping3 res: %d\n", PT_CALL(dev3.ping()));
 		// Do again in 1s
-		this->timeout.restart(1000);
-		PT_WAIT_UNTIL(this->timeout.isExpired());
+		timeout.restart(1s);
+		PT_WAIT_UNTIL(timeout.isExpired());
 	}
 
 	PT_END();

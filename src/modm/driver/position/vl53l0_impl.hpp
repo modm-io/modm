@@ -60,7 +60,7 @@ modm::Vl53l0<I2cMaster>::reset()
 	// Wait until the device responds again
 	// After releasing reset it does not accept any I2C transactions
 	// for some time and will respond with NACKs
-	timeout.restart(500);
+	timeout.restart(500ms);
 	RF_WAIT_UNTIL(RF_CALL(ping()) or timeout.isExpired());
 
 	RF_END_RETURN(not timeout.isExpired());
@@ -659,7 +659,7 @@ modm::Vl53l0<I2cMaster>::poll(Register reg, Predicate pred, const uint16_t timeo
 			break;
 		}
 
-		timeout.restart(stepMs);
+		timeout.restart(std::chrono::milliseconds(stepMs));
 		RF_WAIT_UNTIL(timeout.isExpired());
 
 		if(index >= stepMs) {

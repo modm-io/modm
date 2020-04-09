@@ -162,8 +162,8 @@ private:
 	modm::ResumableResult<bool>
 	setLimitRegister(Register reg, float temperature);
 
-	modm::ShortTimeout timeout;
 	uint16_t updateTime;
+	modm::ShortTimeout timeout;
 
 	Config2_t config_lsb;
 };

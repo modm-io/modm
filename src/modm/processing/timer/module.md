@@ -1,141 +1,178 @@
 # Software Timers
 
-An implementation of lightweight software timeouts and periodic timers.
+This module provides polling based software timers for executing code after a
+delay or periodically in millisecond resolution via `modm::Clock` and in
+microsecond resolution via `modm::PreciseClock`.
 
-- `modm::Timestamp` containing a time in millisecond resolution up to 49 days.
-- `modm::Timeout` for timeouts up to 24 days.
-- `modm::PeriodicTimer` for periodic timeouts up to 24 days periods.
-
-There are also 16-bit versions of these, in case you need to preserve memory:
-
-- `modm::ShortTimestamp` containing a time in millisecond resolution up to 65 seconds.
-- `modm::ShortTimeout` for timeouts up to 32 seconds.
-- `modm::ShortPeriodicTimer` for periodic timeouts up to 32 second periods.
-
-These classes default to using `modm::Clock`, which must be implemented on your
-system to return a time with millisecond resolution.
-
-You may also create your own timers with custom time bases and resolutions
-using these classes:
-
-- `modm::GenericTimestamp`.
-- `modm::GenericTimeout`.
-- `modm::GenericPeriodicTimer`.
-
-!!! warning
-	Never use these classes when a precise timebase is needed!
-
-## Timeouts
-
-The `modm::GenericTimeout` classes allow for a signal to be generated after a
-period of time, which can also be used to execute code once after timeout
-expiration.
-
-Its behavior can be described by the following annotated waveform:
-
-- C: Default Constructor
-- S: (Re-)Start timeout
-- E: Timeout Expired
-- H: Code handler (`execute()` returned `true`)
-- P: Stop timeout
-
-```
-Event:    C      S      E     H       P            S          E H
-                         _____________                         ______________
-Expired:  ______________/             \_______________________/              ...
-                  ______                            __________
-Armed:    _______/      \__________________________/          \______________...
-          _______                      ____________
-Stopped:         \____________________/            \_________________________...
-
-                              _                                 _
-Handle:   ___________________/ \_______________________________/ \___________...
-
-Remaining:   0  |   +   |      -      |     0      |     +     |   -
-
-     time ——————>
-```
-
-The default constructor initializes the timeout in the `Stopped` state,
-in which `isExpired()` and `execute()` never return `true`.
-If you need a timeout to expire immidiately after construction, you need
-to explicitly initialize the constructor with time `0`, which has the
-same behavior as `restart(0)`.
-
-If you want to execute code once after the timeout expired, poll the
-`execute()` method, which returns `true` exactly once after expiration.
+To delay or delegate execution to the future, you can use `modm::Timeout` to set
+a duration after which the timeout expires and executes your code:
 
 ```cpp
-if (timeout.execute())
+modm::Timeout timeout{100ms};
+while (not timeout.isExpired()) ;
+// your code after a delay
+```
+
+However, this construct is not very useful, particularly since you could also
+simply use `modm::delay(100ms)` for this, so instead use the `execute()`
+method to poll non-blockingly for expiration:
+
+```cpp
+modm::Timeout timeout{100ms};
+
+void update()
 {
-    // called once after timeout
-    Led::toggle();
+    if (timeout.execute())
+    {
+        // your code after a expiration
+    }
+}
+// You must call the update() function in your main loop now!
+int main()
+{
+    while(1)
+    {
+        update();
+    }
 }
 ```
 
-Be aware, however, that since this method is polled, it cannot execute
-exactly at the time of expiration, but some time after expiration, as
-indicated in the above waveform graph.
-
-The `remaining()` time until expiration is signed positive before, and
-negative after expiration. This means `Clock::now() + Timeout::remaining()`
-will yield the timestamp of the expiration.
-If the timeout is stopped, `remaining()` returns zero.
-
-
-## Periodic Timers
-
-The `modm::GenericPeriodicTimer` class allows for periodic code execution.
-
-Its behavior can be described by the following annotated waveform:
-
-- C: Constructor
-- S: (Re-)Start timer
-- I: Period interval
-- H: Code handler (`execute()` returned `true`)
-- P: Stop timer
-
-```
-Event:    C         IH        I         I  H      I  S    IH   I    IH  P
-                     _         _____________       __      _    ______
-Expired:  __________/ \_______/             \_____/  \____/ \__/      \____...
-          __________   _______               _____    ____   __        _
-Armed:              \_/       \_____________/     \__/    \_/  \______/ \__...
-                                                                         __
-Stopped:  ______________________________________________________________/  ...
-
-                     _                     _               _         _
-Handle:   __________/ \___________________/ \_____________/ \_______/ \____...
-
-Remaining:     +    |0|   +   |     -     |0|  +  | -|  + |0| +| -  |0|+| 0
-
-     time ——————>
-```
-
-If you want to execute code once per period interval, poll the
-`execute()` method, which returns `true` exactly once after expiration.
+The `execute()` method returns true only once after expiration, so it can be
+continuously polled somewhere in your code. A more comfortable use-case is to
+use a `modm::Timeout` inside a class that needs to provide some asynchronous
+method for timekeeping:
 
 ```cpp
-if (timer.execute())
+class DelayEvents
 {
-    // periodically called once
-    Led::toggle();
+    modm::Timeout timeout;
+public:
+    void event() { timeout.restart(100ms); }
+    void update()
+    {
+        if (timeout.execute()) {
+            // delegated code here
+        }
+    }
 }
 ```
 
-Be aware, however, that since this method is polled, it cannot execute
-exactly at the time of expiration, but some time after expiration, as
-indicated in the above waveform graph.
-If one or several periods are missed when polling `execute()`, these
-code executions are discarded and will not be caught up.
-Instead, `execute()` returns `true` once and then reschedules itself
-for the next period, without any period skewing.
+However, for more complex use-cases, these classes are intended to be used with
+Protothreads (from module `modm:processing:protothread`) or Resumable Functions
+(from module `modm:processing:resumable`) to implement non-blocking delays.
 
-Notice, that the `PeriodicTimerState::Expired` is reset to
-`PeriodicTimerState::Armed` only after `execute()` has returned `true`.
-This is different to the behavior of GenericTimeout, where calls to
-`GenericTimeout::execute()` have no impact on class state.
+```cpp
+class FancyDelayEvents : public modm::pt::Protothread
+{
+    modm::Timeout timeout;
+public:
+    void event()
+    {
+        this->restart(); // restart entire protothread
+    }
+    bool update()
+    {
+        PT_BEGIN();
 
-The `remaining()` time until period expiration is signed positive before,
-and negative after period expiration until `execute()` is called.
-If the timer is stopped, `remaining()` returns zero.
+        // pre-delay computation
+        timeout.restart(100ms);
+        PT_WAIT_UNTIL(timeout.isExpired());
+        // post-delay computation
+
+        PT_END();
+    }
+}
+```
+
+For periodic timeouts, you could simply restart the timeout, however, the
+`restart()` method schedules a timeout from the *current* time onwards:
+
+```cpp
+void update()
+{
+    if (timeout.execute())
+    {
+        // delayed code
+        timeout.restart(); // restarts but with *current* time!!!
+    }
+}
+
+```
+
+This can lead to longer period than required, particularly in a system that has
+a lot to do and cannot service every timeout immediately. The solution is to use
+a `modm::PeriodicTimer`, which only reimplements the `execute()` method to
+automatically restart the timer, by adding the interval to the *old* time, thus
+keeping the period accurate:
+
+```cpp
+modm::PeriodicTimer timer{100ms};
+void update()
+{
+    if (timer.execute()) // automatically restarts
+    {
+        // blink an LED or something
+    }
+}
+```
+
+The `execute()` method actually returns the number of missed periods, so that in
+a heavily congested system you do not need to keep track of time yourself. This
+can be particularly useful when dealing with soft-time physical systems like LED
+animations or control loops:
+
+```cpp
+modm::PeriodicTimer timer{1ms}; // render at 1kHz ideally
+void update()
+{
+    // call only once regarless of the number of periods
+    if (const size_t periods = timer.execute(); periods)
+    {
+        animation.step(periods); // still compute the missing steps
+        animation.render();      // but only render once please
+    }
+    // or alternatively to call the code the number of missed periods
+    for (auto periods{timer.execute()}; periods; periods--)
+    {
+        // periods is decreasing!
+    }
+    // This is fine, since execute() is evaluated only once!
+    for (auto periods : modm::range(timer.execute()))
+    {
+        // periods is increasing!
+    }
+    // THIS WILL NOT WORK, since execute() reschedules itself immediately!
+    for (auto periods{0}; periods < timer.execute(); periods++)
+    {
+        // called at most only once!!! periods == 0 always!
+    }
+}
+```
+
+!!! warning "DO NOT use for hard real time systems!"
+    You are responsible for polling these timers `execute()` methods as often as
+    required. If you need to meed hard real time deadlines these are not the
+    timers you are looking for!
+
+!!! note "Timers are stopped by default!"
+    If you want to start a timer at construction time, give the constructor a
+    duration. Duration Zero will expire the timer immediately
+
+## Resolution
+
+Two timer resolutions are available, using `modm::Clock` for milliseconds and
+`modm::PreciseClock` for microseconds. They follow the same naming scheme:
+
+- `modm::Timeout`, `modm::PeriodicTimer`: 49 days in milliseconds and 8 bytes.
+- `modm::PreciseTimeout`, `modm::PrecisePeriodicTimer`: 71 mins in microseconds
+  and 8 bytes.
+
+If you deal with short time periods, you can save a little memory by using the
+16-bit versions of the same timers:
+
+- `modm::ShortTimeout`, `modm::ShortPeriodicTimer`: 65 seconds in milliseconds
+  and 4 bytes.
+- `modm::ShortPreciseTimeout`, `modm::ShortPrecisePeriodicTimer`: 65
+  milliseconds in microseconds and 4 bytes.
+
+

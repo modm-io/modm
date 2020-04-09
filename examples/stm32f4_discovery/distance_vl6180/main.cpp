@@ -64,8 +64,8 @@ public:
 			 	break;
 			}
 			// otherwise, try again in 100ms
-			this->timeout.restart(100);
-			PT_WAIT_UNTIL(this->timeout.isExpired());
+			timeout.restart(100ms);
+			PT_WAIT_UNTIL(timeout.isExpired());
 		}
 
 		MODM_LOG_DEBUG << "Device responded" << modm::endl;
@@ -75,12 +75,12 @@ public:
 			if (PT_CALL(distance.initialize()))
 				break;
 			// otherwise, try again in 100ms
-			this->timeout.restart(100);
-			PT_WAIT_UNTIL(this->timeout.isExpired());
+			timeout.restart(100ms);
+			PT_WAIT_UNTIL(timeout.isExpired());
 		}
 
 		MODM_LOG_DEBUG << "Device initialized" << modm::endl;
-		this->timeout.restart(1);
+		timeout.restart(1ms);
 
 		PT_CALL(distance.setIntegrationTime(10));
 
@@ -125,8 +125,8 @@ public:
 
 			MODM_LOG_DEBUG << " \tt=" << (modm::Clock::now() - stamp) << modm::endl;
 
-			PT_WAIT_UNTIL(this->timeout.isExpired());
-			this->timeout.restart(40);
+			PT_WAIT_UNTIL(timeout.isExpired());
+			timeout.restart(40ms);
 		}
 
 		PT_END();
@@ -153,7 +153,7 @@ main()
 
 	MODM_LOG_INFO << "\n\nWelcome to VL6180X demo!\n\n";
 
-	modm::ShortPeriodicTimer tmr(500);
+	modm::ShortPeriodicTimer tmr(500ms);
 
 	while (true)
 	{

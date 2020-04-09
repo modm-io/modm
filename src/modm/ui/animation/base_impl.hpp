@@ -15,15 +15,8 @@
 // ----------------------------------------------------------------------------
 
 template< typename T >
-modm::ui::Animation<T>::Animation(T &value)
-:	Animation(value, nullptr)
-{
-}
-
-template< typename T >
 modm::ui::Animation<T>::Animation(T &value, Handler handler)
-:	handler(handler), currentValue(value), endValue(0),
-	 animationTime(0), previous(0)
+:	handler(handler), currentValue(value)
 {
 }
 
@@ -85,7 +78,7 @@ modm::ui::Animation<T>::animateTo(T value, TimeType time)
 	endValue = value;
 	animationTime = time;
 	interpolation.initialize(currentValue, endValue, animationTime);
-	previous = modm::Clock::nowShort();
+	previous = modm::Clock::now();
 	return true;
 }
 
@@ -101,11 +94,11 @@ modm::ui::Animation<T>::update()
 	if (animationTime > 0)
 	{
 		// buffer the delta time
-		modm::ShortTimestamp now = modm::Clock::nowShort();
+		const modm::ShortTimestamp now = modm::Clock::now();
 		// this cast requires us to be updates once at least every 255ms
 		// If this method is not called every few ms, the animation does
 		// not look good anyways, so this limitation is okay.
-		uint_fast8_t delta = (now - previous).getTime();
+		uint_fast8_t delta = (now - previous).count();
 
 		// check if at least 1ms has passed
 		if (delta)

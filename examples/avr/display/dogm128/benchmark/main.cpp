@@ -47,15 +47,11 @@ modm::DogM128< lcd::SPI, lcd::Cs, lcd::A0, lcd::Reset, true > display;
 
 using namespace modm::glcd;
 
-// timer interrupt routine
-MODM_ISR(TIMER2_COMPA)
-{
-	modm::Clock::increment();
-}
-
 void
 setup()
 {
+	SystemClock::enable();
+
 	led::R::set();
 	led::G::set();
 	led::B::reset();
@@ -66,13 +62,6 @@ setup()
 
 	lcd::SPI::connect<lcd::Sck::BitBang, lcd::Mosi::BitBang>();
 	lcd::SPI::initialize<SystemClock, 2_MHz>();
-
-	// timer initialization
-	// compare-match-interrupt every 1 ms at 14.7456 MHz
-	TCCR2A = (1 << WGM21);
-	TCCR2B = (1 << CS22);
-	TIMSK2 = (1 << OCIE2A);
-	OCR2A = 230;
 
 	// enable interrupts
 	enableInterrupts();
@@ -165,7 +154,7 @@ main()
 
 	display.setFont(modm::font::FixedWidth5x8);
 
-	modm::ShortPeriodicTimer timer(1000);
+	modm::ShortPeriodicTimer timer(1s);
 	while (true)
 	{
 		uint8_t iter = 0;

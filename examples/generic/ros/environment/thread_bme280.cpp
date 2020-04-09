@@ -49,8 +49,8 @@ Bme280Thread::update()
 		if (PT_CALL(barometer.ping()))
 			break;
 		// otherwise, try again in 100ms
-		this->timeout.restart(100);
-		PT_WAIT_UNTIL(this->timeout.isExpired());
+		timeout.restart(100ms);
+		PT_WAIT_UNTIL(timeout.isExpired());
 	}
 
 	// Configure the device until it responds
@@ -60,8 +60,8 @@ Bme280Thread::update()
 		if (PT_CALL(barometer.initialize()))
 			break;
 		// otherwise, try again in 100ms
-		this->timeout.restart(100);
-		PT_WAIT_UNTIL(this->timeout.isExpired());
+		timeout.restart(100ms);
+		PT_WAIT_UNTIL(timeout.isExpired());
 	}
 
 	MODM_LOG_DEBUG << MODM_FILE_INFO;

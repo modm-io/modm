@@ -241,7 +241,7 @@ private:
 	/// Depending on the amount of retransmissions and the auto retransmit delay
 	/// this timeout can become quite large. Worst case is 4000us * 15 = 60ms
 	/// plus some processing times. We consider the worst case here.
-	static constexpr int sendingInterruptTimeoutMs = 65;
+	static constexpr std::chrono::milliseconds sendingInterruptTimeoutMs{65};
 };
 
 }	// namespace modm

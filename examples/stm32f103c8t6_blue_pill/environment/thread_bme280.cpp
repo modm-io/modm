@@ -53,8 +53,8 @@ Bme280Thread::update()
 		if (PT_CALL(barometerA.ping()))
 			break;
 		// otherwise, try again in 100ms
-		this->timeout.restart(100);
-		PT_WAIT_UNTIL(this->timeout.isExpired());
+		timeout.restart(100ms);
+		PT_WAIT_UNTIL(timeout.isExpired());
 	}
 
 	while(true)
@@ -63,8 +63,8 @@ Bme280Thread::update()
 		if (PT_CALL(barometerB.ping()))
 			break;
 		// otherwise, try again in 100ms
-		this->timeout.restart(100);
-		PT_WAIT_UNTIL(this->timeout.isExpired());
+		timeout.restart(100ms);
+		PT_WAIT_UNTIL(timeout.isExpired());
 	}
 
 	// stream << "Barometer BME280 responded" << modm::endl;
@@ -76,8 +76,8 @@ Bme280Thread::update()
 		if (PT_CALL(barometerA.initialize()))
 			break;
 		// otherwise, try again in 100ms
-		this->timeout.restart(100);
-		PT_WAIT_UNTIL(this->timeout.isExpired());
+		timeout.restart(100ms);
+		PT_WAIT_UNTIL(timeout.isExpired());
 	}
 
 	while(true)
@@ -86,8 +86,8 @@ Bme280Thread::update()
 		if (PT_CALL(barometerB.initialize()))
 			break;
 		// otherwise, try again in 100ms
-		this->timeout.restart(100);
-		PT_WAIT_UNTIL(this->timeout.isExpired());
+		timeout.restart(100ms);
+		PT_WAIT_UNTIL(timeout.isExpired());
 	}
 
 	MODM_LOG_DEBUG << MODM_FILE_INFO;

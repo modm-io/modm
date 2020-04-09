@@ -1,0 +1,12 @@
+<library>
+  <extends>modm:arduino-nano</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/avr/timer</option>
+  </options>
+  <modules>
+    <module>modm:architecture:delay</module>
+    <module>modm:processing:timer</module>
+    <module>modm:build:scons</module>
+    <module>modm:build:cmake</module>
+  </modules>
+</library>
