@@ -14,7 +14,7 @@ from os.path import abspath, relpath
 
 def build_target(env, sources):
 	# Building application
-	program = env.Program(target=env["CONFIG_PROJECT_NAME"]+".elf", source=sources)
+	program = env.Program(target=env["CONFIG_PROJECT_NAME"]+"{{ program_extension }}", source=sources)
 
 %% if with_compilation_db
 	env.Command("compile_commands.json", sources,
