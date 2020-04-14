@@ -1,0 +1,12 @@
+<library>
+  <extends>modm:nucleo-f303re</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_f303re/itm</option>
+    <option name="modm:platform:itm:buffer.tx">250</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:itm</module>
+    <module>modm:processing:timer</module>
+  </modules>
+</library>

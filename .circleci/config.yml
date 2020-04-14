@@ -88,7 +88,7 @@ jobs:
       - run:
           name: Examples STM32F3 Series
           command: |
-            (cd examples && ../tools/scripts/examples_compile.py stm32f3_discovery nucleo_f303k8)
+            (cd examples && ../tools/scripts/examples_compile.py stm32f3_discovery nucleo_f303k8 nucleo_f303re)
       - run:
           name: Examples STM32F7 Series
           command: |

@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:nucleo-f303re</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_f303re/rtos</option>
+  </options>
+  <modules>
+    <module>modm:processing:rtos</module>
+    <module>modm:platform:heap</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>
