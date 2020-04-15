@@ -237,7 +237,7 @@ def validate(env):
         all_peripherals.extend([get_driver(r) for r in driver["remap"]])
     bprops["all_peripherals"] = sorted(list(set(all_peripherals)))
     bprops["all_signals"] = sorted(list(set(s["name"] for s in all_signals.values())))
-    bprops["pf"] = "1" if device.identifier["family"] in ["l4", "g0", "g4"] else ""
+    bprops["pf"] = "1" if device.identifier["family"] in ["l4", "g0", "g4", "h7"] else ""
 
     # Check the max number of ADC instances
     max_adc_instance = max(map(int, device.get_driver("adc").get("instance", [1])))

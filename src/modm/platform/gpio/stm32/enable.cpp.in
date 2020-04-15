@@ -17,7 +17,9 @@ void
 modm_gpio_enable(void)
 {
 %%	set prefix = "GPIO"
-%% if target["family"] in ["f2", "f4", "f7"]
+%% if target["family"] in ["h7"]
+%%	set clock_tree = "AHB4"
+%% elif target["family"] in ["f2", "f4", "f7"]
 %%	set clock_tree = "AHB1"
 %% elif target["family"] in ["f0", "f3", "l1"]
 %%	set clock_tree = "AHB"
@@ -30,6 +32,10 @@ modm_gpio_enable(void)
 %%  set clock_tree = 'IOP'
 %% endif
 
+%% if target["family"] in ["h7"]
+	// Enable I/O compensation cell
+	SYSCFG->CCCSR = SYSCFG_CCCSR_EN;
+%% endif
 %% if target["family"] in ["f2", "f4", "f7"]
 	// Enable I/O compensation cell
 	SYSCFG->CMPCR = SYSCFG_CMPCR_CMP_PD;
