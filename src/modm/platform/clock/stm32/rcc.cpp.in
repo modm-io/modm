@@ -141,7 +141,40 @@ modm::platform::Rcc::enableLowSpeedExternalCrystal(uint32_t waitCycles)
 bool
 modm::platform::Rcc::enablePll(PllSource source, const PllFactors& pllFactors, uint32_t waitCycles)
 {
-%% if target["family"] in ["f2", "f4", "f7"]
+%% if target["family"] in ["h7"]
+	// Read reserved values and clear all other values
+	uint32_t srctmp = RCC->PLLCKSELR & ~(RCC_PLLCKSELR_PLLSRC);
+	// PLLSRC source for pll and for plli2s
+	srctmp |= static_cast<uint32_t>(source);
+
+	RCC->PLLCKSELR = srctmp;
+
+	uint32_t divtmp = RCC->PLL1DIVR & ~(RCC_PLL1DIVR_R1
+			| RCC_PLL1DIVR_Q1 | RCC_PLL1DIVR_P1 | RCC_PLL1DIVR_N1);
+
+	// PLLM (0) = factor is user defined VCO input frequency must be configured to 2MHz
+	divtmp |= (((uint32_t) pllFactors.pll1DivR1) << RCC_PLL1DIVR_R1_Pos) & RCC_PLL1DIVR_R1;
+
+	// PLLN (6) = factor is user defined
+	divtmp |= (((uint32_t) pllFactors.pll1DivQ1) << RCC_PLL1DIVR_Q1_Pos) & RCC_PLL1DIVR_Q1;
+
+	// PLLP (16) divider for CPU frequency; (00: PLLP = 2, 01: PLLP = 4, etc.)
+	divtmp |= (((uint32_t) pllFactors.pll1DivP1) << RCC_PLL1DIVR_P1_Pos) & RCC_PLL1DIVR_P1;
+
+	divtmp |= (((uint32_t) pllFactors.pll1DivN1) << RCC_PLL1DIVR_N1_Pos) & RCC_PLL1DIVR_N1;
+
+	RCC->PLL1DIVR = divtmp;
+
+	// enable pll
+	RCC->CR |= RCC_CR_PLL1ON;
+
+	uint32_t tmp;
+	while (not (tmp = (RCC->CR & RCC_CR_PLL1RDY)) and --waitCycles)
+		;
+
+	return tmp;
+
+%% elif target["family"] in ["f2", "f4", "f7"]
 	// Read reserved values and clear all other values
 	uint32_t tmp = RCC->PLLCFGR & ~(RCC_PLLCFGR_PLLSRC | RCC_PLLCFGR_PLLM
 			| RCC_PLLCFGR_PLLN | RCC_PLLCFGR_PLLP | RCC_PLLCFGR_PLLQ);

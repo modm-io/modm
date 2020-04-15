@@ -72,6 +72,9 @@ Rcc::setFlashLatency()
 %% elif target["family"] in ["g0"]
 	// enable flash prefetch and instruction cache
 	acr |= FLASH_ACR_PRFTEN | FLASH_ACR_ICEN;
+%% elif target["family"] == "h7"
+	// TODO(elias) calculate correct number of wait cycles
+	acr |= FLASH_ACR_WRHIGHFREQ_1 | FLASH_ACR_WRHIGHFREQ_0;
 %% elif target["family"] == "f7"
 	// enable flash prefetch and flash accelerator
 	acr |= FLASH_ACR_PRFTEN | FLASH_ACR_ARTEN;
@@ -160,4 +163,3 @@ Rcc::isEnabled()
 }
 
 }   // namespace modm::platform
-

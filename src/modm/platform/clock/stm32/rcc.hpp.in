@@ -40,7 +40,12 @@ public:
 	enum class
 	PllSource : uint32_t
 	{
-%% if target["family"] in ["f2", "f4", "f7", "l4", "g0", "g4"]
+%% if target["family"] in ["h7"]
+		/// High speed internal clock (16 MHz)
+		Hsi = RCC_PLLCKSELR_PLLSRC_HSI,
+		/// High speed external clock (see HseConfig)
+		Hse = RCC_PLLCKSELR_PLLSRC_HSE,
+%% elif target["family"] in ["f2", "f4", "f7", "l4", "g0", "g4"]
 		/// High speed internal clock (16 MHz)
 		Hsi = RCC_PLLCFGR_PLLSRC_HSI,
 		/// High speed external clock (see HseConfig)
@@ -108,7 +113,11 @@ public:
 		InternalClock = Hsi,
 		ExternalClock = Hse,
 		ExternalCrystal = Hse,
+%% if target["family"] in ["h7"]
+		Pll = RCC_CFGR_SW_PLL1,
+%% else
 		Pll = RCC_CFGR_SW_PLL,
+%% endif
 	};
 
 	enum class
@@ -140,6 +149,17 @@ public:
 	enum class
 	AhbPrescaler : uint32_t
 	{
+%% if target["family"] in ["h7"]
+		Div1   = RCC_D1CFGR_HPRE_DIV1,
+		Div2   = RCC_D1CFGR_HPRE_DIV2,
+		Div4   = RCC_D1CFGR_HPRE_DIV4,
+		Div8   = RCC_D1CFGR_HPRE_DIV8,
+		Div16  = RCC_D1CFGR_HPRE_DIV16,
+		Div64  = RCC_D1CFGR_HPRE_DIV64,
+		Div128 = RCC_D1CFGR_HPRE_DIV128,
+		Div256 = RCC_D1CFGR_HPRE_DIV256,
+		Div512 = RCC_D1CFGR_HPRE_DIV512
+%% else
 		Div1   = RCC_CFGR_HPRE_DIV1,
 		Div2   = RCC_CFGR_HPRE_DIV2,
 		Div4   = RCC_CFGR_HPRE_DIV4,
@@ -149,6 +169,7 @@ public:
 		Div128 = RCC_CFGR_HPRE_DIV128,
 		Div256 = RCC_CFGR_HPRE_DIV256,
 		Div512 = RCC_CFGR_HPRE_DIV512
+%% endif
 	};
 
 %% if target["family"] in ["f0", "g0"]
@@ -160,6 +181,26 @@ public:
 		Div4   = RCC_CFGR_PPRE_DIV4,
 		Div8   = RCC_CFGR_PPRE_DIV8,
 		Div16  = RCC_CFGR_PPRE_DIV16
+	};
+%% elif target["family"] in ["h7"]
+	enum class
+	Apb1Prescaler : uint32_t
+	{
+		Div1   = RCC_D2CFGR_D2PPRE1_DIV1,
+		Div2   = RCC_D2CFGR_D2PPRE1_DIV2,
+		Div4   = RCC_D2CFGR_D2PPRE1_DIV4,
+		Div8   = RCC_D2CFGR_D2PPRE1_DIV8,
+		Div16  = RCC_D2CFGR_D2PPRE1_DIV16
+	};
+
+	enum class
+	Apb2Prescaler : uint32_t
+	{
+		Div1   = RCC_D2CFGR_D2PPRE2_DIV1,
+		Div2   = RCC_D2CFGR_D2PPRE2_DIV2,
+		Div4   = RCC_D2CFGR_D2PPRE2_DIV4,
+		Div8   = RCC_D2CFGR_D2PPRE2_DIV8,
+		Div16  = RCC_D2CFGR_D2PPRE2_DIV16
 	};
 %% else
 	enum class
@@ -183,7 +224,7 @@ public:
 	};
 %% endif
 
-%% if target["family"] in ["f2", "f4", "f7"]
+%% if target["family"] in ["f2", "f4", "f7", "h7"]
 	enum class
 	ClockOutput1Source : uint32_t
 	{
@@ -356,7 +397,12 @@ public:
 	 */
 	struct PllFactors
 	{
-%% if target["family"] in ["f2", "f4", "f7", "l4", "g0", "g4"]
+%% if target["family"] in ["h7"]
+		const uint8_t pll1DivR1;
+		const uint8_t pll1DivQ1;
+		const uint8_t pll1DivP1;
+		const uint16_t pll1DivN1;
+%% elif target["family"] in ["f2", "f4", "f7", "l4", "g0", "g4"]
 		const uint8_t pllM;
 		const uint16_t pllN;
  %% if target["family"] in ["l4", "g0", "g4"]
@@ -444,6 +490,20 @@ public:
 		};
 		return enablePll(source, pllFactors, waitCycles);
 	}
+%% elif target["family"] in ["h7"]
+	[[deprecated("Use PllFactors as argument instead")]] static bool
+	enablePll(PllSource source, uint8_t pll1DivR1, uint8_t pll1DivQ1,
+						uint8_t pll1DivP1, uint16_t pll1DivN1,
+	          uint32_t waitCycles = 2048)
+	{
+		PllFactors pllFactors{
+			.pll1DivR1 = pll1DivR1,
+			.pll1DivQ1 = pll1DivQ1,
+			.pll1DivP1 = pll1DivP1,
+			.pll1DivN1 = pll1DivN1,
+		};
+		return enablePll(source, pllFactors, waitCycles);
+	}
 %% elif target["family"] in ["l1"]
 	[[deprecated("Use PllFactors as argument instead")]] static bool
 	enablePll(PllSource source, PllMultiplier pllMul, uint8_t pllDiv,
@@ -498,7 +558,7 @@ public:
 	enableWatchdogClock(WatchdogClockSource /*src*/)
 	{ return true; }
 
-%% if target["family"] in ["f2", "f4", "f7"]
+%% if target["family"] in ["f2", "f4", "f7", "h7"]
 	static inline bool
 	enableClockOutput1(ClockOutput1Source src, uint8_t div)
 	{
@@ -553,7 +613,11 @@ public:
 	static inline bool
 	setAhbPrescaler(AhbPrescaler prescaler)
 	{
+%% if target["family"] in ["h7"]
+		RCC->D1CFGR = (RCC->D1CFGR & ~RCC_D1CFGR_HPRE) | uint32_t(prescaler);
+%% else
 		RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_HPRE) | uint32_t(prescaler);
+%% endif
 		return true;
 	}
 
@@ -562,6 +626,20 @@ public:
 	setApbPrescaler(ApbPrescaler prescaler)
 	{
 		RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_PPRE) | uint32_t(prescaler);
+		return true;
+	}
+%% elif target["family"] in ["h7"]
+	static inline bool
+	setApb1Prescaler(Apb1Prescaler prescaler)
+	{
+		RCC->D2CFGR = (RCC->D2CFGR & ~RCC_D2CFGR_D2PPRE1) | uint32_t(prescaler);
+		return true;
+	}
+
+	static inline bool
+	setApb2Prescaler(Apb2Prescaler prescaler)
+	{
+		RCC->D2CFGR = (RCC->D2CFGR & ~RCC_D2CFGR_D2PPRE2) | uint32_t(prescaler);
 		return true;
 	}
 %% else
