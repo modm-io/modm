@@ -39,6 +39,10 @@ def build(env):
         properties["hsi_frequency"] = 8
         properties["lsi_frequency"] = 40
         properties["boot_frequency"] = properties["hsi_frequency"]
+    elif target["family"] in ["h7"]:
+        properties["hsi_frequency"] = 64
+        properties["lsi_frequency"] = 32
+        properties["boot_frequency"] = properties["hsi_frequency"]
     elif target["family"] in ["l0", "l1"]:
         properties["hsi_frequency"] = 16
         properties["lsi_frequency"] = 37
@@ -60,8 +64,24 @@ def build(env):
     properties["pll_p"] = ((target["family"] == "l4" and target["name"] not in ["12", "22"]) or target["family"] == "g4")
     properties["overdrive"] = (target["family"] == "f7") or \
         ((target["family"] == "f4") and target["name"] in ["27", "29", "37", "39", "46", "69", "79"])
+    properties["vos0_overdrive"] = (target["family"] == "h7") and \
+        target["name"] in ["42", "43", "45", "47", "50", "53", "55", "57"]
     properties["pllsai_p_usb"] = (target["family"] == "f7") or \
         ((target["family"] == "f4") and target["name"] in ["46", "69", "79"])
+    properties["cfgr1"] = ("CDCFGR1" if target.name in ["a0", "a3", "b0", "b3"] else "D1CFGR") \
+                           if target.family == "h7" else "CFGR"
+    properties["d1"] = ("CD" if target.name in ["a0", "a3", "b0", "b3"] else "D1") \
+                        if target.family == "h7" else ""
+    properties["cfgr2"] = ("CDCFGR2" if target.name in ["a0", "a3", "b0", "b3"] else "D2CFGR") \
+                           if target.family == "h7" else "CFGR"
+    properties["d2"] = ("CD" if target.name in ["a0", "a3", "b0", "b3"] else "D2") \
+                        if target.family == "h7" else ""
+    properties["cfgr3"] = ("SRDCFGR" if target.name in ["a0", "a3", "b0", "b3"] else "D3CFGR")
+    properties["d3"] = ("SRD" if target.name in ["a0", "a3", "b0", "b3"] else "D3")
+    properties["bdcr"] = "CSR" if target.family in ["l0", "l1"] else "BDCR"
+    properties["pll_ids"] = ["1", "2", "3"] if target.family == "h7" else [""]
+    properties["has_smps"] = target["family"] == "h7" and (target["name"] in ["25", "35", "45", "47", "55", "57"] or \
+        (target["name"] in ["30", "a3", "b0", "b3"] and target["variant"] == "q"))
 
     flash_latencies = {}
     for vcore in device.get_driver("flash")["latency"]:
@@ -105,6 +125,13 @@ def build(env):
         if "Dac1" in all_peripherals and per == "DAC":
             per = "DAC1"
             nper = "DAC"
+        # DAC12
+        if "Dac1" in all_peripherals and per == "DAC12":
+            per = "DAC1"
+            nper = "DAC12"
+        if "Dac2" in all_peripherals and per == "DAC12":
+            per = "DAC2"
+            nper = "DAC12"
         if "Dac" in all_peripherals and per == "DAC1":
             per = "DAC"
             nper = "DAC1"
@@ -122,6 +149,8 @@ def build(env):
         if "Usbotgfs" in all_peripherals and per.startswith("OTG"):
             if per == "OTGH": per = "OTGHS";
             per = "USB"+per
+        if "Usbotgfs" in all_peripherals and per.startswith("USB"):
+            per = per.replace("USB1", "USB").replace("USB2", "USB")
             # print(per, mode)
         if per.capitalize() not in all_peripherals:
             continue

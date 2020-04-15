@@ -77,7 +77,7 @@ Rcc::setFlashLatency()
 %% elif target["family"] == "l0"
 	// enable flash prefetch and pre-read
 	acr |= FLASH_ACR_PRFTEN | FLASH_ACR_PRE_READ;
-%% else
+%% elif target["family"] != "h7"
 	// enable flash prefetch
 	acr |= FLASH_ACR_PRFTBE;
 %% endif
@@ -164,4 +164,3 @@ Rcc::isEnabled()
 }
 
 }   // namespace modm::platform
-

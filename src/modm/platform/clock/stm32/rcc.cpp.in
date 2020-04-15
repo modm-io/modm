@@ -27,7 +27,7 @@ constinit uint16_t modm_fastdata delay_fcpu_MHz(computeDelayMhz(Rcc::BootFrequen
 constinit uint16_t modm_fastdata delay_ns_per_loop(computeDelayNsPerLoop(Rcc::BootFrequency));
 
 // ----------------------------------------------------------------------------
-%% if target["family"] == "f0"
+%% if target.family == "f0"
 bool
 Rcc::enableInternalClockMHz14(uint32_t waitCycles)
 {
@@ -61,12 +61,12 @@ Rcc::enableInternalClock(uint32_t waitCycles)
 	return retval;
 }
 
-%% if target["family"] in ["l0", "l1", "l4"]
+%% if target.family in ["l0", "l1", "l4"]
 bool
 Rcc::enableMultiSpeedInternalClock(MsiFrequency msi_frequency, uint32_t waitCycles)
 {
 	bool retval;
-%% if target["family"] in ["l0", "l1"]
+%% if target.family in ["l0", "l1"]
 	RCC->ICSCR = (RCC->ICSCR & ~RCC_ICSCR_MSIRANGE) | static_cast<uint32_t>(msi_frequency);
 	RCC->CR |= RCC_CR_MSION;
 	while (not (retval = (RCC->CR & RCC_CR_MSIRDY)) and --waitCycles)
@@ -113,13 +113,8 @@ bool
 Rcc::enableLowSpeedExternalClock(uint32_t waitCycles)
 {
 	bool retval;
-%% if target["family"] in ["l0", "l1"]
-	RCC->CSR |= RCC_CSR_LSEBYP | RCC_CSR_LSEON;
-	while (not (retval = (RCC->CSR & RCC_CSR_LSERDY)) and --waitCycles)
-%% else
-	RCC->BDCR |= RCC_BDCR_LSEBYP | RCC_BDCR_LSEON;
-	while (not (retval = (RCC->BDCR & RCC_BDCR_LSERDY)) and --waitCycles)
-%% endif
+	RCC->{{bdcr}} |= RCC_{{bdcr}}_LSEBYP | RCC_{{bdcr}}_LSEON;
+	while (not (retval = (RCC->{{bdcr}} & RCC_{{bdcr}}_LSERDY)) and --waitCycles)
 		;
 	return retval;
 }
@@ -128,21 +123,46 @@ bool
 Rcc::enableLowSpeedExternalCrystal(uint32_t waitCycles)
 {
 	bool retval;
-%% if target["family"] in ["l0", "l1"]
-	RCC->CSR = (RCC->CSR & ~RCC_CSR_LSEBYP) | RCC_CSR_LSEON;
-	while (not (retval = (RCC->CSR & RCC_CSR_LSERDY)) and --waitCycles)
-%% else
-	RCC->BDCR = (RCC->BDCR & ~RCC_BDCR_LSEBYP) | RCC_BDCR_LSEON;
-	while (not (retval = (RCC->BDCR & RCC_BDCR_LSERDY)) and --waitCycles)
-%% endif
+	RCC->{{bdcr}} = (RCC->{{bdcr}} & ~RCC_{{bdcr}}_LSEBYP) | RCC_{{bdcr}}_LSEON;
+	while (not (retval = (RCC->{{bdcr}} & RCC_{{bdcr}}_LSERDY)) and --waitCycles)
 		;
 	return retval;
 }
 
+%% for id in pll_ids
 bool
-Rcc::enablePll(PllSource source, const PllFactors& pllFactors, uint32_t waitCycles)
+Rcc::enablePll{{id}}(PllSource source, const PllFactors& pllFactors, uint32_t waitCycles)
 {
-%% if target["family"] in ["f2", "f4", "f7"]
+%% if target.family == "h7"
+	// set the PLL{{id}} source and DIVM{{id}} prescaler
+	uint32_t tmp = RCC->PLLCKSELR & ~(RCC_PLLCKSELR_PLLSRC | RCC_PLLCKSELR_DIVM{{id}});
+	tmp |= uint32_t(source);
+	tmp |= (uint32_t(pllFactors.pllM) << RCC_PLLCKSELR_DIVM{{id}}_Pos) & RCC_PLLCKSELR_DIVM{{id}};
+	RCC->PLLCKSELR = tmp;
+
+	// Set Frequency Range
+	tmp = RCC->PLLCFGR & ~(RCC_PLLCFGR_PLL{{id}}RGE | RCC_PLLCFGR_PLL{{id}}VCOSEL);
+	tmp |= uint32_t(pllFactors.range) << RCC_PLLCFGR_PLL{{id}}RGE_Pos;
+	if (pllFactors.range == PllInputRange::MHz1_2) tmp |= RCC_PLLCFGR_PLL{{id}}VCOSEL;
+	RCC->PLLCFGR = tmp;
+
+	// Using integer mode
+	RCC->PLL{{id}}FRACR = pllFactors.pllFrac;
+	// Set PLL Dividers
+	RCC->PLL{{id}}DIVR =
+			((uint32_t(pllFactors.pllR - 1u) << RCC_PLL{{id}}DIVR_R{{id}}_Pos) & RCC_PLL{{id}}DIVR_R{{id}}) |
+			((uint32_t(pllFactors.pllQ - 1u) << RCC_PLL{{id}}DIVR_Q{{id}}_Pos) & RCC_PLL{{id}}DIVR_Q{{id}}) |
+			((uint32_t(pllFactors.pllP - 1u) << RCC_PLL{{id}}DIVR_P{{id}}_Pos) & RCC_PLL{{id}}DIVR_P{{id}}) |
+			((uint32_t(pllFactors.pllN - 1u) << RCC_PLL{{id}}DIVR_N{{id}}_Pos) & RCC_PLL{{id}}DIVR_N{{id}});
+
+	// enable pll
+	RCC->CR |= RCC_CR_PLL{{id}}ON;
+
+	while (not (tmp = (RCC->CR & RCC_CR_PLL{{id}}RDY)) and --waitCycles)
+		;
+
+	return tmp;
+%% elif target.family in ["f2", "f4", "f7"]
 	// Read reserved values and clear all other values
 	uint32_t tmp = RCC->PLLCFGR & ~(RCC_PLLCFGR_PLLSRC | RCC_PLLCFGR_PLLM
 			| RCC_PLLCFGR_PLLN | RCC_PLLCFGR_PLLP);
@@ -174,9 +194,7 @@ Rcc::enablePll(PllSource source, const PllFactors& pllFactors, uint32_t waitCycl
 		;
 
 	return tmp;
-
-%% elif target["family"] in ["g0", "l4", "g4"]
-
+%% elif target.family in ["g0", "l4", "g4"]
 	// Read reserved values and clear all other values
 	uint32_t tmp = RCC->PLLCFGR & ~(
 			RCC_PLLCFGR_PLLSRC | RCC_PLLCFGR_PLLM | RCC_PLLCFGR_PLLN |
@@ -195,7 +213,7 @@ Rcc::enablePll(PllSource source, const PllFactors& pllFactors, uint32_t waitCycl
 	tmp |= (uint32_t(pllFactors.pllN) << RCC_PLLCFGR_PLLN_Pos) & RCC_PLLCFGR_PLLN;
 
 	// PLLR divider for CPU frequency
-%% if target["family"] in ["g0"]
+%% if target.family in ["g0"]
 	tmp |= ((uint32_t(pllFactors.pllR) - 1) << RCC_PLLCFGR_PLLR_Pos) & RCC_PLLCFGR_PLLR;
 	// PLLP divider for P frequency
 	// tmp |= ((uint32_t(pllP) - 1) << RCC_PLLCFGR_PLLP_Pos) & RCC_PLLCFGR_PLLP;
@@ -222,9 +240,8 @@ Rcc::enablePll(PllSource source, const PllFactors& pllFactors, uint32_t waitCycl
 		;
 
 	return tmp;
-
-%% elif target["family"] in ["l0", "l1"]
-%% if target["family"] == "l0"
+%% elif target.family in ["l0", "l1"]
+%% if target.family == "l0"
 	setHsiPredivider4Enabled(pllFactors.enableHsiPrediv4);
 %% endif
 
@@ -242,11 +259,8 @@ Rcc::enablePll(PllSource source, const PllFactors& pllFactors, uint32_t waitCycl
 		;
 
 	return tmp;
-
-
 %% else
-
-%% set pullmul = 'RCC_CFGR_PLLMULL' if target["family"] == "f1" else 'RCC_CFGR_PLLMUL'
+%% set pullmul = 'RCC_CFGR_PLLMULL' if target.family == "f1" else 'RCC_CFGR_PLLMUL'
 	// Read reserved values and clear all other values
 %% if usbprescaler
 	uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_USBPRE | {{pullmul}} | RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE);
@@ -272,7 +286,7 @@ Rcc::enablePll(PllSource source, const PllFactors& pllFactors, uint32_t waitCycl
 	RCC->CFGR = tmp;
 
 %% if pllprediv
-	%% set mask = 'RCC_CFGR2_PREDIV1' if target["family"] == "f1" else 'RCC_CFGR2_PREDIV'
+	%% set mask = 'RCC_CFGR2_PREDIV1' if target.family == "f1" else 'RCC_CFGR2_PREDIV'
 	// HSE PREDIV division factor
 	RCC->CFGR2 = (RCC->CFGR2 & ~({{mask}})) | (uint32_t(pllFactors.pllPrediv - 1) & {{mask}});
 %% endif
@@ -286,8 +300,10 @@ Rcc::enablePll(PllSource source, const PllFactors& pllFactors, uint32_t waitCycl
 		;
 
 	return tmp;
-%%endif
+%% endif
 }
+
+%% endfor
 
 %% if pllsai_p_usb
 bool
@@ -295,12 +311,12 @@ Rcc::enablePllSai(const PllSaiFactors& pllFactors, uint32_t waitCycles)
 {
 	// Read reserved values and clear all other values
 	uint32_t tmp = RCC->PLLSAICFGR & ~(
-%% if target["family"] == "f4" and target["name"] in "46"
+%% if target.family == "f4" and target.name in "46"
 		RCC_PLLSAICFGR_PLLSAIM |
 %% endif
 		RCC_PLLSAICFGR_PLLSAIN | RCC_PLLSAICFGR_PLLSAIP);
 
-%% if target["family"] == "f4" and target["name"] in "46"
+%% if target.family == "f4" and target.name in "46"
 	// PLLSAIM (0) = factor is user defined VCO input frequency must be configured to 2MHz
 	tmp |= ((uint32_t) pllFactors.pllSaiM) & RCC_PLLSAICFGR_PLLSAIM;
 %% endif
@@ -327,25 +343,75 @@ Rcc::enablePllSai(const PllSaiFactors& pllFactors, uint32_t waitCycles)
 bool
 Rcc::enableOverdriveMode(uint32_t waitCycles)
 {
-	RCC->APB1ENR |= RCC_APB1ENR_PWREN;
-
 %% set suffix = '1' if target["family"] == "f7" else ''
 
 	PWR->CR{{suffix}} |= PWR_CR{{suffix}}_ODEN;
 	auto waitCounter = waitCycles;
 	while (!(PWR->CSR{{suffix}} & PWR_CSR{{suffix}}_ODRDY))
-	{
-		if (--waitCounter == 0)
-			return false;
-	}
+		if (--waitCounter == 0) return false;
 
 	PWR->CR{{suffix}} |= PWR_CR{{suffix}}_ODSWEN;
-	waitCounter = waitCycles;
 	while (!(PWR->CSR{{suffix}} & PWR_CSR{{suffix}}_ODSWRDY))
-	{
-		if (--waitCounter == 0)
-			return false;
+		if (--waitCycles == 0) return false;
+
+	return true;
+}
+%% endif
+
+%% if target.family == "h7"
+bool
+Rcc::setVoltageScaling(VoltageScaling voltage, uint32_t waitCycles)
+{
+	auto waitCounter = waitCycles;
+	// wait for power supply to be ready to set VOS setting
+	while(!(PWR->CSR1 & PWR_CSR1_ACTVOSRDY))
+		if (--waitCounter == 0) return false;
+
+%% if vos0_overdrive
+	if (voltage == VoltageScaling::Scale0) {
+		// set VOS1
+		waitCounter = waitCycles;
+		PWR->{{d3}}CR = static_cast<uint32_t>(VoltageScaling::Scale1);
+		while (!(PWR->{{d3}}CR & PWR_{{d3}}CR_VOSRDY))
+			if (--waitCounter == 0) return false;
+
+		// set overdrive
+		SYSCFG->PWRCR |= SYSCFG_PWRCR_ODEN;
+		while (!(PWR->{{d3}}CR & PWR_{{d3}}CR_VOSRDY))
+			if (--waitCycles == 0) return false;
+	} else {
+		// disable overdrive
+		SYSCFG->PWRCR &= ~SYSCFG_PWRCR_ODEN;
+		// set voltage scale
+		PWR->{{d3}}CR = static_cast<uint32_t>(voltage);
+		while (!(PWR->{{d3}}CR & PWR_{{d3}}CR_VOSRDY))
+			if (--waitCycles == 0) return false;
 	}
+%% else
+	// set voltage scale
+	PWR->{{d3}}CR = static_cast<uint32_t>(voltage);
+	waitCounter = waitCycles;
+	while (!(PWR->{{d3}}CR & PWR_{{d3}}CR_VOSRDY))
+		if (--waitCycles == 0) return false;
+%% endif
+
+	return true;
+}
+
+bool
+Rcc::configurePowerSource(PowerSource source, uint32_t waitCycles)
+{
+	constexpr auto mask = PWR_CR3_LDOEN |
+%% if has_smps
+		PWR_CR3_SMPSLEVEL | PWR_CR3_SMPSEXTHP | PWR_CR3_SMPSEN |
+%% endif
+		PWR_CR3_BYPASS;
+
+	PWR->CR3 = (PWR->CR3 & ~mask) | static_cast<uint32_t>(source);
+
+	// wait for power supply to be ready to set VOS setting
+	while(!(PWR->CSR1 & PWR_CSR1_ACTVOSRDY))
+		if (--waitCycles == 0) return false;
 
 	return true;
 }
@@ -357,12 +423,9 @@ Rcc::setHsiPredivider4Enabled(bool divideBy4, uint32_t waitCycles)
 {
 	const uint32_t enableFlag = divideBy4 ? RCC_CR_HSIDIVEN : 0;
 	RCC->CR = (RCC->CR & ~RCC_CR_HSIDIVEN) | enableFlag;
+	while (isHsiPredivider4Active() != divideBy4)
+		if (waitCycles-- == 0) return false;
 
-	while (isHsiPredivider4Active() != divideBy4) {
-		if (waitCycles-- == 0) {
-			return false;
-		}
-	}
 	return true;
 }
 %% endif
@@ -376,16 +439,13 @@ Rcc::enableSystemClock(SystemClockSource src, uint32_t waitCycles)
 	// Wait till the main PLL is used as system clock source
 	src = SystemClockSource(uint32_t(src) << 2);
 	while ((RCC->CFGR & RCC_CFGR_SWS) != uint32_t(src))
-	{
-		if (not --waitCycles)
-			return false;
-	}
+		if (not --waitCycles) return false;
 
 	return true;
 }
 
 
-%% if target["family"] == "g4"
+%% if target.family == "g4"
 bool
 Rcc::setCanPrescaler(CanPrescaler prescaler)
 {
