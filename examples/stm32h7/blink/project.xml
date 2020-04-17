@@ -1,0 +1,13 @@
+<library>
+  <options>
+    <option name="modm:build:build.path">../../../build/stm32h7/blink</option>
+    <option name="modm:target">stm32h743zit6</option>
+  </options>
+  <modules>
+    <module>modm:platform:clock</module>
+    <module>modm:platform:core</module>
+    <module>modm:platform:gpio</module>
+    <module>modm:architecture:delay</module>
+    <module>modm:build:cmake</module>
+  </modules>
+</library>
