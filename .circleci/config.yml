@@ -94,6 +94,10 @@ jobs:
           command: |
             (cd examples && ../tools/scripts/examples_compile.py stm32f746g_discovery stm32f769i_discovery)
       - run:
+          name: Examples STM32H7 Series
+          command: |
+            (cd examples && ../tools/scripts/examples_compile.py stm32h7)
+      - run:
           name: Examples STM32G0 Series
           command: |
             (cd examples && ../tools/scripts/examples_compile.py nucleo_g071rb)
@@ -254,6 +258,23 @@ jobs:
           name: Compile HAL for all STM32F7
           command: |
             (cd test/all && python3 run_all.py stm32f7)
+      - store_artifacts:
+          path: test/all/log
+          destination: log
+
+  stm32h7-compile-all:
+    docker:
+      - image: modm/modm-build:latest
+    steps:
+      - checkout
+      - run:
+          name: Checkout code and update modm tools
+          command: |
+            (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - run:
+          name: Compile HAL for all STM32H7
+          command: |
+            (cd test/all && python3 run_all.py stm32h7)
       - store_artifacts:
           path: test/all/log
           destination: log
@@ -471,6 +492,13 @@ workflows:
             branches:
               ignore: /^develop.*/
       - stm32f7-compile-all:
+          requires:
+            - unittests-linux-generic
+            - stm32-examples
+          filters:
+            branches:
+              ignore: /^develop.*/
+      - stm32h7-compile-all:
           requires:
             - unittests-linux-generic
             - stm32-examples
