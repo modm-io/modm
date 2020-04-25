@@ -16,10 +16,6 @@ def init(module):
 
 
 def prepare(module, options):
-    target = options[":target"].identifier
-    if target["platform"] != "avr":
-        return False
-
     module.depends(":stdc++")
     return True
 
