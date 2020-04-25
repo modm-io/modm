@@ -42,6 +42,7 @@ jobs:
             (cd test && make compile-al-avreb-can)
             (cd test && make compile-arduino-uno)
             (cd test && make compile-arduino-nano)
+            (cd test && make compile-mega-2560-pro)
       - run:
           name: Linux Examples
           command: |
