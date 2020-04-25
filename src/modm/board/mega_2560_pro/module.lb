@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2016-2018, Niklas Hauser
+# Copyright (c) 2017, Fabian Greif
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":board:mega-2560-pro"
+    module.description = """
+# Mega 2560 PRO (Embed) CH340G
+
+A compact breakout board similiar to the Arduino Mega 2560 board.
+You can order this for little money from well known Chinese online stores.
+
+See: https://robotdyn.com/mega-2560-pro-embed-ch340g-atmega2560-16au.html
+"""
+
+def prepare(module, options):
+    if not options[":target"].partname.startswith("atmega2560"):
+        return False
+
+    module.depends(
+        ":architecture:clock",
+        ":architecture:interrupt",
+        ":debug",
+        ":platform:clock",
+        ":platform:core",
+        ":platform:gpio",
+        ":platform:uart:0")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/board"
+    env.copy('.')
+    env.collect(":build:default.avrdude.programmer", "stk500v2");
+    env.collect(":build:default.avrdude.baudrate", "115200");
+    # The STK500v2 bootloader of the atmega is unwilling to chip erase
+    env.collect(":build:default.avrdude.options", "-D");

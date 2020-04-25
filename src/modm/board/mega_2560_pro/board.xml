@@ -1,0 +1,15 @@
+<library>
+  <repositories>
+    <repository>
+      <path>../../../../repo.lb</path>
+    </repository>
+  </repositories>
+
+  <options>
+    <option name="modm:target">atmega2560-16au</option>
+    <option name="modm:platform:core:f_cpu">16000000</option>
+  </options>
+  <modules>
+    <module>modm:board:mega-2560-pro</module>
+  </modules>
+</library>

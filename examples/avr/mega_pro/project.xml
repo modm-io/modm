@@ -1,0 +1,9 @@
+<library>
+  <extends>modm:mega-2560-pro</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/avr/mega_pro</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+  </modules>
+</library>
