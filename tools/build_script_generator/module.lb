@@ -127,6 +127,9 @@ def prepare(module, options):
         module.add_collector(
             StringCollector(name="default.avrdude.port",
                             description="Default AvrDude port"))
+        module.add_collector(
+            StringCollector(name="default.avrdude.options",
+                            description="Default AvrDude options"))
 
     # Compile flag collectors
     def flag_validate(flag):

@@ -152,6 +152,8 @@ def common_avrdude_options(env):
         option_port = env.collector_values(":build:default.avrdude.port", option_port)[0]
     if not option_baudrate:
         option_baudrate = env.collector_values(":build:default.avrdude.baudrate", option_baudrate)[0]
+    if not option_options:
+        option_options = env.collector_values(":build:default.avrdude.options", option_options)[0]
     options = {
         "avrdude_programmer": option_programmer,
         "avrdude_port": option_port,
