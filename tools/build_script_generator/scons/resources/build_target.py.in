@@ -40,23 +40,32 @@ def build_target(env, sources):
 
 	env.Alias("artifact", env.CacheArtifact(program))
 		%% set artifact = ', "artifact"' if upload_with_artifact else ''
-	env.Alias("program", [env.ProgramOpenOcd(program){{ artifact }}])
+	env.Alias("program-openocd", [env.ProgramOpenOcd(program){{ artifact }}])
 	env.Alias("program-remote", [env.ProgramGdbRemote(program){{ artifact }}])
 	env.Alias("program-bmp", [env.ProgramBMP(program){{ artifact }}])
 	env.Alias('program-dfu', [env.ProgramDFU(env.Bin(program)){{ artifact }}])
+		%% if platform in ["sam"]
+	env.Alias("program-bossac", [env.ProgramBossac(env.Bin(program)){{ artifact }}])
+		%% endif
 
-	env.Alias("debug", env.DebugOpenOcd(program))
+	env.Alias("debug-openocd", env.DebugOpenOcd(program))
 	env.Alias("debug-remote", env.DebugGdbRemote(program))
 	env.Alias("debug-bmp", env.DebugBMP(program))
 	env.Alias("debug-coredump", env.DebugCoredump(program))
 
-	env.Alias("reset", env.ResetOpenOcd())
+	env.Alias("reset-openocd", env.ResetOpenOcd())
 	env.Alias("reset-bmp", env.ResetBMP())
 	env.Alias("reset-remote", env.ResetGdbRemote())
 
+	# Default to OpenOCD
+	env.Alias("program", "program-openocd")
+	env.Alias("reset", "reset-openocd")
+	env.Alias("debug", "debug-openocd")
+
 	%% elif core.startswith("avr")
-	env.Alias("program", env.ProgramAvrdude(program))
+	env.Alias("program-avrdude", env.ProgramAvrdude(program))
 	env.Alias("program-fuses", env.ProgramAvrdudeFuses(program))
+	env.Alias("program", "program-avrdude")
 	%% endif
 
 	env.Alias("all", ["build", "size"])

@@ -49,6 +49,10 @@ well:
 	brew install arm-gcc-bin
 	brew install openocd --HEAD
 
+To program Microchip SAM devices via the bootloader, install the `bossac` tool:
+
+	brew cask install bossa
+
 We recommend the use of a graphical frontend for GDB called [gdbgui][]:
 
 	pip3 install gdbgui

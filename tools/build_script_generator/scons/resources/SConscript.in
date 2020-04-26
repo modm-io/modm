@@ -108,13 +108,21 @@ env["CONFIG_AVRDUDE_PORT"] = "{{ avrdude_port }}"
 %% if avrdude_options
 env["CONFIG_AVRDUDE_OPTIONS"] = "{{ avrdude_options }}"
 %% endif
-%% if avrdude_baudrate > 0
+%% if avrdude_baudrate
 env["CONFIG_AVRDUDE_BAUDRATE"] = "{{ avrdude_baudrate }}"
 %% endif
 %% elif core.startswith("cortex-m")
 env.Append(MODM_OPENOCD_CONFIGFILES="$BASEPATH/openocd.cfg")
 env.Append(MODM_OPENOCD_GDBINIT="$BASEPATH/openocd_gdbinit")
 env.Append(MODM_GDBINIT="$BASEPATH/gdbinit")
+%% if platform == "sam"
+%% if bossac_offset
+env.Append(MODM_BOSSAC_OFFSET={{ bossac_offset }})
+%% endif
+%% if bossac_options
+env.Append(MODM_BOSSAC_OPTIONS="{{ bossac_options }}")
+%% endif
+%% endif
 %% endif
 
 # XPCC generator tool path

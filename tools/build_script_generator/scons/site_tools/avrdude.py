@@ -24,7 +24,7 @@ def call_avrdude(env, source, fuses=None):
 					fuses=fuses)
 
 # -----------------------------------------------------------------------------
-def avrdude_flash(env, source, alias="avrdude_program"):
+def avrdude_flash(env, source, alias="avrdude_flash"):
 	def call_program(target, source, env):
 		call_avrdude(env, source[0])
 

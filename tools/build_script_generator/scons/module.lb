@@ -104,6 +104,8 @@ def build(env):
     if device["core"].startswith("cortex-m"):
         tools.update({"compiler_arm_none_eabi_gcc", "size", "log_itm", "artifact",
                       "openocd", "openocd_remote", "bmp", "crashdebug", "dfu"})
+        if device["platform"] in ["sam"]:
+            tools.update({"bossac"})
     elif device["core"].startswith("avr"):
         tools.update({"compiler_avr_gcc", "size", "avrdude"})
     else: # hosted
@@ -185,6 +187,9 @@ def post_build(env):
         })
     if subs["platform"] == "avr":
         subs.update(env.query("::avrdude_options"))
+    if subs["platform"] == "sam":
+        subs.update({"bossac_offset": env.get(":platform:cortex-m:linkerscript.flash_offset", None),
+                     "bossac_options": " ".join(env.collector_values(":build:bossac.options"))})
     # Set these substitutions for all templates
     env.substitutions = subs
 
