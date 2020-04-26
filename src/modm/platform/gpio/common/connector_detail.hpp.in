@@ -65,7 +65,7 @@ struct GpioSignalConnect;
 template< Peripheral peripheral, template<Peripheral _> class SignalT, template<Peripheral _> class... Signals >
 struct GpioSignalConnect<peripheral, SignalT, Signals...>
 {
-%% if target["platform"] == "stm32" and target["family"] in ["f1", "l1"]
+%% if target.family in ["f1", "l1"]
 	static constexpr uint32_t id = GpioSignalConnect<peripheral, Signals...>::id & SignalT<peripheral>::Groups;
 %% endif
 	static inline void connect()
@@ -82,7 +82,7 @@ struct GpioSignalConnect<peripheral, SignalT, Signals...>
 template< Peripheral peripheral >
 struct GpioSignalConnect<peripheral>
 {
-%% if target["platform"] == "stm32" and target["family"] in ["f1", "l1"]
+%% if target.family in ["f1", "l1"]
 	static constexpr uint32_t id = uint32_t(-1);
 %% endif
 	static inline void connect() {}

@@ -54,7 +54,7 @@ def prepare(module, options):
         return False
 
     # port.hpp depends on modm::bitReverse()!
-    module.depends(":architecture:gpio", ":platform:gpio.common", ":math:utils")
+    module.depends(":architecture:gpio", ":math:utils")
     return True
 
 bprops = {}
@@ -154,3 +154,7 @@ def build(env):
     env.template("software_port.hpp.in")
     env.template("set.hpp.in")
     env.template("unused.hpp.in")
+
+    env.copy("../common/inverted.hpp", "inverted.hpp")
+    env.copy("../common/connector.hpp", "connector.hpp")
+    env.template("../common/connector_detail.hpp.in", "connector_detail.hpp")

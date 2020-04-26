@@ -149,7 +149,6 @@ def prepare(module, options):
         ":architecture:gpio",
         ":cmsis:device",
         ":math:utils",
-        ":platform:gpio.common",
         ":platform:rcc")
     return True
 
@@ -271,6 +270,10 @@ def build(env):
     env.template("unused.hpp.in")
     if len(env["enable_ports"]):
         env.template("enable.cpp.in")
+
+    env.copy("../common/inverted.hpp", "inverted.hpp")
+    env.copy("../common/connector.hpp", "connector.hpp")
+    env.template("../common/connector_detail.hpp.in", "connector_detail.hpp")
 
     # FIXME: Move to modm:platform:core!
     env.outbasepath = "modm/src/modm/platform/core"
