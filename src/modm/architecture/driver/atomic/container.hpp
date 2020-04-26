@@ -15,7 +15,6 @@
 #define	MODM_ATOMIC_CONTAINER_HPP
 
 #include <modm/architecture/interface/atomic_lock.hpp>
-#include <modm/architecture/interface/accessor.hpp>
 
 namespace modm
 {
@@ -90,7 +89,7 @@ namespace modm
 			get()
 			{
 				Lock lock;
-				return accessor::asVolatile(this->object);
+				return (volatile T&)this->object;
 			}
 
 			/**
@@ -123,7 +122,7 @@ namespace modm
 			{
 				Lock lock;
 
-				T oldValue = accessor::asVolatile(this->object);
+				T oldValue = (volatile T&)this->object;
 				this->object = value;
 
 				return oldValue;

@@ -9,11 +9,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/io/iostream.hpp>
-#include <modm/architecture/interface/i2c.hpp>
-
-namespace modm
-{
+#include "i2c.hpp"
 
 modm::IOStream&
 operator << (modm::IOStream& s, const modm::I2c::Operation op)
@@ -49,4 +45,3 @@ operator << (modm::IOStream& s, const modm::I2c::OperationAfterWrite op)
 	return s;
 }
 
-}

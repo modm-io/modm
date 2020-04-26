@@ -29,12 +29,12 @@ template<typename T, std::size_t N>
 modm_always_inline bool
 modm::atomic::Queue<T, N>::isFull() const
 {
-	Index tmphead = modm::accessor::asVolatile(this->head) + 1;
+	Index tmphead = this->head + 1;
 	if (tmphead >= (N+1)) {
 		tmphead = 0;
 	}
 
-	return (tmphead == modm::accessor::asVolatile(this->tail));
+	return (tmphead == this->tail);
 }
 
 template<typename T, std::size_t N>
@@ -43,8 +43,8 @@ modm::atomic::Queue<T, N>::isNearlyFull() const
 {
 	static_assert(N > 3, "Not possible the check for 'nearly full' of such a small queue.");
 
-	Index tmphead = modm::accessor::asVolatile(this->head);
-	Index tmptail = modm::accessor::asVolatile(this->tail);
+	Index tmphead = this->head;
+	Index tmptail = this->tail;
 
 	Index free;
 	if (tmphead >= tmptail) {
@@ -61,7 +61,7 @@ template<typename T, std::size_t N>
 modm_always_inline bool
 modm::atomic::Queue<T, N>::isEmpty() const
 {
-	return (modm::accessor::asVolatile(this->head) == modm::accessor::asVolatile(this->tail));
+	return (this->head == this->tail);
 }
 
 template<typename T, std::size_t N>
@@ -70,8 +70,8 @@ modm::atomic::Queue<T, N>::isNearlyEmpty() const
 {
 	static_assert(N > 3, "Not possible the check for 'nearly empty' of such a small queue. ");
 
-	Index tmphead = modm::accessor::asVolatile(this->head);
-	Index tmptail = modm::accessor::asVolatile(this->tail);
+	Index tmphead = this->head;
+	Index tmptail = this->tail;
 
 	Index stored;
 	if (tmphead >= tmptail) {
@@ -107,7 +107,7 @@ modm::atomic::Queue<T, N>::push(const T& value)
 	if (tmphead >= (N+1)) {
 		tmphead = 0;
 	}
-	if (tmphead == modm::accessor::asVolatile(this->tail)) {
+	if (tmphead == this->tail) {
 		return false;
 	}
 	else {

@@ -9,32 +9,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <stdint.h>
-#include <inttypes.h>
-
-#include <modm/io/iostream.hpp>
-#include <modm/architecture/utils.hpp>
-#include <modm/architecture/interface/can_message.hpp>
-
-namespace modm
-{
-
-namespace can
-{
-
-modm::IOStream&
-operator << (modm::IOStream& s, const modm::can::Message m)
-{
-    s.printf("id = %04" PRIx32 ", len = ", m.identifier);
-    s << m.length;
-    s.printf(", flags = %c%c, data = ",
-             m.flags.rtr ? 'R' : 'r',
-             m.flags.extended ? 'E' : 'e');
-    for (uint_fast8_t ii = 0; ii < m.length; ++ii) {
-        s.printf("%02x ", m.data[ii]);
-    }
-    return s;
-}
+#include "can_message.hpp"
 
 bool
 modm::can::Message::operator == (const modm::can::Message& rhs) const
@@ -55,5 +30,22 @@ modm::can::Message::operator == (const modm::can::Message& rhs) const
 	}
 	return false;
 }
-} // can namespace
-} // modm namespace
+
+%% if with_io
+#include <inttypes.h>
+#include <modm/io/iostream.hpp>
+
+modm::IOStream&
+operator << (modm::IOStream& s, const modm::can::Message m)
+{
+    s.printf("id = %04" PRIx32 ", len = ", m.identifier);
+    s << m.length;
+    s.printf(", flags = %c%c, data = ",
+             m.flags.rtr ? 'R' : 'r',
+             m.flags.extended ? 'E' : 'e');
+    for (uint_fast8_t ii = 0; ii < m.length; ++ii) {
+        s.printf("%02x ", m.data[ii]);
+    }
+    return s;
+}
+%% endif

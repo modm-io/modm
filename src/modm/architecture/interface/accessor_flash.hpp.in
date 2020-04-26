@@ -15,7 +15,9 @@
 #define	MODM_INTERFACE_ACCESSOR_FLASH_HPP
 
 #include <modm/architecture/utils.hpp>
+%% if with_io
 #include <modm/io/iostream.hpp>
+%% endif
 
 #ifdef	__DOXYGEN__
 
@@ -162,11 +164,12 @@ public:
 
 private:
 	const T* address;
-
+%% if with_io
 private:
 	template <typename U>
 	friend IOStream&
 	operator << ( IOStream&, const Flash<U>&);
+%% endif
 };
 
 /// Convert a normal pointer to a accessor::Flash
@@ -182,9 +185,7 @@ asFlash(const T* ptr)
 
 }	// namespace modm
 
-// -----------------------------------------------------------------------------
-// IMPLEMENTATION
-// -----------------------------------------------------------------------------
+%% if with_io
 template<typename T>
 modm::IOStream&
 operator << (modm::IOStream& os, modm::accessor::Flash<T> ptr);
@@ -202,5 +203,6 @@ operator << (modm::IOStream& os, modm::accessor::Flash<char> ptr)
 	}
 	return os;
 }
+%% endif
 
 #endif	// MODM_INTERFACE_ACCESSOR_FLASH_HPP

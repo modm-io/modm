@@ -17,14 +17,13 @@ class Accessor(Module):
         module.description = "Memory Accessors"
 
     def prepare(self, module, options):
-        module.depends(":io")
-        # module.depends(":platform:core")
         return True
 
     def build(self, env):
+        env.substitutions = {"with_io": env.has_module(":io")}
         env.outbasepath = "modm/src/modm/architecture"
         env.copy("interface/accessor.hpp")
-        env.copy("interface/accessor_flash.hpp")
+        env.template("interface/accessor_flash.hpp.in")
         env.copy("interface/accessor_ram.hpp")
 
 # -----------------------------------------------------------------------------
@@ -79,7 +78,6 @@ class Atomic(Module):
         module.description = "Atomic Operations and Containers"
 
     def prepare(self, module, options):
-        module.depends(":utils", ":architecture:accessor")
         return True
 
     def build(self, env):
@@ -122,15 +120,15 @@ class Can(Module):
         module.description = FileReader("interface/can.md")
 
     def prepare(self, module, options):
-        module.depends(":io")
         return True
 
     def build(self, env):
+        env.substitutions = {"with_io": env.has_module(":io")}
         env.outbasepath = "modm/src/modm/architecture"
         env.copy("interface/can.hpp")
         env.copy("interface/can.cpp")
-        env.copy("interface/can_message.hpp")
-        env.copy("interface/can_message.cpp")
+        env.template("interface/can_message.hpp.in")
+        env.template("interface/can_message.cpp.in")
 # -----------------------------------------------------------------------------
 
 class Clock(Module):
@@ -154,7 +152,6 @@ class Delay(Module):
         module.description = FileReader("interface/delay.md")
 
     def prepare(self, module, options):
-        # module.depends(":platform:core")
         return True
 
     def build(self, env):
@@ -196,13 +193,15 @@ class I2c(Module):
         module.description = "Inter-Integrated Circuit (I²C)"
 
     def prepare(self, module, options):
-        module.depends(":architecture:gpio", ":architecture:delay", ":io")
+        module.depends(":architecture:gpio", ":architecture:delay")
         return True
 
     def build(self, env):
+        env.substitutions = {"with_io": env.has_module(":io")}
         env.outbasepath = "modm/src/modm/architecture"
-        env.copy("interface/i2c.hpp")
-        env.copy("interface/i2c.cpp")
+        env.template("interface/i2c.hpp.in")
+        if env.has_module(":io"):
+            env.copy("interface/i2c.cpp")
         env.copy("interface/i2c_master.hpp")
         env.copy("interface/i2c_transaction.hpp")
 # -----------------------------------------------------------------------------
@@ -297,12 +296,13 @@ class Register(Module):
         module.description = FileReader("interface/register.md")
 
     def prepare(self, module, options):
-        module.depends(":io", ":math:utils")
+        module.depends(":math:utils")
         return True
 
     def build(self, env):
+        env.substitutions = {"with_io": env.has_module(":io")}
         env.outbasepath = "modm/src/modm/architecture"
-        env.copy("interface/register.hpp")
+        env.template("interface/register.hpp.in")
 # -----------------------------------------------------------------------------
 
 class Spi(Module):
@@ -353,7 +353,6 @@ class Unaligned(Module):
         module.description = "Unaligned Memory Accessor"
 
     def prepare(self, module, options):
-        # module.depends(":platform:core")
         return True
 
     def build(self, env):
@@ -365,7 +364,7 @@ import re
 
 def init(module):
     module.name = ":architecture"
-    module.description = """\
+    module.description = """
 # Architecture Interfaces
 
 All hardware peripherals with common interfaces.
