@@ -1,0 +1,75 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2016-2018, Niklas Hauser
+# Copyright (c) 2017, Fabian Greif
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+import copy
+from collections import defaultdict, OrderedDict
+
+def port_ranges(gpios):
+    ports = {p: (32, 0) for p in set(p["port"] for p in gpios)}
+    for gpio in gpios:
+        pin = int(gpio["pin"])
+        pmin, pmax = ports[gpio["port"]]
+        ports[gpio["port"]] = (min(pin, pmin), max(pin, pmax))
+
+    ports = [{"name": k.upper(), "start": v[0], "width": v[1] - v[0] + 1} for k,v in ports.items()]
+    ports.sort(key=lambda p: p["name"])
+    return ports
+
+bprops = {}
+
+# -----------------------------------------------------------------------------
+def init(module):
+    module.name = ":platform:gpio"
+    module.description = "General Purpose I/O (GPIO)"
+
+def prepare(module, options):
+    device = options[":target"]
+    if not device.has_driver("gpio:sam*"):
+        return False
+
+    module.depends(
+        ":architecture:gpio",
+        ":cmsis:device",
+        ":math:utils")
+    return True
+
+def build(env):
+    device = env[":target"]
+    driver = device.get_driver("gpio")
+    bprops["ranges"] = port_ranges(driver["gpio"])
+    bprops["ports"] = OrderedDict([(k, i) for i, k in enumerate([p["name"] for p in bprops["ranges"]])])
+
+    properties = {"target": device.identifier}
+    properties.update(bprops)
+
+    env.substitutions = properties
+    env.outbasepath = "modm/src/modm/platform/gpio"
+
+    for gpio in driver["gpio"]:
+        po, pi = gpio["port"], gpio["pin"]
+        properties["gpio"] = gpio
+        env.template("pin.hpp.in", "gpio_{}{}.hpp".format(po.upper(), pi))
+
+    # env.template("port.hpp.in")
+    # env.template("software_port.hpp.in")
+    env.template("set.hpp.in")
+    env.template("base.hpp.in")
+    env.template("unused.hpp.in")
+
+    env.copy("../common/inverted.hpp", "inverted.hpp")
+    env.copy("../common/connector.hpp", "connector.hpp")
+    env.template("../common/connector_detail.hpp.in", "connector_detail.hpp")
+
+    # FIXME: Move to modm:platform:core!
+    env.outbasepath = "modm/src/modm/platform/core"
+    env.template("peripherals.hpp.in")
