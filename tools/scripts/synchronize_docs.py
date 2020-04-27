@@ -124,6 +124,7 @@ ignored_devices = set(d for d in ignored_path.read_text().strip().splitlines() i
 targets -= ignored_devices
 avr_count = len([t for t in targets if t.startswith("at")])
 stm_count = len([t for t in targets if t.startswith("stm32")])
+sam_count = len([t for t in targets if t.startswith("sam")])
 
 # get the author count
 from authors import author_handles
@@ -141,6 +142,7 @@ driver_table = format_table(drivers, 6)
 readme = readme_path.read_text()
 readme = replace(readme, "authorcount", author_count - 7)
 readme = replace(readme, "avrcount", avr_count)
+readme = replace(readme, "samcount", sam_count)
 readme = replace(readme, "stmcount", stm_count)
 readme = replace(readme, "bsptable", bsp_table)
 readme = replace(readme, "drivertable", driver_table)
