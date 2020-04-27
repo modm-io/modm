@@ -84,9 +84,9 @@ class TestRun:
             if self.device.startswith("at"):
                 lbuild_command = ["-c", "avr.xml"]
                 shutil.copyfile("avr.cpp", os.path.join(tempdir, "main.cpp"))
-            elif self.device.startswith("stm32"):
-                lbuild_command = ["-c", "stm32.xml", "-D:::main_stack_size=512"]
-                shutil.copyfile("stm32.cpp", os.path.join(tempdir, "main.cpp"))
+            else:
+                lbuild_command = ["-c", "cortex-m.xml", "-D:::main_stack_size=512"]
+                shutil.copyfile("cortex-m.cpp", os.path.join(tempdir, "main.cpp"))
 
             if self.cache_dir:
                 lbuild_command.append("-D:::cache_dir={}".format(self.cache_dir))
