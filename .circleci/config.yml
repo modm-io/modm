@@ -52,6 +52,10 @@ jobs:
           command: |
             (cd examples && ../tools/scripts/examples_compile.py generic)
       - run:
+          name: Examples SAM Devices
+          command: |
+            (cd examples && ../tools/scripts/examples_compile.py samd)
+      - run:
           name: Execute Python Scripts
           command: |
             python3 tools/scripts/authors.py --handles --count --shoutout --since 2017-01-01
