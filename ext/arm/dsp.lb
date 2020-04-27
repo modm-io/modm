@@ -66,13 +66,19 @@ class CmsisDspModule(Module):
         if not env.get(":cmsis:dsp:unaligned_data", False):
             metadata[":build:cppdefines"].append("UNALIGNED_SUPPORT_DISABLE")
 
+        if env.get(":cmsis:dsp:loop_unroll", False):
+            metadata[":build:cppdefines"].append("ARM_MATH_LOOPUNROLL")
+
         env.outbasepath = "modm/ext/cmsis/dsp"
+
         if "tables" in self.name:
             env.copy("cmsis/CMSIS/DSP/Include/arm_common_tables.h", "arm_common_tables.h")
             env.copy("cmsis/CMSIS/DSP/Include/arm_const_structs.h", "arm_const_structs.h")
+        if "support" in self.name:
+            env.copy("cmsis/CMSIS/DSP/PrivateInclude/arm_sorting.h", "arm_sorting.h")
+
         operations = env.copy("cmsis/CMSIS/DSP/Source/{}".format(self.path), "{}".format(self.path),
-                              ignore=env.ignore_files("arm_bitreversal2.c", "CMakeLists.txt",
-                                                      "*Functions.c", "*Tables.c"))
+                              ignore=env.ignore_files("arm_bitreversal2.c"))
 
         # For all sources add these compile flags
         for key, values in metadata.items():
@@ -104,6 +110,11 @@ def prepare(module, options):
         BooleanOption(
             name="round_float_inputs",
             description=descr_round_floats,
+            default=True))
+    module.add_option(
+        BooleanOption(
+            name="loop_unroll",
+            description=descr_loop_unroll,
             default=True))
 
     for path in Path(localpath("cmsis/CMSIS/DSP/Source")).iterdir():
@@ -138,4 +149,9 @@ Check the input and output sizes of matrices and return
 descr_round_floats = """# Round float inputs
 
 Rounds float inputs properly during all conversions.
+"""
+
+descr_loop_unroll = """# Loop Unroll
+
+Enables manual loop unrolling in DSP functions.
 """

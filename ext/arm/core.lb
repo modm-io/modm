@@ -27,7 +27,10 @@ def build(env):
     env.copy("cmsis/CMSIS/Core/Include/cmsis_version.h", "cmsis_version.h")
     env.copy("cmsis/CMSIS/Core/Include/cmsis_compiler.h", "cmsis_compiler.h")
     env.copy("cmsis/CMSIS/Core/Include/cmsis_gcc.h", "cmsis_gcc.h")
-    if "m0" not in core:
+    if core != "0": # 0+ has MPU support though!
         env.copy("cmsis/CMSIS/Core/Include/mpu_armv7.h", "mpu_armv7.h")
+    print(core)
+    if core == "7":
+        env.copy("cmsis/CMSIS/Core/Include/cachel1_armv7.h", "cachel1_armv7.h")
 
     env.collect(":build:path.include", "modm/ext/cmsis/core")

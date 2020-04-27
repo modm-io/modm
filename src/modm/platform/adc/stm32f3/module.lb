@@ -99,10 +99,10 @@ class Instance(Module):
             properties["clock_mux"] = False
         elif target["family"] == "l4":
             properties["adc_ccr"] = "ADC_CCR"
-            if len(driver["instance"]) == 1:
+            if len(driver["instance"]) == 1 and "q5a" not in target.string:
                 properties["id_common"] = "1"
                 properties["id_common_u"] = "1_COMMON"
-            elif len(driver["instance"]) == 2:
+            elif len(driver["instance"]) == 2 or "q5a" in target.string:
                 properties["id_common"] = "12"
                 properties["id_common_u"] = "12_COMMON"
             else:
