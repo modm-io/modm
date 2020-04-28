@@ -46,7 +46,7 @@ jobs:
       - run:
           name: Linux Examples
           command: |
-            (cd examples && ../tools/scripts/examples_compile.py linux zmq)
+            (cd examples && ../tools/scripts/examples_compile.py linux)
       - run:
           name: Generic Examples
           command: |

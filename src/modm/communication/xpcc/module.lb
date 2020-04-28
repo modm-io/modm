@@ -48,15 +48,6 @@ def build(env):
     if env[":target"].identifier["platform"] in ["avr"]:
         ignore.append("*postman/dynamic*")
 
-    if env[":target"].identifier["platform"] in ["hosted"]:
-        env.collect(":build:library", "zmqpp")
-        env.collect(":build:library", "zmq")
-
-        if env[":target"].identifier["family"] in ["linux"]:
-            env.collect(":build:library", "pthread")
-    else:
-        ignore.append("*backend/zeromq*")
-
     env.copy(".", ignore=env.ignore_paths(*ignore))
     env.copy("../xpcc.hpp")
     env.template("dispatcher.hpp.in")

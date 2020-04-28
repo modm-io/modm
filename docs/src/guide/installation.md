@@ -64,7 +64,7 @@ For a less intrusive way to run all scons scripts with Python 3 add this to your
 To compile modm *for macOS* (and not the embedded target) you need to install
 some of these libraries as well, depending on what modm modules you use:
 
-	brew install boost zmqpp gcc
+	brew install boost gcc
 
 
 ## Linux
@@ -102,7 +102,7 @@ We recommend the use of a graphical frontend for GDB called [gdbgui][]:
 To compile modm *for Linux* (and not the embedded target) you need to install
 some of these libraries as well, depending on what modm modules you use:
 
-	sudo apt-get install gcc build-essential libboost-all-dev libzmqpp-dev
+	sudo apt-get install gcc build-essential libboost-all-dev
 
 
 ## Windows
