@@ -180,6 +180,7 @@ template <typename SerialPort>
 bool
 modm::platform::CanUsb<SerialPort>::getMessage(can::Message& message)
 {
+	MutexGuard stateGuard(readBufferLock);
 	if (not this->readBuffer.empty())
 	{
 		message = this->readBuffer.front();
@@ -229,6 +230,7 @@ modm::platform::CanUsb<SerialPort>::update()
 			if (modm::CanLawicelFormatter::convertToCanMessage(
 					this->tmpRead.c_str(), message))
 			{
+				MutexGuard stateGuard(readBufferLock);
 				this->readBuffer.push(message);
 			}
 		}

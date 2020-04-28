@@ -53,7 +53,8 @@ public:
 	inline bool
 	isMessageAvailable()
 	{
-		return (!this->readBuffer.empty());
+		MutexGuard stateGuard(readBufferLock);
+		return (not this->readBuffer.empty());
 	}
 
 	bool
