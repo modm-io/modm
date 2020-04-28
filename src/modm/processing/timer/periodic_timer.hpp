@@ -54,7 +54,7 @@ public:
 			size_t count{0};
 			if (this->_interval.count())
 			{
-				const typename Clock::time_point now = Clock::now();
+				const auto now = this->now();
 				while(1)
 				{
 					this->_start += this->_interval;
@@ -64,7 +64,7 @@ public:
 				}
 			}
 			else {
-				this->_start = Clock::now();
+				this->_start = this->now();
 				count = 1;
 			}
 			this->_state = this->ARMED;

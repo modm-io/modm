@@ -123,6 +123,9 @@ protected:
 	bool
 	checkExpiration() const;
 
+	time_point
+	now() const;
+
 	enum
 	InternalState : uint8_t
 	{

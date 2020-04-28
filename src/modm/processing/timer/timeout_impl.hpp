@@ -38,7 +38,7 @@ modm::GenericTimeout<Clock, Duration>::restart(std::chrono::duration<Rep, Period
 		modm_assert_continue_fail_debug(interval.count() <= duration::max().count(), "tmr.size",
 				"Timer interval must be smaller than the maximal duration!", interval.count());
 
-		_start = std::chrono::time_point_cast<duration>(Clock::now());
+		_start = now();
 		_interval = cast_interval;
 		_state = ARMED;
 	}
@@ -83,7 +83,7 @@ modm::GenericTimeout<Clock, Duration>::remaining() const
 		return wide_signed_duration{0};
 	return  std::chrono::duration_cast<wide_signed_duration>(_interval) +
 			std::chrono::time_point_cast<wide_signed_duration>(_start) -
-			std::chrono::time_point_cast<wide_signed_duration>(Clock::now());
+			std::chrono::time_point_cast<wide_signed_duration>(now());
 }
 
 // ----------------------------------------------------------------------------
@@ -124,5 +124,12 @@ template< class Clock, class Duration >
 bool
 modm::GenericTimeout<Clock, Duration>::checkExpiration() const
 {
-	return (_state & ARMED) and (Clock::now() - _start) >= _interval;
+	return (_state & ARMED) and (now() - _start) >= _interval;
+}
+
+template< class Clock, class Duration >
+typename modm::GenericTimeout<Clock, Duration>::time_point
+modm::GenericTimeout<Clock, Duration>::now() const
+{
+	return std::chrono::time_point_cast<duration>(Clock::now());
 }

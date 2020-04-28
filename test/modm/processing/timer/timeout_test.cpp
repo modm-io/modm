@@ -236,6 +236,11 @@ TimeoutTest::testTimeOverflow()
 	timeoutShort.restart(time+1ms);
 	TEST_ASSERT_EQUALS(timeoutShort.remaining(), 0ms);
 	TEST_ASSERT_TRUE(timeoutShort.execute());
+
+	test_clock::setTime(-1000);
+	timeoutShort.restart(500ms);
+	TEST_ASSERT_EQUALS(timeoutShort.remaining(), 500ms);
+	TEST_ASSERT_FALSE(timeoutShort.execute());
 }
 
 void
