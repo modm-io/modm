@@ -24,29 +24,9 @@ displayMessage(const modm::can::Message& message, const uint8_t& filter_id)
 {
 	static uint32_t receiveCounter = 0;
 	receiveCounter++;
-    MODM_LOG_INFO<< "filter_id  =" << filter_id;
-	MODM_LOG_INFO<< "id  =" << message.getIdentifier();
-	if (message.isExtended()) {
-		MODM_LOG_INFO<< " extended";
-	}
-	else {
-		MODM_LOG_INFO<< " standard";
-	}
-	if (message.isRemoteTransmitRequest()) {
-		MODM_LOG_INFO<< ", rtr";
-	}
-	MODM_LOG_INFO<< modm::endl;
-
-	MODM_LOG_INFO<< "dlc =" << message.getLength() << modm::endl;
-	if (!message.isRemoteTransmitRequest())
-	{
-		MODM_LOG_INFO << "data=";
-		for (uint32_t i = 0; i < message.getLength(); ++i) {
-			MODM_LOG_INFO<< modm::hex << message.data[i] << modm::ascii << ' ';
-		}
-		MODM_LOG_INFO<< modm::endl;
-	}
-	MODM_LOG_INFO<< "# received=" << receiveCounter << modm::endl;
+	MODM_LOG_INFO << "filter_id = " << filter_id << ", ";
+	MODM_LOG_INFO << message << modm::endl;
+	MODM_LOG_INFO << "# received=" << receiveCounter << modm::endl;
 }
 
 // ----------------------------------------------------------------------------
