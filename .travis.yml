@@ -1,0 +1,17 @@
+os: osx
+osx_image: xcode11.3
+
+before_install:
+  - brew update
+  - brew tap osx-cross/avr
+  - brew tap osx-cross/arm
+  - brew install scons git doxygen boost gcc avr-gcc arm-gcc-bin cmake || true
+  - brew upgrade boost gcc git || true
+  - export PATH=/Users/travis/Library/Python/3.7/bin:$PATH
+  - pip3 install --user modm
+
+script:
+  - (cd test && make run-hosted-darwin)
+  - (cd examples && ../tools/scripts/examples_compile.py linux)
+  - (cd examples && ../tools/scripts/examples_compile.py stm32f1_discovery nucleo_f103rb olimexino_stm32 stm32f103c8t6_blue_pill stm32f103c8t6_black_pill)
+  - (cd test && make compile-arduino-nano)
