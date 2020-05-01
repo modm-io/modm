@@ -76,16 +76,17 @@ can_map = {
     },
 }
 
-def get_substitutions(instance, device, env):
-    target = device.identifier
-    driver = device.get_driver("can")
+def get_substitutions(env, instance):
+    target = env["target"].identifier
+    driver = env["target"].get_driver("can")
     instances = map(lambda i: int(i), driver["instance"]) if "instance" in driver else (0,)
 
-    cm = can_map[target["family"]]
+    cm = can_map[target.family]
     is_single = (cm[instance].type == CanType.Single) or (cm[instance].associated_instance not in instances)
     other = cm[instance].associated_instance
 
     subs = {
+        "target": target,
         "id": "" if instance == 0 else str(instance),
         "own_instance": cm[instance].register,
         "other_instance": cm[other].register if other in cm else None,
@@ -109,15 +110,7 @@ class Instance(Module):
         return True
 
     def build(self, env):
-        device = env[":target"]
-        driver = device.get_driver("can")
-
-        properties = device.properties
-        properties["target"] = target = device.identifier
-        properties["driver"] = driver
-        properties.update(get_substitutions(self.instance, device, env))
-
-        env.substitutions = properties
+        env.substitutions = get_substitutions(env, self.instance)
         env.outbasepath = "modm/src/modm/platform/can"
 
         env.template("can.hpp.in", "can_{}.hpp".format(self.instance))
@@ -159,22 +152,13 @@ def prepare(module, options):
     return True
 
 def build(env):
-    device = env[":target"]
-    driver = device.get_driver("can")
-
-    properties = device.properties
-    properties["target"] = device.identifier
-    properties["driver"] = driver
-
-    if "instance" not in driver:
-        properties.update(get_substitutions(0, device, env))
-
-    env.substitutions = properties
+    env.substitutions = {"target": env[":target"].identifier}
     env.outbasepath = "modm/src/modm/platform/can"
 
     env.template("can_filter.hpp.in")
     env.template("can_filter.cpp.in")
 
     if "instance" not in driver:
+        env.substitutions = get_substitutions(env, 0)
         env.template("can.hpp.in")
         env.template("can.cpp.in")

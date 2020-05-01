@@ -34,7 +34,7 @@ def prepare(module, options):
 def build(env):
     device = env[":target"]
 
-    properties = device.properties
+    properties = {}
     properties["target"] = device.identifier
     dma = device.get_driver("dma")
     properties["dma"] = dma
@@ -60,7 +60,6 @@ def build(env):
 
     env.substitutions = properties
     env.outbasepath = "modm/src/modm/platform/dma"
-
     env.template("dma_base.hpp.in")
     env.template("dma_hal.hpp.in")
     env.template("dma_hal_impl.hpp.in")

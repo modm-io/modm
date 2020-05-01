@@ -26,7 +26,7 @@ def build(env):
     device = env[":target"]
     driver = device.get_driver("spi")
 
-    properties = device.properties
+    properties = {}
     properties["target"] = device.identifier
     properties["driver"] = driver
 

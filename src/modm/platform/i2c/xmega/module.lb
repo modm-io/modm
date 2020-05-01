@@ -14,7 +14,7 @@
 def get_properties(env):
     device = env[":target"]
     driver = device.get_driver("i2c:xmega")
-    properties = device.properties
+    properties = {}
     properties["target"] = device.identifier
     properties["driver"] = driver
     return properties

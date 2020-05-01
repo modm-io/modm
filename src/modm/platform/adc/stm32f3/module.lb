@@ -27,7 +27,7 @@ class Instance(Module):
         device = env[":target"]
         driver = device.get_driver("adc")
 
-        properties = device.properties
+        properties = {}
         properties["target"] = target = device.identifier
         instance_id = int(self.instance)
         properties["id"] = instance_id
@@ -151,12 +151,4 @@ def prepare(module, options):
     return True
 
 def build(env):
-    device = env[":target"]
-    driver = device.get_driver("adc")
-
-    properties = device.properties
-    properties["target"] = device.identifier
-    properties["driver"] = driver
-
-    env.substitutions = properties
-    env.outbasepath = "modm/src/modm/platform/adc"
+    pass

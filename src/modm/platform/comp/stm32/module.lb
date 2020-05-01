@@ -26,7 +26,7 @@ class Instance(Module):
         device = env[":target"]
         driver = device.get_driver("comp")
 
-        properties = device.properties
+        properties = {}
         properties["target"] = device.identifier
         instance_id = int(self.instance)
         properties["id"] = instance_id
@@ -49,8 +49,6 @@ class Instance(Module):
             properties["blanking_source"]["b001"] = "Tim1Oc5"
             properties["blanking_source"]["b010"] = "Tim2Oc3"
             properties["blanking_source"]["b011"] = "Tim3Oc3"
-
-
 
         env.substitutions = properties
         env.outbasepath = "modm/src/modm/platform/comp"
@@ -109,7 +107,7 @@ def build(env):
     device = env[":target"]
     driver = device.get_driver("comp")
 
-    properties = device.properties
+    properties = {}
     properties["target"] = device.identifier
     properties["driver"] = driver
     properties["csr"] = "COMP_CSR_" if device.identifier["family"] in ["l4", "g4"] else "COMP_CSR_COMPx"

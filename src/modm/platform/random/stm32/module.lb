@@ -22,12 +22,7 @@ def prepare(module, options):
     return True
 
 def build(env):
-    device = env[":target"]
-
-    properties = device.properties
-    properties["target"] = device.identifier
-
-    env.substitutions = properties
+    env.substitutions = {"target": env[":target"].identifier}
     env.outbasepath = "modm/src/modm/platform/random"
 
     env.template("random_number_generator.hpp.in")

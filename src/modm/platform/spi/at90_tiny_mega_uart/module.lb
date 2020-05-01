@@ -13,11 +13,7 @@
 
 def get_properties(env):
     device = env[":target"]
-    driver = device.get_driver("spi:avr_uart")
-    properties = device.properties
-    properties["target"] = device.identifier
-    properties["driver"] = driver
-    return properties
+    return {"target": device.identifier}
 
 
 class Instance(Module):
@@ -52,10 +48,8 @@ class Instance(Module):
         return True
 
     def build(self, env):
-        properties = get_properties(env)
-        properties["id"] = self.instance
-
-        target = properties["target"]
+        target = env[":target"].identifier
+        properties = {"target": target, "id": self.instance}
 
         properties["extended"] = False
         if target["name"] in ["48", "88", "168", "328"] and target["type"] == "p":
@@ -102,5 +96,4 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.substitutions = get_properties(env)
-    env.outbasepath = "modm/src/modm/platform/spi_uart"
+    pass
