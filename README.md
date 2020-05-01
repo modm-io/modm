@@ -5,6 +5,10 @@
 </p>
 <!--/webignore-->
 
+<!-- CI status -->
+[![Build Status](https://travis-ci.org/modm-io/modm.svg?branch=develop)](https://travis-ci.org/modm-io/modm)
+[![CircleCI](https://circleci.com/gh/modm-io/modm.svg?style=svg)](https://circleci.com/gh/modm-io/modm)
+
 modm (pronounced like dial-up "modem") is a toolbox for
 building custom C++17 libraries tailored to your embedded device.
 modm generates startup code, HALs and their implementations, communication
