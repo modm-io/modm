@@ -16,6 +16,8 @@
 	.type	Reset_Handler, %function
 	.func   Reset_Handler
 Reset_Handler:
+	ldr r0,=__main_stack_top
+	mov sp,r0
 	bl __modm_initialize_platform
 	b __modm_startup
 	.endfunc
