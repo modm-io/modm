@@ -3,6 +3,7 @@
 #
 # Copyright (c) 2016-2018, Niklas Hauser
 # Copyright (c) 2017, Fabian Greif
+# Copyright (c) 2020, Mike Wolfram
 #
 # This file is part of the modm project.
 #
@@ -10,31 +11,6 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
-
-class Instance(Module):
-    def __init__(self, instance):
-        self.instance = instance
-
-    def init(self, module):
-        module.name = str(self.instance)
-        module.description = "Instance {}".format(self.instance)
-
-    def prepare(self, module, options):
-        module.depends(":platform:dma")
-        return True
-
-    def build(self, env):
-        device = env[":target"]
-
-        properties = device.properties
-        properties["target"] = device.identifier
-        properties["id"] = self.instance
-
-        env.substitutions = properties
-        env.outbasepath = "modm/src/modm/platform/dma"
-
-        env.template("dma.hpp.in", "dma_{}.hpp".format(self.instance))
-        env.template("dma_impl.hpp.in", "dma_{}_impl.hpp".format(self.instance))
 
 def init(module):
     module.name = ":platform:dma"
@@ -45,14 +21,13 @@ def prepare(module, options):
     if not device.has_driver("dma:stm32*"):
         return False
 
-    # FIXME the driver is referenced in STM32F0 device files, but appears only to support STM32F3/4
-    if device.identifier["family"] not in ["f3", "f4"]:
+    # FIXME the driver is for L4 only
+    if device.identifier["family"] not in ["l4"]:
+        return False
+    if device.identifier["name"] not in ["12", "22", "31", "32", "33", "42", "43", "51", "52", "62", "75", "76", "86", "96", "A6"]:
         return False
 
     module.depends(":cmsis:device", ":platform:rcc")
-
-    for instance in device.get_driver("dma")["instance"]:
-        module.add_submodule(Instance(int(instance)))
 
     return True
 
@@ -61,8 +36,34 @@ def build(env):
 
     properties = device.properties
     properties["target"] = device.identifier
+    dma = device.get_driver("dma")
+    properties["dma"] = dma
+
+    # Get the peripheral supported by DMA from device info and create a list of signals
+    # (also determines the maximum number of channels per controller)
+    signal_names = {}
+    controller = []
+    for channels in dma["channels"]:
+        max_channels = 0
+        for channel in channels["channel"]:
+            max_channels = channel["position"]
+            for request in channel["request"]:
+                for signal in request["signal"]:
+                    if "name" in signal:
+                        signal_name = signal["name"].capitalize()
+                        signal_names[signal_name] = 1
+        controller.append({"instance": int(channels["instance"]), "channels": int(max_channels)})
+
+    signal_names = sorted(list(set(signal_names)))
+    properties["dmaSignals"] = signal_names
+    properties["dmaController"] = controller
 
     env.substitutions = properties
     env.outbasepath = "modm/src/modm/platform/dma"
 
     env.template("dma_base.hpp.in")
+    env.template("dma_hal.hpp.in")
+    env.template("dma_hal_impl.hpp.in")
+    env.template("dma.hpp.in")
+    env.template("dma.cpp.in")
+

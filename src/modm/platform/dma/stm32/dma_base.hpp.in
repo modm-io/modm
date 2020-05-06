@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2014, Kevin Läufer
  * Copyright (c) 2014-2017, Niklas Hauser
+ * Copyright (c) 2020, Mike Wolfram
  *
  * This file is part of the modm project.
  *
@@ -10,15 +11,19 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_STM32F3_DMA_BASE_HPP
-#define MODM_STM32F3_DMA_BASE_HPP
+#ifndef MODM_STM32_DMA_BASE_HPP
+#define MODM_STM32_DMA_BASE_HPP
 
 #include <stdint.h>
 #include "../device.hpp"
 
+#include <modm/architecture/interface/assert.hpp>
+#include <modm/architecture/interface/interrupt.hpp>
+#include <modm/architecture/interface/register.hpp>
+
 %% if target["family"] == "f4"
 	%% set reg_prefix = "DMA_SxCR"
-%% elif target["family"] == "f3"
+%% elif target["family"] in ["f3", "l4"]
 	%% set reg_prefix = "DMA_CCR"
 %% endif
 
@@ -27,11 +32,11 @@ namespace modm
 
 namespace platform
 {
-
 /**
  * DMA
  *
  * @author	Kevin Laeufer
+ * @author	Mike Wolfram
  * @ingroup	modm_platform_dma
  */
 class DmaBase
@@ -76,6 +81,40 @@ public:
 		Dma 		= 0,
 		Peripheral 	= DMA_SxCR_PFCTRL, ///< the peripheral is the flow controller
 	};
+%% elif target["family"] in ["f3", "l4"]
+	%% set channel_count = namespace(max_channels = 0)
+	%% for controller in dmaController
+		%% if channel_count.max_channels < controller.channels
+			%% set channel_count.max_channels = controller.channels
+		%% endif
+	%% endfor
+	enum class
+	Channel
+	{
+	%% for channel in range(1, channel_count.max_channels + 1)
+		Channel{{ channel }}{% if channel == 1 %} = 0{% endif %},
+	%% endfor
+	};
+
+	%% if target["family"] == "l4"
+	%% set request_count = namespace(max_requests = 0)
+	%% for channels in dma["channels"]
+		%% for channel in channels.channel
+			%% for request in channel.request
+				%% if request_count.max_requests < request.position | int
+					%% set request_count.max_requests = request.position | int
+				%% endif
+			%% endfor
+		%% endfor
+	%% endfor
+	enum class
+	Request
+	{
+	%% for request in range(0, request_count.max_requests + 1)
+		Request{{ request }}{% if request == 0 %} = 0{% endif %},
+	%% endfor
+	};
+	%% endif
 %% endif
 
 	enum class
@@ -142,7 +181,7 @@ public:
 		MemoryToPeripheral 	= DMA_SxCR_DIR_0,
 		/// Source: DMA_SxPAR; Sink: DMA_SxM0AR
 		MemoryToMemory 		= DMA_SxCR_DIR_1,
-%% elif target["family"] == "f3"
+%% elif target["family"] in ["f3", "l4"]
 		/// Source: DMA_CPARx; Sink: DMA_CMARx
 		PeripheralToMemory 	= 0,
 		/// Source: DMA_CMARx; Sink: DMA_CPARx
@@ -150,6 +189,17 @@ public:
 		/// Source: DMA_CPARx; Sink: DMA_CMARx
 		MemoryToMemory 		= DMA_CCR_MEM2MEM,
 %% endif
+	};
+
+	/**
+	 * Peripheral signals that can be used in DMA channels
+	 */
+	enum class
+	Signal : uint8_t {
+		NoSignal,
+%% for signal in dmaSignals
+		{{ signal }},
+%% endfor
 	};
 
 protected:
@@ -169,7 +219,7 @@ protected:
 			DMA_SxCR_PL_1    | DMA_SxCR_PL_0    |						// Priority
 			DMA_SxCR_CIRC    |											// CircularMode
 			DMA_SxCR_PFCTRL;											// FlowControl
-%% elif target["family"] == "f3"
+%% elif target["family"] in ["f3", "l4"]
 	static constexpr uint32_t memoryMask =
 			DMA_CCR_MSIZE_0  | DMA_CCR_MSIZE_1  |	// MemoryDataSize
 			DMA_CCR_MINC                        |	// MemoryIncrementMode
@@ -182,10 +232,36 @@ protected:
 			DMA_CCR_CIRC     |						// CircularMode
 			DMA_CCR_PL_1     | DMA_CCR_PL_0;		// Priority
 %% endif
+
+	enum class Interrupt {
+		Global = 0x01,
+		TransferComplete = 0x02,
+		HalfTransferComplete = 0x04,
+		Error = 0x08,
+		All = 0x0f,
+	};
+	MODM_FLAGS32(Interrupt);
+
+	using IrqHandler = void (*)(void);
+
+	template <uint32_t ID>
+	struct Nvic;
 };
+
+%% for channels in dma["channels"]
+template <>
+struct DmaBase::Nvic<{{ channels.instance }}>
+{
+	static constexpr IRQn_Type DmaIrqs[] {
+	%% for channel in channels.channel
+			DMA{{ channels.instance }}_Channel{{ channel.position }}_IRQn,
+	%% endfor
+	};
+};
+%% endfor
 
 }	// namespace platform
 
 }	// namespace modm
 
-#endif	// MODM_STM32F3_DMA_BASE_HPP
+#endif	// MODM_STM32_DMA_BASE_HPP

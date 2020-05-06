@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2014, Kevin Läufer
  * Copyright (c) 2014-2017, Niklas Hauser
+ * Copyright (c) 2020, Mike Wolfram
  *
  * This file is part of the modm project.
  *
@@ -10,22 +11,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_STM32_DMA{{ id }}_HPP
-#define MODM_STM32_DMA{{ id }}_HPP
+#ifndef MODM_STM32_DMA_HPP
+#define MODM_STM32_DMA_HPP
 
 #include <stdint.h>
 #include "../device.hpp"
-#include "dma_base.hpp"
-
-%% if target["family"] == "f4"
-	%% set streams = range(0,8)
-%% elif target["family"] == "f3"
-	%% if id == 1
-		%% set streams = range(1,7)
-	%% elif id == 2
-		%% set streams = range(1,5)
-	%% endif
-%% endif
+#include "dma_hal.hpp"
 
 namespace modm
 {
@@ -34,107 +25,358 @@ namespace platform
 {
 
 /**
- * DMA
+ * DMA controller
  *
  * Does not support - among other things - double buffering or FIFO usage
  *
- * @author	Kevin Laeufer
- * @ingroup	modm_platform_dma modm_platform_dma_{{id}}
+ * @author	Mike Wolfram
+ * @ingroup	modm_platform_dma
  */
-class Dma{{ id }}
+template <uint32_t ID>
+class DmaController : public DmaBase
+{
+	static_assert(ID >= 1 and ID <= {{ dma.instance | length }}, "invalid DMA controller ID");
+
+public:
+	/**
+	 * Enable the DMA controller in the RCC
+	 */
+	static void
+	enable()
+	{
+		if constexpr (ID == 1)
+			Rcc::enable<Peripheral::Dma1>();
+		else
+			Rcc::enable<Peripheral::Dma2>();
+	}
+	/**
+	 * Disable the DMA controller in the RCC
+	 */
+	static void
+	disable()
+	{
+		if constexpr (ID == 1)
+			Rcc::disable<Peripheral::Dma1>();
+		else
+			Rcc::disable<Peripheral::Dma2>();
+	}
+
+	/**
+	 * Class representing a DMA channel/stream
+	 */
+	template <DmaBase::Channel ChannelID>
+	class Channel
+	{
+		static_assert(
+%% for controller in dmaController
+%% if controller["instance"] > 1
+				or
+%% endif
+				(ID == {{ controller["instance"] }} and
+						ChannelID >= DmaBase::Channel::Channel1 and
+						ChannelID <= DmaBase::Channel::Channel{{ controller["channels"] }})
+%% endfor
+				, "invalid Channel ID for that DMA controller"
+				);
+
+		using ControlHal = DmaHal<ID>;
+
+		static constexpr uint32_t CHANNEL_BASE { ControlHal::CHANNEL_BASE +
+			uint32_t(ChannelID) * ControlHal::CHANNEL_2_CHANNEL };
+
+		using ChannelHal = DmaChannelHal<ChannelID, CHANNEL_BASE>;
+
+	public:
+		/**
+		 * Configure the DMA channel
+		 *
+		 * Stops the DMA channel and writes the new values to its control register.
+		 *
+		 * @param[in] direction Direction of the DMA channel
+		 * @param[in] memoryDataSize Size of data in memory (byte, halfword, word)
+		 * @param[in] peripheralDataSize Size of data in peripheral (byte, halfword, word)
+		 * @param[in] memoryIncrement Defines whether the memory address is incremented
+		 * 			  after a transfer completed
+		 * @param[in] peripheralIncrement Defines whether the peripheral address is
+		 * 			  incremented after a transfer completed
+		 * @param[in] priority Priority of the DMA channel
+		 * @param[in] circularMode Transfer data in circular mode?
+		 */
+		static void
+		configure(DataTransferDirection direction, MemoryDataSize memoryDataSize,
+				PeripheralDataSize peripheralDataSize,
+				MemoryIncrementMode memoryIncrement,
+				PeripheralIncrementMode peripheralIncrement,
+				Priority priority = Priority::Medium,
+				CircularMode circularMode = CircularMode::Disabled)
+		{
+			ChannelHal::configure(direction, memoryDataSize, peripheralDataSize,
+					memoryIncrement, peripheralIncrement, priority, circularMode);
+		}
+
+		/**
+		 * Start the transfer of the DMA channel
+		 */
+		static void
+		start()
+		{
+			ControlHal::clearInterruptFlags(uint32_t(Interrupt::Global) << (uint32_t(ChannelID) * 4));
+			ChannelHal::start();
+		}
+		/**
+		 * Stop a DMA channel transfer
+		 */
+		static void
+		stop()
+		{
+			ChannelHal::stop();
+		}
+
+		/**
+		 * Get the direction of the data transfer
+		 */
+		static DataTransferDirection
+		getDataTransferDirection()
+		{
+			return ChannelHal::getDataTransferDirection();
+		}
+
+		/**
+		 * Set the memory address of the DMA channel
+		 *
+		 * @note In Mem2Mem mode use this method to set the memory source address.
+		 *
+		 * @param[in] address Source address
+		 */
+		static void
+		setMemoryAddress(uintptr_t address)
+		{
+			ChannelHal::setMemoryAddress(address);
+		}
+		/**
+		 * Set the peripheral address of the DMA channel
+		 *
+		 * @note In Mem2Mem mode use this method to set the memory destination address.
+		 *
+		 * @param[in] address Destination address
+		 */
+		static void
+		setPeripheralAddress(uintptr_t address)
+		{
+			ChannelHal::setPeripheralAddress(address);
+		}
+
+		/**
+		 * Enable/disable memory increment
+		 *
+		 * When enabled, the memory address is incremented by the size of the data
+		 * (e.g. 1 for byte transfers, 4 for word transfers) after the transfer
+		 * completed.
+		 *
+		 * @param[in] increment Enable/disable
+		 */
+		static void
+		setMemoryIncrementMode(bool increment)
+		{
+			ChannelHal::setMemoryIncrementMode(increment);
+		}
+		/**
+		 * Enable/disable peripheral increment
+		 *
+		 * When enabled, the peripheral address is incremented by the size of the data
+		 * (e.g. 1 for byte transfers, 4 for word transfers) after the transfer
+		 * completed.
+		 *
+		 * @param[in] increment Enable/disable
+		 */
+		static void
+		setPeripheralIncrementMode(bool increment)
+		{
+			ChannelHal::setPeripheralIncrementMode(increment);
+		}
+
+		/**
+		 * Set the length of data to be transfered
+		 */
+		static void
+		setDataLength(std::size_t length)
+		{
+			ChannelHal::setDataLength(length);
+		}
+
+		/**
+		 * Set the IRQ handler for transfer errors
+		 *
+		 * The handler will be called from the channels IRQ handler function
+		 * when the IRQ status indicates an error occured.
+		 */
+		static void
+		setTransferErrorIrqHandler(IrqHandler irqHandler)
+		{
+			transferError = irqHandler;
+		}
+		/**
+		 * Set the IRQ handler for transfer complete
+		 *
+		 * Called by the channels IRQ handler when the transfer is complete.
+		 */
+		static void
+		setTransferCompleteIrqHandler(IrqHandler irqHandler)
+		{
+			transferComplete = irqHandler;
+		}
+		/**
+		 * Set the peripheral that operates the channel
+		 */
+		template <DmaBase::Request dmaRequest>
+		static void
+		setPeripheralRequest()
+		{
+			DMA_Request_TypeDef *DMA_REQ = reinterpret_cast<DMA_Request_TypeDef *>(ControlHal::DMA_CSEL);
+			DMA_REQ->CSELR &= ~(0x0f << (uint32_t(ChannelID) * 4));
+			DMA_REQ->CSELR |= uint32_t(dmaRequest) << (uint32_t(ChannelID) * 4);
+		}
+
+		/**
+		 * IRQ handler of the DMA channel
+		 *
+		 * Reads the IRQ status and checks for error or transfer complete. In case
+		 * of error the DMA channel will be disabled.
+		 */
+		static void
+		interruptHandler()
+		{
+			static const uint32_t TC_Flag {
+				uint32_t(Interrupt::TransferComplete) << (uint32_t(ChannelID) * 4)
+			};
+			static const uint32_t TE_Flag {
+				uint32_t(Interrupt::Error) << (uint32_t(ChannelID) * 4)
+			};
+
+			auto isr { ControlHal::getInterruptFlags() };
+			if (isr & TE_Flag) {
+				disable();
+				if (transferError)
+					transferError();
+			}
+			if ((isr & TC_Flag) and transferComplete)
+				transferComplete();
+
+			ControlHal::clearInterruptFlags(uint32_t(Interrupt::Global) << (uint32_t(ChannelID) * 4));
+		}
+
+		/**
+		 * Enable the IRQ vector of the channel
+		 *
+		 * @param[in] priority Priority of the IRQ
+		 */
+		static void
+		enableInterruptVector(uint32_t priority = 1)
+		{
+			NVIC_SetPriority(DmaBase::Nvic<ID>::DmaIrqs[uint32_t(ChannelID)], priority);
+			NVIC_EnableIRQ(DmaBase::Nvic<ID>::DmaIrqs[uint32_t(ChannelID)]);
+		}
+		/**
+		 * Disable the IRQ vector of the channel
+		 */
+		static void
+		disableInterruptVector()
+		{
+			NVIC_DisableIRQ(DmaBase::Nvic<ID>::DmaIrqs[uint32_t(ChannelID)]);
+		}
+
+		/**
+		 * Enable the specified interrupt of the channel
+		 */
+		static void
+		enableInterrupt(Interrupt_t irq)
+		{
+			ChannelHal::enableInterrupt(irq);
+		}
+		/**
+		 * Disable the specified interrupt of the channel
+		 */
+		static void
+		disableInterrupt(Interrupt_t irq)
+		{
+			ChannelHal::disableInterrupt(irq);
+		}
+
+		/**
+		 * Helper to verify that the selected channel supports the selected
+		 * hardware and provides the Request to be set in setPeripheralRequest().
+		 */
+		template <Peripheral peripheral, Signal signal = Signal::NoSignal>
+		struct RequestMapping {
+		};
+
+	private:
+		static inline DmaBase::IrqHandler transferError { nullptr };
+		static inline DmaBase::IrqHandler transferComplete { nullptr };
+	};
+};
+
+/*
+ * Derive DMA controller classes for convenience. Every derived class defines
+ * the channels available on that controller.
+ */
+%% for channels in dma["channels"]
+class Dma{{ channels.instance }}: public DmaController<{{ channels.instance }}>
 {
 public:
-	static inline void
-	enable();
-
-	static inline void
-	disable();
-
-
-public:
-%% for stream in streams
-	class Stream{{ stream }} : public DmaBase
-	{
-	public:
-	%% set pointer_types = [8, 16, 32]
-	%% for type in pointer_types
-		/// will disable the stream
-		static inline void
-		setMemorySource(uint{{type}}_t* address,
-			MemoryIncrementMode inc = MemoryIncrementMode::Increment
-		%% if target["family"] == "f4"
-			, MemoryBurstTransfer transfer = MemoryBurstTransfer::Single);
-		%% elif target["family"] == "f3"
-			);
-		%% endif
-
-		/// will disable the stream
-		static inline void
-		setPeripheralSource(uint{{type}}_t* address,
-			PeripheralIncrementMode inc = PeripheralIncrementMode::Fixed
-		%% if target["family"] == "f4"
-			, PeripheralBurstTransfer transfer = PeripheralBurstTransfer::Single);
-		%% elif target["family"] == "f3"
-			);
-		%% endif
+	%% for channel in channels.channel
+	using Channel{{ channel.position }} = DmaController<{{ channels.instance }}>::Channel<DmaBase::Channel::Channel{{ channel.position }}>;
 	%% endfor
-
-	%% for type in pointer_types
-		/// will disable the stream
-		static inline void
-		setMemoryDestination(uint{{type}}_t* address,
-			MemoryIncrementMode inc = MemoryIncrementMode::Increment
-		%% if target["family"] == "f4"
-			, MemoryBurstTransfer transfer = MemoryBurstTransfer::Single);
-		%% elif target["family"] == "f3"
-			);
-		%% endif
-
-		/// will disable the stream
-		static inline void
-		setPeripheralDestination(uint{{type}}_t* address,
-			PeripheralIncrementMode inc = PeripheralIncrementMode::Fixed
-		%% if target["family"] == "f4"
-			, PeripheralBurstTransfer transfer = PeripheralBurstTransfer::Single);
-		%% elif target["family"] == "f3"
-			);
-		%% endif
-	%% endfor
-
-		static inline void
-		stop();
-
-		/// will disable the stream
-		static inline void
-		configure(
-		%% if target["family"] == "f4"
-			Channel channel,
-		%% endif
-			uint16_t sample_length,
-			Priority priority = Priority::Medium,
-			CircularMode circular = CircularMode::Disabled
-		%% if target["family"] == "f4"
-			, FlowControl flow = FlowControl::Dma);
-		%% elif target["family"] == "f3"
-			);
-		%% endif
-
-		static inline void
-		start();
-
-		static inline bool
-		isFinished();
-
-		static inline DataTransferDirection
-		getDataTransferDirection();
-	};
-%% endfor
 };
+%% endfor
+
+
+/*
+ * Specialization of the RequestMapping. For all hardware supported by DMA the
+ * RequestMapping structure defines the channel and the Request. It can be used
+ * by hardware classes to verify that the provided channel is valid and to
+ * get the value to set in setPeripheralRequest().
+ *
+ * Example:
+ * template <class DmaRx, class DmaTx>
+ * class SpiMaster1_Dma : public SpiMaster1
+ * {
+ *     using RxChannel = typename DmaRx::template RequestMapping<Peripheral::Spi1, DmaBase::Signal::Rx>::Channel;
+ * 	   using TxChannel = typename DmaTx::template RequestMapping<Peripheral::Spi1, DmaBase::Signal::Tx>::Channel;
+ * 	   static constexpr DmaBase::Request RxRequest = DmaRx::template RequestMapping<Peripheral::Spi1, DmaBase::Signal::Rx>::Request;
+ * 	   static constexpr DmaBase::Request TxRequest = DmaTx::template RequestMapping<Peripheral::Spi1, DmaBase::Signal::Tx>::Request;
+ *
+ *     ...
+ * };
+ */
+%% for channels in dma["channels"]
+	%% for channel in channels.channel
+		%% for request in channel.request
+			%% for signal in request.signal
+				%% set peripheral = signal.driver.capitalize()
+				%% if signal.instance is defined
+					%% set peripheral = peripheral ~ signal.instance
+				%% else
+					%% if peripheral not in ["Quadspi", "Aes", "Dcmi"]
+						%% set peripheral = peripheral ~ 1
+					%% endif
+				%% endif
+template <>
+template <>
+template <>
+struct DmaController<{{ channels.instance }}>::Channel<DmaBase::Channel::Channel{{ channel.position }}>::RequestMapping<Peripheral::{{ peripheral }}{% if signal.name is defined %}, DmaBase::Signal::{{ signal.name.capitalize() }}{% endif %}>
+{
+	using Channel = DmaController<{{ channels.instance }}>::Channel<DmaBase::Channel::Channel{{ channel.position }}>;
+	static constexpr DmaBase::Request Request = DmaBase::Request::Request{{ request.position }};
+};
+
+			%% endfor
+		%% endfor
+	%% endfor
+%% endfor
 
 }	// namespace platform
 
 }	// namespace modm
 
-#include "dma_{{ id }}_impl.hpp"
-
-#endif	// MODM_STM32_DMA{{ id }}_HPP
+#endif	// MODM_STM32_DMA_HPP
