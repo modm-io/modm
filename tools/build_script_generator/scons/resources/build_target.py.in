@@ -33,7 +33,7 @@ def build_target(env, sources):
 	env.Alias("all", ["build", "run"])
 %% else
 	# The executable depends on the linkerscript
-	env.Depends(target=program, dependency=abspath("modm/link/linkerscript.ld"))
+	env.Depends(target=program, dependency="$BASEPATH/link/linkerscript.ld")
 	env.Alias("size", env.Size(program))
 	%% if core.startswith("cortex-m")
 	env.Alias("log-itm", env.LogItmOpenOcd())

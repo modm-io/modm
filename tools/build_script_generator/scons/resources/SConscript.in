@@ -11,11 +11,6 @@
 from os.path import join, abspath
 Import("env")
 
-%% if is_modm
-import sys
-sys.path.append(join(env.Dir("#").abspath, "modm"))
-%% endif
-
 profile = env["CONFIG_PROFILE"]
 %% if is_modm
 env["BUILDPATH"] = join(env["CONFIG_BUILD_BASE"], profile)
