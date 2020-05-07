@@ -2,6 +2,7 @@
  * Copyright (c) 2013, Kevin Läufer
  * Copyright (c) 2013-2017, Niklas Hauser
  * Copyright (c) 2014, Daniel Krebs
+ * Copyright (c) 2020, Mike Wolfram
  *
  * This file is part of the modm project.
  *
@@ -96,6 +97,15 @@ modm::platform::SpiHal{{ id }}::setMasterSelection(MasterSelection masterSelecti
 	SPI{{ id }}->CR1 = (SPI{{ id }}->CR1 & ~static_cast<uint32_t>(MasterSelection::All))
 										 | static_cast<uint32_t>(masterSelection);
 }
+
+%% if "fifo" in features
+inline void
+modm::platform::SpiHal{{ id }}::setRxFifoThreshold(RxFifoThreshold threshold)
+{
+	SPI{{ id }}->CR2 = (SPI{{ id }}->CR2 & ~static_cast<uint32_t>(RxFifoThreshold::QuarterFull))
+										 | static_cast<uint32_t>(threshold);
+}
+%% endif
 
 inline bool
 modm::platform::SpiHal{{ id }}::isReceiveRegisterNotEmpty()

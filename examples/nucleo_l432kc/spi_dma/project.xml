@@ -1,0 +1,12 @@
+<library>
+  <extends>modm:nucleo-l432kc</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_l432kc/spi_dma</option>
+  </options>
+  <modules>
+    <module>modm:platform:gpio</module>
+    <module>modm:platform:dma</module>
+    <module>modm:platform:spi:1</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

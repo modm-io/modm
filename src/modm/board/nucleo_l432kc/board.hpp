@@ -40,6 +40,9 @@ struct SystemClock {
 	static constexpr uint32_t Usart4 = Apb1;
 	static constexpr uint32_t Usart5 = Apb1;
 
+	static constexpr uint32_t Spi1 = Apb2;
+	static constexpr uint32_t Spi2 = Apb2;
+
 	static bool inline
 	enable()
 	{
