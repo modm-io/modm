@@ -44,7 +44,7 @@ delay_us(uint32_t us)
 		const uint32_t cycles = uint32_t(ceil(fabs((F_CPU * double(us)) / 1e6)));
 		__builtin_avr_delay_cycles(cycles);
 	}) : ({
-%% if f_cpu <= 6e6
+%% if f_cpu <= 6000000
 		constexpr int32_t cycles = (F_CPU / 1e6);
 		for (int16_t _us = us; _us > 0; _us -= cycles)
 			__builtin_avr_delay_cycles(1);
