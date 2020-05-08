@@ -80,3 +80,42 @@ own BSP:
    (check for `module.depends(...)` in the BSPs `module.lb`).
 4. You may need to manually add the pre-defined collector values to your project
    configuration (check for `env.collect(...)` in the BSPs `module.lb`).
+
+
+## Create the SystemClock struct
+
+The easiest way using ST's CubeMX tool.
+
+### 1. CubeMX Clock Graph
+
+First we create a project in CubeMX with the desired microcontroller using the
+largest (pin-count, flash) variant. CubeMX displays something like this in the
+"Clock configuration" tab:
+
+![ST CubeMX Clock Configuration example](https://user-images.githubusercontent.com/2820734/81305132-43715000-907e-11ea-8b8e-b444dc7560cf.png)
+
+Then configure all clocks, muxes, multipliers and dividers to the highest
+allowed clock speeds (*).
+
+(*) exceptions: E.g. USB usually requires exactly 48 MHz.
+
+This settings are reflected in the constants `static constexpr uint32_t Frequency`,
+`Apb1` and `Apb2` as well as in `const Rcc::PllFactors pllFactors{...}` and the
+following lines. The `PllFactors` struct should be fairly self-explanatory.
+
+
+### 2. Peripheral Mapping
+
+As we can see in the graphic above, there are different clock ranges.
+Each peripheral is connected to a clock domain.
+Some peripherals have an upstream clock mux, this is currently ignored in
+modm and the default setting for the clock mux is assumed.
+
+The figure shows the block diagram of the controller, which can be found at
+the beginning of the data sheet (not in the reference manual):
+
+![STM32 Block Diagram example](https://user-images.githubusercontent.com/2820734/81448035-fffe0b00-917d-11ea-8a1f-428548851e63.png)
+
+For each peripheral we create a `static constexpr uint32_t` member in
+the `struct SystemClock` and assign the value of the clock domain to which
+the peripheral is connected.
