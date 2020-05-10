@@ -145,14 +145,16 @@ documentation.
 <td align="center">NUCLEO-F429ZI</td>
 <td align="center">NUCLEO-F446RE</td>
 </tr><tr>
+<td align="center">NUCLEO-F746ZG</td>
 <td align="center">NUCLEO-G071RB</td>
 <td align="center">NUCLEO-G474RE</td>
 <td align="center">NUCLEO-L152RE</td>
-<td align="center">NUCLEO-L432KC</td>
 </tr><tr>
+<td align="center">NUCLEO-L432KC</td>
 <td align="center">NUCLEO-L476RG</td>
 <td align="center">OLIMEXINO-STM32</td>
 <td align="center">STM32F030F4P6-DEMO</td>
+</tr><tr>
 </tr>
 </table>
 <!--/bsptable-->

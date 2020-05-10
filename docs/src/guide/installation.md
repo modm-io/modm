@@ -7,7 +7,7 @@ with modm:
 - [Software Construct][scons] or [CMake][]
 - [Library Builder][lbuild]
 - AVR toolchain: [avr-gcc][] and [avrdude][]
-- ARM toolchain: [gcc-arm-toolchain][] and [OpenOCD][].
+- ARM toolchain: [gcc-arm-toolchain][] and [OpenOCD][] (HEAD version!).
 - Optional: [Doxygen][] or [Doxypress][]
 - Optional: [gdbgui][] for IDE-independent debugging
 
@@ -71,7 +71,7 @@ some of these libraries as well, depending on what modm modules you use:
 
 For Ubuntu 18.04LTS, these commands install the basic build system:
 
-	sudo apt-get install python3 python3-pip scons git openocd
+	sudo apt-get install python3 python3-pip scons git
 	sudo apt-get --no-install-recommends install doxygen
 	pip3 install modm
 
@@ -94,6 +94,14 @@ Install the ARM toochain by downloading [the pre-built version][gcc-arm-toolchai
 for 64-bit Linux and adding its `/bin` directory to your path.
 **Even though your distribution may ship their own ARM toolchain, we very strongly
 recommend using the official toolchain, since all of modm is tested with it.**
+
+Install OpenOCD via your package manager:
+
+	sudo apt-get install openocd
+
+The latest OpenOCD release v0.10.0 (as of May 2020) is too old for some targets
+(STM32G0, STM32G4, STM32F7). To program these targets you need to compile the
+[HEAD version of OpenOCD from source][openocd-source].
 
 We recommend the use of a graphical frontend for GDB called [gdbgui][]:
 
@@ -141,6 +149,7 @@ You'll need to add both `/bin` paths to your `PATH` variable manually.
 [examples]: https://github.com/modm-io/modm/tree/develop/examples
 [gcc-arm-toolchain]: https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm
 [openocd]: http://openocd.org
+[openocd-source]: https://github.com/ntfreak/openocd
 [avr-gcc]: https://www.nongnu.org/avr-libc
 [avrdude]: https://www.nongnu.org/avrdude
 [lbuild]: https://github.com/modm-io/lbuild
