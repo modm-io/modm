@@ -101,35 +101,35 @@ main()
 
 MODM_ISR(ADC1_2)
 {
-	MODM_LOG_INFO << "Entry Adc1::getInterruptFlags() = " << modm::bin << Adc1::getInterruptFlags() << modm::ascii << "\n";
-	MODM_LOG_INFO << "Entry Adc2::getInterruptFlags() = " << modm::bin << Adc2::getInterruptFlags() << modm::ascii << "\n";
+	MODM_LOG_DEBUG << "Entry Adc1::getInterruptFlags() = " << modm::bin << Adc1::getInterruptFlags() << modm::ascii << "\n";
+	MODM_LOG_DEBUG << "Entry Adc2::getInterruptFlags() = " << modm::bin << Adc2::getInterruptFlags() << modm::ascii << "\n";
 
 	if (Adc1::getInterruptFlags() & Adc1::InterruptFlag::EndOfSampling) {
-		MODM_LOG_INFO << "ACK EndOfSampling\n";
+		MODM_LOG_DEBUG << "ACK EndOfSampling\n";
 		Adc1::acknowledgeInterruptFlag(Adc1::InterruptFlag::EndOfSampling);
 	}
 	if (Adc1::getInterruptFlags() & Adc1::InterruptFlag::EndOfRegularConversion) {
-		MODM_LOG_INFO << "ACK EndOfRegularConversion\n";
+		MODM_LOG_DEBUG << "ACK EndOfRegularConversion\n";
 		Adc1::acknowledgeInterruptFlag(Adc1::InterruptFlag::EndOfRegularConversion);
-		MODM_LOG_INFO << "Interrupt: regularValue=" << Adc1::getValue() << "\n";
+		MODM_LOG_DEBUG << "Interrupt: regularValue=" << Adc1::getValue() << "\n";
 	}
 
-	MODM_LOG_INFO << "Middle Adc1::getInterruptFlags() = " << modm::bin << Adc1::getInterruptFlags() << modm::ascii << "\n";
+	MODM_LOG_DEBUG << "Middle Adc1::getInterruptFlags() = " << modm::bin << Adc1::getInterruptFlags() << modm::ascii << "\n";
 
 	if (Adc1::getInterruptFlags() & Adc1::InterruptFlag::EndOfRegularSequenceOfConversions) {
-		MODM_LOG_INFO << "ACK EndOfRegularSequenceOfConversions\n";
+		MODM_LOG_DEBUG << "ACK EndOfRegularSequenceOfConversions\n";
 		Adc1::acknowledgeInterruptFlag(Adc1::InterruptFlag::EndOfRegularSequenceOfConversions);
-		MODM_LOG_INFO << "Interrupt: regularValue=" << Adc1::getValue() << "\n";
+		MODM_LOG_DEBUG << "Interrupt: regularValue=" << Adc1::getValue() << "\n";
 	}
 	if (Adc1::getInterruptFlags() & Adc1::InterruptFlag::EndOfInjectedConversion) {
 		Adc1::acknowledgeInterruptFlag(Adc1::InterruptFlag::EndOfInjectedConversion);
-		MODM_LOG_INFO << "ACK EndOfInjectedConversion\n";
+		MODM_LOG_DEBUG << "ACK EndOfInjectedConversion\n";
 	}
 	if (Adc1::getInterruptFlags() & Adc1::InterruptFlag::EndOfInjectedSequenceOfConversions) {
 		Adc1::acknowledgeInterruptFlag(Adc1::InterruptFlag::EndOfInjectedSequenceOfConversions);
-		MODM_LOG_INFO << "ACK EndOfInjectedSequenceOfConversions\n";
+		MODM_LOG_DEBUG << "ACK EndOfInjectedSequenceOfConversions\n";
 	}
-	MODM_LOG_INFO << "Exit Adc1::getInterruptFlags() = " << modm::bin << Adc1::getInterruptFlags() << modm::ascii << "\n";
+	MODM_LOG_DEBUG << "Exit Adc1::getInterruptFlags() = " << modm::bin << Adc1::getInterruptFlags() << modm::ascii << "\n";
 	Adc1::acknowledgeInterruptFlag(Adc1::InterruptFlag_t{0xffff'ffff});
 	__DSB();
 }
@@ -137,7 +137,7 @@ MODM_ISR(ADC1_2)
 MODM_ISR(TIM1_CC)
 {
 	if(Timer1::getInterruptFlags() & Timer1::InterruptFlag::CaptureCompare4) {
-		MODM_LOG_INFO << "TIM1_CC interrupt CaptureCompare4 entered!\n";
+		MODM_LOG_DEBUG << "TIM1_CC interrupt CaptureCompare4 entered!\n";
 		Timer1::acknowledgeInterruptFlags(Timer1::InterruptFlag::CaptureCompare4);
 	}
 	else {
@@ -148,7 +148,7 @@ MODM_ISR(TIM1_CC)
 MODM_ISR(TIM1_UP_TIM16)
 {
 	if(Timer1::getInterruptFlags() & Timer1::InterruptFlag::Update) {
-		MODM_LOG_INFO << "TIM1_UP_TIM16 interrupt Update entered!\n";
+		MODM_LOG_DEBUG << "TIM1_UP_TIM16 interrupt Update entered!\n";
 		Timer1::acknowledgeInterruptFlags(Timer1::InterruptFlag::Update);
 	}
 	else {
