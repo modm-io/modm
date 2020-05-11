@@ -40,7 +40,7 @@ def run(where, command, stdin=None):
 
 def name(raw_name):
     result = []
-    raw_name = raw_name.replace("_", " ").replace(".", " ").replace(":", " ")
+    raw_name = str(raw_name).replace("_", " ").replace(".", " ").replace(":", " ")
     for part in raw_name.split(" "):
         part = part.upper()
         result.append(part)
@@ -61,7 +61,7 @@ def name(raw_name):
                    .replace("BLOCK-", "")\
                    .replace("-SPI", "")
     if result in ["DEVICE", "LIS3-TRANSPORT", "MEMORY-BUS", "TERMINAL", "ALLOCATOR",
-                  "MIRROR", "ADC-SAMPLER", "FAT", "HEAP", "--PYCACHE--"]:
+                  "MIRROR", "ADC-SAMPLER", "FAT", "HEAP", "--PYCACHE--", "FILE"]:
         return None
     return result
 
@@ -80,9 +80,12 @@ def format_table(items, width, align=None):
     if align: subs["align"] = align;
     return Environment().from_string(TABLE_TEMPLATE).render(subs)
 
-def get_lbuild_in(path):
-    builder = lbuild.api.Builder(cwd=path, config=join(path, "project.xml"))
-    builder.load()
+def get_lbuild(root, target=None):
+    if target is None: target = "stm32";
+    target = {"avr": "atmega2560-16au", "stm32": "stm32f469nih6",
+              "hosted": "hosted-linux"}[target]
+    builder = lbuild.api.Builder(cwd=root, options=[":target={}".format(target)])
+    builder.load(root / "repo.lb")
     return builder.parser
 
 
@@ -104,8 +107,8 @@ modules_in_path = root / "docs/modules.md.in"
 modules_path = root / "docs/src/reference/modules.md"
 
 # We cannot use lbuild to enumerate the boards since they only make themselves available for certain devices
-# boards = [{"name": name(x.name), "url": url(x.relative_to(root))} for x in board_path.iterdir() if x.is_dir() and name(x.name)]
-boards = [{"name": name(x.name), "url": None} for x in board_path.iterdir() if x.is_dir() and name(x.name)]
+boards = (b.relative_to(board_path) for b in board_path.glob('**/board.xml'))
+boards = [{"name": name(b.parent.name), "url": None} for b in boards]
 boards.sort(key=lambda b: b["name"])
 bsp_table = format_table(boards, 4)
 
@@ -116,8 +119,7 @@ examples.sort(key=lambda b: b["name"])
 example_table = format_table(examples, 2, "left")
 
 # Get all supported targets
-lbuild_parser = get_lbuild_in("{}/examples/stm32f4_discovery/blink/".format(root))
-targets = set(lbuild_parser.find_option("modm:target").values)
+targets = set(get_lbuild(root).find_option("modm:target").values)
 ignored_devices = set(d for d in ignored_path.read_text().strip().splitlines() if "#" not in d)
 targets -= ignored_devices
 avr_count = len([t for t in targets if t.startswith("at")])
@@ -129,7 +131,9 @@ author_count = len(author_handles)
 
 # Get all the modules that are available for the STM32
 # Get all drivers, we assume they are available for all devices
-drivers = sorted([m.replace("modm:driver:", "") for m in lbuild_parser.modules if m.startswith("modm:driver:")])
+drivers = (get_lbuild(root, t).modules for t in {"avr", "stm32", "hosted"})
+drivers = {m for mg in drivers for m in mg if m.startswith("modm:driver:")}
+drivers = sorted(m.replace("modm:driver:", "") for m in drivers)
 drivers = [{"name": name(d), "url": None} for d in drivers if name(d)]
 driver_table = format_table(drivers, 6)
 
