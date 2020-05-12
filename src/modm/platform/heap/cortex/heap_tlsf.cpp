@@ -148,6 +148,8 @@ void *__wrap__realloc_r(struct _reent *, void *p, size_t size)
 
 void __wrap__free_r(struct _reent *, void *p)
 {
+	// do nothing if NULL pointer
+	if (!p) return;
 	tlsf_t pool = get_tlsf_for_ptr(p);
 	// if pointer belongs to no pool, exit.
 	if (!pool) return;
