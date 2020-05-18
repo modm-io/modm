@@ -209,6 +209,8 @@ public:
 private:
 	template< Peripheral peripheral >
 	static constexpr int8_t AdcChannel = -1;
+	template< Peripheral peripheral >
+	static constexpr int8_t DacChannel = -1;
 };
 
 /// @cond
@@ -245,6 +247,13 @@ template<>
 constexpr int8_t
 Gpio{{ port ~ pin }}::AdcChannel<Peripheral::{{ signal.driver }}> = {{ signal.name | to_adc_channel }};
 		%% endif
+
+		%% if signal.driver.startswith("Dac") and signal.name.startswith("Out")
+template<>
+constexpr int8_t
+Gpio{{ port ~ pin }}::DacChannel<Peripheral::{{ signal.driver }}> = {{ signal.name | to_adc_channel }};
+		%% endif
+
 	%% endfor
 
 %% endfor

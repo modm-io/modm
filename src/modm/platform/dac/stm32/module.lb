@@ -1,0 +1,24 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import os
+
+def init(module):
+    module.name = ":platform:dac"
+    module.description = "Digital-to-Analog Converter (DAC)"
+
+def prepare(module, options):
+    if not options[":target"].has_driver("dac:stm32"):
+        return False
+
+    if not options[":target"].identifier.family == 'f4':
+        return False
+
+    module.depends(":cmsis:device")
+
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/platform/dac"
+    env.copy("dac.hpp")
+    env.copy("dac_impl.hpp")
