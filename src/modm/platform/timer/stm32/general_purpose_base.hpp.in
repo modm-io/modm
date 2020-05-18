@@ -201,6 +201,20 @@ public:
 	};
 %% endif
 
+%% if target.family not in ["l1"]
+	enum class OffStateForRunMode : uint32_t
+	{
+		Disable = 0,
+		Enable  = TIM_BDTR_OSSR,
+	};
+
+	enum class OffStateForIdleMode : uint32_t
+	{
+		Disable = 0,
+		Enable  = TIM_BDTR_OSSI,
+	};
+%% endif
+
 public:
 	/**
 	 * Set operation mode of the timer
@@ -211,6 +225,8 @@ public:
 	static void
 	setMode(Mode mode, SlaveMode slaveMode = SlaveMode::Disabled,
 			SlaveModeTrigger slaveModeTrigger = (SlaveModeTrigger) 0);
+
+
 
 public:
 	/**

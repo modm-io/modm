@@ -120,18 +120,6 @@ public:
 		ExternalClock = TIM_SMCR_SMS_2 | TIM_SMCR_SMS_1 | TIM_SMCR_SMS_0,
 	};
 
-	enum class OffStateForRunMode : uint32_t
-	{
-		Disable = 0,
-		Enable  = TIM_BDTR_OSSR,
-	};
-
-	enum class OffStateForIdleMode : uint32_t
-	{
-		Disable = 0,
-		Enable  = TIM_BDTR_OSSI,
-	};
-
 	enum class OutputIdleState : uint32_t
 	{
 		Reset = 0,
@@ -152,12 +140,6 @@ public:
 		CaptureCompare1 			= TIM_EGR_CC1G,
 		Update 						= TIM_EGR_UG,
 	};
-
-	/**
-	 * Enable output pins
-	 */
-	static void
-	enableOutput();
 };
 
 }	// namespace platform
