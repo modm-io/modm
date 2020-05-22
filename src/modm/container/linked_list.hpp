@@ -17,6 +17,7 @@
 #define	MODM_LINKED_LIST_HPP
 
 #include <stdint.h>
+#include <iterator>
 #include <modm/utils/allocator.hpp>
 
 namespace modm
@@ -116,7 +117,7 @@ namespace modm
 		/**
 		 * \brief	Forward iterator
 		 */
-		class iterator
+		class iterator : public std::iterator<std::forward_iterator_tag, T>
 		{
 			friend class LinkedList;
 			friend class const_iterator;
@@ -142,7 +143,7 @@ namespace modm
 		/**
 		 * \brief	forward const iterator
 		 */
-		class const_iterator
+		class const_iterator : public std::iterator<std::forward_iterator_tag, T>
 		{
 			friend class LinkedList;
 

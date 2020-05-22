@@ -18,6 +18,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <type_traits>
+#include <iterator>
 
 namespace modm
 {
@@ -189,7 +190,7 @@ namespace modm
 		 *
 		 * \todo	check if a simpler implementation is possible
 		 */
-		class const_iterator
+		class const_iterator : public std::iterator<std::bidirectional_iterator_tag, T>
 		{
 			friend class BoundedDeque;
 

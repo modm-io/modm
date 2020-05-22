@@ -18,6 +18,7 @@
 
 #include <stdint.h>
 #include <modm/utils/allocator.hpp>
+#include <iterator>
 
 namespace modm
 {
@@ -103,7 +104,7 @@ namespace modm
 		 *
 		 * \todo	decrement operator doesn't work correctly
 		 */
-		class iterator
+		class iterator : public std::iterator<std::forward_iterator_tag, T>
 		{
 			friend class DoublyLinkedList;
 			friend class const_iterator;
@@ -132,7 +133,7 @@ namespace modm
 		 *
 		 * \todo	decrement operator doesn't work correctly
 		 */
-		class const_iterator
+		class const_iterator : public std::iterator<std::forward_iterator_tag, T>
 		{
 			friend class DoublyLinkedList;
 

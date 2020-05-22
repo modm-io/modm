@@ -19,6 +19,7 @@
 #include <cstddef>
 #include <modm/utils/allocator.hpp>
 #include <initializer_list>
+#include <iterator>
 
 namespace modm
 {
@@ -258,7 +259,7 @@ namespace modm
 		/**
 		 * \brief	Forward iterator
 		 */
-		class iterator
+		class iterator : public std::iterator<std::forward_iterator_tag, T>
 		{
 			friend class DynamicArray;
 			friend class const_iterator;
@@ -288,7 +289,7 @@ namespace modm
 		/**
 		 * \brief	forward const iterator
 		 */
-		class const_iterator
+		class const_iterator : public std::iterator<std::forward_iterator_tag, T>
 		{
 			friend class DynamicArray;
 
