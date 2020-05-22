@@ -80,8 +80,8 @@ modm::platform::SpiHal{{ id }}::setDataOrder(DataOrder dataOrder)
 void inline
 modm::platform::SpiHal{{ id }}::setDataSize(DataSize dataSize)
 {
-%% if "data-size" in features
 	// TODO: implement as set/reset bit
+%% if "data-size" not in features
 	SPI{{ id }}->CR1 = (SPI{{ id }}->CR1 & ~static_cast<uint32_t>(DataSize::All))
 										 | static_cast<uint32_t>(dataSize);
 %% else

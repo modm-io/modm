@@ -64,6 +64,8 @@ public:
 		LsbFirst = SPI_CR1_LSBFIRST
 	};
 
+	using DataSize = Hal::DataSize;
+
 public:
 	template< template<Peripheral _> class... Signals >
 	static void
@@ -107,6 +109,11 @@ public:
 	setDataOrder(DataOrder order)
 	{
 		SpiHal{{ id }}::setDataOrder(static_cast<SpiHal{{ id }}::DataOrder>(order));
+	}
+	static modm_always_inline void
+	setDataSize(DataSize size)
+	{
+		SpiHal{{ id }}::setDataSize(static_cast<SpiHal{{ id }}::DataSize>(size));
 	}
 
 
