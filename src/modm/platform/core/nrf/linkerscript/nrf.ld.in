@@ -1,0 +1,50 @@
+%% import "../../cortex/linker.macros" as linker with context
+{{ linker.copyright() }}
+
+{{ linker.prefix() }}
+
+%% if vector_table_location == "ram"
+/* Round up the number of vector table entries to the nearest power-of-two and multiply by 8. */
+VECTOR_TABLE_ALIGNMENT = (1 << LOG2CEIL({{ number_of_interrupts + 16 }})) * 8;
+/* compute the vector table offset from start of RAM */
+VECTOR_TABLE_OFFSET = ALIGN(TOTAL_STACK_SIZE, VECTOR_TABLE_ALIGNMENT);
+%% else
+VECTOR_TABLE_OFFSET = TOTAL_STACK_SIZE;
+%% endif
+
+SECTIONS
+{
+{{ linker.section_rom_start("FLASH") }}
+
+{{ linker.section_vector_rom("FLASH") }}
+
+{{ linker.section_stack("RAM", "VECTOR_TABLE_OFFSET - TOTAL_STACK_SIZE") }}
+
+{{ linker.section_vector_ram("RAM") }}
+
+{{ linker.section_rom("FLASH") }}
+
+{{ linker.section("FLASH", "fastcode") }}
+
+{{ linker.section_ram("RAM", "FLASH") }}
+
+{{ linker.section("RAM AT >FLASH", "fastdata") }}
+
+{{ linker.section_heap("RAM", "heap1") }}
+
+{{ linkerscript_sections | indent(first=True) }}
+
+    /* TABLES! TABLES! ALL THE TABLES YOU COULD EVER WANT! TABLES! */
+{{ linker.section_table_zero("FLASH") }}
+
+{{ linker.section_table_copy("FLASH") }}
+
+{{ linker.section_table_extern("FLASH") }}
+
+%% set heap_table = [{"name": "heap1", "prop": "0x000f"}]
+{{ linker.section_table_heap("FLASH", heap_table) }}
+
+{{ linker.section_rom_end("FLASH") }}
+
+{{ linker.section_debug() }}
+}
