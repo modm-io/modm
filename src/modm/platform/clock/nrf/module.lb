@@ -1,0 +1,40 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2016-2018, Niklas Hauser
+# Copyright (c) 2017, Fabian Greif
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":platform:hfclk"
+    module.description = "High Frequency Clock Controller (HFCLK)"
+
+def prepare(module, options):
+    if not options[":target"].has_driver("clock", ["nrf51", "nrf52"]):
+        return False
+
+    module.depends(":cmsis:device")
+    return True
+
+def build(env):
+    device = env[":target"]
+    core = device.get_driver("core")["type"]
+
+    if "m0" in core:
+        loops = 4
+    elif "m7" in core:
+        loops = 1
+    else:
+        loops = 3
+
+    env.substitutions = {"loops": loops}
+    env.outbasepath = "modm/src/modm/platform/clock"
+    env.copy("hfclk.hpp")
+    env.template("hfclk.cpp.in")
+    env.template("hfclk_impl.hpp.in")
