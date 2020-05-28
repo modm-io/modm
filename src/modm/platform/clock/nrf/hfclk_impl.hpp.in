@@ -1,0 +1,30 @@
+/*
+ * Copyright (c) 2019, Ethan Slattery
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#include <cmath>
+
+namespace modm::platform
+{
+/// @cond
+extern uint16_t delay_fcpu_MHz;
+extern uint16_t delay_ns_per_loop;
+/// @endcond
+
+template< uint32_t Core_Hz >
+void
+HighFrequencyClockController::updateCoreFrequency()
+{
+	delay_fcpu_MHz = Core_Hz / 64'000'000;
+	delay_ns_per_loop = ::round({{loops}}000.f / (Core_Hz / 64'000'000));
+}
+
+}
+
