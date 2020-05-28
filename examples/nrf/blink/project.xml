@@ -1,0 +1,14 @@
+<library>
+  <options>
+    <option name="modm:target">nrf52840-xxaa</option>
+    <option name="modm:build:build.path">../../../../build/nrf/blink</option>
+  </options>
+  <modules>
+    <module>modm:architecture:delay</module>
+    <module>modm:platform:core</module>
+    <module>modm:platform:clock</module>
+    <module>modm:platform:hfclk</module>
+    <module>modm:platform:gpio</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>
