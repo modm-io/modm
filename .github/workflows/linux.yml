@@ -286,6 +286,26 @@ jobs:
           name: hal-compile-quick-avr
           path: test/all/log
 
+  nrf-examples:
+    runs-on: ubuntu-24.04
+    container:
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2025-05-18
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
+        run: |
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
+      - name: Examples NRF52840 Without Discovery Board
+        if: always()
+        run: |
+          (cd examples && ../tools/scripts/examples_compile.py nrf)
+
   hal-compile-quick-1:
     runs-on: ubuntu-24.04
     container:
@@ -304,7 +324,7 @@ jobs:
       - name: Quick compile HAL for Cortex-M Part 1
         if: always()
         run: |
-          (cd test/all && python3 run_all.py stm32 sam rp --quick --split 4 --part 0)
+          (cd test/all && python3 run_all.py stm32 sam rp nrf --quick --split 4 --part 0)
       - name: Upload log artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -329,7 +349,7 @@ jobs:
       - name: Quick compile HAL for Cortex-M Part 2
         if: always()
         run: |
-          (cd test/all && python3 run_all.py stm32 sam rp --quick --split 4 --part 1)
+          (cd test/all && python3 run_all.py stm32 sam rp nrf --quick --split 4 --part 1)
       - name: Upload log artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -354,7 +374,7 @@ jobs:
       - name: Quick compile HAL for Cortex-M Part 3
         if: always()
         run: |
-          (cd test/all && python3 run_all.py stm32 sam rp --quick --split 4 --part 2)
+          (cd test/all && python3 run_all.py stm32 sam rp nrf --quick --split 4 --part 2)
       - name: Upload log artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -379,7 +399,7 @@ jobs:
       - name: Quick compile HAL for Cortex-M Part 4
         if: always()
         run: |
-          (cd test/all && python3 run_all.py stm32 sam rp --quick --split 4 --part 3)
+          (cd test/all && python3 run_all.py stm32 sam rp nrf --quick --split 4 --part 3)
       - name: Upload log artifacts
         uses: actions/upload-artifact@v4
         with:

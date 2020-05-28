@@ -737,3 +737,29 @@ jobs:
         with:
           name: stm32h7-compile-all-2
           path: test/all/log
+
+  nrf52-compile-all:
+    if: github.event.label.name == 'ci:hal'
+    runs-on: ubuntu-24.04
+    container:
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2025-05-18
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
+        run: |
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
+      - name: Compile HAL for all nrf52
+        run: |
+          (cd test/all && python3 run_all.py nrf52 --quick-remaining)
+      - name: Upload log artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nrf52-compile-all
+          path: test/all/log
