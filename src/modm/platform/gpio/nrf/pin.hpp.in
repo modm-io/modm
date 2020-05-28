@@ -1,0 +1,134 @@
+/*
+ * Copyright (c) 2017-2018, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+%% set port = "P" ~ gpio["port"] | upper
+%% set reg  = "NRF_" ~ port
+%% set pin  = gpio["pin"]
+%% set pinname = port ~ "_" ~ pin
+
+#ifndef MODM_NRF_GPIO_PIN_{{ pinname }}_HPP
+#define MODM_NRF_GPIO_PIN_{{ pinname }}_HPP
+
+#include "../device.hpp"
+#include "base.hpp"
+
+namespace modm::platform
+{
+
+/// @cond
+class Gpio{{ pinname }};
+using GpioOutput{{ pinname }} = Gpio{{ pinname }};
+using GpioInput{{ pinname }}  = Gpio{{ pinname }};
+/// @endcond
+
+/// IO class for Pin {{pinname}}
+/// @ingroup	modm_platform_gpio
+class Gpio{{ pinname }} : public Gpio, public ::modm::GpioIO
+{
+public:
+	using Output = Gpio{{ pinname }};
+	using Input = Gpio{{ pinname }};
+	using IO = Gpio{{ pinname }};
+	using Type = Gpio{{ pinname }};
+	// static constexpr Port port = Port::P{{port}}; ///< Port name
+	static constexpr uint8_t pin = {{pin}}; ///< Pin number
+
+protected:
+	static constexpr uint32_t mask  = 0x1 << pin;
+
+public:
+	// GpioOutput
+	// start documentation inherited
+	inline static void setOutput() { {{reg}}->DIRSET |= mask; }
+	inline static void setOutput(bool status) { setOutput(); set(status); }
+	inline static void set() { {{reg}}->OUTSET |= mask; }
+	inline static void set(bool status) { if(status) set(); else reset(); }
+	inline static void reset() { {{reg}}->OUTCLR |= mask; }
+	inline static void toggle() {
+		if (isSet()) { reset(); }
+		else         { set();   }
+	}
+	inline static bool isSet() { return ({{reg}}->OUT & mask); }
+	// stop documentation inherited
+	// inline static void configure(OutputType type, OutputSpeed speed = OutputSpeed::MHz50) { PinSet::configure(type, speed); }
+	// inline static void setOutput(OutputType type, OutputSpeed speed = OutputSpeed::MHz50) { PinSet::setOutput(type, speed); }
+	// GpioInput
+	// start documentation inherited
+	inline static void setInput() { {{reg}}->DIRCLR |= mask; }
+	inline static bool read() { return ({{reg}}->IN & mask); }
+	// end documentation inherited TODO
+	// inline static void configure(InputType type) { PinSet::configure(type); }
+	// inline static void setInput(InputType type) { PinSet::setInput(type); }
+
+	// GpioIO
+	// start documentation inherited
+	inline static Direction getDirection() {
+		if ({{reg}}->DIR |= mask) {
+			return Direction::Out;
+		} else {
+			return Direction::In;
+		}
+	}
+	// end documentation inherited TODO
+	// inline static void disconnect() {
+	// 	setInput(InputType::Floating);
+	// 	{{reg}}->AFR[af_id] &= ~af_mask;
+	// %% if target["family"] in ["l4"] and target["name"] in ["71", "75", "76", "85", "86"]
+	// 	{{reg}}->ASCR &= ~mask;
+	// %% endif
+
+	// }
+
+public:
+#ifdef __DOXYGEN__
+	/// @{
+	/// Connect to any software peripheral
+	using BitBang = GpioSignal;
+	%% for name, group in signals.items()
+	/// Connect to {% for sig in group %}{{ sig.driver }}{{ "" if loop.last else " or "}}{% endfor %}
+	using {{ name }} = GpioSignal;
+	%% endfor
+	/// @}
+#endif
+	/// @cond
+	template< Peripheral peripheral >
+	struct BitBang { static void connect();
+		static_assert(
+			(peripheral == Peripheral::BitBang),
+			"Gpio{{ pinname }}::BitBang only connects to software drivers!");
+	};
+	%% for signal_name, signal_group in signals.items()
+	template< Peripheral peripheral >
+	struct {{ signal_name }} { static void connect();
+		static_assert(
+		%% for signal in signal_group
+			(peripheral == Peripheral::{{ signal.driver }}){% if loop.last %},{% else %} ||{% endif %}
+		%% endfor
+			"Gpio{{ pinname }}::{{ signal_name }} only connects to {% for signal in signal_group %}{{signal.driver}}{% if not loop.last %} or {% endif %}{% endfor %}!");
+	};
+	%% endfor
+	/// @endcond
+};
+
+/// @cond
+template<>
+struct Gpio{{ pinname }}::BitBang<Peripheral::BitBang>
+{
+	using Gpio = Gpio{{ pinname }};
+	static constexpr Gpio::Signal Signal = Gpio::Signal::BitBang;
+	inline static void connect() {}
+};
+
+/// @endcond
+
+} // namespace modm::platform
+
+#endif // MODM_NRF_GPIO_PIN_{{ pinname }}_HPP
