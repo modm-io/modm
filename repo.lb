@@ -94,6 +94,7 @@ class DevicesCache(dict):
                      "same70", "sams70", "samv70", "samv71",
                      "samd51", "same51", "same53", "same54",
                      "rp2040",
+                     "nrf",
                      "hosted"]
         device_file_names = [dfn for dfn in device_file_names if any(s in dfn for s in supported)]
         # These files are ignored due to various issues
