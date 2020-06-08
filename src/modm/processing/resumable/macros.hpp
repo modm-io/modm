@@ -72,8 +72,8 @@
  * @warning	Use at end of the `resumable()` implementation only!
  * @hideinitializer
  */
-#define RF_END_RETURN_CALL(resumable) \
-			RF_RETURN_CALL(resumable); \
+#define RF_END_RETURN_CALL(...) \
+			RF_RETURN_CALL(__VA_ARGS__); \
 			modm_fallthrough; \
 		default: \
 			this->popRf(); \
@@ -108,10 +108,10 @@
 
 /// Calls a resumable function and returns its result.
 /// @hideinitializer
-#define RF_CALL(resumable) \
+#define RF_CALL(...) \
 	({ \
 			RF_INTERNAL_SET_CASE(__COUNTER__); \
-			auto rfResult = resumable; \
+			auto rfResult = (__VA_ARGS__); \
 			if (rfResult.getState() > modm::rf::NestingError) { \
 				this->popRf(); \
 				return {modm::rf::Running}; \
@@ -125,21 +125,21 @@
  * @warning	Use this with extreme caution, this can cause deadlocks!
  * @hideinitializer
  */
-#define RF_CALL_BLOCKING(resumable) \
+#define RF_CALL_BLOCKING(...) \
 	({ \
-			auto rfResult = resumable; \
-			while (rfResult.getState() > modm::rf::NestingError) \
-			{ rfResult = resumable; } \
+			decltype(__VA_ARGS__) rfResult{0}; \
+			do { rfResult = (__VA_ARGS__); } \
+			while (rfResult.getState() > modm::rf::NestingError); \
 			rfResult.getResult(); \
 	})
 
 /// Exits a resumable function and returns another resumable function's result.
 /// @hideinitializer
-#define RF_RETURN_CALL(resumable) \
+#define RF_RETURN_CALL(...) \
 		do { \
 			RF_INTERNAL_SET_CASE(__COUNTER__); \
 			{ \
-				auto rfResult = resumable; \
+				auto rfResult = (__VA_ARGS__); \
 				if (rfResult.getState() > modm::rf::NestingError) { \
 					this->popRf(); \
 					return {modm::rf::Running}; \
