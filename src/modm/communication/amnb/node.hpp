@@ -1,7 +1,5 @@
 /*
- * Copyright (c) 2011, Fabian Greif
- * Copyright (c) 2011-2013, 2015-2016, Niklas Hauser
- * Copyright (c) 2012-2013, Sascha Schade
+ * Copyright (c) 2020, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -11,559 +9,314 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	MODM_AMNB_NODE_HPP
-#define	MODM_AMNB_NODE_HPP
-
-#include <cstddef>
-#include <modm/architecture/interface/accessor_flash.hpp>
-#include <modm/processing/timer.hpp>
+#pragma once
 
 #include "interface.hpp"
+#include "handler.hpp"
+#include <modm/processing.hpp>
+#include <modm/container.hpp>
 
-namespace modm
+namespace modm::amnb
 {
-	namespace amnb
+
+/**
+ * @author	Niklas Hauser
+ * @ingroup modm_communication_amnb
+ */
+template < size_t TxBufferSize = 2, size_t MaxHeapAllocation = 0 >
+class Node : public modm::Resumable<6>
+{
+	static_assert(2 <= TxBufferSize, "TxBuffer must have at least two messages!");
+public:
+	Node(Device &device, uint8_t address): interface(device), address(address)
+	{ setSeed(); }
+
+	template< size_t Actions >
+	Node(Device &device, uint8_t address, const Action (&actions)[Actions])
+	:	interface(device), actionList(actions), actionCount(Actions), address(address)
 	{
-		/**
-		 * \internal
-		 * \brief	Interface used to transmit data through a slave object
-		 *
-		 * \ingroup	amnb
-		 */
-		class Transmitter
-		{
-		public:
-			virtual void
-			send(bool acknowledge, const void *payload, uint8_t payloadLength) = 0;
-		};
-
-		/**
-		 * \brief	Response object for an action call
-		 *
-		 * \ingroup	amnb
-		 */
-		class Response
-		{
-			template <typename I>
-			friend class Node;
-
-		public:
-			/**
-			 * \brief	Signal an error condition
-			 *
-			 * \param 	errorCode	Error code. Values below 0x20 are reserved
-			 * 						for the system, feel free to use any other
-			 * 						value for specific error conditions.
-			 *
-			 * \see		modm::amnb::Error
-			 */
-			void
-			error(uint8_t errorCode = ERROR_GENERAL_ERROR);
-
-			/**
-			 * \brief	Send a response without any data
-			 */
-			void
-			send();
-
-			/**
-			 * \brief	Send a response with an attached payload
-			 *
-			 * \param	payload		Pointer to the payload
-			 * \param	length		Number of bytes
-			 */
-			void
-			send(const void *payload, std::size_t length);
-
-			/**
-			 * \brief	Send a response with an attached payload
-			 */
-			template <typename T>
-			modm_always_inline void
-			send(const T& payload);
-
-		protected:
-			Response(Transmitter *parent);
-
-			Response(const Response&);
-
-			Response&
-			operator = (const Response&);
-
-			Transmitter *transmitter;
-			bool triggered;				///< is used by amnp::Node to check that a response was send
-		};
-
-		/**
-		 * \brief	Base-class for every object which should be used inside
-		 * 			a callback.
-		 *
-		 * Example:
-		 * \code
-		 * class Sensor : public modm::amnb::Callable
-		 * {
-		 * public:
-		 *     void
-		 *     sendValue(modm::amnb::Response& response)
-		 *     {
-		 *         response.send(this->value);
-		 *     }
-		 *
-		 *     // ...
-		 *
-		 * private:
-		 *     int8_t value;
-		 * };
-		 * \endcode
-		 *
-		 * A complete example is available in the \c example/amnb folder.
-		 *
-		 * \see		modm::amnb::Node
-		 * \ingroup	amnb
-		 */
-		struct Callable
-		{
-		};
-
-		/**
-		 * \brief	Possible Action
-		 *
-		 * \see		AMNB_ACTION()
-		 * \ingroup	amnb
-		 */
-		struct Action
-		{
-			typedef void (Callable::*Callback)(Response& response, const void *payload);
-
-			inline void
-			call(Response& response, const void *payload);
-
-			uint8_t command;
-			uint8_t payloadLength;		//!< Payload length in bytes
-			Callable *object;
-			Callback function;			//!< Method callActionback
-		};
-
-		/**
-		 * \brief	Possible Listener
-		 *
-		 * \see		AMNB_LISTEN()
-		 * \ingroup	amnb
-		 */
-		struct Listener
-		{
-			typedef void (Callable::*Callback)(const void *payload, const uint8_t length, const uint8_t sender);
-
-			inline void
-			call(const void *payload, const uint8_t length, const uint8_t sender);
-
-			uint8_t address;			//!< Address of transmitting node
-			uint8_t command;
-			Callable *object;
-			Callback function;			//!< Method callActionback
-		};
-
-		/**
-		 * \brief	Possible Error
-		 *
-		 * \see		AMNB_ERROR()
-		 * \ingroup	amnb
-		 */
-		struct ErrorHandler
-		{
-			typedef void (Callable::*Callback)(Flags type, const uint8_t errorCode);
-
-			inline void
-			call(Flags type, const uint8_t errorCode);
-
-			uint8_t address;			//!< Node address of message
-			uint8_t command;			//!< Command of message
-			Callable *object;
-			Callback function;			//!< Method callActionback
-		};
-
-		/**
-		 * \brief	AMNB Node
-		 *
-		 * \code
-		 * typedef modm::amnb::Node< modm::amnb::Interface< modm::BufferedUart0 > > Node;
-		 *
-		 * FLASH_STORAGE(modm::amnb::Action actionList[]) =
-		 * {
-		 *     AMNB_ACTION(0x57, object, Object::method1,  0),
-		 *     AMNB_ACTION(0x03, object, Object::method2,  2),
-		 * };
-		 * // optional
-		 * FLASH_STORAGE(modm::amnb::Listener listenList[]) =
-		 * {
-		 *     AMNB_LISTEN(0x29, 0x46,	object, Object::method)
-		 * };
-		 * // also optional
-		 * FLASH_STORAGE(modm::amnb::ErrorHandler errorHandlerList[]) =
-		 * {
-		 *     AMNB_LISTEN(0x29, 0x46,	object, Object::method)
-		 * };
-		 *
-		 * int
-		 * main()
-		 * {
-		 *     // initialize the interface
-		 *     Node node(0x02,
-		 *               modm::accessor::asFlash(actionList),
-		 *               sizeof(actionList) / sizeof(modm::amnb::Action),
-		 *				 // optional
-		 *               modm::accessor::asFlash(listenList),
-		 *               sizeof(listenList) / sizeof(modm::amnb::Listener),
-		 *               modm::accessor::asFlash(errorHandlerList),
-		 *               sizeof(errorHandlerList) / sizeof(modm::amnb::ErrorHandler));
-		 *
-		 *     while (true)
-		 *     {
-		 *         node.update();
-		 *     }
-		 * }
-		 * \endcode
-		 *
-		 * A complete example is available in the \c example/amnb folder.
-		 *
-		 * \author	Fabian Greif, Niklas Hauser
-		 * \ingroup	amnb
-		 */
-		template <typename Interface>
-		class Node : protected Transmitter
-		{
-		public:
-			/**
-			 * \brief	Initialize the node
-			 *
-			 * \param	address		Own address
-			 * \param	actionList	List of all action callbacks, need to be
-			 * 						stored in flash-memory
-			 * \param	actionCount	Number of entries in \a actionList
-			 * \param	listenList	List of all listener callbacks, need to be
-			 * 						stored in flash-memory
-			 * \param	listenCount	Number of entries in \a listenList
-			 * \param	errorHandlerList	List of all error handler callbacks,
-			 *								need to be stored in flash-memory
-			 * \param	errorHandlerCount	Number of entries in \a errorHandlerList
-			 *
-			 * \see		AMNB_ACTION()
-			 * \see		AMNB_LISTEN()
-			 * \see		AMNB_ERROR()
-			 */
-			Node(uint8_t address, modm::accessor::Flash<Action> actionList, uint8_t actionCount,
-				 modm::accessor::Flash<Listener> listenList, uint8_t listenCount,
-				 modm::accessor::Flash<ErrorHandler> errorHandlerList, uint8_t errorHandlerCount);
-
-			/**
-			 * \brief	Initialize the node without error handlers
-			 */
-			Node(uint8_t address, modm::accessor::Flash<Action> actionList, uint8_t actionCount,
-				 modm::accessor::Flash<Listener> listenList, uint8_t listenCount);
-
-			/**
-			 * \brief	Initialize the node without listeners or error handlers
-			 */
-			Node(uint8_t address, modm::accessor::Flash<Action> actionList, uint8_t actionCount);
-
-			/**
-			 * \brief	Start a new query with a payload
-			 *
-			 * \param slaveAddress
-			 * \param command
-			 * \param payload
-			 * \param responseLength	Expected payload length of the response
-			 * \return \c true if no error occurred
-			 */
-			template <typename T>
-			bool
-			query(uint8_t slaveAddress, uint8_t command,
-				  const T& payload, uint8_t responseLength);
-
-			template <typename T>
-			bool
-			query(uint8_t slaveAddress, uint8_t command,
-				  const void *payload, uint8_t payloadLength, uint8_t responseLength);
-
-			/**
-			 * \brief	Start a new query without any payload
-			 *
-			 * \return \c true if no error occurred
-			 */
-			bool
-			query(uint8_t slaveAddress, uint8_t command, uint8_t responseLength);
-
-			/**
-			 * \brief	Start a new broadcast with a payload
-			 *
-			 * \param command
-			 * \param payload
-			 * \return \c true if no error occurred
-			 */
-			template <typename T>
-			bool
-			broadcast(uint8_t command, const T& payload);
-
-			/**
-			 * \brief	Start a new broadcast with a payload
-			 *
-			 * \param command
-			 * \param payload
-			 * \param payloadLength
-			 * \return \c true if no error occurred
-			 */
-			bool
-			broadcast(uint8_t command, const void *payload, uint8_t payloadLength);
-
-			/**
-			 * \brief	Start a new broadcast without any payload
-			 *
-			 * \return \c true if no error occurred
-			 */
-			bool
-			broadcast(uint8_t command);
-
-			bool
-			isQueryCompleted();
-
-			/**
-			 * \brief	Check if the last query could be performed successful
-			 *
-			 * Only valid if isQueryCompleted() returns \c true.
-			 *
-			 * \return	\c true if the query was successful. Use getResponse() to
-			 * 			access the result.
-			 */
-			bool
-			isSuccess();
-
-			/**
-			 * \brief	Check error code
-			 *
-			 * Only valid if isQueryCompleted() returns \c true while
-			 * isSuccess() returns \c false.
-			 *
-			 * \return	Error code
-			 * \see		modm::amnb::Error
-			 */
-			uint8_t
-			getErrorCode();
-
-
-			template <typename T>
-			inline const T *
-			getResponse();
-
-			inline const void *
-			getResponse();
-
-			/**
-			 * \brief	Receive and process messages
-			 *
-			 * This method will decode the incoming messages and call the
-			 * corresponding callback methods from the action list. It must
-			 * be called periodically, best in every main loop cycle.
-			 */
-			void
-			update();
-
-		protected:
-			void
-			send(bool acknowledge, const void *payload, uint8_t payloadLength);
-
-			bool
-			checkErrorHandlers(uint8_t address, uint8_t command, Flags type, uint8_t errorCode);
-
-
-			uint8_t ownAddress;
-			modm::accessor::Flash<Action> actionList;
-			uint8_t actionCount;
-			modm::accessor::Flash<Listener> listenList;
-			uint8_t listenCount;
-			modm::accessor::Flash<ErrorHandler> errorHandlerList;
-			uint8_t errorHandlerCount;
-
-			uint8_t currentCommand;
-			Response response;
-
-			enum QueryStatus
-			{
-				IN_PROGRESS,			///< Query in progress
-				SUCCESS,				///< Response successfully received
-				ERROR_RESPONSE = 0x40,	///< Error in the received message
-				ERROR_TIMEOUT = 0x41,	///< No message received within the timeout window
-				ERROR_PAYLOAD = 0x42,	///< Wrong payload size
-			};
-
-			QueryStatus queryStatus;
-			uint8_t expectedAddress;
-			uint8_t expectedResponseLength;
-			modm::ShortTimeout timer;
-			/// timeout value in milliseconds
-			static constexpr std::chrono::milliseconds timeout{10};
-		};
+		static_assert(Actions <= 0xff, "Actions list must be smaller than 255!");
+		setSeed();
 	}
+
+	template< size_t Listeners >
+	Node(Device &device, uint8_t address, const Listener (&listeners)[Listeners])
+	:	interface(device), listenerList(listeners), listenerCount(Listeners), address(address)
+	{
+		static_assert(Listeners <= 0xff, "Listeners list must be smaller than 255!");
+		setSeed();
+	}
+
+	template< size_t Actions, size_t Listeners >
+	Node(Device &device, uint8_t address, const Action (&actions)[Actions], const Listener (&listeners)[Listeners])
+	:	interface(device), actionList(actions), listenerList(listeners),
+		actionCount(Actions), listenerCount(Listeners), address(address)
+	{
+		static_assert(Actions <= 0xff, "Actions list must be smaller than 255!");
+		static_assert(Listeners <= 0xff, "Listeners list must be smaller than 255!");
+		setSeed();
+	}
+
+	void
+	setAddress(uint8_t address)
+	{
+		this->address = address;
+		setSeed();
+	}
+
+public:
+	bool
+	broadcast(uint8_t command)
+	{
+		if (tx_queue.isFull()) return false;
+		return tx_queue.push(std::move(Message(address, command, Type::Broadcast)));
+	}
+	template< typename T >
+	bool
+	broadcast(uint8_t command, const T &argument)
+	{
+		if (tx_queue.isFull()) return false;
+		Message msg(address, command, sizeof(T), Type::Broadcast);
+		T* t = msg.get<T>();
+		if (t == nullptr) return false;
+		*t = argument;
+		return tx_queue.push(std::move(msg));
+	}
+
+	template< class ReturnType = void, class ErrorType = void >
+	modm::ResumableResult< Result<ReturnType, ErrorType> >
+	request(uint8_t from, uint8_t command)
+	{
+		RF_BEGIN(0);
+		request_msg = Message(from, command, Type::Request);
+		RF_CALL(request());
+		RF_END_RETURN(request_msg);
+	}
+
+	template< class ReturnType = void, class ErrorType = void, class T >
+	modm::ResumableResult< Result<ReturnType, ErrorType> >
+	request(uint8_t from, uint8_t command, const T &argument)
+	{
+		RF_BEGIN(1);
+		{
+			request_msg = Message(from, command, sizeof(T), Type::Request);
+			T* arg = request_msg.get<T>();
+			if constexpr (sizeof(T) > Message::SMALL_LENGTH) {
+				if (arg == nullptr) {
+					request_msg = Response(Error::RequestAllocationFailed).msg;
+					RF_RETURN(request_msg);
+				}
+			}
+			*arg = argument;
+		}
+		RF_CALL(request());
+		RF_END_RETURN(request_msg);
+	}
+
+public:
+	void
+	update()
+	{
+		transmit();
+		receive();
+	}
+
+protected:
+	modm::ResumableResult<void>
+	transmit()
+	{
+		RF_BEGIN(2);
+		while(1)
+		{
+			if (not tx_queue.isEmpty())
+			{
+				RF_WAIT_WHILE(isResumableRunning(3));
+				RF_CALL(send(tx_queue.get()));
+				tx_queue.pop();
+			}
+			RF_YIELD();
+		}
+		RF_END();
+	}
+
+	modm::ResumableResult<void>
+	send(Message &msg)
+	{
+		RF_BEGIN(3);
+
+		msg.setValid();
+		tx_counter = std::min(10, msg.command() >> (8 - PRIORITY_BITS));
+		while(1)
+		{
+			while (interface.isMediumBusy())
+			{
+				RF_WAIT_WHILE(interface.isMediumBusy());
+				reschedule(RESCHEDULE_MASK_SHORT);
+				RF_WAIT_UNTIL(tx_timer.isExpired());
+			}
+
+			if (RF_CALL(interface.transmit(&msg)) == InterfaceStatus::Ok)
+				break;
+
+			if (--tx_counter == 0) break;
+
+			// a collision or other write issue occurred
+			RF_WAIT_WHILE(interface.isMediumBusy());
+			reschedule(RESCHEDULE_MASK_LONG);
+			RF_WAIT_UNTIL(tx_timer.isExpired());
+		}
+		RF_END();
+	}
+
+	modm::ResumableResult<void>
+	request()
+	{
+		RF_BEGIN(4);
+
+		RF_WAIT_WHILE(isResumableRunning(3));
+		response_status = ResponseStatus::Waiting;
+		RF_CALL(send(request_msg));
+
+		response_timer.restart(1s);
+		RF_WAIT_UNTIL((response_status == ResponseStatus::Received) or response_timer.isExpired());
+		response_status = ResponseStatus::NotWaiting;
+
+		if (response_timer.isExpired()) {
+			request_msg = Message(address, request_msg.command(), 1, Type::Error);
+			*request_msg.get<Error>() = Error::RequestTimeout;
+		}
+
+		RF_END();
+	}
+
+	modm::ResumableResult<void>
+	receive()
+	{
+		RF_BEGIN(5);
+		while(1)
+		{
+			rx_msg.deallocate();	// deallocates previous message
+			if (RF_CALL(interface.receiveHeader(&rx_msg)) == InterfaceStatus::Ok)
+			{
+				// Check lists if we are interested in this message
+				is_rx_msg_for_us = handleRxMessage(false);
+				// Receive the message data, only allocate if it's for us
+				if (RF_CALL(interface.receiveData(&rx_msg, is_rx_msg_for_us)) == InterfaceStatus::Ok)
+				{
+					// Only handle message *with* data if it's for us
+					if (is_rx_msg_for_us) handleRxMessage(true);
+				}
+			}
+			RF_YIELD();
+		}
+		RF_END();
+	}
+
+protected:
+	bool
+	handleRxMessage(bool complete)
+	{
+		switch(rx_msg.type())
+		{
+			case Type::Broadcast:
+				for (size_t ii=0; ii<listenerCount; ii++)
+				{
+					const auto listener = listenerList[ii];
+					if (rx_msg.command() == listener.command) {
+						if (complete) listener.call(rx_msg);
+						return true;
+					}
+				}
+				break;
+
+			case Type::Request:
+				if (rx_msg.address() == address)
+				{
+					for (size_t ii=0; ii<actionCount; ii++)
+					{
+						const auto action = actionList[ii];
+						if (rx_msg.command() == action.command)
+						{
+							if (complete)
+							{
+								auto msg = action.call(rx_msg);
+								msg.setAddress(address);
+								msg.setCommand(action.command);
+								tx_queue.push(std::move(msg));
+							}
+							return true;
+						}
+					}
+					Message msg(address, rx_msg.command(), 1, Type::Error);
+					*msg.get<Error>() = Error::NoAction;
+					tx_queue.push(std::move(msg));
+				}
+				break;
+
+			default:
+				if (response_status == ResponseStatus::Waiting)
+				{
+					if (complete and
+					    request_msg.address() == rx_msg.address() and
+						request_msg.command() == rx_msg.command())
+					{
+						request_msg = std::move(rx_msg);
+						response_status = ResponseStatus::Received;
+					}
+					return true;
+				}
+		}
+		return false;
+	}
+
+	void
+	setSeed()
+	{ lfsr = address << 8 | (address + 1); }
+
+	void
+	reschedule(uint8_t mask)
+	{
+		lfsr ^= lfsr >> 7;
+		lfsr ^= lfsr << 9;
+		lfsr ^= lfsr >> 13;
+
+		const uint16_t priority = ((1u << PRIORITY_BITS) - 1 - tx_counter) >> 3;
+		const uint16_t delay = (lfsr & ((1ul << mask) - 1)) | (priority << mask);
+		tx_timer.restart(std::chrono::microseconds(delay));
+	}
+
+protected:
+	Interface<MaxHeapAllocation> interface;
+
+	const Action *const actionList{nullptr};
+	const Listener *const listenerList{nullptr};
+
+	modm::ShortPreciseTimeout tx_timer;
+	modm::ShortTimeout response_timer;
+
+	modm::BoundedQueue<Message, TxBufferSize> tx_queue;
+	Message request_msg;
+	Message rx_msg;
+
+	uint16_t lfsr;
+	const uint8_t actionCount{0};
+	const uint8_t listenerCount{0};
+	uint8_t address;
+
+	uint8_t tx_counter;
+	bool is_rx_msg_for_us;
+
+	enum class ResponseStatus : uint8_t
+	{
+		NotWaiting = 0,
+		Waiting,
+		Received,
+	}
+	response_status{ResponseStatus::NotWaiting};
+
+	static constexpr uint8_t PRIORITY_BITS{5};
+	static constexpr uint8_t RESCHEDULE_MASK_SHORT{7};
+	static constexpr uint8_t RESCHEDULE_MASK_LONG{11};
+};
+
 }
-
-#ifdef __DOXYGEN__
-	/**
-	 * \brief	Define a amnb::Action
-	 *
-	 * Example:
-	 * \code
-	 * class Sensor : public modm::amnb::Callable
-	 * {
-	 * public:
-	 *     void
-	 *     sendValue(modm::amnb::Response& response)
-	 *     {
-	 *         response.send(this->value);
-	 *     }
-	 *
-	 *     void
-	 *     doSomething(modm::amnb::Response& response, const uint32_t* parameter)
-	 *     {
-	 *         // ... do something useful ...
-	 *
-	 *         response.send();
-	 *     }
-	 *
-	 *     // ...
-	 *
-	 * private:
-	 *     int8_t value;
-	 * };
-	 *
-	 * Sensor sensor;
-	 *
-	 * FLASH_STORAGE(modm::amnb::Action actionList[]) =
-	 * {
-	 *     AMNB_ACTION(0x57, sensor, Sensor::sendValue,   0),
-	 *     AMNB_ACTION(0x03, sensor, Sensor::doSomething, sizeof(uint32_t)),
-	 * };
-	 * \endcode
-	 *
-	 * A complete example is available in the \c example/amnb folder.
-	 *
-	 * \param	command		Command byte
-	 * \param	object
-	 * \param	function	Member function of object
-	 * \param	length		Parameter size in bytes
-	 *
-	 * \see		modm::amnb::Action
-	 * \ingroup	amnb
-	 */
-	#define	AMNB_ACTION(command, object, function, length)
-#else
-	#define	AMNB_ACTION(command, object, function, length)		\
-		{	command, \
-			length, \
-			static_cast<modm::amnb::Callable *>(&object), \
-			reinterpret_cast<modm::amnb::Action::Callback>(&function) }
-#endif	// __DOXYGEN__
-
-
-
-#ifdef __DOXYGEN__
-	/**
-	 * \brief	Define a amnb::Listener
-	 *
-	 * Example:
-	 * \code
-	 * class ListenToNodes : public modm::amnb::Callable
-	 * {
-	 * public:
-	 *     void
-	 *     listenToCommand(uint8_t *payload, const uint8_t length, uint8_t sender)
-	 *     {
-	 *         // ... do something useful ...
-	 *
-	 *     }
-	 *
-	 *     void
-	 *     listenToCommandWithOutCaringForSender(uint8_t *payload, const uint8_t length)
-	 *     {
-	 *         // ... do something useful ...
-	 *
-	 *     }
-	 *
-	 *     // ...
-	 * };
-	 *
-	 * ListenToNodes listen;
-	 *
-	 * FLASH_STORAGE(modm::amnb::Listener listenList[]) =
-	 * {
-	 *     AMNB_LISTEN(0x46, 0x03, listen, ListenToNodes::listenToCommand),
-	 * };
-	 * \endcode
-	 *
-	 * A complete example is available in the \c example/amnb folder.
-	 *
-	 * \param	address		Address of the transmitting node
-	 * \param	command		Command byte
-	 * \param	object
-	 * \param	function	Member function of object
-	 *
-	 * \see		modm::amnb::Listener
-	 * \ingroup	amnb
-	 */
-	#define	AMNB_LISTEN(address, command, object, function)
-#else
-	#define	AMNB_LISTEN(address, command, object, function)	\
-		{	address, \
-			command, \
-			static_cast<modm::amnb::Callable *>(&object), \
-			reinterpret_cast<modm::amnb::Listener::Callback>(&function) }
-#endif	// __DOXYGEN__
-
-
-#ifdef __DOXYGEN__
-	/**
-	 * \brief	Define a amnb::ErrorHandler
-	 *
-	 * Example:
-	 * \code
-	 * class handleErrors : public modm::amnb::Callable
-	 * {
-	 * public:
-	 *     void
-	 *     errorForCommand(modm::amnb::Flags type, const uint8_t errorCode)
-	 *     {
-	 *         // ... do something useful with that information ...
-	 *
-	 *     }
-	 *
-	 *     // ...
-	 * };
-	 *
-	 * handleErrors errorhandler;
-	 *
-	 * FLASH_STORAGE(modm::amnb::Listener listenList[]) =
-	 * {
-	 *     AMNB_LISTEN(0x37, 0x57, errorhandler, handleErrors::errorForCommand),
-	 * };
-	 * \endcode
-	 *
-	 * A complete example is available in the \c example/amnb folder.
-	 *
-	 * \param	address		Node address of message
-	 * \param	command		Command of message
-	 * \param	object
-	 * \param	function	Member function of object
-	 *
-	 * \see		modm::amnb::ErrorHandler
-	 * \ingroup	amnb
-	 */
-	#define	AMNB_ERROR(address, command, object, function)
-#else
-	#define	AMNB_ERROR(address, command, object, function)	\
-		{	address, \
-			command, \
-			static_cast<modm::amnb::Callable *>(&object), \
-			reinterpret_cast<modm::amnb::ErrorHandler::Callback>(&function) }
-#endif	// __DOXYGEN__
-
-#include "node_impl.hpp"
-
-#endif	// MODM_AMNB_NODE_HPP

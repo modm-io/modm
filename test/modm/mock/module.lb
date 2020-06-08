@@ -62,6 +62,18 @@ class IoDevice(Module):
         env.copy("io_device.hpp")
         env.copy("io_device.cpp")
 
+class SharedMedium(Module):
+    def init(self, module):
+        module.name = "shared_medium"
+
+    def prepare(self, module, options):
+        module.depends(":stdc++")
+        return True
+
+    def build(self, env):
+        env.outbasepath = "modm-test/src/modm-test/mock"
+        env.copy("shared_medium.hpp")
+
 
 def init(module):
     module.name = ":mock"
@@ -71,6 +83,7 @@ def prepare(module, options):
     module.add_submodule(SpiDevice())
     module.add_submodule(SpiMaster())
     module.add_submodule(IoDevice())
+    module.add_submodule(SharedMedium())
     return True
 
 def build(env):

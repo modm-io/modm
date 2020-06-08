@@ -10,6 +10,19 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+class Amnb(Module):
+    def init(self, module):
+        module.name = "amnb"
+
+    def prepare(self, module, options):
+        module.depends("modm:communication:amnb", ":mock:clock", ":mock:shared_medium")
+        return True
+
+    def build(self, env):
+        env.outbasepath = "modm-test/src/modm-test/communication"
+        env.copy("amnb")
+
+
 class Sab(Module):
     def init(self, module):
         module.name = "sab"
@@ -40,6 +53,7 @@ def init(module):
     module.name = ":test:communication"
 
 def prepare(module, options):
+    module.add_submodule(Amnb())
     module.add_submodule(Sab())
     module.add_submodule(Xpcc())
     return True

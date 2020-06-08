@@ -1,0 +1,19 @@
+<library>
+  <extends>modm:nucleo-g071rb</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_g071rb/amnb</option>
+    <option name="modm:platform:uart:1:buffer.tx">1</option>
+    <option name="modm:platform:uart:1:buffer.rx">32</option>
+    <option name="modm:platform:uart:3:buffer.tx">1</option>
+    <option name="modm:platform:uart:3:buffer.rx">32</option>
+    <option name="modm:communication:amnb:with_heap">False</option>
+  </options>
+  <modules>
+    <module>modm:platform:gpio</module>
+    <module>modm:communication:amnb</module>
+    <module>modm:platform:uart:1</module>
+    <module>modm:platform:uart:3</module>
+    <module>modm:platform:uart:4</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

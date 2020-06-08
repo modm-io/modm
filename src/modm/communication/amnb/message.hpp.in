@@ -1,0 +1,279 @@
+/*
+ * Copyright (c) 2020, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <modm/architecture/utils.hpp>
+#include <modm/math/utils/crc.hpp>
+#include <cstring>
+#include <memory>
+
+namespace modm::amnb
+{
+
+/// @ingroup modm_communication_amnb
+enum class Type: uint8_t
+{
+	Broadcast = 0b000 << 5,	///< Message Broadcast
+	Request   = 0b010 << 5,	///< Action request
+	Response  = 0b011 << 5,	///< Positive Response with a custom user payload
+	Error     = 0b100 << 5,	///< Negative Response with a system error code
+	UserError = 0b101 << 5,	///< Negative Response with a custom user payload
+};
+
+/// @ingroup modm_communication_amnb
+class modm_packed modm_aligned(4) Message
+{
+public:
+	inline Message() = default;
+	inline Message(uint8_t address, uint8_t command, uint16_t length, Type type=Type::Broadcast)
+	:	header{0, address, command, uint8_t(uint8_t(type) |
+			((length <= SMALL_LENGTH) ? length : LENGTH_MASK))},
+		storage{(length <= SMALL_LENGTH) ? uint16_t(0) : length} {}
+
+	inline Message(uint16_t length) : Message(0, 0, length) {}
+	inline Message(uint8_t address, uint8_t command, Type type=Type::Broadcast)
+	:	Message(address, command, 0, type) {}
+
+	inline Message(const Message& m) { *this = m; }
+	inline Message(Message&& m) { *this = std::move(m); }
+
+	inline ~Message() { deallocate(); }
+
+	inline Message& operator=(const Message& m)
+	{
+		deallocate();
+		header = m.header;
+		if (isLarge()) {
+			storage.large = m.storage.large;
+			if (storage.large.data) (*storage.large.data)++;
+		}
+		else storage.small = m.storage.small;
+		return *this;
+	}
+	inline Message& operator=(Message&& m)
+	{
+		deallocate();
+		header = m.header;
+		if (isLarge()) {
+			storage.large = m.storage.large;
+			m.storage.large.data = nullptr;
+		}
+		else storage.small = m.storage.small;
+		m.header.type_length &= ~LENGTH_MASK;
+		return *this;
+	}
+
+public:
+	inline uint8_t address() const          { return header.address; }
+	inline void setAddress(uint8_t address) { header.address = address; }
+
+	inline uint8_t command() const          { return header.command; }
+	inline void setCommand(uint8_t command) { header.command = command; }
+
+	inline uint16_t length() const
+	{
+		if (isLarge()) return storage.large.length;
+		return std::min(smallLength(), SMALL_LENGTH);
+	}
+	inline void setLength(uint16_t length)
+	{
+		deallocate();
+		if (length <= SMALL_LENGTH) {
+			header.type_length = (header.type_length & ~LENGTH_MASK) | length;
+		}
+		else {
+			header.type_length |= LENGTH_MASK;
+			storage.large.length = length;
+			storage.large.data = nullptr;
+		}
+	}
+
+	inline Type type() const
+	{ return Type(header.type_length & TYPE_MASK); }
+	inline void setType(Type type)
+	{ header.type_length = (header.type_length & ~TYPE_MASK) | uint8_t(type); }
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waddress-of-packed-member"
+	template<typename T=uint8_t>
+	T* get()
+	{
+		if (isLarge()) {
+			if (not allocate() or sizeof(T) > storage.large.length) return nullptr;
+			return reinterpret_cast<T*>(storage.large.data + LARGE_DATA_OFFSET);
+		}
+		if (not smallLength() or sizeof(T) > smallLength()) return nullptr;
+		return reinterpret_cast<T*>(storage.small.data);
+	}
+
+	template<typename T=uint8_t>
+	const T* get() const
+	{
+		if (isLarge()) {
+			if (sizeof(T) > storage.large.length or not storage.large.data) return nullptr;
+			return reinterpret_cast<const T*>(storage.large.data + LARGE_DATA_OFFSET);
+		}
+		if (not smallLength() or sizeof(T) > smallLength()) return nullptr;
+		return reinterpret_cast<const T*>(storage.small.data);
+	}
+#pragma GCC diagnostic pop
+
+protected:
+	inline bool isHeaderValid() const
+	{ return crcHeader() == header.crc; }
+
+	inline bool isDataValid() const
+	{
+		if (not isHeaderValid()) return false;
+		if (dataLength()) return (crcData() == storage.large.crc);
+		return true;
+	}
+
+	inline void setValid()
+	{
+		if (isLarge() and allocate()) {
+			storage.large.crc = crcData();
+		}
+		header.crc = crcHeader();
+	}
+
+protected:
+	inline uint8_t
+	crcHeader() const
+	{
+		return modm::math::crc8_ccitt(&header.address, headerLength()-1);
+	}
+
+	inline uint16_t
+	crcData() const
+	{
+		return modm::math::crc16_ccitt(storage.large.data + LARGE_DATA_OFFSET, dataLength());
+	}
+
+	inline uint8_t smallLength() const
+	{
+		return header.type_length & LENGTH_MASK;
+	}
+
+	inline bool isLarge() const
+	{
+		return smallLength() > SMALL_LENGTH;
+	}
+
+	inline uint8_t headerLength() const
+	{
+		if (isLarge()) return LARGE_HEADER_SIZE;
+		return SMALL_HEADER_SIZE + std::min(smallLength(), SMALL_LENGTH);
+	}
+
+	inline uint8_t dataLength() const
+	{
+		return isLarge() ? storage.large.length : 0;
+	}
+
+	inline bool allocate()
+	{
+		if (isLarge() and not storage.large.data) {
+%% if with_heap
+			storage.large.data = new (std::nothrow) uint8_t[storage.large.length + LARGE_DATA_OFFSET];
+			if (storage.large.data) {
+				*storage.large.data = 1;
+				return true;
+			}
+%% endif
+			return false;
+		}
+		return true;
+	}
+	inline void deallocate()
+	{
+%% if with_heap
+		if (isLarge() and storage.large.data) {
+			if (*storage.large.data <= 1) delete storage.large.data;
+			else (*storage.large.data)--;
+			storage.large.data = nullptr;
+		}
+%% endif
+	}
+	inline uint8_t* self()
+	{ return &header.crc; }
+	inline const uint8_t* self() const
+	{ return &header.crc; }
+
+protected:
+	static constexpr uint8_t TYPE_MASK{0xE0};
+	static constexpr uint8_t LENGTH_MASK{0x1F};
+	static constexpr uint8_t SMALL_LENGTH{28};
+%% if target.platform == "avr"
+	static constexpr uint8_t LARGE_DATA_OFFSET{1};
+%% else
+	static constexpr uint8_t LARGE_DATA_OFFSET{4};
+%% endif
+
+	static constexpr uint8_t SMALL_HEADER_SIZE{4};
+	static constexpr uint8_t LARGE_HEADER_SIZE{8};
+
+public:
+	static constexpr uint8_t  SizeSmall{SMALL_LENGTH};
+	static constexpr uint16_t SizeMax{8*1024};
+
+protected:
+	// NOTE: This arrangement allows this data structure to be 4-byte aligned
+	//       so that any Cortex-M0 device has no issues with unaligned access
+	//       of neither the header values nor the data cast to another struct!
+	struct modm_packed Header {
+		uint8_t  crc{0};				// 0
+		uint8_t  address{0};			// 1
+		uint8_t  command{0};			// 2
+		uint8_t  type_length{0};		// 3
+	} header;
+	union modm_packed Storage {
+		inline Storage(uint16_t length=0)
+		: large{length,0,nullptr} {}
+
+		struct modm_packed {
+			uint16_t length;			// 4 5
+			uint16_t crc;				// 6 7
+			uint8_t *data;				// 8... 4-byte aligned
+		} large;
+		struct modm_packed {
+			uint8_t data[SMALL_LENGTH];	// 4...  4-byte aligned
+		} small;
+	} storage;
+
+private:
+	template< size_t >         friend class Interface;
+	template< size_t, size_t > friend class Node;
+	template< class, class >   friend class Result;
+};
+static_assert(sizeof(Message) == 32, "modm::amnb::Message must be memory-packed!");
+
+}	// namespace modm::amnb
+
+%% if with_io
+#include <modm/io/iostream.hpp>
+
+inline modm::IOStream&
+operator << (modm::IOStream& s, const modm::amnb::Type type)
+{
+	using namespace modm::amnb;
+	switch(type)
+	{
+		case Type::Broadcast:	s << "Broadcast";	break;
+		case Type::Request:		s << "Request";		break;
+		case Type::UserError:	s << "UserError";	break;
+		case Type::Error:		s << "Error";		break;
+		case Type::Response:	s << "Response";	break;
+	}
+	return s;
+}
+%% endif

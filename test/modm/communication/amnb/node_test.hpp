@@ -9,4 +9,16 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "amnb/node.hpp"
+#include <unittest/testsuite.hpp>
+
+/// @ingroup modm_test_test_communication
+class AmnbNodeTest : public unittest::TestSuite
+{
+public:
+	void setUp() override;
+
+	void testBroadcast();
+	void testRequest();
+	void testAction();
+	void testListener();
+};

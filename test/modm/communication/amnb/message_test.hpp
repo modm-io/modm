@@ -9,4 +9,21 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "amnb/node.hpp"
+#include <unittest/testsuite.hpp>
+
+/// @ingroup modm_test_test_communication
+class AmnbMessageTest : public unittest::TestSuite
+{
+public:
+	void
+	testConstructor();
+
+	void
+	testAllocator();
+
+	void
+	testLifetime();
+
+	void
+	testSerialize();
+};
