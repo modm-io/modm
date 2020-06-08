@@ -55,9 +55,9 @@ struct SystemClock {
 		// (internal clock / 2) * 12 = 48MHz
 		const Rcc::PllFactors pllFactors{
 			.pllMul = 12,
-			.pllPrediv = 1
+			.pllPrediv = 1  // only used with Hse
 		};
-		Rcc::enablePll(Rcc::PllSource::InternalClock, pllFactors);
+		Rcc::enablePll(Rcc::PllSource::HsiDiv2, pllFactors);
 		// set flash latency for 48MHz
 		Rcc::setFlashLatency<Frequency>();
 		// switch system clock to PLL output
