@@ -43,20 +43,26 @@ public:
 %% if target["family"] in ["f2", "f4", "f7", "l4", "g0", "g4"]
 		/// High speed internal clock (16 MHz)
 		Hsi = RCC_PLLCFGR_PLLSRC_HSI,
+		InternalClock = Hsi,
 		/// High speed external clock (see HseConfig)
 		Hse = RCC_PLLCFGR_PLLSRC_HSE,
 %% elif target["family"] in ["f0", "f3"]
 		/// High speed internal clock (8 MHz)
-	%% if target["family"] == "f3" and target["name"] in ["02", "03", "98"] and target["size"] in ["d", "e"]
-		Hsi = 0,
-	%% else
-		Hsi = RCC_CFGR_PLLSRC_HSI_DIV2,
+		// On STM32F0 and STM32F3 some devices have a fixed /2 pre-divider, some have a configurable
+		// pre-divider and some have both, selectable via pll source mux
+	%% if (target["family"] == "f0" and (target["name"] in ["42", "48", "70", "71", "72", "78", "91", "98"] or (target["name"] in ["30"] and target["size"] in ["c"]))) or (target["family"] == "f3" and target["name"] in ["02", "03", "98"] and target["size"] in ["d", "e"])
+		Hsi = RCC_CFGR_PLLSRC_HSI_PREDIV,
+		InternalClock = Hsi,
+	%% endif
+	%% if (target["family"] == "f0") or (target["family"] == "f3" and target["size"] in ["8", "c"])
+		HsiDiv2 = RCC_CFGR_PLLSRC_HSI_DIV2,
 	%% endif
 		/// High speed external clock (see HseConfig)
 		Hse = RCC_CFGR_PLLSRC_HSE_PREDIV,
 %% elif target["family"] in ["f1", "l1"]
 		/// High speed internal clock (8 MHz)
 		Hsi = 0,
+		InternalClock = Hsi,
 		/// High speed external clock (see HseConfig)
 		Hse = RCC_CFGR_PLLSRC,
 %% endif
@@ -69,8 +75,6 @@ public:
 		Msi = RCC_PLLCFGR_PLLSRC_MSI,
 		MultiSpeedInternalClock = Msi,
 %% endif
-
-		InternalClock = Hsi,
 		ExternalClock = Hse,
 		ExternalCrystal = Hse,
 	};
