@@ -9,7 +9,7 @@ repo_url: 'https://github.com/modm-io/modm'
 edit_uri: ""
 # dev_addr: 192.168.1.2:8000
 
-copyright: 'Copyright &copy 2009-2019 Niklas Hauser & modm authors'
+copyright: 'Copyright &copy 2009-2020 Niklas Hauser & modm authors'
 
 # Turn around for GitHub Hosting in /docs
 docs_dir: 'src'
@@ -33,10 +33,10 @@ theme:
 
 extra:
   social:
-    - type: github-alt
+    - icon: fontawesome/brands/github-alt
       link: https://github.com/modm-io
-    - type: twitter
-      link: https://twitter.com/RCA_eV
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/modm_embedded
 
 markdown_extensions:
   - markdown.extensions.admonition
