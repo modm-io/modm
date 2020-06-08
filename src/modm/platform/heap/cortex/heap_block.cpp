@@ -45,7 +45,7 @@ void __modm_initialize_memory(void)
 	bool success = modm::platform::HeapTable::find_largest(&heap_start, &heap_end);
 	modm_assert(success, "heap.init", "Could not find main heap memory!");
 	// clamp the heap size to the maximum
-	if ((heap_end - heap_start) > max_heap_size) {
+	if (size_t(heap_end - heap_start) > max_heap_size) {
 		heap_end = heap_start + max_heap_size;
 	}
 	// initialize the heap
@@ -67,7 +67,7 @@ void* __wrap__calloc_r(struct _reent *r, size_t size)
 	return ptr;
 }
 
-void* __wrap__realloc_r(struct _reent *, void *, size_t)
+void* __wrap__realloc_r(struct _reent *, void *, size_t size)
 {
 	// NOT IMPLEMENTED!
 	modm_assert(0, "realloc", "Realloc is not implemented for Block heap!", size);
