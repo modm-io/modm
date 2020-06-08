@@ -77,6 +77,10 @@ public:
 %%	set reg = "ISR"
 		/// Set if match character is received.
 		CharacterMatch	= USART_{{reg}}_CMF,
+#ifdef USART_{{reg}}_NE
+		/// Set if noise was detected on the input.
+		NoiseError		= USART_{{reg}}_NE,
+#endif
 %% else
 %%	set reg = "SR"
 %% endif
@@ -126,6 +130,19 @@ public:
 	{
 		DoNotOutput = 0b0,
 		Output = USART_CR2_LBCL,
+	};
+
+	enum class
+	WordLength : uint32_t
+	{
+#ifdef USART_CR1_M1
+		Bit7 = USART_CR1_M1,
+		Bit8 = 0,
+		Bit9 = USART_CR1_M0,
+#else
+		Bit8 = 0,
+		Bit9 = USART_CR1_M,
+#endif
 	};
 
 	enum class

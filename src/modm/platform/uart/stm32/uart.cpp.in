@@ -116,6 +116,16 @@ modm::platform::{{ name }}::isWriteFinished()
 }
 
 std::size_t
+modm::platform::{{ name }}::transmitBufferSize()
+{
+%% if options["buffered"]
+	return txBuffer.getSize();
+%% else
+	return {{ hal }}::isTransmitRegisterEmpty() ? 0 : 1;
+%% endif
+}
+
+std::size_t
 modm::platform::{{ name }}::discardTransmitBuffer()
 {
 %% if options["buffered"]
@@ -179,6 +189,16 @@ modm::platform::{{ name }}::read(uint8_t *data, std::size_t length)
 }
 
 std::size_t
+modm::platform::{{ name }}::receiveBufferSize()
+{
+%% if options["buffered"]
+	return rxBuffer.getSize();
+%% else
+	return {{ hal }}::isReceiveRegisterNotEmpty() ? 1 : 0;
+%% endif
+}
+
+std::size_t
 modm::platform::{{ name }}::discardReceiveBuffer()
 {
 %% if options["buffered"]
@@ -191,6 +211,27 @@ modm::platform::{{ name }}::discardReceiveBuffer()
 %% else
 	return 0;
 %% endif
+}
+
+bool
+modm::platform::{{ name }}::hasError()
+{
+	return {{ hal }}::getInterruptFlags().any(
+		{{ hal }}::InterruptFlag::ParityError |
+#ifdef USART_ISR_NE
+		{{ hal }}::InterruptFlag::NoiseError |
+#endif
+		{{ hal }}::InterruptFlag::OverrunError | {{ hal }}::InterruptFlag::FramingError);
+}
+void
+modm::platform::{{ name }}::clearError()
+{
+	return {{ hal }}::acknowledgeInterruptFlags(
+		{{ hal }}::InterruptFlag::ParityError |
+#ifdef USART_ISR_NE
+		{{ hal }}::InterruptFlag::NoiseError |
+#endif
+		{{ hal }}::InterruptFlag::OverrunError | {{ hal }}::InterruptFlag::FramingError);
 }
 
 
@@ -219,5 +260,6 @@ MODM_ISR({{ name | upper }})
 			txBuffer.pop();
 		}
 	}
+	{{ hal }}::acknowledgeInterruptFlags({{ hal }}::InterruptFlag::OverrunError);
 }
 %% endif

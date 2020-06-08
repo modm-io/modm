@@ -50,6 +50,7 @@ private:
 %% endif
 
 public:
+	using Hal = {{ hal }};
 	// Expose jinja template parameters to be checked by e.g. drivers or application
 	static constexpr size_t RxBufferSize = {{ options["buffer.rx"] }};
 	static constexpr size_t TxBufferSize = {{ options["buffer.tx"] }};
@@ -57,7 +58,8 @@ public:
 public:
 	template< template<Peripheral _> class... Signals >
 	static void
-	connect(Gpio::InputType InputTypeRx = Gpio::InputType::PullUp)
+	connect(Gpio::InputType InputTypeRx = Gpio::InputType::PullUp,
+	        Gpio::OutputType OutputTypeTx = Gpio::OutputType::PushPull)
 	{
 		using Connector = GpioConnector<Peripheral::{{ name }}, Signals...>;
 		using Tx = typename Connector::template GetSignal< Gpio::Signal::Tx >;
@@ -67,7 +69,7 @@ public:
 					  "{{ name }}::connect() requires one Tx and/or one Rx signal!");
 
 		// Connector::disconnect();
-		Tx::setOutput(Gpio::OutputType::PushPull);
+		Tx::setOutput(OutputTypeTx);
 		Rx::setInput(InputTypeRx);
 		Connector::connect();
 	}
@@ -114,6 +116,9 @@ public:
 	isWriteFinished();
 
 	static std::size_t
+	transmitBufferSize();
+
+	static std::size_t
 	discardTransmitBuffer();
 
 	static bool
@@ -123,7 +128,16 @@ public:
 	read(uint8_t *buffer, std::size_t length);
 
 	static std::size_t
+	receiveBufferSize();
+
+	static std::size_t
 	discardReceiveBuffer();
+
+	static bool
+	hasError();
+
+	static void
+	clearError();
 
 %% if id in shared_irq_ids
 	static void

@@ -81,13 +81,15 @@ public:
 	initialize(	Parity parity = Parity::Disabled);
 %% endif
 
+	static inline void
+	setWordLength(WordLength length);
 
 	/**
-	* Initialize Uart HAL Peripheral
-	*
-	* Enables clocks, the UART peripheral (but neither TX nor RX)
-	* Sets raw brr, parity and oversampling mode.
-	*/
+	 * Initialize Uart HAL Peripheral
+	 *
+	 * Enables clocks, the UART peripheral (but neither TX nor RX)
+	 * Sets raw brr, parity and oversampling mode.
+	 */
 	static void
 	initializeWithBrr(uint16_t brr,
 %% if target["family"] == "f1"

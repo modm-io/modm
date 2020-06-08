@@ -177,6 +177,31 @@ modm::platform::{{ name }}::setSpiDataMode(SpiDataMode mode)
 }
 
 void
+modm::platform::{{ name }}::setWordLength(WordLength length)
+{
+%% if "extended" in driver["type"]
+	const bool usartEnabled = ({{ peripheral }}->CR1 & USART_CR1_UE);
+	if(usartEnabled) {
+		disableOperation();
+	}
+%% endif
+
+	{{ peripheral }}->CR1 =
+#ifdef USART_CR1_M1
+		({{ peripheral }}->CR1 & ~(USART_CR1_M0 | USART_CR1_M1))
+#else
+		({{ peripheral }}->CR1 & ~USART_CR1_M)
+#endif
+		| static_cast<uint32_t>(length);
+
+%% if "extended" in driver["type"]
+	if(usartEnabled) {
+		enableOperation();
+	}
+%% endif
+}
+
+void
 modm::platform::{{ name }}::setLastBitClockPulse(LastBitClockPulse pulse)
 {
 %% if "extended" in driver["type"]

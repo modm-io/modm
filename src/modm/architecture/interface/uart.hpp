@@ -127,6 +127,10 @@ public:
 	static std::size_t
 	read(uint8_t *data, std::size_t length);
 
+	/// @return	the size of the receive FIFO queue.
+	static std::size_t
+	receiveBufferSize();
+
 	/**
 	 * Empty the receive FIFO queue and hardware buffer.
 	 *
@@ -135,6 +139,10 @@ public:
 	static std::size_t
 	discardReceiveBuffer();
 
+	/// @return	the size of the transmit FIFO queue.
+	static std::size_t
+	transmitBufferSize();
+
 	/**
 	 * Empty the transmit FIFO queue and hardware buffer.
 	 *
@@ -142,6 +150,14 @@ public:
 	 */
 	static std::size_t
 	discardTransmitBuffer();
+
+	/// @return `true` if an error occured during any write or read
+	static bool
+	hasError();
+
+	/// Reset the sticky error indication
+	static void
+	clearError();
 #endif
 };
 
