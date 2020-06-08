@@ -133,11 +133,13 @@
  	#	define modm_weak			__attribute__((weak))
 	#endif
 
-	#ifdef MODM_OS_HOSTED
+	#if defined(MODM_OS_HOSTED) || defined(MODM_CPU_AVR)
 	#	define modm_fastcode
+	#	define modm_ramcode
 	#	define modm_fastdata
 	#else
 	#	define modm_fastcode		modm_section(".fastcode")
+	#	define modm_ramcode			modm_section(".ramcode")
 	#	define modm_fastdata		modm_section(".fastdata")
 	#endif
 

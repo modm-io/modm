@@ -287,7 +287,12 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		__data_load = LOADADDR(.data);
 		__data_start = .;
 		*(.data .data.* .gnu.linkonce.d.*)
-		. = ALIGN(4);
+	} >{{memory}} AT >{{rom}}
+
+	/* code routines in RAM */
+	.ramcode : ALIGN(4)
+	{
+		*(.ramcode .ramcode*)
 		__data_end = .;
 	} >{{memory}} AT >{{rom}}
 
