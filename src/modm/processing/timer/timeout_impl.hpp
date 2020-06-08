@@ -86,6 +86,13 @@ modm::GenericTimeout<Clock, Duration>::remaining() const
 			std::chrono::time_point_cast<wide_signed_duration>(now());
 }
 
+template< class Clock, class Duration >
+typename modm::GenericTimeout<Clock, Duration>::duration
+modm::GenericTimeout<Clock, Duration>::interval() const
+{
+	return _interval;
+}
+
 // ----------------------------------------------------------------------------
 template< class Clock, class Duration >
 modm::TimerState
