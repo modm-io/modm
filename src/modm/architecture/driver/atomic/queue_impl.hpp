@@ -42,19 +42,7 @@ bool
 modm::atomic::Queue<T, N>::isNearlyFull() const
 {
 	static_assert(N > 3, "Not possible the check for 'nearly full' of such a small queue.");
-
-	Index tmphead = this->head;
-	Index tmptail = this->tail;
-
-	Index free;
-	if (tmphead >= tmptail) {
-		free = (N + 1) - tmphead + tmptail;
-	}
-	else {
-		free = tmptail - tmphead;
-	}
-
-	return (free < 3);
+	return (getSize() > (N - 3));
 }
 
 template<typename T, std::size_t N>
@@ -69,7 +57,21 @@ bool
 modm::atomic::Queue<T, N>::isNearlyEmpty() const
 {
 	static_assert(N > 3, "Not possible the check for 'nearly empty' of such a small queue. ");
+	return (getSize() < 3);
+}
 
+
+template<typename T, std::size_t N>
+modm_always_inline typename modm::atomic::Queue<T, N>::Size
+modm::atomic::Queue<T, N>::getMaxSize() const
+{
+	return N;
+}
+
+template<typename T, std::size_t N>
+typename modm::atomic::Queue<T, N>::Size
+modm::atomic::Queue<T, N>::getSize() const
+{
 	Index tmphead = this->head;
 	Index tmptail = this->tail;
 
@@ -81,15 +83,7 @@ modm::atomic::Queue<T, N>::isNearlyEmpty() const
 		stored = (N + 1) - tmptail + tmphead;
 	}
 
-	return (stored < 3);
-}
-
-
-template<typename T, std::size_t N>
-modm_always_inline typename modm::atomic::Queue<T, N>::Size
-modm::atomic::Queue<T, N>::getMaxSize() const
-{
-	return N;
+	return stored;
 }
 
 template<typename T, std::size_t N>

@@ -82,6 +82,9 @@ namespace modm
 			modm_always_inline Size
 			getMaxSize() const;
 
+			Size
+			getSize() const;
+
 			const T&
 			get() const;
 
