@@ -12,6 +12,7 @@
 #include <modm/driver/pwm/lp503x.hpp>
 
 using namespace Board;
+using namespace std::chrono_literals;
 
 /*
  * Example to demonstrate LP503x driver
@@ -51,7 +52,7 @@ main()
 		RF_CALL_BLOCKING(leds.setChannelBrightness(channel, brightness));
 	}
 
-	modm::delayMilliseconds(1000);
+	modm::delay(1s);
 
 	// Configure outputs 0-5 (rgb led 0-1) in bank mode
 	using LedBankMode = modm::lp503x::LedBankMode;
@@ -66,8 +67,8 @@ main()
 	// Blink leds in bank mode
 	while(true) {
 		RF_CALL_BLOCKING(leds.setBankBrightness(255));
-		modm::delayMilliseconds(500);
+		modm::delay(0.5s);
 		RF_CALL_BLOCKING(leds.setBankBrightness(0));
-		modm::delayMilliseconds(500);
+		modm::delay(0.5s);
 	}
 }
