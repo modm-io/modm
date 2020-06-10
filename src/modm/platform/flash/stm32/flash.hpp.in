@@ -1,0 +1,111 @@
+/*
+ * Copyright (c) 2020, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+#include "../device.hpp"
+#include <modm/platform/clock/rcc.hpp>
+#include <modm/architecture/interface/register.hpp>
+
+namespace modm::platform
+{
+
+/// @ingroup modm_platform_flash
+class Flash
+{
+public:
+	static constexpr uintptr_t OriginAddr{ 0x{{ "%0x" | format(start) }} };
+	static constexpr size_t Size{ 0x{{ "%0x" | format(size) }} };
+	static inline uint8_t *const Origin{(uint8_t*)OriginAddr};
+	using MaxWordType = uint{{ 32 if has_sectors else 64 }}_t;
+
+%% if has_sectors
+	enum class
+	WordSize : uint32_t
+	{
+		B8 = 0,
+		B16 = FLASH_CR_PSIZE_0,
+		B32 = FLASH_CR_PSIZE_1,
+	};
+%% endif
+
+public:
+	inline static void
+	enable()
+	{
+%% if not has_sectors
+		Rcc::enable<Peripheral::Flash>();
+%% endif
+	}
+
+	inline static void
+	disable()
+	{
+%% if not has_sectors
+		Rcc::disable<Peripheral::Flash>();
+%% endif
+
+	}
+
+	static bool
+	isLocked()
+	{ return FLASH->CR & FLASH_CR_LOCK; }
+
+	static inline bool
+	isBusy()
+%% if has_sectors
+	{ return FLASH->SR & FLASH_SR_BSY; }
+%% else
+	{ return FLASH->SR & FLASH_SR_BSY1; }
+%% endif
+
+	static bool
+	unlock();
+
+	static inline uint8_t
+	getSector(uint8_t *ptr)
+	{ return getPage(ptr - Flash::Origin); }
+
+	static uint8_t
+	getSector(uintptr_t offset)
+	{ return getPage(offset); }
+
+	static inline uint8_t
+	getPage(uint8_t *ptr)
+	{ return getPage(ptr - Flash::Origin); }
+
+	static uint8_t
+	getPage(uintptr_t offset);
+
+	static uint32_t
+%% if has_sectors
+	erase(uint8_t {{ type }}, WordSize size = WordSize::B32);
+%% else
+	erase(uint8_t {{ type }});
+%% endif
+
+%% if has_sectors
+	static inline uint32_t
+	program(uintptr_t addr, uint8_t data)
+	{ return program(addr, data, WordSize::B8); }
+
+	static inline uint32_t
+	program(uintptr_t addr, uint16_t data)
+	{ return program(addr, data, WordSize::B16); }
+
+	static uint32_t
+	program(uintptr_t addr, MaxWordType data, WordSize size = WordSize::B32);
+%% else
+	static uint32_t
+	program(uintptr_t addr, MaxWordType data);
+%% endif
+};
+
+} // namespace modm::platform

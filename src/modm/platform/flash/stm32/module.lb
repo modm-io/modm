@@ -1,0 +1,50 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2016-2018, Niklas Hauser
+# Copyright (c) 2017, Fabian Greif
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":platform:flash"
+    module.description = "Flash Memory"
+
+def prepare(module, options):
+    device = options[":target"]
+    if device.identifier.family not in ["g0", "f4"]:
+        return False
+    if not device.has_driver("flash:stm32*"):
+        return False
+
+    module.depends(":cmsis:device", ":platform:rcc",
+                   ":architecture:register")
+    return True
+
+def build(env):
+    target = env[":target"].identifier
+    memories = listify(env[":target"].get_driver("core")["memory"])
+    flash = next(filter(lambda m: m["name"] == "flash", memories))
+
+    if target.family in ["f4"]:
+        block_shift = 17
+        ftype = "sector"
+    elif target.family in ["g0"]:
+        block_shift = 11
+        ftype = "page"
+
+    env.substitutions = {
+        "start": int(flash["start"], 16),
+        "size": int(flash["size"]),
+        "type": ftype,
+        "shift": block_shift,
+        "has_sectors": ftype == "sector",
+    }
+    env.outbasepath = "modm/src/modm/platform/flash"
+    env.template("flash.hpp.in")
+    env.template("flash.cpp.in")
