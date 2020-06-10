@@ -45,7 +45,7 @@ def build(env):
     def flag_format(flag):
         subs = {
             "target_base": "${CMAKE_PROJECT_NAME}",
-            "linkdir": "${CMAKE_CURRENT_LIST_DIR}/link",
+            "project_source_dir": "${CMAKE_CURRENT_SOURCE_DIR}",
         }
         if "{" in flag:
             return flag.format(**subs)

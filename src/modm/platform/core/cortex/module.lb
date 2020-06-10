@@ -190,6 +190,15 @@ def prepare(module, options):
             maximum=hex(flash_size),
             default=0))
 
+    module.add_option(
+        PathOption(
+            name="linkerscript.override",
+            description="Path to project provided linkerscript",
+            default="",
+            empty_ok=True,
+            absolute=False,
+        ))
+
     module.add_collector(
         StringCollector(
             name="linkerscript.memory",
@@ -315,9 +324,13 @@ def build(env):
     if env.has_module(":architecture:unaligned"):
         env.template("unaligned_impl.hpp.in")
 
+    env.collect(":build:linkflags", "-Wl,--no-wchar-size-warning", "-L{project_source_dir}")
     # Linkerscript
-    env.collect(":build:linkflags", "-L{linkdir}", "-Tlinkerscript.ld",
-                                    "-Wl,--no-wchar-size-warning")
+    linkerscript_override_option = env["linkerscript.override"]
+    if linkerscript_override_option:
+        env.collect(":build:linkflags", "-T{}".format(linkerscript_override_option))
+    else:
+        env.collect(":build:linkflags", "-Tmodm/link/linkerscript.ld")
 
     # Compilation for FPU
     core = env[":target"].get_driver("core")["type"]
@@ -337,4 +350,3 @@ def build(env):
     if single_precision:
         env.collect(":build:ccflags", "-fsingle-precision-constant",
                                       "-Wdouble-promotion")
-

@@ -35,7 +35,7 @@ def build(env):
 
     env.outbasepath = "modm/link"
     env.copy("linkerscript/linkerscript.ld", "linkerscript.ld")
-    env.collect(":build:linkflags", "-L{linkdir}", "-Tlinkerscript.ld")
+    env.collect(":build:linkflags", "-L{project_source_dir}", "-Tmodm/link/linkerscript.ld")
 
     env.substitutions = {
         "target": target.identifier,
