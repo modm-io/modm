@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:nucleo-f411re</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_f411re/sx1276_tx</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:spi:1</module>
+    <module>modm:driver:sx1276</module>
+  </modules>
+</library>
