@@ -13,6 +13,7 @@
 #define MODM_SX1276_HPP
 
 #include <modm/architecture/interface/spi_device.hpp>
+#include <modm/debug/logger.hpp>
 
 #include "sx1276_definitions.hpp"
 
@@ -78,8 +79,9 @@ public:
 	 *
 	 * \param data A pointer to the payload data of the Package
 	 * \param length The length of the payload data in bytes
+	 * \return Returns true if transmission has started. False if the buffer was already sending
 	 */
-	modm::ResumableResult<void>
+	modm::ResumableResult<bool>
 	transmit(uint8_t* data, uint8_t length);
 
 	/**
@@ -150,6 +152,8 @@ private:
 
 	/// The latest irq flags
 	Interrupts_t irqFlags;
+	/// Result of the last transmission attempt
+	bool lastTransmitResult;
 	/// The payload size of the last packet
 	uint8_t lastPacketSize;
 	/// Temporary storage for RSSI values

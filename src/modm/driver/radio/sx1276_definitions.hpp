@@ -105,7 +105,7 @@ public:
 	};
 	typedef modm::Configuration<OpModeRegister_t, ModemMode, Bit0 | Bit1 | Bit2> ModemMode_t;
 
-	//Available interrupts with their positions in the flag and mask register
+	/// Available interrupts with their positions in the flag and mask register
 	enum class
 	Interrupts : uint8_t
 	{

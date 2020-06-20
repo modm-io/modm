@@ -152,34 +152,43 @@ Sx1276<SpiMaster, Cs>::setSyncWord(uint8_t syncWord)
 // -----------------------------------------------------------------------------
 
 template <typename SpiMaster, typename Cs>
-modm::ResumableResult<void>
+modm::ResumableResult<bool>
 Sx1276<SpiMaster, Cs>::transmit(uint8_t* data, uint8_t length)
 {
 	RF_BEGIN();
 
-	RF_CALL(changeMode(ModemMode::STDBY));
+	lastTransmitResult = false;
 
-	RF_CALL(writeRegister(Sx1276Register::PayloadLength,length));
-	RF_CALL(writeRegister(Sx1276Register::FifoTxBaseAddr,0x00));
-	RF_CALL(writeRegister(Sx1276Register::FifoAddrPtr,0x00));
-
-	RF_WAIT_UNTIL(this->acquireMaster());
-
-	buffer[0] = 0x80 | static_cast<uint8_t>(Sx1276Register::Fifo);
-
-	Cs::reset();
-
-	RF_CALL(SpiMaster::transfer(buffer,nullptr,1));
-	RF_CALL(SpiMaster::transfer(data,nullptr,length));
-
-	if(this->releaseMaster())
+	//read the mode register and check if we're in the RX Mode
+	opModeShadow.value = RF_CALL(readRegister(Sx1276Register::OpMode));
+	if(ModemMode_t::get(opModeShadow) == ModemMode::STDBY)
 	{
-		Cs::set();
+		RF_CALL(writeRegister(Sx1276Register::PayloadLength,length));
+		RF_CALL(writeRegister(Sx1276Register::FifoTxBaseAddr,0x00));
+		RF_CALL(writeRegister(Sx1276Register::FifoAddrPtr,0x00));
+
+		RF_WAIT_UNTIL(this->acquireMaster());
+
+		buffer[0] = 0x80 | static_cast<uint8_t>(Sx1276Register::Fifo);
+
+		Cs::reset();
+
+		RF_CALL(SpiMaster::transfer(buffer,nullptr,1));
+		RF_CALL(SpiMaster::transfer(data,nullptr,length));
+
+		if(this->releaseMaster())
+		{
+			Cs::set();
+		}
+
+		RF_CALL(changeMode(ModemMode::TX));
+	}
+	else
+	{
+		MODM_LOG_ERROR<<"SX1276: Transmission failed as the modem is busy"<<modm::endl;
 	}
 
-	RF_CALL(changeMode(ModemMode::TX));
-
-	RF_END();
+	RF_END_RETURN(lastTransmitResult);
 }
 
 // -----------------------------------------------------------------------------
@@ -226,37 +235,46 @@ Sx1276<SpiMaster, Cs>::readPacket(uint8_t* data, uint8_t maxLength)
 {
 	RF_BEGIN();
 
-	irqFlags.value = RF_CALL(readRegister(Sx1276Register::IrqFlags));
-	RF_CALL(writeRegister(Sx1276Register::IrqFlags, 0xFF));
-
 	lastPacketSize = 0;
 
-	if(irqFlags & Interrupts::RX_DONE)
+	//read the mode register and check if we're in the RX Mode
+	opModeShadow.value = RF_CALL(readRegister(Sx1276Register::OpMode));
+	if(ModemMode_t::get(opModeShadow) == ModemMode::RXCONTINOUS)
 	{
-		lastPacketSize = RF_CALL(readRegister(Sx1276Register::RxNbBytes));
-		RF_WAIT_UNTIL(this->acquireMaster());
-
-		buffer[0] = static_cast<uint8_t>(Sx1276Register::Fifo);
-
-		Cs::reset();
-
-		RF_CALL(SpiMaster::transfer(buffer,nullptr,1));
-		if(lastPacketSize > maxLength)
+		irqFlags.value = RF_CALL(readRegister(Sx1276Register::IrqFlags));
+		if(irqFlags & Interrupts::RX_DONE)
 		{
-			MODM_LOG_ERROR<<"Read buffer is too small, packet discarded!"<<modm::endl;
-			//read it out anyway to clean the fifo
-			RF_CALL(SpiMaster::transfer(nullptr,nullptr,lastPacketSize));
-		}
-		else
-		{
-			RF_CALL(SpiMaster::transfer(nullptr,data,lastPacketSize));
-		}
+			lastPacketSize = RF_CALL(readRegister(Sx1276Register::RxNbBytes));
+			RF_WAIT_UNTIL(this->acquireMaster());
 
-		if(this->releaseMaster())
-		{
-			Cs::set();
-		}
+			buffer[0] = static_cast<uint8_t>(Sx1276Register::Fifo);
 
+			Cs::reset();
+
+			RF_CALL(SpiMaster::transfer(buffer,nullptr,1));
+			if(lastPacketSize > maxLength)
+			{
+				MODM_LOG_ERROR<<"SX1276: Read buffer is too small, packet discarded!"<<modm::endl;
+				//read it out anyway to clean the fifo
+				RF_CALL(SpiMaster::transfer(nullptr,nullptr,lastPacketSize));
+			}
+			else
+			{
+				RF_CALL(SpiMaster::transfer(nullptr,data,lastPacketSize));
+			}
+
+			if(this->releaseMaster())
+			{
+				Cs::set();
+			}
+
+			RF_CALL(writeRegister(Sx1276Register::IrqFlags, static_cast<uint8_t>(Interrupts::RX_DONE)));
+
+		}
+	}
+	else
+	{
+		MODM_LOG_ERROR<<"SX1276: ReadPacket can only called when enabling listening first!"<<modm::endl;
 	}
 
 	RF_END_RETURN(lastPacketSize);
