@@ -150,6 +150,13 @@ public:
 	{ writeIntegerMode(v); return *this; }
 
 %% if options["with_long_long"]
+#ifdef __arm__
+#ifdef __linux__
+	// This overload is used on arm32v7. See issue with OSX below
+	inline IOStream& operator << (const long unsigned int& v)
+	{ writeIntegerMode(static_cast<uint32_t>(v)); return *this; }
+#endif
+#endif
 	inline IOStream& operator << (const int64_t& v)
 	{ writeIntegerMode(v); return *this; }
 	inline IOStream& operator << (const uint64_t& v)

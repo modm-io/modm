@@ -12,6 +12,7 @@
 
 %% if target.platform in ["hosted"]
 #include <stdlib.h>
+#include <cstdint>
 #include <modm/debug/logger.hpp>
 %% elif core.startswith("avr")
 #include <avr/pgmspace.h>
@@ -84,7 +85,7 @@ void modm_abandon(const modm::AssertionInfo &info)
 {
 %% if target.platform in ["hosted"]
 	MODM_LOG_ERROR.printf("Assertion '%s'", info.name);
-	if (info.context != uintptr_t(-1)) { MODM_LOG_ERROR.printf(" @ %p (%lu)", (void *)info.context, info.context); }
+	if (info.context != uintptr_t(-1)) { MODM_LOG_ERROR.printf(" @ %p (%" PRIuPTR ")", (void *)info.context, info.context); }
 	%% if options.get(":architecture:assert:with_description", False)
 	MODM_LOG_ERROR.printf(" failed!\n  %s\nAbandoning...\n", info.description) << modm::flush;
 	%% else

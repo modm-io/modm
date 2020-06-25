@@ -214,7 +214,6 @@ def common_compiler_flags(compiler, target):
 
         "-fdata-sections",
         "-ffunction-sections",
-        "-fshort-wchar",
         "-funsigned-char",
         "-fwrapv",
         # "-fmerge-all-constants",
@@ -222,6 +221,8 @@ def common_compiler_flags(compiler, target):
         "-g3",
         "-gdwarf",
     ]
+    if target.identifier["platform"] not in ["hosted"]:
+        flags["ccflags"].append("-fshort-wchar")
     if compiler.startswith("gcc"):
         flags["ccflags"] += [
             "-finline-limit=10000",
