@@ -1,0 +1,41 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2020, Benjamin Carrick
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:lsm6ds33"
+    module.description = """\
+# LSM6DS33 always-on 3D accelerometer and 3D gyroscope
+
+The LSM6DS33 is a system-in-package featuring a 3D digital accelerometer and
+a 3D digital gyroscope performing at 1.25 mA (up to 1.6 kHz ODR) in high-performance mode.
+has a full-scale acceleration range of ±2/±4/±8/±16 g and an angular rate range
+of ±125/±245/±500/±1000/±2000 dps.
+The LSM6DS33 includes an I2C serial bus interface that supports standard and
+fast mode 100 kHz and 400 kHz.
+
+This driver only supports the raw data output of the sensor.
+Functions like tap recognition, step counter, free fall recogition, etc. are not supported
+"""
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:register",
+        ":driver:lis3.transport",
+        ":math:utils",
+        ":math:geometry")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/inertial"
+    env.copy("lsm6ds33.hpp")
+    env.copy("lsm6ds33_impl.hpp")
