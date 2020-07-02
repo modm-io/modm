@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:nucleo-f042k6</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_f042k6/lsm6ds33</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:driver:lsm6ds33</module>
+    <module>modm:platform:i2c:1</module>
+  </modules>
+</library>
