@@ -1,0 +1,94 @@
+/*
+ * Copyright (c) 2016-2018, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_NRF_GPIO_BASE_HPP
+#define MODM_NRF_GPIO_BASE_HPP
+
+#include "../device.hpp"
+#include <modm/architecture/interface/gpio.hpp>
+#include <modm/math/utils/bit_operation.hpp>
+#include <modm/platform/core/peripherals.hpp>
+
+namespace modm::platform
+{
+
+/// @ingroup modm_platform_gpio
+struct Gpio
+{
+	enum class
+	Dir
+	{
+		Input = 0,
+		Output = 1,
+	};
+
+	enum class
+	Input
+	{
+		Connect = 0,
+		Disconnect = 1,
+	};
+
+	enum class
+	Pull
+	{
+		Disabled = 0,
+		Pulldown = 1,
+		Pullup = 3,
+	};
+
+	enum class
+	Drive
+	{
+		S0S1 = 0,
+		H0S1 = 1,
+		S0H1 = 2,
+		H0H1 = 3,
+		D0S1 = 4,
+		D0H1 = 5,
+		S0D1 = 6,
+		H0D1 = 7,
+	};
+
+	enum class
+	Sense
+	{
+		Disabled = 0,
+		High = 2,
+		Low = 3,
+	};
+
+	/// @cond
+	enum class
+	Signal
+	{
+		BitBang,
+	};
+	/// @endcond
+
+protected:
+
+	// Enum Class To Integer helper functions.
+	static constexpr uint32_t
+	i(Dir dir) {return uint32_t(dir); }
+	static constexpr uint32_t
+	i(Input input) {return uint32_t(input); }
+	static constexpr uint32_t
+	i(Pull pull) {return uint32_t(pull); }
+	static constexpr uint32_t
+	i(Drive drive) {return uint32_t(drive); }
+	static constexpr uint32_t
+	i(Sense sense) {return uint32_t(sense); }
+};
+
+} // namespace modm::platform
+
+#endif // MODM_NRF_GPIO_BASE_HPP

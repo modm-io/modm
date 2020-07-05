@@ -140,6 +140,20 @@ jobs:
           command: |
             (cd examples && ../tools/scripts/examples_compile.py avr arduino_uno)
 
+  nrf-examples:
+    docker:
+      - image: modm/modm-build:latest
+    steps:
+      - checkout
+      - run:
+          name: Checkout code and update modm tools
+          command: |
+            (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - run:
+          name: Examples NRF Series
+          command: |
+            (cd examples && ../tools/scripts/examples_compile.py nrf)
+
   avr-compile-all:
     docker:
       - image: modm/modm-build:latest
@@ -421,6 +435,10 @@ workflows:
             branches:
               ignore: /^develop.*/
       - avr-examples:
+          filters:
+            branches:
+              ignore: /^develop.*/
+      - nrf-examples:
           filters:
             branches:
               ignore: /^develop.*/
