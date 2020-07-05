@@ -124,7 +124,9 @@ def main():
         # output_dir.rename(cwd / 'modm-api-docs')
         if args.compress:
             print("Zipping docs ...")
-            shutil.make_archive(str(cwd / 'modm-api-docs'), 'gztar', str(output_dir))
+            # Zipping may take more than 10 minutes
+            os.system("tar -czvf {} {}".format(str(cwd / 'modm-api-docs.tar.gz'), str(output_dir)))
+            # shutil.make_archive(str(cwd / 'modm-api-docs'), 'gztar', str(output_dir))
         else:
             final_output_dir = Path(args.output)
             if args.overwrite:
