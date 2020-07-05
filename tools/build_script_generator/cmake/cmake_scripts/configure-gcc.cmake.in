@@ -30,10 +30,9 @@ if(WIN32)
 %% if platform == "hosted"
 elseif(APPLE)
     # Using homebrew gcc on macOS
-    find_program(GCC_VERSION NAMES "gcc-9" "gcc-8" "gcc-7")
-    string(LENGTH ${GCC_VERSION} GCC_VERSION_LENGTH)
-    math(EXPR GCC_VERSION_LENGTH "${GCC_VERSION_LENGTH}-2")
-    string(SUBSTRING ${GCC_VERSION} ${GCC_VERSION_LENGTH} -1 GCC_VERSION)
+    find_program(GCC_VERSION NAMES "gcc-10" "gcc-9" "gcc-8" "gcc-7")
+    string(REGEX MATCH "gcc-[0-9]+" GCC_VERSION ${GCC_VERSION})
+    string(SUBSTRING ${GCC_VERSION} 3 -1 GCC_VERSION)
     set(TOOL_EXECUTABLE_SUFFIX "${GCC_VERSION}")
 %% endif
 else()

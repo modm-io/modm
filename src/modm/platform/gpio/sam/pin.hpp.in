@@ -1,0 +1,112 @@
+/*
+ * Copyright (c) 2017-2018, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+%% set port = gpio.port | upper
+%% set reg  = "GPIO" ~ port
+%% set pin  = gpio.pin
+%% set pnr = gpio.port | modm.ord
+
+#pragma once
+
+#include "../device.hpp"
+#include "base.hpp"
+#include "set.hpp"
+
+namespace modm::platform
+{
+
+/// @cond
+class Gpio{{ port ~ pin }};
+using GpioOutput{{ port ~ pin }} = Gpio{{ port ~ pin }};
+using GpioInput{{ port ~ pin }}  = Gpio{{ port ~ pin }};
+/// @endcond
+
+/// IO class for Pin {{port ~ pin}}
+/// @ingroup	modm_platform_gpio
+class Gpio{{ port ~ pin }} : public Gpio, public ::modm::GpioIO
+{
+	template<class... Gpios>
+	friend class GpioSet;
+	using PinSet = GpioSet<Gpio{{ port ~ pin }}>;
+	friend class Adc;
+	friend class Adc1; friend class Adc2;
+	friend class Adc3; friend class Adc4;
+public:
+	using Output = Gpio{{ port ~ pin }};
+	using Input = Gpio{{ port ~ pin }};
+	using IO = Gpio{{ port ~ pin }};
+	using Type = Gpio{{ port ~ pin }};
+	static constexpr bool isInverted = false;
+	static constexpr Port port = Port::{{port}}; ///< Port name
+	static constexpr uint8_t pin = {{pin|int}}; ///< Pin number
+
+protected:
+	/// Bitmask for registers that contain a 1bit value for every pin.
+	static constexpr uint32_t mask  = 1ul << pin;
+	/// Bitmask for registers that contain a 2bit value for every pin.
+	// static constexpr uint32_t mask2 = 0x3 << (pin * 2);
+	/// Port Number.
+	static constexpr uint8_t port_nr = uint8_t(port);
+	/// Alternate Function register id. 0 for pin 0-7. 1 for pin 8-15.
+	// static constexpr uint8_t af_id  = pin / 8;
+	/// Alternate Function offset.
+	// static constexpr uint8_t af_offset = (pin * 4) % 32;
+	/// Alternate Function register mask.
+	// static constexpr uint32_t af_mask  = 0xf << af_offset;
+
+public:
+	/// @cond
+	inline static void setAlternateFunction(uint8_t) {
+		// {{reg}}->AFR[af_id] = ({{reg}}->AFR[af_id] & ~af_mask) | ((af & 0xf) << af_offset);
+		// {{reg}}->MODER = ({{reg}}->MODER & ~mask2) | (i(Mode::AlternateFunction) << (pin * 2));
+	}
+
+	/// Enable Analog Mode which is needed to use this pin as an ADC input.
+	inline static void setAnalogInput() { PinSet::setAnalogInput(); }
+	/// @endcond
+
+public:
+	// GpioOutput
+	// start documentation inherited
+	inline static void setOutput() { PinSet::setOutput(); }
+	inline static void setOutput(bool status) { PinSet::setOutput(status); }
+	inline static void set() { PinSet::set(); }
+	inline static void set(bool status) { PinSet::set(status); }
+	inline static void reset() { PinSet::reset(); }
+	inline static void toggle() {
+		if (isSet()) { reset(); }
+		else         { set();   }
+	}
+	inline static bool isSet() { return (REG_PORT_OUT{{pnr}} & mask); }
+	// stop documentation inherited
+	inline static void configure(OutputType type, OutputSpeed speed = OutputSpeed::MHz50) { PinSet::configure(type, speed); }
+	inline static void setOutput(OutputType type, OutputSpeed speed = OutputSpeed::MHz50) { PinSet::setOutput(type, speed); }
+	// GpioInput
+	// start documentation inherited
+	inline static void setInput() { PinSet::setInput(); }
+	inline static bool read() { return (REG_PORT_IN{{pnr}} & mask); }
+	// end documentation inherited
+	inline static void configure(InputType type) { PinSet::configure(type); }
+	inline static void setInput(InputType type) { PinSet::setInput(type); }
+	// GpioIO
+	// start documentation inherited
+	inline static Direction getDirection() {
+		if (REG_PORT_DIR{{pnr}} & mask)
+			return Direction::In;
+		return Direction::Out;
+	}
+	// end documentation inherited
+	inline static void disconnect() {
+		setInput(InputType::Floating);
+	}
+};
+
+} // namespace modm::platform

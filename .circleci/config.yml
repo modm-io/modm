@@ -52,6 +52,10 @@ jobs:
           command: |
             (cd examples && ../tools/scripts/examples_compile.py generic)
       - run:
+          name: Examples SAM Devices
+          command: |
+            (cd examples && ../tools/scripts/examples_compile.py samd)
+      - run:
           name: Execute Python Scripts
           command: |
             python3 tools/scripts/authors.py --handles --count --shoutout --since 2017-01-01
@@ -153,6 +157,23 @@ jobs:
           name: Compile HAL for all AVRs
           command: |
             (cd test/all && python3 run_all.py at)
+      - store_artifacts:
+          path: test/all/log
+          destination: log
+
+  samd-compile-all:
+    docker:
+      - image: modm/modm-build:latest
+    steps:
+      - checkout
+      - run:
+          name: Checkout code and update modm tools
+          command: |
+            (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - run:
+          name: Compile HAL for all SAMD
+          command: |
+            (cd test/all && python3 run_all.py samd)
       - store_artifacts:
           path: test/all/log
           destination: log
@@ -437,6 +458,12 @@ workflows:
           filters:
             branches:
               ignore: /^develop.*/
+      - samd-compile-all:
+          requires:
+            - unittests-linux-generic
+          filters:
+            branches:
+              ignore: /^develop.*/
       - stm32f0-compile-all:
           requires:
             - unittests-linux-generic
@@ -514,6 +541,7 @@ workflows:
               ignore: /^develop.*/
           requires:
             - avr-compile-all
+            - samd-compile-all
             - stm32f0-compile-all
             - stm32f1-compile-all
             - stm32f2-compile-all

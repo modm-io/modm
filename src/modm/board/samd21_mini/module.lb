@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2016-2018, Niklas Hauser
+# Copyright (c) 2017, Fabian Greif
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":board:samd21-mini"
+    module.description = """
+# RobotDyn SAMD21 M0 MINI
+
+The SAMD21 MINI board is a small breakout board for the ATSAMD21G18 ARM
+Cortex-M0 processor, clocked at 48 MHz and at 3.3V logic.
+
+See: https://robotdyn.com/samd21-m0-mini.html
+
+It can be bought for little cost from well known Chinese online stores.
+"""
+
+def prepare(module, options):
+    if not options[":target"].partname.startswith("samd21g18a"):
+        return False
+
+    module.depends(":platform:gclk", ":platform:core", ":platform:clock",
+                   ":platform:gpio")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/board"
+    # env.substitutions = {"board_has_logger": False}
+    # env.template("../board.cpp.in", "board.cpp")
+    env.copy('.')
+
+    # env.outbasepath = "modm/openocd/modm/board/"
+    # env.copy(repopath("tools/openocd/modm/stm32f103_blue_pill.cfg"), "stm32f103_blue_pill.cfg")
+    # env.collect(":build:openocd.source", "modm/board/stm32f103_blue_pill.cfg");

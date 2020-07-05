@@ -117,6 +117,11 @@ def prepare(module, options):
             PathCollector(name="path.openocd",
                           description="Search path for OpenOCD configuration files"))
 
+        if platform == "sam":
+            module.add_collector(
+                StringCollector(name="bossac.options",
+                                description="Additional BOSSAc options"))
+
     elif platform in ["avr"]:
         module.add_collector(
             StringCollector(name="default.avrdude.programmer",
@@ -171,6 +176,8 @@ def build(env):
     if is_cortex_m:
         tools.update({"bmp", "openocd", "crashdebug", "gdb", "backend",
                       "log", "build_id", "size"})
+        if platform in ["sam"]:
+            tools.update({"bossac"})
     elif platform in ["avr"]:
         tools.update({"avrdude"})
 

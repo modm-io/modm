@@ -98,3 +98,8 @@ stm32l151qch6
 stm32l151zct6
 stm32l152qch6
 stm32l152zct6
+# FIXME: Missing cmsis-header for these ones
+samd21e15c-uf
+samd21e15c-uu
+samd21e16c-uf
+samd21e16c-uu

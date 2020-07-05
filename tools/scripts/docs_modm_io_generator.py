@@ -59,6 +59,9 @@ def get_targets():
         elif target.platform == "hosted":
             short_id.naming_schema = "{platform}"
 
+        elif target.platform == "sam":
+            short_id.naming_schema = "{platform}{family}{series}"
+
         short_id.set("platform", target.platform) # invalidate caches
         minimal_targets[short_id.string].append(target)
 
@@ -93,7 +96,7 @@ def main():
         # test list
         device_list = ["hosted-linux", "atmega328p-au", "stm32f103c8t6", "stm32g474cet6"]
     elif args.test2:
-        device_list = ["hosted-linux", "atmega328p-pu", "stm32f103zgt7", "stm32g474vet7"]
+        device_list = ["hosted-linux", "atmega328p-pu", "stm32f103zgt7", "stm32g474vet7", "samd21g18a-uu"]
     else:
         device_list = get_targets()
 

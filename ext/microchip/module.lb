@@ -1,0 +1,70 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2019, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+import re
+from pathlib import Path
+
+# -----------------------------------------------------------------------------
+def init(module):
+    module.name = ":cmsis:device"
+
+def prepare(module, options):
+    device = options[":target"]
+    if device.identifier["platform"] != "sam":
+        return False
+
+    module.depends(":cmsis:core")
+    return True
+
+pp = {}
+def validate(env):
+    device = env[":target"]
+    name = device.partname.split("-")[0]
+
+
+    define = "__{}__".format(name.upper())
+    family_file = None
+    for famfile in Path(localpath("sam")).glob("**/sam.h"):
+        content = famfile.read_text(encoding="utf-8", errors="replace")
+        match = re.findall(r"defined\((?P<define>__SAM.*?__)\)", content)
+        if match is not None and define in match:
+            family_file = famfile.relative_to(localpath("."))
+
+    if family_file is None:
+        raise ValidateException("No device define found for '{}'!".format(device.partname))
+
+    family_folder = family_file.parent
+    device_header = "{}.h".format(name)
+
+    global pp
+    pp = {
+        "define": define,
+        "folder": family_folder,
+        "device_header": device_header,
+    }
+
+def build(env):
+    global pp
+    env.collect(":build:path.include", "modm/ext")
+    env.collect(":build:path.include", "modm/ext/cmsis/device")
+
+    env.outbasepath = "modm/ext/cmsis/device"
+    files = ["sam.h", "component-version.h", "pio", "instance", "component", pp["device_header"]]
+    for file in files:
+        env.copy(localpath(pp["folder"], file), file)
+
+    env.substitutions = {
+        "headers": [pp["device_header"]],
+        "defines": [pp["define"]],
+    }
+    env.outbasepath = "modm/src/modm/platform"
+    env.template("device.hpp.in")

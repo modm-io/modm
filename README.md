@@ -70,7 +70,8 @@ git clone --recurse-submodules https://github.com/modm-io/modm.git
 
 ## Targets
 
-modm can generate code for <!--avrcount-->530<!--/avrcount--> AVR and <!--stmcount-->1959<!--/stmcount-->
+modm can generate code for <!--avrcount-->530<!--/avrcount--> AVR,
+<!--samcount-->163<!--/samcount--> SAM and <!--stmcount-->1959<!--/stmcount-->
 STM32 devices, however, there are different levels of support and testing.
 
 <center>
@@ -81,6 +82,7 @@ STM32 devices, however, there are different levels of support and testing.
 | STM32F2       | ★★★★    | STM32F3       | ★★★★★   | STM32F4       | ★★★★★   |
 | STM32F7       | ★★★★    | STM32L1       | ★★★★    | STM32L4       | ★★★★    |
 | STM32L4+      | ★★★★    | STM32G0       | ★★★★    | STM32G4       | ★★★★    |
+| SAMD21        | ★       |               |         |               |         |
 
 </center>
 
@@ -130,31 +132,33 @@ documentation.
 <td align="center">DISCO-L152RC</td>
 <td align="center">DISCO-L476VG</td>
 </tr><tr>
+<td align="center">FEATHER-M0</td>
 <td align="center">MEGA-2560-PRO</td>
 <td align="center">MINI-F401</td>
 <td align="center">MINI-F411</td>
-<td align="center">NUCLEO-F031K6</td>
 </tr><tr>
+<td align="center">NUCLEO-F031K6</td>
 <td align="center">NUCLEO-F042K6</td>
 <td align="center">NUCLEO-F103RB</td>
 <td align="center">NUCLEO-F303K8</td>
-<td align="center">NUCLEO-F303RE</td>
 </tr><tr>
+<td align="center">NUCLEO-F303RE</td>
 <td align="center">NUCLEO-F401RE</td>
 <td align="center">NUCLEO-F411RE</td>
 <td align="center">NUCLEO-F429ZI</td>
-<td align="center">NUCLEO-F446RE</td>
 </tr><tr>
+<td align="center">NUCLEO-F446RE</td>
 <td align="center">NUCLEO-F746ZG</td>
 <td align="center">NUCLEO-G071RB</td>
 <td align="center">NUCLEO-G474RE</td>
-<td align="center">NUCLEO-L152RE</td>
 </tr><tr>
+<td align="center">NUCLEO-L152RE</td>
 <td align="center">NUCLEO-L432KC</td>
 <td align="center">NUCLEO-L476RG</td>
 <td align="center">OLIMEXINO-STM32</td>
-<td align="center">STM32F030F4P6-DEMO</td>
 </tr><tr>
+<td align="center">SAMD21-MINI</td>
+<td align="center">STM32F030F4P6-DEMO</td>
 </tr>
 </table>
 <!--/bsptable-->

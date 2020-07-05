@@ -1,0 +1,9 @@
+<library>
+  <extends>modm:samd21-mini</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/samd/blink</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+  </modules>
+</library>
