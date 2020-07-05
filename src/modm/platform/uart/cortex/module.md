@@ -4,7 +4,7 @@ This module provides the ITM port 0 as a (buffered) Uart interface.
 You can use this class as a *transmit-only* alternative for logging:
 
 ```cpp
-modm::IODeviceWrapper<modm::platform::Itm, 
+modm::IODeviceWrapper<modm::platform::Itm,
                       modm::IOBuffer::DiscardIfFull> itm_device;
 modm::IOStream stream(itm_device);
 stream << "Hello World" << modm::endl;
@@ -61,7 +61,7 @@ wrapper, which logs to a temporary file and displays it's contents on the
 terminal
 
 ```
- $ scons itm fcpu=64000000
+ $ scons log-itm fcpu=64000000
 .----OpenOCD--> Single Wire Viewer
 '------SWO----- stm32f103rbt
 

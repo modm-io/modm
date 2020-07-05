@@ -73,17 +73,21 @@ some of these libraries as well, depending on what modm modules you use:
 
 ## Linux
 
-For Ubuntu 18.04LTS, these commands install the basic build system:
+For Ubuntu 20.04LTS, these commands install the basic build system:
 
 	sudo apt-get install python3 python3-pip scons git
 	sudo apt-get --no-install-recommends install doxygen
 	pip3 install modm
 
-scons now works with Python 3. Unfortunately, Ubuntu still defaults to Python 2.
-For a less intrusive way to run all scons scripts with Python 3 add this to your
-`.bashrc` or `.zshrc`:
+!!! warning "Use Python 3!"
+	Ubuntu 18.04LTS unfortunately defaults to Python 2, however, our SCons tools
+	require Python 3. For a less intrusive way to run all scons scripts with
+	Python 3 add this to your `.bashrc` or `.zshrc`:
 
-	alias scons="/usr/bin/env python3 $(which scons)"
+		alias scons="/usr/bin/env python3 $(which scons)"
+
+	If you get errors about missing `pyelftools`, check that you're really
+	running SCons with Python 3!
 
 Install the AVR toochain:
 

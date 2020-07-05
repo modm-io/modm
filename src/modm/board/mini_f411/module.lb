@@ -29,10 +29,10 @@ descr_programming = """
 
 Since the board has no St-Link programmer on the board,
 you must use DFU (Device Firmware Update (via USB)) to program the board.
-A DFU command is integrated into the modm:build:scons tool and can be called as follows:
+A DFU command is integrated into the `modm:build:scons` tool and can be called as follows:
 
 ```
-scons dfu
+scons program-dfu
 ```
 
 Alternatively you can go for an external programmer

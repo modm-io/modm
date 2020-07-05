@@ -162,5 +162,5 @@ the corresponding ELF file automatically.
 # Copy data into coredump.txt
 touch coredump.txt
 # Start postmortem debugging of executable with this build id
-scons postmortem firmware=59f08f7a37a7340799d9dba6b0c092bc3c9515c5
+scons debug-coredump firmware=59f08f7a37a7340799d9dba6b0c092bc3c9515c5
 ```
