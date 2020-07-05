@@ -22,6 +22,7 @@ def prepare(module, options):
 
 def build(env):
     env.collect("modm:build:path.include", "modm-test/src")
+    core = env[":target"].get_driver("core")["type"]
+    core = next(t for t in ("avr", "cortex-m", "hosted") if core.startswith(t))
     env.outbasepath = "."
-    env.copy("runner/{}.cpp".format(env[":target"].identifier.platform),
-             "main.cpp")
+    env.copy("runner/{}.cpp".format(core), "main.cpp")
