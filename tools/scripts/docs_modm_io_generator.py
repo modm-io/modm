@@ -94,9 +94,9 @@ def main():
     device_list = []
     if args.test:
         # test list
-        device_list = ["hosted-linux", "atmega328p-au", "stm32f103c8t6", "stm32g474cet6"]
+        device_list = ["hosted-linux", "atmega328p-au", "stm32f103c8t6", "stm32g474cet6", "samd21g18a-uu"]
     elif args.test2:
-        device_list = ["hosted-linux", "atmega328p-pu", "stm32f103zgt7", "stm32g474vet7", "samd21g18a-uu"]
+        device_list = ["hosted-linux", "atmega328p-pu", "stm32f103zgt7", "stm32g474vet7"]
     else:
         device_list = get_targets()
 
@@ -125,7 +125,7 @@ def main():
         if args.compress:
             print("Zipping docs ...")
             # Zipping may take more than 10 minutes
-            os.system("tar -czvf {} {}".format(str(cwd / 'modm-api-docs.tar.gz'), str(output_dir)))
+            os.system("(cd {} && tar -czvf {} .)".format(str(output_dir), str(cwd / 'modm-api-docs.tar.gz')))
             # shutil.make_archive(str(cwd / 'modm-api-docs'), 'gztar', str(output_dir))
         else:
             final_output_dir = Path(args.output)
