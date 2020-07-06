@@ -17,12 +17,9 @@ int
 main()
 {
     Board::initialize();
-    LedRx::set();
-
     while (1)
     {
-        LedTx::toggle();
-        LedRx::toggle();
+        LedD13::toggle();
         modm::delay(500ms);
 
 #ifdef MODM_BOARD_HAS_LOGGER

@@ -1,5 +1,5 @@
 <library>
-  <extends>modm:samd21-mini</extends>
+  <extends>modm:feather-m0</extends>
   <options>
     <option name="modm:build:build.path">../../../build/samd/blink</option>
   </options>

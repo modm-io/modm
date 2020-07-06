@@ -77,6 +77,7 @@ initialize()
 	SystemClock::enable();
 	SysTickTimer::initialize<SystemClock>();
 
+	LedD13::setOutput(modm::Gpio::Low);
 	LedTx::setOutput(modm::Gpio::Low);
 	LedRx::setOutput(modm::Gpio::Low);
 }

@@ -29,7 +29,8 @@ def prepare(module, options):
     if not options[":target"].partname.startswith("samd21g18a"):
         return False
 
-    module.depends(":platform:gclk", ":platform:core", ":platform:clock")
+    module.depends(":platform:gclk", ":platform:core", ":platform:clock",
+                   ":platform:gpio")
     return True
 
 def build(env):

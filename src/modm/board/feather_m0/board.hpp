@@ -24,7 +24,8 @@ namespace Board
 	using namespace modm::literals;
 
 /// samd21g18a running at 48MHz generated from the external 32.768 KHz crystal
-struct SystemClock {
+struct SystemClock
+{
 	static constexpr uint32_t Frequency = 48_MHz;
 	// static constexpr uint32_t Ahb  = Frequency;
 	// static constexpr uint32_t Apba = Frequency;
@@ -63,11 +64,8 @@ struct SystemClock {
 	}
 };
 
-// User LED (inverted, because connected to 3V3)
-// using LedRed = GpioOutputA17;
-// using Leds = SoftwareGpioPort< LedRed >;
-
-// using Button = GpioUnused;
+using LedD13 = GpioInverted<GpioOutputA17>;
+// using Leds = SoftwareGpioPort< LedD13 >;
 
 inline void
 initialize()
@@ -75,7 +73,7 @@ initialize()
 	SystemClock::enable();
 	SysTickTimer::initialize<SystemClock>();
 
-	// LedGreen::setOutput(modm::Gpio::Low);
+	LedD13::setOutput(modm::Gpio::Low);
 }
 
 } // Board namespace
