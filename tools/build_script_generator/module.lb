@@ -10,7 +10,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-import os, sys
+import os, sys, re
 from pathlib import Path
 
 # import all common code
@@ -30,12 +30,13 @@ class BuildModuleDocs:
             for tool in tools:
                 tpath = Path(repopath("tools/modm_tools/{}.py".format(tool)))
                 doc = None
+                # Documentation is inside a Markdown file
                 if tpath.with_suffix(".md").exists():
                     doc = tpath.with_suffix(".md").read_text()
+                # Documentation is inside the tool as a docstring
                 elif tpath.exists():
-                    co = compile(tpath.read_bytes(), tpath, 'exec')
-                    if co.co_consts and isinstance(co.co_consts[0], str):
-                        doc = co.co_consts[0]
+                    doc = re.search('"""(.*?)"""', tpath.read_text(), flags=re.DOTALL | re.MULTILINE)
+                    if doc: doc = doc.group(1);
                 if doc is not None:
                     self._content += "\n\n\n" + doc.strip()
 
