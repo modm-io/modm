@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:nucleo-f042k6</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_f042k6/lis3mdl</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:driver:lis3mdl</module>
+    <module>modm:platform:i2c:1</module>
+  </modules>
+</library>
