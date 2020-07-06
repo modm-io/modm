@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2020, Benjamin Carrick
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:lis3mdl"
+    module.description = """\
+# LIS3MDL Magnetic Sensor
+
+The LIS3MDL is an ultra-low-power high-performance three-axis magnetic sensor.
+The sensor has user-selectable full scales of 4/ 8/ 12/ 16 gauss.
+The LIS3MDL includes an I2C serial bus interface that supports standard and
+fast mode 100 kHz and 400 kHz.
+"""
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:register",
+        ":driver:lis3.transport",
+        ":math:utils",
+        ":math:geometry")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/inertial"
+    env.copy("lis3mdl.hpp")
+    env.copy("lis3mdl_impl.hpp")
