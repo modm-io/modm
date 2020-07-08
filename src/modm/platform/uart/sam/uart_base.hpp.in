@@ -1,0 +1,49 @@
+/*
+ * Copyright (c) 2013, Kevin Läufer
+ * Copyright (c) 2014-2018, Niklas Hauser
+ * Copyright (c) 2017, Sascha Schade
+ * Copyright (c) 2020, Erik Henriksson
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <stdint.h>
+#include "../device.hpp"
+#include <modm/architecture/interface/register.hpp>
+#include <modm/architecture/interface/interrupt.hpp>
+#include <modm/math/units.hpp>
+
+
+namespace modm
+{
+namespace platform
+{
+/**
+ * Base class for the UART classes
+ *
+ * Provides some common enum that do not depend on the specific UART.
+ *
+ * @author Kevin Laeufer
+ * @ingroup		modm_platform_uart
+ */
+class UartBase
+{
+public:
+	enum class Parity : uint32_t
+	{
+		Even 			= 0,
+		Odd  			= 1,
+		Disabled  = 2,
+	};
+};
+
+}	// namespace platform
+
+}	// namespace modm

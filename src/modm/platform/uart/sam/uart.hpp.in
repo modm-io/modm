@@ -1,0 +1,101 @@
+/*
+ * Copyright (c) 2009-2012, Fabian Greif
+ * Copyright (c) 2010, Martin Rosekeit
+ * Copyright (c) 2011, Georgi Grinshpun
+ * Copyright (c) 2011, 2013-2017, Niklas Hauser
+ * Copyright (c) 2012, Sascha Schade
+ * Copyright (c) 2013, 2016, Kevin Läufer
+ * Copyright (c) 2020, Erik Henriksson
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+%% set hal = uart_name ~ "Hal" ~ id
+%% set name = uart_name ~ id
+%% set sercom = sercom_name ~ id
+
+#pragma once
+
+#include <modm/architecture/interface/uart.hpp>
+#include <modm/platform/gpio/connector.hpp>
+#include "uart_base.hpp"
+#include "uart_hal_{{ id }}.hpp"
+
+namespace modm
+{
+
+namespace platform
+{
+
+/**
+ * Universal asynchronous receiver transmitter ({{ uart_name | upper ~ id }})
+ *
+ * @author		Kevin Laeufer
+ * @author		Niklas Hauser
+ * @ingroup		modm_platform_uart modm_platform_uart_{{id}}
+ */
+class {{ name }} : public UartBase, public ::modm::Uart
+{
+public:
+	template< template<Peripheral _> class RxPin, template<Peripheral _> class TxPin >
+	static void
+	connect()
+	{
+		using Connector = GpioConnector<Peripheral::{{ sercom }}, RxPin, TxPin>;
+		using Rx = typename Connector::template GetSignal< Gpio::Signal::Pad3 >;
+		using Tx = typename Connector::template GetSignal< Gpio::Signal::Pad2 >;
+		static_assert(Connector::template IsValid<Rx>,
+				"{{ name }}::connect() requires Rx on {{ sercom }}Pad3");
+		static_assert(Connector::template IsValid<Tx>,
+				"{{ name }}::connect() requires Tx on {{ sercom }}Pad2");
+		Connector::connect();
+	}
+
+	template< class SystemClock, baudrate_t baudrate, percent_t tolerance=pct(1) >
+	static void modm_always_inline
+	initialize(Parity parity = Parity::Disabled)
+	{
+		{{ hal }}::initialize<SystemClock, baudrate>(parity);
+		{{ hal }}::setTransmitterEnable(true);
+		{{ hal }}::setReceiverEnable(true);
+	}
+
+	static void
+	writeBlocking(uint8_t data);
+
+	static void
+	writeBlocking(const uint8_t *data, std::size_t length);
+
+	static void
+	flushWriteBuffer();
+
+	static bool
+	write(uint8_t data);
+
+	static std::size_t
+	write(const uint8_t *data, std::size_t length);
+
+	static bool
+	isWriteFinished();
+
+	static std::size_t
+	discardTransmitBuffer();
+
+	static bool
+	read(uint8_t &data);
+
+	static std::size_t
+	read(uint8_t *buffer, std::size_t length);
+
+	static std::size_t
+	discardReceiveBuffer();
+};
+
+}	// namespace platform
+
+}	// namespace modm

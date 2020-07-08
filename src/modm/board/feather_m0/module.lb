@@ -3,6 +3,7 @@
 #
 # Copyright (c) 2016-2018, Niklas Hauser
 # Copyright (c) 2017, Fabian Greif
+# Copyright (c) 2020, Erik Henriksson
 #
 # This file is part of the modm project.
 #
@@ -30,13 +31,16 @@ def prepare(module, options):
         return False
 
     module.depends(":platform:gclk", ":platform:core", ":platform:clock",
-                   ":platform:gpio")
+                   ":platform:gpio", ":platform:uart:0", ":debug")
     return True
 
 def build(env):
     env.outbasepath = "modm/src/modm/board"
-    # env.substitutions = {"board_has_logger": False}
-    # env.template("../board.cpp.in", "board.cpp")
+    env.substitutions = {
+        "with_logger": True,
+        "with_assert": False,
+    }
+    env.template("../board.cpp.in", "board.cpp")
     env.copy('.')
 
     # env.outbasepath = "modm/openocd/modm/board/"
