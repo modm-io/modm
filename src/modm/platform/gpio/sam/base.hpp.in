@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2020, Niklas Hauser
+ * Copyright (c) 2020, Erik Henriksson
  *
  * This file is part of the modm project.
  *
@@ -60,7 +61,7 @@ struct Gpio
 
 	/// The Port a Gpio Pin is connected to.
 	enum class
-	Port
+	PortName
 	{
 %% for port in ports
 		{{ port | upper }} = {{ port | modm.ord }},
@@ -72,8 +73,27 @@ struct Gpio
 	Signal
 	{
 		BitBang,
+%% for signal in all_signals
+		{{ signal }},
+%% endfor
 	};
 	/// @endcond
+
+	enum class
+	SercomRxPad
+	{
+		Pad0 = 0x0,
+		Pad1 = 0x1,
+		Pad2 = 0x2,
+		Pad3 = 0x3,
+	};
+
+	enum class
+	SercomTxPad
+	{
+		Pad0 = 0x0,
+		Pad2 = 0x1,
+	};
 
 protected:
 	/// @cond

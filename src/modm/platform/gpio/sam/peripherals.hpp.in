@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2019, Niklas Hauser
+ * Copyright (c) 2020, Erik Henriksson
  *
  * This file is part of the modm project.
  *
@@ -18,6 +19,9 @@ enum class
 Peripheral
 {
 	BitBang,
+%% for per in all_peripherals
+	{{ per }},
+%% endfor
 };
 
 }

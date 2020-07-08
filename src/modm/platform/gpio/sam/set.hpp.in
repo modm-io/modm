@@ -28,14 +28,14 @@ class GpioSet : public Gpio
 protected:
 	static constexpr uint32_t inverteds[{{ ports | length }}] = {
 %% for port in ports
-		(((Gpios::port == Port::{{port}} and Gpios::isInverted) ? Gpios::mask : 0) | ...),
+		(((Gpios::port == PortName::{{port}} and Gpios::isInverted) ? Gpios::mask : 0) | ...),
 %% endfor
 	};
 	static constexpr uint32_t inverted(uint8_t id) { return inverteds[id]; }
 
 	static constexpr uint32_t masks[{{ ports | length }}] = {
 %% for port in ports
-		(((Gpios::port == Port::{{port}}) ? Gpios::mask : 0) | ...),
+		(((Gpios::port == PortName::{{port}}) ? Gpios::mask : 0) | ...),
 %% endfor
 	};
 	static constexpr uint32_t mask(uint8_t id) { return masks[id]; }

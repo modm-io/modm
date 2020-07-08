@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2017-2018, Niklas Hauser
+ * Copyright (c) 2020, Erik Henriksson
  *
  * This file is part of the modm project.
  *
@@ -45,7 +46,7 @@ public:
 	using IO = Gpio{{ port ~ pin }};
 	using Type = Gpio{{ port ~ pin }};
 	static constexpr bool isInverted = false;
-	static constexpr Port port = Port::{{port}}; ///< Port name
+	static constexpr PortName port = PortName::{{port}}; ///< Port name
 	static constexpr uint8_t pin = {{pin|int}}; ///< Pin number
 
 protected:
@@ -107,6 +108,66 @@ public:
 	inline static void disconnect() {
 		setInput(InputType::Floating);
 	}
+	template< Peripheral peripheral >
+	struct BitBang { static void connect();
+		static_assert(
+			(peripheral == Peripheral::BitBang),
+			"Gpio{{ port ~ pin }}::BitBang only connects to software drivers!");
+	};
+	%% for signal_name, signal_group in signals.items()
+	template< Peripheral peripheral >
+	struct {{ signal_name }} { static void connect();
+		static_assert(
+		%% for signal in signal_group
+			(peripheral == Peripheral::{{ signal.driver }}){% if loop.last %},{% else %} ||{% endif %}
+		%% endfor
+			"Gpio{{ port ~ pin }}::{{ signal_name }} only connects to {% for signal in signal_group %}{{signal.driver}}{% if not loop.last %} or {% endif %}{% endfor %}!");
+	};
+	%% endfor
 };
+
+/// @cond
+template<>
+struct Gpio{{ port ~ pin }}::BitBang<Peripheral::BitBang>
+{
+	using Gpio = Gpio{{ port ~ pin }};
+	static constexpr Gpio::Signal Signal = Gpio::Signal::BitBang;
+	static constexpr int af = -1;
+	inline static void connect() {}
+};
+%% for signal_group in signals.values()
+	%% for signal in signal_group
+template<>
+struct Gpio{{ port ~ pin }}::{{ signal.name }}<Peripheral::{{ signal.driver }}>
+{
+	using Gpio = Gpio{{ port ~ pin }};
+	static constexpr Gpio::Signal Signal = Gpio::Signal::{{ signal.name }};
+	%% if signal.driver.startswith("Sercom")
+	static constexpr Gpio::SercomRxPad RxPad = Gpio::SercomRxPad::{{ signal.name }};
+	%% endif
+	%% if signal.driver.startswith("Sercom") and signal.name in ("Pad0", "Pad2")
+	static constexpr Gpio::SercomTxPad TxPad = Gpio::SercomTxPad::{{ signal.name }};
+	%% endif
+	inline static void
+	connect()
+	{
+		//## FIXME: Support using alternate function (see stm32).
+		%% if signal.driver.startswith("Sercom")
+		PORT->Group[uint32_t(Gpio::port)].PINCFG[uint32_t(Gpio::pin)].bit.PMUXEN = true;
+		if (Gpio::pin & 1u) {
+			PORT->Group[uint32_t(Gpio::port)].PMUX[uint32_t(Gpio::pin) >> 1].reg |= PORT_PMUX_PMUXO_C;
+		} else {
+			PORT->Group[uint32_t(Gpio::port)].PMUX[uint32_t(Gpio::pin) >> 1].reg |= PORT_PMUX_PMUXE_C;
+		}
+		%% endif
+	}
+};
+
+	%% endfor
+
+%% endfor
+
+
+/// @endcond
 
 } // namespace modm::platform

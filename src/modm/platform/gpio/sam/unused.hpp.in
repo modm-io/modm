@@ -29,7 +29,7 @@ public:
 	using IO = GpioUnused;
 	using Type = GpioUnused;
 	static constexpr bool isInverted = false;
-	static constexpr Port port = Port(-1);
+	static constexpr PortName port = PortName(-1);
 	static constexpr uint8_t pin = uint8_t(-1);
 	static constexpr uint32_t mask = 0;
 
