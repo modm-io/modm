@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2016-2017, Sascha Schade
  * Copyright (c) 2017-2018, Niklas Hauser
+ * Copyright (c) 2020, Erik Henriksson
  *
  * This file is part of the modm project.
  *
@@ -12,8 +13,10 @@
 
 #pragma once
 
+#include <modm/debug/logger.hpp>
 #include <modm/platform.hpp>
 #include <modm/architecture/interface/clock.hpp>
+#define MODM_BOARD_HAS_LOGGER
 
 using namespace modm::platform;
 
@@ -52,17 +55,24 @@ struct SystemClock
 	static bool inline
 	enable()
 	{
-		// GenericClockController::enableExternalCrystal(Frequency);
-
-		// switch system clock to PLL output
-		// GenericClockController::enableSystemClock(ClockControl::SystemClockSource::Pll);
-
-		// update frequencies for busy-wait delay functions
-		// GenericClockController::updateCoreFrequency<Frequency>();
-
+    GenericClockController::setFlashLatency<Frequency>();
+		GenericClockController::initExternalCrystal();
+		GenericClockController::initDFLL48MHz();
+		GenericClockController::initOsc8MHz();
+		GenericClockController::setSystemClock(ClockSource::DFLL48M);
+		GenericClockController::updateCoreFrequency<Frequency>();
 		return true;
 	}
 };
+
+
+namespace debug_logger
+{
+	using Rx = GpioInputA11;
+	using Tx = GpioOutputA10;
+}
+
+using LoggerDevice = modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull >;
 
 using LedD13 = GpioInverted<GpioOutputA17>;
 // using Leds = SoftwareGpioPort< LedD13 >;
@@ -72,6 +82,8 @@ initialize()
 {
 	SystemClock::enable();
 	SysTickTimer::initialize<SystemClock>();
+	Uart0::connect<debug_logger::Rx::Pad3, debug_logger::Tx::Pad2>();
+	Uart0::initialize<SystemClock, 9'600_Bd>();
 
 	LedD13::setOutput(modm::Gpio::Low);
 }

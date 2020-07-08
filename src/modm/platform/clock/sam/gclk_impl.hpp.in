@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2019, Ethan Slattery
+ * Copyright (c) 2020, Erik Henriksson
  *
  * This file is part of the modm project.
  *
@@ -10,6 +11,7 @@
 // ----------------------------------------------------------------------------
 
 #include <cmath>
+#include "modm/math/units.hpp"
 
 namespace modm::platform
 {
@@ -24,6 +26,19 @@ GenericClockController::updateCoreFrequency()
 {
 	delay_fcpu_MHz = Core_Hz / 1'000'000;
 	delay_ns_per_loop = ::round({{loops}}000.f / (Core_Hz / 1'000'000));
+}
+
+template< uint32_t Core_Hz >
+uint32_t
+GenericClockController::setFlashLatency()
+{
+	// See table 41.11 (NVM Characteristics) in the datasheet
+	if (Core_Hz > 24_MHz) {
+		NVMCTRL->CTRLB.bit.RWS = NVMCTRL_CTRLB_RWS_HALF_Val;
+	} else {
+		NVMCTRL->CTRLB.bit.RWS = NVMCTRL_CTRLB_RWS_SINGLE_Val;
+	}
+	return Core_Hz;
 }
 
 }
