@@ -49,4 +49,7 @@ public:
 
 	void
 	testNonNestedResumables();
+
+	void
+	testWaitForInterrupt();
 };

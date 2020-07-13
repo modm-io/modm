@@ -35,6 +35,7 @@ ResultState
 
 	// reasons to wait
 	WrongState = 127,	///< A conflicting nested resumable function of the same class is already running
+	WaitForInterrupt = 128,		///< Resumable function is waiting for an interrupt
 
 	// reasons to keep running
 	Running = 255,		///< Resumable function is running

@@ -106,13 +106,36 @@
 #define RF_WAIT_UNTIL(condition) \
 	RF_WAIT_WHILE(!(condition))
 
+/// Cause resumable function to wait **while** given `condition` is true, while
+/// signaling that it is expecting an interrupt to happen before. This is
+/// useful to let the CPU idle/sleep until an interrupt happens.
+/// @hideinitializer
+#define RF_WAIT_FOR_INTERRUPT_WHILE(condition) \
+		do { \
+			RF_INTERNAL_SET_CASE(__COUNTER__); \
+			if (condition) { \
+				this->popRf(); \
+				return {modm::rf::WaitForInterrupt}; \
+			} \
+		} while(0)
+
+/// Cause resumable function to wait **until** given `condition` is true, while
+/// signaling that it is expecting an interrupt to happen before. This is
+/// useful to let the CPU idle/sleep until an interrupt happens.
+/// @hideinitializer
+#define RF_WAIT_FOR_INTERRUPT_UNTIL(condition) \
+	RF_WAIT_FOR_INTERRUPT_WHILE(!(condition))
+
 /// Calls a resumable function and returns its result.
 /// @hideinitializer
 #define RF_CALL(...) \
 	({ \
 			RF_INTERNAL_SET_CASE(__COUNTER__); \
 			auto rfResult = (__VA_ARGS__); \
-			if (rfResult.getState() > modm::rf::NestingError) { \
+			if (rfResult.getState() == modm::rf::WaitForInterrupt) { \
+				this->popRf(); \
+				return {modm::rf::WaitForInterrupt}; \
+			} else if (rfResult.getState() > modm::rf::NestingError) { \
 				this->popRf(); \
 				return {modm::rf::Running}; \
 			} \
@@ -140,10 +163,13 @@
 			RF_INTERNAL_SET_CASE(__COUNTER__); \
 			{ \
 				auto rfResult = (__VA_ARGS__); \
-				if (rfResult.getState() > modm::rf::NestingError) { \
-					this->popRf(); \
-					return {modm::rf::Running}; \
-				} \
+				if (rfResult.getState() == modm::rf::WaitForInterrupt) { \
+				this->popRf(); \
+				return {modm::rf::WaitForInterrupt}; \
+			} else if (rfResult.getState() > modm::rf::NestingError) { \
+				this->popRf(); \
+				return {modm::rf::Running}; \
+			} \
 				RF_RETURN(rfResult.getResult()); \
 			} \
 		} while(0)

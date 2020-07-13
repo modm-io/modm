@@ -1064,3 +1064,51 @@ ResumableTest::testNonNestedResumables()
 	TEST_ASSERT_EQUALS(thread.state1, 2);
 	TEST_ASSERT_EQUALS(thread.state0, 1);
 }
+
+class TestingWaitForInterruptResumables : public modm::NestedResumable<2>
+{
+public:
+	modm::ResumableResult<void>
+	parent()
+	{
+		RF_BEGIN();
+
+		RF_CALL(this->runningChild());
+		RF_CALL(this->sleepyChild());
+
+		RF_END();
+	}
+
+	modm::ResumableResult<void>
+	runningChild()
+	{
+		RF_BEGIN();
+
+		RF_WAIT_UNTIL(running_continue);
+
+		RF_END();
+	}
+
+	modm::ResumableResult<void>
+	sleepyChild()
+	{
+		RF_BEGIN();
+
+		RF_WAIT_FOR_INTERRUPT_UNTIL(sleepy_continue);
+
+		RF_END();
+	}
+
+	bool running_continue, sleepy_continue;
+};
+
+void
+ResumableTest::testWaitForInterrupt()
+{
+	TestingWaitForInterruptResumables thread;
+	TEST_ASSERT_EQUALS(thread.parent().getState(), modm::rf::Running);
+	thread.running_continue = true;
+	TEST_ASSERT_EQUALS(thread.parent().getState(), modm::rf::WaitForInterrupt);
+	thread.sleepy_continue = true;
+	TEST_ASSERT_EQUALS(thread.parent().getState(), modm::rf::Stop);
+}
