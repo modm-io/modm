@@ -35,13 +35,15 @@ struct KeyFrameBase
 {
 	static constexpr std::size_t size = sizeof...(Args);
 
-	typename Animation<T>::TimeType length;
-	T value[size];
+	typename Animation<T>::TimeType length = 0;
+	T value[size] = {};
+
+	KeyFrameBase() = default;
+	KeyFrameBase(typename Animation<T>::TimeType length)
+	:	length(length) {}
 
 	KeyFrameBase(typename Animation<T>::TimeType length, Args... values)
-	:	length(length), value{values...}
-	{
-	}
+	:	length(length), value{values...} {}
 } modm_packed;
 
 template<typename T, int remaining, typename... Args>
@@ -114,6 +116,9 @@ public:
 
 	KeyFrame<T, size> *
 	getKeyFrames() const;
+
+	uint16_t
+	getCurrentKeyFrame() const;
 
 	void
 	setKeyFrames(KeyFrame<T, size> *frames, uint16_t length);
@@ -207,6 +212,10 @@ public:
 	/// @return	the pointer to the key frame array
 	KeyFrame<T, N> *
 	getKeyFrames() const;
+
+	/// @return	get the currently animating key frame index, or 0
+	uint16_t
+	getCurrentKeyFrame() const;
 
 	/// @param	frames	pointer to the keyframe array
 	/// @param	length	the number of keyframes in the array

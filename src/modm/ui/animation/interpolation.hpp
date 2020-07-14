@@ -115,10 +115,17 @@ private:
 		initialize(Type begin, Type end, uint_fast16_t steps)
 		{
 			int_fast16_t delta = (static_cast<int_fast16_t>(end) - begin) << 7;
-			deltaValue = delta / static_cast<int_fast16_t>(steps);
-			if (deltaValue == 0)
-				deltaValue = delta > 0 ? 1 : -1;
-			accumulatedValue = (static_cast<uint_fast16_t>(begin) << 7) + deltaValue / 2;
+			if (delta)
+			{
+				deltaValue = delta / static_cast<int_fast16_t>(steps);
+				if (deltaValue == 0) deltaValue = delta > 0 ? 1 : -1;
+				accumulatedValue = (static_cast<uint_fast16_t>(begin) << 7) + deltaValue / 2;
+			}
+			else
+			{
+				deltaValue = 0;
+				accumulatedValue = end << 7;
+			}
 		}
 
 		void inline
@@ -156,10 +163,17 @@ private:
 		initialize(Type begin, Type end, uint32_t steps)
 		{
 			int32_t delta = (static_cast<int32_t>(end) - begin) << 15;
-			deltaValue = delta / static_cast<int32_t>(steps);
-			if (deltaValue == 0)
-				deltaValue = delta > 0 ? 1 : -1;
-			accumulatedValue = (static_cast<uint32_t>(begin) << 15) + deltaValue / 2;
+			if (delta)
+			{
+				deltaValue = delta / static_cast<int32_t>(steps);
+				if (deltaValue == 0) deltaValue = delta > 0 ? 1 : -1;
+				accumulatedValue = (static_cast<uint32_t>(begin) << 15) + deltaValue / 2;
+			}
+			else
+			{
+				deltaValue = 0;
+				accumulatedValue = end << 15;
+			}
 		}
 
 		void inline
@@ -204,10 +218,17 @@ private:
 		initialize(Type begin, Type end, uint32_t steps)
 		{
 			int64_t delta = (static_cast<int64_t>(end) - begin) << 16;
-			deltaValue = delta / static_cast<int32_t>(steps);
-			if (deltaValue == 0)
-				deltaValue = delta > 0 ? 1 : -1;
-			accumulatedValue = (static_cast<uint64_t>(begin) << 16) + deltaValue / 2;
+			if (delta)
+			{
+				deltaValue = delta / static_cast<int32_t>(steps);
+				if (deltaValue == 0) deltaValue = delta > 0 ? 1 : -1;
+				accumulatedValue = (static_cast<uint64_t>(begin) << 16) + deltaValue / 2;
+			}
+			else
+			{
+				deltaValue = 0;
+				accumulatedValue = end << 16;
+			}
 		}
 
 		void inline

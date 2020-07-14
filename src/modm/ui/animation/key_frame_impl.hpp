@@ -83,6 +83,13 @@ modm::ui::KeyFrameAnimationBase<T, Args...>::cancel()
 }
 
 template< typename T, class... Args >
+uint16_t
+modm::ui::KeyFrameAnimationBase<T, Args...>::getCurrentKeyFrame() const
+{
+	return currentFrame ? (currentFrame - 1) : 0;
+}
+
+template< typename T, class... Args >
 bool
 modm::ui::KeyFrameAnimationBase<T, Args...>::isAnimating() const
 {

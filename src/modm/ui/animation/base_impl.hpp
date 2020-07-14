@@ -63,12 +63,6 @@ template< typename T >
 bool
 modm::ui::Animation<T>::animateTo(T value, TimeType time)
 {
-	if (value == currentValue)
-	{
-		setValue(value);
-		animationTime = time;
-		return false;
-	}
 	if(time == 0)
 	{
 		setValue(value);
@@ -77,8 +71,9 @@ modm::ui::Animation<T>::animateTo(T value, TimeType time)
 
 	endValue = value;
 	animationTime = time;
-	interpolation.initialize(currentValue, endValue, animationTime);
 	previous = modm::Clock::now();
+	interpolation.initialize(currentValue, endValue, animationTime);
+	if (endValue == currentValue and handler) handler(currentValue);
 	return true;
 }
 
@@ -95,7 +90,7 @@ modm::ui::Animation<T>::update()
 	{
 		// buffer the delta time
 		const modm::ShortTimestamp now = modm::Clock::now();
-		// this cast requires us to be updates once at least every 255ms
+		// this cast requires us to be updated once at least every 255ms
 		// If this method is not called every few ms, the animation does
 		// not look good anyways, so this limitation is okay.
 		uint_fast8_t delta = (now - previous).count();
@@ -120,7 +115,7 @@ modm::ui::Animation<T>::update()
 			while (delta--) interpolation.step();
 
 			// get the calculated value for this step
-			T newValue = interpolation.getValue();
+			const T newValue = interpolation.getValue();
 
 			if (currentValue != newValue)
 			{
