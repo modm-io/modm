@@ -44,6 +44,8 @@ protected:
 		for (const auto &m: masks) r += (m) ? 1 : 0;
 		return r;
 	}
+	static constexpr PORT_PINCFG_Type *configs[] =
+		{(PORT_PINCFG_Type*) &PORT->Group[uint32_t(Gpios::port)].PINCFG[uint32_t(Gpios::pin)] ...};
 public:
 	static constexpr uint8_t width = sizeof...(Gpios);
 	static constexpr uint8_t number_of_ports = numberOfPorts();
@@ -61,20 +63,13 @@ public:
 		setOutput();
 	}
 
-	static void setOutput(OutputType type, OutputSpeed speed = OutputSpeed::MHz50)
+	static void setOutput(OutputType, OutputSpeed)
 	{
-		configure(type, speed);
 		setOutput();
 	}
 
 	static void configure(OutputType , OutputSpeed = OutputSpeed::MHz50)
 	{
-	%% for port, id in ports.items()
-		if constexpr (mask({{id}})) {
-			// GPIO{{port}}->OSPEEDR = (GPIO{{port}}->OSPEEDR & ~mask2({{id}})) | (i(speed) * mask2({{id}}, 0b01));
-			// GPIO{{port}}->OTYPER  = (GPIO{{port}}->OTYPER  & ~mask({{id}}))  | (i(type) ? mask({{id}}) : 0);
-		}
-	%% endfor
 	}
 
 	static void setInput()
@@ -92,20 +87,18 @@ public:
 		setInput();
 	}
 
-	static void setAnalogInput()
+	static void configure(InputType type)
 	{
-	%% for port, id in ports.items()
-		// if constexpr (mask({{id}})) GPIO{{port}}->MODER |= mask2({{id}}, i(Mode::Analog));
-	%% endfor
+		for (PORT_PINCFG_Type* config : configs) {
+			set(type == InputType::PullUp);
+			config->reg =
+					PORT_PINCFG_INEN |
+					(type != InputType::Floating) << PORT_PINCFG_PULLEN_Pos;
+		}
 	}
 
-	static void configure(InputType)
+	static void setAnalogInput()
 	{
-	%% for port, id in ports.items()
-		if constexpr (mask({{id}})) {
-			// GPIO{{port}}->PUPDR = (GPIO{{port}}->PUPDR & ~mask2({{id}})) | (i(type) * mask2({{id}}, 0b01));
-		}
-	%% endfor
 	}
 
 	static void set()

@@ -19,7 +19,7 @@ main()
     Board::initialize();
     while (1)
     {
-        LedD13::toggle();
+        Led::toggle();
         modm::delay(500ms);
 
 #ifdef MODM_BOARD_HAS_LOGGER

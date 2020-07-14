@@ -6,7 +6,7 @@
   </repositories>
 
   <options>
-    <option name="modm:target">samd21g18a-uu</option>
+    <option name="modm:target">samd21g18a-au</option>
     <option name="modm:platform:cortex-m:linkerscript.flash_offset">0x2000</option>
   </options>
   <modules>
