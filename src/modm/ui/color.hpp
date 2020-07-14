@@ -36,22 +36,19 @@ template<class UnderlyingType = uint8_t>
 class RgbT
 {
 public:
-	UnderlyingType red;
-	UnderlyingType green;
-	UnderlyingType blue;
+	UnderlyingType red{0};
+	UnderlyingType green{0};
+	UnderlyingType blue{0};
 
-	RgbT(UnderlyingType red, UnderlyingType green, UnderlyingType blue)
+	constexpr RgbT() = default;
+
+	constexpr RgbT(UnderlyingType red, UnderlyingType green, UnderlyingType blue)
 	:	red(red), green(green), blue(blue)
 	{
 	}
 
-	RgbT()
-	:	red(0), green(0), blue(0)
-	{
-	}
-
 	template<typename IntermediateType = float, unsigned int multiplier = 100, typename ReturnType = UnderlyingType>
-	inline ReturnType getRelative(const UnderlyingType color) const
+	ReturnType getRelative(const UnderlyingType color) const
 	{
 		return static_cast<ReturnType>(
 				(static_cast<IntermediateType>(color) *
@@ -60,25 +57,25 @@ public:
 	}
 
 	template<typename IntermediateType = float, unsigned int multiplier = 100, typename ReturnType = UnderlyingType>
-	inline ReturnType getRelativeRed() const
+	ReturnType getRelativeRed() const
 	{
 		return getRelative<IntermediateType, multiplier, ReturnType>(red);
 	}
 
 	template<typename IntermediateType = float, unsigned int multiplier = 100, typename ReturnType = UnderlyingType>
-	inline ReturnType getRelativeGreen() const
+	ReturnType getRelativeGreen() const
 	{
 		return getRelative<IntermediateType, multiplier, ReturnType>(green);
 	}
 
 	template<typename IntermediateType = float, unsigned int multiplier = 100, typename ReturnType = UnderlyingType>
-	inline ReturnType getRelativeBlue() const
+	ReturnType getRelativeBlue() const
 	{
 		return getRelative<IntermediateType, multiplier, ReturnType>(blue);
 	}
 
 	template<typename IntermediateType = float, unsigned int multiplier = 100, typename ReturnType = UnderlyingType>
-	inline RgbT<ReturnType> getRelativeColors() const
+	RgbT<ReturnType> getRelativeColors() const
 	{
 		return RgbT<ReturnType>(
 			getRelativeRed	<IntermediateType, multiplier, ReturnType>(),
@@ -89,6 +86,12 @@ public:
 
 	template<typename T> void
 	toHsv(HsvT<T>* color) const;
+
+	constexpr bool
+	operator == (const RgbT<UnderlyingType>& other) const
+	{
+		return (red == other.red and green == other.green and blue == other.blue);
+	}
 
 private:
 	template<typename T>
@@ -104,17 +107,14 @@ template<class UnderlyingType = uint8_t>
 class HsvT
 {
 public:
-	UnderlyingType hue;
-	UnderlyingType saturation;
-	UnderlyingType value;
+	UnderlyingType hue{0};
+	UnderlyingType saturation{0};
+	UnderlyingType value{0};
 
-	HsvT(UnderlyingType hue, UnderlyingType saturation, UnderlyingType value)
+	constexpr HsvT() = default;
+
+	constexpr HsvT(UnderlyingType hue, UnderlyingType saturation, UnderlyingType value)
 	:	hue(hue), saturation(saturation), value(value)
-	{
-	}
-
-	HsvT()
-	:	hue(0), saturation(0), value(0)
 	{
 	}
 
