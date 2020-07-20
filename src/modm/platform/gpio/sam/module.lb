@@ -116,6 +116,7 @@ def build(env):
     # env.template("software_port.hpp.in")
     env.template("set.hpp.in")
     env.template("base.hpp.in")
+    env.template("software_port.hpp.in")
     env.template("unused.hpp.in")
 
     env.copy("../common/inverted.hpp", "inverted.hpp")

@@ -101,7 +101,7 @@ struct SystemClock
 };
 
 using LoggerDevice = modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull >;
-// using Leds = SoftwareGpioPort< LedD13 >;
+using Leds = SoftwareGpioPort< Led >;
 
 inline void
 initialize()
