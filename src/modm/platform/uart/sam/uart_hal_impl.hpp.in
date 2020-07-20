@@ -58,10 +58,7 @@ modm::platform::{{ name }}::initialize(Parity parity)
 {
 	// Enable peripheral clock in power manager.
 	PM->APBCMASK.bit.{{ peripheral }}_ = true;
-	// Init clock using GCLK0 as source.
-	GCLK->CLKCTRL.reg = GCLK_CLKCTRL_ID_{{ peripheral }}_CORE |
-                      GCLK_CLKCTRL_GEN_GCLK0 |
-                      GCLK_CLKCTRL_CLKEN ;
+	GenericClockController::connect<ClockPeripheral::{{ sercom }}>(ClockGenerator::System);
 	while (GCLK->STATUS.bit.SYNCBUSY);
 	// Reset USART
 	reset();

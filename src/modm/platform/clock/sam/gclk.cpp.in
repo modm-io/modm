@@ -40,7 +40,9 @@ modm::platform::GenericClockController::initExternalCrystal(
   // Enable external crystal.
   SYSCTRL->XOSC32K.reg =
       SYSCTRL_XOSC32K_STARTUP( 0x6u ) |
-      SYSCTRL_XOSC32K_XTALEN | SYSCTRL_XOSC32K_EN32K;
+      SYSCTRL_XOSC32K_XTALEN |
+      SYSCTRL_XOSC32K_RUNSTDBY |
+      SYSCTRL_XOSC32K_EN32K;
   // separate call, as described in chapter 15.6.3
   SYSCTRL->XOSC32K.bit.ENABLE = 1;
   while (!SYSCTRL->PCLKSR.bit.XOSC32KRDY and --waitCycles);
@@ -94,7 +96,7 @@ modm::platform::GenericClockController::initDFLL48MHz(
     !(SYSCTRL->PCLKSR.reg & SYSCTRL_PCLKSR_DFLLLCKC) ||
     !(SYSCTRL->PCLKSR.reg & SYSCTRL_PCLKSR_DFLLLCKF));
   // Wait for synchronization.
-  while (!SYSCTRL->PCLKSR.bit.DFLLRDY and --waitCycles)
+  while (!SYSCTRL->PCLKSR.bit.DFLLRDY and --waitCycles);
   return waitCycles;
 }
 

@@ -24,7 +24,6 @@ class Instance(Module):
         module.description = "Instance {}".format(self.instance)
 
     def prepare(self, module, options):
-        module.depends(":platform:uart")
         return True
 
     def build(self, env):
@@ -63,7 +62,8 @@ def prepare(module, options):
         ":architecture:uart",
         ":math:algorithm",
         ":cmsis:device",
-        ":platform:gpio")
+        ":platform:gpio",
+        ":platform:gclk")
 
     global props
     drivers = options[":target"].get_all_drivers("sercom")

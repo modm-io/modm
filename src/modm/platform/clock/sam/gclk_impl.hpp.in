@@ -41,5 +41,15 @@ GenericClockController::setFlashLatency()
 	return Core_Hz;
 }
 
+	template< ClockPeripheral peripheral >
+	void
+	GenericClockController::connect(ClockGenerator clockGen)
+	{
+		GCLK->CLKCTRL.reg =
+				GCLK_CLKCTRL_CLKEN |
+				GCLK_CLKCTRL_GEN(uint32_t(clockGen)) |
+				GCLK_CLKCTRL_ID(uint32_t(peripheral));
+	}
+
 }
 
