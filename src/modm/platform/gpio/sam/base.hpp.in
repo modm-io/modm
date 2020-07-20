@@ -54,9 +54,11 @@ struct Gpio
 	enum class
 	InputTrigger
 	{
-		RisingEdge,
-		FallingEdge,
-		BothEdges,
+		RisingEdge = EIC_CONFIG_SENSE0_RISE_Val,
+		FallingEdge = EIC_CONFIG_SENSE0_FALL_Val,
+		BothEdges = EIC_CONFIG_SENSE0_BOTH_Val,
+		High = EIC_CONFIG_SENSE0_HIGH_Val,
+		Low = EIC_CONFIG_SENSE0_LOW_Val,
 	};
 
 	/// The Port a Gpio Pin is connected to.

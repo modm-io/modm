@@ -1,0 +1,31 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2020, Erik Henriksson
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+import sys
+
+def init(module):
+    module.name = ":platform:extint"
+    module.description = "External Interrupt"
+
+def prepare(module, options):
+    if options[":target"].identifier.platform != "sam":
+        return False
+
+    module.depends(":cmsis:device", ":platform:clock", ":platform:gpio")
+
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/platform/extint"
+    env.copy("extint.hpp")
+    env.copy("extint_impl.hpp")
+    env.copy("extint.cpp")

@@ -1,0 +1,10 @@
+<library>
+  <extends>modm:feather-m0</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/samd/interrupt</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:extint</module>
+  </modules>
+</library>

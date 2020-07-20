@@ -40,6 +40,7 @@ class Gpio{{ port ~ pin }} : public Gpio, public ::modm::GpioIO
 	friend class Adc;
 	friend class Adc1; friend class Adc2;
 	friend class Adc3; friend class Adc4;
+	template<int instance> friend class ExtInt;
 public:
 	using Output = Gpio{{ port ~ pin }};
 	using Input = Gpio{{ port ~ pin }};
@@ -123,6 +124,19 @@ public:
 		%% endfor
 			"Gpio{{ port ~ pin }}::{{ signal_name }} only connects to {% for signal in signal_group %}{{signal.driver}}{% if not loop.last %} or {% endif %}{% endfor %}!");
 	};
+	%% endfor
+
+protected:
+	%% for extint in extints
+	template< int instance >
+	inline static void connectInterrupt() {
+		static_assert(
+			instance == {{ extint.pin }},
+			"Gpio{{ port ~ pin }} only connects to ExtInt<{{ extint.pin }}>");
+		PORT->Group[uint32_t(port)].PINCFG[uint32_t(pin)].bit.PMUXEN = true;
+		PORT->Group[uint32_t(port)].PMUX[uint32_t(pin) >> 1].reg =
+			PORT_PMUX_{{ gpio.pmux }}_{{ extint.function | upper }};
+	}
 	%% endfor
 };
 
