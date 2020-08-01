@@ -37,7 +37,7 @@ def generate(project):
 	output = ["=" * 90, "Generating: {}".format(path)]
 	options = " ".join("-D{}={}".format(k, v) for k,v in global_options.items())
 	# Compile Linux examples under macOS with hosted-darwin target
-	if "Darwin" in platform.platform() and "hosted-linux" in project.read_text():
+	if "Darwin" in platform.system() and "hosted-linux" in project.read_text():
 		options += " -D:target=hosted-darwin"
 	rc, ro = run(path, "lbuild {} build".format(options))
 	print("\n".join(output + [ro]))

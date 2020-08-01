@@ -19,7 +19,7 @@ class CrashDebugBackend:
         crashdebug = "lin64/CrashDebug"
         if "Windows" in platform.platform():
             crashdebug = "win32/CrashDebug.exe"
-        elif "Darwin" in platform.platform():
+        elif "Darwin" in platform.system():
             crashdebug = "osx64/CrashDebug"
         self.binary = os.path.join(binary_path, crashdebug)
 
