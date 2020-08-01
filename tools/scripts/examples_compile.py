@@ -15,7 +15,7 @@ import subprocess
 import multiprocessing
 from pathlib import Path
 
-is_running_in_ci = os.getenv("CIRCLECI") is not None
+is_running_in_ci = os.getenv("CIRCLECI") is not None or os.getenv("TRAVIS") is not None
 cpus = 4 if is_running_in_ci else os.cpu_count()
 build_dir = (Path(os.path.abspath(__file__)).parents[2] / "build")
 cache_dir = build_dir / "cache"
