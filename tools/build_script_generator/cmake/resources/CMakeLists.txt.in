@@ -34,5 +34,5 @@ add_custom_target(${CMAKE_PROJECT_NAME}.lss ALL DEPENDS ${CMAKE_PROJECT_NAME} CO
 add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_SIZE} ARGS -C -d --mcu={{ partname }} ${CMAKE_PROJECT_NAME}.elf)
 %% elif core.startswith("cortex-m")
 #% FIXME: build path does not contain python tools of course
-#% add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD COMMAND python3 ./modm/modm_tools/size.py ${CMAKE_PROJECT_NAME}.elf "{{memories}}")
+#% add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD VERBATIM COMMAND python3 ./modm/modm_tools/size.py ${CMAKE_PROJECT_NAME}.elf "{{memories}}")
 %% endif
