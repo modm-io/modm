@@ -1,0 +1,12 @@
+<library>
+  <extends>modm:nucleo-g071rb</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_g071rb/matrix</option>
+  </options>
+  <modules>
+    <module>modm:platform:gpio</module>
+    <module>modm:platform:i2c.bitbang</module>
+    <module>modm:driver:is31fl3733</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>
