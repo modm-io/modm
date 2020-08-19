@@ -1,0 +1,78 @@
+/*
+ * Copyright (c) 2020, Niklas Hauser
+ * Copyright (c) 2020, Erik Henriksson
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+#include "../device.hpp"
+#include <modm/architecture/interface/register.hpp>
+
+namespace modm::platform
+{
+
+/// @ingroup modm_platform_flash
+class Flash
+{
+public:
+	static constexpr uintptr_t OriginAddr{ 0x{{ "%0x" | format(start) }} };
+	static constexpr size_t Size{ 0x{{ "%0x" | format(size) }} };
+	static inline uint8_t *const Origin{(uint8_t*)OriginAddr};
+	static constexpr uint32_t PageSize = 64;
+	static constexpr uint32_t SectorSize = 4 * PageSize;
+	static constexpr uint32_t WriteBufferSize = PageSize;
+	using MaxWordType = uint32_t;
+	using SectorType = uint16_t;
+	using PageType = uint16_t;
+
+public:
+	inline static void
+	enable() {
+  	NVMCTRL->CTRLB.bit.MANW = 1; // Disable auto page writes
+	}
+
+	inline static void
+	disable() {
+  	NVMCTRL->CTRLB.bit.MANW = 0; // Enable auto page writes (default)
+	}
+
+	static bool
+	isLocked() { return false; }
+
+	static inline bool
+	isBusy()
+	{ return !NVMCTRL->INTFLAG.bit.READY; }
+
+	static bool
+	unlock() {
+		enable();
+		return true;
+	}
+
+  // Equivalent to "row" on SAM, but we name it Sector to be consistent with STM32.
+	static SectorType
+	getSector(uintptr_t offset)
+	{ return offset / SectorSize; }
+
+	static PageType
+	getPage(uintptr_t offset)
+	{ return offset / PageSize; }
+
+	static uint32_t
+	erase(SectorType sector);
+
+	static inline uint32_t
+	program(uintptr_t addr, MaxWordType data)
+	{ * (MaxWordType*) addr = data; return 0; }
+
+	static uint32_t
+	write();
+};
+
+} // namespace modm::platform

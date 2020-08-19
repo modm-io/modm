@@ -6,5 +6,6 @@
   <modules>
     <module>modm:build:scons</module>
     <module>modm:platform:ota</module>
+    <module>modm:platform:flash</module>
   </modules>
 </library>

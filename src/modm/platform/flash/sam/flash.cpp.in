@@ -1,0 +1,36 @@
+/*
+ * Copyright (c) 2020, Erik Henriksson
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#include "flash.hpp"
+
+static constexpr uint32_t FLASH_SR_ERR = 0xfffe;
+
+namespace modm::platform
+{
+
+modm_ramcode uint32_t
+Flash::erase(SectorType sector)
+{
+	NVMCTRL->ADDR.reg = (uint32_t) sector * SectorSize / 2;
+	NVMCTRL->CTRLA.reg = NVMCTRL_CTRLA_CMDEX_KEY | NVMCTRL_CTRLA_CMD_ER;
+	while(isBusy());
+	return NVMCTRL->INTFLAG.bit.ERROR;
+}
+
+modm_ramcode uint32_t
+Flash::write()
+{
+	NVMCTRL->CTRLA.reg = NVMCTRL_CTRLA_CMDEX_KEY | NVMCTRL_CTRLA_CMD_WP;
+	while(isBusy());
+	return NVMCTRL->INTFLAG.bit.ERROR;
+}
+
+} // namespace modm::platform

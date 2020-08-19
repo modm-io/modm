@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2020, Niklas Hauser
+ * Copyright (c) 2020, Erik Henriksson
  *
  * This file is part of the modm project.
  *
@@ -25,6 +26,8 @@ public:
 	static constexpr size_t Size{ 0x{{ "%0x" | format(size) }} };
 	static inline uint8_t *const Origin{(uint8_t*)OriginAddr};
 	using MaxWordType = uint{{ 32 if has_sectors else 64 }}_t;
+	using SectorType = uint8_t;
+	using PageType = uint8_t;
 
 %% if has_sectors
 	enum class
@@ -69,26 +72,26 @@ public:
 	static bool
 	unlock();
 
-	static inline uint8_t
+	static inline SectorType
 	getSector(uint8_t *ptr)
 	{ return getPage(ptr - Flash::Origin); }
 
-	static uint8_t
+	static SectorType
 	getSector(uintptr_t offset)
 	{ return getPage(offset); }
 
-	static inline uint8_t
+	static inline PageType
 	getPage(uint8_t *ptr)
 	{ return getPage(ptr - Flash::Origin); }
 
-	static uint8_t
+	static PageType
 	getPage(uintptr_t offset);
 
 	static uint32_t
 %% if has_sectors
-	erase(uint8_t {{ type }}, WordSize size = WordSize::B32);
+	erase(SectorType {{ type }}, WordSize size = WordSize::B32);
 %% else
-	erase(uint8_t {{ type }});
+	erase(PageType {{ type }});
 %% endif
 
 %% if has_sectors
@@ -106,6 +109,9 @@ public:
 	static uint32_t
 	program(uintptr_t addr, MaxWordType data);
 %% endif
+
+	static uint32_t
+	write() {};
 };
 
 } // namespace modm::platform
