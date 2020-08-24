@@ -65,7 +65,7 @@ def prepare(module, options):
         ":architecture:assert",
         ":cmsis:device",
         ":platform:clock")
-        
+
     module.add_submodule(FreeRTOS_TCP())
 
     return True
