@@ -11,6 +11,35 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
+class FreeRTOS_TCP(Module):
+    def init(self, module):
+        module.name = "tcp"
+        module.description = "FreeRTOS-Plus-TCP"
+
+    def prepare(self, module, options):
+        module.add_option(
+	        BooleanOption(
+	            name="dhcp",
+	            description="Use DHCP",
+	            default=False))
+        module.add_option(
+	        BooleanOption(
+	            name="dns",
+	            description="Enable simple DNS client/resolver",
+	            default=False))
+
+        module.depends(
+            ":freertos")
+        return True
+
+    def build(self, env):
+        env.outbasepath = "modm/ext"
+        env.copy("freertos/FreeRTOS-Plus-TCP", "freertos_plus_tcp",
+            ignore=env.ignore_files("BufferAllocation_1.c"))
+        env.collect(":build:path.include", "modm/ext/freertos_plus_tcp/include")
+        env.template("FreeRTOSIPConfig.h.in", "freertos_plus_tcp/include/FreeRTOSIPConfig.h")
+# -----------------------------------------------------------------------------
+
 def init(module):
     module.name = "freertos"
     module.description = """\
@@ -36,6 +65,8 @@ def prepare(module, options):
         ":architecture:assert",
         ":cmsis:device",
         ":platform:clock")
+        
+    module.add_submodule(FreeRTOS_TCP())
 
     return True
 
