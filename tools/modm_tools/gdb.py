@@ -64,14 +64,19 @@ def call(source=None, config=None, commands=None, backend=None, ui=None):
 
 def add_subparser(subparsers):
     # Generic backend
-    parser = subparser.add_parser("remote", help="Use a generic extended remote as Backend.")
+    parser = subparsers.add_parser("remote", help="Use a generic extended remote as Backend.")
     parser.add_argument(
             "--host",
             dest="host",
             default="localhost",
             help="Connect to this host.")
+    parser.add_argument(
+            "--port",
+            dest="port",
+            default="3333",
+            help="Connect to this port.")
     def build_backend(args):
-        return bem.ExtendedRemote(args.host)
+        return bem.ExtendedRemote(args.host, args.port)
     parser.set_defaults(backend=build_backend)
 
 # -----------------------------------------------------------------------------

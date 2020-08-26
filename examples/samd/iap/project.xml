@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:feather-samd21e17</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/samd/iap</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:flash</module>
+    <module>modm:driver:firmware_image</module>
+  </modules>
+</library>

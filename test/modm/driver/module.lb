@@ -28,6 +28,9 @@ def prepare(module, options):
         "modm:driver:drv832x_spi",
         "modm:driver:mcp2515",
         "modm:driver:block.allocator",
+        "modm:driver:block.device:heap",
+        "modm:driver:block.device:io",
+        "modm:driver:firmware_image",
         "modm:platform:gpio",
         ":mock:spi.device",
         ":mock:spi.master")

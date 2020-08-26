@@ -7,18 +7,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+// ----------------------------------------------------------------------------
 
-#include <modm/board.hpp>
+#pragma once
 
-using namespace Board;
-using modm::OTA;
+#include <unittest/testsuite.hpp>
 
-int
-main()
+/// @ingroup modm_test_test_architecture
+class BlockDeviceIOTest : public unittest::TestSuite
 {
-    Board::initialize();
-    OTA::initialize();
-    OTA::write((uint32_t*) 0x10000u, 0x1000);
-    OTA::apply();
-    return 0;
-}
+public:
+  void testWrite();
+  void testFlush();
+  void testRead();
+};

@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2018, Raphael Lehmann
  * Copyright (c) 2020, Niklas Hauser
  * Copyright (c) 2020, Erik Henriksson
  *
@@ -12,17 +13,94 @@
 
 #pragma once
 #include "../device.hpp"
-#include <modm/architecture/interface/register.hpp>
+#include <modm/processing/resumable.hpp>
+#include <modm/architecture/interface/block_device.hpp>
 
 namespace modm::platform
 {
 
-/// @ingroup modm_platform_flash
-class Flash
+/**
+ * \brief	Block device using SAM devices' internal Flash.
+ *
+ * The `read()`, `erase()`,`program()` and `write()` methodes block for
+ * the CPU to finish writing to the flash.
+ *
+ * \ingroup	modm_platform_flash
+ * \author Erik Henriksson
+ */
+class Flash : public modm::BlockDevice
 {
 public:
-	static constexpr uintptr_t OriginAddr{ 0x{{ "%0x" | format(start) }} };
-	static constexpr size_t Size{ 0x{{ "%0x" | format(size) }} };
+	/// Initializes the storage hardware
+	modm::ResumableResult<bool>
+	initialize()
+	{
+  	NVMCTRL->CTRLB.bit.MANW = 1; // Disable auto page writes
+		return {modm::rf::Stop, true};
+	};
+
+	/// Deinitializes the storage hardware
+	modm::ResumableResult<bool>
+	deinitialize()
+	{
+		NVMCTRL->CTRLB.bit.MANW = 0; // Enable auto page writes (default)
+	 	return {modm::rf::Stop, true};
+	};
+
+	/** Read data from one or more blocks
+	 *
+	 *  @param buffer	Buffer to read data into
+	 *  @param address	Address to begin reading from
+	 *  @param size		Size to read in bytes (multiple of read block size)
+	 *  @return			True on success
+	 */
+	modm::ResumableResult<bool>
+	read(uint8_t* buffer, bd_address_t address, bd_size_t size);
+
+	/** Program blocks with data
+	 *
+	 *  Any block has to be erased prior to being programmed
+	 *
+	 *  @param buffer	Buffer of data to write to blocks
+	 *  @param address	Address of first block to begin writing to
+	 *  @param size		Size to write in bytes (multiple of read block size)
+	 *  @return			True on success
+	 */
+	modm::ResumableResult<bool>
+	program(const uint8_t* buffer, bd_address_t address, bd_size_t size);
+
+	/** Erase blocks
+	 *
+	 *  All bytes in an erased block are filled with 0xFF.
+	 *
+	 *  @param address	Address of block to begin erasing
+	 *  @param size		Size to erase in bytes (multiple of read block size)
+	 *  @return			True on success
+	 */
+	modm::ResumableResult<bool>
+	erase(bd_address_t address, bd_size_t size);
+
+	/** Writes data to one or more blocks after erasing them
+	*
+	*  The blocks are erased prior to being programmed
+	*
+	*  @param buffer	Buffer of data to write to blocks
+	*  @param address	Address of first block to begin writing to
+	*  @param size		Size to write in bytes (multiple of read block size)
+	*  @return			True on success
+	*/
+	modm::ResumableResult<bool>
+	write(const uint8_t* buffer, bd_address_t address, bd_size_t size);
+
+	static constexpr bd_size_t BlockSizeRead = 4;
+	static constexpr bd_size_t BlockSizeWrite = 64;
+	static constexpr bd_size_t BlockSizeErase = 4 * BlockSizeWrite;
+	static constexpr bd_size_t DeviceStart{ 0x{{ "%0x" | format(start) }} };
+	static constexpr bd_size_t DeviceSize{ 0x{{ "%0x" | format(size) }} };
+
+public:
+	static constexpr uintptr_t OriginAddr = DeviceStart;
+	static constexpr size_t Size = DeviceSize;
 	static inline uint8_t *const Origin{(uint8_t*)OriginAddr};
 	static constexpr uint32_t PageSize = 64;
 	static constexpr uint32_t SectorSize = 4 * PageSize;
@@ -34,12 +112,12 @@ public:
 public:
 	inline static void
 	enable() {
-  	NVMCTRL->CTRLB.bit.MANW = 1; // Disable auto page writes
+  	RF_CALL_BLOCKING(Flash().initialize());
 	}
 
 	inline static void
 	disable() {
-  	NVMCTRL->CTRLB.bit.MANW = 0; // Enable auto page writes (default)
+  	RF_CALL_BLOCKING(Flash().deinitialize());
 	}
 
 	static bool
@@ -64,15 +142,23 @@ public:
 	getPage(uintptr_t offset)
 	{ return offset / PageSize; }
 
-	static uint32_t
-	erase(SectorType sector);
+	inline static uint32_t
+	erase(SectorType sector)
+	{
+		return Flash().erase((bd_address_t) sector * SectorSize + OriginAddr, SectorSize).getResult() != true;
+	}
 
-	static inline uint32_t
+	inline static uint32_t
 	program(uintptr_t addr, MaxWordType data)
 	{ * (MaxWordType*) addr = data; return 0; }
 
-	static uint32_t
-	write();
+	inline static uint32_t
+	write()
+	{
+		NVMCTRL->CTRLA.reg = NVMCTRL_CTRLA_CMDEX_KEY | NVMCTRL_CTRLA_CMD_WP;
+		while(isBusy());
+		return NVMCTRL->INTFLAG.bit.ERROR;
+	}
 };
 
 } // namespace modm::platform

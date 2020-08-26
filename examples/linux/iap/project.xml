@@ -1,0 +1,14 @@
+<library>
+  <options>
+    <option name="modm:target">hosted-darwin</option>
+    <option name="modm:build:build.path">../../../build/linux/iap</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:core</module>
+    <module>modm:architecture:assert</module>
+    <module>modm:debug</module>
+    <module>modm:driver:firmware_image</module>
+    <module>modm:driver:block.device:heap</module>
+  </modules>
+</library>

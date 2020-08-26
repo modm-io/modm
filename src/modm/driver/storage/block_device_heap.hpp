@@ -33,7 +33,7 @@ namespace modm
  * \author	Raphael Lehmann
  */
 template <size_t DeviceSize_, bool externalMemory = false>
-class BdHeap : public modm::BlockDevice, protected modm::NestedResumable<3>
+class BdHeap : public modm::BlockDevice, protected modm::NestedResumable<4>
 {
 public:
 	/// Initializes the memory with zeros

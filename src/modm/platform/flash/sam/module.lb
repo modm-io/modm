@@ -22,6 +22,7 @@ def prepare(module, options):
         return False
 
     module.depends(":cmsis:device",
+                   ":architecture:block.device",
                    ":architecture:register")
     return True
 

@@ -12,6 +12,7 @@
 #include <modm/board.hpp>
 #include <modm/processing.hpp>
 
+using namespace Board;
 using namespace std::chrono_literals;
 
 #undef MODM_LOG_LEVEL
@@ -24,6 +25,9 @@ main()
 	Board::initialize();
 
 	MODM_LOG_INFO << "\n\nReboot\n";
+	Led::set();
+	modm::delay(100ms);
+	Led::reset();
 	if (not Flash::unlock()) {
 		MODM_LOG_INFO << "Flash unlock failed!" << modm::endl;
 	}
@@ -48,8 +52,9 @@ main()
 
 		const modm::PreciseTimestamp start = modm::PreciseClock::now();
 
-		for (Flash::SectorType sector{sector_start}; sector < sector_end; sector++)
+		for (Flash::SectorType sector{sector_start}; sector < sector_end; sector++) {
 			err |= Flash::erase(sector);
+		}
 
 		const auto diff = (modm::PreciseClock::now() - start);
 		MODM_LOG_INFO << "Erasing done in " << diff << " with errors: " << err << modm::endl;

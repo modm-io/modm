@@ -85,7 +85,7 @@ initialize()
 	SystemClock::enable();
 	SysTickTimer::initialize<SystemClock>();
 	Uart0::connect<Rx::Pad3, Tx::Pad2>();
-	Uart0::initialize<SystemClock, 115'200_Bd>();
+	Uart0::initialize<SystemClock, 250'000_Bd>();
 
 	Led::setOutput(modm::Gpio::Low);
 }
