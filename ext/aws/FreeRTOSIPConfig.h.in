@@ -305,4 +305,9 @@ disconnecting stage will timeout after a period of non-activity. */
 #define ipconfigZERO_COPY_TX_DRIVER                   1
 #define ipconfigUSE_LINKED_RX_MESSAGES                1
 
+/* A header file that overwrites with local project settings. */
+#if __has_include(<FreeRTOSIPConfigLocal.h>)
+#include <FreeRTOSIPConfigLocal.h>
+#endif
+
 #endif // FREERTOS_IP_CONFIG_H

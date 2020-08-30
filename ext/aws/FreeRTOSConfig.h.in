@@ -141,7 +141,10 @@ standard names. */
 #define vPortSVCHandler SVC_Handler
 #define xPortSysTickHandler SysTick_Handler
 
-/* A header file that defines trace macro can be included here. */
+/* A header file that overwrites with local project settings. */
+#if __has_include(<FreeRTOSConfigLocal.h>)
+#include <FreeRTOSConfigLocal.h>
+#endif
 
 #endif /* FREERTOS_CONFIG_H */
 

@@ -14,7 +14,19 @@
 class FreeRTOS_TCP(Module):
     def init(self, module):
         module.name = "tcp"
-        module.description = "FreeRTOS-Plus-TCP"
+        module.description = """
+# a:FreeRTOS-Plus-TCP
+
+This module defines a default FreeRTOS IP config. If you need to change a
+configuration setting, then you can define a `FreeRTOSConfigIPLocal.h` file, which
+is included *after* at the end of the config. You must therefore first `#undef`
+the config macros, then redefine them with your options, for example:
+
+```c
+#undef ipconfigUSE_DNS
+#define ipconfigUSE_DNS 1
+```
+"""
 
     def prepare(self, module, options):
         return True
@@ -33,6 +45,18 @@ def init(module):
 # a:FreeRTOS
 
 Amazon FreeRTOS port for modm to be used with via the `modm:processing:rtos` module.
+
+## Custom Configuration
+
+This module defines a default FreeRTOS config. If you need to change a
+configuration setting, then you can define a `FreeRTOSConfigLocal.h` file, which
+is included *after* at the end of the config. You must therefore first `#undef`
+the config macros, then redefine them with your options, for example:
+
+```c
+#undef configCHECK_FOR_STACK_OVERFLOW
+#define configCHECK_FOR_STACK_OVERFLOW 0
+```
 """
 
 def prepare(module, options):
