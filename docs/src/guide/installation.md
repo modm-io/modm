@@ -30,6 +30,42 @@ additional build system documentation.
 Please help us [keep these instructions up-to-date][contribute]!
 
 
+## Linux
+
+For Ubuntu 20.04LTS, these commands install the basic build system:
+
+	sudo apt-get install python3 python3-pip scons git gcc-arm-none-eabi openocd \
+	  gcc build-essential libboost-all-dev
+	pip3 install modm gdbgui
+
+!!! warning "OpenOCD for recent targets"
+	The latest OpenOCD release v0.10.0 (as of May 2020) is too old for some targets
+	(STM32G0, STM32G4, STM32F7). To program these targets you need to compile the
+	[HEAD version of OpenOCD from source][openocd-source], install it and add it to
+	the beginning of your `$PATH`.
+
+!!! warning "Python 3 on Ubuntu ≤ 19.10"
+	Ubuntu ≤ 19.10 unfortunately defaults to Python 2, however, our SCons tools
+	require Python 3. For a less intrusive way to run all scons scripts with
+	Python 3 add this to your `.bashrc` or `.zshrc`:
+
+		alias scons="/usr/bin/env python3 $(which scons)"
+
+	If you get errors about missing `pyelftools`, check that you're really
+	running SCons with Python 3!
+
+!!! warning "arm-none-eabi-gcc on Ubuntu ≤ 19.10"
+	Ubuntu ≤ 19.10 does not provide a recent arm-none-eabi-gcc toolchain.
+	Install the ARM toochain by downloading [the pre-built version][gcc-arm-toolchain]
+	for 64-bit Linux and adding its `/bin` directory to the beginning of your `$PATH`.
+
+!!! bug "avr-gcc on Ubuntu"
+	Ubuntu does not provide an up-to-date version of avr-gcc that supports C++17.
+	For our CI we've created a [precompiled version of avr-gcc for Ubuntu][avr-gcc-latest].
+	Unfortunately its path is hardcoded to `/work/avr-gcc`,
+	[please help us fix it](https://github.com/modm-ext/docker-avr-gcc/issues/1).
+
+
 ## macOS
 
 We will use [Homebrew](http://brew.sh/) to install the minimal build system:
@@ -69,57 +105,6 @@ To compile modm *for macOS* (and not the embedded target) you need to install
 some of these libraries as well, depending on what modm modules you use:
 
 	brew install boost gcc
-
-
-## Linux
-
-For Ubuntu 20.04LTS, these commands install the basic build system:
-
-	sudo apt-get install python3 python3-pip scons git
-	sudo apt-get --no-install-recommends install doxygen
-	pip3 install modm
-
-!!! warning "Use Python 3!"
-	Ubuntu 18.04LTS unfortunately defaults to Python 2, however, our SCons tools
-	require Python 3. For a less intrusive way to run all scons scripts with
-	Python 3 add this to your `.bashrc` or `.zshrc`:
-
-		alias scons="/usr/bin/env python3 $(which scons)"
-
-	If you get errors about missing `pyelftools`, check that you're really
-	running SCons with Python 3!
-
-Install the AVR toochain:
-
-	sudo apt-get install gcc-avr binutils-avr avr-libc avrdude
-
-!!! bug "avr-gcc on Ubuntu"
-	Ubuntu does not provide an up-to-date version of avr-gcc that supports C++17.
-	For our CI we've created a [precompiled version of avr-gcc for Ubuntu][avr-gcc-latest].
-	Unfortunately its path is hardcoded to `/work/avr-gcc`.
-
-Install the ARM toochain by downloading [the pre-built version][gcc-arm-toolchain]
-for 64-bit Linux and adding its `/bin` directory to your path.
-**Even though your distribution may ship their own ARM toolchain, we very strongly
-recommend using the official toolchain, since all of modm is tested with it.**
-
-Install OpenOCD via your package manager:
-
-	sudo apt-get install openocd
-
-The latest OpenOCD release v0.10.0 (as of May 2020) is too old for some targets
-(STM32G0, STM32G4, STM32F7). To program these targets you need to compile the
-[HEAD version of OpenOCD from source][openocd-source].
-
-We recommend the use of a graphical frontend for GDB called [gdbgui][]:
-
-	pip3 install gdbgui
-
-To compile modm *for Linux* (and not the embedded target) you need to install
-some of these libraries as well, depending on what modm modules you use:
-
-	sudo apt-get install gcc build-essential libboost-all-dev
-
 
 ## Windows
 

@@ -69,8 +69,8 @@ nav:
     - How modm works: how-modm-works.md
     - Who we are: who-we-are.md
   - Guide:
-    - Getting Started: guide/getting-started.md
     - Installation: guide/installation.md
+    - Getting Started: guide/getting-started.md
     # - Qt Creator: guide/qtcreator.md
     # - Cookbook: guide/cookbook.md
     - Testing: guide/testing.md
