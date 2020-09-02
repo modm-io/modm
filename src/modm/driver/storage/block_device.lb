@@ -71,6 +71,21 @@ Microchip SST26VF064B 64MBit flash chip in SOIJ-8, WDFN-8 or SOIC-16.
         env.copy("block_device_spiflash_impl.hpp")
 # -----------------------------------------------------------------------------
 
+class BlockDeviceIO(Module):
+    def init(self, module):
+        module.name = "io"
+        module.description = "Block Device IO"
+
+    def prepare(self, module, options):
+        module.depends(":architecture:block.device")
+        return True
+
+    def build(self, env):
+        env.outbasepath = "modm/src/modm/driver/storage"
+        env.copy("block_device_io.hpp")
+        env.copy("block_device_io_impl.hpp")
+# -----------------------------------------------------------------------------
+
 def init(module):
     module.name = ":driver:block.device"
     module.description = "Block Devices"
@@ -80,6 +95,7 @@ def prepare(module, options):
     module.add_submodule(BlockDeviceHeap())
     module.add_submodule(BlockDeviceMirror())
     module.add_submodule(BlockDeviceSpiFlash())
+    module.add_submodule(BlockDeviceIO())
     return True
 
 def build(env):

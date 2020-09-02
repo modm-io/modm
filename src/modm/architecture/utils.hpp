@@ -110,6 +110,7 @@
 	#define MODM_ARRAY_SIZE(x)	(sizeof(x) / sizeof(x[0]))
 
 	#define modm_always_inline		inline __attribute__((always_inline))
+	#define modm_noinline		__attribute__((noinline))
 	#define modm_unused				__attribute__((unused))
 	#define modm_aligned(n)			__attribute__((aligned(n)))
 	#define modm_packed				__attribute__((packed))

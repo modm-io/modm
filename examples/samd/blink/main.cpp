@@ -17,9 +17,11 @@ int
 main()
 {
     Board::initialize();
+    TxLed::toggle();
     while (1)
     {
         Led::toggle();
+        TxLed::toggle();
         modm::delay(500ms);
 
 #ifdef MODM_BOARD_HAS_LOGGER

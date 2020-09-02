@@ -1,0 +1,99 @@
+/*
+ * Copyright (c) 2020, Erik Henriksson
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#include "flash.hpp"
+
+#include <modm/debug/logger.hpp>
+
+namespace modm::platform
+{
+namespace {
+	modm_ramcode bool
+	checkAlignment(Flash::bd_address_t address, Flash::bd_size_t size, Flash::bd_size_t alignment)
+	{
+		return (size % alignment == 0) && (address % alignment == 0);
+	}
+
+	modm_ramcode bool
+	checkBounds(Flash::bd_address_t address, Flash::bd_size_t size)
+	{
+		return address >= Flash::DeviceStart && (address + size <= Flash::DeviceStart + Flash::DeviceSize);
+	}
+
+	modm_ramcode void
+	memcpy(Flash::bd_address_t* dest, const Flash::bd_address_t* src, Flash::bd_size_t len)
+	{
+		for (; len; len -= sizeof(Flash::bd_address_t)) {
+			*dest++ = *src++;
+		}
+	}
+}
+
+modm_ramcode modm::ResumableResult<bool>
+Flash::read(uint8_t* buffer, bd_address_t address, bd_size_t size)
+{
+	if((size == 0) || !checkAlignment(address, size, BlockSizeRead) || !checkBounds(address, size)) {
+		return {modm::rf::Stop, false};
+	}
+	memcpy((bd_address_t*) buffer, (bd_address_t*) address, size);
+	return {modm::rf::Stop, true};
+}
+
+modm_ramcode modm::ResumableResult<bool>
+Flash::program(const uint8_t* buffer, bd_address_t address, bd_size_t size)
+{
+	if((size == 0) || !checkAlignment(address, size, BlockSizeWrite) || !checkBounds(address, size)) {
+		return {modm::rf::Stop, false};
+	}
+
+	for (; size; size -= BlockSizeWrite) {
+		memcpy((bd_address_t*) address, (const bd_address_t*) buffer, BlockSizeWrite);
+		NVMCTRL->CTRLA.reg = NVMCTRL_CTRLA_CMDEX_KEY | NVMCTRL_CTRLA_CMD_WP;
+		while(isBusy());
+		address += BlockSizeWrite;
+		buffer += BlockSizeWrite;
+	}
+	return {modm::rf::Stop, !NVMCTRL->INTFLAG.bit.ERROR};
+}
+
+modm_ramcode modm::ResumableResult<bool>
+Flash::erase(bd_address_t address, bd_size_t size)
+{
+	if((size == 0) || !checkAlignment(address, size, BlockSizeErase) || !checkBounds(address, size)) {
+		return {modm::rf::Stop, false};
+	}
+	for (bd_address_t end_address = address + size;
+			 address != end_address;
+			 address += BlockSizeErase) {
+		NVMCTRL->ADDR.reg = address / 2;
+		NVMCTRL->CTRLA.reg = NVMCTRL_CTRLA_CMDEX_KEY | NVMCTRL_CTRLA_CMD_ER;
+		while(isBusy());
+		if (NVMCTRL->INTFLAG.bit.ERROR) {
+			return {modm::rf::Stop, false};
+		}
+	}
+	return {modm::rf::Stop, true};
+}
+
+modm_ramcode modm::ResumableResult<bool>
+Flash::write(const uint8_t* buffer, bd_address_t address, bd_size_t size)
+{
+	if(!erase(address, size).getResult()) {
+		return {modm::rf::Stop, false};
+	}
+
+	if(!program(buffer, address, size).getResult()) {
+		return {modm::rf::Stop, false};
+	}
+	return {modm::rf::Stop, true};
+}
+
+} // namespace modm::platform
