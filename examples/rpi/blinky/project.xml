@@ -1,0 +1,9 @@
+<library>
+  <extends>modm:raspberrypi</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/rpi/blinky</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+  </modules>
+</library>
