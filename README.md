@@ -157,6 +157,7 @@ documentation.
 <td align="center">NUCLEO-L476RG</td>
 <td align="center">OLIMEXINO-STM32</td>
 </tr><tr>
+<td align="center">RASPBERRYPI</td>
 <td align="center">SAMD21-MINI</td>
 <td align="center">STM32F030F4P6-DEMO</td>
 </tr>
