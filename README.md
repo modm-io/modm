@@ -82,7 +82,7 @@ STM32 devices, however, there are different levels of support and testing.
 | STM32F2       | ★★★★    | STM32F3       | ★★★★★   | STM32F4       | ★★★★★   |
 | STM32F7       | ★★★★    | STM32L1       | ★★★★    | STM32L4       | ★★★★    |
 | STM32L4+      | ★★★★    | STM32G0       | ★★★★    | STM32G4       | ★★★★    |
-| SAMD21        | ★★      |               |         |               |         |
+| SAMD21        | ★★      | Raspberry Pi  | ★       |               |         |
 
 </center>
 

@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2020, Erik Henriksson
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":platform:gpio"
+    module.description = "Hosted GPIO for Raspberry Pi"
+
+
+def prepare(module, options):
+    if not options[":target"].has_driver("gpio:rpi"):
+        return False
+
+    module.depends(":architecture:gpio")
+    return True
+
+
+def build(env):
+    env.substitutions = {"target": env[":target"].identifier}
+    env.outbasepath = "modm/src/modm/platform/gpio"
+
+    env.collect(":build:library", "wiringPi")
+
+    env.copy(".")
+    env.copy("../common/inverted.hpp", "inverted.hpp")
+    env.copy("../common/connector.hpp", "connector.hpp")
+    env.template("../common/connector_detail.hpp.in", "connector_detail.hpp")
