@@ -219,8 +219,9 @@ def common_compiler_flags(compiler, target):
         # "-fmerge-all-constants",
 
         "-g3",
-        "-gdwarf",
+        "-gdwarf-3",
     ]
+
     if target.identifier["platform"] not in ["hosted"]:
         flags["ccflags"].append("-fshort-wchar")
     if compiler.startswith("gcc"):
@@ -264,7 +265,7 @@ def common_compiler_flags(compiler, target):
     # flags only for Assembly
     flags["asflags"] = [
         "-g3",
-        "-gdwarf",
+        "-gdwarf-3",
         # "-xassembler-with-cpp",
     ]
     # flags for the linker
@@ -277,6 +278,9 @@ def common_compiler_flags(compiler, target):
         ]
     # C Preprocessor defines
     flags["cppdefines"] = []
+    if target.identifier["family"] == "windows":
+        # Required for extended <inttypes.h> types
+        flags["cppdefines"] += ["__STDC_FORMAT_MACROS"]
     flags["cppdefines.debug"] = [
         "MODM_DEBUG_BUILD",
     ]

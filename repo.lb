@@ -228,10 +228,15 @@ def init(repo):
             path = normpath(path)
             escaped = "\\" * (2 ** escape_level)
             return path.replace("\\", escaped)
+        def posixify(path):
+            return normpath(path).replace("\\", "/")
     else:
         def windowsify(path, escape_level):
             return normpath(path)
+        def posixify(path):
+            return normpath(path)
     repo.add_filter("modm.windowsify", windowsify)
+    repo.add_filter("modm.posixify", posixify)
     repo.add_filter("modm.ord", lambda letter: ord(letter[0].lower()) - ord("a"))
     repo.add_filter("modm.chr", lambda num: chr(num + ord("A")))
 

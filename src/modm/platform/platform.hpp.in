@@ -13,5 +13,5 @@
 #include <modm/architecture.hpp>
 
 %% for header in headers
-#include "{{header}}"
+#include "{{ header | modm.posixify }}"
 %% endfor

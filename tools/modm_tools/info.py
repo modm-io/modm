@@ -120,7 +120,7 @@ def build_info(directory=None, cxx_compiler=None):
             m = re.match(r"(?P<name>[a-z\-\+]+)[a-zA-Z\(\) ]* (?P<version>\d+\.\d+\.\d+)", c)
             if m: comp = "{0} {1}".format(m.group("name"), m.group("version"))
             else: comp = c
-            info["MODM_BUILD_COMPILER"] = comp
+            info["MODM_BUILD_COMPILER"] = comp.strip()
     except:
         pass
 

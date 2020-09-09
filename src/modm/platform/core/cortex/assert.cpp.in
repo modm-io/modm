@@ -31,6 +31,10 @@ extern AssertionHandler __assertion_table_end __asm("section$end$__DATA$modm_ass
 %% elif target.family == "linux"
 extern AssertionHandler __assertion_table_start __asm("__start_modm_assertion");
 extern AssertionHandler __assertion_table_end __asm("__stop_modm_assertion");
+%% elif target.family == "windows"
+// FIXME: Figure out how to access custom linker sections
+static AssertionHandler __assertion_table_start;
+#define __assertion_table_end __assertion_table_start
 %% else
 extern AssertionHandler __assertion_table_start;
 extern AssertionHandler __assertion_table_end;

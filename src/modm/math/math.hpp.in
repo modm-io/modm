@@ -13,7 +13,7 @@
 #define	MODM_MATH_HPP
 
 %% for header in headers
-#include "{{header}}"
+#include "{{ header | modm.posixify }}"
 %% endfor
 
 #endif	// MODM_MATH_HPP

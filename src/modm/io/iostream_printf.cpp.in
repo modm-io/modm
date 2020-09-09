@@ -9,7 +9,14 @@
  */
 // ----------------------------------------------------------------------------
 
+%% if family in ["windows"]
+#define _vsnprintf _vsnprintf_windows
+%% endif
 #include <stdio.h>
+%% if family in ["windows"]
+#undef _vsnprintf
+%% endif
+
 #include <stdarg.h>
 #include <modm/architecture/interface/accessor.hpp>
 #include <cmath>

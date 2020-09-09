@@ -15,6 +15,7 @@
 
 #include <cstddef>
 #include <stdint.h>
+#undef NO_ERROR // Windows defines NO_ERROR as a number
 
 namespace modm_test
 {

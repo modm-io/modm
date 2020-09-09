@@ -45,14 +45,12 @@ def build(env):
     if env.has_module(":architecture:clock"):
         env.copy("clock.cpp")
 
-    if target.family == "windows":
-        if env.has_module(":architecture:assert"):
-            env.log.error("Assertions are not implemented!")
-        if env.has_module(":architecture:delay"):
-            env.log.error("Delay functions are not implemented!")
-    else:
-        if env.has_module(":architecture:assert"):
-            env.template("../cortex/assert.cpp.in", "assert.cpp")
-            env.template("../cortex/assert_impl.hpp.in", "assert_impl.hpp")
-        if env.has_module(":architecture:delay"):
-            env.template("delay_impl.hpp.in")
+    if env.has_module(":architecture:delay"):
+        env.template("delay_impl.hpp.in")
+
+    if env.has_module(":architecture:assert"):
+        env.template("../cortex/assert.cpp.in", "assert.cpp")
+        env.template("../cortex/assert_impl.hpp.in", "assert_impl.hpp")
+        if target.family == "windows":
+            env.log.error("Assertions are not fully implemented!")
+

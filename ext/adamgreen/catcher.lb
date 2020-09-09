@@ -34,5 +34,7 @@ def build(env):
     env.outbasepath = "modm/ext/crashcatcher"
 
     env.copy("crashcatcher/CrashCatcher/include/CrashCatcher.h", "include/CrashCatcher.h")
-    ignore = "*armv7m.S" if "m0" in core else "*armv6m.S"
-    env.copy("crashcatcher/CrashCatcher/Core/src", "src", ignore=env.ignore_files(ignore))
+    env.copy("crashcatcher/CrashCatcher/Core/src", "src", ignore=env.ignore_files("*.S"))
+    version = "armv{}m".format("6" if "m0" in core else "7")
+    env.copy("crashcatcher/CrashCatcher/Core/src/CrashCatcher_{}.S".format(version),
+             "src/CrashCatcher_{}.sx".format(version))

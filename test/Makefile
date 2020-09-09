@@ -11,7 +11,8 @@
 
 # LBUILD = python3 ../../library-builder/scripts/lbuild
 LBUILD = lbuild
-SCONS = python3 `which scons`
+# SCONS = python3 `which scons`
+SCONS = scons
 
 define compile-test
 	@$(RM) -r ../build/generated-unittest/$(1)
@@ -27,6 +28,8 @@ run-hosted-linux:
 	$(call compile-test,hosted,run,-D":target=hosted-linux")
 run-hosted-darwin:
 	$(call compile-test,hosted,run,-D":target=hosted-darwin")
+run-hosted-windows:
+	$(call compile-test,hosted,run,-D":target=hosted-windows")
 
 
 compile-nucleo-f401:

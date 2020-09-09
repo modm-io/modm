@@ -15,8 +15,7 @@
 #ifndef MODM_LOG_LEVEL_HPP
 #define MODM_LOG_LEVEL_HPP
 
-#pragma push_macro("ERROR") // avoid collision with ERROR defined macro in winsock.h
-#undef ERROR
+#undef ERROR // avoid collision with ERROR defined macro in winsock.h
 
 namespace modm
 {
@@ -58,7 +57,5 @@ namespace modm
 	 */
 	#define MODM_LOG_LEVEL modm::log::DEBUG
 #endif // MODM_LOG_LEVEL
-
-#pragma pop_macro("ERROR")
 
 #endif // MODM_LOG_LEVEL_HPP

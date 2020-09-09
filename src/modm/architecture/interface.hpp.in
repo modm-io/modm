@@ -15,7 +15,7 @@
 #include <stdint.h>
 
 %% for header in headers
-#include "{{header}}"
+#include "{{ header | modm.posixify }}"
 %% endfor
 #include "interface/peripheral.hpp"
 

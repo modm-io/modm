@@ -614,6 +614,7 @@ IoStreamTest::testPrintf2()
 void
 IoStreamTest::testPrintf3()
 {
+#ifndef MODM_OS_WIN32 // Windows doesn't support %lld
 	// Test for 64 bit uints and ints on printf
 	unsigned long long unsignedlonglong = 0xFEDCBA9876543210;
 	(*stream).printf("%llX", unsignedlonglong);
@@ -624,6 +625,7 @@ IoStreamTest::testPrintf3()
 	(*stream).printf("%lld", longlong);
 	TEST_ASSERT_EQUALS_ARRAY("-9223372036854775806", device.buffer, 20);
 	(*stream).flush();
+#endif
 }
 
 int myFunc1(void) { return -1; };

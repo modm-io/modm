@@ -23,7 +23,7 @@ class BuildModuleDocs:
 
     def __str__(self):
         if self._content is None:
-            self._content = Path(localpath("module.md")).read_text().strip()
+            self._content = Path(localpath("module.md")).read_text(encoding="utf-8").strip()
             tools = ["avrdude", "openocd", "bmp", "gdb", "size",
                      "unittest", "log", "build_id", "bitmap"]
 
@@ -32,10 +32,10 @@ class BuildModuleDocs:
                 doc = None
                 # Documentation is inside a Markdown file
                 if tpath.with_suffix(".md").exists():
-                    doc = tpath.with_suffix(".md").read_text()
+                    doc = tpath.with_suffix(".md").read_text(encoding="utf-8")
                 # Documentation is inside the tool as a docstring
                 elif tpath.exists():
-                    doc = re.search('"""(.*?)"""', tpath.read_text(), flags=re.DOTALL | re.MULTILINE)
+                    doc = re.search('"""(.*?)"""', tpath.read_text(encoding="utf-8"), flags=re.DOTALL | re.MULTILINE)
                     if doc: doc = doc.group(1);
                 if doc is not None:
                     self._content += "\n\n\n" + doc.strip()

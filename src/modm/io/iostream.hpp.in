@@ -162,7 +162,7 @@ public:
 	inline IOStream& operator << (const uint64_t& v)
 	{ writeIntegerMode(v); return *this; }
 
-%% if family in ["darwin"]
+%% if family in ["darwin", "windows"]
 	// For OSX 'int64_t' is of type 'int'. Therefore there is no
 	// function here for the default type 'long int'. As 'long int' has the same
 	// width as 'int64_t' we just use a typedef here.

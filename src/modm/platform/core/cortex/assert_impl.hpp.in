@@ -11,12 +11,13 @@
 
 #pragma once
 
+%# FIXME: Missing custom linker section support for Windows
 #define MODM_ASSERTION_HANDLER(handler) \
 %% if target.family == "darwin"
 	__attribute__((section("__DATA,modm_assertion"), used)) \
 %% elif target.family == "linux"
 	__attribute__((section("modm_assertion"), used)) \
-%% else
+%% elif target.family != "windows"
 	__attribute__((section(".assertion"), used)) \
 %% endif
 	const modm::AssertionHandler \
