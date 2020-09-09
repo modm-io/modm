@@ -1,0 +1,68 @@
+name: Run hosted tests on Windows
+
+on: [pull_request]
+
+jobs:
+  windows_hosted:
+    runs-on: windows-2019
+    #env:
+    #  PYTHONIOENCODING: "utf-8"
+
+    steps:
+
+      # Disabling snake-oil for performance reasons
+      - name: Disable Windows Defender
+        run: Set-MpPreference -DisableRealtimeMonitoring $true
+
+      - name: Install Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+
+      - name: Install Python packages
+        run: |
+          pip install --user modm scons future
+
+      - name: Download MinGW installer
+        run: |
+          $ProgressPreference = 'SilentlyContinue'
+          Invoke-WebRequest -OutFile mingw-get-0.6.3.zip https://acc.dl.osdn.jp/mingw/68260/mingw-get-0.6.3-mingw32-pre-20170905-1-bin.zip
+
+      - name: Unpack MinGW installer
+        shell: powershell
+        run: |
+          Add-Type -Assembly "System.IO.Compression.Filesystem"
+          [System.IO.Compression.ZipFile]::ExtractToDirectory("mingw-get-0.6.3.zip", "C:\mingw-get")
+          dir C:\mingw-get
+          echo "::add-path::C:\mingw-get\bin"
+          rm mingw-get-0.6.3.zip
+
+      - name: Install MinGW toolchains
+        shell: powershell
+        run: |
+          mingw-get install gcc g++ mingw32-make
+
+      - name: Show lbuild and gcc version
+        run: |
+          lbuild --version
+          gcc --version
+          g++ --version
+          make --version
+
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Git Submodules
+        shell: bash
+        run: |
+          git submodule update --init
+
+      - name: Hosted Examples
+        shell: bash
+        run: |
+          (cd examples && python ../tools/scripts/examples_compile.py linux/assert linux/block_device linux/build_info linux/git linux/logger linux/printf)
+
+      - name: Hosted Unittests
+        shell: bash
+        run: |
+          (cd test && make run-hosted-windows)
