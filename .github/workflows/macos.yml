@@ -1,0 +1,49 @@
+name: Run tests on MacOS
+
+on: [pull_request]
+
+jobs:
+  macos_testing:
+    runs-on: macos-10.15
+
+    steps:
+      - name: Setup environment - Brew tap
+        run: |
+          brew tap osx-cross/avr
+          brew tap osx-cross/arm
+
+      - name: Setup environment - Brew install
+        run: |
+          brew install git doxygen boost gcc avr-gcc arm-gcc-bin cmake || true
+          brew upgrade boost gcc git || true
+
+      - name: Setup environment - Python pip
+        run: |
+          pip3 install --user modm scons
+          echo "::add-path::/usr/local/bin"
+          echo "::add-path::/Users/runner/Library/Python/3.8/bin"
+          echo $PATH
+
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Git Submodules
+        run: |
+          git submodule update --init
+
+      - name: Hosted Unittests
+        run: |
+          (cd test && make run-hosted-darwin)
+
+      - name: Hosted Examples
+        run: |
+          (cd examples && ../tools/scripts/examples_compile.py linux)
+
+      - name: Compile STM32 Examples
+        run: |
+          (cd examples && ../tools/scripts/examples_compile.py nucleo_f031k6 nucleo_f103rb nucleo_f303re nucleo_f411re nucleo_f746zg)
+          (cd examples && ../tools/scripts/examples_compile.py nucleo_g071rb nucleo_l152re nucleo_l476rg nucleo_g474re)
+
+      - name: Compile AVR Examples
+        run: |
+          (cd examples && ../tools/scripts/examples_compile.py avr)
