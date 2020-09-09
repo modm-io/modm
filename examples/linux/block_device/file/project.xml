@@ -1,4 +1,5 @@
 <library>
+  <!-- CI: run -->
   <options>
     <option name="modm:target">hosted-linux</option>
     <option name="modm:build:build.path">../../../../build/linux/block_device/file</option>
