@@ -56,6 +56,9 @@ FunctionPointer vectorsRam[sizeof(vectorsRom) / sizeof(FunctionPointer)];
 %% endif
 
 // ----------------------------------------------------------------------------
+// Ignore redeclaration of interrupt handlers in vendor headers
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wredundant-decls"
 // Explicitly include this BELOW the vector table to *not deal* with potential
 // re-#defines of interrupt vector names! Bad vendors!! BAD!!!
 #include <modm/platform/device.hpp>
@@ -77,3 +80,5 @@ void Undefined_Handler(void)
 			"An undefined NVIC interrupt was raised!", irqn);
 %% endif
 }
+
+#pragma GCC diagnostic pop
