@@ -118,48 +118,50 @@ documentation.
 <td align="center">Black Pill</td>
 </tr><tr>
 <td align="center">Blue Pill</td>
+<td align="center">DEVEBOX-STM32F4XX</td>
 <td align="center">DISCO-F051R8</td>
 <td align="center">DISCO-F072RB</td>
-<td align="center">DISCO-F100RB</td>
 </tr><tr>
+<td align="center">DISCO-F100RB</td>
 <td align="center">DISCO-F303VC</td>
 <td align="center">DISCO-F407VG</td>
 <td align="center">DISCO-F429ZI</td>
-<td align="center">DISCO-F469NI</td>
 </tr><tr>
+<td align="center">DISCO-F469NI</td>
 <td align="center">DISCO-F746NG</td>
 <td align="center">DISCO-F769NI</td>
 <td align="center">DISCO-L152RC</td>
-<td align="center">DISCO-L476VG</td>
 </tr><tr>
+<td align="center">DISCO-L476VG</td>
 <td align="center">FEATHER-M0</td>
 <td align="center">MEGA-2560-PRO</td>
 <td align="center">MINI-F401</td>
-<td align="center">MINI-F411</td>
 </tr><tr>
+<td align="center">MINI-F411</td>
 <td align="center">NUCLEO-F031K6</td>
 <td align="center">NUCLEO-F042K6</td>
 <td align="center">NUCLEO-F103RB</td>
-<td align="center">NUCLEO-F303K8</td>
 </tr><tr>
+<td align="center">NUCLEO-F303K8</td>
 <td align="center">NUCLEO-F303RE</td>
 <td align="center">NUCLEO-F401RE</td>
 <td align="center">NUCLEO-F411RE</td>
-<td align="center">NUCLEO-F429ZI</td>
 </tr><tr>
+<td align="center">NUCLEO-F429ZI</td>
 <td align="center">NUCLEO-F446RE</td>
 <td align="center">NUCLEO-F746ZG</td>
 <td align="center">NUCLEO-G071RB</td>
-<td align="center">NUCLEO-G474RE</td>
 </tr><tr>
+<td align="center">NUCLEO-G474RE</td>
 <td align="center">NUCLEO-L152RE</td>
 <td align="center">NUCLEO-L432KC</td>
 <td align="center">NUCLEO-L476RG</td>
-<td align="center">OLIMEXINO-STM32</td>
 </tr><tr>
+<td align="center">OLIMEXINO-STM32</td>
 <td align="center">RASPBERRYPI</td>
 <td align="center">SAMD21-MINI</td>
 <td align="center">STM32F030F4P6-DEMO</td>
+</tr><tr>
 </tr>
 </table>
 <!--/bsptable-->
