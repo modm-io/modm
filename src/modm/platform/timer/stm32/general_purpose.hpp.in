@@ -164,6 +164,12 @@ public:
 		TIM{{ id }}->PSC = prescaler - 1;
 	}
 
+	static uint16_t
+	getPrescaler()
+	{
+		return (TIM{{ id }}->PSC + 1);
+	}
+
 	static inline void
 	setOverflow(Value overflow)
 	{
@@ -191,6 +197,14 @@ public:
 		}
 
 		return overflow;
+	}
+
+	/* Returns the frequency of the timer */
+	template<class SystemClock>
+	static uint32_t
+	getTickFrequency()
+	{
+		return SystemClock::Timer{{ id }} / (TIM{{ id }}->PSC + 1);
 	}
 
 	static inline void
