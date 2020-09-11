@@ -105,6 +105,8 @@ def build(env):
         if "Dsihost" in all_peripherals and per == "DSI":
             per = "Dsihost"
             nper = "DSI"
+        if "Eth" in all_peripherals and per == "ETHMAC":
+            per = "Eth"
         if per.capitalize() not in all_peripherals:
             continue
         if "EN" in mode:
