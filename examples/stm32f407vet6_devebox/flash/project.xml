@@ -1,0 +1,12 @@
+<library>
+  <extends>modm:devebox-stm32f4xx</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/stm32f4xx_devebox/flash</option>
+    <option name="modm:build:openocd.cfg">openocd.cfg</option>
+  </options>
+  <modules>
+    <module>modm:debug</module>
+    <module>modm:platform:uart:1</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>
