@@ -36,9 +36,12 @@ def validate(env):
 def build(env):
     core = env[":target"].get_driver("core")["type"]
     default = 1000 if "m0" in core else 4
+    # SAMD: Reference Clock not implemented => Prescaler always 1
+    reference_clock = {"stm32": 8}.get(env[":target"].identifier.platform, 1)
     env.substitutions = {
         "systick_frequency": env.get(":freertos:frequency", default),
         "has_freertos": env.has_module(":freertos"),
+        "ref_clk": reference_clock
     }
     env.outbasepath = "modm/src/modm/platform/clock"
     env.template("systick_timer.hpp.in")

@@ -50,9 +50,12 @@ public:
 	static void
 	initialize()
 	{
-		static_assert(SystemClock::Frequency < (2ull << 24)*8*{{systick_frequency}},
+		static_assert(SystemClock::Frequency < (1ull << 24)*{{ref_clk}}*{{systick_frequency}},
 		              "HLCK is too fast for the SysTick to run at {{systick_frequency}}Hz!");
-		if constexpr (SystemClock::Frequency < 8'000'000) {
+%% if ref_clk > 1
+		if constexpr (SystemClock::Frequency < {{ref_clk}}'000'000)
+%% endif
+		{
 			constexpr auto result = Prescaler::from_range(
 					SystemClock::Frequency, {{ systick_frequency }}, 1, (1ul << 24)-1);
 			PeripheralDriver::assertBaudrateInTolerance< result.frequency, {{ systick_frequency }}, tolerance >();
@@ -63,17 +66,20 @@ public:
 %% endif
 			enable(result.index, false);
 		}
-		else {
+%% if ref_clk > 1
+		else
+		{
 			constexpr auto result = Prescaler::from_range(
-					SystemClock::Frequency/8, {{ systick_frequency }}, 1, (1ul << 24)-1);
+					SystemClock::Frequency/{{ref_clk}}, {{ systick_frequency }}, 1, (1ul << 24)-1);
 			PeripheralDriver::assertBaudrateInTolerance< result.frequency, {{ systick_frequency }}, tolerance >();
 
-			us_per_Ncycles = ((1ull << Ncycles) * 8'000'000ull) / SystemClock::Frequency;
+			us_per_Ncycles = ((1ull << Ncycles) * {{ref_clk}}'000'000ull) / SystemClock::Frequency;
 %% if systick_frequency != 1000
-			ms_per_Ncycles = ((1ull << Ncycles) * 8'000ull) / SystemClock::Frequency;
+			ms_per_Ncycles = ((1ull << Ncycles) * {{ref_clk}}'000ull) / SystemClock::Frequency;
 %% endif
 			enable(result.index, true);
 		}
+%% endif
 	}
 
 	/**
