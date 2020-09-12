@@ -65,5 +65,3 @@ struct Gpio
 }	// namespace platform
 
 }	// namespace modm
-
-#endif
