@@ -1,0 +1,22 @@
+os: linux
+dist: focal  # Ubuntu 20.04LTS
+arch: arm64
+#arch: arm64-graviton2
+
+language: minimal
+
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install -y python3 python3-pip scons cmake doxygen gcc build-essential libboost-all-dev libwiringpi-dev
+  #- sudo apt-get install -y gcc-arm-none-eabi
+  - wget -qO- https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm/9-2020q2/gcc-arm-none-eabi-9-2020-q2-update-aarch64-linux.tar.bz2 | tar xj -C /opt
+  - export PATH="/opt/gcc-arm-none-eabi-9-2020-q2-update/bin:$PATH"
+  - pip3 install modm
+  - export PATH="~/.local/bin:$PATH"
+  - uname -a
+
+script:
+  - (cd test && make run-hosted-linux)
+  - (cd examples && ../tools/scripts/examples_compile.py linux)
+  - (cd examples && ../tools/scripts/examples_compile.py stm32f1_discovery nucleo_f103rb olimexino_stm32 stm32f103c8t6_blue_pill stm32f103c8t6_black_pill)
+  - (cd examples && ../tools/scripts/examples_compile.py rpi)

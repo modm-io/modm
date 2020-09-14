@@ -200,7 +200,7 @@
 #	endif
 #endif
 
-#if defined __arm__ || defined __ARM_EABI__
+#if defined __arm__ || defined __aarch64__
 #	define MODM_CPU_ARM	1
 #	define MODM_ALIGNMENT	4
 #	if defined __ARM_ARCH_4T__
@@ -208,19 +208,22 @@
 #		define MODM_CPU_STRING		"ARM7TDMI"
 #	elif defined __ARM_ARCH_6SM__ || defined __ARM_ARCH_6M__
 #		define MODM_CPU_CORTEX_M0	1
-#		define MODM_CPU_STRING		"Cortex-M0"
+#		define MODM_CPU_STRING		"ARM Cortex-M0"
 #	elif defined __ARM_ARCH_7M__
 #		define MODM_CPU_CORTEX_M3	1
-#		define MODM_CPU_STRING		"Cortex-M3"
+#		define MODM_CPU_STRING		"ARM Cortex-M3"
 #	elif defined __ARM_ARCH_7EM__
 #		define MODM_CPU_CORTEX_M4	1
-#		define MODM_CPU_STRING		"Cortex-M4"
+#		define MODM_CPU_STRING		"ARM Cortex-M4"
 #	elif defined __ARM_ARCH_6__
 #		define MODM_CPU_CORTEX_A6	1
-#		define MODM_CPU_STRING		"Cortex-A6"
+#		define MODM_CPU_STRING		"ARM Cortex-A6"
 #	elif defined __ARM_ARCH_7A__
 #		define MODM_CPU_CORTEX_A7	1
-#		define MODM_CPU_STRING		"Cortex-A7"
+#		define MODM_CPU_STRING		"ARM Cortex-A7"
+#	elif defined __ARM_ARCH_ISA_A64
+#		define MODM_CPU_AARCH64	1
+#		define MODM_CPU_STRING		"ARM AArch64"
 #	endif
 #endif
 
