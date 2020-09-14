@@ -107,9 +107,16 @@ namespace modm
 	modm_always_inline uint32_t
 	swap(uint32_t n)
 	{
-#ifdef MODM_CPU_ARM
+#if defined(MODM_CPU_ARM) && !defined(__aarch64__)
 		asm volatile(
 			"rev %0,%0"		"\n\t"
+			 : "=r" (n)
+			 : "0" (n)
+		);
+		return n;
+#elif defined(MODM_CPU_ARM) && defined(__aarch64__)
+		asm volatile(
+			"rev32 %0,%0"	"\n\t"
 			 : "=r" (n)
 			 : "0" (n)
 		);
@@ -187,9 +194,18 @@ namespace modm
 	inline uint32_t
 	bitReverse(uint32_t n)
 	{
-#if defined(MODM_CPU_ARM) && !defined(MODM_CPU_CORTEX_M0)
+#if defined(MODM_CPU_ARM) && !defined(MODM_CPU_CORTEX_M0) && !defined(__aarch64__)
 		asm volatile(
 			"rbit %0,%0"	"\n\t"
+			 : "=r" (n)
+			 : "0" (n)
+		);
+		return n;
+#elif defined(__aarch64__)
+		asm volatile(
+			"rbit %0,%0"	"\n\t"
+			"rev32 %0,%0"	"\n\t"
+			"rev %0,%0"		"\n\t"
 			 : "=r" (n)
 			 : "0" (n)
 		);
