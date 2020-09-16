@@ -38,8 +38,6 @@ def post_build(env):
     target = env[":target"].identifier
     properties["with_crashcatcher"] = env.has_module(":crashcatcher")
 
-    if target.family in ["l4"]: # FIXME!
-        properties["regions"].remove("sram2")
     if "backup" in properties["regions"]:
         properties["regions"].remove("backup")
 

@@ -48,7 +48,7 @@ def check_submodules():
               "    git submodule update --init\n")
 
 # Import modm-device tools
-sys.path.append(repopath("ext/modm-devices/tools/device"))
+sys.path.append(repopath("ext/modm-devices"))
 try:
     import modm_devices.parser
 except ModuleNotFoundError:
