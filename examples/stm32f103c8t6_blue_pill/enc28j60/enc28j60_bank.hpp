@@ -124,6 +124,73 @@ enum class Register : uint8_t
 	EPAUSH		= 0x19 | BANK_3,
 };
 
+/* ENC28J60 EIE Register Bit Definitions */
+static constexpr uint8_t EIE_INTIE	= 0x80;
+static constexpr uint8_t EIE_PKTIE	= 0x40;
+static constexpr uint8_t EIE_DMAIE	= 0x20;
+static constexpr uint8_t EIE_LINKIE	= 0x10;
+static constexpr uint8_t EIE_TXIE	= 0x08;
+/* static constexpr uint8_t  EIE_WOLIE	0x04 (reserved) */
+static constexpr uint8_t EIE_TXERIE	= 0x02;
+static constexpr uint8_t EIE_RXERIE	= 0x01;
+
+/* ENC28J60 EIR Register Bit Definitions */
+static constexpr uint8_t EIR_PKTIF	= 0x40;
+static constexpr uint8_t EIR_DMAIF	= 0x20;
+static constexpr uint8_t EIR_LINKIF	= 0x10;
+static constexpr uint8_t EIR_TXIF	= 0x08;
+/* static constexpr uint8_t EIR_WOLIF	0x04 (reserved) */
+static constexpr uint8_t EIR_TXERIF	= 0x02;
+static constexpr uint8_t EIR_RXERIF	= 0x01;
+
+/* ENC28J60 ESTAT Register Bit Definitions */
+static constexpr uint8_t ESTAT_INT		= 0x80;
+static constexpr uint8_t ESTAT_LATECOL	= 0x10;
+static constexpr uint8_t ESTAT_RXBUSY	= 0x04;
+static constexpr uint8_t ESTAT_TXABRT	= 0x02;
+static constexpr uint8_t ESTAT_CLKRDY	= 0x01;
+
+/* ENC28J60 ECON2 Register Bit Definitions */
+static constexpr uint8_t ECON2_AUTOINC	= 0x80;
+static constexpr uint8_t ECON2_PKTDEC	= 0x40;
+static constexpr uint8_t ECON2_PWRSV	= 0x20;
+static constexpr uint8_t ECON2_VRPS		= 0x08;
+
+/* ENC28J60 ECON1 Register Bit Definitions */
+static constexpr uint8_t ECON1_TXRST	= 0x80;
+static constexpr uint8_t ECON1_RXRST	= 0x40;
+static constexpr uint8_t ECON1_DMAST	= 0x20;
+static constexpr uint8_t ECON1_CSUMEN	= 0x10;
+static constexpr uint8_t ECON1_TXRTS	= 0x08;
+static constexpr uint8_t ECON1_RXEN		= 0x04;
+static constexpr uint8_t ECON1_BSEL1	= 0x02;
+static constexpr uint8_t ECON1_BSEL0	= 0x01;
+
+/* ENC28J60 MACON1 Register Bit Definitions */
+static constexpr uint8_t MACON1_LOOPBK	= 0x10;
+static constexpr uint8_t MACON1_TXPAUS	= 0x08;
+static constexpr uint8_t MACON1_RXPAUS	= 0x04;
+static constexpr uint8_t MACON1_PASSALL	= 0x02;
+static constexpr uint8_t MACON1_MARXEN	= 0x01;
+
+/* ENC28J60 MACON2 Register Bit Definitions */
+static constexpr uint8_t MACON2_MARST	= 0x80;
+static constexpr uint8_t MACON2_RNDRST	= 0x40;
+static constexpr uint8_t MACON2_MARXRST	= 0x08;
+static constexpr uint8_t MACON2_RFUNRST	= 0x04;
+static constexpr uint8_t MACON2_MATXRST	= 0x02;
+static constexpr uint8_t MACON2_TFUNRST	= 0x01;
+
+/* ENC28J60 MACON3 Register Bit Definitions */
+static constexpr uint8_t MACON3_PADCFG2	= 0x80;
+static constexpr uint8_t MACON3_PADCFG1	= 0x40;
+static constexpr uint8_t MACON3_PADCFG0	= 0x20;
+static constexpr uint8_t MACON3_TXCRCEN	= 0x10;
+static constexpr uint8_t MACON3_PHDRLEN	= 0x08;
+static constexpr uint8_t MACON3_HFRMLEN	= 0x04;
+static constexpr uint8_t MACON3_FRMLNEN	= 0x02;
+static constexpr uint8_t MACON3_FULDPX	= 0x01;
+
 
 /* ENC28J60 MICMD Register Bit Definitions */
 static constexpr uint8_t MICMD_MIISCAN	= 0x02;
@@ -133,6 +200,54 @@ static constexpr uint8_t MICMD_MIIRD	= 0x01;
 static constexpr uint8_t MISTAT_NVALID	= 0x04;
 static constexpr uint8_t MISTAT_SCAN	= 0x02;
 static constexpr uint8_t MISTAT_BUSY	= 0x01;
+
+/* ENC28J60 ERXFCON Register Bit Definitions */
+static constexpr uint8_t ERXFCON_UCEN	= 0x80;
+static constexpr uint8_t ERXFCON_ANDOR	= 0x40;
+static constexpr uint8_t ERXFCON_CRCEN	= 0x20;
+static constexpr uint8_t ERXFCON_PMEN	= 0x10;
+static constexpr uint8_t ERXFCON_MPEN	= 0x08;
+static constexpr uint8_t ERXFCON_HTEN	= 0x04;
+static constexpr uint8_t ERXFCON_MCEN	= 0x02;
+static constexpr uint8_t ERXFCON_BCEN	= 0x01;
+
+/* ENC28J60 PHY PHCON1 Register Bit Definitions */
+static constexpr uint16_t PHCON1_PRST		= 0x8000;
+static constexpr uint16_t PHCON1_PLOOPBK	= 0x4000;
+static constexpr uint16_t PHCON1_PPWRSV		= 0x0800;
+static constexpr uint16_t PHCON1_PDPXMD		= 0x0100;
+
+/* ENC28J60 PHY PHSTAT1 Register Bit Definitions */
+static constexpr uint16_t PHSTAT1_PFDPX		= 0x1000;
+static constexpr uint16_t PHSTAT1_PHDPX		= 0x0800;
+static constexpr uint16_t PHSTAT1_LLSTAT	= 0x0004;
+static constexpr uint16_t PHSTAT1_JBSTAT	= 0x0002;
+
+/* ENC28J60 PHY PHSTAT2 Register Bit Definitions */
+static constexpr uint16_t PHSTAT2_TXSTAT	= (1 << 13);
+static constexpr uint16_t PHSTAT2_RXSTAT	= (1 << 12);
+static constexpr uint16_t PHSTAT2_COLSTAT	= (1 << 11);
+static constexpr uint16_t PHSTAT2_LSTAT		= (1 << 10);
+static constexpr uint16_t PHSTAT2_DPXSTAT	= (1 << 9);
+static constexpr uint16_t PHSTAT2_PLRITY	= (1 << 5);
+
+/* ENC28J60 PHY PHCON2 Register Bit Definitions */
+static constexpr uint16_t PHCON2_FRCLINK	= 0x4000;
+static constexpr uint16_t PHCON2_TXDIS	= 0x2000;
+static constexpr uint16_t PHCON2_JABBER	= 0x0400;
+static constexpr uint16_t PHCON2_HDLDIS	= 0x0100;
+
+/* ENC28J60 PHY PHIE Register Bit Definitions */
+static constexpr uint8_t PHIE_PLNKIE	= (1 << 4);
+static constexpr uint8_t PHIE_PGEIE		= (1 << 1);
+
+/* ENC28J60 PHY PHIR Register Bit Definitions */
+static constexpr uint8_t PHIR_PLNKIF	= (1 << 4);
+static constexpr uint8_t PHIR_PGEIF		= (1 << 1);
+
+/* Preferred half duplex: LEDA: Link status LEDB: Rx/Tx activity */
+static constexpr uint16_t ENC28J60_LAMPS_MODE	= 0x3476;
+
 
 
 

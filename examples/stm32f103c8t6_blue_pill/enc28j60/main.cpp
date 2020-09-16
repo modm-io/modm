@@ -52,17 +52,6 @@ static constexpr uint8_t SPI_OPLEN = 2;
 
 
 
-/* ENC28J60 ECON1 Register Bit Definitions */
-static constexpr uint8_t ECON1_TXRST	= 0x80;
-static constexpr uint8_t ECON1_RXRST	= 0x40;
-static constexpr uint8_t ECON1_DMAST	= 0x20;
-static constexpr uint8_t ECON1_CSUMEN	= 0x10;
-static constexpr uint8_t ECON1_TXRTS	= 0x08;
-static constexpr uint8_t ECON1_RXEN		= 0x04;
-static constexpr uint8_t ECON1_BSEL1	= 0x02;
-static constexpr uint8_t ECON1_BSEL0	= 0x01;
-
-
 
 enum class PhyRegister : uint8_t
 {
@@ -97,9 +86,114 @@ static constexpr uint16_t SPI_TRANSFER_BUF_LEN = (4 + MAX_FRAMELEN);
 
 uint8_t spi_transfer_buf[SPI_TRANSFER_BUF_LEN];
 
+
+enum class RxFilter : uint8_t {
+	PROMISC,
+	MULTI,
+	NORMAL
+};
+
 class Enc28j60
 {
 public:
+
+	/// Bring the chip up. This should be the first method to be called
+	static int8_t
+	enc28j60_hw_init() {
+		// mutex_lock
+
+		/* first reset the chip */
+		enc28j60_soft_reset();
+
+		/* Clear ECON1 */
+		spi_write_op(SpiOperation::WRITE_CTRL_REG, Register::ECON1, 0x00);
+
+		bank = 0;
+		hw_enable = false;
+		tx_retry_count = 0;
+		max_pk_counter = 0;
+		rxfilter = RxFilter::NORMAL;
+
+		/* enable address auto increment and voltage regulator powersave */
+		nolock_regb_write(Register::ECON2, ECON2_AUTOINC | ECON2_VRPS);
+
+		nolock_rxfifo_init(RXSTART_INIT, RXEND_INIT);
+		nolock_txfifo_init(TXSTART_INIT, TXEND_INIT);
+
+		// mutex_unlock
+
+		/*
+		 * Check the RevID.
+		 * If it's 0x00 or 0xFF probably the enc28j60 is not mounted or
+		 * damaged.
+		 */
+		uint8_t revid = locked_regb_read(Register::EREVID);
+		MODM_LOG_DEBUG.printf("chip RevID: 0x%02x\n", revid);
+		if (revid == 0x00 or revid == 0xff) {
+			MODM_LOG_ERROR.printf("Invalid RevId %d\n", revid);
+			return 0;
+		}
+
+		/* default filter mode: (unicast OR broadcast) AND crc valid */
+		locked_regb_write(Register::ERXFCON,
+				    ERXFCON_UCEN | ERXFCON_CRCEN | ERXFCON_BCEN);
+
+		/* enable MAC receive */
+		locked_regb_write(Register::MACON1,
+				    MACON1_MARXEN | MACON1_TXPAUS | MACON1_RXPAUS);
+
+		/* enable automatic padding and CRC operations */
+		if (full_duplex) {
+			locked_regb_write(Register::MACON3,
+					    MACON3_PADCFG0 | MACON3_TXCRCEN |
+					    MACON3_FRMLNEN | MACON3_FULDPX);
+			/* set inter-frame gap (non-back-to-back) */
+			locked_regb_write(Register::MAIPGL, 0x12);
+			/* set inter-frame gap (back-to-back) */
+			locked_regb_write(Register::MABBIPG, 0x15);
+		} else {
+			locked_regb_write(Register::MACON3,
+					    MACON3_PADCFG0 | MACON3_TXCRCEN |
+					    MACON3_FRMLNEN);
+			locked_regb_write(Register::MACON4, 1 << 6);	/* DEFER bit */
+			/* set inter-frame gap (non-back-to-back) */
+			locked_regw_write(Register::MAIPGL, 0x0C12);
+			/* set inter-frame gap (back-to-back) */
+			locked_regb_write(Register::MABBIPG, 0x12);
+		}
+
+		/*
+		 * MACLCON1 (default)
+		 * MACLCON2 (default)
+		 * Set the maximum packet size which the controller will accept.
+		 */
+		locked_regw_write(Register::MAMXFLL, MAX_FRAMELEN);
+
+		/* Configure LEDs */
+		if (not enc28j60_phy_write(PhyRegister::PHLCON, ENC28J60_LAMPS_MODE)) {
+			return 0;
+		}
+
+		if (full_duplex) {
+			if (not enc28j60_phy_write(PhyRegister::PHCON1, PHCON1_PDPXMD)) {
+				return 0;
+			}
+			if (not enc28j60_phy_write(PhyRegister::PHCON2, 0x00)) {
+				return 0;
+			}
+		} else {
+			if (not enc28j60_phy_write(PhyRegister::PHCON1, 0x00)) {
+				return 0;
+			}
+			if (not enc28j60_phy_write(PhyRegister::PHCON2, PHCON2_HDLDIS)) {
+				return 0;
+			}
+		}
+		enc28j60_dump_regs("Hw initialized.");
+		return 1;
+	}
+
+
 
 	/// Soft reset of chip
 	static void
@@ -108,7 +202,61 @@ public:
 		/* Errata workaround #1, CLKRDY check is unreliable,
 		 * delay at least 1 ms instead */
 		modm::delay(2ms);
-}
+	}
+
+	/*
+	 * Low power mode shrinks power consumption about 100x, so we'd like
+	 * the chip to be in that mode whenever it's inactive. (However, we
+	 * can't stay in low power mode during suspend with WOL active.)
+	 */
+	static void
+	enc28j60_lowpower(const bool is_low)
+	{
+		MODM_LOG_DEBUG.printf("Setting power %s\n", is_low ? "low" : "high");
+
+		// mutex_lock
+		if (is_low) {
+			nolock_reg_bfclr(Register::ECON1, ECON1_RXEN);
+			poll_ready(Register::ESTAT, ESTAT_RXBUSY, 0);
+			poll_ready(Register::ECON1, ECON1_TXRTS, 0);
+			/* ECON2_VRPS was set during initialization */
+			nolock_reg_bfset(Register::ECON2, ECON2_PWRSV);
+		} else {
+			nolock_reg_bfclr(Register::ECON2, ECON2_PWRSV);
+			poll_ready(Register::ESTAT, ESTAT_CLKRDY, ESTAT_CLKRDY);
+			/* caller sets ECON1_RXEN */
+		}
+		// mutex_unlock
+	}
+
+
+	static int8_t
+	enc28j60_set_hw_macaddr(const uint8_t macaddr[6])
+	{
+		int8_t ret = 0;
+		// mutex_lock
+		if (not hw_enable) {
+			MODM_LOG_DEBUG.printf("Setting MAC address to %02x:%02x:%02x:%02x:%02x:%02x\n",
+				macaddr[0], macaddr[1], macaddr[2], macaddr[3], macaddr[4], macaddr[5]);
+			/* NOTE: MAC address in ENC28J60 is byte-backward */
+			nolock_regb_write(Register::MAADR5, macaddr[0]);
+			nolock_regb_write(Register::MAADR4, macaddr[1]);
+			nolock_regb_write(Register::MAADR3, macaddr[2]);
+			nolock_regb_write(Register::MAADR2, macaddr[3]);
+			nolock_regb_write(Register::MAADR1, macaddr[4]);
+			nolock_regb_write(Register::MAADR0, macaddr[5]);
+		} else {
+			MODM_LOG_ERROR.printf("Hardware must be disabled to set Mac address\n");
+			ret = -1;
+		}
+		// mutex_unlock
+		return ret;
+	}
+
+
+
+
+
 
 	/// Debug routine to dump useful register contents
 	static void
@@ -207,6 +355,58 @@ private:
 
 		return 0;
 	}
+
+	/// ERXRDPT need to be set always at odd addresses, refer to errata datasheet
+	static uint16_t
+	erxrdpt_workaround(const uint16_t next_packet_ptr, const uint16_t start, const uint16_t end)
+	{
+		uint16_t erxrdpt;
+
+		if ((next_packet_ptr - 1 < start) or (next_packet_ptr - 1 > end)) {
+			erxrdpt = end;
+		} else {
+			erxrdpt = next_packet_ptr - 1;
+		}
+
+		return erxrdpt;
+	}
+
+
+	/// Receive FIFO
+	static void
+	nolock_rxfifo_init(const uint16_t start, const uint16_t end)
+	{
+		// validate parameters
+		if (start > 0x1fff or end > 0x1fff or start > end) {
+			MODM_LOG_ERROR.printf("RXFIFO bad parameters (start=%04x, end=%04x)\n", start, end);
+			return;
+		}
+
+		/* set receive buffer start + end */
+		next_pk_ptr = start;
+		nolock_regw_write(Register::ERXSTL, start);
+		uint16_t erxrdpt = erxrdpt_workaround(next_pk_ptr, start, end);
+		nolock_regw_write(Register::ERXRDPTL, erxrdpt);
+		nolock_regw_write(Register::ERXNDL, end);
+	}
+
+
+	/// Transmit FIFO
+	static void
+	nolock_txfifo_init(const uint16_t start, const uint16_t end)
+	{
+		// validate parameters
+		if (start > 0x1fff or end > 0x1fff or start > end) {
+			MODM_LOG_ERROR.printf("TXFIFO bad parameters (start=%04x, end=%04x)\n", start, end);
+			return;
+		}
+		/* set transmit buffer start + end */
+		nolock_regw_write(Register::ETXSTL, start);
+		nolock_regw_write(Register::ETXNDL, end);
+	}
+
+
+
 
 	
 	/*
@@ -482,12 +682,27 @@ private:
 
 
 private:
-	static uint8_t bank;
+	static uint8_t bank; /* current register bank selected */
+	static uint16_t next_pk_ptr; /* next packet pointer within FIFO */
+	static uint16_t max_pk_counter; /* statistics: max packet counter */
+	static uint16_t tx_retry_count;
+
+	static bool hw_enable;
+	static bool full_duplex;
+	static RxFilter rxfilter;
 
 
 };
 
 uint8_t Enc28j60::bank = 0;
+uint16_t Enc28j60::next_pk_ptr = 0;
+uint16_t Enc28j60::max_pk_counter = 0;
+
+uint16_t Enc28j60::tx_retry_count = 0;
+bool Enc28j60::hw_enable = false;
+bool Enc28j60::full_duplex = false;
+RxFilter Enc28j60::rxfilter = RxFilter::NORMAL;
+
 
 /*
  * Blinks the green user LED with 1 Hz.
@@ -562,6 +777,7 @@ main()
 	phlcon = Enc28j60::enc28j60_phy_read(PhyRegister::PHLCON);
 	MODM_LOG_DEBUG.printf("PHLCON=%04x\n", phlcon);
 
+	Enc28j60::enc28j60_hw_init();
 
 	while (true)
 	{
