@@ -254,7 +254,20 @@ public:
 	}
 
 
+	static void
+	enc28j60_check_link_status()
+	{
+		uint16_t phstat2 = enc28j60_phy_read(PhyRegister::PHSTAT2);
+		uint16_t phstat1 = enc28j60_phy_read(PhyRegister::PHSTAT1);
+		MODM_LOG_DEBUG.printf("PHSTAT1: %04x, PHSTAT2: %04x\n", phstat1, phstat2);
+		bool duplex = phstat2 & PHSTAT2_DPXSTAT;
 
+		if (phstat2 & PHSTAT2_LSTAT) {
+			MODM_LOG_DEBUG.printf("link up - %s\n", duplex ? "Full duplex" : "Half duplex");
+		} else {
+			MODM_LOG_DEBUG.printf("link down\n");
+		}
+	}
 
 
 
@@ -782,10 +795,12 @@ main()
 	while (true)
 	{
 		LedGreen::set();
-		modm::delay(100ms);
+		modm::delay(1000ms);
 
 		LedGreen::reset();
-		modm::delay(90ms);
+		modm::delay(900ms);
+
+		Enc28j60::enc28j60_check_link_status();
 	}
 
 	return 0;
