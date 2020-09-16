@@ -88,6 +88,9 @@ get_tlsf_for_ptr(void *p)
 	return NULL;
 }
 
+extern void __malloc_lock(struct _reent *);
+extern void __malloc_unlock(struct _reent *);
+
 void * malloc_traits(size_t size, uint32_t traits)
 {
 try_again:
@@ -97,7 +100,9 @@ try_again:
 	{
 		if ((pool->traits & traits) == traits)
 		{
+			__malloc_lock(_REENT);
 			void *p = tlsf_malloc(pool->tlsf, size);
+			__malloc_unlock(_REENT);
 			if (p) return p;
 		}
 	}
@@ -124,7 +129,8 @@ try_again:
 void *__wrap__malloc_r(struct _reent *, size_t size)
 {
 	// default is accessible by S-Bus and DMA-able
-	return malloc_traits(size, 0x8 | 0x1);
+	return malloc_traits(size, uint32_t(modm::MemoryTrait::AccessSBus) |
+							   uint32_t(modm::MemoryTrait::AccessDMA));
 }
 
 void *__wrap__calloc_r(struct _reent *r, size_t size)
@@ -134,26 +140,29 @@ void *__wrap__calloc_r(struct _reent *r, size_t size)
 	return ptr;
 }
 
-void *__wrap__realloc_r(struct _reent *, void *p, size_t size)
+void *__wrap__realloc_r(struct _reent *r, void *p, size_t size)
 {
-	tlsf_t pool = get_tlsf_for_ptr(p);
-	// if pointer belongs to no pool, exit.
-	if (!pool) return NULL;
+	void *ptr = NULL;
 
-	void *ptr = tlsf_realloc(pool, p, size);
-	modm_assert_continue_fail_debug(0, "realloc",
+	__malloc_lock(r);
+	const tlsf_t pool = get_tlsf_for_ptr(p);
+	if (pool) ptr = tlsf_realloc(pool, p, size);
+	__malloc_unlock(r);
+
+	modm_assert_continue_fail_debug(ptr, "realloc",
 			"Unable to realloc in TLSF pool!", size);
 	return ptr;
 }
 
-void __wrap__free_r(struct _reent *, void *p)
+void __wrap__free_r(struct _reent *r, void *p)
 {
 	// do nothing if NULL pointer
 	if (!p) return;
-	tlsf_t pool = get_tlsf_for_ptr(p);
-	// if pointer belongs to no pool, exit.
-	if (!pool) return;
-	tlsf_free(pool, p);
+	__malloc_lock(r);
+	const tlsf_t pool = get_tlsf_for_ptr(p);
+	// free if pointer belongs to a pool.
+	if (pool) tlsf_free(pool, p);
+	__malloc_unlock(r);
 }
 
 } // extern "C"

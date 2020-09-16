@@ -52,9 +52,14 @@ void __modm_initialize_memory(void)
 	allocator.initialize((void*)heap_start, (void*)heap_end);
 }
 
-void* __wrap__malloc_r(struct _reent *, size_t size)
+extern void __malloc_lock(struct _reent *);
+extern void __malloc_unlock(struct _reent *);
+
+void* __wrap__malloc_r(struct _reent *r, size_t size)
 {
+	__malloc_lock(r);
 	void *ptr = allocator.allocate(size);
+	__malloc_unlock(r);
 	modm_assert_continue_fail_debug(ptr, "malloc",
 			"No memory left in Block heap!", size);
 	return ptr;
@@ -74,9 +79,11 @@ void* __wrap__realloc_r(struct _reent *, void *, size_t size)
 	return NULL;
 }
 
-void __wrap__free_r(struct _reent *, void *p)
+void __wrap__free_r(struct _reent *r, void *p)
 {
+	__malloc_lock(r);
 	allocator.free(p);
+	__malloc_unlock(r);
 }
 
 } // extern "C"
