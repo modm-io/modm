@@ -3,6 +3,7 @@
 #
 # Copyright (c) 2016-2018, Niklas Hauser
 # Copyright (c) 2017, Fabian Greif
+# Copyright (c) 2020, Christopher Durand
 #
 # This file is part of the modm project.
 #
@@ -123,6 +124,22 @@ def validate_alternate_functions(driver, env):
     if not success:
         env.log.debug("Gpio signal validation failed!")
 
+def get_remap_command(family, key):
+    reg = 'SYSCFG->CFGR1'
+    mask = {
+        ('f0', 'a9') : 'SYSCFG_CFGR1_PA11_PA12_RMP',
+        ('f0', 'a10'): 'SYSCFG_CFGR1_PA11_PA12_RMP',
+        ('f0', 'a11'): 'SYSCFG_CFGR1_PA11_PA12_RMP',
+        ('f0', 'a12'): 'SYSCFG_CFGR1_PA11_PA12_RMP',
+        ('g0', 'a9') : 'SYSCFG_CFGR1_PA11_RMP',
+        ('g0', 'a10'): 'SYSCFG_CFGR1_PA12_RMP',
+        ('g0', 'a11'): 'SYSCFG_CFGR1_PA11_RMP',
+        ('g0', 'a12'): 'SYSCFG_CFGR1_PA12_RMP',
+    }.get((family, key))
+    if mask is None:
+        raise ValidateException("Unknown Remap for GPIO: 'P{}'".format(key.upper()))
+    return (reg, mask)
+
 bprops = {}
 
 # -----------------------------------------------------------------------------
@@ -199,6 +216,16 @@ def validate(env):
                 raise ValidateException("Pin '{}' already in EXTI map!".format(str(num)))
             extimap[str(num)] = vec
 
+    # Compute the set of remapped pins
+    remapped_gpios = {}
+    for p in driver["package"][0]["pin"]:
+        variant = p.get("variant", "")
+        if "remap" in variant:  # also matches "remap-default"
+            name = p["name"][1:4].strip().lower()
+            if len(name) > 2 and not name[2].isdigit():
+                name = name[:2]
+            remapped_gpios[name] = (variant == "remap") # "remap-default" -> False
+
     all_signals = {}
     for gpio in driver["gpio"]:
         key = gpio["port"] + gpio["pin"]
@@ -215,11 +242,20 @@ def validate(env):
         all_signals.update(extracted_signals)
         signal_names = sorted(list(set(s["name"] for s in extracted_signals.values())))
         extracted_signals = OrderedDict([(name, sorted([s for s in extracted_signals.values() if s["name"] == name], key=lambda si:si["name"])) for name in signal_names])
+        has_remap = key in remapped_gpios
         bprops[key] = {
             "gpio": gpio,
             "exti_irqn": extimap[gpio["pin"]],
-            "signals": extracted_signals
+            "signals": extracted_signals,
+            "has_remap": has_remap,
         }
+        if has_remap:
+            reg, mask = get_remap_command(device.identifier.family, key)
+            bprops[key].update({
+                "remap_reg": reg,
+                "remap_mask": mask,
+                "remap_value": remapped_gpios[key]
+            })
 
     all_peripherals = [s["driver"] for s in all_signals.values()]
     # Signals are not enough, since there are peripherals that don't have signals.

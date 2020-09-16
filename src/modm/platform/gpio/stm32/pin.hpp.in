@@ -74,6 +74,17 @@ public:
 	inline static void setAnalogInput() { PinSet::setAnalogInput(); }
 	/// @endcond
 
+%% if has_remap
+	/// Remap this GPIO onto physical pins with selectable GPIO mappings
+	inline static void remap() {
+	%% if remap_value
+		{{remap_reg}} |= {{remap_mask}};
+	%% else
+		{{remap_reg}} &= ~{{remap_mask}};
+	%% endif
+	};
+%% endif
+
 public:
 	// GpioOutput
 	// start documentation inherited
