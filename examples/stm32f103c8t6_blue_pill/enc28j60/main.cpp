@@ -93,6 +93,8 @@ enum class RxFilter : uint8_t {
 	NORMAL
 };
 
+uint8_t macaddr[6] = {0xfe, 0xa7, 0x75, 0x3a, 0x20, 0xfb};
+
 class Enc28j60
 {
 public:
@@ -194,6 +196,48 @@ public:
 	}
 
 
+	/*
+	 * Open/initialize the board. This is called (in the current kernel)
+	 * sometime after booting when the 'ifconfig' program is run.
+	 *
+	 * This routine should set everything up anew at each open, even
+	 * registers that "should" only need to be set once at boot, so that
+	 * there is non-reboot way to recover if something goes wrong.
+	 */
+	static int
+	enc28j60_net_open()
+	{
+		/* Reset the hardware here (and take it out of low power mode) */
+		enc28j60_lowpower(false);
+		enc28j60_hw_disable();
+		if (not enc28j60_hw_init()) {
+			MODM_LOG_ERROR.printf("hw_reset() failed\n");
+			return -1; // EINVAL;
+		}
+		/* Update the MAC address (in case user has changed it) */
+		enc28j60_set_hw_macaddr(macaddr);
+		/* Enable interrupts */
+		enc28j60_hw_enable();
+		/* check link status */
+		enc28j60_check_link_status();
+		/* We are now ready to accept transmit requests from
+		 * the queueing layer of the networking.
+		 */
+		// netif_start_queue(dev);
+
+		return 0;
+	}
+
+	/* The inverse routine to net_open(). */
+	static int enc28j60_net_close()
+	{
+		enc28j60_hw_disable();
+		enc28j60_lowpower(true);
+		// netif_stop_queue(dev);
+
+		return 0;
+	}
+
 
 	/// Soft reset of chip
 	static void
@@ -204,6 +248,36 @@ public:
 		modm::delay(2ms);
 	}
 
+	static void
+	enc28j60_hw_enable()
+	{
+		/* enable interrupts */
+		MODM_LOG_DEBUG.printf("enabling interrupts.\n");
+
+		enc28j60_phy_write(PhyRegister::PHIE, PHIE_PGEIE | PHIE_PLNKIE);
+
+		// mutex_lock(&priv->lock);
+		nolock_reg_bfclr(Register::EIR, EIR_DMAIF | EIR_LINKIF |
+				 EIR_TXIF | EIR_TXERIF | EIR_RXERIF | EIR_PKTIF);
+		nolock_regb_write(Register::EIE, EIE_INTIE | EIE_PKTIE | EIE_LINKIE |
+				  EIE_TXIE | EIE_TXERIE | EIE_RXERIE);
+
+		/* enable receive logic */
+		nolock_reg_bfset(Register::ECON1, ECON1_RXEN);
+		hw_enable = true;
+		// mutex_unlock(&priv->lock);
+	}
+
+	static void
+	enc28j60_hw_disable()
+	{
+		// mutex_lock(&priv->lock);
+		/* disable interrupts and packet reception */
+		nolock_regb_write(Register::EIE, 0x00);
+		nolock_reg_bfclr(Register::ECON1, ECON1_RXEN);
+		hw_enable = false;
+		// mutex_unlock(&priv->lock);
+	}
 	/*
 	 * Low power mode shrinks power consumption about 100x, so we'd like
 	 * the chip to be in that mode whenever it's inactive. (However, we
@@ -254,6 +328,7 @@ public:
 	}
 
 
+	/// Access the PHY to determine link status
 	static void
 	enc28j60_check_link_status()
 	{
@@ -306,6 +381,21 @@ public:
 	}
 
 
+	/// Dump an Ethernet Frame
+	static void
+	enc28j60_dump_packet(std::size_t len, const uint8_t* data)
+	{
+		for (std::size_t ii = 0; ii < len; ++ii) {
+			MODM_LOG_DEBUG.printf("%02x ", data[ii]);
+
+			if (ii % 16 == 15) {
+				MODM_LOG_DEBUG.printf("\n");
+			}
+		}
+		MODM_LOG_DEBUG.printf("\n");
+	}
+
+
 	/// PHY register read
 	static uint16_t
 	enc28j60_phy_read(const PhyRegister address)
@@ -347,13 +437,154 @@ public:
 
 
 private:
+	/// IRQ handlers
+
+	/*
+	 * RX handler
+	 * Ignore PKTIF because is unreliable! (Look at the errata datasheet)
+	 * Check EPKTCNT is the suggested workaround.
+	 * We don't need to clear interrupt flag, automatically done when
+	 * enc28j60_hw_rx() decrements the packet counter.
+	 * Returns how many packet processed.
+	 */
+	static uint8_t
+	enc28j60_rx_interrupt()
+	{
+		uint8_t pk_counter = locked_regb_read(Register::EPKTCNT);
+		if (pk_counter) {
+			MODM_LOG_DEBUG.printf("intRX, pk_cnt: %d\n", pk_counter);
+		}
+		if (pk_counter > max_pk_counter) {
+			/* update statistics */
+			max_pk_counter = pk_counter;
+			if (max_pk_counter > 1) {
+				MODM_LOG_DEBUG.printf("RX max_pk_cnt: %d\n", max_pk_counter);
+			}
+		}
+		uint8_t ret = pk_counter;
+		while (pk_counter-- > 0) {
+			enc28j60_hw_rx();
+		}
+
+		return ret;
+	}
+
+	/*
+	 * Hardware receive function.
+	 * Read the buffer memory, update the FIFO pointer to free the buffer,
+	 * check the status vector and decrement the packet counter.
+	 */
+	static void
+	enc28j60_hw_rx()
+	{
+		MODM_LOG_DEBUG.printf("RX pk_addr:0x%04x\n", next_pk_ptr);
+
+		if (next_pk_ptr > RXEND_INIT) {
+			MODM_LOG_DEBUG.printf("Invalid packet address!! 0x%04x\n", next_pk_ptr);
+			/* packet address corrupted: reset RX logic */
+			// mutex_lock(&priv->lock);
+			nolock_reg_bfclr(Register::ECON1, ECON1_RXEN);
+			nolock_reg_bfset(Register::ECON1, ECON1_RXRST);
+			nolock_reg_bfclr(Register::ECON1, ECON1_RXRST);
+			nolock_rxfifo_init(RXSTART_INIT, RXEND_INIT);
+			nolock_reg_bfclr(Register::EIR, EIR_RXERIF);
+			nolock_reg_bfset(Register::ECON1, ECON1_RXEN);
+			// mutex_unlock(&priv->lock);
+			// ndev->stats.rx_errors++;
+			return;
+		}
+		/* Read next packet pointer and rx status vector */
+		uint8_t rsv[RSV_SIZE];
+		enc28j60_mem_read(next_pk_ptr, sizeof(rsv), rsv);
+
+		uint16_t next_packet = rsv[1];
+		next_packet <<= 8;
+		next_packet |= rsv[0];
+
+		int len = rsv[3];
+		len <<= 8;
+		len |= rsv[2];
+
+		uint16_t rxstat = rsv[5];
+		rxstat <<= 8;
+		rxstat |= rsv[4];
+
+		enc28j60_dump_rsv(next_packet, len, rxstat);
+
+		if (not RSV_GETBIT(rxstat, RSV_RXOK) or len > MAX_FRAMELEN) {
+			// if (netif_msg_rx_err(priv)) {
+			// 	netdev_err(ndev, "Rx Error (%04x)\n", rxstat);
+			// }
+			// ndev->stats.rx_errors++;
+			if (RSV_GETBIT(rxstat, RSV_CRCERROR)) {
+				// ndev->stats.rx_crc_errors++;
+			}
+			if (RSV_GETBIT(rxstat, RSV_LENCHECKERR)) {
+				// ndev->stats.rx_frame_errors++;
+			}
+			if (len > MAX_FRAMELEN) {
+				// ndev->stats.rx_over_errors++;
+			}
+		} else {
+			// skb = netdev_alloc_skb(ndev, len + NET_IP_ALIGN);
+			// if (!skb) {
+			// 	if (netif_msg_rx_err(priv))
+			// 		netdev_err(ndev, "out of memory for Rx'd frame\n");
+			// 	ndev->stats.rx_dropped++;
+			// } else {
+			// 	skb_reserve(skb, NET_IP_ALIGN);
+				/* copy the packet from the receive buffer */
+				uint8_t buf[MAX_FRAMELEN];
+				enc28j60_mem_read(
+					rx_packet_start(next_pk_ptr),
+					len, buf); // skb_put(skb, len));
+				enc28j60_dump_packet(len, buf);
+				// if (netif_msg_pktdata(priv))
+				// 	dump_packet(__func__, skb->len, skb->data);
+				// skb->protocol = eth_type_trans(skb, ndev);
+				// /* update statistics */
+				// ndev->stats.rx_packets++;
+				// ndev->stats.rx_bytes += len;
+				// netif_rx_ni(skb);
+			// }
+		}
+		/*
+		 * Move the RX read pointer to the start of the next
+		 * received packet.
+		 * This frees the memory we just read out.
+		 */
+		uint16_t erxrdpt = erxrdpt_workaround(next_packet, RXSTART_INIT, RXEND_INIT);
+		MODM_LOG_DEBUG.printf("%s() ERXRDPT:0x%04x\n",
+				   __func__, erxrdpt);
+
+		// mutex_lock(&priv->lock);
+		nolock_regw_write(Register::ERXRDPTL, erxrdpt);
+	#ifdef CONFIG_ENC28J60_WRITEVERIFY
+		if (netif_msg_drv(priv)) {
+			u16 reg;
+			reg = nolock_regw_read(priv, ERXRDPTL);
+			if (reg != erxrdpt)
+				MODM_LOG_DEBUG.printf(
+					   "%s() ERXRDPT verify error (0x%04x - 0x%04x)\n",
+					   __func__, reg, erxrdpt);
+		}
+	#endif
+		next_pk_ptr = next_packet;
+		/* we are done with this packet, decrement the packet counter */
+		nolock_reg_bfset(Register::ECON2, ECON2_PKTDEC);
+		// mutex_unlock(&priv->lock);
+	}
+
+
+private:
 	/// Wait until the PHY operation is complete.
 	static int8_t wait_phy_ready()
 	{
 		return poll_ready(Register::MISTAT, MISTAT_BUSY, 0) ? 0 : 1;
 	}
 
-	static int8_t poll_ready(const Register address, uint8_t bitmask, uint8_t value)
+	static int8_t
+	poll_ready(const Register address, uint8_t bitmask, uint8_t value)
 	{
 		/* 20 msec timeout read */
 		uint8_t tt = 20;
@@ -367,6 +598,17 @@ private:
 		}
 
 		return 0;
+	}
+
+	/// Calculate wrap around when reading beyond the end of the RX buffer
+	static uint16_t
+	rx_packet_start(uint16_t ptr)
+	{
+		if (ptr + RSV_SIZE > RXEND_INIT) {
+			return (ptr + RSV_SIZE) - (RXEND_INIT - RXSTART_INIT + 1);
+		} else {
+			return ptr + RSV_SIZE;
+		}
 	}
 
 	/// ERXRDPT need to be set always at odd addresses, refer to errata datasheet
@@ -383,6 +625,36 @@ private:
 
 		return erxrdpt;
 	}
+
+
+	/// Dump the Receive Status Vector (RSV)
+	static void
+	enc28j60_dump_rsv(const uint16_t pk_ptr, uint16_t len, uint16_t sts)
+	{
+		MODM_LOG_DEBUG.printf("NextPk: 0x%04x - RSV:\n", pk_ptr);
+		MODM_LOG_DEBUG.printf("ByteCount: %d, DribbleNibble: %d\n",
+			   len, RSV_GETBIT(sts, RSV_DRIBBLENIBBLE));
+		MODM_LOG_DEBUG.printf(
+			   "RxOK: %d, CRCErr:%d, LenChkErr: %d, LenOutOfRange: %d\n",
+			   RSV_GETBIT(sts, RSV_RXOK),
+			   RSV_GETBIT(sts, RSV_CRCERROR),
+			   RSV_GETBIT(sts, RSV_LENCHECKERR),
+			   RSV_GETBIT(sts, RSV_LENOUTOFRANGE));
+		MODM_LOG_DEBUG.printf(
+			   "Multicast: %d, Broadcast: %d, LongDropEvent: %d, CarrierEvent: %d\n",
+			   RSV_GETBIT(sts, RSV_RXMULTICAST),
+			   RSV_GETBIT(sts, RSV_RXBROADCAST),
+			   RSV_GETBIT(sts, RSV_RXLONGEVDROPEV),
+			   RSV_GETBIT(sts, RSV_CARRIEREV));
+		MODM_LOG_DEBUG.printf(
+			   "ControlFrame: %d, PauseFrame: %d, UnknownOp: %d, VLanTagFrame: %d\n",
+			   RSV_GETBIT(sts, RSV_RXCONTROLFRAME),
+			   RSV_GETBIT(sts, RSV_RXPAUSEFRAME),
+			   RSV_GETBIT(sts, RSV_RXUNKNOWNOPCODE),
+			   RSV_GETBIT(sts, RSV_RXTYPEVLAN));
+	}
+
+
 
 
 	/// Receive FIFO
@@ -419,9 +691,6 @@ private:
 	}
 
 
-
-
-	
 	/*
 	 * Register access routines through the SPI bus.
 	 * Every register access comes in two flavours:
@@ -434,24 +703,28 @@ private:
 	 */
 
 	/// Register bit field Set
-	static void nolock_reg_bfset(const Register address, const uint8_t bitmask) {
+	static void
+	nolock_reg_bfset(const Register address, const uint8_t bitmask) {
 		enc28j60_set_bank(address);
 		spi_write_op(SpiOperation::BIT_FIELD_SET, address, bitmask);
 	}
 
-	static void locked_reg_bfset(const Register address, const uint8_t bitmask) {
+	static void
+	locked_reg_bfset(const Register address, const uint8_t bitmask) {
 		// mutex_lock
 		nolock_reg_bfset(address, bitmask);
 		// mutex_unlock
 	}
 
 	/// Register bit field Clear
-	static void nolock_reg_bfclr(const Register address, const uint8_t bitmask) {
+	static void
+	nolock_reg_bfclr(const Register address, const uint8_t bitmask) {
 		enc28j60_set_bank(address);
 		spi_write_op(SpiOperation::BIT_FIELD_CLR, address, bitmask);
 	}
 
-	static void locked_reg_bfclr(const Register address, const uint8_t bitmask) {
+	static void
+	locked_reg_bfclr(const Register address, const uint8_t bitmask) {
 		// mutex_lock
 		nolock_reg_bfclr(address, bitmask);
 		// mutex_unlock
@@ -459,12 +732,14 @@ private:
 
 
 	/// Register byte read
-	static uint8_t nolock_regb_read(const Register address) {
+	static uint8_t
+	nolock_regb_read(const Register address) {
 		enc28j60_set_bank(address);
 		return spi_read_op(SpiOperation::READ_CTRL_REG, address);
 	}
 
-	static uint8_t locked_regb_read(const Register address) {
+	static uint8_t
+	locked_regb_read(const Register address) {
 		// mutex_lock
 		auto ret = nolock_regb_read(address);
 		// mutex_unlock
@@ -474,7 +749,8 @@ private:
 
 
 	/// Register word read
-	static uint16_t nolock_regw_read(const Register address) {
+	static uint16_t
+	nolock_regw_read(const Register address) {
 		// assert address is even
 		// assert address is word address (register with L and H)
 
@@ -485,7 +761,8 @@ private:
 		return (rh << 8) | rl;
 	}
 
-	static uint16_t locked_regw_read(const Register address) {
+	static uint16_t
+	locked_regw_read(const Register address) {
 		// mutex_lock
 		auto ret = nolock_regw_read(address);
 		// mutex_unlock
@@ -495,16 +772,19 @@ private:
 
 
 	/// Register byte write
-	static void nolock_regb_write(const Register address, const uint8_t data) {
+	static void
+	nolock_regb_write(const Register address, const uint8_t data) {
 		enc28j60_set_bank(address);
 		spi_write_op(SpiOperation::WRITE_CTRL_REG, address, data);
 	}
 
-	static void nolock_regb_write(const Register address, const PhyRegister phy_register) {
+	static void
+	nolock_regb_write(const Register address, const PhyRegister phy_register) {
 		nolock_regb_write(address, static_cast<uint8_t>(phy_register));
 	}
 
-	static void locked_regb_write(const Register address, const uint8_t data) {
+	static void
+	locked_regb_write(const Register address, const uint8_t data) {
 		// mutex_lock
 		nolock_regb_write(address, data);
 		// mutex_unlock
@@ -512,7 +792,8 @@ private:
 
 
 	/// Register word write
-	static void nolock_regw_write(const Register address, const uint16_t data) {
+	static void
+	nolock_regw_write(const Register address, const uint16_t data) {
 		// assert address is even
 		// assert address is word address (register with L and H)
 
@@ -521,7 +802,8 @@ private:
 		spi_write_op(SpiOperation::WRITE_CTRL_REG, address + 1, data >> 8);
 	}
 
-	static void locked_regw_write(const Register address, const uint16_t data) {
+	static void
+	locked_regw_write(const Register address, const uint16_t data) {
 		// mutex_lock
 		nolock_regw_write(address, data);
 		// mutex_unlock
@@ -529,7 +811,8 @@ private:
 
 
 	/// Buffer memory read
-	static void enc28j60_mem_read(const uint16_t address, std::size_t len, uint8_t *data) {
+	static void
+	enc28j60_mem_read(const uint16_t address, std::size_t len, uint8_t *data) {
 		// mutex_lock
 		nolock_regw_write(Register::ERDPTL, address);
 
@@ -547,7 +830,8 @@ private:
 
 
 	/// Buffer memory write
-	static void enc28j60_packet_write(const std::size_t len, const uint8_t *data)
+	static void
+	enc28j60_packet_write(const std::size_t len, const uint8_t *data)
 	{
 		// mutex_lock
 
@@ -624,13 +908,12 @@ private:
 	static void
 	spi_read_buf(const std::size_t len, uint8_t *data)
 	{
-		uint8_t *tx_buf = spi_transfer_buf;
-
-		tx_buf[0] = static_cast<uint8_t>(SpiOperation::READ_BUF_MEM);
+		uint8_t tx_buf = static_cast<uint8_t>(SpiOperation::READ_BUF_MEM);
 
 		// assert len <= SPI_TRANSFER_BUF_LEN
 		enc28j60::Cs::reset();
-		enc28j60::SpiMaster::transferBlocking(tx_buf, data, len);
+		enc28j60::SpiMaster::transferBlocking(tx_buf);
+		enc28j60::SpiMaster::transferBlocking(nullptr, data, len);
 		enc28j60::Cs::set();
 	}
 
@@ -733,13 +1016,6 @@ main()
 	Usart1::connect<GpioOutputB6::Tx>();
 	Usart1::initialize<Board::SystemClock, 115200_Bd>();
 
-	// Use the logging streams to print some messages.
-	// Change MODM_LOG_LEVEL above to enable or disable these messages
-	MODM_LOG_DEBUG   << "debug"   << modm::endl;
-	MODM_LOG_INFO    << "info"    << modm::endl;
-	MODM_LOG_WARNING << "warning" << modm::endl;
-	MODM_LOG_ERROR   << "error"   << modm::endl;
-
 	// Testing Register and RegisterBank class
 	if (true)
 	{
@@ -774,33 +1050,63 @@ main()
 	modm::delay(500ms);
 
 
-	// Dump registers
-	Enc28j60::enc28j60_dump_regs("Hw init");
-
 	// Access PHY for testing communication
 
-	uint16_t phlcon = Enc28j60::enc28j60_phy_read(PhyRegister::PHLCON);
-	MODM_LOG_DEBUG.printf("PHLCON=%04x\n", phlcon);
+	// uint16_t phlcon = Enc28j60::enc28j60_phy_read(PhyRegister::PHLCON);
+	// MODM_LOG_DEBUG.printf("PHLCON=%04x\n", phlcon);
 
 	// blink LED B (orange) fast
 	// blink LED A (green)  slow
 	//                                         0011 LEDA LEDB 0010
-	Enc28j60::enc28j60_phy_write(PhyRegister::PHLCON, 0b0011'1011'1010'0010);
+	// Enc28j60::enc28j60_phy_write(PhyRegister::PHLCON, 0b0011'1011'1010'0010);
 
-	phlcon = Enc28j60::enc28j60_phy_read(PhyRegister::PHLCON);
-	MODM_LOG_DEBUG.printf("PHLCON=%04x\n", phlcon);
+	// phlcon = Enc28j60::enc28j60_phy_read(PhyRegister::PHLCON);
+	// MODM_LOG_DEBUG.printf("PHLCON=%04x\n", phlcon);
+
+	// MODM_LOG_DEBUG.printf("**************************************************\n");
+
+
+
 
 	Enc28j60::enc28j60_hw_init();
+	Enc28j60::enc28j60_net_open();
+
+
+	for (uint8_t ii = 0; ii < 8; ++ii) {
+		Enc28j60::enc28j60_check_link_status();
+		modm::delay(500ms);
+	}
+
+
+	if (false) {
+		// Check Buffer read and write
+
+		uint8_t rsv[RSV_SIZE] = {0x19, 0xc4, 0xb6, 0x0b, 0xb4, 0xd9 };
+
+		// Write
+		Enc28j60::nolock_regw_write(Register::ERDPTL, RXSTART_INIT);
+		Enc28j60::spi_write_buf(RSV_SIZE, rsv);
+
+		// Read back
+		Enc28j60::enc28j60_mem_read(0x0000, sizeof(rsv), rsv);
+
+		for (uint8_t ii = 0; ii < RSV_SIZE; ++ii) {
+			MODM_LOG_DEBUG.printf("%02x ", rsv[ii]);
+		}
+
+	}
+
+
 
 	while (true)
 	{
-		LedGreen::set();
-		modm::delay(1000ms);
+		// LedGreen::set();
+		// modm::delay(10ms);
 
-		LedGreen::reset();
-		modm::delay(900ms);
+		// LedGreen::reset();
+		// modm::delay(90ms);
 
-		Enc28j60::enc28j60_check_link_status();
+		Enc28j60::enc28j60_rx_interrupt();
 	}
 
 	return 0;

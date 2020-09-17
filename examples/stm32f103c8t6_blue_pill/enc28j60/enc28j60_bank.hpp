@@ -248,6 +248,57 @@ static constexpr uint8_t PHIR_PGEIF		= (1 << 1);
 /* Preferred half duplex: LEDA: Link status LEDB: Rx/Tx activity */
 static constexpr uint16_t ENC28J60_LAMPS_MODE	= 0x3476;
 
+/* ENC28J60 Packet Control Byte Bit Definitions */
+#define PKTCTRL_PHUGEEN		0x08
+#define PKTCTRL_PPADEN		0x04
+#define PKTCTRL_PCRCEN		0x02
+#define PKTCTRL_POVERRIDE	0x01
+
+/* ENC28J60 Transmit Status Vector */
+static constexpr uint8_t TSV_TXBYTECNT			= 0;
+static constexpr uint8_t TSV_TXCOLLISIONCNT		= 16;
+static constexpr uint8_t TSV_TXCRCERROR			= 20;
+static constexpr uint8_t TSV_TXLENCHKERROR		= 21;
+static constexpr uint8_t TSV_TXLENOUTOFRANGE	= 22;
+static constexpr uint8_t TSV_TXDONE				= 23;
+static constexpr uint8_t TSV_TXMULTICAST		= 24;
+static constexpr uint8_t TSV_TXBROADCAST		= 25;
+static constexpr uint8_t TSV_TXPACKETDEFER		= 26;
+static constexpr uint8_t TSV_TXEXDEFER			= 27;
+static constexpr uint8_t TSV_TXEXCOLLISION		= 28;
+static constexpr uint8_t TSV_TXLATECOLLISION	= 29;
+static constexpr uint8_t TSV_TXGIANT			= 30;
+static constexpr uint8_t TSV_TXUNDERRUN			= 31;
+static constexpr uint8_t TSV_TOTBYTETXONWIRE	= 32;
+static constexpr uint8_t TSV_TXCONTROLFRAME		= 48;
+static constexpr uint8_t TSV_TXPAUSEFRAME		= 49;
+static constexpr uint8_t TSV_BACKPRESSUREAPP	= 50;
+static constexpr uint8_t TSV_TXVLANTAGFRAME		= 51;
+
+static constexpr uint8_t TSV_SIZE		= 7;
+#define TSV_BYTEOF(x)		((x) / 8)
+#define TSV_BITMASK(x)		(1 << ((x) % 8))
+#define TSV_GETBIT(x, y)	(((x)[TSV_BYTEOF(y)] & TSV_BITMASK(y)) ? 1 : 0)
+
+/* ENC28J60 Receive Status Vector */
+static constexpr uint8_t RSV_RXLONGEVDROPEV		= 16;
+static constexpr uint8_t RSV_CARRIEREV			= 18;
+static constexpr uint8_t RSV_CRCERROR			= 20;
+static constexpr uint8_t RSV_LENCHECKERR		= 21;
+static constexpr uint8_t RSV_LENOUTOFRANGE		= 22;
+static constexpr uint8_t RSV_RXOK				= 23;
+static constexpr uint8_t RSV_RXMULTICAST		= 24;
+static constexpr uint8_t RSV_RXBROADCAST		= 25;
+static constexpr uint8_t RSV_DRIBBLENIBBLE		= 26;
+static constexpr uint8_t RSV_RXCONTROLFRAME		= 27;
+static constexpr uint8_t RSV_RXPAUSEFRAME		= 28;
+static constexpr uint8_t RSV_RXUNKNOWNOPCODE	= 29;
+static constexpr uint8_t RSV_RXTYPEVLAN			= 30;
+
+static constexpr uint8_t RSV_SIZE		= 6;
+#define RSV_BITMASK(x)		(1 << ((x) - 16))
+#define RSV_GETBIT(x, y)	(((x) & RSV_BITMASK(y)) ? 1 : 0)
+
 
 
 
