@@ -34,7 +34,11 @@ the config macros, then redefine them with your options, for example:
     def build(self, env):
         env.outbasepath = "modm/ext"
         env.copy("freertos/FreeRTOS-Plus-TCP", "freertos_plus_tcp",
-            ignore=env.ignore_files("BufferAllocation_1.c"))
+            ignore=env.ignore_files("BufferAllocation_1.c", "portable"))
+        # Copy the compiler support files
+        env.copy("freertos/FreeRTOS-Plus-TCP/portable/Compiler/GCC/pack_struct_start.h", "freertos_plus_tcp/include/pack_struct_start.h")
+        env.copy("freertos/FreeRTOS-Plus-TCP/portable/Compiler/GCC/pack_struct_end.h", "freertos_plus_tcp/include/pack_struct_end.h")
+
         env.collect(":build:path.include", "modm/ext/freertos_plus_tcp/include")
         env.template("FreeRTOSIPConfig.h.in", "freertos_plus_tcp/include/FreeRTOSIPConfig.h")
 # -----------------------------------------------------------------------------
