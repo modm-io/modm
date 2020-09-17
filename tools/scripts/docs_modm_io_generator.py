@@ -29,7 +29,7 @@ def repopath(path):
 def relpath(path):
     return os.path.relpath(path, str(repopath(".")))
 
-sys.path.append(str(repopath("ext/modm-devices/tools/device")))
+sys.path.append(str(repopath("ext/modm-devices")))
 from modm_devices.device_identifier import *
 
 

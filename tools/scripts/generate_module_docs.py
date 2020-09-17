@@ -22,7 +22,7 @@ def relpath(path):
     return os.path.relpath(path, str(repopath(".")))
 
 sys.path.append(str(repopath("ext/modm-devices/tools/generator")))
-sys.path.append(str(repopath("ext/modm-devices/tools/device")))
+sys.path.append(str(repopath("ext/modm-devices")))
 from dfg.device_tree import DeviceTree
 from modm_devices.device_identifier import *
 sys.path.append(str(repopath("../lbuild")))
