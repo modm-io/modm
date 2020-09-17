@@ -31,8 +31,18 @@ def getDefineForDevice(device_id, familyDefines):
     if len(deviceDefines) == 1:
         return deviceDefines[0]
 
-    # now we match for the size-id.
+    # sort with respecting variants
+    minlen = min(len(d) for d in deviceDefines)
+    deviceDefines.sort(key=lambda d: (d[:minlen], d[minlen:]))
+
+    # now we match for the size-id (and variant-id if applicable).
     devNameMatch = devName + "x{}".format(device_id.size.upper())
+    if device_id.family == "l1":
+        # Map STM32L1xxQC and STM32L1xxZC -> STM32L162QCxA variants
+        if device_id.pin in ["q", "z"] and device_id.size == "c":
+            devNameMatch += "A"
+        else:
+            devNameMatch += device_id.variant.upper()
     for define in deviceDefines:
         if devNameMatch <= define:
             return define
@@ -70,7 +80,7 @@ def common_rcc_map(env):
     define = None
 
     content = Path(localpath(folder, family_header)).read_text(encoding="utf-8", errors="replace")
-    match = re.findall(r"if defined\((?P<define>STM32[F|L|G].....)\)", content)
+    match = re.findall(r"if defined\((?P<define>STM32[F|L|G][\w\d]+)\)", content)
     define = getDefineForDevice(device.identifier, match)
     if define is None or match is None:
         raise ValidateException("No device define found for '{}'!".format(device.partname))
