@@ -1,0 +1,34 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2020, Erik Henriksson
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":tinyusb"
+    module.description = """\
+# TinyUSB
+
+TinyUSB is an open-source cross-platform USB Host/Device stack for embedded
+system, designed to be memory-safe with no dynamic allocation and thread-safe
+with all interrupt events are deferred then handled in the non-ISR task
+function.
+"""
+
+def prepare(module, options):
+    module.depends(":cmsis:device")
+    return True
+
+def build(env):
+    env.collect(":build:path.include", "modm/ext/tinyusb")
+
+    env.outbasepath = "modm/ext/tinyusb"
+    env.copy("tinyusb/src", ".")
+    env.copy("tusb_config.h", "tusb_config.h")
+    env.copy("usb_descriptors.c", "usb_descriptors.c")

@@ -41,6 +41,8 @@ def listrify(*objs):
 def guess_serial_port(port_hint=None):
     if "Windows" in platform.platform():
         ports = glob.glob('COM[0-9]*')
+    elif "Darwin" in platform.system() and port_hint == "bossac":
+        ports = glob.glob('/dev/tty.usbmodem*')
     elif "Darwin" in platform.system():
         ports = glob.glob('/dev/tty.usb*')
     else:

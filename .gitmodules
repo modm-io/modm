@@ -28,3 +28,6 @@
 [submodule "ext/microchip/sam"]
 	path = ext/microchip/sam
 	url = https://github.com/modm-io/cmsis-header-sam.git
+[submodule "ext/tinyusb/tinyusb"]
+	path = ext/tinyusb/tinyusb
+	url = https://github.com/hathach/tinyusb.git

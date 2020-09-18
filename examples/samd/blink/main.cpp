@@ -9,24 +9,25 @@
  */
 
 #include <modm/board.hpp>
+#include <modm/processing/timer.hpp>
 
 using namespace Board;
 using namespace std::chrono_literals;
 
-int
-main()
-{
-    Board::initialize();
-    while (1)
-    {
-        Led::toggle();
-        modm::delay(500ms);
+int main() {
+  Board::initialize();
+  modm::Timeout timeout(1000ms);
+  while (1) {
+    Led::toggle();
+    while (!timeout.isExpired())
+      ;
+    timeout.restart();
 
 #ifdef MODM_BOARD_HAS_LOGGER
-        static uint32_t counter(0);
-        MODM_LOG_INFO << "Loop counter: " << (counter++) << modm::endl;
+    static uint32_t counter(0);
+    MODM_LOG_INFO << "Loop counter: " << (counter++) << modm::endl;
 #endif
-    }
+  }
 
-    return 0;
+  return 0;
 }

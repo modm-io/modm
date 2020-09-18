@@ -1,10 +1,10 @@
 <library>
   <extends>modm:feather-m0</extends>
   <options>
-    <option name="modm:build:build.path">../../../build/samd/blink</option>
+    <option name="modm:build:build.path">../../../build/samd/usbserial</option>
   </options>
   <modules>
     <module>modm:build:scons</module>
-    <module>modm:processing:timer</module>
+    <module>modm:platform:usb</module>
   </modules>
 </library>
