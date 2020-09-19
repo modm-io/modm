@@ -160,8 +160,9 @@ documentation.
 <td align="center">OLIMEXINO-STM32</td>
 <td align="center">RASPBERRYPI</td>
 <td align="center">SAMD21-MINI</td>
-<td align="center">STM32F030F4P6-DEMO</td>
+<td align="center">STM32-F4VE</td>
 </tr><tr>
+<td align="center">STM32F030F4P6-DEMO</td>
 </tr>
 </table>
 <!--/bsptable-->
