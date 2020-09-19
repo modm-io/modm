@@ -1,0 +1,30 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2020, Mike Wolfram
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:ili9341"
+    module.description = "ILI9341 Display with parallel and SPI bus transports"
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:delay",
+        ":architecture:spi.device",
+        ":ui:display")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/display"
+    env.copy("ili9341.hpp")
+    env.copy("ili9341_impl.hpp")
+    env.copy("ili9341_spi.hpp")
+    env.copy("ili9341_parallel.hpp")
