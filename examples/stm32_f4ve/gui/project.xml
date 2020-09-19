@@ -1,0 +1,22 @@
+<library>
+  <extends>modm:stm32_f4ve</extends>
+  <options>
+    <option name="modm:build:build.path">../../../../build/stm32_f4ve/gui</option>
+    <option name="modm:build:scons:image.source">images</option>
+  </options>
+  <modules>
+    <module>modm:container</module>
+    <module>modm:debug</module>
+    <module>modm:driver:ads7843</module>
+    <module>modm:driver:ili9341</module>
+    <module>modm:driver:memory_bus</module>
+    <module>modm:platform:fsmc</module>
+    <module>modm:platform:spi:2</module>
+    <module>modm:platform:uart:2</module>
+    <module>modm:platform:heap</module>
+    <module>modm:ui:display</module>
+    <module>modm:ui:gui</module>
+    <module>modm:utils</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>
