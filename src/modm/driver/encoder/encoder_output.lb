@@ -12,8 +12,7 @@
 
 
 def init(module):
-    module.parent = "driver"
-    module.name = "encoder.output"
+    module.name = ":driver:encoder.output"
     module.description = """\
 # Encoder Output
 

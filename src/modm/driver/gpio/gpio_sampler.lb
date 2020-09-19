@@ -12,8 +12,7 @@
 from collections import OrderedDict
 
 def init(module):
-    module.parent = ":driver"
-    module.name = "gpio_sampler"
+    module.name = ":driver:gpio_sampler"
 
 
 def prepare(module, options):
