@@ -18,12 +18,14 @@ namespace modm::platform
 /// @cond
 extern uint16_t delay_fcpu_MHz;
 extern uint16_t delay_ns_per_loop;
+extern "C" uint32_t SystemCoreClock;
 /// @endcond
 
 template< uint32_t Core_Hz >
 void
 GenericClockController::updateCoreFrequency()
 {
+	SystemCoreClock = Core_Hz;
 	delay_fcpu_MHz = Core_Hz / 1'000'000;
 	delay_ns_per_loop = ::round({{loops}}000.f / (Core_Hz / 1'000'000));
 }

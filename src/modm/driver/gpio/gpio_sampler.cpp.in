@@ -86,7 +86,7 @@ GpioSampler::Channel::dump() const
 {
 	for (size_t ii=0; ii<count; ii++) {
 		Type d = diff(ii);
-		MODM_LOG_DEBUG.printf("%3u %9ld %6ld (%ldus)\n", ii, (*this)[ii], d, int32_t(int64_t(d * 1000000) / modm::platform::fcpu));
+		MODM_LOG_DEBUG.printf("%3u %9ld %6ld (%ldus)\n", ii, (*this)[ii], d, int32_t(int64_t(d * 1000000) / SystemCoreClock));
 	}
 	MODM_LOG_DEBUG << modm::endl;
 }

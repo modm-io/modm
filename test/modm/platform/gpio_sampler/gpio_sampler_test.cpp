@@ -64,7 +64,7 @@ GpioSamplerTest::testTiming()
 		TEST_ASSERT_FALSE(r[1].read(3)); // low
 		TEST_ASSERT_TRUE( r[1].read(4)); // high
 
-		const int32_t ce = modm::platform::fcpu / 1000;
+		const int32_t ce = SystemCoreClock / 1000;
 		const int32_t cu = ce * 1.1f;
 
 		TEST_ASSERT_EQUALS(r[0].diff(0), 0);

@@ -14,7 +14,6 @@
 namespace modm::platform
 {
 /// @cond
-extern uint32_t fcpu;
 extern uint16_t delay_fcpu_MHz;
 extern uint16_t delay_ns_per_loop;
 /// @endcond
@@ -96,8 +95,8 @@ template< uint32_t Core_Hz >
 void
 Rcc::updateCoreFrequency()
 {
+	SystemCoreClock = Core_Hz;
 	delay_fcpu_MHz = Core_Hz / 1'000'000;
-	fcpu = Core_Hz;
 	delay_ns_per_loop = std::round({{loops}}000.f / (Core_Hz / 1'000'000));
 }
 

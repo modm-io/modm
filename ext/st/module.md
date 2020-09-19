@@ -29,12 +29,10 @@ modm implements the target specific CMSIS functionality itself, without using
 the CMSIS interface. This is necessary to provide similar functionality on
 non-Cortex-M based targets.
 
-Specifically, these functions are not implemented:
-
-- `uint32_t SystemCoreClock` and `void SystemCoreClockUpdate()`: please use
-  `modm::clock::f_cpu` as defined in the `modm:architecture:clock` module.
-- `void SystemInit()`: modm defines its own startup architecture, see the
-  `modm:platform:core` module for details.
+- `uint32_t SystemCoreClock` contains an up-to-date value of CPU frequency.
+- `void SystemCoreClockUpdate()` does nothing, it's a weak empty function.
+- `void SystemInit()` is **undefined**: modm defines its own startup
+  architecture, see the `modm:platform:core` module for details.
 
 
 [repo]: https://github.com/modm-io/cmsis-header-stm32

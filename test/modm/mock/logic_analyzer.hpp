@@ -83,7 +83,7 @@ public:
 				{
 					char *out;
 					const uint64_t us = strtoul(state, &out, 10);
-					const uint32_t cycles = (modm::platform::fcpu * us) / 1000000;
+					const uint32_t cycles = (SystemCoreClock * us) / 1000000;
 					*time = cycles;
 					state = out;
 					// MODM_LOG_DEBUG << (time == &tmin ? "min " : "max ") << us << "us => " << cycles << modm::endl;
