@@ -16,7 +16,7 @@
 #include <modm/debug/logger.hpp>
 %% elif core.startswith("avr")
 #include <avr/pgmspace.h>
-%% else
+%% elif core.startswith("cortex-m")
 #include <modm/platform/device.hpp>
 %% endif
 #include <modm/architecture/interface/assert.hpp>
@@ -76,6 +76,8 @@ modm_assert_report(_modm_assertion_info *cinfo)
 		modm_abandon(*info);
 %% if core.startswith("cortex-m")
 		NVIC_SystemReset();
+%% elif core.startswith("e31")
+		while(1) ;
 %% elif core.startswith("avr")
 		while(1) ;
 %% else

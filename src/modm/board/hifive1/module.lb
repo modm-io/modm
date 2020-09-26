@@ -26,7 +26,7 @@ def prepare(module, options):
         return False
 
     module.depends(":platform:core")
-    module.depends(":platform:clock")
+    #module.depends(":platform:clock")
     module.depends(":platform:prci")
     return True
 

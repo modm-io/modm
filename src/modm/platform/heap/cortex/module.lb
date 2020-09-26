@@ -33,7 +33,7 @@ def init(module):
     module.description = FileReader("module.md")
 
 def prepare(module, options):
-    if not options[":target"].has_driver("core:cortex-m*"):
+    if (not options[":target"].has_driver("core:cortex-m*")) or (not options[":target"].has_driver("core:e31")):
         return False
 
     ram_sizes = continuous_ram_sizes(options[":target"])

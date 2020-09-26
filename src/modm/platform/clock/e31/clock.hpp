@@ -13,7 +13,7 @@
 #define MODM_E31_CLOCK_HPP
 
 #include <stdint.h>
-#include "common.hpp"
+//#include "common.hpp"
 
 namespace modm
 {
@@ -77,19 +77,22 @@ namespace modm
 			static inline uint32_t
 			getCpuFrequency()
 			{
-				return modm::clock::fcpu;
+				//return modm::clock::fcpu;
+				return 100'000'000;
 			}
 
 			static inline uint32_t
 			getCpuFrequencykHz()
 			{
-				return modm::clock::fcpu_kHz;
+				//return modm::clock::fcpu_kHz;
+				return 100'000;
 			}
 
 			static inline uint32_t
 			getCpuFrequencyMHz()
 			{
-				return modm::clock::fcpu_MHz;
+				//return modm::clock::fcpu_MHz;
+				return 100;
 			}
 		};
 	}

@@ -8,7 +8,6 @@
   <options>
     <option name="modm:target">fe310-g000</option>
     <option name="modm:platform:core:main_stack_size">1024</option>
-    <option name="modm:platform:core:allocator">block</option>
     <option name="modm:platform:core:linkerscript.flash_offset">0x400000</option>
   </options>
   <modules>

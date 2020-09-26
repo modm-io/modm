@@ -52,15 +52,15 @@ def prepare(module, options):
             ":architecture:memory"
         )
 
-    module.add_option(
-    EnumerationOption(
-        name="allocator",
-        description=FileReader("../cortex/option/allocator.md"),
-        enumeration=["newlib", "block", "tlsf"],
-        default="newlib",
-        dependencies=lambda v: {"newlib": None,
-                                "block": ":architecture:heap",
-                                "tlsf": ":tlsf"}[v]))
+    #module.add_option(
+    #EnumerationOption(
+    #    name="allocator",
+    #    description=FileReader("../cortex/option/allocator.md"),
+    #    enumeration=["newlib", "block", "tlsf"],
+    #    default="newlib",
+    #    dependencies=lambda v: {"newlib": None,
+    #                            "block": ":architecture:heap",
+    #                            "tlsf": ":tlsf"}[v]))
 
     module.add_option(
     NumericOption(
@@ -98,29 +98,41 @@ def build(env):
 
     env.substitutions = properties
     env.substitutions["with_fault_storage"] = env.has_module(":platform:fault")
+    env.substitutions["with_assert"] = env.has_module(":architecture:assert")
 
     env.outbasepath = "modm/link"
-
     env.template("linkerscript.ld.in")
 
-
     env.outbasepath = "modm/src/modm/platform/core"
-
     env.copy("entry.S")
     env.copy("startup.c")
     env.copy("flash_reader.hpp")
     env.copy("clock.cpp")
-    env.copy("assert.cpp")
 
-    env.template("../cortex/heap_table.cpp.in","heap_table.cpp")
-    env.template("../cortex/heap_table.hpp.in","heap_table.hpp")
+    if env.has_module(":architecture:memory"):
+        env.template("../cortex/heap_table.cpp.in","heap_table.cpp")
+        env.template("../cortex/heap_table.hpp.in","heap_table.hpp")
+
+    #if env.has_module(":architecture:accessor"):
+    env.copy("../cortex/flash_reader_impl.hpp","flash_reader_impl.hpp")
+
+    #env.copy("assert.cpp") ## Old / TODO: Delete file
+    # dealing with runtime assertions
+    if env.has_module(":architecture:assert"):
+        env.template("../cortex/assert.cpp.in", "assert.cpp")
+        env.template("../cortex/assert_impl.hpp.in", "assert_impl.hpp")
+
+    # busy-waiting delays
+    if env.has_module(":architecture:delay"):
+        env.template("delay.cpp.in")
+        env.template("delay_impl.hpp.in")
 
     # everything to do with dynamic memory
-    if env["allocator"] == "newlib":
-        env.copy("../cortex/heap_newlib.cpp","heap_newlib.cpp")
-    elif env["allocator"] == "tlsf":
-        env.copy("../cortex/heap_tlsf.cpp","heap_tlsf.cpp")
-    elif env["allocator"] == "block":
-        env.copy("../cortex/heap_block_allocator.cpp","heap_block_allocator.cpp")
+    #if env["allocator"] == "newlib":
+    #    env.copy("../cortex/heap_newlib.cpp","heap_newlib.cpp")
+    #elif env["allocator"] == "tlsf":
+    #    env.copy("../cortex/heap_tlsf.cpp","heap_tlsf.cpp")
+    #elif env["allocator"] == "block":
+    #    env.copy("../cortex/heap_block_allocator.cpp","heap_block_allocator.cpp")
 
 
