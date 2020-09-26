@@ -41,12 +41,12 @@ def get_modules(builder, limit=None):
     targets = []
     for d in raw_targets:
         if d.startswith("stm32"):
-            # filter out temperature key
-            sd = d[:12] + d[13:]
+            # filter out a few keys
+            sd = d[:10] + d[13:]
             if sd not in short_targets:
                 targets.append(d)
                 short_targets.add(sd)
-        elif d.startswith("at"):
+        elif d.startswith("at") or d.startswith("sam"):
             # filter out package
             sd = d.split("-")[0]
             if sd not in short_targets:
@@ -110,10 +110,14 @@ def get_modules(builder, limit=None):
 
                 if o._dependency_handler:
                     for valin in o.values:
-                        valout = o._dependency_handler(o._in(valin))
-                        if valout:
+                        valout = lbuild.utils.listify(o._dependency_handler(o._in(valin)))
+                        if len(valout):
                             opdep = op.addChild("dependency")
-                            opdep.setValue("{} -> {}".format(valin, ("modm" + valout).replace("modmmodm", "modm")))
+                            vconcat = ", ".join(("modm" + v).replace("modmmodm", "modm") for v in valout)
+                            if len(valout) == 1:
+                                opdep.setValue("{} -> {}".format(valin, vconcat))
+                            else:
+                                opdep.setValue("{} -> [{}]".format(valin, vconcat))
 
             for c in init._collectors:
                 cp = m.addChild(c.fullname.split(":")[-1])
@@ -268,6 +272,8 @@ def format_module(modules, node):
     mprops["graph"] = render_dependency_graphs(mprops)
     modules[fullname].append(mprops)
 
+    print(".", end ="", flush=True)
+
     for child in [c for c in node.children if "filename" in c]:
         format_module(modules, child)
 
@@ -285,10 +291,12 @@ if __name__ == "__main__":
           f"Between {min(mlens[0])} and {max(mlens[0])} modules per target.\n"
           f"Up to {max(mlens[1])} options per module.")
 
+    print("Formatting modules", end ="")
     modules = defaultdict(list)
     for c in module_tree.children:
         format_module(modules, c)
 
+    print("\nWriting modules", end ="")
     env = Environment()
     env.line_statement_prefix = '%%'
     module_path = repopath("docs/src/reference/module/")
@@ -306,7 +314,9 @@ if __name__ == "__main__":
             rendered = env.from_string(repopath("docs/module.md.in").read_text()).render({"module": m})
             (module_path / "{}.md".format(url)).write_text(rendered)
             modtable.append("      - \"{}\": \"reference/module/{}.md\"".format(nname.replace("modm:", ":"), url))
+            print(".", end ="", flush=True)
 
+    print("\nWriting module table")
     config_path = Path(repopath("docs/mkdocs.yml"))
     modtable = "\n".join(sorted(modtable))
     config = config_path.read_text()

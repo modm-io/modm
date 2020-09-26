@@ -1,0 +1,80 @@
+/*
+ * Copyright (c) 2020, Erik Henriksson
+ * Copyright (c) 2020, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#include <modm/platform/device.hpp>
+#include <modm/architecture/interface/interrupt.hpp>
+#include "tusb.h"
+
+%% for irq in irqs | sort
+MODM_ISR({{irq}})
+{
+	tud_int_handler({{port}});
+}
+%% endfor
+
+
+extern "C" uint8_t
+tusb_get_device_serial(uint16_t *serial_str)
+{
+	constexpr uint8_t SERIAL_BYTE_LEN = 16;
+
+	uint32_t *id_addresses[4] =
+	{
+%% if target.platform in ["stm32"]
+		((uint32_t *) UID_BASE), ((uint32_t *) UID_BASE) + 1,
+		((uint32_t *) UID_BASE) + 2, ((uint32_t *) UID_BASE) + 3
+%% elif target.platform in ["sam"]
+	%% if "samd51" in target.string
+		(uint32_t *)0x008061FC, (uint32_t *)0x00806010,
+		(uint32_t *)0x00806014, (uint32_t *)0x00806018
+	%% else
+		(uint32_t *)0x0080A00C, (uint32_t *)0x0080A040,
+		(uint32_t *)0x0080A044, (uint32_t *)0x0080A048
+	%% endif
+%% endif
+	};
+
+	uint8_t raw_id[SERIAL_BYTE_LEN];
+
+	for (int i = 0; i < 4; i++)
+		for (int k = 0; k < 4; k++)
+			raw_id[4 * i + (3 - k)] = (*(id_addresses[i]) >> k * 8) & 0xff;
+
+	const auto fn_nibble = [](uint8_t nibble)
+	{
+		return nibble + (nibble > 9 ? 'A' - 10 : '0');
+	};
+
+	for (unsigned int i = 0; i < sizeof(raw_id); i++)
+	{
+		serial_str[i * 2 + 1] = fn_nibble(raw_id[i] & 0xf);
+		serial_str[i * 2] = fn_nibble(raw_id[i] >> 4 & 0xf);
+	}
+
+	return sizeof(raw_id) * 2;
+}
+
+%% if with_debug
+#ifdef CFG_TUSB_DEBUG
+#include <modm/debug.hpp>
+
+extern "C" int
+tinyusb_debug_printf(const char *fmt, ...)
+{
+	va_list va;
+	va_start(va, fmt);
+	modm::log::debug.vprintf(fmt, va);
+	va_end(va);
+	return 0;
+}
+#endif
+%% endif

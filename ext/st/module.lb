@@ -112,6 +112,7 @@ def common_rcc_map(env):
         "folder": folder,
         "define": define,
         "device_header": device_header,
+        "family_header": family_header,
         "system_header": "system_" + family_header,
         "peripherals": peripherals,
     })
@@ -144,6 +145,8 @@ def build(env):
     env.outbasepath = "modm/ext/cmsis/device"
     env.copy(localpath(bprops["folder"], bprops["device_header"]), bprops["device_header"])
     env.copy(localpath(bprops["folder"], bprops["system_header"]), bprops["system_header"])
+    if env.has_module(":tinyusb"): # Requires the family header
+        env.copy(localpath(bprops["folder"], bprops["family_header"]), bprops["family_header"])
 
     env.substitutions = bprops
     env.substitutions.update({

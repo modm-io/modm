@@ -1,0 +1,32 @@
+/*
+ * Copyright (c) 2020, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <modm/platform/device.hpp>
+
+%% for name, value in config.items() | sort
+#define {{name}} {{value}}
+
+%% endfor
+
+#include <modm/architecture/interface/assert.h>
+
+// Redirect TinyUSB asserts to use modm_assert
+#define MODM_ASSERT_1ARGS(_cond) \
+	TU_VERIFY_DEFINE(_cond, modm_assert(0, "tu", \
+		__FILE__ ":" MODM_STRINGIFY(__LINE__) " -> \"" #_cond "\""), false)
+
+#define MODM_ASSERT_2ARGS(_cond, _ret) \
+	TU_VERIFY_DEFINE(_cond, modm_assert_continue_fail(0, "tu", \
+		__FILE__ ":" MODM_STRINGIFY(__LINE__) " -> \"" #_cond "\""), _ret)
+
+#define TU_ASSERT(...) GET_3RD_ARG(__VA_ARGS__, MODM_ASSERT_2ARGS, MODM_ASSERT_1ARGS,UNUSED)(__VA_ARGS__)
