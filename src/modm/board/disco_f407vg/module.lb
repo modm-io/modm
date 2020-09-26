@@ -30,7 +30,8 @@ def prepare(module, options):
         ":platform:core",
         ":platform:gpio",
         ":platform:i2c:1",
-        ":platform:spi:1")
+        ":platform:spi:1",
+        ":platform:usb:fs")
     return True
 
 def build(env):

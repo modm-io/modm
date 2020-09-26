@@ -25,12 +25,13 @@ using namespace modm::literals;
 
 struct SystemClock
 {
-	static constexpr uint32_t Frequency = 1_MHz;
+	static constexpr uint32_t Frequency = 48_MHz;
 	// static constexpr uint32_t Ahb  = Frequency;
 	// static constexpr uint32_t Apba = Frequency;
 	// static constexpr uint32_t Apbb = Frequency;
 	// static constexpr uint32_t Apbc = Frequency;
 
+	static constexpr uint32_t Usb = 48_MHz;
 	// static constexpr uint32_t Adc = Apb2;
 
 	// static constexpr uint32_t SercomSlow = Apb2;
@@ -51,23 +52,44 @@ struct SystemClock
 	static bool inline
 	enable()
 	{
-		// GenericClockController::enableExternalCrystal(Frequency);
-
-		// switch system clock to PLL output
-		// GenericClockController::enableSystemClock(ClockControl::SystemClockSource::Pll);
-
-		// update frequencies for busy-wait delay functions
-		// GenericClockController::updateCoreFrequency<Frequency>();
-
+		GenericClockController::setFlashLatency<Frequency>();
+		GenericClockController::initExternalCrystal();
+		GenericClockController::initDFLL48MHz();
+		GenericClockController::initOsc8MHz();
+		GenericClockController::setSystemClock(ClockSource::DFLL48M);
+		GenericClockController::updateCoreFrequency<Frequency>();
 		return true;
 	}
 };
+
+using ARef	= GpioA03;
+using A0	= GpioA02;
+using A1	= GpioB08;
+using A2	= GpioB09;
+using A3	= GpioA04;
+using A4	= GpioA05;
+using A5	= GpioB02;
+
+using D0  = GpioA11;
+using D1  = GpioA10;
+using D2  = GpioA14;
+using D3  = GpioA09;
+using D4  = GpioA08;
+using D5  = GpioA15;
+using D6  = GpioA20;
+using D7  = GpioA21;
+using D8  = GpioA06;
+using D9  = GpioA07;
+using D10 = GpioA18;
+using D11 = GpioA16;
+using D12 = GpioA19;
+using D13 = GpioA17;
 
 // User LED (inverted, because connected to 3V3)
 using LedD13 = GpioInverted<GpioOutputA17>;
 using LedTx = GpioInverted<GpioOutputA27>;
 using LedRx = GpioInverted<GpioOutputB03>;
-// using Leds = SoftwareGpioPort< LedRed >;
+using Leds = SoftwareGpioPort< LedTx, LedRx >;
 
 using Button = GpioUnused;
 
@@ -77,9 +99,14 @@ initialize()
 	SystemClock::enable();
 	SysTickTimer::initialize<SystemClock>();
 
-	LedD13::setOutput(modm::Gpio::Low);
-	LedTx::setOutput(modm::Gpio::Low);
-	LedRx::setOutput(modm::Gpio::Low);
+	Leds::setOutput(modm::Gpio::Low);
+}
+
+inline void
+initializeUsbFs()
+{
+	modm::platform::Usb::initialize<Board::SystemClock>();
+	modm::platform::Usb::connect<GpioA24::Dm, GpioA25::Dp>();
 }
 
 } // Board namespace

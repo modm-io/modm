@@ -75,6 +75,8 @@ struct SystemClock {
 	static constexpr uint32_t Timer13 = Apb1Timer;
 	static constexpr uint32_t Timer14 = Apb1Timer;
 
+	static constexpr uint32_t Usb = 48_MHz;
+
 	static bool inline
 	enable()
 	{
@@ -82,7 +84,8 @@ struct SystemClock {
 		const Rcc::PllFactors pllFactors{
 			.pllM = 4,		// 8MHz / M=4 -> 2MHz
 			.pllN = 168,	// 2MHz * N=168 -> 336MHz
-			.pllP = 2		// 336MHz / P=2 -> 168MHz = F_cpu
+			.pllP = 2,		// 336MHz / P=2 -> 168MHz = F_cpu
+			.pllQ = 7		// 336MHz / Q=7 ->  48MHz = F_usb
 		};
 		Rcc::enablePll(Rcc::PllSource::ExternalCrystal, pllFactors);
 		// set flash latency for 168MHz
@@ -154,14 +157,15 @@ using Dout = GpioInputC3;	// PDM_OUT: I2S2_SD
 
 namespace usb
 {
+using Vbus = GpioInputA9;	// VBUS_FS: USB_OTG_HS_VBUS
+using Id = GpioA10;			// OTG_FS_ID: USB_OTG_FS_ID
 using Dm = GpioA11;			// OTG_FS_DM: USB_OTG_FS_DM
 using Dp = GpioA12;			// OTG_FS_DP: USB_OTG_FS_DP
-using Id = GpioA10;			// OTG_FS_ID: USB_OTG_FS_ID
 
-using Overcurrent = GpioD5;	// OTG_FS_OverCurrent
-using Power = GpioOutputC0;	// OTG_FS_PowerSwitchOn
-using VBus = GpioInputA9;	// VBUS_FS: USB_OTG_HS_VBUS
-//using Device = UsbFs;
+using Overcurrent = GpioInputD5;	// OTG_FS_OverCurrent
+using Power = GpioOutputC0;			// OTG_FS_PowerSwitchOn
+
+using Device = UsbFs;
 }
 
 
@@ -171,10 +175,7 @@ initialize()
 	SystemClock::enable();
 	SysTickTimer::initialize<SystemClock>();
 
-	LedOrange::setOutput(modm::Gpio::Low);
-	LedGreen::setOutput(modm::Gpio::Low);
-	LedRed::setOutput(modm::Gpio::Low);
-	LedBlue::setOutput(modm::Gpio::Low);
+	Leds::setOutput(modm::Gpio::Low);
 
 	Button::setInput();
 	Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);
@@ -220,18 +221,17 @@ initializeMp45()
 //	mp45::Dout::connect(mp45::I2sMaster::Sd);
 }
 
-/// not supported yet, due to missing USB driver
 inline void
-initializeUsb()
+initializeUsbFs()
 {
-//	usb::Dm::connect(usb::Device::Dm);
-//	usb::Dp::connect(usb::Device::Dp);
-//	usb::Id::connect(usb::Device::Id);
+	usb::Device::initialize<SystemClock>();
+	usb::Device::connect<usb::Dm::Dm, usb::Dp::Dp, usb::Id::Id>();
 
-	usb::Power::setOutput(Gpio::OutputType::PushPull, Gpio::OutputSpeed::MHz2);
-
-	usb::Overcurrent::setInput(Gpio::InputType::Floating);
-	usb::VBus::setInput(Gpio::InputType::Floating);
+	usb::Overcurrent::setInput();
+	usb::Vbus::setInput();
+	// Enable VBUS sense (B device) via pin PA9
+	USB_OTG_FS->GCCFG &= ~USB_OTG_GCCFG_NOVBUSSENS;
+	USB_OTG_FS->GCCFG |= USB_OTG_GCCFG_VBUSBSEN;
 }
 
 }
