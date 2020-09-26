@@ -128,7 +128,8 @@ Rcc::enable()
 			RCC->{{rcc_reset[st_per]}} |= RCC_{{rcc_reset[st_per]}}_{{st_per}}RST; __DSB();
 			RCC->{{rcc_reset[st_per]}} &= ~RCC_{{rcc_reset[st_per]}}_{{st_per}}RST;{% endif %}{% if peripheral == "Eth" %} __DSB();
 			RCC->{{bus}} |= RCC_{{bus}}_{{st_per}}RXEN; __DSB();
-			RCC->{{bus}} |= RCC_{{bus}}_{{st_per}}TXEN;{% endif %}
+			RCC->{{bus}} |= RCC_{{bus}}_{{st_per}}TXEN;{% elif peripheral == "Usbotghs" %} __DSB();
+			RCC->{{bus}} |= RCC_{{bus}}_{{st_per}}ULPIEN;{% endif %}
 		}
 	%% endfor
 	__DSB();
@@ -146,7 +147,8 @@ Rcc::disable()
 	if constexpr (peripheral == Peripheral::{{ peripheral }})
 		RCC->{{bus}} &= ~RCC_{{bus}}_{{st_per}}EN;{% if peripheral == "Eth" %} __DSB();
 		RCC->{{bus}} &= ~RCC_{{bus}}_{{st_per}}RXEN; __DSB();
-		RCC->{{bus}} &= ~RCC_{{bus}}_{{st_per}}TXEN;{% endif %}
+		RCC->{{bus}} &= ~RCC_{{bus}}_{{st_per}}TXEN;{% elif peripheral == "Usbotghs" %} __DSB();
+		RCC->{{bus}} &= ~RCC_{{bus}}_{{st_per}}ULPIEN;{% endif %}
 	%% endfor
 	__DSB();
 }

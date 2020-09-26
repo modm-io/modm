@@ -74,7 +74,7 @@ def build(env):
 
     all_peripherals = set()
     all_drivers = [d for d in device._properties["driver"] if d["name"] not in ["gpio", "core"]]
-    translate = lambda s: "".join(p.capitalize() for p in s.split("_"))
+    translate = lambda s: s.replace("_", "").capitalize()
     for d in all_drivers:
         dname = translate(d["name"])
         if "instance" in d:
@@ -103,6 +103,11 @@ def build(env):
             nper = "DSI"
         if "Eth" in all_peripherals and per == "ETHMAC":
             per = "Eth"
+        # Fix USBOTG OTG
+        if "Usbotgfs" in all_peripherals and per.startswith("OTG"):
+            if per == "OTGH": per = "OTGHS";
+            per = "USB"+per
+            # print(per, mode)
         if per.capitalize() not in all_peripherals:
             continue
         if "EN" in mode:
