@@ -47,13 +47,15 @@ class Assert(Module):
         module.description = FileReader("interface/assert.md")
 
     def prepare(self, module, options):
+        platform = options[":target"].identifier.platform
         module.add_option(
-            BooleanOption(name="with_description",
-                          default=options[":target"].identifier.platform in ["hosted"],
-                          description=Assert.with_description_descr))
+            EnumerationOption(name="with_description",
+                              description=Assert.with_description_descr,
+                              default="release" if platform == "hosted" else "debug",
+                              enumeration=["off", "debug", "release"]))
 
         module.depends(":architecture:register")
-        if options[":target"].identifier.platform in ["avr"]:
+        if platform == "avr":
             module.depends(":architecture:accessor")
         return True
 

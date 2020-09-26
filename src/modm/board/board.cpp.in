@@ -35,11 +35,11 @@ modm_abandon(const modm::AssertionInfo &info)
 		MODM_LOG_ERROR << " @ " << (void *) info.context <<
 						 " (" << (uint32_t) info.context << ")";
 	}
-	%% if options.get(":architecture:assert:with_description", False)
+	#if MODM_ASSERTION_INFO_HAS_DESCRIPTION
 	MODM_LOG_ERROR << " failed!\n  " << info.description << "\nAbandoning...\n";
-	%% else
+	#else
 	MODM_LOG_ERROR << " failed!\nAbandoning...\n";
-	%% endif
+	#endif
 %% else
 	(void)info;
 %% endif
