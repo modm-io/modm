@@ -53,11 +53,7 @@ def build(env):
     properties["loops"] = loops
 
     # TODO: Move this data into the device files
-    properties["usbprescaler"] = (
-        (target["family"] == "f0" and target["name"] in ["42", "48", "70", "72", "78"]) or
-        (target["family"] == "f1" and target["name"] in ["02", "03"]) or
-        (target["family"] == "f3" and (target["name"] in ["02", "73"] or
-            (target["name"] in ["03"] and target["size"] in ["b", "c", "d", "e"]))))
+    properties["usbprescaler"] = device.has_driver("usb") and target.family in ["f0", "f1", "f3"]
     properties["pllprediv"] = \
         (target["family"] in ["f0", "f3"] or (target["family"] == "f1" and target["name"] in ["00", "05", "07"]))
     properties["pllprediv2"] = False    # FIXME: not sure what value this should have
