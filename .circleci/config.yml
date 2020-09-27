@@ -179,6 +179,20 @@ jobs:
           command: |
             (cd test && make compile-mega-2560-pro)
 
+  riscv-examples:
+    docker:
+      - image: modm/modm-build:riscv-gcc
+    steps:
+      - checkout
+      - run:
+          name: Checkout code and update modm tools
+          command: |
+            (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - run:
+          name: Examples RISC-V
+          command: |
+            (cd examples && ../tools/scripts/examples_compile.py hifive1) # red-v-thing-plus
+
   avr-compile-all:
     docker:
       - image: modm/modm-build:avr
@@ -383,6 +397,23 @@ jobs:
           path: test/all/log
           destination: log
 
+  riscv-compile-all:
+    docker:
+      - image: modm/modm-build:riscv-gcc
+    steps:
+      - checkout
+      - run:
+          name: Checkout code and update modm tools
+          command: |
+            (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - run:
+          name: Compile HAL for all RISC-V
+          command: |
+            (cd test/all && python3 run_all.py fe310)
+      - store_artifacts:
+          path: test/all/log
+          destination: log
+
   build-docs:
     docker:
       - image: modm/modm-build:base
@@ -486,6 +517,10 @@ workflows:
           filters:
             branches:
               ignore: /^develop.*/
+      - riscv-examples:
+          filters:
+            branches:
+              ignore: /^develop.*/
 
       # Compile all targets
       - avr-compile-all:
@@ -567,6 +602,13 @@ workflows:
           requires:
             - unittests-linux-generic
             - stm32-examples
+          filters:
+            branches:
+              ignore: /^develop.*/
+      - riscv-compile-all:
+          requires:
+            - unittests-linux-generic
+            - riscv-examples
           filters:
             branches:
               ignore: /^develop.*/
