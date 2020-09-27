@@ -1,0 +1,12 @@
+<library>
+  <extends>modm:blue-pill</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/stm32f103c8t6_blue_pill/graphics</option>
+    <option name="modm:build:openocd.cfg">openocd.cfg</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:driver:ili9341</module>
+    <module>modm:platform:spi:1</module>
+  </modules>
+</library>

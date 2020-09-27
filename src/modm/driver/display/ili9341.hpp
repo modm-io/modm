@@ -162,7 +162,7 @@ public:
 	using Rotation = ili9341::Rotation;
 	using DisplayMode = ili9341::DisplayMode;
 
-	template<bool B= std::is_default_constructible_v<Interface>, std::enable_if_t<B> = 0>
+	template<bool B=std::is_default_constructible_v<Interface>, std::enable_if_t<B, bool> = 0>
 	Ili9341(): Interface()
 	{
 		Reset::setOutput(modm::Gpio::High);
