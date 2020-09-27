@@ -9,8 +9,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "../device.hpp"
-#include "hardware_init.hpp"
+//#include "../device.hpp"
+//#include "hardware_init.hpp"
 #include "delay_impl.hpp"
 
 namespace modm
@@ -29,7 +29,7 @@ delay_us(uint32_t us)
 
 	// Very very rough estimate:
 	us *= 10000;
-	for(uint32_t i; i < us; i++) {
+	for(uint32_t i = 0; i < us; i++) {
 		asm("nop");
 	}
 }

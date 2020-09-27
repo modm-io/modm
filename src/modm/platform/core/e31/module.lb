@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2019, Benjamin Weps
+# Copyright (c) 2020, Raphael Lehmann
 #
 # This file is part of the modm project.
 #
@@ -82,6 +83,15 @@ def prepare(module, options):
             maximum=hex(flash_size),
             default=0))
 
+    module.add_option(
+        PathOption(
+            name="linkerscript.override",
+            description="Path to project provided linkerscript",
+            default="",
+            empty_ok=True,
+            absolute=False,
+        ))
+
     return True
 
 def build(env):
@@ -100,18 +110,33 @@ def build(env):
     env.substitutions["with_fault_storage"] = env.has_module(":platform:fault")
     env.substitutions["with_assert"] = env.has_module(":architecture:assert")
 
+    #env.collect(":build:linkflags", "-L{project_source_dir}")
+    # Linkerscript
     env.outbasepath = "modm/link"
     env.template("linkerscript.ld.in")
+    linkerscript_override_option = env["linkerscript.override"]
+    if linkerscript_override_option:
+        env.collect(":build:linkflags", "-T{}".format(linkerscript_override_option))
+    else:
+        env.collect(":build:linkflags", "-Tmodm/link/linkerscript.ld")
+
 
     env.outbasepath = "modm/src/modm/platform/core"
     env.copy("entry.S")
     env.copy("startup.c")
     env.copy("flash_reader.hpp")
-    env.copy("clock.cpp")
+    env.collect(":build:linkflags", "-nostartfiles")
 
+    # Heap table from linkerscript
     if env.has_module(":architecture:memory"):
-        env.template("../cortex/heap_table.cpp.in","heap_table.cpp")
-        env.template("../cortex/heap_table.hpp.in","heap_table.hpp")
+        env.template("../cortex/heap_table.cpp.in", "heap_table.cpp")
+        env.template("../cortex/heap_table.hpp.in", "heap_table.hpp")
+    # Deprecate malloc and new if no heap is implemented!
+    if not env.has_module(":platform:heap"):
+         # See :platform:heap for explanation
+        env.substitutions["no_heap_section"] = (".Heap_is_not_implemented!__"
+        "Please_include_the__modm:platform:heap__module_in_your_project!")
+        env.template("../../heap/cortex/no_heap.c.in", "no_heap.c")
 
     #if env.has_module(":architecture:accessor"):
     env.copy("../cortex/flash_reader_impl.hpp","flash_reader_impl.hpp")
@@ -127,12 +152,10 @@ def build(env):
         env.template("delay.cpp.in")
         env.template("delay_impl.hpp.in")
 
-    # everything to do with dynamic memory
-    #if env["allocator"] == "newlib":
-    #    env.copy("../cortex/heap_newlib.cpp","heap_newlib.cpp")
-    #elif env["allocator"] == "tlsf":
-    #    env.copy("../cortex/heap_tlsf.cpp","heap_tlsf.cpp")
-    #elif env["allocator"] == "block":
-    #    env.copy("../cortex/heap_block_allocator.cpp","heap_block_allocator.cpp")
+    # GNU Build ID
+    env.collect(":build:linkflags", "-Wl,--build-id=sha1")
+    # TODO
+    #if env.has_module(":architecture:build_id"):
+    #    env.copy("build_id.cpp")
 
-
+    env.collect(":build:archflags", "-march=rv32imac", "-mabi=ilp32")

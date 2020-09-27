@@ -18,7 +18,7 @@ main()
 {
 	Board::initialize();
 
-	modm::ShortPeriodicTimer timer(500);
+	modm::ShortPeriodicTimer timer(500ms);
 
 	LedRed::set();
 	LedGreen::set();

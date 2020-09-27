@@ -14,19 +14,19 @@
 #define RTC_COUNT_LO *((volatile uint32_t *)0x10000048)
 #define RTC_COUNT_HI *((volatile uint32_t *)0x1000004C)
 
-modm::Clock::Type modm::Clock::time;
 
-template< typename TimestampType >
-TimestampType
-modm::Clock::now()
+modm::chrono::milli_clock::time_point modm_weak
+modm::chrono::milli_clock::now() noexcept
 {
     uint64_t ctrVal = RTC_COUNT_HI;
     ctrVal = ctrVal << 32;
     ctrVal |= RTC_COUNT_LO;
-    time = static_cast<uint32_t>(ctrVal/33);
-	return TimestampType(time);
+	return time_point{duration{static_cast<uint32_t>(ctrVal/33)}};
 }
 
-// explicit declaration of what member function templates we need to generate
-template modm::ShortTimestamp modm::Clock::now();
-template modm::Timestamp modm::Clock::now();
+modm::chrono::micro_clock::time_point modm_weak
+modm::chrono::micro_clock::now() noexcept
+{
+	uint32_t time = 0;
+	return time_point{duration{time}};
+}

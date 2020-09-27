@@ -106,6 +106,12 @@ void __modm_startup(void)
 	extern int main(void);
 	main();
 
+//%% if with_assert
 	// If main exits, assert here in debug mode
-	modm_assert_debug(0, "core", "main", "exit");
+	(void) modm_assert_continue_fail_debug(0,
+			"main.exit", "The main() function returned!");
+//%% endif
+
+	// Otherwise reset
+	// TODO
 }

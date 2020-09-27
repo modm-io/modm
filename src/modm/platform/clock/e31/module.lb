@@ -32,6 +32,8 @@ def build(env):
     env.substitutions = properties
     env.outbasepath = "modm/src/modm/platform/clock"
 
-    env.template("clock.cpp")
-    env.template("clock.hpp")
+    env.copy("clock.cpp")
+    env.copy("clock.hpp")
+
+    env.copy("rtc_clock.cpp")
 
