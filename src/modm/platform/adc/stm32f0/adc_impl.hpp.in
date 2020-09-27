@@ -21,8 +21,8 @@
 #include <modm/math/algorithm/prescaler.hpp>
 
 
-template< class SystemClock, modm::platform::Adc{{ id }}::ClockMode mode,
-		  modm::frequency_t frequency, modm::percent_t tolerance >
+template< class SystemClock, modm::frequency_t frequency, modm::percent_t tolerance,
+          modm::platform::Adc{{ id }}::ClockMode mode >
 void
 modm::platform::Adc{{ id }}::initialize()
 {

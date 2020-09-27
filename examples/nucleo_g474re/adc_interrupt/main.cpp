@@ -21,6 +21,8 @@ using namespace modm::literals;
 int
 main()
 {
+	using namespace modm::platform;
+
 	Board::initialize();
 
 	MODM_LOG_INFO << "STM32G4 ADC interrupt example" << modm::endl;
@@ -48,39 +50,35 @@ main()
 	Adc1::setChannelSampleTime(Adc1::Channel::Channel3, Adc1::SampleTime::Cycles641);
 	Adc1::setChannelSampleTime(Adc1::Channel::Channel4, Adc1::SampleTime::Cycles641);
 
-	Adc1::setInjectedChannel(std::array<Adc1::Channel, 2>{Adc1::Channel::Channel1, Adc1::Channel::Channel2});
+	//Adc1::setInjectedChannel(std::array<Adc1::Channel, 2>{Adc1::Channel::Channel1, Adc1::Channel::Channel2});
 	Adc1::setChannel(std::array<Adc1::Channel, 2>{Adc1::Channel::Channel3, Adc1::Channel::Channel4});
 
-	Adc1::setInjectedTrigger(Adc1::TriggerMode::BothEdges, Adc1::TriggerSourceInjected::Tim1Trgo2);
+	//Adc1::setInjectedTrigger(Adc1::TriggerMode::BothEdges, Adc1::TriggerSourceInjected::Tim1Trgo2);
 
 	Adc1::enableInterruptVector(5);
+	Adc1::enableInterrupt(Adc1::Interrupt::EndOfSampling);
 	Adc1::enableInterrupt(Adc1::Interrupt::EndOfRegularConversion);
 	Adc1::enableInterrupt(Adc1::Interrupt::EndOfRegularSequenceOfConversions);
 	Adc1::enableInterrupt(Adc1::Interrupt::EndOfInjectedConversion);
 	Adc1::enableInterrupt(Adc1::Interrupt::EndOfInjectedSequenceOfConversions);
 	MODM_LOG_INFO << " finished." << modm::endl;
 
+	/*
 	MODM_LOG_INFO << "Configuring Timer 1 ...";
 	Timer1::enable();
-	Timer1::pause();
 	Timer1::setMode(Timer1::Mode::UpCounter);
-	// Timer 1 runs at 170_MHz / prescaler=17000 = 10kHz
-	Timer1::setPrescaler(17000);
-	// Timer over with 1_Hz = 10kHz / overflow=10000
-	Timer1::setOverflow(10000);
-	Timer1::setCompareValue(4, 100);
-	//Timer1::enableInterrupt(Timer1::Interrupt::CaptureCompare4);
-	//Timer1::enableInterruptVector(Timer1::Interrupt::CaptureCompare4, true, 10);
-	//Timer1::enableInterrupt(Timer1::Interrupt::Update);
-	//Timer1::enableInterruptVector(Timer1::Interrupt::Update, true, 10);
+
+	Timer1::setPeriod<Board::SystemClock>(1'500'000);
+	Timer1::enableInterruptVector(Timer1::Interrupt::Update, true, 10);
+	Timer1::enableInterrupt(Timer1::Interrupt::Update);
 
 	// Trigger output for ADC
 	TIM1->CR2 |= (0b1100 << TIM_CR2_MMS2_Pos);
-	//TIM1->CR2 |= (0b??? << TIM_CR2_MMS_Pos);
 	
 	Timer1::applyAndReset();
 	Timer1::start();
-	Timer1::enableOutput();
+	//Timer1::enableOutput();
+	*/
 
 	MODM_LOG_INFO << " finished." << modm::endl;
 
@@ -92,8 +90,8 @@ main()
 		MODM_LOG_INFO << "Triggering a regular conversion sequence from software." << modm::endl;
 		Adc1::startConversion();
 		Adc1::startInjectedConversion();
-		modm::delayMilliseconds(500);
-		MODM_LOG_INFO << "ADC1->JSQR=" << modm::bin << static_cast<uint32_t>(ADC1->JSQR) << modm::ascii << "\n";
+		modm::delayMilliseconds(5000);
+		//MODM_LOG_INFO << "ADC1->JSQR=" << modm::bin << static_cast<uint32_t>(ADC1->JSQR) << modm::ascii << "\n";
 	}
 
 	return 0;
@@ -101,36 +99,33 @@ main()
 
 MODM_ISR(ADC1_2)
 {
-	MODM_LOG_DEBUG << "Entry Adc1::getInterruptFlags() = " << modm::bin << Adc1::getInterruptFlags() << modm::ascii << "\n";
-	MODM_LOG_DEBUG << "Entry Adc2::getInterruptFlags() = " << modm::bin << Adc2::getInterruptFlags() << modm::ascii << "\n";
+	//MODM_LOG_DEBUG << "Entry Adc1::getInterruptFlags() = " << modm::bin << Adc1::getInterruptFlags() << modm::ascii << "\n";
+	//MODM_LOG_DEBUG << "Entry Adc2::getInterruptFlags() = " << modm::bin << Adc2::getInterruptFlags() << modm::ascii << "\n";
 
 	if (Adc1::getInterruptFlags() & Adc1::InterruptFlag::EndOfSampling) {
-		MODM_LOG_DEBUG << "ACK EndOfSampling\n";
+		MODM_LOG_DEBUG << "ADC: EndOfSampling\n";
 		Adc1::acknowledgeInterruptFlag(Adc1::InterruptFlag::EndOfSampling);
 	}
 	if (Adc1::getInterruptFlags() & Adc1::InterruptFlag::EndOfRegularConversion) {
-		MODM_LOG_DEBUG << "ACK EndOfRegularConversion\n";
+		MODM_LOG_DEBUG << "ADC: EndOfRegularConversion\n";
 		Adc1::acknowledgeInterruptFlag(Adc1::InterruptFlag::EndOfRegularConversion);
-		MODM_LOG_DEBUG << "Interrupt: regularValue=" << Adc1::getValue() << "\n";
+		//MODM_LOG_DEBUG << "Interrupt: regularValue=" << Adc1::getValue() << "\n";
 	}
-
-	MODM_LOG_DEBUG << "Middle Adc1::getInterruptFlags() = " << modm::bin << Adc1::getInterruptFlags() << modm::ascii << "\n";
-
 	if (Adc1::getInterruptFlags() & Adc1::InterruptFlag::EndOfRegularSequenceOfConversions) {
-		MODM_LOG_DEBUG << "ACK EndOfRegularSequenceOfConversions\n";
+		MODM_LOG_DEBUG << "ADC: EndOfRegularSequenceOfConversions\n";
 		Adc1::acknowledgeInterruptFlag(Adc1::InterruptFlag::EndOfRegularSequenceOfConversions);
-		MODM_LOG_DEBUG << "Interrupt: regularValue=" << Adc1::getValue() << "\n";
+		//MODM_LOG_DEBUG << "Interrupt: regularValue=" << Adc1::getValue() << "\n";
 	}
 	if (Adc1::getInterruptFlags() & Adc1::InterruptFlag::EndOfInjectedConversion) {
 		Adc1::acknowledgeInterruptFlag(Adc1::InterruptFlag::EndOfInjectedConversion);
-		MODM_LOG_DEBUG << "ACK EndOfInjectedConversion\n";
+		MODM_LOG_DEBUG << "ADC: EndOfInjectedConversion\n";
 	}
 	if (Adc1::getInterruptFlags() & Adc1::InterruptFlag::EndOfInjectedSequenceOfConversions) {
 		Adc1::acknowledgeInterruptFlag(Adc1::InterruptFlag::EndOfInjectedSequenceOfConversions);
-		MODM_LOG_DEBUG << "ACK EndOfInjectedSequenceOfConversions\n";
+		MODM_LOG_DEBUG << "ADC: EndOfInjectedSequenceOfConversions\n";
 	}
-	MODM_LOG_DEBUG << "Exit Adc1::getInterruptFlags() = " << modm::bin << Adc1::getInterruptFlags() << modm::ascii << "\n";
-	Adc1::acknowledgeInterruptFlag(Adc1::InterruptFlag_t{0xffff'ffff});
+	MODM_LOG_DEBUG << "MODM_ISR(ADC1_2) exit Adc1::getInterruptFlags() = " << modm::bin << Adc1::getInterruptFlags() << modm::ascii << "\n";
+	//Adc1::acknowledgeInterruptFlag(Adc1::InterruptFlag_t{0xffff'ffff});
 	__DSB();
 }
 

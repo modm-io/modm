@@ -1,0 +1,10 @@
+<library>
+  <extends>modm:nucleo-g474re</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_g474re/timer_interrupt</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:timer:1</module>
+  </modules>
+</library>

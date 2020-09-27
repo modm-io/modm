@@ -124,6 +124,8 @@ public:
 
 %% if clock_mux
 	// ADCs clock source selection
+	// Warning: One clock MUX is shared between ADCs 1 and 2,
+	//  another mux sharded between ADCs 3, 4 and 5
 	enum class ClockSource : uint32_t
 	{
 		NoClock = 0, // No clock selected.
@@ -141,6 +143,15 @@ public:
 		SystemClock = RCC_CCIPR_ADCSEL_1 | RCC_CCIPR_ADCSEL_0, // System clock selected as ADCs clock
 %% endif
 	};
+%% if target["family"] in ["g4"]
+%% if id in [1, 2]
+	static constexpr uint32_t ClockSourceMsk = RCC_CCIPR_ADC12SEL_Msk;
+%% elif id in [3, 4, 5]
+	static constexpr uint32_t ClockSourceMsk = RCC_CCIPR_ADC345SEL_Msk;
+%% endif
+%% else
+	static constexpr uint32_t ClockSourceMsk = RCC_CCIPR_ADCSEL_Msk;
+%% endif
 %% endif
 
 	// Prescaler of the Asynchronous ADC clock
@@ -515,6 +526,7 @@ public:
 	 * 		This parameter is only taken into account
 	 * 		if clk == ClockMode::Asynchronous.
 	 */
+/*
 	static inline void
 	initialize(	const ClockMode clk = ClockMode::DoNotChange,
 %% if clock_mux
@@ -523,6 +535,17 @@ public:
 				const Prescaler pre = Prescaler::Disabled,
 				const CalibrationMode cal = CalibrationMode::DoNotCalibrate,
 				const bool blocking = true);
+*/
+	template< class SystemClock
+			, modm::frequency_t frequency
+			, modm::percent_t tolerance
+			, modm::platform::Adc{{ id }}::ClockMode clk
+	%% if clock_mux
+			, modm::platform::Adc{{ id }}::ClockSource clk_src
+	%% endif
+			>
+	static void
+	initialize();
 
 	static inline void
 	disable(const bool blocking = true);

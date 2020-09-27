@@ -133,6 +133,35 @@ class Instance(Module):
         env.template("adc_impl.hpp.in", "adc_{}_impl.hpp".format(self.instance))
 
 
+
+class InstanceCommon(Module):
+    def __init__(self, instance):
+        self.instance = instance
+
+    def init(self, module):
+        module.name = str(self.instance)
+        module.description = "Common configuration for ADC{}".format(self.instance)
+
+    def prepare(self, module, options):
+        module.depends(":platform:adc")
+        return True
+
+    def build(self, env):
+        device = env[":target"]
+        driver = device.get_driver("adc")
+
+        properties = device.properties
+        properties["target"] = target = device.identifier
+        instance_id = int(self.instance)
+        properties["id"] = instance_id
+
+        env.substitutions = properties
+        env.outbasepath = "modm/src/modm/platform/adc"
+
+        env.template("adc.hpp.in", "adc_{}.hpp".format(self.instance))
+        env.template("adc_impl.hpp.in", "adc_{}_impl.hpp".format(self.instance))
+
+
 def init(module):
     module.name = ":platform:adc"
     module.description = "Analog-to-Digital Converter (ADC)"
