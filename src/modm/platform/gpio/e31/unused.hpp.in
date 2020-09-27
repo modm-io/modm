@@ -1,0 +1,46 @@
+/*
+ * Copyright (c) 2020, Raphael Lehmann
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include "base.hpp"
+#include <modm/architecture/interface/gpio.hpp>
+
+namespace modm::platform
+{
+
+/**
+ * @author	Raphael Lehmann
+ * @ingroup	modm_platform_gpio
+ */
+class GpioUnused : public Gpio, public ::modm::GpioIO
+{
+public:
+	inline static void setOutput() { }
+	inline static void set() { }
+	inline static void reset() { }
+	inline static void set(bool /*status*/) { }
+	inline static void setOutput(bool /*status*/) { }
+	inline static void setInverted(bool /*inverted*/) { }
+	inline static void toggle() { }
+	inline static bool isSet() { return false; }
+	inline static void setInput() { }
+	inline static void setInput(InputType /*type*/) { }
+	inline static bool read() { return false; }
+	inline static void enableExternalInterrupt(const InputTrigger /*trigger*/) { }
+	inline static void disableExternalInterrupt(const InputTrigger /*trigger*/) { }
+	inline static bool getExternalInterruptFlag(const InputTrigger /*trigger*/) { return false; }
+	inline static void acknowledgeExternalInterruptFlag(const InputTrigger /*trigger*/) { }
+	inline static void setAlternateFunction(uint8_t /*af*/) { }
+	inline static void disconnect() { }
+};
+
+}

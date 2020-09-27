@@ -34,3 +34,15 @@ def build(env):
 
     env.copy("gpio_base.hpp")
     env.template("gpio.hpp.in")
+
+    env.template("base.hpp.in")
+
+    env.template("unused.hpp.in")
+
+    env.copy("../common/inverted.hpp", "inverted.hpp")
+    env.copy("../common/connector.hpp", "connector.hpp")
+    env.template("../common/connector_detail.hpp.in", "connector_detail.hpp")
+
+    # FIXME: Move to modm:platform:core!
+    env.outbasepath = "modm/src/modm/platform/core"
+    env.template("peripherals.hpp.in")
