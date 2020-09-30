@@ -318,9 +318,9 @@ public:
 %% if target.family in ["f0"]
 	static constexpr uint8_t TS_CAL2_TEMP{110};
 	static constexpr uint16_t VDDA_CAL{3300};
-	static inline volatile uint16_t *const VREFINT_CAL{(volatile uint16_t *)0x1FFFF7BA};
-	static inline volatile uint16_t *const TS_CAL1{(volatile uint16_t *)0x1FFF77B8};
-	static inline volatile uint16_t *const TS_CAL2{(volatile uint16_t *)0x1FFF77C2};
+	static inline volatile uint16_t *const VREFINT_CAL{(volatile uint16_t *)0x1FFF'F7BA};
+	static inline volatile uint16_t *const TS_CAL1{(volatile uint16_t *)0x1FFF'F7B8};
+	static inline volatile uint16_t *const TS_CAL2{(volatile uint16_t *)0x1FFF'F7C2};
 %% else
 	static constexpr uint8_t TS_CAL2_TEMP{130};
 	static constexpr uint16_t VDDA_CAL{3000};
