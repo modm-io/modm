@@ -1,0 +1,310 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2020, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+from pathlib import Path
+from collections import defaultdict
+tusb_config = {}
+
+# -----------------------------------------------------------------------------
+def init(module):
+    module.name = ":tinyusb"
+    module.description = FileReader("module.md")
+
+def prepare(module, options):
+    if not (options[":target"].has_driver("usb") or
+            options[":target"].has_driver("usb_otg_fs") or
+            options[":target"].has_driver("usb_otg_hs")):
+        return False
+
+    configs = {"device.cdc", "device.msc", "device.vendor", "device.midi", "device.dfu"}
+    # TODO: Allow all device classes
+    # configs  = {"device.{}".format(p.parent.name)
+    #            for p in Path(localpath("tinyusb/src/class/")).glob("*/*_device.h")}
+    # TODO: Allow all host classes
+    # configs |= {"host.{}".format(p.parent.name)
+    #            for p in Path(localpath("tinyusb/src/class/")).glob("*/*_host.h")}
+
+    module.add_list_option(
+            EnumerationOption(name="config",
+                              description="Endpoint Configuration",
+                              enumeration=sorted(configs),
+                              dependencies=lambda vs:
+                                    [":tinyusb:{}".format(v.replace(".", ":")) for v in vs]))
+
+    if options[":target"].has_driver("usb_otg_hs"):
+        module.add_option(
+                EnumerationOption(name="speed",
+                                  description="USB Port Speed",
+                                  enumeration={"full": "fs", "high": "hs"},
+                                  default="full",
+                                  dependencies=lambda s: ":platform:usb:{}s".format(s[0])))
+
+    module.add_submodule(TinyUsbDeviceModule())
+    module.add_submodule(TinyUsbHostModule())
+    module.depends(":cmsis:device", ":architecture:interrupt", ":platform:usb")
+    return True
+
+
+def validate(env):
+    if env.has_module(":tinyusb:device") and env.has_module(":tinyusb:host"):
+        raise ValidateException("TinyUSB won't let you use both Device *and* Host at the same time!")
+
+
+def build(env):
+    env.collect(":build:path.include", "modm/ext/tinyusb/")
+    env.outbasepath = "modm/ext/tinyusb"
+
+    env.copy("tinyusb/src/tusb.h", "tusb.h")
+    env.copy("tinyusb/src/tusb_option.h", "tusb_option.h")
+    env.copy("tinyusb/src/osal/osal.h", "osal/osal.h")
+    env.copy("tinyusb/src/common", "common/")
+    env.copy("tinyusb/src/tusb.c", "tusb.c")
+
+    """ Generic config defaults:
+    - CFG_TUSB_CONFIG_FILE  = tusb_config.h
+    - CFG_TUSB_DEBUG        = 0
+    - CFG_TUSB_DEBUG_PRINTF = [undef]
+    - CFG_TUSB_MCU          = OPT_MCU_NONE
+    - CFG_TUSB_MEM_ALIGN    = __attribute__((aligned(4)))
+    - CFG_TUSB_MEM_SECTION  = [empty] # FIXME
+    - CFG_TUSB_OS           = OPT_OS_NONE
+    - CFG_TUSB_RHPORT0_MODE = OPT_MODE_NONE
+    - CFG_TUSB_RHPORT1_MODE = OPT_MODE_NONE
+    """
+    global tusb_config
+
+    target = env[":target"].identifier
+    if target.platform == "stm32":
+        tusb_config["CFG_TUSB_MCU"] = "OPT_MCU_STM32{}".format(target.family.upper())
+        # TODO: use modm-devices driver type for this
+        fs_dev = (target.family in ["f0", "f3", "l0"] or
+                 (target.family == "f1" and target.name <= "03"))
+        if fs_dev:
+            # PMA buffer size: 512B or 1024B
+            env.copy("tinyusb/src/portable/st/stm32_fsdev/", "portable/st/stm32_fsdev/")
+        else:
+            env.copy("tinyusb/src/portable/st/synopsys", "portable/st/synopsys/")
+
+    elif target.platform == "sam":
+        if target.family == "g":
+            tusb_config["CFG_TUSB_MCU"] = "OPT_MCU_SAMG"
+            env.copy("tinyusb/src/portable/microchip/samg/", "portable/microchip/samg/")
+        else:
+            tusb_config["CFG_TUSB_MCU"] = "OPT_MCU_SAM{}{}".format(target.family.upper(), target.series.upper())
+            env.copy("tinyusb/src/portable/microchip/samd/", "portable/microchip/samd/")
+
+    if env.has_module(":freertos"):
+        tusb_config["CFG_TUSB_OS"] = "OPT_OS_FREERTOS"
+        env.copy("tinyusb/src/osal/osal_freertos.h", "osal/osal_freertos.h")
+    else:
+        env.copy("tinyusb/src/osal/osal_none.h", "osal/osal_none.h")
+
+    if env.has_module(":debug"):
+        tusb_config["CFG_TUSB_DEBUG_PRINTF"] = "tinyusb_debug_printf"
+        # env.collect(":build:cppdefines.debug", "CFG_TUSB_DEBUG=2")
+
+    has_device = env.has_module(":tinyusb:device")
+    has_host = env.has_module(":tinyusb:host")
+    speed = env.get("speed", "fs")
+    port = 0 if speed == "fs" else 1
+
+    mode = None
+    if has_device: mode = "OPT_MODE_DEVICE";
+    if has_host: mode = "OPT_MODE_HOST";
+    if mode is not None:
+        if "hs" in speed: mode = "({} | OPT_MODE_HIGH_SPEED)".format(mode);
+        tusb_config["CFG_TUSB_RHPORT{}_MODE".format(port)] = mode
+
+    itf_config = env["config"]
+    # Enumerate the configurations
+    config_enum = defaultdict(list)
+    config_enum_counter = 0
+    for conf in itf_config:
+        config_enum[conf.split(".")[1]].append(config_enum_counter)
+        config_enum_counter += 1
+
+    # Generate the ITF and Endpoint counters
+    itfs = []
+    itf_enum = []
+    endpoints = {}
+    endpoint_counter = 0
+    for devclass, devitfs in config_enum.items():
+        prefix = "{}".format(devclass.upper())
+        for itf in devitfs:
+            endpoint_counter += 1
+            itf_prefix = prefix + str(itf)
+            itfs.append( (prefix, itf_prefix) )
+            if devclass in ["cdc"]:
+                itf_enum.extend([itf_prefix, itf_prefix + "_DATA"])
+                endpoints[itf_prefix + "_NOTIF"] = hex(0x80 | endpoint_counter)
+                endpoint_counter += 1
+            elif devclass in ["msc", "midi", "vendor", "dfu"]:
+                itf_enum.append(itf_prefix)
+            else:
+                raise ValidateException("Unknown ITF device class '{}'!".format(devclass))
+
+            endpoints[itf_prefix + "_OUT"] = hex(endpoint_counter)
+            endpoints[itf_prefix + "_IN"] = hex(0x80 | endpoint_counter)
+
+    if target.platform == "stm32":
+        irq_data = env.query(":platform:usb:irqs")
+        irqs = irq_data["port_irqs"][speed]
+        if irq_data["is_remap"]:
+            tusb_config["STM32F3_IRQ_REMAP"] = 1
+    else:
+        irqs = ["USB"]
+
+    env.substitutions = {
+        "target": target,
+        "config": tusb_config,
+        "irqs": irqs,
+        "port": port,
+        "with_debug": env.has_module(":debug"),
+        "with_cdc": env.has_module(":tinyusb:device:cdc"),
+        "itfs": itfs,
+        "itfs_enum": itf_enum,
+        "endpoints": endpoints,
+    }
+    env.template("tusb_config.h.in")
+    if len(itf_config): env.template("tusb_descriptors.c.in");
+    env.template("tusb_port.cpp.in")
+
+
+# -----------------------------------------------------------------------------
+class TinyUsbDeviceModule(Module):
+    def init(self, module):
+        module.name = ":tinyusb:device"
+        module.description = "TinyUSB in Device Mode"
+
+    def prepare(self, module, options):
+        paths = {p.parent for p in Path(localpath("tinyusb/src/class/")).glob("*/*_device.h")}
+        for path in paths:
+            module.add_submodule(TinyUsbClassModule(path, "device"))
+        return True
+
+    def build(self, env):
+        env.outbasepath = "modm/ext/tinyusb"
+        env.copy("tinyusb/src/device/", "device/")
+
+        """ Device config defaults:
+        - CFG_TUD_ENDPOINT0_SIZE = 64
+        - CFG_TUD_TASK_QUEUE_SZ = 16
+        """
+
+
+# -----------------------------------------------------------------------------
+class TinyUsbHostModule(Module):
+    def __init__(self):
+        self.config = {}
+
+    def init(self, module):
+        module.name = ":tinyusb:host"
+        module.description = "TinyUSB in Host Mode"
+
+    def prepare(self, module, options):
+        # Only OTG has Host Mode
+        if not (options[":target"].has_driver("usb_otg_fs") or
+                options[":target"].has_driver("usb_otg_hs")):
+            return False
+
+        paths = {p.parent for p in Path(localpath("tinyusb/src/class/")).glob("*/*_host.h")}
+        for path in paths:
+            module.add_submodule(TinyUsbClassModule(path, "host"))
+        return True
+
+    def build(self, env):
+        env.outbasepath = "modm/ext/tinyusb"
+        env.copy("tinyusb/src/host/", "host/")
+
+        """ Host config defaults:
+        - CFG_TUH_TASK_QUEUE_SZ = 16
+        """
+
+
+# -----------------------------------------------------------------------------
+class TinyUsbClassModule(Module):
+    def __init__(self, path, mode):
+        self.mode = mode
+        self.name = str(path.name)
+
+    def init(self, module):
+        module.name = ":tinyusb:{}:{}".format(self.mode, self.name)
+        module.description = "{} class {}".format(self.mode.capitalize(), self.name.upper())
+
+    def prepare(self, module, options):
+        if self.mode == "device":
+            # FIXME: Changing these defaults seems to crash TinyUSB in weird ways.
+            #        Since all of the TinyUSB examples leave them at these default values
+            #        I think they are not supposed to be changed? -Niklas
+            # if self.name in ["cdc", "midi", "vendor"]:
+            #     module.add_option(NumericOption("buffer.rx", description="", minimum=64, default=64))
+            #     module.add_option(NumericOption("buffer.tx", description="", minimum=64, default=64))
+            # if self.name in ["msc"]:
+            #     module.add_option(NumericOption("buffer.ep", description="", minimum=512, default=512))
+            if self.name == "cdc":
+                module.depends(":architecture:uart")
+        module.depends(":tinyusb")
+        return True
+
+    def build(self, env):
+        env.outbasepath = "modm/ext/tinyusb"
+        env.copy("tinyusb/src/class/{}".format(self.name), "class/{}".format(self.name),
+                 ignore=env.ignore_files("*_host.*" if "device" in self.mode else "*_device.*"))
+
+        global tusb_config
+        cfg_name = "CFG_TU{}_{}".format(self.mode[0].upper(), self.name.upper())
+        if "DFU" in cfg_name: cfg_name += "_RT";
+        tusb_config[cfg_name] = env[":tinyusb:config"].count("{}.{}".format(self.mode, self.name))
+        speed = env.get(":tinyusb:speed", 0)
+
+        if self.mode == "device":
+            # These are the defaults that don't crash TinyUSB.
+            if self.name in ["cdc", "midi", "vendor"]:
+                tusb_config[cfg_name+"_RX_BUFSIZE"] = 512 if speed else 64 #env["buffer.rx"]
+                tusb_config[cfg_name+"_TX_BUFSIZE"] = 512 if speed else 64 #env["buffer.tx"]
+            if self.name in ["msc"]:
+                tusb_config[cfg_name+"_EP_BUFSIZE"] = 512 #env["buffer.ep"]
+            if self.name == "midi":
+                env.copy("tinyusb/src/class/audio", "class/audio")
+
+
+        """ Device class defaults:
+        - CFG_TUD_BTH_DATA_EPSIZE = 64
+        - CFG_TUD_BTH_EVENT_EPSIZE = 16
+        - CFG_TUD_BTH_ISO_ALT_COUNT = 0
+
+        - CFG_TUD_CDC_EP_BUFSIZE = 64 or 512 (hs)
+        - CFG_TUD_CDC_RX_BUFSIZE = [undef]
+        - CFG_TUD_CDC_TX_BUFSIZE = [undef]
+
+        - CFG_TUD_HID_EP_BUFSIZE = 16
+
+        - CFG_TUD_MIDI_EP_BUFSIZE = 64 or 512 (hs)
+        - CFG_TUD_MIDI_RX_BUFSIZE = [undef]
+        - CFG_TUD_MIDI_TX_BUFSIZE = [undef]
+
+        - CFG_TUD_MSC_EP_BUFSIZE = [undef]
+
+        - CFG_TUD_NET_ENDPOINT_SIZE = 64 or 512 (hs)
+
+        - CFG_TUD_USBTMC_ENABLE_488 = 1
+
+        - CFG_TUD_VENDOR_EPSIZE = 64
+        - CFG_TUD_VENDOR_RX_BUFSIZE = [undef]
+        - CFG_TUD_VENDOR_TX_BUFSIZE = [undef]
+        """
+
+        """ Host config defaults:
+        - CFG_TUH_CDC_RNDIS
+        - CFG_TUH_HID_KEYBOARD
+        - CFG_TUH_HID_MOUSE
+        """

@@ -1,0 +1,62 @@
+/*
+* Copyright (c) 2020, Erik Henriksson
+* Copyright (c) 2020, Niklas Hauser
+*
+* This file is part of the modm project.
+*
+* This Source Code Form is subject to the terms of the Mozilla Public
+* License, v. 2.0. If a copy of the MPL was not distributed with this
+* file, You can obtain one at http://mozilla.org/MPL/2.0/.
+*/
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <modm/platform/device.hpp>
+#include <modm/platform/gpio/connector.hpp>
+
+%% set name = "Usb" ~ port | capitalize
+
+namespace modm::platform
+{
+
+class {{ name }}
+{
+public:
+	template< class SystemClock >
+	static void
+	initialize(uint8_t priority=3)
+	{
+		static_assert(SystemClock::Usb == 48_MHz, "{{ name }} must have a 48MHz clock!");
+		Rcc::enable<Peripheral::{{ peripheral }}>();
+%% if is_remap
+		SYSCFG->CFGR1 |= SYSCFG_CFGR1_USB_IT_RMP;
+%% endif
+%% for irq in irqs | sort
+		NVIC_SetPriority({{ irq }}_IRQn, priority);
+%% endfor
+	}
+
+	template< template<Peripheral _> class... Signals >
+	static void
+	connect()
+	{
+		using Connector = GpioConnector<Peripheral::{{ peripheral }}, Signals...>;
+%% if port == "fs"
+		using Dp = typename Connector::template GetSignal< Gpio::Signal::Dp >;
+		using Dm = typename Connector::template GetSignal< Gpio::Signal::Dm >;
+%% if is_otg
+		using Id = typename Connector::template GetSignal< Gpio::Signal::Id >;
+%% endif
+		static_assert(((Connector::template IsValid<Dp> and Connector::template IsValid<Dm>) and sizeof...(Signals) >= 2),
+					  "{{ name }}::connect() requires at least one Dp and one Dm signal!");
+
+%% if is_otg
+		Id::configure(Gpio::OutputType::OpenDrain, Gpio::OutputSpeed::High);
+%% endif
+%% endif
+		Connector::connect();
+	}
+};
+
+} // namespace modm::platform

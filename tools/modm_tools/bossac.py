@@ -34,7 +34,7 @@ from elftools.elf.elffile import ELFFile, NoteSection
 
 # -----------------------------------------------------------------------------
 def program(source, offset=None, port=None, erase=False, options=None):
-    command = ["bossac", "-b", "-R"]
+    command = ["bossac", "-b", "-R", "-a"]
 
     # Attempt to find a serial port automatically
     if port == "auto":

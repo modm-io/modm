@@ -146,7 +146,7 @@ modm::platform::Rcc::enablePll(PllSource source, const PllFactors& pllFactors, u
 %% if target["family"] in ["f2", "f4", "f7"]
 	// Read reserved values and clear all other values
 	uint32_t tmp = RCC->PLLCFGR & ~(RCC_PLLCFGR_PLLSRC | RCC_PLLCFGR_PLLM
-			| RCC_PLLCFGR_PLLN | RCC_PLLCFGR_PLLP | RCC_PLLCFGR_PLLQ);
+			| RCC_PLLCFGR_PLLN | RCC_PLLCFGR_PLLP);
 
 	// PLLSRC source for pll and for plli2s
 	tmp |= static_cast<uint32_t>(source);
@@ -161,7 +161,10 @@ modm::platform::Rcc::enablePll(PllSource source, const PllFactors& pllFactors, u
 	tmp |= (((uint32_t) (pllFactors.pllP / 2) - 1) << RCC_PLLCFGR_PLLP_Pos) & RCC_PLLCFGR_PLLP;
 
 	// PLLQ (24) divider for USB frequency; (0-15)
-	// tmp |= (((uint32_t) pllQ) << RCC_PLLCFGR_PLLQ_Pos) & RCC_PLLCFGR_PLLQ;
+	if (pllFactors.pllQ != 0xff) {
+		tmp &= ~RCC_PLLCFGR_PLLQ;
+		tmp |= (((uint32_t) pllFactors.pllQ) << RCC_PLLCFGR_PLLQ_Pos) & RCC_PLLCFGR_PLLQ;
+	}
 
 	RCC->PLLCFGR = tmp;
 
@@ -181,7 +184,6 @@ modm::platform::Rcc::enablePll(PllSource source, const PllFactors& pllFactors, u
 %% if pll_p
 			// RCC_PLLCFGR_PLLPEN | RCC_PLLCFGR_PLLP |
 %% endif
-			// RCC_PLLCFGR_PLLQEN | RCC_PLLCFGR_PLLQ |
 			RCC_PLLCFGR_PLLREN | RCC_PLLCFGR_PLLR);
 
 	// PLLSRC source for pll
@@ -201,9 +203,12 @@ modm::platform::Rcc::enablePll(PllSource source, const PllFactors& pllFactors, u
 %% else
 	tmp |= ((uint32_t(pllFactors.pllR / 2) - 1) << RCC_PLLCFGR_PLLR_Pos) & RCC_PLLCFGR_PLLR;
 	// PLLQ (21) divider for USB frequency; (00: PLLQ = 2, 01: PLLQ = 4, etc.)
-	// tmp |= (((uint32_t) (pllQ / 2) - 1) << RCC_PLLCFGR_PLLQ_Pos) & RCC_PLLCFGR_PLLQ;
-	// enable pll USB clock output
-	// tmp |= RCC_PLLCFGR_PLLQEN;
+	if (pllFactors.pllQ != 0xff) {
+		tmp &= ~RCC_PLLCFGR_PLLQ;
+		tmp |= (((uint32_t) (pllFactors.pllQ / 2) - 1) << RCC_PLLCFGR_PLLQ_Pos) & RCC_PLLCFGR_PLLQ;
+		// enable pll USB clock output
+		tmp |= RCC_PLLCFGR_PLLQEN;
+	}
 %% endif
 
 	// enable pll CPU clock output
@@ -245,7 +250,7 @@ modm::platform::Rcc::enablePll(PllSource source, const PllFactors& pllFactors, u
 	uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_USBPRE | {{pullmul}} | RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE);
 
 	// Divide Output for USB Clock by 1.5?
-	// tmp |= static_cast<uint32_t>(usb);
+	tmp |= static_cast<uint32_t>(pllFactors.usbPrediv);
 %% else
 	uint32_t tmp = RCC->CFGR & ~({{pullmul}} | RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE);
 %% endif

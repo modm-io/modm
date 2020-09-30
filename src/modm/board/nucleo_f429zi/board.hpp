@@ -26,10 +26,11 @@ namespace Board
 {
 	using namespace modm::literals;
 
-/// STM32F429 running at 180MHz from the external 8MHz STLink clock
+/// STM32F429 running at 168MHz from the external 8MHz STLink clock
 struct SystemClock
 {
-	static constexpr uint32_t Frequency = 180_MHz;
+	static constexpr uint32_t Frequency = 168_MHz;
+	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency / 4;
 	static constexpr uint32_t Apb2 = Frequency / 2;
 
@@ -75,18 +76,19 @@ struct SystemClock
 	static constexpr uint32_t Timer13 = Apb1Timer;
 	static constexpr uint32_t Timer14 = Apb1Timer;
 
+	static constexpr uint32_t Usb = 48_MHz;
+
 	static bool inline
 	enable()
 	{
 		Rcc::enableExternalClock(); // 8 MHz
 		const Rcc::PllFactors pllFactors{
 			.pllM = 4,		//   8MHz / M=  4 ->   2MHz
-			.pllN = 180,	//   2MHz * N=180 -> 360MHz
-			.pllP = 2,		// 360MHz / P=  2 -> 180MHz = F_cpu
+			.pllN = 168,	//   2MHz * N=168 -> 336MHz
+			.pllP = 2,		// 336MHz / P=  2 -> 168MHz = F_cpu
+			.pllQ = 7,		// 336MHz / Q=  7 ->  48MHz = F_usb
 		};
 		Rcc::enablePll(Rcc::PllSource::ExternalClock, pllFactors);
-		PWR->CR |= PWR_CR_ODEN; // Enable overdrive mode
-		while (not (PWR->CSR & PWR_CSR_ODRDY)) ;
 		Rcc::setFlashLatency<Frequency>();
 		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
 		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div4);
@@ -107,6 +109,19 @@ using LedGreen = GpioOutputB0;	// LED1 [Green]
 using LedBlue = GpioOutputB7;	// LED2 [Blue]
 using LedRed = GpioOutputB14;	// LED3 [Red]
 using Leds = SoftwareGpioPort< LedRed, LedBlue, LedGreen >;
+
+namespace usb
+{
+using Vbus = GpioA9;
+using Id = GpioA10;
+using Dm = GpioA11;
+using Dp = GpioA12;
+
+using Overcurrent = GpioInputG7;	// OTG_FS_OverCurrent
+using Power = GpioOutputG6;			// OTG_FS_PowerSwitchOn
+
+using Device = UsbFs;
+}
 
 namespace stlink
 {
@@ -135,6 +150,19 @@ initialize()
     Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);
     Button::enableExternalInterrupt();
 //  Button::enableExternalInterruptVector(12);
+}
+
+inline void
+initializeUsbFs()
+{
+	usb::Device::initialize<SystemClock>();
+	usb::Device::connect<usb::Dm::Dm, usb::Dp::Dp, usb::Id::Id>();
+
+	usb::Overcurrent::setInput();
+	usb::Vbus::setInput();
+	// Enable VBUS sense (B device) via pin PA9
+	USB_OTG_FS->GCCFG &= ~USB_OTG_GCCFG_NOVBUSSENS;
+	USB_OTG_FS->GCCFG |= USB_OTG_GCCFG_VBUSBSEN;
 }
 
 }

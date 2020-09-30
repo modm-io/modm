@@ -134,8 +134,7 @@ protected:
 			instance == {{ extint.pin }},
 			"Gpio{{ port ~ pin }} only connects to ExtInt<{{ extint.pin }}>");
 		PORT->Group[uint32_t(port)].PINCFG[uint32_t(pin)].bit.PMUXEN = true;
-		PORT->Group[uint32_t(port)].PMUX[uint32_t(pin) >> 1].reg =
-			PORT_PMUX_{{ gpio.pmux }}_{{ extint.function | upper }};
+		PORT->Group[uint32_t(port)].PMUX[uint32_t(pin) >> 1].bit.{{ gpio.pmux }} = PORT_PMUX_{{ gpio.pmux }}_{{ extint.function | upper }}_Val;
 	}
 	%% endfor
 };
@@ -160,8 +159,8 @@ struct Gpio{{ port ~ pin }}::{{ signal.name }}<Peripheral::{{ signal.driver }}>
 	connect()
 	{
 		%% if signal.function
-		PORT->Group[uint32_t(Gpio::port)].PINCFG[uint32_t(Gpio::pin)].bit.PMUXEN = true;
-		PORT->Group[uint32_t(Gpio::port)].PMUX[uint32_t(Gpio::pin) >> 1].reg = PORT_PMUX_{{ gpio.pmux }}_{{ signal.function | upper }};
+		PORT->Group[uint32_t(port)].PINCFG[uint32_t(pin)].bit.PMUXEN = true;
+		PORT->Group[uint32_t(port)].PMUX[uint32_t(pin) >> 1].bit.{{ gpio.pmux }} = PORT_PMUX_{{ gpio.pmux }}_{{ signal.function | upper }}_Val;
 		%% endif
 	}
 };

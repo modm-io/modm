@@ -70,7 +70,6 @@ modm::platform::GenericClockController::initDFLL48MHz(
   GCLK->CLKCTRL.reg =
       GCLK_CLKCTRL_ID(uint32_t(ClockMux::DFLL48M)) |
       GCLK_CLKCTRL_GEN(uint32_t(ClockGenerator::ExternalCrystal32K)) |
-      // GCLK_CLKCTRL_GEN_GCLK1 |
       GCLK_CLKCTRL_CLKEN;
   // Wait for synchronization.
   while (GCLK->STATUS.bit.SYNCBUSY and --waitCycles);
@@ -83,7 +82,7 @@ modm::platform::GenericClockController::initDFLL48MHz(
   SYSCTRL->DFLLMUL.reg =
       SYSCTRL_DFLLMUL_CSTEP( 31 ) |
       SYSCTRL_DFLLMUL_FSTEP( 511 ) |
-      SYSCTRL_DFLLMUL_MUL((48_MHz + 32'768_Hz/2) / 32'768_Hz);
+      SYSCTRL_DFLLMUL_MUL(48_MHz / 32'768_Hz);
   // Wait for synchronization.
   while (!SYSCTRL->PCLKSR.bit.DFLLRDY and --waitCycles);
   // Write full configuration to DFLL control register

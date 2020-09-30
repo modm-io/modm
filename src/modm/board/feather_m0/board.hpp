@@ -27,13 +27,13 @@ namespace Board
 
 using namespace modm::literals;
 
-using ARef 	= GpioA03;
-using A0 		= GpioA02;
-using A1 		= GpioB08;
-using A2 		= GpioB09;
-using A3 		= GpioA04;
-using A4 		= GpioA05;
-using A5 		= GpioB02;
+using ARef	= GpioA03;
+using A0	= GpioA02;
+using A1	= GpioB08;
+using A2	= GpioB09;
+using A3	= GpioA04;
+using A4	= GpioA05;
+using A5	= GpioB02;
 
 using Sck 	= GpioB11;
 using Mosi 	= GpioB10;
@@ -65,6 +65,7 @@ using Led = D13;
 struct SystemClock
 {
 	static constexpr uint32_t Frequency = 48_MHz;
+	static constexpr uint32_t Usb = 48_MHz;
 	// static constexpr uint32_t Ahb  = Frequency;
 	// static constexpr uint32_t Apba = Frequency;
 	// static constexpr uint32_t Apbb = Frequency;
@@ -90,7 +91,7 @@ struct SystemClock
 	static bool inline
 	enable()
 	{
-    GenericClockController::setFlashLatency<Frequency>();
+		GenericClockController::setFlashLatency<Frequency>();
 		GenericClockController::initExternalCrystal();
 		GenericClockController::initDFLL48MHz();
 		GenericClockController::initOsc8MHz();
@@ -112,6 +113,13 @@ initialize()
 	Uart0::initialize<SystemClock, 115'200_Bd>();
 
 	Led::setOutput(modm::Gpio::Low);
+}
+
+inline void
+initializeUsbFs()
+{
+	modm::platform::Usb::initialize<Board::SystemClock>();
+	modm::platform::Usb::connect<GpioA24::Dm, GpioA25::Dp>();
 }
 
 } // Board namespace

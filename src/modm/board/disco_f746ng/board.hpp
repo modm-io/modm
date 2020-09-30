@@ -33,8 +33,8 @@ namespace Board
 struct SystemClock
 {
 	static constexpr uint32_t Frequency = 216_MHz;
-	static constexpr uint32_t Apb1 = Frequency / 8;
-	static constexpr uint32_t Apb2 = Frequency / 4;
+	static constexpr uint32_t Apb1 = Frequency / 4;
+	static constexpr uint32_t Apb2 = Frequency / 2;
 
 	static constexpr uint32_t Adc1 = Apb2;
 	static constexpr uint32_t Adc2 = Apb2;
@@ -78,6 +78,8 @@ struct SystemClock
 	static constexpr uint32_t Timer13 = Apb1Timer;
 	static constexpr uint32_t Timer14 = Apb1Timer;
 
+	static constexpr uint32_t Usb = 48_MHz;
+
 	static bool inline
 	enable()
 	{
@@ -85,17 +87,19 @@ struct SystemClock
 		const Rcc::PllFactors pllFactors{
 			.pllM = 25,		// 25MHz / M=25 -> 1MHz
 			.pllN = 432,	// 1MHz * N=432 -> 432MHz
-			.pllP = 2		// 432MHz / P=2 -> 216MHz = F_cpu
+			.pllP = 2,		// 432MHz / P=2 -> 216MHz = F_cpu
+			.pllQ = 9		// 432MHz / Q=9 -> 48MHz = F_usb
 		};
 		Rcc::enablePll(Rcc::PllSource::ExternalClock, pllFactors);
 		PWR->CR1 |= PWR_CR1_ODEN; // Enable overdrive mode
 		while (not (PWR->CSR1 & PWR_CSR1_ODRDY)) ;
+
 		Rcc::setFlashLatency<Frequency>();
 		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
-		// APB1 is running only at 27MHz, since AHB / 4 = 54MHz > 45MHz limit!
-		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div8);
-		// APB2 is running only at 54MHz, since AHB / 2 = 108MHz > 90MHz limit!
-		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div4);
+		// APB1 is running at 54MHz
+		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div4);
+		// APB2 is running at 108MHz
+		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div2);
 		Rcc::updateCoreFrequency<Frequency>();
 
 		return true;
@@ -133,6 +137,37 @@ using D13 = GpioI1;
 using D14 = GpioB9;
 using D15 = GpioB8;
 
+namespace usb_fs
+{
+using Vbus = GpioA9;
+using Id = GpioA10;
+using Dm = GpioA11;
+using Dp = GpioA12;
+
+using Device = UsbFs;
+}
+
+namespace usb_hs
+{
+using Ck = GpioA5;
+
+using D0 = GpioA3;
+using D1 = GpioB0;
+using D2 = GpioB1;
+using D3 = GpioB10;
+using D4 = GpioB11;
+using D5 = GpioB12;
+using D6 = GpioB13;
+using D7 = GpioB5;
+
+using Stp = GpioC0;
+using Dir = GpioC2;
+using Nxt = GpioH4;
+
+using Overcurrent = GpioE3;
+
+using Device = UsbHs;
+}
 
 namespace stlink
 {
@@ -157,6 +192,51 @@ initialize()
 	Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);
 	Button::enableExternalInterrupt();
 //	Button::enableExternalInterruptVector(12);
+
+	// Disable Backlight
+	GpioK3::setOutput(modm::Gpio::Low);
+}
+
+inline void
+initializeUsbFs()
+{
+	usb_fs::Device::initialize<SystemClock>();
+	usb_fs::Device::connect<usb_fs::Dm::Dm, usb_fs::Dp::Dp, usb_fs::Id::Id>();
+
+	USB_OTG_DeviceTypeDef *dev = (USB_OTG_DeviceTypeDef *) (USB_OTG_FS_PERIPH_BASE + USB_OTG_DEVICE_BASE);
+	dev->DCTL |= USB_OTG_DCTL_SDIS;
+
+	// Deactivate VBUS Sensing B
+	USB_OTG_FS->GCCFG &= ~USB_OTG_GCCFG_VBDEN;
+
+	// B-peripheral session valid override enable
+	USB_OTG_FS->GOTGCTL |= USB_OTG_GOTGCTL_BVALOEN;
+	USB_OTG_FS->GOTGCTL |= USB_OTG_GOTGCTL_BVALOVAL;
+}
+
+inline void
+initializeUsbHs()
+{
+	usb_hs::Device::initialize<SystemClock>();
+	usb_hs::Device::connect<
+		usb_hs::Ck::Ulpick,	usb_hs::Stp::Ulpistp,
+		usb_hs::Dir::Ulpidir, usb_hs::Nxt::Ulpinxt,
+		usb_hs::D0::Ulpid0, usb_hs::D1::Ulpid1,
+		usb_hs::D2::Ulpid2, usb_hs::D3::Ulpid3,
+		usb_hs::D4::Ulpid4, usb_hs::D5::Ulpid5,
+		usb_hs::D6::Ulpid6, usb_hs::D7::Ulpid7>();
+	usb_hs::Overcurrent::setInput();
+
+	// Deactivate VBUS Sensing B
+	USB_OTG_HS->GCCFG &= ~USB_OTG_GCCFG_VBDEN;
+
+	// B-peripheral session valid override enable
+	USB_OTG_HS->GOTGCTL |= USB_OTG_GOTGCTL_BVALOEN;
+	USB_OTG_HS->GOTGCTL |= USB_OTG_GOTGCTL_BVALOVAL;
+
+	// Force device mode
+	USB_OTG_HS->GUSBCFG &= ~USB_OTG_GUSBCFG_FHMOD;
+	USB_OTG_HS->GUSBCFG |= USB_OTG_GUSBCFG_FDMOD;
 }
 
 }

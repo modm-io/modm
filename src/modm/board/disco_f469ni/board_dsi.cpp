@@ -119,6 +119,7 @@ board_initialize_display(uint8_t ColorCoding)
 		DSI->WCR = DSI_WCR_DSIEN;
 	}
 
+	/* done by SystemClock::enable()
 	{
 		// LCD clock configuration
 		// PLLSAI_VCO Input = HSE_VALUE/PLL_M = 1 Mhz
@@ -134,6 +135,7 @@ board_initialize_display(uint8_t ColorCoding)
 			modm::delay_ms(1);
 		}
 	}
+	*/
 
 	{
 		// HAL_LTDC_Init(&hltdc_eval);

@@ -206,6 +206,7 @@ def common_compiler_flags(compiler, target):
         "-Wlogical-op",
         "-Wpointer-arith",
         "-Wundef",
+        "-Wno-redundant-decls",
         # "-Wcast-align",
         # "-Wcast-qual",
         # "-Wmissing-declarations",

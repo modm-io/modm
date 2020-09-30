@@ -18,7 +18,7 @@
 using namespace modm::platform;
 
 
-/// @ingroup modm_board_blue_pill
+/// @ingroup modm_board_mini_f411
 namespace Board
 {
 	using namespace modm::literals;
@@ -58,6 +58,8 @@ struct SystemClock {
 	static constexpr uint32_t Timer10 = Apb2Timer;
 	static constexpr uint32_t Timer11 = Apb2Timer;
 
+	static constexpr uint32_t Usb = 48_MHz;
+
 	static bool inline
 	enable()
 	{
@@ -66,6 +68,7 @@ struct SystemClock {
 			.pllM = 25,		// 25MHz / M=25 -> 1MHz
 			.pllN = 336,	// 1MHz * N=336 -> 336MHz
 			.pllP = 4,		// 336MHz / P=4 -> 84MHz = F_cpu
+			.pllQ = 7,		// 336MHz / Q=7 -> 48MHz = F_usb
 		};
 		Rcc::enablePll(Rcc::PllSource::ExternalCrystal, pllFactors);
 
@@ -86,6 +89,15 @@ struct SystemClock {
 	}
 };
 
+namespace usb
+{
+using Id = GpioA10;
+using Dm = GpioA11;
+using Dp = GpioA12;
+
+using Device = UsbFs;
+}
+
 // User LED (inverted, because connected to 3V3)
 using LedGreen = GpioInverted< GpioOutputC13 >;
 using Leds = SoftwareGpioPort< LedGreen >;
@@ -100,6 +112,19 @@ initialize()
 
 	LedGreen::setOutput(modm::Gpio::Low);
 	Button::setInput(Gpio::InputType::PullUp);
+}
+
+inline void
+initializeUsbFs()
+{
+	usb::Device::initialize<SystemClock>();
+	usb::Device::connect<usb::Dm::Dm, usb::Dp::Dp, usb::Id::Id>();
+	usb::Id::configure(Gpio::InputType::PullUp);
+
+	// explicitly disable VBUS sense (B device)
+	USB_OTG_FS->GCCFG |= USB_OTG_GCCFG_NOVBUSSENS;
+	USB_OTG_FS->GCCFG &= ~USB_OTG_GCCFG_VBUSBSEN;
+	USB_OTG_FS->GCCFG &= ~USB_OTG_GCCFG_VBUSASEN;
 }
 
 } // Board namespace

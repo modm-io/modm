@@ -186,6 +186,14 @@ public:
 		Div16  = RCC_CFGR_PPRE2_DIV16
 	};
 %% endif
+%% if usbprescaler
+	enum class
+	UsbPrescaler : uint32_t
+	{
+		Div1 = RCC_CFGR_USBPRE,	///< do not divide
+		Div1_5 = 0,				///< divide by 1.5
+	};
+%% endif
 
 %% if target["family"] in ["f2", "f4", "f7"]
 	enum class
@@ -368,6 +376,7 @@ public:
  %% else
 		const uint8_t pllP;
  %% endif
+ 		const uint8_t pllQ = 0xff;
 %% elif target["family"] in ["l1"]
 		const PllMultiplier pllMul;
 		const uint8_t pllDiv;
@@ -378,6 +387,9 @@ public:
 		const uint8_t pllPrediv2;
  %% elif pllprediv
 		const uint8_t pllPrediv;
+ %% endif
+ %% if usbprescaler
+ 		const UsbPrescaler usbPrediv = UsbPrescaler::Div1_5;
  %% endif
 %% endif
 	};

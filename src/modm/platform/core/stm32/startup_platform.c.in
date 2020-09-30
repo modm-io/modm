@@ -35,12 +35,7 @@ __modm_initialize_platform(void)
 	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
 %% endif
 
-%% if target.family == "f3"
-	%% if target["name"] in ["02"] or (target["name"] in ["03"] and target["size"] in ["c", "e"])
-	// Remap USB Interrupts
-	SYSCFG->CFGR1 |= SYSCFG_CFGR1_USB_IT_RMP;
-	%% endif
-%% elif target.family == "f4"
+%% if target.family == "f4"
 // Only the more powerful F4 targets have CCM or Backup SRAM
 #ifdef RCC_AHB1ENR_CCMDATARAMEN
 	// Enable power to backup domain

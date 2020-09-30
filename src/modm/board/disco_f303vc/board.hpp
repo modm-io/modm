@@ -81,13 +81,16 @@ struct SystemClock {
 	static constexpr uint32_t Timer16 = Apb2Timer;
 	static constexpr uint32_t Timer17 = Apb2Timer;
 
+	static constexpr uint32_t Usb = Ahb / 1.5;
+
 	static bool inline
 	enable()
 	{
 		Rcc::enableExternalClock();	// 8MHz
 		const Rcc::PllFactors pllFactors{
 			.pllMul = 9,
-			.pllPrediv = 1
+			.pllPrediv = 1,
+			.usbPrediv = Rcc::UsbPrescaler::Div1_5
 		};
 		Rcc::enablePll(Rcc::PllSource::ExternalClock, pllFactors);
 		// set flash latency for 72MHz
@@ -155,7 +158,7 @@ namespace usb
 {
 using Dm = GpioA11;		// DM: USB_DM
 using Dp = GpioA12;		// DP: USB_DP
-//using Device = UsbFs;
+using Device = UsbFs;
 }
 
 
@@ -165,14 +168,7 @@ initialize()
 	SystemClock::enable();
 	SysTickTimer::initialize<SystemClock>();
 
-	LedNorth::setOutput(modm::Gpio::Low);
-	LedNorthEast::setOutput(modm::Gpio::Low);
-	LedEast::setOutput(modm::Gpio::Low);
-	LedSouthEast::setOutput(modm::Gpio::Low);
-	LedSouth::setOutput(modm::Gpio::Low);
-	LedSouthWest::setOutput(modm::Gpio::Low);
-	LedWest::setOutput(modm::Gpio::Low);
-	LedNorthWest::setOutput(modm::Gpio::Low);
+	Leds::setOutput(modm::Gpio::Low);
 
 	Button::setInput();
 	Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);
@@ -225,12 +221,11 @@ initializeLsm3()
 }
 
 
-/// not supported yet, due to missing USB driver
 inline void
-initializeUsb()
+initializeUsbFs()
 {
-//	usb::Dm::connect(usb::Device::Dm);
-//	usb::Dp::connect(usb::Device::Dp);
+	usb::Device::initialize<SystemClock>();
+	usb::Device::connect<usb::Dm::Dm, usb::Dp::Dp>();
 }
 
 }

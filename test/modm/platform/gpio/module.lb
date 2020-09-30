@@ -55,10 +55,7 @@ test_io_al_avrev_can = sorted([
 ])
 
 def translate(s):
-    name = ""
-    for part in s.split("_"):
-        name += part.capitalize()
-    return name
+    return s.replace("_", "").capitalize()
 
 def get_driver(s):
     name = "None"

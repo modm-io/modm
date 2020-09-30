@@ -56,6 +56,8 @@ struct SystemClock {
 	static constexpr uint32_t Timer3  = Apb1Timer;
 	static constexpr uint32_t Timer4  = Apb1Timer;
 
+	static constexpr uint32_t Usb = Ahb / 1.5;
+
 	static bool inline
 	enable()
 	{
@@ -63,7 +65,8 @@ struct SystemClock {
 
 		// external clock * 9 = 72MHz, => 72/1.5 = 48 => good for USB
 		const Rcc::PllFactors pllFactors{
-			.pllMul = 9
+			.pllMul = 9,
+			.usbPrediv = Rcc::UsbPrescaler::Div1_5
 		};
 		Rcc::enablePll(Rcc::PllSource::ExternalCrystal, pllFactors);
 
@@ -89,6 +92,13 @@ struct SystemClock {
 	}
 };
 
+namespace usb
+{
+using Dm = GpioA11;		// DM: USB_DM
+using Dp = GpioA12;		// DP: USB_DP
+using Device = UsbFs;
+}
+
 // User LED (inverted, because connected to 3V3)
 using LedGreen = GpioInverted< GpioOutputC13 >;
 using Leds = SoftwareGpioPort< LedGreen >;
@@ -102,6 +112,13 @@ initialize()
 	SysTickTimer::initialize<SystemClock>();
 
 	LedGreen::setOutput(modm::Gpio::Low);
+}
+
+inline void
+initializeUsbFs()
+{
+	usb::Device::initialize<SystemClock>();
+	usb::Device::connect<usb::Dm::Dm, usb::Dp::Dp>();
 }
 
 } // Board namespace

@@ -42,7 +42,10 @@ def guess_serial_port(port_hint=None):
     if "Windows" in platform.platform():
         ports = glob.glob('COM[0-9]*')
     elif "Darwin" in platform.system():
-        ports = glob.glob('/dev/tty.usb*')
+        if port_hint == "bossac":
+            ports = glob.glob('/dev/tty.usbmodem*')
+        else:
+            ports = glob.glob('/dev/tty.usb*')
     else:
         ports = glob.glob('/dev/tty[A-Za-z]*')
     return next(iter(ports), None)
