@@ -1,0 +1,479 @@
+name: Run tests on Linux
+
+on: [pull_request]
+
+jobs:
+  unittests-linux-generic:
+    runs-on: ubuntu-20.04
+    container:
+      image: modm/modm-build:cortex-m
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Checkout code and update modm tools
+        run: |
+            (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - name: Check environment
+        run: |
+            env
+            locale -a
+            python --version  || true
+            python3 --version || true
+            which scons
+            scons --version
+            which g++
+            g++ --version
+            #which avr-g++
+            #avr-g++ --version
+            which arm-none-eabi-g++
+            arm-none-eabi-g++ --version
+            which lbuild
+            lbuild --version
+      - name: Hosted Unittests
+        run: |
+            (cd test && make run-hosted-linux)
+      - name: Compile STM32 Unittests
+        run: |
+            (cd test && make compile-nucleo-f411)
+            (cd test && make compile-nucleo-f103)
+            (cd test && make compile-nucleo-l432)
+      # FIXME: split into two or more tests (docker image does not support avr)
+      #- name: Compile AVR Unittests
+      #  run: |
+      #      (cd test && make compile-al-avreb-can)
+      #      (cd test && make compile-arduino-uno)
+      #      (cd test && make compile-arduino-nano)
+      #      (cd test && make compile-mega-2560-pro)
+      - name: Linux Examples
+        run: |
+            (cd examples && ../tools/scripts/examples_compile.py linux)
+      - name: Generic Examples
+        run: |
+            (cd examples && ../tools/scripts/examples_compile.py generic)
+      - name: Examples SAM Devices
+        run: |
+            (cd examples && ../tools/scripts/examples_compile.py samd)
+      - name: Execute Python Scripts
+        run: |
+            python3 tools/scripts/authors.py --handles --count --shoutout --since 2017-01-01
+            python3 tools/xpcc_generator/builder/system_layout.py examples/xpcc/xml/communication.xml -o /tmp
+      - name: Check for Trailing Whitespace
+        run: |
+            python3 tools/scripts/rm_whitespace.py
+      - name: Synchronize Documentation
+        run: |
+          python3 tools/scripts/synchronize_docs.py -d
+      - name: Check for Unique Build Paths
+        run: |
+          python3 tools/scripts/examples_check.py examples
+
+
+
+
+  stm32-examples:
+    if: "!startsWith(github.ref, 'refs/heads/develop')"
+    runs-on: ubuntu-20.04
+    container:
+      image: modm/modm-build:cortex-m
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Checkout code and update modm tools
+        run: |
+            (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - name: Examples STM32F0 Series
+        run: |
+            (cd examples && ../tools/scripts/examples_compile.py stm32f0_discovery stm32f072_discovery nucleo_f031k6 nucleo_f042k6 stm32f030f4p6_demo_board)
+      - name: Examples STM32F1 Series
+        run: |
+            (cd examples && ../tools/scripts/examples_compile.py stm32f1_discovery nucleo_f103rb olimexino_stm32 stm32f103c8t6_blue_pill stm32f103c8t6_black_pill)
+      - name: Examples STM32F3 Series
+        run: |
+            (cd examples && ../tools/scripts/examples_compile.py stm32f3_discovery nucleo_f303k8 nucleo_f303re)
+      - name: Examples STM32F7 Series
+        run: |
+            (cd examples && ../tools/scripts/examples_compile.py stm32f746g_discovery stm32f769i_discovery nucleo_f746zg)
+      - name: Examples STM32G0 Series
+        run: |
+            (cd examples && ../tools/scripts/examples_compile.py nucleo_g071rb)
+      - name: Examples STM32L1 Series
+        run: |
+            (cd examples && ../tools/scripts/examples_compile.py nucleo_l152re stm32l1_discovery)
+      - name: Examples STM32L4 Series
+        run: |
+            (cd examples && ../tools/scripts/examples_compile.py stm32l476_discovery nucleo_l476rg nucleo_l432kc)
+      - name: Examples STM32G4 Series
+        run: |
+            (cd examples && ../tools/scripts/examples_compile.py nucleo_g474re)
+
+  stm32f4-examples:
+    if: "!startsWith(github.ref, 'refs/heads/develop')"
+    runs-on: ubuntu-20.04
+    container:
+      image: modm/modm-build:cortex-m
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Checkout code and update modm tools
+        run: |
+            (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - name: Examples STM32F4 Series
+        run: |
+            (cd examples && ../tools/scripts/examples_compile.py stm32f4_discovery)
+            (cd examples && ../tools/scripts/examples_compile.py stm32f429_discovery stm32f469_discovery nucleo_f401re nucleo_f411re nucleo_f429zi nucleo_f446re stm32f411ccu_mini_f401 stm32f411ceu_mini_f411 stm32f407vet6_devebox stm32_f4ve)
+
+  avr-examples:
+    if: "!startsWith(github.ref, 'refs/heads/develop')"
+    runs-on: ubuntu-20.04
+    container:
+      image: modm/modm-build:avr
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Checkout code and update modm tools
+        run: |
+            (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - name: Examples AVR Series
+        run: |
+            (cd examples && ../tools/scripts/examples_compile.py avr arduino_uno)
+
+  avr-compile-all:
+    if: "!startsWith(github.ref, 'refs/heads/develop')"
+    needs: [unittests-linux-generic, avr-examples]
+    runs-on: ubuntu-20.04
+    container:
+      image: modm/modm-build:avr
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Checkout code and update modm tools
+        run: |
+            (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - name: Compile HAL for all AVRs
+        run: |
+            (cd test/all && python3 run_all.py at)
+      - name: Store log as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: avr-compile-all.log
+          path: test/all/log
+
+  samd-compile-all:
+    if: "!startsWith(github.ref, 'refs/heads/develop')"
+    needs: [unittests-linux-generic]
+    runs-on: ubuntu-20.04
+    container:
+      image: modm/modm-build:cortex-m
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Checkout code and update modm tools
+        run: |
+            (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - name: Compile HAL for all SAMD
+        run: |
+            (cd test/all && python3 run_all.py samd)
+      - name: Store log as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: samd-compile-all.log
+          path: test/all/log
+
+  stm32f0-compile-all:
+    if: "!startsWith(github.ref, 'refs/heads/develop')"
+    needs: [unittests-linux-generic, stm32-examples]
+    runs-on: ubuntu-20.04
+    container:
+      image: modm/modm-build:cortex-m
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Checkout code and update modm tools
+        run: |
+            (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - name: Compile HAL for all STM32F0
+        run: |
+            (cd test/all && python3 run_all.py stm32f0)
+      - name: Store log as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: stm32f0-compile-all.log
+          path: test/all/log
+
+  stm32f1-compile-all:
+    if: "!startsWith(github.ref, 'refs/heads/develop')"
+    needs: [unittests-linux-generic, stm32-examples]
+    runs-on: ubuntu-20.04
+    container:
+      image: modm/modm-build:cortex-m
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Checkout code and update modm tools
+        run: |
+            (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - name: Compile HAL for all STM32F1
+        run: |
+            (cd test/all && python3 run_all.py stm32f1)
+      - name: Store log as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: stm32f1-compile-all.log
+          path: test/all/log
+
+  stm32f2-compile-all:
+    if: "!startsWith(github.ref, 'refs/heads/develop')"
+    needs: [unittests-linux-generic, stm32-examples]
+    runs-on: ubuntu-20.04
+    container:
+      image: modm/modm-build:cortex-m
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Checkout code and update modm tools
+        run: |
+            (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - name: Compile HAL for all STM32F2
+        run: |
+            (cd test/all && python3 run_all.py stm32f2)
+      - name: Store log as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: stm32f2-compile-all.log
+          path: test/all/log
+
+  stm32f3-compile-all:
+    if: "!startsWith(github.ref, 'refs/heads/develop')"
+    needs: [unittests-linux-generic, stm32-examples]
+    runs-on: ubuntu-20.04
+    container:
+      image: modm/modm-build:cortex-m
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Checkout code and update modm tools
+        run: |
+            (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - name: Compile HAL for all STM32F3
+        run: |
+            (cd test/all && python3 run_all.py stm32f3)
+      - name: Store log as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: stm32f3-compile-all.log
+          path: test/all/log
+
+  stm32f4-compile-all:
+    if: "!startsWith(github.ref, 'refs/heads/develop')"
+    needs: [unittests-linux-generic, stm32f4-examples]
+    runs-on: ubuntu-20.04
+    container:
+      image: modm/modm-build:cortex-m
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Checkout code and update modm tools
+        run: |
+            (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - name: Compile HAL for all STM32F4
+        run: |
+            (cd test/all && python3 run_all.py stm32f4)
+      - name: Store log as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: stm32f4-compile-all.log
+          path: test/all/log
+
+  stm32f7-compile-all:
+    if: "!startsWith(github.ref, 'refs/heads/develop')"
+    needs: [unittests-linux-generic, stm32-examples]
+    runs-on: ubuntu-20.04
+    container:
+      image: modm/modm-build:cortex-m
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Checkout code and update modm tools
+        run: |
+            (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - name: Compile HAL for all STM32F7
+        run: |
+            (cd test/all && python3 run_all.py stm32f7)
+      - name: Store log as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: stm32f7-compile-all.log
+          path: test/all/log
+
+  stm32l1-compile-all:
+    if: "!startsWith(github.ref, 'refs/heads/develop')"
+    needs: [unittests-linux-generic, stm32-examples]
+    runs-on: ubuntu-20.04
+    container:
+      image: modm/modm-build:cortex-m
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Checkout code and update modm tools
+        run: |
+            (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - name: Compile HAL for all STM32L1
+        run: |
+            (cd test/all && python3 run_all.py stm32l1)
+      - name: Store log as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: stm32l1-compile-all.log
+          path: test/all/log
+
+  stm32l4-compile-all:
+    if: "!startsWith(github.ref, 'refs/heads/develop')"
+    needs: [unittests-linux-generic, stm32-examples]
+    runs-on: ubuntu-20.04
+    container:
+      image: modm/modm-build:cortex-m
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Checkout code and update modm tools
+        run: |
+            (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - name: Compile HAL for all STM32L4
+        run: |
+            (cd test/all && python3 run_all.py stm32l4)
+      - name: Store log as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: stm32l4-compile-all.log
+          path: test/all/log
+
+  stm32g0-compile-all:
+    if: "!startsWith(github.ref, 'refs/heads/develop')"
+    needs: [unittests-linux-generic, stm32-examples]
+    runs-on: ubuntu-20.04
+    container:
+      image: modm/modm-build:cortex-m
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Checkout code and update modm tools
+        run: |
+            (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - name: Compile HAL for all STM32G0
+        run: |
+            (cd test/all && python3 run_all.py stm32g0)
+      - name: Store log as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: stm32g0-compile-all.log
+          path: test/all/log
+
+  stm32g4-compile-all:
+    if: "!startsWith(github.ref, 'refs/heads/develop')"
+    needs: [unittests-linux-generic, stm32-examples]
+    runs-on: ubuntu-20.04
+    container:
+      image: modm/modm-build:cortex-m
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Checkout code and update modm tools
+        run: |
+            (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - name: Compile HAL for all STM32G4
+        run: |
+            (cd test/all && python3 run_all.py stm32g4)
+      - name: Store log as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: stm32g4-compile-all.log
+          path: test/all/log
+
+  build-docs:
+    if: "!startsWith(github.ref, 'refs/heads/develop')"
+    needs: [avr-compile-all,
+      samd-compile-all,
+      stm32f0-compile-all,
+      stm32f1-compile-all,
+      stm32f2-compile-all,
+      stm32f3-compile-all,
+      stm32g0-compile-all,
+      stm32g4-compile-all]
+      # FIXME: Why not all *-compile-all jobs?
+    runs-on: ubuntu-20.04
+    container:
+      image: modm/modm-build:base
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Update submodules and install lbuild
+        run: |
+            (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
+      - name: Test run of docs.modm.io-generator-script
+        run: |
+            export TERM=xterm-256color
+            export COLUMNS=120
+            python3 tools/scripts/docs_modm_io_generator.py -t -c -j4
+      - name: Build Homepage
+        run: |
+            python3 tools/scripts/synchronize_docs.py
+            python3 tools/scripts/generate_module_docs.py
+            (cd docs && mkdocs build)
+      # FIXME: Allow localhost:port to work with Docker
+      # - run:
+      #     name: Check Homepage
+      #   run: |
+      #       apt install -y nodejs npm
+      #       npm install -g broken-link-checker-local
+      #       blcl modm/docs/modm.io/docs -ro --host-requests 100 --filter-level 1
+
+
+  build-upload-docs:
+    if: startsWith(github.ref, 'refs/heads/develop')
+    runs-on: ubuntu-20.04
+    container:
+      image: modm/modm-build:base
+    steps:
+      #- add_ssh_keys:
+      #    fingerprints:
+      #      - "8c:e7:b6:51:2a:40:66:e6:e9:50:ea:fe:38:49:1d:3f"
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Update submodules and install lbuild
+        run: |
+            (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
+      - name: Build Homepage
+        run: |
+            git clone --depth 1 --no-checkout git@github.com:modm-ext/modm.io.git docs/modm.io
+            python3 tools/scripts/synchronize_docs.py
+            python3 tools/scripts/generate_module_docs.py
+            (cd docs && mkdocs build)
+      - name: Push New Docs to Github
+        run: |
+            cd docs/modm.io
+            git config user.email "rca@circleci.com"
+            git config user.name "CircleCI Deployment Bot"
+            git add -A
+            git diff-index --quiet HEAD || git commit -m "Update"
+            git push origin master
+
+  api-docs-all:
+    if: startsWith(github.ref, 'refs/heads/develop')
+    runs-on: ubuntu-20.04
+    container:
+      image: modm/modm-build:base
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Update submodules and install lbuild
+        run: |
+            (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
+      - name: Full run of docs.modm.io-generator-script
+        continue-on-error: true
+        run: |
+            export TERM=xterm-256color
+            export COLUMNS=120
+            python3 tools/scripts/docs_modm_io_generator.py -c -j4
+      - name: Upload api documentation to docs.modm.io
+        run: |
+            curl https://docs.modm.io/upload/compressed --upload-file modm-api-docs.tar.gz --user $MODM_UPLOAD
