@@ -5,9 +5,27 @@ on: [pull_request]
 jobs:
   unittests-linux-generic:
     runs-on: ubuntu-20.04
-    container:
-      image: modm/modm-build:cortex-m
+    #container:
+    #  image: modm/modm-build:cortex-m
     steps:
+      - name: Setup build environment
+        env:
+          TZ: Europe/Berlin
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq build-essential git bzip2 wget python3 python3-dev python3-pip libboost-all-dev libsdl1.2-dev libsdl-image1.2-dev libgtkmm-2.4-dev libmpc-dev libmpfr-dev libgmp-dev cmake locales texlive-latex-base texlive-fonts-recommended doxygen graphviz curl
+          sudo locale-gen en_US.UTF-8
+          pip3 install modm scons configparser numpy pyx graphviz mkdocs mkdocs-material && echo "::add-path::~/.local/bin"
+          #mkdir /opt/doxypress
+          #wget -qO- https://download.copperspice.com/doxypress/binary/doxypress-1.4.0-ubuntu20.04-x64.tar.bz2 | tar xj -C /opt/doxypress
+          #echo "::add-path::/opt/doxypress"
+          #wget -qO- https://github.com/modm-ext/docker-avr-gcc/releases/download/v10.2.0/avr-gcc.tar.bz2 | tar xj -C /opt
+          #echo "::add-path::/opt/avr-gcc/avr-gcc/bin:/opt/avr-gcc/avr-binutils/bin"
+          wget -qO- https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2020q2/gcc-arm-none-eabi-9-2020-q2-update-x86_64-linux.tar.bz2 | tar -xj -C /opt
+          echo "::add-path::/opt/gcc-arm-none-eabi-9-2020-q2-update/bin"
+          #wget -qO- https://github.com/modm-ext/riscv-gcc/releases/download/v10.2.0/modm-riscv-gcc.tar.bz2 | tar xj -C /opt
+          #echo "::add-path::/opt/modm-riscv-gcc/bin"
       - name: Check out repository
         uses: actions/checkout@v2
       - name: Checkout code and update modm tools
@@ -73,9 +91,27 @@ jobs:
   stm32-examples:
     if: "!startsWith(github.ref, 'refs/heads/develop')"
     runs-on: ubuntu-20.04
-    container:
-      image: modm/modm-build:cortex-m
+    #container:
+    #  image: modm/modm-build:cortex-m
     steps:
+      - name: Setup build environment
+        env:
+          TZ: Europe/Berlin
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq build-essential git bzip2 wget python3 python3-dev python3-pip libboost-all-dev libsdl1.2-dev libsdl-image1.2-dev libgtkmm-2.4-dev libmpc-dev libmpfr-dev libgmp-dev cmake locales texlive-latex-base texlive-fonts-recommended doxygen graphviz curl
+          sudo locale-gen en_US.UTF-8
+          pip3 install modm scons configparser numpy pyx graphviz mkdocs mkdocs-material && echo "::add-path::~/.local/bin"
+          #mkdir /opt/doxypress
+          #wget -qO- https://download.copperspice.com/doxypress/binary/doxypress-1.4.0-ubuntu20.04-x64.tar.bz2 | tar xj -C /opt/doxypress
+          #echo "::add-path::/opt/doxypress"
+          #wget -qO- https://github.com/modm-ext/docker-avr-gcc/releases/download/v10.2.0/avr-gcc.tar.bz2 | tar xj -C /opt
+          #echo "::add-path::/opt/avr-gcc/avr-gcc/bin:/opt/avr-gcc/avr-binutils/bin"
+          wget -qO- https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2020q2/gcc-arm-none-eabi-9-2020-q2-update-x86_64-linux.tar.bz2 | tar -xj -C /opt
+          echo "::add-path::/opt/gcc-arm-none-eabi-9-2020-q2-update/bin"
+          #wget -qO- https://github.com/modm-ext/riscv-gcc/releases/download/v10.2.0/modm-riscv-gcc.tar.bz2 | tar xj -C /opt
+          #echo "::add-path::/opt/modm-riscv-gcc/bin"
       - name: Check out repository
         uses: actions/checkout@v2
       - name: Checkout code and update modm tools
@@ -109,9 +145,27 @@ jobs:
   stm32f4-examples:
     if: "!startsWith(github.ref, 'refs/heads/develop')"
     runs-on: ubuntu-20.04
-    container:
-      image: modm/modm-build:cortex-m
+    #container:
+    #  image: modm/modm-build:cortex-m
     steps:
+      - name: Setup build environment
+        env:
+          TZ: Europe/Berlin
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq build-essential git bzip2 wget python3 python3-dev python3-pip libboost-all-dev libsdl1.2-dev libsdl-image1.2-dev libgtkmm-2.4-dev libmpc-dev libmpfr-dev libgmp-dev cmake locales texlive-latex-base texlive-fonts-recommended doxygen graphviz curl
+          sudo locale-gen en_US.UTF-8
+          pip3 install modm scons configparser numpy pyx graphviz mkdocs mkdocs-material && echo "::add-path::~/.local/bin"
+          #mkdir /opt/doxypress
+          #wget -qO- https://download.copperspice.com/doxypress/binary/doxypress-1.4.0-ubuntu20.04-x64.tar.bz2 | tar xj -C /opt/doxypress
+          #echo "::add-path::/opt/doxypress"
+          #wget -qO- https://github.com/modm-ext/docker-avr-gcc/releases/download/v10.2.0/avr-gcc.tar.bz2 | tar xj -C /opt
+          #echo "::add-path::/opt/avr-gcc/avr-gcc/bin:/opt/avr-gcc/avr-binutils/bin"
+          wget -qO- https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2020q2/gcc-arm-none-eabi-9-2020-q2-update-x86_64-linux.tar.bz2 | tar -xj -C /opt
+          echo "::add-path::/opt/gcc-arm-none-eabi-9-2020-q2-update/bin"
+          #wget -qO- https://github.com/modm-ext/riscv-gcc/releases/download/v10.2.0/modm-riscv-gcc.tar.bz2 | tar xj -C /opt
+          #echo "::add-path::/opt/modm-riscv-gcc/bin"
       - name: Check out repository
         uses: actions/checkout@v2
       - name: Checkout code and update modm tools
@@ -125,9 +179,27 @@ jobs:
   avr-examples:
     if: "!startsWith(github.ref, 'refs/heads/develop')"
     runs-on: ubuntu-20.04
-    container:
-      image: modm/modm-build:avr
+    #container:
+    #  image: modm/modm-build:avr
     steps:
+      - name: Setup build environment
+        env:
+          TZ: Europe/Berlin
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq build-essential git bzip2 wget python3 python3-dev python3-pip libboost-all-dev libsdl1.2-dev libsdl-image1.2-dev libgtkmm-2.4-dev libmpc-dev libmpfr-dev libgmp-dev cmake locales texlive-latex-base texlive-fonts-recommended doxygen graphviz curl
+          sudo locale-gen en_US.UTF-8
+          pip3 install modm scons configparser numpy pyx graphviz mkdocs mkdocs-material && echo "::add-path::~/.local/bin"
+          #mkdir /opt/doxypress
+          #wget -qO- https://download.copperspice.com/doxypress/binary/doxypress-1.4.0-ubuntu20.04-x64.tar.bz2 | tar xj -C /opt/doxypress
+          #echo "::add-path::/opt/doxypress"
+          wget -qO- https://github.com/modm-ext/docker-avr-gcc/releases/download/v10.2.0/avr-gcc.tar.bz2 | tar xj -C /opt
+          echo "::add-path::/opt/avr-gcc/avr-gcc/bin:/opt/avr-gcc/avr-binutils/bin"
+          #wget -qO- https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2020q2/gcc-arm-none-eabi-9-2020-q2-update-x86_64-linux.tar.bz2 | tar -xj -C /opt
+          #echo "::add-path::/opt/gcc-arm-none-eabi-9-2020-q2-update/bin"
+          #wget -qO- https://github.com/modm-ext/riscv-gcc/releases/download/v10.2.0/modm-riscv-gcc.tar.bz2 | tar xj -C /opt
+          #echo "::add-path::/opt/modm-riscv-gcc/bin"
       - name: Check out repository
         uses: actions/checkout@v2
       - name: Checkout code and update modm tools
@@ -141,9 +213,27 @@ jobs:
     if: "!startsWith(github.ref, 'refs/heads/develop')"
     needs: [unittests-linux-generic, avr-examples]
     runs-on: ubuntu-20.04
-    container:
-      image: modm/modm-build:avr
+    #container:
+    #  image: modm/modm-build:avr
     steps:
+      - name: Setup build environment
+        env:
+          TZ: Europe/Berlin
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq build-essential git bzip2 wget python3 python3-dev python3-pip libboost-all-dev libsdl1.2-dev libsdl-image1.2-dev libgtkmm-2.4-dev libmpc-dev libmpfr-dev libgmp-dev cmake locales texlive-latex-base texlive-fonts-recommended doxygen graphviz curl
+          sudo locale-gen en_US.UTF-8
+          pip3 install modm scons configparser numpy pyx graphviz mkdocs mkdocs-material && echo "::add-path::~/.local/bin"
+          #mkdir /opt/doxypress
+          #wget -qO- https://download.copperspice.com/doxypress/binary/doxypress-1.4.0-ubuntu20.04-x64.tar.bz2 | tar xj -C /opt/doxypress
+          #echo "::add-path::/opt/doxypress"
+          wget -qO- https://github.com/modm-ext/docker-avr-gcc/releases/download/v10.2.0/avr-gcc.tar.bz2 | tar xj -C /opt
+          echo "::add-path::/opt/avr-gcc/avr-gcc/bin:/opt/avr-gcc/avr-binutils/bin"
+          #wget -qO- https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2020q2/gcc-arm-none-eabi-9-2020-q2-update-x86_64-linux.tar.bz2 | tar -xj -C /opt
+          #echo "::add-path::/opt/gcc-arm-none-eabi-9-2020-q2-update/bin"
+          #wget -qO- https://github.com/modm-ext/riscv-gcc/releases/download/v10.2.0/modm-riscv-gcc.tar.bz2 | tar xj -C /opt
+          #echo "::add-path::/opt/modm-riscv-gcc/bin"
       - name: Check out repository
         uses: actions/checkout@v2
       - name: Checkout code and update modm tools
@@ -162,9 +252,27 @@ jobs:
     if: "!startsWith(github.ref, 'refs/heads/develop')"
     needs: [unittests-linux-generic]
     runs-on: ubuntu-20.04
-    container:
-      image: modm/modm-build:cortex-m
+    #container:
+    #  image: modm/modm-build:cortex-m
     steps:
+      - name: Setup build environment
+        env:
+          TZ: Europe/Berlin
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq build-essential git bzip2 wget python3 python3-dev python3-pip libboost-all-dev libsdl1.2-dev libsdl-image1.2-dev libgtkmm-2.4-dev libmpc-dev libmpfr-dev libgmp-dev cmake locales texlive-latex-base texlive-fonts-recommended doxygen graphviz curl
+          sudo locale-gen en_US.UTF-8
+          pip3 install modm scons configparser numpy pyx graphviz mkdocs mkdocs-material && echo "::add-path::~/.local/bin"
+          #mkdir /opt/doxypress
+          #wget -qO- https://download.copperspice.com/doxypress/binary/doxypress-1.4.0-ubuntu20.04-x64.tar.bz2 | tar xj -C /opt/doxypress
+          #echo "::add-path::/opt/doxypress"
+          #wget -qO- https://github.com/modm-ext/docker-avr-gcc/releases/download/v10.2.0/avr-gcc.tar.bz2 | tar xj -C /opt
+          #echo "::add-path::/opt/avr-gcc/avr-gcc/bin:/opt/avr-gcc/avr-binutils/bin"
+          wget -qO- https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2020q2/gcc-arm-none-eabi-9-2020-q2-update-x86_64-linux.tar.bz2 | tar -xj -C /opt
+          echo "::add-path::/opt/gcc-arm-none-eabi-9-2020-q2-update/bin"
+          #wget -qO- https://github.com/modm-ext/riscv-gcc/releases/download/v10.2.0/modm-riscv-gcc.tar.bz2 | tar xj -C /opt
+          #echo "::add-path::/opt/modm-riscv-gcc/bin"
       - name: Check out repository
         uses: actions/checkout@v2
       - name: Checkout code and update modm tools
@@ -183,9 +291,27 @@ jobs:
     if: "!startsWith(github.ref, 'refs/heads/develop')"
     needs: [unittests-linux-generic, stm32-examples]
     runs-on: ubuntu-20.04
-    container:
-      image: modm/modm-build:cortex-m
+    #container:
+    #  image: modm/modm-build:cortex-m
     steps:
+      - name: Setup build environment
+        env:
+          TZ: Europe/Berlin
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq build-essential git bzip2 wget python3 python3-dev python3-pip libboost-all-dev libsdl1.2-dev libsdl-image1.2-dev libgtkmm-2.4-dev libmpc-dev libmpfr-dev libgmp-dev cmake locales texlive-latex-base texlive-fonts-recommended doxygen graphviz curl
+          sudo locale-gen en_US.UTF-8
+          pip3 install modm scons configparser numpy pyx graphviz mkdocs mkdocs-material && echo "::add-path::~/.local/bin"
+          #mkdir /opt/doxypress
+          #wget -qO- https://download.copperspice.com/doxypress/binary/doxypress-1.4.0-ubuntu20.04-x64.tar.bz2 | tar xj -C /opt/doxypress
+          #echo "::add-path::/opt/doxypress"
+          #wget -qO- https://github.com/modm-ext/docker-avr-gcc/releases/download/v10.2.0/avr-gcc.tar.bz2 | tar xj -C /opt
+          #echo "::add-path::/opt/avr-gcc/avr-gcc/bin:/opt/avr-gcc/avr-binutils/bin"
+          wget -qO- https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2020q2/gcc-arm-none-eabi-9-2020-q2-update-x86_64-linux.tar.bz2 | tar -xj -C /opt
+          echo "::add-path::/opt/gcc-arm-none-eabi-9-2020-q2-update/bin"
+          #wget -qO- https://github.com/modm-ext/riscv-gcc/releases/download/v10.2.0/modm-riscv-gcc.tar.bz2 | tar xj -C /opt
+          #echo "::add-path::/opt/modm-riscv-gcc/bin"
       - name: Check out repository
         uses: actions/checkout@v2
       - name: Checkout code and update modm tools
@@ -204,9 +330,27 @@ jobs:
     if: "!startsWith(github.ref, 'refs/heads/develop')"
     needs: [unittests-linux-generic, stm32-examples]
     runs-on: ubuntu-20.04
-    container:
-      image: modm/modm-build:cortex-m
+    #container:
+    #  image: modm/modm-build:cortex-m
     steps:
+      - name: Setup build environment
+        env:
+          TZ: Europe/Berlin
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq build-essential git bzip2 wget python3 python3-dev python3-pip libboost-all-dev libsdl1.2-dev libsdl-image1.2-dev libgtkmm-2.4-dev libmpc-dev libmpfr-dev libgmp-dev cmake locales texlive-latex-base texlive-fonts-recommended doxygen graphviz curl
+          sudo locale-gen en_US.UTF-8
+          pip3 install modm scons configparser numpy pyx graphviz mkdocs mkdocs-material && echo "::add-path::~/.local/bin"
+          #mkdir /opt/doxypress
+          #wget -qO- https://download.copperspice.com/doxypress/binary/doxypress-1.4.0-ubuntu20.04-x64.tar.bz2 | tar xj -C /opt/doxypress
+          #echo "::add-path::/opt/doxypress"
+          #wget -qO- https://github.com/modm-ext/docker-avr-gcc/releases/download/v10.2.0/avr-gcc.tar.bz2 | tar xj -C /opt
+          #echo "::add-path::/opt/avr-gcc/avr-gcc/bin:/opt/avr-gcc/avr-binutils/bin"
+          wget -qO- https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2020q2/gcc-arm-none-eabi-9-2020-q2-update-x86_64-linux.tar.bz2 | tar -xj -C /opt
+          echo "::add-path::/opt/gcc-arm-none-eabi-9-2020-q2-update/bin"
+          #wget -qO- https://github.com/modm-ext/riscv-gcc/releases/download/v10.2.0/modm-riscv-gcc.tar.bz2 | tar xj -C /opt
+          #echo "::add-path::/opt/modm-riscv-gcc/bin"
       - name: Check out repository
         uses: actions/checkout@v2
       - name: Checkout code and update modm tools
@@ -225,9 +369,27 @@ jobs:
     if: "!startsWith(github.ref, 'refs/heads/develop')"
     needs: [unittests-linux-generic, stm32-examples]
     runs-on: ubuntu-20.04
-    container:
-      image: modm/modm-build:cortex-m
+    #container:
+    #  image: modm/modm-build:cortex-m
     steps:
+      - name: Setup build environment
+        env:
+          TZ: Europe/Berlin
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq build-essential git bzip2 wget python3 python3-dev python3-pip libboost-all-dev libsdl1.2-dev libsdl-image1.2-dev libgtkmm-2.4-dev libmpc-dev libmpfr-dev libgmp-dev cmake locales texlive-latex-base texlive-fonts-recommended doxygen graphviz curl
+          sudo locale-gen en_US.UTF-8
+          pip3 install modm scons configparser numpy pyx graphviz mkdocs mkdocs-material && echo "::add-path::~/.local/bin"
+          #mkdir /opt/doxypress
+          #wget -qO- https://download.copperspice.com/doxypress/binary/doxypress-1.4.0-ubuntu20.04-x64.tar.bz2 | tar xj -C /opt/doxypress
+          #echo "::add-path::/opt/doxypress"
+          #wget -qO- https://github.com/modm-ext/docker-avr-gcc/releases/download/v10.2.0/avr-gcc.tar.bz2 | tar xj -C /opt
+          #echo "::add-path::/opt/avr-gcc/avr-gcc/bin:/opt/avr-gcc/avr-binutils/bin"
+          wget -qO- https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2020q2/gcc-arm-none-eabi-9-2020-q2-update-x86_64-linux.tar.bz2 | tar -xj -C /opt
+          echo "::add-path::/opt/gcc-arm-none-eabi-9-2020-q2-update/bin"
+          #wget -qO- https://github.com/modm-ext/riscv-gcc/releases/download/v10.2.0/modm-riscv-gcc.tar.bz2 | tar xj -C /opt
+          #echo "::add-path::/opt/modm-riscv-gcc/bin"
       - name: Check out repository
         uses: actions/checkout@v2
       - name: Checkout code and update modm tools
@@ -246,9 +408,27 @@ jobs:
     if: "!startsWith(github.ref, 'refs/heads/develop')"
     needs: [unittests-linux-generic, stm32-examples]
     runs-on: ubuntu-20.04
-    container:
-      image: modm/modm-build:cortex-m
+    #container:
+    #  image: modm/modm-build:cortex-m
     steps:
+      - name: Setup build environment
+        env:
+          TZ: Europe/Berlin
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq build-essential git bzip2 wget python3 python3-dev python3-pip libboost-all-dev libsdl1.2-dev libsdl-image1.2-dev libgtkmm-2.4-dev libmpc-dev libmpfr-dev libgmp-dev cmake locales texlive-latex-base texlive-fonts-recommended doxygen graphviz curl
+          sudo locale-gen en_US.UTF-8
+          pip3 install modm scons configparser numpy pyx graphviz mkdocs mkdocs-material && echo "::add-path::~/.local/bin"
+          #mkdir /opt/doxypress
+          #wget -qO- https://download.copperspice.com/doxypress/binary/doxypress-1.4.0-ubuntu20.04-x64.tar.bz2 | tar xj -C /opt/doxypress
+          #echo "::add-path::/opt/doxypress"
+          #wget -qO- https://github.com/modm-ext/docker-avr-gcc/releases/download/v10.2.0/avr-gcc.tar.bz2 | tar xj -C /opt
+          #echo "::add-path::/opt/avr-gcc/avr-gcc/bin:/opt/avr-gcc/avr-binutils/bin"
+          wget -qO- https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2020q2/gcc-arm-none-eabi-9-2020-q2-update-x86_64-linux.tar.bz2 | tar -xj -C /opt
+          echo "::add-path::/opt/gcc-arm-none-eabi-9-2020-q2-update/bin"
+          #wget -qO- https://github.com/modm-ext/riscv-gcc/releases/download/v10.2.0/modm-riscv-gcc.tar.bz2 | tar xj -C /opt
+          #echo "::add-path::/opt/modm-riscv-gcc/bin"
       - name: Check out repository
         uses: actions/checkout@v2
       - name: Checkout code and update modm tools
@@ -267,9 +447,27 @@ jobs:
     if: "!startsWith(github.ref, 'refs/heads/develop')"
     needs: [unittests-linux-generic, stm32f4-examples]
     runs-on: ubuntu-20.04
-    container:
-      image: modm/modm-build:cortex-m
+    #container:
+    #  image: modm/modm-build:cortex-m
     steps:
+      - name: Setup build environment
+        env:
+          TZ: Europe/Berlin
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq build-essential git bzip2 wget python3 python3-dev python3-pip libboost-all-dev libsdl1.2-dev libsdl-image1.2-dev libgtkmm-2.4-dev libmpc-dev libmpfr-dev libgmp-dev cmake locales texlive-latex-base texlive-fonts-recommended doxygen graphviz curl
+          sudo locale-gen en_US.UTF-8
+          pip3 install modm scons configparser numpy pyx graphviz mkdocs mkdocs-material && echo "::add-path::~/.local/bin"
+          #mkdir /opt/doxypress
+          #wget -qO- https://download.copperspice.com/doxypress/binary/doxypress-1.4.0-ubuntu20.04-x64.tar.bz2 | tar xj -C /opt/doxypress
+          #echo "::add-path::/opt/doxypress"
+          #wget -qO- https://github.com/modm-ext/docker-avr-gcc/releases/download/v10.2.0/avr-gcc.tar.bz2 | tar xj -C /opt
+          #echo "::add-path::/opt/avr-gcc/avr-gcc/bin:/opt/avr-gcc/avr-binutils/bin"
+          wget -qO- https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2020q2/gcc-arm-none-eabi-9-2020-q2-update-x86_64-linux.tar.bz2 | tar -xj -C /opt
+          echo "::add-path::/opt/gcc-arm-none-eabi-9-2020-q2-update/bin"
+          #wget -qO- https://github.com/modm-ext/riscv-gcc/releases/download/v10.2.0/modm-riscv-gcc.tar.bz2 | tar xj -C /opt
+          #echo "::add-path::/opt/modm-riscv-gcc/bin"
       - name: Check out repository
         uses: actions/checkout@v2
       - name: Checkout code and update modm tools
@@ -288,9 +486,27 @@ jobs:
     if: "!startsWith(github.ref, 'refs/heads/develop')"
     needs: [unittests-linux-generic, stm32-examples]
     runs-on: ubuntu-20.04
-    container:
-      image: modm/modm-build:cortex-m
+    #container:
+    #  image: modm/modm-build:cortex-m
     steps:
+      - name: Setup build environment
+        env:
+          TZ: Europe/Berlin
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq build-essential git bzip2 wget python3 python3-dev python3-pip libboost-all-dev libsdl1.2-dev libsdl-image1.2-dev libgtkmm-2.4-dev libmpc-dev libmpfr-dev libgmp-dev cmake locales texlive-latex-base texlive-fonts-recommended doxygen graphviz curl
+          sudo locale-gen en_US.UTF-8
+          pip3 install modm scons configparser numpy pyx graphviz mkdocs mkdocs-material && echo "::add-path::~/.local/bin"
+          #mkdir /opt/doxypress
+          #wget -qO- https://download.copperspice.com/doxypress/binary/doxypress-1.4.0-ubuntu20.04-x64.tar.bz2 | tar xj -C /opt/doxypress
+          #echo "::add-path::/opt/doxypress"
+          #wget -qO- https://github.com/modm-ext/docker-avr-gcc/releases/download/v10.2.0/avr-gcc.tar.bz2 | tar xj -C /opt
+          #echo "::add-path::/opt/avr-gcc/avr-gcc/bin:/opt/avr-gcc/avr-binutils/bin"
+          wget -qO- https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2020q2/gcc-arm-none-eabi-9-2020-q2-update-x86_64-linux.tar.bz2 | tar -xj -C /opt
+          echo "::add-path::/opt/gcc-arm-none-eabi-9-2020-q2-update/bin"
+          #wget -qO- https://github.com/modm-ext/riscv-gcc/releases/download/v10.2.0/modm-riscv-gcc.tar.bz2 | tar xj -C /opt
+          #echo "::add-path::/opt/modm-riscv-gcc/bin"
       - name: Check out repository
         uses: actions/checkout@v2
       - name: Checkout code and update modm tools
@@ -309,9 +525,27 @@ jobs:
     if: "!startsWith(github.ref, 'refs/heads/develop')"
     needs: [unittests-linux-generic, stm32-examples]
     runs-on: ubuntu-20.04
-    container:
-      image: modm/modm-build:cortex-m
+    #container:
+    #  image: modm/modm-build:cortex-m
     steps:
+      - name: Setup build environment
+        env:
+          TZ: Europe/Berlin
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq build-essential git bzip2 wget python3 python3-dev python3-pip libboost-all-dev libsdl1.2-dev libsdl-image1.2-dev libgtkmm-2.4-dev libmpc-dev libmpfr-dev libgmp-dev cmake locales texlive-latex-base texlive-fonts-recommended doxygen graphviz curl
+          sudo locale-gen en_US.UTF-8
+          pip3 install modm scons configparser numpy pyx graphviz mkdocs mkdocs-material && echo "::add-path::~/.local/bin"
+          #mkdir /opt/doxypress
+          #wget -qO- https://download.copperspice.com/doxypress/binary/doxypress-1.4.0-ubuntu20.04-x64.tar.bz2 | tar xj -C /opt/doxypress
+          #echo "::add-path::/opt/doxypress"
+          #wget -qO- https://github.com/modm-ext/docker-avr-gcc/releases/download/v10.2.0/avr-gcc.tar.bz2 | tar xj -C /opt
+          #echo "::add-path::/opt/avr-gcc/avr-gcc/bin:/opt/avr-gcc/avr-binutils/bin"
+          wget -qO- https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2020q2/gcc-arm-none-eabi-9-2020-q2-update-x86_64-linux.tar.bz2 | tar -xj -C /opt
+          echo "::add-path::/opt/gcc-arm-none-eabi-9-2020-q2-update/bin"
+          #wget -qO- https://github.com/modm-ext/riscv-gcc/releases/download/v10.2.0/modm-riscv-gcc.tar.bz2 | tar xj -C /opt
+          #echo "::add-path::/opt/modm-riscv-gcc/bin"
       - name: Check out repository
         uses: actions/checkout@v2
       - name: Checkout code and update modm tools
@@ -330,9 +564,27 @@ jobs:
     if: "!startsWith(github.ref, 'refs/heads/develop')"
     needs: [unittests-linux-generic, stm32-examples]
     runs-on: ubuntu-20.04
-    container:
-      image: modm/modm-build:cortex-m
+    #container:
+    #  image: modm/modm-build:cortex-m
     steps:
+      - name: Setup build environment
+        env:
+          TZ: Europe/Berlin
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq build-essential git bzip2 wget python3 python3-dev python3-pip libboost-all-dev libsdl1.2-dev libsdl-image1.2-dev libgtkmm-2.4-dev libmpc-dev libmpfr-dev libgmp-dev cmake locales texlive-latex-base texlive-fonts-recommended doxygen graphviz curl
+          sudo locale-gen en_US.UTF-8
+          pip3 install modm scons configparser numpy pyx graphviz mkdocs mkdocs-material && echo "::add-path::~/.local/bin"
+          #mkdir /opt/doxypress
+          #wget -qO- https://download.copperspice.com/doxypress/binary/doxypress-1.4.0-ubuntu20.04-x64.tar.bz2 | tar xj -C /opt/doxypress
+          #echo "::add-path::/opt/doxypress"
+          #wget -qO- https://github.com/modm-ext/docker-avr-gcc/releases/download/v10.2.0/avr-gcc.tar.bz2 | tar xj -C /opt
+          #echo "::add-path::/opt/avr-gcc/avr-gcc/bin:/opt/avr-gcc/avr-binutils/bin"
+          wget -qO- https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2020q2/gcc-arm-none-eabi-9-2020-q2-update-x86_64-linux.tar.bz2 | tar -xj -C /opt
+          echo "::add-path::/opt/gcc-arm-none-eabi-9-2020-q2-update/bin"
+          #wget -qO- https://github.com/modm-ext/riscv-gcc/releases/download/v10.2.0/modm-riscv-gcc.tar.bz2 | tar xj -C /opt
+          #echo "::add-path::/opt/modm-riscv-gcc/bin"
       - name: Check out repository
         uses: actions/checkout@v2
       - name: Checkout code and update modm tools
@@ -351,9 +603,27 @@ jobs:
     if: "!startsWith(github.ref, 'refs/heads/develop')"
     needs: [unittests-linux-generic, stm32-examples]
     runs-on: ubuntu-20.04
-    container:
-      image: modm/modm-build:cortex-m
+    #container:
+    #  image: modm/modm-build:cortex-m
     steps:
+      - name: Setup build environment
+        env:
+          TZ: Europe/Berlin
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq build-essential git bzip2 wget python3 python3-dev python3-pip libboost-all-dev libsdl1.2-dev libsdl-image1.2-dev libgtkmm-2.4-dev libmpc-dev libmpfr-dev libgmp-dev cmake locales texlive-latex-base texlive-fonts-recommended doxygen graphviz curl
+          sudo locale-gen en_US.UTF-8
+          pip3 install modm scons configparser numpy pyx graphviz mkdocs mkdocs-material && echo "::add-path::~/.local/bin"
+          #mkdir /opt/doxypress
+          #wget -qO- https://download.copperspice.com/doxypress/binary/doxypress-1.4.0-ubuntu20.04-x64.tar.bz2 | tar xj -C /opt/doxypress
+          #echo "::add-path::/opt/doxypress"
+          #wget -qO- https://github.com/modm-ext/docker-avr-gcc/releases/download/v10.2.0/avr-gcc.tar.bz2 | tar xj -C /opt
+          #echo "::add-path::/opt/avr-gcc/avr-gcc/bin:/opt/avr-gcc/avr-binutils/bin"
+          wget -qO- https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2020q2/gcc-arm-none-eabi-9-2020-q2-update-x86_64-linux.tar.bz2 | tar -xj -C /opt
+          echo "::add-path::/opt/gcc-arm-none-eabi-9-2020-q2-update/bin"
+          #wget -qO- https://github.com/modm-ext/riscv-gcc/releases/download/v10.2.0/modm-riscv-gcc.tar.bz2 | tar xj -C /opt
+          #echo "::add-path::/opt/modm-riscv-gcc/bin"
       - name: Check out repository
         uses: actions/checkout@v2
       - name: Checkout code and update modm tools
@@ -372,9 +642,27 @@ jobs:
     if: "!startsWith(github.ref, 'refs/heads/develop')"
     needs: [unittests-linux-generic, stm32-examples]
     runs-on: ubuntu-20.04
-    container:
-      image: modm/modm-build:cortex-m
+    #container:
+    #  image: modm/modm-build:cortex-m
     steps:
+      - name: Setup build environment
+        env:
+          TZ: Europe/Berlin
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq build-essential git bzip2 wget python3 python3-dev python3-pip libboost-all-dev libsdl1.2-dev libsdl-image1.2-dev libgtkmm-2.4-dev libmpc-dev libmpfr-dev libgmp-dev cmake locales texlive-latex-base texlive-fonts-recommended doxygen graphviz curl
+          sudo locale-gen en_US.UTF-8
+          pip3 install modm scons configparser numpy pyx graphviz mkdocs mkdocs-material && echo "::add-path::~/.local/bin"
+          #mkdir /opt/doxypress
+          #wget -qO- https://download.copperspice.com/doxypress/binary/doxypress-1.4.0-ubuntu20.04-x64.tar.bz2 | tar xj -C /opt/doxypress
+          #echo "::add-path::/opt/doxypress"
+          #wget -qO- https://github.com/modm-ext/docker-avr-gcc/releases/download/v10.2.0/avr-gcc.tar.bz2 | tar xj -C /opt
+          #echo "::add-path::/opt/avr-gcc/avr-gcc/bin:/opt/avr-gcc/avr-binutils/bin"
+          wget -qO- https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2020q2/gcc-arm-none-eabi-9-2020-q2-update-x86_64-linux.tar.bz2 | tar -xj -C /opt
+          echo "::add-path::/opt/gcc-arm-none-eabi-9-2020-q2-update/bin"
+          #wget -qO- https://github.com/modm-ext/riscv-gcc/releases/download/v10.2.0/modm-riscv-gcc.tar.bz2 | tar xj -C /opt
+          #echo "::add-path::/opt/modm-riscv-gcc/bin"
       - name: Check out repository
         uses: actions/checkout@v2
       - name: Checkout code and update modm tools
@@ -404,6 +692,24 @@ jobs:
     container:
       image: modm/modm-build:base
     steps:
+      - name: Setup build environment
+        env:
+          TZ: Europe/Berlin
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq build-essential git bzip2 wget python3 python3-dev python3-pip libboost-all-dev libsdl1.2-dev libsdl-image1.2-dev libgtkmm-2.4-dev libmpc-dev libmpfr-dev libgmp-dev cmake locales texlive-latex-base texlive-fonts-recommended doxygen graphviz curl
+          sudo sudo locale-gen en_US.UTF-8
+          pip3 install modm scons configparser numpy pyx graphviz mkdocs mkdocs-material && echo "::add-path::~/.local/bin"
+          mkdir /opt/doxypress
+          wget -qO- https://download.copperspice.com/doxypress/binary/doxypress-1.4.0-ubuntu20.04-x64.tar.bz2 | tar xj -C /opt/doxypress
+          echo "::add-path::/opt/doxypress"
+          #wget -qO- https://github.com/modm-ext/docker-avr-gcc/releases/download/v10.2.0/avr-gcc.tar.bz2 | tar xj -C /opt
+          #echo "::add-path::/opt/avr-gcc/avr-gcc/bin:/opt/avr-gcc/avr-binutils/bin"
+          #wget -qO- https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2020q2/gcc-arm-none-eabi-9-2020-q2-update-x86_64-linux.tar.bz2 | tar -xj -C /opt
+          #echo "::add-path::/opt/gcc-arm-none-eabi-9-2020-q2-update/bin"
+          #wget -qO- https://github.com/modm-ext/riscv-gcc/releases/download/v10.2.0/modm-riscv-gcc.tar.bz2 | tar xj -C /opt
+          #echo "::add-path::/opt/modm-riscv-gcc/bin"
       - name: Check out repository
         uses: actions/checkout@v2
       - name: Update submodules and install lbuild
@@ -434,6 +740,24 @@ jobs:
     container:
       image: modm/modm-build:base
     steps:
+      - name: Setup build environment
+        env:
+          TZ: Europe/Berlin
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq build-essential git bzip2 wget python3 python3-dev python3-pip libboost-all-dev libsdl1.2-dev libsdl-image1.2-dev libgtkmm-2.4-dev libmpc-dev libmpfr-dev libgmp-dev cmake locales texlive-latex-base texlive-fonts-recommended doxygen graphviz curl
+          sudo locale-gen en_US.UTF-8
+          pip3 install modm scons configparser numpy pyx graphviz mkdocs mkdocs-material && echo "::add-path::~/.local/bin"
+          mkdir /opt/doxypress
+          wget -qO- https://download.copperspice.com/doxypress/binary/doxypress-1.4.0-ubuntu20.04-x64.tar.bz2 | tar xj -C /opt/doxypress
+          echo "::add-path::/opt/doxypress"
+          #wget -qO- https://github.com/modm-ext/docker-avr-gcc/releases/download/v10.2.0/avr-gcc.tar.bz2 | tar xj -C /opt
+          #echo "::add-path::/opt/avr-gcc/avr-gcc/bin:/opt/avr-gcc/avr-binutils/bin"
+          #wget -qO- https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2020q2/gcc-arm-none-eabi-9-2020-q2-update-x86_64-linux.tar.bz2 | tar -xj -C /opt
+          #echo "::add-path::/opt/gcc-arm-none-eabi-9-2020-q2-update/bin"
+          #wget -qO- https://github.com/modm-ext/riscv-gcc/releases/download/v10.2.0/modm-riscv-gcc.tar.bz2 | tar xj -C /opt
+          #echo "::add-path::/opt/modm-riscv-gcc/bin"
       #- add_ssh_keys:
       #    fingerprints:
       #      - "8c:e7:b6:51:2a:40:66:e6:e9:50:ea:fe:38:49:1d:3f"
@@ -463,6 +787,24 @@ jobs:
     container:
       image: modm/modm-build:base
     steps:
+      - name: Setup build environment
+        env:
+          TZ: Europe/Berlin
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq build-essential git bzip2 wget python3 python3-dev python3-pip libboost-all-dev libsdl1.2-dev libsdl-image1.2-dev libgtkmm-2.4-dev libmpc-dev libmpfr-dev libgmp-dev cmake locales texlive-latex-base texlive-fonts-recommended doxygen graphviz curl
+          sudo locale-gen en_US.UTF-8
+          pip3 install modm scons configparser numpy pyx graphviz mkdocs mkdocs-material && echo "::add-path::~/.local/bin"
+          mkdir /opt/doxypress
+          wget -qO- https://download.copperspice.com/doxypress/binary/doxypress-1.4.0-ubuntu20.04-x64.tar.bz2 | tar xj -C /opt/doxypress
+          echo "::add-path::/opt/doxypress"
+          #wget -qO- https://github.com/modm-ext/docker-avr-gcc/releases/download/v10.2.0/avr-gcc.tar.bz2 | tar xj -C /opt
+          #echo "::add-path::/opt/avr-gcc/avr-gcc/bin:/opt/avr-gcc/avr-binutils/bin"
+          #wget -qO- https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2020q2/gcc-arm-none-eabi-9-2020-q2-update-x86_64-linux.tar.bz2 | tar -xj -C /opt
+          #echo "::add-path::/opt/gcc-arm-none-eabi-9-2020-q2-update/bin"
+          #wget -qO- https://github.com/modm-ext/riscv-gcc/releases/download/v10.2.0/modm-riscv-gcc.tar.bz2 | tar xj -C /opt
+          #echo "::add-path::/opt/modm-riscv-gcc/bin"
       - name: Check out repository
         uses: actions/checkout@v2
       - name: Update submodules and install lbuild
