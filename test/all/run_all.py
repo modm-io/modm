@@ -24,7 +24,14 @@ from pathlib import Path
 
 LOGGER = logging.getLogger("run")
 LBUILD_COMMAND = ["lbuild"]
-cpus = 4 if os.getenv("CIRCLECI") else os.cpu_count()
+
+is_running_in_ci = 	os.getenv("CIRCLECI") is not None or \
+					os.getenv("TRAVIS") is not None or \
+					os.getenv("GITHUB_ACTIONS") is not None
+cpus = 4 if is_running_in_ci else os.cpu_count()
+if os.getenv("GITHUB_ACTIONS") is not None:
+    cpus = 8
+
 build_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../build"))
 
 class CommandException(Exception):
