@@ -2,7 +2,7 @@ version: 2
 jobs:
   unittests-linux-generic:
     docker:
-      - image: modm/modm-build:latest
+      - image: modm/modm-build:cortex-m
     steps:
       - checkout
       - run:
@@ -20,8 +20,6 @@ jobs:
             scons --version
             which g++
             g++ --version
-            which avr-g++
-            avr-g++ --version
             which arm-none-eabi-g++
             arm-none-eabi-g++ --version
             which lbuild
@@ -36,13 +34,6 @@ jobs:
             (cd test && make compile-nucleo-f411)
             (cd test && make compile-nucleo-f103)
             (cd test && make compile-nucleo-l432)
-      - run:
-          name: Compile AVR Unittests
-          command: |
-            (cd test && make compile-al-avreb-can)
-            (cd test && make compile-arduino-uno)
-            (cd test && make compile-arduino-nano)
-            (cd test && make compile-mega-2560-pro)
       - run:
           name: Linux Examples
           command: |
@@ -75,7 +66,7 @@ jobs:
 
   stm32-examples:
     docker:
-      - image: modm/modm-build:latest
+      - image: modm/modm-build:cortex-m
     steps:
       - checkout
       - run:
@@ -117,7 +108,7 @@ jobs:
 
   stm32f4-examples:
     docker:
-      - image: modm/modm-build:latest
+      - image: modm/modm-build:cortex-m
     steps:
       - checkout
       - run:
@@ -132,7 +123,7 @@ jobs:
 
   avr-examples:
     docker:
-      - image: modm/modm-build:latest
+      - image: modm/modm-build:avr
     steps:
       - checkout
       - run:
@@ -140,13 +131,25 @@ jobs:
           command: |
             (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
       - run:
+          name: Check environment
+          command: |
+            which avr-g++
+            avr-g++ --version
+      - run:
           name: Examples AVR Series
           command: |
             (cd examples && ../tools/scripts/examples_compile.py avr arduino_uno)
+      - run:
+          name: Compile AVR Unittests
+          command: |
+            (cd test && make compile-al-avreb-can)
+            (cd test && make compile-arduino-uno)
+            (cd test && make compile-arduino-nano)
+            (cd test && make compile-mega-2560-pro)
 
   avr-compile-all:
     docker:
-      - image: modm/modm-build:latest
+      - image: modm/modm-build:avr
     steps:
       - checkout
       - run:
@@ -163,7 +166,7 @@ jobs:
 
   samd-compile-all:
     docker:
-      - image: modm/modm-build:latest
+      - image: modm/modm-build:cortex-m
     steps:
       - checkout
       - run:
@@ -180,7 +183,7 @@ jobs:
 
   stm32f0-compile-all:
     docker:
-      - image: modm/modm-build:latest
+      - image: modm/modm-build:cortex-m
     steps:
       - checkout
       - run:
@@ -197,7 +200,7 @@ jobs:
 
   stm32f1-compile-all:
     docker:
-      - image: modm/modm-build:latest
+      - image: modm/modm-build:cortex-m
     steps:
       - checkout
       - run:
@@ -214,7 +217,7 @@ jobs:
 
   stm32f2-compile-all:
     docker:
-      - image: modm/modm-build:latest
+      - image: modm/modm-build:cortex-m
     steps:
       - checkout
       - run:
@@ -231,7 +234,7 @@ jobs:
 
   stm32f3-compile-all:
     docker:
-      - image: modm/modm-build:latest
+      - image: modm/modm-build:cortex-m
     steps:
       - checkout
       - run:
@@ -248,7 +251,7 @@ jobs:
 
   stm32f4-compile-all:
     docker:
-      - image: modm/modm-build:latest
+      - image: modm/modm-build:cortex-m
     steps:
       - checkout
       - run:
@@ -265,7 +268,7 @@ jobs:
 
   stm32f7-compile-all:
     docker:
-      - image: modm/modm-build:latest
+      - image: modm/modm-build:cortex-m
     steps:
       - checkout
       - run:
@@ -282,7 +285,7 @@ jobs:
 
   stm32l1-compile-all:
     docker:
-      - image: modm/modm-build:latest
+      - image: modm/modm-build:cortex-m
     steps:
       - checkout
       - run:
@@ -299,7 +302,7 @@ jobs:
 
   stm32l4-compile-all:
     docker:
-      - image: modm/modm-build:latest
+      - image: modm/modm-build:cortex-m
     steps:
       - checkout
       - run:
@@ -316,7 +319,7 @@ jobs:
 
   stm32g0-compile-all:
     docker:
-      - image: modm/modm-build:latest
+      - image: modm/modm-build:cortex-m
     steps:
       - checkout
       - run:
@@ -333,7 +336,7 @@ jobs:
 
   stm32g4-compile-all:
     docker:
-      - image: modm/modm-build:latest
+      - image: modm/modm-build:cortex-m
     steps:
       - checkout
       - run:
@@ -350,7 +353,7 @@ jobs:
 
   build-docs:
     docker:
-      - image: modm/modm-build:latest
+      - image: modm/modm-build:base
     steps:
       - checkout
       - run:
@@ -380,7 +383,7 @@ jobs:
 
   build-upload-docs:
     docker:
-      - image: modm/modm-build:latest
+      - image: modm/modm-build:base
     steps:
       - add_ssh_keys:
           fingerprints:
@@ -409,7 +412,7 @@ jobs:
 
   api-docs-all:
     docker:
-      - image: modm/modm-build:latest
+      - image: modm/modm-build:base
     steps:
       - checkout
       - run:
