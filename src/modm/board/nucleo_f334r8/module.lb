@@ -1,0 +1,38 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2020, Raphael Lehmann
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":board:nucleo-f334r8"
+    module.description = """\
+# NUCLEO-F334R8
+
+[Nucleo kit for STM32F334R8](https://www.st.com/en/evaluation-tools/nucleo-f334r8.html)
+"""
+
+def prepare(module, options):
+    if not options[":target"].partname.startswith("stm32f334r8t"):
+        return False
+
+    module.depends(":platform:core", ":platform:gpio", ":platform:clock", ":platform:uart:2",
+                   ":debug", ":architecture:clock")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/board"
+    env.substitutions = {
+        "with_logger": True,
+        "with_assert": env.has_module(":architecture:assert")
+    }
+    env.template("../board.cpp.in", "board.cpp")
+    env.copy('.')
+    env.copy("../nucleo64_arduino.hpp", "nucleo64_arduino.hpp")
+    env.collect(":build:openocd.source", "board/st_nucleo_f3.cfg");
