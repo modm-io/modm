@@ -143,11 +143,13 @@ TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 	} >{{memory}}
 %% endmacro
 
-%% macro section(memory, name, sections=[])
-	.{{name}} :
+%% macro section(memory, name, sections=[], noload=False)
+	.{{name}}{% if noload %} (NOLOAD){% endif %} :
 	{
 		. = ALIGN(4);
+	%% if not noload
 		__{{name}}_load = LOADADDR(.{{name}});
+	%% endif
 		__{{name}}_start = .;
 		*(.{{name}} .{{name}}.*)
 		. = ALIGN(4);

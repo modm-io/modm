@@ -129,14 +129,14 @@ void __modm_startup(void)
 	// Call all constructors of static objects
 	table_call(__init_array_start, __init_array_end);
 
-	// Call the application's entry point
-	extern int main(void);
-	main();
+	// This will setup a main fiber and start the scheduler.
+	extern void __modm_fiber_initialize(void);
+	__modm_fiber_initialize();
 
 %% if with_assert
-	// If main exits, assert here in debug mode
+	// If all fiber exits, assert here in debug mode
 	(void) modm_assert_continue_fail_debug(0,
-			"main.exit", "The main() function returned!");
+			"fiber.exit", "All fibers returned!");
 %% endif
 	// Otherwise reboot
 	NVIC_SystemReset();

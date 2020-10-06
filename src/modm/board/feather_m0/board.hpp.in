@@ -16,7 +16,10 @@
 #include <modm/architecture/interface/clock.hpp>
 #include <modm/debug/logger.hpp>
 #include <modm/platform.hpp>
+
+%% if with_logger
 #define MODM_BOARD_HAS_LOGGER
+%% endif
 
 using namespace modm::platform;
 
@@ -108,8 +111,10 @@ initialize()
 {
 	SystemClock::enable();
 	SysTickTimer::initialize<SystemClock>();
+%% if with_logger
 	Uart0::connect<Rx::Rx, Tx::Tx>();
 	Uart0::initialize<SystemClock, 115'200_Bd>();
+%% endif
 
 	Led::setOutput(modm::Gpio::Low);
 }

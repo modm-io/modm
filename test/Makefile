@@ -137,3 +137,8 @@ compile-mega-2560-pro:
 	$(call compile-test,mega-2560-pro,size)
 run-mega-2560-pro:
 	$(call run-test,mega-2560-pro,size)
+
+compile-blue-pill:
+	$(call compile-test,blue-pill,size)
+run-blue-pill:
+	$(call run-test,blue-pill,size)

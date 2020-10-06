@@ -1,0 +1,13 @@
+<library>
+  <extends>modm:blue-pill</extends>
+  <!-- <extends>modm:feather-m0</extends> -->
+  <options>
+    <option name="modm:build:build.path">../../../build/generic/fiber</option>
+    <option name="modm:build:openocd.cfg">openocd.cfg</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:processing:timer</module>
+    <module>modm:processing:fiber</module>
+  </modules>
+</library>

@@ -1,0 +1,42 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2020, Erik Henriksson
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":processing:fiber"
+    module.description = ''
+
+def prepare(module, options):
+    if options[":target"].identifier["platform"] not in ["hosted", "sam", "stm32"]:
+        return False
+    # module.depends(":architecture:assert")
+    # if options[":target"].identifier["platform"] in ["sam", "stm32"]:
+    #     module.depends(":cmsis:device")
+    return True
+
+def build(env):
+    core = env[":target"].get_driver("core")["type"]
+
+    env.outbasepath = "modm/src/modm/processing/fiber"
+    env.copy("../fiber.hpp")
+    env.copy("fiber.hpp")
+    env.copy("fiber.cpp")
+    env.copy("fiber_impl.hpp")
+    env.copy("context.hpp")
+    env.copy("context.cpp")
+    env.copy("fiber_main.cpp")
+
+    if core.startswith("cortex-m0"):
+        env.copy("context_cortex_m0.cpp")
+    elif core.startswith("cortex-m"):
+        env.copy("context_cortex_armv7.cpp")
+    elif core == "hosted":
+        env.copy("context_x86_64.cpp")

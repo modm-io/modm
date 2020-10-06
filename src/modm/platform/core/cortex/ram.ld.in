@@ -26,6 +26,8 @@ SECTIONS
 
 {{ linker.section_stack(cont_ram_regions[0].name|upper, "__vec_offset - TOTAL_STACK_SIZE") }}
 
+{{ linker.section(cont_ram_regions[0].name|upper, "faststack", noload=True) }}
+
 %% if vector_table_location == "ram"
 {{ linker.section_vector_ram(cont_ram_regions[0].name|upper) }}
 %% endif

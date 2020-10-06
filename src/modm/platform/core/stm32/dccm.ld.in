@@ -39,6 +39,8 @@ SECTIONS
 
 {{ linker.section_stack("CCM") }}
 
+{{ linker.section("CCM", "faststack", noload=True) }}
+
 	/* CCM can only be accessed by D-Bus, do not place .fastcode here! */
 {{ linker.section("CCM AT >FLASH", "fastdata", sections=["data_ccm"]) }}
 %% do table_copy.append("fastdata")

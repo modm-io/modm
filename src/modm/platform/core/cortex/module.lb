@@ -177,6 +177,7 @@ def prepare(module, options):
 
     module.depends(
         ":architecture:interrupt",
+        ":processing:fiber",
         ":cmsis:device",
         ":stdc++")
 
@@ -186,7 +187,7 @@ def prepare(module, options):
             description=FileReader("option/main_stack_size.md"),
             minimum=2 ** 8,
             maximum=2 ** 16,
-            default="3*1024"))
+            default="1024"))
 
     if "f" in options[":target"].get_driver("core")["type"]:
         module.add_option(

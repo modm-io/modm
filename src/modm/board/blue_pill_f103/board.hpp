@@ -15,6 +15,8 @@
 
 #include <modm/platform.hpp>
 #include <modm/architecture/interface/clock.hpp>
+#include <modm/debug/logger.hpp>
+#define MODM_BOARD_HAS_LOGGER
 
 using namespace modm::platform;
 
@@ -106,11 +108,23 @@ using Leds = SoftwareGpioPort< LedGreen >;
 
 using Button = GpioUnused;
 
+namespace stlink
+{
+using Rx = GpioInputA3;
+using Tx = GpioOutputA2;
+using Uart = Usart2;
+}
+
+using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
+
 inline void
 initialize()
 {
 	SystemClock::enable();
 	SysTickTimer::initialize<SystemClock>();
+
+	stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>();
+	stlink::Uart::initialize<SystemClock, 115200_Bd>();
 
 	LedGreen::setOutput(modm::Gpio::Low);
 }

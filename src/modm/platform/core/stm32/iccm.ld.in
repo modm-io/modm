@@ -18,6 +18,8 @@ SECTIONS
 
 {{ linker.section_stack(cont_ram_regions[0].name|upper) }}
 
+{{ linker.section(cont_ram_regions[0].name|upper, "faststack", noload=True) }}
+
 {{ linker.section_ram(cont_ram_regions[0].name|upper, "FLASH",
                       sections_data=["data_" + cont_ram_regions[0].contains[0].name],
                       sections_bss=["bss_" + cont_ram_regions[0].contains[0].name]) }}

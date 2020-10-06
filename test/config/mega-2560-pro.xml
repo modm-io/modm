@@ -29,7 +29,7 @@
     <module>modm-test:test:platform:**</module>
 
 
-    <module>modm-test:test:processing</module>
+    <!-- <module>modm-test:test:processing</module> -->
 
 
     <module>modm-test:test:ui</module>
