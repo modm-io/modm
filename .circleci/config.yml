@@ -96,7 +96,7 @@ jobs:
           name: Examples STM32F3 Series
           when: always
           command: |
-            (cd examples && ../tools/scripts/examples_compile.py stm32f3_discovery nucleo_f303k8 nucleo_f303re)
+            (cd examples && ../tools/scripts/examples_compile.py stm32f3_discovery nucleo_f303k8 nucleo_f303re nucleo_f334r8)
       - run:
           name: Examples STM32F7 Series
           when: always
