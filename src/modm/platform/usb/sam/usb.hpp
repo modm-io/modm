@@ -32,17 +32,19 @@ public:
 		NVIC_SetPriority(USB_IRQn, priority);
 	}
 
-	template< template<Peripheral _> class... Signals >
+	template<class... Pins>
 	static void
 	connect()
 	{
-		using Connector = GpioConnector<Peripheral::Usb, Signals...>;
-		using Dp = typename Connector::template GetSignal< Gpio::Signal::Dp >;
-		using Dm = typename Connector::template GetSignal< Gpio::Signal::Dm >;
-		static_assert(((Connector::template IsValid<Dp> and Connector::template IsValid<Dm>) and sizeof...(Signals) == 2),
-					  "Usb::connect() requires one Dp and one Dm signal!");
-
-		Connector::connect();
+		using DpPin = GetPin_t<PeripheralPin::Dp, Pins...>;
+		using DmPin = GetPin_t<PeripheralPin::Dm, Pins...>;
+		static_assert(!std::is_same_v<typename DpPin::Base, typename DmPin::Base>,
+					  "Dp and Dm cannot use the same pin!");
+		using Usb = Peripherals::Usb;
+		using DpConnector = typename DpPin::template Connector<Usb, Usb::Dp>;
+		using DmConnector = typename DmPin::template Connector<Usb, Usb::Dm>;
+		DpConnector::connect();
+		DmConnector::connect();
 	}
 };
 

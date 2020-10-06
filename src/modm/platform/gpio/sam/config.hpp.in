@@ -1,0 +1,120 @@
+/*
+ * Copyright (c) 2020, Erik Henriksson
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <stdint.h>
+#include <tuple>
+
+namespace modm::platform
+{
+
+typedef uint32_t Instance;
+
+enum class PinFunction
+{
+%% for function in functions
+	{{ function }},
+%% endfor
+};
+
+struct Peripherals
+{
+%% for name, peripheral in peripherals.items()
+%% if "instances" in peripheral
+	template<int instance>
+%% endif
+	struct {{ name }}
+	{
+%% for signal, index_list in peripheral["signals"].items()
+%% if not index_list
+		struct {{ signal }} {};
+%% else
+		template<int index>
+		struct {{ signal }};
+%% endif
+%% endfor
+  	};
+
+%% endfor
+};
+
+%% for name, peripheral in peripherals.items()
+%% if "instances" in peripheral
+%% for instance in peripheral["instances"]
+%% for signal, index_list in peripheral["signals"].items()
+%% if index_list
+%% for index in index_list
+template<> template<>
+struct Peripherals::{{ name }}<{{ instance }}>::{{ signal }}<{{ index }}> {};
+%% endfor
+%% else
+template<>
+struct Peripherals::{{ name }}<{{ instance }}>::{{ signal }} {};
+%% endif
+%% endfor
+%% endfor
+%% else
+%% for signal, index_list in peripheral["signals"].items()
+%% for index in index_list
+template<>
+struct Peripherals::{{ name }}::{{ signal }}<{{ index }}> {};
+%% endfor
+%% endfor
+%% endif
+%% endfor
+
+
+enum class PortName
+{
+	A,
+	B,
+};
+
+template<class _>
+class Gpio;
+
+%% for gpio in gpios
+namespace gpio {
+struct {{ gpio["port"] ~ gpio["pin"] }}
+{
+	static constexpr PortName port = PortName::{{ gpio["port"] }};
+	static constexpr uint32_t pin = {{ gpio["pin"] | int }};
+
+%% for signal in gpio["signal"]
+	struct {{ signal["full_name"] }}
+	{
+		static constexpr PinFunction function{PinFunction::{{ signal["function"] }}};
+		%% if "instance" in signal
+		using peripheral = Peripherals::{{ signal["peripheral"] }}<{{ signal["instance"] }}>;
+		%% else
+		using peripheral = Peripherals::{{ signal["peripheral"] }};
+		%% endif
+		%% if "index" in signal
+		using signal = peripheral::{{ signal["name"] }}<{{ signal["index"] }}>;
+		%% else
+		using signal = peripheral::{{ signal["name"] }};
+		%% endif
+	};
+%% endfor
+
+	using Signals =
+		std::tuple<
+%% for signal in gpio["signal"]
+			{{ signal["full_name"] }}{{ ">;" if loop.last else ","}}
+%% endfor
+};
+}  // namespace gpio
+using Gpio{{ gpio["port"] ~ gpio["pin"] }} = Gpio<gpio::{{ gpio["port"] ~ gpio["pin"] }}>;
+
+%% endfor
+
+} // namespace modm::platform

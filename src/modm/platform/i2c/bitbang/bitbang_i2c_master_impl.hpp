@@ -5,6 +5,7 @@
  * Copyright (c) 2013, David Hebbeker
  * Copyright (c) 2013, Kevin Läufer
  * Copyright (c) 2014, Sascha Schade
+ * Copyright (c) 2020, Erik Henriksson
  *
  * This file is part of the modm project.
  *
@@ -66,8 +67,8 @@ modm::platform::BitBangI2cMaster<Scl, Sda>::connect(PullUps pullups)
 	static_assert(sizeof...(Signals) == 2, "BitBangI2cMaster<Scl, Sda>::connect() requires one Scl and one Sda signal!");
 	static_assert(Connector::template Contains<SCL> and Connector::template Contains<SDA>,
 				  "BitBangI2cMaster<Scl, Sda> can only connect to the same Scl and Sda signals of the declaration!");
-	const Gpio::InputType input =
-		(pullups == PullUps::Internal) ? Gpio::InputType::PullUp : Gpio::InputType::Floating;
+	const typename SCL::InputType input =
+		(pullups == PullUps::Internal) ? SCL::InputType::PullUp : SCL::InputType::Floating;
 
 	Connector::disconnect();
 	SCL::configure(input);

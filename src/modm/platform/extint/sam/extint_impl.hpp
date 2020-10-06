@@ -11,29 +11,26 @@
 
 #pragma once
 
-namespace modm
-{
-namespace platform
+namespace modm::platform
 {
 
 template<int instance>
 void
-ExtInt<instance>::initialize(
-		std::function<void()> handler,
-		Gpio::InputTrigger trigger,
-		bool wakeupEnabled) {
+ExtInt<instance>::initialize(std::function<void()> handler, InputTrigger trigger,
+							 bool wakeupEnabled)
+{
 	handlers_[instance] = handler;
-	if (wakeupEnabled) {
+	if (wakeupEnabled)
+	{
 		EIC->WAKEUP.reg |= EIC_WAKEUP_WAKEUPEN(1u << instance);
-	} else {
+	} else
+	{
 		EIC->WAKEUP.reg &= ~EIC_WAKEUP_WAKEUPEN(1u << instance);
 	}
-	constexpr int sensePos = instance*EIC_CONFIG_SENSE1_Pos;
+	constexpr int sensePos = instance * EIC_CONFIG_SENSE1_Pos;
 	EIC->CONFIG[instance & 0x8].reg &= EIC_CONFIG_SENSE0_Msk << sensePos;
 	EIC->CONFIG[instance & 0x8].reg |= uint32_t(trigger) << sensePos;
 	EIC->INTENSET.vec.EXTINT |= 1u << instance;
 }
 
-
-}	// namespace platform
-}	// namespace modm
+}  // namespace modm::platform

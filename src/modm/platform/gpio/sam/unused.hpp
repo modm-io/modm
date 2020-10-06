@@ -11,8 +11,9 @@
 
 #pragma once
 
-#include "base.hpp"
 #include <modm/architecture/interface/gpio.hpp>
+
+#include "pin.hpp"
 
 namespace modm::platform
 {
@@ -21,7 +22,7 @@ namespace modm::platform
  * @author	Niklas Hauser
  * @ingroup	modm_platform_gpio
  */
-class GpioUnused : public Gpio, public ::modm::GpioIO
+class GpioUnused : public ::modm::GpioIO
 {
 public:
 	using Output = GpioUnused;
@@ -60,15 +61,6 @@ public:
 	// end documentation inherited
 	static void configure(InputType) {}
 	static void setInput(InputType) {}
-	// External Interrupts
-	static void enableExternalInterrupt() {}
-	static void disableExternalInterrupt() {}
-	static void enableExternalInterruptVector(const uint32_t) {}
-	static void disableExternalInterruptVector() {}
-	static void setInputTrigger(const InputTrigger) {}
-	static bool getExternalInterruptFlag() { return false; }
-	/// Reset the interrupt flag in the interrupt routine.
-	static void acknowledgeExternalInterruptFlag() {}
 
 	// GpioIO
 	// start documentation inherited
@@ -78,4 +70,4 @@ public:
 	static void disconnect() {}
 };
 
-} // namespace modm::platform
+}  // namespace modm::platform

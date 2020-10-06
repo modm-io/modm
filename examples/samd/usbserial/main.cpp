@@ -62,7 +62,8 @@ int main()
 	TCC0->PER.bit.PER = SystemClock::Frequency / 1000;
 	TCC0->CC[3].bit.CC = SystemClock::Frequency / 2000;
 	TCC0->CTRLA.bit.ENABLE = true;
-	D12::Wo3<Peripheral::Tcc0>::connect();
+	using Tcc = Peripherals::Tcc<0>;
+	D12::As<PeripheralPin::Wo>::Connector<Tcc, Tcc::Wo<3>>::connect();
 	GenericClockController::connect<ClockPeripheral::Tcc0>(ClockGenerator::System);
 
 	tusb_init();

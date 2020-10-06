@@ -4,6 +4,7 @@
  * Copyright (c) 2012-2017, Niklas Hauser
  * Copyright (c) 2014, Sascha Schade
  * Copyright (c) 2018, Raphael Lehmann
+ * Copyright (c) 2020, Erik Henriksson
  *
  * This file is part of the modm project.
  *
@@ -53,9 +54,9 @@ modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::connect()
 				  "BitBangSpiMaster<Sck, Mosi, Miso> can only connect to the same Sck, Mosi and Miso signals of the declaration!");
 
 	// Connector::disconnect();
-	Sck::setOutput(Gpio::OutputType::PushPull);
-	Mosi::setOutput(Gpio::OutputType::PushPull);
-	Miso::setInput(Gpio::InputType::Floating);
+	Sck::setOutput(Sck::OutputType::PushPull);
+	Mosi::setOutput(Mosi::OutputType::PushPull);
+	Miso::setInput(Miso::InputType::Floating);
 	Connector::connect();
 }
 

@@ -18,7 +18,6 @@
 #include "../device.hpp"
 #include "uart_base.hpp"
 #include "modm/platform/clock/gclk.hpp"
-#include "modm/platform/core/peripherals.hpp"
 
 namespace modm
 {

@@ -13,7 +13,7 @@
 #include <modm/architecture/interface/interrupt.hpp>
 #include <modm/platform/clock/gclk.hpp>
 #include <modm/platform/device.hpp>
-#include <modm/platform/gpio/base.hpp>
+#include <modm/platform/gpio/pin.hpp>
 
 #pragma once
 
@@ -25,14 +25,25 @@ namespace platform
 
 MODM_ISR_DECL(EIC);
 
+enum class InputTrigger
+{
+	RisingEdge = EIC_CONFIG_SENSE0_RISE_Val,
+	FallingEdge = EIC_CONFIG_SENSE0_FALL_Val,
+	BothEdges = EIC_CONFIG_SENSE0_BOTH_Val,
+	High = EIC_CONFIG_SENSE0_HIGH_Val,
+	Low = EIC_CONFIG_SENSE0_LOW_Val,
+};
+
 /**
  * External Interrupt handler for SAMD devices.
  *
  * @author		Erik Henriksson
  * @ingroup		modm_platform_extint
  */
-class ExternalInterrupt {
+class ExternalInterrupt
+{
 	friend void EIC_IRQHandler(void);
+
 public:
 	/**
 	 * Initializes the External Interrupt handler.
@@ -42,11 +53,11 @@ public:
 	 *  be used to akeup the CPU from standby mode, make sure this clock is
 	 *  actually running in standby. Defaults to external 32.768kHz crystal osc.
 	 */
-	static void initialize(
-			ClockGenerator clockGen = ClockGenerator::ExternalCrystal32K,
-			int priority = (1ul << __NVIC_PRIO_BITS) - 1ul);
+	static void
+	initialize(ClockGenerator clockGen = ClockGenerator::ExternalCrystal32K,
+			   int priority = (1ul << __NVIC_PRIO_BITS) - 1ul);
 
- protected:
+protected:
 	static std::array<std::function<void()>, 16> handlers_;
 };
 
@@ -56,7 +67,8 @@ public:
  * @author		Erik Henriksson
  * @ingroup		modm_platform_extint
  */
-template<int instance> class ExtInt : private ExternalInterrupt
+template<int instance>
+class ExtInt : private ExternalInterrupt
 {
 public:
 	/**
@@ -70,10 +82,9 @@ public:
 	 * 	If true (default), allows the CPU to wakeup from interrupt
 	 * 	from this instance.
 	 */
-	static void initialize(
-			std::function<void()> handler,
-			Gpio::InputTrigger trigger = Gpio::InputTrigger::RisingEdge,
-			bool wakeupEnabled = true);
+	static void
+	initialize(std::function<void()> handler, InputTrigger trigger = InputTrigger::RisingEdge,
+			   bool wakeupEnabled = true);
 
 	/**
 	 * Connects a GPIO pin to this External Interrupt instance.
@@ -81,15 +92,18 @@ public:
 	 * @tparam Pin
 	 * 	The GPIO pin to connect this instance to.
 	 */
-	template<class Pin>
+	template<class GpioPin>
 	static void
-	connectPin() {
-		Pin::template connectInterrupt<instance>();
+	connect()
+	{
+		using Eic = Peripherals::Eic;
+		using Pin = typename GpioPin::template As<PeripheralPin::ExtInt>;
+		Pin::template Connector<Eic, Eic::Extint<instance>>::connect();
 	}
 };
 
-}	// namespace platform
+}  // namespace platform
 
-}	// namespace modm
+}  // namespace modm
 
 #include "extint_impl.hpp"
