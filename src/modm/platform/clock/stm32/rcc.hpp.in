@@ -54,7 +54,7 @@ public:
 		Hsi = RCC_CFGR_PLLSRC_HSI_PREDIV,
 		InternalClock = Hsi,
 	%% endif
-	%% if (target["family"] == "f0") or (target["family"] == "f3" and target["size"] in ["8", "c"])
+	%% if (target["family"] == "f0") or (target["family"] == "f3" and target["name"] in ["18", "28", "58", "73", "78"]) or (target["family"] == "f3" and target["size"] in ["8", "c"])
 		HsiDiv2 = RCC_CFGR_PLLSRC_HSI_DIV2,
 	%% endif
 		/// High speed external clock (see HseConfig)
