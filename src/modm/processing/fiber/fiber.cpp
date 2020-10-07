@@ -11,51 +11,64 @@
 
 #include "fiber.hpp"
 
-namespace modm {
+namespace modm
+{
 
-namespace fiber {
+namespace fiber
+{
 
 Scheduler scheduler;
 
-} // namespace fiber
+}  // namespace fiber
 
-void Waitable::wait() {
-  using ::modm::fiber::scheduler;
-  pushWaiter(scheduler.removeCurrent());
-  scheduler.currentFiber()->jump(*scheduler.lastFiber()->next());
+void
+Waitable::wait()
+{
+	using ::modm::fiber::scheduler;
+	pushWaiter(scheduler.removeCurrent());
+	scheduler.currentFiber()->jump(*scheduler.lastFiber()->next());
 }
 
-void Waitable::signal() {
-  using ::modm::fiber::scheduler;
-  Fiber* waiter = popWaiter();
-  if (waiter != nullptr) {
-    scheduler.runNext(waiter);
-    yield();
-  }
+void
+Waitable::signal()
+{
+	using ::modm::fiber::scheduler;
+	Fiber* waiter = popWaiter();
+	if (waiter != nullptr)
+	{
+		scheduler.runNext(waiter);
+		yield();
+	}
 }
 
-Fiber* Waitable::popWaiter() {
-  if (!last_waiter_) {
-    return nullptr;
-  }
-  Fiber* first = last_waiter_->next();
-  if (first == last_waiter_) {
-    last_waiter_ = nullptr;
-  } else {
-    last_waiter_->next(first->next());
-  }
-  first->next(nullptr);
-  return first;
+Fiber*
+Waitable::popWaiter()
+{
+	if (!last_waiter_) { return nullptr; }
+	Fiber* first = last_waiter_->next();
+	if (first == last_waiter_)
+	{
+		last_waiter_ = nullptr;
+	} else
+	{
+		last_waiter_->next(first->next());
+	}
+	first->next(nullptr);
+	return first;
 }
 
-void Waitable::pushWaiter(Fiber* waiter) {
-  if (last_waiter_) {
-    waiter->next(last_waiter_->next());
-    last_waiter_->next(waiter);
-  } else {
-    waiter->next(waiter);
-  }
-  last_waiter_ = waiter;
+void
+Waitable::pushWaiter(Fiber* waiter)
+{
+	if (last_waiter_)
+	{
+		waiter->next(last_waiter_->next());
+		last_waiter_->next(waiter);
+	} else
+	{
+		waiter->next(waiter);
+	}
+	last_waiter_ = waiter;
 }
 
-} // namespace modm
+}  // namespace modm

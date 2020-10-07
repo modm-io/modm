@@ -11,8 +11,7 @@
 
 #pragma once
 
-namespace modm {
-
-} // namespace modm
+namespace modm
+{}  // namespace modm
 
 #include "channel_impl.hpp"

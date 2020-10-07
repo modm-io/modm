@@ -13,9 +13,9 @@
 #ifndef MODM_STM32_F103C8T6_BLUE_PILL_HPP
 #define MODM_STM32_F103C8T6_BLUE_PILL_HPP
 
-#include <modm/platform.hpp>
 #include <modm/architecture/interface/clock.hpp>
 #include <modm/debug/logger.hpp>
+#include <modm/platform.hpp>
 #define MODM_BOARD_HAS_LOGGER
 
 using namespace modm::platform;
@@ -113,9 +113,9 @@ namespace stlink
 using Rx = GpioInputA3;
 using Tx = GpioOutputA2;
 using Uart = Usart2;
-}
+}  // namespace stlink
 
-using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
+using LoggerDevice = modm::IODeviceWrapper<stlink::Uart, modm::IOBuffer::BlockIfFull>;
 
 inline void
 initialize()

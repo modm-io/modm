@@ -11,13 +11,14 @@
 
 #include "fiber.hpp"
 
-modm_extern_c int main(void);
+modm_extern_c int
+main(void);
 
 modm::fiber::Stack<2048> main_stack;
 modm::Fiber main_fiber(main_stack, &main);
 
-modm_extern_c
-void
-__modm_fiber_initialize() {
-  modm::fiber::scheduler.start();
+modm_extern_c void
+__modm_fiber_initialize()
+{
+	modm::fiber::scheduler.start();
 }

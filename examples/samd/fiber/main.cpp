@@ -9,8 +9,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/debug/logger.hpp>
 #include <modm/board.hpp>
+#include <modm/debug/logger.hpp>
 #include <modm/processing.hpp>
 
 using namespace Board;
@@ -25,42 +25,49 @@ using namespace std::chrono_literals;
 #define STACK_SIZE 40
 #endif
 
+void
+f1();
 
-void f1();
-
-
-void f2();
+void
+f2();
 
 modm::fiber::Stack<STACK_SIZE> stack1, stack2;
 modm::Fiber fiber1(stack1, &f1), fiber2(stack2, &f2);
 
-void f1() {
-#ifdef MODM_BOARD_HAS_LOGGER
-  MODM_LOG_INFO << "f1: entered" << modm::endl;
-#endif
-  while (1) {
-    A0::set();
-    modm::yield();
-  }
-}
-
-void f2() {
-#ifdef MODM_BOARD_HAS_LOGGER
-  MODM_LOG_INFO << "f2: entered" << modm::endl;
-#endif
-  while (1) {
-    A0::reset();
-    modm::yield();
-  }
-}
-
-
-// Frequency of A0 is 625.3kHz, resulting in ~45 CPU cycles per context switch (incl. GPIO overhead).
-int main( int argc, char * argv[])
+void
+f1()
 {
-  Board::initialize();
-  A0::setOutput();
-  modm::fiber::scheduler.start();
-  // Will never get here.
-  return 0;
+#ifdef MODM_BOARD_HAS_LOGGER
+	MODM_LOG_INFO << "f1: entered" << modm::endl;
+#endif
+	while (1)
+	{
+		A0::set();
+		modm::yield();
+	}
+}
+
+void
+f2()
+{
+#ifdef MODM_BOARD_HAS_LOGGER
+	MODM_LOG_INFO << "f2: entered" << modm::endl;
+#endif
+	while (1)
+	{
+		A0::reset();
+		modm::yield();
+	}
+}
+
+// Frequency of A0 is 625.3kHz, resulting in ~45 CPU cycles per context switch (incl. GPIO
+// overhead).
+int
+main(int argc, char* argv[])
+{
+	Board::initialize();
+	A0::setOutput();
+	modm::fiber::scheduler.start();
+	// Will never get here.
+	return 0;
 }

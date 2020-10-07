@@ -44,11 +44,10 @@ public:
 	Stack(const Stack&) = delete;
 
 private:
-	modm_aligned(8)
-	modm_stack_t memory_[size / sizeof(modm_stack_t)];
+	modm_aligned(8) modm_stack_t memory_[size / sizeof(modm_stack_t)];
 };
 
-} // namespace fiber
+}  // namespace fiber
 
 template<class Data_t>
 class Channel;
@@ -65,42 +64,52 @@ class Waitable;
  */
 class Fiber
 {
-  friend class fiber::Scheduler;
-  template<class> friend class Channel;
-  friend class Waitable;
-  friend void yield();
- public:
-  template<int size, typename ReturnType>
-  Fiber(fiber::Stack<size>& stack, ReturnType(*f)());
+	friend class fiber::Scheduler;
+	template<class>
+	friend class Channel;
+	friend class Waitable;
+	friend void
+	yield();
 
-  /**
-   * Currently does nothing, but might be useful in the future for debugging.
+public:
+	template<int size, typename ReturnType>
+	Fiber(fiber::Stack<size>& stack, ReturnType (*f)());
+
+	/**
+	 * Currently does nothing, but might be useful in the future for debugging.
 	 */
-  void dumpStack();
+	void
+	dumpStack();
 
 protected:
 	inline void
 	jump(Fiber& other);
 
 private:
-  Fiber() = default;
-  Fiber(const Fiber&) = delete;
+	Fiber() = default;
+	Fiber(const Fiber&) = delete;
 
 	// Removes the current fiber from the scheduler and yields execution. This is called on fiber
 	// return.
 	static inline void
 	done();
 
-  modm_always_inline
-  Fiber* next() { return next_; }
+	modm_always_inline Fiber*
+	next()
+	{
+		return next_;
+	}
 
-  modm_always_inline
-  void next(Fiber* fiber) { next_ = fiber; }
+	modm_always_inline void
+	next(Fiber* fiber)
+	{
+		next_ = fiber;
+	}
 
 private:
-  modm_context ctx_;
-  modm_stack_t stack_;
-  Fiber* next_;
+	modm_context ctx_;
+	modm_stack_t stack_;
+	Fiber* next_;
 };
 
 /**
@@ -115,22 +124,27 @@ class Waitable
 {
 protected:
 	/**
-   * Adds current fiber to the waitlist and yields execution.
+	 * Adds current fiber to the waitlist and yields execution.
 	 */
-  void wait();
+	void
+	wait();
 
-  /**
-   * Resumes next fiber in the waitlist (yields execution of current fiber).
-   *
-   * This will push the waiting fiber to the front of the ready queue, the reason for this is that
-   * it allows a more efficient implementation of message passing (the reciever is guaranteed to
-   * consume the sent message immediately).
+	/**
+	 * Resumes next fiber in the waitlist (yields execution of current fiber).
+	 *
+	 * This will push the waiting fiber to the front of the ready queue, the reason for this is that
+	 * it allows a more efficient implementation of message passing (the reciever is guaranteed to
+	 * consume the sent message immediately).
 	 */
-  void signal();
+	void
+	signal();
+
 private:
-  Fiber* last_waiter_;
-  Fiber* popWaiter();
-  void pushWaiter(Fiber* waiter);
+	Fiber* last_waiter_;
+	Fiber*
+	popWaiter();
+	void
+	pushWaiter(Fiber* waiter);
 };
 
 /**
@@ -149,36 +163,45 @@ template<typename Data_t>
 class Channel : Waitable
 {
 public:
+	bool
+	empty()
+	{
+		return !size_;
+	}
 
-  bool empty() { return !size_; }
-
-  bool full() { return size_ > buffer_size_; }
+	bool
+	full()
+	{
+		return size_ > buffer_size_;
+	}
 
 	/**
-   * Send data to the channel.
-   *
-   * This method will be non-blocking if the channel is in the ready state, otherwise it will yield
-   * execution.
+	 * Send data to the channel.
+	 *
+	 * This method will be non-blocking if the channel is in the ready state, otherwise it will
+	 * yield execution.
 	 *
 	 *  @param data	Data to add to the channel
 	 */
-  void send(const Data_t& data);
+	void
+	send(const Data_t& data);
 
 	/**
-   * Receive data from the channel.
-   *
-   * This method will be non-blocking if the channel is in the ready state, otherwise it will yield
-   * execution.
+	 * Receive data from the channel.
+	 *
+	 * This method will be non-blocking if the channel is in the ready state, otherwise it will
+	 * yield execution.
 	 *
 	 *  @return The data from the channel.
 	 */
-  Data_t recv();
+	Data_t
+	recv();
 
 private:
-  Data_t data_;
-  Data_t* buffer_ = nullptr;
-  size_t buffer_size_ = 0;
-  size_t size_;
+	Data_t data_;
+	Data_t* buffer_ = nullptr;
+	size_t buffer_size_ = 0;
+	size_t size_;
 };
 
 /**
@@ -192,35 +215,40 @@ template<std::ptrdiff_t MaxValue>
 class Semaphore : Waitable
 {
 public:
-  /**
-   * Increments the internal counter and unblocks acquirers.
-   *
-   * Yields execution if the counter is equal to MaxValue.
+	/**
+	 * Increments the internal counter and unblocks acquirers.
+	 *
+	 * Yields execution if the counter is equal to MaxValue.
 	 */
-  void release() {
-    if (!counter_) {
-      wait();
-    }
-    ++counter_;
-    signal();
-  }
+	void
+	release()
+	{
+		if (!counter_) { wait(); }
+		++counter_;
+		signal();
+	}
 
-  /**
-   * Decrements the internal counter and unblocks releasers.
-   *
-   * Yields execution if the counter is zero.
+	/**
+	 * Decrements the internal counter and unblocks releasers.
+	 *
+	 * Yields execution if the counter is zero.
 	 */
-  void acquire() {
-    if (counter_ == max()) {
-      wait();
-    }
-    ++counter_;
-    signal();
-  }
+	void
+	acquire()
+	{
+		if (counter_ == max()) { wait(); }
+		++counter_;
+		signal();
+	}
 
-  static std::ptrdiff_t max() { return MaxValue; }
+	static std::ptrdiff_t
+	max()
+	{
+		return MaxValue;
+	}
+
 private:
-  std::ptrdiff_t counter_ = 0;
+	std::ptrdiff_t counter_ = 0;
 };
 
 /**
@@ -240,81 +268,100 @@ using Mutex = Semaphore<1>;
 class MutexLock
 {
 public:
-  /**
-   * Aquires the Mutex.
+	/**
+	 * Aquires the Mutex.
 	 */
-  MutexLock(Mutex* m) : mutex_(m) { mutex_->acquire(); }
+	MutexLock(Mutex* m) : mutex_(m) { mutex_->acquire(); }
 
-  /**
-   * Releases the Mutex.
+	/**
+	 * Releases the Mutex.
 	 */
-  ~MutexLock() { mutex_->release(); }
+	~MutexLock() { mutex_->release(); }
+
 private:
-  Mutex* mutex_;
+	Mutex* mutex_;
 };
 
-namespace fiber {
+namespace fiber
+{
 
 class Scheduler
 {
 	friend class modm::Fiber;
-	friend void modm::yield();
+	friend void
+	modm::yield();
+
 public:
-  constexpr Scheduler() = default;
-  /* Should be called by the main() function. */
-  inline void
-  start();
+	constexpr Scheduler() = default;
+	/* Should be called by the main() function. */
+	inline void
+	start();
 
-  inline Fiber*
-  currentFiber() { return current_fiber_; }
+	inline Fiber*
+	currentFiber()
+	{
+		return current_fiber_;
+	}
 
-  inline Fiber*
-  lastFiber() { return last_fiber_; }
+	inline Fiber*
+	lastFiber()
+	{
+		return last_fiber_;
+	}
 
-  inline bool
-  empty() { return last_fiber_ == nullptr; }
+	inline bool
+	empty()
+	{
+		return last_fiber_ == nullptr;
+	}
 
-  inline Fiber*
-  removeCurrent() {
-    Fiber* current = currentFiber();
-    if (current == last_fiber_) {
-      last_fiber_ = nullptr;
-    } else {
-      last_fiber_->next(current->next());
-    }
-    current->next(nullptr);
-    return current;
-  }
+	inline Fiber*
+	removeCurrent()
+	{
+		Fiber* current = currentFiber();
+		if (current == last_fiber_)
+		{
+			last_fiber_ = nullptr;
+		} else
+		{
+			last_fiber_->next(current->next());
+		}
+		current->next(nullptr);
+		return current;
+	}
 
-  inline void
-  runNext(Fiber* fiber) {
-    Fiber* current = currentFiber();
-    fiber->next(current->next());
-    current->next(fiber);
-  }
+	inline void
+	runNext(Fiber* fiber)
+	{
+		Fiber* current = currentFiber();
+		fiber->next(current->next());
+		current->next(fiber);
+	}
 
-  inline void
-  runLast(Fiber* fiber) {
-    fiber->next(last_fiber_->next());
-    last_fiber_->next(fiber);
-    last_fiber_ = fiber;
-  }
+	inline void
+	runLast(Fiber* fiber)
+	{
+		fiber->next(last_fiber_->next());
+		last_fiber_->next(fiber);
+		last_fiber_ = fiber;
+	}
 
 protected:
-  inline void
-  registerFiber(Fiber*);
- private:
-  Scheduler(const Scheduler&) = delete;
-  // Last fiber in the ready queue.
-  Fiber* last_fiber_ = nullptr;
-  // Current running fiber
-  Fiber* current_fiber_ = nullptr;
+	inline void
+	registerFiber(Fiber*);
+
+private:
+	Scheduler(const Scheduler&) = delete;
+	// Last fiber in the ready queue.
+	Fiber* last_fiber_ = nullptr;
+	// Current running fiber
+	Fiber* current_fiber_ = nullptr;
 };
 
 extern Scheduler scheduler;
 
-} // namespace fiber
+}  // namespace fiber
 
-} // namespace modm
+}  // namespace modm
 
 #include "fiber_impl.hpp"

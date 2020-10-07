@@ -17,11 +17,18 @@
 class FiberTest : public unittest::TestSuite
 {
 public:
-  void subroutine();
-  void testOneFiber();
-  void testTwoFibers();
-  void testYieldFromSubroutine();
-  void testNonBlockingRecieve();
-  void testBlockingRecieve();
-  void testSemaphore();
+	void
+	subroutine();
+	void
+	testOneFiber();
+	void
+	testTwoFibers();
+	void
+	testYieldFromSubroutine();
+	void
+	testNonBlockingRecieve();
+	void
+	testBlockingRecieve();
+	void
+	testSemaphore();
 };
