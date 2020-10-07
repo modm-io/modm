@@ -1,0 +1,16 @@
+<library>
+  <repositories>
+    <repository>
+      <path>../../../../repo.lb</path>
+    </repository>
+  </repositories>
+
+  <options>
+    <option name="modm:target">stm32g431rbt6</option>
+
+    <option name="modm:platform:uart:2:buffer.tx">2048</option>
+  </options>
+  <modules>
+    <module>modm:board:nucleo-g431rb</module>
+  </modules>
+</library>

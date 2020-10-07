@@ -121,8 +121,7 @@ jobs:
           name: Examples STM32G4 Series
           when: always
           command: |
-            (cd examples && ../tools/scripts/examples_compile.py nucleo_g431kb nucleo_g474re)
-
+            (cd examples && ../tools/scripts/examples_compile.py nucleo_g474re nucleo_g431rb nucleo_g431kb)
   stm32f4-examples:
     docker:
       - image: modm/modm-build:cortex-m
