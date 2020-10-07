@@ -12,8 +12,8 @@
 
   <modules>
     <!-- ATmega328p only has 32kB of Flash -->
-    <!-- <module>modm-test:test:architecture</module>
-    <module>modm-test:test:communication</module>
+    <module>modm-test:test:architecture</module>
+    <!-- <module>modm-test:test:communication</module>
     <module>modm-test:test:container</module>
     <module>modm-test:test:driver</module>
     <module>modm-test:test:stdc++</module> -->
