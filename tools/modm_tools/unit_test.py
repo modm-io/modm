@@ -17,7 +17,7 @@ This tools scans a directory for files ending in `_test.hpp`, extracts their
 test cases and generates a source file containing the test runner.
 
 ```sh
-python3 modm/modm_tools/unittest.py path/containing/tests \\
+python3 modm/modm_tools/unit_test.py path/containing/tests \\
                                     path/to/generated_runner.cpp
 ```
 

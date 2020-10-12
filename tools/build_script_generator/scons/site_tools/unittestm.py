@@ -21,11 +21,11 @@ import re
 import string
 import datetime
 
-from modm_tools import unittest
+from modm_tools import unit_test
 
 # -----------------------------------------------------------------------------
 def unittest_action(target, source, env):
-	unittest.render_runner(headers=(str(s) for s in source),
+	unit_test.render_runner(headers=(str(s) for s in source),
 	                       destination=target[0].abspath)
 	return 0
 
