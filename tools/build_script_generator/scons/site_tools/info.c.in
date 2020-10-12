@@ -15,6 +15,6 @@
 %% if value is number
 const int16_t {{ name | upper }} = {{ value }};
 %% else
-const char *{{ name | upper }} = "{{ value }}";
+const char *{{ name | upper }} = "{{ value | replace('"', '\\"') }}";
 %% endif
 %% endfor
