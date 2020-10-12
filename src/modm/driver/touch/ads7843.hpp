@@ -19,6 +19,8 @@
 #include <modm/ui/display/graphic_display.hpp>
 #include <modm/architecture/interface/delay.hpp>
 
+
+
 namespace modm
 {
 	/**
@@ -59,11 +61,13 @@ namespace modm
 	private:
 		static const uint8_t CHX = 0x90;
 		static const uint8_t CHY = 0xd0;
+		static const uint8_t CHZ1 = 0xb0;
+		static const uint8_t CHZ2 = 0xc0;
 
-		static const uint16_t threshold = 2;
+		static const uint16_t threshold = 72;
 
-		static bool
-		getAverage(uint16_t * buffer, int16_t & value);
+		static uint16_t
+		getBestTwo(uint16_t *temp);
 
 		static uint16_t
 		readData(uint8_t command);
