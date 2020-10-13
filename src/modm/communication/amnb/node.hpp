@@ -224,7 +224,7 @@ protected:
 					const auto listener = listenerList[ii];
 					if (rx_msg.command() == listener.command) {
 						if (complete) listener.call(rx_msg);
-						return true;
+						else return true;
 					}
 				}
 				break;
