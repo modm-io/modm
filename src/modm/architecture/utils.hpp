@@ -42,6 +42,11 @@
 	/// Compute the size of a static (!) array.
 	#define MODM_ARRAY_SIZE(x)	(sizeof(x) / sizeof(x[0]))
 
+	/// Include a binary file into a specific section (usually `".rodata"`).
+	/// Access via `extern "C" uint8_t {{name}}[]; extern "C" uint8_t {{name}}_length[];`.
+	/// @see http://elm-chan.org/junk/32bit/binclude.html
+	#define MODM_IMPORT_BINARY(name, file, section)
+
 	/// @{
 	/**
 	 * Force inlining on functions if needed. Compiling with -Os  does not
@@ -148,6 +153,23 @@
 	#else
 	#	define modm_extern_c
 	#endif
+
+	#define MODM_IMPORT_BINARY(name, file, section) \
+		asm 										\
+		(											\
+			".section " #section "\n"				\
+			".balign 4\n"							\
+			".global " #name "\n"					\
+			#name ":\n"								\
+			".incbin \"" file "\"\n"				\
+			".global " #name "_laddr\n"				\
+			".set " #name "_laddr, . - " #name "\n"	\
+			".balign 4\n"							\
+			".section \".text\"\n"					\
+		); 											\
+		modm_extern_c uint8_t name ## _laddr[];		\
+		modm_extern_c const size_t name ## _length = (size_t) name ## _laddr; \
+		modm_extern_c uint8_t name[]
 
 
 #endif	// !__DOXYGEN__
