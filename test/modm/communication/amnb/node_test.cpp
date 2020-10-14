@@ -46,7 +46,7 @@ AmnbNodeTest::testBroadcast()
 	SharedMedium::fail_tx_index = 2;
 	{
 		node.broadcast(0x70);
-		for(uint32_t ii=0; ii < 10000; ii += 10) { node.update(); micro_clock::setTime(ii); }
+		for(uint32_t ii=0; ii < 20000; ii += 10) { node.update(); micro_clock::setTime(ii); }
 		// first transmission attempt fails
 		const uint8_t raw[] = {0x7E, 0x7E, 110, 0x7E, 0x7E, 110, 0x08, 0x70, 0};
 		TEST_ASSERT_EQUALS(SharedMedium::raw_transmitted.size(), sizeof(raw));

@@ -61,8 +61,11 @@ public:
 	setAddress(uint8_t address)
 	{
 		this->address = address;
-		setSeed();
 	}
+
+	void
+	setSeed(uint16_t seed)
+	{ lfsr = seed; }
 
 public:
 	bool
@@ -155,7 +158,7 @@ protected:
 		RF_BEGIN(3);
 
 		msg.setValid();
-		tx_counter = std::min(10, msg.command() >> (8 - PRIORITY_BITS));
+		tx_counter = std::min(MIN_TX_TRIES, uint8_t(msg.command() >> (8 - PRIORITY_BITS)));
 		while(1)
 		{
 			while (interface.isMediumBusy())
@@ -324,7 +327,8 @@ protected:
 	}
 	response_status{ResponseStatus::NotWaiting};
 
-	static constexpr uint8_t PRIORITY_BITS{5};
+	static constexpr uint8_t MIN_TX_TRIES{20};
+	static constexpr uint8_t PRIORITY_BITS{6};
 	static constexpr uint8_t RESCHEDULE_MASK_SHORT{7};
 	static constexpr uint8_t RESCHEDULE_MASK_LONG{11};
 };
