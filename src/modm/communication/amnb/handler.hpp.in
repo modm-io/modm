@@ -53,6 +53,16 @@ struct Listener
 		})
 	{}
 
+	inline
+	Listener(int command, void(*listener)(uint8_t, const uint8_t*, size_t))
+	:	command(command), callback((void*)listener),
+		redirect([](const Message &msg, void* cb)
+		{
+			if (const uint8_t* arg = msg.get<uint8_t>(); arg)
+				reinterpret_cast<decltype(listener)>(cb)(msg.address(), arg, msg.length());
+		})
+	{}
+
 protected:
 	const uint8_t command;
 	void *const callback;
@@ -126,6 +136,18 @@ struct Action
 		})
 	{}
 
+	template<typename T>
+	Action(int command, Response(*action)(const uint8_t*, size_t))
+	:	command(command), callback((void*)action),
+		redirect([](const Message &msg, void* cb) -> Message
+		{
+			const uint8_t* arg = msg.get<uint8_t>();
+			if (arg == nullptr)
+				return Response(Error::ResponseAllocationFailed).msg;
+			return reinterpret_cast<decltype(action)>(cb)(arg, msg.length()).msg;
+		})
+	{}
+
 	inline
 	Action(int command, void(*action)())
 	:	command(command), callback((void*)action),
@@ -144,13 +166,25 @@ struct Action
 	:	command(command), callback((void*)action),
 		redirect([](const Message &msg, void* cb) -> Message
 		{
-
 			const T* arg = msg.get<T>();
 			if (arg == nullptr)
 				return Response(Error::ResponseAllocationFailed).msg;
 			if (msg.length() < sizeof(T))
 				return Response(Error::WrongArgumentSize).msg;
 			reinterpret_cast<decltype(action)>(cb)(*arg);
+			return Response().msg;
+		})
+	{}
+
+	template<typename T>
+	Action(int command, void(*action)(const uint8_t*, size_t))
+	:	command(command), callback((void*)action),
+		redirect([](const Message &msg, void* cb) -> Message
+		{
+			const uint8_t* arg = msg.get<uint8_t>();
+			if (arg == nullptr)
+				return Response(Error::ResponseAllocationFailed).msg;
+			reinterpret_cast<decltype(action)>(cb)(arg, msg.length());
 			return Response().msg;
 		})
 	{}
