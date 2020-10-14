@@ -22,6 +22,9 @@ namespace modm
 /// @ingroup modm_driver_is31fl3733
 struct is31fl3733
 {
+	static constexpr uint8_t SizeX{12};
+	static constexpr uint8_t SizeY{16};
+
 	enum class
 	Addr : uint8_t
 	{
@@ -70,6 +73,21 @@ struct is31fl3733
 		INTERRUPT_STATUS =  0xF1
 	};
 
+	enum class
+	Resistor : uint8_t
+	{
+		None = 0,
+		kOhm_0_5 = 1,
+		kOhm_1 = 2,
+		kOhm_2 = 3,
+		kOhm_4 = 4,
+		kOhm_8 = 5,
+		kOhm_16 = 6,
+		kOhm_32 = 7,
+	};
+
+	using LedBinaryData = uint16_t[SizeX];
+
 protected:
 	static constexpr uint8_t LED_ON_OFF_size = 0x18;
 	static constexpr uint8_t LED_OPEN_size = LED_ON_OFF_size;
@@ -101,7 +119,7 @@ public:
 	bool
 	enable(uint8_t x, uint8_t y)
 	{
-		if (x < 12 and y < 16)
+		if (x < SizeX and y < SizeY)
 		{
 			data.led_on_off[x] |= (1u << y);
 			return true;
@@ -114,7 +132,7 @@ public:
 	bool
 	disable(uint8_t x, uint8_t y)
 	{
-		if (x < 12 and y < 16)
+		if (x < SizeX and y < SizeY)
 		{
 			data.led_on_off[x] &= ~(1u << y);
 			return true;
@@ -127,7 +145,7 @@ public:
 	bool
 	setPwm(uint8_t x, uint8_t y, uint8_t pwm)
 	{
-		if (x < 12 and y < 16)
+		if (x < SizeX and y < SizeY)
 		{
 			data.led_pwm[x][y] = pwm;
 			return true;
@@ -136,6 +154,14 @@ public:
 	}
 	void setAllPwm(uint8_t pwm)
 	{ std::memset(data.led_pwm, pwm, sizeof(data.led_pwm)); }
+
+	LedBinaryData&
+	ledsOpen()
+	{ return led_open; }
+
+	LedBinaryData&
+	ledsShort()
+	{ return led_short; }
 
 public:
 	modm::ResumableResult<bool>
@@ -149,6 +175,29 @@ public:
 	modm::ResumableResult<bool>
 	clearSoftwareShutdown()
 	{ return writeRegister(Register::CONFIGURATION, 0x01); }
+
+	modm::ResumableResult<bool>
+	setSwPullUp(Resistor value)
+	{ return writeRegister(Register::SW_PULL_UP, uint8_t(value)); }
+
+	modm::ResumableResult<bool>
+	setCsPullDown(Resistor value)
+	{ return writeRegister(Register::CS_PULL_DOWN, uint8_t(value)); }
+
+	modm::ResumableResult<bool>
+	triggerOpenShortDetection()
+	{ return writeRegister(Register::CONFIGURATION, 0b101); }
+
+	modm::ResumableResult<bool>
+	readOpenShort()
+	{
+		RF_BEGIN();
+		if (not RF_CALL(setPage(Register::LED_OPEN))) RF_RETURN(false);
+
+		buffer[0] = uint8_t(Register::LED_OPEN);
+		this->transaction.configureWriteRead(buffer, 1, (uint8_t*)&led_open, LED_OPEN_size + LED_SHORT_size);
+		RF_END_RETURN_CALL(this->runTransaction());
+	}
 
 	modm::ResumableResult<bool>
 	writeOnOff()
@@ -218,15 +267,18 @@ protected:
 		RF_END_RETURN(true);
 	}
 
-private:
+protected:
 	struct LedData
 	{
         const uint8_t addr_led_on_off{uint8_t(Register::LED_ON_OFF)};
-		uint16_t led_on_off[12];
+		uint16_t led_on_off[SizeX];
 
         const uint8_t addr_led_pwm{uint8_t(Register::PWM)};
-		uint8_t led_pwm[12][16];
+		uint8_t led_pwm[SizeX][SizeY];
 	} modm_packed;
+
+	uint16_t led_open[SizeX];
+	uint16_t led_short[SizeX];
 
 	LedData data;
 	uint8_t current_page{0xff};
