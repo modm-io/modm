@@ -158,8 +158,6 @@ def build(env):
     if target.platform == "stm32":
         irq_data = env.query(":platform:usb:irqs")
         irqs = irq_data["port_irqs"][speed]
-        if irq_data["is_remap"]:
-            tusb_config["STM32F3_IRQ_REMAP"] = 1
     else:
         irqs = ["USB"]
 
@@ -273,8 +271,6 @@ class TinyUsbClassModule(Module):
                 tusb_config[cfg_name+"_TX_BUFSIZE"] = 512 if speed else 64 #env["buffer.tx"]
             if self.name in ["msc"]:
                 tusb_config[cfg_name+"_EP_BUFSIZE"] = 512 #env["buffer.ep"]
-            if self.name == "midi":
-                env.copy("tinyusb/src/class/audio", "class/audio")
 
 
         """ Device class defaults:
