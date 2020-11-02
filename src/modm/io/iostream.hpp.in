@@ -71,7 +71,7 @@ public:
 	/// reads characters into NULL delimited c string
 	/// in contrast to the standard implementation, this does not care about
 	/// newline characters in the input
-	inline IOStream&
+	IOStream&
 	get(char* s, size_t n);
 
 	template<size_t N>
