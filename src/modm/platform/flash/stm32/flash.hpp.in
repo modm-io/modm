@@ -84,6 +84,16 @@ public:
 	static uint8_t
 	getPage(uintptr_t offset);
 
+	static inline uint8_t*
+	getAddr(uint8_t {{ type }})
+	{ return Origin + getOffset({{ type }}); }
+
+	static uint32_t
+	getOffset(uint8_t {{ type }});
+
+	static size_t
+	getSize(uint8_t {{ type }});
+
 	static uint32_t
 %% if has_sectors
 	erase(uint8_t {{ type }}, WordSize size = WordSize::B32);

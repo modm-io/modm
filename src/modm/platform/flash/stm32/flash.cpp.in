@@ -51,6 +51,32 @@ Flash::getPage(uintptr_t offset)
 %% endif
 }
 
+uint32_t
+Flash::getOffset(uint8_t index)
+{
+%% if has_sectors
+	switch(index) {
+		case 0: return (1ul << 14);
+		case 1: return (2ul << 14);
+		case 2: return (3ul << 14);
+		case 3: return (4ul << 14);
+		case 4: return (1ul << 16);
+		default: index -= 4; break;
+	}
+%% endif
+	return (1ul << {{shift}}) * index;
+}
+
+size_t
+Flash::getSize(uint8_t modm_unused index)
+{
+%% if has_sectors
+	if (index < 4) return (1ul << 14);
+	if (index == 5) return (1ul << 16);
+%% endif
+	return (1ul	<< {{shift}});
+}
+
 modm_ramcode uint32_t
 %% if has_sectors
 Flash::erase(uint8_t index, WordSize size)
