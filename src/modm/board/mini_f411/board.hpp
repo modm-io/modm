@@ -99,8 +99,8 @@ using Device = UsbFs;
 }
 
 // User LED (inverted, because connected to 3V3)
-using LedGreen = GpioInverted< GpioOutputC13 >;
-using Leds = SoftwareGpioPort< LedGreen >;
+using Led = GpioInverted< GpioOutputC13 >;
+using Leds = SoftwareGpioPort< Led >;
 
 using Button = GpioInverted< GpioInputA0 >;
 
@@ -110,7 +110,7 @@ initialize()
 	SystemClock::enable();
 	SysTickTimer::initialize<SystemClock>();
 
-	LedGreen::setOutput(modm::Gpio::Low);
+	Led::setOutput(modm::Gpio::Low);
 	Button::setInput(Gpio::InputType::PullUp);
 }
 

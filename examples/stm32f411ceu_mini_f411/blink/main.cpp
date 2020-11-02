@@ -25,11 +25,11 @@ main()
 {
 	Board::initialize();
 
-	LedGreen::set();
+	Led::set();
 
 	while (true)
 	{
-		LedGreen::toggle();
+		Led::toggle();
 		modm::delay(Button::read() ? 100ms : 500ms);
 	}
 
