@@ -1,0 +1,47 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2016-2017, Niklas Hauser
+# Copyright (c) 2017, Fabian Greif
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":fatfs"
+    module.description = """\
+# FatFs Generic FAT Filesystem Module
+
+See http://elm-chan.org/fsw/ff/00index_e.html.
+
+## Custom Configuration
+
+This module defines a default `ffconf.h` config file. If you need to change a
+configuration setting, then you can define a `ffconf_local.h` file, which
+is included *after* at the end of the config. You must therefore first `#undef`
+the config macros, then redefine them with your options, for example:
+
+```c
+#undef FF_USE_STRFUNC
+#define FF_USE_STRFUNC 1
+```
+"""
+
+def prepare(module, options):
+    return True
+
+def build(env):
+    env.collect(":build:path.include", "modm/ext")
+    env.outbasepath = "modm/ext/fatfs"
+
+    env.copy("fatfs/full/source/diskio.h", "diskio.h")
+    env.copy("fatfs/full/source/ff.h", "ff.h")
+    env.copy("fatfs/full/source/ff.c", "ff.c")
+    env.copy("fatfs/full/source/ffunicode.c", "ffunicode.c")
+    env.copy("fatfs/full/LICENSE.txt", "LICENSE.txt")
+
+    env.copy("ffconf.h")

@@ -31,3 +31,6 @@
 [submodule "ext/hathach/tinyusb"]
 	path = ext/hathach/tinyusb
 	url = https://github.com/modm-ext/tinyusb-partial.git
+[submodule "ext/chan/fatfs"]
+	path = ext/chan/fatfs
+	url = https://github.com/modm-ext/fatfs-partial.git
