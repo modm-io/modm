@@ -21,5 +21,6 @@
 #include "utils/bit_constants.hpp"
 #include "utils/operator.hpp"
 #include "utils/endianness.hpp"
+#include "utils/crc.hpp"
 
 #endif // MODM_MATH_UTILS_HPP
