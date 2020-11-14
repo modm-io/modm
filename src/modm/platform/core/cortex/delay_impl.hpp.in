@@ -31,7 +31,7 @@ extern uint16_t delay_ns_per_loop;
 extern uint16_t delay_fcpu_MHz;
 }
 
-inline void delay_ns(uint32_t ns)
+inline void modm_fastcode delay_ns(uint32_t ns)
 {
 	volatile uint32_t overhead_cycles;
 	// ns_per_loop = nanoseconds per cycle times cycles per loop ({{loop}} cycles)
