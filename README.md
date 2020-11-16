@@ -153,15 +153,16 @@ documentation.
 <td align="center">NUCLEO-F746ZG</td>
 </tr><tr>
 <td align="center">NUCLEO-G071RB</td>
+<td align="center">NUCLEO-G431KB</td>
 <td align="center">NUCLEO-G474RE</td>
 <td align="center">NUCLEO-L152RE</td>
-<td align="center">NUCLEO-L432KC</td>
 </tr><tr>
+<td align="center">NUCLEO-L432KC</td>
 <td align="center">NUCLEO-L476RG</td>
 <td align="center">OLIMEXINO-STM32</td>
 <td align="center">RASPBERRYPI</td>
-<td align="center">SAMD21-MINI</td>
 </tr><tr>
+<td align="center">SAMD21-MINI</td>
 <td align="center">STM32-F4VE</td>
 <td align="center">STM32F030F4P6-DEMO</td>
 </tr>
