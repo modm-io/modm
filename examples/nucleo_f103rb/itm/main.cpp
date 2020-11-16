@@ -23,7 +23,7 @@ main()
 	Board::initialize();
 	LedD13::setOutput();
 
-	// Done by OpenOCD: scons itm fcpu=64000000
+	// Done by OpenOCD: scons log-itm fcpu=64000000
 	// Itm::initialize<Board::SystemClock, 500_kHz>();
 	// Itm::connect<GpioB3::Traceswo>();
 
