@@ -58,15 +58,13 @@ modm::Ads7843<Spi, Cs, Int>::getBestTwo(uint16_t *buf)
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs, typename Int>
 bool
-modm::Ads7843<Spi, Cs, Int>::read(glcd::Point * point)
+modm::Ads7843<Spi, Cs, Int>::read(glcd::Point * point, uint16_t pressure_threshold)
 {
-	uint16_t z1 = readData(CHZ1);
-	uint16_t z2 = readData(CHZ2);
-	uint16_t z = z1 + 4095 - z2;
+	uint16_t z = readPressure();
 	uint16_t xbuf[3];
 	uint16_t ybuf[3];
 
-	if(z > threshold) {
+	if(z > pressure_threshold) {
 		xbuf[0] = readData(CHX);
 		ybuf[0] = readData(CHY);
 		xbuf[1] = readData(CHX);

@@ -44,7 +44,7 @@ namespace modm
 		 * 			stable enough to provide a reading, otherwise `false`.
 		 */
 		static bool
-		read(modm::glcd::Point * point);
+		read(modm::glcd::Point * point, uint16_t pressure_threshold=defaultThreshold);
 
 		static inline uint16_t
 		readX()
@@ -58,13 +58,33 @@ namespace modm
 			return readData(CHY);
 		}
 
+		static inline uint16_t
+		readZ1()
+		{
+			return readData(CHZ1);
+		}
+
+		static inline uint16_t
+		readZ2()
+		{
+			return readData(CHZ2);
+		}
+
+		static inline uint16_t
+		readPressure()
+		{
+			uint16_t z1 = readZ1();
+			uint16_t z2 = readZ2();
+			return z1 + 4095 - z2;
+		}
+
 	private:
 		static const uint8_t CHX = 0x90;
 		static const uint8_t CHY = 0xd0;
 		static const uint8_t CHZ1 = 0xb0;
 		static const uint8_t CHZ2 = 0xc0;
 
-		static const uint16_t threshold = 72;
+		static const uint16_t defaultThreshold = 72;
 
 		static uint16_t
 		getBestTwo(uint16_t *temp);
