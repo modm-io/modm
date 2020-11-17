@@ -34,7 +34,7 @@ jobs:
           Add-Type -Assembly "System.IO.Compression.Filesystem"
           [System.IO.Compression.ZipFile]::ExtractToDirectory("mingw-get-0.6.3.zip", "C:\mingw-get")
           dir C:\mingw-get
-          echo "::add-path::C:\mingw-get\bin"
+          echo "C:\mingw-get\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           rm mingw-get-0.6.3.zip
 
       - name: Install MinGW toolchains

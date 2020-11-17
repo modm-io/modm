@@ -20,8 +20,8 @@ jobs:
       - name: Setup environment - Python pip
         run: |
           pip3 install --user modm scons
-          echo "::add-path::/usr/local/bin"
-          echo "::add-path::/Users/runner/Library/Python/3.8/bin"
+          echo "/usr/local/bin" >> $GITHUB_PATH
+          echo "/Users/runner/Library/Python/3.8/bin" >> $GITHUB_PATH
           echo $PATH
 
       - name: Check out repository

@@ -35,7 +35,7 @@ jobs:
           Add-Type -Assembly "System.IO.Compression.Filesystem"
           [System.IO.Compression.ZipFile]::ExtractToDirectory("gcc-arm-none-eabi-win32.zip", "C:\arm-none-eabi-gcc")
           dir C:\arm-none-eabi-gcc
-          echo "::add-path::C:\arm-none-eabi-gcc\bin"
+          echo "C:\arm-none-eabi-gcc\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           rm gcc-arm-none-eabi-win32.zip
 
       - name: Show lbuild and arm-none-eabi-gcc Version Information
