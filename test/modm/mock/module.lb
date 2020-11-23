@@ -50,6 +50,20 @@ class SpiMaster(Module):
         env.copy("spi_master.hpp")
         env.copy("spi_master.cpp")
 
+class CanDriver(Module):
+    def init(self, module):
+        module.name = "can_driver"
+        module.description = "CAN Mockup"
+
+    def prepare(self, module, options):
+        module.depends(":architecture:can", ":container")
+        return True
+
+    def build(self, env):
+        env.outbasepath = "modm-test/src/modm-test/mock"
+        env.copy("can_driver.hpp")
+        env.copy("can_driver.cpp")
+
 class IoDevice(Module):
     def init(self, module):
         module.name = "io.device"
@@ -100,6 +114,7 @@ def prepare(module, options):
     module.add_submodule(Clock())
     module.add_submodule(SpiDevice())
     module.add_submodule(SpiMaster())
+    module.add_submodule(CanDriver())
     module.add_submodule(IoDevice())
     module.add_submodule(SharedMedium())
     module.add_submodule(LogicAnalyzer())

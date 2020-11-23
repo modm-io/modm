@@ -17,7 +17,7 @@
 
 #include <modm/communication/xpcc/backend/can/connector.hpp>
 
-#include "can_driver.hpp"
+#include <modm-test/mock/can_driver.hpp>
 
 /// @ingroup modm_test_test_communication
 class TestingCanConnector : public xpcc::CanConnector<modm_test::platform::CanDriver>

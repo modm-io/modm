@@ -3,6 +3,7 @@
 #
 # Copyright (c) 2016-2018, Niklas Hauser
 # Copyright (c) 2017, Fabian Greif
+# Copyright (c) 2020, Sascha Schade
 #
 # This file is part of the modm project.
 #
@@ -41,7 +42,11 @@ class Xpcc(Module):
         module.name = "xpcc"
 
     def prepare(self, module, options):
-        module.depends("modm:communication:xpcc", ":mock:clock")
+        module.depends(
+            "modm:communication:xpcc",
+            ":mock:clock",
+            ":mock:can_driver",
+        )
         return True
 
     def build(self, env):
