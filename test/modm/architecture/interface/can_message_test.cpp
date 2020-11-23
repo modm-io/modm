@@ -44,3 +44,23 @@ CanMessageTest::testEqualOperator()
 	msgB.data[1] = 0x11;
 	TEST_ASSERT_FALSE(msgA == msgB);
 }
+
+void
+CanMessageTest::testConstructor()
+{
+	modm::can::Message msgA(0x123, 7, 0x19821122aaffEE);
+	TEST_ASSERT_EQUALS(msgA.data[0], 0x19);
+	TEST_ASSERT_EQUALS(msgA.data[1], 0x82);
+	TEST_ASSERT_EQUALS(msgA.data[2], 0x11);
+	TEST_ASSERT_EQUALS(msgA.data[3], 0x22);
+	TEST_ASSERT_EQUALS(msgA.data[4], 0xaa);
+	TEST_ASSERT_EQUALS(msgA.data[5], 0xff);
+	TEST_ASSERT_EQUALS(msgA.data[6], 0xee);
+	TEST_ASSERT_EQUALS(msgA.getLength(), 7);
+	TEST_ASSERT_FALSE(msgA.isExtended());
+
+	modm::can::Message msgB(0x432, 1, 0xab, true);
+	TEST_ASSERT_EQUALS(msgB.data[0], 0xab);
+	TEST_ASSERT_EQUALS(msgB.getLength(), 1);
+	TEST_ASSERT_TRUE(msgB.isExtended());
+}

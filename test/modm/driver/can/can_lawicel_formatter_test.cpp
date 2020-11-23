@@ -23,7 +23,7 @@
 void
 CanLawicelFormatterTest::testIdentifierToStringExtended()
 {
-	modm::can::Message msg(0x75395165, 0);
+	modm::can::Message msg(0x75395165);
 
 	char buffer[128];
 	for (int i = 0; i < 128; ++i) {
@@ -44,7 +44,7 @@ CanLawicelFormatterTest::testIdentifierToStringExtended()
 void
 CanLawicelFormatterTest::testIdentifierToStringStandard()
 {
-	modm::can::Message msg(0x123, 0);
+	modm::can::Message msg(0x123);
 	msg.flags.extended = false;
 
 	char buffer[128];
@@ -61,12 +61,7 @@ CanLawicelFormatterTest::testIdentifierToStringStandard()
 void
 CanLawicelFormatterTest::testMessageToStringStandard()
 {
-	modm::can::Message msg(0x123, 4);
-	msg.flags.extended = false;
-	msg.data[0] = 0x44;
-	msg.data[1] = 0xff;
-	msg.data[2] = 0x1A;
-	msg.data[3] = 0x12;
+	modm::can::Message msg(0x123, 4, 0x44ff1a12, false);
 
 	char buffer[128];
 	for (int i = 0; i < 128; ++i) {
@@ -87,12 +82,7 @@ CanLawicelFormatterTest::testMessageToStringStandard()
 void
 CanLawicelFormatterTest::testMessageToStringExtended()
 {
-	modm::can::Message msg(0x123, 4);
-	msg.flags.extended = true;
-	msg.data[0] = 0x44;
-	msg.data[1] = 0xff;
-	msg.data[2] = 0x1A;
-	msg.data[3] = 0x12;
+	modm::can::Message msg(0x123, 4, 0x44ff1a12, true);
 
 	char buffer[128];
 	for (int i = 0; i < 128; ++i) {
@@ -151,12 +141,7 @@ CanLawicelFormatterTest::testRoundtripMessage()
 void
 CanLawicelFormatterTest::testRoudtripString()
 {
-	modm::can::Message msg(0x123, 4);
-	msg.flags.extended = true;
-	msg.data[0] = 0x44;
-	msg.data[1] = 0xff;
-	msg.data[2] = 0x1A;
-	msg.data[3] = 0x12;
+	modm::can::Message msg(0x123, 4, 0x44ff1a12, true);
 
 	char buffer[128];
 	for (int i = 0; i < 128; ++i) {

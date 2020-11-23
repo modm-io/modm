@@ -14,6 +14,7 @@
 #define MODM_CAN_MESSAGE_HPP
 
 #include <stdint.h>
+#include <string.h>  // strlen
 #include <algorithm>
 #include <modm/architecture/utils.hpp>
 
@@ -27,6 +28,16 @@ struct Message
 	inline Message(uint32_t inIdentifier = 0, uint8_t inLength = 0) :
 		identifier(inIdentifier), flags(), length(inLength)
 	{
+	}
+
+	// Create CAN message from long data in Network Order.
+	inline Message(uint32_t inIdentifier, uint8_t inLength, const uint64_t &inData, bool extended=false) :
+		identifier(inIdentifier), length(std::min(inLength, uint8_t(8)))
+	{
+		flags.extended = extended;
+		const uint8_t *inDataB = reinterpret_cast<const uint8_t *>(&inData);
+		for (uint8_t ii = 0; ii < length; ++ii)
+ 			data[ii] = inDataB[length - ii - 1];
 	}
 
 	inline uint32_t

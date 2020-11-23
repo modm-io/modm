@@ -2,7 +2,7 @@
  * Copyright (c) 2009, Martin Rosekeit
  * Copyright (c) 2009-2010, Fabian Greif
  * Copyright (c) 2012, 2015, Niklas Hauser
- * Copyright (c) 2016, Sascha Schade
+ * Copyright (c) 2016-2020, Sascha Schade
  *
  * This file is part of the modm project.
  *
@@ -24,6 +24,9 @@ class CanMessageTest : public unittest::TestSuite
 public:
 	void
 	testEqualOperator();
+
+	void
+	testConstructor();
 };
 
 #endif // MODM_UNITTEST_CAN_MESSAGE_HPP
