@@ -23,7 +23,7 @@
 class TestingComponent1 : public xpcc::AbstractComponent
 {
 public:
-	TestingComponent1(xpcc::Dispatcher &communication, Timeline *timeline);
+	TestingComponent1(xpcc::Dispatcher &communication, Timeline &timeline);
 
 	virtual ~TestingComponent1()
 		{};
@@ -71,7 +71,7 @@ public:
 	eventUint32(const xpcc::Header& header, const uint32_t *parameter);
 
 private:
-	Timeline *timeline;
+	Timeline &timeline;
 
 	bool isDelayedResponseActive;
 	xpcc::ResponseHandle delayedResponseHandle;

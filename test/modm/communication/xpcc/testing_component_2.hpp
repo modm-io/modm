@@ -23,7 +23,7 @@
 class TestingComponent2 : public xpcc::AbstractComponent
 {
 public:
-	TestingComponent2(xpcc::Dispatcher &communication, Timeline *timeline);
+	TestingComponent2(xpcc::Dispatcher &communication, Timeline &timeline);
 
 	virtual ~TestingComponent2()
 		{};
@@ -62,7 +62,7 @@ public:
 	responseCallAction(const xpcc::Header& header);
 
 private:
-	Timeline *timeline;
+	Timeline &timeline;
 };
 
 #endif

@@ -14,7 +14,7 @@
 #include "testing_component_1.hpp"
 
 TestingComponent1::TestingComponent1(xpcc::Dispatcher &communication,
-		Timeline *timeline) :
+		Timeline &timeline) :
 	xpcc::AbstractComponent(1, communication),
 	timeline(timeline),
 	isDelayedResponseActive(false)
@@ -34,7 +34,7 @@ TestingComponent1::update()
 void
 TestingComponent1::actionNoParameter(const xpcc::ResponseHandle& handle)
 {
-	timeline->events.append(
+	timeline.events.append(
 			Timeline::Event(Timeline::Type::Action, 1, 0x10, handle.getDestination()));
 }
 
@@ -42,14 +42,14 @@ void
 TestingComponent1::actionUint16(const xpcc::ResponseHandle& handle,
 		const uint16_t *parameter)
 {
-	timeline->events.append(
+	timeline.events.append(
 			Timeline::Event(Timeline::Type::Action, 1, 0x11, handle.getDestination(), parameter));
 }
 
 void
 TestingComponent1::actionDirectResponse(const xpcc::ResponseHandle& handle)
 {
-	timeline->events.append(
+	timeline.events.append(
 			Timeline::Event(Timeline::Type::Action, 1, 0x12, handle.getDestination()));
 
 	this->sendResponse(handle);
@@ -58,7 +58,7 @@ TestingComponent1::actionDirectResponse(const xpcc::ResponseHandle& handle)
 void
 TestingComponent1::actionDelayedResponse(const xpcc::ResponseHandle& handle)
 {
-	timeline->events.append(
+	timeline.events.append(
 			Timeline::Event(Timeline::Type::Action, 1, 0x13, handle.getDestination()));
 
 	this->delayedResponseHandle = handle;
@@ -69,7 +69,7 @@ void
 TestingComponent1::actionUint16CallAction(const xpcc::ResponseHandle& handle,
 			const uint16_t *parameter)
 {
-	timeline->events.append(
+	timeline.events.append(
 			Timeline::Event(Timeline::Type::Action, 1, 0x14, handle.getDestination(), parameter));
 
 	this->callAction(2, 0x11, *parameter);
@@ -79,7 +79,7 @@ TestingComponent1::actionUint16CallAction(const xpcc::ResponseHandle& handle,
 void
 TestingComponent1::eventNoParameter(const xpcc::Header& header)
 {
-	timeline->events.append(
+	timeline.events.append(
 			Timeline::Event(Timeline::Type::Event, 2, 0x20, header.source));
 }
 
@@ -87,6 +87,6 @@ void
 TestingComponent1::eventUint32(const xpcc::Header& header,
 		const uint32_t *parameter)
 {
-	timeline->events.append(
+	timeline.events.append(
 			Timeline::Event(Timeline::Type::Event, 1, 0x21, header.source, parameter));
 }
