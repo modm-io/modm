@@ -14,7 +14,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #ifdef __AVR__
-#include <avr/crc16.h>
+#include <util/crc16.h>
 #endif
 
 namespace modm::math
