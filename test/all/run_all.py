@@ -109,7 +109,7 @@ class TestRun:
         end_time = time.time()
         self.time = end_time - start_time
 
-        sys.stdout.write("{:5}{:20} {:=3.1f}s\n".format(self.format_result(), self.device, self.time))
+        sys.stdout.write("{:5}{:20} {:=6.1f}s\n".format(self.format_result(), self.device, self.time))
         if self.errors:
             sys.stdout.write(self.errors)
         sys.stdout.flush()
@@ -182,20 +182,20 @@ def main():
         with multiprocessing.Pool(cpus) as pool:
             test_runs = pool.map(build_device, [TestRun(x, cache_dir) for x in devices])
 
-        succeded = []
+        succeeded = []
         failed = []
         print()
         for run in sorted(test_runs, key=lambda x: x.device):
             if run.result == TestRunResult.SUCCESS:
-                succeded.append(run.device)
+                succeeded.append(run.device)
             else:
                 failed.append(run.device)
 
         print()
-        print("SUCCESS", len(succeded))
-        print("FAIL   ", len(failed))
+        print("SUCCESS {:=4d}".format(len(succeeded)))
+        print("FAIL    {:=4d}".format(len(failed)))
         print("------------------")
-        print("Total: ", len(succeded) + len(failed))
+        print("Total   {:=4d}".format(len(succeeded) + len(failed)))
         print()
 
         Path("failed.txt").write_text("\n".join(failed))
