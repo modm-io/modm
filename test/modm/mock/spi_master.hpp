@@ -128,6 +128,6 @@ public:
 
 } // namespace platform
 
-} // namespace modm
+} // namespace modm_test
 
 #endif // MODM_TEST_MOCK_SPI_MASTER_HPP
