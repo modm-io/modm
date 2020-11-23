@@ -21,8 +21,23 @@ jobs:
         run: |
           pip3 install --user modm scons
           echo "/usr/local/bin" >> $GITHUB_PATH
-          echo "/Users/runner/Library/Python/3.8/bin" >> $GITHUB_PATH
+          echo "/Users/runner/Library/Python/3.9/bin" >> $GITHUB_PATH
           echo $PATH
+
+      - name: Dump environment
+        run: |
+            env
+            locale -a
+            python --version  || true
+            python3 --version || true
+            which scons
+            scons --version
+            which g++
+            g++ --version
+            which arm-none-eabi-g++
+            arm-none-eabi-g++ --version
+            which lbuild
+            lbuild --version
 
       - name: Check out repository
         uses: actions/checkout@v2
