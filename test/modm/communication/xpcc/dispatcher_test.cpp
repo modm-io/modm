@@ -147,7 +147,7 @@ DispatcherTest::testEventTransmission()
 
 	// Event was delivered to the internal component
 	TEST_ASSERT_EQUALS(timeline->events.getSize(), 1U);
-	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::EVENT);
+	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::Type::Event);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().id, 0x21);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().source, 2);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().payload.getSize(), 4U);
@@ -171,7 +171,7 @@ DispatcherTest::testInternalActionCallNoParameter()
 	dispatcher->update();
 
 	TEST_ASSERT_EQUALS(timeline->events.getSize(), 1U);
-	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::ACTION);
+	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::Type::Action);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().id, 0x10);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().component, 1);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().source, 2);
@@ -190,7 +190,7 @@ DispatcherTest::testInternalActionCallUnit16()
 	dispatcher->update();
 
 	TEST_ASSERT_EQUALS(timeline->events.getSize(), 1U);
-	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::ACTION);
+	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::Type::Action);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().id, 0x11);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().component, 1);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().source, 2);
@@ -214,14 +214,14 @@ DispatcherTest::testInternalActionCallDirectResponse()
 
 	TEST_ASSERT_EQUALS(timeline->events.getSize(), 2U);
 
-	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::ACTION);
+	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::Type::Action);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().id, 0x12);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().component, 1);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().source, 2);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().payload.getSize(), 0U);
 
 	timeline->events.removeFront();
-	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::RESPONSE);
+	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::Type::Response);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().id, 0x30);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().component, 2);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().source, 1);
@@ -242,7 +242,7 @@ DispatcherTest::testInternalActionCallDelayedResponse()
 
 	TEST_ASSERT_EQUALS(timeline->events.getSize(), 1U);
 
-	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::ACTION);
+	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::Type::Action);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().id, 0x13);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().component, 1);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().source, 2);
@@ -256,7 +256,7 @@ DispatcherTest::testInternalActionCallDelayedResponse()
 
 	TEST_ASSERT_EQUALS(timeline->events.getSize(), 1U);
 
-	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::RESPONSE);
+	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::Type::Response);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().id, 0x30);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().component, 2);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().source, 1);
@@ -277,7 +277,7 @@ DispatcherTest::testInternalActionCallWithRecall()
 
 	TEST_ASSERT_EQUALS(timeline->events.getSize(), 2U);
 
-	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::ACTION);
+	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::Type::Action);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().id, 0x14);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().component, 1);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().source, 2);
@@ -287,7 +287,7 @@ DispatcherTest::testInternalActionCallWithRecall()
 			0x4321U);
 
 	timeline->events.removeFront();
-	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::ACTION);
+	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::Type::Action);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().id, 0x11);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().component, 2);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().source, 1);
@@ -318,7 +318,7 @@ DispatcherTest::testInternalActionBackAndForth()
 	TEST_ASSERT_EQUALS(timeline->events.getSize(), 7U);
 
 	// 1
-	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::ACTION);
+	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::Type::Action);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().id, 0x12);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().component, 1);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().source, 2);
@@ -326,7 +326,7 @@ DispatcherTest::testInternalActionBackAndForth()
 
 	// 2
 	timeline->events.removeFront();
-	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::ACTION);
+	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::Type::Action);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().id, 0x14);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().component, 1);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().source, 2);
@@ -337,7 +337,7 @@ DispatcherTest::testInternalActionBackAndForth()
 
 	// 3
 	timeline->events.removeFront();
-	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::ACTION);
+	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::Type::Action);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().id, 0x10);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().component, 2);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().source, 1);
@@ -345,7 +345,7 @@ DispatcherTest::testInternalActionBackAndForth()
 
 	// 4
 	timeline->events.removeFront();
-	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::ACTION);
+	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::Type::Action);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().id, 0x11);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().component, 2);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().source, 1);
@@ -356,7 +356,7 @@ DispatcherTest::testInternalActionBackAndForth()
 
 	// 5
 	timeline->events.removeFront();
-	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::RESPONSE);
+	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::Type::Response);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().id, 0x32);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().component, 2);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().source, 1);
@@ -364,7 +364,7 @@ DispatcherTest::testInternalActionBackAndForth()
 
 	// 6
 	timeline->events.removeFront();
-	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::ACTION);
+	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::Type::Action);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().id, 0x12);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().component, 1);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().source, 2);
@@ -372,7 +372,7 @@ DispatcherTest::testInternalActionBackAndForth()
 
 	// 7
 	timeline->events.removeFront();
-	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::RESPONSE);
+	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::Type::Response);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().id, 0x30);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().component, 2);
 	TEST_ASSERT_EQUALS(timeline->events.getFront().source, 1);

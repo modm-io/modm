@@ -22,11 +22,11 @@
 class Timeline
 {
 public:
-	enum Type
+	enum class Type : uint8_t
 	{
-		EVENT,
-		ACTION,
-		RESPONSE
+		Event,
+		Action,
+		Response,
 	};
 
 	struct Event
