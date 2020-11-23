@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2009-2010, Fabian Greif
  * Copyright (c) 2012-2014, Niklas Hauser
- * Copyright (c) 2015, Sascha Schade
+ * Copyright (c) 2015-2020, Sascha Schade
  *
  * This file is part of the modm project.
  *
@@ -11,21 +11,21 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "fake_can_driver.hpp"
+#include "can_driver.hpp"
 
-FakeCanDriver::FakeCanDriver() :
+modm_test::platform::CanDriver::CanDriver() :
 	sendSlots(0)
 {
 }
 
 bool
-FakeCanDriver::isMessageAvailable()
+modm_test::platform::CanDriver::isMessageAvailable()
 {
 	return (not receiveList.isEmpty());
 }
 
 bool
-FakeCanDriver::getMessage(modm::can::Message& message)
+modm_test::platform::CanDriver::getMessage(modm::can::Message& message)
 {
 	if (isMessageAvailable())
 	{
@@ -40,13 +40,13 @@ FakeCanDriver::getMessage(modm::can::Message& message)
 }
 
 bool
-FakeCanDriver::isReadyToSend()
+modm_test::platform::CanDriver::isReadyToSend()
 {
 	return (this->sendSlots > 0);
 }
 
 bool
-FakeCanDriver::sendMessage(const modm::can::Message& message)
+modm_test::platform::CanDriver::sendMessage(const modm::can::Message& message)
 {
 	if (this->isReadyToSend())
 	{
@@ -60,19 +60,19 @@ FakeCanDriver::sendMessage(const modm::can::Message& message)
 }
 
 uint8_t
-FakeCanDriver::getReceiveErrorCounter()
+modm_test::platform::CanDriver::getReceiveErrorCounter()
 {
 	return 0;
 }
 
 uint8_t
-FakeCanDriver::getTransmitErrorCounter()
+modm_test::platform::CanDriver::getTransmitErrorCounter()
 {
 	return 0;
 }
 
 modm::Can::BusState
-FakeCanDriver::getBusState()
+modm_test::platform::CanDriver::getBusState()
 {
 	return modm::Can::BusState::Connected;
 }

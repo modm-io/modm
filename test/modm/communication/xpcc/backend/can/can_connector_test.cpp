@@ -69,7 +69,7 @@ CanConnectorTest::createMessage(modm::can::Message& message,
 void
 CanConnectorTest::setUp()
 {
-	this->driver = new FakeCanDriver();
+	this->driver = new modm_test::platform::CanDriver();
 	this->connector = new TestingCanConnector(this->driver);
 }
 

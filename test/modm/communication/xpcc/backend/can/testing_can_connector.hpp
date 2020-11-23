@@ -17,16 +17,16 @@
 
 #include <modm/communication/xpcc/backend/can/connector.hpp>
 
-#include "fake_can_driver.hpp"
+#include "can_driver.hpp"
 
 /// @ingroup modm_test_test_communication
-class TestingCanConnector : public xpcc::CanConnector<FakeCanDriver>
+class TestingCanConnector : public xpcc::CanConnector<modm_test::platform::CanDriver>
 {
 public:
-	TestingCanConnector(FakeCanDriver *driver);
+	TestingCanConnector(modm_test::platform::CanDriver *driver);
 
 	// expose the internal variable for testing
-	using xpcc::CanConnector<FakeCanDriver>::messageCounter;
+	using xpcc::CanConnector<modm_test::platform::CanDriver>::messageCounter;
 };
 
 #endif	// TESTING_CAN_CONNECTOR_HPP

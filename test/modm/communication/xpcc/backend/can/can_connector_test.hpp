@@ -61,7 +61,7 @@ public:
 
 private:
 	TestingCanConnector *connector;
-	FakeCanDriver *driver;
+	modm_test::platform::CanDriver *driver;
 
 	xpcc::Header xpccHeader;
 	uint32_t normalIdentifier;

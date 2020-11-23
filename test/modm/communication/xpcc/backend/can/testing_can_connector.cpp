@@ -14,7 +14,7 @@
 
 #include "testing_can_connector.hpp"
 
-TestingCanConnector::TestingCanConnector(FakeCanDriver *driver) :
-	xpcc::CanConnector<FakeCanDriver>(driver)
+TestingCanConnector::TestingCanConnector(modm_test::platform::CanDriver *driver) :
+	xpcc::CanConnector<modm_test::platform::CanDriver>(driver)
 {
 }

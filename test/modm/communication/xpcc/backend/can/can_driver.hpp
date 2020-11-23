@@ -2,6 +2,7 @@
  * Copyright (c) 2009-2010, Martin Rosekeit
  * Copyright (c) 2009-2011, Fabian Greif
  * Copyright (c) 2012-2014, Niklas Hauser
+ * Copyright (c) 2020, Sascha Schade
  *
  * This file is part of the modm project.
  *
@@ -11,17 +12,27 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef FAKE_CAN_DRIVER_HPP
-#define FAKE_CAN_DRIVER_HPP
+#ifndef MODM_TEST_MOCK_CAN_DRIVER_HPP
+#define MODM_TEST_MOCK_CAN_DRIVER_HPP
 
-#include <modm/container/linked_list.hpp>
 #include <modm/architecture/interface/can.hpp>
+#include <modm/container/linked_list.hpp>
 
-/// @ingroup modm_test_test_communication
-class FakeCanDriver : public modm::Can
+namespace modm_test
+{
+
+namespace platform
+{
+
+/**
+ * Mock CAN peripheral interface for unittests.
+ *
+ * @ingroup modm_test_mock_can
+ */
+class CanDriver : public modm::Can
 {
 public:
-	FakeCanDriver();
+	CanDriver();
 
 	bool
 	isMessageAvailable();
@@ -55,4 +66,8 @@ public:
 	uint8_t sendSlots;
 };
 
-#endif	// FAKE_CAN_DRIVER_HPP
+} // namespace platform
+
+} // namespace modm_test
+
+#endif	// MODM_TEST_MOCK_CAN_DRIVER_HPP
