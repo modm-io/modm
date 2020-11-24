@@ -342,6 +342,9 @@ protected:
 %% if with_io
 #include <modm/io/iostream.hpp>
 
+namespace modm
+{
+
 inline modm::IOStream&
 operator << (modm::IOStream& s, const modm::amnb::Error error)
 {
@@ -359,5 +362,7 @@ operator << (modm::IOStream& s, const modm::amnb::Error error)
 	}
 	return s;
 }
+
+} // modm namespace
 %% endif
 

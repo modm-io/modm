@@ -186,15 +186,14 @@ asFlash(const T* ptr)
 }	// namespace modm
 
 %% if with_io
-template<typename T>
-modm::IOStream&
-operator << (modm::IOStream& os, modm::accessor::Flash<T> ptr);
+namespace modm
+{
 
 /**
  * Streamoperator - specialization for `char`
  * @ingroup modm_architecture_accessor
  */
-static inline modm::IOStream&
+inline modm::IOStream&
 operator << (modm::IOStream& os, modm::accessor::Flash<char> ptr)
 {
 	char c;
@@ -203,6 +202,8 @@ operator << (modm::IOStream& os, modm::accessor::Flash<char> ptr)
 	}
 	return os;
 }
+
+}	// namespace modm
 %% endif
 
 #endif	// MODM_INTERFACE_ACCESSOR_FLASH_HPP

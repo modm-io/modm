@@ -134,6 +134,7 @@ namespace modm
 
 	modm::IOStream&
 	operator <<( modm::IOStream& s, const modm::SmartPointer& sPtr);
-};
+
+} // modm namespace
 
 #endif	// MODM_SMART_POINTER_H

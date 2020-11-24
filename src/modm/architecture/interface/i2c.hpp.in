@@ -133,6 +133,9 @@ struct I2c
 %% if with_io
 #include <modm/io/iostream.hpp>
 
+namespace modm
+{
+
 modm::IOStream&
 operator << (modm::IOStream& s, const modm::I2c::Operation op);
 
@@ -144,6 +147,8 @@ operator << (modm::IOStream& s, const modm::I2c::OperationAfterRead op);
 
 modm::IOStream&
 operator << (modm::IOStream& s, const modm::I2c::OperationAfterWrite op);
+
+}	// namespace modm
 %% endif
 
 #endif // MODM_INTERFACE_I2C_HPP

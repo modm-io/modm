@@ -237,7 +237,8 @@ namespace modm
 
 	IOStream&
 	operator << (IOStream& os, const ad7280a::ConversionValue& c);
-}
+
+} // modm namespace
 
 #include "ad7280a_impl.hpp"
 

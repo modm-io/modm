@@ -222,7 +222,7 @@ private:
 };
 
 IOStream&
-operator<<(IOStream& out, const ad7928::Data& data);
+operator << (IOStream& out, const ad7928::Data& data);
 
 } // namespace modm
 

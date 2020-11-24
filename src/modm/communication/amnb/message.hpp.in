@@ -262,6 +262,9 @@ static_assert(sizeof(Message) == 32, "modm::amnb::Message must be memory-packed!
 %% if with_io
 #include <modm/io/iostream.hpp>
 
+namespace modm
+{
+
 inline modm::IOStream&
 operator << (modm::IOStream& s, const modm::amnb::Type type)
 {
@@ -276,4 +279,6 @@ operator << (modm::IOStream& s, const modm::amnb::Type type)
 	}
 	return s;
 }
+
+} // modm namespace
 %% endif

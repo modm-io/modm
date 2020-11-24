@@ -12,7 +12,7 @@
 #include "i2c.hpp"
 
 modm::IOStream&
-operator << (modm::IOStream& s, const modm::I2c::Operation op)
+modm::operator << (modm::IOStream& s, const modm::I2c::Operation op)
 {
 	switch (op)
 	{
@@ -25,21 +25,21 @@ operator << (modm::IOStream& s, const modm::I2c::Operation op)
 }
 
 modm::IOStream&
-operator << (modm::IOStream& s, const modm::I2c::OperationAfterStart op)
+modm::operator << (modm::IOStream& s, const modm::I2c::OperationAfterStart op)
 {
 	s << static_cast<modm::I2c::Operation>(op);
 	return s;
 }
 
 modm::IOStream&
-operator << (modm::IOStream& s, const modm::I2c::OperationAfterRead op)
+modm::operator << (modm::IOStream& s, const modm::I2c::OperationAfterRead op)
 {
 	s << static_cast<modm::I2c::Operation>(op);
 	return s;
 }
 
 modm::IOStream&
-operator << (modm::IOStream& s, const modm::I2c::OperationAfterWrite op)
+modm::operator << (modm::IOStream& s, const modm::I2c::OperationAfterWrite op)
 {
 	s << static_cast<modm::I2c::Operation>(op);
 	return s;

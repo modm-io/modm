@@ -414,7 +414,7 @@ operator << (IOStream& os, const drv832xSpi::OcpControl_t& c);
 IOStream&
 operator << (IOStream& os, const drv832xSpi::CsaControl_t& c);
 
-}
+} // modm namespace
 
 #include "drv832x_spi_impl.hpp"
 

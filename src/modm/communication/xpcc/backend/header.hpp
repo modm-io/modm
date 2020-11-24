@@ -71,12 +71,18 @@ namespace xpcc
 		operator == (const Header& other) const;
 	};
 
-	/**
-	 * \brief	Stream operator for a packet header
-	 * \ingroup	backend
-	 */
-	modm::IOStream&
-	operator << (modm::IOStream& s, const Header& header);
-}
+} // namespace xpcc
+
+namespace modm
+{
+
+/**
+ * \brief	Stream operator for a packet header
+ * \ingroup	backend
+ */
+modm::IOStream&
+operator << (modm::IOStream& s, const xpcc::Header& header);
+
+} // modm namespace
 
 #endif	// XPCC_HEADER_HPP

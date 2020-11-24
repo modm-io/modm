@@ -101,8 +101,13 @@ public:
 %% if with_io
 #include <modm/io/iostream.hpp>
 
+namespace modm
+{
+
 modm::IOStream&
-operator << (modm::IOStream& s, const modm::can::Message m);
+operator << (modm::IOStream& s, const modm::can::Message& m);
+
+} // modm namespace
 %% endif
 
 #endif // MODM_CAN_MESSAGE_HPP

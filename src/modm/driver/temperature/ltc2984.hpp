@@ -479,7 +479,7 @@ operator << (IOStream& os, const ltc2984::Data& c);
 IOStream&
 operator << (IOStream& os, const ltc2984::Data::Status& c);
 
-}
+} // modm namespace
 
 #include "ltc2984_impl.hpp"
 

@@ -267,6 +267,9 @@ protected:
 %% if with_io
 #include <modm/io/iostream.hpp>
 
+namespace modm
+{
+
 inline modm::IOStream&
 operator << (modm::IOStream& s, const modm::amnb::InterfaceStatus status)
 {
@@ -288,4 +291,6 @@ operator << (modm::IOStream& s, const modm::amnb::InterfaceStatus status)
 	}
 	return s;
 }
+
+} // modm namespace
 %% endif

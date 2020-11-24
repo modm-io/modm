@@ -15,7 +15,7 @@
 
 // ----------------------------------------------------------------------------
 modm::IOStream&
-modm::operator<<(modm::IOStream& out, const modm::ad7928::Data& data)
+modm::operator << (modm::IOStream& out, const modm::ad7928::Data& data)
 {
 	out	<< "(channel = " << static_cast<uint16_t>(data.channel())
 		<< ", value = " << data.value() << ")";

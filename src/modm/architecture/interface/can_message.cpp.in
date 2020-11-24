@@ -35,8 +35,11 @@ modm::can::Message::operator == (const modm::can::Message& rhs) const
 #include <inttypes.h>
 #include <modm/io/iostream.hpp>
 
+namespace modm
+{
+
 modm::IOStream&
-operator << (modm::IOStream& s, const modm::can::Message m)
+operator << (modm::IOStream& s, const modm::can::Message& m)
 {
 	s.printf("id = %04" PRIx32 ", len = ", m.identifier);
 	s << m.length;
@@ -50,4 +53,6 @@ operator << (modm::IOStream& s, const modm::can::Message m)
 	}
 	return s;
 }
+
+} // modm namespace
 %% endif

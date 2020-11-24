@@ -28,7 +28,7 @@ xpcc::Header::operator == (const Header& other) const
 
 // ----------------------------------------------------------------------------
 modm::IOStream&
-xpcc::operator << (modm::IOStream& s, const Header& header)
+modm::operator << (modm::IOStream& s, const xpcc::Header& header)
 {
 	s	<< "(t=" << static_cast<int32_t>(header.type)
 		<< ",a=" << header.isAcknowledge
