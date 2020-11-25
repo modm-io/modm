@@ -70,9 +70,7 @@ public:
 	{
 		if (index >= LEDs) return {};
 		const uint32_t value = reinterpret_cast<const uint32_t*>(data)[1+index];
-		return {(value >> 24),
-				(value >> 16) & 0xfful,
-				(value >> 8) & 0xfful};
+		return {uint8_t(value >> 24), uint8_t(value >> 16), uint8_t(value >> 8)};
 	}
 
 	void
