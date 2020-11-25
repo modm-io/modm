@@ -23,6 +23,42 @@ namespace modm
 namespace ui
 {
 
+/// @ingroup modm_ui_animation
+template< typename T >
+class AnimationBase
+{
+public:
+	using TimeType = uint32_t;
+
+	virtual
+	~AnimationBase() {}
+
+	/// stop any running animation and set a value.
+	virtual void
+	setValue(T value) = 0;
+
+	/// @return `true` if animation is currently running,
+	///			`false` if otherwise
+	virtual bool
+	isAnimating() const = 0;
+
+	/// stops any running animation.
+	virtual void
+	stop() = 0;
+
+	/// Animate from the current value to a new value in the specified ms.
+	/// @return `true` if animation started,
+	///			`false` if otherwise
+	virtual bool
+	animateTo(T value, uint32_t time) = 0;
+
+	/// @return	`true` if the value has been changed,
+	///			`false` otherwise
+	virtual bool
+	update()
+	{ return false; }
+};
+
 /**
  * This class allows the linear animation of one value over time.
  *
@@ -38,10 +74,10 @@ namespace ui
  * @ingroup modm_ui_animation
  */
 template< typename T = uint8_t >
-class Animation
+class Animation : public AnimationBase<T>
 {
 public:
-	typedef typename FastRamp<T>::StepType TimeType;
+	using TimeType = typename FastRamp<T>::StepType;
 	using Handler = void(*)(T);
 
 public:
@@ -54,8 +90,8 @@ public:
 	attachCallback(Handler handler);
 
 	/// stop any running animation and set a value.
-	void
-	setValue(T value);
+	virtual void
+	setValue(T value) override;
 
 	/// @return the current value
 	T
@@ -63,25 +99,25 @@ public:
 
 	/// @return `true` if animation is currently running,
 	///			`false` if otherwise
-	bool
-	isAnimating() const;
+	virtual bool
+	isAnimating() const override;
 
 	/// stops any running animation.
-	void
-	stop();
+	virtual void
+	stop() override;
 
 	/// Animate from the current value to a new value in the specified ms.
 	/// @return `true` if animation started,
 	///			`false` if otherwise
-	bool
-	animateTo(T value, TimeType time);
+	virtual bool
+	animateTo(T value, uint32_t time) override;
 
 	/// Can be called at an interval of 1ms or less.
 	/// If you do not need 1ms response time, you may call this at intervals < 250ms.
 	/// @return	`true` if the value has been changed,
 	///			`false` otherwise
-	bool
-	update();
+	virtual bool
+	update() override;
 
 private:
 	Handler handler;

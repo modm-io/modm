@@ -15,14 +15,14 @@
 
 // ----------------------------------------------------------------------------
 template< typename T, class... Args >
-modm::ui::KeyFrameAnimationBase<T, Args...>::KeyFrameAnimationBase(Animation<Args>&... animators)
+modm::ui::KeyFrameAnimationBase<T, Args...>::KeyFrameAnimationBase(AnimationBase<Args>&... animators)
 :	KeyFrameAnimationBase(nullptr,0, animators...)
 {
 }
 
 template< typename T, class... Args >
 template< uint16_t N >
-modm::ui::KeyFrameAnimationBase<T, Args...>::KeyFrameAnimationBase(const KeyFrame<T, size> (&frames)[N], Animation<Args>&... animators)
+modm::ui::KeyFrameAnimationBase<T, Args...>::KeyFrameAnimationBase(const KeyFrame<T, size> (&frames)[N], AnimationBase<Args>&... animators)
 :	KeyFrameAnimationBase(frames, N, animators...)
 {
 }
@@ -30,7 +30,7 @@ modm::ui::KeyFrameAnimationBase<T, Args...>::KeyFrameAnimationBase(const KeyFram
 template< typename T, class... Args >
 modm::ui::KeyFrameAnimationBase<T, Args...>::KeyFrameAnimationBase(
 		const KeyFrame<T, size> *frames, uint16_t length,
-		Animation<Args>&... animators)
+		AnimationBase<Args>&... animators)
 :	animators{(&animators)...}, frames(frames), length(length),
 	currentFrame(0), repeat(0), mode(modeCycleMask)
 {

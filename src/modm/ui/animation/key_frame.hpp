@@ -92,12 +92,12 @@ class KeyFrameAnimationBase
 	static constexpr std::size_t size = sizeof...(Args);
 
 public:
-	KeyFrameAnimationBase(Animation<Args>&... animator);
+	KeyFrameAnimationBase(AnimationBase<Args>&... animator);
 
 	template< uint16_t N >
-	KeyFrameAnimationBase(const KeyFrame<T, size> (&frames)[N], Animation<Args>&... animator);
+	KeyFrameAnimationBase(const KeyFrame<T, size> (&frames)[N], AnimationBase<Args>&... animator);
 
-	KeyFrameAnimationBase(const KeyFrame<T, size> *frames, uint16_t length, Animation<Args>&... animator);
+	KeyFrameAnimationBase(const KeyFrame<T, size> *frames, uint16_t length, AnimationBase<Args>&... animator);
 
 	bool
 	start(uint8_t repeat=0);
@@ -123,6 +123,11 @@ public:
 	void
 	setKeyFrames(KeyFrame<T, size> *frames, uint16_t length);
 
+	template< uint16_t N >
+	void
+	setKeyFrames(KeyFrame<T, size> (&frames)[N])
+	{ setKeyFrames(frames, N); }
+
 	uint16_t
 	getLength() const;
 
@@ -136,7 +141,7 @@ private:
 	bool
 	checkRepeat();
 
-	Animation<T> *animators[size];
+	AnimationBase<T> *animators[size];
 	const KeyFrame<T, size> *frames;
 	uint16_t length;
 	uint16_t currentFrame;

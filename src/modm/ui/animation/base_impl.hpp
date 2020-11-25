@@ -61,7 +61,7 @@ modm::ui::Animation<T>::stop()
 
 template< typename T >
 bool
-modm::ui::Animation<T>::animateTo(T value, TimeType time)
+modm::ui::Animation<T>::animateTo(T value, uint32_t time)
 {
 	if(time == 0)
 	{
