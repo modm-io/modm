@@ -22,7 +22,10 @@ def prepare(module, options):
         "modm:architecture:atomic",
         "modm:architecture:can",
         "modm:architecture:clock",
-        "modm:architecture:register")
+        "modm:architecture:i2c",
+        "modm:architecture:register",
+        ":mock:io.device",
+    )
     return True
 
 
