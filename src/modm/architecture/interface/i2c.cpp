@@ -12,6 +12,18 @@
 #include "i2c.hpp"
 
 modm::IOStream&
+modm::operator << (modm::IOStream& s, const modm::I2c::DetachCause detach_cause)
+{
+	switch (detach_cause)
+	{
+		case modm::I2c::DetachCause::NormalStop:     s << "NormalStop";     break;
+		case modm::I2c::DetachCause::ErrorCondition: s << "ErrorCondition"; break;
+		case modm::I2c::DetachCause::FailedToAttach: s << "FailedToAttach"; break;
+	}
+	return s;
+}
+
+modm::IOStream&
 modm::operator << (modm::IOStream& s, const modm::I2c::Operation op)
 {
 	switch (op)

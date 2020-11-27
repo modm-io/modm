@@ -137,6 +137,9 @@ namespace modm
 {
 
 modm::IOStream&
+operator << (modm::IOStream& s, const modm::I2c::DetachCause detach_cause);
+
+modm::IOStream&
 operator << (modm::IOStream& s, const modm::I2c::Operation op);
 
 modm::IOStream&
