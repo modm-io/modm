@@ -59,6 +59,7 @@ class IoDevice(Module):
 
     def build(self, env):
         env.outbasepath = "modm-test/src/modm-test/mock"
+        env.copy("iodevice.hpp")
         env.copy("io_device.hpp")
         env.copy("io_device.cpp")
 

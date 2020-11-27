@@ -18,59 +18,13 @@
 #include "io_stream_test.hpp"
 
 #include <modm/architecture/utils.hpp> // MODM_ARRAY_SIZE
+#include <modm-test/mock/iodevice.hpp>
 #include <stdio.h>	// snprintf
 #include <string.h>	// memset
 #include <limits>
 
 // ----------------------------------------------------------------------------
-// simple IODevice which stores all data in a memory buffer
-// used for testing the output of an IOStream
-
-class MemoryWriter : public modm::IODevice
-{
-public:
-	MemoryWriter() :
-		bytesWritten(0) {}
-
-	/// Write a single char to the buffer.
-	virtual void
-	write(char c)
-	{
-		this->buffer[this->bytesWritten] = c;
-		this->bytesWritten++;
-	}
-
-	using modm::IODevice::write;
-
-	virtual void
-	flush()
-	{
-		memset(this->buffer, 0, this->buffer_length);
-		this->bytesWritten = 0;
-	}
-
-	/// Reading is not implemented
-	virtual bool
-	read(char& /*c*/)
-	{
-		return false;
-	}
-
-	/// Clear the buffer and reset counter.
-	void
-	clear()
-	{
-		memset(this->buffer, 0, this->buffer_length);
-		this->bytesWritten = 0;
-	}
-
-	static constexpr std::size_t buffer_length = 100;
-	char buffer[buffer_length];
-	size_t bytesWritten;
-};
-
-// ----------------------------------------------------------------------------
-static MemoryWriter device;
+static modm_test::platform::IODevice device;
 
 void
 IoStreamTest::setUp()

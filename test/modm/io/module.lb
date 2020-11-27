@@ -15,7 +15,10 @@ def init(module):
     module.name = ":test:io"
 
 def prepare(module, options):
-    module.depends("modm:io")
+    module.depends(
+    	'modm:io',
+    	':mock:io.device',
+    )
     return True
 
 def build(env):
