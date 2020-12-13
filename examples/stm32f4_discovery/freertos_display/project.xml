@@ -1,0 +1,12 @@
+<library>
+  <extends>modm:disco-f407vg</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/stm32f4_discovery/freertos_display</option>
+  </options>
+  <modules>
+    <module>modm:processing:rtos</module>
+     <module>modm:freertos:tcp</module>
+    <module>modm:platform:heap</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>
