@@ -22,7 +22,7 @@ using namespace modm::platform;
  * What to expect?
  * ---------------
  * - All 3  LEDs blinking at different rates, about 3 to 4 Hz
- * - SSD1306 LCD screen displaying a counter.
+ * - SSD1306 LCD screen displaying a counter (coming).
  */
 
 // ----------------------------------------------------------------------------
