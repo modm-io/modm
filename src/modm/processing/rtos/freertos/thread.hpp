@@ -142,7 +142,7 @@ namespace modm
 			 */
 			void
 			setPriority(uint32_t priority);
-                        
+
 			/**
 			 * \brief Enter critical section
 			 *
@@ -151,7 +151,7 @@ namespace modm
 			 */
 			void
 			enterCritical();
-			
+
 			/**
 			 * \brief Exit critical section
 			 *
@@ -160,7 +160,7 @@ namespace modm
 			 */
 			void
 			exitCritical();
-			
+
 			/**
 			 * \brief	When created suspends all real time kernel activity
 			 * 			while keeping interrupts (including the kernel tick)
