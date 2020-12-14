@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2009-2012, Fabian Greif
  * Copyright (c) 2012, 2018, Niklas Hauser
+ * Copyright (c) 2020, Ayoub SOUSSI
  *
  * This file is part of the modm project.
  *
@@ -69,6 +70,21 @@ modm::rtos::Thread::setPriority(uint32_t priority)
 }
 
 // ----------------------------------------------------------------------------
+
+void
+modm::rtos::Thread::enterCritical()
+{
+	taskENTER_CRITICAL();
+}
+
+void
+modm::rtos::Thread::exitCritical()
+{
+	taskEXIT_CRITICAL();
+}
+
+// ----------------------------------------------------------------------------
+
 /*void
 modm::rtos::Thread::suspend()
 {

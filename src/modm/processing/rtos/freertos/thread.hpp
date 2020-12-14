@@ -3,6 +3,7 @@
  * Copyright (c) 2010, Martin Rosekeit
  * Copyright (c) 2012, 2018, Niklas Hauser
  * Copyright (c) 2014, Sascha Schade
+ * Copyright (c) 2020, Ayoub SOUSSI
  *
  * This file is part of the modm project.
  *
@@ -141,7 +142,25 @@ namespace modm
 			 */
 			void
 			setPriority(uint32_t priority);
-
+                        
+			/**
+			 * \brief Enter critical section
+			 *
+			 * It simply disables all interrupts
+			 *
+			 */
+			void
+			enterCritical();
+			
+			/**
+			 * \brief Exit critical section
+			 *
+			 * By re-enabling interrupts
+			 *
+			 */
+			void
+			exitCritical();
+			
 			/**
 			 * \brief	When created suspends all real time kernel activity
 			 * 			while keeping interrupts (including the kernel tick)
