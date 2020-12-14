@@ -43,10 +43,7 @@ public:
 			sleep(SleepTime * MILLISECONDS);
 
 			Gpio::toggle();
-			{
-				static modm::rtos::Mutex lm;
-				modm::rtos::MutexGuard m(lm);
-			}
+
 			i = (i+1)%10;
 			a *= 3.141f;
 		}
