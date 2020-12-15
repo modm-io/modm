@@ -17,7 +17,7 @@ include(./{{ path }}/repo.cmake)
 
 project({{ project_name }})
 
-file(GLOB APP_SOURCE_FILES *.c *.cpp */*.c */*cpp)
+file(GLOB APP_SOURCE_FILES *.c *.cpp */*.c */*.cpp)
 list(APPEND SOURCE_FILES ${APP_SOURCE_FILES})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
