@@ -2,7 +2,7 @@ version: 2
 jobs:
   unittests-linux-generic:
     docker:
-      - image: modm/modm-build:cortex-m
+      - image: ghcr.io/modm-ext/modm-build-cortex-m:latest
     steps:
       - checkout
       - run:
@@ -76,7 +76,7 @@ jobs:
 
   stm32-examples:
     docker:
-      - image: modm/modm-build:cortex-m
+      - image: ghcr.io/modm-ext/modm-build-cortex-m:latest
     steps:
       - checkout
       - run:
@@ -125,7 +125,7 @@ jobs:
             (cd examples && ../tools/scripts/examples_compile.py nucleo_g474re nucleo_g431rb nucleo_g431kb)
   stm32f4-examples:
     docker:
-      - image: modm/modm-build:cortex-m
+      - image: ghcr.io/modm-ext/modm-build-cortex-m:latest
     steps:
       - checkout
       - run:
@@ -145,7 +145,7 @@ jobs:
 
   avr-examples:
     docker:
-      - image: modm/modm-build:avr
+      - image: ghcr.io/modm-ext/modm-build-avr
     steps:
       - checkout
       - run:
@@ -181,7 +181,7 @@ jobs:
 
   avr-compile-all:
     docker:
-      - image: modm/modm-build:avr
+      - image: ghcr.io/modm-ext/modm-build-avr:latest
     steps:
       - checkout
       - run:
@@ -198,7 +198,7 @@ jobs:
 
   samd-compile-all:
     docker:
-      - image: modm/modm-build:cortex-m
+      - image: ghcr.io/modm-ext/modm-build-cortex-m:latest
     steps:
       - checkout
       - run:
@@ -215,7 +215,7 @@ jobs:
 
   stm32f0-compile-all:
     docker:
-      - image: modm/modm-build:cortex-m
+      - image: ghcr.io/modm-ext/modm-build-cortex-m:latest
     steps:
       - checkout
       - run:
@@ -232,7 +232,7 @@ jobs:
 
   stm32f1-compile-all:
     docker:
-      - image: modm/modm-build:cortex-m
+      - image: ghcr.io/modm-ext/modm-build-cortex-m:latest
     steps:
       - checkout
       - run:
@@ -249,7 +249,7 @@ jobs:
 
   stm32f2-compile-all:
     docker:
-      - image: modm/modm-build:cortex-m
+      - image: ghcr.io/modm-ext/modm-build-cortex-m:latest
     steps:
       - checkout
       - run:
@@ -266,7 +266,7 @@ jobs:
 
   stm32f3-compile-all:
     docker:
-      - image: modm/modm-build:cortex-m
+      - image: ghcr.io/modm-ext/modm-build-cortex-m:latest
     steps:
       - checkout
       - run:
@@ -283,7 +283,7 @@ jobs:
 
   stm32f4-compile-all:
     docker:
-      - image: modm/modm-build:cortex-m
+      - image: ghcr.io/modm-ext/modm-build-cortex-m:latest
     steps:
       - checkout
       - run:
@@ -300,7 +300,7 @@ jobs:
 
   stm32f7-compile-all:
     docker:
-      - image: modm/modm-build:cortex-m
+      - image: ghcr.io/modm-ext/modm-build-cortex-m:latest
     steps:
       - checkout
       - run:
@@ -317,7 +317,7 @@ jobs:
 
   stm32l1-compile-all:
     docker:
-      - image: modm/modm-build:cortex-m
+      - image: ghcr.io/modm-ext/modm-build-cortex-m:latest
     steps:
       - checkout
       - run:
@@ -334,7 +334,7 @@ jobs:
 
   stm32l4-compile-all:
     docker:
-      - image: modm/modm-build:cortex-m
+      - image: ghcr.io/modm-ext/modm-build-cortex-m:latest
     steps:
       - checkout
       - run:
@@ -351,7 +351,7 @@ jobs:
 
   stm32g0-compile-all:
     docker:
-      - image: modm/modm-build:cortex-m
+      - image: ghcr.io/modm-ext/modm-build-cortex-m:latest
     steps:
       - checkout
       - run:
@@ -368,7 +368,7 @@ jobs:
 
   stm32g4-compile-all:
     docker:
-      - image: modm/modm-build:cortex-m
+      - image: ghcr.io/modm-ext/modm-build-cortex-m:latest
     steps:
       - checkout
       - run:
@@ -385,7 +385,7 @@ jobs:
 
   build-docs:
     docker:
-      - image: modm/modm-build:base
+      - image: ghcr.io/modm-ext/modm-build-base:latest
     steps:
       - checkout
       - run:
@@ -417,7 +417,7 @@ jobs:
 
   build-upload-docs:
     docker:
-      - image: modm/modm-build:base
+      - image: ghcr.io/modm-ext/modm-build-base:latest
     steps:
       - add_ssh_keys:
           fingerprints:
@@ -446,7 +446,7 @@ jobs:
 
   api-docs-all:
     docker:
-      - image: modm/modm-build:base
+      - image: ghcr.io/modm-ext/modm-build-base:latest
     steps:
       - checkout
       - run:
