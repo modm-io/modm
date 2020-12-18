@@ -260,7 +260,7 @@ def common_compiler_flags(compiler, target):
         # "-Wnon-virtual-dtor",
         # "-Wold-style-cast",
         "-fstrict-enums",
-        "-std=c++17",
+        "-std=c++20",
         # "-pedantic",
     ]
     # flags only for Assembly

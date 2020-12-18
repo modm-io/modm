@@ -43,7 +43,7 @@ For *debug builds*:
 
 #### Only C++
 
-- `-std=c++17`: use C++17
+- `-std=c++20`: use C++20
 
 For exception and RTTI flags, see `modm:stdc++` module.
 
