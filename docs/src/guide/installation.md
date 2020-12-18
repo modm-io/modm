@@ -15,8 +15,8 @@ Note that the modm examples use the SCons build system by default, however,
 you are not *required* to use it. See [the reference manual](../../reference/build-systems) for
 additional build system documentation.
 
-!!! info "Use GCC 7 or newer"
-	modm uses C++17, so you need *at least* GCC 7.
+!!! info "Use GCC 10 or newer"
+	modm uses C++20, so you need *at least* GCC 10.
 
 !!! warning "Beware of AVRs"
 	We **strongly discourage** using AVRs for new designs, due to a significant
@@ -53,18 +53,18 @@ For ARM Cortex-M targets:
 	sudo apt install openocd
 
 !!! warning "Ubuntus 'gcc-arm-none-eabi' package"
-	The Ubuntu package 'gcc-arm-none-eabi' causes [issues at the moment](https://github.com/modm-io/modm/issues/468).
+	The Ubuntu package 'gcc-arm-none-eabi' causes [issues at the moment](https://github.com/modm-io/modm/issues/468) and ships only version 9.3.
 	We recommend using the toolchain provided by ARM:
 
-		wget -O- https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2020q2/gcc-arm-none-eabi-9-2020-q2-update-x86_64-linux.tar.bz2 | sudo tar xj -C /opt/
+		wget -O- https://developer.arm.com/-/media/Files/downloads/gnu-rm/10-2020q4/gcc-arm-none-eabi-10-2020-q4-major-x86_64-linux.tar.bz2 | sudo tar xj -C /opt/
 	
 	Add it to your systems PATH variable by appending the following line to `~/.bashrc`:
 
-		export PATH="/opt/gcc-arm-none-eabi-9-2020-q2-update/bin:$PATH"
+		export PATH="/opt/gcc-arm-none-eabi-10-2020-q4-major/bin:$PATH"
 
 For Atmel/Microchip AVR targets:
 
-	wget -O- https://github.com/modm-ext/docker-avr-gcc/releases/download/v10.2.0/avr-gcc.tar.bz2 | sudo tar xj -C /opt
+	wget -O- https://github.com/modm-io/avr-gcc/releases/download/v10.2.0/avr-gcc.tar.bz2 | sudo tar xj -C /opt
 
 Add it to your systems PATH variable by appending the following line to `~/.bashrc`:
 
