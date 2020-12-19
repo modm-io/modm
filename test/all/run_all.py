@@ -23,7 +23,7 @@ import multiprocessing
 from pathlib import Path
 
 LOGGER = logging.getLogger("run")
-LBUILD_COMMAND = ["lbuild"]
+LBUILD_COMMAND = ["$(which lbuild)"]
 cpus = 4 if os.getenv("CIRCLECI") else os.cpu_count()
 build_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../build"))
 
@@ -142,7 +142,7 @@ def main():
             # filter for only the devices specified
             for arg in sys.argv[1:]:
                 raw_devices = (d for d in raw_devices if d.startswith(arg))
-            # print(devices)
+            #print("\n".join(raw_devices))
         except CommandException as error:
             print(error)
             exit(1)

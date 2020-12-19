@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2018, Niklas Hauser
+# Copyright (c) 2019, Benjamin Weps
+# Copyright (c) 2020, Raphael Lehmann
 #
 # This file is part of the modm project.
 #
@@ -286,5 +288,24 @@ def common_compiler_flags(compiler, target):
         "MODM_DEBUG_BUILD",
     ]
 
-    return flags
+    # Architecture flags for C, C++, Assembly and **Linker**
+    flags["archflags"] = []
 
+    # Target specific flags
+    core = target.get_driver("core")["type"]
+    if core.startswith("e31"):
+        flags["cxxflags"] += [
+            "-fno-exceptions",
+            "-fno-unwind-tables",
+            "-fno-rtti",
+            "-fno-threadsafe-statics",
+        ]
+        flags["linkflags"] += [
+        #    "-L{linkdir}",
+        #    "-Tlinkerscript.ld",
+        #    "--specs=nano.specs",
+        #    "--specs=nosys.specs",
+        #    "-nostartfiles"
+        ]
+
+    return flags

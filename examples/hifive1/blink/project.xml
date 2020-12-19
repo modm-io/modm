@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:hifive1</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/hifive1/blink</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:processing:timer</module>
+    <module>modm:platform:gpio</module>
+  </modules>
+</library>

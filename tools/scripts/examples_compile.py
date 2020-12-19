@@ -41,7 +41,7 @@ def generate(project):
 	# Compile Linux examples under macOS with hosted-darwin target
 	if "hosted-linux" in project.read_text():
 		options += " -D:target=hosted-{}".format(platform.system().lower())
-	rc, ro = run_command(path, "lbuild {} build".format(options))
+	rc, ro = run_command(path, "$(which lbuild) {} build".format(options))
 	print("\n".join(output + [ro]))
 	return None if rc else project
 

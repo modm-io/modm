@@ -86,7 +86,9 @@ class DevicesCache(dict):
                      "stm32l1", "stm32l4",
                      "at90", "attiny", "atmega",
                      "samd21",
-                     "hosted"]
+                     "fe310",
+                     "hosted",
+                     ]
         device_file_names = [dfn for dfn in device_file_names if any(s in dfn for s in supported)]
 
         # Parse the files and build the :target enumeration

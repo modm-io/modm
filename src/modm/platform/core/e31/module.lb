@@ -1,0 +1,161 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2019, Benjamin Weps
+# Copyright (c) 2020, Raphael Lehmann
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":platform:core"
+    module.description = "SiFive E31 Core"
+
+def common_memories(env):
+    """
+    Computes memory properties:
+
+      - `memories`: unfiltered memory regions
+      - `regions`: memory region names
+
+    :returns: dictionary of memory properties
+    """
+    device = env[":target"]
+    memories = listify(device.get_driver("core")["memory"])
+
+    # Convert from string to int and add offsets
+    flash_offset = env.get(":platform:core:linkerscript.flash_offset", 0)
+    for m in memories:
+        if m["name"] == "flash":
+            m["start"] = int(m["start"], 0) + flash_offset
+            m["size"] = int(m["size"], 0) - flash_offset
+        else:
+            m["start"] = int(m["start"], 0)
+            m["size"] = int(m["size"], 0)
+
+    properties = {
+        "memories": memories,
+        "regions": [m["name"] for m in memories],
+    }
+    return properties
+
+
+def prepare(module, options):
+    if not options[":target"].has_driver("core:e31"):
+        return False
+
+    module.depends(
+            ":architecture:assert",
+            ":architecture:memory"
+        )
+
+    #module.add_option(
+    #EnumerationOption(
+    #    name="allocator",
+    #    description=FileReader("../cortex/option/allocator.md"),
+    #    enumeration=["newlib", "block", "tlsf"],
+    #    default="newlib",
+    #    dependencies=lambda v: {"newlib": None,
+    #                            "block": ":architecture:heap",
+    #                            "tlsf": ":tlsf"}[v]))
+
+    module.add_option(
+    NumericOption(
+        name="main_stack_size",
+        description=FileReader("../cortex/option/main_stack_size.md"),
+        minimum=2 ** 8,
+        maximum=2 ** 14,
+        default=2 ** 10 * 3 - 32))
+
+    memories = listify(options[":target"].get_driver("core")["memory"])
+
+    # Find the size of the flash memory
+    flash_size = next(int(x['size']) for x in memories if x['name'] == 'flash')
+    module.add_option(
+        NumericOption(
+            name="linkerscript.flash_offset",
+            description=FileReader("../cortex/option/flash_offset.md"),
+            minimum=0,
+            maximum=hex(flash_size),
+            default=0))
+
+    module.add_option(
+        PathOption(
+            name="linkerscript.override",
+            description="Path to project provided linkerscript",
+            default="",
+            empty_ok=True,
+            absolute=False,
+        ))
+
+    return True
+
+def build(env):
+    device = env[":target"]
+    driver = device.get_driver("core")
+
+    properties = device.properties
+
+    properties["target"] = target = device.identifier
+    properties["driver"] = driver
+    properties["process_stack_size"] = 0
+
+    properties.update(common_memories(env))
+
+    env.substitutions = properties
+    env.substitutions["with_fault_storage"] = env.has_module(":platform:fault")
+    env.substitutions["with_assert"] = env.has_module(":architecture:assert")
+
+    #env.collect(":build:linkflags", "-L{project_source_dir}")
+    # Linkerscript
+    env.outbasepath = "modm/link"
+    env.template("linkerscript.ld.in")
+    linkerscript_override_option = env["linkerscript.override"]
+    if linkerscript_override_option:
+        env.collect(":build:linkflags", "-T{}".format(linkerscript_override_option))
+    else:
+        env.collect(":build:linkflags", "-Tmodm/link/linkerscript.ld")
+
+
+    env.outbasepath = "modm/src/modm/platform/core"
+    env.copy("entry.S")
+    env.copy("startup.c")
+    env.copy("flash_reader.hpp")
+    env.collect(":build:linkflags", "-nostartfiles")
+
+    # Heap table from linkerscript
+    if env.has_module(":architecture:memory"):
+        env.template("../cortex/heap_table.cpp.in", "heap_table.cpp")
+        env.template("../cortex/heap_table.hpp.in", "heap_table.hpp")
+    # Deprecate malloc and new if no heap is implemented!
+    if not env.has_module(":platform:heap"):
+         # See :platform:heap for explanation
+        env.substitutions["no_heap_section"] = (".Heap_is_not_implemented!__"
+        "Please_include_the__modm:platform:heap__module_in_your_project!")
+        env.template("../../heap/cortex/no_heap.c.in", "no_heap.c")
+
+    #if env.has_module(":architecture:accessor"):
+    env.copy("../cortex/flash_reader_impl.hpp","flash_reader_impl.hpp")
+
+    #env.copy("assert.cpp") ## Old / TODO: Delete file
+    # dealing with runtime assertions
+    if env.has_module(":architecture:assert"):
+        env.template("../cortex/assert.cpp.in", "assert.cpp")
+        env.template("../cortex/assert_impl.hpp.in", "assert_impl.hpp")
+
+    # busy-waiting delays
+    if env.has_module(":architecture:delay"):
+        env.template("delay.cpp.in")
+        env.template("delay_impl.hpp.in")
+
+    # GNU Build ID
+    env.collect(":build:linkflags", "-Wl,--build-id=sha1")
+    # TODO
+    #if env.has_module(":architecture:build_id"):
+    #    env.copy("build_id.cpp")
+
+    env.collect(":build:archflags", "-march=rv32imac", "-mabi=ilp32")

@@ -108,6 +108,8 @@ def build(env):
             tools.update({"bossac"})
     elif device["core"].startswith("avr"):
         tools.update({"compiler_avr_gcc", "size", "avrdude"})
+    elif device["core"].startswith("e31"):
+        tools.update({"compiler_riscv64_unknown_elf_gcc", "size"})  #, "openocd"})
     else: # hosted
         tools.update({"compiler_hosted_gcc"})
 

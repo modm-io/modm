@@ -4,6 +4,7 @@
 # Copyright (c) 2013, 2016-2017, German Aerospace Center (DLR)
 # Copyright (c) 2017-2018, Niklas Hauser
 # Copyright (c) 2018, Fabian Greif
+# Copyright (c) 2020, Raphael Lehmann
 #
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -34,7 +35,8 @@ def show_size(env, source, alias='__size'):
             print(size.format(source[0].abspath, env['CONFIG_DEVICE_MEMORY']))
             return 0
         action = Action(size_action, cmdstr="$SIZECOMSTR")
-    elif env.has_key('CONFIG_DEVICE_NAME'):
+    elif env.has_key('CONFIG_DEVICE_NAME') and ("avr" in env["ARCHITECTURE"]):
+        # the mcu parameter is an AVR specific feature
         action = Action("$SIZE -C --mcu=$CONFIG_DEVICE_NAME %s" % source[0].path,
                         cmdstr="$SIZECOMSTR")
     else:
