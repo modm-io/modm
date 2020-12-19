@@ -35,7 +35,8 @@ jobs:
           command: |
             (cd test && make compile-nucleo-f411)
             (cd test && make compile-nucleo-l432)
-            (cd test && make compile-nucleo-f103)
+            (cd test && make compile-nucleo-f103_A)
+            (cd test && make compile-nucleo-f103_B)
       - run:
           name: Linux Examples
           when: always

@@ -10,7 +10,8 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 # LBUILD = python3 ../../library-builder/scripts/lbuild
-LBUILD = lbuild
+# LBUILD = lbuild
+LBUILD = $(shell which lbuild)
 # SCONS = python3 `which scons`
 SCONS = scons
 
@@ -56,10 +57,15 @@ run-nucleo-l432:
 	$(call run-test,nucleo-l432,size)
 
 
-compile-nucleo-f103:
-	$(call compile-test,nucleo-f103,size)
-run-nucleo-f103:
-	$(call run-test,nucleo-f103,size)
+compile-nucleo-f103_A:
+	$(call compile-test,nucleo-f103_A,size)
+run-nucleo-f103_A:
+	$(call run-test,nucleo-f103_A,size)
+
+compile-nucleo-f103_B:
+	$(call compile-test,nucleo-f103_B,size)
+run-nucleo-f103_B:
+	$(call run-test,nucleo-f103_B,size)
 
 
 compile-al-avreb-can:
