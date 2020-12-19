@@ -5,8 +5,8 @@ on: [pull_request]
 jobs:
   windows_hosted:
     runs-on: windows-2019
-    #env:
-    #  PYTHONIOENCODING: "utf-8"
+    env:
+      PYTHONIOENCODING: "utf-8"
 
     steps:
 
@@ -23,24 +23,19 @@ jobs:
         run: |
           pip install --user modm scons future
 
-      - name: Download MinGW installer
+      - name: Download GCC for Windows
         run: |
           $ProgressPreference = 'SilentlyContinue'
-          Invoke-WebRequest -OutFile mingw-get-0.6.3.zip https://acc.dl.osdn.jp/mingw/68260/mingw-get-0.6.3-mingw32-pre-20170905-1-bin.zip
+          Invoke-WebRequest -OutFile winlibs-gcc.zip https://github.com/brechtsanders/winlibs_mingw/releases/download/10.2.0-11.0.0-9.0.0-r5/winlibs-x86_64-posix-seh-gcc-10.2.0-mingw-w64-8.0.0-r5.zip
 
-      - name: Unpack MinGW installer
+      - name: Unpack GCC for Windows
         shell: powershell
         run: |
           Add-Type -Assembly "System.IO.Compression.Filesystem"
-          [System.IO.Compression.ZipFile]::ExtractToDirectory("mingw-get-0.6.3.zip", "C:\mingw-get")
-          dir C:\mingw-get
-          echo "C:\mingw-get\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          rm mingw-get-0.6.3.zip
-
-      - name: Install MinGW toolchains
-        shell: powershell
-        run: |
-          mingw-get install gcc g++ mingw32-make
+          [System.IO.Compression.ZipFile]::ExtractToDirectory("winlibs-gcc.zip", "C:\winlibs-gcc")
+          dir C:\winlibs-gcc
+          dir C:\winlibs-gcc\mingw64
+          echo "C:\winlibs-gcc\mingw64\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Show lbuild and gcc version
         run: |

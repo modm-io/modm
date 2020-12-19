@@ -84,6 +84,11 @@ modm_assert_report(_modm_assertion_info *cinfo)
 	}
 }
 
+// Mingw64 :facepalm;
+#if defined(__MINGW64__) && !defined(__clang__)
+#define PRIuPTR "I64u"
+#endif
+
 modm_weak
 void modm_abandon(const modm::AssertionInfo &info)
 {
