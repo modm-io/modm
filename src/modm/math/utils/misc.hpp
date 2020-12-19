@@ -3,6 +3,7 @@
  * Copyright (c) 2010, Martin Rosekeit
  * Copyright (c) 2011-2012, 2014-2015, Niklas Hauser
  * Copyright (c) 2015, Sascha Schade
+ * Copyright (c) 2020, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -18,6 +19,7 @@
 #include <cstddef>
 #include <cmath>
 #include <stdint.h>
+#include <type_traits>
 
 #include <modm/architecture/utils.hpp>
 
@@ -159,6 +161,20 @@ max(const T& a, const T& b, Compare compare)
 		return b;
 	else
 		return a;
+}
+
+/**
+ * @brief constexpr implementation of fabs
+ */
+template <typename Float>
+    requires std::is_floating_point_v<Float>
+constexpr Float constexpr_fabs(Float number)
+{
+    if (number >= 0) {
+        return number;
+    } else {
+        return -number;
+    }
 }
 
 /// @}

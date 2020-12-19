@@ -17,6 +17,7 @@
 
 #include <modm/architecture/interface/clock.hpp>
 #include <modm/math/units.hpp>
+#include <modm/math/utils/misc.hpp>
 #include <cmath>
 
 namespace modm
@@ -77,7 +78,7 @@ private:
 		for(uint8_t bs1Bs2 = minBs1Bs2; bs1Bs2 <= maxBs1Bs2; ++bs1Bs2) {
 			float idealPrescaler = float(Clk) / (Bitrate * (1 + bs1Bs2));
 			uint32_t intPrescaler = round_uint32(idealPrescaler);
-			float error = fabs(1 - intPrescaler/idealPrescaler);
+			float error = constexpr_fabs(1 - intPrescaler/idealPrescaler);
 			if(error <= minError) {
 				bestPrescaler = intPrescaler;
 				minError = error;
