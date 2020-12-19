@@ -36,12 +36,12 @@ your application. */
 #include <modm/platform/device.hpp>
 
 // declared in modm:platform:clock
-modm_extern_c uint32_t _ZN4modm8platform4fcpuE;
+modm_extern_c uint32_t SystemCoreClock;
 
 #define configUSE_PREEMPTION                    1
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION {{ ("m0" not in core) | int }}
 #define configUSE_TICKLESS_IDLE                 0
-#define configCPU_CLOCK_HZ                      ( _ZN4modm8platform4fcpuE )
+#define configCPU_CLOCK_HZ                      ( SystemCoreClock )
 #define configTICK_RATE_HZ                      ( {{ options["::frequency"] }} )
 #define configMAX_PRIORITIES                    5
 #define configMINIMAL_STACK_SIZE                128
