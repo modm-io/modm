@@ -27,15 +27,15 @@ jobs:
         shell: powershell
         run: |
           $ProgressPreference = 'SilentlyContinue'
-          Invoke-WebRequest -OutFile gcc-arm-none-eabi-win32.zip https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm/9-2020q2/gcc-arm-none-eabi-9-2020-q2-update-win32.zip
+          Invoke-WebRequest -OutFile gcc-arm-none-eabi-win32.zip https://developer.arm.com/-/media/Files/downloads/gnu-rm/10-2020q4/gcc-arm-none-eabi-10-2020-q4-major-win32.zip
 
       - name: Install ARM Toolchain
         shell: powershell
         run: |
           Add-Type -Assembly "System.IO.Compression.Filesystem"
-          [System.IO.Compression.ZipFile]::ExtractToDirectory("gcc-arm-none-eabi-win32.zip", "C:\arm-none-eabi-gcc")
-          dir C:\arm-none-eabi-gcc
-          echo "C:\arm-none-eabi-gcc\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          [System.IO.Compression.ZipFile]::ExtractToDirectory("gcc-arm-none-eabi-win32.zip", "C:\")
+          dir C:\gcc-arm-none-eabi-10-2020-q4-major
+          echo "C:\gcc-arm-none-eabi-10-2020-q4-major\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           rm gcc-arm-none-eabi-win32.zip
 
       - name: Show lbuild and arm-none-eabi-gcc Version Information
