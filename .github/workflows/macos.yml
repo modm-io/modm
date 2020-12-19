@@ -9,7 +9,7 @@ jobs:
     steps:
       - name: Setup environment - Brew tap
         run: |
-          brew tap osx-cross/avr
+          brew tap modm-ext/avr
           brew tap modm-ext/arm
 
       - name: Setup environment - Brew install
