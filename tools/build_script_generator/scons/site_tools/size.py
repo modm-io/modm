@@ -35,7 +35,8 @@ def show_size(env, source, alias='__size'):
             return 0
         action = Action(size_action, cmdstr="$SIZECOMSTR")
     elif env.has_key('CONFIG_DEVICE_NAME'):
-        action = Action("$SIZE -C --mcu=$CONFIG_DEVICE_NAME %s" % source[0].path,
+        # AVR devices use avr-objdump -Pmem-usage via ELF file
+        action = Action("$OBJDUMP -Pmem-usage {}".format(source[0].path),
                         cmdstr="$SIZECOMSTR")
     else:
         # use the raw output of the size tool
