@@ -30,9 +30,9 @@ main()
 	MODM_LOG_INFO << "Vref=" << Vref << modm::endl;
 	MODM_LOG_INFO << "Temp=" << Temp << modm::endl;
 
-	MODM_LOG_INFO << "TS_CAL1=" << uint16_t(*((volatile uint16_t *)0x1FFF77B8)) << modm::endl;
-	MODM_LOG_INFO << "TS_CAL2=" << uint16_t(*((volatile uint16_t *)0x1FFF77C2)) << modm::endl;
-	MODM_LOG_INFO << "VREFINT_CAL=" << uint16_t(*((volatile uint16_t *)0x1FFFF7BA)) << modm::endl;
+	MODM_LOG_INFO << "TS_CAL1=" << *Adc::TS_CAL1 << modm::endl;
+	MODM_LOG_INFO << "TS_CAL2=" << *Adc::TS_CAL2 << modm::endl;
+	MODM_LOG_INFO << "VREFINT_CAL=" << *Adc::VREFINT_CAL << modm::endl;
 
 	Adc::setPinChannel<AdcIn1>();
 	Adc::setResolution(Adc::Resolution::Bits12);
