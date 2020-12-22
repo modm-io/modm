@@ -20,10 +20,9 @@ class Accessor(Module):
         return True
 
     def build(self, env):
-        env.substitutions = {"with_io": env.has_module(":io")}
         env.outbasepath = "modm/src/modm/architecture"
         env.copy("interface/accessor.hpp")
-        env.template("interface/accessor_flash.hpp.in")
+        env.copy("interface/accessor_flash.hpp")
         env.copy("interface/accessor_ram.hpp")
 
 # -----------------------------------------------------------------------------
@@ -125,12 +124,10 @@ class Can(Module):
         return True
 
     def build(self, env):
-        env.substitutions = {"with_io": env.has_module(":io")}
         env.outbasepath = "modm/src/modm/architecture"
         env.copy("interface/can.hpp")
         env.copy("interface/can.cpp")
-        env.template("interface/can_message.hpp.in")
-        env.template("interface/can_message.cpp.in")
+        env.copy("interface/can_message.hpp")
 # -----------------------------------------------------------------------------
 
 class Clock(Module):
@@ -143,9 +140,8 @@ class Clock(Module):
         return True
 
     def build(self, env):
-        env.substitutions = {"with_io": env.has_module(":io")}
         env.outbasepath = "modm/src/modm/architecture"
-        env.template("interface/clock.hpp.in")
+        env.copy("interface/clock.hpp")
 # -----------------------------------------------------------------------------
 
 class Delay(Module):
@@ -199,11 +195,8 @@ class I2c(Module):
         return True
 
     def build(self, env):
-        env.substitutions = {"with_io": env.has_module(":io")}
         env.outbasepath = "modm/src/modm/architecture"
-        env.template("interface/i2c.hpp.in")
-        if env.has_module(":io"):
-            env.copy("interface/i2c.cpp")
+        env.copy("interface/i2c.hpp")
         env.copy("interface/i2c_master.hpp")
         env.copy("interface/i2c_transaction.hpp")
 # -----------------------------------------------------------------------------
@@ -302,9 +295,8 @@ class Register(Module):
         return True
 
     def build(self, env):
-        env.substitutions = {"with_io": env.has_module(":io")}
         env.outbasepath = "modm/src/modm/architecture"
-        env.template("interface/register.hpp.in")
+        env.copy("interface/register.hpp")
 # -----------------------------------------------------------------------------
 
 class Spi(Module):

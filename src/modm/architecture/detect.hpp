@@ -261,4 +261,6 @@
 #define MODM_IS_BIG_ENDIAN		(MODM_BYTE_ORDER == MODM_ORDER_BIG_ENDIAN)
 #define MODM_IS_LITTLE_ENDIAN	(MODM_BYTE_ORDER == MODM_ORDER_LITTLE_ENDIAN)
 
+#define MODM_HAS_IOSTREAM __has_include(<modm/io/iostream.hpp>)
+
 #endif	// !__DOXYGEN__

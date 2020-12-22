@@ -14,6 +14,7 @@
 #define MODM_CAN_MESSAGE_HPP
 
 #include <stdint.h>
+#include <algorithm>
 #include <modm/architecture/utils.hpp>
 
 namespace modm::can
@@ -23,7 +24,7 @@ namespace modm::can
 /// @ingroup modm_architecture_can
 struct Message
 {
-	Message(const uint32_t& inIdentifier = 0, uint8_t inLength = 0) :
+	inline Message(uint32_t inIdentifier = 0, uint8_t inLength = 0) :
 		identifier(inIdentifier), flags(), length(inLength)
 	{
 	}
@@ -92,22 +93,43 @@ public:
 	uint8_t length;
 
 public:
-	bool
-	operator == (const modm::can::Message& rhs) const;
+	inline bool
+	operator == (const modm::can::Message& rhs) const
+	{
+		return ((this->identifier     == rhs.identifier) and
+				(this->length         == rhs.length)     and
+				(this->flags.rtr      == rhs.flags.rtr)  and
+				(this->flags.extended == rhs.flags.extended) and
+				std::equal(data, data + length, rhs.data));
+	}
 };
 
 }	// namespace modm::can
 
-%% if with_io
+#if MODM_HAS_IOSTREAM
+#include <inttypes.h>
 #include <modm/io/iostream.hpp>
 
 namespace modm
 {
 
-modm::IOStream&
-operator << (modm::IOStream& s, const modm::can::Message& m);
+inline modm::IOStream&
+operator << (modm::IOStream& s, const modm::can::Message& m)
+{
+	s.printf("id = %04" PRIx32 ", len = ", m.identifier);
+	s << m.length;
+	s.printf(", flags = %c%c, data = ",
+			 m.flags.rtr ? 'R' : 'r',
+			 m.flags.extended ? 'E' : 'e');
+	if (not m.isRemoteTransmitRequest()) {
+		for (uint_fast8_t ii = 0; ii < m.length; ++ii) {
+			s.printf("%02x ", m.data[ii]);
+		}
+	}
+	return s;
+}
 
 } // modm namespace
-%% endif
+#endif
 
 #endif // MODM_CAN_MESSAGE_HPP

@@ -94,7 +94,7 @@ using namespace ::std::chrono_literals;
 
 }	// namespace modm
 
-%% if with_io
+#if MODM_HAS_IOSTREAM
 #include <modm/io/iostream.hpp>
 
 namespace modm
@@ -122,4 +122,4 @@ operator << (modm::IOStream& s, const std::chrono::duration<T, R>& m)
 }
 
 } // modm namespace
-%% endif
+#endif

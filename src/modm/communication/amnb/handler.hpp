@@ -339,7 +339,7 @@ protected:
 
 }
 
-%% if with_io
+#if MODM_HAS_IOSTREAM
 #include <modm/io/iostream.hpp>
 
 namespace modm
@@ -364,5 +364,5 @@ operator << (modm::IOStream& s, const modm::amnb::Error error)
 }
 
 } // modm namespace
-%% endif
+#endif
 

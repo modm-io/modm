@@ -30,13 +30,12 @@ def prepare(module, options):
 
 def build(env):
     env.substitutions = {
-        "with_io": env.has_module(":io"),
         "target": env[":target"].identifier,
         "with_heap": env["with_heap"]
     }
     env.outbasepath = "modm/src/modm/communication/amnb"
     env.template("message.hpp.in")
-    env.template("interface.hpp.in")
-    env.template("handler.hpp.in")
+    env.copy("interface.hpp")
+    env.copy("handler.hpp")
     env.copy("node.hpp")
     env.copy("../amnb.hpp")

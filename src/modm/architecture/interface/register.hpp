@@ -17,9 +17,9 @@
 #include <stdint.h>
 #include <modm/math/utils/bit_constants.hpp>
 #include <modm/architecture/detect.hpp>
-%% if with_io
+#if MODM_HAS_IOSTREAM
 #include <modm/io/iostream.hpp>
-%% endif
+#endif
 
 namespace modm
 {
@@ -84,12 +84,12 @@ struct Register
 	{ return not bool(value); }
 	/// @}
 
-%% if with_io
+#if MODM_HAS_IOSTREAM
 	/// Printing a register will output its numeric value.
 	friend IOStream&
 	operator << (IOStream& s, const Register<T>& m)
 	{ return (s << m.value); }
-%% endif
+#endif
 
 protected:
 	/// This class is meant to be subclassed

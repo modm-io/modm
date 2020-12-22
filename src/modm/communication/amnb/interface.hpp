@@ -264,7 +264,7 @@ protected:
 
 }	// namespace modm::amnb
 
-%% if with_io
+#if MODM_HAS_IOSTREAM
 #include <modm/io/iostream.hpp>
 
 namespace modm
@@ -293,4 +293,4 @@ operator << (modm::IOStream& s, const modm::amnb::InterfaceStatus status)
 }
 
 } // modm namespace
-%% endif
+#endif
