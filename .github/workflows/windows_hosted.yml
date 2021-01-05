@@ -26,7 +26,7 @@ jobs:
       - name: Download GCC for Windows
         run: |
           $ProgressPreference = 'SilentlyContinue'
-          Invoke-WebRequest -OutFile winlibs-gcc.zip https://github.com/brechtsanders/winlibs_mingw/releases/download/10.2.0-11.0.0-9.0.0-r5/winlibs-x86_64-posix-seh-gcc-10.2.0-mingw-w64-8.0.0-r5.zip
+          Invoke-WebRequest -OutFile winlibs-gcc.zip https://github.com/brechtsanders/winlibs_mingw/releases/download/10.2.0-11.0.0-8.0.0-r5/winlibs-x86_64-posix-seh-gcc-10.2.0-mingw-w64-8.0.0-r5.zip
 
       - name: Unpack GCC for Windows
         shell: powershell
