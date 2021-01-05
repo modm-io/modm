@@ -28,7 +28,7 @@ FLASH_STORAGE(uint8_t monthDays[]) = {
  * but since we have no fancy years between 1970 and 2038 we can do:
  */
 #define LEAP_YEAR(year) 	((year % 4) == 0)
-#define SECONDS_PER_DAY		(60 * 60 * 24L)
+#define SECONDS_PER_DAY		(INT32_C(60) * 60 * 24)
 
 // ----------------------------------------------------------------------------
 void
