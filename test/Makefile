@@ -80,10 +80,40 @@ run-arduino-uno:
 	$(call run-test,arduino-uno,size)
 
 
-compile-arduino-nano:
-	$(call compile-test,arduino-nano,size)
-run-arduino-nano:
-	$(call run-test,arduino-nano,size)
+# Currenly only unittests _A, _C, _D, _E, _G are functional
+compile-arduino-nano_A:
+	$(call compile-test,arduino-nano_A,size)
+run-arduino-nano_A:
+	$(call run-test,arduino-nano_A,size)
+compile-arduino-nano_B:
+	$(call compile-test,arduino-nano_B,size)
+run-arduino-nano_B:
+	$(call run-test,arduino-nano_B,size)
+compile-arduino-nano_C:
+	$(call compile-test,arduino-nano_C,size)
+run-arduino-nano_C:
+	$(call run-test,arduino-nano_C,size)
+compile-arduino-nano_D:
+	$(call compile-test,arduino-nano_D,size)
+run-arduino-nano_D:
+	$(call run-test,arduino-nano_D,size)
+compile-arduino-nano_E:
+	$(call compile-test,arduino-nano_E,size)
+run-arduino-nano_E:
+	$(call run-test,arduino-nano_E,size)
+compile-arduino-nano_F:
+	$(call compile-test,arduino-nano_F,size)
+run-arduino-nano_F:
+	$(call run-test,arduino-nano_F,size)
+compile-arduino-nano_G:
+	$(call compile-test,arduino-nano_G,size)
+run-arduino-nano_G:
+	$(call run-test,arduino-nano_G,size)
+compile-arduino-nano_H:
+	$(call compile-test,arduino-nano_H,size)
+run-arduino-nano_H:
+	$(call run-test,arduino-nano_H,size)
+
 
 compile-mega-2560-pro:
 	$(call compile-test,mega-2560-pro,size)

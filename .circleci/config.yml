@@ -172,7 +172,7 @@ jobs:
           when: always
           command: |
             (cd test && make compile-arduino-uno)
-            (cd test && make compile-arduino-nano)
+            (cd test && make compile-arduino-nano_A compile-arduino-nano_C compile-arduino-nano_D compile-arduino-nano_E compile-arduino-nano_G)
       - run:
           name: Compile AVR Unittests ATmega
           when: always
