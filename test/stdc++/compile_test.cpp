@@ -10,7 +10,6 @@
 #include <cinttypes>
 #include <ciso646>
 #include <climits>
-#include <clocale>
 #include <cmath>
 #include <complex>
 #include <csetjmp>
