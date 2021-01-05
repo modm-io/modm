@@ -21,10 +21,10 @@ using namespace std::chrono_literals;
 void
 DurationTest::testConstructors()
 {
-	modm::ShortDuration t1Short;
+	modm::ShortDuration t1Short{};
 	TEST_ASSERT_TRUE(t1Short == 0ms);
 
-	modm::Duration t1;
+	modm::Duration t1{};
 	TEST_ASSERT_TRUE(t1 == 0ms);
 
 	modm::ShortDuration t2Short(1s);
