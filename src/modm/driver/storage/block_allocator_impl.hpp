@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <algorithm>
+
 // ----------------------------------------------------------------------------
 /*
  * Align heapStart to two bytes after a four byte boundary. When using two
@@ -209,8 +211,10 @@ template<typename T, unsigned int BLOCK_SIZE >
 T *
 modm::BlockAllocator<T, BLOCK_SIZE>::alignPointer(void * ptr) const
 {
-	// (MODM_ALIGNMENT - 1) is used as a bitmask
-	std::size_t misalignment = ((uintptr_t) ptr & (MODM_ALIGNMENT - 1));
+	// On AVR MODM_ALIGNMENT is 1
+	constexpr auto alignment = std::max(MODM_ALIGNMENT, 4);
+	// (alignment - 1) is used as a bitmask
+	std::size_t misalignment = ((uintptr_t) ptr & (alignment - 1));
 #if MODM_ALIGNMENT == 8
 	const uint8_t offset[8] = { 6, 5, 4, 3, 2, 1, 0, 7 };
 #else
