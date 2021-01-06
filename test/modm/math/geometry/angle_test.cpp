@@ -37,7 +37,14 @@ AngleTest::testReverse()
 void
 AngleTest::testPerpendicularCw()
 {
-	TEST_ASSERT_EQUALS_FLOAT(modm::Angle::perpendicular(-0.5 * M_PI, true),  1.0 * M_PI);
+	auto pi_angle = modm::Angle::perpendicular(-0.5 * M_PI, true);
+	// angle wraps at M_PI
+	// legal results can be -M_PI or M_PI due to numerical reasons
+	if(pi_angle < 0) {
+		pi_angle *= -1;
+	}
+	TEST_ASSERT_EQUALS_FLOAT(pi_angle, 1.0 * M_PI);
+
 	TEST_ASSERT_EQUALS_FLOAT(modm::Angle::perpendicular(-0.9 * M_PI, true),  0.6 * M_PI);
 	TEST_ASSERT_EQUALS_FLOAT(modm::Angle::perpendicular( 0.7 * M_PI, true),  0.2 * M_PI);
 	TEST_ASSERT_EQUALS_FLOAT(modm::Angle::perpendicular( 0.1 * M_PI, true), -0.4 * M_PI);
