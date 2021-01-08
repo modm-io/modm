@@ -261,6 +261,12 @@ modm::platform::Rcc::enablePll(PllSource source, const PllFactors& pllFactors, u
 	// Pll multiplication factor
 	tmp |= (static_cast<uint32_t>(pllFactors.pllMul - 2) << 18) & {{pullmul}};
 
+%% if pll_hse_prediv2
+	if(pllFactors.enableHsePllPrediv2) {
+		tmp |= RCC_CFGR_PLLXTPRE;
+	}
+%% endif
+
 	RCC->CFGR = tmp;
 
 %% if pllprediv

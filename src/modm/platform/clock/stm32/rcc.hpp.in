@@ -399,6 +399,8 @@ public:
 		const uint8_t pllPrediv2;
  %% elif pllprediv
 		const uint8_t pllPrediv;
+ %% elif pll_hse_prediv2
+		const bool enableHsePllPrediv2 = false;
  %% endif
  %% if usbprescaler
  		const UsbPrescaler usbPrediv = UsbPrescaler::Div1_5;
