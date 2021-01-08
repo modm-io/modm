@@ -5,7 +5,7 @@
  * Copyright (c) 2012, 2016, Sascha Schade
  * Copyright (c) 2012, 2014-2019, Niklas Hauser
  * Copyright (c) 2013-2014, Kevin Läufer
- * Copyright (c) 2018, Christopher Durand
+ * Copyright (c) 2018, 2021, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -261,16 +261,13 @@ modm::platform::Rcc::enablePll(PllSource source, const PllFactors& pllFactors, u
 	// Pll multiplication factor
 	tmp |= (static_cast<uint32_t>(pllFactors.pllMul - 2) << 18) & {{pullmul}};
 
+	RCC->CFGR = tmp;
+
 %% if pllprediv
 	%% set mask = 'RCC_CFGR2_PREDIV1' if target["family"] == "f1" else 'RCC_CFGR2_PREDIV'
-#ifdef {{mask}}
 	// HSE PREDIV division factor
 	RCC->CFGR2 = (RCC->CFGR2 & ~({{mask}})) | (uint32_t(pllFactors.pllPrediv - 1) & {{mask}});
-#else
-	if (uint32_t(pllFactors.pllPrediv - 1) & 0x1) tmp |= RCC_CFGR_PLLXTPRE;
-#endif
 %% endif
-	RCC->CFGR = tmp;
 %% if pllprediv2
 	RCC->CFGR2 = (RCC->CFGR2 & ~(RCC_CFGR2_PREDIV2)) | ((uint32_t(pllFactors.pllPrediv2 - 1) << 4) & RCC_CFGR2_PREDIV2);
 %% endif
