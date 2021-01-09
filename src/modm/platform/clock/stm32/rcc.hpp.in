@@ -195,6 +195,18 @@ public:
 	};
 %% endif
 
+%% if pllsai_p_usb
+	enum class Clock48Source
+	{
+		PllQ = 0,
+%% if target["family"] == "f4" and target["name"] in ["69", "79"]
+		PllSaiP = RCC_DCKCFGR_CK48MSEL
+%% else
+		PllSaiP = RCC_DCKCFGR2_CK48MSEL
+%% endif
+	};
+%% endif
+
 %% if target["family"] in ["f2", "f4", "f7"]
 	enum class
 	ClockOutput1Source : uint32_t
@@ -394,6 +406,17 @@ public:
 %% endif
 	};
 
+%% if pllsai_p_usb
+	struct PllSaiFactors
+	{
+%% if target["family"] == "f4" and target["name"] in "46"
+		const uint8_t pllSaiM;
+%% endif
+		const uint16_t pllSaiN;
+		const uint8_t pllSaiP;
+	};
+%% endif
+
 	/**
 	 * Enable PLL.
 	 *
@@ -409,6 +432,22 @@ public:
 	 */
 	static bool
 	enablePll(PllSource source, const PllFactors& pllFactors, uint32_t waitCycles = 2048);
+
+%% if pllsai_p_usb
+	/**
+	 * Enable PLLSAI.
+	 *
+	 * \warning The PLL source must be selected first by configuring the main PLL.
+	 *
+	 * \param	factors
+	 * 		Struct with all pllsai factors. \see PllSaiFactors.
+	 *
+	 * \param	waitCycles
+	 * 		Number of cycles to wait for the pll to stabilise. Default: 2048.
+	 */
+	static bool
+	enablePllSai(const PllSaiFactors& pllFactors, uint32_t waitCycles = 2048);
+%% endif
 
 %% if target["family"] in ["f2", "f4", "f7", "l4", "g0", "g4"]
 	/**
@@ -513,6 +552,18 @@ public:
 	static inline bool
 	enableWatchdogClock(WatchdogClockSource /*src*/)
 	{ return true; }
+
+%% if pllsai_p_usb
+	static inline void
+	setClock48Source(Clock48Source source)
+	{
+%% if target["family"] == "f4" and target["name"] in ["69", "79"]
+		RCC->DCKCFGR = (RCC->DCKCFGR & ~RCC_DCKCFGR_CK48MSEL) | uint32_t(source);
+%% else
+		RCC->DCKCFGR2 = (RCC->DCKCFGR2 & ~RCC_DCKCFGR2_CK48MSEL) | uint32_t(source);
+%% endif
+	}
+%% endif
 
 %% if target["family"] in ["f2", "f4", "f7"]
 	static inline bool

@@ -62,6 +62,8 @@ def build(env):
     properties["pll_p"] = ((target["family"] == "l4" and target["name"] not in ["12", "22"]) or target["family"] == "g4")
     properties["overdrive"] = (target["family"] == "f7") or \
         ((target["family"] == "f4") and target["name"] in ["27", "29", "37", "39", "46", "69", "79"])
+    properties["pllsai_p_usb"] = (target["family"] == "f7") or \
+        ((target["family"] == "f4") and target["name"] in ["46", "69", "79"])
 
     flash_latencies = {}
     for vcore in device.get_driver("flash")["latency"]:

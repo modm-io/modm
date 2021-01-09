@@ -284,6 +284,40 @@ modm::platform::Rcc::enablePll(PllSource source, const PllFactors& pllFactors, u
 %%endif
 }
 
+%% if pllsai_p_usb
+bool
+modm::platform::Rcc::enablePllSai(const PllSaiFactors& pllFactors, uint32_t waitCycles)
+{
+	// Read reserved values and clear all other values
+	uint32_t tmp = RCC->PLLSAICFGR & ~(
+%% if target["family"] == "f4" and target["name"] in "46"
+		RCC_PLLSAICFGR_PLLSAIM |
+%% endif
+		RCC_PLLSAICFGR_PLLSAIN | RCC_PLLSAICFGR_PLLSAIP);
+
+%% if target["family"] == "f4" and target["name"] in "46"
+	// PLLSAIM (0) = factor is user defined VCO input frequency must be configured to 2MHz
+	tmp |= ((uint32_t) pllFactors.pllSaiM) & RCC_PLLSAICFGR_PLLSAIM;
+%% endif
+
+	// PLLSAIN (6) = factor is user defined
+	tmp |= (((uint32_t) pllFactors.pllSaiN) << RCC_PLLSAICFGR_PLLSAIN_Pos) & RCC_PLLSAICFGR_PLLSAIN;
+
+	// PLLSAIP (16) divider for CLK48 frequency; (00: PLLP = 2, 01: PLLP = 4, etc.)
+	tmp |= (((uint32_t) (pllFactors.pllSaiP / 2) - 1) << RCC_PLLCFGR_PLLP_Pos) & RCC_PLLCFGR_PLLP;
+
+	RCC->PLLSAICFGR = tmp;
+
+	// enable pll
+	RCC->CR |= RCC_CR_PLLSAION;
+
+	while (not (tmp = (RCC->CR & RCC_CR_PLLSAIRDY)) and --waitCycles)
+		;
+
+	return tmp;
+}
+%% endif
+
 %% if overdrive
 bool
 modm::platform::Rcc::enableOverdriveMode(uint32_t waitCycles)
