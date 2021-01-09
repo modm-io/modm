@@ -91,8 +91,8 @@ struct SystemClock
 			.pllP = 2,		// 360MHz / P=2 -> 180MHz = F_cpu
 		};
 		Rcc::enablePll(Rcc::PllSource::ExternalCrystal, pllFactors);
-		PWR->CR |= PWR_CR_ODEN; // Enable overdrive mode
-		while (not (PWR->CSR & PWR_CSR_ODRDY)) ;
+		// Required for 180 MHz clock
+		Rcc::enableOverdriveMode();
 		Rcc::setFlashLatency<Frequency>();
 		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
 		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div4);

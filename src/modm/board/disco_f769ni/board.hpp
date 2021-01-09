@@ -88,8 +88,8 @@ struct SystemClock
 			.pllP = 2		// 432MHz / P=2 -> 216MHz = F_cpu
 		};
 		Rcc::enablePll(Rcc::PllSource::ExternalClock, pllFactors);
-		PWR->CR1 |= PWR_CR1_ODEN; // Enable overdrive mode
-		while (not (PWR->CSR1 & PWR_CSR1_ODRDY)) ;
+		// Required for 216 MHz clock
+		Rcc::enableOverdriveMode();
 		Rcc::setFlashLatency<Frequency>();
 		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
 		// APB1 is running only at 27MHz, since AHB / 4 = 54MHz > 45MHz limit!

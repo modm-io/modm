@@ -91,8 +91,8 @@ struct SystemClock
 			.pllQ = 9		// 432MHz / Q=9 -> 48MHz = F_usb
 		};
 		Rcc::enablePll(Rcc::PllSource::ExternalClock, pllFactors);
-		PWR->CR1 |= PWR_CR1_ODEN; // Enable overdrive mode
-		while (not (PWR->CSR1 & PWR_CSR1_ODRDY)) ;
+		// Required for 216 MHz clock
+		Rcc::enableOverdriveMode();
 
 		Rcc::setFlashLatency<Frequency>();
 		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);

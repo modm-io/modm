@@ -76,6 +76,8 @@ struct SystemClock {
 			.pllP = 2,		// 360MHz / P=  2 -> 180MHz = F_cpu
 		};
 		Rcc::enablePll(Rcc::PllSource::InternalClock, pllFactors);
+		// Required for 180 MHz clock
+		Rcc::enableOverdriveMode();
 		// set flash latency
 		Rcc::setFlashLatency<Frequency>();
 		// switch system clock to PLL output
