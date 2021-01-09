@@ -284,6 +284,35 @@ modm::platform::Rcc::enablePll(PllSource source, const PllFactors& pllFactors, u
 %%endif
 }
 
+%% if overdrive
+bool
+modm::platform::Rcc::enableOverdriveMode(uint32_t waitCycles)
+{
+	RCC->APB1ENR |= RCC_APB1ENR_PWREN;
+
+%% set suffix = '1' if target["family"] == "f7" else ''
+
+	PWR->CR{{suffix}} |= PWR_CR{{suffix}}_ODEN;
+	auto waitCounter = waitCycles;
+	while (!(PWR->CSR{{suffix}} & PWR_CSR{{suffix}}_ODRDY))
+	{
+		if (--waitCounter == 0)
+			return false;
+	}
+
+	PWR->CR{{suffix}} |= PWR_CR{{suffix}}_ODSWEN;
+	waitCounter = waitCycles;
+	while (!(PWR->CSR{{suffix}} & PWR_CSR{{suffix}}_ODSWRDY))
+	{
+		if (--waitCounter == 0)
+			return false;
+	}
+
+	return true;
+}
+%% endif
+
+
 // ----------------------------------------------------------------------------
 bool
 modm::platform::Rcc::enableSystemClock(SystemClockSource src, uint32_t waitCycles)
