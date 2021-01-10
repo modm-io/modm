@@ -17,6 +17,10 @@ def init(module):
 
 def prepare(module, options):
     module.depends(":stdc++")
+    target = options[":target"]
+    if target.identifier.platform != "avr":
+        return False
+
     return True
 
 
