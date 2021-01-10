@@ -44,7 +44,7 @@ const tusb_desc_device_t desc_device =
 {
 	.bLength            = sizeof(tusb_desc_device_t),
 	.bDescriptorType    = TUSB_DESC_DEVICE,
-	.bcdUSB             = 0x0210,
+	.bcdUSB             = 0x0200,
 
 %% if with_cdc
 	// Use Interface Association Descriptor (IAD) for CDC
