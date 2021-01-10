@@ -75,7 +75,7 @@ private:
 			float delta = (static_cast<float>(end) - begin);
 			deltaValue = delta / steps;
 			if (deltaValue == 0)
-				deltaValue = std::copysignf(std::numeric_limits<float>::epsilon(), delta);
+				deltaValue = std::copysign(std::numeric_limits<float>::epsilon(), delta);
 			accumulatedValue = static_cast<float>(begin) + deltaValue / 2;
 		}
 
