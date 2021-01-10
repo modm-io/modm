@@ -9,13 +9,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "vector_test.hpp"
+#include "std_vector_test.hpp"
 #include <vector>
 #include <iterator>
 #include <algorithm>
 
 void
-VectorTest::testInsertion()
+StdVectorTest::testInsertion()
 {
 	std::vector<int> vec;
 
@@ -32,7 +32,7 @@ VectorTest::testInsertion()
 }
 
 void
-VectorTest::testIteration()
+StdVectorTest::testIteration()
 {
 	uint8_t data[] = {1,2,5,6,100};
 	std::vector<int> vec{1,2,5,6,100};
@@ -47,7 +47,7 @@ VectorTest::testIteration()
 }
 
 void
-VectorTest::testEmplace()
+StdVectorTest::testEmplace()
 {
 	struct NonCopyable
 	{
@@ -72,7 +72,7 @@ VectorTest::testEmplace()
 }
 
 void
-VectorTest::testRemove()
+StdVectorTest::testRemove()
 {
 	std::vector<int> vec{2,3,4,5,6,7};
 	auto it = vec.begin() + 3;
