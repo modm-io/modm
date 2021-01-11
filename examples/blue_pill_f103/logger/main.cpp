@@ -22,6 +22,9 @@
 #undef	MODM_LOG_LEVEL
 #define	MODM_LOG_LEVEL modm::log::INFO
 
+/*** The following code is included in the modm:board module (board.hpp),
+ * but might be useful if the BSP is not used.
+
 // Create an IODeviceWrapper around the Uart Peripheral we want to use
 modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice;
 
@@ -30,6 +33,7 @@ modm::log::Logger modm::log::debug(loggerDevice);
 modm::log::Logger modm::log::info(loggerDevice);
 modm::log::Logger modm::log::warning(loggerDevice);
 modm::log::Logger modm::log::error(loggerDevice);
+*/
 
 
 class BlinkThread : public modm::pt::Protothread

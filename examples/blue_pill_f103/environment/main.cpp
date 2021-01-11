@@ -30,17 +30,6 @@ Bme280Thread bme280Thread;
 #undef	MODM_LOG_LEVEL
 #define	MODM_LOG_LEVEL modm::log::DEBUG
 
-// Create an IODeviceWrapper around the Uart Peripheral we want to use
-modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice;
-modm::IOStream stream(loggerDevice);
-
-// Set all four logger streams to use the UART
-modm::log::Logger modm::log::debug(loggerDevice);
-modm::log::Logger modm::log::info(loggerDevice);
-modm::log::Logger modm::log::warning(loggerDevice);
-modm::log::Logger modm::log::error(loggerDevice);
-
-// ----------------------------------------------------------------------------
 
 using namespace Board;
 

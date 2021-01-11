@@ -22,16 +22,6 @@ using namespace Board;
 #undef	MODM_LOG_LEVEL
 #define	MODM_LOG_LEVEL modm::log::DEBUG
 
-// Create an IODeviceWrapper around the Uart Peripheral we want to use
-modm::IODeviceWrapper< Usart1, modm::IOBuffer::BlockIfFull > loggerDevice;
-
-// Set all four logger streams to use the UART
-modm::log::Logger modm::log::debug(loggerDevice);
-modm::log::Logger modm::log::info(loggerDevice);
-modm::log::Logger modm::log::warning(loggerDevice);
-modm::log::Logger modm::log::error(loggerDevice);
-
-
 struct hx711_config : public modm::hx711::Config
 {
 	using Sck  = GpioOutputA9;

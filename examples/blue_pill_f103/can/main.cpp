@@ -12,9 +12,6 @@
 #include <modm/board.hpp>
 #include <modm/debug/logger.hpp>
 
-modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice;
-modm::log::Logger modm::log::info(loggerDevice);
-
 // Set the log level
 #undef	MODM_LOG_LEVEL
 #define	MODM_LOG_LEVEL modm::log::INFO
