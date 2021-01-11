@@ -1,0 +1,34 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2020, Christopher Durand
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:tmp12x"
+    module.description = """\
+# TMP121/123/125 Thermometer
+
+TMP121/123/125 temperature sensor driver
+
+This driver supports the TMP125 device but not its optional shutdown function.
+"""
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:gpio",
+        ":architecture:register",
+        ":architecture:spi.device",
+        ":processing:resumable")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/temperature"
+    env.copy("tmp12x.hpp")

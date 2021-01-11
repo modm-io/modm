@@ -667,11 +667,12 @@ you specific needs.
 </tr><tr>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-tlc594x">TLC594X</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-tmp102">TMP102</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-tmp12x">TMP12X</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-tmp175">TMP175</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-touch2046">TOUCH2046</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-vl53l0">VL53L0</a></td>
-<td align="center"><a href="https://modm.io/reference/module/modm-driver-vl6180">VL6180</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-vl6180">VL6180</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-ws2812">WS2812</a></td>
 </tr>
 </table>
