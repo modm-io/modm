@@ -57,8 +57,7 @@ def build(env):
     env.outbasepath = "modm/src/"
     if env["info.git"] != "Disabled":
         env.collect(":build:gitignore", "modm/src/info_git.c")
-        env.template("resources/info_git.h.in", "info_git.h",
-                     substitutions={"with_status": "Status" in env["info.git"]},)
+        env.copy("resources/info_git.h", "info_git.h")
     if env["info.build"]:
         env.collect(":build:gitignore", "modm/src/info_build.c")
         env.copy("resources/info_build.h", "info_build.h")

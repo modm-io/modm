@@ -30,14 +30,14 @@ extern const char *MODM_GIT_SUBJECT;
 extern const char *MODM_GIT_CONFIG_USER_NAME;
 extern const char *MODM_GIT_CONFIG_USER_EMAIL;
 
-%% if with_status
+#if defined(MODM_GIT_STATUS) && MODM_GIT_STATUS
 extern const int16_t MODM_GIT_MODIFIED;
 extern const int16_t MODM_GIT_ADDED;
 extern const int16_t MODM_GIT_DELETED;
 extern const int16_t MODM_GIT_RENAMED;
 extern const int16_t MODM_GIT_COPIED;
 extern const int16_t MODM_GIT_UNTRACKED;
-%% endif
+#endif
 
 #ifdef __cplusplus
 }
