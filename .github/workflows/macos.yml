@@ -10,45 +10,46 @@ jobs:
       - name: Setup environment - Brew tap
         run: |
           brew tap modm-ext/arm
-        # brew tap modm-ext/avr
+          brew tap modm-ext/avr
 
       - name: Setup environment - Brew install
         run: |
-          brew install git doxygen boost gcc arm-gcc-bin cmake || true
-          brew upgrade boost gcc git || true
-        # brew install git doxygen boost gcc avr-gcc arm-gcc-bin cmake || true
-        # brew upgrade boost gcc git || true
+          export HOMEBREW_NO_INSTALL_CLEANUP=1 # saves time
+          brew update
+          brew install doxygen boost gcc avr-gcc@10 arm-gcc-bin cmake || true
+          brew link --force avr-gcc@10
+          # brew upgrade boost gcc git || true
 
       - name: Setup environment - Python pip
         run: |
           pip3 install --user modm scons
           echo "/usr/local/bin" >> $GITHUB_PATH
           echo "/Users/runner/Library/Python/3.9/bin" >> $GITHUB_PATH
-          echo $PATH
 
       - name: Dump environment
         run: |
-            env
-            locale -a
-            python --version  || true
-            python3 --version || true
-            which scons
-            scons --version
-            which g++
-            g++ --version
-            which arm-none-eabi-g++
-            arm-none-eabi-g++ --version
-            which lbuild
-            lbuild --version
-          # which avr-g++
-          # avr-g++ --version
+          echo $PATH
+          env
+          locale -a
+          python --version  || true
+          python3 --version || true
+          which scons
+          scons --version
+          which g++
+          g++ --version
+          which arm-none-eabi-g++
+          arm-none-eabi-g++ --version
+          which lbuild
+          lbuild --version
+          which avr-g++
+          avr-g++ --version
 
       - name: Check out repository
         uses: actions/checkout@v2
 
       - name: Git Submodules
         run: |
-          git submodule update --init
+          git submodule update --init --jobs 8
 
       - name: Hosted Unittests
         run: |
@@ -63,6 +64,6 @@ jobs:
           (cd examples && ../tools/scripts/examples_compile.py nucleo_f031k6 nucleo_f103rb nucleo_f303re nucleo_f411re nucleo_f746zg)
           (cd examples && ../tools/scripts/examples_compile.py nucleo_g071rb nucleo_l152re nucleo_l476rg nucleo_g474re)
 
-      #- name: Compile AVR Examples
-      #  run: |
-      #    (cd examples && ../tools/scripts/examples_compile.py avr)
+      - name: Compile AVR Examples
+        run: |
+          (cd examples && ../tools/scripts/examples_compile.py avr)
