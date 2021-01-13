@@ -17,7 +17,7 @@ env["BUILDPATH"] = join(env["CONFIG_BUILD_BASE"], profile)
 env["BASEPATH"] = abspath(".")
 %% if family == "darwin"
 # Using homebrew gcc on macOS instead of clang
-env["COMPILERSUFFIX"] = env.Detect(["gcc-10", "gcc-9", "gcc-8", "gcc-7"])[3:]
+env["COMPILERSUFFIX"] = env.Detect(["gcc-11", "gcc-10"])[3:]
 %% endif
 %% endif
 
