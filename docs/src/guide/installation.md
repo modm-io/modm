@@ -82,7 +82,7 @@ to `~/.bashrc`:
 	export PATH="/opt/doxypress:$PATH"
 
 !!! warning "OpenOCD for recent targets"
-	The latest OpenOCD release v0.10.0 (as of May 2020) is too old for some targets
+	The latest OpenOCD release v0.10.0 (as of Jan 2021) is too old for some targets
 	(STM32G0, STM32G4, STM32F7). To program these targets you need to compile the
 	[HEAD version of OpenOCD from source][openocd-source], install it and add it to
 	the beginning of your `$PATH`.
@@ -104,13 +104,15 @@ to `~/.bashrc`:
 
 We will use [Homebrew](http://brew.sh/) to install the minimal build system:
 
+	brew update
 	brew install python3 scons git doxygen
 	pip3 install modm
 
 Install the [AVR toolchain from source](https://github.com/osx-cross/homebrew-avr):
 
 	brew tap osx-cross/avr
-	brew install avr-gcc
+	brew install avr-gcc@10
+	brew link --force avr-gcc@10
 
 And the [pre-built ARM toolchain](https://github.com/osx-cross/homebrew-arm) as
 well:
