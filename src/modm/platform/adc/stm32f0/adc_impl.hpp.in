@@ -245,8 +245,13 @@ modm::platform::Adc{{ id }}::readTemperature(uint16_t Vref)
 	// Sample time must be at least 5us!!!
 	const int32_t TS_DATA = readChannel(Channel::Temperature);
 
+%% if target.family == "f0" and target.name in ["30", "70"]
+	const int32_t value = (int32_t(*TS_CAL1) - (TS_DATA * Vref / VDDA_CAL)) * 1000;
+	return value / TS_AVG_SLOPE + TS_CAL1_TEMP;
+%% else
 	const int32_t value = int32_t(TS_CAL2_TEMP - TS_CAL1_TEMP) * (TS_DATA * Vref / VDDA_CAL - *TS_CAL1);
 	return value / (*TS_CAL2 - *TS_CAL1) + TS_CAL1_TEMP;
+%% endif
 }
 
 uint16_t

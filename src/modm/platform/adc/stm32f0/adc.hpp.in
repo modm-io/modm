@@ -316,11 +316,16 @@ public:
 public:
 	static constexpr uint8_t TS_CAL1_TEMP{30};
 %% if target.family in ["f0"]
-	static constexpr uint8_t TS_CAL2_TEMP{110};
 	static constexpr uint16_t VDDA_CAL{3300};
 	static inline volatile uint16_t *const VREFINT_CAL{(volatile uint16_t *)0x1FFF'F7BA};
 	static inline volatile uint16_t *const TS_CAL1{(volatile uint16_t *)0x1FFF'F7B8};
+%% if target.name in ["30", "70"]
+	// defined in F030 reference manual
+	static constexpr uint16_t TS_AVG_SLOPE{5336};
+%% else
+	static constexpr uint8_t TS_CAL2_TEMP{110};
 	static inline volatile uint16_t *const TS_CAL2{(volatile uint16_t *)0x1FFF'F7C2};
+%% endif
 %% else
 	static constexpr uint8_t TS_CAL2_TEMP{130};
 	static constexpr uint16_t VDDA_CAL{3000};
