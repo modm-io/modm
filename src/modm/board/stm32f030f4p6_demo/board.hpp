@@ -80,7 +80,7 @@ struct SystemClock {
 };
 
 // User LED
-using LedOrange = GpioOutputA4;
+using LedOrange = GpioInverted< GpioOutputA4 >;
 using Leds = SoftwareGpioPort< LedOrange >;
 
 using Button = GpioUnused;
