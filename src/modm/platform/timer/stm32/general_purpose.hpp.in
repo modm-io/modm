@@ -108,7 +108,7 @@ public:
 	};
 
 	// This type is the internal size of the counter.
-%% if id in [2, 5] and (target["family"] in ["f2", "f3", "f4", "f7", "l1", "l4"])
+%% if id in [2, 5] and (target["family"] in ["f2", "f3", "f4", "f7", "l1", "l4", "g4"])
 	// Timer 2 and 5 are the only one which have the size of 32 bit
 	typedef uint32_t Value;
 
