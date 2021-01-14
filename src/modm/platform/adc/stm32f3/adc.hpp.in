@@ -103,13 +103,11 @@ public:
 		NoClock = 0, // No clock selected.
 %% if target["family"] in ["g4"]
 %% if id in [1, 2]
-		PllSai1 = RCC_CCIPR_ADC12SEL_0, // PLLSAI1 "R" clock (PLLADC1CLK) selected as ADCs clock
-		PllSai2 = RCC_CCIPR_ADC12SEL_1, // PLLSAI2 "R" clock (PLLADC2CLK) selected as ADCs clock
-		SystemClock = RCC_CCIPR_ADC12SEL_1 | RCC_CCIPR_ADC12SEL_0, // System clock selected as ADCs clock
+		Pll = RCC_CCIPR_ADC12SEL_0, // PLL “P” clock selected as ADC clock
+		SystemClock = RCC_CCIPR_ADC12SEL_1 , // System clock selected as ADCs clock
 %% elif id in [3, 4, 5]
-		PllSai1 = RCC_CCIPR_ADC345SEL_0, // PLLSAI1 "R" clock (PLLADC1CLK) selected as ADCs clock
-		PllSai2 = RCC_CCIPR_ADC345SEL_1, // PLLSAI2 "R" clock (PLLADC2CLK) selected as ADCs clock
-		SystemClock = RCC_CCIPR_ADC345SEL_1 | RCC_CCIPR_ADC345SEL_0, // System clock selected as ADCs clock
+		Pll = RCC_CCIPR_ADC345SEL_0, // PLL “P” clock selected as ADC clock
+		SystemClock = RCC_CCIPR_ADC345SEL_1 , // System clock selected as ADCs clock
 %% endif
 %% else
 		PllSai1 = RCC_CCIPR_ADCSEL_0, // PLLSAI1 "R" clock (PLLADC1CLK) selected as ADCs clock
