@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:stm32f030_demo</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/stm32f030f4p6_demo/adc</option>
+    <option name="modm:build:openocd.cfg">openocd.cfg</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:adc</module>
+  </modules>
+</library>
