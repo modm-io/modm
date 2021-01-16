@@ -17,35 +17,31 @@ int
 main()
 {
 	Board::initialize();
-	LedD13::setOutput();
-	//Adc1::connect<GpioB10::In11>();
 
-	Adc1::initialize<Board::SystemClock, Adc1::ClockMode::Asynchronous, 1_MHz>();
+	MODM_LOG_INFO << "STM32G4 ADC new example" << modm::endl;
+	MODM_LOG_INFO << " running on Nucleo-G474RE" << modm::endl << modm::endl;
 
-	uint16_t Vref = Adc1::readInternalVoltageReference();
-	int16_t Temp = Adc1::readTemperature(Vref);
-	MODM_LOG_INFO << "Vref=" << Vref << modm::endl;
-	MODM_LOG_INFO << "Temp=" << Temp << modm::endl;
+	MODM_LOG_INFO << "Configuring ADC ...\n";
+	Adc1::initialize<
+		Board::SystemClock,
+		1_MHz, 10_pct,
+		Adc1::ClockMode::SynchronousPrescaler1,
+		Adc1::ClockSource::SystemClock>();
 
-	MODM_LOG_INFO << "TS_CAL1=" << uint16_t(*((volatile uint16_t *)0x1FFF75A8)) << modm::endl;
-	MODM_LOG_INFO << "TS_CAL2=" << uint16_t(*((volatile uint16_t *)0x1FFF75CA)) << modm::endl;
-	MODM_LOG_INFO << "VREFINT_CAL=" << uint16_t(*((volatile uint16_t *)0x1FFF75AA)) << modm::endl;
-	MODM_LOG_INFO << "ADC_CALFACT=" << uint16_t(ADC1->CALFACT) << modm::endl;
-
-	Adc1::setPinChannel<GpioB10>();
-	Adc1::setResolution(Adc1::Resolution::Bits12);
-	Adc1::setRightAdjustResult();
-	Adc1::setSampleTime(Adc1::SampleTime::Cycles160_5);
-	Adc1::enableFreeRunningMode();
-	Adc1::enableOversampling(Adc1::OversampleRatio::x256, Adc1::OversampleShift::Div256);
-	Adc1::startConversion();
+	Adc1::connect<GpioA0::In1>();
+	Adc1::setPinChannel<GpioA0>(Adc1::SampleTime::Cycles13);
 
 	while (true)
 	{
-		LedD13::toggle();
-		modm::delay(100ms);
-
-		MODM_LOG_INFO << "mV=" << (Vref * Adc1::getValue() / 4095ul) << modm::endl;
+		Adc1::startConversion();
+		while(!Adc1::isConversionFinished)
+			;
+		int adcValue = Adc1::getValue();
+		MODM_LOG_INFO << "adcValue=" << adcValue;
+		float voltage = adcValue * 3.3 / 0xfff;
+		MODM_LOG_INFO << " voltage=";
+		MODM_LOG_INFO.printf("%.3f\n", voltage);
+		modm::delay(500ms);
 	}
 
 	return 0;

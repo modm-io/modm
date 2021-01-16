@@ -538,10 +538,10 @@ public:
 */
 	template< class SystemClock
 			, modm::frequency_t frequency
-			, modm::percent_t tolerance
-			, modm::platform::Adc{{ id }}::ClockMode clk
+			, modm::percent_t tolerance = modm::pct(10)
+			, modm::platform::Adc{{ id }}::ClockMode clk = modm::platform::Adc{{ id }}::ClockMode::SynchronousPrescaler1
 	%% if clock_mux
-			, modm::platform::Adc{{ id }}::ClockSource clk_src
+			, modm::platform::Adc{{ id }}::ClockSource clk_src = modm::platform::Adc{{ id }}::ClockSource::SystemClock
 	%% endif
 			>
 	static void

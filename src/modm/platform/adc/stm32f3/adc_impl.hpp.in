@@ -39,7 +39,9 @@ modm::platform::Adc{{ id }}::initialize()
 %% if target["family"] in ["f3"]
 	RCC->{{ ahb }}ENR |= RCC_{{ ahb }}ENR_ADC{{ id_common }}EN;
 %% elif target["family"] in ["l4", "g4"]
-	Rcc::enable<Peripheral::Adc1>();
+	//Rcc::enable<Peripheral::Adc1>();
+	// FIXME
+	RCC->AHB2ENR |= RCC_AHB2ENR_ADC{{ id_common }}EN;
 %% endif
 
 %% if clock_mux
