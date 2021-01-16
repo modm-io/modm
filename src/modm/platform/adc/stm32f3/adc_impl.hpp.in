@@ -151,7 +151,7 @@ modm::platform::Adc{{ id }}::setLeftAdjustResult(const bool enable)
 }
 
 bool
-modm::platform::Adc{{ id }}::setChannel(const nonstd::span<const Channel> channels)
+modm::platform::Adc{{ id }}::setChannel(const std::span<const Channel> channels)
 {
 	if(channels.size() >= maxSequenceLength) {
 		return false;
@@ -182,7 +182,7 @@ modm::platform::Adc{{ id }}::setChannel(const nonstd::span<const Channel> channe
 }
 
 bool
-modm::platform::Adc{{ id }}::setInjectedChannel(const nonstd::span<const Channel> channels)
+modm::platform::Adc{{ id }}::setInjectedChannel(const std::span<const Channel> channels)
 {
 	if(channels.size() >= maxInjectedSequenceLength) {
 		return false;

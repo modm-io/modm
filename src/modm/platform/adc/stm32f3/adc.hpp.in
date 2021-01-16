@@ -16,7 +16,7 @@
 #define MODM_STM32F3_ADC{{ id }}_HPP
 
 #include <stdint.h>
-#include <nonstd/span.hpp>
+#include <span>
 #include <array>
 #include "../device.hpp"
 #include <modm/architecture/interface/register.hpp>
@@ -624,7 +624,7 @@ public:
 	 * 		initialize()
 	 */
 	static inline bool
-	setChannel(const nonstd::span<const Channel> channels);
+	setChannel(const std::span<const Channel> channels);
 
 	/**
 	 * Analog injected channel selection.
@@ -657,7 +657,7 @@ public:
 	 * 		initialize()
 	 */
 	static inline bool
-	setInjectedChannel(const nonstd::span<const Channel> channels);
+	setInjectedChannel(const std::span<const Channel> channels);
 
 	/// Setting the channel by Gpio pin
 	template< class Gpio >

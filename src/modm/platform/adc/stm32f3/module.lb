@@ -176,8 +176,7 @@ def prepare(module, options):
         ":architecture:register",
         ":cmsis:device",
         ":platform:gpio",
-        ":platform:rcc",
-        ":span-lite")
+        ":platform:rcc")
 
     for instance in listify(device.get_driver("adc")["instance"]):
         module.add_submodule(Instance(int(instance)))
