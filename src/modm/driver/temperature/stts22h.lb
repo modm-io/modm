@@ -1,0 +1,30 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2018, Niklas Hauser
+# Copyright (c) 2021, Christopher Durand
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:stts22h"
+    module.description = """\
+Simple driver for STTS22H I2c temperature sensor
+"""
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:i2c.device",
+        ":architecture:register")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/temperature"
+    env.copy("stts22h.hpp")
+    env.copy("stts22h_impl.hpp")
