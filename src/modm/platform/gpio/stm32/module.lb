@@ -305,6 +305,7 @@ def build(env):
         env.template("enable.cpp.in")
     env.template("gpio_accessor.hpp.in")
 
+    env.copy("random_access_port.hpp")
     env.copy("../common/inverted.hpp", "inverted.hpp")
     env.copy("../common/connector.hpp", "connector.hpp")
     env.template("../common/connector_detail.hpp.in", "connector_detail.hpp")
