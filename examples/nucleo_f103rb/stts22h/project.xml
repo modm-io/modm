@@ -1,0 +1,12 @@
+<library>
+  <extends>modm:nucleo-f103rb</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_f103rb/stts22h</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:processing:timer</module>
+    <module>modm:platform:i2c:1</module>
+    <module>modm:driver:stts22h</module>
+  </modules>
+</library>
