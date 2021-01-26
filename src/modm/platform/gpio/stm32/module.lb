@@ -303,6 +303,7 @@ def build(env):
     env.template("unused.hpp.in")
     if len(env["enable_ports"]):
         env.template("enable.cpp.in")
+    env.template("gpio_accessor.hpp.in")
 
     env.copy("../common/inverted.hpp", "inverted.hpp")
     env.copy("../common/connector.hpp", "connector.hpp")
