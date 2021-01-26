@@ -24,9 +24,7 @@ template< class SystemClock
           , modm::frequency_t frequency
           , modm::percent_t tolerance
           , modm::platform::Adc{{ id }}::ClockMode clk
-%% if clock_mux
           , modm::platform::Adc{{ id }}::ClockSource clk_src
-%% endif
 		  >
 void
 modm::platform::Adc{{ id }}::initialize()
@@ -36,12 +34,10 @@ modm::platform::Adc{{ id }}::initialize()
 	uint32_t tmp = 0;
 
 	// enable clock
-%% if target["family"] in ["f3"]
+%% if target["family"] in ["f3", "g4"]
 	RCC->{{ ahb }}ENR |= RCC_{{ ahb }}ENR_ADC{{ id_common }}EN;
-%% elif target["family"] in ["l4", "g4"]
-	//Rcc::enable<Peripheral::Adc1>();
-	// FIXME
-	RCC->AHB2ENR |= RCC_AHB2ENR_ADC{{ id_common }}EN;
+%% elif target["family"] in ["l4"]
+	Rcc::enable<Peripheral::Adc{{ id }}>();
 %% endif
 
 %% if clock_mux
@@ -61,12 +57,13 @@ modm::platform::Adc{{ id }}::initialize()
 	// set ADC "analog" clock source
 	if (clk != ClockMode::DoNotChange) {
 		if (clk == ClockMode::Asynchronous) {
-			//setPrescaler(pre);
+			setPrescaler(pre);
 		}
 		tmp  =  ADC{{ id_common_u }}->CCR;
-		tmp &= ~{{ adc_ccr }}_CKMODE;
+		tmp &= ~{{ adc_ccr }}_CKMODE_Msk;
 		tmp |=  static_cast<uint32_t>(clk);
 		ADC{{ id_common_u }}->CCR = tmp;
+		//ADC{{ id_common_u }}->CCR = (ADC{{ id_common_u }}->CCR & ~{{ adc_ccr }}_CKMODE_Msk) | static_cast<uint32_t>(clk);
 	}
 
 	// enable regulator

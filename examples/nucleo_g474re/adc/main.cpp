@@ -25,7 +25,7 @@ main()
 	Adc1::initialize<
 		Board::SystemClock,
 		1_MHz, 10_pct,
-		Adc1::ClockMode::SynchronousPrescaler1,
+		Adc1::ClockMode::SynchronousPrescaler2,
 		Adc1::ClockSource::SystemClock>();
 
 	Adc1::connect<GpioA0::In1>();

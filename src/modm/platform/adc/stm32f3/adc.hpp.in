@@ -122,27 +122,33 @@ public:
 		SynchronousPrescaler4 = {{ adc_ccr }}_CKMODE_1 | {{ adc_ccr }}_CKMODE_0,
 	};
 
-%% if clock_mux
 	// ADCs clock source selection
 	// Warning: One clock MUX is shared between ADCs 1 and 2,
 	//  another mux sharded between ADCs 3, 4 and 5
 	enum class ClockSource : uint32_t
 	{
+%% if clock_mux
 		NoClock = 0, // No clock selected.
-%% if target["family"] in ["g4"]
-%% if id in [1, 2]
+ %% if target["family"] in ["g4"]
+ %% if id in [1, 2]
 		Pll = RCC_CCIPR_ADC12SEL_0, // PLL “P” clock selected as ADC clock
 		SystemClock = RCC_CCIPR_ADC12SEL_1 , // System clock selected as ADCs clock
-%% elif id in [3, 4, 5]
+ %% elif id in [3, 4, 5]
 		Pll = RCC_CCIPR_ADC345SEL_0, // PLL “P” clock selected as ADC clock
 		SystemClock = RCC_CCIPR_ADC345SEL_1 , // System clock selected as ADCs clock
-%% endif
-%% else
+ %% endif
+ %% else
 		PllSai1 = RCC_CCIPR_ADCSEL_0, // PLLSAI1 "R" clock (PLLADC1CLK) selected as ADCs clock
 		PllSai2 = RCC_CCIPR_ADCSEL_1, // PLLSAI2 "R" clock (PLLADC2CLK) selected as ADCs clock
 		SystemClock = RCC_CCIPR_ADCSEL_1 | RCC_CCIPR_ADCSEL_0, // System clock selected as ADCs clock
+ %% endif
+%%elif
+		Default, // F3 has no clock_mux
 %% endif
 	};
+
+%% if clock_mux
+private:
 %% if target["family"] in ["g4"]
 %% if id in [1, 2]
 	static constexpr uint32_t ClockSourceMsk = RCC_CCIPR_ADC12SEL_Msk;
@@ -152,6 +158,7 @@ public:
 %% else
 	static constexpr uint32_t ClockSourceMsk = RCC_CCIPR_ADCSEL_Msk;
 %% endif
+public:
 %% endif
 
 	// Prescaler of the Asynchronous ADC clock
@@ -511,38 +518,13 @@ public:
 	/**
 	 * Initialize and enable the A/D converter.
 	 *
-	 * Enables the ADC clock and switches on the ADC. The ADC clock
-	 * prescaler will be set as well.
-	 *
-	 * The ADC can be clocked
-	 *
-	 * @param clk
-	 * 		Clock Mode for ADC1/ADC2 or ADC3/ADC4.
-	 * 		Set to ClockMode::DoNotChange or leave blank if you
-	 * 		want to leave this setting untouched.
-	 *
-	 * @param pre
-	 * 		The prescaler for the asynchronous ADC clock.
-	 * 		This parameter is only taken into account
-	 * 		if clk == ClockMode::Asynchronous.
+FIXME!!!!!!
 	 */
-/*
-	static inline void
-	initialize(	const ClockMode clk = ClockMode::DoNotChange,
-%% if clock_mux
-				const ClockSource clk_src = ClockSource::SystemClock,
-%% endif
-				const Prescaler pre = Prescaler::Disabled,
-				const CalibrationMode cal = CalibrationMode::DoNotCalibrate,
-				const bool blocking = true);
-*/
 	template< class SystemClock
 			, modm::frequency_t frequency
 			, modm::percent_t tolerance = modm::pct(10)
 			, modm::platform::Adc{{ id }}::ClockMode clk = modm::platform::Adc{{ id }}::ClockMode::SynchronousPrescaler1
-	%% if clock_mux
 			, modm::platform::Adc{{ id }}::ClockSource clk_src = modm::platform::Adc{{ id }}::ClockSource::SystemClock
-	%% endif
 			>
 	static void
 	initialize();
