@@ -1,0 +1,16 @@
+<library>
+  <repositories>
+    <repository>
+      <path>../../../../repo.lb</path>
+    </repository>
+  </repositories>
+
+  <options>
+    <option name="modm:target">stm32f767zit6</option>
+
+    <option name="modm:platform:uart:3:buffer.tx">2048</option>
+  </options>
+  <modules>
+    <module>modm:board:nucleo-f767zi</module>
+  </modules>
+</library>
