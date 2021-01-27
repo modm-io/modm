@@ -62,7 +62,7 @@ def call(source=None, config=None, commands=None, backend=None, ui=None):
     return True
 
 
-def add_subparser(subparsers):
+def add_subparser(subparser):
     # Generic backend
     parser = subparser.add_parser("remote", help="Use a generic extended remote as Backend.")
     parser.add_argument(
