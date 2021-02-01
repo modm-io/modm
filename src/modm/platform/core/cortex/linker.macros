@@ -102,7 +102,7 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 	%% if vector_table_location == "ram"
 		%% do sections.append("vector_table_ram")
 	%% endif
-	.table.copy.intern : ALIGN(4)
+	.table.copy.intern : ALIGN(8)
 	{
 		__table_copy_intern_start = .;
 		LONG(__data_load)
