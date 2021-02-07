@@ -102,7 +102,7 @@ jobs:
           name: Examples STM32F7 Series
           when: always
           command: |
-            (cd examples && ../tools/scripts/examples_compile.py stm32f746g_discovery stm32f769i_discovery nucleo_f746zg)
+            (cd examples && ../tools/scripts/examples_compile.py stm32f746g_discovery stm32f769i_discovery nucleo_f746zg nucleo_f767zi)
       - run:
           name: Examples STM32G0 Series
           when: always
