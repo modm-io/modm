@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2016-2017, Niklas Hauser
+# Copyright (c) 2016-2017, 2021, Niklas Hauser
 # Copyright (c) 2017, Fabian Greif
 #
 # This file is part of the modm project.
@@ -10,6 +10,23 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
+
+class FreeRTOS_TCP_LAN8720A(Module):
+    def init(self, module):
+        module.name = "lan8720a"
+        module.description = """
+# a:FreeRTOS-Plus-TCP Ethernet via LAN8720A
+
+This module implements TCP over Ethernet via the LAN8720A transceiver.
+"""
+    def prepare(self, module, options):
+        module.depends(":platform:eth", ":driver:lan8720a")
+        return options[":target"].has_driver("eth:stm32*")
+
+    def build(self, env):
+        env.outbasepath = "modm/ext/freertos_plus_tcp"
+        env.copy("modm_lan8720a.cpp")
+
 
 class FreeRTOS_TCP(Module):
     def init(self, module):
@@ -29,6 +46,8 @@ the config macros, then redefine them with your options, for example:
 """
 
     def prepare(self, module, options):
+        module.add_submodule(FreeRTOS_TCP_LAN8720A())
+        module.depends(":platform:heap")
         return True
 
     def build(self, env):
