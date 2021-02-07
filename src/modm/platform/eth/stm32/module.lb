@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2020, Mike Wolfram
+# Copyright (c) 2021, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":platform:eth"
+    module.description = "Ethernet"
+
+def prepare(module, options):
+    device = options[":target"]
+
+    if not device.has_driver("eth:stm32*"):
+        return False
+    # FIXME the driver is for F7 only right now
+    if device.identifier["family"] not in ["f7"]:
+        return False
+
+    module.depends(":architecture:delay",
+                   ":architecture:interrupt",
+                   ":architecture:register",
+                   ":architecture:assert",
+                   ":platform:gpio",
+                   ":platform:rcc",
+                   ":math:utils")
+
+    return True
+
+def build(env):
+    env.substitutions = {"target": env[":target"].identifier}
+    env.outbasepath = "modm/src/modm/platform/eth"
+
+    env.copy("eth.hpp")
+    env.copy("eth_impl.hpp")
+
