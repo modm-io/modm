@@ -65,7 +65,7 @@ def build(env):
     def flag_format(flag):
         subs = {
             "target_base": "\"${TARGET.base}\"",
-            "linkdir": "abspath(\"..\")"
+            "project_source_dir": "abspath(\"..\")",
         }
         flag = '"{}"'.format(flag)
         vals = ["{}={}".format(t, r) for t, r in subs.items() if "{{{}}}".format(t) in flag]
