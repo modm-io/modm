@@ -154,9 +154,6 @@ and can be accessed by pressing the BOOT0-Button during startup.
 
 ```
 $ scons program-dfu
-scons: Reading SConscript files ...
-scons: done reading SConscript files.
-scons: Building targets ...
 dfu_stm32_programmer: program [...]/blink/release/blink.bin
 dfu-util 0.9
 
@@ -224,9 +221,6 @@ You can let the tool guess the port or explicitly specify it:
 
 ```
 $ scons program-bmp port=/dev/cu.usbmodemDEADBEEF
-scons: Reading SConscript files ...
-scons: done reading SConscript files.
-scons: Building targets ...
 [...]
 Remote debugging using /dev/cu.usbmodemDEADBEEF
 Target voltage: unknown
@@ -367,9 +361,6 @@ displays the serial output stream.
 
 ```
  $ scons log-itm fcpu=64000000
-scons: Reading SConscript files ...
-scons: done reading SConscript files.
-scons: Building targets ...
 .----OpenOCD--> Single Wire Viewer
 '------SWO----- stm32f103rbt6
 Open On-Chip Debugger 0.10.0
@@ -384,6 +375,26 @@ loop: 61
 
 See the `:platform:itm` module for details how to use the ITM as a logging
 output.
+
+
+#### scons library
+
+```
+scons library profile={debug|release}
+```
+
+Generates only the static library `libmodm.a` without linking it to the
+application.
+
+```
+ $ scons library
+Compiling C++·· {debug|release}/modm/ext/gcc/assert.o
+    ...
+Compiling C++·· {debug|release}/modm/src/modm/utils/dummy.o
+Create Library· {debug|release}/modm/libmodm.a
+Indexing······· {debug|release}/modm/libmodm.a
+```
+
 
 #### scons symbols
 

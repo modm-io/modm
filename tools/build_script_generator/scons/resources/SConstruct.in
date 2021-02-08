@@ -27,7 +27,8 @@ env["CONFIG_PROJECT_NAME"] = project_name
 env["CONFIG_PROFILE"] = ARGUMENTS.get("profile", "release")
 
 # Building all libraries
-env.SConscript(dirs=generated_paths, exports="env")
+libraries = env.SConscript(dirs=generated_paths, exports="env")
+env.Alias("library", libraries)
 
 %% if is_unittest
 # Building unit tests
