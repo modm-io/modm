@@ -217,7 +217,11 @@ def render_dependency_graphs(node):
         graph.edge(ref_name(node["name"]), ref_name(mod),
                    style="solid" if node["dependencies"][mod] else "dashed")
 
-    return graph.pipe().decode("utf-8")
+    svg = graph.pipe().decode("utf-8")
+    # We need to remove html comments from this output or mkdocs does not parse correctly
+    svg = re.sub(r"<!--.*?-->\n", "", svg, flags=re.DOTALL | re.MULTILINE)
+    return svg
+
 
 def format_module(modules, node):
     fullname = node.name

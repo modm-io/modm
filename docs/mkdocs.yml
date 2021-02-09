@@ -9,7 +9,7 @@ repo_url: 'https://github.com/modm-io/modm'
 edit_uri: ""
 # dev_addr: 192.168.1.2:8000
 
-copyright: 'Copyright &copy 2009-2020 Niklas Hauser & modm authors'
+copyright: 'Copyright &copy 2009-<script>document.write(new Date().getFullYear())</script> Niklas Hauser & modm authors'
 
 # Turn around for GitHub Hosting in /docs
 docs_dir: 'src'
