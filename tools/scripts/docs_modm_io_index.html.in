@@ -42,7 +42,6 @@ input, select {
 input[type=text] {
     background-color: #f1f1f1;
     width: 100%;
-    text-transform: uppercase;
 }
 input[type=text]::placeholder {
     text-transform: none;
@@ -60,7 +59,6 @@ input[type=submit] {
     top: 100%;
     left: 0;
     right: 0;
-    text-transform: uppercase;
 }
 .autocomplete-items div {
     padding: 10px;
@@ -85,24 +83,26 @@ input[type=submit] {
 <h1>API documentation</h1>
 </header>
 <main>
-<p id="numtargets">Documentation is available for {{ num_devices }} devices.</p>
+<p id="numtargets">Documentation is available for {{ num_devices }} devices and {{ num_boards }} boards.</p>
 <h3>Select your target:</h3>
 <form autocomplete="off" action="javascript:showDocumentation()">
 <table>
     <tr>
-        <td>Version/Release</td>
-        <td>Microcontroller</td>
+        <!-- <td>Version/Release</td> -->
+        <td>Device or Board</td>
         <td>&nbsp;</td>
     </tr>
     <tr>
+        <!--
         <td>
             <select id="releaseinput" name="releases">
                 <option>develop</option>
             </select>
         </td>
+        -->
         <td>
             <div class="autocomplete" style="width:300px;">
-                <input id="targetinput" type="text" name="target" placeholder="Type e.g. 'F407'">
+                <input id="targetinput" type="text" name="target" placeholder="Search for e.g. 'F469' or 'NUCLEO'">
             </div>
         </td>
         <td>
@@ -112,15 +112,23 @@ input[type=submit] {
 </table>
 </form>
 <br />
-<small>For most microcontrollers-sub-families only the variant with largest pin-count and memory is available.</small>
+<small>For most microcontroller sub-families only the variant with largest pin-count and memory is available.</small>
 <p>Last updated: {{ date }}</p>
 
 <script type="text/javascript">
 var devices = [
 {% for d in devices %}
-"{{ d }}",
+"{{ d | upper }}",
+{% endfor %}
+{% for (_, b, _) in boards %}
+"{{ b }}",
 {% endfor %}
 ];
+var name2board = {
+{% for (b, n, _) in boards %}
+"{{ n }}": "{{ b }}",
+{% endfor %}
+};
 var targetinput = document.getElementById("targetinput");
 var currentFocus;
 function showDocumentation() {
@@ -133,6 +141,7 @@ function showDocumentation() {
         }, 5000);
         return;
     }
+    /*
     if(!releaseinput.value) {
         releaseinput.style.transition = "border 5ms ease-out";
         releaseinput.style.borderColor = "red";
@@ -143,6 +152,9 @@ function showDocumentation() {
         return;
     }
     var url = "/" + releaseinput.value + "/api/" + targetinput.value + "/";
+    */
+    n2b = name2board[targetinput.value]
+    var url = "/develop/api/" + (n2b ? n2b : targetinput.value).toLowerCase() + "/";
     location.href = url;
 }
 targetinput.addEventListener("input", function(event) {
@@ -219,10 +231,13 @@ document.addEventListener("click", function (element) {
 </script>
 <noscript>
 <h3>Select your target</h3>
-<input type="text" id="input" placeholder="Type e.g. 'F407'" />
+<input type="text" id="input" placeholder="Search for e.g. 'F469' or 'NUCLEO'"/>
 <ul>
+{% for (board, name, _) in boards %}
+ <li id="{{ board }}"><a href="/develop/api/{{ board }}/">{{ name }}</a></li>
+{% endfor %}
 {% for d in devices %}
- <li id="{{ d }}"><a href="/develop/api/{{ d }}/">{{ d }}</a></li>
+ <li id="{{ d }}"><a href="/develop/api/{{ d }}/">{{ d | upper }}</a></li>
 {% endfor %}
 </ul>
 </noscript>

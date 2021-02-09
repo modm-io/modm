@@ -163,7 +163,7 @@ documentation.
 <td align="center">NUCLEO-L476RG</td>
 </tr><tr>
 <td align="center">OLIMEXINO-STM32</td>
-<td align="center">RASPBERRYPI</td>
+<td align="center">Raspberry Pi</td>
 <td align="center">SAMD21-MINI</td>
 <td align="center">STM32-F4VE</td>
 </tr><tr>

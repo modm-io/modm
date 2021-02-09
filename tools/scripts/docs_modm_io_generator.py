@@ -28,10 +28,16 @@ def repopath(path):
     return Path(__file__).absolute().parents[2] / path
 def relpath(path):
     return os.path.relpath(path, str(repopath(".")))
+def rename_board(name):
+    return name.replace("_", "-").replace(".", "-").replace(":", "-").upper()\
+               .replace("BLUE-PILL", "Blue Pill") \
+               .replace("BLACK-PILL", "Black Pill") \
+               .replace("ARDUINO-UNO", "Arduino UNO") \
+               .replace("ARDUINO-NANO", "Arduino NANO") \
+               .replace("RASPBERRYPI", "Raspberry Pi")
 
 sys.path.append(str(repopath("ext/modm-devices")))
 from modm_devices.device_identifier import *
-
 
 def get_targets():
     builder = lbuild.api.Builder()
@@ -75,7 +81,13 @@ def get_targets():
     for key, values in minimal_targets.items():
         target_list.append(sorted(values, key=lambda d: d.string)[-1])
 
-    return target_list
+    # We must include all :board module targets manually
+    board_list = []
+    for board in repopath("src/modm/board").glob("*/board.xml"):
+        target = re.search(r"< *option +name=\"modm:target\" *>(.*?)</ *option *>", board.read_text())[1]
+        board_list.append( (board.parent.name.replace("_", "-"), target) )
+
+    return target_list, board_list
 
 
 def main():
@@ -92,13 +104,15 @@ def main():
     args = parser.parse_args()
 
     device_list = []
+    board_list = []
     if args.test:
-        # test list
         device_list = ["hosted-linux", "atmega328p-au", "stm32f103c8t6", "stm32g474cet6", "samd21g18a-uu"]
+        board_list = [("arduino-nano", "atmega328p-au"), ("arduino-uno", "atmega328p-au"), ("nucleo-g474re", "stm32g474ret6"),
+                      ("blue-pill", "stm32f103c8t6"), ("feather-m0", "samd21g18a-uu")]
     elif args.test2:
         device_list = ["hosted-linux", "atmega328p-pu", "stm32f103zgt7", "stm32g474vet7"]
     else:
-        device_list = get_targets()
+        device_list, board_list = get_targets()
 
     template_path = os.path.realpath(os.path.dirname(sys.argv[0]))
     cwd = Path().cwd()
@@ -115,11 +129,12 @@ def main():
         (output_dir / "develop/api").mkdir(parents=True)
         os.chdir(tempdir)
         print("Starting to generate documentation...")
-        template_overview(output_dir, device_list, template_path)
+        template_overview(output_dir, device_list, board_list, template_path)
         print("... for {} devices, estimated memory footprint is {} MB".format(len(device_list), (len(device_list)*70)+2000))
         with multiprocessing.Pool(args.jobs) as pool:
             # We can only pass one argument to pool.map
-            devices = ["{}|{}|{}".format(modm_path, path_tempdir, d) for d in device_list]
+            devices = ["{}|{}|{}|".format(modm_path, path_tempdir, dev) for dev in device_list]
+            devices += ["{}|{}|{}|{}".format(modm_path, path_tempdir, dev, brd) for (brd, dev) in board_list]
             results = pool.map(create_target, devices)
         # output_dir.rename(cwd / 'modm-api-docs')
         if args.compress:
@@ -129,7 +144,7 @@ def main():
             # shutil.make_archive(str(cwd / 'modm-api-docs'), 'gztar', str(output_dir))
         else:
             final_output_dir = Path(args.output)
-            if args.overwrite:
+            if args.overwrite and final_output_dir.exists():
                 for i in final_output_dir.iterdir():
                     print('Removing {}'.format(i))
                     if i.is_dir():
@@ -143,9 +158,10 @@ def main():
 
 
 def create_target(argument):
-    modm_path, tempdir, device = argument.split("|")
+    modm_path, tempdir, device, board = argument.split("|")
+    output_dir = board if board else device
     try:
-        print("Generating documentation for {} ...".format(device))
+        print("Generating documentation for {} ...".format(output_dir))
 
         options = ["modm:target={0}".format(device)]
         if device.startswith("at"):
@@ -154,9 +170,12 @@ def create_target(argument):
         builder.load([Path(modm_path) / "repo.lb", Path(modm_path) / "test/repo.lb"])
         modules = sorted(builder.parser.modules.keys())
 
-        # Only allow the first board module to be built (they overwrite each others files)
-        first_board = next((m for m in modules if ":board:" in m), None)
-        modules = [m for m in modules if ":board" not in m or m == first_board]
+        if board:
+            chosen_board = "modm:board:{}".format(board)
+        else:
+            # Only allow the first board module to be built (they overwrite each others files)
+            chosen_board = next((m for m in modules if ":board:" in m), None)
+        modules = [m for m in modules if ":board" not in m or m == chosen_board]
 
         # Remove :tinyusb:host modules, they conflict with :tinyusb:device modules
         modules = [m for m in modules if ":tinyusb:host" not in m]
@@ -165,23 +184,25 @@ def create_target(argument):
         #  exist are include as dependencies of the :platform modules.
         modules = [m for m in modules if ":architecture" not in m]
 
-        builder.build(device, modules)
+        builder.build(output_dir, modules)
 
-        print('Executing: (cd {}/modm/docs/ && doxypress doxypress.json)'.format(device))
-        os.system('(cd {}/modm/docs/ && doxypress doxypress.json > /dev/null 2>&1)'.format(device))
-        (Path(tempdir) / device / "modm/docs/html").rename(Path(tempdir) / 'output/develop/api' / device)
-        print("Finished generating documentation for device {}.".format(device))
+        print('Executing: (cd {}/modm/docs/ && doxypress doxypress.json)'.format(output_dir))
+        os.system('(cd {}/modm/docs/ && doxypress doxypress.json > /dev/null 2>&1)'.format(output_dir))
+        (Path(tempdir) / output_dir / "modm/docs/html").rename(Path(tempdir) / 'output/develop/api' / output_dir)
+        print("Finished generating documentation for device {}.".format(output_dir))
         return True
     except Exception as e:
-        print("Error generating documentation for device {}: {}".format(device, e))
+        print("Error generating documentation for device {}: {}".format(output_dir, e))
         return False
 
 
-def template_overview(output_dir, device_list, template_path):
+def template_overview(output_dir, device_list, board_list, template_path):
     html = Environment(loader=FileSystemLoader(template_path)).get_template("docs_modm_io_index.html.in").render(
         devices=device_list,
+        boards=[(b, rename_board(b), d) for (b,d) in board_list],
         date=datetime.datetime.now().strftime("%d.%m.%Y, %H:%M"),
-        num_devices=len(device_list))
+        num_devices=len(device_list),
+        num_boards=len(board_list))
     with open(str(output_dir) + "/index.html","w+") as f:
         f.write(html)
     with open(str(output_dir) + "/robots.txt","w+") as f:

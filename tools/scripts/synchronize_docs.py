@@ -51,6 +51,7 @@ def name(raw_name):
                    .replace("BLACK-PILL", "Black Pill")\
                    .replace("ARDUINO-UNO", "Arduino UNO")\
                    .replace("ARDUINO-NANO", "Arduino NANO")\
+                   .replace("RASPBERRYPI", "Raspberry Pi")\
                    .replace("GENERIC", "Generic")\
                    .replace("LINUX", "Linux")\
                    .replace("WINDOWS", "Windows")\

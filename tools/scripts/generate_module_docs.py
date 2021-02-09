@@ -55,9 +55,14 @@ def get_modules(builder, limit=None):
         else:
             targets.append(d)
 
+    # We must include all :board module targets for reproducibility!!!
+    for board in repopath("src/modm/board").glob("*/board.xml"):
+        target = re.search(r"< *option +name=\"modm:target\" *>(.*?)</ *option *>", board.read_text())
+        targets.append(target[1])
+
     if limit is not None:
         targets = targets[:limit]
-    targets = sorted(targets)
+    targets = sorted(list(set(targets)))
 
     # Prime the repositories and get all module files
     mfiles = []
