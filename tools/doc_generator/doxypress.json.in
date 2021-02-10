@@ -282,7 +282,7 @@
             ""
         ],
         "html-file-extension": ".html",
-        "html-footer": "",
+        "html-footer": "footer.html",
         "html-header": "",
         "html-index-num-entries": 100,
         "html-output": "html",
@@ -402,7 +402,7 @@
     "project": {
         "project-brief": "",
         "project-logo": "",
-        "project-name": "modm API documentation for {{ device }}",
+        "project-name": "modm API documentation",
         "project-version": ""
     },
     "source": {

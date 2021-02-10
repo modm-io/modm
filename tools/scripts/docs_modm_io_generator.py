@@ -101,6 +101,7 @@ def main():
     group.add_argument("--compress", "-c", action='store_true', help="Compress output into gzip archive")
     group.add_argument("--output", "-o", type=str, help="Output directory (absolute path)")
     parser.add_argument("--overwrite", "-f", action='store_true', help="Overwrite existing data in output directory (Removes all files from output directory.)")
+    parser.add_argument("--deduplicate", "-d", action='store_true', help="Deduplicate identical files with symlinks.")
     args = parser.parse_args()
 
     device_list = []
@@ -136,6 +137,26 @@ def main():
             devices = ["{}|{}|{}|".format(modm_path, path_tempdir, dev) for dev in device_list]
             devices += ["{}|{}|{}|{}".format(modm_path, path_tempdir, dev, brd) for (brd, dev) in board_list]
             results = pool.map(create_target, devices)
+        if args.deduplicate:
+            print("Deduplicating files...")
+            symlinks = {}
+            files_deduplicated = 0
+            file_size_deduplicated = 0
+            for file in output_dir.rglob('*'):
+                if file.is_dir():
+                    print(end="", flush=True)
+                    continue
+                fhash = hash(file.read_bytes())
+                if fhash in symlinks:
+                    # print("Linking {} -> {}".format(file.relative_to(output_dir), symlinks[fhash].relative_to(output_dir)))
+                    print(".", end="")
+                    file_size_deduplicated += file.stat().st_size
+                    file.unlink()
+                    file.symlink_to(os.path.relpath(symlinks[fhash], file.parent))
+                    files_deduplicated += 1
+                else:
+                    symlinks[fhash] = file
+            print("{} files (~{}MB) deduplicated!".format(files_deduplicated, file_size_deduplicated//(1024*1024)))
         # output_dir.rename(cwd / 'modm-api-docs')
         if args.compress:
             print("Zipping docs ...")
