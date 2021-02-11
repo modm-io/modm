@@ -53,6 +53,7 @@ public:
 
 %% if is_otg
 		Id::configure(Gpio::OutputType::OpenDrain, Gpio::OutputSpeed::High);
+		Id::configure(Gpio::InputType::PullUp);
 %% endif
 %% endif
 		Connector::connect();
