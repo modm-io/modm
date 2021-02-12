@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2020, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:mmc5603"
+    module.description = """
+# MMC5603 3-Axis Digital Magnetometer
+
+The MMC5603NJ is a monolithic complete 3-axis AMR magnetic sensor with on-chip
+signal processing and integrated I2C bus.
+
+It can measure magnetic fields within the full scale range of ±30 Gauss (G),
+with up to 0.0625mG per LSB resolution at 20bits operation mode and 2mG total
+RMS noise level, enabling heading accuracy of ±1° in electronic compass applications.
+
+An integrated SET/RESET function provides for the elimination of error due to
+Null Field output change with temperature. In addition it clears the sensors of
+any residual magnetic polarization resulting from exposure to strong external
+magnets. The SET/RESET function can be performed for each measurement or
+periodically as the specific application requires.
+
+The MMC5603NJ is in wafer level package with an ultra-small size of 0.8x0.8x0.4mm
+and with an operating temperature range from -40°C to +85°C.
+"""
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:i2c.device",
+        ":architecture:register",
+        ":math:utils")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/inertial"
+    env.copy("mmc5603.hpp")
