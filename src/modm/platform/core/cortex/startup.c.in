@@ -97,7 +97,7 @@ void __modm_startup(void)
 	SCB_EnableICache();
 %% endif
 
-%% if "f" in core
+%% if with_fpu
 	// Enable FPU in privileged and user mode
 	SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));
 %% endif

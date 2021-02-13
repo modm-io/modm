@@ -166,6 +166,14 @@ def prepare(module, options):
             maximum=2 ** 16,
             default="3*1024"))
 
+    if "f" in options[":target"].get_driver("core")["type"]:
+        module.add_option(
+            EnumerationOption(
+                name="float-abi",
+                description="Floating point ABI",
+                enumeration=["soft", "softfp", "hard"],
+                default="hard"))
+
     memories = listify(options[":target"].get_driver("core")["memory"])
 
     # Cortex-M0 does not have remappable vector table, so it will remain in Flash
@@ -258,6 +266,7 @@ def build(env):
         "with_fault_storage": env.has_module(":platform:fault"),
         "with_memory_traits": env.has_module(":architecture:memory"),
         "with_assert": env.has_module(":architecture:assert"),
+        "with_fpu": env.get("float-abi", "soft") != "soft",
     })
     env.outbasepath = "modm/src/modm/platform/core"
 
@@ -345,7 +354,7 @@ def build(env):
             "7f": "-mfpu=fpv5-sp-d16",
             "7fd": "-mfpu=fpv5-d16",
         }[fpu]
-        env.collect(":build:archflags", "-mfloat-abi=hard", fpu_spec)
+        env.collect(":build:archflags", "-mfloat-abi={}".format(env["float-abi"]), fpu_spec)
         single_precision = ("-sp-" in fpu_spec)
     if single_precision:
         env.collect(":build:ccflags", "-fsingle-precision-constant",

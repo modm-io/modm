@@ -309,7 +309,7 @@ This module adds these architecture specific [compiler options][options]:
 
 - `-mcpu=cortex-m{type}`: the target to compile for.
 - `-mthumb`: only Thumb2 instruction set is supported.
-- `-mfloat-abi=hard`: if FPU available use the fastest ABI available.
+- `-mfloat-abi={soft, softfp, hard}`: the FPU ABI: `hard` is fastest.
 - `-mfpu=fpv{4, 5}-{sp}-d16`: single or double precision FPU.
 - `-fsingle-precision-constant`: if SP-FPU, treat all FP constants as SP.
 - `-Wdouble-promotion`: if SP-FPU, warn if FPs are promoted to doubles.
