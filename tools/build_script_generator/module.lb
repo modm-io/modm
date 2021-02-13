@@ -99,9 +99,14 @@ def prepare(module, options):
     module.add_collector(
         PathCollector(name="path.library",
                       description="Search path for static libraries"))
+    def validate_library(library):
+        if library.startswith("lib") or library.endswith(".a"):
+            raise ValueError("Libraries must only contain `name` not `libname.a`!")
+        return library
     module.add_collector(
         StringCollector(name="library",
-                        description="Libraries to link against"))
+                        description="Libraries to link against",
+                        validate=validate_library))
     module.add_collector(
         StringCollector(name="pkg-config",
                         description="Packages to configure against"))
