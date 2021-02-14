@@ -137,10 +137,16 @@ def build(env):
         env.copy("site_tools/info.c.in")
 
     # Generate the env.BuildTarget tool
+    linkerscript = env.get(":platform:cortex-m:linkerscript.override")
+    linkerscript = env.relative_outpath(linkerscript) if linkerscript \
+                   else "$BASEPATH/modm/link/linkerscript.ld"
     env.substitutions = env.query("::device")
-    env.substitutions["upload_with_artifact"] = env.has_module(":crashcatcher")
-    env.substitutions["with_compilation_db"] = env.has_module(":build:compilation_db")
-    env.substitutions["program_extension"] = ".exe" if env[":target"].identifier.family == "windows" else ".elf"
+    env.substitutions.update({
+        "upload_with_artifact": env.has_module(":crashcatcher"),
+        "with_compilation_db": env.has_module(":build:compilation_db"),
+        "program_extension": ".exe" if env[":target"].identifier.family == "windows" else ".elf",
+        "linkerscript": linkerscript,
+    })
     env.outbasepath = "modm/scons/site_tools"
     env.template("resources/build_target.py.in", "build_target.py")
 
