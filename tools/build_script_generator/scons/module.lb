@@ -87,8 +87,8 @@ def build(env):
         "comstr",
         "find_files",
         "qtcreator",
-        "settings_buildpath",
         "template",
+        "utils_buildpath",
     }
     if env.has_module(":communication:xpcc:generator"):
         tools.add("xpcc_generator")

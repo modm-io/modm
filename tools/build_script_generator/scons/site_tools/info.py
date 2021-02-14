@@ -27,7 +27,7 @@ def git_info_defines(env, with_status=False):
 	if with_status: defines["MODM_GIT_STATUS"] = 1
 	env.AppendUnique(CPPDEFINES=defines)
 
-	target = join(env["BASEPATH"], "src", "info_git.c")
+	target = join(env["BASEPATH"], "modm", "src", "info_git.c")
 	subs = {"type": "git", "defines": information}
 	sources = env.Jinja2Template(target=target, source=TEMPLATE_SOURCE, substitutions=subs)
 
@@ -41,7 +41,7 @@ def build_info_defines(env):
 	env.AppendUnique(CPPDEFINES=defines)
 
 	information["MODM_BUILD_PROJECT_NAME"] = env.get('CONFIG_PROJECT_NAME', 'Unknown')
-	target = join(env["BASEPATH"], "src", "info_build.c")
+	target = join(env["BASEPATH"], "modm", "src", "info_build.c")
 	subs = {"type": "build", "defines": information}
 	sources = env.Jinja2Template(target=target, source=TEMPLATE_SOURCE, substitutions=subs)
 

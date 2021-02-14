@@ -60,7 +60,7 @@ def qt_creator_project_method(env, sources, with_modm=False):
 
 	# generate project files
 	proj_path = join(cwd, project_name)
-	temp_path = abspath(join(env["BASEPATH"], "scons", "site_tools", "qtcreator", "project"))
+	temp_path = abspath(join(env["BASEPATH"], "modm", "scons", "site_tools", "qtcreator", "project"))
 	return [
 		env.Jinja2Template(
 			target = proj_path + ".creator",

@@ -11,20 +11,14 @@
 import os
 from os.path import join, abspath
 
-# User Configurable Options
-project_name = "{{ options[":build:project.name"] }}"
-build_path = "{{ build_path | modm.windowsify(escape_level=1)}}"
-generated_paths = {{ generated_paths }}
 %% if cache_dir | length
 CacheDir("{{ cache_dir | modm.windowsify(escape_level=1)}}")
 %% endif
-
-# SCons environment with all tools
 env = DefaultEnvironment(tools=[], ENV=os.environ)
-env["CONFIG_BUILD_BASE"] = abspath(build_path)
+env["CONFIG_PROJECT_NAME"] = "{{ options[":build:project.name"] }}"
+env["CONFIG_BUILD_BASE"] = abspath("{{ build_path | modm.windowsify(escape_level=1)}}")
 env["CONFIG_ARTIFACT_PATH"] = join(env["CONFIG_BUILD_BASE"], "artifact")
-env["CONFIG_PROJECT_NAME"] = project_name
-env["CONFIG_PROFILE"] = ARGUMENTS.get("profile", "release")
+generated_paths = {{ generated_paths }}
 
 # Building all libraries
 libraries = env.SConscript(dirs=generated_paths, exports="env")
@@ -36,7 +30,7 @@ headers = env.FindHeaderFiles("{{ unittest_source }}")
 sources = [env.UnittestRunner(target="unittest_runner.cpp", source=headers)]
 %% else
 env.Append(CPPPATH=".")
-ignored = [".lbuild_cache", build_path] + generated_paths
+ignored = [".lbuild_cache", env["CONFIG_BUILD_BASE"]] + generated_paths
 sources = []
 %% endif
 
