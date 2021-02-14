@@ -16,6 +16,11 @@ profile = ARGUMENTS.get("profile", "release")
 env["CONFIG_PROFILE"] = profile
 env["BUILDPATH"] = join(env["CONFIG_BUILD_BASE"], profile)
 env["BASEPATH"] = abspath("..")
+%% if core.startswith("avr")
+env["COMPILERPREFIX"] = "avr-"
+%% elif core.startswith("cortex-m")
+env["COMPILERPREFIX"] = "arm-none-eabi-"
+%% endif
 %% if family == "darwin"
 # Using homebrew gcc on macOS instead of clang
 env["COMPILERSUFFIX"] = env.Detect(["gcc-11", "gcc-10"])[3:]

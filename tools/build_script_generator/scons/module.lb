@@ -80,14 +80,15 @@ def build(env):
     # SCons tools and toolpaths
     toolpaths = {
         "scons/site_tools",
-        "ext/dlr/scons/site_tools"
     }
     tools = {
         "build_target",
         "comstr",
         "find_files",
+        "gcc_retarget",
         "qtcreator",
         "template",
+        "utils",
         "utils_buildpath",
     }
     if env.has_module(":communication:xpcc:generator"):
@@ -101,29 +102,15 @@ def build(env):
 
     device = env.query("::device")
     if device["core"].startswith("cortex-m"):
-        tools.update({"compiler_arm_none_eabi_gcc", "size", "log_itm", "artifact",
-                      "openocd", "openocd_remote", "bmp", "crashdebug", "dfu"})
+        tools.update({"size", "log_itm", "artifact", "openocd",
+                     "openocd_remote", "bmp", "crashdebug", "dfu"})
         if device["platform"] in ["sam"]:
             tools.update({"bossac"})
     elif device["core"].startswith("avr"):
-        tools.update({"compiler_avr_gcc", "size", "avrdude"})
-    else: # hosted
-        tools.update({"compiler_hosted_gcc"})
+        tools.update({"size", "avrdude"})
 
     env.collect("path.tools", *toolpaths)
     env.collect("tools", *tools)
-
-    # Add common DLR SCons build tools
-    tools.update({
-        "settings_gcc_default_internal",
-        "utils_common",
-        "utils_gcc_version",
-    })
-    env.outbasepath = "modm/ext/dlr/scons/site_tools"
-    for tool in tools:
-        path = repopath("ext/dlr/scons-build-tools/site_tools/{}.py".format(tool))
-        if exists(path):
-            env.copy(path, "{}.py".format(tool))
 
     # Copy only these modm SCons build tools
     env.outbasepath = "modm/scons/"
