@@ -10,11 +10,15 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-from os.path import abspath, relpath
+from os.path import join, abspath, relpath
 
 def build_target(env, sources):
 	# Building application
 	program = env.Program(target=env["CONFIG_PROJECT_NAME"]+"{{ program_extension }}", source=sources)
+	# Clean additional artifacts
+	env.Clean(program, join(env["BUILDPATH"], env["CONFIG_PROJECT_NAME"]+".bin"))
+	env.Clean(program, join(env["BUILDPATH"], env["CONFIG_PROJECT_NAME"]+".hex"))
+	env.Clean(program, join(env["BUILDPATH"], env["CONFIG_PROJECT_NAME"]+".lss"))
 
 %% if with_compilation_db
 	env.Command("compile_commands.json", sources,
@@ -27,6 +31,7 @@ def build_target(env, sources):
 	env.Alias("symbols", env.Symbols(program))
 	env.Alias("listing", env.Listing(program))
 	env.Alias("bin", env.Bin(program))
+	env.Alias("hex", env.Hex(program))
 	env.Alias("build", program)
 %% if platform in ["hosted"]
 	env.Alias("run", env.Run(program))

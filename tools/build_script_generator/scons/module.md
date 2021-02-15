@@ -474,6 +474,20 @@ Binary File···· {debug|release}/blink.bin
 ```
 
 
+#### scons hex
+
+```
+scons hex profile={debug|release}
+```
+
+Creates a Intel-hex file of your executable.
+
+```
+ $ scons hex
+Hex File······· {debug|release}/blink.hex
+```
+
+
 #### scons artifact
 
 ```
