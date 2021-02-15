@@ -64,8 +64,9 @@ def build(env):
 
     def flag_format(flag):
         subs = {
-            "target_base": "\"${TARGET.base}\"",
-            "project_source_dir": "abspath(\"..\")",
+            "target_base": '"${TARGET.base}"',
+            "project_source_dir": 'env["BASEPATH"]',
+            "gccpath": 'env["GCC_PATH"]'
         }
         flag = '"{}"'.format(flag)
         vals = ["{}={}".format(t, r) for t, r in subs.items() if "{{{}}}".format(t) in flag]

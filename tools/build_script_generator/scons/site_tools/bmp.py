@@ -27,8 +27,9 @@ def black_magic_probe_program(env, source, alias='black_magic_probe_program'):
 def black_magic_probe_debug(env, source, alias='black_magic_probe_debug'):
 	def call_bmp_debug(target, source, env):
 		backend = bmp.BlackMagicProbeBackend(port=ARGUMENTS.get("port", "auto"))
-		gdb.call(source=source[0].abspath, backend=backend,
-				 ui=ARGUMENTS.get("ui", "tui"))
+		gdb.call(source=source[0].abspath, backend=backend, ui=ARGUMENTS.get("ui", "tui"),
+			 	 config=map(env.subst, env.Listify(env.get("MODM_GDBINIT", []))),
+			 	 commands=map(env.subst, env.Listify(env.get("MODM_GDB_COMMANDS", []))))
 
 	action = Action(call_bmp_debug, cmdstr="$BMP_DEBUG_COMSTR")
 	return env.AlwaysBuild(env.Alias(alias, source, action))

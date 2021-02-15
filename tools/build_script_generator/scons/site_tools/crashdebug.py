@@ -44,7 +44,8 @@ def run_post_mortem_gdb(target, source, env):
 			binary_path=env.subst("$BASEPATH/modm/ext/crashcatcher/bins"),
 			coredump=env["COREDUMP_FILE"])
 	gdb.call(source=source, backend=backend, ui=ARGUMENTS.get("ui", "tui"),
-			 config=map(env.subst, env.Listify(env.get("MODM_GDBINIT", []))))
+			 config=map(env.subst, env.Listify(env.get("MODM_GDBINIT", []))),
+			 commands=map(env.subst, env.Listify(env.get("MODM_GDB_COMMANDS", []))))
 
 	return 0
 

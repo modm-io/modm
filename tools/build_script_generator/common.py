@@ -218,6 +218,8 @@ def common_compiler_flags(compiler, target):
         "-funsigned-char",
         "-fwrapv",
         # "-fmerge-all-constants",
+        "-ffile-prefix-map={project_source_dir}=.",
+        "-ffile-prefix-map={gccpath}=.",
 
         "-g3",
         "-gdwarf-3",

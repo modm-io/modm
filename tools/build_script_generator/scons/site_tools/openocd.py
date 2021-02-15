@@ -28,12 +28,13 @@ def debug_openocd(env, source, alias="debug_openocd"):
 	def call_debug_openocd(target, source, env):
 		config_openocd = env.Listify(env.get("MODM_OPENOCD_CONFIGFILES", []))
 		config_searchdirs = env.Listify(env.get("MODM_OPENOCD_SEARCHDIRS", []))
-		config  = env.Listify(env.get("MODM_OPENOCD_GDBINIT", []))
-		config += env.Listify(env.get("MODM_GDBINIT", []))
 		backend = OpenOcdBackend(config=map(env.subst, config_openocd),
 								 search=map(env.subst, config_searchdirs))
-		gdb.call(source=source[0], backend=backend,
-				 config=map(env.subst, config), ui=ARGUMENTS.get("ui", "tui"))
+		config  = env.Listify(env.get("MODM_OPENOCD_GDBINIT", []))
+		config += env.Listify(env.get("MODM_GDBINIT", []))
+		commands = env.Listify(env.get("MODM_GDB_COMMANDS", []))
+		gdb.call(source=source[0], backend=backend, config=map(env.subst, config),
+				 commands=map(env.subst, commands), ui=ARGUMENTS.get("ui", "tui"))
 
 	action = Action(call_debug_openocd, cmdstr="$DEBUG_OPENOCD_COMSTR")
 	return env.AlwaysBuild(env.Alias(alias, source, action))

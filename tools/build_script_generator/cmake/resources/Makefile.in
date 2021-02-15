@@ -1,5 +1,5 @@
 # Copyright (c) 2018, Sergiy Yevtushenko
-# Copyright (c) 2018-2019, Niklas Hauser
+# Copyright (c) 2018-2019, 2021, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -59,6 +59,7 @@ program-bmp: build
 ui?=tui
 debug: build
 	@python3 modm/modm_tools/gdb.py -x modm/gdbinit -x modm/openocd_gdbinit \
+			-ex "dir $(dir $(realpath $(dir $(realpath $(shell which arm-none-eabi-gcc)))))" \
 			$(ELF_FILE) -ui=$(ui) \
 			openocd -f modm/openocd.cfg
 
