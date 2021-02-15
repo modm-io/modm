@@ -1,5 +1,6 @@
 <library>
   <extends>modm:blue-pill</extends>
+  <!-- <extends>modm:disco-f072rb</extends> -->
   <!-- <extends>modm:mini-f401</extends> -->
   <!-- <extends>modm:mini-f411</extends> -->
   <!-- <extends>modm:feather-m0</extends> -->

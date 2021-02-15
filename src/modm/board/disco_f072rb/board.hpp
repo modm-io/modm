@@ -60,6 +60,8 @@ struct SystemClock
 	static constexpr uint32_t Timer16 = Apb;
 	static constexpr uint32_t Timer17 = Apb;
 
+	static constexpr uint32_t Usb = 48_MHz;
+
 	static bool inline
 	enable()
 	{
@@ -102,6 +104,14 @@ using Transport = modm::Lis3TransportSpi< SpiMaster, Cs >;
 using Gyroscope = modm::L3gd20< Transport >;
 }
 
+namespace usb
+{
+using Dm = GpioA11;			// OTG_FS_DM: USB_OTG_FS_DM
+using Dp = GpioA12;			// OTG_FS_DP: USB_OTG_FS_DP
+
+using Device = UsbFs;
+}
+
 
 inline void
 initialize()
@@ -139,6 +149,13 @@ initializeL3g()
 	l3g::SpiMaster::connect<l3g::Sck::Sck, l3g::Mosi::Mosi, l3g::Miso::Miso>();
 	l3g::SpiMaster::initialize<SystemClock, 3_MHz>();
 	l3g::SpiMaster::setDataMode(l3g::SpiMaster::DataMode::Mode3);
+}
+
+inline void
+initializeUsbFs()
+{
+	usb::Device::initialize<SystemClock>();
+	usb::Device::connect<usb::Dm::Dm, usb::Dp::Dp>();
 }
 
 } // namespace Board

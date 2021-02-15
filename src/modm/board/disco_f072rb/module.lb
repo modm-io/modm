@@ -29,7 +29,8 @@ def prepare(module, options):
         ":platform:clock",
         ":platform:core",
         ":platform:gpio",
-        ":platform:spi:2")
+        ":platform:spi:2",
+        ":platform:usb")
     return True
 
 def build(env):
