@@ -35,7 +35,7 @@ def debug_openocd(env, source, alias="debug_openocd"):
 		gdb.call(source=source[0], backend=backend,
 				 config=map(env.subst, config), ui=ARGUMENTS.get("ui", "tui"))
 
-	action = Action(call_debug_openocd, cmdstr="$DEBUG_OPENOCD_STR")
+	action = Action(call_debug_openocd, cmdstr="$DEBUG_OPENOCD_COMSTR")
 	return env.AlwaysBuild(env.Alias(alias, source, action))
 
 # -----------------------------------------------------------------------------
@@ -47,7 +47,7 @@ def program_openocd(env, source, alias="program_openocd"):
 						config=map(env.subst, config),
 						search=map(env.subst, searchdir))
 
-	action = Action(call_program_openocd, cmdstr="$PROGRAM_OPENOCD_STR")
+	action = Action(call_program_openocd, cmdstr="$PROGRAM_OPENOCD_COMSTR")
 	return env.AlwaysBuild(env.Alias(alias, source, action))
 
 # -----------------------------------------------------------------------------
@@ -59,25 +59,11 @@ def reset_openocd(env, alias="reset_openocd"):
 					 config=map(env.subst, config),
 					 search=map(env.subst, searchdir))
 
-	action = Action(call_reset_openocd, cmdstr="$RESET_OPENOCD_STR")
+	action = Action(call_reset_openocd, cmdstr="$RESET_OPENOCD_COMSTR")
 	return env.AlwaysBuild(env.Alias(alias, '', action))
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
-	if not ARGUMENTS.get('verbose'):
-		env["DEBUG_OPENOCD_STR"] = \
-			"{0}.-----GDB-----> {1}$SOURCE\n" \
-			"{0}'---OpenOCD---> {2}$CONFIG_DEVICE_NAME{3}" \
-			.format("\033[;0;32m", "\033[;0;33m", "\033[;1;33m", "\033[;0;0m")
-		env["PROGRAM_OPENOCD_STR"] = \
-			"{0}.-------------- {1}$SOURCE\n" \
-			"{0}'---OpenOCD---> {2}$CONFIG_DEVICE_NAME{3}" \
-			.format("\033[;0;32m", "\033[;0;33m", "\033[;1;33m", "\033[;0;0m")
-		env["RESET_OPENOCD_STR"] = \
-			"{0}.----Reset----- {1}\n" \
-			"{0}'---OpenOCD---> {2}$CONFIG_DEVICE_NAME{3}" \
-			.format("\033[;0;32m", "\033[;0;33m", "\033[;1;33m", "\033[;0;0m")
-
 	env.AddMethod(program_openocd, "ProgramOpenOcd")
 	env.AddMethod(debug_openocd, "DebugOpenOcd")
 	env.AddMethod(reset_openocd, "ResetOpenOcd")

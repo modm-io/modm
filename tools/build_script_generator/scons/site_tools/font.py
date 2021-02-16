@@ -16,7 +16,7 @@
 # -----------------------------------------------------------------------------
 
 import os
-import os.path
+from SCons.Script import *
 
 script_path = os.path.dirname(__file__)
 command = os.path.join(script_path, "../../tools/font_creator/font_export.py")
@@ -28,10 +28,6 @@ def font_action(target, source, env):
 
 	os.system('python3 "%s" "%s" "%s"' % (command, infile, outfile))
 
-def font_string(target, source, env):
-	return "{0}Create Font···· {1}{3}{2}" \
-	       .format("\033[;0;32m", "\033[;0;33m", "\033[;0;0m", str(source[0]))
-
 def font_emitter(target, source, env):
 	header = os.path.splitext(str(target[0]))[0] + ".hpp"
 	target.append(header)
@@ -40,15 +36,12 @@ def font_emitter(target, source, env):
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
-	env.Append(
-		BUILDERS = {
-			'Font': env.Builder(
-				action = env.Action(font_action, font_string),
-				suffix = '.cpp',
-				src_suffix = '.font',
-				emitter = font_emitter,
-				single_source = True),
-	})
+	env['BUILDERS']['Font'] = env.Builder(
+		action = Action(font_action, cmdstr="$FONTCOMSTR"),
+		suffix = '.cpp',
+		src_suffix = '.font',
+		emitter = font_emitter,
+		single_source = True)
 
 def exists(env):
 	return True

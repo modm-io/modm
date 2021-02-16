@@ -17,7 +17,7 @@ import tempfile
 from modm_tools.openocd import OpenOcdBackend, log_itm
 
 # -----------------------------------------------------------------------------
-def log_openocd_itm(env, alias="openocd_itm"):
+def log_openocd_itm(env, alias="log_openocd_itm"):
     def run_openocd_itm(target, source, env):
         fcpu = ARGUMENTS.get("fcpu", None)
         if fcpu is None:
@@ -32,17 +32,11 @@ def log_openocd_itm(env, alias="openocd_itm"):
         log_itm(backend, fcpu, baudrate)
         return 0
 
-    action = Action(run_openocd_itm, cmdstr="$OPENOCD_ITM_STR")
+    action = Action(run_openocd_itm, cmdstr="$ITM_OPENOCD_COMSTR")
     return env.AlwaysBuild(env.Alias(alias, None, action))
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
-    if ARGUMENTS.get('verbose') != '1':
-        env["OPENOCD_ITM_STR"] = \
-            "{0}.----OpenOCD--> {1}Single Wire Viewer\n" \
-            "{0}'------SWO----- {2}$CONFIG_DEVICE_NAME{3}" \
-            .format("\033[;0;32m", "\033[;0;33m", "\033[;1;33m", "\033[;0;0m")
-
     env.AddMethod(log_openocd_itm, "LogItmOpenOcd")
 
 def exists(env):

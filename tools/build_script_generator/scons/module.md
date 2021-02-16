@@ -65,14 +65,13 @@ Example for a STM32 target:
 
 ```
  $ scons build
-Compiling C++·· build/release/main.o
-Compiling C···· build/release/modm/ext/tlsf/tlsf.o
+Compiling C++·· {debug|release}/main.o
+Compiling C···· {debug|release}/modm/ext/gcc/cabi.o
     ...
-Compiling C++·· build/release/modm/src/modm/ui/display/virtual_graphic_display.o
-Compiling C++·· build/release/modm/src/modm/utils/dummy.o
-Create Library· build/release/modm/libmodm.a
-Indexing······· build/release/modm/libmodm.a
-Linking········ build/release/game_of_life.elf
+Compiling C++·· {debug|release}/modm/src/modm/utils/dummy.o
+Archiving······ {debug|release}/modm/libmodm.a
+Indexing······· {debug|release}/modm/libmodm.a
+Linking········ /build/{debug|release}/blink.elf
 ```
 
 
@@ -88,8 +87,7 @@ Example for a STM32 target with 16MB external heap:
 
 ```
  $ scons size
-Memory usage:.. build/release/game_of_life.elf
-
+Memory usage··· /build/{debug|release}/blink.elf
 Program:  12.8 KiB (0.6% used)
 (.data + .fastcode + .fastdata + .hardware_init + .reset + .rodata +
  .table.copy.extern + .table.copy.intern + .table.section_heap +
@@ -118,8 +116,8 @@ Example for a STM32 target:
 
 ```
  $ scons program
-.----OpenOCD--- build/release/game_of_life.elf
-'-------------> stm32f469nih
+╭────────────── /build/{debug|release}/blink.elf
+╰───OpenOCD───> stm32f469nih
 Open On-Chip Debugger 0.10.0
     ...
 Info : using stlink api v2
@@ -132,7 +130,7 @@ Info : device id = 0x10006434
 Info : flash size = 2048kbytes
 Info : Dual Bank 2048 kiB STM32F42x/43x/469/479 found
     ...
-wrote 16384 bytes from file build/release/game_of_life.elf in 0.589736s (27.131 KiB/s)
+wrote 16384 bytes from file {debug|release}/blink.elf in 0.589736s (27.131 KiB/s)
 ** Programming Finished **
 ** Verify Started **
 verified 13064 bytes in 0.296308s (43.056 KiB/s)
@@ -154,7 +152,10 @@ and can be accessed by pressing the BOOT0-Button during startup.
 
 ```
 $ scons program-dfu
-dfu_stm32_programmer: program [...]/blink/release/blink.bin
+Binary File···· /build/{debug|release}/blink.bin
+╭────────────── /build/{debug|release}/blink.bin
+╰─────DFU─────> stm32f469nih
+dfu_stm32_programmer: program /build/{debug|release}/blink.bin
 dfu-util 0.9
 
 Copyright 2005-2009 Weston Schmidt, Harald Welte and OpenMoko Inc.
@@ -221,7 +222,8 @@ You can let the tool guess the port or explicitly specify it:
 
 ```
 $ scons program-bmp port=/dev/cu.usbmodemDEADBEEF
-[...]
+╭─Black─Magic── /build/{debug|release}/blink.elf
+╰────Probe────> stm32f103rbt6
 Remote debugging using /dev/cu.usbmodemDEADBEEF
 Target voltage: unknown
 Available Targets:
@@ -254,7 +256,7 @@ running on your own computer (host=`localhost`) or somewhere else.
 
 #### scons run
 
-Executes your project on your computer.
+Compiles and executes your program on your computer.
 (\* *only Hosted targets*)
 
 
@@ -297,15 +299,17 @@ Launches GDB to debug via Black Magic Probe.
 
 ```
 scons debug-coredump profile={debug|release} ui={tui|web} \
-                     firmware={GNU Build ID} coredump={path/to/coredump.txt}
+                     coredump={path/to/coredump.txt} \
+                     [firmware={GNU Build ID or path/to/firmware.elf}]
 ```
 
 Launches GDB for post-mortem debugging with the firmware identified by the
-`firmware={hash}` argument using the data from the `coredump={filepath}`
-argument.
+(optional) `firmware={hash or filepath}` argument using the data from the
+`coredump={filepath}` argument.
 (\* *only ARM Cortex-M targets*)
 
 See the `:platform:fault` module for details how to receive the coredump data.
+
 
 #### scons program-remote
 
@@ -361,8 +365,8 @@ displays the serial output stream.
 
 ```
  $ scons log-itm fcpu=64000000
-.----OpenOCD--> Single Wire Viewer
-'------SWO----- stm32f103rbt6
+╭───OpenOCD───> Single Wire Viewer
+╰─────SWO────── stm32f103rbt6
 Open On-Chip Debugger 0.10.0
 Licensed under GNU GPL v2
 Info : The selected transport took over low-level target control.
@@ -391,7 +395,7 @@ application.
 Compiling C++·· {debug|release}/modm/ext/gcc/assert.o
     ...
 Compiling C++·· {debug|release}/modm/src/modm/utils/dummy.o
-Create Library· {debug|release}/modm/libmodm.a
+Archiving······ {debug|release}/modm/libmodm.a
 Indexing······· {debug|release}/modm/libmodm.a
 ```
 
@@ -406,7 +410,7 @@ Dumps the symbol table for your executable.
 
 ```
  $ scons symbols
-Show symbols for 'build/release/game_of_life.elf':
+Show symbols for '{debug|release}/blink.elf':
 536871656 00000001 b (anonymous namespace)::nextOperation
 536871657 00000001 b (anonymous namespace)::checkNextOperation
 536871658 00000001 b (anonymous namespace)::error
@@ -431,8 +435,8 @@ into assembly instructions:
 
 ```
  $ scons listing
-Ext. Listing··· build/release/game_of_life.lss
- $ less build/release/game_of_life.lss
+Listing········ {debug|release}/blink.lss
+ $ less {debug|release}/blink.lss
     ...
 Disassembly of section .text:
     ...
@@ -450,8 +454,8 @@ main()
  8000d7a:   f000 fd91   bl  80018a0 <_ZN5Board17initializeDisplayEv>
     Board::initializeTouchscreen();
  8000d7e:   f7ff fc55   bl  800062c <_ZN5Board21initializeTouchscreenEv>
-    game_of_life();
- 8000d82:   f7ff feff   bl  8000b84 <_Z12game_of_lifev>
+    blink();
+ 8000d82:   f7ff feff   bl  8000b84 <_Z12blinkv>
     ...
 ```
 
@@ -466,7 +470,7 @@ Creates a binary file of your executable.
 
 ```
  $ scons bin
-Binary File···· build/release/game_of_life.bin
+Binary File···· {debug|release}/blink.bin
 ```
 
 
@@ -481,7 +485,8 @@ the hash of the binary file in `{build_path}/artifacts/{hash}.elf`.
 
 ```
  $ scons artifact
-Cache Artifact· build/release/game_of_life.elf
+╭───Artifact─── /build/release/blink.elf
+╰────Cache────> artifacts/0214523ab713bc7bdfb37d902e65dae8305f4754.elf
 ```
 
 
@@ -495,14 +500,14 @@ Cleans the build artifacts.
 
 ```
  $ scons -c
-Removed build/release/main.o
-Removed build/release/modm/ext/tlsf/tlsf.o
-
-Removed build/release/modm/src/modm/ui/display/virtual_graphic_display.o
-Removed build/release/modm/src/modm/utils/dummy.o
-Removed build/release/modm/libmodm.a
-Removed build/release/game_of_life.elf
-Removed build/release/game_of_life.lss
+Removed {debug|release}/main.o
+Removed {debug|release}/modm/ext/tlsf/tlsf.o
+    ...
+Removed {debug|release}/modm/src/modm/ui/display/virtual_graphic_display.o
+Removed {debug|release}/modm/src/modm/utils/dummy.o
+Removed {debug|release}/modm/libmodm.a
+Removed {debug|release}/blink.elf
+Removed {debug|release}/blink.lss
 ```
 
 

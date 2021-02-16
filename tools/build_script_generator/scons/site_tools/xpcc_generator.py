@@ -148,7 +148,7 @@ def generate(env, **kw):
 					'--namespace "${namespace}" ' \
 					'${include_paths} ' \
 					'$SOURCE',
-				cmdstr="$SYSTEM_CPP_PACKETS_COMSTR"),
+				cmdstr="$XPCC_PACKETS_COMSTR"),
 			emitter = packet_emitter,
 			source_scanner = env['XPCC_SYSTEM_DESIGN_SCANNERS']['XML'],
 			single_source = True,
@@ -164,7 +164,7 @@ def generate(env, **kw):
 					'--namespace "${namespace}" ' \
 					'${include_paths} ' \
 					'$SOURCE',
-				cmdstr="$SYSTEM_CPP_IDENTIFIER_COMSTR"),
+				cmdstr="$XPCC_IDENTIFIER_COMSTR"),
 			emitter = identifier_emitter,
 			source_scanner = env['XPCC_SYSTEM_DESIGN_SCANNERS']['XML'],
 			single_source = True,
@@ -181,7 +181,7 @@ def generate(env, **kw):
 					'--namespace "${namespace}" ' \
 					'${include_paths} ' \
 					'$SOURCE',
-				cmdstr="$SYSTEM_CPP_POSTMAN_COMSTR"),
+				cmdstr="$XPCC_POSTMAN_COMSTR"),
 			emitter = postman_emitter,
 			source_scanner = env['XPCC_SYSTEM_DESIGN_SCANNERS']['XML'],
 			single_source = True,
@@ -197,7 +197,7 @@ def generate(env, **kw):
 					'--namespace "${namespace}" ' \
 					'${include_paths} ' \
 					'$SOURCE',
-				cmdstr="$SYSTEM_CPP_COMMUNICATION_COMSTR"),
+				cmdstr="$XPCC_COMM_STUBS_COMSTR"),
 			emitter = communication_emitter,
 			source_scanner = env['XPCC_SYSTEM_DESIGN_SCANNERS']['XML'],
 			single_source = True,
@@ -213,19 +213,12 @@ def generate(env, **kw):
 					'--namespace "${namespace}" ' \
 					'${include_paths} ' \
 					'$SOURCE',
-				cmdstr="$SYSTEM_CPP_XPCC_TASK_CALLER_COMSTR"),
+				cmdstr="$XPCC_TASK_CALLER_COMSTR"),
 			emitter = xpcc_task_caller_emitter,
 			source_scanner = env['XPCC_SYSTEM_DESIGN_SCANNERS']['XML'],
 			single_source = True,
 			target_factory = env.fs.Entry,
 			src_suffix = ".xml")
-
-	if SCons.Script.ARGUMENTS.get('verbose') != '1':
-		env['SYSTEM_CPP_PACKETS_COMSTR'] = "Generate packets from: $SOURCE"
-		env['SYSTEM_CPP_IDENTIFIER_COMSTR'] = "Generate identifier from: $SOURCE"
-		env['SYSTEM_CPP_POSTMAN_COMSTR'] = "Generate postman from: $SOURCE"
-		env['SYSTEM_CPP_COMMUNICATION_COMSTR'] = "Generate communication stubs from: $SOURCE"
-		env['SYSTEM_CPP_XPCC_TASK_CALLER_COMSTR'] = "Generate xpcc task callers from: $SOURCE"
 
 	env.AddMethod(xpcc_communication_header, 'XpccCommunication')
 

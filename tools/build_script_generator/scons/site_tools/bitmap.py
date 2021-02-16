@@ -24,10 +24,6 @@ def bitmap_action(target, source, env):
 	bitmap.convert(image=str(source[0]),
 	               outpath=dirname(str(target[0])))
 
-def bitmap_string(target, source, env):
-    return "{0}Create Bitmap·· {1}{3}{2}" \
-           .format("\033[;0;32m", "\033[;0;33m", "\033[;0;0m", str(target[0]))
-
 def bitmap_emitter(target, source, env):
 	header = splitext(str(target[0]))[0] + ".hpp"
 	target.append(header)
@@ -35,15 +31,12 @@ def bitmap_emitter(target, source, env):
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
-	env.Append(
-		BUILDERS = {
-			'Bitmap': env.Builder(
-				action = env.Action(bitmap_action, bitmap_string),
-				suffix = '.cpp',
-				src_suffix = '.pbm',
-				emitter = bitmap_emitter,
-				single_source = True),
-	})
+	env['BUILDERS']['Bitmap'] = env.Builder(
+		action = Action(bitmap_action, cmdstr="$BITMAPCOMSTR"),
+		suffix = '.cpp',
+		src_suffix = '.pbm',
+		emitter = bitmap_emitter,
+		single_source = True)
 
 def exists(env):
 	return True

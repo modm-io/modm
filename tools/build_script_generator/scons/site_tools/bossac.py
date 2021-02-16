@@ -26,18 +26,11 @@ def bossac_program(env, source, alias="bossac_program"):
 						   port=ARGUMENTS.get("port", "auto"),
 						   options=env.get("MODM_BOSSAC_OPTIONS"))
 
-	action = Action(call_program, cmdstr="$PROGRAM_BOSSAC_STR")
+	action = Action(call_program, cmdstr="$PROGRAM_BOSSAC_COMSTR")
 	return env.AlwaysBuild(env.Alias(alias, source, action))
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
-	# build messages
-	if ARGUMENTS.get("verbose") != "1":
-		env["PROGRAM_BOSSAC_STR"] = \
-			"{0}.-------------- {1}$SOURCE\n" \
-			"{0}'----BOSSAc---> {2}$CONFIG_DEVICE_NAME{3}" \
-			.format("\033[;0;32m", "\033[;0;33m", "\033[;1;33m", "\033[;0;0m")
-
 	env.AddMethod(bossac_program, "ProgramBossac")
 
 def exists(env):

@@ -10,6 +10,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
+import os.path
 from SCons.Script import *
 from modm_tools import build_id
 
@@ -17,16 +18,15 @@ def store_artifact(env, source, alias="store_artifact"):
 	def run_store_artifact(target, source, env):
 		build_id.cache_elf(source[0].path, env["CONFIG_ARTIFACT_PATH"])
 		return 0
-	action = Action(run_store_artifact, cmdstr="$ARTIFACT_STR")
+	def comstr_artifact(target, source, env):
+		env["ARTIFACT_FILEPATH"] = "{}/{}.elf".format(
+				os.path.relpath(env["CONFIG_ARTIFACT_PATH"]),
+				build_id.extract(source[0].path))
+		return env.subst(env["ARTIFACT_COMSTR"], source=source)
+	action = Action(run_store_artifact, comstr_artifact)
 	return env.AlwaysBuild(env.Alias(alias, source, action))
 
 def generate(env, **kw):
-	if not ARGUMENTS.get("verbose"):
-		env["ARTIFACT_STR"] = \
-			"{0}.---Artifact--- {1}$SOURCE\n" \
-			"{0}'----Cache----> {2}$CONFIG_ARTIFACT_PATH{3}" \
-			.format("\033[;0;32m", "\033[;0;33m", "\033[;1;33m", "\033[;0;0m")
-
 	env.AddMethod(store_artifact, "CacheArtifact")
 
 def exists(env):

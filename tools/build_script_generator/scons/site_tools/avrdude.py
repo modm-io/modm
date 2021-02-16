@@ -28,25 +28,18 @@ def avrdude_flash(env, source, alias="avrdude_flash"):
 	def call_program(target, source, env):
 		call_avrdude(env, source[0])
 
-	action = Action(call_program, cmdstr="$PROGRAM_AVRDUDE_STR")
+	action = Action(call_program, cmdstr="$PROGRAM_AVRDUDE_COMSTR")
 	return env.AlwaysBuild(env.Alias(alias, source, action))
 
 def avrdude_fuse(env, source, alias="avrdude_fuse"):
 	def call_fuse(target, source, env):
 		call_avrdude(env, source[0], fuses=["hfuse", "lfuse", "efuse"])
 
-	action = Action(call_fuse, cmdstr="$PROGRAM_AVRDUDE_STR")
+	action = Action(call_fuse, cmdstr="$PROGRAM_AVRDUDE_COMSTR")
 	return env.AlwaysBuild(env.Alias(alias, source, action))
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
-	# build messages
-	if ARGUMENTS.get("verbose") != "1":
-		env["PROGRAM_AVRDUDE_STR"] = \
-			"{0}.-------------- {1}$SOURCE\n" \
-			"{0}'---Avrdude---> {2}$CONFIG_DEVICE_NAME{3}" \
-			.format("\033[;0;32m", "\033[;0;33m", "\033[;1;33m", "\033[;0;0m")
-
 	env.AddMethod(avrdude_flash, "ProgramAvrdude")
 	env.AddMethod(avrdude_fuse, "ProgramAvrdudeFuses")
 

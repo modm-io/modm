@@ -28,7 +28,7 @@ def program_openocd_gdb_remote(env, source, alias='program_openocd_gdb_remote'):
 		         config=map(env.subst, config),
 		         commands=["load", "monitor reset", "disconnect", "quit"])
 
-	action = Action(call_remote_program, cmdstr="$PROGRAM_REMOTE_STR")
+	action = Action(call_remote_program, cmdstr="$PROGRAM_REMOTE_COMSTR")
 	return env.AlwaysBuild(env.Alias(alias, source, action))
 
 # -----------------------------------------------------------------------------
@@ -41,7 +41,7 @@ def debug_openocd_gdb_remote(env, source, alias='debug_openocd_gdb_remote'):
 		gdb.call(source=source[0], backend=bem.ExtendedRemote(host),
 				 config=map(env.subst, config), ui=ARGUMENTS.get("ui", "tui"),)
 
-	action = Action(call_remote_debug, cmdstr="$DEBUG_REMOTE_STR")
+	action = Action(call_remote_debug, cmdstr="$DEBUG_REMOTE_COMSTR")
 	return env.AlwaysBuild(env.Alias(alias, source, action))
 
 # -----------------------------------------------------------------------------
@@ -53,25 +53,11 @@ def reset_openocd_gdb_remote(env, alias='reset_openocd_gdb_remote'):
 		gdb.call(backend=bem.ExtendedRemote(host), config=map(env.subst, config),
 		         commands=["monitor reset", "disconnect", "quit"])
 
-	action = Action(call_remote_reset, cmdstr="$RESET_REMOTE_STR")
+	action = Action(call_remote_reset, cmdstr="$RESET_REMOTE_COMSTR")
 	return env.AlwaysBuild(env.Alias(alias, '', action))
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
-	if not ARGUMENTS.get('verbose'):
-		env["PROGRAM_REMOTE_STR"] = \
-			"{0}.---Remote----- {1}$SOURCE\n" \
-			"{0}'---OpenOCD---> {2}$CONFIG_DEVICE_NAME{3}" \
-			.format("\033[;0;32m", "\033[;0;33m", "\033[;1;33m", "\033[;0;0m")
-		env["DEBUG_REMOTE_STR"] = \
-			"{0}.------GDB----> {1}$SOURCE\n" \
-			"{0}'-Rem-OpenOCD-> {2}$CONFIG_DEVICE_NAME{3}" \
-			.format("\033[;0;32m", "\033[;0;33m", "\033[;1;33m", "\033[;0;0m")
-		env["RESET_REMOTE_STR"] = \
-			"{0}.----Reset----- {1}\n" \
-			"{0}'-Remote--GDB-> {2}$CONFIG_DEVICE_NAME{3}" \
-			.format("\033[;0;32m", "\033[;0;33m", "\033[;1;33m", "\033[;0;0m")
-
 	env.AddMethod(program_openocd_gdb_remote, 'ProgramGdbRemote')
 	env.AddMethod(debug_openocd_gdb_remote,   'DebugGdbRemote')
 	env.AddMethod(reset_openocd_gdb_remote,   'ResetGdbRemote')

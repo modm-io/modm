@@ -20,7 +20,7 @@ def black_magic_probe_program(env, source, alias='black_magic_probe_program'):
 	def call_bmp_program(target, source, env):
 		bmp.program(source=source[0].abspath, port=ARGUMENTS.get("port", "auto"))
 
-	action = Action(call_bmp_program, cmdstr="$BLACK_MAGIC_PROBE_PROGRAM_COMSTR")
+	action = Action(call_bmp_program, cmdstr="$BMP_PROGRAM_COMSTR")
 	return env.AlwaysBuild(env.Alias(alias, source, action))
 
 # -----------------------------------------------------------------------------
@@ -30,7 +30,7 @@ def black_magic_probe_debug(env, source, alias='black_magic_probe_debug'):
 		gdb.call(source=source[0].abspath, backend=backend,
 				 ui=ARGUMENTS.get("ui", "tui"))
 
-	action = Action(call_bmp_debug, cmdstr="$BLACK_MAGIC_PROBE_DEBUG_COMSTR")
+	action = Action(call_bmp_debug, cmdstr="$BMP_DEBUG_COMSTR")
 	return env.AlwaysBuild(env.Alias(alias, source, action))
 
 # -----------------------------------------------------------------------------
@@ -39,25 +39,11 @@ def black_magic_probe_reset(env, alias='black_magic_probe_reset'):
 		backend = bmp.BlackMagicProbeBackend(port=ARGUMENTS.get("port", "auto"))
 		gdb.call(backend=backend, commands=["kill", "quit"])
 
-	action = Action(call_bmp_reset, cmdstr="$BLACK_MAGIC_PROBE_RESET_COMSTR")
+	action = Action(call_bmp_reset, cmdstr="$BMP_RESET_COMSTR")
 	return env.AlwaysBuild(env.Alias(alias, '', action))
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
-	if not ARGUMENTS.get('verbose'):
-		env["BLACK_MAGIC_PROBE_PROGRAM_COMSTR"] = \
-			"{0}.-Black-Magic-- {1}$SOURCE\n" \
-			"{0}'----Probe----> {2}$CONFIG_DEVICE_NAME{3}" \
-			.format("\033[;0;32m", "\033[;0;33m", "\033[;1;33m", "\033[;0;0m")
-		env["BLACK_MAGIC_PROBE_DEBUG_COMSTR"] = \
-			"{0}.-----GDB-----> {1}$SOURCE\n" \
-			"{0}'-----BMP-----> {2}$CONFIG_DEVICE_NAME{3}" \
-			.format("\033[;0;32m", "\033[;0;33m", "\033[;1;33m", "\033[;0;0m")
-		env["BLACK_MAGIC_PROBE_RESET_COMSTR"] = \
-			"{0}.----Reset----- {1}\n" \
-			"{0}'-----BMP-----> {2}$CONFIG_DEVICE_NAME{3}" \
-			.format("\033[;0;32m", "\033[;0;33m", "\033[;1;33m", "\033[;0;0m")
-
 	env.AddMethod(black_magic_probe_program, 'ProgramBMP')
 	env.AddMethod(black_magic_probe_debug, 'DebugBMP')
 	env.AddMethod(black_magic_probe_reset, 'ResetBMP')

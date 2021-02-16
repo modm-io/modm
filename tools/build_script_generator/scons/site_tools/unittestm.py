@@ -38,15 +38,11 @@ def unittest_emitter(target, source, env):
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
-	action_str = "{0}Create Tests··· {1}$TARGET{2}" \
-        .format("\033[;0;32m", "\033[;0;33m", "\033[;0;0m")
-	env.Append(BUILDERS = {
-		'UnittestRunner': Builder(
-				action = SCons.Action.Action(unittest_action, action_str),
-				suffix = '.cpp',
-				emitter = unittest_emitter,
-				target_factory = env.fs.File)
-	})
+	env['BUILDERS']['UnittestRunner'] = env.Builder(
+		action = Action(unittest_action, cmdstr="$UNITTESTCOMSTR"),
+		suffix = '.cpp',
+		emitter = unittest_emitter,
+		target_factory = env.fs.File)
 
 def exists(env):
 	return True
