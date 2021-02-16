@@ -17,7 +17,7 @@ CacheDir("{{ cache_dir | modm.windowsify(escape_level=1)}}")
 env = DefaultEnvironment(tools=[], ENV=os.environ)
 env["CONFIG_PROJECT_NAME"] = "{{ options[":build:project.name"] }}"
 env["CONFIG_BUILD_BASE"] = abspath("{{ build_path | modm.windowsify(escape_level=1)}}")
-env["CONFIG_ARTIFACT_PATH"] = join(env["CONFIG_BUILD_BASE"], "artifact")
+env["CONFIG_ARTIFACT_PATH"] = abspath("{{ artifact_path | modm.windowsify(escape_level=1)}}")
 generated_paths = {{ generated_paths }}
 
 # Building all libraries

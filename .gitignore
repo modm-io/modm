@@ -31,6 +31,7 @@ CMakeLists.txt
 
 # ignore generated code in the example folder
 examples/**/modm
+examples/**/artifacts
 examples/**/compile_commands.json
 examples/**/SConstruct
 examples/**/Makefile

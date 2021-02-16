@@ -37,7 +37,7 @@ This module generates these SCons methods depending on the target.
 
 Defaults to **scons build**.
 
-You can add these arguments to any of the scons commands:
+You can add these arguments to any of the SCons commands:
 
 - `verbose=1`: gives a more verbose output, so you can, for example, check what
   options the compiler is called with.
@@ -51,6 +51,11 @@ module documentation.
     When working with the debug profile, make sure to add `profile=debug` to all
     commands, especially `scons program profile=debug` and
     `scons debug profile=debug`!
+
+Some SCons commands take a `firmware={GNU Build ID or path/to/firmware.elf}`
+argument that specifies which firmware to use for the command. It is useful in
+combination with the `scons artifact` command to preserve a specific firmware
+version for later.
 
 
 #### scons build
@@ -78,7 +83,7 @@ Linking········ /build/{debug|release}/blink.elf
 #### scons size
 
 ```
-scons size profile={debug|release}
+scons size profile={debug|release} [firmware={hash or file}]
 ```
 
 Displays the static Flash and RAM consumption of your target.
@@ -104,7 +109,7 @@ Heap:     16.4 MiB
 #### scons program
 
 ```
-scons program profile={debug|release} [port={serial-port}]
+scons program profile={debug|release} [port={serial-port}] [firmware={hash or file}]
 ```
 
 Writes the executable onto your target via Avrdude or OpenOCD.
@@ -142,7 +147,7 @@ shutdown command invoked
 #### scons program-dfu
 
 ```
-scons program-dfu profile={debug|release}
+scons program-dfu profile={debug|release} [firmware={hash or file}]
 ```
 
 Writes the executable onto your target via Device Firmware Update (DFU) over USB.
@@ -200,7 +205,7 @@ scons: done building targets.
 #### scons program-bmp
 
 ```
-scons program-bmp profile={debug|release} [port={serial-port}]
+scons program-bmp profile={debug|release} [port={serial-port}] [firmware={hash or file}]
 ```
 
 [Black Magic Probe][bmp] is convenient tool to convert cheap USB ST-LINK V2 clones
@@ -247,7 +252,7 @@ scons: done building targets.
 #### scons program-remote
 
 ```
-scons program-remote profile={debug|release} [host={ip or hostname}]
+scons program-remote profile={debug|release} [host={ip or hostname}] [firmware={hash or file}]
 ```
 
 Writes the executable onto your target connected to a remote OpenOCD process
@@ -263,7 +268,7 @@ Compiles and executes your program on your computer.
 #### scons debug
 
 ```
-scons debug profile={debug|release} ui={tui|web}
+scons debug profile={debug|release} ui={tui|web} [firmware={hash or file}]
 ```
 
 Launches OpenOCD in the background, then launches GDB in foreground with the
@@ -288,7 +293,7 @@ This is just a convenience wrapper for the debug functionality defined in the
 #### scons debug-bmp
 
 ```
-scons debug-bmp profile={debug|release} ui={tui|web} port={serial-port}
+scons debug-bmp profile={debug|release} ui={tui|web} port={serial-port} [firmware={hash or file}]
 ```
 
 Launches GDB to debug via Black Magic Probe.
@@ -314,7 +319,7 @@ See the `:platform:fault` module for details how to receive the coredump data.
 #### scons program-remote
 
 ```
-scons debug-remote profile={debug|release} ui={tui|web} [host={ip or hostname}]
+scons debug-remote profile={debug|release} ui={tui|web} [host={ip or hostname}] [firmware={hash or file}]
 ```
 
 Debugs the executable via a remote OpenOCD process running on your own computer
@@ -403,13 +408,13 @@ Indexing······· {debug|release}/modm/libmodm.a
 #### scons symbols
 
 ```
-scons symbols profile={debug|release}
+scons symbols profile={debug|release} [firmware={hash or file}]
 ```
 
 Dumps the symbol table for your executable.
 
 ```
- $ scons symbols
+ $ scons symbols [firmware={hash or file}]
 Show symbols for '{debug|release}/blink.elf':
 536871656 00000001 b (anonymous namespace)::nextOperation
 536871657 00000001 b (anonymous namespace)::checkNextOperation
@@ -426,7 +431,7 @@ Show symbols for '{debug|release}/blink.elf':
 #### scons listing
 
 ```
-scons listing profile={debug|release}
+scons listing profile={debug|release} [firmware={hash or file}]
 ```
 
 Decompiles your executable into an annotated assembly listing.
@@ -463,7 +468,7 @@ main()
 #### scons bin
 
 ```
-scons bin profile={debug|release}
+scons bin profile={debug|release} [firmware={hash or file}]
 ```
 
 Creates a binary file of your executable.
@@ -477,7 +482,7 @@ Binary File···· {debug|release}/blink.bin
 #### scons hex
 
 ```
-scons hex profile={debug|release}
+scons hex profile={debug|release} [firmware={hash or file}]
 ```
 
 Creates a Intel-hex file of your executable.
@@ -495,7 +500,8 @@ scons artifact profile={debug|release}
 ```
 
 Caches the ELF and binary file of the newest compiled executable identified by
-the hash of the binary file in `{build_path}/artifacts/{hash}.elf`.
+the hash of the binary file in `artifacts/{hash}.elf`. You can change this path
+with the `modm:build:scons:path.artifact` option.
 
 ```
  $ scons artifact

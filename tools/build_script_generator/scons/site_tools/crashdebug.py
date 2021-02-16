@@ -17,21 +17,10 @@ import platform
 from modm_tools import gdb, crashdebug
 
 def run_post_mortem_gdb(target, source, env):
-	source = str(source[0])
 
-	artifact = ARGUMENTS.get("firmware", None)
-	if artifact is None:
-		print("\n> Using the newest firmware may be inaccurate!\n"
-			  "> Use 'firmware={hash}' argument to specify a specific firmware.\n")
-	else:
-		artifact = artifact.lower()
-		artifactpath = os.path.join(env["CONFIG_ARTIFACT_PATH"], "{}.elf".format(artifact))
-		if os.path.isfile(artifactpath):
-			source = artifactpath
-		else:
-			print("\n> Unable to find artifact '{}' in build cache!\n"
-					"> Run without artifact argument to use newest firmware.\n".format(artifact))
-			return 1
+	if ARGUMENTS.get("firmware") is None:
+		print("\n> Using the latest firmware may be inaccurate!"
+			  "\n> Use the 'firmware={hash or file}' argument to point to a specific firmware.\n")
 
 	if not os.path.isfile(env["COREDUMP_FILE"]):
 		print("\n> Unable to find coredump file!"
@@ -43,7 +32,7 @@ def run_post_mortem_gdb(target, source, env):
 	backend = crashdebug.CrashDebugBackend(
 			binary_path=env.subst("$BASEPATH/modm/ext/crashcatcher/bins"),
 			coredump=env["COREDUMP_FILE"])
-	gdb.call(source=source, backend=backend, ui=ARGUMENTS.get("ui", "tui"),
+	gdb.call(source=source[0].path, backend=backend, ui=ARGUMENTS.get("ui", "tui"),
 			 config=map(env.subst, env.Listify(env.get("MODM_GDBINIT", []))),
 			 commands=map(env.subst, env.Listify(env.get("MODM_GDB_COMMANDS", []))))
 

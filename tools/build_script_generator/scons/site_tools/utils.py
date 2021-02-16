@@ -74,6 +74,16 @@ def phony_target(env, **kw):
         env.AlwaysBuild(env.Alias(target, [], action))
 
 
+def artifact_firmware(env, source):
+    firmware = ARGUMENTS.get("firmware", None)
+    if firmware:
+        try:
+            int(firmware, 16) # Validate hexadecimal string
+            source = os.path.join(env["CONFIG_ARTIFACT_PATH"], "{}.elf".format(firmware.lower()))
+        except:
+            source = firmware
+    return source
+
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
     env.Append(ENV={'PATH': os.environ['PATH']})
@@ -85,6 +95,8 @@ def generate(env, **kw):
     env.AddMethod(phony_target, 'Phony')
 
     env.AddMethod(listify, 'Listify')
+
+    env.AddMethod(artifact_firmware, 'ChooseFirmware')
 
 
 def exists(env):

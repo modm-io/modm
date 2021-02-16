@@ -26,6 +26,9 @@ def prepare(module, options):
         PathOption(name="cache_dir", default="", empty_ok=True, absolute=True,
                    description=descr_cache_dir))
     module.add_option(
+        PathOption(name="path.artifact", default="artifacts", absolute=True,
+                   description=descr_path_artifact))
+    module.add_option(
         PathOption(name="image.source", default="", empty_ok=True, absolute=True,
                    description=descr_image_source))
 
@@ -161,6 +164,7 @@ def post_build(env):
     subs.update({
         "build_path": env.relative_outpath(env[":build:build.path"]),
         "cache_dir": env.relative_outpath(cache_dir) if len(cache_dir) else "",
+        "artifact_path": env.relative_outpath(env["path.artifact"]),
         "generated_paths": repositories,
         "is_unittest": is_unittest,
 
@@ -244,6 +248,13 @@ descr_cache_dir = """# Path to SConstruct CacheDir
 
 If value is `$cache`, the cache is placed into the top-level `build/` folder.
 You can disable CacheDir by setting an empty string.
+"""
+
+descr_path_artifact = """# Path to Artifact Store
+
+The artifact folder contains ELF files named by their GNU build id hash. This
+allows identification of firmware on the device via serial output and is useful
+for archiving or post-mortem debugging.
 """
 
 descr_image_source = """# Path to directory containing .pbm files"""
