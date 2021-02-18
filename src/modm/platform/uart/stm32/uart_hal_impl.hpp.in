@@ -38,7 +38,11 @@ modm::platform::{{ name }}::setParity(const Parity parity)
 	flags |= static_cast<uint32_t>(parity);
 	if (parity != Parity::Disabled) {
 		// Parity Bit counts as 9th bit -> enable 9 data bits
+#ifdef USART_CR1_M1
+		flags |= USART_CR1_M0;
+#else
 		flags |= USART_CR1_M;
+#endif
 	}
 	{{ peripheral }}->CR1 = flags;
 
