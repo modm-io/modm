@@ -10,7 +10,10 @@ Make sure you've [installed all tools required for building modm](https://modm.i
 
 ## TL;DR
 
+To compile any example:
+
 ```
+cd modm/examples/generic/blinky  # cd into the example
 lbuild build    # generate modm library (call only once)
 scons program   # compile and upload to your development board
 ```
@@ -19,7 +22,7 @@ To debug with GDB in TUI mode:
 
 ```
 scons program profile=debug # compile and upload debug profile
-scons gdb profile=debug     # launch OpenOCD and GDB for debugging
+scons debug profile=debug   # launch OpenOCD and GDB for debugging
 ```
 
 To generate your target specific Doxygen documentation:
