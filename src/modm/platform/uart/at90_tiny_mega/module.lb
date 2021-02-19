@@ -21,11 +21,6 @@ def get_properties(env):
 
 def load_options(module):
     module.add_option(
-        BooleanOption(
-            name="buffered",
-            description="",
-            default=True))
-    module.add_option(
         NumericOption(
             name="buffer.tx",
             description="",
