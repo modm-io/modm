@@ -21,214 +21,111 @@
 #	error 	"Don't include this file directly, use uart_hal_{{ id }}.hpp instead!"
 #endif
 #include <modm/platform/clock/rcc.hpp>
+#include <modm/math/algorithm/prescaler.hpp>
+
+namespace modm::platform
+{
 
 // ----------------------------------------------------------------------------
 void
-modm::platform::{{ name }}::setParity(const Parity parity)
-{
-%% if "extended" in driver["type"]
-	const bool usartEnabled = ({{ peripheral }}->CR1 & USART_CR1_UE);
-	if(usartEnabled) {
-		disableOperation();
-	}
-%% endif
-
-	uint32_t flags = {{ peripheral }}->CR1;
-	flags &= ~(USART_CR1_PCE | USART_CR1_PS | USART_CR1_M);
-	flags |= static_cast<uint32_t>(parity);
-	if (parity != Parity::Disabled) {
-		// Parity Bit counts as 9th bit -> enable 9 data bits
-		flags |= USART_CR1_M;
-	}
-	{{ peripheral }}->CR1 = flags;
-
-%% if "extended" in driver["type"]
-	if(usartEnabled) {
-		enableOperation();
-	}
-%% endif
-}
-
-void
-modm::platform::{{ name }}::enable()
+{{ name }}::enable()
 {
 	Rcc::enable<Peripheral::{{ uart_name ~ id }}>();
-	{{ peripheral }}->CR1 |= USART_CR1_UE;		// Uart Enable
 }
 
 void
-modm::platform::{{ name }}::disable()
+{{ name }}::disable()
 {
 	// TX, RX, Uart, etc. Disable
 	{{ peripheral }}->CR1 = 0;
 	Rcc::disable<Peripheral::{{ uart_name ~ id }}>();
 }
-%% if target["family"] != "f1"
-template<class SystemClock, modm::baudrate_t baudrate,
-		modm::platform::{{ name }}::OversamplingMode oversample>
-void modm_always_inline
-modm::platform::{{ name }}::initialize(Parity parity)
-{
-	initializeWithBrr(UartBaudrate::getBrr<SystemClock::{{ uart_name ~ id }}, baudrate>(), parity, oversample);
-}
-%% endif
 
-template<class SystemClock, modm::baudrate_t baudrate>
-void modm_always_inline
-modm::platform::{{ name }}::initialize(Parity parity)
+void
+{{ name }}::enableOperation()
 {
-%% if target["family"] == "f1"
-	initializeWithBrr(UartBaudrate::getBrr<SystemClock::{{ uart_name ~ id }}, baudrate>(), parity);
-%% else
-	initializeWithBrr(UartBaudrate::getBrr<SystemClock::{{ uart_name ~ id }}, baudrate>(), parity,
-					  UartBaudrate::getOversamplingMode(SystemClock::{{ uart_name ~ id }}, baudrate));
-%% endif
+	{{ peripheral }}->CR1 |= USART_CR1_UE;
 }
 
+void
+{{ name }}::disableOperation()
+{
+	{{ peripheral }}->CR1 &= ~USART_CR1_UE;
+}
 
-void inline
-%% if target["family"] != "f1"
-modm::platform::{{ name }}::initializeWithBrr(uint16_t brr, Parity parity, OversamplingMode oversample)
-%% else
-modm::platform::{{ name }}::initializeWithBrr(uint16_t brr, Parity parity)
-%% endif
+template< class SystemClock, modm::baudrate_t baudrate, modm::percent_t tolerance >
+void
+{{ name }}::initialize(Parity parity, WordLength length)
 {
 	enable();
-	// DIRTY HACK: disable and reenable uart to be able to set
-	//             baud rate as well as parity
-	{{ peripheral }}->CR1 &= ~USART_CR1_UE;	// Uart Disable
-	// set baudrate
-	{{ peripheral }}->BRR = brr;
-	setParity(parity);
-%% if target["family"] != "f1"
-	setOversamplingMode(oversample);
-%% endif
-	{{ peripheral }}->CR1 |=  USART_CR1_UE;	// Uart Reenable
-}
+	disableOperation();
 
-%% if target["family"] != "f1"
-void
-modm::platform::{{ name }}::setOversamplingMode(OversamplingMode mode)
-{
-%% if "extended" in driver["type"]
-	const bool usartEnabled = ({{ peripheral }}->CR1 & USART_CR1_UE);
-	if(usartEnabled) {
-		disableOperation();
-	}
+%% if over8
+	constexpr uint32_t scalar = (baudrate * 16l > SystemClock::{{ uart_name ~ id }}) ? 8 : 16;
+	constexpr uint32_t max = ((scalar == 16) ? (1ul << 16) : (1ul << 15)) - 1ul;
+%% else
+	constexpr uint32_t max = (1ul << 16) - 1ul;
 %% endif
+	constexpr auto result = Prescaler::from_range(SystemClock::{{ uart_name ~ id }}, baudrate, 1, max);
+	modm::PeripheralDriver::assertBaudrateInTolerance< result.frequency, baudrate, tolerance >();
 
-	if(mode == OversamplingMode::By16) {
-		{{ peripheral }}->CR1 &= ~static_cast<uint32_t>(OversamplingMode::By8);
+	uint32_t cr1 = {{ peripheral }}->CR1;
+%% if over8
+	// set baudrate and oversampling
+	if constexpr (scalar == 16) {
+		// When OVER8 = 0:, BRR[3:0] = USARTDIV[3:0].
+		{{ peripheral }}->BRR = result.prescaler;
+		cr1 &= ~USART_CR1_OVER8;
 	} else {
-		{{ peripheral }}->CR1 |=  static_cast<uint32_t>(OversamplingMode::By8);
+		// When OVER8 = 1: BRR[15:4] = USARTDIV[15:4]
+		// BRR[2:0] = USARTDIV[3:0] shifted 1 bit to the right. BRR[3] must be kept cleared.
+		{{ peripheral }}->BRR = (result.prescaler & ~0b1111) | ((result.prescaler & 0b1111) >> 1);
+		cr1 |= USART_CR1_OVER8;
 	}
-
-%% if "extended" in driver["type"]
-	if(usartEnabled) {
-		enableOperation();
-	}
-%% endif
-}
-%% endif
-%% if uart_name == "Usart"
-
-void
-modm::platform::{{ name }}::setSpiClock(SpiClock clk)
-{
-%% if "extended" in driver["type"]
-	const bool usartEnabled = ({{ peripheral }}->CR1 & USART_CR1_UE);
-	if(usartEnabled) {
-		disableOperation();
-	}
+%% else
+	// Set baudrate
+	{{ peripheral }}->BRR = result.prescaler;
 %% endif
 
-	if(clk == SpiClock::Disabled) {
-		{{ peripheral }}->CR2 &= ~static_cast<uint32_t>(SpiClock::Enabled);
-	} else {
-		{{ peripheral }}->CR2 |=  static_cast<uint32_t>(SpiClock::Enabled);
-	}
+	// Set parity
+	cr1 &= ~(USART_CR1_PCE | USART_CR1_PS);
+	cr1 |= static_cast<uint32_t>(parity);
 
-	%% if "extended" in driver["type"]
-	if(usartEnabled) {
-		enableOperation();
-	}
-	%% endif
-}
-
-void
-modm::platform::{{ name }}::setSpiDataMode(SpiDataMode mode)
-{
-%% if "extended" in driver["type"]
-	const bool usartEnabled = ({{ peripheral }}->CR1 & USART_CR1_UE);
-	if(usartEnabled) {
-		disableOperation();
-	}
-%% endif
-
-	{{ peripheral }}->CR2 =
-		({{ peripheral }}->CR2 & ~static_cast<uint32_t>(SpiDataMode::Mode3))
-		| static_cast<uint32_t>(mode);
-
-%% if "extended" in driver["type"]
-	if(usartEnabled) {
-		enableOperation();
-	}
-%% endif
-}
-
-void
-modm::platform::{{ name }}::setWordLength(WordLength length)
-{
-%% if "extended" in driver["type"]
-	const bool usartEnabled = ({{ peripheral }}->CR1 & USART_CR1_UE);
-	if(usartEnabled) {
-		disableOperation();
-	}
-%% endif
-
-	{{ peripheral }}->CR1 =
+	// Set word length
 #ifdef USART_CR1_M1
-		({{ peripheral }}->CR1 & ~(USART_CR1_M0 | USART_CR1_M1))
+	cr1	&= ~(USART_CR1_M0 | USART_CR1_M1);
 #else
-		({{ peripheral }}->CR1 & ~USART_CR1_M)
+	cr1	&= ~USART_CR1_M;
 #endif
-		| static_cast<uint32_t>(length);
+	cr1 |= static_cast<uint32_t>(length);
 
-%% if "extended" in driver["type"]
-	if(usartEnabled) {
-		enableOperation();
-	}
-%% endif
+	{{ peripheral }}->CR1 = cr1;
+}
+
+%% if uart_name == "Usart"
+void
+{{ name }}::setSpiClock(SpiClock clk, LastBitClockPulse pulse)
+{
+	uint32_t cr2 = {{ peripheral }}->CR2;
+	cr2 &= ~(USART_CR2_LBCL | USART_CR2_CLKEN);
+	cr2 |= static_cast<uint32_t>(clk) | static_cast<uint32_t>(pulse);
+	{{ peripheral }}->CR2 = cr2;
 }
 
 void
-modm::platform::{{ name }}::setLastBitClockPulse(LastBitClockPulse pulse)
+{{ name }}::setSpiDataMode(SpiDataMode mode)
 {
-%% if "extended" in driver["type"]
-	const bool usartEnabled = ({{ peripheral }}->CR1 & USART_CR1_UE);
-	if(usartEnabled) {
-		disableOperation();
-	}
-%% endif
-
-	if(pulse == LastBitClockPulse::DoNotOutput) {
-		{{ peripheral }}->CR2 &= ~static_cast<uint32_t>(LastBitClockPulse::Output);
-	} else {
-		{{ peripheral }}->CR2 |=  static_cast<uint32_t>(LastBitClockPulse::Output);
-	}
-
-%% if "extended" in driver["type"]
-	if(usartEnabled) {
-		enableOperation();
-	}
-%% endif
+	uint32_t cr2 = {{ peripheral }}->CR2;
+	cr2 &= ~(USART_CR2_CPOL | USART_CR2_CPHA);
+	cr2 |= static_cast<uint32_t>(mode);
+	{{ peripheral }}->CR2 = cr2;
 }
 %% endif
 
 void
-modm::platform::{{ name }}::write(uint8_t data)
+{{ name }}::write(uint16_t data)
 {
-%% if "extended" in driver["type"]
+%% if extended_driver
 	{{ peripheral }}->TDR = data;
 %% else
 	{{ peripheral }}->DR = data;
@@ -236,9 +133,9 @@ modm::platform::{{ name }}::write(uint8_t data)
 }
 
 void
-modm::platform::{{ name }}::read(uint8_t &data)
+{{ name }}::read(uint8_t &data)
 {
-%% if "extended" in driver["type"]
+%% if extended_driver
 	data = {{ peripheral }}->RDR;
 %% else
 	data = {{ peripheral }}->DR;
@@ -246,7 +143,17 @@ modm::platform::{{ name }}::read(uint8_t &data)
 }
 
 void
-modm::platform::{{ name }}::setTransmitterEnable(const bool enable)
+{{ name }}::read(uint16_t &data)
+{
+%% if extended_driver
+	data = {{ peripheral }}->RDR;
+%% else
+	data = {{ peripheral }}->DR;
+%% endif
+}
+
+void
+{{ name }}::setTransmitterEnable(bool enable)
 {
 	if (enable) {
 		{{ peripheral }}->CR1 |=  USART_CR1_TE;
@@ -256,7 +163,7 @@ modm::platform::{{ name }}::setTransmitterEnable(const bool enable)
 }
 
 void
-modm::platform::{{ name }}::setReceiverEnable(bool enable)
+{{ name }}::setReceiverEnable(bool enable)
 {
 	if (enable) {
 		{{ peripheral }}->CR1 |=  USART_CR1_RE;
@@ -265,22 +172,10 @@ modm::platform::{{ name }}::setReceiverEnable(bool enable)
 	}
 }
 
-void
-modm::platform::{{ name }}::enableOperation()
-{
-	{{ peripheral }}->CR1 |= USART_CR1_UE;
-}
-
-void
-modm::platform::{{ name }}::disableOperation()
-{
-	{{ peripheral }}->CR1 &= ~USART_CR1_UE;
-}
-
 bool
-modm::platform::{{ name }}::isReceiveRegisterNotEmpty()
+{{ name }}::isReceiveRegisterNotEmpty()
 {
-%% if "extended" in driver["type"]
+%% if extended_driver
 	return {{ peripheral }}->ISR & USART_ISR_RXNE;
 %% else
 	return {{ peripheral }}->SR & USART_SR_RXNE;
@@ -288,9 +183,9 @@ modm::platform::{{ name }}::isReceiveRegisterNotEmpty()
 }
 
 bool
-modm::platform::{{ name }}::isTransmitRegisterEmpty()
+{{ name }}::isTransmitRegisterEmpty()
 {
-%% if "extended" in driver["type"]
+%% if extended_driver
 	return {{ peripheral }}->ISR & USART_ISR_TXE;
 %% else
 	return {{ peripheral }}->SR & USART_SR_TXE;
@@ -298,7 +193,7 @@ modm::platform::{{ name }}::isTransmitRegisterEmpty()
 }
 
 void
-modm::platform::{{ name }}::enableInterruptVector(bool enable, uint32_t priority)
+{{ name }}::enableInterruptVector(bool enable, uint32_t priority)
 {
 %% if id in shared_irq_ids
 	%% set irq = shared_irq
@@ -318,21 +213,27 @@ modm::platform::{{ name }}::enableInterruptVector(bool enable, uint32_t priority
 }
 
 void
-modm::platform::{{ name }}::enableInterrupt(Interrupt_t interrupt)
+{{ name }}::setInterruptPriority(uint32_t priority)
+{
+	NVIC_SetPriority({{ irq }}_IRQn, priority);
+}
+
+void
+{{ name }}::enableInterrupt(Interrupt_t interrupt)
 {
 	{{ peripheral }}->CR1 |= interrupt.value;
 }
 
 void
-modm::platform::{{ name }}::disableInterrupt(Interrupt_t interrupt)
+{{ name }}::disableInterrupt(Interrupt_t interrupt)
 {
 	{{ peripheral }}->CR1 &= ~interrupt.value;
 }
 
-modm::platform::{{ name }}::InterruptFlag_t
-modm::platform::{{ name }}::getInterruptFlags()
+{{ name }}::InterruptFlag_t
+{{ name }}::getInterruptFlags()
 {
-%% if "extended" in driver["type"]
+%% if extended_driver
 	return InterruptFlag_t( {{ peripheral }}->ISR );
 %% else
 	return InterruptFlag_t( {{ peripheral }}->SR );
@@ -340,44 +241,19 @@ modm::platform::{{ name }}::getInterruptFlags()
 }
 
 void
-modm::platform::{{ name }}::acknowledgeInterruptFlags(InterruptFlag_t flags)
+{{ name }}::acknowledgeInterruptFlags(InterruptFlag_t flags)
 {
-%% if "extended" in driver["type"]
-	// Not all flags can be cleared by writing to this reg
-#ifdef USART_ICR_NECF
-#define USART_ICR_NCF USART_ICR_NECF
-#endif
-	%% if target["family"] == "f0" and target["name"] in ["30", "70"]
-	const uint32_t mask = USART_ICR_PECF  | USART_ICR_FECF   |
-		USART_ICR_NCF   | USART_ICR_ORECF | USART_ICR_IDLECF |
-		USART_ICR_TCCF  | USART_ICR_CTSCF  |
-		USART_ICR_RTOCF | USART_ICR_CMCF;
-	%% else
-	const uint32_t mask = USART_ICR_PECF  | USART_ICR_FECF   |
-		USART_ICR_NCF   | USART_ICR_ORECF | USART_ICR_IDLECF |
-		USART_ICR_TCCF  | USART_ICR_CTSCF | USART_ICR_RTOCF  |
-		USART_ICR_CMCF
-#ifdef USART_ICR_LBDCF // F0x0 do not have LIN mode!
-		| USART_ICR_LBDCF
-#endif
-#ifdef USART_ICR_EOBCF // F0x0 do not have Smartcard mode!
-		| USART_ICR_EOBCF
-#endif
-#ifdef USART_ICR_WUCF
-		| USART_ICR_WUCF
-#endif
-		;
-	%% endif
+%% if extended_driver
 	// Flags are cleared by writing a one to the flag position.
 	// Writing a zero is (hopefully) ignored.
-	{{ peripheral }}->ICR = (flags.value & mask);
+	{{ peripheral }}->ICR = flags.value;
 %% else
 	/* Interrupts must be cleared manually by accessing SR and DR.
 	 * Overrun Interrupt, Noise flag detected, Framing Error, Parity Error
 	 * p779: "It is cleared by a software sequence (an read to the
 	 * USART_SR register followed by a read to the USART_DR register"
 	 */
-	if (flags & InterruptFlag::OverrunError) {
+	if (flags.value & 0xful) {
 		uint32_t tmp;
 		tmp = {{ peripheral }}->SR;
 		tmp = {{ peripheral }}->DR;
@@ -386,3 +262,5 @@ modm::platform::{{ name }}::acknowledgeInterruptFlags(InterruptFlag_t flags)
 	(void) flags;	// avoid compiler warning
 %% endif
 }
+
+} // namespace modm::platform

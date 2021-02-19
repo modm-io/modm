@@ -72,30 +72,13 @@ public:
 	static void
 	initialize()
 	{
-%% if target["family"] != "f1"
-		constexpr UartBase::OversamplingMode oversample =
-				UartBaudrate::getOversamplingMode(SystemClock::Usart{{ id }}, baudrate);
-%% endif
-		UsartHal{{ id }}::initializeWithBrr(
-				UartBaudrate::getBrr<SystemClock::Usart{{ id }}, baudrate, tolerance>(),
-%% if target["family"] == "f1"
-				UsartHal{{ id }}::Parity::Disabled);
-%% else
-				UsartHal{{ id }}::Parity::Disabled,
-				oversample);
-%% endif
-
-%% if extended
-		UsartHal{{ id }}::disableOperation();
-%% endif
-		UsartHal{{ id }}::setLastBitClockPulse(UsartHal{{ id }}::LastBitClockPulse::Output);
-		UsartHal{{ id }}::setSpiClock(UsartHal{{ id }}::SpiClock::Enabled);
-%% if extended
-		UsartHal{{ id }}::enableOperation();
-%% endif
-
+		UsartHal{{ id }}::initialize<SystemClock, baudrate, tolerance>(
+				UsartHal{{ id }}::Parity::Disabled, UsartHal{{ id }}::WordLength::Bit8);
+		UsartHal{{ id }}::setSpiClock(UsartHal{{ id }}::SpiClock::Enabled,
+		                              UsartHal{{ id }}::LastBitClockPulse::Output);
 		UsartHal{{ id }}::setTransmitterEnable(true);
 		UsartHal{{ id }}::setReceiverEnable(true);
+		UsartHal{{ id }}::enableOperation();
 		dataOrder = DataOrder::MsbFirst;
 		state = 0;
 	}
@@ -104,7 +87,9 @@ public:
 	static void
 	setDataMode(DataMode mode)
 	{
+		if constexpr (UsartHal{{ id }}::isExtended) UsartHal{{ id }}::disableOperation();
 		UsartHal{{ id }}::setSpiDataMode(static_cast<UartBase::SpiDataMode>(mode));
+		if constexpr (UsartHal{{ id }}::isExtended) UsartHal{{ id }}::enableOperation();
 	}
 
 	/// @warning 	On this target, only `DataOrder::LsbFirst` is natively

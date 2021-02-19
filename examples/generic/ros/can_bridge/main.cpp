@@ -95,7 +95,7 @@ main()
 
 	// Reinit onboard UART to 1 Mbps
 	// Do not use it for logging because this will destroy ROS serial messages.
-	RosSerialUart::initialize<Board::SystemClock, 250_kBd>(12);
+	RosSerialUart::initialize<Board::SystemClock, 250_kBd>();
 
 	CanFilter::setStartFilterBankForCan2(14);
 

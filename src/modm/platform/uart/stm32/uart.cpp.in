@@ -33,15 +33,6 @@ namespace
 }
 %% endif
 
-%% if options["buffered"]
-void
-modm::platform::{{ name }}::initializeBuffered(uint32_t interruptPriority)
-{
-	{{ hal }}::enableInterruptVector(true, interruptPriority);
-	{{ hal }}::enableInterrupt(Interrupt::RxNotEmpty);
-}
-%% endif
-
 void
 modm::platform::{{ name }}::writeBlocking(uint8_t data)
 {

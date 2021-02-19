@@ -145,7 +145,7 @@ main()
 	Board::initialize();
 
 	Usart2::connect<GpioOutputA2::Tx>();
-	Usart2::initialize<Board::SystemClock, 115200_Bd>(10);
+	Usart2::initialize<Board::SystemClock, 115200_Bd>();
 
 	// Connect the GPIOs to the SPIs alternate function
 	SpiMaster::connect<Sck::Sck, Mosi::Mosi, Miso::Miso>();

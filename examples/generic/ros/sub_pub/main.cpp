@@ -74,7 +74,7 @@ main()
 
 	// Reinit onboard UART to 1 Mbps
 	// Do not use it for logging because this will destroy ROS serial messages.
-	Board::stlink::Uart::initialize<Board::SystemClock, 1_MBd>(12);
+	Board::stlink::Uart::initialize<Board::SystemClock, 1_MBd>();
 
 	Board::LedGreen::set();
 

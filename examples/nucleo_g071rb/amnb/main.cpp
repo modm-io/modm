@@ -69,7 +69,7 @@ main()
 	LedD13::setOutput();
 
 	Usart1::connect<PinNode1::Tx>();
-	Usart1::initialize<SystemClock, 115200>();
+	Usart1::initialize<SystemClock, 115200>(Usart1::Parity::Even, Usart1::WordLength::Bit9);
 	// Use Single-Wire Half-Duplex Mode
 	PinNode1::configure(Gpio::OutputType::OpenDrain);
 	PinNode1::configure(Gpio::InputType::PullUp);
@@ -78,7 +78,7 @@ main()
 	USART1->CR1 |= USART_CR1_UE;
 
 	Usart3::connect<PinNode2::Tx>();
-	Usart3::initialize<SystemClock, 115200>();
+	Usart3::initialize<SystemClock, 115200>(Usart1::Parity::Even, Usart1::WordLength::Bit9);
 	// Use Single-Wire Half-Duplex Mode
 	PinNode2::configure(Gpio::OutputType::OpenDrain);
 	PinNode2::configure(Gpio::InputType::PullUp);
@@ -87,7 +87,7 @@ main()
 	USART3->CR1 |= USART_CR1_UE;
 
 	Usart4::connect<PinNode3::Tx>();
-	Usart4::initialize<SystemClock, 115200>();
+	Usart4::initialize<SystemClock, 115200>(Usart1::Parity::Even, Usart1::WordLength::Bit9);
 	// Use Single-Wire Half-Duplex Mode
 	PinNode3::configure(Gpio::OutputType::OpenDrain);
 	PinNode3::configure(Gpio::InputType::PullUp);

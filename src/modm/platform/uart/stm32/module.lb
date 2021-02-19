@@ -86,7 +86,7 @@ def prepare(module, options):
     global props
     drivers = (device.get_all_drivers("uart") + device.get_all_drivers("usart"))
     props["extended_driver"] = ("extended" in drivers[0]["type"])
-    props["over8_sampling"] = ("feature" in drivers[0]) and ("over8" in drivers[0]["feature"])
+    props["over8"] = ("feature" in drivers[0]) and ("over8" in drivers[0]["feature"])
     props["tcbgt"] = ("feature" in drivers[0]) and ("tcbgt" in drivers[0]["feature"])
     props["instances"] = []
 
@@ -114,6 +114,5 @@ def build(env):
     env.substitutions = props
     env.outbasepath = "modm/src/modm/platform/uart"
     env.template("uart_base.hpp.in")
-    env.template("uart_baudrate.hpp.in")
     if any(i in props["shared_irq_ids"] for i in props["instances"]):
         env.template("uart_shared.cpp.in")

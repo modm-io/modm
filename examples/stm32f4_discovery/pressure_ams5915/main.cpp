@@ -100,7 +100,7 @@ main()
 	Board::initialize();
 
 	Usart2::connect<GpioOutputA2::Tx>();
-	Usart2::initialize<Board::SystemClock, 115200_Bd>(10);
+	Usart2::initialize<Board::SystemClock, 115200_Bd>();
 
 	MyI2cMaster::connect<GpioB10::Scl, GpioB11::Sda>();
 	MyI2cMaster::initialize<Board::SystemClock, 400_kHz>();

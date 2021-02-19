@@ -12,10 +12,12 @@
 
 def get_properties(env):
     device = env[":target"]
-    driver = device.get_driver("usart:stm32")
-    properties = device.properties
-    properties["target"] = device.identifier
-    properties["driver"] = driver
+    driver = device.get_driver("usart:stm32*")
+    properties = {
+        "target": device.identifier,
+        "driver": driver,
+        "over8_sampling": ("feature" in driver) and ("over8" in driver["feature"]),
+    }
     return properties
 
 class Instance(Module):

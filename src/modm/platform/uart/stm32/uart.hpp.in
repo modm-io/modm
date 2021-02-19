@@ -23,13 +23,9 @@
 #include <modm/architecture/interface/uart.hpp>
 #include <modm/platform/gpio/connector.hpp>
 #include "uart_base.hpp"
-#include "uart_baudrate.hpp"
 #include "uart_hal_{{ id }}.hpp"
 
-namespace modm
-{
-
-namespace platform
+namespace modm::platform
 {
 
 /**
@@ -41,14 +37,6 @@ namespace platform
  */
 class {{ name }} : public UartBase, public ::modm::Uart
 {
-%% if options["buffered"]
-private:
-	/// Second stage initialize for buffered uart
-	// that need to be implemented in the .cpp
-	static void
-	initializeBuffered(uint32_t interruptPriority);
-%% endif
-
 public:
 	using Hal = {{ hal }};
 	// Expose jinja template parameters to be checked by e.g. drivers or application
@@ -74,27 +62,19 @@ public:
 		Connector::connect();
 	}
 
+	/// @warning Remember to set word length correctly when using the parity bit!
 	template< class SystemClock, baudrate_t baudrate, percent_t tolerance=pct(1) >
-	static void modm_always_inline
-%% if options["buffered"]
-	initialize(uint32_t interruptPriority = 12, Parity parity = Parity::Disabled)
-%% else
-	initialize(Parity parity = Parity::Disabled)
-%% endif
+	static inline void
+	initialize(Parity parity=Parity::Disabled, WordLength length=WordLength::Bit8)
 	{
-		{{ hal }}::initializeWithBrr(
-				UartBaudrate::getBrr<SystemClock::{{ name }}, baudrate, tolerance>(),
-%% if target["family"] == "f1"
-				parity);
-%% else
-				parity,
-				UartBaudrate::getOversamplingMode(SystemClock::{{ name }}, baudrate));
-%% endif
+		{{ hal }}::initialize<SystemClock, baudrate, tolerance>(parity, length);
 %% if options["buffered"]
-		initializeBuffered(interruptPriority);
+		{{ hal }}::enableInterruptVector(true, 12);
+		{{ hal }}::enableInterrupt(Interrupt::RxNotEmpty);
 %% endif
 		{{ hal }}::setTransmitterEnable(true);
 		{{ hal }}::setReceiverEnable(true);
+		{{ hal }}::enableOperation();
 	}
 
 	static void
@@ -145,8 +125,6 @@ public:
 %% endif
 };
 
-}	// namespace platform
-
-}	// namespace modm
+}	// namespace modm::platform
 
 #endif // MODM_STM32_UART_{{ id }}_HPP

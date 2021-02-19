@@ -108,7 +108,7 @@ main()
 
 #ifndef MODM_BOARD_HAS_LOGGER
 	LoggerUsart::connect<LoggerUsartTx::Tx, LoggerUsartRx::Rx>();
-	LoggerUsart::initialize<Board::SystemClock, 115200_Bd>(12);
+	LoggerUsart::initialize<Board::SystemClock, 115200_Bd>();
 #endif
 
 	modm::platform::I2cMaster1::connect<modm::platform::GpioB7::Sda, modm::platform::GpioB6::Scl>();
