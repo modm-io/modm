@@ -26,22 +26,17 @@ class Instance(Module):
         module.depends(":platform:uart")
 
         module.add_option(
-            BooleanOption(
-                name="buffered",
-                description="",
-                default=True))
-        module.add_option(
             NumericOption(
                 name="buffer.tx",
                 description="",
-                minimum=1, maximum=2 ** 16 - 2,
-                default=250))
+                minimum=0, maximum=2 ** 16 - 2,
+                default=0))
         module.add_option(
             NumericOption(
                 name="buffer.rx",
                 description="",
-                minimum=1, maximum=2 ** 16 - 2,
-                default=16))
+                minimum=0, maximum=2 ** 16 - 2,
+                default=0))
 
         return True
 
@@ -52,6 +47,7 @@ class Instance(Module):
         props["driver"] = self.driver
         props["features"] = self.driver["feature"] if "feature" in self.driver else []
         props["uart_name"] = self.driver["name"].capitalize()
+        props["buffered"] = env["buffer.tx"] or env["buffer.rx"]
 
         env.substitutions = props
         env.outbasepath = "modm/src/modm/platform/uart"
@@ -62,6 +58,8 @@ class Instance(Module):
         env.template("uart.cpp.in", "uart_{}.cpp".format(self.instance))
 
         props["instances"].append(self.instance)
+        if props["buffered"]:
+            props["buffered_instances"].append(self.instance)
 
 
 def init(module):
@@ -89,6 +87,7 @@ def prepare(module, options):
     props["over8"] = ("feature" in drivers[0]) and ("over8" in drivers[0]["feature"])
     props["tcbgt"] = ("feature" in drivers[0]) and ("tcbgt" in drivers[0]["feature"])
     props["instances"] = []
+    props["buffered_instances"] = []
 
     for driver in drivers:
         for instance in driver["instance"]:
@@ -114,5 +113,5 @@ def build(env):
     env.substitutions = props
     env.outbasepath = "modm/src/modm/platform/uart"
     env.template("uart_base.hpp.in")
-    if any(i in props["shared_irq_ids"] for i in props["instances"]):
+    if any(i in props["shared_irq_ids"] for i in props["buffered_instances"]):
         env.template("uart_shared.cpp.in")

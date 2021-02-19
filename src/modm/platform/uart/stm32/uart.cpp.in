@@ -22,26 +22,33 @@
 #include "uart_hal_{{ id }}.hpp"
 #include "uart_{{ id }}.hpp"
 
-%% if options["buffered"]
+%% if buffered
 #include <modm/architecture/interface/atomic_lock.hpp>
 #include <modm/architecture/driver/atomic/queue.hpp>
 
 namespace
 {
+%% if options["buffer.rx"]
 	static modm::atomic::Queue<uint8_t, {{ options["buffer.rx"] }}> rxBuffer;
+%% endif
+%% if options["buffer.tx"]
 	static modm::atomic::Queue<uint8_t, {{ options["buffer.tx"] }}> txBuffer;
+%% endif
 }
 %% endif
 
+namespace modm::platform
+{
+
 void
-modm::platform::{{ name }}::writeBlocking(uint8_t data)
+{{ name }}::writeBlocking(uint8_t data)
 {
 	while(!{{ hal }}::isTransmitRegisterEmpty());
 	{{ hal }}::write(data);
 }
 
 void
-modm::platform::{{ name }}::writeBlocking(const uint8_t *data, std::size_t length)
+{{ name }}::writeBlocking(const uint8_t *data, std::size_t length)
 {
 	while (length-- != 0) {
 		writeBlocking(*data++);
@@ -49,9 +56,9 @@ modm::platform::{{ name }}::writeBlocking(const uint8_t *data, std::size_t lengt
 }
 
 void
-modm::platform::{{ name }}::flushWriteBuffer()
+{{ name }}::flushWriteBuffer()
 {
-%% if options["buffered"]
+%% if options["buffer.tx"]
 	while(!isWriteFinished());
 %% else
 	return;
@@ -59,9 +66,9 @@ modm::platform::{{ name }}::flushWriteBuffer()
 }
 
 bool
-modm::platform::{{ name }}::write(uint8_t data)
+{{ name }}::write(uint8_t data)
 {
-%% if options["buffered"]
+%% if options["buffer.tx"]
 	if(txBuffer.isEmpty() && {{ hal }}::isTransmitRegisterEmpty()) {
 		{{ hal }}::write(data);
 	} else {
@@ -84,7 +91,7 @@ modm::platform::{{ name }}::write(uint8_t data)
 }
 
 std::size_t
-modm::platform::{{ name }}::write(const uint8_t *data, std::size_t length)
+{{ name }}::write(const uint8_t *data, std::size_t length)
 {
 	uint32_t i = 0;
 	for (; i < length; ++i)
@@ -97,9 +104,9 @@ modm::platform::{{ name }}::write(const uint8_t *data, std::size_t length)
 }
 
 bool
-modm::platform::{{ name }}::isWriteFinished()
+{{ name }}::isWriteFinished()
 {
-%% if options["buffered"]
+%% if options["buffer.tx"]
 	return txBuffer.isEmpty() && {{ hal }}::isTransmitRegisterEmpty();
 %% else
 	return {{ hal }}::isTransmitRegisterEmpty();
@@ -107,9 +114,9 @@ modm::platform::{{ name }}::isWriteFinished()
 }
 
 std::size_t
-modm::platform::{{ name }}::transmitBufferSize()
+{{ name }}::transmitBufferSize()
 {
-%% if options["buffered"]
+%% if options["buffer.tx"]
 	return txBuffer.getSize();
 %% else
 	return {{ hal }}::isTransmitRegisterEmpty() ? 0 : 1;
@@ -117,9 +124,9 @@ modm::platform::{{ name }}::transmitBufferSize()
 }
 
 std::size_t
-modm::platform::{{ name }}::discardTransmitBuffer()
+{{ name }}::discardTransmitBuffer()
 {
-%% if options["buffered"]
+%% if options["buffer.tx"]
 	std::size_t count = 0;
 	// disable interrupt since buffer will be cleared
 	{{ hal }}::disableInterrupt({{ hal }}::Interrupt::TxEmpty);
@@ -134,9 +141,9 @@ modm::platform::{{ name }}::discardTransmitBuffer()
 }
 
 bool
-modm::platform::{{ name }}::read(uint8_t &data)
+{{ name }}::read(uint8_t &data)
 {
-%% if options["buffered"]
+%% if options["buffer.rx"]
 	if (rxBuffer.isEmpty()) {
 		return false;
 	} else {
@@ -155,9 +162,9 @@ modm::platform::{{ name }}::read(uint8_t &data)
 }
 
 std::size_t
-modm::platform::{{ name }}::read(uint8_t *data, std::size_t length)
+{{ name }}::read(uint8_t *data, std::size_t length)
 {
-%% if options["buffered"]
+%% if options["buffer.rx"]
 	uint32_t i = 0;
 	for (; i < length; ++i)
 	{
@@ -180,9 +187,9 @@ modm::platform::{{ name }}::read(uint8_t *data, std::size_t length)
 }
 
 std::size_t
-modm::platform::{{ name }}::receiveBufferSize()
+{{ name }}::receiveBufferSize()
 {
-%% if options["buffered"]
+%% if options["buffer.rx"]
 	return rxBuffer.getSize();
 %% else
 	return {{ hal }}::isReceiveRegisterNotEmpty() ? 1 : 0;
@@ -190,9 +197,9 @@ modm::platform::{{ name }}::receiveBufferSize()
 }
 
 std::size_t
-modm::platform::{{ name }}::discardReceiveBuffer()
+{{ name }}::discardReceiveBuffer()
 {
-%% if options["buffered"]
+%% if options["buffer.rx"]
 	std::size_t count = 0;
 	while(!rxBuffer.isEmpty()) {
 		++count;
@@ -205,7 +212,7 @@ modm::platform::{{ name }}::discardReceiveBuffer()
 }
 
 bool
-modm::platform::{{ name }}::hasError()
+{{ name }}::hasError()
 {
 	return {{ hal }}::getInterruptFlags().any(
 		{{ hal }}::InterruptFlag::ParityError |
@@ -215,7 +222,7 @@ modm::platform::{{ name }}::hasError()
 		{{ hal }}::InterruptFlag::OverrunError | {{ hal }}::InterruptFlag::FramingError);
 }
 void
-modm::platform::{{ name }}::clearError()
+{{ name }}::clearError()
 {
 	return {{ hal }}::acknowledgeInterruptFlags(
 		{{ hal }}::InterruptFlag::ParityError |
@@ -225,9 +232,9 @@ modm::platform::{{ name }}::clearError()
 		{{ hal }}::InterruptFlag::OverrunError | {{ hal }}::InterruptFlag::FramingError);
 }
 
+}	// namespace modm::platform
 
-%% if options["buffered"]
-%% set hal = "modm::platform::" ~ hal
+%% if buffered
 %% if id in shared_irq_ids
 void
 modm::platform::{{ name }}::irq()
@@ -235,12 +242,16 @@ modm::platform::{{ name }}::irq()
 MODM_ISR({{ name | upper }})
 %% endif
 {
+	using namespace modm::platform;
+%% if options["buffer.rx"]
 	if ({{ hal }}::isReceiveRegisterNotEmpty()) {
 		// TODO: save the errors
 		uint8_t data;
 		{{ hal }}::read(data);
 		rxBuffer.push(data);
 	}
+%% endif
+%% if options["buffer.tx"]
 	if ({{ hal }}::isTransmitRegisterEmpty()) {
 		if (txBuffer.isEmpty()) {
 			// transmission finished, disable TxEmpty interrupt
@@ -251,6 +262,7 @@ MODM_ISR({{ name | upper }})
 			txBuffer.pop();
 		}
 	}
+%% endif
 	{{ hal }}::acknowledgeInterruptFlags({{ hal }}::InterruptFlag::OverrunError);
 }
 %% endif

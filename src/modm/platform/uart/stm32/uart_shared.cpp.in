@@ -10,13 +10,13 @@
 // ----------------------------------------------------------------------------
 
 #include "../device.hpp"
-%% for id in instances if id in shared_irq_ids
+%% for id in buffered_instances if id in shared_irq_ids
 #include "uart_{{ id }}.hpp"
 %% endfor
 
 MODM_ISR({{ shared_irq }})
 {
-%% for id in instances if id in shared_irq_ids
+%% for id in buffered_instances if id in shared_irq_ids
     modm::platform::Usart{{ id }}::irq();
 %% endfor
 }

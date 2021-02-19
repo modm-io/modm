@@ -68,7 +68,7 @@ public:
 	initialize(Parity parity=Parity::Disabled, WordLength length=WordLength::Bit8)
 	{
 		{{ hal }}::initialize<SystemClock, baudrate, tolerance>(parity, length);
-%% if options["buffered"]
+%% if buffered
 		{{ hal }}::enableInterruptVector(true, 12);
 		{{ hal }}::enableInterrupt(Interrupt::RxNotEmpty);
 %% endif

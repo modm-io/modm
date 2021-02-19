@@ -2,10 +2,9 @@
   <extends>modm:nucleo-g071rb</extends>
   <options>
     <option name="modm:build:build.path">../../../build/nucleo_g071rb/amnb</option>
-    <option name="modm:platform:uart:1:buffer.tx">1</option>
     <option name="modm:platform:uart:1:buffer.rx">32</option>
-    <option name="modm:platform:uart:3:buffer.tx">1</option>
-    <option name="modm:platform:uart:3:buffer.rx">32</option>
+    <option name="modm:platform:uart:3:buffer.rx">16</option>
+    <option name="modm:platform:uart:4:buffer.rx">0</option>
     <option name="modm:communication:amnb:with_heap">False</option>
   </options>
   <modules>
