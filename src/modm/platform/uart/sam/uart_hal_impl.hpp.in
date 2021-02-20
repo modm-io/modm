@@ -1,10 +1,4 @@
 /*
- * Copyright (c) 2013-2014, 2016, Kevin Läufer
- * Copyright (c) 2013-2017, Niklas Hauser
- * Copyright (c) 2017, Fabian Greif
- * Copyright (c) 2017, Sascha Schade
- * Copyright (c) 2018, Christopher Durand
- * Copyright (c) 2018, Lucas Mösch
  * Copyright (c) 2020, Erik Henriksson
  *
  * This file is part of the modm project.
@@ -15,13 +9,17 @@
  */
 // ----------------------------------------------------------------------------
 
-%% set name = uart_name ~ "Hal" ~ id
+%% set name = "UartHal" ~ id
 %% set sercom = sercom_name ~ id
 %% set peripheral = sercom | upper
+#include <modm/math/algorithm/prescaler.hpp>
+
+namespace modm::platform
+{
 
 // ----------------------------------------------------------------------------
 void
-modm::platform::{{ name }}::setParity(const Parity parity)
+{{ name }}::setParity(const Parity parity)
 {
 	if (parity != Parity::Disabled) {
 		{{ peripheral }}->USART.CTRLA.bit.FORM = 0x1; // Enable parity.
@@ -32,29 +30,29 @@ modm::platform::{{ name }}::setParity(const Parity parity)
 }
 
 void
-modm::platform::{{ name }}::enable()
+{{ name }}::enable()
 {
 	{{ peripheral }}->USART.CTRLA.bit.ENABLE = true;	// Uart Enable
 	while({{ peripheral }}->USART.SYNCBUSY.bit.ENABLE); // Wait for sync.
 }
 
 void
-modm::platform::{{ name }}::disable()
+{{ name }}::disable()
 {
 	{{ peripheral }}->USART.CTRLA.bit.ENABLE = false;	// Uart Disable
 	while({{ peripheral }}->USART.SYNCBUSY.bit.ENABLE); // Wait for sync.
 }
 
 void
-modm::platform::{{ name }}::reset()
+{{ name }}::reset()
 {
 	{{ peripheral }}->USART.CTRLA.bit.SWRST = true;	// Uart Reset
 	while({{ peripheral }}->USART.SYNCBUSY.bit.SWRST); // Wait for sync.
 }
 
-template<class SystemClock, modm::baudrate_t baudrate>
-void modm_always_inline
-modm::platform::{{ name }}::initialize(Parity parity)
+template<class SystemClock, modm::baudrate_t baudrate, modm::percent_t tolerance>
+void
+{{ name }}::initialize(Parity parity)
 {
 	// Enable peripheral clock in power manager.
 	PM->APBCMASK.bit.{{ peripheral }}_ = true;
@@ -77,65 +75,70 @@ modm::platform::{{ name }}::initialize(Parity parity)
 	setParity(parity);
 	// Set stop bits to 1
 	{{ peripheral }}->USART.CTRLB.bit.SBMODE = 0x0;
-	// fractional baud rate
-	{{ peripheral }}->USART.CTRLA.bit.SAMPR = 0x1;
-	// set baudrate (multiply by 8 to calc fractional part)
-	uint16_t baudTimes8 = (SystemClock::Frequency * 8) / (16 * baudrate);
-	SERCOM0->USART.BAUD.FRAC.BAUD = baudTimes8 / 8;
-	SERCOM0->USART.BAUD.FRAC.FP = baudTimes8 % 8;
-	// uint16_t baud = SystemClock::Frequency / (16 * baudrate);
-	// SERCOM0->USART.BAUD.reg = baud;
+
+	// Oversampling 8x or 16x
+	constexpr uint32_t scalar = (baudrate * 16l > SystemClock::Frequency) ? 8 : 16;
+	{{ peripheral }}->USART.CTRLA.bit.SAMPR = (scalar == 16) ? 0x1 : 0x3;
+	// Prescaler 13 bit integer, 3 bit fractional
+	constexpr auto result = Prescaler::from_range(
+			SystemClock::Frequency/(scalar/8), baudrate, 1, (1ul << 16) - 1ul);
+	assertBaudrateInTolerance< result.frequency, baudrate, tolerance >();
+	{{ peripheral }}->USART.BAUD.FRAC.BAUD = result.prescaler >> 3;
+	{{ peripheral }}->USART.BAUD.FRAC.FP = result.prescaler & 0b111;
+
+	// Enable USART
 	setReceiverEnable(true);
 	setTransmitterEnable(true);
-	// Enable USART
 	enable();
 }
 
 
 void
-modm::platform::{{ name }}::write(uint8_t data)
+{{ name }}::write(uint8_t data)
 {
 	{{ peripheral }}->USART.DATA.reg = data;
 }
 
 void
-modm::platform::{{ name }}::read(uint8_t &data)
+{{ name }}::read(uint8_t &data)
 {
 	data = {{ peripheral }}->USART.DATA.reg;
 }
 
 void
-modm::platform::{{ name }}::setTransmitterEnable(const bool enable)
+{{ name }}::setTransmitterEnable(const bool enable)
 {
 	{{ peripheral }}->USART.CTRLB.bit.TXEN = enable;
 }
 
 void
-modm::platform::{{ name }}::setReceiverEnable(bool enable)
+{{ name }}::setReceiverEnable(bool enable)
 {
 	{{ peripheral }}->USART.CTRLB.bit.RXEN = enable;
 }
 
 void
-modm::platform::{{ name }}::enableOperation()
+{{ name }}::enableOperation()
 {
 	enable();
 }
 
 void
-modm::platform::{{ name }}::disableOperation()
+{{ name }}::disableOperation()
 {
 	disable();
 }
 
 bool
-modm::platform::{{ name }}::isReceiveRegisterNotEmpty()
+{{ name }}::isReceiveRegisterNotEmpty()
 {
 	return {{ peripheral }}->USART.INTFLAG.bit.RXC;
 }
 
 bool
-modm::platform::{{ name }}::isTransmitRegisterEmpty()
+{{ name }}::isTransmitRegisterEmpty()
 {
 	return {{ peripheral }}->USART.INTFLAG.bit.DRE;
 }
+
+}	// namespace modm::platform

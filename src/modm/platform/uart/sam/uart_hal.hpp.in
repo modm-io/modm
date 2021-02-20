@@ -1,7 +1,4 @@
 /*
- * Copyright (c) 2013, Sascha Schade
- * Copyright (c) 2013-2014, 2016, Kevin Läufer
- * Copyright (c) 2013-2017, Niklas Hauser
  * Copyright (c) 2020, Erik Henriksson
  *
  * This file is part of the modm project.
@@ -15,28 +12,24 @@
 #pragma once
 
 #include <stdint.h>
+#include <modm/architecture/interface/peripheral.hpp>
 #include "../device.hpp"
 #include "uart_base.hpp"
 #include "modm/platform/clock/gclk.hpp"
 
-namespace modm
-{
-
-namespace platform
+namespace modm::platform
 {
 
 /**
- * Universal asynchronous receiver transmitter ({{ uart_name ~ "Hal" ~ id }})
- *
- * Not available on the low- and medium density devices.
+ * Universal asynchronous receiver transmitter (UartHal{{ id }})
  *
  * Very basic implementation that exposes more hardware features than
  * the regular Usart classes.
  *
- * @author		Kevin Laeufer
+ * @author		Erik Henriksson
  * @ingroup		modm_platform_uart
  */
-class {{ uart_name ~ "Hal" ~ id }} : public UartBase
+class UartHal{{ id }} : public UartBase, /** @cond */protected modm::PeripheralDriver/** @endcond */
 {
 private:
 	/**
@@ -68,9 +61,9 @@ public:
 	* Enables clocks, the UART peripheral (but neither TX nor RX)
 	* Sets baudrate and parity.
 	*/
-	template< class SystemClock, baudrate_t baudrate >
+	template< class SystemClock, baudrate_t baudrate, percent_t tolerance=pct(1) >
 	static void
-	initialize(	Parity parity = Parity::Disabled);
+	initialize(Parity parity = Parity::Disabled);
 
 	/**
 	 * \brief	Write a single byte to the transmit register
@@ -117,8 +110,6 @@ public:
 	isTransmitRegisterEmpty();
 };
 
-}	// namespace platform
-
-}	// namespace modm
+}	// namespace modm::platform
 
 #include "uart_hal_{{ id }}_impl.hpp"

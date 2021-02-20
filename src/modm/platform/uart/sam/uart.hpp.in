@@ -1,10 +1,4 @@
 /*
- * Copyright (c) 2009-2012, Fabian Greif
- * Copyright (c) 2010, Martin Rosekeit
- * Copyright (c) 2011, Georgi Grinshpun
- * Copyright (c) 2011, 2013-2017, Niklas Hauser
- * Copyright (c) 2012, Sascha Schade
- * Copyright (c) 2013, 2016, Kevin Läufer
  * Copyright (c) 2020, Erik Henriksson
  *
  * This file is part of the modm project.
@@ -15,9 +9,8 @@
  */
 // ----------------------------------------------------------------------------
 
-%% set hal = uart_name ~ "Hal" ~ id
-%% set name = uart_name ~ id
-%% set sercom = sercom_name ~ id
+%% set hal = "UartHal" ~ id
+%% set name = "Uart" ~ id
 
 #pragma once
 
@@ -26,17 +19,13 @@
 #include "uart_hal_{{ id }}.hpp"
 #include <modm/platform/gpio/pin.hpp>
 
-namespace modm
-{
-
-namespace platform
+namespace modm::platform
 {
 
 /**
- * Universal asynchronous receiver transmitter ({{ uart_name | upper ~ id }})
+ * Universal asynchronous receiver transmitter ({{ "Uart" | upper ~ id }})
  *
- * @author		Kevin Laeufer
- * @author		Niklas Hauser
+ * @author		Erik Henriksson
  * @ingroup		modm_platform_uart modm_platform_uart_{{id}}
  */
 class {{ name }} : public UartBase, public ::modm::Uart
@@ -72,7 +61,7 @@ public:
 	static void modm_always_inline
 	initialize(Parity parity = Parity::Disabled)
 	{
-		{{ hal }}::initialize<SystemClock, baudrate>(parity);
+		{{ hal }}::initialize<SystemClock, baudrate, tolerance>(parity);
 		{{ hal }}::setTransmitterEnable(true);
 		{{ hal }}::setReceiverEnable(true);
 	}
@@ -108,6 +97,4 @@ public:
 	discardReceiveBuffer();
 };
 
-}	// namespace platform
-
-}	// namespace modm
+}	// namespace modm::platform
