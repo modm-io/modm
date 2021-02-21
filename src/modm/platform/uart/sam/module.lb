@@ -15,12 +15,11 @@
 props = {}
 
 class Instance(Module):
-    def __init__(self, driver, instance):
-        self.driver = driver
-        self.instance = int(instance)
+    def __init__(self, instance):
+        self.instance = instance
 
     def init(self, module):
-        module.name = str(self.instance)
+        module.name = self.instance.name
         module.description = "Instance {}".format(self.instance)
 
     def prepare(self, module, options):
@@ -29,11 +28,10 @@ class Instance(Module):
     def build(self, env):
         device = env[":target"].identifier
         global props
-        props["id"] = self.instance
-        props["driver"] = self.driver
-        props["features"] = self.driver["feature"] if "feature" in self.driver else []
+        props["id"] = self.instance.number
+        props["driver"] = self.instance.driver
         props["uart_name"] = 'Uart'
-        props["sercom_name"] = self.driver["name"].capitalize()
+        props["sercom_name"] = self.instance.driver.name.capitalize()
 
         env.substitutions = props
         env.outbasepath = "modm/src/modm/platform/uart"
@@ -72,11 +70,10 @@ def prepare(module, options):
     props["tcbgt"] = ("feature" in drivers[0]) and ("tcbgt" in drivers[0]["feature"])
     props["instances"] = []
 
-    for driver in drivers:
-        for instance in driver["instance"]:
-            module.add_submodule(Instance(driver, instance))
-
     props["target"] = device.identifier
+
+    for instance in device.driver("sercom").instances():
+        module.add_submodule(Instance(instance))
     return True
 
 def build(env):

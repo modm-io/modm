@@ -19,36 +19,22 @@ def prepare(module, options):
     if options[":target"].identifier["platform"] != "stm32":
         return False
 
-    core = options[":target"].get_driver("core:cortex-m*")
+    core = options[":target"].driver("core").type
     # Cortex-M0 doesn't have the DWT->CYCCNT and Cortex-M7 support is broken
-    if not core or "m0" in core["type"] or "m7" in core["type"]:
+    if "m0" in core or "m7" in core:
         return False
 
     module.depends(
         ":platform:gpio",
         ":platform:core",
         ":architecture:interrupt")
+
     return True
 
 
 def build(env):
-    exti_vectors = [v["name"] for v in env[":target"].get_driver("core")["vector"] if "EXTI" in v["name"]]
-    # These are all exti possible vectors: 0, 0_1, 1, 15_10, 2, 2_3, 2_TSC, 3, 4, 4_15, 9_5
-    extimap = {
-        "0": [0], "1": [1], "2": [2], "3": [3], "4": [4],
-        "0_1": [0,1],
-        "2_TSC": [2],
-        "2_3": [2,3],
-        "4_15": [4,5,6,7,8,9,10,11,12,13,14,15],
-        "9_5": [5,6,7,8,9],
-        "15_10": [10,11,12,13,14,15],
-    }
-    extis = OrderedDict()
-    for v in sorted(exti_vectors):
-        extis[v] = extimap[v[4:]]
-
     env.substitutions = {
-        "extis": extis,
+        "extis": env[":target"].core.shared_irqs("EXTI"),
         "vectors_location": env.get(":platform:core:vector_table_location", "rom")
     }
     env.outbasepath = "modm/src/modm/driver"

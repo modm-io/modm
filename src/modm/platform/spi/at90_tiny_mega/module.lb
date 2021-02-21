@@ -53,10 +53,10 @@ def prepare(module, options):
     if not device.has_driver("spi:avr"):
         return False
 
-    driver = device.get_driver("spi:avr")
-    if "instance" in driver:
-        for instance in listify(driver["instance"]):
-            module.add_submodule(Instance(int(instance)))
+    instances = device.driver("spi").instances()
+    if instances:
+        for instance in instances:
+            module.add_submodule(Instance(instance.number))
     else:
         load_options(module)
 
@@ -69,11 +69,11 @@ def prepare(module, options):
     return True
 
 def build(env):
-    driver = env[":target"].get_driver("spi")
-    if "instance" not in driver:
+    device = env[":target"]
+    if not device.driver("spi").instances():
         env.substitutions = {
-            "target": env[":target"].identifier,
-            "partname": env[":target"].partname,
+            "target": device.identifier,
+            "partname": device.partname,
             "id": "",
         }
         env.outbasepath = "modm/src/modm/platform/spi"

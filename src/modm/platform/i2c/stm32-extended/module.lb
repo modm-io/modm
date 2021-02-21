@@ -59,8 +59,8 @@ def prepare(module, options):
         ":container",
         ":platform:gpio")
 
-    for instance in listify(device.get_driver("i2c")["instance"]):
-        module.add_submodule(Instance(int(instance)))
+    for instance in device.driver("i2c").instances():
+        module.add_submodule(Instance(instance.number))
 
     return True
 

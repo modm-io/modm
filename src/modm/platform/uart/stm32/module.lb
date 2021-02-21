@@ -14,12 +14,11 @@
 props = {}
 
 class Instance(Module):
-    def __init__(self, driver, instance):
-        self.driver = driver
-        self.instance = int(instance)
+    def __init__(self, instance):
+        self.instance = instance
 
     def init(self, module):
-        module.name = str(self.instance)
+        module.name = self.instance.name
         module.description = "Instance {}".format(self.instance)
 
     def prepare(self, module, options):
@@ -48,10 +47,10 @@ class Instance(Module):
     def build(self, env):
         device = env[":target"].identifier
         global props
-        props["id"] = self.instance
-        props["driver"] = self.driver
-        props["features"] = self.driver["feature"] if "feature" in self.driver else []
-        props["uart_name"] = self.driver["name"].capitalize()
+        props["driver"] = self.instance.driver
+        props["id"] = self.instance.number
+        props["features"] = self.instance.features()
+        props["uart_name"] = self.instance.driver.name.capitalize()
 
         env.substitutions = props
         env.outbasepath = "modm/src/modm/platform/uart"
@@ -61,7 +60,7 @@ class Instance(Module):
         env.template("uart.hpp.in", "uart_{}.hpp".format(self.instance))
         env.template("uart.cpp.in", "uart_{}.cpp".format(self.instance))
 
-        props["instances"].append(self.instance)
+        props["instances"].append(self.instance.number)
 
 
 def init(module):
@@ -84,26 +83,23 @@ def prepare(module, options):
         ":platform:rcc")
 
     global props
-    drivers = (device.get_all_drivers("uart") + device.get_all_drivers("usart"))
-    props["extended_driver"] = ("extended" in drivers[0]["type"])
-    props["over8_sampling"] = ("feature" in drivers[0]) and ("over8" in drivers[0]["feature"])
-    props["tcbgt"] = ("feature" in drivers[0]) and ("tcbgt" in drivers[0]["feature"])
+    drivers = device.drivers("usart", "uart")
+    props["extended_driver"] = ("extended" in drivers[0].type)
+    props["shared_features"] = features = drivers[0].features()
+    props["over8_sampling"] = "over8" in features
+    props["tcbgt"] = "tcbgt" in features
+    props["half_duplex"] = "half-duplex" in features
+    props["7_bit"] = "7-bit" in features
+    props["target"] = device.identifier
     props["instances"] = []
 
+    shared_irqs = device.core.shared_irqs("USART")
+    props["shared_irq"] = next(iter(shared_irqs.keys()), None)
+    props["shared_irq_ids"] = shared_irqs.get(props["shared_irq"], [])
+
     for driver in drivers:
-        for instance in driver["instance"]:
-            module.add_submodule(Instance(driver, instance))
-
-    shared_irqs = [v["name"] for v in device.get_driver("core")["vector"]]
-    shared_irqs = [v for v in shared_irqs if v.startswith("USART") and "_" in v]
-    if len(shared_irqs):
-        props["shared_irq"] = name = shared_irqs[0]
-        parts = name[5:].split("_")
-        props["shared_irq_ids"] = range(int(parts[0]), int(parts[1]) + 1)
-    else:
-        props["shared_irq_ids"] = []
-
-    props["target"] = device.identifier
+        for instance in driver.instances():
+            module.add_submodule(Instance(instance))
 
     return True
 

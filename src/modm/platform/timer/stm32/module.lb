@@ -29,18 +29,18 @@ def get_connectors(instance):
     return []
 
 class Instance(Module):
-    def __init__(self, driver, instance):
-        self.driver = driver
-        self.instance = int(instance)
+    def __init__(self, device, instance):
+        self.device = device
+        self.instance = instance
         self.vectors = None
         self.type = "general_purpose"
-        if self.instance in [1, 8, 20]:
+        if self.instance.number in [1, 8, 20]:
             self.type = "advanced"
-        elif self.instance in [6, 7, 18]:
+        elif self.instance.number in [6, 7, 18]:
             self.type = "basic"
 
     def init(self, module):
-        module.name = str(self.instance)
+        module.name = self.instance.name
         module.description = "Instance {}".format(self.instance)
 
     def prepare(self, module, options):
@@ -55,7 +55,8 @@ class Instance(Module):
             "_CC": ["CaptureCompare1", "CaptureCompare2",
                      "CaptureCompare3", "CaptureCompare4"],
         }
-        self.vectors = {irq:[] for irq in props["timer_vectors"][self.instance]}
+        vectors = list(self.device.core.vectors(lambda v: "TIM"+self.instance.name in v.split("_")))
+        self.vectors = {irq:[] for irq in vectors}
         for irq in self.vectors.keys():
             for part, flags in vecmap.items():
                 if part in irq:
@@ -63,7 +64,7 @@ class Instance(Module):
 
         if len(self.vectors) == 0:
             raise ValidateException("No interrupts found for Timer{}! Possible IRQs are {}"
-                                    .format(self.instance, props["timer_vectors"]))
+                                    .format(self.instance, list(self.device.core.vectors(lambda v: "TIM" in v))))
         if self.type != "advanced":
             if len(self.vectors) != 1:
                 raise ValidateException("Timer{} is only allowed to have one IRQ! Found {}"
@@ -72,15 +73,15 @@ class Instance(Module):
 
     def build(self, env):
         global props
-        props["id"] = self.instance
-        props["connectors"] = get_connectors(self.instance)
+        props["id"] = self.instance.number
+        props["connectors"] = get_connectors(self.instance.number)
         props["vectors"] = self.vectors
         props["types"].add(self.type)
 
         env.substitutions = props
         env.outbasepath = "modm/src/modm/platform/timer"
-        env.template("{}.hpp.in".format(self.type), "timer_{}.hpp".format(self.instance))
-        env.template("{}.cpp.in".format(self.type), "timer_{}.cpp".format(self.instance))
+        env.template("{}.hpp.in".format(self.type), "timer_{}.hpp".format(self.instance.name))
+        env.template("{}.cpp.in".format(self.type), "timer_{}.cpp".format(self.instance.name))
 
 
 def init(module):
@@ -98,26 +99,17 @@ def prepare(module, options):
         ":platform:gpio",
         ":platform:rcc")
 
-    timers = device.get_all_drivers("tim")
+    timers = device.drivers("tim")
     instances = []
     for driver in timers:
-        for instance in driver["instance"]:
-            module.add_submodule(Instance(driver, instance))
-            instances.append(int(instance))
+        for instance in driver.instances():
+            module.add_submodule(Instance(device, instance))
+            instances.append(instance.number)
 
     global props
     device = options[":target"]
     props["target"] = device.identifier
     props["types"] = set()
-
-    props["timer_vectors"] = tim_vectors = defaultdict(list)
-    vectors = [v["name"] for v in device.get_driver("core")["vector"] if "TIM" in v["name"]]
-    for instance in instances:
-        timstr = "TIM{}".format(instance)
-        for vector in vectors:
-            if (vector == timstr or ("_"+timstr+"_") in vector or
-                vector.startswith(timstr+"_") or vector.endswith("_"+timstr)):
-                tim_vectors[instance].append(vector)
 
     return True
 

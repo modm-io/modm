@@ -188,11 +188,12 @@ main()
 	Leds::setOutput();
 	MODM_LOG_INFO << "\n\nReboot: Ethernet Example" << modm::endl;
 
-	Ethernet::Port::connect<Ethernet::RMII_Ref_Clk::Refclk,
+	Ethernet::Port::connect<
+		Ethernet::RMII_Ref_Clk::RefClk,
 		Ethernet::RMII_Mdc::Mdc,
 		Ethernet::RMII_Mdio::Mdio,
-		Ethernet::RMII_Crs_Dv::Rcccrsdv,
-		Ethernet::RMII_Tx_En::Txen,
+		Ethernet::RMII_Crs_Dv::RccCrsDv,
+		Ethernet::RMII_Tx_En::TxEn,
 		Ethernet::RMII_Tx_D0::Txd0,
 		Ethernet::RMII_Tx_D1::Txd1,
 		Ethernet::RMII_Rx_D0::Rxd0,

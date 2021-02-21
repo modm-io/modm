@@ -74,10 +74,10 @@ def prepare(module, options):
         ":math:algorithm",
         ":platform:gpio")
 
-    driver = device.get_driver("usart:avr")
-    if "instance" in driver:
-        for instance in listify(driver["instance"]):
-            module.add_submodule(Instance(int(instance)))
+    instances = device.driver("usart").instances()
+    if instances:
+        for instance in instances:
+            module.add_submodule(Instance(instance.number))
     else:
         load_options(module)
 
@@ -87,8 +87,7 @@ def build(env):
     env.outbasepath = "modm/src/modm/platform/uart"
     env.template("uart_defines.h")
 
-    driver = env[":target"].get_driver("usart:avr")
-    if "instance" not in driver:
+    if not env[":target"].driver("usart").instances():
         env.substitutions = {"id": ""}
         env.template("uart.hpp.in")
         env.template("uart_tx.cpp.in")

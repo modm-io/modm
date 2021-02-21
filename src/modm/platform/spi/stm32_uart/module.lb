@@ -50,9 +50,9 @@ def prepare(module, options):
         ":platform:gpio",
         ":platform:uart")
 
-    for driver in device.get_all_drivers("usart"):
-        for instance in listify(driver["instance"]):
-            module.add_submodule(Instance(int(instance), "extended" in driver["type"]))
+    for driver in device.drivers("usart"):
+        for instance in driver.instances():
+            module.add_submodule(Instance(instance.number, "extended" in driver.type))
 
     return True
 

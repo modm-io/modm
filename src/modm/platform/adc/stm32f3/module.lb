@@ -145,8 +145,8 @@ def prepare(module, options):
         ":platform:gpio",
         ":platform:rcc")
 
-    for instance in listify(device.get_driver("adc")["instance"]):
-        module.add_submodule(Instance(int(instance)))
+    for instance in device.driver("adc").instances():
+        module.add_submodule(Instance(instance.number))
 
     return True
 

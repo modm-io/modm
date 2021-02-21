@@ -21,7 +21,7 @@ def get_properties(env):
 
 class Instance(Module):
     def __init__(self, driver, instance):
-        self.instance = int(instance)
+        self.instance = instance
         self.driver = driver
 
     def init(self, module):
@@ -65,9 +65,9 @@ def prepare(module, options):
         ":platform:gpio",
         ":platform:rcc")
 
-    for driver in device.get_all_drivers("spi:stm32"):
-        for instance in driver["instance"]:
-            module.add_submodule(Instance(driver, instance))
+    for driver in device.drivers("spi:stm32"):
+        for instance in driver.instances():
+            module.add_submodule(Instance(driver, instance.number))
 
     return True
 

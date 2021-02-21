@@ -26,7 +26,7 @@ struct Gpio
 	enum class
 	InputType
 	{
-%% if target["family"] in ["f1"]
+%% if target.family in ["f1"]
 		Floating = 0x4,	///< floating on input
 		PullUp = 0x9,	///< pull-up on input
 		PullDown = 0x8,	///< pull-down on input
@@ -41,7 +41,7 @@ struct Gpio
 	OutputType
 	{
 		PushPull = 0x0,		///< push-pull on output
-%% if target["family"] in ["f1"]
+%% if target.family in ["f1"]
 		OpenDrain = 0x4,	///< open-drain on output
 %% else
 		OpenDrain = 0x1,	///< open-drain on output
@@ -51,14 +51,14 @@ struct Gpio
 	enum class
 	OutputSpeed
 	{
-%% if target["family"] in ["f1"]
+%% if target.family in ["f1"]
 		Low    = 0x2,
 		Medium = 0x1,
 		High   = 0x3,
 		MHz2   = Low,
 		MHz10  = Medium,
 		MHz50  = High,
-%% elif target["family"] in ["f0", "f3"]
+%% elif target.family in ["f0", "f3"]
 		Low    = 0,
 		Medium = 0x1,
 		High   = 0x3,
@@ -99,15 +99,15 @@ struct Gpio
 	Signal
 	{
 		BitBang,
-%% for signal in all_signals
-		{{ signal }},
+%% for signal in signal_names
+		{{ signal | modm.fmt }},
 %% endfor
 	};
 	/// @endcond
 
 protected:
 	/// @cond
-%% if target["family"] not in ["f1"]
+%% if target.family not in ["f1"]
 	/// I/O Direction Mode values for this specific pin.
 	enum class
 	Mode

@@ -9,9 +9,8 @@
  */
 // ----------------------------------------------------------------------------
 
-%% set port = gpio["port"] | upper
 %% set reg  = "GPIO" ~ port
-%% set pin  = gpio["pin"]
+%% set cr = "CRL" if pin < 8 else "CRH"
 
 #ifndef MODM_STM32_GPIO_PIN_{{ port ~ pin }}_HPP
 #define MODM_STM32_GPIO_PIN_{{ port ~ pin }}_HPP
@@ -47,29 +46,36 @@ public:
 	static constexpr bool isInverted = false;
 	static constexpr Port port = Port::{{port}}; ///< Port name
 	static constexpr uint8_t pin = {{pin}}; ///< Pin number
-	static constexpr IRQn_Type ExternalInterruptIRQ = EXTI{{ exti_irqn }}_IRQn;
+	static constexpr IRQn_Type ExternalInterruptIRQ = {{ exti_irqn }}_IRQn;
 
 protected:
-	/// Bitmask for registers that contain a 1bit value for every pin.
-	static constexpr uint16_t mask  = 0x1 << pin;
-	/// Bitmask for registers that contain a 2bit value for every pin.
-	static constexpr uint32_t mask2 = 0x3 << (pin * 2);
 	/// Port Number.
 	static constexpr uint8_t port_nr = uint8_t(port);
+	/// Bitmask for registers that contain a 1bit value for every pin.
+	static constexpr uint16_t mask  = 0x1 << pin;
+%% if target.family in ["f1"]
+	static constexpr uint8_t cr_pin = pin % 8;
+	/// Bitmask for the configuration register with a 4bit mask.
+	static constexpr uint32_t mask4 = 0xf << (cr_pin * 4);
+%% else
+	/// Bitmask for registers that contain a 2bit value for every pin.
+	static constexpr uint32_t mask2 = 0x3 << (pin * 2);
 	/// Alternate Function register id. 0 for pin 0-7. 1 for pin 8-15.
 	static constexpr uint8_t af_id  = pin / 8;
 	/// Alternate Function offset.
 	static constexpr uint8_t af_offset = (pin * 4) % 32;
 	/// Alternate Function register mask.
 	static constexpr uint32_t af_mask  = 0xf << af_offset;
+%% endif
 
 public:
 	/// @cond
+%% if target.family not in ["f1"]
 	inline static void setAlternateFunction(uint8_t af) {
 		{{reg}}->AFR[af_id] = ({{reg}}->AFR[af_id] & ~af_mask) | ((af & 0xf) << af_offset);
 		{{reg}}->MODER = ({{reg}}->MODER & ~mask2) | (i(Mode::AlternateFunction) << (pin * 2));
 	}
-
+%% endif
 	/// Enable Analog Mode which is needed to use this pin as an ADC input.
 	inline static void setAnalogInput() { PinSet::setAnalogInput(); }
 	/// @endcond
@@ -124,7 +130,9 @@ public:
 		constexpr uint8_t bit_pos = (pin & 0b0011) << 2;
 		constexpr uint16_t syscfg_mask = (0b1111) << bit_pos;
 		constexpr uint16_t syscfg_value = (port_nr & (0b1111)) << bit_pos;
-%% if target.family in ["g0"]
+%% if target.family in ["f1"]
+		AFIO->EXTICR[index] = (AFIO->EXTICR[index] & ~syscfg_mask) | syscfg_value;
+%% elif target.family in ["g0"]
 		EXTI->EXTICR[index] = (EXTI->EXTICR[index] & ~syscfg_mask) | syscfg_value;
 %% else
 		SYSCFG->EXTICR[index] = (SYSCFG->EXTICR[index] & ~syscfg_mask) | syscfg_value;
@@ -168,6 +176,14 @@ public:
 	// GpioIO
 	// start documentation inherited
 	inline static Direction getDirection() {
+%% if target.family in ["f1"]
+		uint32_t mode = ({{reg}}->{{cr}} & mask4);
+		if ((mode == 0) or (mode > (uint32_t(0b1001) << (cr_pin * 4))))
+			return Direction::Special;
+		if (mode > 0)
+			return Direction::Out;
+		return Direction::In;
+%% else
 		uint32_t mode = ({{reg}}->MODER & mask2);
 		if (mode == (i(Mode::Input) << pin * 2)) {
 			return Direction::In;
@@ -176,16 +192,18 @@ public:
 			return Direction::Out;
 		}
 		return Direction::Special;
+%% endif
 	}
 	// end documentation inherited
 	inline static void lock() { PinSet::lock(); }
 	inline static void disconnect() {
 		setInput(InputType::Floating);
+%% if target.family not in ["f1"]
 		{{reg}}->AFR[af_id] &= ~af_mask;
-	%% if target["family"] in ["l4"] and target["name"] in ["71", "75", "76", "85", "86"]
+	%% if target.family in ["l4"] and target.name in ["71", "75", "76", "85", "86"]
 		{{reg}}->ASCR &= ~mask;
 	%% endif
-
+%% endif
 	}
 
 public:
@@ -193,9 +211,9 @@ public:
 	/// @{
 	/// Connect to any software peripheral
 	using BitBang = GpioSignal;
-	%% for name, group in signals.items()
-	/// Connect to {% for sig in group %}{{ sig.driver }}{{ "" if loop.last else " or "}}{% endfor %}
-	using {{ name }} = GpioSignal;
+	%% for sname, sgroup in signals.items() | sort
+	/// Connect to {% for sig in sgroup %}{{ sig | modm.fmt.driver }}{{ "" if loop.last else " or "}}{% endfor %}
+	using {{ sname | modm.fmt }} = GpioSignal;
 	%% endfor
 	/// @}
 #endif
@@ -206,14 +224,14 @@ public:
 			(peripheral == Peripheral::BitBang),
 			"Gpio{{ port ~ pin }}::BitBang only connects to software drivers!");
 	};
-	%% for signal_name, signal_group in signals.items()
+	%% for sname, sgroup in signals.items() | sort
 	template< Peripheral peripheral >
-	struct {{ signal_name }} { static void connect();
+	struct {{ sname | modm.fmt }} { static void connect();
 		static_assert(
-		%% for signal in signal_group
-			(peripheral == Peripheral::{{ signal.driver }}){% if loop.last %},{% else %} ||{% endif %}
+		%% for signal in sgroup
+			(peripheral == Peripheral::{{ signal | modm.fmt.driver }}){% if loop.last %},{% else %} or{% endif %}
 		%% endfor
-			"Gpio{{ port ~ pin }}::{{ signal_name }} only connects to {% for signal in signal_group %}{{signal.driver}}{% if not loop.last %} or {% endif %}{% endfor %}!");
+			"Gpio{{ port ~ pin }}::{{ sname | modm.fmt }} only connects to {% for signal in sgroup %}{{signal | modm.fmt.driver}}{% if not loop.last %} or {% endif %}{% endfor %}!");
 	};
 	%% endfor
 	/// @endcond
@@ -233,30 +251,45 @@ struct Gpio{{ port ~ pin }}::BitBang<Peripheral::BitBang>
 	static constexpr int af = -1;
 	inline static void connect() {}
 };
-%% for signal_group in signals.values()
-	%% for signal in signal_group
+%% for sname, sgroup in signals.items() | sort
+	%% for signal in sgroup
 template<>
-struct Gpio{{ port ~ pin }}::{{ signal.name }}<Peripheral::{{ signal.driver }}>
+struct Gpio{{ port ~ pin }}::{{ sname | modm.fmt }}<Peripheral::{{ signal | modm.fmt.driver }}>
 {
 	using Gpio = Gpio{{ port ~ pin }};
-	static constexpr Gpio::Signal Signal = Gpio::Signal::{{ signal.name }};
-	static constexpr int af = {{ signal.af[0] if signal.af | length else -1 }};
+	static constexpr Gpio::Signal Signal = Gpio::Signal::{{ sname | modm.fmt }};
+		%% if "group" in signal
+	static constexpr uint32_t Groups = {% for gid in signal.group %}(1ul << {{ gid }}){% if not loop.last %} | {% endif %}{% endfor %};
+		%% else
+	static constexpr uint32_t Groups{-1ul};
+		%% endif
+	static constexpr int af = {{ signal.af if "af" in signal else -1 }};
 	inline static void
 	connect()
 	{
-		%% if signal.af | length
-		setAlternateFunction({{ signal.af[0] }});
-		%% elif ( signal.driver.startswith("Adc") or signal.driver.startswith("Dac")
-			or signal.driver.startswith("Comp") )
+		%% if target.family in ["f1"]
+			%% if signal.is_analog
+		setAnalogInput();
+			%% else
+		uint32_t cr = {{reg}}->{{cr}};
+		if (cr & (0b0011UL << (cr_pin * 4))) {
+			{{reg}}->{{cr}} = cr | (0b1000UL << (cr_pin * 4));
+		}
+			%% endif
+		%% else
+			%% if "af" in signal
+		setAlternateFunction({{ signal.af }});
+			%% elif signal.is_analog
 		disconnect();
 		setAnalogInput();
+			%% endif
 		%% endif
 	}
 };
-		%% if signal.driver.startswith("Adc") and signal.name.startswith("In")
+		%% if "analog_channel" in signal
 template<>
 constexpr int8_t
-Gpio{{ port ~ pin }}::AdcChannel<Peripheral::{{ signal.driver }}> = {{ signal.name | to_adc_channel }};
+Gpio{{ port ~ pin }}::AdcChannel<Peripheral::{{ signal | modm.fmt.driver }}> = {{ signal.analog_channel }};
 		%% endif
 
 		%% if signal.driver.startswith("Dac") and signal.name.startswith("Out")

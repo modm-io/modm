@@ -219,12 +219,12 @@ initializeUsbHs()
 {
 	usb_hs::Device::initialize<SystemClock>();
 	usb_hs::Device::connect<
-		usb_hs::Ck::Ulpick,	usb_hs::Stp::Ulpistp,
-		usb_hs::Dir::Ulpidir, usb_hs::Nxt::Ulpinxt,
-		usb_hs::D0::Ulpid0, usb_hs::D1::Ulpid1,
-		usb_hs::D2::Ulpid2, usb_hs::D3::Ulpid3,
-		usb_hs::D4::Ulpid4, usb_hs::D5::Ulpid5,
-		usb_hs::D6::Ulpid6, usb_hs::D7::Ulpid7>();
+		usb_hs::Ck::UlpiCk,	usb_hs::Stp::UlpiStp,
+		usb_hs::Dir::UlpiDir, usb_hs::Nxt::UlpiNxt,
+		usb_hs::D0::UlpiD0, usb_hs::D1::UlpiD1,
+		usb_hs::D2::UlpiD2, usb_hs::D3::UlpiD3,
+		usb_hs::D4::UlpiD4, usb_hs::D5::UlpiD5,
+		usb_hs::D6::UlpiD6, usb_hs::D7::UlpiD7>();
 	usb_hs::Overcurrent::setInput();
 
 	// Deactivate VBUS Sensing B

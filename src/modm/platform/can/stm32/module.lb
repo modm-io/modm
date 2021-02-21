@@ -77,9 +77,12 @@ can_map = {
 }
 
 def get_substitutions(env, instance):
-    target = env["target"].identifier
-    driver = env["target"].get_driver("can")
-    instances = map(lambda i: int(i), driver["instance"]) if "instance" in driver else (0,)
+    device = env[":target"]
+    target = device.identifier
+
+    driver = device.get_driver("can")
+    instances = (i.number for i in device.driver("can").instances())
+    instances = instances if instances else [0]
 
     cm = can_map[target.family]
     is_single = (cm[instance].type == CanType.Single) or (cm[instance].associated_instance not in instances)
@@ -140,12 +143,12 @@ def prepare(module, options):
         ":platform:rcc",
         ":utils")
 
-    driver = device.get_driver("can")
+    instances = device.driver("can").instances()
     # If there is only one instance of the peripheral it is not numbered and
     # merged into the generic can module.
-    if "instance" in driver:
-        for instance in listify(driver["instance"]):
-            module.add_submodule(Instance(int(instance)))
+    if instances:
+        for instance in instances:
+            module.add_submodule(Instance(instance.number))
     else:
         load_options(module)
 
@@ -158,7 +161,7 @@ def build(env):
     env.template("can_filter.hpp.in")
     env.template("can_filter.cpp.in")
 
-    if "instance" not in driver:
+    if not env[":target"].driver("can").instances():
         env.substitutions = get_substitutions(env, 0)
         env.template("can.hpp.in")
         env.template("can.cpp.in")

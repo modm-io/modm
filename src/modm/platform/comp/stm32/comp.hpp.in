@@ -234,7 +234,7 @@ namespace modm::platform
 					Output out = Output::NoSelection,
 				{% endif -%}
 					Hysteresis hyst = Hysteresis::NoHysteresis,
-				{% if driver.type not in ["stm32-tsmc90_g4_rockfish_cube"] -%}
+				{% if type not in ["stm32-tsmc90_g4_rockfish_cube"] -%}
 					Mode mode = Mode::HighSpeed,
 				{% endif -%}
 					Polarity pol = Polarity::NonInverted,
@@ -248,7 +248,7 @@ namespace modm::platform
 			setOutputSelection(out);
 		{% endif -%}
 			setHysteresis(hyst);
-		{% if driver.type not in ["stm32-tsmc90_g4_rockfish_cube"] -%}
+		{% if type not in ["stm32-tsmc90_g4_rockfish_cube"] -%}
 			setMode(mode);
 		{% endif -%}
 			setPolarity(pol);
@@ -308,7 +308,7 @@ namespace modm::platform
 		}
 	{% endif -%}
 
-	{% if driver.type not in ["stm32-tsmc90_g4_rockfish_cube"] -%}
+	{% if type not in ["stm32-tsmc90_g4_rockfish_cube"] -%}
 		/**
 		 * \brief	Sets the mode that determins speed/power consumption.
 		 *

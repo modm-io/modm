@@ -24,13 +24,12 @@ class Instance(Module):
 
     def build(self, env):
         device = env[":target"]
-        driver = device.get_driver("comp")
 
         properties = {}
         properties["target"] = device.identifier
         instance_id = int(self.instance)
         properties["id"] = instance_id
-        properties["driver"] = driver
+        properties["type"] = device.driver("comp").type
         properties["csr"] = "COMP_CSR_" if device.identifier["family"] in ["l4", "g4"] else "COMP_CSR_COMPx"
         properties["blanking_source"] = dict()
         if device.identifier["family"] in ["g4"]:
@@ -81,7 +80,7 @@ def prepare(module, options):
         "stm32-v3.4"
         "stm32-v3.6"
     """
-    if not device.get_driver("comp")["type"] in ["stm32-v1.3", "stm32-tsmc90_cube", "stm32-tsmc90_g4_rockfish_cube"]:
+    if not device.driver("comp").type in ["stm32-v1.3", "stm32-tsmc90_cube", "stm32-tsmc90_g4_rockfish_cube"]:
         return False
 
     # Only some STM32F3 and STM32L4
@@ -98,18 +97,17 @@ def prepare(module, options):
 
     module.depends(":cmsis:device")
 
-    for instance in listify(device.get_driver("comp")["instance"]):
-        module.add_submodule(Instance(int(instance)))
+    for instance in device.driver("comp").instances():
+        module.add_submodule(Instance(instance.number))
 
     return True
 
 def build(env):
     device = env[":target"]
-    driver = device.get_driver("comp")
 
     properties = {}
     properties["target"] = device.identifier
-    properties["driver"] = driver
+    properties["type"] = device.driver("comp").type
     properties["csr"] = "COMP_CSR_" if device.identifier["family"] in ["l4", "g4"] else "COMP_CSR_COMPx"
 
     env.substitutions = properties
