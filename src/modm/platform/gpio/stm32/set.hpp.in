@@ -45,7 +45,7 @@ protected:
 			if (masks[id] & (1 << ii)) r |= (uint32_t(value) << (ii * 2));
 		return r;
 	}
-%% if target["family"] in ["f1"]
+%% if target.family in ["f1"]
 	static constexpr uint64_t mask4(uint8_t id, uint8_t value = 0b1111) {
 		uint64_t r{0};
 		for (int ii=0; ii<16; ii++)
@@ -70,11 +70,11 @@ public:
 public:
 	static void setOutput()
 	{
-%% if target["family"] in ["f1"]
+%% if target.family in ["f1"]
 		configure(OutputType::PushPull);
 %% else
-	%% for port, id in ports.items()
-		if constexpr (mask({{id}})) GPIO{{port}}->MODER = (GPIO{{port}}->MODER & ~mask2({{id}})) | mask2({{id}}, i(Mode::Output));
+	%% for port in ports
+		if constexpr (mask({{loop.index0}})) GPIO{{port}}->MODER = (GPIO{{port}}->MODER & ~mask2({{loop.index0}})) | mask2({{loop.index0}}, i(Mode::Output));
 	%% endfor
 %% endif
 	}
@@ -88,23 +88,23 @@ public:
 	static void setOutput(OutputType type, OutputSpeed speed = OutputSpeed::MHz50)
 	{
 		configure(type, speed);
-%% if target["family"] not in ["f1"]
+%% if target.family not in ["f1"]
 		setOutput();
 %% endif
 	}
 
 	static void configure(OutputType type, OutputSpeed speed = OutputSpeed::MHz50)
 	{
-%% if target["family"] in ["f1"]
-	%% for port, id in ports.items()
-		if constexpr (crl({{id}})) GPIO{{port}}->CRL = (GPIO{{port}}->CRL & ~crl({{id}})) | ((i(type) | i(speed)) * crl({{id}}, 0b0001));
-		if constexpr (crh({{id}})) GPIO{{port}}->CRH = (GPIO{{port}}->CRH & ~crh({{id}})) | ((i(type) | i(speed)) * crh({{id}}, 0b0001));
+%% if target.family in ["f1"]
+	%% for port in ports
+		if constexpr (crl({{loop.index0}})) GPIO{{port}}->CRL = (GPIO{{port}}->CRL & ~crl({{loop.index0}})) | ((i(type) | i(speed)) * crl({{loop.index0}}, 0b0001));
+		if constexpr (crh({{loop.index0}})) GPIO{{port}}->CRH = (GPIO{{port}}->CRH & ~crh({{loop.index0}})) | ((i(type) | i(speed)) * crh({{loop.index0}}, 0b0001));
 	%% endfor
 %% else
-	%% for port, id in ports.items()
-		if constexpr (mask({{id}})) {
-			GPIO{{port}}->OSPEEDR = (GPIO{{port}}->OSPEEDR & ~mask2({{id}})) | (i(speed) * mask2({{id}}, 0b01));
-			GPIO{{port}}->OTYPER  = (GPIO{{port}}->OTYPER  & ~mask({{id}}))  | (i(type) ? mask({{id}}) : 0);
+	%% for port in ports
+		if constexpr (mask({{loop.index0}})) {
+			GPIO{{port}}->OSPEEDR = (GPIO{{port}}->OSPEEDR & ~mask2({{loop.index0}})) | (i(speed) * mask2({{loop.index0}}, 0b01));
+			GPIO{{port}}->OTYPER  = (GPIO{{port}}->OTYPER  & ~mask({{loop.index0}}))  | (i(type) ? mask({{loop.index0}}) : 0);
 		}
 	%% endfor
 %% endif
@@ -112,14 +112,14 @@ public:
 
 	static void setInput()
 	{
-%% if target["family"] in ["f1"]
+%% if target.family in ["f1"]
 		configure(InputType::Floating);
 %% else
-	%% for port, id in ports.items()
-		if constexpr (mask({{id}})) {
-			GPIO{{port}}->MODER &= ~mask2({{id}});
-			GPIO{{port}}->OTYPER &= ~mask({{id}});
-			GPIO{{port}}->OSPEEDR &= ~mask2({{id}});
+	%% for port in ports
+		if constexpr (mask({{loop.index0}})) {
+			GPIO{{port}}->MODER &= ~mask2({{loop.index0}});
+			GPIO{{port}}->OTYPER &= ~mask({{loop.index0}});
+			GPIO{{port}}->OSPEEDR &= ~mask2({{loop.index0}});
 		}
 	%% endfor
 %% endif
@@ -128,23 +128,23 @@ public:
 	static void setInput(InputType type)
 	{
 		configure(type);
-%% if target["family"] not in ["f1"]
+%% if target.family not in ["f1"]
 		setInput();
 %% endif
 	}
 
 	static void setAnalogInput()
 	{
-%% if target["family"] in ["f1"]
-	%% for port, id in ports.items()
-		if constexpr (crl({{id}})) GPIO{{port}}->CRL &= ~crl({{id}});
-		if constexpr (crh({{id}})) GPIO{{port}}->CRH &= ~crh({{id}});
+%% if target.family in ["f1"]
+	%% for port in ports
+		if constexpr (crl({{loop.index0}})) GPIO{{port}}->CRL &= ~crl({{loop.index0}});
+		if constexpr (crh({{loop.index0}})) GPIO{{port}}->CRH &= ~crh({{loop.index0}});
 	%% endfor
 %% else
-	%% for port, id in ports.items()
-		if constexpr (mask({{id}})) GPIO{{port}}->MODER |= mask2({{id}}, i(Mode::Analog));
-		%% if target["family"] in ["l4"] and target["name"] in ["71", "75", "76", "85", "86"]
-		if constexpr (mask({{id}})) GPIO{{port}}->ASCR |= mask({{id}});
+	%% for port in ports
+		if constexpr (mask({{loop.index0}})) GPIO{{port}}->MODER |= mask2({{loop.index0}}, i(Mode::Analog));
+		%% if target.family in ["l4"] and target["name"] in ["71", "75", "76", "85", "86"]
+		if constexpr (mask({{loop.index0}})) GPIO{{port}}->ASCR |= mask({{loop.index0}});
 		%% endif
 	%% endfor
 %% endif
@@ -152,16 +152,16 @@ public:
 
 	static void configure(InputType type)
 	{
-%% if target["family"] in ["f1"]
-	%% for port, id in ports.items()
-		if constexpr (crl({{id}})) GPIO{{port}}->CRL = (GPIO{{port}}->CRL & ~crl({{id}})) | ((i(type) & 0xc) * crl({{id}}, 0b0001));
-		if constexpr (crh({{id}})) GPIO{{port}}->CRH = (GPIO{{port}}->CRH & ~crh({{id}})) | ((i(type) & 0xc) * crh({{id}}, 0b0001));
-		if constexpr (mask({{id}})) GPIO{{port}}->BSRR = mask({{id}}) << ((type == InputType::PullUp) ? 0 : 16);
+%% if target.family in ["f1"]
+	%% for port in ports
+		if constexpr (crl({{loop.index0}})) GPIO{{port}}->CRL = (GPIO{{port}}->CRL & ~crl({{loop.index0}})) | ((i(type) & 0xc) * crl({{loop.index0}}, 0b0001));
+		if constexpr (crh({{loop.index0}})) GPIO{{port}}->CRH = (GPIO{{port}}->CRH & ~crh({{loop.index0}})) | ((i(type) & 0xc) * crh({{loop.index0}}, 0b0001));
+		if constexpr (mask({{loop.index0}})) GPIO{{port}}->BSRR = mask({{loop.index0}}) << ((type == InputType::PullUp) ? 0 : 16);
 	%% endfor
 %% else
-	%% for port, id in ports.items()
-		if constexpr (mask({{id}})) {
-			GPIO{{port}}->PUPDR = (GPIO{{port}}->PUPDR & ~mask2({{id}})) | (i(type) * mask2({{id}}, 0b01));
+	%% for port in ports
+		if constexpr (mask({{loop.index0}})) {
+			GPIO{{port}}->PUPDR = (GPIO{{port}}->PUPDR & ~mask2({{loop.index0}})) | (i(type) * mask2({{loop.index0}}, 0b01));
 		}
 	%% endfor
 %% endif
@@ -169,8 +169,8 @@ public:
 
 	static void set()
 	{
-%% for port, id in ports.items()
-		if constexpr (mask({{id}})) GPIO{{port}}->BSRR = (inverted({{id}}) << 16) | (mask({{id}}) & ~inverted({{id}}));
+%% for port in ports
+		if constexpr (mask({{loop.index0}})) GPIO{{port}}->BSRR = (inverted({{loop.index0}}) << 16) | (mask({{loop.index0}}) & ~inverted({{loop.index0}}));
 %% endfor
 	}
 
@@ -182,17 +182,17 @@ public:
 
 	static void reset()
 	{
-%% for port, id in ports.items()
-		if constexpr (mask({{id}})) GPIO{{port}}->BSRR = ((uint32_t(mask({{id}})) & ~inverted({{id}})) << 16) | inverted({{id}});
+%% for port in ports
+		if constexpr (mask({{loop.index0}})) GPIO{{port}}->BSRR = ((uint32_t(mask({{loop.index0}})) & ~inverted({{loop.index0}})) << 16) | inverted({{loop.index0}});
 %% endfor
 	}
 
 	static void toggle()
 	{
-%% for port, id in ports.items()
-		if constexpr (mask({{id}})) {
-			uint32_t are_set = (GPIO{{port}}->ODR & mask({{id}}));
-			uint32_t are_reset = mask({{id}}) ^ are_set;
+%% for port in ports
+		if constexpr (mask({{loop.index0}})) {
+			uint32_t are_set = (GPIO{{port}}->ODR & mask({{loop.index0}}));
+			uint32_t are_reset = mask({{loop.index0}}) ^ are_set;
 			GPIO{{port}}->BSRR = (are_set << 16) | are_reset;
 		}
 %% endfor
@@ -200,11 +200,11 @@ public:
 
 	static void lock()
 	{
-%% for port, id in ports.items()
-		if constexpr (mask({{id}})) {
-			GPIO{{port}}->LCKR = 0x10000 | mask({{id}});
-			GPIO{{port}}->LCKR = 0x00000 | mask({{id}});
-			GPIO{{port}}->LCKR = 0x10000 | mask({{id}});
+%% for port in ports
+		if constexpr (mask({{loop.index0}})) {
+			GPIO{{port}}->LCKR = 0x10000 | mask({{loop.index0}});
+			GPIO{{port}}->LCKR = 0x00000 | mask({{loop.index0}});
+			GPIO{{port}}->LCKR = 0x10000 | mask({{loop.index0}});
 			(void) GPIO{{port}}->LCKR;
 		}
 %% endfor

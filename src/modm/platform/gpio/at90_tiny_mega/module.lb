@@ -101,7 +101,7 @@ def validate(env):
     for d in all_drivers:
         dname = d["name"].capitalize()
         if "instance" in d:
-            all_peripherals.extend([dname + i.capitalize() for i in d["instance"]])
+            all_peripherals.extend([dname + i["name"].capitalize() for i in d["instance"]])
         else:
             all_peripherals.append(dname)
     bprops["all_peripherals"] = sorted(list(set(all_peripherals)))

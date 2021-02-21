@@ -15,10 +15,7 @@
 #include "define.h"
 #include <modm/architecture/interface/gpio.hpp>
 
-namespace modm
-{
-
-namespace platform
+namespace modm::platform
 {
 
 /// @ingroup modm_platform_gpio
@@ -95,7 +92,7 @@ protected:
 template< class Pin >
 class GpioOpenDrain : public Pin
 {
-	static Gpio::InputType inputType;
+	static inline Gpio::InputType inputType{Gpio::InputType::Floating};
 	static_assert(Pin::direction == modm::Gpio::Direction::InOut, "Pin must inherit from modm::GpioIO");
 public:
 	using Output = GpioOpenDrain<typename Pin::IO>;
@@ -143,12 +140,6 @@ public:
 	}
 };
 
-}	// namespace platform
-
 }	// namespace modm
-
-template< class Pin >
-modm::platform::Gpio::InputType
-modm::platform::GpioOpenDrain<Pin>::inputType(modm::platform::Gpio::InputType::Floating);
 
 #endif	// MODM_AVR_GPIO_BASE_HPP

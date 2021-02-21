@@ -122,7 +122,7 @@ def common_memories(env):
     if "memory" in core_driver:
         memories.extend([
             {
-                k:(int(v) if v.isdigit() else (int(v, 16) if v.startswith("0x") else v))
+                k:(int(v) if str(v).isdigit() else (int(v, 16) if v.startswith("0x") else v))
                 for k, v in memory.items()
             }
             for memory in core_driver["memory"]

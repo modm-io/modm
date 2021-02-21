@@ -21,9 +21,7 @@ def prepare(module, options):
     if not options[":target"].has_driver("rcc:stm32*"):
         return False
 
-    module.depends(":cmsis:device", ":utils", ":platform:clock")
-    # FIXME: Move Peripherals enum somewhere better
-    module.depends(":platform:gpio")
+    module.depends(":cmsis:device", ":utils", ":platform:clock", ":platform:core")
     return True
 
 def build(env):
@@ -67,31 +65,18 @@ def build(env):
     properties["pllsai_p_usb"] = (target["family"] == "f7") or \
         ((target["family"] == "f4") and target["name"] in ["46", "69", "79"])
 
-    flash_latencies = {}
-    for vcore in device.get_driver("flash")["latency"]:
-        flash_latencies[int(vcore["vcore-min"])] = sorted([int(f["hclk-max"]) for f in vcore["wait-state"]])
-
-    properties["table"] = flash_latencies
+    properties["table"] = device.flash.wait_states
     env.substitutions = properties
     env.outbasepath = "modm/src/modm/platform/clock"
 
     env.template("rcc.cpp.in")
     env.template("rcc.hpp.in")
 
-    all_peripherals = set()
-    all_drivers = [d for d in device._properties["driver"] if d["name"] not in ["gpio", "core"]]
-    translate = lambda s: s.replace("_", "").capitalize()
-    for d in all_drivers:
-        dname = translate(d["name"])
-        if "instance" in d:
-            all_peripherals.update(dname + translate(i) for i in d["instance"])
-        else:
-            all_peripherals.add(dname)
-    all_peripherals = sorted(list(all_peripherals))
-
     rcc_map = env.query(":cmsis:device:rcc-map")
     rcc_enable = {}
     rcc_reset = {}
+    all_peripherals = uniquify(map(env.filter("modm.fmt.driver"), env[":target"].peripherals))
+    all_peripherals_lut = {p.lower():p for p in all_peripherals}
 
     for per, mode in rcc_map.items():
         nper = per
@@ -110,14 +95,14 @@ def build(env):
         if "Eth" in all_peripherals and per == "ETHMAC":
             per = "Eth"
         # Fix USBOTG OTG
-        if "Usbotgfs" in all_peripherals and per.startswith("OTG"):
+        if "UsbOtgFs" in all_peripherals and per.startswith("OTG"):
             if per == "OTGH": per = "OTGHS";
             per = "USB"+per
             # print(per, mode)
-        if per.capitalize() not in all_peripherals:
+        if per.lower() not in all_peripherals_lut:
             continue
         if "EN" in mode:
-            rcc_enable[per.capitalize()] = (nper, mode["EN"])
+            rcc_enable[all_peripherals_lut[per.lower()]] = (nper, mode["EN"])
         if "RST" in mode:
             rcc_reset[nper] = mode["RST"]
 

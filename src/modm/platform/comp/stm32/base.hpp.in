@@ -19,17 +19,17 @@ namespace modm::platform
 	/// @ingroup modm_platform_comp
 	class CompBase
 	{
-	{% if driver.type not in ["stm32-tsmc90_g4_rockfish_cube"] -%}
+	{% if type not in ["stm32-tsmc90_g4_rockfish_cube"] -%}
 	public:
 		enum class
 		Mode
 		{
-			{% if driver.type in ["stm32-v1.3"] -%}
+			{% if type in ["stm32-v1.3"] -%}
 			UltraLowPower	= 0b00 << 2,
 			LowPower		= 0b01 << 2,
 			MediumSpeed		= 0b10 << 2,
 			HighSpeed		= 0b11 << 2,
-			{% elif driver.type in ["stm32-tsmc90_cube"] -%}
+			{% elif type in ["stm32-tsmc90_cube"] -%}
 			HighSpeed		= 0b00 << 2,
 			MediumSpeed		= 0b01 << 2,
 			//MediumSpeed2	= 0b10 << 2,
@@ -50,7 +50,7 @@ namespace modm::platform
 	protected:
 		static constexpr uint32_t PolarityMask = 0b1 << 15;
 
-	{% if driver.type in ["stm32-v1.3", "stm32-tsmc90_cube"] -%}
+	{% if type in ["stm32-v1.3", "stm32-tsmc90_cube"] -%}
 	public:
 		enum class
 		Hysteresis
@@ -62,7 +62,7 @@ namespace modm::platform
 		};
 	protected:
 		static constexpr uint32_t HysteresisMask = 0b11 << 16;
-	{% elif "g4" in driver.type -%}
+	{% elif "g4" in type -%}
 	public:
 		enum class
 		Hysteresis

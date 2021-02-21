@@ -34,8 +34,7 @@ def common_usb_irqs(env):
 
     :returns: a dictionary of USB interrupt properties
     """
-    usb_vectors = {v["name"] for v in env[":target"].get_driver("core")["vector"]
-                   if any(v["name"].startswith(n) for n in ["USB", "OTG"])}
+    usb_vectors = set(env[":target"].core.vectors(lambda v: any(v.startswith(n) for n in ["USB", "OTG"])))
     is_remap = any("_RMP" in v for v in usb_vectors)
 
     port_irqs = defaultdict(list)
@@ -60,7 +59,7 @@ def generate_instance(env, port, otg=False):
     irq_data = env.query(":platform:usb:irqs")
     env.substitutions = {
         "port": port,
-        "peripheral": "Usbotg{}".format(port) if otg else "Usb",
+        "peripheral": "UsbOtg{}".format(port.capitalize()) if otg else "Usb",
         "is_otg": otg,
         "is_remap": irq_data["is_remap"],
         "irqs": irq_data["port_irqs"][port],

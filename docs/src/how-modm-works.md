@@ -56,7 +56,7 @@ def prepare(module, options):
 
 def build(env):
     device = env[":target"]
-    env.substitutions = device.properties
+    env.substitutions = device.get_driver("uart")
     env.outbasepath = "src/modm/platform/uart"
     for instance in device.get_driver("uart:stm32*")["instance"]:
         env.template("uart.hpp.in", "uart_{}.hpp".format(instance))

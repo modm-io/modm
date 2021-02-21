@@ -38,9 +38,10 @@ def build(env):
     bprops = env.substitutions
     device = env[":target"]
     driver = device.get_driver("gpio")
+    gpios = copy.deepcopy(driver["gpio"])
 
     peripherals = OrderedDict()
-    for gpio in driver["gpio"]:
+    for gpio in gpios:
         signals = []
         for signal in gpio["signal"]:
             signal.update({
@@ -70,14 +71,14 @@ def build(env):
         gpio["signal"] = signals
 
     bprops["peripherals"] = OrderedDict(sorted(peripherals.items()))
-    bprops["functions"] = sorted(list(set(s["function"] for gpio in driver["gpio"] for s in gpio["signal"])))
+    bprops["functions"] = sorted(list(set(s["function"] for gpio in gpios for s in gpio["signal"])))
 
     bprops["target"] = device.identifier
 
     env.substitutions = bprops
     env.outbasepath = "modm/src/modm/platform/gpio"
 
-    bprops["gpios"] = driver["gpio"]
+    bprops["gpios"] = gpios
     env.template("config.hpp.in")
     env.copy("connector.hpp")
     env.copy("pin.hpp")

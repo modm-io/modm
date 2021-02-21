@@ -11,6 +11,8 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
+import copy
+
 def common_vector_table_location(env):
     return env.get(":platform:cortex-m:vector_table_location", "rom")
 
@@ -72,7 +74,7 @@ def common_memories(env):
     :returns: dictionary of memory properties
     """
     device = env[":target"]
-    memories = listify(device.get_driver("core")["memory"])
+    memories = copy.deepcopy(listify(device.get_driver("core")["memory"]))
 
     # Convert from string to int and add offsets
     flash_offset = env.get(":platform:cortex-m:linkerscript.flash_offset", 0)

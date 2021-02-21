@@ -68,27 +68,6 @@ def prepare(module, options):
     device = options[":target"]
     if not device.has_driver("adc:stm32"):
         return False
-    global props
-    props = {}
-    driver = device.get_driver("adc")
-    props["target"] = target = device.identifier
-    props["driver"] = driver
-    props["instances"] = []
-
-    if target["family"] in ["f2", "f4", "f7"]:
-        props["shared_irqs"] = {"ADC": listify(device.get_driver("adc")["instance"])}
-        props["shared_irq_ids"] = props["shared_irqs"]["ADC"]
-    else:
-        shared_irqs = [v["name"] for v in device.get_driver("core")["vector"]]
-        shared_irqs = [v for v in shared_irqs if v.startswith("ADC") and "_" in v]
-        props["shared_irqs"] = {}
-        props["shared_irq_ids"] = []
-        for irq in shared_irqs:
-            parts = irq[3:].split("_")
-            shared_irqs_ids = (int(parts[0]), int(parts[1]) )
-            props["shared_irqs"][irq] = shared_irqs_ids
-            props["shared_irq_ids"].extend(shared_irqs_ids)
-
 
     module.depends(
         ":architecture:adc",
@@ -99,21 +78,35 @@ def prepare(module, options):
         ":math:algorithm",
         ":utils")
 
-    for instance in listify(device.get_driver("adc").get("instance", [])):
-        module.add_submodule(Instance(int(instance)))
+    for instance in device.driver("adc").instances():
+        module.add_submodule(Instance(instance.number))
 
     return True
 
+def validate(env):
+    device = env[":target"]
+    global props
+    props = {}
+    props["target"] = target = device.identifier
+    props["instances"] = []
+
+    shared_irqs = device.core.shared_irqs("ADC")
+    if shared_irqs.values():
+        props["shared_irqs"] = shared_irqs
+        props["shared_irq_ids"] = list(shared_irqs.values())[0]
+    else:
+        irq_name = next(device.core.vectors(lambda v: v.startswith("ADC")), "ADC")
+        instances = [i.number for i in device.driver("adc").instances()]
+        props["shared_irqs"] = {irq_name: instances}
+        props["shared_irq_ids"] = instances
+
 def build(env):
     device = env[":target"]
-    driver = device.get_driver("adc")
-
     global props
-
     env.substitutions = props
     env.outbasepath = "modm/src/modm/platform/adc"
 
-    if device.get_driver("adc").get("instance", None) is None:
+    if not device.driver("adc").instances():
         Instance(None).build(env)
 
     if any(i in props["shared_irq_ids"] for i in props["instances"]):

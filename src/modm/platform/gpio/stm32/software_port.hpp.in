@@ -66,7 +66,8 @@ public:
 	static PortType isSet()
 	{
 		PortType r{0};
-%% for port, id in ports.items()
+%% for port in ports
+	%% set id = loop.index0
 		if constexpr (mask({{id}})) {
 			const uint16_t p = (GPIO{{port}}->ODR & mask({{id}})) ^ inverted({{id}});
 	%% for pos in range(32)
@@ -79,7 +80,8 @@ public:
 
 	static void write(PortType data)
 	{
-%% for port, id in ports.items()
+%% for port in ports
+	%% set id = loop.index0
 		if constexpr (mask({{id}})) { uint32_t p{0};
 	%% for pos in range(32)
 			if constexpr ({{pos}} < width) if constexpr (constexpr auto pos = shift_mask({{id}}, {{pos}}); pos >= 0) p |= (data & (1ul << {{pos}})) ? (1ul << pos) : (1ul << (pos + 16));
@@ -93,7 +95,8 @@ public:
 	static PortType read()
 	{
 		PortType r{0};
-%% for port, id in ports.items()
+%% for port in ports
+	%% set id = loop.index0
 		if constexpr (mask({{id}})) {
 			const uint16_t p = (GPIO{{port}}->IDR & mask({{id}})) ^ inverted({{id}});
 	%% for pos in range(32)

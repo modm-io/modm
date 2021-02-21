@@ -240,6 +240,14 @@ def init(repo):
     repo.add_filter("modm.ord", lambda letter: ord(letter[0].lower()) - ord("a"))
     repo.add_filter("modm.chr", lambda num: chr(num + ord("A")))
 
+    # Global filters for naming things
+    def fmt_str(s):
+        return "".join(p.capitalize() for p in str(s).split("_"))
+    def fmt_driver(d):
+        return fmt_str(d.get("driver", "")) + fmt_str(d.get("instance", ""))
+    repo.add_filter("modm.fmt", fmt_str)
+    repo.add_filter("modm.fmt.driver", fmt_driver)
+
     # Compute the available data from modm-devices
     devices = DevicesCache()
     try:

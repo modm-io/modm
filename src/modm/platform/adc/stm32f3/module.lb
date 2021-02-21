@@ -27,7 +27,7 @@ class Instance(Module):
         device = env[":target"]
         driver = device.get_driver("adc")
 
-        properties = device.properties
+        properties = {}
         properties["target"] = target = device.identifier
         instance_id = int(self.instance)
         properties["id"] = instance_id
@@ -145,18 +145,10 @@ def prepare(module, options):
         ":platform:gpio",
         ":platform:rcc")
 
-    for instance in listify(device.get_driver("adc")["instance"]):
-        module.add_submodule(Instance(int(instance)))
+    for instance in device.driver("adc").instances():
+        module.add_submodule(Instance(instance.number))
 
     return True
 
 def build(env):
-    device = env[":target"]
-    driver = device.get_driver("adc")
-
-    properties = device.properties
-    properties["target"] = device.identifier
-    properties["driver"] = driver
-
-    env.substitutions = properties
-    env.outbasepath = "modm/src/modm/platform/adc"
+    pass

@@ -111,12 +111,12 @@ public:
 
 public:
 	/// @cond
-%% for name in all_signals
+%% for name in signal_names
 	template< Peripheral _ >
-	struct {{ name }}
+	struct {{ name | modm.fmt }}
 	{
 		using Gpio = GpioUnused;
-		static constexpr Gpio::Signal Signal = Gpio::Signal::{{ name }};
+		static constexpr Gpio::Signal Signal = Gpio::Signal::{{ name | modm.fmt }};
 		static void connect() {}
 	};
 %% endfor

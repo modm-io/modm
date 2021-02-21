@@ -76,16 +76,20 @@ can_map = {
     },
 }
 
-def get_substitutions(instance, device, env):
+def get_substitutions(env, instance):
+    device = env[":target"]
     target = device.identifier
-    driver = device.get_driver("can")
-    instances = map(lambda i: int(i), driver["instance"]) if "instance" in driver else (0,)
 
-    cm = can_map[target["family"]]
+    driver = device.get_driver("can")
+    instances = (i.number for i in device.driver("can").instances())
+    instances = instances if instances else [0]
+
+    cm = can_map[target.family]
     is_single = (cm[instance].type == CanType.Single) or (cm[instance].associated_instance not in instances)
     other = cm[instance].associated_instance
 
     subs = {
+        "target": target,
         "id": "" if instance == 0 else str(instance),
         "own_instance": cm[instance].register,
         "other_instance": cm[other].register if other in cm else None,
@@ -109,15 +113,7 @@ class Instance(Module):
         return True
 
     def build(self, env):
-        device = env[":target"]
-        driver = device.get_driver("can")
-
-        properties = device.properties
-        properties["target"] = target = device.identifier
-        properties["driver"] = driver
-        properties.update(get_substitutions(self.instance, device, env))
-
-        env.substitutions = properties
+        env.substitutions = get_substitutions(env, self.instance)
         env.outbasepath = "modm/src/modm/platform/can"
 
         env.template("can.hpp.in", "can_{}.hpp".format(self.instance))
@@ -147,34 +143,25 @@ def prepare(module, options):
         ":platform:rcc",
         ":utils")
 
-    driver = device.get_driver("can")
+    instances = device.driver("can").instances()
     # If there is only one instance of the peripheral it is not numbered and
     # merged into the generic can module.
-    if "instance" in driver:
-        for instance in listify(driver["instance"]):
-            module.add_submodule(Instance(int(instance)))
+    if instances:
+        for instance in instances:
+            module.add_submodule(Instance(instance.number))
     else:
         load_options(module)
 
     return True
 
 def build(env):
-    device = env[":target"]
-    driver = device.get_driver("can")
-
-    properties = device.properties
-    properties["target"] = device.identifier
-    properties["driver"] = driver
-
-    if "instance" not in driver:
-        properties.update(get_substitutions(0, device, env))
-
-    env.substitutions = properties
+    env.substitutions = {"target": env[":target"].identifier}
     env.outbasepath = "modm/src/modm/platform/can"
 
     env.template("can_filter.hpp.in")
     env.template("can_filter.cpp.in")
 
-    if "instance" not in driver:
+    if not env[":target"].driver("can").instances():
+        env.substitutions = get_substitutions(env, 0)
         env.template("can.hpp.in")
         env.template("can.cpp.in")

@@ -32,10 +32,14 @@ def build(env):
     # startup helper code
     env.template("startup_platform.c.in")
 
+    # Generate a list of all on-device peripherals
+    peripherals = uniquify(map(env.filter("modm.fmt.driver"), env[":target"].peripherals))
+    env.substitutions = {"peripherals": peripherals}
+    env.template("peripherals.hpp.in")
+
 
 def post_build(env):
     properties = env.query("::cortex-m:linkerscript")
-    target = env[":target"].identifier
     properties["with_crashcatcher"] = env.has_module(":crashcatcher")
 
     if "backup" in properties["regions"]:

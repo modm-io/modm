@@ -11,14 +11,6 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-def get_properties(env):
-    device = env[":target"]
-    driver = device.get_driver("usart:avr")
-    properties = device.properties
-    properties["target"] = device.identifier
-    properties["driver"] = driver
-    return properties
-
 def load_options(module):
     module.add_option(
         BooleanOption(
@@ -52,16 +44,13 @@ class Instance(Module):
         return True
 
     def build(self, env):
-        properties = get_properties(env)
-        target = properties["target"]
-
-        if target["family"] == "tiny" and target["name"] in ["828", "2313", "4313"]:
+        target = env[":target"].identifier
+        if target.family == "tiny" and target.name in ["828", "2313", "4313"]:
             instance = ""
         else:
             instance = self.instance
-        properties["id"] = instance
 
-        env.substitutions = properties
+        env.substitutions = {"id": instance}
         env.outbasepath = "modm/src/modm/platform/uart"
 
         env.template("uart.hpp.in", "uart{}.hpp".format(instance))
@@ -85,28 +74,21 @@ def prepare(module, options):
         ":math:algorithm",
         ":platform:gpio")
 
-    driver = device.get_driver("usart:avr")
-    if "instance" in driver:
-        for instance in listify(driver["instance"]):
-            module.add_submodule(Instance(int(instance)))
+    instances = device.driver("usart").instances()
+    if instances:
+        for instance in instances:
+            module.add_submodule(Instance(instance.number))
     else:
         load_options(module)
 
     return True
 
 def build(env):
-    properties = get_properties(env)
-    driver = properties["driver"]
-
-    if "instance" not in driver:
-        properties["id"] = ""
-
-    env.substitutions = properties
     env.outbasepath = "modm/src/modm/platform/uart"
-
     env.template("uart_defines.h")
 
-    if "instance" not in driver:
+    if not env[":target"].driver("usart").instances():
+        env.substitutions = {"id": ""}
         env.template("uart.hpp.in")
         env.template("uart_tx.cpp.in")
         env.template("uart_rx.cpp.in")
