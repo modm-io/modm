@@ -107,7 +107,7 @@ def main():
     device_list = []
     board_list = []
     if args.test:
-        device_list = ["hosted-linux", "atmega328p-au", "stm32f103c8t6", "stm32g474cet6", "samd21g18a-uu"]
+        device_list = ["hosted-linux", "atmega328p-au", "stm32f103c8t6", "stm32g474cet6", "samd21g18a-uu", "stm32f417zgt6"]
         board_list = [("arduino-nano", "atmega328p-au"), ("arduino-uno", "atmega328p-au"), ("nucleo-g474re", "stm32g474ret6"),
                       ("blue-pill", "stm32f103c8t6"), ("feather-m0", "samd21g18a-uu")]
     elif args.test2:

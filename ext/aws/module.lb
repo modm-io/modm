@@ -20,8 +20,13 @@ class FreeRTOS_TCP_LAN8720A(Module):
 This module implements TCP over Ethernet via the LAN8720A transceiver.
 """
     def prepare(self, module, options):
+        device = options[":target"]
+        if not device.has_driver("eth:stm32*"):
+            return False
+        if device.identifier.family not in ["f7"]:
+            return False
         module.depends(":platform:eth", ":driver:lan8720a")
-        return options[":target"].has_driver("eth:stm32*")
+        return True
 
     def build(self, env):
         env.outbasepath = "modm/ext/freertos_plus_tcp"
