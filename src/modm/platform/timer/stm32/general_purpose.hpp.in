@@ -65,12 +65,12 @@ public:
 
 	enum class SlaveModeTrigger : uint32_t
 	{
-	%% if (id < 2 or id > 5) or target["family"] == "f3"
+	%% if (id < 2 or id > 5) or target["family"] in ["f3", "f4"]
 		Internal0 = 0,
 	%% endif
 		Internal1 = TIM_SMCR_TS_0,
 		Internal2 = TIM_SMCR_TS_1,
-	%% if ((id < 2 or id > 5) and id != 9 and id != 12) or target["family"] == "f3"
+	%% if ((id < 2 or id > 5) and id != 9 and id != 12) or target["family"] in ["f3", "f4"]
 		Internal3 = TIM_SMCR_TS_1 | TIM_SMCR_TS_0,
 	%% endif
 		TimerInput1EdgeDetector = TIM_SMCR_TS_2,
