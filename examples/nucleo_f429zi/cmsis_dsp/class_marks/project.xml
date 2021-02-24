@@ -2,6 +2,7 @@
   <extends>modm:nucleo-f429zi</extends>
   <options>
     <option name="modm:build:build.path">../../../../build/nucleo_f429zi/cmsis_dsp/class_marks</option>
+    <option name="modm:build:cmake:include_cmakelists">yes</option>
   </options>
   <modules>
     <module>modm:build:scons</module>

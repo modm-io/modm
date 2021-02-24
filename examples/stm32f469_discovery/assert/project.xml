@@ -2,6 +2,7 @@
   <extends>modm:disco-f469ni</extends>
   <options>
     <option name="modm:build:build.path">../../../build/stm32f469_discovery/assert</option>
+    <option name="modm:build:cmake:include_cmakelists">yes</option>
   </options>
   <modules>
     <module>modm:build:scons</module>

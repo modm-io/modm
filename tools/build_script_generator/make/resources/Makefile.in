@@ -119,7 +119,7 @@ debug: build
 
 .PHONY: debug-bmp
 debug-bmp: build
-	@python3 modm/modm_tools/bmp.py $(addprefix -x ,$(MODM_GDBINIT)) \
+	@python3 modm/modm_tools/gdb.py $(addprefix -x ,$(MODM_GDBINIT)) \
 			$(ELF_FILE) --ui=$(ui) \
 			bmp -p $(port)
 

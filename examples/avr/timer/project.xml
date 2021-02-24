@@ -2,6 +2,7 @@
   <extends>modm:arduino-nano</extends>
   <options>
     <option name="modm:build:build.path">../../../build/avr/timer</option>
+    <option name="modm:build:cmake:include_cmakelists">yes</option>
   </options>
   <modules>
     <module>modm:architecture:delay</module>

@@ -3,6 +3,7 @@
 #
 # Copyright (c) 2018, Sergiy Yevtushenko
 # Copyright (c) 2018-2019, Niklas Hauser
+# Copyright (c) 2021, Jacob Andersen
 #
 # This file is part of the modm project.
 #
@@ -14,8 +15,59 @@
 with open(localpath("../common.py")) as common:
     exec(common.read())
 
+import re
 from os.path import join, isdir
 
+class PerFileAttr:
+    def __init__(self, filename, flags):
+        self.files = [filename]
+        self.attr = flags
+
+    def __eq__(self, flags):
+        for key in flags:
+            if key in flags and flags[key] != self.attr[key]:
+                return False
+        return True
+
+    def add(self, filename):
+        self.files.append(filename)
+
+    def format_flags(self, language_group):
+        rlst = self.attr[language_group]["release"]
+        dlst = self.attr[language_group]["debug"]
+        lst = self.attr[language_group][""]
+        if len(lst) > 0:
+            yield(';'.join(lst))
+        if len(rlst) > 0:
+            yield("$<$<CONFIG:MinSizeRel>:" + ';'.join(rlst)) + ">"
+            yield("$<$<CONFIG:Release>:" + ';'.join(rlst)) + ">"
+        if len(dlst) > 0:
+            yield("$<$<CONFIG:Debug>:" + ';'.join(dlst)) + ">"
+
+    def join_flags(self, fmt, language_group):
+        f = [output for output in self.format_flags(language_group)]
+        return fmt.format(';'.join(f))
+
+    def to_string(self, repo):
+        s = "set_source_files_properties(\n"
+        for file in self.files:
+            s += "  " + file[len(repo) + 1:] + "\n"      # Filter out base directory
+        s += "    TARGET_DIRECTORY modm\n  PROPERTIES\n"
+        groups = []
+        if "ccflags" in self.attr:
+            groups.append(self.join_flags("{}", "ccflags"))
+        if "cxxflags" in self.attr:
+            groups.append(self.join_flags("$<$<COMPILE_LANGUAGE:CXX>:{}>", "cxxflags"))
+        if "cflags" in self.attr:
+            groups.append(self.join_flags("$<$<COMPILE_LANGUAGE:C>:{}>", "cflags"))
+        if "asmflags" in self.attr:
+            groups.append(self.join_flags("$<$<COMPILE_LANGUAGE:ASM>:{}>", "asmflags"))
+        if len(groups) > 0:
+            s += "    COMPILE_OPTIONS \"" + ';'.join(groups) + "\"\n"
+        if "cppdefines" in self.attr:
+            s += ("    COMPILE_DEFINITIONS ")
+            s += ("\"" + ';'.join([ output for output in self.format_flags("cppdefines")]) + "\"")
+        return s + "\n)\n"
 
 def init(module):
     module.name = ":build:cmake"
@@ -24,10 +76,7 @@ def init(module):
 
 def prepare(module, options):
     module.add_option(
-        BooleanOption(name="include_makefile", default=True,
-                      description=descr_include_makefile))
-    module.add_option(
-        BooleanOption(name="include_cmakelists", default=True,
+        BooleanOption(name="include_cmakelists", default=False,
                       description=descr_include_cmakelists))
 
     module.add_collector(
@@ -39,13 +88,11 @@ def prepare(module, options):
 
 def build(env):
     env.substitutions = env.query("::device")
-    env.outbasepath = "modm/cmake"
-    env.template("cmake_scripts/configure-gcc.cmake.in", "configure-gcc.cmake")
 
     def flag_format(flag):
         subs = {
             "target_base": "${CMAKE_PROJECT_NAME}",
-            "project_source_dir": "${CMAKE_CURRENT_SOURCE_DIR}",
+            "project_source_dir": "${CMAKE_SOURCE_DIR}",
             "gccpath": "${MODM_GCC_PATH}",
         }
         if "{" in flag:
@@ -80,19 +127,40 @@ def post_build(env):
     def flags_format(flag):
         for fmt in env.collector_values("flag_format"):
             nflag = fmt(flag)
-            if nflag: return nflag;
+            if nflag: return nflag
         return flag
+
+    def update_file_attr(filename, fileflag):
+        for attr in per_file_attr:
+            if attr == fileflag:
+                attr.add(filename)
+                return
+        per_file_attr.append(PerFileAttr(filename, fileflag))
 
     # Generate one repo.cmake per repository
     for repo in repositories:
         files = []
+        per_file_attr = []
         repo_filter = lambda scope: scope.repository == repo
         repo_flags = env.query("::collect_flags")(env, repo_filter)
 
-        # Prepends -D to all CPP defines for this repo
+        warning_pattern = re.compile("^-W")
+        exclude_pattern = re.compile("(^-W|^-O)")
+
         for filename, fileflags in repo_flags.items():
-            for profile, flags in fileflags.get("cppdefines", {}).items():
-                repo_flags[filename]["cppdefines"][profile] = ["-D"+f for f in flags]
+            if filename != None:
+                update_file_attr(filename, fileflags)
+            else:
+                for flag_type in ["c", "cc", "cxx"]:
+                    for profile, flags in fileflags.get(flag_type + "flags", {}).items():
+                        repo_flags[filename][flag_type + "warn"][""] += \
+                            [ s for s in repo_flags[filename][flag_type + "flags"][profile] if warning_pattern.match(s) ]
+                        repo_flags[filename][flag_type + "flags"][profile] = \
+                            [ s for s in repo_flags[filename][flag_type + "flags"][profile] if not exclude_pattern.match(s) ]
+
+                for profile, flags in fileflags.get("asflags", {}).items():
+                    repo_flags[filename]["asflags"][profile] = \
+                        [ s for s in repo_flags[filename]["asflags"][profile] if not exclude_pattern.match(s) ]
 
         # Flatten the flags into one list for the specific file suffix
         for sfile in sources[repo]:
@@ -111,6 +179,7 @@ def post_build(env):
         packages = env.collector_values("::pkg-config", filterfunc=repo_filter)
         asm_sources = [f[0] for f in files if re.match(common_source_flag_map["asm"][0],
                                                        os.path.splitext(f[0])[-1])]
+        file_attrs = [attr.to_string(repo) for attr in per_file_attr]
         subs.update({
             "repo": repo,
             "flags": repo_flags[None],
@@ -121,27 +190,22 @@ def post_build(env):
             "include_paths": include_paths,
             "packages": packages,
             "is_modm": repo == "modm",
+            "per_file_attr": file_attrs,
         })
 
         env.outbasepath = repo
-        env.template("resources/repo.cmake.in", "repo.cmake",
-                     filters={"flags_format": flags_format,
-                              "relocate": lambda p: env.relative_outpath(p, repo)})
+        env.template("resources/CMakeLists.txt.in", "CMakeLists.txt",
+                     filters={"relocate": lambda p: env.relative_outpath(p, repo)})
+        env.template("resources/ModmConfiguration.cmake.in", "cmake/ModmConfiguration.cmake",
+                     filters={"flags_format": flags_format})
 
     # these are the ONLY files that are allowed to NOT be namespaced with modm!
     env.outbasepath = "."
     if env["include_cmakelists"]:
-        env.template("resources/CMakeLists.txt.in", "CMakeLists.txt")
-    if env["include_makefile"] and not env.has_module("::make"):
-        env.template("resources/Makefile.in", "Makefile")
+        env.template("resources/ci_CMakeLists.txt.in", "CMakeLists.txt")
 
 
 # ============================ Option Descriptions ============================
-descr_include_makefile = """# Generate a wrapper Makefile
-
-!!! warning "This overwrites any top-level `Makefile` file!"
-"""
-
 descr_include_cmakelists = """# Generate a CMakeLists.txt
 
 !!! warning "This overwrites any top-level `CMakeLists.txt` file!"

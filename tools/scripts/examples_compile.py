@@ -55,12 +55,15 @@ def build(project):
     if ":build:make" in project_cfg and not is_running_on_windows:
         commands.append( ("make build", "Make") )
     elif ":build:cmake" in project_cfg:
-        commands.append( ("make cmake && make build", "CMake") )
+        build_dir = re.search(r'name=".+?:build:build.path">(.*?)</option>', project_cfg)[1]
+        cmd = "cmake -E make_directory {}/cmake-build-release; ".format(build_dir)
+        cmd += '(cd {}/cmake-build-release && cmake -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles" {}); '.format(build_dir, path.absolute())
+        cmd += "cmake --build {}/cmake-build-release".format(build_dir)
+        commands.append( (cmd, "CMake") )
 
     rcs = 0
     for command, build_system in commands:
-        output = ["=" * 90, "Building: {} with {}".format(
-                  path / "main.cpp", build_system)]
+        output = ["=" * 90, "Building: {} with {}".format(path / "main.cpp", build_system)]
         rc, ro = run_command(path, command)
         rcs += rc
         print("\n".join(output + [ro]))

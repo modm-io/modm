@@ -278,7 +278,10 @@ def common_compiler_flags(compiler, target):
             "-Wl,--fatal-warnings",
             "-Wl,--gc-sections",
             "-Wl,--relax",
-            # "-Wl,-Map,{target_base}.map,--cref",
+        ]
+    if target.identifier["family"] not in ["darwin", "windows"]:
+        flags["linkflags"] += [
+            "-Wl,-Map,{target_base}.map,--cref"
         ]
     # C Preprocessor defines
     flags["cppdefines"] = []

@@ -57,8 +57,6 @@ hackable build system without standardized IDE integration.
 
 The `modm:build:cmake` module generates a CMake build script, which you can
 import into a lot of IDEs and compile it from there.
-This module ships with a Makefile that wraps all of the CMake commands, however,
-its focus is less on tooling.
 
 [See the `modm:build:cmake` documentation](../module/modm-build-cmake).
 
