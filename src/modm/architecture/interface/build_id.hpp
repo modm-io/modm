@@ -12,7 +12,7 @@
 #pragma once
 
 #include <cstdint>
-#include <array>
+#include <span>
 
 namespace modm
 {
@@ -23,7 +23,7 @@ namespace modm
  * @ingroup modm_architecture_build_id
  */
 [[nodiscard]]
-const std::array<uint8_t, 20>&
+std::span<const uint8_t, 20>
 build_id();
 
 }

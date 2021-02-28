@@ -12,6 +12,7 @@
 #pragma once
 #include "fault_storage.hpp"
 #include <modm/architecture/interface/build_id.hpp>
+#include <span>
 
 /**
  * Called first after a HardFault occurred.
@@ -46,7 +47,7 @@ public:
 	/// @returns report size > 0
 	static inline bool hasReport() { return begin() != end(); }
 	/// @returns a 20-bytes SHA1 of the firmware for identification
-	static inline const std::array<uint8_t, 20>& buildId() { return modm::build_id(); }
+	static inline std::span<const uint8_t, 20> buildId() { return modm::build_id(); }
 	/// Clears the report
 	static inline void clear() { FaultStorage::closeRead(); }
 	/// Clears the report and reboots the device

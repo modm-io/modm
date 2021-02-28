@@ -15,19 +15,17 @@ typedef struct {
     uint32_t namesz;
     uint32_t descsz;
     uint32_t type;
-    uint8_t data[];
+    uint8_t data[30];
 } ElfNoteSection_t;
-extern "C" const ElfNoteSection_t __build_id[];
+extern "C" const ElfNoteSection_t __build_id;
 
 namespace modm
 {
 
-const std::array<uint8_t, 20>&
+std::span<const uint8_t, 20>
 build_id()
 {
-	const uint8_t *const sha1 = &__build_id->data[__build_id->namesz];
-	auto *const hash = reinterpret_cast<const std::array<uint8_t, 20> *>(sha1);
-	return *hash;
+    return std::span<const uint8_t, 20>(&__build_id.data[__build_id.namesz], 20);
 }
 
 }
