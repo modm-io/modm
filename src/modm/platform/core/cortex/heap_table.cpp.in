@@ -14,12 +14,12 @@
 #include <stdint.h>
 #include "heap_table.hpp"
 
-typedef struct
+struct table_pool_t
 {
 	uint32_t traits;
 	uint8_t *const start;
 	uint8_t *const end;
-} __attribute__((packed)) table_pool_t;
+} __attribute__((packed));
 
 extern "C" const table_pool_t __table_heap_start[];
 extern "C" const table_pool_t __table_heap_end[];
@@ -40,43 +40,41 @@ HeapTable::begin()
 		{
 			if (t->start <= fault_storage_heap_start and fault_storage_heap_start < t->end)
 			{
-				auto it = Iterator(reinterpret_cast<const void*>(t));
-				it.offset = (size_t)fault_storage_heap_start - (size_t)t->start;
+				auto it = Iterator(t);
+				it.offset = static_cast<size_t>(fault_storage_heap_start - t->start);
 				return it;
 			}
 		}
 	}
 %% endif
-	return Iterator(reinterpret_cast<const void*>(__table_heap_start));
+	return Iterator(__table_heap_start);
 }
 
 HeapTable::Iterator
 HeapTable::end()
 {
-	return Iterator(reinterpret_cast<const void*>(__table_heap_end));
+	return Iterator(__table_heap_end);
 }
 
-HeapTable::Iterator::Iterator(const void* table):
+HeapTable::Iterator::Iterator(const table_pool_t* table):
 	table(table)
 {}
 
 HeapTable::Iterator::Type
 HeapTable::Iterator::operator*() const
 {
-	const auto t{reinterpret_cast<const table_pool_t*>(table)};
 %% if with_fault_storage
-	const uint8_t *const start = (const uint8_t *)((size_t)t->start + offset);
-	return {MemoryTraits(t->traits), start, t->end, (size_t)t->end - (size_t)start};
+	const uint8_t *const start = table->start + offset;
+	return {MemoryTraits(table->traits), start, table->end, static_cast<size_t>(table->end - start)};
 %% else
-	return {MemoryTraits(t->traits), t->start, t->end, (size_t)t->end - (size_t)t->start};
+	return {MemoryTraits(table->traits), table->start, table->end, static_cast<size_t>(table->end - table->start)};
 %% endif
 }
 
 HeapTable::Iterator&
 HeapTable::Iterator::operator++()
 {
-	auto t{reinterpret_cast<const table_pool_t*>(table)};
-	table = reinterpret_cast<const void*>(++t);
+	table++;
 	return *this;
 }
 
