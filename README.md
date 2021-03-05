@@ -149,24 +149,25 @@ documentation.
 </tr><tr>
 <td align="center">NUCLEO-F411RE</td>
 <td align="center">NUCLEO-F429ZI</td>
+<td align="center">NUCLEO-F439ZI</td>
 <td align="center">NUCLEO-F446RE</td>
-<td align="center">NUCLEO-F446ZE</td>
 </tr><tr>
+<td align="center">NUCLEO-F446ZE</td>
 <td align="center">NUCLEO-F746ZG</td>
 <td align="center">NUCLEO-F767ZI</td>
 <td align="center">NUCLEO-G071RB</td>
-<td align="center">NUCLEO-G431KB</td>
 </tr><tr>
+<td align="center">NUCLEO-G431KB</td>
 <td align="center">NUCLEO-G431RB</td>
 <td align="center">NUCLEO-G474RE</td>
 <td align="center">NUCLEO-L152RE</td>
-<td align="center">NUCLEO-L432KC</td>
 </tr><tr>
+<td align="center">NUCLEO-L432KC</td>
 <td align="center">NUCLEO-L476RG</td>
 <td align="center">OLIMEXINO-STM32</td>
 <td align="center">Raspberry Pi</td>
-<td align="center">SAMD21-MINI</td>
 </tr><tr>
+<td align="center">SAMD21-MINI</td>
 <td align="center">STM32-F4VE</td>
 <td align="center">STM32F030F4P6-DEMO</td>
 </tr>
