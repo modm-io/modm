@@ -69,6 +69,9 @@
 	/// Specifies that a variable (or function) lives in a particular section.
 	#define modm_section(s)
 
+	/// Specifies that a variable (or function) lives in a particular section with used flag.
+	#define modm_section_used(s)
+
 	/// Marks a declaration as deprecated and displays a message.
 	#define modm_deprecated(msg)
 
@@ -124,6 +127,7 @@
 	#define modm_likely(x)			__builtin_expect(!!(x), 1)
 	#define modm_unlikely(x)		__builtin_expect(!!(x), 0)
 	#define modm_section(s)			__attribute__((section(s)))
+	#define modm_section_used(s)	__attribute__((section(s), used))
 	#define modm_fallthrough		__attribute__((fallthrough))
 	#define modm_noreturn			__attribute__((noreturn))
 	#define modm_warn_unused_result	__attribute__((warn_unused_result))
