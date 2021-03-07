@@ -284,6 +284,9 @@ def build(env):
     # hardware init section
     env.copy("hardware_init.hpp")
 
+    # Used in fault_storage and heap_tabe
+    env.copy("table_pool.hpp")
+
     # busy-waiting delays
     if env.has_module(":architecture:delay"):
         core = env.substitutions["core"]

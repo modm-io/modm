@@ -12,8 +12,7 @@
 #include "fault_storage.hpp"
 #include <modm/architecture/utils.hpp>
 #include <modm/platform/core/hardware_init.hpp>
-#include <modm/platform/core/heap_table.hpp>
-
+#include <modm/platform/core/table_pool.hpp>
 
 static constexpr uint32_t magic_start = 0xBAADC0DE;
 static constexpr uint32_t magic_end = 0xC0FFEEEE;
