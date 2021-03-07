@@ -14,34 +14,25 @@
 #include <stdint.h>
 #include "heap_table.hpp"
 
-struct table_pool_t
-{
-	uint32_t traits;
-	uint8_t *const start;
-	uint8_t *const end;
-} __attribute__((packed));
-
-extern "C" const table_pool_t __table_heap_start[];
-extern "C" const table_pool_t __table_heap_end[];
-
 namespace modm::platform
 {
 %% if with_fault_storage
-extern const uint8_t *fault_storage_heap_start;
+extern const uint32_t *fault_storage_heap_start;
 %% endif
 
 HeapTable::Iterator
 HeapTable::begin()
 {
 %% if with_fault_storage
-	if (fault_storage_heap_start)
+	const auto heap_ptr = reinterpret_cast<const uint8_t*>(fault_storage_heap_start);
+	if (heap_ptr)
 	{
 		for (auto t = __table_heap_start; t < __table_heap_end; t++)
 		{
-			if (t->start <= fault_storage_heap_start and fault_storage_heap_start < t->end)
+			if (t->start <= heap_ptr and heap_ptr < t->end)
 			{
 				auto it = Iterator(t);
-				it.offset = static_cast<size_t>(fault_storage_heap_start - t->start);
+				it.offset = static_cast<size_t>(heap_ptr - t->start);
 				return it;
 			}
 		}
