@@ -220,6 +220,8 @@ def common_compiler_flags(compiler, target):
         # "-fmerge-all-constants",
         "-ffile-prefix-map={project_source_dir}=.",
         "-ffile-prefix-map={gccpath}=.",
+        "-flto",
+        "-fno-fat-lto-objects",
 
         "-g3",
         "-gdwarf-3",
@@ -279,6 +281,8 @@ def common_compiler_flags(compiler, target):
             "-Wl,--gc-sections",
             "-Wl,--relax",
             # "-Wl,-Map,{target_base}.map,--cref",
+            "-flto",
+            "-fno-fat-lto-objects",
         ]
     # C Preprocessor defines
     flags["cppdefines"] = []
