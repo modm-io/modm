@@ -1,0 +1,13 @@
+<library>
+  <extends>modm:disco-f072rb</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/stm32f072_discovery/stusb4500</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:debug</module>
+    <module>modm:driver:stusb4500</module>
+    <module>modm:platform:i2c:1</module>
+    <module>modm:platform:uart:1</module>
+  </modules>
+</library>
