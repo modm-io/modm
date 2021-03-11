@@ -129,6 +129,9 @@ typedef HsvT<>	Hsv;
 template <typename UnderlyingType>
 IOStream& operator << ( IOStream& os, const color::RgbT<UnderlyingType>& color);
 
+template <typename UnderlyingType>
+IOStream& operator << ( IOStream& os, const color::HsvT<UnderlyingType>& color);
+
 } // namespace color
 
 } // namespace modm
