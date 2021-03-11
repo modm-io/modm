@@ -21,115 +21,123 @@
 namespace modm
 {
 
-/// @ingroup modm_ui_color
-namespace color
-{
+    /// @ingroup modm_ui_color
+    namespace color
+    {
 
-template<typename T>
-class HsvT;
+        template <typename T>
+        class HsvT;
 
-template<typename T>
-class RgbT;
+        template <typename T>
+        class RgbT;
 
-/// @ingroup modm_ui_color
-template<class UnderlyingType = uint8_t>
-class RgbT
-{
-public:
-	UnderlyingType red{0};
-	UnderlyingType green{0};
-	UnderlyingType blue{0};
+        /// @ingroup modm_ui_color
+        template <class UnderlyingType = uint8_t>
+        class RgbT
+        {
+        public:
+            UnderlyingType red{0};
+            UnderlyingType green{0};
+            UnderlyingType blue{0};
 
-	constexpr RgbT() = default;
+            constexpr RgbT() = default;
 
-	constexpr RgbT(UnderlyingType red, UnderlyingType green, UnderlyingType blue)
-	:	red(red), green(green), blue(blue)
-	{
-	}
+            constexpr RgbT(UnderlyingType red, UnderlyingType green, UnderlyingType blue)
+                : red(red), green(green), blue(blue)
+            {
+            }
 
-	template<typename IntermediateType = float, unsigned int multiplier = 100, typename ReturnType = UnderlyingType>
-	ReturnType getRelative(const UnderlyingType color) const
-	{
-		return static_cast<ReturnType>(
-				(static_cast<IntermediateType>(color) *
-				static_cast<IntermediateType>(multiplier)) /
-				static_cast<IntermediateType>(red + green + blue));
-	}
+            template <typename IntermediateType = float, unsigned int multiplier = 100, typename ReturnType = UnderlyingType>
+            ReturnType getRelative(const UnderlyingType color) const
+            {
+                return static_cast<ReturnType>(
+                    (static_cast<IntermediateType>(color) *
+                     static_cast<IntermediateType>(multiplier)) /
+                    static_cast<IntermediateType>(red + green + blue));
+            }
 
-	template<typename IntermediateType = float, unsigned int multiplier = 100, typename ReturnType = UnderlyingType>
-	ReturnType getRelativeRed() const
-	{
-		return getRelative<IntermediateType, multiplier, ReturnType>(red);
-	}
+            template <typename IntermediateType = float, unsigned int multiplier = 100, typename ReturnType = UnderlyingType>
+            ReturnType getRelativeRed() const
+            {
+                return getRelative<IntermediateType, multiplier, ReturnType>(red);
+            }
 
-	template<typename IntermediateType = float, unsigned int multiplier = 100, typename ReturnType = UnderlyingType>
-	ReturnType getRelativeGreen() const
-	{
-		return getRelative<IntermediateType, multiplier, ReturnType>(green);
-	}
+            template <typename IntermediateType = float, unsigned int multiplier = 100, typename ReturnType = UnderlyingType>
+            ReturnType getRelativeGreen() const
+            {
+                return getRelative<IntermediateType, multiplier, ReturnType>(green);
+            }
 
-	template<typename IntermediateType = float, unsigned int multiplier = 100, typename ReturnType = UnderlyingType>
-	ReturnType getRelativeBlue() const
-	{
-		return getRelative<IntermediateType, multiplier, ReturnType>(blue);
-	}
+            template <typename IntermediateType = float, unsigned int multiplier = 100, typename ReturnType = UnderlyingType>
+            ReturnType getRelativeBlue() const
+            {
+                return getRelative<IntermediateType, multiplier, ReturnType>(blue);
+            }
 
-	template<typename IntermediateType = float, unsigned int multiplier = 100, typename ReturnType = UnderlyingType>
-	RgbT<ReturnType> getRelativeColors() const
-	{
-		return RgbT<ReturnType>(
-			getRelativeRed	<IntermediateType, multiplier, ReturnType>(),
-			getRelativeGreen<IntermediateType, multiplier, ReturnType>(),
-			getRelativeBlue	<IntermediateType, multiplier, ReturnType>()
-		);
-	}
+            template <typename IntermediateType = float, unsigned int multiplier = 100, typename ReturnType = UnderlyingType>
+            RgbT<ReturnType> getRelativeColors() const
+            {
+                return RgbT<ReturnType>(
+                    getRelativeRed<IntermediateType, multiplier, ReturnType>(),
+                    getRelativeGreen<IntermediateType, multiplier, ReturnType>(),
+                    getRelativeBlue<IntermediateType, multiplier, ReturnType>());
+            }
 
-	template<typename T> void
-	toHsv(HsvT<T>* color) const;
+            template <typename T>
+            void
+            toHsv(HsvT<T> *color) const;
 
-	constexpr bool
-	operator == (const RgbT<UnderlyingType>& other) const
-	{
-		return (red == other.red and green == other.green and blue == other.blue);
-	}
+            constexpr bool
+            operator==(const RgbT<UnderlyingType> &other) const
+            {
+                return (red == other.red and green == other.green and blue == other.blue);
+            }
 
-private:
-	template<typename T>
-	friend IOStream&
-	operator << ( IOStream& os, const RgbT<T>&);
-};
+        private:
+            template <typename T>
+            friend IOStream &
+            operator<<(IOStream &os, const RgbT<T> &);
+        };
 
-/// @ingroup modm_ui_color
-typedef RgbT<>	Rgb;
+        /// @ingroup modm_ui_color
+        typedef RgbT<> Rgb;
 
-/// @ingroup modm_ui_color
-template<class UnderlyingType = uint8_t>
-class HsvT
-{
-public:
-	UnderlyingType hue{0};
-	UnderlyingType saturation{0};
-	UnderlyingType value{0};
+        /// @ingroup modm_ui_color
+        template <class UnderlyingType = uint8_t>
+        class HsvT
+        {
+        public:
+            UnderlyingType hue{0};
+            UnderlyingType saturation{0};
+            UnderlyingType value{0};
 
-	constexpr HsvT() = default;
+            constexpr HsvT() = default;
 
-	constexpr HsvT(UnderlyingType hue, UnderlyingType saturation, UnderlyingType value)
-	:	hue(hue), saturation(saturation), value(value)
-	{
-	}
+            constexpr HsvT(UnderlyingType hue, UnderlyingType saturation, UnderlyingType value)
+                : hue(hue), saturation(saturation), value(value)
+            {
+            }
 
-	template<typename T=UnderlyingType>
-	void
-	toRgb(RgbT<T>* color) const;
-};
+            template <typename T = UnderlyingType>
+            void
+            toRgb(RgbT<T> *color) const;
 
-/// @ingroup modm_ui_color
-typedef HsvT<>	Hsv;
+        private:
+            template <typename T>
+            friend IOStream &
+            operator<<(IOStream &os, const HsvT<T> &);
+        };
 
-template <typename UnderlyingType>
-IOStream& operator << ( IOStream& os, const color::RgbT<UnderlyingType>& color);
+        /// @ingroup modm_ui_color
+        typedef HsvT<> Hsv;
 
-} // namespace color
+        template <typename UnderlyingType>
+        IOStream &operator<<(IOStream &os, const color::RgbT<UnderlyingType> &color);
+
+        template <typename UnderlyingType>
+        IOStream &operator<<(IOStream &os, const color::HsvT<UnderlyingType> &color);
+
+    } // namespace color
 
 } // namespace modm
 

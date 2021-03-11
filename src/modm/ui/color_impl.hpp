@@ -75,3 +75,12 @@ modm::color::operator << ( modm::IOStream& os, const modm::color::RgbT<Underlyin
 	os << color.red << "\t" << color.green << "\t" << color.blue;
 	return os;
 }
+
+template <typename UnderlyingType>
+modm::IOStream&
+modm::color::operator << ( modm::IOStream& os, const modm::color::HsvT<UnderlyingType>& color)
+{
+	os << color.hue << "\t" << color.saturation << "\t" << color.value;
+	return os;
+}
+
