@@ -1,0 +1,13 @@
+<library>
+  <extends>modm:nucleo-f446re</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_f446re/color</option>
+  </options>
+  <modules>
+    <module>modm:driver:tcs3472</module>
+    <module>modm:platform:i2c:1</module>
+    <module>modm:processing:protothread</module>
+    <module>modm:processing:timer</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

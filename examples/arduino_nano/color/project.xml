@@ -1,0 +1,13 @@
+<library>
+  <extends>modm:arduino-nano</extends>
+  <options>
+    <option name="modm:build:build.path">../../../../build/arduino_nano/color</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:processing:protothread</module>
+    <module>modm:processing:timer</module>
+    <module>modm:platform:i2c</module>
+    <module>modm:driver:tcs3472</module>
+  </modules>
+</library>

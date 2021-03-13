@@ -161,7 +161,7 @@ jobs:
           name: Examples AVR Series
           when: always
           command: |
-            (cd examples && ../tools/scripts/examples_compile.py avr arduino_uno)
+            (cd examples && ../tools/scripts/examples_compile.py avr arduino_uno arduino_nano)
       - run:
           name: Compile AVR Unittests AT90CAN
           when: always
