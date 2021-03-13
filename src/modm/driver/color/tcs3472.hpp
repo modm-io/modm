@@ -1,7 +1,8 @@
 // coding: utf-8
 /*
  * Copyright (c) 2017, Arjun Sarin
- * Copyright (c) 2017-2018, Niklas Hauser
+ * Copyright (c) 2017-2018, 2021, Niklas Hauser
+ * Copyright (c) 2021, Thomas Sommer
  *
  * This file is part of the modm project.
  *
@@ -11,234 +12,262 @@
  */
 // ----------------------------------------------------------------------------
 
-/**
- * \file	tcs3472.hpp
- * \date	04 Feb 2017
- * \author	David Hebbeker, Arjun Sarin
- */
-
 #ifndef MODM_TCS3472_HPP
 #define MODM_TCS3472_HPP
 
 #include <stdint.h>
-
-#include <modm/ui/color.hpp>
 #include <modm/architecture/interface/i2c_device.hpp>
+#include <modm/math/utils/endianness.hpp>
+#include <modm/ui/color.hpp>
 
 namespace modm
 {
-/**
- * \brief 	Settings to configure the ams digital color sensor family tcs34721, -13, -15, 17
- * \see		tcs3472
- * \ingroup	modm_driver_tcs3472
- *
- * Device   Address
- * tcs34721  0x39 (with IR filter)
- *        3  0x39 (without IR filter)
- *        5  0x29 (with IR filter)
- *        7  0x29 (without IR filter)
- *
- */
+
+// forward declaration for friending with tcs3472::Data
+template < class I2cMaster >
+class Tcs3472;
+
+/// @ingroup	modm_driver_tcs3472
 struct tcs3472
 {
-	/** @name Gain_Register
-	 * @{
+	/** Device Address depends on version TCS3472x
+	 *
+	 * - 1 = 0x39 (with IR filter)
+	 * - 3 = 0x39 (without IR filter)
+	 * - 5 = 0x29 (with IR filter)
+	 * - 7 = 0x29 (without IR filter)
 	 */
+	static constexpr uint8_t
+	addr(uint8_t version=5)
+	{ return version < 5 ? 0x39 : 0x29; }
 
-	//! \brief 	Analog rgbc gain control
-	enum class Gain : uint8_t
+	/// Analog rgbc gain control
+	enum class
+	Gain : uint8_t
 	{
-		X1	= 0b00,	//!< x1 gain
-		X4	= 0b01,	//!< x4 gain
-		X16	= 0b10,	//!< x16 gain
-		X64	= 0b11,	//!< x60 gain
-		DEFAULT = 0	//!< default value on chip reset
-	};
-	//! @}
-
-
-	//! \brief 	Integration for a fixed time
-	enum class IntegrationTime : uint8_t
-	{
-		MSEC_2		= 0xFF,		//!< integrate over 2.4 ms
-		MSEC_24		= 0xF6,		//!< integrate over 100 ms
-		MSEC_101	= 0xD5,		//!< integrate over 101 ms
-		MSEC_154	= 0xC0,		//!< integrate over 154 ms
-		MSEC_700	= 0x00,		//!< integrate over 700 ms
-		DEFAULT = 0xFF			//!< default value on chip reset
-	};
-	//! @}
-
-
-	//! \brief 	Register addresses
-	enum class RegisterAddress : uint8_t
-	{
-		ENABLE				= 0x00,	//!< Primarily to power up the device
-		TIMING				= 0x01,	//!< Integration time control  @see tcs3472::setIntegrationTime
-		//INTERRUPT			= 0x02,	//!< Interrupt settings
-		//INT_SOURCE			= 0x03,	//!< Interrupt source
-		ID				= 0x12,	//!< Part number
-		GAIN				= 0x0F,	//!< Sensitivity settings @see Tcs3414::setGain
-		// Interrupt threshold registers
-		LOW_THRESH_LOW_BYTE		= 0x04,	//!< Low byte of low interrupt threshold
-		LOW_THRESH_HIGH_BYTE		= 0x05,	//!< High byte of low interrupt threshold
-		HIGH_THRESH_LOW_BYTE		= 0x06,	//!< Low byte of high interrupt threshold
-		HIGH_THRESH_HIGH_BYTE		= 0x07,	//!< High byte of high interrupt threshold
-		// Data registers
-		CDATALOW			= 0x14,	//!< Low byte of ADC clear channel
-		CDATAHIGH			= 0x15,	//!< High byte of ADC clear channel
-		RDATALOW			= 0x16,	//!< Low byte of ADC red channel
-		RDATAHIGH			= 0x17,	//!< High byte of ADC red channel
-		GDATALOW			= 0x18,	//!< Low byte of ADC green channel
-		GDATAHIGH			= 0x19,	//!< High byte of ADC green channel
-		BDATALOW			= 0x1A,	//!< Low byte of ADC blue channel
-		BDATAHIGH			= 0x1B	//!< High byte of ADC blue channel
+		X1 = 0b00,			///< x1 gain
+		X4 = 0b01,			///< x4 gain
+		X16 = 0b10,			///< x16 gain
+		X60 = 0b11,			///< x60 gain
 	};
 
-	typedef uint16_t	UnderlyingType;		//!< datatype of color values
-	typedef color::RgbT<UnderlyingType> Rgb;
+	/// Integration for a fixed time
+	enum class
+	IntegrationTime : uint8_t
+	{
+		MSEC_2_4 = 0xFF,	///< integrate over 2.4 ms
+		MSEC_24 = 0xF6,		///< integrate over 24 ms
+		MSEC_101 = 0xD5,	///< integrate over 101 ms
+		MSEC_154 = 0xC0,	///< integrate over 154 ms
+		MSEC_700 = 0x00,	///< integrate over 700 ms
+	};
 
+	enum class
+	WaitTime : uint8_t
+	{
+		MSEC_2_4 = 0xFF,	///< wait for 2.4 ms
+		MSEC_204 = 0xAB,	///< wait for 204 ms>
+		MSEC_614 = 0x00		///< wait for 614 ms>
+	};
+
+	/// Controls rate of interrupt to the host processor.
+	enum class
+	InterruptPersistence : uint8_t
+	{
+		EVERY = 0,			// Interrupt for every new sample independent of thresholds
+		CNT_1 = 1,			// Interrupt after 1 cycle being below or above thresholds
+		CNT_2 = 2,			// Interrupt after 2 cycles being below or above thresholds
+		CNT_3 = 3,			// ...
+		CNT_5 = 4,
+		CNT_10 = 5,
+		CNT_15 = 6,
+		CNT_20 = 7,
+		CNT_25 = 8,
+		CNT_30 = 9,
+		CNT_35 = 10,
+		CNT_40 = 11,
+		CNT_45 = 12,
+		CNT_50 = 13,
+		CNT_55 = 14,
+		CNT_60 = 15,
+	};
+
+	/// Power-control and feature enable flags
+	enum class
+	Enable : uint8_t
+	{
+		POWER_ON = 1,
+		ADC_ENABLE = 1 << 1,
+		WAIT_ENABLE = 1 << 3,
+		INTERRUPT_ENABLE = 1 << 4,
+		POWER_ON_POLLING = POWER_ON | ADC_ENABLE,
+		POWER_ON_INTERRUPT = POWER_ON | ADC_ENABLE | INTERRUPT_ENABLE,
+		POWER_ON_INTERRUPT_AND_WAITTIME = POWER_ON | ADC_ENABLE | WAIT_ENABLE | INTERRUPT_ENABLE
+	};
+
+	/// Register addresses
+	enum class
+	RegisterAddress : uint8_t
+	{
+		ENABLE = 0x00,					///< Power up the device, Enable features
+		ID = 0x12,						///< Read part-ID
+
+		// Shutter configuration
+		INTEGRATION_TIME = 0x01,		///< Shutter integration time
+		GAIN = 0x0F,  					///< Shutter gain control
+
+		// Waittime configuration
+		WAIT_TIME = 0x03,				///< Waittime between samples. Conceived for power savings
+		CONFIGURATION = 0x0D,			///< Setting WAITLONG multiplies WAIT_TIME by 12
+
+		// Interrupt configuration
+		LOW_THRESH_LOW_BYTE = 0x04,		///< Low byte of low interrupt threshold
+		LOW_THRESH_HIGH_BYTE = 0x05,	///< High byte of low interrupt threshold
+		HIGH_THRESH_LOW_BYTE = 0x06,	///< Low byte of high interrupt threshold
+		HIGH_THRESH_HIGH_BYTE = 0x07,	///< High byte of high interrupt threshold
+		INTERRUPT_PERSIST_FILTER = 0x0C,///< Set how much threshold-passing cycles are required, to trigger the interrupt
+		RELOAD_INTERRUPT = 0x66,		///< Reset Interrupt special command
+
+		// Data results
+		CDATALOW = 0x14,				///< Low byte of ADC clear channel
+		CDATAHIGH = 0x15,				///< High byte of ADC clear channel
+		RDATALOW = 0x16,				///< Low byte of ADC red channel
+		RDATAHIGH = 0x17,				///< High byte of ADC red channel
+		GDATALOW = 0x18,				///< Low byte of ADC green channel
+		GDATAHIGH = 0x19,				///< High byte of ADC green channel
+		BDATALOW = 0x1A,				///< Low byte of ADC blue channel
+		BDATAHIGH = 0x1B 				///< High byte of ADC blue channel
+	};
+
+	using Rgb = color::RgbT<uint16_t>;
+
+	struct modm_packed
+	Data
+	{
+		inline Rgb
+		getColor()
+		{ return {getRed(), getGreen(), getBlue()}; }
+
+		/** Normalize color values based on clear value
+		 *
+		 * Imagine a low band light. For example a green laser. In case the filters
+		 * of this sensors do not transfer this wavelength well, it might
+		 * result in all colors being very low. The clear value will not
+		 * filter colors and thus it will see a bright light (intensity).
+		 * In order to still have some signal the very low green value can be
+		 * amplified with the clear value.
+		 */
+		inline Rgb
+		getNormalizedColor()
+		{
+			Rgb color = getColor();
+			const float scalar = getClear() / float(color.red + color.green + color.blue);
+			color.red *= scalar;
+			color.green *= scalar;
+			color.blue *= scalar;
+			return color;
+		}
+
+		inline uint16_t
+		getClear()  { return getValue(0); }
+		inline uint16_t
+		getRed() { return getValue(1); }
+		inline uint16_t
+		getGreen() { return getValue(2); }
+		inline uint16_t
+		getBlue() { return getValue(3); }
+
+		inline uint16_t
+		operator[] (uint8_t index)
+		{ return (index < 4) ? getValue(index) : 0; }
+
+	protected:
+		inline uint16_t
+		getValue(uint8_t index)
+		{ return modm::fromLittleEndian(reinterpret_cast<uint16_t*>(data)[index]); }
+
+		// clear, red, green, blue
+		uint8_t data[sizeof(uint16_t) * 4];
+		template<class I2cMaster> friend class Tcs3472;
+	};
 };
 
 /**
- * \brief	Tcs3472X Digital Color Sensors
+ * TCS3472X Digital Color Sensors
  *
- * \todo	Not all features of the sensors are implemented in this driver
- * 			yet.
- *
- * \tparam	I2CMaster	I2C interface which needs an \em initialized
- * 						modm::i2c::Master
- * \see		tcs3472
- * \author	David Hebbeker, Arjun Sarin
- * \ingroup	modm_driver_tcs3472
+ * @see		tcs3472
+ * @author	David Hebbeker, Arjun Sarin, Thomas Sommer, Niklas Hauser
+ * @ingroup	modm_driver_tcs3472
  */
-template < typename I2cMaster >
-class Tcs3472 : public tcs3472, public modm::I2cDevice< I2cMaster, 2 >
+template<typename I2cMaster>
+class Tcs3472 : public tcs3472, public modm::I2cDevice<I2cMaster, 2>
 {
 public:
-	Tcs3472(uint8_t address = 0x29);
+	Tcs3472(Data &data, uint8_t address = addr());
 
-	//! \brief 	Power up sensor and start conversions
-	// Blocking
-	bool inline
-	initializeBlocking()
-	{
-		return RF_CALL_BLOCKING(initialize());
-	}
-
-	//! \brief	The gain can be used to adjust the sensitivity of all ADC output channels.
+	/// Power up sensor and start conversions
 	modm::ResumableResult<bool>
-	setGain(
-                        const Gain      gain      = Gain::DEFAULT)
-	{
-		return writeRegister(RegisterAddress::GAIN,
-				static_cast<uint8_t>(gain));
-	}
-
-	/**
-	 * @name Return already sampled color
-	 * @{
-	 */
-	inline static Tcs3472::Rgb
-	getOldColors()
-	{
-		return color;
-        };
-
-	//!@}
-
-	/**
-	 * @name Sample and return fresh color values
-	 * @{
-	 */
-	inline static Tcs3472::Rgb
-	getNewColors()
-	{
-		refreshAllColors();
-		return getOldColors();
-	};
-
-	//!@}
-
-	//! \brief	Read current samples of ADC conversions for all channels.
-	// Non-blocking
-	modm::ResumableResult<bool>
-	refreshAllColors();
-
-	// MARK: - TASKS
-	modm::ResumableResult<bool>
-	initialize()
-	{
-		return writeRegister(RegisterAddress::ENABLE, 0b11);	// control to power up and start conversion
-		// note: adafruits driver waits 3ms before writing AEN bit (0b10). we don't??
-	};
+	initialize(Enable flags = Enable::POWER_ON_POLLING)
+	{ return writeRegister(RegisterAddress::ENABLE, uint8_t(flags)); }
 
 	modm::ResumableResult<bool>
-	configure(
-                        const Gain	gain        = Gain::DEFAULT,
-                        const uint8_t 	int_time    = IntegrationTime::DEFAULT);
+	configure(Gain gain = Gain::X1,
+			  IntegrationTime int_time = IntegrationTime::MSEC_2_4);
 
-private:
-	//! \brief Sets the integration time for the ADCs.
+public:
+	/// The gain can be used to adjust the sensitivity of all ADC output channels.
 	modm::ResumableResult<bool>
-        setIntegrationTime(const uint8_t int_time = 0)
-	{
-		return writeRegister(
-				RegisterAddress::TIMING,
-                                static_cast<uint8_t>(int_time));
-	}
+	setGain(Gain gain = Gain::X1)
+	{ return writeRegister(RegisterAddress::GAIN, uint8_t(gain)); }
 
-private:
-	uint8_t commandBuffer[4];
-	bool success;
-
-private:
-	//! \brief	Read value of specific register.
+	/// Sets the integration time for the ADCs.
 	modm::ResumableResult<bool>
-	readRegisters(
-			const RegisterAddress address,
-			uint8_t * const values,
-			const uint8_t count = 1);
+	setIntegrationTime(IntegrationTime int_time = tcs3472::IntegrationTime::MSEC_2_4)
+	{ return writeRegister(RegisterAddress::INTEGRATION_TIME, uint8_t(int_time)); }
+
+	/// Sets the wait time for the ADCs.
+	modm::ResumableResult<bool>
+	setWaitTime(WaitTime wait_time, bool wait_long = false);
+
+	/// Sets the low threshold for the interrupt-comparator
+	modm::ResumableResult<bool>
+	setInterruptLowThreshold(uint16_t threshold);
+
+	/// Sets the high threshold for the interrupt-comparator
+	modm::ResumableResult<bool>
+	setInterruptHighThreshold(uint16_t threshold);
+
+	/// The gain can be used to adjust the sensitivity of all ADC output channels.
+	modm::ResumableResult<bool>
+	setInterruptPersistenceFilter(InterruptPersistence value)
+	{ return writeRegister(RegisterAddress::INTERRUPT_PERSIST_FILTER, uint8_t(value)); }
+
+public:
+	/// Resets the interrupt output.
+	modm::ResumableResult<bool>
+	reloadInterrupt();
+
+	/// Read current samples of ADC conversions for all channels.
+	modm::ResumableResult<bool>
+	readColor()
+	{ return readRegisters(RegisterAddress::CDATALOW, data.data, sizeof(data.data)); }
+
+public:
+	modm::ResumableResult<bool>
+	readRegisters(RegisterAddress address, uint8_t *values, uint8_t count = 1);
 
 	modm::ResumableResult<bool>
-	writeRegister(
-			const RegisterAddress address,
-			const uint8_t value);
+	writeRegister(RegisterAddress address, uint8_t value);
 
-private:
-	class uint16_t_LOW_HIGH
-	{
-	private:
-		uint8_t low;
-		uint8_t high;
-	public:
-		uint16_t
-		get() const
-		{
-			uint16_t value = low;
-			value |= high << 8;
-			return value;
-		}
-		inline uint8_t getLSB()	const { return low; }
-		inline uint8_t getMSB()	const { return high; }
-	} modm_packed;
+	Data& getData() { return data; }
 
-	static union Data
-	{
-		uint8_t dataBytes[2*4];
-		struct
-		{
-                        uint16_t_LOW_HIGH clear;
-			uint16_t_LOW_HIGH red;
-			uint16_t_LOW_HIGH green;
-			uint16_t_LOW_HIGH blue;
-		} modm_packed;
-	} data;
-
-	static Rgb	color;
+protected:
+	Data &data;
+	uint8_t buffer[2];
 };
-}
+
+}  // namespace modm
 
 #include "tcs3472_impl.hpp"
 
-#endif // MODM_tcs3472_HPP
+#endif  // MODM_TCS3472_HPP

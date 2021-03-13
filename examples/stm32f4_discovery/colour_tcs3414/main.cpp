@@ -41,11 +41,6 @@ typedef I2cMaster2 MyI2cMaster;
 class ThreadOne : public modm::pt::Protothread
 {
 public:
-	ThreadOne() :
-		colorSensor()
-	{
-	}
-
 	bool
 	update()
 	{
@@ -57,7 +52,7 @@ public:
 		while (true)
 		{
 			// we wait until the task started
-			if (PT_CALL(colorSensor.ping())) {
+			if (PT_CALL(sensor.ping())) {
 			 	break;
 			}
 			// otherwise, try again in 100ms
@@ -69,7 +64,7 @@ public:
 
 		while (true)
 		{
-			if (PT_CALL(colorSensor.initialize())) {
+			if (PT_CALL(sensor.initialize())) {
 				break;
 			}
 			// otherwise, try again in 100ms
@@ -81,11 +76,16 @@ public:
 
 		while (true)
 		{
-			if (PT_CALL(colorSensor.configure(
+			if (PT_CALL(sensor.configure(
 					modm::tcs3414::Gain::X16,
-					modm::tcs3414::Prescaler::DEFAULT,
-					modm::tcs3414::IntegrationMode::INTERNAL,
-					static_cast<uint8_t>(modm::tcs3414::NominalIntegrationTime::MSEC_100)))){
+					modm::tcs3414::Prescaler::D1)))
+			{
+				if (PT_CALL(sensor.setIntegrationTime(
+						modm::tcs3414::IntegrationMode::INTERNAL,
+						modm::tcs3414::NominalIntegrationTime::MSEC_100)))
+				{
+					break;
+				}
 				break;
 			}
 			// otherwise, try again in 100ms
@@ -97,12 +97,12 @@ public:
 
 		while (true)
 		{
-			if (PT_CALL(colorSensor.refreshAllColors())) {
-				auto colors = colorSensor.getOldColors();
-				stream.printf("RGB: %5d %5d %5d", colors.red, colors.green, colors.blue);
-				modm::color::HsvT<modm::tcs3414::UnderlyingType> hsv;
-				colors.toHsv(&hsv);
-				stream.printf("  %5d\n", hsv.hue);
+			if (PT_CALL(sensor.readColor())) {
+				auto color = data.getColor();
+				stream << "RGB: " << color;
+				modm::color::HsvT<uint16_t> hsv;
+				color.toHsv(&hsv);
+				stream << "  " << hsv << modm::endl;
 			}
 			timeout.restart(500ms);
 			PT_WAIT_UNTIL(timeout.isExpired());
@@ -113,7 +113,8 @@ public:
 
 private:
 	modm::ShortTimeout timeout;
-	modm::Tcs3414<MyI2cMaster> colorSensor;
+	modm::tcs3414::Data data;
+	modm::Tcs3414<MyI2cMaster> sensor{data};
 };
 
 ThreadOne one;

@@ -19,7 +19,8 @@ def init(module):
 def prepare(module, options):
     module.depends(
         ":architecture:i2c.device",
-        ":ui:color")
+        ":ui:color",
+        ":math:utils")
     return True
 
 def build(env):
