@@ -290,7 +290,8 @@
         "html-output": "html",
         "html-search": true,
         "html-stylesheets": [
-            ""
+            "custom.css",
+            "custom_dark_theme.css"
         ],
         "html-timestamp": false,
         "mathjax-codefile": "",

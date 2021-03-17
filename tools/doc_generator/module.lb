@@ -85,6 +85,8 @@ def build(env):
     env.template("doxyfile.cfg.in")
     env.template("doxypress.json.in")
     env.copy("footer.html")
+    env.copy("custom.css")
+    env.copy("custom_dark_theme.css")
     env.copy(repopath("README.md"), "README.md")
 
 def post_build(env, buildlog):

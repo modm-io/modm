@@ -22,6 +22,21 @@ if (window.location.href.includes("modm.io")) {
  document.title = document.title.replace("modm API documentation", "modm API documentation for " + device);
  document.getElementById('projectname').innerHTML = document.getElementById('projectname').innerHTML.replace("modm API documentation", "modm API documentation for " + device);
 }
+document.getElementById('MSearchResults').onload = function()
+{
+  var iframe = document.getElementById('MSearchResults').contentWindow.document;
+  var head = iframe.getElementsByTagName("head")[0];
+  var link = iframe.createElement("link");
+  link.setAttribute("rel", "stylesheet");
+  link.setAttribute("type", "text/css");
+  link.setAttribute("href", "../custom.css");
+  head.appendChild(link);
+  var link = iframe.createElement("link");
+  link.setAttribute("rel", "stylesheet");
+  link.setAttribute("type", "text/css");
+  link.setAttribute("href", "../custom_dark_theme.css");
+  head.appendChild(link);
+}
 </script>
 </body>
 </html>
