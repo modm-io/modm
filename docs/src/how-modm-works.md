@@ -13,9 +13,8 @@ specifically for your targets and needs and generate a custom library.
 You can generate more than just code, in this example, lbuild also generates a
 build system which then compiles and links the application into a executable.
 
-<center>
-<img width="80%" src="/images/system_overview.png"/>
-</center>
+<style scoped>@media(prefers-color-scheme:dark){img{filter:invert(100%)}}</style>
+![](images/system_overview.png)
 
 We've also put a lot of thought into modm-devices, about what data to extract,
 how to format and store it. We automated the entire process to get the high
@@ -117,11 +116,6 @@ generate classes for the four USART peripherals.
 ```
 
 With these techiques we can generate a target specific HAL for hundreds of devices.
-Don't believe us? [Check out our CI doing just that](https://circleci.com/gh/modm-io/workflows/modm/tree/develop).
-
-<center>
-<img width="70%" src="/images/circle-ci.png"/>
-</center>
 
 
 ## modm asserts at compile-time

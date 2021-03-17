@@ -207,7 +207,7 @@ def target_diff(targets, compare=None):
 def render_dependency_graphs(node):
     graph = gv.Digraph(name=node["name"],
                        format="svg",
-                       graph_attr={"rankdir": "BT"},
+                       graph_attr={"rankdir": "BT", "bgcolor": "transparent", "class": "deps"},
                        node_attr={"style": "filled,solid", "shape": "box"})
     graph.node(ref_name(node["name"]), node_name(node["name"]), style="filled,bold")
 
@@ -216,10 +216,13 @@ def render_dependency_graphs(node):
                    style="filled" if node["dependencies"][mod] else "filled,dashed")
         graph.edge(ref_name(node["name"]), ref_name(mod),
                    style="solid" if node["dependencies"][mod] else "dashed")
-
     svg = graph.pipe().decode("utf-8")
     # We need to remove html comments from this output or mkdocs does not parse correctly
     svg = re.sub(r"<!--.*?-->\n", "", svg, flags=re.DOTALL | re.MULTILINE)
+    # Invert the graph for dark mode
+    svg = svg.replace("<svg ", '<svg class="deps" ')
+    svg += "<style>@media(prefers-color-scheme:dark){" \
+            "svg.deps{filter:invert(100%);}}</style>"
     return svg
 
 

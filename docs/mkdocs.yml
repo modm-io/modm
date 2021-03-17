@@ -23,6 +23,7 @@ theme:
   palette:
     primary: 'indigo'
     accent: 'cyan'
+    scheme: preference
   # logo: '../images/logo.svg'
   font:
     text: 'Ubuntu'
