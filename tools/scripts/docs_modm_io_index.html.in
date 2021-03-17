@@ -36,7 +36,7 @@ input, select {
     padding: 10px;
     font-size: 16px;
     width: 100%;
-    border-width: 2px;
+    border-width: 0px;
     border-color: #fff;
 }
 input[type=text] {
@@ -49,6 +49,7 @@ input[type=text]::placeholder {
 input[type=submit] {
     background-color: #3f51b5;
     color: #fff;
+    border: 0px;
 }
 .autocomplete-items {
     position: absolute;
@@ -72,6 +73,33 @@ input[type=submit] {
 .autocomplete-active {
     background-color: DodgerBlue !important;
     color: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+body {
+    background: #32363d;
+    color: #D8D8D8;
+}
+input, select {
+    background-color: #282923;
+}
+input[type=text] {
+    background-color: #282923;
+    color: #fff;
+}
+.autocomplete-items {
+    border: 1px solid #282923;
+}
+.autocomplete-items div {
+    background-color: #282923;
+    border-bottom: 1px solid #282923;
+}
+.autocomplete-items div:hover {
+    background-color: #32363d;
+}
+.autocomplete-active {
+    color: #D8D8D8;
+}
 }
 </style>
 </head>
