@@ -95,7 +95,7 @@ modm::Tcs3472<I2cMaster>::configure(Gain gain, IntegrationTime int_time)
 
 // ----------------------------------------------------------------------------
 // MARK: - Tasks
-template<class I2cMaster>
+template<typename I2cMaster>
 modm::ResumableResult<bool>
 modm::Tcs3472<I2cMaster>::reloadInterrupt()
 {
