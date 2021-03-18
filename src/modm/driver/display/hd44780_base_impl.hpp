@@ -177,6 +177,7 @@ modm::Hd44780Base<DATA, RW, RS, E>::writeCGRAM(uint8_t character, uint8_t *cg)
 	while(not writeCommand(SetCGRAM_Address | (character << 3)))
 		;
 	for (std::size_t ii = 0; ii < 8; ++ii) {
+		modm::delay(50us);
 		writeRAM(cg[ii]);
 	}
 	return true;
