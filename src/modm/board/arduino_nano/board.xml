@@ -8,6 +8,9 @@
   <options>
     <option name="modm:target">atmega328p-au</option>
     <option name="modm:platform:core:f_cpu">16000000</option>
+    <option name="modm:build:avrdude.lfuse">0xFF</option>
+    <option name="modm:build:avrdude.hfuse">0xDA</option>
+    <option name="modm:build:avrdude.efuse">0xFD</option>
   </options>
   <modules>
     <module>modm:board:arduino-nano</module>
