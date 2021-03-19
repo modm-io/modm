@@ -161,11 +161,11 @@ def common_avrdude_options(env):
     if not option_options:
         option_options = env.collector_values(":build:default.avrdude.options", option_options)[0]
     if not option_hfuse:
-        option_options = env.collector_values(":build:default.avrdude.hfuse", option_hfuse)[0]
+        option_hfuse = env.collector_values(":build:default.avrdude.hfuse", option_hfuse)[0]
     if not option_lfuse:
-        option_options = env.collector_values(":build:default.avrdude.lfuse", option_lfuse)[0]
+        option_lfuse = env.collector_values(":build:default.avrdude.lfuse", option_lfuse)[0]
     if not option_efuse:
-        option_options = env.collector_values(":build:default.avrdude.efuse", option_efuse)[0]
+        option_efuse = env.collector_values(":build:default.avrdude.efuse", option_efuse)[0]
     options = {
         "avrdude_programmer": option_programmer,
         "avrdude_port": option_port,
@@ -175,6 +175,7 @@ def common_avrdude_options(env):
         "avrdude_lfuse": option_lfuse,
         "avrdude_efuse": option_efuse,
     }
+    print(options)
     return options
 
 def common_collect_flags_for_scope(env, scope_filter=None):

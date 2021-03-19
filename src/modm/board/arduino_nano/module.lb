@@ -34,3 +34,6 @@ def build(env):
     env.copy(localpath("../arduino_uno"), "board")
     env.collect(":build:default.avrdude.programmer", "arduino");
     env.collect(":build:default.avrdude.baudrate", "115200");
+    env.collect(":build:default.avrdude.lfuse", "0xFF");
+    env.collect(":build:default.avrdude.hfuse", "0xDA");
+    env.collect(":build:default.avrdude.efuse", "0xFD");
