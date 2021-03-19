@@ -47,6 +47,15 @@ def init(module):
     module.name = ":build"
     module.description = BuildModuleDocs()
 
+def validate_fuse(string):
+    if(string):
+        if(len(string) != 4):
+            raise ValueError("Fuse option must be exactly 4 characters")
+        if(string[:2] != "0x"):
+            raise ValueError("Fuse option must begin with 0x")
+        for ch in string[2:]:
+            if ((ch < '0' or ch > '9') and (ch < 'A' or ch > 'F')):
+                raise ValueError("Fuse option contains non-hex character")
 
 def prepare(module, options):
     default_project_name = os.path.split(os.getcwd())[1].replace(".", "_").replace(" ", "_")
@@ -74,6 +83,15 @@ def prepare(module, options):
         module.add_option(
             StringOption(name="avrdude.options", default="",
                          description="AvrDude programmer options"))
+        module.add_option(
+            StringOption(name="avrdude.lfuse", validate=validate_fuse, default="",
+                         description="AvrDude lfuse"))
+        module.add_option(
+            StringOption(name="avrdude.hfuse", validate=validate_fuse, default="",
+                         description="AvrDude hfuse"))
+        module.add_option(
+            StringOption(name="avrdude.efuse", validate=validate_fuse, default="",
+                         description="AvrDude efuse"))
 
     elif is_cortex_m:
         module.add_option(

@@ -63,8 +63,8 @@ def program(source, device, programmer, port=None, baudrate=None, fuses=None, op
     command.append("-U flash:w:{}".format(source))
     if ".eeprom" in sections:
         command.append("-U eeprom:w:{}".format(source))
-    for fuse in utils.listify(fuses):
-        command.append("-U {}:w:{}".format(fuse, source))
+    for fuse, value in fuses.items():
+        command.append("-U {}:w:{}".format(fuse, value))
     command += utils.listify(options)
 
     command = " ".join(command)

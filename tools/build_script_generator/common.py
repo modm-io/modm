@@ -138,6 +138,9 @@ def common_avrdude_options(env):
     - `avrdude_port`
     - `avrdude_baudrate`
     - `avrdude_options`
+    - `avrdude_hfuse`
+    - `avrdude_lfuse`
+    - `avrdude_efuse`
 
     :returns: options dictionary
     """
@@ -145,6 +148,9 @@ def common_avrdude_options(env):
     option_port = env.get(":build:avrdude.port")
     option_baudrate = env.get(":build:avrdude.baudrate")
     option_options = env.get(":build:avrdude.options")
+    option_hfuse = env.get(":build:avrdude.hfuse")
+    option_lfuse = env.get(":build:avrdude.lfuse")
+    option_efuse = env.get(":build:avrdude.efuse")
 
     if not len(option_programmer):
         option_programmer = env.collector_values(":build:default.avrdude.programmer", option_programmer)[0]
@@ -154,11 +160,20 @@ def common_avrdude_options(env):
         option_baudrate = env.collector_values(":build:default.avrdude.baudrate", option_baudrate)[0]
     if not option_options:
         option_options = env.collector_values(":build:default.avrdude.options", option_options)[0]
+    if not option_hfuse:
+        option_options = env.collector_values(":build:default.avrdude.hfuse", option_hfuse)[0]
+    if not option_lfuse:
+        option_options = env.collector_values(":build:default.avrdude.lfuse", option_lfuse)[0]
+    if not option_efuse:
+        option_options = env.collector_values(":build:default.avrdude.efuse", option_efuse)[0]
     options = {
         "avrdude_programmer": option_programmer,
         "avrdude_port": option_port,
         "avrdude_baudrate": option_baudrate,
         "avrdude_options": option_options,
+        "avrdude_hfuse": option_hfuse,
+        "avrdude_lfuse": option_lfuse,
+        "avrdude_efuse": option_efuse,
     }
     return options
 

@@ -33,7 +33,13 @@ def avrdude_flash(env, source, alias="avrdude_flash"):
 
 def avrdude_fuse(env, source, alias="avrdude_fuse"):
 	def call_fuse(target, source, env):
-		call_avrdude(env, source[0], fuses=["hfuse", "lfuse", "efuse"])
+		fuses = {}
+		for fuse in ["hfuse", "lfuse", "efuse"]:
+			value = env.get("CONFIG_AVRDUDE_{}".format(fuse.upper()))
+			if value:
+				fuses[fuse] = value
+
+		call_avrdude(env, source[0], fuses)
 
 	action = Action(call_fuse, cmdstr="$PROGRAM_AVRDUDE_COMSTR")
 	return env.AlwaysBuild(env.Alias(alias, source, action))

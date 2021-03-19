@@ -119,6 +119,15 @@ env["CONFIG_AVRDUDE_OPTIONS"] = "{{ avrdude_options }}"
 %% if avrdude_baudrate
 env["CONFIG_AVRDUDE_BAUDRATE"] = "{{ avrdude_baudrate }}"
 %% endif
+%% if avrdude_hfuse
+env["CONFIG_AVRDUDE_HFUSE"] = "{{ avrdude_hfuse }}"
+%% endif
+%% if avrdude_lfuse
+env["CONFIG_AVRDUDE_LFUSE"] = "{{ avrdude_lfuse }}"
+%% endif
+%% if avrdude_efuse
+env["CONFIG_AVRDUDE_EFUSE"] = "{{ avrdude_efuse }}"
+%% endif
 %% elif core.startswith("cortex-m")
 env.Append(MODM_OPENOCD_CONFIGFILES = "$BASEPATH/modm/openocd.cfg")
 env.Append(MODM_OPENOCD_GDBINIT = "$BASEPATH/modm/openocd_gdbinit")
