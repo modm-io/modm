@@ -33,4 +33,4 @@ def build(env):
     env.outbasepath = "modm/src/modm/"
     env.copy(localpath("../arduino_uno"), "board")
     env.collect(":build:default.avrdude.programmer", "arduino");
-    env.collect(":build:default.avrdude.baudrate", "57600");
+    env.collect(":build:default.avrdude.baudrate", "115200");
