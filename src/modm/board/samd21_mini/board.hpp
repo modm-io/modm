@@ -86,10 +86,10 @@ using D12 = GpioA19;
 using D13 = GpioA17;
 
 // User LED (inverted, because connected to 3V3)
-using LedD13 = GpioInverted<GpioOutputA17>;
-using LedTx = GpioInverted<GpioOutputA27>;
-using LedRx = GpioInverted<GpioOutputB03>;
-using Leds = SoftwareGpioPort< LedTx, LedRx >;
+using LedD13 = GpioA17;
+using LedTx = GpioA27;
+using LedRx = GpioB03;
+using Leds = LedTx;
 
 using Button = GpioUnused;
 
