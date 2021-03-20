@@ -37,6 +37,3 @@ def build(env):
     env.copy('.')
     env.collect(":build:default.avrdude.port", "usb");
     env.collect(":build:default.avrdude.programmer", "avrispmkII");
-    # env.collect(":build:default.avrdude.efuse", "0xff");
-    # env.collect(":build:default.avrdude.hfuse", "0xd9");
-    # env.collect(":build:default.avrdude.lfuse", "0xfe");

@@ -98,6 +98,7 @@ if __name__ == "__main__":
     parser.add_argument(
             "--fuse",
             dest="fuses",
+            choices=["lfuse", "hfuse", "efuse"],
             action="append",
             help="The fuses to write to the target.")
 

@@ -15,6 +15,7 @@
 #define	MODM_AVR_MAIN_HPP
 
 #include <stdint.h>
+#include <avr/io.h>
 
 /// @cond
 // saves a couple of bytes of stack and program.

@@ -144,6 +144,30 @@ shutdown command invoked
 ```
 
 
+#### scons program-fuses
+
+```
+scons program-fuses profile={debug|release} [firmware={hash or file}]
+```
+
+Writes all fuses onto your target connected to avrdude.
+(\* *only AVR targets*)
+
+You can define the fuse values in your source code via the [`FUSES` struct ELF
+section][fuses] mechanism, they are automatically used by avrdude. For fuse
+values see the [AVR Fuse Calculator][fusecalc].
+
+```c
+#include <avr/io.h>
+FUSES =
+{
+    LFUSE_DEFAULT, // .low
+    HFUSE_DEFAULT, // .high
+    EFUSE_DEFAULT, // .extended
+};
+```
+
+
 #### scons program-dfu
 
 ```
@@ -690,3 +714,5 @@ can be accessed as `#include <image.hpp>`.
 [scons]: http://scons.org
 [scons_tools]: https://github.com/modm-io/scons-build-tools
 [bmp]: https://github.com/blacksphere/blackmagic
+[fuses]: https://www.nongnu.org/avr-libc/user-manual/group__avr__fuse.html
+[fusecalc]: https://www.engbedded.com/fusecalc/
