@@ -11,8 +11,10 @@
 
 #include <modm/board.hpp>
 #include <modm/architecture/interface/assert.hpp>
+#include <string>
 
 using namespace Board;
+using namespace std::string_literals;
 
 MODM_ISR(EXTI0)
 { MODM_LOG_DEBUG << "EXTI0 called!" << modm::endl; }
@@ -29,22 +31,17 @@ MODM_ISR(EXTI3)
 
 [[maybe_unused]]
 static modm::Abandonment
-core_assertion_handler(const char * module,
-					   const char * /*location*/,
-					   const char * /*failure*/,
-					   uintptr_t context)
+core_assertion_handler(const modm::AssertionInfo &info)
 {
-	if (!memcmp(module, "core\0nvic\0undefined", 19)) {
-		MODM_LOG_ERROR.printf("Ignoring undefined IRQ handler %d!\n", int8_t(context));
+	if (info.name == "nvic.undef"s) {
+		MODM_LOG_ERROR.printf("Ignoring undefined IRQ handler %d!\n", int8_t(info.context));
 		return modm::Abandonment::Ignore;
 	}
 	return modm::Abandonment::DontCare;
 }
-// Uncomment to ignore the assertion
-// MODM_ASSERTION_HANDLER(core_assertion_handler);
+// Comment this line to abandon execution
+MODM_ASSERTION_HANDLER(core_assertion_handler);
 
-// Uncomment to overwrite the undefined handler
-// extern "C" void modm_undefined_handler(int32_t) {}
 
 int main()
 {
@@ -71,7 +68,7 @@ int main()
 		{
 			NVIC_SetPendingIRQ(IRQn_Type(int(EXTI0_IRQn) + ii));
 			ii = (ii + 1) % 5;
-			// wait one second for debounce
+			// wait for user reaction
 			modm::delay(500ms);
 		}
 	}
