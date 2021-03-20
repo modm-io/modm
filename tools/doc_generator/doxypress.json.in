@@ -226,7 +226,9 @@
         "input-recursive": true,
         "input-source": [
             "dox/",
+%% if with_tests
             "../../modm-test/src/",
+%% endif
             "../src/"
         ],
         "mdfile-mainpage": "README.md"

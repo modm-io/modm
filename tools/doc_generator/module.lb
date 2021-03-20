@@ -80,6 +80,7 @@ def build(env):
         "xml": False,
         "qch": env["enable_qch"],
         "device": str(env[":target"].identifier).upper(),
+        "with_tests": env.has_module("modm-test:test")
     }
     env.template("doxyfile.cfg.in")
     env.template("doxypress.json.in")
