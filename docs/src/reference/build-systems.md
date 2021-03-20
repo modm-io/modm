@@ -37,6 +37,16 @@ However, it is more optimized for terminal use and not for integration into IDEs
 [See the `modm:build:scons` documentation](../module/modm-build-scons).
 
 
+### Make
+
+The `modm:build:make` generator creates a stand-alone, but feature-complete,
+Makefile build system. The embedded-specific tooling is provided by wrapping
+separate Python3 scripts in `.PHONY` targets. It is intended as a simple,
+hackable build system without standardized IDE integration.
+
+[See the `modm:build:make` documentation](../module/modm-build-make).
+
+
 ### CMake
 
 The `modm:build:cmake` module generates a CMake build script, which you can

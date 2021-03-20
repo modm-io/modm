@@ -1,0 +1,137 @@
+# Copyright (c) 2021, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+%% if is_unittest
+unittest_runner.cpp:
+	@python3 modm/modm_tools/unit_test.py {{ unittest_source }}
+APP_SRC := unittest_runner.cpp
+%% else
+APP_SRC := $(shell find . -type f \( -name '*.c' -o -iname '*.s' -o -name '*.sx' \
+			-o -name '*.cpp' -o -name '*.cxx' -o -name '*.c++' -o -name '*.cc' \) )
+%% endif
+%#
+include modm/config.mk
+%% for path in generated_paths
+include {{path}}/repo.mk
+%% endfor
+%#
+%% if platform == "hosted"
+.DEFAULT_GOAL := build
+.PHONY: run
+run: $(ELF_FILE)
+	@$(ELF_FILE)
+
+%% else
+.DEFAULT_GOAL := size
+
+.PHONY: library listing bin hex
+library: $(LIBRARIES)
+listing: $(LSS_FILE)
+bin: $(BIN_FILE)
+hex: $(HEX_FILE)
+
+.PHONY: symbols
+symbols:
+	@echo "Symbols········" $(ELF_FILE)
+	@$(NM) -S -C --size-sort -td $(ELF_FILE)
+%% endif
+%#
+.PHONY:  build
+build: $(ELF_FILE)
+
+.PHONY: clean
+clean:
+	@$(foreach file,$(CLEAN_FILES),echo "Removing·······" $(file);)
+	@rm -rf $(CLEAN_FILES)
+
+%% if core.startswith("avr")
+.PHONY: size
+size: build
+	@echo "Memory usage···" $(ELF_FILE)
+	@$(OBJDUMP) -Pmem-usage $(ELF_FILE)
+
+port?=auto
+.PHONY: program
+program: build
+	@python3 modm/modm_tools/avrdude.py -p $(CONFIG_AVRDUDE_DEVICE) \
+			$(CONFIG_AVRDUDE_PROGRAMMER) $(CONFIG_AVRDUDE_OPTIONS) \
+			-P $(if $(CONFIG_AVRDUDE_PORT),$(CONFIG_AVRDUDE_PORT),$(port)) \
+			$(CONFIG_AVRDUDE_BAUDRATE) $(ELF_FILE)
+
+.PHONY: program-fuses
+program-fuses: build
+	@python3 modm/modm_tools/avrdude.py -p $(CONFIG_AVRDUDE_DEVICE) \
+			$(CONFIG_AVRDUDE_PROGRAMMER) $(CONFIG_AVRDUDE_OPTIONS) \
+			-P $(if $(CONFIG_AVRDUDE_PORT),$(CONFIG_AVRDUDE_PORT),$(port)) \
+			$(CONFIG_AVRDUDE_BAUDRATE) $(ELF_FILE) \
+			--fuse lfuse --fuse hfuse --fuse efuse
+
+%% elif core.startswith("cortex-m")
+.PHONY: size
+size: build
+	@echo "Memory usage···" $(ELF_FILE)
+	@python3 modm/modm_tools/size.py $(ELF_FILE) $(CONFIG_DEVICE_MEMORY)
+
+port?=auto
+.PHONY: program
+program: build
+	@python3 modm/modm_tools/openocd.py $(ELF_FILE) \
+			$(addprefix -f ,$(MODM_OPENOCD_CONFIGFILES))
+
+.PHONY: program-bmp
+program-bmp: build
+	@python3 modm/modm_tools/bmp.py -p $(port) $(ELF_FILE)
+
+.PHONY: program-dfu
+program-dfu: bin
+	@dfu-util -v -E2 -R -i 0 -a 0 -s 0x08000000:leave -D $(BIN_FILE)
+
+%% if platform in ["sam"]
+.PHONY: program-bossac
+program-bossac: bin
+	@python3 modm/modm_tools/bossac.py -p $(port) \
+			--offset $(if $($(MODM_BOSSAC_OFFSET) < 4096),4096,$(MODM_BOSSAC_OFFSET)) \
+			$(MODM_BOSSAC_OPTIONS) $(BIN_FILE)
+%% endif
+%#
+.PHONY: reset
+reset:
+	@python3 modm/modm_tools/openocd.py --reset \
+			$(addprefix -f ,$(MODM_OPENOCD_CONFIGFILES))
+
+.PHONY: reset-bmp
+reset-bmp:
+	@python3 modm/modm_tools/bmp.py -p $(port) --reset
+
+ui?=tui
+.PHONY: debug
+debug: build
+	@python3 modm/modm_tools/gdb.py $(addprefix -x ,$(MODM_GDBINIT)) \
+			$(addprefix -x ,$(MODM_OPENOCD_GDBINIT)) \
+			$(ELF_FILE) -ui=$(ui) \
+			openocd $(addprefix -f ,$(MODM_OPENOCD_CONFIGFILES))
+
+.PHONY: debug-bmp
+debug-bmp: build
+	@python3 modm/modm_tools/bmp.py $(addprefix -x ,$(MODM_GDBINIT)) \
+			$(ELF_FILE) -ui=$(ui) \
+			bmp -p $(port)
+
+coredump?=coredump.txt
+.PHONY: debug-coredump
+debug-coredump: build
+	@python3 modm/modm_tools/gdb.py $(addprefix -x ,$(MODM_GDBINIT)) \
+			$(ELF_FILE) -ui=$(ui) \
+			crashdebug --binary-path modm/ext/crashcatcher/bins \
+			--dump $(coredump)
+
+fcpu?=0
+.PHONY: log-itm
+log-itm:
+	@python3 modm/modm_tools/log.py itm openocd -f modm/openocd.cfg -fcpu $(fcpu)
+%% endif

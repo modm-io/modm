@@ -1,0 +1,164 @@
+# Copyright (c) 2021, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+profile?=release
+BUILDPATH_PREFIX := {{ build_path }}/make-
+BUILDPATH := $(BUILDPATH_PREFIX)$(profile)
+MODM_PROJECT_NAME := {{ options[":build:project.name"] }}
+
+ELF_FILE := $(BUILDPATH)/$(MODM_PROJECT_NAME).{{program_extension}}
+BIN_FILE := $(BUILDPATH)/$(MODM_PROJECT_NAME).bin
+HEX_FILE := $(BUILDPATH)/$(MODM_PROJECT_NAME).hex
+LSS_FILE := $(BUILDPATH)/$(MODM_PROJECT_NAME).lss
+CLEAN_FILES += $(BUILDPATH)
+
+# Device configuration
+CONFIG_DEVICE_NAME := {{ partname }}
+%% if memories | length
+CONFIG_DEVICE_MEMORY := "{{ memories }}"
+%% endif
+%% if core.startswith("avr")
+CONFIG_AVRDUDE_DEVICE := {{ mcu }}
+%% if avrdude_programmer
+CONFIG_AVRDUDE_PROGRAMMER := -c {{ avrdude_programmer }}
+%% endif
+%% if avrdude_port
+CONFIG_AVRDUDE_PORT := {{ avrdude_port }}
+%% endif
+%% if avrdude_options
+CONFIG_AVRDUDE_OPTIONS := {{ avrdude_options }}
+%% endif
+%% if avrdude_baudrate
+CONFIG_AVRDUDE_BAUDRATE := -b {{ avrdude_baudrate }}
+%% endif
+%% elif core.startswith("cortex-m")
+MODM_OPENOCD_CONFIGFILES += modm/openocd.cfg
+MODM_OPENOCD_GDBINIT += modm/openocd_gdbinit
+MODM_GDBINIT += modm/gdbinit
+%% if platform == "sam"
+%% if bossac_offset
+MODM_BOSSAC_OFFSET := {{ bossac_offset }}
+%% endif
+%% if bossac_options
+MODM_BOSSAC_OPTIONS := {{ bossac_options }}
+%% endif
+%% endif
+%% endif
+%#
+include modm/compiler.mk
+
+# Application sources
+APP_SRC := $(APP_SRC:./%=%)
+%% for repo in generated_paths
+APP_SRC := $(filter-out {{repo}}/%,$(APP_SRC))
+%% endfor
+%% if options["::info.git"] != "Disabled"
+%#
+# Git information
+INFO_GIT_FILE := modm/src/info_git.c
+$(INFO_GIT_FILE): $(shell python3 modm/modm_tools/info.py \
+    -o $(INFO_GIT_FILE) -t {{ "git_status" if "Status" in options["::info.git"] else "git" }} --check-rebuild);
+APP_SRC += $(INFO_GIT_FILE)
+CLEAN_FILES += $(INFO_GIT_FILE)
+CPPDEFINES += -DMODM_GIT_INFO{% if "Status" in options["::info.git"] %} -DMODM_GIT_STATUS{% endif %}
+%% endif
+%% if options["::info.build"]
+%#
+# Build information
+INFO_BUILD_FILE := modm/src/info_build.c
+$(INFO_BUILD_FILE):
+	@python3 modm/modm_tools/info.py -o $(INFO_BUILD_FILE) -t build --compiler $(CC) \
+		--additions MODM_BUILD_PROJECT_NAME="$(MODM_PROJECT_NAME)"
+APP_SRC += $(INFO_BUILD_FILE)
+CLEAN_FILES += $(INFO_BUILD_FILE)
+CPPDEFINES += -DMODM_BUILD_INFO
+%% endif
+%% if options["::image.source"]
+%#
+# Image generator
+IMAGE_SOURCE := {{image_source}}
+.PRECIOUS: $(IMAGE_SOURCE)/%.cpp
+$(IMAGE_SOURCE)/%.cpp: $(IMAGE_SOURCE)/%.pbm
+	@python3 modm/modm_tools/bitmap.py $^ -o $(dir $^)
+IMAGE_PBM := $(wildcard $(IMAGE_SOURCE)/*.pbm)
+APP_SRC += $(IMAGE_PBM:.pbm=.cpp)
+CPPDEFINES += -I$(IMAGE_SOURCE)
+CLEAN_FILES += $(IMAGE_PBM:.pbm=.cpp) $(IMAGE_PBM:.pbm=.hpp)
+%% endif
+%#
+# Application objects
+APP_OBJS := $(addprefix $(BUILDPATH)/,$(APP_SRC))
+%% for suffix in ["cpp", "cxx", "c++", "cc", "c", "sx", "s", "S"]
+APP_OBJS := $(APP_OBJS:.{{suffix}}=.o)
+%% endfor
+LIBRARIES :={% for repo in generated_paths %} $(BUILDPATH)/{{repo}}/lib{{repo}}.a{% endfor %}
+
+# Application linking
+.PRECIOUS: $(BUILDPATH)/%.{{program_extension}}
+$(BUILDPATH)/%.{{program_extension}}: $(APP_OBJS) $(LIBRARIES){% if platform != "hosted" %} {{ linkerscript }}{% endif %}
+	@echo "Linking········" $@
+	@$(CXX) -o $@ $(LINKFLAGS) $(filter %.o,$^) $(LIBPATH) \
+%% if platform != "hosted"
+		-Wl,--whole-archive -Wl,--start-group $(LIBS) -Wl,--end-group -Wl,--no-whole-archive
+%% else
+		$(LIBS)
+%% endif
+%#
+# Compiler invocations, -MMD is for header dependency tracking
+compile_c = \
+	echo "Compiling C····" $(subst $(BUILDPATH_PREFIX),,$1); \
+	mkdir -p $(dir $1); \
+	$(CC) -MMD -o $1 -c $(CFLAGS) $(CCFLAGS) $(CPPDEFINES) $3 $2
+
+compile_cpp = \
+	echo "Compiling C++··" $(subst $(BUILDPATH_PREFIX),,$1); \
+	mkdir -p $(dir $1); \
+	$(CXX) -MMD -o $1 -c $(CXXFLAGS) $(CCFLAGS) $(CPPDEFINES) $3 $2
+
+compile_asm = \
+	echo "Assembling·····" $(subst $(BUILDPATH_PREFIX),,$1); \
+	mkdir -p $(dir $1); \
+	$(CXX) -MMD -o $1 -c $(ASFLAGS) $(CPPDEFINES) $3 $2
+
+# Build rules with relocation
+.PRECIOUS: $(BUILDPATH)/%.o $(BUILDPATH)/%.a
+$(BUILDPATH)/%.o : %.c
+	@$(call compile_c,$@,$<,)
+%% for suffix in ["cc", "cpp", "cxx", "c++"]
+$(BUILDPATH)/%.o : %.{{suffix}}
+	@$(call compile_cpp,$@,$<,)
+%% endfor
+%% for suffix in ["sx", "s", "S"]
+$(BUILDPATH)/%.o : %.{{suffix}}
+	@$(call compile_asm,$@,$<,)
+%% endfor
+%#
+.PRECIOUS: $(BUILDPATH)/%.bin
+$(BUILDPATH)/%.bin: $(BUILDPATH)/%.{{program_extension}}
+	@echo "Binary File····" $@
+	@$(OBJCOPY) -O binary $< $@
+
+.PRECIOUS: $(BUILDPATH)/%.hex
+$(BUILDPATH)/%.hex: $(BUILDPATH)/%.{{program_extension}}
+	@echo "Hex File·······" $@
+	@$(OBJCOPY) -O ihex $< $@
+
+.PRECIOUS: $(BUILDPATH)/%.lss
+$(BUILDPATH)/%.lss: $(BUILDPATH)/%.{{program_extension}}
+	@echo "Listing········" $@
+	@$(OBJDUMP) -x -S -l -w $< > $@
+
+
+
+
+
+
+
+
+
+

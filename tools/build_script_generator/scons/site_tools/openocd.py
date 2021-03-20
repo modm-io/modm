@@ -56,9 +56,8 @@ def reset_openocd(env, alias="reset_openocd"):
 	def call_reset_openocd(target, source, env):
 		config = env.Listify(env.get("MODM_OPENOCD_CONFIGFILES", []))
 		searchdir = env.Listify(env.get("MODM_OPENOCD_SEARCHDIRS", []))
-		openocd.call(commands=["init", "reset", "quit"],
-					 config=map(env.subst, config),
-					 search=map(env.subst, searchdir))
+		openocd.reset(config=map(env.subst, config),
+		              search=map(env.subst, searchdir))
 
 	action = Action(call_reset_openocd, cmdstr="$RESET_OPENOCD_COMSTR")
 	return env.AlwaysBuild(env.Alias(alias, '', action))

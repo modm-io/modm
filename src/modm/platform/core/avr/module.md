@@ -4,6 +4,23 @@ Implements the interfaces defined in the `:architecture` modules. Adds the
 `-mmcu={target}` compile flag and the `F_CPU={core frequency}` define.
 
 
+## Fuses
+
+You can define the fuse values in your source code via the [`FUSES` struct ELF
+section][fuses] mechanism, they are automatically used by avrdude. For fuse
+values see the [AVR Fuse Calculator][fusecalc].
+
+```c
+#include <avr/io.h>
+FUSES =
+{
+    LFUSE_DEFAULT, // .low
+    HFUSE_DEFAULT, // .high
+    EFUSE_DEFAULT, // .extended
+};
+```
+
+
 ## Blocking Delay
 
 The delay functions as defined by `modm:architecture:delay` and called with a
@@ -31,3 +48,7 @@ For micro- and milliseconds delays with dynamic time:
   maximum time delay of 65ms for clocks larger than 6MHz, or .
 - Millisecond delay is implemented fairly accurately in 1ms steps on 32-bits of
   input time.
+
+
+[fuses]: https://www.nongnu.org/avr-libc/user-manual/group__avr__fuse.html
+[fusecalc]: https://www.engbedded.com/fusecalc/

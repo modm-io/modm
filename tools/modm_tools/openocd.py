@@ -19,6 +19,12 @@ Simply wraps OpenOCD and issues the right command to program the target.
 python3 modm/modm_tools/openocd.py -f modm/openocd.cfg path/to/project.elf
 ```
 
+You can also reset the target:
+
+```sh
+python3 modm/modm_tools/openocd.py -f modm/openocd.cfg --reset
+```
+
 (\* *only ARM Cortex-M targets*)
 """
 
@@ -106,6 +112,9 @@ def program(source, config=None, search=None):
     commands = ["modm_program {{{}}}".format(source)]
     call(commands=commands, config=config, search=search)
 
+def reset(config=None, search=None):
+    commands = ["init", "reset", "shutdown"]
+    call(commands=commands, config=config, search=search)
 
 # -----------------------------------------------------------------------------
 def add_subparser(subparser):
@@ -135,9 +144,11 @@ def add_subparser(subparser):
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(description='Program ELF file via OpenOCD')
+    parser = argparse.ArgumentParser(
+        description='Program ELF file or reset device via OpenOCD')
     parser.add_argument(
             dest="source",
+            nargs="?",
             metavar="ELF")
     parser.add_argument(
             "-f",
@@ -149,7 +160,16 @@ if __name__ == "__main__":
             dest="searchdirs",
             action="append",
             help="Search in these paths for config files.")
+    parser.add_argument(
+            "-r", "--reset",
+            dest="reset",
+            default=False,
+            action="store_true",
+            help="Reset device.")
 
     args = parser.parse_args()
-    program(source=os.path.abspath(args.source),
-            config=args.config, search=args.searchdirs)
+    if args.reset:
+        reset(config=args.config, search=args.searchdirs)
+    else:
+        program(source=os.path.abspath(args.source),
+                config=args.config, search=args.searchdirs)

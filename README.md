@@ -50,7 +50,7 @@ git clone --recurse-submodules https://github.com/modm-io/modm.git
 
 - Efficient and fast object-oriented C++20 API.
 - Support for hundreds of AVR and ARM Cortex-M microcontrollers from Atmel and ST.
-- Build system agnostic: Choose SCons, CMake or use your own.
+- Build system agnostic: Choose SCons, CMake, Makefile or use your own.
 - Data-driven, target-specific HAL generation using the lbuild engine.
 - No memory allocations in HAL with very low overall RAM consumption.
 - Highly-configurable modules with sensible defaults and lots of documentation.

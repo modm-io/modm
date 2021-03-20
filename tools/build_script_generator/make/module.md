@@ -1,46 +1,43 @@
-# SCons Build Script Generator
+# Makefile Build Script Generator
 
-[SCons][] is a software construction build system written in Python.
-For a better embedded experience, we've extended it with modm-specific build
-tools.
+[Make][] is a simple dependency tracking build system. It's very lightweight and
+available pretty much everywhere.
 
-This module generates two files:
+This module generates a set of self contained Makefiles for building modm
+applications:
 
-- a `modm/SConscript` file: configures all required SCons tools with
-  the right settings (also using information from the `modm:build` module) to
-  compile the modm library.
-- a top-level `SConstruct` file: configures additional, optional tools and sets
-  up all the relevant SCons functions for your target.
-
-The `SConscript` file is self contained and does not depend on anything outside of
-the `modm/` directory. This allows it to be combined with `SConscript` of other
-projects without clashing.
-
-In fact, if you look at your generated `SConstruct` file, you'll notice that
-it doesn't contain a lot of logic or specific data, it is only meant for calling
-the right SCons tool with the right arguments.
+- a `modm/config.mk` file: configures the toolchain, device-specific information
+  and sets up generic and special build rules based on the `modm:build` options.
+- a `modm/repo.mk` file: contains all build rules to build the modm library.
+- a top-level `Makefile` file: globs the application sources and provides all
+  the Makefile targets for the device-specific embedded tools.
 
 We do not intend to serve every possible use-case with this module.
-**If you need something special, write your own SConstruct file, maybe
-starting by modifying ours.**
-Remember to set `modm:build:scons:include_sconstruct` to `False`, so that your
-custom `SConstruct` does not get overwritten by `lbuild build`.
-See the instructions inside our generated default `SConstruct`.
+**If you need something special, write your own Makefile, maybe starting by
+modifying ours.**
+Remember to set `modm:build:make:include_makefile` to `False`, so that your
+custom `Makefile` does not get overwritten by `lbuild build`.
+
+!!! bug "No Windows Support"
+    Due to issues with the Windows path separator `\` the generated Makefile may
+    not work correctly on Windows. We recommend using SCons on Windows instead.
 
 
-## SCons Methods
+## Makefile Targets
 
-This module generates these SCons methods depending on the target.
+This module generates these [`.PHONY` targets][phony].
 
 
-#### scons
+#### make
 
-Defaults to **scons build size**.
+Defaults to **make build size**.
 
-You can add these arguments to any of the SCons commands:
+You can add these arguments to any of the Make commands:
 
-- `verbose=1`: gives a more verbose output, so you can, for example, check what
-  options the compiler is called with.
+- `-j8`: Process 8 jobs in parallel. You can also `export MAKEFLAGS="-j8"` in
+         your `.bashrc` to have a permanent setting.
+- `-n`: gives a verbose, simulated output, so you can check what options the
+        compiler is called with.
 - `profile=release`: Compile project with the release profile options (default).
 - `profile=debug`: Compile project with the debug profile options.
 
@@ -49,27 +46,22 @@ module documentation.
 
 !!! tip "Debug Profile"
     When working with the debug profile, make sure to add `profile=debug` to all
-    commands, especially `scons program profile=debug` and
-    `scons debug profile=debug`!
-
-Some SCons commands take a `firmware={GNU Build ID or path/to/firmware.elf}`
-argument that specifies which firmware to use for the command. It is useful in
-combination with the `scons artifact` command to preserve a specific firmware
-version for later.
+    commands, especially `make program profile=debug` and
+    `make debug profile=debug`!
 
 
-#### scons build
+#### make build
 
 ```
-scons build profile={debug|release}
+make build profile={debug|release}
 ```
 
 Compiles your application into an executable.
 
-Example for a STM32 target:
+Example for an embedded target:
 
 ```
- $ scons build
+ $ make build
 Compiling C++·· {debug|release}/main.o
 Compiling C···· {debug|release}/modm/ext/gcc/cabi.o
     ...
@@ -80,31 +72,31 @@ Linking········ /build/{debug|release}/blink.elf
 ```
 
 
-#### scons -c
+#### make clean
 
 ```
-scons -c profile={debug|release}
+make clean profile={debug|release}
 ```
 
 Cleans the build artifacts.
 
+
 ```
- $ scons -c
-Removed {debug|release}/main.o
-Removed {debug|release}/modm/ext/tlsf/tlsf.o
-    ...
-Removed {debug|release}/modm/src/modm/ui/display/virtual_graphic_display.o
-Removed {debug|release}/modm/src/modm/utils/dummy.o
-Removed {debug|release}/modm/libmodm.a
-Removed {debug|release}/blink.elf
-Removed {debug|release}/blink.lss
+ $ make clean
+Removing······· {debug|release}
 ```
 
 
-#### scons size
+#### make run
+
+Compiles and executes your program on your computer.
+(\* *only Hosted targets*)
+
+
+#### make size
 
 ```
-scons size profile={debug|release} [firmware={hash or file}]
+make size profile={debug|release}
 ```
 
 Displays the static Flash and RAM consumption of your target.
@@ -112,7 +104,7 @@ Displays the static Flash and RAM consumption of your target.
 Example for a STM32 target with 16MB external heap:
 
 ```
- $ scons size
+ $ make size
 Memory usage··· /build/{debug|release}/blink.elf
 Program:  12.8 KiB (0.6% used)
 (.data + .fastcode + .fastdata + .hardware_init + .reset + .rodata +
@@ -127,10 +119,10 @@ Heap:     16.4 MiB
 ```
 
 
-#### scons program
+#### make program
 
 ```
-scons program profile={debug|release} [port={serial-port}] [firmware={hash or file}]
+make program profile={debug|release} [port={serial-port}]
 ```
 
 Writes the executable onto your target via Avrdude or OpenOCD.
@@ -141,9 +133,7 @@ defined in the `modm:build` module.
 Example for a STM32 target:
 
 ```
- $ scons program
-╭────────────── /build/{debug|release}/blink.elf
-╰───OpenOCD───> stm32f469nih
+ $ make program
 Open On-Chip Debugger 0.10.0
     ...
 Info : using stlink api v2
@@ -165,10 +155,10 @@ shutdown command invoked
 ```
 
 
-#### scons program-fuses
+#### make program-fuses
 
 ```
-scons program-fuses profile={debug|release} [firmware={hash or file}]
+make program-fuses profile={debug|release}
 ```
 
 Writes all fuses onto your target connected to avrdude. See the
@@ -176,10 +166,10 @@ Writes all fuses onto your target connected to avrdude. See the
 (\* *only AVR targets*)
 
 
-#### scons program-dfu
+#### make program-dfu
 
 ```
-scons program-dfu profile={debug|release} [firmware={hash or file}]
+make program-dfu profile={debug|release}
 ```
 
 Writes the executable onto your target via Device Firmware Update (DFU) over USB.
@@ -188,10 +178,8 @@ and can be accessed by pressing the BOOT0-Button during startup.
 (\* *only ARM Cortex-M targets*)
 
 ```
-$ scons program-dfu
+$ make program-dfu
 Binary File···· /build/{debug|release}/blink.bin
-╭────────────── /build/{debug|release}/blink.bin
-╰─────DFU─────> stm32f469nih
 dfu_stm32_programmer: program /build/{debug|release}/blink.bin
 dfu-util 0.9
 Opening DFU capable USB device...
@@ -219,14 +207,13 @@ File downloaded successfully
    Poll timeout 104 ms
    Poll timeout 0 ms
 Transitioning to dfuMANIFEST state
-scons: done building targets.
 ```
 
 
-#### scons program-bmp
+#### make program-bmp
 
 ```
-scons program-bmp profile={debug|release} [port={serial-port}] [firmware={hash or file}]
+make program-bmp profile={debug|release} [port={serial-port}]
 ```
 
 [Black Magic Probe][bmp] is convenient tool to convert cheap USB ST-LINK V2 clones
@@ -247,9 +234,7 @@ crw-rw-rw-  1 root  wheel   21, 106 Feb 19 09:46 /dev/tty.usbmodemDEADBEF1
 You can let the tool guess the port or explicitly specify it:
 
 ```
-$ scons program-bmp port=/dev/tty.usbmodemDEADBEEF
-╭─Black─Magic── /build/{debug|release}/blink.elf
-╰────Probe────> stm32f103rbt6
+$ make program-bmp port=/dev/tty.usbmodemDEADBEEF
 Remote debugging using /dev/tty.usbmodemDEADBEEF
 Target voltage: unknown
 Available Targets:
@@ -266,30 +251,14 @@ Start address 0x8000e6c, load size 5120
 Transfer rate: 10 KB/sec, 365 bytes/write.
 Detaching from program: , Remote target
 [Inferior 1 (Remote target) detached]
-scons: done building targets.
+make: done building targets.
 ```
 
 
-#### scons program-remote
+#### make debug
 
 ```
-scons program-remote profile={debug|release} [host={ip or hostname}] [firmware={hash or file}]
-```
-
-Writes the executable onto your target connected to a remote OpenOCD process
-running on your own computer (host=`localhost`) or somewhere else.
-
-
-#### scons run
-
-Compiles and executes your program on your computer.
-(\* *only Hosted targets*)
-
-
-#### scons debug
-
-```
-scons debug profile={debug|release} ui={tui|web} [firmware={hash or file}]
+make debug profile={debug|release} ui={tui|web}
 ```
 
 Launches OpenOCD in the background, then launches GDB in foreground with the
@@ -306,83 +275,59 @@ This is just a convenience wrapper for the debug functionality defined in the
     firmware and the executable given to GDB have to be the same or you'll see
     GDB translate the program counter to the wrong code locations. When you
     suspect a bug in your firmware, consider that it was most likely compiled
-    with the release profile, since that's the default. First try to `scons
-    debug profile=release`, and if that doesn't help, compile and `scons
-    program profile=debug` and try `scons debug profile=debug` again.
+    with the release profile, since that's the default. First try to `make
+    debug profile=release`, and if that doesn't help, compile and `make
+    program profile=debug` and try `make debug profile=debug` again.
 
 
-#### scons debug-bmp
+#### make debug-bmp
 
 ```
-scons debug-bmp profile={debug|release} ui={tui|web} port={serial-port} [firmware={hash or file}]
+make debug-bmp profile={debug|release} ui={tui|web} port={serial-port}
 ```
 
 Launches GDB to debug via Black Magic Probe.
 (\* *only ARM Cortex-M targets*)
 
 
-#### scons debug-coredump
+#### make debug-coredump
 
 ```
-scons debug-coredump profile={debug|release} ui={tui|web} \
-                     coredump={path/to/coredump.txt} \
-                     [firmware={GNU Build ID or path/to/firmware.elf}]
+make debug-coredump profile={debug|release} ui={tui|web} \
+                    coredump={path/to/coredump.txt}
 ```
 
-Launches GDB for post-mortem debugging with the firmware identified by the
-(optional) `firmware={hash or filepath}` argument using the data from the
-`coredump={filepath}` argument.
+Launches GDB for post-mortem debugging with the latest firmware using the data
+from the `coredump={filepath}` argument.
 (\* *only ARM Cortex-M targets*)
 
 See the `modm:platform:fault` module for details how to receive the coredump data.
 
 
-#### scons program-remote
+#### make reset
 
 ```
-scons debug-remote profile={debug|release} ui={tui|web} [host={ip or hostname}] [firmware={hash or file}]
-```
-
-Debugs the executable via a remote OpenOCD process running on your own computer
-(localhost is default) or somewhere else.
-(\* *only ARM Cortex-M targets*)
-
-
-#### scons reset
-
-```
-scons reset
+make reset
 ```
 
 Resets the executable via OpenOCD.
 (\* *only ARM Cortex-M targets*)
 
 
-#### scons reset-bmp
+#### make reset-bmp
 
 ```
-scons reset-bmp [port={serial}]
+make reset-bmp [port={serial}]
 ```
 
 Resets the executable via Black Magic Probe.
 (\* *only ARM Cortex-M targets*)
 
 
-#### scons reset-remote
+#### make log-itm
 
 ```
-scons reset-remote [host={ip or hostname}]
-```
-
-Resets the executable via a remote OpenOCD process running on your own computer
-(localhost is default) or somewhere else.
-(\* *only ARM Cortex-M targets*)
-
-
-#### scons log-itm
-
-```
-scons log-itm fcpu={HCLK in Hz}
+make log-itm fcpu={HCLK in Hz}
 ```
 
 Configures OpenOCD in tracing mode to output ITM channel 0 on SWO pin and
@@ -390,9 +335,7 @@ displays the serial output stream.
 (\* *only ARM Cortex-M targets*)
 
 ```
- $ scons log-itm fcpu=64000000
-╭───OpenOCD───> Single Wire Viewer
-╰─────SWO────── stm32f103rbt6
+ $ make log-itm fcpu=64000000
 Open On-Chip Debugger 0.10.0
 Licensed under GNU GPL v2
 Info : The selected transport took over low-level target control.
@@ -407,17 +350,17 @@ See the `:platform:itm` module for details how to use the ITM as a logging
 output.
 
 
-#### scons library
+#### make library
 
 ```
-scons library profile={debug|release}
+make library profile={debug|release}
 ```
 
 Generates only the static library `libmodm.a` without linking it to the
 application.
 
 ```
- $ scons library
+ $ make library
 Compiling C++·· {debug|release}/modm/ext/gcc/assert.o
     ...
 Compiling C++·· {debug|release}/modm/src/modm/utils/dummy.o
@@ -426,17 +369,16 @@ Indexing······· {debug|release}/modm/libmodm.a
 ```
 
 
-#### scons symbols
+#### make symbols
 
 ```
-scons symbols profile={debug|release} [firmware={hash or file}]
+make symbols profile={debug|release}
 ```
 
 Dumps the symbol table for your executable.
 
 ```
- $ scons symbols [firmware={hash or file}]
-Show symbols for '{debug|release}/blink.elf':
+ $ make symbols
 536871656 00000001 b (anonymous namespace)::nextOperation
 536871657 00000001 b (anonymous namespace)::checkNextOperation
 536871658 00000001 b (anonymous namespace)::error
@@ -449,10 +391,10 @@ Show symbols for '{debug|release}/blink.elf':
 ```
 
 
-#### scons listing
+#### make listing
 
 ```
-scons listing profile={debug|release} [firmware={hash or file}]
+make listing profile={debug|release}
 ```
 
 Decompiles your executable into an annotated assembly listing.
@@ -460,7 +402,7 @@ This is very useful for checking and learning how the compiler translates C++
 into assembly instructions:
 
 ```
- $ scons listing
+ $ make listing
 Listing········ {debug|release}/blink.lss
  $ less {debug|release}/blink.lss
     ...
@@ -486,105 +428,54 @@ main()
 ```
 
 
-#### scons bin
+#### make bin
 
 ```
-scons bin profile={debug|release} [firmware={hash or file}]
+make bin profile={debug|release}
 ```
 
 Creates a binary file of your executable.
 
 ```
- $ scons bin
+ $ make bin
 Binary File···· {debug|release}/blink.bin
 ```
 
 
-#### scons hex
+#### make hex
 
 ```
-scons hex profile={debug|release} [firmware={hash or file}]
+make hex profile={debug|release}
 ```
 
 Creates a Intel-hex file of your executable.
 
 ```
- $ scons hex
+ $ make bin
 Hex File······· {debug|release}/blink.hex
 ```
 
 
-#### scons artifact
-
-```
-scons artifact profile={debug|release}
-```
-
-Caches the ELF and binary file of the newest compiled executable identified by
-the hash of the binary file in `artifacts/{hash}.elf`. You can change this path
-with the `modm:build:scons:path.artifact` option.
-
-```
- $ scons artifact
-╭───Artifact─── /build/release/blink.elf
-╰────Cache────> artifacts/0214523ab713bc7bdfb37d902e65dae8305f4754.elf
-```
-
-
-#### scons qtcreator
-
-Generates several files so that the project can be imported into Qt Creator via
-the `.creator` file importer. Note, that no compiliation or debugging features
-are supported, this is only meant for using the IDE as an editor.
-
-!!! warning "Consider this an unstable feature"
-
-
-## XPCC Generator Tool
-
-The `modm:communication:xpcc:generator` module contains the Python tools to
-translate the XPCC XML declarations into various language implementations.
-This module contains a SCons wrapper tool, that understands the XML dependencies
-and automatically updates the generated files when it becomes necessary.
-
-The wrapper tool is automatically used when the generator module is detected,
-and its options are evaluated for the wrapper as follows:
-
-```py
-env.XpccCommunication(
-    xmlfile=options["::xpcc:generator:source"],
-    container=options["::xpcc:generator:container"],
-    path=options["::xpcc:generator:path"],
-    namespace=options["::xpcc:generator:namespace"]
-)
-```
-
-The generated files are available as a top-level `#include <identifiers.hpp>`.
-
-
 ## Information Tool
 
-Our `info` SCons tool generates a set of header files containing information
-about the repository state.
+This tool generates a set of header files containing information about the
+repository state.
 
-A call to `env.InfoGit(with_status={True, False})` will generate a `<info_git.h>`
-header file and add these two defines to the command line CPP options:
+Setting the `modm:build:info.git` option will generate a `<info_git.h>` header
+file and add these two defines to the command line CPP options:
 
 - `MODM_GIT_INFO`
-- `MODM_GIT_STATUS`: defined only if called with `with_state=True`.
-
-You can enable this by setting the `modm:build:info.git` option.
+- `MODM_GIT_STATUS`: defined only with option `Git+Status`.
 
 !!! info "Increased build time"
     Since the git repository status can change at any time, it needs to be
     checked on every build. This adds less than a second to every build.
 
-A call to `env.InfoBuild()` will generate a `<info_build.h>` header file and add
-this define to the command line CPP options:
+Setting the `modm:build:info.build` option will generate a `<info_build.h>`
+header file and add this define to the command line CPP options:
 
 - `MODM_BUILD_INFO`
 
-You can enable this by setting the `modm:build:info.build` option.
 
 !!! warning "Respect developers privacy"
     This information is placed into the firmware in **cleartext**, so it will
@@ -596,11 +487,7 @@ You can enable this by setting the `modm:build:info.build` option.
 ## Bitmap Tool
 
 If the `modm:build:image.source` is defined as a path, it'll be searched
-for `.pbm` files to convert into C++ data files using the `bitmap` tool:
-
-```py
-source, header = env.Bitmap(bpm_file)
-```
+for `.pbm` files to convert into C++ data files using the `bitmap` tool.
 
 See the `GraphicsDisplay::drawImage()` method in the `modm:ui:display` module
 for how to use these generated files.
@@ -608,6 +495,7 @@ The directory is added to the include search paths, so the generated files
 can be accessed as `#include <image.hpp>`.
 
 
-[scons]: http://scons.org
+[make]: https://www.gnu.org/software/make/manual/make.html
 [bmp]: https://github.com/blacksphere/blackmagic
 [gdbgui]: https://www.gdbgui.com
+[phony]: https://www.gnu.org/software/make/manual/html_node/Phony-Targets.html

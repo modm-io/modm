@@ -15,7 +15,7 @@ Import("env")
 profile = ARGUMENTS.get("profile", "release")
 %% if is_modm
 env["CONFIG_PROFILE"] = profile
-env["BUILDPATH"] = join(env["CONFIG_BUILD_BASE"], profile)
+env["BUILDPATH"] = join(env["CONFIG_BUILD_BASE"], "scons-" + profile)
 env["BASEPATH"] = abspath("..")
 %% if core.startswith("avr")
 env["COMPILERPREFIX"] = "avr-"

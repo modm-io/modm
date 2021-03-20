@@ -22,6 +22,12 @@ python3 modm/modm_tools/bmp.py path/to/project.elf
 python3 modm/modm_tools/bmp.py path/to/project.elf -p /dev/tty.usbserial-123
 ```
 
+You can also reset the target:
+
+```sh
+python3 modm/modm_tools/bmp.py --reset
+```
+
 (\* *only ARM Cortex-M targets*)
 """
 
@@ -56,6 +62,11 @@ def program(source, port=None):
     commands = ["load", "compare-sections", "kill", "quit"]
     gdb.call(source=source, backend=backend, commands=commands)
 
+def reset(port=None):
+    from modm_tools import gdb
+    backend = BlackMagicProbeBackend(port=port)
+    commands = ["kill", "quit"]
+    gdb.call(backend=backend, commands=commands)
 
 # -----------------------------------------------------------------------------
 def add_subparser(subparser):
@@ -74,17 +85,28 @@ def add_subparser(subparser):
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(description='Program ELF file via Black Magic Probe')
+    parser = argparse.ArgumentParser(
+        description='Program ELF file or reset device via Black Magic Probe')
     parser.add_argument(
             dest="source",
+            nargs="?",
             metavar="ELF")
     parser.add_argument(
             "-p", "--port",
             dest="port",
             default="auto",
             help="Serial port of Black Magic Probe.")
+    parser.add_argument(
+            "-r", "--reset",
+            dest="reset",
+            default=False,
+            action="store_true",
+            help="Reset device.")
 
     args = parser.parse_args()
-    program(source=os.path.abspath(args.source), port=args.port)
+    if args.reset:
+        reset(port=args.port)
+    else:
+        program(source=os.path.abspath(args.source), port=args.port)
 
 

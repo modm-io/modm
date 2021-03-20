@@ -1,0 +1,111 @@
+# Copyright (c) 2021, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+profile?=release
+
+%% macro generate_flags_for_profile(name, profile, append=False)
+{{name | upper}} {% if append %}+{% else %}:{% endif %}= \
+%% for flag in flags[name][profile] | sort
+	{{ flag | flags_format }}{% if not loop.last %} \{% endif %}
+%% endfor
+%% endmacro
+
+%% macro generate_flags(name, append=False)
+%% if not append or flags[name][""] | length
+{{ generate_flags_for_profile(name, "", append) }}
+%% endif
+%% for profile in flags[name].keys()
+%% if profile != "" and flags[name][profile] | length
+ifeq ($(profile),{{ profile }})
+	{{ generate_flags_for_profile(name, profile, True) | lbuild.indent(4) }}
+endif
+%% endif
+%% endfor
+%% endmacro
+
+# Toolchain configuration
+{{ generate_flags("cppdefines", True) }}
+{{ generate_flags("ccflags", not is_modm) }}
+{{ generate_flags("cflags", not is_modm) }}
+{{ generate_flags("cxxflags", not is_modm) }}
+{{ generate_flags("asflags", not is_modm) }}
+{{ generate_flags("linkflags", not is_modm) }}
+{{ generate_flags("archflags", not is_modm) }}
+
+%% if is_modm
+# ARCHFLAGS must be known for compiling *and* linking
+CCFLAGS += $(ARCHFLAGS)
+ASFLAGS += $(ARCHFLAGS)
+LINKFLAGS += $(ARCHFLAGS)
+%% endif
+
+%% if include_paths | length
+# Include paths
+CPPDEFINES += \
+%% for path in include_paths | sort
+	-I{{ path | modm.windowsify(escape_level=0) }}{% if not loop.last %} \{% endif %}
+%% endfor
+%% endif
+
+%% if sources | length
+
+# Repo sources
+{{ repo|upper }}_OBJS += \
+%% for file, _ in sources
+	$(BUILDPATH)/{{ file | modm.windowsify(escape_level=0) | objectify }}{% if not loop.last %} \{% endif %}
+%% endfor
+
+# Include header dependencies files
+-include $({{ repo|upper }}_OBJS:.o=.d)
+
+# Custom build rules for repo sources
+%% for file, flags in sources
+	%% if flags | length
+$(BUILDPATH)/{{ file | modm.windowsify(escape_level=0) | objectify }}: {{ file | modm.windowsify(escape_level=0) }}
+	%% set ext = {"sx":"asm","s":"asm","S":"asm"}.get(file.split(".")[-1],file.split(".")[-1])
+	@$(call compile_{{ ext }},$@,$<,{% for key, profiles in flags.items() if "" in profiles %} {{ profiles[""] | join(" ") }}{% endfor %} \
+		%% for key, profiles in flags.items()
+			%% for profile, flags in profiles.items() if "" != profile
+			$(if $(filter {{profile}},$(profile)),{{ flags | join(" ") }},) \
+			%% endfor
+		%% endfor
+		)
+	%% endif
+%% endfor
+
+# Static library build rule
+$(BUILDPATH)/{{repo}}/lib{{repo}}.a: $({{ repo|upper }}_OBJS)
+	@echo "Archiving······" $(subst $(BUILDPATH_PREFIX),,$@)
+	@$(AR) rc $@ $^
+	@echo "Indexing·······" $(subst $(BUILDPATH_PREFIX),,$@)
+	@$(RANLIB) $@
+
+LIBS += $(BUILDPATH)/{{repo}}/lib{{ repo }}.a
+
+%% endif
+
+%% if libraries | length
+# Repo libraries
+LIBS += \
+%% for library in libraries | sort
+	-l{{ library }}{% if not loop.last %} \{% endif %}
+%% endfor
+%% endif
+
+%% if library_paths | length
+# Repo library paths
+LIBPATH += \
+%% for library in library_paths | sort
+	-L{{ library | modm.windowsify(escape_level=0) }}{% if not loop.last %} \{% endif %}
+%% endfor
+%% endif
+
+%% if packages | length
+CPPDEFINES += `pkg-config --cflags {{ packages | sort | join(" ") }}`
+LIBS += `pkg-config --libs {{ packages | sort | join(" ") }}`
+%% endif

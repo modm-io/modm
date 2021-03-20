@@ -43,8 +43,7 @@ def call(source=None, config=None, commands=None, backend=None, ui=None):
                 '{source}'
     elif 'web' in ui:
         gdb_command = 'gdbgui {source} ' \
-                '-g arm-none-eabi-gdb ' \
-                "--gdb-args='{args} {source}'"
+                "--gdb-cmd='arm-none-eabi-gdb {args} {source}'"
     else:
         raise ValueError("Unknown UI mode! '{}'".format(ui))
 

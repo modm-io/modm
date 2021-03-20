@@ -37,8 +37,7 @@ def black_magic_probe_debug(env, source, alias='black_magic_probe_debug'):
 # -----------------------------------------------------------------------------
 def black_magic_probe_reset(env, alias='black_magic_probe_reset'):
 	def call_bmp_reset(target, source, env):
-		backend = bmp.BlackMagicProbeBackend(port=ARGUMENTS.get("port", "auto"))
-		gdb.call(backend=backend, commands=["kill", "quit"])
+		bmp.reset(port=ARGUMENTS.get("port", "auto"))
 
 	action = Action(call_bmp_reset, cmdstr="$BMP_RESET_COMSTR")
 	return env.AlwaysBuild(env.Alias(alias, '', action))
