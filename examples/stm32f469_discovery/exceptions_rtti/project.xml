@@ -8,5 +8,6 @@
   <modules>
     <module>modm:platform:gpio</module>
     <module>modm:build:scons</module>
+    <module>modm:build:make</module>
   </modules>
 </library>

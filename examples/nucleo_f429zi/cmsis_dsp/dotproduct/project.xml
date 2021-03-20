@@ -5,6 +5,7 @@
   </options>
   <modules>
     <module>modm:build:scons</module>
+    <module>modm:build:make</module>
     <module>modm:cmsis:dsp:transform</module>
     <module>modm:cmsis:dsp:basic_math</module>
   </modules>

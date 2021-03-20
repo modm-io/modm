@@ -7,5 +7,6 @@
     <module>modm:processing:rtos</module>
     <module>modm:platform:heap</module>
     <module>modm:build:scons</module>
+    <module>modm:build:make</module>
   </modules>
 </library>

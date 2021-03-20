@@ -36,6 +36,7 @@ examples/**/compile_commands.json
 examples/**/SConstruct
 examples/**/Makefile
 examples/**/generated
+examples/**/coredump.txt
 
 # repo.lb cache file
 ext/modm-devices.cache

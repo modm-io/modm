@@ -9,5 +9,6 @@
     <module>modm:architecture:assert</module>
     <module>modm:debug</module>
     <module>modm:build:scons</module>
+    <module>modm:build:make</module>
   </modules>
 </library>

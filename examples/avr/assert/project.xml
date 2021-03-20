@@ -7,5 +7,6 @@
     <module>modm:architecture:delay</module>
     <module>modm:build:scons</module>
     <module>modm:build:cmake</module>
+    <module>modm:build:make</module>
   </modules>
 </library>

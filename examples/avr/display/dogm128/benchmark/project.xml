@@ -15,5 +15,6 @@
     <module>modm:processing:timer</module>
     <module>modm:ui:display</module>
     <module>modm:build:scons</module>
+    <module>modm:build:make</module>
   </modules>
 </library>

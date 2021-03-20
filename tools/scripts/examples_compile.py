@@ -19,6 +19,7 @@ from pathlib import Path
 is_running_in_ci = (os.getenv("CIRCLECI") is not None or
                     os.getenv("TRAVIS") is not None or
                     os.getenv("GITHUB_ACTIONS") is not None)
+is_running_on_windows = "Windows" in platform.platform()
 build_dir = (Path(os.path.abspath(__file__)).parents[2] / "build")
 cache_dir = build_dir / "cache"
 global_options = {}
@@ -50,14 +51,16 @@ def build(project):
     project_cfg = project.read_text()
     commands = []
     if ":build:scons" in project_cfg:
-        commands.append("scons build --cache-show --random")
-    if ":build:cmake" in project_cfg:
-        commands.append("make cmake && make build")
+        commands.append( ("scons build --cache-show --random", "SCons") )
+    if ":build:make" in project_cfg and not is_running_on_windows:
+        commands.append( ("make build", "Make") )
+    elif ":build:cmake" in project_cfg:
+        commands.append( ("make cmake && make build", "CMake") )
 
     rcs = 0
-    for command in commands:
+    for command, build_system in commands:
         output = ["=" * 90, "Building: {} with {}".format(
-                  path / "main.cpp", "SCons" if "scons" in command else "CMake")]
+                  path / "main.cpp", build_system)]
         rc, ro = run_command(path, command)
         rcs += rc
         print("\n".join(output + [ro]))
@@ -66,13 +69,24 @@ def build(project):
 
 def run(project):
     path = project.parent
-    command = "scons run"
-    output = ["=" * 90, "Running: {} with {}".format(path / "main.cpp", "SCons" if "scons" in command else "CMake")]
-    rc, ro = run_command(path, command, all_output=True)
-    print("\n".join(output + [ro]))
-    if "CI: run fail" in project.read_text():
-        return None if not rc else project
-    return None if rc else project
+    project_cfg = project.read_text()
+    commands = []
+    if ":build:scons" in project_cfg:
+        commands.append( ("scons run", "SCons") )
+    if ":build:make" in project_cfg and not is_running_on_windows:
+        commands.append( ("make run", "Make") )
+
+    rcs = 0
+    for command, build_system in commands:
+        output = ["=" * 90, "Running: {} with {}".format(path / "main.cpp", build_system)]
+        rc, ro = run_command(path, command, all_output=True)
+        print("\n".join(output + [ro]))
+        if "CI: run fail" in project_cfg:
+            rcs += 0 if rc else 1
+        else:
+            rcs += rc
+
+    return None if rcs else project
 
 def compile_examples(paths, jobs, split, part):
     print("Using {}x parallelism".format(jobs))

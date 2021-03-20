@@ -60,6 +60,10 @@ main()
 #endif
 		MODM_LOG_ERROR << "firmware=" << modm::hex;
 		for (const auto data : FaultReporter::buildId()) MODM_LOG_ERROR << data;
+		MODM_LOG_ERROR << "\nor\n\tmake debug-coredump";
+#ifdef MODM_DEBUG_BUILD
+		MODM_LOG_ERROR << " profile=debug";
+#endif
 		MODM_LOG_ERROR << "\n\n";
 		for (const auto data : FaultReporter())
 			MODM_LOG_ERROR << modm::hex << data << modm::flush;
