@@ -18,7 +18,8 @@ from pathlib import Path
 is_running_in_ci = 	os.getenv("CIRCLECI") is not None or \
 					os.getenv("TRAVIS") is not None or \
 					os.getenv("GITHUB_ACTIONS") is not None
-cpus = 4 if is_running_in_ci else os.cpu_count()
+jobs = 4 if is_running_in_ci else os.cpu_count()
+if os.getenv("GITHUB_ACTIONS") is not None: jobs = 8;
 build_dir = (Path(os.path.abspath(__file__)).parents[2] / "build")
 cache_dir = build_dir / "cache"
 global_options = {}
@@ -81,28 +82,28 @@ def run(project):
 	return None if rc else project
 
 def compile_examples(paths):
-	print("Using {}x parallelism".format(cpus))
+	print("Using {}x parallelism".format(jobs))
 	# Create build folder to prevent process race
 	cache_dir.mkdir(exist_ok=True, parents=True)
 	(cache_dir / "config").write_text('{"prefix_len": 2}')
 	# Find all project files
 	projects = [p for path in paths for p in Path(path).glob("**/project.xml")]
 	# first generate all projects
-	with multiprocessing.Pool(cpus) as pool:
+	with multiprocessing.Pool(jobs) as pool:
 		projects = pool.map(generate, projects)
 	results = projects.count(None)
 
 	# Filter projects for successful generation
 	projects = [p for p in projects if p is not None]
 	# Then build the successfully generated ones
-	with multiprocessing.Pool(cpus) as pool:
+	with multiprocessing.Pool(jobs) as pool:
 		projects = pool.map(build, projects)
 	results += projects.count(None)
 
 	# Filter projects for successful compilation and runablity
 	projects = [p for p in projects if p is not None and "CI: run" in p.read_text()]
 	# Then run the successfully compiled ones
-	with multiprocessing.Pool(cpus) as pool:
+	with multiprocessing.Pool(jobs) as pool:
 		projects = pool.map(run, projects)
 	results += projects.count(None)
 

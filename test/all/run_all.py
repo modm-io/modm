@@ -24,6 +24,7 @@ from pathlib import Path
 
 LBUILD_COMMAND = ["lbuild"]
 jobs = 4 if os.getenv("CIRCLECI") else os.cpu_count()
+if os.getenv("GITHUB_ACTIONS") is not None: jobs = 8;
 build_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../build"))
 
 class CommandException(Exception):
@@ -220,6 +221,7 @@ if __name__ == "__main__":
     # Translate cache limit to bytes
     cache_limit = args.cache_limit * 1e9
 
+    print("Using {}x parallel jobs".format(args.jobs))
     try:
         with multiprocessing.Pool(args.jobs) as pool:
             test_runs = pool.map(build_device, [TestRun(x, cache_dir, cache_limit) for x in devices])
