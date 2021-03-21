@@ -11,6 +11,39 @@
  */
 // ----------------------------------------------------------------------------
 
+/*
+Make sure to compile and upload the *debug* version of the firmware:
+
+	scons program profile=debug
+
+Then you can start GDB in TUI mode by default:
+
+	scons debug profile=debug
+
+Alternatively if you installed gdbgui you can use:
+
+	scons debug profile=debug ui=web
+
+
+Useful GDB Commands:
+
+- info break (i b)           list all breakpoints
+- break (b)                  set breakpoint; e.g. "b main.cpp:120"
+- continue (c)               continue to next breakpoint
+- layout split               display C/C++ code as well as assembler instructions in window
+- layout regs                display registers in window
+- list (l)                   show
+- next (n)                   next line; do not step into
+- step (s)                   steps into function
+- nexti (ni)                 go to next machine instruction
+- stepi (si)                 step one machine instruction
+- print (p)                  print variable (i.e. p a, for reg0 p $r0, for reg2 in hex p/x $r0)
+- set (s)                    set variable (i.e. s a=10, s $reg2=16)
+- info registers (i r)       show registers and content
+- info registers XX (i r XX) replace XX by register name
+
+*/
+
 #include <modm/board.hpp>
 
 int global_a = 1;
