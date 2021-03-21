@@ -14,17 +14,16 @@ import os
 import sys
 import time
 import enum
-import string
 import shutil
+import random
 import tempfile
-import logging
+import argparse
 import subprocess
 import multiprocessing
 from pathlib import Path
 
-LOGGER = logging.getLogger("run")
 LBUILD_COMMAND = ["lbuild"]
-cpus = 4 if os.getenv("CIRCLECI") else os.cpu_count()
+jobs = 4 if os.getenv("CIRCLECI") else os.cpu_count()
 build_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../build"))
 
 class CommandException(Exception):
@@ -44,14 +43,13 @@ def run_command(cmdline):
 
 def run_lbuild(command):
     cmdline = LBUILD_COMMAND + command
-    LOGGER.debug(" ".join(cmdline))
     output, errors, retval = run_command(cmdline)
     if retval != 0:
         raise CommandException(output, errors)
     return output
 
 def run_scons(tempdir):
-    cmdline = ["python3 $(which scons)", "-C", tempdir, "--random", "--cache-show"]
+    cmdline = ["scons", "-C", tempdir, "--random", "--cache-show", "-k"]
     return run_command(cmdline)
 
 def build_code(tempdir):
@@ -68,13 +66,14 @@ class TestRunResult(enum.Enum):
 
 
 class TestRun:
-    def __init__(self, device, cache_dir=None):
+    def __init__(self, device, cache_dir, cache_limit):
         self.device = device
         self.output = ""
         self.errors = ""
         self.result = TestRunResult.FAIL_BUILD
         self.time = None
         self.cache_dir = cache_dir
+        self.cache_limit = cache_limit
 
     def run(self):
         start_time = time.time()
@@ -106,6 +105,21 @@ class TestRun:
                 self.output += error.output
                 self.errors = error.errors
 
+        # Try and keep the cache_dir under a certain size
+        if self.cache_dir and self.cache_limit:
+            def _try(op, retval=None):
+                try: return op();
+                except: return retval;
+            files = [f for f in Path(self.cache_dir).glob('*/*')
+                     if _try(lambda: f.is_file(), False)]
+            size = sum(_try(lambda: f.stat().st_size, 0) for f in files)
+            if size > self.cache_limit:
+                # assuming evenly distributed files
+                random.shuffle(files)
+                files = files[:int(((size - self.cache_limit) * len(files))/size)]
+                for file in files:
+                    _try(lambda: file.unlink())
+
         end_time = time.time()
         self.time = end_time - start_time
 
@@ -132,16 +146,42 @@ def build_device(run):
     run.run()
     return run
 
-def main():
-    if len(sys.argv) == 2 and sys.argv[1] == "failed":
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Run platform tests')
+    parser.add_argument(
+            "prefix",
+            action="append",
+            help="Device prefix to filter for")
+    parser.add_argument(
+            "--cache-limit",
+            dest="cache_limit",
+            default=0,
+            type=int,
+            help="Scons CacheDir size limit in GB")
+    parser.add_argument(
+            "--jobs",
+            dest="jobs",
+            default=jobs,
+            type=int,
+            help="Number of parallel jobs")
+    parser.add_argument(
+            "--no-cache",
+            dest="no_cache",
+            default=False,
+            action="store_true",
+            help="Disable using CacheDir.")
+    args = parser.parse_args()
+
+    if "failed" in args.prefix:
         raw_devices = Path("failed.txt").read_text().strip().split("\n")
     else:
         try:
             stdout = run_lbuild(["-c", "avr.xml", "discover", "--values", "--name :target"])
             raw_devices = stdout.strip().splitlines()
             # filter for only the devices specified
-            for arg in sys.argv[1:]:
-                raw_devices = (d for d in raw_devices if d.startswith(arg))
+            for prefix in args.prefix:
+                raw_devices = (d for d in raw_devices if d.startswith(prefix))
             # print(devices)
         except CommandException as error:
             print(error)
@@ -170,17 +210,19 @@ def main():
 
     os.makedirs("log", exist_ok=True)
 
-    if "no-cache" in sys.argv:
+    if args.no_cache:
         cache_dir = None
     else:
         cache_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../build/cache"))
         Path(cache_dir).mkdir(exist_ok=True, parents=True)
         (Path(cache_dir) / "config").write_text('{"prefix_len": 2}')
 
+    # Translate cache limit to bytes
+    cache_limit = args.cache_limit * 1e9
+
     try:
-        #devices = [device for device in devices if device.startswith("atx")]
-        with multiprocessing.Pool(cpus) as pool:
-            test_runs = pool.map(build_device, [TestRun(x, cache_dir) for x in devices])
+        with multiprocessing.Pool(args.jobs) as pool:
+            test_runs = pool.map(build_device, [TestRun(x, cache_dir, cache_limit) for x in devices])
 
         succeeded = []
         failed = []
@@ -205,5 +247,3 @@ def main():
         print("Interrupted!")
         sys.exit(1)
 
-if __name__ == "__main__":
-    main()

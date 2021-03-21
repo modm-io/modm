@@ -296,7 +296,7 @@ jobs:
           (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
       - name: Compile HAL for all STM32F4
         run: |
-          (cd test/all && python3 run_all.py stm32f4)
+          (cd test/all && python3 run_all.py stm32f4 --cache-limit 8)
       - name: Upload log artifacts
         uses: actions/upload-artifact@v2
         with:
@@ -356,7 +356,7 @@ jobs:
           (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
       - name: Compile HAL for all STM32L4
         run: |
-          (cd test/all && python3 run_all.py stm32l4)
+          (cd test/all && python3 run_all.py stm32l4 --cache-limit 8)
       - name: Upload log artifacts
         uses: actions/upload-artifact@v2
         with:
