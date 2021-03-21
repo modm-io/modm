@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-upload-docs:
-    runs-on: ubuntu-20.04
+    runs-on: self-hosted
     container:
       image: ghcr.io/modm-ext/modm-build-base:latest
     steps:
@@ -41,7 +41,7 @@ jobs:
           git push origin master
 
   api-docs-all:
-    runs-on: ubuntu-20.04
+    runs-on: self-hosted
     container:
       image: ghcr.io/modm-ext/modm-build-base:latest
     steps:

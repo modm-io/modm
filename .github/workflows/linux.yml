@@ -4,7 +4,7 @@ on: [pull_request]
 
 jobs:
   unittests-linux-generic:
-    runs-on: ubuntu-20.04
+    runs-on: self-hosted
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:latest
 
@@ -70,7 +70,7 @@ jobs:
           python3 tools/scripts/examples_check.py examples
 
   stm32-examples:
-    runs-on: ubuntu-20.04
+    runs-on: self-hosted
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:latest
     steps:
@@ -113,7 +113,7 @@ jobs:
           (cd examples && ../tools/scripts/examples_compile.py nucleo_g474re nucleo_g431rb nucleo_g431kb)
 
   stm32f4-examples:
-    runs-on: ubuntu-20.04
+    runs-on: self-hosted
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:latest
     steps:
@@ -132,7 +132,7 @@ jobs:
           (cd examples && ../tools/scripts/examples_compile.py stm32f429_discovery stm32f469_discovery nucleo_f401re nucleo_f411re nucleo_f429zi nucleo_f446re stm32f411ccu_mini_f401 stm32f411ceu_mini_f411 stm32f407vet6_devebox stm32_f4ve)
 
   avr-examples:
-    runs-on: ubuntu-20.04
+    runs-on: self-hosted
     container:
       image: ghcr.io/modm-ext/modm-build-avr
     steps:
@@ -165,7 +165,7 @@ jobs:
 
   avr-compile-all:
     needs: [unittests-linux-generic, avr-examples]
-    runs-on: ubuntu-20.04
+    runs-on: self-hosted
     container:
       image: ghcr.io/modm-ext/modm-build-avr:latest
     steps:
@@ -185,7 +185,7 @@ jobs:
 
   samd-compile-all:
     needs: [unittests-linux-generic]
-    runs-on: ubuntu-20.04
+    runs-on: self-hosted
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:latest
     steps:
@@ -205,7 +205,7 @@ jobs:
 
   stm32f0-compile-all:
     needs: [unittests-linux-generic, stm32-examples]
-    runs-on: ubuntu-20.04
+    runs-on: self-hosted
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:latest
     steps:
@@ -225,7 +225,7 @@ jobs:
 
   stm32f1-compile-all:
     needs: [unittests-linux-generic, stm32-examples]
-    runs-on: ubuntu-20.04
+    runs-on: self-hosted
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:latest
     steps:
@@ -245,7 +245,7 @@ jobs:
 
   stm32f2-compile-all:
     needs: [unittests-linux-generic, stm32-examples]
-    runs-on: ubuntu-20.04
+    runs-on: self-hosted
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:latest
     steps:
@@ -265,7 +265,7 @@ jobs:
 
   stm32f3-compile-all:
     needs: [unittests-linux-generic, stm32-examples]
-    runs-on: ubuntu-20.04
+    runs-on: self-hosted
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:latest
     steps:
@@ -285,7 +285,7 @@ jobs:
 
   stm32f4-compile-all:
     needs: [unittests-linux-generic, stm32f4-examples]
-    runs-on: ubuntu-20.04
+    runs-on: self-hosted
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:latest
     steps:
@@ -305,7 +305,7 @@ jobs:
 
   stm32f7-compile-all:
     needs: [unittests-linux-generic, stm32-examples]
-    runs-on: ubuntu-20.04
+    runs-on: self-hosted
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:latest
     steps:
@@ -325,7 +325,7 @@ jobs:
 
   stm32l1-compile-all:
     needs: [unittests-linux-generic, stm32-examples]
-    runs-on: ubuntu-20.04
+    runs-on: self-hosted
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:latest
     steps:
@@ -345,7 +345,7 @@ jobs:
 
   stm32l4-compile-all:
     needs: [unittests-linux-generic, stm32-examples]
-    runs-on: ubuntu-20.04
+    runs-on: self-hosted
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:latest
     steps:
@@ -365,7 +365,7 @@ jobs:
 
   stm32g0-compile-all:
     needs: [unittests-linux-generic, stm32-examples]
-    runs-on: ubuntu-20.04
+    runs-on: self-hosted
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:latest
     steps:
@@ -385,7 +385,7 @@ jobs:
 
   stm32g4-compile-all:
     needs: [unittests-linux-generic, stm32-examples]
-    runs-on: ubuntu-20.04
+    runs-on: self-hosted
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:latest
     steps:
@@ -405,7 +405,7 @@ jobs:
 
   build-docs-test:
     needs: [avr-compile-all, samd-compile-all, stm32f0-compile-all, stm32f1-compile-all, stm32f2-compile-all, stm32f3-compile-all, stm32g0-compile-all, stm32g4-compile-all]
-    runs-on: ubuntu-20.04
+    runs-on: self-hosted
     container:
       image: ghcr.io/modm-ext/modm-build-base:latest
     steps:
