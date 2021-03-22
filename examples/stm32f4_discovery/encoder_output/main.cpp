@@ -10,7 +10,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
-#include <modm/driver/encoder/encoder_output.hpp>
+#include <modm/driver/encoder/bitbang_encoder_output.hpp>
 
 using namespace Board;
 
@@ -25,7 +25,7 @@ main()
 	LedGreen::set();
 
 	// period=100000 // 100000us => 10Hz (visible)
-	using TestEncoder = modm::EncoderOutput<LedBlue, LedGreen, int32_t, modm::PrecisePeriodicTimer, 100'000>;
+	using TestEncoder = modm::BitBangEncoderOutput<LedBlue, LedGreen, int32_t, modm::PrecisePeriodicTimer, 100'000>;
 	TestEncoder testEncoder{0};
 
 	testEncoder.setPosition(1 << 31);

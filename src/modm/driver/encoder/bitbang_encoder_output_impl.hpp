@@ -10,79 +10,72 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	MODM_ENCODER_OUTPUT_HPP
-#	error	"Don't include this file directly, use 'encoder_output.hpp' instead!"
+#ifndef MODM_BITBANG_ENCODER_OUTPUT_HPP
+#error "Don't include this file directly, use 'bitbang_encoder_output.hpp' instead!"
 #endif
-#include "encoder_output.hpp"
+#include "bitbang_encoder_output.hpp"
 
-template <
-	class PinA,
-	class PinB,
-	typename PositionType,
-	class PeriodicTimer,
-	uint32_t period
-	>
-modm::EncoderOutput<PinA, PinB, PositionType, PeriodicTimer, period>::EncoderOutput(PositionType initialValue) :
-	setpoint(initialValue), actualValue(initialValue), timer(period), state(State::State0)
+template<class SignalA, class SignalB, typename PositionType, class PeriodicTimer, uint32_t period>
+modm::BitBangEncoderOutput<SignalA, SignalB, PositionType, PeriodicTimer,
+						   period>::BitBangEncoderOutput(PositionType initialValue)
+	: setpoint(initialValue), actualValue(initialValue), timer(period), state(State::State0)
 {
-	PinA::setOutput();
-	PinB::setOutput();
-	PinA::set();
-	PinB::set();
+	SignalA::setOutput();
+	SignalB::setOutput();
+	SignalA::set();
+	SignalB::set();
 	setpoint = initialValue;
 	actualValue = initialValue;
 }
 
-template <
-	class PinA,
-	class PinB,
-	typename PositionType,
-	class PeriodicTimer,
-	uint32_t period
-	>
+template<class SignalA, class SignalB, typename PositionType, class PeriodicTimer, uint32_t period>
 void
-modm::EncoderOutput<PinA, PinB, PositionType, PeriodicTimer, period>::update()
+modm::BitBangEncoderOutput<SignalA, SignalB, PositionType, PeriodicTimer, period>::update()
 {
-	if(timer.execute()){
-		if(setpoint > actualValue) {
+	if (timer.execute())
+	{
+		if (setpoint > actualValue)
+		{
 			// generate forward tick
-			switch(state) {
+			switch (state)
+			{
 				case State::State0:
-					PinA::reset();
+					SignalA::reset();
 					state = State::State1;
 					break;
 				case State::State1:
-					PinB::reset();
+					SignalB::reset();
 					state = State::State2;
 					break;
 				case State::State2:
-					PinA::set();
+					SignalA::set();
 					state = State::State3;
 					break;
 				case State::State3:
-					PinB::set();
+					SignalB::set();
 					state = State::State0;
 					break;
 			}
 			actualValue++;
-		}
-		else if(setpoint < actualValue) {
+		} else if (setpoint < actualValue)
+		{
 			// generate backward tick
-			switch(state) {
+			switch (state)
+			{
 				case State::State0:
-					PinB::reset();
+					SignalB::reset();
 					state = State::State3;
 					break;
 				case State::State1:
-					PinA::reset();
+					SignalA::reset();
 					state = State::State0;
 					break;
 				case State::State2:
-					PinB::set();
+					SignalB::set();
 					state = State::State1;
 					break;
 				case State::State3:
-					PinA::set();
+					SignalA::set();
 					state = State::State2;
 					break;
 			}

@@ -12,9 +12,9 @@
 
 
 def init(module):
-    module.name = ":driver:encoder.output"
+    module.name = ":driver:encoder_output.bitbang"
     module.description = """\
-# Encoder Output
+# Quadrature Encoder Output
 
 This driver generates a AB (incremental) encoder signal to
 emulate a hardware encoder with a microcontroller.
@@ -28,5 +28,5 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "modm/src/modm/driver/encoder"
-    env.copy("encoder_output.hpp")
-    env.copy("encoder_output_impl.hpp")
+    env.copy("bitbang_encoder_output.hpp")
+    env.copy("bitbang_encoder_output_impl.hpp")

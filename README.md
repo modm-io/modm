@@ -205,7 +205,7 @@ can easily configure them for you specific needs.
 <td align="center">DS1631</td>
 <td align="center">DS18B20</td>
 <td align="center">EA-DOG</td>
-<td align="center">ENCODER-OUTPUT</td>
+<td align="center">ENCODER-OUTPUT-BITBANG</td>
 <td align="center">FT245</td>
 </tr><tr>
 <td align="center">FT6X06</td>
