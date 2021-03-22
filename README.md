@@ -205,65 +205,66 @@ can easily configure them for you specific needs.
 <td align="center">DS1631</td>
 <td align="center">DS18B20</td>
 <td align="center">EA-DOG</td>
+<td align="center">ENCODER-INPUT-BITBANG</td>
 <td align="center">ENCODER-OUTPUT-BITBANG</td>
-<td align="center">FT245</td>
 </tr><tr>
+<td align="center">FT245</td>
 <td align="center">FT6X06</td>
 <td align="center">GPIO-SAMPLER</td>
 <td align="center">HCLAx</td>
 <td align="center">HD44780</td>
 <td align="center">HMC58x</td>
-<td align="center">HMC6343</td>
 </tr><tr>
+<td align="center">HMC6343</td>
 <td align="center">HX711</td>
 <td align="center">I2C-EEPROM</td>
 <td align="center">ILI9341</td>
 <td align="center">IS31FL3733</td>
 <td align="center">ITG3200</td>
-<td align="center">L3GD20</td>
 </tr><tr>
+<td align="center">L3GD20</td>
 <td align="center">LAN8720A</td>
 <td align="center">LAWICEL</td>
 <td align="center">LIS302DL</td>
 <td align="center">LIS3DSH</td>
 <td align="center">LIS3MDL</td>
-<td align="center">LM75</td>
 </tr><tr>
+<td align="center">LM75</td>
 <td align="center">LP503X</td>
 <td align="center">LSM303A</td>
 <td align="center">LSM6DS33</td>
 <td align="center">LTC2984</td>
 <td align="center">MAX6966</td>
-<td align="center">MAX7219</td>
 </tr><tr>
+<td align="center">MAX7219</td>
 <td align="center">MCP23X17</td>
 <td align="center">MCP2515</td>
 <td align="center">MMC5603</td>
 <td align="center">NOKIA5110</td>
 <td align="center">NRF24</td>
-<td align="center">TFT-DISPLAY</td>
 </tr><tr>
+<td align="center">TFT-DISPLAY</td>
 <td align="center">PAT9125EL</td>
 <td align="center">PCA8574</td>
 <td align="center">PCA9535</td>
 <td align="center">PCA9548A</td>
 <td align="center">PCA9685</td>
-<td align="center">SIEMENS-S65</td>
 </tr><tr>
+<td align="center">SIEMENS-S65</td>
 <td align="center">SIEMENS-S75</td>
 <td align="center">SK6812</td>
 <td align="center">SK9822</td>
 <td align="center">SSD1306</td>
 <td align="center">STUSB4500</td>
-<td align="center">SX1276</td>
 </tr><tr>
+<td align="center">SX1276</td>
 <td align="center">TCS3414</td>
 <td align="center">TCS3472</td>
 <td align="center">TLC594X</td>
 <td align="center">TMP102</td>
 <td align="center">TMP175</td>
-<td align="center">VL53L0</td>
 </tr><tr>
+<td align="center">VL53L0</td>
 <td align="center">VL6180</td>
 <td align="center">WS2812</td>
 </tr>
