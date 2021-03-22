@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:arduino-nano</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/arduino_nano/encoder_input</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:processing:timer</module>
+    <module>modm:driver:encoder_input.bitbang</module>
+  </modules>
+</library>
