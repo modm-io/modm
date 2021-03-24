@@ -597,14 +597,18 @@ header file and add these two defines to the command line CPP options:
 - `MODM_GIT_INFO`
 - `MODM_GIT_STATUS`: defined only if called with `with_state=True`.
 
-You can enable this by setting the `modm:build:scons:info.git` option.
+You can enable this by setting the `modm:build:info.git` option.
+
+!!! info "Increased build time"
+    Since the git repository status can change at any time, it needs to be
+    checked on every build. This adds less than a second to every build.
 
 A call to `env.InfoBuild()` will generate a `<info_build.h>` header file and add
 this define to the command line CPP options:
 
 - `MODM_BUILD_INFO`
 
-You can enable this by setting the `modm:build:scons:info.build` option.
+You can enable this by setting the `modm:build:info.build` option.
 
 !!! warning "Respect developers privacy"
     This information is placed into the firmware in **cleartext**, so it will
@@ -613,92 +617,9 @@ You can enable this by setting the `modm:build:scons:info.build` option.
     information you absolutely need!
 
 
-### Git Information
-
-These are the values defined as `const char *` strings in `<info_git.h>`:
-
-- `MODM_GIT_SHA`: commit hash: `%H`.
-- `MODM_GIT_SHA_ABBR`: short commit hash: `%h`.
-- `MODM_GIT_SUBJECT`: commit subject as text: `%s`.
-- `MODM_GIT_AUTHOR`: author name: `%an`.
-- `MODM_GIT_AUTHOR_EMAIL`: author email: `%ae`.
-- `MODM_GIT_AUTHOR_DATE`: authoring date: `%ad`.
-- `MODM_GIT_AUTHOR_DATE_TIMESTAMP`: authoring date as Unix timestamp: `%at`.
-- `MODM_GIT_COMMITTER`: committer name: `%cn`.
-- `MODM_GIT_COMMITTER_EMAIL`: committer email: `%ce`.
-- `MODM_GIT_COMMITTER_DATE`: committer date: `%cd`.
-- `MODM_GIT_COMMITTER_DATE_TIMESTAMP`: committer das as Unix timestamp: `%ct`.
-- `MODM_GIT_CONFIG_USER_NAME`: local user name: `user.name`.
-- `MODM_GIT_CONFIG_USER_EMAIL`: local user email: `user.email`.
-
-If called `with_status=True`, this information is added as well:
-
-- `MODM_GIT_MODIFIED`: number of modified files: `M`.
-- `MODM_GIT_ADDED`: number of added files: `A`.
-- `MODM_GIT_DELETED`: number of deleted files: `D`.
-- `MODM_GIT_RENAMED`: number of renamed files: `R`.
-- `MODM_GIT_COPIED`: number of copied files: `C`.
-- `MODM_GIT_UNTRACKED`: number of untracked files: `?`.
-
-This is the output of the `example/linux/git` project showing an unclean
-repository state with uncommitted changes. This can give you a few hints as to
-where a firmware came from and help you pinpoint the source of a bug or feature.
-
-```
-Info:    Local Git User:
-Info:    Name:  Name Surname
-Info:    Email: name.surname@provider.com
-Info:    Last Commit:
-Info:    SHA:             1b5a9a642857182161a615039c92907e59881614
-Info:    Abbreviated SHA: 1b5a9a642
-Info:    Subject:         wip
-Info:
-Info:    Author:
-Info:    Name:      Name Surname
-Info:    Email:     name.surname@provider.com
-Info:    Date:      Tue Jul 17 22:23:20 2018 +0200
-Info:    Timestamp: 1531859000
-Info:
-Info:    Committer:
-Info:    Name:      Name Surname
-Info:    Email:     name.surname@provider.com
-Info:    Date:      Tue Jul 17 22:23:20 2018 +0200
-Info:    Timestamp: 1531859000
-Info:
-Info:    File Status:
-Info:    Modified:  10
-Info:    Added:     0
-Info:    Deleted:   0
-Info:    Renamed:   0
-Info:    Copied:    0
-Info:    Untracked: 6
-```
-
-
-### Build Information
-
-These are the values defined as `const char *` strings in `<info_build.h>`:
-
-- `MODM_BUILD_PROJECT_NAME`: as defined in the `modm:build:project.name` option.
-- `MODM_BUILD_MACHINE`: machine information.
-- `MODM_BUILD_USER`: user information.
-- `MODM_BUILD_OS`: OS version string (best effort, may not be useful!).
-- `MODM_BUILD_COMPILER`: compiler information.
-
-The output of the `examples/linux/build_info` running on macOS:
-
-```
-Info:    Project:  build_info
-Info:    Machine:  name.local
-Info:    User:     user
-Info:    Os:       Mac 10.12.6 (x86_64)
-Info:    Compiler: g++-8 (Homebrew GCC 8.1.0) 8.1.0
-```
-
-
 ## Bitmap Tool
 
-If the `modm:build:scons:image.source` is defined as a path, it'll be searched
+If the `modm:build:image.source` is defined as a path, it'll be searched
 for `.pbm` files to convert into C++ data files using the `bitmap` tool:
 
 ```py

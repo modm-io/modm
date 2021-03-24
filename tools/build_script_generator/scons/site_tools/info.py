@@ -13,15 +13,11 @@
 # -----------------------------------------------------------------------------
 
 from SCons.Script import *
-from os.path import join, dirname, abspath
+from os.path import join
 from modm_tools import info
 
-TEMPLATE_SOURCE = join(dirname(abspath(__file__)), "info.c.in")
-
 def git_info_defines(env, with_status=False):
-	information = info.git_info(env.Dir("#").abspath)
-	if with_status:
-		information.update(info.git_status(env.Dir("#").abspath))
+	information = info.git_info(env.Dir("#").abspath, with_status=with_status)
 
 	defines = {"MODM_GIT_INFO": 1}
 	if with_status: defines["MODM_GIT_STATUS"] = 1
@@ -29,7 +25,7 @@ def git_info_defines(env, with_status=False):
 
 	target = join(env["BASEPATH"], "modm", "src", "info_git.c")
 	subs = {"type": "git", "defines": information}
-	sources = env.Jinja2Template(target=target, source=TEMPLATE_SOURCE, substitutions=subs)
+	sources = env.Jinja2Template(target=target, source=str(info.TEMPLATE_SOURCE), substitutions=subs)
 
 	return sources
 
@@ -43,7 +39,7 @@ def build_info_defines(env):
 	information["MODM_BUILD_PROJECT_NAME"] = env.get('CONFIG_PROJECT_NAME', 'Unknown')
 	target = join(env["BASEPATH"], "modm", "src", "info_build.c")
 	subs = {"type": "build", "defines": information}
-	sources = env.Jinja2Template(target=target, source=TEMPLATE_SOURCE, substitutions=subs)
+	sources = env.Jinja2Template(target=target, source=str(info.TEMPLATE_SOURCE), substitutions=subs)
 
 	return sources
 

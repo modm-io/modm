@@ -2,7 +2,7 @@
   <extends>modm:disco-f407vg</extends>
   <options>
     <option name="modm:build:build.path">../../../../build/stm32f4_discovery/open407v-d/gui</option>
-    <option name="modm:build:scons:image.source">images</option>
+    <option name="modm:build:image.source">images</option>
   </options>
   <modules>
     <module>modm:container</module>

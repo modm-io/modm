@@ -4,7 +4,7 @@
   <options>
     <option name="modm:build:build.path">../../build/generated-unittest/arduino-nano_H/</option>
     <option name="modm:build:unittest.source">../../build/generated-unittest/arduino-nano_H/modm-test</option>
-    <option name="modm:build:scons:info.git">Disabled</option>
+    <option name="modm:build:info.git">Disabled</option>
     <option name="modm:io:with_float">True</option>
     <option name="modm:io:with_long_long">True</option>
     <option name="modm:io:with_printf">True</option>

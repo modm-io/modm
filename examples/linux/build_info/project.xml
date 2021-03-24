@@ -3,7 +3,7 @@
   <options>
     <option name="modm:target">hosted-linux</option>
     <option name="modm:build:build.path">../../../build/linux/build_info</option>
-    <option name="modm:build:scons:info.build">True</option>
+    <option name="modm:build:info.build">True</option>
   </options>
   <modules>
     <module>modm:platform:core</module>

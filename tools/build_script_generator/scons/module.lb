@@ -28,17 +28,6 @@ def prepare(module, options):
     module.add_option(
         PathOption(name="path.artifact", default="artifacts", absolute=True,
                    description=descr_path_artifact))
-    module.add_option(
-        PathOption(name="image.source", default="", empty_ok=True, absolute=True,
-                   description=descr_image_source))
-
-    module.add_option(
-        EnumerationOption(name="info.git", default="Disabled",
-                          enumeration=["Disabled", "Info", "Info+Status"],
-                          description=descr_info_git))
-    module.add_option(
-        BooleanOption(name="info.build", default=False,
-                      description=descr_info_build))
 
     module.add_collector(
         CallableCollector(name="flag_format",
@@ -55,19 +44,23 @@ def prepare(module, options):
         Alias(name="unittest.source",
               destination=":build:unittest.source",
               description="Moved into `modm:build` module"))
+    module.add_alias(
+        Alias(name="info.git",
+              destination=":build:info.git",
+              description="Moved into `modm:build` module"))
+    module.add_alias(
+        Alias(name="info.build",
+              destination=":build:info.build",
+              description="Moved into `modm:build` module"))
+    module.add_alias(
+        Alias(name="image.source",
+              destination=":build:image.source",
+              description="Moved into `modm:build` module"))
 
     return True
 
 
 def build(env):
-    env.outbasepath = "modm/src/"
-    if env["info.git"] != "Disabled":
-        env.collect(":build:gitignore", "modm/src/info_git.c")
-        env.copy("resources/info_git.h", "info_git.h")
-    if env["info.build"]:
-        env.collect(":build:gitignore", "modm/src/info_build.c")
-        env.copy("resources/info_build.h", "info_build.h")
-
     def flag_format(flag):
         subs = {
             "target_base": '"${TARGET.base}"',
@@ -83,7 +76,6 @@ def build(env):
 
     env.collect("flag_format", flag_format)
 
-    has_info_tool = (env["info.git"] != "Disabled" or env["info.build"])
     # SCons tools and toolpaths
     toolpaths = {
         "scons/site_tools",
@@ -100,9 +92,9 @@ def build(env):
     }
     if env.has_module(":communication:xpcc:generator"):
         tools.add("xpcc_generator")
-    if len(env["image.source"]):
+    if len(env["::image.source"]):
         tools.add("bitmap")
-    if has_info_tool:
+    if env["::info.git"] != "Disabled" or env["::info.build"]:
         tools.add("info")
     if len(env["::unittest.source"]):
         tools.add("unittestm")
@@ -127,8 +119,6 @@ def build(env):
             env.copy(path)
     # Copy support files
     env.copy("site_tools/qtcreator/")
-    if has_info_tool:
-        env.copy("site_tools/info.c.in")
 
     # Generate the env.BuildTarget tool
     linkerscript = env.get(":platform:cortex-m:linkerscript.override")
@@ -148,7 +138,7 @@ def build(env):
 def post_build(env):
     is_unittest = len(env["::unittest.source"])
     has_xpcc_generator = env.has_module(":communication:xpcc:generator")
-    has_image_source = len(env["image.source"])
+    has_image_source = len(env["::image.source"])
     repositories = [p for p in env.buildlog.repositories if isdir(env.real_outpath(p, basepath="."))]
     repositories.sort(key=lambda name: "0" if name == "modm" else name)
 
@@ -175,7 +165,7 @@ def post_build(env):
         "has_xpcc_generator": has_xpcc_generator,
     })
     if has_image_source:
-        subs["image_source"] = env.relative_outpath(env["image.source"])
+        subs["image_source"] = env.relative_outpath(env["::image.source"])
     if is_unittest:
         subs["unittest_source"] = env.relative_outpath(env["::unittest.source"])
     if has_xpcc_generator:
@@ -259,13 +249,3 @@ The artifact folder contains ELF files named by their GNU build id hash. This
 allows identification of firmware on the device via serial output and is useful
 for archiving or post-mortem debugging.
 """
-
-descr_image_source = """# Path to directory containing .pbm files"""
-
-descr_info_git = """# Generate git repository state information
-
-- `Info`: generates information about the last commit.
-- `Info+Status`: like `Info` plus git file status.
-"""
-
-descr_info_build = """# Generate build state information"""

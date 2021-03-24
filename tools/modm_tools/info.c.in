@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Niklas Hauser
+ * Copyright (c) 2019, 2021, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -11,10 +11,10 @@
 
 #include "info_{{ type }}.h"
 
-%% for name, value in defines.items()
-%% if value is number
-const int16_t {{ name | upper }} = {{ value }};
-%% else
+{% for name, value in defines.items() | sort %}
+{%- if value is number %}
+const {{ "uint32_t" if "TIMESTAMP" in name else "int16_t" }} {{ name | upper }} = {{ value }};
+{%- else %}
 const char *{{ name | upper }} = "{{ value | replace('"', '\\"') }}";
-%% endif
-%% endfor
+{%- endif %}
+{%- endfor %}

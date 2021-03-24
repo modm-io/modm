@@ -6,7 +6,7 @@
     <option name="modm:build:unittest.source">../../build/generated-unittest/al-avreb-can/modm-test</option>
     <!-- <option name="modm:build:avrdude.programmer">avrispmkII</option> -->
     <option name="modm:build:avrdude.programmer">usbasp-clone</option>
-    <option name="modm:build:scons:info.git">Disabled</option>
+    <option name="modm:build:info.git">Disabled</option>
     <option name="modm:io:with_float">True</option>
     <option name="modm:io:with_long_long">True</option>
     <option name="modm:io:with_printf">True</option>

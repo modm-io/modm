@@ -24,7 +24,7 @@ class BuildModuleDocs:
     def __str__(self):
         if self._content is None:
             self._content = Path(localpath("module.md")).read_text(encoding="utf-8").strip()
-            tools = ["avrdude", "openocd", "bmp", "gdb", "size",
+            tools = ["avrdude", "openocd", "bmp", "gdb", "size", "info",
                      "unit_test", "log", "build_id", "bitmap"]
 
             for tool in tools:
@@ -63,6 +63,17 @@ def prepare(module, options):
     module.add_option(
         PathOption(name="unittest.source", default="", empty_ok=True, absolute=True,
                    description=descr_unittest_source))
+    module.add_option(
+        PathOption(name="image.source", default="", empty_ok=True, absolute=True,
+                   description=descr_image_source))
+
+    module.add_option(
+        EnumerationOption(name="info.git", default="Disabled",
+                          enumeration=["Disabled", "Info", "Info+Status"],
+                          description=descr_info_git))
+    module.add_option(
+        BooleanOption(name="info.build", default=False,
+                      description=descr_info_build))
 
     if platform in ["avr"]:
         module.add_option(
@@ -159,6 +170,14 @@ def prepare(module, options):
 
 
 def build(env):
+    env.outbasepath = "modm/src/"
+    if env["info.git"] != "Disabled":
+        env.collect("gitignore", "modm/src/info_git.c")
+        env.copy("info_git.h")
+    if env["info.build"]:
+        env.collect("gitignore", "modm/src/info_build.c")
+        env.copy("info_build.h")
+
     # Copy crashcatcher binaries
     if env.has_module(":crashcatcher"):
         env.outbasepath = "modm/ext/crashcatcher"
@@ -176,11 +195,13 @@ def build(env):
     platform = env[":target"].identifier["platform"]
     is_cortex_m = env[":target"].has_driver("core:cortex-m*")
     tools = {
-        "bitmap",
         "find_files",
-        "info",
         "utils",
     }
+    if env["info.git"] != "Disabled" or env["info.build"]:
+        tools.add("info")
+    if len(env["image.source"]):
+        tools.add("bitmap")
     if len(env["unittest.source"]):
         tools.add("unit_test")
     if is_cortex_m:
@@ -196,6 +217,8 @@ def build(env):
     env.template("../modm_tools/__init__.py.in", "modm_tools/__init__.py")
     for tool in ("modm_tools/{}.py".format(t) for t in tools):
         env.copy(localpath("..", tool), tool)
+        if "info" in tool:
+            env.copy(localpath("../modm_tools/info.c.in"), "modm_tools/info.c.in")
 
 def post_build(env):
     if env.buildlog._buildlog._metadata:
@@ -253,6 +276,16 @@ unittests, not your application source code!
 You must use separate project configurations for compiling your unittest and
 application!
 """
+
+descr_image_source = """# Path to directory containing .pbm files"""
+
+descr_info_git = """# Generate git repository state information
+
+- `Info`: generates information about the last commit.
+- `Info+Status`: like `Info` plus git file status.
+"""
+
+descr_info_build = """# Generate build state information"""
 
 descr_openocd_cfg = """# Path to a custom OpenOCD configuration file
 
