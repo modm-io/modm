@@ -60,11 +60,11 @@ def program(source, device, programmer, port=None, baudrate=None, fuses=None, op
         elffile = ELFFile(src)
         sections = [section.name for section in elffile.iter_sections()]
 
-    command.append("-U flash:w:{}".format(source))
+    command.append('-U flash:w:"{}":e'.format(source))
     if ".eeprom" in sections:
-        command.append("-U eeprom:w:{}".format(source))
+        command.append('-U eeprom:w:"{}":e'.format(source))
     for fuse in utils.listify(fuses):
-        command.append("-U {}:w:{}".format(fuse, source))
+        command.append('-U {}:w:"{}":e'.format(fuse, source))
     command += utils.listify(options)
 
     command = " ".join(command)
