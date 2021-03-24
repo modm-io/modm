@@ -60,6 +60,9 @@ def prepare(module, options):
     module.add_option(
         PathOption(name="build.path", default="build/"+default_project_name, absolute=True,
                    description=descr_build_path))
+    module.add_option(
+        PathOption(name="unittest.source", default="", empty_ok=True, absolute=True,
+                   description=descr_unittest_source))
 
     if platform in ["avr"]:
         module.add_option(
@@ -176,9 +179,10 @@ def build(env):
         "bitmap",
         "find_files",
         "info",
-        "unit_test",
         "utils",
     }
+    if len(env["unittest.source"]):
+        tools.add("unit_test")
     if is_cortex_m:
         tools.update({"bmp", "openocd", "crashdebug", "gdb", "backend",
                       "log", "build_id", "size"})
@@ -240,6 +244,14 @@ Remember to add your build path to your `.gitignore`.
 
 You should use a relative path instead of an absolute one, so that this option
 still works for other developers.
+"""
+
+descr_unittest_source = """# Path to directory containing unittests
+
+When this path is declared, the generated build script will compile **only** the
+unittests, not your application source code!
+You must use separate project configurations for compiling your unittest and
+application!
 """
 
 descr_openocd_cfg = """# Path to a custom OpenOCD configuration file

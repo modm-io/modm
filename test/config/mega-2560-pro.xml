@@ -3,7 +3,7 @@
   <extends>modm:mega-2560-pro</extends>
   <options>
     <option name="modm:build:build.path">../../build/generated-unittest/mega-2560-pro/</option>
-    <option name="modm:build:scons:unittest.source">../../build/generated-unittest/mega-2560-pro/modm-test</option>
+    <option name="modm:build:unittest.source">../../build/generated-unittest/mega-2560-pro/modm-test</option>
     <option name="modm:build:scons:info.git">Disabled</option>
     <option name="modm:io:with_float">True</option>
     <option name="modm:io:with_long_long">True</option>

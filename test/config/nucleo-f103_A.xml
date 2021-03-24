@@ -3,7 +3,7 @@
   <extends>modm:nucleo-f103rb</extends>
   <options>
     <option name="modm:build:build.path">../../build/generated-unittest/nucleo-f103_A/</option>
-    <option name="modm:build:scons:unittest.source">../../build/generated-unittest/nucleo-f103_A/modm-test</option>
+    <option name="modm:build:unittest.source">../../build/generated-unittest/nucleo-f103_A/modm-test</option>
   </options>
   <modules>
     <module>modm:platform:heap</module>
