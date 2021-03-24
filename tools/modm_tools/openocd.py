@@ -32,6 +32,7 @@ import os
 import signal
 import tempfile
 import subprocess
+import platform
 if __name__ == "__main__":
     import sys
     sys.path.append(os.path.dirname(os.path.dirname(__file__)))
@@ -55,7 +56,10 @@ class OpenOcdBackend:
 
     def stop(self):
         if self.process is not None:
-            os.killpg(os.getpgid(self.process.pid), signal.SIGTERM)
+            if "Windows" in platform.platform():
+                os.kill(self.process.pid, signal.CTRL_BREAK_EVENT)
+            else:
+                os.killpg(os.getpgid(self.process.pid), signal.SIGTERM)
             self.process = None
 
 
@@ -65,7 +69,8 @@ def call(commands=None, config=None, search=None, blocking=True, silent=False):
     config = utils.listify(config)
     search = utils.listify(search)
     if silent:
-        commands.append("log_output /dev/null")
+        null_file = "nul" if "Windows" in platform.platform() else "/dev/null"
+        commands.append("log_output " + null_file)
 
     # Provide additional search paths via the OPENOCD_SCRIPTS environment variable
     # See http://openocd.org/doc/html/Running.html
@@ -78,13 +83,16 @@ def call(commands=None, config=None, search=None, blocking=True, silent=False):
     )
     # print(command_openocd)
 
+    kwargs = {"cwd": os.getcwd(), "shell": True}
     if blocking:
-        return subprocess.call(command_openocd, cwd=os.getcwd(), shell=True)
+        return subprocess.call(command_openocd, **kwargs)
+    # We have to start openocd in its own session ID, so that Ctrl-C in GDB
+    # does not kill OpenOCD. See https://github.com/RIOT-OS/RIOT/pull/3619.
+    if "Windows" in platform.platform():
+        kwargs["creationflags"] = subprocess.CREATE_NEW_PROCESS_GROUP
     else:
-        # We have to start openocd in its own session ID, so that Ctrl-C in GDB
-        # does not kill OpenOCD. See https://github.com/RIOT-OS/RIOT/pull/3619.
-        return subprocess.Popen(command_openocd, cwd=os.getcwd(), shell=True,
-                                preexec_fn=os.setsid)
+        kwargs["preexec_fn"] = os.setsid
+    return subprocess.Popen(command_openocd, **kwargs)
 
 
 # -----------------------------------------------------------------------------
