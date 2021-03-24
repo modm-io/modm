@@ -43,6 +43,7 @@ jobs:
           gcc --version
           g++ --version
           make --version
+          python -c "import os; print(os.cpu_count())"
 
       - name: Check out repository
         uses: actions/checkout@v2

@@ -33,6 +33,7 @@ jobs:
           locale -a
           python --version  || true
           python3 --version || true
+          python3 -c "import os; print(os.cpu_count())"
           which scons
           scons --version
           which g++

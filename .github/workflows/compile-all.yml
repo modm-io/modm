@@ -1,0 +1,367 @@
+name: Compile HAL for all devices
+
+on:
+  pull_request_review:
+    types: [submitted]
+  workflow_dispatch:
+
+jobs:
+  avr-compile-all:
+    if: github.event.review.state == 'approved'
+    runs-on: ubuntu-20.04
+    container:
+      image: ghcr.io/modm-ext/modm-build-avr:latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Checkout code and update modm tools
+        run: |
+          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - name: Compile HAL for all AVRs
+        run: |
+          (cd test/all && python3 run_all.py at --quick-remaining)
+      - name: Upload log artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: avr-compile-all
+          path: test/all/log
+
+  samd-compile-all:
+    if: github.event.review.state == 'approved'
+    runs-on: ubuntu-20.04
+    container:
+      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Checkout code and update modm tools
+        run: |
+          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - name: Compile HAL for all SAMD
+        run: |
+          (cd test/all && python3 run_all.py samd --quick-remaining)
+      - name: Upload log artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: samd-compile-all
+          path: test/all/log
+
+  stm32f0-compile-all:
+    if: github.event.review.state == 'approved'
+    runs-on: ubuntu-20.04
+    container:
+      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Checkout code and update modm tools
+        run: |
+          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - name: Compile HAL for all STM32F0
+        run: |
+          (cd test/all && python3 run_all.py stm32f0 --quick-remaining)
+      - name: Upload log artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: stm32f0-compile-all
+          path: test/all/log
+
+  stm32f1-compile-all:
+    if: github.event.review.state == 'approved'
+    runs-on: ubuntu-20.04
+    container:
+      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Checkout code and update modm tools
+        run: |
+          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - name: Compile HAL for all STM32F1
+        run: |
+          (cd test/all && python3 run_all.py stm32f1 --quick-remaining)
+      - name: Upload log artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: stm32f1-compile-all
+          path: test/all/log
+
+  stm32f2-compile-all:
+    if: github.event.review.state == 'approved'
+    runs-on: ubuntu-20.04
+    container:
+      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Checkout code and update modm tools
+        run: |
+          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - name: Compile HAL for all STM32F2
+        run: |
+          (cd test/all && python3 run_all.py stm32f2 --quick-remaining)
+      - name: Upload log artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: stm32f2-compile-all
+          path: test/all/log
+
+  stm32f3-compile-all:
+    if: github.event.review.state == 'approved'
+    runs-on: ubuntu-20.04
+    container:
+      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Checkout code and update modm tools
+        run: |
+          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - name: Compile HAL for all STM32F3
+        run: |
+          (cd test/all && python3 run_all.py stm32f3 --quick-remaining)
+      - name: Upload log artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: stm32f3-compile-all
+          path: test/all/log
+
+  stm32f4-compile-all-1:
+    if: github.event.review.state == 'approved'
+    runs-on: ubuntu-20.04
+    container:
+      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Checkout code and update modm tools
+        run: |
+          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - name: Compile HAL for all STM32F4 Part 1
+        run: |
+          (cd test/all && python3 run_all.py stm32f4 --quick-remaining --split 3 --part 0)
+      - name: Upload log artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: stm32f4-compile-all-1
+          path: test/all/log
+
+  stm32f4-compile-all-2:
+    if: github.event.review.state == 'approved'
+    runs-on: ubuntu-20.04
+    container:
+      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Checkout code and update modm tools
+        run: |
+          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - name: Compile HAL for all STM32F4 Part 2
+        run: |
+          (cd test/all && python3 run_all.py stm32f4 --quick-remaining --split 3 --part 1)
+      - name: Upload log artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: stm32f4-compile-all-2
+          path: test/all/log
+
+  stm32f4-compile-all-3:
+    if: github.event.review.state == 'approved'
+    runs-on: ubuntu-20.04
+    container:
+      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Checkout code and update modm tools
+        run: |
+          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - name: Compile HAL for all STM32F4 Part 3
+        run: |
+          (cd test/all && python3 run_all.py stm32f4 --quick-remaining --split 3 --part 2)
+      - name: Upload log artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: stm32f4-compile-all-3
+          path: test/all/log
+
+  stm32f7-compile-all-1:
+    if: github.event.review.state == 'approved'
+    runs-on: ubuntu-20.04
+    container:
+      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Checkout code and update modm tools
+        run: |
+          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - name: Compile HAL for all STM32F7 Part 1
+        run: |
+          (cd test/all && python3 run_all.py stm32f7 --quick-remaining --split 2 --part 0)
+      - name: Upload log artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: stm32f7-compile-all-1
+          path: test/all/log
+
+  stm32f7-compile-all-2:
+    if: github.event.review.state == 'approved'
+    runs-on: ubuntu-20.04
+    container:
+      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Checkout code and update modm tools
+        run: |
+          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - name: Compile HAL for all STM32F7 Part 1
+        run: |
+          (cd test/all && python3 run_all.py stm32f7 --quick-remaining --split 2 --part 1)
+      - name: Upload log artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: stm32f7-compile-all-2
+          path: test/all/log
+
+  stm32l1-compile-all:
+    if: github.event.review.state == 'approved'
+    runs-on: ubuntu-20.04
+    container:
+      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Checkout code and update modm tools
+        run: |
+          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - name: Compile HAL for all STM32L1
+        run: |
+          (cd test/all && python3 run_all.py stm32l1 --quick-remaining)
+      - name: Upload log artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: stm32l1-compile-all
+          path: test/all/log
+
+  stm32l4-compile-all-1:
+    if: github.event.review.state == 'approved'
+    runs-on: ubuntu-20.04
+    container:
+      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Checkout code and update modm tools
+        run: |
+          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - name: Compile HAL for all STM32L4 Part 1
+        run: |
+          (cd test/all && python3 run_all.py stm32l4 --quick-remaining --split 3 --part 0)
+      - name: Upload log artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: stm32l4-compile-all-1
+          path: test/all/log
+
+  stm32l4-compile-all-2:
+    if: github.event.review.state == 'approved'
+    runs-on: ubuntu-20.04
+    container:
+      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Checkout code and update modm tools
+        run: |
+          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - name: Compile HAL for all STM32L4 Part 2
+        run: |
+          (cd test/all && python3 run_all.py stm32l4 --quick-remaining --split 3 --part 1)
+      - name: Upload log artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: stm32l4-compile-all-2
+          path: test/all/log
+
+  stm32l4-compile-all-3:
+    if: github.event.review.state == 'approved'
+    runs-on: ubuntu-20.04
+    container:
+      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Checkout code and update modm tools
+        run: |
+          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - name: Compile HAL for all STM32L4 Part 3
+        run: |
+          (cd test/all && python3 run_all.py stm32l4 --quick-remaining --split 3 --part 2)
+      - name: Upload log artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: stm32l4-compile-all-3
+          path: test/all/log
+
+  stm32g0-compile-all:
+    if: github.event.review.state == 'approved'
+    runs-on: ubuntu-20.04
+    container:
+      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Checkout code and update modm tools
+        run: |
+          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - name: Compile HAL for all STM32G0
+        run: |
+          (cd test/all && python3 run_all.py stm32g0 --quick-remaining)
+      - name: Upload log artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: stm32g0-compile-all
+          path: test/all/log
+
+  stm32g4-compile-all-1:
+    if: github.event.review.state == 'approved'
+    runs-on: ubuntu-20.04
+    container:
+      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Checkout code and update modm tools
+        run: |
+          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - name: Compile HAL for all STM32G4 Part 1
+        run: |
+          (cd test/all && python3 run_all.py stm32g4 --quick-remaining --split 2 --part 0)
+      - name: Upload log artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: stm32g4-compile-all-1
+          path: test/all/log
+
+  stm32g4-compile-all-2:
+    if: github.event.review.state == 'approved'
+    runs-on: ubuntu-20.04
+    container:
+      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Checkout code and update modm tools
+        run: |
+          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - name: Compile HAL for all STM32G4 Part 2
+        run: |
+          (cd test/all && python3 run_all.py stm32g4 --quick-remaining --split 2 --part 1)
+      - name: Upload log artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: stm32g4-compile-all-2
+          path: test/all/log

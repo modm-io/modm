@@ -42,6 +42,7 @@ jobs:
         run: |
           lbuild --version
           arm-none-eabi-g++ --version
+          python -c "import os; print(os.cpu_count())"
 
       - name: Check out repository
         uses: actions/checkout@v2

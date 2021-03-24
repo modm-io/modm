@@ -1,0 +1,61 @@
+name: Build and deploy docs
+
+on:
+  push:
+    branches:
+      - develop
+      - develop-**
+
+jobs:
+  build-upload-docs:
+    runs-on: ubuntu-20.04
+    container:
+      image: ghcr.io/modm-ext/modm-build-base:latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Update submodules and install lbuild
+        run: |
+          (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
+      - name: Clone modm-ext/modm.io repository
+        uses: actions/checkout@v2
+        with:
+          repository: modm-ext/modm.io
+          ssh-key: ${{secrets.MODM_EXT_MODM_IO_DEPLOY_KEY}}
+          path: docs/modm.io
+      - name: Build Homepage
+        run: |
+          rm -rf docs/modm.io/docs/*
+          python3 tools/scripts/synchronize_docs.py
+          python3 tools/scripts/generate_module_docs.py
+          (cd docs && mkdocs build)
+      - name: Push New Docs to Github
+        run: |
+          cd docs/modm.io
+          git config user.email "rca@circleci.com"
+          git config user.name "CircleCI Deployment Bot"
+          git add -A
+          git diff-index --quiet HEAD || git commit -m "Update"
+          git push origin master
+
+  api-docs-all:
+    runs-on: ubuntu-20.04
+    container:
+      image: ghcr.io/modm-ext/modm-build-base:latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Update submodules and install lbuild
+        run: |
+          (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
+      - name: Full run of docs.modm.io-generator-script
+        run: |
+          export TERM=xterm-256color
+          export COLUMNS=120
+          python3 tools/scripts/docs_modm_io_generator.py -c -j4 -d
+      - name: Upload api documentation to docs.modm.io
+        if: always()
+        env:
+          DOCS_MODM_IO_UPLOAD: ${{ secrets.DOCS_MODM_IO_UPLOAD }}
+        run: |
+          curl https://docs.modm.io/upload/compressed --upload-file modm-api-docs.tar.gz --user $DOCS_MODM_IO_UPLOAD
