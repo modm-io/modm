@@ -122,11 +122,11 @@ def main():
     else:
         temp_dir = None
     with tempfile.TemporaryDirectory(dir=temp_dir) as tempdir:
-        path_tempdir = Path(tempdir)
+        tempdir = Path(tempdir)
         modm_path = os.path.abspath(os.path.dirname(sys.argv[0]) + "/../..")
         print("Modm Path: {}".format(modm_path))
         print("Temporary directory: {}".format(str(tempdir)))
-        output_dir = (path_tempdir / "output")
+        output_dir = (tempdir / "output")
         (output_dir / "develop/api").mkdir(parents=True)
         os.chdir(tempdir)
         print("Starting to generate documentation...")
@@ -134,29 +134,9 @@ def main():
         print("... for {} devices, estimated memory footprint is {} MB".format(len(device_list), (len(device_list)*70)+2000))
         with multiprocessing.Pool(args.jobs) as pool:
             # We can only pass one argument to pool.map
-            devices = ["{}|{}|{}|".format(modm_path, path_tempdir, dev) for dev in device_list]
-            devices += ["{}|{}|{}|{}".format(modm_path, path_tempdir, dev, brd) for (brd, dev) in board_list]
+            devices = ["{}|{}|{}||{}".format(modm_path, tempdir, dev, args.deduplicate) for dev in device_list]
+            devices += ["{}|{}|{}|{}|{}".format(modm_path, tempdir, dev, brd, args.deduplicate) for (brd, dev) in board_list]
             results = pool.map(create_target, devices)
-        if args.deduplicate:
-            print("Deduplicating files...")
-            symlinks = {}
-            files_deduplicated = 0
-            file_size_deduplicated = 0
-            for file in output_dir.rglob('*'):
-                if file.is_dir():
-                    print(end="", flush=True)
-                    continue
-                fhash = hash(file.read_bytes())
-                if fhash in symlinks:
-                    # print("Linking {} -> {}".format(file.relative_to(output_dir), symlinks[fhash].relative_to(output_dir)))
-                    print(".", end="")
-                    file_size_deduplicated += file.stat().st_size
-                    file.unlink()
-                    file.symlink_to(os.path.relpath(symlinks[fhash], file.parent))
-                    files_deduplicated += 1
-                else:
-                    symlinks[fhash] = file
-            print("{} files (~{}MB) deduplicated!".format(files_deduplicated, file_size_deduplicated//(1024*1024)))
         # output_dir.rename(cwd / 'modm-api-docs')
         if args.compress:
             print("Zipping docs ...")
@@ -179,7 +159,8 @@ def main():
 
 
 def create_target(argument):
-    modm_path, tempdir, device, board = argument.split("|")
+    modm_path, tempdir, device, board, deduplicate = argument.split("|")
+    tempdir = Path(tempdir)
     output_dir = board if board else device
     try:
         print("Generating documentation for {} ...".format(output_dir))
@@ -209,8 +190,41 @@ def create_target(argument):
 
         print('Executing: (cd {}/modm/docs/ && doxypress doxypress.json)'.format(output_dir))
         os.system('(cd {}/modm/docs/ && doxypress doxypress.json > /dev/null 2>&1)'.format(output_dir))
-        (Path(tempdir) / output_dir / "modm/docs/html").rename(Path(tempdir) / 'output/develop/api' / output_dir)
         print("Finished generating documentation for device {}.".format(output_dir))
+
+        srcdir = (tempdir / output_dir / "modm/docs/html")
+        destdir = tempdir / 'output/develop/api' / output_dir
+
+        if deduplicate == "True":
+            print("Deduplicating files for {}...".format(device))
+            symlinks = defaultdict(list)
+            for file in (tempdir / 'output').rglob('*'):
+                if file.is_dir() or file.is_symlink(): continue;
+                key = file.relative_to(tempdir).parts[4:]
+                if key:
+                    symlinks[os.path.join(*key)].append(file)
+            for file in srcdir.rglob('*'):
+                if file.is_dir():
+                    print(end="", flush=True)
+                    continue
+                key = str(file.relative_to(srcdir))
+                if key in symlinks:
+                    for kfile in symlinks[key]:
+                        symlinks[hash(kfile.read_bytes())].append(kfile)
+                    del symlinks[key]
+                fhash = hash(file.read_bytes())
+                if fhash in symlinks:
+                    print(".", end="")
+                    rpath = symlinks[fhash][0].relative_to(tempdir / 'output/develop/api')
+                    lpath = os.path.relpath(srcdir, file.parent)
+                    sympath = os.path.join("..", lpath, rpath)
+                    # print("Linking {} -> {}".format(file.relative_to(srcdir), sympath))
+                    file.unlink()
+                    file.symlink_to(sympath)
+
+        # Only move folder *after* deduplication to prevent race condition with file.unlink()
+        srcdir.rename(destdir)
+        print(end="", flush=True)
         return True
     except Exception as e:
         print("Error generating documentation for device {}: {}".format(output_dir, e))
