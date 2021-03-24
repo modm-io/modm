@@ -1,0 +1,228 @@
+/*
+ * Copyright (c) 2019, Pavel Pletenev
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_AVR_TIMER_{{ id }}_HPP
+#define MODM_AVR_TIMER_{{ id }}_HPP
+
+#include <avr/io.h>
+#ifdef MODM_AVR_TIMER_TEMPLATE_DEBUG
+#include "tc8_base.hpp.in"
+#else
+#include "tc8_base.hpp"
+#endif
+#include <modm/platform.hpp>
+#include <modm/platform/gpio/connector.hpp>
+
+namespace modm
+{
+
+namespace platform
+{
+
+#ifdef MODM_AVR_TIMER_TEMPLATE_DEBUG
+class Timer/*{{ id }}*/ : public TimerCounter8bit
+#else
+/**
+ * @brief		8-bit Timer/Counter {{ id }}
+ *
+ * Interrupt handler:
+ * \code
+ * MODM_ISR(TOVF{{ id }})
+ * {
+ *
+ *     ...
+ * }
+ * \endcode
+ *
+ *
+ * @author		Pavel Pletenev
+ * @ingroup		modm_platform_timer
+ */
+class Timer{{ id }} : public TimerCounter8bit
+#endif
+{
+public:
+	static Control_t tccr;
+	static uint8_t overflow;
+
+	template< template<Peripheral _> class... Signals >
+	static void
+	connect()
+	{
+		using Connector = GpioConnector<Peripheral::Tc{{ id }}, Signals...>;
+		Connector::connect();
+	}
+
+	static inline void
+	enable()
+	{
+		PRR &= ~_BV(PRTIM{{ id }});
+	}
+
+	static inline void
+	disable()
+	{
+		PRR |= _BV(PRTIM{{ id }});
+	}
+
+	static inline void
+	pause()
+	{
+		Control_t tccr_{tccr};
+		ClockSelect_t::set(tccr_, ClockSelect::Stopped);
+		TCCR{{ id }}B = tccr_.value & 0xff;
+		TCCR{{ id }}A = (tccr_.value >> 8) & 0xff;
+	}
+
+	static inline void
+	start()
+	{
+		pause();
+		TCCR{{ id }}A = (tccr.value >> 8) & 0xff;
+		TCCR{{ id }}B = tccr.value & 0xff;
+		if(counting_to_overflow(tccr)){
+			OCR{{ id }}A = overflow;
+		}
+	}
+
+	static void
+	setMode(WaveGenerationMode mode){
+		WaveGenerationMode_t::set(tccr, mode);
+	}
+
+	static inline void
+	setPrescaler(ClockSelect prescaler)
+	{
+		ClockSelect_t::set(tccr, prescaler);
+	}
+
+	static inline void
+	setOverflow(uint8_t _overflow)
+	{
+		if(counting_to_overflow(tccr)){
+			overflow = _overflow;
+		}
+	}
+
+	static uint32_t
+	setPeriod(uint32_t microseconds, bool autoStart = true)
+	{
+		// This will be inaccurate for non-smooth frequencies (last six digits
+		// unequal to zero)
+		const uint32_t cycles = microseconds * (SystemClock::Timer / 1000000UL);
+		const uint16_t calced_prescaler = (cycles + 255) / 255;	// always round up
+		uint32_t actual=0;
+		struct PrecscalerSetting{
+			ClockSelect setting;
+			uint16_t value;
+		};
+		PrecscalerSetting prescalers[5] = {
+			{ClockSelect::Div1,		1},
+			{ClockSelect::Div8,		8},
+			{ClockSelect::Div64,	64},
+			{ClockSelect::Div256,	256},
+			{ClockSelect::Div1024,	1024}
+		};
+		PrecscalerSetting* min_presc{nullptr};
+		uint16_t min_diff{0};
+		for(auto& presc : prescalers){
+			uint16_t diff = abs(presc.value - calced_prescaler);
+			if(min_presc == nullptr){
+				min_presc = &presc;
+				min_diff = diff;
+			}else{
+				if(diff < min_diff ){
+					min_presc = &presc;
+				}
+			}
+		}
+		setPrescaler(min_presc->setting);
+		if(counting_to_overflow(tccr)){
+			actual = (min_presc->value * 255 * 1000000UL) / SystemClock::Timer;
+		}else{
+			uint8_t overflow = cycles / min_presc->value;
+			overflow = overflow - 1;	// e.g. 36000 cycles are from 0 to 35999
+			setOverflow(overflow);
+			actual = (min_presc->value * overflow * 1000000UL) / SystemClock::Timer;
+		}
+		if (autoStart) {
+			start();
+		}
+		return actual;
+	}
+
+	static inline uint8_t
+	getValue()
+	{
+		return TCNT{{ id }};
+	}
+
+	static inline void
+	setValue(uint8_t value)
+	{
+		TCNT{{ id }} = value;
+	}
+
+
+	static inline void
+	enableInterrupt(Interrupt_t interrupt)
+	{
+		TIMSK{{ id }} |= interrupt.value;
+	}
+
+	static inline void
+	disableInterrupt(Interrupt_t interrupt)
+	{
+		TIMSK{{ id }} &= ~interrupt.value;
+	}
+
+	static inline Interrupt_t
+	getInterruptFlags()
+	{
+
+		return Interrupt_t(TIFR{{ id }});
+	}
+
+	static void
+	acknowledgeInterruptFlags(Interrupt_t interrupt)
+	{
+		// Flags are cleared by writing a one to the flag position.
+		// Writing a zero is ignored.
+		TIFR{{ id }} = interrupt.value;
+	}
+
+	static void
+	configureOutputChannel(
+			Channel channel, CompareOutputMode mode, uint8_t compareValue
+	){
+		if(channel == Channel::A){
+			CompareOutputModeA::set(tccr, mode);
+			OCR{{ id }}A = compareValue;
+		}else {
+			CompareOutputModeB::set(tccr, mode);
+			OCR{{ id }}B = compareValue;
+		}
+	}
+
+	static inline void
+	setCompareValue(Channel channel, uint8_t value){
+		((channel == Channel::A) ? OCR{{ id }}A : OCR{{ id }}B) = value;
+	}
+
+	static inline uint8_t
+	getCompareValue(Channel channel);
+};
+
+}	// namespace platform
+
+}	// namespace modm
+
+#endif // MODM_AVR_TIMER_{{ id }}_HPP

@@ -1,0 +1,338 @@
+/*
+ * Copyright (c) 2019, Pavel Pletenev
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_AVR_TIMER_TC8_BASE_HPP
+#define MODM_AVR_TIMER_TC8_BASE_HPP
+
+#include <stdint.h>
+#include <modm/architecture/interface/accessor.hpp>
+#include <modm/architecture/interface/register.hpp>
+
+namespace modm
+{
+
+namespace platform
+{
+
+/// @ingroup	modm_platform_timer
+
+
+class TimerCounter8bit
+{
+public:
+	enum class Control : uint16_t
+	{
+		// TCCR_A
+		COMA1 = Bit15,
+		COMA0 = Bit14,
+		COMB1 = Bit13,
+		COMB0 = Bit12,
+		WGM1 = Bit9,
+		WGM0 = Bit8,
+		// TCCR_B
+		FOCA = Bit7,
+		FOCB = Bit6,
+		WGM2 = Bit3,
+		CS2 = Bit2,
+		CS1 = Bit1,
+		CS0 = Bit0,
+	};
+	MODM_FLAGS16(Control);
+#ifdef CU16__
+#   error "internal macro is used"
+#endif
+#define CU16__(x) (uint16_t)(Control:: x)
+	enum class WaveGenerationMode : uint16_t{
+		Normal = 0,
+		PhaseCorrectPWM = CU16__(WGM0),
+		ClearTimerOnCompareMatch = CU16__(WGM1),
+		FastPWM = CU16__(WGM1) | CU16__(WGM0),
+		PhaseCorrectPWMToOCRA = CU16__(WGM2) | CU16__(WGM0),
+		FastCorrectPWMToOCRA = CU16__(WGM2) | CU16__(WGM1) | CU16__(WGM0)
+	};
+
+	using WaveGenerationMode_t = Configuration<
+		Control_t, WaveGenerationMode, CU16__(WGM2) | CU16__(WGM1) | CU16__(WGM0) >;
+
+	enum class ClockSelect: uint16_t
+	{
+		Stopped = 0,
+		Div1 = CU16__(CS0),
+		Div8 = CU16__(CS1),
+		Div64 = CU16__(CS0) | CU16__(CS1),
+		Div256 = CU16__(CS2) ,
+		Div1024 = CU16__(CS2) | CU16__(CS0),
+		ExternalOnFalling = CU16__(CS2) | CU16__(CS1),
+		ExternalOnRising = CU16__(CS2) | CU16__(CS1) | CU16__(CS0)
+	};
+
+	using ClockSelect_t = Configuration<
+		Control_t, ClockSelect,
+		CU16__(CS2) | CU16__(CS1) | CU16__(CS0) >;
+
+	enum class CompareOutputMode : uint16_t{
+		Disconnected = 0,
+		Toogle = CU16__(COMB0),
+		NormalPWM = CU16__(COMB1),
+		InvertedPWM = CU16__(COMB1) | CU16__(COMB0),
+	};
+
+	using CompareOutputModeB = Configuration<
+		Control_t, CompareOutputMode,
+		CU16__(COMB1) | CU16__(COMB0) >;
+
+	using CompareOutputModeA = Configuration<
+		Control_t, CompareOutputMode,
+		CU16__(COMB1) | CU16__(COMB0), 2>;
+
+#undef CU16__
+	static modm_always_inline bool
+	counting_to_overflow(const Control_t& tccr){
+		switch(WaveGenerationMode_t::get(tccr)){
+		case WaveGenerationMode::Normal:
+		case WaveGenerationMode::FastPWM:
+		case WaveGenerationMode::PhaseCorrectPWM:
+			return false;
+		case WaveGenerationMode::FastCorrectPWMToOCRA:
+		case WaveGenerationMode::PhaseCorrectPWMToOCRA:
+		case WaveGenerationMode::ClearTimerOnCompareMatch:
+			return true;
+		}
+		return false;
+	}
+#ifdef __AVR_MEGA__
+	enum class Interrupt : uint8_t
+	{
+		OutputCompareB = Bit2,
+		OutputCompareA = Bit1,
+		Overflow = Bit0
+	};
+	MODM_FLAGS8(Interrupt);
+#else
+	enum class Interrupt : uint8_t
+	{
+		OutputCompareB = Bit4,
+		OutputCompareA = Bit3,
+		Overflow = Bit1
+	};
+	MODM_FLAGS8(Interrupt);
+#endif
+	enum class Channel: uint8_t{
+		A=1,
+		B=2
+	};
+
+public:
+	/**
+	 * Enables the clock for the timer and resets all settings
+	 *
+	 * Has to be called before calling any other function from this
+	 * class! Otherwise the settings won't have any effect.
+	 */
+	static inline void
+	enable();
+
+	/**
+	 * Disable clock.
+	 *
+	 * All settings are ignored in this mode and the timer is
+	 * shut down. Calling any function other than enable() won't
+	 * have any effect.
+	 */
+	static void
+	disable();
+
+	/**
+	 * Pause timer operation
+	 *
+	 * All settings are stored but the timer operation is suspend until
+	 * start() is called.
+	 */
+	static void
+	pause();
+
+	/**
+	 * Re-enable timer operations
+	 *
+	 * Has to called after the initial configuration to start timer
+	 * or after pause() to restart the timer.
+	 */
+	static inline void
+	start();
+
+	/**
+	 * Set operation mode of the timer
+	 */
+	static void
+	setMode(WaveGenerationMode_t mode);
+
+	/**
+	 * Set new prescaler
+	 *
+	 * The prescaler can divide the counter clock frequency by any
+	 * factor between 1 and 65536. The new prescaler ratio is taken
+	 * into account at the next update event.
+	 *
+	 * @see		applyAndReset()
+	 */
+	static inline void
+	setPrescaler(ClockSelect_t prescaler);
+
+	/**
+	 * Set overflow.
+	 *
+	 * This sets the maximum counter value of the timer.
+	 * The timer is blocked if \p overflow is set to zero.
+	 *
+	 * Takes effect at next update event.
+	 *
+	 * @see		applyAndReset()
+	 */
+	static inline void
+	setOverflow(uint8_t overflow);
+
+	/**
+	 * Set period in microseconds
+	 *
+	 * Changes prescaler and overflow values.
+	 * Takes effect at next update event.
+	 *
+	 * @param	microseconds	Requested period in microseconds
+	 * @param	autoApply		Start timer immediately
+	 *
+	 * @return	New overflow value.
+	 *
+	 * @see		applyAndReset()
+	 */
+	static uint16_t
+	setPeriod(uint32_t microseconds, bool autoApply = true);
+
+	/**
+	 * @brief	Reset the counter, and update the prescaler and
+	 * 			overflow values.
+	 *
+	 * Generates an Update-Event without generating an
+	 * Update-Interrupt.
+	 *
+	 * This will reset the counter to 0 in up-counting mode (the
+	 * default) or to the maximal value in down-counting mode. It will
+	 * also update the timer's prescaler and overflow values if you
+	 * have set them up to be changed using setPrescaler() or
+	 * setOverflow() (or setPeriod()).
+	 *
+	 * An Update-Event is also generated when the timer reaches its
+	 * maximal (up-counting) or minimal (down-counting) value. The
+	 * settings for Prescaler, Overflow and Compare values are applied
+	 * then without calling this function.
+	 */
+	static inline void
+	applyAndReset();
+
+	/**
+	 * Get the counter value
+	 */
+	static inline uint8_t
+	getValue();
+
+	/**
+	 * Set a new counter value
+	 */
+	static inline void
+	setValue(uint8_t value);
+
+	/**
+	 * Enables interrupts. Don't forget to enable the Interrupt Vector.
+	 *
+	 * \param	interrupt
+	 * 				Interrupts to enable
+	 *
+	 * \see		enableInterruptVector()
+	 */
+	static void
+	enableInterrupt(Interrupt_t interrupt);
+
+	/**
+	 * Disables interrupts.
+	 *
+	 * \param	interrupt
+	 * 				Interrupts to disable
+	 */
+	static void
+	disableInterrupt(Interrupt_t interrupt);
+
+	/**
+	 * Returns a bitmap of the enum StateFlag. Use this method while
+	 * executing an interrupt or in other situations where you want to
+	 * know which of the flags are set.
+	 *
+	 * If a flag is a cause of an enabled interrupt (and the Interrupt
+	 * Vector is enabled) then interrupt will be triggered as long
+	 * the flag is set.
+	 *
+	 * \warning		You cannot use a switch statement for the returned
+	 * 				value, since multiple flags may be set!
+	 *
+	 * \code
+	 * InterruptFlag flags = TimerX::getInterruptFlags()
+	 * if (flags & TimerX::FLAG_XX){
+	 *	 // Flag was set, clear the flag since flags are set by
+	 *	 // hardware, but have to be cleared by software
+	 *	 TimerX::resetInterruptFlags(TIMx::FLAG_XX)
+	 * }
+	 * \endcode
+	 */
+	static Interrupt_t
+	getInterruptFlags();
+
+	/**
+	 * Clears one or multiple flags.
+	 *
+	 * \param flags		Bitmap of StateFlag
+	 */
+	static void
+	acknowledgeInterruptFlags(Interrupt_t flags);
+
+	/**
+	 * Configure output channel A, B.
+	 *
+	 * @param	channel			Channel::A,Channel::B
+	 * @param	mode			Output compare mode
+	 * @param	compareValue	Preloaded output compare value (can be
+	 * 							changed later via setCompareValue())
+	 */
+	static void
+	configureOutputChannel(
+		Channel channel, CompareOutputMode mode, uint8_t compareValue);
+
+	/**
+	 * Set compare value for channel A, B.
+	 *
+	 * @param	channel	Channel::A,Channel::B
+	 * @param	value	Compare value
+	 */
+	static inline void
+	setCompareValue(Channel channel, uint8_t value);
+
+	/**
+	 * Read compare value for channel A, B.
+	 *
+	 * @param	channel	Channel::A,Channel::B
+	 * @return	Current compare value
+	 */
+	static inline uint8_t
+	getCompareValue(Channel channel);
+};
+
+} // namespace platform
+
+} // namespace modm
+
+#endif // MODM_AVR_TIMER_TC8_BASE_HPP
