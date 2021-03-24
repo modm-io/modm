@@ -6,11 +6,14 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-run:
-	python3 run_all.py
+run-quick:
+	python3 run_all.py at sam stm32 --quick
 
 run-avr:
 	python3 run_all.py at
+
+run-sam:
+	python3 run_all.py sam
 
 run-stm32:
 	python3 run_all.py stm32
