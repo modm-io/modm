@@ -47,8 +47,8 @@ def name(raw_name):
 
     result = "-".join(result)
     # Rename some things to be more accurate
-    result = result.replace("BLUE-PILL", "Blue Pill")\
-                   .replace("BLACK-PILL", "Black Pill")\
+    result = result.replace("BLUE-PILL-", "Blue Pill ")\
+                   .replace("BLACK-PILL-", "Black Pill ")\
                    .replace("ARDUINO-UNO", "Arduino UNO")\
                    .replace("ARDUINO-NANO", "Arduino NANO")\
                    .replace("RASPBERRYPI", "Raspberry Pi")\
@@ -108,8 +108,9 @@ modules_in_path = root / "docs/modules.md.in"
 modules_path = root / "docs/src/reference/modules.md"
 
 # We cannot use lbuild to enumerate the boards since they only make themselves available for certain devices
-boards = (b.relative_to(board_path) for b in board_path.glob('**/board.xml'))
-boards = [{"name": name(b.parent.name), "url": None} for b in boards]
+boards = [re.search(r"<module>modm:board:(.*?)</module>", config.read_text()).group(1)
+          for config in Path(repopath("src/modm/board")).glob("*/board.xml")]
+boards = [{"name": name(b), "url": None} for b in boards]
 boards.sort(key=lambda b: b["name"])
 bsp_table = format_table(boards, 4)
 

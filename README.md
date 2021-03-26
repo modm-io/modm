@@ -115,29 +115,29 @@ documentation.
 <td align="center">AL-AVREB-CAN</td>
 <td align="center">Arduino NANO</td>
 <td align="center">Arduino UNO</td>
-<td align="center">Black Pill</td>
+<td align="center">Black Pill F103</td>
 </tr><tr>
-<td align="center">Blue Pill</td>
+<td align="center">Black Pill F401</td>
+<td align="center">Black Pill F411</td>
+<td align="center">Blue Pill F103</td>
 <td align="center">DEVEBOX-STM32F4XX</td>
+</tr><tr>
 <td align="center">DISCO-F051R8</td>
 <td align="center">DISCO-F072RB</td>
-</tr><tr>
 <td align="center">DISCO-F100RB</td>
 <td align="center">DISCO-F303VC</td>
+</tr><tr>
 <td align="center">DISCO-F407VG</td>
 <td align="center">DISCO-F429ZI</td>
-</tr><tr>
 <td align="center">DISCO-F469NI</td>
 <td align="center">DISCO-F746NG</td>
+</tr><tr>
 <td align="center">DISCO-F769NI</td>
 <td align="center">DISCO-L152RC</td>
-</tr><tr>
 <td align="center">DISCO-L476VG</td>
 <td align="center">FEATHER-M0</td>
-<td align="center">MEGA-2560-PRO</td>
-<td align="center">MINI-F401</td>
 </tr><tr>
-<td align="center">MINI-F411</td>
+<td align="center">MEGA-2560-PRO</td>
 <td align="center">NUCLEO-F031K6</td>
 <td align="center">NUCLEO-F042K6</td>
 <td align="center">NUCLEO-F103RB</td>
@@ -169,7 +169,7 @@ documentation.
 </tr><tr>
 <td align="center">SAMD21-MINI</td>
 <td align="center">STM32-F4VE</td>
-<td align="center">STM32F030F4P6-DEMO</td>
+<td align="center">STM32F030-DEMO</td>
 </tr>
 </table>
 <!--/bsptable-->

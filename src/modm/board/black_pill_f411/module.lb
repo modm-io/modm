@@ -11,9 +11,9 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = ":board:mini-f411"
+    module.name = ":board:black-pill-f411"
     module.description = """\
-# Mini-F411
+# Black Pill F411
 
 STM32F411CEU "Mini-F411" Minimum System Development Board
 
@@ -47,7 +47,7 @@ Then include this file in your build options like so:
 
 ```xml
 <library>
-  <extends>modm:mini-f411</extends>
+  <extends>modm:black-pill-f411</extends>
   <options>
     <option name="modm:build:openocd.cfg">openocd.cfg</option>
   </options>

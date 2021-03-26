@@ -6,9 +6,9 @@
   </repositories>
 
   <options>
-    <option name="modm:target">stm32f401ccu6</option>
+    <option name="modm:target">stm32f411ceu6</option>
   </options>
   <modules>
-    <module>modm:board:mini-f401</module>
+    <module>modm:board:black-pill-f411</module>
   </modules>
 </library>

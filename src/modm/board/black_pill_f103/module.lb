@@ -12,16 +12,16 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = ":board:blue-pill"
+    module.name = ":board:black-pill-f103"
     module.description = """\
-# Blue Pill
+# Black Pill
 
-STM32F103C8T6 "Blue Pill" Minimum System Development Board
+STM32F103C8T6 "Black Pill" Minimum System Development Board
 
 Cheap and bread-board-friendly board for STM32 F1 series.
 Sold for less than 2 USD on well known Internet shops from China.
 
-http://wiki.stm32duino.com/index.php?title=Blue_Pill
+http://wiki.stm32duino.com/index.php?title=Black_Pill
 """ + descr_programming
 
 descr_programming = """
@@ -38,7 +38,7 @@ source [find interface/stlink-v2.cfg]
 #set CPUTAPID 0x2ba01477
 
 # To select a specific programmer you can specify its serial number
-#hla_serial "\\x53\\x3f\\x6f\\x06\\x50\\x77\\x50\\x57\\x12\\x17\\x13\\x3f"
+#hla_serial "\\x53\\x3f\\x6f\\x06\\x50\\x77\\x50\\x57\\x12\\x17\\x14\\x3f"
 # You can discover the serial via `stlink --hla-serial` or `st-info --hla-serial`.
 ```
 
@@ -46,7 +46,7 @@ Then include this file in your build options like so:
 
 ```xml
 <library>
-  <extends>modm:blue-pill</extends>
+  <extends>modm:black-pill</extends>
   <options>
     <option name="modm:build:openocd.cfg">openocd.cfg</option>
   </options>

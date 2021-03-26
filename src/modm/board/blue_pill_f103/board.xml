@@ -9,6 +9,6 @@
     <option name="modm:target">stm32f103c8t6</option>
   </options>
   <modules>
-    <module>modm:board:blue-pill</module>
+    <module>modm:board:blue-pill-f103</module>
   </modules>
 </library>

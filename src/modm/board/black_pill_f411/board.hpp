@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2016-2017, Sascha Schade
- * Copyright (c) 2017-2018, Niklas Hauser
+ * Copyright (c) 2019, Raphael Lehmann
  *
  * This file is part of the modm project.
  *
@@ -10,8 +9,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_STM32_F103C8T6_BLUE_PILL_HPP
-#define MODM_STM32_F103C8T6_BLUE_PILL_HPP
+#ifndef MODM_STM32_F4X1CEU_MINI_F4X1_HPP
+#define MODM_STM32_F4X1CEU_MINI_F4X1_HPP
 
 #include <modm/platform.hpp>
 #include <modm/architecture/interface/clock.hpp>
@@ -19,15 +18,16 @@
 using namespace modm::platform;
 
 
-/// @ingroup modm_board_blue_pill
+/// @ingroup modm_board_black_pill_f401 modm_board_black_pill_f411
+/// @{
 namespace Board
 {
-	using namespace modm::literals;
+using namespace modm::literals;
 
-/// STM32F103 running at 72MHz generated from the external 8MHz crystal
-// Dummy clock for devices
-struct SystemClock {
-	static constexpr uint32_t Frequency = 72_MHz;
+/// STM32F4x1 running at 84MHz generated from the external 25MHz crystal
+struct SystemClock
+{
+	static constexpr uint32_t Frequency = 84_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency / 2;
 	static constexpr uint32_t Apb2 = Frequency;
@@ -37,17 +37,16 @@ struct SystemClock {
 	static constexpr uint32_t Spi1 = Apb2;
 	static constexpr uint32_t Spi2 = Apb1;
 	static constexpr uint32_t Spi3 = Apb1;
+	static constexpr uint32_t Spi4 = Apb2;
+	static constexpr uint32_t Spi5 = Apb2;
 
 	static constexpr uint32_t Usart1 = Apb2;
 	static constexpr uint32_t Usart2 = Apb1;
-	static constexpr uint32_t Usart3 = Apb1;
-	static constexpr uint32_t Uart4  = Apb1;
-	static constexpr uint32_t Uart5  = Apb1;
-
-	static constexpr uint32_t Can    = Apb1;
+	static constexpr uint32_t Usart6 = Apb2;
 
 	static constexpr uint32_t I2c1   = Apb1;
 	static constexpr uint32_t I2c2   = Apb1;
+	static constexpr uint32_t I2c3   = Apb1;
 
 	static constexpr uint32_t Apb1Timer = Apb1 * 2;
 	static constexpr uint32_t Apb2Timer = Apb2 * 1;
@@ -55,34 +54,33 @@ struct SystemClock {
 	static constexpr uint32_t Timer2  = Apb1Timer;
 	static constexpr uint32_t Timer3  = Apb1Timer;
 	static constexpr uint32_t Timer4  = Apb1Timer;
+	static constexpr uint32_t Timer5  = Apb1Timer;
+	static constexpr uint32_t Timer9  = Apb2Timer;
+	static constexpr uint32_t Timer10 = Apb2Timer;
+	static constexpr uint32_t Timer11 = Apb2Timer;
 
-	static constexpr uint32_t Usb = Ahb / 1.5;
+	static constexpr uint32_t Usb = 48_MHz;
 
 	static bool inline
 	enable()
 	{
 		Rcc::enableExternalCrystal();
-
-		// external clock * 9 = 72MHz, => 72/1.5 = 48 => good for USB
 		const Rcc::PllFactors pllFactors{
-			.pllMul = 9,
-			.usbPrediv = Rcc::UsbPrescaler::Div1_5
+			.pllM = 25,		// 25MHz / M=25 -> 1MHz
+			.pllN = 336,	// 1MHz * N=336 -> 336MHz
+			.pllP = 4,		// 336MHz / P=4 -> 84MHz = F_cpu
+			.pllQ = 7,		// 336MHz / Q=7 -> 48MHz = F_usb
 		};
 		Rcc::enablePll(Rcc::PllSource::ExternalCrystal, pllFactors);
 
-		// set flash latency for 72MHz
+		// set flash latency
 		Rcc::setFlashLatency<Frequency>();
 
 		// switch system clock to PLL output
 		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
 
-		// AHB has max 72MHz
 		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
-
-		// APB1 has max. 36MHz
 		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div2);
-
-		// APB2 has max. 72MHz
 		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div1);
 
 		// update frequencies for busy-wait delay functions
@@ -94,16 +92,18 @@ struct SystemClock {
 
 namespace usb
 {
-using Dm = GpioA11;		// DM: USB_DM
-using Dp = GpioA12;		// DP: USB_DP
+using Id = GpioA10;
+using Dm = GpioA11;
+using Dp = GpioA12;
+
 using Device = UsbFs;
 }
 
 // User LED (inverted, because connected to 3V3)
-using LedGreen = GpioInverted< GpioOutputC13 >;
-using Leds = SoftwareGpioPort< LedGreen >;
+using Led = GpioInverted< GpioOutputC13 >;
+using Leds = SoftwareGpioPort< Led >;
 
-using Button = GpioUnused;
+using Button = GpioInverted< GpioInputA0 >;
 
 inline void
 initialize()
@@ -111,16 +111,24 @@ initialize()
 	SystemClock::enable();
 	SysTickTimer::initialize<SystemClock>();
 
-	LedGreen::setOutput(modm::Gpio::Low);
+	Led::setOutput(modm::Gpio::Low);
+	Button::setInput(Gpio::InputType::PullUp);
 }
 
 inline void
 initializeUsbFs()
 {
 	usb::Device::initialize<SystemClock>();
-	usb::Device::connect<usb::Dm::Dm, usb::Dp::Dp>();
+	usb::Device::connect<usb::Dm::Dm, usb::Dp::Dp, usb::Id::Id>();
+	usb::Id::configure(Gpio::InputType::PullUp);
+
+	// explicitly disable VBUS sense (B device)
+	USB_OTG_FS->GCCFG |= USB_OTG_GCCFG_NOVBUSSENS;
+	USB_OTG_FS->GCCFG &= ~USB_OTG_GCCFG_VBUSBSEN;
+	USB_OTG_FS->GCCFG &= ~USB_OTG_GCCFG_VBUSASEN;
 }
 
 } // Board namespace
+/// @}
 
-#endif	// MODM_STM32_F103C8T6_BLUE_PILL_HPP
+#endif	// MODM_STM32_F4X1CEU_MINI_F4X1_HPP

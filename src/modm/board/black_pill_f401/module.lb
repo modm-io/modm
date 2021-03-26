@@ -11,9 +11,9 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = ":board:mini-f401"
+    module.name = ":board:black-pill-f401"
     module.description = """\
-# Mini-F401
+# Black Pill F401
 
 STM32F401CCU "Mini-F401" Minimum System Development Board
 
@@ -47,7 +47,7 @@ Then include this file in your build options like so:
 
 ```xml
 <library>
-  <extends>modm:mini-f401</extends>
+  <extends>modm:black-pill-f401</extends>
   <options>
     <option name="modm:build:openocd.cfg">openocd.cfg</option>
   </options>
@@ -74,8 +74,7 @@ def build(env):
         "with_assert": env.has_module(":architecture:assert")
     }
     env.template("../board.cpp.in", "board.cpp")
-    env.copy('../mini_f411/board.hpp', 'board.hpp')
-    env.copy('board.xml')
+    env.copy('../black_pill_f411/board.hpp', 'board.hpp')
 
     env.outbasepath = "modm/openocd/modm/board/"
     env.copy(repopath("tools/openocd/modm/stm32f4x1_mini_f4x1.cfg"), "stm32f4x1_mini_f4x1.cfg")
