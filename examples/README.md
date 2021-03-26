@@ -1,98 +1,59 @@
-# Examples, glorious Examples!
+# Explore the Examples
 
-<!--examples-->
-The easiest way for you to learn about modm's APIs is to look at and experiment
-[with our examples](https://github.com/modm-io/modm/tree/develop/examples),
-especially if you have a development board that modm supports out-of-box.
+To get a quick feel about modm's APIs you can look at and experiment
+[with our examples][examples], especially if you have a development board that
+modm supports out-of-box.
 
-Make sure you've [installed all tools required for building modm](https://modm.io/guide/installation).
+Make sure you've [installed all tools required for building modm][installation]
+and you've cloned the modm repository *recursively*:
+
+```sh
+git clone --recurse-submodules --jobs 8 https://github.com/modm-io/modm.git
+```
 
 
 ## TL;DR
 
-To compile any example:
+Change directory into any of the examples and compile it:
 
-```
-cd modm/examples/generic/blinky  # cd into the example
-lbuild build    # generate modm library (call only once)
-scons program   # compile and upload to your development board
-```
-
-To debug with GDB in TUI mode:
-
-```
-scons program profile=debug # compile and upload debug profile
-scons debug profile=debug   # launch OpenOCD and GDB for debugging
+```sh
+# cd into any example you like
+cd modm/examples/generic/blinky
+# generate modm library (call only once)
+lbuild build
+# compile the example
+scons -j8
+# Connect your development board and upload the firmware
+scons program
 ```
 
-To generate your target specific Doxygen documentation:
+To debug with GDB in TUI mode. Make sure to change to the debug profile:
 
+```sh
+# compile and upload debug profile
+scons program profile=debug
+# launch OpenOCD and GDB for debugging
+scons debug profile=debug
 ```
-(cd modm/docs && doxygen doxyfile.cfg)  # may take a minute or two
+
+To generate your target specific Doxypress documentation:
+
+```sh
+(cd modm/docs && doxypress doxypress.json)
 # open modm/docs/html/index.html
 ```
 
 To remove it all:
 
-```
-scons -c      # removes build artifacts
-lbuild clean  # removes generated files
-```
-
-
-## Quickstart
-
-To generate the modm library for the specific example target, call
-
-```
-lbuild build
+```sh
+# Remove build artifacts
+scons -c
+# Remove generated files
+lbuild clean
 ```
 
-You can then look at the generated modm code in the local `modm/src/modm` folder.
-
-Most of our examples compile with SCons by default, however you can generate
-a CMake build script by including the [CMake build script generator module](https://modm.io/reference/module/modm-build-cmake).
-
-```
-lbuild build -m "::cmake"
-```
-
-
-To compile the example and modm, call SCons or CMake:
-
-```
-scons
-# or for CMake
-make cmake           # call just once
-make build-release
-```
-
-To upload the example to your development board:
-
-```
-scons program
-# or for CMake
-make upload-release
-```
-
-You can also debug your examples. Make sure you've compiled and uploaded the
-debug profile first, because debugging a release profile is annoying:
-
-```
-scons program profile=debug
-# or for CMake
-make upload-debug
-```
-
-Then just do this to open up GDB in TUI mode:
-
-```
-scons gdb profile=debug
-# or for CMake
-make openocd
-# open another shell to this location
-make gdb
-```
+Have a look at the [build system documentation][build_docs] and the
+[online documentation][docs].
 
 
 ## Interesting Examples
@@ -109,7 +70,12 @@ supported development boards:
 [Blinky & Serial](https://github.com/modm-io/modm/tree/develop/examples/nucleo_f031k6/blink/main.cpp).
 - NUCLEO-F103RB:
 [Blinky & Serial](https://github.com/modm-io/modm/blob/develop/examples/nucleo_f103rb/blink/main.cpp),
-[Debugging hard faults](https://github.com/modm-io/modm/blob/develop/examples/nucleo_f103rb/hard_fault/main.cpp).
+[Undefined IRQ Handler](https://github.com/modm-io/modm/blob/develop/examples/nucleo_f103rb/undefined_irq/main.cpp),
+[Logging via ITM](https://github.com/modm-io/modm/blob/develop/examples/nucleo_f103rb/itm/main.cpp).
+- NUCLEO-F429ZI:
+[CMSIS DSP](https://github.com/modm-io/modm/tree/develop/examples/nucleo_f429zi/cmsis_dsp).
+- NUCLEO-F446RE:
+[Internal Flash Programming](https://github.com/modm-io/modm/blob/develop/examples/nucleo_f446re/flash/main.cpp).
 - STM32F072 Discovery:
 [Blinky](https://github.com/modm-io/modm/blob/develop/examples/stm32f072_discovery/blink/main.cpp),
 [CAN](https://github.com/modm-io/modm/blob/develop/examples/stm32f072_discovery/can/main.cpp),
@@ -118,7 +84,8 @@ supported development boards:
 [Blinky](https://github.com/modm-io/modm/blob/develop/examples/stm32f3_discovery/blink/main.cpp),
 [CAN](https://github.com/modm-io/modm/blob/develop/examples/stm32f3_discovery/can/main.cpp),
 [Accelerometer](https://github.com/modm-io/modm/blob/develop/examples/stm32f3_discovery/accelerometer/main.cpp),
-[Gyroscope](https://github.com/modm-io/modm/blob/develop/examples/stm32f3_discovery/rotation/main.cpp).
+[Gyroscope](https://github.com/modm-io/modm/blob/develop/examples/stm32f3_discovery/rotation/main.cpp),
+[TinyUSB DFU](https://github.com/modm-io/modm/blob/develop/examples/stm32f3_discovery/usb_dfu/main.cpp).
 - STM32F4 Discovery:
 [Blinky](https://github.com/modm-io/modm/blob/develop/examples/stm32f4_discovery/blink/main.cpp),
 [CAN](https://github.com/modm-io/modm/blob/develop/examples/stm32f4_discovery/can/main.cpp),
@@ -129,7 +96,8 @@ supported development boards:
 [Drawing on display](https://github.com/modm-io/modm/blob/develop/examples/stm32f469_discovery/display/main.cpp),
 [Touchscreen inputs](https://github.com/modm-io/modm/blob/develop/examples/stm32f469_discovery/touchscreen/main.cpp),
 [Multi-heap with external 16MB memory](https://github.com/modm-io/modm/blob/develop/examples/stm32f469_discovery/tlsf-allocator/main.cpp),
-[Game of Life in Color with Multitouch](https://github.com/modm-io/modm/tree/develop/examples/stm32f469_discovery/game_of_life/main.cpp)
+[Game of Life in Color with Multitouch](https://github.com/modm-io/modm/tree/develop/examples/stm32f469_discovery/game_of_life/main.cpp),
+[Hard Fault with CrashCatcher](https://github.com/modm-io/modm/tree/develop/examples/stm32f469_discovery/hard_fault/main.cpp)
 - STM32F769 Discovery:
 [FPU with double precision](https://github.com/modm-io/modm/blob/develop/examples/stm32f769i_discovery/blink/main.cpp)
 
@@ -147,18 +115,34 @@ Here are some additional examples of displays and sensors we like:
 
 <!--/checkrepourls-->
 
+
 ### Copy Carefully
 
 When copying from our examples make sure to set the repository path correctly!
 All example `modm/examples/**/project.xml` files are missing this path, since we
 set it in the inherited base `modm/examples/lbuild.xml` configuration.
+You must also add the `modm:docs` module manually if you want it.
+
+The `modm/examples/lbuild.xml` file:
 
 ```xml
 <library>
+  <!-- This is the default lbuild configuration file for every
+       example in this folder. It only defaults the common settings,
+       so that this isn't duplicated in every single example.
+       When you write your own application, you must set this
+       path yourself! -->
   <repositories>
-  	<repository><path>path/to/modm/repo.lb</path></repository>
+  	<repository><path>../repo.lb</path></repository>
   </repositories>
+  <modules>
+  	<module>modm:docs</module>
+  </modules>
 </library>
 ```
 
-<!--/examples-->
+[examples]: https://github.com/modm-io/modm/tree/develop/examples
+[installation]: https://modm.io/guide/installation
+[make]: https://modm.io/reference/module/modm-build-make
+[build_docs]: https://modm.io/reference/build-systems/
+[docs]: https://modm.io/reference/documentation/

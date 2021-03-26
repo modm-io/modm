@@ -21,7 +21,7 @@ STM32F103C8T6 "Black Pill" Minimum System Development Board
 Cheap and bread-board-friendly board for STM32 F1 series.
 Sold for less than 2 USD on well known Internet shops from China.
 
-http://wiki.stm32duino.com/index.php?title=Black_Pill
+https://stm32-base.org/boards/STM32F103C8T6-Black-Pill.html
 """ + descr_programming
 
 descr_programming = """

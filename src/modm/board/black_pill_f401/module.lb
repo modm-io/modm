@@ -21,10 +21,8 @@ Cheap and bread-board-friendly board for STM32F401 series.
 Sold for less than 4 USD on well known Internet shops from China.
 Attention: There are two variants: Mini-F411 and the cheaper Mini-F401.
 
-[Schematic](https://pbs.twimg.com/media/EGcCd4NWsAUkWFx?format=jpg&name=orig)
-""" + descr_programming
+https://stm32-base.org/boards/STM32F401CEU6-WeAct-Black-Pill-V3.0
 
-descr_programming = """
 ## Programming
 
 Since the board has no St-Link programmer on the board,

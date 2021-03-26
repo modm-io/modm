@@ -27,6 +27,12 @@ specific build system.
 	an PR that adds support for your build system and we'll give you lots of
 	tips during the review.
 
+!!! tip "Enable parallel builds"
+    Remember to add the `-j8` flag to your `scons/make build` call to enable
+    parallel builds, which are significantly faster than sequential builds. To
+    make this a permanent setting you can add `export SCONSFLAGS="-j8"` or
+    `export MAKEFLAGS="-j8"` to your `.bashrc`!
+
 
 ### SCons
 

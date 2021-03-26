@@ -136,7 +136,8 @@ In case of recursive initialization the debug assertion `cxa.guard.recursion`
 is raised.
 
 Further reading on this topic:
-- [C++ ABI for the ARM Architecture](https://static.docs.arm.com/ihi0041/d/IHI0041D_cppabi.pdf)
-- https://manishearth.github.io/blog/2015/06/26/adventures-in-systems-programming-c-plus-plus-local-statics/
-- https://iamroman.org/blog/2017/04/cpp11-static-init/
+
+- [C++ ABI for the ARM Architecture](https://developer.arm.com/documentation/ihi0041/latest)
+- [Adventures in Systems Programming: C++ Local Statics](https://manishearth.github.io/blog/2015/06/26/adventures-in-systems-programming-c-plus-plus-local-statics/)
+- [C++11 thread-safe static object initialization](https://iamroman.org/blog/2017/04/cpp11-static-init/)
 """

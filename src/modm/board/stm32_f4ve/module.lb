@@ -15,7 +15,7 @@ def init(module):
     module.description = """\
 # STM32_F4VE
 
-[Chinese dev board](https://stm32-base.org/boards/STM32F407VET6-STM32-F4VE-V2.0.html)
+https://stm32-base.org/boards/STM32F407VET6-STM32-F4VE-V2.0.html
 """
 
 def prepare(module, options):

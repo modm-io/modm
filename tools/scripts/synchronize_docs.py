@@ -9,7 +9,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-import re, os, sys, subprocess, lbuild
+import re, os, sys, subprocess, lbuild, shutil
 from pathlib import Path
 from jinja2 import Environment
 from os import listdir
@@ -95,11 +95,9 @@ root = repopath(".")
 board_path = root / "src/modm/board"
 example_path = root / "examples"
 ignored_path = root / "test/all/ignored.txt"
-
-examples_readme_path = root / "examples/README.md"
+examples_readme_in_path = root / "examples/README.md"
+examples_readme_path = root / "docs/src/guide/examples.md"
 readme_path = root / "README.md"
-getting_started_in_path = root / "docs/getting-started.md.in"
-getting_started_path = root / "docs/src/guide/getting-started.md"
 index_in_path = root / "docs/index.md.in"
 index_path = root / "docs/src/index.md"
 whoweare_in_path = root / "docs/who-we-are.md.in"
@@ -162,13 +160,8 @@ index_path.write_text(index)
 whoweare = Environment().from_string(whoweare_in_path.read_text()).render({"authors": authors, "links": links})
 whoweare_path.write_text(whoweare)
 
-# Read the examples README.md and replace these keys
-readme = examples_readme_path.read_text()
-# readme = replace(readme, "examplecount", len(examples))
-# examples_readme_path.write_text(readme)
-
-getting_started = Environment().from_string(getting_started_in_path.read_text()).render({"examples": extract(readme, "examples")})
-getting_started_path.write_text(getting_started)
+# Copy the example readme over
+shutil.copy(examples_readme_in_path, examples_readme_path)
 
 # Check git differences and fail
 if "-d" in sys.argv:

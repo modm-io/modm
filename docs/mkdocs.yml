@@ -71,15 +71,13 @@ nav:
     - Who we are: who-we-are.md
   - Guide:
     - Installation: guide/installation.md
-    - Getting Started: guide/getting-started.md
-    # - Qt Creator: guide/qtcreator.md
-    # - Cookbook: guide/cookbook.md
-    - Testing: guide/testing.md
+    - Explore Examples: guide/examples.md
+    - Discover modm: guide/discover.md
+    - Your Project: guide/custom-project.md
+    # - Testing: guide/testing.md
   - Reference:
     - Documentation: reference/documentation.md
     - Build Systems: reference/build-systems.md
-    # - Overview: reference/overview.md
-    # - Concepts: reference/concepts.md
     - Modules:
 # moduletable
     # - module: module.md

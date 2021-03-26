@@ -13,14 +13,16 @@ We recommend prefixing your branch with
 - `fix/` for a bug fix.
 
 Please remember to have a look at [our coding conventions](docs/coding_convention.md).
+Note that we have a `.clang-format` in the repository that can help you.
+There should be no whitespace-only changes in pull requests.
 
 Once you [open the pull request][pulls], we will review it and might ask you for
-changes. Remember that you can continue to push to your `feature/*` or `fix/*` 
+changes. Remember that you can continue to push to your `feature/*` or `fix/*`
 branches to update the corresponding pull requests!
 
 Including unit tests is very welcomed and highly recommended. modm has its own
 simple and easy to use unit test framework. Unit tests are placed in the `modm/test`
-subdirectory. [See testing strategies in modm](docs/TESTING.md).
+subdirectory. [See testing strategies in modm](test/README.md).
 
 The CI first compiles all examples and unittests and then executes the unittests
 for Linux. If all of that passes, it will compile all `:platform:**` modules for
@@ -30,13 +32,13 @@ CI tests in order to be merged.
 
 ## When in doubt, ask
 
-The dedicated maintainer of modm is [@salkinium](https://github.com/salkinium)
-and you can always ping him.
+The dedicated maintainers of modm are [@salkinium](https://github.com/salkinium)
+and [@rleh](https://github.com/rleh) and you can always ping them.
 
 If you want to add a new platform, or other significant functionality, we
 [ask you to discuss that in an issue first][issues]. We are very open to new
 helping hands, but all of this is still fairly complicated and we want to
-provideyou with tips and additional explanations along the way.
+provide you with tips and additional explanations along the way.
 
 Communication is cheap, implementation is expensive and we don't want to
 frustrate you.

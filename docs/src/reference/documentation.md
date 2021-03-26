@@ -14,7 +14,7 @@ modm's documentation is split into two parts:
 
 ## Modules
 
-The modm modules and their options are [shown by `lbuild discover`](../../guide/getting-started#discovering-modm).
+The modm modules and their options are [shown by `lbuild discover`](../../guide/discover).
 These descriptions advertise the modules capabilities and gives a
 high-level overview of how to use it.
 
@@ -56,15 +56,15 @@ instance submodule to reduce visual noise.
 
 ## Doxypress / Doxygen
 
-The generated C/C++ API is documented using Doxypress or Doxygen and therefore only
+The generated C/C++ API is documented using Doxypress and therefore only
 available *after* code generation.
 
 To view this documentation, include the `modm:docs` module in your `project.xml`
 configuration and run `lbuild build`. A `modm/docs` folder is created containing
-the `doxypress.json` and `doxyfile.cfg` for modm as well as all the `@defgroup`s
-mirroring the module structure.
+the `doxypress.json` for modm as well as all the `@defgroup`s mirroring the
+module structure.
 
-You must then call Doxygen manually, which can take several minutes, and
+You must then run Doxypress manually, which can take several minutes, and
 compiles the target-specific documentation into `modm/docs/html`:
 
 ```sh
@@ -72,15 +72,13 @@ lbuild build -m "modm:docs"
 
 # With Doxypress
 (cd modm/docs && doxypress doxypress.json)
-# Or Doxygen
-(cd modm/docs && doxygen doxyfile.cfg)
 
 # then open: modm/docs/html/index.html
 ```
 
-The generated Doxypress/Doxygen documentation contains the original module documentation
-*including the option choices you made*. This makes it easier to map the
-lbuild options to changes in the generated source code.
+The generated Doxypress/Doxygen documentation contains the original module
+documentation *including the option choices you made*. This makes it easier to
+map the lbuild options to changes in the generated source code.
 
 
 ## Online API Docs

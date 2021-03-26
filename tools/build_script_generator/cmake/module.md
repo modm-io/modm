@@ -158,7 +158,7 @@ make debug profile={debug|release} ui={tui|web}
 ```
 
 Launches OpenOCD in the background, then launches GDB in foreground with the
-correct executable with text-based or [web-based gdbgui](gdbgui) UI. When GDB
+correct executable with text-based or [web-based gdbgui][gdbgui] UI. When GDB
 exits, it stops the OpenOCD process.
 (\* *only ARM Cortex-M targets*)
 

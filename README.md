@@ -13,8 +13,9 @@ process that you can fine-tune to your needs.
 
 <!--webignore-->
 - [This project has a homepage](http://modm.io).<!--/webignore-->
-- Check out our [install instructions][install] and our [getting started guide][guide].
-- Feast your eyes on [lots of working examples][examples].
+- [Install the toolchain][install] and [explore our examples][examples].
+- You can [discover the modm library][discover] in more detail.
+- Easily start your [own completely custom project][custom-project].
 - Our CI checks every contribution for regressions.
 - We care [about testing modm][testing].
 - [API reference is available here][api-docs].
@@ -25,8 +26,6 @@ This project also has a [technical blog][blog] to document larger design concept
 
 - You found a bug? [Open up an issue, we don't bite][issues].
 - You want to contribute? [Read the contribution guidelines][contrib] and [open a pull request][prs].
-
-<!-- - You want to port modm? [Read our porting guide][porting]. -->
 
 modm is optimized for the harsh requirements of the [Eurobot competition][eurobot],
 where our robots need to run reliably and completely autonomously for the game's
@@ -43,7 +42,7 @@ back so everyone can benefit.
 Please clone modm recursively, you need all the submodules:
 
 ```sh
-git clone --recurse-submodules https://github.com/modm-io/modm.git
+git clone --recurse-submodules --jobs 8 https://github.com/modm-io/modm.git
 ```
 
 ## Features
@@ -53,19 +52,25 @@ git clone --recurse-submodules https://github.com/modm-io/modm.git
 - Build system agnostic: Choose SCons, CMake, Makefile or use your own.
 - Data-driven, target-specific HAL generation using the lbuild engine.
 - No memory allocations in HAL with very low overall RAM consumption.
-- Highly-configurable modules with sensible defaults and lots of documentation.
-- Cross platform peripheral interfaces incl. bit banging:
-    - GPIO and GPIO expanders.
-    - ADC and Analog.
-    - UART, I<sup>2</sup>C, SPI, CAN.
+- Highly configurable modules with sensible defaults and lots of documentation.
+- Cross-platform peripheral interfaces incl. bit banging:
+    - GPIO, External Interrupt and IO expanders.
+    - ADC, DAC and Comparators.
+    - UART, I<sup>2</sup>C, SPI, CAN and Ethernet.
 - Interfaces and drivers for many external I<sup>2</sup>C and SPI sensors and devices.
 - Debug/logging system with IOStream and printf interface.
 - Lightweight, stackless threads and resumable functions using cooperative multitasking.
 - Functional (partial) libstdc++ implementation for AVRs.
-- Integration of useful third-party software: FreeRTOS, ROSserial, CMSIS-DSP.
 - Useful filter, interpolation and geometric algorithms.
 - Lightweight unit testing system (suitable for AVRs).
 - Hundreds of tests to ensure correct functionality.
+- Integration of useful third-party software:
+	- [FreeRTOS][] and [FreeRTOS+TCP][].
+	- [CMSIS][] and [CMSIS-DSP][].
+	- [TinyUSB][].
+	- [FatFS][].
+	- [ROSserial][].
+	- [CrashCatcher][].
 
 
 ## Targets
@@ -98,9 +103,8 @@ We also use a few targets in everyday development, which are very well tested
 (★★★★★).
 
 We are only a small team of developers and are limited in the amount of targets
-we can support and test in hardware. We have prepared, but currently not finished
-support for STM32F2, STM32L0 and STM32L1. [Open an issue][issues] to ask if your
-specific target is supported out-of-the-box and what you can do if it's not.
+we can support and test in hardware. [Open an issue][issues] to ask if your
+specific target is supported out-of-the-box and what you can do if it is not.
 
 
 ### Boards
@@ -279,14 +283,15 @@ Please see [our examples for a complete list][examples] of tested targets and dr
 ## How can I contribute?
 
 The easiest way for you and the best way for us to see if something is unclear
-or missing, is if you use the library and give us some feedback by
-[filing a bug report][issues] or if you have a fix already, [opening a pull request][prs].
+or missing, is if you use the library and give us some feedback by [filing a bug
+report][issues] or if you have a fix already [opening a pull request][prs].
 
 See [CONTRIBUTING.md][contrib] for our contribution guidelines.
 
 <!--authors-->
 The modm project is maintained by
-Niklas Hauser ([\@salkinium](https://github.com/salkinium)) with significant contributions from
+Niklas Hauser ([\@salkinium](https://github.com/salkinium)) and
+Raphael Lehmann ([\@rleh](https://github.com/rleh)) with significant contributions from
 Sascha Schade ([\@strongly-typed](https://github.com/strongly-typed)),
 Fabian Greif ([\@dergraaf](https://github.com/dergraaf)),
 Kevin Läufer ([\@ekiwi](https://github.com/ekiwi)),
@@ -334,22 +339,33 @@ and <!--authorcount-->33<!--/authorcount-->  more contributors.
 <!--links-->
 [blog]:            https://blog.salkinium.com
 [changelog]:       https://github.com/modm-io/modm/tree/develop/docs/CHANGELOG.md
-[circle_ci]:       https://circleci.com/gh/modm-io/workflows/modm/tree/develop
 [contrib]:         https://github.com/modm-io/modm/tree/develop/CONTRIBUTING.md
-[devboards]:       https://github.com/modm-io/modm/tree/develop/src/modm/board
-[drivers]:         https://github.com/modm-io/modm/tree/develop/src/modm/driver
 [eurobot]:         https://www.eurobot.org/
 [examples]:        https://github.com/modm-io/modm/tree/develop/examples
-[guide]:           https://modm.io/guide/getting-started
+[discover]:        https://modm.io/guide/discover
+[custom-project]:  https://modm.io/guide/custom-project
 [install]:         https://modm.io/guide/installation
 [issues]:          https://github.com/modm-io/modm/issues
-[library-builder]: https://github.com/dergraaf/library-builder
-[modm-devices]:    https://github.com/modm-io/modm-devices
-[porting]:         https://github.com/modm-io/modm/tree/develop/docs/PORTING.md
 [prs]:             https://github.com/modm-io/modm/pulls
-[rca_ev]:          https://www.roboterclub.rwth-aachen.de/
-[reference]:       https://modm.io/reference/api
 [releases]:        https://github.com/modm-io/modm/releases
-[testing]:         https://modm.io/guide/testing
+[testing]:         https://github.com/modm-io/modm/tree/develop/test/README.md
 [api-docs]:        https://docs.modm.io/
+
+[FreeRTOS]:        https://www.freertos.org
+[FreeRTOS-TCP]:    https://www.freertos.org/FreeRTOS-Plus/FreeRTOS_Plus_TCP/index.html
+[CMSIS]:           https://www.keil.com/pack/doc/CMSIS/General/html/index.html
+[CMSIS-DSP]:       https://www.keil.com/pack/doc/CMSIS/DSP/html/index.html
+[TinyUSB]:         https://github.com/hathach/tinyusb
+[FatFS]:           http://elm-chan.org/fsw/ff/00index_e.html
+[ROSserial]:       https://wiki.ros.org/rosserial
+[CrashCatcher]:    https://github.com/adamgreen/CrashCatcher
+
+[FreeRTOS]:        https://www.freertos.org
+[FreeRTOS-TCP]:    https://www.freertos.org/FreeRTOS-Plus/FreeRTOS_Plus_TCP/index.html
+[CMSIS]:           https://www.keil.com/pack/doc/CMSIS/General/html/index.html
+[CMSIS-DSP]:       https://www.keil.com/pack/doc/CMSIS/DSP/html/index.html
+[TinyUSB]:         https://github.com/hathach/tinyusb
+[FatFS]:           http://elm-chan.org/fsw/ff/00index_e.html
+[ROSserial]:       https://wiki.ros.org/rosserial
+[CrashCatcher]:    https://github.com/adamgreen/CrashCatcher
 <!--/links-->

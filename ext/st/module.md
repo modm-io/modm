@@ -10,8 +10,6 @@ peripherals.
     These CMSIS headers should reflect what's written in the documentation,
     however, in our experience there may be small differences in naming,
     behavior and availability between it and this implementation.
-    Since ST is not interested in addressing these issues, please contribute
-	[to our patch list][patches].
 
 The generated header file `modm/platform/device.hpp` contains the necessary
 target define `STM32{FAMILY}{NAME}xx` or similar and includes the
