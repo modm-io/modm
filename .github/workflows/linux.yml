@@ -282,17 +282,22 @@ jobs:
           export TERM=xterm-256color
           export COLUMNS=120
           python3 tools/scripts/docs_modm_io_generator.py -t -c -j4 -d
+      - name: Upload Doxypress Documentation
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-docs-test
+          path: modm-api-docs.tar.gz
       - name: Build Homepage
         if: always()
         run: |
           python3 tools/scripts/synchronize_docs.py
           python3 tools/scripts/generate_module_docs.py
           (cd docs && mkdocs build)
-      - name: Upload Doxypress Documentation
+      - name: Upload Homepage Documentation
         uses: actions/upload-artifact@v2
         with:
-          name: build-docs-test
-          path: modm-api-docs.tar.gz
+          name: build-homepage-test
+          path: docs/modm.io
       # FIXME: Allow localhost:port to work with Docker
       # - name: Check Homepage
       #   run: |
