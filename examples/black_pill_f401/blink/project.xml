@@ -1,0 +1,9 @@
+<library>
+  <extends>modm:black-pill-f401</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/black_pill_f401/blink</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

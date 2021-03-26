@@ -1,7 +1,7 @@
 <library>
-  <extends>modm:blue-pill</extends>
+  <extends>modm:blue-pill-f103</extends>
   <options>
-    <option name="modm:build:build.path">../../../build/stm32f103c8t6_blue_pill/blink</option>
+    <option name="modm:build:build.path">../../../build/blue_pill_f103/blink</option>
     <option name="modm:build:openocd.cfg">openocd.cfg</option>
   </options>
   <modules>

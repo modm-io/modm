@@ -1,15 +1,17 @@
 <library>
-  <extends>modm:blue-pill</extends>
+  <extends>modm:blue-pill-f103</extends>
   <options>
-    <option name="modm:build:build.path">../../../build/stm32f103c8t6_blue_pill/logger</option>
+    <option name="modm:build:build.path">../../../build/blue_pill_f103/adns_9800</option>
     <option name="modm:build:openocd.cfg">openocd.cfg</option>
   </options>
   <modules>
     <module>modm:debug</module>
+    <module>modm:driver:adns9800</module>
     <module>modm:platform:gpio</module>
+    <module>modm:platform:spi:1</module>
     <module>modm:platform:uart:2</module>
-    <module>modm:processing:timer</module>
     <module>modm:processing:protothread</module>
+    <module>modm:processing:timer</module>
     <module>modm:build:scons</module>
   </modules>
 </library>

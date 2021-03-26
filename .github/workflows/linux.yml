@@ -89,7 +89,7 @@ jobs:
       - name: Examples STM32F1 Series
         if: always()
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py stm32f1_discovery nucleo_f103rb olimexino_stm32 stm32f103c8t6_blue_pill stm32f103c8t6_black_pill)
+          (cd examples && ../tools/scripts/examples_compile.py stm32f1_discovery nucleo_f103rb olimexino_stm32 blue_pill_f103 black_pill_f103)
       - name: Examples STM32F3 Series
         if: always()
         run: |
@@ -143,7 +143,7 @@ jobs:
       - name: Examples STM32F4 Without Discovery Board
         if: always()
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py nucleo_f401re nucleo_f411re nucleo_f429zi nucleo_f446re stm32f411ccu_mini_f401 stm32f411ceu_mini_f411 stm32f407vet6_devebox stm32_f4ve)
+          (cd examples && ../tools/scripts/examples_compile.py nucleo_f401re nucleo_f411re nucleo_f429zi nucleo_f446re black_pill_f401 black_pill_f411 stm32f407vet6_devebox stm32_f4ve)
 
   avr-examples:
     runs-on: ubuntu-20.04

@@ -25,11 +25,9 @@ main()
 {
 	Board::initialize();
 
-	LedGreen::set();
-
 	while (true)
 	{
-		LedGreen::toggle();
+		Led::toggle();
 		modm::delay(Button::read() ? 100ms : 500ms);
 	}
 
