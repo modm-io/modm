@@ -51,6 +51,8 @@ public:
 		// Setup WaitTime to further slow down samplerate
 		PT_CALL(sensor.setWaitTime(modm::tcs3472::WaitTime::MSEC_2_4));
 
+		// Dummy read required
+		PT_CALL(sensor.readColor());
 		// Fetch one sample ...
 		PT_CALL(sensor.readColor());
 		// ...and set the high threshold 20% above current clear
@@ -59,13 +61,14 @@ public:
 		while (true)
 		{
 			PT_CALL(sensor.reloadInterrupt());
+			PT_WAIT_UNTIL(TCS3472_INT::read() == false);
 			if (PT_CALL(sensor.readColor()))
 			{
 				const auto color = data.getColor();
 				MODM_LOG_INFO << "RGB: " << color;
 				modm::color::HsvT<uint16_t> hsv;
 				color.toHsv(&hsv);
-				MODM_LOG_INFO << "HSV: " << hsv << modm::endl;
+				MODM_LOG_INFO << "\tHSV: " << hsv << modm::endl;
 			}
 		}
 

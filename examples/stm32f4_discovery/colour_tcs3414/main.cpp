@@ -102,7 +102,7 @@ public:
 				stream << "RGB: " << color;
 				modm::color::HsvT<uint16_t> hsv;
 				color.toHsv(&hsv);
-				stream << "  " << hsv << modm::endl;
+				stream << "\tHSV: " << hsv << modm::endl;
 			}
 			timeout.restart(500ms);
 			PT_WAIT_UNTIL(timeout.isExpired());
