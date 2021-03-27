@@ -48,6 +48,7 @@ main()
 		display::Sck::Sck, display::Miso::Miso, display::Mosi::Mosi>();
 	display::Spi::initialize<SystemClock, 1125_kHz>();
 	tft.initialize();
+	tft.enableBacklight(true);
 	LedGreen::set();
 	tft.setColor(modm::glcd::Color::black());
 	int16_t w = tft.getWidth();
