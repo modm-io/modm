@@ -1,7 +1,7 @@
 <library>
   <extends>modm:arduino-nano</extends>
   <options>
-    <option name="modm:build:build.path">../../../../build/arduino_nano/color</option>
+    <option name="modm:build:build.path">../../../build/arduino_nano/color</option>
   </options>
   <modules>
     <module>modm:build:scons</module>

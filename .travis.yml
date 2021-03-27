@@ -19,5 +19,5 @@ before_install:
 script:
   - (cd test && make run-hosted-linux)
   - (cd examples && ../tools/scripts/examples_compile.py linux)
-  - (cd examples && ../tools/scripts/examples_compile.py stm32f1_discovery nucleo_f103rb olimexino_stm32 stm32f103c8t6_blue_pill stm32f103c8t6_black_pill)
+  - (cd examples && ../tools/scripts/examples_compile.py stm32f1_discovery nucleo_f103rb olimexino_stm32 blue_pill_f103 black_pill_f103)
   - (cd examples && ../tools/scripts/examples_compile.py rpi)

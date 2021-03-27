@@ -93,6 +93,10 @@ def compile_examples(paths, jobs, split, part):
     # Create build folder to prevent process race
     cache_dir.mkdir(exist_ok=True, parents=True)
     (cache_dir / "config").write_text('{"prefix_len": 2}')
+    # Validate that paths exist!
+    invalid_paths = [p for p in paths if not Path(p).exists()]
+    if invalid_paths: print("Invalid paths:\n- " + "\n- ".join(invalid_paths));
+    results = len(invalid_paths)
     # Find all project files
     projects = [p for path in paths for p in Path(path).glob("**/project.xml")]
     projects.sort()
@@ -103,7 +107,7 @@ def compile_examples(paths, jobs, split, part):
     # first generate all projects
     with multiprocessing.Pool(jobs) as pool:
         projects = pool.map(generate, projects)
-    results = projects.count(None)
+    results += projects.count(None)
 
     # Filter projects for successful generation
     projects = [p for p in projects if p is not None]

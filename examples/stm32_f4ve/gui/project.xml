@@ -1,7 +1,7 @@
 <library>
   <extends>modm:stm32_f4ve</extends>
   <options>
-    <option name="modm:build:build.path">../../../../build/stm32_f4ve/gui</option>
+    <option name="modm:build:build.path">../../../build/stm32_f4ve/gui</option>
     <option name="modm:build:image.source">images</option>
   </options>
   <modules>
