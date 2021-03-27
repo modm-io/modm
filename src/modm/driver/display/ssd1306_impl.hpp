@@ -49,7 +49,7 @@ modm::Ssd1306<I2cMaster, Height>::initialize()
 //	commandBuffer[11] &= RF_CALL(writeCommand(Command::SetPageAddress, 0, 7));
 	commandBuffer[11] &= RF_CALL(writeCommand(Command::SetDisplayOn));
 
-	RF_END_RETURN(commandBuffer[11]);
+	RF_END_RETURN(bool(commandBuffer[11]));
 }
 
 // ----------------------------------------------------------------------------
