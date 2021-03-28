@@ -10,18 +10,18 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_STM32_NUCLEO_F429ZI_HPP
-#define MODM_STM32_NUCLEO_F429ZI_HPP
+#pragma once
 
 #include <modm/platform.hpp>
 #include <modm/architecture/interface/clock.hpp>
 #include <modm/debug/logger.hpp>
-/// @ingroup modm_board_nucleo_f429zi
-#define MODM_BOARD_HAS_LOGGER
 
 using namespace modm::platform;
 
-/// @ingroup modm_board_nucleo_f429zi
+/// @ingroup modm_board_nucleo_f429zi modm_board_nucleo_f439zi
+/// @{
+#define MODM_BOARD_HAS_LOGGER
+
 namespace Board
 {
 	using namespace modm::literals;
@@ -166,5 +166,5 @@ initializeUsbFs()
 }
 
 }
+/// @}
 
-#endif  // MODM_STM32_NUCLEO_F429ZI_HPP

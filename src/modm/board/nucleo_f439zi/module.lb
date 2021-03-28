@@ -41,6 +41,6 @@ def build(env):
         "with_assert": env.has_module(":architecture:assert")
     }
     env.template("../board.cpp.in", "board.cpp")
-    env.copy('../nucleo_f429zi/board.hpp')
+    env.copy("../nucleo_f429zi/board.hpp", "board.hpp")
     env.copy("../nucleo144_arduino.hpp", "nucleo144_arduino.hpp")
     env.collect(":build:openocd.source", "board/st_nucleo_f4.cfg");
