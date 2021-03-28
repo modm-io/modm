@@ -66,9 +66,17 @@ def name(raw_name):
         return None
     return result
 
-def url(path):
-    # this should point to the module API documentation instead of the source code
+def fmt_url(name):
+    return str(name).replace(".", "-").replace(":", "-")
+
+def github_url(path):
     return "https://github.com/modm-io/modm/tree/develop/" + str(path)
+
+def board_url(name):
+    return "https://modm.io/reference/module/modm-board-" + fmt_url(name)
+
+def driver_url(name):
+    return "https://modm.io/reference/module/modm-driver-" + fmt_url(name)
 
 def replace(text, key, content):
     return re.sub(r"<!--{0}-->.*?<!--/{0}-->".format(key), "<!--{0}-->{1}<!--/{0}-->".format(key, content), text, flags=re.DOTALL | re.MULTILINE)
@@ -108,13 +116,14 @@ modules_path = root / "docs/src/reference/modules.md"
 # We cannot use lbuild to enumerate the boards since they only make themselves available for certain devices
 boards = [re.search(r"<module>modm:board:(.*?)</module>", config.read_text()).group(1)
           for config in Path(repopath("src/modm/board")).glob("*/board.xml")]
-boards = [{"name": name(b), "url": None} for b in boards]
+boards = [{"name": name(b), "url": board_url(b)} for b in boards]
 boards.sort(key=lambda b: b["name"])
 bsp_table = format_table(boards, 4)
 
 # Get all the example directory paths
 examples = [e.relative_to(example_path) for e in example_path.glob('**/project.xml')]
-examples = [{"name": "{}: {}".format(name(str(e.parts[0])), e.parent.relative_to(e.parts[0])), "url": url(Path("examples") / e.parent / "main.cpp")} for e in examples]
+examples = [{"name": "{}: {}".format(name(str(e.parts[0])), e.parent.relative_to(e.parts[0])),
+             "url": github_url(Path("examples") / e.parent / "main.cpp")} for e in examples]
 examples.sort(key=lambda b: b["name"])
 example_table = format_table(examples, 2, "left")
 
@@ -135,7 +144,7 @@ author_count = len(author_handles)
 drivers = (get_lbuild(root, t).modules for t in {"avr", "stm32", "hosted"})
 drivers = {m for mg in drivers for m in mg if m.startswith("modm:driver:")}
 drivers = sorted(m.replace("modm:driver:", "") for m in drivers)
-drivers = [{"name": name(d), "url": None} for d in drivers if name(d)]
+drivers = [{"name": name(d), "url": driver_url(d)} for d in drivers if name(d)]
 driver_table = format_table(drivers, 6)
 
 # Read the repo README.md and replace these keys

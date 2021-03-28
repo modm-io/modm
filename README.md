@@ -109,71 +109,70 @@ specific target is supported out-of-the-box and what you can do if it is not.
 
 ### Boards
 
-We have out-of-box support for [several development boards][devboards] including
-documentation.
+We have out-of-box support for many development boards including documentation.
 
 <center>
 <!--bsptable-->
 <table>
 <tr>
-<td align="center">AL-AVREB-CAN</td>
-<td align="center">Arduino NANO</td>
-<td align="center">Arduino UNO</td>
-<td align="center">Black Pill F103</td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-al-avreb-can">AL-AVREB-CAN</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-arduino-nano">Arduino NANO</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-arduino-uno">Arduino UNO</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-black-pill-f103">Black Pill F103</a></td>
 </tr><tr>
-<td align="center">Black Pill F401</td>
-<td align="center">Black Pill F411</td>
-<td align="center">Blue Pill F103</td>
-<td align="center">DEVEBOX-STM32F4XX</td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-black-pill-f401">Black Pill F401</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-black-pill-f411">Black Pill F411</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-blue-pill-f103">Blue Pill F103</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-devebox-stm32f4xx">DEVEBOX-STM32F4XX</a></td>
 </tr><tr>
-<td align="center">DISCO-F051R8</td>
-<td align="center">DISCO-F072RB</td>
-<td align="center">DISCO-F100RB</td>
-<td align="center">DISCO-F303VC</td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-disco-f051r8">DISCO-F051R8</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-disco-f072rb">DISCO-F072RB</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-disco-f100rb">DISCO-F100RB</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-disco-f303vc">DISCO-F303VC</a></td>
 </tr><tr>
-<td align="center">DISCO-F407VG</td>
-<td align="center">DISCO-F429ZI</td>
-<td align="center">DISCO-F469NI</td>
-<td align="center">DISCO-F746NG</td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-disco-f407vg">DISCO-F407VG</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-disco-f429zi">DISCO-F429ZI</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-disco-f469ni">DISCO-F469NI</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-disco-f746ng">DISCO-F746NG</a></td>
 </tr><tr>
-<td align="center">DISCO-F769NI</td>
-<td align="center">DISCO-L152RC</td>
-<td align="center">DISCO-L476VG</td>
-<td align="center">FEATHER-M0</td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-disco-f769ni">DISCO-F769NI</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-disco-l152rc">DISCO-L152RC</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-disco-l476vg">DISCO-L476VG</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-feather-m0">FEATHER-M0</a></td>
 </tr><tr>
-<td align="center">MEGA-2560-PRO</td>
-<td align="center">NUCLEO-F031K6</td>
-<td align="center">NUCLEO-F042K6</td>
-<td align="center">NUCLEO-F103RB</td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-mega-2560-pro">MEGA-2560-PRO</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-f031k6">NUCLEO-F031K6</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-f042k6">NUCLEO-F042K6</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-f103rb">NUCLEO-F103RB</a></td>
 </tr><tr>
-<td align="center">NUCLEO-F303K8</td>
-<td align="center">NUCLEO-F303RE</td>
-<td align="center">NUCLEO-F334R8</td>
-<td align="center">NUCLEO-F401RE</td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-f303k8">NUCLEO-F303K8</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-f303re">NUCLEO-F303RE</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-f334r8">NUCLEO-F334R8</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-f401re">NUCLEO-F401RE</a></td>
 </tr><tr>
-<td align="center">NUCLEO-F411RE</td>
-<td align="center">NUCLEO-F429ZI</td>
-<td align="center">NUCLEO-F439ZI</td>
-<td align="center">NUCLEO-F446RE</td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-f411re">NUCLEO-F411RE</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-f429zi">NUCLEO-F429ZI</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-f439zi">NUCLEO-F439ZI</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-f446re">NUCLEO-F446RE</a></td>
 </tr><tr>
-<td align="center">NUCLEO-F446ZE</td>
-<td align="center">NUCLEO-F746ZG</td>
-<td align="center">NUCLEO-F767ZI</td>
-<td align="center">NUCLEO-G071RB</td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-f446ze">NUCLEO-F446ZE</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-f746zg">NUCLEO-F746ZG</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-f767zi">NUCLEO-F767ZI</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-g071rb">NUCLEO-G071RB</a></td>
 </tr><tr>
-<td align="center">NUCLEO-G431KB</td>
-<td align="center">NUCLEO-G431RB</td>
-<td align="center">NUCLEO-G474RE</td>
-<td align="center">NUCLEO-L152RE</td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-g431kb">NUCLEO-G431KB</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-g431rb">NUCLEO-G431RB</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-g474re">NUCLEO-G474RE</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-l152re">NUCLEO-L152RE</a></td>
 </tr><tr>
-<td align="center">NUCLEO-L432KC</td>
-<td align="center">NUCLEO-L476RG</td>
-<td align="center">OLIMEXINO-STM32</td>
-<td align="center">Raspberry Pi</td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-l432kc">NUCLEO-L432KC</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-l476rg">NUCLEO-L476RG</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-olimexino-stm32">OLIMEXINO-STM32</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-raspberrypi">Raspberry Pi</a></td>
 </tr><tr>
-<td align="center">SAMD21-MINI</td>
-<td align="center">STM32-F4VE</td>
-<td align="center">STM32F030-DEMO</td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-samd21-mini">SAMD21-MINI</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-stm32_f4ve">STM32-F4VE</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-stm32f030_demo">STM32F030-DEMO</a></td>
 </tr>
 </table>
 <!--/bsptable-->
@@ -182,95 +181,95 @@ documentation.
 
 ### Drivers
 
-We also have a number of completely target-independent [drivers for external
-devices][drivers] connected via I<sup>2</sup>C, SPI, UART, BitBang, etc.
-Most of these also give you access to the entire device so you
-can easily configure them for you specific needs.
+We also have a number of completely target-independent drivers for external
+devices connected via I<sup>2</sup>C, SPI, UART, BitBang, etc. Most of these
+also give you access to the entire device so you can easily configure them for
+you specific needs.
 
 <center>
 <!--drivertable-->
 <table>
 <tr>
-<td align="center">AD7280A</td>
-<td align="center">AD7928</td>
-<td align="center">ADNS9800</td>
-<td align="center">ADS7843</td>
-<td align="center">AMS5915</td>
-<td align="center">APA102</td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-ad7280a">AD7280A</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-ad7928">AD7928</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-adns9800">ADNS9800</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-ads7843">ADS7843</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-ams5915">AMS5915</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-apa102">APA102</a></td>
 </tr><tr>
-<td align="center">SPI-FLASH</td>
-<td align="center">BME280</td>
-<td align="center">BMP085</td>
-<td align="center">BNO055</td>
-<td align="center">CAT24AA</td>
-<td align="center">DRV832X</td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-block-device-spi-flash">SPI-FLASH</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-bme280">BME280</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-bmp085">BMP085</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-bno055">BNO055</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-cat24aa">CAT24AA</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-drv832x_spi">DRV832X</a></td>
 </tr><tr>
-<td align="center">DS1302</td>
-<td align="center">DS1631</td>
-<td align="center">DS18B20</td>
-<td align="center">EA-DOG</td>
-<td align="center">ENCODER-INPUT-BITBANG</td>
-<td align="center">ENCODER-OUTPUT-BITBANG</td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-ds1302">DS1302</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-ds1631">DS1631</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-ds18b20">DS18B20</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-ea_dog">EA-DOG</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-encoder_input-bitbang">ENCODER-INPUT-BITBANG</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-encoder_output-bitbang">ENCODER-OUTPUT-BITBANG</a></td>
 </tr><tr>
-<td align="center">FT245</td>
-<td align="center">FT6X06</td>
-<td align="center">GPIO-SAMPLER</td>
-<td align="center">HCLAx</td>
-<td align="center">HD44780</td>
-<td align="center">HMC58x</td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-ft245">FT245</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-ft6x06">FT6X06</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-gpio_sampler">GPIO-SAMPLER</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-hclax">HCLAx</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-hd44780">HD44780</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-hmc58x">HMC58x</a></td>
 </tr><tr>
-<td align="center">HMC6343</td>
-<td align="center">HX711</td>
-<td align="center">I2C-EEPROM</td>
-<td align="center">ILI9341</td>
-<td align="center">IS31FL3733</td>
-<td align="center">ITG3200</td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-hmc6343">HMC6343</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-hx711">HX711</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-i2c-eeprom">I2C-EEPROM</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-ili9341">ILI9341</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-is31fl3733">IS31FL3733</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-itg3200">ITG3200</a></td>
 </tr><tr>
-<td align="center">L3GD20</td>
-<td align="center">LAN8720A</td>
-<td align="center">LAWICEL</td>
-<td align="center">LIS302DL</td>
-<td align="center">LIS3DSH</td>
-<td align="center">LIS3MDL</td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-l3gd20">L3GD20</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-lan8720a">LAN8720A</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-lawicel">LAWICEL</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-lis302dl">LIS302DL</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-lis3dsh">LIS3DSH</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-lis3mdl">LIS3MDL</a></td>
 </tr><tr>
-<td align="center">LM75</td>
-<td align="center">LP503X</td>
-<td align="center">LSM303A</td>
-<td align="center">LSM6DS33</td>
-<td align="center">LTC2984</td>
-<td align="center">MAX6966</td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-lm75">LM75</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-lp503x">LP503X</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-lsm303a">LSM303A</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-lsm6ds33">LSM6DS33</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-ltc2984">LTC2984</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-max6966">MAX6966</a></td>
 </tr><tr>
-<td align="center">MAX7219</td>
-<td align="center">MCP23X17</td>
-<td align="center">MCP2515</td>
-<td align="center">MMC5603</td>
-<td align="center">NOKIA5110</td>
-<td align="center">NRF24</td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-max7219">MAX7219</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-mcp23x17">MCP23X17</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-mcp2515">MCP2515</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-mmc5603">MMC5603</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-nokia5110">NOKIA5110</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-nrf24">NRF24</a></td>
 </tr><tr>
-<td align="center">TFT-DISPLAY</td>
-<td align="center">PAT9125EL</td>
-<td align="center">PCA8574</td>
-<td align="center">PCA9535</td>
-<td align="center">PCA9548A</td>
-<td align="center">PCA9685</td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-parallel_tft_display">TFT-DISPLAY</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-pat9125el">PAT9125EL</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-pca8574">PCA8574</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-pca9535">PCA9535</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-pca9548a">PCA9548A</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-pca9685">PCA9685</a></td>
 </tr><tr>
-<td align="center">SIEMENS-S65</td>
-<td align="center">SIEMENS-S75</td>
-<td align="center">SK6812</td>
-<td align="center">SK9822</td>
-<td align="center">SSD1306</td>
-<td align="center">STUSB4500</td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-siemens_s65">SIEMENS-S65</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-siemens_s75">SIEMENS-S75</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-sk6812">SK6812</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-sk9822">SK9822</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-ssd1306">SSD1306</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-stusb4500">STUSB4500</a></td>
 </tr><tr>
-<td align="center">SX1276</td>
-<td align="center">TCS3414</td>
-<td align="center">TCS3472</td>
-<td align="center">TLC594X</td>
-<td align="center">TMP102</td>
-<td align="center">TMP175</td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-sx1276">SX1276</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-tcs3414">TCS3414</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-tcs3472">TCS3472</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-tlc594x">TLC594X</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-tmp102">TMP102</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-tmp175">TMP175</a></td>
 </tr><tr>
-<td align="center">VL53L0</td>
-<td align="center">VL6180</td>
-<td align="center">WS2812</td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-vl53l0">VL53L0</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-vl6180">VL6180</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-ws2812">WS2812</a></td>
 </tr>
 </table>
 <!--/drivertable-->
