@@ -29,14 +29,17 @@ r"""
 """
 
 def repopath(path):
-  return (Path(os.path.abspath(__file__)).parents[2] / path)
+    return (Path(os.path.abspath(__file__)).parents[2] / path)
+
+with open(repopath("tools/scripts/generate_hal_matrix.py")) as hal_tables:
+    exec(hal_tables.read())
 
 def run(where, command, stdin=None):
-  print(command)
-  result = subprocess.run(command, shell=True, cwd=where, input=stdin, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-  return (result.returncode,
-          result.stdout.decode("utf-8").strip(" \n"),
-          result.stderr.decode("utf-8").strip(" \n"))
+    print(command)
+    result = subprocess.run(command, shell=True, cwd=where, input=stdin, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    return (result.returncode,
+            result.stdout.decode("utf-8").strip(" \n"),
+            result.stderr.decode("utf-8").strip(" \n"))
 
 def name(raw_name):
     result = []
@@ -134,6 +137,7 @@ targets -= ignored_devices
 avr_count = len([t for t in targets if t.startswith("at")])
 stm_count = len([t for t in targets if t.startswith("stm32")])
 sam_count = len([t for t in targets if t.startswith("sam")])
+all_count = avr_count + stm_count + sam_count
 
 # get the author count
 from authors import author_handles
@@ -148,12 +152,15 @@ drivers = [{"name": name(d), "url": driver_url(d)} for d in drivers if name(d)]
 driver_table = format_table(drivers, 6)
 
 # Read the repo README.md and replace these keys
+hal_tables = hal_format_tables()
 readme = readme_path.read_text()
 readme = replace(readme, "authorcount", author_count - 7)
 readme = replace(readme, "avrcount", avr_count)
 readme = replace(readme, "samcount", sam_count)
 readme = replace(readme, "stmcount", stm_count)
+readme = replace(readme, "allcount", all_count)
 readme = replace(readme, "bsptable", bsp_table)
+readme = replace(readme, "alltable", hal_tables["all"])
 readme = replace(readme, "drivertable", driver_table)
 readme_path.write_text(readme)
 

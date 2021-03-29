@@ -73,38 +73,344 @@ git clone --recurse-submodules --jobs 8 https://github.com/modm-io/modm.git
 	- [CrashCatcher][].
 
 
-## Targets
+## Microcontrollers
 
-modm can generate code for <!--avrcount-->506<!--/avrcount-->
-AVR, <!--samcount-->163<!--/samcount--> SAM and <!--stmcount-->2010<!--/stmcount-->
-STM32 devices, however, there are different levels of support and testing.
+modm can create a HAL for <!--allcount-->2679<!--/allcount--> devices of these vendors:
+
+- STMicroelectronics STM32: <!--stmcount-->2010<!--/stmcount--> devices.
+- Microchip SAM: <!--samcount-->163<!--/samcount--> devices.
+- Microchip AVR: <!--avrcount-->506<!--/avrcount--> devices.
+
+Here is a table with all device families and the peripheral drivers they support:
+
+- ✅ Implemented as a software driver in modm.
+- ○ Available in hardware but missing a software driver in modm.
+- ✗ Unavailable in hardware or device with that peripheral not supported by modm.
+
+Note that this is a summary overview and your specific device may not have all
+the peripherals in this table.
+Please [discover modm's peripheral drivers for your specific device][discover].
 
 <center>
-
-| Device Family | Support | Device Family | Support | Device Family | Support |
-|:--------------|:--------|:--------------|:--------|:--------------|:--------|
-| AVR           | ★★★     | STM32F0       | ★★★★    | STM32F1       | ★★★★    |
-| STM32F2       | ★★★★    | STM32F3       | ★★★★★   | STM32F4       | ★★★★★   |
-| STM32F7       | ★★★★    | STM32L1       | ★★★★    | STM32L4       | ★★★★    |
-| STM32L4+      | ★★★★    | STM32G0       | ★★★★    | STM32G4       | ★★★★    |
-| SAMD21        | ★★      | Raspberry Pi  | ★       |               |         |
-
+<!--alltable-->
+<table>
+<tr>
+<th align="center"></th>
+<th align="center" colspan="10">STM32</th>
+<th align="center" colspan="1">SAM</th>
+<th align="center" colspan="3">AT</th>
+</tr><tr>
+<th align="left">Peripheral</th>
+<th align="center">F0</th>
+<th align="center">F1</th>
+<th align="center">F2</th>
+<th align="center">F3</th>
+<th align="center">F4</th>
+<th align="center">F7</th>
+<th align="center">G0</th>
+<th align="center">G4</th>
+<th align="center">L1</th>
+<th align="center">L4</th>
+<th align="center">D21</th>
+<th align="center">90</th>
+<th align="center">Mega</th>
+<th align="center">Tiny</th>
+</tr><tr>
+<td align="left">ADC</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+</tr><tr>
+<td align="left">CAN</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✗</td>
+<td align="center">○</td>
+<td align="center">✗</td>
+<td align="center">✅</td>
+<td align="center">✗</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">✗</td>
+</tr><tr>
+<td align="left">Comparator</td>
+<td align="center">○</td>
+<td align="center">✗</td>
+<td align="center">✗</td>
+<td align="center">✅</td>
+<td align="center">✗</td>
+<td align="center">✗</td>
+<td align="center">○</td>
+<td align="center">✅</td>
+<td align="center">○</td>
+<td align="center">✅</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+</tr><tr>
+<td align="left">DAC</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">✅</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">✗</td>
+<td align="center">○</td>
+<td align="center">✗</td>
+</tr><tr>
+<td align="left">DMA</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">✅</td>
+<td align="center">○</td>
+<td align="center">✗</td>
+<td align="center">✗</td>
+<td align="center">✗</td>
+</tr><tr>
+<td align="left">Ethernet</td>
+<td align="center">✗</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">✗</td>
+<td align="center">○</td>
+<td align="center">✅</td>
+<td align="center">✗</td>
+<td align="center">✗</td>
+<td align="center">✗</td>
+<td align="center">✗</td>
+<td align="center">✗</td>
+<td align="center">✗</td>
+<td align="center">✗</td>
+<td align="center">✗</td>
+</tr><tr>
+<td align="left">External Interrupt</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+</tr><tr>
+<td align="left">External Memory</td>
+<td align="center">✗</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✗</td>
+<td align="center">✅</td>
+<td align="center">○</td>
+<td align="center">✗</td>
+<td align="center">○</td>
+<td align="center">✗</td>
+<td align="center">○</td>
+<td align="center">✗</td>
+<td align="center">✗</td>
+<td align="center">✗</td>
+<td align="center">✗</td>
+</tr><tr>
+<td align="left">GPIO</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+</tr><tr>
+<td align="left">I<sup>2</sup>C</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">○</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+</tr><tr>
+<td align="left">Internal Flash</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">✅</td>
+<td align="center">○</td>
+<td align="center">✅</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">✗</td>
+<td align="center">✗</td>
+<td align="center">✗</td>
+</tr><tr>
+<td align="left">Random Generator</td>
+<td align="center">✗</td>
+<td align="center">✗</td>
+<td align="center">✅</td>
+<td align="center">✗</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✗</td>
+<td align="center">✅</td>
+<td align="center">✗</td>
+<td align="center">✗</td>
+<td align="center">✗</td>
+<td align="center">✗</td>
+</tr><tr>
+<td align="left">SPI</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">○</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+</tr><tr>
+<td align="left">System Clock</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✗</td>
+<td align="center">✗</td>
+<td align="center">✗</td>
+</tr><tr>
+<td align="left">Timer</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+</tr><tr>
+<td align="left">UART</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">○</td>
+</tr><tr>
+<td align="left">Unique ID</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✗</td>
+<td align="center">✗</td>
+<td align="center">✗</td>
+<td align="center">✗</td>
+</tr><tr>
+<td align="left">USB</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✗</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✗</td>
+<td align="center">✗</td>
+<td align="center">✗</td>
+</tr>
+</table>
+<!--/alltable-->
 </center>
 
-All of these targets are compiling and booting correctly
-(★)
-and have GPIO and UART working
-(★★).
-Most targets have support for basic peripherals, like I2C, SPI and ADC
-(★★★)
-as well as complicated peripherals, like Timers, CAN and external memory
-(★★★★).
-We also use a few targets in everyday development, which are very well tested
-(★★★★★).
-
-We are only a small team of developers and are limited in the amount of targets
+We are only a small team of developers and are limited in the amount of devices
 we can support and test in hardware. [Open an issue][issues] to ask if your
-specific target is supported out-of-the-box and what you can do if it is not.
+specific device is supported out-of-the-box and what you can do if it is not.
 
 
 ### Boards
