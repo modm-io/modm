@@ -193,7 +193,7 @@ Ili9341<Interface, Reset, Backlight, BufferSize>::clear()
 {
 	auto const saveForegroundColor { foregroundColor };
 	foregroundColor = backgroundColor;
-	fillRectangle(glcd::Point(0, 0), Height, Width);
+	fillRectangle(glcd::Point(0, 0), Width, Height);
 	foregroundColor = saveForegroundColor;
 }
 
