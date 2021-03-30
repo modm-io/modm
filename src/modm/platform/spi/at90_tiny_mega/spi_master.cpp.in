@@ -116,7 +116,7 @@ modm::platform::SpiMaster{{ id }}::transfer(uint8_t data)
 }
 
 modm::ResumableResult<void>
-modm::platform::SpiMaster{{ id }}::transfer(uint8_t *tx, uint8_t *rx, std::size_t length)
+modm::platform::SpiMaster{{ id }}::transfer(const uint8_t *tx, uint8_t *rx, std::size_t length)
 {
 %% if options["busywait"]
 	for (std::size_t index = 0; index < length; index++)

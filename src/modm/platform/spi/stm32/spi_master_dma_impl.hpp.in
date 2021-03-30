@@ -89,7 +89,7 @@ modm::platform::SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(uint
 
 template <class DmaChannelRx, class DmaChannelTx>
 modm::ResumableResult<void>
-modm::platform::SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(uint8_t *tx,
+modm::platform::SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(const uint8_t *tx,
 		uint8_t *rx, std::size_t length)
 {
 	// this is a manually implemented "fast resumable function"

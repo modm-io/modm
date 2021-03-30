@@ -72,14 +72,14 @@ public:
 	transferBlocking(uint8_t data);
 
 	static void
-	transferBlocking(uint8_t *tx, uint8_t *rx, std::size_t length);
+	transferBlocking(const uint8_t *tx, uint8_t *rx, std::size_t length);
 
 
 	static modm::ResumableResult<uint8_t>
 	transfer(uint8_t data);
 
 	static modm::ResumableResult<void>
-	transfer(uint8_t *tx, uint8_t *rx, std::size_t length);
+	transfer(const uint8_t *tx, uint8_t *rx, std::size_t length);
 	// end documentation inherited
 
 private:

@@ -131,7 +131,7 @@ public:
 	}
 
 	static void
-	transferBlocking(uint8_t *tx, uint8_t *rx, std::size_t length)
+	transferBlocking(const uint8_t *tx, uint8_t *rx, std::size_t length)
 	{
 		RF_CALL_BLOCKING(transfer(tx, rx, length));
 	}
@@ -141,7 +141,7 @@ public:
 	transfer(uint8_t data);
 
 	static modm::ResumableResult<void>
-	transfer(uint8_t *tx, uint8_t *rx, std::size_t length);
+	transfer(const uint8_t *tx, uint8_t *rx, std::size_t length);
 	// end documentation inherited
 };
 

@@ -117,7 +117,7 @@ public:
 	 *      number of bytes to be shifted out
 	 */
 	static void
-	transferBlocking(uint8_t *tx, uint8_t *rx, std::size_t length);
+	transferBlocking(const uint8_t *tx, uint8_t *rx, std::size_t length);
 
 	/**
 	 * Swap a single byte and wait for completion non-blocking!.
@@ -154,7 +154,7 @@ public:
 	 *      number of bytes to be shifted out
 	 */
 	static modm::ResumableResult<void>
-	transfer(uint8_t *tx, uint8_t *rx, std::size_t length);
+	transfer(const uint8_t *tx, uint8_t *rx, std::size_t length);
 #endif
 };
 

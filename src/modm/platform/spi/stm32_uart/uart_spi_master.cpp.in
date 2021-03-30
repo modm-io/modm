@@ -108,7 +108,7 @@ modm::platform::UartSpiMaster{{ id }}::transfer(uint8_t data)
 
 modm::ResumableResult<void>
 modm::platform::UartSpiMaster{{ id }}::transfer(
-		uint8_t * tx, uint8_t * rx, std::size_t length)
+		const uint8_t * tx, uint8_t * rx, std::size_t length)
 {
 	// this is a manually implemented "fast resumable function"
 	// there is no context or nesting protection, since we don't need it.

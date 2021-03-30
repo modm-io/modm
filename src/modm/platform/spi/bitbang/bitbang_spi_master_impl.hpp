@@ -180,7 +180,7 @@ modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::transferBlocking(uint8_t data
 template <typename Sck, typename Mosi, typename Miso>
 void
 modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::transferBlocking(
-		uint8_t *tx, uint8_t *rx, std::size_t length)
+		const uint8_t *tx, uint8_t *rx, std::size_t length)
 {
 	uint8_t tx_byte = 0xff;
 	uint8_t rx_byte;
@@ -206,7 +206,7 @@ modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::transfer(uint8_t data)
 template <typename Sck, typename Mosi, typename Miso>
 modm::ResumableResult<void>
 modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::transfer(
-		uint8_t *tx, uint8_t *rx, std::size_t length)
+		const uint8_t *tx, uint8_t *rx, std::size_t length)
 {
 	transferBlocking(tx, rx, length);
 	return {modm::rf::Stop, 0};
