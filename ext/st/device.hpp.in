@@ -29,6 +29,31 @@
 #include <{{ header }}>
 %% endfor
 
+%% if target.family in ["g0"]
+// these defines are missing from the STM32G0 header files
+#define RCC_CFGR_SW_HSI (0UL)          /*!< HSI selected as system clock */
+#define RCC_CFGR_SW_HSE (0x00000001UL) /*!< HSE selected as system clock */
+#define RCC_CFGR_SW_PLL (0x00000002UL) /*!< PLL selected as system clock */
+#define RCC_CFGR_SW_LSI (0x00000003UL) /*!< LSI selected as system clock */
+#define RCC_CFGR_SW_LSE (0x00000004UL) /*!< LSE selected as system clock */
+
+#define RCC_CFGR_HPRE_DIV1   (0x0UL)        /*!< SYSCLK not divided */
+#define RCC_CFGR_HPRE_DIV2   (0x00000800UL) /*!< SYSCLK divided by 2 */
+#define RCC_CFGR_HPRE_DIV4   (0x00000900UL) /*!< SYSCLK divided by 4 */
+#define RCC_CFGR_HPRE_DIV8   (0x00000A00UL) /*!< SYSCLK divided by 8 */
+#define RCC_CFGR_HPRE_DIV16  (0x00000B00UL) /*!< SYSCLK divided by 16 */
+#define RCC_CFGR_HPRE_DIV64  (0x00000C00UL) /*!< SYSCLK divided by 64 */
+#define RCC_CFGR_HPRE_DIV128 (0x00000D00UL) /*!< SYSCLK divided by 128 */
+#define RCC_CFGR_HPRE_DIV256 (0x00000E00UL) /*!< SYSCLK divided by 256 */
+#define RCC_CFGR_HPRE_DIV512 (0x00000F00UL) /*!< SYSCLK divided by 512 */
+
+#define RCC_CFGR_PPRE_DIV1  (0x0UL)        /*!< HCLK not divided */
+#define RCC_CFGR_PPRE_DIV2  (0x00004000UL) /*!< HCLK divided by 2 */
+#define RCC_CFGR_PPRE_DIV4  (0x00005000UL) /*!< HCLK divided by 4 */
+#define RCC_CFGR_PPRE_DIV8  (0x00006000UL) /*!< HCLK divided by 8 */
+#define RCC_CFGR_PPRE_DIV16 (0x00007000UL) /*!< HCLK divided by 16 */
+%% endif
+
 /// @cond
 // This is a hack to make the *_Typedef's known to GDB, so that you can debug
 // the peripherals directly in GDB in any context.

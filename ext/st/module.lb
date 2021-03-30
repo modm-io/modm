@@ -152,6 +152,7 @@ def build(env):
     env.substitutions.update({
         "headers": [bprops["device_header"], bprops["system_header"]],
         "defines": [bprops["define"]],
+        "target": env[":target"].identifier,
     })
     env.outbasepath = "modm/src/modm/platform"
     env.template("device.hpp.in")
