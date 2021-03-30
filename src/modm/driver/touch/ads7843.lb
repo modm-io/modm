@@ -20,8 +20,10 @@ The ADS7843 by Texas Instruments is the de-facto standard for cheap
 resistive touch screens.
 
 There are many compatible devices from other manufacturers available,
-such as the UH7843 by Zilltek, the TSC2046 and the XPT2046 by XPTEK.
-All of these are 100%% compatible with the ADS7843.
+such as the UH7843 by Zilltek.
+
+TSC2046, XPT2046 and other *2046 chips seem to be not fully compatible
+with the ADS7843 and have their own driver "modm:driver:touch2046".
 """
 
 def prepare(module, options):

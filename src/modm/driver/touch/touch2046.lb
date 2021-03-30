@@ -1,0 +1,38 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2021, Raphael Lehmann
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:touch2046"
+    module.description = """\
+# TSC2046/x2046 Resistive Touch Controller
+
+The TSC2046 by Texas Instruments is a popular touchscreen controller
+on cheap displays.
+
+https://www.ti.com/lit/ds/symlink/tsc2046.pdf
+
+There are many compatible devices from other manufacturers available,
+such as the XPT2046 by XPTEK or "2046" labeled chips from unknown manufacturers.
+All of these are compatible with the TSC2046.
+"""
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:spi.device",
+        ":processing:resumable")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/touch"
+    env.copy("touch2046.hpp")
+    env.copy("touch2046_impl.hpp")
