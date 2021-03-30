@@ -472,13 +472,15 @@ We have out-of-box support for many development boards including documentation.
 <td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-l152re">NUCLEO-L152RE</a></td>
 </tr><tr>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-l432kc">NUCLEO-L432KC</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-l452re">NUCLEO-L452RE</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-l476rg">NUCLEO-L476RG</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-olimexino-stm32">OLIMEXINO-STM32</a></td>
-<td align="center"><a href="https://modm.io/reference/module/modm-board-raspberrypi">Raspberry Pi</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-raspberrypi">Raspberry Pi</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-samd21-mini">SAMD21-MINI</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-stm32_f4ve">STM32-F4VE</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-stm32f030_demo">STM32F030-DEMO</a></td>
+</tr><tr>
 </tr>
 </table>
 <!--/bsptable-->
