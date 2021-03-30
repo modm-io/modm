@@ -65,6 +65,7 @@ the config macros, then redefine them with your options, for example:
         env.copy("freertos/FreeRTOS-Plus-TCP/portable/Compiler/GCC/pack_struct_end.h", "freertos_plus_tcp/include/pack_struct_end.h")
 
         env.collect(":build:path.include", "modm/ext/freertos_plus_tcp/include")
+        env.collect(":build:path.include", "modm/ext/freertos_plus_tcp/tools/tcp_utilities/include")
         env.template("FreeRTOSIPConfig.h.in", "freertos_plus_tcp/include/FreeRTOSIPConfig.h")
 # -----------------------------------------------------------------------------
 
