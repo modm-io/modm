@@ -260,7 +260,7 @@ class TinyUsbClassModule(Module):
 
         global tusb_config
         cfg_name = "CFG_TU{}_{}".format(self.mode[0].upper(), self.name.upper())
-        if "DFU" in cfg_name: cfg_name += "_RT";
+        if "DFU" in cfg_name: cfg_name += "_RUNTIME";
         tusb_config[cfg_name] = env[":tinyusb:config"].count("{}.{}".format(self.mode, self.name))
         speed = env.get(":tinyusb:speed", 0)
 

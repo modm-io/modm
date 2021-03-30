@@ -35,7 +35,10 @@ constexpr uint64_t DFU_MAGIC{0xf318ea89313f2be8};
 /* 1. Do scons program once
  * 2. Power-cycle by disconnecting USB cable from ST-Link
  * 3. Force USB re-enumeration by connecting USB cable to UsbFs
- * 3. Do scons program-dfu as many times as you want
+ * 4. Do `scons program-dfu delay=3` as many times as you want
+ *
+ * Rebooting the chip into DFU and enumerating USB again takes a few seconds.
+ * You may have to increase the `delay` argument.
  */
 
 int main()
@@ -72,7 +75,7 @@ int main()
 }
 
 // Invoked on DFU_DETACH request to reboot to the bootloader
-void tud_dfu_rt_reboot_to_dfu(void)
+void tud_dfu_runtime_reboot_to_dfu_cb(void)
 {
 	dfu_mode = DFU_MAGIC;
 	// You must delay SystemReset so that TinyUSB can finish!!!

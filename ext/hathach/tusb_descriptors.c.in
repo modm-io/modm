@@ -35,7 +35,7 @@
 #define _PID_MAP(itf, n) ((CFG_TUD_##itf) << (n))
 #define USB_PID                                                      \
 	(0x4000 | _PID_MAP(CDC, 0) | _PID_MAP(MSC, 2) | _PID_MAP(HID, 3) | \
-	_PID_MAP(MIDI, 4) | _PID_MAP(VENDOR, 5))
+	_PID_MAP(MIDI, 4) | _PID_MAP(AUDIO, 5) | _PID_MAP(VENDOR, 6))
 
 //--------------------------------------------------------------------+
 // Device Descriptors
@@ -90,12 +90,13 @@ enum
 };
 
 #define CONFIG_TOTAL_LEN (TUD_CONFIG_DESC_LEN + \
-	CFG_TUD_CDC    * TUD_CDC_DESC_LEN + \
-	CFG_TUD_MSC    * TUD_MSC_DESC_LEN + \
-	CFG_TUD_HID    * TUD_HID_DESC_LEN + \
-	CFG_TUD_MIDI   * TUD_MIDI_DESC_LEN + \
-	CFG_TUD_DFU_RT * TUD_DFU_RT_DESC_LEN + \
-	CFG_TUD_VENDOR * TUD_VENDOR_DESC_LEN)
+	CFG_TUD_CDC         * TUD_CDC_DESC_LEN + \
+	CFG_TUD_MSC         * TUD_MSC_DESC_LEN + \
+	CFG_TUD_HID         * TUD_HID_DESC_LEN + \
+	CFG_TUD_AUDIO       * TUD_AUDIO_MIC_DESC_LEN + \
+	CFG_TUD_MIDI        * TUD_MIDI_DESC_LEN + \
+	CFG_TUD_DFU_RUNTIME * TUD_DFU_RT_DESC_LEN + \
+	CFG_TUD_VENDOR      * TUD_VENDOR_DESC_LEN)
 
 %% for endpoint, value in endpoints.items()
 #define EPNUM_{{ endpoint }} {{ value }}

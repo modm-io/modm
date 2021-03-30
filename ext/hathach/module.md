@@ -42,8 +42,10 @@ generated, so you can implement them yourself. Note that you must also
 manually depend on the device classes you want to implement:
 
 ```xml
-<module>modm:tinyusb:device:net</module>
+<module>modm:tinyusb:device:audio</module>
+<module>modm:tinyusb:device:bth</module>
 <module>modm:tinyusb:device:hid</module>
+<module>modm:tinyusb:device:net</module>
 <module>modm:tinyusb:device:usbtmc</module>
 ```
 
