@@ -46,6 +46,8 @@ public:
     static constexpr int16_t displayBufferWidth = Width;
     static constexpr int16_t displayBufferHeight = Height / 8;
 
+    MonochromeGraphicDisplayBufferedVertical() { this->setColor(glcd::Color::black()); }
+
     virtual ~MonochromeGraphicDisplayBufferedVertical() = default;
 
     virtual inline uint16_t
