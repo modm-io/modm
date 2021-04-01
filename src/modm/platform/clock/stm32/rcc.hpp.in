@@ -19,6 +19,7 @@
 #include <stdint.h>
 #include "../device.hpp"
 #include <modm/platform/core/peripherals.hpp>
+#include <modm/architecture/interface/delay.hpp>
 
 namespace modm::platform
 {
@@ -279,6 +280,51 @@ public:
 	%% endif
 	};
 %% endif
+
+%% if target["family"] == "g4"
+	enum class
+	CanClockSource : uint32_t
+	{
+		Hse = 0,
+		PllQ = RCC_CCIPR_FDCANSEL_0,
+		Pclk = RCC_CCIPR_FDCANSEL_1,
+	};
+
+	static void
+	setCanClockSource(CanClockSource source)
+	{
+		RCC->CCIPR = (RCC->CCIPR & ~RCC_CCIPR_FDCANSEL) | uint32_t(source);
+	}
+
+	/// FDCAN subsystem prescaler common to all FDCAN instances
+	enum class
+	CanPrescaler : uint8_t
+	{
+		Div1  = 0b0000,
+		Div2  = 0b0001,
+		Div4  = 0b0010,
+		Div6  = 0b0011,
+		Div8  = 0b0100,
+		Div10 = 0b0101,
+		Div12 = 0b0110,
+		Div14 = 0b0111,
+		Div16 = 0b1000,
+		Div18 = 0b1001,
+		Div20 = 0b1010,
+		Div22 = 0b1011,
+		Div24 = 0b1100,
+		Div26 = 0b1101,
+		Div28 = 0b1110,
+		Div30 = 0b1111,
+	};
+
+	/// Configure CAN subsystem prescaler
+	/// \warning Configure the prescaler before enabling the CAN peripherals
+	/// \returns true if setting the prescaler was successful
+	static bool
+	setCanPrescaler(CanPrescaler prescaler);
+%% endif
+
 public:
 	// sources
 	static bool

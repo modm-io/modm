@@ -23,6 +23,16 @@
 namespace modm
 {
 
+
+struct CanBitTimingConfiguration
+{
+	uint8_t bs1;
+	uint8_t bs2;
+	uint8_t sjw;
+	uint16_t prescaler;
+	float error;
+};
+
 /**
  * CAN Bit Timing
  *
@@ -49,14 +59,6 @@ template<int32_t Clk, int32_t Bitrate, uint8_t prescaler_width = 10, uint8_t bs1
 class CanBitTiming
 {
 private:
-	struct CanBitTimingConfiguration {
-		uint8_t bs1;	// 1-16
-		uint8_t bs2;	// 1-8
-		uint8_t sjw;
-		uint16_t prescaler;
-		float minError;
-	};
-
 	static constexpr uint32_t round_uint32(float f)
 	{
 		uint32_t f_int = (uint32_t) f;
@@ -103,10 +105,16 @@ public:
 	static constexpr uint8_t getSJW() { return BestConfig.sjw; }
 	static constexpr uint8_t getPrescaler() { return BestConfig.prescaler; }
 
+	static constexpr CanBitTimingConfiguration
+	getBitTimings()
+	{
+		return BestConfig;
+	}
+
 	template<percent_t tolerance>
 	static constexpr void assertBitrateInTolerance()
 	{
-		static_assert(pct2f(tolerance) >= BestConfig.minError,
+		static_assert(pct2f(tolerance) >= BestConfig.error,
 			"The closest available bitrate exceeds the specified maximum tolerance!");
 	}
 

@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2019, Raphael Lehmann
+ * Copyright (c) 2021, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -13,11 +14,12 @@
 #define MODM_STM32_FDCAN{{ id }}_HPP
 
 #include <modm/architecture/interface/can.hpp>
+#include <modm/architecture/interface/can_filter.hpp>
 #include <modm/platform/gpio/connector.hpp>
 #include "../device.hpp"
 
 #include "can_bit_timings.hpp"
-
+#include "message_ram.hpp"
 
 namespace modm::platform
 {
@@ -39,108 +41,44 @@ namespace modm::platform
  * You can set the buffer size using the `tx_buffer` and `rx_buffer` parameters.
  *
  * @author		Raphael Lehmann <raphael@rleh.de>
+ * @author		Christopher Durand <christopher.durand@rwth-aachen.de>
  * @ingroup		modm_platform_can_{{ id }}
  */
 class Fdcan{{ id }} : public ::modm::Can
 {
 public:
-/**
- * Address and offset definitions for the CAN SRAM
- */
-// if STM32G4
-	static constexpr uint32_t FilterListStandardSize		= 28;   // Filter List Standard size
-	static constexpr uint32_t FilterListStandardElementSize	= 1*4;  // Filter Standard Element Size in bytes
-	static constexpr uint32_t FilterListExtendedSize		= 8;    // Filter List Extended size
-	static constexpr uint32_t FilterListExtendedElementSize	= 2*4;  // Filter Extended Element Size in bytes
-	static constexpr uint32_t RxFifo0Size					= 3;    // RX FIFO 0 size
-	static constexpr uint32_t RxFifo1Size					= 3;    // RX FIFO 1 size
-	static constexpr uint32_t RxFifoElementSize				= 18*4; // RX FIFO 1 size
-	static constexpr uint32_t TxEventFifoSize				= 3;    // TX Event FIFO size
-	static constexpr uint32_t TxEventFifoElementSize		= 2*4;  // TX Event FIFO element size
-	static constexpr uint32_t TxFifoSize					= 3;    // TX FIFO/Queue size
-	static constexpr uint32_t TxFifoElementSize				= 18*4; // TX FIFO/Queue element size
-// endif
-// TODO: else F7 ...
-
-	static constexpr uint32_t RamSize =
-		(FilterListStandardSize * FilterListStandardElementSize)
-		+(FilterListExtendedSize * FilterListExtendedElementSize)
-		+(RxFifo0Size * RxFifoElementSize)
-		+(RxFifo1Size * RxFifoElementSize)
-		+(TxEventFifoSize * TxEventFifoElementSize)
-		+(TxFifoSize * TxFifoElementSize);
-	static constexpr uint32_t RamBase = SRAMCAN_BASE + (RamSize * {{ id - 1 }});
-	static constexpr uint32_t FilterListStandard = RamBase + 0;
-	static constexpr uint32_t FilterListExtended = FilterListStandard + (FilterListStandardSize * FilterListStandardElementSize);
-	static constexpr uint32_t RxFifo0 = FilterListExtended + (RxFifo0Size * RxFifoElementSize);
-	static constexpr uint32_t RxFifo1 = RxFifo0 + (RxFifo1Size * RxFifoElementSize);
-	static constexpr uint32_t TxEventFifo = RxFifo1 + (TxEventFifoSize * TxEventFifoElementSize);
-	static constexpr uint32_t TxFifo = TxEventFifo + (TxFifoSize * TxFifoElementSize);
-
-public:
 	enum class
 	Mode : uint32_t
 	{
-		//Configuration,
 		Normal,
 		Restricted,
 		Monitoring,
 		Sleep,
-		// various test modes:
 		TestExternalLoopback,
 		TestInternalLoopback,
 
-		// compatibility:
-		//ListenOnly = Monitoring, // no acknowledging
-		//LoopBack = TestInternalLoopback,
-		//ListenOnlyLoopBack not supported(?)
+		// for compatibility with bxCAN:
+		ListenOnly = Monitoring, // no acknowledging
+		LoopBack = TestInternalLoopback,
 
 	};
-
-	enum class
-	Preprescaler : uint8_t
-	{
-		Preprescaler1  = 0b0000,
-		Preprescaler2  = 0b0001,
-		Preprescaler4  = 0b0010,
-		Preprescaler6  = 0b0011,
-		Preprescaler8  = 0b0100,
-		Preprescaler10 = 0b0101,
-		Preprescaler12 = 0b0110,
-		Preprescaler14 = 0b0111,
-		Preprescaler16 = 0b1000,
-		Preprescaler18 = 0b1001,
-		Preprescaler20 = 0b1010,
-		Preprescaler22 = 0b1011,
-		Preprescaler24 = 0b1100,
-		Preprescaler26 = 0b1101,
-		Preprescaler28 = 0b1110,
-		Preprescaler30 = 0b1111,
-	};
-private:
-	static constexpr uint8_t
-	getPreprescalerValue(Preprescaler preprescaler)
-	{
-		if(preprescaler == Preprescaler::Preprescaler1) {
-			return 1;
-		}
-		else {
-			return static_cast<uint8_t>(preprescaler) * 2;
-		}
-	}
 
 public:
 	// Expose jinja template parameters to be checked by e.g. drivers or application
 	static constexpr size_t RxBufferSize = {{ options["buffer.rx"] }};
 	static constexpr size_t TxBufferSize = {{ options["buffer.tx"] }};
 
+	using ErrorCallback = void (*)();
+
 private:
-	/// Private Initializer with computed prescaler and timing constants
+	using MessageRam = fdcan::MessageRam<{{ id - 1 }}>;
+
+	static inline volatile ErrorCallback errorCallback_ = nullptr;
+
 	static void
 	initializeWithPrescaler(
-			uint16_t prescaler, uint8_t bs1, uint8_t bs2, uint8_t sjw,
-			uint16_t dataPrescaler, uint8_t dataBs1, uint8_t dataBs2, uint8_t dataSjw,
-			Preprescaler preprescaler,
+			CanBitTimingConfiguration standardTimings,
+			std::optional<CanBitTimingConfiguration> fdDataTimings,
 			uint32_t interruptPriority, Mode startupMode, bool overwriteOnOverrun
 			);
 
@@ -155,7 +93,6 @@ public:
 		static_assert(Connector::template IsValid<Tx> and Connector::template IsValid<Rx> and sizeof...(Signals) == 2,
 					  "Can{{ id }}::connect() requires one Tx and one Rx signal!");
 
-		// Connector::disconnect();
 		Tx::setOutput(Gpio::OutputType::PushPull);
 		Rx::setInput(inputType);
 		Connector::connect();
@@ -164,10 +101,27 @@ public:
 	/**
 	 * Enables the clock for the CAN controller and resets all settings
 	 *
-	 * \param bitrate
-	 * 			CAN bitrate (defined in driver/connectivity/can/message.hpp)
+	 * \tparam SystemClock
+	 * 			System clock struct with an FDCAN{{ id }} member containing
+	 * 			the clock speed supplied to the peripheral.
+	 * 			\warning	The CAN subsystem prescaler can be configured using
+	 * 						the RCC module and must be taken into account in
+	 * 						the provided clock speed value.
+	 * \tparam bitrate
+	 * 			Nominal CAN bitrate
+	 * \tparam tolerance
+	 * 			Maximum relative deviation between requested and resulting
+	 * 			CAN bitrates. If the tolerance is exceeded a compile-time
+	 * 			assertion will be triggered.
+	 * \tparam fastDataBitrate
+	 * 			CAN bitrate for data in FD frames with bit rate switching
+	 * 			Set to 0 to disable CANFD support.
+	 *
 	 * \param interruptPriority
 	 * 			Interrupt vector priority (0=highest to 15=lowest)
+	 * \param startupMode
+	 * 			Mode of operation set after initialization
+	 * 			\see Fdcan{{ id }}::Mode
 	 * \param overwriteOnOverrun
 	 * 			Once a receive FIFO is full the next incoming message
 	 * 			will overwrite the previous one if \c true otherwise
@@ -180,44 +134,42 @@ public:
 		class SystemClock,
 		bitrate_t bitrate=kbps(125),
 		percent_t tolerance=pct(1),
-		bitrate_t dataBitrate=bitrate,
-		Preprescaler preprescaler=Preprescaler::Preprescaler16
+		bitrate_t fastDataBitrate=0 // 0: FDCAN mode disabled
 	>
 	static inline void
 	initialize(	uint32_t interruptPriority, Mode startupMode = Mode::Normal,
 				bool overwriteOnOverrun = true)
 	{
 		using Timings = CanBitTiming<
-			SystemClock::Fdcan{{ id }} / getPreprescalerValue(preprescaler),
+			SystemClock::Fdcan{{ id }},
 			bitrate,
 			9, 8, 7, 7
 		>;
 		Timings::template assertBitrateInTolerance<tolerance>();
 
-		using DataTimings = CanBitTiming<
-			SystemClock::Fdcan{{ id }} / getPreprescalerValue(preprescaler),
-			bitrate,
-			5, 5, 4, 4
-		>;
-		DataTimings::template assertBitrateInTolerance<tolerance>();
+		std::optional<CanBitTimingConfiguration> fastDataTimings = std::nullopt;
+
+		if constexpr (fastDataBitrate != 0) {
+			using DataTimings = CanBitTiming<
+				SystemClock::Fdcan{{ id }},
+				fastDataBitrate,
+				5, 5, 4, 4
+			>;
+			DataTimings::template assertBitrateInTolerance<tolerance>();
+
+			fastDataTimings = DataTimings::getBitTimings();
+		}
 
 		return initializeWithPrescaler(
-			Timings::getPrescaler(),
-			Timings::getBS1(),
-			Timings::getBS2(),
-			Timings::getSJW(),
-			DataTimings::getPrescaler(),
-			DataTimings::getBS1(),
-			DataTimings::getBS2(),
-			DataTimings::getSJW(),
-			preprescaler,
+			Timings::getBitTimings(),
+			fastDataTimings,
 			interruptPriority,
 			startupMode,
 			overwriteOnOverrun);
 	}
 
 	/**
-	 * The the operating mode.
+	 * Set the operating mode.
 	 *
 	 * Default after initialization is the normal mode.
 	 */
@@ -227,12 +179,8 @@ public:
 	static void
 	setAutomaticRetransmission(bool retransmission);
 
-private:
-	static void
-	_setMode(Mode mode);
-
 public:
-	// Can Interface Methods
+	// Can interface methods
 	static bool
 	isMessageAvailable();
 
@@ -246,6 +194,74 @@ public:
 	sendMessage(const can::Message& message);
 
 public:
+	// Can filter configuration
+
+	using FilterConfig = MessageRam::FilterConfig;
+
+	static constexpr inline uint8_t StandardFilterCount{28};
+	static constexpr inline uint8_t ExtendedFilterCount{8};
+
+	/// Set standard filter with id and mask
+	/// \param standardIndex Standard filter index 0..27
+	/// \returns true if filter index is valid
+	static bool
+	setStandardFilter(uint8_t standardIndex, FilterConfig config,
+		modm::can::StandardIdentifier id,
+		modm::can::StandardMask mask);
+
+	/// Set standard filter with dual ids
+	/// Matches on any of both specified ids
+	/// \param standardIndex Standard filter index 0..27
+	/// \returns true if filter index is valid
+	static bool
+	setStandardFilter(uint8_t standardIndex, FilterConfig config,
+		modm::can::StandardIdentifier id0,
+		modm::can::StandardIdentifier id1);
+
+	/// Set standard range filter
+	/// Matches the inclusive range between both specified ids
+	/// \param standardIndex Standard filter index 0..27
+	/// \returns true if filter index is valid
+	static bool
+	setStandardRangeFilter(uint8_t standardIndex, FilterConfig config,
+		modm::can::StandardIdentifier first,
+		modm::can::StandardIdentifier last);
+
+	/// Set extended filter with id and mask
+	/// \param extendedIndex Extended filter index 0..7
+	/// \returns true if filter index is valid
+	static bool
+	setExtendedFilter(uint8_t extendedIndex, FilterConfig config,
+		modm::can::ExtendedIdentifier id,
+		modm::can::ExtendedMask mask);
+
+	/// Set standard filter with dual ids
+	/// Matches on any of both specified ids
+	/// \param extendedIndex Extended filter index 0..7
+	/// \returns true if filter index is valid
+	static bool
+	setExtendedFilter(uint8_t extendedIndex, FilterConfig config,
+		modm::can::ExtendedIdentifier id0,
+		modm::can::ExtendedIdentifier id1);
+
+	/// Set standard range filter
+	/// Matches the inclusive range between both specified ids
+	/// \param extendedIndex Extended filter index 0..7
+	/// \returns true if filter index is valid
+	static bool
+	setExtendedRangeFilter(uint8_t extendedIndex, FilterConfig config,
+		modm::can::ExtendedIdentifier first,
+		modm::can::ExtendedIdentifier last);
+
+	/// Disable all standard filters, receive no standard frames
+	static void
+	clearStandardFilters();
+
+	/// Disable all extended filters, receive no extended frames
+	static void
+	clearExtendedFilters();
+
+public:
 	// Extended Functionality
 	/**
 	 * Get Receive Error Counter.
@@ -257,7 +273,7 @@ public:
 	 * was higher than 128. When the counter value exceeds 127, the
 	 * CAN controller enters the error passive state.
 	 */
-	static inline uint32_t
+	static inline uint8_t
 	getReceiveErrorCounter()
 	{
 		return (({{ reg }}->ECR >> 8) & 0xFF);
@@ -267,7 +283,7 @@ public:
 	 * Get Transmit Error Counter.
 	 *
 	 */
-	static inline uint32_t
+	static inline uint8_t
 	getTransmitErrorCounter()
 	{
 		return ({{ reg }}->ECR & 0xFF);
@@ -277,48 +293,68 @@ public:
 	getBusState();
 
 	/**
-	 * Enable the error and status change interrupt.
+	 * Set the error interrupt callback.
 	 *
-	 * Can be generated by the following events:
-	 * - Error condition, for more details on error conditions please
-	 *   refer to the CAN Error Status register (CAN_ESR).
-	 * - Wakeup condition, SOF monitored on the CAN Rx signal.
-	 * - Entry into Sleep mode
+	 * It will be called on the following events:
+	 * - The FDCAN peripheral enters ERROR_PASSIVE or BUS_OFF state
+	 * - The error counter exceeds the warning limit
 	 *
-	 * You need to create you own interrupt handler for this interrupt.
-	 * The interrupt handler has a fixed name:
-	 * \code
-	 * MODM_ISR(CAN{{ id }}_SCE)
-	 * {
-	 *     ...
-	 *
-	 *     // e.g. Acknowledge interrupt
-	 *     CAN{{ id }}->MSR = CAN_MSR_ERRI;
-	 * }
-	 * \endcode
-	 *
-	 * \param interruptEnable
-	 * 			Upper 24-bit of the CAN_IER register. E.g.:
-	 * 			 - CAN_IER_BOFIE
-	 * 			 - CAN_IER_EPVIE
-	 * 			 - ...
-	 * 			See Reference Manual >> bxCAN >> CAN_IER Register
-	 * \param interruptPriority
-	 * 			Interrupt vector priority (0=highest to 15=lowest)
+	 * To disable the interrupt set the callback to nullptr.
 	 */
 	static void
-	enableStatusChangeInterrupt(uint32_t interruptEnable,
-			uint32_t interruptPriority);
+	setErrorInterruptCallback(ErrorCallback callback)
+	{
+		errorCallback_ = callback;
+		if(callback) {
+			FDCAN{{ id }}->IE |=  (FDCAN_IE_BOE | FDCAN_IE_EPE | FDCAN_IE_EWE);
+		} else {
+			FDCAN{{ id }}->IE &= ~(FDCAN_IE_BOE | FDCAN_IE_EPE | FDCAN_IE_EWE);
+		}
+	}
 
-	/**
-	 *
-	 *
-	 */
+	static ErrorCallback
+	getErrorInterruptCallback()
+	{
+		return errorCallback_;
+	}
+
 	static uint16_t
 	getCurrentTimestamp()
 	{
 		return {{ reg }}->TSCV;
 	}
+
+private:
+	static void
+	configureMode(Mode mode);
+
+	static void
+	configureInterrupts(uint32_t interruptPriority);
+
+	struct EnterInitMode
+	{
+		EnterInitMode()
+		{
+			{{ reg }}->CCCR |= FDCAN_CCCR_INIT;
+			int deadlockPreventer = 10'000; // max ~10ms
+			while ((({{ reg }}->CCCR & FDCAN_CCCR_INIT) == 0) and (deadlockPreventer-- > 0)) {
+				using namespace std::literals;
+				modm::delay(1us);
+				// Wait until the initialization mode is entered.
+			}
+			modm_assert(deadlockPreventer > 0, "can.{{ id }}.init", "timeout expired");
+			{{ reg }}->CCCR |= FDCAN_CCCR_CCE;
+		}
+
+		~EnterInitMode()
+		{
+			// Switch to normal operation, automatically clears CCE flag
+			{{ reg }}->CCCR &= ~FDCAN_CCCR_INIT;
+		}
+
+		EnterInitMode(const EnterInitMode&) = delete;
+		EnterInitMode& operator=(const EnterInitMode&) = delete;
+	};
 };
 
 }	// namespace modm::platform

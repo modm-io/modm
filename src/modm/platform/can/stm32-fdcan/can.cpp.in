@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2019, Raphael Lehmann
+ * Copyright (c) 2021, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -11,17 +12,23 @@
 #include <queue>
 #include <array>
 #include <algorithm>
+#include <cstring>
+#include <optional>
 
 #include <modm/architecture/driver/atomic/queue.hpp>
 #include <modm/platform/clock/rcc.hpp>
 #include <modm/architecture/interface/delay.hpp>
 #include <modm/architecture/interface/assert.hpp>
+#include <modm/architecture/interface/interrupt.hpp>
 
 #include "can_{{ id }}.hpp"
 
+namespace {
+
+using MessageRam = modm::platform::fdcan::MessageRam<{{ id - 1 }}>;
 
 %% if options["buffer.tx"] > 0
-static std::priority_queue<modm::can::Message> txQueue;
+modm::atomic::Queue<modm::can::Message, {{ options["buffer.tx"] }}> txQueue;
 %% endif
 
 struct RxMessage {
@@ -30,152 +37,31 @@ struct RxMessage {
     uint16_t timestamp;
 };
 %% if options["buffer.rx"] > 0
-static modm::atomic::Queue<RxMessage, {{ options["buffer.rx"] }}> rxQueue;
+modm::atomic::Queue<RxMessage, {{ options["buffer.rx"] }}> rxQueue;
 %% endif
 
+bool
+isHardwareTxQueueFull()
+{
+	return (({{ reg }}->TXFQS & FDCAN_TXFQS_TFQF) != 0);
+}
+
+bool
+rxFifo0HasMessage()
+{
+	return (({{ reg }}->RXF0S & FDCAN_RXF0S_F0FL_Msk) > 0);
+}
+
+bool
+rxFifo1HasMessage()
+{
+	return (({{ reg }}->RXF1S & FDCAN_RXF1S_F1FL_Msk) > 0);
+}
 
 void
-modm::platform::Fdcan{{ id }}::initializeWithPrescaler(
-		uint16_t prescaler, uint8_t bs1, uint8_t bs2, uint8_t sjw,
-		uint16_t dataPrescaler, uint8_t dataBs1, uint8_t dataBs2, uint8_t dataSjw,
-		Preprescaler preprescaler,
-		uint32_t interruptPriority, Mode startupMode, bool overwriteOnOverrun)
+acknowledgeRxFifoRead(uint8_t fifoIndex, uint8_t getIndex)
 {
-	if(!Rcc::isEnabled<Peripheral::Fdcan1>()) {
-		Rcc::enable<Peripheral::Fdcan1>();
-	}
-
-	// Enter init mode, stops all FDCAN activities
-	{{ reg }}->CCCR = FDCAN_CCCR_INIT;
-	int deadlockPreventer = 10'000; // max ~10ms
-	while ((({{ reg }}->CCCR & FDCAN_CCCR_INIT) == 0) and (deadlockPreventer-- > 0)) {
-		modm::delayMicroseconds(1);
-		// Wait until the initialization mode is entered.
-	}
-	modm_assert(deadlockPreventer > 0, "can", "init", "timeout", {{ id }});
-	{{ reg }}->CCCR |= FDCAN_CCCR_CCE;
-
-	// Configure pre-prescaler (common for all three FDCAN instances)
-	// Fixme: TODO!!!!!
-	FDCAN_CONFIG->CKDIV = static_cast<uint8_t>(preprescaler);
-
-	// Configure nominal and data bitrates
-	{{ reg }}->NBTP =
-			((sjw - 1) << FDCAN_NBTP_NSJW_Pos) |
-			((bs2 - 1) << FDCAN_NBTP_NTSEG2_Pos) |
-			((bs1 - 1) << FDCAN_NBTP_NTSEG1_Pos) |
-			((prescaler - 1) << FDCAN_NBTP_NBRP_Pos);
-	{{ reg }}->DBTP =
-			((dataSjw - 1) << FDCAN_DBTP_DSJW_Pos) |
-			((dataBs2 - 1) << FDCAN_DBTP_DTSEG2_Pos) |
-			((dataBs1 - 1) << FDCAN_DBTP_DTSEG1_Pos) |
-			((dataPrescaler - 1) << FDCAN_DBTP_DBRP_Pos) |
-			FDCAN_DBTP_TDC; // enable "Transceiver Delay Compensation"
-
-
-	// Timestamp: FDCAN internal counter with prescaler=1
-	// In CAN FD mode the internal timestamp counter TCP does not provide a constant time
-	//  base due to the different CAN bit times between arbitration phase and data phase.
-	{{ reg }}->TSCC = (1 << FDCAN_TSCC_TSS_Pos);
-
-	// Set vector priority
-	NVIC_SetPriority({{ reg }}_IT0_IRQn, interruptPriority);
-	NVIC_SetPriority({{ reg }}_IT1_IRQn, interruptPriority);
-
-	// Register Interrupts at the NVIC
-	NVIC_EnableIRQ({{ reg }}_IT0_IRQn);
-	NVIC_EnableIRQ({{ reg }}_IT1_IRQn);
-
-	{{ reg }}->ILE = FDCAN_ILE_EINT1 | FDCAN_ILE_EINT0;
-	// TODO: assign interrupts to interrupt lines
-
-	{{ reg }}->RXGFC = overwriteOnOverrun ? 0 : (FDCAN_RXGFC_F1OM | FDCAN_RXGFC_F0OM); // TODO: or inverted?
-
-	// Reject frames not matching any filter
-	{{ reg }}->RXGFC |= FDCAN_RXGFC_ANFE | FDCAN_RXGFC_ANFS;
-
-	// Tx buffer: queue mode
-	{{ reg }}->TXBC = FDCAN_TXBC_TFQM;
-
-	_setMode(startupMode);
-
-	// Switch to normal operation
-	{{ reg }}->CCCR &= ~FDCAN_CCCR_INIT;
-}
-
-
-// Configure the mailbox to send a CAN message.
-// Low level function called by sendMessage and by Tx Interrupt.
-static bool
-sendMsg(const modm::can::Message& message)
-{
-	using namespace modm::platform;
-	if(!Fdcan{{ id }}::isReadyToSend()) {
-		return false;
-	}
-
-	// Retrieve the Tx queue put index
-	uint8_t putIndex = ({{ reg }}->TXFQS & FDCAN_TXFQS_TFQPI_Msk) >> FDCAN_TXFQS_TFQPI_Pos;
-
-	uint32_t* msgRam = (uint32_t*)(Fdcan{{ id }}::TxFifo + (putIndex * Fdcan{{ id }}::TxFifoElementSize));
-	*msgRam++ = ((message.isExtended() ? 1 : 0) << 30)
-		| ((message.isRemoteTransmitRequest() ? 1 : 0) << 30)
-		| (message.isExtended() ? message.getIdentifier() : (message.getIdentifier() << 18));
-	*msgRam++ = /* ((message.isLFM() ? 1 : 0) << 21) */ 0
-		/*| ((message.isFFM() ? 1 : 0) << 20)*/
-		| (message.getDLC() << 16);
-
-	// copy data (max. 64 bytes)
-	std::memcpy(msgRam, message.data, std::min(message.getLength(), uint8_t(64)));
-
-	// Activate the corresponding transmission request
-	{{ reg }}->TXBAR = ((uint32_t)1 << putIndex);
-
-	return true;
-}
-
-
-// Low level function to receive a message from mailbox.
-// Called by Rx Interrupt or by getMessage.
-static void
-readMsg(modm::can::Message& message, uint8_t* filter_id, uint16_t *timestamp)
-{
-	using namespace modm::platform;
-	uint8_t getIndex;
-	uint32_t* msgRam;
-	if(true /* fifo 0 or 1? */) {
-		getIndex = ({{ reg }}->RXF0S & FDCAN_RXF0S_F0GI_Msk) >> FDCAN_RXF0S_F0GI_Pos;
-		msgRam = (uint32_t*)(Fdcan{{ id }}::RxFifo0 + (getIndex * Fdcan{{ id }}::RxFifoElementSize));
-	}
-	else {
-		getIndex = ({{ reg }}->RXF1S & FDCAN_RXF1S_F1GI_Msk) >> FDCAN_RXF1S_F1GI_Pos;
-		msgRam = (uint32_t*)(Fdcan{{ id }}::RxFifo1 + (getIndex * Fdcan{{ id }}::RxFifoElementSize));
-	}
-
-	message.setExtended(*msgRam & (1 << 30));
-	message.setRemoteTransmitRequest(*msgRam & (1 << 29));
-	message.setIdentifier((*msgRam & ((1 << 29) - 1)) >> message.isExtended() ? 0 : 18);
-
-	msgRam++;
-
-	//message.setFilterId((*msgRam >> 24) & (1 << 7));
-	if(filter_id != nullptr) {
-		*filter_id = (*msgRam >> 24) & (1 << 7);
-	}
-	//message.setLFM(*msgRam & (1 << 21));
-	//message.setFFM(*msgRam & (1 << 20));
-	message.setDLC((*msgRam >> 16) & (1 << 20));
-	//message.setTimestamp(*msgRam & ((1 << 16) -1 ));
-	if(timestamp != nullptr) {
-		*timestamp = *msgRam & ((1 << 16) -1 );
-	}
-
-	msgRam++;
-
-	// copy data (max. 8 (64) bytes)
-	std::memcpy(message.data, msgRam, std::min(message.getLength(), uint8_t(8) /* 64 */));
-
-	if(true /* fifo 0 or 1? */) {
+	if (fifoIndex == 0) {
 		{{ reg }}->RXF0A = getIndex;
 	}
 	else {
@@ -183,123 +69,218 @@ readMsg(modm::can::Message& message, uint8_t* filter_id, uint16_t *timestamp)
 	}
 }
 
+uint8_t
+retrieveRxFifoGetIndex(uint8_t fifoIndex)
+{
+	if (fifoIndex == 0) {
+		return (({{ reg }}->RXF0S & FDCAN_RXF0S_F0GI_Msk) >> FDCAN_RXF0S_F0GI_Pos);
+	} else {
+		return (({{ reg }}->RXF1S & FDCAN_RXF1S_F1GI_Msk) >> FDCAN_RXF1S_F1GI_Pos);
+	}
+}
 
-/* Transmit Interrupt
- *
- * Generated when Transmit Mailbox 0..2 becomes empty.
- */
+uint8_t
+retrieveTxFifoPutIndex()
+{
+	return (({{ reg }}->TXFQS & FDCAN_TXFQS_TFQPI_Msk) >> FDCAN_TXFQS_TFQPI_Pos);
+}
 
-/*
-MODM_ISR({{ reg }}_TX)
+// Internal function to receive a message from an RX Fifo.
+// Called by RX interrupt or by getMessage()
+void
+readMsg(modm::can::Message& message, uint8_t fifoIndex, uint8_t* filter_id, uint16_t *timestamp)
+{
+	using namespace modm::platform;
+	using CommonHeader = MessageRam::CommonFifoHeader;
+	using RxFifoAddress = MessageRam::RxFifoAddress;
+
+	// retrieve index of next frame in RX fifo
+	const uint8_t getIndex = retrieveRxFifoGetIndex(fifoIndex);
+	const RxFifoAddress address = {fifoIndex, getIndex};
+
+	const auto [commonHeader, rxHeader] = MessageRam::readRxHeaders(address);
+
+	message.setExtended(bool(commonHeader & CommonHeader::ExtendedId));
+	message.setRemoteTransmitRequest(bool(commonHeader & CommonHeader::RemoteFrame));
+	const auto id = MessageRam::CanId_t::get(commonHeader);
+	if(message.isExtended()) {
+		message.setIdentifier(id);
+	} else {
+		message.setIdentifier(id >> 18);
+	}
+
+	if (filter_id != nullptr) {
+		*filter_id = MessageRam::FilterIndex_t::get(rxHeader);
+	}
+
+	if (timestamp != nullptr) {
+		*timestamp = MessageRam::Timestamp_t::get(rxHeader);
+	}
+
+	const uint8_t dlcValue = MessageRam::RxDlc_t::get(rxHeader);
+	// TODO: fd large frames not supported yet
+	//if (rxHeader & MessageRam::RxHeader::FdFrame)
+		//message.setDLC(dlcValue);
+	// else
+	message.setLength(std::min<uint8_t>(8u, dlcValue));
+
+	// required for optimization in MessageRam::readData()
+	static_assert((std::size(decltype(message.data){}) % 4) == 0);
+
+	MessageRam::readData(address, {&message.data[0], message.getLength()});
+	acknowledgeRxFifoRead(fifoIndex, getIndex);
+}
+
+// Internal function to send a CAN message.
+// called by sendMessage and by TX Interrupt.
+bool
+sendMsg(const modm::can::Message& message)
+{
+	using namespace modm::platform;
+
+	if (!Fdcan{{ id }}::isReadyToSend()) {
+		return false;
+	}
+
+	// TODO: for fdcan frame format with bit rate switching set:
+	// (TxFifoHeader::FdFrame | TxFifoHeader::RateSwitching)
+	MessageRam::TxFifoHeader_t txHeader{};
+
+	// TODO: large frame support
+	const uint8_t dlc = std::min<uint8_t>(8, message.getLength());
+	MessageRam::TxDlc_t::set(txHeader, dlc);
+
+	const uint8_t putIndex = retrieveTxFifoPutIndex();
+	const auto commonHeader = MessageRam::headerFromMessage(message);
+	MessageRam::writeTxHeaders(putIndex, commonHeader, txHeader);
+
+	// required for optimization in MessageRam::readData()
+	static_assert((std::size(decltype(message.data){}) % 4) == 0);
+
+	MessageRam::writeData(putIndex, {&message.data[0], message.getLength()});
+
+	// Activate the corresponding transmission request
+	{{ reg }}->TXBAR = (1u << putIndex);
+
+	return true;
+}
+
+}
+
+void
+modm::platform::Fdcan{{ id }}::initializeWithPrescaler(
+		CanBitTimingConfiguration standardTimings,
+		std::optional<CanBitTimingConfiguration> fdDataTimings,
+		uint32_t interruptPriority, Mode startupMode, bool overwriteOnOverrun)
+{
+	Rcc::enable<Peripheral::Fdcan1>();
+
+	EnterInitMode init;
+
+	// Configure nominal bitrate
+	{{ reg }}->NBTP =
+		((standardTimings.sjw - 1) << FDCAN_NBTP_NSJW_Pos) |
+		((standardTimings.bs2 - 1) << FDCAN_NBTP_NTSEG2_Pos) |
+		((standardTimings.bs1 - 1) << FDCAN_NBTP_NTSEG1_Pos) |
+		((standardTimings.prescaler - 1) << FDCAN_NBTP_NBRP_Pos);
+
+	if(fdDataTimings) {
+		// Configure FD mode fast data bitrate
+		const auto& timings = *fdDataTimings;
+		{{ reg }}->DBTP =
+			((timings.sjw - 1) << FDCAN_DBTP_DSJW_Pos) |
+			((timings.bs2 - 1) << FDCAN_DBTP_DTSEG2_Pos) |
+			((timings.bs1 - 1) << FDCAN_DBTP_DTSEG1_Pos) |
+			((timings.prescaler - 1) << FDCAN_DBTP_DBRP_Pos)/* |
+			FDCAN_DBTP_TDC*/; // enable "Transceiver Delay Compensation"
+	}
+
+	// Timestamp: FDCAN internal counter with prescaler=1
+	// In CAN FD mode the internal timestamp counter TCP does not provide a constant time
+	// base due to the different CAN bit times between arbitration phase and data phase.
+	{{ reg }}->TSCC = (1 << FDCAN_TSCC_TSS_Pos);
+
+	configureInterrupts(interruptPriority);
+
+	{{ reg }}->RXGFC = overwriteOnOverrun ? (FDCAN_RXGFC_F1OM | FDCAN_RXGFC_F0OM) : 0;
+
+	// enable all filters, reject non-matching frames
+	{{ reg }}->RXGFC |= FDCAN_RXGFC_LSE | FDCAN_RXGFC_LSS | FDCAN_RXGFC_ANFE | FDCAN_RXGFC_ANFS;
+
+	// Tx buffer: queue mode
+	{{ reg }}->TXBC = FDCAN_TXBC_TFQM;
+
+	// Enable bit rate switching and CANFD frame format
+	if(fdDataTimings) {
+		{{ reg }}->CCCR |= FDCAN_CCCR_BRSE | FDCAN_CCCR_FDOE;
+	} else {
+		{{ reg }}->CCCR &= ~(FDCAN_CCCR_BRSE | FDCAN_CCCR_FDOE);
+	}
+
+	configureMode(startupMode);
+}
+
+// line 0 used as TX and error interrupt
+// generated on finished frame transmission and error state
+MODM_ISR({{ reg }}_IT0)
 {
 %% if options["buffer.tx"] > 0
-	uint32_t mailbox;
-	uint32_t tsr = {{ reg }}->TSR;
-
-	if (tsr & CAN_TSR_RQCP2) {
-		mailbox = 2;
-		{{ reg }}->TSR = CAN_TSR_RQCP2;
-	}
-	else if (tsr & CAN_TSR_RQCP1) {
-		mailbox = 1;
-		{{ reg }}->TSR = CAN_TSR_RQCP1;
-	}
-	else {
-		mailbox = 0;
-		{{ reg }}->TSR = CAN_TSR_RQCP0;
-	}
-
-	if (txQueue.isNotEmpty())
-	{
-		sendMailbox(txQueue.get(), mailbox);
+	if (txQueue.isNotEmpty()) {
+		sendMsg(txQueue.get());
 		txQueue.pop();
 	}
 %% endif
-}
-*/
 
-
-/* FIFO0 Interrupt
- *
- * Generated on a new received message, FIFO0 full condition and Overrun
- * Condition.
- */
-/*
-MODM_ISR({{ reg }}_RX0)
-{
-	if ({{ reg }}->RF0R & CAN_RF0R_FOVR0) {
-		modm::ErrorReport::report(modm::platform::Fdcan{{ id }}_FIFO0_OVERFLOW);
-
-		// release overrun flag & access the next message
-		{{ reg }}->RF0R = CAN_RF0R_FOVR0 | CAN_RF0R_RFOM0;
+	const auto callback = modm::platform::Fdcan{{ id }}::getErrorInterruptCallback();
+	if (callback) {
+		const bool hasErrorInterrupt = ({{ reg }}->IR & (FDCAN_IR_BO | FDCAN_IR_EW | FDCAN_IR_EP));
+		if (hasErrorInterrupt) {
+			callback();
+		}
 	}
+	{{ reg }}->IR = FDCAN_IR_TC | FDCAN_IR_BO | FDCAN_IR_EW | FDCAN_IR_EP;
+}
 
+
+// line 1 used as RX interrupt
+// generated on received frame
+MODM_ISR({{ reg }}_IT1)
+{
 %% if options["buffer.rx"] > 0
 	RxMessage rxMessage;
-	readMailbox(rxMessage.message, 0, &(rxMessage.filter_id));
 
-	// Release FIFO (access the next message)
-	{{ reg }}->RF0R = CAN_RF0R_RFOM0;
+	if (rxFifo0HasMessage()) {
+		readMsg(rxMessage.message, 0, &rxMessage.filter_id, &rxMessage.timestamp);
+		// acknowledge interrupt flag
+		{{ reg }}->IR = FDCAN_IR_RF0N;
 
-	if (!rxQueue.push(rxMessage)) {
-		modm::ErrorReport::report(modm::platform::Fdcan{{ id }}_FIFO0_OVERFLOW);
+		modm_assert_continue_ignore(rxQueue.push(rxMessage), "fdcan.rx.buffer",
+			"CAN receive software buffer overflowed!", {{ id }});
+	}
+
+	if (rxFifo1HasMessage()) {
+		readMsg(rxMessage.message, 1, &rxMessage.filter_id, &rxMessage.timestamp);
+		// acknowledge interrupt flag
+		{{ reg }}->IR = FDCAN_IR_RF1N;
+
+		modm_assert_continue_ignore(rxQueue.push(rxMessage), "fdcan.rx.buffer",
+			"CAN receive software buffer overflowed!", {{ id }});
 	}
 %% endif
 }
-*/
-
-
-/* FIFO1 Interrupt
- *
- * See FIFO0 Interrupt
- */
-/*
-MODM_ISR({{ reg }}_RX1)
-{
-	if ({{ reg }}->RF1R & CAN_RF1R_FOVR1) {
-		modm::ErrorReport::report(modm::platform::Fdcan{{ id }}_FIFO1_OVERFLOW);
-
-		// release overrun flag & access the next message
-		{{ reg }}->RF1R = CAN_RF1R_FOVR1 | CAN_RF1R_RFOM1;
-	}
-
-%% if options["buffer.rx"] > 0
-	RxMessage rxMessage;
-	readMailbox(rxMessage.message, 1, &(rxMessage.filter_id));
-
-	// Release FIFO (access the next message)
-	{{ reg }}->RF1R = CAN_RF1R_RFOM1;
-
-	if (!rxQueue.push(rxMessage)) {
-		modm::ErrorReport::report(modm::platform::Fdcan{{ id }}_FIFO1_OVERFLOW);
-	}
-%% endif
-}
-*/
 
 
 void
 modm::platform::Fdcan{{ id }}::setMode(Mode mode)
 {
-
-	// Enter init mode, stops all FDCAN activities
-	{{ reg }}->CCCR = FDCAN_CCCR_INIT;
-	int deadlockPreventer = 10'000; // max ~10ms
-	while ((({{ reg }}->CCCR & FDCAN_CCCR_INIT) == 0) and (deadlockPreventer-- > 0)) {
-		modm::delayMicroseconds(1);
-		// Wait until the initialization mode is entered.
-	}
-	modm_assert(deadlockPreventer > 0, "can", "setmode", "timeout", {{ id }});
-	{{ reg }}->CCCR |= FDCAN_CCCR_CCE | FDCAN_CCCR_TEST;
-
-	_setMode(mode);
-
-	// Switch back to normal operation
-	{{ reg }}->CCCR &= ~FDCAN_CCCR_INIT;
+	EnterInitMode init;
+	{{ reg }}->CCCR |= FDCAN_CCCR_CCE;
+	configureMode(mode);
 }
 
+
 void
-modm::platform::Fdcan{{ id }}::_setMode(Mode mode)
+modm::platform::Fdcan{{ id }}::configureMode(Mode mode)
 {
 	// Reset all mode register bits
 	{{ reg }}->TEST = 0;
@@ -331,6 +312,34 @@ modm::platform::Fdcan{{ id }}::_setMode(Mode mode)
 
 
 void
+modm::platform::Fdcan{{ id }}::configureInterrupts(uint32_t interruptPriority)
+{
+	NVIC_SetPriority({{ reg }}_IT0_IRQn, interruptPriority);
+	NVIC_SetPriority({{ reg }}_IT1_IRQn, interruptPriority);
+
+	NVIC_EnableIRQ({{ reg }}_IT0_IRQn);
+	NVIC_EnableIRQ({{ reg }}_IT1_IRQn);
+
+	// enable both interrupts lines (0 and 1)
+	{{ reg }}->ILE = FDCAN_ILE_EINT1 | FDCAN_ILE_EINT0;
+	// assign receive interrupts to line 1
+	{{ reg }}->ILS = (FDCAN_ILS_RXFIFO0 | FDCAN_ILS_RXFIFO1);
+
+	{{ reg }}->IE = 0;
+%% if options["buffer.tx"] > 0
+	// enable transmission complete and fifo empty interrupt
+	{{ reg }}->IE |= FDCAN_IE_TCE;
+	// enable TX interrupts for all 3 buffers
+	{{ reg }}->TXBTIE |= FDCAN_TXBTIE_TIE;
+%% endif
+%% if options["buffer.rx"] > 0
+	// enable message receive interrupts for both RX FIFOs
+	{{ reg }}->IE |= (FDCAN_IE_RF0NE | FDCAN_IE_RF1NE);
+%% endif
+}
+
+
+void
 modm::platform::Fdcan{{ id }}::setAutomaticRetransmission(bool retransmission)
 {
 	if (retransmission) {
@@ -349,8 +358,7 @@ modm::platform::Fdcan{{ id }}::isMessageAvailable()
 %% if options["buffer.rx"] > 0
 	return rxQueue.isNotEmpty();
 %% else
-	// Check if there are any messages pending in the receive registers
-	return (({{ reg }}->RXF0S & FDCAN_RXF0S_F0FL_Msk) > 0 || ({{ reg }}->RXF1S & FDCAN_RXF1S_F1FL_Msk) > 0);
+	return rxFifo0HasMessage() || rxFifo1HasMessage();
 %% endif
 }
 
@@ -359,38 +367,29 @@ bool
 modm::platform::Fdcan{{ id }}::getMessage(can::Message& message, uint8_t *filter_id, uint16_t *timestamp)
 {
 %% if options["buffer.rx"] > 0
-	if (rxQueue.isEmpty())
-	{
+	if (rxQueue.isEmpty()) {
 		// no message in the receive buffer
 		return false;
-	}
-	else {
+	} else {
 		auto& rxMessage = rxQueue.get();
-		std::memcpy(&message, &rxMessage.message, sizeof(message));
-		if(filter_id != nullptr) {
+		message = rxMessage.message;
+		if (filter_id != nullptr) {
 			(*filter_id) = rxMessage.filter_id;
 		}
-		if(timestamp != nullptr) {
+		if (timestamp != nullptr) {
 			(*timestamp) = rxMessage.timestamp;
 		}
 		rxQueue.pop();
 		return true;
 	}
 %% else
-	if (({{ reg }}->RXF0S & FDCAN_RXF0S_F0FL_Msk) > 0)
-	{
-		readMsg(message, filter_id, timestamp);
-
-		// Release FIFO (access the next message)
-		{{ reg }}->RF0R = CAN_RF0R_RFOM0;
+	if (rxFifo0HasMessage()) {
+		readMsg(message, 0, filter_id, timestamp);
+		releaseRxFifo0Message();
 		return true;
-	}
-	else if (({{ reg }}->RXF1S & FDCAN_RXF1S_F1FL_Msk) > 0)
-	{
-		readMsg(message, filter_id, timestamp);
-
-		// Release FIFO (access the next message)
-		{{ reg }}->RF1R = CAN_RF1R_RFOM1;
+	} else if (rxFifo1HasMessage()) {
+		readMsg(message, 1, filter_id, timestamp);
+		releaseRxFifo1Message();
 		return true;
 	}
 	return false;
@@ -402,9 +401,9 @@ bool
 modm::platform::Fdcan{{ id }}::isReadyToSend()
 {
 %% if options["buffer.tx"] > 0
-	return txQueue.size() < {{ options["buffer.tx"] }};
+	return txQueue.isNotFull();
 %% else
-	return (({{ reg }}->TXFQS & FDCAN_TXFQS_TFQF) != 0);
+	return isHardwareTxQueueFull();
 %% endif
 }
 
@@ -412,14 +411,9 @@ modm::platform::Fdcan{{ id }}::isReadyToSend()
 bool
 modm::platform::Fdcan{{ id }}::sendMessage(const can::Message& message)
 {
-	// This function is not reentrant. If one of the buffers is not full it
-	// means that the software buffer is empty too. Therefore the buffer
-	// will stay empty and won't be taken by an interrupt.
-	if (({{ reg }}->TXFQS & FDCAN_TXFQS_TFQF) == 0)
-	{
-		// Buffer completely filled at the moment
+	if (isHardwareTxQueueFull()) {
 %% if options["buffer.tx"] > 0
-		if (txQueue.size() < {{ options["buffer.tx"] }}) {
+		if (txQueue.isFull()) {
 			return false;
 		}
 		txQueue.push(message);
@@ -427,8 +421,7 @@ modm::platform::Fdcan{{ id }}::sendMessage(const can::Message& message)
 %% else
 		return false;
 %% endif
-	}
-	else {
+	} else {
 		sendMsg(message);
 		return true;
 	}
@@ -444,7 +437,7 @@ modm::platform::Fdcan{{ id }}::getBusState()
 	else if ({{ reg }}->PSR & FDCAN_PSR_EP) {
 		return BusState::ErrorPassive;
 	}
-	else if ({{ reg }}->PSR & FDCAN_PSR_EP) {
+	else if ({{ reg }}->PSR & FDCAN_PSR_EW) {
 		return BusState::ErrorWarning;
 	}
 	else {
@@ -453,8 +446,144 @@ modm::platform::Fdcan{{ id }}::getBusState()
 }
 
 
-void
-modm::platform::Fdcan{{ id }}::enableStatusChangeInterrupt(uint32_t interruptEnable, uint32_t interruptPriority)
+bool
+modm::platform::Fdcan{{ id }}::setStandardFilter(
+	uint8_t standardIndex, FilterConfig config,
+	modm::can::StandardIdentifier id,
+	modm::can::StandardMask mask)
 {
-	// TODO
+	if (standardIndex >= StandardFilterCount) {
+		return false;
+	}
+
+	EnterInitMode init;
+
+	MessageRam::setStandardFilter(standardIndex,
+		MessageRam::FilterType::Classic,
+		config, uint16_t(id), uint16_t(mask));
+
+	return true;
+}
+
+
+bool
+modm::platform::Fdcan{{ id }}::setStandardFilter(
+	uint8_t standardIndex, FilterConfig config,
+	modm::can::StandardIdentifier id0,
+	modm::can::StandardIdentifier id1)
+{
+	if (standardIndex >= StandardFilterCount) {
+		return false;
+	}
+
+	EnterInitMode init;
+
+	MessageRam::setStandardFilter(standardIndex,
+		MessageRam::FilterType::Dual,
+		config, uint16_t(id0), uint16_t(id1));
+
+	return true;
+}
+
+
+bool
+modm::platform::Fdcan{{ id }}::setStandardRangeFilter(
+	uint8_t standardIndex, FilterConfig config,
+	modm::can::StandardIdentifier first,
+	modm::can::StandardIdentifier last)
+{
+	if (standardIndex >= StandardFilterCount) {
+		return false;
+	}
+
+	EnterInitMode init;
+
+	MessageRam::setStandardFilter(standardIndex,
+		MessageRam::FilterType::Range,
+		config, uint16_t(first), uint16_t(last));
+
+	return true;
+}
+
+
+bool
+modm::platform::Fdcan{{ id }}::setExtendedFilter(
+	uint8_t extendedIndex, FilterConfig config,
+	modm::can::ExtendedIdentifier id,
+	modm::can::ExtendedMask mask)
+{
+	if (extendedIndex >= ExtendedFilterCount) {
+		return false;
+	}
+
+	EnterInitMode init;
+
+	MessageRam::setExtendedFilter0(extendedIndex,
+		config, uint32_t(id));
+	MessageRam::setExtendedFilter1(extendedIndex,
+		MessageRam::FilterType::Classic, uint32_t(mask));
+
+	return true;
+}
+
+
+bool
+modm::platform::Fdcan{{ id }}::setExtendedFilter(
+	uint8_t extendedIndex, FilterConfig config,
+	modm::can::ExtendedIdentifier id0,
+	modm::can::ExtendedIdentifier id1)
+{
+	if (extendedIndex >= ExtendedFilterCount) {
+		return false;
+	}
+
+	EnterInitMode init;
+
+	MessageRam::setExtendedFilter0(extendedIndex,
+		config, uint32_t(id0));
+	MessageRam::setExtendedFilter1(extendedIndex,
+		MessageRam::FilterType::Dual, uint32_t(id1));
+
+	return true;
+}
+
+
+bool
+modm::platform::Fdcan{{ id }}::setExtendedRangeFilter(
+	uint8_t extendedIndex, FilterConfig config,
+	modm::can::ExtendedIdentifier first,
+	modm::can::ExtendedIdentifier last)
+{
+	if (extendedIndex >= ExtendedFilterCount) {
+		return false;
+	}
+
+	EnterInitMode init;
+
+	MessageRam::setExtendedFilter0(extendedIndex,
+		config, uint32_t(first));
+	MessageRam::setExtendedFilter1(extendedIndex,
+		MessageRam::FilterType::Range, uint32_t(last));
+
+	return true;
+}
+
+
+void
+modm::platform::Fdcan{{ id }}::clearStandardFilters()
+{
+	EnterInitMode init;
+	for (unsigned i = 0; i < StandardFilterCount; ++i) {
+		MessageRam::setStandardFilterDisabled(i);
+	}
+}
+
+
+void
+modm::platform::Fdcan{{ id }}::clearExtendedFilters()
+{
+	EnterInitMode init;
+	for (unsigned i = 0; i < ExtendedFilterCount; ++i) {
+		MessageRam::setExtendedFilterDisabled(i);
+	}
 }

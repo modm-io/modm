@@ -384,3 +384,35 @@ modm::platform::Rcc::enableSystemClock(SystemClockSource src, uint32_t waitCycle
 
 	return true;
 }
+
+
+%% if target["family"] == "g4"
+bool
+modm::platform::Rcc::setCanPrescaler(CanPrescaler prescaler)
+{
+	enable<Peripheral::Fdcan1>();
+
+	// FDCAN1 must enter initialization mode to configure common divider.
+	// This will stop operation of FDCAN1.
+	// The setting only takes effect after resetting INIT in FDCAN1_CCCR
+	if (FDCAN_CONFIG->CKDIV != uint32_t(prescaler)) {
+		FDCAN1->CCCR = FDCAN_CCCR_INIT;
+
+		// Wait until the initialization mode is entered
+		int deadlockPreventer = 10'000; // max ~10ms
+		while (((FDCAN1->CCCR & FDCAN_CCCR_INIT) == 0) and (deadlockPreventer-- > 0)) {
+			modm::delay_us(1);
+		}
+
+		if(deadlockPreventer == 0) {
+			return false;
+		}
+
+		FDCAN1->CCCR |= FDCAN_CCCR_CCE;
+		FDCAN_CONFIG->CKDIV = uint32_t(prescaler);
+
+		FDCAN1->CCCR &= ~FDCAN_CCCR_INIT;
+	}
+	return true;
+}
+%% endif

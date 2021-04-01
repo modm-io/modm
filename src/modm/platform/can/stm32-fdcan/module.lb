@@ -86,15 +86,5 @@ def prepare(module, options):
     return True
 
 def build(env):
-    pass
-    #device = env[":target"]
-    #driver = device.get_driver("fdcan")
-
-    #properties = device.properties
-    #properties["target"] = device.identifier
-    #properties["driver"] = driver
-
-    #env.substitutions = properties
-    #env.outbasepath = "modm/src/modm/platform/can"
-
-    #env.copy("common.hpp")
+    env.outbasepath = "modm/src/modm/platform/can"
+    env.copy("message_ram.hpp")
