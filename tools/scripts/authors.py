@@ -21,44 +21,57 @@ author_handles = {
     "Andre Gilerson": "AndreGilerson",
     "Antal Szabó": "Sh4rK",
     "Arjun Sarin": None,
+    "Benjamin Carrick": "nesos",
     "Benjamin Weps": "nesos",
     "Carl Treudler": "cajt",
+    "Cerem Cem ASLAN": "ceremcem",
     "Christian Menard": "chrism333",
     "Christoph Rüdi": None,
     "Christopher Durand": "chris-durand",
     "Daniel Krebs": "daniel-k",
     "David Hebbeker": "dhebbeker",
+    "Erik Henriksson": "henrikssn",
     "Fabian Greif": "dergraaf",
+    "Felix Petriconi": "FelixPetriconi",
     "Georgi Grinshpun": "georgi-g",
     "Hans Schily": "RzwoDzwo",
-    "Jörg Hoffmann": "19joho66",
+    "Jacob Schultz Andersen": "jasa",
+    "Jeff McBride": "mcbridejc",
     "Julia Gutheil": None,
+    "Jörg Hoffmann": "19joho66",
+    "Kaelin Laundry": "WasabiFan",
     "Kevin Läufer": "ekiwi",
     "Linas Nikiperavicius": "linasnikis",
     "Lucas Mösch": "lmoesch",
+    "Lukas Güldenstein": "gueldenstone",
     "Marten Junga": "Maju-Ketchup",
     "Martin Esser": "Scabber",
     "Martin Rosekeit": "thundernail",
     "Michael Thies": "mhthies",
+    "Mike Wolfram": "mikewolfram",
     "Nick Sarten": "genbattle",
     "Niclas Rohrer": None,
+    "Nicolai Bruhn": "nicoBruhn",
     "Niklas Hauser": "salkinium",
     "Niklas Meyer": "Zweistein885",
-    "Thomas Figueroa": "OperativeF",
-    "Zawadniak Pedro": "PDR5",
     "Patrick Servello": "patrick--",
+    "Pavel Pletenev": "ASMfreaK",
+    "Philipp Graf": "luxarf",
     "Raphael Lehmann": "rleh",
     "Sascha Schade": "strongly-typed",
     "Sebastian Birke": "se-bi",
     "Sergiy Yevtushenko": "siy",
     "Tarik TIRE": "7Kronos",
+    "Thomas Figueroa": "OperativeF",
+    "Thomas Sommer": "TomSaw",
     "Thorsten Lajewski": "TheTh0r",
     "Tomasz Chyrowicz": "tomchy",
-    "Pavel Pletenev": "ASMfreaK",
+    "Vivien Henry": "lukh",
+    "Zawadniak Pedro": "PDR5",
     "Álan Crístoffer": "acristoffers",
 }
 
-def get_author_log(since = None, until = None, handles = True, count = False):
+def get_author_log(since = None, until = None, handles = False, count = False):
     sl_command = "git shortlog -sn"
     if since is not None:
         sl_command += " --since=\"{}\"".format(since)
@@ -84,7 +97,7 @@ def get_author_log(since = None, until = None, handles = True, count = False):
 
     output = []
     for (commits, author) in commit_tuples:
-        out = author
+        out = "- " + author
         if handles and author in author_handles and author_handles[author] is not None:
             out += u" (@{})".format(author_handles[author])
         if count:
@@ -101,22 +114,24 @@ if __name__ == "__main__":
                         help="adds and sorts authors by commit count")
     parser.add_argument("--shoutout", dest="with_shoutout", action="store_true",
                         help="annotates first time contributers")
-    parser.add_argument("--since", dest="since",
-                        help="evaluates the git history from this date until present")
+    parser.add_argument("--since", dest="since", default=None,
+                        help="evaluates the git history from this date")
+    parser.add_argument("--until", dest="until", default=None,
+                        help="evaluates the git history until this date")
 
     args = parser.parse_args()
-    since_date = args.since if args.since else None
-    log_authors = get_author_log(since=since_date, handles=args.with_handles, count=args.with_count)
+    log_authors = get_author_log(since=args.since, until=args.until,
+                                 handles=args.with_handles, count=args.with_count)
 
     new_authors = []
-    if args.with_shoutout and since_date:
-        previous_authors = get_author_log(until=since_date, handles=False, count=False)
-        new_authors = get_author_log(since=since_date, handles=False, count=False)
+    if args.with_shoutout and args.since:
+        previous_authors = get_author_log(until=args.since)
+        new_authors = get_author_log(since=args.since, until=args.until)
         new_authors = [a for a in new_authors if a not in previous_authors]
 
     authors = []
     for author in log_authors:
         if any(a in author for a in new_authors):
-            author += u" 🎉🎊"
+            author += u" 🎉"
         authors.append(author)
     print("\n".join(authors))

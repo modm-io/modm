@@ -19,8 +19,7 @@ process that you can fine-tune to your needs.
 - Our CI checks every contribution for regressions.
 - We care [about testing modm][testing].
 - [API reference is available here][api-docs].
-
-<!-- - [Check out our latest quarterly release][releases] with a [beautiful changelog][changelog]. -->
+- [We do quarterly releases][releases] with a [curated changelog][changelog].
 
 This project also has a [technical blog][blog] to document larger design concepts.
 
@@ -605,8 +604,12 @@ Fabian Greif ([\@dergraaf](https://github.com/dergraaf)),
 Kevin Läufer ([\@ekiwi](https://github.com/ekiwi)),
 Martin Rosekeit ([\@thundernail](https://github.com/thundernail)),
 Daniel Krebs ([\@daniel-k](https://github.com/daniel-k)),
-Georgi Grinshpun ([\@georgi-g](https://github.com/georgi-g))
-and <!--authorcount-->33<!--/authorcount-->  more contributors.
+Georgi Grinshpun ([\@georgi-g](https://github.com/georgi-g)),
+Christopher Durand ([\@chris-durand](https://github.com/chris-durand))
+David Hebbeker ([\@dhebbeker](https://github.com/dhebbeker)),
+Thorsten Lajewski ([\@TheTh0r](https://github.com/TheTh0r)),
+Mike Wolfram ([\@mikewolfram](https://github.com/mikewolfram))
+and [many more contributors][contributors].
 <!--/authors-->
 
 ## Folder structure
@@ -645,8 +648,11 @@ and <!--authorcount-->33<!--/authorcount-->  more contributors.
 <!--/webignore-->
 
 <!--links-->
+
 [blog]:            https://blog.salkinium.com
-[changelog]:       https://github.com/modm-io/modm/tree/develop/docs/CHANGELOG.md
+[changelog]:       https://github.com/modm-io/modm/tree/develop/CHANGELOG.md
+[releases]:        https://github.com/modm-io/modm/releases
+[contributors]:    https://github.com/modm-io/modm/graphs/contributors
 [contrib]:         https://github.com/modm-io/modm/tree/develop/CONTRIBUTING.md
 [eurobot]:         https://www.eurobot.org/
 [examples]:        https://github.com/modm-io/modm/tree/develop/examples
@@ -655,21 +661,11 @@ and <!--authorcount-->33<!--/authorcount-->  more contributors.
 [install]:         https://modm.io/guide/installation
 [issues]:          https://github.com/modm-io/modm/issues
 [prs]:             https://github.com/modm-io/modm/pulls
-[releases]:        https://github.com/modm-io/modm/releases
 [testing]:         https://github.com/modm-io/modm/tree/develop/test/README.md
 [api-docs]:        https://docs.modm.io/
 
 [FreeRTOS]:        https://www.freertos.org
-[FreeRTOS-TCP]:    https://www.freertos.org/FreeRTOS-Plus/FreeRTOS_Plus_TCP/index.html
-[CMSIS]:           https://www.keil.com/pack/doc/CMSIS/General/html/index.html
-[CMSIS-DSP]:       https://www.keil.com/pack/doc/CMSIS/DSP/html/index.html
-[TinyUSB]:         https://github.com/hathach/tinyusb
-[FatFS]:           http://elm-chan.org/fsw/ff/00index_e.html
-[ROSserial]:       https://wiki.ros.org/rosserial
-[CrashCatcher]:    https://github.com/adamgreen/CrashCatcher
-
-[FreeRTOS]:        https://www.freertos.org
-[FreeRTOS-TCP]:    https://www.freertos.org/FreeRTOS-Plus/FreeRTOS_Plus_TCP/index.html
+[FreeRTOS+TCP]:    https://www.freertos.org/FreeRTOS-Plus/FreeRTOS_Plus_TCP/index.html
 [CMSIS]:           https://www.keil.com/pack/doc/CMSIS/General/html/index.html
 [CMSIS-DSP]:       https://www.keil.com/pack/doc/CMSIS/DSP/html/index.html
 [TinyUSB]:         https://github.com/hathach/tinyusb

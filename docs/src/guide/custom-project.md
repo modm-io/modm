@@ -242,7 +242,7 @@ one of our examples and then work your way into your specialization.
     to help you understand what code is pulled in when you generate your library.
 
 
-### Generate, Compile, Upload
+## Generate, Compile and Upload
 
 Once you have your `project.xml` set up, you can call `lbuild build`, which
 generates the target and configuration specific library from modm.

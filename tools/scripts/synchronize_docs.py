@@ -14,6 +14,7 @@ from pathlib import Path
 from jinja2 import Environment
 from os import listdir
 from os.path import isfile, join, abspath
+from collections import defaultdict
 
 TABLE_TEMPLATE = \
 r"""
@@ -93,24 +94,25 @@ def get_lbuild(root, target=None):
     target = {"avr": "atmega2560-16au", "stm32": "stm32f469nih6",
               "hosted": "hosted-linux"}[target]
     builder = lbuild.api.Builder(cwd=root, options=[":target={}".format(target)])
-    builder.load(root / "repo.lb")
+    builder.load(repopath("repo.lb"))
     return builder.parser
 
 
 # All the paths
-root = repopath(".")
-board_path = root / "src/modm/board"
-example_path = root / "examples"
-ignored_path = root / "test/all/ignored.txt"
-examples_readme_in_path = root / "examples/README.md"
-examples_readme_path = root / "docs/src/guide/examples.md"
-readme_path = root / "README.md"
-index_in_path = root / "docs/index.md.in"
-index_path = root / "docs/src/index.md"
-whoweare_in_path = root / "docs/who-we-are.md.in"
-whoweare_path = root / "docs/src/who-we-are.md"
-modules_in_path = root / "docs/modules.md.in"
-modules_path = root / "docs/src/reference/modules.md"
+board_path = repopath("src/modm/board")
+example_path = repopath("examples")
+ignored_path = repopath("test/all/ignored.txt")
+examples_readme_in_path = repopath("examples/README.md")
+examples_readme_path = repopath("docs/src/guide/examples.md")
+readme_path = repopath("README.md")
+index_in_path = repopath("docs/index.md.in")
+index_path = repopath("docs/src/index.md")
+whoweare_in_path = repopath("docs/who-we-are.md.in")
+whoweare_path = repopath("docs/src/who-we-are.md")
+modules_in_path = repopath("docs/modules.md.in")
+modules_path = repopath("docs/src/reference/modules.md")
+changelog_in_paths = repopath("docs/release").glob("20*.md")
+changelog_path = repopath("CHANGELOG.md")
 
 # We cannot use lbuild to enumerate the boards since they only make themselves available for certain devices
 boards = [re.search(r"<module>modm:board:(.*?)</module>", config.read_text()).group(1)
@@ -127,7 +129,7 @@ examples.sort(key=lambda b: b["name"])
 example_table = format_table(examples, 2, "left")
 
 # Get all supported targets
-targets = set(get_lbuild(root).find_option("modm:target").values)
+targets = set(get_lbuild(repopath(".")).find_option("modm:target").values)
 ignored_devices = set(d for d in ignored_path.read_text().strip().splitlines() if "#" not in d)
 targets -= ignored_devices
 avr_count = len([t for t in targets if t.startswith("at")])
@@ -135,13 +137,9 @@ stm_count = len([t for t in targets if t.startswith("stm32")])
 sam_count = len([t for t in targets if t.startswith("sam")])
 all_count = avr_count + stm_count + sam_count
 
-# get the author count
-from authors import author_handles
-author_count = len(author_handles)
-
 # Get all the modules that are available for the STM32
 # Get all drivers, we assume they are available for all devices
-drivers = (get_lbuild(root, t).modules for t in {"avr", "stm32", "hosted"})
+drivers = (get_lbuild(repopath("."), t).modules for t in {"avr", "stm32", "hosted"})
 drivers = {m for mg in drivers for m in mg if m.startswith("modm:driver:")}
 drivers = sorted(m.replace("modm:driver:", "") for m in drivers)
 drivers = [{"name": name(d), "url": driver_url(d)} for d in drivers if name(d)]
@@ -149,7 +147,6 @@ driver_table = format_table(drivers, 6)
 
 # Read the repo README.md and replace these keys
 readme = readme_path.read_text()
-readme = replace(readme, "authorcount", author_count - 7)
 readme = replace(readme, "avrcount", avr_count)
 readme = replace(readme, "samcount", sam_count)
 readme = replace(readme, "stmcount", stm_count)
@@ -172,6 +169,47 @@ whoweare_path.write_text(whoweare)
 
 # Copy the example readme over
 shutil.copy(examples_readme_in_path, examples_readme_path)
+
+# Compose changelog
+crlinks = set()
+cchangelog = "\n\n"
+for path in reversed(sorted(changelog_in_paths)):
+    content = path.read_text()
+    content = re.sub(r"as (`modm:[^:][^ ]+?`)\.\n", r"as [\1][].\n", content)
+    content = re.sub(r"(#\d+)", r"[\1][]", content)
+    content = re.sub(r"(@[\w\d\-_]+)", r"[\1][]", content)
+    content = re.sub(r"-> ([\da-f]{7})", r"-> [\1][]", content)
+    content = re.sub(r"(20[12]\dq[1-4])\.\n", r"[\1][].\n", content)
+    cchangelog += content + "\n\n"
+    crlinks.update(re.findall(r"\[(.*?)\]\[\]", content))
+# Generate appropriate link
+clinks = defaultdict(dict)
+for link in crlinks:
+    if link.startswith("@"): # user handle
+        clinks["@"][link] = "https://github.com/" + link[1:]
+    elif link.startswith("#"): # PR or Issue
+        clinks["#"][link] = "https://github.com/modm-io/modm/pull/" + link[1:]
+    elif link.startswith("`"): # lbuild module
+        clinks["`"][link] = "https://modm.io/reference/module/" + \
+                link[1:-1].replace(".", "-").replace(":", "-")
+    elif link.startswith("20") and len(link) == 6: # Release tag
+        clinks["r"][link] = "https://github.com/modm-io/modm/releases/tag/" + link
+    elif len(link) == 7: # Commit
+        clinks["c"][link] = "https://github.com/modm-io/modm/commit/" + link
+    else:
+        print("Unknown changelog link:", link)
+# Format the links
+links = ""
+links += "\n\n" + "\n".join(sorted("[{}]: {}".format(name, url) for name, url in clinks["r"].items()))
+links += "\n\n" + "\n".join(sorted("[{}]: {}".format(name, url) for name, url in clinks["@"].items()))
+links += "\n\n" + "\n".join(sorted("[{}]: {}".format(name, url) for name, url in clinks["`"].items()))
+links += "\n\n" + "\n".join(sorted("[{}]: {}".format(name, url) for name, url in clinks["#"].items()))
+links += "\n\n" + "\n".join(sorted("[{}]: {}".format(name, url) for name, url in clinks["c"].items()))
+# Format the changelog file
+changelog = changelog_path.read_text()
+changelog = replace(changelog, "releases", cchangelog)
+changelog = replace(changelog, "links", links + "\n\n")
+changelog_path.write_text(changelog)
 
 # Check git differences and fail
 if "-d" in sys.argv:
