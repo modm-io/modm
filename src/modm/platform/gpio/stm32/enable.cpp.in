@@ -26,7 +26,7 @@ modm_gpio_enable(void)
 %%	set prefix = "IOP"
 %% elif target["family"] in ["l4", "g4"]
 %%  set clock_tree = 'AHB2'
-%% elif target["family"] in ["g0"]
+%% elif target["family"] in ["g0", "l0"]
 %%  set clock_tree = 'IOP'
 %% endif
 

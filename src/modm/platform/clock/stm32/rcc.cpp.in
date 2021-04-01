@@ -62,12 +62,12 @@ modm::platform::Rcc::enableInternalClock(uint32_t waitCycles)
 	return retval;
 }
 
-%% if target["family"] in ["l1", "l4"]
+%% if target["family"] in ["l0", "l1", "l4"]
 bool
 modm::platform::Rcc::enableMultiSpeedInternalClock(MsiFrequency msi_frequency, uint32_t waitCycles)
 {
 	bool retval;
-%% if target["family"] in ["l1"]
+%% if target["family"] in ["l0", "l1"]
 	RCC->ICSCR = (RCC->ICSCR & ~RCC_ICSCR_MSIRANGE) | static_cast<uint32_t>(msi_frequency);
 	RCC->CR |= RCC_CR_MSION;
 	while (not (retval = (RCC->CR & RCC_CR_MSIRDY)) and --waitCycles)
@@ -114,7 +114,7 @@ bool
 modm::platform::Rcc::enableLowSpeedExternalClock(uint32_t waitCycles)
 {
 	bool retval;
-%% if target["family"] in ["l1"]
+%% if target["family"] in ["l0", "l1"]
 	RCC->CSR |= RCC_CSR_LSEBYP | RCC_CSR_LSEON;
 	while (not (retval = (RCC->CSR & RCC_CSR_LSERDY)) and --waitCycles)
 %% else
@@ -129,7 +129,7 @@ bool
 modm::platform::Rcc::enableLowSpeedExternalCrystal(uint32_t waitCycles)
 {
 	bool retval;
-%% if target["family"] in ["l1"]
+%% if target["family"] in ["l0", "l1"]
 	RCC->CSR = (RCC->CSR & ~RCC_CSR_LSEBYP) | RCC_CSR_LSEON;
 	while (not (retval = (RCC->CSR & RCC_CSR_LSERDY)) and --waitCycles)
 %% else
@@ -224,7 +224,10 @@ modm::platform::Rcc::enablePll(PllSource source, const PllFactors& pllFactors, u
 
 	return tmp;
 
-%% elif target["family"] in ["l1"]
+%% elif target["family"] in ["l0", "l1"]
+%% if target["family"] == "l0"
+	setHsiPredivider4Enabled(pllFactors.enableHsiPrediv4);
+%% endif
 
 	uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_PLLMUL | RCC_CFGR_PLLSRC | RCC_CFGR_PLLDIV);
 	// PLLSRC source for pll
@@ -349,6 +352,21 @@ modm::platform::Rcc::enableOverdriveMode(uint32_t waitCycles)
 }
 %% endif
 
+%% if target["family"] == "l0"
+bool
+modm::platform::Rcc::setHsiPredivider4Enabled(bool divideBy4, uint32_t waitCycles)
+{
+	const uint32_t enableFlag = divideBy4 ? RCC_CR_HSIDIVEN : 0;
+	RCC->CR = (RCC->CR & ~RCC_CR_HSIDIVEN) | enableFlag;
+
+	while (isHsiPredivider4Active() != divideBy4) {
+		if (waitCycles-- == 0) {
+			return false;
+		}
+	}
+	return true;
+}
+%% endif
 
 // ----------------------------------------------------------------------------
 bool
