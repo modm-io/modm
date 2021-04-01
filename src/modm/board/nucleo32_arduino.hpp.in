@@ -19,8 +19,13 @@ using D3  = GpioB0;
 using D4  = GpioB7;
 using D5  = GpioB6;
 using D6  = GpioB1;
+%% if has_gpio_c14_c15
+using D7  = GpioC14;
+using D8  = GpioC15;
+%% else
 using D7  = GpioF0;
 using D8  = GpioF1;
+%% endif
 using D9  = GpioA8;
 using D10 = GpioA11;
 using D11 = GpioB5;

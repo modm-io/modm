@@ -1,0 +1,17 @@
+<library>
+  <repositories>
+    <repository>
+      <path>../../../../repo.lb</path>
+    </repository>
+  </repositories>
+
+  <options>
+    <option name="modm:target">stm32l031k6t6</option>
+
+    <option name="modm:platform:uart:2:buffer.tx">256</option>
+    <option name="modm:platform:cortex-m:main_stack_size">1024</option>
+  </options>
+  <modules>
+    <module>modm:board:nucleo-l031k6</module>
+  </modules>
+</library>

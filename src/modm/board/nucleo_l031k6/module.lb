@@ -3,6 +3,7 @@
 #
 # Copyright (c) 2016-2018, Niklas Hauser
 # Copyright (c) 2017, Fabian Greif
+# Copyright (c) 2021, Christopher Durand
 #
 # This file is part of the modm project.
 #
@@ -12,19 +13,19 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = ":board:nucleo-f303k8"
+    module.name = ":board:nucleo-l031k6"
     module.description = """\
-# NUCLEO-F303K8
+# NUCLEO-L031K6
 
-[Nucleo kit for STM32F303K8](https://www.st.com/en/evaluation-tools/nucleo-f303k8.html)
+[Nucleo kit for STM32L031K6](https://www.st.com/en/evaluation-tools/nucleo-l031k6.html)
 """
 
 def prepare(module, options):
-    if not options[":target"].partname.startswith("stm32f303k8t"):
+    if not options[":target"].partname.startswith("stm32l031k6t"):
         return False
 
     module.depends(":platform:core", ":platform:gpio", ":platform:clock", ":platform:uart:2",
-                   ":debug", ":architecture:clock")
+                   ":debug", ":architecture:clock", ":architecture:clock")
     return True
 
 def build(env):
@@ -32,9 +33,12 @@ def build(env):
     env.substitutions = {
         "with_logger": True,
         "with_assert": env.has_module(":architecture:assert"),
-        "has_gpio_c14_c15": False
+        "has_gpio_c14_c15": True
     }
     env.template("../board.cpp.in", "board.cpp")
     env.copy('.')
     env.template("../nucleo32_arduino.hpp.in", "nucleo32_arduino.hpp")
-    env.collect(":build:openocd.source", "board/st_nucleo_f3.cfg");
+
+    env.outbasepath = "modm/openocd/modm/board/"
+    env.copy(repopath("tools/openocd/modm/st_nucleo_l0.cfg"), "st_nucleo_l0.cfg")
+    env.collect(":build:openocd.source", "modm/board/st_nucleo_l0.cfg");
