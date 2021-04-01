@@ -15,9 +15,9 @@
 #ifndef MODM_MONOCHROME_GRAPHIC_DISPLAY_BUFFERED_VERTICAL_HPP
 #define MODM_MONOCHROME_GRAPHIC_DISPLAY_BUFFERED_VERTICAL_HPP
 
-#include "graphic_display.hpp"
-
 #include <stdlib.h>
+
+#include "graphic_display.hpp"
 
 namespace modm
 {
@@ -33,69 +33,65 @@ namespace modm
  * \author	Fabian Greif
  * \ingroup	modm_ui_display
  */
-template <int16_t Width, int16_t Height>
+template<int16_t Width, int16_t Height>
 class MonochromeGraphicDisplayBufferedVertical : public GraphicDisplay
 {
-    // Height must be a multiple of 8
-    static_assert((Height % 8) == 0, "height must be a multiple of 8");
+	// Height must be a multiple of 8
+	static_assert((Height % 8) == 0, "height must be a multiple of 8");
 
-    static_assert(Width > 0, "width must be greater than 0");
-    static_assert(Height > 0, "height must be greater than 0");
+	static_assert(Width > 0, "width must be greater than 0");
+	static_assert(Height > 0, "height must be greater than 0");
 
 public:
-    static constexpr int16_t displayBufferWidth = Width;
-    static constexpr int16_t displayBufferHeight = Height / 8;
+	static constexpr int16_t displayBufferWidth = Width;
+	static constexpr int16_t displayBufferHeight = Height / 8;
 
-    MonochromeGraphicDisplayBufferedVertical() { this->setColor(glcd::Color::black()); }
+	virtual ~MonochromeGraphicDisplayBufferedVertical() = default;
 
-    virtual ~MonochromeGraphicDisplayBufferedVertical() = default;
+	virtual inline uint16_t
+	getWidth() const override
+	{
+		return Width;
+	}
 
-    virtual inline uint16_t
-    getWidth() const override
-    {
-        return Width;
-    }
+	virtual inline uint16_t
+	getHeight() const override
+	{
+		return Height;
+	}
 
-    virtual inline uint16_t
-    getHeight() const override
-    {
-        return Height;
-    }
+	/**
+	 * \brief	Clear the complete screen
+	 *
+	 * Use fillRectangle() to clear certain areas of the screen.
+	 */
+	virtual void
+	clear() override;
 
-    /**
-     * \brief	Clear the complete screen
-     *
-     * Use fillRectangle() to clear certain areas of the screen.
-     */
-    virtual void
-    clear() override;
-
-    // Faster version adapted for the RAM buffer
-    virtual void
-    drawImageRaw(glcd::Point upperLeft,
-                 uint16_t width,
-                 uint16_t height,
-                 modm::accessor::Flash<uint8_t> data) override;
+	// Faster version adapted for the RAM buffer
+	virtual void
+	drawImageRaw(glcd::Point upperLeft, uint16_t width, uint16_t height,
+				 modm::accessor::Flash<uint8_t> data) override;
 
 protected:
-    // Faster version adapted for the RAM buffer
-    virtual void
-    drawHorizontalLine(glcd::Point start, uint16_t length) override;
+	// Faster version adapted for the RAM buffer
+	virtual void
+	drawHorizontalLine(glcd::Point start, uint16_t length) override;
 
-    // TODO Faster version adapted for the RAM buffer
-    // virtual void
-    // drawVerticalLine(glcd::Point start, uint8_t length);
+	// TODO Faster version adapted for the RAM buffer
+	// virtual void
+	// drawVerticalLine(glcd::Point start, uint8_t length);
 
-    virtual void
-    setPixel(int16_t x, int16_t y) override;
+	virtual void
+	setPixel(int16_t x, int16_t y) override;
 
-    virtual void
-    clearPixel(int16_t x, int16_t y) override;
+	virtual void
+	clearPixel(int16_t x, int16_t y) override;
 
-    virtual bool
-    getPixel(int16_t x, int16_t y) override;
-
-    uint8_t display_buffer[displayBufferWidth][displayBufferHeight];
+	virtual bool
+	getPixel(int16_t x, int16_t y) override;
+    
+	uint8_t display_buffer[displayBufferWidth][displayBufferHeight];
 };
 }  // namespace modm
 

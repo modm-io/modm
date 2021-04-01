@@ -15,7 +15,7 @@
 #include <modm/architecture/interface/register.hpp>
 #include <modm/math/utils/endianness.hpp>
 #include <modm/platform/gpio/base.hpp>
-#include <modm/ui/display/graphic_display.hpp>
+#include <modm/ui/display/colored_graphic_display.hpp>
 
 namespace modm
 {

@@ -12,7 +12,7 @@
 
 #include "virtual_graphic_display.hpp"
 
-modm::VirtualGraphicDisplay::VirtualGraphicDisplay(modm::GraphicDisplay* display,
+modm::VirtualGraphicDisplay::VirtualGraphicDisplay(modm::ColoredGraphicDisplay* display,
 		modm::glcd::Point leftUpper, modm::glcd::Point rightLower):
 		display(display), leftUpper(leftUpper), rightLower(rightLower),
 		width(static_cast<uint16_t>(this->rightLower[0] - this->leftUpper[0])),
@@ -21,7 +21,7 @@ modm::VirtualGraphicDisplay::VirtualGraphicDisplay(modm::GraphicDisplay* display
 }
 
 void
-modm::VirtualGraphicDisplay::setDisplay(modm::GraphicDisplay* display)
+modm::VirtualGraphicDisplay::setDisplay(modm::ColoredGraphicDisplay* display)
 {
 	this->display = display;
 	return;

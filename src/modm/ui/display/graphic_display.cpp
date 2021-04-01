@@ -27,35 +27,8 @@ modm::GraphicDisplay::GraphicDisplay() :
 	IOStream(writer),
 	writer(this),
 	draw(&modm::GraphicDisplay::setPixel),
-	foregroundColor(glcd::Color::white()),
-	backgroundColor(glcd::Color::black()),
 	font(modm::accessor::asFlash(modm::font::FixedWidth5x8))
 {
-}
-
-// ----------------------------------------------------------------------------
-void
-modm::GraphicDisplay::setColor(const glcd::Color& newColor)
-{
-//	if (newColor == glcd::Color::black()) {
-//		draw = &modm::GraphicDisplay::clearPixel;
-//	}
-//	else {
-//		draw = &modm::GraphicDisplay::setPixel;
-//	}
-
-	/* When using a multicolor display we don't need clearPixel(), or at least
-	 * not the way it was implemented above. Maybe check if newColor equals
-	 * backgroundColor.
-	 * */
-	draw = &modm::GraphicDisplay::setPixel;
-	this->foregroundColor = newColor;
-}
-
-void
-modm::GraphicDisplay::setBackgroundColor(const glcd::Color& newColor)
-{
-	this->backgroundColor = newColor;
 }
 
 // ----------------------------------------------------------------------------

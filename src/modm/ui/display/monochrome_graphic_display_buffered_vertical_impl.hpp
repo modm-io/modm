@@ -20,6 +20,7 @@ template <int16_t Width, int16_t Height>
 void
 modm::MonochromeGraphicDisplayBufferedVertical<Width, Height>::clear()
 {
+    // OPTIMIZE use memcpy
     for (int_fast16_t y = 0; y < Height / 8; ++y)
     {
         for (int_fast16_t x = 0; x < Width; ++x)
@@ -39,7 +40,8 @@ modm::MonochromeGraphicDisplayBufferedVertical<Width, Height>::drawHorizontalLin
 {
     const int16_t y = start.getY() / 8;
 
-    if (this->foregroundColor == glcd::Color::black())
+    // if (this->foregroundColor == glcd::Color::black())
+    if(true)
     {
         const uint8_t mask = 1 << (start.getY() & 0x07);
         for (int_fast16_t x = start.getX(); x < static_cast<int16_t>(start.getX() + length); ++x)

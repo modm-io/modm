@@ -16,20 +16,20 @@
 #ifndef MODM_VIRTUAL_GRAPHIC_DISPLAY
 #define MODM_VIRTUAL_GRAPHIC_DISPLAY
 
-#include <modm/ui/display/graphic_display.hpp>
+#include <modm/ui/display/colored_graphic_display.hpp>
 
 namespace modm
 {
 	/// @ingroup modm_ui_display
 	class VirtualGraphicDisplay:
-			public modm::GraphicDisplay
+			public modm::ColoredGraphicDisplay
 	{
 	public:
-		VirtualGraphicDisplay(modm::GraphicDisplay* display,
+		VirtualGraphicDisplay(modm::ColoredGraphicDisplay* display,
 				modm::glcd::Point leftUpper, modm::glcd::Point rightLower);
 
 		void
-		setDisplay(modm::GraphicDisplay* display);
+		setDisplay(modm::ColoredGraphicDisplay* display);
 
 		virtual inline uint16_t
 		getWidth() const
@@ -61,7 +61,7 @@ namespace modm
 		getPixel(int16_t x, int16_t y);
 
  	private:
-		modm::GraphicDisplay* display;
+		modm::ColoredGraphicDisplay* display;
 		modm::glcd::Point leftUpper;
 		modm::glcd::Point rightLower;
 		const uint16_t width;
