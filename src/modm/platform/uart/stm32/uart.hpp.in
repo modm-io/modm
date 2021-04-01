@@ -70,6 +70,8 @@ public:
 		{{ hal }}::initialize<SystemClock, baudrate, tolerance>(parity, length);
 %% if buffered
 		{{ hal }}::enableInterruptVector(true, 12);
+%% endif
+%% if options["buffer.rx"]
 		{{ hal }}::enableInterrupt(Interrupt::RxNotEmpty);
 %% endif
 		{{ hal }}::setTransmitterEnable(true);
