@@ -33,8 +33,10 @@ public:
 		CaptureCompare2 = TIM_DIER_CC2DE,
 		CaptureCompare3 = TIM_DIER_CC3DE,
 		CaptureCompare4 = TIM_DIER_CC4DE,
-%% if target.family not in ["l1"]
+%% if target.family not in ["l0", "l1"]
 		COM = TIM_DIER_COMDE,
+%% endif
+%% if target.family not in ["l1"]
 		Trigger = TIM_DIER_TDE,
 %% endif
 	};
@@ -47,7 +49,7 @@ public:
 		CaptureCompare3 = TIM_DIER_CC3IE,
 		CaptureCompare4= TIM_DIER_CC4IE,
 		Trigger = TIM_DIER_TIE,
-%% if target.family not in ["l1"]
+%% if target.family not in ["l0", "l1"]
 		COM = TIM_DIER_COMIE,
 		Break = TIM_DIER_BIE,
 %% endif
@@ -66,7 +68,7 @@ public:
 		Overcapture2 = TIM_SR_CC2OF,
 		Overcapture3 = TIM_SR_CC3OF,
 		Overcapture4 = TIM_SR_CC4OF,
-%% if target.family not in ["l1"]
+%% if target.family not in ["l0", "l1"]
 		COM = TIM_SR_COMIF,
 		Break = TIM_SR_BIF,
 %% endif
@@ -189,7 +191,7 @@ public:
 		Enable = 1,
 	};
 
-%% if target.family not in ["l1"]
+%% if target.family not in ["l0", "l1"]
 	/* Different Resolution Depending on DeadTime[7:5]: */
 	enum class DeadTimeResolution : uint32_t
 	{
@@ -201,7 +203,7 @@ public:
 	};
 %% endif
 
-%% if target.family not in ["l1"]
+%% if target.family not in ["l0", "l1"]
 	enum class OffStateForRunMode : uint32_t
 	{
 		Disable = 0,
