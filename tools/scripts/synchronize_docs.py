@@ -28,11 +28,7 @@ r"""
 
 """
 
-def repopath(path):
-    return (Path(os.path.abspath(__file__)).parents[2] / path)
-
-with open(repopath("tools/scripts/generate_hal_matrix.py")) as hal_tables:
-    exec(hal_tables.read())
+repopath = lambda path: Path(__file__).parents[2] / path
 
 def run(where, command, stdin=None):
     print(command)
@@ -152,7 +148,6 @@ drivers = [{"name": name(d), "url": driver_url(d)} for d in drivers if name(d)]
 driver_table = format_table(drivers, 6)
 
 # Read the repo README.md and replace these keys
-hal_tables = hal_format_tables()
 readme = readme_path.read_text()
 readme = replace(readme, "authorcount", author_count - 7)
 readme = replace(readme, "avrcount", avr_count)
@@ -160,7 +155,6 @@ readme = replace(readme, "samcount", sam_count)
 readme = replace(readme, "stmcount", stm_count)
 readme = replace(readme, "allcount", all_count)
 readme = replace(readme, "bsptable", bsp_table)
-readme = replace(readme, "alltable", hal_tables["all"])
 readme = replace(readme, "drivertable", driver_table)
 readme_path.write_text(readme)
 

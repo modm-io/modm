@@ -9,7 +9,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-import lbuild, re, functools
+import lbuild, re, functools, sys, subprocess
 from collections import defaultdict
 from jinja2 import Environment
 from pathlib import Path
@@ -209,9 +209,23 @@ def hal_format_tables():
 
     return tables
 
-# if __name__ == "__main__":
-#     output = hal_format_tables()
-#     print(output["avr"])
-#     print(output["stm32_all"])
-#     print(output["stm32"])
-#     print(output["sam"])
+
+hal_tables = hal_format_tables()
+readme = repopath("README.md")
+readme.write_text(re.sub(
+        r"<!--alltable-->.*?<!--/alltable-->",
+         "<!--alltable-->{}<!--/alltable-->".format(hal_tables["all"]),
+        readme.read_text(), flags=re.DOTALL | re.MULTILINE))
+
+# Check git differences and fail
+if "-d" in sys.argv:
+    differences = subprocess.run("git diff", shell=True, cwd=repopath("."),
+            stdout=subprocess.PIPE).stdout.decode("utf-8").strip(" \n")
+    if len(differences):
+        subprocess.run("git --no-pager diff", shell=True, cwd=repopath("."))
+        print("\nPlease synchronize the HAL implementation table:\n\n"
+              "    $ python3 tools/scripts/generate_hal_matrix.py\n\n"
+              "and then commit the results!")
+        exit(1)
+
+exit(0)

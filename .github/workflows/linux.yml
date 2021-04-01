@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Update submodules and install lbuild
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
+          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
       - name: Check environment
         run: |
           env
@@ -29,6 +29,25 @@ jobs:
           arm-none-eabi-g++ --version
           which lbuild
           lbuild --version
+      - name: Check for Trailing Whitespace
+        if: always()
+        run: |
+          python3 tools/scripts/rm_whitespace.py
+      - name: Synchronize Documentation
+        if: always()
+        run: |
+          git checkout .
+          python3 tools/scripts/synchronize_docs.py -d
+      - name: Synchronize HAL Support Matrix
+        if: always()
+        run: |
+          git checkout .
+          python3 tools/scripts/generate_hal_matrix.py -d
+      - name: Check Examples
+        if: always()
+        run: |
+          git checkout .
+          python3 tools/scripts/examples_check.py
       - name: Hosted Unittests
         if: always()
         run: |
@@ -57,20 +76,6 @@ jobs:
         run: |
           python3 tools/scripts/authors.py --handles --count --shoutout --since 2017-01-01
           python3 tools/xpcc_generator/builder/system_layout.py examples/xpcc/xml/communication.xml -o /tmp
-      - name: Check for Trailing Whitespace
-        if: always()
-        run: |
-          python3 tools/scripts/rm_whitespace.py
-          git checkout .
-      - name: Synchronize Documentation
-        if: always()
-        run: |
-          python3 tools/scripts/synchronize_docs.py -d
-          git checkout .
-      - name: Check Examples
-        if: always()
-        run: |
-          python3 tools/scripts/examples_check.py
 
   stm32-examples:
     runs-on: ubuntu-20.04
@@ -275,7 +280,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Update submodules and install lbuild
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
+          (git submodule sync && git submodule update --init --jobs 8) & pip3 --upgrade --upgrade-strategy=eager modm & wait
       - name: Test run of docs.modm.io-generator-script
         if: always()
         run: |
