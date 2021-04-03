@@ -202,11 +202,10 @@ void
 Ili9341<Interface, Reset, Backlight, BufferSize>::drawHorizontalLine(
 		glcd::Point start, uint16_t length)
 {
-	auto const fgColor { foregroundColor.getValue() };
+	uint16_t const pixelValue { modm::toBigEndian(foregroundColor.getValue()) };
 	auto minLength { std::min(std::size_t(length), BufferSize) };
 	uint16_t *buffer16 { reinterpret_cast<uint16_t *>(buffer) };
-	for (std::size_t i = 0; i < minLength; ++i)
-		buffer16[i] = modm::toBigEndian(fgColor);
+	std::fill(buffer16, buffer16+minLength, pixelValue);
 
 	BatchHandle h(*this);
 
@@ -224,11 +223,10 @@ void
 Ili9341<Interface, Reset, Backlight, BufferSize>::drawVerticalLine(
 		glcd::Point start, uint16_t length)
 {
-	auto const fgColor { foregroundColor.getValue() };
+	uint16_t const pixelValue { modm::toBigEndian(foregroundColor.getValue()) };
 	auto minLength { std::min(std::size_t(length), BufferSize) };
 	uint16_t *buffer16 { reinterpret_cast<uint16_t *>(buffer) };
-	for (std::size_t i = 0; i < minLength; ++i)
-		buffer16[i] = modm::toBigEndian(fgColor);
+	std::fill(buffer16, buffer16+minLength, pixelValue);
 
 	BatchHandle h(*this);
 
@@ -250,11 +248,10 @@ Ili9341<Interface, Reset, Backlight, BufferSize>::fillRectangle(
 	auto const y { upperLeft.getY() };
 	std::size_t pixelCount { std::size_t(width) * std::size_t(height) };
 
-	auto const fgColor { foregroundColor.getValue() };
+	uint16_t const pixelValue { modm::toBigEndian(foregroundColor.getValue()) };
 	auto minLength { std::min(std::size_t(pixelCount), BufferSize) };
 	uint16_t *buffer16 { reinterpret_cast<uint16_t *>(buffer) };
-	for (std::size_t i = 0; i < minLength; ++i)
-		buffer16[i] = modm::toBigEndian(fgColor);
+	std::fill(buffer16, buffer16+minLength, pixelValue);
 
 	BatchHandle h(*this);
 
@@ -348,6 +345,22 @@ Ili9341<Interface, Reset, Backlight, BufferSize>::drawImageRaw(glcd::Point upper
 		if (bit == 0)
 			bit = 0x01;
 	}
+}
+
+template <class Interface, class Reset, class Backlight, std::size_t BufferSize>
+void
+Ili9341<Interface, Reset, Backlight, BufferSize>::drawRaw(glcd::Point upperLeft,
+		uint16_t width, uint16_t height, glcd::Color* data)
+{
+	BatchHandle h(*this);
+
+	uint16_t* buffer = (uint16_t*)data;
+	for(size_t i = 0; i < size_t(width*height); i++) {
+		buffer[i] = modm::fromBigEndian(buffer[i]);
+	}
+
+	setClipping(upperLeft.getX(), upperLeft.getY(), width, height);
+	this->writeData((uint8_t*)buffer, width * height * 2);
 }
 
 template <class Interface, class Reset, class Backlight, std::size_t BufferSize>

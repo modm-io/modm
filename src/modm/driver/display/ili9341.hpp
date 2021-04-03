@@ -251,6 +251,9 @@ public:
 				 uint16_t width, uint16_t height,
 				 modm::accessor::Flash<uint8_t> data) override;
 
+	virtual void
+	drawRaw(glcd::Point upperLeft, uint16_t width, uint16_t height, glcd::Color* data);
+
 	void
 	setScrollArea(uint16_t topFixedRows, uint16_t bottomFixedRows, uint16_t firstRow);
 	void
