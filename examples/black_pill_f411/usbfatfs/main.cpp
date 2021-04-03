@@ -20,7 +20,7 @@
 If you want to use the sanity check:
 
 	scons bin && \
-	cp ../../../build/stm32f411ceu_mini_f411/usb_fatfs/release/usbfatfs.bin . && \
+	cp ../../../build/black_pill_f411/usb_fatfs/scons-release/usbfatfs.bin . && \
 	echo -n "F411" >> usbfatfs.bin && \
 	crc32 usbfatfs.bin | xxd -r -p - >> usbfatfs.bin && \
 	mv usbfatfs.bin /Volumes/MODM_USB
@@ -28,7 +28,7 @@ If you want to use the sanity check:
 Otherwise just copy the file as is and `#define WITH_SANITY_CHECK 0`
 
 	scons bin && \
-	cp ../../../build/stm32f411ceu_mini_f411/usb_fatfs/release/usbfatfs.bin /Volumes/MODM_USB
+	cp ../../../build/black_pill_f411/usb_fatfs/scons-release/usbfatfs.bin /Volumes/MODM_USB
 
 */
 
