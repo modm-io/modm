@@ -330,7 +330,7 @@ if __name__ == "__main__":
 
     print("\nWriting module table")
     config_path = Path(repopath("docs/mkdocs.yml"))
-    modtable = "\n".join(sorted(modtable))
+    modtable = "\n".join(["    - Modules:"] + sorted(modtable))
     config = config_path.read_text()
     if extract(config, "moduletable") != modtable:
         config = replace(config, "moduletable", modtable)

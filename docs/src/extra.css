@@ -11,3 +11,6 @@
 	width: 100%;
 	height: 100%;
 }
+.md-typeset table:not([class]) th {
+	min-width: 0;
+}

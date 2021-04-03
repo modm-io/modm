@@ -91,7 +91,7 @@ nav:
   - Reference:
     - Documentation: reference/documentation.md
     - Build Systems: reference/build-systems.md
-    - Modules:
 # moduletable
-    # - module: module.md
+    # - Modules:
+    #   - module: module.md
 # /moduletable
