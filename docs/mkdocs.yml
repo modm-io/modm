@@ -21,9 +21,22 @@ theme:
   include_search_page: false
   search_index_only: true
   palette:
-    primary: 'indigo'
-    accent: 'cyan'
-    scheme: preference
+    # Light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: cyan
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    # Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: blue
+      accent: blue
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
   # logo: '../images/logo.svg'
   font:
     text: 'Ubuntu'
