@@ -179,12 +179,15 @@ Writes all fuses onto your target connected to avrdude. See the
 #### scons program-dfu
 
 ```
-scons program-dfu profile={debug|release} [firmware={hash or file}]
+scons program-dfu profile={debug|release} [firmware={hash or file}] [delay={seconds}]
 ```
 
 Writes the executable onto your target via Device Firmware Update (DFU) over USB.
 A DFU bootloader is available on many STM32 microcontrollers
 and can be accessed by pressing the BOOT0-Button during startup.
+
+Some DFU devices require additional delay to re-enumerate, which you can specify
+with the `delay` parameter (default is 5 seconds).
 (\* *only ARM Cortex-M targets*)
 
 ```

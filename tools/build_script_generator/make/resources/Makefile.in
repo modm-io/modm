@@ -87,9 +87,10 @@ program: build
 program-bmp: build
 	@python3 modm/modm_tools/bmp.py -p $(port) $(ELF_FILE)
 
+delay?=5
 .PHONY: program-dfu
 program-dfu: bin
-	@dfu-util -v -E2 -R -i 0 -a 0 -s 0x08000000:leave -D $(BIN_FILE)
+	@dfu-util -v -E$(delay) -R -i 0 -a 0 -s 0x08000000:leave -D $(BIN_FILE)
 
 %% if platform in ["sam"]
 .PHONY: program-bossac

@@ -26,14 +26,14 @@ from SCons.Script import *
 
 # -----------------------------------------------------------------------------
 def program_dfu(env, source, alias='program_dfu'):
-	actionString  = '$DFU_PROGRAMMER -v -E2 -R -i 0 -a 0 -s 0x08000000:leave -D $SOURCE'
+	delay = ARGUMENTS.get("delay", "5")
+	actionString  = 'dfu-util -v -E{} -R -i 0 -a 0 -s 0x08000000:leave -D $SOURCE'.format(delay)
 
 	action = Action(actionString, cmdstr="$PROGRAM_DFU_COMSTR")
 	return env.AlwaysBuild(env.Alias(alias, source, action))
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):
-	env['DFU_PROGRAMMER'] = 'dfu-util'
 	env.AddMethod(program_dfu, 'ProgramDFU')
 
 def exists(env):
