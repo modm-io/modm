@@ -67,27 +67,11 @@ def common_rcc_map(env):
 
     :returns: a 2D-dictionary: `map[PERIPHERAL][TYPE] = REGISTER`
     """
-    device = env[":target"]
-
-    core = device.get_driver("core")["type"]
-    core = core.replace("cortex-m", "").replace("+", "plus").replace("f", "").replace("d", "")
-    core_header = "core_cm{}.h".format(core)
-    core_header = repopath("ext/arm/cmsis/CMSIS/Core/Include", core_header)
-
-    folder = "stm32{}xx".format(device.identifier.family)
-    family_header = folder + ".h"
-    folder = "stm32/{}/Include".format(folder)
-    define = None
-
-    content = Path(localpath(folder, family_header)).read_text(encoding="utf-8", errors="replace")
-    match = re.findall(r"if defined\((?P<define>STM32[F|L|G][\w\d]+)\)", content)
-    define = getDefineForDevice(device.identifier, match)
-    if define is None or match is None:
-        raise ValidateException("No device define found for '{}'!".format(device.partname))
-    device_header = define.lower() + ".h"
+    headers = env.query("headers")
+    core_header = repopath("ext/arm/cmsis/CMSIS/Core/Include", headers["core_header"])
 
     content = ""
-    for header_path in [core_header, localpath(folder, device_header)]:
+    for header_path in [core_header, localpath(bprops["folder"], headers["device_header"])]:
         content += Path(header_path).read_text(encoding="utf-8", errors="replace")
 
     # find mpu and fpu features
@@ -108,16 +92,52 @@ def common_rcc_map(env):
     for (reg, per, typ) in match:
         rcc_map[per][typ] = reg
 
-    bprops.update({
-        "folder": folder,
+    bprops["peripherals"] = peripherals
+    return rcc_map
+
+def common_header_file(env):
+    """
+    Gives information about the STM32 header files. For example the STM32F469:
+
+      - family_define: `STM32F4`
+      - define: `STM32F469xx`
+      - core_header: `core_cm4.h`
+      - system_header: `system_stm32f4xx.h`
+      - family_header: `stm32f4xx.h`
+      - device_header: `stm32f469xx.h`
+
+    :returns: a dictionary with the above keys
+    """
+    device = env[":target"]
+
+    core = device.get_driver("core")["type"]
+    core = core.replace("cortex-m", "").replace("+", "plus").replace("f", "").replace("d", "")
+    core_header = "core_cm{}.h".format(core)
+
+    folder = "stm32{}xx".format(device.identifier.family)
+    family_header = folder + ".h"
+    folder = "stm32/{}/Include".format(folder)
+    define = None
+
+    content = Path(localpath(folder, family_header)).read_text(encoding="utf-8", errors="replace")
+    match = re.findall(r"if defined\((?P<define>STM32[F|L|G][\w\d]+)\)", content)
+    define = getDefineForDevice(device.identifier, match)
+    if define is None or match is None:
+        raise ValidateException("No device define found for '{}'!".format(device.partname))
+    device_header = define.lower() + ".h"
+    family_define = "STM32{}".format(device.identifier.family.upper())
+
+    headers = {
         "define": define,
+        "family_define": family_define,
+        "core_header": core_header,
         "device_header": device_header,
         "family_header": family_header,
         "system_header": "system_" + family_header,
-        "peripherals": peripherals,
-    })
-    return rcc_map
-
+    }
+    bprops.update(headers)
+    bprops["folder"] = folder
+    return headers
 
 # -----------------------------------------------------------------------------
 def init(module):
@@ -131,6 +151,8 @@ def prepare(module, options):
 
     module.add_query(
         EnvironmentQuery(name="rcc-map", factory=common_rcc_map))
+    module.add_query(
+        EnvironmentQuery(name="headers", factory=common_header_file))
 
     module.depends(":cmsis:core")
     return True
@@ -141,12 +163,12 @@ def validate(env):
 def build(env):
     env.collect(":build:path.include", "modm/ext")
     env.collect(":build:path.include", "modm/ext/cmsis/device")
+    env.collect(":build:cppdefines", bprops["family_define"])
 
     env.outbasepath = "modm/ext/cmsis/device"
     env.copy(localpath(bprops["folder"], bprops["device_header"]), bprops["device_header"])
     env.copy(localpath(bprops["folder"], bprops["system_header"]), bprops["system_header"])
-    if env.has_module(":tinyusb"): # Requires the family header
-        env.copy(localpath(bprops["folder"], bprops["family_header"]), bprops["family_header"])
+    env.copy(localpath(bprops["folder"], bprops["family_header"]), bprops["family_header"])
 
     env.substitutions = bprops
     env.substitutions.update({
