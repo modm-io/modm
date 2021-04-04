@@ -13,8 +13,14 @@
 
 #include <modm/platform/device.hpp>
 
+#if __has_include(<tusb_config_local.h>)
+#	include <tusb_config_local.h>
+#endif
+
 %% for name, value in config.items() | sort
-#define {{name}} {{value}}
+#ifndef {{name}}
+#	define {{name}} {{value}}
+#endif
 
 %% endfor
 
