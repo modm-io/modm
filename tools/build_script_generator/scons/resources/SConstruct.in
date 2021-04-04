@@ -29,7 +29,7 @@ env.Alias("library", libraries)
 headers = env.FindHeaderFiles("{{ unittest_source }}")
 sources = [env.UnittestRunner(target="unittest_runner.cpp", source=headers)]
 %% else
-env.Append(CPPPATH=".")
+env.Append(CPPPATH=abspath("."))
 ignored = [".lbuild_cache", env["CONFIG_BUILD_BASE"]] + generated_paths
 sources = []
 %% endif

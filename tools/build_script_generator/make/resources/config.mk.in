@@ -57,6 +57,7 @@ APP_SRC := $(APP_SRC:./%=%)
 %% for repo in generated_paths
 APP_SRC := $(filter-out {{repo}}/%,$(APP_SRC))
 %% endfor
+CPPDEFINES += -I.
 %% if options["::info.git"] != "Disabled"
 %#
 # Git information
