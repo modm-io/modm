@@ -127,6 +127,7 @@ class Can(Module):
         env.outbasepath = "modm/src/modm/architecture"
         env.copy("interface/can.hpp")
         env.copy("interface/can.cpp")
+        env.copy("interface/can_filter.hpp")
         env.copy("interface/can_message.hpp")
 # -----------------------------------------------------------------------------
 
