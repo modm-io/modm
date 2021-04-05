@@ -2,6 +2,7 @@
  * Copyright (c) 2014, Kevin Läufer
  * Copyright (c) 2014-2017, Niklas Hauser
  * Copyright (c) 2020, Mike Wolfram
+ * Copyright (c) 2021, Raphael Lehmann
  *
  * This file is part of the modm project.
  *
@@ -46,8 +47,10 @@ public:
 	{
 		if constexpr (ID == 1)
 			Rcc::enable<Peripheral::Dma1>();
+%% if (dma.instance | length) > 1
 		else
 			Rcc::enable<Peripheral::Dma2>();
+%% endif
 	}
 	/**
 	 * Disable the DMA controller in the RCC
@@ -57,8 +60,10 @@ public:
 	{
 		if constexpr (ID == 1)
 			Rcc::disable<Peripheral::Dma1>();
+%% if (dma.instance | length) > 1
 		else
 			Rcc::disable<Peripheral::Dma2>();
+%% endif
 	}
 
 	/**
@@ -225,6 +230,7 @@ public:
 		{
 			transferComplete = irqHandler;
 		}
+
 		/**
 		 * Set the peripheral that operates the channel
 		 */
@@ -232,9 +238,14 @@ public:
 		static void
 		setPeripheralRequest()
 		{
+%% if dmaType in ["stm32-channel-request"]
 			DMA_Request_TypeDef *DMA_REQ = reinterpret_cast<DMA_Request_TypeDef *>(ControlHal::DMA_CSEL);
 			DMA_REQ->CSELR &= ~(0x0f << (uint32_t(ChannelID) * 4));
 			DMA_REQ->CSELR |= uint32_t(dmaRequest) << (uint32_t(ChannelID) * 4);
+%% else
+			// Nothing to see here. This controller has no request mux, instead
+			// all requests are or-ed together.
+%% endif
 		}
 
 		/**
@@ -349,6 +360,7 @@ public:
  *     ...
  * };
  */
+%% if dmaType in ["stm32-channel-request"]
 %% for channels in dma["channels"]
 	%% for channel in channels.channel
 		%% for request in channel.request
@@ -357,7 +369,7 @@ public:
 				%% if signal.instance is defined
 					%% set peripheral = peripheral ~ signal.instance
 				%% else
-					%% if peripheral not in ["Quadspi", "Aes", "Dcmi"]
+					%% if peripheral in ["Dac", "Lpuart", "Swpmi"] and target["family"] not in ["f1", "f3", "l0", "l1"]
 						%% set peripheral = peripheral ~ 1
 					%% endif
 				%% endif
@@ -375,6 +387,32 @@ struct DmaController<{{ channels.instance }}>::Channel<DmaBase::Channel::Channel
 	%% endfor
 %% endfor
 
+%%else
+%% for channels in dma["channels"]
+	%% for channel in channels.channel
+		%% for signal in channel.signal
+			%% set peripheral = signal.driver.capitalize()
+			%% if signal.instance is defined
+				%% set peripheral = peripheral ~ signal.instance
+			%% else
+				%% if peripheral in ["Dac", "Lpuart", "Swpmi"] and target["family"] not in ["f1", "f3", "l0", "l1"]
+					%% set peripheral = peripheral ~ 1
+				%% endif
+			%% endif
+template <>
+template <>
+template <>
+struct DmaController<{{ channels.instance }}>::Channel<DmaBase::Channel::Channel{{ channel.position }}>::RequestMapping<Peripheral::{{ peripheral }}{% if signal.name is defined %}, DmaBase::Signal::{{ signal.name.capitalize() }}{% endif %}>
+{
+	using Channel = DmaController<{{ channels.instance }}>::Channel<DmaBase::Channel::Channel{{ channel.position }}>;
+	static constexpr DmaBase::Request Request = DmaBase::Request::Any;
+};
+
+		%% endfor
+	%% endfor
+%% endfor
+
+%%endif
 }	// namespace platform
 
 }	// namespace modm

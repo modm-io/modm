@@ -4,6 +4,7 @@
 # Copyright (c) 2016-2018, Niklas Hauser
 # Copyright (c) 2017, Fabian Greif
 # Copyright (c) 2020, Mike Wolfram
+# Copyright (c) 2021, Raphael Lehmann
 #
 # This file is part of the modm project.
 #
@@ -16,20 +17,53 @@ def init(module):
     module.name = ":platform:dma"
     module.description = "Direct Memory Access (DMA)"
 
+
 def prepare(module, options):
     device = options[":target"]
-    if not device.has_driver("dma:stm32*"):
-        return False
-
-    # FIXME the driver is for L4 only
-    if device.identifier["family"] not in ["l4"]:
-        return False
-    if device.identifier["name"] not in ["12", "22", "31", "32", "33", "42", "43", "51", "52", "62", "75", "76", "86", "96", "A6"]:
-        return False
 
     module.depends(":cmsis:device", ":platform:rcc")
 
-    return True
+    if (not device.has_driver("dma")) or device.get_driver("dma")["type"] not in \
+            [
+            "stm32-channel-request",
+            "stm32-channel",
+    ]:
+        return False
+
+    did = device.identifier
+
+    # Enable DMA for all but some devices...
+
+    if did["family"] in ["f0"]:
+        if did["name"] in ["30", "71", "72", "78", "91", "98"]:
+            # STM32F09x has shared interrupts between DMA1 and DMA2, not supported...
+            return False
+        return True
+
+    if did["family"] in ["f1"]:
+        if did["name"] in ["02", "05", "07"]:
+            return True
+        if did["name"] in ["00", "01", "03"] and did["pin"] in ["r", "v", "z"] and did["size"] in ["c", "d", "e", "f", "g"]:
+            return True
+        return False
+
+    if did["family"] in ["f3"]:
+        if did["name"] in ["73", "78"]:
+            return False
+        if did["name"] in ["02"] and did["pin"] in ["c"] and did["size"] in ["b", "c"]:
+            return False
+        return True
+
+    if did["family"] in ["l0", "l4"]:
+        return True
+
+    if did["family"] in ["l1"]:
+        if did["size"] in ["c"]:
+            return False
+        return True
+
+    return False
+
 
 def build(env):
     device = env[":target"]
@@ -47,16 +81,41 @@ def build(env):
         max_channels = 0
         for channel in channels["channel"]:
             max_channels = channel["position"]
-            for request in channel["request"]:
-                for signal in request["signal"]:
+            if dma["type"] in ["stm32-channel-request"]:
+                for request in channel["request"]:
+                    for signal in request["signal"]:
+                        if "name" in signal:
+                            signal_name = signal["name"].capitalize()
+                            signal_names[signal_name] = 1
+            else:
+                for signal in channel["signal"]:
                     if "name" in signal:
                         signal_name = signal["name"].capitalize()
                         signal_names[signal_name] = 1
         controller.append({"instance": int(channels["instance"]), "channels": int(max_channels)})
 
+    did = device.identifier
+    if (did.family in ['f0'] and did.name == '30' and did.size == 'c') or (did.family in ['f1'] and did.name == '02'):
+        # FIXME: Bug in modm-deviced data: Dma2 does not exist on device.identifier
+        properties["dma"]["instance"].remove('2')
+
     signal_names = sorted(list(set(signal_names)))
+    properties["dmaType"] = dma["type"]
     properties["dmaSignals"] = signal_names
     properties["dmaController"] = controller
+
+    properties["irqList"] = dict()
+    for channels in dma["channels"]:
+        irqs = [v["name"] for v in device.get_driver("core")["vector"]]
+        irqs = [v for v in irqs if v.startswith("DMA" + channels["instance"]) and not "DMA2D" in v]
+        irq_list = list()
+        for irq in irqs:
+            irq_channel_list = []
+            for c in irq.split("Channel",1)[1]:
+                if c.isdigit():
+                    irq_channel_list.append(int(c))
+            irq_list.append(irq_channel_list)
+        properties["irqList"][int(channels["instance"])] = irq_list
 
     env.substitutions = properties
     env.outbasepath = "modm/src/modm/platform/dma"

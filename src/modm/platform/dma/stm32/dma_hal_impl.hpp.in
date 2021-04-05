@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2020, Mike Wolfram
+ * Copyright (c) 2021, Raphael Lehmann
  *
  * This file is part of the modm project.
  *
@@ -23,7 +24,7 @@ modm::platform::DmaChannelHal<ChannelID, CHANNEL_BASE>::start()
 
 %% if target["family"] == "f4"
 	Base->CR |= DMA_SxCR_EN;
-%% else
+%% elif dmaType in ["stm32-channel-request", "stm32-channel"]
 	Base->CCR |= DMA_CCR_EN;
 %% endif
 }
@@ -37,7 +38,7 @@ modm::platform::DmaChannelHal<ChannelID, CHANNEL_BASE>::stop()
 %% if target["family"] == "f4"
 	Base->CR &= ~DMA_SxCR_EN;
 	while (Base->SCR & DMA_SxCR_EN); // wait for stream to be stopped
-%% else
+%% elif dmaType in ["stm32-channel-request", "stm32-channel"]
 	Base->CCR &= ~DMA_CCR_EN;
 	while (Base->CCR & DMA_CCR_EN); // wait for stream to be stopped
 %% endif
@@ -52,7 +53,7 @@ modm::platform::DmaChannelHal<ChannelID, CHANNEL_BASE>::getDataTransferDirection
 	return static_cast<DataTransferDirection>(
 %% if target["family"] == "f4"
 		Base->CR & (DMA_SxCR_DIR_0 | DMA_SxCR_DIR_1));
-%% else
+%% elif dmaType in ["stm32-channel-request", "stm32-channel"]
 		Base->CCR & (DMA_CCR_MEM2MEM | DMA_CCR_DIR));
 %% endif
 }

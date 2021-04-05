@@ -11,16 +11,19 @@
 
 #include "dma.hpp"
 
-%% for channels in dma["channels"]
-/*
- * IRQ handler for DMA{{ channels.instance }}
- */
-%% for channel in channels.channel
+using namespace modm::platform;
 
-MODM_ISR(DMA{{ channels.instance }}_Channel{{ channel.position }})
+%% for instance, irqs in irqList.items()
+/*
+ * IRQ handler for DMA{{ instance }}
+ */
+%% for channels in irqs
+
+MODM_ISR(DMA{{ instance }}_Channel{{ channels | join("_") }})
 {
-	using namespace modm::platform;
-	Dma{{ channels.instance }}::Channel<DmaBase::Channel::Channel{{ channel.position }}>::interruptHandler();
+	%% for channel in channels
+	Dma{{ instance }}::Channel<DmaBase::Channel::Channel{{ channel }}>::interruptHandler();
+	%% endfor
 }
 
 %% endfor

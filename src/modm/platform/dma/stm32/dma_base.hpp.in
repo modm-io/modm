@@ -2,6 +2,7 @@
  * Copyright (c) 2014, Kevin Läufer
  * Copyright (c) 2014-2017, Niklas Hauser
  * Copyright (c) 2020, Mike Wolfram
+ * Copyright (c) 2021, Raphael Lehmann
  *
  * This file is part of the modm project.
  *
@@ -15,6 +16,8 @@
 #define MODM_STM32_DMA_BASE_HPP
 
 #include <stdint.h>
+#include <cstddef>
+
 #include "../device.hpp"
 
 #include <modm/architecture/interface/assert.hpp>
@@ -23,7 +26,7 @@
 
 %% if target["family"] == "f4"
 	%% set reg_prefix = "DMA_SxCR"
-%% elif target["family"] in ["f3", "l4"]
+%% elif dmaType in ["stm32-channel-request", "stm32-channel"]
 	%% set reg_prefix = "DMA_CCR"
 %% endif
 
@@ -81,7 +84,7 @@ public:
 		Dma 		= 0,
 		Peripheral 	= DMA_SxCR_PFCTRL, ///< the peripheral is the flow controller
 	};
-%% elif target["family"] in ["f3", "l4"]
+%% elif dmaType in ["stm32-channel-request", "stm32-channel"]
 	%% set channel_count = namespace(max_channels = 0)
 	%% for controller in dmaController
 		%% if channel_count.max_channels < controller.channels
@@ -96,7 +99,7 @@ public:
 	%% endfor
 	};
 
-	%% if target["family"] == "l4"
+	%% if dmaType in ["stm32-channel-request"]
 	%% set request_count = namespace(max_requests = 0)
 	%% for channels in dma["channels"]
 		%% for channel in channels.channel
@@ -113,6 +116,14 @@ public:
 	%% for request in range(0, request_count.max_requests + 1)
 		Request{{ request }}{% if request == 0 %} = 0{% endif %},
 	%% endfor
+	};
+	%% else
+	enum class
+	Request
+	{
+		// Nothing to see here. This controller has no request mux, instead
+		// all requests are OR-ed together.
+		Any
 	};
 	%% endif
 %% endif
@@ -181,7 +192,7 @@ public:
 		MemoryToPeripheral 	= DMA_SxCR_DIR_0,
 		/// Source: DMA_SxPAR; Sink: DMA_SxM0AR
 		MemoryToMemory 		= DMA_SxCR_DIR_1,
-%% elif target["family"] in ["f3", "l4"]
+%% elif dmaType in ["stm32-channel-request", "stm32-channel"]
 		/// Source: DMA_CPARx; Sink: DMA_CMARx
 		PeripheralToMemory 	= 0,
 		/// Source: DMA_CMARx; Sink: DMA_CPARx
@@ -219,7 +230,7 @@ protected:
 			DMA_SxCR_PL_1    | DMA_SxCR_PL_0    |						// Priority
 			DMA_SxCR_CIRC    |											// CircularMode
 			DMA_SxCR_PFCTRL;											// FlowControl
-%% elif target["family"] in ["f3", "l4"]
+%% elif dmaType in ["stm32-channel-request", "stm32-channel"]
 	static constexpr uint32_t memoryMask =
 			DMA_CCR_MSIZE_0  | DMA_CCR_MSIZE_1  |	// MemoryDataSize
 			DMA_CCR_MINC                        |	// MemoryIncrementMode
@@ -248,13 +259,15 @@ protected:
 	struct Nvic;
 };
 
-%% for channels in dma["channels"]
+%% for instance, irqs in irqList.items()
 template <>
-struct DmaBase::Nvic<{{ channels.instance }}>
+struct DmaBase::Nvic<{{ instance }}>
 {
 	static constexpr IRQn_Type DmaIrqs[] {
-	%% for channel in channels.channel
-			DMA{{ channels.instance }}_Channel{{ channel.position }}_IRQn,
+	%% for channels in irqs
+	%% for i in range(channels | length)
+			DMA{{ instance }}_Channel{{ channels | join("_") }}_IRQn,
+	%% endfor
 	%% endfor
 	};
 };

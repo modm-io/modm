@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2020, Mike Wolfram
+ * Copyright (c) 2021, Raphael Lehmann
  *
  * This file is part of the modm project.
  *
@@ -21,6 +22,7 @@ namespace modm
 
 namespace platform
 {
+
 
 /**
  * Hardware abstraction of DMA controller
@@ -45,11 +47,13 @@ class DmaHal : public DmaBase
 	static constexpr uint32_t getBaseAddress() {
 		if (id == 1)
 			return DMA1_BASE;
+%% if (dma.instance | length) > 1
 		else
 			return DMA2_BASE;
+%% endif
 	}
 	/**
-	 * Get the base address of the DMA channel reigsters
+	 * Get the base address of the DMA channel registers
 	 *
 	 * @tparam id The number of the DMA channel
 	 */
@@ -57,8 +61,10 @@ class DmaHal : public DmaBase
 	static constexpr uint32_t getChannelBaseAddress() {
 		if (id == 1)
 			return DMA1_Channel1_BASE;
+%% if (dma.instance | length) > 1
 		else
 			return DMA2_Channel1_BASE;
+%% endif
 	}
 	/**
 	 * Get the address of the channel selection register
@@ -67,10 +73,18 @@ class DmaHal : public DmaBase
 	 */
 	template <uint32_t id>
 	static constexpr uint32_t getCselAddress() {
+%% if dmaType in ["stm32-channel-request"]
 		if (id == 1)
 			return DMA1_CSELR_BASE;
+%% if (dma.instance | length) > 1
 		else
 			return DMA2_CSELR_BASE;
+%%endif
+%% else
+		// Nothing to see here. This controller has no request mux, instead
+		// all requests are OR-ed together.
+		return 0;
+%% endif
 	}
 
 public:

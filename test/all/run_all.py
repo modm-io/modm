@@ -93,6 +93,7 @@ class CommandException(Exception):
 def run_command(cmdline):
     try:
         cmdline = " ".join(cmdline)
+        print(cmdline)
         p = subprocess.run(cmdline, shell=True, stdout=subprocess.PIPE,
                            stderr=subprocess.PIPE, universal_newlines=True)
         return (p.stdout, p.stderr, p.returncode)
