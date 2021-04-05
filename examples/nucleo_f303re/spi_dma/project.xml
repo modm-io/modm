@@ -1,0 +1,12 @@
+<library>
+  <extends>modm:nucleo-f303re</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_f303re/spi_dma</option>
+  </options>
+  <modules>
+    <module>modm:platform:gpio</module>
+    <module>modm:platform:dma</module>
+    <module>modm:platform:spi:1</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>
