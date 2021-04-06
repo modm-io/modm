@@ -1,0 +1,60 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2021, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":fatfs.petit"
+    module.description = """
+# Petit FatFs: Tiny FAT Filesystem
+
+Petit FatFs is a sub-set of FatFs module for tiny 8-bit microcontrollers. It can
+be incorporated into the tiny microcontrollers with limited memory even if the
+RAM size is less than sector size.
+
+See http://elm-chan.org/fsw/ff/00index_p.html.
+
+
+## Configuration
+
+To configure Petit FatFs for your project, create a `<pffconf_local.h>` file,
+which is included at the *beginning* of the config, thus overwriting the default
+settings. Please see the `modm/ext/fatfs-petit/pffconf.h` file for the available
+configuration options and their default values.
+
+Example `<pffconf_local.h>` configuration:
+
+```c
+// Enable directories: pf_opendir(), pf_readdir()
+#define PF_USE_DIR 1
+
+// Enabling writing: pf_write()
+#define PF_USE_WRITE 1
+
+// Use FAT12 file system
+#define PF_FS_FAT12 1
+#define PF_FS_FAT16 0
+#define PF_FS_FAT32 0
+```
+"""
+
+def prepare(module, options):
+    return True
+
+def build(env):
+    env.collect(":build:path.include", "modm/ext")
+    env.outbasepath = "modm/ext/fatfs-petit"
+
+    env.copy("fatfs/tiny/source/diskio.h", "diskio.h")
+    env.copy("fatfs/tiny/source/pff.h", "pff.h")
+    env.copy("fatfs/tiny/source/pff.c", "pff.c")
+    env.copy("fatfs/tiny/LICENSE.txt", "LICENSE.txt")
+
+    env.copy("pffconf.h")
