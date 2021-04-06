@@ -1,0 +1,16 @@
+<library>
+  <extends>modm:nucleo-l452re</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_l452re/lvgl</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:processing:timer</module>
+    <module>modm:driver:ili9341</module>
+    <module>modm:driver:touch2046</module>
+    <module>modm:platform:spi:1</module>
+    <module>modm:platform:spi:2</module>
+    <module>modm:platform:dma</module>
+    <module>modm:lvgl</module>
+  </modules>
+</library>
