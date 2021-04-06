@@ -13,21 +13,43 @@
 
 def init(module):
     module.name = ":fatfs"
-    module.description = """\
-# FatFs Generic FAT Filesystem Module
+    module.description = """
+# FatFs: FAT Filesystem
+
+FatFs is a generic FAT/exFAT filesystem module for small embedded systems.
 
 See http://elm-chan.org/fsw/ff/00index_e.html.
 
-## Custom Configuration
 
-This module defines a default `ffconf.h` config file. If you need to change a
-configuration setting, then you can define a `ffconf_local.h` file, which
-is included *after* at the end of the config. You must therefore first `#undef`
-the config macros, then redefine them with your options, for example:
+## Configuration
+
+This module generates a `ffconf.h` config file for modm integration with these
+settings:
+
+- `FF_FS_NORTC = 1`: modm does not provide an accurate RTC timekeeping method,
+                     you must implement that yourself.
+- `ff_memalloc`/`ff_memfree`: Forwarded to `malloc` and `free` as implemented by
+                              the `modm:platform:heap` module
+
+To configure FatFs for your project, create a `<ffconf_local.h>` file, which is
+included at the *beginning* of the config, thus overwriting the default
+settings. Please see the `modm/ext/fatfs/ffconf.h` file for the available
+configuration options and their default values.
+
+Example `<ffconf_local.h>` configuration:
 
 ```c
-#undef FF_USE_STRFUNC
-#define FF_USE_STRFUNC 1
+// Enable directory filtering: f_findfirst(), f_findnext()
+#define FF_USE_FIND 1
+
+// Enable Volume Formatting: f_mkfs()
+#define FF_USE_MKFS 1
+
+// Enable Volume Label: f_setlabel(), f_getlabel()
+#define FF_USE_LABEL 1
+
+// Enable tiny sector buffers
+#define FF_FS_TINY 1
 ```
 """
 
