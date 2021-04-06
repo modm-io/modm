@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:disco-f469ni</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/stm32f469_discovery/lvgl</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:processing:timer</module>
+    <module>modm:lvgl</module>
+  </modules>
+</library>
