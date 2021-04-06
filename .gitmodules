@@ -31,3 +31,6 @@
 [submodule "ext/chan/fatfs"]
 	path = ext/chan/fatfs
 	url = https://github.com/modm-ext/fatfs-partial.git
+[submodule "ext/lvgl/lvgl"]
+	path = ext/lvgl/lvgl
+	url = https://github.com/modm-ext/lvgl-partial.git

@@ -1,0 +1,88 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2020, Raphael Lehmann
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":lvgl"
+    module.description = """
+# LVGL graphics library
+
+LVGL is a free and open-source graphics library providing everything you need
+to create embedded GUI with easy-to-use graphical elements, beautiful visual effects
+and low memory footprint.
+
+- https://lvgl.io/
+- https://github.com/lvgl/lvgl
+
+
+## Configuration
+
+LVGL defines defaults for all it's configuration settings, which you can find in
+the [configuration template][conf_template].
+
+This module generates a `lv_conf.h` file to define the options necessary for
+integration with modm which are:
+
+- `LV_MEM_CUSTOM = 1`: Heap is provided by the `modm:platform:heap` module.
+- `LV_TICK_CUSTOM = 1`: Tick is implemented via the `modm:platform:clock` module.
+- `LV_LOG_PRINTF = 0`: logging is redirected to `MODM_LOG_*` if the
+                       `modm:debug` module is included and `LV_USE_LOG = 1`.
+- `typedef int16_t lv_coord_t;`: Hardcoded choice for now.
+
+To add your own configuration you can create a `<lv_conf_local.h>` file which
+will automatically be included at the *beginning* of our `lv_conf.h`.
+
+Example `<lv_conf_local.h>` configuration:
+
+```c
+// Maximal resolutions
+#define LV_HOR_RES_MAX  240
+#define LV_VER_RES_MAX  320
+#define LV_DPI          200
+
+/* Color depth:
+ * - 1:  1 byte per pixel
+ * - 8:  RGB332
+ * - 16: RGB565
+ * - 32: ARGB8888
+ */
+#define LV_COLOR_DEPTH  16
+
+// Enable logging at INFO level
+#define LV_USE_LOG    1
+#define LV_LOG_LEVEL  LV_LOG_LEVEL_INFO
+
+// Disable anti-aliasing
+#define LV_ANTIALIAS  0
+```
+
+[conf_template]: https://github.com/lvgl/lvgl/blob/master/lv_conf_template.h
+"""
+
+def prepare(module, options):
+    module.depends(":architecture:clock")
+    if options[":target"].identifier.platform != "hosted":
+        module.depends(":platform:heap")
+
+    return True
+
+def build(env):
+    env.collect(":build:path.include", "modm/ext/lvgl")
+    env.outbasepath = "modm/ext/lvgl"
+
+    env.copy("lvgl/lvgl.h")
+    env.template("lv_conf.h.in")
+    env.copy("lvgl/src")
+    env.copy("lv_modm_clock.h")
+    env.copy("lv_modm_clock.cpp")
+
+    if env.has_module(":debug"):
+        env.copy("lv_modm_logging.cpp")
