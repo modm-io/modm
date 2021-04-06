@@ -29,10 +29,6 @@ def prepare(module, options):
 
     return True
 
-def validate(env):
-    if (1000 % env.get(":freertos:frequency", 1000) != 0):
-        raise ValidateException("FreeRTOS frequency must cleanly divide 1kHz for modm::Clock!")
-
 def build(env):
     core = env[":target"].get_driver("core")["type"]
     default = 1000 if "m0" in core else 4

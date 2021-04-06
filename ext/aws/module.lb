@@ -71,23 +71,7 @@ the config macros, then redefine them with your options, for example:
 
 def init(module):
     module.name = "freertos"
-    module.description = """\
-# a:FreeRTOS
-
-Amazon FreeRTOS port for modm to be used with via the `modm:processing:rtos` module.
-
-## Custom Configuration
-
-This module defines a default FreeRTOS config. If you need to change a
-configuration setting, then you can define a `FreeRTOSConfigLocal.h` file, which
-is included *after* at the end of the config. You must therefore first `#undef`
-the config macros, then redefine them with your options, for example:
-
-```c
-#undef configCHECK_FOR_STACK_OVERFLOW
-#define configCHECK_FOR_STACK_OVERFLOW 0
-```
-"""
+    module.description = FileReader("freertos.md")
 
 def prepare(module, options):
     device = options[":target"]
@@ -95,17 +79,23 @@ def prepare(module, options):
     if not (core and core["type"].startswith("cortex-m")):
         return False
 
-    module.add_option(
-        NumericOption(
-            name="frequency",
-            description="Context switch frequency in Hz",
-            minimum=1, maximum=1000,
-            default=1000))
+    if "m0" not in core:
+        def validate_frequency(freq):
+            if (1000 % freq > 1):
+                raise ValueError("FreeRTOS frequency must cleanly divide 1kHz for modm::Clock!")
+        module.add_option(
+            NumericOption(
+                name="frequency",
+                description="Context switch frequency in Hz",
+                validate=validate_frequency,
+                minimum=4, maximum=1000,
+                default=1000))
 
     module.depends(
         ":architecture:assert",
         ":cmsis:device",
-        ":platform:clock")
+        ":platform:clock",
+        ":platform:heap")
 
     module.add_submodule(FreeRTOS_TCP())
 
@@ -114,7 +104,10 @@ def prepare(module, options):
 def build(env):
     # Figure out the core and correct path in portable/
     core = env[":target"].get_driver("core")["type"]
-    env.substitutions = {"core": core}
+    env.substitutions = {
+        "core": core,
+        "frequency": env.get("frequency", 1000)
+    }
     path = core.replace("cortex-m", "ARM_CM").replace("+", "").replace("fd", "f").upper()
     path = path.replace("CM7F", "CM7/r0p1") # use subfolder for M7
     path = "freertos/FreeRTOS/Source/portable/GCC/{}".format(path)
