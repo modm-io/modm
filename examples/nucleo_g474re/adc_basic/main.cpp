@@ -22,8 +22,10 @@ main()
 	MODM_LOG_INFO << " running on Nucleo-G474RE" << modm::endl << modm::endl;
 
 	MODM_LOG_INFO << "Configuring ADC ...";
+	// max. ADC clock for STM32G474: 60 MHz
+	// 170 MHz AHB clock / 4 = 42.5 MHz
 	Adc1::initialize(
-		Adc1::ClockMode::SynchronousPrescaler1,
+		Adc1::ClockMode::SynchronousPrescaler4,
 		Adc1::ClockSource::SystemClock,
 		Adc1::Prescaler::Disabled,
 		Adc1::CalibrationMode::SingleEndedInputsMode,
