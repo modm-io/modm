@@ -196,7 +196,7 @@ make log-itm fcpu={HCLK in Hz}
 Configures OpenOCD in tracing mode to output ITM channel 0 on SWO pin and
 displays the serial output stream.
 
-See the `:platform:itm` module for details how to use the ITM as a logging
+See the `modm:platform:itm` module for details how to use the ITM as a logging
 output.
 
 

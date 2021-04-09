@@ -78,7 +78,7 @@ def hal_get_modules():
 
         modules = set()
         # We only care about some modm:platform:* modules here
-        not_interested = {"bitbang", "common", "heap", "clock", "core", "fault", "cortex-m", "uart.spi", "itm"}
+        not_interested = {"bitbang", "common", "heap", "clock", "core", "fault", "cortex-m", "uart.spi", "itm", "rtt"}
         imodules = (m  for (repo, mfile) in mfiles  for m in lbuild.module.load_module_from_file(repo, mfile)
                     if m.available and m.fullname.startswith("modm:platform:") and
                     all(p not in m.fullname for p in not_interested))

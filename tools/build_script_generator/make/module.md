@@ -349,8 +349,32 @@ loop: 60
 loop: 61
 ```
 
-See the `:platform:itm` module for details how to use the ITM as a logging
+See the `modm:platform:itm` module for details how to use the ITM as a logging
 output.
+
+
+#### make log-rtt
+
+```
+make log-rtt [channel={int}]
+```
+
+Configures OpenOCD in RTT mode to output the chosen channel (default 0) via a
+simple telnet client. Disconnect with Ctrl+D.
+(\* *only ARM Cortex-M targets*)
+
+```
+ $ make log-rtt
+Info : rtt: Searching for control block 'modm.rtt.modm'
+Info : rtt: Control block found at 0x20000008
+loop: 57
+loop: 58
+loop: 59
+loop: 60
+loop: 61
+```
+
+See the `modm:platform:rtt` module for details how to use RTT for data transfer.
 
 
 #### make library

@@ -14,7 +14,7 @@ import os
 from SCons.Script import *
 import subprocess
 import tempfile
-from modm_tools.openocd import OpenOcdBackend, log_itm
+from modm_tools.openocd import OpenOcdBackend, log_itm, log_rtt
 
 # -----------------------------------------------------------------------------
 def log_openocd_itm(env, alias="log_openocd_itm"):
@@ -36,8 +36,22 @@ def log_openocd_itm(env, alias="log_openocd_itm"):
     return env.AlwaysBuild(env.Alias(alias, None, action))
 
 # -----------------------------------------------------------------------------
+def log_openocd_rtt(env, alias="log_openocd_rtt"):
+    def run_openocd_rtt(target, source, env):
+        search = map(env.subst, env.Listify(env.get("MODM_OPENOCD_SEARCHDIRS", [])))
+        config = map(env.subst, env.Listify(env.get("MODM_OPENOCD_CONFIGFILES", [])))
+        backend = OpenOcdBackend(config=config, search=search)
+
+        log_rtt(backend, int(ARGUMENTS.get("channel", 0)))
+        return 0
+
+    action = Action(run_openocd_rtt, cmdstr="$RTT_OPENOCD_COMSTR")
+    return env.AlwaysBuild(env.Alias(alias, None, action))
+
+# -----------------------------------------------------------------------------
 def generate(env, **kw):
     env.AddMethod(log_openocd_itm, "LogItmOpenOcd")
+    env.AddMethod(log_openocd_rtt, "LogRttOpenOcd")
 
 def exists(env):
     return env.Detect("openocd") and env.Detect("tail")

@@ -29,10 +29,12 @@ python3 modm/modm_tools/openocd.py -f modm/openocd.cfg --reset
 """
 
 import os
+import time
 import signal
 import tempfile
-import subprocess
 import platform
+import telnetlib
+import subprocess
 if __name__ == "__main__":
     import sys
     sys.path.append(os.path.dirname(os.path.dirname(__file__)))
@@ -114,6 +116,13 @@ def log_itm(backend, fcpu, baudrate=None):
             except KeyboardInterrupt:
                 pass
 
+def log_rtt(backend, channel=0):
+    backend.commands.append("modm_rtt")
+    # Start OpenOCD in the background
+    with bem.Scope(backend) as b:
+        time.sleep(0.5)
+        with telnetlib.Telnet("localhost", 9090+channel) as tn:
+            tn.interact()
 
 # -----------------------------------------------------------------------------
 def program(source, config=None, search=None):
@@ -121,7 +130,7 @@ def program(source, config=None, search=None):
     call(commands=commands, config=config, search=search)
 
 def reset(config=None, search=None):
-    commands = ["init", "reset", "shutdown"]
+    commands = ["reset", "shutdown"]
     call(commands=commands, config=config, search=search)
 
 # -----------------------------------------------------------------------------

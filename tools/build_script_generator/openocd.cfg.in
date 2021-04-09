@@ -22,3 +22,16 @@ proc modm_program { SOURCE } {
 	reset run
 	shutdown
 }
+
+%% if has_rtt
+proc modm_rtt { {POLLING 1} {CHANNELS {{rtt_channels}}} } {
+	rtt setup 0x20000000 {{ram_size}} "modm.rtt.modm"
+	rtt start
+	rtt polling_interval $POLLING
+	for {set i 0} {$i < $CHANNELS} {incr i} {
+		rtt server start [expr {9090 + $i}] $i
+	}
+}
+%% endif
+
+init

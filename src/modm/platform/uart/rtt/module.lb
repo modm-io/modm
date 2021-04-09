@@ -1,0 +1,42 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2021, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":platform:rtt"
+    module.description = FileReader("module.md")
+
+def prepare(module, options):
+    if not options[":target"].has_driver("core:cortex-m*"):
+        return False
+
+    module.add_set_option(
+        NumericOption(name="buffer.tx", description="Transmit buffer sizes",
+            minimum=0, maximum=2**16), default=512)
+    module.add_set_option(
+        NumericOption(name="buffer.rx", description="Receive buffer sizes",
+            minimum=0, maximum=2**16), default=0)
+
+    module.depends(":architecture:uart")
+    return True
+
+def validate(env):
+    if len(env["buffer.tx"]) != len(env["buffer.rx"]):
+        raise ValidateException("There must be the same number of TX buffers as RX buffers!")
+
+def build(env):
+    env.outbasepath = "modm/src/modm/platform/rtt"
+    env.substitutions = {
+        "buffer_tx": env["buffer.tx"],
+        "buffer_rx": env["buffer.rx"],
+    }
+    env.template("rtt.hpp.in")
+    env.template("rtt.cpp.in")

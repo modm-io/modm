@@ -68,6 +68,7 @@ def common_memories(env):
 
       - `memories`: unfiltered memory regions
       - `regions`: memory region names
+      - `cont_ram`: largest continuous internal SRAM section
 
     :returns: dictionary of memory properties
     """
@@ -84,9 +85,19 @@ def common_memories(env):
             m["start"] = int(m["start"], 0)
             m["size"] = int(m["size"], 0)
 
+    # Find largest continuous internal SRAM section
+    cont = []
+    for m in memories:
+        if m["name"].startswith("sram") or m["name"].startswith("ram"):
+            if cont and (cont[-1]["start"] + cont[-1]["size"] == m["start"]):
+                cont[-1]["size"] += m["size"]
+            else:
+                cont.append(dict(m))
+
     properties = {
         "memories": memories,
         "regions": [m["name"] for m in memories],
+        "cont_ram": sorted(cont, key=lambda m: -m["size"])[0],
     }
     return properties
 
@@ -116,6 +127,7 @@ def common_linkerscript(env):
       - `regions`: memory region names
       - `ram_origin`: Lowest SRAM origin address
       - `ram_origin`: Total size of all SRAM regions
+      - `cont_ram`: largest continuous internal SRAM section
 
     :returns: dictionary of linkerscript properties
     """

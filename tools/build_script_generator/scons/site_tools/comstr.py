@@ -132,6 +132,9 @@ def generate(env, **kw):
         env["ITM_OPENOCD_COMSTR"] =      "%s╭───OpenOCD───> %sSingle Wire Viewer\n" \
                                          "%s╰─────SWO────── %s$CONFIG_DEVICE_NAME%s" % install
 
+        env["RTT_OPENOCD_COMSTR"] =      "%s╭───OpenOCD───> %sReal Time Transfer\n" \
+                                         "%s╰─────RTT────── %s$CONFIG_DEVICE_NAME%s" % install
+
         env["PROGRAM_REMOTE_COMSTR"] =   "%s╭────────────── %s$SOURCE\n" \
                                          "%s╰─Rem─OpenOCD─> %s$CONFIG_DEVICE_NAME%s" % install
 

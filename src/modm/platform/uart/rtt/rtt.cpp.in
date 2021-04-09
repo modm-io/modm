@@ -1,0 +1,145 @@
+/*
+ * Copyright (c) 2021, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#include <modm/platform/device.hpp>
+#include "rtt.hpp"
+#include <algorithm>
+
+namespace modm::platform
+{
+
+struct RttBuffer
+{
+	const char* name{nullptr};
+	uint8_t* buffer{nullptr};
+	const uint32_t size{0};
+	volatile uint32_t head{0};
+	volatile uint32_t tail{0};
+	uint32_t flags{0};
+
+	bool write(uint8_t data)
+	{
+		const uint32_t rhead{head};
+		const uint32_t rtail{tail};
+		const uint32_t rhead_next{(rhead + 1) % size};
+		if (not size or rhead_next == rtail) return false;
+		buffer[rhead] = data;
+		head = rhead_next;
+		return true;
+	}
+	bool read(uint8_t &data)
+	{
+		const uint32_t rhead{head};
+		const uint32_t rtail{tail};
+		if (not size or rtail == rhead) return false;
+		data = buffer[rtail];
+		tail = (rtail + 1) % size;
+		return true;
+	}
+	bool isEmpty() const { return (head == tail); }
+	uint32_t getSize() const
+	{
+		const uint32_t rhead{head};
+		const uint32_t rtail{tail};
+		return ((rhead >= rtail) ? 0 : size) + rhead - rtail;
+	}
+} modm_packed;
+
+%% for size in buffer_tx
+%% if size
+static uint8_t tx_data_buffer_{{loop.index0}}[{{size}}];
+%% endif
+%% endfor
+%% for size in buffer_rx
+%% if size
+static uint8_t rx_data_buffer_{{loop.index0}}[{{size}}];
+%% endif
+%% endfor
+%#
+struct RttControlBlock
+{
+	const char identifier[16]{"modm.rtt.modm"};
+	const int32_t tx_buffer_count{ {{ buffer_tx | length }} };
+	const int32_t rx_buffer_count{ {{ buffer_rx | length }} };
+	RttBuffer tx_buffers[{{ buffer_tx | length }}] = {
+%% for size in buffer_tx
+		{"tx{{loop.index0}}", {% if size %}tx_data_buffer_{{loop.index0}}{% else %}nullptr{% endif %}, {{size}} },
+%% endfor
+	};
+	RttBuffer rx_buffers[{{ buffer_rx | length }}] = {
+%% for size in buffer_rx
+		{"rx{{loop.index0}}", {% if size %}rx_data_buffer_{{loop.index0}}{% else %}nullptr{% endif %}, {{size}} },
+%% endfor
+	};
+} modm_packed;
+
+static RttControlBlock rtt_control;
+
+
+Rtt::Rtt(uint8_t channel)
+:	tx_buffer(rtt_control.tx_buffers[std::min<uint8_t>(channel, {{ buffer_tx | length - 1 }})]),
+	rx_buffer(rtt_control.rx_buffers[std::min<uint8_t>(channel, {{ buffer_rx | length - 1 }})])
+{
+}
+
+bool
+Rtt::write(uint8_t data)
+{
+	return tx_buffer.write(data);
+}
+
+std::size_t
+Rtt::write(const uint8_t *data, std::size_t length)
+{
+	std::size_t sent = 0;
+	for (; sent < length; sent++)
+		if (not write(*data++))
+			return sent;
+	return sent;
+}
+
+bool
+Rtt::isWriteFinished()
+{
+	return tx_buffer.isEmpty();
+}
+
+std::size_t
+Rtt::transmitBufferSize()
+{
+	return tx_buffer.getSize();
+}
+
+bool
+Rtt::read(uint8_t& data)
+{
+	return rx_buffer.read(data);
+}
+
+std::size_t
+Rtt::read(uint8_t *data, std::size_t length)
+{
+	uint32_t i = 0;
+	for (; i < length; ++i)
+		if (not rx_buffer.read(*data++))
+			return i;
+	return i;
+}
+
+std::size_t
+Rtt::receiveBufferSize()
+{
+	return rx_buffer.getSize();
+}
+
+
+
+}	// namespace modm::platform

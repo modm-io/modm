@@ -6,6 +6,3 @@ define rerun
   mon reset halt
   c
 end
-
-mon init
-mon poll on

@@ -101,7 +101,7 @@ def build(env):
 
     device = env.query("::device")
     if device["core"].startswith("cortex-m"):
-        tools.update({"size", "log_itm", "artifact", "openocd",
+        tools.update({"size", "log_cortex", "artifact", "openocd",
                      "openocd_remote", "bmp", "crashdebug", "dfu"})
         if device["platform"] in ["sam"]:
             tools.update({"bossac"})

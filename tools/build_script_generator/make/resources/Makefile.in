@@ -135,4 +135,9 @@ fcpu?=0
 .PHONY: log-itm
 log-itm:
 	@python3 modm/modm_tools/log.py itm openocd -f modm/openocd.cfg --fcpu $(fcpu)
+
+channel?=0
+.PHONY: log-rtt
+log-rtt:
+	@python3 modm/modm_tools/log.py rtt openocd -f modm/openocd.cfg --channel $(channel)
 %% endif

@@ -44,8 +44,8 @@ the asynchronous trace stream.
 To log the output to a file called `itm.fifo` you can call the `modm_log_itm`
 command manually.
 
-```
- $ openocd -f "modm/openocd.cfg" -c "modm_log_itm itm.fifo 64000000"
+```sh
+openocd -f modm/openocd.cfg -c "modm_log_itm itm.fifo 64000000"
 ```
 
 You can then either use `tail -f itm.fifo` to display the raw data stream
@@ -62,9 +62,8 @@ terminal
 
 ```
  $ scons log-itm fcpu=64000000
-.----OpenOCD--> Single Wire Viewer
-'------SWO----- stm32f103rbt
-
+╭───OpenOCD───> Single Wire Viewer
+╰─────SWO────── stm32f103rbt
 Hello from the SWO.
 debug
 info

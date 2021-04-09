@@ -43,6 +43,7 @@ def build_target(env, sources):
 	env.Alias("size", env.Size(chosen_program))
 	%% if core.startswith("cortex-m")
 	env.Alias("log-itm", env.LogItmOpenOcd())
+	env.Alias("log-rtt", env.LogRttOpenOcd())
 
 	env.Alias("artifact", env.CacheArtifact(program))
 		%% set artifact = ', "artifact"' if upload_with_artifact else ''

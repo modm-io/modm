@@ -243,6 +243,13 @@ def post_build(env):
         openocd_cfg = env.get(":build:openocd.cfg", "")
         if len(openocd_cfg):
             env.substitutions["openocd_user_path"] = env.relative_outpath(openocd_cfg)
+
+        has_rtt = env.has_module(":platform:rtt")
+        env.substitutions["has_rtt"] = has_rtt
+        if has_rtt:
+            memories = env.query(":platform:cortex-m:linkerscript", {})
+            env.substitutions["ram_size"] = memories.get("cont_ram", {}).get("size", 4096)
+            env.substitutions["rtt_channels"] = len(env.get(":platform:rtt:buffer.tx", []))
         env.template("openocd.cfg.in")
         env.template("openocd_gdbinit.in")
         env.template("gdbinit")
