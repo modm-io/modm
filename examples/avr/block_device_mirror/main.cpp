@@ -20,7 +20,7 @@ using namespace modm::platform;
 
 // Create a new UART object and configure it to a baudrate of 115200
 Uart0 uart;
-modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull > loggerDevice(uart);
+modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull > loggerDevice;
 
 // Set all four logger streams to use the UART
 modm::log::Logger modm::log::debug(loggerDevice);

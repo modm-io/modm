@@ -40,19 +40,18 @@ template< class Device, IOBuffer behavior >
 class IODeviceWrapper : public IODevice
 {
 public:
-	IODeviceWrapper(const Device&) {}
 	IODeviceWrapper() = default;
 	using IODevice::write;
 
 	void
 	write(char c) override
 	{
-		if constexpr (behavior == IOBuffer::DiscardIfFull) {
-			Device::write(static_cast<uint8_t>(c));
+		bool written;
+		do
+		{
+			written = Device::write(uint8_t(c));
 		}
-		else {
-			while(not Device::write(static_cast<uint8_t>(c))) ;
-		}
+		while(behavior == IOBuffer::BlockIfFull and not written);
 	}
 
 	void
@@ -65,6 +64,39 @@ public:
 	read(char& c) override
 	{
 		return Device::read(reinterpret_cast<uint8_t&>(c));
+	}
+};
+
+/// @ingroup modm_io
+template< class Device, IOBuffer behavior >
+class IODeviceObjectWrapper : public IODevice
+{
+	Device &device;
+public:
+	IODeviceObjectWrapper(Device& device) : device{device} {}
+	using IODevice::write;
+
+	void
+	write(char c) override
+	{
+		bool written;
+		do
+		{
+			written = device.write(uint8_t(c));
+		}
+		while(behavior == IOBuffer::BlockIfFull and not written);
+	}
+
+	void
+	flush() override
+	{
+		device.flushWriteBuffer();
+	}
+
+	bool
+	read(char& c) override
+	{
+		return device.read(reinterpret_cast<uint8_t&>(c));
 	}
 };
 
