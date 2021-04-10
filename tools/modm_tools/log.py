@@ -24,7 +24,7 @@ Logging via the SWO trace pin is supported via OpenOCD and the
 `modm:platform:itm` module:
 
 ```sh
-python3 modm/modm_tools/log.py itm openocd -f modm/openocd.cfg -fcpu 64000000
+python3 modm/modm_tools/log.py itm openocd -f modm/openocd.cfg --fcpu 64000000
 ```
 
 (\* *only ARM Cortex-M targets*)
@@ -51,7 +51,7 @@ if __name__ == "__main__":
     # Add backends
     parser_openocd = openocd.add_subparser(subparsers)
     parser_openocd.add_argument(
-            "-fcpu",
+            "--fcpu",
             dest="fcpu",
             required=True,
             type=int,

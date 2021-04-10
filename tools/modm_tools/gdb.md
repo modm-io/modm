@@ -8,7 +8,7 @@ The tool can be called from the command line. Here is a typical use-case using
 the openocd backend with the common configuration files:
 
 ```sh
-python3 modm/modm_tools/gdb.py path/to/project.elf -ui=tui \
+python3 modm/modm_tools/gdb.py path/to/project.elf --ui=tui \
         -x modm/gdbinit -x modm/openocd_gdbinit \
         openocd -f modm/openocd.cfg
 ```
@@ -32,7 +32,7 @@ remote backend with the `--host={ip or hostname}` via the command line:
 
 ```sh
 # Extended-Remote running remotely
-python3 modm/modm_tools/gdb.py path/to/project.elf -x modm/gdbinit -ui=tui \
+python3 modm/modm_tools/gdb.py path/to/project.elf -x modm/gdbinit --ui=tui \
         remote --host 123.45.67.89
 ```
 
@@ -40,11 +40,11 @@ Note that you can use different programmer backends to GDB:
 
 ```sh
 # Black Magic Probe
-python3 modm/modm_tools/gdb.py path/to/project.elf -x modm/gdbinit -ui=tui \
+python3 modm/modm_tools/gdb.py path/to/project.elf -x modm/gdbinit --ui=tui \
         bmp --port /dev/tty.usbserial-123
 
 # CrashDebug for Post-Mortem debugging
-python3 modm/modm_tools/gdb.py path/to/project.elf -x modm/gdbinit -ui=tui \
+python3 modm/modm_tools/gdb.py path/to/project.elf -x modm/gdbinit --ui=tui \
         crashdebug --binary-path modm/ext/crashcatcher/bins --dump coredump.txt
 ```
 
@@ -52,8 +52,8 @@ python3 modm/modm_tools/gdb.py path/to/project.elf -x modm/gdbinit -ui=tui \
 
 Currently two UIs are implemented for debugging:
 
-- `-ui=tui`: Text-based UI in your shell.
-- `-ui=web`: Web-based UI in your browser, based on [gdbgui][].
+- `--ui=tui`: Text-based UI in your shell.
+- `--ui=web`: Web-based UI in your browser, based on [gdbgui][].
 
 
 #### Text UI

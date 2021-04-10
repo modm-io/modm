@@ -60,20 +60,20 @@ ui?=tui
 debug: build
 	@python3 modm/modm_tools/gdb.py -x modm/gdbinit -x modm/openocd_gdbinit \
 			-ex "dir $(dir $(realpath $(dir $(realpath $(shell which arm-none-eabi-gcc)))))" \
-			$(ELF_FILE) -ui=$(ui) \
+			$(ELF_FILE) --ui=$(ui) \
 			openocd -f modm/openocd.cfg
 
 debug-bmp: build
 	@python3 modm/modm_tools/bmp.py -x modm/gdbinit \
-			$(ELF_FILE) -ui=$(ui) \
+			$(ELF_FILE) --ui=$(ui) \
 			bmp -p $(port)
 
 debug-coredump: build
 	@python3 modm/modm_tools/gdb.py -x modm/gdbinit \
-			$(ELF_FILE) -ui=$(ui) \
+			$(ELF_FILE) --ui=$(ui) \
 			crashdebug --binary-path modm/ext/crashcatcher/bins
 
 fcpu?=0
 log-itm:
-	@python3 modm/modm_tools/log.py itm openocd -f modm/openocd.cfg -fcpu $(fcpu)
+	@python3 modm/modm_tools/log.py itm openocd -f modm/openocd.cfg --fcpu $(fcpu)
 %% endif

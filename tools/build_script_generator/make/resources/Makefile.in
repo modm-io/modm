@@ -114,25 +114,25 @@ ui?=tui
 debug: build
 	@python3 modm/modm_tools/gdb.py $(addprefix -x ,$(MODM_GDBINIT)) \
 			$(addprefix -x ,$(MODM_OPENOCD_GDBINIT)) \
-			$(ELF_FILE) -ui=$(ui) \
+			$(ELF_FILE) --ui=$(ui) \
 			openocd $(addprefix -f ,$(MODM_OPENOCD_CONFIGFILES))
 
 .PHONY: debug-bmp
 debug-bmp: build
 	@python3 modm/modm_tools/bmp.py $(addprefix -x ,$(MODM_GDBINIT)) \
-			$(ELF_FILE) -ui=$(ui) \
+			$(ELF_FILE) --ui=$(ui) \
 			bmp -p $(port)
 
 coredump?=coredump.txt
 .PHONY: debug-coredump
 debug-coredump: build
 	@python3 modm/modm_tools/gdb.py $(addprefix -x ,$(MODM_GDBINIT)) \
-			$(ELF_FILE) -ui=$(ui) \
+			$(ELF_FILE) --ui=$(ui) \
 			crashdebug --binary-path modm/ext/crashcatcher/bins \
 			--dump $(coredump)
 
 fcpu?=0
 .PHONY: log-itm
 log-itm:
-	@python3 modm/modm_tools/log.py itm openocd -f modm/openocd.cfg -fcpu $(fcpu)
+	@python3 modm/modm_tools/log.py itm openocd -f modm/openocd.cfg --fcpu $(fcpu)
 %% endif

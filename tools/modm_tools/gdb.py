@@ -83,7 +83,7 @@ if __name__ == "__main__":
             metavar="ELF",
             help="The ELF files to use for debugging.")
     parser.add_argument(
-            "-ui",
+            "--ui",
             dest="ui",
             choices=["tui", "web"],
             help="Use GDB via TUI or GDBGUI.")
