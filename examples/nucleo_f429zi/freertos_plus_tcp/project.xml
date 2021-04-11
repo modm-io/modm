@@ -6,7 +6,6 @@
   <modules>
     <module>modm:processing:rtos</module>
     <module>modm:freertos:tcp</module>
-    <module>modm:platform:heap</module>
     <module>modm:build:scons</module>
   </modules>
 </library>

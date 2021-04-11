@@ -64,3 +64,24 @@ void vPortFree(void *pv)
 		traceFREE(pv, 0);
 	}
 }
+
+%% if with_debug
+#include <modm/debug.hpp>
+
+extern "C" void modm_freertos_printf(char const *fmt, ...);
+void modm_freertos_printf(char const *fmt, ...)
+{
+	va_list va;
+	va_start(va, fmt);
+	MODM_LOG_INFO.vprintf(fmt, va);
+	va_end(va);
+}
+extern "C" void modm_freertos_printf_debug(char const *fmt, ...);
+void modm_freertos_printf_debug(char const *fmt, ...)
+{
+	va_list va;
+	va_start(va, fmt);
+	MODM_LOG_DEBUG.vprintf(fmt, va);
+	va_end(va);
+}
+%% endif

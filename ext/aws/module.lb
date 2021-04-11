@@ -36,27 +36,15 @@ This module implements TCP over Ethernet via the LAN8720A transceiver.
 class FreeRTOS_TCP(Module):
     def init(self, module):
         module.name = "tcp"
-        module.description = """
-# a:FreeRTOS-Plus-TCP
-
-This module defines a default FreeRTOS IP config. If you need to change a
-configuration setting, then you can define a `FreeRTOSConfigIPLocal.h` file, which
-is included *after* at the end of the config. You must therefore first `#undef`
-the config macros, then redefine them with your options, for example:
-
-```c
-#undef ipconfigUSE_DNS
-#define ipconfigUSE_DNS 1
-```
-"""
+        module.description = FileReader("freertos_tcp.md")
 
     def prepare(self, module, options):
         module.add_submodule(FreeRTOS_TCP_LAN8720A())
-        module.depends(":platform:heap")
         return True
 
     def build(self, env):
         env.outbasepath = "modm/ext"
+        env.substitutions = {"with_debug": env.has_module(":debug")}
         env.copy("freertos/FreeRTOS-Plus-TCP", "freertos_plus_tcp",
             ignore=env.ignore_files("portable"))
         env.copy("freertos/FreeRTOS-Plus-TCP/portable/BufferManagement/BufferAllocation_2.c", "freertos_plus_tcp/BufferAllocation_2.c")
@@ -106,7 +94,8 @@ def build(env):
     core = env[":target"].get_driver("core")["type"]
     env.substitutions = {
         "core": core,
-        "frequency": env.get("frequency", 1000)
+        "frequency": env.get("frequency", 1000),
+        "with_debug": env.has_module(":debug")
     }
     path = core.replace("cortex-m", "ARM_CM").replace("+", "").replace("fd", "f").upper()
     path = path.replace("CM7F", "CM7/r0p1") # use subfolder for M7
@@ -114,7 +103,7 @@ def build(env):
 
     env.outbasepath = "modm/ext"
     # Copy our own modm-specific port
-    env.copy("modm_port.cpp", "freertos/modm_port.cpp")
+    env.template("modm_port.cpp.in", "freertos/modm_port.cpp")
     # Copy the entire source folder, minus portable folder and some files.
     env.copy("freertos/FreeRTOS/Source", "freertos",
              ignore=env.ignore_files("*.txt", "*.readme", "portable", "include"))
