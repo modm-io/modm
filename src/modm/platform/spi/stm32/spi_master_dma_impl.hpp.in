@@ -139,13 +139,14 @@ modm::platform::SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(cons
 				break;
 			if (not dmaTransmitComplete and not dmaReceiveComplete)
 				return { modm::rf::Running };
-			if (SpiHal{{ id }}::getInterruptFlags() & SpiBase::InterruptFlag::FifoTxLevel)
-				return { modm::rf::Running };
 			if (SpiHal{{ id }}::getInterruptFlags() & SpiBase::InterruptFlag::Busy)
+				return { modm::rf::Running };
+%% if "fifo" in features
+			if (SpiHal{{ id }}::getInterruptFlags() & SpiBase::InterruptFlag::FifoTxLevel)
 				return { modm::rf::Running };
 			if (SpiHal{{ id }}::getInterruptFlags() & SpiBase::InterruptFlag::FifoRxLevel)
 				return { modm::rf::Running };
-
+%% endif
 			break;
 		}
 
