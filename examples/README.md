@@ -85,7 +85,8 @@ supported development boards:
 [CAN](https://github.com/modm-io/modm/blob/develop/examples/stm32f3_discovery/can/main.cpp),
 [Accelerometer](https://github.com/modm-io/modm/blob/develop/examples/stm32f3_discovery/accelerometer/main.cpp),
 [Gyroscope](https://github.com/modm-io/modm/blob/develop/examples/stm32f3_discovery/rotation/main.cpp),
-[TinyUSB DFU](https://github.com/modm-io/modm/blob/develop/examples/stm32f3_discovery/usb_dfu/main.cpp).
+[TinyUSB DFU](https://github.com/modm-io/modm/blob/develop/examples/stm32f3_discovery/usb_dfu/main.cpp),
+[Logging via RTT](https://github.com/modm-io/modm/blob/develop/examples/stm32f3_discovery/rtt/main.cpp).
 - STM32F4 Discovery:
 [Blinky](https://github.com/modm-io/modm/blob/develop/examples/stm32f4_discovery/blink/main.cpp),
 [CAN](https://github.com/modm-io/modm/blob/develop/examples/stm32f4_discovery/can/main.cpp),

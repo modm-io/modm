@@ -1,0 +1,13 @@
+<library>
+  <extends>modm:disco-f303vc</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/stm32f3_discovery/rtt</option>
+    <option name="modm:platform:rtt:buffer.rx">16</option>
+  </options>
+  <modules>
+    <module>modm:platform:rtt</module>
+    <module>modm:processing:timer</module>
+    <module>modm:build:scons</module>
+    <module>modm:debug</module>
+  </modules>
+</library>
