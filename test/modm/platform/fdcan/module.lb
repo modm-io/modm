@@ -1,0 +1,30 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2021, Christopher Durand
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+
+def init(module):
+    module.name = ":test:platform:fdcan"
+
+def prepare(module, options):
+    target = options[":target"]
+
+    identifier = target.identifier
+    if identifier.platform != "stm32" or identifier.family != "g4":
+        return False
+
+    module.depends(":architecture:delay", ":platform:can:1")
+    return True
+
+def build(env):
+#    env.substitutions = properties
+    env.outbasepath = "modm-test/src/modm-test/platform/fdcan_test"
+    env.copy("fdcan_test.hpp")
+    env.copy("fdcan_test.cpp")

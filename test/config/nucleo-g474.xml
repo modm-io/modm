@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <extends>modm:nucleo-g474re</extends>
+  <options>
+    <option name="modm:build:build.path">../../build/generated-unittest/nucleo-g474/</option>
+    <option name="modm:build:unittest.source">../../build/generated-unittest/nucleo-g474/modm-test</option>
+  </options>
+  <modules>
+    <module>modm:platform:heap</module>
+    <module>modm-test:test:**</module>
+  </modules>
+</library>
