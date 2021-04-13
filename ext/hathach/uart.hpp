@@ -29,6 +29,12 @@ public:
 		return tud_cdc_n_connected(ITF);
 	}
 
+	static inline void
+	flushWriteBuffer()
+	{
+		tud_cdc_n_write_flush(ITF);
+	}
+
 	static inline bool
 	write(uint8_t c)
 	{
@@ -45,22 +51,26 @@ public:
 		return rc;
 	}
 
-	static inline void
-	flushWriteBuffer()
+	static inline bool
+	isWriteFinished()
 	{
-		tud_cdc_n_write_flush(ITF);
+		return not transmitBufferSize();
 	}
 
 	static inline bool
 	read(uint8_t& c)
 	{
-		return tud_cdc_n_read(ITF, &c, sizeof(uint8_t));
+		if (receiveBufferSize())
+			return tud_cdc_n_read(ITF, &c, sizeof(uint8_t));
+		return false;
 	}
 
 	static inline std::size_t
 	read(uint8_t *data, std::size_t length)
 	{
-		return tud_cdc_n_read(ITF, data, length);
+		if (receiveBufferSize())
+			return tud_cdc_n_read(ITF, data, length);
+		return 0;
 	}
 
 	static inline std::size_t
@@ -70,10 +80,36 @@ public:
 	}
 
 	static inline std::size_t
+	discardReceiveBuffer()
+	{
+		const std::size_t rxsize = receiveBufferSize();
+		tud_cdc_n_read_flush(ITF);
+		return rxsize;
+	}
+
+	static inline std::size_t
 	transmitBufferSize()
 	{
 		return tud_cdc_n_write_available(ITF);
 	}
+
+	static inline std::size_t
+	discardTransmitBuffer()
+	{
+		const std::size_t txsize = transmitBufferSize();
+		tud_cdc_n_write_clear(ITF);
+		return txsize;
+	}
+
+	static inline bool
+	hasError()
+	{
+		return false;
+	}
+
+	static inline void
+	clearError()
+	{}
 };
 
 using UsbUart0 = UsbUart<0>;

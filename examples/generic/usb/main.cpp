@@ -46,6 +46,12 @@ int main()
 		tud_task();
 		midi_task();
 
+#if CFG_TUD_CDC
+		// Do a loopback on the CDC
+		if (char input; usb_stream0.get(input), input != modm::IOStream::eof) {
+			usb_stream0 << input;
+		}
+#endif
 		if (tmr.execute())
 		{
 			Leds::toggle();
