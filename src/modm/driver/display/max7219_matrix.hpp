@@ -15,7 +15,7 @@
 
 #include "max7219.hpp"
 
-#include <modm/ui/display/monochrome_graphic_display_buffered_vertical.hpp>
+#include <modm/ui/display/monochrome_graphic_display_vertical.hpp>
 
 namespace modm
 {
@@ -50,7 +50,7 @@ namespace modm
  * @ingroup modm_driver_max7219
  */
 template <typename SPI, typename CS, uint8_t COLUMNS = 1, uint8_t ROWS = 1>
-class Max7219Matrix : public MonochromeGraphicDisplayBufferedVertical<8 * COLUMNS, 8 * ROWS>
+class Max7219Matrix : public MonochromeGraphicDisplayVertical<8 * COLUMNS, 8 * ROWS>
 {
 public:
     virtual ~Max7219Matrix() = default;
@@ -105,7 +105,7 @@ modm::Max7219Matrix<SPI, CS, COLUMNS, ROWS>::update()
             // a group of eight pixels vertical
             for (uint8_t row = 0; row < ROWS; ++row)
             {
-                buf[idx] = this->display_buffer[col * 8 + ledCol][row];
+                buf[idx] = this->buffer[col * 8 + ledCol][row];
                 ++idx;
             }
         }

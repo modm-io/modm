@@ -60,9 +60,9 @@ modm::Ssd1306<I2cMaster, Height>::startWriteDisplay()
 	RF_BEGIN();
 
 	RF_WAIT_UNTIL(
-	    this->transaction.configureDisplayWrite(this->display_buffer,
-                                                (this->displayBufferWidth * this->displayBufferHeight))
-	              and this->startTransaction());
+	    this->transaction.configureDisplayWrite(
+			this->buffer,
+			this->getBufferWidth() * this->getBufferHeight()) and this->startTransaction());
 
 	RF_END();
 }
@@ -82,14 +82,14 @@ modm::Ssd1306<I2cMaster, Height>::writeDisplay()
 
 template < class I2cMaster, uint8_t Height >
 modm::ResumableResult<bool>
-modm::Ssd1306<I2cMaster, Height>::setRotation(Rotation rotation)
+modm::Ssd1306<I2cMaster, Height>::setOrientation(glcd::Orientation orientation)
 {
 	RF_BEGIN();
 
-	if ( RF_CALL(writeCommand((rotation == Rotation::Normal) ?
+	if ( RF_CALL(writeCommand((orientation == glcd::Orientation::Landscape0) ?
 			Command::SetSegmentRemap127 : Command::SetSegmentRemap0)) )
 	{
-		RF_RETURN_CALL(writeCommand((rotation == Rotation::Normal) ?
+		RF_RETURN_CALL(writeCommand((orientation == glcd::Orientation::Landscape0) ?
 				Command::SetComOutputScanDirectionDecrement : Command::SetComOutputScanDirectionIncrement));
 	}
 

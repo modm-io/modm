@@ -16,7 +16,7 @@
 #define MODM_NOKIA6610_HPP
 
 #include <modm/architecture/interface/delay.hpp>
-#include <modm/ui/display/monochrome_graphic_display_buffered_vertical.hpp>
+#include <modm/ui/display/monochrome_graphic_display_vertical.hpp>
 
 namespace modm
 {
@@ -33,7 +33,7 @@ namespace modm
 	 * \ingroup	modm_driver_nokia6610
 	 */
 	template <typename SPI, typename CS, typename Reset, bool GE12>
-	class Nokia6610 : public MonochromeGraphicDisplayBufferedVertical<130, 128>
+	class Nokia6610 : public MonochromeGraphicDisplayVertical<130, 128>
 	{
 	public:
 		void

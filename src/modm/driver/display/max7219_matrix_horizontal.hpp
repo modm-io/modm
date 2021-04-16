@@ -12,7 +12,7 @@
 #define MODM_MAX7219_MATRIX_HORIZONTAL_HPP
 
 #include <modm/driver/display/max7219.hpp>
-#include <modm/ui/display/monochrome_graphic_display_buffered_horizontal.hpp>
+#include <modm/ui/display/monochrome_graphic_display_horizontal.hpp>
 
 namespace modm
 {
@@ -45,7 +45,7 @@ namespace modm
  */
 template <typename SPI, typename CS, uint8_t COLUMNS = 1, uint8_t ROWS = 1>
 class Max7219MatrixHorizontal
-    : public MonochromeGraphicDisplayBufferedHorizontal<8 * COLUMNS, 8 * ROWS>
+    : public MonochromeGraphicDisplayHorizontal<8 * COLUMNS, 8 * ROWS>
 {
 public:
     virtual ~Max7219MatrixHorizontal() = default;
@@ -95,7 +95,7 @@ Max7219MatrixHorizontal<SPI, CS, COLUMNS, ROWS>::update()
             // a group of eight pixels horizontal
             for (uint8_t col = 0; col < COLUMNS; ++col)
             {
-                buf[--idx] = this->mDisplayBuffer[row * 8 + ledCol][col];
+                buf[--idx] = this->buffer[row * 8 + ledCol][col];
             }
         }
 

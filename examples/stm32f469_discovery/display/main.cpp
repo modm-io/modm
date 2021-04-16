@@ -20,7 +20,7 @@ main()
 	Board::initialize();
 	Board::initializeDisplay();
 
-	modm::GraphicDisplay& display = Board::getDisplay();
+	modm::ColorGraphicDisplay& display = Board::getDisplay();
 	display.setFont(modm::font::Assertion);
 
 	display.drawRectangle(0,0, 10, 10);

@@ -71,7 +71,7 @@ modm::GraphicDisplay::write(char c)
 	const uint8_t vspace = font[5];
 
 	if (character == '\n') {
-		this->cursor.set(0, this->cursor.getY() + height + hspace);
+		this->cursor.set(0, this->cursor.y + height + hspace);
 		return;
 	}
 
@@ -97,7 +97,7 @@ modm::GraphicDisplay::write(char c)
 	this->drawImageRaw(cursor, width, height,
 			accessor::asFlash(font.getPointer() + offset));
 
-	cursor.setX(cursor.getX() + width);
+	cursor.setX(cursor.x + width);
 
 	// all characters below 128 have whitespace afterwards (number given
 	// by vspace).
@@ -107,7 +107,7 @@ modm::GraphicDisplay::write(char c)
 		//this->setColor(glcd::Color::white());
 		for (uint_fast8_t i = 0; i < vspace; ++i) {
 			//this->drawVerticalLine(cursor, height);
-			cursor.setX(cursor.getX() + 1);
+			cursor.setX(cursor.x + 1);
 		}
 
 		// restore color

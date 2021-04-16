@@ -153,7 +153,7 @@ modm::Nokia6610<SPI, CS, Reset, GE12>::lcdSettings()
 		// Page Address set
 		writeSpiCommand(nokia::NOKIA_GE8_PASET);
 		writeSpiData(2); // start at 2 others corrupt display settings in a unpredictable way
-		writeSpiData(2 + this->getHeight()-1 + 2); // 2 more for filling, but not handled by buffered display
+		writeSpiData(2 + this->getHeight()-1 + 2); // 2 more for filling, but not handled by display
 
 		// Page Column set
 		writeSpiCommand(nokia::NOKIA_GE8_CASET);
@@ -197,7 +197,7 @@ modm::Nokia6610<SPI, CS, Reset, GE12>::update()
 	for(uint8_t x = 0; x < this->getWidth(); ++x)
 	{
 		for(uint8_t y = 0; y < this->getHeight()/8; ++y) {
-			uint8_t group = this->display_buffer[x][y];
+			uint8_t group = this->buffer[x][y];
 			for (uint8_t pix = 0; pix < 8; pix+=2, group>>=2){
 				uint32_t data =
 						((group&1)?mask1Filled:mask1Blank)|
@@ -208,7 +208,7 @@ modm::Nokia6610<SPI, CS, Reset, GE12>::update()
 				writeSpiData(data);
 			}
 		}
-		// fill pixel not handled by buffered display
+		// fill pixel not handled by  display
 		uint32_t data = mask1Blank | mask2Blank;
 		writeSpiData(data>>16);
 		writeSpiData(data>>8);

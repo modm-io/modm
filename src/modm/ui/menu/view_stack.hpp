@@ -39,7 +39,7 @@ namespace modm
 	class ViewStack
 	{
 	public:
-		ViewStack(modm::GraphicDisplay* display);
+		ViewStack(modm::ColorGraphicDisplay* display);
 
 		virtual ~ViewStack();
 
@@ -74,7 +74,7 @@ namespace modm
 		/**
 		 * @brief getDisplay access underlying GraphicDisplay
 		 */
-		inline modm::GraphicDisplay&
+		inline modm::ColorGraphicDisplay&
 		getDisplay()
 		{
 			return *this->display;
@@ -100,7 +100,7 @@ namespace modm
 		shortButtonPress(modm::MenuButtons::Button button);
 
 	protected:
-		modm::GraphicDisplay* display;
+		modm::ColorGraphicDisplay* display;
 		modm::Stack< modm::AbstractView* , modm::LinkedList< modm::AbstractView* > > stack;
 	};
 }

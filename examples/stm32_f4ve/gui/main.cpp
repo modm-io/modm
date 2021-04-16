@@ -140,7 +140,7 @@ initDisplay()
 
 	tft.initialize();
 	tft.enableBacklight(true);
-	tft.setRotation(Display::Rotation::Rotate90);
+	tft.setOrientation(modm::glcd::Orientation::Portrait90);
 }
 
 
@@ -164,7 +164,7 @@ initTouchscreen()
 // ----------------------------------------------------------------------------
 /* screen calibration  */
 static void
-drawCross(modm::GraphicDisplay& display, modm::glcd::Point center)
+drawCross(modm::ColorGraphicDisplay& display, modm::glcd::Point center)
 {
 	display.setColor(modm::glcd::Color::red());
 	display.drawLine(center.x - 15, center.y, center.x - 2, center.y);
@@ -187,7 +187,7 @@ drawCross(modm::GraphicDisplay& display, modm::glcd::Point center)
 }
 
 static void
-calibrateTouchscreen(modm::GraphicDisplay& display, modm::glcd::Point *fixed_samples = NULL)
+calibrateTouchscreen(modm::ColorGraphicDisplay& display, modm::glcd::Point *fixed_samples = nullptr)
 {
 	MODM_LOG_DEBUG << __PRETTY_FUNCTION__ << modm::endl;
 	modm::glcd::Point calibrationPoint[3] = { { 45, 45 }, { 270, 90 }, { 100, 190 } };
@@ -229,10 +229,10 @@ drawPoint(modm::GraphicDisplay& display, modm::glcd::Point point)
 		return;
 	}
 
-	display.drawPixel(point.x, point.y);
-	display.drawPixel(point.x + 1, point.y);
-	display.drawPixel(point.x, point.y + 1);
-	display.drawPixel(point.x + 1, point.y + 1);
+	display.setPixel(point.x, point.y);
+	display.setPixel(point.x + 1, point.y);
+	display.setPixel(point.x, point.y + 1);
+	display.setPixel(point.x + 1, point.y + 1);
 }
 
 // ----------------------------------------------------------------------------

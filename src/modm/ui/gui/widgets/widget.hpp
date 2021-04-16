@@ -15,7 +15,7 @@
 #ifndef MODM_GUI_WIDGET_HPP
 #define MODM_GUI_WIDGET_HPP
 
-#include <modm/ui/display/graphic_display.hpp>
+#include <modm/ui/display/color_graphic_display.hpp>
 #include <modm/ui/gui/colorpalette.hpp>
 #include <modm/ui/gui/types.hpp>
 

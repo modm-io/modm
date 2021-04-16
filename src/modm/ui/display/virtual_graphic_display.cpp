@@ -12,7 +12,7 @@
 
 #include "virtual_graphic_display.hpp"
 
-modm::VirtualGraphicDisplay::VirtualGraphicDisplay(modm::GraphicDisplay* display,
+modm::VirtualGraphicDisplay::VirtualGraphicDisplay(modm::ColorGraphicDisplay* display,
 		modm::glcd::Point leftUpper, modm::glcd::Point rightLower):
 		display(display), leftUpper(leftUpper), rightLower(rightLower),
 		width(static_cast<uint16_t>(this->rightLower[0] - this->leftUpper[0])),
@@ -21,7 +21,7 @@ modm::VirtualGraphicDisplay::VirtualGraphicDisplay(modm::GraphicDisplay* display
 }
 
 void
-modm::VirtualGraphicDisplay::setDisplay(modm::GraphicDisplay* display)
+modm::VirtualGraphicDisplay::setDisplay(modm::ColorGraphicDisplay* display)
 {
 	this->display = display;
 	return;
@@ -55,8 +55,8 @@ modm::VirtualGraphicDisplay::clearPixel(int16_t x, int16_t y)
 	this->display->clearPixel(x + this->leftUpper[0], y + this->leftUpper[1] );
 }
 
-bool
-modm::VirtualGraphicDisplay::getPixel(int16_t x, int16_t y)
+modm::glcd::Color
+modm::VirtualGraphicDisplay::getPixel(int16_t x, int16_t y) const
 {
 	return this->display->getPixel(x + this->leftUpper[0], y + this->leftUpper[1] );
 }

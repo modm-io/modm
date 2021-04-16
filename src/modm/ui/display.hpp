@@ -3,6 +3,7 @@
  * Copyright (c) 2009-2011, 2019, Fabian Greif
  * Copyright (c) 2012, Sascha Schade
  * Copyright (c) 2012-2014, Niklas Hauser
+ * Copyright (c) 2021, Thomas Sommer
  *
  * This file is part of the modm project.
  *
@@ -15,6 +16,5 @@
 #include "display/image.hpp"
 
 #include "display/character_display.hpp"
-#include "display/graphic_display.hpp"
-#include "display/monochrome_graphic_display_buffered_horizontal.hpp"
-#include "display/monochrome_graphic_display_buffered_vertical.hpp"
+#include "display/color_graphic_display.hpp"
+#include "display/monochrome_graphic_display.hpp"

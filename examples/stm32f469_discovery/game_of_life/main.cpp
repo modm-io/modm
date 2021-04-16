@@ -135,7 +135,7 @@ static inline void touch(framebuffer_t buffer)
 	}
 }
 
-static inline void drawPixel(int x, int y, uint8_t color)
+static inline void setPixel(int x, int y, uint8_t color)
 {
 #define DRAW(x, y) displayBuffer[(y) * 800 + (x)] = GET_TRAIL_COLOR(color).getValue();
 #if SCALE >= 8
@@ -202,7 +202,7 @@ static inline void drawPixel(int x, int y, uint8_t color)
 static inline void drawScreen(framebuffer_t before, framebuffer_t next)
 {
 	for_yx(bw, bh) {
-		drawPixel(x*SCALE + SCALE/2, y*SCALE + SCALE/2, next[y][x]);
+		setPixel(x*SCALE + SCALE/2, y*SCALE + SCALE/2, next[y][x]);
 
 		before[y][x] = next[y][x];
 	}

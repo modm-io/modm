@@ -102,22 +102,6 @@ modm::ParallelTft<INTERFACE>::initialize()
 }
 
 template <typename INTERFACE>
-uint16_t
-modm::ParallelTft<INTERFACE>::getWidth() const
-{
-	// TODO
-	return 320;
-}
-
-template <typename INTERFACE>
-uint16_t
-modm::ParallelTft<INTERFACE>::getHeight() const
-{
-	// TODO
-	return 240;
-}
-
-template <typename INTERFACE>
 void
 modm::ParallelTft<INTERFACE>::clear()
 {
@@ -158,8 +142,8 @@ modm::ParallelTft<INTERFACE>::clearPixel(int16_t x, int16_t y)
 }
 
 template <typename INTERFACE>
-bool
-modm::ParallelTft<INTERFACE>::getPixel(int16_t x, int16_t y)
+modm::glcd::Color
+modm::ParallelTft<INTERFACE>::getPixel(int16_t x, int16_t y) const
 {
 	(void) x;
 	(void) y;

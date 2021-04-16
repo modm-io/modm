@@ -130,7 +130,7 @@ initTouchscreen()
 
 // ----------------------------------------------------------------------------
 static void
-drawCross(modm::GraphicDisplay& display, modm::glcd::Point center)
+drawCross(modm::ColorGraphicDisplay& display, modm::glcd::Point center)
 {
 	display.setColor(modm::glcd::Color::red());
 	display.drawLine(center.x - 15, center.y, center.x - 2, center.y);
@@ -153,7 +153,7 @@ drawCross(modm::GraphicDisplay& display, modm::glcd::Point center)
 }
 
 static void
-calibrateTouchscreen(modm::GraphicDisplay& display)
+calibrateTouchscreen(modm::ColorGraphicDisplay& display)
 {
 	modm::glcd::Point calibrationPoint[3] = { { 45, 45 }, { 270, 90 }, { 100, 190 } };
 	modm::glcd::Point sample[3];
@@ -186,10 +186,10 @@ drawPoint(modm::GraphicDisplay& display, modm::glcd::Point point)
 		return;
 	}
 
-	display.drawPixel(point.x, point.y);
-	display.drawPixel(point.x + 1, point.y);
-	display.drawPixel(point.x, point.y + 1);
-	display.drawPixel(point.x + 1, point.y + 1);
+	display.setPixel(point.x, point.y);
+	display.setPixel(point.x + 1, point.y);
+	display.setPixel(point.x, point.y + 1);
+	display.setPixel(point.x + 1, point.y + 1);
 }
 
 // ----------------------------------------------------------------------------

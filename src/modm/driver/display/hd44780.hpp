@@ -69,7 +69,7 @@ public:
 	clear();
 
 protected:
-	typedef Hd44780Base<DATA, RW, RS, E> driver;
+	using driver = Hd44780Base<DATA, RW, RS, E>;
 
 public:
 	/**
@@ -129,8 +129,8 @@ public:
 	clear();
 
 protected:
-	typedef Hd44780Base<DATA, RW, RS, E1> driver1;
-	typedef Hd44780Base<DATA, RW, RS, E2> driver2;
+	using driver1 = Hd44780Base<DATA, RW, RS, E1>;
+	using driver2 = Hd44780Base<DATA, RW, RS, E2>;
 };
 
 } // namespace modm

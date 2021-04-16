@@ -45,7 +45,7 @@ modm::Hd44780Base<DATA, RW, RS, E>::initialize(LineMode lineMode)
 		Bus<DATA, E, DATA::width>::writeHighNibble(Set4BitBus);
 	}
 
-	while(!writeCommand(static_cast<InternalCommand>(lineMode) |
+	while(!writeCommand(InternalCommand(lineMode) |
 			Bus<DATA, E, DATA::width>::Mode))
 		;
 	while(!writeCommand(DisableDisplay))

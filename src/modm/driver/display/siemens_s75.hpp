@@ -17,7 +17,7 @@
 
 #include <modm/architecture/interface/delay.hpp>
 #include <modm/driver/bus/bitbang_memory_interface.hpp>
-#include <modm/ui/display/monochrome_graphic_display_buffered_vertical.hpp>
+#include <modm/ui/display/monochrome_graphic_display_vertical.hpp>
 
 namespace modm
 {
@@ -38,7 +38,7 @@ namespace modm
 		uint16_t  HEIGHT,
 		modm::Orientation ORIENTATION>
 	class SiemensS75Common :
-			public MonochromeGraphicDisplayBufferedVertical<WIDTH, HEIGHT>
+			public MonochromeGraphicDisplayVertical<WIDTH, HEIGHT>
 	{
 	public:
 		SiemensS75Common(MEMORY& interface) :
@@ -79,7 +79,7 @@ namespace modm
 
 	/**
 	 * The display in landscape mode does not match the required
-	 * alignment of BufferedGraphicDisplay which requests that
+	 * alignment of GraphicDisplay which requests that
 	 * the vertical resolution can be divided by 8.
 	 *
 	 * @ingroup modm_driver_siemens_s75

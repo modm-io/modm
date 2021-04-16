@@ -35,7 +35,7 @@ template <typename DATA, typename RW, typename RS, typename E>
 void
 modm::Hd44780<DATA, RW, RS, E>::writeRaw(char c)
 {
-	while(!driver::writeRAM(static_cast<uint8_t>(c)))
+	while(!driver::writeRAM(uint8_t(c)))
 		;
 }
 
@@ -48,7 +48,7 @@ modm::Hd44780<DATA, RW, RS, E>::setCursor(uint8_t column, uint8_t line)
 
 	uint8_t address = this->column + 0x40 * this->line;
 	if (this->line >= 2) {
-		address += 20;
+		address += this->lineWidth;
 	}
 	while(!driver::writeAddress(address))
 		;
@@ -105,10 +105,10 @@ void
 modm::Hd44780Dual<DATA, RW, RS, E1, E2>::writeRaw(char c)
 {
 	if (this->line < 2) {
-		while(!driver1::writeRAM(static_cast<uint8_t>(c)))
+		while(!driver1::writeRAM(uint8_t(c)))
 			;
 	} else {
-		while(!driver2::writeRAM(static_cast<uint8_t>(c)))
+		while(!driver2::writeRAM(uint8_t(c)))
 			;
 	}
 }

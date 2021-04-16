@@ -61,7 +61,7 @@ modm::AbstractView::onRemove()
 
 // ----------------------------------------------------------------------------
 
-modm::GraphicDisplay&
+modm::ColorGraphicDisplay&
 modm::AbstractView::display()
 {
 	return stack->getDisplay();

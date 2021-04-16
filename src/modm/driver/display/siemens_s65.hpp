@@ -16,7 +16,7 @@
 #define MODM_SIEMENS_S65_HPP
 
 #include <modm/architecture/interface/delay.hpp>
-#include <modm/ui/display/monochrome_graphic_display_buffered_vertical.hpp>
+#include <modm/ui/display/monochrome_graphic_display_vertical.hpp>
 
 // to enable this define add it to your ``project.cfg`` and
 // include <modm_config.hpp> before including this file.
@@ -33,7 +33,7 @@ namespace modm
 	 * ot 132 x 176 pixels in 18 bit colour.
 	 *
 	 * The portrait mode is a bit more 'native' for this display because
-	 * modm::BufferedGraphicDisplay requests that the vertical resolution is
+	 * modm::GraphicDisplay requests that the vertical resolution is
 	 * dividable by 8.
 	 *
 	 * In portrait mode the connector is at the bottom.
@@ -67,7 +67,7 @@ namespace modm
 	/// \ingroup	modm_driver_siemens_s65
 	template <typename SPI, typename CS, typename RS, typename Reset>
 	class SiemensS65Portrait :
-		public MonochromeGraphicDisplayBufferedVertical<132, 176>,
+		public MonochromeGraphicDisplayVertical<132, 176>,
 		public SiemensS65Common<SPI, CS, RS, Reset>
 	{
 	public:
@@ -84,13 +84,13 @@ namespace modm
 
 	/**
 	 * The display in landscape mode does not match the required
-	 * alignment of BufferedGraphicDisplay which requests that
+	 * alignment of GraphicDisplay which requests that
 	 * the vertical resolution can be divided by 8.
 	 * \ingroup	modm_driver_siemens_s65
 	 */
 	template <typename SPI, typename CS, typename RS, typename Reset>
 	class SiemensS65Landscape :
-		public MonochromeGraphicDisplayBufferedVertical<176, 136>,
+		public MonochromeGraphicDisplayVertical<176, 136>,
 		public SiemensS65Common<SPI, CS, RS, Reset>
 	{
 	public:

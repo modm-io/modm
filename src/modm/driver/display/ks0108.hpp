@@ -15,7 +15,7 @@
 #define MODM_KS0108_HPP
 
 #include <modm/architecture/interface/delay.hpp>
-#include <modm/ui/display/monochrome_graphic_display_buffered_vertical.hpp>
+#include <modm/ui/display/monochrome_graphic_display_vertical.hpp>
 
 namespace modm
 {
@@ -40,7 +40,7 @@ namespace modm
 	 */
 	template < typename E, typename RW, typename RS,
 			   typename PIN_CS1, typename PIN_CS2, typename PORT >
-	class Ks0108 : public MonochromeGraphicDisplayBufferedVertical<128, 64>
+	class Ks0108 : public MonochromeGraphicDisplayVertical<128, 64>
 	{
 	public:
 		/**

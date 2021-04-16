@@ -17,7 +17,7 @@
 #include <modm/architecture/interface/accessor_flash.hpp>
 #include <modm/architecture/interface/delay.hpp>
 
-#include <modm/ui/display/monochrome_graphic_display_buffered_vertical.hpp>
+#include <modm/ui/display/monochrome_graphic_display_vertical.hpp>
 
 namespace modm
 {
@@ -29,7 +29,7 @@ namespace modm
 	 */
 	template <typename SPI, typename CS, typename A0, typename Reset,
 			  unsigned int Width, unsigned int Height, bool TopView>
-	class St7565 : public MonochromeGraphicDisplayBufferedVertical<Width, Height>
+	class St7565 : public MonochromeGraphicDisplayVertical<Width, Height>
 	{
 	public:
 		virtual ~St7565()

@@ -12,11 +12,13 @@
 #include "board.hpp"
 #include <modm/architecture/interface/memory.hpp>
 
+#include <algorithm>
+
 extern void
 board_initialize_display(uint8_t);
 
 // Basic implementation of display running on memory mapped buffer
-class DsiDisplay : public modm::GraphicDisplay
+class DsiDisplay : public modm::ColorGraphicDisplay
 {
 public:
 	DsiDisplay() : buffer(new (modm::MemoryExternal) uint16_t[800*480])
@@ -32,40 +34,49 @@ public:
 	getHeight() const override
 	{ return 480; }
 
-	void
-	clear() override
+	inline std::size_t
+	getBufferWidth() const final
 	{
-		for (int ii = 0; ii < 800*480; ii++)
-		{
-			buffer[ii] = this->backgroundColor.getValue();
-		}
+		return 800;
+	}
+
+	inline std::size_t
+	getBufferHeight() const final
+	{
+		return 480;
 	}
 
 	void
-	update() override
+	clear() final
+	{
+		std::fill(buffer, buffer + this->getBufferWidth()*this->getBufferHeight(), this->backgroundColor.getValue());
+	}
+
+	void
+	update() final
 	{
 		// FIXME: avoid tearing by using double buffering!
 	}
 
 	void
-	setPixel(int16_t x, int16_t y) override
+	setPixel(int16_t x, int16_t y) final
 	{
 		if (x < 0 or 800 <= x or y < 0 or 480 <= y) return;
 		buffer[y * 800 + x] = this->foregroundColor.getValue();
 	}
 
 	void
-	clearPixel(int16_t x, int16_t y) override
+	clearPixel(int16_t x, int16_t y) final
 	{
 		if (x < 0 or 800 <= x or y < 0 or 480 <= y) return;
 		buffer[y * 800 + x] = this->backgroundColor.getValue();
 	}
 
-	bool
-	getPixel(int16_t x, int16_t y) override
+	modm::glcd::Color
+	getPixel(int16_t x, int16_t y) const final
 	{
 		if (x < 0 or 800 <= x or y < 0 or 480 <= y) return false;
-		return (buffer[y * 800 + x] != this->backgroundColor.getValue());
+		return buffer[y * 800 + x];
 	}
 
 protected:
@@ -97,7 +108,7 @@ Board::getDisplayBuffer()
 	return (void *) LTDC_Layer1->CFBAR;
 }
 
-modm::GraphicDisplay&
+modm::ColorGraphicDisplay&
 Board::getDisplay()
 {
 	static DsiDisplay display;

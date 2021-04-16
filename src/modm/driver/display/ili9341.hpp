@@ -15,7 +15,7 @@
 #include <modm/architecture/interface/register.hpp>
 #include <modm/math/utils/endianness.hpp>
 #include <modm/platform/gpio/base.hpp>
-#include <modm/ui/display/graphic_display.hpp>
+#include <modm/ui/display/color_graphic_display.hpp>
 
 namespace modm
 {
@@ -130,17 +130,6 @@ protected:
 
 public:
 	enum class
-	Rotation : uint8_t
-	{
-		Rotate0,
-		Rotate90,
-		Rotate180,
-		Rotate270,
-		Normal = Rotate0,
-		UpsideDown = Rotate180,
-	};
-
-	enum class
 	DisplayMode : uint8_t
 	{
 		Normal = uint8_t(Command::InversionOff),
@@ -150,7 +139,7 @@ public:
 
 /// @ingroup modm_driver_ili9341
 template <class Interface, class Reset, class Backlight, std::size_t BufferSize = 320>
-class Ili9341 : public Interface, public modm::GraphicDisplay
+class Ili9341 : public Interface, public modm::ColorGraphicDisplay
 {
 	static_assert(BufferSize >= 16, "at least a small buffer is required");
 
@@ -159,18 +148,11 @@ class Ili9341 : public Interface, public modm::GraphicDisplay
 	using BatchHandle = typename Interface::BatchHandle;
 	using Command = ili9341::Command;
 public:
-	using Rotation = ili9341::Rotation;
+	using Orientation = glcd::Orientation;
 	using DisplayMode = ili9341::DisplayMode;
 
-	template<bool B=std::is_default_constructible_v<Interface>, std::enable_if_t<B, bool> = 0>
-	Ili9341(): Interface()
-	{
-		Reset::setOutput(modm::Gpio::High);
-		Backlight::setOutput(modm::Gpio::Low);
-	}
-
-	template<typename T, typename =std::enable_if_t<std::is_constructible_v<Interface, T&>, T>>
-	Ili9341(T& r): Interface(r)
+	template<typename... Args>
+	Ili9341(Args&&... args): Interface(std::forward<Args>(args)...)
 	{
 		Reset::setOutput(modm::Gpio::High);
 		Backlight::setOutput(modm::Gpio::Low);
@@ -187,58 +169,94 @@ public:
 
 	void
 	turnOn();
+
 	void
 	turnOff();
 
 	void
 	enableBacklight(bool enable)
 	{ Backlight::set(enable); }
+
 	void
 	setBrightness(uint8_t level);
+
 	void
 	setInvert(bool invert);
 
 	void
 	setIdle(bool enable);
+
 	void
 	enableSleep(bool enable);
 
-	virtual uint16_t
-	getWidth() const override
+	uint16_t
+	getWidth() const final
 	{
-		switch (rotation_)
+		switch (orientation)
 		{
-			case Rotation::Rotate90:
-			case Rotation::Rotate270:
+			case Orientation::Portrait90:
+			case Orientation::Portrait270:
 				return Height;
 			default:
 				return Width;
 		}
 	}
-	virtual uint16_t
-	getHeight() const override
+
+	uint16_t
+	getHeight() const final
 	{
-		switch (rotation_)
+		switch (orientation)
 		{
-			case Rotation::Rotate90:
-			case Rotation::Rotate270:
+			case Orientation::Portrait90:
+			case Orientation::Portrait270:
 				return Width;
 			default:
 				return Height;
 		}
 	}
 
-	virtual void
-	clear() override;
-	virtual void
-	update() override
-	{ /* nothing to do, data is directly written to TFT RAM */ }
+	inline std::size_t
+	getBufferWidth() const final
+	{
+		return Width;
+	}
+
+	inline std::size_t
+	getBufferHeight() const final
+	{
+		return Height;
+	}
 
 	void
-	setRotation(Rotation rotation);
+	setPixel(int16_t x, int16_t y) final
+	{ setColoredPixel(x, y, foregroundColor); }
+
+	void
+	clearPixel(int16_t x, int16_t y) final
+	{ setColoredPixel(x, y, backgroundColor); }
+
+    // TODO implement getPixel for ili9341
+	glcd::Color
+	getPixel(int16_t x, int16_t y) const final
+	{
+		(void) x;
+		(void) y;
+		return glcd::Color::white();
+	}
+
+	void
+	clear() final;
+
+	inline void
+	update() final
+	{ /* nothing to do, data is directly written to TFT RAM */ }
+
+	inline void
+	setOrientation(glcd::Orientation orientation);
 
 	void
 	fillRectangle(glcd::Point upperLeft, uint16_t width, uint16_t height);
+
 	inline void
 	fillRectangle(int16_t x, int16_t y, uint16_t width, uint16_t height)
 	{ fillRectangle(glcd::Point(x, y), width, height); }
@@ -246,16 +264,17 @@ public:
 	void
 	fillCircle(glcd::Point center, uint16_t radius);
 
-	virtual void
+	void
 	drawImageRaw(glcd::Point upperLeft,
 				 uint16_t width, uint16_t height,
-				 modm::accessor::Flash<uint8_t> data) override;
+				 modm::accessor::Flash<uint8_t> data) final;
 
-	virtual void
+	void
 	drawRaw(glcd::Point upperLeft, uint16_t width, uint16_t height, glcd::Color* data);
 
 	void
 	setScrollArea(uint16_t topFixedRows, uint16_t bottomFixedRows, uint16_t firstRow);
+
 	void
 	scrollTo(uint16_t row);
 
@@ -263,28 +282,21 @@ public:
 	drawBitmap(glcd::Point upperLeft, uint16_t width, uint16_t height, modm::accessor::Flash<uint8_t> data);
 
 protected:
-	virtual void
-	setPixel(int16_t x, int16_t y) override
-	{ setColoredPixel(x, y, foregroundColor); }
-	virtual void
-	clearPixel(int16_t x, int16_t y) override
-	{ setColoredPixel(x, y, backgroundColor); }
-	virtual bool
-	getPixel(int16_t /*x*/, int16_t /*y*/) override
-	{ return false; }
+	void
+	drawHorizontalLine(glcd::Point start, uint16_t length) final;
 
-	virtual void
-	drawHorizontalLine(glcd::Point start, uint16_t length) override;
-	virtual void
-	drawVerticalLine(glcd::Point start, uint16_t length) override;
+	void
+	drawVerticalLine(glcd::Point start, uint16_t length) final;
 
 private:
 	void
 	setColoredPixel(int16_t x, int16_t y, glcd::Color const &color);
+
 	void
 	setClipping(uint16_t x, uint16_t y, uint16_t width, uint16_t height);
 
-	Rotation rotation_{Rotation::Rotate0};
+	Orientation orientation{Orientation::Landscape0};
+
 	uint8_t buffer[BufferSize * 2]{0};
 };
 

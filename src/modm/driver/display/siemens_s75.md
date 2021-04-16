@@ -4,7 +4,7 @@ The controller in displays manufactured by Alps is a SOLOMON SYSTECH SSD1286
 which can drive color displays of up to 132 x 176 pixels in 18 bit color.
 
 The portrait mode is a bit more 'native' for this display because
-`modm::BufferedGraphicDisplay` requests that the vertical resolution is
+`modm::GraphicDisplay` requests that the vertical resolution is
 divisible by 8.
 
 In portrait mode the connector is at the top.

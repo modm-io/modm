@@ -20,7 +20,7 @@ modm::gui::ButtonWidget::render(View* view)
 		return;
 
 	// output device of view
-	modm::GraphicDisplay* out = &view->display();
+	modm::ColorGraphicDisplay* out = &view->display();
 
 	// color palette of view
 	ColorPalette cp = this->color_palette;
@@ -56,8 +56,8 @@ modm::gui::ButtonWidget::render(View* view)
 	 * TODO: center text
 	 */
 
-	const uint16_t stringWidth = modm::GraphicDisplay::getStringWidth(this->label, &(this->font));
-	const uint16_t stringHeight = modm::GraphicDisplay::getFontHeight(&(this->font));
+	const uint16_t stringWidth = modm::ColorGraphicDisplay::getStringWidth(this->label, &(this->font));
+	const uint16_t stringHeight = modm::ColorGraphicDisplay::getFontHeight(&(this->font));
 
 	if(this->font.isValid())
 		out->setFont(&(this->font));
@@ -74,7 +74,7 @@ modm::gui::ArrowButton::render(View* view)
 		return;
 
 	// output device of view
-	modm::GraphicDisplay* out = &view->display();
+	modm::ColorGraphicDisplay* out = &view->display();
 
 	// color palette of view
 	ColorPalette cp = this->color_palette;
@@ -127,7 +127,7 @@ modm::gui::FilledAreaButton::render(View* view)
 		return;
 
 	// output device of view
-	modm::GraphicDisplay* out = &view->display();
+	modm::ColorGraphicDisplay* out = &view->display();
 
 	// position and dimensions
 	const uint16_t x = this->getPosition().x;

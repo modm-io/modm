@@ -6,6 +6,7 @@
  * Copyright (c) 2013, Hans Schily
  * Copyright (c) 2014, Daniel Krebs
  * Copyright (c) 2015, Niclas Rohrer
+ * Copyright (c) 2021, Thomas Sommer
  *
  * This file is part of the modm project.
  *
@@ -19,461 +20,439 @@
 #define MODM_GRAPHIC_DISPLAY_HPP
 
 #include <modm/architecture/interface/accessor.hpp>
-#include <modm/math/geometry.hpp>
-
 #include <modm/io/iodevice.hpp>
 #include <modm/io/iostream.hpp>
+#include <modm/math/geometry.hpp>
 
 #include "font.hpp"
 
 namespace modm
 {
-	/// @ingroup	modm_ui_display
-	namespace glcd
-	{
-		/// @ingroup modm_ui_display
-		typedef Vector<int16_t, 2> Point;
 
-		// RGB16 (565) Format
-		/// @ingroup modm_ui_display
-		class Color
-		{
-		public:
-			static modm_always_inline Color white()   { return Color(0xffff); };
-			static modm_always_inline Color yellow()  { return Color(0xFFE0); };
-			static modm_always_inline Color magenta() { return Color(0xF81F); };
-			static modm_always_inline Color red()     { return Color(0xF800); };
-			static modm_always_inline Color orange()  { return Color(0xFD20); };
-			static modm_always_inline Color sliver()  { return Color(0xC618); };
-			static modm_always_inline Color gray()    { return Color(0x8410); };
-			static modm_always_inline Color maroon()  { return Color(0x8000); };
-			static modm_always_inline Color lime()    { return Color(0x07E0); };
-			static modm_always_inline Color green()   { return Color(0x0400); };
-			static modm_always_inline Color blue()    { return Color(0x001F); };
-			static modm_always_inline Color navy()    { return Color(0x0010); };
-			static modm_always_inline Color black()   { return Color(0x0000); };
-			static modm_always_inline Color signalViolet()   { return Color(0x8010); }; //0x84D0
-			static modm_always_inline Color emeraldGreen()   { return Color(0x5DCC); };
+/// @ingroup	modm_ui_display
+namespace glcd
+{
 
-			/**
-			 * @param	red
-			 * 		Range [0..255]
-			 * @param	green
-			 * 		Range [0..255]
-			 * @param	blue
-			 * 		Range [0..255]
-			 */
-			Color(uint8_t red, uint8_t green, uint8_t blue) :
-				color(((static_cast<uint16_t>(red >> 3) << 11) |
-						(static_cast<uint16_t>(green >> 2) << 5) |
-						static_cast<uint16_t>(blue >> 3)))
-			{
-			}
+/// @ingroup modm_ui_display
+using Point = Vector<int16_t, 2>;
 
-			Color(uint16_t color) :
-				color(color)
-			{
-			}
+enum Orientation : uint8_t
+{
+	Landscape0,
+	Portrait90,
+	Landscape180,
+	Portrait270,
+};
 
-			Color() : color(0)
-			{
-			}
+}  // namespace glcd
 
-			inline uint16_t
-			getValue() const
-			{
-				return color;
-			}
+/**
+ * Base class for graphical displays.
+ *
+ * \ingroup	modm_ui_display
+ */
 
-			bool
-			operator == (const Color& other) const {
-				return (color == other.color);
-			}
+/*
+ *
+ * Text mode:
+ * - left adjusted (default)
+ * - right adjusted
+ * - centered
+ *
+ * All modes relative to the current viewport. This would make
+ * drawing a menu system easier.
+ */
+class GraphicDisplay : public IOStream
+{
+public:
+	friend class VirtualGraphicDisplay;
 
-		private:
-			uint16_t color;
-		};
-	}
+	GraphicDisplay();
 
-	// TODO
-//	enum class Orientation : uint8_t
-//	{
-//		Portrait, 				//< Connector top
-//		LandscapeRight,			//< Connector right
-//		LandscapeLeft,			//< Connector left
-//		PortraitUpsideDown,		//< Connector bottom
-//	};
+	virtual ~GraphicDisplay() {}
 
 	/**
-	 * Base class for graphical displays.
-	 *
-	 * \ingroup	modm_ui_display
+	 * Number of pixel in horizontal direction.
 	 */
-	/*
-	 * TODO
-	 *
-	 * setBrush() and setPen() for filling and the border?
-	 * possible Brush/Pen modes:
-	 * - NONE
-	 * - BLACK
-	 * - WHITE
-	 * - INVERT
-	 *
-	 * Text mode:
-	 * - left adjusted (default)
-	 * - right adjusted
-	 * - centered
-	 *
-	 * All modes relative to the current viewport. This would make
-	 * drawing a menu system easier.
+	virtual uint16_t
+	getWidth() const = 0;
+
+	/**
+	 * Number of pixel in vertical direction.
 	 */
-	class GraphicDisplay : public IOStream
+	virtual uint16_t
+	getHeight() const = 0;
+
+	// TODO Requires all inherited drivers work with resumable functions
+	// virtual modm::ResumableResult<bool>
+	// setOrientation() = 0;
+
+	/**
+	 * Buffer-array size of first dimension
+	 */
+	virtual std::size_t
+	getBufferWidth() const = 0;
+
+	/**
+	 * Buffer-array size of second dimension
+	 */
+	virtual std::size_t
+	getBufferHeight() const = 0;
+
+	/**
+	 * Set a pixel to foregroundColor
+	 *
+	 * \param x		x-position
+	 * \param y		y-position
+	 */
+	virtual void
+	setPixel(int16_t x, int16_t y) = 0;
+
+	/**
+	 * Set a pixel to foregroundColor
+	 *
+	 * \param p		point
+	 */
+	inline void
+	setPixel(glcd::Point p)
+	{
+		this->setPixel(p.x, p.y);
+	}
+
+	/**
+	 * Set a pixel to backgroundColor
+	 *
+	 * \param x		x-position
+	 * \param y		y-position
+	 */
+	virtual void
+	clearPixel(int16_t x, int16_t y) = 0;
+
+	/**
+	 * Set a pixel to backgroundColor
+	 *
+	 * \param p		point
+	 */
+	inline void
+	clearPixel(glcd::Point p)
+	{
+		this->setPixel(p.x, p.y);
+	}
+
+	/**
+	 * Set whole screen to backgroundColor
+	 */
+	virtual void
+	clear() = 0;
+
+	/**
+	 * Transfer the content of the RAM buffer to the real display.
+	 */
+	virtual void
+	update() = 0;
+
+	// TODO Requires all inherited drivers work with resumable functions
+	// modm::ResumableResult<bool>
+	// writeDisplay();
+
+	// TODO Set a clipping area
+	// Everything drawn outside this area will be discarded.
+	// inline void
+	// setClippingWindow(glcd::Point start, glcd::Point end);
+
+	/**
+	 * Draw a line.
+	 *
+	 * Uses the faster drawHorizontalLine() or drawVerticalLine() if
+	 * possible, otherwise the line is rastered with the Bresenham line
+	 * algorithm.
+	 *
+	 * \param start	first point
+	 * \param end	second point
+	 */
+	inline void
+	drawLine(glcd::Point start, glcd::Point end)
+	{
+		this->drawLine(start.x, start.y, end.x, end.y);
+	}
+
+	/**
+	 * Draw a line
+	 *
+	 * \param x1	Start x-position
+	 * \param y1	Start y-position
+	 * \param x2	End x-position
+	 * \param y3	End y-position
+	 */
+	void
+	drawLine(int16_t x1, int16_t y1, int16_t x2, int16_t y2);
+
+	/**
+	 * Draw a rectangle.
+	 *
+	 * \param start 	Upper left corner
+	 * \param width		Width of rectangle
+	 * \param height	Height of rectangle
+	 */
+	void
+	drawRectangle(glcd::Point start, uint16_t width, uint16_t height);
+
+	/**
+	 * Draw a rectangle.
+	 *
+	 * \param x 		Upper left corner x-position
+	 * \param y 		Upper left corner y-position
+	 * \param width		Width of rectangle
+	 * \param height	Height of rectangle
+	 */
+	inline void
+	drawRectangle(int16_t x, int16_t y, uint16_t width, uint16_t height)
+	{
+		drawRectangle(glcd::Point(x, y), width, height);
+	}
+
+	/**
+	 * Draw a filled rectangle.
+	 *
+	 * \param start 	Upper left corner
+	 * \param width		Width of rectangle
+	 * \param height	Height of rectangle
+	 */
+	void
+	fillRectangle(glcd::Point start, uint16_t width, uint16_t height);
+
+	/**
+	 * Draw a rectangle.
+	 *
+	 * \param x 		Upper left corner x-position
+	 * \param y 		Upper left corner y-position
+	 * \param width		Width of rectangle
+	 * \param height	Height of rectangle
+	 */
+	inline void
+	fillRectangle(int16_t x, int16_t y, uint16_t width, uint16_t height)
+	{
+		fillRectangle(glcd::Point(x, y), width, height);
+	}
+
+	/**
+	 * Draw a rectangle with rounded corners
+	 *
+	 * \param start 	Upper left corner
+	 * \param width		Width of rectangle
+	 * \param height	Height of rectangle
+	 * \param radius	Rounding radius
+	 */
+	void
+	drawRoundedRectangle(glcd::Point start, uint16_t width, uint16_t height, uint16_t radius);
+
+	/**
+	 * Draw a filled rectangle with rounded corners
+	 *
+	 * \param start 	Upper left corner
+	 * \param width		Width of rectangle
+	 * \param height	Height of rectangle
+	 * \param radius	Rounding radius
+	 */
+	// TODO Not yet implemented
+	// void
+	// fillRoundedRectangle(glcd::Point start, uint16_t width, uint16_t height, uint16_t radius);
+
+	/**
+	 * Draw a circle
+	 *
+	 * Uses the midpoint circle algorithm.
+	 *
+	 * \param center	Center of the circle
+	 * \param radius	Radius of the circle
+	 */
+	void
+	drawCircle(glcd::Point center, uint16_t radius);
+
+	/**
+	 * Draw a filled circle.
+	 *
+	 * \param center	Center of the circle
+	 * \param radius	Radius of the circle
+	 */
+	virtual void
+	fillCircle(glcd::Point center, uint16_t radius);
+
+	/**
+	 * Draw an ellipse.
+	 *
+	 * Uses a variation of the midpoint algorithm. May be improved through
+	 * simplification of the used formula.
+	 *
+	 * \param center	Center of the ellipse
+	 * \param rx		Radius in x-direction
+	 * \param ry		Radius in y-direction
+	 */
+	void
+	drawEllipse(glcd::Point center, int16_t rx, int16_t ry);
+
+	/**
+	 * Draw an image.
+	 *
+	 * The first byte in the image data specifies the with, the second
+	 * byte the height. Afterwards the actual image data.
+	 *
+	 * \param start		Upper left corner
+	 * \param image		Image data in Flash
+	 *
+	 * \see	drawImage()
+	 */
+	void
+	drawImage(glcd::Point start, modm::accessor::Flash<uint8_t> image);
+
+	/**
+	 * Draw an image.
+	 *
+	 * \param start		Upper left corner
+	 * \param width		Image width
+	 * \param height	Image height
+	 * \param data		Image data in Flash without any size information.
+	 */
+	virtual void
+	drawImageRaw(glcd::Point start, uint16_t width, uint16_t height,
+				 modm::accessor::Flash<uint8_t> data);
+
+	/**
+	 * Set the cursor for text drawing.
+	 *
+	 * \param position	Cursor position
+	 */
+	inline void
+	setCursor(glcd::Point position)
+	{
+		this->cursor = position;
+	}
+
+	/**
+	 * Set the cursor for text drawing.
+	 *
+	 * \param x		Cursor x-position
+	 * \param y		Cursor y-position
+	 */
+	inline void
+	setCursor(int16_t x, int16_t y)
+	{
+		this->cursor = glcd::Point(x, y);
+	}
+
+	/**
+	 * Set the cursor x-position for text drawing.
+	 *
+	 * \param x		Cursor x-position
+	 */
+	inline void
+	setCursorX(int16_t x)
+	{
+		this->cursor.x = x;
+	}
+
+	/**
+	 * Set the cursor y-position for text drawing.
+	 *
+	 * \param y		Cursor y-position
+	 */
+	inline void
+	setCursorY(int16_t y)
+	{
+		this->cursor.y = y;
+	}
+
+	inline glcd::Point
+	getCursor() const
+	{
+		return this->cursor;
+	}
+
+	/**
+	 * Set a new font.
+	 *
+	 * Default font is modm::font::FixedWidth5x8.
+	 *
+	 * \param	newFont	Active font
+	 * \see		modm::font
+	 */
+	inline void
+	setFont(const uint8_t *newFont)
+	{
+		this->font = modm::accessor::asFlash(newFont);
+	}
+
+	inline void
+	setFont(const modm::accessor::Flash<uint8_t> *font)
+	{
+		this->font = *font;
+	}
+
+	/**
+	 * Get the height of a character.
+	 */
+	uint8_t
+	getFontHeight() const;
+
+	static uint8_t
+	getFontHeight(const modm::accessor::Flash<uint8_t> *font);
+
+	/**
+	 * Get the width of (null terminated) string.
+	 */
+	uint16_t
+	getStringWidth(const char *s) const;
+
+	static uint16_t
+	getStringWidth(const char *s, const modm::accessor::Flash<uint8_t> *font);
+
+	/**
+	 * Write a single character.
+	 */
+	void
+	write(char c);
+
+protected:
+	/// helper method for drawCircle() and drawEllipse()
+	void
+	drawCircle4(glcd::Point center, int16_t x, int16_t y);
+
+	virtual void
+	drawHorizontalLine(glcd::Point start, uint16_t length);
+
+	virtual void
+	drawVerticalLine(glcd::Point start, uint16_t length);
+
+protected:
+	// Interface class for the IOStream
+	class Writer : public IODevice
 	{
 	public:
-		friend class VirtualGraphicDisplay;
+		Writer(GraphicDisplay *parent) : parent(parent) {}
 
-		GraphicDisplay();
-
-		virtual
-		~GraphicDisplay()
-		{
-		}
-
-		/**
-		 * Number of pixel in horizontal direction.
-		 */
-		virtual uint16_t
-		getWidth() const = 0;
-
-		/**
-		 * Number of pixel in vertical direction.
-		 */
-		virtual uint16_t
-		getHeight() const = 0;
-
-		/**
-		 * Clear screen and reset the cursor.
-		 */
+		/// Draw a single character
 		virtual void
-		clear() = 0;
-
-		/**
-		 * Transfer the content of the RAM buffer to the real display.
-		 */
-		virtual void
-		update() = 0;
-
-		/**
-		 * Set a new foreground color.
-		 *
-		 * The foreground color is used for all drawing operations. Default
-		 * is white.
-		 *
-		 * @see	setBackgroundColor()
-		 */
-		void
-		setColor(const glcd::Color& color);
-
-		inline glcd::Color
-		getForegroundColor() const
-		{
-			return this->foregroundColor;
-		}
-
-		/**
-		 * Set new background color.
-		 *
-		 * The background color used when clearing the screen. Default is black.
-		 *
-		 * @see	setColor()
-		 */
-		void
-		setBackgroundColor(const glcd::Color& color);
-
-		/**
-		 * Limit the coordinate system to a smaller area.
-		 *
-		 * The default viewport is the complete screen.
-		 */
-		//void
-		//setViewport();
-
-		// TODO Set a clipping area
-		// Everything drawn outside this area will be discarded.
-		//void
-		//setClippingWindow();
-
-		/**
-		 * Draw a pixel in currently active foreground color.
-		 *
-		 * \param	x	x-position
-		 * \param	y	y-position
-		 */
-		inline void
-		drawPixel(int16_t x, int16_t y)
-		{
-			(this->*draw)(x, y);
-		}
-
-		inline void
-		drawPixel(glcd::Point center)
-		{
-			(this->*draw)(center.x, center.y);
-		}
-
-		/**
-		 * Draw a line.
-		 *
-		 * Uses the faster drawHorizontalLine() or drawVerticalLine() if
-		 * possible, otherwise the line is rastered with the Bresenham line
-		 * algorithm.
-		 *
-		 * \param start	first point
-		 * \param end	second point
-		 */
-		inline void
-		drawLine(glcd::Point start, glcd::Point end)
-		{
-			this->drawLine(start.getX(), start.getY(), end.getX(), end.getY());
-		}
-
-		/**
-		 * Draw a line specified by x and y coordinates of both points.
-		 */
-		void
-		drawLine(int16_t x1, int16_t y1, int16_t x2, int16_t y2);
-
-		inline void
-		drawRectangle(int16_t x, int16_t y, uint16_t width, uint16_t height)
-		{
-			drawRectangle(glcd::Point(x, y), width, height);
-		}
-
-		/**
-		 * Draw a rectangle.
-		 */
-		void
-		drawRectangle(glcd::Point upperLeft, uint16_t width, uint16_t height);
-
-		/**
-		 * Draw a rectangle with rounded corners.
-		 */
-		void
-		drawRoundedRectangle(glcd::Point upperLeft,
-				uint16_t width, uint16_t height,
-				uint16_t radius);
-
-		/**
-		 * Draw a circle
-		 *
-		 * Uses the midpoint circle algorithm.
-		 *
-		 * \param center	Center of the circle
-		 * \param radius	Radius of the circle
-		 */
-		void
-		drawCircle(glcd::Point center, uint16_t radius);
-
-		/**
-		 * Draw an ellipse.
-		 *
-		 * Uses a variation of the midpoint algorithm. May be improved through
-		 * simplification of the used formula.
-		 *
-		 * \param center	Center of the ellipse
-		 * \param rx		radius in x-direction
-		 * \param ry		radius in y-direction
-		 */
-		void
-		drawEllipse(glcd::Point center, int16_t rx, int16_t ry);
-
-		/**
-		 * Draw an image.
-		 *
-		 * The first byte in the image data specifies the with, the second
-		 * byte the height. Afterwards the actual image data.
-		 *
-		 * \param upperLeft		Upper left corner
-		 * \param image			Image data
-		 *
-		 * \see	drawImage()
-		 */
-		void
-		drawImage(glcd::Point upperLeft, modm::accessor::Flash<uint8_t> image);
-
-		/**
-		 * Draw an image.
-		 *
-		 * \p data is the actual image data without any size information.
-		 */
-		virtual void
-		drawImageRaw(glcd::Point upperLeft,
-				uint16_t width, uint16_t height,
-				modm::accessor::Flash<uint8_t> data);
-
-		/**
-		 * Fill a rectangle.
-		 */
-		virtual void
-		fillRectangle(glcd::Point upperLeft, uint16_t width, uint16_t height);
-
-		inline void
-		fillRectangle(int16_t x, int16_t y, uint16_t width, uint16_t height)
-		{
-			fillRectangle(glcd::Point(x, y), width, height);
-		}
-
-		/**
-		 * Fill a circle.
-		 */
-		virtual void
-		fillCircle(glcd::Point center, uint16_t radius);
-
-	public:
-		/**
-		 * Set a new font.
-		 *
-		 * Default font is modm::font::FixedWidth5x8.
-		 *
-		 * \param	newFont	Active font
-		 * \see		modm::font
-		 */
-		inline void
-		setFont(const uint8_t *newFont)
-		{
-			this->font = modm::accessor::asFlash(newFont);
-		}
-
-		inline void
-		setFont(const modm::accessor::Flash<uint8_t> *font)
-		{
-			this->font = *font;
-		}
-
-		/**
-		 * Get the height of a character.
-		 */
-		uint8_t
-		getFontHeight() const;
-
-		static uint8_t
-		getFontHeight(const modm::accessor::Flash<uint8_t> *font);
-
-		/**
-		* Get the width of (null terminated) string.
-		*/
-		uint16_t
-		getStringWidth(const char* s) const;
-
-		static uint16_t
-		getStringWidth(const char* s, const modm::accessor::Flash<uint8_t> *font);
-
-		/**
-		 * Set the cursor for text drawing.
-		 *
-		 * \param	position	Cursor position
-		 */
-		inline void
-		setCursor(glcd::Point position)
-		{
-			this->cursor = position;
-		}
-
-		/**
-		 * Set the cursor for text drawing.
-		 *
-		 * \param	x	Cursor x-position
-		 * \param	y	Cursor y-position
-		 */
-		inline void
-		setCursor(int16_t x, int16_t y)
-		{
-			this->cursor = glcd::Point(x, y);
-		}
-
-		inline void
-		setCursorX(int16_t x)
-		{
-			this->cursor.x = x;
-		}
-
-		inline void
-		setCursorY(int16_t y)
-		{
-			this->cursor.y = y;
-		}
-
-		inline glcd::Point
-		getCursor() const
-		{
-			return this->cursor;
-		}
-
-		/**
-		 * Write a single character.
-		 */
-		void
 		write(char c);
 
-	protected:
-		/// helper method for drawCircle() and drawEllipse()
-		void
-		drawCircle4(glcd::Point center, int16_t x, int16_t y);
+		using IODevice::write;
 
+		// unused
 		virtual void
-		drawHorizontalLine(glcd::Point start, uint16_t length);
+		flush();
 
-		virtual void
-		drawVerticalLine(glcd::Point start, uint16_t length);
-
-		virtual void
-		setPixel(int16_t x, int16_t y) = 0;
-
-		virtual void
-		clearPixel(int16_t x, int16_t y) = 0;
-
+		// unused, returns always `false`
 		virtual bool
-		getPixel(int16_t x, int16_t y) = 0;
+		read(char &c);
 
-	protected:
-		// Interface class for the IOStream
-		class Writer : public IODevice
-		{
-		public:
-			Writer(GraphicDisplay *parent) :
-				parent(parent)
-			{
-			}
-
-			/// Draw a single character
-			virtual void
-			write(char c);
-
-			using IODevice::write;
-
-			// unused
-			virtual void
-			flush();
-
-			// unused, returns always `false`
-			virtual bool
-			read(char& c);
-
-		private:
-			GraphicDisplay *parent;
-		};
-
-	protected:
-		Writer writer;
-
-		// callback function for drawing pixels
-		void (GraphicDisplay::*draw)(int16_t x, int16_t y);
-
-		glcd::Color foregroundColor;
-		glcd::Color backgroundColor;
-		modm::accessor::Flash<uint8_t> font;
-		glcd::Point cursor;
+	private:
+		GraphicDisplay *parent;
 	};
-}
 
-#endif	// MODM_GRAPHIC_DISPLAY_HPP
+protected:
+	Writer writer;
+	modm::accessor::Flash<uint8_t> font;
+	glcd::Point cursor;
+};
+}  // namespace modm
+
+#endif  // MODM_GRAPHIC_DISPLAY_HPP

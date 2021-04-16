@@ -72,7 +72,7 @@ modm::ChoiceMenu::setTitle(const char* text)
 void
 modm::ChoiceMenu::draw()
 {
-	modm::GraphicDisplay* display = &getViewStack()->getDisplay();
+	modm::ColorGraphicDisplay* display = &getViewStack()->getDisplay();
 	display->clear();
 	display->setCursor(0,2);
 	(*display) << this->title;

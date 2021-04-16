@@ -16,7 +16,7 @@
 
 #include <modm/platform.hpp>
 #include <modm/architecture/interface/clock.hpp>
-#include <modm/ui/display/graphic_display.hpp>
+#include <modm/ui/display/color_graphic_display.hpp>
 #include <modm/driver/touch/ft6x06.hpp>
 #include <modm/debug/logger.hpp>
 
@@ -209,7 +209,7 @@ setDisplayBuffer(void * buffer);
 void *
 getDisplayBuffer();
 
-modm::GraphicDisplay&
+modm::ColorGraphicDisplay&
 getDisplay();
 
 inline void

@@ -23,7 +23,7 @@ modm::gui::CheckboxWidget::render(View* view)
 	constexpr uint16_t padding = 5;
 
 	// output device of view
-	modm::GraphicDisplay* out = &view->display();
+	modm::ColorGraphicDisplay* out = &view->display();
 
 	// color palette of view
 	ColorPalette cp = this->color_palette;

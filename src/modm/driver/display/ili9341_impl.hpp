@@ -74,7 +74,7 @@ Ili9341<Interface, Reset, Backlight, BufferSize>::initialize()
 		this->writeCommand(Command::InversionOff);
 		this->writeCommand(Command::DisplayOn);
 
-		setRotation(rotation_);
+		setOrientation(orientation);
 	}
 }
 
@@ -110,22 +110,22 @@ Ili9341<Interface, Reset, Backlight, BufferSize>::getIcModel()
 }
 
 template <class Interface, class Reset, class Backlight, std::size_t BufferSize>
-void
-Ili9341<Interface, Reset, Backlight, BufferSize>::setRotation(Rotation rotation)
+inline void
+Ili9341<Interface, Reset, Backlight, BufferSize>::setOrientation(glcd::Orientation orientation)
 {
 	using MemoryAccessCtrl_t = ili9341::MemoryAccessCtrl_t;
 	using MemoryAccessCtrl = ili9341::MemoryAccessCtrl;
 	MemoryAccessCtrl_t madCtrl { MemoryAccessCtrl::BGR };
 
-	switch (rotation)
+	switch (orientation)
 	{
-		case Rotation::Rotate90:
+		case glcd::Orientation::Portrait90:
 			madCtrl |= MemoryAccessCtrl::MV | MemoryAccessCtrl::MX;
 			break;
-		case Rotation::Rotate180:
+		case glcd::Orientation::Landscape180:
 			madCtrl |= MemoryAccessCtrl::MX | MemoryAccessCtrl::MY;
 			break;
-		case Rotation::Rotate270:
+		case glcd::Orientation::Portrait270:
 			madCtrl |= MemoryAccessCtrl::MV | MemoryAccessCtrl::MY;
 			break;
 		default:
@@ -133,7 +133,7 @@ Ili9341<Interface, Reset, Backlight, BufferSize>::setRotation(Rotation rotation)
 			break;
 	}
 
-	rotation_ = rotation;
+	this->orientation = orientation;
 
 	BatchHandle h(*this);
 	this->writeCommandValue8(Command::MemoryAccessCtrl, madCtrl.value);

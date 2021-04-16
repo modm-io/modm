@@ -29,7 +29,7 @@ namespace modm
 	class CommunicatingViewStack : public ViewStack
 	{
 	public:
-		CommunicatingViewStack(modm::GraphicDisplay* display, xpcc::Communicator* communicator) :
+		CommunicatingViewStack(modm::ColorGraphicDisplay* display, xpcc::Communicator* communicator) :
 			ViewStack(display),
 			communicator(communicator)
 		{

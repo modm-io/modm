@@ -16,59 +16,56 @@
 #ifndef MODM_VIRTUAL_GRAPHIC_DISPLAY
 #define MODM_VIRTUAL_GRAPHIC_DISPLAY
 
-#include <modm/ui/display/graphic_display.hpp>
+#include <modm/ui/display/color_graphic_display.hpp>
 
 namespace modm
 {
-	/// @ingroup modm_ui_display
-	class VirtualGraphicDisplay:
-			public modm::GraphicDisplay
+/// @ingroup modm_ui_display
+class VirtualGraphicDisplay : public modm::ColorGraphicDisplay
+{
+public:
+	VirtualGraphicDisplay(modm::ColorGraphicDisplay* display, modm::glcd::Point leftUpper,
+						  modm::glcd::Point rightLower);
+
+	void
+	setDisplay(modm::ColorGraphicDisplay* display);
+
+	virtual inline uint16_t
+	getWidth() const
 	{
-	public:
-		VirtualGraphicDisplay(modm::GraphicDisplay* display,
-				modm::glcd::Point leftUpper, modm::glcd::Point rightLower);
+		return this->width;
+	}
 
-		void
-		setDisplay(modm::GraphicDisplay* display);
+	virtual inline uint16_t
+	getHeight() const
+	{
+		return this->height;
+	}
 
-		virtual inline uint16_t
-		getWidth() const
-		{
-			return this->width;
-		}
+	virtual void
+	clear();
 
-		virtual inline uint16_t
-		getHeight() const
-		{
-			return this->height;
-		}
+	virtual void
+	update();
 
-		virtual void
-		clear();
+protected:
+	void
+	setPixel(int16_t x, int16_t y) final;
 
-		virtual void
-		update();
+	void
+	clearPixel(int16_t x, int16_t y) final;
 
-	protected:
+	glcd::Color
+	getPixel(int16_t x, int16_t y) const final;
 
-		virtual void
-		setPixel(int16_t x, int16_t y);
+private:
+	modm::ColorGraphicDisplay* display;
+	modm::glcd::Point leftUpper;
+	modm::glcd::Point rightLower;
+	const uint16_t width;
+	const uint16_t height;
+};
 
-		virtual void
-		clearPixel(int16_t x, int16_t y);
+}  // namespace modm
 
-		virtual bool
-		getPixel(int16_t x, int16_t y);
-
- 	private:
-		modm::GraphicDisplay* display;
-		modm::glcd::Point leftUpper;
-		modm::glcd::Point rightLower;
-		const uint16_t width;
-		const uint16_t height;
-	};
-
-
-}
-
-#endif //MODM_VIRTUAL_GRAPHIC_DISPLAY
+#endif  // MODM_VIRTUAL_GRAPHIC_DISPLAY

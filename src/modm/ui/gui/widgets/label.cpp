@@ -21,7 +21,7 @@ modm::gui::Label::render(View* view)
 		return;
 
 	// output device of view
-	modm::GraphicDisplay* out = &view->display();
+	modm::ColorGraphicDisplay* out = &view->display();
 
 	out->setColor(color);
 

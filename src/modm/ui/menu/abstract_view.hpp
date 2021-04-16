@@ -17,7 +17,7 @@
 #ifndef MODM_ABSTRACT_VIEW_HPP
 #define MODM_ABSTRACT_VIEW_HPP
 
-#include <modm/ui/display/graphic_display.hpp>
+#include <modm/ui/display/color_graphic_display.hpp>
 
 #include "menu_buttons.hpp"
 
@@ -99,7 +99,7 @@ namespace modm
 
 	public:
 
-		modm::GraphicDisplay&
+		modm::ColorGraphicDisplay&
 		display();
 
 		/**

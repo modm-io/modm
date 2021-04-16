@@ -17,7 +17,7 @@
 #include "view_stack.hpp"
 
 // ----------------------------------------------------------------------------
-modm::ViewStack::ViewStack(modm::GraphicDisplay* display) :
+modm::ViewStack::ViewStack(modm::ColorGraphicDisplay* display) :
 	display(display)
 {
 }

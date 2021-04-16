@@ -15,7 +15,7 @@
 #ifndef MODM_GUI_COLORPALETTE_HPP
 #define MODM_GUI_COLORPALETTE_HPP
 
-#include <modm/ui/display/graphic_display.hpp>
+#include <modm/ui/display/color_graphic_display.hpp>
 
 
 namespace modm

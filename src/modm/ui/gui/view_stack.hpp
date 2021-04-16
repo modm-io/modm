@@ -18,7 +18,7 @@
 #ifndef MODM_GUI_VIEWSTACK_HPP
 #define MODM_GUI_VIEWSTACK_HPP
 
-#include <modm/ui/display/graphic_display.hpp>
+#include <modm/ui/display/color_graphic_display.hpp>
 #include <modm/container/stack.hpp>
 #include <modm/container/linked_list.hpp>
 #include <modm/ui/menu/menu_buttons.hpp>
@@ -44,7 +44,7 @@ namespace gui
 class GuiViewStack : public modm::ViewStack
 {
 public:
-	GuiViewStack(modm::GraphicDisplay* display, modm::gui::inputQueue* queue);
+	GuiViewStack(modm::ColorGraphicDisplay* display, modm::gui::inputQueue* queue);
 
 	virtual
 	~GuiViewStack();

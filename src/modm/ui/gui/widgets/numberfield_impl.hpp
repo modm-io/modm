@@ -23,7 +23,7 @@ modm::gui::NumberField<T>::render(View* view)
 		return;
 
 	// output device of view
-	modm::GraphicDisplay* out = &view->display();
+	modm::ColorGraphicDisplay* out = &view->display();
 
 	// color palette of view
 	ColorPalette cp = this->color_palette;

@@ -76,8 +76,8 @@ private:
 		// Update label dimension
 		if(this->font.isValid())
 		{
-			this->dimension.width = modm::GraphicDisplay::getStringWidth(this->label, &(this->font));
-			this->dimension.height = modm::GraphicDisplay::getFontHeight(&(this->font));
+			this->dimension.width = modm::ColorGraphicDisplay::getStringWidth(this->label, &(this->font));
+			this->dimension.height = modm::ColorGraphicDisplay::getFontHeight(&(this->font));
 		}
 	}
 

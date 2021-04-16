@@ -84,7 +84,7 @@ public:
 private:
 	Touch::Data touchData;
 	Touch touch;
-	modm::GraphicDisplay& display;
+	modm::ColorGraphicDisplay& display;
 	int16_t px[2], py[2];
 	Color c[2];
 };

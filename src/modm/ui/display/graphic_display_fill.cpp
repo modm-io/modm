@@ -16,20 +16,12 @@
 
 // ----------------------------------------------------------------------------
 void
-modm::GraphicDisplay::fillRectangle(glcd::Point upperLeft,
+modm::GraphicDisplay::fillRectangle(glcd::Point start,
 		uint16_t width, uint16_t height)
 {
-	for (uint16_t i = upperLeft.getX();
-			(i < upperLeft.getX() + width) && (i < getWidth());
-			++i)
-	{
-		for (uint16_t k = upperLeft.getY();
-				(k < upperLeft.getY() + height) && (k < getHeight());
-				++k)
-		{
-			(this->*draw)(i, k);
-		}
-	}
+	for (uint16_t i = start.x; (i < start.x + width) && (i < getWidth()); ++i)
+		for (uint16_t k = start.y; (k < start.y + height) && (k < getHeight()); ++k)
+			this->setPixel(i, k);
 }
 
 void
@@ -41,7 +33,7 @@ modm::GraphicDisplay::fillCircle(glcd::Point center, uint16_t radius)
 	uint16_t x = 0;
 	uint16_t y = radius;
 
-	this->drawVerticalLine(glcd::Point(center.getX(), center.getY() - radius), 2 * radius);
+	this->drawVerticalLine(glcd::Point(center.x, center.y - radius), 2 * radius);
 
 	while(x < y)
 	{
@@ -55,9 +47,9 @@ modm::GraphicDisplay::fillCircle(glcd::Point center, uint16_t radius)
 		ddF_x += 2;
 		f += ddF_x + 1;
 
-		this->drawVerticalLine(glcd::Point(center.getX() + x, center.getY() - y), 2 * y);
-		this->drawVerticalLine(glcd::Point(center.getX() + y, center.getY() - x), 2 * x);
-		this->drawVerticalLine(glcd::Point(center.getX() - x, center.getY() - y), 2 * y);
-		this->drawVerticalLine(glcd::Point(center.getX() - y, center.getY() - x), 2 * x);
+		this->drawVerticalLine(glcd::Point(center.x + x, center.y - y), 2 * y);
+		this->drawVerticalLine(glcd::Point(center.x + y, center.y - x), 2 * x);
+		this->drawVerticalLine(glcd::Point(center.x - x, center.y - y), 2 * y);
+		this->drawVerticalLine(glcd::Point(center.x - y, center.y - x), 2 * x);
 	}
 }

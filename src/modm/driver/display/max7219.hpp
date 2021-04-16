@@ -127,7 +127,7 @@ public:
         // Write the command multiple times, for each MODULES
         for (uint8_t i = 0; i < MODULES; ++i)
         {
-            SPI::transferBlocking(static_cast<uint8_t>(reg));
+            SPI::transferBlocking(uint8_t(reg));
             SPI::transferBlocking(data);
         }
         CS::set();

@@ -19,7 +19,7 @@
 #include "view_stack.hpp"
 
 // ----------------------------------------------------------------------------
-modm::gui::GuiViewStack::GuiViewStack(modm::GraphicDisplay* display, modm::gui::inputQueue* queue) :
+modm::gui::GuiViewStack::GuiViewStack(modm::ColorGraphicDisplay* display, modm::gui::inputQueue* queue) :
 	ViewStack(display),
 	input_queue(queue)
 {

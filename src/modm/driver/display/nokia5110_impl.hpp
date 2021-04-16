@@ -29,7 +29,7 @@ Nokia5110< Spi, Ce, Dc, Reset >::initialize()
 	writeCommand(0xc2); // Set Vop
 
 	// Basic instruction set, vertical addressing
-	// Matches well with modm's BufferedGraphicDisplay memory layout
+	// Matches well with modm's GraphicDisplay memory layout
 	writeCommand(0x20 | (1 << 1));
 
 	// writeCommand(0x08); // display blank
@@ -50,7 +50,7 @@ Nokia5110< Spi, Ce, Dc, Reset >::update()
 	Dc::set(); // high = data
 	for (uint8_t xx = 0; xx < this->getWidth(); ++xx) {
 		for (uint8_t yy = 0; yy < this->getHeight() / 8; ++yy) {
-			Spi::transferBlocking(this->display_buffer[xx][yy]);
+			Spi::transferBlocking(this->buffer[xx][yy]);
 		}
 	}
 	Ce::set();
