@@ -23,7 +23,7 @@ This module implements TCP over Ethernet via the LAN8720A transceiver.
         device = options[":target"]
         if not device.has_driver("eth:stm32*"):
             return False
-        if device.identifier.family not in ["f7"]:
+        if device.identifier.family not in ["f7", "f4"]:
             return False
         module.depends(":platform:eth", ":driver:lan8720a")
         return True

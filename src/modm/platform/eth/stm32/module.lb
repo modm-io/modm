@@ -21,7 +21,7 @@ def prepare(module, options):
     if not device.has_driver("eth:stm32*"):
         return False
     # FIXME the driver is for F7 only right now
-    if device.identifier["family"] not in ["f7"]:
+    if device.identifier["family"] not in ["f7", "f4"]:
         return False
 
     module.depends(":architecture:delay",
