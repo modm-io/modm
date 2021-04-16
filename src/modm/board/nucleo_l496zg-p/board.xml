@@ -1,0 +1,16 @@
+<library>
+  <repositories>
+    <repository>
+      <path>../../../../repo.lb</path>
+    </repository>
+  </repositories>
+
+  <options>
+    <option name="modm:target">stm32l496zgt6p</option>
+    <option name="modm:platform:uart:lpuart1:buffer.tx">2048</option>
+  </options>
+
+  <modules>
+    <module>modm:board:nucleo-l496zg-p</module>
+  </modules>
+</library>
