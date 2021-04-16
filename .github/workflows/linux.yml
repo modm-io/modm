@@ -118,7 +118,7 @@ jobs:
       - name: Examples STM32L4 Series
         if: always()
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py stm32l476_discovery nucleo_l476rg nucleo_l432kc nucleo_l452re)
+          (cd examples && ../tools/scripts/examples_compile.py stm32l476_discovery nucleo_l476rg nucleo_l432kc nucleo_l452re nucleo_l496zg-p)
       - name: Examples STM32G4 Series
         if: always()
         run: |
