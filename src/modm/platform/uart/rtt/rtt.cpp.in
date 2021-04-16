@@ -18,12 +18,12 @@ namespace modm::platform
 
 struct RttBuffer
 {
-	const char* name{nullptr};
-	uint8_t* buffer{nullptr};
-	const uint32_t size{0};
-	volatile uint32_t head{0};
-	volatile uint32_t tail{0};
-	uint32_t flags{0};
+	const char* name;
+	uint8_t* const buffer;
+	const uint32_t size;
+	volatile uint32_t head;
+	volatile uint32_t tail;
+	const uint32_t flags;
 
 	bool write(uint8_t data)
 	{
@@ -66,22 +66,30 @@ static uint8_t rx_data_buffer_{{loop.index0}}[{{size}}];
 %#
 struct RttControlBlock
 {
-	const char identifier[16]{"modm.rtt.modm"};
-	const int32_t tx_buffer_count{ {{ buffer_tx | length }} };
-	const int32_t rx_buffer_count{ {{ buffer_rx | length }} };
-	RttBuffer tx_buffers[{{ buffer_tx | length }}] = {
-%% for size in buffer_tx
-		{"tx{{loop.index0}}", {% if size %}tx_data_buffer_{{loop.index0}}{% else %}nullptr{% endif %}, {{size}} },
-%% endfor
-	};
-	RttBuffer rx_buffers[{{ buffer_rx | length }}] = {
-%% for size in buffer_rx
-		{"rx{{loop.index0}}", {% if size %}rx_data_buffer_{{loop.index0}}{% else %}nullptr{% endif %}, {{size}} },
-%% endfor
-	};
+	const char identifier[16];
+	const int32_t tx_buffer_count;
+	const int32_t rx_buffer_count;
+	RttBuffer tx_buffers[{{ buffer_tx | length }}];
+	RttBuffer rx_buffers[{{ buffer_rx | length }}];
 } modm_packed;
 
-static RttControlBlock rtt_control;
+// Explicitly constructed as constinit to force *only* copying via .data section.
+// This prevents the "modm.rtt.modm" identifier leaking into the stack and being
+// found by OpenOCD accidentally instead of the real RTT control block.
+static constinit RttControlBlock rtt_control{
+	"modm.rtt.modm",
+	{{ buffer_tx | length }},
+	{{ buffer_rx | length }},
+	{
+%% for size in buffer_tx
+		{"tx{{loop.index0}}", {% if size %}tx_data_buffer_{{loop.index0}}{% else %}nullptr{% endif %}, {{size}}, 0,0,0 },
+%% endfor
+	},{
+%% for size in buffer_rx
+		{"rx{{loop.index0}}", {% if size %}rx_data_buffer_{{loop.index0}}{% else %}nullptr{% endif %}, {{size}}, 0,0,0 },
+%% endfor
+	}
+};
 
 
 Rtt::Rtt(uint8_t channel)
