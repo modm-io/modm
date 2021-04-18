@@ -290,6 +290,29 @@ modm::platform::Rcc::enablePll(PllSource source, const PllFactors& pllFactors, u
 %%endif
 }
 
+%% if target["family"] == "f4"
+bool
+modm::platform::Rcc::enablePllI2s(PllSource, const PllI2sFactors& pllFactors, uint32_t waitCycles)
+{
+	// Read reserved and don't care values and clear all other values
+	uint32_t tmp = RCC->PLLI2SCFGR & ~(RCC_PLLI2SCFGR_PLLI2SN | RCC_PLLI2SCFGR_PLLI2SR);
+	// set PLL divider and multiplier
+	tmp |= (((uint32_t) pllFactors.pllN) << RCC_PLLI2SCFGR_PLLI2SN_Pos) & RCC_PLLI2SCFGR_PLLI2SN;
+	tmp |= (((uint32_t) pllFactors.pllR) << RCC_PLLI2SCFGR_PLLI2SR_Pos) & RCC_PLLI2SCFGR_PLLI2SR;
+	RCC->PLLI2SCFGR = tmp;
+
+	// enable I2S PLL
+	RCC->CR |= RCC_CR_PLLI2SON;
+	// wait till I2S PLL gets ready or time is up
+	while ((RCC->CR & RCC_CR_PLLI2SRDY) == 0)
+	{
+		if (not --waitCycles)
+			return false;
+	}
+	return true;
+}
+%% endif
+
 %% if pllsai_p_usb
 bool
 modm::platform::Rcc::enablePllSai(const PllSaiFactors& pllFactors, uint32_t waitCycles)

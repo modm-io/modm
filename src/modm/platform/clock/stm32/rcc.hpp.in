@@ -559,6 +559,32 @@ public:
 	setHsiPredivider4Enabled(bool divideBy4, uint32_t waitCycles = 2048);
 %% endif
 
+%% if target["family"] == "f4"
+	/** TODO: comments
+	 * input clock is the HSE or HSI divided by M
+	 * f(VCO clock) = f(PLLI2S clock input) × (PLLI2SN / PLLM)
+	 * f(PLL I2S clock output) = f(VCO clock) / PLLI2SR
+	 * 
+	 * \param	pllN
+	 * PLLI2S multiplication factor for VCO
+	 * 50 <= PLLI2SN <= 432
+	 * 
+	 * \param	pllR
+	 * PLLI2S division factor for I2S clocks
+	 * Caution: The I2Ss requires a frequency lower than or equal to 192 MHz to work correctly.
+	 * 2 <= PLLR <= 7
+	 */
+	struct PllI2sFactors
+	{
+		const uint16_t pllN;
+		const uint16_t pllR;
+	};
+
+	/* TODO: comments */
+	static bool
+	enablePllI2s(PllSource, const PllI2sFactors& pllFactors, uint32_t waitCycles);
+%% endif
+
 	// sinks
 	static bool
 	enableSystemClock(SystemClockSource src, uint32_t waitCycles = 2048);

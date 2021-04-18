@@ -82,12 +82,17 @@ struct SystemClock {
 	{
 		Rcc::enableExternalCrystal();	// 8MHz
 		const Rcc::PllFactors pllFactors{
-			.pllM = 4,		// 8MHz / M=4 -> 2MHz
-			.pllN = 168,	// 2MHz * N=168 -> 336MHz
+			.pllM = 8,		// 8MHz / M=8 -> 1MHz
+			.pllN = 336,	// 1MHz * N=336 -> 336MHz
 			.pllP = 2,		// 336MHz / P=2 -> 168MHz = F_cpu
 			.pllQ = 7		// 336MHz / Q=7 ->  48MHz = F_usb
 		};
 		Rcc::enablePll(Rcc::PllSource::ExternalCrystal, pllFactors);
+		const Rcc::PllI2sFactors pllI2sFactors{
+			.pllN = 258,	// 1 MHz * N=258 -> 258 MHz
+			.pllR = 3		// 258 MHz / R=3 -> 86 MHz
+		};
+		Rcc::enablePllI2s(Rcc::PllSource::ExternalCrystal, pllI2sFactors, 2048);
 		// set flash latency for 168MHz
 		Rcc::setFlashLatency<Frequency>();
 		// switch system clock to PLL output
