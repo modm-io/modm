@@ -593,91 +593,6 @@ public:
 	enablePllSai(const PllSaiFactors& pllFactors, uint32_t waitCycles = 2048);
 %% endif
 
-	// DEPRECATE: 2022q1
-%% if target.family in ["f2", "f4", "f7", "l4", "g0", "g4"]
-	/**
-	 * Enable PLL.
-	 *
-	 * \code
-	 * VCO input frequency = PLL input clock frequency / PLLM [with 2 <= PLLM <= 63]
-	 * VCO output frequency = VCO input frequency × PLLN [with 64 <= PLLN <= 432]
-	 * \endcode
-	 *
-	 * \param	source
-	 * 		Source select for PLL and for plli2s. If you are using
-	 * 		HSE you must enable it first (see enableHse()).
-	 *
-	 * \param	pllM
-	 * 		Division factor for the main PLL (PLL) and
-	 * 		audio PLL (PLLI2S) input clock (with 2 <= pllM <= 63).
-	 *		The software has to set these bits correctly to ensure
-	 *		that frequency of selected source divided by pllM
-	 *		is in ranges from 1 to 2 MHz.
-	 *
-	 * \param	pllN
-	 * 		Main PLL (PLL) multiplication factor for VCO (with 64 <= pllN <= 432).
-	 * 		The software has to set these bits correctly to ensure
-	 * 		that the VCO output frequency is
-	 * 		 - 336 MHz for ST32F4. Core will run at 168 MHz.
-	 *		 - 240 MHz for ST32F2. Core will run at 120 MHz.
-	 *
-	 * Example:
-	 *
-	 */
-	[[deprecated("Use PllFactors as argument instead")]] static bool
-	enablePll(PllSource source, uint8_t pllM, uint16_t pllN,
-	%% if target.family in ["l4", "g0", "g4"]
-	          uint8_t pllR,
-	%% else
-			  uint8_t pllP,
-	%% endif
-			  uint32_t waitCycles = 2048)
-	{
-		PllFactors pllFactors{
-			.pllM = pllM,
-			.pllN = pllN,
-	%% if target.family in ["l4", "g0", "g4"]
-	          .pllR = pllR,
-	%% else
-			  .pllP = pllP,
-	%% endif
-		};
-		return enablePll(source, pllFactors, waitCycles);
-	}
-%% elif target.family in ["l1"]
-	[[deprecated("Use PllFactors as argument instead")]] static bool
-	enablePll(PllSource source, PllMultiplier pllMul, uint8_t pllDiv,
-	          uint32_t waitCycles = 2048)
-	{
-		PllFactors pllFactors{
-			.pllMul = pllMul,
-			.pllDiv = pllDiv,
-		};
-		return enablePll(source, pllFactors, waitCycles);
-	}
-%% elif target.family in ["f0", "f1", "f3"]
-	[[deprecated("Use PllFactors as argument instead")]] static bool
-	enablePll(PllSource source,
-	          uint8_t pllMul,
-	%% if pllprediv2
-				uint8_t pllPrediv, uint8_t pllPrediv2,
-	%% elif pllprediv
-				uint8_t pllPrediv,
-	%% endif
-				uint32_t waitCycles = 2048)
-	{
-		PllFactors pllFactors{
-			.pllMul = pllMul,
-	%% if pllprediv2
-				.pllPrediv = pllPrediv,
-				.pllPrediv2 = pllPrediv2,
-	%% elif pllprediv
-				.pllPrediv = pllPrediv,
-	%% endif
-		};
-		return enablePll(source, pllFactors, waitCycles);
-	}
-%% endif
 %% if target.family == "l0"
 	static inline bool
 	isHsiPredivider4Active()
@@ -687,6 +602,48 @@ public:
 
 	static bool
 	setHsiPredivider4Enabled(bool divideBy4, uint32_t waitCycles = 2048);
+%% endif
+
+%% if target["family"] == "f4"
+	/**
+	 * Input clock for I2S Pll is the HSE or HSI divided by M.
+	 *
+	 * f(VCO clock) = f(PLLI2S clock input) × (PLLI2SN / PLLM)
+	 *
+	 * f(PLL I2S clock output) = f(VCO clock) / PLLI2SR
+	 */
+	struct PllI2sFactors
+	{
+		/**
+		 * @brief multiplication factor for VCO
+		 *
+		 * Caution: The software has to set these bits correctly
+		 * to ensure that the VCO output frequency
+		 * is between 100 and 432 MHz.
+		 *
+		 * 50 <= `pllN` <= 432
+		 */
+		const uint16_t pllN;
+
+		/**
+		 * @brief division factor for I2S clocks
+		 *
+		 * Caution: The I2Ss requires a frequency lower than
+		 * or equal to 192 MHz to work correctly.
+		 *
+		 * 2 <= `pllR` <= 7
+		 */
+		const uint16_t pllR;
+	};
+
+	/**
+	 * @brief Configure factors for I2S pll and enable.
+	 *
+	 * @param pllFactors See `PllI2sFactors`
+	 * @param waitCycles Number of cycles to wait for pll to become stable. Defaults to 2048.
+	 */
+	static bool
+	enablePllI2s(const PllI2sFactors& pllFactors, uint32_t waitCycles = 2048);
 %% endif
 
 	// sinks
