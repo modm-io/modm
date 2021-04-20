@@ -21,7 +21,7 @@ def prepare(module, options):
     if not options[":target"].has_driver("rcc:stm32*"):
         return False
 
-    module.depends(":cmsis:device", ":utils", ":platform:clock")
+    module.depends(":cmsis:device", ":utils", ":platform:clock", ":architecture:delay")
     # FIXME: Move Peripherals enum somewhere better
     module.depends(":platform:gpio")
     return True
