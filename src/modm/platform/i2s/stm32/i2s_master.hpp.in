@@ -1,0 +1,74 @@
+/*
+ * Copyright (c) 2009-2011, Fabian Greif
+ * Copyright (c) 2010, Martin Rosekeit
+ * Copyright (c) 2011-2017, Niklas Hauser
+ * Copyright (c) 2012, Georgi Grinshpun
+ * Copyright (c) 2013, Kevin Läufer
+ * Copyright (c) 2014, Sascha Schade
+ * Copyright (C) 2021, Marton Ledneczki
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_STM32_I2S_MASTER{{ id }}_HPP
+#define MODM_STM32_I2S_MASTER{{ id }}_HPP
+
+#include <modm/architecture/interface/i2s_master.hpp>
+#include <modm/platform/gpio/connector.hpp>
+#include <modm/math/algorithm/prescaler.hpp>
+//#include "i2s_hal_{{ id }}.hpp" TODO
+
+namespace modm
+{
+
+namespace platform
+{
+
+/**
+ * Inter-IC Sound (I2C{{ id }}).
+ *
+ * TODO: say something about the nature of implementation
+ *
+ * @author	Marton Ledneczki
+ * @ingroup	modm_platform_i2s modm_platform_i2s_{{id}}
+ */
+class I2sMaster{{ id }} : public modm::I2sMaster
+{
+public:
+	//using Hal = I2sHal{{ id }}; TODO
+
+	//using DataSize = Hal::DataSize; TODO
+
+public:
+	template< template<Peripheral _> class... Signals >
+	static void
+	connect()
+	{
+		using Connector = GpioConnector<Peripheral::I2s{{ id }}, Signals...>;
+		using Ck = typename Connector::template GetSignal<Gpio::Signal::Ck>;
+		using Mck = typename Connector::template GetSignal<Gpio::Signal::Mck>;
+		using Sd = typename Connector::template GetSignal<Gpio::Signal::Sd>;
+        using Ws = typename Connector::template GetSignal<Gpio::Signal::Ws>;
+
+		// Connector::disconnect();
+		Ck::setOutput(Gpio::OutputType::PushPull);
+		Mck::setOutput(Gpio::OutputType::PushPull);
+		Sd::setOutput(Gpio::OutputType::PushPull);
+        Ws::setOutput(Gpio::OutputType::PushPull);
+		Connector::connect();
+	}
+
+	
+	// end documentation inherited
+};
+
+} // namespace platform
+
+} // namespace modm
+
+#endif // MODM_STM32_I2S_MASTER{{ id }}_HPP

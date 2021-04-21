@@ -230,6 +230,21 @@ class I2cMultiplexer(Module):
         env.copy("interface/i2c_multiplexer.hpp")
 # -----------------------------------------------------------------------------
 
+class I2s(Module):
+    def init(self, module):
+        module.name = "i2s"
+        module.description = "Inter-IC Sound (I2S)"
+
+    def prepare(self, module, options):
+        module.depends(":processing:resumable")
+        return True
+
+    def build(self, env):
+        env.outbasepath = "modm/src/modm/architecture"
+        env.copy("interface/i2s.hpp")
+        env.copy("interface/i2s_master.hpp")
+# -----------------------------------------------------------------------------
+
 class Interrupt(Module):
     def init(self, module):
         module.name = "interrupt"
@@ -381,6 +396,7 @@ def prepare(module, options):
     module.add_submodule(I2c())
     module.add_submodule(I2cDevice())
     module.add_submodule(I2cMultiplexer())
+    module.add_submodule(I2s())
     module.add_submodule(Interrupt())
     module.add_submodule(Memory())
     module.add_submodule(OneWire())
