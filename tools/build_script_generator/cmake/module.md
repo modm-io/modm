@@ -7,10 +7,10 @@ This module generates three files:
 - a `modm/repo.cmake` file: configures all required CMake tools with
   the right settings (also using information from the `modm:build` module) to
   compile the modm library.
-- a top-level `CMakeLists.txt`: configures CMake to build modm and your
-  application.
-- a top-level `Makefile`: provides a convenience wrapper for calling CMake from
-  the command line.
+- a top-level BSD-licensed `CMakeLists.txt`: configures CMake to build modm and
+  your application.
+- a top-level BSD-licensed `Makefile`: provides a convenience wrapper for
+  calling CMake from the command line.
 
 This module is intended to be used for integration with IDEs that natively only
 support CMake. It therefore only provides the bare minimum of features to compile

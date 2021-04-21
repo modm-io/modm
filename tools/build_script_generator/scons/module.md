@@ -9,8 +9,8 @@ This module generates two files:
 - a `modm/SConscript` file: configures all required SCons tools with
   the right settings (also using information from the `modm:build` module) to
   compile the modm library.
-- a top-level `SConstruct` file: configures additional, optional tools and sets
-  up all the relevant SCons functions for your target.
+- a top-level BSD-licensed `SConstruct` file: configures additional, optional
+  tools and sets up all the relevant SCons functions for your target.
 
 The `SConscript` file is self contained and does not depend on anything outside of
 the `modm/` directory. This allows it to be combined with `SConscript` of other
@@ -20,12 +20,14 @@ In fact, if you look at your generated `SConstruct` file, you'll notice that
 it doesn't contain a lot of logic or specific data, it is only meant for calling
 the right SCons tool with the right arguments.
 
-We do not intend to serve every possible use-case with this module.
-**If you need something special, write your own SConstruct file, maybe
-starting by modifying ours.**
+We do not intend to serve every possible use-case with this module. **If you
+need something special, write your own SConstruct file, maybe starting by
+modifying ours.** It is intentionally BSD-licensed so that you do not have to
+publish your changes to it.
+
 Remember to set `modm:build:scons:include_sconstruct` to `False`, so that your
 custom `SConstruct` does not get overwritten by `lbuild build`.
-See the instructions inside our generated default `SConstruct`.
+See the instructions inside our generated default `SConstruct` file.
 
 
 ## SCons Methods
