@@ -57,7 +57,7 @@ want [to choose one at this point](../../reference/build-systems). Add the
 ```xml
 <library>
   <repositories>
-    <repository><path>../modm/repo.lb</path></repository>
+    <repository><path>../../ext/modm/repo.lb</path></repository>
   </repositories>
   <options>
     <option name="modm:build:project.name">custom_name</option>
