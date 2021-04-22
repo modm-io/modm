@@ -292,7 +292,7 @@ modm::platform::Rcc::enablePll(PllSource source, const PllFactors& pllFactors, u
 
 %% if target["family"] == "f4"
 bool
-modm::platform::Rcc::enablePllI2s(PllSource, const PllI2sFactors& pllFactors, uint32_t waitCycles)
+modm::platform::Rcc::enablePllI2s(const PllI2sFactors& pllFactors, uint32_t waitCycles)
 {
 	// Read reserved and don't care values and clear all other values
 	uint32_t tmp = RCC->PLLI2SCFGR & ~(RCC_PLLI2SCFGR_PLLI2SN | RCC_PLLI2SCFGR_PLLI2SR);

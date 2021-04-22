@@ -92,7 +92,7 @@ struct SystemClock {
 			.pllN = 258,	// 1 MHz * N=258 -> 258 MHz
 			.pllR = 3		// 258 MHz / R=3 -> 86 MHz
 		};
-		Rcc::enablePllI2s(Rcc::PllSource::ExternalCrystal, pllI2sFactors, 2048);
+		Rcc::enablePllI2s(pllI2sFactors, 2048);
 		// set flash latency for 168MHz
 		Rcc::setFlashLatency<Frequency>();
 		// switch system clock to PLL output
@@ -148,7 +148,7 @@ using Scl = GpioB6;			// Audio_SCL
 using Sda = GpioB9;			// Audio_SDA
 
 using I2cMaster = I2cMaster1;
-//using I2sMaster = I2sMaster3;
+using I2sMaster = I2sMaster3;
 }
 
 
@@ -207,10 +207,8 @@ initializeLis3()
 inline void
 initializeCs43()
 {
-//	cs43::Lrck::connect(cs43::I2sMaster::Ws);
-//	cs43::Mclk::connect(cs43::I2sMaster::Mck);
-//	cs43::Sclk::connect(cs43::I2sMaster::Ck);
-//	cs43::Sdin::connect(cs43::I2sMaster::Sd);
+	cs43::I2sMaster::connect<cs43::Mclk::Mck, cs43::Sclk::Ck,
+							cs43::Lrck::Ws, cs43::Sdin::Sd>();
 
 	cs43::Reset::setOutput(modm::Gpio::High);
 

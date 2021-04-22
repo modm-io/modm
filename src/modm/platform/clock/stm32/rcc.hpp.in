@@ -561,18 +561,25 @@ public:
 
 %% if target["family"] == "f4"
 	/** TODO: comments
+	 * \code
 	 * input clock is the HSE or HSI divided by M
 	 * f(VCO clock) = f(PLLI2S clock input) × (PLLI2SN / PLLM)
 	 * f(PLL I2S clock output) = f(VCO clock) / PLLI2SR
+	 * \endcode
+	 * 
 	 * 
 	 * \param	pllN
-	 * PLLI2S multiplication factor for VCO
-	 * 50 <= PLLI2SN <= 432
+	 *	 	PLLI2S multiplication factor for VCO
+	 *	 	Caution: The software has to set these bits correctly
+	 *	 		to ensure that the VCO output frequency
+	 * 			is between 100 and 432 MHz. 
+	 *  	50 <= PLLI2SN <= 432
 	 * 
 	 * \param	pllR
-	 * PLLI2S division factor for I2S clocks
-	 * Caution: The I2Ss requires a frequency lower than or equal to 192 MHz to work correctly.
-	 * 2 <= PLLR <= 7
+	 * 		PLLI2S division factor for I2S clocks
+	 * 		Caution: The I2Ss requires a frequency lower than
+	 * 			or equal to 192 MHz to work correctly.
+	 * 		2 <= PLLR <= 7
 	 */
 	struct PllI2sFactors
 	{
@@ -582,7 +589,7 @@ public:
 
 	/* TODO: comments */
 	static bool
-	enablePllI2s(PllSource, const PllI2sFactors& pllFactors, uint32_t waitCycles);
+	enablePllI2s(const PllI2sFactors& pllFactors, uint32_t waitCycles);
 %% endif
 
 	// sinks
