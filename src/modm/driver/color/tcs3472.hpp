@@ -17,7 +17,7 @@
 
 #include <stdint.h>
 #include <modm/architecture/interface/i2c_device.hpp>
-#include <modm/math/utils/endianness.hpp>
+#include <modm/math/utils.hpp>
 #include <modm/ui/color.hpp>
 
 namespace modm
@@ -30,81 +30,6 @@ class Tcs3472;
 /// @ingroup	modm_driver_tcs3472
 struct tcs3472
 {
-	/** Device Address depends on version TCS3472x
-	 *
-	 * - 1 = 0x39 (with IR filter)
-	 * - 3 = 0x39 (without IR filter)
-	 * - 5 = 0x29 (with IR filter)
-	 * - 7 = 0x29 (without IR filter)
-	 */
-	static constexpr uint8_t
-	addr(uint8_t version=5)
-	{ return version < 5 ? 0x39 : 0x29; }
-
-	/// Analog rgbc gain control
-	enum class
-	Gain : uint8_t
-	{
-		X1 = 0b00,			///< x1 gain
-		X4 = 0b01,			///< x4 gain
-		X16 = 0b10,			///< x16 gain
-		X60 = 0b11,			///< x60 gain
-	};
-
-	/// Integration for a fixed time
-	enum class
-	IntegrationTime : uint8_t
-	{
-		MSEC_2_4 = 0xFF,	///< integrate over 2.4 ms
-		MSEC_24 = 0xF6,		///< integrate over 24 ms
-		MSEC_101 = 0xD5,	///< integrate over 101 ms
-		MSEC_154 = 0xC0,	///< integrate over 154 ms
-		MSEC_700 = 0x00,	///< integrate over 700 ms
-	};
-
-	enum class
-	WaitTime : uint8_t
-	{
-		MSEC_2_4 = 0xFF,	///< wait for 2.4 ms
-		MSEC_204 = 0xAB,	///< wait for 204 ms>
-		MSEC_614 = 0x00		///< wait for 614 ms>
-	};
-
-	/// Controls rate of interrupt to the host processor.
-	enum class
-	InterruptPersistence : uint8_t
-	{
-		EVERY = 0,			// Interrupt for every new sample independent of thresholds
-		CNT_1 = 1,			// Interrupt after 1 cycle being below or above thresholds
-		CNT_2 = 2,			// Interrupt after 2 cycles being below or above thresholds
-		CNT_3 = 3,			// ...
-		CNT_5 = 4,
-		CNT_10 = 5,
-		CNT_15 = 6,
-		CNT_20 = 7,
-		CNT_25 = 8,
-		CNT_30 = 9,
-		CNT_35 = 10,
-		CNT_40 = 11,
-		CNT_45 = 12,
-		CNT_50 = 13,
-		CNT_55 = 14,
-		CNT_60 = 15,
-	};
-
-	/// Power-control and feature enable flags
-	enum class
-	Enable : uint8_t
-	{
-		POWER_ON = 1,
-		ADC_ENABLE = 1 << 1,
-		WAIT_ENABLE = 1 << 3,
-		INTERRUPT_ENABLE = 1 << 4,
-		POWER_ON_POLLING = POWER_ON | ADC_ENABLE,
-		POWER_ON_INTERRUPT = POWER_ON | ADC_ENABLE | INTERRUPT_ENABLE,
-		POWER_ON_INTERRUPT_AND_WAITTIME = POWER_ON | ADC_ENABLE | WAIT_ENABLE | INTERRUPT_ENABLE
-	};
-
 	/// Register addresses
 	enum class
 	RegisterAddress : uint8_t
@@ -138,6 +63,81 @@ struct tcs3472
 		BDATALOW = 0x1A,				///< Low byte of ADC blue channel
 		BDATAHIGH = 0x1B 				///< High byte of ADC blue channel
 	};
+
+	public:
+	/// Analog rgbc gain control
+	enum class
+	Gain : uint8_t
+	{
+		X1 = 0,		///< x1 gain
+		X4 = 1,		///< x4 gain
+		X16 = 2,	///< x16 gain
+		X60 = 3,	///< x60 gain
+	};
+
+	/// Light integration time in ms
+	enum class
+	IntegrationTime : uint8_t
+	{
+		MSEC_2_4 = 0xFF,	///< integrate over 2.4 ms
+		MSEC_24 = 0xF6,		///< integrate over 24 ms
+		MSEC_101 = 0xD5,	///< integrate over 101 ms
+		MSEC_154 = 0xC0,	///< integrate over 154 ms
+		MSEC_700 = 0x00,	///< integrate over 700 ms
+	};
+
+	/// Time to wait between samples in ms
+	enum class
+	WaitTime : uint8_t
+	{
+		MSEC_2_4 = 0xFF,	///< wait for 2.4 ms
+		MSEC_204 = 0xAB,	///< wait for 204 ms>
+		MSEC_614 = 0x00		///< wait for 614 ms>
+	};
+
+	/// Controls rate of interrupt to the host processor.
+	enum class
+	InterruptPersistence : uint8_t
+	{
+		EVERY = 0,		///< Interrupt for every new sample independent of thresholds
+		CNT_1 = 1,		///< Interrupt after 1 cycle being below or above thresholds
+		CNT_2 = 2,		///< Interrupt after 2 cycles being below or above thresholds
+		CNT_3 = 3,		///< ...
+		CNT_5 = 4,
+		CNT_10 = 5,
+		CNT_15 = 6,
+		CNT_20 = 7,
+		CNT_25 = 8,
+		CNT_30 = 9,
+		CNT_35 = 10,
+		CNT_40 = 11,
+		CNT_45 = 12,
+		CNT_50 = 13,
+		CNT_55 = 14,
+		CNT_60 = 15,
+	};
+
+	/// Power-control and feature enable flags
+	enum class
+	Enable : uint8_t
+	{
+		POWER_ON = Bit0,
+		ADC_ENABLE = Bit1,
+		WAIT_ENABLE = Bit3,
+		INTERRUPT_ENABLE = Bit4
+	};
+	MODM_FLAGS8(Enable);
+
+	/** Device Address depends on version TCS3472x
+	 *
+	 * - 1 = 0x39 (with IR filter)
+	 * - 3 = 0x39 (without IR filter)
+	 * - 5 = 0x29 (with IR filter)
+	 * - 7 = 0x29 (without IR filter)
+	 */
+	static constexpr uint8_t
+	addr(uint8_t version=5)
+	{ return version < 5 ? 0x39 : 0x29; }
 
 	using Rgb = color::RgbT<uint16_t>;
 
@@ -205,10 +205,15 @@ class Tcs3472 : public tcs3472, public modm::I2cDevice<I2cMaster, 2>
 public:
 	Tcs3472(Data &data, uint8_t address = addr());
 
+	// Typical Runmodes
+	static constexpr Enable_t Enable_PollingMode = Enable::POWER_ON | Enable::ADC_ENABLE;
+	static constexpr Enable_t Enable_InterruptMode = Enable_PollingMode | Enable::INTERRUPT_ENABLE;
+	static constexpr Enable_t Enable_InterruptMode_Waittime = Enable_InterruptMode | Enable::INTERRUPT_ENABLE;
+
 	/// Power up sensor and start conversions
 	modm::ResumableResult<bool>
-	initialize(Enable flags = Enable::POWER_ON_POLLING)
-	{ return writeRegister(RegisterAddress::ENABLE, uint8_t(flags)); }
+	initialize(Enable_t flags = Enable_PollingMode)
+	{ return writeRegister(RegisterAddress::ENABLE, flags.value); }
 
 	modm::ResumableResult<bool>
 	configure(Gain gain = Gain::X1,

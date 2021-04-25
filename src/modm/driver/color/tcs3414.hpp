@@ -54,13 +54,13 @@ struct tcs3414
 	enum class
 	Prescaler : uint8_t
 	{
-		D1	= 0b000,	///< divide by 1
-		D2	= 0b001,	///< divide by 2
-		D4	= 0b010,	///< divide by 4
-		D8	= 0b011,	///< divide by 8
-		D16	= 0b100,	///< divide by 16
-		D32	= 0b101,	///< divide by 32
-		D64	= 0b110,	///< divide by 64
+		D1		= 0, ///< divide by 1
+		D2		= 1, ///< divide by 2
+		D4		= 2, ///< divide by 4
+		D8		= 3, ///< divide by 8
+		D16		= 4, ///< divide by 16
+		D32		= 5, ///< divide by 32
+		D64		= 6, ///< divide by 64
 	};
 
 	/// Select mode how to choose the integration time
@@ -77,24 +77,24 @@ struct tcs3414
 	enum class
 	NominalIntegrationTime : uint8_t
 	{
-		MSEC_12  = 0b0000,	///< integrate over 12 ms
-		MSEC_100 = 0b0001,	///< integrate over 100 ms
-		MSEC_400 = 0b0010,	///< integrate over 400 ms
+		MSEC_12		= 0,	///< integrate over 12 ms
+		MSEC_100	= 1,	///< integrate over 100 ms
+		MSEC_400	= 2,	///< integrate over 400 ms
 	};
 
 	/// The number of pulses on sync pin to integrate over
 	enum class
 	SyncPulseCount : uint8_t
 	{
-		PULSES_1	= 0b0000,	///< integrate over 1 pulses of sync pin
-		PULSES_2	= 0b0001,	///< integrate over 2 pulses of sync pin
-		PULSES_4	= 0b0010,	///< integrate over 4 pulses of sync pin
-		PULSES_8	= 0b0011,	///< integrate over 8 pulses of sync pin
-		PULSES_16	= 0b0100,	///< integrate over 16 pulses of sync pin
-		PULSES_32	= 0b0101,	///< integrate over 32 pulses of sync pin
-		PULSES_64	= 0b0110,	///< integrate over 64 pulses of sync pin
-		PULSES_128	= 0b0111,	///< integrate over 128 pulses of sync pin
-		PULSES_256	= 0b1000,	///< integrate over 256 pulses of sync pin
+		PULSES_1	= 0,	///< integrate over 1 pulses of sync pin
+		PULSES_2	= 1,	///< integrate over 2 pulses of sync pin
+		PULSES_4	= 2,	///< integrate over 4 pulses of sync pin
+		PULSES_8	= 3,	///< integrate over 8 pulses of sync pin
+		PULSES_16	= 4,	///< integrate over 16 pulses of sync pin
+		PULSES_32	= 5,	///< integrate over 32 pulses of sync pin
+		PULSES_64	= 6,	///< integrate over 64 pulses of sync pin
+		PULSES_128	= 7,	///< integrate over 128 pulses of sync pin
+		PULSES_256	= 8,	///< integrate over 256 pulses of sync pin
 	};
 
 	/// Register addresses

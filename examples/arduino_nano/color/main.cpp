@@ -45,7 +45,7 @@ public:
 
 		MODM_LOG_INFO << "TCS34725 responded" << modm::endl;
 
-		PT_CALL(sensor.initialize(modm::tcs3472::Enable::POWER_ON_INTERRUPT_AND_WAITTIME));
+		PT_CALL(sensor.initialize(sensor.Enable_InterruptMode_Waittime));
 		PT_CALL(sensor.configure(modm::tcs3472::Gain::X16, modm::tcs3472::IntegrationTime::MSEC_2_4));
 		PT_CALL(sensor.setInterruptPersistenceFilter(modm::tcs3472::InterruptPersistence::CNT_20));
 		// Setup WaitTime to further slow down samplerate
