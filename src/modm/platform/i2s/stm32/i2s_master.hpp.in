@@ -18,10 +18,12 @@
 #ifndef MODM_STM32_I2S_MASTER{{ id }}_HPP
 #define MODM_STM32_I2S_MASTER{{ id }}_HPP
 
+#include <cstdlib>
+
 #include <modm/architecture/interface/i2s_master.hpp>
 #include <modm/platform/gpio/connector.hpp>
 #include <modm/math/algorithm/prescaler.hpp>
-//#include "i2s_hal_{{ id }}.hpp" TODO
+#include "i2s_hal_{{ id }}.hpp"
 
 namespace modm
 {
@@ -40,11 +42,9 @@ namespace platform
 class I2sMaster{{ id }} : public modm::I2sMaster
 {
 public:
-	//using Hal = I2sHal{{ id }}; TODO
+	using Hal = I2sHal{{ id }};
 
-	//using DataSize = Hal::DataSize; TODO
 
-public:
 	template< template<Peripheral _> class... Signals >
 	static void
 	connect()
@@ -63,7 +63,21 @@ public:
 		Connector::connect();
 	}
 
-	
+	template< class SystemClock, frequency_t samplerate, percent_t tolerance=pct(0.019) >
+	static inline void
+	initialize()
+	{
+		constexpr float prescaler = static_cast<float>(SystemClock::I2sPll) / (samplerate*16*2*8);
+		constexpr uint8_t i2s_div = static_cast<uint8_t>(prescaler/2);
+		constexpr uint8_t odd_factor = ((prescaler - static_cast<float>(i2s_div*2)) >= 0.5) ? 1 : 0;
+		constexpr float real_samplerate = static_cast<float>(SystemClock::I2sPll) /
+											(16*2*8*(2*i2s_div+odd_factor));
+		static_assert(i2s_div > 1, "I2S{{ id }}: i2s_div can not be 1 or 0!");
+		static_assert(abs(samplerate - real_samplerate)/static_cast<float>(samplerate) < pct2f(tolerance),
+						"I2S{{ id }}: Exceeding specified tolerance, when determining prescelar.");
+		Hal::initialize(odd_factor ? Hal::OddFactor::Enabled : Hal::OddFactor::Disabled,
+						i2s_div);
+	}
 	// end documentation inherited
 };
 

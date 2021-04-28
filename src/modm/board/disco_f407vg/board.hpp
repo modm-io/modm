@@ -45,6 +45,11 @@ struct SystemClock {
 	static constexpr uint32_t Spi5   = Apb2;
 	static constexpr uint32_t Spi6   = Apb2;
 
+	static constexpr uint32_t I2s2   = Spi2;
+	static constexpr uint32_t I2s3   = Spi3;
+
+	static constexpr uint32_t I2sPll = 86_MHz;
+
 	static constexpr uint32_t Usart1 = Apb2;
 	static constexpr uint32_t Usart2 = Apb1;
 	static constexpr uint32_t Usart3 = Apb1;
@@ -209,7 +214,7 @@ initializeCs43()
 {
 	cs43::I2sMaster::connect<cs43::Mclk::Mck, cs43::Sclk::Ck,
 							cs43::Lrck::Ws, cs43::Sdin::Sd>();
-
+	cs43::I2sMaster::initialize<SystemClock, 48_kHz>();
 	cs43::Reset::setOutput(modm::Gpio::High);
 
 	cs43::I2cMaster::connect<cs43::Scl::Scl, cs43::Sda::Sda>();

@@ -40,8 +40,8 @@ class Instance(Module):
         env.substitutions = properties
         env.outbasepath = "modm/src/modm/platform/i2s"
 
-        #env.template("i2s_hal.hpp.in", "i2s_hal_{}.hpp".format(self.instance))
-        #env.template("i2s_hal_impl.hpp.in", "i2s_hal_{}_impl.hpp".format(self.instance))
+        env.template("i2s_hal.hpp.in", "i2s_hal_{}.hpp".format(self.instance))
+        env.template("i2s_hal_impl.hpp.in", "i2s_hal_{}_impl.hpp".format(self.instance))
         env.template("i2s_master.hpp.in", "i2s_master_{}.hpp".format(self.instance))
         #env.template("i2s_master.cpp.in", "i2s_master_{}.cpp".format(self.instance))
         if env.has_module(":platform:dma"):
@@ -77,4 +77,4 @@ def build(env):
     env.substitutions = get_properties(env)
     env.outbasepath = "modm/src/modm/platform/i2s"
 
-    #env.template("i2s_base.hpp.in")
+    env.template("i2s_base.hpp.in")

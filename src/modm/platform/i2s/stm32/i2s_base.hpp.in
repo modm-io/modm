@@ -1,0 +1,109 @@
+/*
+ * Copyright (c) 2013, Kevin Läufer
+ * Copyright (c) 2013-2017, Niklas Hauser
+ * Copyright (c) 2014, Daniel Krebs
+ * Copyright (c) 2020, Mike Wolfram,
+ * Copyright (c) 2021, Marton Ledneczki
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_STM32_I2S_BASE_HPP
+#define MODM_STM32_I2S_BASE_HPP
+
+#include <stdint.h>
+#include "../device.hpp"
+#include <modm/architecture/interface/register.hpp>
+
+namespace modm
+{
+
+namespace platform
+{
+
+/**
+ * Base class for the I2S classes
+ *
+ * Provides some common enum that do not depend on the specific I2S.
+ *
+ * @author Marton Ledneczki
+ * @ingroup	modm_platform_i2s
+ */
+class I2sBase
+{
+public:
+	enum class
+	Interrupt : uint32_t
+	{
+		RxBufferNotEmpty	= SPI_CR2_RXNEIE,
+		TxBufferEmpty		= SPI_CR2_TXEIE,
+		Error				= SPI_CR2_ERRIE,
+		RxDmaEnable         = SPI_CR2_RXDMAEN,
+		TxDmaEnable         = SPI_CR2_TXDMAEN,
+	};
+	MODM_FLAGS32(Interrupt);
+
+	enum class
+	InterruptFlag : uint32_t
+	{
+		TxBufferEmpty		= SPI_SR_TXE,
+		RxBufferNotEmpty	= SPI_SR_RXNE,
+		CrcError			= SPI_SR_CRCERR,
+		ModeFaultError		= SPI_SR_MODF,
+		OverrunError		= SPI_SR_OVR,
+		Busy				= SPI_SR_BSY,
+	};
+	MODM_FLAGS32(InterruptFlag);
+
+	enum class
+	MasterSelection : uint32_t
+	{
+		Slave 	    = 0b0,			        ///< Configure I2S as Slave
+        Master 	    = SPI_I2SCFGR_I2SCFG_1,	///< Configure I2S as Master
+		All 	    = Master,
+	};
+
+    enum class
+    DirectionSelection : uint32_t
+    {
+        Transmitter = 0b0,                  ///< Configure I2S as Transmitter
+        Receiver    = SPI_I2SCFGR_I2SCFG_0, ///< COnfigure I2S as Receiver
+        All         = Receiver,
+    };
+
+	enum class
+	BitDepth : uint32_t
+	{
+		Sixteen = 0b0,
+		Twentyfour = SPI_I2SCFGR_DATLEN_0,
+		Thirtytwo = SPI_I2SCFGR_DATLEN_1,
+		All = Thirtytwo,
+	};
+
+	enum class
+	MasterClockOutput : uint32_t
+	{
+		Disabled = 0b0,
+		Enabled = SPI_I2SPR_MCKOE,
+		All = Enabled,
+	};
+
+	enum class
+	OddFactor : uint32_t
+	{
+		Disabled = 0,
+		Enabled = SPI_I2SPR_ODD,
+		All = Enabled,
+	};
+};
+
+} // namespace platform
+
+} // namespace modm
+
+#endif // MODM_STM32_I2S_BASE_HPP
