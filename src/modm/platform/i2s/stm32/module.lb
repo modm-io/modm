@@ -1,0 +1,79 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2016-2018, Niklas Hauser
+# Copyright (c) 2017, Fabian Greif
+# Copyright (c) 2021, Marton Ledneczki
+# Copyright (c) 2022, Raphael Lehmann
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def get_properties(env):
+    device = env[":target"]
+    driver = device.get_driver("i2s")
+    properties = {}
+    properties["target"] = device.identifier
+    properties["features"] = driver["feature"] if "feature" in driver else []
+    return properties
+
+class Instance(Module):
+    def __init__(self, driver, instance):
+        self.instance = int(instance)
+        self.driver = driver
+
+    def init(self, module):
+        module.name = str(self.instance)
+        module.description = "Instance {}".format(self.instance)
+
+    def prepare(self, module, options):
+        module.depends(
+            ":platform:i2s",
+            ":platform:dma",
+            )
+        return True
+
+    def build(self, env):
+        properties = get_properties(env)
+        properties["id"] = self.instance
+
+        env.substitutions = properties
+        env.outbasepath = "modm/src/modm/platform/i2s"
+
+        env.template("i2s_hal.hpp.in", "i2s_hal_{}.hpp".format(self.instance))
+        env.template("i2s_hal_impl.hpp.in", "i2s_hal_{}_impl.hpp".format(self.instance))
+        env.template("i2s_master.hpp.in", "i2s_master_{}.hpp".format(self.instance))
+
+
+def init(module):
+    module.name = ":platform:i2s"
+    module.description = "Inter-IC Sound (I2S)"
+
+def prepare(module, options):
+    device = options[":target"]
+    if not device.has_driver("i2s:stm32*"):
+        return False
+
+    module.depends(
+        ":architecture:register",
+        ":architecture:i2s",
+        ":cmsis:device",
+        ":math:algorithm",
+        ":platform:gpio",
+        ":platform:rcc")
+
+    for driver in device.get_all_drivers("i2s:stm32*"):
+        for instance in driver["instance"]:
+            module.add_submodule(Instance(driver, instance))
+
+    return True
+
+def build(env):
+    env.substitutions = get_properties(env)
+    env.outbasepath = "modm/src/modm/platform/i2s"
+
+    env.template("i2s_base.hpp.in")

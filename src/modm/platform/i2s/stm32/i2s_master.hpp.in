@@ -1,0 +1,152 @@
+/*
+ * Copyright (C) 2021, Marton Ledneczki
+ * Copyright (c) 2021-2022, Raphael Lehmann
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_STM32_I2S_MASTER{{ id }}_HPP
+#define MODM_STM32_I2S_MASTER{{ id }}_HPP
+
+#include <cstdlib>
+
+#include <modm/architecture/interface/i2s_master.hpp>
+#include <modm/architecture/interface/peripheral.hpp>
+#include <modm/platform/gpio/connector.hpp>
+#include <modm/math/algorithm/prescaler.hpp>
+#include "i2s_hal_{{ id }}.hpp"
+
+namespace modm::platform
+{
+
+/**
+ * Inter-IC Sound (I2C{{ id }}).
+ *
+ * TODO: say something about the nature of implementation
+ *
+ * @tparam	DmaChannelTX DMA channel for sending
+ *
+ * @author	Marton Ledneczki
+ * @author	Raphael Lehmann
+ * @ingroup	modm_platform_i2s modm_platform_i2s_{{id}}
+ */
+template <class DmaChannelTx>
+class I2sMaster{{ id }} : public modm::I2sMaster
+{
+	struct Dma {
+		using TxChannel = typename DmaChannelTx::template RequestMapping<Peripheral::Spi{{ id }}, DmaBase::Signal::Tx>::Channel;
+
+		static constexpr DmaBase::Request TxRequest = DmaChannelTx::template RequestMapping<Peripheral::Spi{{ id }}, DmaBase::Signal::Tx>::Request;
+	};
+
+private:
+	using Hal = I2sHal{{ id }};
+
+public:
+	template< class... Signals >
+	static void
+	connect()
+	{
+		using Connector = GpioConnector<Peripheral::I2s{{ id }}, Signals...>;
+		using Ck = typename Connector::template GetSignal<Gpio::Signal::Ck>;
+		using Mck = typename Connector::template GetSignal<Gpio::Signal::Mck>;
+		using Sd = typename Connector::template GetSignal<Gpio::Signal::Sd>;
+        using Ws = typename Connector::template GetSignal<Gpio::Signal::Ws>;
+
+		// Connector::disconnect();
+		Ck::setOutput(Gpio::OutputType::PushPull);
+		Mck::setOutput(Gpio::OutputType::PushPull);
+		Sd::setOutput(Gpio::OutputType::PushPull);
+        Ws::setOutput(Gpio::OutputType::PushPull);
+		Connector::connect();
+	}
+
+	template< class SystemClock, frequency_t samplerate, percent_t tolerance=pct(0.019) >
+	static inline void
+	initialize(DmaBase::Priority dmaPriority = DmaBase::Priority::High)
+	{
+		constexpr float prescaler = static_cast<float>(SystemClock::I2sPll) / (samplerate*16*2*8);
+		constexpr uint8_t i2s_div = static_cast<uint8_t>(prescaler/2);
+		constexpr uint8_t odd_factor = ((prescaler - static_cast<float>(i2s_div*2)) >= 0.5) ? 1 : 0;
+		constexpr float real_samplerate = static_cast<float>(SystemClock::I2sPll) /
+											(16*2*8*(2*i2s_div+odd_factor));
+		static_assert(i2s_div > 1, "I2S{{ id }}: i2s_div can not be 1 or 0!");
+		modm::PeripheralDriver::assertBaudrateInTolerance<uint32_t(real_samplerate), samplerate, tolerance>();
+
+		Hal::initialize(odd_factor ? Hal::OddFactor::Enabled : Hal::OddFactor::Disabled,
+						i2s_div);
+
+		dmaError = false;
+		Dma::TxChannel::configure(
+			DmaBase::DataTransferDirection::MemoryToPeripheral,
+			DmaBase::MemoryDataSize::Bit16,
+			DmaBase::PeripheralDataSize::Bit16,
+			DmaBase::MemoryIncrementMode::Increment,
+			DmaBase::PeripheralIncrementMode::Fixed,
+			dmaPriority,
+			DmaBase::CircularMode::Disabled);
+		Dma::TxChannel::setPeripheralAddress(SPI{{ id }}_BASE + 0x0c);
+		Dma::TxChannel::setTransferErrorIrqHandler(handleDmaTransferError);
+		Dma::TxChannel::enableInterruptVector();
+		Dma::TxChannel::enableInterrupt(DmaBase::InterruptEnable::TransferError |
+				DmaBase::InterruptEnable::TransferComplete);
+		Dma::TxChannel::template setPeripheralRequest<Dma::TxRequest>();
+		Hal::enableDma(true);
+	}
+
+	static inline void
+	setTxBufferAddress(uintptr_t address, std::size_t length)
+	{
+		Dma::TxChannel::setMemoryAddress(address);
+		Dma::TxChannel::setDataLength(length);
+	}
+
+	static inline void
+	setTransferCompleteIrqHandler(DmaBase::IrqHandler handleDmaTransferComplete)
+	{
+		Dma::TxChannel::setTransferCompleteIrqHandler(handleDmaTransferComplete);
+	}
+
+	static inline void
+	start()
+	{
+		Hal::start();
+		Dma::TxChannel::start();
+	}
+
+	static inline void
+	startDma()
+	{
+		Dma::TxChannel::start();
+	}
+
+	static inline void
+	stop()
+	{
+		//Hal::stop();
+		Dma::TxChannel::stop();
+	}
+
+	// end documentation inherited
+
+private:
+	static void handleDmaTransferError()
+	{
+		Hal::enableDma(false);
+		Dma::TxChannel::stop();
+		dmaError = true;
+	}
+
+	static inline bool dmaError { false };
+public:
+	static bool hasDmaError() { return dmaError; }
+};
+
+} // namespace modm::platform
+
+#endif // MODM_STM32_I2S_MASTER{{ id }}_HPP
