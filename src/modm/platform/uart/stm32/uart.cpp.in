@@ -6,6 +6,7 @@
  * Copyright (c) 2013, 2016, Kevin Läufer
  * Copyright (c) 2013-2017, Niklas Hauser
  * Copyright (c) 2018, Lucas Mösch
+ * Copyright (c) 2021, Raphael Lehmann
  *
  * This file is part of the modm project.
  *
@@ -15,12 +16,12 @@
  */
 // ----------------------------------------------------------------------------
 
-%% set name = uart_name ~ id
-%% set hal = uart_name ~ "Hal" ~ id
-
 #include "../device.hpp"
-#include "uart_hal_{{ id }}.hpp"
+%% if "Lpuart" in uart_type
+#include "lpuart_{{ id }}.hpp"
+%% else
 #include "uart_{{ id }}.hpp"
+%%endif
 
 %% if buffered
 #include <modm/architecture/interface/atomic_lock.hpp>
@@ -235,7 +236,7 @@ void
 }	// namespace modm::platform
 
 %% if buffered
-%% if id in shared_irq_ids
+%% if name in shared_irqs.keys()
 void
 modm::platform::{{ name }}::irq()
 %% else

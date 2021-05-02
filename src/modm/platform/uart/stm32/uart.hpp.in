@@ -5,6 +5,7 @@
  * Copyright (c) 2011, 2013-2017, Niklas Hauser
  * Copyright (c) 2012, Sascha Schade
  * Copyright (c) 2013, 2016, Kevin Läufer
+ * Copyright (c) 2021, Raphael Lehmann
  *
  * This file is part of the modm project.
  *
@@ -14,22 +15,28 @@
  */
 // ----------------------------------------------------------------------------
 
-%% set hal = uart_name ~ "Hal" ~ id
-%% set name = uart_name ~ id
-
+%% if "Lpuart" in uart_type
+#ifndef MODM_STM32_LPUART_{{ id }}_HPP
+#define MODM_STM32_LPUART_{{ id }}_HPP
+%% else
 #ifndef MODM_STM32_UART_{{ id }}_HPP
 #define MODM_STM32_UART_{{ id }}_HPP
+%%endif
 
 #include <modm/architecture/interface/uart.hpp>
 #include <modm/platform/gpio/connector.hpp>
 #include "uart_base.hpp"
+%% if "Lpuart" in uart_type
+#include "lpuart_hal_{{ id }}.hpp"
+%% else
 #include "uart_hal_{{ id }}.hpp"
+%%endif
 
 namespace modm::platform
 {
 
 /**
- * Universal asynchronous receiver transmitter ({{ uart_name | upper ~ id }})
+ * Universal asynchronous receiver transmitter ({{ name }})
  *
  * @author		Kevin Laeufer
  * @author		Niklas Hauser
@@ -121,7 +128,7 @@ public:
 	static void
 	clearError();
 
-%% if id in shared_irq_ids
+%% if name in shared_irqs.keys()
 	static void
 	irq();
 %% endif

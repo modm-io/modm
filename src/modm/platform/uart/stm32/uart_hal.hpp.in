@@ -2,6 +2,7 @@
  * Copyright (c) 2013, Sascha Schade
  * Copyright (c) 2013-2014, 2016, Kevin Läufer
  * Copyright (c) 2013-2017, 2021, Niklas Hauser
+ * Copyright (c) 2021, Raphael Lehmann
  *
  * This file is part of the modm project.
  *
@@ -11,8 +12,13 @@
  */
 // ----------------------------------------------------------------------------
 
+%% if "Lpuart" in uart_type
+#ifndef MODM_STM32_LPUARTHAL_{{ id }}_HPP
+#define MODM_STM32_LPUARTHAL_{{ id }}_HPP
+%% else
 #ifndef MODM_STM32_UARTHAL_{{ id }}_HPP
 #define MODM_STM32_UARTHAL_{{ id }}_HPP
+%%endif
 
 #include <stdint.h>
 #include "../device.hpp"
@@ -24,7 +30,7 @@ namespace modm::platform
 {
 
 /**
- * Universal asynchronous receiver transmitter ({{ uart_name ~ "Hal" ~ id }})
+ * Universal asynchronous receiver transmitter ({{ hal }})
  *
  * Not available on the low- and medium density devices.
  *
@@ -34,7 +40,7 @@ namespace modm::platform
  * @author		Kevin Laeufer
  * @ingroup		modm_platform_uart
  */
-class {{ uart_name ~ "Hal" ~ id }} : public UartBase
+class {{ hal }} : public UartBase
 {
 public:
 	static constexpr bool isExtended = {{ extended_driver | lower }};
@@ -61,7 +67,7 @@ public:
 	static inline void
 	initialize(Parity parity, WordLength length);
 
-%% if uart_name == "Usart"
+%% if uart_type == "Usart"
 	%% if extended_driver
 	/// @warning You must call `disableOperations()` before this function!
 	%% endif
@@ -133,6 +139,10 @@ public:
 
 }	// namespace modm::platform
 
+%% if "Lpuart" in uart_type
+#include "lpuart_hal_{{ id }}_impl.hpp"
+%% else
 #include "uart_hal_{{ id }}_impl.hpp"
+%%endif
 
-#endif // MODM_STM32_UARTHAL_{{ id }}_HPP
+#endif

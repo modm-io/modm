@@ -5,6 +5,7 @@
  * Copyright (c) 2017, Sascha Schade
  * Copyright (c) 2018, Christopher Durand
  * Copyright (c) 2018, Lucas Mösch
+ * Copyright (c) 2021, Raphael Lehmann
  *
  * This file is part of the modm project.
  *
@@ -14,12 +15,18 @@
  */
 // ----------------------------------------------------------------------------
 
-%% set name = uart_name ~ "Hal" ~ id
-%% set peripheral = uart_name | upper ~ id
+%% set peripheral = uart_type | upper ~ id
 
+%% if "Lpuart" in uart_type
+#ifndef MODM_STM32_LPUARTHAL_{{ id }}_HPP
+#	error 	"Don't include this file directly, use lpuart_hal_{{ id }}.hpp instead!"
+#endif
+%% else
 #ifndef MODM_STM32_UARTHAL_{{ id }}_HPP
 #	error 	"Don't include this file directly, use uart_hal_{{ id }}.hpp instead!"
 #endif
+%%endif
+
 #include <modm/platform/clock/rcc.hpp>
 #include <modm/math/algorithm/prescaler.hpp>
 
@@ -28,45 +35,56 @@ namespace modm::platform
 
 // ----------------------------------------------------------------------------
 void
-{{ name }}::enable()
+{{ hal }}::enable()
 {
-	Rcc::enable<Peripheral::{{ uart_name ~ id }}>();
+	Rcc::enable<Peripheral::{{ name }}>();
 }
 
 void
-{{ name }}::disable()
+{{ hal }}::disable()
 {
 	// TX, RX, Uart, etc. Disable
 	{{ peripheral }}->CR1 = 0;
-	Rcc::disable<Peripheral::{{ uart_name ~ id }}>();
+	Rcc::disable<Peripheral::{{ name }}>();
 }
 
 void
-{{ name }}::enableOperation()
+{{ hal }}::enableOperation()
 {
 	{{ peripheral }}->CR1 |= USART_CR1_UE;
 }
 
 void
-{{ name }}::disableOperation()
+{{ hal }}::disableOperation()
 {
 	{{ peripheral }}->CR1 &= ~USART_CR1_UE;
 }
 
 template< class SystemClock, modm::baudrate_t baudrate, modm::percent_t tolerance >
 void
-{{ name }}::initialize(Parity parity, WordLength length)
+{{ hal }}::initialize(Parity parity, WordLength length)
 {
 	enable();
 	disableOperation();
 
 %% if over8
-	constexpr uint32_t scalar = (baudrate * 16l > SystemClock::{{ uart_name ~ id }}) ? 8 : 16;
+	constexpr uint32_t scalar = (baudrate * 16 > SystemClock::{{ name }}) ? 8 : 16;
 	constexpr uint32_t max = ((scalar == 16) ? (1ul << 16) : (1ul << 15)) - 1ul;
+	constexpr auto result = Prescaler::from_range(SystemClock::{{ name }}, baudrate, 1, max);
+%% elif uart_type == "Lpuart"
+	static_assert(SystemClock::{{ name }} >= baudrate * 3,
+		"fck must be in the range [3 x baud rate, 4096 x baud rate].");
+	static_assert(SystemClock::{{ name }} <= uint64_t(baudrate) * 4096,
+		"fck must be in the range [3 x baud rate, 4096 x baud rate].");
+	constexpr uint32_t max = (1ul << 20) - 1ul;
+	constexpr auto result = GenericPrescaler<uint64_t>::from_range(
+		uint64_t(SystemClock::{{ name }}) * 256,
+		baudrate,
+		0x300, max);
 %% else
 	constexpr uint32_t max = (1ul << 16) - 1ul;
+	constexpr auto result = Prescaler::from_range(SystemClock::{{ name }}, baudrate, 1, max);
 %% endif
-	constexpr auto result = Prescaler::from_range(SystemClock::{{ uart_name ~ id }}, baudrate, 1, max);
 	modm::PeripheralDriver::assertBaudrateInTolerance< result.frequency, baudrate, tolerance >();
 
 	uint32_t cr1 = {{ peripheral }}->CR1;
@@ -102,9 +120,9 @@ void
 	{{ peripheral }}->CR1 = cr1;
 }
 
-%% if uart_name == "Usart"
+%% if uart_type == "Usart"
 void
-{{ name }}::setSpiClock(SpiClock clk, LastBitClockPulse pulse)
+{{ hal }}::setSpiClock(SpiClock clk, LastBitClockPulse pulse)
 {
 	uint32_t cr2 = {{ peripheral }}->CR2;
 	cr2 &= ~(USART_CR2_LBCL | USART_CR2_CLKEN);
@@ -113,7 +131,7 @@ void
 }
 
 void
-{{ name }}::setSpiDataMode(SpiDataMode mode)
+{{ hal }}::setSpiDataMode(SpiDataMode mode)
 {
 	uint32_t cr2 = {{ peripheral }}->CR2;
 	cr2 &= ~(USART_CR2_CPOL | USART_CR2_CPHA);
@@ -123,7 +141,7 @@ void
 %% endif
 
 void
-{{ name }}::write(uint16_t data)
+{{ hal }}::write(uint16_t data)
 {
 %% if extended_driver
 	{{ peripheral }}->TDR = data;
@@ -133,7 +151,7 @@ void
 }
 
 void
-{{ name }}::read(uint8_t &data)
+{{ hal }}::read(uint8_t &data)
 {
 %% if extended_driver
 	data = {{ peripheral }}->RDR;
@@ -143,7 +161,7 @@ void
 }
 
 void
-{{ name }}::read(uint16_t &data)
+{{ hal }}::read(uint16_t &data)
 {
 %% if extended_driver
 	data = {{ peripheral }}->RDR;
@@ -153,7 +171,7 @@ void
 }
 
 void
-{{ name }}::setTransmitterEnable(bool enable)
+{{ hal }}::setTransmitterEnable(bool enable)
 {
 	if (enable) {
 		{{ peripheral }}->CR1 |=  USART_CR1_TE;
@@ -163,7 +181,7 @@ void
 }
 
 void
-{{ name }}::setReceiverEnable(bool enable)
+{{ hal }}::setReceiverEnable(bool enable)
 {
 	if (enable) {
 		{{ peripheral }}->CR1 |=  USART_CR1_RE;
@@ -173,7 +191,7 @@ void
 }
 
 bool
-{{ name }}::isReceiveRegisterNotEmpty()
+{{ hal }}::isReceiveRegisterNotEmpty()
 {
 %% if extended_driver
 	return {{ peripheral }}->ISR & USART_ISR_RXNE;
@@ -183,7 +201,7 @@ bool
 }
 
 bool
-{{ name }}::isTransmitRegisterEmpty()
+{{ hal }}::isTransmitRegisterEmpty()
 {
 %% if extended_driver
 	return {{ peripheral }}->ISR & USART_ISR_TXE;
@@ -193,10 +211,10 @@ bool
 }
 
 void
-{{ name }}::enableInterruptVector(bool enable, uint32_t priority)
+{{ hal }}::enableInterruptVector(bool enable, uint32_t priority)
 {
-%% if id in shared_irq_ids
-	%% set irq = shared_irq
+%% if name in shared_irqs.keys()
+	%% set irq = shared_irqs[name]
 %% else
 	%% set irq = peripheral
 %% endif
@@ -213,25 +231,25 @@ void
 }
 
 void
-{{ name }}::setInterruptPriority(uint32_t priority)
+{{ hal }}::setInterruptPriority(uint32_t priority)
 {
 	NVIC_SetPriority({{ irq }}_IRQn, priority);
 }
 
 void
-{{ name }}::enableInterrupt(Interrupt_t interrupt)
+{{ hal }}::enableInterrupt(Interrupt_t interrupt)
 {
 	{{ peripheral }}->CR1 |= interrupt.value;
 }
 
 void
-{{ name }}::disableInterrupt(Interrupt_t interrupt)
+{{ hal }}::disableInterrupt(Interrupt_t interrupt)
 {
 	{{ peripheral }}->CR1 &= ~interrupt.value;
 }
 
-{{ name }}::InterruptFlag_t
-{{ name }}::getInterruptFlags()
+{{ hal }}::InterruptFlag_t
+{{ hal }}::getInterruptFlags()
 {
 %% if extended_driver
 	return InterruptFlag_t( {{ peripheral }}->ISR );
@@ -241,7 +259,7 @@ void
 }
 
 void
-{{ name }}::acknowledgeInterruptFlags(InterruptFlag_t flags)
+{{ hal }}::acknowledgeInterruptFlags(InterruptFlag_t flags)
 {
 %% if extended_driver
 	// Flags are cleared by writing a one to the flag position.

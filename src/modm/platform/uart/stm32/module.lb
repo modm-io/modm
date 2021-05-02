@@ -3,6 +3,7 @@
 #
 # Copyright (c) 2016-2018, Niklas Hauser
 # Copyright (c) 2017, Fabian Greif
+# Copyright (c) 2021, Raphael Lehmann
 #
 # This file is part of the modm project.
 #
@@ -19,7 +20,10 @@ class Instance(Module):
         self.instance = int(instance)
 
     def init(self, module):
-        module.name = str(self.instance)
+        if self.driver["name"] == "lpuart":
+            module.name = "lpuart" + str(self.instance)
+        else:
+            module.name = str(self.instance)
         module.description = "Instance {}".format(self.instance)
 
     def prepare(self, module, options):
@@ -46,20 +50,27 @@ class Instance(Module):
         props["id"] = self.instance
         props["driver"] = self.driver
         props["features"] = self.driver["feature"] if "feature" in self.driver else []
-        props["uart_name"] = self.driver["name"].capitalize()
+        props["uart_type"] = self.driver["name"].capitalize()
+        props["name"] = self.driver["name"].capitalize() + str(self.instance)
+        props["hal"] = self.driver["name"].capitalize() + "Hal" + str(self.instance)
         props["buffered"] = env["buffer.tx"] or env["buffer.rx"]
 
         env.substitutions = props
         env.outbasepath = "modm/src/modm/platform/uart"
 
-        env.template("uart_hal.hpp.in", "uart_hal_{}.hpp".format(self.instance))
-        env.template("uart_hal_impl.hpp.in", "uart_hal_{}_impl.hpp".format(self.instance))
-        env.template("uart.hpp.in", "uart_{}.hpp".format(self.instance))
-        env.template("uart.cpp.in", "uart_{}.cpp".format(self.instance))
+        if self.driver["name"] == "lpuart":
+            uart = "lpuart"
+        else:
+            uart = "uart"
 
-        props["instances"].append(self.instance)
+        env.template("uart_hal.hpp.in", "{}_hal_{}.hpp".format(uart, self.instance))
+        env.template("uart_hal_impl.hpp.in", "{}_hal_{}_impl.hpp".format(uart, self.instance))
+        env.template("uart.hpp.in", "{}_{}.hpp".format(uart, self.instance))
+        env.template("uart.cpp.in", "{}_{}.cpp".format(uart, self.instance))
+
+        #props["instances"].append(props["name"])
         if props["buffered"]:
-            props["buffered_instances"].append(self.instance)
+            props["buffered_instances"].append(props["name"])
 
 
 def init(module):
@@ -68,7 +79,9 @@ def init(module):
 
 def prepare(module, options):
     device = options[":target"]
-    if not (device.has_driver("uart:stm32*") or device.has_driver("usart:stm32*")):
+    if not (device.has_driver("uart:stm32*")
+            or device.has_driver("usart:stm32*")
+            or device.has_driver("lpuart:stm32*")):
         return False
 
     module.depends(
@@ -82,7 +95,7 @@ def prepare(module, options):
         ":platform:rcc")
 
     global props
-    drivers = (device.get_all_drivers("uart") + device.get_all_drivers("usart"))
+    drivers = (device.get_all_drivers("uart") + device.get_all_drivers("usart") + device.get_all_drivers("lpuart"))
     props["extended_driver"] = ("extended" in drivers[0]["type"])
     props["over8"] = ("feature" in drivers[0]) and ("over8" in drivers[0]["feature"])
     props["tcbgt"] = ("feature" in drivers[0]) and ("tcbgt" in drivers[0]["feature"])
@@ -93,14 +106,28 @@ def prepare(module, options):
         for instance in driver["instance"]:
             module.add_submodule(Instance(driver, instance))
 
+    shared_irqs_new = dict()
     shared_irqs = [v["name"] for v in device.get_driver("core")["vector"]]
-    shared_irqs = [v for v in shared_irqs if v.startswith("USART") and "_" in v]
-    if len(shared_irqs):
-        props["shared_irq"] = name = shared_irqs[0]
-        parts = name[5:].split("_")
-        props["shared_irq_ids"] = range(int(parts[0]), int(parts[1]) + 1)
-    else:
-        props["shared_irq_ids"] = []
+    shared_irqs = [v for v in shared_irqs if ("USART" in v or "UART" in v or "LPUART" in v) and "_" in v]
+    for shared_irq in shared_irqs:
+        uart_type = ""
+        import re
+        for s in re.findall(r"L?P?US?ART[\d_]+", shared_irq):
+            if "LPUART" in s:
+                uart_type = "Lpuart"
+            elif "UART" in s:
+                uart_type = "Uart"
+            elif "USART" in s:
+                uart_type = "Usart"
+            else:
+                # use type from previous irq id
+                pass
+            irq_ids = re.findall(r"\d+", s)
+            if len(irq_ids) == 2:
+                irq_ids = range(int(irq_ids[0]), int(irq_ids[1])+1)
+            for irq_id in irq_ids:
+                shared_irqs_new[uart_type + str(irq_id)] = shared_irq
+    props["shared_irqs"] = shared_irqs_new
 
     props["target"] = device.identifier
 
@@ -113,5 +140,17 @@ def build(env):
     env.substitutions = props
     env.outbasepath = "modm/src/modm/platform/uart"
     env.template("uart_base.hpp.in")
-    if any(i in props["shared_irq_ids"] for i in props["buffered_instances"]):
+
+    props["uart_shared_irqs_data"] = dict()
+    for name in props["buffered_instances"]:
+        if name in props["shared_irqs"].keys():
+            irq = props["shared_irqs"][name]
+            if irq not in props["uart_shared_irqs_data"]:
+                props["uart_shared_irqs_data"][irq] = list()
+            props["uart_shared_irqs_data"][irq].append({
+                "name": name,
+                "id": name[-1],
+                "type": name[:-1],
+            })
+    if len(props["uart_shared_irqs_data"]):
         env.template("uart_shared.cpp.in")

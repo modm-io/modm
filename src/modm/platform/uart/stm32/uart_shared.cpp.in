@@ -10,13 +10,23 @@
 // ----------------------------------------------------------------------------
 
 #include "../device.hpp"
-%% for id in buffered_instances if id in shared_irq_ids
-#include "uart_{{ id }}.hpp"
+
+%% for irq, uarts in uart_shared_irqs_data.items()
+%% for uart in uarts
+%% if "Lpuart" in uart.type
+#include "lpuart_{{ uart["id"] }}.hpp"
+%%else
+#include "uart_{{ uart["id"] }}.hpp"
+%%endif
+%% endfor
 %% endfor
 
-MODM_ISR({{ shared_irq }})
+
+%% for irq, uarts in uart_shared_irqs_data.items()
+MODM_ISR({{ irq }})
 {
-%% for id in buffered_instances if id in shared_irq_ids
-    modm::platform::Usart{{ id }}::irq();
+%% for uart in uarts
+    modm::platform::{{ uart.name }}::irq();
 %% endfor
 }
+%% endfor
