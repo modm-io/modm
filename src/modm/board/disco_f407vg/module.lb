@@ -26,11 +26,14 @@ def prepare(module, options):
     module.depends(
         ":architecture:clock",
         ":driver:lis3dsh",
+        ":driver:cs43l22",
         ":platform:clock",
         ":platform:core",
+        ":platform:dma",
         ":platform:gpio",
         ":platform:i2c:1",
         ":platform:spi:1",
+        ":platform:i2s:3",
         ":platform:usb:fs")
     return True
 

@@ -18,6 +18,7 @@
 #include <modm/platform.hpp>
 #include <modm/architecture/interface/clock.hpp>
 #include <modm/driver/inertial/lis3dsh.hpp>
+#include <modm/math/units.hpp>
 
 using namespace modm::platform;
 
@@ -46,6 +47,11 @@ struct SystemClock
 	static constexpr uint32_t Spi4   = Apb2;
 	static constexpr uint32_t Spi5   = Apb2;
 	static constexpr uint32_t Spi6   = Apb2;
+
+	static constexpr uint32_t I2s2   = Spi2;
+	static constexpr uint32_t I2s3   = Spi3;
+
+	static constexpr uint32_t I2sPll = 86_MHz;
 
 	static constexpr uint32_t Usart1 = Apb2;
 	static constexpr uint32_t Usart2 = Apb1;
@@ -84,12 +90,17 @@ struct SystemClock
 	{
 		Rcc::enableExternalCrystal();	// 8MHz
 		const Rcc::PllFactors pllFactors{
-			.pllM = 4,		// 8MHz / M=4 -> 2MHz
-			.pllN = 168,	// 2MHz * N=168 -> 336MHz
+			.pllM = 8,		// 8MHz / M=8 -> 1MHz
+			.pllN = 336,	// 1MHz * N=336 -> 336MHz
 			.pllP = 2,		// 336MHz / P=2 -> 168MHz = F_cpu
 			.pllQ = 7		// 336MHz / Q=7 ->  48MHz = F_usb
 		};
 		Rcc::enablePll(Rcc::PllSource::ExternalCrystal, pllFactors);
+		const Rcc::PllI2sFactors pllI2sFactors{
+			.pllN = 258,	// 1 MHz * N=258 -> 258 MHz
+			.pllR = 3		// 258 MHz / R=3 -> 86 MHz
+		};
+		Rcc::enablePllI2s(pllI2sFactors);
 		// set flash latency for 168MHz
 		Rcc::setFlashLatency<Frequency>();
 		// switch system clock to PLL output
@@ -144,12 +155,16 @@ using Mclk = GpioOutputC7;	// I2S3_MCK
 using Sclk = GpioOutputC10;	// I2S3_SCK
 using Sdin = GpioOutputC12;	// I2S3_SD
 
+using DmaTx = Dma1::Channel5;
+
 using Reset = GpioOutputD4;	// Audio_RST
 using Scl = GpioB6;			// Audio_SCL
 using Sda = GpioB9;			// Audio_SDA
 
 using I2cMaster = I2cMaster1;
-//using I2sMaster = I2sMaster3;
+using I2sMaster = I2sMaster3<DmaTx>;
+
+static constexpr uint8_t I2CAddress = 0x4a; // (0x94 >> 1)
 /// @}
 }
 
@@ -205,19 +220,22 @@ initializeLis3()
 	lis3::SpiMaster::setDataMode(lis3::SpiMaster::DataMode::Mode3);
 }
 
-/// not supported yet, due to missing I2S driver
+template< modm::frequency_t samplerate=48_kHz, modm::percent_t tolerance=modm::pct(0.019) >
 inline void
 initializeCs43()
 {
-//	cs43::Lrck::connect(cs43::I2sMaster::Ws);
-//	cs43::Mclk::connect(cs43::I2sMaster::Mck);
-//	cs43::Sclk::connect(cs43::I2sMaster::Ck);
-//	cs43::Sdin::connect(cs43::I2sMaster::Sd);
-
+	cs43::I2sMaster::connect<cs43::Mclk::Mck, cs43::Sclk::Ck,
+							cs43::Lrck::Ws, cs43::Sdin::Sd>();
+	cs43::I2sMaster::initialize<SystemClock, samplerate, tolerance>();
 	cs43::Reset::setOutput(modm::Gpio::High);
 
 	cs43::I2cMaster::connect<cs43::Scl::Scl, cs43::Sda::Sda>();
 	cs43::I2cMaster::initialize<SystemClock, 100_kHz>();
+
+	cs43::Reset::setOutput(modm::Gpio::Low);
+	modm::delay_ms(2);
+	cs43::Reset::setOutput(modm::Gpio::High);
+
 }
 
 /// not supported yet, due to missing I2S driver
