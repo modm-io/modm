@@ -78,6 +78,7 @@ public:
 		Hal::initialize(odd_factor ? Hal::OddFactor::Enabled : Hal::OddFactor::Disabled,
 						i2s_div);
 	}
+
 	// end documentation inherited
 };
 

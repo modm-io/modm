@@ -219,6 +219,11 @@ initializeCs43()
 
 	cs43::I2cMaster::connect<cs43::Scl::Scl, cs43::Sda::Sda>();
 	cs43::I2cMaster::initialize<SystemClock, 100_kHz>();
+
+	cs43::Reset::setOutput(modm::Gpio::Low);
+	modm::delay_ms(2);
+	cs43::Reset::setOutput(modm::Gpio::High);
+	
 }
 
 /// not supported yet, due to missing I2S driver

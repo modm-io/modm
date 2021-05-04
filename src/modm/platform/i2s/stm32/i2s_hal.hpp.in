@@ -55,6 +55,24 @@ public:
 				DirectionSelection directionSelection = DirectionSelection::Transmitter,
 				BitDepth bitDepth = BitDepth::Sixteen,
 				MasterClockOutput masterClockOutput = MasterClockOutput::Enabled);
+
+	static void
+	write(uint16_t sample);
+
+	static void
+	enableInterruptVector(bool enable, uint32_t priority);
+
+	static void
+	enableInterrupt(Interrupt_t interrupt);
+
+	static void
+	disableInterrupt(Interrupt_t interrupt);
+
+	static InterruptFlag_t
+	getInterruptFlags();
+
+	static void
+	acknowledgeInterruptFlag(InterruptFlag_t flags);
 };
 
 } // namespace platform
