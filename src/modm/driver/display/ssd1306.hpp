@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2014, 2016-2017, Sascha Schade
  * Copyright (c) 2014-2016, 2018, Niklas Hauser
+ * Copyright (c) 2021, Thomas Sommer
  *
  * This file is part of the modm project.
  *
@@ -18,69 +19,15 @@
 #include <modm/processing/timer.hpp>
 #include <modm/ui/display/monochrome_graphic_display_vertical.hpp>
 
+#include "ssd1306_register.hpp"
+
 namespace modm
 {
 
 /// @ingroup modm_driver_ssd1306
-struct ssd1306
+struct ssd1306 : public ssd1306_register
 {
-protected:
-	/// @cond
-	enum Command : uint8_t
-	{
-		// fundamental commands
-		SetContrastControl = 0x81,
-		SetChargePump = 0x8D,
-		SetEntireDisplayResumeToRam = 0xA4,
-		SetEntireDisplayIgnoreRam = 0xA5,
-		SetNormalDisplay = 0xA6,
-		SetInvertedDisplay = 0xA7,
-		SetDisplayOff = 0xAE,
-		SetDisplayOn = 0xAF,
-
-		// scrolling commands
-		SetHorizontalScrollRight = 0x26,
-		SetHorizontalScrollLeft = 0x27,
-		SetVerticalAndHorizontalScrollRight = 0x29,
-		SetVerticalAndHorizontalScrollLeft = 0x2A,
-		SetDisableScroll = 0x2E,
-		SetEnableScroll = 0x2F,
-		SetVerticalScrollArea = 0xA3,
-
-		// addressing commands
-		SetLowerColumnStartAddress = 0x00,
-		SetHigherColumnStartAddress = 0x10,
-		SetMemoryMode = 0x20,
-		SetColumnAddress = 0x21,
-		SetPageAddress = 0x22,
-		SetPageStartAddress = 0xB0,
-
-		// Hardware configuration
-		SetDisplayStartLine = 0x40,
-		SetSegmentRemap0 = 0xA0,
-		SetSegmentRemap127 = 0xA1,
-		SetMultiplexRatio = 0xA8,
-		SetComOutputScanDirectionIncrement = 0xC0,
-		SetComOutputScanDirectionDecrement = 0xC8,
-		SetDisplayOffset = 0xD3,
-		SetComPins = 0xDA,
-
-		// timing configuration
-		SetDisplayClockDivideRatio = 0xD5,
-		SetPreChargePeriod = 0xD9,
-		SetV_DeselectLevel = 0xDB,
-		Nop = 0xE3,
-	};
-	/// @endcond
-
 public:
-	enum class
-	Rotation : bool
-	{
-		Normal,
-		UpsideDown
-	};
-
 	enum class
 	ScrollStep : uint8_t
 	{
@@ -97,37 +44,28 @@ public:
 	enum class
 	ScrollDirection : uint8_t
 	{
-		Right = SetHorizontalScrollRight,
-		Left = SetHorizontalScrollLeft
+		Right = HorizontalScrollRight,
+		Left = HorizontalScrollLeft,
+		// RightBottom = VerticalAndHorizontalScrollRight,
+		// LeftBottom = VerticalAndHorizontalScrollLeft,
 	};
 
 	enum class
 	DisplayMode : uint8_t
 	{
-		Normal = SetNormalDisplay,
-		Inverted = SetInvertedDisplay
+		Normal = NormalDisplay,
+		Inverted = InvertedDisplay
 	};
 
-protected:
-	/// @cond
-	static constexpr uint8_t
-	i(ScrollDirection direction) { return uint8_t(direction); }
-	static constexpr uint8_t
-	i(ScrollStep step) { return uint8_t(step); }
-
 public:
-	template < uint8_t Height >
-	class DataTransmissionAdapter : public modm::I2cWriteTransaction
+	/// @cond
+	class Ssd1306_I2cWriteTransaction : public modm::I2cWriteTransaction
 	{
 	public:
-		DataTransmissionAdapter(uint8_t address);
-
-		void modm_always_inline
-		setCommandBuffer(uint8_t *buffer)
-		{ commands = buffer; }
+		Ssd1306_I2cWriteTransaction(uint8_t address);
 
 		bool
-		configureDisplayWrite(uint8_t (*buffer)[Height / 8], std::size_t size);
+		configureDisplayWrite(const uint8_t *buffer, std::size_t size);
 
 	protected:
 		virtual Writing
@@ -136,13 +74,16 @@ public:
 		virtual void
 		detaching(modm::I2c::DetachCause cause) override;
 
+		inline bool
+		isWritable()
+		{ return !transfer_active; }
+
 	private:
-		uint8_t *commands;
-	public:
-		bool writeable;
+		uint8_t transfer_type;
+		bool transfer_active;
 	};
 	/// @endcond
-}; // struct ssd1306
+};  // struct ssd1306
 
 /**
  * Driver for SSD1306 based OLED-displays using I2C.
@@ -150,11 +91,13 @@ public:
  * the frame rate to about 40Hz.
  *
  * @author	Niklas Hauser
+ * @author	Thomas Sommer
  * @ingroup	modm_driver_ssd1306
  */
-template < class I2cMaster, uint8_t Height = 64 >
-class Ssd1306 : public ssd1306, public MonochromeGraphicDisplayVertical<128, Height>,
-				public I2cDevice<I2cMaster, 2, ssd1306::DataTransmissionAdapter<Height>>
+template<class I2cMaster, uint8_t Height = 64>
+class Ssd1306 : public ssd1306,
+				public MonochromeGraphicDisplayVertical<128, Height>,
+				public I2cDevice<I2cMaster, 3, ssd1306::Ssd1306_I2cWriteTransaction>
 {
 	static_assert((Height == 64) or (Height == 32), "Display height must be either 32 or 64 pixel!");
 
@@ -162,34 +105,23 @@ public:
 	Ssd1306(uint8_t address = 0x3C);
 
 	/// Pings the display
-	bool inline
-	pingBlocking()
-	{
-		return RF_CALL_BLOCKING(this->ping());
-	}
+	bool inline pingBlocking()
+	{ return RF_CALL_BLOCKING(this->ping()); }
 
 	/// initializes for 3V3 with charge-pump
-	bool inline
-	initializeBlocking()
-	{
-		return RF_CALL_BLOCKING(initialize());
-	}
+	bool inline initializeBlocking()
+	{ return RF_CALL_BLOCKING(initialize()); }
 
 	/// Update the display with the content of the RAM buffer.
 	void
 	update() override
-	{
-		RF_CALL_BLOCKING(startWriteDisplay());
-	}
+	{ RF_CALL_BLOCKING(startWriteDisplay()); }
 
 	/// Use this method to synchronize writing to the displays buffer
 	/// to avoid tearing.
 	/// @return	`true` if the frame buffer is not being copied to the display
-	bool modm_always_inline
-	isWritable()
-	{
-		return this->transaction.writeable;
-	}
+	bool isWritable()
+	{ return this->transaction.isWriteable(); }
 
 	// MARK: - TASKS
 	/// initializes for 3V3 with charge-pump asynchronously
@@ -197,62 +129,63 @@ public:
 	initialize();
 
 	// starts a frame transfer and waits for completion
-	modm::ResumableResult<bool>
+	virtual modm::ResumableResult<bool>
 	writeDisplay();
 
-
-	modm::ResumableResult<bool> modm_always_inline
+	modm::ResumableResult<bool>
 	setDisplayMode(DisplayMode mode = DisplayMode::Normal)
-	{ return writeCommand(static_cast<Command>(mode)); }
+	{
+		commandBuffer[0] = mode;
+		return writeCommands(1);
+	}
 
-	modm::ResumableResult<bool> modm_always_inline
+	modm::ResumableResult<bool>
 	setContrast(uint8_t contrast = 0xCE)
-	{ return writeCommand(Command::SetContrastControl, contrast); }
+	{
+		commandBuffer[0] = FundamentalCommands::ContrastControl;
+		commandBuffer[1] = contrast;
+		return writeCommands(2);
+	}
+
+	/**
+	 * \param orientation	glcd::Orientation::Landscape0 or glcd::Orientation::Landscape180
+	 */
+	modm::ResumableResult<bool>
+	setOrientation(glcd::Orientation orientation);
 
 	modm::ResumableResult<bool>
-	setOrientation(glcd::Orientation orientation = glcd::Orientation::Landscape0);
-
+	configureScroll(uint8_t origin, uint8_t size, ScrollDirection direction, ScrollStep steps);
 
 	modm::ResumableResult<bool>
-	configureScroll(uint8_t origin, uint8_t size,
-			ScrollDirection direction, ScrollStep steps);
-
-	modm::ResumableResult<bool> modm_always_inline
 	enableScroll()
-	{ return writeCommand(Command::SetEnableScroll); }
+	{
+		commandBuffer[0] = ScrollingCommands::EnableScroll;
+		return writeCommands(1);
+	}
 
-	modm::ResumableResult<bool> modm_always_inline
+	modm::ResumableResult<bool>
 	disableScroll()
-	{ return writeCommand(Command::SetDisableScroll); }
+	{
+		commandBuffer[0] = ScrollingCommands::DisableScroll;
+		return writeCommands(1);
+	}
 
 protected:
-	/// Write a command without data
 	modm::ResumableResult<bool>
-	writeCommand(uint8_t command);
+	writeCommands(std::size_t length);
 
-	/// Write a command with one byte data
-	modm::ResumableResult<bool>
-	writeCommand(uint8_t command, uint8_t data);
+	virtual modm::ResumableResult<void>
+	initializeMemoryMode();
 
-	/// Write a command with two bytes data
-	modm::ResumableResult<bool>
-	writeCommand(uint8_t command, uint8_t data1, uint8_t data2);
-
-private:
-	modm::ResumableResult<void>
+	virtual modm::ResumableResult<void>
 	startWriteDisplay();
 
-	bool
-	startTransactionWithLength(uint8_t length);
-
-private:
-	uint8_t commandBuffer[14];
+	uint8_t commandBuffer[7];
+	bool transaction_success;
 };
 
-} // namespace modm
+}  // namespace modm
 
 #include "ssd1306_impl.hpp"
 
-#include "ssd1306_transmission_impl.hpp"
-
-#endif // MODM_SSD1306_HPP
+#endif  // MODM_SSD1306_HPP

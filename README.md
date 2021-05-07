@@ -580,20 +580,21 @@ you specific needs.
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-pca9548a">PCA9548A</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-pca9685">PCA9685</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-sh1106">SH1106</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-siemens_s65">SIEMENS-S65</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-siemens_s75">SIEMENS-S75</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-sk6812">SK6812</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-sk9822">SK9822</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-ssd1306">SSD1306</a></td>
-<td align="center"><a href="https://modm.io/reference/module/modm-driver-stusb4500">STUSB4500</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-stusb4500">STUSB4500</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-sx1276">SX1276</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-tcs3414">TCS3414</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-tcs3472">TCS3472</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-tlc594x">TLC594X</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-tmp102">TMP102</a></td>
-<td align="center"><a href="https://modm.io/reference/module/modm-driver-tmp175">TMP175</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-tmp175">TMP175</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-touch2046">TOUCH2046</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-vl53l0">VL53L0</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-vl6180">VL6180</a></td>
