@@ -25,23 +25,11 @@ modm::MonochromeGraphicDisplayVertical<Width, Height>::drawHorizontalLine(glcd::
 	{
 		const int16_t y = start.y / 8;
 
-		// TODO Implement draw / clear pixels for monochrome displays
-		// if (draw mode)
-		// {
 		const uint8_t byte = 1 << (start.y % 8);
 		for (int_fast16_t x = start.x; x < static_cast<int16_t>(start.x + length); ++x)
 		{
-			if (x < Width) { this->buffer[x][y] |= byte; }
+			if (x < Width) { this->buffer[y][x] |= byte; }
 		}
-		// } else
-		// {
-		// 	const uint8_t byte = ~(1 << (start.y % 8));
-		// 	for (int_fast16_t x = start.x; x < static_cast<int16_t>(start.x + length);
-		// ++x)
-		// 	{
-		// 		if (x < Width and y < Height) { this->buffer[x][y] &= byte; }
-		// 	}
-		// }
 	}
 }
 
@@ -62,7 +50,7 @@ modm::MonochromeGraphicDisplayVertical<Width, Height>::drawVerticalLine(glcd::Po
 		{
 			if (y < Height / 8)
 			{
-				this->buffer[start.x][y] |= byte;
+				this->buffer[y][start.x] |= byte;
 				byte = 0xFF;
 			}
 			y++;
@@ -71,7 +59,7 @@ modm::MonochromeGraphicDisplayVertical<Width, Height>::drawVerticalLine(glcd::Po
 		if (y < Height / 8)
 		{
 			byte &= 0xFF >> (8 - end_y % 8);
-			this->buffer[start.x][y] |= byte;
+			this->buffer[y][start.x] |= byte;
 		}
 	}
 }
@@ -97,7 +85,7 @@ modm::MonochromeGraphicDisplayVertical<Width, Height>::drawImageRaw(
 
 					if (x < Width and y < Height)
 					{
-						this->buffer[x][y] = data[i + k * width];
+						this->buffer[y][x] = data[i + k * width];
 					}
 				}
 			}
@@ -112,14 +100,14 @@ template<int16_t Width, int16_t Height>
 void
 modm::MonochromeGraphicDisplayVertical<Width, Height>::setPixel(int16_t x, int16_t y)
 {
-	if (x < Width and y < Height) { this->buffer[x][y / 8] |= (1 << y % 8); }
+	if (x < Width and y < Height) { this->buffer[y / 8][x] |= (1 << y % 8); }
 }
 
 template<int16_t Width, int16_t Height>
 void
 modm::MonochromeGraphicDisplayVertical<Width, Height>::clearPixel(int16_t x, int16_t y)
 {
-	if (x < Width and y < Height) { this->buffer[x][y / 8] &= ~(1 << y % 8); }
+	if (x < Width and y < Height) { this->buffer[y / 8][x] &= ~(1 << y % 8); }
 }
 
 template<int16_t Width, int16_t Height>
@@ -128,7 +116,7 @@ modm::MonochromeGraphicDisplayVertical<Width, Height>::getPixel(int16_t x, int16
 {
 	if (x < Width and y < Height)
 	{
-		return (this->buffer[x][y / 8] & (1 << y % 8));
+		return (this->buffer[y / 8][x] & (1 << y % 8));
 	} else
 	{
 		return false;

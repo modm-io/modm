@@ -22,6 +22,6 @@ template<int16_t Width, int16_t Height, std::size_t BufferWidth, std::size_t Buf
 void
 modm::MonochromeGraphicDisplay<Width, Height, BufferWidth, BufferHeight>::clear()
 {
-	std::fill(&buffer[0][0], &buffer[BufferWidth][BufferHeight], 0);
-	this->cursor = glcd::Point(0, 0);
+	std::fill(&buffer[0][0], &buffer[0][0] + sizeof(buffer), 0);
+	this->cursor = {0, 0};
 }

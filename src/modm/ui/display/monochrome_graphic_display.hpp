@@ -76,7 +76,7 @@ public:
 	clear() final;
 
 protected:
-	uint8_t buffer[BufferWidth][BufferHeight];
+	uint8_t buffer[BufferHeight][BufferWidth];
 };
 }  // namespace modm
 

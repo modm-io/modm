@@ -95,7 +95,7 @@ Max7219MatrixHorizontal<SPI, CS, COLUMNS, ROWS>::update()
             // a group of eight pixels horizontal
             for (uint8_t col = 0; col < COLUMNS; ++col)
             {
-                buf[--idx] = this->buffer[row * 8 + ledCol][col];
+                buf[--idx] = this->buffer[col][row * 8 + ledCol];
             }
         }
 
