@@ -1,0 +1,10 @@
+<library>
+  <extends>modm:nucleo-f072rb</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_f072rb/blink</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:processing:timer</module>
+  </modules>
+</library>
