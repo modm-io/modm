@@ -5,6 +5,7 @@
 # Copyright (c) 2017, Fabian Greif
 # Copyright (c) 2020, Mike Wolfram
 # Copyright (c) 2021, Raphael Lehmann
+# Copyright (c) 2021, Christopher Durand
 #
 # This file is part of the modm project.
 #
@@ -12,6 +13,8 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
+
+from collections import defaultdict
 
 def init(module):
     module.name = ":platform:dma"
@@ -27,6 +30,7 @@ def prepare(module, options):
             [
             "stm32-channel-request",
             "stm32-channel",
+            "stm32-mux",
     ]:
         return False
 
@@ -62,6 +66,9 @@ def prepare(module, options):
             return False
         return True
 
+    if did["family"] in ["g0", "g4"]:
+        return True
+
     return False
 
 
@@ -73,26 +80,48 @@ def build(env):
     dma = device.get_driver("dma")
     properties["dma"] = dma
 
-    # Get the peripheral supported by DMA from device info and create a list of signals
-    # (also determines the maximum number of channels per controller)
     signal_names = {}
     controller = []
-    for channels in dma["channels"]:
-        max_channels = 0
-        for channel in channels["channel"]:
-            max_channels = channel["position"]
-            if dma["type"] in ["stm32-channel-request"]:
-                for request in channel["request"]:
-                    for signal in request["signal"]:
+    if dma["type"] in ["stm32-channel-request", "stm32-channel"]:
+        # Get the peripheral supported by DMA from device info and create a list of signals
+        # (also determines the maximum number of channels per controller)
+        for channels in dma["channels"]:
+            max_channels = 0
+            for channel in channels["channel"]:
+                max_channels = channel["position"]
+                if dma["type"] in ["stm32-channel-request"]:
+                    for request in channel["request"]:
+                        for signal in request["signal"]:
+                            if "name" in signal:
+                                signal_name = signal["name"].capitalize()
+                                signal_names[signal_name] = 1
+                else:
+                    for signal in channel["signal"]:
                         if "name" in signal:
                             signal_name = signal["name"].capitalize()
                             signal_names[signal_name] = 1
-            else:
-                for signal in channel["signal"]:
-                    if "name" in signal:
-                        signal_name = signal["name"].capitalize()
-                        signal_names[signal_name] = 1
-        controller.append({"instance": int(channels["instance"]), "channels": int(max_channels)})
+            controller.append({"instance": int(channels["instance"]),
+                               "min_channel": 1, "max_channel": int(max_channels)})
+    else:  # type is stm32-mux
+        for request_data in dma["requests"]:
+            for request in request_data["request"]:
+                assert len(request["signal"]) == 1  # one signal per request for dmamux
+                signal = request["signal"][0]
+                if "name" in signal:
+                    signal_name = signal["name"].capitalize()
+                    signal_names[signal_name] = 1
+
+        assert len(dma["mux-channels"]) == 1  # only one DMAMUX instance is supported
+        channels = dma["mux-channels"][0]["mux-channel"]
+        instance_channels = defaultdict(list)
+        for channel in channels:
+            instance_channels[channel["dma-instance"]].append(channel["dma-channel"])
+        for instance in instance_channels:
+            channel_list = instance_channels[instance]
+            channel_list.sort()
+            min_channel = channel_list[0]
+            max_channel = channel_list[-1]
+            controller.append({"instance": int(instance), "min_channel": int(min_channel), "max_channel": int(max_channel)})
 
     did = device.identifier
     if (did.family in ['f0'] and did.name == '30' and did.size == 'c') or (did.family in ['f1'] and did.name == '02'):
@@ -104,10 +133,14 @@ def build(env):
     properties["dmaSignals"] = signal_names
     properties["dmaController"] = controller
 
-    properties["irqList"] = dict()
-    for channels in dma["channels"]:
+    properties['channel_count'] = {
+        "min" : min(controller, key=lambda c: c["min_channel"])["min_channel"],
+        "max" : max(controller, key=lambda c: c["max_channel"])["max_channel"]
+    }
+
+    def irq_list_for_dma_instance(instance):
         irqs = [v["name"] for v in device.get_driver("core")["vector"]]
-        irqs = [v for v in irqs if v.startswith("DMA" + channels["instance"]) and not "DMA2D" in v]
+        irqs = [v for v in irqs if v.startswith("DMA" + instance) and not "DMA2D" in v]
         irq_list = list()
         for irq in irqs:
             irq_channel_list = []
@@ -115,7 +148,19 @@ def build(env):
                 if c.isdigit():
                     irq_channel_list.append(int(c))
             irq_list.append(irq_channel_list)
-        properties["irqList"][int(channels["instance"])] = irq_list
+        return irq_list
+
+    properties["irqList"] = dict()
+    if dma["type"] in ["stm32-channel-request", "stm32-channel"]:
+        for channels in dma["channels"]:
+            irq_list = irq_list_for_dma_instance(channels["instance"])
+            properties["irqList"][int(channels["instance"])] = irq_list
+    else:  # type is stm32-mux
+        channels = dma["mux-channels"][0]["mux-channel"]
+        instances = list(dict.fromkeys(([channel["dma-instance"] for channel in channels])))
+        for instance in instances:
+            irq_list = irq_list_for_dma_instance(instance)
+            properties["irqList"][int(instance)] = irq_list
 
     env.substitutions = properties
     env.outbasepath = "modm/src/modm/platform/dma"

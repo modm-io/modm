@@ -265,6 +265,8 @@ def validate(env):
             all_peripherals.extend([dname + translate(i) for i in d["instance"]])
         else:
             all_peripherals.append(dname)
+        if dname == "Dma" and d["type"] == "stm32-mux":
+            all_peripherals.append("Dmamux1")
     if "remap" in driver:
         all_peripherals.extend([get_driver(r) for r in driver["remap"]])
     bprops["all_peripherals"] = sorted(list(set(all_peripherals)))

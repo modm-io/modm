@@ -45,7 +45,7 @@ class DmaHal : public DmaBase
 	 */
 	template <uint32_t id>
 	static constexpr uint32_t getBaseAddress() {
-		if (id == 1)
+		if constexpr (id == 1)
 			return DMA1_BASE;
 %% if (dma.instance | length) > 1
 		else
@@ -59,13 +59,15 @@ class DmaHal : public DmaBase
 	 */
 	template <uint32_t id>
 	static constexpr uint32_t getChannelBaseAddress() {
-		if (id == 1)
+		if constexpr (id == 1)
 			return DMA1_Channel1_BASE;
 %% if (dma.instance | length) > 1
 		else
 			return DMA2_Channel1_BASE;
 %% endif
 	}
+
+%% if dmaType in ["stm32-channel-request"]
 	/**
 	 * Get the address of the channel selection register
 	 *
@@ -73,25 +75,22 @@ class DmaHal : public DmaBase
 	 */
 	template <uint32_t id>
 	static constexpr uint32_t getCselAddress() {
-%% if dmaType in ["stm32-channel-request"]
-		if (id == 1)
+		if constexpr (id == 1)
 			return DMA1_CSELR_BASE;
 %% if (dma.instance | length) > 1
 		else
 			return DMA2_CSELR_BASE;
 %%endif
-%% else
-		// Nothing to see here. This controller has no request mux, instead
-		// all requests are OR-ed together.
-		return 0;
-%% endif
 	}
+%% endif
 
 public:
 	/// DMA base register address
 	static constexpr uint32_t DMA_BASE { getBaseAddress<ID>() };
+%% if dmaType in ["stm32-channel-request"]
 	/// DMA channel selection register address
 	static constexpr uint32_t DMA_CSEL { getCselAddress<ID>() };
+%% endif
 	/// DMA channel base register address
 	static constexpr uint32_t CHANNEL_BASE { getChannelBaseAddress<ID>() };
 	/// Register offset from channel to channel

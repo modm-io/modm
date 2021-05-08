@@ -87,8 +87,10 @@ def build(env):
             all_peripherals.update(dname + translate(i) for i in d["instance"])
         else:
             all_peripherals.add(dname)
-    all_peripherals = sorted(list(all_peripherals))
+        if dname == "Dma" and d["type"] == "stm32-mux":
+            all_peripherals.add("Dmamux1")
 
+    all_peripherals = sorted(list(all_peripherals))
     rcc_map = env.query(":cmsis:device:rcc-map")
     rcc_enable = {}
     rcc_reset = {}

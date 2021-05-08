@@ -3,6 +3,7 @@
  * Copyright (c) 2014-2017, Niklas Hauser
  * Copyright (c) 2020, Mike Wolfram
  * Copyright (c) 2021, Raphael Lehmann
+ * Copyright (c) 2021, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -26,7 +27,7 @@
 
 %% if target["family"] == "f4"
 	%% set reg_prefix = "DMA_SxCR"
-%% elif dmaType in ["stm32-channel-request", "stm32-channel"]
+%% elif dmaType in ["stm32-channel-request", "stm32-channel", "stm32-mux"]
 	%% set reg_prefix = "DMA_CCR"
 %% endif
 
@@ -84,18 +85,12 @@ public:
 		Dma 		= 0,
 		Peripheral 	= DMA_SxCR_PFCTRL, ///< the peripheral is the flow controller
 	};
-%% elif dmaType in ["stm32-channel-request", "stm32-channel"]
-	%% set channel_count = namespace(max_channels = 0)
-	%% for controller in dmaController
-		%% if channel_count.max_channels < controller.channels
-			%% set channel_count.max_channels = controller.channels
-		%% endif
-	%% endfor
+%% elif dmaType in ["stm32-channel-request", "stm32-channel", "stm32-mux"]
 	enum class
 	Channel
 	{
-	%% for channel in range(1, channel_count.max_channels + 1)
-		Channel{{ channel }}{% if channel == 1 %} = 0{% endif %},
+	%% for channel in range(channel_count["min"], channel_count["max"] + 1)
+		Channel{{ channel }}{% if loop.first %} = 0{% endif %},
 	%% endfor
 	};
 
@@ -115,6 +110,15 @@ public:
 	{
 	%% for request in range(0, request_count.max_requests + 1)
 		Request{{ request }}{% if request == 0 %} = 0{% endif %},
+	%% endfor
+	};
+	%% elif dmaType in ["stm32-mux"]:
+	enum class
+	Request
+	{
+		None = 0,
+	%% for request in range(1, 127 + 1)
+		Request{{ request }},
 	%% endfor
 	};
 	%% else
@@ -192,7 +196,7 @@ public:
 		MemoryToPeripheral 	= DMA_SxCR_DIR_0,
 		/// Source: DMA_SxPAR; Sink: DMA_SxM0AR
 		MemoryToMemory 		= DMA_SxCR_DIR_1,
-%% elif dmaType in ["stm32-channel-request", "stm32-channel"]
+%% elif dmaType in ["stm32-channel-request", "stm32-channel", "stm32-mux"]
 		/// Source: DMA_CPARx; Sink: DMA_CMARx
 		PeripheralToMemory 	= 0,
 		/// Source: DMA_CMARx; Sink: DMA_CPARx
@@ -230,7 +234,7 @@ protected:
 			DMA_SxCR_PL_1    | DMA_SxCR_PL_0    |						// Priority
 			DMA_SxCR_CIRC    |											// CircularMode
 			DMA_SxCR_PFCTRL;											// FlowControl
-%% elif dmaType in ["stm32-channel-request", "stm32-channel"]
+%% elif dmaType in ["stm32-channel-request", "stm32-channel", "stm32-mux"]
 	static constexpr uint32_t memoryMask =
 			DMA_CCR_MSIZE_0  | DMA_CCR_MSIZE_1  |	// MemoryDataSize
 			DMA_CCR_MINC                        |	// MemoryIncrementMode
