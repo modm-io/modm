@@ -9,12 +9,14 @@ applications:
 - a `modm/config.mk` file: configures the toolchain, device-specific information
   and sets up generic and special build rules based on the `modm:build` options.
 - a `modm/repo.mk` file: contains all build rules to build the modm library.
-- a top-level `Makefile` file: globs the application sources and provides all
-  the Makefile targets for the device-specific embedded tools.
+- a top-level BSD-licensed `Makefile` file: globs the application sources and
+  provides all the Makefile targets for the device-specific embedded tools.
 
 We do not intend to serve every possible use-case with this module.
 **If you need something special, write your own Makefile, maybe starting by
-modifying ours.**
+modifying ours.** It is intentionally BSD-licensed so that you do not have to
+publish your changes to it.
+
 Remember to set `modm:build:make:include_makefile` to `False`, so that your
 custom `Makefile` does not get overwritten by `lbuild build`.
 
