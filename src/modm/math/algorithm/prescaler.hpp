@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2019, Niklas Hauser
+ * Copyright (c) 2021, Raphael Lehmann
  *
  * This file is part of the modm project.
  *
@@ -11,10 +12,13 @@
 
 #pragma once
 
-#include <stdint.h>
 #include <modm/math/units.hpp>
-#include <tuple>
+
+#include <algorithm>
 #include <cmath>
+#include <concepts>
+#include <cstdint>
+#include <initializer_list>
 
 namespace modm
 {
@@ -25,14 +29,15 @@ namespace modm
  * @note For ranges the end is *inclusive*: [begin, end]!
  * @ingroup	modm_math_algorithm
  */
+template<std::unsigned_integral T>
 class
-Prescaler
+GenericPrescaler
 {
 public:
 	struct Result
 	{
-		constexpr Result(modm::frequency_t input_frequency,
-		                 modm::frequency_t desired_frequency,
+		constexpr Result(T input_frequency,
+		                 T desired_frequency,
 		                 uint32_t index, uint32_t prescaler) :
 			index{index}, prescaler{prescaler},
 			frequency{input_frequency / prescaler},
@@ -45,11 +50,11 @@ public:
 		/// Prescaler value
 		const uint32_t prescaler;
 		/// Generated frequency
-		const modm::frequency_t frequency;
+		const T frequency;
 		/// Input frequency
-		const modm::frequency_t input_frequency;
+		const T input_frequency;
 		/// Desired Frequency
-		const modm::frequency_t desired_frequency;
+		const T desired_frequency;
 		/// Relative Frequency Error
 		const float error;
 	};
@@ -59,8 +64,8 @@ public:
 	/// @note container must have `begin()`, `end()` and `size()` function!
 	template<class Iterator>
 	static constexpr Result
-	from_iterator(modm::frequency_t input_frequency,
-				  modm::frequency_t desired_frequency,
+	from_iterator(T input_frequency,
+				  T desired_frequency,
 				  Iterator prescalers)
 	{
 		const double desired = double(input_frequency) / desired_frequency;
@@ -76,8 +81,8 @@ public:
 				break;
 			prescaler_floor = prescaler; ii_floor++;
 		}
-		const uint32_t baud_lower = input_frequency / prescaler_ceiling;
-		const uint32_t baud_upper = input_frequency / prescaler_floor;
+		const T baud_lower = input_frequency / prescaler_ceiling;
+		const T baud_upper = input_frequency / prescaler_floor;
 		const double baud_middle = (baud_upper + baud_lower) / 2.0;
 
 		if (desired_frequency <= baud_middle)
@@ -87,8 +92,8 @@ public:
 
 	/// From a initializer list.
 	static constexpr Result
-	from_list(modm::frequency_t input_frequency,
-			  modm::frequency_t desired_frequency,
+	from_list(T input_frequency,
+			  T desired_frequency,
 			  std::initializer_list<uint32_t> prescalers)
 	{
 		return from_iterator(input_frequency, desired_frequency, prescalers);
@@ -98,8 +103,8 @@ public:
 	/// @note the range end is *inclusive*: [begin, end].
 	template< typename Function >
 	static constexpr Result
-	from_function(modm::frequency_t input_frequency,
-			      modm::frequency_t desired_frequency,
+	from_function(T input_frequency,
+			      T desired_frequency,
 			      uint32_t begin, uint32_t end,
 			      Function prescaler_modifier)
 	{
@@ -127,15 +132,15 @@ public:
 	/// From any linear range.
 	/// @note the range end is *inclusive*: [begin, end].
 	static constexpr Result
-	from_range(modm::frequency_t input_frequency,
-			   modm::frequency_t desired_frequency,
+	from_range(T input_frequency,
+			   T desired_frequency,
 			   uint32_t begin, uint32_t end)
 	{
 		const double desired = double(input_frequency) / desired_frequency;
 		const uint32_t prescaler_floor = std::max(uint32_t(std::floor(desired)), begin);
 		const uint32_t prescaler_ceiling = std::min(uint32_t(std::ceil(desired)), end);
-		const uint32_t baud_lower = input_frequency / prescaler_ceiling;
-		const uint32_t baud_upper = input_frequency / prescaler_floor;
+		const T baud_lower = input_frequency / prescaler_ceiling;
+		const T baud_upper = input_frequency / prescaler_floor;
 		const double baud_middle = (baud_upper + baud_lower) / 2.0;
 		if (desired_frequency <= baud_middle)
 			return {input_frequency, desired_frequency, prescaler_ceiling - begin, prescaler_ceiling};
@@ -147,8 +152,8 @@ public:
 	/// @param begin	must be a power-of-two!
 	/// @param end		must be a power-of-two!
 	static constexpr Result
-	from_power(modm::frequency_t input_frequency,
-			   modm::frequency_t desired_frequency,
+	from_power(T input_frequency,
+			   T desired_frequency,
 			   uint32_t begin, uint32_t end)
 	{
 		const double desired = double(input_frequency) / desired_frequency;
@@ -158,5 +163,7 @@ public:
 		return {input_frequency, desired_frequency, ii, power};
 	}
 };
+
+using Prescaler = GenericPrescaler<uint64_t>;
 
 } // namespace modm
