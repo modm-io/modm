@@ -277,9 +277,9 @@ struct cs43l22
 										MasterVolumeControl_t, AnalogZcAndSrSettings_t,
 										MiscellaneousControls_t, LimiterControl1MinMaxThresholds_t >;
 	
-	typedef int16_t centiBels_t;
-	static constexpr centiBels_t MaxVolume = 120;
-	static constexpr centiBels_t MinVolume = -1020;
+	typedef int16_t centiBel_t;
+	static constexpr centiBel_t MaxVolume = 120;
+	static constexpr centiBel_t MinVolume = -1020;
 };  // struct cs43l22
 
 
@@ -307,11 +307,15 @@ public:
      *       and min volume by cs43l22::MinVolume
      */
 	ResumableResult<bool>
-	setMasterVolume(centiBels_t vol);
+	setMasterVolume(centiBel_t vol);
+
+	ResumableResult<bool>
+	setMasterVolumeRelative(centiBel_t rel_vol);
 
 private:
 	uint8_t tx_buffer[2];
 	uint8_t rx_buffer;
+	centiBel_t volume;
 	bool success;
 
 	ResumableResult<bool>
@@ -319,6 +323,12 @@ private:
 
 	ResumableResult<bool>
 	readRegister(Register reg);
+
+	ResumableResult<bool>
+	getMasterVolume();
+
+	void
+	regToCentibel(uint8_t reg);
 
 };
 

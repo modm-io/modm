@@ -18,7 +18,10 @@ namespace modm
 
 template<typename I2cMaster, typename I2sMaster>
 CS43L22<I2cMaster, I2sMaster>::CS43L22(uint8_t i2cAddress)
-	: I2cDevice<I2cMaster, 3>(i2cAddress) {}
+	: I2cDevice<I2cMaster, 3>(i2cAddress)
+{
+	volume = -300;
+}
 
 template<typename I2cMaster, typename I2sMaster>
 ResumableResult<bool>
@@ -26,35 +29,35 @@ CS43L22<I2cMaster, I2sMaster>::initialize()
 {
 	RF_BEGIN();
 	// Verify the chip ID
-	success = RF_CALL_BLOCKING(readRegister(Register::ChipIdRevision));
+	success = RF_CALL(readRegister(Register::ChipIdRevision));
 	if (!success || (ChipId_t::get(static_cast<ChipId_t>(rx_buffer)) != ChipId::CS43L22))
 	{
 		RF_RETURN(false);
 	}
-	RF_CALL_BLOCKING(writeRegister(Register::PowerControl1, Power_t(Power::Down)));
-	RF_CALL_BLOCKING(writeRegister(Register::PowerControl2, ChannelPowerHeadphoneA_t(ChannelPower::OnAlways) | 
+	RF_CALL(writeRegister(Register::PowerControl1, Power_t(Power::Down)));
+	RF_CALL(writeRegister(Register::PowerControl2, ChannelPowerHeadphoneA_t(ChannelPower::OnAlways) | 
 															ChannelPowerHeadphoneB_t(ChannelPower::OnAlways) | 
 															ChannelPowerSpeakerA_t(ChannelPower::OffAlways)  |
 															ChannelPowerSpeakerB_t(ChannelPower::OffAlways)));
-	RF_CALL_BLOCKING(writeRegister(Register::ClockingControl, ClockingControl::AUTO_DETECT));
-	RF_CALL_BLOCKING(writeRegister(Register::InterfaceControl1, DacInterfaceFormat_t(DacInterfaceFormat::I2sPhillipsStandard) |
+	RF_CALL(writeRegister(Register::ClockingControl, ClockingControl::AUTO_DETECT));
+	RF_CALL(writeRegister(Register::InterfaceControl1, DacInterfaceFormat_t(DacInterfaceFormat::I2sPhillipsStandard) |
 																Role_t(Role::Slave)));
-	RF_CALL_BLOCKING(setMasterVolume(-30));
-	RF_CALL_BLOCKING(writeRegister(Register::PowerControl1, Power_t(Power::Up)));
+	RF_CALL(setMasterVolume(volume));
+	RF_CALL(writeRegister(Register::PowerControl1, Power_t(Power::Up)));
 	/* Additional configuration for the CODEC. These configurations are done to reduce
 	the time needed for the Codec to power off. If these configurations are removed, 
 	then a long delay should be added between powering off the Codec and switching 
 	off the I2S peripheral MCLK clock (which is the operating clock for Codec).
 	If this delay is not inserted, then the codec will not shut down properly and
 	it results in high noise after shut down. */
-	RF_CALL_BLOCKING(writeRegister(Register::AnalogZcAndSrSettings, AnalogSoftRampA_t(SoftRamp::Disabled) |
+	RF_CALL(writeRegister(Register::AnalogZcAndSrSettings, AnalogSoftRampA_t(SoftRamp::Disabled) |
 	    															AnalogSoftRampB_t(SoftRamp::Disabled) |
 																	AnalogZeroCrossingA_t(ZeroCrossing::Disabled) |
 																	AnalogZeroCrossingB_t(ZeroCrossing::Disabled)));
 	/* Disable the digital soft ramp */
-	RF_CALL_BLOCKING(writeRegister(Register::MiscellaneousControls, MiscellaneousControls_t(0x00)));
+	RF_CALL(writeRegister(Register::MiscellaneousControls, MiscellaneousControls_t(0x00)));
 	/* Disable the limiter attack level */
-	RF_CALL_BLOCKING(writeRegister(Register::LimiterControl1MinMaxThresholds, LimiterControl1MinMaxThresholds_t(0x00)));
+	RF_CALL(writeRegister(Register::LimiterControl1MinMaxThresholds, LimiterControl1MinMaxThresholds_t(0x00)));
 	RF_END_RETURN(success);
 }
 
@@ -75,23 +78,71 @@ CS43L22<I2cMaster, I2sMaster>::readRegister(Register reg)
 {
 	RF_BEGIN();
 	rx_buffer = static_cast<uint8_t>(reg);
+	// First, set the internal address pointer
+	// of the DAC to the requested register
+	this->transaction.configureWrite(&rx_buffer, 1);
+	RF_CALL(this->runTransaction());
 	this->transaction.configureRead(&rx_buffer, 1);
 	RF_END_RETURN_CALL(this->runTransaction());
 }
 
 template<typename I2cMaster, typename I2sMaster>
 ResumableResult<bool>
-CS43L22<I2cMaster, I2sMaster>::setMasterVolume(centiBels_t vol)
+CS43L22<I2cMaster, I2sMaster>::setMasterVolume(centiBel_t vol)
 {
 	RF_BEGIN();
-	if (vol > MaxVolume)
-		vol = MaxVolume;
-	else if (vol < MinVolume)
-		vol = MinVolume;
-	vol /= 5;
-	RF_CALL_BLOCKING(writeRegister(Register::MasterVolumeControlA, static_cast<MasterVol_t>(vol)));
-	RF_CALL_BLOCKING(writeRegister(Register::MasterVolumeControlB, static_cast<MasterVol_t>(vol)));
+	{
+		volume = vol;
+		if (volume > MaxVolume)
+			volume = MaxVolume;
+		else if (volume < MinVolume)
+			volume = MinVolume;
+		volume /= 5;
+		if (volume < -128)
+			volume += 256;
+	}
+	RF_CALL(writeRegister(Register::MasterVolumeControlA, static_cast<MasterVol_t>(volume)));
+	RF_CALL(writeRegister(Register::MasterVolumeControlB, static_cast<MasterVol_t>(volume)));
 	RF_END_RETURN(true);
+}
+
+template<typename I2cMaster, typename I2sMaster>
+void
+CS43L22<I2cMaster, I2sMaster>::regToCentibel(uint8_t reg)
+{
+	volume = reg;
+	if (volume <= 24 and volume >= 0)
+		volume *= 5;
+	else if (volume <= 52 and volume > 24)
+		volume = MinVolume;
+	else if (volume <= 127 and volume > 52)
+		volume = (256-volume)*(-5);
+	else
+	{
+		volume |= 0xFF00;
+		volume *= 5;
+	}
+}
+
+template<typename I2cMaster, typename I2sMaster>
+ResumableResult<bool>
+CS43L22<I2cMaster, I2sMaster>::setMasterVolumeRelative(centiBel_t rel_vol)
+{
+	RF_BEGIN();
+	if (RF_CALL(getMasterVolume()))
+	{
+		regToCentibel(rx_buffer);
+		volume += rel_vol;
+		RF_RETURN_CALL(setMasterVolume(volume));
+	}
+	RF_END_RETURN(false);
+}
+
+template<typename I2cMaster, typename I2sMaster>
+ResumableResult<bool>
+CS43L22<I2cMaster, I2sMaster>::getMasterVolume()
+{
+	return readRegister(Register::MasterVolumeControlA);
 }
 
 }	// namespace modm
