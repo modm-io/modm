@@ -17,6 +17,9 @@
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/processing/resumable.hpp>
 
+#include <array>
+#include <tuple>
+
 namespace modm
 {
 
