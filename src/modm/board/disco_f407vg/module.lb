@@ -31,6 +31,7 @@ def prepare(module, options):
         ":platform:gpio",
         ":platform:i2c:1",
         ":platform:spi:1",
+        ":platform:i2s:3",
         ":platform:usb:fs")
     return True
 

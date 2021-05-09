@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2021, Marton Ledneczki
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:cs43l22"
+    module.description = """\
+# CS43L22, Portable Audio DAC with Integrated Class D Speaker Driver
+
+The CS43L22 is low power stereo digital/analog converter (DAC) with
+integrated headphone and Class D speaker amplifiers that operates from a
+low voltage analog and digital core. The DAC output path includes a
+digital signal processing engine with various fixed-function controls,
+such as tone and volume control, and includes de-emphasis, limiting
+functions and beep generator that delivers tones selectable across
+a range of two octaves. The stereo headphone amplifier is powered
+from a separate positive supply and the integrated charge pump provides
+a negative supply allowing for a ground-centered analog output to eliminate
+the need for DC blocking capacitors. The Class D stereo speaker does not
+require an external filter and can be powered directly from a battery.
+"""
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:register",
+        ":architecture:i2c.device",
+        ":architecture:i2s",
+        ":processing:resumable")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/dac"
+    env.copy("cs43l22.hpp")
+    env.copy("cs43l22_impl.hpp")

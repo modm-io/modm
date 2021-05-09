@@ -1,0 +1,84 @@
+/*
+ * Copyright (c) 2013, Kevin Läufer
+ * Copyright (c) 2013-2018, Niklas Hauser
+ * Copyright (c) 2014, Daniel Krebs
+ * Copyright (c) 2020, Mike Wolfram
+ * Copyright (c) 2021, Marton Ledneczki
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_STM32_I2S_HAL{{ id }}_HPP
+#define MODM_STM32_I2S_HAL{{ id }}_HPP
+
+#include "i2s_base.hpp"
+
+namespace modm
+{
+
+namespace platform
+{
+
+/**
+ * Serial peripheral interface (I2S{{ id }})
+ *
+ * TODO: Very basic implementation that exposes more hardware features than
+ * the regular Spi classes.
+ *
+ * @author		Marton Ledneczki
+ * @ingroup		modm_platform_i2s modm_platform_i2s_{{id}}
+ */
+class I2sHal{{ id }} : public I2sBase
+{
+public:
+	/// TODO: Enables the clock, resets the hardware and sets the SPE bit
+	static void
+	enable();
+
+	/// Disables the hw module (by disabling its clock line)
+	static void
+	disable();
+
+	/**
+	 * Initialize I2s Peripheral
+	 *
+	 * TODO: Enables clocks
+	 */
+	static void
+	initialize( OddFactor oddFactor, uint8_t i2s_div,
+				MasterSelection masterSelection = MasterSelection::Master,
+				DirectionSelection directionSelection = DirectionSelection::Transmitter,
+				BitDepth bitDepth = BitDepth::Sixteen,
+				MasterClockOutput masterClockOutput = MasterClockOutput::Enabled);
+
+	static void
+	write(uint16_t sample);
+
+	static void
+	enableInterruptVector(bool enable, uint32_t priority);
+
+	static void
+	enableInterrupt(Interrupt_t interrupt);
+
+	static void
+	disableInterrupt(Interrupt_t interrupt);
+
+	static InterruptFlag_t
+	getInterruptFlags();
+
+	static void
+	acknowledgeInterruptFlag(InterruptFlag_t flags);
+};
+
+} // namespace platform
+
+} // namespace modm
+
+#include "i2s_hal_{{ id }}_impl.hpp"
+
+#endif // MODM_STM32_I2S_HAL{{ id }}_HPP
