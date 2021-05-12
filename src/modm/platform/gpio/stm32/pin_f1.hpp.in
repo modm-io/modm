@@ -43,10 +43,14 @@ struct Gpio{{ port ~ pin }} : public Gpio, ::modm::GpioIO
 	using PinSet = GpioSet<Gpio{{ port ~ pin }}>;
 	friend class Adc1; friend class Adc2; friend class Adc3;
 public:
+	using Direction = ::modm::Gpio::Direction;
+	using Config = ::modm::Gpio::Config;
+	using Config_t = ::modm::Gpio::Config_t;
 	using Output = Gpio{{ port ~ pin }};
 	using Input = Gpio{{ port ~ pin }};
 	using IO = Gpio{{ port ~ pin }};
 	using Type = Gpio{{ port ~ pin }};
+	static constexpr Direction direction = Direction::InOut;
 	static constexpr bool isInverted = false;
 	static constexpr Port port = Port::{{port}}; ///< Port name
 	static constexpr uint8_t pin = {{pin}}; ///< Pin Number
@@ -67,6 +71,23 @@ public:
 	inline static void setAnalogInput() { PinSet::setAnalogInput(); }
 	/// @endcond
 
+	inline static void configure(Config_t config)
+	{
+		if (config & Config::_Input)
+			configure(InputType( (config & Config::_InputMask).value >> uint8_t(Config::_InputShift) ));
+		if (config & Config::_Output)
+			configure(OutputType( (config & Config::_OutputMask).value >> uint8_t(Config::_OutputShift) ),
+			          (config & Config::_Speed) ? OutputSpeed( (config & Config::_SpeedMask).value >>
+			                                                   uint8_t(Config::_SpeedShift) ) :
+			          							  OutputSpeed::MHz50); else
+		if (config & Config::_Speed)
+			configure(OutputSpeed( (config & Config::_SpeedMask).value >> uint8_t(Config::_SpeedShift) ));
+
+		if (config & Config::Input) setInput(); else
+		if (config & Config::Output) setOutput(); else
+		if (config & Config::Analog) setAnalogInput();
+	}
+
 public:
 	// GpioOutput
 	// start documentation inherited
@@ -81,6 +102,7 @@ public:
 	}
 	inline static bool isSet() { return ({{reg}}->ODR & mask); }
 	// stop documentation inherited
+	inline static void configure(OutputSpeed speed) { PinSet::configure(speed); }
 	inline static void configure(OutputType type, OutputSpeed speed = OutputSpeed::MHz50) { PinSet::configure(type, speed); }
 	inline static void setOutput(OutputType type, OutputSpeed speed = OutputSpeed::MHz50) { PinSet::setOutput(type, speed); }
 	// GpioInput

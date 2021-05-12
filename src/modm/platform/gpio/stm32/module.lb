@@ -300,6 +300,7 @@ def build(env):
     if "f1" in driver["type"]:
         env.template("connector_specialized.hpp.in", filters={"formatPeripheral": get_driver, "printSignalMap": print_remap_group_table})
     env.template("base.hpp.in")
+    env.template("config.hpp.in")
     env.template("unused.hpp.in")
     if len(env["enable_ports"]):
         env.template("enable.cpp.in")

@@ -15,30 +15,45 @@
 
 using namespace Board;
 
+RtGpio north     = Board::LedNorth();
+RtGpio northEast = Board::LedNorthEast();
+RtGpio east      = Board::LedEast();
+RtGpio southEast = Board::LedSouthEast();
+RtGpio south     = Board::LedSouth();
+RtGpio southWest = Board::LedSouthWest();
+RtGpio west      = Board::LedWest();
+RtGpio northWest = Board::LedNorthWest();
+
+modm::Gpio &gnorth = north;
+
 int
 main()
 {
 	Board::initialize();
 
-	Board::LedNorth::set();
+	using Config = modm::Gpio::Config;
+	gnorth.configure(Config::Output | Config::OpenDrain |
+	                 Config::PullUp | Config::SpeedLow |
+	                 Config::LogicInverted);
+	gnorth.set(true);
 
 	while (true)
 	{
-		Board::LedNorth::toggle();
+		north.toggle();
 		modm::delay(100ms);
-		Board::LedNorthEast::toggle();
+		northEast.toggle();
 		modm::delay(100ms);
-		Board::LedEast::toggle();
+		east.toggle();
 		modm::delay(100ms);
-		Board::LedSouthEast::toggle();
+		southEast.toggle();
 		modm::delay(100ms);
-		Board::LedSouth::toggle();
+		south.toggle();
 		modm::delay(100ms);
-		Board::LedSouthWest::toggle();
+		southWest.toggle();
 		modm::delay(100ms);
-		Board::LedWest::toggle();
+		west.toggle();
 		modm::delay(100ms);
-		Board::LedNorthWest::toggle();
+		northWest.toggle();
 		modm::delay(100ms);
 	}
 

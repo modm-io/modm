@@ -53,61 +53,69 @@ namespace platform
  * @author	Niklas Hauser
  * @ingroup	modm_platform_gpio
  */
-class GpioUnused : public Gpio, public ::modm::GpioIO
+class GpioUnused : public Gpio
 {
 public:
+	using Direction = ::modm::Gpio::Direction;
+	using Config = ::modm::Gpio::Config;
+	using Config_t = ::modm::Gpio::Config_t;
+
 	using Output = GpioUnused;
 	using Input = GpioUnused;
 	using IO = GpioUnused;
 	using Type = GpioUnused;
+
+	static constexpr Direction direction = Direction::InOut;
 	static constexpr bool isInverted = false;
 	static constexpr Port port = Port(-1);
 	static constexpr uint8_t pin = uint8_t(-1);
 	static constexpr uint16_t mask = 0;
 
-protected:
+public:
 	/// @cond
-	static void setAlternateFunction(uint8_t) {}
-	static void setAnalogInput() {}
+	static inline void setAlternateFunction(uint8_t) {}
+	static inline void setAnalogInput() {}
+	static inline void configure(Config_t) {}
 	/// @endcond
 
 public:
 	// GpioOutput
 	// start documentation inherited
-	static void setOutput() {}
-	static void setOutput(bool) {}
-	static void set() {}
-	static void set(bool) {}
-	static void reset() {}
-	static void toggle() {}
-	static bool isSet() { return false; }
+	static inline void setOutput() {}
+	static inline void setOutput(bool) {}
+	static inline void set() {}
+	static inline void set(bool) {}
+	static inline void reset() {}
+	static inline void toggle() {}
+	static inline bool isSet() { return false; }
 	// stop documentation inherited
-	static void configure(OutputType, OutputSpeed = OutputSpeed::MHz50) {}
-	static void setOutput(OutputType, OutputSpeed = OutputSpeed::MHz50) {}
+	static inline void configure(OutputSpeed) {}
+	static inline void configure(OutputType, OutputSpeed = OutputSpeed::MHz50) {}
+	static inline void setOutput(OutputType, OutputSpeed = OutputSpeed::MHz50) {}
 
 	// GpioInput
 	// start documentation inherited
-	static void setInput() {}
-	static bool read() { return false; }
+	static inline void setInput() {}
+	static inline bool read() { return false; }
 	// end documentation inherited
-	static void configure(InputType) {}
-	static void setInput(InputType) {}
+	static inline void configure(InputType) {}
+	static inline void setInput(InputType) {}
 	// External Interrupts
-	static void enableExternalInterrupt() {}
-	static void disableExternalInterrupt() {}
-	static void enableExternalInterruptVector(const uint32_t) {}
-	static void disableExternalInterruptVector() {}
-	static void setInputTrigger(const InputTrigger) {}
-	static bool getExternalInterruptFlag() { return false; }
+	static inline void enableExternalInterrupt() {}
+	static inline void disableExternalInterrupt() {}
+	static inline void enableExternalInterruptVector(const uint32_t) {}
+	static inline void disableExternalInterruptVector() {}
+	static inline void setInputTrigger(const InputTrigger) {}
+	static inline bool getExternalInterruptFlag() { return false; }
 	/// Reset the interrupt flag in the interrupt routine.
-	static void acknowledgeExternalInterruptFlag() {}
+	static inline void acknowledgeExternalInterruptFlag() {}
 
 	// GpioIO
 	// start documentation inherited
-	static Direction getDirection() { return Direction::Special; }
+	static inline Direction getDirection() { return Direction::Special; }
 	// end documentation inherited
-	static void lock() {}
-	static void disconnect() {}
+	static inline void lock() {}
+	static inline void disconnect() {}
 
 public:
 	/// @cond
@@ -117,7 +125,7 @@ public:
 	{
 		using Gpio = GpioUnused;
 		static constexpr Gpio::Signal Signal = Gpio::Signal::{{ name }};
-		static void connect() {}
+		static inline void connect() {}
 	};
 %% endfor
 	/// @endcond
