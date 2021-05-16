@@ -1,0 +1,10 @@
+<library>
+  <extends>modm:nucleo-f446ze</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_f446ze/dac_basic</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:dac</module>
+  </modules>
+</library>
