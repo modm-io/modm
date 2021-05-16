@@ -1,0 +1,107 @@
+/*
+ * Copyright (c) 2020, Jeff McBride
+ * Copyright (c) 2021, Christopher Durand
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+%% if id == ""
+#include "dac.hpp"
+%% else
+#include "dac_{{ id }}.hpp"
+%% endif
+
+namespace modm::platform
+{
+
+%% if target.family != "g4"
+void Dac{{ id }}::initialize()
+{
+	Rcc::enable<Peripheral::Dac{{ id }}>();
+	DAC{{ id }}->CR = 0;
+}
+%% endif
+
+void Dac{{ id }}::enableChannel(Channel chan)
+{
+	switch(chan) {
+	case Channel::Channel1:
+		DAC{{ id }}->CR |= DAC_CR_EN1_Msk;
+		break;
+%% if dual_channel
+	case Channel::Channel2:
+		DAC{{ id }}->CR |= DAC_CR_EN2_Msk;
+		break;
+%% endif
+	}
+}
+
+void Dac{{ id }}::disableChannel(Channel chan)
+{
+	switch(chan) {
+	case Channel::Channel1:
+		DAC{{ id }}->CR &= ~DAC_CR_EN1_Msk;
+		break;
+%% if dual_channel
+	case Channel::Channel2:
+		DAC{{ id }}->CR &= ~DAC_CR_EN2_Msk;
+		break;
+%% endif
+	}
+}
+
+%% if has_mcr
+void Dac{{ id }}::setMode(Channel channel, Mode mode)
+{
+	static_assert(DAC_MCR_MODE1_Pos == 0);
+%% if dual_channel
+	static_assert(DAC_MCR_MODE2_Pos == 16);
+%% endif
+
+	if(channel == Channel::Channel1) {
+		DAC{{ id }}->CR &= ~DAC_CR_EN1;
+	} else {
+%% if dual_channel
+		DAC{{ id }}->CR &= ~DAC_CR_EN2;
+%% endif
+	}
+
+%% if dual_channel
+	const auto shift = (channel == Channel::Channel1) ? 0 : DAC_MCR_MODE2_Pos;
+%% else
+	const auto shift = 0;
+%% endif
+	const auto clearMask = ~(DAC_MCR_MODE1_Msk << shift);
+	DAC{{ id }}->MCR = (DAC{{ id }}->MCR & clearMask) | (uint32_t(mode) << shift);
+}
+
+%% else
+void Dac{{ id }}::enableOutputBuffer(Channel chan, bool enable)
+{
+	uint32_t chanShift = 0;
+%% if dual_channel
+	switch(chan) {
+		case Channel::Channel1:
+			chanShift = 0;
+			break;
+		case Channel::Channel2:
+			chanShift = 16;
+			break;
+	};
+%% endif
+
+	if(enable) {
+		DAC{{ id }}->CR &= ~(DAC_CR_BOFF1_Msk << chanShift);
+	} else {
+		DAC{{ id }}->CR |= DAC_CR_BOFF1_Msk << chanShift;
+	}
+}
+
+%% endif
+
+} // namespace modm::platform

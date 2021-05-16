@@ -3,22 +3,98 @@
 
 import os
 
+def get_target_properties(target):
+    properties = {}
+    properties["has_sr"] = (target["family"] != 'f1') or (target["name"] == "00")
+    properties["has_mcr"] = target.family not in ["f0", "f1", "f2", "f3", "f4", "f7", "l0", "l1"]
+
+    # The following data has been extracted via grep for DAC_CHANNEL2_SUPPORT from headers.
+    # This define exists for some families if any instance is dual channel.
+    # That information is insufficient for devices with instances with different channel counts.
+    # TODO: extract information from CubeMX data and move it to modm-devices
+    if target["family"] == "f0":
+        properties["dual_channel"] = target.name in ["71", "72", "78", "91", "98"]
+    elif target["family"] == "f3":
+        properties["dual_channel"] = target.name not in ["01", "02", "18"]
+    elif target["family"] == "f4":
+        properties["dual_channel"] = target.name not in ["10"]
+    elif target["family"] == "l0":
+        properties["dual_channel"] = target.name in ["72", "73", "82", "83"]
+    elif target["family"] == "l4":
+        properties["dual_channel"] = target.name not in ["51", "52", "62"]
+    else:
+        properties["dual_channel"] = True
+    return properties
+
+
+class Instance(Module):
+    def __init__(self, instance):
+        self.instance = instance
+
+    def init(self, module):
+        module.name = str(self.instance)
+        module.description = "Instance {}".format(self.instance)
+
+    def prepare(self, module, options):
+        return True
+
+    def build(self, env):
+        device = env[":target"]
+        driver = device.get_driver("dac")
+
+        properties = device.properties
+        properties["target"] = device.identifier
+        properties["driver"] = driver
+        properties["id"] = self.instance
+        properties.update(get_target_properties(device.identifier))
+
+        if (device.identifier.family == "g4") and (self.instance == 2):
+            properties["dual_channel"] = False
+
+        env.substitutions = properties
+        env.outbasepath = "modm/src/modm/platform/dac"
+
+        env.template("dac.hpp.in", "dac_{}.hpp".format(self.instance))
+        env.template("dac.cpp.in", "dac_{}.cpp".format(self.instance))
+
+
 def init(module):
     module.name = ":platform:dac"
     module.description = "Digital-to-Analog Converter (DAC)"
 
+
 def prepare(module, options):
-    if not options[":target"].has_driver("dac:stm32"):
+    device = options[":target"]
+    if not device.has_driver("dac:stm32"):
         return False
 
-    if not options[":target"].identifier.family == 'f4':
-        return False
+    driver = device.get_driver("dac")
+
+    # If there is only one instance of the peripheral it is not numbered and
+    # merged into the generic dac module.
+    if "instance" in driver:
+        for instance in listify(driver["instance"]):
+            module.add_submodule(Instance(int(instance)))
 
     module.depends(":cmsis:device")
-
     return True
 
+
 def build(env):
+    device = env[":target"]
+    driver = device.get_driver("dac")
+
+    properties = device.properties
+    properties["target"] = device.identifier
+    properties["driver"] = driver
+    properties.update(get_target_properties(device.identifier))
+
+    if "instance" not in driver:
+        properties["id"] = ""
+
+    env.substitutions = properties
     env.outbasepath = "modm/src/modm/platform/dac"
-    env.copy("dac.hpp")
-    env.copy("dac_impl.hpp")
+
+    if "instance" not in driver:
+        env.template("dac.hpp.in")
+        env.template("dac.cpp.in")

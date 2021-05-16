@@ -217,6 +217,17 @@ public:
 %% endfor
 	};
 
+	enum class Interrupt {
+		Global = 0x01,
+		TransferComplete = 0x02,
+		HalfTransferComplete = 0x04,
+		Error = 0x08,
+		All = 0x0f,
+	};
+	MODM_FLAGS32(Interrupt);
+
+	using IrqHandler = void (*)(void);
+
 protected:
 %% if target["family"] == "f4"
 	static constexpr uint32_t memoryMask =
@@ -247,17 +258,6 @@ protected:
 			DMA_CCR_CIRC     |						// CircularMode
 			DMA_CCR_PL_1     | DMA_CCR_PL_0;		// Priority
 %% endif
-
-	enum class Interrupt {
-		Global = 0x01,
-		TransferComplete = 0x02,
-		HalfTransferComplete = 0x04,
-		Error = 0x08,
-		All = 0x0f,
-	};
-	MODM_FLAGS32(Interrupt);
-
-	using IrqHandler = void (*)(void);
 
 	template <uint32_t ID>
 	struct Nvic;

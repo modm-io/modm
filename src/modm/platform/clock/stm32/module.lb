@@ -105,6 +105,13 @@ def build(env):
         if "Fdcan1" in all_peripherals and per == "FDCAN":
             per = "FDCAN1"
             nper = "FDCAN"
+        # DAC
+        if "Dac1" in all_peripherals and per == "DAC":
+            per = "DAC1"
+            nper = "DAC"
+        if "Dac" in all_peripherals and per == "DAC1":
+            per = "DAC"
+            nper = "DAC1"
         # Fix ADC vs ADC1
         if "Adc1" in all_peripherals and per == "ADC":
             per = "ADC1"

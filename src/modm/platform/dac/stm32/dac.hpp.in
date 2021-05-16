@@ -1,0 +1,224 @@
+/*
+ * Copyright (c) 2020, Jeff McBride
+ * Copyright (c) 2021, Christopher Durand
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_STM32_DAC{{ id }}_HPP
+#define MODM_STM32_DAC{{ id }}_HPP
+
+#include <cstdint>
+#include "../device.hpp"
+#include <modm/platform/gpio/connector.hpp>
+#include <modm/platform/clock/rcc.hpp>
+#include <modm/src/modm/math/units.hpp>
+
+namespace modm::platform
+{
+
+/**
+ * Digital-to-Analog Converter (DAC{{ id }})
+ *
+ * Supports simple synchronous access to the 2-channel DAC found on most STM32
+ * microcontrollers.
+ *
+ * @author Jeff McBride
+ * @ingroup modm_platform_dac{% if id %} modm_platform_dac_{{id}}{% endif %}
+ */
+class Dac{{ id }} {
+public:
+	/**
+%% if dual_channel
+	 * The DAC has two output channels, Channel1 and Channel2
+%% else
+	 * The DAC has one output channel, Channel1
+%% endif
+	 */
+	enum class Channel : uint8_t
+	{
+		Channel1 = 0,
+%% if dual_channel
+		Channel2 = 1
+%% endif
+	};
+
+%% if has_mcr
+	enum class Mode
+	{
+		ExternalWithBuffer = 0,
+		ExternalInternalWithBuffer = DAC_MCR_MODE1_0,
+		ExternalWithoutBuffer = DAC_MCR_MODE1_1,
+		Internal = DAC_MCR_MODE1_0 | DAC_MCR_MODE1_1
+	};
+%% endif
+
+	template< template<Peripheral _> class... Signals >
+	static void
+	connect()
+	{
+		using Connector = GpioConnector<Peripheral::Dac{{ id }}, Signals...>;
+		Connector::connect();
+	}
+
+%% if target.family == "g4"
+	/**
+	 * Initialize the D/A converter.
+	 *
+	 * Enables the RCC clock output for the DAC
+	 *
+	 * @tparam SystemClock System clock struct
+	 */
+	template<typename SystemClock>
+	static inline void initialize();
+
+%% else
+	/**
+	 * Initialize the D/A converter.
+	 *
+	 * Enables the RCC clock output for the DAC
+	 */
+	static void initialize();
+
+%% endif
+
+	/** Enable DAC output for the given channel
+	 *
+	 * @param chan    The channel to be enabled
+	 *
+	 * @pre The DAC clock must be enabled with initialize()
+	 */
+	static void enableChannel(Channel chan);
+
+	/**
+	 * Disable DAC output for the given channel
+	 *
+	 * @param chan    The channel to be disabled
+	 *
+	 * @pre The DAC clock must be enabled with initialize()
+	 */
+	static void disableChannel(Channel chan);
+
+%% if has_mcr
+	/**
+	 * Control the output mode
+	 *
+	 * @param chan  The channel to configure the mode for
+	 * @param mode  The channel output mode
+	 *
+	 * @warning The DAC channel will be disabled when setting the mode
+	 */
+	static void setMode(Channel chan, Mode mode);
+
+%% else
+	/**
+	 * Control the output buffer setting
+	 *
+	 * @param chan    The channel to enable/disable the output buffer on
+	 * @param enable  true to turn on the output buffer, false to turn it off
+	 *
+	 * @pre The DAC clock must be enabled with initialize()
+	 */
+	static void enableOutputBuffer(Channel chan, bool enable);
+
+%% endif
+
+	/**
+	 * Set the output voltage for a DAC channel
+	 *
+	 * @param chan    The channel to set
+	 * @param value   The 12-bit DAC output value, range 0-4095.
+	 *
+	 * @pre The DAC clock must be enabled with initialize()
+	 */
+	static inline void setOutput(Channel chan, uint16_t value);
+
+	/**
+	 * Set output value for Channel1
+	 *
+	 * Equivalent to setOutput(modm::platform::Dac::Channel1, value)
+	 *
+	 * @param value   The 12-bit DAC output value, range 0-4095
+	 *
+	 * @pre The DAC clock must be enabled with initialize()
+	 */
+	static inline void setOutput1(uint16_t value);
+
+%% if dual_channel
+	/**
+	 * Set output value for Channel2
+	 *
+	 * Equivalent to setOutput(modm::platform::Dac::Channel2, value)
+	 *
+	 * @param value   The 12-bit DAC output value, range 0-4095
+	 *
+	 * @pre The DAC clock must be enabled with initialize()
+	 */
+	static inline void setOutput2(uint16_t value);
+
+%% endif
+	/// Get the channel for a Pin
+	template< class Gpio >
+	static inline constexpr Channel
+	getPinChannel()
+	{
+		constexpr int8_t channel{Gpio::template DacChannel<Peripheral::Dac{{ id }}>};
+		static_assert(channel >= 0, "Dac does not have a channel for this pin!");
+		return Channel(channel);
+	}
+
+};
+
+%% if target.family == "g4"
+template <typename SystemClock>
+inline void
+Dac{{ id }}::initialize()
+{
+	Rcc::enable<Peripheral::Dac{{ id }}>();
+	DAC{{ id }}->CR = 0;
+	DAC{{ id }}->MCR = 0;
+
+	if constexpr(SystemClock::Dac{{ id }} > MHz(160)) {
+		DAC{{ id }}->MCR = DAC_MCR_HFSEL_1;
+	} else if constexpr(SystemClock::Dac{{ id }} > MHz(80)) {
+		DAC{{ id }}->MCR = DAC_MCR_HFSEL_0;
+	}
+}
+%% endif
+
+inline void
+Dac{{ id }}::setOutput(Channel chan, uint16_t value)
+{
+	switch(chan) {
+		case Channel::Channel1:
+			DAC{{ id }}->DHR12R1 = value & DAC_DHR12R1_DACC1DHR_Msk;
+			break;
+%% if dual_channel
+		case Channel::Channel2:
+			DAC{{ id }}->DHR12R2 = value & DAC_DHR12R2_DACC2DHR_Msk;
+			break;
+%% endif
+	}
+}
+
+inline void
+Dac{{ id }}::setOutput1(uint16_t value)
+{
+	setOutput(Channel::Channel1, value);
+}
+
+%% if dual_channel
+inline void
+Dac{{ id }}::setOutput2(uint16_t value)
+{
+	setOutput(Channel::Channel2, value);
+}
+%% endif
+} // namespace modm::platform
+
+#endif // MODM_STM32_DAC{{ id }}_HPP
