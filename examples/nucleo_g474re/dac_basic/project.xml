@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:nucleo-g474re</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_g474re/dac_basic</option>
+  </options>
+  <modules>
+    <module>modm:debug</module>
+    <module>modm:platform:dac:2</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>
