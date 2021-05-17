@@ -1,0 +1,14 @@
+<library>
+  <extends>modm:nucleo-g474re</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_g474re/dac_dma</option>
+  </options>
+  <modules>
+    <module>modm:debug</module>
+    <module>modm:platform:dac:1</module>
+    <module>modm:platform:dac:4</module>
+    <module>modm:platform:dma</module>
+    <module>modm:platform:timer:4</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>
