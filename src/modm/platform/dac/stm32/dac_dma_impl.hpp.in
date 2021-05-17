@@ -1,0 +1,154 @@
+/*
+ * Copyright (c) 2021, Christopher Durand
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_STM32_DAC_DMA{{ id }}_HPP
+#	error 	"Don't include this file directly, use 'spi_master_{{ id }}_dma.hpp' instead!"
+#endif
+
+namespace modm::platform
+{
+
+%% if target.family == "g4"
+template <typename SystemClock>
+%% endif
+void
+Dac{{ id }}Dma::initialize()
+{
+	Rcc::enable<Peripheral::Dac{{ id }}>();
+%% if dual_channel
+	DAC{{ id }}->CR = DAC_CR_TEN1 | DAC_CR_TEN2;
+%% else
+	DAC{{ id }}->CR = DAC_CR_TEN1;
+%% endif
+%% if has_mcr
+	DAC{{ id }}->MCR = 0;
+%% endif
+
+%% if target.family == "g4"
+	if constexpr(SystemClock::Dac{{ id }} > MHz(160)) {
+		DAC{{ id }}->MCR = DAC_MCR_HFSEL_1;
+	} else if constexpr(SystemClock::Dac{{ id }} > MHz(80)) {
+		DAC{{ id }}->MCR = DAC_MCR_HFSEL_0;
+	}
+%% endif
+}
+
+%% set max_channel = 2 if dual_channel else 1
+%% for channel_id in range(1, max_channel + 1)
+%% set channel="Dac{}Dma::Channel{}<DmaChannel>".format(id, channel_id)
+
+template<typename DmaChannel>
+void
+{{ channel }}::enableDacChannel()
+{
+	DAC{{ id }}->CR |= DAC_CR_DMAEN{{ channel_id }} | DAC_CR_EN{{ channel_id }};
+}
+
+template<typename DmaChannel>
+void
+{{ channel }}::disableDacChannel()
+{
+%% if has_sr
+	// clear underrun flag
+	DAC{{ id }}->SR = DAC_SR_DMAUDR{{ channel_id }};
+%% endif
+	DAC{{ id }}->CR &= ~(DAC_CR_DMAEN{{ channel_id }} | DAC_CR_EN{{ channel_id }});
+}
+
+%% if has_mcr
+template<typename DmaChannel>
+void
+{{ channel }}::setMode(Mode mode)
+{
+	disableDacChannel();
+	DAC{{ id }}->MCR = (DAC{{ id }}->MCR & DAC_MCR_MODE{{ channel_id }}) | uint32_t(mode);
+}
+
+%% else
+template<typename DmaChannel>
+void
+{{ channel }}::setOutputBufferEnabled(bool enabled)
+{
+	if (enabled) {
+		DAC{{ id }}->CR |= DAC_CR_BOFF{{ channel_id }};
+	} else {
+		DAC{{ id }}->CR &= ~DAC_CR_BOFF{{ channel_id }};
+	}
+}
+
+%% endif
+
+template<typename DmaChannel>
+void
+{{ channel }}::setTriggerSource(uint8_t triggerSource)
+{
+	DAC{{ id }}->CR = (DAC{{ id }}->CR & ~DAC_CR_TSEL{{ channel_id }})
+		| ((uint32_t(triggerSource) << DAC_CR_TSEL{{ channel_id }}_Pos) & DAC_CR_TSEL{{ channel_id }}_Msk);
+}
+
+%% if has_sr
+template<typename DmaChannel>
+bool
+{{ channel }}::hasDmaUnderrun()
+{
+	return (DAC{{ id }}->SR & DAC_SR_DMAUDR{{ channel_id }});
+}
+%% endif
+
+template<typename DmaChannel>
+void
+{{ channel }}::configure(const void* data, size_t dataLength, DmaBase::CircularMode circularMode,
+						 DmaBase::Priority priority)
+{
+	using RequestMapping = typename DmaChannel::RequestMapping<Peripheral::Dac{{ id }}, DmaBase::Signal::Ch{{ channel_id }}>;
+	constexpr auto request = RequestMapping::Request;
+
+	DmaChannel::configure(
+		DmaBase::DataTransferDirection::MemoryToPeripheral,
+		DmaBase::MemoryDataSize::HalfWord,
+		DmaBase::PeripheralDataSize::Word,
+		DmaBase::MemoryIncrementMode::Increment,
+		DmaBase::PeripheralIncrementMode::Fixed,
+		priority,
+		circularMode
+	);
+
+	DmaChannel::template setPeripheralRequest<request>();
+
+	DmaChannel::setMemoryAddress(uintptr_t(data));
+	DmaChannel::setPeripheralAddress(uintptr_t(&(DAC{{ id }}->DHR12R{{ channel_id }})));
+	DmaChannel::setDataLength(dataLength);
+}
+
+template<typename DmaChannel>
+void
+{{ channel }}::setData(const void* data, size_t dataLength)
+{
+	DmaChannel::setMemoryAddress(uintptr_t(data));
+	DmaChannel::setDataLength(dataLength);
+}
+
+template<typename DmaChannel>
+void
+{{ channel }}::startDma()
+{
+	DmaChannel::start();
+}
+
+template<typename DmaChannel>
+void
+{{ channel }}::stopDma()
+{
+	DmaChannel::stop();
+}
+%% endfor
+
+} // namespace modm::platform

@@ -56,6 +56,9 @@ class Instance(Module):
 
         env.template("dac.hpp.in", "dac_{}.hpp".format(self.instance))
         env.template("dac.cpp.in", "dac_{}.cpp".format(self.instance))
+        if env.has_module(":platform:dma"):
+            env.template("dac_dma.hpp.in", "dac_dma_{}.hpp".format(self.instance))
+            env.template("dac_dma_impl.hpp.in", "dac_dma_{}_impl.hpp".format(self.instance))
 
 
 def init(module):
@@ -98,3 +101,6 @@ def build(env):
     if "instance" not in driver:
         env.template("dac.hpp.in")
         env.template("dac.cpp.in")
+        if env.has_module(":platform:dma"):
+            env.template("dac_dma.hpp.in")
+            env.template("dac_dma_impl.hpp.in")

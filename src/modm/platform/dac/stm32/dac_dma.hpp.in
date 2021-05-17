@@ -1,0 +1,164 @@
+/*
+ * Copyright (c) 2021, Christopher Durand
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_STM32_DAC_DMA{{ id }}_HPP
+#define MODM_STM32_DAC_DMA{{ id }}_HPP
+
+#include <cstdint>
+#include "../device.hpp"
+#include <modm/platform/dma/dma.hpp>
+#include <modm/platform/gpio/connector.hpp>
+#include <modm/platform/clock/rcc.hpp>
+#include <modm/src/modm/math/units.hpp>
+
+namespace modm::platform
+{
+
+/**
+ * Digital-to-Analog Converter with DMA (DAC{{ id }})
+ *
+ * @author Christopher Durand
+ * @ingroup modm_platform_dac{% if id %} modm_platform_dac_{{id}}{% endif %}
+ */
+class Dac{{ id }}Dma
+{
+public:
+	template< template<Peripheral _> class... Signals >
+	static void
+	connect()
+	{
+		using Connector = GpioConnector<Peripheral::Dac{{ id }}, Signals...>;
+		Connector::connect();
+	}
+
+%% if target.family == "g4"
+	/**
+	 * Initialize the D/A converter.
+	 *
+	 * Enables the RCC clock output for the DAC
+	 *
+	 * @tparam SystemClock System clock struct
+	 */
+	template<typename SystemClock>
+	static inline void
+	initialize();
+
+%% else
+	/**
+	 * Initialize the D/A converter.
+	 *
+	 * Enables the RCC clock output for the DAC
+	 */
+	static void
+	initialize();
+
+%% endif
+
+%% set max_channel = 2 if dual_channel else 1
+%% for channel_id in range(1, max_channel + 1)
+	/**
+	 * DAC output channel {{ channel_id }}
+	 *
+	 * @ingroup modm_platform_dac{% if id %} modm_platform_dac_{{id}}{% endif %}
+	 */
+	template<typename DmaChannel>
+	class Channel{{ channel_id }}
+	{
+	public:
+%% if has_mcr
+		enum class Mode
+		{
+%% set mode="DAC_MCR_MODE{}".format(channel_id)
+			ExternalWithBuffer = 0,
+			ExternalInternalWithBuffer = {{ mode }}_0,
+			ExternalWithoutBuffer = {{ mode }}_1,
+			Internal = {{ mode }}_0 | {{ mode }}_1,
+			Mask = {{ mode }}_0 | {{ mode }}_1 | {{ mode }}_2
+		};
+%% endif
+
+		/// Enable the DAC channel
+		static void enableDacChannel();
+
+		/// Disable the DAC channel
+		static void disableDacChannel();
+
+%% if has_mcr
+		/// Configure connection mode (internal, external, external with buffer)
+		static void setMode(Mode mode);
+%% else
+		/// Enable the output buffer
+		static void setOutputBufferEnabled(bool enabled);
+%% endif
+
+		/**
+		 * Configure the external trigger source
+		 *
+		 * If DMA is used the external trigger mode is always active
+		 *
+		 * @param triggerSource trigger source id, please refer to the reference manual
+		 */
+		static void setTriggerSource(uint8_t triggerSource);
+%% if has_sr
+		/**
+		 * Returns true on DMA underrun
+		 *
+		 * @warning To reset the condition both the DAC channel and DMA channel
+		 *          have to be disabled and and the DMA channel must be reconfigured.
+		 */
+		static bool hasDmaUnderrun();
+%% endif
+		/**
+		 * Configure the DMA channel
+		 *
+		 * @warning this function must be called before enabling the DMA channel
+		 * @pre the DMA channel must be disabled to be reconfigured
+		 *
+		 * @param data output data
+		 * @param dataSize number of DMA transfers to be performed
+		 * @param circularMode DMA circular mode setting
+		 * @param priority DMA transfer priority
+		 */
+		static void configure(const void* data, size_t dataSize, DmaBase::CircularMode circularMode,
+							  DmaBase::Priority priority = DmaBase::Priority::Medium);
+
+		/**
+		 * Set data to transfer
+		 *
+		 * @pre the DMA channel must be disabled to call this function
+		 *
+		 * @param data output data
+		 * @param dataSize number of DMA transfers to be performed
+		 */
+		static void setData(const void* data, size_t dataSize);
+
+		/**
+		 * Start DMA transfers
+		 * @pre before starting the transfer the channel must be configured
+		 */
+		static void startDma();
+
+		/// Stop DMA transfers
+		static void stopDma();
+	};
+%% endfor
+};
+
+
+} // namespace modm::platform
+
+%% if id == ""
+#include "dac_dma_impl.hpp"
+%% else
+#include "dac_dma_{{ id }}_impl.hpp"
+%% endif
+
+#endif // MODM_STM32_DAC_DMA{{ id }}_HPP
