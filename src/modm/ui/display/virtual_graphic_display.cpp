@@ -31,9 +31,9 @@ void
 modm::VirtualGraphicDisplay::clear()
 {
 	//TODO switch black , white
-	this->display->setColor(glcd::Color::black());
+	this->display->setColor(color::Rgb(0, 0, 0));
 	this->display->fillRectangle(this->leftUpper, width, height);
-	this->display->setColor(glcd::Color::white());
+	this->display->setColor(color::Rgb(255, 255, 255));
 }
 
 void
@@ -55,7 +55,7 @@ modm::VirtualGraphicDisplay::clearPixel(int16_t x, int16_t y)
 	this->display->clearPixel(x + this->leftUpper[0], y + this->leftUpper[1] );
 }
 
-modm::glcd::Color
+modm::color::Rgb565
 modm::VirtualGraphicDisplay::getPixel(int16_t x, int16_t y) const
 {
 	return this->display->getPixel(x + this->leftUpper[0], y + this->leftUpper[1] );

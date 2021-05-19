@@ -26,10 +26,12 @@
 
 #include <modm/ui/gui.hpp>
 
+
 #include "touchscreen_calibrator.hpp"
 
 #include "images/bluetooth_12x16.hpp"
 
+using namespace modm::color;
 
 
 // ----------------------------------------------------------------------------
@@ -166,13 +168,13 @@ initTouchscreen()
 static void
 drawCross(modm::ColorGraphicDisplay& display, modm::glcd::Point center)
 {
-	display.setColor(modm::glcd::Color::red());
+	display.setColor(html::Red);
 	display.drawLine(center.x - 15, center.y, center.x - 2, center.y);
 	display.drawLine(center.x + 2, center.y, center.x + 15, center.y);
 	display.drawLine(center.x, center.y - 15, center.x, center.y - 2);
 	display.drawLine(center.x, center.y + 2, center.x, center.y + 15);
 
-	display.setColor(modm::glcd::Color::white());
+	display.setColor(html::White);
 	display.drawLine(center.x - 15, center.y + 15, center.x - 7, center.y + 15);
 	display.drawLine(center.x - 15, center.y + 7, center.x - 15, center.y + 15);
 
@@ -198,7 +200,7 @@ calibrateTouchscreen(modm::ColorGraphicDisplay& display, modm::glcd::Point *fixe
 		{
 			display.clear();
 
-			display.setColor(modm::glcd::Color::yellow());
+			display.setColor(modm::color::html::Yellow);
 			display.setCursor(50, 5);
 			display << "Touch crosshair to calibrate";
 
@@ -385,20 +387,18 @@ test_callback(const modm::gui::InputEvent& ev, modm::gui::Widget* w, void* data)
 	Board::LedGreen2::toggle();
 }
 
-
-modm::glcd::Color colors[modm::gui::Color::PALETTE_SIZE] {
-	modm::glcd::Color::black(),
-	modm::glcd::Color::white(),
-	modm::glcd::Color::gray(),
-	modm::glcd::Color::red(),
-	modm::glcd::Color::green(),
-	modm::glcd::Color::blue(),
-	modm::glcd::Color::blue(),		// BORDER
-	modm::glcd::Color::red(),		// TEXT
-	modm::glcd::Color::black(),		// BACKGROUND
-	modm::glcd::Color::red(),		// ACTIVATED
-	modm::glcd::Color::blue(),		// DEACTIVATED
-
+modm::color::Rgb565 colors[modm::gui::Color::PALETTE_SIZE] {
+	html::Black,
+	html::White,
+	html::Gray,
+	html::Red,
+	html::Green,
+	html::Blue,
+	html::Blue,		// BORDER
+	html::Red,		// TEXT
+	html::Black,		// BACKGROUND
+	html::Red,		// ACTIVATED
+	html::Blue,		// DEACTIVATED
 };
 modm::gui::ColorPalette colorpalette{colors};
 /*
@@ -444,7 +444,7 @@ main()
 	 * manipulate the color palette
 	 */
 
-	colorpalette.setColor(modm::gui::Color::TEXT, modm::glcd::Color::yellow());
+	colorpalette.setColor(modm::gui::Color::TEXT, html::Yellow);
 
 
 	/*

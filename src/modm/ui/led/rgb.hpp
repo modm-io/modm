@@ -12,17 +12,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_UI_RGB_LED_HPP
-#define MODM_UI_RGB_LED_HPP
+#pragma once
 
 #include <stdint.h>
-#include "led.hpp"
 #include <modm/ui/color.hpp>
+#include "led.hpp"
 
-namespace modm
-{
-
-namespace ui
+namespace modm::ui
 {
 
 /**
@@ -42,44 +38,30 @@ class RgbLed
 	::modm::color::Rgb absolute;
 
 public:
-	RgbLed(Led& red, Led& green, Led& blue)
-	:	red(red), green(green), blue(blue), absolute()
-	{
-	}
+	RgbLed(Led& red, Led& green, Led& blue):
+		red(red), green(green), blue(blue) {}
 
 	inline void
 	setColor(::modm::color::Rgb color)
 	{
 		absolute = color;
 
-		red.setBrightness(absolute.red);
-		green.setBrightness(absolute.green);
-		blue.setBrightness(absolute.blue);
-	}
-
-	inline void
-	setColor(::modm::color::Hsv color)
-	{
-		color.toRgb(&absolute);
-		setColor(absolute);
+		red.setBrightness(color.red);
+		green.setBrightness(color.green);
+		blue.setBrightness(color.blue);
 	}
 
 	inline ::modm::color::Rgb
 	getColor()
 	{
 		return ::modm::color::Rgb(
-			red.getBrightness(),
-			green.getBrightness(),
-			blue.getBrightness()
-		);
+			red.getBrightness(), green.getBrightness(), blue.getBrightness());
 	}
 
 	inline bool
 	isFading()
 	{
-		return (red.isFading() ||
-				green.isFading() ||
-				blue.isFading());
+		return (red.isFading() || green.isFading() || blue.isFading());
 	}
 
 	inline void
@@ -92,13 +74,6 @@ public:
 		blue.fadeTo(absolute.blue, time);
 	}
 
-	inline void
-	fadeTo(::modm::color::Hsv color, uint16_t time)
-	{
-		color.toRgb(&absolute);
-		fadeTo(absolute, time);
-	}
-
 	/// should be called every 1ms or more.
 	inline void
 	update()
@@ -109,8 +84,4 @@ public:
 	}
 };
 
-}
-
-}
-
-#endif	// MODM_PWM_RGB_LED_HPP
+}  // namespace modm::ui

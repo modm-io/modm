@@ -23,7 +23,7 @@ public:
 		touch(touchData),
 		display{Board::getDisplay()},
 		px{-1, -1}, py{-1, -1},
-		c{Color::white(), Color::white()}
+		c{modm::color::html::White, modm::color::html::White}
 		{}
 
 	bool
@@ -72,7 +72,7 @@ public:
 					// invalidate points
 					px[tp.id] = -1; py[tp.id] = -1;
 					// generate new random color
-					c[tp.id] = Color(uint16_t(rand()));
+					c[tp.id] = modm::color::Rgb565(uint16_t(rand()));
 				}
 			}
 			LedRed::reset();
@@ -86,7 +86,7 @@ private:
 	Touch touch;
 	modm::ColorGraphicDisplay& display;
 	int16_t px[2], py[2];
-	Color c[2];
+	modm::color::Rgb565 c[2];
 };
 
 LineDrawer drawer;

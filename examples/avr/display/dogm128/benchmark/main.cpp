@@ -21,6 +21,7 @@
 using namespace modm::platform;
 using namespace modm::literals;
 using namespace std::chrono_literals;
+using namespace modm::color::html;
 
 
 namespace led
@@ -161,7 +162,7 @@ main()
 		while (!timer.execute())
 		{
 			// rectangle in left side of screen
-			// TODO display.setColor(Color::black());
+			// display.setColor(Black);
 			display.drawRectangle(Point(0, 0), 62, 62);
 
 			// rounded rectangle around text area
@@ -176,14 +177,14 @@ main()
 			display.drawCircle(Point(31, 31), 31);
 
 			// clear previous spinner position
-			// TODO display.setColor(Color::white());
+			// TODO display.setColor(White);
 			display.fillRectangle(Point(87, 40), 16, 16);
 
 			static uint8_t loops = 0;
-			// TODO display.setColor(Color::black());
+			// TODO display.setColor(Black);
 			drawSpinner(Point(95, 48), loops++);
 
-			// TODO display.setColor(Color::white());
+			// TODO display.setColor(White);
 			display.setCursor(Point(25, 40));
 			display << ++iter;
 			display.update();
@@ -192,7 +193,7 @@ main()
 		// print number of iterations in one second
 		display.clear();
 		display.setCursor(Point(80, 10));
-		// TODO display.setColor(Color::white());
+		// display.setColor(White);
 		display << "FPS=" << iter;
 	}
 }

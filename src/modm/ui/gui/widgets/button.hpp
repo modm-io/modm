@@ -77,14 +77,14 @@ private:
 class FilledAreaButton : public Widget
 {
 public:
-	FilledAreaButton(modm::glcd::Color color, Dimension d) :
+	FilledAreaButton(modm::color::Rgb565 color, Dimension d) :
 		Widget(d, true),
 		color(color)
 	{
 	}
 
 	void
-	setBackgroundColor(modm::glcd::Color color)
+	setBackgroundColor(modm::color::Rgb565 color)
 	{
 		this->color = color;
 	}
@@ -93,7 +93,7 @@ public:
 	render(View* view);
 
 private:
-	modm::glcd::Color color;
+	modm::color::Rgb565 color;
 };
 
 }	// namespace gui

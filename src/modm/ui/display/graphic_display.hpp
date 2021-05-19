@@ -24,6 +24,7 @@
 #include <modm/io/iostream.hpp>
 #include <modm/math/geometry.hpp>
 
+#include <modm/ui/color.hpp>
 #include "font.hpp"
 
 namespace modm

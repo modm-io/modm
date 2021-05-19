@@ -23,6 +23,8 @@
 
 #include "touchscreen_calibrator.hpp"
 
+using namespace modm::color::html;
+
 
 // ----------------------------------------------------------------------------
 
@@ -132,13 +134,13 @@ initTouchscreen()
 static void
 drawCross(modm::ColorGraphicDisplay& display, modm::glcd::Point center)
 {
-	display.setColor(modm::glcd::Color::red());
+	display.setColor(Red);
 	display.drawLine(center.x - 15, center.y, center.x - 2, center.y);
 	display.drawLine(center.x + 2, center.y, center.x + 15, center.y);
 	display.drawLine(center.x, center.y - 15, center.x, center.y - 2);
 	display.drawLine(center.x, center.y + 2, center.x, center.y + 15);
 
-	display.setColor(modm::glcd::Color::white());
+	display.setColor(White);
 	display.drawLine(center.x - 15, center.y + 15, center.x - 7, center.y + 15);
 	display.drawLine(center.x - 15, center.y + 7, center.x - 15, center.y + 15);
 
@@ -162,7 +164,7 @@ calibrateTouchscreen(modm::ColorGraphicDisplay& display)
 	{
 		display.clear();
 
-		display.setColor(modm::glcd::Color::yellow());
+		display.setColor(Yellow);
 		display.setCursor(50, 5);
 		display << "Touch crosshair to calibrate";
 
@@ -205,7 +207,7 @@ main()
 
 	calibrateTouchscreen(tft);
 
-	tft.setColor(modm::glcd::Color::lime());
+	tft.setColor(Lime);
 
 	while (true)
 	{

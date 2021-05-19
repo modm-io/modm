@@ -14,21 +14,23 @@
 
 #include "colorpalette.hpp"
 
-modm::glcd::Color defaultColors[] = {
-	modm::glcd::Color::black(),		// BLACK
-	modm::glcd::Color::white(),		// WHITE
-	modm::glcd::Color::gray(),		// GRAY
-	modm::glcd::Color::red(),		// RED
-	modm::glcd::Color::green(),		// GREEN
-	modm::glcd::Color::blue(),		// BLUE
-	modm::glcd::Color::yellow(),	// YELLOW
-	modm::glcd::Color::signalViolet(), //SIGNALVIOLET
-	modm::glcd::Color::emeraldGreen(), //EMERALDGREEN
-	modm::glcd::Color::blue(),		// BORDER
-	modm::glcd::Color::yellow(),	// TEXT
-	modm::glcd::Color::black(),		// BACKGROUND
-	modm::glcd::Color::red(),		// ACTIVATED
-	modm::glcd::Color::blue(),		// DEACTIVATED
+using namespace modm::color::html;
+
+modm::color::Rgb565 defaultColors[] = {
+	Black,
+	White,
+	Gray,
+	Red,
+	Green,
+	Blue,
+	Yellow,
+	Purple,
+	MediumSeaGreen,
+	Blue,			// BORDER
+	Yellow,			// TEXT
+	Black,			// BACKGROUND
+	Red,			// ACTIVATED
+	Blue,			// DEACTIVATED
 };
 
 modm::gui::ColorPalette modm::gui::DefaultColorPalette(defaultColors);

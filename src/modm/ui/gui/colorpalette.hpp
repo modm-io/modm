@@ -56,7 +56,7 @@ Color {
 class ColorPalette
 {
 public:
-	ColorPalette(modm::glcd::Color colors[Color::PALETTE_SIZE]) :
+	ColorPalette(modm::color::Rgb565 colors[Color::PALETTE_SIZE]) :
 		colors(colors)
 	{
 	}
@@ -74,7 +74,7 @@ public:
 	}
 
 	void
-	setColor(Color name, modm::glcd::Color color)
+	setColor(Color name, modm::color::Rgb565 color)
 	{
 		if (name < Color::PALETTE_SIZE)
 		{
@@ -82,28 +82,28 @@ public:
 		}
 	}
 
-	const modm::glcd::Color
+	const modm::color::Rgb565
 	getColor(Color name) const
 	{
 		if (name >= Color::PALETTE_SIZE)
-			return modm::glcd::Color(0xffff);
+			return modm::color::Rgb565(0xffff);
 		return colors[name];
 	}
 
-	const modm::glcd::Color
+	const modm::color::Rgb565
 	operator[](Color name)
 	{
 		return getColor(name);
 	}
 
-	const modm::glcd::Color*
+	const modm::color::Rgb565*
 	getPointer() const
 	{
 		return colors;
 	}
 
 private:
-	modm::glcd::Color *colors;
+	modm::color::Rgb565 *colors;
 };
 
 }	// namespace gui

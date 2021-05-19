@@ -50,7 +50,8 @@ main()
 	tft.initialize();
 	tft.enableBacklight(true);
 	LedGreen::set();
-	tft.setColor(modm::glcd::Color::black());
+	tft.setColor(modm::color::html::Black);
+
 	int16_t w = tft.getWidth();
 	int16_t h = tft.getHeight();
 	tft.drawLine({0,0}, {w, h});

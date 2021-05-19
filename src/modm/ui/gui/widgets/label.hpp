@@ -29,7 +29,7 @@ namespace gui
 class Label : public Widget
 {
 public:
-	Label(const char* lbl, modm::glcd::Color color) :
+	Label(const char* lbl, modm::color::Rgb565 color) :
 		Widget(Dimension(0,0), false),
 		label(lbl),
 		color(color)
@@ -41,7 +41,7 @@ public:
 	render(View* view);
 
 	void
-	setColor(modm::glcd::Color color)
+	setColor(modm::color::Rgb565 color)
 	{
 		this->color = color;
 		this->markDirty();
@@ -83,7 +83,7 @@ private:
 
 private:
 	const char* label;
-	modm::glcd::Color color;
+	modm::color::Rgb565 color;
 };
 
 }	// namespace gui

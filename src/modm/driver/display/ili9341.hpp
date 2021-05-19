@@ -236,12 +236,12 @@ public:
 	{ setColoredPixel(x, y, backgroundColor); }
 
     // TODO implement getPixel for ili9341
-	glcd::Color
+	color::Rgb565
 	getPixel(int16_t x, int16_t y) const final
 	{
 		(void) x;
 		(void) y;
-		return glcd::Color::white();
+		return modm::color::html::White;
 	}
 
 	void
@@ -270,7 +270,7 @@ public:
 				 modm::accessor::Flash<uint8_t> data) final;
 
 	void
-	drawRaw(glcd::Point upperLeft, uint16_t width, uint16_t height, glcd::Color* data);
+	drawRaw(glcd::Point upperLeft, uint16_t width, uint16_t height, color::Rgb565* data);
 
 	void
 	setScrollArea(uint16_t topFixedRows, uint16_t bottomFixedRows, uint16_t firstRow);
@@ -290,7 +290,7 @@ protected:
 
 private:
 	void
-	setColoredPixel(int16_t x, int16_t y, glcd::Color const &color);
+	setColoredPixel(int16_t x, int16_t y, color::Rgb565 const &color);
 
 	void
 	setClipping(uint16_t x, uint16_t y, uint16_t width, uint16_t height);

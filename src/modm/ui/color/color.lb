@@ -12,20 +12,17 @@
 
 def init(module):
     module.name = ":ui:color"
-    module.description = """\
+    module.description = """
 # Color
 
-RGB and HSV containers and converters.
+Color containers and converters in various formats: RGB, HSV, Brightness, Rgb565
 """
 
 def prepare(module, options):
-    module.depends(
-        ":io",
-        ":math:utils")
+    module.depends(":math:utils")
     return True
 
 def build(env):
-    env.outbasepath = "modm/src/modm/ui"
-    env.copy("color.hpp")
-    env.copy("color.cpp")
-    env.copy("color_impl.hpp")
+    env.outbasepath = "modm/src/modm/ui/color"
+    env.copy(".")
+    env.copy("../color.hpp")

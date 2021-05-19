@@ -148,28 +148,9 @@ struct tcs3472
 		getColor()
 		{ return {getRed(), getGreen(), getBlue()}; }
 
-		/** Normalize color values based on clear value
-		 *
-		 * Imagine a low band light. For example a green laser. In case the filters
-		 * of this sensors do not transfer this wavelength well, it might
-		 * result in all colors being very low. The clear value will not
-		 * filter colors and thus it will see a bright light (intensity).
-		 * In order to still have some signal the very low green value can be
-		 * amplified with the clear value.
-		 */
-		inline Rgb
-		getNormalizedColor()
-		{
-			Rgb color = getColor();
-			const float scalar = getClear() / float(color.red + color.green + color.blue);
-			color.red *= scalar;
-			color.green *= scalar;
-			color.blue *= scalar;
-			return color;
-		}
-
 		inline uint16_t
 		getClear()  { return getValue(0); }
+
 		inline uint16_t
 		getRed() { return getValue(1); }
 		inline uint16_t

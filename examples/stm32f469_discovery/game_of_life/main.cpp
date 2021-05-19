@@ -72,7 +72,7 @@ uint16_t * displayBuffer;
 #define TRAIL_LENGTH ((1 << TRAIL_POWER) + 1)
 constexpr uint8_t alive = (1 << TRAIL_POWER);
 
-#define COLOR_SHADE(red, green, blue, fraction) Color( \
+#define COLOR_SHADE(red, green, blue, fraction) modm::color::Rgb(\
 	uint8_t(uint32_t(red)   * (fraction) / TRAIL_LENGTH), \
 	uint8_t(uint32_t(green) * (fraction) / TRAIL_LENGTH), \
 	uint8_t(uint32_t(blue)  * (fraction) / TRAIL_LENGTH) )
@@ -82,7 +82,7 @@ constexpr uint8_t alive = (1 << TRAIL_POWER);
 	COLOR_SHADE(r,g,b,8), COLOR_SHADE(r,g,b,9), COLOR_SHADE(r,g,b,10),COLOR_SHADE(r,g,b,11), \
 	COLOR_SHADE(r,g,b,12),COLOR_SHADE(r,g,b,13),COLOR_SHADE(r,g,b,14),COLOR_SHADE(r,g,b,15) }
 
-static const Color shades_of_color[][16] {
+static const modm::color::Rgb565 shades_of_color[][16] {
 	COLOR_PALETTE(0xff, 0xff, 0xff),
 
 	COLOR_PALETTE(0xff, 0, 0),
@@ -137,7 +137,7 @@ static inline void touch(framebuffer_t buffer)
 
 static inline void setPixel(int x, int y, uint8_t color)
 {
-#define DRAW(x, y) displayBuffer[(y) * 800 + (x)] = GET_TRAIL_COLOR(color).getValue();
+#define DRAW(x, y) displayBuffer[(y) * 800 + (x)] = GET_TRAIL_COLOR(color).color;
 #if SCALE >= 8
 	// >:v x:y
 	// 0 |        |
@@ -148,7 +148,7 @@ static inline void setPixel(int x, int y, uint8_t color)
 	// 5 | x    x |
 	// 6 |  xxxx  |
 	// 7 |        |
-
+GET_TRAIL_COLOR(color).color;
 	// 1
 	DRAW(x+2, y+1);
 	DRAW(x+3, y+1);

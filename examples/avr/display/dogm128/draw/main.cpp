@@ -17,6 +17,7 @@
 
 using namespace modm::platform;
 using namespace modm::literals;
+using namespace modm::color::html;
 
 
 namespace led
@@ -71,11 +72,11 @@ main()
 
 	display.fillRectangle(Point(10, 10), 20, 20);
 	display.fillCircle(Point(45, 40), 23);
-	// TODO display.setColor(Color::white());
+	// display.setColor(White);
 	display.fillRectangle(Point(20, 20), 20, 20);
 	display.fillCircle(Point(55, 50), 8);
 
-	// TODO display.setColor(Color::black());
+	// display.setColor(Black);
 	display.drawLine(Point(0, 0), Point(127, 63));
 
 	display.update();

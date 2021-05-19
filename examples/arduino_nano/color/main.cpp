@@ -64,11 +64,8 @@ public:
 			PT_WAIT_UNTIL(TCS3472_INT::read() == false);
 			if (PT_CALL(sensor.readColor()))
 			{
-				const auto color = data.getColor();
-				MODM_LOG_INFO << "RGB: " << color;
-				modm::color::HsvT<uint16_t> hsv;
-				color.toHsv(&hsv);
-				MODM_LOG_INFO << "\tHSV: " << hsv << modm::endl;
+				const auto rgb = data.getColor();
+				MODM_LOG_INFO << "RGB: " << rgb << "\tHSV: " << modm::color::Hsv(rgb) << modm::endl;
 			}
 		}
 

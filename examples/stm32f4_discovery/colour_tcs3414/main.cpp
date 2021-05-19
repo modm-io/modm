@@ -98,11 +98,8 @@ public:
 		while (true)
 		{
 			if (PT_CALL(sensor.readColor())) {
-				auto color = data.getColor();
-				stream << "RGB: " << color;
-				modm::color::HsvT<uint16_t> hsv;
-				color.toHsv(&hsv);
-				stream << "\tHSV: " << hsv << modm::endl;
+				const auto rgb = data.getColor();
+				stream << "RGB: " << rgb << "\tHSV: " << modm::color::Hsv(rgb) << modm::endl;
 			}
 			timeout.restart(500ms);
 			PT_WAIT_UNTIL(timeout.isExpired());

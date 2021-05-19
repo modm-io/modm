@@ -18,6 +18,8 @@ def init(module):
 def prepare(module, options):
     module.depends(
         "modm:ui:button",
+        "modm:ui:color",
+        "modm:math",
         "modm:ui:time")
     return True
 

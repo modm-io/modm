@@ -11,8 +11,8 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
-#include <modm/processing.hpp>
 #include <modm/driver/color/tcs3472.hpp>
+#include <modm/processing.hpp>
 
 class ThreadOne : public modm::pt::Protothread
 {
@@ -28,9 +28,7 @@ public:
 		while (true)
 		{
 			// we wait until the task started
-			if (PT_CALL(sensor.ping())) {
-			 	break;
-			}
+			if (PT_CALL(sensor.ping())) { break; }
 			// otherwise, try again in 100ms
 			timeout.restart(100ms);
 			PT_WAIT_UNTIL(timeout.isExpired());
@@ -40,9 +38,7 @@ public:
 
 		while (true)
 		{
-			if (PT_CALL(sensor.initialize())) {
-				break;
-			}
+			if (PT_CALL(sensor.initialize())) { break; }
 			// otherwise, try again in 100ms
 			timeout.restart(100ms);
 			PT_WAIT_UNTIL(timeout.isExpired());
@@ -52,7 +48,8 @@ public:
 
 		while (true)
 		{
-			if (PT_CALL(sensor.configure(sensor.Gain::X4, sensor.IntegrationTime::MSEC_101))) {
+			if (PT_CALL(sensor.configure(sensor.Gain::X4, sensor.IntegrationTime::MSEC_101)))
+			{
 				break;
 			}
 			// otherwise, try again in 100ms
@@ -66,11 +63,8 @@ public:
 		{
 			if (PT_CALL(sensor.readColor()))
 			{
-				const auto color = data.getColor();
-				MODM_LOG_INFO << "RGB: " << color;
-				modm::color::HsvT<uint16_t> hsv;
-				color.toHsv(&hsv);
-				MODM_LOG_INFO << "\tHSV: " << hsv << modm::endl;
+				const auto rgb = data.getColor();
+				MODM_LOG_INFO << "RGB: " << rgb << "\tHSV: " << modm::color::Hsv(rgb) << modm::endl;
 			}
 			timeout.restart(500ms);
 			PT_WAIT_UNTIL(timeout.isExpired());

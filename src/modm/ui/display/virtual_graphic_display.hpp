@@ -55,7 +55,7 @@ protected:
 	void
 	clearPixel(int16_t x, int16_t y) final;
 
-	glcd::Color
+	color::Rgb565
 	getPixel(int16_t x, int16_t y) const final;
 
 private:

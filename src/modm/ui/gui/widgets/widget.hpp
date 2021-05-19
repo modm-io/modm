@@ -23,7 +23,6 @@
 
 #include <modm/debug/logger.hpp>
 
-
 namespace modm
 {
 
@@ -154,7 +153,7 @@ public:
 	}
 
 	void
-	setColor(modm::gui::Color name, modm::glcd::Color color)
+	setColor(modm::gui::Color name, modm::color::Rgb565 color)
 	{
 		this->color_palette.setColor(name, color);
 		this->markDirty();

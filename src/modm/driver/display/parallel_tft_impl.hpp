@@ -110,7 +110,7 @@ modm::ParallelTft<INTERFACE>::clear()
 	interface.writeIndex(0x0022);
 	for (uint32_t i = 0; i < MAX_X * MAX_Y; i++)
 	{
-		interface.writeData(backgroundColor.getValue());
+		interface.writeData(backgroundColor.color);
 	}
 }
 
@@ -123,7 +123,7 @@ modm::ParallelTft<INTERFACE>::setPixel(int16_t x, int16_t y)
 	}
 
 	writeCursor(x, y);
-	interface.writeRegister(0x0022, foregroundColor.getValue());
+	interface.writeRegister(0x0022, foregroundColor.color);
 }
 
 template <typename INTERFACE>
@@ -142,7 +142,7 @@ modm::ParallelTft<INTERFACE>::clearPixel(int16_t x, int16_t y)
 }
 
 template <typename INTERFACE>
-modm::glcd::Color
+modm::color::Rgb565
 modm::ParallelTft<INTERFACE>::getPixel(int16_t x, int16_t y) const
 {
 	(void) x;

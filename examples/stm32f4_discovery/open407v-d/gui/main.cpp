@@ -29,6 +29,8 @@
 
 #include "images/bluetooth_12x16.hpp"
 
+using namespace modm::color::html;
+
 // ----------------------------------------------------------------------------
 /*
  * Setup UART Logger
@@ -175,13 +177,13 @@ initTouchscreen()
 static void
 drawCross(modm::ColorGraphicDisplay& display, modm::glcd::Point center)
 {
-	display.setColor(modm::glcd::Color::red());
+	display.setColor(Red);
 	display.drawLine(center.x - 15, center.y, center.x - 2, center.y);
 	display.drawLine(center.x + 2, center.y, center.x + 15, center.y);
 	display.drawLine(center.x, center.y - 15, center.x, center.y - 2);
 	display.drawLine(center.x, center.y + 2, center.x, center.y + 15);
 
-	display.setColor(modm::glcd::Color::white());
+	display.setColor(White);
 	display.drawLine(center.x - 15, center.y + 15, center.x - 7, center.y + 15);
 	display.drawLine(center.x - 15, center.y + 7, center.x - 15, center.y + 15);
 
@@ -206,7 +208,7 @@ calibrateTouchscreen(modm::ColorGraphicDisplay& display, modm::glcd::Point *fixe
 		{
 			display.clear();
 
-			display.setColor(modm::glcd::Color::yellow());
+			display.setColor(Yellow);
 			display.setCursor(50, 5);
 			display << "Touch crosshair to calibrate";
 
@@ -394,17 +396,17 @@ test_callback(const modm::gui::InputEvent& ev, modm::gui::Widget* w, void* data)
 
 
 //modm::gui::ColorPalette colorpalette[modm::gui::Color::PALETTE_SIZE] = {
-//	modm::glcd::Color::black(),
-//	modm::glcd::Color::white(),
-//	modm::glcd::Color::gray(),
-//	modm::glcd::Color::red(),
-//	modm::glcd::Color::green(),
-//	modm::glcd::Color::blue(),
-//	modm::glcd::Color::blue(),		// BORDER
-//	modm::glcd::Color::red(),		// TEXT
-//	modm::glcd::Color::black(),		// BACKGROUND
-//	modm::glcd::Color::red(),		// ACTIVATED
-//	modm::glcd::Color::blue(),		// DEACTIVATED
+//	Black,
+//	White,
+//	Gray,
+//	Red,
+//	Green,
+//	Blue,
+//	Blue,		// BORDER
+//	Red,		// TEXT
+//	Black,		// BACKGROUND
+//	Red,		// ACTIVATED
+//	Blue,		// DEACTIVATED
 //
 //};
 
@@ -437,7 +439,7 @@ main()
 	 * manipulate the color palette
 	 */
 
-//	colorpalette[modm::gui::Color::TEXT] = modm::glcd::Color::yellow();
+//	colorpalette[modm::gui::Color::TEXT] = Yellow;
 
 
 	/*

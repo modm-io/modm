@@ -202,7 +202,7 @@ void
 Ili9341<Interface, Reset, Backlight, BufferSize>::drawHorizontalLine(
 		glcd::Point start, uint16_t length)
 {
-	uint16_t const pixelValue { modm::toBigEndian(foregroundColor.getValue()) };
+	uint16_t const pixelValue { modm::toBigEndian(foregroundColor.color) };
 	auto minLength { std::min(std::size_t(length), BufferSize) };
 	uint16_t *buffer16 { reinterpret_cast<uint16_t *>(buffer) };
 	std::fill(buffer16, buffer16+minLength, pixelValue);
@@ -223,7 +223,7 @@ void
 Ili9341<Interface, Reset, Backlight, BufferSize>::drawVerticalLine(
 		glcd::Point start, uint16_t length)
 {
-	uint16_t const pixelValue { modm::toBigEndian(foregroundColor.getValue()) };
+	uint16_t const pixelValue { modm::toBigEndian(foregroundColor.color) };
 	auto minLength { std::min(std::size_t(length), BufferSize) };
 	uint16_t *buffer16 { reinterpret_cast<uint16_t *>(buffer) };
 	std::fill(buffer16, buffer16+minLength, pixelValue);
@@ -248,7 +248,7 @@ Ili9341<Interface, Reset, Backlight, BufferSize>::fillRectangle(
 	auto const y { upperLeft.getY() };
 	std::size_t pixelCount { std::size_t(width) * std::size_t(height) };
 
-	uint16_t const pixelValue { modm::toBigEndian(foregroundColor.getValue()) };
+	uint16_t const pixelValue { modm::toBigEndian(foregroundColor.color) };
 	auto minLength { std::min(std::size_t(pixelCount), BufferSize) };
 	uint16_t *buffer16 { reinterpret_cast<uint16_t *>(buffer) };
 	std::fill(buffer16, buffer16+minLength, pixelValue);
@@ -270,9 +270,8 @@ void
 Ili9341<Interface, Reset, Backlight, BufferSize>::fillCircle(
 		glcd::Point center, uint16_t radius)
 {
-	auto const fgColor { foregroundColor.getValue() };
-	uint8_t const setColor[] { uint8_t((fgColor >> 8) & 0xff),
-			uint8_t(fgColor & 0xff) };
+	uint8_t const setColor[] { uint8_t((foregroundColor.color >> 8) & 0xff),
+			uint8_t(foregroundColor.color & 0xff) };
 
 	int16_t f = 1 - radius;
 	int16_t ddF_x = 0;
@@ -318,12 +317,10 @@ void
 Ili9341<Interface, Reset, Backlight, BufferSize>::drawImageRaw(glcd::Point upperLeft,
 		uint16_t width, uint16_t height, modm::accessor::Flash<uint8_t> data)
 {
-	auto const fgColor { foregroundColor.getValue() };
-	auto const bgColor { backgroundColor.getValue() };
-	uint8_t const setColor[] { uint8_t((fgColor >> 8) & 0xff),
-			uint8_t(fgColor & 0xff) };
-	uint8_t const clearColor[] { uint8_t((bgColor >> 8) & 0xff),
-			uint8_t(bgColor & 0xff) };
+	uint8_t const setColor[] { uint8_t((foregroundColor.color >> 8) & 0xff),
+			uint8_t(foregroundColor.color & 0xff) };
+	uint8_t const clearColor[] { uint8_t((backgroundColor.color >> 8) & 0xff),
+			uint8_t(backgroundColor.color & 0xff) };
 
 	BatchHandle h(*this);
 
@@ -350,7 +347,7 @@ Ili9341<Interface, Reset, Backlight, BufferSize>::drawImageRaw(glcd::Point upper
 template <class Interface, class Reset, class Backlight, std::size_t BufferSize>
 void
 Ili9341<Interface, Reset, Backlight, BufferSize>::drawRaw(glcd::Point upperLeft,
-		uint16_t width, uint16_t height, glcd::Color* data)
+		uint16_t width, uint16_t height, color::Rgb565* data)
 {
 	BatchHandle h(*this);
 
@@ -392,10 +389,10 @@ Ili9341<Interface, Reset, Backlight, BufferSize>::scrollTo(uint16_t row)
 template <class Interface, class Reset, class Backlight, std::size_t BufferSize>
 void
 Ili9341<Interface, Reset, Backlight, BufferSize>::setColoredPixel(
-		int16_t x, int16_t y, glcd::Color const &color)
+		int16_t x, int16_t y, color::Rgb565 const &color)
 {
-	auto const pixelColor { color.getValue() };
-	uint8_t const setColor[] { uint8_t((pixelColor >> 8) & 0xff), uint8_t(pixelColor & 0xff) };
+	auto const pixelColor { color };
+	uint8_t const setColor[] { uint8_t((pixelColor.color >> 8) & 0xff), uint8_t(pixelColor.color & 0xff) };
 
 	BatchHandle h(*this);
 

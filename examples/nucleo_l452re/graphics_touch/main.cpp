@@ -16,6 +16,7 @@
 #include <modm/driver/touch/touch2046.hpp>
 
 using namespace Board;
+using namespace modm::color::html;
 
 namespace tft
 {
@@ -86,12 +87,12 @@ main()
 
 	LedGreen::set();
 
-	tftController.setColor(modm::glcd::Color::black());
-	tftController.setBackgroundColor(modm::glcd::Color::red());
+	tftController.setColor(Black);
+	tftController.setBackgroundColor(Red);
 	tftController.clear();
 
 	tftController.setFont(modm::font::ArcadeClassic);
-	tftController.setColor(modm::glcd::Color::white());
+	tftController.setColor(White);
 	tftController.setCursor(10,12);
 	tftController << "(10,10)";
 	tftController.setCursor(150,202);
@@ -101,7 +102,7 @@ main()
 	tftController.drawLine(145, 200, 155, 200);
 	tftController.drawLine(150, 195, 150, 205);
 
-	tftController.setColor(modm::glcd::Color::black());
+	tftController.setColor(Black);
 	tftController.setFont(modm::font::Ubuntu_36);
 
 	int16_t X = 0;
@@ -113,9 +114,9 @@ main()
 		LedGreen::set();
 
 		std::tie(X, Y, Z) = RF_CALL_BLOCKING(touchController.getRawValues());
-		tftController.setColor(modm::glcd::Color::red());
+		tftController.setColor(Red);
 		tftController.fillRectangle({30, 50}, 90, 115);
-		tftController.setColor(modm::glcd::Color::black());
+		tftController.setColor(Black);
 		tftController.setCursor(0, 50);
 		tftController << "X=" << X;
 		tftController.setCursor(0, 90);
@@ -123,9 +124,9 @@ main()
 		tftController.setCursor(0, 130);
 		tftController << "Z=" << Z;
 
-		tftController.setColor(modm::glcd::Color::red());
+		tftController.setColor(Red);
 		tftController.fillRectangle({30, 220}, 120, 35);
-		tftController.setColor(modm::glcd::Color::black());
+		tftController.setColor(Black);
 		if(RF_CALL_BLOCKING(touchController.isTouched())) {
 			std::tie(X, Y) = RF_CALL_BLOCKING(touchController.getTouchPosition());
 			tftController.setCursor(5, 220);

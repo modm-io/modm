@@ -42,7 +42,7 @@ main()
 		} else {
 			display.setCursor(rand() % 750, rand() % 460);
 			display << "Hello World!";
-			display.setColor(Color(uint16_t(rand())));
+			display.setColor(uint16_t(rand()));
 		}
 	}
 

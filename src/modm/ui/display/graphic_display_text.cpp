@@ -102,9 +102,9 @@ modm::GraphicDisplay::write(char c)
 	// all characters below 128 have whitespace afterwards (number given
 	// by vspace).
 	if (character < 128) {
-		//glcd::Color oldColor = this->color;
+		//color::Rgb565 oldColor = this->color;
 
-		//this->setColor(glcd::Color::white());
+		//this->setColor(color::html::White);
 		for (uint_fast8_t i = 0; i < vspace; ++i) {
 			//this->drawVerticalLine(cursor, height);
 			cursor.setX(cursor.x + 1);
