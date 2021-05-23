@@ -33,6 +33,7 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "modm/src/modm/platform/itm"
+    env.substitutions = {"target": env[":target"].identifier}
     env.template("itm.hpp.in")
     env.template("itm.cpp.in")
 

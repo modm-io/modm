@@ -24,13 +24,20 @@ namespace
 namespace modm::platform
 {
 
-/* All done by OpenOCD 'tpiu config'
+void
+Itm::initialize()
+{
+	// Enable Tracing Debug Unit
+	CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+%% if target.platform == "stm32"
+	// Enable the Trace SWO output
+	DBGMCU->CR |= DBGMCU_CR_TRACE_IOEN;
+%% endif
+}
+
 void
 Itm::enable(uint8_t prescaler)
 {
-	// Enable the Tracing functionality
-	CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
-
 	// Trace Port Interface Selected Pin Protocol Register
 	TPI->ACPR = prescaler;
 
@@ -57,7 +64,6 @@ Itm::enable(uint8_t prescaler)
 	// Trace Enable Register
 	ITM->TER = 0b1;
 }
-*/
 
 void
 Itm::writeBlocking(uint8_t data)
@@ -179,3 +185,4 @@ Itm::update()
 }
 
 }	// namespace modm::platform
+

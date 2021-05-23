@@ -9,12 +9,12 @@ source [find {{ openocd_user_path | modm.windowsify(escape_level=1) }}]
 source [find {{ file | modm.windowsify(escape_level=1) }}]
 %% endfor
 
-proc modm_itm_log { OUTPUT F_CPU {BAUDRATE ""} } {
-	if {$BAUDRATE eq ""} {
-		tpiu config internal $OUTPUT uart off $F_CPU
-	} else {
-		tpiu config internal $OUTPUT uart off $F_CPU $BAUDRATE
-	}
+proc modm_itm_log { OUTPUT F_CPU {BAUDRATE 2000000} } {
+	tpiu create itm.tpiu -dap [dap names] -ap-num 0 -protocol uart
+	itm.tpiu configure -traceclk $F_CPU -pin-freq $BAUDRATE -output $OUTPUT
+	itm.tpiu enable
+	tpiu init
+	itm port 0 on
 }
 
 proc modm_program { SOURCE } {

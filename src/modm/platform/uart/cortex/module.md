@@ -7,6 +7,8 @@ You can use this class as a *transmit-only* alternative for logging:
 modm::IODeviceWrapper<modm::platform::Itm,
                       modm::IOBuffer::DiscardIfFull> itm_device;
 modm::IOStream stream(itm_device);
+
+modm::platform::Itm::initialize();
 stream << "Hello World" << modm::endl;
 ```
 

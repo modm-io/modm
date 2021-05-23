@@ -21,11 +21,8 @@ int
 main()
 {
 	Board::initialize();
+	Itm::initialize();
 	LedD13::setOutput();
-
-	// Done by OpenOCD: scons log-itm fcpu=64000000
-	// Itm::initialize<Board::SystemClock, 500_kHz>();
-	// Itm::connect<GpioB3::Traceswo>();
 
 	stream << "Hello from the SWO." << modm::endl;
 	stream << "debug"   << modm::endl;

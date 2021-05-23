@@ -12,8 +12,6 @@
 #pragma once
 
 #include <modm/architecture/interface/uart.hpp>
-// #include <modm/platform/gpio/connector.hpp>
-// #include <cmath>
 
 namespace modm::platform
 {
@@ -31,46 +29,8 @@ public:
 	static constexpr size_t TxBufferSize = {{ options["buffer.tx"] }};
 
 public:
-	/* Initialized by OpenOCD 'tpiu config'
-	template< class SystemClock, baudrate_t baudrate, percent_t tolerance=pct(2) >
 	static void
-	initialize()
-	{
-		constexpr float desired = float(SystemClock::Frequency) / baudrate;
-
-		// calculate the possible rates above and below the requested rate
-		constexpr uint32_t rate_lower = SystemClock::Frequency / std::ceil(desired);
-		constexpr uint32_t rate_upper = SystemClock::Frequency / std::floor(desired);
-
-		// calculate the half-point between the upper and lower rate
-		constexpr uint32_t rate_middle = (rate_upper + rate_lower) / 2;
-		// decide which reload value is closer to a possible rate
-		constexpr uint32_t prescaler = (1000 < rate_middle) ? std::ceil(desired) : std::floor(desired);
-
-		// check if within rate tolerance
-		constexpr uint32_t generated_rate = SystemClock::Frequency / prescaler;
-		PeripheralDriver::assertBaudrateInTolerance< generated_rate, baudrate, tolerance >();
-
-		enable(prescaler - 1);
-	}
-	*/
-
-	/* Trace pins can only be assigned by debugger on External Private Peripheral Bus
-	 * !!! THIS IS DEVICE SPECIFIC!
-	template< template<Peripheral _> class... Signals >
-	static void
-	connect()
-	{
-		using Connector = GpioConnector<Peripheral::Sys, Signals...>;
-		using Tx = typename Connector::template GetSignal< Gpio::Signal::Traceswo >;
-		static_assert(((Connector::template IsValid<Tx>) and sizeof...(Signals) == 1),
-					  "Itm::connect() requires one SWO signal!");
-
-		// Enable the Trace SWO output
-		DBGMCU->CR |= DBGMCU_CR_TRACE_IOEN;
-		Connector::connect();
-	}
-	*/
+	initialize();
 
 	static void
 	writeBlocking(uint8_t data);
