@@ -100,7 +100,7 @@ MovingAverageTest::testAverage()
 {
 	modm::filter::MovingAverage<TestData::Type, 4> filter;
 
-	for (uint_fast8_t i = 0; i < (sizeof(data) / sizeof(TestData)); ++i)
+	for (uint_fast8_t i = 0; i < MODM_ARRAY_SIZE(data); ++i)
 	{
 		filter.update(data[i].input);
 		TEST_ASSERT_EQUALS(filter.getValue(), data[i].output);
@@ -111,7 +111,7 @@ void
 MovingAverageTest::testFloatAverage()
 {
 	modm::filter::MovingAverage<TestDataFloat::Type, 4> filter;
-	for (uint_fast8_t i = 0; i < (sizeof(data) / sizeof(TestDataFloat)); ++i)
+	for (uint_fast8_t i = 0; i < MODM_ARRAY_SIZE(dataF); ++i)
 	{
 		filter.update(dataF[i].input);
 		TEST_ASSERT_EQUALS_DELTA(filter.getValue(), dataF[i].output, double(1e-4));
