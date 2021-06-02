@@ -2,6 +2,7 @@
  * Copyright (c) 2013, Kevin Läufer
  * Copyright (c) 2013, Thorsten Lajewski
  * Copyright (c) 2015, Niklas Hauser
+ * Copyright (c) 2020, Matthew Arnold
  *
  * This file is part of the modm project.
  *
@@ -11,75 +12,68 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "choice_menu.hpp"
+#ifndef MODM_STANDARD_MENU_HPP
+#	error 	"Don't include this file directly, use standard_menu.hpp instead!"
+#endif
 
+template<typename Allocator>
+modm::MenuEntry<Allocator>::MenuEntry(const char* text, uint16_t space, MenuEntryCallback<Allocator> func):
+	text(text, space),
+	callback(func)
+{
+}
 
-modm::ChoiceMenu::ChoiceMenu(modm::ViewStack* stack, uint8_t identifier) :
-	modm::AbstractMenu(stack, identifier),
+template<typename Allocator>
+modm::StandardMenu<Allocator>::StandardMenu(modm::ViewStack<Allocator>* stack, uint8_t identifier) :
+	modm::AbstractMenu<Allocator>(stack, identifier),
 	display_update_time(500),
-	timer(display_update_time),
+	timer(std::chrono::milliseconds(display_update_time)),
 	buttonAction(false),
 	title(""),
 	homePosition(0),
 	position(0)
 {
-	this->maximalDrawnEntrys = (getViewStack()->getDisplay().getHeight()- 16) / 8 ;
+	this->maximalDrawnEntrys = (this->getViewStack()->getDisplay().getHeight()- 16) / 8 ;
 }
 
-modm::ChoiceMenu::ChoiceMenu(modm::ViewStack* stack, uint8_t identifier, const char* title) :
-	modm::AbstractMenu(stack, identifier),
+template<typename Allocator>
+modm::StandardMenu<Allocator>::StandardMenu(modm::ViewStack<Allocator>* stack, uint8_t identifier, const char* title) :
+	modm::AbstractMenu<Allocator>(stack, identifier),
 	display_update_time(500),
-	timer(display_update_time),
+	timer(std::chrono::milliseconds(display_update_time)),
 	buttonAction(false),
 	title(title),
 	homePosition(0),
 	position(0)
 {
-	this->maximalDrawnEntrys = (getViewStack()->getDisplay().getHeight()- 16) / 8 ;
+	this->maximalDrawnEntrys = (this->getViewStack()->getDisplay().getHeight()- 16) / 8 ;
 }
 
-void
-modm::ChoiceMenu::addEntry(const char* text,  bool *valuePtr, bool defaultValue)
+template<typename Allocator> void
+modm::StandardMenu<Allocator>::addEntry(const char* text, MenuEntryCallback<Allocator> func)
 {
-	static uint16_t availableSpace = (getViewStack()->getDisplay().getWidth()-16)/6-6;
-	modm::ChoiceMenuEntry entry(text, availableSpace, valuePtr, defaultValue);
+	modm::MenuEntry entry(text, (this->getViewStack()->getDisplay().getWidth()-16)/6, func);
 	this->entries.append(entry);
 }
 
-void
-modm::ChoiceMenu::initialise()
-{
-	EntryList::iterator iter = this->entries.begin();
-	for(; iter!= this->entries.end(); ++iter){
-		(*iter->valuePtr) = iter->defaultValue;
-	}
-	this->position = 0;
-	this->homePosition = 0;
-	if (this->entries.begin()->text.needsScrolling())
-	{
-
-		this->entries.begin()->text.toogle();
-	}
-}
-
-void
-modm::ChoiceMenu::setTitle(const char* text)
+template<typename Allocator> void
+modm::StandardMenu<Allocator>::setTitle(const char* text)
 {
 	this->title = text;
 }
 
 
-void
-modm::ChoiceMenu::draw()
+template<typename Allocator> void
+modm::StandardMenu<Allocator>::draw()
 {
-	modm::ColorGraphicDisplay* display = &getViewStack()->getDisplay();
+	typename modm::GraphicDisplay* display = &this->getViewStack()->getDisplay();
 	display->clear();
 	display->setCursor(0,2);
 	(*display) << this->title;
 	display->drawLine(0, 10, display->getWidth(), 10);
 
 	uint8_t i, count = this->entries.getSize();
-	EntryList::iterator iter = this->entries.begin();
+	typename EntryList<Allocator>::iterator iter = this->entries.begin();
 
 	for(uint8_t j=0; j<this->homePosition; ++j)
 	{
@@ -93,30 +87,21 @@ modm::ChoiceMenu::draw()
 
 		display->setCursor(4, 12+i*8);
 		if (this->position - this->homePosition == i) {
-				(*display) << ">"; // TODO schönes Zeichen nehmen
+				(*display) << ">"; // TODO add nicer symbol
 		}
 		else {
 				(*display) << " ";
 		}
 
 		(*display) << iter->text.getText();
-		display->setCursor(display->getWidth()- 8 - 5*6,12+i*8);
-		if(*(iter->valuePtr) == true)
-		{
-			(*display) << "TRUE";
-		}
-		else{
-			(*display) << "FALSE";
-		}
-		//(*display) << iter->text;
 		++iter;
 	}
 
-	// TODO wenn möglich pfeil nach oben und nach unten einfügen
+	// todo add file up and / or down if some entrys are not displayed on screen
 }
 
-bool
-modm::ChoiceMenu::hasChanged()
+template<typename Allocator> bool
+modm::StandardMenu<Allocator>::hasChanged()
 {
 	if (timer.execute() || this->buttonAction)
 	{
@@ -130,9 +115,14 @@ modm::ChoiceMenu::hasChanged()
 	}
 }
 
+template<typename Allocator> void
+modm::StandardMenu<Allocator>::selectedEntryFunction(uint8_t /*selected*/)
+{
 
-void
-modm::ChoiceMenu::shortButtonPress(modm::MenuButtons::Button button)
+}
+
+template<typename Allocator> void
+modm::StandardMenu<Allocator>::shortButtonPress(modm::MenuButtons::Button button)
 {
 	switch(button)
 	{
@@ -140,7 +130,7 @@ modm::ChoiceMenu::shortButtonPress(modm::MenuButtons::Button button)
 		{
 			if (this->position + 1U < this->entries.getSize())
 			{
-				EntryList::iterator iter = this->entries.begin();
+				typename EntryList<Allocator>::iterator iter = this->entries.begin();
 
 				for (uint8_t j=0; j<this->position;  ++j)
 				{
@@ -162,6 +152,7 @@ modm::ChoiceMenu::shortButtonPress(modm::MenuButtons::Button button)
 					++iter;
 					iter->text.toogle();
 				}
+				this->selectedEntryFunction(this->position);
 				this->buttonAction=true;
 			}
 			break;
@@ -170,7 +161,7 @@ modm::ChoiceMenu::shortButtonPress(modm::MenuButtons::Button button)
 		{
 			if (this->position > 0)
 			{
-				EntryList::iterator iter = this->entries.begin();
+				typename EntryList<Allocator>::iterator iter = this->entries.begin();
 
 				for (uint8_t j = 0; j < this->position; ++j)
 				{
@@ -193,6 +184,7 @@ modm::ChoiceMenu::shortButtonPress(modm::MenuButtons::Button button)
 					--iter;
 					iter->text.toogle();
 				}
+				this->selectedEntryFunction(this->position);
 				this->buttonAction = true;
 			}
 			break;
@@ -204,20 +196,19 @@ modm::ChoiceMenu::shortButtonPress(modm::MenuButtons::Button button)
 		}
 		case modm::MenuButtons::OK:
 		{
-			EntryList::iterator iter = this->entries.begin();
+			break;
+		}
+		case modm::MenuButtons::RIGHT:
+		{
+			typename EntryList<Allocator>::iterator iter = this->entries.begin();
 
 			for (uint8_t j = 0; j < this->position; ++j)
 			{
 				++iter;
 			}
 
-			*(iter->valuePtr) = !(*iter->valuePtr);
-			this->buttonAction = true;
+			iter->callback.call();
 			break;
-		}
-		case modm::MenuButtons::RIGHT:
-		{
-			this->openNextScreen();
 		}
 	}
 }

@@ -2,6 +2,7 @@
  * Copyright (c) 2013, Kevin Läufer
  * Copyright (c) 2013, Thorsten Lajewski
  * Copyright (c) 2015, Niklas Hauser
+ * Copyright (c) 2020, Matthew Arnold
  *
  * This file is part of the modm project.
  *
@@ -37,13 +38,14 @@ namespace modm{
 	 *    \ingroup modm_ui_menu
 	 *
 	 */
-	class  ChoiceMenu: public AbstractMenu
+	template<typename Allocator = allocator::Dynamic<IAbstractView> >
+	class ChoiceMenu : public AbstractMenu<Allocator>
 	{
 	public:
 
-		ChoiceMenu(modm::ViewStack* stack, uint8_t identifier);
+		ChoiceMenu(modm::ViewStack<Allocator>* stack, uint8_t identifier);
 
-		ChoiceMenu(modm::ViewStack* stack, uint8_t identifier, const char* title);
+		ChoiceMenu(modm::ViewStack<Allocator>* stack, uint8_t identifier, const char* title);
 
 		/**
 		 * @brief addEntry a new entry to the ChoiceMenu
@@ -111,5 +113,7 @@ namespace modm{
 		EntryList entries;
 	};
 }
+
+#include "choice_menu_impl.hpp"
 
 #endif /* CHOICE_MENU_HPP*/

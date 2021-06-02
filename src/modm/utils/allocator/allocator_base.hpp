@@ -46,6 +46,7 @@ namespace modm
 			static inline void
 			construct(T* p, const T& value)
 			{
+				if (p == nullptr) return;
 				// placement new
 				::new((void *) p) T(value);
 			}
@@ -61,6 +62,7 @@ namespace modm
 			static inline void
 			destroy(T* p)
 			{
+				if (p == nullptr) return;
 				p->~T();
 			}
 

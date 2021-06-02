@@ -5,6 +5,7 @@
  * Copyright (c) 2013, Kevin Läufer
  * Copyright (c) 2013, Thorsten Lajewski
  * Copyright (c) 2014, Sascha Schade
+ * Copyright (c) 2020, Matthew Arnold
  *
  * This file is part of the modm project.
  *
@@ -36,19 +37,26 @@ namespace modm
 	* \author	Thorsten Lajewski
 	*/
 
+	template<typename Allocator = allocator::Dynamic<IAbstractView> >
 	class ViewStack
 	{
 	public:
-		ViewStack(modm::ColorGraphicDisplay* display);
+		ViewStack(modm::GraphicDisplay* display, const Allocator allocator = Allocator()) :
+			display(display),
+			allocator(allocator)
+		{
+		}
 
-		virtual ~ViewStack();
+		virtual ~ViewStack()
+		{
+		}
 
 		/**
 		 * @brief get the top view from the stack
 		 * @return pointer to view from stack
 		 */
 
-		inline modm::AbstractView*
+		inline modm::AbstractView<Allocator>*
 		get()
 		{
 			return this->stack.get();
@@ -62,11 +70,11 @@ namespace modm
 		 * @param view next displayed view
 		 */
 		inline void
-		push(modm::AbstractView* view)
+		push(modm::AbstractView<Allocator>* view)
 		{
 			this->stack.push(view);
 			this->getDisplay().clear();
-			modm::AbstractView* top = this->get();
+			modm::AbstractView<Allocator>* top = this->get();
 			top->draw();
 			this->display->update();
 		}
@@ -74,7 +82,7 @@ namespace modm
 		/**
 		 * @brief getDisplay access underlying GraphicDisplay
 		 */
-		inline modm::ColorGraphicDisplay&
+		inline modm::GraphicDisplay&
 		getDisplay()
 		{
 			return *this->display;
@@ -86,10 +94,46 @@ namespace modm
 		 */
 
 		void
-		pop();
+		pop()
+		{
+			modm::AbstractView<Allocator> *topElement = this->stack.get();
+			this->stack.pop();
+
+			allocator.destroy(topElement);
+			allocator.deallocate(topElement);
+		}
 
 		virtual void
-		update();
+		update()
+		{
+			modm::AbstractView<Allocator>* top = this->get();
+
+			if (top == NULL)
+				return;
+
+			top->update();
+			if (top->isAlive())
+			{
+				if (top->hasChanged())
+				{
+					top->draw();
+					this->display->update();
+				}
+			}
+			else
+			{
+				// Remove old view
+				top->onRemove();
+				this->pop();
+
+				// Get new screen
+				top = this->get();
+				top->update();
+				this->display->clear();
+				top->draw();
+				this->display->update();
+			}
+		}
 
 		/**
 		 * @brief shortButtonPress pass the button press to the current top view
@@ -97,11 +141,16 @@ namespace modm
 		 */
 
 		void
-		shortButtonPress(modm::MenuButtons::Button button);
+		shortButtonPress(modm::MenuButtons::Button button)
+		{
+			modm::AbstractView<Allocator>* top = this->get();
+			top->shortButtonPress(button);
+		}
 
 	protected:
-		modm::ColorGraphicDisplay* display;
-		modm::Stack< modm::AbstractView* , modm::LinkedList< modm::AbstractView* > > stack;
+		modm::GraphicDisplay* display;
+		modm::Stack< modm::AbstractView<Allocator>* , modm::LinkedList< modm::AbstractView<Allocator>* > > stack;
+		Allocator allocator;
 	};
 }
 
