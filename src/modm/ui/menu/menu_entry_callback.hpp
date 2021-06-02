@@ -5,6 +5,7 @@
  * Copyright (c) 2012, Sascha Schade
  * Copyright (c) 2013, Kevin Läufer
  * Copyright (c) 2013, Thorsten Lajewski
+ * Copyright (c) 2020, Matthew Arnold
  *
  * This file is part of the modm project.
  *
@@ -22,14 +23,15 @@
 namespace modm
 {
 	/// @ingroup modm_ui_menu
+	template<typename Allocator = allocator::Dynamic<IAbstractView> >
 	class MenuEntryCallback
 	{
 	public:
-			typedef void (modm::AbstractMenu::*Function)();
+			typedef void (modm::AbstractMenu<Allocator>::*Function)();
 
 			template <typename M>
 			MenuEntryCallback(M *menu, void (M::*function)()) :
-				menu(reinterpret_cast<modm::AbstractMenu *>(menu)),
+				menu(reinterpret_cast<modm::AbstractMenu<Allocator> *>(menu)),
 				function(reinterpret_cast<Function>(function))
 			{
 			}
@@ -41,7 +43,7 @@ namespace modm
 			}
 
 		protected:
-			modm::AbstractMenu * const menu;
+			modm::AbstractMenu<Allocator> * const menu;
 			Function const function;
 		};
 }

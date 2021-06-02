@@ -5,6 +5,7 @@
  * Copyright (c) 2013, Kevin Läufer
  * Copyright (c) 2013, Thorsten Lajewski
  * Copyright (c) 2014, Sascha Schade
+ * Copyright (c) 2020, Matthew Arnold
  *
  * This file is part of the modm project.
  *
@@ -17,13 +18,14 @@
 #ifndef MODM_ABSTRACT_VIEW_HPP
 #define MODM_ABSTRACT_VIEW_HPP
 
-#include <modm/ui/display/color_graphic_display.hpp>
+#include <modm/utils/allocator/static.hpp>
 
-#include "menu_buttons.hpp"
+#include "iabstract_view.hpp"
 
 namespace modm
 {
 	// forward declaration
+	template<typename T>
 	class ViewStack;
 
 	/**
@@ -34,8 +36,10 @@ namespace modm
 	 *\ingroup modm_ui_menu
 	 */
 
-	class AbstractView
+	template<typename Allocator = allocator::Dynamic<IAbstractView> >
+	class AbstractView : public IAbstractView
 	{
+		template<typename T>
 		friend class ViewStack;
 
 	public:
@@ -44,83 +48,27 @@ namespace modm
 		 * @param identifier can be used to determine which screen is the currently
 		 *        displayed on the graphicDisplay
 		 */
-		AbstractView(modm::ViewStack* stack, uint8_t identifier);
-
-		virtual ~AbstractView() = 0;
-
-		/**
-		 * @brief update The update function of the top most display gets called
-		 *        as often as possible. Only the update of the top view in each
-		 *        ViewStack gets called.
-		 */
-		virtual void
-		update();
-
-		/**
-		 * @brief hasChanged indicates the current displayed view has changed.
-		 *        This function prevents unnecessary drawing of the display
-		 * @return if true the display has to be redrawn.
-		 */
-		virtual bool
-		hasChanged() = 0;
-
-		/**
-		 * @brief draw determine the output on the Graphic Display
-		 */
-		virtual void
-		draw() = 0;
-
-
-		/**
-		 * @brief shortButtonPress handle the action for the pressed button
-		 */
-		virtual void
-		shortButtonPress(modm::MenuButtons::Button button);
-
-		/**
-		 * @brief isAlive tells the ViewStack if it should remove this screen.
-		 * @return
-		 */
-		bool
-		isAlive() const;
-
-		/**
-		 * @brief remove the view from the screen. The viewStack handles the deletion.
-		 */
-		void
-		remove();
-
-		/**
-		 * @brief getIdentifier of the view.
-		 */
-		inline uint8_t getIdentifier(){
-			return this->identifier;
+		AbstractView(modm::ViewStack<Allocator>* stack, uint8_t identifier) :
+			IAbstractView(identifier), stack(stack)
+		{
 		}
 
-	public:
+		virtual ~AbstractView() = default;
 
-		modm::ColorGraphicDisplay&
-		display();
-
-		/**
-		 * @brief onRemove will be called right before the view gets deleted,
-		 *        can be reimplemented to reset external data.
-		 */
-		virtual void
-		onRemove();
-
-		inline modm::ViewStack*
+		inline modm::ViewStack<Allocator>*
 		getViewStack()
 		{
 			return stack;
 		}
 
-	private:
-		modm::ViewStack* stack;
+		modm::GraphicDisplay&
+		display()
+		{
+			return stack->getDisplay();
+		}
 
-	public:
-		const uint8_t identifier;
-		bool alive;
+	private:
+		modm::ViewStack<Allocator>* stack;
 	};
 }
 

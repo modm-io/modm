@@ -41,7 +41,7 @@ namespace gui
  * @ingroup modm_ui_gui
  * @author	Thorsten Lajewski
  */
-class GuiViewStack : public modm::ViewStack
+class GuiViewStack
 {
 public:
 	GuiViewStack(modm::ColorGraphicDisplay* display, modm::gui::inputQueue* queue);
@@ -84,7 +84,29 @@ public:
 	virtual void
 	update();
 
+	/**
+	 * @brief shortButtonPress pass the button press to the current top view
+	 * @param button the pressed button
+	 */
+
+	void
+	shortButtonPress(modm::MenuButtons::Button button)
+	{
+		modm::gui::View* top = this->get();
+		top->shortButtonPress(button);
+	}
+
+	/**
+	 * @brief getDisplay access underlying GraphicDisplay
+	 */
+	inline modm::ColorGraphicDisplay&
+	getDisplay()
+	{
+		return *this->display;
+	}
+
 private:
+	modm::ColorGraphicDisplay *display;
 	modm::Stack< modm::gui::View* , modm::LinkedList< modm::gui::View* > > stack;
 	modm::gui::inputQueue *input_queue;
 };

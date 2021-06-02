@@ -5,8 +5,6 @@
 
 #include "graphic_display.hpp"
 
-using namespace modm::platform;
-
 namespace modm
 {
 
