@@ -263,18 +263,18 @@ protected:
 	struct Nvic;
 };
 
-%% for instance, irqs in irqList.items()
+%% for controller in dmaController
+%% set instance=controller["instance"]
 template <>
 struct DmaBase::Nvic<{{ instance }}>
 {
 	static constexpr IRQn_Type DmaIrqs[] {
-	%% for channels in irqs
-	%% for i in range(channels | length)
-			DMA{{ instance }}_Channel{{ channels | join("_") }}_IRQn,
-	%% endfor
+	%% for channel in range(controller["min_channel"], controller["max_channel"] + 1)
+		{{ irqMap[instance][channel] }}_IRQn,
 	%% endfor
 	};
 };
+
 %% endfor
 
 }	// namespace platform

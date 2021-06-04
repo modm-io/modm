@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2020, Mike Wolfram
+ * Copyright (c) 2021, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -13,18 +14,14 @@
 
 using namespace modm::platform;
 
-%% for instance, irqs in irqList.items()
-/*
- * IRQ handler for DMA{{ instance }}
- */
-%% for channels in irqs
-
-MODM_ISR(DMA{{ instance }}_Channel{{ channels | join("_") }})
+%% for irq in irqList
+MODM_ISR({{ irq["name"] }})
 {
-	%% for channel in channels
-	Dma{{ instance }}::Channel<DmaBase::Channel::Channel{{ channel }}>::interruptHandler();
-	%% endfor
+%% for instance in irq["instances"]
+%% for channel in instance["channels"]
+	Dma{{ instance["instance"] }}::Channel<DmaBase::Channel::Channel{{ channel }}>::interruptHandler();
+%% endfor
+%% endfor
 }
 
-%% endfor
 %% endfor

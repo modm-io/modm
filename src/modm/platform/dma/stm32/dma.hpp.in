@@ -421,7 +421,7 @@ public:
 				%% if signal.instance is defined
 					%% set peripheral = peripheral ~ signal.instance
 				%% else
-					%% if peripheral in ["Dac", "Lpuart", "Swpmi"] and target["family"] not in ["f1", "f3", "l0", "l1"]
+					%% if peripheral in ["Dac", "Lpuart", "Swpmi"] and target["family"] not in ["f0", "f1", "f3", "l0", "l1"]
 						%% set peripheral = peripheral ~ 1
 					%% endif
 				%% endif
@@ -476,7 +476,7 @@ namespace dma
 			%% if signal.instance is defined
 				%% set peripheral = peripheral ~ signal.instance
 			%% else
-				%% if peripheral in ["Dac", "Lpuart", "Swpmi"] and target["family"] not in ["f1", "f3", "l0", "l1"]
+				%% if peripheral in ["Dac", "Lpuart", "Swpmi"] and target["family"] not in ["f0", "f1", "f3", "l0", "l1"]
 					%% set peripheral = peripheral ~ 1
 				%% endif
 			%% endif
