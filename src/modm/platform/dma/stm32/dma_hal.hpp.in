@@ -67,7 +67,7 @@ class DmaHal : public DmaBase
 %% endif
 	}
 
-%% if dmaType in ["stm32-channel-request"]
+%% if dmaType in ["stm32-channel-request"] and target["family"] != "f0"
 	/**
 	 * Get the address of the channel selection register
 	 *
@@ -87,7 +87,7 @@ class DmaHal : public DmaBase
 public:
 	/// DMA base register address
 	static constexpr uint32_t DMA_BASE { getBaseAddress<ID>() };
-%% if dmaType in ["stm32-channel-request"]
+%% if dmaType in ["stm32-channel-request"] and target["family"] != "f0"
 	/// DMA channel selection register address
 	static constexpr uint32_t DMA_CSEL { getCselAddress<ID>() };
 %% endif

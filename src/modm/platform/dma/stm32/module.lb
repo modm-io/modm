@@ -37,15 +37,7 @@ def prepare(module, options):
 
     did = device.identifier
 
-    # Enable DMA for all but some devices...
-
-    if did["family"] in ["f0"]:
-        if did["name"] in ["91", "98"] or (did["name"] == "30" and did["size"] == "c"):
-            # type "stm32-channel-request" incompatible to driver
-            return False
-        return True
-
-    if did["family"] in ["f1", "f3", "l0", "l1", "l4", "g0", "g4"]:
+    if did["family"] in ["f0", "f1", "f3", "l0", "l1", "l4", "g0", "g4"]:
         return True
 
     return False
@@ -95,11 +87,28 @@ def build(env):
             for channel in channels["channel"]:
                 max_channels = channel["position"]
                 if dma["type"] in ["stm32-channel-request"]:
+                    # Some F0 allow to use multiple requests for the same peripheral signal
+                    # on the same channel. This is not supported with the current api.
+                    # Therefore, signals are deduplicated.
+                    signal_set = set()
+                    duplicates = []
                     for request in channel["request"]:
                         for signal in request["signal"]:
+                            signal_data = (signal.get("driver"),
+                                           signal.get("instance"),
+                                           signal.get("name"))
+                            if signal_data in signal_set:
+                                duplicates.append((channel, request, signal))
+                            else:
+                                signal_set.add(signal_data)
                             if "name" in signal:
                                 signal_name = signal["name"].capitalize()
                                 signal_names[signal_name] = 1
+                    for duplicate in duplicates:
+                        (channel, request, signal) = duplicate
+                        request["signal"].remove(signal)
+                        if len(request["signal"]) == 0:
+                            channel["request"].remove(request)
                 else:
                     for signal in channel["signal"]:
                         if "name" in signal:
