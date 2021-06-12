@@ -22,6 +22,7 @@ namespace unittest
 	FLASH_STORAGE_STRING(stringDiffer) = " != ";
 	FLASH_STORAGE_STRING(stringNotInRange) = " not in range ";
 	FLASH_STORAGE_STRING(stringNotTrue) = "true == false\n";
+	FLASH_STORAGE_STRING(stringDelta) = " ±";
 }
 
 bool

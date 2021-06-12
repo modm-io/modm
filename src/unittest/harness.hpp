@@ -31,6 +31,7 @@ namespace unittest
 	EXTERN_FLASH_STORAGE_STRING(stringNotInRange);
 	EXTERN_FLASH_STORAGE_STRING(stringNotTrue);
 	EXTERN_FLASH_STORAGE_STRING(stringNotFalse);
+	EXTERN_FLASH_STORAGE_STRING(stringDelta);
 }
 
 #ifdef	UNITTEST_RETURN_ON_FAIL
@@ -94,7 +95,9 @@ namespace unittest
 		}
 		else {
 			TEST_REPORTER_.reportFailure(line)
-				<< a << modm::accessor::asFlash(unittest::stringEqual) << b << '\n';
+				<< a << modm::accessor::asFlash(unittest::stringEqual)
+				<< b << modm::accessor::asFlash(unittest::stringDelta)
+				<< delta << '\n';
 			return false;
 		}
 	}
