@@ -293,14 +293,15 @@ env.collect(":platform:cortex-m:linkerscript.table_extern.heap", linkerscript_he
 ## Blocking Delay
 
 The delay functions as defined by `modm:architecture:delay` are implemented via
-software loop or hardware cycle counter (via DWT->CYCCNT, not available on
-ARMv6-M devices) and have the following limitations:
+software loop (ARMv6-M devices) or hardware cycle counter (via `DWT->CYCCNT` on
+ARMv7-M device) and have the following limitations expressed in cycles, which
+depends on the configured CPU frequency:
 
-- nanosecond delay is implemented as a tight loop with better than 100ns
-  resolution and accuracy at any CPU frequency.
-- microsecond delay has a maximum delay of 10 seconds.
+- nanosecond delay is implemented as a tight loop with a minimum delay of <20
+  cycles, a resolution of 1-4 cycles and a maximum delay of 32-bit cycles.
+- microsecond delay has a maximum delay of 32-bit cycles.
 - millisecond delay is implemented via `modm::delay_us(ms * 1000)`, thus also
-  has a maximum delay of 10 seconds.
+  has a maximum delay of 32-bit cycles.
 
 
 ## Compiler Options

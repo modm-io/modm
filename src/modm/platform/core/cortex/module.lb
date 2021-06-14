@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2016-2018, Niklas Hauser
+# Copyright (c) 2016-2021, Niklas Hauser
 # Copyright (c) 2017, Fabian Greif
 #
 # This file is part of the modm project.
@@ -298,29 +298,12 @@ def build(env):
 
     # busy-waiting delays
     if env.has_module(":architecture:delay"):
-        core = env.substitutions["core"]
-        if core == "cortex-m0":
-            loop = 4
-        elif core.startswith("cortex-m7"):
-            # Cortex-M7 is superscalar with dual issue ALU and a 6-stage pipeline
-            # _and_ branches in 1 cycle => The entire loop is in the pipeline.
-            loop = 1
-        else:
-            loop = 3
-        env.substitutions["loop"] = loop
-        # FIXME: Move out of this modules, maybe remove completely
-        # TODO: These numbers were measured from a few example applications.
-        #       A statistical analysis of the average overhead cycles is required!
-        target = env.substitutions["target"]
-        if target.family in ["f4"]:
-            overhead = 25
-        elif target.family in ["f1"]:
-            overhead = 12
-        else:
-            overhead = 30
-        env.substitutions["overhead"] = overhead
-        env.template("delay.cpp.in")
+        if not env.substitutions["core"].startswith("cortex-m0"):
+            env.template("delay.cpp.in")
         env.template("delay_impl.hpp.in")
+        # Must be done by :platform:core module due to 'loop' knowledge
+        # env.template("delay_ns.hpp.in")
+        # env.template("delay_ns.cpp.in")
 
     # GNU Build ID
     env.collect(":build:linkflags", "-Wl,--build-id=sha1")

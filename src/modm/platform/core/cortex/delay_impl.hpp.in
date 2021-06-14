@@ -3,7 +3,7 @@
  * Copyright (c) 2009-2011, Fabian Greif
  * Copyright (c) 2010, Georgi Grinshpun
  * Copyright (c) 2012, 2014, Sascha Schade
- * Copyright (c) 2012, 2014-2016, Niklas Hauser
+ * Copyright (c) 2012, 2014-2016, 2019-2021 Niklas Hauser
  * Copyright (c) 2014, Kevin Läufer
  *
  * This file is part of the modm project.
@@ -15,7 +15,9 @@
 // ----------------------------------------------------------------------------
 
 #pragma once
+#include <cmath>
 #include <chrono>
+#include "delay_ns.hpp"
 %% if with_assert
 #include <modm/architecture/interface/assert.hpp>
 %% endif
@@ -29,44 +31,47 @@ namespace platform
 {
 extern uint16_t delay_ns_per_loop;
 extern uint16_t delay_fcpu_MHz;
+
+constexpr uint8_t delay_fcpu_MHz_shift{3};
+// 400 MHz is the maximum for binary scaling
+static_assert(400 * (1ul << delay_fcpu_MHz_shift) < 65535);
+
+constexpr uint16_t computeDelayMhz(uint32_t hz)
+{ return std::round(hz / 1'000'000.f * (1ul << delay_fcpu_MHz_shift)); }
 }
 
-inline void modm_fastcode delay_ns(uint32_t ns)
+modm_always_inline
+void delay_ns(uint32_t ns)
 {
-	volatile uint32_t cycles;
-	// ns_per_loop = nanoseconds per cycle times cycles per loop ({{loop}} cycles)
-	asm volatile (
-		".syntax unified \n\t"
-		".align 4 \n\t"
-		"muls.n	%[cyc], %[cyc], %[dnpl] \n\t"	// multiply the overhead cycles with the ns per cycle:  1-2 cycles on cm3, up to 32 cycles on cm0
-		"subs.n	%[cyc], %[cyc], %[ovhd] \n\t"	// subtract the overhead in ns from the input:          1 cycle
-	"1:  subs.n	%[cyc], %[cyc], %[dnpl] \n\t"	// subtract the ns per loop from the input:             1 cycle
-		"bpl.n	1b"								// keep doing that while result is still positive:      2 cycles (when taken)
-	: [cyc] "=l" (cycles) : "0" (ns), [dnpl] "l" (platform::delay_ns_per_loop), [ovhd] "l" ({{(overhead / loop) | int}}));
-	// => loop is {{loop}} cycles long
+    asm volatile(
+        "mov r0, %0 \n\t"
+        "blx %1"
+        :: "r" (ns), "l" (platform::delay_ns) : "r0", "r1", "r2");
 }
+
+
 void delay_us(uint32_t us);
 inline void delay_ms(uint32_t ms) { delay_us(ms * 1000); }
 
 // ----------------------------------------------------------------------------
 template< class Rep >
 void
-delay(std::chrono::duration<Rep, std::nano> ns_)
+delay(std::chrono::duration<Rep, std::nano> ns)
 {
-	const auto ns{std::chrono::duration_cast<std::chrono::nanoseconds>(ns_)};
+	const auto ns_{std::chrono::duration_cast<std::chrono::nanoseconds>(ns)};
 %% if with_assert
-	modm_assert_continue_fail_debug(0 <= ns.count() and ns.count() <= 1'000'000,
+	modm_assert_continue_fail_debug(0 <= ns_.count() and ns_.count() <= 1'000'000,
 		"delay.ns", "modm::delay(ns) can only delay a (positive) maximum of ~1 millisecond!");
 %% endif
-	delay_ns(ns.count());
+	delay_ns(ns_.count());
 }
 
 template< class Rep >
 void
-delay(std::chrono::duration<Rep, std::micro> us_)
+delay(std::chrono::duration<Rep, std::micro> us)
 {
-	const auto us{std::chrono::duration_cast<std::chrono::microseconds>(us_)};
-	delay_us(us.count());
+	const auto us_{std::chrono::duration_cast<std::chrono::microseconds>(us)};
+	delay_us(us_.count());
 }
 
 template< class Rep >

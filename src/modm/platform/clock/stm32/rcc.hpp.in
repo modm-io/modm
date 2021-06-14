@@ -38,6 +38,8 @@ namespace modm::platform
 class Rcc
 {
 public:
+	static constexpr uint32_t BootFrequency = {{ "{0:,}".format((1000000 * boot_frequency)|int).replace(',', "'") }};
+
 	enum class
 	PllSource : uint32_t
 	{

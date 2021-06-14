@@ -19,21 +19,10 @@ def prepare(module, options):
     if not options[":target"].has_driver("gclk:sam"):
         return False
 
-    module.depends(":cmsis:device")
+    module.depends(":cmsis:device", ":architecture:delay")
     return True
 
 def build(env):
-    device = env[":target"]
-    core = device.get_driver("core")["type"]
-
-    if "m0" in core:
-        loops = 4
-    elif "m7" in core:
-        loops = 1
-    else:
-        loops = 3
-
-    env.substitutions = {"loops": loops}
     env.outbasepath = "modm/src/modm/platform/clock"
     env.copy("gclk.hpp")
     env.template("gclk.cpp.in")

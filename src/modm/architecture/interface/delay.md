@@ -47,9 +47,20 @@ to you is to delay for _at least_ the specified time. Note that invocation of
 interrupts during spinning may add delay too. For additional limitations also
 check the description of the `modm:platform:core` modules.
 
+Please note that the delay these functions provide is defined as the time from
+invocation to the time of execution return. Obviously no delay beyond that is
+considered, which may require you to use shorter delays to compensate for the
+overhead of your code:
+
+```cpp
+do // GpioA4 toggling takes longer than 500ns because:
+{
+    modm::delay_ns(500); // takes ~500ns
+    GpioA4::toggle();    // takes a few cycles
+} while(1);              // jump back to loop also takes a few cycles
+```
+
 You should always prefer Software Timers (see `modm:processing:timer`) over
 these *blocking* delay functions. However, when `modm::Clock` is not set up yet,
 or when you need very small delays (for example to bit-bang a protocol), you
 need to use these delay functions.
-
-

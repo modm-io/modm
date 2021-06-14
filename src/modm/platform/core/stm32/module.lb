@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2019, Niklas Hauser
+# Copyright (c) 2019-2021 Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -9,6 +9,8 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
+
+import math
 
 def init(module):
     module.name = ":platform:core"
@@ -27,10 +29,38 @@ def prepare(module, options):
 
 
 def build(env):
-    env.substitutions = {"target": env[":target"].identifier}
+    target = env[":target"].identifier
+    env.substitutions = {"target": target}
     env.outbasepath = "modm/src/modm/platform/core"
     # startup helper code
     env.template("startup_platform.c.in")
+
+    # delay code that must be tuned for each family
+    # (cycles per loop, setup cost in loops)
+    tuning = {
+        "g4": (3,  4), # CM4  guessed based on documentation
+        "l0": (3,  4), # CM0+ guessed based on documentation
+        "g0": (3,  4), # CM0+ tested on G072 in RAM
+        "f7": (1, 16), # CM7  tested on F767 in ITCM
+        "l4": (3,  4), # CM4  tested on L476 in SRAM2
+        "f3": (3,  4), # CM4  tested on F334, F303 in CCM RAM
+
+        # Defaults of (4, 4) for these families:
+        # - l1: CM3  tested on L152 in RAM
+        # - f0: CM3  tested on F071 in RAM
+        # - f1: CM3  tested on F103 in RAM
+        # - f4: CM4  tested on F401, F411, F446 in RAM
+        # - f2: CM3  guessed based on documentation
+    }.get(target.family, (4, 4))
+
+    env.substitutions.update({
+        "with_cm0": env[":target"].has_driver("core:cortex-m0*"),
+        "loop": tuning[0],
+        "shift": int(math.log2(tuning[1])),
+        "with_assert": env.has_module(":architecture:assert")
+    })
+    env.template("../cortex/delay_ns.cpp.in", "delay_ns.cpp")
+    env.template("../cortex/delay_ns.hpp.in", "delay_ns.hpp")
 
 
 def post_build(env):

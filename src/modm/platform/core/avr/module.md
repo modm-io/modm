@@ -45,7 +45,7 @@ For delays with a dynamic time, the following limitations apply for nanoseconds:
 For micro- and milliseconds delays with dynamic time:
 
 - Microseconds delay is implemented fairly accurately in 1us steps with a
-  maximum time delay of 65ms for clocks larger than 6MHz, or .
+  maximum time delay of 65ms for clocks larger than 6MHz.
 - Millisecond delay is implemented fairly accurately in 1ms steps on 32-bits of
   input time.
 

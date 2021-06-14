@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Niklas Hauser
+ * Copyright (c) 2019, 2021 Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -9,14 +9,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <cmath>
-
 namespace modm::platform
 {
-/// @cond
-extern uint16_t delay_fcpu_MHz;
-extern uint16_t delay_ns_per_loop;
-/// @endcond
 
 constexpr Rcc::flash_latency
 Rcc::computeFlashLatency(uint32_t Core_Hz, uint16_t Core_mV)
@@ -99,8 +93,8 @@ void
 Rcc::updateCoreFrequency()
 {
 	SystemCoreClock = Core_Hz;
-	delay_fcpu_MHz = Core_Hz / 1'000'000;
-	delay_ns_per_loop = std::round({{loops}}000.f / (Core_Hz / 1'000'000));
+	delay_fcpu_MHz = computeDelayMhz(Core_Hz);
+	delay_ns_per_loop = computeDelayNsPerLoop(Core_Hz);
 }
 
 constexpr bool

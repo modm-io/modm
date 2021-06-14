@@ -3,7 +3,7 @@
  * Copyright (c) 2009-2012, Fabian Greif
  * Copyright (c) 2011, Georgi Grinshpun
  * Copyright (c) 2012, 2016, Sascha Schade
- * Copyright (c) 2012, 2014-2019, Niklas Hauser
+ * Copyright (c) 2012, 2014-2019, 2021, Niklas Hauser
  * Copyright (c) 2013-2014, Kevin Läufer
  * Copyright (c) 2018, 2021, Christopher Durand
  *
@@ -18,19 +18,18 @@
 #include "rcc.hpp"
 
 // CMSIS Core compliance
-uint32_t modm_fastdata SystemCoreClock({{ "{0:,}".format((1000000 * hsi_frequency)|int).replace(',', "'") }});
+constinit uint32_t modm_fastdata SystemCoreClock(modm::platform::Rcc::BootFrequency);
 modm_weak void SystemCoreClockUpdate() { /* Nothing to update */ }
 
 namespace modm::platform
 {
-uint16_t modm_fastdata delay_fcpu_MHz({{ hsi_frequency }});
-uint16_t modm_fastdata delay_ns_per_loop({{ "{0:,}".format((loops * 1000.0 / hsi_frequency)|int).replace(',', "'") }});
-}
+constinit uint16_t modm_fastdata delay_fcpu_MHz(computeDelayMhz(Rcc::BootFrequency));
+constinit uint16_t modm_fastdata delay_ns_per_loop(computeDelayNsPerLoop(Rcc::BootFrequency));
 
 // ----------------------------------------------------------------------------
 %% if target["family"] == "f0"
 bool
-modm::platform::Rcc::enableInternalClockMHz14(uint32_t waitCycles)
+Rcc::enableInternalClockMHz14(uint32_t waitCycles)
 {
 	bool retval;
 	RCC->CR2 |= RCC_CR2_HSI14ON;
@@ -42,7 +41,7 @@ modm::platform::Rcc::enableInternalClockMHz14(uint32_t waitCycles)
 
 %% if hsi48
 bool
-modm::platform::Rcc::enableInternalClockMHz48(uint32_t waitCycles)
+Rcc::enableInternalClockMHz48(uint32_t waitCycles)
 {
 	bool retval;
 	RCC->CR2 |= RCC_CR2_HSI48ON;
@@ -53,7 +52,7 @@ modm::platform::Rcc::enableInternalClockMHz48(uint32_t waitCycles)
 %% endif
 
 bool
-modm::platform::Rcc::enableInternalClock(uint32_t waitCycles)
+Rcc::enableInternalClock(uint32_t waitCycles)
 {
 	bool retval;
 	RCC->CR |= RCC_CR_HSION;
@@ -64,7 +63,7 @@ modm::platform::Rcc::enableInternalClock(uint32_t waitCycles)
 
 %% if target["family"] in ["l0", "l1", "l4"]
 bool
-modm::platform::Rcc::enableMultiSpeedInternalClock(MsiFrequency msi_frequency, uint32_t waitCycles)
+Rcc::enableMultiSpeedInternalClock(MsiFrequency msi_frequency, uint32_t waitCycles)
 {
 	bool retval;
 %% if target["family"] in ["l0", "l1"]
@@ -81,7 +80,7 @@ modm::platform::Rcc::enableMultiSpeedInternalClock(MsiFrequency msi_frequency, u
 %% endif
 
 bool
-modm::platform::Rcc::enableExternalClock(uint32_t waitCycles)
+Rcc::enableExternalClock(uint32_t waitCycles)
 {
 	bool retval;
 	RCC->CR |= RCC_CR_HSEBYP | RCC_CR_HSEON;
@@ -91,7 +90,7 @@ modm::platform::Rcc::enableExternalClock(uint32_t waitCycles)
 }
 
 bool
-modm::platform::Rcc::enableExternalCrystal(uint32_t waitCycles)
+Rcc::enableExternalCrystal(uint32_t waitCycles)
 {
 	bool retval;
 	RCC->CR = (RCC->CR & ~RCC_CR_HSEBYP) | RCC_CR_HSEON;
@@ -101,7 +100,7 @@ modm::platform::Rcc::enableExternalCrystal(uint32_t waitCycles)
 }
 
 bool
-modm::platform::Rcc::enableLowSpeedInternalClock(uint32_t waitCycles)
+Rcc::enableLowSpeedInternalClock(uint32_t waitCycles)
 {
 	bool retval;
 	RCC->CSR |= RCC_CSR_LSION;
@@ -111,7 +110,7 @@ modm::platform::Rcc::enableLowSpeedInternalClock(uint32_t waitCycles)
 }
 
 bool
-modm::platform::Rcc::enableLowSpeedExternalClock(uint32_t waitCycles)
+Rcc::enableLowSpeedExternalClock(uint32_t waitCycles)
 {
 	bool retval;
 %% if target["family"] in ["l0", "l1"]
@@ -126,7 +125,7 @@ modm::platform::Rcc::enableLowSpeedExternalClock(uint32_t waitCycles)
 }
 
 bool
-modm::platform::Rcc::enableLowSpeedExternalCrystal(uint32_t waitCycles)
+Rcc::enableLowSpeedExternalCrystal(uint32_t waitCycles)
 {
 	bool retval;
 %% if target["family"] in ["l0", "l1"]
@@ -141,7 +140,7 @@ modm::platform::Rcc::enableLowSpeedExternalCrystal(uint32_t waitCycles)
 }
 
 bool
-modm::platform::Rcc::enablePll(PllSource source, const PllFactors& pllFactors, uint32_t waitCycles)
+Rcc::enablePll(PllSource source, const PllFactors& pllFactors, uint32_t waitCycles)
 {
 %% if target["family"] in ["f2", "f4", "f7"]
 	// Read reserved values and clear all other values
@@ -292,7 +291,7 @@ modm::platform::Rcc::enablePll(PllSource source, const PllFactors& pllFactors, u
 
 %% if pllsai_p_usb
 bool
-modm::platform::Rcc::enablePllSai(const PllSaiFactors& pllFactors, uint32_t waitCycles)
+Rcc::enablePllSai(const PllSaiFactors& pllFactors, uint32_t waitCycles)
 {
 	// Read reserved values and clear all other values
 	uint32_t tmp = RCC->PLLSAICFGR & ~(
@@ -326,7 +325,7 @@ modm::platform::Rcc::enablePllSai(const PllSaiFactors& pllFactors, uint32_t wait
 
 %% if overdrive
 bool
-modm::platform::Rcc::enableOverdriveMode(uint32_t waitCycles)
+Rcc::enableOverdriveMode(uint32_t waitCycles)
 {
 	RCC->APB1ENR |= RCC_APB1ENR_PWREN;
 
@@ -354,7 +353,7 @@ modm::platform::Rcc::enableOverdriveMode(uint32_t waitCycles)
 
 %% if target["family"] == "l0"
 bool
-modm::platform::Rcc::setHsiPredivider4Enabled(bool divideBy4, uint32_t waitCycles)
+Rcc::setHsiPredivider4Enabled(bool divideBy4, uint32_t waitCycles)
 {
 	const uint32_t enableFlag = divideBy4 ? RCC_CR_HSIDIVEN : 0;
 	RCC->CR = (RCC->CR & ~RCC_CR_HSIDIVEN) | enableFlag;
@@ -370,7 +369,7 @@ modm::platform::Rcc::setHsiPredivider4Enabled(bool divideBy4, uint32_t waitCycle
 
 // ----------------------------------------------------------------------------
 bool
-modm::platform::Rcc::enableSystemClock(SystemClockSource src, uint32_t waitCycles)
+Rcc::enableSystemClock(SystemClockSource src, uint32_t waitCycles)
 {
 	RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_SW) | uint32_t(src);
 
@@ -388,7 +387,7 @@ modm::platform::Rcc::enableSystemClock(SystemClockSource src, uint32_t waitCycle
 
 %% if target["family"] == "g4"
 bool
-modm::platform::Rcc::setCanPrescaler(CanPrescaler prescaler)
+Rcc::setCanPrescaler(CanPrescaler prescaler)
 {
 	enable<Peripheral::Fdcan1>();
 
@@ -416,3 +415,5 @@ modm::platform::Rcc::setCanPrescaler(CanPrescaler prescaler)
 	return true;
 }
 %% endif
+
+}

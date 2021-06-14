@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2019, Ethan Slattery
  * Copyright (c) 2020, Erik Henriksson
+ * Copyright (c) 2021, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -11,23 +12,19 @@
 // ----------------------------------------------------------------------------
 
 #include <cmath>
-#include "modm/math/units.hpp"
+#include <modm/math/units.hpp>
 
 namespace modm::platform
 {
-/// @cond
-extern uint16_t delay_fcpu_MHz;
-extern uint16_t delay_ns_per_loop;
 extern "C" uint32_t SystemCoreClock;
-/// @endcond
 
 template< uint32_t Core_Hz >
 void
 GenericClockController::updateCoreFrequency()
 {
 	SystemCoreClock = Core_Hz;
-	delay_fcpu_MHz = Core_Hz / 1'000'000;
-	delay_ns_per_loop = ::round({{loops}}000.f / (Core_Hz / 1'000'000));
+	delay_fcpu_MHz = computeDelayMhz(Core_Hz);
+	delay_ns_per_loop = computeDelayNsPerLoop(Core_Hz);
 }
 
 template< uint32_t Core_Hz >
@@ -35,7 +32,7 @@ uint32_t
 GenericClockController::setFlashLatency()
 {
 	// See table 41.11 (NVM Characteristics) in the datasheet
-	if (Core_Hz > 24_MHz) {
+	if constexpr (Core_Hz > 24_MHz) {
 		NVMCTRL->CTRLB.bit.RWS = NVMCTRL_CTRLB_RWS_HALF_Val;
 	} else {
 		NVMCTRL->CTRLB.bit.RWS = NVMCTRL_CTRLB_RWS_SINGLE_Val;
@@ -43,15 +40,15 @@ GenericClockController::setFlashLatency()
 	return Core_Hz;
 }
 
-	template< ClockPeripheral peripheral >
-	void
-	GenericClockController::connect(ClockGenerator clockGen)
-	{
-		GCLK->CLKCTRL.reg =
-				GCLK_CLKCTRL_CLKEN |
-				GCLK_CLKCTRL_GEN(uint32_t(clockGen)) |
-				GCLK_CLKCTRL_ID(uint32_t(peripheral));
-	}
+template< ClockPeripheral peripheral >
+void
+GenericClockController::connect(ClockGenerator clockGen)
+{
+	GCLK->CLKCTRL.reg =
+		GCLK_CLKCTRL_CLKEN |
+		GCLK_CLKCTRL_GEN(uint32_t(clockGen)) |
+		GCLK_CLKCTRL_ID(uint32_t(peripheral));
+}
 
 }
 

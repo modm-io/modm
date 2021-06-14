@@ -14,6 +14,7 @@
 
 #include <stdint.h>
 #include "../device.hpp"
+#include <modm/architecture/interface/delay.hpp>
 
 namespace modm::platform
 {
@@ -86,6 +87,8 @@ enum class ClockPeripheral : uint32_t {
 class GenericClockController
 {
 public:
+	static constexpr uint32_t BootFrequency = 1'000'000;
+
 	template< uint32_t Core_Hz>
 	static uint32_t
 	setFlashLatency();
