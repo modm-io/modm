@@ -24,11 +24,7 @@ SECTIONS
 
 {{ linker.section_rom("FLASH") }}
 
-{{ linker.section("FLASH", "fastcode") }}
-
-{{ linker.section_ram("RAM", "FLASH") }}
-
-{{ linker.section("RAM AT >FLASH", "fastdata") }}
+{{ linker.section_ram("RAM", "FLASH", ["fastdata", "fastcode"]) }}
 
 {{ linker.section_heap("SRAM1", "heap1", "RAM") }}
 

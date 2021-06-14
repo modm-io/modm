@@ -2,7 +2,7 @@
 %% macro copyright()
 /*
  * Copyright (c) 2011-2012, 2019, Fabian Greif
- * Copyright (c) 2012, 2015-2019, Niklas Hauser
+ * Copyright (c) 2012, 2015-2021, Niklas Hauser
  * Copyright (c) 2013, Sascha Schade
  * Copyright (c) 2013, 2015, Kevin Läufer
  *
@@ -108,9 +108,6 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		LONG(__data_load)
 		LONG(__data_start)
 		LONG(__data_end)
-		LONG(__fastdata_load)
-		LONG(__fastdata_start)
-		LONG(__fastdata_end)
 	%% for section in sections
 		LONG(__{{section}}_load)
 		LONG(__{{section}}_start)
@@ -167,12 +164,19 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 %% endmacro
 
 
-%% macro section(memory, name)
+%% macro section(memory, name, additions=None)
 	.{{name}} : ALIGN(4)
 	{
 		__{{name}}_load = LOADADDR(.{{name}});
 		__{{name}}_start = .;
 		*(.{{name}})
+%% if additions
+%% for addition in additions
+		__{{addition}}_start = .;
+		*(.{{ addition }})
+		__{{addition}}_end = .;
+%% endfor
+%% endif
 		. = ALIGN(4);
 		__{{name}}_end = .;
 	} >{{memory}}
@@ -280,19 +284,20 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 %% endmacro
 
 
-%% macro section_ram(memory, rom)
+%% macro section_ram(memory, rom, additions=None)
 	/* initialized variables */
 	.data : ALIGN(4)
 	{
 		__data_load = LOADADDR(.data);
 		__data_start = .;
+%% if additions
+%% for addition in additions
+		__{{addition}}_start = .;
+		*(.{{ addition }})
+		__{{addition}}_end = .;
+%% endfor
+%% endif
 		*(.data .data.* .gnu.linkonce.d.*)
-	} >{{memory}} AT >{{rom}}
-
-	/* code routines in RAM */
-	.ramcode : ALIGN(4)
-	{
-		*(.ramcode .ramcode*)
 		__data_end = .;
 	} >{{memory}} AT >{{rom}}
 

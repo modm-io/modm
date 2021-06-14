@@ -12,9 +12,7 @@ SECTIONS
 
 {{ linker.section_vector_ram("CCM") }}
 
-{{ linker.section("CCM AT >FLASH", "fastcode") }}
-
-{{ linker.section("CCM AT >FLASH", "fastdata") }}
+{{ linker.section("CCM AT >FLASH", "fastcode", ["fastdata"]) }}
 
 {{ linker.section_heap("CCM", "heap4") }}
 %% if with_crashcatcher

@@ -44,7 +44,7 @@ SECTIONS
 	/* TABLES! TABLES! ALL THE TABLES YOU COULD EVER WANT! TABLES! */
 {{ linker.section_table_zero("FLASH") }}
 
-{{ linker.section_table_copy("FLASH", ["fastcode"]) }}
+{{ linker.section_table_copy("FLASH", ["fastdata", "fastcode"]) }}
 
 {{ linker.section_table_extern("FLASH") }}
 

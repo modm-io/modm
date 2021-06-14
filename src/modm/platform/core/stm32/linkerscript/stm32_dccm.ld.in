@@ -14,6 +14,7 @@ SECTIONS
 
 {{ linker.section_stack("CCM") }}
 
+	/* CCM can only be accessed by D-Bus, do not place .fastcode here! */
 {{ linker.section("CCM AT >FLASH", "fastdata") }}
 
 {{ linker.section_heap("CCM", "heap0") }}
@@ -26,9 +27,7 @@ SECTIONS
 
 {{ linker.section_rom("FLASH") }}
 
-{{ linker.section("FLASH", "fastcode") }}
-
-{{ linker.section_ram("RAM", "FLASH") }}
+{{ linker.section_ram("RAM", "FLASH", ["fastcode"]) }}
 
 {{ linker.section_heap("SRAM1", "heap1", "RAM") }}
 
@@ -48,7 +47,7 @@ SECTIONS
 	/* TABLES! TABLES! ALL THE TABLES YOU COULD EVER WANT! TABLES! */
 {{ linker.section_table_zero("FLASH") }}
 
-%% set copy_table = []
+%% set copy_table = ["fastdata"]
 %% if "backup" in regions
 	%% do copy_table.append("backup")
 %% endif

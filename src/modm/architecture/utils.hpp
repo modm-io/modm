@@ -2,7 +2,7 @@
  * Copyright (c) 2011, Georgi Grinshpun
  * Copyright (c) 2011, Martin Rosekeit
  * Copyright (c) 2011-2012, Fabian Greif
- * Copyright (c) 2012, 2014-2017, Niklas Hauser
+ * Copyright (c) 2012, 2014-2017, 2021, Niklas Hauser
  * Copyright (c) 2013, Kevin Läufer
  * Copyright (c) 2015, Sascha Schade
  * Copyright (c) 2016, Tarik TIRE
@@ -72,11 +72,13 @@
 	/// Marks a declaration as deprecated and displays a message.
 	#define modm_deprecated(msg)
 
-	/// Specifies that a function is placed in fastest executable memory.
-	/// @note This is not always SRAM, since Flash accelerators can be faster.
+	/// Places a function in the fastest executable memory:
+	/// instruction cache, core coupled memory or SRAM as fallback.
 	#define modm_fastcode
 
-	/// Specifies that a variable is placed in fastest accessible memory.
+	/// Places a variable in the fastest accessible memory:
+	/// data cache, core coupled memory or SRAM as fallback.
+	/// @note This memory location may not be DMA-able!
 	#define modm_fastdata
 
 	/// This branch is more likely to execute.
@@ -144,7 +146,7 @@
 	#	define modm_fastdata
 	#else
 	#	define modm_fastcode		modm_section(".fastcode")
-	#	define modm_ramcode			modm_section(".ramcode")
+	#	define modm_ramcode			modm_fastcode
 	#	define modm_fastdata		modm_section(".fastdata")
 	#endif
 
