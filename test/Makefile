@@ -33,6 +33,12 @@ run-hosted-windows:
 	$(call compile-test,hosted,run,-D":target=hosted-windows")
 
 
+compile-nucleo-f091:
+	$(call compile-test,nucleo-f091,size)
+run-nucleo-f091:
+	$(call run-test,nucleo-f091,size)
+
+
 compile-nucleo-f401:
 	$(call compile-test,nucleo-f401,size)
 run-nucleo-f401:
