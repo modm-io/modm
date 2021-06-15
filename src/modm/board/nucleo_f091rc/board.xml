@@ -1,0 +1,14 @@
+<library>
+  <repositories>
+    <repository>
+      <path>../../../../repo.lb</path>
+    </repository>
+  </repositories>
+
+  <options>
+    <option name="modm:target">stm32f091rct6</option>
+  </options>
+  <modules>
+    <module>modm:board:nucleo-f091rc</module>
+  </modules>
+</library>
