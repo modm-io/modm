@@ -1,0 +1,24 @@
+<library>
+  <!-- <extends>modm:nucleo-l152re</extends> -->
+  <!-- <extends>modm:nucleo-f103rb</extends> -->
+  <!-- <extends>modm:nucleo-f401re</extends> -->
+  <!-- <extends>modm:nucleo-f411re</extends> -->
+  <!-- <extends>modm:nucleo-f446re</extends> -->
+  <extends>modm:nucleo-f334r8</extends>
+  <!-- <extends>modm:nucleo-f303k8</extends> -->
+  <!-- <extends>modm:nucleo-l476rg</extends> -->
+  <!-- <extends>modm:disco-f746ng</extends> -->
+  <!-- <extends>modm:nucleo-g071rb</extends> -->
+  <!-- <extends>modm:nucleo-f072rb</extends> -->
+  <!-- <extends>modm:nucleo-f091rc</extends> -->
+  <!-- <extends>modm:samd21-mini</extends> -->
+  <options>
+    <option name="modm:build:build.path">../../../build/generic/delay</option>
+    <!-- <option name="modm:tinyusb:config">device.cdc</option> -->
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:debug</module>
+    <!-- <module>modm:tinyusb</module> -->
+  </modules>
+</library>
