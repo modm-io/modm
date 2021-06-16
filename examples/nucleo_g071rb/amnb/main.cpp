@@ -16,9 +16,9 @@ using namespace std::chrono_literals;
 using namespace modm::amnb;
 // ----------------------------------------------------------------------------
 
-const Listener listeners[] =
+Listener listeners[] =
 {
-	{1, +[](uint8_t sender, const uint32_t& data)
+	{1, [](uint8_t sender, const uint32_t& data)
 		{
 			MODM_LOG_INFO << "Node2 and Node3 received Broadcast 1 from '" << sender;
 			MODM_LOG_INFO << "': " << data << modm::endl;
@@ -30,16 +30,16 @@ const Listener listeners[] =
 		}
 	},
 };
-const Action actions[] =
+Action actions[] =
 {
-	{1, +[]() -> Response
+	{1, []() -> Response
 		{
 			static uint8_t counter{0};
 			MODM_LOG_INFO << "Node1 and Node3 received Action 1" << modm::endl;
 			return counter++;
 		}
 	},
-	{2, +[](const uint32_t& data) -> Response
+	{2, [](const uint32_t& data) -> Response
 		{
 			static uint8_t counter{0};
 			MODM_LOG_INFO << "Node1 and Node3 received Action 2 with argument: " << data << modm::endl;

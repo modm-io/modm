@@ -127,20 +127,23 @@ void
 AmnbNodeTest::testAction()
 {
 	static uint8_t trig{0};
-	const Action actions[] =
+	static uint8_t count{0};
+	Action actions[] =
 	{
-		{1, []()
+		{1, [private_count = uint8_t(10)]() mutable
 			{
 				trig |= 1;
+				count += ++private_count;
 			}
 		},
-		{2, +[](const uint32_t& data)
+		{2, [private_count = uint16_t(20)](const uint32_t& data) mutable
 			{
 				TEST_ASSERT_EQUALS(data, uint32_t(0x03020100));
 				trig |= 2;
+				count += ++private_count;
 			}
 		},
-		{3, +[](const uint32_t& data) -> Response
+		{3, [](const uint32_t& data) -> Response
 			{
 				TEST_ASSERT_EQUALS(data, uint32_t(0x03020100));
 				trig |= 4;
@@ -153,7 +156,7 @@ AmnbNodeTest::testAction()
 				return ErrorResponse(uint8_t(3));
 			}
 		},
-		{5, +[](const uint32_t& data) -> Response
+		{5, [](const uint32_t& data) -> Response
 			{
 				TEST_ASSERT_EQUALS(data, uint32_t(0x03020100));
 				trig |= 16;
@@ -194,6 +197,7 @@ AmnbNodeTest::testAction()
 	{
 		node.update(); node.update();
 		TEST_ASSERT_EQUALS(trig, 1);
+		TEST_ASSERT_EQUALS(count, 11);
 		const uint8_t raw[] = {0x7E, 0x7E, 42, 8, 1, 96};
 		TEST_ASSERT_EQUALS(SharedMedium::transmitted.size(), sizeof(raw));
 		TEST_ASSERT_EQUALS_ARRAY(SharedMedium::transmitted, raw, sizeof(raw));
@@ -205,6 +209,7 @@ AmnbNodeTest::testAction()
 	{
 		node.update(); node.update();
 		TEST_ASSERT_EQUALS(trig, 2);
+		TEST_ASSERT_EQUALS(count, 11+21);
 		const uint8_t raw[] = {0x7E, 0x7E, 209, 8, 2, 96};
 		TEST_ASSERT_EQUALS(SharedMedium::transmitted.size(), sizeof(raw));
 		TEST_ASSERT_EQUALS_ARRAY(SharedMedium::transmitted, raw, sizeof(raw));
@@ -248,19 +253,30 @@ void
 AmnbNodeTest::testListener()
 {
 	static uint8_t trig{0};
-	const Listener listeners[] =
+	static uint8_t count{0};
+	Listener listeners[] =
 	{
-		{1, [](uint8_t sender)
+		{1, [private_count = uint8_t(10)](uint8_t sender) mutable
 			{
 				TEST_ASSERT_EQUALS(sender, 0x20);
 				trig |= 1;
+				count += ++private_count;
 			}
 		},
-		{2, +[](uint8_t sender, const uint32_t& data)
+		{2, [private_count = uint16_t(20)](uint8_t sender, const uint32_t& data) mutable
 			{
 				TEST_ASSERT_EQUALS(sender, 0x10);
 				TEST_ASSERT_EQUALS(data, uint32_t(0x03020100));
 				trig |= 2;
+				count += ++private_count;
+			}
+		},
+		// Test multiple listerners on the same id
+		{2, [](uint8_t sender, const uint32_t& data)
+			{
+				TEST_ASSERT_EQUALS(sender, 0x10);
+				TEST_ASSERT_EQUALS(data, uint32_t(0x03020100));
+				trig |= 4;
 			}
 		},
 	};
@@ -272,16 +288,20 @@ AmnbNodeTest::testListener()
 	{
 		node.update();
 		TEST_ASSERT_EQUALS(trig, 1);
+		TEST_ASSERT_EQUALS(count, 11);
 		node.update();
 		TEST_ASSERT_EQUALS(trig, 1);
+		TEST_ASSERT_EQUALS(count, 11);
 	}
 	trig = 0;
 	SharedMedium::add_rx({0x7E, 0x7E, 102, 16, 2, 4, 0, 1, 2, 3});
 	{
 		node.update();
-		TEST_ASSERT_EQUALS(trig, 2);
+		TEST_ASSERT_EQUALS(trig, 6);
+		TEST_ASSERT_EQUALS(count, 11+21);
 		node.update();
-		TEST_ASSERT_EQUALS(trig, 2);
+		TEST_ASSERT_EQUALS(trig, 6);
+		TEST_ASSERT_EQUALS(count, 11+21);
 	}
 	trig = 0;
 	SharedMedium::add_rx({0x7E, 0x7E, 4, 32, 1, 0});
@@ -289,7 +309,9 @@ AmnbNodeTest::testListener()
 	{
 		node.update();
 		TEST_ASSERT_EQUALS(trig, 1);
+		TEST_ASSERT_EQUALS(count, 11+21+12);
 		node.update();
-		TEST_ASSERT_EQUALS(trig, 3);
+		TEST_ASSERT_EQUALS(trig, 7);
+		TEST_ASSERT_EQUALS(count, 11+21+12+22);
 	}
 }

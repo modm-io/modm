@@ -19,7 +19,8 @@ def prepare(module, options):
         ":math:utils",
         ":processing:resumable",
         ":processing:timer",
-        ":container")
+        ":container",
+        ":utils")
 
     module.add_option(
         BooleanOption(name="with_heap",

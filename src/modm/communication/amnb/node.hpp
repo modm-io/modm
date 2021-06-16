@@ -32,7 +32,7 @@ public:
 	{ setSeed(); }
 
 	template< size_t Actions >
-	Node(Device &device, uint8_t address, const Action (&actions)[Actions])
+	Node(Device &device, uint8_t address, Action (&actions)[Actions])
 	:	interface(device), actionList(actions), actionCount(Actions), address(address)
 	{
 		static_assert(Actions <= 0xff, "Actions list must be smaller than 255!");
@@ -40,7 +40,7 @@ public:
 	}
 
 	template< size_t Listeners >
-	Node(Device &device, uint8_t address, const Listener (&listeners)[Listeners])
+	Node(Device &device, uint8_t address, Listener (&listeners)[Listeners])
 	:	interface(device), listenerList(listeners), listenerCount(Listeners), address(address)
 	{
 		static_assert(Listeners <= 0xff, "Listeners list must be smaller than 255!");
@@ -48,7 +48,7 @@ public:
 	}
 
 	template< size_t Actions, size_t Listeners >
-	Node(Device &device, uint8_t address, const Action (&actions)[Actions], const Listener (&listeners)[Listeners])
+	Node(Device &device, uint8_t address, Action (&actions)[Actions], Listener (&listeners)[Listeners])
 	:	interface(device), actionList(actions), listenerList(listeners),
 		actionCount(Actions), listenerCount(Listeners), address(address)
 	{
@@ -234,7 +234,7 @@ protected:
 			case Type::Broadcast:
 				for (size_t ii=0; ii<listenerCount; ii++)
 				{
-					const auto listener = listenerList[ii];
+					auto& listener = listenerList[ii];
 					if (rx_msg.command() == listener.command) {
 						if (complete) listener.call(rx_msg);
 						else return true;
@@ -247,7 +247,7 @@ protected:
 				{
 					for (size_t ii=0; ii<actionCount; ii++)
 					{
-						const auto action = actionList[ii];
+						auto& action = actionList[ii];
 						if (rx_msg.command() == action.command)
 						{
 							if (complete)
@@ -301,8 +301,8 @@ protected:
 protected:
 	Interface<MaxHeapAllocation> interface;
 
-	const Action *const actionList{nullptr};
-	const Listener *const listenerList{nullptr};
+	Action *const actionList{nullptr};
+	Listener *const listenerList{nullptr};
 
 	modm::ShortPreciseTimeout tx_timer;
 	modm::ShortTimeout response_timer;

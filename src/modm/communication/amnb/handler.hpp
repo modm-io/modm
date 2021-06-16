@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2020, Niklas Hauser
+ * Copyright (c) 2021, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -13,6 +14,21 @@
 
 #include "message.hpp"
 #include <modm/processing.hpp>
+#include <modm/utils/inplace_any.hpp>
+#include <modm/utils/inplace_function.hpp>
+#include <modm/utils/type_traits.hpp>
+#include <functional>
+
+#ifndef MODM_AMNB_HANDLER_STORAGE
+#define MODM_AMNB_HANDLER_STORAGE sizeof(void*)
+#endif
+
+#ifdef __DOXYGEN__
+///
+/// @ingroup modm_communication_amnb
+#define MODM_AMNB_HANDLER_STORAGE sizeof(void*)
+#endif
+
 
 namespace modm::amnb
 {
@@ -34,46 +50,46 @@ enum class Error : uint8_t
 /// @ingroup modm_communication_amnb
 struct Listener
 {
-	inline
-	Listener(int command, void(*listener)(uint8_t))
-	:	command(command), callback((void*)listener),
-		redirect([](const Message &msg, void *cb)
-		{
-			reinterpret_cast<decltype(listener)>(cb)(msg.address());
-		})
-	{}
-
-	template<typename T>
-	Listener(int command, void(*listener)(uint8_t, const T&))
-	:	command(command), callback((void*)listener),
-		redirect([](const Message &msg, void* cb)
-		{
-			if (const T* arg = msg.get<T>(); arg and msg.length() == sizeof(T))
-				reinterpret_cast<decltype(listener)>(cb)(msg.address(), *arg);
-		})
-	{}
-
-	inline
-	Listener(int command, void(*listener)(uint8_t, const uint8_t*, size_t))
-	:	command(command), callback((void*)listener),
-		redirect([](const Message &msg, void* cb)
-		{
-			if (const uint8_t* arg = msg.get<uint8_t>(); arg)
-				reinterpret_cast<decltype(listener)>(cb)(msg.address(), arg, msg.length());
-		})
+	template <typename L, typename F = get_callable_signature_t<std::remove_cvref_t<L>>>
+	Listener(int command, L&& listener)
+	:	command(command), callback(std::in_place_type<function<F>>, std::forward<L>(listener)),
+		redirect(getRedirect(static_cast<F*>(nullptr)))
 	{}
 
 protected:
-	const uint8_t command;
-	void *const callback;
-	void (*const redirect)(const Message &msg, void *cb);
+	template<class Signature>
+	using function = modm::inplace_function<Signature, MODM_AMNB_HANDLER_STORAGE, alignof(void*)>;
+	using Storage = modm::inplace_any<MODM_AMNB_HANDLER_STORAGE + sizeof(void*)>;
+	using Redirect = void(const Message&, Storage*);
 
-	inline
-	void call(const Message &msg) const
+	auto getRedirect(void(*)(uint8_t))
 	{
-		redirect(msg, callback);
+		return [](const Message &msg, Storage *cb) {
+			(*any_cast<function<void(uint8_t)>>(cb))(msg.address());
+		};
 	}
 
+	template<typename T>
+	auto getRedirect(void(*)(uint8_t, const T&))
+	{
+		return [](const Message &msg, Storage *cb) {
+			if (const T* arg = msg.get<T>(); arg and msg.length() == sizeof(T))
+				(*any_cast<function<void(uint8_t, const T&)>>(cb))(msg.address(), *arg);
+		};
+	}
+
+	auto getRedirect(void(*)(uint8_t, const uint8_t*, size_t))
+	{
+		return [](const Message &msg, Storage *cb) {
+			if (const uint8_t* arg = msg.get<uint8_t>(); arg)
+				(*any_cast<function<void(uint8_t, const uint8_t*, size_t)>>(cb))(msg.address(), arg, msg.length());
+		};
+	}
+
+	const uint8_t command;
+	Storage callback;
+	Redirect *const redirect;
+	inline void call(const Message &msg) { redirect(msg, &callback); }
 	template< size_t, size_t > friend class Node;
 };
 
@@ -111,95 +127,96 @@ ErrorResponse(T error)
 /// @ingroup modm_communication_amnb
 struct Action
 {
-	inline
-	Action(int command, Response(*action)())
-	:	command(command), callback((void*)action),
-		redirect([](const Message &msg, void *cb) -> Message
-		{
-			if (msg.length() == 0)
-				return reinterpret_cast<decltype(action)>(cb)().msg;
-			return Response(Error::WrongArgumentSize).msg;
-		})
-	{}
-
-	template<typename T>
-	Action(int command, Response(*action)(const T&))
-	:	command(command), callback((void*)action),
-		redirect([](const Message &msg, void* cb) -> Message
-		{
-			const T* arg = msg.get<T>();
-			if (arg == nullptr)
-				return Response(Error::ResponseAllocationFailed).msg;
-			if (msg.length() < sizeof(T))
-				return Response(Error::WrongArgumentSize).msg;
-			return reinterpret_cast<decltype(action)>(cb)(*arg).msg;
-		})
-	{}
-
-	template<typename T>
-	Action(int command, Response(*action)(const uint8_t*, size_t))
-	:	command(command), callback((void*)action),
-		redirect([](const Message &msg, void* cb) -> Message
-		{
-			const uint8_t* arg = msg.get<uint8_t>();
-			if (arg == nullptr)
-				return Response(Error::ResponseAllocationFailed).msg;
-			return reinterpret_cast<decltype(action)>(cb)(arg, msg.length()).msg;
-		})
-	{}
-
-	inline
-	Action(int command, void(*action)())
-	:	command(command), callback((void*)action),
-		redirect([](const Message &msg, void *cb) -> Message
-		{
-			if (msg.length() == 0) {
-				reinterpret_cast<decltype(action)>(cb)();
-				return Response().msg;
-			}
-			return Response(Error::WrongArgumentSize).msg;
-		})
-	{}
-
-	template<typename T>
-	Action(int command, void(*action)(const T&))
-	:	command(command), callback((void*)action),
-		redirect([](const Message &msg, void* cb) -> Message
-		{
-			const T* arg = msg.get<T>();
-			if (arg == nullptr)
-				return Response(Error::ResponseAllocationFailed).msg;
-			if (msg.length() < sizeof(T))
-				return Response(Error::WrongArgumentSize).msg;
-			reinterpret_cast<decltype(action)>(cb)(*arg);
-			return Response().msg;
-		})
-	{}
-
-	template<typename T>
-	Action(int command, void(*action)(const uint8_t*, size_t))
-	:	command(command), callback((void*)action),
-		redirect([](const Message &msg, void* cb) -> Message
-		{
-			const uint8_t* arg = msg.get<uint8_t>();
-			if (arg == nullptr)
-				return Response(Error::ResponseAllocationFailed).msg;
-			reinterpret_cast<decltype(action)>(cb)(arg, msg.length());
-			return Response().msg;
-		})
+	template <typename A, typename F = get_callable_signature_t<std::remove_cvref_t<A>>>
+	Action(int command, A&& action)
+	:	command(command), callback(std::in_place_type<function<F>>, std::forward<A>(action)),
+		redirect(getRedirect(static_cast<F*>(nullptr)))
 	{}
 
 protected:
-	const uint8_t command;
-	void *const callback;
-	Message (*const redirect)(const Message &msg, void *cb);
+	template<class Signature>
+	using function = modm::inplace_function<Signature, MODM_AMNB_HANDLER_STORAGE, alignof(void*)>;
+	using Storage = modm::inplace_any<MODM_AMNB_HANDLER_STORAGE + sizeof(void*)>;
+	using Redirect = Message(const Message &msg, Storage *cb);
 
-	inline
-	Message call(const Message &msg) const
+	auto getRedirect(Response(*)())
 	{
-		return redirect(msg, callback);
+		return [](const Message &msg, Storage *cb) -> Message {
+			if (msg.length() == 0)
+				return (*any_cast<function<Response()>>(cb))().msg;
+			return Response(Error::WrongArgumentSize).msg;
+		};
 	}
 
+	template<typename T>
+	auto getRedirect(Response(*)(const T&))
+	{
+		return [](const Message &msg, Storage *cb) -> Message
+		{
+			const T* arg = msg.get<T>();
+			if (arg == nullptr)
+				return Response(Error::ResponseAllocationFailed).msg;
+			if (msg.length() < sizeof(T))
+				return Response(Error::WrongArgumentSize).msg;
+			return (*any_cast<function<Response(const T&)>>(cb))(*arg).msg;
+		};
+	}
+
+	auto getRedirect(Response(*)(const uint8_t*, size_t))
+	{
+		return [](const Message &msg, Storage *cb) -> Message
+		{
+			const uint8_t* arg = msg.get<uint8_t>();
+			if (arg == nullptr)
+				return Response(Error::ResponseAllocationFailed).msg;
+			return (*any_cast<function<Response(const uint8_t*, size_t)>>(cb))(arg, msg.length()).msg;
+		};
+	}
+
+	auto getRedirect(void(*)())
+	{
+		return [](const Message &msg, Storage *cb) -> Message
+		{
+			if (msg.length() == 0) {
+				(*any_cast<function<void()>>(cb))();
+				return Response().msg;
+			}
+			return Response(Error::WrongArgumentSize).msg;
+		};
+	}
+
+	template<typename T>
+	auto getRedirect(void(*)(const T&))
+	{
+		return [](const Message &msg, Storage *cb) -> Message
+		{
+			const T* arg = msg.get<T>();
+			if (arg == nullptr)
+				return Response(Error::ResponseAllocationFailed).msg;
+			if (msg.length() < sizeof(T))
+				return Response(Error::WrongArgumentSize).msg;
+			(*any_cast<function<void(const T&)>>(cb))(*arg);
+			return Response().msg;
+		};
+	}
+
+	auto getRedirect(void(*)(const uint8_t*, size_t))
+	{
+		return [](const Message &msg, Storage *cb) -> Message
+		{
+			const uint8_t* arg = msg.get<uint8_t>();
+			if (arg == nullptr)
+				return Response(Error::ResponseAllocationFailed).msg;
+			(*any_cast<function<void(const uint8_t*, size_t)>>(cb))(arg, msg.length());
+			return Response().msg;
+		};
+	}
+
+	const uint8_t command;
+	Storage callback;
+	Redirect *const redirect;
+
+	inline Message call(const Message &msg) { return redirect(msg, &callback); }
 	template< size_t, size_t > friend class Node;
 };
 
