@@ -52,30 +52,30 @@
 
 /// Cause protothread to wait **while** given condition is true.
 /// \hideinitializer
-#define PT_WAIT_WHILE(condition) \
+#define PT_WAIT_WHILE(...) \
     do { \
 		this->ptState = __LINE__; \
 		modm_fallthrough; \
 		case __LINE__: \
-			if (condition) \
+			if (__VA_ARGS__) \
 				return true; \
     } while (0)
 
 /// Cause protothread to wait **until** given condition is true.
 /// \hideinitializer
-#define PT_WAIT_UNTIL(condition) \
-	PT_WAIT_WHILE(!(condition))
+#define PT_WAIT_UNTIL(...) \
+	PT_WAIT_WHILE(!(__VA_ARGS__))
 
 /// Cause protothread to wait until given child protothread completes.
 /// \hideinitializer
-#define PT_WAIT_THREAD(child) 	PT_WAIT_UNTIL(!(child).run())
+#define PT_WAIT_THREAD(...) 	PT_WAIT_UNTIL(!(__VA_ARGS__).run())
 
 /// Restart and spawn given child protothread and wait until it completes.
 /// \hideinitializer
-#define PT_SPAWN(child) \
+#define PT_SPAWN(...) \
     do { \
-		(child).restart(); \
-		PT_WAIT_THREAD(child); \
+		(__VA_ARGS__).restart(); \
+		PT_WAIT_THREAD(__VA_ARGS__); \
     } while (0)
 
 
@@ -84,12 +84,12 @@
  * whether it completed successfully or not.
  * \hideinitializer
  */
-#define PT_CALL(resumable) \
+#define PT_CALL(...) \
 	({ \
 		this->ptState = __LINE__; \
 		modm_fallthrough; \
 		case __LINE__: \
-			auto rfResult = resumable; \
+			auto rfResult = (__VA_ARGS__); \
 			if (rfResult.getState() > modm::rf::NestingError) { \
 				return true; \
 			} \

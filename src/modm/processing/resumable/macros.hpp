@@ -41,8 +41,8 @@
  * @warning	Use at end of the `resumable()` implementation only!
  * @hideinitializer
  */
-#define RF_END_RETURN(result) \
-			RF_RETURN(result); \
+#define RF_END_RETURN(...) \
+			RF_RETURN(__VA_ARGS__); \
 			modm_fallthrough; \
 		default: \
 			this->popRf(); \
@@ -88,14 +88,14 @@
 
 /// Cause resumable function to wait until given child protothread completes.
 /// @hideinitializer
-#define RF_WAIT_THREAD(child) 	RF_WAIT_UNTIL(!(child).run())
+#define RF_WAIT_THREAD(...) 	RF_WAIT_UNTIL(!(__VA_ARGS__).run())
 
 /// Cause resumable function to wait **while** given `condition` is true.
 /// @hideinitializer
-#define RF_WAIT_WHILE(condition) \
+#define RF_WAIT_WHILE(...) \
 		do { \
 			RF_INTERNAL_SET_CASE(__COUNTER__); \
-			if (condition) { \
+			if (__VA_ARGS__) { \
 				this->popRf(); \
 				return {modm::rf::Running}; \
 			} \
@@ -103,8 +103,8 @@
 
 /// Cause resumable function to wait **until** given `condition` is true.
 /// @hideinitializer
-#define RF_WAIT_UNTIL(condition) \
-	RF_WAIT_WHILE(!(condition))
+#define RF_WAIT_UNTIL(...) \
+	RF_WAIT_WHILE(!(__VA_ARGS__))
 
 /// Calls a resumable function and returns its result.
 /// @hideinitializer
