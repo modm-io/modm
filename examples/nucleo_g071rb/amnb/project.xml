@@ -14,5 +14,6 @@
     <module>modm:platform:uart:3</module>
     <module>modm:platform:uart:4</module>
     <module>modm:build:scons</module>
+    <module>modm:processing:protothread</module>
   </modules>
 </library>

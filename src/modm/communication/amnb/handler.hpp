@@ -229,14 +229,23 @@ struct Result
 	bool
 	hasError() const { return syserr != Error::Ok; }
 
+	bool
+	hasUserError() const { return syserr == Error::UserError; }
+
 	Error
 	error() const { return syserr; }
 
 	const ErrorType*
-	resultError() const { return errval; }
+	userError() const { return errval; }
 
 	const ReturnType*
 	result() const { return retval; }
+
+	explicit
+	operator bool() const { return not hasError(); }
+
+	const ReturnType&
+	operator *() const { return *result(); }
 
 protected:
 	Result(Message &msg)
@@ -278,14 +287,23 @@ struct Result<ReturnType, void>
 	bool
 	hasError() const { return syserr != Error::Ok; }
 
+	bool
+	hasUserError() const { return syserr == Error::UserError; }
+
 	Error
 	error() const { return syserr; }
 
 	const Error*
-	resultError() const { return &syserr; }
+	userError() const { return &syserr; }
 
 	const ReturnType*
 	result() const { return retval; }
+
+	explicit
+	operator bool() const { return not hasError(); }
+
+	const ReturnType&
+	operator *() const { return *result(); }
 
 protected:
 	Result(Message &msg)
@@ -321,14 +339,20 @@ struct Result<void, void>
 	bool
 	hasError() const { return syserr != Error::Ok; }
 
+	bool
+	hasUserError() const { return syserr == Error::UserError; }
+
 	Error
 	error() const { return syserr; }
 
 	const Error*
-	resultError() const { return &syserr; }
+	userError() const { return &syserr; }
 
 	const Error*
 	result() const { return &syserr; }
+
+	explicit
+	operator bool() const { return not hasError(); }
 
 protected:
 	Result(Message &msg)

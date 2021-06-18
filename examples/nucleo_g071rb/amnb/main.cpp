@@ -10,6 +10,7 @@
 
 #include <modm/board.hpp>
 #include <modm/communication/amnb.hpp>
+#include <modm/processing.hpp>
 
 using namespace Board;
 using namespace std::chrono_literals;
@@ -61,6 +62,42 @@ using PinNode1 = GpioC4; // D1
 using PinNode2 = GpioB8; // D15
 using PinNode3 = GpioA0; // A0
 
+class Thread : public modm::pt::Protothread
+{
+	modm::ShortPeriodicTimer tmr{1s};
+	uint32_t counter{0};
+	Result<uint8_t> res1;
+	Result<uint8_t, uint8_t> res2;
+
+public:
+	bool inline
+	update()
+	{
+		PT_BEGIN();
+
+		while(true)
+		{
+			PT_WAIT_UNTIL(tmr.execute());
+
+			node1.broadcast(1, counter++);
+			node3.broadcast(2);
+
+			res1 = PT_CALL(node2.request<uint8_t>(1, 1));
+			MODM_LOG_INFO << "Node1 responded with: " << res1.error();
+			if (res1) { MODM_LOG_INFO << " " << *res1 << modm::endl; }
+
+			res2 = PT_CALL(node1.request<uint8_t, uint8_t>(3, 2, counter));
+			MODM_LOG_INFO << "Node3 responded with: " << res2.error();
+			if (res2.hasUserError()) {
+				MODM_LOG_INFO << " " << *res2.userError() << modm::endl;
+			}
+		}
+
+		PT_END();
+	}
+}
+thread;
+
 // ----------------------------------------------------------------------------
 int
 main()
@@ -95,37 +132,12 @@ main()
 	USART4->CR3 = USART_CR3_HDSEL;
 	USART4->CR1 |= USART_CR1_UE;
 
-
-	modm::ShortPeriodicTimer tmr{1s};
-	uint32_t counter{0};
-
 	while (true)
 	{
 		node1.update();
 		node2.update();
 		node3.update();
-
-		if (tmr.execute())
-		{
-			LedD13::toggle();
-			node1.broadcast(1, counter++);
-			node3.broadcast(2);
-
-			{
-				modm::ResumableResult< Result<uint8_t> > res{0};
-				while((res = node2.request<uint8_t>(1, 1)).getState() == modm::rf::Running)
-				{ node1.update(); node2.update(); node3.update(); }
-				MODM_LOG_INFO << "Node1 responded with: " << res.getResult().error();
-				MODM_LOG_INFO << " " << *res.getResult().result() << modm::endl;
-			}
-			{
-				modm::ResumableResult< Result<uint8_t, uint8_t> > res{0};
-				while((res = node1.request<uint8_t, uint8_t>(3, 2, counter)).getState() == modm::rf::Running)
-				{ node1.update(); node2.update(); node3.update(); }
-				MODM_LOG_INFO << "Node3 responded with: " << res.getResult().error();
-				MODM_LOG_INFO << " " << *res.getResult().resultError() << modm::endl;
-			}
-		}
+		thread.update();
 	}
 
 	return 0;

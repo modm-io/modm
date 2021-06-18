@@ -68,6 +68,7 @@ AmnbNodeTest::testRequest()
 		{ micro_clock::setTime(ii); milli_clock::setTime(ii/1000); node.update(); }
 
 		TEST_ASSERT_EQUALS(res.getResult().error(), Error::RequestTimeout);
+		TEST_ASSERT_FALSE(bool(res.getResult()));
 		TEST_ASSERT_EQUALS(SharedMedium::tx_count, 6u);
 		TEST_ASSERT_EQUALS(SharedMedium::rx_count, 12u);
 	}
@@ -81,6 +82,7 @@ AmnbNodeTest::testRequest()
 		{ micro_clock::setTime(ii); milli_clock::setTime(ii/1000); node.update(); }
 
 		TEST_ASSERT_EQUALS(res.getResult().error(), Error::ResponseAllocationFailed);
+		TEST_ASSERT_FALSE(bool(res.getResult()));
 
 		TEST_ASSERT_EQUALS(SharedMedium::tx_count, 6u);
 		TEST_ASSERT_EQUALS(SharedMedium::rx_count, 13u);
@@ -95,7 +97,8 @@ AmnbNodeTest::testRequest()
 		{ micro_clock::setTime(ii); milli_clock::setTime(ii/1000); node.update(); }
 
 		TEST_ASSERT_EQUALS(res.getResult().error(), Error::UserError);
-		TEST_ASSERT_EQUALS(*res.getResult().resultError(), 0x07u);
+		TEST_ASSERT_FALSE(bool(res.getResult()));
+		TEST_ASSERT_EQUALS(*res.getResult().userError(), 0x07u);
 
 		TEST_ASSERT_EQUALS(SharedMedium::tx_count, 7u);
 		TEST_ASSERT_EQUALS(SharedMedium::rx_count, 14u);
@@ -116,7 +119,9 @@ AmnbNodeTest::testRequest()
 		{ micro_clock::setTime(ii); milli_clock::setTime(ii/1000); node.update(); }
 
 		TEST_ASSERT_EQUALS(res.getResult().error(), Error::Ok);
+		TEST_ASSERT_TRUE(bool(res.getResult()));
 		TEST_ASSERT_EQUALS(*res.getResult().result(), 0x07060504ul);
+		TEST_ASSERT_EQUALS(*res.getResult(), 0x07060504ul);
 
 		TEST_ASSERT_EQUALS(SharedMedium::tx_count, 10u);
 		TEST_ASSERT_EQUALS(SharedMedium::rx_count, 32u);
