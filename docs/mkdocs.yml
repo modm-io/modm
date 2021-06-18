@@ -40,7 +40,7 @@ theme:
   # logo: '../images/logo.svg'
   font:
     text: 'Ubuntu'
-    code: 'Ubuntu Mono'
+    code: 'Roboto Mono'
   language: en
   feature:
     tabs: true
