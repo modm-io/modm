@@ -187,6 +187,7 @@ class TinyUsbDeviceModule(Module):
 Configuration options:
 
 - `CFG_TUD_ENDPOINT0_SIZE` = 64
+- `CFG_TUD_EP_MAX` = 9
 - `CFG_TUD_TASK_QUEUE_SZ` = 16
 """
 
@@ -215,6 +216,7 @@ Configuration options:
 
 - `CFG_TUH_EP_MAX` = 9
 - `CFG_TUH_TASK_QUEUE_SZ` = 16
+- `CFG_TUH_ENUMERATION_BUFSZIE` [sic] = 256
 """
 
     def prepare(self, module, options):
@@ -234,40 +236,12 @@ Configuration options:
 
 
 # -----------------------------------------------------------------------------
+# Only contains those configurations that this modules can generate a descriptor for
 tu_config_descr = {"device": {
-    "audio": """
-- `CFG_TUD_AUDIO_CTRL_BUF_SIZE` = [undef]
-- `CFG_TUD_AUDIO_ENABLE_FEEDBACK_EP` = 0
-- `CFG_TUD_AUDIO_EPSIZE_IN` = 0
-- `CFG_TUD_AUDIO_EPSIZE_OUT` = 0
-- `CFG_TUD_AUDIO_FORMAT_TYPE_I_RX` = `AUDIO_DATA_FORMAT_TYPE_I_PCM`
-- `CFG_TUD_AUDIO_FORMAT_TYPE_I_TX` = `AUDIO_DATA_FORMAT_TYPE_I_PCM`
-- `CFG_TUD_AUDIO_FORMAT_TYPE_RX` = `AUDIO_FORMAT_TYPE_UNDEFINED`
-- `CFG_TUD_AUDIO_FORMAT_TYPE_TX` = `AUDIO_FORMAT_TYPE_UNDEFINED`
-- `CFG_TUD_AUDIO_INT_CTR_BUFSIZE` = 6
-- `CFG_TUD_AUDIO_INT_CTR_EPSIZE_IN` = 0
-- `CFG_TUD_AUDIO_N_AS_INT` = 0
-- `CFG_TUD_AUDIO_N_BYTES_PER_SAMPLE_RX` = 1
-- `CFG_TUD_AUDIO_N_BYTES_PER_SAMPLE_TX` = 1
-- `CFG_TUD_AUDIO_N_CHANNELS_RX` = 1
-- `CFG_TUD_AUDIO_N_CHANNELS_TX` = 1
-- `CFG_TUD_AUDIO_RX_FIFO_COUNT` = `CFG_TUD_AUDIO_N_CHANNELS_RX`
-- `CFG_TUD_AUDIO_RX_FIFO_SIZE` = 0
-- `CFG_TUD_AUDIO_TX_FIFO_COUNT` = `CFG_TUD_AUDIO_N_CHANNELS_TX`
-- `CFG_TUD_AUDIO_TX_FIFO_SIZE` = 0
-""",
-    "bth": """
-- `CFG_TUD_BTH_DATA_EPSIZE` = 64
-- `CFG_TUD_BTH_EVENT_EPSIZE` = 16
-- `CFG_TUD_BTH_ISO_ALT_COUNT` = 0
-""",
     "cdc": """
 - `CFG_TUD_CDC_EP_BUFSIZE` = 64/512 (fs/hs)
 - `CFG_TUD_CDC_RX_BUFSIZE` = [undef] modm default: 512
 - `CFG_TUD_CDC_TX_BUFSIZE` = [undef] modm default: 512
-""",
-    "hid": """
-- `CFG_TUD_HID_EP_BUFSIZE` = 16
 """,
     "midi": """
 - `CFG_TUD_MIDI_EP_BUFSIZE` = 64/512 (fs/hs)
@@ -277,23 +251,13 @@ tu_config_descr = {"device": {
     "msc": """
 - `CFG_TUD_MSC_EP_BUFSIZE` = [undef] modm default: 512
 """,
-    "net": """
-- `CFG_TUD_NET_ENDPOINT_SIZE` = 64/512 (fs/hs)
-- `CFG_TUD_NET_MTU` = 1514
-""",
-    "usbtmc": """
-- `CFG_TUD_USBTMC_ENABLE_488` = 1
-""",
     "vendor": """
 - `CFG_TUD_VENDOR_EPSIZE` = 64
 - `CFG_TUD_VENDOR_RX_BUFSIZE` = [undef] modm default: 64/512 (fs/hs)
 - `CFG_TUD_VENDOR_TX_BUFSIZE` = [undef] modm default: 64/512 (fs/hs)
 """
-}, "host": {
-    "msc": """
-- `CFG_TUH_MSC_MAXLUN` = 4
-"""
-}}
+}
+}
 class TinyUsbClassModule(Module):
     def __init__(self, path, mode):
         self.mode = mode
@@ -302,8 +266,9 @@ class TinyUsbClassModule(Module):
     def init(self, module):
         module.name = ":tinyusb:{}:{}".format(self.mode, self.name)
         descr = "# {} class {}".format(self.mode.capitalize(), self.name.upper())
-        conf = tu_config_descr[self.mode].get(self.name, "")
+        conf = tu_config_descr.get(self.mode, {}).get(self.name, "")
         if conf: descr += "\n\nConfiguration options:\n" + conf
+        else: descr += "\n\nPlease consult the TinyUSB docs for configuration options.\n"
         module.description = descr
 
     def prepare(self, module, options):

@@ -74,8 +74,8 @@ manually depend on the device classes you want to implement:
 ```
 
 Some of these classes require a lot of configuration that you must provide via
-the `<tusb_config_local.h>` file. See the class module descriptions for these
-configurations and consult the TinyUSB documentation for their purpose.
+the `<tusb_config_local.h>` file. Please consult the TinyUSB documentation and
+examples for their purpose.
 
 
 ## Initializing USB
@@ -97,7 +97,8 @@ USB_OTG_FS->GCCFG |= USB_OTG_GCCFG_VBDEN;
 ```
 
 Note that depending on your specific hardware setup, you may need to fiddle
-around to find the right VBus sensing mechanism.
+around to find the right VBus sensing mechanism. Please look at the TinyUSB
+board definitions and examples for inspiration.
 
 !!! warning "USB shares resources with CAN"
 	Note that on STM32F1 and STM32F3 the USB interrupts and RAM are shared with CAN,
