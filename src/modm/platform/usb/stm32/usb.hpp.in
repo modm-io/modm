@@ -28,6 +28,11 @@ public:
 	initialize(uint8_t priority=3)
 	{
 		static_assert(SystemClock::Usb == 48_MHz, "{{ name }} must have a 48MHz clock!");
+%% if target.family in ["g0", "l4", "l5"]
+#ifdef PWR_CR2_USV
+		PWR->CR2 |= PWR_CR2_USV;
+#endif
+%% endif
 		Rcc::enable<Peripheral::{{ peripheral }}>();
 %% if is_remap
 		SYSCFG->CFGR1 |= SYSCFG_CFGR1_USB_IT_RMP;

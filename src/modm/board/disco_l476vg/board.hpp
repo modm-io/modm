@@ -1,7 +1,7 @@
 // coding: utf-8
 /*
  * Copyright (c) 2017, Sascha Schade
- * Copyright (c) 2017-2018, Niklas Hauser
+ * Copyright (c) 2017-2018, 2021, Niklas Hauser
  * Copyright (c) 2018, Antal Szabó
  *
  * This file is part of the modm project.
@@ -17,24 +17,24 @@
 
 #include <modm/platform.hpp>
 #include <modm/architecture/interface/clock.hpp>
-// #include <modm/driver/inertial/lis3dsh.hpp>
 
 using namespace modm::platform;
 
 /// @ingroup modm_board_disco_l476vg
 namespace Board
 {
-	using namespace modm::literals;
+using namespace modm::literals;
 
-/// STM32L4 running at 48MHz generated from the
-/// internal Multispeed oscillator
-
-// Dummy clock for devices
-struct SystemClock {
-	static constexpr uint32_t Frequency = 48_MHz;
+/// STM32L4 running at 80MHz generated from the
+/// Internal Multispeed Oscillator
+struct SystemClock
+{
+	static constexpr uint32_t Frequency = 80_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency;
 	static constexpr uint32_t Apb2 = Frequency;
+
+	static constexpr uint32_t Usb = 48_MHz;
 
 	static constexpr uint32_t Usart1 = Apb2;
 
@@ -49,23 +49,33 @@ struct SystemClock {
 		// set flash latency first because system already runs from MSI
 		Rcc::setFlashLatency<Frequency>();
 
+		Rcc::enableLowSpeedExternalCrystal();
+		// // Disable the LSE Clock Security System
+		RCC->BDCR &= ~RCC_BDCR_LSECSSON;
+
 		Rcc::enableMultiSpeedInternalClock(Rcc::MsiFrequency::MHz48);
 
-		// Rcc::enablePll(
-		// 	Rcc::PllSource::MultiSpeedInternalClock,
-		// 	1,	// 4MHz / N=1 -> 4MHz
-		// 	16,	// 4MHz * M=16 -> 64MHz <= 344MHz = PLL VCO output max, >= 64 MHz = PLL VCO out min
-		// 	1,	// 64MHz / P=1 -> 64MHz = F_cpu
-		// 	2	// 64MHz / Q=2 -> 32MHz = F_usb
-		// );
+		const Rcc::PllFactors pllFactors{
+			.pllM = 6,	// 48MHz / M=6 -> 8MHz
+			.pllN = 40,	// 8MHz * N=40 -> 320MHz <= 344MHz = PLL VCO output max, >= 64 MHz = PLL VCO out min
+			.pllR = 4,	// 320MHz / R=4 -> 80MHz = F_cpu
+			.pllQ = 4	// 320MHz / Q=4 -> 80MHz
+		};
+		Rcc::enablePll(Rcc::PllSource::MultiSpeedInternalClock, pllFactors);
 		// switch system clock to PLL output
-		// Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
-		// Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
-		// APB1 has max. 50MHz
-		// Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div2);
-		// Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div1);
+		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
+		// all max. 80MHz
+		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
+		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div1);
+		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div1);
 		// update frequencies for busy-wait delay functions
 		Rcc::updateCoreFrequency<Frequency>();
+
+		// Enable MSI Auto-calibration through LSE
+		RCC->CR |= RCC_CR_MSIPLLEN;
+
+		// Choose MSI48 for USB
+		RCC->CCIPR |= RCC_CCIPR_CLK48SEL;
 
 		return true;
 	}
@@ -75,10 +85,10 @@ using Button = GpioInputA0;
 
 namespace Joystick
 {
-	using Left  = GpioInputA1;
-	using Right = GpioInputA2;
-	using Up    = GpioInputA3;
-	using Down  = GpioInputA5;
+using Left  = GpioInputA1;
+using Right = GpioInputA2;
+using Up    = GpioInputA3;
+using Down  = GpioInputA5;
 }
 
 using LedRed   = GpioOutputB2;	// User LED 4
@@ -86,6 +96,16 @@ using LedGreen = GpioOutputE8;	// User LED 5
 
 using Leds = SoftwareGpioPort< LedRed, LedGreen >;
 
+namespace usb
+{
+using Overcurrent = GpioInputC10;	// OTG_FS_OverCurrent
+using Vbus = GpioInputA9; // default PC11 if SB24 open
+using Id = GpioA10; // default PC12 if SB25 left open
+using Dm = GpioA11;
+using Dp = GpioA12;
+
+using Device = UsbFs;
+}
 
 inline void
 initialize()
@@ -100,6 +120,20 @@ initialize()
 	Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);
 	Button::enableExternalInterrupt();
 //	Button::enableExternalInterruptVector(12);
+}
+
+/// You must take out the LCD screen and close SB24 and SB25 for USB to work
+inline void
+initializeUsbFs()
+{
+	usb::Device::initialize<SystemClock>();
+	usb::Device::connect<usb::Dm::Dm, usb::Dp::Dp, usb::Id::Id>();
+
+	usb::Overcurrent::setInput();
+	usb::Vbus::setInput();
+
+	// Enable VBUS sense (B device) via pin PA9
+	USB_OTG_FS->GCCFG |= USB_OTG_GCCFG_VBDEN;
 }
 
 }

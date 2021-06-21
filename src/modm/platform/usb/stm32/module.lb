@@ -64,6 +64,7 @@ def generate_instance(env, port, otg=False):
         "is_otg": otg,
         "is_remap": irq_data["is_remap"],
         "irqs": irq_data["port_irqs"][port],
+        "target": env[":target"].identifier,
     }
     if otg:
         env.template("usb.hpp.in", "usb_{}.hpp".format(port))
