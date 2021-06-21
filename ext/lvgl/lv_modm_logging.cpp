@@ -12,31 +12,10 @@
 #include <modm/debug/logger.hpp>
 
 #if LV_USE_LOG
-static void _lv_modm_logging_callback(lv_log_level_t level, const char * file, uint32_t line, const char * fn_name, const char * dsc)
-{
-    switch (level)
-    {
-    case LV_LOG_LEVEL_ERROR:
-        MODM_LOG_ERROR << "LVGL(" << file << ":" << line << ") " << fn_name << ": " << dsc << modm::endl;
-        break;
-    case LV_LOG_LEVEL_WARN:
-        MODM_LOG_WARNING << "LVGL(" << file << ":" << line << ") " << fn_name << ": " << dsc << modm::endl;
-        break;
-    case LV_LOG_LEVEL_INFO:
-        MODM_LOG_INFO << "LVGL(" << file << ":" << line << ") " << fn_name << ": " << dsc << modm::endl;
-        break;
-    case LV_LOG_LEVEL_TRACE:
-        MODM_LOG_DEBUG << "LVGL(" << file << ":" << line << ") " << fn_name << ": " << dsc << modm::endl;
-        break;
-    default:
-        break;
-    }
-}
-
 __attribute__((constructor))
 static void lv_register_modm_logging()
 {
 	// register modm logging callback with LVGL
-	lv_log_register_print_cb(_lv_modm_logging_callback);
+	lv_log_register_print_cb([](const char *buffer) { MODM_LOG_INFO << buffer; });
 }
 #endif

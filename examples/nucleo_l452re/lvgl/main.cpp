@@ -62,11 +62,11 @@ namespace touch
 modm::Touch2046<touch::Spi, touch::Cs> touchController;
 
 
-static lv_disp_buf_t disp_buf;
+static lv_disp_draw_buf_t disp_buf;
 static constexpr size_t buf_size = LV_HOR_RES_MAX * LV_VER_RES_MAX / 8;
 static lv_color_t buf[buf_size];
 
-bool my_touchpad_read(lv_indev_drv_t*, lv_indev_data_t* data)
+void my_touchpad_read(lv_indev_drv_t*, lv_indev_data_t* data)
 {
 	data->state = RF_CALL_BLOCKING(touchController.isTouched()) ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
 	if(data->state == LV_INDEV_STATE_PR) {
@@ -74,7 +74,6 @@ bool my_touchpad_read(lv_indev_drv_t*, lv_indev_data_t* data)
 		data->point.x = std::get<0>(xy);
 		data->point.y = std::get<1>(xy);
 	}
-	return false;
 }
 
 void my_flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
@@ -122,17 +121,16 @@ main()
 	lv_init();
 
 	// Initialize the display buffer
-	lv_disp_buf_init(&disp_buf, buf, NULL, buf_size);
+	lv_disp_draw_buf_init(&disp_buf, buf, NULL, buf_size);
 
 	// Initialize the display:
 	lv_disp_drv_t disp_drv;
 	lv_disp_drv_init(&disp_drv);
-	disp_drv.buffer = &disp_buf;
+	disp_drv.draw_buf = &disp_buf;
 	disp_drv.flush_cb = my_flush_cb;
 	disp_drv.hor_res = LV_HOR_RES_MAX;
 	disp_drv.ver_res = LV_VER_RES_MAX;
-	lv_disp_t * disp;
-	disp = lv_disp_drv_register(&disp_drv);
+	lv_disp_t *disp = lv_disp_drv_register(&disp_drv);
 
 	// Initialize touchscreen driver:
 	lv_indev_drv_t indev_drv;
@@ -143,27 +141,25 @@ main()
 
 	lv_obj_t* scr = lv_disp_get_scr_act(disp); // Get the current screen
 
-	lv_obj_t* labelA =  lv_label_create(scr, NULL);
+	lv_obj_t* labelA =  lv_label_create(scr);
 	lv_label_set_text(labelA, "Hello world!");
 	lv_obj_set_pos(labelA, 60, 10);
 	lv_obj_set_size(labelA, 120, 50);
 
-	lv_obj_t* btn = lv_btn_create(lv_scr_act(), NULL);
+	lv_obj_t* btn = lv_btn_create(lv_scr_act());
 	lv_obj_set_pos(btn, 60, 135);
 	lv_obj_set_size(btn, 120, 50);
-	lv_obj_t* btnLabel = lv_label_create(btn, NULL);
+	lv_obj_t* btnLabel = lv_label_create(btn);
 	lv_label_set_text(btnLabel, "Button");
-	lv_obj_set_event_cb(btn, [](struct _lv_obj_t * obj, lv_event_t event) {
+	lv_obj_add_event_cb(btn, [](lv_event_t *event) {
 		static uint16_t btnCounter = 0;
-		if(event == LV_EVENT_PRESSED) {
-			lv_label_set_text_fmt(lv_obj_get_child(obj, NULL), "Button: %d", ++btnCounter);
-		}
-	});
+		lv_label_set_text_fmt(lv_obj_get_child(event->target, 0), "Button: %d", ++btnCounter);
+	}, LV_EVENT_PRESSED, NULL);
 
-	lv_obj_t* labelB =  lv_label_create(scr, NULL);
+	lv_obj_t* labelB =  lv_label_create(scr);
 	lv_label_set_text(labelB, "Big Font");
 	lv_obj_set_pos(labelB, 40, 260);
-	lv_obj_set_style_local_text_font(labelB, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &lv_font_montserrat_36);
+	lv_obj_set_style_text_font(labelB, &lv_font_montserrat_36, LV_PART_MAIN);
 
 	uint16_t counter = 0;
 

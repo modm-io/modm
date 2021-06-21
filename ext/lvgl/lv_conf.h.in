@@ -1,11 +1,10 @@
 /**
  * @file lv_conf.h
- * Configuration file for v7.11.0
+ * Configuration file for v8.0.1
  */
 
 #ifndef LV_CONF_H
 #define LV_CONF_H
-/* clang-format off */
 
 #include <stdint.h>
 
@@ -28,6 +27,9 @@ typedef int16_t lv_coord_t;
 /* 1: use custom malloc/free, 0: use the built-in `lv_mem_alloc` and `lv_mem_free` */
 #define LV_MEM_CUSTOM  1
 
+/*Use the standard `memcpy` and `memset` instead of LVGL's own functions. (Might or might not be faster).*/
+#define LV_MEMCPY_MEMSET_STD  1
+
 /*===================
  *  HAL settings
  *==================*/
@@ -47,7 +49,5 @@ typedef int16_t lv_coord_t;
 /* 1: Print the log with 'printf';
  * 0: user need to register a callback with `lv_log_register_print_cb`*/
 #define LV_LOG_PRINTF  0
-
-/*--END OF LV_CONF_H--*/
 
 #endif /*LV_CONF_H*/

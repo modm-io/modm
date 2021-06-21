@@ -27,14 +27,14 @@ using namespace modm::literals;
 
 
 static uint16_t* displayBuffer;
-static lv_disp_buf_t disp_buf;
+static lv_disp_draw_buf_t disp_buf;
 static lv_color_t* buf;
 static constexpr size_t buf_size = LV_HOR_RES_MAX * LV_VER_RES_MAX;
 
 Touch::Data touchData;
 Touch touch{touchData};
 
-bool my_touchpad_read(lv_indev_drv_t*, lv_indev_data_t* data)
+void my_touchpad_read(lv_indev_drv_t*, lv_indev_data_t* data)
 {
 	RF_CALL_BLOCKING(touch.readTouches());
 	Touch::touch_t tp;
@@ -46,7 +46,6 @@ bool my_touchpad_read(lv_indev_drv_t*, lv_indev_data_t* data)
 		data->point.x = x;
 		data->point.y = y;
 	}
-	return false;
 }
 
 void my_flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
@@ -81,17 +80,16 @@ main()
 	setDisplayBuffer(displayBuffer);
 
 	// Initialize the display buffer
-	lv_disp_buf_init(&disp_buf, buf, NULL, buf_size);
+	lv_disp_draw_buf_init(&disp_buf, buf, NULL, buf_size);
 
 	// Initialize the display:
 	lv_disp_drv_t disp_drv;
 	lv_disp_drv_init(&disp_drv);
-	disp_drv.buffer = &disp_buf;
+	disp_drv.draw_buf = &disp_buf;
 	disp_drv.flush_cb = my_flush_cb;
 	disp_drv.hor_res = LV_HOR_RES_MAX;
 	disp_drv.ver_res = LV_VER_RES_MAX;
-	lv_disp_t * disp;
-	disp = lv_disp_drv_register(&disp_drv);
+	lv_disp_t *disp = lv_disp_drv_register(&disp_drv);
 
 	// Initialize touchscreen driver:
 	lv_indev_drv_t indev_drv;
@@ -102,22 +100,20 @@ main()
 
 	lv_obj_t* scr = lv_disp_get_scr_act(disp); // Get the current screen
 
-	lv_obj_t* labelA =  lv_label_create(scr, NULL);
+	lv_obj_t* labelA =  lv_label_create(scr);
 	lv_label_set_text(labelA, "Hello world!");
 	lv_obj_set_pos(labelA, 10, 10);
 	lv_obj_set_size(labelA, 120, 50);
 
-	lv_obj_t* btn2 = lv_btn_create(lv_scr_act(), NULL);
+	lv_obj_t* btn2 = lv_btn_create(lv_scr_act());
 	lv_obj_set_pos(btn2, 140, 10);
 	lv_obj_set_size(btn2, 120, 50);
-	lv_obj_t* label2 = lv_label_create(btn2, NULL);
+	lv_obj_t* label2 = lv_label_create(btn2);
 	lv_label_set_text(label2, "Button2");
-	lv_obj_set_event_cb(btn2, [](struct _lv_obj_t * obj, lv_event_t event) {
+	lv_obj_add_event_cb(btn2, [](lv_event_t *event) {
 		static uint16_t btn2Counter = 0;
-		if(event == LV_EVENT_PRESSED) {
-			lv_label_set_text_fmt(lv_obj_get_child(obj, NULL), "Button 2: %d", ++btn2Counter);
-		}
-	});
+		lv_label_set_text_fmt(lv_obj_get_child(event->target, 0), "Button 2: %d", ++btn2Counter);
+	}, LV_EVENT_PRESSED, NULL);
 
 	uint16_t counter = 0;
 
