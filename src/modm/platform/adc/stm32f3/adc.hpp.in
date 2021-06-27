@@ -527,7 +527,7 @@ FIXME!!!!!!
 			, modm::platform::Adc{{ id }}::ClockSource clk_src = modm::platform::Adc{{ id }}::ClockSource::SystemClock
 			>
 	static void
-	initialize();
+	initialize(bool blocking = true);
 
 	static inline void
 	disable(const bool blocking = true);

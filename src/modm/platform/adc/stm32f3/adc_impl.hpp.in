@@ -28,7 +28,7 @@ template< class SystemClock
           , modm::platform::Adc{{ id }}::ClockSource clk_src
 		  >
 void
-modm::platform::Adc{{ id }}::initialize()
+modm::platform::Adc{{ id }}::initialize(bool blocking)
 //		const Prescaler pre,
 //		const CalibrationMode cal, const bool blocking)
 {
@@ -38,7 +38,7 @@ modm::platform::Adc{{ id }}::initialize()
 %% if target["family"] in ["f3", "g4"]
 	RCC->{{ ahb }}ENR |= RCC_{{ ahb }}ENR_ADC{{ id_common }}EN;
 %% elif target["family"] in ["l4"]
-	Rcc::enable<Peripheral::Adc{{ id }}>();
+	Rcc::enable<Peripheral::Adc1>();
 %% endif
 
 %% if clock_mux
@@ -55,25 +55,14 @@ modm::platform::Adc{{ id }}::initialize()
 	// FIXME: not a good idea since you can only reset both
 	// ADC1/ADC2 or ADC3/ADC4 at once ....
 
-	if constexpr (clk != ClockMode::DoNotChange) {
-		// TODO...
-		ADC{{ id_common_u }}->CCR = (ADC{{ id_common_u }}->CCR & ~{{ adc_ccr }}_CKMODE_Msk) | static_cast<uint32_t>(clk);
-	}
-
-	/*
-	OLD INTERFACE: prescaler manually supplied as function parameter
 	// set ADC "analog" clock source
 	if (clk != ClockMode::DoNotChange) {
 		if (clk == ClockMode::Asynchronous) {
-			setPrescaler(pre);
+			// FIXME
+			// compute and set prescaler
 		}
-		tmp  =  ADC{{ id_common_u }}->CCR;
-		tmp &= ~{{ adc_ccr }}_CKMODE_Msk;
-		tmp |=  static_cast<uint32_t>(clk);
-		ADC{{ id_common_u }}->CCR = tmp;
-		//ADC{{ id_common_u }}->CCR = (ADC{{ id_common_u }}->CCR & ~{{ adc_ccr }}_CKMODE_Msk) | static_cast<uint32_t>(clk);
+		ADC{{ id_common_u }}->CCR = (ADC{{ id_common_u }}->CCR & ~{{ adc_ccr }}_CKMODE_Msk) | static_cast<uint32_t>(clk);
 	}
-	*/
 
 	// enable regulator
 	ADC{{ id }}->CR &= ~ADC_CR_ADVREGEN;
@@ -83,7 +72,7 @@ modm::platform::Adc{{ id }}::initialize()
 	acknowledgeInterruptFlag(InterruptFlag::Ready);
 
 	ADC{{ id }}->CR |= ADC_CR_ADEN;
-	if (true) {
+	if (blocking) {
 		// ADEN can only be set 4 ADC clock cycles after ADC_CR_ADCAL gets
 		// cleared. Setting it in a loop ensures the flag gets set for ADC
 		// clocks slower than the CPU clock.
