@@ -142,7 +142,7 @@ public:
 		PllSai2 = RCC_CCIPR_ADCSEL_1, // PLLSAI2 "R" clock (PLLADC2CLK) selected as ADCs clock
 		SystemClock = RCC_CCIPR_ADCSEL_1 | RCC_CCIPR_ADCSEL_0, // System clock selected as ADCs clock
  %% endif
-%%elif
+%% else
 		Default, // F3 has no clock_mux
 %% endif
 	};

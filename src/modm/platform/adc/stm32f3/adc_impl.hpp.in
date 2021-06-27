@@ -19,6 +19,7 @@
 #include <modm/architecture/interface/delay.hpp>	// modm::delayMicroseconds
 #include <modm/platform/clock/rcc.hpp>
 #include <modm/math/algorithm/enumerate.hpp>
+#include <modm/math/algorithm/prescaler.hpp>
 
 template< class SystemClock
           , modm::frequency_t frequency
@@ -54,6 +55,13 @@ modm::platform::Adc{{ id }}::initialize()
 	// FIXME: not a good idea since you can only reset both
 	// ADC1/ADC2 or ADC3/ADC4 at once ....
 
+	if constexpr (clk != ClockMode::DoNotChange) {
+		// TODO...
+		ADC{{ id_common_u }}->CCR = (ADC{{ id_common_u }}->CCR & ~{{ adc_ccr }}_CKMODE_Msk) | static_cast<uint32_t>(clk);
+	}
+
+	/*
+	OLD INTERFACE: prescaler manually supplied as function parameter
 	// set ADC "analog" clock source
 	if (clk != ClockMode::DoNotChange) {
 		if (clk == ClockMode::Asynchronous) {
@@ -65,6 +73,7 @@ modm::platform::Adc{{ id }}::initialize()
 		ADC{{ id_common_u }}->CCR = tmp;
 		//ADC{{ id_common_u }}->CCR = (ADC{{ id_common_u }}->CCR & ~{{ adc_ccr }}_CKMODE_Msk) | static_cast<uint32_t>(clk);
 	}
+	*/
 
 	// enable regulator
 	ADC{{ id }}->CR &= ~ADC_CR_ADVREGEN;
@@ -74,7 +83,7 @@ modm::platform::Adc{{ id }}::initialize()
 	acknowledgeInterruptFlag(InterruptFlag::Ready);
 
 	ADC{{ id }}->CR |= ADC_CR_ADEN;
-	if (blocking) {
+	if (true) {
 		// ADEN can only be set 4 ADC clock cycles after ADC_CR_ADCAL gets
 		// cleared. Setting it in a loop ensures the flag gets set for ADC
 		// clocks slower than the CPU clock.
