@@ -24,7 +24,7 @@ main()
 	MODM_LOG_INFO << "Configuring ADC ...";
 	// max. ADC clock for STM32G474: 60 MHz
 	// 170 MHz AHB clock / 4 = 42.5 MHz
-	Adc1::initialize<Board::SystemClock, 10_MHz, 10_pct, Adc1::ClockMode::SynchronousPrescaler4,
+	Adc1::initialize<Board::SystemClock, 0_MHz, 0_pct, Adc1::ClockMode::SynchronousPrescaler4,
 					 Adc1::ClockSource::SystemClock>();
 	// Adc1::initialize(
 	// 	Adc1::ClockMode::SynchronousPrescaler4,
@@ -38,7 +38,7 @@ main()
 	while (true)
 	{
 		Adc1::startConversion();
-		while(!Adc1::isConversionFinished)
+		while(!Adc1::isConversionFinished())
 			;
 		int adcValue = Adc1::getValue();
 		MODM_LOG_INFO << "adcValue=" << adcValue;

@@ -147,7 +147,20 @@ modm::platform::Adc{{ id }}::setLeftAdjustResult(const bool enable)
 	}
 }
 
-bool
+inline bool
+modm::platform::Adc{{ id }}::setChannel(const Channel channel, const SampleTime sampleTime)
+{
+	sqr1 = 0;
+	setSequenceChannel(0, channel);
+	setChannelSampleTime(channel, sampleTime);
+
+	// Write SQRx registers
+	ADC{{ id }}->SQR1 = sqr1;
+
+	return true;
+}
+
+inline bool
 modm::platform::Adc{{ id }}::setChannel(const std::span<const Channel> channels)
 {
 	if(channels.size() >= maxSequenceLength) {
@@ -199,7 +212,7 @@ modm::platform::Adc{{ id }}::setInjectedChannel(const std::span<const Channel> c
 }
 
 
-bool
+inline bool
 modm::platform::Adc{{ id }}::setSequenceChannel(const int index, const Channel channel)
 {
 	if(static_cast<uint8_t>(channel) > 18) {

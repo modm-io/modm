@@ -586,11 +586,7 @@ FIXME!!!!!!
 	 */
 	static inline bool
 	setChannel(const Channel channel,
-			const SampleTime sampleTime=static_cast<SampleTime>(0b000))
-	{
-		return setSequenceChannel(0, channel)
-			&& setChannelSampleTime(channel, sampleTime);
-	}
+			const SampleTime sampleTime=static_cast<SampleTime>(0b000));
 
 	/**
 	 * Analog channel selection.
