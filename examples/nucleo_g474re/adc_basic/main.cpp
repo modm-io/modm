@@ -26,12 +26,7 @@ main()
 	// 170 MHz AHB clock / 4 = 42.5 MHz
 	Adc1::initialize<Board::SystemClock, 0_MHz, 0_pct, Adc1::ClockMode::SynchronousPrescaler4,
 					 Adc1::ClockSource::SystemClock>();
-	// Adc1::initialize(
-	// 	Adc1::ClockMode::SynchronousPrescaler4,
-	// 	Adc1::ClockSource::SystemClock,
-	// 	Adc1::Prescaler::Disabled,
-	// 	Adc1::CalibrationMode::SingleEndedInputsMode,
-	// 	true);
+
 	Adc1::connect<GpioA0::In1>();
 	Adc1::setPinChannel<GpioA0>(Adc1::SampleTime::Cycles13);
 
