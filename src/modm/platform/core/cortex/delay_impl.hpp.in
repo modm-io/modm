@@ -32,10 +32,7 @@ namespace platform
 extern uint16_t delay_ns_per_loop;
 extern uint16_t delay_fcpu_MHz;
 
-constexpr uint8_t delay_fcpu_MHz_shift{3};
-// 400 MHz is the maximum for binary scaling
-static_assert(400 * (1ul << delay_fcpu_MHz_shift) < 65535);
-
+constexpr uint8_t delay_fcpu_MHz_shift({{us_shift}});
 constexpr uint16_t computeDelayMhz(uint32_t hz)
 { return std::round(hz / 1'000'000.f * (1ul << delay_fcpu_MHz_shift)); }
 }

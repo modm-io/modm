@@ -300,8 +300,8 @@ def build(env):
     if env.has_module(":architecture:delay"):
         if not env.substitutions["core"].startswith("cortex-m0"):
             env.template("delay.cpp.in")
-        env.template("delay_impl.hpp.in")
-        # Must be done by :platform:core module due to 'loop' knowledge
+        # Must be done by :platform:core module due to tuning
+        # env.template("delay_impl.hpp.in")
         # env.template("delay_ns.hpp.in")
         # env.template("delay_ns.cpp.in")
 
