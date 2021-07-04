@@ -28,12 +28,8 @@ delay_ns(uint32_t ns)
 		const uint32_t cycles = uint32_t(ceil(fabs((F_CPU * double(ns)) / 1e9)));
 		__builtin_avr_delay_cycles(cycles);
 	}) : ({
-		const auto _ns = uint16_t(ns);
-		// overhead of checking + loop setup is ~5-10 instructions
-		if (_ns < uint16_t(7*3e9/F_CPU)) return; // if below, don't bother
-		// 3 cycles per loop => ns per loop = 3e9/F_CPU, round up to next power of two
-		const uint8_t loops = uint16_t(ns) >> {{ shift }};
-		if (loops) _delay_loop_1(loops);
+		const uint16_t loops = ns >> {{ shift }};
+		if (loops) _delay_loop_2(loops);
 	});
 }
 modm_always_inline void
@@ -46,12 +42,12 @@ delay_us(uint32_t us)
 	}) : ({
 %% if f_cpu <= 6000000
 		constexpr int32_t cycles = (F_CPU / 1e6);
-		for (int16_t _us = us; _us > 0; _us -= cycles)
+		for (int32_t _us = us; _us > 0; _us -= cycles)
 			__builtin_avr_delay_cycles(1);
 %% else
 		constexpr int32_t cycles = (F_CPU / 1e6) - 6;
-		for (uint16_t _us = us; _us; _us--)
-			__builtin_avr_delay_cycles(cycles > 0 ? cycles : 0);
+		for (uint32_t _us = us; _us; _us--)
+			__builtin_avr_delay_cycles(cycles);
 %% endif
 	});
 }

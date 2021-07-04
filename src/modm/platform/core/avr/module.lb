@@ -41,7 +41,7 @@ def build(env):
         "target": target.identifier,
         "core": target.get_driver("core")["type"],
         "f_cpu": env["f_cpu"],
-        "shift": int(3e9/env["f_cpu"]).bit_length() - 1,
+        "shift": int(4e9/env["f_cpu"]).bit_length(),
     }
     env.outbasepath = "modm/src/modm/platform/core"
 
