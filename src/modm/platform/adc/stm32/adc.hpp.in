@@ -286,10 +286,15 @@ public:
 	setRightAdjustResult();
 	// stop documentation inherited
 
-	// TODO
-	//static void
-	//calibrate();
-
+%% if target["family"] == "f1"
+	/**
+	 * Run ADC self-calibration
+	 *
+	 * @pre	The ADC must be initialized to perform the calibration
+	 */
+	static inline void
+	calibrate();
+%% endif
 
 %% if temperature_available
 	/// Switch on temperature- and V_REF measurement.

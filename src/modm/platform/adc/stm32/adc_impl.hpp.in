@@ -76,6 +76,15 @@ modm::platform::Adc{{ id }}::setRightAdjustResult()
 	ADC{{ per }}->CR2 &= ~ADC_CR2_ALIGN;
 }
 
+%% if target["family"] == "f1"
+void
+modm::platform::Adc{{ id }}::calibrate()
+{
+	ADC{{ per }}->CR2 |= ADC_CR2_CAL;
+	while (ADC{{ per }}->CR2 & ADC_CR2_CAL);
+}
+%% endif
+
 bool
 modm::platform::Adc{{ id }}::setChannel(const Channel channel,
 									 const SampleTime sampleTime)
