@@ -124,6 +124,10 @@ jobs:
         if: always()
         run: |
           (cd examples && ../tools/scripts/examples_compile.py nucleo_g474re nucleo_g431rb nucleo_g431kb)
+      - name: Examples STM32H7 Series
+        if: always()
+        run: |
+          (cd examples && ../tools/scripts/examples_compile.py nucleo_h743zi)
 
   stm32f4-examples-1:
     runs-on: ubuntu-20.04
