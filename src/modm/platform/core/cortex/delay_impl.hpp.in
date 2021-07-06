@@ -48,7 +48,18 @@ void delay_ns(uint32_t ns)
 
 
 void delay_us(uint32_t us);
-inline void delay_ms(uint32_t ms) { delay_us(ms * 1000); }
+inline void delay_ms(uint32_t ms)
+{
+    while(1)
+    {
+        if (ms <= 1000) {
+            delay_us(ms * 1000);
+            break;
+        }
+        delay_us(1'000'000);
+        ms -= 1000;
+    }
+}
 
 // ----------------------------------------------------------------------------
 template< class Rep >
@@ -75,8 +86,8 @@ template< class Rep >
 void
 delay(std::chrono::duration<Rep, std::milli> ms)
 {
-	const auto us{std::chrono::duration_cast<std::chrono::microseconds>(ms)};
-	delay_us(us.count());
+    const auto ms_{std::chrono::duration_cast<std::chrono::milliseconds>(ms)};
+    delay_ms(ms_.count());
 }
 
 }

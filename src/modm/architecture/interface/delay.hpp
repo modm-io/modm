@@ -82,10 +82,10 @@ void delay_ms(uint32_t ms);
 namespace modm
 {
 
-// Everything else is cast to microseconds
+// Everything else is cast to milliseconds
 template<class Rep, class Period>
 inline void delay(std::chrono::duration<Rep, Period> time)
-{ delay(std::chrono::duration_cast<std::chrono::microseconds>(time)); }
+{ delay(std::chrono::duration_cast<std::chrono::milliseconds>(time)); }
 
 // The old methods are deprecated
 [[deprecated("Use `modm::delay_ns(uint32_t ns)` instead!")]]
