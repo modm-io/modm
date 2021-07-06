@@ -23,10 +23,7 @@ namespace modm
  * @warning This function is implemented as best-effort and its resolution will
  *          be very coarse especially on platforms with very slow clocks.
  *
- * @warning The maximum delay is less than 1 millisecond.
- *
- * @note In debug mode this function may raise "delay.us" if input validation
- *       fails.
+ * @warning The maximum delay is 1'000'000ns = 1 millisecond.
  *
  * @ingroup modm_architecture_delay
  */
@@ -46,7 +43,7 @@ void delay_ns(uint32_t ns);
 /**
  * Spin for microseconds.
  *
- * @warning The maximum delay is less than 10 seconds.
+ * @warning The maximum delay is 1'000'000us = 1 second. Use milliseconds for longer delays.
  *
  * @note In debug mode this function may raise "delay.us" if input validation
  *       fails.
@@ -59,11 +56,6 @@ void delay_us(uint32_t us);
 
 /**
  * Spin for milliseconds.
- *
- * @warning The maximum delay is less than 10 seconds.
- *
- * @note In debug mode this function may raise "delay.us" if input validation
- *       fails.
  *
  * @ingroup modm_architecture_delay
  */
@@ -81,6 +73,31 @@ void delay_ms(uint32_t ms);
 
 namespace modm
 {
+
+// Forward everything to specialized functions
+template< class Rep >
+void
+delay(std::chrono::duration<Rep, std::nano> ns_)
+{
+    const auto ns{std::chrono::duration_cast<std::chrono::nanoseconds>(ns_)};
+    delay_ns(ns.count());
+}
+
+template< class Rep >
+void
+delay(std::chrono::duration<Rep, std::micro> us_)
+{
+    const auto us{std::chrono::duration_cast<std::chrono::microseconds>(us_)};
+    delay_us(us.count());
+}
+
+template< class Rep >
+void
+delay(std::chrono::duration<Rep, std::milli> ms_)
+{
+    const auto ms{std::chrono::duration_cast<std::chrono::milliseconds>(ms_)};
+    delay_ms(ms.count());
+}
 
 // Everything else is cast to milliseconds
 template<class Rep, class Period>

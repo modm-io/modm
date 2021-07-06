@@ -44,31 +44,7 @@ inline void delay_ns(uint32_t ns) { Sleep(ns / 1000'000ul); }
 inline void delay_us(uint32_t us) { Sleep(us / 1000ul); }
 inline void delay_ms(uint32_t ms) { Sleep(ms); }
 
-template< class Rep >
-void
-delay(std::chrono::duration<Rep, std::milli> ms_)
-{
-	const auto ms{std::chrono::duration_cast<std::chrono::milliseconds>(ms_)};
-	delay_ms(ms.count());
-}
-
 %% endif
-
-template< class Rep >
-void
-delay(std::chrono::duration<Rep, std::nano> ns_)
-{
-	const auto ns{std::chrono::duration_cast<std::chrono::nanoseconds>(ns_)};
-	delay_ns(ns.count());
-}
-
-template< class Rep >
-void
-delay(std::chrono::duration<Rep, std::micro> us_)
-{
-	const auto us{std::chrono::duration_cast<std::chrono::microseconds>(us_)};
-	delay_us(us.count());
-}
 
 }	// namespace modm
 /// @endcond

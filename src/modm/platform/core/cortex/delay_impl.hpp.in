@@ -61,34 +61,5 @@ inline void delay_ms(uint32_t ms)
     }
 }
 
-// ----------------------------------------------------------------------------
-template< class Rep >
-void
-delay(std::chrono::duration<Rep, std::nano> ns)
-{
-	const auto ns_{std::chrono::duration_cast<std::chrono::nanoseconds>(ns)};
-%% if with_assert
-	modm_assert_continue_fail_debug(0 <= ns_.count() and ns_.count() <= 1'000'000,
-		"delay.ns", "modm::delay(ns) can only delay a (positive) maximum of ~1 millisecond!");
-%% endif
-	delay_ns(ns_.count());
-}
-
-template< class Rep >
-void
-delay(std::chrono::duration<Rep, std::micro> us)
-{
-	const auto us_{std::chrono::duration_cast<std::chrono::microseconds>(us)};
-	delay_us(us_.count());
-}
-
-template< class Rep >
-void
-delay(std::chrono::duration<Rep, std::milli> ms)
-{
-    const auto ms_{std::chrono::duration_cast<std::chrono::milliseconds>(ms)};
-    delay_ms(ms_.count());
-}
-
 }
 /// @endcond

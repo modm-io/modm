@@ -19,12 +19,16 @@ modm::delay_us(uint32_t us)
 	const uint32_t start = DWT->CYCCNT;
 	asm inline ("" ::: "memory");
 %% if with_assert
+#ifdef MODM_DEBUG_BUILD
 	unsigned int unshifted_cycles;
 	modm_assert_continue_fail_debug(
 		not __builtin_umul_overflow(platform::delay_fcpu_MHz, us, &unshifted_cycles),
-		"delay.us", "modm::delay(us) has overflowed at the current frequency!");
-%% else
+		"delay.us", "modm::delay(us) can only delay ~1s! Use modm::delay(ms) for longer durations.");
+#else
+%% endif
 	const uint32_t unshifted_cycles = platform::delay_fcpu_MHz * us;
+%% if with_assert
+#endif
 %% endif
 	const uint32_t cycles = unshifted_cycles >> platform::delay_fcpu_MHz_shift;
 	while (true)
