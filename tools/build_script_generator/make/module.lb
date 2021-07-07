@@ -33,7 +33,7 @@ def prepare(module, options):
 def build(env):
     def flag_format(flag):
         subs = {
-            "target_base": "$(MAKE_PROJECT_NAME)",
+            "target_base": "$(BUILDPATH)/$(MODM_PROJECT_NAME)",
             "project_source_dir": "$(CURDIR)",
             "gccpath": "$(GCC_BASE)",
         }
