@@ -246,7 +246,7 @@ public:
 
 		float inline
 		swapDataFloat(uint8_t index) const
-		{ return swapDataFloat(index) / 16384.f; }
+		{ return swapData(index) / 16384.f; }
 
 		uint8_t data[10];
 	};
