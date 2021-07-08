@@ -31,15 +31,13 @@ import lbuild
 
 def get_modules(builder, limit=None):
     builder._load_repositories(repopath("repo.lb"))
-    option = builder.parser.find_option(":target")
-    ignored = list(filter(lambda d: "#" not in d, repopath("test/all/ignored.txt").read_text().strip().splitlines()))
-    raw_targets = sorted(d for d in option.values if not any(d.startswith(i) for i in ignored))
+    target_option = builder.parser.find_option(":target")
 
     # Reduce device set a little to keep RAM usage in check
     # this should ~half the considered devices
     short_targets = set()
     targets = []
-    for d in raw_targets:
+    for d in target_option.values:
         if d.startswith("stm32"):
             # filter out a few keys
             sd = d[:10] + d[13:]
@@ -66,7 +64,7 @@ def get_modules(builder, limit=None):
 
     # Prime the repositories and get all module files
     mfiles = []
-    option.value = targets[0]
+    target_option.value = targets[0]
     for repo in builder.parser._findall(builder.parser.Type.REPOSITORY):
         repo.prepare()
         mfiles.extend([(repo, file) for file in repo._module_files])
@@ -77,8 +75,8 @@ def get_modules(builder, limit=None):
     print("Querying for {} targets...".format(len(targets)))
     mfinal = None
     for target in targets:
-        option.value = target
-        target = option.value._identifier
+        target_option.value = target
+        target = target_option.value._identifier
 
         imodules = [m for (repo, mfile) in mfiles for m in lbuild.module.load_module_from_file(repo, mfile)]
         imodules = [m for m in imodules if m.available]

@@ -39,13 +39,9 @@ def get_targets(prefix=None, short=False):
 
     # Get me a condensed list of targets
     target_option = builder.parser.find_option(":target")
-    ignored = list(filter(lambda d: "#" not in d,
-        repopath("test/all/ignored.txt").read_text().strip().splitlines()))
-    raw_targets = sorted(d for d in target_option.values
-                         if not any(d.startswith(i) for i in ignored))
     minimal_targets = defaultdict(list)
 
-    for target in raw_targets:
+    for target in target_option.values:
         if not any(target.startswith(p) for p in prefix):
             continue
         target_option.value = target

@@ -101,7 +101,6 @@ def get_lbuild(root, target=None):
 # All the paths
 board_path = repopath("src/modm/board")
 example_path = repopath("examples")
-ignored_path = repopath("test/all/ignored.txt")
 examples_readme_in_path = repopath("examples/README.md")
 examples_readme_path = repopath("docs/src/guide/examples.md")
 readme_path = repopath("README.md")
@@ -130,8 +129,6 @@ example_table = format_table(examples, 2, "left")
 
 # Get all supported targets
 targets = set(get_lbuild(repopath(".")).find_option("modm:target").values)
-ignored_devices = set(d for d in ignored_path.read_text().strip().splitlines() if "#" not in d)
-targets -= ignored_devices
 avr_count = len([t for t in targets if t.startswith("at")])
 stm_count = len([t for t in targets if t.startswith("stm32")])
 sam_count = len([t for t in targets if t.startswith("sam")])

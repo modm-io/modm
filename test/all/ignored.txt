@@ -1,7 +1,11 @@
+#
+# This file contains devices that don't work with modm. This could be an issue
+# with missing data in modm-devices or missing headers or missing peripheral
+# support. They are removed from the modm:target option in repo.lb.
+#
+#
 # FIXME: Some AVR device files do not contain any GPIO signals, due to a lack of
 #        machine readable data, therefore their HAL cannot be generated.
-#        This should be fixed in modm-devices, but currently too much is
-#        changing for this to be practical.
 at90pwm1
 at90pwm161
 at90pwm2
@@ -78,7 +82,7 @@ attiny828
 attiny84
 attiny861a
 attiny87
-# FIXME: avr-gcc doesn't know how to compile some of these devices
+# FIXME: avr-gcc doesn't know how to compile these devices
 atmega168pb
 atmega324pb
 atmega328pb
@@ -104,80 +108,6 @@ samd21e15c-uu
 samd21e16c-uf
 samd21e16c-uu
 # FIXME: Shared IRQs on UART, SPI, I2C
-stm32g0b0cet6
-stm32g0b0ket6
-stm32g0b0ret6
-stm32g0b0vet6
-stm32g0b1cbt6
-stm32g0b1cbt6n
-stm32g0b1cbu6
-stm32g0b1cbu6n
-stm32g0b1cct6
-stm32g0b1cct6n
-stm32g0b1ccu6
-stm32g0b1ccu6n
-stm32g0b1cet6
-stm32g0b1cet6n
-stm32g0b1ceu6
-stm32g0b1ceu6n
-stm32g0b1kbt6
-stm32g0b1kbt6n
-stm32g0b1kbu6
-stm32g0b1kbu6n
-stm32g0b1kct6
-stm32g0b1kct6n
-stm32g0b1kcu6
-stm32g0b1kcu6n
-stm32g0b1ket6
-stm32g0b1ket6n
-stm32g0b1keu6
-stm32g0b1keu6n
-stm32g0b1mbt6
-stm32g0b1mct6
-stm32g0b1met6
-stm32g0b1ney6
-stm32g0b1rbi6n
-stm32g0b1rbt6
-stm32g0b1rbt6n
-stm32g0b1rci6n
-stm32g0b1rct6
-stm32g0b1rct6n
-stm32g0b1rei6n
-stm32g0b1ret6
-stm32g0b1ret6n
-stm32g0b1vbi6
-stm32g0b1vbt6
-stm32g0b1vci6
-stm32g0b1vct6
-stm32g0b1vei6
-stm32g0b1vet6
-stm32g0c1cct6
-stm32g0c1cct6n
-stm32g0c1ccu6
-stm32g0c1ccu6n
-stm32g0c1cet6
-stm32g0c1cet6n
-stm32g0c1ceu6
-stm32g0c1ceu6n
-stm32g0c1kct6
-stm32g0c1kct6n
-stm32g0c1kcu6
-stm32g0c1kcu6n
-stm32g0c1ket6
-stm32g0c1ket6n
-stm32g0c1keu6
-stm32g0c1keu6n
-stm32g0c1mct6
-stm32g0c1met6
-stm32g0c1ney6
-stm32g0c1rci6n
-stm32g0c1rct6
-stm32g0c1rct6n
-stm32g0c1rei6n
-stm32g0c1ret6
-stm32g0c1ret6n
-stm32g0c1vci6
-stm32g0c1vct6
-stm32g0c1vei6
-stm32g0c1vet6
-
+stm32g0b0
+stm32g0b1
+stm32g0c1

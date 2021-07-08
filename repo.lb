@@ -88,14 +88,17 @@ class DevicesCache(dict):
                      "samd21",
                      "hosted"]
         device_file_names = [dfn for dfn in device_file_names if any(s in dfn for s in supported)]
+        # These files are ignored due to various issues
+        ignored = [d for d in Path(repopath("test/all/ignored.txt")).read_text().strip().splitlines() if "#" not in d]
 
         # Parse the files and build the :target enumeration
         parser = modm_devices.parser.DeviceParser()
         for device_file_name in device_file_names:
             device_file = parser.parse(device_file_name)
             for device in device_file.get_devices():
-                self[device.partname] = device
-                mapping[device.partname] = device_file_name
+                if not any(device.partname.startswith(i) for i in ignored):
+                    self[device.partname] = device
+                    mapping[device.partname] = device_file_name
 
         return mapping
 
