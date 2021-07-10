@@ -30,14 +30,26 @@ def prepare(module, options):
     return True
 
 def build(env):
+    target = env[":target"].identifier
     core = env[":target"].get_driver("core")["type"]
-    default = 1000 if "m0" in core else 4
-    # SAMD: Reference Clock not implemented => Prescaler always 1
-    reference_clock = {"stm32": 8}.get(env[":target"].identifier.platform, 1)
+
+    # Interrupt Frequency must not overflow the 2^24 SysTick->VAL!
+    freq = 1000 if "m0" in core else 4
+    # STM32H7 goes up to 550MHz, so make the Frequency higher
+    if target.family == "h7": freq = 100;
+
+    # SysTick clock prescaler is dynamically chosen as /1 or /8
+    div = 8
+    # SAMD: Prescaler not implemented
+    if target.platform == "sam": div = 1;
+    # H742/43: Prescaler not implemented in revY
+    elif target.family == "h7" and target.name in ["42", "43"] and target.revision == "y":
+        div = 1
+
     env.substitutions = {
-        "systick_frequency": env.get(":freertos:frequency", default),
+        "systick_frequency": env.get(":freertos:frequency", freq),
         "has_freertos": env.has_module(":freertos"),
-        "ref_clk": reference_clock
+        "ref_clk": div
     }
     env.outbasepath = "modm/src/modm/platform/clock"
     env.template("systick_timer.hpp.in")
