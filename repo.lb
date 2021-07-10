@@ -167,15 +167,21 @@ class DevicesCache(dict):
 class TargetOption(EnumerationOption):
     """
     Allows the target string to be longer than required by selecting the best
-    fitting target string
+    fitting target string and adds the revision to the device identifier.
     """
+
     def as_enumeration(self, value):
-        targets = self._enumeration.keys()
+        revision = "" # split revision from the input value
+        if "/rev" in value: value, revision = value.split("/rev");
         target = self._obj_to_str(value)
+        targets = self._enumeration.keys()
+
         # check if input string is part of keys OR longer
         while(len(target) > len("attiny4-")):
             if target in targets:
-                return self._enumeration[target]
+                target = self._enumeration[target]
+                target._identifier.set("revision", revision.lower())
+                return target
             else:
                 # cut off last character and try again
                 target = target[:-1]
@@ -264,7 +270,7 @@ def init(repo):
 
     repo.add_option(
         TargetOption(name="target",
-                     description="Meta-HAL target device",
+                     description=descr_target,
                      enumeration=devices))
 
 def prepare(repo, options):
@@ -274,3 +280,15 @@ def prepare(repo, options):
 
 def build(env):
     env.collect(":build:path.include", "modm/src")
+
+
+# ============================ Option Descriptions ============================
+descr_target = """# Device identifier
+
+This is the long string written on your microcontroller that uniquely identifies
+the target device for which to generate the modm HAL.
+
+You can optionally add the hardware revision to the identifier string by
+appending `/revX` where X is the revision. This can help modm apply workarounds
+for specific hardware bugs as recommended by the errata sheet.
+"""
