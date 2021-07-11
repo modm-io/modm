@@ -19,5 +19,6 @@ Reset_Handler:
 	ldr r0,=__main_stack_top
 	mov sp,r0
 	bl __modm_initialize_platform
+	bl modm_initialize_platform
 	b __modm_startup
 	.endfunc

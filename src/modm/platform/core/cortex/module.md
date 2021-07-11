@@ -14,27 +14,37 @@ on that module directly instead of this one.
 After reset, the ARM Cortex-M hardware jumps to the `Reset_Handler()`, which is
 implemented as follows:
 
-1. The main stack pointer (MSP) is initialized by hardware.
-2. Call `__modm_initialize_platform()` to initialize the device  hardware.
-3. Copy data from internal flash to internal RAM.
-4. Zero sections in internal RAM.
-5. Initialize ARM Cortex-M core: enable FPU and relocate vector table.
-6. Execute shared hardware initialization functions.
-7. Copy data from internal flash to *external* RAM.
-8. Zero sections in *external* RAM.
-9. Initialize heap via `__modm_initialize_memory()` (implemented by the
-   `modm:platform:heap` module).
-10. Call static constructors.
-11. Call `main()` application entry point.
-12. If `main()` returns, assert on `main.exit` (only in debug profile).
-13. Reboot if assertion returns.
+1. The main stack pointer (MSP) is initialized by software.
+2. Call `__modm_initialize_platform()` to initialize the device hardware.
+3. Call `modm_initialize_platform()` to initialize the custom device hardware.
+4. Copy data to internal RAM.
+5. Zero sections in internal RAM.
+6. Initialize ARM Cortex-M core: enable FPU and relocate vector table.
+7. Execute shared hardware initialization functions.
+8. Copy data to *external* RAM.
+9. Zero sections in *external* RAM.
+10. Initialize heap via `__modm_initialize_memory()` (implemented by the
+    `modm:platform:heap` module).
+11. Call static constructors.
+12. Call `main()` application entry point.
+13. If `main()` returns, assert on `main.exit` (only in debug profile).
+14. Reboot if assertion returns.
 
 
 ### Device Initialization
 
 The `__modm_initialize_platform()` function is called *directly* after reset,
 and its purpose is to initialize the device specific hardware, such as enable
-internal memories or disable the hardware watchdog timer.
+internal memories or disable the hardware watchdog timer. You can provide
+additional application-specific initialization by overwriting the weakly linked
+`modm_initialize_platform()` function:
+
+```c
+extern "C" void modm_initialize_platform()
+{
+    // Configure power settings before accessing SRAM
+}
+```
 
 It's important to understand that because the `.data` section has not yet been
 copied and the `.bss` section has not yet been zeroed, **there exists no valid C
@@ -47,8 +57,7 @@ stack until you've enabled its backing memory. The `Reset_Handler` therefore
 calls this function in Assembly without accessing the stack.
 
 It is strongly recommended to only read/write registers in this function, and
-perhaps even write this function in Assembly if deemed necessary. *Do not
-initialize the device clock, leave the default clock undisturbed*!
+perhaps even write this function in Assembly if deemed necessary.
 
 
 ### Additional Initialization

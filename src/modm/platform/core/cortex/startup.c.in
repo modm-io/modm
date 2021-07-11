@@ -4,6 +4,7 @@
  * Copyright (c) 2016, Fabian Greif
  * Copyright (c) 2016, Sascha Schade
  * Copyright (c) 2017, Michael Thies
+ * Copyright (c) 2021, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -19,6 +20,10 @@
 #include <modm/architecture/interface/assert.h>
 %% endif
 #include "../device.hpp"
+
+// ----------------------------------------------------------------------------
+// Default implementation of platform initialization
+modm_weak void modm_initialize_platform(void) {}
 
 // ----------------------------------------------------------------------------
 // Linker section start and end pointers
