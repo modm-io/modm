@@ -19,7 +19,7 @@ Various classes for animating values.
 """
 
 def prepare(module, options):
-    module.depends(":architecture:clock", ":math:utils")
+    module.depends(":architecture:clock", ":math:utils", ":processing:timer")
     return True
 
 def build(env):
