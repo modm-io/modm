@@ -32,6 +32,8 @@ __modm_initialize_platform(void)
 	RCC->APBENR2 |= RCC_APBENR2_SYSCFGEN;
 %% elif target.family == "f1"
 	RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
+%% elif target.family == "h7"
+	RCC->APB4ENR |= RCC_APB4ENR_SYSCFGEN;
 %% else
 	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
 %% endif

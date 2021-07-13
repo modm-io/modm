@@ -31,7 +31,11 @@ Itm::initialize()
 	CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
 %% if target.platform == "stm32"
 	// Enable the Trace SWO output
+%% if target.family == "h7"
+	DBGMCU->CR |= DBGMCU_CR_DBG_TRACECKEN;
+%% else
 	DBGMCU->CR |= DBGMCU_CR_TRACE_IOEN;
+%% endif
 %% endif
 }
 
