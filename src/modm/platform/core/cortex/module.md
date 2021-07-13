@@ -300,8 +300,6 @@ depends on the configured CPU frequency:
 - nanosecond delay is implemented as a tight loop with a minimum delay of <20
   cycles, a resolution of 1-4 cycles and a maximum delay of 32-bit cycles.
 - microsecond delay has a maximum delay of 32-bit cycles.
-- millisecond delay is implemented via `modm::delay_us(ms * 1000)`, thus also
-  has a maximum delay of 32-bit cycles.
 
 
 ## Compiler Options

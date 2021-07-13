@@ -44,6 +44,7 @@ def build(env):
 
     env.substitutions.update({
         "with_cm0": env[":target"].has_driver("core:cortex-m0*"),
+        "with_cm7": False,
         "loop": tuning[0],
         "shift": int(math.log2(tuning[1])),
         "us_shift": tuning[2],

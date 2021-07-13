@@ -12,6 +12,7 @@
   <!-- <extends>modm:nucleo-f429zi</extends> -->
   <!-- <extends>modm:nucleo-f446re</extends> -->
   <!-- <extends>modm:nucleo-g071rb</extends> -->
+  <!-- <extends>modm:nucleo-h743zi</extends> -->
   <extends>modm:nucleo-l152re</extends>
   <!-- <extends>modm:nucleo-l432kc</extends> -->
   <!-- <extends>modm:nucleo-l476rg</extends> -->
