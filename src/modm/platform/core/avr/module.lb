@@ -34,7 +34,7 @@ def build(env):
     is_xmega = "xmega" in target.get_driver("core")["type"]
 
     env.outbasepath = "modm/link"
-    env.copy("linkerscript/linkerscript.ld", "linkerscript.ld")
+    env.copy("linkerscript.ld")
     env.collect(":build:linkflags", "-L{project_source_dir}", "-Tmodm/link/linkerscript.ld")
 
     env.substitutions = {

@@ -58,4 +58,4 @@ def build(env):
 def post_build(env):
     env.substitutions = env.query("::cortex-m:linkerscript")
     env.outbasepath = "modm/link"
-    env.template("linkerscript/sam_ram.ld.in", "linkerscript.ld")
+    env.template("ram.ld.in", "linkerscript.ld")

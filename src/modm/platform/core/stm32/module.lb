@@ -74,18 +74,18 @@ def post_build(env):
     if "backup" in properties["regions"]:
         properties["regions"].remove("backup")
 
-    linkerscript = "ram"
+    linkerscript = "ram.ld.in"
     for memory in properties["memories"]:
         if memory["name"] == "ccm":
             if "x" in memory["access"]:
                 # Executable CCM (Instruction Core-Coupled Memory)
-                linkerscript = "iccm"
+                linkerscript = "iccm.ld.in"
             else:
                 # Non-executable CCM (Data Core-Coupled Memory)
-                linkerscript = "dccm"
+                linkerscript = "dccm.ld.in"
         elif memory["name"] == "dtcm":
             # Executable ITCM and DTCM (Tightly-Coupled Memory)
-            linkerscript = "idtcm"
+            linkerscript = "idtcm.ld.in"
 
     # Add the RAM section for a poor-mans flood filling of all SRAMs
     ram_origin = min(m["start"] for m in properties["memories"] if "sram" in m["name"]),
@@ -99,4 +99,4 @@ def post_build(env):
 
     env.substitutions = properties
     env.outbasepath = "modm/link"
-    env.template("linkerscript/stm32_{}.ld.in".format(linkerscript), "linkerscript.ld")
+    env.template(linkerscript, "linkerscript.ld")
