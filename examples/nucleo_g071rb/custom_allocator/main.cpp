@@ -12,9 +12,9 @@
 
 using namespace Board;
 
-// Allocate giant array inside a NOLOAD heap section
+// Allocate giant array inside the SRAM1 noinit section
 // Play around with the array size and see effect it has on HeapTable!
-modm_section(".heap1")
+modm_section(".noinit_sram1")
 uint8_t heap_begin[30*1024]; // 31kB overflows the linkerscript
 const uint8_t *const heap_end{heap_begin + sizeof(heap_begin)};
 const uint8_t *heap_top{heap_begin};

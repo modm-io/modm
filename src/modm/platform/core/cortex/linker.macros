@@ -17,41 +17,41 @@
 %% macro prefix()
 MEMORY
 {
-%% for memory in memories
+%% for memory in (memories + cont_ram_regions)
 	{{ memory.name | upper }} ({{ memory.access }}) : ORIGIN = {{ "0x%08X" % memory.start }}, LENGTH = {{ memory.size }}
 %% endfor
 {{ linkerscript_memory | indent(first=True) }}
 }
 
+%% for memory in memories
+__{{memory.name}}_start = ORIGIN({{memory.name|upper}});
+__{{memory.name}}_end = ORIGIN({{memory.name|upper}}) + LENGTH({{memory.name|upper}});
+%% endfor
+
 OUTPUT_FORMAT("elf32-littlearm")
 OUTPUT_ARCH(arm)
-
-/* First executable instruction in an output file */
 ENTRY(Reset_Handler)
 
-/* the thread stack is used only for reporting hard fault conditions! It may therefore be small. */
-PROCESS_STACK_SIZE  = {{ process_stack_size }};
 /* the handler stack is used for main program as well as interrupts */
-MAIN_STACK_SIZE     = {{ options[":platform:cortex-m:main_stack_size"] }};
-/* combined stack size */
-TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
+MAIN_STACK_SIZE    = {{ options[":platform:cortex-m:main_stack_size"] }};
+PROCESS_STACK_SIZE = {{ process_stack_size }};
+TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 %% endmacro
 
 
 %% macro section_vector_rom(memory)
-	.vector_rom :
+	.text :
 	{
 		__vector_table_rom_start = .;
 		__vector_table_ram_load = .;
 		/* Initial stack address, Reset and NMI handler */
 		KEEP(*(.vector_rom))
-		. = ALIGN(4);
 	} >{{memory}}
 %% endmacro
 
 
 %% macro section_vector_ram(memory)
-	.vector_ram (NOLOAD) :
+	.vectors (NOLOAD) :
 	{
 		__vector_table_ram_start = .;
 		/* Vector table in RAM, only if remapped */
@@ -83,125 +83,135 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 %% endmacro
 
 
-%% macro section_table_zero(memory, sections=[])
-	.table.zero.intern : ALIGN(4)
+%% macro section_tables(memory, copy, zero, heap)
+%% if vector_table_location == "ram"
+	%% do copy.insert(0, "vector_table_ram")
+%% endif
+	.rodata :
 	{
+		. = ALIGN(4);
 		__table_zero_intern_start = .;
 		LONG(__bss_start)
 		LONG(__bss_end)
-	%% for section in sections
-		LONG(__{{section}}_start)
-		LONG(__{{section}}_end)
+	%% for name in zero
+		LONG(__{{name}}_start)
+		LONG(__{{name}}_end)
 	%% endfor
 		__table_zero_intern_end = .;
-	} >{{memory}}
-%% endmacro
 
-
-%% macro section_table_copy(memory, sections=[])
-	%% if vector_table_location == "ram"
-		%% do sections.append("vector_table_ram")
-	%% endif
-	.table.copy.intern : ALIGN(4)
-	{
 		__table_copy_intern_start = .;
 		LONG(__data_load)
 		LONG(__data_start)
 		LONG(__data_end)
-	%% for section in sections
-		LONG(__{{section}}_load)
-		LONG(__{{section}}_start)
-		LONG(__{{section}}_end)
+	%% for name in copy
+		LONG(__{{name}}_load)
+		LONG(__{{name}}_start)
+		LONG(__{{name}}_end)
 	%% endfor
 		__table_copy_intern_end = .;
-	} >{{memory}}
-%% endmacro
 
-
-%% macro section_table_extern(memory)
-	.table.zero.extern : ALIGN(4)
-	{
 		__table_zero_extern_start = .;
 {{ linkerscript_extern_zero | indent(8, first=True) }}
 		__table_zero_extern_end = .;
-	} >{{memory}}
-
-	.table.copy.extern : ALIGN(4)
-	{
 		__table_copy_extern_start = .;
 {{ linkerscript_extern_copy | indent(8, first=True) }}
 		__table_copy_extern_end = .;
-	} >{{memory}}
-%% endmacro
 
-
-%% macro section_table_heap(memory, sections)
-	/* SRAM properties bit mask (16-bit):
-	 *
-	 * - 0x0001: accessible via S-Bus
-	 * - 0x0002: accessible via D-Bus
-	 * - 0x0004: accessible via I-Bus
-	 * - 0x0008: accessible via DMA
-	 * - 0x0010: accessible via DMA2D
-	 *
-	 * - 0x1FE0: reserved
-	 *
-	 * - 0x2000: Fast memory (Core- or Tightly-Coupled)
-	 * - 0x4000: non-volatile (or battery backed) memory
-	 * - 0x8000: external memory
-	 */
-	.table.heap : ALIGN(4)
-	{
+		/* SRAM properties bit mask (16-bit):
+		 *
+		 * - 0x0001: accessible via S-Bus
+		 * - 0x0002: accessible via D-Bus
+		 * - 0x0004: accessible via I-Bus
+		 * - 0x0008: accessible via DMA
+		 * - 0x0010: accessible via DMA2D
+		 *
+		 * - 0x1FE0: reserved
+		 *
+		 * - 0x2000: Fast memory (Core- or Tightly-Coupled)
+		 * - 0x4000: non-volatile (or battery backed) memory
+		 * - 0x8000: external memory
+		 */
 		__table_heap_start = .;
-	%% for section in sections
+	%% for section in heap
 		LONG({{ section.prop }})
 		LONG(__{{ section.name }}_start)
 		LONG(__{{ section.name }}_end)
 	%% endfor
 {{ linkerscript_extern_heap | indent(8, first=True) }}
 		__table_heap_end = .;
+
 	} >{{memory}}
 %% endmacro
 
-
-%% macro section(memory, name, additions=None)
-	.{{name}} : ALIGN(4)
+%% macro section(memory, name, sections=[])
+	.{{name}} :
 	{
+		. = ALIGN(4);
 		__{{name}}_load = LOADADDR(.{{name}});
 		__{{name}}_start = .;
-		*(.{{name}})
-%% if additions
-%% for addition in additions
-		__{{addition}}_start = .;
-		*(.{{ addition }})
-		__{{addition}}_end = .;
-%% endfor
-%% endif
+		*(.{{name}} .{{name}}.*)
 		. = ALIGN(4);
-		__{{name}}_end = .;
 	} >{{memory}}
+
+	%% for section in sections
+	.{{section}} :
+	{
+		__{{section}}_start = .;
+		*(.{{section}} .{{section}}.*)
+		. = ALIGN(4);
+		__{{section}}_end = .;
+	} >{{memory}}
+	%% endfor
+	__{{name}}_end = .;
 %% endmacro
 
 
-%% macro section_heap(memory, name, placement=None)
+%% macro section_heap(memory, name, placement=None, sections=[])
+	%% for section in sections
+	.{{section}} (NOLOAD) :
+	{
+		. = ALIGN(4);
+		__{{section}}_start = .;
+		*(.{{section}} .{{section}}.*)
+		. = ALIGN(4);
+		__{{section}}_end = .;
+	} >{{ placement if placement else memory }}
+	%% endfor
+
 	.{{name}} (NOLOAD) :
 	{
-		*(.{{name}})
 		. = ALIGN(4);
 		__{{name}}_start = .;
-		. = ORIGIN({{memory}}) + LENGTH({{memory}});
+		. = MAX(ABSOLUTE(.), ORIGIN({{memory}}) + LENGTH({{memory}}));
 		__{{name}}_end = .;
 	} >{{ placement if placement else memory }}
 %% endmacro
 
 
+%% macro all_heap_sections(table_copy, table_zero, table_heap)
+	%% for cont_region in cont_ram_regions
+		%% for region in cont_region.contains
+			%% if region.index
+{{ section(cont_region.name|upper + " AT >FLASH", "data_"+region.name) }}
+				%% do table_copy.append("data_"+region.name)
+				%% do table_zero.append("bss_"+region.name)
+			%% endif
+
+{{ section_heap(region.name|upper, "heap_"+region.name, cont_region.name|upper,
+				sections=(["bss_"+region.name] if region.index else []) + ["noinit_"+region.name]) }}
+			%% do table_heap.insert(region.index, {"name": "heap_"+region.name, "prop": "0x2013" if "dtcm" in region.name else "0x001f"})
+		%% endfor
+	%% endfor
+%% endmacro
+
+
 %% macro section_rom(memory)
-	.text : ALIGN(4)
+	.text :
 	{
 		*(.text .text.* .gnu.linkonce.t.*)
 	} >{{memory}}
 
-	.rodata : ALIGN(4)
+	.rodata :
 	{
 		*(.rodata .rodata.* .gnu.linkonce.r.*)
 		KEEP(*(.init))
@@ -210,98 +220,90 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		__init_array_start = .;
 		KEEP(*(SORT(.init_array.*)))
 		KEEP(*(.init_array))
+		. = ALIGN(4);
 		__init_array_end = .;
-%% if 0
-		/* These are for static constructors and destructors under ELF */
-		%# We never call destructors
+	%% if 0
 		__fini_array_start = .;
 		KEEP(*(.fini_array))
 		KEEP(*(SORT(.fini_array.*)))
+		. = ALIGN(4);
 		__fini_array_end = .;
-%% endif
+	%% endif
+
+		__hardware_init_start = .;
+		/* Table symbols are alphabetically sorted! */
+		KEEP(*(SORT(.hardware_init.order_*)))
+		KEEP(*(SORT(.hardware_init)))
+		. = ALIGN(4);
+		__hardware_init_end = .;
+
+		__assertion_table_start = .;
+		KEEP(*(.assertion))
+		. = ALIGN(4);
+		__assertion_table_end = .;
+
+		__build_id = .;
+		KEEP(*(.note.gnu.build-id))
 	} >{{memory}}
 
-%% if with_cpp_exceptions
-	.ARM.extab : ALIGN(4)
+	%% if with_cpp_exceptions
+	.exidx :
 	{
-		*(.ARM.extab* .gnu.linkonce.armextab.*)
-	} >{{memory}}
-
-	.ARM.exidx : ALIGN(4)
-	{
+		. = ALIGN(4);
 		__exidx_start = .;
 		*(.ARM.exidx* .gnu.linkonce.armexidx.*)
+		. = ALIGN(4);
 		__exidx_end = .;
 	} >{{memory}}
 
-	.eh_frame : ALIGN(4)
+	.extab :
 	{
+		*(.ARM.extab* .gnu.linkonce.armextab.*)
 		KEEP(*(.eh_frame*))
 	} >{{memory}}
-%% else
+	%% else
 	/* Unwind tables are used to unwind the stack for C++ exceptions. Even
 	 * though we disabled exceptions, pre-compiled libraries such as libstdc++
-	 * still have to raise exceptions. We still force discard all tables
-	 * though and hook these exception throwers in code. */
+	 * still have to raise exceptions. */
 	/DISCARD/ :
 	{
 		*(.ARM.extab* .gnu.linkonce.armextab.*)
 		*(.ARM.exidx* .gnu.linkonce.armexidx.*)
 		*(.eh_frame*)
 	}
-%% endif
-%% if not with_heap
+	%% endif
+	%% if not with_heap
 	/DISCARD/ :
 	{
 		/* See `modm:platform:heap` module for an explanation! */
 		*({{no_heap_section}})
 	}
-%% endif
-
-	/* Hardware init table */
-	.hardware_init : ALIGN(4)
-	{
-		__hardware_init_start = .;
-		/* Table symbols are alphabetically sorted! */
-		KEEP(*(SORT(.hardware_init.order_*)))
-		KEEP(*(SORT(.hardware_init)))
-		__hardware_init_end = .;
-	} >{{memory}}
-
-	/* Assertion handler table */
-	.assertion : ALIGN(4)
-	{
-		__assertion_table_start = .;
-		KEEP(*(.assertion))
-		__assertion_table_end = .;
-	} >{{memory}}
-
-	.build_id :
-	{
-		__build_id = .;
-		KEEP(*(.note.gnu.build-id))
-	} > {{memory}}
+	%% endif
 %% endmacro
 
 
-%% macro section_ram(memory, rom, additions=None)
-	/* initialized variables */
-	.data : ALIGN(4)
+%% macro section_ram(memory, rom, sections_data=[], sections_bss=[])
+	.data :
 	{
+		. = ALIGN(4);
 		__data_load = LOADADDR(.data);
 		__data_start = .;
-%% if additions
-%% for addition in additions
-		__{{addition}}_start = .;
-		*(.{{ addition }})
-		__{{addition}}_end = .;
-%% endfor
-%% endif
 		*(.data .data.* .gnu.linkonce.d.*)
-		__data_end = .;
+		. = ALIGN(4);
 	} >{{memory}} AT >{{rom}}
 
-	/* uninitialized variables */
+	%% for section in sections_data
+	.{{section}} :
+	{
+		__{{section}}_load = LOADADDR(.{{section}});
+		__{{section}}_start = .;
+		*(.{{section}} .{{section}}.*)
+		. = ALIGN(4);
+		__{{section}}_end = .;
+	} >{{memory}} AT >{{rom}}
+	%% endfor
+	__data_end = .;
+
 	.bss (NOLOAD) :
 	{
 		__bss_start = . ;
@@ -310,11 +312,21 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		__bss_end = .;
 	} >{{memory}}
 
-	/* Global data not cleared after reset.  */
+	%% for section in sections_bss
+	.{{section}} (NOLOAD) :
+	{
+		__{{section}}_start = . ;
+		*(.{{section}} .{{section}}.*)
+		. = ALIGN(4);
+		__{{section}}_end = .;
+	} >{{memory}}
+	%% endfor
+	__bss_end = .;
+
 	.noinit (NOLOAD) :
 	{
 		__noinit_start = .;
-		*(.noinit*)
+		*(.noinit .noinit.*)
 		. = ALIGN(4);
 		__noinit_end = .;
 	} >{{memory}}
@@ -328,11 +340,6 @@ TOTAL_STACK_SIZE = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 %% macro section_rom_end(rom)
 	. = ALIGN(4);
 	__rom_end = .;
-%% if 0
-	_end = . ;
-	__end = . ;
-	PROVIDE(end = .);
-%% endif
 %% endmacro
 
 

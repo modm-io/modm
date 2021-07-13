@@ -1,7 +1,10 @@
-%% import "../../cortex/linker.macros" as linker with context
+%% import "../cortex/linker.macros" as linker with context
 {{ linker.copyright() }}
 
 {{ linker.prefix() }}
+%% set table_heap = []
+%% set table_copy = []
+%% set table_zero = []
 
 
 SECTIONS
@@ -10,36 +13,37 @@ SECTIONS
 
 {{ linker.section_vector_rom("FLASH") }}
 
-{{ linker.section_vector_ram("CCM") }}
+{{ linker.section_rom("FLASH") }}
 
-{{ linker.section("CCM AT >FLASH", "fastcode", ["fastdata"]) }}
 
-{{ linker.section_heap("CCM", "heap4") }}
+{{ linker.section_stack(cont_ram_regions[0].name|upper) }}
+
+{{ linker.section_ram(cont_ram_regions[0].name|upper, "FLASH",
+                      sections_data=["data_" + cont_ram_regions[0].contains[0].name],
+                      sections_bss=["bss_" + cont_ram_regions[0].contains[0].name]) }}
+
+{{ linker.all_heap_sections(table_copy, table_zero, table_heap) }}
 %% if with_crashcatcher
 	g_crashCatcherStack = . - 500;
 %% endif
 
-{{ linker.section_rom("FLASH") }}
 
-{{ linker.section_stack("RAM") }}
+%% if vector_table_location == "ram"
+{{ linker.section_vector_ram("CCM") }}
+%% endif
 
-{{ linker.section_ram("RAM", "FLASH") }}
+{{ linker.section("CCM AT >FLASH", "fastcode", sections=["fastdata", "data_ccm"]) }}
+%% do table_copy.append("fastcode")
 
-{{ linker.section_heap("RAM", "heap1") }}
+{{ linker.section_heap("CCM", "heap_ccm", sections=["bss_ccm", "noinit_ccm"]) }}
+%% do table_heap.append({"name": "heap_ccm", "prop": "0x2006"})
+%% do table_zero.append("bss_ccm")
+
 
 {{ linkerscript_sections | indent(first=True) }}
 
-	/* TABLES! TABLES! ALL THE TABLES YOU COULD EVER WANT! TABLES! */
-{{ linker.section_table_zero("FLASH") }}
 
-{{ linker.section_table_copy("FLASH", ["fastcode"]) }}
-
-{{ linker.section_table_extern("FLASH") }}
-
-%% set heap_table = [
-		{'name': 'heap1', 'prop': '0x000f'},
-		{'name': 'heap4', 'prop': '0x2006'}]
-{{ linker.section_table_heap("FLASH", heap_table) }}
+{{ linker.section_tables("FLASH", table_copy, table_zero, table_heap) }}
 
 {{ linker.section_rom_end("FLASH") }}
 

@@ -47,6 +47,7 @@ def build(env):
 
     env.collect(":platform:cortex-m:linkerscript.memory", linkerscript_memory)
     env.collect(":platform:cortex-m:linkerscript.sections", linkerscript_sections)
+    env.collect(":platform:cortex-m:linkerscript.table_extern.zero", linkerscript_extern_zero)
     env.collect(":platform:cortex-m:linkerscript.table_extern.copy", linkerscript_extern_copy)
     env.collect(":platform:cortex-m:linkerscript.table_extern.heap", linkerscript_extern_heap)
 
@@ -57,36 +58,56 @@ SDRAM (rwx) : ORIGIN = 0xC0000000, LENGTH = 16M
 """
 
 linkerscript_sections = """\
-.sdramdata :
+__sdram_start = ORIGIN(SDRAM);
+__sdram_end = ORIGIN(SDRAM) + LENGTH(SDRAM);
+
+.data_sdram :
 {
-    __sdramdata_load = LOADADDR (.sdramdata);   /* address in FLASH */
-    __sdramdata_start = .;                      /* address in RAM */
-
-    *(.sdramdata)
-
+    __data_sdram_load = LOADADDR(.data_sdram);
+    __data_sdram_start = .;
+    *(.data_sdram .data_sdram.*)
     . = ALIGN(4);
-    __sdramdata_end = .;
+    __data_sdram_end = .;
 } >SDRAM AT >FLASH
 
-.heap_extern (NOLOAD) : ALIGN(4)
+.bss_sdram (NOLOAD) :
 {
-    *(.heap_extern)
+    __bss_sdram_start = .;
+    *(.bss_sdram .bss_sdram.*)
     . = ALIGN(4);
+    __bss_sdram_end = .;
+} >SDRAM
 
-    __heap_extern_start = .;
+.noinit_sdram (NOLOAD) :
+{
+    __noinit_sdram_start = .;
+    *(.noinit_sdram .noinit_sdram.*)
+    . = ALIGN(4);
+    __noinit_sdram_end = .;
+} >SDRAM
+
+.heap_sdram (NOLOAD) :
+{
+    __heap_sdram_start = .;
+    *(.heap_sdram .heap_sdram.*)
     . = ORIGIN(SDRAM) + LENGTH(SDRAM);
-    __heap_extern_end = .;
+    __heap_sdram_end = .;
 } >SDRAM
 """
 
+linkerscript_extern_zero = """\
+LONG(__bss_sdram_start)
+LONG(__bss_sdram_end)
+"""
+
 linkerscript_extern_copy = """\
-LONG (__sdramdata_load)
-LONG (__sdramdata_start)
-LONG (__sdramdata_end)
+LONG(__data_sdram_load)
+LONG(__data_sdram_start)
+LONG(__data_sdram_end)
 """
 
 linkerscript_extern_heap = """\
-LONG (0x801f)
-LONG (__heap_extern_start)
-LONG (__heap_extern_end)
+LONG(0x801f)
+LONG(__heap_sdram_start)
+LONG(__heap_sdram_end)
 """

@@ -1,7 +1,10 @@
-%% import "../../cortex/linker.macros" as linker with context
+%% import "../cortex/linker.macros" as linker with context
 {{ linker.copyright() }}
 
 {{ linker.prefix() }}
+%% set table_heap = []
+%% set table_copy = []
+%% set table_zero = []
 
 
 SECTIONS
@@ -10,62 +13,48 @@ SECTIONS
 
 {{ linker.section_vector_rom("FLASH") }}
 
-{{ linker.section_vector_ram("RAM") }}
+{{ linker.section_rom("FLASH") }}
+
+
+%% if vector_table_location == "ram"
+{{ linker.section_vector_ram(cont_ram_regions[0].name|upper) }}
+%% endif
+
+{{ linker.section_ram(cont_ram_regions[0].name|upper, "FLASH",
+                      sections_data=["fastcode", "data_" + cont_ram_regions[0].contains[0].name],
+                      sections_bss=["bss_" + cont_ram_regions[0].contains[0].name]) }}
+
+{{ linker.all_heap_sections(table_copy, table_zero, table_heap) }}
+
+
+%% if "backup" in regions
+{{ linker.section("BACKUP AT >FLASH", "data_backup") }}
+%% do table_copy.append("data_backup")
+
+{{ linker.section_heap("BACKUP", "heap_backup", sections=["bss_backup", "noinit_backup"]) }}
+%% do table_heap.append({"name": "heap_backup", "prop": "0x4009"})
+%% do table_zero.append("bss_backup")
+%% endif
+
 
 {{ linker.section_stack("CCM") }}
 
 	/* CCM can only be accessed by D-Bus, do not place .fastcode here! */
-{{ linker.section("CCM AT >FLASH", "fastdata") }}
+{{ linker.section("CCM AT >FLASH", "fastdata", sections=["data_ccm"]) }}
+%% do table_copy.append("fastdata")
 
-{{ linker.section_heap("CCM", "heap0") }}
-
-%% if "backup" in regions
-{{ linker.section("BACKUP AT >FLASH", "backup") }}
-
-{{ linker.section_heap("BACKUP", "heap5") }}
-%% endif
-
-{{ linker.section_rom("FLASH") }}
-
-{{ linker.section_ram("RAM", "FLASH", ["fastcode"]) }}
-
-{{ linker.section_heap("SRAM1", "heap1", "RAM") }}
-
-%% if "sram2" in regions
-{{ linker.section_heap("SRAM2", "heap2", "RAM") }}
-%% endif
-
-%% if "sram3" in regions
-{{ linker.section_heap("SRAM3", "heap3", "RAM") }}
-%% endif
+{{ linker.section_heap("CCM", "heap_ccm", sections=["bss_ccm", "noinit_ccm"]) }}
+%% do table_heap.append({"name": "heap_ccm", "prop": "0x2002"})
+%% do table_zero.append("bss_ccm")
 %% if with_crashcatcher
 	g_crashCatcherStack = . - 500;
 %% endif
 
+
 {{ linkerscript_sections | indent(first=True) }}
 
-	/* TABLES! TABLES! ALL THE TABLES YOU COULD EVER WANT! TABLES! */
-{{ linker.section_table_zero("FLASH") }}
 
-%% set copy_table = ["fastdata"]
-%% if "backup" in regions
-	%% do copy_table.append("backup")
-%% endif
-{{ linker.section_table_copy("FLASH", copy_table) }}
-
-{{ linker.section_table_extern("FLASH") }}
-
-%% set heap_table = [{"name": "heap1", "prop": "0x001f"}, {"name": "heap0", "prop": "0x2002"}]
-%% if "sram3" in regions
-	%% do heap_table.insert(1, {"name": "heap3", "prop": "0x0019"})
-%% endif
-%% if "sram2" in regions
-	%% do heap_table.insert(1, {"name": "heap2", "prop": "0x0019"})
-%% endif
-%% if "backup" in regions
-	%% do heap_table.insert(1, {"name": "heap5", "prop": "0x4009"})
-%% endif
-{{ linker.section_table_heap("FLASH", heap_table) }}
+{{ linker.section_tables("FLASH", table_copy, table_zero, table_heap) }}
 
 {{ linker.section_rom_end("FLASH") }}
 

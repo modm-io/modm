@@ -17,8 +17,8 @@
 // ----------------------------------------------------------------------------
 static constexpr uint32_t sector_size{512};
 static constexpr uint32_t sector_count{230};
-// Allocate giant array inside a NOLOAD heap section
-modm_section(".heap1") uint8_t ram_disk[sector_count * sector_size];
+// Allocate giant array inside the SRAM1 noinit section
+modm_section(".noinit_sram1") uint8_t ram_disk[sector_count * sector_size];
 
 DSTATUS disk_initialize(BYTE pdrv) { return pdrv ? STA_NOINIT : 0; }
 DSTATUS disk_status(BYTE pdrv) { return pdrv ? STA_NOINIT : 0; }

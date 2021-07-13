@@ -14,11 +14,8 @@ import math
 
 def init(module):
     module.name = ":platform:core"
-    module.description = """\
-# STM32 core module
+    module.description = FileReader("module.md")
 
-Provides STM32 specific linkerscripts and startup code.
-"""
 
 def prepare(module, options):
     if options[":target"].identifier.platform != "stm32":
@@ -67,15 +64,11 @@ def build(env):
 
 
 def post_build(env):
-    properties = env.query("::cortex-m:linkerscript")
-    target = env[":target"].identifier
-    properties["with_crashcatcher"] = env.has_module(":crashcatcher")
+    env.substitutions = env.query("::cortex-m:linkerscript")
+    env.outbasepath = "modm/link"
 
-    if "backup" in properties["regions"]:
-        properties["regions"].remove("backup")
-
-    linkerscript = "ram.ld.in"
-    for memory in properties["memories"]:
+    linkerscript = "../cortex/ram.ld.in"
+    for memory in env.substitutions["memories"]:
         if memory["name"] == "ccm":
             if "x" in memory["access"]:
                 # Executable CCM (Instruction Core-Coupled Memory)
@@ -86,17 +79,4 @@ def post_build(env):
         elif memory["name"] == "dtcm":
             # Executable ITCM and DTCM (Tightly-Coupled Memory)
             linkerscript = "idtcm.ld.in"
-
-    # Add the RAM section for a poor-mans flood filling of all SRAMs
-    ram_origin = min(m["start"] for m in properties["memories"] if "sram" in m["name"]),
-    ram_size, = sum(m["size"] for m in properties["memories"] if "sram" in m["name"]),
-    properties["memories"].append({
-        "name": "ram",
-        "start": ram_origin,
-        "size": ram_size,
-        "access": "rwx",
-    })
-
-    env.substitutions = properties
-    env.outbasepath = "modm/link"
     env.template(linkerscript, "linkerscript.ld")

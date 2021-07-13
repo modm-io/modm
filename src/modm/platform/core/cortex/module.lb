@@ -68,6 +68,7 @@ def common_memories(env):
 
       - `memories`: unfiltered memory regions
       - `regions`: memory region names
+      - `cont_ram_regions`: all continuous internal SRAM sections
       - `cont_ram`: largest continuous internal SRAM section
 
     :returns: dictionary of memory properties
@@ -85,18 +86,25 @@ def common_memories(env):
             m["start"] = int(m["start"], 0)
             m["size"] = int(m["size"], 0)
 
-    # Find largest continuous internal SRAM section
+    # Find all continuous internal SRAM sections
     cont = []
+    index = 0
     for m in memories:
-        if m["name"].startswith("sram") or m["name"].startswith("ram"):
+        if "ram" in m["name"] or "dtcm" in m["name"]:
             if cont and (cont[-1]["start"] + cont[-1]["size"] == m["start"]):
                 cont[-1]["size"] += m["size"]
+                cont[-1]["contains"].append({**m, "index": index})
             else:
                 cont.append(dict(m))
+                cont[-1]["contains"] = [{**m, "index": index}]
+                cont[-1]["name"] = "cont_" + cont[-1]["name"]
+            index += 1
 
     properties = {
         "memories": memories,
         "regions": [m["name"] for m in memories],
+        "ram_regions": list(sorted(m["name"] for m in memories if "ram" in m["name"])),
+        "cont_ram_regions": cont,
         "cont_ram": sorted(cont, key=lambda m: -m["size"])[0],
     }
     return properties
@@ -127,6 +135,7 @@ def common_linkerscript(env):
       - `regions`: memory region names
       - `ram_origin`: Lowest SRAM origin address
       - `ram_origin`: Total size of all SRAM regions
+      - `cont_ram_regions`: all continuous internal SRAM sections
       - `cont_ram`: largest continuous internal SRAM section
 
     :returns: dictionary of linkerscript properties
@@ -150,6 +159,7 @@ def common_linkerscript(env):
 
         "with_cpp_exceptions": env.get(":stdc++:exceptions", False),
         "with_heap": env.has_module(":platform:heap"),
+        "with_crashcatcher": env.has_module(":crashcatcher"),
         "no_heap_section": common_no_heap_section,
     }
     properties.update(common_memories(env))

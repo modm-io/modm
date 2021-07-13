@@ -1,0 +1,51 @@
+%% import "linker.macros" as linker with context
+{{ linker.copyright() }}
+
+{{ linker.prefix() }}
+%% set table_heap = []
+%% set table_copy = []
+%% set table_zero = []
+
+%% if vector_table_location == "ram"
+/* Round up the number of vector table entries to the nearest power-of-two and multiply by 8. */
+__vec_alignment = (1 << LOG2CEIL({{ number_of_interrupts + 16 }})) * 8;
+/* compute the vector table offset from start of RAM */
+__vec_offset = ALIGN(TOTAL_STACK_SIZE, __vec_alignment);
+%% else
+__vec_offset = TOTAL_STACK_SIZE;
+%% endif
+
+SECTIONS
+{
+{{ linker.section_rom_start("FLASH") }}
+
+{{ linker.section_vector_rom("FLASH") }}
+
+{{ linker.section_rom("FLASH") }}
+
+
+{{ linker.section_stack(cont_ram_regions[0].name|upper, "__vec_offset - TOTAL_STACK_SIZE") }}
+
+%% if vector_table_location == "ram"
+{{ linker.section_vector_ram(cont_ram_regions[0].name|upper) }}
+%% endif
+
+{{ linker.section_ram(cont_ram_regions[0].name|upper, "FLASH",
+                      sections_data=["fastdata", "fastcode", "data_" + cont_ram_regions[0].contains[0].name],
+                      sections_bss=["bss_" + cont_ram_regions[0].contains[0].name]) }}
+
+{{ linker.all_heap_sections(table_copy, table_zero, table_heap) }}
+%% if with_crashcatcher
+	g_crashCatcherStack = . - 500;
+%% endif
+
+
+{{ linkerscript_sections | indent(first=True) }}
+
+
+{{ linker.section_tables("FLASH", table_copy, table_zero, table_heap) }}
+
+{{ linker.section_rom_end("FLASH") }}
+
+{{ linker.section_debug() }}
+}

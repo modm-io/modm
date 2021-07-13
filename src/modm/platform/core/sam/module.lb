@@ -15,11 +15,7 @@ import math
 
 def init(module):
     module.name = ":platform:core"
-    module.description = """
-# Microchip SAM core module
-
-Provides SAM specific linkerscripts and startup code.
-"""
+    module.description = FileReader("module.md")
 
 def prepare(module, options):
     if options[":target"].identifier.platform != "sam":
@@ -58,4 +54,4 @@ def build(env):
 def post_build(env):
     env.substitutions = env.query("::cortex-m:linkerscript")
     env.outbasepath = "modm/link"
-    env.template("ram.ld.in", "linkerscript.ld")
+    env.template("../cortex/ram.ld.in", "linkerscript.ld")
