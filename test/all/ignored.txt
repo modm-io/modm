@@ -111,3 +111,8 @@ samd21e16c-uu
 stm32g0b0
 stm32g0b1
 stm32g0c1
+# FIXME: Dual-core devices not supported yet
+stm32h745
+stm32h755
+stm32h747
+stm32h757

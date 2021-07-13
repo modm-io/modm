@@ -425,3 +425,45 @@ jobs:
         with:
           name: stm32g4-compile-all-2
           path: test/all/log
+
+  stm32h7-compile-all-1:
+    if: github.event.label.name == 'ci:hal'
+    runs-on: ubuntu-20.04
+    container:
+      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Checkout code and update modm tools
+        run: |
+          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - name: Compile HAL for all STM32H7 Part 1
+        run: |
+          (cd test/all && python3 run_all.py stm32h7 --quick-remaining --split 2 --part 0)
+      - name: Upload log artifacts
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: stm32h7-compile-all-1
+          path: test/all/log
+
+  stm32h7-compile-all-2:
+    if: github.event.label.name == 'ci:hal'
+    runs-on: ubuntu-20.04
+    container:
+      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Checkout code and update modm tools
+        run: |
+          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - name: Compile HAL for all STM32H7 Part 2
+        run: |
+          (cd test/all && python3 run_all.py stm32h7 --quick-remaining --split 2 --part 1)
+      - name: Upload log artifacts
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: stm32h7-compile-all-2
+          path: test/all/log
