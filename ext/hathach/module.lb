@@ -45,7 +45,7 @@ def prepare(module, options):
                 EnumerationOption(name="speed",
                                   description="USB Port Speed",
                                   enumeration={"full": "fs", "high": "hs"},
-                                  default="full",
+                                  default="high" if options[":target"].has_driver("usb_otg_hs") else "full",
                                   dependencies=lambda s: ":platform:usb:{}s".format(s[0])))
 
     module.add_submodule(TinyUsbDeviceModule())
