@@ -79,13 +79,16 @@ def get_targets():
     for key, values in minimal_targets.items():
         target_list.append(sorted(values, key=lambda d: d.string)[-1])
 
+    # Generate one device per family
+    family_list = list({d.get("family", "hosted"): d for d in target_list}.values())
+
     # We must include all :board module targets manually
     board_list = []
     for board in repopath("src/modm/board").glob("*/board.xml"):
         target = re.search(r"< *option +name=\"modm:target\" *>(.*?)</ *option *>", board.read_text())[1]
         board_list.append( (board.parent.name.replace("_", "-"), target) )
 
-    return target_list, board_list
+    return target_list, board_list, family_list
 
 
 def main():
@@ -102,16 +105,15 @@ def main():
     parser.add_argument("--deduplicate", "-d", action='store_true', help="Deduplicate identical files with symlinks.")
     args = parser.parse_args()
 
-    device_list = []
-    board_list = []
+    device_list, board_list, family_list = get_targets()
     if args.test:
-        device_list = ["hosted-linux", "atmega328p-au", "stm32f103c8t6", "stm32g474cet6", "samd21g18a-uu", "stm32f417zgt6"]
+        device_list = ["stm32f103c8t6", "stm32f417zgt6"] + family_list
+        device_list = list(set(device_list))
         board_list = [("arduino-nano", "atmega328p-au"), ("arduino-uno", "atmega328p-au"), ("nucleo-g474re", "stm32g474ret6"),
                       ("blue-pill", "stm32f103c8t6"), ("feather-m0", "samd21g18a-uu")]
     elif args.test2:
         device_list = ["hosted-linux", "atmega328p-pu", "stm32f103zgt7", "stm32g474vet7"]
-    else:
-        device_list, board_list = get_targets()
+        board_list = []
 
     template_path = os.path.realpath(os.path.dirname(sys.argv[0]))
     cwd = Path().cwd()
