@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2020, Erik Henriksson
+ * Copyright (c) 2021, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -14,7 +15,7 @@
 modm_extern_c int
 main(void);
 
-modm::fiber::Stack<2048> main_stack;
+modm::fiber::Stack<{{ main_fiber_stack_size }}> main_stack;
 modm::Fiber main_fiber(main_stack, &main);
 
 modm_extern_c void

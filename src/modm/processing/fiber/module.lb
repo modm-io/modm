@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2020, Erik Henriksson
+# Copyright (c) 2021, Christopher Durand
 #
 # This file is part of the modm project.
 #
@@ -20,11 +21,20 @@ def prepare(module, options):
     # module.depends(":architecture:assert")
     # if options[":target"].identifier["platform"] in ["sam", "stm32"]:
     #     module.depends(":cmsis:device")
+
+    module.add_option(
+        NumericOption(
+            name="main_fiber_stack_size",
+            description="Stack size of fiber running main()",
+            minimum=2 ** 8,
+            maximum=2 ** 16,
+            default=2048))
     return True
 
 def build(env):
     core = env[":target"].get_driver("core")["type"]
 
+    env.substitutions["main_fiber_stack_size"] = env["main_fiber_stack_size"]
     env.outbasepath = "modm/src/modm/processing/fiber"
     env.copy("../fiber.hpp")
     env.copy("fiber.hpp")
@@ -32,7 +42,7 @@ def build(env):
     env.copy("fiber_impl.hpp")
     env.copy("context.hpp")
     env.copy("context.cpp")
-    env.copy("fiber_main.cpp")
+    env.template("fiber_main.cpp.in")
 
     if core.startswith("cortex-m0"):
         env.copy("context_cortex_m0.cpp")

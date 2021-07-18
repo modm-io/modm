@@ -137,7 +137,7 @@ class TestRun:
                 lbuild_command += ["avr.xml"]
                 shutil.copyfile("avr.cpp", os.path.join(tempdir, "main.cpp"))
             else:
-                lbuild_command += ["cortex-m.xml", "-D:::main_stack_size=512"]
+                lbuild_command += ["cortex-m.xml", "-D:::main_stack_size=512", "-D:::main_fiber_stack_size=512"]
                 shutil.copyfile("cortex-m.cpp", os.path.join(tempdir, "main.cpp"))
 
             if self.cache_dir:
