@@ -19,7 +19,7 @@
 #include <stdint.h>
 #include <concepts>
 
-#include "brightness.hpp"
+#include "grayscale.hpp"
 #include "rgb.hpp"
 #include "rgb565.hpp"
 
@@ -31,8 +31,9 @@ template<std::unsigned_integral T>
 class RgbT;
 
 template<std::unsigned_integral T>
-class BrightnessT;
+class GrayscaleT;
 
+template<bool BigEndian>
 class Rgb565;
 
 /**
@@ -45,6 +46,8 @@ template<std::unsigned_integral T>
 class HsvT
 {
 public:
+	static constexpr bool isColor = true;
+
 	T hue{0};
 	T saturation{0};
 	T value{0};
@@ -80,12 +83,12 @@ public:
 	constexpr HsvT(const RgbT<U>& rgb);
 
 	/**
-	 * Convertion Constructor for Brightness
+	 * Convertion Constructor for Grayscale
 	 *
-	 * @param brightness	Brightness 'Color'-object
+	 * @param grayscale	Grayscale 'Color'-object
 	 */
 	template<std::unsigned_integral U>
-	constexpr HsvT(const BrightnessT<U> gray) : hue(0), saturation(0), value(gray.value)
+	constexpr HsvT(const GrayscaleT<U> gray) : hue(0), saturation(0), value(gray.value)
 	{}
 
 	/**
@@ -93,7 +96,8 @@ public:
 	 *
 	 * @param rgb565	RGB565 Color
 	 */
-	constexpr HsvT(const Rgb565& rgb565) : HsvT(RgbT<uint8_t>(rgb565)) {}
+	template<bool BigEndian>
+	constexpr HsvT(const Rgb565<BigEndian>& rgb565) : HsvT(RgbT<uint8_t>(rgb565)) {}
 
 	constexpr bool
 	operator==(const HsvT<T>& other) const = default;

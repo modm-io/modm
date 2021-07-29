@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2020, Pavel Pletenev
+ * Copyright (c) 2021, Thomas Sommer
  *
  * This file is part of the modm project.
  *
@@ -7,32 +8,37 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-#ifndef MODM_ILI9341_PARALLEL_HPP
-#define MODM_ILI9341_PARALLEL_HPP
+#pragma once
 
-#include "ili9341.hpp"
+#ifndef MODM_ILI9341_HPP
+#error "Don't include this file directly, use 'ili9341.hpp' instead!"
+#endif
+
+#include <modm/math/utils/endianness.hpp>
+
+#include "ili9341_register.hpp"
 
 namespace modm
 {
 
 /// @ingroup modm_driver_ili9341
-template<class INTERFACE>
-class Ili9341ParallelInterface: public ili9341
+template<class Interface>
+class Ili9341InterfaceParallel: public ili9341_register
 {
-	INTERFACE& interface;
+	Interface& interface;
 public:
-	Ili9341ParallelInterface(INTERFACE& interface)
+	Ili9341InterfaceParallel(Interface& interface)
 	: interface(interface) {}
 
-	__attribute__((noinline)) void
+	void
 	writeCommand(Command command)
 	{
-		interface.writeIndex(i(command));
+		interface.writeIndex(uint8_t(command));
 	}
-	__attribute__((noinline)) void
+	void
 	writeCommand(Command command, uint8_t const *args, std::size_t length)
 	{
-		interface.writeIndex(i(command));
+		interface.writeIndex(uint8_t(command));
 		for(std::size_t i=0; i<length; ++i)
 			interface.writeData(args[i]);
 	}
@@ -53,7 +59,7 @@ public:
 	void
 	readData(Command command, uint8_t *buffer, std::size_t length)
 	{
-		interface.writeIndex(i(command));
+		interface.writeIndex(uint8_t(command));
 		interface.readData();
 		for(std::size_t i=0; i<length; ++i)
 			buffer[i] = interface.readData();
@@ -69,17 +75,9 @@ public:
 public:
 	struct BatchHandle
 	{
-		BatchHandle(Ili9341ParallelInterface&) {}
+		BatchHandle(Ili9341InterfaceParallel&) {}
 		~BatchHandle() {}
 	};
 };
 
-/// @ingroup modm_driver_ili9341
-template <class Interface, class Reset, class Backlight, std::size_t BufferSize = 320>
-using Ili9341Parallel = Ili9341<
-	Ili9341ParallelInterface<Interface>,
-	Reset, Backlight, BufferSize>;
-
 } // namespace modm
-
-#endif // MODM_ILI9341_PARALLEL_HPP

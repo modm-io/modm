@@ -13,7 +13,7 @@
 #include "virtual_graphic_display.hpp"
 
 modm::VirtualGraphicDisplay::VirtualGraphicDisplay(modm::ColorGraphicDisplay* display,
-		modm::glcd::Point leftUpper, modm::glcd::Point rightLower):
+		modm::display::Point leftUpper, modm::display::Point rightLower):
 		display(display), leftUpper(leftUpper), rightLower(rightLower),
 		width(static_cast<uint16_t>(this->rightLower[0] - this->leftUpper[0])),
 		height(static_cast<uint16_t>(this->rightLower[1] - this->leftUpper[1]))
@@ -31,9 +31,9 @@ void
 modm::VirtualGraphicDisplay::clear()
 {
 	//TODO switch black , white
-	this->display->setColor(color::Rgb(0, 0, 0));
+	this->display->color = color::html::Black;
 	this->display->fillRectangle(this->leftUpper, width, height);
-	this->display->setColor(color::Rgb(255, 255, 255));
+	this->display->color = color::html::White;
 }
 
 void
@@ -44,19 +44,13 @@ modm::VirtualGraphicDisplay::update()
 }
 
 void
-modm::VirtualGraphicDisplay::setPixel(int16_t x, int16_t y)
+modm::VirtualGraphicDisplay::setPixel(display::Point pos)
 {
-	this->display->setPixel(x + this->leftUpper[0], y + this->leftUpper[1]);
+	this->display->setPixel(pos + display::Point(this->leftUpper[0], this->leftUpper[1]));
 }
 
-void
-modm::VirtualGraphicDisplay::clearPixel(int16_t x, int16_t y)
+modm::color::Rgb565<true>
+modm::VirtualGraphicDisplay::getPixel(display::Point pos) const
 {
-	this->display->clearPixel(x + this->leftUpper[0], y + this->leftUpper[1] );
-}
-
-modm::color::Rgb565
-modm::VirtualGraphicDisplay::getPixel(int16_t x, int16_t y) const
-{
-	return this->display->getPixel(x + this->leftUpper[0], y + this->leftUpper[1] );
+	return this->display->getPixel(pos + display::Point(this->leftUpper[0], this->leftUpper[1]));
 }

@@ -24,8 +24,8 @@ namespace modm
 class VirtualGraphicDisplay : public modm::ColorGraphicDisplay
 {
 public:
-	VirtualGraphicDisplay(modm::ColorGraphicDisplay* display, modm::glcd::Point leftUpper,
-						  modm::glcd::Point rightLower);
+	VirtualGraphicDisplay(modm::ColorGraphicDisplay* display, modm::display::Point leftUpper,
+						  modm::display::Point rightLower);
 
 	void
 	setDisplay(modm::ColorGraphicDisplay* display);
@@ -50,18 +50,15 @@ public:
 
 protected:
 	void
-	setPixel(int16_t x, int16_t y) final;
+	setPixel(display::Point pos) final;
 
-	void
-	clearPixel(int16_t x, int16_t y) final;
-
-	color::Rgb565
-	getPixel(int16_t x, int16_t y) const final;
+	color::Rgb565<true>
+	getPixel(display::Point pos) const final;
 
 private:
 	modm::ColorGraphicDisplay* display;
-	modm::glcd::Point leftUpper;
-	modm::glcd::Point rightLower;
+	modm::display::Point leftUpper;
+	modm::display::Point rightLower;
 	const uint16_t width;
 	const uint16_t height;
 };

@@ -18,7 +18,7 @@
 
 template<int16_t Width, int16_t Height>
 void
-modm::MonochromeGraphicDisplayVertical<Width, Height>::drawHorizontalLine(glcd::Point start,
+modm::MonochromeGraphicDisplayVertical<Width, Height>::drawHorizontalLine(display::Point start,
 																		  uint16_t length)
 {
 	if (start.y >= 0 and start.y < Height)
@@ -35,7 +35,7 @@ modm::MonochromeGraphicDisplayVertical<Width, Height>::drawHorizontalLine(glcd::
 
 template<int16_t Width, int16_t Height>
 void
-modm::MonochromeGraphicDisplayVertical<Width, Height>::drawVerticalLine(glcd::Point start,
+modm::MonochromeGraphicDisplayVertical<Width, Height>::drawVerticalLine(display::Point start,
 																		uint16_t length)
 {
 	if (start.x >= 0 and start.x < Width)
@@ -67,7 +67,7 @@ modm::MonochromeGraphicDisplayVertical<Width, Height>::drawVerticalLine(glcd::Po
 template<int16_t Width, int16_t Height>
 void
 modm::MonochromeGraphicDisplayVertical<Width, Height>::drawImageRaw(
-	glcd::Point start, uint16_t width, uint16_t height, modm::accessor::Flash<uint8_t> data)
+	display::Point start, uint16_t width, uint16_t height, modm::accessor::Flash<uint8_t> data)
 {
 	if ((start.y % 8) == 0)
 	{

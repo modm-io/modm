@@ -15,7 +15,7 @@
 
 #include "color/rgb.hpp"
 #include "color/hsv.hpp"
-#include "color/brightness.hpp"
+#include "color/grayscale.hpp"
 
 #include "color/rgb565.hpp"
 #include "color/rgbhtml.hpp"

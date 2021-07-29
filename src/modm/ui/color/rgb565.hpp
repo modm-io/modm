@@ -12,8 +12,9 @@
 #pragma once
 
 #include <algorithm>
+#include <bit>
 
-#include "brightness.hpp"
+#include "grayscale.hpp"
 #include "hsv.hpp"
 #include "rgb.hpp"
 
@@ -28,7 +29,7 @@ template<std::unsigned_integral T>
 class HsvT;
 
 template<std::unsigned_integral T>
-class BrightnessT;
+class GrayscaleT;
 
 /**
  * Color in RGB Colorspace, 16 bits: RRRR RGGG GGGB BBBB
@@ -36,9 +37,13 @@ class BrightnessT;
  * @author		Fabian Greif, Thomas Sommer
  * @ingroup		modm_ui_color
  */
+
+template<bool BigEndian = false>
 class Rgb565
 {
 public:
+	static constexpr bool isColor = true;
+
 	uint16_t color{0x0000};
 
 	using RgbCalcType = RgbT<uint8_t>;
@@ -61,7 +66,9 @@ public:
 	 */
 	constexpr Rgb565(uint8_t red, uint8_t green, uint8_t blue)
 		: color(uint16_t(red & 0xF8) << 8 | uint16_t(green & 0xFC) << 3 | uint16_t(blue >> 3))
-	{}
+	{
+		if(BigEndian) color = std::rotr(color, 8);
+	}
 
 	/**
 	 * Convertion Constructor for RGB Color
@@ -82,12 +89,12 @@ public:
 	{}
 
 	/**
-	 * Convertion Constructor for Brightness
+	 * Convertion Constructor for Grayscale
 	 *
-	 * @param brightness	Brightness 'Color'-object
+	 * @param grayscale	Grayscale 'Color'-object
 	 */
 	template<std::unsigned_integral U>
-	constexpr Rgb565(const BrightnessT<U> brightness) : Rgb565(RgbCalcType(brightness))
+	constexpr Rgb565(const GrayscaleT<U> grayscale) : Rgb565(RgbCalcType(grayscale))
 	{}
 
 	constexpr bool
@@ -97,6 +104,7 @@ public:
 	Rgb565
 	operator+(const Rgb565 other) const
 	{
+		// FIXME implement for BigEndian == true
 		const int8_t red_raw = (color >> 11) + (other.color >> 11);
 		const uint16_t red = std::clamp<int8_t>(red_raw, 0, 31) << 11;
 
@@ -113,6 +121,7 @@ public:
 	Rgb565
 	operator-(const Rgb565 other) const
 	{
+		// FIXME implement for BigEndian == true
 		const int8_t red_raw = (color >> 11) - (other.color >> 11);
 		const uint16_t red = std::clamp<int8_t>(red_raw, 0, 0x1F) << 11;
 

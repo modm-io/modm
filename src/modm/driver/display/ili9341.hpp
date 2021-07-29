@@ -13,295 +13,183 @@
 
 #include <modm/architecture/interface/delay.hpp>
 #include <modm/architecture/interface/register.hpp>
-#include <modm/math/utils/endianness.hpp>
 #include <modm/platform/gpio/base.hpp>
-#include <modm/ui/display/color_graphic_display.hpp>
+#include <modm/processing/resumable.hpp>
+#include <modm/ui/display.hpp>
+
+#include "ili9341_interface_parallel.hpp"
+#include "ili9341_interface_spi.hpp"
 
 namespace modm
 {
 
 /// @ingroup modm_driver_ili9341
-struct ili9341
+template<class Interface, class Reset, size_t BufferSize = 1024>
+class Ili9341 : public Interface, public ColorGraphicDisplay
 {
-protected:
-	/// @cond
-	enum class
-	Command : uint8_t
-	{
-		// common commands
-		Nop = 0x00,
-		SwReset = 0x01,
-		ReadID = 0x04,
-		ReadStatus = 0x09,
-		ReadPowerMode = 0x0a,
-		ReadMemoryAccessCtrl = 0x0b,
-		ReadPixelFormat = 0x0c,
-		ReadImageFormat = 0x0d,
-		ReadSignalMode = 0x0e,
-		ReadSelfDiagnostic = 0x0f,
-		EnterSleep = 0x10,
-		LeaveSleep = 0x11,
-		PartialMode = 0x12,
-		NormalMode = 0x13,
-		InversionOff = 0x20,
-		InversionOn = 0x21,
-		GammaSet = 0x26,
-		DisplayOff = 0x28,
-		DisplayOn = 0x29,
-		ColumnAddressSet = 0x2a,
-		PageAddressSet = 0x2b,
-		MemoryWrite = 0x2c,
-		ColorSet = 0x2d,
-		MemoryRead = 0x2e,
-		PartialArea = 0x30,
-		VerticalScrollDefinition = 0x33,
-		TearingEffectOff = 0x34,
-		TearingEffectOn = 0x35,
-		MemoryAccessCtrl = 0x36,
-		VerticalScrollStartAddr = 0x37,
-		IdleModeOff = 0x38,
-		IdleModeOn = 0x39,
-		PixelFormatSet = 0x3a,
-		WriteMemoryContinue = 0x3c,
-		ReadMemoryContinue = 0x3e,
-		SetTearScanLine = 0x44,
-		GetScanLine = 0x45,
-		WriteBrightness = 0x51,
-		ReadBrightness = 0x52,
-		WriteCtrlDisplay = 0x53,
-		ReadCtrlDisplay = 0x54,
-		WriteContentAdaptiveBrightnessCtrl = 0x55,
-		ReadContentAdaptiveBrightnessCtrl = 0x56,
-		WriteCabcMinimumBrightness = 0x5e,
-		ReadCabcMinimumBrightness = 0x5f,
-		ReadId1 = 0xda,
-		ReadId2 = 0xdb,
-		ReadId3 = 0xdc,
-		// extended commands
-		RgbInterfaceSignalCtrl = 0xb0,
-		FrameCtrlNormalMode = 0xb1,
-		FrameCtrlIdleMode = 0xb2,
-		FrameCtrlPartialMode = 0xb3,
-		InversionCtrl = 0xb4,
-		BlankingPorchCtrl = 0xb5,
-		DisplayFunctionCtrl = 0xb6,
-		EntryModeSet = 0xb7,
-		BacklightCtrl1 = 0xb8,
-		BacklightCtrl2 = 0xb9,
-		BacklightCtrl3 = 0xba,
-		BacklightCtrl4 = 0xbb,
-		BacklightCtrl5 = 0xbc,
-		BacklightCtrl7 = 0xbe,
-		BacklightCtrl8 = 0xbf,
-		PowerCtrl1 = 0xc0,
-		PowerCtrl2 = 0xc1,
-		VComCtrl1 = 0xc5,
-		VComCtrl2 = 0xc7,
-		PowerCtrlA = 0xcb,
-		PowerCtrlB = 0xcf,
-		NvMemoryWrite = 0xd0,
-		NvMemoryProtectionKey = 0xd1,
-		NvMemoryStatus = 0xd2,
-		ReadId4 = 0xd3,
-		PositiveGammaCorrection = 0xe0,
-		NegativeGammaCorrection = 0xe1,
-		DigitalGammaCtrl = 0xe2,
-		TimingCtrlA = 0xe8,
-		TimingCtrlB = 0xea,
-		PowerOnSequenceCtrl = 0xed,
-		Enable3Gamma = 0xf2,
-		InterfaceCtrl = 0xf6,
-		PumpRatioCtrl = 0xf7,
-	};
-	static constexpr uint8_t i(Command command) { return uint8_t(command); }
+	static_assert(BufferSize >= 128, "Minimum Buffer is required");
 
-	enum class
-	MemoryAccessCtrl : uint8_t
-	{
-		MY = modm::Bit7,
-		MX = modm::Bit6,
-		MV = modm::Bit5,
-		ML = modm::Bit4,
-		BGR = modm::Bit3,
-		MH = modm::Bit2
-	};
-	MODM_FLAGS8(MemoryAccessCtrl);
-	/// @endcond
+	using Toggle = ili9341_register::Toggle;
+	using ReadWrite = ili9341_register::ReadWrite;
+	using Command = ili9341_register::Command;
+	using ReadCommand = ili9341_register::ReadCommand;
 
 public:
-	enum class
-	DisplayMode : uint8_t
-	{
-		Normal = uint8_t(Command::InversionOff),
-		Inverted = uint8_t(Command::InversionOn)
-	};
-};
-
-/// @ingroup modm_driver_ili9341
-template <class Interface, class Reset, class Backlight, std::size_t BufferSize = 320>
-class Ili9341 : public Interface, public modm::ColorGraphicDisplay
-{
-	static_assert(BufferSize >= 16, "at least a small buffer is required");
-
-	static constexpr uint16_t Width = 240;
-	static constexpr uint16_t Height = 320;
-	using BatchHandle = typename Interface::BatchHandle;
-	using Command = ili9341::Command;
-public:
-	using Orientation = glcd::Orientation;
-	using DisplayMode = ili9341::DisplayMode;
-
 	template<typename... Args>
-	Ili9341(Args&&... args): Interface(std::forward<Args>(args)...)
+	Ili9341(Args &&...args) : Interface(std::forward<Args>(args)...)
 	{
 		Reset::setOutput(modm::Gpio::High);
-		Backlight::setOutput(modm::Gpio::Low);
 	}
 
-	void
+	~Ili9341(){};
+
+	modm::ResumableResult<void>
 	initialize();
 
-	void
+	modm::ResumableResult<void>
 	reset(bool hardReset = false);
 
-	uint16_t
+	modm::ResumableResult<uint16_t>
 	getIcModel();
-
-	void
-	turnOn();
-
-	void
-	turnOff();
-
-	void
-	enableBacklight(bool enable)
-	{ Backlight::set(enable); }
-
-	void
-	setBrightness(uint8_t level);
-
-	void
-	setInvert(bool invert);
-
-	void
-	setIdle(bool enable);
-
-	void
-	enableSleep(bool enable);
 
 	uint16_t
 	getWidth() const final
-	{
-		switch (orientation)
-		{
-			case Orientation::Portrait90:
-			case Orientation::Portrait270:
-				return Height;
-			default:
-				return Width;
-		}
-	}
+	{ return (orientation & display::OrientationFlags::Portrait) ? 240 : 320; }
 
 	uint16_t
 	getHeight() const final
-	{
-		switch (orientation)
-		{
-			case Orientation::Portrait90:
-			case Orientation::Portrait270:
-				return Width;
-			default:
-				return Height;
-		}
-	}
+	{ return (orientation & display::OrientationFlags::Portrait) ? 320 : 240; }
 
-	inline std::size_t
-	getBufferWidth() const final
-	{
-		return Width;
-	}
+	/* modm::ResumableResult<uint32_t>
+	getStatus(); // 5 bytes, Datasheet P92
 
-	inline std::size_t
-	getBufferHeight() const final
-	{
-		return Height;
-	}
+	modm::ResumableResult<uint16_t>
+	getPowerMode(); // 2 bytes, Datasheet P94
 
-	void
-	setPixel(int16_t x, int16_t y) final
-	{ setColoredPixel(x, y, foregroundColor); }
+	modm::ResumableResult<uint16_t>
+	getMadCtl(); // 2 bytes, Datasheet P95
 
-	void
-	clearPixel(int16_t x, int16_t y) final
-	{ setColoredPixel(x, y, backgroundColor); }
+	modm::ResumableResult<uint16_t>
+	getPixelFormat(); // 2 bytes, Datasheet P96 */
 
-    // TODO implement getPixel for ili9341
-	color::Rgb565
-	getPixel(int16_t x, int16_t y) const final
-	{
-		(void) x;
-		(void) y;
-		return modm::color::html::White;
-	}
+	modm::ResumableResult<void>
+	set(Toggle toggle, bool state);
 
-	void
-	clear() final;
+	modm::ResumableResult<void>
+	set(ReadWrite reg, uint8_t value);
 
-	inline void
-	update() final
-	{ /* nothing to do, data is directly written to TFT RAM */ }
+	modm::ResumableResult<uint8_t>
+	get(ReadWrite reg);
 
-	inline void
-	setOrientation(glcd::Orientation orientation);
+	// After change of Orientation, wait 1ms before sending new pixels
+	modm::ResumableResult<void>
+	setOrientation(display::Orientation orientation);
 
-	void
-	fillRectangle(glcd::Point upperLeft, uint16_t width, uint16_t height);
-
-	inline void
-	fillRectangle(int16_t x, int16_t y, uint16_t width, uint16_t height)
-	{ fillRectangle(glcd::Point(x, y), width, height); }
-
-	void
-	fillCircle(glcd::Point center, uint16_t radius);
-
-	void
-	drawImageRaw(glcd::Point upperLeft,
-				 uint16_t width, uint16_t height,
-				 modm::accessor::Flash<uint8_t> data) final;
-
-	void
-	drawRaw(glcd::Point upperLeft, uint16_t width, uint16_t height, color::Rgb565* data);
-
-	void
+	modm::ResumableResult<void>
 	setScrollArea(uint16_t topFixedRows, uint16_t bottomFixedRows, uint16_t firstRow);
 
-	void
+	modm::ResumableResult<void>
 	scrollTo(uint16_t row);
 
+	// Some rectangular drawing functions, send directly to the display
+	// Using DMA (f.e. SpiMaster_Dma) is highly recommended!
 	void
-	drawBitmap(glcd::Point upperLeft, uint16_t width, uint16_t height, modm::accessor::Flash<uint8_t> data);
+	setPixel(display::Point pos);
+
+	void
+	clearPixel(display::Point pos);
+
+	void
+	setPixel(display::Point pos, bool value);
+
+	void
+	setPixel(display::Point pos, modm::color::Rgb565<true> color);
+
+	color::Rgb565<true>
+	getPixel(display::Point) const final {
+		// TODO implement
+		return modm::color::html::Black;
+	}
+
+	void
+	drawHorizontalLine(display::Point origin, uint16_t length);
+
+	void
+	drawVerticalLine(display::Point origin, uint16_t length);
+
+	void
+	fillRectangle(display::Point origin, uint16_t width, uint16_t height);
+
+	modm::ResumableResult<void>
+	clear(color::Rgb565<true> color = color::html::Black);
+
+	void
+	update() final {};
+
+	// TODO Reimplement
+	// Send monochrome image stored in flash directly to the screen
+	void
+	drawImageRaw(display::Point origin, uint16_t width, uint16_t height,
+		modm::accessor::Flash<uint8_t> data);
+
+	// TODO Reimplement
+	// Send color-image stored in flash directly to the screen
+	void
+	drawBitmap(display::Point origin, uint16_t width, uint16_t height,
+		modm::accessor::Flash<uint8_t> data);
+
+	// TODO Reimplement
+	// Send a colored graphic-buffer directly to the screen
+	void
+	drawRaw(display::Point origin,
+	uint16_t width, uint16_t height, color::Rgb565<false>* data);
 
 protected:
-	void
-	drawHorizontalLine(glcd::Point start, uint16_t length) final;
+	bool
+	xOnScreen(int16_t x) const
+	{ return x >= 0 and x < int16_t(getWidth()); }
 
-	void
-	drawVerticalLine(glcd::Point start, uint16_t length) final;
+	bool
+	yOnScreen(int16_t y) const
+	{ return y >= 0 and y < int16_t(getHeight()); }
 
-private:
-	void
-	setColoredPixel(int16_t x, int16_t y, color::Rgb565 const &color);
+	bool
+	pointOnScreen(display::Point position) const
+	{ return xOnScreen(position.x) and yOnScreen(position.y); }
 
-	void
-	setClipping(uint16_t x, uint16_t y, uint16_t width, uint16_t height);
+	// setClipping for a single pixel
+	modm::ResumableResult<void>
+	setClipping(display::Point pos);
 
-	Orientation orientation{Orientation::Landscape0};
+	// setClipping for an area
+	modm::ResumableResult<void>
+	setClipping(display::Point origin, display::Point bottomRight);
 
-	uint8_t buffer[BufferSize * 2]{0};
+	// fill an area with buffer
+	modm::ResumableResult<void>
+	fill(display::Point origin, uint16_t width, uint16_t height);
+
+	// "Local" variables, required for resumable functions
+
+	union {
+		// Buffers for Commands & Configuration
+		uint8_t buffer8[15];
+		uint16_t buffer16[3];
+		ili9341_register::MemoryAccessCtrl_t madCtrl;
+
+		// Parallel use in resumable function
+		// No overlap permitted!
+		struct {
+			modm::color::Rgb565<true> buffer[BufferSize];
+			display::Intersection intersection;
+			uint16_t clipping_buffer[2];
+			uint32_t write_pixels;
+		} p; // p for parallel
+	};
 };
 
-} // namespace modm
+}  // namespace modm
 
 #include "ili9341_impl.hpp"
 
-#endif //  MODM_ILI9341_HPP
+#endif  //  MODM_ILI9341_HPP

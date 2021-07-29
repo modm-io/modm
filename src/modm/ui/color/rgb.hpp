@@ -24,7 +24,7 @@
 #include <modm/math/utils/arithmetic_traits.hpp>
 #include <type_traits>
 
-#include "brightness.hpp"
+#include "grayscale.hpp"
 #include "hsv.hpp"
 #include "rgb565.hpp"
 
@@ -36,8 +36,9 @@ template<std::unsigned_integral T>
 class HsvT;
 
 template<std::unsigned_integral T>
-class BrightnessT;
+class GrayscaleT;
 
+template <bool BigEndian>
 class Rgb565;
 
 /**
@@ -50,6 +51,8 @@ template<std::unsigned_integral T>
 class RgbT
 {
 public:
+	static constexpr bool isColor = true;
+
 	T red{0};
 	T green{0};
 	T blue{0};
@@ -87,14 +90,14 @@ public:
 	constexpr RgbT(const HsvT<U>& hsv);
 
 	/**
-	 * Convertion Constructor for Brightness
+	 * Convertion Constructor for Grayscale
 	 *
-	 * @param brightness	Brightness 'Color'-object
+	 * @param grayscale	Grayscale 'Color'-object
 	 */
 	// TODO Plump conversion, implement the right way
 	template<std::unsigned_integral U>
-	constexpr RgbT(const BrightnessT<U> brightness)
-		: red(brightness), green(brightness), blue(brightness)
+	constexpr RgbT(const GrayscaleT<U> grayscale)
+		: red(grayscale.value), green(grayscale.value), blue(grayscale.value)
 	{}
 
 	/**
@@ -102,11 +105,19 @@ public:
 	 *
 	 * @param rgb565	RGB565 Color
 	 */
-	constexpr RgbT(const Rgb565& rgb565)
+	constexpr RgbT(const Rgb565<false>& rgb565)
 		: red((rgb565.color >> 8) & 0xF8),
 		  green((rgb565.color >> 3) & 0xFC),
 		  blue(rgb565.color << 3)
 	{}
+
+	constexpr RgbT(const Rgb565<true>& rgb565)
+	{
+		uint16_t color = std::rotr(rgb565.color, 8);
+		red = (rgb565.color >> 8) & 0xF8;
+		green = (rgb565.color >> 3) & 0xFC;
+		blue = rgb565.color << 3;
+	}
 
 	constexpr bool
 	operator==(const RgbT<T>& other) const = default;

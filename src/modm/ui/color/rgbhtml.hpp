@@ -21,6 +21,7 @@ namespace modm::color::html
  *
  * @see 		https://htmlcolorcodes.com/color-names/
  * @see 		modm:color:RgbT
+ * @author      Thomas Sommer
  * @ingroup 	modm_ui_color
  * @{
  */

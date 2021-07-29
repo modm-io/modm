@@ -23,6 +23,7 @@
 #include <modm/io/iodevice.hpp>
 #include <modm/io/iostream.hpp>
 #include <modm/math/geometry.hpp>
+#include <modm/math/utils/bit_constants.hpp>
 
 #include <modm/ui/color.hpp>
 #include "font.hpp"
@@ -31,21 +32,84 @@ namespace modm
 {
 
 /// @ingroup	modm_ui_display
-namespace glcd
+namespace display
 {
 
 /// @ingroup modm_ui_display
-using Point = Vector<int16_t, 2>;
-
-enum Orientation : uint8_t
+class Point : public Vector<int16_t, 2>
 {
-	Landscape0,
-	Portrait90,
-	Landscape180,
-	Portrait270,
+public:
+	Point() = default;
+
+	// Allow arbitray arithmetic Types for Point-construction
+	// This suspresses "narrowing conversion" compiler warnings
+	template<typename T, typename U>
+	requires std::is_arithmetic_v<T> and std::is_arithmetic_v<U>
+	Point(T x, U y) : Vector<int16_t, 2>(x, y){};
+
+	template<typename T>
+	requires std::is_arithmetic_v<T>
+	Point(Vector<T, 2> vector) : Vector<int16_t, 2>(vector){};
 };
 
-}  // namespace glcd
+/**
+ * Helper class for 2d-drawing functions and buffer-conversion
+ */
+class Intersection
+{
+public:
+	Point pos, topLeft, bottomRight;
+
+	Intersection() = default;
+
+	Intersection(Point pos, int16_t width_source, int16_t height_source, int16_t width_target, int16_t height_target)
+		: pos(pos),
+		topLeft({
+			std::clamp<int16_t>(pos.x, 0, width_target),
+			std::clamp<int16_t>(pos.y, 0, height_target)
+		}),
+		bottomRight({
+			std::clamp<int16_t>(pos.x + width_source, 0, width_target),
+			std::clamp<int16_t>(pos.y + height_source, 0, height_target)
+		})
+	{}
+
+	// Optional getters
+
+	Point
+	getSourceTopLeft() const
+	{ return {pos.x < 0 ? -pos.x : 0, pos.y < 0 ? -pos.y : 0}; }
+
+	uint32_t getPixelCount() const
+	{
+		const Point diagonal = bottomRight - topLeft;
+		return diagonal.x * diagonal.y;
+	}
+
+	bool noIntersection() const
+	{
+		return topLeft == bottomRight;
+	}
+};
+
+/// @ingroup modm_ui_display
+enum OrientationFlags : uint8_t
+{
+	Portrait = Bit0,
+	Rotate180 = Bit1
+};
+
+/// @ingroup modm_ui_display
+enum Orientation : uint8_t
+{
+	Landscape0 = 0,
+	Portrait90 = Portrait,
+	Landscape180 = Rotate180,
+	Portrait270 = Portrait | Rotate180
+};
+}  // namespace display
+
+using namespace display;
 
 /**
  * Base class for graphical displays.
@@ -84,67 +148,13 @@ public:
 	virtual uint16_t
 	getHeight() const = 0;
 
-	// TODO Requires all inherited drivers work with resumable functions
-	// virtual modm::ResumableResult<bool>
-	// setOrientation() = 0;
-
 	/**
-	 * Buffer-array size of first dimension
-	 */
-	virtual std::size_t
-	getBufferWidth() const = 0;
-
-	/**
-	 * Buffer-array size of second dimension
-	 */
-	virtual std::size_t
-	getBufferHeight() const = 0;
-
-	/**
-	 * Set a pixel to foregroundColor
-	 *
-	 * \param x		x-position
-	 * \param y		y-position
-	 */
-	virtual void
-	setPixel(int16_t x, int16_t y) = 0;
-
-	/**
-	 * Set a pixel to foregroundColor
+	 * Set a pixel to color
 	 *
 	 * \param p		point
 	 */
-	inline void
-	setPixel(glcd::Point p)
-	{
-		this->setPixel(p.x, p.y);
-	}
-
-	/**
-	 * Set a pixel to backgroundColor
-	 *
-	 * \param x		x-position
-	 * \param y		y-position
-	 */
 	virtual void
-	clearPixel(int16_t x, int16_t y) = 0;
-
-	/**
-	 * Set a pixel to backgroundColor
-	 *
-	 * \param p		point
-	 */
-	inline void
-	clearPixel(glcd::Point p)
-	{
-		this->setPixel(p.x, p.y);
-	}
-
-	/**
-	 * Set whole screen to backgroundColor
-	 */
-	virtual void
-	clear() = 0;
+	setPixel(Point p) = 0;
 
 	/**
 	 * Transfer the content of the RAM buffer to the real display.
@@ -159,7 +169,7 @@ public:
 	// TODO Set a clipping area
 	// Everything drawn outside this area will be discarded.
 	// inline void
-	// setClippingWindow(glcd::Point start, glcd::Point end);
+	// setClippingWindow(Point start, Point end);
 
 	/**
 	 * Draw a line.
@@ -171,22 +181,8 @@ public:
 	 * \param start	first point
 	 * \param end	second point
 	 */
-	inline void
-	drawLine(glcd::Point start, glcd::Point end)
-	{
-		this->drawLine(start.x, start.y, end.x, end.y);
-	}
-
-	/**
-	 * Draw a line
-	 *
-	 * \param x1	Start x-position
-	 * \param y1	Start y-position
-	 * \param x2	End x-position
-	 * \param y3	End y-position
-	 */
 	void
-	drawLine(int16_t x1, int16_t y1, int16_t x2, int16_t y2);
+	drawLine(Point start, Point end);
 
 	/**
 	 * Draw a rectangle.
@@ -196,21 +192,7 @@ public:
 	 * \param height	Height of rectangle
 	 */
 	void
-	drawRectangle(glcd::Point start, uint16_t width, uint16_t height);
-
-	/**
-	 * Draw a rectangle.
-	 *
-	 * \param x 		Upper left corner x-position
-	 * \param y 		Upper left corner y-position
-	 * \param width		Width of rectangle
-	 * \param height	Height of rectangle
-	 */
-	inline void
-	drawRectangle(int16_t x, int16_t y, uint16_t width, uint16_t height)
-	{
-		drawRectangle(glcd::Point(x, y), width, height);
-	}
+	drawRectangle(Point start, uint16_t width, uint16_t height);
 
 	/**
 	 * Draw a filled rectangle.
@@ -220,21 +202,7 @@ public:
 	 * \param height	Height of rectangle
 	 */
 	void
-	fillRectangle(glcd::Point start, uint16_t width, uint16_t height);
-
-	/**
-	 * Draw a rectangle.
-	 *
-	 * \param x 		Upper left corner x-position
-	 * \param y 		Upper left corner y-position
-	 * \param width		Width of rectangle
-	 * \param height	Height of rectangle
-	 */
-	inline void
-	fillRectangle(int16_t x, int16_t y, uint16_t width, uint16_t height)
-	{
-		fillRectangle(glcd::Point(x, y), width, height);
-	}
+	fillRectangle(Point start, uint16_t width, uint16_t height);
 
 	/**
 	 * Draw a rectangle with rounded corners
@@ -245,7 +213,7 @@ public:
 	 * \param radius	Rounding radius
 	 */
 	void
-	drawRoundedRectangle(glcd::Point start, uint16_t width, uint16_t height, uint16_t radius);
+	drawRoundedRectangle(Point start, uint16_t width, uint16_t height, uint16_t radius);
 
 	/**
 	 * Draw a filled rectangle with rounded corners
@@ -257,7 +225,7 @@ public:
 	 */
 	// TODO Not yet implemented
 	// void
-	// fillRoundedRectangle(glcd::Point start, uint16_t width, uint16_t height, uint16_t radius);
+	// fillRoundedRectangle(Point start, uint16_t width, uint16_t height, uint16_t radius);
 
 	/**
 	 * Draw a circle
@@ -268,7 +236,7 @@ public:
 	 * \param radius	Radius of the circle
 	 */
 	void
-	drawCircle(glcd::Point center, uint16_t radius);
+	drawCircle(Point center, uint16_t radius);
 
 	/**
 	 * Draw a filled circle.
@@ -277,7 +245,7 @@ public:
 	 * \param radius	Radius of the circle
 	 */
 	virtual void
-	fillCircle(glcd::Point center, uint16_t radius);
+	fillCircle(Point center, uint16_t radius);
 
 	/**
 	 * Draw an ellipse.
@@ -290,7 +258,7 @@ public:
 	 * \param ry		Radius in y-direction
 	 */
 	void
-	drawEllipse(glcd::Point center, int16_t rx, int16_t ry);
+	drawEllipse(Point center, int16_t rx, int16_t ry);
 
 	/**
 	 * Draw an image.
@@ -304,7 +272,7 @@ public:
 	 * \see	drawImage()
 	 */
 	void
-	drawImage(glcd::Point start, modm::accessor::Flash<uint8_t> image);
+	drawImage(Point start, modm::accessor::Flash<uint8_t> image);
 
 	/**
 	 * Draw an image.
@@ -315,7 +283,7 @@ public:
 	 * \param data		Image data in Flash without any size information.
 	 */
 	virtual void
-	drawImageRaw(glcd::Point start, uint16_t width, uint16_t height,
+	drawImageRaw(Point start, uint16_t width, uint16_t height,
 				 modm::accessor::Flash<uint8_t> data);
 
 	/**
@@ -324,7 +292,7 @@ public:
 	 * \param position	Cursor position
 	 */
 	inline void
-	setCursor(glcd::Point position)
+	setCursor(Point position)
 	{
 		this->cursor = position;
 	}
@@ -338,7 +306,7 @@ public:
 	inline void
 	setCursor(int16_t x, int16_t y)
 	{
-		this->cursor = glcd::Point(x, y);
+		this->cursor = Point(x, y);
 	}
 
 	/**
@@ -363,7 +331,7 @@ public:
 		this->cursor.y = y;
 	}
 
-	inline glcd::Point
+	inline Point
 	getCursor() const
 	{
 		return this->cursor;
@@ -416,13 +384,13 @@ public:
 protected:
 	/// helper method for drawCircle() and drawEllipse()
 	void
-	drawCircle4(glcd::Point center, int16_t x, int16_t y);
+	drawCircle4(Point center, int16_t x, int16_t y);
 
 	virtual void
-	drawHorizontalLine(glcd::Point start, uint16_t length);
+	drawHorizontalLine(Point start, uint16_t length);
 
 	virtual void
-	drawVerticalLine(glcd::Point start, uint16_t length);
+	drawVerticalLine(Point start, uint16_t length);
 
 protected:
 	// Interface class for the IOStream
@@ -452,7 +420,10 @@ protected:
 protected:
 	Writer writer;
 	modm::accessor::Flash<uint8_t> font;
-	glcd::Point cursor;
+
+	Point cursor;
+
+	Orientation orientation = Orientation::Landscape0;
 };
 }  // namespace modm
 

@@ -15,6 +15,7 @@ def init(module):
     module.name = ":driver:ili9341"
     module.description = "ILI9341 Display with parallel and SPI bus transports"
 
+
 def prepare(module, options):
     module.depends(
         ":architecture:delay",
@@ -22,9 +23,11 @@ def prepare(module, options):
         ":ui:display")
     return True
 
+
 def build(env):
     env.outbasepath = "modm/src/modm/driver/display"
     env.copy("ili9341.hpp")
+    env.copy("ili9341_register.hpp")
     env.copy("ili9341_impl.hpp")
-    env.copy("ili9341_spi.hpp")
-    env.copy("ili9341_parallel.hpp")
+    env.copy("ili9341_interface_spi.hpp")
+    env.copy("ili9341_interface_parallel.hpp")

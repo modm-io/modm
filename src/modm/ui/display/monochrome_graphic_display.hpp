@@ -58,13 +58,13 @@ public:
 	}
 
 	inline std::size_t
-	getBufferWidth() const final
+	getBufferWidth() const
 	{
 		return BufferWidth;
 	}
 
 	inline std::size_t
-	getBufferHeight() const final
+	getBufferHeight() const
 	{
 		return BufferHeight;
 	}

@@ -45,7 +45,7 @@ public:
 
 	// Faster version adapted for the RAM buffer
 	void
-	drawImageRaw(glcd::Point start, uint16_t width, uint16_t height,
+	drawImageRaw(display::Point start, uint16_t width, uint16_t height,
 				 modm::accessor::Flash<uint8_t> data) final;
 
 	void
@@ -60,11 +60,11 @@ public:
 protected:
 	// Faster version adapted for the RAM buffer
 	void
-	drawHorizontalLine(glcd::Point start, uint16_t length) final;
+	drawHorizontalLine(display::Point start, uint16_t length) final;
 
 	// Faster version adapted for the RAM buffer
 	void
-	drawVerticalLine(glcd::Point start, uint16_t length) final;
+	drawVerticalLine(display::Point start, uint16_t length) final;
 };
 }  // namespace modm
 

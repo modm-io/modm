@@ -23,59 +23,63 @@
 
 #include "font/fixed_width_5x8.hpp"
 
+using namespace modm::display;
+
 // ----------------------------------------------------------------------------
 modm::GraphicDisplay::GraphicDisplay()
 	: IOStream(writer), writer(this), font(modm::accessor::asFlash(modm::font::FixedWidth5x8))
 {}
 
+#include <modm/debug/logger.hpp>
+
 // ----------------------------------------------------------------------------
 void
-modm::GraphicDisplay::drawLine(int16_t x1, int16_t y1, int16_t x2, int16_t y2)
+modm::GraphicDisplay::drawLine(Point start, Point end)
 {
-	if (x1 == x2)
+	if (start.x == end.x)
 	{
-		// x1|y1 must be the upper point
-		if (y1 > y2) { modm::swap(y1, y2); }
-		this->drawVerticalLine(glcd::Point(x1, y1), y2 - y1 + 1);
-	} else if (y1 == y2)
+		// start.x|start.y must be the upper point
+		if (start.y > end.y) { modm::swap(start.y, end.y); }
+		this->drawVerticalLine(start, end.y - start.y + 1);
+	} else if (start.y == end.y)
 	{
-		// x1|y1 must be the left point
-		if (x1 > x2) { modm::swap(x1, x2); }
-		this->drawHorizontalLine(glcd::Point(x1, y1), x2 - x1 + 1);
+		// start.x|start.y must be the left point
+		if (start.x > end.x) { modm::swap(start.x, end.x); }
+		this->drawHorizontalLine(start, end.x - start.x + 1);
 	} else
 	{
 		// bresenham algorithm
-		bool steep = abs(y2 - y1) > abs(x2 - x1);
+		bool steep = abs(end.y - start.y) > abs(end.x - start.x);
 		if (steep)
 		{
-			modm::swap(x1, y1);
-			modm::swap(x2, y2);
+			modm::swap(start.x, start.y);
+			modm::swap(end.x, end.y);
 		}
 
-		if (x1 > x2)
+		if (start.x > end.x)
 		{
-			modm::swap(x1, x2);
-			modm::swap(y1, y2);
+			modm::swap(start.x, end.x);
+			modm::swap(start.y, end.y);
 		}
 
-		int16_t deltaX = x2 - x1;
-		int16_t deltaY = abs(y2 - y1);
+		int16_t deltaX = end.x - start.x;
+		int16_t deltaY = abs(end.y - start.y);
 		int16_t error = deltaX / 2;
 
 		int16_t yStep;
-		int16_t y = y1;
+		int16_t y = start.y;
 
-		if (y1 < y2)
+		if (start.y < end.y)
 			yStep = 1;
 		else
 			yStep = -1;
 
-		for (int_fast16_t x = x1; x <= x2; ++x)
+		for (int_fast16_t x = start.x; x <= end.x; ++x)
 		{
 			if (steep)
-				this->setPixel(y, x);
+				this->setPixel({y, x});
 			else
-				this->setPixel(x, y);
+				this->setPixel({x, y});
 
 			error = error - deltaY;
 
@@ -89,37 +93,43 @@ modm::GraphicDisplay::drawLine(int16_t x1, int16_t y1, int16_t x2, int16_t y2)
 }
 
 void
-modm::GraphicDisplay::drawHorizontalLine(glcd::Point start, uint16_t length)
+modm::GraphicDisplay::drawHorizontalLine(Point start, uint16_t length)
 {
-	for (int_fast16_t i = start.x; i < static_cast<int16_t>(start.x + length); ++i)
-	{
-		this->setPixel(i, start.y);
-	}
+	uint16_t x_end = start.x + length;
+	while(start.x < x_end)
+		this->setPixel(start);
 }
 
 void
-modm::GraphicDisplay::drawVerticalLine(glcd::Point start, uint16_t length)
+modm::GraphicDisplay::drawVerticalLine(Point start, uint16_t length)
 {
-	for (int_fast16_t i = start.y; i < static_cast<int16_t>(start.y + length); ++i)
-	{
-		this->setPixel(start.x, i);
-	}
+	uint16_t y_end = start.y + length;
+	while(start.y < y_end)
+		this->setPixel(start);
 }
 
 void
-modm::GraphicDisplay::drawRectangle(glcd::Point start, uint16_t width, uint16_t height)
+modm::GraphicDisplay::drawRectangle(Point origin, uint16_t width, uint16_t height)
 {
-	uint16_t x2 = start.x + width - 1;
-	uint16_t y2 = start.y + height - 1;
+	uint16_t end_x = origin.x + width - 1;
+	uint16_t end_y = origin.y + height - 1;
 
-	this->drawHorizontalLine(start, width);
-	this->drawHorizontalLine(glcd::Point(start.x, y2), width);
-	this->drawVerticalLine(start, height);
-	this->drawVerticalLine(glcd::Point(x2, start.y), height);
+	this->drawHorizontalLine(origin, width);
+	this->drawHorizontalLine({origin.x, end_y}, width);
+	this->drawVerticalLine(origin, height);
+	this->drawVerticalLine({end_x, origin.y}, height);
 }
 
 void
-modm::GraphicDisplay::drawRoundedRectangle(glcd::Point start, uint16_t width, uint16_t height,
+modm::GraphicDisplay::fillRectangle(Point start, uint16_t width, uint16_t height)
+{
+	for (uint16_t i = start.x; (i < start.x + width) && (i < getWidth()); ++i)
+		for (uint16_t k = start.y; (k < start.y + height) && (k < getHeight()); ++k)
+			this->setPixel({i, k});
+}
+
+void
+modm::GraphicDisplay::drawRoundedRectangle(Point start, uint16_t width, uint16_t height,
 										   uint16_t radius)
 {
 	if (radius == 0) { this->drawRectangle(start, width, height); }
@@ -133,37 +143,37 @@ modm::GraphicDisplay::drawRoundedRectangle(glcd::Point start, uint16_t width, ui
 
 	while (x1 <= y1)
 	{
-		this->setPixel(x + radius - x1, y + radius - y1);
-		this->setPixel(x + radius - x1, y + height - radius + y1);
-		this->setPixel(x + radius - y1, y + radius - x1);
-		this->setPixel(x + radius - y1, y + height - radius + x1);
+		this->setPixel({x + radius - start.x, y + radius - start.y});
+		this->setPixel({x + radius - start.x, y + height - radius + start.y});
+		this->setPixel({x + radius - start.y, y + radius - start.x});
+		this->setPixel({x + radius - start.y, y + height - radius + start.x});
 
-		this->setPixel(x + width - radius + x1, y + radius - y1);
-		this->setPixel(x + width - radius + x1, y + height - radius + y1);
-		this->setPixel(x + width - radius + y1, y + radius - x1);
-		this->setPixel(x + width - radius + y1, y + height - radius + x1);
+		this->setPixel({x + width - radius + start.x, y + radius - start.y});
+		this->setPixel({x + width - radius + start.x, y + height - radius + start.y});
+		this->setPixel({x + width - radius + start.y, y + radius - start.x});
+		this->setPixel({x + width - radius + start.y, y + height - radius + start.x});
 
 		if (f < 0)
 		{
-			f += (4 * x1 + 6);
+			f += (4 * start.x + 6);
 		} else
 		{
-			f += (4 * (x1 - y1) + 10);
-			y1--;
+			f += (4 * (start.x - start.y) + 10);
+			start.y--;
 		}
-		x1++;
+		start.x++;
 	}
 
-	this->drawHorizontalLine(glcd::Point(x + radius, y), width - (2 * radius));
-	this->drawHorizontalLine(glcd::Point(x + radius, y + height), width - (2 * radius));
-	this->drawVerticalLine(glcd::Point(x, y + radius), height - (2 * radius));
-	this->drawVerticalLine(glcd::Point(x + width, y + radius), height - (2 * radius));
+	this->drawHorizontalLine(Point(x + radius, y), width - (2 * radius));
+	this->drawHorizontalLine(Point(x + radius, y + height), width - (2 * radius));
+	this->drawVerticalLine(Point(x, y + radius), height - (2 * radius));
+	this->drawVerticalLine(Point(x + width, y + radius), height - (2 * radius));
 }
 
 void
-modm::GraphicDisplay::drawCircle(glcd::Point center, uint16_t radius)
+modm::GraphicDisplay::drawCircle(Point center, uint16_t radius)
 {
-	if (radius == 0) { return; }
+	if (radius == 0) return;
 
 	int16_t error = -radius;
 	int16_t x = radius;
@@ -189,19 +199,39 @@ modm::GraphicDisplay::drawCircle(glcd::Point center, uint16_t radius)
 }
 
 void
-modm::GraphicDisplay::drawCircle4(glcd::Point center, int16_t x, int16_t y)
+modm::GraphicDisplay::fillCircle(Point center, uint16_t radius)
 {
-	const int16_t cx = center.x;
-	const int16_t cy = center.y;
+	if (radius < 2) return;
 
-	this->setPixel(cx + x, cy + y);
-	this->setPixel(cx - x, cy - y);
-	if (x != 0) { this->setPixel(cx - x, cy + y); }
-	if (y != 0) { this->setPixel(cx + x, cy - y); }
+	int16_t f = 1 - radius;
+	int16_t ddF_x = 0;
+	int16_t ddF_y = -2 * radius;
+	uint16_t x = 0;
+	uint16_t y = radius;
+
+	this->drawVerticalLine(Point(center.x, center.y - radius), 2 * radius);
+
+	while(x < y)
+	{
+		if (f >= 0)
+		{
+			y--;
+			ddF_y += 2;
+			f += ddF_y;
+		}
+		x++;
+		ddF_x += 2;
+		f += ddF_x + 1;
+
+		this->drawVerticalLine(center + Point(x, -y), 2 * y);
+		this->drawVerticalLine(center + Point(y, -x), 2 * x);
+		this->drawVerticalLine(center + Point(-x, -y), 2 * y);
+		this->drawVerticalLine(center + Point(-y, -x), 2 * x);
+	}
 }
 
 void
-modm::GraphicDisplay::drawEllipse(glcd::Point center, int16_t rx, int16_t ry)
+modm::GraphicDisplay::drawEllipse(Point center, int16_t rx, int16_t ry)
 {
 	int32_t rx_2 = rx * rx;
 	int32_t ry_2 = ry * ry;
@@ -258,7 +288,7 @@ modm::GraphicDisplay::drawEllipse(glcd::Point center, int16_t rx, int16_t ry)
 
 // ----------------------------------------------------------------------------
 void
-modm::GraphicDisplay::drawImage(glcd::Point start, modm::accessor::Flash<uint8_t> image)
+modm::GraphicDisplay::drawImage(Point start, modm::accessor::Flash<uint8_t> image)
 {
 	uint8_t width = image[0];
 	uint8_t height = image[1];
@@ -267,8 +297,8 @@ modm::GraphicDisplay::drawImage(glcd::Point start, modm::accessor::Flash<uint8_t
 }
 
 void
-modm::GraphicDisplay::drawImageRaw(glcd::Point start, uint16_t width, uint16_t height,
-								   modm::accessor::Flash<uint8_t> data)
+modm::GraphicDisplay::drawImageRaw(Point start,
+	uint16_t width, uint16_t height, modm::accessor::Flash<uint8_t> data)
 {
 	uint16_t rows = (height + 7) / 8;
 	for (uint16_t i = 0; i < width; i++)
@@ -281,12 +311,19 @@ modm::GraphicDisplay::drawImageRaw(glcd::Point start, uint16_t width, uint16_t h
 			for (uint16_t j = 0; j < rowHeight; j++)
 			{
 				if (byte & 0x01)
-					this->setPixel(start.x + i, start.y + k * 8 + j);
-				else
-					this->clearPixel(start.x + i, start.y + k * 8 + j);
+					this->setPixel({start.x + i, start.y + k * 8 + j});
 
 				byte >>= 1;
 			}
 		}
 	}
+}
+
+void
+modm::GraphicDisplay::drawCircle4(Point center, int16_t x, int16_t y)
+{
+	this->setPixel(center + Point(x, y));
+	this->setPixel(center - Point(x, y));
+	if (x != 0) this->setPixel(center + Point(-x, y));
+	if (y != 0) this->setPixel(center + Point(x, -y));
 }
