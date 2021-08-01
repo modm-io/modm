@@ -10,18 +10,19 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_GPIO_HPP
-#define MODM_GPIO_HPP
+#pragma once
 
 #include <stdint.h>
 #include <modm/architecture/utils.hpp>
+#include <modm/architecture/interface/register.hpp>
 
 namespace modm
 {
 
 /// @ingroup modm_architecture_gpio
-struct Gpio
+class Gpio
 {
+public:
 	/**
 	 * These constants refer to the *logical* state of the GPIO.
 	 * The physical state is determined by the configuration and external connection.
@@ -40,6 +41,39 @@ struct Gpio
 		InOut = 2,		//< GPIO is both Input and Output
 		Special = 3,	//< GPIO is configured with a special purpose
 	};
+
+	// Delegate to the platform for the Config_t implementation
+	#include <modm/platform/gpio/config.hpp>
+
+public:
+	virtual ~Gpio() {};
+
+	// Config methods
+	virtual void
+	configure(Config_t config) = 0;
+
+	// Input methods
+	virtual bool
+	read() const = 0;
+
+	// Output methods
+	virtual void
+	set(bool value) = 0;
+
+	virtual bool
+	isSet() const = 0;
+
+	virtual void
+	toggle()
+	{ set(not isSet()); }
+
+	inline void
+	set()
+	{ set(true); }
+
+	inline void
+	reset()
+	{ set(false); }
 };
 
 /**
@@ -187,4 +221,3 @@ public:
 
 } // namespace modm
 
-#endif // MODM_GPIO_HPP

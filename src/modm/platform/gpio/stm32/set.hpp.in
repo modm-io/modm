@@ -110,6 +110,22 @@ public:
 %% endif
 	}
 
+	static void configure(OutputSpeed speed)
+	{
+%% if target["family"] in ["f1"]
+	%% for port, id in ports.items()
+		if constexpr (crl({{id}})) GPIO{{port}}->CRL = (GPIO{{port}}->CRL & ~crl({{id}}, 0b0011)) | (i(speed) * crl({{id}}, 0b0001));
+		if constexpr (crh({{id}})) GPIO{{port}}->CRH = (GPIO{{port}}->CRH & ~crh({{id}}, 0b0011)) | (i(speed) * crh({{id}}, 0b0001));
+	%% endfor
+%% else
+	%% for port, id in ports.items()
+		if constexpr (mask({{id}})) {
+			GPIO{{port}}->OSPEEDR = (GPIO{{port}}->OSPEEDR & ~mask2({{id}})) | (i(speed) * mask2({{id}}, 0b01));
+		}
+	%% endfor
+%% endif
+	}
+
 	static void setInput()
 	{
 %% if target["family"] in ["f1"]

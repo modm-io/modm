@@ -1,0 +1,228 @@
+/*
+* Copyright (c) 2021, Christopher Durand
+*
+* This file is part of the modm project.
+*
+* This Source Code Form is subject to the terms of the Mozilla Public
+* License, v. 2.0. If a copy of the MPL was not distributed with this
+* file, You can obtain one at http://mozilla.org/MPL/2.0/.
+*/
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <array>
+
+#include "../device.hpp"
+#include "base.hpp"
+
+namespace modm::platform
+{
+
+/**
+* Runtime Gpio wrapper
+*
+* Example:
+* @code
+*  RtGpio gpio = GpioA1();
+*  gpio.toggle();
+* @endcode
+*
+* @author	Christopher Durand, Niklas Hauser
+* @ingroup	modm_platform_gpio
+*/
+class RtGpio : public Gpio, public ::modm::Gpio
+{
+	const uintptr_t portAddress;
+	const uint16_t pinMask;
+	const uint8_t position2;
+	bool isInverted{false};
+
+	inline GPIO_TypeDef* p() const { return reinterpret_cast<GPIO_TypeDef*>(portAddress); }
+	inline uint32_t mask() const { return pinMask; }
+%% if target["family"] in ["f1"]
+	inline uint32_t crl(uint8_t value=0xf) const {
+		return uint32_t(value) << ((position2 & 0xf) << 1);
+	}
+	inline uint32_t crh(uint8_t value=0xf) const {
+		return uint32_t(value) << (((position2 & 0xf) << 1) - 32);
+	}
+%% else
+	inline uint32_t mask2(uint32_t value=3ul) const { return value << position2; }
+%% endif
+
+public:
+	constexpr RtGpio(Gpio::Port port, uint8_t pin, bool inverted=false):
+		portAddress(GPIOA_BASE + (uint32_t(port) << 10)),
+		pinMask(1u << (pin & 0xf)), position2((pin & 0xf) << 1), isInverted(inverted)
+	{}
+
+	// Construct from a specific Gpio type
+	template<class Gpio> requires requires { Gpio::port; Gpio::pin; Gpio::isInverted; }
+	constexpr RtGpio(Gpio) : RtGpio(Gpio::port, Gpio::pin, Gpio::isInverted)
+	{}
+
+public:
+	constexpr uint8_t
+	port() const
+	{
+		return uint8_t(portAddress >> 10) & 0xf;
+	}
+
+	constexpr uint8_t
+	pin() const
+	{
+		return position2 >> 1;
+	}
+
+	inline void
+	disconnect()
+	{
+		configure(Config::Input);
+
+%% if target["family"] not in ["f1"]
+		const uint8_t af_id = position2 >> 4;
+		const uint8_t af_offset = (position2 * 2) % 32;
+		p()->AFR[af_id] &= ~(0xf << af_offset);
+	%% if target["family"] in ["l4"] and target["name"] in ["71", "75", "76", "85", "86"]
+		p()->ASCR &= ~mask();
+	%% endif
+%% endif
+	}
+
+	inline void
+	lock()
+	{
+		p()->LCKR = 0x10000 | mask();
+		p()->LCKR = 0x00000 | mask();
+		p()->LCKR = 0x10000 | mask();
+		(void) p()->LCKR;
+	}
+
+public:
+	inline void
+	configure(Config_t config) override
+	{
+%% if target["family"] in ["f1"]
+		const uint8_t cr_offset = (position2 & 0xf) << 1;
+		const auto cr_ptr = (position2 & 0x10) ? p().CRH : p().CRL;
+		const uint32_t cr = *cr_ptr;
+		const uint32_t mode = (cr >> cr_offset) | 0xf;
+
+		if (config & Config::_Mode)
+		{
+			switch((config & Config::_ModeMask).value >> uint8_t(Config::_ModeShift))
+			{
+				case i(Mode::Input): default:
+					if (not (config & Config::_Input)) config |= Config::Floating;
+					break;
+				case i(Mode::Output):
+					if (not (config & Config::_Output)) config |= Config::PushPull;
+					break;
+				case i(Mode::Analog):
+					mode &= ~0xf;
+					config = Config(0);
+					break;
+				case i(Mode::AlternateFunction):
+					if (config & Config::OpenDrain) mode |= 0b1100;
+					else mode |= 0b1000;
+					if (not (mode & 0b0011)) mode |= i(OutputSpeed::Medium);
+					break;
+			}
+		}
+
+		if (config & Config::_Input)
+		{
+			const uint32_t type{ (config & Config::_InputMask).value >> uint8_t(Config::_InputShift) };
+			mode = (mode & ~0xf) | type;
+			p()->BSRR = mask() << ((InputType(type) == InputType::PullUp) ? 0 : 16);
+		}
+		if (config & Config::_Output)
+		{
+			const uint32_t type{ (config & Config::_OutputMask).value >> uint8_t(Config::_OutputShift) };
+			mode = (mode & ~0xc) | type;
+			if (not (config & Config::_Speed)) config |= Config::SpeedMedium;
+		}
+		if (config & Config::_Speed)
+		{
+			const uint32_t speed{ (config & Config::_SpeedMask).value >> uint8_t(Config::_SpeedShift) };
+			mode = (mode & ~0x3) | speed;
+		}
+		*cr_ptr = (cr & ~(0xf << cr_offset)) | (mode << cr_offset);
+%% else
+		if (config & Config::_Input)
+		{
+			const uint32_t type{ (config & Config::_InputMask).value >> uint8_t(Config::_InputShift) };
+			p()->PUPDR = (p()->PUPDR & ~mask2()) | mask2(type);
+		}
+		if (config & Config::_Output)
+		{
+			if (config & Config::_OutputMask) p()->OTYPER |= mask();
+			else p()->OTYPER &= ~mask();
+			// if (not (config & Config::_Speed)) config |= Config::SpeedMedium;
+		}
+		if (config & Config::_Speed)
+		{
+			const uint32_t speed{ (config & Config::_SpeedMask).value >> uint8_t(Config::_SpeedShift) };
+			p()->OSPEEDR = (p()->OSPEEDR & ~mask2()) | mask2(speed);
+		}
+
+		if (config & Config::_Mode)
+		{
+			const uint8_t mode = (config & Config::_ModeMask).value >> uint8_t(Config::_ModeShift);
+			if (mode == i(Mode::Analog))
+			{
+				p()->PUPDR &= ~mask2();
+	%% if target["family"] in ["l4"] and target["name"] in ["71", "75", "76", "85", "86"]
+				p()->ASCR |= mask();
+	%% endif
+			}
+			else if (mode == i(Mode::AlternateFunction))
+			{
+				const uint8_t reg = position2 >> 4;
+				const uint8_t offset = (position2 & 0xf) << 1;
+				p()->AFR[reg] = (p()->AFR[reg] & ~(0xf << offset)) | ((config.value & 0xf) << offset);
+			}
+			p()->MODER = (p()->MODER & ~mask2()) | mask2(mode);
+		}
+%% endif
+
+		if (config & Config::_Logic)
+		{
+			const bool newInverted = bool(config & Config::_LogicMask);
+			if (isInverted ^ newInverted)
+			{
+				isInverted = newInverted;
+				toggle();
+			}
+		}
+	}
+
+	inline bool
+	read() const override
+	{
+		const bool value = p()->IDR & mask();
+		return isInverted xor value;
+	}
+
+	inline void
+	set(bool value) override
+	{
+		p()->BSRR = mask() << ((isInverted xor value) ? 0 : 16);
+	}
+
+	inline bool
+	isSet() const override
+	{
+		const bool value = p()->ODR & mask();
+		return isInverted xor value;
+	}
+};
+
+template<typename... Gpios>
+constexpr auto makeGpioArray()
+{
+	return std::array{ Gpios()... };
+}
+
+} // namespace modm::platform

@@ -1,0 +1,93 @@
+/*
+ * Copyright (c) 2016-2018, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+enum class
+Config : uint32_t
+{
+	/// @cond
+	_Mode        = 0x8000'0000,
+	_ModeMaskAf  = 0x0000'000f,
+	_ModeShiftAf = 0,
+	_ModeMask    = 0x0000'0030,
+	_ModeShift   = 4,
+	_Alternate   = 0x20 | _Mode,
+
+	_Input       = 0x4000'0000,
+	_InputMask   = 0x0000'0f00,
+	_InputShift  = 8,
+
+	_Output      = 0x2000'0000,
+	_OutputMask  = 0x0000'f000,
+	_OutputShift = 12,
+
+	_Speed       = 0x1000'0000,
+	_SpeedMask   = 0x0003'0000,
+	_SpeedShift  = 16,
+
+	_Logic       = 0x0800'0000,
+	_LogicMask   = 0x0010'0000,
+	_LogicShift  = 20,
+	/// @endcond
+
+	Input         = 0x00 | _Mode,
+	Output        = 0x10 | _Mode,
+%% if target["family"] in ["f1"]
+	Alternate     = 0x20 | _Mode,
+%% endif
+	Analog        = 0x30 | _Mode,
+
+%% if target["family"] in ["f1"]
+	Floating      = 0x400 | _Input,
+	PullUp        = 0x900 | _Input,
+	PullDown      = 0x800 | _Input,
+%% else
+	Floating      = 0x000 | _Input,
+	PullUp        = 0x100 | _Input,
+	PullDown      = 0x200 | _Input,
+%% endif
+
+	PushPull      = 0x0000 | _Output,
+%% if target["family"] in ["f1"]
+	OpenDrain     = 0x4000 | _Output,
+%% else
+	OpenDrain     = 0x1000 | _Output,
+%% endif
+
+%% if target["family"] in ["f1"]
+	SpeedLow      = 0x2'0000 | _Speed,
+	SpeedMedium   = 0x1'0000 | _Speed,
+	SpeedHigh     = 0x3'0000 | _Speed,
+	SpeedVeryHigh = 0x3'0000 | _Speed,
+%% elif target["family"] in ["f0", "f3"]
+	SpeedLow      = 0x0'0000 | _Speed,
+	SpeedMedium   = 0x1'0000 | _Speed,
+	SpeedHigh     = 0x3'0000 | _Speed,
+	SpeedVeryHigh = 0x3'0000 | _Speed,
+%% else
+	SpeedLow      = 0x0'0000 | _Speed,
+	SpeedMedium   = 0x1'0000 | _Speed,
+	SpeedHigh     = 0x2'0000 | _Speed,
+	SpeedVeryHigh = 0x3'0000 | _Speed,
+%% endif
+
+	LogicNormal   = 0x00'0000 | _Logic,
+	LogicInverted = 0x10'0000 | _Logic,
+};
+MODM_FLAGS32(Config);
+
+%% if target["family"] not in ["f1"]
+static constexpr Config_t
+ConfigAlternate(uint8_t af)
+{ return Config::_Mode | Config(0x20 | (af & 0xf)); }
+%% endif
+
