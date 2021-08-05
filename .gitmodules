@@ -34,3 +34,6 @@
 [submodule "ext/lvgl/lvgl"]
 	path = ext/lvgl/lvgl
 	url = https://github.com/modm-ext/lvgl-partial.git
+[submodule "ext/etlcpp/etl"]
+	path = ext/etlcpp/etl
+	url = https://github.com/modm-ext/etl-partial.git

@@ -69,6 +69,7 @@ git clone --recurse-submodules --jobs 8 https://github.com/modm-io/modm.git
 - Integration of useful third-party software:
 	- [FreeRTOS][] and [FreeRTOS+TCP][].
 	- [CMSIS][] and [CMSIS-DSP][].
+	- [ETL][].
 	- [TinyUSB][].
 	- [FatFS][].
 	- [ROSserial][].
@@ -766,6 +767,7 @@ and [many more contributors][contributors].
 [CMSIS]:           https://www.keil.com/pack/doc/CMSIS/General/html/index.html
 [CMSIS-DSP]:       https://www.keil.com/pack/doc/CMSIS/DSP/html/index.html
 [TinyUSB]:         https://github.com/hathach/tinyusb
+[ETL]:             https://www.etlcpp.com
 [FatFS]:           http://elm-chan.org/fsw/ff/00index_e.html
 [ROSserial]:       https://wiki.ros.org/rosserial
 [CrashCatcher]:    https://github.com/adamgreen/CrashCatcher
