@@ -22,16 +22,6 @@ void __cxa_pure_virtual()
 void __cxa_deleted_virtual()
 { modm_assert(0, "virt.del", "A deleted virtual function was called!"); }
 
-void* __dso_handle = (void*) &__dso_handle;
-%% if core.startswith("avr")
-int __cxa_atexit(void (*)(void *), void *, void *)
-%% else
-// ARM EABI specifies __aeabi_atexit instead of __cxa_atexit
-int __aeabi_atexit(void (*)(void *), void *, void *)
-%% endif
-{
-	return 0;
-}
 }
 
 %% if with_threadsafe_statics

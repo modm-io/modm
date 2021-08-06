@@ -19,3 +19,17 @@ void _exit(int status)
 	modm_assert(false, "libc.exit",
 			"The libc exit(status) function was called!", status);
 }
+
+extern void abort(void);
+void abort(void)
+{
+    modm_assert(false, "libc.abort",
+            "The libc abort() function was called!");
+}
+
+extern int atexit(void (*fn)(void));
+int atexit(void (*fn)(void))
+{
+    (void) fn;
+    return 0;
+}

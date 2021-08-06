@@ -93,7 +93,7 @@ def build(env):
         env.copy("libstdc++", ignore=env.ignore_files("*.lb", "*.md", "*.in", "examples"))
         env.template("assert.cpp.in", "assert.cpp")
 
-    env.collect(":build:cxxflags", "-fuse-cxa-atexit")
+    env.collect(":build:cxxflags", "-fno-use-cxa-atexit")
     # Threadsafe statics
     if not with_threadsafe_statics:
         env.collect(":build:cxxflags", "-fno-threadsafe-statics")

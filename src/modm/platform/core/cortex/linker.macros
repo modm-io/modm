@@ -222,13 +222,6 @@ TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		KEEP(*(.init_array))
 		. = ALIGN(4);
 		__init_array_end = .;
-	%% if 0
-		__fini_array_start = .;
-		KEEP(*(.fini_array))
-		KEEP(*(SORT(.fini_array.*)))
-		. = ALIGN(4);
-		__fini_array_end = .;
-	%% endif
 
 		__hardware_init_start = .;
 		/* Table symbols are alphabetically sorted! */
@@ -245,6 +238,11 @@ TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		__build_id = .;
 		KEEP(*(.note.gnu.build-id))
 	} >{{memory}}
+	/* We do not call static destructors ever */
+	/DISCARD/ :
+	{
+		*(.fini_array .fini_array.*)
+	}
 
 	%% if with_cpp_exceptions
 	.exidx :
