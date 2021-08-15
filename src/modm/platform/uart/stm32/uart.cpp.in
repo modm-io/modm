@@ -240,7 +240,7 @@ void
 void
 modm::platform::{{ name }}::irq()
 %% else
-MODM_ISR({{ name | upper }})
+MODM_ISR_HOOKS({{ name | upper }})
 %% endif
 {
 	using namespace modm::platform;
