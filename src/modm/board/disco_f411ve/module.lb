@@ -1,0 +1,46 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2024, Thomas Sommer
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":board:disco-f411ve"
+    module.description = """\
+# STM32F4DISCOVERY
+
+[Discovery kit for STM32F411](https://www.st.com/en/evaluation-tools/32f411ediscovery.html)
+"""
+
+def prepare(module, options):
+    if not options[":target"].partname.startswith("stm32f411ve"):
+        return False
+
+    module.depends(
+        ":architecture:clock",
+        ":driver:lis3dsh",
+		":driver:lsm303a",
+		":driver:l3gd20",
+        ":platform:clock",
+        ":platform:core",
+        ":platform:gpio",
+        ":platform:i2c:1",
+        ":platform:spi:1",
+        ":platform:usb:fs")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/board"
+    env.substitutions = {
+        "with_logger": False,
+        "with_assert": env.has_module(":architecture:assert")
+    }
+    env.template("../board.cpp.in", "board.cpp")
+    env.copy('.')
+    env.collect(":build:openocd.source", "board/stm32f4discovery.cfg");
