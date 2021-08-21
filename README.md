@@ -74,9 +74,9 @@ git clone --recurse-submodules --jobs 8 https://github.com/modm-io/modm.git
 
 ## Microcontrollers
 
-modm can create a HAL for <!--allcount-->3138<!--/allcount--> devices of these vendors:
+modm can create a HAL for <!--allcount-->3166<!--/allcount--> devices of these vendors:
 
-- STMicroelectronics STM32: <!--stmcount-->2593<!--/stmcount--> devices.
+- STMicroelectronics STM32: <!--stmcount-->2621<!--/stmcount--> devices.
 - Microchip SAM: <!--samcount-->163<!--/samcount--> devices.
 - Microchip AVR: <!--avrcount-->382<!--/avrcount--> devices.
 
