@@ -176,7 +176,7 @@ jobs:
       - name: Examples AVR Series
         if: always()
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py avr arduino_uno arduino_nano)
+          (cd examples && ../tools/scripts/examples_compile.py avr arduino_uno arduino_nano srxe)
       - name: Compile AVR Unittests AT90CAN
         if: always()
         run: |

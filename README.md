@@ -525,6 +525,7 @@ We have out-of-box support for many development boards including documentation.
 </tr><tr>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-stm32_f4ve">STM32-F4VE</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-stm32f030_demo">STM32F030-DEMO</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-srxe">Smart Response XE</a></td>
 </tr>
 </table>
 <!--/bsptable-->

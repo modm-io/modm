@@ -1,0 +1,51 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2021, Tomasz Wasilczyk
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":board:srxe"
+    module.description = """
+# Smart Response XE
+
+Smart Response XE is an obsolete classroom clicker, sold for as little as 5 USD on well known online auction site.
+It's a compelling platform that's fully reverse engineered and ready to hack out of box, featuring:
+ - ATmega128RFA1 MCU
+ - 384x160 LCD display
+ - QWERTY keyboard
+ - External 1M SPI flash
+ - Exposed ISP and JTAG headers
+ - ZigBee transciever w/ antennas
+ - Powered by 4 AAA batteries
+ - Optional (unpopulated):
+   - RS232
+   - Debug LED
+   - Buzzer
+   - Accelerometer
+"""
+
+def prepare(module, options):
+    if not options[":target"].partname.startswith("atmega128rfa1"):
+        return False
+
+    module.depends(
+        ":architecture:clock",
+        ":architecture:interrupt",
+        ":debug",
+        ":platform:clock",
+        ":platform:core",
+        ":platform:gpio",
+        ":platform:uart:0")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/board"
+    env.copy('.')
+    env.collect(":build:default.avrdude.programmer", "usbasp");
