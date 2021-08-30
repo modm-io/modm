@@ -13,6 +13,8 @@
 
 #include <modm/platform.hpp>
 
+#include <modm/driver/display/st7586s.hpp>
+
 using namespace modm::platform;
 
 /// @ingroup modm_board_srxe
@@ -25,13 +27,26 @@ using SystemClock = modm::platform::SystemClock;
 using LedDebug = GpioB0;
 using Leds = SoftwareGpioPort<LedDebug>;
 
-namespace Display {
+namespace spi {
+
+using Sck = GpioB1;
+using Mosi = GpioB2;
+using Miso = GpioB3;
+using SpiMaster = modm::platform::SpiMaster;
+
+}  // namespace spi
+
+namespace DisplayGpio {
 
 using DC = GpioD6;
 using CS = GpioE7;
 using RST = GpioG2;
 
-}  // namespace Display
+}  // namespace DisplayGpio
+
+using Display = modm::St7586s<spi::SpiMaster, DisplayGpio::CS, DisplayGpio::RST, DisplayGpio::DC,
+	384, 136>;
+extern Display display;
 
 inline void
 initialize() {
@@ -39,7 +54,17 @@ initialize() {
 
 	LedDebug::setOutput();
 
+	spi::SpiMaster::connect<spi::Sck::Sck, spi::Mosi::Mosi, spi::Miso::Miso>();
+	/* Display controller datasheet requires minimum 60+140ns clock pulse width (that's 3.5MHz
+	 * for 200ns cycle or 5MHz for 280ns), but it seems to work just fine with 8MHz.
+	 */
+	spi::SpiMaster::initialize<SystemClock, 4_MHz>();
+	// Clock is high when inactive, data is sampled on clock trailing edge.
+	spi::SpiMaster::setDataMode(spi::SpiMaster::DataMode::Mode3);
+
 	enableInterrupts();
+
+	display.initialize();
 }
 
 }  // namespace Board
