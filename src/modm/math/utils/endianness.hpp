@@ -38,7 +38,7 @@ isLittleEndian()
 }
 
 // MARK: - to host
-inline uint16_t
+constexpr uint16_t
 fromLittleEndian(uint16_t value)
 {
 #if MODM_IS_LITTLE_ENDIAN
@@ -48,13 +48,13 @@ fromLittleEndian(uint16_t value)
 #endif
 }
 
-inline int16_t
+constexpr int16_t
 fromLittleEndian(int16_t value)
 {
 	return int16_t(fromLittleEndian(uint16_t(value)));
 }
 
-inline uint32_t
+constexpr uint32_t
 fromLittleEndian(uint32_t value)
 {
 #if MODM_IS_LITTLE_ENDIAN
@@ -64,13 +64,13 @@ fromLittleEndian(uint32_t value)
 #endif
 }
 
-inline int32_t
+constexpr int32_t
 fromLittleEndian(int32_t value)
 {
 	return int32_t(fromLittleEndian(uint32_t(value)));
 }
 
-inline uint16_t
+constexpr uint16_t
 fromBigEndian(uint16_t value)
 {
 #if MODM_IS_BIG_ENDIAN
@@ -80,13 +80,13 @@ fromBigEndian(uint16_t value)
 #endif
 }
 
-inline int16_t
+constexpr int16_t
 fromBigEndian(int16_t value)
 {
 	return int16_t(fromBigEndian(uint16_t(value)));
 }
 
-inline uint32_t
+constexpr uint32_t
 fromBigEndian(uint32_t value)
 {
 #if MODM_IS_BIG_ENDIAN
@@ -96,14 +96,14 @@ fromBigEndian(uint32_t value)
 #endif
 }
 
-inline int32_t
+constexpr int32_t
 fromBigEndian(int32_t value)
 {
 	return int32_t(fromBigEndian(uint32_t(value)));
 }
 
 // MARK: - from host
-inline uint16_t
+constexpr uint16_t
 toLittleEndian(uint16_t value)
 {
 #if MODM_IS_LITTLE_ENDIAN
@@ -113,13 +113,13 @@ toLittleEndian(uint16_t value)
 #endif
 }
 
-inline int16_t
+constexpr int16_t
 toLittleEndian(int16_t value)
 {
 	return int16_t(toLittleEndian(uint16_t(value)));
 }
 
-inline uint32_t
+constexpr uint32_t
 toLittleEndian(uint32_t value)
 {
 #if MODM_IS_LITTLE_ENDIAN
@@ -129,13 +129,13 @@ toLittleEndian(uint32_t value)
 #endif
 }
 
-inline int32_t
+constexpr int32_t
 toLittleEndian(int32_t value)
 {
 	return int32_t(toLittleEndian(uint32_t(value)));
 }
 
-inline uint16_t
+constexpr uint16_t
 toBigEndian(uint16_t value)
 {
 #if MODM_IS_BIG_ENDIAN
@@ -145,13 +145,13 @@ toBigEndian(uint16_t value)
 #endif
 }
 
-inline int16_t
+constexpr int16_t
 toBigEndian(int16_t value)
 {
 	return int16_t(toBigEndian(uint16_t(value)));
 }
 
-inline uint32_t
+constexpr uint32_t
 toBigEndian(uint32_t value)
 {
 #if MODM_IS_BIG_ENDIAN
@@ -161,7 +161,7 @@ toBigEndian(uint32_t value)
 #endif
 }
 
-inline int32_t
+constexpr int32_t
 toBigEndian(int32_t value)
 {
 	return int32_t(toBigEndian(uint32_t(value)));

@@ -34,7 +34,7 @@ namespace modm
 	 * 0xab => 0xba
 	 * \endcode
 	 */
-	modm_always_inline uint8_t
+	constexpr uint8_t
 	swap(uint8_t n)
 	{
 #ifdef MODM_CPU_AVR
@@ -52,7 +52,7 @@ namespace modm
 	}
 
 	/// Exchange two byte
-	modm_always_inline void
+	constexpr void
 	swap(uint8_t& a, uint8_t& b)
 	{
 		uint8_t temp = a;
@@ -67,10 +67,13 @@ namespace modm
 	 * 0xabcd => 0xcdab
 	 * \endcode
 	 */
-	modm_always_inline uint16_t
+	constexpr uint16_t
 	swap(uint16_t n)
 	{
 #ifdef MODM_CPU_ARM
+		if (std::is_constant_evaluated()) {
+			return (n << 8) | (n >> 8);
+		}
 		asm volatile(
 			"rev16 %0,%0"	"\n\t"
 			 : "=r" (n)
@@ -104,30 +107,35 @@ namespace modm
 	 * 0xabcdefgh => 0xghefcdab
 	 * \endcode
 	 */
-	modm_always_inline uint32_t
+	constexpr uint32_t
 	swap(uint32_t n)
 	{
-#if defined(MODM_CPU_ARM) && !defined(__aarch64__)
+#if defined(MODM_CPU_ARM)
+		if (std::is_constant_evaluated()) {
+			return (n << 24) | ((n << 8) & 0xff0000) | ((n >> 8) & 0xff00) | (n >> 24);
+		}
+#if !defined(__aarch64__)
 		asm volatile(
 			"rev %0,%0"		"\n\t"
 			 : "=r" (n)
 			 : "0" (n)
 		);
 		return n;
-#elif defined(MODM_CPU_ARM) && defined(__aarch64__)
+#else
 		asm volatile(
 			"rev32 %0,%0"	"\n\t"
 			 : "=r" (n)
 			 : "0" (n)
 		);
 		return n;
+#endif
 #else
 		n = (n << 24) | ((n << 8) & 0xff0000) | ((n >> 8) & 0xff00) | (n >> 24);
 		return n;
 #endif
 	}
 
-	modm_always_inline void
+	constexpr void
 	swap(int16_t& a, int16_t& b)
 	{
 		int16_t temp = a;
