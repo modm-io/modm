@@ -167,6 +167,26 @@ toBigEndian(int32_t value)
 	return int32_t(toBigEndian(uint32_t(value)));
 }
 
+template <typename T>
+struct BigEndian
+{
+	T raw;
+
+	constexpr BigEndian() : raw() {}
+	constexpr BigEndian(T value) : raw(toBigEndian(value)) {}
+	constexpr operator T() const { return fromBigEndian(raw); }
+};
+
+template <typename T>
+struct LittleEndian
+{
+	T raw;
+
+	constexpr LittleEndian() : raw() {}
+	constexpr LittleEndian(T value) : raw(toLittleEndian(value)) {}
+	constexpr operator T() const { return fromLittleEndian(raw); }
+};
+
 /// @}
 
 } // namespace modm

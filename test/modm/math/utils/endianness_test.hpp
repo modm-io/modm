@@ -26,4 +26,16 @@ public:
 
 	void
 	testFromLittleEndian();
+
+	void
+	testBigEndianStruct();
+
+	void
+	testLittleEndianStruct();
+
+	void
+	testBigEndianReinterpreted();
+
+	void
+	testLittleEndianReinterpreted();
 };
