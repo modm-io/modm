@@ -106,11 +106,13 @@ struct {{ gpio["port"] ~ gpio["pin"] }}
 	};
 %% endfor
 
+%% if gpio["signal"] | length > 0
 	using Signals =
 		std::tuple<
 %% for signal in gpio["signal"]
 			{{ signal["full_name"] }}{{ ">;" if loop.last else ","}}
 %% endfor
+%% endif
 };
 }  // namespace gpio
 using Gpio{{ gpio["port"] ~ gpio["pin"] }} = Gpio<gpio::{{ gpio["port"] ~ gpio["pin"] }}>;

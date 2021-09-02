@@ -28,24 +28,6 @@ enum class InputType
 	PullDown = 0x2,  ///< pull-down on input
 };
 
-enum class OutputType
-{
-	PushPull = 0x0,   ///< push-pull on output
-	OpenDrain = 0x1,  ///< open-drain on output
-};
-
-enum class OutputSpeed
-{
-	Low = 0,
-	Medium = 0x1,
-	High = 0x2,
-	VeryHigh = 0x3,  ///< 30 pF (80 MHz Output max speed on 15 pF)
-	MHz2 = Low,
-	MHz25 = Medium,
-	MHz50 = High,
-	MHz100 = VeryHigh,
-};
-
 enum class PeripheralPin
 {
 	BitBang,
@@ -103,6 +85,176 @@ struct OneOfSignals
 	template<class Signal>
 	static constexpr bool value = ((std::is_same_v<typename Signal::signal, Signals>) | ...);
 };
+
+%% if target["family"] in ["g"]
+
+template<class... PinConfigs>
+struct PinMuxMixin
+{
+	inline static void set(uint8_t){};
+};
+
+template<class PinConfig, class... PinConfigs>
+struct PinMuxMixin<PinConfig, PinConfigs...>
+{
+	inline static void
+	set(uint8_t cfg)
+	{
+		uint8_t bit0 = cfg & 1;
+		uint8_t bit1 = (cfg & 2) >> 1;
+		if constexpr (PinConfig::port == PortName::A)
+		{
+			PIOA->PIO_ABCDSR[0] = (PIOA->PIO_ABCDSR[0] & ~(1<<PinConfig::pin)) | (bit0 << PinConfig::pin);
+			PIOA->PIO_ABCDSR[1] = (PIOA->PIO_ABCDSR[1] & ~(1<<PinConfig::pin)) | (bit1 << PinConfig::pin);
+		} else if constexpr (PinConfig::port == PortName::B)
+		{
+			PIOB->PIO_ABCDSR[0] = (PIOB->PIO_ABCDSR[0] & ~(1<<PinConfig::pin)) | (bit0 << PinConfig::pin);
+			PIOB->PIO_ABCDSR[1] = (PIOB->PIO_ABCDSR[1] & ~(1<<PinConfig::pin)) | (bit1 << PinConfig::pin);
+		}
+		PinMuxMixin<PinConfigs...>::set(cfg);
+	}
+};
+
+template<class... PinConfigs>
+class GpioSet : protected PinMuxMixin<PinConfigs...>
+{
+protected:
+	using PinMux = PinMuxMixin<PinConfigs...>;
+
+	static constexpr uint32_t
+	mask(PortName port)
+	{
+		return (((PinConfigs::port == port) ? 1u << PinConfigs::pin : 0u) | ...);
+	}
+
+	template<PortName port>
+	inline static constexpr volatile uint32_t*
+	getPortReg(size_t offset)
+	{
+		if constexpr (port == PortName::A) {
+			return (uint32_t*)((uint8_t*)PIOA + offset);
+		}
+		if constexpr (port == PortName::B) {
+			return (uint32_t*)((uint8_t*)PIOB + offset);
+		}
+	}
+
+	inline static constexpr void
+	setPortReg(size_t offset)
+	{
+		if constexpr (mask(PortName::A) != 0) { *getPortReg<PortName::A>(offset) = mask(PortName::A); }
+		if constexpr (mask(PortName::B) != 0) { *getPortReg<PortName::B>(offset) = mask(PortName::B); }
+	}
+
+	template<PortName port>
+	inline static constexpr uint32_t
+	readPortReg(size_t offset)
+	{
+		if constexpr (port == PortName::A)
+		{
+			static_assert(mask(PortName::A) != 0,
+						  "Trying to read port which is not in the GpioSet!");
+			return *getPortReg<PortName::A>(offset) & mask(PortName::A);
+		} else if constexpr (port == PortName::B)
+		{
+			static_assert(mask(PortName::B) != 0,
+						  "Trying to read port which is not in the GpioSet!");
+			return *getPortReg<PortName::B>(offset) & mask(PortName::B);
+		}
+	}
+
+public:
+	inline static void
+	setOutput()
+	{
+		setPortReg(PIO_OER_OFFSET);
+	}
+
+	inline static void
+	setOutput(bool status)
+	{
+		setOutput();
+		set(status);
+	}
+
+	static void
+	setInput()
+	{
+		setPortReg(PIO_ODR_OFFSET); // Disable output driver
+	}
+
+	static void
+	setInput(InputType type)
+	{
+		configure(type);
+		setInput();
+	}
+
+	static void
+	configure(InputType type)
+	{
+		if(type == InputType::Floating) {
+			setPortReg(PIO_PPDDR_OFFSET); // disable pull down
+			setPortReg(PIO_PUDR_OFFSET); // disable pull up
+		} else if (type == InputType::PullDown) {
+			setPortReg(PIO_PPDER_OFFSET); // Enable pull down
+			setPortReg(PIO_PUDR_OFFSET); // disable pull up
+		} else {
+			setPortReg(PIO_PPDDR_OFFSET); // Disable pull down
+			setPortReg(PIO_PUER_OFFSET); // Enable pull up
+		}
+	}
+
+	static void
+	setAnalogInput()
+	{}
+
+	static void
+	set()
+	{
+		setPortReg(PIO_SODR_OFFSET);
+	}
+
+	static void
+	set(bool status)
+	{
+		if (status)
+			set();
+		else
+			reset();
+	}
+
+	static void
+	reset()
+	{
+		setPortReg(PIO_CODR_OFFSET);
+	}
+
+	static void
+	toggle()
+	{
+		if constexpr (mask(PortName::A) != 0) {
+			volatile uint32_t *reg = getPortReg<PortName::A>(PIO_ODSR_OFFSET);
+			uint32_t tmp = *reg;
+			tmp ^= mask(PortName::A);
+			*reg = tmp;
+		}
+		if constexpr (mask(PortName::B) != 0) {
+			volatile uint32_t *reg = getPortReg<PortName::B>(PIO_ODSR_OFFSET);
+			uint32_t tmp = *reg;
+			tmp ^= mask(PortName::B);
+			*reg = tmp;
+		}
+	}
+
+	static void
+	disconnect()
+	{
+		setInput(InputType::Floating);
+	}
+};
+
+%% else
 
 template<class... PinConfigs>
 struct PinCfgMixin
@@ -189,10 +341,6 @@ public:
 		set(status);
 	}
 
-	static void setOutput(OutputType, OutputSpeed) { setOutput(); }
-
-	static void configure(OutputType, OutputSpeed = OutputSpeed::MHz50) {}
-
 	static void
 	setInput()
 	{
@@ -250,6 +398,8 @@ public:
 		setInput(InputType::Floating);
 	}
 };
+%% endif
+
 
 template<class PinConfig>
 class Gpio : public GpioSet<PinConfig>, public ::modm::GpioIO
@@ -259,7 +409,6 @@ class Gpio : public GpioSet<PinConfig>, public ::modm::GpioIO
 public:
 	// For backwards compability with bitbang API
 	using InputType = ::modm::platform::InputType;
-	using OutputType = ::modm::platform::OutputType;
 
 	template<PeripheralPin peripheral_pin_v>
 	struct As;
@@ -273,7 +422,11 @@ public:
 	inline static bool
 	read()
 	{
+%% if target["family"] in ["g"]
+		return Base::readPortReg<PinConfig::port>(PIO_PDSR_OFFSET);
+%% else
 		return Base::readPortReg<PinConfig::port>(PORT_IN_OFFSET);
+%% endif
 	}
 
 	inline static void
@@ -332,6 +485,16 @@ struct Gpio<PinConfig>::As : public Gpio<PinConfig>
 		inline static void
 		connect()
 		{
+%% if target["family"] in ["g"]
+			Pio* PIOBase;
+			if constexpr (PinConfig::port == PortName::A) {
+				PIOBase = PIOA;
+			} else {
+				PIOBase = PIOB;
+			}
+			PIOBase->PIO_PDR = (1<<PinConfig::pin);
+			Base::PinMux::set((uint32_t)PinSignal::function);
+%% else
 			Base::PinCfg::set(PORT_PINCFG_PMUXEN);
 			if constexpr (PinConfig::pin & 1u)
 			{
@@ -342,7 +505,9 @@ struct Gpio<PinConfig>::As : public Gpio<PinConfig>
 				PORT->Group[uint32_t(PinConfig::port)].PMUX[PinConfig::pin >> 1].bit.PMUXE =
 					uint32_t(PinSignal::function);
 			}
+%% endif
 		}
+
 	};
 };
 

@@ -34,13 +34,6 @@ public:
 	static constexpr uint8_t pin = uint8_t(-1);
 	static constexpr uint32_t mask = 0;
 
-protected:
-	/// @cond
-	static void setAlternateFunction(uint8_t) {}
-	static void setAnalogInput() {}
-	/// @endcond
-
-public:
 	// GpioOutput
 	// start documentation inherited
 	static void setOutput() {}
@@ -51,16 +44,12 @@ public:
 	static void toggle() {}
 	static bool isSet() { return false; }
 	// stop documentation inherited
-	static void configure(OutputType, OutputSpeed = OutputSpeed::MHz50) {}
-	static void setOutput(OutputType, OutputSpeed = OutputSpeed::MHz50) {}
 
 	// GpioInput
 	// start documentation inherited
 	static void setInput() {}
 	static bool read() { return false; }
 	// end documentation inherited
-	static void configure(InputType) {}
-	static void setInput(InputType) {}
 
 	// GpioIO
 	// start documentation inherited

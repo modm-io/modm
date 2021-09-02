@@ -68,10 +68,14 @@ jobs:
         if: always()
         run: |
           (cd examples && ../tools/scripts/examples_compile.py generic)
-      - name: Examples SAM Devices
+      - name: Examples SAMD Devices
         if: always()
         run: |
           (cd examples && ../tools/scripts/examples_compile.py samd)
+      - name: Examples SAMG Devices
+        if: always()
+        run: |
+          (cd examples && ../tools/scripts/examples_compile.py samg55_xplained_pro)
       - name: Execute Python Scripts
         if: always()
         run: |

@@ -99,13 +99,16 @@ class LogicAnalyzer(Module):
         if not core or "m0" in core["type"] or "m7" in core["type"]:
             return False
 
+        # gpio_sampler only supports stm32
+        if options[":target"].identifier["platform"] != "stm32":
+            return False
+
         module.depends(":stdc++", ":driver:gpio_sampler", ":debug")
         return True
 
     def build(self, env):
         env.outbasepath = "modm-test/src/modm-test/mock"
         env.copy("logic_analyzer.hpp")
-
 
 def init(module):
     module.name = ":mock"

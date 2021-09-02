@@ -1,0 +1,38 @@
+/*
+ * Copyright (c) 2021, Jeff McBride
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ---------------------------------------------------------------------------
+
+#include "../device.hpp"
+#include <modm/platform/core/hardware_init.hpp>
+
+void
+modm_gpio_enable(void)
+{
+
+%% if target["family"] in ["g"]
+
+    PMC->PMC_PCER0 =
+%% for port in options["enable_ports"]
+%% if not loop.last
+        (1<<ID_PIO{{ port | upper }}) |
+%% else
+        (1<<ID_PIO{{ port | upper }});
+%% endif
+%% endfor
+
+    // Enable usage of the ODSR register for all pins
+%% for port in options["enable_ports"]
+    PIO{{ port | upper }}->PIO_OWER = 0xFFFFFFFF;
+%% endfor
+
+%%endif
+}
+
+MODM_HARDWARE_INIT_ORDER(modm_gpio_enable, 80);

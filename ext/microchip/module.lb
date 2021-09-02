@@ -28,26 +28,35 @@ def prepare(module, options):
 pp = {}
 def validate(env):
     device = env[":target"]
-    name = device.partname.split("-")[0]
 
+    # Some families use the variant in header defines, some do not (e.g. SAMG)
+    names = [
+        "".join([device.identifier[f] for f in ["platform", "family", "series", "pin", "flash", "variant"]]),
+        "".join([device.identifier[f] for f in ["platform", "family", "series", "pin", "flash"]]),
+    ]
 
-    define = "__{}__".format(name.upper())
+    device_define = None
     family_file = None
+    device_header = None
     for famfile in Path(localpath("sam")).glob("**/sam.h"):
         content = famfile.read_text(encoding="utf-8", errors="replace")
         match = re.findall(r"defined\((?P<define>__SAM.*?__)\)", content)
-        if match is not None and define in match:
-            family_file = famfile.relative_to(localpath("."))
+        for n in names:
+            define = "__{}__".format(n.upper())
+            if match is not None and define in match:
+                family_file = famfile.relative_to(localpath("."))
+                device_header = "{}.h".format(n)
+                device_define = define
+
 
     if family_file is None:
         raise ValidateException("No device define found for '{}'!".format(device.partname))
 
     family_folder = family_file.parent
-    device_header = "{}.h".format(name)
 
     global pp
     pp = {
-        "define": define,
+        "define": device_define,
         "folder": family_folder,
         "device_header": device_header,
     }

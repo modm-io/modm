@@ -15,6 +15,19 @@
 import copy
 from collections import defaultdict, OrderedDict
 
+def port_ranges(gpios):
+    ports = {p: (32, 0) for p in set(p["port"] for p in gpios)}
+    for gpio in gpios:
+        pin = int(gpio["pin"])
+        pmin, pmax = ports[gpio["port"]]
+        ports[gpio["port"]] = (min(pin, pmin), max(pin, pmax))
+
+    ports = [{"name": k.upper(), "start": v[0], "width": v[1] - v[0] + 1} for k,v in ports.items()]
+    ports.sort(key=lambda p: p["name"])
+    return ports
+
+bprops = {}
+
 def init(module):
     module.name = ":platform:gpio"
     module.description = "General Purpose I/O (GPIO)"
@@ -23,6 +36,16 @@ def prepare(module, options):
     device = options[":target"]
     if not device.has_driver("gpio:sam*"):
         return False
+
+    bprops["ranges"] = port_ranges(device.get_driver("gpio")["gpio"])
+    bprops["ports"] = OrderedDict([(k, i) for i, k in enumerate([p["name"] for p in bprops["ranges"]])])
+
+    module.add_set_option(
+        EnumerationOption(
+            name="enable_ports",
+            description="Enable clock for these GPIO ports during startup",
+            enumeration=list(bprops["ports"].keys())),
+        default=list(bprops["ports"].keys()))
 
     module.depends(
         ":architecture:gpio",
@@ -42,12 +65,16 @@ def build(env):
     peripherals = OrderedDict()
     for gpio in driver["gpio"]:
         signals = []
-        for signal in gpio["signal"]:
+        for signal in gpio.get("signal", []):
             signal.update({
                 "peripheral": signal["driver"].capitalize(),
                 "function": signal["function"].capitalize(),
                 "name": signal["name"].capitalize(),
             })
+            # SAMG devices have X1 peripheral connection, which is "extra function",
+            # but it is not configured by the normal alternate IO function. Skip these.
+            if signal['function'] == 'X1':
+                continue
             # This is a hack for L variant devices, which have a Ac without instance *and*
             # a Ac with instance 1. Why???
             if (device.identifier.get("variant") == "l"
@@ -80,5 +107,7 @@ def build(env):
     bprops["gpios"] = driver["gpio"]
     env.template("config.hpp.in")
     env.copy("connector.hpp")
-    env.copy("pin.hpp")
+    if len(env["enable_ports"]):
+        env.template("enable.cpp.in")
+    env.template("pin.hpp.in")
     env.copy("unused.hpp")
