@@ -139,17 +139,23 @@ protected:
 		return (((PinConfigs::port == port) ? 1u << PinConfigs::pin : 0u) | ...);
 	}
 
-	inline static constexpr uint32_t*
+	template<PortName port>
+	inline static constexpr volatile uint32_t*
 	getPortReg(size_t offset)
 	{
-		return (uint32_t*)(&PORT->Group[0]) + offset / sizeof(uint32_t);
+		if constexpr (port == PortName::A) {
+			return (uint32_t*)(&PORT->Group[0]) + offset / sizeof(uint32_t);
+		}
+		if constexpr (port == PortName::B) {
+			return (uint32_t*)(&PORT->Group[1]) + offset / sizeof(uint32_t);
+		}
 	}
 
 	inline static constexpr void
 	setPortReg(size_t offset)
 	{
-		if constexpr (mask(PortName::A) != 0) { *getPortReg(offset) = mask(PortName::A); }
-		if constexpr (mask(PortName::B) != 0) { *getPortReg(offset) = mask(PortName::B); }
+		if constexpr (mask(PortName::A) != 0) { *getPortReg<PortName::A>(offset) = mask(PortName::A); }
+		if constexpr (mask(PortName::B) != 0) { *getPortReg<PortName::B>(offset) = mask(PortName::B); }
 	}
 
 	template<PortName port>
@@ -160,12 +166,12 @@ protected:
 		{
 			static_assert(mask(PortName::A) != 0,
 						  "Trying to read port which is not in the GpioSet!");
-			return *getPortReg(offset) & mask(PortName::A);
+			return *getPortReg<PortName::A>(offset) & mask(PortName::A);
 		} else if constexpr (port == PortName::B)
 		{
 			static_assert(mask(PortName::B) != 0,
 						  "Trying to read port which is not in the GpioSet!");
-			return *getPortReg(offset) & mask(PortName::A);
+			return *getPortReg<PortName::B>(offset) & mask(PortName::B);
 		}
 	}
 
