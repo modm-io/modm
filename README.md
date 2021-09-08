@@ -487,66 +487,67 @@ We have out-of-box support for many development boards including documentation.
 <td align="center"><a href="https://modm.io/reference/module/modm-board-blue-pill-f103">Blue Pill F103</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-devebox-stm32f4xx">DEVEBOX-STM32F4XX</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-devebox-stm32h750vb">DEVEBOX-STM32H750VB</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-disco-f051r8">DISCO-F051R8</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-disco-f072rb">DISCO-F072RB</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-disco-f100rb">DISCO-F100RB</a></td>
-<td align="center"><a href="https://modm.io/reference/module/modm-board-disco-f303vc">DISCO-F303VC</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-disco-f303vc">DISCO-F303VC</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-disco-f407vg">DISCO-F407VG</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-disco-f429zi">DISCO-F429ZI</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-disco-f469ni">DISCO-F469NI</a></td>
-<td align="center"><a href="https://modm.io/reference/module/modm-board-disco-f746ng">DISCO-F746NG</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-disco-f746ng">DISCO-F746NG</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-disco-f769ni">DISCO-F769NI</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-disco-l152rc">DISCO-L152RC</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-disco-l476vg">DISCO-L476VG</a></td>
-<td align="center"><a href="https://modm.io/reference/module/modm-board-feather-m0">FEATHER-M0</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-feather-m0">FEATHER-M0</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-mega-2560-pro">MEGA-2560-PRO</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-f031k6">NUCLEO-F031K6</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-f042k6">NUCLEO-F042K6</a></td>
-<td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-f072rb">NUCLEO-F072RB</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-f072rb">NUCLEO-F072RB</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-f091rc">NUCLEO-F091RC</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-f103rb">NUCLEO-F103RB</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-f303k8">NUCLEO-F303K8</a></td>
-<td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-f303re">NUCLEO-F303RE</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-f303re">NUCLEO-F303RE</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-f334r8">NUCLEO-F334R8</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-f401re">NUCLEO-F401RE</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-f411re">NUCLEO-F411RE</a></td>
-<td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-f429zi">NUCLEO-F429ZI</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-f429zi">NUCLEO-F429ZI</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-f439zi">NUCLEO-F439ZI</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-f446re">NUCLEO-F446RE</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-f446ze">NUCLEO-F446ZE</a></td>
-<td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-f746zg">NUCLEO-F746ZG</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-f746zg">NUCLEO-F746ZG</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-f767zi">NUCLEO-F767ZI</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-g071rb">NUCLEO-G071RB</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-g431kb">NUCLEO-G431KB</a></td>
-<td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-g431rb">NUCLEO-G431RB</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-g431rb">NUCLEO-G431RB</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-g474re">NUCLEO-G474RE</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-h723zg">NUCLEO-H723ZG</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-h743zi">NUCLEO-H743ZI</a></td>
-<td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-l031k6">NUCLEO-L031K6</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-l031k6">NUCLEO-L031K6</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-l152re">NUCLEO-L152RE</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-l432kc">NUCLEO-L432KC</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-l452re">NUCLEO-L452RE</a></td>
-<td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-l476rg">NUCLEO-L476RG</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-l476rg">NUCLEO-L476RG</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-l496zg-p">NUCLEO-L496ZG-P</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-olimexino-stm32">OLIMEXINO-STM32</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-raspberrypi">Raspberry Pi</a></td>
-<td align="center"><a href="https://modm.io/reference/module/modm-board-samd21-mini">SAMD21-MINI</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-samd21-mini">SAMD21-MINI</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-samg55-xplained-pro">SAMG55-XPLAINED-PRO</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-stm32_f4ve">STM32-F4VE</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-stm32f030_demo">STM32F030-DEMO</a></td>
-<td align="center"><a href="https://modm.io/reference/module/modm-board-srxe">Smart Response XE</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-srxe">Smart Response XE</a></td>
 </tr>
 </table>
 <!--/bsptable-->
