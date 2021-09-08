@@ -43,6 +43,34 @@ enum class MainInternalFreq : uint32_t {
 	Rc24Mhz
 };
 
+enum class ClockPeripheral : uint32_t {
+	FlexCom0 = ID_FLEXCOM0,
+	FlexCom1 = ID_FLEXCOM1,
+	FlexCom2 = ID_FLEXCOM2,
+	FlexCom3 = ID_FLEXCOM3,
+	FlexCom4 = ID_FLEXCOM4,
+	FlexCom5 = ID_FLEXCOM5,
+	FlexCom6 = ID_FLEXCOM6,
+	FlexCom7 = ID_FLEXCOM7,
+	PioA = ID_PIOA,
+	PioB = ID_PIOB,
+	Pdmic0 = ID_PDMIC0,
+	Pdmic1 = ID_PDMIC1,
+	Mem2Mem = ID_MEM2MEM,
+	I2sc0 = ID_I2SC0,
+	I2sc1 = ID_I2SC1,
+	Tc0 = ID_TC0_CHANNEL0,
+	Tc1 = ID_TC0_CHANNEL1,
+	Tc2 = ID_TC0_CHANNEL2,
+	Tc3 = ID_TC1_CHANNEL0,
+	Tc4 = ID_TC1_CHANNEL1,
+	Tc5 = ID_TC1_CHANNEL2,
+	Adc = ID_ADC,
+	Uhp = ID_UHP,
+	Udp = ID_UDP,
+	Crccu = ID_CRCCU
+};
+
 static constexpr uint32_t SlowClkFreqHz = 32'768;
 
 /**
@@ -105,6 +133,18 @@ public:
 
 	/** Returns the configured frequency of PLL B output */
 	static uint32_t pllBFrequency();
+
+	template< ClockPeripheral peripheral >
+	static void
+	enable();
+
+	template< ClockPeripheral peripheral >
+	static bool
+	isEnabled();
+
+	template< ClockPeripheral peripheral >
+	static void
+	disable();
 };
 
 } // namespace modm::platform

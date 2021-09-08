@@ -76,4 +76,35 @@ void ClockGen::setFlashLatency() {
 	EFC->EEFC_FMR = (EFC->EEFC_FMR & ~EEFC_FMR_FWS_Msk) | EEFC_FMR_FWS(fws);
 }
 
+template< ClockPeripheral peripheral >
+void ClockGen::enable() {
+	constexpr uint32_t id = (uint32_t)peripheral;
+	if constexpr (id < 32) {
+		PMC->PMC_PCER0 = (1<<id);
+	} else {
+		PMC->PMC_PCER1 = (1<<(id-32));
+	}
+}
+
+template< ClockPeripheral peripheral >
+bool ClockGen::isEnabled() {
+	constexpr uint32_t id = (uint32_t)peripheral;
+	if constexpr (id < 32) {
+		return PMC->PMC_PCSR0 & (1<<id);
+	} else {
+		return PMC->PMC_PCSR1 & (1<<(id-32));
+	}
+}
+
+template< ClockPeripheral peripheral >
+void ClockGen::disable() {
+	constexpr uint32_t id = (uint32_t)peripheral;
+	if constexpr (id < 32) {
+		PMC->PMC_PCDR0 = (1<<id);
+	} else {
+		PMC->PMC_PCDR1 = (1<<(id-32));
+	}
+}
+
+
 } // namespace modm::platform

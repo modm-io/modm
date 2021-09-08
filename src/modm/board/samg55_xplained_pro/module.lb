@@ -18,7 +18,7 @@ def prepare(module, options):
     if not options[":target"].partname == "samg55j19a-au":
         return False
 
-    module.depends(":platform:clockgen", ":platform:gpio", ":platform:core");
+    module.depends(":platform:clockgen", ":platform:gpio", ":platform:core", ":platform:usb");
     return True
 
 def build(env):

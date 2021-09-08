@@ -20,8 +20,13 @@ using namespace modm::platform;
 
 struct SystemClock
 {
+	// Chosen to achieve 120MHz system clock
 	static constexpr uint32_t PllAMult = 3662;
+	// Chosen to achieve 48MHz USB clock
+	static constexpr uint32_t PllBMult = 1465;
+
 	static constexpr uint32_t Frequency = PllAMult * SlowClkFreqHz;
+	static constexpr uint32_t Usb = PllBMult * SlowClkFreqHz;
 	static bool inline
 	enable()
 	{
@@ -30,6 +35,15 @@ struct SystemClock
 		ClockGen::enableExternal32Khz(false);
 		ClockGen::enablePllA<PllAMult>();
 		ClockGen::selectMasterClk<MasterClkSource::PLLA_CLK, MasterClkPrescaler::CLK_1>();
+		return true;
+	}
+
+	static bool inline
+	enableUsb()
+	{
+		ClockGen::enablePllB<PllBMult>();
+		// Use PLLB as USB clock source
+		PMC->PMC_USB = PMC_USB_USBS;
 		return true;
 	}
 };
@@ -49,6 +63,12 @@ initialize()
 	Led::setOutput(modm::Gpio::Low);
 
 	Button::setInput();
+}
+
+inline void initializeUsbFs()
+{
+	SystemClock::enableUsb();
+	modm::platform::Usb::initialize<Board::SystemClock>();
 }
 
 } // namespace Board

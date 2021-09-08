@@ -1,7 +1,7 @@
 <library>
   <extends>modm:samg55-xplained-pro</extends>
   <options>
-    <option name="modm:build:build.path">../../../build/samg/blink</option>
+    <option name="modm:build:build.path">../../../build/samg55_xplained_pro/blink</option>
   </options>
   <modules>
     <module>modm:build:scons</module>

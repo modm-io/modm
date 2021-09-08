@@ -22,7 +22,9 @@ def init(module):
 def prepare(module, options):
     if not (options[":target"].has_driver("usb") or
             options[":target"].has_driver("usb_otg_fs") or
-            options[":target"].has_driver("usb_otg_hs")):
+            options[":target"].has_driver("usb_otg_hs") or
+            options[":target"].has_driver("udp") or
+            options[":target"].has_driver("uhp")):
         return False
 
     configs = {"device.cdc", "device.msc", "device.vendor", "device.midi", "device.dfu"}
@@ -153,11 +155,16 @@ def build(env):
                 raise ValidateException("Unknown ITF device class '{}'!".format(devclass))
 
             endpoints[itf_prefix + "_OUT"] = hex(endpoint_counter)
+            # SAMG doesn't support using the same EP number for IN and OUT
+            if target.platform == "sam" and target.family in ["g"]:
+                endpoint_counter += 1
             endpoints[itf_prefix + "_IN"] = hex(0x80 | endpoint_counter)
 
     if target.platform == "stm32":
         irq_data = env.query(":platform:usb:irqs")
         irqs = irq_data["port_irqs"][speed]
+    elif target.platform == "sam" and target.family in ["g"]:
+        irqs = ["UDP"]
     else:
         irqs = ["USB"]
 
@@ -220,9 +227,10 @@ Configuration options:
 """
 
     def prepare(self, module, options):
-        # Only OTG has Host Mode
+        # On STM32, only OTG has Host Mode
         if not (options[":target"].has_driver("usb_otg_fs") or
-                options[":target"].has_driver("usb_otg_hs")):
+                options[":target"].has_driver("usb_otg_hs") or
+                options[":target"].has_driver("uhp:samg*")):
             return False
 
         paths = {p.parent for p in Path(localpath("tinyusb/src/class/")).glob("*/*_host.h")}
