@@ -44,14 +44,14 @@ enum class MainInternalFreq : uint32_t {
 };
 
 enum class ClockPeripheral : uint32_t {
-	FlexCom0 = ID_FLEXCOM0,
-	FlexCom1 = ID_FLEXCOM1,
-	FlexCom2 = ID_FLEXCOM2,
-	FlexCom3 = ID_FLEXCOM3,
-	FlexCom4 = ID_FLEXCOM4,
-	FlexCom5 = ID_FLEXCOM5,
-	FlexCom6 = ID_FLEXCOM6,
-	FlexCom7 = ID_FLEXCOM7,
+	Flexcom0 = ID_FLEXCOM0,
+	Flexcom1 = ID_FLEXCOM1,
+	Flexcom2 = ID_FLEXCOM2,
+	Flexcom3 = ID_FLEXCOM3,
+	Flexcom4 = ID_FLEXCOM4,
+	Flexcom5 = ID_FLEXCOM5,
+	Flexcom6 = ID_FLEXCOM6,
+	Flexcom7 = ID_FLEXCOM7,
 	PioA = ID_PIOA,
 	PioB = ID_PIOB,
 	Pdmic0 = ID_PDMIC0,

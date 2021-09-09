@@ -37,6 +37,9 @@ enum class PeripheralPin
 	Dm,
 	Dp,
 	Wo,
+	Sck,
+	Miso,
+	Mosi
 };
 
 template<typename... Tuples>
@@ -418,6 +421,9 @@ public:
 	using ExtInt = As<PeripheralPin::ExtInt>;
 	using Dm = As<PeripheralPin::Dm>;
 	using Dp = As<PeripheralPin::Dp>;
+	using Sck = As<PeripheralPin::Sck>;
+	using Miso = As<PeripheralPin::Miso>;
+	using Mosi = As<PeripheralPin::Mosi>;
 
 	inline static bool
 	read()
