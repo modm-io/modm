@@ -11,6 +11,9 @@
 
 #pragma once
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waddress-of-packed-member"
+
 #include <modm/architecture/interface/register.hpp>
 #include <modm/architecture/interface/i2c_device.hpp>
 #include <modm/processing/resumable.hpp>
@@ -670,3 +673,5 @@ private:
 };
 
 } // namespace modm
+
+#pragma GCC diagnostic pop
