@@ -1,0 +1,197 @@
+/*
+ * Copyright (c) 2021 Jeff McBride
+ * Copyright (c) 2021, Tomasz Wasilczyk
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+namespace modm::platform
+{
+
+void
+ClockGen::enableMainInternal(MainInternalFreq freq)
+{
+	// Enable Main RC Oscillator and wait for it to stabilize
+	PMC->CKGR_MOR |= CKGR_MOR_KEY_PASSWD | CKGR_MOR_MOSCRCEN;
+	while (!(PMC->PMC_SR & PMC_SR_MOSCRCS));
+
+	// Change Main RC Oscillator frequency
+	PMC->CKGR_MOR =
+		(PMC->CKGR_MOR & ~(CKGR_MOR_MOSCRCF_Msk)) |
+		CKGR_MOR_MOSCRCF((uint32_t)freq) |
+		CKGR_MOR_KEY_PASSWD;
+	while (!(PMC->PMC_SR & PMC_SR_MOSCRCS));
+}
+
+void
+ClockGen::selectMainClockSource(MainClockSource src)
+{
+	if (src == MainClockSource::Internal)
+	{
+		PMC->CKGR_MOR =
+			(PMC->CKGR_MOR & ~CKGR_MOR_MOSCSEL) |
+			CKGR_MOR_KEY_PASSWD;
+	}
+	else
+	{	// MainClockSource::External
+		PMC->CKGR_MOR |= CKGR_MOR_MOSCSEL | CKGR_MOR_KEY_PASSWD;
+	}
+}
+
+template <MasterClkSource src, MasterClkPrescaler pres, MasterClkDivider divider>
+void
+ClockGen::selectMasterClk()
+{
+	// Datasheet says when selecting PLL as source, write PRES first, otherwise
+	// write CSS first.
+%% if target.family in ["g"]
+	static_assert(divider == MasterClkDivider::Div1, "Divider for master clock is not supported");
+	constexpr bool isPll = (src == MasterClkSource::PLLA_CLK
+		|| src == MasterClkSource::PLLB_CLK);
+%% elif target.family in ["v"]
+	constexpr bool isPll = (src == MasterClkSource::PLLA_CLK
+		|| src == MasterClkSource::UPLL_CLK);
+%% endif
+
+	if constexpr (isPll) {
+		PMC->PMC_MCKR = (PMC->PMC_MCKR & ~PMC_MCKR_PRES_Msk) | PMC_MCKR_PRES((uint32_t)pres);
+		while(!(PMC->PMC_SR & PMC_SR_MCKRDY)) {}
+%% if target.family in ["v"]
+		PMC->PMC_MCKR = (PMC->PMC_MCKR & ~PMC_MCKR_MDIV_Msk) | PMC_MCKR_MDIV(uint32_t(divider));
+		while(!(PMC->PMC_SR & PMC_SR_MCKRDY)) {}
+%% endif
+		PMC->PMC_MCKR = (PMC->PMC_MCKR & ~PMC_MCKR_CSS_Msk) | PMC_MCKR_CSS((uint32_t)src);
+		while(!(PMC->PMC_SR & PMC_SR_MCKRDY)) {}
+	} else {
+		PMC->PMC_MCKR = (PMC->PMC_MCKR & ~PMC_MCKR_CSS_Msk) | PMC_MCKR_CSS((uint32_t)src);
+		while(!(PMC->PMC_SR & PMC_SR_MCKRDY)) {}
+		PMC->PMC_MCKR = (PMC->PMC_MCKR & ~PMC_MCKR_PRES_Msk) | PMC_MCKR_PRES((uint32_t)pres);
+		while(!(PMC->PMC_SR & PMC_SR_MCKRDY)) {}
+%% if target.family in ["v"]
+		PMC->PMC_MCKR = (PMC->PMC_MCKR & ~PMC_MCKR_MDIV_Msk) | PMC_MCKR_MDIV(uint32_t(divider));
+		while(!(PMC->PMC_SR & PMC_SR_MCKRDY)) {}
+%% endif
+	}
+}
+
+template<uint32_t multiplier, uint32_t divider>
+void
+ClockGen::enablePllA(uint32_t wait_cycles)
+{
+%% if target.family in ["g"]
+    static_assert(9 <= multiplier && multiplier <= 7501, "Valid PLL MUL range is 9-7501");
+    static_assert(divider == 1, "PLL divider not supported");
+%% elif target.family in ["v"]
+    static_assert(1 <= multiplier && multiplier <= 62, "Valid PLL MUL range is 1-62");
+    static_assert(1 <= divider && divider <= 255, "Valid PLL DIV range is 1-255");
+%% endif
+    // we should disable PLLA first, but on boot it's disabled anyway
+    PMC->CKGR_PLLAR =
+        CKGR_PLLAR_MULA(multiplier-1) |
+        CKGR_PLLAR_PLLACOUNT(wait_cycles) |
+%% if target.family in ["g"]
+        CKGR_PLLAR_PLLAEN(1);
+%% elif target.family in ["v"]
+        CKGR_PLLAR_ONE |
+        CKGR_PLLAR_DIVA(divider);
+%% endif
+    // Wait for lock bit
+    while(!(PMC->PMC_SR & PMC_SR_LOCKA)) {}
+}
+
+%% if target.family in ["g"]
+template<uint32_t multiplier>
+void
+ClockGen::enablePllB(uint32_t wait_cycles)
+{
+    static_assert(multiplier > 8 && multiplier < 7502, "Valid PLL MUL range is 9-7501");
+    PMC->CKGR_PLLBR =
+        CKGR_PLLBR_MULB(multiplier-1) |
+        CKGR_PLLBR_PLLBCOUNT(wait_cycles) |
+        CKGR_PLLBR_PLLBEN(1);
+    // Wait for lock bit
+    while(!(PMC->PMC_SR & PMC_SR_LOCKB)) {}
+}
+%% endif
+
+%% if target.family in ["v"]
+template<UtmiRefClk refclk>
+void
+ClockGen::enableUPll(uint32_t wait_cycles)
+{
+	REG_UTMI_CKTRIM = refclk;
+	PMC->CKGR_UCKR =
+		CKGR_UCKR_UPLLCOUNT(wait_cycles) |
+		CKGR_UCKR_UPLLEN;
+	// Wait for lock bit
+	while(!(PMC->PMC_SR & PMC_SR_LOCKU)) {}
+}
+%% endif
+
+template< uint32_t Core_Hz >
+void
+ClockGen::updateCoreFrequency()
+{
+	SystemCoreClock = Core_Hz;
+	delay_fcpu_MHz = computeDelayMhz(Core_Hz);
+	delay_ns_per_loop = computeDelayNsPerLoop(Core_Hz);
+}
+
+template< uint32_t Core_Hz >
+void
+ClockGen::setFlashLatency()
+{
+	uint32_t fws = (Core_Hz - 1) / 20'000'000;
+	if constexpr (Core_Hz <= 130'000'000) fws = 5;
+	else fws = 6;
+	EFC->EEFC_FMR = (EFC->EEFC_FMR & ~EEFC_FMR_FWS_Msk) | EEFC_FMR_FWS(fws);
+}
+
+template< ClockPeripheral peripheral >
+void
+ClockGen::enable()
+{
+	constexpr uint32_t id = (uint32_t)peripheral;
+	if constexpr (id < 32) {
+		PMC->PMC_PCER0 = (1<<id);
+	} else if constexpr (id < 64) {
+		PMC->PMC_PCER1 = (1<<(id-32));
+	} else {
+		static_assert(id < 64, "ClockGen for peripheral ID 64-127 not implemented");
+	}
+}
+
+template< ClockPeripheral peripheral >
+bool
+ClockGen::isEnabled()
+{
+	constexpr uint32_t id = (uint32_t)peripheral;
+	if constexpr (id < 32) {
+		return PMC->PMC_PCSR0 & (1<<id);
+	} else if constexpr (id < 64) {
+		return PMC->PMC_PCSR1 & (1<<(id-32));
+	} else {
+		static_assert(id < 64, "ClockGen for peripheral ID 64-127 not implemented");
+	}
+}
+
+template< ClockPeripheral peripheral >
+void
+ClockGen::disable()
+{
+	constexpr uint32_t id = (uint32_t)peripheral;
+	if constexpr (id < 32) {
+		PMC->PMC_PCDR0 = (1<<id);
+	} else if constexpr (id < 64) {
+		PMC->PMC_PCDR1 = (1<<(id-32));
+	} else {
+		static_assert(id < 64, "ClockGen for peripheral ID 64-127 not implemented");
+	}
+}
+
+} // namespace modm::platform

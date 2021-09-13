@@ -35,7 +35,9 @@ ClockGenerator : uint32_t
 	Internal8M = 3,
 };
 
-enum class ClockPeripheral : uint32_t {
+enum class
+ClockPeripheral : uint32_t
+{
 	Dfll48 = GCLK_CLKCTRL_ID_DFLL48_Val,
 	Fdpll = GCLK_CLKCTRL_ID_FDPLL_Val,
 	Fdpll32K = GCLK_CLKCTRL_ID_FDPLL32K_Val,

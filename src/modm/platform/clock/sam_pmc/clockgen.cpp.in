@@ -1,5 +1,6 @@
 /**
  * Copyright (c) 2021, Jeff McBride
+ * Copyright (c) 2021, Tomasz Wasilczyk
  *
  * This file is part of the modm project.
  *
@@ -12,18 +13,19 @@
 #include "clockgen.hpp"
 #include <cmath>
 
-
 // CMSIS Core compliance
-uint32_t modm_fastdata SystemCoreClock(8000000);
+constinit uint32_t modm_fastdata SystemCoreClock(modm::platform::ClockGen::BootFrequency);
 modm_weak void SystemCoreClockUpdate() { /* Nothing to update */ }
 
 namespace modm::platform
 {
-uint16_t modm_fastdata delay_fcpu_MHz = computeDelayMhz(8'000'000);
-uint16_t modm_fastdata delay_ns_per_loop = computeDelayNsPerLoop(8'000'000);
+constinit uint16_t modm_fastdata delay_fcpu_MHz = computeDelayMhz(ClockGen::BootFrequency);
+constinit uint16_t modm_fastdata delay_ns_per_loop = computeDelayNsPerLoop(ClockGen::BootFrequency);
 
 
-static uint16_t divFromMasterClkPrescaler(MasterClkPrescaler pres) {
+static constexpr uint16_t
+divFromMasterClkPrescaler(MasterClkPrescaler pres)
+{
 	switch(pres) {
 		case MasterClkPrescaler::CLK_1:
 			return 1;
@@ -46,76 +48,91 @@ static uint16_t divFromMasterClkPrescaler(MasterClkPrescaler pres) {
 	}
 }
 
-void ClockGen::enableExternal32Khz(bool crystal_bypass) {
-	if(crystal_bypass) {
-		SUPC->SUPC_MR |= SUPC_MR_OSCBYPASS;
-	}
-
+void
+ClockGen::enableExternal32Khz(bool crystal_bypass)
+{
+	if (crystal_bypass) SUPC->SUPC_MR |= SUPC_MR_OSCBYPASS;
 	SUPC->SUPC_CR = SUPC_CR_KEY_PASSWD | SUPC_CR_XTALSEL;
 }
 
-
-
-
-uint32_t ClockGen::masterClkFrequency() {
+uint32_t
+ClockGen::masterClkFrequency()
+{
 	uint32_t mckr = PMC->PMC_MCKR;
 	MasterClkSource src = (MasterClkSource)((mckr & PMC_MCKR_CSS_Msk) >> PMC_MCKR_CSS_Pos);
 	MasterClkPrescaler pres = (MasterClkPrescaler)((mckr & PMC_MCKR_PRES_Msk) >> PMC_MCKR_PRES_Pos);
 	uint32_t div = divFromMasterClkPrescaler(pres);
-	switch(src) {
+	switch(src)
+	{
 		case MasterClkSource::SLOW_CLK:
 			return SlowClkFreqHz / div;
 		case MasterClkSource::MAIN_CLK:
 			return mainClkFrequency() / div;
 		case MasterClkSource::PLLA_CLK:
 			return pllAFrequency() / div;
+%% if target.family in ["g"]
 		case MasterClkSource::PLLB_CLK:
 			return pllBFrequency() / div;
+%% elif target.family in ["v"]
+		case MasterClkSource::UPLL_CLK:
+			return 240'000'000;  // UPLLDIV2
+%% endif
 		default:
 			return 0;
 	}
 }
 
-uint32_t ClockGen::mainClkFrequency() {
+uint32_t
+ClockGen::mainClkFrequency()
+{
 	// NOTE: This does not support external main clk. To add this, we'll need
 	// a way for user supplied input frequency. For now, this assumes we're
 	// using the internal RC for main clock.
 	uint32_t moscrcf = (PMC->CKGR_MOR & CKGR_MOR_MOSCRCF_Msk) >> CKGR_MOR_MOSCRCF_Pos;
-	if(moscrcf == (uint32_t)MainInternalFreq::Rc8Mhz) {
-		return 8'000'000;
-	} else if(moscrcf == (uint32_t)MainInternalFreq::Rc16Mhz) {
-		return 16'000'000;
-	} else if(moscrcf == (uint32_t)MainInternalFreq::Rc24Mhz) {
-		return 24'000'000;
-	} else {
-		return 0;
-	}
+	const auto freq = MainInternalFreq(moscrcf);
+#ifdef CKGR_MOR_MOSCRCF_4_MHz_Val
+	if (freq == MainInternalFreq::Rc4Mhz) return 4'000'000;
+#endif
+#ifdef CKGR_MOR_MOSCRCF_8_MHz_Val
+	if (freq == MainInternalFreq::Rc8Mhz) return 8'000'000;
+#endif
+#ifdef CKGR_MOR_MOSCRCF_12_MHz_Val
+	if (freq == MainInternalFreq::Rc12Mhz) return 12'000'000;
+#endif
+#ifdef CKGR_MOR_MOSCRCF_16_MHz_Val
+	if (freq == MainInternalFreq::Rc16Mhz) return 16'000'000;
+#endif
+#ifdef CKGR_MOR_MOSCRCF_24_MHz_Val
+	if (freq == MainInternalFreq::Rc24Mhz) return 24'000'000;
+#endif
+	return 0;
 }
 
-uint32_t ClockGen::pllAFrequency() {
+uint32_t
+ClockGen::pllAFrequency()
+{
 	uint32_t mul = ((PMC->CKGR_PLLAR & CKGR_PLLAR_MULA_Msk) >> CKGR_PLLAR_MULA_Pos) + 1;
+%% if target.family in ["g"]
 	uint32_t freq = SlowClkFreqHz * mul;
-	if(PMC->PMC_MCKR & PMC_MCKR_PLLADIV2) {
-		freq /= 2;
-	}
+	if(PMC->PMC_MCKR & PMC_MCKR_PLLADIV2) freq /= 2;
+%% elif target.family in ["v"]
+	uint32_t freq = mainClkFrequency() * mul;
+	const auto diva = ((PMC->CKGR_PLLAR & CKGR_PLLAR_DIVA_Msk) >> CKGR_PLLAR_DIVA_Pos);
+	if (diva == 0) return 0;  // PLLA is disabled
+	freq /= diva;
+%% endif
 	return freq;
 }
 
-uint32_t ClockGen::pllBFrequency() {
+%% if target.family in ["g"]
+uint32_t
+ClockGen::pllBFrequency()
+{
 	uint32_t mul = ((PMC->CKGR_PLLBR & CKGR_PLLBR_MULB_Msk) >> CKGR_PLLBR_MULB_Pos) + 1;
 	uint32_t freq = SlowClkFreqHz * mul;
-	if(PMC->PMC_MCKR & PMC_MCKR_PLLBDIV2) {
-		freq /= 2;
-	}
+	if(PMC->PMC_MCKR & PMC_MCKR_PLLBDIV2) freq /= 2;
 	return freq;
 }
-
-
-void ClockGen::setMainInternalFreq(MainInternalFreq freq) {
-	PMC->CKGR_MOR =
-		(PMC->CKGR_MOR & ~(CKGR_MOR_MOSCRCF_Msk)) |
-		CKGR_MOR_MOSCRCF((uint32_t)freq) |
-		CKGR_MOR_KEY_PASSWD;
-}
+%% endif
 
 } // namespace modm::platform
