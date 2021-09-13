@@ -75,8 +75,9 @@ struct Peripherals::{{ name }}::{{ signal }}<{{ index }}> {};
 
 enum class PortName
 {
-	A,
-	B,
+%% for port in ports
+	{{ port }},
+%% endfor
 };
 
 template<class _>

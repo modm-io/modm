@@ -58,7 +58,6 @@ def validate(env):
     driver = device.get_driver("gpio")
 
 def build(env):
-    bprops = env.substitutions
     device = env[":target"]
     driver = device.get_driver("gpio")
 
