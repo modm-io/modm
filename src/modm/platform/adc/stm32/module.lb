@@ -49,6 +49,7 @@ class Instance(Module):
         properties["channels"] = sorted(channels)
         global props
         properties["shared_irq_ids"] = props["shared_irq_ids"]
+        properties["irq"] = "1" if target.family in ["l1"] else self.instance
         props["instances"].append(self.instance)
 
         env.substitutions = properties

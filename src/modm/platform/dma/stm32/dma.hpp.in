@@ -58,8 +58,13 @@ public:
 		if constexpr (ID == 1)
 			Rcc::enable<Peripheral::Dma1>();
 %% if (dma.instance | length) > 1
-		else
+		else {
 			Rcc::enable<Peripheral::Dma2>();
+%% if target.string.startswith("stm32f100")
+			// TODO: Enable remap of DMA2_Channel5 IRQ
+			// AFIO->MAPR2 |= AFIO_MAPR2_MISC_REMAP;
+%% endif
+		}
 %% endif
 %% if dmaType in ["stm32-mux"]:
 		Rcc::enable<Peripheral::Dmamux1>();
