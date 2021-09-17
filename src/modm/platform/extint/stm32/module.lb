@@ -1,0 +1,105 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2021, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":platform:exti"
+    module.description = FileReader("module.md")
+
+def prepare(module, options):
+    module.depends(":cmsis:device", ":platform:gpio", ":utils")
+    module.add_option(
+        BooleanOption(
+            name="with_handlers",
+            description=descr_with_handlers,
+            default=True))
+    return options[":target"].identifier.platform == "stm32"
+
+extimap = {}
+def validate(env):
+    # These are all exti possible vectors: 0, 0_1, 1, 15_10, 2, 2_3, 2_TSC, 3, 4, 4_15, 9_5
+    all_exti = {
+        "0": [0], "1": [1], "2": [2], "3": [3], "4": [4],
+        "0_1": [0,1],
+        "2_TSC": [2],
+        "2_3": [2,3],
+        "4_15": [4,5,6,7,8,9,10,11,12,13,14,15],
+        "9_5": [5,6,7,8,9],
+        "15_10": [10,11,12,13,14,15],
+    }
+    global extimap
+    for vec in (v["name"][4:] for v in env[":target"].get_driver("core")["vector"] if "EXTI" in v["name"]):
+        if vec not in all_exti:
+            raise ValidateException("Unknown EXTI vector: '{}'".format(vec))
+        extimap[vec] = all_exti[vec]
+
+def build(env):
+    target = env[":target"].identifier
+
+    separate_flags = target.family in ["g0"]
+    extended = target.family in ["l4", "g4", "h7"]
+    if separate_flags: extended = target.name in ["b1", "c1"]
+
+    exti_reg = "SYSCFG"
+    if target.family in ["g0"]: exti_reg = "EXTI"
+    if target.family in ["f1"]: exti_reg = "AFIO"
+
+    global extimap
+    lines = 1 + max(int(g["pin"]) for g in env[":target"].get_driver("gpio")["gpio"])
+    env.substitutions = {
+        "extended": extended,
+        "separate_flags": separate_flags,
+        "exti_reg": exti_reg,
+        "target": target,
+        "extimap": extimap,
+        "lines": lines,
+        "with_handlers": env["with_handlers"],
+    }
+    env.outbasepath = "modm/src/modm/platform/exti"
+    env.template("exti.hpp.in")
+    if env["with_handlers"]:
+        env.template("exti.cpp.in")
+
+
+descr_with_handlers = """
+# Use callbacks for GPIO lines
+
+To simplify the external IRQ management of external GPIO triggers, you can use
+the connect method to attach a `void(uint8_t)` callback to EXTI lines 0-15,
+which gets passed the triggered line number as an argument:
+
+```cpp
+Exti::connect<GpioA0>(Exti::Trigger::FallingEdge,
+                      [count=uint32_t(0)](uint8_t line) mutable
+{
+    MODM_LOG_INFO << "Line " << line << " triggered " << ++count << " times!" << modm::endl;
+});
+// to disable the handler and IRQ later
+Exti::disconnect<GpioA0>();
+```
+
+!!! warning "Duplicate Symbols for EXTI_IRQHandler"
+    This option internally defines all `MODM_ISR(EXTI*)` IRQs, so you cannot
+    define them anymore in your application!
+
+The callback is implemented using `modm::inplace_function`, therefore uses no
+heap, but has a fixed storage size of `sizeof(void*)` by default.
+You can increase this storage size by defining a new global storage size
+`MODM_EXTI_HANDLER_STORAGE=bytes` in your `project.xml`:
+
+```xml
+<library>
+  <collectors>
+    <collect name="modm:build:cppdefines">MODM_EXTI_HANDLER_STORAGE=12</collect>
+  </collectors>
+</library>
+```
+"""

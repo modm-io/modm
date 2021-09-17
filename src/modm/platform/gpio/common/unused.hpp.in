@@ -95,16 +95,6 @@ public:
 	static void configure(InputType) {}
 	static bool read() { return false; }
 
-	// External Interrupts
-	static void enableExternalInterrupt() {}
-	static void disableExternalInterrupt() {}
-	static void enableExternalInterruptVector(const uint32_t) {}
-	static void disableExternalInterruptVector() {}
-	static void setInputTrigger(const InputTrigger) {}
-	static bool getExternalInterruptFlag() { return false; }
-	/// Reset the interrupt flag in the interrupt routine.
-	static void acknowledgeExternalInterruptFlag() {}
-
 	// GpioIO
 	static Direction getDirection() { return Direction::In; }
 %% if target.platform in ["stm32"]
@@ -121,9 +111,8 @@ public:
 %% for name in all_signals
 	struct {{ name }}
 	{
-		using Gpio = GpioUnused;
+		using Data = detail::DataUnused;
 		static constexpr Gpio::Signal Signal = Gpio::Signal::{{ name }};
-		static void connect() {}
 	};
 %% endfor
 };

@@ -195,25 +195,6 @@ def validate(env):
         bprops["group_map"] = signal_map
         bprops["remaps"] = driver["remap"]
 
-    # These are all exti possible vectors: 0, 0_1, 1, 15_10, 2, 2_3, 2_TSC, 3, 4, 4_15, 9_5
-    all_exti = {
-        "0": [0], "1": [1], "2": [2], "3": [3], "4": [4],
-        "0_1": [0,1],
-        "2_TSC": [2],
-        "2_3": [2,3],
-        "4_15": [4,5,6,7,8,9,10,11,12,13,14,15],
-        "9_5": [5,6,7,8,9],
-        "15_10": [10,11,12,13,14,15],
-    }
-    extimap = {}
-    for vec in [v["name"][4:] for v in device.get_driver("core")["vector"] if "EXTI" in v["name"]]:
-        if vec not in all_exti:
-            raise ValidateException("Unknown EXTI vector: '{}'".format(vec))
-        for num in all_exti[vec]:
-            if str(num) in extimap:
-                raise ValidateException("Pin '{}' already in EXTI map!".format(str(num)))
-            extimap[str(num)] = vec
-
     # Compute the set of remapped pins
     remapped_gpios = {}
     for p in driver["package"][0]["pin"]:
@@ -243,7 +224,6 @@ def validate(env):
         has_remap = key in remapped_gpios
         bprops[key] = {
             "gpio": gpio,
-            "exti_irqn": extimap[gpio["pin"]],
             "signals": extracted_signals,
             "has_remap": has_remap,
         }
@@ -272,10 +252,6 @@ def validate(env):
         all_peripherals.extend([get_driver(r) for r in driver["remap"]])
     bprops["all_peripherals"] = sorted(list(set(all_peripherals)))
     bprops["all_signals"] = sorted(list(set(s["name"] for s in all_signals.values())))
-    bprops["pf"] = "1" if device.identifier["family"] in ["l4", "g0", "g4", "h7"] else ""
-    bprops["exti_reg"] = "SYSCFG"
-    if device.identifier.family in ["g0"]: bprops["exti_reg"] = "EXTI"
-    if device.identifier.family in ["f1"]: bprops["exti_reg"] = "AFIO"
     bprops["gpios"] = [bprops[g["port"] + g["pin"]] for g in driver["gpio"]]
 
     # Check the max number of ADC instances
