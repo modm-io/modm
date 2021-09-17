@@ -250,7 +250,5 @@ modm::platform::Adc{{ id }}::getInterruptFlags()
 void
 modm::platform::Adc{{ id }}::acknowledgeInterruptFlags(const InterruptFlag_t flags)
 {
-	// Flags are cleared by writing a one to the flag position.
-	// Writing a zero is ignored.
-	ADC{{ per }}->SR = flags.value;
+	ADC{{ per }}->SR = ~flags.value;
 }

@@ -76,7 +76,7 @@ def prepare(module, options):
     props["instances"] = []
 
     if target["family"] in ["f2", "f4", "f7"]:
-        props["shared_irqs"] = {"ADC": listify(device.get_driver("adc")["instance"])}
+        props["shared_irqs"] = {"ADC": listify([int(i) for i in device.get_driver("adc")["instance"]])}
         props["shared_irq_ids"] = props["shared_irqs"]["ADC"]
     else:
         shared_irqs = [v["name"] for v in device.get_driver("core")["vector"]]
