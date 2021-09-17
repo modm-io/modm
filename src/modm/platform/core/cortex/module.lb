@@ -293,7 +293,7 @@ def build(env):
     env.outbasepath = "modm/src/modm/platform/core"
 
     # startup script
-    env.copy("reset_handler.sx")
+    env.template("reset_handler.sx.in")
     env.template("startup.c.in")
     env.template("vectors.c.in")
     env.collect(":build:linkflags", "-nostartfiles")
