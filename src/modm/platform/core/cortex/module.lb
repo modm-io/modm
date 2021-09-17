@@ -296,6 +296,7 @@ def build(env):
     env.template("reset_handler.sx.in")
     env.template("startup.c.in")
     env.template("vectors.c.in")
+    env.template("vectors.hpp.in")
     env.collect(":build:linkflags", "-nostartfiles")
 
     # dealing with runtime assertions

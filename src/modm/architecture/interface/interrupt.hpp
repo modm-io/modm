@@ -62,6 +62,12 @@
  * This maps to `MODM_ISR_NAME({vector})()`.
  * @note You may have to forward declare the interrupt using `MODM_ISR_DECL({vector})`.
  *
+ * On Cortex-M the vector name is validated at compile time against the device's
+ * vector table, so that misspelled vector names get caught during compilation.
+ * If this is undesirable you can manually call the vector using
+ * `MODM_ISR_NAME(vector)()` or disable the validation by defining
+ * `MODM_ISR_DISABLE_VALIDATION`.
+ *
  * @param vector
  *        The name of the interrupt without any suffix (neither `_vect`, nor `_IRQHandler`).
  *
@@ -78,6 +84,10 @@
  * On AVRs this maps to `ISR(MODM_ISR_NAME({vector}), args)`.
  * On Cortex-M and Hosted this maps to `void MODM_ISR_NAME({vector})(void) args`.
  * `extern "C"` is automatically added in a C++ environment.
+ *
+ * On Cortex-M the vector name is validated at compile time against the device's
+ * vector table, so that misspelled vector names get caught during compilation.
+ * You can disable the validation by defining `MODM_ISR_DISABLE_VALIDATION`.
  *
  * @param vector
  *        The name of the interrupt without any suffix (neither `_vect`, nor `_IRQHandler`).
@@ -103,13 +113,27 @@
 
 #elif defined MODM_CPU_ARM
 
+
+#ifdef __cplusplus
+#	include <modm/platform/core/vectors.hpp>
+#else
+#	ifndef MODM_ISR_DISABLE_VALIDATION
+#  		define MODM_ISR_VALIDATE(vector_str, vector) \
+			_Static_assert(vector ## _IRQn > -127);
+#	else
+#   	define MODM_ISR_VALIDATE(...)
+#	endif
+#endif
+
 #	define MODM_ISR_NAME(vector) \
 		vector ## _IRQHandler
 #	define MODM_ISR_DECL(vector) \
 		modm_extern_c void vector ## _IRQHandler(void)
 #	define MODM_ISR_CALL(vector) \
+		MODM_ISR_VALIDATE(#vector, vector); \
 		vector ## _IRQHandler()
 #	define MODM_ISR(vector, ...) \
+		MODM_ISR_VALIDATE(#vector, vector); \
 		modm_extern_c void vector ## _IRQHandler(void) \
 			__attribute__((externally_visible)) __VA_ARGS__; \
 		void vector ## _IRQHandler(void)
