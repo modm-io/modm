@@ -65,7 +65,7 @@ modm::platform::Adc{{ id }}::initialize(const ClockMode clk,
 	ADC{{ id }}->CR |= static_cast<uint32_t>(VoltageRegulatorState::Enabled);
 	modm::delay_us(10);	// FIXME: this is ugly -> find better solution
 
-	acknowledgeInterruptFlag(InterruptFlag::Ready);
+	acknowledgeInterruptFlags(InterruptFlag::Ready);
 
 	calibrate(cal, true);	// blocking calibration
 
@@ -77,7 +77,7 @@ modm::platform::Adc{{ id }}::initialize(const ClockMode clk,
 		while (not isReady()) {
 			ADC{{ id }}->CR |= ADC_CR_ADEN;
 		}
-		acknowledgeInterruptFlag(InterruptFlag::Ready);
+		acknowledgeInterruptFlags(InterruptFlag::Ready);
 	}
 }
 
@@ -189,7 +189,7 @@ void
 modm::platform::Adc{{ id }}::startConversion(void)
 {
 	// TODO: maybe add more interrupt flags
-	acknowledgeInterruptFlag(InterruptFlag::EndOfRegularConversion |
+	acknowledgeInterruptFlags(InterruptFlag::EndOfRegularConversion |
 			InterruptFlag::EndOfSampling | InterruptFlag::Overrun);
 	// starts single conversion for the regular group
 	ADC{{ id }}->CR |= ADC_CR_ADSTART;
@@ -262,7 +262,7 @@ modm::platform::Adc{{ id }}::getInterruptFlags()
 }
 
 void
-modm::platform::Adc{{ id }}::acknowledgeInterruptFlag(const InterruptFlag_t flags)
+modm::platform::Adc{{ id }}::acknowledgeInterruptFlags(const InterruptFlag_t flags)
 {
 	// Flags are cleared by writing a one to the flag position.
 	// Writing a zero is ignored.

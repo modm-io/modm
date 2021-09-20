@@ -16,6 +16,7 @@
 #include <avr/io.h>
 
 #include <modm/architecture/interface/adc.hpp>
+#include <modm/architecture/interface/register.hpp>
 #include <modm/platform/gpio/connector.hpp>
 #include <modm/math/algorithm/prescaler.hpp>
 
@@ -142,6 +143,13 @@ public:
 	%% endif
 	};
 %% endif
+
+	enum class
+	InterruptFlag : uint8_t
+	{
+		All = (1<<ADIF),
+	};
+	MODM_FLAGS8(InterruptFlag);
 
 private:
 	enum class
@@ -339,11 +347,26 @@ public:
 		return (ADCSRA & (1<<ADIF));
 	}
 
+	/// @return	`InterruptFlag::All` if the flag is set,
+	///			`0` otherwise
+	static inline InterruptFlag_t
+	getInterruptFlags()
+	{
+		return InterruptFlag(ADCSRA & (1<<ADIF));
+	}
+
 	/// Clears the interrupt flag
 	static inline void
 	acknowledgeInterruptFlag()
 	{
 		ADCSRA &= ~(1<<ADIF);
+	}
+
+	/// Clears the interrupt flag if `flags` is set to `InterruptFlag::All`
+	static inline void
+	acknowledgeInterruptFlags(const InterruptFlag_t flags)
+	{
+		ADCSRA &= ~flags.value;
 	}
 
 

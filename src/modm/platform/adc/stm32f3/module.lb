@@ -125,8 +125,16 @@ class Instance(Module):
         env.substitutions = properties
         env.outbasepath = "modm/src/modm/platform/adc"
 
+        global props
+        properties["shared_irq_ids"] = props["shared_irq_ids"]
+        props["instances"].append(self.instance)
+
+        properties["resolution"] = 12
+
         env.template("adc.hpp.in", "adc_{}.hpp".format(self.instance))
         env.template("adc_impl.hpp.in", "adc_{}_impl.hpp".format(self.instance))
+        env.template("adc_interrupt.hpp.in", "adc_interrupt_{}.hpp".format(self.instance))
+        env.template("adc_interrupt.cpp.in", "adc_interrupt_{}.cpp".format(self.instance))
 
 
 def init(module):
@@ -139,11 +147,28 @@ def prepare(module, options):
         return False
 
     module.depends(
+        ":architecture:adc",
+        ":math:algorithm",
+        ":utils",
         ":architecture:delay",
         ":architecture:register",
         ":cmsis:device",
         ":platform:gpio",
         ":platform:rcc")
+
+    global props
+    props = {}
+    props["instances"] = []
+
+    shared_irqs = [v["name"] for v in device.get_driver("core")["vector"]]
+    shared_irqs = [v for v in shared_irqs if v.startswith("ADC") and "_" in v]
+    props["shared_irqs"] = {}
+    props["shared_irq_ids"] = []
+    for irq in shared_irqs:
+        parts = irq[3:].split("_")
+        shared_irqs_ids = (int(parts[0]), int(parts[1]) )
+        props["shared_irqs"][irq] = shared_irqs_ids
+        props["shared_irq_ids"].extend(shared_irqs_ids)
 
     for instance in listify(device.get_driver("adc")["instance"]):
         module.add_submodule(Instance(int(instance)))
@@ -158,5 +183,13 @@ def build(env):
     properties["target"] = device.identifier
     properties["driver"] = driver
 
+    global props
+    properties["shared_irq_ids"] = props["shared_irq_ids"]
+    properties["instances"] = props["instances"]
+    properties["shared_irqs"] = props["shared_irqs"]
+
     env.substitutions = properties
     env.outbasepath = "modm/src/modm/platform/adc"
+
+    if any(i in props["shared_irq_ids"] for i in props["instances"]):
+        env.template("adc_shared_interrupts.cpp.in")

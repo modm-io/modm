@@ -52,6 +52,8 @@ template < class AdcInterrupt, uint8_t Channels, uint32_t Oversamples >
 void
 modm::AdcSampler<AdcInterrupt,Channels,Oversamples>::sampleAdc()
 {
+	AdcInterrupt::acknowledgeInterruptFlags(AdcInterrupt::InterruptFlag::All);
+
 	if (Oversamples > 1) {
 
 		// reset array to zero at the beginning of sampling

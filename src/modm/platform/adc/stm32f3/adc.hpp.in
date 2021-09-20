@@ -40,6 +40,10 @@ namespace platform
  */
 class Adc{{ id }}
 {
+
+public:
+	static constexpr uint8_t Resolution = {{ resolution }};
+
 public:
 	/// Channels, which can be used with this ADC.
 	enum class Channel : uint8_t	// TODO: What is the best type?
@@ -226,6 +230,7 @@ public:
 		AnalogWatchdog2 					= ADC_ISR_AWD2,
 		AnalogWatchdog3 					= ADC_ISR_AWD3,
 		InjectedContextQueueOverflow 		= ADC_ISR_JQOVF,
+		All									= ADC_ISR_ADRDY | ADC_ISR_EOSMP | ADC_ISR_EOC | ADC_ISR_EOS | ADC_ISR_OVR | ADC_ISR_JEOC | ADC_ISR_JEOS | ADC_ISR_AWD1 | ADC_ISR_AWD2 | ADC_ISR_AWD3 | ADC_ISR_JQOVF,
 	};
 	MODM_FLAGS32(InterruptFlag);
 
@@ -403,7 +408,7 @@ public:
 	getInterruptFlags();
 
 	static inline void
-	acknowledgeInterruptFlag(const InterruptFlag_t flags);
+	acknowledgeInterruptFlags(const InterruptFlag_t flags);
 };
 
 }
