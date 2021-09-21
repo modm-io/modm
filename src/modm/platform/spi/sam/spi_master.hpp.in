@@ -96,7 +96,7 @@ public:
 		assertBaudrateInTolerance< result.frequency, baudrate, tolerance >();
 
 		Regs()->SPI_CSR[0] = SPI_CSR_SCBR(result.prescaler);
-		Regs()->SPI_MR = SPI_MR_MSTR;
+		Regs()->SPI_MR = SPI_MR_MSTR | SPI_MR_MODFDIS;
 		Regs()->SPI_CR |= SPI_CR_SPIEN;
 	}
 

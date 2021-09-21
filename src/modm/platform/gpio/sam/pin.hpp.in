@@ -412,9 +412,19 @@ public:
 	read()
 	{
 %% if target["family"] in ["g", "v"]
-		return Base::readPortReg<PinConfig::port>(PIO_PDSR_OFFSET);
+		return Base::template readPortReg<PinConfig::port>(PIO_PDSR_OFFSET);
 %% else
-		return Base::readPortReg<PinConfig::port>(PORT_IN_OFFSET);
+		return Base::template readPortReg<PinConfig::port>(PORT_IN_OFFSET);
+%% endif
+	}
+
+	inline static bool
+	isSet()
+	{
+%% if target["family"] in ["g", "v"]
+		return Base::template readPortReg<PinConfig::port>(PIO_ODSR_OFFSET);
+%% else
+		return Base::template readPortReg<PinConfig::port>(PORT_OUT_OFFSET);
 %% endif
 	}
 
