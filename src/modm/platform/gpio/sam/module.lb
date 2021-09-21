@@ -70,10 +70,6 @@ def build(env):
                 "function": signal["function"].capitalize(),
                 "name": signal["name"].capitalize(),
             })
-            # SAMG devices have X1 peripheral connection, which is "extra function",
-            # but it is not configured by the normal alternate IO function. Skip these.
-            if signal['function'] == 'X1':
-                continue
             # This is a hack for L variant devices, which have a Ac without instance *and*
             # a Ac with instance 1. Why???
             if (device.identifier.get("variant") == "l"
@@ -84,7 +80,17 @@ def build(env):
             peripheral = peripherals.setdefault(signal["peripheral"], dict())
             if "instance" in signal:
                 signal["full_name"] += signal["instance"]
-                signal["instance"] = int(signal["instance"])
+                try:
+                    signal["instance"] = int(signal["instance"])
+                except ValueError:
+                    # On SAMV devices, some signals (e.g. PIODC/data capture) belong to
+                    # PIOs, and have alphabetic instance values. The config.hpp.in
+                    # template requires integers, so convert "a", "b", "c" etc to
+                    # integer values
+                    if len(signal["instance"]) == 1:
+                        signal["instance"] = ord(signal["instance"].lower()) - ord("a")
+                    else:
+                        raise ValueError(f"Encountered invalid signal instance {signal['instance']}")
                 peripheral.setdefault("instances", set()).add(signal["instance"])
             signal["full_name"] += signal["name"]
             p_signal = peripheral.setdefault("signals", dict()).setdefault(signal["name"], set())

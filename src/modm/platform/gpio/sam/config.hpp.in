@@ -35,7 +35,7 @@ struct Peripherals
 	struct {{ name }}
 	{
 %% for signal, index_list in peripheral["signals"].items()
-%% if not index_list
+%% if not index_list or name == "Adc"
 		struct {{ signal }} {};
 %% else
 		template<int index>
@@ -62,7 +62,7 @@ struct Peripherals::{{ name }}<{{ instance }}>::{{ signal }} {};
 %% endif
 %% endfor
 %% endfor
-%% else
+%% elif name != "Adc"
 %% for signal, index_list in peripheral["signals"].items()
 %% for index in index_list
 template<>
@@ -99,10 +99,15 @@ struct {{ gpio["port"] ~ gpio["pin"] }}
 		%% else
 		using peripheral = Peripherals::{{ signal["peripheral"] }};
 		%% endif
-		%% if "index" in signal
+		%% if "index" in signal and signal["peripheral"] != "Adc"
 		using signal = peripheral::{{ signal["name"] }}<{{ signal["index"] }}>;
 		%% else
 		using signal = peripheral::{{ signal["name"] }};
+		%% endif
+		%% if signal["peripheral"] == "Adc" and "index" in signal
+		static constexpr int32_t AdcChannel = {{ signal["index"] }};
+		%% else
+		static constexpr int32_t AdcChannel = -1;
 		%% endif
 	};
 %% endfor

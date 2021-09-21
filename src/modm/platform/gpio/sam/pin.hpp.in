@@ -39,7 +39,8 @@ enum class PeripheralPin
 	Wo,
 	Sck,
 	Miso,
-	Mosi
+	Mosi,
+	Ad,
 };
 
 template<typename... Tuples>
@@ -407,6 +408,7 @@ public:
 	using Sck = As<PeripheralPin::Sck>;
 	using Miso = As<PeripheralPin::Miso>;
 	using Mosi = As<PeripheralPin::Mosi>;
+	using Ad = As<PeripheralPin::Ad>;
 
 	inline static bool
 	read()
@@ -484,7 +486,12 @@ struct Gpio<PinConfig>::As : public Gpio<PinConfig>
 		inline static void
 		connect()
 		{
+
 %% if target["family"] in ["g", "v"]
+			// X1 denotes an "extra function", such as an ADC pin, which is not
+			// enabled by the PIO ABCD register.
+			static_assert(PinSignal::function != PinFunction::X1,
+				"This is a system connection, and cannot be connected by Gpio connect()");
 			Pio* PIOBase;
 %% for port in ports
 			if constexpr (PinConfig::port == PortName::{{ port }})
