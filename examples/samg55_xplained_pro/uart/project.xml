@@ -1,0 +1,9 @@
+<library>
+  <extends>modm:samg55-xplained-pro</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/samg55_xplained_pro/uart</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+  </modules>
+</library>
