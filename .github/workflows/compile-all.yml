@@ -26,7 +26,7 @@ jobs:
           name: avr-compile-all
           path: test/all/log
 
-  samd-compile-all:
+  sam-compile-all:
     if: github.event.label.name == 'ci:hal'
     runs-on: ubuntu-20.04
     container:
@@ -37,14 +37,14 @@ jobs:
       - name: Checkout code and update modm tools
         run: |
           (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
-      - name: Compile HAL for all SAMD
+      - name: Compile HAL for all SAM
         run: |
-          (cd test/all && python3 run_all.py samd --quick-remaining)
+          (cd test/all && python3 run_all.py sam --quick-remaining)
       - name: Upload log artifacts
         if: always()
         uses: actions/upload-artifact@v2
         with:
-          name: samd-compile-all
+          name: sam-compile-all
           path: test/all/log
 
   stm32f0-compile-all:

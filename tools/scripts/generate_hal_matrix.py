@@ -116,22 +116,32 @@ def hal_get_modules():
         all_targets[target] = (drivers, modules)
 
     # Some information cannot be extracted from the module.lb files
+    mapping["ADC"].add("afec")
+    mapping["DAC"].add("dacc")
+    mapping["Ethernet"].add("gmac")
+    mapping["Random Generator"].add("trng")
     mapping["UART"].update({"usi", "sercom"})
     mapping["Timer"].update({"tc", "tcc"})
     mapping["SPI"].add("sercom")
-    mapping["I<sup>2</sup>C"].add("sercom")
-    mapping["USB"].add("usb")
-    mapping["CAN"].add("fdcan")
-    mapping["DMA"].add("dmac")
-    mapping["Comparator"].add("ac")
-    mapping["Internal Flash"].add("nvmctrl")
-    mapping["External Memory"].add("quadspi")
+    mapping["I<sup>2</sup>C"].update({"sercom", "twihs"})
+    mapping["USB"].update({"usb", "usbhs"})
+    mapping["CAN"].update({"fdcan", "mcan"})
+    mapping["DMA"].update({"dmac", "xdmac"})
+    mapping["Comparator"].update({"ac", "acc"})
+    mapping["Internal Flash"].update({"efc", "nvmctrl"})
+    mapping["External Memory"].update({"sdramc", "smc", "quadspi"})
 
     print(); print()
     return (all_targets, mapping)
 
+def _n2f(name):
+    if name == "d21": return "d";
+    if name == "g55": return "g";
+    if name == "v70": return "v";
+    return name
+
 def hal_module_filter(targets, family):
-    family = family.replace("d21", "d")
+    family = _n2f(family)
     drivers = [v[0] for k,v in targets[0].items() if k.family == family]
     modules = [v[1] for k,v in targets[0].items() if k.family == family]
 
@@ -140,9 +150,15 @@ def hal_module_filter(targets, family):
 
     return (all_peripherals, implemented_peripherals)
 
+def _f2n(family):
+    if family == "d": return "d21";
+    if family == "g": return "g55";
+    if family == "v": return "v70";
+    return family
+
 
 def hal_create_table(targets, platforms, common_table=False):
-    families = set((t.platform.replace("avr", "at"), t.family.replace("d", "d21"))
+    families = set((t.platform.replace("avr", "at"), _f2n(t.family))
                    for t in targets[0] if any(t.platform == p for p in platforms))
     if not families: return (None, None) if common_table else None;
     modules = {f:hal_module_filter(targets, f[1]) for f in families}
