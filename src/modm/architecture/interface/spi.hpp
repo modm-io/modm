@@ -12,13 +12,24 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_INTERFACE_SPI_HPP
-#define MODM_INTERFACE_SPI_HPP
+#pragma once
 
 #include <modm/architecture/interface/peripheral.hpp>
 
 namespace modm
 {
+namespace spi
+{
+
+template<class Spi>
+concept Support_DataSize_Bit16 = requires
+{ Spi::DataSize::Bit16; };
+
+template<class Spi>
+concept Support_DataSize_Bit32 = requires
+{ Spi::DataSize::Bit32; };
+
+}  // namespace spi
 
 /// @ingroup modm_architecture_spi
 struct Spi
@@ -43,8 +54,7 @@ struct Spi
 		MsbFirst = 0b0,
 		LsbFirst = 0b1,
 	};
+
 };
 
 } // namespace modm
-
-#endif // MODM_INTERFACE_SPI_HPP

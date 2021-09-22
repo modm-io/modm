@@ -42,6 +42,7 @@ class Instance(Module):
         env.template("spi_hal.hpp.in", "spi_hal_{}.hpp".format(self.instance))
         env.template("spi_hal_impl.hpp.in", "spi_hal_{}_impl.hpp".format(self.instance))
         env.template("spi_master.hpp.in", "spi_master_{}.hpp".format(self.instance))
+        env.template("spi_master_impl.hpp.in", "spi_master_{}_impl.hpp".format(self.instance))
         env.template("spi_master.cpp.in", "spi_master_{}.cpp".format(self.instance))
         if env.has_module(":platform:dma"):
             env.template("spi_master_dma.hpp.in", "spi_master_{}_dma.hpp".format(self.instance))

@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2020, Mike Wolfram
+ * Copyright (c) 2021, Thomas Sommer
  *
  * This file is part of the modm project.
  *
@@ -56,23 +57,99 @@ public:
 	static void
 	initialize();
 
-	static uint8_t
-	transferBlocking(uint8_t data)
+	static void
+	setDataSize(DataSize size)
 	{
-		return RF_CALL_BLOCKING(transfer(data));
+		SpiMaster{{ id }}::setDataSize(size);
+		
+		if(size < DataSize::Bit9) {
+			Dma::TxChannel::setPeripheralDataSize(DmaBase::PeripheralDataSize::Byte);
+			Dma::RxChannel::setMemoryDataSize(DmaBase::MemoryDataSize::Byte);
+		}
+		else {
+			Dma::TxChannel::setPeripheralDataSize(DmaBase::PeripheralDataSize::HalfWord);
+			Dma::RxChannel::setMemoryDataSize(DmaBase::MemoryDataSize::HalfWord);
+		}
+	}
+
+	static uint8_t
+	transferBlocking(const uint8_t data)
+	{
+		return RF_CALL_BLOCKING(transmit<uint8_t>(data));
+	}
+
+	static uint16_t
+	transferBlocking16(const uint16_t data)
+	{
+		return RF_CALL_BLOCKING(transmit<uint16_t>(data));
 	}
 
 	static void
-	transferBlocking(const uint8_t *tx, uint8_t *rx, std::size_t length)
+	transferBlocking(const uint8_t *tx, uint16_t repeat)
 	{
-		RF_CALL_BLOCKING(transfer(tx, rx, length));
+		RF_CALL_BLOCKING(transmit<uint8_t>(tx, repeat));
+	}
+
+	static void
+	transferBlocking16(const uint16_t *tx, uint16_t repeat)
+	{
+		RF_CALL_BLOCKING(transmit<uint16_t>(tx, repeat));
+	}
+
+	static void
+	transferBlocking(const uint8_t *tx, uint8_t *rx, uint16_t length)
+	{
+		RF_CALL_BLOCKING(transmit<uint8_t>(tx, rx, length));
+	}
+
+	static void
+	transferBlocking16(const uint16_t *tx, uint16_t *rx, uint16_t length)
+	{
+		RF_CALL_BLOCKING(transmit<uint16_t>(tx, rx, length));
 	}
 
 	static modm::ResumableResult<uint8_t>
-	transfer(uint8_t data);
+	transfer(const uint8_t data) {
+		return transmit<uint8_t>(data);
+	}
+
+	static modm::ResumableResult<uint16_t>
+	transfer16(const uint16_t data) {
+		return transmit<uint16_t>(data);
+	}
 
 	static modm::ResumableResult<void>
-	transfer(const uint8_t *tx, uint8_t *rx, std::size_t length);
+	transfer(const uint8_t *tx, const uint16_t repeat) {
+		return transmit<uint8_t>(tx, repeat);
+	}
+
+	static modm::ResumableResult<void>
+	transfer16(const uint16_t *tx, const uint16_t repeat) {
+		return transmit<uint16_t>(tx, repeat);
+	}
+
+	static modm::ResumableResult<void>
+	transfer(const uint8_t *tx, uint8_t *rx, const uint16_t length) {
+		return transmit<uint8_t>(tx, rx, length);
+	}
+
+	static modm::ResumableResult<void>
+	transfer16(const uint16_t *tx, uint16_t *rx, const uint16_t length) {
+		return transmit<uint16_t>(tx, rx, length);
+	}
+
+	// TODO "transmit" == good?
+	template <std::unsigned_integral T>
+	static modm::ResumableResult<T>
+	transmit(const T data);
+
+	template <std::unsigned_integral T>
+	static modm::ResumableResult<void>
+	transmit(const T *tx, const uint16_t repeat);
+
+ 	template <std::unsigned_integral T>
+	static modm::ResumableResult<void>
+	transmit(const T *tx, T *rx, const uint16_t length);
 
 private:
 	static void

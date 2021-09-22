@@ -1,0 +1,80 @@
+/*
+ * Copyright (c) 2009-2011, Fabian Greif
+ * Copyright (c) 2010, Martin Rosekeit
+ * Copyright (c) 2011-2017, Niklas Hauser
+ * Copyright (c) 2012, Georgi Grinshpun
+ * Copyright (c) 2013, Kevin Läufer
+ * Copyright (c) 2014, Sascha Schade
+ * Copyright (c) 2021, Thomas Sommer
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+#include "spi_master_{{ id }}.hpp"
+
+template <typename T>
+void modm::platform::SpiMaster{{ id }}::setup_isr()
+{
+	if constexpr (std::is_same<T, uint8_t>::value)
+	{
+		DataType_t::set(state, DataType::Byte);
+		// Transmit first byte
+		SpiHal{{ id }}::write(uint8_t(temp));
+	}
+	else if constexpr (std::is_same<T, uint16_t>::value)
+	{
+		DataType_t::set(state, DataType::HalfWord);
+		// Transmit first byte
+		SpiHal{{ id }}::write(uint16_t(temp));
+	}
+	else if constexpr (std::is_same<T, uint32_t>::value)
+	{
+		DataType_t::set(state, DataType::Word);
+		shift = 1 * 16;
+		// Transmit first byte
+		SpiHal{{ id }}::write(uint16_t(uint32_t(temp) >> shift));
+	}
+	
+	SpiHal{{ id }}::enableInterrupt(SpiBase::Interrupt::TxBufferEmpty);
+}
+
+template <typename T>
+void modm::platform::SpiMaster{{ id }}::setup_isr(const T *tx_first, const T *tx_last)
+{
+	if constexpr (std::is_same<T, uint8_t>::value)
+	{
+		// TODO move this upwards into SpiApi
+		DataType_t::set(state, DataType::Byte);
+		tx.u8 = tx_first;
+		tx_end.u8 = tx_last;
+		// Transmit first byte
+		SpiHal{{ id }}::write(*tx.u8);
+	}
+	else if constexpr (std::is_same<T, uint16_t>::value)
+	{
+		// TODO move this upwards into SpiApi
+		DataType_t::set(state, DataType::HalfWord);
+		tx.u16 = tx_first;
+		tx_end.u16 = tx_last;
+		// Transmit first byte
+		SpiHal{{ id }}::write(*tx.u16);
+	}
+	else if constexpr (std::is_same<T, uint32_t>::value)
+	{
+		// TODO move this upwards into SpiApi
+		DataType_t::set(state, DataType::Word);
+		tx.u32 = tx_first;
+		tx_end.u32 = tx_last;
+		shift = 1 * 16;
+		// Transmit first byte
+		SpiHal{{ id }}::write(uint16_t(*tx.u32 >> shift));
+	}
+	
+	SpiHal{{ id }}::enableInterrupt(SpiBase::Interrupt::TxBufferEmpty);
+}

@@ -3,6 +3,7 @@
  * Copyright (c) 2013-2017, Niklas Hauser
  * Copyright (c) 2014, Daniel Krebs
  * Copyright (c) 2020, Mike Wolfram
+ * Copyright (c) 2021, Thomas Sommer
  *
  * This file is part of the modm project.
  *
@@ -137,15 +138,15 @@ modm::platform::SpiHal{{ id }}::write(uint8_t data)
 }
 
 void inline
-modm::platform::SpiHal{{ id }}::read(uint8_t &data)
+modm::platform::SpiHal{{ id }}::read(uint8_t *data)
 {
-	data = static_cast<uint8_t>(SPI{{ id }}->DR);
+	*data = static_cast<uint8_t>(SPI{{ id }}->DR);
 }
 
 void inline
-modm::platform::SpiHal{{ id }}::read(uint16_t &data)
+modm::platform::SpiHal{{ id }}::read(uint16_t *data)
 {
-	data = static_cast<uint16_t>(SPI{{ id }}->DR);
+	*data = static_cast<uint16_t>(SPI{{ id }}->DR);
 }
 
 void inline

@@ -5,6 +5,7 @@
  * Copyright (c) 2012-2017, Niklas Hauser
  * Copyright (c) 2013, Kevin Läufer
  * Copyright (c) 2014, Sascha Schade
+ * Copyright (c) 2021, Thomas Sommer
  *
  * This file is part of the modm project.
  *
@@ -16,11 +17,6 @@
 
 #include "spi_master_{{id}}.hpp"
 
-// Bit0: single transfer state
-// Bit1: block transfer state
-uint8_t
-modm::platform::SpiMaster{{ id }}::state(0);
-
 uint8_t
 modm::platform::SpiMaster{{ id }}::count(0);
 
@@ -29,6 +25,28 @@ modm::platform::SpiMaster{{ id }}::context(nullptr);
 
 modm::Spi::ConfigurationHandler
 modm::platform::SpiMaster{{ id }}::configuration(nullptr);
+
+// ----------------------------------------------------------------------------
+
+modm::platform::SpiMaster{{ id }}::State_t
+modm::platform::SpiMaster{{ id }}::state(0);
+
+uint8_t modm::platform::SpiMaster{{ id }}::shift(0);
+
+uint32_t modm::platform::SpiMaster{{ id }}::temp(0);
+
+modm::platform::SpiMaster{{ id }}::unsigned_types_const
+	modm::platform::SpiMaster{{ id }}::tx{nullptr};
+
+modm::platform::SpiMaster{{ id }}::unsigned_types_const
+	modm::platform::SpiMaster{{ id }}::tx_end{nullptr};
+
+modm::platform::SpiMaster{{ id }}::unsigned_types
+	modm::platform::SpiMaster{{ id }}::rx{nullptr};
+
+modm::platform::SpiMaster{{ id }}::unsigned_types
+	modm::platform::SpiMaster{{ id }}::rx_end{nullptr};
+
 // ----------------------------------------------------------------------------
 
 uint8_t
@@ -62,84 +80,107 @@ modm::platform::SpiMaster{{ id }}::release(void *ctx)
 	}
 	return count;
 }
-// ----------------------------------------------------------------------------
 
-modm::ResumableResult<uint8_t>
-modm::platform::SpiMaster{{ id }}::transfer(uint8_t data)
+MODM_ISR(SPI{{ id }}_EV)
 {
-	// this is a manually implemented "fast resumable function"
-	// there is no context or nesting protection, since we don't need it.
-	// there are only two states encoded into 1 bit (LSB of state):
-	//   1. waiting to start, and
-	//   2. waiting to finish.
-
-	// LSB != Bit0 ?
-	if ( !(state & Bit0) )
-	{
-		// wait for previous transfer to finish
-		if (!SpiHal{{ id }}::isTransmitRegisterEmpty())
-			return {modm::rf::Running};
-
-		// start transfer by copying data into register
-		SpiHal{{ id }}::write(data);
-
-		// set LSB = Bit0
-		state |= Bit0;
-	}
-
-	if (!SpiHal{{ id }}::isReceiveRegisterNotEmpty())
-		return {modm::rf::Running};
-
-	SpiHal{{ id }}::read(data);
-
-	// transfer finished
-	state &= ~Bit0;
-	return {modm::rf::Stop, data};
+	// TODO Required?
+	// Spi::acknowledgeInterruptFlags();
+	modm::platform::SpiMaster{{ id }}::isr_handler();
 }
 
-modm::ResumableResult<void>
-modm::platform::SpiMaster{{ id }}::transfer(
-		const uint8_t * tx, uint8_t * rx, std::size_t length)
+void modm::platform::SpiMaster{{ id }}::isr_handler()
 {
-	// this is a manually implemented "fast resumable function"
-	// there is no context or nesting protection, since we don't need it.
-	// there are only two states encoded into 1 bit (Bit1 of state):
-	//   1. initialize index, and
-	//   2. wait for 1-byte transfer to finish.
+	constexpr State_t state_normal = State::Idle;
+	constexpr State_t state_repeat = State::Idle | State::Repeat;
 
-	// we need to globally remember which byte we are currently transferring
-	static std::size_t index = 0;
-
-	// we are only interested in Bit1
-	switch(state & Bit1)
-	{
-		case 0:
-			// we will only visit this state once
-			state |= Bit1;
-
-			// initialize index and check range
-			index = 0;
-			while (index < length)
-			{
-		default:
+	switch (state.value) {
+	case state_normal.value | DataType::Byte:
+		// Store received byte
+		if (rx.u8)
+			SpiHal{{ id }}::read(rx.u8++);
+		if (++tx.u8 == tx_end.u8)
 		{
-				// if tx == 0, we use a dummy byte 0x00
-				// else we copy it from the array
-				// call the resumable function
-				modm::ResumableResult<uint8_t> result = transfer(tx ? tx[index] : 0);
-
-				// if the resumable function is still running, so are we
-				if (result.getState() > modm::rf::NestingError)
-					return {modm::rf::Running};
-
-				// if rx != 0, we copy the result into the array
-				if (rx) rx[index] = result.getResult();
+			// Job done, disable Interrupt.
+			SpiHal{{ id }}::disableInterrupt(SpiBase::Interrupt::TxBufferEmpty);
+			return;
 		}
-				index++;
-			}
-
-			// clear the state
-			state &= ~Bit1;
-			return {modm::rf::Stop};
+		// Transmit next byte
+		SpiHal{{ id }}::write(*tx.u8);
+		return;
+	case state_repeat.value | DataType::Byte:
+		if(++tx.repeat == tx_end.repeat)
+		{
+			// Job done, disable Interrupt.
+			SpiHal{{ id }}::disableInterrupt(SpiBase::Interrupt::TxBufferEmpty);
+			return;
+		}
+		// Transmit byte again
+		SpiHal{{ id }}::write(uint8_t(temp));
+		return;
+	case state_normal.value | DataType::HalfWord:
+		// Store received halfword
+		if (rx.u16)
+			SpiHal{{ id }}::read(rx.u16++);
+		if (++tx.u16 == tx_end.u16)
+		{
+			// Job done, disable Interrupt.
+			SpiHal{{ id }}::disableInterrupt(SpiBase::Interrupt::TxBufferEmpty);
+			return;
+		}
+		// Transmit next halfword
+		SpiHal{{ id }}::write(*tx.u16);
+		return;
+	case state_repeat.value | DataType::HalfWord:
+		if(++tx.repeat == tx_end.repeat)
+		{
+			// Job done, disable Interrupt.
+			SpiHal{{ id }}::disableInterrupt(SpiBase::Interrupt::TxBufferEmpty);
+			return;
+		}
+		// Transmit halfword again
+		SpiHal{{ id }}::write(uint16_t(temp));
+		return;
+	case state_normal.value | DataType::Word:
+		if (shift)
+		{
+			// Store received sub-halfword
+			if (rx.u32)
+				SpiHal{{ id }}::read((rx.u16 - 1)); // TODO confirm this targets the right address
+			// Transmit next sub-byte
+			shift = 0;
+			SpiHal{{ id }}::write(uint16_t(*tx.u32));
+			return;
+		}
+		// Store received sub-byte
+		if (rx.u32)
+			SpiHal{{ id }}::read((uint16_t*)(rx.u32++));
+		if (++tx.u32 == tx_end.u32)
+		{
+			// Job done, disable Interrupt.
+			SpiHal{{ id }}::disableInterrupt(SpiBase::Interrupt::TxBufferEmpty);
+			return;
+		}
+		// Transmit next word
+		shift = 16;
+		SpiHal{{ id }}::write(uint16_t(*tx.u32 >> shift));
+		return;
+	case state_repeat.value | DataType::Word:
+		if (shift)
+		{
+			// Transmit next sub-byte
+			shift = 0;
+			SpiHal{{ id }}::write(uint16_t(*tx.u32));
+			return;
+		}
+		if(++tx.repeat == tx_end.repeat)
+		{
+			// Job done, disable Interrupt.
+			SpiHal{{ id }}::disableInterrupt(SpiBase::Interrupt::TxBufferEmpty);
+			return;
+		}
+		// Transmit word again
+		shift = 16;
+		SpiHal{{ id }}::write(uint16_t(*tx.u32 >> shift));
+		return;
 	}
 }
