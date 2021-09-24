@@ -171,9 +171,6 @@ initialize()
 	Leds::setOutput(modm::Gpio::Low);
 
 	Button::setInput();
-	Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-	Button::enableExternalInterrupt();
-//	Button::enableExternalInterruptVector(12);
 }
 
 
@@ -181,15 +178,7 @@ inline void
 initializeL3g()
 {
 	l3g::Int1::setInput();
-	l3g::Int1::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-	l3g::Int1::enableExternalInterrupt();
-//	l3g::Int1::enableExternalInterruptVector(12);
-
 	l3g::Int2::setInput();
-	l3g::Int2::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-	l3g::Int2::enableExternalInterrupt();
-//	l3g::Int2::enableExternalInterruptVector(12);
-
 	l3g::Cs::setOutput(modm::Gpio::High);
 
 	l3g::SpiMaster::connect<l3g::Sck::Sck, l3g::Mosi::Mosi, l3g::Miso::Miso>();
@@ -202,19 +191,8 @@ inline void
 initializeLsm3()
 {
 	lsm3::Int1::setInput();
-	lsm3::Int1::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-	lsm3::Int1::enableExternalInterrupt();
-//	lsm3::Int1::enableExternalInterruptVector(12);
-
 	lsm3::Int2::setInput();
-	lsm3::Int2::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-	lsm3::Int2::enableExternalInterrupt();
-//	lsm3::Int2::enableExternalInterruptVector(12);
-
 	lsm3::Drdy::setInput();
-	lsm3::Drdy::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-	lsm3::Drdy::enableExternalInterrupt();
-//	lsm3::Drdy::enableExternalInterruptVector(12);
 
 	lsm3::I2cMaster::connect<lsm3::Scl::Scl, lsm3::Sda::Sda>();
 	lsm3::I2cMaster::initialize<SystemClock, 400_kHz>();

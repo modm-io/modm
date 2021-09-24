@@ -106,21 +106,14 @@ GpioSampler::Channel::operator[](size_t index) const
 bool
 GpioSampler::Channel::read(size_t index) const
 {
-	return ((*this)[index] > 0);
+	return ((*this)[index] & 1);
 }
 
 GpioSampler::Type
 GpioSampler::Channel::diff(size_t index) const
 {
 	if (index == 0) return 0;
-	Type s0 = (*this)[index - 1];
-	Type s1 = (*this)[index];
-	// abs
-	uint32_t t0 = (s0 > 0) ? s0 : -s0;
-	uint32_t t1 = (s1 > 0) ? s1 : -s1;
-	// Fix overflow issues
-	if (t1 < t0) t1 |= (1ul << 31);
-	return t1 - t0;
+	return (*this)[index - 1] - (*this)[index];
 }
 
 } // namespace modm::platform

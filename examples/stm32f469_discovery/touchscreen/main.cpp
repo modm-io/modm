@@ -38,11 +38,10 @@ public:
 		{
 			do {
 				// Wait for either touchscreen interrupt or clear screen button
-				PT_WAIT_UNTIL(Int::getExternalInterruptFlag() or Button::read());
+				PT_WAIT_UNTIL(Int::read() or Button::read());
 				if (Button::read()) display.clear();
-			} while (not Int::getExternalInterruptFlag());
+			} while (not Int::read());
 
-			Int::acknowledgeExternalInterruptFlag();
 			LedRed::set();
 
 			PT_CALL(touch.readTouches());

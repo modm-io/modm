@@ -158,14 +158,8 @@ initialize()
 	SysTickTimer::initialize<SystemClock>();
 
 	LedGreen::setOutput(modm::Gpio::Low);
-
 	ButtonK1::setInput(Gpio::InputType::PullUp);
-	ButtonK1::setInputTrigger(Gpio::InputTrigger::FallingEdge);
-	ButtonK1::enableExternalInterrupt();
-
 	ButtonK2::setInput(Gpio::InputType::PullUp);
-	ButtonK2::setInputTrigger(Gpio::InputTrigger::FallingEdge);
-	ButtonK2::enableExternalInterrupt();
 }
 }
 

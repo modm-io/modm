@@ -4,6 +4,7 @@
   <options>
     <option name="modm:build:build.path">../../build/generated-unittest/nucleo-l432/</option>
     <option name="modm:build:unittest.source">../../build/generated-unittest/nucleo-l432/modm-test</option>
+    <option name="modm:platform:exti:with_handlers">false</option>
   </options>
   <modules>
     <module>modm:platform:heap</module>

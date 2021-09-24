@@ -234,16 +234,9 @@ initialize()
 	LedGreen3::setOutput(modm::Gpio::Low);
 
 	Button::setInput();
-	Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-	Button::enableExternalInterrupt();
-
 	ButtonK0::setInput();
-	ButtonK0::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-	// ButtonK0::enableExternalInterrupt();
-
 	ButtonK1::setInput();
-	ButtonK1::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-	// ButtonK1::enableExternalInterrupt();
+
 	Usart1::connect<GpioA9::Tx, GpioA10::Rx>();
 	Usart1::initialize<Board::SystemClock, 115200_Bd>();
 }

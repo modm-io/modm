@@ -26,6 +26,7 @@ def prepare(module, options):
 
     module.depends(
         ":platform:gpio",
+        ":platform:exti",
         ":platform:core",
         ":architecture:interrupt")
     return True
@@ -49,7 +50,7 @@ def build(env):
 
     env.substitutions = {
         "extis": extis,
-        "vectors_location": env.get(":platform:core:vector_table_location", "rom")
+        "vectors_location": env.get(":platform:core:vector_table_location", "rom"),
     }
     env.outbasepath = "modm/src/modm/driver"
     env.template("gpio_sampler.cpp.in")

@@ -132,9 +132,6 @@ initialize()
 	stlink::Uart::initialize<SystemClock, 115200_Bd>();
 
 	Button::setInput();
-	Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-	Button::enableExternalInterrupt();
-//	Button::enableExternalInterruptVector(12);
 }
 
 }

@@ -137,9 +137,6 @@ initialize()
 	LedGreen::setOutput(modm::Gpio::Low);
 
 	Button::setInput(Gpio::InputType::PullDown);
-	Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-	Button::enableExternalInterrupt();
-//	Button::enableExternalInterruptVector(12);
 }
 
 
