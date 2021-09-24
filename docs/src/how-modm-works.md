@@ -284,9 +284,6 @@ bool state = Button::read();
 // Depending on your targets, additional functions are available
 Led::setOutput(Gpio::OutputType::OpenDrain);
 Button::setInput(Gpio::InputType::PullUp);
-Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-Button::enableExternalInterrupt();
-Button::acknowledgeExternalInterruptFlag();
 ```
 
 You can use these GPIOs as building blocks for more complex drivers and

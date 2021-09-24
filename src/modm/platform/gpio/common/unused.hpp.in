@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2018, Niklas Hauser
+ * Copyright (c) 2017-2018, 2021, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -9,18 +9,17 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_STM32_GPIO_PIN_UNUSED_HPP
-#define MODM_STM32_GPIO_PIN_UNUSED_HPP
+#pragma once
 
 #include "base.hpp"
-#include <modm/architecture/interface/gpio.hpp>
+#include "data.hpp"
+#include "static.hpp"
 
-namespace modm
+namespace modm::platform
 {
 
-namespace platform
-{
-
+/// @ingroup modm_platform_gpio
+using GpioUnused = GpioStatic<detail::DataUnused>;
 /**
  * Dummy implementation of an I/O pin.
  *
@@ -53,45 +52,49 @@ namespace platform
  * @author	Niklas Hauser
  * @ingroup	modm_platform_gpio
  */
-class GpioUnused : public Gpio, public ::modm::GpioIO
+template<>
+class GpioStatic<detail::DataUnused> : public Gpio, public ::modm::GpioIO
 {
 public:
 	using Output = GpioUnused;
 	using Input = GpioUnused;
 	using IO = GpioUnused;
 	using Type = GpioUnused;
+	using Data = detail::DataUnused;
 	static constexpr bool isInverted = false;
 	static constexpr Port port = Port(-1);
 	static constexpr uint8_t pin = uint8_t(-1);
-	static constexpr uint16_t mask = 0;
-
+	static constexpr uint{{8 if target.platform == "avr" else 16}}_t mask = 0;
+%% if target.platform in ["stm32"]
 protected:
-	/// @cond
 	static void setAlternateFunction(uint8_t) {}
+	static void setAlternateFunction() {}
 	static void setAnalogInput() {}
-	/// @endcond
-
+%% endif
 public:
 	// GpioOutput
-	// start documentation inherited
 	static void setOutput() {}
 	static void setOutput(bool) {}
+%% if target.platform in ["stm32"]
+	static void setOutput(OutputType, OutputSpeed = OutputSpeed::MHz50) {}
+	static void configure(OutputType, OutputSpeed = OutputSpeed::MHz50) {}
+%% else
+	static void setOutput(OutputType) {}
+	static void configure(OutputType) {}
+%% endif
+
 	static void set() {}
 	static void set(bool) {}
 	static void reset() {}
-	static void toggle() {}
 	static bool isSet() { return false; }
-	// stop documentation inherited
-	static void configure(OutputType, OutputSpeed = OutputSpeed::MHz50) {}
-	static void setOutput(OutputType, OutputSpeed = OutputSpeed::MHz50) {}
+	static void toggle() {}
 
 	// GpioInput
-	// start documentation inherited
 	static void setInput() {}
-	static bool read() { return false; }
-	// end documentation inherited
-	static void configure(InputType) {}
 	static void setInput(InputType) {}
+	static void configure(InputType) {}
+	static bool read() { return false; }
+
 	// External Interrupts
 	static void enableExternalInterrupt() {}
 	static void disableExternalInterrupt() {}
@@ -103,16 +106,19 @@ public:
 	static void acknowledgeExternalInterruptFlag() {}
 
 	// GpioIO
-	// start documentation inherited
-	static Direction getDirection() { return Direction::Special; }
-	// end documentation inherited
+	static Direction getDirection() { return Direction::In; }
+%% if target.platform in ["stm32"]
 	static void lock() {}
+%% endif
 	static void disconnect() {}
 
 public:
-	/// @cond
+	struct BitBang
+	{
+		using Data = detail::DataUnused;
+		static constexpr Gpio::Signal Signal = Gpio::Signal::BitBang;
+	};
 %% for name in all_signals
-	template< Peripheral _ >
 	struct {{ name }}
 	{
 		using Gpio = GpioUnused;
@@ -120,11 +126,6 @@ public:
 		static void connect() {}
 	};
 %% endfor
-	/// @endcond
 };
 
-} // namespace platform
-
-} // namespace modm
-
-#endif // MODM_STM32_GPIO_PIN_UNUSED_HPP
+} // namespace modm::platform

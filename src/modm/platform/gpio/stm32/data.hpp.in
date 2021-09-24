@@ -1,0 +1,77 @@
+/*
+ * Copyright (c) 2021, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include "base.hpp"
+
+/// @cond
+namespace modm::platform::detail
+{
+
+%% if target.family in ["h7"]
+enum class
+AdcPolarity
+{
+	Positive,
+	Negative
+};
+%% endif
+template<class Signal, Peripheral p> struct SignalConnection;
+template<class Data, Peripheral p{% if target.family in ["h7"] %}, AdcPolarity ap{% endif %}> static constexpr int8_t AdcChannel = -1;
+template<class Data, Peripheral p> static constexpr int8_t DacChannel = -1;
+
+struct DataUnused {};
+%% for gpio in gpios
+%% set port = gpio.gpio.port | upper
+%% set pin  = gpio.gpio.pin
+%#
+struct Data{{ port ~ pin }} {
+	static constexpr Gpio::Port port = Gpio::Port::{{port}};
+	static constexpr uint8_t pin = {{pin}};
+	static constexpr IRQn_Type ExternalInterruptIRQ = EXTI{{ gpio.exti_irqn }}_IRQn;
+%% if gpio.has_remap
+	inline static void remap() { {{gpio.remap_reg}} {% if gpio.remap_value %}|= {% else %}&= ~{% endif %}{{gpio.remap_mask}}; }
+%% endif
+	struct BitBang { using Data = Data{{ port ~ pin }}; static constexpr Gpio::Signal Signal = Gpio::Signal::BitBang; };
+%% for signal_name in gpio.signals
+	struct {{ signal_name }} { using Data = Data{{ port ~ pin }}; static constexpr Gpio::Signal Signal = Gpio::Signal::{{ signal_name }}; };
+%% endfor
+};
+template<Peripheral p> struct SignalConnection<Data{{ port ~ pin }}::BitBang, p> {
+	static_assert(p == Peripheral::BitBang, "Gpio{{ port ~ pin }}::BitBang only connects to software drivers!"); };
+%% for signal_name, signal_group in gpio.signals.items()
+template<Peripheral p> struct SignalConnection<Data{{ port ~ pin }}::{{ signal_name }}, p> {
+	static_assert((p == Peripheral::{{ signal_group | map(attribute="driver") | join(") or (p == Peripheral::") }}),{% if signal_group | length > 1 %}
+		{% endif %}"Gpio{{ port ~ pin }}::{{ signal_name }} only connects to {{ signal_group | map(attribute="driver") | join(" or ") }}!"); };
+%% endfor
+template<> struct SignalConnection<Data{{ port ~ pin }}::BitBang, Peripheral::BitBang> { {% if target.family in ["f1"] %}
+	static constexpr uint32_t Groups = uint32_t(-1); {% endif %}static constexpr int8_t af = -1; };
+%% for signal_group in gpio.signals.values()
+	%% for signal in signal_group
+template<> struct SignalConnection<Data{{ port ~ pin }}::{{ signal.name }}, Peripheral::{{ signal.driver }}> { {% if target.family in ["f1"] %}
+	static constexpr uint32_t Groups = {% if signal.af | length %}(1ul << {{signal.af | join (") | (1ul << ")}}){% else %}uint32_t(-1){% endif %}; {% endif %}static constexpr int8_t af = {{ signal.af[0] if signal.af | length else (-2 if (signal.driver.startswith("Adc") or signal.driver.startswith("Dac") or signal.driver.startswith("Comp")) else -1) }}; };
+	%% endfor
+%% endfor
+%% for signal_name, signal_group in gpio.signals.items()
+	%% for signal in signal_group
+		%% if signal.driver.startswith("Adc") and signal.name.startswith("In")
+template<> constexpr int8_t AdcChannel<Data{{ port ~ pin }}, Peripheral::{{ signal.driver }}{% if signal.name.startswith("Inn") %}, AdcPolarity::Negative{% endif %}{% if signal.name.startswith("Inp") %}, AdcPolarity::Positive{% endif %}> = {{ signal.name | to_adc_channel }};
+		%% endif
+		%% if signal.driver.startswith("Dac") and signal.name.startswith("Out")
+template<> constexpr int8_t DacChannel<Data{{ port ~ pin }}, Peripheral::{{ signal.driver }}> = {{ signal.name | to_adc_channel }};
+		%% endif
+	%% endfor
+%% endfor
+%% endfor
+%#
+} // namespace modm::platform::detail
+/// @endcond

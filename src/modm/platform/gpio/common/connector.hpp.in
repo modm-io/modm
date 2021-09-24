@@ -1,0 +1,158 @@
+/*
+ * Copyright (c) 2017, 2021, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include "unused.hpp"
+#include "static.hpp"
+#include <type_traits>
+
+/// @cond
+namespace modm::platform
+{
+
+namespace detail
+{
+
+template< Gpio::Signal signal, class... Signals >
+struct GpioGetSignal;
+template< Gpio::Signal signal, class SignalT, class... Signals >
+struct GpioGetSignal<signal, SignalT, Signals...>
+{
+	using Gpio = std::conditional_t<
+				(SignalT::Signal == signal),
+				typename modm::platform::GpioStatic<typename SignalT::Data>,
+				typename GpioGetSignal<signal, Signals...>::Gpio
+			>;
+};
+template< Gpio::Signal signal >
+struct GpioGetSignal<signal>
+{
+	using Gpio = GpioUnused;
+};
+
+} // namespace detail
+
+template< Peripheral peripheral, class... Signals >
+struct GpioConnector
+{
+	template< class GpioQuery >
+	static constexpr bool Contains = (
+		std::is_same_v<typename Signals::Data, typename GpioQuery::Data> or ...);
+
+	template< class GpioQuery >
+	static constexpr bool IsValid = not std::is_same_v<typename GpioQuery::Data, detail::DataUnused>;
+
+	template< Gpio::Signal signal >
+	using GetSignal = typename detail::GpioGetSignal<signal, Signals...>::Gpio;
+
+	template< class Signal >
+	static void connectSignal()
+	{
+		using Connection = detail::SignalConnection<Signal, peripheral>;
+%% if target.platform in ["stm32"]
+		using Pin = GpioStatic<typename Signal::Data>;
+		if constexpr(Connection::af == -2) {
+%% if target.family in ["f1"]
+			Pin::setAnalogInput();
+		}
+		else {
+			Pin::setAlternateFunction();
+		}
+%% else
+			Pin::disconnect();
+			Pin::setAnalogInput();
+		}
+		if constexpr (Connection::af >= 0) {
+			Pin::setAlternateFunction(Connection::af);
+		}
+%% endif
+%% elif target.platform in ["avr"]
+		static Connection check [[maybe_unused]];
+%% endif
+	}
+
+	static inline void connect()
+	{
+		(connectSignal<Signals>(), ...);
+	}
+
+	static inline void disconnect()
+	{
+		(GpioStatic<typename Signals::Data>::disconnect(), ...);
+	}
+};
+
+} // namespace modm::platform
+
+%% if target.family in ["f1"]
+#include <bit>
+
+/// @cond
+namespace modm::platform
+{
+%% for remap in remaps
+	%% set reg = "MAPR" if (remap.position | int) < 32 else "MAPR2"
+	%% set per = remap | formatPeripheral
+%#
+template< class... Signals >
+struct GpioConnector<Peripheral::{{per}}, Signals...>
+{
+	template< class GpioQuery >
+	static constexpr bool Contains = (
+		std::is_same_v<typename Signals::Data, typename GpioQuery::Data> or ...);
+
+	template< class GpioQuery >
+	static constexpr bool IsValid = not std::is_same_v<typename GpioQuery::Data, detail::DataUnused>;
+
+	template< Gpio::Signal signal >
+	using GetSignal = typename detail::GpioGetSignal<signal, Signals...>::Gpio;
+
+	template< class Signal >
+	static void connectSignal()
+	{
+		using Connection = detail::SignalConnection<Signal, Peripheral::{{per}}>;
+		using Pin = GpioStatic<typename Signal::Data>;
+		if constexpr(Connection::af == -2) {
+			Pin::setAnalogInput();
+		}
+		else {
+			Pin::setAlternateFunction();
+		}
+	}
+
+	static inline void connect()
+	{
+		constexpr auto lmb = [](uint32_t id) { return 31 - std::countl_zero(id); };
+		static constexpr uint32_t id = (detail::SignalConnection<Signals, Peripheral::{{per}}>::Groups & ... & uint32_t(-1));
+		static_assert((id == uint32_t(-1)) or (lmb(id) == {{ remap.group | map(attribute="id") | join("ul) or (lmb(id) == ") }}ul),
+					  "This pin set contains conflicting remap groups!\nAvailable groups for {{per}} are:\n"
+	%% for line in group_map | printSignalMap(per)
+					  "{{line}}\n"
+	%% endfor
+			);
+		if (id != uint32_t(-1)) {
+			AFIO->{{reg}} = (AFIO->{{reg}} & ~({{ remap.mask }}ul << {{ (remap.position | int) % 32 }})) | (lmb(id) << {{ (remap.position | int) % 32 }});
+		}
+		(connectSignal<Signals>(), ...);
+	}
+
+	static inline void disconnect()
+	{
+		(GpioStatic<typename Signals::Data>::disconnect(), ...);
+	}
+};
+%% endfor
+
+} // namespace modm::platform
+%% endif
+/// @endcond
+

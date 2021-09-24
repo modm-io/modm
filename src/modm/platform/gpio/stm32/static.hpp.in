@@ -1,0 +1,205 @@
+/*
+ * Copyright (c) 2017-2021, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include "../device.hpp"
+#include "base.hpp"
+#include "set.hpp"
+
+namespace modm::platform
+{
+
+/// @ingroup	modm_platform_gpio
+template< class GpioData >
+class GpioStatic : public Gpio, public GpioData
+{
+	template<class... Gpios>
+	friend class GpioSet;
+	using PinSet = GpioSet<GpioStatic<GpioData>>;
+public:
+	using Direction = ::modm::Gpio::Direction;
+	using Type = GpioStatic<GpioData>;
+	using Output = Type;
+	using Input = Type;
+	using IO = Type;
+	using Data = GpioData;
+	using GpioData::port;
+	using GpioData::pin;
+	using GpioData::ExternalInterruptIRQ;
+	static constexpr Direction direction = Direction::InOut;
+	static constexpr bool isInverted = false;
+
+protected:
+	/// @cond
+	// Bitmask for registers that contain a 1bit value for every pin.
+	static constexpr uint16_t mask  = 0x1 << pin;
+	// Bitmask for registers that contain a 2bit value for every pin.
+	static constexpr uint32_t mask2 = 0x3 << (pin * 2);
+%% if target.family in ["f1"]
+	// Bitmask for the configuration register with a 4bit mask.
+	static constexpr uint8_t cr_pin = pin % 8;
+	static constexpr uint32_t mask4 = 0xf << (cr_pin * 4);
+%% endif
+	// Port Number.
+	static constexpr uint8_t port_nr = uint8_t(port);
+	// Alternate Function register id. 0 for pin 0-7. 1 for pin 8-15.
+	static constexpr uint8_t af_id  = pin / 8;
+	// Alternate Function offset.
+	static constexpr uint8_t af_offset = (pin * 4) % 32;
+	// Alternate Function register mask.
+	static constexpr uint32_t af_mask  = 0xf << af_offset;
+
+	static GPIO_TypeDef* gport()
+	{
+%% for port in ports
+		if constexpr (port == Gpio::Port::{{port}}) return GPIO{{port}};
+%% endfor
+		return nullptr;
+	}
+%% if target.family in ["f1"]
+	static volatile uint32_t* gcr()
+	{
+		if constexpr (pin < 8) return &gport()->CRL;
+		return &gport()->CRH;
+	}
+%% endif
+	/// @endcond
+
+public:
+%% if target.family not in ["f1"]
+	inline static void setAlternateFunction(uint8_t af) {
+		gport()->AFR[af_id] = (gport()->AFR[af_id] & ~af_mask) | ((af & 0xf) << af_offset);
+		gport()->MODER = (gport()->MODER & ~mask2) | (i(Mode::AlternateFunction) << (pin * 2));
+	}
+%% else
+	inline static void setAlternateFunction()
+	{
+		uint32_t cr = *gcr();
+		if (cr & (0b0011UL << (cr_pin * 4)))
+			*gcr() = cr | (0b1000UL << (cr_pin * 4));
+	}
+%% endif
+	/// Enable Analog Mode which is needed to use this pin as an ADC input.
+	inline static void setAnalogInput() { PinSet::setAnalogInput(); }
+
+public:
+	// GpioOutput
+	inline static void setOutput() { PinSet::setOutput(); }
+	inline static void setOutput(bool status) { PinSet::setOutput(status); }
+	inline static void setOutput(OutputType type, OutputSpeed speed = OutputSpeed::MHz50) { PinSet::setOutput(type, speed); }
+	inline static void configure(OutputType type, OutputSpeed speed = OutputSpeed::MHz50) { PinSet::configure(type, speed); }
+
+	inline static void set() { PinSet::set(); }
+	inline static void set(bool status) { PinSet::set(status); }
+	inline static void reset() { PinSet::reset(); }
+	inline static bool isSet() { return gport()->ODR & mask; }
+	inline static bool toggle()
+	{
+		if (isSet()) { reset(); return true; }
+		else         { set();   return false; }
+	}
+
+	// GpioInput
+	inline static void setInput() { PinSet::setInput(); }
+	inline static void setInput(InputType type) { PinSet::setInput(type); }
+	inline static void configure(InputType type) { PinSet::configure(type); }
+
+	inline static bool read() { return gport()->IDR & mask; }
+
+	// External Interrupts
+	// Warning: This will disable any previously enabled interrupt which is
+	// routed to the same interupt line, e.g. PA3 will disable PB3.
+	// This is a hardware limitation by the STM32 EXTI.
+	inline static void enableExternalInterrupt()
+	{
+		// PA[x], x =  0 ..  3 maps to EXTICR[0]
+		// PA[x], x =  4 ..  7 maps to EXTICR[1]
+		// PA[x], x =  8 .. 11 maps to EXTICR[2]
+		// PA[x], x = 12 .. 15 maps to EXTICR[3]
+		// => bit3 and bit2 (mask 0x0c) specify the register
+		// => bit1 and bit0 (mask 0x03) specify the bit position
+		constexpr uint8_t index   = (pin & 0b1100) >> 2;
+		constexpr uint8_t bit_pos = (pin & 0b0011) << 2;
+		constexpr uint16_t syscfg_mask = (0b1111) << bit_pos;
+		constexpr uint16_t syscfg_value = (port_nr & (0b1111)) << bit_pos;
+		{{exti_reg}}->EXTICR[index] = ({{exti_reg}}->EXTICR[index] & ~syscfg_mask) | syscfg_value;
+		EXTI->IMR{{pf}} |= mask;
+	}
+	inline static void disableExternalInterrupt() { EXTI->IMR{{pf}} &= ~mask; }
+	inline static void enableExternalInterruptVector(const uint32_t priority)
+	{
+		NVIC_SetPriority(ExternalInterruptIRQ, priority);
+		NVIC_EnableIRQ(ExternalInterruptIRQ);
+	}
+	inline static void disableExternalInterruptVector() { NVIC_DisableIRQ(ExternalInterruptIRQ); }
+	inline static void setInputTrigger(const InputTrigger trigger)
+	{
+		switch (trigger)
+		{
+		case InputTrigger::RisingEdge:
+			EXTI->RTSR{{pf}} |=  mask;
+			EXTI->FTSR{{pf}} &= ~mask;
+			break;
+		case InputTrigger::FallingEdge:
+			EXTI->RTSR{{pf}} &= ~mask;
+			EXTI->FTSR{{pf}} |=  mask;
+			break;
+		case InputTrigger::BothEdges:
+			EXTI->RTSR{{pf}} |=  mask;
+			EXTI->FTSR{{pf}} |=  mask;
+			break;
+		}
+	}
+%% if target.family in ["g0"]
+	inline static bool getExternalInterruptFlag()
+	{ return (EXTI->FPR1 & mask) | (EXTI->RPR1 & mask); }
+	inline static void acknowledgeExternalInterruptFlag()
+	{ EXTI->FPR1 |= mask; EXTI->RPR1 |= mask; }
+%% else
+	inline static bool getExternalInterruptFlag() { return (EXTI->PR{{pf}} & mask); }
+	inline static void acknowledgeExternalInterruptFlag() { EXTI->PR{{pf}} = mask; }
+%% endif
+
+	// GpioIO
+	inline static Direction getDirection()
+	{
+%% if target.family in ["f1"]
+		uint32_t mode = (*gcr() & mask4);
+		if ((mode == 0) or (mode > (uint32_t(0b1001) << (cr_pin * 4))))
+			return Direction::Special;
+		if (mode > 0)
+			return Direction::Out;
+		return Direction::In;
+%% else
+		uint32_t mode = (gport()->MODER & mask2);
+		if (mode == (i(Mode::Input) << pin * 2))
+			return Direction::In;
+		if (mode == (i(Mode::Output) << pin * 2))
+			return Direction::Out;
+		return Direction::Special;
+%% endif
+	}
+	inline static void lock() { PinSet::lock(); }
+	inline static void disconnect()
+	{
+		setInput(InputType::Floating);
+%% if target.family not in ["f1", "l1"]
+		gport()->AFR[af_id] &= ~af_mask;
+	%% if target["family"] in ["l4"] and target["name"] in ["71", "75", "76", "85", "86"]
+		gport()->ASCR &= ~mask;
+	%% endif
+%% endif
+	}
+};
+
+} // namespace modm::platform
+
