@@ -342,34 +342,13 @@ class Eth : public eth
 	using BurstLength_t = modm::Configuration<DmaBusMode_t, BurstLength, 0b111111, 8>;
 	using RxDmaBurstLength_t = modm::Configuration<DmaBusMode_t, BurstLength, 0b111111, 17>;
 
-	template <Peripheral peripheral, template <Peripheral _> class... Signals>
-	struct GpioConfigurator;
-	template <Peripheral peripheral, template <Peripheral _> class Signal, template <Peripheral _> class... Signals>
-	struct GpioConfigurator<peripheral, Signal, Signals...>
-	{
-		static inline void
-		configure() {
-			Signal<peripheral>::Gpio::configure(modm::platform::Gpio::OutputType::PushPull, modm::platform::Gpio::OutputSpeed::VeryHigh);
-			GpioConfigurator<peripheral, Signals...>::configure();
-		}
-	};
-	template <Peripheral peripheral>
-	struct GpioConfigurator<peripheral>
-	{
-		static inline void
-		configure() {}
-	};
-
 public:
-	template <template<Peripheral _> class... Signals>
+	template< class... Signals >
 	static void
 	connect()
 	{
-		using Configurator = GpioConfigurator<Peripheral::Eth, Signals...>;
-		using Connector = GpioConnector<Peripheral::Eth, Signals...>;
-
-		Configurator::configure();
-		Connector::connect();
+		(GpioStatic<typename Signals::Data>::configure(Gpio::OutputType::PushPull, Gpio::OutputSpeed::VeryHigh), ...);
+		GpioConnector<Peripheral::Eth, Signals...>::connect();
 	}
 
 	template <MediaInterface Interface>

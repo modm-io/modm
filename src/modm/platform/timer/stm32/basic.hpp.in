@@ -56,7 +56,7 @@ namespace platform
 class Timer{{ id }} : public BasicTimer
 {
 public:
-	template< template<Peripheral _> class... Signals >
+	template< class... Signals >
 	static void
 	connect()
 	{

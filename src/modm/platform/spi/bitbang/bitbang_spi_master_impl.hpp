@@ -40,7 +40,7 @@ modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::configuration(nullptr);
 // ----------------------------------------------------------------------------
 
 template <typename Sck, typename Mosi, typename Miso>
-template< template<modm::platform::Peripheral _> class... Signals >
+template< class... Signals >
 void
 modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::connect()
 {
