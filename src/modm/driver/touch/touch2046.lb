@@ -35,4 +35,6 @@ def prepare(module, options):
 def build(env):
     env.outbasepath = "modm/src/modm/driver/touch"
     env.copy("touch2046.hpp")
-    env.copy("touch2046_impl.hpp")
+
+    env.substitutions = {'spi_16bit_hardware': env[":target"].has_driver("spi:stm32")}
+    env.template("touch2046_impl.hpp.in")
