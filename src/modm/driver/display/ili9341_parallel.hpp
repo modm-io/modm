@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2020, Pavel Pletenev
+ * Copyright (c) 2020, Thomas Sommer
  *
  * This file is part of the modm project.
  *
@@ -7,9 +8,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-#ifndef MODM_ILI9341_PARALLEL_HPP
-#define MODM_ILI9341_PARALLEL_HPP
-
+#pragma once
 #include "ili9341.hpp"
 
 namespace modm
@@ -36,14 +35,20 @@ public:
 		for(std::size_t i=0; i<length; ++i)
 			interface.writeData(args[i]);
 	}
+
 	void
-	writeData(uint8_t const *data, std::size_t length)
+	writeData(color::Rgb565 data)
 	{
-		auto const data16 = reinterpret_cast<uint16_t const*>(data);
-		size_t const length16 = length / 2;
-		for(std::size_t i=0; i<length16; ++i)
-			interface.writeData(modm::fromBigEndian(data16[i]));
+		interface.writeData(data.color);
 	}
+
+	void
+	writeData(color::Rgb565 const *data, std::size_t length)
+	{
+		for(std::size_t i=0; i < length; ++i)
+			interface.writeData(data[i].color);
+	}
+
 	void
 	writeCommandValue8(Command command, uint8_t value)
 	{
@@ -81,5 +86,3 @@ using Ili9341Parallel = Ili9341<
 	Reset, Backlight, BufferSize>;
 
 } // namespace modm
-
-#endif // MODM_ILI9341_PARALLEL_HPP
