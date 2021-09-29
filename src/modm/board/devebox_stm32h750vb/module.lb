@@ -58,7 +58,7 @@ Then include this file in your build options like so:
 
 ```xml
 <library>
-  <extends>modm:blue-pill</extends>
+  <extends>modm:devebox-stm32h750vb</extends>
   <options>
     <option name="modm:build:openocd.cfg">openocd.cfg</option>
   </options>

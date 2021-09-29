@@ -15,20 +15,22 @@ def init(module):
     module.description = """
 # Smart Response XE
 
-Smart Response XE is an obsolete classroom clicker, sold for as little as 5 USD on well known online auction site.
-It's a compelling platform that's fully reverse engineered and ready to hack out of box, featuring:
- - ATmega128RFA1 MCU
- - 384x136 LCD display
- - QWERTY keyboard
- - External 1M SPI flash
- - Exposed ISP and JTAG headers
- - ZigBee transciever w/ antennas
- - Powered by 4 AAA batteries
- - Optional (unpopulated):
-   - RS232
-   - Debug LED
-   - Buzzer
-   - Accelerometer
+Smart Response XE is an obsolete classroom clicker, sold for as little as 5 USD
+on well known online auction site. It's a compelling platform that's fully
+reverse engineered and ready to hack out of box, featuring:
+
+- ATmega128RFA1 MCU
+- 384x136 LCD display
+- QWERTY keyboard
+- External 1MB SPI flash
+- Exposed ISP and JTAG headers
+- ZigBee transciever with antennas
+- Powered by 4 AAA batteries
+- Optional (unpopulated):
+  - RS232
+  - Debug LED
+  - Buzzer
+  - Accelerometer
 """
 
 def prepare(module, options):
