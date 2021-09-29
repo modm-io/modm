@@ -40,7 +40,7 @@ namespace modm
  * @author	Niklas Hauser
  * @ingroup modm_architecture_i2c_device
  */
-template < class I2cMaster, uint8_t NestingLevels = 10, class Transaction = I2cWriteReadTransaction >
+template < class I2cMaster, uint8_t NestingLevels = 10, class Transaction = I2cWriteReadTransaction<uint8_t> >
 class I2cDevice : protected modm::NestedResumable< NestingLevels + 1 >
 {
 public:

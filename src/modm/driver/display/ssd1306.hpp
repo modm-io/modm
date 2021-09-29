@@ -11,15 +11,21 @@
  */
 // ----------------------------------------------------------------------------
 
+#pragma once
 #ifndef MODM_SSD1306_HPP
 #define MODM_SSD1306_HPP
 
 #include <modm/architecture/interface/i2c_device.hpp>
 #include <modm/architecture/utils.hpp>
 #include <modm/processing/timer.hpp>
-#include <modm/ui/display/monochrome_graphic_display_vertical.hpp>
 
-#include "ssd1306_register.hpp"
+#include <modm/ui/graphic/display.hpp>
+#include <modm/ui/graphic/buffer.hpp>
+#include <modm/ui/color/gray.hpp>
+
+#include "ssd1306_defines.hpp"
+
+using namespace modm::graphic;
 
 namespace modm
 {
@@ -50,16 +56,9 @@ public:
 		// LeftBottom = VerticalAndHorizontalScrollLeft,
 	};
 
-	enum class
-	DisplayMode : uint8_t
-	{
-		Normal = NormalDisplay,
-		Inverted = InvertedDisplay
-	};
-
 public:
 	/// @cond
-	class Ssd1306_I2cWriteTransaction : public modm::I2cWriteTransaction
+	class Ssd1306_I2cWriteTransaction : public modm::I2cWriteTransaction<uint8_t >
 	{
 	public:
 		Ssd1306_I2cWriteTransaction(uint8_t address);
@@ -94,15 +93,19 @@ public:
  * @author	Thomas Sommer
  * @ingroup	modm_driver_ssd1306
  */
-template<class I2cMaster, uint8_t Height = 64>
+template<class I2cMaster, uint16_t H = 64>
 class Ssd1306 : public ssd1306,
-				public MonochromeGraphicDisplayVertical<128, Height>,
+				public graphic::Display<Monochrome, Size(128, H), false>,
 				public I2cDevice<I2cMaster, 3, ssd1306::Ssd1306_I2cWriteTransaction>
 {
-	static_assert((Height == 64) or (Height == 32), "Display height must be either 32 or 64 pixel!");
+	static_assert((H == 64) or (H == 32), "Display height must be either 32 or 64 pixel!");
+public:	
+	using ColorType = Monochrome;
+	using Buffer = graphic::Buffer<ColorType, Size(128, H)>;
 
-public:
-	Ssd1306(uint8_t address = 0x3C);
+	Ssd1306(uint8_t address = 0x3C)
+		: Display<Monochrome, Size(128, H), false>(true), I2cDevice<I2cMaster, 3, ssd1306::Ssd1306_I2cWriteTransaction>(address)
+	{}
 
 	/// Pings the display
 	bool inline pingBlocking()
@@ -112,10 +115,6 @@ public:
 	bool inline initializeBlocking()
 	{ return RF_CALL_BLOCKING(initialize()); }
 
-	/// Update the display with the content of the RAM buffer.
-	void
-	update() override
-	{ RF_CALL_BLOCKING(startWriteDisplay()); }
 
 	/// Use this method to synchronize writing to the displays buffer
 	/// to avoid tearing.
@@ -128,16 +127,8 @@ public:
 	modm::ResumableResult<bool>
 	initialize();
 
-	// starts a frame transfer and waits for completion
-	virtual modm::ResumableResult<bool>
-	writeDisplay();
-
 	modm::ResumableResult<bool>
-	setDisplayMode(DisplayMode mode = DisplayMode::Normal)
-	{
-		commandBuffer[0] = mode;
-		return writeCommands(1);
-	}
+	set(ssd1306_register::Toggle toggle, bool state);
 
 	modm::ResumableResult<bool>
 	setContrast(uint8_t contrast = 0xCE)
@@ -148,13 +139,13 @@ public:
 	}
 
 	/**
-	 * \param orientation	glcd::Orientation::Landscape0 or glcd::Orientation::Landscape180
+	 * @param orientation	display::Orientation::Landscape0 or display::Orientation::Landscape180
 	 */
 	modm::ResumableResult<bool>
-	setOrientation(glcd::Orientation orientation);
+	setOrientation(graphic::Orientation orientation);
 
 	modm::ResumableResult<bool>
-	configureScroll(uint8_t origin, uint8_t size, ScrollDirection direction, ScrollStep steps);
+	configureScroll(uint8_t placement, uint8_t size, ScrollDirection direction, ScrollStep steps);
 
 	modm::ResumableResult<bool>
 	enableScroll()
@@ -170,16 +161,46 @@ public:
 		return writeCommands(1);
 	}
 
+    // TODO Abstract these write(...) cause is common to all I2c Displays!
+	// Write BufferInterface
+	// Caution: placement.y rounds to multiples of 8
+	modm::ResumableResult<bool>
+	write(BufferInterface<Monochrome> &buffer, Point placement = {0, 0}) {
+		RF_BEGIN();
+		RF_END_RETURN_CALL(writeImage(ImageAccessor<Monochrome, modm::accessor::Ram>(&buffer, placement)));
+	}
+
+	// Write Flash Image
+	modm::ResumableResult<bool>
+	write(const uint8_t *addr, Point placement = {0, 0}) {
+		RF_BEGIN();
+		RF_END_RETURN_CALL(writeImage(ImageAccessor<Monochrome, modm::accessor::Flash>(addr, placement)));
+	}
+
+	// Clear whole screen with color
+	modm::ResumableResult<bool>
+	clear(Monochrome color = 0);
+
 protected:
+	virtual modm::ResumableResult<bool>
+	updateClipping();
+
+	// Write monochrome Image
+	template<template<typename> class Accessor>
+	modm::ResumableResult<bool>
+	writeImage(ImageAccessor<Monochrome, Accessor> accessor);
+
 	modm::ResumableResult<bool>
 	writeCommands(std::size_t length);
 
-	virtual modm::ResumableResult<void>
+	/**
+	 * MemoryMode::HORIZONTAL and MemoryMode::VERTICAL have the best performance
+	 * because the whole buffer is send in one transaction.
+	 */
+	virtual modm::ResumableResult<bool>
 	initializeMemoryMode();
 
-	virtual modm::ResumableResult<void>
-	startWriteDisplay();
-
+	// Static variables for resumable functions
 	uint8_t commandBuffer[7];
 	bool transaction_success;
 };

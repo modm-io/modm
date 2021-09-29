@@ -238,6 +238,7 @@ protected:
  * @author	Niklas Hauser
  * @ingroup	modm_architecture_i2c
  */
+template <std::unsigned_integral T = uint8_t>
 class I2cWriteReadTransaction : public I2cTransaction
 {
 public:
@@ -406,6 +407,7 @@ protected:
  * @author	Niklas Hauser
  * @ingroup	modm_architecture_i2c
  */
+template <std::unsigned_integral T = uint8_t>
 class I2cWriteTransaction : public I2cTransaction
 {
 public:
@@ -481,6 +483,7 @@ protected:
  * @author	Niklas Hauser
  * @ingroup	modm_architecture_i2c
  */
+template <std::unsigned_integral T = uint8_t>
 class I2cReadTransaction : public I2cTransaction
 {
 public:
