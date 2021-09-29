@@ -149,9 +149,6 @@ initialize()
 	LedRed::setOutput(modm::Gpio::Low);
 
 	Button::setInput();
-	Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-	Button::enableExternalInterrupt();
-	//  Button::enableExternalInterruptVector(12);
 }
 
 inline void

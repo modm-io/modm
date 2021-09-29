@@ -17,57 +17,45 @@ void
 modm_gpio_enable(void)
 {
 %%	set prefix = "GPIO"
-%% if target["family"] in ["h7"]
+%% if target.family in ["h7"]
 %%	set clock_tree = "AHB4"
-%% elif target["family"] in ["f2", "f4", "f7"]
+%% elif target.family in ["f2", "f4", "f7"]
 %%	set clock_tree = "AHB1"
-%% elif target["family"] in ["f0", "f3", "l1"]
+%% elif target.family in ["f0", "f3", "l1"]
 %%	set clock_tree = "AHB"
-%% elif target["family"] in ["f1"]
+%% elif target.family in ["f1"]
 %%	set clock_tree = "APB2"
 %%	set prefix = "IOP"
-%% elif target["family"] in ["l4", "g4"]
+%% elif target.family in ["l4", "g4"]
 %%  set clock_tree = 'AHB2'
-%% elif target["family"] in ["g0", "l0"]
+%% elif target.family in ["g0", "l0"]
 %%  set clock_tree = 'IOP'
 %% endif
 
-%% if target["family"] in ["h7"]
+%% if target.family in ["h7"]
 	// Enable I/O compensation cell
 	SYSCFG->CCCSR = SYSCFG_CCCSR_EN;
 %% endif
-%% if target["family"] in ["f2", "f4", "f7"]
+%% if target.family in ["f2", "f4", "f7"]
 	// Enable I/O compensation cell
 	SYSCFG->CMPCR = SYSCFG_CMPCR_CMP_PD;
 %% endif
 
 	// Enable GPIO clock
 	RCC->{{ clock_tree }}ENR  |=
-%% for port in options["enable_ports"]
-%%	if not loop.last
-		RCC_{{ clock_tree }}ENR_{{ prefix }}{{ port | upper }}EN |
-%%	else
-		RCC_{{ clock_tree }}ENR_{{ prefix }}{{ port | upper }}EN;
-%%	endif
+%% for port in options.enable_ports
+		RCC_{{ clock_tree }}ENR_{{ prefix }}{{ port | upper }}EN{% if loop.last %};{% else %} |{% endif %}
 %% endfor
 
 	// Reset GPIO peripheral
 	RCC->{{ clock_tree }}RSTR |=
-%% for port in options["enable_ports"]
-%%	if not loop.last
-		RCC_{{ clock_tree }}RSTR_{{ prefix }}{{ port | upper }}RST |
-%%	else
-		RCC_{{ clock_tree }}RSTR_{{ prefix }}{{ port | upper }}RST;
-%%	endif
+%% for port in options.enable_ports
+		RCC_{{ clock_tree }}RSTR_{{ prefix }}{{ port | upper }}RST{% if loop.last %};{% else %} |{% endif %}
 %% endfor
 
 	RCC->{{ clock_tree }}RSTR &= ~(
-%% for port in options["enable_ports"]
-%%	if not loop.last
-		RCC_{{ clock_tree }}RSTR_{{ prefix }}{{ port | upper }}RST |
-%%	else
-		RCC_{{ clock_tree }}RSTR_{{ prefix }}{{ port | upper }}RST);
-%%	endif
+%% for port in options.enable_ports
+		RCC_{{ clock_tree }}RSTR_{{ prefix }}{{ port | upper }}RST{% if loop.last %});{% else %} |{% endif %}
 %% endfor
 }
 

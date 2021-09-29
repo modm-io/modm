@@ -16,6 +16,7 @@
 #include <modm/architecture/interface/memory.hpp>
 #include <modm/architecture/interface/atomic_lock.hpp>
 #include <modm/platform/device.hpp>
+#include <modm/platform/exti/exti.hpp>
 
 namespace modm
 {
@@ -63,12 +64,12 @@ GpioSampler::sampleGpio(Channel *data, Type time)
 {
 	if constexpr (Gpio::pin == pin)
 	{
-		if ((pin_count == 1) or Gpio::getExternalInterruptFlag())
+		if ((pin_count == 1) or (platform::Exti::areFlagsSet<Gpio>()))
 		{
-			if (not Gpio::read()) time = -time;
+			if (Gpio::read()) time |= 1;
 			constexpr size_t channel = channels - sizeof...(Gpios) - 1;
 			data[channel].add(time);
-			Gpio::acknowledgeExternalInterruptFlag();
+			platform::Exti::acknowledgeFlags<Gpio>();
 		}
 	}
 	sampleGpio<channels, pin_count, pin, Gpios...>(data, time);
@@ -92,11 +93,11 @@ GpioSampler::Create(size_t max_samples)
 		[](Handle<sizeof...(Gpios)> &h) {
 			// prime the data logger
 			const Type time = getTime();
-			const Type start[] = {(Gpios::read() ? time : -time)...};
+			const Type start[] = {(Gpios::read() ? (time | 1) : time)...};
 			h.set_start_time(start);
 		},
 		[]() {
-			(Gpios::disableExternalInterrupt(), ...);
+			platform::Exti::disableInterrupts<Gpios...>();
 			// only reset the vectors that contain at least one GPIO
 %% for vector in extis
 			if constexpr (pin_count_{{vector | lower}}) reset(Interrupt::{{ vector | capitalize }});
@@ -117,9 +118,9 @@ GpioSampler::Create(size_t max_samples)
 	}
 %% endfor
 	// trigger on both edges
-	(Gpios::setInputTrigger(Gpios::InputTrigger::BothEdges), ...);
+	platform::Exti::setTriggers<Gpios...>(platform::Exti::Trigger::BothEdges);
 	// enabled all GPIO interrupts
-	(Gpios::enableExternalInterrupt(), ...);
+	platform::Exti::enableInterrupts<Gpios...>();
 	// prime the logger with initial measurement
 	handle.restart();
 	return handle;

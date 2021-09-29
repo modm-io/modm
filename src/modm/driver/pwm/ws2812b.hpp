@@ -55,7 +55,7 @@ public:
 	void
 	initialize()
 	{
-		SpiMaster::template connect<Output::template Mosi>();
+		SpiMaster::template connect<typename Output::Mosi>();
 		SpiMaster::template initialize<SystemClock, MHz(3), pct(10)>();
 		SpiMaster::setDataOrder(SpiMaster::DataOrder::LsbFirst);
 		SpiMaster::Hal::write(uint8_t(0));

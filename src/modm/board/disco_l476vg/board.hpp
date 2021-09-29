@@ -117,9 +117,6 @@ initialize()
 	LedRed::setOutput(modm::Gpio::Low);
 
 	Button::setInput();
-	Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-	Button::enableExternalInterrupt();
-//	Button::enableExternalInterruptVector(12);
 }
 
 /// You must take out the LCD screen and close SB24 and SB25 for USB to work

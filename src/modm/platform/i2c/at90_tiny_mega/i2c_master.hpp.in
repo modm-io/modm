@@ -38,7 +38,7 @@ namespace platform
 class I2cMaster : public ::modm::I2cMaster, I2c
 {
 public:
-	template< template<Peripheral _> class... Signals, ResetDevices reset = ResetDevices::Standard>
+	template< class... Signals, ResetDevices reset = ResetDevices::Standard>
 	static void
 	connect(PullUps pullups = PullUps::External)
 	{

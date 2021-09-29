@@ -192,9 +192,6 @@ inline void
 initializeTouchscreen()
 {
 	ft6::Int::setInput();
-	ft6::Int::setInputTrigger(Gpio::InputTrigger::FallingEdge);
-	ft6::Int::enableExternalInterrupt();
-//	ft6::Int::enableExternalInterruptVector(12);
 
 	ft6::I2cMaster::connect<ft6::Scl::Scl, ft6::Sda::Sda>();
 	ft6::I2cMaster::initialize<SystemClock, 360_kHz>();
@@ -228,9 +225,6 @@ initialize()
 	LedOrange::setOutput(modm::Gpio::Low);
 
 	Button::setInput();
-	Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-	Button::enableExternalInterrupt();
-//	Button::enableExternalInterruptVector(12);
 }
 
 inline void

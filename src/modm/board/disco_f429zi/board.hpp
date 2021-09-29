@@ -228,9 +228,6 @@ initialize()
 	LedRed::setOutput(modm::Gpio::Low);
 
 	Button::setInput();
-	Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-	Button::enableExternalInterrupt();
-//	Button::enableExternalInterruptVector(12);
 }
 
 
@@ -238,15 +235,7 @@ inline void
 initializeL3g()
 {
 	l3g::Int1::setInput();
-	l3g::Int1::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-	l3g::Int1::enableExternalInterrupt();
-//	l3g::Int1::enableExternalInterruptVector(12);
-
 	l3g::Int2::setInput();
-	l3g::Int2::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-	l3g::Int2::enableExternalInterrupt();
-//	l3g::Int2::enableExternalInterruptVector(12);
-
 	l3g::Cs::setOutput(modm::Gpio::High);
 
 	l3g::SpiMaster::connect<l3g::Sck::Sck, l3g::Mosi::Mosi, l3g::Miso::Miso>();

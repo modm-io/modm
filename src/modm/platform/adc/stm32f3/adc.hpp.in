@@ -235,7 +235,7 @@ public:
 	MODM_FLAGS32(InterruptFlag);
 
 public:
-	template< template<Peripheral _> class... Signals >
+	template< class... Signals >
 	static void
 	connect()
 	{
@@ -341,7 +341,7 @@ public:
 	static inline constexpr Channel
 	getPinChannel()
 	{
-		constexpr int8_t channel{Gpio::template AdcChannel<Peripheral::Adc{{ id }}>};
+		constexpr int8_t channel{detail::AdcChannel<typename Gpio::Data, Peripheral::Adc{{ id }}>};
 		static_assert(channel >= 0, "Adc{{id}} does not have a channel for this pin!");
 		return Channel(channel);
 	}

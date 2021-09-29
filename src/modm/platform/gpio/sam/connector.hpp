@@ -23,7 +23,7 @@ namespace platform
 using Peripheral = PeripheralPin;
 
 // GpioConnector only exists for backwards compability with bitbang API.
-template<Peripheral peripheral, template<Peripheral _> class... Signals>
+template<Peripheral peripheral, class... Signals>
 struct GpioConnector
 {
 	template<class GpioQuery>

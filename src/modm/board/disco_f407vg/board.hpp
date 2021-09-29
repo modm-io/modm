@@ -178,19 +178,12 @@ initialize()
 	Leds::setOutput(modm::Gpio::Low);
 
 	Button::setInput();
-	Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-	Button::enableExternalInterrupt();
-//	Button::enableExternalInterruptVector(12);
 }
 
 inline void
 initializeLis3()
 {
 	lis3::Int::setInput();
-	lis3::Int::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-	lis3::Int::enableExternalInterrupt();
-//	lis3::Int::enableExternalInterruptVector(12);
-
 	lis3::Cs::setOutput(modm::Gpio::High);
 
 	lis3::SpiMaster::connect<lis3::Sck::Sck, lis3::Mosi::Mosi, lis3::Miso::Miso>();

@@ -19,16 +19,12 @@ modm_gpio_enable(void)
 %% if target["family"] in ["g", "v"]
 
     PMC->PMC_PCER0 =
-%% for port in options["enable_ports"]
-%% if not loop.last
-        (1<<ID_PIO{{ port | upper }}) |
-%% else
-        (1<<ID_PIO{{ port | upper }});
-%% endif
+%% for port in options.enable_ports
+        (1<<ID_PIO{{ port | upper }}){% if loop.last %};{% else %} |{% endif %}
 %% endfor
 
     // Enable usage of the ODSR register for all pins
-%% for port in options["enable_ports"]
+%% for port in options.enable_ports
     PIO{{ port | upper }}->PIO_OWER = 0xFFFFFFFF;
 %% endfor
 

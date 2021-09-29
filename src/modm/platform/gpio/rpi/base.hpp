@@ -13,10 +13,7 @@
 
 #include <modm/architecture/interface/gpio.hpp>
 
-namespace modm
-{
-
-namespace platform
+namespace modm::platform
 {
 
 /// @ingroup modm_platform_gpio
@@ -34,7 +31,9 @@ struct Gpio
 	enum class
 	InputType : uint8_t
 	{
-		Floating,	///< The input pin is left floating
+		Floating = PUD_OFF,
+		PullUp = PUD_UP,
+		PullDown = PUD_DOWN,
 	};
 
 	enum class
@@ -43,25 +42,11 @@ struct Gpio
 		PushPull	///< push-pull on output
 	};
 
-	/// Available ports on this device.
-	enum class
-	Port
-	{
-        // ...
-	};
-
 	enum class
 	Signal
 	{
 		BitBang,
-        // ...
 	};
-
-	/// @endcond
 };
 
-/// @}
-
-}	// namespace platform
-
-}	// namespace modm
+}	// namespace modm::platform

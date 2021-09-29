@@ -26,36 +26,7 @@
 #include <modm/architecture/interface/interrupt.hpp>
 
 using namespace Board;
-
-typedef GpioInputE11 Irq;
-
-
-/* When you choose a different pin you must choose the corresponding
- * interrupt handler: (x in A, B, C, D, E, F, G, H, I)
- * Px0:          EXTI0
- * Px1:          EXTI1
- * Px2:          EXTI2
- * Px3:          EXTI3
- * Px4:          EXTI4
- * Px5  to Px9:  EXTI9_5
- * Px10 to Px15: EXTI15_10
- */
-MODM_ISR(EXTI0)
-{
-	Button::acknowledgeExternalInterruptFlag();
-	LedBlue::set();
-	modm::delay(1ms);
-	LedBlue::reset();
-}
-
-
-MODM_ISR(EXTI15_10)
-{
-	Irq::acknowledgeExternalInterruptFlag();
-	LedOrange::set();
-	modm::delay(1ms);
-	LedOrange::reset();
-}
+using Irq = GpioInputE11;
 
 // ----------------------------------------------------------------------------
 int
@@ -73,15 +44,21 @@ main()
 
 	// push the button to see the blue led light up
 	Button::setInput(Gpio::InputType::Floating);
-	Button::setInputTrigger(Button::InputTrigger::RisingEdge);
-	Button::enableExternalInterrupt();
-	Button::enableExternalInterruptVector(14);
+	Exti::connect<Button>(Exti::Trigger::RisingEdge, [](uint8_t)
+	{
+		LedBlue::set();
+		modm::delay(1ms);
+		LedBlue::reset();
+	});
 
 	// pull pin E11 low to see the orange led light up
 	Irq::setInput(Gpio::InputType::PullUp);
-	Irq::setInputTrigger(Irq::InputTrigger::BothEdges);
-	Irq::enableExternalInterrupt();
-	Irq::enableExternalInterruptVector(14);
+	Exti::connect<Irq>(Exti::Trigger::BothEdges, [](uint8_t)
+	{
+		LedOrange::set();
+		modm::delay(1ms);
+		LedOrange::reset();
+	});
 
 	while (true)
 	{

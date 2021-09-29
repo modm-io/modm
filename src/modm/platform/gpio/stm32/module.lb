@@ -142,7 +142,7 @@ bprops = {}
 # -----------------------------------------------------------------------------
 def init(module):
     module.name = ":platform:gpio"
-    module.description = "General Purpose I/O (GPIO)"
+    module.description = FileReader("module.md")
 
 def prepare(module, options):
     device = options[":target"]
@@ -193,25 +193,7 @@ def validate(env):
                             sig["instance"] = remap["instance"]
                         signal_map[key].append(sig)
         bprops["group_map"] = signal_map
-
-    # These are all exti possible vectors: 0, 0_1, 1, 15_10, 2, 2_3, 2_TSC, 3, 4, 4_15, 9_5
-    all_exti = {
-        "0": [0], "1": [1], "2": [2], "3": [3], "4": [4],
-        "0_1": [0,1],
-        "2_TSC": [2],
-        "2_3": [2,3],
-        "4_15": [4,5,6,7,8,9,10,11,12,13,14,15],
-        "9_5": [5,6,7,8,9],
-        "15_10": [10,11,12,13,14,15],
-    }
-    extimap = {}
-    for vec in [v["name"][4:] for v in device.get_driver("core")["vector"] if "EXTI" in v["name"]]:
-        if vec not in all_exti:
-            raise ValidateException("Unknown EXTI vector: '{}'".format(vec))
-        for num in all_exti[vec]:
-            if str(num) in extimap:
-                raise ValidateException("Pin '{}' already in EXTI map!".format(str(num)))
-            extimap[str(num)] = vec
+        bprops["remaps"] = driver["remap"]
 
     # Compute the set of remapped pins
     remapped_gpios = {}
@@ -242,7 +224,6 @@ def validate(env):
         has_remap = key in remapped_gpios
         bprops[key] = {
             "gpio": gpio,
-            "exti_irqn": extimap[gpio["pin"]],
             "signals": extracted_signals,
             "has_remap": has_remap,
         }
@@ -271,7 +252,7 @@ def validate(env):
         all_peripherals.extend([get_driver(r) for r in driver["remap"]])
     bprops["all_peripherals"] = sorted(list(set(all_peripherals)))
     bprops["all_signals"] = sorted(list(set(s["name"] for s in all_signals.values())))
-    bprops["pf"] = "1" if device.identifier["family"] in ["l4", "g0", "g4", "h7"] else ""
+    bprops["gpios"] = [bprops[g["port"] + g["pin"]] for g in driver["gpio"]]
 
     # Check the max number of ADC instances
     max_adc_instance = max(map(int, device.get_driver("adc").get("instance", [1])))
@@ -279,36 +260,26 @@ def validate(env):
         raise ValidateException("Too many ADC instances: '{}'".format(max_adc_instance))
 
 def build(env):
-    device = env[":target"]
-    driver = device.get_driver("gpio")
-    properties = device.properties
-    properties["target"] = device.identifier
-    properties["driver"] = driver
-    properties.update(bprops)
-
-    env.substitutions = properties
+    env.substitutions["target"] = env[":target"].identifier
+    env.substitutions.update(bprops)
     env.outbasepath = "modm/src/modm/platform/gpio"
-    gpio_source = "pin_f1.hpp.in" if "f1" in driver["type"] else "pin.hpp.in"
 
-    for gpio in driver["gpio"]:
-        po, pi = gpio["port"], gpio["pin"]
-        properties.update(bprops[po + pi])
-        header_name = "gpio_{}{}.hpp".format(po.upper(), pi)
-        env.template(gpio_source, header_name, filters={ "to_adc_channel" : lambda name : "".join(filter(str.isdigit, name)) })
+    env.template("data.hpp.in", filters={"to_adc_channel": lambda name: "".join(filter(str.isdigit, name))})
+    env.template("static.hpp.in")
+    env.template("../common/pins.hpp.in", "pins.hpp")
 
     env.template("port.hpp.in")
     env.template("software_port.hpp.in")
     env.template("set.hpp.in")
-    if "f1" in driver["type"]:
-        env.template("connector_specialized.hpp.in", filters={"formatPeripheral": get_driver, "printSignalMap": print_remap_group_table})
     env.template("base.hpp.in")
-    env.template("unused.hpp.in")
+    env.template("../common/unused.hpp.in", "unused.hpp")
     if len(env["enable_ports"]):
         env.template("enable.cpp.in")
 
     env.copy("../common/inverted.hpp", "inverted.hpp")
-    env.copy("../common/connector.hpp", "connector.hpp")
-    env.template("../common/connector_detail.hpp.in", "connector_detail.hpp")
+    env.template("../common/connector.hpp.in", "connector.hpp",
+                 filters={"formatPeripheral": get_driver,
+                          "printSignalMap": print_remap_group_table})
 
     # FIXME: Move to modm:platform:core!
     env.outbasepath = "modm/src/modm/platform/core"

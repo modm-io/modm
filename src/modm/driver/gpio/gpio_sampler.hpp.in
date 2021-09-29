@@ -100,7 +100,7 @@ protected:
 	static void reset(Interrupt vector);
 	static void setHandler(Interrupt vector, void(*handler)());
 	static inline Type getTime() {
-		return Type(DWT->CYCCNT & ~(1ul << 31));
+		return Type(DWT->CYCCNT & ~1);
 	}
 };
 

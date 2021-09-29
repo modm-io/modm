@@ -59,7 +59,7 @@ modm::platform::BitBangI2cMaster<Scl, Sda>::initialize()
 }
 
 template <class Scl, class Sda>
-template< template<modm::platform::Peripheral _> class... Signals, modm::I2cMaster::ResetDevices reset >
+template< class... Signals, modm::I2cMaster::ResetDevices reset >
 void
 modm::platform::BitBangI2cMaster<Scl, Sda>::connect(PullUps pullups)
 {
@@ -75,7 +75,7 @@ modm::platform::BitBangI2cMaster<Scl, Sda>::connect(PullUps pullups)
 	SDA::configure(input);
 	SCL::setOutput(SCL::OutputType::OpenDrain);
 	SDA::setOutput(SDA::OutputType::OpenDrain);
-	if (reset != ResetDevices::NoReset) resetDevices<SCL, uint32_t(reset)>();
+	if constexpr (reset != ResetDevices::NoReset) resetDevices<SCL, uint32_t(reset)>();
 	Connector::connect();
 }
 

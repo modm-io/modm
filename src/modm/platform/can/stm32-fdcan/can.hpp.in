@@ -83,7 +83,7 @@ private:
 			);
 
 public:
-	template< template<Peripheral _> class... Signals >
+	template< class... Signals >
 	static void
 	connect(Gpio::InputType inputType = Gpio::InputType::Floating)
 	{

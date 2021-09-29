@@ -98,6 +98,7 @@ def hal_get_modules():
                 "rcc": "System Clock",
                 "gclk": "System Clock",
                 "extint": "External Interrupt",
+                "exti": "External Interrupt",
                 "fsmc": "External Memory",
                 "flash": "Internal Flash",
                 "timer": "Timer",
@@ -108,7 +109,7 @@ def hal_get_modules():
             mapping[mname].update(file_cache[module.filename])
 
         # External interrupt is currently part of the GPIO module
-        if target.platform in ["avr", "stm32"] and "GPIO" in modules:
+        if target.platform in ["avr"] and "GPIO" in modules:
             modules.add("External Interrupt")
 
         # print(target, dict(modules))
@@ -171,7 +172,7 @@ def hal_create_table(targets, platforms, common_table=False):
     mapping = targets[1]
 
     print(platforms, dict(mapping))
-    values = defaultdict(lambda: defaultdict(lambda: "✗"))
+    values = defaultdict(lambda: defaultdict(lambda: "✕"))
     for driver in all_drivers:
         for f, v in modules.items():
             # mapping from driver to peripheral

@@ -60,15 +60,6 @@ using Nrf1Phy     = modm::Nrf24Phy<Nrf1Spi, Nrf1Csn, Nrf1Ce>;
 using Nrf1Config  = modm::Nrf24Config<Nrf1Phy>;
 using Nrf1Data    = modm::Nrf24Data<Nrf1Phy, ClockUs>;
 
-
-// This must normally be declared in a .cpp file, NOT a header file
-MODM_ISR(EXTI9_5) // From PA9
-{
-	Nrf1Irq::acknowledgeExternalInterruptFlag();
-	Board::LedD13::toggle();
-	Nrf1Data::interruptHandler();
-}
-
 using Nrf2Spi  = SpiMaster2;
 using Nrf2Sck  = GpioB13;
 using Nrf2Mosi = GpioB15;
@@ -80,13 +71,6 @@ using Nrf2Irq  = GpioB12;
 using Nrf2Phy     = modm::Nrf24Phy<Nrf2Spi, Nrf2Csn, Nrf2Ce>;
 using Nrf2Config  = modm::Nrf24Config<Nrf2Phy>;
 using Nrf2Data    = modm::Nrf24Data<Nrf2Phy, ClockUs>;
-
-MODM_ISR(EXTI15_10) // From PB12
-{
-	Nrf2Irq::acknowledgeExternalInterruptFlag();
-	Board::LedD13::toggle();
-	Nrf2Data::interruptHandler();
-}
 
 void inline
 initializeSpi(uint8_t instances=0b11)
@@ -138,9 +122,11 @@ initializeNrf(uint8_t instances=0b11, uint8_t address1=nrf_address1, uint8_t add
 		Nrf1Config::setCrc(Nrf1Config::Crc::Crc2Byte);
 
 		Nrf1Irq::setInput(Nrf1Irq::InputType::PullUp);
-		Nrf1Irq::setInputTrigger(Nrf1Irq::InputTrigger::FallingEdge);
-		Nrf1Irq::enableExternalInterrupt();
-		Nrf1Irq::enableExternalInterruptVector(4);
+		Exti::connect<Nrf1Irq>(Exti::Trigger::FallingEdge, [](uint8_t)
+		{
+			Board::LedD13::toggle();
+			Nrf1Data::interruptHandler();
+		});
 	}
 	if (instances & 0b10)
 	{
@@ -155,8 +141,10 @@ initializeNrf(uint8_t instances=0b11, uint8_t address1=nrf_address1, uint8_t add
 		Nrf2Config::setCrc(Nrf2Config::Crc::Crc2Byte);
 
 		Nrf2Irq::setInput(Nrf2Irq::InputType::PullUp);
-		Nrf2Irq::setInputTrigger(Nrf2Irq::InputTrigger::FallingEdge);
-		Nrf2Irq::enableExternalInterrupt();
-		Nrf2Irq::enableExternalInterruptVector(5);
+		Exti::connect<Nrf2Irq>(Exti::Trigger::FallingEdge, [](uint8_t)
+		{
+			Board::LedD13::toggle();
+			Nrf2Data::interruptHandler();
+		});
 	}
 }
