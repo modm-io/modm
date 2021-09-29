@@ -21,9 +21,12 @@ process that you can fine-tune to your needs.
 - [API reference is available here][api-docs].
 - [We do quarterly releases][releases] with a [curated changelog][changelog].
 
-This project also has a [technical blog][blog] to document larger design concepts.
+This project also has a [forum for discussions][discussions] and a
+[technical blog][blog] to document larger design concepts.
 
 - You found a bug? [Open up an issue, we don't bite][issues].
+- You have a question? [We probably have an answer][questions].
+- You require a feature? [Write it down to get things rolling][ideas].
 - You want to contribute? [Read the contribution guidelines][contrib] and [open a pull request][prs].
 
 modm is optimized for the harsh requirements of the [Eurobot competition][eurobot],
@@ -752,6 +755,9 @@ and [many more contributors][contributors].
 [install]:         https://modm.io/guide/installation
 [issues]:          https://github.com/modm-io/modm/issues
 [prs]:             https://github.com/modm-io/modm/pulls
+[discussions]:     https://github.com/modm-io/modm/discussions
+[questions]:       https://github.com/modm-io/modm/discussions/categories/q-a
+[ideas]:           https://github.com/modm-io/modm/discussions/categories/ideas
 [testing]:         https://github.com/modm-io/modm/tree/develop/test/README.md
 [api-docs]:        https://docs.modm.io/
 
