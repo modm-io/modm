@@ -3,13 +3,10 @@
   <options>
     <option name="modm:build:build.path">../../../../build/nucleo_f429zi/cmsis_dsp/linear_interp</option>
   </options>
-  <collectors>
-    <!-- We need to cast `&arm_linear_interep_table[0]` to (float*), but cannot change the example... -->
-  	<collect name="modm:build:cxxflags">-fpermissive</collect>
-  </collectors>
   <modules>
     <module>modm:build:scons</module>
     <module>modm:build:make</module>
     <module>modm:cmsis:dsp:fast_math</module>
+    <module>modm:cmsis:dsp:interpolation</module>
   </modules>
 </library>

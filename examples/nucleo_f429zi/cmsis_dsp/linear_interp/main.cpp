@@ -21,7 +21,6 @@
 #define while return status; void
 #include "../../../../ext/arm/cmsis/CMSIS/DSP/Examples/ARM/arm_linear_interp_example/arm_linear_interp_example_f32.c"
 #undef while
-#undef float
 #undef main
 #pragma GCC diagnostic pop
 
