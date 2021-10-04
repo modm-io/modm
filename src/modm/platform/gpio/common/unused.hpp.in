@@ -106,13 +106,13 @@ public:
 	struct BitBang
 	{
 		using Data = detail::DataUnused;
-		static constexpr Gpio::Signal Signal = Gpio::Signal::BitBang;
+		static constexpr platform::Gpio::Signal Signal = platform::Gpio::Signal::BitBang;
 	};
 %% for name in all_signals
 	struct {{ name }}
 	{
 		using Data = detail::DataUnused;
-		static constexpr Gpio::Signal Signal = Gpio::Signal::{{ name }};
+		static constexpr platform::Gpio::Signal Signal = platform::Gpio::Signal::{{ name }};
 	};
 %% endfor
 };
