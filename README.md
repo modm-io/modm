@@ -324,7 +324,7 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 </tr><tr>
 <td align="left">Internal Flash</td>
 <td align="center">○</td>
-<td align="center">○</td>
+<td align="center">✅</td>
 <td align="center">○</td>
 <td align="center">○</td>
 <td align="center">✅</td>

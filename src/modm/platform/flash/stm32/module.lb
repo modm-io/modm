@@ -17,7 +17,7 @@ def init(module):
 
 def prepare(module, options):
     device = options[":target"]
-    if device.identifier.family not in ["g0", "f4"]:
+    if device.identifier.family not in ["g0", "f1", "f4"]:
         return False
     if not device.has_driver("flash:stm32*"):
         return False
@@ -31,12 +31,19 @@ def build(env):
     memories = listify(env[":target"].get_driver("core")["memory"])
     flash = next(filter(lambda m: m["name"] == "flash", memories))
 
+    family = target.family
     if target.family in ["f4"]:
         block_shift = 17
         ftype = "sector"
+        busy_bit = "FLASH_SR_BSY"
+    elif target.family in ["f1"]:
+        block_shift = 10
+        ftype = "page"
+        busy_bit = "FLASH_SR_BSY"
     elif target.family in ["g0"]:
         block_shift = 11
         ftype = "page"
+        busy_bit = "FLASH_SR_BSY1"
 
     env.substitutions = {
         "start": int(flash["start"], 16),
@@ -44,6 +51,8 @@ def build(env):
         "type": ftype,
         "shift": block_shift,
         "has_sectors": ftype == "sector",
+        "busy_bit": busy_bit,
+        "family": family
     }
     env.outbasepath = "modm/src/modm/platform/flash"
     env.template("flash.hpp.in")

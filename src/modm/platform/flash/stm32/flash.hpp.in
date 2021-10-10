@@ -24,7 +24,11 @@ public:
 	static constexpr uintptr_t OriginAddr{ 0x{{ "%0x" | format(start) }} };
 	static constexpr size_t Size{ 0x{{ "%0x" | format(size) }} };
 	static inline uint8_t *const Origin{(uint8_t*)OriginAddr};
+%% if family=="f1"
+	using MaxWordType = uint16_t;
+%% else
 	using MaxWordType = uint{{ 32 if has_sectors else 64 }}_t;
+%% endif
 
 %% if has_sectors
 	enum class
@@ -40,7 +44,7 @@ public:
 	inline static void
 	enable()
 	{
-%% if not has_sectors
+%% if not has_sectors and family == "g0"
 		Rcc::enable<Peripheral::Flash>();
 %% endif
 	}
@@ -48,7 +52,7 @@ public:
 	inline static void
 	disable()
 	{
-%% if not has_sectors
+%% if not has_sectors and family == "g0"
 		Rcc::disable<Peripheral::Flash>();
 %% endif
 
@@ -60,11 +64,7 @@ public:
 
 	static inline bool
 	isBusy()
-%% if has_sectors
-	{ return FLASH->SR & FLASH_SR_BSY; }
-%% else
-	{ return FLASH->SR & FLASH_SR_BSY1; }
-%% endif
+	{ return FLASH->SR & {{ busy_bit }}; }
 
 	static bool
 	unlock();
