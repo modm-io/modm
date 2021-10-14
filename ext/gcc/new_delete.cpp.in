@@ -78,26 +78,40 @@ new_assert(size_t size)
 }
 
 // ----------------------------------------------------------------------------
+modm_weak
 void* operator new  (std::size_t size) { return new_assert<false>(size); }
+modm_weak
 void* operator new[](std::size_t size) { return new_assert<false>(size); }
 
+modm_weak
 void* operator new  (std::size_t size, const std::nothrow_t&) noexcept { return malloc(size); }
+modm_weak
 void* operator new[](std::size_t size, const std::nothrow_t&) noexcept { return malloc(size); }
 
 %% if with_memory_traits
+modm_weak
 void* operator new  (std::size_t size, modm::MemoryTraits traits) { return new_assert<true>(size, traits); }
+modm_weak
 void* operator new[](std::size_t size, modm::MemoryTraits traits) { return new_assert<true>(size, traits); }
 
+modm_weak
 void* operator new  (std::size_t size, modm::MemoryTraits traits, const std::nothrow_t&) noexcept { return malloc_traits(size, traits.value); }
+modm_weak
 void* operator new[](std::size_t size, modm::MemoryTraits traits, const std::nothrow_t&) noexcept { return malloc_traits(size, traits.value); }
 %% endif
 
 // ----------------------------------------------------------------------------
+modm_weak
 void operator delete  (void *ptr) noexcept { free(ptr); }
+modm_weak
 void operator delete[](void* ptr) noexcept { free(ptr); }
 
+modm_weak
 void operator delete  (void* ptr, std::size_t) noexcept { free(ptr); }
+modm_weak
 void operator delete[](void* ptr, std::size_t) noexcept { free(ptr); }
 
+modm_weak
 void operator delete  (void* ptr, const std::nothrow_t&) noexcept { free(ptr); }
+modm_weak
 void operator delete[](void* ptr, const std::nothrow_t&) noexcept { free(ptr); }
