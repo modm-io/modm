@@ -101,17 +101,28 @@ void* operator new[](std::size_t size, modm::MemoryTraits traits, const std::not
 %% endif
 
 // ----------------------------------------------------------------------------
-modm_weak
-void operator delete  (void *ptr) noexcept { free(ptr); }
-modm_weak
-void operator delete[](void* ptr) noexcept { free(ptr); }
+extern "C" modm_weak
+void operator_delete(modm_unused void* ptr)
+{
+%% if with_heap
+	free(ptr);
+%% else
+	modm_assert_continue_fail_debug(0, "delete",
+		"operator delete was called without heap implementation!", ptr);
+%% endif
+}
 
 modm_weak
-void operator delete  (void* ptr, std::size_t) noexcept { free(ptr); }
+void operator delete  (void* ptr) noexcept { operator_delete(ptr); }
 modm_weak
-void operator delete[](void* ptr, std::size_t) noexcept { free(ptr); }
+void operator delete[](void* ptr) noexcept { operator_delete(ptr); }
 
 modm_weak
-void operator delete  (void* ptr, const std::nothrow_t&) noexcept { free(ptr); }
+void operator delete  (void* ptr, std::size_t) noexcept { operator_delete(ptr); }
 modm_weak
-void operator delete[](void* ptr, const std::nothrow_t&) noexcept { free(ptr); }
+void operator delete[](void* ptr, std::size_t) noexcept { operator_delete(ptr); }
+
+modm_weak
+void operator delete  (void* ptr, const std::nothrow_t&) noexcept { operator_delete(ptr); }
+modm_weak
+void operator delete[](void* ptr, const std::nothrow_t&) noexcept { operator_delete(ptr); }

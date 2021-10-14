@@ -34,6 +34,10 @@ extern "C" void* _sbrk_r(struct _reent *,  ptrdiff_t size)
     }
     return (void*) heap;
 }
+extern "C" void operator_delete(void* ptr)
+{
+	free(ptr);
+}
 
 // ----------------------------------------------------------------------------
 int main()
@@ -47,7 +51,7 @@ int main()
 							 traits.value, start, end, size);
 	}
 
-	void* ptr;
+	uint8_t* ptr;
 	size_t counter{0};
 	while (true)
 	{
@@ -55,9 +59,13 @@ int main()
 		modm::delay(200ms);
 
 		// leak memory until heap is exhausted
-		ptr = malloc(1024);
-		if (ptr) counter++;
+		ptr = new uint8_t[1024];
+		if (ptr) {
+			ptr[0] = counter;
+			counter++;
+		}
 		MODM_LOG_INFO << "Allocated " << counter << "kb of heap!" << modm::endl;
+		// delete ptr;
 	}
 
 	return 0;
