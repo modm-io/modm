@@ -77,14 +77,14 @@ modm::platform::CanFilter::disableFilter(uint8_t id)
 }
 
 // ----------------------------------------------------------------------------
-%% if target["family"] in ["f1", "f2", "f4"]
+%% if target_has_can2
 void
 modm::platform::CanFilter::setStartFilterBankForCan2(uint8_t startBank)
 {
 	// Initialization mode for the filter
 	{{ reg }}->FMR |= CAN_FMR_FINIT;
 
-	{{ reg }}->FMR = ({{ reg }}->FMR & ~0x3f00) | (startBank << 8);
+	{{ reg }}->FMR = ({{ reg }}->FMR & ~CAN_FMR_CAN2SB_Msk) | (startBank << CAN_FMR_CAN2SB_Pos);
 
 	// Leave the initialization mode for the filter
 	{{ reg }}->FMR &= ~CAN_FMR_FINIT;
