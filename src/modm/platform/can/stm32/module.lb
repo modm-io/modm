@@ -184,6 +184,7 @@ def build(env):
         properties["combined_isr"] = True
     else:
         properties["combined_isr"] = False
+    properties["target_has_can2"] = (("instance" in driver) and len(driver["instance"]) > 1)
 
     if "instance" not in driver:
         properties.update(get_substitutions(0, device, env))
