@@ -41,12 +41,9 @@ main()
 
 	MODM_LOG_INFO << "CAN Test Program" << modm::endl;
 
-	MODM_LOG_INFO << "Dividing filter bank..." << modm::endl;
-	CanFilter::setStartFilterBankForCan2(14);
+	MODM_LOG_INFO << "Initializing Can..." << modm::endl;
 
-	MODM_LOG_INFO << "Initializing Can1..." << modm::endl;
-
-	// Initialize Can1
+	// Initialize Can
 	if (false) {
 		Can::connect<GpioInputA11::Rx, GpioOutputA12::Tx>(Gpio::InputType::PullUp);
 	} else {
@@ -54,7 +51,7 @@ main()
 	}
 	Can::initialize<Board::SystemClock, 125_kbps>(9);
 
-	MODM_LOG_INFO << "Setting up Filter for Can1..." << modm::endl;
+	MODM_LOG_INFO << "Setting up Filter for Can..." << modm::endl;
 	// Receive every message
 	CanFilter::setFilter(0, CanFilter::FIFO0,
 			CanFilter::ExtendedIdentifier(0),
@@ -65,7 +62,7 @@ main()
 			CanFilter::StandardFilterMask(0));
 
 	// Send a message
-	MODM_LOG_INFO << "Sending message on Can1... nn" << modm::endl;
+	MODM_LOG_INFO << "Sending message on Can... nn" << modm::endl;
 	modm::can::Message msg1(1, 1);
 	msg1.setExtended(true);
 	msg1.data[0] = 0x11;
@@ -75,7 +72,7 @@ main()
 	{
 		if (Can::isMessageAvailable())
 		{
-			MODM_LOG_INFO << "Can1: Message is available..." << modm::endl;
+			MODM_LOG_INFO << "Can: Message is available..." << modm::endl;
 			modm::can::Message message;
 			uint8_t filter_id;
 			Can::getMessage(message, &filter_id);
