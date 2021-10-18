@@ -12,15 +12,14 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
-#include <modm/processing/rtos.hpp>
+#include <freertos/FreeRTOS.h>
+#include <freertos/semphr.h>
+#include <freertos/task.h>
 
 using namespace modm::platform;
 
 /**
  * This example uses four threads to check if task switching works correctly.
- *
- * It also check if the FreeRTOS TCP stack can be compiled.
- * No TCP functionality in this example (yet).
  *
  * What to expect?
  * ---------------
@@ -38,27 +37,43 @@ using namespace modm::platform;
  */
 
 // ----------------------------------------------------------------------------
+SemaphoreHandle_t semaphore = nullptr;
+StaticSemaphore_t semaphoreBuffer;
+
 template <typename Gpio, int SleepTime>
-class P: modm::rtos::Thread
+class P
 {
 	char c;
 	uint8_t i = 0;
 	volatile float a = 10.f;
+	TaskHandle_t task;
+	StaticTask_t taskBuffer;
+	StackType_t stack[1024/4];
 public:
-	P(char c): Thread(2,1<<10), c(c) {}
+	P(char c): c(c)
+	{
+		xTaskCreateStatic(
+			[](void* obj) { reinterpret_cast<P*>(obj)->run(); },
+			"anon",
+			(1024 / 4),
+			this,
+			2,
+			stack,
+			&taskBuffer);
+	}
 
 	void run()
 	{
 		Gpio::setOutput();
 		while (true)
 		{
-			sleep(SleepTime * MILLISECONDS);
+			vTaskDelay(SleepTime * (configTICK_RATE_HZ / 1000.0));
 
 			Gpio::toggle();
 			{
-				static modm::rtos::Mutex lm;
-				modm::rtos::MutexGuard m(lm);
+				xSemaphoreTake(semaphore, portMAX_DELAY);
 				MODM_LOG_INFO << char(i + c);
+				xSemaphoreGive(semaphore);
 			}
 			i = (i+1)%10;
 			a *= 3.141f;
@@ -70,12 +85,14 @@ P< Board::LedRed,   260      > p1('0');
 P< Board::LedGreen, 260 + 10 > p2('a');
 P< Board::LedBlue,  260 + 20 > p3('A');
 
-
 // ----------------------------------------------------------------------------
 int
 main()
 {
 	Board::initialize();
-	modm::rtos::Scheduler::schedule();
+
+	semaphore = xSemaphoreCreateMutexStatic(&semaphoreBuffer);
+	vTaskStartScheduler();
+
 	return 0;
 }
