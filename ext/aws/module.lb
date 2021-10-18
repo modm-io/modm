@@ -82,8 +82,7 @@ def prepare(module, options):
     module.depends(
         ":architecture:assert",
         ":cmsis:device",
-        ":platform:clock",
-        ":platform:heap")
+        ":platform:clock")
 
     module.add_submodule(FreeRTOS_TCP())
 
@@ -95,7 +94,8 @@ def build(env):
     env.substitutions = {
         "core": core,
         "frequency": env.get("frequency", 1000),
-        "with_debug": env.has_module(":debug")
+        "with_debug": env.has_module(":debug"),
+        "with_heap": env.has_module(":platform:heap"),
     }
     path = core.replace("cortex-m", "ARM_CM").replace("+", "").replace("fd", "f").upper()
     path = path.replace("CM7F", "CM7/r0p1") # use subfolder for M7

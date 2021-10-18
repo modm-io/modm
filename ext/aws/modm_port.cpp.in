@@ -20,6 +20,7 @@ void vApplicationStackOverflowHook(TaskHandle_t /*pxTask*/, char *pcTaskName)
 	modm_assert(false, "freertos.stack", "FreeRTOS detected a stack overflow!", pcTaskName);
 }
 
+%% if with_heap
 // ----------------------------------------------------------------------------
 // Make the Newlib heap thread-safe with FreeRTOS
 
@@ -64,6 +65,33 @@ void vPortFree(void *pv)
 		traceFREE(pv, 0);
 	}
 }
+%% else
+#if configUSE_TIMERS == 1
+static StaticTask_t timers_task_storage;
+static StackType_t timers_task_stack_storage[configTIMER_TASK_STACK_DEPTH];
+extern "C"
+void vApplicationGetTimerTaskMemory(StaticTask_t** ppxTimerTaskTCBBuffer,
+									StackType_t** ppxTimerTaskStackBuffer,
+									uint32_t* pulTimerTaskStackSize)
+{
+	*ppxTimerTaskTCBBuffer = &timers_task_storage;
+	*ppxTimerTaskStackBuffer = timers_task_stack_storage;
+	*pulTimerTaskStackSize = configTIMER_TASK_STACK_DEPTH;
+}
+#endif
+
+static StaticTask_t idle_task_storage;
+static StackType_t idle_task_stack_storage[configMINIMAL_STACK_SIZE];
+extern "C"
+void vApplicationGetIdleTaskMemory(StaticTask_t** ppxIdleTaskTCBBuffer,
+								   StackType_t** ppxIdleTaskStackBuffer,
+								   uint32_t* pulIdleTaskStackSize)
+{
+	*ppxIdleTaskTCBBuffer = &idle_task_storage;
+	*ppxIdleTaskStackBuffer = idle_task_stack_storage;
+	*pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
+}
+%% endif
 
 %% if with_debug
 #include <modm/debug.hpp>
