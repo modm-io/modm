@@ -2,6 +2,7 @@
  * Copyright (c) 2019, Ethan Slattery
  * Copyright (c) 2020, Erik Henriksson
  * Copyright (c) 2021, Niklas Hauser
+ * Copyright (c) 2022, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -13,6 +14,8 @@
 
 #include <cmath>
 #include <modm/math/units.hpp>
+#include <utility>
+#include <algorithm>
 
 namespace modm::platform
 {
@@ -27,19 +30,41 @@ GenericClockController::updateCoreFrequency()
 	delay_ns_per_loop = computeDelayNsPerLoop(Core_Hz);
 }
 
-template< uint32_t Core_Hz >
+template< uint32_t Core_Hz, uint16_t Vdd_mV=3300 >
 uint32_t
 GenericClockController::setFlashLatency()
 {
+%% if device_family == "e5x":
+{% raw %}
+	// TODO: move to device files
+	constexpr std::array<std::pair<uint32_t, uint8_t>, 6> waitStates0{{
+		{22_MHz, 0}, { 44_MHz, 1}, { 67_MHz, 2},
+		{89_MHz, 3}, {111_MHz, 4}, {120_MHz, 5}
+	}};
+	constexpr std::array<std::pair<uint32_t, uint8_t>, 6> waitStates1{{
+		{ 24_MHz, 0}, { 51_MHz, 1}, { 77_MHz, 2},
+		{101_MHz, 3}, {119_MHz, 4}, {120_MHz, 5}
+	}};
+{% endraw %}
+	constexpr auto waitStates = (Vdd_mV >= 2700) ? waitStates1 : waitStates0;
+	constexpr auto rws = std::lower_bound(std::begin(waitStates), std::end(waitStates), Core_Hz,
+		[](auto w1, auto w2) {
+			return w1.first < w2;
+		})->second;
+	NVMCTRL->CTRLA.bit.RWS = rws;
+	NVMCTRL->CTRLA.bit.AUTOWS = 0;
+%% else
 	// See table 41.11 (NVM Characteristics) in the datasheet
 	if constexpr (Core_Hz > 24_MHz) {
 		NVMCTRL->CTRLB.bit.RWS = NVMCTRL_CTRLB_RWS_HALF_Val;
 	} else {
 		NVMCTRL->CTRLB.bit.RWS = NVMCTRL_CTRLB_RWS_SINGLE_Val;
 	}
+%% endif
 	return Core_Hz;
 }
 
+%% if device_family == "d2x"
 template< ClockPeripheral peripheral >
 void
 GenericClockController::connect(ClockGenerator clockGen)
@@ -49,6 +74,6 @@ GenericClockController::connect(ClockGenerator clockGen)
 		GCLK_CLKCTRL_GEN(uint32_t(clockGen)) |
 		GCLK_CLKCTRL_ID(uint32_t(peripheral));
 }
-
+%% endif
 }
 

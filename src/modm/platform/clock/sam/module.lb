@@ -3,6 +3,7 @@
 #
 # Copyright (c) 2016-2018, Niklas Hauser
 # Copyright (c) 2017, Fabian Greif
+# Copyright (c) 2022, Christopher Durand
 #
 # This file is part of the modm project.
 #
@@ -19,11 +20,30 @@ def prepare(module, options):
     if not options[":target"].has_driver("gclk:sam"):
         return False
 
-    module.depends(":cmsis:device", ":architecture:delay")
+    module.depends(":cmsis:device", ":architecture:delay", ":platform:clock")
     return True
 
 def build(env):
+    target = env[":target"].identifier
+
+    if target.family in ["d", "e"] and target.series.startswith("5"):
+        device_family = "e5x"
+    elif target.family == "d" and target.series.startswith("2"):
+        device_family = "d2x"
+    else:
+        raise RuntimeError("Unsupported device")
+
+    if device_family == "e5x":
+        boot_frequency = "48'000'000"
+    else: # d2x
+        boot_frequency = "1'000'000"
+
+    env.substitutions = {
+        "target": target,
+        "boot_frequency": boot_frequency,
+        "device_family": device_family
+    }
     env.outbasepath = "modm/src/modm/platform/clock"
-    env.copy("gclk.hpp")
+    env.template("gclk.hpp.in")
     env.template("gclk.cpp.in")
     env.template("gclk_impl.hpp.in")

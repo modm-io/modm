@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2020-2021, Niklas Hauser
  * Copyright (c) 2020, Erik Henriksson
+ * Copyright (c) 2022, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -23,6 +24,7 @@ namespace modm::platform
 constinit uint16_t modm_fastdata delay_fcpu_MHz(computeDelayMhz(GenericClockController::BootFrequency));
 constinit uint16_t modm_fastdata delay_ns_per_loop(computeDelayNsPerLoop(GenericClockController::BootFrequency));
 
+%% if device_family == "d2x"
 bool
 GenericClockController::initOsc8MHz(uint32_t waitCycles)
 {
@@ -118,5 +120,5 @@ GenericClockController::setSystemClock(ClockSource source, uint32_t waitCycles)
 
 	return waitCycles;
 }
-
+%% endif
 }

@@ -21,6 +21,7 @@ namespace modm::platform
 /// @ingroup modm_platform_gclk
 /// @{
 
+%% if device_family == "d2x"
 enum class
 ClockSource : uint32_t
 {
@@ -83,6 +84,7 @@ ClockPeripheral : uint32_t
 	I2s1 = GCLK_CLKCTRL_ID_I2S_1_Val
 };
 /// @}
+%% endif
 
 /**
  * Clock management
@@ -92,16 +94,17 @@ ClockPeripheral : uint32_t
 class GenericClockController
 {
 public:
-	static constexpr uint32_t BootFrequency = 1'000'000;
+	static constexpr uint32_t BootFrequency = {{ boot_frequency }};
 
-	template< uint32_t Core_Hz>
+	template< uint32_t Core_Hz, uint16_t Vdd_mV=3300 >
 	static uint32_t
 	setFlashLatency();
 
-  template< uint32_t Core_Hz >
+	template< uint32_t Core_Hz >
 	static void
 	updateCoreFrequency();
 
+%% if device_family == "d2x"
 	static bool
 	initOsc8MHz(uint32_t waitCycles = 2048);
 
@@ -119,7 +122,6 @@ public:
 	template< ClockPeripheral peripheral >
 	static void
 	connect(ClockGenerator clockGen);
-
 private:
 
 	enum class
@@ -127,6 +129,7 @@ private:
 	{
 		DFLL48M = 0,
 	};
+%% endif
 };
 
 }
