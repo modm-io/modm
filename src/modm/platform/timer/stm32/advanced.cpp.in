@@ -37,7 +37,7 @@ modm::platform::Timer{{ id }}::disable()
 void
 modm::platform::Timer{{ id }}::setMode(Mode mode, SlaveMode slaveMode,
 		SlaveModeTrigger slaveModeTrigger, MasterMode masterMode
-%% if target["family"] in ["f3", "f7"]
+%% if advanced_extended
 		, MasterMode2 masterMode2
 %% endif
 		)
@@ -55,7 +55,7 @@ modm::platform::Timer{{ id }}::setMode(Mode mode, SlaveMode slaveMode,
 
 	// ARR Register is buffered, only Under/Overflow generates update interrupt
 	TIM{{ id }}->CR1 = TIM_CR1_ARPE | TIM_CR1_URS | static_cast<uint32_t>(mode);
-%% if target["family"] in ["f3", "f7"]
+%% if advanced_extended
 	TIM{{ id }}->CR2 = 	static_cast<uint32_t>(masterMode) |
 						static_cast<uint32_t>(masterMode2);
 %% else

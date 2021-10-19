@@ -107,8 +107,11 @@ def prepare(module, options):
 
     global props
     device = options[":target"]
-    props["target"] = device.identifier
+    props["target"] = target = device.identifier
     props["types"] = set()
+    # extended advanced control timer with 6 channels and trigger out 2
+    props["advanced_extended"] = target.family not in ["f0", "f1", "f2", "f4", "l0", "l1"] or \
+            target.family == "f3" and target.name not in ["73", "78"]
 
     props["timer_vectors"] = tim_vectors = defaultdict(list)
     vectors = [v["name"] for v in device.get_driver("core")["vector"] if "TIM" in v["name"]]

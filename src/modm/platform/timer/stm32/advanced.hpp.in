@@ -107,7 +107,7 @@ public:
 			SlaveMode slaveMode = SlaveMode::Disabled,
 			SlaveModeTrigger slaveModeTrigger = SlaveModeTrigger::Internal0,
 			MasterMode masterMode = MasterMode::Reset
-%% if target["family"] in ["f3", "f7"]
+%% if advanced_extended
 			, MasterMode2 masterMode2 = MasterMode2::Reset
 %% endif
 			);
