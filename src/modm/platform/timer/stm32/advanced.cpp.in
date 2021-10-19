@@ -83,7 +83,7 @@ modm::platform::Timer{{ id }}::configureInputChannel(uint32_t channel,
 
 	if (channel <= 1)
 	{
-		uint32_t offset = 8 * channel;
+		const uint32_t offset = 8 * channel;
 
 		flags <<= offset;
 		flags |= TIM{{ id }}->CCMR1 & ~(0xff << offset);
@@ -97,14 +97,28 @@ modm::platform::Timer{{ id }}::configureInputChannel(uint32_t channel,
 				TIM{{ id }}->CR2 &= ~TIM_CR2_TI1S;
 		}
 	}
+%% if advanced_extended
+	else if (channel <= 3) {
+%% else
 	else {
-		uint32_t offset = 8 * (channel - 2);
+%% endif
+		const uint32_t offset = 8 * (channel - 2);
 
 		flags <<= offset;
 		flags |= TIM{{ id }}->CCMR2 & ~(0xff << offset);
 
 		TIM{{ id }}->CCMR2 = flags;
 	}
+%% if advanced_extended
+	else {
+		const uint32_t offset = 8 * (channel - 4);
+
+		flags <<= offset;
+		flags |= TIM{{ id }}->CCMR3 & ~(0xff << offset);
+
+		TIM{{ id }}->CCMR3 = flags;
+	}
+%% endif
 
 	TIM{{ id }}->CCER |= (TIM_CCER_CC1E | static_cast<uint32_t>(polarity)) << (channel * 4);
 }
@@ -126,21 +140,35 @@ modm::platform::Timer{{ id }}::configureOutputChannel(uint32_t channel,
 
 	if (channel <= 1)
 	{
-		uint32_t offset = 8 * channel;
+		const uint32_t offset = 8 * channel;
 
 		flags <<= offset;
 		flags |= TIM{{ id }}->CCMR1 & ~(0xff << offset);
 
 		TIM{{ id }}->CCMR1 = flags;
 	}
+%% if advanced_extended
+	else if (channel <= 3) {
+%% else
 	else {
-		uint32_t offset = 8 * (channel - 2);
+%% endif
+		const uint32_t offset = 8 * (channel - 2);
 
 		flags <<= offset;
 		flags |= TIM{{ id }}->CCMR2 & ~(0xff << offset);
 
 		TIM{{ id }}->CCMR2 = flags;
 	}
+%% if advanced_extended
+	else {
+		const uint32_t offset = 8 * (channel - 4);
+
+		flags <<= offset;
+		flags |= TIM{{ id }}->CCMR3 & ~(0xff << offset);
+
+		TIM{{ id }}->CCMR3 = flags;
+	}
+%% endif
 
 	// Disable Repetition Counter (FIXME has to be done here for some unknown reason)
 	TIM{{ id }}->RCR = 0;
@@ -166,21 +194,36 @@ OutputComparePreload preload)
 
 	if (channel <= 1)
 	{
-		uint32_t offset = 8 * channel;
+		const uint32_t offset = 8 * channel;
 
 		flags <<= offset;
 		flags |= TIM{{ id }}->CCMR1 & ~(0xff << offset);
 
 		TIM{{ id }}->CCMR1 = flags;
 	}
+%% if advanced_extended
+	else if (channel <= 3) {
+%% else
 	else {
-		uint32_t offset = 8 * (channel - 2);
+%% endif
+		const uint32_t offset = 8 * (channel - 2);
 
 		flags <<= offset;
 		flags |= TIM{{ id }}->CCMR2 & ~(0xff << offset);
 
 		TIM{{ id }}->CCMR2 = flags;
 	}
+%% if advanced_extended
+	else {
+		const uint32_t offset = 8 * (channel - 4);
+
+		flags <<= offset;
+		flags |= TIM{{ id }}->CCMR3 & ~(0xff << offset);
+
+		TIM{{ id }}->CCMR3 = flags;
+	}
+%% endif
+
 
 	// Disable Repetition Counter (FIXME has to be done here for some unknown reason)
 	TIM{{ id }}->RCR = 0;
@@ -210,7 +253,11 @@ uint32_t modeOutputPorts)
 			flags |= TIM{{ id }}->CCMR1 & ~(TIM_CCMR1_OC1M << offset);
 			TIM{{ id }}->CCMR1 = flags;
 		}
+%% if advanced_extended
+		else if (channel <= 3) {
+%% else
 		else {
+%% endif
 			uint32_t offset = 8 * (channel - 2);
 
 			flags <<= offset;
@@ -218,6 +265,16 @@ uint32_t modeOutputPorts)
 
 			TIM{{ id }}->CCMR2 = flags;
 		}
+%% if advanced_extended
+		else {
+			uint32_t offset = 8 * (channel - 4);
+
+			flags <<= offset;
+			flags |= TIM{{ id }}->CCMR3 & ~(TIM_CCMR1_OC1M << offset);
+
+			TIM{{ id }}->CCMR3 = flags;
+		}
+%% endif
 	}
 
 	// Disable Repetition Counter (FIXME has to be done here for some unknown reason)

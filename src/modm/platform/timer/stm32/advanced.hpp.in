@@ -360,7 +360,17 @@ public:
 	static inline void
 	setCompareValue(uint32_t channel, uint16_t value)
 	{
+%% if advanced_extended
+		if(channel <= 4) {
+			*(&TIM{{ id }}->CCR1 + (channel - 1)) = value;
+		} else if(channel == 5) {
+			TIM{{ id }}->CCR5 = value;
+		} else if(channel == 6) {
+			TIM{{ id }}->CCR6 = value;
+		}
+%% else
 		*(&TIM{{ id }}->CCR1 + (channel - 1)) = value;
+%% endif
 	}
 
 	static inline uint16_t
