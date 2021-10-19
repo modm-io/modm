@@ -796,12 +796,24 @@ public:
 %% endif
 	};
 
-	static bool
-	setVoltageScaling(VoltageScaling voltage, uint32_t waitCycles = 2048);
-
 	/// Configure power source, has to be called exactly once early on start-up
 	static bool
 	configurePowerSource(PowerSource source, uint32_t waitCycles = 2048);
+%% endif
+
+%% if has_r1mode
+	enum class
+	VoltageScaling : uint32_t
+	{
+		Boost = 0,
+		Scale1 = PWR_CR1_VOS_0,
+		Scale2 = PWR_CR1_VOS_1
+	};
+%% endif
+
+%% if target.family == "h7" or has_r1mode
+	static bool
+	setVoltageScaling(VoltageScaling voltage, uint32_t waitCycles = 2048);
 %% endif
 
 public:

@@ -57,10 +57,17 @@ __modm_initialize_platform(void)
 	PWR->CR1 |= PWR_CR1_DBP;
 	// Enable Data Tighly Coupled Memory (DTCM) and backup SRAM (BKPSRAM)
 	RCC->AHB1ENR |= RCC_AHB1ENR_DTCMRAMEN | RCC_AHB1ENR_BKPSRAMEN;
-%% elif target.family in ["g0", "l4", "l5"]
+%% elif target.family in ["g0", "g4", "l4", "l5"]
+%% if target.family in ["l4", "g4"]
+	RCC->APB1ENR1 |= RCC_APB1ENR1_PWREN;
+%% else
+#ifdef PWR_CR2_IOSV
+	RCC->APB1ENR1 |= RCC_APB1ENR1_PWREN;
+#endif
+%% endif
+
 #ifdef PWR_CR2_IOSV
 	// Enable VDDIO2
-	RCC->APB1ENR1 |= RCC_APB1ENR1_PWREN;
 	PWR->CR2 |= PWR_CR2_IOSV;
 #endif
 %% endif

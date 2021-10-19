@@ -66,6 +66,8 @@ def build(env):
         ((target["family"] == "f4") and target["name"] in ["27", "29", "37", "39", "46", "69", "79"])
     properties["vos0_overdrive"] = (target["family"] == "h7") and \
         target["name"] in ["42", "43", "45", "47", "50", "53", "55", "57"]
+    properties["has_r1mode"] = (target["family"] == "g4") or \
+        (target["family"] == "l4" and target["name"][0] in ["p", "q", "r", "s"])
     properties["pllsai_p_usb"] = (target["family"] == "f7") or \
         ((target["family"] == "f4") and target["name"] in ["46", "69", "79"])
     properties["cfgr1"] = ("CDCFGR1" if target.name in ["a0", "a3", "b0", "b3"] else "D1CFGR") \

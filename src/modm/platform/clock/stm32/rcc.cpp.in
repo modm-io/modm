@@ -358,6 +358,30 @@ Rcc::enableOverdriveMode(uint32_t waitCycles)
 }
 %% endif
 
+%% if has_r1mode
+bool
+Rcc::setVoltageScaling(VoltageScaling voltage, uint32_t waitCycles)
+{
+	const auto currentSetting = PWR->CR1 & PWR_CR1_VOS;
+	if (voltage == VoltageScaling::Boost) {
+		PWR->CR5 &= ~PWR_CR5_R1MODE;
+	} else {
+		PWR->CR5 |= PWR_CR5_R1MODE;
+	}
+	if (voltage != VoltageScaling::Scale2) {
+		if(static_cast<VoltageScaling>(currentSetting) == VoltageScaling::Scale2) {
+			PWR->CR1 = (PWR->CR1 & ~PWR_CR1_VOS) | PWR_CR1_VOS_0;
+			while (PWR->SR2 & PWR_SR2_VOSF)
+				if (--waitCycles == 0) return false;
+		}
+	} else {
+		PWR->CR1 = (PWR->CR1 & ~PWR_CR1_VOS) | PWR_CR1_VOS_1;
+	}
+
+	return true;
+}
+%% endif
+
 %% if target.family == "h7"
 bool
 Rcc::setVoltageScaling(VoltageScaling voltage, uint32_t waitCycles)
