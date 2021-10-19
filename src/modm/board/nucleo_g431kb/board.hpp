@@ -95,6 +95,7 @@ struct SystemClock {
 		};
 		Rcc::enablePll(Rcc::PllSource::InternalClock, pllFactors);
 		Rcc::setFlashLatency<Frequency>();
+		Rcc::setVoltageScaling(Rcc::VoltageScaling::Boost); // recommended for >150 MHz
 		// switch system clock to PLL output
 		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
 		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
