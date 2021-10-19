@@ -97,6 +97,10 @@ jobs:
         if: always()
         run: |
           (cd examples && ../tools/scripts/examples_compile.py samg55_xplained_pro)
+      - name: Examples SAME5x Devices
+        if: always()
+        run: |
+          (cd examples && ../tools/scripts/examples_compile.py same54_xplained_pro)
       - name: Examples SAMV Devices
         if: always()
         run: |

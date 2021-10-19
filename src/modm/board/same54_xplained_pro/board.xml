@@ -1,0 +1,14 @@
+<library>
+  <repositories>
+    <repository>
+      <path>../../../../repo.lb</path>
+    </repository>
+  </repositories>
+
+  <options>
+    <option name="modm:target">same54p20a-au</option>
+  </options>
+  <modules>
+    <module>modm:board:same54-xplained-pro</module>
+  </modules>
+</library>
