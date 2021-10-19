@@ -15,7 +15,7 @@ def init(module):
     module.description = "External Interrupt"
 
 def prepare(module, options):
-    if not options[":target"].partname.startswith("samd"):
+    if not options[":target"].partname.startswith("samd2"):
         return False
 
     module.depends(":cmsis:device", ":platform:gclk", ":platform:gpio")
