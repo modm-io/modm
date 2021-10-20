@@ -119,7 +119,7 @@ jobs:
       - name: Examples STM32L0 Series
         if: always()
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py nucleo_l031k6)
+          (cd examples && ../tools/scripts/examples_compile.py nucleo_l031k6 nucleo_l053r8)
       - name: Examples STM32L1 Series
         if: always()
         run: |
