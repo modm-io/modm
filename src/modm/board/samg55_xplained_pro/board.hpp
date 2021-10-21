@@ -27,7 +27,16 @@ struct SystemClock
 
 	static constexpr uint32_t Frequency = PllAMult * SlowClkFreqHz; // CPU core frequency
 	static constexpr uint32_t Usb = PllBMult * SlowClkFreqHz;
-	static constexpr uint32_t Mck = Frequency; // Master clock, used by most peripherals
+	static constexpr uint32_t Mck = Frequency; // Master clock: default used by most peripherals
+	// Programmable clocks: optionally used by certain peripherals
+	static constexpr uint32_t Pck0 = Mck;
+	static constexpr uint32_t Pck1 = Mck;
+	static constexpr uint32_t Pck2 = Mck;
+	static constexpr uint32_t Pck3 = Mck;
+	static constexpr uint32_t Pck4 = Mck;
+	static constexpr uint32_t Pck5 = Mck;
+	static constexpr uint32_t Pck6 = Mck;
+	static constexpr uint32_t Pck7 = Mck;
 
 	static bool inline
 	enable()
