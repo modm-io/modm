@@ -39,13 +39,13 @@ class NetworkInitTask : modm::rtos::Thread
 {
 public:
 	NetworkInitTask()
-	: Thread(5, 2048, "network_init")
+	: Thread(configMAX_PRIORITIES - 1, 2048, "network_init")
 	{}
 
 	void
 	run()
 	{
-		uint8_t ipAddress[4] { 192, 168, 1, 1 };
+		uint8_t ipAddress[4] { 192, 168, 178, 42 };
 		uint8_t netmask[4] { 255, 255, 255, 0 };
 		uint8_t gatewayAddress[4] { 0, 0, 0, 0 };
 		uint8_t dnsAddress[4] { 0, 0, 0, 0 };
@@ -174,7 +174,7 @@ public:
 			char buffer[16];
 			FreeRTOS_inet_ntoa(clientAddress.sin_addr, buffer);
 			xTaskCreate(HttpConnection::run, HttpConnection::name, configMINIMAL_STACK_SIZE * 5,
-					reinterpret_cast<void *>(connectedSocket), configMAX_PRIORITIES, 0);
+					reinterpret_cast<void *>(connectedSocket), configMAX_PRIORITIES - 3, 0);
 		}
 	}
 };
@@ -212,7 +212,7 @@ void vApplicationIPNetworkEventHook(eIPCallbackEvent_t eNetworkEvent)
 		return;
 
 	if (not taskCreated) {
-		xTaskCreate(HttpServerListener::run, HttpServerListener::name, configMINIMAL_STACK_SIZE * 2, 0, configMAX_PRIORITIES + 1, 0);
+		xTaskCreate(HttpServerListener::run, HttpServerListener::name, configMINIMAL_STACK_SIZE * 2, 0, configMAX_PRIORITIES - 2, 0);
 		taskCreated = true;
 	}
 
