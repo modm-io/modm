@@ -6,6 +6,14 @@
 %% set table_copy = []
 %% set table_zero = []
 
+%% if vector_table_location == "ram"
+/* Round up the number of vector table entries to the nearest power-of-two and multiply by 8. */
+__vec_alignment = (1 << LOG2CEIL({{ highest_irq + 16 }})) * 8;
+/* compute the vector table offset from start of RAM */
+__vec_offset = ALIGN(TOTAL_STACK_SIZE, __vec_alignment);
+%% else
+__vec_offset = TOTAL_STACK_SIZE;
+%% endif
 
 SECTIONS
 {
@@ -15,6 +23,8 @@ SECTIONS
 
 {{ linker.section_rom("FLASH") }}
 
+
+{{ linker.section_stack(cont_ram_regions[0].name|upper, "__vec_offset - TOTAL_STACK_SIZE") }}
 
 %% if vector_table_location == "ram"
 {{ linker.section_vector_ram(cont_ram_regions[0].name|upper) }}
@@ -37,9 +47,6 @@ SECTIONS
 %% endif
 
 
-{{ linker.section_stack("CCM") }}
-
-	/* CCM can only be accessed by D-Bus, do not place .fastcode here! */
 {{ linker.section("CCM AT >FLASH", "fastdata", sections=["data_ccm"]) }}
 %% do table_copy.append("fastdata")
 

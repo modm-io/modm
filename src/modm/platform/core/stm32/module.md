@@ -105,6 +105,7 @@ SRAMs explicitly to free up the space in the lower sections.
 
 Some STM32F4 have a battery-backed backup SRAM and a single-cycle CCM that is
 only accessible to the core via the D-Code bus, thus the CCM is not DMA-able.
+Therefore the main stack is placed into SRAM, even though it is slower than CCM.
 
 ```
             ┌────────────────────────┐◄ __backup_end
@@ -133,17 +134,17 @@ only accessible to the core via the D-Code bus, thus the CCM is not DMA-able.
             │  .data_sram1           │
             │  .data                 │
             │  .fastcode             │
-   SRAM1    │ (.vector_ram)          │◄ only if remapped into RAM
+            │ (.vector_ram)          │◄ only if remapped into RAM
+            │  +PROCESS_STACK_SIZE   │◄ __process_stack_top
+   SRAM1    │  +MAIN_STACK_SIZE      │◄ __main_stack_top
 0x2000 0000 └────────────────────────┘◄ __sram1_start
 
             ┌────────────────────────┐◄ __ccm_end
-            │  +HEAP_CCM             │
-   D-Code   │  .noinit_ccm           │
-    only    │  .bss_ccm              │
-   access   │  .data_ccm             │
-            │  .fastdata             │
-            │  +PROCESS_STACK_SIZE   │◄ __process_stack_top
-    CCM     │  +MAIN_STACK_SIZE      │◄ __main_stack_top
+   D-Code   │  +HEAP_CCM             │
+    only    │  .noinit_ccm           │
+   access   │  .bss_ccm              │
+            │  .data_ccm             │
+    CCM     │  .fastdata             │
 0x1000 0000 └────────────────────────┘◄ __ccm_start
 
             ┌────────────────────────┐◄ __flash_end

@@ -8,7 +8,7 @@
 
 %% if vector_table_location == "ram"
 /* Round up the number of vector table entries to the nearest power-of-two and multiply by 8. */
-__vec_alignment = (1 << LOG2CEIL({{ number_of_interrupts + 16 }})) * 8;
+__vec_alignment = (1 << LOG2CEIL({{ highest_irq + 16 }})) * 8;
 /* compute the vector table offset from start of RAM */
 __vec_offset = ALIGN(TOTAL_STACK_SIZE, __vec_alignment);
 %% else
