@@ -33,19 +33,22 @@ def build(env):
     env.template("startup_platform.c.in")
 
     # delay code that must be tuned for each family
-    # (cycles per loop, setup cost in loops, us shift)
+    # (cycles per loop, setup cost in loops, max cpu frequency)
     tuning = {
-        "d": (3, 4, 5), # CM0 tested on D21 in RAM
-        "g": (6, 4, 5), # G55
-        "v": (4, 4, 3), # V70
-    }.get(target.family, (4, 4, 5))
+        "d": (3, 4,  48), # CM0 tested on D21 in RAM
+        "g": (6, 4, 120), # G55
+        "v": (4, 4, 300), # V70
+    }[target.family]
+
+    # us_shift is an optimization to limit error via fractional math
+    us_shift = 32 - math.ceil(math.log2(tuning[2] * 1e6))
 
     env.substitutions.update({
         "with_cm0": env[":target"].has_driver("core:cortex-m0*"),
         "with_cm7": env[":target"].has_driver("core:cortex-m7*"),
         "loop": tuning[0],
         "shift": int(math.log2(tuning[1])),
-        "us_shift": tuning[2],
+        "us_shift": us_shift,
         "with_assert": env.has_module(":architecture:assert")
     })
     env.template("../cortex/delay_ns.cpp.in", "delay_ns.cpp")

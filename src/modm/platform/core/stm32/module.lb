@@ -33,30 +33,34 @@ def build(env):
     env.template("startup_platform.c.in")
 
     # delay code that must be tuned for each family
-    # (cycles per loop, setup cost in loops, max us shift)
+    # (cycles per loop, setup cost in loops)
     tuning = {
-        "g4": (3,  4, 5), # CM4  tested on G476 in RAM
-        "l0": (3,  4, 6), # CM0+ tested on L031 in RAM
-        "g0": (3,  4, 5), # CM0+ tested on G072 in RAM
-        "f7": (4,  4, 4), # CM7  tested on F767 in ITCM
-        "h7": (4,  4, 3), # CM7  tested on H743 in ITCM
-        "l4": (3,  4, 5), # CM4  tested on L476 in SRAM2
-        "f3": (3,  4, 5), # CM4  tested on F334, F303 in CCM RAM
+        "g4": (3,  4), # CM4  tested on G476 in RAM
+        "l0": (3,  4), # CM0+ tested on L031 in RAM
+        "g0": (3,  4), # CM0+ tested on G072 in RAM
+        "f7": (4,  4), # CM7  tested on F767 in ITCM
+        "h7": (4,  4), # CM7  tested on H743 in ITCM
+        "l4": (3,  4), # CM4  tested on L476 in SRAM2
+        "f3": (3,  4), # CM4  tested on F334, F303 in CCM RAM
 
         # Defaults of (4, 4) for these families:
-        "l1": (4,  4, 6), # CM3  tested on L152 in RAM
-        "f0": (4,  4, 6), # CM3  tested on F071 in RAM
-        "f1": (4,  4, 5), # CM3  tested on F103 in RAM
-        "f4": (4,  4, 4), # CM4  tested on F401, F411, F446 in RAM
-        "f2": (4,  4, 4), # CM3  guessed based on documentation
+        "l1": (4,  4), # CM3  tested on L152 in RAM
+        "f0": (4,  4), # CM3  tested on F071 in RAM
+        "f1": (4,  4), # CM3  tested on F103 in RAM
+        "f4": (4,  4), # CM4  tested on F401, F411, F446 in RAM
+        "f2": (4,  4), # CM3  guessed based on documentation
     }[target.family]
+
+    # us_shift is an optimization to limit error via fractional math
+    frequency = int(env[":target"].get_driver("rcc")["max-frequency"][0])
+    us_shift = 32 - math.ceil(math.log2(frequency))
 
     env.substitutions.update({
         "with_cm0": env[":target"].has_driver("core:cortex-m0*"),
         "with_cm7": env[":target"].has_driver("core:cortex-m7*"),
         "loop": tuning[0],
         "shift": int(math.log2(tuning[1])),
-        "us_shift": tuning[2],
+        "us_shift": us_shift,
         "with_assert": env.has_module(":architecture:assert")
     })
     env.template("../cortex/delay_ns.cpp.in", "delay_ns.cpp")
