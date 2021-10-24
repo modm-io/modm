@@ -27,10 +27,10 @@ SECTIONS
 {{ linker.section_stack(cont_ram_regions[0].name|upper, "__vec_offset - TOTAL_STACK_SIZE") }}
 
 %% if vector_table_location == "ram"
-{{ linker.section_vector_ram(cont_ram_regions[0].name|upper) }}
+{{ linker.section_vector_ram(cont_ram_regions[0].name|upper, table_copy) }}
 %% endif
 
-{{ linker.section_ram(cont_ram_regions[0].name|upper, "FLASH",
+{{ linker.section_ram(cont_ram_regions[0].name|upper, "FLASH", table_copy, table_zero,
                       sections_data=["fastcode", "data_" + cont_ram_regions[0].contains[0].name],
                       sections_bss=["bss_" + cont_ram_regions[0].contains[0].name]) }}
 
@@ -38,8 +38,7 @@ SECTIONS
 
 
 %% if "backup" in regions
-{{ linker.section("BACKUP AT >FLASH", "data_backup") }}
-%% do table_copy.append("data_backup")
+{{ linker.section("BACKUP AT >FLASH", "data_backup", table_copy) }}
 
 {{ linker.section_heap("BACKUP", "heap_backup", sections=["bss_backup", "noinit_backup"]) }}
 %% do table_heap.append({"name": "heap_backup", "prop": "0x4009"})
@@ -47,8 +46,7 @@ SECTIONS
 %% endif
 
 
-{{ linker.section("CCM AT >FLASH", "fastdata", sections=["data_ccm"]) }}
-%% do table_copy.append("fastdata")
+{{ linker.section("CCM AT >FLASH", "fastdata", table_copy, sections=["data_ccm"]) }}
 
 {{ linker.section_heap("CCM", "heap_ccm", sections=["bss_ccm", "noinit_ccm"]) }}
 %% do table_heap.append({"name": "heap_ccm", "prop": "0x2002"})

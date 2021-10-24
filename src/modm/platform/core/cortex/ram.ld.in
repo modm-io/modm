@@ -27,10 +27,10 @@ SECTIONS
 {{ linker.section_stack(cont_ram_regions[0].name|upper, "__vec_offset - TOTAL_STACK_SIZE") }}
 
 %% if vector_table_location == "ram"
-{{ linker.section_vector_ram(cont_ram_regions[0].name|upper) }}
+{{ linker.section_vector_ram(cont_ram_regions[0].name|upper, table_copy) }}
 %% endif
 
-{{ linker.section_ram(cont_ram_regions[0].name|upper, "FLASH",
+{{ linker.section_ram(cont_ram_regions[0].name|upper, "FLASH", table_copy, table_zero,
                       sections_data=["fastdata", "fastcode", "data_" + cont_ram_regions[0].contains[0].name],
                       sections_bss=["bss_" + cont_ram_regions[0].contains[0].name]) }}
 

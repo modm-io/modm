@@ -17,11 +17,10 @@ SECTIONS
 
 
 %% if vector_table_location == "ram"
-{{ linker.section_vector_ram("ITCM") }}
+{{ linker.section_vector_ram("ITCM", table_copy) }}
 %% endif
 
-{{ linker.section("ITCM AT >FLASH", "fastcode", sections=["data_itcm"]) }}
-%% do table_copy.append("fastcode")
+{{ linker.section("ITCM AT >FLASH", "fastcode", table_copy, sections=["data_itcm"]) }}
 
 {{ linker.section_heap("ITCM", "heap_itcm", sections=["noinit_itcm"]) }}
 %% do table_heap.append({"name": "heap_itcm", "prop": "0x201f"})
@@ -29,7 +28,7 @@ SECTIONS
 
 {{ linker.section_stack("CONT_DTCM") }}
 
-{{ linker.section_ram(cont_ram_regions[0].name|upper, "FLASH",
+{{ linker.section_ram(cont_ram_regions[0].name|upper, "FLASH", table_copy, table_zero,
                       sections_data=["fastdata", "data_" + cont_ram_regions[0].contains[0].name],
                       sections_bss=["bss_" + cont_ram_regions[0].contains[0].name]) }}
 
@@ -40,8 +39,7 @@ SECTIONS
 
 
 %% if "backup" in regions
-{{ linker.section("BACKUP AT >FLASH", "data_backup") }}
-%% do table_copy.append("data_backup")
+{{ linker.section("BACKUP AT >FLASH", "data_backup", table_copy) }}
 
 {{ linker.section_heap("BACKUP", "heap_backup", sections=["bss_backup", "noinit_backup"]) }}
 %% do table_heap.append({"name": "heap_backup", "prop": "0x4009"})

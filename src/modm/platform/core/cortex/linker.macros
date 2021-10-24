@@ -50,7 +50,8 @@ TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 %% endmacro
 
 
-%% macro section_vector_ram(memory)
+%% macro section_vector_ram(memory, table_copy)
+	%% do table_copy.append("vector_table_ram")
 	.vectors (NOLOAD) :
 	{
 		__vector_table_ram_start = .;
@@ -84,15 +85,10 @@ TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 
 
 %% macro section_tables(memory, copy, zero, heap)
-%% if vector_table_location == "ram"
-	%% do copy.insert(0, "vector_table_ram")
-%% endif
 	.rodata :
 	{
 		. = ALIGN(4);
 		__table_zero_intern_start = .;
-		LONG(__bss_start)
-		LONG(__bss_end)
 	%% for name in zero
 		LONG(__{{name}}_start)
 		LONG(__{{name}}_end)
@@ -100,9 +96,6 @@ TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		__table_zero_intern_end = .;
 
 		__table_copy_intern_start = .;
-		LONG(__data_load)
-		LONG(__data_start)
-		LONG(__data_end)
 	%% for name in copy
 		LONG(__{{name}}_load)
 		LONG(__{{name}}_start)
@@ -143,7 +136,8 @@ TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 	} >{{memory}}
 %% endmacro
 
-%% macro section(memory, name, sections=[])
+%% macro section(memory, name, table_copy, sections=[])
+	%% do table_copy.append(name)
 	.{{name}} :
 	{
 		. = ALIGN(4);
@@ -151,18 +145,20 @@ TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		__{{name}}_start = .;
 		*(.{{name}} .{{name}}.*)
 		. = ALIGN(4);
+		__{{name}}_end = .;
 	} >{{memory}}
 
+	%% do table_copy.extend(sections)
 	%% for section in sections
 	.{{section}} :
 	{
+		__{{section}}_load = LOADADDR(.{{section}});
 		__{{section}}_start = .;
 		*(.{{section}} .{{section}}.*)
 		. = ALIGN(4);
 		__{{section}}_end = .;
 	} >{{memory}}
 	%% endfor
-	__{{name}}_end = .;
 %% endmacro
 
 
@@ -192,8 +188,7 @@ TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 	%% for cont_region in cont_ram_regions
 		%% for region in cont_region.contains
 			%% if region.index
-{{ section(cont_region.name|upper + " AT >FLASH", "data_"+region.name) }}
-				%% do table_copy.append("data_"+region.name)
+{{ section(cont_region.name|upper + " AT >FLASH", "data_"+region.name, table_copy) }}
 				%% do table_zero.append("bss_"+region.name)
 			%% endif
 
@@ -280,7 +275,8 @@ TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 %% endmacro
 
 
-%% macro section_ram(memory, rom, sections_data=[], sections_bss=[])
+%% macro section_ram(memory, rom, table_copy, table_zero, sections_data=[], sections_bss=[])
+	%% do table_copy.append("data")
 	.data :
 	{
 		. = ALIGN(4);
@@ -288,8 +284,10 @@ TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		__data_start = .;
 		*(.data .data.* .gnu.linkonce.d.*)
 		. = ALIGN(4);
+		__data_end = .;
 	} >{{memory}} AT >{{rom}}
 
+	%% do table_copy.extend(sections_data)
 	%% for section in sections_data
 	.{{section}} :
 	{
@@ -300,8 +298,8 @@ TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		__{{section}}_end = .;
 	} >{{memory}} AT >{{rom}}
 	%% endfor
-	__data_end = .;
 
+	%% do table_zero.append("bss")
 	.bss (NOLOAD) :
 	{
 		__bss_start = . ;
@@ -310,6 +308,7 @@ TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		__bss_end = .;
 	} >{{memory}}
 
+	%% do table_zero.extend(sections_bss)
 	%% for section in sections_bss
 	.{{section}} (NOLOAD) :
 	{
@@ -319,7 +318,6 @@ TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		__{{section}}_end = .;
 	} >{{memory}}
 	%% endfor
-	__bss_end = .;
 
 	.noinit (NOLOAD) :
 	{
