@@ -15,24 +15,32 @@
 %% endmacro
 
 %% macro prefix()
-MEMORY
-{
-%% for memory in (memories + cont_ram_regions)
-	{{ memory.name | upper }} ({{ memory.access }}) : ORIGIN = {{ "0x%08X" % memory.start }}, LENGTH = {{ memory.size }}
-%% endfor
-{{ linkerscript_memory | indent(first=True) }}
-}
-
-%% for memory in memories
-__{{memory.name}}_start = ORIGIN({{memory.name|upper}});
-__{{memory.name}}_end = ORIGIN({{memory.name|upper}}) + LENGTH({{memory.name|upper}});
-%% endfor
-
 OUTPUT_FORMAT("elf32-littlearm")
 OUTPUT_ARCH(arm)
 ENTRY(Reset_Handler)
 
-/* the handler stack is used for main program as well as interrupts */
+MEMORY
+{
+	%% for memory in memories
+	{{ memory.name | upper }} ({{ memory.access }}) : ORIGIN = {{ "0x%08X" % memory.start }}, LENGTH = {{ memory.size }}
+	%% endfor
+	%% for memory in cont_ram_regions
+	%% if memory.cont_name != memory.name
+	{{ memory.cont_name | upper }} ({{ memory.access }}) : ORIGIN = {{ "0x%08X" % memory.start }}, LENGTH = {{ memory.size }}
+	%% endif
+	%% endfor
+	%% if linkerscript_memory
+{{ linkerscript_memory | indent(first=True) }}
+	%% endif
+}
+
+	%% for memory in memories
+__{{memory.name}}_start = ORIGIN({{memory.name|upper}});
+__{{memory.name}}_end = ORIGIN({{memory.name|upper}}) + LENGTH({{memory.name|upper}});
+	%% endfor
+	%#
+
+/* The handler stack is used for main program as well as interrupts */
 MAIN_STACK_SIZE    = {{ options[":platform:cortex-m:main_stack_size"] }};
 PROCESS_STACK_SIZE = {{ process_stack_size }};
 TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
@@ -40,22 +48,23 @@ TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 
 
 %% macro section_vector_rom(memory)
+	/* Read-only vector table in {{memory}} */
 	.text :
 	{
 		__vector_table_rom_start = .;
 		__vector_table_ram_load = .;
-		/* Initial stack address, Reset and NMI handler */
 		KEEP(*(.vector_rom))
+		__vector_table_rom_end = .;
 	} >{{memory}}
 %% endmacro
 
 
 %% macro section_vector_ram(memory, table_copy)
+	/* Read-Write vector table in {{memory}} */
 	%% do table_copy.append("vector_table_ram")
 	.vectors (NOLOAD) :
 	{
 		__vector_table_ram_start = .;
-		/* Vector table in RAM, only if remapped */
 		KEEP(*(.vector_ram))
 		. = ALIGN(4);
 		__vector_table_ram_end = .;
@@ -64,10 +73,11 @@ TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 
 
 %% macro section_stack(memory, start=None)
+	/* Main stack in {{memory}} */
 	.stack (NOLOAD) :
 	{
 	%% if start != None
-		. = {{ start }};
+		. += {{ start }};
 	%% endif
 		__stack_start = .;
 
@@ -85,6 +95,7 @@ TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 
 
 %% macro section_tables(memory, copy, zero, heap)
+	/* Memory layout configuration tables */
 	.rodata :
 	{
 		. = ALIGN(4);
@@ -104,35 +115,27 @@ TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		__table_copy_intern_end = .;
 
 		__table_zero_extern_start = .;
+	%% if linkerscript_extern_zero
 {{ linkerscript_extern_zero | indent(8, first=True) }}
+	%% endif
 		__table_zero_extern_end = .;
 		__table_copy_extern_start = .;
+	%% if linkerscript_extern_copy
 {{ linkerscript_extern_copy | indent(8, first=True) }}
+	%% endif
 		__table_copy_extern_end = .;
 
-		/* SRAM properties bit mask (16-bit):
-		 *
-		 * - 0x0001: accessible via S-Bus
-		 * - 0x0002: accessible via D-Bus
-		 * - 0x0004: accessible via I-Bus
-		 * - 0x0008: accessible via DMA
-		 * - 0x0010: accessible via DMA2D
-		 *
-		 * - 0x1FE0: reserved
-		 *
-		 * - 0x2000: Fast memory (Core- or Tightly-Coupled)
-		 * - 0x4000: non-volatile (or battery backed) memory
-		 * - 0x8000: external memory
-		 */
+		/* See `modm:architecture:memory` for bitmask */
 		__table_heap_start = .;
 	%% for section in heap
 		LONG({{ section.prop }})
 		LONG(__{{ section.name }}_start)
 		LONG(__{{ section.name }}_end)
 	%% endfor
+	%% if linkerscript_extern_heap
 {{ linkerscript_extern_heap | indent(8, first=True) }}
+	%% endif
 		__table_heap_end = .;
-
 	} >{{memory}}
 %% endmacro
 
@@ -147,9 +150,9 @@ TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		. = ALIGN(4);
 		__{{name}}_end = .;
 	} >{{memory}}
-
 	%% do table_copy.extend(sections)
 	%% for section in sections
+	%#
 	.{{section}} :
 	{
 		__{{section}}_load = LOADADDR(.{{section}});
@@ -172,8 +175,8 @@ TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		. = ALIGN(4);
 		__{{section}}_end = .;
 	} >{{ placement if placement else memory }}
+	%#
 	%% endfor
-
 	.{{name}} (NOLOAD) :
 	{
 		. = ALIGN(4);
@@ -187,20 +190,22 @@ TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 %% macro all_heap_sections(table_copy, table_zero, table_heap)
 	%% for cont_region in cont_ram_regions
 		%% for region in cont_region.contains
+	/* Sections in {{ region.name|upper }} */
 			%% if region.index
-{{ section(cont_region.name|upper + " AT >FLASH", "data_"+region.name, table_copy) }}
+{{ section(cont_region.cont_name|upper + " AT >FLASH", "data_"+region.name, table_copy) }}
 				%% do table_zero.append("bss_"+region.name)
 			%% endif
-
-{{ section_heap(region.name|upper, "heap_"+region.name, cont_region.name|upper,
+{{ section_heap(region.name|upper, "heap_"+region.name, cont_region.cont_name|upper,
 				sections=(["bss_"+region.name] if region.index else []) + ["noinit_"+region.name]) }}
 			%% do table_heap.insert(region.index, {"name": "heap_"+region.name, "prop": "0x2013" if "dtcm" in region.name else "0x001f"})
+			%#
 		%% endfor
 	%% endfor
 %% endmacro
 
 
 %% macro section_rom(memory)
+	/* Read-only sections in {{memory}} */
 	.text :
 	{
 		*(.text .text.* .gnu.linkonce.t.*)
@@ -219,7 +224,6 @@ TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		__init_array_end = .;
 
 		__hardware_init_start = .;
-		/* Table symbols are alphabetically sorted! */
 		KEEP(*(SORT(.hardware_init.order_*)))
 		KEEP(*(SORT(.hardware_init)))
 		. = ALIGN(4);
@@ -233,13 +237,15 @@ TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		__build_id = .;
 		KEEP(*(.note.gnu.build-id))
 	} >{{memory}}
+
 	/* We do not call static destructors ever */
 	/DISCARD/ :
 	{
 		*(.fini_array .fini_array.*)
 	}
-
 	%% if with_cpp_exceptions
+	%#
+	/* C++ exception unwind tables */
 	.exidx :
 	{
 		. = ALIGN(4);
@@ -255,9 +261,8 @@ TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		KEEP(*(.eh_frame*))
 	} >{{memory}}
 	%% else
-	/* Unwind tables are used to unwind the stack for C++ exceptions. Even
-	 * though we disabled exceptions, pre-compiled libraries such as libstdc++
-	 * still have to raise exceptions. */
+	%#
+	/* C++ exception unwind tables are discarded */
 	/DISCARD/ :
 	{
 		*(.ARM.extab* .gnu.linkonce.armextab.*)
@@ -266,9 +271,10 @@ TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 	}
 	%% endif
 	%% if not with_heap
+	%#
+	/* Catch use of dynamic memory without `modm:platform:heap` module. */
 	/DISCARD/ :
 	{
-		/* See `modm:platform:heap` module for an explanation! */
 		*({{no_heap_section}})
 	}
 	%% endif
@@ -276,6 +282,7 @@ TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 
 
 %% macro section_ram(memory, rom, table_copy, table_zero, sections_data=[], sections_bss=[])
+	/* Read-write sections in {{memory}} */
 	%% do table_copy.append("data")
 	.data :
 	{
@@ -286,9 +293,9 @@ TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		. = ALIGN(4);
 		__data_end = .;
 	} >{{memory}} AT >{{rom}}
-
 	%% do table_copy.extend(sections_data)
 	%% for section in sections_data
+	%#
 	.{{section}} :
 	{
 		__{{section}}_load = LOADADDR(.{{section}});
@@ -298,7 +305,7 @@ TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		__{{section}}_end = .;
 	} >{{memory}} AT >{{rom}}
 	%% endfor
-
+	%#
 	%% do table_zero.append("bss")
 	.bss (NOLOAD) :
 	{
@@ -307,9 +314,9 @@ TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		. = ALIGN(4);
 		__bss_end = .;
 	} >{{memory}}
-
 	%% do table_zero.extend(sections_bss)
 	%% for section in sections_bss
+	%#
 	.{{section}} (NOLOAD) :
 	{
 		__{{section}}_start = . ;
@@ -318,7 +325,7 @@ TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		__{{section}}_end = .;
 	} >{{memory}}
 	%% endfor
-
+	%#
 	.noinit (NOLOAD) :
 	{
 		__noinit_start = .;

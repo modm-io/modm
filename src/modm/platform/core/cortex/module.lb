@@ -94,10 +94,12 @@ def common_memories(env):
             if cont and (cont[-1]["start"] + cont[-1]["size"] == m["start"]):
                 cont[-1]["size"] += m["size"]
                 cont[-1]["contains"].append({**m, "index": index})
+                if not cont[-1]["cont_name"].startswith("cont_"):
+                    cont[-1]["cont_name"] = "cont_" + cont[-1]["cont_name"]
             else:
                 cont.append(dict(m))
                 cont[-1]["contains"] = [{**m, "index": index}]
-                cont[-1]["name"] = "cont_" + cont[-1]["name"]
+                cont[-1]["cont_name"] = cont[-1]["name"]
             index += 1
 
     properties = {

@@ -15,32 +15,35 @@ SECTIONS
 
 {{ linker.section_rom("FLASH") }}
 
+{{ linker.section_stack(cont_ram_regions[0].cont_name|upper) }}
 
-{{ linker.section_stack(cont_ram_regions[0].name|upper) }}
-
-{{ linker.section_ram(cont_ram_regions[0].name|upper, "FLASH", table_copy, table_zero,
+{{ linker.section_ram(cont_ram_regions[0].cont_name|upper, "FLASH", table_copy, table_zero,
                       sections_data=["data_" + cont_ram_regions[0].contains[0].name],
                       sections_bss=["bss_" + cont_ram_regions[0].contains[0].name]) }}
 
 {{ linker.all_heap_sections(table_copy, table_zero, table_heap) }}
 %% if with_crashcatcher
+	%#
+	/* Bottom of crash stack for `modm:platform:fault` */
 	g_crashCatcherStack = . - 500;
+	%#
 %% endif
-
 
 %% if vector_table_location == "ram"
 {{ linker.section_vector_ram("CCM", table_copy) }}
 %% endif
 
+	/* Sections in memory region CCM */
 {{ linker.section("CCM AT >FLASH", "fastcode", table_copy, sections=["fastdata", "data_ccm"]) }}
 
 {{ linker.section_heap("CCM", "heap_ccm", sections=["bss_ccm", "noinit_ccm"]) }}
 %% do table_heap.append({"name": "heap_ccm", "prop": "0x2006"})
 %% do table_zero.append("bss_ccm")
 
-
+%% if linkerscript_sections
 {{ linkerscript_sections | indent(first=True) }}
-
+	%#
+%% endif
 
 {{ linker.section_tables("FLASH", table_copy, table_zero, table_heap) }}
 

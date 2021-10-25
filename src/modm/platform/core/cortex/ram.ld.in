@@ -7,12 +7,9 @@
 %% set table_zero = []
 
 %% if vector_table_location == "ram"
-/* Round up the number of vector table entries to the nearest power-of-two and multiply by 8. */
-__vec_alignment = (1 << LOG2CEIL({{ highest_irq + 16 }})) * 8;
-/* compute the vector table offset from start of RAM */
-__vec_offset = ALIGN(TOTAL_STACK_SIZE, __vec_alignment);
-%% else
-__vec_offset = TOTAL_STACK_SIZE;
+/* Computes stack offset so that vector table is aligned */
+__stack_offset = ALIGN(TOTAL_STACK_SIZE, (1 << LOG2CEIL({{ highest_irq + 16 }})) * 8) - TOTAL_STACK_SIZE;
+%#
 %% endif
 
 SECTIONS
@@ -23,25 +20,29 @@ SECTIONS
 
 {{ linker.section_rom("FLASH") }}
 
-
-{{ linker.section_stack(cont_ram_regions[0].name|upper, "__vec_offset - TOTAL_STACK_SIZE") }}
+{{ linker.section_stack(cont_ram_regions[0].cont_name|upper, "__stack_offset" if vector_table_location == "ram" else None) }}
 
 %% if vector_table_location == "ram"
-{{ linker.section_vector_ram(cont_ram_regions[0].name|upper, table_copy) }}
+{{ linker.section_vector_ram(cont_ram_regions[0].cont_name|upper, table_copy) }}
 %% endif
 
-{{ linker.section_ram(cont_ram_regions[0].name|upper, "FLASH", table_copy, table_zero,
+{{ linker.section_ram(cont_ram_regions[0].cont_name|upper, "FLASH", table_copy, table_zero,
                       sections_data=["fastdata", "fastcode", "data_" + cont_ram_regions[0].contains[0].name],
                       sections_bss=["bss_" + cont_ram_regions[0].contains[0].name]) }}
 
 {{ linker.all_heap_sections(table_copy, table_zero, table_heap) }}
+
 %% if with_crashcatcher
-	g_crashCatcherStack = . - 500;
+    %#
+    /* Bottom of crash stack for `modm:platform:fault` */
+    g_crashCatcherStack = . - 500;
+    %#
 %% endif
 
-
+%% if linkerscript_sections
 {{ linkerscript_sections | indent(first=True) }}
-
+    %#
+%% endif
 
 {{ linker.section_tables("FLASH", table_copy, table_zero, table_heap) }}
 
