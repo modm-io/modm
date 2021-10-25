@@ -99,6 +99,9 @@ def generate(env, **kw):
         env["ARTIFACT_COMSTR"] =         "%s╭───Artifact─── %s$SOURCE\n" \
                                          "%s╰────Cache────> %s$ARTIFACT_FILEPATH%s" % install
 
+        env["RUN_OPENOCD_COMSTR"] =      "%s╭────────────── %s\n" \
+                                         "%s╰───OpenOCD───> %s$CONFIG_DEVICE_NAME%s" % install
+
         env["DEBUG_OPENOCD_COMSTR"] =    "%s╭─────GDB─────> %s$SOURCE\n" \
                                          "%s╰───OpenOCD───> %s$CONFIG_DEVICE_NAME%s" % install
 

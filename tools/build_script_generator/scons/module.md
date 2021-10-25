@@ -283,6 +283,18 @@ scons program-remote profile={debug|release} [host={ip or hostname}] [firmware={
 
 Writes the executable onto your target connected to a remote OpenOCD process
 running on your own computer (host=`localhost`) or somewhere else.
+(\* *only ARM Cortex-M targets*)
+
+
+#### scons openocd
+
+```
+scons openocd
+```
+
+Starts an OpenOCD process to attach a remote debugger to (e.g. with
+`scons program-remote` or `scons debug-remote`).
+(\* *only ARM Cortex-M targets*)
 
 
 #### scons run
@@ -342,7 +354,7 @@ Launches GDB for post-mortem debugging with the firmware identified by the
 See the `modm:platform:fault` module for details how to receive the coredump data.
 
 
-#### scons program-remote
+#### scons debug-remote
 
 ```
 scons debug-remote profile={debug|release} ui={tui|web} [host={ip or hostname}] [firmware={hash or file}]

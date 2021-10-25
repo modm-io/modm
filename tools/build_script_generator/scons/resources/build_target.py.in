@@ -64,6 +64,9 @@ def build_target(env, sources):
 	env.Alias("reset-bmp", env.ResetBMP())
 	env.Alias("reset-remote", env.ResetGdbRemote())
 
+	# Start only OpenOCD to attach a external (remote) debugger
+	env.Alias("openocd", env.OpenOcd())
+
 	# Default to OpenOCD
 	env.Alias("program", "program-openocd")
 	env.Alias("reset", "reset-openocd")

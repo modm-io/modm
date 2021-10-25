@@ -66,7 +66,7 @@ class OpenOcdBackend:
 
 
 # -----------------------------------------------------------------------------
-def call(commands=None, config=None, search=None, blocking=True, silent=False):
+def call(commands=None, config=None, search=None, blocking=True, silent=False, verbose=False):
     commands = utils.listify(commands)
     config = utils.listify(config)
     search = utils.listify(search)
@@ -83,7 +83,8 @@ def call(commands=None, config=None, search=None, blocking=True, silent=False):
         " ".join(map('-f "{}"'.format, config)),
         " ".join(map('-c "{}"'.format, commands))
     )
-    # print(command_openocd)
+    if verbose:
+        print(command_openocd)
 
     kwargs = {"cwd": os.getcwd(), "shell": True}
     if blocking:
