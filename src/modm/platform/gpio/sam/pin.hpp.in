@@ -33,6 +33,8 @@ enum class PeripheralPin
 	BitBang,
 	Rx,
 	Tx,
+	Rts,
+	Cts,
 	ExtInt,
 	Dm,
 	Dp,
@@ -40,7 +42,22 @@ enum class PeripheralPin
 	Sck,
 	Miso,
 	Mosi,
+	Npcs,
+	Spck,
 	Ad,
+	Adtrg,
+	Wkup,
+	Tioa,
+	Tiob,
+	Tclk,
+	Twd,
+	Twck,
+	Pck,
+	I2sck,
+	I2sws,
+	I2sdi,
+	I2sdo,
+	I2smck,
 };
 
 template<typename... Tuples>
@@ -402,13 +419,32 @@ public:
 
 	using Rx = As<PeripheralPin::Rx>;
 	using Tx = As<PeripheralPin::Tx>;
+	using Rts = As<PeripheralPin::Rts>;
+	using Cts = As<PeripheralPin::Cts>;
 	using ExtInt = As<PeripheralPin::ExtInt>;
 	using Dm = As<PeripheralPin::Dm>;
 	using Dp = As<PeripheralPin::Dp>;
+	using Wo = As<PeripheralPin::Wo>;
 	using Sck = As<PeripheralPin::Sck>;
 	using Miso = As<PeripheralPin::Miso>;
 	using Mosi = As<PeripheralPin::Mosi>;
+	using Npcs = As<PeripheralPin::Npcs>;
+	using Spck = As<PeripheralPin::Spck>;
 	using Ad = As<PeripheralPin::Ad>;
+	using Adtrg = As<PeripheralPin::Adtrg>;
+	using Wkup = As<PeripheralPin::Wkup>;
+	using Tioa = As<PeripheralPin::Tioa>;
+	using Tiob = As<PeripheralPin::Tiob>;
+	using Tclk = As<PeripheralPin::Tclk>;
+	using Twd = As<PeripheralPin::Twd>;
+	using Twck = As<PeripheralPin::Twck>;
+	using Pck = As<PeripheralPin::Pck>;
+	using I2sck = As<PeripheralPin::I2sck>;
+	using I2sws = As<PeripheralPin::I2sws>;
+	using I2sdi = As<PeripheralPin::I2sdi>;
+	using I2sdo = As<PeripheralPin::I2sdo>;
+	using I2smck = As<PeripheralPin::I2smck>;
+
 
 	inline static bool
 	read()
