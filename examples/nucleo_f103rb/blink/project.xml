@@ -3,8 +3,11 @@
   <options>
     <option name="modm:build:build.path">../../../build/nucleo_f103rb/blink</option>
   </options>
+  <!-- This just tests the lbuild outpath, don't copy this! -->
+  <outpath>../generated/blink</outpath>
   <modules>
     <module>modm:build:scons</module>
+    <module>modm:build:make</module>
     <module>modm:processing:timer</module>
   </modules>
 </library>

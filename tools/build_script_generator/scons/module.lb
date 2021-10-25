@@ -122,7 +122,7 @@ def build(env):
 
     # Generate the env.BuildTarget tool
     linkerscript = env.get(":platform:cortex-m:linkerscript.override")
-    linkerscript = env.relative_outpath(linkerscript) if linkerscript \
+    linkerscript = env.relcwdoutpath(linkerscript) if linkerscript \
                    else "$BASEPATH/modm/link/linkerscript.ld"
     env.substitutions = env.query("::device")
     env.substitutions.update({
@@ -141,6 +141,7 @@ def post_build(env):
     has_image_source = len(env["::image.source"])
     repositories = [p for p in env.buildlog.repositories if isdir(env.real_outpath(p, basepath="."))]
     repositories.sort(key=lambda name: "0" if name == "modm" else name)
+    generated_paths = [join(env.relcwdoutpath(""), r) for r in repositories]
 
     subs = env.query("::device")
     cache_dir = env["cache_dir"]
@@ -155,24 +156,24 @@ def post_build(env):
         subs["memories"] = []
     # Add SCons specific data
     subs.update({
-        "build_path": env.relative_outpath(env[":build:build.path"]),
-        "cache_dir": env.relative_outpath(cache_dir) if len(cache_dir) else "",
-        "artifact_path": env.relative_outpath(env["path.artifact"]),
-        "generated_paths": repositories,
+        "build_path": env.relcwdoutpath(env[":build:build.path"]),
+        "cache_dir": env.relcwdoutpath(cache_dir) if len(cache_dir) else "",
+        "artifact_path": env.relcwdoutpath(env["path.artifact"]),
+        "generated_paths": generated_paths,
         "is_unittest": is_unittest,
 
         "has_image_source": has_image_source,
         "has_xpcc_generator": has_xpcc_generator,
     })
     if has_image_source:
-        subs["image_source"] = env.relative_outpath(env["::image.source"])
+        subs["image_source"] = env.relcwdoutpath(env["::image.source"])
     if is_unittest:
-        subs["unittest_source"] = env.relative_outpath(env["::unittest.source"])
+        subs["unittest_source"] = env.relcwdoutpath(env["::unittest.source"])
     if has_xpcc_generator:
         subs.update({
-            "generator_source": env.relative_outpath(env.get(":communication:xpcc:generator:source", "")),
+            "generator_source": env.relcwdoutpath(env.get(":communication:xpcc:generator:source", "")),
             "generator_container": env.get(":communication:xpcc:generator:container", ""),
-            "generator_path": env.relative_outpath(env.get(":communication:xpcc:generator:path", "")),
+            "generator_path": env.relcwdoutpath(env.get(":communication:xpcc:generator:path", "")),
             "generator_namespace": env.get(":communication:xpcc:generator:namespace", ""),
         })
     if subs["platform"] == "avr":
@@ -226,7 +227,7 @@ def post_build(env):
                               "relocate": lambda p: env.relative_outpath(p, repo)})
 
     # these are the ONLY files that are allowed to NOT be namespaced with modm!
-    env.outbasepath = "."
+    env.outbasepath = env.cwdpath(".")
     if env["include_sconstruct"]:
         env.template("resources/SConstruct.in", "SConstruct")
 

@@ -38,9 +38,9 @@ CONFIG_AVRDUDE_OPTIONS := {{ avrdude_options }}
 CONFIG_AVRDUDE_BAUDRATE := -b {{ avrdude_baudrate }}
 %% endif
 %% elif core.startswith("cortex-m")
-MODM_OPENOCD_CONFIGFILES += modm/openocd.cfg
-MODM_OPENOCD_GDBINIT += modm/openocd_gdbinit
-MODM_GDBINIT += modm/gdbinit
+MODM_OPENOCD_CONFIGFILES += $(MODM_PATH)/openocd.cfg
+MODM_OPENOCD_GDBINIT += $(MODM_PATH)/openocd_gdbinit
+MODM_GDBINIT += $(MODM_PATH)/gdbinit
 %% if platform == "sam"
 %% if bossac_offset
 MODM_BOSSAC_OFFSET := {{ bossac_offset }}
@@ -51,19 +51,19 @@ MODM_BOSSAC_OPTIONS := {{ bossac_options }}
 %% endif
 %% endif
 %#
-include modm/compiler.mk
+include $(MODM_PATH)/compiler.mk
 
 # Application sources
 APP_SRC := $(APP_SRC:./%=%)
-%% for repo in generated_paths
-APP_SRC := $(filter-out {{repo}}/%,$(APP_SRC))
+%% for repo in repositories
+APP_SRC := $(filter-out {{ repo | relocate }}/%,$(APP_SRC))
 %% endfor
 CPPDEFINES += -I.
 %% if options["::info.git"] != "Disabled"
 %#
 # Git information
-INFO_GIT_FILE := modm/src/info_git.c
-$(INFO_GIT_FILE): $(shell python3 modm/modm_tools/info.py \
+INFO_GIT_FILE := $(MODM_PATH)/src/info_git.c
+$(INFO_GIT_FILE): $(shell python3 $(MODM_PATH)/modm_tools/info.py \
     -o $(INFO_GIT_FILE) -t {{ "git_status" if "Status" in options["::info.git"] else "git" }} --check-rebuild);
 APP_SRC += $(INFO_GIT_FILE)
 CLEAN_FILES += $(INFO_GIT_FILE)
@@ -72,9 +72,9 @@ CPPDEFINES += -DMODM_GIT_INFO{% if "Status" in options["::info.git"] %} -DMODM_G
 %% if options["::info.build"]
 %#
 # Build information
-INFO_BUILD_FILE := modm/src/info_build.c
+INFO_BUILD_FILE := $(MODM_PATH)/src/info_build.c
 $(INFO_BUILD_FILE):
-	@python3 modm/modm_tools/info.py -o $(INFO_BUILD_FILE) -t build --compiler $(CC) \
+	@python3 $(MODM_PATH)/modm_tools/info.py -o $(INFO_BUILD_FILE) -t build --compiler $(CC) \
 		--additions MODM_BUILD_PROJECT_NAME="$(MODM_PROJECT_NAME)"
 APP_SRC += $(INFO_BUILD_FILE)
 CLEAN_FILES += $(INFO_BUILD_FILE)
@@ -86,7 +86,7 @@ CPPDEFINES += -DMODM_BUILD_INFO
 IMAGE_SOURCE := {{image_source}}
 .PRECIOUS: $(IMAGE_SOURCE)/%.cpp
 $(IMAGE_SOURCE)/%.cpp: $(IMAGE_SOURCE)/%.pbm
-	@python3 modm/modm_tools/bitmap.py $^ -o $(dir $^)
+	@python3 $(MODM_PATH)/modm_tools/bitmap.py $^ -o $(dir $^)
 IMAGE_PBM := $(wildcard $(IMAGE_SOURCE)/*.pbm)
 APP_SRC += $(IMAGE_PBM:.pbm=.cpp)
 CPPDEFINES += -I$(IMAGE_SOURCE)
@@ -98,11 +98,11 @@ APP_OBJS := $(addprefix $(BUILDPATH)/,$(APP_SRC))
 %% for suffix in ["cpp", "cxx", "c++", "cc", "c", "sx", "s", "S"]
 APP_OBJS := $(APP_OBJS:.{{suffix}}=.o)
 %% endfor
-LIBRARIES :={% for repo in generated_paths %} $(BUILDPATH)/{{repo}}/lib{{repo}}.a{% endfor %}
+LIBRARIES :={% for repo in repositories %} $(BUILDPATH)/{{repo}}/lib{{repo}}.a{% endfor %}
 
 # Application linking
 .PRECIOUS: $(BUILDPATH)/%.{{program_extension}}
-$(BUILDPATH)/%.{{program_extension}}: $(APP_OBJS) $(LIBRARIES){% if platform != "hosted" %} {{ linkerscript }}{% endif %}
+$(BUILDPATH)/%.{{program_extension}}: $(APP_OBJS) $(LIBRARIES){% if platform != "hosted" %} {{ linkerscript | relocate }}{% endif %}
 	@echo "Linking········" $@
 	@$(CXX) -o $@ $(LINKFLAGS) $(filter %.o,$^) $(LIBPATH) \
 %% if platform != "hosted"
@@ -131,13 +131,25 @@ compile_asm = \
 .PRECIOUS: $(BUILDPATH)/%.o $(BUILDPATH)/%.a
 $(BUILDPATH)/%.o : %.c
 	@$(call compile_c,$@,$<,)
+%% if outpath != "."
+$(BUILDPATH)/%.o : {{outpath}}/%.c
+	@$(call compile_c,$@,$<,)
+%% endif
 %% for suffix in ["cc", "cpp", "cxx", "c++"]
 $(BUILDPATH)/%.o : %.{{suffix}}
 	@$(call compile_cpp,$@,$<,)
+%% if outpath != "."
+$(BUILDPATH)/%.o : {{outpath}}/%.{{suffix}}
+	@$(call compile_cpp,$@,$<,)
+%% endif
 %% endfor
 %% for suffix in ["sx", "s", "S"]
 $(BUILDPATH)/%.o : %.{{suffix}}
 	@$(call compile_asm,$@,$<,)
+%% if outpath != "."
+$(BUILDPATH)/%.o : {{outpath}}/%.{{suffix}}
+	@$(call compile_asm,$@,$<,)
+%% endif
 %% endfor
 %#
 .PRECIOUS: $(BUILDPATH)/%.bin

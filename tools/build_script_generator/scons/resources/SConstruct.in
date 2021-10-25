@@ -25,7 +25,7 @@ import os
 from os.path import join, abspath
 
 %% if cache_dir | length
-CacheDir("{{ cache_dir | modm.windowsify(escape_level=1)}}")
+CacheDir(abspath("{{ cache_dir | modm.windowsify(escape_level=1)}}"))
 %% endif
 env = DefaultEnvironment(tools=[], ENV=os.environ)
 env["CONFIG_PROJECT_NAME"] = "{{ options[":build:project.name"] }}"
