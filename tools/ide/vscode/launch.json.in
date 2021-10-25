@@ -1,0 +1,42 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+%% for config in configs
+        {
+            "name": "Debug ({{ config.profile | capitalize }}, {{ config.tool | capitalize }}, {{ partname }})",
+            "cwd": "${workspaceFolder}",
+            "executable": "{{ config.executable }}",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "device": "{{ partname }}",
+            "runToMain": true,
+    %% if with_freertos
+            "rtos": "FreeRTOS",
+    %% endif
+            "configFiles": [
+    %% for cfg in openocd_cfg
+                "{{ cfg }}",
+    %% endfor
+            ],
+    %% if with_rtt
+            "rttConfig": {
+                "enabled": true,
+                "address": "0x{{"%0x" % rtt_ram.start}}",
+                "searchSize": {{ rtt_ram.size }},
+                "searchId": "modm.rtt.modm",
+                "polling_interval": 1,
+                "decoders": [
+        %% for id in rtt_channels
+                    {
+                        "port": {{id}},
+                        "type": "console"
+                    },
+        %% endfor
+                ]
+            },
+    %% endif
+        },
+%% endfor
+    ]
+}

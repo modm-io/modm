@@ -1,0 +1,32 @@
+{
+    // See https://code.visualstudio.com/docs/editor/tasks
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+%% for config in configs
+        {
+            "type": "shell",
+            "label": "Build ({{ config.profile | capitalize }})",
+            "command": "{{ config.tool }} build profile={{ config.profile }}",
+            "group": "build",
+            "presentation": {
+                "reveal": "silent",
+                "showReuseMessage": false
+            },
+            "problemMatcher": "$gcc"
+        },
+%% endfor
+%% for config in configs
+        {
+            "type": "shell",
+            "label": "Upload ({{ config.profile | capitalize }})",
+            "command": "{{ config.tool }} program profile={{ config.profile }}",
+            "group": "build",
+            "presentation": {
+                "reveal": "silent",
+                "showReuseMessage": false
+            }
+        },
+%% endfor
+    ]
+}
