@@ -25,7 +25,7 @@
 #include <modm/architecture/interface/interrupt.hpp>
 #include <modm/architecture/interface/register.hpp>
 
-%% if target["family"] == "f4"
+%% if dmaType in ["stm32-stream-channel"]
 	%% set reg_prefix = "DMA_SxCR"
 %% elif dmaType in ["stm32-channel-request", "stm32-channel", "stm32-mux"]
 	%% set reg_prefix = "DMA_CCR"
@@ -47,44 +47,47 @@ class DmaBase
 {
 public:
 	// Enums
-%% if target["family"] == "f4"
+%% if dmaType in ["stm32-stream-channel"]
 	enum class
-	Channel : uint32_t
+	Channel
 	{
-		Channel0 = 0,
-		Channel1 = DMA_SxCR_CHSEL_0,
-		Channel2 = DMA_SxCR_CHSEL_1,
-		Channel3 = DMA_SxCR_CHSEL_1 | DMA_SxCR_CHSEL_0,
-		Channel4 = DMA_SxCR_CHSEL_2,
-		Channel5 = DMA_SxCR_CHSEL_2 | DMA_SxCR_CHSEL_0,
-		Channel6 = DMA_SxCR_CHSEL_2 | DMA_SxCR_CHSEL_1,
-		Channel7 = DMA_SxCR_CHSEL_2 | DMA_SxCR_CHSEL_1 | DMA_SxCR_CHSEL_0,
+		Stream0 = 0,
+		Stream1,
+		Stream2,
+		Stream3,
+		Stream4,
+		Stream5,
+		Stream6,
+		Stream7,
+		Channel0 = Stream0,
+		Channel1 = Stream1,
+		Channel2 = Stream2,
+		Channel3 = Stream3,
+		Channel4 = Stream4,
+		Channel5 = Stream5,
+		Channel6 = Stream6,
+		Channel7 = Stream7,
 	};
 
-	enum class
-	MemoryBurstTransfer : uint32_t
-	{
-		Single 		= 0,
-		Increment4 	= DMA_SxCR_MBURST_0,
-		Increment8 	= DMA_SxCR_MBURST_1,
-		Increment16 = DMA_SxCR_MBURST_1 | DMA_SxCR_MBURST_0,
-	};
+	%% set request_count = namespace(max_requests = 0)
+	%% for streams in dma["channels"]
+		%% for stream in streams.stream
+			%% for channel in stream.channel
+				%% if request_count.max_requests < channel.position | int
+					%% set request_count.max_requests = channel.position | int
+				%% endif
+			%% endfor
+		%% endfor
+	%% endfor
 
 	enum class
-	PeripheralBurstTransfer : uint32_t
+	Request : uint32_t
 	{
-		Single 		= 0,
-		Increment4 	= DMA_SxCR_PBURST_0,
-		Increment8 	= DMA_SxCR_PBURST_1,
-		Increment16 = DMA_SxCR_PBURST_1 | DMA_SxCR_PBURST_0,
+	%% for i in range(0, request_count.max_requests + 1)
+		Channel{{ i }} = ({{ i }} << DMA_SxCR_CHSEL_Pos),
+	%% endfor
 	};
 
-	enum class
-	FlowControl : uint32_t
-	{
-		Dma 		= 0,
-		Peripheral 	= DMA_SxCR_PFCTRL, ///< the peripheral is the flow controller
-	};
 %% elif dmaType in ["stm32-channel-request", "stm32-channel", "stm32-mux"]
 	enum class
 	Channel
@@ -189,7 +192,7 @@ public:
 	enum class
 	DataTransferDirection : uint32_t
 	{
-%% if target["family"] == "f4"
+%% if dmaType in ["stm32-stream-channel"]
 		/// Source: DMA_SxPAR; Sink: DMA_SxM0AR
 		PeripheralToMemory 	= 0,
 		/// Source: DMA_SxM0AR; Sink: DMA_SxPAR
@@ -217,34 +220,62 @@ public:
 %% endfor
 	};
 
-	enum class Interrupt {
-		Global = 0x01,
-		TransferComplete = 0x02,
-		HalfTransferComplete = 0x04,
-		Error = 0x08,
-		All = 0x0f,
+%% if dmaType in ["stm32-stream-channel"]
+	enum class InterruptEnable {
+		DirectModeError		= DMA_SxCR_DMEIE,
+		TransferError		= DMA_SxCR_TEIE,
+		HalfTransfer		= DMA_SxCR_HTIE,
+		TransferComplete	= DMA_SxCR_TCIE,
 	};
-	MODM_FLAGS32(Interrupt);
+	MODM_FLAGS32(InterruptEnable);
+
+	enum class InterruptFlags {
+		FifoError = 0b00'0001,
+		DirectModeError = 0b00'0100,
+		Error = 0b00'1000,
+		HalfTransferComplete = 0b01'0000,
+		TransferComplete = 0b10'0000,
+		All = 0b11'1101,
+		Global = All,
+	};
+	MODM_FLAGS32(InterruptFlags);
+%% elif dmaType in ["stm32-channel-request", "stm32-channel", "stm32-mux"]
+	enum class InterruptEnable {
+		TransferComplete	= DMA_CCR_TCIE,
+		HalfTransfer		= DMA_CCR_HTIE,
+		TransferError		= DMA_CCR_TEIE,
+	};
+	MODM_FLAGS32(InterruptEnable);
+
+	enum class InterruptFlags {
+		Global = 0b0001,
+		TransferComplete = 0b0010,
+		HalfTransferComplete = 0b0100,
+		Error = 0b1000,
+		All = 0b1111,
+	};
+	MODM_FLAGS32(InterruptFlags);
+%% endif
 
 	using IrqHandler = void (*)(void);
 
 protected:
-%% if target["family"] == "f4"
+%% if dmaType in ["stm32-stream-channel"]
 	static constexpr uint32_t memoryMask =
-			DMA_SxCR_MBURST_1 | DMA_SxCR_MBURST_0 |	// MemoryBurstTransfer
-			DMA_SxCR_MSIZE_0  | DMA_SxCR_MSIZE_1  |	// MemoryDataSize
-			DMA_SxCR_MINC                         |	// MemoryIncrementMode
-			DMA_SxCR_DIR_0    | DMA_SxCR_DIR_1;    	// DataTransferDirection
+			DMA_SxCR_MBURST_Msk |					// MemoryBurstTransfer
+			DMA_SxCR_MSIZE_Msk |					// MemoryDataSize
+			DMA_SxCR_MINC |							// MemoryIncrementMode
+			DMA_SxCR_DIR_Msk;    					// DataTransferDirection
 	static constexpr uint32_t peripheralMask =
-			DMA_SxCR_PBURST_1 | DMA_SxCR_PBURST_0 |	// PeripheralBurstTransfer
-			DMA_SxCR_PSIZE_0  | DMA_SxCR_PSIZE_1  |	// PeripheralDataSize
-			DMA_SxCR_PINC                         |	// PeripheralIncrementMode
-			DMA_SxCR_DIR_0    | DMA_SxCR_DIR_1;    	// DataTransferDirection
+			DMA_SxCR_PBURST_Msk |					// PeripheralBurstTransfer
+			DMA_SxCR_PSIZE_Msk |					// PeripheralDataSize
+			DMA_SxCR_PINC_Msk |						// PeripheralIncrementMode
+			DMA_SxCR_DIR_Msk;						// DataTransferDirection
 	static constexpr uint32_t configmask =
-			DMA_SxCR_CHSEL_2 | DMA_SxCR_CHSEL_1 | DMA_SxCR_CHSEL_0 |	// Channel
-			DMA_SxCR_PL_1    | DMA_SxCR_PL_0    |						// Priority
-			DMA_SxCR_CIRC    |											// CircularMode
-			DMA_SxCR_PFCTRL;											// FlowControl
+			DMA_SxCR_CHSEL_Msk |					// Channel
+			DMA_SxCR_PL_Msk |						// Priority
+			DMA_SxCR_CIRC_Msk |						// CircularMode
+			DMA_SxCR_PFCTRL_Msk;					// FlowControl
 %% elif dmaType in ["stm32-channel-request", "stm32-channel", "stm32-mux"]
 	static constexpr uint32_t memoryMask =
 			DMA_CCR_MSIZE_0  | DMA_CCR_MSIZE_1  |	// MemoryDataSize
