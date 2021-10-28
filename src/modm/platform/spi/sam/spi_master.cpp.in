@@ -64,6 +64,9 @@ modm::platform::SpiMaster{{ id }}::transfer(uint8_t data)
 	// LSB != Bit0 ?
 	if ( !(state & Bit0) )
 	{
+		// Clear any stale rx data ready status
+		read();
+
 		// wait for previous transfer to finish
 		if (!isTransmitDataRegisterEmpty())
 			return {modm::rf::Running};
@@ -129,3 +132,19 @@ modm::platform::SpiMaster{{ id }}::transfer(
 			return {modm::rf::Stop};
 	}
 }
+
+void modm::platform::SpiMaster{{ id }}::transferBlocking(
+		const uint8_t *tx, std::size_t length)
+{
+	uint8_t index = 0;
+	while(index < length) {
+		// Wait for tx empty
+		while(!isTransmitDataRegisterEmpty());
+		// Write next byte
+		write(tx ? tx[index] : 0);
+		index++;
+	}
+	// wait for the internal shift register to be empty, indicating the transmission of the final byte is complete
+	while(!isTxEmpty());
+}
+

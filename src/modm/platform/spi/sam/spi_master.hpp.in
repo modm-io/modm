@@ -42,6 +42,11 @@ class SpiMaster{{ id }} : public modm::SpiMaster {
 	}
 
 	static inline bool
+	isTxEmpty() {
+		return Regs()->SPI_SR & SPI_SR_TXEMPTY;
+	}
+
+	static inline bool
 	isReceiveDataRegisterFull() {
 		return Regs()->SPI_SR & SPI_SR_RDRF;
 	}
@@ -68,12 +73,10 @@ public:
 
 		if constexpr (!std::is_void<SckPin>::value) {
 			using SckConnector = typename SckPin::template Connector<Flexcom, Flexcom::Sck>;
-			SckPin::setOutput();
 			SckConnector::connect();
 		}
 		if constexpr (!std::is_void<MisoPin>::value) {
 			using MisoConnector = typename MisoPin::template Connector<Flexcom, Flexcom::Miso>;
-			MisoPin::setOutput();
 			MisoConnector::connect();
 		}
 		if constexpr (!std::is_void<MosiPin>::value) {
@@ -124,7 +127,13 @@ public:
 
 	static void
 	transferBlocking(const uint8_t *tx, uint8_t *rx, std::size_t length) {
-		RF_CALL_BLOCKING(transfer(tx, rx, length));
+		// If we do not need to receive data, use a more efficient
+		// transmit-only routine to increase throughput
+		if(rx) {
+			RF_CALL_BLOCKING(transfer(tx, rx, length));
+		} else {
+			transferBlocking(tx, length);
+		}
 	}
 
 	static modm::ResumableResult<uint8_t>
@@ -143,6 +152,17 @@ public:
 			Regs()->SPI_MR &= ~SPI_MR_LLB;
 		}
 	}
+
+protected:
+	/** Perform transmit-only transaction
+	 *
+	 * A faster version of blocking transfer when transmitting only.
+	 *
+	 * If no receive is needed, the next byte can be loaded while the
+	 * current transfer is in progress.
+	 */
+	static void
+	transferBlocking(const uint8_t *tx, std::size_t length);
 };
 
 } // namespace modm::platform
