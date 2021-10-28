@@ -161,7 +161,7 @@ public:
 	static inline constexpr uint8_t
 	getPinChannel()
 	{
-		using Connector = typename Pin::template Connector<Peripherals::Adc, Peripherals::Adc::Ad>;
+		using Connector = typename Pin::Ad::template Connector<Peripherals::Adc, Peripherals::Adc::Ad>;
 		static_assert(Connector::PinSignal::AdcChannel >= 0, "Pin cannot be used as ADC input");
 		return Connector::PinSignal::AdcChannel;
 	}
