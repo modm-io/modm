@@ -72,6 +72,9 @@
 	/// Marks a declaration as deprecated and displays a message.
 	#define modm_deprecated(msg)
 
+	/// Tells the compiler to not generate prologue/epilogue code for this function.
+	#define modm_naked
+
 	/// Places a function in the fastest executable memory:
 	/// instruction cache, core coupled memory or SRAM as fallback.
 	#define modm_fastcode
@@ -134,6 +137,7 @@
 	#define modm_fallthrough		__attribute__((fallthrough))
 	#define modm_noreturn			__attribute__((noreturn))
 	#define modm_warn_unused_result	__attribute__((warn_unused_result))
+	#define modm_naked				__attribute__((naked))
 
 	#ifdef MODM_COMPILER_MINGW
 	 	// FIXME: Windows Object Format PE does not support weak symbols

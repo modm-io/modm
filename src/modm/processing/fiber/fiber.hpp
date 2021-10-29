@@ -1,0 +1,119 @@
+/*
+ * Copyright (c) 2020, Erik Henriksson
+ * Copyright (c) 2021, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+#include "context.h"
+#include "stack.hpp"
+#include <memory>
+
+namespace modm
+{
+
+namespace fiber
+{
+
+void yield();
+
+class Scheduler;
+class Waitable;
+template<class Data_t>
+class Channel;
+
+} // namespace fiber
+
+/**
+ * Fiber is a cooperative threading model consisting of an execution context (stack) and a
+ * function pointer representing the entry function.
+ *
+ * Fibers are scheduled in a round-robin fashion.
+ *
+ * @author Erik Henriksson
+ * @author Niklas Hauser
+ * @ingroup	modm_processing_fiber
+ */
+class Fiber
+{
+	friend class fiber::Scheduler;
+	template<class>
+	friend class fiber::Channel;
+	friend class fiber::Waitable;
+	friend void fiber::yield();
+
+public:
+	template<size_t Size>
+	Fiber(fiber::Stack<Size>& stack, void(*fn)());
+
+	template<size_t Size, class T>
+	requires requires { &std::decay_t<T>::operator(); }
+	Fiber(fiber::Stack<Size>& stack, T&& closure);
+
+protected:
+	inline void
+	jump(Fiber& other);
+
+private:
+	Fiber() = default;
+	Fiber(const Fiber&) = delete;
+
+private:
+	Fiber* next{nullptr};
+	modm_context_t ctx;
+};
+
+}	// namespace modm
+
+#include "scheduler.hpp"
+
+namespace modm
+{
+
+template<size_t Size>
+Fiber::Fiber(fiber::Stack<Size>& stack, void(*fn)())
+{
+	ctx = modm_context_init((uintptr_t) stack.memory,
+							(uintptr_t) stack.memory + stack.size,
+							(uintptr_t) fn,
+							(uintptr_t) fiber::Scheduler::deregisterFiber);
+	// register this fiber to be scheduled
+	fiber::Scheduler::registerFiber(this);
+}
+
+template<size_t Size, class T>
+requires requires { &std::decay_t<T>::operator(); }
+Fiber::Fiber(fiber::Stack<Size>& stack, T&& closure)
+{
+	// Find a suitable aligned area at the top of stack to allocate the closure
+	uintptr_t ptr = uintptr_t(stack.memory) + stack.size;
+	if constexpr (sizeof(std::decay_t<T>))
+	{
+		ptr -= sizeof(std::decay_t<T>);
+		ptr &= ~(std::max(sizeof(void*), alignof(std::decay_t<T>)) - 1u);
+		// construct closure in place
+		::new ((void*)ptr) std::decay_t<T>{std::forward<T>(closure)};
+	}
+	// Encapsulate the proper ABI function call into a simpler function
+	auto function = (uintptr_t) +[](std::decay_t<T>* closure) { (*closure)(); };
+	// format the stack below the allocated closure
+	ctx = modm_context_init((uintptr_t) stack.memory, ptr, function,
+							(uintptr_t) fiber::Scheduler::deregisterFiber);
+	// register this fiber to be scheduled
+	fiber::Scheduler::registerFiber(this);
+}
+
+void
+Fiber::jump(Fiber& other)
+{
+	fiber::Scheduler::current = &other;
+	modm_context_jump(&(ctx.sp), other.ctx.sp);
+}
+
+}	// namespace modm
