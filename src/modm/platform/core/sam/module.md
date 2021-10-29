@@ -25,7 +25,6 @@ Currently only one basic linkerscript is supported.
             │  .data                 │
             │  .fastdata             │
             │  .fastcode             │
-            │  +PROCESS_STACK_SIZE   │◄ __process_stack_top
     RAM     │  +MAIN_STACK_SIZE      │◄ __main_stack_top
 0x2000 0000 └────────────────────────┘◄ __ram_start
 

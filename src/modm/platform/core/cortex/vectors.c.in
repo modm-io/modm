@@ -31,7 +31,6 @@ typedef void (* const FunctionPointer)(void);
 
 // defined in the linkerscript
 extern uint32_t __main_stack_top[];
-extern uint32_t __process_stack_top[];
 
 // Define the vector table
 modm_section(".vector_rom")

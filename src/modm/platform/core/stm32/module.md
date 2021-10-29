@@ -66,7 +66,6 @@ SRAMs explicitly to free up the space in the lower sections.
             │  .fastdata             │
             │  .fastcode             │
             │ (.vector_ram)          │◄ only if remapped into RAM
-            │  +PROCESS_STACK_SIZE   │◄ __process_stack_top
    SRAM1    │  +MAIN_STACK_SIZE      │◄ __main_stack_top
 0x2000 0000 └────────────────────────┘◄ __sram1_start
 
@@ -135,7 +134,6 @@ Therefore the main stack is placed into SRAM, even though it is slower than CCM.
             │  .data                 │
             │  .fastcode             │
             │ (.vector_ram)          │◄ only if remapped into RAM
-            │  +PROCESS_STACK_SIZE   │◄ __process_stack_top
    SRAM1    │  +MAIN_STACK_SIZE      │◄ __main_stack_top
 0x2000 0000 └────────────────────────┘◄ __sram1_start
 
@@ -205,7 +203,6 @@ not DMA-able.
             │  .bss                  │
             │  .data_sram1           │
             │  .data                 │
-            │  +PROCESS_STACK_SIZE   │◄ __process_stack_top
    SRAM1    │  +MAIN_STACK_SIZE      │◄ __main_stack_top
 0x2000 0000 └────────────────────────┘◄ __sram1_start
 
@@ -285,7 +282,6 @@ overflow into the SRAM1/2 sections.
    access   │  .data_dtcm            │
             │  .data                 │
             │  .fastdata             │
-            │  +PROCESS_STACK_SIZE   │◄ __process_stack_top
     DTCM    │  +MAIN_STACK_SIZE      │◄ __main_stack_top
 0x2000 0000 └────────────────────────┘◄ __dtcm_start
 
@@ -391,7 +387,6 @@ placed into the 128kB DTCM, but cannot overflow into D1_SRAM section.
     only    │  .data_dtcm            │
    access   │  .data                 │
             │  .fastdata             │
-            │  +PROCESS_STACK_SIZE   │◄ __process_stack_top
     DTCM    │  +MAIN_STACK_SIZE      │◄ __main_stack_top
 0x2000 0000 └────────────────────────┘◄ __dtcm_start
 
