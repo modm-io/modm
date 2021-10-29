@@ -56,7 +56,7 @@ jobs:
       - name: Hosted Examples
         shell: bash
         run: |
-          (cd examples && python ../tools/scripts/examples_compile.py linux/assert linux/block_device linux/build_info linux/git linux/logger linux/printf)
+          (cd examples && python ../tools/scripts/examples_compile.py linux/assert linux/block_device linux/build_info linux/git linux/logger linux/printf linux/etl linux/fiber)
 
       - name: Hosted Unittests
         if: always()
