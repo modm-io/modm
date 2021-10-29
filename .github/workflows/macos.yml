@@ -53,18 +53,22 @@ jobs:
           git submodule update --init --jobs 8
 
       - name: Hosted Unittests
+        if: always()
         run: |
           (cd test && make run-hosted-darwin)
 
       - name: Hosted Examples
+        if: always()
         run: |
           (cd examples && ../tools/scripts/examples_compile.py linux)
 
       - name: Compile STM32 Examples
+        if: always()
         run: |
           (cd examples && ../tools/scripts/examples_compile.py nucleo_f031k6 nucleo_f103rb nucleo_f303re nucleo_f411re nucleo_f746zg)
           (cd examples && ../tools/scripts/examples_compile.py nucleo_g071rb nucleo_l031k6 nucleo_l152re nucleo_l476rg nucleo_g474re)
 
       - name: Compile AVR Examples
+        if: always()
         run: |
           (cd examples && ../tools/scripts/examples_compile.py avr)

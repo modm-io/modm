@@ -59,6 +59,7 @@ jobs:
           (cd examples && python ../tools/scripts/examples_compile.py linux/assert linux/block_device linux/build_info linux/git linux/logger linux/printf)
 
       - name: Hosted Unittests
+        if: always()
         shell: bash
         run: |
           (cd test && make run-hosted-windows)
