@@ -181,12 +181,17 @@ public:
 	 * @param[in] circularMode Transfer data in circular mode?
 	 */
 	static void
-	configure(DataTransferDirection direction, MemoryDataSize memoryDataSize,
-			PeripheralDataSize peripheralDataSize,
-			MemoryIncrementMode memoryIncrement,
-			PeripheralIncrementMode peripheralIncrement,
-			Priority priority = Priority::Medium,
-			CircularMode circularMode = CircularMode::Disabled)
+	configure(DataTransferDirection direction,
+			  MemoryDataSize memoryDataSize,
+			  PeripheralDataSize peripheralDataSize,
+			  MemoryIncrementMode memoryIncrement,
+			  PeripheralIncrementMode peripheralIncrement,
+			  Priority priority = Priority::Medium,
+			  CircularMode circularMode = CircularMode::Disabled
+%% if doubleBuffer
+			  , DoubleBufferMode doubleBufferMode = DoubleBufferMode::Disabled
+%% endif
+			  )
 	{
 		stop();
 
@@ -194,7 +199,11 @@ public:
 		Base->{{ cr }} = uint32_t(direction) | uint32_t(memoryDataSize) |
 				uint32_t(peripheralDataSize) | uint32_t(memoryIncrement) |
 				uint32_t(peripheralIncrement) | uint32_t(priority) |
-				uint32_t(circularMode);
+				uint32_t(circularMode)
+%% if doubleBuffer
+				| uint32_t(doubleBufferMode)
+%% endif
+				;
 	}
 
 	/**
@@ -235,6 +244,38 @@ public:
 		Base->M0AR = address;
 %% endif
 	}
+
+%% if doubleBuffer
+	/**
+	 * Set the secondary memory address of the DMA channel
+	 *
+	 * Only used in double buffer mode
+	 *
+	 * @param[in] address Source address
+	 */
+	static void
+	setMemoryAddress2(uintptr_t address)
+	{
+		DMA_Channel_TypeDef *Base = (DMA_Channel_TypeDef *) CHANNEL_BASE;
+%% if dmaType in ["stm32-stream-channel"]
+		Base->M1AR = address;
+%% endif
+	}
+
+	/**
+	 * Detect which buffer is currently in use
+	 *
+	 * Only meaningful in double buffer mode
+	 */
+	static bool
+	isPrimaryBufferActive()
+	{
+		DMA_Channel_TypeDef *Base = (DMA_Channel_TypeDef *) CHANNEL_BASE;
+%% if dmaType in ["stm32-stream-channel"]
+		return (Base->CR & DMA_SxCR_CT);
+%% endif
+	}
+%% endif
 
 	/**
 	 * Set the peripheral address of the DMA channel
