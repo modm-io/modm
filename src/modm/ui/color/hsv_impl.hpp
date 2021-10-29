@@ -13,59 +13,52 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_COLOR_HSV_HPP
-#error "Don't include this file directly, use 'hsv.hpp' instead!"
-#endif
+#pragma once
+#include "hsv.hpp"
 
 #include <algorithm>
 
 /**
- * @see http://de.wikipedia.org/wiki/HSV-Farbraum#Umrechnung_RGB_in_HSV.2FHSL
- * @param rgb
+ * @see https://en.wikipedia.org/wiki/HSL_and_HSV
  */
-template<std::unsigned_integral T>
-template<std::unsigned_integral U>
-constexpr modm::color::HsvT<T>::HsvT(const modm::color::RgbT<U> &rgb)
+template<int DH, int DS, int DV>
+template<modm::color::ColorRgb C>
+constexpr modm::color::HsvD<DH, DS, DV>::HsvD(const C& rgb)
 {
+	// OPTIMIZE No need to calculate sharper than the output
+	// Develop CalcType from target types: HueType, SaturationType and ValueType
 	using CalcType = float;
-	const CalcType maxValue = std::numeric_limits<T>::max();
-	const CalcType _red = CalcType(rgb.red) / maxValue;
-	const CalcType _blue = CalcType(rgb.blue) / maxValue;
-	const CalcType _green = CalcType(rgb.green) / maxValue;
-	const CalcType _max = std::max(_red, std::max(_green, _blue));
-	const CalcType _min = std::min(_red, std::min(_green, _blue));
-	const CalcType _diff = _max - _min;
+
+	const CalcType maxValue = ValueType::max;
+
+	const CalcType red = CalcType(ValueType(rgb.getRed()).getValue()) / maxValue;
+	const CalcType green = CalcType(ValueType(rgb.getGreen()).getValue()) / maxValue;
+	const CalcType blue = CalcType(ValueType(rgb.getBlue()).getValue()) / maxValue;
+	const CalcType max = modm::vmax(red, green, blue);
+	const CalcType min = modm::vmin(red, green, blue);
+	const CalcType diff = max - min;
 
 	CalcType hue_temp;
 
-	// CALCULATE HUE
-	if (_max == _min)
+ 	if (max == min)
 	{
 		// all three color values are the same
 		hue_temp = 0;
-		value = _max * maxValue;
-	} else if (_max == _red)
+		value = max * maxValue;
+	} else if (max == red)
 	{
-		hue_temp = 60 * (0 + (_green - _blue) / _diff);
-		value = rgb.red;
-	} else if (_max == _green)
+		hue_temp = 60 * (0 + (green - blue) / diff);
+		value = rgb.getRed();
+	} else if (max == green)
 	{
-		hue_temp = 60 * (2 + (_blue - _red) / _diff);
-		value = rgb.green;
-	} else /*if(_max == _blue)*/
+		hue_temp = 60 * (2 + (blue - red) / diff);
+		value = rgb.getGreen();
+	} else // max == blue
 	{
-		hue_temp = 60 * (4 + (_red - _green) / _diff);
-		value = rgb.blue;
+		hue_temp = 60 * (4 + (red - green) / diff);
+		value = rgb.getBlue();
 	}
 
-	if (hue_temp < 0)
-		hue = (hue_temp + 360) * (maxValue / 360);
-	else
-		hue = (hue_temp) * (maxValue / 360);
-
-	// CALCULATE SATURATION
-	if (_max == 0)
-		saturation = 0;
-	else
-		saturation = _diff / _max * maxValue;
+	hue = hue_temp < 0 ? (hue_temp + 360) * (maxValue / 360) : (hue_temp) * (maxValue / 360);
+	saturation = max ? diff / max * maxValue : 0;
 }

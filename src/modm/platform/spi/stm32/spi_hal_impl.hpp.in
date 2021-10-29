@@ -3,6 +3,7 @@
  * Copyright (c) 2013-2017, Niklas Hauser
  * Copyright (c) 2014, Daniel Krebs
  * Copyright (c) 2020, Mike Wolfram
+ * Copyright (c) 2021, Thomas Sommer
  *
  * This file is part of the modm project.
  *
@@ -81,13 +82,8 @@ void inline
 modm::platform::SpiHal{{ id }}::setDataSize(DataSize dataSize)
 {
 	// TODO: implement as set/reset bit
-%% if "data-size" not in features
-	SPI{{ id }}->CR1 = (SPI{{ id }}->CR1 & ~static_cast<uint32_t>(DataSize::All))
-										 | static_cast<uint32_t>(dataSize);
-%% else
 	SPI{{ id }}->CR2 = (SPI{{ id }}->CR2 & ~static_cast<uint32_t>(DataSize::All))
 										 | static_cast<uint32_t>(dataSize);
-%% endif
 }
 
 void inline
@@ -120,12 +116,6 @@ modm::platform::SpiHal{{ id }}::isTransmitRegisterEmpty()
 }
 
 void inline
-modm::platform::SpiHal{{ id }}::write(uint16_t data)
-{
-	SPI{{ id }}->DR = data;
-}
-
-void inline
 modm::platform::SpiHal{{ id }}::write(uint8_t data)
 {
 %% if "data-size" in features
@@ -134,6 +124,12 @@ modm::platform::SpiHal{{ id }}::write(uint8_t data)
 	write(static_cast<uint16_t>(data));
 %% endif
 
+}
+
+void inline
+modm::platform::SpiHal{{ id }}::write(uint16_t data)
+{
+	SPI{{ id }}->DR = data;
 }
 
 void inline

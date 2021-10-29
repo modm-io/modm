@@ -62,18 +62,11 @@ namespace modm
 		typedef typename GeometricTraits<T>::FloatType FloatType;
 
 	public:
-		/**
-		 * \brief	Default-Constructor
-		 *
-		 * Creates a Vector with coordinates (0, 0).
-		 */
-		Vector();
-
-		Vector(const T& inX, const T& inY);
-
-		Vector(const Vector<T, 1> &inX, const Vector<T, 1> &inY);
-		Vector(const T &inX, const Vector<T, 1> &inY);
-		Vector(const Vector<T, 1> &inX, const T &inY);
+		constexpr Vector() = default;
+		constexpr Vector(const T& inX, const T& inY);
+		constexpr Vector(const Vector<T, 1> &inX, const Vector<T, 1> &inY);
+		constexpr Vector(const T &inX, const Vector<T, 1> &inY);
+		constexpr Vector(const Vector<T, 1> &inX, const T &inY);
 		explicit Vector(T inVal);
 		Vector(const Matrix<T, 2, 1> &rhs);
 
@@ -246,8 +239,8 @@ namespace modm
 		const T* ptr() const;
 
 		Vector operator - () const;
-		Vector operator - (const Vector &rhs) const;
-		Vector operator + (const Vector &rhs) const;
+		constexpr Vector operator - (const Vector &rhs) const;
+		constexpr Vector operator + (const Vector &rhs) const;
 		T operator * (const Vector &rhs) const;
 		T operator ^ (const Vector &rhs) const;
 		Vector operator * (float rhs) const;

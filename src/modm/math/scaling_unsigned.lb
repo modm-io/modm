@@ -1,0 +1,32 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2021, Thomas Sommer
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":math:scaling_unsigned"
+    module.description = """
+# Scaling Unsigned
+
+Unsigned integer with arbitrary digits and scaling value on conversion between
+instances with different digits. F.e. a 2bit scaling unsigned of 0b11 becomes
+0b1111 when converted to a 4bit scaling unsigned.
+
+It's the baseclass to all in modm::color::* but may have wider applications.
+
+"""
+
+def prepare(module, options):
+    module.depends(":utils")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/math"
+    env.copy("scaling_unsigned.hpp")

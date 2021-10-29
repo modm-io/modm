@@ -2,6 +2,7 @@
  * Copyright (c) 2013-2017, Niklas Hauser
  * Copyright (c) 2014, Sascha Schade
  * Copyright (c) 2017, Fabian Greif
+ * Copyright (c) 2021, Thomas Sommer 
  *
  * This file is part of the modm project.
  *
@@ -14,11 +15,13 @@
 #ifndef MODM_AVR_SPI_MASTER{{ id }}_HPP
 #define MODM_AVR_SPI_MASTER{{ id }}_HPP
 
+#include <ranges>
 #include <avr/io.h>
 
 #include <modm/architecture/interface/spi_master.hpp>
 #include <modm/math/algorithm/prescaler.hpp>
 #include <modm/platform/gpio/connector.hpp>
+#include <modm/math/utils/binary.hpp>
 
 %% set sck = "Sck"
 %% if target["type"] in ["u2"]
@@ -52,9 +55,28 @@ namespace platform
  */
 class SpiMaster{{ id }} : public ::modm::SpiMaster, private Spi
 {
-	static uint8_t state;
+	static uint8_t count;
 	static void *context;
 	static ConfigurationHandler configuration;
+
+	static Spi::State_t state;
+	
+	// static uint8_t byte_count;
+	static uint8_t bytes_left;
+	// static bool auto_incr;
+
+	static std::size_t size;
+	static std::size_t index;
+	
+	union unsigned_data_u {
+		uint8_t *u8;
+		uint16_t *u16;
+		uint32_t *u32;
+	};
+	static unsigned_data_u tx;
+	static unsigned_data_u rx;
+
+	static uint32_t temp;
 public:
 	/// Spi Data Mode, Mode0 is the most common mode
 	enum class
@@ -114,11 +136,10 @@ public:
 	static void
 	setDataOrder(DataOrder order)
 	{
-		if (order == DataOrder::LsbFirst) {
+		if (order == DataOrder::LsbFirst)
 			SPCR{{ id }} |= (1 << DORD{{ id }});
-		} else {
+		else
 			SPCR{{ id }} &= ~(1 << DORD{{ id }});
-		}
 	}
 
 
@@ -128,42 +149,221 @@ public:
 	static uint8_t
 	release(void *ctx);
 
+	// TODO Complete the docs
 
-	static uint8_t
-	transferBlocking(uint8_t data)
-	{
+	/**
+	 * @brief 
+	 * 
+	 * @param data 
+	 * @return modm::ResumableResult<T> 
+	 */
+	template <modm::unsigned_integral_max32 T>
+	static modm::ResumableResult<T>
+	transmit(const T data);
+
+	static modm::ResumableResult<uint8_t>
+	transmit(const uint8_t data);
+
+	/**
+	 * @brief 
+	 * 
+	 * @param data 
+	 * @return modm::ResumableResult<T> 
+	 */
+	template <modm::unsigned_integral_max32 T>
+	static modm::ResumableResult<void>
+	transmit(const T data, std::size_t repeat);
+
+	/**
+	 * @brief 			Send and optional receive data in range begin()->end().
+	 * 					Works with C-array or std::array for tx / rx
+	 * 
+	 * @param tx_first	Pointer to first element to send. f.e. tx.begin() OR tx.begin() + 1
+	 * @param tx_first	Pointer to one after last element to send: f.e. tx.end() OR tx.end() - 4
+	 * @param rx_first	Pointer to first element to receive: f.e. rx_data.begin() OR rx_data.begin() + 1
+	 */
+ 	template <modm::unsigned_integral_max32 T>
+	static modm::ResumableResult<void>
+	transmit(const T *tx_first, const T *tx_last, T *rx_first = nullptr);
+
+	/**
+	 * @brief 			Send a std::array
+	 * 
+	 * @param tx_array	std::array with data to send
+	 */
+	template <std::ranges::forward_range C>
+	static modm::ResumableResult<void>
+	transmit(const C &tx_arr)
+	{ return transmit(tx_arr.begin(), tx_arr.end()); };
+
+	/**
+	 * @brief 			Transmit and receive a std::array
+	 * 
+	 * @param tx_arr	std::array with data to send
+	 * @param rx_arr	std::array for received data
+	 */
+	template <std::ranges::forward_range C>
+	static modm::ResumableResult<void>
+	transmit(const C &tx_arr, C &rx_arr)
+	{ return transmit(tx_arr.begin(), tx_arr.end(), rx_arr.begin()); };
+
+// -- Backwards compatible API --------------------------------------------------------
+
+	// Backwards compatible API
 %% if options["busywait"]
-		return transfer(data).getResult();
-%% else
-		return RF_CALL_BLOCKING(transfer(data));
-%% endif
-	}
+	static uint8_t
+	transferBlocking(const uint8_t data)
+	{ return transmit(data).getResult(); }
+
+	static uint16_t
+	transferBlocking16(const uint16_t data)
+	{ return transmit(data).getResult(); }
+
+	static uint32_t
+	transferBlocking32(const uint32_t data)
+	{ return transmit(data).getResult(); }
+
+	static void
+	transferBlocking(const uint8_t data, std::size_t repeat)
+	{ transmit(data, repeat); }
+
+	static void
+	transferBlocking16(const uint16_t data, std::size_t repeat)
+	{ transmit(data, repeat); }
+
+	static void
+	transferBlocking32(const uint32_t data, std::size_t repeat)
+	{ transmit(data, repeat); }
 
 	static void
 	transferBlocking(const uint8_t *tx, uint8_t *rx, std::size_t length)
-	{
-%% if options["busywait"]
-		transfer(tx, rx, length);
-%% else
-		RF_CALL_BLOCKING(transfer(tx, rx, length));
-%% endif
-	}
+	{ transmit(tx, tx + length, rx); }
 
+	static void
+	transferBlocking16(const uint16_t *tx, uint16_t *rx, std::size_t length)
+	{ transmit(tx, tx + length, rx); }
+
+	static void
+	transferBlocking32(const uint32_t *tx, uint32_t *rx, std::size_t length)
+	{ transmit(tx, tx + length, rx); }	
+%% else
+	static uint8_t
+	transferBlocking(const uint8_t data)
+	{ return RF_CALL_BLOCKING(transmit(data)); }
+
+	static uint16_t
+	transferBlocking16(const uint16_t data)
+	{ return RF_CALL_BLOCKING(transmit(data)); }
+
+	static uint32_t
+	transferBlocking32(const uint32_t data)
+	{ return RF_CALL_BLOCKING(transmit(data)); }
+
+	static void
+	transferBlocking(const uint8_t data, std::size_t repeat)
+	{ RF_CALL_BLOCKING(transmit(data, repeat)); }
+
+	static void
+	transferBlocking16(const uint16_t data, std::size_t repeat)
+	{ RF_CALL_BLOCKING(transmit(data, repeat)); }
+
+	static void
+	transferBlocking32(const uint32_t data, std::size_t repeat)
+	{ RF_CALL_BLOCKING(transmit(data, repeat)); }
+
+	static void
+	transferBlocking(const uint8_t *tx, uint8_t *rx, std::size_t length)
+	{ RF_CALL_BLOCKING(transmit(tx, tx + length, rx)); }
+
+	static void
+	transferBlocking16(const uint16_t *tx, uint16_t *rx, std::size_t length)
+	{ RF_CALL_BLOCKING(transmit(tx, tx + length, rx)); }
+
+	static void
+	transferBlocking32(const uint32_t *tx, uint32_t *rx, std::size_t length)
+	{ RF_CALL_BLOCKING(transmit(tx, tx + length, rx)); }
+%% endif
 
 	static modm::ResumableResult<uint8_t>
-	transfer(uint8_t data);
+	transfer(const uint8_t data) {
+		return transmit(data);
+	}
+
+	static modm::ResumableResult<uint16_t>
+	transfer16(const uint16_t data) {
+		return transmit(data);
+	}
+
+	static modm::ResumableResult<uint32_t>
+	transfer32(const uint32_t data) {
+		return transmit(data);
+	}
 
 	static modm::ResumableResult<void>
-	transfer(const uint8_t *tx, uint8_t *rx, std::size_t length);
+	transfer(const uint8_t tx, const std::size_t repeat) {
+		return transmit(tx, repeat);
+	}
+
+	static modm::ResumableResult<void>
+	transfer16(const uint16_t tx, const std::size_t repeat) {
+		return transmit(tx, repeat);
+	}
+
+ 	template <std::unsigned_integral T>
+	static modm::ResumableResult<void>
+	transfer32(const uint32_t tx, const std::size_t repeat) {
+		return transmit(tx, repeat);
+	}
+
+	static modm::ResumableResult<void>
+	transfer(const uint8_t *tx, uint8_t *rx, const std::size_t length) {
+		return transmit(tx, tx + length, rx);
+	}
+
+	static modm::ResumableResult<void>
+	transfer16(const uint16_t *tx, uint16_t *rx, const std::size_t length) {
+		return transmit(tx, tx + length, rx);
+	}
+
+	static modm::ResumableResult<void>
+	transfer32(const uint32_t *tx, uint32_t *rx, const std::size_t length) {
+		return transmit(tx, tx + length, rx);
+	}
 	// end documentation inherited
 
+	// TODO friend with MODM_ISR(SPI_STC) possible?
+	static void isr_handler();
+
+private:
+	template<modm::unsigned_integral_max32 T>
+	static void
+	transmit_begin();
+
 protected:
+	template <std::unsigned_integral T>
+	static modm::ResumableResult<T>
+	transmit(const T data);
+
+	template <std::unsigned_integral T>
+	static modm::ResumableResult<void>
+	transmit(const T *tx, const std::size_t repeat);
+
+ 	template <std::unsigned_integral T>
+	static modm::ResumableResult<void>
+	transmit(const T *tx, T *rx, const std::size_t length);
+
 	static void
 	initialize(Prescaler prescaler);
+
+	template<std::unsigned_integral T>
+	static void
+	begin();
 };
 
 } // namespace platform
 
 } // namespace modm
+
+#include "spi_master_impl.hpp"
 
 #endif // MODM_AVR_SPI_MASTER_HPP

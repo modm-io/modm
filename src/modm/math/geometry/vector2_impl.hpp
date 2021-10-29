@@ -18,15 +18,7 @@
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 2>::Vector() :
-	x(),
-	y()
-{
-}
-
-// ----------------------------------------------------------------------------
-template<typename T>
-modm::Vector<T, 2>::Vector(const T& inX, const T& inY) :
+constexpr modm::Vector<T, 2>::Vector(const T& inX, const T& inY) :
 	x(inX),
 	y(inY)
 {
@@ -34,7 +26,7 @@ modm::Vector<T, 2>::Vector(const T& inX, const T& inY) :
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 2>::Vector(
+constexpr modm::Vector<T, 2>::Vector(
 		const modm::Vector<T, 1> &inX,
 		const modm::Vector<T, 1> &inY) :
 	x(inX.x),
@@ -44,7 +36,7 @@ modm::Vector<T, 2>::Vector(
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 2>::Vector(const T &inX, const modm::Vector<T, 1> &inY) :
+constexpr modm::Vector<T, 2>::Vector(const T &inX, const modm::Vector<T, 1> &inY) :
 	x(inX),
 	y(inY.x)
 {
@@ -52,7 +44,7 @@ modm::Vector<T, 2>::Vector(const T &inX, const modm::Vector<T, 1> &inY) :
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 2>::Vector(const modm::Vector<T, 1> &inX, const T &inY) :
+constexpr modm::Vector<T, 2>::Vector(const modm::Vector<T, 1> &inX, const T &inY) :
 	x(inX.x),
 	y(inY)
 {
@@ -406,7 +398,7 @@ modm::Vector<T, 2>::operator - () const
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 2>
+constexpr modm::Vector<T, 2>
 modm::Vector<T, 2>::operator - (const modm::Vector<T, 2> &rhs) const
 {
 	return modm::Vector<T, 2>(x - rhs.x, y - rhs.y);
@@ -414,7 +406,7 @@ modm::Vector<T, 2>::operator - (const modm::Vector<T, 2> &rhs) const
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 2>
+constexpr modm::Vector<T, 2>
 modm::Vector<T, 2>::operator + (const modm::Vector<T, 2> &rhs) const
 {
 	return modm::Vector<T, 2>(x + rhs.x, y + rhs.y);

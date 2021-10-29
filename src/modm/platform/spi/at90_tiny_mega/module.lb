@@ -20,6 +20,7 @@ def get_properties(env):
     properties["driver"] = driver
     return properties
 
+
 def load_options(module):
     module.add_option(
         BooleanOption(
@@ -50,11 +51,13 @@ class Instance(Module):
 
         env.template("spi.hpp.in", "spi{}.hpp".format(self.instance))
         env.template("spi_master.hpp.in", "spi_master{}.hpp".format(self.instance))
+        env.template("spi_master_impl.hpp.in", "spi_master{}_impl.hpp".format(self.instance))
         env.template("spi_master.cpp.in", "spi_master{}.cpp".format(self.instance))
 
 def init(module):
     module.name = ":platform:spi"
     module.description = "Serial Peripheral Interface (SPI)"
+
 
 def prepare(module, options):
     device = options[":target"]
@@ -76,6 +79,7 @@ def prepare(module, options):
         ":math:utils")
     return True
 
+
 def build(env):
     properties = get_properties(env)
     driver = properties["driver"]
@@ -87,6 +91,7 @@ def build(env):
     env.outbasepath = "modm/src/modm/platform/spi"
 
     if "instance" not in driver:
-        env.template("spi_master.hpp.in")
-        env.template("spi_master.cpp.in")
         env.template("spi.hpp.in")
+        env.template("spi_master.hpp.in")
+        env.template("spi_master_impl.hpp.in")
+        env.template("spi_master.cpp.in")

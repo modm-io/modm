@@ -18,11 +18,20 @@ def init(module):
 Color containers and converters in various formats: RGB, HSV, Brightness, Rgb565
 """
 
+
 def prepare(module, options):
-    module.depends(":math:utils")
+    module.depends(
+		":math:utils",
+		":math:scaling_unsigned",
+		":math:saturation"
+	)
     return True
+
 
 def build(env):
     env.outbasepath = "modm/src/modm/ui/color"
-    env.copy(".")
+
+    ignore = ["*pattern*"]
+    env.copy(".", ignore=env.ignore_paths(*ignore))
+
     env.copy("../color.hpp")

@@ -5,6 +5,7 @@
  * Copyright (c) 2012, Georgi Grinshpun
  * Copyright (c) 2013, Kevin Läufer
  * Copyright (c) 2014, Sascha Schade
+ * Copyright (c) 2021, Thomas Sommer
  *
  * This file is part of the modm project.
  *
@@ -38,7 +39,9 @@ namespace platform
  */
 class SpiMaster{{ id }} : public modm::SpiMaster
 {
-	static uint8_t state;
+	static SpiBase::State_t state;
+	static std::size_t index;
+
 	static uint8_t count;
 	static void *context;
 	static ConfigurationHandler configuration;
@@ -96,7 +99,7 @@ public:
 
 		// initialize the Spi
 		SpiHal{{ id }}::initialize(prescaler);
-		state = 0;
+		state = SpiBase::State(0);
 	}
 
 	static modm_always_inline void
@@ -110,12 +113,12 @@ public:
 	{
 		SpiHal{{ id }}::setDataOrder(static_cast<SpiHal{{ id }}::DataOrder>(order));
 	}
+
 	static modm_always_inline void
 	setDataSize(DataSize size)
 	{
 		SpiHal{{ id }}::setDataSize(static_cast<SpiHal{{ id }}::DataSize>(size));
 	}
-
 
 	static uint8_t
 	acquire(void *ctx, ConfigurationHandler handler = nullptr);
@@ -125,28 +128,103 @@ public:
 
 
 	static uint8_t
-	transferBlocking(uint8_t data)
+	transferBlocking(const uint8_t data)
 	{
-		return RF_CALL_BLOCKING(transfer(data));
+		return RF_CALL_BLOCKING(transmit<uint8_t>(data));
+	}
+
+	static uint16_t
+	transferBlocking16(const uint16_t data)
+	{
+		return RF_CALL_BLOCKING(transmit<uint16_t>(data));
 	}
 
 	static void
-	transferBlocking(const uint8_t *tx, uint8_t *rx, std::size_t length)
+	transferBlocking(const uint8_t *tx, std::size_t repeat)
 	{
-		RF_CALL_BLOCKING(transfer(tx, rx, length));
+		RF_CALL_BLOCKING(transmit<uint8_t>(tx, repeat));
 	}
 
+	static void
+	transferBlocking16(const uint16_t *tx, std::size_t repeat)
+	{
+		RF_CALL_BLOCKING(transmit<uint16_t>(tx, repeat));
+	}
+
+	static void
+	transferBlocking16(const uint16_t *tx, std::size_t repeat)
+	{
+		RF_CALL_BLOCKING(transmit<uint8_t>(tx, rx, length));
+	}
+
+	static void
+	transferBlocking16(const uint16_t *tx, uint16_t *rx, std::size_t length)
+	{
+		RF_CALL_BLOCKING(transmit<uint16_t>(tx, rx, length));
+	}
 
 	static modm::ResumableResult<uint8_t>
-	transfer(uint8_t data);
+	transfer(const uint8_t data) {
+		return transmit<uint8_t>(data);
+	}
+
+	static modm::ResumableResult<uint16_t>
+	transfer16(const uint16_t data) {
+		return transmit<uint16_t>(data);
+	}
 
 	static modm::ResumableResult<void>
-	transfer(const uint8_t *tx, uint8_t *rx, std::size_t length);
+	transfer(const uint8_t *tx, const std::size_t repeat) {
+		return transmit<uint8_t>(tx, repeat);
+	}
+
+	static modm::ResumableResult<void>
+	transfer16(const uint16_t *tx, const std::size_t repeat) {
+		return transmit<uint16_t>(tx, repeat);
+	}
+
+	static modm::ResumableResult<void>
+	transfer(const uint8_t *tx, uint8_t *rx, const std::size_t length) {
+		return transmit<uint8_t>(tx, rx, length);
+	}
+
+	static modm::ResumableResult<void>
+	transfer16(const uint16_t *tx, uint16_t *rx, const std::size_t length) {
+		return transmit<uint16_t>(tx, rx, length);
+	}
+
+	// TODO "transmit" == good?
+	template <std::unsigned_integral T>
+	static modm::ResumableResult<T>
+	transmit(const T data);
+
+	template <std::unsigned_integral T>
+	static modm::ResumableResult<void>
+	transmit(const T *tx, const std::size_t repeat);
+
+ 	template <std::unsigned_integral T>
+	static modm::ResumableResult<void>
+	transmit(const T *tx, T *rx, const std::size_t length);
 	// end documentation inherited
+
+protected:
+	template <std::unsigned_integral T>
+	static modm::ResumableResult<T>
+	transmit(const T data);
+
+	template <std::unsigned_integral T>
+	static modm::ResumableResult<void>
+	transmit(const T *tx, const std::size_t repeat);
+
+ 	template <std::unsigned_integral T>
+	static modm::ResumableResult<void>
+	transmit(const T *tx, T *rx, const std::size_t length);
 };
 
 } // namespace platform
 
 } // namespace modm
+
+#include "spi_master_{{ id }}_impl.hpp"
 
 #endif // MODM_STM32_SPI_MASTER{{ id }}_HPP

@@ -4,6 +4,7 @@
  * Copyright (c) 2011-2012, 2014-2015, Niklas Hauser
  * Copyright (c) 2015, Sascha Schade
  * Copyright (c) 2020, Christopher Durand
+ * Copyright (c) 2021, Thomas Sommer
  *
  * This file is part of the modm project.
  *
@@ -16,10 +17,12 @@
 #ifndef	MODM_MATH_UTILS_MISC_HPP
 #define	MODM_MATH_UTILS_MISC_HPP
 
-#include <cstddef>
-#include <cmath>
 #include <stdint.h>
+
+#include <cmath>
+#include <cstddef>
 #include <type_traits>
+#include <utility>
 
 #include <modm/architecture/utils.hpp>
 
@@ -60,65 +63,51 @@ pow(uint32_t base, uint8_t exponent)
 }
 
 /**
- * @brief This does what you think it does.
+ * @brief 		Variadic min for 2-∞ objects
  *
- * @param  a  A thing of arbitrary type.
- * @param  b  Another thing of arbitrary type.
- * @return   The lesser of the parameters.
+ * @param  a 	first object to compare
+ * @param  b  	second object to compare
+ * @param  cs  	More optional objects to compare
+ * @return   	The smallest object
  *
- * This is the simple classic generic implementation.  It will work on
- * temporary expressions, since they are only evaluated once, unlike a
- * preprocessor macro.
+ * @see			https://stackoverflow.com/questions/23815138/implementing-variadic-min-max-functions
  */
 template<typename T>
-inline const T&
-min(const T& a, const T& b)
+constexpr T vmin(T a, T b)
 {
-	if (b < a)
-		return b;
-	else
-		return a;
+    return a < b ? a : b;
+}
+
+template<typename T, typename... Ts>
+constexpr T vmin(T a, T b, Ts&&... cs)
+{
+    return a < b ?
+        vmin(a, std::forward<Ts>(cs)...) :
+            vmin(b, std::forward<Ts>(cs)...);
 }
 
 /**
- * @brief This does what you think it does.
+ * @brief 		Variadic max for 2-∞ objects
  *
- * @param  a  A thing of arbitrary type.
- * @param  b  Another thing of arbitrary type.
- * @return   The greater of the parameters.
+ * @param  a 	first object to compare
+ * @param  b  	second object to compare
+ * @param  cs  	More optional objects to compare
+ * @return   	The greatest object
  *
- * This is the simple classic generic implementation.  It will work on
- * temporary expressions, since they are only evaluated once, unlike a
- * preprocessor macro.
+ * @see			https://stackoverflow.com/questions/23815138/implementing-variadic-min-max-functions
  */
 template<typename T>
-inline const T&
-max(const T& a, const T& b)
+constexpr T vmax(T& a, T& b)
 {
-	if (a < b)
-		return b;
-	else
-		return a;
+    return a > b ? a : b;
 }
 
-/**
- * @brief This does what you think it does.
- *
- * @param  a  A thing of arbitrary type.
- * @param  b  Another thing of arbitrary type.
- * @param  c  Something else of arbitrary type.
- * @return   The greater of the three parameters.
- *
- * This is the simple classic generic implementation.  It will work on
- * temporary expressions, since they are only evaluated once, unlike a
- * preprocessor macro.
- */
-template<typename T>
-constexpr T
-max(const T a, const T b, const T c)
+template<typename T, typename... Ts>
+constexpr T vmax(T& a, T& b, Ts&... cs)
 {
-	return ( ( (b > c) ? b : c ) > a ) ?
-	         ( (b > c) ? b : c) : a;
+    return a > b ?
+        vmax(a, std::forward<Ts>(cs)...) :
+            vmax(b, std::forward<Ts>(cs)...);
 }
 
 /**
@@ -136,10 +125,7 @@ template<typename T, typename Compare>
 inline const T&
 min(const T& a, const T& b, Compare compare)
 {
-	if (compare(b, a))
-		return b;
-	else
-		return a;
+	return compare(b, a) ? b : a;
 }
 
 /**
@@ -157,24 +143,16 @@ template<typename T, typename Compare>
 inline const T&
 max(const T& a, const T& b, Compare compare)
 {
-	if (compare(a, b))
-		return b;
-	else
-		return a;
+	return compare(a, b) ? b : a;
 }
 
 /**
  * @brief constexpr implementation of fabs
  */
-template <typename Float>
-    requires std::is_floating_point_v<Float>
+template <std::floating_point Float>
 constexpr Float constexpr_fabs(Float number)
 {
-    if (number >= 0) {
-        return number;
-    } else {
-        return -number;
-    }
+	return number >= 0 ? number : -number;
 }
 
 /// @}

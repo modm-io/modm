@@ -280,7 +280,7 @@ modm::SiemensS65Portrait<SPI, CS, RS, Reset>::update() {
 			} // pix
 
 			// use transfer() of SPI to transfer spiBuffer
-			SPI::transferBlocking(spiBuffer, nullptr, 16);
+			SPI::transferBlocking(spiBuffer, (uint8_t*)(nullptr), 16);
 		} // y
 	} // x
 #endif
@@ -383,7 +383,7 @@ modm::SiemensS65Landscape<SPI, CS, RS, Reset>::update() {
 			} // pix
 
 			// use transfer() of SPI to transfer spiBuffer
-			SPI::transferBlocking(spiBuffer, nullptr, bufSize);
+			SPI::transferBlocking(spiBuffer, (uint8_t*)(nullptr), bufSize);
 		} // y
 	} // x
 #endif

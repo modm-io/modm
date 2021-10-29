@@ -2,6 +2,7 @@
  * Copyright (c) 2013-2018, Niklas Hauser
  * Copyright (c) 2014, Sascha Schade
  * Copyright (c) 2017, Fabian Greif
+ * Copyright (c) 2021, Thomas Sommer
  *
  * This file is part of the modm project.
  *
@@ -11,37 +12,140 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "spi_master{{ id }}.hpp"
+#include "spi_master.hpp"
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
 #include <modm/math/utils/bit_constants.hpp>
 #include <modm/architecture/interface/atomic_lock.hpp>
+#include <modm/architecture/interface/interrupt.hpp>
 
-// bit 7 (0x80) is used for transfer 1 byte
-// bit 6 (0x40) is used for transfer multiple byte
-// bit 5-0 (0x3f) are used to store the acquire count
-uint8_t
-modm::platform::SpiMaster{{ id }}::state(0);
+uint8_t modm::platform::SpiMaster{{ id }}::count(0);
 
-void *
-modm::platform::SpiMaster{{ id }}::context(nullptr);
+void* modm::platform::SpiMaster{{ id }}::context(nullptr);
 
 modm::Spi::ConfigurationHandler
-modm::platform::SpiMaster{{ id }}::configuration(nullptr);
+	modm::platform::SpiMaster{{ id }}::configuration(nullptr);
+
 // ----------------------------------------------------------------------------
 
-void
-modm::platform::SpiMaster{{ id }}::initialize(Prescaler prescaler)
+modm::platform::Spi::State_t
+	modm::platform::SpiMaster{{ id }}::state(0);
+uint8_t modm::platform::SpiMaster{{ id }}::bytes_left(0);
+
+std::size_t modm::platform::SpiMaster{{ id }}::size(0);
+std::size_t modm::platform::SpiMaster{{ id }}::index(0);
+modm::platform::SpiMaster{{ id }}::unsigned_data_u
+	modm::platform::SpiMaster{{ id }}::tx{nullptr};
+modm::platform::SpiMaster{{ id }}::unsigned_data_u
+	modm::platform::SpiMaster{{ id }}::rx{nullptr};
+
+uint32_t modm::platform::SpiMaster{{ id }}::temp(0);
+
+// ----------------------------------------------------------------------------
+
+using State = modm::platform::Spi::State;
+using ByteCount = modm::platform::Spi::ByteCount;
+
+MODM_ISR(SPI_STC) {
+	modm::platform::SpiMaster{{ id }}::isr_handler();
+}
+
+void modm::platform::SpiMaster{{ id }}::isr_handler() {
+	// Unpack state
+	const int tx_byte_count = TxByteCount_t::get(state);
+	const bool auto_incr = state.all(State::AutoIncr);
+
+	// Transmit further byte(s)
+	if(bytes_left) {
+		const std::size_t i = auto_incr ? index : 0;
+		switch(tx_byte_count) {
+			case ByteCount::HalfWord:
+				// Store received byte
+				if(rx.u8) rx.u16[index] = uint16_t(SPDR{{ id }}) << 8; // << bytes_left
+				// Transmit next byte
+				bytes_left = 0;
+				SPDR{{ id }} = tx.u16[i];
+				return;
+			case ByteCount::Word:
+				// Store received byte
+				if(rx.u8) rx.u32[index] |= uint32_t(SPDR{{ id }}) << bytes_left;
+				// Transmit next byte
+				bytes_left -= 8;
+				SPDR{{ id }} = tx.u32[i] >> bytes_left;
+				return;
+		}
+	}
+
+	// Store received byte
+	switch(tx_byte_count) {
+		case ByteCount::Byte:
+			if(rx.u8) rx.u8[index] = SPDR{{ id }};
+			break;
+		case ByteCount::HalfWord:
+			if(rx.u8) rx.u16[index] |= SPDR{{ id }};
+			break;
+		case ByteCount::Word:
+			if(rx.u8) rx.u32[index] |= SPDR{{ id }};
+			break;
+	}
+
+	// Increment index
+	if (++index == size) {
+		// Job done, disable Interrupt.
+		SPCR{{ id }} &= ~(1 << SPIE);
+		return;
+	}
+
+	// Transmit next byte
+	const std::size_t i = auto_incr ? index : 0;
+
+	switch(tx_byte_count) {
+		case ByteCount::Byte:
+			SPDR{{ id }} = tx.u8[i];
+			return;
+		case ByteCount::HalfWord:
+			bytes_left = 1 * 8;
+			SPDR{{ id }} = tx.u16[i] >> 8; // >> bytes_left
+			return;
+		case ByteCount::Word:
+			bytes_left = 3 * 8;
+			SPDR{{ id }} = tx.u32[i] >> 24; // >> bytes_left
+			
+			if(rx.u32) rx.u32[index] = 0; // Need reset, because received bytes are | (ored)
+			return;
+	}
+}
+
+modm::ResumableResult<uint8_t>
+modm::platform::SpiMaster{{ id }}::transmit(const uint8_t data) {
+	// FIXME does not yet work when called before a regular transmit()
+	// cause interrupt is not enabled here, witch signales a running condition
+	// ot the regular transmit.
+
+	// Interrupt enabled? transmission in progress!
+	if(SPCR{{ id }} & (1 << SPIE))
+		return {modm::rf::Running};
+
+	SPDR{{ id }} = data;
+	// wait for transfer to finish
+	if (!(SPSR & (1 << SPIF)))
+		return {modm::rf::Running};
+	
+	return {modm::rf::Stop, SPDR{{ id }}};
+}
+
+// ---------------------------------------------------------------------------
+
+void modm::platform::SpiMaster{{ id }}::initialize(Prescaler prescaler)
 {
 	modm::atomic::Lock lock;
 
-	SPCR{{ id }} = (1 << SPE{{ id }}) | (1 << MSTR{{ id }}) | (static_cast<uint8_t>(prescaler) & ~0x80);
-	SPSR{{ id }} = (static_cast<uint8_t>(prescaler) & 0x80) ? (1 << SPI2X{{ id }}) : 0;
-	state &= 0x3f;
+	SPCR{{ id }} = (1 << SPE) | (1 << MSTR) | (static_cast<uint8_t>(prescaler) & ~0x80);
+	SPSR{{ id }} = (static_cast<uint8_t>(prescaler) & 0x80) ? (1 << SPI2X) : 0;
+	state = State(0);
 }
-// ----------------------------------------------------------------------------
 
 uint8_t
 modm::platform::SpiMaster{{ id }}::acquire(void *ctx, ConfigurationHandler handler)
@@ -49,9 +153,10 @@ modm::platform::SpiMaster{{ id }}::acquire(void *ctx, ConfigurationHandler handl
 	if (context == nullptr)
 	{
 		context = ctx;
-		state = (state & ~0x3f) | 1;
+		count = 1;
 		// if handler is not nullptr and is different from previous configuration
-		if (handler and configuration != handler) {
+		if (handler and configuration != handler)
+		{
 			configuration = handler;
 			configuration();
 		}
@@ -59,7 +164,7 @@ modm::platform::SpiMaster{{ id }}::acquire(void *ctx, ConfigurationHandler handl
 	}
 
 	if (ctx == context)
-		return (++state & 0x3f);
+		return ++count;
 
 	return 0;
 }
@@ -67,103 +172,8 @@ modm::platform::SpiMaster{{ id }}::acquire(void *ctx, ConfigurationHandler handl
 uint8_t
 modm::platform::SpiMaster{{ id }}::release(void *ctx)
 {
-	if (ctx == context)
-	{
-		if ((--state & 0x3f) == 0)
-			context = nullptr;
-	}
-	return (state & 0x3f);
-}
-// ----------------------------------------------------------------------------
+	if (ctx == context and --count == 0)
+		context = nullptr;
 
-modm::ResumableResult<uint8_t>
-modm::platform::SpiMaster{{ id }}::transfer(uint8_t data)
-{
-%% if options["busywait"]
-	SPDR{{ id }} = data;
-
-	// wait for transfer to finish
-	while (!(SPSR{{ id }} & (1 << SPIF{{ id }})))
-		;
-
-	data = SPDR{{ id }};
-	return {modm::rf::Stop, data};
-%% else
-	// this is a manually implemented "fast resumable function"
-	// there is no context or nesting protection, since we don't need it.
-	// there are only two states encoded into 1 bit (LSB of state):
-	//   1. waiting to start, and
-	//   2. waiting to finish.
-
-	// MSB != Bit7 ?
-	if ( !(state & Bit7) )
-	{
-		// start transfer by copying data into register
-		SPDR{{ id }} = data;
-
-		// set MSB = Bit7
-		state |= Bit7;
-	}
-
-	// wait for transfer to finish
-	if (!(SPSR{{ id }} & (1 << SPIF{{ id }})))
-		return {modm::rf::Running};
-
-	data = SPDR{{ id }};
-	state &= ~Bit7;
-	return {modm::rf::Stop, data};
-%% endif
-}
-
-modm::ResumableResult<void>
-modm::platform::SpiMaster{{ id }}::transfer(const uint8_t *tx, uint8_t *rx, std::size_t length)
-{
-%% if options["busywait"]
-	for (std::size_t index = 0; index < length; index++)
-	{
-		modm::ResumableResult<uint8_t> result = transfer(tx ? tx[index] : 0);
-		if (rx) rx[index] = result.getResult();
-	}
-	return {modm::rf::Stop};
-%% else
-	// this is a manually implemented "fast resumable function"
-	// there is no context or nesting protection, since we don't need it.
-	// there are only two states encoded into 1 bit (Bit6 of state):
-	//   1. initialize index, and
-	//   2. wait for 1-byte transfer to finish.
-
-	// we need to globally remember which byte we are currently transferring
-	static std::size_t index = 0;
-
-	// we are only interested in Bit6
-	switch(state & Bit6)
-	{
-		case 0:
-			// we will only visit this state once
-			state |= Bit6;
-
-			// initialize index and check range
-			index = 0;
-			while (index < length)
-			{
-		default:
-		{
-				// call the resumable function
-				modm::ResumableResult<uint8_t> result = transfer(tx ? tx[index] : 0);
-
-				// if the resumable function is still running, so are we
-				if (result.getState() > modm::rf::NestingError)
-					return {modm::rf::Running};
-
-				// if rx != 0, we copy the result into the array
-				if (rx) rx[index] = result.getResult();
-		}
-				index++;
-			}
-
-			// clear the state
-			state &= ~Bit6;
-			return {modm::rf::Stop};
-	}
-%% endif
+	return count;
 }

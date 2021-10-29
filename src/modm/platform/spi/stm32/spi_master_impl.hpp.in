@@ -1,0 +1,133 @@
+/*
+ * Copyright (c) 2009-2011, Fabian Greif
+ * Copyright (c) 2010, Martin Rosekeit
+ * Copyright (c) 2011-2017, Niklas Hauser
+ * Copyright (c) 2012, Georgi Grinshpun
+ * Copyright (c) 2013, Kevin Läufer
+ * Copyright (c) 2014, Sascha Schade
+ * Copyright (c) 2021, Thomas Sommer
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+#include "spi_master_{{ id }}.hpp"
+
+template <std::unsigned_integral T>
+modm::ResumableResult<T>
+modm::platform::SpiMaster{{ id }}::transmit(T data)
+{
+	// this is a manually implemented "fast resumable function"
+	// there is no context or nesting protection, since we don't need it.
+	// there are only two states encoded into 1 bit (LSB of state):
+	//   1. waiting to start, and
+	//   2. waiting to finish.
+
+	if (!state.all(SpiBase::LowByte))
+	{
+		// wait for previous transfer to finish
+		if (!SpiHal{{ id }}::isTransmitRegisterEmpty())
+			return {modm::rf::Running};
+
+		// start transfer by copying data into register
+		SpiHal{{ id }}::write(data);
+
+		state.set(SpiBase::LowByte);
+	}
+
+	if (!SpiHal{{ id }}::isReceiveRegisterNotEmpty())
+		return {modm::rf::Running};
+
+	SpiHal{{ id }}::read(data);
+
+	// transfer finished
+	state.reset(SpiBase::LowByte);
+	return {modm::rf::Stop, data};
+}
+
+template <std::unsigned_integral T>
+modm::ResumableResult<void>
+modm::platform::SpiMaster{{ id }}::transmit(const T *tx, const std::size_t repeat)
+{
+ 	// this is a manually implemented "fast resumable function"
+	// there is no context or nesting protection, since we don't need it.
+	// there are only two states encoded into 1 bit (Bit1 of state):
+	//   1. initialize index, and
+	//   2. wait for transfer to finish.
+
+	// we are only interested in Bit1
+	switch(int(state.all(SpiBase::Idle)))
+	{
+		case 0:
+			// we will only visit this state once
+			state.set(SpiBase::Idle);
+
+			// initialize index and check range
+			index = 0;
+
+			while (index < repeat)
+			{
+		default:
+		{
+				// call the resumable function
+				modm::ResumableResult<T> result = transmit<T>(tx[0]);
+
+				// if the resumable function is still running, so are we
+				if (result.getState() > modm::rf::NestingError)
+					return {modm::rf::Running};
+		}
+				index++;
+			}
+
+			state.reset(SpiBase::Idle);
+			return {modm::rf::Stop};
+	}
+}
+
+template <std::unsigned_integral T>
+modm::ResumableResult<void>
+modm::platform::SpiMaster{{ id }}::transmit(const T * tx, T * rx, const std::size_t length)
+{
+	// this is a manually implemented "fast resumable function"
+	// there is no context or nesting protection, since we don't need it.
+	// there are only two states encoded into 1 bit (Bit1 of state):
+	//   1. initialize index, and
+	//   2. wait for transfer to finish.
+
+	switch(int(state.all(SpiBase::Idle)))
+	{
+		case 0:
+			// we will only visit this state once
+			state.set(SpiBase::Idle);
+
+			// initialize index and check range
+			index = 0;
+			while (index < length)
+			{
+		default:
+		{
+				// if tx == 0, we use a dummy byte 0x00
+				// else we copy it from the array
+				// call the resumable function
+				modm::ResumableResult<T> result = transmit<T>(tx ? tx[index] : 0);
+
+				// if the resumable function is still running, so are we
+				if (result.getState() > modm::rf::NestingError)
+					return {modm::rf::Running};
+
+				// if rx != 0, we copy the result into the array
+				if (rx) rx[index] = result.getResult();
+		}
+				index++;
+			}
+
+			// clear the state
+			state.reset(SpiBase::Idle);
+			return {modm::rf::Stop};
+	}
+}

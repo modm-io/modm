@@ -10,6 +10,8 @@
 // ----------------------------------------------------------------------------
 
 #pragma once
+#ifndef MODM_SH1106_HPP
+#define MODM_SH1106_HPP
 
 #include "ssd1306.hpp"
 
@@ -25,51 +27,54 @@ namespace modm
  *
  * @ingroup modm_driver_sh1106
  */
-template<class I2cMaster, uint8_t Height = 64>
-class Sh1106 : public Ssd1306<I2cMaster, Height>
+
+template<class I2cMaster, uint16_t H = 64>
+class Sh1106 : public Ssd1306<I2cMaster, H>
 {
 public:
-	Sh1106(uint8_t address = 0x3C) : Ssd1306<I2cMaster, Height>(address) {}
+	using ColorType = Ssd1306<I2cMaster, H>::ColorType;
+	using Buffer = Ssd1306<I2cMaster, H>::Buffer;
+
+	Sh1106(uint8_t address = 0x3C) : Ssd1306<I2cMaster, H>(address) {}
+
+    // TODO Abstract these write(...) cause is common to all I2c Displays!
+	// Write BufferInterface
+	modm::ResumableResult<bool>
+	write(graphic::BufferInterface<ColorType> &buffer, shape::Point placement = {0, 0}) {
+		RF_BEGIN();
+		RF_END_RETURN_CALL(writeImage(graphic::ImageAccessor<ColorType, modm::accessor::Ram>(&buffer, placement)));
+	}
+
+	// Write Flash Image
+	modm::ResumableResult<bool>
+	write(const uint8_t *addr, shape::Point placement = {0, 0}) {
+		RF_BEGIN();
+		// TODO Support other than ColorType
+		RF_END_RETURN_CALL(writeImage(graphic::ImageAccessor<ColorType, modm::accessor::Flash>(addr, placement)));
+	}
 
 protected:
-	modm::ResumableResult<void>
-	startWriteDisplay() override
-	{
-		RF_BEGIN();
+	modm::ResumableResult<bool>
+	initializeMemoryMode() override;
 
-		this->transaction_success = true;
+	modm::ResumableResult<bool>
+	updateClipping() final;
 
-		this->commandBuffer[0] = ssd1306::AdressingCommands::HigherColumnStartAddress;
-		this->commandBuffer[1] = 0x02;
+	// Write monochrome Image
+	// Caution: placement.y rounds to multiples of 8
+	template<template<typename> class Accessor>
+	modm::ResumableResult<bool>
+	writeImage(graphic::ImageAccessor<ColorType, Accessor> accessor);
 
-		for (page = 0; page < Height / 8; page++)
-		{
-			this->commandBuffer[2] = 0xB0 | page;
-			this->transaction_success &= RF_CALL(this->writeCommands(3));
-
-			RF_WAIT_UNTIL(
-				this->transaction.configureDisplayWrite((uint8_t*)&this->buffer[page], 128));
-			RF_WAIT_UNTIL(this->startTransaction());
-			RF_WAIT_WHILE(this->isTransactionRunning());
-			this->transaction_success &= this->wasTransactionSuccessful();
-		};
-
-		RF_END_RETURN(this->transaction_success);
-	}
-
-	modm::ResumableResult<void>
-	initializeMemoryMode() override
-	{
-		RF_BEGIN();
-		// Default on Power-up - can be omitted
-		this->commandBuffer[0] = ssd1306::AdressingCommands::MemoryMode;
-		this->commandBuffer[1] = ssd1306::MemoryMode::PAGE;
-		this->transaction_success &= RF_CALL(this->writeCommands(2));
-		RF_END();
-	}
-
-private:
-	size_t page;
+	// Static variables for Resumable Functions
+	size_t yd; // vertical index in display (page)
+	size_t yd_start; // first vertical index in display
+	size_t yd_end; // last vertical index in display
+	size_t yb; // vertical position in buffer
 };
 
 }  // namespace modm
+
+#include "sh1106_impl.hpp"
+
+#endif // MODM_SH1106_HPP

@@ -1,0 +1,1 @@
+// OPTIMIZE PainterLocal<GraphicBufferMonochrome> for speed

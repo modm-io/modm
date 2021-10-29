@@ -139,6 +139,14 @@ public:
 		QuarterFull = SPI_CR2_FRXTH,
 	};
 %% endif
+	enum State : uint8_t {
+		// Word = Bit0,		// 0: Byte (uint8_t) transaction, 1: Word (uint16_t) transaction
+		// AutoIncr = Bit1,	// 0: Always send first data of tx, 1: Send consecutive data of tx
+		Idle = Bit2,		// 1: Transaction is Running
+		LowByte = Bit3,		// 1: Low byte has been transmitted
+		ByteHigh = Bit4,	// 1: High byte of word has been transmitted
+	};
+	MODM_FLAGS8(State);
 };
 
 } // namespace platform

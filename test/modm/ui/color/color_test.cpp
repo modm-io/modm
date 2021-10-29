@@ -15,101 +15,110 @@
 #include <modm/debug/logger.hpp>
 #include <algorithm>
 
+using namespace modm;
 using namespace modm::color;
 
-void ColorTest::testRgbCopyConstructors() {
-	RgbT<uint8_t> rgb8(html::Orchid);
-	RgbT<uint8_t> rgb8_b(rgb8);
+void ColorTest::testGrayConstructors() {
+	Gray8 gray8(127);
+	Gray8 gray8_b(gray8);
+	TEST_ASSERT_EQUALS(gray8, gray8_b);
+
+	Gray4 gray4(7);
+	gray4 += 3;
+	TEST_ASSERT_EQUALS(gray4.getValue(), 10);
+	gray4 -= 1;
+	TEST_ASSERT_EQUALS(gray4.getValue(), 9);
+	gray4 -= 42; // under-saturation
+	TEST_ASSERT_EQUALS(gray4.getValue(), 0);
+	gray4 += 66; // over-saturation
+	TEST_ASSERT_EQUALS(gray4.getValue(), 0b00001111);
+	gray4 -= 3;
+	TEST_ASSERT_EQUALS(gray4.getValue(), 0b00001100);
+
+	// not supported
+	// gray4 -= -6; // another over-saturation
+	// TEST_ASSERT_EQUALS(gray4.getValue(), 0b00001111);
+
+
+	gray8 = gray4; // upscaling
+	TEST_ASSERT_EQUALS(gray8.getValue(), 0b11001100);
+	GrayD<13> gray13 = gray4; // more upscaling
+	TEST_ASSERT_EQUALS(gray13.getValue(), 0b0001100110011000); // last digit rounds down for odd D
+	gray4 = gray13; // downscaling
+	TEST_ASSERT_EQUALS(gray4.getValue(), 0b00001100);
+}
+
+void ColorTest::testRgbConstructors() {
+	Rgb888 rgb8(html::Orchid);
+	Rgb888 rgb8_b(rgb8);
 	TEST_ASSERT_EQUALS(rgb8, rgb8_b);
 
-	RgbT<uint16_t> rgb16(rgb8);
-	TEST_ASSERT_EQUALS(uint16_t(rgb8.red) << 8, rgb16.red);
-	TEST_ASSERT_EQUALS(uint16_t(rgb8.green) << 8, rgb16.green);
-	TEST_ASSERT_EQUALS(uint16_t(rgb8.blue) << 8, rgb16.blue);
+	Rgb161616 rgb16(rgb8);
 
-	RgbT<uint8_t> rgb8_c(rgb16);
+	Rgb888 rgb8_c(rgb16);
 	TEST_ASSERT_EQUALS(rgb8, rgb8_c);
 }
 
-void ColorTest::testHsvCopyConstructors() {
-	HsvT<uint8_t> hsv8(html::Orchid);
-	HsvT<uint8_t> hsv8_b(hsv8);
+void ColorTest::testHsvConstructors() {
+	Hsv888 hsv8(html::Orchid);
+	Hsv888 hsv8_b(hsv8);
 	TEST_ASSERT_EQUALS(hsv8, hsv8_b);
 
-	HsvT<uint16_t> hsv16(hsv8);
-	TEST_ASSERT_EQUALS(uint16_t(hsv8.hue) << 8, hsv16.hue);
-	TEST_ASSERT_EQUALS(uint16_t(hsv8.saturation) << 8, hsv16.saturation);
-	TEST_ASSERT_EQUALS(uint16_t(hsv8.value) << 8, hsv16.value);
+	Hsv161616 hsv16(hsv8);
 
-	HsvT<uint8_t> hsv8_c(hsv16);
+	Hsv888 hsv8_c(hsv16);
 	TEST_ASSERT_EQUALS(hsv8, hsv8_c);
-}
-
-void ColorTest::testBrightnessCopyConstructors() {
-	BrightnessT<uint8_t> brightness8(127);
-	BrightnessT<uint8_t> brightness8_b(brightness8);
-	TEST_ASSERT_EQUALS(brightness8.value, brightness8_b.value);
-
-	BrightnessT<uint16_t> brightness16(brightness8);
-	TEST_ASSERT_EQUALS(uint16_t(brightness8.value) << 8, brightness16.value);
-
-	BrightnessT<uint8_t> brightness8_c(brightness16);
-	TEST_ASSERT_EQUALS(brightness8.value, brightness8_c.value);
 }
 
 void ColorTest::testConvertion_8bit()
 {
-	RgbT<uint8_t> rgb(124, 128, 10);
+	Rgb888 rgb(124, 128, 10);
 
-	HsvT<uint8_t> hsv(rgb);
-	TEST_ASSERT_EQUALS(hsv.hue, 43);
-	TEST_ASSERT_EQUALS(hsv.saturation, 235);
-	TEST_ASSERT_EQUALS(hsv.value, 128);
+	Hsv888 hsv(rgb);
+	TEST_ASSERT_EQUALS(hsv.getHue(), 43);
+	TEST_ASSERT_EQUALS(hsv.getSaturation(), 235);
+	TEST_ASSERT_EQUALS(hsv.getValue(), 128);
 
-	BrightnessT<uint8_t> brightness(rgb);
-	TEST_ASSERT_EQUALS(brightness.value, 118);
+	Gray8 gray(rgb);
+	TEST_ASSERT_EQUALS(gray.getValue(), 118);
 }
 
-// TODO 16bit convertion not yet working
-// see hsv_impl.hpp and rgb_impl.hpp
-// void ColorTest::testConvertion_16bit()
-// {
-// 	RgbT<uint8_t> rgb8(html::Orchid);
-// 	HsvT<uint8_t> hsv8(rgb8);
-// 	HsvT<uint16_t> hsv16(hsv8);
 
-// 	RgbT<uint16_t> rgb16(rgb8);
-// 	HsvT<uint16_t> hsv16_b(rgb16);
+void ColorTest::testConvertion_16bit()
+{
+	Rgb888 rgb8(html::Orchid);
+	Hsv888 hsv8(rgb8);
+	Hsv161616 hsv16(hsv8);
 
-// 	// Test, if rgb->hsv conversion produces the same result for 8 and 16bits
-// 	TEST_ASSERT_EQUALS(hsv16, hsv16_b);
-// }
+	Rgb161616 rgb16(rgb8);
+	Hsv161616 hsv16_b(rgb16);
+
+	// Test, if rgb->hsv conversion produces the same result for 8 and 16bits
+	// FIXME test fails
+	// TEST_ASSERT_EQUALS(hsv16, hsv16_b);
+}
 
 void ColorTest::testRgbHsvPingPongConvertion_8bit()
 {
-	RgbT<uint8_t> rgb8(html::Orchid);
-	HsvT<uint8_t> hsv8(rgb8);
-	RgbT<uint8_t> rgb8_b(hsv8);
+	Rgb888 rgb8(html::Orchid);
+	Hsv888 hsv8(rgb8);
+	Rgb888 rgb8_b(hsv8);
 
-	// Convertion can distort - allow some tolerance.
-	using namespace modm;
-	TEST_ASSERT_TRUE(modm::Tolerance::isValueInTolerance(rgb8.red, rgb8_b.red, 1_pct));
-	TEST_ASSERT_TRUE(modm::Tolerance::isValueInTolerance(rgb8.green, rgb8_b.green, 1_pct));
-	TEST_ASSERT_TRUE(modm::Tolerance::isValueInTolerance(rgb8.blue, rgb8_b.blue, 1_pct));
+	// Convertion may distort - allow some tolerance.
+	TEST_ASSERT_TRUE(modm::Tolerance::isValueInTolerance(rgb8.getRed().getValue(), rgb8_b.getRed().getValue(), 1_pct));
+	TEST_ASSERT_TRUE(modm::Tolerance::isValueInTolerance(rgb8.getGreen().getValue(), rgb8_b.getGreen().getValue(), 1_pct));
+	TEST_ASSERT_TRUE(modm::Tolerance::isValueInTolerance(rgb8.getBlue().getValue(), rgb8_b.getBlue().getValue(), 1_pct));
 }
 
-// TODO 16bit convertion not yet working
-// see hsv_impl.hpp and rgb_impl.hpp
-// void ColorTest::testRgbHsvPingPongConvertion_16bit()
-// {
-// 	// Rgb->Hsv->Rgb, both 16 bit
-// 	RgbT<uint16_t> rgb16(html::Orchid);
-// 	HsvT<uint16_t> hsv16(rgb16);
-// 	RgbT<T> rgb16_b(hsv16);
+void ColorTest::testRgbHsvPingPongConvertion_16bit()
+{
+	// Rgb->Hsv->Rgb, both 16 bit
+	Rgb161616 rgb16(html::Orchid);
+	Hsv161616 hsv16(rgb16);
+	Rgb161616 rgb16_b(hsv16);
 
-// 	// Convertion can distort - allow some tolerance.
-// 	using namespace modm;
-// 	TEST_ASSERT_TRUE(modm::Tolerance::isValueInTolerance(rgb.red, rgb16_b.red, 1_pct));
-// 	TEST_ASSERT_TRUE(modm::Tolerance::isValueInTolerance(rgb.green, rgb16_b.green, 1_pct));
-// 	TEST_ASSERT_TRUE(modm::Tolerance::isValueInTolerance(rgb.blue, rgb16_b.blue, 1_pct));
-// }
+	// Convertion may distort - allow some tolerance.
+	TEST_ASSERT_TRUE(modm::Tolerance::isValueInTolerance(rgb16.getRed().getValue(), rgb16_b.getRed().getValue(), 1_pct));
+	TEST_ASSERT_TRUE(modm::Tolerance::isValueInTolerance(rgb16.getGreen().getValue(), rgb16_b.getGreen().getValue(), 1_pct));
+	TEST_ASSERT_TRUE(modm::Tolerance::isValueInTolerance(rgb16.getBlue().getValue(), rgb16_b.getBlue().getValue(), 1_pct));
+}

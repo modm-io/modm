@@ -162,7 +162,7 @@ public:
 		return address;
 	}
 
-private:
+protected:
 	const T* address;
 #if MODM_HAS_IOSTREAM
 private:

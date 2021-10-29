@@ -13,38 +13,43 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_COLOR_RGB_HPP
-#error "Don't include this file directly, use 'rgb.hpp' instead!"
-#endif
+#pragma once
+#include "rgb.hpp"
 
-#include <algorithm>
-
-namespace modm::color
+template<int DR, int DG, int DB>
+template<modm::color::ColorHsv C>
+constexpr modm::color::RgbD<DR, DG, DB>::RgbD(const C& hsv)
 {
+	// OPTIMIZE No need to calculate sharper than the output
+	// Develop CalcType from types of conversion target: RedType, GreenType and BlueType.
+	using CalcType = C::ValueType;
+	using ValueType = CalcType::ValueType;
 
-// TODO Finish generalisation for uint16_t
-template<std::unsigned_integral T>
-template<std::unsigned_integral U>
-constexpr RgbT<T>::RgbT(const HsvT<U> &hsv)
-{
-	uint16_t vs = hsv.value * hsv.saturation;
-	uint16_t h6 = 6 * hsv.hue;
+	using WideType = modm::WideType<ValueType>;
+	using WideWideType = modm::WideType<WideType>;
+	static_assert(!std::is_same_v<WideType, WideWideType>, "C::ValueType too big");
 
-	T p = ((hsv.value << 8) - vs) >> 8;
-	T i = h6 >> 8;
-	uint16_t f = ((i | 1) << 8) - h6;
-	if (i & 1) { f = -f; }
-	T u = (((uint32_t)hsv.value << 16) - (uint32_t)vs * f) >> 16;
+	const ValueType hue = CalcType(hsv.getHue()).getValue();
+	const ValueType saturation = CalcType(hsv.getSaturation()).getValue();
+	const ValueType value = CalcType(hsv.getValue()).getValue();
+
+	const WideType vs = value * saturation;
+	const WideType h6 = 6 * hue;
+
+	ValueType i = h6 >> CalcType::Digits;
+	WideType f = ((i | 1) << CalcType::Digits) - h6;
+	if (i & 1) f = -f;
+
+	CalcType p(((value << CalcType::Digits) - vs) >> CalcType::Digits);
+	CalcType u(((WideWideType(value) << 2 * CalcType::Digits) - WideWideType(vs) * f) >> 2 * CalcType::Digits);
 
 	switch (i)
 	{
-		case 0: red = hsv.value; green = u; blue = p; break;
-		case 1: red = u; green = hsv.value; blue = p; break;
-		case 2: red = p; green = hsv.value; blue = u; break;
-		case 3: red = p; green = u; blue = hsv.value; break;
-		case 4: red = u; green = p; blue = hsv.value; break;
-		case 5: red = hsv.value; green = p; blue = u; break;
+		case 0: red = hsv.getValue(); green = u; blue = p; break;
+		case 1: red = u; green = hsv.getValue(); blue = p; break;
+		case 2: red = p; green = hsv.getValue(); blue = u; break;
+		case 3: red = p; green = u; blue = hsv.getValue(); break;
+		case 4: red = u; green = p; blue = hsv.getValue(); break;
+		case 5: red = hsv.getValue(); green = p; blue = u; break;
 	}
 }
-
-}	// namespace modm::color

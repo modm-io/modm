@@ -19,29 +19,25 @@ class ColorTest : public unittest::TestSuite
 {
 public:
 	void
-	testRgbCopyConstructors();
+	testGrayConstructors();
 
 	void
-	testHsvCopyConstructors();
+	testRgbConstructors();
 
 	void
-	testBrightnessCopyConstructors();
+	testHsvConstructors();
 
 	void
 	testConvertion_8bit();
 
-	// TODO 16bit convertion not yet working
-	// see hsv_impl.hpp and rgb_impl.hpp
-	// void
-	// testConvertion_16bit();
+	void
+	testConvertion_16bit();
 
 	void
 	testRgbHsvPingPongConvertion_8bit();
 
-	// TODO 16bit convertion not yet working
-	// see hsv_impl.hpp and rgb_impl.hpp
-	// void
-	// testRgbHsvPingPongConvertion_16bit();
+	void
+	testRgbHsvPingPongConvertion_16bit();
 };
 
 #endif	// COLOR_TEST_HPP

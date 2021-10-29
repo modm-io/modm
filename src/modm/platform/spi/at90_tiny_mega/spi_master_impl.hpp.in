@@ -1,0 +1,115 @@
+/*
+ * Copyright (c) 2013-2018, Niklas Hauser
+ * Copyright (c) 2014, Sascha Schade
+ * Copyright (c) 2017, Fabian Greif
+ * Copyright (c) 2021, Thomas Sommer
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <modm/platform.hpp>
+
+template <modm::unsigned_integral_max32 T>
+modm::ResumableResult<T>
+modm::platform::SpiMaster{{ id }}::transmit(const T data)
+{
+	// Interrupt enabled? transmission in progress!
+	if(SPCR{{ id }} & (1 << SPIE)) {
+		return {modm::rf::Running};
+	} else if(!state.all(State::Idle)) {
+		temp = data;
+		// TODO cleaner way to assign tx?
+		tx.u8 = (uint8_t*)(&temp);
+		size = 1;
+
+		transmit_begin<T>();
+		return {modm::rf::Running};
+	}
+
+	state.reset(State::Idle);
+
+	return {modm::rf::Stop, T(temp | SPDR{{ id }})};
+}
+
+template <modm::unsigned_integral_max32 T>
+modm::ResumableResult<void>
+modm::platform::SpiMaster{{ id }}::transmit(const T data, std::size_t repeat)
+{
+	// Interrupt enabled? transmission in progress!
+	if(SPCR{{ id }} & (1 << SPIE)) {
+		return {modm::rf::Running};
+	} else if(!state.all(State::Idle)) {
+		temp = data;
+		// TODO cleaner way to assign tx?
+		tx.u8 = (uint8_t*)(&temp);
+		size = repeat;
+
+		state.reset(State::AutoIncr);
+		transmit_begin<T>();
+		return {modm::rf::Running};
+	}
+
+	state.reset(State::Idle);
+	return {modm::rf::Stop};
+}
+
+template <modm::unsigned_integral_max32 T>
+modm::ResumableResult<void>
+modm::platform::SpiMaster{{ id }}::transmit(const T *tx_first, const T *tx_last, T *rx_first)
+{
+	modm_assert_continue_fail_debug(tx_first < tx_last, "SpiMaster{{ id }}::transmit", "tx_first > tx_last");
+	modm_assert_continue_fail_debug(
+		tx_last < rx_first
+		|| rx_first + (tx_last - tx_first) <= tx_first,
+		"SpiMaster{{ id }}::transmit", "rx overlaps tx"
+	);
+	
+	// Interrupt enabled? transmission in progress!
+	if(SPCR{{ id }} & (1 << SPIE)) {
+		return {modm::rf::Running};
+	} else if(!state.all(State::Idle)) {
+		// TODO cleaner way to assign tx and rx?
+		tx.u8 = (uint8_t*)(tx_first);
+		rx.u8 = (uint8_t*)(rx_first);
+		size = tx_last - tx_first;
+
+		state.set(State::AutoIncr);
+		transmit_begin<T>();
+		return {modm::rf::Running};
+	}
+
+	state.reset(State::Idle);
+	return {modm::rf::Stop};
+}
+
+template <modm::unsigned_integral_max32 T>
+void
+modm::platform::SpiMaster{{ id }}::SpiMaster{{ id }}::transmit_begin() {
+	state.set(State::Idle);
+	index = 0;
+
+	if constexpr(std::is_same<T, uint8_t>::value) {
+		TxByteCount_t::set(state, ByteCount::Byte);
+		SPDR{{ id }} = tx.u8[0];
+	} else if constexpr(std::is_same<T, uint16_t>::value) {
+		TxByteCount_t::set(state, ByteCount::HalfWord);
+		bytes_left = 1 * 8;
+		SPDR{{ id }} = tx.u16[0] >> 8; // >> bytes_left
+	} else if constexpr(std::is_same<T, uint32_t>::value) {
+		TxByteCount_t::set(state, ByteCount::Word);
+		bytes_left = 3 * 8;
+		SPDR{{ id }} = tx.u32[0] >> 24; // >> bytes_left
+
+		if(rx.u32) rx.u32[index] = 0; // Need reset, because received bytes are | (ored)
+	}
+
+	 // enable Interrupt
+	SPCR{{ id }} |= (1 << SPIE);
+}

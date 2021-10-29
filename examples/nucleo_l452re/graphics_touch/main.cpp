@@ -51,7 +51,7 @@ namespace touch
 	//using Interrupt = modm::platform::GpioA10;
 }
 
-modm::Touch2046<touch::Spi, touch::Cs> touchController;
+modm::Touch2046<touch::Spi, touch::Cs, 320, 240> touchController;
 
 
 int
@@ -75,12 +75,10 @@ main()
 		touch::Mosi::Mosi>();
 	touch::Spi::initialize<SystemClock, 2500_kHz>();
 	modm::touch2046::Calibration cal{
-		.OffsetX = -11,
-		.OffsetY = 335,
 		.FactorX = 22018,
+		.OffsetX = -11,
 		.FactorY = -29358,
-		.MaxX = 240,
-		.MaxY = 320,
+		.OffsetY = 335,
 		.ThresholdZ = 500,
 	};
 	touchController.setCalibration(cal);
@@ -107,13 +105,13 @@ main()
 
 	int16_t X = 0;
 	int16_t Y = 0;
-	int16_t Z = 0;
+	// int16_t Z = 0;
 
 	while (true)
 	{
 		LedGreen::set();
 
-		std::tie(X, Y, Z) = RF_CALL_BLOCKING(touchController.getRawValues());
+		std::tie(X, Y) = RF_CALL_BLOCKING(touchController.getTouchPosition());
 		tftController.setColor(Red);
 		tftController.fillRectangle({30, 50}, 90, 115);
 		tftController.setColor(Black);
@@ -121,8 +119,8 @@ main()
 		tftController << "X=" << X;
 		tftController.setCursor(0, 90);
 		tftController << "Y=" << Y;
-		tftController.setCursor(0, 130);
-		tftController << "Z=" << Z;
+		// tftController.setCursor(0, 130);
+		// tftController << "Z=" << Z;
 
 		tftController.setColor(Red);
 		tftController.fillRectangle({30, 220}, 120, 35);

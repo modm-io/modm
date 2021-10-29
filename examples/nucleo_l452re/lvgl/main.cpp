@@ -59,7 +59,7 @@ namespace touch
 	//using Interrupt = modm::platform::GpioA10;
 }
 
-modm::Touch2046<touch::Spi, touch::Cs> touchController;
+modm::Touch2046<touch::Spi, touch::Cs, 320, 240> touchController;
 
 
 static lv_disp_draw_buf_t disp_buf;

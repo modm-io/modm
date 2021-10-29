@@ -22,3 +22,4 @@ def prepare(module, options):
 def build(env):
     env.outbasepath = "modm/src/modm/driver/display"
     env.copy("sh1106.hpp")
+    env.copy("sh1106_impl.hpp")

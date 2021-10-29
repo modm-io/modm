@@ -190,6 +190,18 @@ public:
 			ChannelHal::setPeripheralAddress(address);
 		}
 
+				static void
+		setMemoryDataSize(MemoryDataSize memoryDataSize)
+		{
+			ChannelHal::setMemoryDataSize(memoryDataSize);
+		}
+
+		static void
+		setPeripheralDataSize(PeripheralDataSize peripheralDataSize)
+		{
+			ChannelHal::setPeripheralDataSize(peripheralDataSize);
+		}
+
 		/**
 		 * Enable/disable memory increment
 		 *

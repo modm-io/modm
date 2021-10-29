@@ -71,6 +71,20 @@ struct Spi
 		Div64 = (1 << SPR1{{ id }}),
 		Div128 = (1 << SPR1{{ id }}) | (1 << SPR0{{ id }}),
 	};
+
+	enum State : uint8_t {
+		Idle = Bit6,		// Transaction is running
+		AutoIncr = Bit7,	// Increment index in tx/rx after each value transmission
+	};
+	MODM_FLAGS8(State);
+
+	enum ByteCount : uint8_t {
+		Byte = 0,		// 1 byte
+		HalfWord = 1,	// 2 bytes
+		Word = 2,		// 4 bytes
+		// WordWord = 3	// 8 bytes
+	};
+	typedef Configuration<State_t, ByteCount, 0b11, 0> TxByteCount_t; // Right-aligned cause of highest access-rate
 };
 
 } // namespace platform

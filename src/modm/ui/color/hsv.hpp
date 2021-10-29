@@ -1,8 +1,4 @@
 /*
- * Copyright (c) 2009, Martin Rosekeit
- * Copyright (c) 2009-2013, Fabian Greif
- * Copyright (c) 2012-2013, 2015, Niklas Hauser
- * Copyright (c) 2013, David Hebbeker
  * Copyright (c) 2021, Thomas Sommer
  *
  * This file is part of the modm project.
@@ -13,109 +9,116 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_COLOR_HSV_HPP
-#define MODM_COLOR_HSV_HPP
+#pragma once
 
 #include <stdint.h>
 #include <concepts>
 
-#include "brightness.hpp"
-#include "rgb.hpp"
-#include "rgb565.hpp"
+#include "concepts.hpp"
+#include "gray.hpp"
+
+#include <modm/math/utils/arithmetic_traits.hpp>
 
 namespace modm::color
 {
-
-// forward declarations for convertion constructors
-template<std::unsigned_integral T>
-class RgbT;
-
-template<std::unsigned_integral T>
-class BrightnessT;
-
-class Rgb565;
-
 /**
- * @brief		Color in HSV Colorspace
+ * @brief			Color in HSV space. Each channel has it's own Memoryaddress.
  *
- * @author		Martin Rosekeit, Fabian Greif, Niklas Hauser, David Hebbeker, Thomas Sommer
- * @ingroup		modm_ui_color
+ * @tparam DH 		Digits for hue
+ * @tparam DS 		Digits for saturation
+ * @tparam DV 		Digits for value
+ *
+ * @author			Thomas Sommer
+ * @ingroup			modm_ui_color
  */
-template<std::unsigned_integral T>
-class HsvT
+template<int DH, int DS = DH, int DV = DH>
+class HsvD
 {
 public:
-	T hue{0};
-	T saturation{0};
-	T value{0};
+	// TODO HueType should wrap rather than saturate
+	using HueType = GrayD<DH>;
+	using SaturationType = GrayD<DS>;
+	using ValueType = GrayD<DV>;
 
-	constexpr HsvT() = default;
+	constexpr HsvD() = default;
 
-	constexpr HsvT(T hue, T saturation, T value) : hue(hue), saturation(saturation), value(value) {}
-
-	/**
-	 * Copy Constructor 8bit->16bit
-	 */
-	template<std::unsigned_integral U>
-		requires std::is_same_v<T, uint16_t> && std::is_same_v<U, uint8_t>
-	constexpr HsvT(const HsvT<U> &hsv_other)
-		: hue(hsv_other.hue << 8), saturation(hsv_other.saturation << 8), value(hsv_other.value << 8)
+	constexpr HsvD(HueType hue, SaturationType saturation, ValueType value)
+		: hue(hue), saturation(saturation), value(value)
 	{}
 
-	/**
-	 * Copy Constructor 16bit->8bit
-	 */
-	template<std::unsigned_integral U>
-		requires std::is_same_v<T, uint8_t> && std::is_same_v<U, uint16_t>
-	constexpr HsvT(const HsvT<U> &hsv_other)
-		: hue(hsv_other.hue >> 8), saturation(hsv_other.saturation >> 8), value(hsv_other.value >> 8)
+	template<ColorHsv C>
+	constexpr HsvD(const C &other)
+		: hue(other.hue), saturation(other.saturation), value(other.value)
 	{}
 
-	/**
-	 * Convertion Constructor for RGB Color
-	 *
-	 * @param rgb	RGB Color
-	 */
-	template<std::unsigned_integral U>
-	constexpr HsvT(const RgbT<U>& rgb);
+	template<ColorRgb C>
+	constexpr HsvD(const C& rgb);
 
-	/**
-	 * Convertion Constructor for Brightness
-	 *
-	 * @param brightness	Brightness 'Color'-object
-	 */
-	template<std::unsigned_integral U>
-	constexpr HsvT(const BrightnessT<U> gray) : hue(0), saturation(0), value(gray.value)
-	{}
+	template<ColorRgbStacked CS>
+ 	constexpr HsvD(const CS& rgbstacked) : HsvD(RgbD<CS::DR, CS::DG, CS::DB>(rgbstacked)) {}
 
-	/**
-	 * Convertion Constructor for RGB565 Color
-	 *
-	 * @param rgb565	RGB565 Color
-	 */
-	constexpr HsvT(const Rgb565& rgb565) : HsvT(RgbT<uint8_t>(rgb565)) {}
+	void setHue(HueType hue) { this->hue = hue;}
+	void setSaturation(SaturationType saturation) { this->saturation = saturation;}
+	void setValue(ValueType value) { this->value = value;}
+
+	HueType getHue() const { return hue; }
+
+	SaturationType getSaturation() const { return saturation; }
+	ValueType getValue() const { return value; }
 
 	constexpr bool
-	operator==(const HsvT<T>& other) const = default;
+	operator==(const HsvD& other) const = default;
+
+	// IMPLEMENT missing operators
+	// operator+=()
+	// operator-=()
+	// operator*=()
+
+	void invert() {
+		hue.invert();
+	}
+
+	// Output in human readable format
+	// Hue in deg, Sat in pct, Value in pct
+	void iostream_human_readable(IOStream& io) {
+		using CalcTypeHue = modm::WideType<typename HueType::ValueType>;
+		io << (CalcTypeHue(hue.getValue()) * 360 / hue.max) << "deg\t";
+
+		using CalcTypeSaturation = modm::WideType<typename SaturationType::ValueType>;
+ 		io << (CalcTypeSaturation(saturation.getValue()) * 100 / saturation.max) << "%\t";
+
+		using CalcTypeValue = modm::WideType<typename ValueType::ValueType>;
+		io << (CalcTypeValue(value.getValue()) * 100 / value.max) << "%";
+	}
 
 private:
-	template<std::unsigned_integral U>
+	HueType hue{0};
+	SaturationType saturation{0};
+	ValueType value{0};
+
+	template<int, int, int>
+	friend class HsvD;
+
+	template<ColorHsv C>
 	friend IOStream&
-	operator<<(IOStream&, const HsvT<U>&);
+	operator<<(IOStream&, const C&);
 };
 
-/// @ingroup modm_ui_color
-using Hsv = HsvT<uint8_t>;
+template<std::unsigned_integral T>
+using HsvT = HsvD<std::numeric_limits<T>::digits>;
 
+/// @ingroup modm_ui_color
+using Hsv888 = HsvD<8>; // Alternative using Hsv888 = HsvT<uint8_t>;
+using Hsv161616 = HsvD<16>; // Alternative using Hsv888 = HsvT<uint16_t>;
 
 #if __has_include(<modm/io/iostream.hpp>)
 #include <modm/io/iostream.hpp>
 
-template<std::unsigned_integral U>
+template<ColorHsv C>
 IOStream&
-operator<<(IOStream& os, const color::HsvT<U>& color)
+operator<<(IOStream& os, const C& hsv)
 {
-	os << color.hue << "\t" << color.saturation << "\t" << color.value;
+	os << hsv.getHue() << "\t" << hsv.getSaturation() << "\t" << hsv.getValue();
 	return os;
 }
 #endif
@@ -123,5 +126,3 @@ operator<<(IOStream& os, const color::HsvT<U>& color)
 }  // namespace modm::color
 
 #include "hsv_impl.hpp"
-
-#endif  // MODM_COLOR_HSV_HPP

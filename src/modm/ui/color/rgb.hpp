@@ -1,8 +1,4 @@
 /*
- * Copyright (c) 2009, Martin Rosekeit
- * Copyright (c) 2009-2013, Fabian Greif
- * Copyright (c) 2012-2013, 2015, Niklas Hauser
- * Copyright (c) 2013, David Hebbeker
  * Copyright (c) 2021, Thomas Sommer
  *
  * This file is part of the modm project.
@@ -13,8 +9,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_COLOR_RGB_HPP
-#define MODM_COLOR_RGB_HPP
+#pragma once
 
 #include <stdint.h>
 #include <bit>
@@ -24,102 +19,95 @@
 #include <modm/math/utils/arithmetic_traits.hpp>
 #include <type_traits>
 
-#include "brightness.hpp"
-#include "hsv.hpp"
-#include "rgb565.hpp"
+#include "concepts.hpp"
+#include "gray.hpp"
 
 namespace modm::color
 {
-
-// forward declarations for convertion constructors
-template<std::unsigned_integral T>
-class HsvT;
-
-template<std::unsigned_integral T>
-class BrightnessT;
-
-class Rgb565;
-
 /**
- * Color in HSV Colorspace
+ * @brief 			Color in RGB space. Each channel has it's own Memoryaddress.
  *
- * @author		Martin Rosekeit, Fabian Greif, Niklas Hauser, David Hebbeker, Thomas Sommer
- * @ingroup		modm_ui_color
+ * @tparam DR 		Digits for red channel
+ * @tparam DG 		Digits for green channel
+ * @tparam DB 		Digits for blue channel
+ *
+ * @author			Thomas Sommer
+ * @ingroup			modm_ui_color
  */
-template<std::unsigned_integral T>
-class RgbT
+template<int DR, int DG = DR, int DB = DR>
+class RgbD
 {
 public:
-	T red{0};
-	T green{0};
-	T blue{0};
+	using RedType = GrayD<DR>;
+	using GreenType = GrayD<DG>;
+	using BlueType = GrayD<DB>;
 
-	using TSum = modm::WideType<T>;
+	// using RgbSumValueType = modm::fits_any_t<RedType::ValueType, GreenType::ValueType, BlueType::ValueType>;
 
-	constexpr RgbT() = default;
+	constexpr RgbD() = default;
 
-	constexpr RgbT(T red, T green, T blue) : red(red), green(green), blue(blue) {}
-
-	/**
-	 * Copy Constructor 8bit->16bit
-	 */
-	template<std::unsigned_integral U>
-		requires std::is_same_v<T, uint16_t> && std::is_same_v<U, uint8_t>
-	constexpr RgbT(const RgbT<U> &rgb_other)
-		: red(rgb_other.red << 8), green(rgb_other.green << 8), blue(rgb_other.blue << 8)
+	constexpr RgbD(RedType red, GreenType green, BlueType blue)
+		: red(red), green(green), blue(blue)
 	{}
 
-	/**
-	 * Copy Constructor 16bit->8bit
-	 */
-	template<std::unsigned_integral U>
-		requires std::is_same_v<T, uint8_t> && std::is_same_v<U, uint16_t>
-	constexpr RgbT(const RgbT<U> &rgb_other)
-		: red(rgb_other.red >> 8), green(rgb_other.green >> 8), blue(rgb_other.blue >> 8)
+	template<ColorRgb C>
+	constexpr RgbD(const C& rgb_other)
+		: red(rgb_other.red), green(rgb_other.green), blue(rgb_other.blue)
 	{}
 
-	/**
-	 * Convertion Constructor for HSV Color
-	 *
-	 * @param hsv	HSV Color
-	 */
-	template<std::unsigned_integral U>
-	constexpr RgbT(const HsvT<U>& hsv);
+	template<ColorGray C>
+	constexpr RgbD(const C &gray)
+		: red(gray), green(gray), blue(gray) {}
 
-	/**
-	 * Convertion Constructor for Brightness
-	 *
-	 * @param brightness	Brightness 'Color'-object
-	 */
-	// TODO Plump conversion, implement the right way
-	template<std::unsigned_integral U>
-	constexpr RgbT(const BrightnessT<U> brightness)
-		: red(brightness), green(brightness), blue(brightness)
+ 	template<ColorRgbStacked C>
+ 	constexpr RgbD(const C& rgbs)
+		: red(rgbs.getRed()), green(rgbs.getGreen()), blue(rgbs.getBlue())
 	{}
 
-	/**
-	 * Convertion Constructor for RGB565 Color
-	 *
-	 * @param rgb565	RGB565 Color
-	 */
-	constexpr RgbT(const Rgb565& rgb565)
-		: red((rgb565.color >> 8) & 0xF8),
-		  green((rgb565.color >> 3) & 0xFC),
-		  blue(rgb565.color << 3)
-	{}
+	template<ColorHsv C>
+	constexpr RgbD(const C& hsv);
+
+	void setRed(RedType red) { this->red = red;}
+	void setGreen(GreenType green) { this->green = green;}
+	void setBlue(BlueType blue) { this->blue = blue;}
+
+	RedType getRed() const { return red; }
+	GreenType getGreen() const { return green; }
+	BlueType getBlue() const { return blue; }
+
+	// IMPLEMENT missing operators
+	// operator+=()
+	// operator-=()
+	// operator*=()
 
 	constexpr bool
-	operator==(const RgbT<T>& other) const = default;
+	operator==(const RgbD& other) const = default;
+
+	void invert() {
+		red.invert();
+		green.invert();
+		blue.invert();
+	}
 
 private:
-	template<std::unsigned_integral U>
+	RedType red{0};
+	GreenType green{0};
+	BlueType blue{0};
+
+	template<int, int, int>
+	friend class RgbD;
+
+	template<ColorRgb C>
 	friend IOStream&
-	operator<<(IOStream&, const RgbT<U>&);
+	operator<<(IOStream&, const C&);
 };
 
-/// @ingroup modm_ui_color
-using Rgb = RgbT<uint8_t>;
+template<std::unsigned_integral U>
+using RgbT = RgbD<std::numeric_limits<U>::digits>;
 
+/// @ingroup modm_ui_color
+using Rgb888 = RgbD<8>; // Alternative using Rgb888 = RgbT<uint8_t>
+using Rgb161616 = RgbD<16>; // Alternative using Rgb161616 = RgbT<uint16_t>
 
 /**
  * Normalize color values based on a clear value
@@ -133,26 +121,27 @@ using Rgb = RgbT<uint8_t>;
  *
  * @ingroup modm_ui_color
  */
-template<std::unsigned_integral T, typename IntermediateType = float, std::unsigned_integral ReturnType = T>
+template<ColorRgb C, typename IntermediateType = float, ColorRgb ReturnColor = C>
 	requires std::is_fundamental_v<IntermediateType>
-constexpr RgbT<ReturnType>
-normalizeColor(RgbT<T> rgb, IntermediateType multiplier = 1)
+constexpr ReturnColor
+normalizeColor(C rgb, IntermediateType multiplier = 1)
 {
 	const IntermediateType sum = IntermediateType(rgb.red) + rgb.green + rgb.blue;
-	return RgbT<ReturnType>(IntermediateType(rgb.red) * multiplier / sum,
-							IntermediateType(rgb.green) * multiplier / sum,
-							IntermediateType(rgb.blue) * multiplier / sum);
+	return {
+		IntermediateType(rgb.getRed()) * multiplier / sum,
+		IntermediateType(rgb.getGreen()) * multiplier / sum,
+		IntermediateType(rgb.getBlue()) * multiplier / sum
+	};
 }
-
 
 #if __has_include(<modm/io/iostream.hpp>)
 #include <modm/io/iostream.hpp>
 
-template<std::unsigned_integral U>
+template<ColorRgb C>
 IOStream&
-operator<<(IOStream& os, const color::RgbT<U>& color)
+operator<<(IOStream& os, const C& rgb)
 {
-	os << color.red << "\t" << color.green << "\t" << color.blue;
+	os << rgb.getRed() << "\t" << rgb.getGreen() << "\t" << rgb.getBlue();
 	return os;
 }
 #endif
@@ -160,5 +149,3 @@ operator<<(IOStream& os, const color::RgbT<U>& color)
 }  // namespace modm::color
 
 #include "rgb_impl.hpp"
-
-#endif  // MODM_COLOR_RGB_HPP

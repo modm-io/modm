@@ -155,6 +155,7 @@ public:
 		Bit16 		= HalfWord,
 		Word 		= {{ reg_prefix }}_MSIZE_1,
 		Bit32 		= Word,
+		All			= DMA_CCR_MSIZE_0 | DMA_CCR_MSIZE_1
 	};
 
 	enum class
@@ -166,6 +167,7 @@ public:
 		Bit16 		= HalfWord,
 		Word 		= {{ reg_prefix }}_PSIZE_1,
 		Bit32 		= Word,
+		All			= DMA_CCR_PSIZE_0 | DMA_CCR_PSIZE_1
 	};
 
 	enum class
