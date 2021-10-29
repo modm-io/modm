@@ -19,6 +19,7 @@ Currently only one basic linkerscript is supported.
             │  +HEAP_RAM             │
             │  .noinit_ram           │
             │  .noinit               │
+            │  .faststack            │
             │  .bss_ram              │
             │  .bss                  │
             │  .data_ram             │

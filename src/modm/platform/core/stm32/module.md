@@ -59,6 +59,7 @@ SRAMs explicitly to free up the space in the lower sections.
             │  +HEAP_SRAM1           │
             │  .noinit_sram1         │
             │  .noinit               │
+            │  .faststack            │
             │  .bss_sram1            │
             │  .bss                  │
             │  .data_sram1           │
@@ -128,6 +129,7 @@ Therefore the main stack is placed into SRAM, even though it is slower than CCM.
             │  +HEAP_SRAM1           │
             │  .noinit_sram1         │
             │  .noinit               │
+            │  .faststack            │
             │  .bss_sram1            │
             │  .bss                  │
             │  .data_sram1           │
@@ -199,6 +201,7 @@ not DMA-able.
             │  +HEAP_SRAM1           │
             │  .noinit_sram1         │
             │  .noinit               │
+            │  .faststack            │
             │  .bss_sram1            │
             │  .bss                  │
             │  .data_sram1           │
@@ -277,6 +280,7 @@ overflow into the SRAM1/2 sections.
             │  +HEAP_DTCM            │
             │  .noinit_dtcm          │
             │  .noinit               │
+            │  .faststack            │
    D-Code   │  .bss_dtcm             │
     only    │  .bss                  │
    access   │  .data_dtcm            │
@@ -383,6 +387,7 @@ placed into the 128kB DTCM, but cannot overflow into D1_SRAM section.
             │  +HEAP_DTCM            │
             │  .noinit_dtcm          │
             │  .noinit               │
+            │  .faststack            │
    D-Code   │  .bss_dtcm             │
     only    │  .data_dtcm            │
    access   │  .data                 │

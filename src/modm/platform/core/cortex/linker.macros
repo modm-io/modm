@@ -119,6 +119,7 @@ TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 {{ linkerscript_extern_zero | indent(8, first=True) }}
 	%% endif
 		__table_zero_extern_end = .;
+
 		__table_copy_extern_start = .;
 	%% if linkerscript_extern_copy
 {{ linkerscript_extern_copy | indent(8, first=True) }}
@@ -139,17 +140,7 @@ TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 	} >{{memory}}
 %% endmacro
 
-%% macro section(memory, name, table_copy, sections=[])
-	%% do table_copy.append(name)
-	.{{name}} :
-	{
-		. = ALIGN(4);
-		__{{name}}_load = LOADADDR(.{{name}});
-		__{{name}}_start = .;
-		*(.{{name}} .{{name}}.*)
-		. = ALIGN(4);
-		__{{name}}_end = .;
-	} >{{memory}}
+%% macro section_load(memory, table_copy, sections)
 	%% do table_copy.extend(sections)
 	%% for section in sections
 	%#
@@ -192,7 +183,7 @@ TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		%% for region in cont_region.contains
 	/* Sections in {{ region.name|upper }} */
 			%% if region.index
-{{ section(cont_region.cont_name|upper + " AT >FLASH", "data_"+region.name, table_copy) }}
+{{ section_load(cont_region.cont_name|upper + " AT >FLASH", table_copy, sections=["data_"+region.name]) }}
 				%% do table_zero.append("bss_"+region.name)
 			%% endif
 {{ section_heap(region.name|upper, "heap_"+region.name, cont_region.cont_name|upper,
@@ -281,7 +272,7 @@ TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 %% endmacro
 
 
-%% macro section_ram(memory, rom, table_copy, table_zero, sections_data=[], sections_bss=[])
+%% macro section_ram(memory, rom, table_copy, table_zero, sections_data=[], sections_bss=[], sections_noinit=[])
 	/* Read-write sections in {{memory}} */
 	%% do table_copy.append("data")
 	.data :
@@ -312,10 +303,21 @@ TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		__bss_start = . ;
 		*(.bss .bss.* .gnu.linkonce.b.*)
 		. = ALIGN(4);
+	%% for section in sections_bss
+	} >{{memory}}
+	%#
+	.{{section}} (NOLOAD) :
+	{
+		__{{section}}_start = . ;
+		*(.{{section}} .{{section}}.*)
+		. = ALIGN(4);
+		__{{section}}_end = .;
+	%% endfor
 		__bss_end = .;
 	} >{{memory}}
-	%% do table_zero.extend(sections_bss)
-	%% for section in sections_bss
+	%#
+	%% do sections_noinit.insert(0, "noinit")
+	%% for section in sections_noinit
 	%#
 	.{{section}} (NOLOAD) :
 	{
@@ -325,14 +327,6 @@ TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		__{{section}}_end = .;
 	} >{{memory}}
 	%% endfor
-	%#
-	.noinit (NOLOAD) :
-	{
-		__noinit_start = .;
-		*(.noinit .noinit.*)
-		. = ALIGN(4);
-		__noinit_end = .;
-	} >{{memory}}
 %% endmacro
 
 
