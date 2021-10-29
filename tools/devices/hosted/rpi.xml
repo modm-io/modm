@@ -4,8 +4,8 @@
   <device platform="hosted" family="rpi">
     <naming-schema>{platform}-{family}</naming-schema>
 
-    <driver name="core" type="rpi"/>
-    <driver name="gpio" type="rpi"/>
+    <driver name="core" type="hosted-arm64"/>
+    <driver name="gpio" type="wiring-rpi"/>
     <driver name="uart" type="hosted"/>
   </device>
 </modm>

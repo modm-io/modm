@@ -17,7 +17,7 @@ def init(module):
 
 
 def prepare(module, options):
-    if not options[":target"].has_driver("gpio:rpi"):
+    if not options[":target"].has_driver("gpio:wiring-rpi"):
         return False
 
     module.depends(":architecture:gpio")
