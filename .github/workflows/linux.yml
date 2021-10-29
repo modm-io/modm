@@ -197,7 +197,7 @@ jobs:
       - name: Compile AVR Unittests ATmega
         if: always()
         run: |
-          (cd test && make compile-mega-2560-pro)
+          (cd test && make compile-mega-2560-pro_A compile-mega-2560-pro_B)
       - name: Quick compile HAL for AVR Devices
         if: always()
         run: |

@@ -133,7 +133,11 @@ run-arduino-nano_H:
 	$(call run-test,arduino-nano_H,size)
 
 
-compile-mega-2560-pro:
-	$(call compile-test,mega-2560-pro,size)
-run-mega-2560-pro:
-	$(call run-test,mega-2560-pro,size)
+compile-mega-2560-pro_A:
+	$(call compile-test,mega-2560-pro_A,size)
+run-mega-2560-pro_A:
+	$(call run-test,mega-2560-pro_A,size)
+compile-mega-2560-pro_B:
+	$(call compile-test,mega-2560-pro_B,size)
+run-mega-2560-pro_B:
+	$(call run-test,mega-2560-pro_B,size)
