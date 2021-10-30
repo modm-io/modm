@@ -183,20 +183,26 @@ public:
 	inline static void
 	setOutput()
 	{
+		// Enable PIO control of the pin (disables peripheral control)
+		setPortReg(PIO_PER_OFFSET);
+		// Enable output driver
 		setPortReg(PIO_OER_OFFSET);
 	}
 
 	inline static void
 	setOutput(bool status)
 	{
-		setOutput();
 		set(status);
+		setOutput();
 	}
 
 	static void
 	setInput()
 	{
-		setPortReg(PIO_ODR_OFFSET); // Disable output driver
+		// Enable PIO control of the pin (disables peripheral control)
+		setPortReg(PIO_PER_OFFSET);
+		// Disable output driver
+		setPortReg(PIO_ODR_OFFSET);
 	}
 
 	static void
@@ -336,19 +342,22 @@ public:
 	setOutput()
 	{
 		setPortReg(PORT_DIRSET_OFFSET);
+		// Disable peripheral multiplexer
+		PinCfg::set(0);
 	}
 
 	inline static void
 	setOutput(bool status)
 	{
-		setOutput();
 		set(status);
+		setOutput();
 	}
 
 	static void
 	setInput()
 	{
 		setPortReg(PORT_DIRCLR_OFFSET);
+		PinCfg::set(PORT_PINCFG_INEN);
 	}
 
 	static void
