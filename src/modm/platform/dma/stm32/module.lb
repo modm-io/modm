@@ -36,13 +36,7 @@ def prepare(module, options):
             "stm32-stream-channel",
     ]:
         return False
-
-    did = device.identifier
-
-    if did["family"] in ["f0", "f1", "f3", "f4", "f7", "l0", "l1", "l4", "g0", "g4", "h7"]:
-        return True
-
-    return False
+    return True
 
 
 def get_irq_list(device):
