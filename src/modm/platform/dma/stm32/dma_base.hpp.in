@@ -25,7 +25,7 @@
 #include <modm/architecture/interface/interrupt.hpp>
 #include <modm/architecture/interface/register.hpp>
 
-%% if dmaType in ["stm32-stream-channel"]
+%% if dmaType in ["stm32-stream-channel", "stm32-mux-stream"]
 	%% set reg_prefix = "DMA_SxCR"
 %% elif dmaType in ["stm32-channel-request", "stm32-channel", "stm32-mux"]
 	%% set reg_prefix = "DMA_CCR"
@@ -88,7 +88,7 @@ public:
 	%% endfor
 	};
 
-%% elif dmaType in ["stm32-channel-request", "stm32-channel", "stm32-mux"]
+%% elif dmaType in ["stm32-channel-request", "stm32-channel", "stm32-mux", "stm32-mux-stream"]
 	enum class
 	Channel
 	{
@@ -115,12 +115,19 @@ public:
 		Request{{ request }}{% if request == 0 %} = 0{% endif %},
 	%% endfor
 	};
-	%% elif dmaType in ["stm32-mux"]:
+	%% elif dmaType in ["stm32-mux", "stm32-mux-stream"]:
+	%% set request_count = namespace(max_requests = 0)
+	%% for request in dma["requests"][0]["request"]
+		%% if request_count.max_requests < request.position | int
+			%% set request_count.max_requests = request.position | int
+		%% endif
+	%% endfor
+
 	enum class
 	Request
 	{
 		None = 0,
-	%% for request in range(1, 127 + 1)
+	%% for request in range(1, request_count.max_requests + 1)
 		Request{{ request }},
 	%% endfor
 	};
@@ -192,7 +199,7 @@ public:
 	enum class
 	DataTransferDirection : uint32_t
 	{
-%% if dmaType in ["stm32-stream-channel"]
+%% if dmaType in ["stm32-stream-channel", "stm32-mux-stream"]
 		/// Source: DMA_SxPAR; Sink: DMA_SxM0AR
 		PeripheralToMemory 	= 0,
 		/// Source: DMA_SxM0AR; Sink: DMA_SxPAR
@@ -220,7 +227,7 @@ public:
 %% endfor
 	};
 
-%% if dmaType in ["stm32-stream-channel"]
+%% if dmaType in ["stm32-stream-channel", "stm32-mux-stream"]
 	enum class InterruptEnable {
 		DirectModeError		= DMA_SxCR_DMEIE,
 		TransferError		= DMA_SxCR_TEIE,
@@ -260,7 +267,7 @@ public:
 	using IrqHandler = void (*)(void);
 
 protected:
-%% if dmaType in ["stm32-stream-channel"]
+%% if dmaType in ["stm32-stream-channel", "stm32-mux-stream"]
 	static constexpr uint32_t memoryMask =
 			DMA_SxCR_MBURST_Msk |					// MemoryBurstTransfer
 			DMA_SxCR_MSIZE_Msk |					// MemoryDataSize
@@ -272,7 +279,9 @@ protected:
 			DMA_SxCR_PINC_Msk |						// PeripheralIncrementMode
 			DMA_SxCR_DIR_Msk;						// DataTransferDirection
 	static constexpr uint32_t configmask =
+%% if dmaType == "stm32-stream-channel"
 			DMA_SxCR_CHSEL_Msk |					// Channel
+%% endif
 			DMA_SxCR_PL_Msk |						// Priority
 			DMA_SxCR_CIRC_Msk |						// CircularMode
 			DMA_SxCR_PFCTRL_Msk;					// FlowControl

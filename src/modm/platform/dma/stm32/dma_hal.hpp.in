@@ -25,7 +25,7 @@ namespace platform
 
 %% if dmaType in ["stm32-channel-request", "stm32-channel", "stm32-mux"]
 %% set cr = "CCR"
-%% elif dmaType in ["stm32-stream-channel"]
+%% elif dmaType in ["stm32-stream-channel", "stm32-mux-stream"]
 %% set cr = "CR"
 using DMA_Channel_TypeDef = DMA_Stream_TypeDef;
 %% endif
@@ -72,7 +72,7 @@ class DmaHal : public DmaBase
 		else
 			return DMA2_Channel1_BASE;
 %% endif
-%% elif dmaType in ["stm32-stream-channel"]
+%% elif dmaType in ["stm32-stream-channel", "stm32-mux-stream"]
 		if (id == 1)
 			return DMA1_Stream0_BASE;
 %% if (dma.instance | length) > 1
@@ -112,7 +112,7 @@ public:
 %% if dmaType in ["stm32-channel-request", "stm32-channel", "stm32-mux"]
 	/// Register offset from channel to channel
 	static constexpr uint32_t CHANNEL_2_CHANNEL { 0x14 };
-%% elif dmaType in ["stm32-stream-channel"]
+%% elif dmaType in ["stm32-stream-channel", "stm32-mux-stream"]
 	/// Register offset from channel to channel
 	static constexpr uint32_t CHANNEL_2_CHANNEL { 0x18 };
 %% endif
@@ -123,7 +123,7 @@ public:
 		DMA_TypeDef *DMA = reinterpret_cast<DMA_TypeDef *>(DMA_BASE);
 %% if dmaType in ["stm32-channel-request", "stm32-channel", "stm32-mux"]
 		DMA->IFCR = uint32_t(flags) << (uint32_t(ChannelID) * 4);
-%% elif dmaType in ["stm32-stream-channel"]
+%% elif dmaType in ["stm32-stream-channel", "stm32-mux-stream"]
 		uint8_t ch = uint8_t(ChannelID);
 		constexpr uint8_t offsetLut[4] = {0, 6, 16, 22};
 		if (ch < 4) {
@@ -142,7 +142,7 @@ public:
 		DMA_TypeDef *DMA = reinterpret_cast<DMA_TypeDef *>(DMA_BASE);
 		return DMA->ISR;
 	}
-%% elif dmaType in ["stm32-stream-channel"]
+%% elif dmaType in ["stm32-stream-channel", "stm32-mux-stream"]
 	static uint64_t
 	getInterruptFlags()
 	{
@@ -227,7 +227,7 @@ public:
 		DMA_Channel_TypeDef *Base = (DMA_Channel_TypeDef *) CHANNEL_BASE;
 %% if dmaType in ["stm32-channel-request", "stm32-channel", "stm32-mux"]
 		Base->CMAR = address;
-%% elif dmaType in ["stm32-stream-channel"]
+%% elif dmaType in ["stm32-stream-channel", "stm32-mux-stream"]
 		Base->M0AR = address;
 %% endif
 	}
@@ -245,7 +245,7 @@ public:
 		DMA_Channel_TypeDef *Base = (DMA_Channel_TypeDef *) CHANNEL_BASE;
 %% if dmaType in ["stm32-channel-request", "stm32-channel", "stm32-mux"]
 		Base->CPAR = address;
-%% elif dmaType in ["stm32-stream-channel"]
+%% elif dmaType in ["stm32-stream-channel", "stm32-mux-stream"]
 		Base->PAR = address;
 %% endif
 	}
@@ -297,7 +297,7 @@ public:
 		DMA_Channel_TypeDef *Base = (DMA_Channel_TypeDef *) CHANNEL_BASE;
 %% if dmaType in ["stm32-channel-request", "stm32-channel", "stm32-mux"]
 		Base->CNDTR = length;
-%% elif dmaType in ["stm32-stream-channel"]
+%% elif dmaType in ["stm32-stream-channel", "stm32-mux-stream"]
 		Base->NDTR = length;
 %% endif
 	}
