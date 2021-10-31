@@ -485,15 +485,16 @@ namespace dma
 
 %% for request in dma["requests"][0]["request"]
 
-%% if request.signal[0].name is defined
-%% set request_signal = "DmaBase::Signal::" + request.signal[0].name.capitalize()
+%% for signal in request.signal
+%% if signal.name is defined
+%% set request_signal = "DmaBase::Signal::" + signal.name.capitalize()
 %% else
 %% set request_signal = "DmaBase::Signal::NoSignal"
 %% endif
 
-%% set peripheral = request.signal[0].driver.capitalize()
-%% if request.signal[0].instance is defined
-	%% set peripheral = peripheral ~ request.signal[0].instance
+%% set peripheral = signal.driver.capitalize()
+%% if signal.instance is defined
+	%% set peripheral = peripheral ~ signal.instance
 %% endif
 %% if peripheral in ["Dma", "Quadspi", "Swpmi"]
 	%% set peripheral = peripheral ~ 1
@@ -505,6 +506,7 @@ namespace dma
 		using Channel = ChannelT;
 		static constexpr DmaBase::Request Request = DmaBase::Request::Request{{ request.position }};
 	};
+%% endfor
 %% endfor
 
 }
