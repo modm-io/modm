@@ -102,10 +102,12 @@ void __modm_startup(void)
 	SCB_EnableICache();
 %% endif
 
-%% if "m0" not in core
+%% if core != "cortex-m0"
 	// Set the vector table location
 	SCB->VTOR = (uint32_t)__vector_table_{{ vector_table_location }}_start;
+%% endif
 
+%% if "m0" not in core
 	// Enable trapping of divide by zero for UDIV/SDIV instructions.
 	SCB->CCR |= SCB_CCR_DIV_0_TRP_Msk;
 %% endif

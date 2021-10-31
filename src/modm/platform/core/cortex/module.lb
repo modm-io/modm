@@ -204,7 +204,7 @@ def prepare(module, options):
     memories = listify(options[":target"].get_driver("core")["memory"])
 
     # Cortex-M0 does not have remappable vector table, so it will remain in Flash
-    if not options[":target"].has_driver("core:cortex-m0*"):
+    if options[":target"].get_driver("core")["type"] != "cortex-m0":
         default_location = "rom"
         if any((m["name"] == "ccm" and "x" in m["access"]) or m["name"] == "dtcm" for m in memories):
             default_location = "ram"
