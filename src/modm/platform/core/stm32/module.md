@@ -440,3 +440,55 @@ placed into the 128kB DTCM, but cannot overflow into D1_SRAM section.
     ITCM    │  .vector_ram           │
 0x0000 0000 └────────────────────────┘◄ __itcm_start
 ```
+
+## Static RAM (SRAM) with vector table remap on F0 devices
+
+This memory map is identical to the SRAM default one, except that
+`.vector_ram` is placed at the beginning of SRAM1. It is used on STM32F0
+devices in case the platform-specific vector table relocation option
+`modm:platform:core:vector_table_location` is set to `ram`.
+
+```
+            ┌────────────────────────┐◄ __sram1_end
+            │  +HEAP_SRAM1           │
+            │  .noinit_sram1         │
+            │  .noinit               │
+            │  .faststack            │
+            │  .bss_sram1            │
+            │  .bss                  │
+            │  .data_sram1           │
+            │  .data                 │
+            │  .fastdata             │
+            │  .fastcode             │
+            │  +MAIN_STACK_SIZE      │◄ __main_stack_top
+   SRAM1    │  .vector_ram           │
+0x2000 0000 └────────────────────────┘◄ __sram1_start
+
+            ┌────────────────────────┐◄ __flash_end
+            │        (unused)        │
+            ├────────────────────────┤◄ __rom_end
+            │  .table.heap           │
+            │  .table.copy.extern    │
+   tables   │  .table.zero.extern    │
+            │  .table.copy.intern    │
+            │  .table.zero.intern    │
+            │                        │
+    copy    │  .data_sram1           │
+    only    │  .data                 │
+            │  .fastcode             │
+            │  .fastdata             │
+            │                        │
+            │  .note.gnu.build-id    │
+            │  .assertion            │
+            │  .hardware_init        │
+            │ (.eh_frame)            │
+    read    │ (.ARM.exidx)           │  only with C++ exceptions enabled
+    only    │ (.ARM.extab)           │
+            │  .init_array           │
+            │  .init                 │
+            │  .rodata               │
+            │  .text                 │
+   FLASH    │  .vector_rom           │
+0x0800 0000 └────────────────────────┘◄ __rom_start, __flash_start
+
+```

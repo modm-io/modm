@@ -21,13 +21,25 @@ def prepare(module, options):
     if options[":target"].identifier.platform != "stm32":
         return False
 
+    if options[":target"].get_driver("core")["type"] == "cortex-m0":
+        module.add_option(
+            EnumerationOption(
+                name="vector_table_location",
+                description=FileReader("option/vector_table_location.md"),
+                enumeration=["rom", "ram"],
+                default="rom")
+            )
+
     module.depends(":platform:cortex-m")
     return True
 
 
 def build(env):
     target = env[":target"].identifier
-    env.substitutions = {"target": target}
+    env.substitutions = {
+        "target": target,
+        "vector_table_location": env.get(":platform:core:vector_table_location", "rom")
+    }
     env.outbasepath = "modm/src/modm/platform/core"
     # startup helper code
     env.template("startup_platform.c.in")
@@ -74,6 +86,8 @@ def post_build(env):
     env.outbasepath = "modm/link"
 
     linkerscript = "../cortex/ram.ld.in"
+    if env.get(":platform:core:vector_table_location", "rom") == "ram":
+        linkerscript = "ram_remap_vector_table.ld.in"
     for memory in env.substitutions["memories"]:
         if memory["name"] == "ccm":
             if "x" in memory["access"]:

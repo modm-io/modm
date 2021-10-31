@@ -1,0 +1,45 @@
+%% import "../cortex/linker.macros" as linker with context
+{{ linker.copyright() }}
+
+{{ linker.prefix() }}
+%% set table_heap = []
+%% set table_copy = []
+%% set table_zero = []
+
+SECTIONS
+{
+{{ linker.section_rom_start("FLASH") }}
+
+{{ linker.section_vector_rom("FLASH") }}
+
+{{ linker.section_rom("FLASH") }}
+
+{{ linker.section_vector_ram(cont_ram_regions[0].cont_name|upper, table_copy) }}
+
+{{ linker.section_stack(cont_ram_regions[0].cont_name|upper) }}
+
+{{ linker.section_ram(cont_ram_regions[0].cont_name|upper, "FLASH", table_copy, table_zero,
+                      sections_data=["fastdata", "fastcode", "data_" + cont_ram_regions[0].contains[0].name],
+                      sections_bss=["bss_" + cont_ram_regions[0].contains[0].name],
+                      sections_noinit=["faststack"]) }}
+
+{{ linker.all_heap_sections(table_copy, table_zero, table_heap) }}
+
+%% if with_crashcatcher
+    %#
+    /* Bottom of crash stack for `modm:platform:fault` */
+    g_crashCatcherStack = . - 500;
+    %#
+%% endif
+
+%% if linkerscript_sections
+{{ linkerscript_sections | indent(first=True) }}
+    %#
+%% endif
+
+{{ linker.section_tables("FLASH", table_copy, table_zero, table_heap) }}
+
+{{ linker.section_rom_end("FLASH") }}
+
+{{ linker.section_debug() }}
+}

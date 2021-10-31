@@ -12,7 +12,10 @@
 # -----------------------------------------------------------------------------
 
 def common_vector_table_location(env):
+    if env.get(":platform:core:vector_table_location", "rom") == "ram":
+        return "ram"
     return env.get(":platform:cortex-m:vector_table_location", "rom")
+
 
 def common_vector_table(env):
     """

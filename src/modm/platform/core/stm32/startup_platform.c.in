@@ -3,6 +3,7 @@
  * Copyright (c) 2016-2017, Fabian Greif
  * Copyright (c) 2016-2017, 2019, Niklas Hauser
  * Copyright (c) 2021, Raphael Lehmann
+ * Copyright (c) 2021, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -70,5 +71,10 @@ __modm_initialize_platform(void)
 	// Enable VDDIO2
 	PWR->CR2 |= PWR_CR2_IOSV;
 #endif
+%% endif
+
+%% if vector_table_location == "ram"
+	// Remap SRAM to 0x0 for vector table relocation without VTOR register
+	SYSCFG->CFGR1 |= SYSCFG_CFGR1_MEM_MODE;
 %% endif
 }
