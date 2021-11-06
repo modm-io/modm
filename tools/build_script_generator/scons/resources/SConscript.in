@@ -138,11 +138,13 @@ env.Append(MODM_BOSSAC_OPTIONS = "{{ bossac_options }}")
 env["XPCC_SYSTEM_DESIGN"] = "$BASEPATH/modm/tools/xpcc_generator"
 %% endif
 
+%% if is_modm and family == "darwin"
+env.AppendUnique(CPPFLAGS=[
+	"-isystem", "/usr/local/include",
+])
+%% endif
 
 env.AppendUnique(CPPPATH=[
-%% if is_modm and family == "darwin"
-	"/usr/local/include",
-%% endif
 %% for path in include_paths | sort
     abspath(r"{{ path | relocate | modm.windowsify(escape_level=0) }}"),
 %% endfor
