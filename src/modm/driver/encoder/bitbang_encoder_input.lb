@@ -15,7 +15,7 @@ def init(module):
     module.description = """
 # Quadrature Encoder Input
 
-This driver decodes a AB (incremental) encoder signal.
+This driver decodes an AB (incremental) encoder signal.
 Ported from code created by Peter Dannegger:
 https://www.mikrocontroller.net/articles/Drehgeber.
 """
