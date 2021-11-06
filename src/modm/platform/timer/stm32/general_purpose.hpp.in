@@ -318,6 +318,9 @@ public:
 
 public:
 	static void
+	configureInputChannel(uint32_t channel, uint8_t filter);
+
+	static void
 	configureInputChannel(uint32_t channel, InputCaptureMapping input,
 			InputCapturePrescaler prescaler,
 			InputCapturePolarity polarity, uint8_t filter,

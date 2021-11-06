@@ -234,7 +234,7 @@ public:
 	/**
 	 * TODO Description
 	 */
-	void
+	static void
 	configureInputChannel(uint32_t channel, InputCaptureMapping input,
 			InputCapturePrescaler prescaler, InputCapturePolarity polarity, uint8_t filter);
 
@@ -256,7 +256,7 @@ public:
 	 * @param	channel	[1..4]
 	 * @param	value	Compare value
 	 */
-	static inline void
+	static void
 	setCompareValue(uint32_t channel, uint16_t value);
 
 	/**
@@ -265,7 +265,7 @@ public:
 	 * @param	channel	[1..4]
 	 * @return	Current compare value
 	 */
-	static inline uint16_t
+	static uint16_t
 	getCompareValue(uint32_t channel);
 };
 
