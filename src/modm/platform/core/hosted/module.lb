@@ -51,6 +51,6 @@ def build(env):
     if env.has_module(":architecture:assert"):
         env.template("../cortex/assert.cpp.in", "assert.cpp")
         env.template("../cortex/assert_impl.hpp.in", "assert_impl.hpp")
-        if target.family == "windows":
-            env.log.error("Assertions are not fully implemented!")
+        #if target.family == "windows":
+        #    env.log.error("Assertions are not fully implemented!")
 
