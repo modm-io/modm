@@ -10,15 +10,14 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
-#include <modm/driver/encoder/bitbang_encoder_input.hpp>
-#include <modm/math/algorithm/prescaler.hpp>
 #include <modm/processing/timer.hpp>
+#include <modm/math/algorithm/prescaler.hpp>
+#include <modm/driver/encoder/bitbang_encoder_input.hpp>
 
 using namespace modm::platform;
 
 // Connect the encoders outputs to D7 and D8 Pins (usually the outer pins)
 // The common third pin (usually in the middle) is connected to GND.
-// Don't add any resistors or filters. It's all in the MCU and the driver.
 modm::BitBangEncoderInput<Board::D11, Board::D12, 4> encoder;
 
 MODM_ISR(TIMER2_COMPA)
@@ -48,22 +47,19 @@ main()
 	Board::initialize();
 	LedD13::setOutput();
 
-	encoder.connect();
-
+	encoder.initialize();
 	init_Timer2();
 	enableInterrupts();
 
 	int value(0);
 
 	modm::ShortPeriodicTimer heartbeat(500ms);
-	modm::ShortPeriodicTimer outputValue(1000ms);
 
 	while (true)
 	{
-		if (heartbeat.execute()) Board::LedD13::toggle();
-		if (outputValue.execute())
-		{
-			value += encoder.getIncrement();
+		if (heartbeat.execute()) {
+			Board::LedD13::toggle();
+			value += encoder.getDelta();
 			MODM_LOG_INFO << "value: " << value << modm::endl;
 		}
 	}
