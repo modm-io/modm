@@ -28,6 +28,8 @@ CMakeLists.txt
 
 # Codium/Code
 **/.vscode/
+# https://marketplace.visualstudio.com/items?itemName=kdcro101.favorites
+**/.favorites.json
 
 # ignore generated code in the example folder
 examples/**/modm
