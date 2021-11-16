@@ -17,7 +17,8 @@ def init(module):
 # I2C Eeprom
 
 Compatible with the 24C256 (ST) and 24FC1025 (Microchip) family and other
-I2C eeprom with an 16-bit address pointer.
+I2C eeprom with an 16-bit address pointer as well as devices with an 8-bit
+address pointer.
 Base address for most 24xxyyyy eeproms is 0x50.
 """
 
@@ -28,5 +29,4 @@ def prepare(module, options):
 def build(env):
     env.outbasepath = "modm/src/modm/driver/storage"
     env.copy("i2c_eeprom.hpp")
-    env.copy("i2c_eeprom.cpp")
     env.copy("i2c_eeprom_impl.hpp")

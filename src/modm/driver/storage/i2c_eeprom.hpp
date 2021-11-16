@@ -3,6 +3,7 @@
  * Copyright (c) 2009-2012, Fabian Greif
  * Copyright (c) 2011, Georgi Grinshpun
  * Copyright (c) 2012-2016, Niklas Hauser
+ * Copyright (c) 2021, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -22,30 +23,35 @@ namespace modm
 {
 
 /// @cond
-struct i2cEeprom
+namespace i2c_eeprom::detail
 {
-	class DataTransmissionAdapter : public modm::I2cWriteReadTransaction
-	{
-	public:
-		DataTransmissionAdapter(uint8_t address);
 
-		bool
-		configureWrite(uint16_t address, const uint8_t *buffer, std::size_t size);
+template<size_t AddressBytes>
+class DataTransmissionAdapter : public I2cWriteReadTransaction
+{
+public:
+	static_assert(AddressBytes == 1 || AddressBytes == 2, "Only 8 or 16 bit addresses are supported");
 
-		bool
-		configureRead(uint16_t address, uint8_t *buffer, std::size_t size);
+	DataTransmissionAdapter(uint8_t address);
 
-		inline uint8_t getAddress() const {
-			return this->address >> 1;
-		}
+	bool
+	configureWrite(uint16_t address, const uint8_t *buffer, std::size_t size);
 
-	protected:
-		virtual Writing
-		writing() override;
+	bool
+	configureRead(uint16_t address, uint8_t *buffer, std::size_t size);
 
-		uint8_t addressBuffer[2];
-		bool writeAddress;
-	};
+	inline uint8_t getAddress() const {
+		return this->address >> 1;
+	}
+
+protected:
+	Writing
+	writing() override;
+
+	uint8_t addressBuffer[AddressBytes];
+	bool writeAddress;
+};
+
 };
 /// @endcond
 
@@ -60,8 +66,8 @@ struct i2cEeprom
  * @author	Fabian Greif
  * @author	Niklas Hauser
  */
-template <typename I2cMaster>
-class I2cEeprom : public modm::I2cDevice< I2cMaster, 1, i2cEeprom::DataTransmissionAdapter >
+template <typename I2cMaster, size_t AddressBytes = 2>
+class I2cEeprom : public I2cDevice<I2cMaster, 1, i2c_eeprom::detail::DataTransmissionAdapter<AddressBytes>>
 {
 public:
 	I2cEeprom(uint8_t address = 0x50);
