@@ -9,15 +9,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-// ----------------------------------------------------------------------------
 
-#ifndef MODM_QUATERNION_HPP
-#	error	"Don't include this file directly, use 'quaternion.hpp' instead!"
-#endif
-
+#pragma once
 #include "quaternion.hpp"
 
-// ----------------------------------------------------------------------------
 template<class T>
 modm::Quaternion<T>::Quaternion()
 :

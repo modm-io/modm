@@ -161,7 +161,7 @@ modm::Polygon2D<T>::isInside(const modm::Polygon2D<T>::PointType& point)
 
 	SizeType n = this->points.getSize();
 	for (SizeType i = 0; i < n; ++i) {
-		int_fast8_t r = Vector<T, 2>::ccw(this->points[i], this->points[(i + 1) % n], point);
+		int_fast8_t r = modm::ccw(this->points[i], this->points[(i + 1) % n], point);
 
 		switch (r) {
 		case 0:

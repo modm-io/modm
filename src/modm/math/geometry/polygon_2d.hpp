@@ -15,7 +15,7 @@
 #define MODM_POLYGON_2D_HPP
 
 #include "point_set_2d.hpp"
-#include "vector2.hpp"
+#include "vector.hpp"
 
 namespace modm
 {

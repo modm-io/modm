@@ -44,8 +44,8 @@ MatrixTest::testConstruction()
 
 	modm::Matrix<int16_t, 3, 2> b(n);
 
-	TEST_ASSERT_EQUALS(b.getNumberOfRows(), 3);
-	TEST_ASSERT_EQUALS(b.getNumberOfColumns(), 2);
+	TEST_ASSERT_EQUALS(b.getNumberOfRows(), std::size_t(3));
+	TEST_ASSERT_EQUALS(b.getNumberOfColumns(), std::size_t(2));
 
 	TEST_ASSERT_EQUALS(b[0][0], 1);
 	TEST_ASSERT_EQUALS(b[0][1], 2);
@@ -359,7 +359,10 @@ MatrixTest::testMatrixMultiplication()
 		 6,  7,  8,  9, 10,
 		11, 12, 13, 14, 15
 	};
-	modm::Matrix<int16_t, 2, 5> l(q);
+	std::span<const int16_t> r(q);
+	std::span<const int16_t, 10> q10{r};
+
+	modm::Matrix<int16_t, 2, 5> l(q10);
 	modm::Matrix<int16_t, 5, 3> ll(q);
 	modm::Matrix<int16_t, 2, 3> aa = l * ll;
 
@@ -447,7 +450,7 @@ MatrixTest::testReplace()
 	TEST_ASSERT_EQUALS(c[1][0], 7);
 	TEST_ASSERT_EQUALS(c[1][1], 2);
 
-	const int16_t o[2] = { 10, 12 };
+	const int16_t o[] = { 10, 12 };
 	modm::Matrix<int16_t, 1, 2> row(o);
 
 	c.replaceRow(0, row);
@@ -597,7 +600,7 @@ MatrixTest::testRemoveRowColumn()
 void
 MatrixTest::testDeterminant()
 {
-	const int16_t m[9] = {
+	const int16_t m[] = {
 		1, 2, 3,
 		4, 5, 6,
 		7, 8, 9

@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2009-2011, Fabian Greif
  * Copyright (c) 2012, Niklas Hauser
+ * Copyright (c) 2022, Thomas Sommer
  *
  * This file is part of the modm project.
  *
@@ -10,12 +11,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_GEOMETRIC_TRAITS_HPP
-#define MODM_GEOMETRIC_TRAITS_HPP
+#pragma once
 
+#include <concepts>
 #include <cmath>
-#include <stdint.h>
+#include <limits>
 #include <modm/architecture/utils.hpp>
+#include <modm/math/utils/arithmetic_traits.hpp>
 
 namespace modm
 {
@@ -24,120 +26,42 @@ namespace modm
 	 *
 	 * \ingroup	modm_math_geometry
 	 * \author	Fabian Greif
+	 * \author	Thomas Sommer
 	 */
 	template <typename T>
-	struct GeometricTraits
+	struct GeometricTraits;
+
+	template <std::integral T>
+	struct GeometricTraits<T>
 	{
+		[[deprecated("Use an appropriate C++ concept instead!")]]
 		static const bool isValidType = false;
 
-		/**
-		 * \brief	Round if converting from a floating point base to
-		 * 			a integer base.
-		 *
-		 * For T = \c float and \c double this method is specialized to return
-		 * the result directly without any rounding.
-		 */
-		static inline T
-		round(float value)
-		{
-			return ::round(value);
-		}
+		using FloatType = float;
+		using WideType = modm::WideType<T>;
 	};
 
-	template <>
-	struct GeometricTraits<int8_t>
+	template <std::floating_point T>
+	struct GeometricTraits<T>
 	{
+		[[deprecated("Use an appropriate C++ concept instead!")]]
 		static const bool isValidType = true;
 
-		typedef float FloatType;
-		typedef int16_t WideType;
-
-		static inline int8_t
-		round(float value)
-		{
-			return ::round(value);
-		}
+		using FloatType = T;
+		using WideType = T;
 	};
 
-	// TODO is this useful?
-	template <>
-	struct GeometricTraits<uint8_t>
-	{
-		static const bool isValidType = true;
-
-		typedef float FloatType;
-		typedef int16_t WideType;
-
-		static inline uint8_t
-		round(float value)
-		{
-			return ::round(value);
-		}
-	};
-
-	template <>
-	struct GeometricTraits<int16_t>
-	{
-		static const bool isValidType = true;
-
-		typedef float FloatType;
-		typedef int32_t WideType;
-
-		static inline int16_t
-		round(float value)
-		{
-			return ::round(value);
-		}
-	};
-
+	#ifdef __AVR__
 	template <>
 	struct GeometricTraits<int32_t>
 	{
+		[[deprecated("Use an appropriate C++ concept instead!")]]
 		static const bool isValidType = true;
 
-		typedef float FloatType;
-
-		// Usually the range of a int32_t is big enough so that no
+		using FloatType = float;
 		// conversion to int64_t is required. This exception is made because
 		// 64-bit operations are very, very slow on an AVR.
-		typedef int32_t WideType;
-
-		static inline int32_t
-		round(float value)
-		{
-			return ::round(value);
-		}
+		using WideType = int32_t;
 	};
-
-	template <>
-	struct GeometricTraits<float>
-	{
-		static const bool isValidType = true;
-
-		typedef float FloatType;
-		typedef float WideType;
-
-		static inline float
-		round(float value)
-		{
-			return value;
-		}
-	};
-
-	template <>
-	struct GeometricTraits<double>
-	{
-		static const bool isValidType = true;
-
-		typedef double FloatType;
-		typedef double WideType;
-
-		static inline double
-		round(double value)
-		{
-			return value;
-		}
-	};
+	#endif
 }
-
-#endif // MODM_GEOMETRIC_TRAITS_HPP

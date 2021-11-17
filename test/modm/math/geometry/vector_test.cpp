@@ -17,7 +17,7 @@ void
 VectorTest::testConstructor()
 {
 	int16_t array[2] = {1, 2};
-	modm::Matrix<int16_t, 2, 1> m(array);
+/* 	modm::Matrix<int16_t, 2, 1> m(array); */
 
 	modm::Vector<int16_t, 2> a;
 	TEST_ASSERT_EQUALS(a[0], 0);
@@ -36,19 +36,18 @@ VectorTest::testConstructor()
 	TEST_ASSERT_EQUALS(p[0], 1);
 	TEST_ASSERT_EQUALS(p[1], 2);
 
-	modm::Vector<int16_t, 2> q(m);
+/* 	modm::Vector<int16_t, 2> q(m);
 	TEST_ASSERT_EQUALS(q[0], 1);
-	TEST_ASSERT_EQUALS(q[1], 2);
+	TEST_ASSERT_EQUALS(q[1], 2); */
 }
 
 void
 VectorTest::testAssign()
-{
-	int16_t array1[4] = {1, 2, 3, 4};
-	modm::Vector<int16_t, 4> a(array1);
+{;
+	modm::Vector<int16_t, 4> a = {1, 2, 3, 4};
 
-	int16_t array2[4] = {5, 6, 7, 8};
-	modm::Matrix<int16_t, 4, 1> m(array2);
+	/* int16_t array2[4] = {5, 6, 7, 8};
+	modm::Matrix<int16_t, 4, 1> m(array2); */
 
 	modm::Vector<int16_t, 4> b;
 
@@ -58,11 +57,11 @@ VectorTest::testAssign()
 	TEST_ASSERT_EQUALS(b[2], 3);
 	TEST_ASSERT_EQUALS(b[3], 4);
 
-	b = m;
+	/* b = m;
 	TEST_ASSERT_EQUALS(b[0], 5);
 	TEST_ASSERT_EQUALS(b[1], 6);
 	TEST_ASSERT_EQUALS(b[2], 7);
-	TEST_ASSERT_EQUALS(b[3], 8);
+	TEST_ASSERT_EQUALS(b[3], 8); */
 }
 
 void
@@ -99,12 +98,13 @@ VectorTest::testCompare()
 	TEST_ASSERT_FALSE(a >= c);
 }
 
+// TODO I think this is no more required
 void
 VectorTest::testRawDataAccess()
 {
 	int16_t array[4] = {0, 1, 2, 3};
 	modm::Vector<int16_t,4> a(array);
-	int16_t *pointer = a.ptr();
+	int16_t *pointer = a.data();
 
 	TEST_ASSERT_EQUALS(a[0], 0);
 	TEST_ASSERT_EQUALS(a[1], 1);
@@ -119,11 +119,9 @@ VectorTest::testRawDataAccess()
 void
 VectorTest::testOperators()
 {
-	int16_t array1[4] = {1, 2, 3, 4};
-	modm::Vector<int16_t,4> a(array1);
+	modm::Vector<int16_t,4> a({1, 2, 3, 4});
 
-	int16_t array2[4] = {4, 5, 6, 7};
-	modm::Vector<int16_t,4> b(array2);
+	modm::Vector<int16_t,4> b({4, 5, 6, 7});
 
 	TEST_ASSERT_EQUALS((a + b)[0], 1+4);
 	TEST_ASSERT_EQUALS((a + b)[1], 2+5);
@@ -135,7 +133,7 @@ VectorTest::testOperators()
 	TEST_ASSERT_EQUALS((a - b)[2], 3-6);
 	TEST_ASSERT_EQUALS((a - b)[3], 4-7);
 
-	TEST_ASSERT_EQUALS((a * b), 1*4 + 2*5 + 3*6 + 4*7);
+	TEST_ASSERT_EQUALS((a.dot(b)), 1*4 + 2*5 + 3*6 + 4*7);
 
 	TEST_ASSERT_EQUALS((a * 3)[0], 1*3);
 	TEST_ASSERT_EQUALS((a * 3)[1], 2*3);
@@ -199,23 +197,33 @@ void VectorTest::testConvert()
 	modm::Vector<float, 2> f(1.3, 2.7);
 	modm::Vector<double, 2> d(1.3, 2.7);
 
+	// convert() is deprecated but we still test for b.c.
+	modm::Vector<double, 2> d2 = f.convert<double>();
+	TEST_ASSERT_EQUALS_FLOAT(d2.x(), 1.3);
+	TEST_ASSERT_EQUALS_FLOAT(d2.y(), 2.7);
+	// convert() is deprecated but we still test for b.c.
+	modm::Vector<float, 2> f2 = d.convert<float>();
+	TEST_ASSERT_EQUALS_FLOAT(f2.x(), 1.3);
+	TEST_ASSERT_EQUALS_FLOAT(f2.y(), 2.7);
+
+	// Conversion constructor replaces convert()
+	modm::Vector<double, 2> d3(f);
+	TEST_ASSERT_EQUALS_FLOAT(d3.x(), 1.3);
+	TEST_ASSERT_EQUALS_FLOAT(d3.y(), 2.7);
+	// Conversion constructor replaces convert()
+	modm::Vector<float, 2> f3(d);
+	TEST_ASSERT_EQUALS_FLOAT(f3.x(), 1.3);
+	TEST_ASSERT_EQUALS_FLOAT(f3.y(), 2.7);
+
 	modm::Vector<uint8_t, 2> u8(1.3, 2.7);
-	TEST_ASSERT_EQUALS(u8.x, 1);
-	TEST_ASSERT_EQUALS(u8.y, 3);
+	TEST_ASSERT_EQUALS(u8.x(), 1);
+	TEST_ASSERT_EQUALS(u8.y(), 3);
 
 	modm::Vector<int8_t, 2> i8(1.3, 2.7);
-	TEST_ASSERT_EQUALS(i8.x, 1);
-	TEST_ASSERT_EQUALS(i8.y, 3);
+	TEST_ASSERT_EQUALS(i8.x(), 1);
+	TEST_ASSERT_EQUALS(i8.y(), 3);
 
-	modm::Vector<uint16_t, 2> u16(1.3, 2.7);
-	TEST_ASSERT_EQUALS(u16.x, 1);
-	TEST_ASSERT_EQUALS(u16.y, 3);
-
-	modm::Vector<int16_t, 2> i16(1.3, 2.7);
-	TEST_ASSERT_EQUALS(i16.x, 1);
-	TEST_ASSERT_EQUALS(i16.y, 3);
-
-	modm::Vector<double, 2> d2 = f.convert<double>();
-	
-	modm::Vector<float, 2> f2 = f.convert<float>();
+	modm::Vector<int8_t, 2> i82(f);
+	TEST_ASSERT_EQUALS(i82.x(), 1);
+	TEST_ASSERT_EQUALS(i82.y(), 3);
 }

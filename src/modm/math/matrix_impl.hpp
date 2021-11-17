@@ -9,29 +9,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-// ----------------------------------------------------------------------------
+#pragma once
+#include "matrix.hpp"
 
-#ifndef MODM_MATRIX_HPP
-#	error	"Don't include this file directly, use 'matrix.hpp' instead!"
-#endif
+#include <algorithm>
 
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-modm::Matrix<T, ROWS, COLUMNS>::Matrix()
-{
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-modm::Matrix<T, ROWS, COLUMNS>::Matrix(const T *data)
-{
-	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
-		element[i] = data[i];
-	}
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+template<typename T, std::size_t ROWS, std::size_t COLUMNS>
 const modm::Matrix<T, ROWS, COLUMNS>&
 modm::Matrix<T, ROWS, COLUMNS>::identityMatrix()
 {
@@ -41,17 +24,11 @@ modm::Matrix<T, ROWS, COLUMNS>::identityMatrix()
 	if (!hasIdentityMatrix)
 	{
 		if (ROWS < COLUMNS)
-		{
-			for (uint_fast8_t i = 0; i < ROWS; ++i) {
+			for (std::size_t i = 0; i < ROWS; ++i)
 				matrix[i][i] = 1;
-			}
-		}
 		else
-		{
-			for (uint_fast8_t i = 0; i < COLUMNS; ++i) {
+			for (std::size_t i = 0; i < COLUMNS; ++i)
 				matrix[i][i] = 1;
-			}
-		}
 
 		hasIdentityMatrix = true;
 	}
@@ -60,7 +37,7 @@ modm::Matrix<T, ROWS, COLUMNS>::identityMatrix()
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+template<typename T, std::size_t ROWS, std::size_t COLUMNS>
 const modm::Matrix<T, ROWS, COLUMNS>&
 modm::Matrix<T, ROWS, COLUMNS>::zeroMatrix()
 {
@@ -69,7 +46,7 @@ modm::Matrix<T, ROWS, COLUMNS>::zeroMatrix()
 
 	if (!hasZeroMatrix)
 	{
-		memset(matrix.ptr(), 0, matrix.getSize());
+		std::fill(matrix.element, matrix.element + ElementCount, 0);
 		hasZeroMatrix = true;
 	}
 
@@ -77,172 +54,137 @@ modm::Matrix<T, ROWS, COLUMNS>::zeroMatrix()
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-bool
-modm::Matrix<T, ROWS, COLUMNS>::operator == (const modm::Matrix<T, ROWS, COLUMNS> &m) const
-{
-	return memcmp(element, m.element, getSize()) == 0;
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-bool
-modm::Matrix<T, ROWS, COLUMNS>::operator != (const modm::Matrix<T, ROWS, COLUMNS> &m) const
-{
-	return memcmp(element, m.element, getSize()) != 0;
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+template<typename T, std::size_t ROWS, std::size_t COLUMNS>
 modm::Matrix<T, 1, COLUMNS>
-modm::Matrix<T, ROWS, COLUMNS>::getRow(uint8_t index) const
+modm::Matrix<T, ROWS, COLUMNS>::getRow(std::size_t index) const
 {
 	return subMatrix<1, COLUMNS>(index, 0);
 }
 
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+template<typename T, std::size_t ROWS, std::size_t COLUMNS>
 modm::Matrix<T, ROWS, 1>
-modm::Matrix<T, ROWS, COLUMNS>::getColumn(uint8_t index) const
+modm::Matrix<T, ROWS, COLUMNS>::getColumn(std::size_t index) const
 {
 	return subMatrix<ROWS, 1>(0, index);
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+template<typename T, std::size_t ROWS, std::size_t COLUMNS>
 T*
-modm::Matrix<T, ROWS, COLUMNS>::operator [] (uint8_t row)
+modm::Matrix<T, ROWS, COLUMNS>::operator [] (std::size_t row)
 {
 	return &element[row * COLUMNS];
 }
 
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+template<typename T, std::size_t ROWS, std::size_t COLUMNS>
 const T*
-modm::Matrix<T, ROWS, COLUMNS>::operator [] (uint8_t row) const
+modm::Matrix<T, ROWS, COLUMNS>::operator [] (std::size_t row) const
 {
 	return &element[row * COLUMNS];
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-uint8_t
-modm::Matrix<T, ROWS, COLUMNS>::getNumberOfRows() const
-{
-	return ROWS;
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-uint8_t
-modm::Matrix<T, ROWS, COLUMNS>::getNumberOfColumns() const
-{
-	return COLUMNS;
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-const T*
-modm::Matrix<T, ROWS, COLUMNS>::ptr() const
-{
-	return element;
-}
-
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-T*
-modm::Matrix<T, ROWS, COLUMNS>::ptr()
-{
-	return element;
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-modm::Matrix<T, ROWS, COLUMNS>
+template<typename T, std::size_t ROWS, std::size_t COLUMNS>
+constexpr modm::Matrix<T, ROWS, COLUMNS>
 modm::Matrix<T, ROWS, COLUMNS>::operator - ()
 {
 	modm::Matrix<T, ROWS, COLUMNS> m;
-	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
-		m.element[i] = -this->element[i];
-	}
+	for (std::size_t i = 0; i < ElementCount; ++i)
+		m.element[i] = -element[i];
 
 	return m;
 }
 
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-modm::Matrix<T, ROWS, COLUMNS>
+template<typename T, std::size_t ROWS, std::size_t COLUMNS>
+constexpr modm::Matrix<T, ROWS, COLUMNS>
 modm::Matrix<T, ROWS, COLUMNS>::operator - (const modm::Matrix<T, ROWS, COLUMNS> &rhs) const
 {
 	modm::Matrix<T, ROWS, COLUMNS> m;
 
-	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
+	for (std::size_t i = 0; i < ElementCount; ++i)
 		m.element[i] = element[i] - rhs.element[i];
-	}
 
 	return m;
 }
 
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-modm::Matrix<T, ROWS, COLUMNS>
+template<typename T, std::size_t ROWS, std::size_t COLUMNS>
+constexpr modm::Matrix<T, ROWS, COLUMNS>
 modm::Matrix<T, ROWS, COLUMNS>::operator + (const modm::Matrix<T, ROWS, COLUMNS> &rhs) const
 {
 	modm::Matrix<T, ROWS, COLUMNS> m;
 
-	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
+	for (std::size_t i = 0; i < ElementCount; ++i)
 		m.element[i] = element[i] + rhs.element[i];
-	}
 
 	return m;
 }
 
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-modm::Matrix<T, ROWS, COLUMNS>&
-modm::Matrix<T, ROWS, COLUMNS>::operator += (const modm::Matrix<T, ROWS, COLUMNS> &rhs)
-{
-	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
-		element[i] += rhs.element[i];
-	}
-
-	return *this;
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-modm::Matrix<T, ROWS, COLUMNS>&
-modm::Matrix<T, ROWS, COLUMNS>::operator -= (const modm::Matrix<T, ROWS, COLUMNS> &rhs)
-{
-	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
-		element[i] -= rhs.element[i];
-	}
-
-	return *this;
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-template<uint8_t RHSCOL>
-modm::Matrix<T, ROWS, RHSCOL>
+template<typename T, std::size_t ROWS, std::size_t COLUMNS>
+template<std::size_t RHSCOL>
+constexpr modm::Matrix<T, ROWS, RHSCOL>
 modm::Matrix<T, ROWS, COLUMNS>::operator * (const Matrix<T, COLUMNS, RHSCOL> &rhs) const
 {
 	modm::Matrix<T, ROWS, RHSCOL> m;
 
-	for (uint_fast8_t i = 0; i < ROWS; ++i)
+	for (std::size_t i = 0; i < ROWS; ++i)
 	{
-		for (uint_fast8_t j = 0; j < RHSCOL; ++j)
+		for (std::size_t j = 0; j < RHSCOL; ++j)
 		{
 			m[i][j] = element[i * COLUMNS] * rhs[0][j];
-			for (uint_fast8_t x = 1; x < COLUMNS; ++x)
-			{
+			for (std::size_t x = 1; x < COLUMNS; ++x)
 				m[i][j] += element[i * COLUMNS + x] * rhs[x][j];
-			}
 		}
 	}
 	return m;
 }
 
+template<typename T, std::size_t ROWS, std::size_t COLUMNS>
+constexpr modm::Matrix<T, ROWS, COLUMNS>
+modm::Matrix<T, ROWS, COLUMNS>::operator * (T rhs) const
+{
+	modm::Matrix<T, ROWS, COLUMNS> m;
+	for (std::size_t i = 0; i < ElementCount; ++i)
+		m.element[i] = element[i] * rhs;
+
+	return m;
+}
+
+template<typename T, std::size_t ROWS, std::size_t COLUMNS>
+constexpr modm::Matrix<T, ROWS, COLUMNS>
+modm::Matrix<T, ROWS, COLUMNS>::operator / (T rhs) const
+{
+	modm::Matrix<T, ROWS, COLUMNS> m;
+
+	float oneOverRhs = 1.0f / rhs;
+
+	for (std::size_t i = 0; i < ElementCount; ++i)
+		m.element[i] = element[i] * oneOverRhs;
+
+	return m;
+}
+
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+template<typename T, std::size_t ROWS, std::size_t COLUMNS>
+modm::Matrix<T, ROWS, COLUMNS>&
+modm::Matrix<T, ROWS, COLUMNS>::operator += (const modm::Matrix<T, ROWS, COLUMNS> &rhs)
+{
+	for (std::size_t i = 0; i < ElementCount; ++i)
+		element[i] += rhs.element[i];
+
+	return *this;
+}
+
+template<typename T, std::size_t ROWS, std::size_t COLUMNS>
+modm::Matrix<T, ROWS, COLUMNS>&
+modm::Matrix<T, ROWS, COLUMNS>::operator -= (const modm::Matrix<T, ROWS, COLUMNS> &rhs)
+{
+	for (std::size_t i = 0; i < ElementCount; ++i)
+		element[i] -= rhs.element[i];
+
+	return *this;
+}
+
+template<typename T, std::size_t ROWS, std::size_t COLUMNS>
 modm::Matrix<T, ROWS, COLUMNS>
 modm::Matrix<T, ROWS, COLUMNS>::operator *= (const modm::Matrix<T, ROWS, COLUMNS> &rhs)
 {
@@ -250,79 +192,43 @@ modm::Matrix<T, ROWS, COLUMNS>::operator *= (const modm::Matrix<T, ROWS, COLUMNS
 	return *this;
 }
 
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-modm::Matrix<T, ROWS, COLUMNS>
-modm::Matrix<T, ROWS, COLUMNS>::operator * (const T &rhs) const
-{
-	modm::Matrix<T, ROWS, COLUMNS> m;
-	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
-		m.element[i] = element[i] * rhs;
-	}
-
-	return m;
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+template<typename T, std::size_t ROWS, std::size_t COLUMNS>
 modm::Matrix<T, ROWS, COLUMNS>&
-modm::Matrix<T, ROWS, COLUMNS>::operator *= (const T &rhs)
+modm::Matrix<T, ROWS, COLUMNS>::operator *= (T rhs)
 {
-	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
+	for (std::size_t i = 0; i < ElementCount; ++i)
 		element[i] *= rhs;
-	}
 
 	return *this;
 }
 
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-modm::Matrix<T, ROWS, COLUMNS>
-modm::Matrix<T, ROWS, COLUMNS>::operator / (const T &rhs) const
-{
-	modm::Matrix<T, ROWS, COLUMNS> m;
-
-	float oneOverRhs = 1.0f / rhs;
-
-	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
-		m.element[i] = element[i] * oneOverRhs;
-	}
-
-	return m;
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+template<typename T, std::size_t ROWS, std::size_t COLUMNS>
 modm::Matrix<T, ROWS, COLUMNS>&
-modm::Matrix<T, ROWS, COLUMNS>::operator /= (const T &rhs)
+modm::Matrix<T, ROWS, COLUMNS>::operator /= (T rhs)
 {
 	float oneOverRhs = 1.0f / rhs;
 
-	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
+	for (std::size_t i = 0; i < ElementCount; ++i)
 		element[i] *= oneOverRhs;
-	}
 
 	return *this;
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+template<typename T, std::size_t ROWS, std::size_t COLUMNS>
 modm::Matrix<T, COLUMNS, ROWS>
 modm::Matrix<T, ROWS, COLUMNS>::asTransposed() const
 {
 	modm::Matrix<T, COLUMNS, ROWS> m;
 
-	for (uint_fast8_t i = 0; i < ROWS; ++i) {
-		for (uint_fast8_t j = 0; j < COLUMNS; ++j) {
+	for (std::size_t i = 0; i < ROWS; ++i)
+		for (std::size_t j = 0; j < COLUMNS; ++j)
 			m.element[j * ROWS + i] = element[i * COLUMNS + j];
-		}
-	}
 
 	return m;
 }
 
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+template<typename T, std::size_t ROWS, std::size_t COLUMNS>
 void
 modm::Matrix<T, ROWS, COLUMNS>::transpose()
 {
@@ -332,7 +238,7 @@ modm::Matrix<T, ROWS, COLUMNS>::transpose()
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+template<typename T, std::size_t ROWS, std::size_t COLUMNS>
 inline T
 modm::Matrix<T, ROWS, COLUMNS>::determinant() const
 {
@@ -342,43 +248,37 @@ modm::Matrix<T, ROWS, COLUMNS>::determinant() const
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+template<typename T, std::size_t ROWS, std::size_t COLUMNS>
 bool
 modm::Matrix<T, ROWS, COLUMNS>::hasNan() const
 {
-	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
-		if (isnan(element[i])) {
+	for (std::size_t i = 0; i < ElementCount; ++i)
+		if (isnan(element[i]))
 			return true;
-		}
-	}
 
 	return false;
 }
 
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+template<typename T, std::size_t ROWS, std::size_t COLUMNS>
 bool
 modm::Matrix<T, ROWS, COLUMNS>::hasInf() const
 {
-	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
-		if (isinf(element[i])) {
+	for (std::size_t i = 0; i < ElementCount; ++i)
+		if (isinf(element[i]))
 			return true;
-		}
-	}
 
 	return false;
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
+template<typename T, std::size_t WIDTH, std::size_t HEIGHT>
 modm::Matrix<T, WIDTH, HEIGHT>
 operator * (int8_t lhs, const modm::Matrix<T, WIDTH, HEIGHT> &m)
 {
 	return m * lhs;
 }
 
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
+template<typename T, std::size_t WIDTH, std::size_t HEIGHT>
 modm::Matrix<T, WIDTH, HEIGHT>
 operator * (float lhs, const modm::Matrix<T, WIDTH, HEIGHT> &m)
 {
@@ -386,15 +286,14 @@ operator * (float lhs, const modm::Matrix<T, WIDTH, HEIGHT> &m)
 }
 
 // ----------------------------------------------------------------------------
-/*template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+/*template<typename T, std::size_t ROWS, std::size_t COLUMNS>
 void
 modm::Matrix<T, ROWS, COLUMNS>::inverse()
 {
 	*this = inversed();
 }
 
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+template<typename T, std::size_t ROWS, std::size_t COLUMNS>
 modm::Matrix<T, ROWS, COLUMNS>
 modm::Matrix<T, ROWS, COLUMNS>::inversed() const
 {
@@ -404,210 +303,169 @@ modm::Matrix<T, ROWS, COLUMNS>::inversed() const
 }*/
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-size_t
-modm::Matrix<T, ROWS, COLUMNS>::getSize() const
-{
-	return getNumberOfElements() * sizeof(T);
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-uint8_t
-modm::Matrix<T, ROWS, COLUMNS>::getNumberOfElements() const
-{
-	return ROWS * COLUMNS;
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-template <uint8_t MR, uint8_t MC>
+template<typename T, std::size_t ROWS, std::size_t COLUMNS>
+template <std::size_t MR, std::size_t MC>
 modm::Matrix<T, MR, MC>
-modm::Matrix<T, ROWS, COLUMNS>::subMatrix(uint8_t row, uint8_t column) const
+modm::Matrix<T, ROWS, COLUMNS>::subMatrix(std::size_t row, std::size_t column) const
 {
 	static_assert(MR <= ROWS, "sub matrix must be smaller than the original");
 	static_assert(MC <= COLUMNS, "sub matrix must be smaller than the original");
 
 	Matrix<T, MR, MC> sub;
-	for (uint_fast8_t i = 0; i < MR; ++i) {
-		for (uint_fast8_t j = 0; j < MC; ++j) {
+	for (std::size_t i = 0; i < MR; ++i)
+		for (std::size_t j = 0; j < MC; ++j)
 			sub[i][j] = (*this)[i + row][j + column];
-		}
-	}
 
 	return sub;
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS> template<typename U>
+template<typename T, std::size_t ROWS, std::size_t COLUMNS> template<typename U>
 modm::Matrix<T, ROWS, COLUMNS>&
 modm::Matrix<T, ROWS, COLUMNS>::replace(const U *data)
 {
-	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
+	for (std::size_t i = 0; i < ElementCount; ++i)
 		element[i] = data[i];
-	}
 
 	return *this;
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-template <uint8_t MR, uint8_t MC>
+template<typename T, std::size_t ROWS, std::size_t COLUMNS>
+template <std::size_t MR, std::size_t MC>
 modm::Matrix<T, ROWS, COLUMNS>&
-modm::Matrix<T, ROWS, COLUMNS>::replace(uint8_t row, uint8_t column, const modm::Matrix<T, MR, MC> &m)
+modm::Matrix<T, ROWS, COLUMNS>::replace(std::size_t row, std::size_t column, const modm::Matrix<T, MR, MC> &m)
 {
 	static_assert(MR <= ROWS, "replacement matrix can't be larger than the original");
 	static_assert(MC <= COLUMNS, "replacement matrix can't be larger than the original");
 
-	for (uint_fast8_t i = 0; i < MR && (i + row) < ROWS; ++i)
-	{
-		for (uint_fast8_t j = 0; j < MC && (j + column) < COLUMNS; ++j)
-		{
+	for (std::size_t i = 0; i < MR && (i + row) < ROWS; ++i)
+		for (std::size_t j = 0; j < MC && (j + column) < COLUMNS; ++j)
 			element[(i + row) * COLUMNS + (j + column)] = m[i][j];
-		}
-	}
 
 	return *this;
 }
 
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+template<typename T, std::size_t ROWS, std::size_t COLUMNS>
 modm::Matrix<T, ROWS, COLUMNS>&
-modm::Matrix<T, ROWS, COLUMNS>::replaceRow(uint8_t index, const modm::Matrix<T, 1, COLUMNS> &m)
+modm::Matrix<T, ROWS, COLUMNS>::replaceRow(std::size_t index, const modm::Matrix<T, 1, COLUMNS> &m)
 {
 	return replace(index, 0, m);
 }
 
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+template<typename T, std::size_t ROWS, std::size_t COLUMNS>
 modm::Matrix<T, ROWS, COLUMNS>&
-modm::Matrix<T, ROWS, COLUMNS>::replaceColumn(uint8_t index, const modm::Matrix<T, ROWS, 1> &m)
+modm::Matrix<T, ROWS, COLUMNS>::replaceColumn(std::size_t index, const modm::Matrix<T, ROWS, 1> &m)
 {
 	return replace(0, index, m);
 }
 
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+template<typename T, std::size_t ROWS, std::size_t COLUMNS>
 modm::Matrix<T, ROWS+1, COLUMNS>
-modm::Matrix<T, ROWS, COLUMNS>::addRow(uint8_t index, const modm::Matrix<T, 1, COLUMNS> &r) const
+modm::Matrix<T, ROWS, COLUMNS>::addRow(std::size_t index, const modm::Matrix<T, 1, COLUMNS> &r) const
 {
 	modm::Matrix<T, ROWS+1, COLUMNS> m;
-	uint_fast8_t i = 0, ri = 0;
+	std::size_t i = 0, ri = 0;
 
-	for (; i < index; ++i) {
+	for (; i < index; ++i)
 		m.replaceRow(ri++, getRow(i));
-	}
+
 	m.replaceRow(ri++, r);
-	for (; i < ROWS+1; ++i) {
+
+	for (; i < ROWS+1; ++i)
 		m.replaceRow(ri++, getRow(i));
-	}
 
 	return m;
 }
 
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+template<typename T, std::size_t ROWS, std::size_t COLUMNS>
 modm::Matrix<T, ROWS, COLUMNS+1>
-modm::Matrix<T, ROWS, COLUMNS>::addColumn(uint8_t index, const modm::Matrix<T, ROWS, 1> &c) const
+modm::Matrix<T, ROWS, COLUMNS>::addColumn(std::size_t index, const modm::Matrix<T, ROWS, 1> &c) const
 {
 	modm::Matrix<T, ROWS, COLUMNS+1> m;
-	uint_fast8_t i = 0, ci = 0;
+	std::size_t i = 0, ci = 0;
 
-	for (; i < index; ++i) {
+	for (; i < index; ++i)
 		m.replaceColumn(ci++, getColumn(i));
-	}
+
 	m.replaceColumn(ci++, c);
-	for (; i < COLUMNS+1; ++i) {
+
+	for (; i < COLUMNS+1; ++i)
 		m.replaceColumn(ci++, getColumn(i));
-	}
 
 	return m;
 }
 
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+template<typename T, std::size_t ROWS, std::size_t COLUMNS>
 modm::Matrix<T, ROWS-1, COLUMNS>
-modm::Matrix<T, ROWS, COLUMNS>::removeRow(uint8_t index ) const
+modm::Matrix<T, ROWS, COLUMNS>::removeRow(std::size_t index ) const
 {
 	if (index == 0)
-	{
 		return subMatrix<ROWS-1, COLUMNS>(1, 0);
-	}
 	else if (index == (ROWS - 1))
-	{
 		return subMatrix<ROWS-1, COLUMNS>(0, 0);
-	}
 	else
 	{
 		Matrix<T, ROWS-1, COLUMNS> m;
-		uint_fast8_t i = 0, ri = 0;
+		std::size_t i = 0, ri = 0;
 
-		for (; i < index; ++i) {
+		for (; i < index; ++i)
 			m.replaceRow(ri++, getRow(i));
-		}
+
 		++i; // skip one row
-		for (; i < ROWS; ++i) {
+
+		for (; i < ROWS; ++i)
 			m.replaceRow(ri++, getRow(i));
-		}
 
 		return m;
 	}
 }
 
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+template<typename T, std::size_t ROWS, std::size_t COLUMNS>
 modm::Matrix<T, ROWS, COLUMNS-1>
-modm::Matrix<T, ROWS, COLUMNS>::removeColumn(uint8_t index) const
+modm::Matrix<T, ROWS, COLUMNS>::removeColumn(std::size_t index) const
 {
 	if (index == 0)
-	{
 		return subMatrix<ROWS, COLUMNS-1>(0, 1);
-	}
 	else if (index == (COLUMNS - 1))
-	{
 		return subMatrix<ROWS, COLUMNS-1>(0, 0);
-	}
 	else
 	{
 		Matrix<T, ROWS, COLUMNS-1> m;
-		uint_fast8_t i = 0, ci = 0;
+		std::size_t i = 0, ci = 0;
 
-		for (; i < index; ++i) {
+		for (; i < index; ++i)
 			m.replaceColumn(ci++, getColumn(i));
-		}
+
 		++i; // skip one column
-		for (; i < COLUMNS; ++i) {
+
+		for (; i < COLUMNS; ++i)
 			m.replaceColumn(ci++, getColumn(i));
-		}
 
 		return m;
 	}
 }
 
 // ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+template<typename T, std::size_t ROWS, std::size_t COLUMNS>
 modm::IOStream&
 modm::operator << (modm::IOStream& os, const modm::Matrix<T, ROWS, COLUMNS> &m)
 {
 	os << "{ ";
 
-	for (uint_fast8_t i = 0; i < ROWS; ++i)
+	for (std::size_t i = 0; i < ROWS; ++i)
 	{
 		os << "{ ";
-		for (uint_fast8_t j = 0; j < COLUMNS; ++j)
+		for (std::size_t j = 0; j < COLUMNS; ++j)
 		{
 			os << m.element[i * COLUMNS + j];
 			if (j < COLUMNS-1)
-			{
 				os << ", ";
-			}
 		}
 		os << " }";
 
 		if (i < ROWS-1)
-		{
 			os << ", \n";
-		}
 	}
 	os << " }";
 	return os;
@@ -621,7 +479,6 @@ modm::determinant(const modm::Matrix<T, 1, 1> &m)
 	return m[0][0];
 }
 
-// ----------------------------------------------------------------------------
 template<typename T>
 T
 modm::determinant(const modm::Matrix<T, 2, 2> &m)
@@ -629,30 +486,25 @@ modm::determinant(const modm::Matrix<T, 2, 2> &m)
 	return (m[0][0] * m[1][1] - m[0][1] * m[1][0]);
 }
 
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t N>
+template<typename T, std::size_t N>
 T
 modm::determinant(const modm::Matrix<T, N, N> &m)
 {
 	// not the most efficient way, but should work for now...
 	T value = 0;
 	int8_t factor = 1;
-	for (uint_fast8_t i = 0; i < N; ++i)
+	for (std::size_t i = 0; i < N; ++i)
 	{
 		T coeff = m[0][i];
 		modm::Matrix<T, N-1, N-1> subM;
 
-		for (uint_fast8_t x = 0; x < i; ++x) {
-			for (uint_fast8_t y = 1; y < N; ++y) {
+		for (std::size_t x = 0; x < i; ++x)
+			for (std::size_t y = 1; y < N; ++y)
 				subM[y-1][x] = m[y][x];
-			}
-		}
 
-		for (uint_fast8_t x = i+1; x < N; ++x) {
-			for (uint_fast8_t y = 1; y < N; ++y) {
+		for (std::size_t x = i+1; x < N; ++x)
+			for (std::size_t y = 1; y < N; ++y)
 				subM[y-1][x-1] = m[y][x];
-			}
-		}
 
 		value += coeff * factor * determinant(subM);
 		factor *= -1;
@@ -660,4 +512,3 @@ modm::determinant(const modm::Matrix<T, N, N> &m)
 
 	return value;
 }
-

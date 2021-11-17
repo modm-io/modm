@@ -59,8 +59,8 @@ Circle2DTest::testIntersectionCircle()
 	TEST_ASSERT_TRUE(circle1.getIntersections(circle2, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 1U);
 
-	TEST_ASSERT_EQUALS(points[0].getX(), 10);
-	TEST_ASSERT_EQUALS(points[0].getY(), 0);
+	TEST_ASSERT_EQUALS(points[0].x(), 10);
+	TEST_ASSERT_EQUALS(points[0].y(), 0);
 
 	points.removeAll();
 
@@ -75,11 +75,11 @@ Circle2DTest::testIntersectionCircle()
 	TEST_ASSERT_TRUE(circle1.getIntersections(circle2, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 2U);
 
-	TEST_ASSERT_EQUALS(points[0].getX(), 15);
-	TEST_ASSERT_EQUALS(points[0].getY(), -26);
+	TEST_ASSERT_EQUALS(points[0].x(), 15);
+	TEST_ASSERT_EQUALS(points[0].y(), -26);
 
-	TEST_ASSERT_EQUALS(points[1].getX(), 15);
-	TEST_ASSERT_EQUALS(points[1].getY(), 26);
+	TEST_ASSERT_EQUALS(points[1].x(), 15);
+	TEST_ASSERT_EQUALS(points[1].y(), 26);
 
 	points.removeAll();
 

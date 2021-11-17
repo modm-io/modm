@@ -14,19 +14,6 @@
 #endif
 
 // ----------------------------------------------------------------------------
-template<typename T>
-modm::Ray2D<T>::Ray2D() :
-	basePoint(), direction()
-{
-}
-
-template<typename T>
-modm::Ray2D<T>::Ray2D(const Vector<T, 2>& start, const Vector<T, 2>& direction) :
-	basePoint(start), direction(direction)
-{
-}
-
-// ----------------------------------------------------------------------------
 template <typename T>
 inline void
 modm::Ray2D<T>::setStartPoint(const Vector<T, 2>& point)
@@ -145,15 +132,15 @@ bool
 modm::Ray2D<T>::intersects(const LineSegment2D<T>& line) const
 {
 	// vector from the base point of the line to the new point
-	Vector<T, 2> startToPoint = line.getStartPoint() - this->basePoint;
-	Vector<T, 2> endToPoint = line.getEndPoint() - this->basePoint;
+	Vector<T, 2> startToPoint = line.startPoint - this->basePoint;
+	Vector<T, 2> endToPoint = line.endPoint - this->basePoint;
 	Vector<T, 2> dt = this->direction.toOrthogonalVector();
 
 	if ((startToPoint.dot(dt) * endToPoint.dot(dt)) < 0) {
 		// Points are on different sides of the ray (interpreted as
 		// continuous line)
 
-		Vector<T, 2> pointToStart = this->basePoint - line.getStartPoint();
+		Vector<T, 2> pointToStart = this->basePoint - line.startPoint;
 		Vector<T, 2> lt = line.getDirectionVector().toOrthogonalVector();
 		if ((pointToStart.dot(lt) * this->direction.dot(lt)) < 0) {
 			// Point and

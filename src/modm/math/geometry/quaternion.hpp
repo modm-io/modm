@@ -11,8 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_QUATERNION_HPP
-#define MODM_QUATERNION_HPP
+#pragma once
 
 #include <cmath>
 #include <stdint.h>
@@ -20,10 +19,11 @@
 namespace modm
 {
 	// forward declaration
-	template<class T, uint8_t N>
+	template<typename T, std::size_t N>
+	requires (N > 0)
 	class Vector;
 
-	template<class T, uint8_t ROWS, uint8_t COLUMNS>
+	template<typename T, std::size_t ROWS, std::size_t COLUMNS>
 	class Matrix;
 
 	/**
@@ -99,10 +99,7 @@ namespace modm
 		void to3x3Matrix(Matrix<T, 3, 3> *outMatrix);
 
 	public:
-		T w;
-		T x;
-		T y;
-		T z;
+		T w, x, y, z;
 	};
 
 	template<class T>
@@ -111,5 +108,3 @@ namespace modm
 }
 
 #include "quaternion_impl.hpp"
-
-#endif	// MODM_QUATERNION_HPP

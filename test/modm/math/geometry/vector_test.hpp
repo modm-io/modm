@@ -34,4 +34,7 @@ public:
 
 	void
 	testLength();
+
+	void
+	testConvert();
 };
