@@ -19,6 +19,10 @@ proc modm_itm_log { OUTPUT F_CPU {BAUDRATE 2000000} } {
 
 proc modm_program { SOURCE } {
 	program $SOURCE verify
+%% if has_rtt
+	# Zero SRAM to prevent OpenOCD from leaking RTT identifier into memory
+	mww 0x{{"%0x" % main_ram.start}} 0 {{main_ram.size // 4}}
+%% endif
 	reset run
 	shutdown
 }
