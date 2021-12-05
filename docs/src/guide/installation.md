@@ -85,13 +85,13 @@ export PATH="/opt/doxypress:$PATH"
 Install the [pre-built ARM toolchain][gcc-arm-toolchain]:
 
 ```sh
-wget -O- https://developer.arm.com/-/media/Files/downloads/gnu-rm/10-2020q4/gcc-arm-none-eabi-10-2020-q4-major-x86_64-linux.tar.bz2 | sudo tar xj -C /opt/
+wget -O- https://developer.arm.com/-/media/Files/downloads/gnu-rm/10.3-2021.10/gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2 | sudo tar xj -C /opt/
 ```
 
 Add it to your `PATH` variable in `~/.bashrc`:
 
 ```sh
-export PATH="/opt/gcc-arm-none-eabi-10-2020-q4-major/bin:$PATH"
+export PATH="/opt/gcc-arm-none-eabi-10.3-2021.10/bin:$PATH"
 ```
 
 !!! warning "Ubuntus 'gcc-arm-none-eabi' package"
