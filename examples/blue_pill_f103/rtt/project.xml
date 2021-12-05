@@ -1,0 +1,14 @@
+<library>
+  <extends>modm:blue-pill-f103</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/blue_pill_f103/rtt</option>
+    <option name="modm:platform:rtt:buffer.rx">16</option>
+    <option name="modm:build:openocd.cfg">openocd.cfg</option>
+  </options>
+  <modules>
+    <module>modm:platform:rtt</module>
+    <module>modm:processing:timer</module>
+    <module>modm:build:scons</module>
+    <module>modm:debug</module>
+  </modules>
+</library>
