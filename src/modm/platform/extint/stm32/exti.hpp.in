@@ -420,7 +420,7 @@ public:
 	%% if (range | length) == 1
 				return 1ul << {{ range[0] }};
 	%% else
-				return ((1ul << {{range[-1]+1}}) - 1ul) & ~((1ul << {{range[0]+1}}) - 1ul);
+				return ((1ul << {{range[-1]+1}}) - 1ul) & ~((1ul << {{range[0]}}) - 1ul);
 	%% endif
 %% endfor
 		}
