@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:nucleo-f429zi</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_f429zi/adc_ads816x</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:spi:1</module>
+    <module>modm:driver:ads816x</module>
+  </modules>
+</library>
