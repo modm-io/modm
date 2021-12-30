@@ -3,6 +3,7 @@
  * Copyright (c) 2016, Fabian Greif
  * Copyright (c) 2016-2017, Sascha Schade
  * Copyright (c) 2018, Antal Szabó
+ * Copyright (c) 2021, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -33,8 +34,8 @@ namespace Board
 struct SystemClock
 {
 	static constexpr uint32_t Frequency = 216_MHz;
-	static constexpr uint32_t Apb1 = Frequency / 8;
-	static constexpr uint32_t Apb2 = Frequency / 4;
+	static constexpr uint32_t Apb1 = Frequency / 4;
+	static constexpr uint32_t Apb2 = Frequency / 2;
 
 	static constexpr uint32_t Adc1 = Apb2;
 	static constexpr uint32_t Adc2 = Apb2;
@@ -92,10 +93,8 @@ struct SystemClock
 		Rcc::enableOverdriveMode();
 		Rcc::setFlashLatency<Frequency>();
 		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
-		// APB1 is running only at 27MHz, since AHB / 4 = 54MHz > 45MHz limit!
-		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div8);
-		// APB2 is running only at 54MHz, since AHB / 2 = 108MHz > 90MHz limit!
-		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div4);
+		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div4);
+		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div2);
 		Rcc::updateCoreFrequency<Frequency>();
 
 		return true;
