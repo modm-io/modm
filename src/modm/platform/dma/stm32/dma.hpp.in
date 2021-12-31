@@ -27,7 +27,7 @@ namespace modm
 namespace platform
 {
 
-%% if dmaType in ["stm32-mux"]
+%% if dmaType in ["stm32-mux", "stm32-mux-stream"]
 namespace dma
 {
 	template <typename ChannelT, Peripheral peripheral, DmaBase::Signal signal>
@@ -59,6 +59,10 @@ public:
 			Rcc::enable<Peripheral::Dma1>();
 %% if (dma.instance | length) > 1
 		else {
+%% if dmaType in ["stm32-mux-stream"]:
+			// DMAMUX is clocked from DMA1 clock
+			Rcc::enable<Peripheral::Dma1>();
+%% endif
 			Rcc::enable<Peripheral::Dma2>();
 %% if target.string.startswith("stm32f100")
 			// TODO: Enable remap of DMA2_Channel5 IRQ
@@ -265,11 +269,14 @@ public:
 %% endif
 			DMA_REQ->CSELR &= ~(0x0f << (uint32_t(ChannelID) * 4));
 			DMA_REQ->CSELR |= uint32_t(dmaRequest) << (uint32_t(ChannelID) * 4);
-%% elif dmaType in ["stm32-mux"]
+%% elif dmaType in ["stm32-mux", "stm32-mux-stream"]
 			constexpr auto muxChannel = std::find_if(muxChannels.begin(), muxChannels.end(), [](MuxChannel ch) {
+%% if dmaType == "stm32-mux"
 				return (ch.dmaInstance == ID) && (ch.dmaChannel == (uint32_t(ChannelID) + 1));
+%% else
+				return (ch.dmaInstance == ID) && (ch.dmaChannel == uint32_t(ChannelID));
+%% endif
 			})->muxChannel;
-
 			auto* channel = DMAMUX1_Channel0 + muxChannel;
 			channel->CCR = (channel->CCR & DMAMUX_CxCR_DMAREQ_ID) | uint32_t(dmaRequest);
 %% elif dmaType in ["stm32-stream-channel"]
@@ -297,7 +304,7 @@ public:
 			static const uint32_t TE_Flag {
 				uint32_t(InterruptFlags::Error) << (uint32_t(ChannelID) * 4)
 			};
-%% elif dmaType in ["stm32-stream-channel"]
+%% elif dmaType in ["stm32-stream-channel", "stm32-mux-stream"]
 			constexpr uint8_t offsetLut[8] = {0, 6, 16, 22, 0+32, 6+32, 16+32, 22+32};
 			static const uint64_t TC_Flag {
 				uint64_t(InterruptFlags::TransferComplete) << offsetLut[uint32_t(ChannelID)]
@@ -360,7 +367,7 @@ public:
 		 * Helper to verify that the selected channel supports the selected
 		 * hardware and provides the Request to be set in setPeripheralRequest().
 		 */
-%% if dmaType in ["stm32-mux"]
+%% if dmaType in ["stm32-mux", "stm32-mux-stream"]
 		template <Peripheral peripheral, Signal signal = Signal::NoSignal>
 		using RequestMapping = dma::RequestMapping<Channel, peripheral, signal>;
 %% else
@@ -373,7 +380,7 @@ public:
 		static inline DmaBase::IrqHandler transferError { nullptr };
 		static inline DmaBase::IrqHandler transferComplete { nullptr };
 
-%% if dmaType in ["stm32-mux"]:
+%% if dmaType in ["stm32-mux", "stm32-mux-stream"]:
 		struct MuxChannel
 		{
 			uint8_t muxChannel;
@@ -394,7 +401,7 @@ public:
  * Derive DMA controller classes for convenience. Every derived class defines
  * the channels available on that controller.
  */
-%% if dmaType in ["stm32-mux"]:
+%% if dmaType in ["stm32-mux", "stm32-mux-stream"]:
 %% for controller in dmaController
 class Dma{{ controller.instance }}: public DmaController<{{ controller.instance }}>
 {
@@ -472,23 +479,24 @@ struct DmaController<{{ channels.instance }}>::Channel<DmaBase::Channel::Channel
 	%% endfor
 %% endfor
 
-%% elif dmaType in ["stm32-mux"]
+%% elif dmaType in ["stm32-mux", "stm32-mux-stream"]
 namespace dma
 {
 
 %% for request in dma["requests"][0]["request"]
 
-%% if request.signal[0].name is defined
-%% set request_signal = "DmaBase::Signal::" + request.signal[0].name.capitalize()
+%% for signal in request.signal
+%% if signal.name is defined
+%% set request_signal = "DmaBase::Signal::" + signal.name.capitalize()
 %% else
 %% set request_signal = "DmaBase::Signal::NoSignal"
 %% endif
 
-%% set peripheral = request.signal[0].driver.capitalize()
-%% if request.signal[0].instance is defined
-	%% set peripheral = peripheral ~ request.signal[0].instance
+%% set peripheral = signal.driver.capitalize()
+%% if signal.instance is defined
+	%% set peripheral = peripheral ~ signal.instance
 %% endif
-%% if peripheral in ["Dma", "Quadspi"]
+%% if peripheral in ["Dma", "Quadspi", "Swpmi"]
 	%% set peripheral = peripheral ~ 1
 %% endif
 
@@ -498,6 +506,7 @@ namespace dma
 		using Channel = ChannelT;
 		static constexpr DmaBase::Request Request = DmaBase::Request::Request{{ request.position }};
 	};
+%% endfor
 %% endfor
 
 }
