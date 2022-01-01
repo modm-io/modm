@@ -17,6 +17,9 @@ def init(module):
 # MCP79410/MCP79411/MCP79412
 
 Battery-Backed I2C Real-Time Clock/Calendar with SRAM, EEPROM and Protected EEPROM
+
+[MCP7941x datasheet](http://ww1.microchip.com/downloads/en/DeviceDoc/22266A.pdf)
+
 """
 
 

@@ -7,7 +7,6 @@
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- * chip datasheet available at http://ww1.microchip.com/downloads/en/DeviceDoc/22266A.pdf
  */
 // ----------------------------------------------------------------------------
 
@@ -24,6 +23,7 @@
 namespace modm
 {
 
+/// @ingroup modm_driver_mcp7941x
 struct mcp7941x
 {
 	/// days, months, etc. are decoded (BCD) in this struct
@@ -45,7 +45,7 @@ struct mcp7941x
  * @author	Raphael Lehmann
  */
 template < class I2cMaster >
-class Mcp7941x :	public modm::mcp7941x,
+class Mcp7941x :	public mcp7941x,
 					public modm::I2cDevice<I2cMaster, 2>
 {
 public:
