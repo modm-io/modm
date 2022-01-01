@@ -1,0 +1,41 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2022, Raphael Lehmann
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:adis16470"
+    module.description = """\
+# ADIS16470 Inertial Measurement Unit
+
+[Datasheet](https://www.analog.com/media/en/technical-documentation/data-sheets/ADIS16470.pdf)
+"""
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:gpio",
+        ":architecture:register",
+        ":architecture:spi.device",
+        ":math:utils",
+        ":processing:resumable",
+        ":processing:timer")
+    return True
+
+def build(env):
+    env.substitutions = {
+        "has_io": env.has_module("modm:io"),
+    }
+    env.outbasepath = "modm/src/modm/driver/inertial"
+    env.copy("adis16470.hpp")
+    env.template("adis16470_io.hpp.in")
+    env.copy("adis16470_impl.hpp")
+    if env.has_module("modm:io"):
+        env.copy("adis16470.cpp")
