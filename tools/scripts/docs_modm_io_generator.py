@@ -189,7 +189,10 @@ def create_target(argument):
         builder.build(output_dir, modules)
 
         print('Executing: (cd {}/modm/docs/ && doxypress doxypress.json)'.format(output_dir))
-        os.system('(cd {}/modm/docs/ && doxypress doxypress.json > /dev/null 2>&1)'.format(output_dir))
+        retval = os.system('(cd {}/modm/docs/ && doxypress doxypress.json > /dev/null 2>&1)'.format(output_dir))
+        if retval != 0:
+            print("Error {} generating documentation for device {}.".format(retval, output_dir))
+            return False
         print("Finished generating documentation for device {}.".format(output_dir))
 
         srcdir = (tempdir / output_dir / "modm/docs/html")
