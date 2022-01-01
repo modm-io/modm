@@ -199,9 +199,6 @@ modm::platform::Timer{{ id }}::configureOutputChannel(uint32_t channel,
 	}
 %% endif
 
-	// Disable Repetition Counter (FIXME has to be done here for some unknown reason)
-	TIM{{ id }}->RCR = 0;
-
 	if (mode != OutputCompareMode::Inactive) {
 		TIM{{ id }}->CCER |= (TIM_CCER_CC1E) << (channel * 4);
 	}
@@ -253,10 +250,6 @@ OutputComparePreload preload)
 	}
 %% endif
 
-
-	// Disable Repetition Counter (FIXME has to be done here for some unknown reason)
-	TIM{{ id }}->RCR = 0;
-
 	// CCER Flags (Enable/Polarity)
 	flags = (static_cast<uint32_t>(polarity_n) << 2) |
 			(static_cast<uint32_t>(out_n)      << 2) |
@@ -305,9 +298,6 @@ uint32_t modeOutputPorts)
 		}
 %% endif
 	}
-
-	// Disable Repetition Counter (FIXME has to be done here for some unknown reason)
-	TIM{{ id }}->RCR = 0;
 
 	uint32_t flags = (modeOutputPorts & (0xf)) << (channel * 4);
 	flags |= TIM{{ id }}->CCER & ~(0xf << (channel * 4));
