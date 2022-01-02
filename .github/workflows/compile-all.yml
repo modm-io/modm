@@ -363,6 +363,27 @@ jobs:
           name: stm32l4-compile-all-3
           path: test/all/log
 
+  stm32l5-compile-all:
+    if: github.event.label.name == 'ci:hal'
+    runs-on: ubuntu-20.04
+    container:
+      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Checkout code and update modm tools
+        run: |
+          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+      - name: Compile HAL for all STM32L5
+        run: |
+          (cd test/all && python3 run_all.py stm32l5 --quick-remaining)
+      - name: Upload log artifacts
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: stm32l5-compile-all
+          path: test/all/log
+
   stm32g0-compile-all:
     if: github.event.label.name == 'ci:hal'
     runs-on: ubuntu-20.04
