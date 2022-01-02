@@ -36,7 +36,7 @@ class Instance(Module):
             if target["family"] == "f3":
                 # 13-14 reserved
                 channels = [1,2,3,4,5,6,7,8,9,10,11,12,15,16,17,18]
-            elif target["family"] == "l4":
+            elif target["family"] in ["l4", "l5"]:
                 # ADC1 is connected to 16 external channels + 3 internal channels
                 channels = range(1,17)
             elif target["family"] == "g4":
@@ -51,6 +51,9 @@ class Instance(Module):
                 channels = [1,2,3,4,5,6,7,8,9,10,11,12,17,18]
             elif target["family"] == "g4":
                 # ADC2 is connected to 16 external channels + 2 internal channels
+                channels = range(1,17)
+            elif target["family"] == "l5":
+                # ADC1 is connected to 16 external channels + 2 internal channels
                 channels = range(1,17)
             else:
                 # ADC2 is connected to 16 external channels + 2 internal channels
@@ -99,6 +102,7 @@ class Instance(Module):
             properties["clock_mux"] = False
         elif target["family"] == "l4":
             properties["adc_ccr"] = "ADC_CCR"
+            properties["ccipr"] = "CCIPR"
             if len(driver["instance"]) == 1 and "q5a" not in target.string:
                 properties["id_common"] = "1"
                 properties["id_common_u"] = "1_COMMON"
@@ -109,9 +113,17 @@ class Instance(Module):
                 properties["id_common"] = "123"
                 properties["id_common_u"] = "123_COMMON"
             properties["clock_mux"] = (target["name"] not in ("12", "22"))
+        elif target["family"] == "l5":
+            properties["adc_ccr"] = "ADC_CCR"
+            properties["ccipr"] = "CCIPR1"
+            properties["ahb"] = "AHB2"
+            properties["id_common"] = ""
+            properties["id_common_u"] = "12_COMMON"
+            properties["clock_mux"] = True
         elif target["family"] == "g4":
             properties["ahb"] = "AHB2"
             properties["adc_ccr"] = "ADC_CCR"
+            properties["ccipr"] = "CCIPR"
             if instance_id in [1, 2]:
                 properties["id_common"] = "12"
                 properties["id_common_u"] = "12_COMMON"

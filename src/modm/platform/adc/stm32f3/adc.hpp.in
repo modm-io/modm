@@ -62,12 +62,16 @@ public:
 %% elif target["family"] in ["l4", "g4"]
 		Temperature = 17,
 		BatDiv3     = 18,
+%% elif target["family"] in ["l5"]
+		InternalReference = 0,
+		Temperature = 17,
+		BatDiv3     = 18,
 %% endif
 %% elif id == 2
 %% if target["family"] in ["f3"]
 		Opamp2 = 17,
 		InternalReference = 18,
-%% elif target["family"] in ["l4", "g4"]
+%% elif target["family"] in ["l4", "l5", "g4"]
 		Dac1 = 17,
 		Dac2 = 18,
 %% endif
@@ -107,16 +111,18 @@ public:
 		NoClock = 0, // No clock selected.
 %% if target["family"] in ["g4"]
 %% if id in [1, 2]
-		Pll = RCC_CCIPR_ADC12SEL_0, // PLL “P” clock selected as ADC clock
-		SystemClock = RCC_CCIPR_ADC12SEL_1 , // System clock selected as ADCs clock
+		Pll = RCC_{{ ccipr }}_ADC12SEL_0, // PLL “P” clock selected as ADC clock
+		SystemClock = RCC_{{ ccipr }}_ADC12SEL_1 , // System clock selected as ADCs clock
 %% elif id in [3, 4, 5]
-		Pll = RCC_CCIPR_ADC345SEL_0, // PLL “P” clock selected as ADC clock
-		SystemClock = RCC_CCIPR_ADC345SEL_1 , // System clock selected as ADCs clock
+		Pll = RCC_{{ ccipr }}_ADC345SEL_0, // PLL “P” clock selected as ADC clock
+		SystemClock = RCC_{{ ccipr }}_ADC345SEL_1 , // System clock selected as ADCs clock
 %% endif
 %% else
-		PllSai1 = RCC_CCIPR_ADCSEL_0, // PLLSAI1 "R" clock (PLLADC1CLK) selected as ADCs clock
-		PllSai2 = RCC_CCIPR_ADCSEL_1, // PLLSAI2 "R" clock (PLLADC2CLK) selected as ADCs clock
-		SystemClock = RCC_CCIPR_ADCSEL_1 | RCC_CCIPR_ADCSEL_0, // System clock selected as ADCs clock
+		PllSai1 = RCC_{{ ccipr }}_ADCSEL_0, // PLLSAI1 "R" clock (PLLADC1CLK) selected as ADCs clock
+%% if target["family"] != "l5"
+		PllSai2 = RCC_{{ ccipr }}_ADCSEL_1, // PLLSAI2 "R" clock (PLLADC2CLK) selected as ADCs clock
+%% endif
+		SystemClock = RCC_{{ ccipr }}_ADCSEL_1 | RCC_{{ ccipr }}_ADCSEL_0, // System clock selected as ADCs clock
 %% endif
 	};
 %% endif
@@ -139,7 +145,7 @@ public:
 		Div128 				= RCC_CFGR2_{{ adc_pre }}_DIV128,
 		Div256 				= RCC_CFGR2_{{ adc_pre }}_DIV256,
 		Div256AllBits 		= RCC_CFGR2_{{ adc_pre }},	// for bit clear
-%% elif target["family"] in ["l4", "g4"]
+%% elif target["family"] in ["l4", "l5", "g4"]
 		Div1 				= 0,
 		Div2 				= ADC_CCR_PRESC_0,
 		Div4 				= ADC_CCR_PRESC_1,
@@ -156,7 +162,7 @@ public:
 %% endif
 	};
 
-%% if target["family"] in ["l4", "g4"]
+%% if target["family"] in ["l4", "l5", "g4"]
 	enum class SampleTime : uint8_t	// TODO: What is the best type?
 	{
 		Cycles2 	= 0b000,	//!   1.5 ADC clock cycles
@@ -190,7 +196,7 @@ public:
 
 	enum class VoltageRegulatorState : uint32_t
 	{
-%% if target["family"] in ["l4", "g4"]
+%% if target["family"] in ["l4", "l5", "g4"]
 		Enabled 		= ADC_CR_ADVREGEN,
 %% elif target["family"] in ["f3"]
 		// Intermediate state is needed to move from enabled to disabled
