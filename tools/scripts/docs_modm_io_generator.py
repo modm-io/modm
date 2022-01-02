@@ -23,6 +23,7 @@ import os, sys
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 from collections import defaultdict
+import json
 
 def repopath(path):
     return Path(__file__).absolute().parents[2] / path
@@ -112,8 +113,8 @@ def main():
         board_list = [("arduino-nano", "atmega328p-au"), ("arduino-uno", "atmega328p-au"), ("nucleo-g474re", "stm32g474ret6"),
                       ("blue-pill", "stm32f103c8t6"), ("feather-m0", "samd21g18a-uu")]
     elif args.test2:
-        device_list = ["hosted-linux", "atmega328p-pu", "stm32f103zgt7", "stm32g474vet7"]
-        board_list = []
+        device_list = ["hosted-linux", "atmega328p-pu", "stm32f103zgt7"]
+        board_list = [("nucleo-g474re", "stm32g474ret6")]
 
     template_path = os.path.realpath(os.path.dirname(sys.argv[0]))
     cwd = Path().cwd()
@@ -131,7 +132,7 @@ def main():
         os.chdir(tempdir)
         print("Starting to generate documentation...")
         template_overview(output_dir, device_list, board_list, template_path)
-        print("... for {} devices, estimated memory footprint is {} MB".format(len(device_list), (len(device_list)*70)+2000))
+        print("... for {} devices, estimated memory footprint is {} MB".format(len(device_list) + len(board_list), (len(device_list)*70)+2000))
         with multiprocessing.Pool(args.jobs) as pool:
             # We can only pass one argument to pool.map
             devices = ["{}|{}|{}||{}".format(modm_path, tempdir, dev, args.deduplicate) for dev in device_list]
@@ -243,6 +244,12 @@ def template_overview(output_dir, device_list, board_list, template_path):
         num_boards=len(board_list))
     with open(str(output_dir) + "/index.html","w+") as f:
         f.write(html)
+    json_data = {
+        "devices": [str(d).upper() for d in device_list] + [rename_board(b) for (b,_) in board_list],
+        "name2board": [{rename_board(b): b} for (b,_) in board_list],
+    }
+    with open(str(output_dir) + "/develop/targets.json","w+") as outfile:
+        json.dump(json_data, outfile)
     with open(str(output_dir) + "/robots.txt","w+") as f:
         robots_txt = "User-agent: *\n"
         f.write(robots_txt)
