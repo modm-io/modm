@@ -65,7 +65,9 @@ def build(env):
     properties["pllprediv2"] = False    # FIXME: not sure what value this should have
     properties["pll_hse_prediv2"] = target["family"] == "f1" and target["name"] in ["01", "02", "03"]
     properties["hsi48"] = \
-        target["family"] == "f0" and target["name"] in ["42", "48", "71", "72", "78", "91", "98"]
+        (target["family"] == "f0" and target["name"] in ["42", "48", "71", "72", "78", "91", "98"]) or \
+        (target["family"] == "l4" and target["name"][0] not in ["7", "8"]) or \
+        (target["family"] == "l5")
     properties["pll_p"] = ((target["family"] == "l4" and target["name"] not in ["12", "22"]) or target["family"] == "g4")
     properties["overdrive"] = (target["family"] == "f7") or \
         ((target["family"] == "f4") and target["name"] in ["27", "29", "37", "39", "46", "69", "79"])

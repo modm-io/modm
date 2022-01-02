@@ -102,14 +102,9 @@ struct SystemClock {
 		// update clock frequencies
 		Rcc::updateCoreFrequency<Frequency>();
 
-		// Enable Hsi48 clock
-		uint32_t waitCycles = 2048;
-		RCC->CRRCR |= RCC_CRRCR_HSI48ON;
-		while (not (RCC->CRRCR & RCC_CRRCR_HSI48RDY) and --waitCycles)
-			;
-
+		Rcc::enableInternalClockMHz48();
 		// Select Hsi48 as source for CLK48 MUX (USB, SDMMC, RNG)
-		RCC->CCIPR = (RCC->CCIPR & ~RCC_CCIPR_CLK48SEL_Msk) | (0b00 << RCC_CCIPR_CLK48SEL_Pos);
+		Rcc::setClock48Source(Rcc::Clock48Source::Hsi48);
 
 		return true;
 	}

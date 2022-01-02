@@ -40,6 +40,17 @@ Rcc::enableInternalClockMHz14(uint32_t waitCycles)
 %% endif
 
 %% if hsi48
+%% if target.family in ["l4", "l5"]
+bool
+Rcc::enableInternalClockMHz48(uint32_t waitCycles)
+{
+	bool retval;
+	RCC->CRRCR |= RCC_CRRCR_HSI48ON;
+	while (not ((retval = RCC->CRRCR & RCC_CRRCR_HSI48RDY)) and --waitCycles)
+		;
+	return retval;
+}
+%% else
 bool
 Rcc::enableInternalClockMHz48(uint32_t waitCycles)
 {
@@ -49,6 +60,7 @@ Rcc::enableInternalClockMHz48(uint32_t waitCycles)
 		;
 	return retval;
 }
+%% endif
 %% endif
 
 bool

@@ -302,6 +302,19 @@ public:
 		PllSaiP = RCC_DCKCFGR2_CK48MSEL
 	%% endif
 	};
+%% elif target.family in ["g4", "l4", "l5", "u5"]
+	enum class Clock48Source
+	{
+%% set sel48="MSEL" if target.family in ["l5", "u5"] else "SEL"
+%% if target.family == "l4" and target.name[0] in ["7", "8"]
+		None = 0,
+%% else
+		Hsi48 = 0,
+%% endif
+		PllSai1Q = RCC_{{ccipr1}}_CLK48{{sel48}}_0,
+		PllQ = RCC_{{ccipr1}}_CLK48{{sel48}}_1,
+		Msi = RCC_{{ccipr1}}_CLK48{{sel48}}_1 | RCC_{{ccipr1}}_CLK48{{sel48}}_0
+	};
 %% endif
 
 %% if target.family in ["f2", "f4", "f7", "h7"]
@@ -700,7 +713,14 @@ public:
 		RCC->DCKCFGR2 = (RCC->DCKCFGR2 & ~RCC_DCKCFGR2_CK48MSEL) | uint32_t(source);
 	%% endif
 	}
+%% elif target.family in ["g4", "l4", "l5", "u5"]
+	static inline void
+	setClock48Source(Clock48Source source)
+	{
+		RCC->{{ccipr1}} = (RCC->{{ccipr1}} & ~RCC_{{ccipr1}}_CLK48{{sel48}}_Msk) | uint32_t(source);
+	}
 %% endif
+
 %% if target.family == "h7"
 	enum class
 	UsbClockSource : uint32_t
