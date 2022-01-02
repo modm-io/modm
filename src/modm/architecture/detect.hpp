@@ -215,6 +215,9 @@
 #	elif defined __ARM_ARCH_7EM__
 #		define MODM_CPU_CORTEX_M4	1
 #		define MODM_CPU_STRING		"ARM Cortex-M4"
+#	elif defined __ARM_ARCH_8M_MAIN__
+#		define MODM_CPU_CORTEX_M33	1
+#		define MODM_CPU_STRING		"ARM Cortex-M33"
 #	elif defined __ARM_ARCH_6__
 #		define MODM_CPU_CORTEX_A6	1
 #		define MODM_CPU_STRING		"ARM Cortex-A6"

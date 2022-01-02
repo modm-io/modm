@@ -360,6 +360,7 @@ def build(env):
     if "f" in fpu:
         fpu_spec = {
             "4f": "-mfpu=fpv4-sp-d16",
+            "33f": "-mfpu=fpv4-sp-d16",
             "7f": "-mfpu=fpv5-sp-d16",
             "7fd": "-mfpu=fpv5-d16",
         }[fpu]
