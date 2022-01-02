@@ -29,7 +29,7 @@
 #define	USART_BRR_DIV_FRACTION	USART_BRR_DIV_Fraction
 #endif
 %% endif
-%% if tcbgt and target.family != "g4"
+%% if tcbgt and target.family not in ["g4", "l5"]
 #define USART_CR1_TXEIE   USART_CR1_TXEIE_TXFNFIE
 #define USART_CR1_RXNEIE  USART_CR1_RXNEIE_RXFNEIE
 #define USART_ISR_RXNE    USART_ISR_RXNE_RXFNE

@@ -226,7 +226,11 @@ public:
 	{
 		DMA_Channel_TypeDef *Base = (DMA_Channel_TypeDef *) CHANNEL_BASE;
 %% if dmaType in ["stm32-channel-request", "stm32-channel", "stm32-mux"]
+%% if target["family"] == "l5"
+		Base->CM0AR = address;
+%% else
 		Base->CMAR = address;
+%% endif
 %% elif dmaType in ["stm32-stream-channel", "stm32-mux-stream"]
 		Base->M0AR = address;
 %% endif

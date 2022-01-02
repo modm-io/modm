@@ -25,9 +25,12 @@ def prepare(module, options):
 
 extimap = {}
 def validate(env):
-    # These are all exti possible vectors: 0, 0_1, 1, 15_10, 2, 2_3, 2_TSC, 3, 4, 4_15, 9_5
+    # These are all exti possible vectors: 0..15, 0_1, 15_10, 2_3, 2_TSC, 4_15, 9_5
     all_exti = {
         "0": [0], "1": [1], "2": [2], "3": [3], "4": [4],
+        "5": [5], "6": [6], "7": [7], "8": [8], "9": [9],
+        "10": [10], "11": [11], "12": [12], "13": [13], "14": [14],
+        "15" : [15],
         "0_1": [0,1],
         "2_TSC": [2],
         "2_3": [2,3],
@@ -44,12 +47,12 @@ def validate(env):
 def build(env):
     target = env[":target"].identifier
 
-    separate_flags = target.family in ["g0"]
-    extended = target.family in ["l4", "g4", "h7"]
+    separate_flags = target.family in ["g0", "l5"]
+    extended = target.family in ["l4", "l5", "g4", "h7"]
     if separate_flags: extended = target.name in ["b1", "c1"]
 
     exti_reg = "SYSCFG"
-    if target.family in ["g0"]: exti_reg = "EXTI"
+    if target.family in ["g0", "l5"]: exti_reg = "EXTI"
     if target.family in ["f1"]: exti_reg = "AFIO"
 
     global extimap

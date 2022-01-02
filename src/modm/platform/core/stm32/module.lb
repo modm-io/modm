@@ -53,6 +53,7 @@ def build(env):
         "f7": (4,  4), # CM7  tested on F767 in ITCM
         "h7": (4,  4), # CM7  tested on H743 in ITCM
         "l4": (3,  4), # CM4  tested on L476 in SRAM2
+        "l5": (3,  4), # CM33 tested on L552 in RAM
         "f3": (3,  4), # CM4  tested on F334, F303 in CCM RAM
 
         # Defaults of (4, 4) for these families:

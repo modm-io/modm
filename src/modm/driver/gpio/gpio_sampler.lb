@@ -34,9 +34,12 @@ def prepare(module, options):
 
 def build(env):
     exti_vectors = [v["name"] for v in env[":target"].get_driver("core")["vector"] if "EXTI" in v["name"]]
-    # These are all exti possible vectors: 0, 0_1, 1, 15_10, 2, 2_3, 2_TSC, 3, 4, 4_15, 9_5
+    # These are all exti possible vectors: 0..15, 0_1, 15_10, 2_3, 2_TSC, 4_15, 9_5
     extimap = {
         "0": [0], "1": [1], "2": [2], "3": [3], "4": [4],
+        "5": [5], "6": [6], "7": [7], "8": [8], "9": [9],
+        "10": [10], "11": [11], "12": [12], "13": [13], "14": [14],
+        "15" : [15],
         "0_1": [0,1],
         "2_TSC": [2],
         "2_3": [2,3],

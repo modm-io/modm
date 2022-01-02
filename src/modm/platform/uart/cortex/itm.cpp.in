@@ -61,7 +61,11 @@ Itm::enable(uint8_t prescaler)
 	ITM->TPR  = 0;
 
 	// Trace Control Register
+%% if target.platform == "stm32" and target.family == "l5"
+	ITM->TCR  = (1 << ITM_TCR_TRACEBUSID_Pos) |
+%% else
 	ITM->TCR  = (1 << ITM_TCR_TraceBusID_Pos) |
+%% endif
 				(1 << ITM_TCR_DWTENA_Pos)     |
 				(1 << ITM_TCR_ITMENA_Pos);
 
