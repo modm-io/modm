@@ -1,3 +1,14 @@
+/*
+ * Copyright (c) 2021, Raphael Lehmann
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
 // Nucleo144 Arduino Header Footprint for STM32L4xxZx
 // Schematic: https://www.st.com/resource/en/schematic_pack/mb1312-l4xxzx-a03_schematic.pdf
 
