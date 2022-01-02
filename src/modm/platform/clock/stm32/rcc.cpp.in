@@ -61,7 +61,7 @@ Rcc::enableInternalClock(uint32_t waitCycles)
 	return retval;
 }
 
-%% if target.family in ["l0", "l1", "l4"]
+%% if target.family in ["l0", "l1", "l4", "l5"]
 bool
 Rcc::enableMultiSpeedInternalClock(MsiFrequency msi_frequency, uint32_t waitCycles)
 {
@@ -194,7 +194,7 @@ Rcc::enablePll{{id}}(PllSource source, const PllFactors& pllFactors, uint32_t wa
 		;
 
 	return tmp;
-%% elif target.family in ["g0", "l4", "g4"]
+%% elif target.family in ["g0", "l4", "l5", "g4"]
 	// Read reserved values and clear all other values
 	uint32_t tmp = RCC->PLLCFGR & ~(
 			RCC_PLLCFGR_PLLSRC | RCC_PLLCFGR_PLLM | RCC_PLLCFGR_PLLN |
@@ -380,6 +380,23 @@ Rcc::setVoltageScaling(VoltageScaling voltage, uint32_t waitCycles)
 
 	return true;
 }
+%% elif target.family == "l5"
+bool
+Rcc::setVoltageScaling(VoltageScaling voltage, uint32_t waitCycles)
+{
+	// TODO: check if low power mode is active and reject changing range if active
+	// Implemented according to STHAL HAL_PWREx_ControlVoltageScaling()
+	// TODO: The reference manual describes a more complicated procedure
+	// but the CubeHal also does not implement that ...
+	const auto currentSetting = PWR->CR1 & PWR_CR1_VOS;
+	if (voltage == static_cast<VoltageScaling>(currentSetting)) {
+		return true;
+	}
+	PWR->CR1 = (PWR->CR1 & ~PWR_CR1_VOS) | uint32_t(voltage);
+	while (PWR->SR2 & PWR_SR2_VOSF)
+		if (--waitCycles == 0) return false;
+	return true;
+}
 %% endif
 
 %% if target.family == "h7"
@@ -469,7 +486,7 @@ Rcc::enableSystemClock(SystemClockSource src, uint32_t waitCycles)
 }
 
 
-%% if target.family == "g4"
+%% if target.family in ["g4", "l5"]
 bool
 Rcc::setCanPrescaler(CanPrescaler prescaler)
 {

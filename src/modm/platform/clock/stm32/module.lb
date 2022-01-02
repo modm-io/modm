@@ -48,6 +48,11 @@ def build(env):
         properties["lsi_frequency"] = 37
         properties["msi_frequency"] = 2.097
         properties["boot_frequency"] = properties["msi_frequency"]
+    elif target["family"] in ["l5"]:
+        properties["hsi_frequency"] = 16
+        properties["lsi_frequency"] = 32
+        properties["msi_frequency"] = 4
+        properties["boot_frequency"] = properties["msi_frequency"]
     else:
         properties["hsi_frequency"] = 16
         properties["lsi_frequency"] = 32
@@ -84,6 +89,7 @@ def build(env):
     properties["pll_ids"] = ["1", "2", "3"] if target.family == "h7" else [""]
     properties["has_smps"] = target["family"] == "h7" and (target["name"] in ["25", "35", "45", "47", "55", "57"] or \
         (target["name"] in ["30", "a3", "b0", "b3"] and target["variant"] == "q"))
+    properties["ccipr1"] = "CCIPR1" if target.family == "l5" else "CCIPR"
 
     flash_latencies = {}
     for vcore in device.get_driver("flash")["latency"]:
@@ -153,7 +159,8 @@ def build(env):
             per = "USB"+per
         if "Usbotgfs" in all_peripherals and per.startswith("USB"):
             per = per.replace("USB1", "USB").replace("USB2", "USB")
-            # print(per, mode)
+        if target.family == "l5" and per == "USBFS":
+            per = "Usb"
         if per.capitalize() not in all_peripherals:
             continue
         if "EN" in mode:
