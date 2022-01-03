@@ -41,7 +41,8 @@ class Instance(Module):
                 channels = range(1,17)
             elif target["family"] == "g4":
                 # ADC1 is connected to 14 external channels + 4 internal channels
-                channels = range(1,15)
+                # 13, 16-18 reserved
+                channels = [1,2,3,4,5,6,7,8,9,10,11,12,14,15]
             else:
                 # 11-14 reserved
                 channels = [1,2,3,4,5,6,7,8,9,10,15,16,17,18]
@@ -51,7 +52,8 @@ class Instance(Module):
                 channels = [1,2,3,4,5,6,7,8,9,10,11,12,17,18]
             elif target["family"] == "g4":
                 # ADC2 is connected to 16 external channels + 2 internal channels
-                channels = range(1,17)
+                # 16 and 18 reserved
+                channels = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,17]
             else:
                 # ADC2 is connected to 16 external channels + 2 internal channels
                 channels = range(1,17)
@@ -60,7 +62,8 @@ class Instance(Module):
                 channels = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]
             elif target["family"] == "g4":
                 # ADC3 is connected to 15 external channels + 3 internal channels
-                channels = range(1,16)
+                # 13, 17, 18 reserved
+                channels = [1,2,3,4,5,6,7,8,9,10,11,12,14,15,16]
             else:
                 # ADC3 is connected to 12 external channels + 4 internal channels
                 channels = [1,2,3,4,6,7,8,9,10,11,12,13]
@@ -74,7 +77,8 @@ class Instance(Module):
         elif instance_id == 5:
             if target["family"] == "g4":
                 # ADC5 is connected to 13 external channels + 5 internal channels
-                channels = range(1,14)
+                # 3-5, 17, 18 reserved
+                channels = [1,2,6,7,8,9,10,11,12,13,14,15,16]
             else:
                 raise NotImplementedError
         properties["channels"] = sorted(channels)
@@ -137,6 +141,35 @@ class Instance(Module):
         env.template("adc_interrupt.cpp.in", "adc_interrupt_{}.cpp".format(self.instance))
 
 
+
+# class InstanceCommon(Module):
+#     def __init__(self, instance):
+#         self.instance = instance
+
+#     def init(self, module):
+#         module.name = str(self.instance)
+#         module.description = "Common configuration for ADC{}".format(self.instance)
+
+#     def prepare(self, module, options):
+#         module.depends(":platform:adc")
+#         return True
+
+#     def build(self, env):
+#         device = env[":target"]
+#         driver = device.get_driver("adc")
+
+#         properties = device.properties
+#         properties["target"] = target = device.identifier
+#         instance_id = int(self.instance)
+#         properties["id"] = instance_id
+
+#         env.substitutions = properties
+#         env.outbasepath = "modm/src/modm/platform/adc"
+
+#         env.template("adc_common.hpp.in", "adc_common_{}.hpp".format(self.instance))
+#         env.template("adc_common_impl.hpp.in", "adc_common{}_impl.hpp".format(self.instance))
+
+
 def init(module):
     module.name = ":platform:adc"
     module.description = "Analog-to-Digital Converter (ADC)"
@@ -172,6 +205,13 @@ def prepare(module, options):
 
     for instance in listify(device.get_driver("adc")["instance"]):
         module.add_submodule(Instance(int(instance)))
+
+    # if target["family"] in ["f3", "l4"]:
+    #     module.add_submodule(InstanceCommon(12))
+    #     module.add_submodule(InstanceCommon(34))
+    # elif target["family"] in ["g4"]:
+    #     module.add_submodule(InstanceCommon(12))
+    #     module.add_submodule(InstanceCommon(345))
 
     return True
 

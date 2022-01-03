@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Raphael Lehmann
+ * Copyright (c) 2019, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -10,22 +10,23 @@
 
 #include <modm/board.hpp>
 
-#undef	MODM_LOG_LEVEL
-#define	MODM_LOG_LEVEL modm::log::INFO
+using namespace Board;
 
+// ----------------------------------------------------------------------------
 int
 main()
 {
 	Board::initialize();
 
-	MODM_LOG_INFO << "STM32G4 ADC basic example" << modm::endl;
+	MODM_LOG_INFO << "STM32G4 ADC new example" << modm::endl;
 	MODM_LOG_INFO << " running on Nucleo-G474RE" << modm::endl << modm::endl;
 
-	MODM_LOG_INFO << "Configuring ADC ...";
-	// max. ADC clock for STM32G474: 60 MHz
-	// 170 MHz AHB clock / 4 = 42.5 MHz
-	Adc1::initialize<Board::SystemClock, 0_MHz, 0_pct, Adc1::ClockMode::SynchronousPrescaler4,
-					 Adc1::ClockSource::SystemClock>();
+	MODM_LOG_INFO << "Configuring ADC ...\n";
+	Adc1::initialize<
+		Board::SystemClock,
+		1_MHz, 10_pct,
+		Adc1::ClockMode::SynchronousPrescaler2,
+		Adc1::ClockSource::SystemClock>();
 
 	Adc1::connect<GpioA0::In1>();
 	Adc1::setPinChannel<GpioA0>(Adc1::SampleTime::Cycles13);
@@ -33,7 +34,7 @@ main()
 	while (true)
 	{
 		Adc1::startConversion();
-		while(!Adc1::isConversionFinished())
+		while(!Adc1::isConversionFinished)
 			;
 		int adcValue = Adc1::getValue();
 		MODM_LOG_INFO << "adcValue=" << adcValue;

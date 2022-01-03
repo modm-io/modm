@@ -20,7 +20,7 @@ main()
 	LedD13::setOutput();
 	Adc1::connect<GpioB10::In11>();
 
-	Adc1::initialize<Board::SystemClock, Adc1::ClockMode::Asynchronous, 1_MHz>();
+	Adc1::initialize<Board::SystemClock, 1_MHz, 10_pct, Adc1::ClockMode::Asynchronous>();
 
 	uint16_t Vref = Adc1::readInternalVoltageReference();
 	int16_t Temp = Adc1::readTemperature(Vref);

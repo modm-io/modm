@@ -2,6 +2,7 @@
  * Copyright (c) 2013-2014, Kevin Läufer
  * Copyright (c) 2014, 2016-2018, Niklas Hauser
  * Copyright (c) 2017, Sascha Schade
+ * Copyright (c) 2020, Raphael Lehmann
  *
  * This file is part of the modm project.
  *
@@ -15,6 +16,8 @@
 #define MODM_STM32F3_ADC{{ id }}_HPP
 
 #include <stdint.h>
+#include <span>
+#include <array>
 #include "../device.hpp"
 #include <modm/architecture/interface/register.hpp>
 #include <modm/platform/gpio/connector.hpp>
@@ -58,34 +61,57 @@ public:
 		VTS       = 16,
 		BatDiv2   = 17,
 		InternalReference = 18,
-		// TODO: Add internal connections
-%% elif target["family"] in ["l4", "g4"]
+%% elif target["family"] in ["l4"]
 		Temperature = 17,
 		BatDiv3     = 18,
+%% elif target["family"] in ["g4"]
+		Opamp1 = 13,
+		Temperature = 16,
+		BatDiv3     = 17,
+		InternalReference = 18,
 %% endif
 %% elif id == 2
 %% if target["family"] in ["f3"]
 		Opamp2 = 17,
 		InternalReference = 18,
-%% elif target["family"] in ["l4", "g4"]
+%% elif target["family"] in ["l4"]
 		Dac1 = 17,
 		Dac2 = 18,
+%% elif target["family"] in ["g4"]
+		Opamp2 = 16,
+		Opamp3 = 18,
 %% endif
 %% elif id == 3
 %% if target["family"] in ["f3"]
 		Vss    =  4,	// ADC3_IN4 not bonded and connected to VSS
 		Opamp3 = 17,
 		InternalReference = 18,
-%% elif target["family"] in ["l4", "g4"]
+%% elif target["family"] in ["l4"]
 		Dac1 = 14,
 		Dac2 = 15,
 		Vss  = 16,
 		Temperature = 17,
 		BatDiv3 = 18,
+%% elif target["family"] in ["g4"]
+		Opamp3 = 13,
+		BatDiv3 = 17,
+		InternalReference  = 18,
 %% endif
 %% elif id == 4
+%% if target["family"] in ["f3"]
 		Opamp3 = 17,
+%% elif target["family"] in ["l4", "g4"]
+		Opamp6 = 17,
+%% endif
 		InternalReference = 18,
+%% elif id == 5
+%% if target["family"] in ["g4"]
+		Opamp5 = 3,
+		Temperature = 4,
+		Opamp4 = 5,
+		BatDiv3 = 17,
+		InternalReference = 18,
+%% endif
 %% endif
 	};
 
@@ -100,25 +126,43 @@ public:
 		SynchronousPrescaler4 = {{ adc_ccr }}_CKMODE_1 | {{ adc_ccr }}_CKMODE_0,
 	};
 
-%% if clock_mux
 	// ADCs clock source selection
+	// Warning: One clock MUX is shared between ADCs 1 and 2,
+	//  another mux sharded between ADCs 3, 4 and 5
 	enum class ClockSource : uint32_t
 	{
+%% if clock_mux
 		NoClock = 0, // No clock selected.
-%% if target["family"] in ["g4"]
-%% if id in [1, 2]
+ %% if target["family"] in ["g4"]
+ %% if id in [1, 2]
 		Pll = RCC_CCIPR_ADC12SEL_0, // PLL “P” clock selected as ADC clock
 		SystemClock = RCC_CCIPR_ADC12SEL_1 , // System clock selected as ADCs clock
-%% elif id in [3, 4, 5]
+ %% elif id in [3, 4, 5]
 		Pll = RCC_CCIPR_ADC345SEL_0, // PLL “P” clock selected as ADC clock
 		SystemClock = RCC_CCIPR_ADC345SEL_1 , // System clock selected as ADCs clock
-%% endif
-%% else
+ %% endif
+ %% else
 		PllSai1 = RCC_CCIPR_ADCSEL_0, // PLLSAI1 "R" clock (PLLADC1CLK) selected as ADCs clock
 		PllSai2 = RCC_CCIPR_ADCSEL_1, // PLLSAI2 "R" clock (PLLADC2CLK) selected as ADCs clock
 		SystemClock = RCC_CCIPR_ADCSEL_1 | RCC_CCIPR_ADCSEL_0, // System clock selected as ADCs clock
+ %% endif
+%% else
+		Default, // F3 has no clock_mux
 %% endif
 	};
+
+%% if clock_mux
+private:
+%% if target["family"] in ["g4"]
+%% if id in [1, 2]
+	static constexpr uint32_t ClockSourceMsk = RCC_CCIPR_ADC12SEL_Msk;
+%% elif id in [3, 4, 5]
+	static constexpr uint32_t ClockSourceMsk = RCC_CCIPR_ADC345SEL_Msk;
+%% endif
+%% else
+	static constexpr uint32_t ClockSourceMsk = RCC_CCIPR_ADCSEL_Msk;
+%% endif
+public:
 %% endif
 
 	// Prescaler of the Asynchronous ADC clock
@@ -201,6 +245,227 @@ public:
 %% endif
 	};
 
+	enum class TriggerMode : uint8_t
+	{
+		Disabled		= 0b00,
+		SoftwareTrigger	= Disabled,
+		RisingEdge		= 0b01,
+		FallingEdge		= 0b10,
+		BothEdges		= 0b11,
+	};
+
+	enum class TriggerSourceRegular : uint8_t
+	{
+%% if target["family"] in ["g4"]
+%% if id in [1, 2]
+		Tim1Cc1			= 0b00000,
+		Tim1Cc2			= 0b00001,
+		Tim1Cc3			= 0b00010,
+		Tim2Cc2			= 0b00011,
+		Tim3Trgo		= 0b00100,
+		Tim4Cc4			= 0b00101,
+		ExtiLine11		= 0b00110,
+		Tim8Trgo		= 0b00111,
+		Tim8Trgo2		= 0b01000,
+		Tim1Trgo		= 0b01001,
+		Tim1Trgo2		= 0b01010,
+		Tim2Trgo		= 0b01011,
+		Tim4Trgo		= 0b01100,
+		Tim6Trgo		= 0b01101,
+		Tim15Trgo		= 0b01110,
+		Tim3Cc4			= 0b01111,
+		Tim20Trgo		= 0b10000,
+		Tim20Trgo2		= 0b10001,
+		Tim20Cc1		= 0b10010,
+		Tim20Cc2		= 0b10011,
+		Tim20Cc3		= 0b10100,
+		HrtimAdcTrg1	= 0b10101,
+		HrtimAdcTrg3	= 0b10110,
+		HrtimAdcTrg5	= 0b10111,
+		HrtimAdcTrg6	= 0b11000,
+		HrtimAdcTrg7	= 0b11001,
+		HrtimAdcTrg8	= 0b11010,
+		HrtimAdcTrg9	= 0b11011,
+		HrtimAdcTrg10	= 0b11100,
+		Lptimout		= 0b11101,
+		Tim7Trgo		= 0b11110,
+		//Reserved		= 0b11111,
+%% elif id in [3, 4, 5]
+		Tim3Cc1			= 0b00000,
+		Tim2Cc3			= 0b00001,
+		Tim1Cc3			= 0b00010,
+		Tim8Cc1			= 0b00011,
+		Tim3Trgo		= 0b00100,
+		ExtiLine2		= 0b00101,
+		Tim4Cc1			= 0b00110,
+		Tim8Trgo		= 0b00111,
+		Tim8Trgo2		= 0b01000,
+		Tim1Trgo		= 0b01001,
+		Tim1Trgo2		= 0b01010,
+		Tim2Trgo		= 0b01011,
+		Tim4Trgo		= 0b01100,
+		Tim6Trgo		= 0b01101,
+		Tim15Trgo		= 0b01110,
+		Tim2Cc1			= 0b01111,
+		Tim20Trgo		= 0b10000,
+		Tim20Trgo2		= 0b10001,
+		Tim20Cc1		= 0b10010,
+		HrtimAdcTrg2	= 0b10011,
+		HrtimAdcTrg4	= 0b10100,
+		HrtimAdcTrg1	= 0b10101,
+		HrtimAdcTrg3	= 0b10110,
+		HrtimAdcTrg5	= 0b10111,
+		HrtimAdcTrg6	= 0b11000,
+		HrtimAdcTrg7	= 0b11001,
+		HrtimAdcTrg8	= 0b11010,
+		HrtimAdcTrg9	= 0b11011,
+		HrtimAdcTrg10	= 0b11100,
+		Lptimout		= 0b11101,
+		Tim7Trgo		= 0b11110,
+		//Reserved		= 0b11111,
+%% endif
+%% else
+		ExtTrigger0		= 0b0,
+		ExtTrigger1		= 0b1,
+		ExtTrigger2		= 0b10,
+		ExtTrigger3		= 0b11,
+		ExtTrigger4		= 0b100,
+		ExtTrigger5		= 0b101,
+		ExtTrigger6		= 0b110,
+		ExtTrigger7		= 0b111,
+		ExtTrigger8		= 0b1000,
+		ExtTrigger9		= 0b1001,
+		ExtTrigger10	= 0b1010,
+		ExtTrigger11	= 0b1011,
+		ExtTrigger12	= 0b1100,
+		ExtTrigger13	= 0b1101,
+		ExtTrigger14	= 0b1110,
+		ExtTrigger15	= 0b1111,
+		ExtTrigger16	= 0b10000,
+		ExtTrigger17	= 0b10001,
+		ExtTrigger18	= 0b10010,
+		ExtTrigger19	= 0b10011,
+		ExtTrigger20	= 0b10100,
+		ExtTrigger21	= 0b10101,
+		ExtTrigger22	= 0b10110,
+		ExtTrigger23	= 0b10111,
+		ExtTrigger24	= 0b11000,
+		ExtTrigger25	= 0b11001,
+		ExtTrigger26	= 0b11010,
+		ExtTrigger27	= 0b11011,
+		ExtTrigger28	= 0b11100,
+		ExtTrigger29	= 0b11101,
+		ExtTrigger30	= 0b11110,
+		ExtTrigger31	= 0b11111,
+%% endif
+	};
+
+	enum class TriggerSourceInjected : uint8_t
+	{
+%% if target["family"] in ["g4"]
+%% if id in [1, 2]
+		Tim1Trgo		= 0b00000,
+		Tim1Cc4			= 0b00001,
+		Tim2Trgo		= 0b00010,
+		Tim2Cc1			= 0b00011,
+		Tim3Cc4			= 0b00100,
+		Tim4Trgo		= 0b00101,
+		ExtiLine15		= 0b00110,
+		Tim8Cc4			= 0b00111,
+		Tim1Trgo2		= 0b01000,
+		Tim8Trgo		= 0b01001,
+		Tim8Trgo2		= 0b01010,
+		Tim3Cc3			= 0b01011,
+		Tim3Trgo		= 0b01100,
+		Tim3Cc1			= 0b01101,
+		Tim6Trgo		= 0b01110,
+		Tim15Trgo		= 0b01111,
+		Tim20Trgo		= 0b10000,
+		Tim20Trgo2		= 0b10001,
+		Tim20Cc4		= 0b10010,
+		HrtimAdcTrg2	= 0b10011,
+		HrtimAdcTrg4	= 0b10100,
+		HrtimAdcTrg5	= 0b10101,
+		HrtimAdcTrg6	= 0b10110,
+		HrtimAdcTrg7	= 0b10111,
+		HrtimAdcTrg8	= 0b11000,
+		HrtimAdcTrg9	= 0b11001,
+		HrtimAdcTrg10	= 0b11010,
+		Tim16Cc1		= 0b11011,
+		//Reserved		= 0b11100,
+		Lptimout		= 0b11101,
+		Tim7Trgo		= 0b11110,
+		//Reserved		= 0b11111,
+%% elif id in [3, 4, 5]
+		Tim1Trgo		= 0b00000,
+		Tim1Cc4			= 0b00001,
+		Tim2Trgo		= 0b00010,
+		Tim8Cc2			= 0b00011,
+		Tim4Cc3			= 0b00100,
+		Tim4Trgo		= 0b00101,
+		Tim4Cc4			= 0b00110,
+		Tim8Cc4			= 0b00111,
+		Tim1Trgo2		= 0b01000,
+		Tim8Trgo		= 0b01001,
+		Tim8Trgo2		= 0b01010,
+		Tim1Cc3			= 0b01011,
+		Tim3Trgo		= 0b01100,
+		ExtiLine3		= 0b01101,
+		Tim6Trgo		= 0b01110,
+		Tim15Trgo		= 0b01111,
+		Tim20Trgo		= 0b10000,
+		Tim20Trgo2		= 0b10001,
+		Tim20Cc2		= 0b10010,
+		HrtimAdcTrg2	= 0b10011,
+		HrtimAdcTrg4	= 0b10100,
+		HrtimAdcTrg5	= 0b10101,
+		HrtimAdcTrg6	= 0b10110,
+		HrtimAdcTrg7	= 0b10111,
+		HrtimAdcTrg8	= 0b11000,
+		HrtimAdcTrg9	= 0b11001,
+		HrtimAdcTrg10	= 0b11010,
+		HrtimAdcTrg1	= 0b11011,
+		HrtimAdcTrg3	= 0b11100,
+		Lptimout		= 0b11101,
+		Tim7Trgo		= 0b11110,
+		//Reserved		= 0b11111,
+%% endif
+%% else
+		ExtTrigger0		= 0b0,
+		ExtTrigger1		= 0b1,
+		ExtTrigger2		= 0b10,
+		ExtTrigger3		= 0b11,
+		ExtTrigger4		= 0b100,
+		ExtTrigger5		= 0b101,
+		ExtTrigger6		= 0b110,
+		ExtTrigger7		= 0b111,
+		ExtTrigger8		= 0b1000,
+		ExtTrigger9		= 0b1001,
+		ExtTrigger10	= 0b1010,
+		ExtTrigger11	= 0b1011,
+		ExtTrigger12	= 0b1100,
+		ExtTrigger13	= 0b1101,
+		ExtTrigger14	= 0b1110,
+		ExtTrigger15	= 0b1111,
+		ExtTrigger16	= 0b10000,
+		ExtTrigger17	= 0b10001,
+		ExtTrigger18	= 0b10010,
+		ExtTrigger19	= 0b10011,
+		ExtTrigger20	= 0b10100,
+		ExtTrigger21	= 0b10101,
+		ExtTrigger22	= 0b10110,
+		ExtTrigger23	= 0b10111,
+		ExtTrigger24	= 0b11000,
+		ExtTrigger25	= 0b11001,
+		ExtTrigger26	= 0b11010,
+		ExtTrigger27	= 0b11011,
+		ExtTrigger28	= 0b11100,
+		ExtTrigger29	= 0b11101,
+		ExtTrigger30	= 0b11110,
+		ExtTrigger31	= 0b11111,
+%% endif
+	};
+
 	enum class Interrupt : uint32_t
 	{
 		Ready 								= ADC_IER_ADRDYIE,
@@ -234,6 +499,18 @@ public:
 	};
 	MODM_FLAGS32(InterruptFlag);
 
+	static constexpr uint8_t maxSequenceLength = 16;
+	static constexpr uint8_t maxInjectedSequenceLength = 4;
+
+private:
+	static inline bool
+	setSequenceChannel(const int index, const Channel channel);
+
+	static inline uint32_t sqr1 = 0;
+	static inline uint32_t sqr2 = 0;
+	static inline uint32_t sqr3 = 0;
+	static inline uint32_t sqr4 = 0;
+
 public:
 	template< class... Signals >
 	static void
@@ -246,29 +523,16 @@ public:
 	/**
 	 * Initialize and enable the A/D converter.
 	 *
-	 * Enables the ADC clock and switches on the ADC. The ADC clock
-	 * prescaler will be set as well.
-	 *
-	 * The ADC can be clocked
-	 *
-	 * @param clk
-	 * 		Clock Mode for ADC1/ADC2 or ADC3/ADC4.
-	 * 		Set to ClockMode::DoNotChange or leave blank if you
-	 * 		want to leave this setting untouched.
-	 *
-	 * @param pre
-	 * 		The prescaler for the asynchronous ADC clock.
-	 * 		This parameter is only taken into account
-	 * 		if clk == ClockMode::Asynchronous.
+FIXME!!!!!!
 	 */
-	static inline void
-	initialize(	const ClockMode clk = ClockMode::DoNotChange,
-%% if clock_mux
-				const ClockSource clk_src = ClockSource::SystemClock,
-%% endif
-				const Prescaler pre = Prescaler::Disabled,
-				const CalibrationMode cal = CalibrationMode::DoNotCalibrate,
-				const bool blocking = true);
+	template< class SystemClock
+			, modm::frequency_t frequency
+			, modm::percent_t tolerance = modm::pct(10)
+			, modm::platform::Adc{{ id }}::ClockMode clk = modm::platform::Adc{{ id }}::ClockMode::SynchronousPrescaler1
+			, modm::platform::Adc{{ id }}::ClockSource clk_src = modm::platform::Adc{{ id }}::ClockSource::SystemClock
+			>
+	static void
+	initialize(bool blocking = true);
 
 	static inline void
 	disable(const bool blocking = true);
@@ -329,13 +593,71 @@ public:
 	setChannel(const Channel channel,
 			const SampleTime sampleTime=static_cast<SampleTime>(0b000));
 
-	/// Setting the channel for a Pin
+	/**
+	 * Analog channel selection.
+	 *
+	 * Up to @see maxSequenceLength channels con be configured to be read
+	 * in a sequence.
+	 *
+	 * @param channels		List (std::span) of up to @see maxSequenceLength
+							channels which shall be read.
+	 * @param sampleTime	The sample time to sample the input voltage.
+	 *
+	 * @pre The ADC clock must be started and the ADC switched on with
+	 * 		initialize()
+	 */
+	static inline bool
+	setChannel(const std::span<const Channel> channels);
+
+	/**
+	 * Analog injected channel selection.
+	 *
+	 * @see setChannel()
+	 *
+	 * @param channel		The channel which shall be read.
+	 * @param sampleTime	The sample time to sample the input voltage.
+	 */
+	static inline bool
+	setInjectedChannel(const Channel channel,
+			const SampleTime sampleTime=static_cast<SampleTime>(0b000))
+	{
+		return setInjectedChannel(std::array <Channel, 1>{ channel, })
+			&& setChannelSampleTime(channel, sampleTime);
+	}
+
+	/**
+	 * Analog injected channel selection.
+	 *
+	 * Up to @see maxInjectedSequenceLength channels con be configured to
+	 * be read in a sequence.
+	 *
+	 * @param channels		List (std::span) of up to @see
+							maxInjectedSequenceLength channels which shall
+							be read.
+	 * @param sampleTime	The sample time to sample the input voltage.
+	 *
+	 * @pre The ADC clock must be started and the ADC switched on with
+	 * 		initialize()
+	 */
+	static inline bool
+	setInjectedChannel(const std::span<const Channel> channels);
+
+	/// Setting the channel by Gpio pin
 	template< class Gpio >
 	static inline bool
 	setPinChannel(SampleTime sampleTime = static_cast<SampleTime>(0b000))
 	{
 		return setChannel(getPinChannel<Gpio>(), sampleTime);
 	}
+
+	/// Setting injected channel by Gpio pin
+	template< class Gpio >
+	static inline bool
+	setInjectedPinChannel(SampleTime sampleTime = static_cast<SampleTime>(0b000))
+	{
+		return setInjectedChannel(getPinChannel<Gpio>(), sampleTime);
+	}
+
 	/// Get the channel for a Pin
 	template< class Gpio >
 	static inline constexpr Channel
@@ -345,6 +667,9 @@ public:
 		static_assert(channel >= 0, "Adc{{id}} does not have a channel for this pin!");
 		return Channel(channel);
 	}
+
+	static inline bool
+	setChannelSampleTime(const Channel channel, const SampleTime sampleTime);
 
 	/**
 	 * Enables free running mode
@@ -359,6 +684,30 @@ public:
 	setFreeRunningMode(const bool enable);
 
 	/**
+	 * Enables the trigger for a regular conversion sequence.
+	 *
+	 * @param mode		Selects the trigger mode or disables the trigger
+	 * @param source	Selects one of the (up to 32) trigger sources
+	 *
+	 * @pre No ADC conversion must be ongoing when changing the
+	 *      trigger configuration.
+	 */
+	static inline void
+	setTrigger(const TriggerMode mode, const TriggerSourceRegular source);
+
+	/**
+	 * Enables the trigger for a injected conversion sequence.
+	 *
+	 * @param mode		Selects the trigger mode or disables the trigger
+	 * @param source	Selects one of the (up to 32) trigger sources
+	 *
+	 * @pre No ADC conversion must be ongoing when changing the
+	 *      trigger configuration.
+	 */
+	static inline void
+	setInjectedTrigger(const TriggerMode mode, const TriggerSourceInjected source);
+
+	/**
 	 * Start a new conversion or continuous conversions.
 	 *
 	 * @pre A ADC channel must be selected with setChannel().
@@ -368,14 +717,32 @@ public:
 	 * TODO: is there any limitation to when is can be called??
 	 */
 	static inline void
-	startConversion(void);
+	startConversion();
+
+	/**
+	 * Start a new injected conversion or continuous conversions.
+	 *
+	 * @pre A ADC channel must be selected with setChannel().
+	 *
+	 * @post The result can be fetched with getValue()
+	 */
+	static inline void
+	startInjectedConversion();
 
 	/**
 	 * @return If the conversion is finished.
 	 * @pre A conversion should have been stared with startConversion()
 	 */
 	static inline bool
-	isConversionFinished(void);
+	isConversionFinished();
+
+	/**
+	 * @return If the injected conversion is finished.
+	 * @pre A injected conversion should have been stared
+	 *   with startInjectedConversion()
+	 */
+	//static inline bool
+	//isInjectedConversionFinished();
 
 	/**
 	 * @return The most recent 16bit result of the ADC conversion.
@@ -390,10 +757,29 @@ public:
 		@endcode
 	 */
 	static inline uint16_t
-	getValue(void)
+	getValue()
 	{
 		return ADC{{ id }}->DR;
 	}
+
+	/**
+	 * @return The most recent 16bit result of the injected conversion
+	 * at the index of the sequence.
+	 * @pre A injected conversion should have been stared
+	 * with startInjectedConversion()
+	 */
+	static inline uint16_t
+	getInjectedValue(uint8_t index);
+
+	/**
+	 * @return The most recent 16bit result of the injected conversion
+	 * at the index of the sequence.
+	 * @pre A injected conversion should have been stared
+	 * with startInjectedConversion()
+	 */
+	template<uint8_t index>
+	static inline uint16_t
+	getInjectedValue();
 
 	static inline void
 	enableInterruptVector(const uint32_t priority, const bool enable = true);

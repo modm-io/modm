@@ -24,7 +24,7 @@
 namespace modm::platform
 {
 /**
- * Analog/Digital-Converter module (ADC1).
+ * Analog/Digital-Converter module (ADC{{ id }}).
  *
  * The 12-bit ADC is a successive approximation analog-to-digital
  * converter. It has up to 19 multiplexed channels allowing it measure
@@ -164,8 +164,8 @@ public:
 	 * 		want to leave this setting untouched.
 	 *
 	 */
-	template< class SystemClock, ClockMode mode,
-			  frequency_t frequency=MHz(1), percent_t tolerance=pct(10) >
+	template< class SystemClock, frequency_t frequency=MHz(1),
+	          percent_t tolerance=pct(10), ClockMode mode = ClockMode::Synchronous >
 	static void
 	initialize();
 
