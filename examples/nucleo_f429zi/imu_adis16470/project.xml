@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:nucleo-f429zi</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_f429zi/imu_adis16470</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:spi:1</module>
+    <module>modm:driver:adis16470</module>
+  </modules>
+</library>
