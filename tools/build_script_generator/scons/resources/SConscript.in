@@ -37,7 +37,15 @@ env.Append(toolpath=[
 %% for tool in tools | sort
 env.Tool("{{tool}}")
 %% endfor
-env["GCC_PATH"] = dirname(dirname(realpath(shutil.which(env["CC"]))))
+
+c_compiler_name = env["CC"]
+c_compiler_path = shutil.which(c_compiler_name)
+
+if c_compiler_path is None:
+    print(f'Selected compiler "{c_compiler_name}" not found on PATH. Please add its installation directory to the PATH environment variable.')
+    exit(1)
+
+env["GCC_PATH"] = dirname(dirname(realpath(c_compiler_path)))
 
 %% macro generate_flags_for_profile(name, profile, append=False)
 env{% if append %}.Append({{name | upper}}{% else %}["{{name | upper}}"]{% endif %} = [
