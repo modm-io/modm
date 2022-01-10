@@ -64,7 +64,7 @@ public:
 			if (PT_CALL(sensor.readColor()))
 			{
 				const auto rgb = data.getColor();
-				MODM_LOG_INFO << "RGB: " << rgb << "\tHSV: " << modm::color::Hsv(rgb) << modm::endl;
+				MODM_LOG_INFO << "RGB: " << rgb << "\tHSV: " << modm::color::Hsv888(rgb) << modm::endl;
 			}
 			timeout.restart(500ms);
 			PT_WAIT_UNTIL(timeout.isExpired());

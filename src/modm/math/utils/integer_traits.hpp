@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Thomas Sommer
+ * Copyright (c) 2021-2023, Thomas Sommer
  *
  * This file is part of the modm project.
  *
@@ -13,60 +13,48 @@
 
 #include <limits>
 #include <type_traits>
-
 #include <cmath>
+#include <tuple>
+#include <bit>
+
+#include "arithmetic_traits.hpp"
+
 namespace modm
 {
 /// @ingroup modm_math_utils
 /// @{
+using builtin_int_t = std::tuple<int8_t, int16_t, int32_t, int64_t>;
+using builtin_uint_t = std::tuple<uint8_t, uint16_t, uint32_t, uint64_t>;
 
-/// Trait the smallest unsigned type that fits n Bits
+/// Trait the smallest unsigned integral fitting n [D]igits
 /// @author		Thomas Sommer
-template <int Bits>
-struct uint_t
-{
-	using least = std::conditional_t<
-		(Bits <= 8), uint8_t, std::conditional_t<
-		(Bits <= 16), uint16_t, std::conditional_t<
-		(Bits <= 32), uint32_t, std::enable_if_t<
-		(Bits <= 64), uint64_t>>>>;
-};
-
-template<int Bits>
-using least_uint = typename modm::uint_t<Bits>::least;
+template<int D>
+requires(0 < D and D <= 64)
+using least_uint = std::tuple_element_t<int(std::log2(std::bit_ceil(std::max<unsigned int>(D, 8))>>3)), builtin_uint_t>;
 
 /// @cond
 namespace detail
 {
-	template<typename T>
-	constexpr int most_digits() {
-		return std::numeric_limits<T>::digits;
+	template<typename... Ts>
+	consteval int max_digits() {
+		return std::max({std::numeric_limits<Ts>::digits...});
 	}
 
-	template<typename T, typename... Ts>
-	constexpr std::enable_if_t<sizeof...(Ts), int>
-	most_digits() {
-		return std::max(std::numeric_limits<T>::digits, most_digits<Ts...>());
-	}
+	template <typename ... Ts>
+	struct fits_any {
+		static constexpr int max_digits = max_digits<Ts...>();
+		static constexpr bool is_any_signed = std::disjunction_v<std::is_signed<Ts>...>;
+
+		using type = std::conditional_t<is_any_signed,
+			::modm::WideType<std::make_signed_t<least_uint<max_digits>>>,
+			least_uint<max_digits>
+		>;
+	};
 }
 /// @endcond
 
 /// Trait the smallest integral - signed or unsigned - fitting any Ts
 /// @author	Thomas Sommer
 template <typename ... Ts>
-struct fits_any {
-	static constexpr int most_dig = detail::most_digits<Ts...>();
-
-	using type = std::conditional_t<
-		std::conjunction_v<std::is_unsigned<Ts>...>,
-		typename uint_t<most_dig>::least,
-		// An odd most_dig means: type with most digits is signed integral
-		std::make_signed_t<typename uint_t<most_dig % 2 ? most_dig : most_dig * 2>::least>
-	>;
-};
-
-template <typename ... Ts>
-using fits_any_t = typename fits_any<Ts...>::type;
-
-/// @}
-}
+using fits_any = typename detail::fits_any<Ts...>::type;
+} // namespace modm

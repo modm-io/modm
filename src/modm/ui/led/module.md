@@ -188,7 +188,7 @@ modm::ui::Led leds[3] =
 // Group them together as one RGB LED
 modm::ui::RgbLed rgb(leds[1], leds[0], leds[2]);
 // animate to orange within 2 seconds
-rgb.fadeTo(modm::ui::Rgb(95, 177, 147), 2000);
+rgb.fadeTo(modm::ui::Rgb888(95, 177, 147), 2000);
 ```
 
 

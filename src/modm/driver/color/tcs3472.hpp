@@ -139,7 +139,7 @@ struct tcs3472
 	addr(uint8_t version=5)
 	{ return version < 5 ? 0x39 : 0x29; }
 
-	using Rgb = color::RgbT<uint16_t>;
+	using Rgb = color::Rgb161616;
 
 	struct modm_packed
 	Data
