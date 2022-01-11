@@ -115,13 +115,17 @@ sudo apt install openocd
 Download and extract the [pre-built AVR toolchain][modm-avr-gcc]:
 
 ```sh
-wget -O- https://github.com/modm-io/avr-gcc/releases/download/v10.2.0/avr-gcc.tar.bz2 | sudo tar xj -C /opt
+wget -O- https://github.com/modm-io/avr-gcc/releases/download/v11.2.0/modm-avr-gcc.tar.bz2 | sudo tar xj -C /opt
 ```
 
-Add the `bin` directories to your `PATH` variable in `~/.bashrc`:
+!!! warning "AVR toolchain install directory"
+    It is unfortunately not possible to install the AVR toolchain into a
+    directory other than directly into `/opt`.
+
+Add the `bin` directory to your `PATH` variable in `~/.bashrc`:
 
 ```sh
-export PATH="/opt/avr-gcc/avr-gcc/bin:/opt/avr-gcc/avr-binutils/bin:$PATH"
+export PATH="/opt/avr-gcc/bin:$PATH"
 ```
 
 Install the AvrDude tool:
