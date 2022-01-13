@@ -493,7 +493,7 @@ struct FlagsGroup<T> : public Register<typename T::UnderlyingType>
  * the meanings [Div1, Div2, Div4, Div8].
  *
  * The Configuration class belongs to a specific Flags class and connects a
- * corresponding Sascha Schade enum with a specific mask and bit position.
+ * corresponding strongly typed enum with a specific mask and bit position.
  * This means that the Configuration class will mask and shift the values whenever
  * needed.
  * However, shifting is only done when the Position template parameter is non-zero.
