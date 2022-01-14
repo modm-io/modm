@@ -193,3 +193,29 @@ VectorTest::testLength()
 	TEST_ASSERT_EQUALS_FLOAT(a.getLengthSquared(), 1.f*1.f + 2.f*2.f + 3.f*3.f + 4.f*4.f);
 	TEST_ASSERT_EQUALS_FLOAT(a.getLength(), 5.477225575);
 }
+
+void VectorTest::testConvert()
+{
+	modm::Vector<float, 2> f(1.3, 2.7);
+	modm::Vector<double, 2> d(1.3, 2.7);
+
+	modm::Vector<uint8_t, 2> u8(1.3, 2.7);
+	TEST_ASSERT_EQUALS(u8.x, 1);
+	TEST_ASSERT_EQUALS(u8.y, 3);
+
+	modm::Vector<int8_t, 2> i8(1.3, 2.7);
+	TEST_ASSERT_EQUALS(i8.x, 1);
+	TEST_ASSERT_EQUALS(i8.y, 3);
+
+	modm::Vector<uint16_t, 2> u16(1.3, 2.7);
+	TEST_ASSERT_EQUALS(u16.x, 1);
+	TEST_ASSERT_EQUALS(u16.y, 3);
+
+	modm::Vector<int16_t, 2> i16(1.3, 2.7);
+	TEST_ASSERT_EQUALS(i16.x, 1);
+	TEST_ASSERT_EQUALS(i16.y, 3);
+
+	modm::Vector<double, 2> d2 = f.convert<double>();
+	
+	modm::Vector<float, 2> f2 = f.convert<float>();
+}

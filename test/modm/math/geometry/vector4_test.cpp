@@ -356,7 +356,7 @@ Vector4Test::testOperators()
 	TEST_ASSERT_EQUALS(a.x, 1-4);
 	TEST_ASSERT_EQUALS(a.y, 2-5);
 	TEST_ASSERT_EQUALS(a.z, 3-6);
-	TEST_ASSERT_EQUALS(a.z, 4-7);
+	TEST_ASSERT_EQUALS(a.w, 4-7);
 	a -= b;
 	TEST_ASSERT_EQUALS(a.x, 1);
 	TEST_ASSERT_EQUALS(a.y, 2);
