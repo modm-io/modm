@@ -96,9 +96,12 @@ def build(env):
         "frequency": env.get("frequency", 1000),
         "with_debug": env.has_module(":debug"),
         "with_heap": env.has_module(":platform:heap"),
+        "with_fpu": env.get(":platform:cortex-m:float-abi", "soft") != "soft",
     }
     path = core.replace("cortex-m", "ARM_CM").replace("+", "").replace("fd", "f").upper()
     path = path.replace("CM7F", "CM7/r0p1") # use subfolder for M7
+    path = path.replace("CM33F", "CM33") # common port for FPU/non-FPU version
+    path = path.replace("CM33", "CM33_NTZ/non_secure") # no trustzone supported, use non_secure subfolder
     path = "freertos/FreeRTOS/Source/portable/GCC/{}".format(path)
 
     env.outbasepath = "modm/ext"
@@ -112,6 +115,10 @@ def build(env):
     env.copy("{}/port.c".format(path), "freertos/port.c")
     # Copy the portmacro.h file
     env.copy("{}/portmacro.h".format(path), "freertos/inc/freertos/portmacro.h")
+    # Copy the portasm.c/.h files for CM33
+    if "CM33" in path:
+        env.copy("{}/portasm.c".format(path), "freertos/portasm.c")
+        env.copy("{}/portasm.h".format(path), "freertos/inc/freertos/portasm.h")
 
     # Generate the FreeRTOSConfig.h file
     env.template("FreeRTOSConfig.h.in", "freertos/inc/freertos/FreeRTOSConfig.h")
