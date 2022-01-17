@@ -69,6 +69,12 @@ run-nucleo-l432:
 	$(call run-test,nucleo-l432,size)
 
 
+compile-nucleo-l552:
+	$(call compile-test,nucleo-l552,size)
+run-nucleo-l552:
+	$(call run-test,nucleo-l552,size)
+
+
 compile-nucleo-g474:
 	$(call compile-test,nucleo-g474,size)
 run-nucleo-g474:
