@@ -51,7 +51,7 @@ pip3 install gdbgui
     Add the following line to the end of your `~/.bashrc` file:
 
     ```sh
-    export PATH="~/.local/bin:$PATH"
+    export PATH="$HOME/.local/bin:$PATH"
     ```
 
 !!! warning "Ubuntu ≤ 19.10"
