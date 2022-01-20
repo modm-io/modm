@@ -29,9 +29,6 @@ def build(env):
     env.outbasepath = "modm/src/modm/processing/fiber"
     env.copy("../fiber.hpp")
 
-    env.copy("fiber.hpp")
-    env.copy("scheduler.hpp")
-
     env.copy("context.h")
 
     core = env[":target"].get_driver("core")["type"]
@@ -41,7 +38,13 @@ def build(env):
         "with_fpu": env.get(":platform:cortex-m:float-abi", "soft") != "soft",
         "with_windows": env[":target"].identifier.family == "windows",
         "target": env[":target"].identifier,
+        "multicore": env.has_module(":platform:multicore"),
     }
+    if env.has_module(":platform:multicore"):
+        cores = int(env[":target"].identifier.cores)
+        env.substitutions["num_cores"] = cores
+    env.template("fiber.hpp.in")
+    env.template("scheduler.hpp.in")
 
     env.template("stack.hpp.in")
 
