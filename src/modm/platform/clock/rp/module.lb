@@ -1,0 +1,70 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2022, Andrey Kunitsyn
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+import re
+
+def init(module):
+    module.name = ":platform:clockgen"
+    module.description = "Clock Generator and Source"
+
+def prepare(module, options):
+    if not options[":target"].has_driver("clocks:rp*"):
+        return False
+
+    module.depends(":cmsis:device", ":utils", ":platform:clock")
+    return True
+
+def _space_numbers(match):
+    return f'{match.group(1)} {match.group(2)} {match.group(3)}'
+
+def _add_word_boundaries_to_numbers(string):
+    pattern = re.compile(r'([a-zA-Z])(\d+)([a-zA-Z]?)')
+    return pattern.sub(_space_numbers, string)
+
+def to_camel(string):
+    string = _add_word_boundaries_to_numbers(string)
+    string = string.strip(" ")
+    n = ""
+    cap_next = True
+    for v in string:
+        if (v >= 'A' and v <= 'Z') or (v >= '0' and v <= '9'):
+            n += v
+        if v >= 'a' and v <= 'z':
+            if cap_next:
+                n += v.upper()
+            else:
+                n += v
+        if v == '_' or v == ' ' or v == '-':
+            cap_next = True
+        else:
+            cap_next = False
+    return n
+
+
+def build(env):
+    device = env[":target"]
+    env.outbasepath = "modm/src/modm/platform/clock"
+    properties = {}
+    properties["target"] = device.identifier
+    clocks = device.get_driver("clocks")
+    properties["clocks"] = clocks["clock"]
+
+    sources = set()
+    for clk in clocks["clock"]:
+        for src in clk['source']:
+            src['cname'] = to_camel(src['name'])
+            sources.add(src['cname'])
+    properties['sources'] = sorted(sources)
+
+    env.substitutions = properties
+    env.copy("clocks.cpp")
+    env.template("clocks.hpp.in")
