@@ -38,6 +38,15 @@ def build(env):
     env.copy("pico-sdk/include", "")
     env.copy("address_mapped.h", "hardware/address_mapped.h")
 
+    if env.has_module(":tinyusb"):
+        env.substitutions = {
+            "with_debug": env.has_module(":debug")
+        }
+        env.copy("pico.h")
+        env.template("pico.cpp.in", "pico.cpp")
+        env.copy("irq.h", "hardware/irq.h")
+        env.copy("resets.h", "hardware/resets.h")
+
     env.substitutions = {
         "headers": headers,
         "defines": defines,

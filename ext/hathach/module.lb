@@ -104,6 +104,11 @@ def build(env):
             tusb_config["CFG_TUSB_MCU"] = "OPT_MCU_SAM{}{}".format(target.family.upper(), target.series.upper())
             env.copy("tinyusb/src/portable/microchip/samd/", "portable/microchip/samd/")
 
+    elif target.platform == "rp":
+        if target.family == "20":
+            tusb_config["CFG_TUSB_MCU"] = "OPT_MCU_RP2040"
+            env.copy("tinyusb/src/portable/raspberrypi/rp2040/", "portable/raspberrypi/rp2040/")
+
     if env.has_module(":freertos"):
         tusb_config["CFG_TUSB_OS"] = "OPT_OS_FREERTOS"
         env.copy("tinyusb/src/osal/osal_freertos.h", "osal/osal_freertos.h")
@@ -165,6 +170,8 @@ def build(env):
         irqs = irq_data["port_irqs"][speed]
     elif target.platform == "sam" and target.family in ["g"]:
         irqs = ["UDP"]
+    elif target.platform == "rp" and target.family in ["20"]:
+        irqs = ["USBCTRL_IRQ"]
     else:
         irqs = ["USB"]
 
