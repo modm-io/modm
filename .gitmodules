@@ -37,3 +37,6 @@
 [submodule "ext/etlcpp/etl"]
 	path = ext/etlcpp/etl
 	url = https://github.com/modm-ext/etl-partial.git
+[submodule "ext/rp/pico-sdk"]
+	path = ext/rp/pico-sdk
+	url = https://github.com/modm-ext/pico-sdk-partial.git
