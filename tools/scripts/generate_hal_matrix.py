@@ -76,10 +76,11 @@ def hal_get_modules():
 
         modules = set()
         # We only care about some modm:platform:* modules here
-        not_interested = {"bitbang", "common", "heap", "clock", "core", "fault", "cortex-m", "uart.spi", "itm", "rtt"}
+        not_interested = {"bitbang", "common", "heap", "core", "fault", "cortex-m", "uart.spi", "itm", "rtt"}
         imodules = (m  for (repo, mfile) in mfiles  for m in lbuild.module.load_module_from_file(repo, mfile)
                     if m.available and m.fullname.startswith("modm:platform:") and
-                    all(p not in m.fullname for p in not_interested))
+                    all(p not in m.fullname for p in not_interested) and
+                    m.fullname not in {"modm:platform:clock"})
         for module in imodules:
             # lookup the mapping of a module onto the hardware names
             if module.filename not in file_cache:
@@ -97,6 +98,8 @@ def hal_get_modules():
                 "id": "Unique ID",
                 "rcc": "System Clock",
                 "gclk": "System Clock",
+                "clocks": "System Clock",
+                "clockgen": "System Clock",
                 "extint": "External Interrupt",
                 "exti": "External Interrupt",
                 "fsmc": "External Memory",
@@ -122,7 +125,7 @@ def hal_get_modules():
     mapping["Ethernet"].add("gmac")
     mapping["Random Generator"].add("trng")
     mapping["UART"].update({"usi", "sercom"})
-    mapping["Timer"].update({"tc", "tcc"})
+    mapping["Timer"].update({"tc", "tcc", "timer"})
     mapping["SPI"].add("sercom")
     mapping["I<sup>2</sup>C"].update({"sercom", "twihs"})
     mapping["USB"].update({"usb", "usbhs"})
@@ -130,7 +133,7 @@ def hal_get_modules():
     mapping["DMA"].update({"dmac", "xdmac"})
     mapping["Comparator"].update({"ac", "acc"})
     mapping["Internal Flash"].update({"efc", "nvmctrl"})
-    mapping["External Memory"].update({"sdramc", "smc", "quadspi"})
+    mapping["External Memory"].update({"sdramc", "smc", "quadspi", "xip_ssi"})
 
     print(); print()
     return (all_targets, mapping)
@@ -220,7 +223,7 @@ def hal_format_tables():
     # tables["stm32"] = hal_create_table(targets, ["stm32"])
     # tables["sam"] = hal_create_table(targets, ["sam"])
 
-    tables["all"] = hal_create_table(targets, ["avr", "stm32", "sam"])
+    tables["all"] = hal_create_table(targets, ["avr", "stm32", "sam", "rp"])
 
     return tables
 

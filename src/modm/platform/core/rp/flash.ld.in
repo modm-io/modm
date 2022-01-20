@@ -1,0 +1,102 @@
+%% import "../cortex/linker.macros" as linker with context
+{{ linker.copyright() }}
+
+{{ linker.prefix() }}
+%% set table_heap = []
+%% set table_copy = []
+%% set table_zero = []
+
+SECTIONS
+{
+{{ linker.section_rom_start("FLASH") }}
+
+	.boot2 :
+	{
+		__boot2_start__ = .;
+		KEEP (*(.boot2))
+		__boot2_end__ = .;
+	} > FLASH
+	ASSERT(__boot2_end__ - __boot2_start__ == 256,
+		   "ERROR: Pico second stage bootloader must be 256 bytes in size!")
+
+	.text :
+	{
+		__vector_table_rom_start = .;
+		__vector_table_ram_load = .;
+		KEEP(*(.vector_rom))
+		__vector_table_rom_end = .;
+	} > FLASH
+
+{{ linker.section_rom("FLASH") }}
+
+
+%% if vector_table_location == "ram"
+{{ linker.section_vector_ram("RAM", table_copy) }}
+%% endif
+
+{{ linker.section_ram(cont_ram_regions[0].cont_name|upper, "FLASH", table_copy, table_zero,
+					  sections_data=["fastdata", "fastcode", "data_" + cont_ram_regions[0].contains[0].name],
+					  sections_bss=["bss_" + cont_ram_regions[0].contains[0].name],
+					  sections_noinit=["faststack"]) }}
+
+{{ linker.all_heap_sections(table_copy, table_zero, table_heap) }}
+
+%% if with_crashcatcher
+	%#
+	/* Bottom of crash stack for `modm:platform:fault` */
+	g_crashCatcherStack = . - 500;
+	%#
+%% endif
+
+%% macro section_mem_bank(memory, section, alt_name)
+	/* Sections in {{memory}} */
+	.data_{{memory | lower}} :
+	{
+		__{{section}}_data_load = LOADADDR(.data_{{memory | lower}});
+		__{{section}}_data_start = .;
+		 *(.data_{{section}} .data_{{section}}.*)
+		 *(.{{alt_name}})
+		. = ALIGN(4);
+		__{{section}}_data_end = .;
+	} >{{memory}} AT > FLASH
+	%% do table_copy.append(section + "_data")
+	%#
+	.bss_{{memory | lower}} (NOLOAD) :
+	{
+		__{{section}}_bss_start = . ;
+		*(.bss_{{section}} .bss_{{section}}.*)
+		. = ALIGN(4);
+		__{{section}}_bss_end = . ;
+	} >{{memory}}
+	%% do table_zero.append(section + "_bss")
+	%#
+	.noinit_{{memory | lower}} (NOLOAD) :
+	{
+		__{{section}}_noinit_start = . ;
+		*(.noinit_{{section}} .noinit_{{section}}.*)
+		. = ALIGN(4);
+		__{{section}}_noinit_end = . ;
+	} >{{memory}}
+%% endmacro
+
+%% if with_multicore
+{{ linker.section_stack("CORE1", suffix="1") }}
+%% endif
+{{ section_mem_bank("CORE1", "core1", "scratch_x") }}
+
+
+{{ linker.section_stack("CORE0") }}
+
+{{ section_mem_bank("CORE0", "core0", "scratch_y") }}
+
+%% if linkerscript_sections
+{{ linkerscript_sections | indent(first=True) }}
+	%#
+%% endif
+
+{{ linker.section_tables("FLASH", table_copy, table_zero, table_heap) }}
+
+{{ linker.section_rom_end("FLASH") }}
+
+{{ linker.section_debug() }}
+}

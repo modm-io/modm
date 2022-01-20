@@ -46,6 +46,9 @@ def build(env):
     # H742/43: Prescaler not implemented in revY
     elif target.family == "h7" and target.name in ["42", "43", "50", "53"] and target.revision == "y":
         div = 1
+    # RP2040 external reference clock need additional configuration
+    elif target.platform == "rp":
+        div = 1
 
     env.substitutions = {
         "systick_frequency": env.get(":freertos:frequency", freq),

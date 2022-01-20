@@ -16,12 +16,18 @@
 
 #include "../device.hpp"
 #include <modm/architecture/utils.hpp>
+%% if with_multicore
+#include "multicore.hpp"
+%% endif
 
 /// @cond
 namespace modm::atomic
 {
 
 class Lock
+%% if with_multicore
+	: public modm::platform::multicore::CoreLock
+%% endif
 {
 public:
 	modm_always_inline

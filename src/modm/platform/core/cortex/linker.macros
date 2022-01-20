@@ -69,20 +69,20 @@ MAIN_STACK_SIZE = {{ options[":platform:cortex-m:main_stack_size"] }};
 %% endmacro
 
 
-%% macro section_stack(memory, start=None)
-	/* Main stack in {{memory}} */
-	.stack (NOLOAD) :
+%% macro section_stack(memory, start=None, suffix="")
+	/* Main stack{{suffix}} in {{memory}} */
+	.stack{{suffix}} (NOLOAD) :
 	{
 	%% if start != None
-		. += {{ start }};
+		. += {{start}};
 	%% endif
-		__stack_start = .;
+		__stack{{suffix}}_start = .;
 
 		. += MAIN_STACK_SIZE;
 		. = ALIGN(8);
-		__main_stack_top = .;
+		__main{{suffix}}_stack_top = .;
 
-		__stack_end = .;
+		__stack{{suffix}}_end = .;
 	} >{{memory}}
 %% endmacro
 

@@ -286,6 +286,7 @@ def build(env):
         "with_memory_traits": env.has_module(":architecture:memory"),
         "with_assert": env.has_module(":architecture:assert"),
         "with_fpu": env.get("float-abi", "soft") != "soft",
+        "with_multicore": env.has_module(":platform:multicore"),
     })
     env.outbasepath = "modm/src/modm/platform/core"
 
