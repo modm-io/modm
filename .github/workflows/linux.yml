@@ -80,6 +80,10 @@ jobs:
         if: always()
         run: |
           (cd examples && ../tools/scripts/examples_compile.py samv)
+      - name: Examples RP20 Devices
+        if: always()
+        run: |
+          (cd examples && ../tools/scripts/examples_compile.py rp_pico)
       - name: Execute Python Scripts
         if: always()
         run: |

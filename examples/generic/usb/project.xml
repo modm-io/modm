@@ -9,6 +9,7 @@
   <!-- <extends>modm:disco-f303vc</extends> -->
   <!-- <extends>modm:disco-f407vg</extends> -->
   <!-- <extends>modm:disco-f746ng</extends> -->
+  <!-- <extends>modm:rp-pico</extends> -->
   <options>
     <option name="modm:build:build.path">../../../build/generic/usb</option>
     <option name="modm:build:openocd.cfg">openocd.cfg</option>
