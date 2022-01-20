@@ -8,7 +8,7 @@
 
 %% if vector_table_location == "ram"
 /* Computes stack offset so that vector table is aligned */
-__stack_offset = ALIGN(TOTAL_STACK_SIZE, (1 << LOG2CEIL({{ highest_irq + 16 }})) * 8) - TOTAL_STACK_SIZE;
+__stack_offset = ALIGN(MAIN_STACK_SIZE, (1 << LOG2CEIL({{ highest_irq + 16 }})) * 8) - MAIN_STACK_SIZE;
 %#
 %% endif
 

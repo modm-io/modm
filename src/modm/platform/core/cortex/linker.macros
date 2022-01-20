@@ -2,7 +2,7 @@
 %% macro copyright()
 /*
  * Copyright (c) 2011-2012, 2019, Fabian Greif
- * Copyright (c) 2012, 2015-2021, Niklas Hauser
+ * Copyright (c) 2012, 2015-2022, Niklas Hauser
  * Copyright (c) 2013, Sascha Schade
  * Copyright (c) 2013, 2015, Kevin Läufer
  *
@@ -40,10 +40,7 @@ __{{memory.name}}_end = ORIGIN({{memory.name|upper}}) + LENGTH({{memory.name|upp
 	%% endfor
 	%#
 
-/* The handler stack is used for main program as well as interrupts */
-MAIN_STACK_SIZE    = {{ options[":platform:cortex-m:main_stack_size"] }};
-PROCESS_STACK_SIZE = {{ process_stack_size }};
-TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
+MAIN_STACK_SIZE = {{ options[":platform:cortex-m:main_stack_size"] }};
 %% endmacro
 
 
@@ -84,10 +81,6 @@ TOTAL_STACK_SIZE   = MAIN_STACK_SIZE + PROCESS_STACK_SIZE;
 		. += MAIN_STACK_SIZE;
 		. = ALIGN(8);
 		__main_stack_top = .;
-
-		. += PROCESS_STACK_SIZE;
-		. = ALIGN(8);
-		__process_stack_top = .;
 
 		__stack_end = .;
 	} >{{memory}}
