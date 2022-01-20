@@ -1,0 +1,165 @@
+/*
+ * Copyright (c) 2022, Andrey Kunitsyn
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+#pragma once
+#include "spi_master_{{ id }}_dma.hpp"
+
+template <class DmaChannelRx, class DmaChannelTx>
+template <class SystemClock, modm::baudrate_t baudrate, modm::percent_t tolerance>
+void
+modm::platform::SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::initialize()
+{
+	// Configure the DMA channels, then calls SpiMaster{{ id }}::initialzie().
+	Dma::RxChannel::configure(DmaBase::TransferDataSize::Byte, false, true);
+	Dma::RxChannel::setReadAddress(uint32_t(&spi{{id}}_hw->dr));
+	Dma::RxChannel::template setPeripheralRequest<Dma::RxRequest>();
+
+	Dma::TxChannel::configure(DmaBase::TransferDataSize::Byte, true, false);
+	Dma::TxChannel::setWriteAddress(uint32_t(&spi{{id}}_hw->dr));
+	Dma::TxChannel::template setPeripheralRequest<Dma::TxRequest>();
+
+	SpiMaster{{ id }}::initialize<SystemClock, baudrate, tolerance>();
+}
+
+template <class DmaChannelRx, class DmaChannelTx>
+modm::ResumableResult<uint8_t>
+modm::platform::SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(uint8_t data)
+{
+	// this is a manually implemented "fast resumable function"
+	// there is no context or nesting protection, since we don't need it.
+	// there are only two states encoded into 1 bit (LSB of state):
+	//   1. waiting to start, and
+	//   2. waiting to finish.
+	// LSB != Bit0 ?
+	if ( !(state & Bit0) )
+	{
+		// disable DMA for single byte transfer
+		disableDreq(Dma::DreqTx|Dma::DreqRx);
+	}
+	return SpiMaster{{ id }}::transfer(data);
+}
+
+template <class DmaChannelRx, class DmaChannelTx>
+void
+modm::platform::SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::startTransfer(const uint8_t *tx,
+		uint8_t *rx, std::size_t length)
+{
+	if ( (!rx && !tx) or length == 0) {
+		return;
+	}
+	if constexpr (Dma::RxChannel::mask == 0) {
+		rx = nullptr;
+		enableDreq(Dma::DreqTx);
+	} else {
+		enableDreq((tx ? Dma::DreqTx : 0)|(rx ? Dma::DreqRx : 0));
+	}
+
+	if (tx) {
+		Dma::TxChannel::setReadAddress(uint32_t(tx));
+		Dma::TxChannel::setReadIncrementMode(true);
+	} else {
+		Dma::TxChannel::setReadAddress(uint32_t(&dmaDummy));
+		Dma::TxChannel::setReadIncrementMode(false);
+	}
+	Dma::TxChannel::setDataLength(length);
+	if constexpr (Dma::RxChannel::mask == 0) {
+		Dma::TxChannel::start();
+	} else {
+		if (rx) {
+			Dma::RxChannel::setWriteAddress(uint32_t(rx));
+			Dma::RxChannel::setWriteIncrementMode(true);
+		} else {
+			Dma::RxChannel::setWriteAddress(uint32_t(&dmaDummy));
+			Dma::RxChannel::setWriteIncrementMode(false);
+		}
+		Dma::RxChannel::setDataLength(length);
+		::modm::platform::Dma::template start<typename Dma::RxChannel,typename Dma::TxChannel>();
+	}
+}
+
+template <class DmaChannelRx, class DmaChannelTx>
+template <class Wait>
+void
+modm::platform::SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::waitCompleted(Wait wait)
+{
+	while (Dma::TxChannel::isBusy() or Dma::RxChannel::isBusy())
+		wait();
+	while (!txFifoEmpty() or isBusy())
+		wait();
+	if constexpr (Dma::RxChannel::mask == 0) {
+		// Drain RX FIFO, then wait for shifting to finish (which may be *after*
+		// TX FIFO drains), then drain RX FIFO again
+		while (!rxFifoEmpty())
+			(void)read();
+		while (isBusy())
+			wait();
+		while (!rxFifoEmpty())
+			(void)read();
+
+		// Don't leave overrun flag set
+		spi{{ id }}_hw->icr = SPI_SSPICR_RORIC_BITS;
+	} else {
+		while (!rxFifoEmpty() or isBusy())
+			wait();
+	}
+}
+
+template <class DmaChannelRx, class DmaChannelTx>
+modm::ResumableResult<void>
+modm::platform::SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(const uint8_t *tx,
+		uint8_t *rx, std::size_t length)
+{
+	if ( (!rx && !tx) || length == 0) {
+		return {modm::rf::Stop};
+	}
+	if constexpr (Dma::RxChannel::mask == 0) rx = nullptr;
+	// this is a manually implemented "fast resumable function"
+	// there is no context or nesting protection, since we don't need it.
+	// there are only two states encoded into 1 bit (Bit1 of state):
+	//   1. initialize index, and
+	//   2. wait for 1-byte transfer to finish.
+
+	// we are only interested in Bit1
+	switch(state & Bit1)
+	{
+	case 0:
+		// we will only visit this state once
+		state |= Bit1;
+		startTransfer(tx,rx,length);
+
+		[[fallthrough]];
+
+	default:
+		while (true) {
+			if (Dma::TxChannel::isBusy() or (rx && Dma::RxChannel::isBusy()))
+				return { modm::rf::Running };
+			if (!txFifoEmpty() or (rx && !rxFifoEmpty()) or isBusy())
+				return { modm::rf::Running };
+			break;
+		}
+		if (!rx) {
+			// Drain RX FIFO, then wait for shifting to finish (which may be *after*
+			// TX FIFO drains), then drain RX FIFO again
+			while (!rxFifoEmpty())
+				(void)read();
+			while (isBusy())
+				return { modm::rf::Running };
+
+			// Don't leave overrun flag set
+			spi{{ id }}_hw->icr = SPI_SSPICR_RORIC_BITS;
+		}
+
+
+		disableDreq(Dma::DreqTx|Dma::DreqRx);
+		// clear the state
+		state &= ~Bit1;
+		return {modm::rf::Stop};
+	}
+}

@@ -1,0 +1,225 @@
+/**
+ * Copyright (c) 2022, Andrey Kunitsyn
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+#pragma once
+
+#include <modm/architecture/interface/spi_master.hpp>
+#include <modm/platform/gpio/connector.hpp>
+#include <modm/math/algorithm/prescaler.hpp>
+
+#include <hardware/structs/spi.h>
+
+namespace modm::platform
+{
+
+/**
+ * Serial peripheral interface SPI{{ id }}.
+ *
+ * @author	Andrey Kunitsyn
+ * @ingroup	modm_platform_spi modm_platform_spi_{{id}}
+ */
+class SpiMaster{{ id }} : public modm::SpiMaster
+{
+	// Bit0: single transfer state
+	// Bit1: block transfer state
+	static inline uint8_t state{0};
+	static inline uint8_t count{0};
+	static inline void *context{nullptr};
+	static inline ConfigurationHandler configuration{nullptr};
+
+protected:
+	static inline bool isBusy() {
+		return (spi{{ id }}_hw->sr & SPI_SSPSR_BSY_BITS);
+	}
+
+	static inline bool txFifoFull() {
+		return (spi{{ id }}_hw->sr & SPI_SSPSR_TNF_BITS) == 0;
+	}
+	static inline bool txFifoEmpty() {
+		return spi{{ id }}_hw->sr & SPI_SSPSR_TFE_BITS;
+	}
+
+	static inline bool rxFifoEmpty() {
+		return (spi{{ id }}_hw->sr & SPI_SSPSR_RNE_BITS) == 0;
+	}
+
+	static inline void drainRx()
+	{
+		// Drain RX FIFO, then wait for shifting to finish (which may be *after*
+		// TX FIFO drains), then drain RX FIFO again
+		while (!rxFifoEmpty())
+			(void)read();
+		while (isBusy())
+			__NOP();
+		while (!rxFifoEmpty())
+			(void)read();;
+
+		// Don't leave overrun flag set
+		spi{{ id }}_hw->icr = SPI_SSPICR_RORIC_BITS;
+	}
+	/*
+	 * Find smallest prescale value which puts output frequency in range of
+	 * post-divide. Prescale is an even number from 2 to 254 inclusive.
+	 */
+	template <uint32_t freq_in, baudrate_t baudrate>
+	constexpr static uint32_t
+	calcPrescale()
+	{
+		uint32_t prescale;
+		for (prescale = 2; prescale <= 254; prescale += 2) {
+			if (freq_in < (prescale + 2) * 256 * (uint64_t) baudrate)
+				break;
+		}
+		return prescale;
+	}
+public:
+	template< class... Signals >
+	static void
+	connect()
+	{
+		using Connector = GpioConnector<Peripheral::Spi{{ id }}, Signals...>;
+		using Sclk = typename Connector::template GetSignal< Gpio::Signal::Sclk >;
+		using Mosi = typename Connector::template GetSignal< Gpio::Signal::Tx >;
+		/*using Miso = typename Connector::template GetSignal< Gpio::Signal::Rx >;*/
+		static_assert(Connector::template IsValid<Sclk>);
+		static_assert(Connector::template IsValid<Mosi>);
+
+		Connector::connect();
+	}
+
+	static void reset();
+	static void unreset();
+
+	static void
+	setFormat(uint8_t data_bits, DataMode mode, DataOrder order)
+	{
+		modm_assert(data_bits >= 4 && data_bits <= 16, "SPI data_bits", "SPI data bits out of range");
+		// LSB-first not supported on PL022:
+		modm_assert(order == DataOrder::MsbFirst, "SPI DataOrder", "SPI hardware does not support alternate transmit order");
+		hw_write_masked(&spi{{ id }}_hw->cr0,
+					((uint32_t(data_bits - 1)) << SPI_SSPCR0_DSS_LSB) |
+					(((uint32_t(mode)&2)>>1) << SPI_SSPCR0_SPO_LSB) |
+					((uint32_t(mode)&1) << SPI_SSPCR0_SPH_LSB),
+					SPI_SSPCR0_DSS_BITS |
+					SPI_SSPCR0_SPO_BITS |
+					SPI_SSPCR0_SPH_BITS);
+	}
+
+	template< class SystemClock, baudrate_t baudrate, percent_t tolerance=pct(5)>
+	static uint32_t
+	setBaudrate()
+	{
+		constexpr uint32_t freq_in = SystemClock::PeriFrequency;
+		constexpr uint32_t prescale = calcPrescale<freq_in,baudrate>();
+		static_assert(prescale <= 254, "Frequency too low");
+		static_assert(freq_in / prescale <= 256 * (uint64_t) baudrate, "Failed calc prescale");
+
+		// Find largest post-divide which makes output closest to baudrate. Post-divide is
+		// an integer in the range 1 to 256 inclusive.
+		constexpr uint32_t postdiv = Prescaler::from_range(freq_in / prescale, baudrate, 1, 256).prescaler;
+
+		constexpr uint32_t result_baudrate = freq_in / (prescale * postdiv);
+
+		assertBaudrateInTolerance< result_baudrate, baudrate, tolerance >();
+
+		spi{{ id }}_hw->cpsr = prescale;
+		hw_write_masked(&spi{{ id }}_hw->cr0, (postdiv - 1) << SPI_SSPCR0_SCR_LSB, SPI_SSPCR0_SCR_BITS);
+
+		return result_baudrate;
+	}
+
+	// start documentation inherited
+	template< class SystemClock, baudrate_t baudrate, percent_t tolerance=5_pct >
+	static void
+	initialize()
+	{
+		reset();
+		unreset();
+
+		setBaudrate<SystemClock, baudrate, tolerance>();
+		setFormat(8,DataMode::Mode0, DataOrder::MsbFirst);
+		// Set master mode
+		hw_clear_bits(&spi{{ id }}_hw->cr1, SPI_SSPCR1_MS_BITS);
+		// Finally enable the SPI
+		hw_set_bits(&spi{{ id }}_hw->cr1, SPI_SSPCR1_SSE_BITS);
+	}
+
+	static void
+	setDataMode(DataMode mode)
+	{
+		hw_write_masked(&spi{{ id }}_hw->cr0,
+					(((uint32_t(mode)&2)>>1) << SPI_SSPCR0_SPO_LSB) |
+					((uint32_t(mode)&1) << SPI_SSPCR0_SPH_LSB),
+					SPI_SSPCR0_SPO_BITS |
+					SPI_SSPCR0_SPH_BITS);
+	}
+
+	static void
+	setDataOrder(DataOrder order)
+	{
+		modm_assert(order == DataOrder::MsbFirst, "SPI DataOrder", "SPI hardware does not support alternate transmit order");
+	}
+
+	static uint8_t
+	acquire(void *ctx, ConfigurationHandler handler = nullptr);
+
+	static uint8_t
+	release(void *ctx);
+
+	static uint8_t
+	transferBlocking(uint8_t data)
+	{
+		return RF_CALL_BLOCKING(transfer(data));
+	}
+
+	static void
+	transferBlocking(const uint8_t *tx, uint8_t *rx, std::size_t length)
+	{
+		// If we do not need to receive data, use a more efficient
+		// transmit-only routine to increase throughput
+		if(rx) {
+			RF_CALL_BLOCKING(transfer(tx, rx, length));
+		} else {
+			transferBlocking(tx, length);
+		}
+	}
+
+	static modm::ResumableResult<uint8_t>
+	transfer(uint8_t data);
+
+	static modm::ResumableResult<void>
+	transfer(const uint8_t *tx, uint8_t *rx, std::size_t length);
+	// end documentation inherited
+
+protected:
+	/** Perform transmit-only transaction
+	 *
+	 * A faster version of blocking transfer when transmitting only.
+	 *
+	 * If no receive is needed, the next byte can be loaded while the
+	 * current transfer is in progress.
+	 */
+	static void
+	transferBlocking(const uint8_t *tx, std::size_t length);
+
+	static inline void
+	write(uint8_t data)
+	{
+		spi{{ id }}_hw->dr = uint32_t(data);
+	}
+
+	static inline uint8_t
+	read()
+	{
+		return uint8_t(spi{{ id }}_hw->dr);
+	}
+};
+
+} // namespace modm::platform
