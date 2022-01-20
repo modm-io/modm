@@ -1,0 +1,15 @@
+<library>
+  <repositories>
+    <repository>
+      <path>../../../../repo.lb</path>
+    </repository>
+  </repositories>
+
+  <options>
+    <option name="modm:target">rp2040</option>
+    <option name="modm:platform:core:boot2">w25q080</option>
+  </options>
+  <modules>
+    <module>modm:board:rp-pico</module>
+  </modules>
+</library>
