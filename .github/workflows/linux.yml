@@ -6,7 +6,7 @@ jobs:
   unittests-linux-generic:
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-01-03
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-01-20
 
     steps:
       - name: Check out repository
@@ -89,7 +89,7 @@ jobs:
   stm32-examples:
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-01-03
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-01-20
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
@@ -144,7 +144,7 @@ jobs:
   stm32f4-examples-1:
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-01-03
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-01-20
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
@@ -159,7 +159,7 @@ jobs:
   stm32f4-examples-2:
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-01-03
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-01-20
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
@@ -215,7 +215,7 @@ jobs:
   hal-compile-quick-1:
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-01-03
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-01-20
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
@@ -235,7 +235,7 @@ jobs:
   hal-compile-quick-2:
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-01-03
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-01-20
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
@@ -255,7 +255,7 @@ jobs:
   hal-compile-quick-3:
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-01-03
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-01-20
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
@@ -275,7 +275,7 @@ jobs:
   hal-compile-quick-4:
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-01-03
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-01-20
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
@@ -295,7 +295,7 @@ jobs:
   build-docs-test:
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-base:2022-01-03
+      image: ghcr.io/modm-ext/modm-build-base:2022-01-20
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
