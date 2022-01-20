@@ -70,6 +70,7 @@ def common_memories(env):
     Computes memory properties:
 
       - `memories`: unfiltered memory regions
+      - `ram_regions`: memory region name with `ram` in their names
       - `regions`: memory region names
       - `cont_ram_regions`: all continuous internal SRAM sections
       - `cont_ram`: largest continuous internal SRAM section
@@ -136,9 +137,8 @@ def common_linkerscript(env):
     Additional memory properties:
 
       - `memories`: unfiltered memory regions
+      - `ram_regions`: memory region name with `ram` in their names
       - `regions`: memory region names
-      - `ram_origin`: Lowest SRAM origin address
-      - `ram_origin`: Total size of all SRAM regions
       - `cont_ram_regions`: all continuous internal SRAM sections
       - `cont_ram`: largest continuous internal SRAM section
 

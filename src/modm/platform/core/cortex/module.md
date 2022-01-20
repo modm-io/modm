@@ -135,11 +135,12 @@ The following macros are available:
 - `section_vector_rom(memory)`: places the read-only vector table into ROM
   `memory`.
 
-- `section_vector_ram(memory)`: places the volatile vector table into RAM
-  `memory`. You must satisfy alignment requirements externally.
+- `section_vector_ram(memory, table_copy)`: places the volatile vector table
+  into RAM `memory` and add it to the copy table. You must satisfy alignment
+  requirements externally.
 
-- `section(memory, name, sections=[])`: place section `.{name}` into `memory`
-  and include `sections` into the `.{name}` section.
+- `section_load(memory, table_copy, sections)`: place each `.{section}` in
+  `sections` into `memory` and add them the copy table.
 
 - `section_stack(memory, start=None)`: place the main stack into `memory` after
   moving the location counter to `start`.
@@ -152,14 +153,16 @@ The following macros are available:
   section end address, so that previous sections will push this section back.
 
 - `all_heap_sections(table_copy, table_heap)`: places the heap sections as
-  described by `cont_ram_regions` of the `linkerscript` query.
+  described by `cont_ram_regions` of the `linkerscript` query. This also adds
+  bss and noinit sections into each region.
 
 - `section_rom(memory)`: place all read-only sections (`.text`, `.rodata` etc)
   into `memory`.
 
-- `section_ram(memory, rom, sections=[])`: place all volatile sections (`.data`,
-  `.bss` etc) into `memory` and load from `rom`. Adds `sections` into the
-  `.data` section.
+- `section_ram(memory, rom, table_copy, table_zero,
+  sections_data=[], sections_bss=[], sections_noinit=[])`: place all volatile
+  sections (`.data`, `.bss` etc) into `memory` and load from `rom`. Additional
+  sections can be added.
 
 - `section_tables(memory, copy, zero, heap)`: place the zero, copy and heap
   table into `memory`.
