@@ -20,7 +20,7 @@
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/architecture/interface/i2c_master.hpp>
 #include <modm/platform/gpio/connector.hpp>
-%% if target.platform in ["avr"]
+%% if target.platform in ["avr", "rp"]
 #include <modm/platform/gpio/open_drain.hpp>
 %% endif
 
@@ -41,7 +41,7 @@ template< class Scl,
 		  class Sda >
 class BitBangI2cMaster : public modm::I2cMaster
 {
-%% if target.platform in ["avr"]
+%% if target.platform in ["avr", "rp"]
 	using SCL = platform::GpioOpenDrain<Scl>;
 	using SDA = platform::GpioOpenDrain<Sda>;
 %% else

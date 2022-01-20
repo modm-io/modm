@@ -1,0 +1,134 @@
+/*
+ * Copyright (c) 2022, Andrey Kunitsyn
+ * Copyright (c) 2022, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <stdint.h>
+#include <tuple>
+#include <modm/platform/core/peripherals.hpp>
+%% for port in ports
+#include <hardware/structs/io{{port | lower}}.h>
+#include <hardware/structs/pads{{(pads_names[port] or port) | lower}}.h>
+%% endfor
+#include <hardware/structs/sio.h>
+
+namespace modm::platform
+{
+
+/// @ingroup modm_platform_gpio
+struct Gpio
+{
+	enum class
+	InputType
+	{
+		Floating = 0x0,  ///< floating on input
+		PullUp = 0x1,    ///< pull-up on input
+		PullDown = 0x2,  ///< pull-down on input
+	};
+
+	enum class
+	OutputType
+	{
+		PushPull
+	};
+
+	enum class
+	OutputSpeed
+	{
+		Slow = 0,
+		Fast = 1,
+	};
+	enum class
+	DriveStrength
+	{
+		mA_2 = 0,
+		mA_4 = 1,
+		mA_8 = 2,
+		mA_12 = 3,
+	};
+
+	enum class
+	Port
+	{
+%% for port in ports
+		{{ port }},
+%% endfor
+	};
+
+	/// @cond
+	enum class
+	Signal
+	{
+		BitBang,
+%% for signal in all_signals | sort
+		{{ signal }},
+%% endfor
+	};
+
+	template <Port>
+	struct PortRegs;
+	/// @endcond
+};
+
+/// @cond
+%% for port in ports
+template <>
+struct Gpio::PortRegs<Gpio::Port::{{ port | capitalize }}>
+{
+	using status_ctrl_hw_t = io{{port | lower}}_status_ctrl_hw_t;
+	static uint32_t sio_in() { return sio_hw->gpio{{sio_names[port]}}_in; }
+	static uint32_t sio_out() { return sio_hw->gpio{{sio_names[port]}}_out; }
+	static uint32_t sio_oe() { return sio_hw->gpio{{sio_names[port]}}_oe; }
+	static void sio_set(uint32_t mask) { sio_hw->gpio{{sio_names[port]}}_set = mask; }
+	static void sio_clr(uint32_t mask) { sio_hw->gpio{{sio_names[port]}}_clr = mask; }
+	static void sio_togl(uint32_t mask) { sio_hw->gpio{{sio_names[port]}}_togl = mask; }
+	static void sio_oe_set(uint32_t mask) { sio_hw->gpio{{sio_names[port]}}_oe_set = mask; }
+	static void sio_oe_clr(uint32_t mask) { sio_hw->gpio{{sio_names[port]}}_oe_clr = mask; }
+	static uint8_t funcsel(uint8_t pin)
+	{ return (io{{port | lower}}_hw->io[pin].ctrl & IO_BANK0_GPIO0_CTRL_FUNCSEL_BITS) >> IO_BANK0_GPIO0_CTRL_FUNCSEL_LSB; }
+	static void set_funcsel(uint8_t pin, uint32_t fn)
+	{
+		hw_write_masked(&pads{{(pads_names[port] or port) | lower}}_hw->io[pin],
+				   PADS_BANK0_GPIO0_IE_BITS,
+				   PADS_BANK0_GPIO0_IE_BITS | PADS_BANK0_GPIO0_OD_BITS
+		);
+		io{{port | lower}}_hw->io[pin].ctrl = fn << IO_BANK0_GPIO0_CTRL_FUNCSEL_LSB;
+	}
+	static void set_pue_pde(uint8_t pin, bool up, bool down)
+	{
+		hw_write_masked(
+			&pads{{(pads_names[port] or port) | lower}}_hw->io[pin],
+			((up?1:0) << PADS_BANK0_GPIO0_PUE_LSB) | ((down?1:0) << PADS_BANK0_GPIO0_PDE_LSB),
+			PADS_BANK0_GPIO0_PUE_BITS | PADS_BANK0_GPIO0_PDE_BITS
+		);
+	}
+	static void set_drive(uint8_t pin, uint8_t strength)
+	{
+		hw_write_masked(
+			&pads{{(pads_names[port] or port) | lower}}_hw->io[pin],
+			strength << PADS_BANK0_GPIO0_DRIVE_LSB,
+			PADS_BANK0_GPIO0_DRIVE_BITS
+		);
+	}
+	static void set_slewfast(uint8_t pin, bool fast)
+	{
+		hw_write_masked(
+			&pads{{(pads_names[port] or port) | lower}}_hw->io[pin],
+			(fast?1:0) << PADS_BANK0_GPIO0_SLEWFAST_LSB,
+			PADS_BANK0_GPIO0_SLEWFAST_BITS
+		);
+	}
+};
+%% endfor
+/// @endcond
+
+} // namespace modm::platform
