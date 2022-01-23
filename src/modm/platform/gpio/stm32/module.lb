@@ -253,6 +253,7 @@ def validate(env):
     bprops["all_peripherals"] = sorted(list(set(all_peripherals)))
     bprops["all_signals"] = sorted(list(set(s["name"] for s in all_signals.values())))
     bprops["gpios"] = [bprops[g["port"] + g["pin"]] for g in driver["gpio"]]
+    bprops["port_width"] = 16
 
     # Check the max number of ADC instances
     max_adc_instance = max(map(int, device.get_driver("adc").get("instance", [1])))
@@ -273,6 +274,7 @@ def build(env):
     env.template("set.hpp.in")
     env.template("base.hpp.in")
     env.template("../common/unused.hpp.in", "unused.hpp")
+    env.template("../common/port_shim.hpp.in", "port_shim.hpp")
     if len(env["enable_ports"]):
         env.template("enable.cpp.in")
 

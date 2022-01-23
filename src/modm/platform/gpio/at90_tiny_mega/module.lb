@@ -109,6 +109,7 @@ def validate(env):
     bprops["ranges"] = port_ranges(driver["gpio"])
     bprops["ports"] = {k:i for i, k in enumerate([p["name"] for p in bprops["ranges"]])}
     bprops["gpios"] = [bprops[g["port"] + g["pin"]] for g in driver["gpio"]]
+    bprops["port_width"] = 8
 
 def build(env):
     device = env[":target"]
@@ -154,5 +155,6 @@ def build(env):
     env.template("../common/unused.hpp.in", "unused.hpp")
 
     env.copy("../common/inverted.hpp", "inverted.hpp")
+    env.template("../common/port_shim.hpp.in", "port_shim.hpp")
     env.template("../common/connector.hpp.in", "connector.hpp",
                  filters={"formatPeripheral": "", "printSignalMap": ""})

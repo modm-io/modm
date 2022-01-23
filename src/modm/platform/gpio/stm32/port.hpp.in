@@ -9,29 +9,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_STM32_GPIO_PORT_HPP
-#define MODM_STM32_GPIO_PORT_HPP
+#pragma once
 
-#include "base.hpp"
+#include "port_shim.hpp"
 #include "set.hpp"
 #include <type_traits>
 #include <modm/math/utils/bit_operation.hpp>
 
 namespace modm::platform
 {
-
-/// @cond
-namespace detail
-{
-template< Gpio::Port port >
-struct GpioPortInfo;
-template< class StartGpio, int8_t Width >
-struct GpioSetShim
-{
-	static typename GpioPortInfo<StartGpio::port>::template check<StartGpio::pin, Width> check;
-};
-} // namespace detail
-/// @endcond
 
 /// @ingroup modm_platform_gpio
 template< class StartGpio, int8_t Width >
@@ -89,62 +75,4 @@ public:
 	}
 };
 
-/// @cond
-namespace detail
-{
-// ------ Port Width Information ------
-%% for port in ranges
-template<>
-struct GpioPortInfo<Gpio::Port::{{port.name}}>
-{
-	static constexpr int8_t Width = {{port.width}};
-	static constexpr int8_t StartPin = {{port.start}};
-	static constexpr int8_t EndPin = StartPin + Width;
-
-	template< uint8_t QueryStartPin, int8_t QueryWidth >
-	struct check
-	{
-		static constexpr bool isNormal = QueryWidth > 0;
-		static constexpr bool isReversed = QueryWidth < 0;
-		static constexpr int8_t width = isNormal ? QueryWidth : -QueryWidth;
-		static_assert(isReversed or width <= Width,
-			"GpioPort Width out of bounds! Maximum is {{port.width}}.");
-
-		static_assert(isReversed or (QueryStartPin + QueryWidth <= EndPin),
-			"GpioPort StartPin + Width out of bounds! Maximum is {{port.start + port.width - 1}}.");
-		static_assert(isNormal or (StartPin <= QueryStartPin + QueryWidth + 1),
-			"GpioPort StartPin - Width out of bounds! Minimum is {{port.start}}.");
-	};
-};
-%% endfor
-
-// ------ Translator classes from Gpio + Width -> GpioSet ------
-template< class StartGpio, int8_t offset >
-struct GpioShim
-{
-	static constexpr typename StartGpio::Port port = StartGpio::port;
-	static constexpr uint16_t mask = (1ul << (StartGpio::pin + offset));
-	static constexpr bool isInverted = StartGpio::isInverted;
-};
-%% for width in range(-16, 0)
-template< class StartGpio >
-struct GpioSetShim<StartGpio, {{width}}> : public GpioSet<
-	%% for offset in (range(width + 1, 1) | reverse)
-		GpioShim<StartGpio, {{offset}}>{% if not loop.last %},{% endif %}
-	%% endfor
-		> { static typename GpioPortInfo<StartGpio::port>::template check<StartGpio::pin, {{width}}> check; };
-%% endfor
-%% for width in range(0, 17)
-template< class StartGpio >
-struct GpioSetShim<StartGpio, {{width}}> : public GpioSet<
-	%% for offset in (range(width) | reverse)
-		GpioShim<StartGpio, {{offset}}>{% if not loop.last %},{% endif %}
-	%% endfor
-		> { static typename GpioPortInfo<StartGpio::port>::template check<StartGpio::pin, {{width}}> check; };
-%% endfor
-} // namespace detail
-/// @endcond
-
 } // namespace modm::platform
-
-#endif // MODM_STM32_GPIO_PORT_HPP
