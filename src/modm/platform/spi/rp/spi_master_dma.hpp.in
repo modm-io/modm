@@ -1,0 +1,93 @@
+/*
+ * Copyright (c) 2022, Andrey Kunitsyn
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <modm/platform/dma/dma.hpp>
+#include "spi_master_{{ id }}.hpp"
+
+namespace modm::platform
+{
+
+/**
+ * Serial peripheral interface (SPI{{ id }}) with DMA support.
+ *
+ * This class uses the DMA controller for sending and receiving data, which
+ * greatly reduces the CPU load. Beside passing the DMA channels as template
+ * parameters the class can be used in the same way like the SpiMaster{{ id }}.
+ *
+ * @tparam DmaChannelRX DMA channel for receiving
+ * @tparam DmaChannelTX DMA channel for sending
+ *
+ * @author	Andrey Kunitsyn
+ * @ingroup	modm_platform_spi modm_platform_spi_{{id}}
+ */
+template <class DmaChannelRx, class DmaChannelTx>
+class SpiMaster{{ id }}_Dma : public SpiMaster{{ id }}
+{
+	struct Dma
+	{
+		using RxChannel = DmaChannelRx;
+		using TxChannel = DmaChannelTx;
+		static constexpr auto RxRequest = DmaBase::Request::Spi{{id}}_Rx;
+		static constexpr auto TxRequest = DmaBase::Request::Spi{{id}}_Tx;
+		static constexpr uint32_t DreqTx = SPI_SSPDMACR_TXDMAE_BITS;
+		static constexpr uint32_t DreqRx = SPI_SSPDMACR_RXDMAE_BITS;
+		static_assert(TxChannel::mask, "Tx Channel cannot be a dummy channel!");
+	};
+protected:
+	static inline void disableDreq(uint32_t mask) {
+		hw_clear_bits(&spi{{ id }}_hw->dmacr,mask);
+	}
+	static inline void enableDreq(uint32_t mask) {
+		hw_set_bits(&spi{{ id }}_hw->dmacr,mask);
+	}
+public:
+	/// Initialize DMA and SPI{{ id }}
+	template <class SystemClock, baudrate_t baudrate, percent_t tolerance=pct(5)>
+	static void
+	initialize();
+
+	static uint8_t
+	transferBlocking(uint8_t data)
+	{
+		return RF_CALL_BLOCKING(transfer(data));
+	}
+
+	static void
+	transferBlocking(const uint8_t *tx, uint8_t *rx, std::size_t length)
+	{
+		RF_CALL_BLOCKING(transfer(tx, rx, length));
+	}
+
+	static modm::ResumableResult<uint8_t>
+	transfer(uint8_t data);
+
+	static modm::ResumableResult<void>
+	transfer(const uint8_t *tx, uint8_t *rx, std::size_t length);
+
+	static void
+	startTransfer(const uint8_t *tx, uint8_t *rx, std::size_t length);
+
+	template <class Wait>
+	static void waitCompleted(Wait wait);
+	static void waitCompleted()
+	{
+		waitCompleted([](){});
+	}
+
+private:
+	// needed for transfers where no RX or TX buffers are given
+	static inline uint8_t dmaDummy{0};
+};
+
+} // namespace modm::platform
+#include "spi_master_{{ id }}_dma_impl.hpp"

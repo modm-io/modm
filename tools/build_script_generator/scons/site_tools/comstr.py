@@ -70,6 +70,7 @@ def generate(env, **kw):
         env['HEXCOMSTR'] =      "%sHex File······· %s$TARGET%s" % default
         env['BINCOMSTR'] =      "%sBinary File···· %s$TARGET%s" % default
         env['LSSCOMSTR'] =      "%sListing········ %s$TARGET%s" % default
+        env['UF2COMSTR'] =      "%sUF2 File······· %s$TARGET%s" % default
 
         # modm tools format strings
         env['BITMAPCOMSTR'] =   "%sBitmap········· %s${str(TARGET).replace(BUILDPATH,CONFIG_PROFILE)}%s" % default

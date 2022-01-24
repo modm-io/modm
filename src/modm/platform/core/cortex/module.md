@@ -142,8 +142,9 @@ The following macros are available:
 - `section_load(memory, table_copy, sections)`: place each `.{section}` in
   `sections` into `memory` and add them the copy table.
 
-- `section_stack(memory, start=None)`: place the main stack into `memory` after
-  moving the location counter to `start`.
+- `section_stack(memory, start=None, suffix="")`: place the main stack into
+  `memory` after moving the location counter to `start`. `suffix` can be used
+  to add multiple `.stack{suffix}` sections.
 
 - `section_heap(memory, name, placement=None, sections=[])`: Add the noload
   `sections` to `memory` and fill up remaining space in `memory` with heap

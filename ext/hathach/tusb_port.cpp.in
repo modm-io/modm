@@ -40,6 +40,10 @@ tusb_get_device_serial(uint16_t *serial_str)
 		(uint32_t *)0x0080A00C, (uint32_t *)0x0080A040,
 		(uint32_t *)0x0080A044, (uint32_t *)0x0080A048
 	%% endif
+%% elif target.platform in ["rp"]
+		/* sysinfo CHIP_ID and GIT_REV */
+		((uint32_t *)0x40000000),((uint32_t *)0x40000040),
+		((uint32_t *)0x40000000),((uint32_t *)0x40000040),
 %% endif
 	};
 

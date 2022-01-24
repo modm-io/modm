@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2017, 2021, Niklas Hauser
+ * Copyright (c) 2022, Andrey Kunitsyn
  *
  * This file is part of the modm project.
  *
@@ -77,6 +78,15 @@ struct GpioConnector
 %% endif
 %% elif target.platform in ["avr"]
 		static Connection check [[maybe_unused]];
+%% elif target.platform in ["rp"]
+		using Pin = GpioStatic<typename Signal::Data>;
+		if constexpr(Connection::func == -1) {
+			Pin::setInput();
+			Pin::disconnect();
+		}
+		if constexpr (Connection::func >= 0) {
+			Pin::setFunction(Connection::func);
+		}
 %% endif
 	}
 

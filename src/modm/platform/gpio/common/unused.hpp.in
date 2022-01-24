@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2017-2018, 2021, Niklas Hauser
+ * Copyright (c) 2022, Andrey Kunitsyn
  *
  * This file is part of the modm project.
  *
@@ -70,6 +71,9 @@ protected:
 	static void setAlternateFunction(uint8_t) {}
 	static void setAlternateFunction() {}
 	static void setAnalogInput() {}
+%% elif target.platform in ["rp"]
+	static void setFunction(uint8_t) {}
+	static void setDriveStrength(DriveStrength) {}
 %% endif
 public:
 	// GpioOutput
@@ -108,7 +112,7 @@ public:
 		using Data = detail::DataUnused;
 		static constexpr platform::Gpio::Signal Signal = platform::Gpio::Signal::BitBang;
 	};
-%% for name in all_signals
+%% for name in all_signals | sort
 	struct {{ name }}
 	{
 		using Data = detail::DataUnused;

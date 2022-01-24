@@ -20,6 +20,7 @@ def build_target(env, sources):
 	env.Clean(program, join(env["BUILDPATH"], env["CONFIG_PROJECT_NAME"]+".bin"))
 	env.Clean(program, join(env["BUILDPATH"], env["CONFIG_PROJECT_NAME"]+".hex"))
 	env.Clean(program, join(env["BUILDPATH"], env["CONFIG_PROJECT_NAME"]+".lss"))
+	env.Clean(program, join(env["BUILDPATH"], env["CONFIG_PROJECT_NAME"]+".uf2"))
 
 %% if with_compilation_db
 	env.Command("compile_commands.json", sources,
@@ -42,6 +43,8 @@ def build_target(env, sources):
 	env.Depends(target=program, dependency="{{ linkerscript }}")
 	env.Alias("size", env.Size(chosen_program))
 	%% if core.startswith("cortex-m")
+	env.Alias("uf2", env.UF2(chosen_program))
+
 	env.Alias("log-itm", env.LogItmOpenOcd())
 	env.Alias("log-rtt", env.LogRttOpenOcd())
 

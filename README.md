@@ -101,6 +101,7 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <th align="center"></th>
 <th align="center" colspan="13">STM32</th>
 <th align="center" colspan="3">SAM</th>
+<th align="center" colspan="1">RP</th>
 <th align="center" colspan="3">AT</th>
 </tr><tr>
 <th align="left">Peripheral</th>
@@ -120,6 +121,7 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <th align="center">D21</th>
 <th align="center">G55</th>
 <th align="center">V70</th>
+<th align="center">20</th>
 <th align="center">90</th>
 <th align="center">Mega</th>
 <th align="center">Tiny</th>
@@ -142,6 +144,7 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✅</td>
 <td align="center">○</td>
 <td align="center">○</td>
+<td align="center">○</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
 </tr><tr>
@@ -162,6 +165,7 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✕</td>
 <td align="center">✕</td>
 <td align="center">○</td>
+<td align="center">✕</td>
 <td align="center">○</td>
 <td align="center">○</td>
 <td align="center">✕</td>
@@ -183,6 +187,7 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">○</td>
 <td align="center">✕</td>
 <td align="center">○</td>
+<td align="center">✕</td>
 <td align="center">○</td>
 <td align="center">○</td>
 <td align="center">○</td>
@@ -205,6 +210,7 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✕</td>
 <td align="center">○</td>
 <td align="center">✕</td>
+<td align="center">✕</td>
 <td align="center">○</td>
 <td align="center">✕</td>
 </tr><tr>
@@ -225,6 +231,7 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">○</td>
 <td align="center">✕</td>
 <td align="center">○</td>
+<td align="center">✅</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
@@ -239,6 +246,7 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✕</td>
 <td align="center">✕</td>
 <td align="center">○</td>
+<td align="center">✕</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
@@ -267,6 +275,7 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✅</td>
 <td align="center">○</td>
 <td align="center">○</td>
+<td align="center">○</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
@@ -288,11 +297,13 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✕</td>
 <td align="center">✕</td>
 <td align="center">○</td>
+<td align="center">○</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
 </tr><tr>
 <td align="left">GPIO</td>
+<td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
@@ -330,6 +341,7 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">○</td>
 <td align="center">○</td>
 <td align="center">○</td>
+<td align="center">○</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
@@ -354,6 +366,7 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✕</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
+<td align="center">✕</td>
 </tr><tr>
 <td align="left">Random Generator</td>
 <td align="center">✕</td>
@@ -372,6 +385,7 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✕</td>
 <td align="center">✕</td>
 <td align="center">○</td>
+<td align="center">✕</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
@@ -396,6 +410,7 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
+<td align="center">✅</td>
 </tr><tr>
 <td align="left">System Clock</td>
 <td align="center">✅</td>
@@ -412,8 +427,9 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
-<td align="center">✕</td>
-<td align="center">✕</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
@@ -432,6 +448,7 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
+<td align="center">○</td>
 <td align="center">○</td>
 <td align="center">○</td>
 <td align="center">○</td>
@@ -458,6 +475,7 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">○</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
+<td align="center">✅</td>
 <td align="center">○</td>
 </tr><tr>
 <td align="left">Unique ID</td>
@@ -474,6 +492,7 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
+<td align="center">✕</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
@@ -498,6 +517,7 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">○</td>
+<td align="center">✅</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
@@ -585,13 +605,15 @@ We have out-of-box support for many development boards including documentation.
 <td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-l552ze-q">NUCLEO-L552ZE-Q</a></td>
 </tr><tr>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-olimexino-stm32">OLIMEXINO-STM32</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-rp-pico">RP-PICO</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-raspberrypi">Raspberry Pi</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-samd21-mini">SAMD21-MINI</a></td>
-<td align="center"><a href="https://modm.io/reference/module/modm-board-samg55-xplained-pro">SAMG55-XPLAINED-PRO</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-samg55-xplained-pro">SAMG55-XPLAINED-PRO</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-stm32_f4ve">STM32-F4VE</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-stm32f030_demo">STM32F030-DEMO</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-srxe">Smart Response XE</a></td>
+</tr><tr>
 </tr>
 </table>
 <!--/bsptable-->

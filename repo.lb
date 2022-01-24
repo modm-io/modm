@@ -87,6 +87,7 @@ class DevicesCache(dict):
                      "stm32l0", "stm32l1", "stm32l4", "stm32l5",
                      "at90", "attiny", "atmega",
                      "samd21", "samg55", "samv70",
+                     "rp2040",
                      "hosted"]
         device_file_names = [dfn for dfn in device_file_names if any(s in dfn for s in supported)]
         # These files are ignored due to various issues
@@ -178,7 +179,7 @@ class TargetOption(EnumerationOption):
         targets = self._enumeration.keys()
 
         # check if input string is part of keys OR longer
-        while(len(target) > len("attiny4-")):
+        while(len(target) >= len("rp2040")):
             if target in targets:
                 target = self._enumeration[target]
                 target._identifier.set("revision", revision.lower())

@@ -557,6 +557,23 @@ Hex File······· {debug|release}/blink.hex
 ```
 
 
+#### scons uf2
+
+```
+scons uf2 profile={debug|release} [firmware={hash or file}]
+```
+
+Creates a UF2 compatible file of your executable. UF2 is a
+[bootloader by Microsoft](https://github.com/microsoft/uf2).
+
+```
+ $ scons uf2
+UF2 File······· {debug|release}/blink.uf2
+```
+
+(\* *only ARM Cortex-M targets*)
+
+
 #### scons artifact
 
 ```

@@ -1,0 +1,110 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2022, Andrey Kunitsyn
+# Copyright (c) 2022, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+import copy
+from collections import defaultdict, OrderedDict
+
+def port_ranges(gpios):
+    ports = {p: (32, 0) for p in set(p["port"] for p in gpios)}
+    for gpio in gpios:
+        pin = int(gpio["pin"])
+        pmin, pmax = ports[gpio["port"]]
+        ports[gpio["port"]] = (min(pin, pmin), max(pin, pmax))
+
+    ports = [{"name": k.capitalize(), "start": v[0], "width": v[1] - v[0] + 1} for k,v in ports.items()]
+    ports.sort(key=lambda p: p["name"])
+    return ports
+
+def translate(s):
+    return "".join(p.capitalize() for p in s.split("_"))
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":platform:gpio"
+    module.description = "General Purpose I/O (GPIO)"
+
+
+def prepare(module, options):
+    module.depends(":architecture:gpio", ":cmsis:device", ":math:utils")
+    return options[":target"].has_driver("gpio:rp*")
+
+
+def build(env):
+    device = env[":target"]
+    driver = device.get_driver("gpio")
+
+    subs = {
+        "ranges": port_ranges(driver["gpio"]),
+        "sio_names": {
+            "Bank0": "",
+            "Qspi": "_hi"
+        },
+        "pads_names": {
+            "Bank0": "bank0",
+            "Qspi": "_qspi"
+        },
+        "port_width": 32
+    }
+    subs["ports"] = OrderedDict([(k, i) for i, k in enumerate([p["name"].capitalize() for p in subs["ranges"]])])
+
+    peripherals = []
+    all_drivers = [d for d in device._properties["driver"] if d["name"] not in ["gpio", "core"]]
+    for d in all_drivers:
+        dname = translate(d["name"])
+        if "instance" in d:
+            peripherals.extend([dname + translate(i) for i in d["instance"]])
+        else:
+            peripherals.append(dname)
+    subs["all_peripherals"] = sorted(list(set(peripherals)))
+
+    all_signals = set()
+    for gpio in driver["gpio"]:
+        gpio["signals"] = set([translate(s["name"]) for s in gpio["signal"]])
+        all_signals.update(gpio["signals"])
+        signals = defaultdict(list)
+        for sig in gpio["signal"]:
+            signals[translate(sig["name"])].append(
+                {"driver": sig["driver"].capitalize() + sig.get("instance", ""),
+                 "name": translate(sig["name"]),
+                 "af": sig["af"]})
+        subs[gpio["name"].capitalize()] = {
+            "gpio": gpio,
+            "signals": signals,
+        }
+
+    subs["target"] = device.identifier
+    subs["all_signals"] = all_signals
+    subs["gpios"] = [subs[gpio["name"].capitalize()] for gpio in driver["gpio"]]
+
+    env.substitutions = subs
+    env.outbasepath = "modm/src/modm/platform/gpio"
+
+    env.template("base.hpp.in")
+    env.template("data.hpp.in")
+    env.template("static.hpp.in")
+    env.template("set.hpp.in")
+    env.template("software_port.hpp.in")
+    env.template("port.hpp.in")
+
+    env.copy("../common/inverted.hpp", "inverted.hpp")
+    env.copy("../common/open_drain.hpp", "open_drain.hpp")
+    env.template("../common/connector.hpp.in", "connector.hpp",
+                 filters={"formatPeripheral": "", "printSignalMap": ""})
+    env.template("../common/unused.hpp.in", "unused.hpp")
+    env.template("../common/pins.hpp.in", "pins.hpp")
+    env.template("../common/port_shim.hpp.in", "port_shim.hpp")
+
+    # FIXME: Move to modm:platform:core!
+    env.outbasepath = "modm/src/modm/platform/core"
+    env.template("peripherals.hpp.in")

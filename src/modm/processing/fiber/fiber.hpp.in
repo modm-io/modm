@@ -9,15 +9,22 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 // ----------------------------------------------------------------------------
+%% if multicore
+%% set CoreDecl = ", size_t core=0"
+%% set CoreArg = ", size_t core"
+%% set CoreForward = ", core"
+%% else
+%% set CoreDecl = ""
+%% set CoreArg = ""
+%% set CoreForward = ""
+%% endif
 
 #pragma once
 #include "context.h"
 #include "stack.hpp"
 #include <memory>
-
 namespace modm
 {
-
 namespace fiber
 {
 
@@ -50,11 +57,11 @@ class Fiber
 
 public:
 	template<size_t Size>
-	Fiber(fiber::Stack<Size>& stack, void(*fn)());
+	Fiber(fiber::Stack<Size>& stack, void(*fn)(){{CoreDecl}});
 
 	template<size_t Size, class T>
 	requires requires { &std::decay_t<T>::operator(); }
-	Fiber(fiber::Stack<Size>& stack, T&& closure);
+	Fiber(fiber::Stack<Size>& stack, T&& closure{{CoreDecl}});
 
 protected:
 	inline void
@@ -75,21 +82,20 @@ private:
 
 namespace modm
 {
-
 template<size_t Size>
-Fiber::Fiber(fiber::Stack<Size>& stack, void(*fn)())
+Fiber::Fiber(fiber::Stack<Size>& stack, void(*fn)(){{CoreArg}})
 {
 	ctx = modm_context_init((uintptr_t) stack.memory,
 							(uintptr_t) stack.memory + stack.size,
 							(uintptr_t) fn,
 							(uintptr_t) fiber::Scheduler::deregisterFiber);
 	// register this fiber to be scheduled
-	fiber::Scheduler::registerFiber(this);
+	fiber::Scheduler::registerFiber(this{{CoreForward}});
 }
 
 template<size_t Size, class T>
 requires requires { &std::decay_t<T>::operator(); }
-Fiber::Fiber(fiber::Stack<Size>& stack, T&& closure)
+Fiber::Fiber(fiber::Stack<Size>& stack, T&& closure{{CoreArg}})
 {
 	// Find a suitable aligned area at the top of stack to allocate the closure
 	uintptr_t ptr = uintptr_t(stack.memory) + stack.size;
@@ -106,14 +112,13 @@ Fiber::Fiber(fiber::Stack<Size>& stack, T&& closure)
 	ctx = modm_context_init((uintptr_t) stack.memory, ptr, function,
 							(uintptr_t) fiber::Scheduler::deregisterFiber);
 	// register this fiber to be scheduled
-	fiber::Scheduler::registerFiber(this);
+	fiber::Scheduler::registerFiber(this{{CoreForward}});
 }
 
 void
 Fiber::jump(Fiber& other)
 {
-	fiber::Scheduler::current = &other;
-	modm_context_jump(&(ctx.sp), other.ctx.sp);
+	fiber::Scheduler::jump(*this,other);
 }
 
 }	// namespace modm

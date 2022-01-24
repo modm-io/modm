@@ -17,7 +17,7 @@
 #include <modm/architecture/utils.hpp>
 #include <modm/architecture/interface/delay.hpp>
 #include <modm/platform/gpio/connector.hpp>
-%% if target.platform in ["avr"]
+%% if target.platform in ["avr", "rp"]
 #include <modm/platform/gpio/open_drain.hpp>
 %% endif
 
@@ -48,7 +48,7 @@ namespace platform
 template <typename Pin>
 class BitBangOneWireMaster
 {
-%% if target.platform in ["avr"]
+%% if target.platform in ["avr", "rp"]
 	using PIN = platform::GpioOpenDrain<Pin>;
 %% else
 	using PIN = Pin;

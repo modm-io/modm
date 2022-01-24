@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, Niklas Hauser
+ * Copyright (c) 2022, Andrey Kunitsyn
  *
  * This file is part of the modm project.
  *
@@ -20,11 +21,14 @@ namespace modm::platform
 /// @ingroup modm_platform_gpio
 /// @{
 %% for gpio in gpios
-%% set port = gpio.gpio.port | upper
-%% set pin  = gpio.gpio.pin
-using Gpio{{ port ~ pin }} = GpioStatic<detail::Data{{ port ~ pin }}>;
-using GpioOutput{{ port ~ pin }} = Gpio{{ port ~ pin }};
-using GpioInput{{ port ~ pin }}  = Gpio{{ port ~ pin }};
+%% if target.platform in ["rp"]
+%% set name = gpio.gpio.name | capitalize
+%% else
+%% set name = gpio.gpio.port | upper ~ gpio.gpio.pin
+%% endif
+using Gpio{{ name }} = GpioStatic<detail::Data{{ name }}>;
+using GpioOutput{{ name }} = Gpio{{ name }};
+using GpioInput{{ name }}  = Gpio{{ name }};
 %#
 %% endfor
 /// @}

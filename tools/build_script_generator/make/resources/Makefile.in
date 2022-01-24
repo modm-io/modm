@@ -108,6 +108,15 @@ delay?=5
 program-dfu: bin
 	@dfu-util -v -E$(delay) -R -i 0 -a 0 -s 0x08000000:leave -D $(BIN_FILE)
 
+.PHONY: uf2
+uf2: build
+	@echo "UF2 File·······" $(UF2_FILE)
+	@python3 $(MODM_PATH)/modm_tools/elf2uf2.py $(ELF_FILE) -o $(UF2_FILE) \
+			--target $(CONFIG_DEVICE_NAME) \
+%% for range in uf2mem
+			--range {{range}}{% if not loop.last %} \{% endif %}
+%% endfor
+%#
 %% if platform in ["sam"]
 .PHONY: program-bossac
 program-bossac: bin
