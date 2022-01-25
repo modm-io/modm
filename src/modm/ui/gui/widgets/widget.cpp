@@ -17,7 +17,7 @@
 bool
 modm::gui::WidgetGroup::pack(Widget* w, const modm::glcd::Point& coord)
 {
-	if(coord.x > (this->dimension.width - w->dimension.width ) || coord.y > (this->dimension.height - w->dimension.height) || coord.x < 0 || coord.y < 0)
+	if(coord.x() > (this->dimension.width - w->dimension.width ) || coord.y() > (this->dimension.height - w->dimension.height) || coord.x() < 0 || coord.y() < 0)
 		return false;
 
 	/* Widget needs to know its parent to calculate its real, absolute
@@ -107,19 +107,19 @@ modm::gui::Widget::checkIntersection(Widget* w)
 
 	/* coordinates of upper left and lower right corner of this widget */
 	auto upper_left = this->getPosition();
-	auto lower_right = modm::glcd::Point(upper_left.x + this->getWidth(), upper_left.y + this->getHeight());
+	auto lower_right = modm::glcd::Point(upper_left.x() + this->getWidth(), upper_left.y() + this->getHeight());
 
 	/* coordinates of upper left and lower right corner of the argument Widget* w */
 	auto upper_left2 = w->getPosition();
-	auto lower_right2 = modm::glcd::Point(upper_left2.x + w->getWidth(), upper_left2.y + w->getHeight());
+	auto lower_right2 = modm::glcd::Point(upper_left2.x() + w->getWidth(), upper_left2.y() + w->getHeight());
 
 	/* check if rectangles contituted by precedingly defined
 	 * coordinates DON'T overlap
 	 * */
-	if(upper_left.x > lower_right2.x ||
-	   upper_left2.x > lower_right.x ||
-	   upper_left.y > lower_right2.y ||
-	   upper_left2.y > lower_right.y
+	if(upper_left.x() > lower_right2.x() ||
+	   upper_left2.x() > lower_right.x() ||
+	   upper_left.y() > lower_right2.y() ||
+	   upper_left2.y() > lower_right.y()
 	  )
 	{
 		return false;
@@ -135,10 +135,10 @@ modm::gui::Widget::handleInputEvent(const InputEvent* ev)
 	auto position = this->getPosition();
 
 	/* check if event is within area */
-	if((position.x < ev->coord.x) &&
-	   (position.y < ev->coord.y) &&
-	   ((position.x + this->getWidth()) > ev->coord.x) &&
-	   ((position.y + this->getHeight()) > ev->coord.y))
+	if((position.x() < ev->coord.x()) &&
+	   (position.y() < ev->coord.y()) &&
+	   ((position.x() + this->getWidth()) > ev->coord.x()) &&
+	   ((position.y() + this->getHeight()) > ev->coord.y()))
 	{
 		/* check if widget has interaction */
 		if(this->isInteractive())

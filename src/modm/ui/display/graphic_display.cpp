@@ -91,31 +91,31 @@ modm::GraphicDisplay::drawLine(int16_t x1, int16_t y1, int16_t x2, int16_t y2)
 void
 modm::GraphicDisplay::drawHorizontalLine(glcd::Point start, uint16_t length)
 {
-	for (int_fast16_t i = start.x; i < static_cast<int16_t>(start.x + length); ++i)
+	for (int_fast16_t i = start.x(); i < static_cast<int16_t>(start.x() + length); ++i)
 	{
-		this->setPixel(i, start.y);
+		this->setPixel(i, start.y());
 	}
 }
 
 void
 modm::GraphicDisplay::drawVerticalLine(glcd::Point start, uint16_t length)
 {
-	for (int_fast16_t i = start.y; i < static_cast<int16_t>(start.y + length); ++i)
+	for (int_fast16_t i = start.y(); i < static_cast<int16_t>(start.y() + length); ++i)
 	{
-		this->setPixel(start.x, i);
+		this->setPixel(start.x(), i);
 	}
 }
 
 void
 modm::GraphicDisplay::drawRectangle(glcd::Point start, uint16_t width, uint16_t height)
 {
-	uint16_t x2 = start.x + width - 1;
-	uint16_t y2 = start.y + height - 1;
+	uint16_t x2 = start.x() + width - 1;
+	uint16_t y2 = start.y() + height - 1;
 
 	this->drawHorizontalLine(start, width);
-	this->drawHorizontalLine(glcd::Point(start.x, y2), width);
+	this->drawHorizontalLine(glcd::Point(start.x(), y2), width);
 	this->drawVerticalLine(start, height);
-	this->drawVerticalLine(glcd::Point(x2, start.y), height);
+	this->drawVerticalLine(glcd::Point(x2, start.y()), height);
 }
 
 void
@@ -124,8 +124,8 @@ modm::GraphicDisplay::drawRoundedRectangle(glcd::Point start, uint16_t width, ui
 {
 	if (radius == 0) { this->drawRectangle(start, width, height); }
 
-	const int16_t x = start.x;
-	const int16_t y = start.y;
+	const int16_t x = start.x();
+	const int16_t y = start.y();
 
 	int16_t x1 = 0;
 	int16_t y1 = radius;
@@ -191,8 +191,8 @@ modm::GraphicDisplay::drawCircle(glcd::Point center, uint16_t radius)
 void
 modm::GraphicDisplay::drawCircle4(glcd::Point center, int16_t x, int16_t y)
 {
-	const int16_t cx = center.x;
-	const int16_t cy = center.y;
+	const int16_t cx = center.x();
+	const int16_t cy = center.y();
 
 	this->setPixel(cx + x, cy + y);
 	this->setPixel(cx - x, cy - y);
@@ -281,9 +281,9 @@ modm::GraphicDisplay::drawImageRaw(glcd::Point start, uint16_t width, uint16_t h
 			for (uint16_t j = 0; j < rowHeight; j++)
 			{
 				if (byte & 0x01)
-					this->setPixel(start.x + i, start.y + k * 8 + j);
+					this->setPixel(start.x() + i, start.y() + k * 8 + j);
 				else
-					this->clearPixel(start.x + i, start.y + k * 8 + j);
+					this->clearPixel(start.x() + i, start.y() + k * 8 + j);
 
 				byte >>= 1;
 			}

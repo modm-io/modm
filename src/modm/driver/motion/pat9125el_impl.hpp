@@ -111,8 +111,8 @@ Pat9125el<Transport, IntPin>::updateData()
 	const int16_t y = (readBuffer[1] | ((readBuffer[2] & 0b00001111) << 8));
 
 	// convert 12-bit 2's complement data to 16-bit signed int
-	data.x = static_cast<int16_t>(x << 4) >> 4;
-	data.y = static_cast<int16_t>(y << 4) >> 4;
+	data.x() = static_cast<int16_t>(x << 4) >> 4;
+	data.y() = static_cast<int16_t>(y << 4) >> 4;
 	moved = true;
 }
 

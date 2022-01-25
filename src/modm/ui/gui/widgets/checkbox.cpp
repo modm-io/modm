@@ -30,8 +30,8 @@ modm::gui::CheckboxWidget::render(View* view)
 
 	const uint16_t box_width = this->dimension.width;
 	const uint16_t box_height = this->dimension.height;
-	const uint16_t box_x = this->getPosition().x;
-	const uint16_t box_y = this->getPosition().y;
+	const uint16_t box_x = this->getPosition().x();
+	const uint16_t box_y = this->getPosition().y();
 
 	// clear background
 	out->setColor(cp[Color::BACKGROUND]);

@@ -169,23 +169,23 @@ static void
 drawCross(modm::ColorGraphicDisplay& display, modm::glcd::Point center)
 {
 	display.setColor(html::Red);
-	display.drawLine(center.x - 15, center.y, center.x - 2, center.y);
-	display.drawLine(center.x + 2, center.y, center.x + 15, center.y);
-	display.drawLine(center.x, center.y - 15, center.x, center.y - 2);
-	display.drawLine(center.x, center.y + 2, center.x, center.y + 15);
+	display.drawLine(center.x() - 15, center.y(), center.x() - 2, center.y());
+	display.drawLine(center.x() + 2, center.y(), center.x() + 15, center.y());
+	display.drawLine(center.x(), center.y() - 15, center.x(), center.y() - 2);
+	display.drawLine(center.x(), center.y() + 2, center.x(), center.y() + 15);
 
 	display.setColor(html::White);
-	display.drawLine(center.x - 15, center.y + 15, center.x - 7, center.y + 15);
-	display.drawLine(center.x - 15, center.y + 7, center.x - 15, center.y + 15);
+	display.drawLine(center.x() - 15, center.y() + 15, center.x() - 7, center.y() + 15);
+	display.drawLine(center.x() - 15, center.y() + 7, center.x() - 15, center.y() + 15);
 
-	display.drawLine(center.x - 15, center.y - 15, center.x - 7, center.y - 15);
-	display.drawLine(center.x - 15, center.y - 7, center.x - 15, center.y - 15);
+	display.drawLine(center.x() - 15, center.y() - 15, center.x() - 7, center.y() - 15);
+	display.drawLine(center.x() - 15, center.y() - 7, center.x() - 15, center.y() - 15);
 
-	display.drawLine(center.x + 7, center.y + 15, center.x + 15, center.y + 15);
-	display.drawLine(center.x + 15, center.y + 7, center.x + 15, center.y + 15);
+	display.drawLine(center.x() + 7, center.y() + 15, center.x() + 15, center.y() + 15);
+	display.drawLine(center.x() + 15, center.y() + 7, center.x() + 15, center.y() + 15);
 
-	display.drawLine(center.x + 7, center.y - 15, center.x + 15, center.y - 15);
-	display.drawLine(center.x + 15, center.y - 15, center.x + 15, center.y - 7);
+	display.drawLine(center.x() + 7, center.y() - 15, center.x() + 15, center.y() - 15);
+	display.drawLine(center.x() + 15, center.y() - 15, center.x() + 15, center.y() - 7);
 }
 
 static void
@@ -211,7 +211,7 @@ calibrateTouchscreen(modm::ColorGraphicDisplay& display, modm::glcd::Point *fixe
 				// wait until a valid sample can be taken
 			}
 
-			MODM_LOG_DEBUG << "calibration point: ("  << sample[i].x << " | " << sample[i].y << ")" << modm::endl;
+			MODM_LOG_DEBUG << "calibration point: ("  << sample[i].x() << " | " << sample[i].y() << ")" << modm::endl;
 		}
 
 		touchscreen.calibrate(calibrationPoint, sample);
@@ -227,14 +227,14 @@ void
 drawPoint(modm::GraphicDisplay& display, modm::glcd::Point point)
 {
 	MODM_LOG_DEBUG << __PRETTY_FUNCTION__ << modm::endl;
-	if (point.x < 0 || point.y < 0) {
+	if (point.x() < 0 || point.y() < 0) {
 		return;
 	}
 
-	display.setPixel(point.x, point.y);
-	display.setPixel(point.x + 1, point.y);
-	display.setPixel(point.x, point.y + 1);
-	display.setPixel(point.x + 1, point.y + 1);
+	display.setPixel(point.x(), point.y());
+	display.setPixel(point.x() + 1, point.y());
+	display.setPixel(point.x(), point.y() + 1);
+	display.setPixel(point.x() + 1, point.y() + 1);
 }
 
 // ----------------------------------------------------------------------------
@@ -286,8 +286,8 @@ debounceTouch(modm::glcd::Point *out, modm::glcd::Point *old)
 			// translate point according to calibration
 			touchscreen.translate(&raw, &point);
 
-			if(abs(point.x - old->x) < TP_TOLERANCE &&
-			   abs(point.y - old->y) < TP_TOLERANCE
+			if(abs(point.x() - old->x()) < TP_TOLERANCE &&
+			   abs(point.y() - old->y()) < TP_TOLERANCE
 			  )
 			{
 				// point is within area of last touch
@@ -321,8 +321,8 @@ touchUp(void* data)
 	modm::gui::InputEvent* ev = static_cast<modm::gui::InputEvent*>(data);
 
 	MODM_LOG_DEBUG << "asynchronous UP-event:" << modm::endl;
-	MODM_LOG_DEBUG << "x: " << ev->coord.x << modm::endl;
-	MODM_LOG_DEBUG << "y: " << ev->coord.y << modm::endl;
+	MODM_LOG_DEBUG << "x: " << ev->coord.x() << modm::endl;
+	MODM_LOG_DEBUG << "y: " << ev->coord.y() << modm::endl;
 
 	// queue UP-event as new input event
 	input_queue.push(ev);
@@ -351,8 +351,8 @@ gatherInput()
 		auto async_ev = new modm::gui::AsyncEvent(500, &touchUp, (void*)(ev_up));
 		async_events.append(async_ev);
 
-		MODM_LOG_DEBUG << "touch down x: " << point.x << modm::endl;
-		MODM_LOG_DEBUG << "touch down y: " << point.y << modm::endl;
+		MODM_LOG_DEBUG << "touch down x: " << point.x() << modm::endl;
+		MODM_LOG_DEBUG << "touch down y: " << point.y() << modm::endl;
 
 	}
 }
@@ -492,11 +492,11 @@ main()
 		/*
 		 * display an arbitrary image
 		 */
-		// if(pixPos.x < 0 || (pixPos.x + pix[0]) > tft.getWidth()){
-		// 	pixDeltaPos.x *= -1;
+		// if(pixPos.x() < 0 || (pixPos.x() + pix[0]) > tft.getWidth()){
+		// 	pixDeltaPos.x() *= -1;
 		// }
-		// if(pixPos.y < 0 || (pixPos.y + pix[1]) > tft.getHeight()){
-		// 	pixDeltaPos.y *= -1;
+		// if(pixPos.y() < 0 || (pixPos.y() + pix[1]) > tft.getHeight()){
+		// 	pixDeltaPos.y() *= -1;
 		// }
 		// pixPos += pixDeltaPos;
 		// tft.drawImage(pixPos, pix);

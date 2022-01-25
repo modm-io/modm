@@ -26,8 +26,8 @@ modm::gui::ButtonWidget::render(View* view)
 	ColorPalette cp = this->color_palette;
 
 	// position and dimensions
-	const uint16_t x = this->getPosition().x;
-	const uint16_t y = this->getPosition().y;
+	const uint16_t x = this->getPosition().x();
+	const uint16_t y = this->getPosition().y();
 	const uint16_t width = this->getWidth();
 	const uint16_t height = this->getHeight();
 
@@ -80,8 +80,8 @@ modm::gui::ArrowButton::render(View* view)
 	ColorPalette cp = this->color_palette;
 
 	// position and dimensions
-	const uint16_t x = this->getPosition().x;
-	const uint16_t y = this->getPosition().y;
+	const uint16_t x = this->getPosition().x();
+	const uint16_t y = this->getPosition().y();
 	const uint16_t width = this->getWidth();
 	const uint16_t height = this->getHeight();
 
@@ -130,8 +130,8 @@ modm::gui::FilledAreaButton::render(View* view)
 	modm::ColorGraphicDisplay* out = &view->display();
 
 	// position and dimensions
-	const uint16_t x = this->getPosition().x;
-	const uint16_t y = this->getPosition().y;
+	const uint16_t x = this->getPosition().x();
+	const uint16_t y = this->getPosition().y();
 	const uint16_t width = this->getWidth();
 	const uint16_t height = this->getHeight();
 
