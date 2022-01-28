@@ -109,7 +109,8 @@ def format(source, device_memories):
 
             if is_in_memory("rom"):
                 totals["rom"] += s["size"]
-                sections["rom"].append(s["name"])
+                if not ".build_id" in s["name"]:
+                    sections["rom"].append(s["name"])
             if is_in_memory("ram"):
                 totals["static"] += s["size"]
                 sections["static"].append(s["name"])

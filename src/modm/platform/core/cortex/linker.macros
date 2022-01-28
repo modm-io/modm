@@ -217,7 +217,10 @@ MAIN_STACK_SIZE = {{ options[":platform:cortex-m:main_stack_size"] }};
 		KEEP(*(.assertion))
 		. = ALIGN(4);
 		__assertion_table_end = .;
+	} >{{memory}}
 
+	.build_id :
+	{
 		__build_id = .;
 		KEEP(*(.note.gnu.build-id))
 	} >{{memory}}
