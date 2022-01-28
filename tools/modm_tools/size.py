@@ -116,7 +116,7 @@ def format(source, device_memories):
                 sections["static"].append(s["name"])
 
     # create lists of the used sections for Flash and RAM
-    sections["rom"] = sorted(sections["rom"])
+    sections["rom"] = sorted(list(set(sections["rom"])))
     sections["ram"] = sorted(list(set(sections["static"] + sections["stack"])))
     sections["heap"] = sorted(sections["heap"])
 
