@@ -20,11 +20,12 @@ def init(module):
     module.description = FileReader("module.md")
 
 def prepare(module, options):
-    if not (options[":target"].has_driver("usb") or
-            options[":target"].has_driver("usb_otg_fs") or
-            options[":target"].has_driver("usb_otg_hs") or
-            options[":target"].has_driver("udp") or
-            options[":target"].has_driver("uhp")):
+    device = options[":target"]
+    if not (device.has_driver("usb") or
+            device.has_driver("usb_otg_fs") or
+            device.has_driver("usb_otg_hs") or
+            device.has_driver("udp") or
+            device.has_driver("uhp")):
         return False
 
     configs = {"device.cdc", "device.msc", "device.vendor", "device.midi", "device.dfu"}
@@ -42,12 +43,15 @@ def prepare(module, options):
                               dependencies=lambda vs:
                                     [":tinyusb:{}".format(v.replace(".", ":")) for v in vs]))
 
-    if options[":target"].has_driver("usb_otg_hs"):
+    # Most devices only have FS=usb, some STM32 have FS/HS=usb_otg_fs/usb_otg_hs
+    # and some STM32 only have HS=usb_otg_hs, so we only define this option if
+    # there is a choice and default this to FS by default.
+    if device.has_driver("usb_otg_hs") and device.has_driver("usb_otg_fs"):
         module.add_option(
                 EnumerationOption(name="speed",
                                   description="USB Port Speed",
                                   enumeration={"full": "fs", "high": "hs"},
-                                  default="high" if options[":target"].has_driver("usb_otg_hs") else "full",
+                                  default="full",
                                   dependencies=lambda s: ":platform:usb:{}s".format(s[0])))
 
     module.add_submodule(TinyUsbDeviceModule())
@@ -121,7 +125,9 @@ def build(env):
 
     has_device = env.has_module(":tinyusb:device")
     has_host = env.has_module(":tinyusb:host")
-    speed = env.get("speed", "fs")
+    # On STM32 with both speeds, the option decides, otherwise we must default
+    # to HS for the few STM32 with *only* usb_otg_hs, all other devices are FS.
+    speed = env.get("speed", "hs" if env[":target"].has_driver("usb_otg_hs") else "fs")
     port = 0 if speed == "fs" else 1
 
     mode = None
