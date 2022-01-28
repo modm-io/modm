@@ -48,7 +48,7 @@ your application. */
 #define configCPU_CLOCK_HZ                      ( SystemCoreClock )
 #define configTICK_RATE_HZ                      ( {{ frequency }} )
 /* Memory allocation related definitions. */
-#define configSUPPORT_STATIC_ALLOCATION         {{ 0 if with_heap else 1 }}
+#define configSUPPORT_STATIC_ALLOCATION         1
 #define configSUPPORT_DYNAMIC_ALLOCATION        {{ 1 if with_heap else 0 }}
 // used by modm:platform:clock for modm::Clock::increment(): vApplicationTickHook()
 #define configUSE_TICK_HOOK                     1
