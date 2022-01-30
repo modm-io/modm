@@ -113,11 +113,16 @@ def build(env):
             tusb_config["CFG_TUSB_MCU"] = "OPT_MCU_RP2040"
             env.copy("tinyusb/src/portable/raspberrypi/rp2040/", "portable/raspberrypi/rp2040/")
 
+    # TinyUSB has a OS abstraction layer for FreeRTOS, but it is causes problems with modm
+    # if env.has_module(":freertos"):
+    #    tusb_config["CFG_TUSB_OS"] = "OPT_OS_FREERTOS"
+    #    env.copy("tinyusb/src/osal/osal_freertos.h", "osal/osal_freertos.h")
+
     if env.has_module(":freertos"):
-        tusb_config["CFG_TUSB_OS"] = "OPT_OS_FREERTOS"
-        env.copy("tinyusb/src/osal/osal_freertos.h", "osal/osal_freertos.h")
-    else:
-        env.copy("tinyusb/src/osal/osal_none.h", "osal/osal_none.h")
+        env.log.warning("TinyUSB in modm does not currently use the FreeRTOS abstraction layer"
+                        " and is not thread-safe with FreeRTOS threads.")
+
+    env.copy("tinyusb/src/osal/osal_none.h", "osal/osal_none.h")
 
     if env.has_module(":debug"):
         tusb_config["CFG_TUSB_DEBUG_PRINTF"] = "tinyusb_debug_printf"
