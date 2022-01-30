@@ -189,9 +189,9 @@ initialize()
 
 /// FIXME: USB does not work on this board.
 inline void
-initializeUsbFs()
+initializeUsbFs(uint8_t priority=3)
 {
-	usb::Device::initialize<SystemClock>();
+	usb::Device::initialize<SystemClock>(priority);
 	usb::Device::connect<usb::Dm::Dm, usb::Dp::Dp, usb::Id::Id>();
 	usb::Id::configure(Gpio::InputType::Floating);
 

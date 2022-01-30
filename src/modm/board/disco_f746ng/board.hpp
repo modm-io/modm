@@ -195,7 +195,7 @@ initialize()
 }
 
 inline void
-initializeUsbFs()
+initializeUsbFs(uint8_t priority=3)
 {
 	usb_fs::Device::initialize<SystemClock>();
 	usb_fs::Device::connect<usb_fs::Dm::Dm, usb_fs::Dp::Dp, usb_fs::Id::Id>();

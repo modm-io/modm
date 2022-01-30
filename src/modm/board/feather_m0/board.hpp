@@ -115,9 +115,9 @@ initialize()
 }
 
 inline void
-initializeUsbFs()
+initializeUsbFs(uint8_t priority=3)
 {
-	modm::platform::Usb::initialize<Board::SystemClock>();
+	modm::platform::Usb::initialize<Board::SystemClock>(priority);
 	modm::platform::Usb::connect<GpioA24::Dm, GpioA25::Dp>();
 }
 

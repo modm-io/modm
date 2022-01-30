@@ -141,9 +141,9 @@ initializeL3g()
 }
 
 inline void
-initializeUsbFs()
+initializeUsbFs(uint8_t priority=3)
 {
-	usb::Device::initialize<SystemClock>();
+	usb::Device::initialize<SystemClock>(priority);
 	usb::Device::connect<usb::Dm::Dm, usb::Dp::Dp>();
 }
 
