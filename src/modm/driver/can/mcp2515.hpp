@@ -143,7 +143,7 @@ namespace modm
 		isMessageAvailable();
 
 		static bool
-		getMessage(can::Message& message);
+		getMessage(can::Message& message, uint8_t *filter_id=nullptr);
 
 		/*
 		 * The CAN controller has a free slot to send a new message.
@@ -160,6 +160,15 @@ namespace modm
 		 */
 		static bool
 		sendMessage(const can::Message& message);
+
+		/*
+		 * Poll the transmit buffer (shoudl be called periodically) 
+		 *
+		 * \return true if a message was send this cycle, false otherwise
+		 */
+		static bool
+		update();
+
 
     public:
         // Extended Functionality
@@ -185,6 +194,18 @@ namespace modm
 			RX_STATUS = 0xB0,
 			BIT_MODIFY = 0x05
 		};
+
+		static void
+		mcp2515interrupt();
+
+		static bool
+		mcp2515readMessage(can::Message& message);
+
+		static bool
+		mcp2515isReadyToSend();
+
+		static bool
+		mcp2515sendMessage(const can::Message& message);
 
 		static void
 		writeRegister(uint8_t address, uint8_t data);

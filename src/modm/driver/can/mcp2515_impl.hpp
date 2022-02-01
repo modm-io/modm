@@ -16,14 +16,18 @@
 #ifndef MODM_MCP2515_HPP
 	#error	"Don't include this file directly, use 'mcp2515.hpp' instead!"
 #endif
-
 #include "mcp2515_bit_timings.hpp"
 #include "mcp2515_definitions.hpp"
+#include <modm/architecture/driver/atomic/queue.hpp>
 #include <modm/architecture/interface/assert.hpp>
-
+#include <modm/architecture/interface/interrupt.hpp>
+#include <modm/platform/exti/exti.hpp>
 
 #undef	MODM_LOG_LEVEL
 #define	MODM_LOG_LEVEL modm::log::DISABLED
+
+static modm::atomic::Queue<modm::can::Message, 32> txQueue;
+static modm::atomic::Queue<modm::can::Message, 32> rxQueue;
 
 // ----------------------------------------------------------------------------
 template <typename SPI, typename CS, typename INT>
@@ -119,6 +123,12 @@ modm::Mcp2515<SPI, CS, INT>::initialize()
 {
 	using Timings = modm::CanBitTimingMcp2515<externalClockFrequency, bitrate>;
 
+	// initialize interrrupt on INT pin
+
+	modm::platform::Exti::connect<INT>(modm::platform::Exti::Trigger::FallingEdge, [](uint8_t){
+		mcp2515interrupt();
+	});
+
 	return initializeWithPrescaler(
 		Timings::getPrescaler(),
 		Timings::getSJW(),
@@ -186,22 +196,73 @@ modm::Mcp2515<SPI, CS, INT>::setMode(Can::Mode mode)
 }
 
 // ----------------------------------------------------------------------------
+
 template <typename SPI, typename CS, typename INT>
 bool
 modm::Mcp2515<SPI, CS, INT>::isMessageAvailable()
 {
-	return !interruptPin.read();
+	return rxQueue.isNotEmpty();
+}
+
+template <typename SPI, typename CS, typename INT>
+bool
+modm::Mcp2515<SPI, CS, INT>::getMessage(can::Message& message, uint8_t* /*filter_id*/)
+{
+	if (rxQueue.isEmpty())
+	{
+		// no message in the receive buffer
+		return false;
+	}
+	else {
+        auto& rxMessage = rxQueue.get();
+		memcpy(&message, &rxMessage, sizeof(message));
+		rxQueue.pop();
+		return true;
+	}
 }
 
 // ----------------------------------------------------------------------------
 template <typename SPI, typename CS, typename INT>
 bool
-modm::Mcp2515<SPI, CS, INT>::getMessage(can::Message& message)
+modm::Mcp2515<SPI, CS, INT>::isReadyToSend()
 {
+	return txQueue.isNotFull();
+}
+
+// ----------------------------------------------------------------------------
+template <typename SPI, typename CS, typename INT>
+bool
+modm::Mcp2515<SPI, CS, INT>::sendMessage(const can::Message& message)
+{
+	if (not modm_assert_continue_ignore(txQueue.push(message), "mcp2515.can.tx",
+			"CAN transmit software buffer overflowed!", 1)) {
+		return false;
+	}
+	return true;
+}
+
+// ----------------------------------------------------------------------------
+template <typename SPI, typename CS, typename INT>
+void
+modm::Mcp2515<SPI, CS, INT>::mcp2515interrupt(){
+	using namespace mcp2515;
+
+	can::Message message;
+	bool success = mcp2515readMessage(message);
+	if(success){
+		modm_assert_continue_ignore(rxQueue.push(message), "mcp2515.can.rx.sw0",
+			"CAN receive software buffer overflowed!", 1);
+	}
+}
+
+template <typename SPI, typename CS, typename INT>
+bool
+modm::Mcp2515<SPI, CS, INT>::mcp2515readMessage(can::Message& message){
 	using namespace mcp2515;
 
 	uint8_t status = readStatus(RX_STATUS);
 	uint8_t address;
+
 	if (status & FLAG_RXB0_FULL) {
 		address = READ_RX;			// message in buffer 0
 	}
@@ -231,15 +292,33 @@ modm::Mcp2515<SPI, CS, INT>::getMessage(can::Message& message)
 
 	// RX0IF or RX1IF respectivly were already cleared automatically by rising CS.
 	// See section 12.4 in datasheet.
-
 	return true;
+}
+
+template <typename SPI, typename CS, typename INT>
+bool
+modm::Mcp2515<SPI, CS, INT>::update(){
+	/// todo
+	/// this should be a timer interrupt 
+	using namespace mcp2515;
+
+	bool hasSend = false;
+	/// check if device accepts messages and start emptying the transmit queue if not empty
+	if (txQueue.isNotEmpty())
+	{
+		if(mcp2515isReadyToSend()){
+			hasSend = mcp2515sendMessage(txQueue.get());
+			txQueue.pop();
+		}
+	}
+	return hasSend;
 }
 
 // ----------------------------------------------------------------------------
 
 template <typename SPI, typename CS, typename INT>
 bool
-modm::Mcp2515<SPI, CS, INT>::isReadyToSend()
+modm::Mcp2515<SPI, CS, INT>::mcp2515isReadyToSend()
 {
 	using namespace mcp2515;
 
@@ -258,7 +337,7 @@ modm::Mcp2515<SPI, CS, INT>::isReadyToSend()
 
 template <typename SPI, typename CS, typename INT>
 bool
-modm::Mcp2515<SPI, CS, INT>::sendMessage(const can::Message& message)
+modm::Mcp2515<SPI, CS, INT>::mcp2515sendMessage(const can::Message& message)
 {
 	using namespace mcp2515;
 
@@ -303,7 +382,7 @@ modm::Mcp2515<SPI, CS, INT>::sendMessage(const can::Message& message)
 	spi.transferBlocking(RTS | address);
 	chipSelect.set();
 
-	return address;
+	return static_cast<bool>(address);
 }
 
 // ----------------------------------------------------------------------------
