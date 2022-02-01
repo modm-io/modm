@@ -124,7 +124,6 @@ modm::Mcp2515<SPI, CS, INT>::initialize()
 	using Timings = modm::CanBitTimingMcp2515<externalClockFrequency, bitrate>;
 
 	// initialize interrrupt on INT pin
-
 	modm::platform::Exti::connect<INT>(modm::platform::Exti::Trigger::FallingEdge, [](uint8_t){
 		mcp2515interrupt();
 	});
@@ -146,8 +145,7 @@ modm::Mcp2515<SPI, CS, INT>::setFilter(accessor::Flash<uint8_t> filter)
 
 	// change to configuration mode
 	bitModify(CANCTRL, 0xe0, REQOP2);
-	while ((readRegister(CANSTAT) & 0xe0) != REQOP2)
-		;
+	while ((readRegister(CANSTAT) & 0xe0) != REQOP2);
 
 	writeRegister(RXB0CTRL, BUKT);
 	writeRegister(RXB1CTRL, 0);

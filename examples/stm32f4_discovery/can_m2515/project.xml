@@ -1,0 +1,18 @@
+<library>
+  <extends>modm:disco-f407vg</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/stm32f4_discovery/spi</option>
+  </options>
+  <modules>
+    <module>modm:platform:gpio</module>
+    <module>modm:platform:spi.bitbang</module>
+    <module>modm:platform:spi:2</module>
+    <module>modm:build:scons</module>
+
+
+    <module>modm:processing:protothread</module>
+    <module>modm:processing:timer</module>
+    <module>modm:driver:mcp2515</module>
+
+  </modules>
+</library>
