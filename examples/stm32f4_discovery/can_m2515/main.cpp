@@ -55,20 +55,21 @@ public:
 	run()
 	{
 		PT_BEGIN();
+
+		// send a new message
+		message_.length = 2;
+		message_.data[0] = 0xab;
+		message_.data[1] = 0xcd;
+		mcp2515.sendMessage(message_);
+
 		while (true)
 		{
-			// send a new message
-			message_.length = 2;
-			message_.data[0] = 0xab;
-			message_.data[1] = 0xcd;
-			mcp2515.sendMessage(message_);
-
 			if (mcp2515.isMessageAvailable())
 			{
 				mcp2515.getMessage(message_);
 				MODM_LOG_INFO << "Received message: " << message_.identifier << modm::endl;
 			}
-			mcp2515.update();
+			PT_CALL(mcp2515.update());
 		}
 		PT_END();
 	}

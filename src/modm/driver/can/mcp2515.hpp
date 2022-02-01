@@ -20,6 +20,9 @@
 #include <modm/architecture/interface/accessor.hpp>
 #include <modm/architecture/interface/delay.hpp>
 #include <modm/architecture/interface/can.hpp>
+#include <modm/processing/protothread.hpp>
+#include <modm/processing/resumable.hpp>
+#include <modm/processing/timer.hpp>
 #include <modm/debug/logger.hpp>
 
 #include "mcp2515_definitions.hpp"
@@ -115,7 +118,7 @@ namespace modm
 	template < typename SPI,
 			   typename CS,
 			   typename INT >
-    class Mcp2515 : public ::modm::Can
+    class Mcp2515 : public ::modm::Can, modm::NestedResumable<4>
 	{
 	public:
 		template<frequency_t ExternalClock, bitrate_t bitrate=kbps(125), percent_t tolerance=pct(1) >
@@ -158,7 +161,7 @@ namespace modm
 		 *
 		 * \return true if the message was send, false otherwise
 		 */
-		static bool
+		bool
 		sendMessage(const can::Message& message);
 
 		/*
@@ -166,7 +169,7 @@ namespace modm
 		 *
 		 * \return true if a message was send this cycle, false otherwise
 		 */
-		static bool
+		modm::ResumableResult<bool>
 		update();
 
 
@@ -201,11 +204,14 @@ namespace modm
 		static bool
 		mcp2515readMessage(can::Message& message);
 
-		static bool
+		bool
+		mcp2515isReadyToSend(uint8_t status);
+
+		modm::ResumableResult<bool>
 		mcp2515isReadyToSend();
 
-		static bool
-		mcp2515sendMessage(const can::Message& message);
+		modm::ResumableResult<bool>
+		mcp2515sendMessage(const can::Message& message, const uint8_t status = 0xff);
 
 		static void
 		writeRegister(uint8_t address, uint8_t data);
@@ -216,10 +222,13 @@ namespace modm
 		static void
 		bitModify(uint8_t address, uint8_t mask, uint8_t data);
 
-		static uint8_t
+		modm::ResumableResult<uint8_t>
 		readStatus(uint8_t type);
 
-		static inline void
+		static uint8_t
+		readStatusBlocking(uint8_t type);
+
+		inline modm::ResumableResult<void>
 		writeIdentifier(const uint32_t& identifier, bool isExtendedFrame);
 
 		static inline bool

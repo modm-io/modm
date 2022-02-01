@@ -32,6 +32,8 @@ def prepare(module, options):
         ":architecture:clock",
         ":architecture:delay",
         ":architecture:interrupt",
+        ":processing:protothread",
+        ":processing:timer",
         ":platform:exti",
         ":debug")
     return True
