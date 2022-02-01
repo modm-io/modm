@@ -68,6 +68,7 @@ public:
 				mcp2515.getMessage(message_);
 				MODM_LOG_INFO << "Received message: " << message_.identifier << modm::endl;
 			}
+			mcp2515.update();
 		}
 		PT_END();
 	}
