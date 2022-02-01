@@ -68,6 +68,9 @@ public:
 	static void
 	setMasterSelection(MasterSelection masterSelection);
 
+	static void
+	setPrescaler(Prescaler prescaler);
+
 %% if "fifo" in features
 	static void
 	setRxFifoThreshold(RxFifoThreshold threshold);

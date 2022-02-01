@@ -41,7 +41,11 @@ class SpiMaster{{ id }} : public modm::SpiMaster
 	static uint8_t state;
 	static uint8_t count;
 	static void *context;
-	static ConfigurationHandler configuration;
+
+	// HACK override handler type, for demo only
+	using ConfigurationHandler = void(*)(void*);
+
+	static inline ConfigurationHandler configuration;
 public:
 	using Hal = SpiHal{{ id }};
 
@@ -97,6 +101,19 @@ public:
 		// initialize the Spi
 		SpiHal{{ id }}::initialize(prescaler);
 		state = 0;
+	}
+
+	template< class SystemClock, baudrate_t baudrate, percent_t tolerance=pct(5) >
+	static void
+	setBaudrate()
+	{
+		constexpr auto result = modm::Prescaler::from_power(SystemClock::Spi{{ id }}, baudrate, 2, 256);
+		assertBaudrateInTolerance< result.frequency, baudrate, tolerance >();
+
+		// translate the prescaler into the bitmapping
+		constexpr SpiHal{{ id }}::Prescaler prescaler{result.index << SPI_CR1_BR_Pos};
+
+		SpiHal{{ id }}::setPrescaler(prescaler);
 	}
 
 	static modm_always_inline void

@@ -64,6 +64,12 @@ modm::platform::SpiHal{{ id }}::initialize(Prescaler prescaler,
 }
 
 void inline
+modm::platform::SpiHal{{ id }}::setPrescaler(Prescaler prescaler)
+{
+	SPI{{ id }}->CR1 = (SPI{{ id }}->CR1 & ~SPI_CR1_BR_Msk) | static_cast<uint32_t>(prescaler);
+}
+
+void inline
 modm::platform::SpiHal{{ id }}::setDataMode(DataMode dataMode)
 {
 	SPI{{ id }}->CR1 = (SPI{{ id }}->CR1 & ~static_cast<uint32_t>(DataMode::All))

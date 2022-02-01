@@ -30,25 +30,38 @@ namespace modm
 template < class SpiMaster >
 class SpiDevice
 {
-	Spi::ConfigurationHandler configuration;
+	Spi::ConfigurationHandler configuration{nullptr};
+	Spi::ConfigurationHandler userConfiguration{nullptr};
 
 public:
-	SpiDevice()
-	:	configuration(nullptr)
-	{
-	}
-
 	void inline
 	attachConfigurationHandler(Spi::ConfigurationHandler handler)
 	{
 		configuration = handler;
 	}
 
+	void inline
+	attachUserConfigurationHandler(Spi::ConfigurationHandler handler)
+	{
+		userConfiguration = handler;
+	}
+
+	inline Spi::ConfigurationHandler
+	configurationHandler() { return configuration; }
+
+	inline Spi::ConfigurationHandler
+	userConfigurationHandler() { return userConfiguration; }
+
 protected:
 	bool inline
 	acquireMaster()
 	{
-		return (SpiMaster::acquire(this, configuration) != 0);
+		const auto handler = +[](void* context) {
+			const auto& device = *static_cast<SpiDevice*>(context);
+			if (device.configuration) device.configuration();
+			if (device.userConfiguration) device.userConfiguration();
+		};
+		return (SpiMaster::acquire(this, handler) != 0);
 	}
 
 	bool inline
