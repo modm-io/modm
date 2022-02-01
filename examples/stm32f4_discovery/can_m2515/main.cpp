@@ -45,16 +45,16 @@ modm::Mcp2515<SpiMaster, Cs, Int> mcp2515;
 class MyTask : modm::pt::Protothread
 {
 public:
-	MyTask() : message_{0x123456}
-	{
-		mcp2515.initialize<8_MHz, 125_kbps>();
-		mcp2515.setFilter(modm::accessor::asFlash(canFilter));
-	}
+	MyTask() : message_{0x123456}{}
 
 	bool
 	run()
 	{
 		PT_BEGIN();
+
+		// Configure MCP2515 and set the filters
+		mcp2515.initialize<8_MHz, 125_kbps>();
+		mcp2515.setFilter(modm::accessor::asFlash(canFilter));
 
 		// send a new message
 		message_.length = 2;
@@ -94,8 +94,7 @@ main()
 	Cs::setOutput();
 	Int::setInput(Gpio::InputType::PullUp);
 
-	// Configure MCP2515 and set the filters
-	mcp2515.initialize<8_MHz, 125_kbps>();
-
-	while (true) { task.run(); }
+	while (true) {
+		task.run();
+	}
 }

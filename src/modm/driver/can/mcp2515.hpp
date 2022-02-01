@@ -199,19 +199,19 @@ namespace modm
 		};
 
 		static void
-		mcp2515interrupt();
+		mcp2515Interrupt();
 
-		static bool
-		mcp2515readMessage(can::Message& message);
+		modm::ResumableResult<bool>
+		mcp2515ReadMessage(can::Message& message, uint8_t status = 0xff);
 
 		bool
-		mcp2515isReadyToSend(uint8_t status);
+		mcp2515IsReadyToSend(uint8_t status);
 
 		modm::ResumableResult<bool>
-		mcp2515isReadyToSend();
+		mcp2515IsReadyToSend();
 
 		modm::ResumableResult<bool>
-		mcp2515sendMessage(const can::Message& message, const uint8_t status = 0xff);
+		mcp2515SendMessage(const can::Message& message, uint8_t status = 0xff);
 
 		static void
 		writeRegister(uint8_t address, uint8_t data);
@@ -225,13 +225,10 @@ namespace modm
 		modm::ResumableResult<uint8_t>
 		readStatus(uint8_t type);
 
-		static uint8_t
-		readStatusBlocking(uint8_t type);
-
 		inline modm::ResumableResult<void>
 		writeIdentifier(const uint32_t& identifier, bool isExtendedFrame);
 
-		static inline bool
+		inline modm::ResumableResult<bool>
 		readIdentifier(uint32_t& identifier);
 
 	protected:
