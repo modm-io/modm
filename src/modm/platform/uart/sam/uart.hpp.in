@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Erik Henriksson
+ * Copyright (c) 2021, Jeff McBride
  *
  * This file is part of the modm project.
  *
@@ -9,37 +9,29 @@
  */
 // ----------------------------------------------------------------------------
 
-%% set hal = "UartHal" ~ id
-%% set name = "Uart" ~ id
-
 #pragma once
 
-#include <modm/architecture/interface/uart.hpp>
 #include "uart_base.hpp"
-#include "uart_hal_{{ id }}.hpp"
-#include <modm/platform/gpio/pin.hpp>
+#include <modm/architecture/interface/uart.hpp>
+#include <modm/math/algorithm/prescaler.hpp>
+#include <modm/platform/gpio/connector.hpp>
+#include <modm/platform/clock/clockgen.hpp>
 
 namespace modm::platform
 {
 
 /**
- * Universal asynchronous receiver transmitter ({{ "Uart" | upper ~ id }})
+ * Universal synchronous asynchronous receiver transmitter (USART{{ id }})
  *
- * @author		Erik Henriksson
+ * @author		Jeff McBride
  * @ingroup		modm_platform_uart modm_platform_uart_{{id}}
  */
-class {{ name }} : public UartBase, public ::modm::Uart
+class Uart{{ id }} : public UartBase, public modm::Uart
 {
-
-	// Separate because that makes GCC print the template args.
-	template<class RxSignal, class TxSignal>
-	struct ValidateNotSame {
-		static_assert(
-			!std::is_same_v<RxSignal, TxSignal>,
-			"Rx and Tx cannot use the same signal!");
-	};
-
 public:
+	static constexpr size_t RxBufferSize = {{ options["buffer.rx"] }};
+	static constexpr size_t TxBufferSize = {{ options["buffer.tx"] }};
+
 	template< class... Pins >
 	static void
 	connect()
@@ -49,52 +41,66 @@ public:
 		static_assert(
 			!std::is_same_v<typename RxPin::Base, typename TxPin::Base>,
 			"Rx and Tx cannot use the same pin!");
-		using Sercom = Peripherals::Sercom<{{ id | int }}>;
-		using RxConnector = typename RxPin::template Connector<Sercom, Sercom::Pad<0>, Sercom::Pad<1>, Sercom::Pad<2>, Sercom::Pad<3>>;
-		using TxConnector = typename TxPin::template Connector<Sercom, Sercom::Pad<0>, Sercom::Pad<2>>;
-		ValidateNotSame<typename RxConnector::Signal, typename TxConnector::Signal> {};
+		using Flexcom = Peripherals::Flexcom<{{ id | int }}>;
+		using RxConnector = typename RxPin::template Connector<Flexcom, Flexcom::Rxd>;
+		using TxConnector = typename TxPin::template Connector<Flexcom, Flexcom::Txd>;
 		RxConnector::connect();
 		TxConnector::connect();
 	}
 
+
 	template< class SystemClock, baudrate_t baudrate, percent_t tolerance=pct(1) >
-	static void
-	initialize(Parity parity = Parity::Disabled)
+	static inline void
+	initialize(
+		Parity parity=Parity::Disabled,
+		WordLength length=WordLength::Bit8,
+		uint8_t irq_priority = 5)
 	{
-		{{ hal }}::initialize<SystemClock, baudrate, tolerance>(parity);
-		{{ hal }}::setTransmitterEnable(true);
-		{{ hal }}::setReceiverEnable(true);
+		ClockGen::enable<ClockPeripheral::Flexcom{{ id }}>();
+		FLEXCOM{{ id }}->FLEXCOM_MR = FLEXCOM_MR_OPMODE_USART;
+		constexpr auto result = Prescaler::from_function(
+			SystemClock::Mck,
+			baudrate,
+			1,
+			65535,
+			[](uint32_t x) { return x * 8; }
+			);
+
+		USART{{ id }}->US_BRGR = result.index;
+
+		// Use 8x oversampling (this affects baud rate generation)
+		USART{{ id }}->US_MR = US_MR_OVER;
+
+		setParity(parity);
+		setWordLength(length);
+
+		USART{{ id }}->US_CR = US_CR_RXEN | US_CR_TXEN;
+
+		// Enable the IRQ
+
+		NVIC_SetPriority(FLEXCOM{{ id }}_IRQn, irq_priority);
+		NVIC_EnableIRQ(FLEXCOM{{ id }}_IRQn);
 	}
 
-	static void
-	writeBlocking(uint8_t data);
+	static bool read(uint8_t &dataOut);
 
-	static void
-	writeBlocking(const uint8_t *data, std::size_t length);
+	static std::size_t read(uint8_t *data, std::size_t length);
 
-	static void
-	flushWriteBuffer();
+	static bool write(uint8_t data);
 
-	static bool
-	write(uint8_t data);
+	static std::size_t write(const uint8_t *data, std::size_t length);
 
-	static std::size_t
-	write(const uint8_t *data, std::size_t length);
+	static bool isWriteFinished();
 
-	static bool
-	isWriteFinished();
+	static void flushWriteBuffer();
 
-	static std::size_t
-	discardTransmitBuffer();
+	static void setParity(Parity parity);
 
-	static bool
-	read(uint8_t &data);
+	static void setWordLength(WordLength length);
 
-	static std::size_t
-	read(uint8_t *buffer, std::size_t length);
+	static inline bool isTransmitReady() { return USART{{ id }}->US_CSR & US_CSR_TXRDY; }
 
-	static std::size_t
-	discardReceiveBuffer();
+	static inline bool isReceiveReady() { return USART{{ id }}->US_CSR & US_CSR_RXRDY; }
 };
 
-}	// namespace modm::platform
+} // namespace modm::platform

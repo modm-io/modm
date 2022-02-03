@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2020, Erik Henriksson
+# Copyright (c) 2021, Jeff McBride
 #
 # This file is part of the modm project.
 #
@@ -22,30 +22,42 @@ class Instance(Module):
         module.description = "Instance {}".format(self.instance)
 
     def prepare(self, module, options):
+        module.depends(":platform:uart")
+
+        module.add_option(
+            NumericOption(
+                name="buffer.tx",
+                description="Size of transmit buffer",
+                minimum=1, maximum="64Ki-2",
+                default=64))
+        module.add_option(
+            NumericOption(
+                name="buffer.rx",
+                description="Size of receive buffer",
+                minimum=1, maximum="64Ki-2",
+                default=64))
+
         return True
 
     def build(self, env):
         device = env[":target"].identifier
         global props
         props["id"] = self.instance
-        props["sercom_name"] = self.driver["name"].capitalize()
 
         env.substitutions = props
         env.outbasepath = "modm/src/modm/platform/uart"
 
-        env.template("uart_hal.hpp.in", "uart_hal_{}.hpp".format(self.instance))
-        env.template("uart_hal_impl.hpp.in", "uart_hal_{}_impl.hpp".format(self.instance))
         env.template("uart.hpp.in", "uart_{}.hpp".format(self.instance))
         env.template("uart.cpp.in", "uart_{}.cpp".format(self.instance))
 
 
 def init(module):
     module.name = ":platform:uart"
-    module.description = "Universal Asynchronous Receiver Transmitter (UART)"
+    module.description = "Universal Synchronous Asynchronous Receiver Transmitter (UART)"
 
 def prepare(module, options):
     device = options[":target"]
-    if not (device.has_driver("sercom:sam")):
+    if not (device.has_driver("usart:samg*")):
         return False
 
     module.depends(
@@ -53,10 +65,10 @@ def prepare(module, options):
         ":math:algorithm",
         ":cmsis:device",
         ":platform:gpio",
-        ":platform:gclk")
+        ":platform:clockgen")
 
     global props
-    drivers = options[":target"].get_all_drivers("sercom")
+    drivers = options[":target"].get_all_drivers("usart")
     for driver in drivers:
         for instance in driver["instance"]:
             module.add_submodule(Instance(driver, instance))
@@ -68,4 +80,4 @@ def build(env):
     global props
     env.substitutions = props
     env.outbasepath = "modm/src/modm/platform/uart"
-    env.template("uart_base.hpp.in")
+    env.copy("uart_base.hpp")
