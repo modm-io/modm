@@ -53,6 +53,12 @@ public:
 		PT_BEGIN();
 
 		// Configure MCP2515 and set the filters
+		mcp2515.attachConfigurationHandler([]() {
+			SpiMaster::setDataMode(SpiMaster::DataMode::Mode0);
+			SpiMaster::setDataOrder(SpiMaster::DataOrder::MsbFirst);
+			/// @chris-durand
+			SpiMaster::setBaudrate<Board::SystemClock, 10_MHz>();
+		});
 		mcp2515.initialize<8_MHz, 125_kbps>();
 		mcp2515.setFilter(modm::accessor::asFlash(canFilter));
 
