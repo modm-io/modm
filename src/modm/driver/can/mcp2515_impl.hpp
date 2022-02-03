@@ -18,24 +18,13 @@
 #endif
 #include "mcp2515_bit_timings.hpp"
 #include "mcp2515_definitions.hpp"
-#include <modm/architecture/driver/atomic/queue.hpp>
 #include <modm/architecture/interface/assert.hpp>
 
 #undef	MODM_LOG_LEVEL
 #define	MODM_LOG_LEVEL modm::log::DISABLED
 
-static modm::atomic::Queue<modm::can::Message, 32> txQueue;
-static modm::atomic::Queue<modm::can::Message, 32> rxQueue;
 
 // ----------------------------------------------------------------------------
-template <typename SPI, typename CS, typename INT>
-SPI modm::Mcp2515<SPI, CS, INT>::spi;
-
-template <typename SPI, typename CS, typename INT>
-CS modm::Mcp2515<SPI, CS, INT>::chipSelect;
-
-template <typename SPI, typename CS, typename INT>
-INT modm::Mcp2515<SPI, CS, INT>::interruptPin;
 
 static uint8_t statusBuffer_;
 static uint8_t addressBuffer_;
@@ -81,6 +70,7 @@ modm::Mcp2515<SPI, CS, INT>::initializeWithPrescaler(
 
 	using namespace mcp2515;
 
+	while(!this->acquireMaster()){};
 	// software reset for the mcp2515, after this the chip is back in the
 	// configuration mode
 	chipSelect.reset();
@@ -101,7 +91,9 @@ modm::Mcp2515<SPI, CS, INT>::initializeWithPrescaler(
 	// enable interrupts
 	spi.transferBlocking(RX1IE | RX0IE);
 	chipSelect.set();
-
+	if(this->releaseMaster()){
+		chipSelect.set();
+	}
 	// set TXnRTS pins as inwrites
 	writeRegister(TXRTSCTRL, 0);
 
@@ -155,6 +147,7 @@ modm::Mcp2515<SPI, CS, INT>::setFilter(accessor::Flash<uint8_t> filter)
 	writeRegister(RXB0CTRL, BUKT);
 	writeRegister(RXB1CTRL, 0);
 
+	while(!this->acquireMaster()){};
 	uint8_t i, j;
 	for (i = 0; i < 0x30; i += 0x10)
 	{
@@ -171,7 +164,9 @@ modm::Mcp2515<SPI, CS, INT>::setFilter(accessor::Flash<uint8_t> filter)
 		}
 		chipSelect.set();
 	}
-
+	if(this->releaseMaster()){
+		chipSelect.set();
+	}
 	bitModify(CANCTRL, 0xe0, 0);
 }
 
@@ -271,6 +266,7 @@ modm::Mcp2515<SPI, CS, INT>::mcp2515ReadMessage(can::Message& message, uint8_t s
 
 	if(temp_)
 	{
+		RF_WAIT_UNTIL(this->acquireMaster());
 		chipSelect.reset();
 		RF_CALL(spi.transfer(addressBuffer_));
 
@@ -286,8 +282,9 @@ modm::Mcp2515<SPI, CS, INT>::mcp2515ReadMessage(can::Message& message, uint8_t s
 		for (i_ = 0; i_ < message.length; ++i_) {
 			message.data[i_] = RF_CALL(spi.transfer(0xff));
 		}
-		chipSelect.set();
-
+		if(this->releaseMaster()){
+			chipSelect.set();
+		}
 	}
 	// RX0IF or RX1IF respectivly were already cleared automatically by rising CS.
 	// See section 12.4 in datasheet.
@@ -396,6 +393,7 @@ modm::Mcp2515<SPI, CS, INT>::mcp2515SendMessage(const can::Message& message, uin
 
 	if (addressBuffer_ == 0x00 || addressBuffer_ == 0x02 || addressBuffer_ == 0x04)
 	{
+		RF_WAIT_UNTIL(this->acquireMaster());
 		chipSelect.reset();
 		RF_CALL(spi.transfer(WRITE_TX | addressBuffer_));
 		RF_CALL(writeIdentifier(message.identifier, message.flags.extended));
@@ -420,8 +418,11 @@ modm::Mcp2515<SPI, CS, INT>::mcp2515SendMessage(const can::Message& message, uin
 		chipSelect.reset();
 		addressBuffer_ = (addressBuffer_ == 0) ? 1 : addressBuffer_;  // 0 2 4 => 1 2 4
 		RF_CALL(spi.transfer(RTS | addressBuffer_));
-		chipSelect.set();
+		if(this->releaseMaster()){
+			chipSelect.set();
+		}
 	}
+
 	RF_END_RETURN(static_cast<bool>(addressBuffer_));
 }
 
@@ -431,27 +432,28 @@ template <typename SPI, typename CS, typename INT>
 void
 modm::Mcp2515<SPI, CS, INT>::writeRegister(uint8_t address, uint8_t data)
 {
+	while(!this->acquireMaster()){};
 	chipSelect.reset();
-
 	spi.transferBlocking(WRITE);
 	spi.transferBlocking(address);
 	spi.transferBlocking(data);
-
-	chipSelect.set();
+	if(this->releaseMaster()){
+		chipSelect.set();
+	}
 }
 
 template <typename SPI, typename CS, typename INT>
 uint8_t
 modm::Mcp2515<SPI, CS, INT>::readRegister(uint8_t address)
 {
+	while(!this->acquireMaster()){};
 	chipSelect.reset();
-
 	spi.transferBlocking(READ);
 	spi.transferBlocking(address);
 	uint8_t data = spi.transferBlocking(0xff);
-
-	chipSelect.set();
-
+	if(this->releaseMaster()){
+		chipSelect.set();
+	}
 	return data;
 }
 
@@ -459,14 +461,15 @@ template <typename SPI, typename CS, typename INT>
 void
 modm::Mcp2515<SPI, CS, INT>::bitModify(uint8_t address, uint8_t mask, uint8_t data)
 {
+	while(!this->acquireMaster()){};
 	chipSelect.reset();
-
 	spi.transferBlocking(BIT_MODIFY);
 	spi.transferBlocking(address);
 	spi.transferBlocking(mask);
 	spi.transferBlocking(data);
-
-	chipSelect.set();
+	if(this->releaseMaster()){
+		chipSelect.set();
+	}
 }
 
 template <typename SPI, typename CS, typename INT>
@@ -475,10 +478,13 @@ modm::Mcp2515<SPI, CS, INT>::readStatus(uint8_t type)
 {
 	RF_BEGIN();
 
+	RF_WAIT_UNTIL(this->acquireMaster());
 	chipSelect.reset();
 	dataBuffer_ = RF_CALL(spi.transfer(type));
 	RF_CALL(spi.transfer(0xff));
-	chipSelect.set();
+	if(this->releaseMaster()) {
+		chipSelect.set();
+	}
 
 	RF_END_RETURN(dataBuffer_);
 }
@@ -495,6 +501,7 @@ modm::Mcp2515<SPI, CS, INT>::writeIdentifier(const uint32_t& identifier,
 
 	RF_BEGIN();
 
+	RF_WAIT_UNTIL(this->acquireMaster());
 	if (isExtendedFrame)
 	{
 		RF_CALL(spi.transfer(*((uint16_t *)ptr + 1) >> 5));
@@ -513,6 +520,10 @@ modm::Mcp2515<SPI, CS, INT>::writeIdentifier(const uint32_t& identifier,
 		RF_CALL(spi.transfer(0));
 		RF_CALL(spi.transfer(0));
 	}
+	if(this->releaseMaster()) {
+		chipSelect.set();
+	}
+
 	RF_END();
 }
 
@@ -525,6 +536,7 @@ modm::Mcp2515<SPI, CS, INT>::readIdentifier(uint32_t &identifier)
 
 	RF_BEGIN();
 
+	RF_WAIT_UNTIL(this->acquireMaster());
 	a_ = RF_CALL(spi.transfer(0xff));
 	b_ = RF_CALL(spi.transfer(0xff));
 
@@ -553,6 +565,9 @@ modm::Mcp2515<SPI, CS, INT>::readIdentifier(uint32_t &identifier)
 		RF_CALL(spi.transfer(0xff));
 
 		*((uint8_t *)ptr) |= b_ >> 5;
+	}
+	if(this->releaseMaster()){
+		chipSelect.set();
 	}
 
 	RF_END_RETURN(temp2_);

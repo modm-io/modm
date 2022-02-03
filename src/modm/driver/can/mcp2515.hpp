@@ -20,6 +20,8 @@
 #include <modm/architecture/interface/accessor.hpp>
 #include <modm/architecture/interface/delay.hpp>
 #include <modm/architecture/interface/can.hpp>
+#include <modm/architecture/interface/spi_device.hpp>
+#include <modm/architecture/driver/atomic/queue.hpp>
 #include <modm/processing/protothread.hpp>
 #include <modm/processing/resumable.hpp>
 #include <modm/processing/timer.hpp>
@@ -118,15 +120,17 @@ namespace modm
 	template < typename SPI,
 			   typename CS,
 			   typename INT >
-    class Mcp2515 : public ::modm::Can, modm::NestedResumable<4>
+    class Mcp2515 : public ::modm::Can,
+					public ::modm::SpiDevice<SPI>,
+					protected ::modm::NestedResumable<4>
 	{
 	public:
 		template<frequency_t ExternalClock, bitrate_t bitrate=kbps(125), percent_t tolerance=pct(1) >
-		static inline bool
+		bool
 		initialize();
 
 	private:
-		static inline bool
+		bool
 		initializeWithPrescaler(
 			uint8_t prescaler,
 			uint8_t sjw,
@@ -135,17 +139,17 @@ namespace modm
 			uint8_t ps2);
 
 	public:
-		static void
+		void
 		setFilter(accessor::Flash<uint8_t> filter);
 
-		static void
+		void
 		setMode(Can::Mode mode);
 
 
-		static inline bool
+		inline bool
 		isMessageAvailable();
 
-		static bool
+		bool
 		getMessage(can::Message& message, uint8_t *filter_id=nullptr);
 
 		/*
@@ -153,7 +157,7 @@ namespace modm
 		 *
 		 * \return true if a slot is available, false otherwise
 		 */
-		static inline bool
+		bool
 		isReadyToSend();
 
 		/*
@@ -179,12 +183,12 @@ namespace modm
         /*
          * Fixme: Empty implementation, required by connector
          */
-        static BusState
+        BusState
         getBusState() {
             return BusState::Connected;
         }
 
-	protected:
+	private:
 		enum SpiCommand
 		{
 			RESET = 0xC0,
@@ -198,7 +202,7 @@ namespace modm
 			BIT_MODIFY = 0x05
 		};
 
-		static void
+		void
 		mcp2515Interrupt();
 
 		modm::ResumableResult<bool>
@@ -213,28 +217,31 @@ namespace modm
 		modm::ResumableResult<bool>
 		mcp2515SendMessage(const can::Message& message, uint8_t status = 0xff);
 
-		static void
+		void
 		writeRegister(uint8_t address, uint8_t data);
 
-		static uint8_t
+		uint8_t
 		readRegister(uint8_t address);
 
-		static void
+		void
 		bitModify(uint8_t address, uint8_t mask, uint8_t data);
 
 		modm::ResumableResult<uint8_t>
 		readStatus(uint8_t type);
 
-		inline modm::ResumableResult<void>
+		modm::ResumableResult<void>
 		writeIdentifier(const uint32_t& identifier, bool isExtendedFrame);
 
-		inline modm::ResumableResult<bool>
+		modm::ResumableResult<bool>
 		readIdentifier(uint32_t& identifier);
 
-	protected:
-		static SPI spi;
-		static CS chipSelect;
-		static INT interruptPin;
+	private:
+		modm::atomic::Queue<modm::can::Message, 32> txQueue;
+		modm::atomic::Queue<modm::can::Message, 32> rxQueue;
+
+		SPI spi;
+		CS chipSelect;
+		INT interruptPin;
 	};
 }
 
