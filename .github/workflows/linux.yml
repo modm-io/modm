@@ -100,7 +100,7 @@ jobs:
       - name: Examples SAMV Devices
         if: always()
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py samv)
+          (cd examples && ../tools/scripts/examples_compile.py samv samv71_xplained_ultra)
       - name: Examples RP20 Devices
         if: always()
         run: |
