@@ -22,7 +22,7 @@
 
 // Set the log level
 #undef MODM_LOG_LEVEL
-#define MODM_LOG_LEVEL modm::log::DISABLED
+#define MODM_LOG_LEVEL modm::log::DEBUG
 
 // If you use a different SPI instance, you may have to also choose different
 // GPIOs to connect to.
