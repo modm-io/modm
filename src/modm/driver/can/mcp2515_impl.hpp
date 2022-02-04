@@ -123,6 +123,11 @@ bool
 modm::Mcp2515<SPI, CS, INT>::initialize()
 {
 	using Timings = modm::CanBitTimingMcp2515<externalClockFrequency, bitrate>;
+	
+	this->attachConfigurationHandler([]() {
+		SpiMaster::setDataMode(SpiMaster::DataMode::Mode3);
+		SpiMaster::setDataOrder(SpiMaster::DataOrder::MsbFirst);
+	});
 
 	return initializeWithPrescaler(
 		Timings::getPrescaler(),

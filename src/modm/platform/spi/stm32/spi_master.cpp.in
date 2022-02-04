@@ -27,6 +27,8 @@ modm::platform::SpiMaster{{ id }}::count(0);
 void *
 modm::platform::SpiMaster{{ id }}::context(nullptr);
 
+modm::Spi::ConfigurationHandler
+modm::platform::SpiMaster{{ id }}::configuration(nullptr);
 // ----------------------------------------------------------------------------
 
 uint8_t
@@ -39,7 +41,7 @@ modm::platform::SpiMaster{{ id }}::acquire(void *ctx, ConfigurationHandler handl
 		// if handler is not nullptr and is different from previous configuration
 		if (handler and configuration != handler) {
 			configuration = handler;
-			configuration(ctx);
+			configuration();
 		}
 		return 1;
 	}
