@@ -10,7 +10,17 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-props = {}
+def _get_properties(env, instance=None):
+    device = env[":target"]
+    peripheral = "Flexcom" if device.has_driver("flexcom") else "Usart"
+    return {
+        "type" : "usart",
+        "peripheral" : peripheral,
+        "id" : instance,
+        "prefix" : "US",
+        "sr" : "CSR"
+    }
+
 
 class Instance(Module):
     def __init__(self, driver, instance):
@@ -22,42 +32,39 @@ class Instance(Module):
         module.description = "Instance {}".format(self.instance)
 
     def prepare(self, module, options):
-        module.depends(":platform:uart")
+        module.depends(":platform:usart")
 
         module.add_option(
             NumericOption(
                 name="buffer.tx",
                 description="Size of transmit buffer",
-                minimum=1, maximum="64Ki-2",
+                minimum=1, maximum=2 ** 16 - 2,
                 default=64))
         module.add_option(
             NumericOption(
                 name="buffer.rx",
                 description="Size of receive buffer",
-                minimum=1, maximum="64Ki-2",
+                minimum=1, maximum=2 ** 16 - 2,
                 default=64))
 
         return True
 
     def build(self, env):
-        device = env[":target"].identifier
-        global props
-        props["id"] = self.instance
+        env.substitutions = _get_properties(env, self.instance)
+        env.outbasepath = "modm/src/modm/platform/usart"
 
-        env.substitutions = props
-        env.outbasepath = "modm/src/modm/platform/uart"
-
-        env.template("uart.hpp.in", "uart_{}.hpp".format(self.instance))
-        env.template("uart.cpp.in", "uart_{}.cpp".format(self.instance))
+        env.template("../uart.hpp.in", "usart_{}.hpp".format(self.instance))
+        env.template("../uart.cpp.in", "usart_{}.cpp".format(self.instance))
 
 
 def init(module):
-    module.name = ":platform:uart"
-    module.description = "Universal Synchronous Asynchronous Receiver Transmitter (UART)"
+    module.name = ":platform:usart"
+    module.description = "Universal Synchronous Asynchronous Receiver Transmitter (USART)"
+
 
 def prepare(module, options):
     device = options[":target"]
-    if not (device.has_driver("usart:samg*")):
+    if (not device.has_driver("usart:sam*")) or device.has_driver("sercom:sam"):
         return False
 
     module.depends(
@@ -67,17 +74,15 @@ def prepare(module, options):
         ":platform:gpio",
         ":platform:clockgen")
 
-    global props
     drivers = options[":target"].get_all_drivers("usart")
     for driver in drivers:
         for instance in driver["instance"]:
             module.add_submodule(Instance(driver, instance))
 
-    props["target"] = device.identifier
     return True
 
+
 def build(env):
-    global props
-    env.substitutions = props
-    env.outbasepath = "modm/src/modm/platform/uart"
-    env.copy("uart_base.hpp")
+    env.substitutions = _get_properties(env)
+    env.outbasepath = "modm/src/modm/platform/usart"
+    env.template("../uart_base.hpp.in", "usart_base.hpp")

@@ -39,6 +39,8 @@ struct SystemClock
 	static constexpr uint32_t Pck6 = Mck;
 	static constexpr uint32_t Pck7 = Mck;
 
+	static constexpr uint32_t Usart7 = Mck;
+
 	static bool inline
 	enable()
 	{
@@ -62,7 +64,7 @@ struct SystemClock
 
 using Led = GpioA6;
 using Button = GpioA2;
-using DebugUart = Uart7;
+using DebugUart = Usart7;
 using TxPin = GpioA28;
 using RxPin = GpioA27;
 

@@ -16,7 +16,7 @@ namespace modm::platform
 {
 
 /// @ingroup modm_platform_uart
-class UartBase
+class {{type}}Base
 {
 public:
     enum class Parity : uint32_t
@@ -29,6 +29,7 @@ public:
         MultiDrop	= US_MR_PAR_MULTIDROP
     };
 
+%% if type == "usart"
     enum class WordLength : uint32_t
     {
         Bit5 = 0,
@@ -37,6 +38,7 @@ public:
         Bit8,
         Bit9
     };
+%% endif
 };
 
 } // namespace modm::platform

@@ -106,6 +106,7 @@ def hal_get_modules():
                 "flash": "Internal Flash",
                 "timer": "Timer",
                 "i2c": "I<sup>2</sup>C",
+                "usart": "UART"
             }
             mname = remap.get(mname, mname.upper())
             modules.add(mname)
