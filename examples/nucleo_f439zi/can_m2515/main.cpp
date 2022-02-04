@@ -67,9 +67,9 @@ public:
 			SpiMaster::setDataMode(SpiMaster::DataMode::Mode3);
 			SpiMaster::setDataOrder(SpiMaster::DataOrder::MsbFirst);
 			/// @chris-durand
-			// SpiMaster::setBaudrate<Board::SystemClock, 5_MHz>();
+			SpiMaster::setBaudrate<Board::SystemClock, 5_MHz>();
 		});
-		initialized_ = mcp2515.initialize<8_MHz, 125_kbps>();
+		initialized_ = mcp2515.initialize<8_MHz, 500_kbps>();
 		MODM_LOG_INFO << "Success: " << initialized_ << modm::endl;
 		mcp2515.setFilter(modm::accessor::asFlash(canFilter));
 		MODM_LOG_INFO << "Running ... " << modm::endl;
