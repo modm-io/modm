@@ -202,9 +202,6 @@ namespace modm
 			BIT_MODIFY = 0x05
 		};
 
-		void
-		mcp2515Interrupt();
-
 		modm::ResumableResult<bool>
 		mcp2515ReadMessage(can::Message& message, uint8_t status = 0xff);
 
