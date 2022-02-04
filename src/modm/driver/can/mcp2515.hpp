@@ -169,7 +169,7 @@ namespace modm
 		sendMessage(const can::Message& message);
 
 		/*
-		 * Poll the transmit buffer (shoudl be called periodically) 
+		 * Poll the transmit buffer (should be called periodically)
 		 *
 		 * \return true if a message was send this cycle, false otherwise
 		 */

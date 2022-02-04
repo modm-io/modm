@@ -293,8 +293,6 @@ modm::Mcp2515<SPI, CS, INT>::mcp2515ReadMessage(can::Message& message, uint8_t s
 template <typename SPI, typename CS, typename INT>
 modm::ResumableResult<bool>
 modm::Mcp2515<SPI, CS, INT>::update(){
-	/// todo
-	/// this should be a timer interrupt 
 	using namespace mcp2515;
 
 	RF_BEGIN();
