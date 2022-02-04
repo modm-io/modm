@@ -35,7 +35,6 @@ def prepare(module, options):
         ":architecture:spi.device",
         ":processing:protothread",
         ":processing:timer",
-        ":platform:exti",
         ":debug")
     return True
 

@@ -242,6 +242,17 @@ namespace modm
 		SPI spi;
 		CS chipSelect;
 		INT interruptPin;
+
+		uint8_t statusBuffer_;
+		uint8_t addressBuffer_;
+		modm::can::Message messageBuffer_;
+		uint8_t i_;
+		uint8_t a_;
+		uint8_t b_;
+		bool temp_;
+		bool temp2_;
+		bool hasSend_;
+		modm::ShortTimeout delay_;
 	};
 }
 

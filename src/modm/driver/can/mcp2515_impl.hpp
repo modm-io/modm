@@ -26,19 +26,6 @@
 
 // ----------------------------------------------------------------------------
 
-static uint8_t statusBuffer_;
-static uint8_t addressBuffer_;
-static modm::can::Message messageBuffer_;
-static uint8_t i_;
-static uint8_t a_;
-static uint8_t b_;
-static bool temp_;
-static bool temp2_;
-static bool hasSend_;
-static modm::ShortTimeout delay_;
-
-// ----------------------------------------------------------------------------
-
 template <typename SPI, typename CS, typename INT>
 bool
 modm::Mcp2515<SPI, CS, INT>::initializeWithPrescaler(
@@ -123,10 +110,10 @@ bool
 modm::Mcp2515<SPI, CS, INT>::initialize()
 {
 	using Timings = modm::CanBitTimingMcp2515<externalClockFrequency, bitrate>;
-	
+
 	this->attachConfigurationHandler([]() {
-		SpiMaster::setDataMode(SpiMaster::DataMode::Mode3);
-		SpiMaster::setDataOrder(SpiMaster::DataOrder::MsbFirst);
+		SPI::setDataMode(SPI::DataMode::Mode3);
+		SPI::setDataOrder(SPI::DataOrder::MsbFirst);
 	});
 
 	return initializeWithPrescaler(

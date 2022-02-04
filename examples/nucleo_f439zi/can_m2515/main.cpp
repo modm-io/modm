@@ -14,8 +14,8 @@
 #include <modm/board.hpp>
 #include <modm/platform/spi/spi_master_1.hpp>
 #include <modm/platform/spi/spi_master_2.hpp>
-#include <modm/driver/can/mcp2515.hpp>
 #include <modm/processing/protothread.hpp>
+#include <modm/driver/can/mcp2515.hpp>
 
 
 #define SENDER 0
