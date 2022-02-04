@@ -120,9 +120,9 @@ namespace modm
 	template < typename SPI,
 			   typename CS,
 			   typename INT >
-    class Mcp2515 : public ::modm::Can,
-					public ::modm::SpiDevice<SPI>,
-					protected ::modm::NestedResumable<4>
+    class Mcp2515 : public modm::Can,
+					public modm::SpiDevice<SPI>,
+					protected modm::NestedResumable<4>
 	{
 	public:
 		template<frequency_t ExternalClock, bitrate_t bitrate=kbps(125), percent_t tolerance=pct(1) >

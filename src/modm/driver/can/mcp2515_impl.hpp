@@ -20,15 +20,14 @@
 #include "mcp2515_definitions.hpp"
 #include <modm/architecture/interface/assert.hpp>
 
-#undef	MODM_LOG_LEVEL
-#define	MODM_LOG_LEVEL modm::log::DISABLED
-
+// Set the log level
+#undef MODM_LOG_LEVEL
+#define MODM_LOG_LEVEL modm::log::DISABLED
 
 // ----------------------------------------------------------------------------
 
 static uint8_t statusBuffer_;
 static uint8_t addressBuffer_;
-static uint8_t dataBuffer_;
 static modm::can::Message messageBuffer_;
 static uint8_t i_;
 static uint8_t a_;
@@ -142,8 +141,8 @@ modm::Mcp2515<SPI, CS, INT>::setFilter(accessor::Flash<uint8_t> filter)
 
 	// change to configuration mode
 	bitModify(CANCTRL, 0xe0, REQOP2);
-	while ((readRegister(CANSTAT) & 0xe0) != REQOP2);
 
+	while ((readRegister(CANSTAT) & 0xe0) != REQOP2);
 	writeRegister(RXB0CTRL, BUKT);
 	writeRegister(RXB1CTRL, 0);
 
@@ -480,13 +479,13 @@ modm::Mcp2515<SPI, CS, INT>::readStatus(uint8_t type)
 
 	RF_WAIT_UNTIL(this->acquireMaster());
 	chipSelect.reset();
-	dataBuffer_ = RF_CALL(spi.transfer(type));
+	statusBuffer_ = RF_CALL(spi.transfer(type));
 	RF_CALL(spi.transfer(0xff));
 	if(this->releaseMaster()) {
 		chipSelect.set();
 	}
 
-	RF_END_RETURN(dataBuffer_);
+	RF_END_RETURN(statusBuffer_);
 }
 
 // ----------------------------------------------------------------------------
