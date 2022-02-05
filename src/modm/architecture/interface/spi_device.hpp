@@ -27,7 +27,7 @@ namespace modm
  * @author	Niklas Hauser
  * @ingroup modm_architecture_spi_device
  */
-template < class SpiMaster, SpiConfiguration config >
+template < class SpiMaster, SpiConfiguration<SpiMaster> config >
 class SpiDevice
 {
 	Spi::ConfigurationHandler configuration;
