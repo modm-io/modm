@@ -27,7 +27,7 @@ namespace modm
  * @author	Niklas Hauser
  * @ingroup modm_architecture_spi_device
  */
-template < class SpiMaster >
+template < class SpiMaster, SpiConfiguration config >
 class SpiDevice
 {
 	Spi::ConfigurationHandler configuration;
@@ -44,6 +44,12 @@ public:
 		configuration = handler;
 	}
 
+	void inline
+	configureBus()
+	{
+		SpiMaster::setDataMode(config.dataMode);
+		SpiMaster::setDataOrder(config.dataOrder);
+	}
 protected:
 	bool inline
 	acquireMaster()
