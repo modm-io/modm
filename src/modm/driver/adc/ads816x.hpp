@@ -85,9 +85,10 @@ struct ads816x
 		ResultChannelStatus	= (0b10 << 4),
 		//Reserved			= (0b11 << 4),
 	};
-
-	static constexpr SpiConfiguration spiConfig{Spi::DataMode::Mode0, Spi::DataOrder::MsbFirst};
 };
+
+template<typename SpiMaster>
+constexpr auto Ads816xSpiConfig = SpiConfiguration<SpiMaster>{SpiMaster::DataMode::Mode0, SpiMaster::DataOrder::MsbFirst};
 
 /**
  * @tparam	SpiMaster	SpiMaster interface
@@ -97,7 +98,9 @@ struct ads816x
  * @ingroup modm_driver_ads816x
  */
 template <typename SpiMaster, typename Cs>
-class Ads816x : public ads816x, public modm::SpiDevice<SpiMaster, ads816x::spiConfig>, protected modm::NestedResumable<3>
+class Ads816x : public ads816x,
+				public modm::SpiDevice<SpiMaster, Ads816xSpiConfig<SpiMaster>>,
+				protected modm::NestedResumable<3>
 {
 public:
 	Ads816x() = default;

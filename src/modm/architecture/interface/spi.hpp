@@ -46,10 +46,11 @@ struct Spi
 	};
 };
 
+template <typename SpiMaster>
 struct SpiConfiguration
 {
-	Spi::DataMode dataMode{};
-	Spi::DataOrder dataOrder{};
+	SpiMaster::DataMode dataMode{};
+	SpiMaster::DataOrder dataOrder{};
 
 	constexpr auto operator<=>(const SpiConfiguration&) const = default;
 };
