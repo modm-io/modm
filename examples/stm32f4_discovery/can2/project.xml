@@ -1,5 +1,5 @@
 <library>
-  <extends>modm:disco-f407vg</extends>
+  <extends>modm:nucleo-f439zi</extends>
   <options>
     <option name="modm:build:build.path">../../../build/stm32f4_discovery/can2</option>
     <option name="modm:platform:uart:2:buffer.tx">2048</option>

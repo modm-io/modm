@@ -24,15 +24,6 @@
  * Tested in hardware (F4) on 2018-08-16 by Sebastian Birke.
  */
 
-// Create an IODeviceWrapper around the Uart Peripheral we want to use
-modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice;
-
-// Set all four logger streams to use the UART
-modm::log::Logger modm::log::debug(loggerDevice);
-modm::log::Logger modm::log::info(loggerDevice);
-modm::log::Logger modm::log::warning(loggerDevice);
-modm::log::Logger modm::log::error(loggerDevice);
-
 // Set the log level
 #undef	MODM_LOG_LEVEL
 #define	MODM_LOG_LEVEL modm::log::DEBUG
@@ -75,16 +66,12 @@ main()
 
 	Board::LedGreen::set();
 
-	// Initialize Usart
-	Usart2::connect<GpioOutputA2::Tx>();
-	Usart2::initialize<Board::SystemClock, 115200_Bd>();
-
 	MODM_LOG_INFO << "CAN Test Program" << modm::endl;
 
 	MODM_LOG_INFO << "Initializing Can ..." << modm::endl;
 	// Initialize Can
-	Can1::connect<GpioInputB8::Rx, GpioOutputB9::Tx>(Gpio::InputType::PullUp);
-	Can1::initialize<Board::SystemClock, 125_kbps>(9);
+	Can1::connect<GpioD1::Tx, GpioD0::Rx>(Gpio::InputType::PullUp);
+	bool success = Can1::initialize<Board::SystemClock, 1_Mbps>(9);
 
 	MODM_LOG_INFO << "Setting up Filter for Can ..." << modm::endl;
 	// Receive every message

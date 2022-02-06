@@ -125,7 +125,7 @@ namespace modm
 					protected modm::NestedResumable<4>
 	{
 	public:
-		Mcp2515(){
+		Mcp2515() : messageBuffer_{}, delay_{} {
 			this->attachConfigurationHandler([]() {
 				SPI::setDataMode(SPI::DataMode::Mode3);
 				SPI::setDataOrder(SPI::DataOrder::MsbFirst);
@@ -210,7 +210,7 @@ namespace modm
 		};
 
 		modm::ResumableResult<bool>
-		mcp2515ReadMessage(can::Message& message, uint8_t status = 0xff);
+		mcp2515ReadMessage(uint8_t status = 0xff);
 
 		bool
 		mcp2515IsReadyToSend(uint8_t status);
@@ -247,16 +247,17 @@ namespace modm
 		static CS chipSelect;
 		static INT interruptPin;
 
-		uint8_t statusBuffer_;
-		uint8_t addressBuffer_;
 		modm::can::Message messageBuffer_;
-		uint8_t i_;
-		uint8_t a_;
-		uint8_t b_;
-		bool temp_;
-		bool temp2_;
-		bool hasSend_;
 		modm::ShortTimeout delay_;
+		uint8_t statusBuffer_ = 0;
+		uint8_t addressBuffer_ = 0;
+		uint8_t i_, j_ = 0;
+		uint8_t a_ = 0;
+		uint8_t b_ = 0;
+		uint8_t data_ = 0;
+		bool temp_ = false;
+		bool temp2_ = false;
+		bool hasSend_ = false;
 	};
 }
 

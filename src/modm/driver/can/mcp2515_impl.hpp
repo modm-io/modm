@@ -225,7 +225,7 @@ modm::Mcp2515<SPI, CS, INT>::sendMessage(const can::Message& message)
 // ----------------------------------------------------------------------------
 template <typename SPI, typename CS, typename INT>
 modm::ResumableResult<bool>
-modm::Mcp2515<SPI, CS, INT>::mcp2515ReadMessage(can::Message& message, uint8_t status)
+modm::Mcp2515<SPI, CS, INT>::mcp2515ReadMessage(uint8_t status)
 {
 	using namespace mcp2515;
 
@@ -253,17 +253,18 @@ modm::Mcp2515<SPI, CS, INT>::mcp2515ReadMessage(can::Message& message, uint8_t s
 		chipSelect.reset();
 		RF_CALL(spi.transfer(addressBuffer_));
 
-		message.flags.extended = RF_CALL(readIdentifier(message.identifier));
+		messageBuffer_.flags.extended = RF_CALL(readIdentifier(messageBuffer_.identifier));
 		if (status & FLAG_RTR) {
-			message.flags.rtr = true;
+			messageBuffer_.flags.rtr = true;
 		}
 		else {
-			message.flags.rtr = false;
+			messageBuffer_.flags.rtr = false;
 		}
-		message.length = RF_CALL(spi.transfer(0xff)) & 0x0f;
+		messageBuffer_.length = RF_CALL(spi.transfer(0xff)) & 0x0f;
 
-		for (i_ = 0; i_ < message.length; ++i_) {
-			message.data[i_] = RF_CALL(spi.transfer(0xff));
+		for (j_ = 0; j_ < messageBuffer_.length; ++j_) {
+			data_ = RF_CALL(spi.transfer(0xff));
+			messageBuffer_.data[j_] = data_;
 		}
 		if(this->releaseMaster()){
 			chipSelect.set();
@@ -287,7 +288,7 @@ modm::Mcp2515<SPI, CS, INT>::update(){
 	// check if the device has received a message(pin = LOW)
 	// if yes: read it and put it into the rxQueue
 	if(!interruptPin.read()){
-		if(RF_CALL(mcp2515ReadMessage(messageBuffer_, statusBuffer_)))
+		if(RF_CALL(mcp2515ReadMessage(statusBuffer_)))
 		{
 			if(not modm_assert_continue_ignore(rxQueue.push(messageBuffer_), "mcp2515.can.tx",
 			"CAN transmit software buffer overflowed!", 1)){
