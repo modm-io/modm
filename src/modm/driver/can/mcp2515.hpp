@@ -125,12 +125,19 @@ namespace modm
 					protected modm::NestedResumable<4>
 	{
 	public:
+		Mcp2515(){
+			this->attachConfigurationHandler([]() {
+				SPI::setDataMode(SPI::DataMode::Mode3);
+				SPI::setDataOrder(SPI::DataOrder::MsbFirst);
+			});
+		}
+
 		template<frequency_t ExternalClock, bitrate_t bitrate=kbps(125), percent_t tolerance=pct(1) >
-		bool
+		static bool
 		initialize();
 
 	private:
-		bool
+		static bool
 		initializeWithPrescaler(
 			uint8_t prescaler,
 			uint8_t sjw,
@@ -146,10 +153,10 @@ namespace modm
 		setMode(Can::Mode mode);
 
 
-		inline bool
+		static inline bool
 		isMessageAvailable();
 
-		bool
+		static bool
 		getMessage(can::Message& message, uint8_t *filter_id=nullptr);
 
 		/*
@@ -157,7 +164,7 @@ namespace modm
 		 *
 		 * \return true if a slot is available, false otherwise
 		 */
-		bool
+		static bool
 		isReadyToSend();
 
 		/*
@@ -165,7 +172,7 @@ namespace modm
 		 *
 		 * \return true if the message was send, false otherwise
 		 */
-		bool
+		static bool
 		sendMessage(const can::Message& message);
 
 		/*
@@ -214,10 +221,10 @@ namespace modm
 		modm::ResumableResult<bool>
 		mcp2515SendMessage(const can::Message& message, uint8_t status = 0xff);
 
-		void
+		static void
 		writeRegister(uint8_t address, uint8_t data);
 
-		uint8_t
+		static uint8_t
 		readRegister(uint8_t address);
 
 		void
@@ -233,12 +240,12 @@ namespace modm
 		readIdentifier(uint32_t& identifier);
 
 	private:
-		modm::atomic::Queue<modm::can::Message, 32> txQueue;
-		modm::atomic::Queue<modm::can::Message, 32> rxQueue;
+		inline static modm::atomic::Queue<modm::can::Message, 32> txQueue;
+		inline static modm::atomic::Queue<modm::can::Message, 32> rxQueue;
 
-		SPI spi;
-		CS chipSelect;
-		INT interruptPin;
+		static SPI spi;
+		static CS chipSelect;
+		static INT interruptPin;
 
 		uint8_t statusBuffer_;
 		uint8_t addressBuffer_;

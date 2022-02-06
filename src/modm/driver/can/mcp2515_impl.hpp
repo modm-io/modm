@@ -56,7 +56,6 @@ modm::Mcp2515<SPI, CS, INT>::initializeWithPrescaler(
 
 	using namespace mcp2515;
 
-	while(!this->acquireMaster()){};
 	// software reset for the mcp2515, after this the chip is back in the
 	// configuration mode
 	chipSelect.reset();
@@ -77,9 +76,7 @@ modm::Mcp2515<SPI, CS, INT>::initializeWithPrescaler(
 	// enable interrupts
 	spi.transferBlocking(RX1IE | RX0IE);
 	chipSelect.set();
-	if(this->releaseMaster()){
-		chipSelect.set();
-	}
+
 	// set TXnRTS pins as inwrites
 	writeRegister(TXRTSCTRL, 0);
 
@@ -110,11 +107,6 @@ bool
 modm::Mcp2515<SPI, CS, INT>::initialize()
 {
 	using Timings = modm::CanBitTimingMcp2515<externalClockFrequency, bitrate>;
-
-	this->attachConfigurationHandler([]() {
-		SPI::setDataMode(SPI::DataMode::Mode3);
-		SPI::setDataOrder(SPI::DataOrder::MsbFirst);
-	});
 
 	return initializeWithPrescaler(
 		Timings::getPrescaler(),
@@ -421,28 +413,22 @@ template <typename SPI, typename CS, typename INT>
 void
 modm::Mcp2515<SPI, CS, INT>::writeRegister(uint8_t address, uint8_t data)
 {
-	while(!this->acquireMaster()){};
 	chipSelect.reset();
 	spi.transferBlocking(WRITE);
 	spi.transferBlocking(address);
 	spi.transferBlocking(data);
-	if(this->releaseMaster()){
-		chipSelect.set();
-	}
+	chipSelect.set();
 }
 
 template <typename SPI, typename CS, typename INT>
 uint8_t
 modm::Mcp2515<SPI, CS, INT>::readRegister(uint8_t address)
 {
-	while(!this->acquireMaster()){};
 	chipSelect.reset();
 	spi.transferBlocking(READ);
 	spi.transferBlocking(address);
 	uint8_t data = spi.transferBlocking(0xff);
-	if(this->releaseMaster()){
-		chipSelect.set();
-	}
+	chipSelect.set();
 	return data;
 }
 
