@@ -56,7 +56,7 @@ def prepare(module, options):
 
     module.add_submodule(TinyUsbDeviceModule())
     module.add_submodule(TinyUsbHostModule())
-    module.depends(":cmsis:device", ":architecture:interrupt", ":platform:usb")
+    module.depends(":cmsis:device", ":architecture:atomic", ":architecture:interrupt", ":platform:usb")
     return True
 
 
