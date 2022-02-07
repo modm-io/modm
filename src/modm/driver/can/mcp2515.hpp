@@ -125,7 +125,7 @@ namespace modm
 					protected modm::NestedResumable<4>
 	{
 	public:
-		Mcp2515() : messageBuffer_{}, delay_{} {
+		Mcp2515() : messageBuffer_{}, delayR_{}, delayS_{} {
 			this->attachConfigurationHandler([]() {
 				SPI::setDataMode(SPI::DataMode::Mode3);
 				SPI::setDataOrder(SPI::DataOrder::MsbFirst);
@@ -210,7 +210,7 @@ namespace modm
 		};
 
 		modm::ResumableResult<bool>
-		mcp2515ReadMessage(uint8_t status = 0xff);
+		mcp2515ReadMessage();
 
 		bool
 		mcp2515IsReadyToSend(uint8_t status);
@@ -219,7 +219,7 @@ namespace modm
 		mcp2515IsReadyToSend();
 
 		modm::ResumableResult<bool>
-		mcp2515SendMessage(const can::Message& message, uint8_t status = 0xff);
+		mcp2515SendMessage(const can::Message& message);
 
 		static void
 		writeRegister(uint8_t address, uint8_t data);
@@ -248,16 +248,23 @@ namespace modm
 		static INT interruptPin;
 
 		modm::can::Message messageBuffer_;
-		modm::ShortTimeout delay_;
+		modm::ShortTimeout delayR_;
+		modm::ShortTimeout delayS_;
 		uint8_t statusBuffer_ = 0;
-		uint8_t addressBuffer_ = 0;
+		uint8_t statusBufferR_ = 0;
+		uint8_t statusBufferS_ = 0;
+		uint8_t statusBufferReady_ = 0;
+		uint8_t addressBufferR_ = 0;
+		uint8_t addressBufferS_ = 0;
 		uint8_t i_, j_ = 0;
 		uint8_t a_ = 0;
 		uint8_t b_ = 0;
 		uint8_t data_ = 0;
+		bool tempR_ = false;
+		bool tempS_ = false;
 		bool temp_ = false;
-		bool temp2_ = false;
 		bool hasSend_ = false;
+		bool receiveSuccess_ = false;
 	};
 }
 

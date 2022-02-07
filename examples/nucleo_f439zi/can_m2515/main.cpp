@@ -17,8 +17,7 @@
 #include <modm/processing/protothread.hpp>
 #include <modm/driver/can/mcp2515.hpp>
 
-
-#define SENDER 0
+#define SENDER 1
 
 // Set the log level
 #undef MODM_LOG_LEVEL
@@ -54,7 +53,11 @@ modm::Mcp2515<SpiMaster, Cs, Int> mcp2515;
 class MyTask : modm::pt::Protothread
 {
 public:
-	MyTask() : message_{0x1337}{}
+	MyTask() :
+		message_{0x1337},
+		i_{0},
+		j_{0}
+		{}
 
 	bool
 	run()
@@ -75,19 +78,29 @@ public:
 			{
 				MODM_LOG_INFO << "Message Available ... " << modm::endl;
 				mcp2515.getMessage(message_);
-				MODM_LOG_INFO << "Received message: " << modm::hex << message_.identifier << modm::endl;
+				for(i_ = 0; i_ < message_.length; ++i_){
+					MODM_LOG_INFO << modm::hex<< " 0x" << message_.data[i_];
+				}
+				MODM_LOG_INFO << modm::endl;
+				MODM_LOG_INFO << "Received message [" << j_ << "]: " << modm::hex << message_.identifier << modm::endl;
+				j_+=1;
+				MODM_LOG_INFO << modm::endl;
 			}
 			PT_CALL(mcp2515.update());
 		}
 #else
 		while (initialized_)
 		{
-			wait_.restart(500ms);
+			wait_.restart(1000ms);
 			PT_WAIT_UNTIL(wait_.isExpired());
 			message_.length = 2;
-			message_.data[0] = 0xab;
-			message_.data[1] = 0xcd;
+			message_.data[0] = i_++;
+			message_.data[1] = i_++;
 			MODM_LOG_INFO << "Sending Message ... "<< modm::endl;
+			for(j_ = 0; j_ < message_.length; ++j_){
+				MODM_LOG_INFO << modm::hex<< " 0x" << message_.data[j_];
+			}
+			MODM_LOG_INFO << modm::endl;
 			mcp2515.sendMessage(message_);
 			PT_CALL(mcp2515.update());
 		}
@@ -100,6 +113,7 @@ private:
 	modm::can::Message message_;
 	bool initialized_;
 	modm::ShortTimeout wait_;
+	uint8_t i_, j_;
 };
 
 MyTask task;
