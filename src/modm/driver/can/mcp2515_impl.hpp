@@ -22,7 +22,7 @@
 
 // Set the log level
 #undef MODM_LOG_LEVEL
-#define MODM_LOG_LEVEL modm::log::DEBUG
+#define MODM_LOG_LEVEL modm::log::DISABLED
 
 // ----------------------------------------------------------------------------
 
