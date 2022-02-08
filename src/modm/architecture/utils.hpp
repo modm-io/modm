@@ -54,6 +54,9 @@
 	 */
 	#define modm_always_inline
 
+	/// Specifies that a function should never be inlined
+	#define modm_noinline
+
 	/// Attached to a variable or a function this means that it is meant to be possibly unused.
 	#define modm_unused
 
@@ -125,6 +128,7 @@
 	#define MODM_ARRAY_SIZE(x)	(sizeof(x) / sizeof(x[0]))
 
 	#define modm_always_inline		inline __attribute__((always_inline))
+	#define modm_noinline			__attribute__((noinline))
 	#define modm_unused				__attribute__((unused))
 	#define modm_aligned(n)			__attribute__((aligned(n)))
 	#define modm_packed				__attribute__((packed))
@@ -155,7 +159,7 @@
 	#	define modm_fastdata
 	#	define modm_faststack
 	#else
-	#	define modm_fastcode		modm_section(".fastcode")
+	#	define modm_fastcode		modm_section(".fastcode") modm_noinline
 	#	define modm_ramcode			modm_fastcode
 	#	define modm_fastdata		modm_section(".fastdata")
 	#	define modm_faststack		modm_section(".faststack")
