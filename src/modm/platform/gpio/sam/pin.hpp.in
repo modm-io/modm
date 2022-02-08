@@ -278,6 +278,7 @@ template<class... PinConfigs>
 struct PinCfgMixin
 {
 	inline static void set(uint8_t){};
+	inline static void set(uint8_t, uint8_t){};
 };
 
 template<class PinConfig, class... PinConfigs>
@@ -291,6 +292,18 @@ struct PinCfgMixin<PinConfig, PinConfigs...>
 			PORT->Group[{{loop.index0}}].PINCFG[PinConfig::pin].reg = cfg;
 %% endfor
 		PinCfgMixin<PinConfigs...>::set(cfg);
+	}
+
+	inline static void
+	set(uint8_t setBits, uint8_t clearMask)
+	{
+%% for port in ports
+		if constexpr (PinConfig::port == PortName::{{ port }}) {
+			auto& reg = PORT->Group[{{loop.index0}}].PINCFG[PinConfig::pin].reg;
+			reg = (reg & (~clearMask)) | setBits;
+		}
+%% endfor
+		PinCfgMixin<PinConfigs...>::set(setBits, clearMask);
 	}
 };
 
@@ -371,7 +384,7 @@ public:
 	configure(InputType type)
 	{
 		set(type == InputType::PullUp);
-		PinCfg::set(PORT_PINCFG_INEN | (type != InputType::Floating) << PORT_PINCFG_PULLEN_Pos);
+		PinCfg::set(PORT_PINCFG_INEN | (type != InputType::Floating) << PORT_PINCFG_PULLEN_Pos, PORT_PINCFG_PULLEN);
 	}
 
 	static void
