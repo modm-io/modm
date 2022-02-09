@@ -16,7 +16,7 @@ void
 modm_gpio_enable(void)
 {
 
-%% if target["family"] in ["g", "v"]
+%% if target["family"] in ["g", "v"] or target["series"][0] == "7"
 
     PMC->PMC_PCER0 =
 %% for port in options.enable_ports
