@@ -50,9 +50,9 @@ git clone --recurse-submodules --jobs 8 https://github.com/modm-io/modm.git
 ## Features
 
 - Efficient and fast object-oriented C++20 API.
-- Support for hundreds of AVR and ARM Cortex-M microcontrollers from Atmel and ST.
+- Support for thousands of AVR and ARM Cortex-M microcontrollers from Microchip, STMicro and Raspberry Pi.
 - Build system agnostic: Choose SCons, CMake, Makefile or use your own.
-- Data-driven, target-specific HAL generation using the lbuild engine.
+- Modular, data-driven, target-specific HAL generation using the lbuild code generator.
 - No memory allocations in HAL with very low overall RAM consumption.
 - Highly configurable modules with sensible defaults and lots of documentation.
 - Cross-platform peripheral interfaces incl. bit banging:
@@ -78,11 +78,12 @@ git clone --recurse-submodules --jobs 8 https://github.com/modm-io/modm.git
 
 ## Microcontrollers
 
-modm can create a HAL for <!--allcount-->3300<!--/allcount--> devices of these vendors:
+modm can create a HAL for <!--allcount-->3301<!--/allcount--> devices of these vendors:
 
 - STMicroelectronics STM32: <!--stmcount-->2726<!--/stmcount--> devices.
 - Microchip SAM: <!--samcount-->186<!--/samcount--> devices.
 - Microchip AVR: <!--avrcount-->388<!--/avrcount--> devices.
+- Raspberry Pi: <!--rpicount-->1<!--/rpicount--> device.
 
 Here is a table with all device families and the peripheral drivers they support:
 
@@ -605,8 +606,8 @@ We have out-of-box support for many development boards including documentation.
 <td align="center"><a href="https://modm.io/reference/module/modm-board-nucleo-l552ze-q">NUCLEO-L552ZE-Q</a></td>
 </tr><tr>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-olimexino-stm32">OLIMEXINO-STM32</a></td>
-<td align="center"><a href="https://modm.io/reference/module/modm-board-rp-pico">RP-PICO</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-raspberrypi">Raspberry Pi</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-board-rp-pico">Raspberry Pi Pico</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-samd21-mini">SAMD21-MINI</a></td>
 </tr><tr>
 <td align="center"><a href="https://modm.io/reference/module/modm-board-samg55-xplained-pro">SAMG55-XPLAINED-PRO</a></td>
@@ -636,11 +637,11 @@ you specific needs.
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-adis16470">ADIS16470</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-adns9800">ADNS9800</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-ads7843">ADS7843</a></td>
-<td align="center"><a href="https://modm.io/reference/module/modm-driver-ads816x">ADS816X</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-ads816x">ADS816x</a></td>
 </tr><tr>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-ams5915">AMS5915</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-apa102">APA102</a></td>
-<td align="center"><a href="https://modm.io/reference/module/modm-driver-block-device-spi-flash">SPI-FLASH</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-block-device-spi-flash">SPI Flash</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-bme280">BME280</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-bmp085">BMP085</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-bno055">BNO055</a></td>
@@ -652,12 +653,12 @@ you specific needs.
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-ds18b20">DS18B20</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-ea_dog">EA-DOG</a></td>
 </tr><tr>
-<td align="center"><a href="https://modm.io/reference/module/modm-driver-encoder_input">ENCODER-INPUT</a></td>
-<td align="center"><a href="https://modm.io/reference/module/modm-driver-encoder_input-bitbang">ENCODER-INPUT-BITBANG</a></td>
-<td align="center"><a href="https://modm.io/reference/module/modm-driver-encoder_output-bitbang">ENCODER-OUTPUT-BITBANG</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-encoder_input">Encoder Input</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-encoder_input-bitbang">Encoder Input BitBang</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-encoder_output-bitbang">Encoder Output BitBang</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-ft245">FT245</a></td>
-<td align="center"><a href="https://modm.io/reference/module/modm-driver-ft6x06">FT6X06</a></td>
-<td align="center"><a href="https://modm.io/reference/module/modm-driver-gpio_sampler">GPIO-SAMPLER</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-ft6x06">FT6x06</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-gpio_sampler">Gpio Sampler</a></td>
 </tr><tr>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-hclax">HCLAx</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-hd44780">HD44780</a></td>
@@ -677,17 +678,17 @@ you specific needs.
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-lis3dsh">LIS3DSH</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-lis3mdl">LIS3MDL</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-lm75">LM75</a></td>
-<td align="center"><a href="https://modm.io/reference/module/modm-driver-lp503x">LP503X</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-lp503x">LP503x</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-lsm303a">LSM303A</a></td>
 </tr><tr>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-lsm6ds33">LSM6DS33</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-ltc2984">LTC2984</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-max6966">MAX6966</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-max7219">MAX7219</a></td>
-<td align="center"><a href="https://modm.io/reference/module/modm-driver-mcp23x17">MCP23X17</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-mcp23x17">MCP23x17</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-mcp2515">MCP2515</a></td>
 </tr><tr>
-<td align="center"><a href="https://modm.io/reference/module/modm-driver-mcp7941x">MCP7941X</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-mcp7941x">MCP7941x</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-mmc5603">MMC5603</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-nokia5110">NOKIA5110</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-nrf24">NRF24</a></td>
@@ -712,10 +713,10 @@ you specific needs.
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-sx1276">SX1276</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-tcs3414">TCS3414</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-tcs3472">TCS3472</a></td>
-<td align="center"><a href="https://modm.io/reference/module/modm-driver-tlc594x">TLC594X</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-tlc594x">TLC594x</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-tmp102">TMP102</a></td>
 </tr><tr>
-<td align="center"><a href="https://modm.io/reference/module/modm-driver-tmp12x">TMP12X</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-tmp12x">TMP12x</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-tmp175">TMP175</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-touch2046">TOUCH2046</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-vl53l0">VL53L0</a></td>
