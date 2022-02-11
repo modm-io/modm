@@ -314,6 +314,7 @@ public:
 	static inline void
 	acknowledgeInterruptFlags(InterruptFlag_t flags);
 
+	// DEPRECATE: 2022q1
 	[[deprecated("Use `acknowledgeInterruptFlags(InterruptFlag_t flags)` instead!")]]
 	static inline void
 	acknowledgeInterruptFlag(InterruptFlag_t flags)

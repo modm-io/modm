@@ -593,6 +593,7 @@ public:
 	enablePllSai(const PllSaiFactors& pllFactors, uint32_t waitCycles = 2048);
 %% endif
 
+	// DEPRECATE: 2022q1
 %% if target.family in ["f2", "f4", "f7", "l4", "g0", "g4"]
 	/**
 	 * Enable PLL.
@@ -950,6 +951,7 @@ private:
 	computeFlashLatency(uint32_t Core_Hz, uint16_t Core_mV);
 };
 
+// DEPRECATE: 2022q1
 using ClockControl [[deprecated("Please use `modm::platform:Rcc` instead")]] = Rcc;
 
 }   // namespace modm::platform

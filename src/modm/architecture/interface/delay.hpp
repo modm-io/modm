@@ -105,6 +105,7 @@ inline void delay(std::chrono::duration<Rep, Period> time)
 { delay(std::chrono::duration_cast<std::chrono::milliseconds>(time)); }
 
 // The old methods are deprecated
+// DEPRECATE: 2022q1
 [[deprecated("Use `modm::delay_ns(uint32_t ns)` instead!")]]
 inline void delayNanoseconds(uint32_t ns) { delay_ns(ns); }
 

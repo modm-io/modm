@@ -109,6 +109,7 @@ public:
 	execute();
 
 	/// @cond
+	// DEPRECATE: 2022q1
 	[[deprecated("Use `std::chrono::{milli,micro}seconds` for interval instead!")]]
 	GenericTimeout(rep interval) :
 		GenericTimeout(duration(interval)) {}
