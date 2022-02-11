@@ -33,6 +33,11 @@ jobs:
         if: always()
         run: |
           python3 tools/scripts/rm_whitespace.py
+      - name: Check for Expired Deprecations
+        if: startsWith(github.head_ref, 'release/')
+        run: |
+          egrep -rI "DEPRECATED?:? +`basename ${{ github.head_ref }}`" . || true
+          return $(egrep -rI "DEPRECATED?:? +`basename ${{ github.head_ref }}`" . | wc -l)
       - name: Synchronize Documentation
         if: always()
         run: |

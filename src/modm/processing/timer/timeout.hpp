@@ -109,6 +109,7 @@ public:
 	execute();
 
 	/// @cond
+	// DEPRECATE: 2022q1
 	[[deprecated("Use `std::chrono::{milli,micro}seconds` for interval instead!")]]
 	GenericTimeout(rep interval) :
 		GenericTimeout(duration(interval)) {}
@@ -172,6 +173,7 @@ using ShortPreciseTimeout = GenericTimeout< PreciseClock, ShortPreciseDuration >
 using      PreciseTimeout = GenericTimeout< PreciseClock, PreciseDuration >;
 
 /// @cond
+// DEPRECATE: 2022q1
 using TimeoutState [[deprecated("Use `modm::TimerState` instead!")]] = TimerState;
 /// @endcond
 

@@ -191,6 +191,7 @@ using UnsignedType = typename detail::MakeUnsigned<T>::type;
 template<typename T>
 struct ArithmeticTraits
 {
+	// DEPRECATE: 2022q1
 	static constexpr bool isFloatingPoint [[deprecated("use std::is_floating_point_v<T> instead!")]] = std::is_floating_point_v<T>;
 	static constexpr bool isInteger = std::is_integral_v<T>
 		&& !std::is_same_v<std::decay_t<T>, bool>;

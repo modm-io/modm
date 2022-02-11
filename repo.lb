@@ -238,7 +238,7 @@ def init(repo):
         config = {v.strip(): (module.parent / "board.xml") for v in versions}
         repo.add_configuration(Configuration(name, description, config, versions[0].strip()))
 
-    # Backwards compatible move, remove this in 2022.
+    # DEPRECATE: 2022q1
     repo.add_alias(Alias(name="blue-pill", destination=":blue-pill-f103",
                          description="Renamed for clarity."))
     repo.add_alias(Alias(name="black-pill", destination=":black-pill-f103",
