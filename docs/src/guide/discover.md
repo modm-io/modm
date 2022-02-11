@@ -20,7 +20,7 @@ format. The `modm/repo.lb` file must be declared to find all modm modules:
 Parser(lbuild)
 ╰── Repository(modm @ .)   modm: a barebone embedded library generator
     ├── Option(target) = REQUIRED in [stm32f469ngh6, stm32f469nih6, stm32f469vet6, ...
-    ├── Config(modm:disco-f469ni)   STM32F469IDISCOVERY
+    ├── Config(modm:disco-f469ni:b-03) in [b-01, b-03]   STM32F469IDISCOVERY
    ...
 ```
 
@@ -54,7 +54,7 @@ modules for this specific target. We will choose the `stm32f469nih6` device:
 Parser(lbuild)
 ╰── Repository(modm @ .)   modm: a barebone embedded library generator
     ├── Option(target) = stm32f469nih6 in [stm32f407vgt6, stm32f469nih6, ...
-    ├── Config(modm:disco-f469ni)   STM32F469IDISCOVERY
+    ├── Config(modm:disco-f469ni:b-03) in [b-01, b-03]   STM32F469IDISCOVERY
    ...
     ├── Module(modm:board)   Board Support Packages
     │   ╰── Module(modm:board:disco-f469ni)   STM32F469IDISCOVERY

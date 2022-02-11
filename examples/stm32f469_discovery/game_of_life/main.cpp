@@ -36,7 +36,7 @@ constexpr modm::MemoryTraits traits = SCALE >= 4 ? modm::MemoryFastData : modm::
 void read_touch()
 {
 	static Touch::Data touchData;
-	static Touch touchSensor(touchData);
+	static Touch touchSensor(touchData, TouchAddress);
 	static bool initialized = false;
 	if (not initialized) {
 		// Configure the touchscreen to sample with 60Hz in active and monitor mode.

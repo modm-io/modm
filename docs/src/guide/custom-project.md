@@ -93,14 +93,16 @@ discover all of modm yet. You can now choose from two levels of customization:
 
 ## Using a Board Support Package
 
-Use lbuild to discover the specific BSP configuration you want to use:
+Use lbuild to discover the specific BSP configuration you want to use.
+Some board configurations support different hardware revisions, so check your
+hardware to select the right one:
 
 ```
  $ lbuild discover
 Parser(lbuild)
 ╰── Repository(modm @ ../../ext/modm)   modm: a barebone embedded library generator
     ├── Option(target) = REQUIRED in [stm32f469ngh6, stm32f469nih6, stm32f469vet6, ...
-    ├── Config(modm:disco-f469ni)   STM32F469IDISCOVERY
+    ├── Config(modm:disco-f469ni:b-03) in [b-01, b-03]   STM32F469IDISCOVERY
    ...
 ```
 
@@ -113,7 +115,7 @@ cannot remove any inherited modules.
 <library>
   <repositories>...</repositories>
 
-  <extends>modm:disco-f469ni</extends>
+  <extends>modm:disco-f469ni:b-03</extends>
 
   <options>...</options>
   <modules>...</modules>

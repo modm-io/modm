@@ -164,6 +164,7 @@ using Scl = GpioB8;
 using Sda = GpioB9;
 using I2cMaster = I2cMaster1;
 using Touch = modm::Ft6x06< I2cMaster >;
+constexpr uint8_t TouchAddress = {{touch_address}};
 }
 
 namespace usb
