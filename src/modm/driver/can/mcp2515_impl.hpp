@@ -123,6 +123,8 @@ modm::Mcp2515<SPI, CS, INT>::setFilter(accessor::Flash<uint8_t> filter)
 {
 	using namespace mcp2515;
 
+	while(!this->acquireMaster()){};
+
 	// change to configuration mode
 	bitModify(CANCTRL, 0xe0, REQOP2);
 
@@ -130,7 +132,6 @@ modm::Mcp2515<SPI, CS, INT>::setFilter(accessor::Flash<uint8_t> filter)
 	writeRegister(RXB0CTRL, BUKT);
 	writeRegister(RXB1CTRL, 0);
 
-	while(!this->acquireMaster()){};
 	uint8_t i, j;
 	for (i = 0; i < 0x30; i += 0x10)
 	{
@@ -147,10 +148,10 @@ modm::Mcp2515<SPI, CS, INT>::setFilter(accessor::Flash<uint8_t> filter)
 		}
 		chipSelect.set();
 	}
-	while(!this->releaseMaster());
 	chipSelect.set();
-
 	bitModify(CANCTRL, 0xe0, 0);
+
+	while(!this->releaseMaster());
 }
 
 // ----------------------------------------------------------------------------
@@ -430,13 +431,11 @@ template <typename SPI, typename CS, typename INT>
 void
 modm::Mcp2515<SPI, CS, INT>::bitModify(uint8_t address, uint8_t mask, uint8_t data)
 {
-	while(!this->acquireMaster()){};
 	chipSelect.reset();
 	spi.transferBlocking(BIT_MODIFY);
 	spi.transferBlocking(address);
 	spi.transferBlocking(mask);
 	spi.transferBlocking(data);
-	while(!this->releaseMaster()){}
 	chipSelect.set();
 }
 
