@@ -1,6 +1,6 @@
 name: Run tests on MacOS
 
-on: [pull_request]
+on: [pull_request1]
 
 jobs:
   macos_testing:

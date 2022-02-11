@@ -1,6 +1,6 @@
 name: Run ARM Cortex-M tests on Windows
 
-on: [pull_request]
+on: [pull_request1]
 
 jobs:
   windows_armcortexm:

@@ -1,6 +1,6 @@
 name: Run hosted tests on Windows
 
-on: [pull_request]
+on: [pull_request1]
 
 jobs:
   windows_hosted:
