@@ -13,7 +13,6 @@
 #ifndef MODM_AVR_ADC_INTERRUPT_HPP
 #define MODM_AVR_ADC_INTERRUPT_HPP
 
-#include <modm/utils/dummy.hpp>
 #include "adc.hpp"
 #include <modm/architecture/interface/adc_interrupt.hpp>
 
@@ -33,7 +32,7 @@ class AdcInterrupt : public modm::platform::Adc, public modm::AdcInterrupt
 {
 public:
 	static inline void
-	attachInterruptHandler(Handler handler=modm::dummy)
+	attachInterruptHandler(Handler handler)
 	{
 		AdcInterrupt::handler = handler;
 	}
