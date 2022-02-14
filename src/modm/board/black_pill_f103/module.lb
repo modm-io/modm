@@ -11,9 +11,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-def init(module):
-    module.name = ":board:black-pill-f103"
-    module.description = """\
+description = """
 # Black Pill
 
 STM32F103C8T6 "Black Pill" Minimum System Development Board
@@ -22,9 +20,7 @@ Cheap and bread-board-friendly board for STM32 F1 series.
 Sold for less than 2 USD on well known Internet shops from China.
 
 https://stm32-base.org/boards/STM32F103C8T6-Black-Pill.html
-""" + descr_programming
 
-descr_programming = """
 ## Programming
 
 Since the board doesn't have a programmer on-board, you need to use your
@@ -54,6 +50,10 @@ Then include this file in your build options like so:
 ```
 """
 
+def init(module):
+    module.name = ":board:black-pill-f103"
+    module.description = description
+
 def prepare(module, options):
     if not options[":target"].partname.startswith("stm32f103c8t"):
         return False
@@ -81,4 +81,4 @@ def build(env):
 
     # Warn the user if they forgot to set a custom openocd config
     if env.has_option(":build:openocd.cfg") and not len(env.get(":build:openocd.cfg", "")):
-        env.log.warning("You need to provide the programmer via a custom OpenOCD config!\n" + descr_programming)
+        env.log.warning("You need to provide the programmer via a custom OpenOCD config!\n" + description)

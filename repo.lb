@@ -230,7 +230,7 @@ def init(repo):
         if (module.parent / "module.md").exists():
             description = FileReader(str(module.parent / "module.md"))
         else:
-            description = re.search(r'\.description += +(""".*?"""|".*?")',
+            description = re.search(r'description += +(""".*?"""|".*?")',
                                     module_text, flags=re.S|re.M)
             description = description.group(1).strip('"\\') if description else None
         versions = re.search(r"#+ +[Rr]evisions? += +\[(.*)\]", module_text)
