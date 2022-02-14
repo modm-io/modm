@@ -13,7 +13,6 @@
 import os
 import sys
 import shutil
-import lbuild
 import zipfile
 import tempfile
 import argparse
@@ -39,6 +38,9 @@ def rename_board(name):
 
 sys.path.append(str(repopath("ext/modm-devices")))
 from modm_devices.device_identifier import *
+
+# sys.path.insert(0, str(repopath("../lbuild")))
+import lbuild
 
 def get_targets():
     builder = lbuild.api.Builder()

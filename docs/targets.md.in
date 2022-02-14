@@ -1,0 +1,76 @@
+# Supported Targets
+
+modm supports a total of {{total}} targets by setting the `modm:target`
+repository option with the device identifier string.
+
+{{description}}
+
+%% for platform, families in targets.items() | sort
+## {{platform}}
+%#
+%% if "Hosted" in platform
+The hosted targets are for compiling modm on an operating system, usually to run
+our unit tests locally or in the CI.
+
+Identifier format example for `Hosted-Linux`:
+
+```
+  hosted    linux
+{platform}-{family}
+```
+%% elif "AVR" in platform
+Identifier format example for `ATmega328P-AU`:
+```
+    avr     mega   328    p              au
+{platform}{family}{name}{type}-{speed}{package}
+```
+Note that the platform is mapped to `avr` not `at` and that some AVRs have an
+optional device speed.
+
+Identifier format example for `AT90CAN128-16AU`:
+```
+    avr      90    can   128     16      au
+{platform}{family}{type}{name}-{speed}{package}
+```
+Note that the type and name are switched here to normalize the identifier
+schema.
+%% elif "STM32" in platform
+Identifier format example for `STM32G071GBU6N/revY`:
+```
+   stm32     g0     71    g    b       u          6          n        y
+{platform}{family}{name}{pin}{size}{package}{temperature}{variant}{revision}
+```
+The revision is optional, however, the device variant often means significant
+differences in pinout or peripherals, so check your device's identifier twice!
+%% elif "SAM" in platform
+Identifier format example for `SAMD21G18A-AU`:
+```
+   sam       d       21     g    18       a         a       u
+{platform}{family}{series}{pin}{flash}{variant}-{package}{grade}
+```
+%% elif "Raspberry" in platform
+Identifier format example for `RP2040`:
+```
+    rp       2     0     4     0
+{platform}{cores}{type}{ram}{flash}
+```
+%% endif
+%#
+%% for family, prefixes in families.items() | sort
+%% if family | length and prefixes | length > 1
+### {{family}}
+%#
+%% endif
+%% for prefix, devices in prefixes.items() | sort
+%% if prefix | length
+#### {{prefix}}
+%#
+%% endif
+`{{ devices | sort | join("`, `") }}`.
+%#
+%#
+%% endfor
+%#
+%% endfor
+%#
+%% endfor

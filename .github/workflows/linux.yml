@@ -303,9 +303,11 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
-      - name: Update submodules and install lbuild
+      - name: Update submodules and update modm tools
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm mkdocs mkdocs-material & wait
+          mkdocs --version
+          pip3 show mkdocs-material
       - name: Test run of docs.modm.io-generator-script
         if: always()
         run: |
@@ -322,6 +324,10 @@ jobs:
         run: |
           python3 tools/scripts/synchronize_docs.py
           python3 tools/scripts/generate_module_docs.py
+          cat docs/mkdocs.yml
+          ls -l docs/src/reference
+          ls -l docs/src/reference/config
+          ls -l docs/src/reference/module
           (cd docs && mkdocs build)
       - name: Upload Homepage Documentation
         uses: actions/upload-artifact@v2

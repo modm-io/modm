@@ -14,9 +14,11 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
-      - name: Update submodules and install lbuild
+      - name: Update submodules and update modm tools
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
+          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm mkdocs mkdocs-material & wait
+          mkdocs --version
+          pip3 show mkdocs-material
       - name: Clone modm-ext/modm.io repository
         uses: actions/checkout@v2
         with:
@@ -45,9 +47,9 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
-      - name: Update submodules and install lbuild
+      - name: Update submodules and update modm tools
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install -U lbuild & wait
+          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
       - name: Full run of docs.modm.io-generator-script
         run: |
           export TERM=xterm-256color
