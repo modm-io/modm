@@ -19,14 +19,15 @@
 
 using namespace modm::platform;
 
-/// @ingroup modm_board_nucleo_g431kb
 namespace Board
 {
-	using namespace modm::literals;
+/// @ingroup modm_board_nucleo_g431kb
+/// @{
+using namespace modm::literals;
 
 /// STM32G431KB running at 170MHz generated from the internal 16MHz crystal
-// Dummy clock for devices
-struct SystemClock {
+struct SystemClock
+{
 	static constexpr uint32_t Frequency = 170_MHz;
 	static constexpr uint32_t Ahb1      = Frequency;
 	static constexpr uint32_t Ahb2      = Frequency;
@@ -137,17 +138,21 @@ using D13 = GpioB3;
 using Button = GpioUnused;
 using LedUser = GpioOutputB8;
 using Leds = SoftwareGpioPort< LedUser >;
-
+/// @}
 
 namespace stlink
 {
+/// @ingroup modm_board_nucleo_g431kb
+/// @{
 using Rx = GpioInputA3;
 using Tx = GpioOutputA2;
 using Uart = Usart2;
+/// @}
 }
 
+/// @ingroup modm_board_nucleo_g431kb
+/// @{
 using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
-
 
 inline void
 initialize()
@@ -160,6 +165,7 @@ initialize()
 
 	LedUser::setOutput(modm::Gpio::Low);
 }
+/// @}
 
 }
 

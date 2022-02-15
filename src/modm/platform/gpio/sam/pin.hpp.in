@@ -20,6 +20,8 @@
 
 namespace modm::platform
 {
+/// @ingroup modm_platform_gpio
+/// @{
 
 enum class InputType
 {
@@ -592,5 +594,6 @@ struct GetPin<peripheral_pin>
 {
 	using type = void;
 };
+/// @}
 
 }  // namespace modm::platform

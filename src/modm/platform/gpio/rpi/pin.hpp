@@ -20,6 +20,7 @@
 namespace modm::platform
 {
 
+/// @ingroup modm_platform_gpio
 template< int Pin >
 class GpioPin : public Gpio, public modm::GpioIO
 {

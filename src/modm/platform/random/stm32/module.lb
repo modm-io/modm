@@ -15,19 +15,9 @@ def init(module):
     module.description = "Random Number Generator (RNG)"
 
 def prepare(module, options):
-    if not options[":target"].has_driver("rng:stm32"):
-        return False
-
     module.depends(":cmsis:device", ":platform:rcc")
-    return True
+    return options[":target"].has_driver("rng:stm32")
 
 def build(env):
-    device = env[":target"]
-
-    properties = device.properties
-    properties["target"] = device.identifier
-
-    env.substitutions = properties
     env.outbasepath = "modm/src/modm/platform/random"
-
-    env.template("random_number_generator.hpp.in")
+    env.copy("random_number_generator.hpp")

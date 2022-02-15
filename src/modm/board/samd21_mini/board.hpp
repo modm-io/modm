@@ -17,10 +17,10 @@
 
 using namespace modm::platform;
 
-
-/// @ingroup modm_board_samd21_mini
 namespace Board
 {
+/// @ingroup modm_board_samd21_mini
+/// @{
 using namespace modm::literals;
 
 struct SystemClock
@@ -105,8 +105,9 @@ initialize()
 inline void
 initializeUsbFs(uint8_t priority=3)
 {
-	modm::platform::Usb::initialize<Board::SystemClock>(priority);
-	modm::platform::Usb::connect<GpioA24::Dm, GpioA25::Dp>();
+	Usb::initialize<Board::SystemClock>(priority);
+	Usb::connect<GpioA24::Dm, GpioA25::Dp>();
 }
+/// @}
 
 } // Board namespace

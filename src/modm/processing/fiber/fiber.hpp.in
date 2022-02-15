@@ -80,6 +80,7 @@ private:
 
 #include "scheduler.hpp"
 
+/// @cond
 namespace modm
 {
 template<size_t Size>
@@ -120,5 +121,6 @@ Fiber::jump(Fiber& other)
 {
 	fiber::Scheduler::jump(*this,other);
 }
+/// @endcond
 
 }	// namespace modm

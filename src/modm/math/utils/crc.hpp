@@ -19,8 +19,9 @@
 
 namespace modm::math
 {
-
 /// @ingroup modm_math_utils
+/// @{
+
 inline uint8_t
 crc8_ccitt_update(uint8_t crc, uint8_t data)
 {
@@ -37,7 +38,6 @@ crc8_ccitt_update(uint8_t crc, uint8_t data)
 #endif
 }
 
-/// @ingroup modm_math_utils
 inline uint16_t
 crc16_ccitt_update(uint16_t crc, uint8_t data)
 {
@@ -51,7 +51,6 @@ crc16_ccitt_update(uint16_t crc, uint8_t data)
 }
 
 /// @see https://github.com/stbrumme/crc32
-/// @ingroup modm_math_utils
 inline uint32_t
 crc32_update(uint32_t crc, uint8_t data)
 {
@@ -62,14 +61,10 @@ crc32_update(uint32_t crc, uint8_t data)
     return crc;
 }
 
-/// @ingroup modm_math_utils
 static constexpr uint8_t crc8_ccitt_init{0xFFu};
-/// @ingroup modm_math_utils
 static constexpr uint16_t crc16_ccitt_init{0xFFFFu};
-/// @ingroup modm_math_utils
 static constexpr uint32_t crc32_init{0xFFFFFFFFul};
 
-/// @ingroup modm_math_utils
 inline uint8_t
 crc8_ccitt(const uint8_t *data, size_t length)
 {
@@ -78,7 +73,6 @@ crc8_ccitt(const uint8_t *data, size_t length)
     return crc;
 }
 
-/// @ingroup modm_math_utils
 inline uint16_t
 crc16_ccitt(const uint8_t *data, size_t length)
 {
@@ -88,7 +82,6 @@ crc16_ccitt(const uint8_t *data, size_t length)
 }
 
 /// Slow, but table-less computation of CRC32.
-/// @ingroup modm_math_utils
 inline uint32_t
 crc32(const uint8_t *data, size_t length)
 {
@@ -97,5 +90,6 @@ crc32(const uint8_t *data, size_t length)
     return ~crc;
 }
 
+/// @}
 } // namespace modm::math
 

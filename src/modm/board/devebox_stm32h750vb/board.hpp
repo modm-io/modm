@@ -17,9 +17,10 @@
 
 using namespace modm::platform;
 
-/// @ingroup modm_board_devebox_stm32h750vb
 namespace Board
 {
+/// @ingroup modm_board_devebox_stm32h750vb
+/// @{
 using namespace modm::literals;
 
 /// STM32H750 running at 400MHz from the external 25MHz HSE
@@ -136,21 +137,24 @@ struct SystemClock
 	}
 };
 
-
 using ButtonK1 = GpioInverted<GpioInputE3>;
 using ButtonK2 = GpioInverted<GpioInputC5>;
 
 using LedGreen = GpioInverted<GpioOutputA1>;	// User LED
 
 using Leds = SoftwareGpioPort< LedGreen >;
+/// @}
 
 namespace usb
 {
+/// @ingroup modm_board_devebox_stm32h750vb
+/// @{
 using Dm = GpioA11;		// DM: USB_DM
 using Dp = GpioA12;		// DP: USB_DP
+/// @}
 }
 
-
+/// @ingroup modm_board_devebox_stm32h750vb
 inline void
 initialize()
 {
@@ -161,6 +165,7 @@ initialize()
 	ButtonK1::setInput(Gpio::InputType::PullUp);
 	ButtonK2::setInput(Gpio::InputType::PullUp);
 }
+
 }
 
 #endif	// MODM_STM32_H750VB_DEVEBOX_HPP

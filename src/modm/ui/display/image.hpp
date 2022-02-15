@@ -15,7 +15,7 @@
  * \ingroup		modm_ui_display
  * \defgroup	modm_ui_display_image	Images
  *
- * Images are generated out of PBM format, see \c tools/bitmap.
+ * Images are generated out of PBM format, see Bitmap tool in `modm:build`.
  */
 
 #include "image/logo_rca_90x64.hpp"

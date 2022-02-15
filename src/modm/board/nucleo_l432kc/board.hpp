@@ -20,14 +20,15 @@
 
 using namespace modm::platform;
 
-/// @ingroup modm_board_nucleo_l432kc
 namespace Board
 {
-	using namespace modm::literals;
+/// @ingroup modm_board_nucleo_l432kc
+/// @{
+using namespace modm::literals;
 
 /// STM32L4 running at 80MHz generated with the PLL from 4MHz MSI clock
-
-struct SystemClock {
+struct SystemClock
+{
 	static constexpr uint32_t Frequency = 80_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency;
@@ -97,17 +98,21 @@ using Button = GpioUnused;
 using LedD13 = D13;
 
 using Leds = SoftwareGpioPort< LedD13 >;
-
+/// @}
 
 namespace stlink
 {
+/// @ingroup modm_board_nucleo_l432kc
+/// @{
 using Rx = GpioInputA15;
 using Tx = GpioOutputA2;
 using Uart = Usart2;
+/// @}
 }
 
+/// @ingroup modm_board_nucleo_l432kc
+/// @{
 using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
-
 
 inline void
 initialize()
@@ -118,6 +123,7 @@ initialize()
 	stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>(Gpio::InputType::PullUp);
 	stlink::Uart::initialize<SystemClock, 115200_Bd>();
 }
+/// @}
 
 }
 

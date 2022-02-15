@@ -16,12 +16,10 @@
 #define MODM_AD7928_HPP
 
 #include <modm/architecture/interface/spi_device.hpp>
-#include <modm/architecture/interface/accessor.hpp>
 #include <modm/architecture/interface/register.hpp>
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/architecture/interface/delay.hpp>
 #include <modm/processing/resumable.hpp>
-#include <modm/io/iostream.hpp>
 
 namespace modm
 {
@@ -221,8 +219,20 @@ private:
 	PowerMode currentPowerMode;
 };
 
-IOStream&
-operator << (IOStream& out, const ad7928::Data& data);
+#if __has_include(<modm/io/iostream.hpp>)
+#include <modm/io/iostream.hpp>
+
+/// @ingroup modm_driver_ad7928
+inline IOStream&
+operator << (IOStream& out, const ad7928::Data& data)
+{
+	out	<< "(channel = " << static_cast<uint16_t>(data.channel())
+		<< ", value = " << data.value() << ")";
+
+	return out;
+}
+
+#endif
 
 } // namespace modm
 

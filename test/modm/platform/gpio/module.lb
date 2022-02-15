@@ -74,6 +74,7 @@ def get_af(s):
 
 def init(module):
     module.name = ":test:platform:gpio"
+    module.description = "Tests for GPIO"
 
 def prepare(module, options):
     target = options[":target"]

@@ -98,9 +98,7 @@ template<class R, class... Args> struct vtable
 };
 
 template<class R, class... Args>
-#if __cplusplus >= 201703L
 inline constexpr
-#endif
 vtable<R, Args...> empty_vtable{};
 
 template<size_t DstCap, size_t DstAlign, size_t SrcCap, size_t SrcAlign>
@@ -117,7 +115,6 @@ struct is_valid_inplace_dst : std::true_type
 
 } // namespace inplace_function_detail
 
-
 template<
     class Signature,
     size_t Capacity = inplace_function_detail::InplaceFunctionDefaultCapacity,
@@ -131,7 +128,7 @@ namespace inplace_function_detail
     template<class Sig, size_t Cap, size_t Align>
     struct is_inplace_function<inplace_function<Sig, Cap, Align>> : std::true_type {};
 } // namespace inplace_function_detail
-/// @cond
+/// @endcond
 
 /// Non-allocating std::function replacement
 /// @ingroup modm_utils

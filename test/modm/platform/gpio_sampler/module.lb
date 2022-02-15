@@ -12,8 +12,8 @@
 from collections import OrderedDict
 
 def init(module):
-    module.parent = ":test:platform"
-    module.name = "gpio_sampler"
+    module.name = ":test:platform:gpio_sampler"
+    module.description = "Tests for GPIO Sampler"
 
 
 def prepare(module, options):

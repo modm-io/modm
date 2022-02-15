@@ -25,43 +25,6 @@
 namespace modm
 {
 
-/**
- * @ingroup		modm_math_utils
- * @defgroup	arithmetic_traits	Arithmetic Traits
- *
- * Traits to give numbers more information then they have by
- * default in C++
- *
- * @section provides	Values provided by these traits
- *
- * - `WideType`			Type that can holds the doubled length of data.
- * 						May be used to hold the result of a multiplication.
- * - `SignedType`		Signed type for the given type. It applies
- * 						`T == SignedType` if `T` is already signed.
- * - `UnsignedType		Some as SignedType only for unsigned types
- * - `min`				smallest value.
- * - `max`				biggest value
- * - `isSigned`			is this a signed or unsigned type
- * - `isFloatingPoint`	is this a floating point type
- * - `isInteger`		is this a integer type
- * - `decimalDigits`	count of digits to display this type in decimal
- *
- * @section usage	Usage
- * @code
- * typedef typename modm::ArithmeticTraits<T>::WideType T_DOUBLE;
- *
- * T min = modm::ArithmeticTraits<T>::min;
- * T max = modm::ArithmeticTraits<T>::max;
- * @endcode
- *
- * @author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
- * @author	Fabian Greif <fabian.greif@rwth-aachen.de>
- * @author	Niklas Hauser
- * @author	Christopher Durand
- *
- * @{
- */
-
 /// @cond
 namespace detail
 {
@@ -179,6 +142,8 @@ namespace detail
 }
 /// @endcond
 
+/// @ingroup modm_math_utils
+/// @{
 template<typename T>
 using WideType = typename detail::WideType<T>::type;
 
@@ -188,6 +153,39 @@ using SignedType = typename detail::MakeSigned<T>::type;
 template<typename T>
 using UnsignedType = typename detail::MakeUnsigned<T>::type;
 
+/**
+ * Arithmetic Traits
+ *
+ * Traits to give numbers more information then they have by
+ * default in C++
+ *
+ * @section provides	Values provided by these traits
+ *
+ * - `WideType`			Type that can holds the doubled length of data.
+ * 						May be used to hold the result of a multiplication.
+ * - `SignedType`		Signed type for the given type. It applies
+ * 						`T == SignedType` if `T` is already signed.
+ * - `UnsignedType		Some as SignedType only for unsigned types
+ * - `min`				smallest value.
+ * - `max`				biggest value
+ * - `isSigned`			is this a signed or unsigned type
+ * - `isFloatingPoint`	is this a floating point type
+ * - `isInteger`		is this a integer type
+ * - `decimalDigits`	count of digits to display this type in decimal
+ *
+ * @section usage	Usage
+ * @code
+ * typedef typename modm::ArithmeticTraits<T>::WideType T_DOUBLE;
+ *
+ * T min = modm::ArithmeticTraits<T>::min;
+ * T max = modm::ArithmeticTraits<T>::max;
+ * @endcode
+ *
+ * @author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
+ * @author	Fabian Greif <fabian.greif@rwth-aachen.de>
+ * @author	Niklas Hauser
+ * @author	Christopher Durand
+ */
 template<typename T>
 struct ArithmeticTraits
 {
@@ -207,8 +205,8 @@ struct ArithmeticTraits
 	static constexpr T max [[deprecated("use std::numeric_limits<T>::max() instead!")]] = std::numeric_limits<T>::max();
 	static constexpr T epsilon [[deprecated("use std::numeric_limits<T>::epsilon() instead!")]] = std::numeric_limits<T>::epsilon();
 };
-
 /// @}
+
 } // namespace modm
 
 #endif	// MODM_ARITHMETIC_TRAITS_HPP

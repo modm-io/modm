@@ -21,25 +21,21 @@
 
 #ifdef	__DOXYGEN__
 
+/// @ingroup modm_architecture_accessor
+/// @{
+
 /// Define a flash variable
-/// @ingroup modm_architecture_accessor
 #define	FLASH_STORAGE(var)
-
 /// Define a flash variable with external linkage
-/// @ingroup modm_architecture_accessor
 #define	EXTERN_FLASH_STORAGE(var)
-
 /// Define a flash string
-/// @ingroup modm_architecture_accessor
 #define	FLASH_STORAGE_STRING(s)
-
 /// Declare a flash string with external linkage
-/// @ingroup modm_architecture_accessor
 #define	EXTERN_FLASH_STORAGE_STRING(s)
-
 /// Declare a flash string inline
-/// @ingroup modm_architecture_accessor
 #define IFSS(s) ((const char *)(s))
+
+/// @}
 
 #else // !__DOXYGEN__
 

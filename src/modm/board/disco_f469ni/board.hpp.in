@@ -25,10 +25,11 @@
 
 using namespace modm::platform;
 
-/// @ingroup modm_board_disco_f469ni
 namespace Board
 {
-	using namespace modm::literals;
+using namespace modm::literals;
+/// @ingroup modm_board_disco_f469ni
+/// @{
 
 /// STM32F469 running at 180MHz from the external 8MHz crystal
 struct SystemClock
@@ -156,19 +157,25 @@ using LedD13    = GpioOutputD3;							// LED7 [Green]
 using Leds = SoftwareGpioPort< LedBlue, LedRed, LedOrange, LedGreen >;
 
 using DisplayReset = GpioOutputH7;
+/// @}
 
 namespace ft6
 {
+/// @ingroup modm_board_disco_f469ni
+/// @{
 using Int = GpioInputJ5;
 using Scl = GpioB8;
 using Sda = GpioB9;
 using I2cMaster = I2cMaster1;
 using Touch = modm::Ft6x06< I2cMaster >;
 constexpr uint8_t TouchAddress = {{touch_address}};
+/// @}
 }
 
 namespace usb
 {
+/// @ingroup modm_board_disco_f469ni
+/// @{
 using Vbus = GpioA9;
 using Id = GpioA10;
 using Dm = GpioA11;
@@ -178,15 +185,21 @@ using Overcurrent = GpioInputB7;	// OTG_FS_OverCurrent
 using Power = GpioOutputB2;			// OTG_FS_PowerSwitchOn
 
 using Device = UsbFs;
+/// @}
 }
 
 namespace stlink
 {
+/// @ingroup modm_board_disco_f469ni
+/// @{
 using Tx = GpioOutputB10;		// STLK_RX [STLINK V2-1_U2_RX]: USART3_TX
 using Rx = GpioInputB11;		// STLK_TX [STLINK V2-1_U2_TX]: USART3_RX
 using Uart = Usart3;
+/// @}
 }
 
+/// @ingroup modm_board_disco_f469ni
+/// @{
 using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
 
 inline void
@@ -239,6 +252,7 @@ initializeUsbFs(uint8_t priority=3)
 	// Enable VBUS sense (B device) via pin PA9
 	USB_OTG_FS->GCCFG |= USB_OTG_GCCFG_VBDEN;
 }
+/// @}
 
 }
 

@@ -19,7 +19,7 @@
 
 #include "timeline.hpp"
 
-/// @ingroup modm_test_test_communication
+/// @ingroup modm_test_test_communication_xpcc
 class TestingComponent2 : public xpcc::AbstractComponent
 {
 public:

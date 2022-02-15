@@ -39,13 +39,10 @@ def prepare(module, options):
         ":architecture:delay",
         ":architecture:gpio",
         ":architecture:spi",
-        ":io",
-        ":math:utils",
-        ":utils")
+        ":math:utils")
     return True
 
 def build(env):
     env.outbasepath = "modm/src/modm/driver/adc"
     env.copy("ad7280a.hpp")
-    env.copy("ad7280a.cpp")
     env.copy("ad7280a_impl.hpp")

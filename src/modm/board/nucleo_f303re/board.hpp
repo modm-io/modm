@@ -21,14 +21,15 @@
 
 using namespace modm::platform;
 
-/// @ingroup modm_board_nucleo_f303re
 namespace Board
 {
-	using namespace modm::literals;
+/// @ingroup modm_board_nucleo_f303re
+/// @{
+using namespace modm::literals;
 
 /// STM32F303RE running at 64MHz generated from the internal 8MHz clock
-// Dummy clock for devices
-struct SystemClock {
+struct SystemClock
+{
 	static constexpr uint32_t Frequency = 64_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency / 2;
@@ -92,17 +93,21 @@ using Button = GpioInverted<GpioInputC13>;
 using LedD13 = D13;
 
 using Leds = SoftwareGpioPort< LedD13 >;
-
+/// @}
 
 namespace stlink
 {
+/// @ingroup modm_board_nucleo_f303re
+/// @{
 using Rx = GpioInputA15;
 using Tx = GpioOutputA2;
 using Uart = Usart2;
+/// @}
 }
 
+/// @ingroup modm_board_nucleo_f303re
+/// @{
 using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
-
 
 inline void
 initialize()
@@ -113,6 +118,7 @@ initialize()
 	stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>();
 	stlink::Uart::initialize<SystemClock, 115200_Bd>();
 }
+/// @}
 
 }
 

@@ -10,13 +10,5 @@
  */
 // ----------------------------------------------------------------------------
 
-namespace modm
-{
-	/// @ingroup modm_processing_protothread
-	namespace pt
-	{
-	}
-}
-
 #include "protothread/protothread.hpp"
 #include "protothread/semaphore.hpp"

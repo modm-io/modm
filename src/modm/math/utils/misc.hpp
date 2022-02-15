@@ -25,15 +25,11 @@
 
 namespace modm
 {
-
 /// @addtogroup modm_math_utils
 /// @{
 
-/**
- * Fast check if a float variable is positive
- *
- * Checks only the sign bit for the AVR.
- */
+/// Fast check if a float variable is positive
+/// Checks only the sign bit for the AVR.
 inline bool
 isPositive(const float& a)
 {
@@ -60,7 +56,7 @@ pow(uint32_t base, uint8_t exponent)
 }
 
 /**
- * @brief This does what you think it does.
+ * This does what you think it does.
  *
  * @param  a  A thing of arbitrary type.
  * @param  b  Another thing of arbitrary type.
@@ -81,7 +77,7 @@ min(const T& a, const T& b)
 }
 
 /**
- * @brief This does what you think it does.
+ * This does what you think it does.
  *
  * @param  a  A thing of arbitrary type.
  * @param  b  Another thing of arbitrary type.
@@ -102,7 +98,7 @@ max(const T& a, const T& b)
 }
 
 /**
- * @brief This does what you think it does.
+ * This does what you think it does.
  *
  * @param  a  A thing of arbitrary type.
  * @param  b  Another thing of arbitrary type.
@@ -122,7 +118,7 @@ max(const T a, const T b, const T c)
 }
 
 /**
- * @brief This does what you think it does.
+ * This does what you think it does.
  *
  * @param  a  A thing of arbitrary type.
  * @param  b  Another thing of arbitrary type.
@@ -143,7 +139,7 @@ min(const T& a, const T& b, Compare compare)
 }
 
 /**
- * @brief This does what you think it does.
+ * This does what you think it does.
  *
  * @param  a  A thing of arbitrary type.
  * @param  b  Another thing of arbitrary type.
@@ -163,9 +159,7 @@ max(const T& a, const T& b, Compare compare)
 		return a;
 }
 
-/**
- * @brief constexpr implementation of fabs
- */
+/// constexpr implementation of fabs
 template <typename Float>
     requires std::is_floating_point_v<Float>
 constexpr Float constexpr_fabs(Float number)
@@ -178,7 +172,6 @@ constexpr Float constexpr_fabs(Float number)
 }
 
 /// @}
-
 }	// namespace modm
 
 #endif

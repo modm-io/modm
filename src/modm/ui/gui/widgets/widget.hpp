@@ -29,7 +29,9 @@ namespace modm
 namespace gui
 {
 
+/// @cond
 static int16_t uid_global = 0;
+/// @endcond
 
 class View;
 

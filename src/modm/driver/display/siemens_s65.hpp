@@ -41,8 +41,6 @@ namespace modm
 	 *
 	 * \ingroup	modm_driver_siemens_s65
 	 */
-
-	// common for landscape and portrait
 	template <typename SPI, typename CS, typename RS, typename Reset>
 	class SiemensS65Common
 	{

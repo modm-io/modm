@@ -1,6 +1,6 @@
 # AVR Core
 
-Implements the interfaces defined in the `:architecture` modules. Adds the
+Implements the interfaces defined in the `modm:architecture` modules. Adds the
 `-mmcu={target}` compile flag and the `F_CPU={core frequency}` define.
 
 

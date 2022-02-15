@@ -19,11 +19,12 @@
 using namespace modm::platform;
 
 /// @ingroup modm_board_nucleo_h723zg
-/// @{
 #define MODM_BOARD_HAS_LOGGER
 
 namespace Board
 {
+/// @ingroup modm_board_nucleo_h723zg
+/// @{
 using namespace modm::literals;
 
 /// STM32H723ZG running at 500MHz from PLL clock generated from 8 MHz HSE
@@ -148,16 +149,21 @@ using LedGreen = GpioOutputB0;
 using LedYellow = GpioOutputE1;
 using LedRed = GpioOutputB14;
 using Leds = SoftwareGpioPort< LedRed, LedYellow, LedGreen >;
+/// @}
 
 namespace stlink
 {
+/// @ingroup modm_board_nucleo_h723zg
+/// @{
 using Tx = GpioOutputD8;
 using Rx = GpioInputD9;
 using Uart = Usart3;
+/// @}
 }
 
+/// @ingroup modm_board_nucleo_h723zg
+/// @{
 using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
-
 
 inline void
 initialize()
@@ -174,6 +180,7 @@ initialize()
 
     Button::setInput();
 }
+/// @}
 
 }
 /// @}

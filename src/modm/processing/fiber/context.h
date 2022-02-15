@@ -21,6 +21,8 @@ extern "C"
 {
 #endif
 
+/// @ingroup    modm_processing_fiber
+/// @{
 struct modm_context_t
 {
 	uintptr_t sp;
@@ -42,6 +44,7 @@ modm_context_jump(uintptr_t* from_sp, uintptr_t to_sp);
 /// Switches control back to the main context from the user context.
 void __attribute__((noreturn))
 modm_context_end();
+/// @}
 
 #ifdef __cplusplus
 }

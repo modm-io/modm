@@ -17,12 +17,13 @@
 #include <modm/architecture/utils.hpp>
 #include <modm/architecture/interface/register.hpp>
 
-
 namespace modm
 {
 
-/// Describes access and type of dynamic memory.
 /// @ingroup modm_architecture_memory
+/// @{
+
+/// Describes access and type of dynamic memory.
 enum class
 MemoryTrait : uint16_t
 {
@@ -41,49 +42,44 @@ MemoryTrait : uint16_t
 };
 
 /// A memory can have multiple traits.
-/// @ingroup modm_architecture_memory
 using MemoryTraits = Flags16<MemoryTrait>;
 MODM_TYPE_FLAGS(MemoryTraits);
 
 /// Fast code memory is accessible by at least the I-Bus and it is core-coupled.
 /// Fallback memory on exhaustion is not core-coupled.
-/// @ingroup modm_architecture_memory
 constexpr MemoryTraits MemoryFastCode = (MemoryTrait::AccessIBus | MemoryTrait::TypeCoreCoupled);
 /// Fast data memory is accessible by at least the D-Bus and it is core coupled.
 /// Fallback memory on exhaustion is not core-coupled.
-/// @ingroup modm_architecture_memory
 constexpr MemoryTraits MemoryFastData = (MemoryTrait::AccessDBus | MemoryTrait::TypeCoreCoupled);
 
 /// DMA-able memory is accessible by at least the S-Bus and DMA.
 /// There is no fallback memory on exhaustion.
-/// @ingroup modm_architecture_memory
 constexpr MemoryTraits MemoryDMA = (MemoryTrait::AccessSBus | MemoryTrait::AccessDMA);
 /// DMA-able memory is accessible by at least the S-Bus and 2D DMA.
 /// There is no fallback memory on exhaustion.
-/// @ingroup modm_architecture_memory
 constexpr MemoryTraits MemoryDMA2D = (MemoryTrait::AccessSBus | MemoryTrait::AccessDMA2D);
 
 /// External memory is accessible by at least the S-Bus and it is external.
 /// Fallback memory on exhaustion is internal.
-/// @ingroup modm_architecture_memory
 constexpr MemoryTraits MemoryExternal = (MemoryTrait::AccessSBus | MemoryTrait::TypeExternal);
 /// Backup memory is accessible by at least the S-Bus and it is non-volatile.
 /// There is no fallback memory on exhaustion.
-/// @ingroup modm_architecture_memory
 constexpr MemoryTraits MemoryBackup = (MemoryTrait::AccessSBus | MemoryTrait::TypeNonVolatile);
 
 /// Default memory is DMA-able.
-/// @ingroup modm_architecture_memory
 constexpr MemoryTraits MemoryDefault = MemoryDMA;
 
+/// @}
+
 } // namespace modm
+
+/// @ingroup modm_architecture_memory
+/// @{
 
 /** Request object memory with defined traits.
  * @code
  *    Foo *p = new (modm::MemoryFastData) Foo;
  * @endcode
- *
- * @ingroup modm_architecture_memory
  */
 void *
 operator new(std::size_t size, modm::MemoryTraits traits);
@@ -92,8 +88,6 @@ operator new(std::size_t size, modm::MemoryTraits traits);
  * @code
  *    uint32_t *p = new (modm::MemoryFastData) uint32_t[200];
  * @endcode
- *
- * @ingroup modm_architecture_memory
  */
 void *
 operator new[](std::size_t size, modm::MemoryTraits traits);
@@ -102,8 +96,6 @@ operator new[](std::size_t size, modm::MemoryTraits traits);
  * @code
  *    Foo *p = new (modm::MemoryFastData, std::nothrow) Foo;
  * @endcode
- *
- * @ingroup modm_architecture_memory
  */
 void *
 operator new(std::size_t size, modm::MemoryTraits traits,
@@ -113,9 +105,9 @@ operator new(std::size_t size, modm::MemoryTraits traits,
  * @code
  *    uint32_t *p = new (modm::MemoryFastData, std::nothrow) uint32_t[200];
  * @endcode
- *
- * @ingroup modm_architecture_memory
  */
 void *
 operator new[](std::size_t size, modm::MemoryTraits traits,
                const std::nothrow_t&) noexcept;
+
+/// @}

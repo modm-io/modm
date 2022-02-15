@@ -14,6 +14,7 @@
 namespace modm
 {
 
+/// @ingroup modm_driver_ssd1306
 struct ssd1306_register
 {
 protected:

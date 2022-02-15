@@ -20,6 +20,7 @@
 namespace modm::platform
 {
 
+/// @ingroup modm_platform_usb
 class Usb
 {
 public:

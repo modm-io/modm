@@ -10,16 +10,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_PLATFORM_ID_HPP
-#define MODM_PLATFORM_ID_HPP
+#pragma once
 
 #include <stdint.h>
 #include "../device.hpp"
 
-namespace modm
-{
-
-namespace platform
+namespace modm::platform
 {
 
 /**
@@ -37,7 +33,3 @@ getUniqueId(uint8_t offset)
 }
 
 }
-
-}
-
-#endif	// MODM_PLATFORM_ID_HPP

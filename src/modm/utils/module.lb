@@ -16,7 +16,7 @@ def init(module):
     module.description = "Utilities"
 
 def prepare(module, options):
-    module.depends(":architecture")
+    module.depends(":architecture:assert")
     return True
 
 def build(env):

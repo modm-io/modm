@@ -22,6 +22,9 @@
 
 namespace modm
 {
+	/// @ingroup	modm_math_matrix
+	/// @{
+
 	/**
 	 * \brief	Class for handling common matrix operations
 	 *
@@ -44,7 +47,6 @@ namespace modm
 	 * \tparam	ROWS		Number of rows
 	 * \tparam	COLUMNS		Number of columns
 	 *
-	 * \ingroup	modm_math_matrix
 	 * \author	Niklas Hauser
 	 * \author	Fabian Greif
 	 */
@@ -228,15 +230,15 @@ namespace modm
 	typedef Matrix<float, 4, 4> Matrix4f;
 
 	// ------------------------------------------------------------------------
-	/// \internal
+	/// @cond
 	template<typename T>
 	T
 	determinant(const modm::Matrix<T, 1, 1> &m);
 
-	/// \internal
 	template<typename T>
 	T
 	determinant(const modm::Matrix<T, 2, 2> &m);
+	/// @endcond
 
 	/**
 	 * \brief	Calculate the determinant
@@ -247,6 +249,7 @@ namespace modm
 	template<typename T, uint8_t N>
 	T
 	determinant(const modm::Matrix<T, N, N> &m);
+	/// @}
 }
 
 #include "matrix_impl.hpp"

@@ -19,10 +19,8 @@
 namespace modm::amnb
 {
 
-/**
- * @author	Niklas Hauser
- * @ingroup modm_communication_amnb
- */
+/// @author	Niklas Hauser
+/// @ingroup modm_communication_amnb
 template < size_t TxBufferSize = 2, size_t MaxHeapAllocation = 0 >
 class Node : public modm::Resumable<6>
 {

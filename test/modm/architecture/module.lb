@@ -13,6 +13,7 @@
 
 def init(module):
     module.name = ":test:architecture"
+    module.description = "Tests for Architecture Interfaces"
 
 
 def prepare(module, options):

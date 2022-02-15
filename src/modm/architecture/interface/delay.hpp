@@ -17,6 +17,9 @@
 namespace modm
 {
 
+/// @ingroup modm_architecture_delay
+/// @{
+
 /**
  * Spin for nanoseconds.
  *
@@ -24,21 +27,16 @@ namespace modm
  *          be very coarse especially on platforms with very slow clocks.
  *
  * @warning The maximum delay is 1'000'000ns = 1 millisecond.
- *
- * @ingroup modm_architecture_delay
  */
 void delay(std::chrono::nanoseconds ns);
-/// @ingroup modm_architecture_delay
 void delay_ns(uint32_t ns);
 
 /**
  * Is true if nanosecond delay is reasonably accurate.
  * On devices with low clock speed it may not be possible to provide this
  * function with <100ns or even <1000ns accuracy.
- *
- * @ingroup modm_architecture_delay
  */
-#define MODM_DELAY_NS_IS_ACCURATE bool(true or false)
+#define MODM_DELAY_NS_IS_ACCURATE 0/1
 
 /**
  * Spin for microseconds.
@@ -47,21 +45,15 @@ void delay_ns(uint32_t ns);
  *
  * @note In debug mode this function may raise "delay.us" if input validation
  *       fails.
- *
- * @ingroup modm_architecture_delay
  */
 void delay(std::chrono::microseconds us);
-/// @ingroup modm_architecture_delay
 void delay_us(uint32_t us);
 
-/**
- * Spin for milliseconds.
- *
- * @ingroup modm_architecture_delay
- */
+/// Spin for milliseconds.
 void delay(std::chrono::milliseconds ms);
-/// @ingroup modm_architecture_delay
 void delay_ms(uint32_t ms);
+
+/// @}
 
 }
 

@@ -26,7 +26,7 @@ namespace modm
 template < class I2cMaster >
 class Tcs3414;
 
-/// @ingroup	modm_driver_tcs3414
+/// @ingroup modm_driver_tcs3414
 struct tcs3414
 {
 	/** Device Address depends on version TCS341x

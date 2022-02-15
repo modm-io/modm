@@ -11,12 +11,13 @@
 #pragma once
 
 #include <modm/platform.hpp>
+using namespace modm::platform;
 
-/// @ingroup modm_board_samg55_xplained_pro
 namespace Board
 {
+/// @ingroup modm_board_samg55_xplained_pro
+/// @{
 using namespace modm::literals;
-using namespace modm::platform;
 
 struct SystemClock
 {
@@ -69,7 +70,7 @@ inline void
 initialize()
 {
 	// Turn off the watchdog
-	WDT->WDT_MR = (WDT_MR_WDDIS_Msk);
+	WDT->WDT_MR = WDT_MR_WDDIS_Msk;
 
 	SystemClock::enable();
 	SysTickTimer::initialize<SystemClock>();
@@ -82,11 +83,13 @@ initialize()
 	Button::setInput();
 }
 
-inline void initializeUsbFs()
+inline void
+initializeUsbFs()
 {
 	SystemClock::enableUsb();
-	modm::platform::Usb::initialize<Board::SystemClock>();
+	Usb::initialize<Board::SystemClock>();
 }
+/// @}
 
 } // namespace Board
 

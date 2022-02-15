@@ -34,23 +34,22 @@ namespace modm
 namespace gui
 {
 
-/// @ingroup modm_ui_gui
-/// @{
-
 // forward declare so that everything compiles. can this be done better?
 class View;
 class Widget;
 
 
 /// Container used in view to store widgets
+/// @ingroup modm_ui_gui
 typedef modm::DynamicArray<Widget*> WidgetContainer;
-
+/// @ingroup modm_ui_gui
 typedef void (*genericCallback)(void*);
 
 /**
  * Input event that is collected when some input happens. Will be processed by View
  *
  * @author	Daniel Krebs
+ * @ingroup modm_ui_gui
  */
 class InputEvent
 {
@@ -92,6 +91,7 @@ public:
  * garantueed that the callback will only be called once.
  *
  * @author	Daniel Krebs
+ * @ingroup modm_ui_gui
  */
 class AsyncEvent
 {
@@ -127,13 +127,15 @@ private:
 	bool already_run;
 };
 
+/// @ingroup modm_ui_gui
 typedef modm::DoublyLinkedList<AsyncEvent*> AsyncEventList;
-
+/// @ingroup modm_ui_gui
 typedef modm::Queue<InputEvent*, modm::LinkedList<InputEvent*> > inputQueue;
 
 /// Callback when an event happend
+/// @ingroup modm_ui_gui
 typedef void (*eventCallback)(const InputEvent&, Widget*, void*);
-
+/// @ingroup modm_ui_gui
 typedef struct Dimension
 {
 	Dimension(int16_t w, int16_t h) :
@@ -148,10 +150,8 @@ typedef struct Dimension
 	}
 
 } Dimension;
-
+/// @ingroup modm_ui_gui
 typedef modm::glcd::Point Point;
-
-/// @}
 
 }	// namespace gui
 

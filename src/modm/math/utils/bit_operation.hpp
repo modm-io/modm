@@ -28,7 +28,7 @@ namespace modm
 	/// @{
 
 	/**
-	 * \brief	Exchange the two nibbles of a byte
+	 * Exchange the two nibbles of a byte
 	 *
 	 * \code
 	 * 0xab => 0xba
@@ -61,7 +61,7 @@ namespace modm
 	}
 
 	/**
-	 * \brief	Exchange the two bytes of a 16-bit integer
+	 * Exchange the two bytes of a 16-bit integer
 	 *
 	 * \code
 	 * 0xabcd => 0xcdab
@@ -101,7 +101,7 @@ namespace modm
 	}
 
 	/**
-	 * \brief	Exchange the four bytes of a 32-bit integer
+	 * Exchange the four bytes of a 32-bit integer
 	 *
 	 * \code
 	 * 0xabcdefgh => 0xghefcdab
@@ -145,7 +145,7 @@ namespace modm
 
 	// --------------------------------------------------------------------
 	/**
-	 * \brief	Reverse the bits in a byte
+	 * Reverse the bits in a byte
 	 *
 	 * \code
 	 * 0b01110100 => 0b00101110
@@ -172,9 +172,7 @@ namespace modm
 #endif
 	}
 
-	/**
-	 * \brief	Reverse the bits in a 16-bit integer
-	 */
+	/// Reverse the bits in a 16-bit integer
 	inline uint16_t
 	bitReverse(uint16_t n)
 	{
@@ -196,9 +194,7 @@ namespace modm
 #endif
 	}
 
-	/**
-	 * \brief	Reverse the bits in a 32-bit integer
-	 */
+	/// Reverse the bits in a 32-bit integer
 	inline uint32_t
 	bitReverse(uint32_t n)
 	{
@@ -248,7 +244,7 @@ namespace modm
 
 	// --------------------------------------------------------------------
 	/**
-	 * \brief	Count the number of bits set
+	 * Count the number of bits set
 	 *
 	 * 16 clock cycles on an AVR, without call + return.
 	 */
@@ -256,7 +252,7 @@ namespace modm
 	bitCount(uint8_t n);
 
 	/**
-	 * \brief	Count the number of bits set
+	 * Count the number of bits set
 	 *
 	 * 33 clock cycles on an AVR, without call + return.
 	 */

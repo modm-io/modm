@@ -20,7 +20,7 @@
 namespace modm_test
 {
 
-
+/// @ingroup modm_test_mock_logic_analyzer
 class LogicAnalyzer
 {
 public:

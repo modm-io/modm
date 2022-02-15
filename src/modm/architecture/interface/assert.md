@@ -63,7 +63,7 @@ mode just to double-check.
 
 When an assertion fails, the runtime calls any number of user-defined handlers,
 registered using `MODM_ASSERTION_HANDLER(handler)`. The handlers must return a
-`modm::Abandonment` value, specifing whether they want to continue with the
+`modm::Abandonment` value, specifying whether they want to continue with the
 execution with `Abandonment::Ignore`, or abandon execution with
 `Abandonment::Fail` leading to a call to `modm_abandon(info)`, or delegate the
 decision with `Abandonment::DontCare`.
@@ -121,7 +121,7 @@ runtime and their results are accumulated as follows:
 !!! warning "Handlers may be called inside high-priority interrupts!"
     This is problematic when relying on interrupts still working inside handlers
     for example for logging the failure via UART. Be aware of this and make sure
-    you do not inadvertantly block inside handlers.
+    you do not inadvertently block inside handlers.
 
 
 ## Assertion Types
@@ -130,7 +130,7 @@ The call site of the assertion decides whether an assertion can be recovered
 from or not. For example, if the CAN receive buffer has overflowed, but
 execution continues, then code to discard the message must be in place.
 
-In case no handlers are registered or they all delegate the abandoment decision
+In case no handlers are registered or they all delegate the abandonment decision
 away, the call site must decide what the default behavior is. For this purpose
 the following assertions are available:
 

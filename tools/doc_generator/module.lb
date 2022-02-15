@@ -42,10 +42,22 @@ def ref_name(name):
 def node_name(name):
     return name.replace(":", ":\n")
 
+def _link(linkname, name=None):
+    if name is None:
+        name = linkname
+    for c in ["_", ".", ":", "-"]:
+        linkname = linkname.replace(c, "__")
+    return "<a href=\"group__{}.html\"><code>{}</code></a>".format(linkname, name)
 
-def doxify(content):
+def doxify(links, content):
+    module_names = re.findall(r"(`modm:\w.+?`)", content)
+    for name in module_names:
+        if name in links:
+            content = content.replace(name, links[name])
+
     content = re.sub(r"```(.+)\n", r"~~~{.\1}\n", content)
     content = re.sub(r"```", "~~~", content)
+    content = re.sub(r"!!! (.*?) \"(.*?)\"", r"!!! \1 \2", content)
     content = re.sub(r"!!! danger", "@warning", content)
     content = re.sub(r"!!! tip", "@note", content)
     content = re.sub(r"!!! info", "@note", content)
@@ -96,6 +108,7 @@ def post_build(env, buildlog):
     omodules = list(env._env.modules._node.root.all_modules())
     omodules.sort(key=lambda m: m.fullname)
     modules = []
+    links = {}
 
     env.log.debug("Parsing module documentation...")
     for m in omodules:
@@ -115,10 +128,13 @@ def post_build(env, buildlog):
                 "description": descr,
                 "value": value
             })
+            links["`{}`".format(o.fullname)] = _link(m.fullname, o.fullname)
         modules.append(mprops)
+        links["`{}`".format(m.fullname)] = _link(m.fullname)
 
     env.log.debug("Generating doxygen group documentation...")
     env.outbasepath = "modm/docs/dox"
     for m in modules:
         env.substitutions = {"module": m}
-        env.template("group.dox.in", "{}.dox".format(url_name(m["name"])), filters={"doxify": doxify})
+        env.template("group.dox.in", "{}.dox".format(url_name(m["name"])),
+                     filters={"doxify": lambda c: doxify(links, c)})

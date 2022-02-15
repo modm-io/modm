@@ -23,14 +23,14 @@
 
 using namespace modm::platform;
 
-/// @ingroup modm_board_nucleo_l552ze_q
 namespace Board
 {
+/// @ingroup modm_board_nucleo_l552ze_q
+/// @{
 using namespace modm::literals;
 
 /// STM32L5 running at 110 MHz generated from the
 /// internal Multispeed oscillator
-
 struct SystemClock
 {
 	static constexpr uint32_t Frequency = 110_MHz;
@@ -120,29 +120,37 @@ using LedGreen = GpioOutputC7;	// LED1 [Green]
 using LedBlue = GpioOutputB7;	// LED2 [Blue]
 using LedRed = GpioOutputA9;	// LED3 [Red]
 using Leds = SoftwareGpioPort<LedRed, LedBlue, LedGreen>;
+/// @}
 
 namespace usb
 {
-	using Dm = GpioA11;
-	using Dp = GpioA12;
+/// @ingroup modm_board_nucleo_l552ze_q
+/// @{
+using Dm = GpioA11;
+using Dp = GpioA12;
 
-	using UcpdFlt = GpioB14;
-	using UcpdDBn = GpioB5;
-	using UcpdCc1 = GpioA15;
-	using UcpdCc2 = GpioB15;
+using UcpdFlt = GpioB14;
+using UcpdDBn = GpioB5;
+using UcpdCc1 = GpioA15;
+using UcpdCc2 = GpioB15;
 
-	using Device = UsbFs;
+using Device = UsbFs;
+/// @}
 }
 
 namespace stlink
 {
-	using Rx = GpioOutputG8;
-	using Tx = GpioInputG7;
-	using Uart = Lpuart1;
+/// @ingroup modm_board_nucleo_l552ze_q
+/// @{
+using Rx = GpioOutputG8;
+using Tx = GpioInputG7;
+using Uart = Lpuart1;
+/// @}
 }
 
+/// @ingroup modm_board_nucleo_l552ze_q
+/// @{
 using LoggerDevice = modm::IODeviceWrapper<stlink::Uart, modm::IOBuffer::BlockIfFull>;
-
 
 inline void
 initialize()
@@ -166,6 +174,7 @@ initializeUsbFs(uint8_t priority=3)
 	usb::Device::initialize<SystemClock>(priority);
 	usb::Device::connect<usb::Dm::Dm, usb::Dp::Dp>();
 }
+/// @}
 
 } // Board namespace
 

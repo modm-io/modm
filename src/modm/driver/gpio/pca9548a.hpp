@@ -23,7 +23,7 @@ namespace modm
  *
  * This bidirectional 8-channel switch can be used to multiplex I2C busses.
  *
- * @ingroup driver_gpio
+ * @ingroup modm_driver_pca9548a
  *
  * @author  Sascha Schade
  */

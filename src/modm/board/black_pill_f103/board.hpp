@@ -18,10 +18,10 @@
 
 using namespace modm::platform;
 
-/// @ingroup modm_board_black_pill_f103
-/// @{
 namespace Board
 {
+/// @ingroup modm_board_black_pill_f103
+/// @{
 using namespace modm::literals;
 
 /// STM32F103 running at 72MHz generated from the external 8MHz crystal
@@ -91,15 +91,20 @@ struct SystemClock
 		return true;
 	}
 };
+/// @}
 
 namespace usb
 {
+/// @ingroup modm_board_black_pill_f103
+/// @{
 using Dm = GpioA11;		// DM: USB_DM
 using Dp = GpioA12;		// DP: USB_DP
 using Device = UsbFs;
+/// @}
 }
 
-// User LED (inverted, because connected to 3V3)
+/// @ingroup modm_board_black_pill_f103
+/// @{
 using LedGreen = GpioInverted< GpioOutputB12 >;
 using Leds = SoftwareGpioPort< LedGreen >;
 
@@ -120,8 +125,8 @@ initializeUsbFs(uint8_t priority=3)
 	usb::Device::initialize<SystemClock>(priority);
 	usb::Device::connect<usb::Dm::Dm, usb::Dp::Dp>();
 }
+/// @}
 
 } // Board namespace
-/// @}
 
 #endif	// MODM_STM32_F103C8T6_BLACK_PILL_HPP
