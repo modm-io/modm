@@ -73,18 +73,18 @@ class GpioOpenDrain : Gpio
 {
 public:
 	/// calls set
-	modm_always_inline static void set() {
+	static void set() {
 		IO::set();
 	}
 	/// calls reset
-	modm_always_inline static void reset() {
+	static void reset() {
 		IO::reset();
 	}
-	modm_always_inline static void set(bool status) {
+	static void set(bool status) {
 		if (status) { set(); }
 		else { reset(); }
 	}
-	modm_always_inline static bool read() {
+	static bool read() {
 		bool lastOutput = IO::read();
 		IO::setInput();
 		bool read = IO::read();
@@ -129,7 +129,7 @@ public:
 	};
 
 	/// change the function of the pin
-	modm_always_inline static void
+	static void
 	selectFunction(Function f){
 		uint32_t temp;
 		temp = {{ conf_reg }} & ~(7<<0);	// FUNC REG is 3 bits wide
@@ -139,7 +139,7 @@ public:
 
 public:
 		%% if "i2c_mode" in bits
-	modm_always_inline static void
+	static void
 	configure(I2cMode mode) {
 		uint32_t temp;
 		temp = {{ conf_reg }} & ~(3<<8);
@@ -151,7 +151,7 @@ public:
 		%% if type == "" or type == "Output"
 
 			%% if "od" in bits
-	modm_always_inline static void
+	static void
 	configure(OutputType type) {
 		if(type == OutputType::PushPull) {
 			{{ conf_reg }} &= ~static_cast<uint32_t>(OutputType::OpenDrain);
@@ -161,7 +161,7 @@ public:
 	}
 			%% endif
 
-	modm_always_inline static void
+	static void
 	setOutput() {
 			%% if "admode" in bits
 		{{ conf_reg }} |= IOCON_ADMODE_DIGITAL;	// configure as digital pin
@@ -170,14 +170,14 @@ public:
 		{{ gpio_reg }}->DIR |= (1 << {{ pin}});
 	}
 
-	modm_always_inline static void
+	static void
 	setOutput(bool status) {
 		setOutput();
 		set(status);
 	}
 
 			%% if "od" in bits
-	modm_always_inline static void
+	static void
 	setOutput(OutputType type) {
 		configure(type);
 		setOutput();
@@ -185,30 +185,30 @@ public:
 			%% endif
 
 			%% if "i2c_mode" in bits
-	modm_always_inline static void
+	static void
 	setOutput(I2cMode type) {
 		configure(type);
 		setOutput();
 	}
 			%% endif
 
-	modm_always_inline static void
+	static void
 	set() {
 		{{ gpio_reg }}->MASKED_ACCESS[1 << {{ pin }}] = (1 << {{pin}});
 	}
 
-	modm_always_inline static void
+	static void
 	set(bool status) {
 		if (status) { set(); }
 		else { reset(); }
 	}
 
-	modm_always_inline static void
+	static void
 	reset() {
 		{{ gpio_reg }}->MASKED_ACCESS[1 << {{ pin }}] = 0;
 	}
 
-	modm_always_inline static void
+	static void
 	toggle() {
 		if (({{ gpio_reg }}->MASKED_ACCESS[1 << {{ pin }}]) >> {{ pin }})
 		{ reset(); } else { set(); }
@@ -217,7 +217,7 @@ public:
 		%% if type == "" or type == "Input"
 
 			%% if "mode" in bits
-	modm_always_inline static void
+	static void
 	configure(InputType type) {
 		uint32_t temp;
 		temp = {{ conf_reg }} & ~static_cast<uint32_t>(InputType::Repeater);
@@ -227,7 +227,7 @@ public:
 			%% endif
 
 
-	modm_always_inline static void
+	static void
 	setInput() {
 			%% if "admode" in bits
 		{{ conf_reg }} |= IOCON_ADMODE_DIGITAL;	// configure as digital pin
@@ -236,13 +236,13 @@ public:
 		{{ gpio_reg }}->DIR &= ~(1 << {{ pin}});
 	}
 
-	modm_always_inline static bool
+	static bool
 	read() {
 		return ({{ gpio_reg }}->MASKED_ACCESS[1 << {{ pin }}]) >> {{ pin }};
 	}
 
 			%% if "mode" in bits
-	modm_always_inline static void
+	static void
 	setInput(InputType type) {
 		configure(type);
 		setInput();
@@ -250,7 +250,7 @@ public:
 			%% endif
 
 			%% if "i2c_mode" in bits
-	modm_always_inline static void
+	static void
 	setInput(I2cMode type) {
 		configure(type);
 		setInput();

@@ -129,50 +129,50 @@ public:
 		// DATA ACCESS
 		/// returns the acceleration in unknown units
 		///@{
-		int16_t modm_always_inline
+		int16_t inline
 		getAccelerationX() { return swapData(0); }
 
-		int16_t modm_always_inline
+		int16_t inline
 		getAccelerationY() { return swapData(1); }
 
-		int16_t modm_always_inline
+		int16_t inline
 		getAccelerationZ() { return swapData(2); }
 		///@}
 
 		/// returns the magnetic field in unknown units
 		///@{
-		int16_t modm_always_inline
+		int16_t inline
 		getMagneticFieldX() { return swapData(3); }
 
-		int16_t modm_always_inline
+		int16_t inline
 		getMagneticFieldY() { return swapData(4); }
 
-		int16_t modm_always_inline
+		int16_t inline
 		getMagneticFieldZ() { return swapData(5); }
 		///@}
 
 		/// returns the heading in tenth of degrees (0 -> 3600)
-		int16_t modm_always_inline
+		int16_t inline
 		getHeading() { return swapData(6); }
 
 		/// returns the Pitch in tenth of degrees (-900 -> 0 -> 900)
-		int16_t modm_always_inline
+		int16_t inline
 		getPitch() { return swapData(7); }
 
 		/// returns the Roll in tenth of degrees (-900 -> 0 -> 900)
-		int16_t modm_always_inline
+		int16_t inline
 		getRoll() { return swapData(8); }
 
 		/// returns the temperature in unknown format (was not specified in datasheet)
-		int16_t modm_always_inline
+		int16_t inline
 		getTemperature() { return swapData(9); }
 
 		/// returns the value of the operation mode register
-		OperationMode_t modm_always_inline
+		OperationMode_t inline
 		getOperationMode() { return OperationMode_t(data[20]); }
 
 
-		inline int16_t
+		int16_t inline
 		operator [](uint8_t index)
 		{ return (index < 10) ? swapData(index) : 0; }
 
@@ -216,7 +216,7 @@ public:
 
 	// READING RAM
 	/// read operation mode register 2
-	modm::ResumableResult<bool> modm_always_inline
+	modm::ResumableResult<bool>
 	readOperationMode()
 	{ return readPostData(Command::PostOperationMode, 20, 1); }
 
@@ -224,7 +224,7 @@ public:
 
 	// WRITING EEPROM
 	/// Configures the sensor to normal orientation mode with 10Hz data rate.
-	modm::ResumableResult<bool> modm_always_inline
+	modm::ResumableResult<bool>
 	setMeasurementRate(MeasurementRate measurementRate=MeasurementRate::Hz10)
 	{ return writeRegister(Register::OperationMode2, i(measurementRate)); }
 
@@ -239,7 +239,7 @@ public:
 	{ return writeRegister(Register16::VariationAngle, static_cast<uint16_t>(angle)); }
 
 	/// sets a new IIR filter in eeprom
-	modm::ResumableResult<bool> modm_always_inline
+	modm::ResumableResult<bool>
 	setIIR_Filter(uint8_t filter)
 	{ return writeRegister(Register::Filter, filter & 0x0f); }
 
@@ -247,12 +247,12 @@ public:
 
 	// READING EEPROM
 	/// reads the device id from eeprom
-	modm::ResumableResult<bool> modm_always_inline
+	modm::ResumableResult<bool>
 	getDeviceId(uint16_t &value)
 	{ return readRegister(Register16::DeviceSerial, value); }
 
 	/// sets a new IIR filter in eeprom
-	modm::ResumableResult<bool> modm_always_inline
+	modm::ResumableResult<bool>
 	getIIR_Filter(uint8_t &value)
 	{ return readRegister(Register::Filter, value); }
 
@@ -260,42 +260,42 @@ public:
 
 	// COMMANDS
 	/// Sets the specified orientation
-	modm::ResumableResult<bool> modm_always_inline
+	modm::ResumableResult<bool>
 	setOrientation(Orientation orientation)
 	{ return writeCommand(static_cast<Command>(orientation)); }
 
 	/// enters run mode
-	modm::ResumableResult<bool> modm_always_inline
+	modm::ResumableResult<bool>
 	enterRunMode()
 	{ return writeCommand(Command::EnterRunMode); }
 
 	/// enters standby mode
-	modm::ResumableResult<bool> modm_always_inline
+	modm::ResumableResult<bool>
 	enterStandbyMode()
 	{ return writeCommand(Command::EnterStandbyMode); }
 
 	/// enters sleep mode
-	modm::ResumableResult<bool> modm_always_inline
+	modm::ResumableResult<bool>
 	enterSleepMode()
 	{ return writeCommand(Command::EnterSleepMode); }
 
 	/// exit sleep mode
-	modm::ResumableResult<bool> modm_always_inline
+	modm::ResumableResult<bool>
 	exitSleepMode()
 	{ return writeCommand(Command::ExitSleepMode, 20); }
 
 	/// enters user calibration mode
-	modm::ResumableResult<bool> modm_always_inline
+	modm::ResumableResult<bool>
 	enterUserCalibrationMode()
 	{ return writeCommand(Command::EnterUserCalibrationMode); }
 
 	/// exit user calibration mode
-	modm::ResumableResult<bool> modm_always_inline
+	modm::ResumableResult<bool>
 	exitUserCalibrationMode()
 	{ return writeCommand(Command::ExitUserCalibrationMode, 50); }
 
 	/// resets the processor, any new command is delayed by 500ms
-	modm::ResumableResult<bool> modm_always_inline
+	modm::ResumableResult<bool>
 	resetProcessor()
 	{ return writeCommand(Command::ResetProcessor, 500); }
 
@@ -303,22 +303,22 @@ public:
 
 	// DATA REQUESTS
 	/// reads the Acceleration registers and buffer the results
-	modm::ResumableResult<bool> modm_always_inline
+	modm::ResumableResult<bool>
 	readAcceleration()
 	{ return readPostData(Command::PostAccelData, 0, 6); }
 
 	/// reads the Magnetometer registers and buffer the results
-	modm::ResumableResult<bool> modm_always_inline
+	modm::ResumableResult<bool>
 	readMagneticField()
 	{ return readPostData(Command::PostMagData, 6, 6); }
 
 	/// reads the Heading registers and buffer the results
-	modm::ResumableResult<bool> modm_always_inline
+	modm::ResumableResult<bool>
 	readHeading()
 	{ return readPostData(Command::PostHeadingData, 12, 6); }
 
 	/// reads the Tilt registers and buffer the results
-	modm::ResumableResult<bool> modm_always_inline
+	modm::ResumableResult<bool>
 	readTilt()
 	{ return readPostData(Command::PostTiltData, 14, 6); }
 

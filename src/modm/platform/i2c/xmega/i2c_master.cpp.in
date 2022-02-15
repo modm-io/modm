@@ -41,28 +41,28 @@ namespace
 	static modm::I2cMaster::Error errorState(modm::I2cMaster::Error::NoError);
 
 	// helper functions
-	static modm_always_inline void
+	static void
 	initializeWrite(modm::I2cDelegate::Writing w) {
 		writePointer = w.buffer;
 		writeBytesLeft = w.size;
 		nextOperation = static_cast<modm::I2c::Operation>(w.next);
 	}
 
-	static modm_always_inline void
+	static void
 	initializeRead(modm::I2cDelegate::Reading r) {
 		readPointer = r.buffer;
 		readBytesLeft = r.size;
 		nextOperation = static_cast<modm::I2c::Operation>(r.next);
 	}
 
-	static modm_always_inline void
+	static void
 	initializeStopAfterAddress() {
 		//writePointer = ..;
 		writeBytesLeft = 0;
 		nextOperation = modm::I2c::Operation::Stop;
 	}
 
-	static modm_always_inline void
+	static void
 	initializeRestartAfterAddress() {
 		//writePointer = ..;
 		writeBytesLeft = 0;

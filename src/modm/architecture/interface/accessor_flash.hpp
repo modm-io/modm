@@ -67,34 +67,29 @@ template<typename T>
 class Flash
 {
 public:
-	modm_always_inline
 	explicit Flash(const T* addr = 0) :
 		address(addr)
 	{
 	}
 
 	template <typename U>
-	modm_always_inline
 	explicit Flash(const Flash<U>& rhs) :
 		address((T*) rhs.address)
 	{
 	}
 
-	modm_always_inline
 	const T
 	operator *() const
 	{
 		return FlashReader<T, sizeof(T)>::read(address);
 	}
 
-	modm_always_inline
 	const T
 	operator [](size_t index) const
 	{
 		return FlashReader<T, sizeof(T)>::read(address + index);
 	}
 
-	modm_always_inline
 	Flash&
 	operator++()
 	{
@@ -102,7 +97,6 @@ public:
 		return *this;
 	}
 
-	modm_always_inline
 	Flash
 	operator++(int)
 	{
@@ -111,7 +105,6 @@ public:
 		return ret;
 	}
 
-	modm_always_inline
 	Flash&
 	operator--()
 	{
@@ -119,7 +112,6 @@ public:
 		return *this;
 	}
 
-	modm_always_inline
 	Flash&
 	operator--(int)
 	{
@@ -128,7 +120,6 @@ public:
 		return ret;
 	}
 
-	modm_always_inline
 	Flash&
 	operator+=(size_t rhs)
 	{
@@ -136,7 +127,6 @@ public:
 		return *this;
 	}
 
-	modm_always_inline
 	Flash&
 	operator-=(size_t rhs)
 	{
@@ -144,14 +134,12 @@ public:
 		return *this;
 	}
 
-	modm_always_inline
 	bool
 	isValid() const
 	{
 		return (address != 0);
 	}
 
-	modm_always_inline
 	const T*
 	getPointer() const
 	{
@@ -170,8 +158,7 @@ private:
 
 /// Convert a normal pointer to a accessor::Flash
 /// @ingroup modm_architecture_accessor
-template<typename T>
-modm_always_inline ::modm::accessor::Flash<T>
+template<typename T> ::modm::accessor::Flash<T>
 asFlash(const T* ptr)
 {
 	return ::modm::accessor::Flash<T>(ptr);

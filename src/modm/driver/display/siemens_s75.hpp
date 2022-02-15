@@ -53,10 +53,10 @@ namespace modm
 		initialize(void);
 
 	protected:
-		modm_always_inline void
+		void
 		lcdCls(const uint16_t colour);
 
-		modm_always_inline void
+		void
 		lcdSettings();
 
 	private:

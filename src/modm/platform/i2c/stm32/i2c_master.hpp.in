@@ -69,7 +69,7 @@ public:
 	 *		`Standard` or `Fast`, `High` datarate is not supported
 	 */
 	template<class SystemClock, baudrate_t baudrate=kBd(100), percent_t tolerance=pct(5)>
-	static modm_always_inline void
+	static void
 	initialize()
 	{
 		// calculate the expected clock ratio

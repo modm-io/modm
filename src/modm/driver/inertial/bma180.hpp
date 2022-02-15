@@ -415,7 +415,7 @@ namespace modm
 		 * only read the X-ZDATA0-1 registers and buffer the results
 		 * sets isNewDataAvailable() to \c true
 		 */
-		modm_always_inline void
+		void
 		readAccelerometer();
 
 		/* \return pointer to 8bit array containing xyzt temperature and accelerations
@@ -428,7 +428,7 @@ namespace modm
 		 * \c false, when the data has been accessed, or data is being
 		 * copied into the buffer.
 		 */
-		modm_always_inline bool
+		bool
 		isNewDataAvailable();
 
 		void

@@ -156,7 +156,7 @@ template <	typename Cclk,
 			typename DataSource,
 			typename Led0,
 			typename Led1>
-modm_always_inline void
+void
 modm::XilinxSpartan6Parallel<Cclk, DataLow, DataHigh, ProgB, InitB, Done, DataSource, Led0, Led1>::writeWord(uint8_t first, uint8_t second) {
 	DataLow::write(first);
 	Cclk::set();
@@ -175,7 +175,7 @@ template <	typename Cclk,
 			typename DataSource,
 			typename Led0,
 			typename Led1 >
-modm_always_inline void
+void
 modm::XilinxSpartan6Parallel<Cclk, DataLow, DataHigh, ProgB, InitB, Done, DataSource, Led0, Led1>::writePage(uint8_t *buffer, WritePageState& writePageState, uint32_t pageSize) {
 	for (uint32_t offset = 0; offset < pageSize; offset+=2) {
 		uint8_t first = buffer[offset];

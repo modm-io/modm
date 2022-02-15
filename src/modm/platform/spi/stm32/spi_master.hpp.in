@@ -99,18 +99,18 @@ public:
 		state = 0;
 	}
 
-	static modm_always_inline void
+	static void
 	setDataMode(DataMode mode)
 	{
 		SpiHal{{ id }}::setDataMode(static_cast<SpiHal{{ id }}::DataMode>(mode));
 	}
 
-	static modm_always_inline void
+	static void
 	setDataOrder(DataOrder order)
 	{
 		SpiHal{{ id }}::setDataOrder(static_cast<SpiHal{{ id }}::DataOrder>(order));
 	}
-	static modm_always_inline void
+	static void
 	setDataSize(DataSize size)
 	{
 		SpiHal{{ id }}::setDataSize(static_cast<SpiHal{{ id }}::DataSize>(size));

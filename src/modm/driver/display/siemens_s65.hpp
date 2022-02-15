@@ -45,19 +45,19 @@ namespace modm
 	class SiemensS65Common
 	{
 	protected:
-		modm_always_inline void
+		void
 		writeCmd(uint8_t reg, uint16_t param);
 
-		modm_always_inline void
+		void
 		writeReg(uint8_t reg);
 
-		modm_always_inline void
+		void
 		writeData(uint16_t param);
 
-		modm_always_inline void
+		void
 		lcdCls(uint16_t colour);
 
-		modm_always_inline void
+		void
 		lcdSettings(bool landscape);
 
 	};
