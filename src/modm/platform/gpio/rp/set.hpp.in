@@ -91,6 +91,11 @@ public:
 		(PortRegs<Gpios::port>::set_pue_pde(Gpios::pin, type==InputType::PullUp, type==InputType::PullDown), ...);
 	}
 
+	static void setSlewRate(SlewRate rate)
+	{
+		(PortRegs<Gpios::port>::set_slewrate(Gpios::pin, uint8_t(rate)), ...);
+	}
+
 	static void set()
 	{
 %% for port, id in ports.items()

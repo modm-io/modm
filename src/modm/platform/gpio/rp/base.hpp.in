@@ -55,6 +55,12 @@ struct Gpio
 		mA_8 = 2,
 		mA_12 = 3,
 	};
+	enum class
+	SlewRate : uint8_t
+	{
+		Slow = 0,
+		Fast = 1
+	};
 
 	enum class
 	Port
@@ -115,15 +121,15 @@ struct Gpio::PortRegs<Gpio::Port::{{ port | capitalize }}>
 	{
 		hw_write_masked(
 			&pads{{(pads_names[port] or port) | lower}}_hw->io[pin],
-			strength << PADS_BANK0_GPIO0_DRIVE_LSB,
+			uint32_t(strength) << PADS_BANK0_GPIO0_DRIVE_LSB,
 			PADS_BANK0_GPIO0_DRIVE_BITS
 		);
 	}
-	static void set_slewfast(uint8_t pin, bool fast)
+	static void set_slewrate(uint8_t pin, uint8_t rate)
 	{
 		hw_write_masked(
 			&pads{{(pads_names[port] or port) | lower}}_hw->io[pin],
-			(fast?1:0) << PADS_BANK0_GPIO0_SLEWFAST_LSB,
+			uint32_t(rate) << PADS_BANK0_GPIO0_SLEWFAST_LSB,
 			PADS_BANK0_GPIO0_SLEWFAST_BITS
 		);
 	}

@@ -64,6 +64,7 @@ public:
 	static void setInput() { PinSet::setInput(); }
 	static void setInput(InputType type) { PinSet::setInput(type); }
 	static void configure(InputType type) { PinSet::configure(type); }
+	static void setSlewRate(SlewRate rate) { PinSet::setSlewRate(rate); }
 
 	static bool read() { return Regs::sio_in() & mask; }
 
