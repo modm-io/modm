@@ -25,7 +25,7 @@ core1_wrapper(void (*entry)(void))
 	(*entry)();
 }
 
-static void __attribute__((naked)) core1_trampoline(void)
+static void modm_naked core1_trampoline(void)
 {
 	asm volatile ("pop {r0, pc}");  // r0 = entry, pc = core1_wrapper
 }

@@ -85,7 +85,7 @@ using AssertionHandler = Abandonment (*)(const AssertionInfo &info);
  *
  * @note This assert is included in all builds!
  */
-modm_noreturn void
+[[noreturn]] void
 modm_assert(bool condition,
 			const char *name, const char *description,
 			uintptr_t context=uintptr_t(-1));
@@ -145,7 +145,7 @@ modm_assert_continue_ignore_debug(bool condition,
 		MODM_ASSERTION_HANDLER(handler)
 #else
 #define MODM_ASSERTION_HANDLER_DEBUG(handler) \
-		static const modm::AssertionHandler modm_unused \
+		static const modm::AssertionHandler [[maybe_unused]] \
 		handler ## _assertion_handler_ptr = handler
 #endif
 

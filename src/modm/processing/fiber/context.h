@@ -42,7 +42,7 @@ void
 modm_context_jump(uintptr_t* from_sp, uintptr_t to_sp);
 
 /// Switches control back to the main context from the user context.
-void __attribute__((noreturn))
+void modm_noreturn
 modm_context_end();
 /// @}
 

@@ -11,6 +11,7 @@
 #ifndef MODM_ILI9341_HPP
 #define MODM_ILI9341_HPP
 
+#include <modm/architecture/utils.hpp>
 #include <modm/architecture/interface/delay.hpp>
 #include <modm/architecture/interface/register.hpp>
 #include <modm/math/utils/endianness.hpp>

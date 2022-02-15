@@ -32,14 +32,14 @@ public:
 		Dc::setOutput();
 	}
 
-	__attribute__((noinline)) void
+	modm_noinline void
 	writeCommand(Command command)
 	{
 		Dc::reset(); // enable command
 		SPI::transferBlocking(i(command));
 		Dc::set(); // reset to data
 	}
-	__attribute__((noinline)) void
+	modm_noinline void
 	writeCommand(Command command, uint8_t const *args, std::size_t length)
 	{
 		Dc::reset(); // enable command
