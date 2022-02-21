@@ -51,6 +51,21 @@ public:
 		return backgroundColor;
 	}
 
+	/**
+	 * Draw a bitmap with 16-bit 565 colored pixels.
+	 *
+	 * \p data is series of pixel color values
+	 */
+	virtual void drawBitmap(
+		glcd::Point upperLeft,
+		uint16_t width,
+		uint16_t height,
+		modm::accessor::Flash<uint8_t> data)
+	{
+		modm_assert(false, "noDrawBitmap",
+			"drawBitmap method is not implemented on ColorGraphicsDisplay implementation");
+	};
+
 protected:
 	color::Rgb565 foregroundColor;
 	color::Rgb565 backgroundColor;
