@@ -17,7 +17,7 @@ def init(module):
 
 def prepare(module, options):
     device = options[":target"]
-    if device.identifier.family not in ["g0", "f1", "f4"]:
+    if device.identifier.family not in ["g0","g4", "f1", "f4"]:
         return False
     if not device.has_driver("flash:stm32*"):
         return False
@@ -44,6 +44,10 @@ def build(env):
         block_shift = 11
         ftype = "page"
         busy_bit = "FLASH_SR_BSY1"
+    elif target.family in ["g4"]:
+        block_shift = 11
+        ftype = "page"
+        busy_bit = "FLASH_SR_BSY"
 
     env.substitutions = {
         "start": int(flash["start"], 16),
