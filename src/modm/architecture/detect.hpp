@@ -84,6 +84,9 @@
 /// Size of pointer in bytes
 #define	MODM_SIZEOF_POINTER
 
+/// Only defined in debug profile
+#define MODM_DEBUG_BUILD
+
 /// @}
 
 #else // !__DOXYGEN__

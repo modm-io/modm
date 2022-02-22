@@ -175,6 +175,26 @@ just as above:
 4. `bool modm_assert_continue_fail_debug()`
 5. `bool modm_assert_continue_ignore_debug()`
 
+Alternatively, you can guard the entire assertion statement with the
+`MODM_BUILD_DEBUG` macro if you only want to execute the check and branch in
+debug profile:
+
+```cpp
+// The check is always performed, but only raises an assertion in debug profile!
+if (not modm_assert_continue_ignore_debug(cond, ...))
+{
+    // if the check fails, this branch is executed in release profile too!
+}
+
+#ifdef MODM_DEBUG_BUILD
+// This check if only performed in debug profile
+if (not modm_assert_continue_ignore(cond, ...))
+{
+    // if the check fails, this branch is executed only in debug profile!
+}
+#endif
+```
+
 
 ### When to use what?
 
