@@ -263,7 +263,6 @@ namespace modm
 		bool tempR_ = false;
 		bool tempS_ = false;
 		bool temp_ = false;
-		bool hasSend_ = false;
 		bool receiveSuccess_ = false;
 	};
 }
