@@ -31,7 +31,6 @@ def prepare(module, options):
         ":architecture:can",
         ":architecture:clock",
         ":architecture:delay",
-        ":architecture:interrupt",
         ":architecture:spi.device",
         ":processing:protothread",
         ":processing:timer",

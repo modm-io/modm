@@ -216,13 +216,12 @@ template <typename SPI, typename CS, typename INT>
 bool
 modm::Mcp2515<SPI, CS, INT>::sendMessage(const can::Message& message)
 {
-	bool success = true;
 	if (not modm_assert_continue_ignore(txQueue.push(message), "mcp2515.can.tx",
 			"CAN transmit software buffer overflowed!", 1)) {
 		/// buffer full, could not send
-		success = false;
+		return false;
 	}
-	return success;
+	return true;
 }
 
 // ----------------------------------------------------------------------------
@@ -237,7 +236,7 @@ modm::Mcp2515<SPI, CS, INT>::mcp2515ReadMessage()
 	// read status flag of the device
 	statusBufferR_ = RF_CALL(readStatus(RX_STATUS));
 
-	tempR_ = true;
+	readTemp_ = true;
 	if (statusBufferR_ & FLAG_RXB0_FULL) {
 		addressBufferR_ = READ_RX;			// message in buffer 0
 	}
@@ -245,10 +244,10 @@ modm::Mcp2515<SPI, CS, INT>::mcp2515ReadMessage()
 		addressBufferR_ = READ_RX | 0x04;	// message in buffer 1 (RXB1SIDH)
 	}
 	else {
-		tempR_ = false;						// Error: no message available
+		readTemp_ = false;						// Error: no message available
 	}
 
-	if(tempR_)
+	if(readTemp_)
 	{
 		RF_WAIT_UNTIL(this->acquireMaster());
 		chipSelect.reset();
@@ -274,7 +273,7 @@ modm::Mcp2515<SPI, CS, INT>::mcp2515ReadMessage()
 	// RX0IF or RX1IF respectivly were already cleared automatically by rising CS.
 	// See section 12.4 in datasheet.
 
-	RF_END_RETURN(tempR_);
+	RF_END_RETURN(readTemp_);
 }
 
 template <typename SPI, typename CS, typename INT>
@@ -290,9 +289,7 @@ modm::Mcp2515<SPI, CS, INT>::update(){
 		if(RF_CALL(mcp2515ReadMessage()))
 		{
 			if(not modm_assert_continue_ignore(rxQueue.push(messageBuffer_), "mcp2515.can.tx",
-			"CAN transmit software buffer overflowed!", 1)){
-				/// ignore
-			}
+			"CAN transmit software buffer overflowed!", 1)){}
 		}
 	}
 

@@ -260,7 +260,7 @@ namespace modm
 		uint8_t a_ = 0;
 		uint8_t b_ = 0;
 		uint8_t data_ = 0;
-		bool tempR_ = false;
+		bool readTemp_ = false;
 		bool tempS_ = false;
 		bool temp_ = false;
 		bool receiveSuccess_ = false;

@@ -17,8 +17,6 @@
 #include <modm/processing/protothread.hpp>
 #include <modm/driver/can/mcp2515.hpp>
 
-#define SENDER 1
-
 // Set the log level
 #undef MODM_LOG_LEVEL
 #define MODM_LOG_LEVEL modm::log::DEBUG
@@ -36,27 +34,28 @@ using SpiMaster = SpiMaster1;
 
 // Default filters to receive any extended CAN frame
 FLASH_STORAGE(uint8_t canFilter[]) = {
-	MCP2515_FILTER_EXTENDED(0),  // Filter 0
-	MCP2515_FILTER_EXTENDED(0),  // Filter 1
+    MCP2515_FILTER_EXTENDED(0), // Filter 0
+    MCP2515_FILTER_EXTENDED(0), // Filter 1
 
-	MCP2515_FILTER_EXTENDED(0),  // Filter 2
-	MCP2515_FILTER_EXTENDED(0),  // Filter 3
-	MCP2515_FILTER_EXTENDED(0),  // Filter 4
-	MCP2515_FILTER_EXTENDED(0),  // Filter 5
+    MCP2515_FILTER(0), // Filter 2
+    MCP2515_FILTER(0), // Filter 3
+    MCP2515_FILTER(0), // Filter 4
+    MCP2515_FILTER(0), // Filter 5
 
-	MCP2515_FILTER_EXTENDED(0),  // Mask 0
-	MCP2515_FILTER_EXTENDED(0),  // Mask 1
+    MCP2515_MASK_EXTENDED(0), // Mask 0
+    MCP2515_MASK(0), // Mask 1
 };
 
 modm::Mcp2515<SpiMaster, Cs, Int> mcp2515;
 
-class MyTask : modm::pt::Protothread
+class CanThread : modm::pt::Protothread
 {
 public:
-	MyTask() :
-		message_{0x1337},
-		i_{0},
-		j_{0}
+	CanThread() :
+		message_{},
+		wait_{1s},
+		i{0},
+		j{0}
 		{}
 
 	bool
@@ -65,75 +64,77 @@ public:
 		PT_BEGIN();
 
 		MODM_LOG_INFO << "Initializing mcp2515 ..." << modm::endl;
-		// Configure MCP2515 and set the filters
-		initialized_ = mcp2515.initialize<8_MHz, 500_kbps>();
-		MODM_LOG_INFO << "Success: " << initialized_ << modm::endl;
+		// Configure MCP2515
+		while (!mcp2515.initialize<8_MHz, 500_kbps>()){
+			PT_WAIT_UNTIL(wait_.isExpired());
+			wait_.restart();
+		}
+		/// Set filters of MCP2515
+		MODM_LOG_INFO << "Setting filters of mcp2515 ..." << modm::endl;
 		mcp2515.setFilter(modm::accessor::asFlash(canFilter));
 		MODM_LOG_INFO << "Running ... " << modm::endl;
-#if SENDER == 0
-		while (initialized_)
+		while (true)
 		{
 			// receive messages
 			if (mcp2515.isMessageAvailable())
 			{
 				MODM_LOG_INFO << "Message Available ... " << modm::endl;
 				mcp2515.getMessage(message_);
-				for(i_ = 0; i_ < message_.length; ++i_){
-					MODM_LOG_INFO << modm::hex<< " 0x" << message_.data[i_];
+				MODM_LOG_INFO << "Received message: " << modm::hex << message_.identifier << modm::endl;
+				for(i = 0; i < message_.length; ++i){
+					MODM_LOG_INFO << modm::hex<< " 0x" << message_.data[i];
 				}
 				MODM_LOG_INFO << modm::endl;
-				MODM_LOG_INFO << "Received message [" << j_ << "]: " << modm::hex << message_.identifier << modm::endl;
-				j_+=1;
 				MODM_LOG_INFO << modm::endl;
 			}
-			PT_CALL(mcp2515.update());
-		}
-#else
-		while (initialized_)
-		{
-			wait_.restart(1000ms);
-			PT_WAIT_UNTIL(wait_.isExpired());
-			message_.length = 2;
-			message_.data[0] = i_++;
-			message_.data[1] = i_++;
-			MODM_LOG_INFO << "Sending Message ... "<< modm::endl;
-			for(j_ = 0; j_ < message_.length; ++j_){
-				MODM_LOG_INFO << modm::hex<< " 0x" << message_.data[j_];
+
+			if(wait_.isExpired())
+			{
+				wait_.restart(1000ms);
+				message_.identifier = 0xAA;
+				message_.length = 2;
+				message_.data[0] = 13;
+				message_.data[1] = 37;
+				MODM_LOG_INFO << "Sending Message ... "<< modm::endl;
+				for(j = 0; j < message_.length; ++j){
+					MODM_LOG_INFO << modm::hex<< " 0x" << message_.data[j];
+				}
+				MODM_LOG_INFO << modm::endl;
+				MODM_LOG_INFO << "Success: " << mcp2515.sendMessage(message_) << modm::endl;
 			}
-			MODM_LOG_INFO << modm::endl;
-			mcp2515.sendMessage(message_);
+
+			/// process internal mcp2515 queues
 			PT_CALL(mcp2515.update());
+			PT_YIELD();
 		}
-#endif
 
 		PT_END();
 	}
 
 private:
 	modm::can::Message message_;
-	bool initialized_;
 	modm::ShortTimeout wait_;
-	uint8_t i_, j_;
+	uint8_t i, j;
 };
 
-MyTask task;
+CanThread canThread;
 
 int
 main()
 {
 	Board::initialize();
 
-	MODM_LOG_INFO << "Hello" << modm::endl;
+	MODM_LOG_INFO << "Mcp2515 Example" << modm::endl;
 	// Initialize SPI interface and the other pins
 	// needed by the MCP2515
 	SpiMaster::connect<Miso::Miso, Mosi::Mosi, Sck::Sck>();
 	/// we initialize a higher baud rate then n the avr example, dunnow hats the mcp2515 is capable
 	/// of
-	SpiMaster::initialize<Board::SystemClock, 20_MHz>();
+	SpiMaster::initialize<Board::SystemClock, 10_MHz>();
 	Cs::setOutput();
 	Int::setInput(Gpio::InputType::PullUp);
 
 	while (true) {
-		task.run();
+		canThread.run();
 	}
 }
