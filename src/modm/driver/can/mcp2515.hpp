@@ -21,13 +21,13 @@
 #include <modm/architecture/interface/delay.hpp>
 #include <modm/architecture/interface/can.hpp>
 #include <modm/architecture/interface/spi_device.hpp>
-#include <modm/architecture/driver/atomic/queue.hpp>
 #include <modm/processing/protothread.hpp>
 #include <modm/processing/resumable.hpp>
 #include <modm/processing/timer.hpp>
 #include <modm/debug/logger.hpp>
 
 #include "mcp2515_definitions.hpp"
+#include "mcp2515_options.hpp"
 
 /**
  * \name	Restructure filter and mask bits for the MCP2515
@@ -125,7 +125,7 @@ namespace modm
 					protected modm::NestedResumable<4>
 	{
 	public:
-		Mcp2515() : messageBuffer_{}, delayR_{}, delayS_{} {
+		Mcp2515() : messageBuffer{}, delayS{} {
 			this->attachConfigurationHandler([]() {
 				SPI::setDataMode(SPI::DataMode::Mode3);
 				SPI::setDataOrder(SPI::DataOrder::MsbFirst);
@@ -240,30 +240,29 @@ namespace modm
 		readIdentifier(uint32_t& identifier);
 
 	private:
-		inline static modm::atomic::Queue<modm::can::Message, 32> txQueue;
-		inline static modm::atomic::Queue<modm::can::Message, 32> rxQueue;
+		inline static modm::mcp2515::options::TX_QUEUE txQueue;
+		inline static modm::mcp2515::options::RX_QUEUE rxQueue;
 
 		static SPI spi;
 		static CS chipSelect;
 		static INT interruptPin;
 
-		modm::can::Message messageBuffer_;
-		modm::ShortTimeout delayR_;
-		modm::ShortTimeout delayS_;
-		uint8_t statusBuffer_ = 0;
-		uint8_t statusBufferR_ = 0;
-		uint8_t statusBufferS_ = 0;
-		uint8_t statusBufferReady_ = 0;
-		uint8_t addressBufferR_ = 0;
-		uint8_t addressBufferS_ = 0;
-		uint8_t i_, j_ = 0;
-		uint8_t a_ = 0;
-		uint8_t b_ = 0;
-		uint8_t data_ = 0;
-		bool readTemp_ = false;
-		bool tempS_ = false;
-		bool temp_ = false;
-		bool receiveSuccess_ = false;
+		modm::can::Message messageBuffer;
+		modm::ShortTimeout delayS;
+		uint8_t statusBuffer = 0;
+		uint8_t statusBufferR = 0;
+		uint8_t statusBufferS = 0;
+		uint8_t statusBufferReady = 0;
+		uint8_t addressBufferR = 0;
+		uint8_t addressBufferS = 0;
+		uint8_t i, j = 0;
+		uint8_t a = 0;
+		uint8_t b = 0;
+		uint8_t data = 0;
+		bool readTemp = false;
+		bool tempS = false;
+		bool temp = false;
+		bool receiveSuccess = false;
 	};
 }
 

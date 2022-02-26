@@ -1,0 +1,22 @@
+
+#ifndef MODM_MCP2515_OPTIONS_HPP
+#define MODM_MCP2515_OPTIONS_HPP
+
+#include <modm/architecture/driver/atomic/queue.hpp>
+
+namespace modm{
+namespace mcp2515{
+namespace options{
+
+%% if options["buffer.tx"] > 0
+using TX_QUEUE = modm::atomic::Queue<modm::can::Message, {{ options["buffer.tx"] }}>;
+%% endif
+%% if options["buffer.rx"] > 0
+using RX_QUEUE = modm::atomic::Queue<modm::can::Message, {{ options["buffer.rx"] }}>;
+%% endif
+
+} // end namespace options
+} // end namespace mcp2515
+} // end namespace modm
+
+#endif // MODM_MCP2515_OPTIONS_HPP

@@ -17,7 +17,7 @@
 	#error	"Don't include this file directly, use 'mcp2515.hpp' instead!"
 #endif
 #include "mcp2515_bit_timings.hpp"
-#include "mcp2515_definitions.hpp"
+#include "mcp2515_options.hpp"
 #include <modm/architecture/interface/assert.hpp>
 
 // Set the log level
@@ -234,38 +234,38 @@ modm::Mcp2515<SPI, CS, INT>::mcp2515ReadMessage()
 	RF_BEGIN();
 
 	// read status flag of the device
-	statusBufferR_ = RF_CALL(readStatus(RX_STATUS));
+	statusBufferR = RF_CALL(readStatus(RX_STATUS));
 
-	readTemp_ = true;
-	if (statusBufferR_ & FLAG_RXB0_FULL) {
-		addressBufferR_ = READ_RX;			// message in buffer 0
+	readTemp = true;
+	if (statusBufferR & FLAG_RXB0_FULL) {
+		addressBufferR = READ_RX;			// message in buffer 0
 	}
-	else if (statusBufferR_ & FLAG_RXB1_FULL) {
-		addressBufferR_ = READ_RX | 0x04;	// message in buffer 1 (RXB1SIDH)
+	else if (statusBufferR & FLAG_RXB1_FULL) {
+		addressBufferR = READ_RX | 0x04;	// message in buffer 1 (RXB1SIDH)
 	}
 	else {
-		readTemp_ = false;						// Error: no message available
+		readTemp = false;						// Error: no message available
 	}
 
-	if(readTemp_)
+	if(readTemp)
 	{
 		RF_WAIT_UNTIL(this->acquireMaster());
 		chipSelect.reset();
-		RF_CALL(spi.transfer(addressBufferR_));
+		RF_CALL(spi.transfer(addressBufferR));
 
-		messageBuffer_.flags.extended = RF_CALL(readIdentifier(messageBuffer_.identifier));
-		if (statusBufferR_ & FLAG_RTR) {
-			messageBuffer_.flags.rtr = true;
+		messageBuffer.flags.extended = RF_CALL(readIdentifier(messageBuffer.identifier));
+		if (statusBufferR & FLAG_RTR) {
+			messageBuffer.flags.rtr = true;
 		}
 		else {
-			messageBuffer_.flags.rtr = false;
+			messageBuffer.flags.rtr = false;
 		}
 
-		messageBuffer_.length = RF_CALL(spi.transfer(0xff)) & 0x0f;
+		messageBuffer.length = RF_CALL(spi.transfer(0xff)) & 0x0f;
 
-		for (j_ = 0; j_ < messageBuffer_.length; ++j_) {
-			data_ = RF_CALL(spi.transfer(0xff));
-			messageBuffer_.data[j_] = data_;
+		for (j = 0; j < messageBuffer.length; ++j) {
+			data = RF_CALL(spi.transfer(0xff));
+			messageBuffer.data[j] = data;
 		}
 		RF_WAIT_UNTIL(this->releaseMaster());
 		chipSelect.set();
@@ -273,7 +273,7 @@ modm::Mcp2515<SPI, CS, INT>::mcp2515ReadMessage()
 	// RX0IF or RX1IF respectivly were already cleared automatically by rising CS.
 	// See section 12.4 in datasheet.
 
-	RF_END_RETURN(readTemp_);
+	RF_END_RETURN(readTemp);
 }
 
 template <typename SPI, typename CS, typename INT>
@@ -288,7 +288,7 @@ modm::Mcp2515<SPI, CS, INT>::update(){
 	if(!interruptPin.read()){
 		if(RF_CALL(mcp2515ReadMessage()))
 		{
-			if(not modm_assert_continue_ignore(rxQueue.push(messageBuffer_), "mcp2515.can.tx",
+			if(not modm_assert_continue_ignore(rxQueue.push(messageBuffer), "mcp2515.can.tx",
 			"CAN transmit software buffer overflowed!", 1)){}
 		}
 	}
@@ -313,16 +313,16 @@ modm::Mcp2515<SPI, CS, INT>::mcp2515IsReadyToSend()
 
 	RF_BEGIN();
 
-	tempS_ = true;
-	statusBufferReady_ = RF_CALL(readStatus(READ_STATUS));
-	if (( statusBufferReady_& (TXB2CNTRL_TXREQ | TXB1CNTRL_TXREQ | TXB0CNTRL_TXREQ)) ==
+	tempS = true;
+	statusBufferReady = RF_CALL(readStatus(READ_STATUS));
+	if (( statusBufferReady& (TXB2CNTRL_TXREQ | TXB1CNTRL_TXREQ | TXB0CNTRL_TXREQ)) ==
 			(TXB2CNTRL_TXREQ | TXB1CNTRL_TXREQ | TXB0CNTRL_TXREQ))
 	{
 		// all buffers currently in use
-		tempS_ = false;
+		tempS = false;
 	}
 
-	RF_END_RETURN(tempS_);
+	RF_END_RETURN(tempS);
 }
 template <typename SPI, typename CS, typename INT>
 bool
@@ -347,32 +347,32 @@ modm::Mcp2515<SPI, CS, INT>::mcp2515SendMessage(const can::Message& message)
 	using namespace modm::mcp2515;
 	RF_BEGIN();
 
-	statusBufferS_ = RF_CALL(readStatus(READ_STATUS));
+	statusBufferS = RF_CALL(readStatus(READ_STATUS));
 
-	addressBufferS_ = static_cast<uint8_t>(false);
+	addressBufferS = static_cast<uint8_t>(false);
 
 	// /// send if ready, else return that nothing was sent
-	if(mcp2515IsReadyToSend(statusBufferS_))
+	if(mcp2515IsReadyToSend(statusBufferS))
 	{
-		if ((statusBufferS_ & TXB0CNTRL_TXREQ) == 0)
+		if ((statusBufferS & TXB0CNTRL_TXREQ) == 0)
 		{
-			addressBufferS_ = 0x00;  // TXB0SIDH
-		} else if ((statusBufferS_ & TXB1CNTRL_TXREQ) == 0)
+			addressBufferS = 0x00;  // TXB0SIDH
+		} else if ((statusBufferS & TXB1CNTRL_TXREQ) == 0)
 		{
-			addressBufferS_ = 0x02;  // TXB1SIDH
-		} else if ((statusBufferS_ & TXB2CNTRL_TXREQ) == 0)
+			addressBufferS = 0x02;  // TXB1SIDH
+		} else if ((statusBufferS & TXB2CNTRL_TXREQ) == 0)
 		{
-			addressBufferS_ = 0x04;  // TXB2SIDH
+			addressBufferS = 0x04;  // TXB2SIDH
 		} else
 		{
 			// all buffer are in use => could not send the message
 		}
 
-		if (addressBufferS_ == 0x00 || addressBufferS_ == 0x02 || addressBufferS_ == 0x04)
+		if (addressBufferS == 0x00 || addressBufferS == 0x02 || addressBufferS == 0x04)
 		{
 			RF_WAIT_UNTIL(this->acquireMaster());
 			chipSelect.reset();
-			RF_CALL(spi.transfer(WRITE_TX | addressBufferS_));
+			RF_CALL(spi.transfer(WRITE_TX | addressBufferS));
 			RF_CALL(writeIdentifier(message.identifier, message.flags.extended));
 
 			// if the message is a rtr-frame, is has a length but no attached data
@@ -383,24 +383,24 @@ modm::Mcp2515<SPI, CS, INT>::mcp2515SendMessage(const can::Message& message)
 			{
 				RF_CALL(spi.transfer(message.length));
 
-				for (i_ = 0; i_ < message.length; ++i_) {
-					RF_CALL(spi.transfer(message.data[i_]));
+				for (i = 0; i < message.length; ++i) {
+					RF_CALL(spi.transfer(message.data[i]));
 				}
 			}
-			delayS_.restart(1ms);
+			delayS.restart(1ms);
 			chipSelect.set();
-			RF_WAIT_UNTIL(delayS_.isExpired());
+			RF_WAIT_UNTIL(delayS.isExpired());
 
 			// send message via RTS command
 			chipSelect.reset();
-			addressBufferS_ = (addressBufferS_ == 0) ? 1 : addressBufferS_;  // 0 2 4 => 1 2 4
-			RF_CALL(spi.transfer(RTS | addressBufferS_));
+			addressBufferS = (addressBufferS == 0) ? 1 : addressBufferS;  // 0 2 4 => 1 2 4
+			RF_CALL(spi.transfer(RTS | addressBufferS));
 			RF_WAIT_UNTIL(this->releaseMaster());
 			chipSelect.set();
 		}
 	}
 
-	RF_END_RETURN(static_cast<bool>(addressBufferS_));
+	RF_END_RETURN(static_cast<bool>(addressBufferS));
 }
 
 // ----------------------------------------------------------------------------
@@ -449,11 +449,11 @@ modm::Mcp2515<SPI, CS, INT>::readStatus(uint8_t type)
 	RF_WAIT_UNTIL(this->acquireMaster());
 	chipSelect.reset();
 	RF_CALL(spi.transfer(type));
-	statusBuffer_ = RF_CALL(spi.transfer(0xff));
+	statusBuffer = RF_CALL(spi.transfer(0xff));
 	RF_WAIT_UNTIL(this->releaseMaster());
 	chipSelect.set();
 
-	RF_END_RETURN(statusBuffer_);
+	RF_END_RETURN(statusBuffer);
 }
 
 // ----------------------------------------------------------------------------
@@ -474,10 +474,10 @@ modm::Mcp2515<SPI, CS, INT>::writeIdentifier(const uint32_t& identifier,
 		RF_CALL(spi.transfer(*((uint16_t *)ptr + 1) >> 5));
 
 		// calculate the next values
-		a_ = (*((uint8_t *)ptr + 2) << 3) & 0xe0;
-		a_ |= MCP2515_IDE;
-		a_ |= (*((uint8_t *)ptr + 2)) & 0x03;
-		RF_CALL(spi.transfer(a_));
+		a = (*((uint8_t *)ptr + 2) << 3) & 0xe0;
+		a |= MCP2515_IDE;
+		a |= (*((uint8_t *)ptr + 2)) & 0x03;
+		RF_CALL(spi.transfer(a));
 		RF_CALL(spi.transfer(*((uint8_t *)ptr + 1)));
 		RF_CALL(spi.transfer(*((uint8_t *)ptr)));
 	} else
@@ -502,22 +502,22 @@ modm::Mcp2515<SPI, CS, INT>::readIdentifier(uint32_t &identifier)
 	RF_BEGIN();
 
 	RF_WAIT_UNTIL(this->acquireMaster());
-	a_ = RF_CALL(spi.transfer(0xff));
-	b_ = RF_CALL(spi.transfer(0xff));
+	a = RF_CALL(spi.transfer(0xff));
+	b = RF_CALL(spi.transfer(0xff));
 
-	temp_ = false;
+	temp = false;
 
-	if (b_ & MCP2515_IDE)
+	if (b & MCP2515_IDE)
 	{
-		*((uint16_t *)ptr + 1) = (uint16_t)a_ << 5;
+		*((uint16_t *)ptr + 1) = (uint16_t)a << 5;
 		*((uint8_t *)ptr + 1) = RF_CALL(spi.transfer(0xff));
 
-		*((uint8_t *)ptr + 2) |= (b_ >> 3) & 0x1C;
-		*((uint8_t *)ptr + 2) |= b_ & 0x03;
+		*((uint8_t *)ptr + 2) |= (b >> 3) & 0x1C;
+		*((uint8_t *)ptr + 2) |= b & 0x03;
 
 		*((uint8_t *)ptr) = RF_CALL(spi.transfer(0xff));
 
-		temp_ = true;
+		temp = true;
 	} else
 	{
 		RF_CALL(spi.transfer(0xff));
@@ -525,13 +525,13 @@ modm::Mcp2515<SPI, CS, INT>::readIdentifier(uint32_t &identifier)
 		*((uint8_t *)ptr + 3) = 0;
 		*((uint8_t *)ptr + 2) = 0;
 
-		*((uint16_t *)ptr) = (uint16_t)a_ << 3;
+		*((uint16_t *)ptr) = (uint16_t)a << 3;
 
 		RF_CALL(spi.transfer(0xff));
 
-		*((uint8_t *)ptr) |= b_ >> 5;
+		*((uint8_t *)ptr) |= b >> 5;
 	}
 	RF_WAIT_UNTIL(this->releaseMaster());
 
-	RF_END_RETURN(temp_);
+	RF_END_RETURN(temp);
 }

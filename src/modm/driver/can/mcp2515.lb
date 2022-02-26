@@ -25,6 +25,19 @@ def prepare(module, options):
                 "is selected according to the clock speed.",
             default="16MHz"))
 
+    module.add_option(
+        NumericOption(
+            name="buffer.tx",
+            description="",
+            minimum=1, maximum=2 ** 16 - 2,
+            default=32))
+    module.add_option(
+        NumericOption(
+            name="buffer.rx",
+            description="",
+            minimum=1, maximum=2 ** 16 - 2,
+            default=32))
+
     module.depends(
         ":architecture:accessor",
         ":architecture:assert",
@@ -44,3 +57,5 @@ def build(env):
     env.copy("mcp2515_bit_timings.hpp")
     env.copy("mcp2515_definitions.hpp")
     env.template("mcp2515.cpp.in")
+    env.template("mcp2515_options.hpp.in")
+
