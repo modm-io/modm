@@ -20,10 +20,6 @@
 #include "mcp2515_options.hpp"
 #include <modm/architecture/interface/assert.hpp>
 
-// Set the log level
-#undef MODM_LOG_LEVEL
-#define MODM_LOG_LEVEL modm::log::DISABLED
-
 // ----------------------------------------------------------------------------
 
 template <typename SPI, typename CS, typename INT>
@@ -42,17 +38,9 @@ modm::Mcp2515<SPI, CS, INT>::initializeWithPrescaler(
 	static constexpr uint8_t CNF1_idx = 2;
 	static constexpr uint8_t CNF2_idx = 1;
 	static constexpr uint8_t CNF3_idx = 0;
-
-	MODM_LOG_DEBUG.printf("SJW: %d\nProp: %d\nPS1: %d\nPS2: %d\nprescaler: %d\n",
-		sjw, prop, ps1, ps2, prescaler);
-
 	cnf[CNF1_idx] = ((sjw - 1) << 6) | ((prescaler / 2 - 1) & 0x3f);
-
 	cnf[CNF2_idx] = (1 << 7) | ( (ps1 - 1) << 3) | ( (prop - 1) << 0);
-
 	cnf[CNF3_idx] = (ps2 - 1);
-
-	MODM_LOG_DEBUG.printf("CNF1 %02x, CNF2 %02x, CNF3 %02x\n", cnf[CNF1_idx], cnf[CNF2_idx], cnf[CNF3_idx]);
 
 	using namespace mcp2515;
 
