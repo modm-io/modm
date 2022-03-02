@@ -14,7 +14,6 @@
 #define MODM_INTERFACE_I2S_MASTER_HPP
 
 #include <modm/processing/resumable.hpp>
-#include "i2s.hpp"
 
 namespace modm
 {
@@ -66,7 +65,7 @@ public:
 	/**
 	 * @brief Set transfer complete handler function
 	 *
-	 * The transfer complete handler should set the next tx buffer using 
+	 * The transfer complete handler should set the next tx buffer using
 	 * `setTxBuffer()` and then restart the DMA transfer using `startDma()`.
 	 */
 	static void

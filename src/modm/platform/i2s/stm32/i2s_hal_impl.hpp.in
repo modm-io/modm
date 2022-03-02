@@ -36,7 +36,9 @@ modm::platform::I2sHal{{ id }}::initialize( OddFactor oddFactor, uint8_t i2s_div
 											MasterSelection masterSelection,
 											DirectionSelection directionSelection,
 											BitDepth bitDepth,
-											MasterClockOutput masterClockOutput)
+											MasterClockOutput masterClockOutput,
+											I2sStandard i2sStandard,
+											ClockPolarity clockPolarity)
 {
 	enable();
 	// disable peripheral, and clear all fields except I2S mode bit
@@ -49,7 +51,9 @@ modm::platform::I2sHal{{ id }}::initialize( OddFactor oddFactor, uint8_t i2s_div
 						  i2s_div;
 	SPI{{ id }}->I2SCFGR |= static_cast<uint32_t>(masterSelection) |
 							static_cast<uint32_t>(directionSelection) |
-							static_cast<uint32_t>(bitDepth);
+							static_cast<uint32_t>(bitDepth) |
+							static_cast<uint32_t>(i2sStandard) |
+							static_cast<uint32_t>(clockPolarity);
 }
 
 void inline

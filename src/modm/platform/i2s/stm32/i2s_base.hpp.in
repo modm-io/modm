@@ -17,10 +17,7 @@
 #include "../device.hpp"
 #include <modm/architecture/interface/register.hpp>
 
-namespace modm
-{
-
-namespace platform
+namespace modm::platform
 {
 
 /**
@@ -40,8 +37,8 @@ public:
 		RxBufferNotEmpty	= SPI_CR2_RXNEIE,
 		TxBufferEmpty		= SPI_CR2_TXEIE,
 		Error				= SPI_CR2_ERRIE,
-		RxDmaEnable         = SPI_CR2_RXDMAEN,
-		TxDmaEnable         = SPI_CR2_TXDMAEN,
+		RxDmaEnable			= SPI_CR2_RXDMAEN,
+		TxDmaEnable			= SPI_CR2_TXDMAEN,
 	};
 	MODM_FLAGS32(Interrupt);
 
@@ -60,47 +57,64 @@ public:
 	enum class
 	MasterSelection : uint32_t
 	{
-		Slave 	    = 0b0,			        ///< Configure I2S as Slave
-        Master 	    = SPI_I2SCFGR_I2SCFG_1,	///< Configure I2S as Master
-		All 	    = Master,
+		Slave	= 0b0, /// Configure I2S as Slave
+		Master	= SPI_I2SCFGR_I2SCFG_1, /// Configure I2S as Master
 	};
 
-    enum class
-    DirectionSelection : uint32_t
-    {
-        Transmitter = 0b0,                  ///< Configure I2S as Transmitter
-        Receiver    = SPI_I2SCFGR_I2SCFG_0, ///< COnfigure I2S as Receiver
-        All         = Receiver,
-    };
+	enum class
+	DirectionSelection : uint32_t
+	{
+		Transmitter	= 0b0, /// Configure I2S as Transmitter
+		Receiver	= SPI_I2SCFGR_I2SCFG_0, /// Configure I2S as Receiver
+	};
 
+	/// Data length to be transferred (with channel length options for 16-bit data length)
+	/// For all data lengths except 16 bit the channel length is fixed to 32 bit.
 	enum class
 	BitDepth : uint32_t
 	{
-		Sixteen = 0b0,
-		Twentyfour = SPI_I2SCFGR_DATLEN_0,
-		Thirtytwo = SPI_I2SCFGR_DATLEN_1,
-		All = Thirtytwo,
+		SixteenWithChannel16	= (0b00 << SPI_I2SCFGR_DATLEN_Pos) | (0b0 << SPI_I2SCFGR_CHLEN_Pos), /// 16 bit data length with 16 bit channel length
+		SixteenWithChannel32	= (0b00 << SPI_I2SCFGR_DATLEN_Pos) | (0b1 << SPI_I2SCFGR_CHLEN_Pos), /// 16 bit data length with 32 bit channel length
+		Twentyfour				= (0b01 << SPI_I2SCFGR_DATLEN_Pos), /// 24 bit data length with 32 bit channel length
+		Thirtytwo				= (0b10 << SPI_I2SCFGR_DATLEN_Pos), /// 32 bit data length with 32 bit channel length
 	};
 
+	/// Master clock output enable
 	enum class
 	MasterClockOutput : uint32_t
 	{
-		Disabled = 0b0,
-		Enabled = SPI_I2SPR_MCKOE,
-		All = Enabled,
+		Disabled	= 0b0,
+		Enabled		= SPI_I2SPR_MCKOE,
 	};
 
 	enum class
 	OddFactor : uint32_t
 	{
-		Disabled = 0,
-		Enabled = SPI_I2SPR_ODD,
-		All = Enabled,
+		Disabled	= 0,
+		Enabled		= SPI_I2SPR_ODD,
+	};
+
+	/// I2S standard selection (with frame synchronization options for PCM)
+	enum class
+	I2sStandard : uint32_t
+	{
+		Philips					= (0b00 << SPI_I2SCFGR_I2SSTD_Pos), /// I2S Philips
+		MsbJustified			= (0b01 << SPI_I2SCFGR_I2SSTD_Pos), /// MSB justified standard (left justified)
+		LsbJustified			= (0b10 << SPI_I2SCFGR_I2SSTD_Pos), /// LSB justified standard (right justified)
+		PcmWithShortFrameSync	= (0b11 << SPI_I2SCFGR_I2SSTD_Pos) | (0b0 << SPI_I2SCFGR_PCMSYNC_Pos), /// PCM with short frame synchronization
+		PcmWithLongFrameSync	= (0b11 << SPI_I2SCFGR_I2SSTD_Pos) | (0b1 << SPI_I2SCFGR_PCMSYNC_Pos), /// PCM with long frame synchronization
+	};
+
+	/// Steady state clock polarity
+	enum class
+	ClockPolarity : uint32_t
+	{
+		Low		= 0, /// clock steady state is low level
+		High	= SPI_I2SCFGR_CKPOL, /// clock steady state is high level
 	};
 };
 
-} // namespace platform
+} // namespace modm::platform
 
-} // namespace modm
 
 #endif // MODM_STM32_I2S_BASE_HPP

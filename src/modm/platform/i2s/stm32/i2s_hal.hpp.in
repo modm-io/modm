@@ -15,25 +15,23 @@
 
 #include "i2s_base.hpp"
 
-namespace modm
-{
-
-namespace platform
+namespace modm::platform
 {
 
 /**
- * Serial peripheral interface (I2S{{ id }})
+ * Serial peripheral interface in I2S mode (I2S{{ id }})
  *
- * TODO: Very basic implementation that exposes more hardware features than
+ * Very basic implementation that exposes more hardware features than
  * the regular Spi classes.
  *
  * @author		Marton Ledneczki
+ * @author		Raphael Lehmann
  * @ingroup		modm_platform_i2s modm_platform_i2s_{{id}}
  */
 class I2sHal{{ id }} : public I2sBase
 {
 public:
-	/// TODO: Enables the clock, resets the hardware and sets the SPE bit
+	/// Enables the RCC clock, resets the hardware and configures mode to I2S
 	static void
 	enable();
 
@@ -41,17 +39,15 @@ public:
 	static void
 	disable();
 
-	/**
-	 * Initialize I2s Peripheral
-	 *
-	 * TODO: Enables clocks
-	 */
+	/// Initialize I2s peripheral
 	static void
 	initialize( OddFactor oddFactor, uint8_t i2s_div,
 				MasterSelection masterSelection = MasterSelection::Master,
 				DirectionSelection directionSelection = DirectionSelection::Transmitter,
-				BitDepth bitDepth = BitDepth::Sixteen,
-				MasterClockOutput masterClockOutput = MasterClockOutput::Enabled);
+				BitDepth bitDepth = BitDepth::SixteenWithChannel16,
+				MasterClockOutput masterClockOutput = MasterClockOutput::Enabled,
+				I2sStandard i2sStandard = I2sStandard::Philips,
+				ClockPolarity clockPolarity = ClockPolarity::Low);
 
 	static void
 	start();
@@ -81,9 +77,7 @@ public:
 	acknowledgeInterruptFlag(InterruptFlag_t flags);
 };
 
-} // namespace platform
-
-} // namespace modm
+} // namespace modm::platform
 
 #include "i2s_hal_{{ id }}_impl.hpp"
 
