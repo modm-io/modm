@@ -1,8 +1,4 @@
 /*
- * Copyright (c) 2013, Kevin Läufer
- * Copyright (c) 2013-2017, Niklas Hauser
- * Copyright (c) 2014, Daniel Krebs
- * Copyright (c) 2020, Mike Wolfram
  * Copyright (c) 2021, Marton Ledneczki
  * Copyright (c) 2021-2022, Raphael Lehmann
  *
@@ -57,13 +53,13 @@ modm::platform::I2sHal{{ id }}::initialize( OddFactor oddFactor, uint8_t i2s_div
 }
 
 void inline
-modm::platform::I2sHal3::start()
+modm::platform::I2sHal{{ id }}::start()
 {
 	SPI{{ id }}->I2SCFGR |= SPI_I2SCFGR_I2SE;
 }
 
 void inline
-modm::platform::I2sHal3::enableDma(bool enable)
+modm::platform::I2sHal{{ id }}::enableDma(bool enable)
 {
 	if (enable) {
 		SPI{{ id }}->CR2 |= SPI_CR2_TXDMAEN;

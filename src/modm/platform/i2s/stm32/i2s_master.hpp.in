@@ -56,13 +56,13 @@ public:
 		using Ck = typename Connector::template GetSignal<Gpio::Signal::Ck>;
 		using Mck = typename Connector::template GetSignal<Gpio::Signal::Mck>;
 		using Sd = typename Connector::template GetSignal<Gpio::Signal::Sd>;
-        using Ws = typename Connector::template GetSignal<Gpio::Signal::Ws>;
+		using Ws = typename Connector::template GetSignal<Gpio::Signal::Ws>;
 
 		// Connector::disconnect();
 		Ck::setOutput(Gpio::OutputType::PushPull);
 		Mck::setOutput(Gpio::OutputType::PushPull);
 		Sd::setOutput(Gpio::OutputType::PushPull);
-        Ws::setOutput(Gpio::OutputType::PushPull);
+		Ws::setOutput(Gpio::OutputType::PushPull);
 		Connector::connect();
 	}
 
@@ -100,7 +100,7 @@ public:
 	}
 
 	static inline void
-	setTxBufferAddress(uintptr_t address, std::size_t length)
+	setTxBuffer(uintptr_t address, std::size_t length)
 	{
 		Dma::TxChannel::setMemoryAddress(address);
 		Dma::TxChannel::setDataLength(length);
