@@ -8,6 +8,7 @@
     <module>modm:build:scons</module>
     <module>modm:platform:uart:2</module>
     <module>modm:processing:timer</module>
+    <module>modm:processing:protothread</module>
     <module>modm:cmsis:dsp:fast_math</module>
   </modules>
 </library>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Raphael Lehmann
+ * Copyright (c) 2021-2022, Raphael Lehmann
  * Copyright (c) 2021, Christopher Durand
  *
  * This file is part of the modm project.
@@ -17,6 +17,7 @@
 #include <modm/debug/logger.hpp>
 #include <modm/driver/dac/cs43l22.hpp>
 #include <modm/io/iostream.hpp>
+#include <modm/processing/protothread.hpp>
 #include <modm/processing/timer.hpp>
 #include <numbers>
 
@@ -49,7 +50,7 @@ constexpr auto computeSinTable(uint8_t cycles=1)
 	return data;
 }
 
-constexpr std::size_t bufferSize = 960; // 480
+constexpr std::size_t bufferSize = 960;
 auto bufferA = computeSinTable<uint16_t, bufferSize>(1);
 auto bufferB = computeSinTable<uint16_t, bufferSize>(2);
 volatile bool bufferA_ready{true};
@@ -61,11 +62,11 @@ transferCompleteIrqHandler()
 	LedGreen::reset();
 
 	if (bufferA_ready) {
-		cs43::I2sMaster::setTxBufferAddress(uintptr_t(bufferA.data()), bufferSize);
+		cs43::I2sMaster::setTxBuffer(uintptr_t(bufferA.data()), bufferSize);
 		bufferA_ready = false;
 	}
 	else if (bufferB_ready) {
-		cs43::I2sMaster::setTxBufferAddress(uintptr_t(bufferB.data()), bufferSize);
+		cs43::I2sMaster::setTxBuffer(uintptr_t(bufferB.data()), bufferSize);
 		bufferB_ready = false;
 	}
 	else {
@@ -77,6 +78,40 @@ transferCompleteIrqHandler()
 	LedGreen::set();
 }
 
+class VolumeThread : public modm::pt::Protothread
+{
+public:
+	VolumeThread(modm::Cs43l22<cs43::I2cMaster>& audioDac) : audioDac{audioDac}
+	{
+		RF_CALL_BLOCKING(audioDac.setMasterVolume(volume));
+	}
+
+	bool
+	update()
+	{
+		PT_BEGIN();
+		while (true) {
+			if (Board::Button::read()) {
+				volume += 50;
+				if (volume > modm::cs43l22::MaxVolume) {
+					volume = modm::cs43l22::MinVolume;
+				}
+				MODM_LOG_INFO.printf("Volume: %2.1fdb\n", volume/10.f);
+				PT_CALL(audioDac.setMasterVolume(volume));
+				timeout.restart();
+				PT_WAIT_UNTIL(timeout.isExpired());
+			}
+			PT_YIELD();
+		}
+		PT_END();
+	}
+
+private:
+	modm::Cs43l22<cs43::I2cMaster>& audioDac;
+	modm::cs43l22::centiBel_t volume = (modm::cs43l22::MinVolume + modm::cs43l22::MaxVolume) / 2;
+	modm::ShortTimeout timeout{500ms};
+};
+
 int
 main()
 {
@@ -87,9 +122,9 @@ main()
 	Usart2::initialize<Board::SystemClock, 115200_Bd>();
 
 	MODM_LOG_INFO << "Audio demo using CS43L22 I2S DAC on STM32F4-DSICOVERY" << modm::endl;
+	MODM_LOG_INFO << "Press the 'user' button to increate volume." << modm::endl;
 
 	Dma1::enable();
-	Dma2::enable();
 
 	Board::initializeCs43</*samplerate=*/48_kHz, /*tolerance=*/0.02_pct>();
 
@@ -97,12 +132,11 @@ main()
 	if (!RF_CALL_BLOCKING(audioDac.initialize())) {
 		MODM_LOG_ERROR << "Unable to initialize CS43L22 audio DAC" << modm::endl;
 	}
-	if (!RF_CALL_BLOCKING(audioDac.setMasterVolume(-600))) {
-		MODM_LOG_ERROR << "Unable to set master volume of CS43L22 audio DAC" << modm::endl;
-	}
+
+	VolumeThread volumeThread{audioDac};
 
 	cs43::I2sMaster::setTransferCompleteIrqHandler(transferCompleteIrqHandler);
-	cs43::I2sMaster::setTxBufferAddress(uintptr_t(bufferA.data()), bufferSize);
+	cs43::I2sMaster::setTxBuffer(uintptr_t(bufferA.data()), bufferSize);
 	cs43::I2sMaster::start();
 
 	modm::PeriodicTimer tmr{500ms};
@@ -129,6 +163,8 @@ main()
 		if (cs43::I2sMaster::hasDmaError()) {
 			MODM_LOG_ERROR << "I2S DMA Error :(" << modm::endl;
 		}
+
+		volumeThread.update();
 	}
 
 	return 0;
