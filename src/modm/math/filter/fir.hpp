@@ -19,18 +19,18 @@
 
 namespace modm
 {
-	/**
-	 * \brief	A finit impulse response (FIR) filter implementation
-	 *
-	 * g[n] = SUM(h[k]x[n-k])
-	 *
-	 * \todo
-	 *
-	 * \author	Kevin Laeufer
-	 * \ingroup modm_math_filter
-	 */
 	namespace filter
 	{
+		/**
+		 * \brief	A finit impulse response (FIR) filter implementation
+		 *
+		 * g[n] = SUM(h[k]x[n-k])
+		 *
+		 * \todo
+		 *
+		 * \author	Kevin Laeufer
+		 * \ingroup modm_math_filter
+		 */
 		template<typename T, int N, int BLOCK_SIZE, signed int ScaleFactor = 1>
 		class Fir
 		{

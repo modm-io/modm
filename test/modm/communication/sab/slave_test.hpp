@@ -16,7 +16,7 @@
 #include <modm/communication/sab/slave.hpp>
 #include <modm-test/mock/io_device.hpp>
 
-/// @ingroup modm_test_test_communication
+/// @ingroup modm_test_test_communication_sab
 class SlaveTest : public unittest::TestSuite
 {
 public:

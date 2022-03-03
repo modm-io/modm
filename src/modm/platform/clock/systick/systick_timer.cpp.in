@@ -38,7 +38,7 @@ static constexpr uint8_t systick_priority{(1ul << __NVIC_PRIO_BITS) - 1ul};
 
 // ----------------------------------------------------------------------------
 void
-modm::platform::SysTickTimer::enable(uint32_t modm_unused reload, bool modm_unused prescaler8)
+modm::platform::SysTickTimer::enable([[maybe_unused]] uint32_t reload, [[maybe_unused]] bool prescaler8)
 {
 %% if not has_freertos
 	// Lower systick interrupt priority to lowest level

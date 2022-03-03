@@ -19,14 +19,15 @@
 
 using namespace modm::platform;
 
-/// @ingroup modm_board_olimexino_stm32
 namespace Board
 {
-	using namespace modm::literals;
+/// @ingroup modm_board_olimexino_stm32
+/// @{
+using namespace modm::literals;
 
 /// STM32F103RB running at 64MHz generated from the internal 8MHz crystal
-// Dummy clock for devices
-struct SystemClock {
+struct SystemClock
+{
 	static constexpr uint32_t Frequency = 64_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency / 2;
@@ -120,22 +121,32 @@ using LedD3 = D3;
 
 using Leds = SoftwareGpioPort< LedD13, LedD3 >;
 using Button = GpioUnused;
+/// @}
 
 namespace uext
 {
+/// @ingroup modm_board_olimexino_stm32
+/// @{
 using Rx = GpioInputA10;
 using Tx = GpioOutputA9;
 using Uart = Usart1;
+/// @}
 }
 
-namespace Sdcard {
-	using nCS  = GpioD2;
-	using sck = GpioB13;
-	using miso = GpioB14;
-	using mosi = GpioB15;
-	using SpiMaster = SpiMaster2;
+namespace Sdcard
+{
+/// @ingroup modm_board_olimexino_stm32
+/// @{
+using nCS  = GpioD2;
+using sck = GpioB13;
+using miso = GpioB14;
+using mosi = GpioB15;
+using SpiMaster = SpiMaster2;
+/// @}
 }
 
+/// @ingroup modm_board_olimexino_stm32
+/// @{
 using LoggerDevice = modm::IODeviceWrapper< uext::Uart, modm::IOBuffer::BlockIfFull >;
 
 inline void
@@ -146,8 +157,8 @@ initialize()
 
 	uext::Uart::connect<uext::Tx::Tx, uext::Rx::Rx>();
 	uext::Uart::initialize<SystemClock, 115200_Bd>();
-
 }
+/// @}
 
 } // Board namespace
 

@@ -215,7 +215,7 @@ modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::transfer(
 // ----------------------------------------------------------------------------
 
 template <typename Sck, typename Mosi, typename Miso>
-void modm_always_inline
+void
 modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::delay()
 {
 	modm::delay_ns(delayTime);

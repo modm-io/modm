@@ -17,6 +17,9 @@
 
 #ifdef __DOXYGEN__
 
+/// @ingroup modm_architecture_interrupt
+/// @{
+
 /**
  * Get the expanded interrupt name.
  *
@@ -38,8 +41,6 @@
  *
  * @param vector
  *        The name of the interrupt without any suffix (neither `_vect`, nor `_IRQHandler`).
- *
- * @ingroup	modm_architecture_interrupt
  */
 #define MODM_ISR_NAME(vector)
 
@@ -51,8 +52,6 @@
  *
  * @param vector
  *        The name of the interrupt without any suffix (neither `_vect`, nor `_IRQHandler`).
- *
- * @ingroup	modm_architecture_interrupt
  */
 #define MODM_ISR_DECL(vector)
 
@@ -70,8 +69,6 @@
  *
  * @param vector
  *        The name of the interrupt without any suffix (neither `_vect`, nor `_IRQHandler`).
- *
- * @ingroup	modm_architecture_interrupt
  */
 #define MODM_ISR_CALL(vector)
 
@@ -93,10 +90,10 @@
  *        The name of the interrupt without any suffix (neither `_vect`, nor `_IRQHandler`).
  * @param ...
  *        Multiple compiler attributes can be added to an interrupt. For example `modm_fastcode`.
- *
- * @ingroup	modm_architecture_interrupt
  */
 #define MODM_ISR(vector, ...)
+
+/// @}
 
 #else
 

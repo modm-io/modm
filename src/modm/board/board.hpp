@@ -17,5 +17,6 @@ using namespace std::chrono_literals;
 #endif
 
 namespace Board {
+    // DEPRECATE: 2022q1
 	using systemClock [[deprecated("Use `Board::SystemClock` instead!")]] = SystemClock;
 }

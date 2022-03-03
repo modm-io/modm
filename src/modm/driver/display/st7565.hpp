@@ -47,7 +47,7 @@ namespace modm
 		setInvert(bool invert);
 
 	protected:
-		modm_always_inline void
+		void
 		initialize(modm::accessor::Flash<uint8_t> configuration, uint8_t size);
 
 		SPI spi;

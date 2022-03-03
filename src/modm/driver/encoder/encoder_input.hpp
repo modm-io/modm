@@ -15,6 +15,7 @@
 namespace modm
 {
 /**
+ * @ingroup				modm_driver_encoder_input
  * @brief 				Gray code decoder using STM32 Timer mode
  *
  * @tparam Timer 		STM32 General purpose timer

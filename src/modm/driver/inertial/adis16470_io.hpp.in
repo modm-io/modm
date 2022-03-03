@@ -23,9 +23,11 @@ namespace modm
 {
 
 // Output operators
+/// @ingroup modm_driver_adis16470
 IOStream&
 operator << (IOStream& os, const adis16470::DiagStat_t& c);
 
+/// @ingroup modm_driver_adis16470
 IOStream&
 operator << (IOStream& os, const adis16470::MscCtrl_t& c);
 

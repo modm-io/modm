@@ -20,7 +20,7 @@ class LineDrawer : public modm::pt::Protothread
 {
 public:
 	LineDrawer() :
-		touch(touchData),
+		touch(touchData, TouchAddress),
 		display{Board::getDisplay()},
 		px{-1, -1}, py{-1, -1},
 		c{modm::color::html::White, modm::color::html::White}

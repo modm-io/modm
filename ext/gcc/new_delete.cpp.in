@@ -33,7 +33,7 @@ void* malloc_traits(std::size_t size, uint32_t)
 template<bool with_traits>
 static inline void*
 %% if with_memory_traits
-new_assert(size_t size, modm_unused modm::MemoryTraits traits = modm::MemoryDefault)
+new_assert(size_t size, [[maybe_unused]] modm::MemoryTraits traits = modm::MemoryDefault)
 %% else
 new_assert(size_t size)
 %% endif
@@ -102,7 +102,7 @@ void* operator new[](std::size_t size, modm::MemoryTraits traits, const std::not
 
 // ----------------------------------------------------------------------------
 extern "C" modm_weak
-void operator_delete(modm_unused void* ptr)
+void operator_delete([[maybe_unused]] void* ptr)
 {
 %% if with_heap
 	free(ptr);

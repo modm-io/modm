@@ -11,12 +11,13 @@
 #pragma once
 
 #include <modm/platform.hpp>
+using namespace modm::platform;
 
-/// @ingroup modm_board_samg55_xplained_pro
 namespace Board
 {
+/// @ingroup modm_board_samg55_xplained_pro
+/// @{
 using namespace modm::literals;
-using namespace modm::platform;
 
 struct SystemClock
 {
@@ -27,7 +28,16 @@ struct SystemClock
 
 	static constexpr uint32_t Frequency = PllAMult * SlowClkFreqHz; // CPU core frequency
 	static constexpr uint32_t Usb = PllBMult * SlowClkFreqHz;
-	static constexpr uint32_t Mck = Frequency; // Master clock, used by most peripherals
+	static constexpr uint32_t Mck = Frequency; // Master clock: default used by most peripherals
+	// Programmable clocks: optionally used by certain peripherals
+	static constexpr uint32_t Pck0 = Mck;
+	static constexpr uint32_t Pck1 = Mck;
+	static constexpr uint32_t Pck2 = Mck;
+	static constexpr uint32_t Pck3 = Mck;
+	static constexpr uint32_t Pck4 = Mck;
+	static constexpr uint32_t Pck5 = Mck;
+	static constexpr uint32_t Pck6 = Mck;
+	static constexpr uint32_t Pck7 = Mck;
 
 	static bool inline
 	enable()
@@ -60,7 +70,7 @@ inline void
 initialize()
 {
 	// Turn off the watchdog
-	WDT->WDT_MR = (WDT_MR_WDDIS_Msk);
+	WDT->WDT_MR = WDT_MR_WDDIS_Msk;
 
 	SystemClock::enable();
 	SysTickTimer::initialize<SystemClock>();
@@ -73,11 +83,13 @@ initialize()
 	Button::setInput();
 }
 
-inline void initializeUsbFs()
+inline void
+initializeUsbFs()
 {
 	SystemClock::enableUsb();
-	modm::platform::Usb::initialize<Board::SystemClock>();
+	Usb::initialize<Board::SystemClock>();
 }
+/// @}
 
 } // namespace Board
 

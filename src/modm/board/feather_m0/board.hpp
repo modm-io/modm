@@ -20,10 +20,10 @@
 
 using namespace modm::platform;
 
-/// @ingroup modm_board_feather_m0
 namespace Board
 {
-
+/// @ingroup modm_board_feather_m0
+/// @{
 using namespace modm::literals;
 
 using ARef	= GpioA03;
@@ -120,5 +120,6 @@ initializeUsbFs(uint8_t priority=3)
 	modm::platform::Usb::initialize<Board::SystemClock>(priority);
 	modm::platform::Usb::connect<GpioA24::Dm, GpioA25::Dp>();
 }
+/// @}
 
 }  // namespace Board

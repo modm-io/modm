@@ -18,6 +18,8 @@
 
 namespace modm::platform
 {
+/// @ingroup modm_platform_gclk
+/// @{
 
 enum class
 ClockSource : uint32_t
@@ -80,6 +82,7 @@ ClockPeripheral : uint32_t
 	I2s0 = GCLK_CLKCTRL_ID_I2S_0_Val,
 	I2s1 = GCLK_CLKCTRL_ID_I2S_1_Val
 };
+/// @}
 
 /**
  * Clock management

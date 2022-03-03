@@ -64,7 +64,7 @@ public:
 	}
 
 	template< class SystemClock, baudrate_t baudrate=kHz(100), percent_t tolerance=pct(5) >
-	static modm_always_inline void
+	static void
 	initialize()
 	{
 		// Prescalers: 1, 4, 16, 64

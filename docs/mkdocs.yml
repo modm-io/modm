@@ -91,6 +91,11 @@ nav:
   - Reference:
     - Documentation: reference/documentation.md
     - Build Systems: reference/build-systems.md
+    - Supported Targets: reference/targets.md
+# configtable
+    # - Configurations:
+    #   - config: config.md
+# /configtable
 # moduletable
     # - Modules:
     #   - module: module.md

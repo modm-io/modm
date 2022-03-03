@@ -22,6 +22,7 @@
 
 namespace modm
 {
+
 /**
  * @brief	Saturation arithmetic building on 'Integer-Overflow-Builtins'
  * 			Implementation works with integer, unsigned integer and float or reference to them.
@@ -31,9 +32,8 @@ namespace modm
  *
  * @author	Thomas Sommer
  *
- * @ingroup modm_math_saturated
+ * @ingroup modm_math_saturation
  */
-
 template<typename T>
 requires std::integral<std::remove_reference_t<T>>
 class Saturated

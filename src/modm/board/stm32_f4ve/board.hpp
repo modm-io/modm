@@ -22,13 +22,15 @@
 
 using namespace modm::platform;
 
-/// @ingroup modm_board_stm32_f4ve
 namespace Board
 {
-	using namespace modm::literals;
+/// @ingroup modm_board_stm32_f4ve
+/// @{
+using namespace modm::literals;
 
 /// STM32F407 running at 168MHz generated from the external 8MHz crystal
-struct SystemClock {
+struct SystemClock
+{
 	static constexpr uint32_t HSExternalOscillatorFrequency = 8_MHz;
 	static constexpr uint32_t LSExternalOscillatorFrequency = 32768_Hz;
 	static constexpr uint32_t Frequency = 168_MHz;
@@ -116,33 +118,46 @@ using LedGreen2 = GpioOutputA6;	// User LED 1
 using LedGreen3  = GpioOutputA7;// User LED 2
 
 using Leds = SoftwareGpioPort< LedGreen2, LedGreen3 >;
+/// @}
 
 namespace sdcard
 {
 
-namespace sdio {
+namespace sdio
+{
+/// @ingroup modm_board_stm32_f4ve
+/// @{
 using Cmd = GpioOutputD2;
 using Clk = GpioOutputC12;
 using D0 = GpioOutputC8;
 using D1 = GpioOutputC9;
 using D2 = GpioOutputC10;
 using D3 = GpioOutputC1; // CD
+/// @}
 } // namespace sdio
 
-namespace spi {
+namespace spi
+{
+/// @ingroup modm_board_stm32_f4ve
+/// @{
 using Cs   = sdio::D3;
 using Sck  = sdio::Clk;
 using Mosi = sdio::D0;
 using Miso = sdio::Cmd;
+/// @}
 } // namespace spi
 
 } // namespace sdcard
 
 
-namespace display {
-// this board has a 16-pin bus interface
-// to an ILI9341 display
-namespace fsmc {
+namespace display
+{
+/// this board has a 16-pin bus interface
+/// to an ILI9341 display
+namespace fsmc
+{
+/// @ingroup modm_board_stm32_f4ve
+/// @{
 using D15 = GpioD10;
 using D14 = GpioD9;
 using D13 = GpioD8;
@@ -163,9 +178,13 @@ using Noe = GpioD4;
 using Nwe = GpioD5;
 using A18 = GpioD13; // this is register select
 using Ne1 = GpioD7;
+/// @}
 } // namespace fsmc
 
-namespace touch {
+namespace touch
+{
+/// @ingroup modm_board_stm32_f4ve
+/// @{
 using Clk = GpioB13; // Touch
 using Cs = GpioB12; // Touch
 using Mosi = GpioB15; // Touch
@@ -173,28 +192,37 @@ using Miso = GpioB14; // Touch
 using Pen = GpioC5; // Touch
 
 using SpiMaster = SpiMaster2;
+/// @}
 } // namespace touch
 
+/// @ingroup modm_board_stm32_f4ve
+/// @{
 using Backlight = GpioB1; // LCD
-// LCD reset is connected to MCU's reset
-// and to physical reset line
+/// LCD reset is connected to MCU's reset
+/// and to physical reset line
 using Reset = GpioUnused;
+/// @}
 
 } // namespace display
 
-namespace nrf24l01 {
-
+namespace nrf24l01
+{
+/// @ingroup modm_board_stm32_f4ve
+/// @{
 using Ce = GpioB6;
 using nCs = GpioOutputB7;
 using Sck = GpioOutputB3;
 using Mosi = GpioOutputB5;
 using Miso = GpioB4;
 using Irq = GpioB8;
-
+/// @}
 } // namespace nrf24l01
 
 
-namespace w25q16 {
+namespace w25q16
+{
+/// @ingroup modm_board_stm32_f4ve
+/// @{
 // a W25Q16JV 2 MiB flash chip
 using Cs = GpioOutputB0;
 using Mosi = GpioInputB5;
@@ -209,11 +237,13 @@ using SpiMaster = SpiMaster1;
 constexpr uint32_t BlockSize = 256;
 constexpr uint32_t MemorySize = 2*1024*1024; // 16 MiBits
 using StorageDevice = modm::BdSpiFlash<SpiMaster, Cs, MemorySize>;
-
+/// @}
 } // namespace w25q16
 
 namespace usb
 {
+/// @ingroup modm_board_stm32_f4ve
+/// @{
 using Dm = GpioA11;			// OTG_FS_DM: USB_OTG_FS_DM
 using Dp = GpioA12;			// OTG_FS_DP: USB_OTG_FS_DP
 using Id = GpioA10;			// OTG_FS_ID: USB_OTG_FS_ID
@@ -222,8 +252,11 @@ using Overcurrent = GpioD5;	// OTG_FS_OverCurrent
 using Power = GpioOutputC0;	// OTG_FS_PowerSwitchOn
 using VBus = GpioInputA9;	// VBUS_FS: USB_OTG_HS_VBUS
 //using Device = UsbFs;
+/// @}
 }
 
+/// @ingroup modm_board_stm32_f4ve
+/// @{
 inline void
 initialize()
 {
@@ -245,10 +278,6 @@ initialize()
 inline void
 initializeUsb()
 {
-//	usb::Dm::connect(usb::Device::Dm);
-//	usb::Dp::connect(usb::Device::Dp);
-//	usb::Id::connect(usb::Device::Id);
-
 	usb::Power::setOutput(Gpio::OutputType::PushPull, Gpio::OutputSpeed::MHz2);
 
 	usb::Overcurrent::setInput(Gpio::InputType::Floating);
@@ -263,6 +292,7 @@ initializeW25q16()
 	w25q16::SpiMaster::connect<w25q16::Sck::Sck, w25q16::Mosi::Mosi, w25q16::Miso::Miso>();
 	w25q16::SpiMaster::initialize<SystemClock, 42_MHz>();
 }
+/// @}
 
 
 }

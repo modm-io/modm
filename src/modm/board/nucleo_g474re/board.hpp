@@ -19,14 +19,15 @@
 
 using namespace modm::platform;
 
-/// @ingroup modm_board_nucleo_g474re
 namespace Board
 {
-	using namespace modm::literals;
+/// @ingroup modm_board_nucleo_g474re
+/// @{
+using namespace modm::literals;
 
 /// STM32G474RE running at 170MHz generated from the internal 16MHz crystal
-// Dummy clock for devices
-struct SystemClock {
+struct SystemClock
+{
 	static constexpr uint32_t Frequency = 170_MHz;
 	static constexpr uint32_t Ahb1      = Frequency;
 	static constexpr uint32_t Ahb2      = Frequency;
@@ -125,17 +126,21 @@ using Button = GpioInverted<GpioInputC13>;
 using LedD13 = D13;
 
 using Leds = SoftwareGpioPort< LedD13 >;
-
+/// @}
 
 namespace stlink
 {
+/// @ingroup modm_board_nucleo_g474re
+/// @{
 using Rx = GpioInputA3;
 using Tx = GpioOutputA2;
 using Uart = Usart2;
+/// @}
 }
 
+/// @ingroup modm_board_nucleo_g474re
+/// @{
 using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
-
 
 inline void
 initialize()
@@ -148,6 +153,7 @@ initialize()
 
 	Button::setInput();
 }
+/// @}
 
 }
 

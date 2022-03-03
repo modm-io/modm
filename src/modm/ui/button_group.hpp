@@ -163,7 +163,7 @@ public:
 	 * @param	input
 	 * 		input signals
 	 */
-	modm_always_inline void
+	void
 	update(T input);
 
 protected:

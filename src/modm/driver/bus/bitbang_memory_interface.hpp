@@ -39,13 +39,13 @@ namespace modm
 	class BitbangMemoryInterface
 	{
 	public:
-		modm_always_inline static void
+		static void
 		initialize();
 
-		modm_always_inline static void
+		static void
 		writeRegister(const uint8_t reg);
 
-		modm_always_inline static void
+		static void
 		writeCommand(const uint8_t command, const uint16_t data);
 
 		static void
@@ -55,7 +55,7 @@ namespace modm
 		writeRam(uint8_t * addr, const uint16_t size);
 
 	protected:
-		modm_always_inline static void
+		static void
 		writeData(const uint16_t data);
 
 	protected:

@@ -13,6 +13,7 @@
 
 def init(module):
     module.name = ":test:container"
+    module.description = "Tests for Containers"
 
 
 def prepare(module, options):

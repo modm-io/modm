@@ -17,11 +17,11 @@
 #include <cmath>
 namespace modm
 {
+/// @ingroup modm_math_utils
+/// @{
 
-/**
- * @brief		Trait the smallest unsigned type that fits n Bits
- * @author		Thomas Sommer
- */
+/// Trait the smallest unsigned type that fits n Bits
+/// @author		Thomas Sommer
 template <int Bits>
 struct uint_t
 {
@@ -35,7 +35,9 @@ struct uint_t
 template<int Bits>
 using least_uint = typename modm::uint_t<Bits>::least;
 
-namespace detail {
+/// @cond
+namespace detail
+{
 	template<typename T>
 	constexpr int most_digits() {
 		return std::numeric_limits<T>::digits;
@@ -47,11 +49,10 @@ namespace detail {
 		return std::max(std::numeric_limits<T>::digits, most_digits<Ts...>());
 	}
 }
+/// @endcond
 
-/**
- * @brief	Trait the smallest integral - signed or unsigned - fitting any Ts
- * @author	Thomas Sommer
- */
+/// Trait the smallest integral - signed or unsigned - fitting any Ts
+/// @author	Thomas Sommer
 template <typename ... Ts>
 struct fits_any {
 	static constexpr int most_dig = detail::most_digits<Ts...>();
@@ -65,5 +66,7 @@ struct fits_any {
 };
 
 template <typename ... Ts>
-	using fits_any_t = typename fits_any<Ts...>::type;
+using fits_any_t = typename fits_any<Ts...>::type;
+
+/// @}
 }

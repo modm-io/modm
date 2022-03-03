@@ -26,7 +26,7 @@ modm::atomic::Queue<T, N>::Queue() :
 }
 
 template<typename T, std::size_t N>
-modm_always_inline bool
+bool
 modm::atomic::Queue<T, N>::isFull() const
 {
 	Index tmphead = this->head + 1;
@@ -46,7 +46,7 @@ modm::atomic::Queue<T, N>::isNearlyFull() const
 }
 
 template<typename T, std::size_t N>
-modm_always_inline bool
+bool
 modm::atomic::Queue<T, N>::isEmpty() const
 {
 	return (this->head == this->tail);
@@ -62,7 +62,7 @@ modm::atomic::Queue<T, N>::isNearlyEmpty() const
 
 
 template<typename T, std::size_t N>
-modm_always_inline typename modm::atomic::Queue<T, N>::Size
+typename modm::atomic::Queue<T, N>::Size
 modm::atomic::Queue<T, N>::getMaxSize() const
 {
 	return N;
@@ -87,14 +87,14 @@ modm::atomic::Queue<T, N>::getSize() const
 }
 
 template<typename T, std::size_t N>
-modm_always_inline const T&
+const T&
 modm::atomic::Queue<T, N>::get() const
 {
 	return this->buffer[this->tail];
 }
 
 template<typename T, std::size_t N>
-modm_always_inline bool
+bool
 modm::atomic::Queue<T, N>::push(const T& value)
 {
 	Index tmphead = this->head + 1;
@@ -112,7 +112,7 @@ modm::atomic::Queue<T, N>::push(const T& value)
 }
 
 template<typename T, std::size_t N>
-modm_always_inline void
+void
 modm::atomic::Queue<T, N>::pop()
 {
 	Index tmptail = this->tail + 1;

@@ -17,7 +17,7 @@ namespace modm
 {
 
 // Only call via modm::delay_ns wrapper, since this function clobbers r0, r1, r2!!!
-void __attribute__((naked, aligned(4))) modm_fastcode
+void modm_naked modm_aligned(4) modm_fastcode
 platform::delay_ns(uint32_t)
 {
 	// ns_per_loop = nanoseconds per cycle times cycles per loop

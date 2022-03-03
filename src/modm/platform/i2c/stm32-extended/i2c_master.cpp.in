@@ -269,7 +269,7 @@ namespace
 		}
 	}
 
-	bool modm_always_inline
+	bool
 	handleError()
 	{
 		uint16_t sr1 = I2C{{ id }}->ISR;

@@ -29,8 +29,10 @@
 #include "mcp2515_definitions.hpp"
 #include "mcp2515_options.hpp"
 
+#ifdef __DOXYGEN__
+
 /**
- * \name	Restructure filter and mask bits for the MCP2515
+ * Restructure filter and mask bits for the MCP2515
  *
  * \code
  * FLASH_STORAGE(uint8_t can_filter[]) =
@@ -60,46 +62,45 @@
  * \warning	Do not use this macro for variables, only for static values
  *			known at compile-time.
  * \ingroup	modm_driver_mcp2515
+ * @{
  */
-//\{
-#if defined(__DOXYGEN__)
+#define	MCP2515_FILTER_EXTENDED(id)
+#define	MCP2515_FILTER(id)
 
-	#define	MCP2515_FILTER_EXTENDED(id)
-	#define	MCP2515_FILTER(id)
-
-	#define	MCP2515_MASK_EXTENDED(id)
-	#define	MCP2515_MASK(id)
+#define	MCP2515_MASK_EXTENDED(id)
+#define	MCP2515_MASK(id)
+/// @}
 
 #else
 
-	#define MCP2515_FILTER_EXTENDED(id)	\
-			(uint8_t)  ((uint32_t) (id) >> 21), \
-			(uint8_t)((((uint32_t) (id) >> 13) & 0xe0) | (1<<3) | \
-				(((uint32_t) (id) >> 16) & 0x3)), \
-			(uint8_t)  ((uint32_t) (id) >> 8), \
-			(uint8_t)  ((uint32_t) (id))
+#define MCP2515_FILTER_EXTENDED(id)	\
+		(uint8_t)  ((uint32_t) (id) >> 21), \
+		(uint8_t)((((uint32_t) (id) >> 13) & 0xe0) | (1<<3) | \
+			(((uint32_t) (id) >> 16) & 0x3)), \
+		(uint8_t)  ((uint32_t) (id) >> 8), \
+		(uint8_t)  ((uint32_t) (id))
 
-	#define	MCP2515_FILTER(id) \
-			(uint8_t)((uint32_t) id >> 3), \
-			(uint8_t)((uint32_t) id << 5), \
-			0, \
-			0
+#define	MCP2515_FILTER(id) \
+		(uint8_t)((uint32_t) id >> 3), \
+		(uint8_t)((uint32_t) id << 5), \
+		0, \
+		0
 
-	#define MCP2515_MASK_EXTENDED(id)	\
-			(uint8_t)  ((uint32_t) (id) >> 21), \
-			(uint8_t)((((uint32_t) (id) >> 13) & 0xe0) | (1<<3) | \
-				(((uint32_t) (id) >> 16) & 0x3)), \
-			(uint8_t)  ((uint32_t) (id) >> 8), \
-			(uint8_t)  ((uint32_t) (id))
+#define MCP2515_MASK_EXTENDED(id)	\
+		(uint8_t)  ((uint32_t) (id) >> 21), \
+		(uint8_t)((((uint32_t) (id) >> 13) & 0xe0) | (1<<3) | \
+			(((uint32_t) (id) >> 16) & 0x3)), \
+		(uint8_t)  ((uint32_t) (id) >> 8), \
+		(uint8_t)  ((uint32_t) (id))
 
-	// TODO check this would receive all frames
-	#define	MCP2515_MASK(id) \
-			(uint8_t)((uint32_t) id >> 3), \
-			(uint8_t)((uint32_t) id << 5), \
-			0, \
-			0
+// TODO check this would receive all frames
+#define	MCP2515_MASK(id) \
+		(uint8_t)((uint32_t) id >> 3), \
+		(uint8_t)((uint32_t) id << 5), \
+		0, \
+		0
+
 #endif
-//\}
 
 namespace modm
 {

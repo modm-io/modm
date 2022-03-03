@@ -52,7 +52,7 @@ public:
 		Ch6 = 6,
 		Ch7 = 7
 	};
-}; // struct i2cMultiplexer
+};
 
 
 /// @ingroup modm_architecture_i2c_multiplexer
@@ -60,9 +60,6 @@ template < class I2cMaster, class I2cMultiplexerDevice >
 class I2cMultiplexer : public i2cMultiplexer, public modm::I2c
 {
 public:
-	/// Constructor, sets address to default of 0x70
-	I2cMultiplexer();
-
 	static bool
 	start(I2cTransaction *transaction, ConfigurationHandler handler = nullptr)
 	{
@@ -94,11 +91,6 @@ public:
 };
 
 } // modm namespace
-
-template < class I2cMaster, class I2cMultiplexerDevice  >
-modm::I2cMultiplexer<I2cMaster, I2cMultiplexerDevice >::I2cMultiplexer()
-{
-}
 
 template <
 	auto &multiplexer,

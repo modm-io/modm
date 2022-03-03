@@ -71,7 +71,7 @@
         "show-file-page": true,
         "show-grouped-members-inc": false,
         "show-include-files": true,
-        "show-namespace-page": true,
+        "show-namespace-page": false,
         "show-used-files": true,
         "sip-support": false,
         "sort-brief-docs": false,
@@ -140,7 +140,6 @@
         "external-groups": true,
         "external-pages": true,
         "generate-tagfile": "",
-        "perl-path": "/usr/bin/perl",
         "tag-files": [
             ""
         ]
@@ -386,21 +385,28 @@
     "preprocessor": {
         "enable-preprocessing": true,
         "expand-as-defined": [
-            ""
+            "EXTERN_FLASH_STORAGE(x)",
+            "MODM_FLAGS8(x)",
+            "MODM_FLAGS16(x)",
+            "MODM_FLAGS32(x)"
         ],
-        "expand-only-predefined": false,
-        "include-path": [
-            ""
-        ],
-        "include-patterns": [
-            ""
-        ],
-        "macro-expansion": false,
+        "expand-only-predefined": true,
+        "include-path": [],
+        "include-patterns": [],
+        "macro-expansion": true,
         "predefined-macros": [
-            "__DOXYGEN__"
+            "__DOXYGEN__",
+            "__cplusplus",
+            "modm_always_inline=inline",
+            "MODM_TYPE_FLAGS(x)=",
+            "MODM_INT_TYPE_FLAGS(x)=",
+            "__attribute__(x)=",
+            "modm_extern_c=extern \"C\"",
+            "MODM_HAS_IOSTREAM=1",
+            "__has_include(x)=1"
         ],
-        "search-includes": true,
-        "skip-function-macros": true
+        "search-includes": false,
+        "skip-function-macros": false
     },
     "project": {
         "project-brief": "",
@@ -450,6 +456,6 @@
             "xml"
         ],
         "use-htags": false,
-        "verbatim-headers": true
+        "verbatim-headers": false
     }
 }

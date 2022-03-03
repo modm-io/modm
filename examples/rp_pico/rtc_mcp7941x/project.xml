@@ -1,0 +1,17 @@
+<library>
+  <extends>modm:rp-pico</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/rp_pico/rtc_mcp7941x</option>
+    <option name="modm:platform:cortex-m:vector_table_location">ram</option>
+  </options>
+  <modules>
+    <module>modm:debug</module>
+    <module>modm:driver:mcp7941x</module>
+    <module>modm:io</module>
+    <module>modm:platform:i2c:0</module>
+    <module>modm:platform:uart:0</module>
+    <module>modm:processing:protothread</module>
+    <module>modm:processing:timer</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

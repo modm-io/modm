@@ -30,13 +30,13 @@
 namespace modm
 {
 
-/// @ingroup	modm_ui_display
 namespace glcd
 {
 
 /// @ingroup modm_ui_display
 using Point = Vector<int16_t, 2>;
 
+/// @ingroup modm_ui_display
 enum Orientation : uint8_t
 {
 	Landscape0,
@@ -50,11 +50,6 @@ enum Orientation : uint8_t
 /**
  * Base class for graphical displays.
  *
- * \ingroup	modm_ui_display
- */
-
-/*
- *
  * Text mode:
  * - left adjusted (default)
  * - right adjusted
@@ -62,6 +57,8 @@ enum Orientation : uint8_t
  *
  * All modes relative to the current viewport. This would make
  * drawing a menu system easier.
+ *
+ * \ingroup	modm_ui_display
  */
 class GraphicDisplay : public IOStream
 {

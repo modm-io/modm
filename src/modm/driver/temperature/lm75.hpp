@@ -138,12 +138,12 @@ public:
 	configureAlertMode(ThermostatMode mode, AlertPolarity polarity, FaultQueue faults);
 
 	/// Writes the upper limit of the alarm.
-	modm::ResumableResult<bool> modm_always_inline
+	modm::ResumableResult<bool>
 	setUpperLimit(float temperature)
 	{ return setLimitRegister(Register::TemperatureUpperLimit, temperature); }
 
 	/// Writes the lower limit of the alarm.
-	modm::ResumableResult<bool> modm_always_inline
+	modm::ResumableResult<bool>
 	setLowerLimit(float temperature)
 	{ return setLimitRegister(Register::TemperatureLowerLimit, temperature); }
 

@@ -52,15 +52,29 @@ def name(raw_name):
                    .replace("ARDUINO-UNO", "Arduino UNO")\
                    .replace("ARDUINO-NANO", "Arduino NANO")\
                    .replace("RASPBERRYPI", "Raspberry Pi")\
+                   .replace("RP-PICO", "Raspberry Pi Pico")\
                    .replace("SRXE", "Smart Response XE")\
                    .replace("GENERIC", "Generic")\
                    .replace("LINUX", "Linux")\
                    .replace("WINDOWS", "Windows")\
                    .replace("HMC58X", "HMC58x")\
                    .replace("HCLAX", "HCLAx")\
+                   .replace("LP503X", "LP503x")\
+                   .replace("MCP23X17", "MCP23x17")\
+                   .replace("TLC594X", "TLC594x")\
+                   .replace("TMP12X", "TMP12x")\
+                   .replace("MCP7941X", "MCP7941x")\
+                   .replace("ADS816X", "ADS816x")\
+                   .replace("FT6X06", "FT6x06")\
                    .replace("PARALLEL-", "")\
                    .replace("BLOCK-DEVICE-", "")\
+                   .replace("ENCODER-", "Encoder ")\
+                   .replace("INPUT", "Input")\
+                   .replace("OUTPUT", "Output")\
+                   .replace("-BITBANG", " BitBang")\
+                   .replace("GPIO-SAMPLER", "Gpio Sampler")\
                    .replace("BLOCK-", "")\
+                   .replace("SPI-FLASH", "SPI Flash")\
                    .replace("-SPI", "")
     if result in ["DEVICE", "LIS3-TRANSPORT", "MEMORY-BUS", "TERMINAL", "ALLOCATOR",
                   "MIRROR", "ADC-SAMPLER", "FAT", "HEAP", "--PYCACHE--", "FILE"]:
@@ -72,6 +86,9 @@ def fmt_url(name):
 
 def github_url(path):
     return "https://github.com/modm-io/modm/tree/develop/" + str(path)
+
+def config_url(name):
+    return "https://modm.io/reference/config/modm-" + fmt_url(name)
 
 def board_url(name):
     return "https://modm.io/reference/module/modm-board-" + fmt_url(name)
@@ -114,12 +131,10 @@ modules_path = repopath("docs/src/reference/modules.md")
 changelog_in_paths = repopath("docs/release").glob("20*.md")
 changelog_path = repopath("CHANGELOG.md")
 
-# We cannot use lbuild to enumerate the boards since they only make themselves available for certain devices
-boards = [re.search(r"<module>modm:board:(.*?)</module>", config.read_text()).group(1)
-          for config in Path(repopath("src/modm/board")).glob("*/board.xml")]
-boards = [{"name": name(b), "url": board_url(b)} for b in boards]
-boards.sort(key=lambda b: b["name"])
-bsp_table = format_table(boards, 4)
+configs = get_lbuild(repopath(".")).configurations
+configs = sorted(c.fullname.replace("modm:", "") for c in configs)
+configs = [{"name": name(c), "url": config_url(c)} for c in configs]
+bsp_table = format_table(configs, 4)
 
 # Get all the example directory paths
 examples = [e.relative_to(example_path) for e in example_path.glob('**/project.xml')]
@@ -133,7 +148,8 @@ targets = set(get_lbuild(repopath(".")).find_option("modm:target").values)
 avr_count = len([t for t in targets if t.startswith("at")])
 stm_count = len([t for t in targets if t.startswith("stm32")])
 sam_count = len([t for t in targets if t.startswith("sam")])
-all_count = avr_count + stm_count + sam_count
+rpi_count = len([t for t in targets if t.startswith("rp")])
+all_count = avr_count + stm_count + sam_count + rpi_count
 
 # Get all the modules that are available for the STM32
 # Get all drivers, we assume they are available for all devices
@@ -148,6 +164,7 @@ readme = readme_path.read_text()
 readme = replace(readme, "avrcount", avr_count)
 readme = replace(readme, "samcount", sam_count)
 readme = replace(readme, "stmcount", stm_count)
+readme = replace(readme, "rpicount", rpi_count)
 readme = replace(readme, "allcount", all_count)
 readme = replace(readme, "bsptable", bsp_table)
 readme = replace(readme, "drivertable", driver_table)
@@ -156,8 +173,10 @@ readme_path.write_text(readme)
 # extract these keys
 links = extract(readme, "links")
 authors = extract(readme, "authors").replace("\\@", "@")
-# remove
-readme = re.sub(r"((<!--webignore-->.*?<!--/webignore-->)|(<!--links-->.*?<!--/links-->)|(<!--/?bsptable-->))\n", "", readme, flags=re.DOTALL | re.MULTILINE)
+# remove html comments
+readme = re.sub(r"((<!--webignore-->.*?<!--/webignore-->)|(<!--links-->.*?<!--/links-->))\n", "", readme, flags=re.DOTALL | re.MULTILINE)
+readme = re.sub(r"<!--.*?-->", "", readme)
+readme = readme.replace("https://modm.io", "")
 
 index = Environment().from_string(index_in_path.read_text()).render({"content": readme, "links": links, "example_table": example_table})
 index_path.write_text(index)

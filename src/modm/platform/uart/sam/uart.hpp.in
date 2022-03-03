@@ -58,7 +58,7 @@ public:
 	}
 
 	template< class SystemClock, baudrate_t baudrate, percent_t tolerance=pct(1) >
-	static void modm_always_inline
+	static void
 	initialize(Parity parity = Parity::Disabled)
 	{
 		{{ hal }}::initialize<SystemClock, baudrate, tolerance>(parity);

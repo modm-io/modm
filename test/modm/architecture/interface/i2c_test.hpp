@@ -11,7 +11,7 @@
 
 #include <unittest/testsuite.hpp>
 
-/// @ingroup modm_test_test_io
+/// @ingroup modm_test_test_architecture
 class I2cTest : public unittest::TestSuite
 {
 public:

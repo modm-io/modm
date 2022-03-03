@@ -14,9 +14,7 @@
 
 def init(module):
     module.name = ":driver:stts22h"
-    module.description = """\
-Simple driver for STTS22H I2c temperature sensor
-"""
+    module.description = "STTS22H temperature sensor"
 
 def prepare(module, options):
     module.depends(

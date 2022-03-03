@@ -17,7 +17,7 @@
 namespace modm::platform
 {
 
-/// @ingroup modm_platform_gpio
+/// @ingroup modm_platform_core
 enum class
 Peripheral
 {

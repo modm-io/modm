@@ -17,10 +17,7 @@
 #include <type_traits>
 
 /// @cond
-namespace modm::platform
-{
-
-namespace detail
+namespace modm::platform::detail
 {
 
 template< Gpio::Signal signal, class... Signals >
@@ -40,8 +37,13 @@ struct GpioGetSignal<signal>
 	using Gpio = GpioUnused;
 };
 
-} // namespace detail
+} // namespace modm::platform::detail
+/// @endcond
 
+namespace modm::platform
+{
+
+/// @ingroup modm_platform_gpio
 template< Peripheral peripheral, class... Signals >
 struct GpioConnector
 {
@@ -163,6 +165,6 @@ struct GpioConnector<Peripheral::{{per}}, Signals...>
 %% endfor
 
 } // namespace modm::platform
-%% endif
 /// @endcond
+%% endif
 

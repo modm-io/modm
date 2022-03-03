@@ -21,14 +21,15 @@
 
 using namespace modm::platform;
 
-/// @ingroup modm_board_nucleo_f031k6
 namespace Board
 {
-	using namespace modm::literals;
+/// @ingroup modm_board_nucleo_f031k6
+/// @{
+using namespace modm::literals;
 
 /// STM32F031K6 running at 48MHz generated from the internal 8MHz crystal
-// Dummy clock for devices
-struct SystemClock {
+struct SystemClock
+{
 	static constexpr uint32_t Frequency = 48_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb = Frequency;
@@ -78,17 +79,21 @@ using Button = GpioUnused;
 using LedD13 = D13;
 
 using Leds = SoftwareGpioPort< LedD13 >;
-
+/// @}
 
 namespace stlink
 {
+/// @ingroup modm_board_nucleo_f031k6
+/// @{
 using Rx = GpioInputA15;
 using Tx = GpioOutputA2;
 using Uart = Usart1;
+/// @}
 }
 
+/// @ingroup modm_board_nucleo_f031k6
+/// @{
 using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
-
 
 inline void
 initialize()
@@ -99,6 +104,7 @@ initialize()
 	stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>();
 	stlink::Uart::initialize<SystemClock, 115200_Bd>();
 }
+/// @}
 
 }
 

@@ -161,7 +161,6 @@ def prepare(module, options):
     module.depends(
         ":architecture:adc",
         ":math:algorithm",
-        ":utils",
         ":architecture:delay",
         ":architecture:register",
         ":cmsis:device",

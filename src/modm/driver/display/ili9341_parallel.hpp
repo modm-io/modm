@@ -24,12 +24,12 @@ public:
 	Ili9341ParallelInterface(INTERFACE& interface)
 	: interface(interface) {}
 
-	__attribute__((noinline)) void
+	modm_noinline void
 	writeCommand(Command command)
 	{
 		interface.writeIndex(i(command));
 	}
-	__attribute__((noinline)) void
+	modm_noinline void
 	writeCommand(Command command, uint8_t const *args, std::size_t length)
 	{
 		interface.writeIndex(i(command));

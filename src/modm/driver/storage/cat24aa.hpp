@@ -19,7 +19,8 @@ namespace modm
 {
 
 /// @cond
-struct cat24Aa {
+struct cat24Aa
+{
 	class DataTransmissionAdapter : public modm::I2cWriteReadTransaction
 	{
 	public:
@@ -53,7 +54,7 @@ struct cat24Aa {
  * slave address plus the address byte.
  * Base address is fixed to 0x50.
  *
- * @ingroup	modm_driver_i2c_eeprom
+ * @ingroup	modm_driver_cat24aa
  * @author	Mike Wolfram
  */
 template <typename I2cMaster>

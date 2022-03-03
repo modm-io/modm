@@ -32,7 +32,7 @@ static lv_color_t* buf;
 static constexpr size_t buf_size = LV_HOR_RES_MAX * LV_VER_RES_MAX;
 
 Touch::Data touchData;
-Touch touch{touchData};
+Touch touch{touchData, TouchAddress};
 
 void my_touchpad_read(lv_indev_drv_t*, lv_indev_data_t* data)
 {

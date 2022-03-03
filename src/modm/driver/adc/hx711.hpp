@@ -13,6 +13,7 @@
 #define MODM_HX711_HPP
 
 #include <modm/architecture/interface/delay.hpp>
+#include <modm/architecture/interface/gpio.hpp>
 #include <modm/processing/resumable.hpp>
 
 namespace modm
@@ -37,6 +38,7 @@ struct hx711
 	};
 };
 
+/// @ingroup modm_driver_hx711
 template <typename Cfg>
 class Hx711 : public hx711, protected modm::NestedResumable<2>
 {

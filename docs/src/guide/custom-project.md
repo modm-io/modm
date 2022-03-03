@@ -93,14 +93,17 @@ discover all of modm yet. You can now choose from two levels of customization:
 
 ## Using a Board Support Package
 
-Use lbuild to discover the specific BSP configuration you want to use:
+Use lbuild to discover the specific BSP configuration you want to use.
+Some board configurations support different hardware revisions, so check your
+hardware to select the right one. For this example, we are going to use
+[the DISCO-F469NI Rev B-03 board config](../../reference/config/modm-disco-f469ni).
 
 ```
  $ lbuild discover
 Parser(lbuild)
 ╰── Repository(modm @ ../../ext/modm)   modm: a barebone embedded library generator
     ├── Option(target) = REQUIRED in [stm32f469ngh6, stm32f469nih6, stm32f469vet6, ...
-    ├── Config(modm:disco-f469ni)   STM32F469IDISCOVERY
+    ├── Config(modm:disco-f469ni:b-03) in [b-01, b-03]   STM32F469IDISCOVERY
    ...
 ```
 
@@ -113,7 +116,7 @@ cannot remove any inherited modules.
 <library>
   <repositories>...</repositories>
 
-  <extends>modm:disco-f469ni</extends>
+  <extends>modm:disco-f469ni:b-03</extends>
 
   <options>...</options>
   <modules>...</modules>
@@ -181,7 +184,7 @@ it's better to use your own BSP:
 
 ## Custom Configuration
 
-For completely custom hardware, you start by definining the `modm:target` option
+For completely custom hardware, you start by defining the `modm:target` option
 and then adding the modules with their options as needed. For example, a basic
 configuration for the STM32F469NIH6 with startup, GPIO and clock modules looks
 like this:

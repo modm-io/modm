@@ -13,6 +13,7 @@ from collections import OrderedDict
 
 def init(module):
     module.name = ":driver:gpio_sampler"
+    module.description = "Gpio Sampling via Interrupts"
 
 
 def prepare(module, options):

@@ -68,7 +68,7 @@ Flash::getOffset(uint8_t index)
 }
 
 size_t
-Flash::getSize(uint8_t modm_unused index)
+Flash::getSize([[maybe_unused]] uint8_t index)
 {
 %% if has_sectors
 	if (index < 4) return (1ul << 14);

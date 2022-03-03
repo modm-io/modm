@@ -111,12 +111,12 @@ namespace modm
 				{{reg}}->TCR = TCR_CRst;
 			}
 
-			static modm_always_inline Value
+			static Value
 			getValue() {
 				return {{reg}}->TC;
 			}
 
-			static modm_always_inline void
+			static void
 			setValue(uint16_t value) {
 				{{reg}}->TC = value;
 			}

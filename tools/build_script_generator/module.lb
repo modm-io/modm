@@ -25,7 +25,7 @@ class BuildModuleDocs:
         if self._content is None:
             self._content = Path(localpath("module.md")).read_text(encoding="utf-8").strip()
             tools = ["avrdude", "openocd", "bmp", "gdb", "size", "info",
-                     "unit_test", "log", "build_id", "bitmap"]
+                     "unit_test", "log", "build_id", "bitmap", "elf2uf2"]
 
             for tool in tools:
                 tpath = Path(repopath("tools/modm_tools/{}.py".format(tool)))
