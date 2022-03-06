@@ -55,7 +55,6 @@ public:
 %% if not has_sectors and family == "g0"
 		Rcc::disable<Peripheral::Flash>();
 %% endif
-
 	}
 
 	static bool
