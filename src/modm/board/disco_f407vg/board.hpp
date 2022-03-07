@@ -226,7 +226,10 @@ initializeCs43()
 {
 	cs43::I2sMaster::connect<cs43::Mclk::Mck, cs43::Sclk::Ck,
 							cs43::Lrck::Ws, cs43::Sdin::Sd>();
-	cs43::I2sMaster::initialize<SystemClock, samplerate, tolerance>();
+	cs43::I2sMaster::initialize<SystemClock, samplerate, tolerance>(
+		cs43::I2sMaster::BitDepth::SixteenWithChannel16,
+		cs43::I2sMaster::MasterClockOutput::Enabled,
+		cs43::I2sMaster::I2sStandard::Philips);
 	cs43::Reset::setOutput(modm::Gpio::High);
 
 	cs43::I2cMaster::connect<cs43::Scl::Scl, cs43::Sda::Sda>();
