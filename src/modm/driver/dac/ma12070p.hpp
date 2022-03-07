@@ -230,7 +230,7 @@ struct ma12070p
 	{
 		return quarter_decibel_t(int16_t(value * 4ul));
 	}
-	
+
 	static constexpr float
 	quarterDecibelToFloat(quarter_decibel_t value)
 	{
@@ -278,8 +278,8 @@ class Ma12070p : public ma12070p, public modm::I2cDevice<I2cMaster, 5>
 public:
 	/**
 	 * Constructor.
-	 * 
-	 * \param i2cAddress The I²C address depends on the AD1 and AD0 pins: 
+	 *
+	 * \param i2cAddress The I²C address depends on the AD1 and AD0 pins:
 	 *                   AD1=0, AD0=0 -> 0x20
 	 *                   AD1=0, AD0=1 -> 0x21
 	 *                   AD1=1, AD0=0 -> 0x22
