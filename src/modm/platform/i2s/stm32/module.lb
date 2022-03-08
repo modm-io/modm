@@ -53,6 +53,9 @@ def init(module):
 
 def prepare(module, options):
     device = options[":target"]
+    if device.identifier.family in ["h7"]:
+        # STM32H7 has a completely different SPI IP
+        return False
     if not device.has_driver("i2s:stm32*"):
         return False
 
