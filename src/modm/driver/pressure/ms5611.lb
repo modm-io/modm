@@ -1,0 +1,34 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2022, Rasmus Kleist Hørlyck Sørensen
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":driver:ms5611"
+    module.description = """\
+# MS5611 Barometric Pressure Sensor
+This barometric pressure sensor is optimized for altimeters and variometers with an altitude resolution of 10 cm.
+"""
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:gpio",
+        ":architecture:spi.device",
+        ":math:utils",
+        ":processing:resumable",
+        ":processing:timer")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/pressure"
+    env.copy("ms5611.hpp")
+    env.copy("ms5611_impl.hpp")
+    env.copy("ms5611_data.hpp")
+    env.copy("ms5611_data_impl.hpp")
