@@ -154,6 +154,7 @@ Flash::program(uintptr_t addr, MaxWordType data)
 	FLASH->CR &= ~FLASH_CR_PG;
 	return FLASH->SR & FLASH_SR_PGERR;
 %% else
+	FLASH->SR |= FLASH_SR_EOP;
 	FLASH->CR = 0;
 	return FLASH->SR & FLASH_SR_ERR;
 %% endif
