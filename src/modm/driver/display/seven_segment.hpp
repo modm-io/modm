@@ -23,7 +23,7 @@ namespace modm
 	{
 
 		// config: left to right, right to left.
-
+		/// @cond
 		static const uint8_t segA  = (1 << 5);
 		static const uint8_t segB  = (1 << 7);
 		static const uint8_t segC  = (1 << 4);
@@ -53,6 +53,7 @@ namespace modm
 			segA               | segD | segE | segF | segG, // E
 			segA                      | segE | segF | segG, // F
 		};
+		/// @endcond
 
 		/**
 		 * \brief	Seven Segment Display Driver

@@ -85,12 +85,12 @@ public:
 
 	/// Clear the display of all Data
 	/// @return	`true` if operation successful, `false` if controller is busy
-	static modm_always_inline bool
+	static bool
 	clear();
 
 	/// Reset the cursor to (0,0) home position
 	/// @return	`true` if operation successful, `false` if controller is busy
-	static modm_always_inline bool
+	static bool
 	resetCursor();
 
 	// write
@@ -112,7 +112,7 @@ public:
 	// read
 	/// Read the cursor position
 	/// @return	`true` if operation successful, `false` if controller is busy
-	static modm_always_inline bool
+	static bool
 	readAddress(uint8_t &address);
 
 	/// Read the character at the current cursor position
@@ -130,11 +130,11 @@ public:
 
 protected:
 	/// unconditionally write data to the controller
-	static modm_always_inline void
+	static void
 	write(uint8_t data);
 
 	/// unconditionally read data from the controller
-	static modm_always_inline uint8_t
+	static uint8_t
 	read();
 
 private:
@@ -177,7 +177,7 @@ private:
 
 		/// only writes the high nibble of data
 		/// Use this in the initialization, when bus width is not determined yet
-		static modm_always_inline void
+		static void
 		writeHighNibble(uint8_t data);
 
 		/// toggles the Enable line and reads the port
@@ -198,7 +198,7 @@ private:
 
 		/// only writes the high nibble of data
 		/// Use this in the initialization, when bus width is not determined yet
-		static modm_always_inline void
+		static void
 		writeHighNibble(uint8_t data);
 
 		/// toggles the Enable line and reads the port

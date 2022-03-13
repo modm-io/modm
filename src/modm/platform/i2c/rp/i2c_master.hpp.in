@@ -1,0 +1,106 @@
+/*
+ * Copyright (c) 2022, Andrey Kunitsyn
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include "../device.hpp"
+#include <modm/platform/gpio/connector.hpp>
+#include <modm/architecture/interface/i2c_master.hpp>
+#include <modm/math/algorithm/prescaler.hpp>
+#include <hardware/structs/i2c.h>
+
+namespace modm::platform
+{
+
+/**
+ * I2cMaster implementation of I2C{{ id }} module.
+ *
+ * @author		Andrey Kunitsyn
+ * @ingroup		modm_platform_i2c modm_platform_i2c_{{id}}
+ */
+class I2cMaster{{ id }} : public ::modm::I2cMaster
+{
+public:
+	static inline i2c_hw_t& hw() { return *i2c{{ id }}_hw; }
+public:
+	template<class... Signals, ResetDevices reset = ResetDevices::Standard>
+	static void
+	connect(PullUps pullups = PullUps::External)
+	{
+		using Connector = GpioConnector<Peripheral::I2c{{ id }}, Signals...>;
+		using Scl = typename Connector::template GetSignal<Gpio::Signal::Scl>;
+		using Sda = typename Connector::template GetSignal<Gpio::Signal::Sda>;
+		static_assert(sizeof...(Signals) == 2 and
+					  Connector::template IsValid<Scl> and Connector::template IsValid<Sda>,
+					  "I2cMaster{{id}}::connect() requires one Scl and one Sda signal!");
+		const Gpio::InputType input =
+			(pullups == PullUps::Internal) ? Gpio::InputType::PullUp : Gpio::InputType::Floating;
+
+		Connector::disconnect();
+		Scl::configure(input);
+		Scl::setSlewRate(Gpio::SlewRate::Slow);
+		Sda::configure(input);
+		Sda::setSlewRate(Gpio::SlewRate::Slow);
+		if (reset != ResetDevices::NoReset) resetDevices<Scl, uint32_t(reset)>();
+		Connector::connect();
+	}
+
+	static void hwReset();
+	static void hwUnReset();
+
+	/**
+	 * Set up the I2C module for master operation.
+	 *
+	 * @param	rate
+	 *		`Standard` or `Fast` or `Fast+`, `High` datarate is not supported
+	 */
+	template<class SystemClock, baudrate_t baudrate=kBd(100), percent_t tolerance=pct(5)>
+	static void
+	initialize();
+
+	template< class SystemClock, baudrate_t baudrate, percent_t tolerance=pct(5)>
+	static uint32_t
+	setBaudrate();
+
+	// start documentation inherited
+	static bool
+	start(I2cTransaction *transaction, ConfigurationHandler handler = nullptr);
+
+	static Error
+	getErrorState();
+
+	static void
+	reset();
+	// end documentation inherited
+
+	template <typename Wait>
+	static Error transfer(uint8_t addr,const uint8_t* write,size_t writeLen,
+		uint8_t* read, size_t readLen);
+
+private:
+	template <typename Wait>
+	static void doWrite(const uint8_t* write,size_t writeLen,bool nostop);
+	template <typename Wait>
+	static void doRead(uint8_t* read,size_t readLen,bool nostop);
+	static bool isReadAvailable() {
+		return hw().rxflr;
+	}
+	static bool isWriteAvailable() {
+		constexpr size_t IC_TX_BUFFER_DEPTH = 16;
+		return IC_TX_BUFFER_DEPTH - hw().txflr;
+	}
+	static inline Error errorState{Error::NoError};
+	static inline I2c::ConfigurationHandler configuration{nullptr};
+	static inline bool restartOnNext{false};
+};
+
+} // namespace modm::platform
+#include "i2c_master_impl_{{id}}.hpp"

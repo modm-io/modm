@@ -28,11 +28,13 @@ namespace platform
 {
 
 %% if dmaType in ["stm32-mux", "stm32-mux-stream"]
+/// @cond
 namespace dma
 {
 	template <typename ChannelT, Peripheral peripheral, DmaBase::Signal signal>
 	struct RequestMapping;
 }
+/// @endcond
 %% endif
 
 /**
@@ -397,6 +399,9 @@ public:
 	};
 };
 
+/// @ingroup	modm_platform_dma
+/// @{
+
 /*
  * Derive DMA controller classes for convenience. Every derived class defines
  * the channels available on that controller.
@@ -433,7 +438,9 @@ public:
 };
 %% endfor
 %% endif
+/// @}
 
+/// @cond
 /*
  * Specialization of the RequestMapping. For all hardware supported by DMA the
  * RequestMapping structure defines the channel and the Request. It can be used
@@ -559,6 +566,7 @@ struct DmaController<{{ channels.instance }}>::Channel<DmaBase::Channel::Channel
 %% endfor
 
 %%endif
+/// @endcond
 }	// namespace platform
 
 }	// namespace modm

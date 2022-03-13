@@ -14,14 +14,6 @@
 #ifndef MODM_INTERPOLATION_HPP
 #define MODM_INTERPOLATION_HPP
 
-namespace modm
-{
-	/// @ingroup modm_math_interpolation
-	namespace interpolation
-	{
-	}
-}
-
 #include "interpolation/linear.hpp"
 #include "interpolation/lagrange.hpp"
 

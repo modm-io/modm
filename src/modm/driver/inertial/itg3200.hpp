@@ -259,7 +259,7 @@ public:
 protected:
 	/// @cond
 	/// write a 8bit value a register
-	modm::ResumableResult<bool> modm_always_inline
+	modm::ResumableResult<bool>
 	write(Register reg, uint8_t &value)
 	{ return write(reg, &value, 1); }
 
@@ -268,7 +268,7 @@ protected:
 	write(Register reg, uint8_t *buffer, uint8_t length, bool copyBuffer=true);
 
 	/// read a 8bit value from a register
-	modm::ResumableResult<bool> modm_always_inline
+	modm::ResumableResult<bool>
 	read(Register reg, uint8_t &value)
 	{ return read(reg, &value, 1); }
 

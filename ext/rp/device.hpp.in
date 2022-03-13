@@ -21,7 +21,6 @@
 %% endfor
 
 #include <stdint.h>
-// Defines for example the modm_always_inline macro
 #include <modm/architecture/utils.hpp>
 
 // Include external device headers:

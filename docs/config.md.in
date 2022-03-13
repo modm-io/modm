@@ -1,0 +1,16 @@
+# {{ config.title if config.title else config.name }}
+
+lbuild config: `{{config.name}}`
+
+{{config.description}}
+
+%% if config.default != ""
+Default: `{{config.default}}`  
+Revisions: `[{{config.revisions}}]`
+%% endif
+%#
+## Configuration
+
+```xml
+{{config.configs[config.default]}}
+```

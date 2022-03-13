@@ -54,14 +54,14 @@ public:
 	 * channel number, like CHANNEL_0.
 	 */
 	enum class
-	Channel : uint8_t	// TODO: What is the best type?
+	Channel : uint8_t
 	{
 %% for channel in channels
 		Channel{{ channel }} = {{ channel }},
 %% endfor
 %#
 %% if target["family"] in ["f2", "f4", "f7"]
-		BatDiv2 = 18, /// Half the V_BAT voltage.
+		BatDiv2 = 18, ///< Half the V_BAT voltage.
 %% endif
 %#
 %% if temperature_available

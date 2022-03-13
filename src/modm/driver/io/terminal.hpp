@@ -22,7 +22,7 @@ namespace modm
  *
  * Uses the STL IOStream for in- and output.
  *
- * @ingroup	modm_platform_uart
+ * @ingroup	modm_driver_terminal
  */
 class Terminal : public IODevice
 {

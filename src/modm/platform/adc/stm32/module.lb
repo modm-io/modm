@@ -97,8 +97,7 @@ def prepare(module, options):
         ":cmsis:device",
         ":platform:gpio",
         ":platform:rcc",
-        ":math:algorithm",
-        ":utils")
+        ":math:algorithm")
 
     for instance in listify(device.get_driver("adc").get("instance", [])):
         module.add_submodule(Instance(int(instance)))

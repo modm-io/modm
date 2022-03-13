@@ -202,29 +202,6 @@ modm::platform::Adc{{ id }}::isConversionFinished(void)
 }
 
 // ----------------------------------------------------------------------------
-// TODO: move this to some shared header for all cortex m3 platforms
-// Re-implemented here to save some code space. As all arguments in the calls
-// below are constant the compiler is able to calculate everything at
-// compile time.
-
-#ifndef MODM_CUSTOM_NVIC_FUNCTIONS
-#define MODM_CUSTOM_NVIC_FUNCTIONS
-
-static modm_always_inline void
-nvicEnableInterrupt(const IRQn_Type IRQn)
-{
-	NVIC->ISER[(static_cast<uint32_t>(IRQn) >> 5)] =
-								(1 << ((uint32_t)(IRQn) & 0x1F));
-}
-
-static modm_always_inline void
-nvicDisableInterrupt(IRQn_Type IRQn)
-{
-	NVIC_DisableIRQ(IRQn);
-}
-
-#endif // MODM_CUSTOM_NVIC_FUNCTIONS
-
 void
 modm::platform::Adc{{ id }}::enableInterruptVector(const uint32_t priority,
 												const bool enable)
@@ -237,7 +214,7 @@ modm::platform::Adc{{ id }}::enableInterruptVector(const uint32_t priority,
 
 	if (enable) {
 		NVIC_SetPriority(INTERRUPT_VECTOR, priority);
-		nvicEnableInterrupt(INTERRUPT_VECTOR);
+		NVIC_EnableIRQ(INTERRUPT_VECTOR);
 	} else {
 		NVIC_DisableIRQ(INTERRUPT_VECTOR);
 	}

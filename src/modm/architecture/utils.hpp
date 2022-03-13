@@ -45,19 +45,20 @@
 	/// Include a binary file into a specific section (usually `".rodata"`).
 	/// Access via `extern "C" uint8_t {{name}}[]; extern "C" uint8_t {{name}}_length[];`.
 	/// @see http://elm-chan.org/junk/32bit/binclude.html
+	/// @warning The build systems cannot detect if the binary file changes and
+	///          will therefore not recompile automatically!
 	#define MODM_IMPORT_BINARY(name, file, section)
 
-	/// @{
-	/**
-	 * Force inlining on functions if needed. Compiling with -Os  does not
-	 * always inline them when declared only `inline`
-	 */
+	/// Force inlining on functions if absolutely necessary (it rarely is).
+	/// @warning Only use this if you really know what you're doing.
 	#define modm_always_inline
 
-	/// Specifies that a function should never be inlined
+	/// Specifies that a function should never be inlined.
+	/// @note Please use `[[noinline]]` in a C++ context instead.
 	#define modm_noinline
 
 	/// Attached to a variable or a function this means that it is meant to be possibly unused.
+	/// @note Please use `[[maybe_unused]]` in a C++ context instead.
 	#define modm_unused
 
 	/// Causes the declaration to be emitted as a weak symbol rather than a global.
@@ -73,10 +74,15 @@
 	#define modm_section(s)
 
 	/// Marks a declaration as deprecated and displays a message.
+	/// @note Please use `[[deprecated(msg)]]` in a C++ context instead.
 	#define modm_deprecated(msg)
 
 	/// Tells the compiler to not generate prologue/epilogue code for this function.
 	#define modm_naked
+
+	/// Tells the compiler that the function never returns.
+	/// @note Please use `[[noreturn]]` in a C++ context instead.
+	#define modm_noreturn
 
 	/// Places a function in the fastest executable memory:
 	/// instruction cache, core coupled memory or SRAM as fallback.
@@ -93,15 +99,17 @@
 	#define modm_faststack
 
 	/// This branch is more likely to execute.
+	/// @note Please use `[[likely]]` in a C++ context instead.
 	#define modm_likely(x) (x)
 
 	/// This branch is less likely to execute.
+	/// @note Please use `[[unlikely]]` in a C++ context instead.
 	#define modm_unlikely(x) (x)
 
 	/// Mark a case statement as fallthrough.
+	/// @note Please use `[[fallthrough]]` in a C++ context instead.
 	#define modm_fallthrough
 
-	/// @}
 	/// @}
 #else // !__DOXYGEN__
 

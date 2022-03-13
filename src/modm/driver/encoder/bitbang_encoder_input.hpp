@@ -19,7 +19,7 @@
 namespace modm
 {
 /**
- * @ingroup 				modm_driver_bitbang_encoder_input
+ * @ingroup 				modm_driver_encoder_input_bitbang
  * @author  				Thomas Sommer
  *
  * @brief					This driver decodes a AB (incremental) encoder signal

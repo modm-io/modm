@@ -22,9 +22,10 @@
 
 using namespace modm::platform;
 
-/// @ingroup modm_board_al_avreb_can
 namespace Board
 {
+/// @ingroup modm_board_al_avreb_can
+/// @{
 using namespace modm::literals;
 using SystemClock = modm::platform::SystemClock;
 
@@ -48,6 +49,7 @@ initialize()
 
 	enableInterrupts();
 }
+/// @}
 
 }
 

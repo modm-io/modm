@@ -18,15 +18,15 @@
 
 using namespace modm::platform;
 
-
-/// @ingroup modm_board_stm32f030_demo
 namespace Board
 {
-	using namespace modm::literals;
+/// @ingroup modm_board_stm32f030_demo
+/// @{
+using namespace modm::literals;
 
 /// STM32F030 running at 48MHz generated from the external 8MHz crystal
-// Dummy clock for devices
-struct SystemClock {
+struct SystemClock
+{
 	static constexpr uint32_t Frequency = 48_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb = Frequency;
@@ -93,6 +93,7 @@ initialize()
 
 	LedOrange::setOutput(modm::Gpio::Low);
 }
+/// @}
 
 } // Board namespace
 

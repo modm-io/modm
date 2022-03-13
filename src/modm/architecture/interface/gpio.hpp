@@ -25,11 +25,9 @@ struct Gpio
 	/**
 	 * These constants refer to the *logical* state of the GPIO.
 	 * The physical state is determined by the configuration and external connection.
-	 * @{
 	 */
 	static constexpr bool Low = false;
 	static constexpr bool High = true;
-	/// @}
 
 	/// Declares the direction of a GPIO
 	enum class

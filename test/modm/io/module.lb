@@ -13,6 +13,7 @@
 
 def init(module):
     module.name = ":test:io"
+    module.description = "Tests for IO"
 
 def prepare(module, options):
     module.depends(

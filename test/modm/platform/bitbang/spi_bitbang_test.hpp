@@ -1,7 +1,5 @@
 /*
- * Copyright (c) 2009, Martin Rosekeit
- * Copyright (c) 2009-2011, Fabian Greif
- * Copyright (c) 2011-2012, Niklas Hauser
+ * Copyright (c) 2018, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -11,10 +9,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "dummy.hpp"
+#include <unittest/testsuite.hpp>
 
-void
-modm::dummy()
+/// @ingroup modm_test_test_platform_bitbang
+class SpiBitbangTest : public unittest::TestSuite
 {
-	// get coffee
-}
+public:
+	void
+	testSpiMaster();
+};

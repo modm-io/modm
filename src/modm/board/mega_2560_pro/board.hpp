@@ -19,9 +19,10 @@
 
 using namespace modm::platform;
 
-/// @ingroup modm_board_mega_2560_pro
 namespace Board
 {
+/// @ingroup modm_board_mega_2560_pro
+/// @{
 using namespace modm::literals;
 using SystemClock = modm::platform::SystemClock;
 
@@ -116,6 +117,7 @@ initialize()
 
 	enableInterrupts();
 }
+/// @}
 
 }
 

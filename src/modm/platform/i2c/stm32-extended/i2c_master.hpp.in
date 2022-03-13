@@ -96,7 +96,7 @@ public:
 	 *		`Standard` or `Fast`, `High` datarate is not supported
 	 */
 	template<class SystemClock, baudrate_t baudrate=kBd(100), percent_t tolerance=pct(5)>
-	static modm_always_inline void
+	static void
 	initialize()
 	{
 		constexpr std::optional<uint32_t> timingRegisterValue = calculateTimings<SystemClock, baudrate, tolerance>();

@@ -14,6 +14,7 @@
 
 def init(module):
     module.name = ":test:utils"
+    module.description = "Tests for Utils"
 
 
 def prepare(module, options):

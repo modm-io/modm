@@ -18,7 +18,7 @@ def prepare(module, options):
 	# The modm_abandon function uses delay functions
     module.depends(":architecture:delay", ":architecture:assert")
 
-    # Backwards compatible move, remove this in 2022.
+    # Backwards compatible move, DEPRECATE: 2022q1
     module.add_alias(Alias(name="blue-pill", destination="blue-pill-f103",
                            description="Renamed for clarity."))
     module.add_alias(Alias(name="black-pill", destination="black-pill-f103",

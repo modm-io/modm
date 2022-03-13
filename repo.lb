@@ -24,7 +24,7 @@ from os.path import normpath
 
 # Check for miminum required lbuild version
 import lbuild
-min_lbuild_version = "1.21.0"
+min_lbuild_version = "1.21.4"
 if StrictVersion(getattr(lbuild, "__version__", "0.1.0")) < StrictVersion(min_lbuild_version):
     print("modm requires at least lbuild v{}, please upgrade!\n"
           "    pip3 install -U lbuild".format(min_lbuild_version))
@@ -230,7 +230,7 @@ def init(repo):
         if (module.parent / "module.md").exists():
             description = FileReader(str(module.parent / "module.md"))
         else:
-            description = re.search(r'\.description += +(""".*?"""|".*?")',
+            description = re.search(r'description += +(""".*?"""|".*?")',
                                     module_text, flags=re.S|re.M)
             description = description.group(1).strip('"\\') if description else None
         versions = re.search(r"#+ +[Rr]evisions? += +\[(.*)\]", module_text)
@@ -238,7 +238,7 @@ def init(repo):
         config = {v.strip(): (module.parent / "board.xml") for v in versions}
         repo.add_configuration(Configuration(name, description, config, versions[0].strip()))
 
-    # Backwards compatible move, remove this in 2022.
+    # DEPRECATE: 2022q1
     repo.add_alias(Alias(name="blue-pill", destination=":blue-pill-f103",
                          description="Renamed for clarity."))
     repo.add_alias(Alias(name="black-pill", destination=":black-pill-f103",

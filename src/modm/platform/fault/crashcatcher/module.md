@@ -1,6 +1,6 @@
 # ARM Cortex-M Fault Reporters
 
-This module manages data storage for core dumps provided by the `:crashcatcher`
+This module manages data storage for core dumps provided by the `modm:crashcatcher`
 module to investigate HardFault events via offline post-mortem debugging.
 The data is stored in the volatile memory designated for the heap.
 
@@ -15,7 +15,7 @@ This works as follows:
 4. The application has no limitations other than a reduced total heap size!
    It may access the report data at any time and use all hardware to send out
    this report.
-5. After the application clears the report ands reboots, the heap will once 
+5. After the application clears the report and reboots, the heap will once
    again be fully available.
 
 
@@ -149,7 +149,7 @@ Displaying notes found in: .build_id
 
 ### Post-Mortem Debugging with SCons
 
-The `:build:scons` module provides a few helper methods for working with fault
+The `modm:build:scons` module provides a few helper methods for working with fault
 reports. You still need to copy the coredump data manually, however, the firmware
 selection is automated.
 

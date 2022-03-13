@@ -18,8 +18,9 @@
 namespace modm
 {
 
-template <typename SPI, typename CS, typename RST, typename DC, int Width = 384, int Height = 160>
 // TODO: this controller has pixels packed by 3, not 8 per byte
+/// @ingroup modm_driver_st7586s
+template <typename SPI, typename CS, typename RST, typename DC, int Width = 384, int Height = 160>
 class St7586s : public MonochromeGraphicDisplayHorizontal<Width, Height>
 {
 	using Command = detail::st7586s::Command;

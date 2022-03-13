@@ -19,9 +19,10 @@
 
 using namespace modm::platform;
 
-/// @ingroup modm_board_nucleo_l152re
 namespace Board
 {
+/// @ingroup modm_board_nucleo_l152re
+/// @{
 using namespace modm::literals;
 
 /// STM32L152RE running at 32MHz generated from the external 8MHz ST-Link clock
@@ -116,17 +117,21 @@ using Button = GpioInverted<GpioInputC13>;
 using LedD13 = D13;
 
 using Leds = SoftwareGpioPort< LedD13 >;
-
+/// @}
 
 namespace stlink
 {
+/// @ingroup modm_board_nucleo_l152re
+/// @{
 using Rx = GpioInputA3;
 using Tx = GpioOutputA2;
 using Uart = Usart2;
+/// @}
 }
 
+/// @ingroup modm_board_nucleo_l152re
+/// @{
 using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
-
 
 inline void
 initialize()
@@ -139,5 +144,6 @@ initialize()
 
 	Button::setInput();
 }
+/// @}
 
 }

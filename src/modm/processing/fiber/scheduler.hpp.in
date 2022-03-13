@@ -22,6 +22,7 @@ namespace modm::fiber
 
 void yield();
 
+/// @ingroup    modm_processing_fiber
 class Scheduler
 {
 	friend class ::modm::Fiber;
@@ -165,6 +166,7 @@ protected:
 	}
 };
 
+/// @ingroup    modm_processing_fiber
 inline void
 yield()
 {

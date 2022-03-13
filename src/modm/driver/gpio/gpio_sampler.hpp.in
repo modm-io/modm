@@ -19,6 +19,7 @@
 namespace modm
 {
 
+/// @ingroup modm_driver_gpio_sampler
 class GpioSampler
 {
 public:

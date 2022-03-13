@@ -15,6 +15,7 @@
 namespace modm_test
 {
 
+/// @ingroup modm_test_mock_shared_medium
 class SharedMedium
 {
 public:

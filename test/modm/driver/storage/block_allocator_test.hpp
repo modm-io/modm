@@ -17,7 +17,7 @@
 
 #include <unittest/testsuite.hpp>
 
-/// @ingroup modm_test_test_architecture
+/// @ingroup modm_test_test_driver
 class BlockAllocatorTest : public unittest::TestSuite
 {
 public:

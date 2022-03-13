@@ -27,6 +27,7 @@ class Clock(Module):
 class SpiDevice(Module):
     def init(self, module):
         module.name = "spi.device"
+        module.description = "Spi Device Mockup"
 
     def prepare(self, module, options):
         module.depends(":architecture:spi.device")
@@ -40,6 +41,7 @@ class SpiDevice(Module):
 class SpiMaster(Module):
     def init(self, module):
         module.name = "spi.master"
+        module.description = "Spi Master Mockup"
 
     def prepare(self, module, options):
         module.depends(":architecture:spi", ":container")
@@ -67,6 +69,7 @@ class CanDriver(Module):
 class IoDevice(Module):
     def init(self, module):
         module.name = "io.device"
+        module.description = "IO Device Mockup"
 
     def prepare(self, module, options):
         return True
@@ -80,6 +83,7 @@ class IoDevice(Module):
 class SharedMedium(Module):
     def init(self, module):
         module.name = "shared_medium"
+        module.description = "Shared Medium Mockup"
 
     def prepare(self, module, options):
         module.depends(":stdc++")
@@ -92,6 +96,7 @@ class SharedMedium(Module):
 class LogicAnalyzer(Module):
     def init(self, module):
         module.name = "logic_analyzer"
+        module.description = "Logic Analyzer Mockup"
 
     def prepare(self, module, options):
         core = options[":target"].get_driver("core:cortex-m*")
@@ -112,6 +117,7 @@ class LogicAnalyzer(Module):
 
 def init(module):
     module.name = ":mock"
+    module.description = "Test Mockups"
 
 def prepare(module, options):
     module.add_submodule(Clock())

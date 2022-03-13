@@ -18,9 +18,6 @@
 
 #include "controller.hpp"
 
-/// @ingroup modm_unittest
-/// @{
-
 /// @cond
 #include <modm/architecture/interface/accessor_flash.hpp>
 
@@ -193,6 +190,9 @@ namespace unittest
 }
 /// @endcond
 
+/// @ingroup modm_unittest
+/// @{
+
 /// Verify (expr) is true
 #define	TEST_ASSERT_TRUE(expr)	\
 	TEST_RETURN_(::unittest::checkExpression((expr), __LINE__))
@@ -226,8 +226,7 @@ namespace unittest
 	TEST_RETURN_(::unittest::checkString((x), (y), __LINE__))
 
 #ifdef __DOXYGEN__
-/// Verify two arrays as equal
-/// start is optional (default = 0).
+/// Verify two arrays as equal start is optional (default = 0).
 #define	TEST_ASSERT_EQUALS_ARRAY(x, y, count, start=0)
 #else
 #define	TEST_ASSERT_EQUALS_ARRAY(x, y, ...) \

@@ -19,6 +19,7 @@ namespace modm
 namespace platform
 {
 
+/// @cond
 // For backwards compability.
 using Peripheral = PeripheralPin;
 
@@ -32,6 +33,7 @@ struct GpioConnector
 	inline static void connect() {}
 	inline static void disconnect() {}
 };
+/// @endcond
 
 }  // namespace platform
 

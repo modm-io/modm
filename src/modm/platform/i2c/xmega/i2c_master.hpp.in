@@ -47,7 +47,7 @@ public:
 	 *		`Standard` or `Fast`, `High` datarate is not supported by the Xmega
 	 */
 	template<class SystemClock, baudrate_t baudrate=kHz(100), percent_t tolerance=pct(5) >
-	static modm_always_inline void
+	static void
 	initialize()
 	{
 		static_assert(baudrate <= 400'000, "The Xmega does not support I2C baudrates above 400kHz.");

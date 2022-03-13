@@ -24,10 +24,11 @@
 
 using namespace modm::platform;
 
-/// @ingroup modm_board_disco_f746ng
 namespace Board
 {
-	using namespace modm::literals;
+/// @ingroup modm_board_disco_f746ng
+/// @{
+using namespace modm::literals;
 
 /// STM32F7 running at 216MHz from the external 25MHz clock
 struct SystemClock
@@ -106,7 +107,6 @@ struct SystemClock
 	}
 };
 
-
 using Button = GpioInputI11;	// User Button
 using LedD13 = GpioOutputI1;	// User LED 1 (Arduino D13)
 
@@ -136,19 +136,25 @@ using D12 = GpioB14;
 using D13 = GpioI1;
 using D14 = GpioB9;
 using D15 = GpioB8;
+/// @}
 
 namespace usb_fs
 {
+/// @ingroup modm_board_disco_f746ng
+/// @{
 using Vbus = GpioA9;
 using Id = GpioA10;
 using Dm = GpioA11;
 using Dp = GpioA12;
 
 using Device = UsbFs;
+/// @}
 }
 
 namespace usb_hs
 {
+/// @ingroup modm_board_disco_f746ng
+/// @{
 using Ck = GpioA5;
 
 using D0 = GpioA3;
@@ -167,17 +173,22 @@ using Nxt = GpioH4;
 using Overcurrent = GpioE3;
 
 using Device = UsbHs;
+/// @}
 }
 
 namespace stlink
 {
+/// @ingroup modm_board_disco_f746ng
+/// @{
 using Tx = GpioOutputA9;
 using Rx = GpioInputB7;
 using Uart = Usart1;
+/// @}
 }
 
+/// @ingroup modm_board_disco_f746ng
+/// @{
 using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
-
 
 inline void
 initialize()
@@ -235,6 +246,7 @@ initializeUsbHs()
 	USB_OTG_HS->GUSBCFG &= ~USB_OTG_GUSBCFG_FHMOD;
 	USB_OTG_HS->GUSBCFG |= USB_OTG_GUSBCFG_FDMOD;
 }
+/// @}
 
 }
 

@@ -32,32 +32,32 @@ public:
 	{
 	}
 
-	modm_always_inline void
+	void
 	writeIndex(uint16_t index)
 	{
 		*ptrIndex = index;
 	}
 
-	modm_always_inline void
+	void
 	writeData(uint16_t data)
 	{
 		*ptrData = data;
 	}
 
-	modm_always_inline uint16_t
+	uint16_t
 	readData()
 	{
 		return *ptrData;
 	}
 
-	modm_always_inline void
+	void
 	writeRegister(uint16_t reg, uint16_t value)
 	{
 		writeIndex(reg);
 		writeData(value);
 	}
 
-	modm_always_inline uint16_t
+	uint16_t
 	readRegister(uint16_t reg)
 	{
 		writeIndex(reg);
@@ -80,34 +80,34 @@ public:
 	{
 	}
 
-	modm_always_inline void
+	void
 	writeIndex(uint8_t index)
 	{
 		*ptrIndex = 0;
 		*ptrIndex = index;
 	}
 
-	modm_always_inline void
+	void
 	writeData(uint16_t data)
 	{
 		*ptrData = data >> 8;
 		*ptrData = data & 0xff;
 	}
 
-//	modm_always_inline uint16_t
+//	uint16_t
 //	readData()
 //	{
 //		return *ptrData;
 //	}
 
-	modm_always_inline void
+	void
 	writeRegister(uint8_t reg, uint16_t value)
 	{
 		writeIndex(reg);
 		writeData(value);
 	}
 
-//	modm_always_inline uint16_t
+//	uint16_t
 //	readRegister(uint16_t reg)
 //	{
 //		writeIndex(reg);
@@ -134,7 +134,7 @@ template <
 class MemoryBus
 {
 public:
-	static modm_always_inline void
+	static void
 	initialize()
 	{
 		CS::set();
@@ -143,7 +143,7 @@ public:
 		PORT::setInput();
 	}
 
-	static modm_always_inline void
+	static void
 	write(const uint8_t data)
 	{
 		CS::reset();
@@ -165,7 +165,7 @@ public:
 		CS::set();
 	}
 
-	static modm_always_inline uint8_t
+	static uint8_t
 	read()
 	{
 		uint8_t ret;
@@ -199,13 +199,13 @@ class TftMemoryBus8BitGpio
 public:
 	typedef MemoryBus<PORT, CS, RD, WR> BUS;
 
-	static modm_always_inline void
+	static void
 	initialize()
 	{
 		BUS::initialize();
 	}
 
-	static modm_always_inline void
+	static void
 	writeIndex(uint8_t index)
 	{
 		// *ptrIndex = 0;
@@ -216,7 +216,7 @@ public:
 		BUS::write(index);
 	}
 
-	static modm_always_inline void
+	static void
 	writeData(uint16_t data)
 	{
 		// *ptrData = data >> 8;
@@ -227,20 +227,20 @@ public:
 		BUS::write(data & 0xff);
 	}
 
-//	static modm_always_inline uint16_t
+//	static uint16_t
 //	readData()
 //	{
 //		return *ptrData;
 //	}
 
-	static modm_always_inline void
+	static void
 	writeRegister(uint8_t reg, uint16_t value)
 	{
 		writeIndex(reg);
 		writeData(value);
 	}
 
-//	static modm_always_inline uint16_t
+//	static uint16_t
 //	readRegister(uint16_t reg)
 //	{
 //		writeIndex(reg);
