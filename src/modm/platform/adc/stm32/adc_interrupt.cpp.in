@@ -15,7 +15,7 @@
 #include <modm/architecture/interface/interrupt.hpp>
 // ----------------------------------------------------------------------------
 modm::platform::AdcInterrupt{{ id }}::Handler
-modm::platform::AdcInterrupt{{ id }}::handler(modm::dummy);
+modm::platform::AdcInterrupt{{ id }}::handler([](){});
 
 %% if id not in shared_irq_ids
 MODM_ISR(ADC{{ irq }})

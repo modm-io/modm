@@ -25,9 +25,10 @@ class Ad7280aTest;
 
 namespace modm
 {
-	/// @ingroup modm_driver_ad7280a
 	namespace ad7280a
 	{
+		/// @ingroup modm_driver_ad7280a
+		/// @{
 		enum Cell
 		{
 			BALANCER_OFF = 0,
@@ -133,6 +134,7 @@ namespace modm
 			AVERAGE_BY_4 = (2 << 1),	///< Average over 4 samples
 			AVERAGE_BY_8 = (3 << 1),	///< Average over 8 samples
 		};
+		/// @}
 	}
 
 	/**
@@ -230,13 +232,34 @@ namespace modm
 		static uint8_t controlHighByte;
 	};
 
-	// ------------------------------------------------------------------------
-	// Output operators
-	IOStream&
-	operator << (IOStream& os, const ad7280a::RegisterValue& c);
+#if __has_include(<modm/io/iostream.hpp>)
+#include <modm/io/iostream.hpp>
 
-	IOStream&
-	operator << (IOStream& os, const ad7280a::ConversionValue& c);
+/// @ingroup modm_driver_ad7280a
+inline IOStream&
+operator << (IOStream& os, const ad7280a::RegisterValue& c)
+{
+	os	<< " (dev=" << c.device
+		<< ", reg=" << c.registerAddress
+		<< ", val=" << c.value
+		<< ", ack=" << c.acknowledge << ")";
+
+	return os;
+}
+
+/// @ingroup modm_driver_ad7280a
+inline IOStream&
+operator << (IOStream& os, const ad7280a::ConversionValue& c)
+{
+	os	<< " (dev=" << c.device
+		<< ", ch =" << c.channel
+		<< ", val=" << c.value
+		<< ", ack=" << c.acknowledge << ")";
+
+	return os;
+}
+
+#endif
 
 } // modm namespace
 

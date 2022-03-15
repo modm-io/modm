@@ -25,6 +25,7 @@ namespace platform
 
 MODM_ISR_DECL(EIC);
 
+/// @ingroup		modm_platform_extint
 enum class InputTrigger
 {
 	RisingEdge = EIC_CONFIG_SENSE0_RISE_Val,

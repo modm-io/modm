@@ -11,8 +11,8 @@
 
 
 def init(module):
-    module.parent = ":test:platform"
-    module.name = "spi.bitbang"
+    module.name = ":test:platform:bitbang"
+    module.description = "Tests for BitBang"
 
 
 def prepare(module, options):

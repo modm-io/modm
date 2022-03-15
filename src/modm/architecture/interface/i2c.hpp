@@ -137,6 +137,9 @@ struct I2c
 namespace modm
 {
 
+/// @ingroup modm_architecture_i2c
+/// @{
+
 inline modm::IOStream&
 operator << (modm::IOStream& s, const modm::I2c::DetachCause detach_cause)
 {
@@ -182,6 +185,8 @@ operator << (modm::IOStream& s, const modm::I2c::OperationAfterWrite op)
 	s << static_cast<modm::I2c::Operation>(op);
 	return s;
 }
+
+/// @}
 
 }	// namespace modm
 #endif

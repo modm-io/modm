@@ -18,11 +18,12 @@
 using namespace modm::platform;
 
 /// @ingroup modm_board_nucleo_h743zi
-/// @{
 #define MODM_BOARD_HAS_LOGGER
 
 namespace Board
 {
+/// @ingroup modm_board_nucleo_h743zi
+/// @{
 using namespace modm::literals;
 
 /// STM32H743 running at 400MHz from the external 8MHz HSE

@@ -18,7 +18,7 @@
 namespace modm
 {
 
-/// @ingroup modm_utils
+/// @ingroup modm_math_utils
 /// @{
 
 constexpr uint8_t  Bit0  = uint8_t(1) << 0;

@@ -258,7 +258,7 @@ namespace modm
 			static bool
 			transfer(TransferOptions options=TRANSFER_SEND_BUFFER_SAVE_RECEIVE);
 
-			static modm_always_inline bool
+			static bool
 			transferSync(TransferOptions options=TRANSFER_SEND_BUFFER_SAVE_RECEIVE);
 
 			static bool

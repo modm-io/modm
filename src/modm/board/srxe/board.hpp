@@ -17,39 +17,49 @@
 
 using namespace modm::platform;
 
+namespace Board
+{
 /// @ingroup modm_board_srxe
-namespace Board {
-
+/// @{
 using namespace modm::literals;
 
 using SystemClock = modm::platform::SystemClock;
 
 using LedDebug = GpioB0;
 using Leds = SoftwareGpioPort<LedDebug>;
+/// @}
 
-namespace spi {
-
+namespace spi
+{
+/// @ingroup modm_board_srxe
+/// @{
 using Sck = GpioB1;
 using Mosi = GpioB2;
 using Miso = GpioB3;
 using SpiMaster = modm::platform::SpiMaster;
+/// @}
+}
 
-}  // namespace spi
-
-namespace DisplayGpio {
-
+namespace DisplayGpio
+{
+/// @ingroup modm_board_srxe
+/// @{
 using DC = GpioD6;
 using CS = GpioE7;
 using RST = GpioG2;
+/// @}
+}
 
-}  // namespace DisplayGpio
-
-using Display = modm::St7586s<spi::SpiMaster, DisplayGpio::CS, DisplayGpio::RST, DisplayGpio::DC,
+/// @ingroup modm_board_srxe
+/// @{
+using Display = modm::St7586s<
+	spi::SpiMaster, DisplayGpio::CS, DisplayGpio::RST, DisplayGpio::DC,
 	384, 136>;
 extern Display display;
 
 inline void
-initialize() {
+initialize()
+{
 	SystemClock::enable();
 
 	LedDebug::setOutput();
@@ -66,5 +76,6 @@ initialize() {
 
 	display.initialize();
 }
+/// @}
 
 }  // namespace Board

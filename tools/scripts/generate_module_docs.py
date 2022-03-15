@@ -25,12 +25,12 @@ sys.path.append(str(repopath("ext/modm-devices/tools/generator")))
 sys.path.append(str(repopath("ext/modm-devices")))
 from dfg.device_tree import DeviceTree
 from modm_devices.device_identifier import *
-sys.path.append(str(repopath("../lbuild")))
+
+# sys.path.insert(0, str(repopath("../lbuild")))
 import lbuild
 
 
 def get_modules(builder, limit=None):
-    builder._load_repositories(repopath("repo.lb"))
     target_option = builder.parser.find_option(":target")
 
     # Reduce device set a little to keep RAM usage in check
@@ -287,12 +287,95 @@ def format_module(modules, node):
     for child in [c for c in node.children if "filename" in c]:
         format_module(modules, child)
 
+def format_config(configs, node):
+    title, descr = split_description(str(node._description))
+    name = node.fullname
+    if node._default:
+        name += ":" + node._default
+    def _fmt(path):
+        text = Path(path).read_text().strip()
+        # Remove repositories tag, as it's a detail that's always the same
+        text = re.sub(r" +<repositories>.*?</repositories>.*?\n  <o", "  <o", text, flags=re.S|re.M)
+        text = text.replace("\n\n", "\n")
+        return text
+    mprops = {
+        "name": name,
+        "title": title,
+        "description": descr,
+        "url": url_name(node.fullname),
+        "configs": {v:_fmt(p) for v, p in node._enumeration.items()},
+        "default": node._default,
+        "revisions": node.format_values(),
+    }
+    configs[node.fullname] = mprops
 
 
 if __name__ == "__main__":
+    config_path = Path(repopath("docs/mkdocs.yml"))
+
+    env = Environment()
+    env.line_statement_prefix = '%%'
+    env.line_comment_prefix = '%#'
+
     # lbuild.logger.configure_logger(2)
     lbuild.format.PLAIN = True
     builder = lbuild.api.Builder()
+    builder._load_repositories(repopath("repo.lb"))
+
+    print("Formatting targets")
+    targets = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
+    otarget = builder.parser.find_option(":target")
+    for target in otarget.values:
+        if target.startswith("stm32"):
+            targets["STMicroelectronics STM32"][target[:7].upper()][target[:9].upper()].append(target)
+        elif target.startswith("sam"):
+            targets["Microchip SAM"][target[:4].upper()][target[:6].upper()].append(target)
+        elif target.startswith("at90"):
+            targets["Microchip AVR"][target[:4].upper()][target[:7].upper()].append(target)
+        elif target.startswith("at"):
+            family = target[:2].upper()+target[2:6]
+            name = "".join(c for c in target[6:10] if c.isnumeric())
+            targets["Microchip AVR"][family][family+name].append(target)
+        elif target.startswith("hosted"):
+            targets["Hosted OS"][""][""].append(target)
+        elif target.startswith("rp"):
+            targets["Raspberry Pi"][""][""].append(target)
+    targets = {
+        "targets": targets,
+        "total": len(otarget.values),
+        "description": split_description(str(otarget._description))[1]
+    }
+
+    print("Writing targets")
+    rendered = env.from_string(repopath("docs/targets.md.in").read_text()).render(targets)
+    (repopath("docs/src/reference") / "targets.md").write_text(rendered)
+
+    print("Formatting configs")
+    configs = {}
+    for config in builder.parser.configurations:
+        format_config(configs, config)
+
+    print("Writing {} configs".format(len(configs)))
+    config_dir = repopath("docs/src/reference/config/")
+    shutil.rmtree(config_dir, ignore_errors=True)
+    config_dir.mkdir()
+
+    conftable = []
+    for name, config in configs.items():
+        url = url_name(name)
+        rendered = env.from_string(repopath("docs/config.md.in").read_text()).render({"config": config})
+        (config_dir / "{}.md".format(url)).write_text(rendered)
+        conftable.append("      - \"{}\": \"reference/config/{}.md\"".format(name.replace("modm:", ":"), url))
+
+    print("Writing config table")
+    conftable = "\n".join(["    - Configurations:"] + sorted(conftable))
+    config = config_path.read_text()
+    if extract(config, "configtable") != conftable:
+        config = replace(config, "configtable", conftable)
+        config_path.write_text(config)
+
+    if "--no-modules" in sys.argv:
+        exit(0)
 
     module_tree, mlens = get_modules(builder)
     all_targets = module_tree.ids
@@ -307,11 +390,9 @@ if __name__ == "__main__":
         format_module(modules, c)
 
     print("\nWriting modules", end ="")
-    env = Environment()
-    env.line_statement_prefix = '%%'
-    module_path = repopath("docs/src/reference/module/")
-    shutil.rmtree(module_path, ignore_errors=True)
-    module_path.mkdir()
+    module_dir = repopath("docs/src/reference/module/")
+    shutil.rmtree(module_dir, ignore_errors=True)
+    module_dir.mkdir()
 
     modtable = []
     for name, tmodules in modules.items():
@@ -322,12 +403,11 @@ if __name__ == "__main__":
                 nname += " ({})".format(m["targets"]);
                 url += url_name("-" + m["targets"])
             rendered = env.from_string(repopath("docs/module.md.in").read_text()).render({"module": m})
-            (module_path / "{}.md".format(url)).write_text(rendered)
+            (module_dir / "{}.md".format(url)).write_text(rendered)
             modtable.append("      - \"{}\": \"reference/module/{}.md\"".format(nname.replace("modm:", ":"), url))
             print(".", end ="", flush=True)
 
     print("\nWriting module table")
-    config_path = Path(repopath("docs/mkdocs.yml"))
     modtable = "\n".join(["    - Modules:"] + sorted(modtable))
     config = config_path.read_text()
     if extract(config, "moduletable") != modtable:

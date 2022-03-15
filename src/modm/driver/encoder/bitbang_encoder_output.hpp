@@ -19,7 +19,7 @@ namespace modm
 {
 
 /**
- * @ingroup 				modm_driver_bitbang_encoder_output
+ * @ingroup 				modm_driver_encoder_output_bitbang
  * @author  				Raphael Lehmann
  *
  * @brief					This driver generates a AB (incremental) encoder signal to

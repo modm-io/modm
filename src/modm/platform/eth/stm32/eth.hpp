@@ -25,34 +25,40 @@ namespace modm
 namespace platform
 {
 
+/// @ingroup modm_platform_eth
 struct eth
 {
 	enum class
-	MediaInterface : uint32_t {
+	MediaInterface : uint32_t
+	{
 		MII  = 0x00,
 		RMII = SYSCFG_PMC_MII_RMII_SEL
 	};
 
 	enum class
-	DuplexMode {
+	DuplexMode
+	{
 		Half = 0,
 		Full = 1,
 	};
 
 	enum class
-	Speed {
+	Speed
+	{
 		Speed10M  = 0,
 		Speed100M = 1,
 	};
 
 	enum class
-	LinkStatus {
+	LinkStatus
+	{
 		Down = 0,
 		Up,
 	};
 
 	enum class
-	MacAddressIndex : uint32_t {
+	MacAddressIndex : uint32_t
+	{
 		Index0 = 0x00000000,
 		Index1 = 0x00000008,
 		Index2 = 0x00000010,
@@ -60,7 +66,8 @@ struct eth
 	};
 
 	enum class
-	Interrupt : uint32_t {
+	Interrupt : uint32_t
+	{
 		NormalIrqSummary   		  = modm::Bit16,
 		AbnormalIrqSummary        = modm::Bit15,
 		EarlyReceive      		  = modm::Bit14,
@@ -80,7 +87,8 @@ struct eth
 	MODM_FLAGS32(Interrupt);
 
 	enum class
-	InterruptFlags : uint32_t {
+	InterruptFlags : uint32_t
+	{
 		TimeStampTrigger  		  = modm::Bit29,
 		Pmt               		  = modm::Bit28,
 		Mmc               		  = modm::Bit27,
@@ -112,7 +120,8 @@ struct eth
 	MODM_FLAGS32(InterruptFlags);
 
 	enum class
-	Event : uint32_t {
+	Event : uint32_t
+	{
 		None     = 0x00,
 		Receive  = 0x01,
 		Transmit = 0x02,
@@ -124,11 +133,13 @@ protected:
 	static constexpr uint32_t i(MediaInterface interface) { return uint32_t(interface); }
 };
 
+/// @ingroup modm_platform_eth
 template <class PHY>
 class Eth : public eth
 {
 	enum class
-	MacConfiguration : uint32_t {
+	MacConfiguration : uint32_t
+	{
 		WatchDogDisable     = modm::Bit23,
 		JabberDisable       = modm::Bit22,
 		InterframeGap2      = modm::Bit19,
@@ -153,21 +164,24 @@ class Eth : public eth
 	static constexpr uint32_t MacCrClearMask { 0xFF20810F };
 
 	enum class
-	Watchdog : uint32_t {
+	Watchdog : uint32_t
+	{
 		Enable  = 0b0,
 		Disable = 0b1,
 	};
 	using Watchdog_t = modm::Configuration<MacConfiguration_t, Watchdog, 0b1, 23>;
 
 	enum class
-	Jabber : uint32_t {
+	Jabber : uint32_t
+	{
 		Enable  = 0b0,
 		Disable = 0b1,
 	};
 	using Jabber_t = modm::Configuration<MacConfiguration_t, Jabber, 0b1, 22>;
 
 	enum class
-	InterframeGap : uint32_t {
+	InterframeGap : uint32_t
+	{
 		Gap96BitTimes = 0b000,
 		Gap88BitTimes = 0b001,
 		Gap80BitTimes = 0b010,
@@ -180,7 +194,8 @@ class Eth : public eth
 	using InterframeGap_t = modm::Configuration<MacConfiguration_t, InterframeGap, 0b111, 17>;
 
 	enum class
-	CarrierSense : uint32_t {
+	CarrierSense : uint32_t
+	{
 		Enable  = 0b0,
 		Disable = 0b1,
 	};
@@ -190,7 +205,8 @@ class Eth : public eth
 	using DuplexMode_t = modm::Configuration<MacConfiguration_t, DuplexMode, 0b1, 11>;
 
 	enum class
-	MacFrameFilter : uint32_t {
+	MacFrameFilter : uint32_t
+	{
 		ReceiveAll                = modm::Bit31,
 		HashOrPerfect             = modm::Bit10,
 		SourceAddress             = modm::Bit9,
@@ -207,7 +223,8 @@ class Eth : public eth
 	MODM_FLAGS32(MacFrameFilter);
 
 	enum class
-	PassControlFrame : uint32_t {
+	PassControlFrame : uint32_t
+	{
 		BlockAll = 0b00,
 		AllExceptPause = 0b01,
 		AllAddressFilterFail = 0b10,
@@ -216,7 +233,8 @@ class Eth : public eth
 	using PassControlFrame_t = modm::Configuration<MacFrameFilter_t, PassControlFrame, 0b11, 6>;
 
 	enum class
-	MacFlowControl : uint32_t {
+	MacFlowControl : uint32_t
+	{
 		PauseTime15 = modm::Bit31,
 		PauseTime14 = modm::Bit30,
 		PauseTime13 = modm::Bit29,
@@ -246,7 +264,8 @@ class Eth : public eth
 	static constexpr uint32_t MacFcrClearMask { 0x0000FF41 };
 
 	enum class
-	PauseLowThreshold : uint32_t {
+	PauseLowThreshold : uint32_t
+	{
 		Minus4SlotTimes   = 0b00,
 		Minus28SlotTimes  = 0b01,
 		Minus144SlotTimes = 0b10,
@@ -255,7 +274,8 @@ class Eth : public eth
 	using PauseLowThreshold_t = modm::Configuration<MacFlowControl_t, PauseLowThreshold, 0b11, 4>;
 
 	enum class
-	DmaOperationMode : uint32_t {
+	DmaOperationMode : uint32_t
+	{
 		DropCrcErrorFrameDisable    = modm::Bit26,
 		ReceiveStoreAndForward      = modm::Bit25,
 		DisableFlushReceivedFrames  = modm::Bit24,
@@ -277,7 +297,8 @@ class Eth : public eth
 	static constexpr uint32_t DmaOmrClearMask { 0xF8DE3F23 };
 
 	enum class
-	TransmitThreshold : uint32_t {
+	TransmitThreshold : uint32_t
+	{
 		Bytes64  = 0b000,
 		Bytes128 = 0b001,
 		Bytes192 = 0b010,
@@ -290,7 +311,8 @@ class Eth : public eth
 	using TransmitThreshold_t = modm::Configuration<DmaOperationMode_t, TransmitThreshold, 0b111, 14>;
 
 	enum class
-	ReceiveThreshold : uint32_t {
+	ReceiveThreshold : uint32_t
+	{
 		Bytes64  = 0b00,
 		Bytes32  = 0b01,
 		Bytes96  = 0b10,
@@ -299,7 +321,8 @@ class Eth : public eth
 	using ReceiveThreshold_t = modm::Configuration<DmaOperationMode_t, ReceiveThreshold, 0b11, 3>;
 
 	enum class
-	DmaBusMode : uint32_t {
+	DmaBusMode : uint32_t
+	{
 		MixedBurst            = modm::Bit26,
 		AddressAlignedBeats   = modm::Bit25,
 		PblModeX4             = modm::Bit24,
@@ -331,7 +354,8 @@ class Eth : public eth
 	MODM_FLAGS32(DmaBusMode);
 
 	enum class
-	BurstLength : uint32_t {
+	BurstLength : uint32_t
+	{
 		Length1Beat   = 0b000001,
 		Length2Beats  = 0b000010,
 		Length4Beats  = 0b000100,

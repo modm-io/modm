@@ -20,6 +20,8 @@ extern "C" uint32_t SystemCoreClock;
 
 namespace modm::platform
 {
+/// @ingroup		modm_platform_clockgen
+/// @{
 
 enum class
 MainClockSource
@@ -220,6 +222,7 @@ UtmiRefClk : uint32_t
 %% endif
 
 static constexpr uint32_t SlowClkFreqHz = 32'768;
+/// @}
 
 /**
  * Clock Generator Controller for SAMG5x devices

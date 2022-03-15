@@ -16,6 +16,8 @@
 
 namespace modm::platform
 {
+/// @ingroup modm_platform_gpio
+/// @{
 
 typedef uint32_t Instance;
 
@@ -47,6 +49,15 @@ struct Peripherals
 %% endfor
 };
 
+enum class PortName
+{
+%% for port in ports
+	{{ port }},
+%% endfor
+};
+/// @}
+
+/// @cond
 %% for name, peripheral in peripherals.items()
 %% if "instances" in peripheral
 %% for instance in peripheral["instances"]
@@ -72,19 +83,12 @@ struct Peripherals::{{ name }}::{{ signal }}<{{ index }}> {};
 %% endif
 %% endfor
 
-
-enum class PortName
-{
-%% for port in ports
-	{{ port }},
-%% endfor
-};
-
 template<class _>
 class Gpio;
 
+namespace gpio
+{
 %% for gpio in gpios
-namespace gpio {
 struct {{ gpio["port"] ~ gpio["pin"] }}
 {
 	static constexpr PortName port = PortName::{{ gpio["port"] }};
@@ -120,9 +124,15 @@ struct {{ gpio["port"] ~ gpio["pin"] }}
 %% endfor
 %% endif
 };
-}  // namespace gpio
-using Gpio{{ gpio["port"] ~ gpio["pin"] }} = Gpio<gpio::{{ gpio["port"] ~ gpio["pin"] }}>;
-
 %% endfor
+}  // namespace gpio
+/// @endcond
+
+/// @ingroup modm_platform_gpio
+/// @{
+%% for gpio in gpios
+using Gpio{{ gpio["port"] ~ gpio["pin"] }} = Gpio<gpio::{{ gpio["port"] ~ gpio["pin"] }}>;
+%% endfor
+/// @}
 
 } // namespace modm::platform

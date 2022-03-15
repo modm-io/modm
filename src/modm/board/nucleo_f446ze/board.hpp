@@ -22,10 +22,11 @@
 
 using namespace modm::platform;
 
-/// @ingroup modm_board_nucleo_f446ze
 namespace Board
 {
-	using namespace modm::literals;
+/// @ingroup modm_board_nucleo_f446ze
+/// @{
+using namespace modm::literals;
 
 /// STM32F446 running at 180 MHz from external 8 MHz STLink clock
 struct SystemClock
@@ -111,9 +112,12 @@ using LedGreen = GpioOutputB0;	// LED1 [Green]
 using LedBlue = GpioOutputB7;	// LED2 [Blue]
 using LedRed = GpioOutputB14;	// LED3 [Red]
 using Leds = SoftwareGpioPort< LedRed, LedBlue, LedGreen >;
+/// @}
 
 namespace usb
 {
+/// @ingroup modm_board_nucleo_f446ze
+/// @{
 using Vbus = GpioA9;
 using Id = GpioA10;
 using Dm = GpioA11;
@@ -123,17 +127,22 @@ using Overcurrent = GpioInputG7;	// OTG_FS_OverCurrent
 using Power = GpioOutputG6;			// OTG_FS_PowerSwitchOn
 
 using Device = UsbFs;
+/// @}
 }
 
 namespace stlink
 {
+/// @ingroup modm_board_nucleo_f446ze
+/// @{
 using Tx = GpioOutputD8;
 using Rx = GpioInputD9;
 using Uart = Usart3;
+/// @}
 }
 
+/// @ingroup modm_board_nucleo_f446ze
+/// @{
 using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
-
 
 inline void
 initialize()
@@ -165,6 +174,7 @@ initializeUsbFs(uint8_t priority=3)
 	// Enable VBUS sense (B device) via pin PA9
 	USB_OTG_FS->GCCFG |= USB_OTG_GCCFG_VBDEN;
 }
+/// @}
 
 }
 

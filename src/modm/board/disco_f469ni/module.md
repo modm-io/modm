@@ -18,8 +18,8 @@ You can enable and use the on-board display in two ways:
 2. Call `Board::initializeDisplay()` and then provide your own display buffer
    with `Board::setDisplayBuffer(void*)`.
 
-!!! warning "Caveats"
-    No double-buffering is implemented, so you may notice some tearing if you
+!!! warning "No Double-Buffering!"
+    Double-buffering is not implemented, so you may notice some tearing if you
     update the display fast enough.
 
 Access to the capacitive touchscreen is provided in the `Board::ft6` namespace.

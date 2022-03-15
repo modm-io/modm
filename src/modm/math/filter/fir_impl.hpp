@@ -77,7 +77,7 @@ modm::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::append(const T& input)
 		else printf("(%.3f)    ", taps[i]);
 	printf("\n");
 #endif // FIR_DEBUG_APPEND
-	if(modm_likely(taps_index > 0)){
+	if(taps_index > 0) [[likely]] {
 		taps_index--;
 	}
 	else{

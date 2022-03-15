@@ -12,6 +12,7 @@
 
 def init(module):
     module.name = ":test:platform:fdcan"
+    module.description = "Tests for FDCAN"
 
 def prepare(module, options):
     target = options[":target"]

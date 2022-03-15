@@ -37,7 +37,7 @@ MACRO_EXPANSION        = YES
 EXPAND_ONLY_PREDEF     = YES
 PREDEFINED             = __DOXYGEN__ \
                          __cplusplus \
-                         "EXTERN_FLASH_STORAGE(x):=const x" \
+                         "EXTERN_FLASH_STORAGE(x):=extern const x" \
                          modm_always_inline=inline \
                          "MODM_FLAGS8(x):=using x ## _t = modm::Flags8< x >" \
                          "MODM_FLAGS16(x):=using x ## _t = modm::Flags16< x >" \

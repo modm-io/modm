@@ -18,6 +18,7 @@
 namespace modm::platform
 {
 
+/// @ingroup modm_platform_adc
 class Adc : modm::Adc
 {
 	static const modm::frequency_t MaxAdcFrequency = modm::MHz(10);

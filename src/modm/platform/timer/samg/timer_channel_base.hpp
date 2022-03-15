@@ -15,6 +15,7 @@
 namespace modm::platform
 {
 
+/// @ingroup modm_platform_timer
 class TimerChannelBase
 {
 public:

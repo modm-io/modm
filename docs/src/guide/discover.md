@@ -25,9 +25,9 @@ Parser(lbuild)
 ```
 
 This gives you an overview of the repositories and their options and
-configurations. Here you can see the `modm:target` option is marked as
-*REQUIRED*, since the HAL modules obviously depend on the target device, so we
-need to discover the option in detail:
+configurations. Here you can see [the `modm:target` option](../../reference/targets)
+is marked as *REQUIRED*, since the HAL modules obviously depend on the target
+device, so we need to discover the option in detail:
 
 ```
  $ lbuild -r repo.lb discover modm:target

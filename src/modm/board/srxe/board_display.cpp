@@ -11,7 +11,8 @@
 
 #include "board.hpp"
 
-namespace Board {
+namespace Board
+{
 
 Display display;
 

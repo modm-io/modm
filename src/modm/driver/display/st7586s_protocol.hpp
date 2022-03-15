@@ -13,6 +13,7 @@
 
 #include <modm/math/utils/endianness.hpp>
 
+/// @cond
 namespace modm::detail::st7586s
 {
 
@@ -182,3 +183,4 @@ enum class AnalogControl : uint8_t {
 }  // namespace payload
 
 }  // namespace modm::detail::st7586s
+/// @endcond

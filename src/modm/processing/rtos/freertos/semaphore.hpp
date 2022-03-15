@@ -20,10 +20,7 @@ namespace modm
 {
 	namespace rtos
 	{
-		/**
-		 * \brief	Base class for binary and counting semaphores
-		 * \internal
-		 */
+		/// @cond
 		class SemaphoreBase
 		{
 		public:
@@ -71,6 +68,7 @@ namespace modm
 			SemaphoreBase &
 			operator = (const SemaphoreBase&);
 		};
+		/// @endcond
 
 		// --------------------------------------------------------------------
 		/**
@@ -88,7 +86,7 @@ namespace modm
 		 *    processed. In this case it is desirable for the initial count
 		 *    value to be zero.
 		 *
-		 * -# Resource management.
+		 * -# Resource management.\n
 		 *    In this usage scenario the count value indicates the number of
 		 *    resources available. To obtain control of a resource a thread must
 		 *    first obtain a semaphore - decrementing the semaphore count

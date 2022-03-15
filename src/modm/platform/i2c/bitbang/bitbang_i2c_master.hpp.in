@@ -64,7 +64,7 @@ public:
 	static bool
 	start(I2cTransaction *transaction, ConfigurationHandler handler = nullptr);
 
-	static Error modm_always_inline
+	static Error
 	getErrorState()
 	{ return errorState; }
 
@@ -119,13 +119,13 @@ private:
 
 	// timings
 	/// busy waits a **half** clock cycle
-	static modm_always_inline void
+	static void
 	delay2()
 	{ modm::delay_ns(delayTime*2); }
 
 	// timings
 	/// busy waits **quarter** clock cycle
-	static modm_always_inline void
+	static void
 	delay4()
 	{ modm::delay_ns(delayTime); }
 

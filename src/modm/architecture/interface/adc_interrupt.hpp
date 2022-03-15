@@ -53,7 +53,7 @@ protected:
 #ifdef __DOXYGEN__
 public:
 	static inline void
-	attachInterruptHandler(Handler handler=modm::dummy);
+	attachInterruptHandler(Handler handler);
 #endif
 };
 

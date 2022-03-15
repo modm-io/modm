@@ -15,7 +15,7 @@
 def init(module):
     module.name = ":driver:adc_sampler"
     module.description = """\
-# Oversampling of ADC inputs
+# ADC Sampler
 
 This template class stores 8, 16 or 32bit ADC values in a buffer and
 provides an easy interface for managing that data.

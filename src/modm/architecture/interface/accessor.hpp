@@ -28,7 +28,7 @@ namespace accessor
  * @ingroup modm_architecture_accessor
  */
 template<typename T>
-modm_always_inline volatile T&
+volatile T&
 asVolatile(T& value)
 {
 	return (volatile T&) value;

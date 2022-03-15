@@ -66,7 +66,6 @@ struct Register
 	constexpr Register()
 	:	value(0) {}
 
-	/// @{
 	/**
 	 * Returns `true` if `value` is non-zero
 	 *
@@ -82,7 +81,6 @@ struct Register
 	/// Returns `true` if `value` is zero
 	constexpr bool operator!() const
 	{ return not bool(value); }
-	/// @}
 
 #if MODM_HAS_IOSTREAM
 	/// Printing a register will output its numeric value.

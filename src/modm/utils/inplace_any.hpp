@@ -217,6 +217,7 @@ private:
  * \param any pointer to const inplace_any object
  * \tparam T type of the object to access
  * \returns pointer to contained object or nullptr if empty or on type mismatch
+ * @ingroup modm_utils
  */
 template<typename T, std::size_t Size>
 auto any_cast(const inplace_any<Size>* any) noexcept
@@ -228,6 +229,7 @@ auto any_cast(const inplace_any<Size>* any) noexcept
  * \param any pointer to inplace_any object
  * \tparam T type of the object to access
  * \returns pointer to contained object or nullptr if empty or on type mismatch
+ * @ingroup modm_utils
  */
 template<typename T, std::size_t Size>
 auto any_cast(inplace_any<Size>* any) noexcept
@@ -241,6 +243,7 @@ auto any_cast(inplace_any<Size>* any) noexcept
  * \param any reference to const inplace_any object
  * \tparam T type of the object to access
  * \returns reference to contained object
+ * @ingroup modm_utils
  */
 template<typename T, std::size_t Size>
 auto any_cast(const inplace_any<Size>& any) noexcept
@@ -260,10 +263,11 @@ auto any_cast(inplace_any<Size>& any) noexcept
     -> std::remove_cvref_t<T>&;
 
 /// Swap contained values of two inplace_any objects
+/// @ingroup modm_utils
 template <std::size_t Size>
 void swap(inplace_any<Size>& first, inplace_any<Size>& second) noexcept;
 
-
+/// @cond
 template<typename T, std::size_t Size>
 auto any_cast(const inplace_any<Size>* any) noexcept
     -> std::add_pointer_t<std::add_const_t<std::remove_cvref_t<T>>>
@@ -545,6 +549,7 @@ void inplace_any_handler<T>::copy(const std::byte* data, std::byte* other_data,
     }
     construct(other_data, other_handler_ptr, *reinterpret_cast<const T*>(data));
 }
+/// @endcond
 
 } // namespace inplace_any_impl
 } // namespace modm

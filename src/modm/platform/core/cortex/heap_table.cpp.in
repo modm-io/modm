@@ -19,7 +19,7 @@ struct table_pool_t
 	uint32_t traits;
 	uint8_t *const start;
 	uint8_t *const end;
-} __attribute__((packed));
+} modm_packed;
 
 extern "C" const table_pool_t __table_heap_start[];
 extern "C" const table_pool_t __table_heap_end[];

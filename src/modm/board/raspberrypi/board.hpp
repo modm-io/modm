@@ -21,12 +21,10 @@ using namespace modm::platform;
 namespace Board
 {
 
-struct SystemClock {};
-
 inline void
 initialize()
 {
-  wiringPiSetup();
+	wiringPiSetup();
 }
 
 } // Board namespace

@@ -10,9 +10,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-def init(module):
-    module.name = ":board:devebox-stm32h750vb"
-    module.description = """\
+description = """
 # STM32F750VB mcudev DevEBox
 
 [STM32F750VB mcudev DevEBox H7xx](https://github.com/mcauser/MCUDEV_DEVEBOX_H7XX_M)
@@ -34,9 +32,7 @@ target option in your `project.xml`:
   </options>
 </library>
 ```
-""" + descr_programming
 
-descr_programming = """
 ## Programming
 
 Since the board doesn't have a programmer on-board, you need to use your
@@ -65,6 +61,10 @@ Then include this file in your build options like so:
 </library>
 ```
 """
+
+def init(module):
+    module.name = ":board:devebox-stm32h750vb"
+    module.description = description
 
 def prepare(module, options):
     if not options[":target"].partname.startswith("stm32h750vbt"):
@@ -95,4 +95,4 @@ def build(env):
 
     # Warn the user if they forgot to set a custom openocd config
     if env.has_option(":build:openocd.cfg") and not len(env.get(":build:openocd.cfg", "")):
-        env.log.warning("You need to provide the programmer via a custom OpenOCD config!\n" + descr_programming)
+        env.log.warning("You need to provide the programmer via a custom OpenOCD config!\n" + description)

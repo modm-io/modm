@@ -63,7 +63,7 @@ mode just to double-check.
 
 When an assertion fails, the runtime calls any number of user-defined handlers,
 registered using `MODM_ASSERTION_HANDLER(handler)`. The handlers must return a
-`modm::Abandonment` value, specifing whether they want to continue with the
+`modm::Abandonment` value, specifying whether they want to continue with the
 execution with `Abandonment::Ignore`, or abandon execution with
 `Abandonment::Fail` leading to a call to `modm_abandon(info)`, or delegate the
 decision with `Abandonment::DontCare`.
@@ -121,7 +121,7 @@ runtime and their results are accumulated as follows:
 !!! warning "Handlers may be called inside high-priority interrupts!"
     This is problematic when relying on interrupts still working inside handlers
     for example for logging the failure via UART. Be aware of this and make sure
-    you do not inadvertantly block inside handlers.
+    you do not inadvertently block inside handlers.
 
 
 ## Assertion Types
@@ -130,7 +130,7 @@ The call site of the assertion decides whether an assertion can be recovered
 from or not. For example, if the CAN receive buffer has overflowed, but
 execution continues, then code to discard the message must be in place.
 
-In case no handlers are registered or they all delegate the abandoment decision
+In case no handlers are registered or they all delegate the abandonment decision
 away, the call site must decide what the default behavior is. For this purpose
 the following assertions are available:
 
@@ -174,6 +174,26 @@ just as above:
 
 4. `bool modm_assert_continue_fail_debug()`
 5. `bool modm_assert_continue_ignore_debug()`
+
+Alternatively, you can guard the entire assertion statement with the
+`MODM_BUILD_DEBUG` macro if you only want to execute the check and branch in
+debug profile:
+
+```cpp
+// The check is always performed, but only raises an assertion in debug profile!
+if (not modm_assert_continue_ignore_debug(cond, ...))
+{
+    // if the check fails, this branch is executed in release profile too!
+}
+
+#ifdef MODM_DEBUG_BUILD
+// This check if only performed in debug profile
+if (not modm_assert_continue_ignore(cond, ...))
+{
+    // if the check fails, this branch is executed only in debug profile!
+}
+#endif
+```
 
 
 ### When to use what?

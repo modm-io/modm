@@ -13,7 +13,6 @@
 import os
 import sys
 import shutil
-import lbuild
 import zipfile
 import tempfile
 import argparse
@@ -39,6 +38,9 @@ def rename_board(name):
 
 sys.path.append(str(repopath("ext/modm-devices")))
 from modm_devices.device_identifier import *
+
+# sys.path.insert(0, str(repopath("../lbuild")))
+import lbuild
 
 def get_targets():
     builder = lbuild.api.Builder()
@@ -101,7 +103,7 @@ def main():
     parser.add_argument("--local-temp", "-l", action='store_true', help="Create temporary directory inside current working directory")
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--compress", "-c", action='store_true', help="Compress output into gzip archive")
-    group.add_argument("--output", "-o", type=str, help="Output directory (absolute path)")
+    group.add_argument("--output", "-o", type=str, help="Output directory")
     parser.add_argument("--overwrite", "-f", action='store_true', help="Overwrite existing data in output directory (Removes all files from output directory.)")
     parser.add_argument("--deduplicate", "-d", action='store_true', help="Deduplicate identical files with symlinks.")
     args = parser.parse_args()
@@ -111,11 +113,12 @@ def main():
         device_list = ["stm32f103c8t6", "stm32f417zgt6"] + family_list
         device_list = list(set(device_list))
         board_list = [("arduino-nano", "atmega328p-au"), ("arduino-uno", "atmega328p-au"), ("nucleo-g474re", "stm32g474ret6"),
-                      ("blue-pill", "stm32f103c8t6"), ("feather-m0", "samd21g18a-uu")]
+                      ("blue-pill", "stm32f103c8t6"), ("feather-m0", "samd21g18a-uu"), ("disco-f469ni", "stm32f469nih6")]
     elif args.test2:
         device_list = ["hosted-linux", "atmega328p-pu", "stm32f103zgt7"]
         board_list = [("nucleo-g474re", "stm32g474ret6")]
 
+    final_output_dir = Path(args.output).absolute() if args.output else "."
     template_path = os.path.realpath(os.path.dirname(sys.argv[0]))
     cwd = Path().cwd()
     if args.local_temp:
@@ -145,7 +148,6 @@ def main():
             os.system("(cd {} && tar -czvf {} .)".format(str(output_dir), str(cwd / 'modm-api-docs.tar.gz')))
             # shutil.make_archive(str(cwd / 'modm-api-docs'), 'gztar', str(output_dir))
         else:
-            final_output_dir = Path(args.output)
             if args.overwrite and final_output_dir.exists():
                 for i in final_output_dir.iterdir():
                     print('Removing {}'.format(i))

@@ -18,13 +18,16 @@
 
 using namespace modm::platform;
 
-/// @ingroup modm_board_devebox_f4xx
+
 namespace Board
 {
-	using namespace modm::literals;
+/// @ingroup modm_board_devebox_f4xx
+/// @{
+using namespace modm::literals;
 
 /// STM32F407 running at 168MHz generated from the external 8MHz crystal
-struct SystemClock {
+struct SystemClock
+{
 	static constexpr uint32_t Frequency = 168_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency / 4;
@@ -106,15 +109,21 @@ using SystemClockOut = GpioOutputC9;
 using LedGreen = GpioInverted<GpioOutputA1>;	// User LED
 
 using Leds = SoftwareGpioPort< LedGreen >;
+/// @}
 
 namespace usb
 {
+/// @ingroup modm_board_devebox_f4xx
+/// @{
 using Dm = GpioA11;		// DM: USB_DM
 using Dp = GpioA12;		// DP: USB_DP
+/// @}
 }
 
 namespace w25q16
 {
+/// @ingroup modm_board_devebox_f4xx
+/// @{
 using Cs   = GpioOutputA15;
 using Sck  = GpioOutputB3;
 using Mosi = GpioOutputB5;
@@ -125,9 +134,11 @@ using SpiMaster = SpiMaster1;
 constexpr uint32_t BlockSize = 256;
 constexpr uint32_t MemorySize = 2*1024*1024; // 16 MiBits
 using StorageDevice = modm::BdSpiFlash<SpiMaster, Cs, MemorySize>;
+/// @}
 }
 
-
+/// @ingroup modm_board_devebox_f4xx
+/// @{
 inline void
 initialize()
 {
@@ -148,6 +159,7 @@ initializeW25q16()
 	w25q16::SpiMaster::connect<w25q16::Sck::Sck, w25q16::Mosi::Mosi, w25q16::Miso::Miso>();
 	w25q16::SpiMaster::initialize<SystemClock, 42_MHz>();
 }
+/// @}
 
 }
 

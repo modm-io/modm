@@ -247,16 +247,6 @@ namespace modm
 															(0x00000000);
 				}
 			};
-
-			class FsmcNand
-			{
-				// TODO
-			};
-
-			class FsmcPcCard
-			{
-				// TODO
-			};
 		}
 
 		/**

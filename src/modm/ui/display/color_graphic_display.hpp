@@ -9,6 +9,8 @@ using namespace modm::platform;
 
 namespace modm
 {
+
+/// @ingroup	modm_ui_display
 class ColorGraphicDisplay : public GraphicDisplay
 {
 public:
