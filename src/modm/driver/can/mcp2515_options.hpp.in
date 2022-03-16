@@ -4,9 +4,8 @@
 
 #include <modm/architecture/driver/atomic/queue.hpp>
 
-namespace modm{
-namespace mcp2515{
-namespace options{
+namespace modm::mcp2515::options
+{
 
 %% if options["buffer.tx"] > 0
 using TX_QUEUE = modm::atomic::Queue<modm::can::Message, {{ options["buffer.tx"] }}>;
