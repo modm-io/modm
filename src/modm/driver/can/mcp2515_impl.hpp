@@ -17,6 +17,7 @@
 	#error	"Don't include this file directly, use 'mcp2515.hpp' instead!"
 #endif
 #include "mcp2515_bit_timings.hpp"
+#include "mcp2515_definitions.hpp"
 #include "mcp2515_options.hpp"
 #include <modm/architecture/interface/assert.hpp>
 
