@@ -2,8 +2,6 @@
   <extends>modm:nucleo-f439zi</extends>
   <options>
     <option name="modm:build:build.path">../../../build/nucleo-f439zi/mcp2515</option>
-    <option name="modm:driver:mcp2515:buffer.tx">32</option>
-    <option name="modm:driver:mcp2515:buffer.rx">32</option>
   </options>
   <modules>
     <module>modm:platform:spi:1</module>

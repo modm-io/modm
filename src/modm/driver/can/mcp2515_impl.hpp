@@ -225,7 +225,7 @@ modm::Mcp2515<SPI, CS, INT>::mcp2515ReadMessage()
 	// read status flag of the device
 	statusBufferR = RF_CALL(readStatus(RX_STATUS));
 
-	readTemp = true;
+	readSuccessfulFlag = true;
 	if (statusBufferR & FLAG_RXB0_FULL) {
 		addressBufferR = READ_RX;			// message in buffer 0
 	}
@@ -233,10 +233,10 @@ modm::Mcp2515<SPI, CS, INT>::mcp2515ReadMessage()
 		addressBufferR = READ_RX | 0x04;	// message in buffer 1 (RXB1SIDH)
 	}
 	else {
-		readTemp = false;						// Error: no message available
+		readSuccessfulFlag = false;						// Error: no message available
 	}
 
-	if(readTemp)
+	if(readSuccessfulFlag)
 	{
 		RF_WAIT_UNTIL(this->acquireMaster());
 		chipSelect.reset();
@@ -262,11 +262,11 @@ modm::Mcp2515<SPI, CS, INT>::mcp2515ReadMessage()
 	// RX0IF or RX1IF respectivly were already cleared automatically by rising CS.
 	// See section 12.4 in datasheet.
 
-	RF_END_RETURN(readTemp);
+	RF_END_RETURN(readSuccessfulFlag);
 }
 
 template <typename SPI, typename CS, typename INT>
-modm::ResumableResult<bool>
+modm::ResumableResult<void>
 modm::Mcp2515<SPI, CS, INT>::update(){
 	using namespace mcp2515;
 
@@ -302,30 +302,29 @@ modm::Mcp2515<SPI, CS, INT>::mcp2515IsReadyToSend()
 
 	RF_BEGIN();
 
-	tempS = true;
+	isReadyToSendFlag = true;
 	statusBufferReady = RF_CALL(readStatus(READ_STATUS));
 	if (( statusBufferReady& (TXB2CNTRL_TXREQ | TXB1CNTRL_TXREQ | TXB0CNTRL_TXREQ)) ==
 			(TXB2CNTRL_TXREQ | TXB1CNTRL_TXREQ | TXB0CNTRL_TXREQ))
 	{
 		// all buffers currently in use
-		tempS = false;
+		isReadyToSendFlag = false;
 	}
 
-	RF_END_RETURN(tempS);
+	RF_END_RETURN(isReadyToSendFlag);
 }
 template <typename SPI, typename CS, typename INT>
 bool
 modm::Mcp2515<SPI, CS, INT>::mcp2515IsReadyToSend(uint8_t status)
 {
 	using namespace mcp2515;
-	bool ready = true;
 	if ((status & (TXB2CNTRL_TXREQ | TXB1CNTRL_TXREQ | TXB0CNTRL_TXREQ)) ==
 			(TXB2CNTRL_TXREQ | TXB1CNTRL_TXREQ | TXB0CNTRL_TXREQ))
 	{
 		// all buffers currently in use
-		ready = false;
+		return false;
 	}
-	return ready;
+	return true;
 }
 
 // ----------------------------------------------------------------------------
@@ -494,7 +493,7 @@ modm::Mcp2515<SPI, CS, INT>::readIdentifier(uint32_t &identifier)
 	a = RF_CALL(spi.transfer(0xff));
 	b = RF_CALL(spi.transfer(0xff));
 
-	temp = false;
+	readIdentifierSuccessfulFlag = false;
 
 	if (b & MCP2515_IDE)
 	{
@@ -506,7 +505,7 @@ modm::Mcp2515<SPI, CS, INT>::readIdentifier(uint32_t &identifier)
 
 		*((uint8_t *)ptr) = RF_CALL(spi.transfer(0xff));
 
-		temp = true;
+		readIdentifierSuccessfulFlag = true;
 	} else
 	{
 		RF_CALL(spi.transfer(0xff));
@@ -522,5 +521,5 @@ modm::Mcp2515<SPI, CS, INT>::readIdentifier(uint32_t &identifier)
 	}
 	RF_WAIT_UNTIL(this->releaseMaster());
 
-	RF_END_RETURN(temp);
+	RF_END_RETURN(readIdentifierSuccessfulFlag);
 }

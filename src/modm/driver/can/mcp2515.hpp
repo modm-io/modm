@@ -181,7 +181,7 @@ namespace modm
 		 *
 		 * \return true if a message was send this cycle, false otherwise
 		 */
-		modm::ResumableResult<bool>
+		modm::ResumableResult<void>
 		update();
 
 
@@ -260,10 +260,9 @@ namespace modm
 		uint8_t a = 0;
 		uint8_t b = 0;
 		uint8_t data = 0;
-		bool readTemp = false;
-		bool tempS = false;
-		bool temp = false;
-		bool receiveSuccess = false;
+		bool readSuccessfulFlag = false;
+		bool isReadyToSendFlag = false;
+		bool readIdentifierSuccessfulFlag = false;
 	};
 }
 
