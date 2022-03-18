@@ -42,10 +42,8 @@ public:
 		ClockGen::enable<ClockPeripheral::Udp>();
 		NVIC_SetPriority(UDP_IRQn, priority);
 %% else
-		static_assert(SystemClock::Frequency == 48_MHz, "Usb must have a 48MHz clock!");
-		PM->APBBMASK.reg |= PM_APBBMASK_USB;
-		PM->AHBMASK.reg |= PM_AHBMASK_USB;
-		GenericClockController::connect<ClockPeripheral::Usb>(ClockGenerator::System);
+		static_assert(SystemClock::Usb == 48_MHz, "Usb must have a 48MHz clock!");
+		PeripheralClock<Peripherals::Usb>::enable();
 %% if target["series"][0] == "5"
 		NVIC_SetPriority(USB_0_IRQn, priority);
 		NVIC_SetPriority(USB_1_IRQn, priority);

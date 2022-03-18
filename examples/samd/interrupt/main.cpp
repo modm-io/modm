@@ -27,7 +27,7 @@ int
 main()
 {
 	Board::initialize();
-	ExternalInterrupt::initialize();
+	ExternalInterrupt::initialize(Board::SystemClock::ClockGen32kHz);
 	ExtInt<3>::initialize(&isr);
 	ExtInt<3>::connect<D12>();
 	while (1)
