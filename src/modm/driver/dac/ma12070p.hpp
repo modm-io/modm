@@ -249,6 +249,19 @@ operator-(ma12070p::quarter_decibel_t v)
 	return static_cast<ma12070p::quarter_decibel_t>(-static_cast<int16_t>(v));
 }
 
+constexpr ma12070p::quarter_decibel_t
+operator+(ma12070p::quarter_decibel_t v1, ma12070p::quarter_decibel_t v2)
+{
+	return static_cast<ma12070p::quarter_decibel_t>(static_cast<int16_t>(v1) + static_cast<int16_t>(v2));
+}
+
+constexpr ma12070p::quarter_decibel_t
+operator+=(ma12070p::quarter_decibel_t& lhs, ma12070p::quarter_decibel_t rhs)
+{
+	lhs = static_cast<ma12070p::quarter_decibel_t>(static_cast<int16_t>(lhs) + static_cast<int16_t>(rhs));
+	return lhs;
+}
+
 namespace literals
 {
 	constexpr ma12070p::quarter_decibel_t
