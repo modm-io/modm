@@ -41,7 +41,8 @@ def build(env):
     env.substitutions = {
         "target": target,
         "boot_frequency": boot_frequency,
-        "device_family": device_family
+        "device_family": device_family,
+        "clock_map": env.query(":cmsis:device:clock-map")
     }
     env.outbasepath = "modm/src/modm/platform/clock"
     env.template("gclk.hpp.in")

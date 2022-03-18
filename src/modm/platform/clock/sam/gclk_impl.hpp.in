@@ -21,6 +21,32 @@ namespace modm::platform
 {
 extern "C" uint32_t SystemCoreClock;
 
+%% for peripheral, clocks in clock_map.items()
+template<>
+%% set name=peripheral[0]
+%% set instance=peripheral[1]
+%% if instance
+struct PeripheralClock<Peripherals::{{name | capitalize}}<{{instance}}>>
+%% else
+struct PeripheralClock<Peripherals::{{name | capitalize}}>
+%% endif
+{
+	static inline void enable()
+	{
+%% for clock in clocks
+		{{clock[0]}}->{{clock[1]}}MASK.reg |= (1u << {{clock[2]}});
+%% endfor
+	}
+
+	static inline void disable()
+	{
+%% for clock in clocks
+		{{clock[0]}}->{{clock[1]}}MASK.reg &= ~(1u << {{clock[2]}});
+%% endfor
+	}
+};
+%% endfor
+
 template< uint32_t Core_Hz >
 void
 GenericClockController::updateCoreFrequency()
