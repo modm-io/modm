@@ -7,8 +7,10 @@
     <module>modm:build:scons</module>
     <module>modm:cmsis:dsp:fast_math</module>
     <module>modm:driver:ma12070p</module>
-    <module>modm:platform:i2c:1</module>
+    <!-- <module>modm:platform:i2c:1</module> -->
+    <module>modm:platform:i2c.bitbang</module>
     <module>modm:platform:i2s:2</module>
     <module>modm:processing:timer</module>
+    <module>modm:processing:protothread</module>
   </modules>
 </library>
