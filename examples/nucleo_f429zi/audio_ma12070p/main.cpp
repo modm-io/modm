@@ -16,7 +16,7 @@
 #include <modm/processing/protothread.hpp>
 #include <modm/driver/dac/ma12070p.hpp>
 #include <modm/platform/gpio/inverted.hpp>
-#include <modm/platform/i2c/bitbang_i2c_master.hpp>
+#include <modm/platform/i2c/i2c_master_1.hpp>
 #include <modm/platform/i2s/i2s_master_2.hpp>
 #include <numbers>
 #include <optional>
@@ -29,15 +29,15 @@ using namespace modm::literals;
 // using Sda = GpioB9;
 // using I2cMaster = modm::platform::I2cMaster1;
 
-using Scl = Board::D3;
-using Sda = Board::D4;
-using I2cMaster = modm::platform::BitBangI2cMaster<Scl, Sda>;
+using Scl = GpioB8;
+using Sda = GpioB9;
+using I2cMaster = modm::platform::I2cMaster1;
 using Ma12070p = modm::Ma12070p<I2cMaster>;
 
 using I2sWs = GpioOutputB12;
 using I2sMck = GpioOutputC6;
 using I2sCk = GpioOutputB13;
-using I2sData = GpioOutputC1;
+using I2sData = GpioOutputB15;
 using DmaTx = Dma1::Channel4;
 using I2sMaster = modm::platform::I2sMaster2<DmaTx>;
 
@@ -198,7 +198,7 @@ main()
 {
 	Board::initialize();
 	I2sSystemClock::enable();
-	I2cMaster::connect<Scl::BitBang, Sda::BitBang>(I2cMaster::PullUps::Internal);
+	I2cMaster::connect<Scl::Scl, Sda::Sda>(I2cMaster::PullUps::Internal);
 	I2cMaster::initialize<SystemClock, 10_kHz>();
 	Dma1::enable();
 	Dma2::enable();
@@ -208,7 +208,7 @@ main()
 	Mute::set();
 
 
-	MODM_LOG_INFO << "Audio MA12070P demo on ST Discovery F469NI" << modm::endl;
+	MODM_LOG_INFO << "Audio MA12070P demo on NUcleo-F429ZI" << modm::endl;
 
 
 	I2sMaster::connect<I2sMck::Mck, I2sCk::Ck, I2sWs::Ws, I2sData::Sd>();
