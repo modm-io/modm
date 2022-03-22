@@ -212,10 +212,14 @@ main()
 
 
 	I2sMaster::connect<I2sMck::Mck, I2sCk::Ck, I2sWs::Ws, I2sData::Sd>();
-	I2sMaster::initialize<I2sSystemClock, 48_kHz, 1_pct>(
-		I2sMaster::BitDepth::SixteenWithChannel16,
-		I2sMaster::MasterClockOutput::Enabled,
-		I2sMaster::I2sStandard::Philips);
+	constexpr I2sMaster::I2sConfig config{
+		.samplerate = 48_kHz,
+		.tolerance = 1_pct,
+		.bitDepth = I2sMaster::BitDepth::SixteenWithChannel16,
+		.masterClockOutput = I2sMaster::MasterClockOutput::Enabled,
+		.i2sStandard = I2sMaster::I2sStandard::Philips,
+	};
+	I2sMaster::initialize<I2sSystemClock, config>();
 	I2sMaster::setTransferCompleteIrqHandler(transferCompleteIrqHandler);
 	I2sMaster::setTxBuffer(uintptr_t(bufferA.data()), bufferSize);
 	I2sMaster::start();
