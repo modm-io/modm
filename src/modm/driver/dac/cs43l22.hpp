@@ -80,7 +80,7 @@ struct cs43l22
 	{
 		CS43L22 = int(ChipIdRevision::CHIPID4) | int(ChipIdRevision::CHIPID3) | int(ChipIdRevision::CHIPID2)
 	};
-	typedef Configuration< ChipIdRevision_t, ChipId, (Bit7 | Bit6 | Bit5 | Bit4 | Bit3) >  ChipId_t;
+	using ChipId_t = Configuration< ChipIdRevision_t, ChipId, (Bit7 | Bit6 | Bit5 | Bit4 | Bit3) >;
 
 	enum class
 	RevisionId : uint8_t
@@ -90,7 +90,7 @@ struct cs43l22
 		B0 = int(ChipIdRevision::REVID1),
 		B1 = int(ChipIdRevision::REVID1) | int(ChipIdRevision::REVID0)
 	};
-	typedef Configuration< ChipIdRevision_t, RevisionId, (Bit2 | Bit1 | Bit0) >  RevisionId_t;
+	using RevisionId_t = Configuration< ChipIdRevision_t, RevisionId, (Bit2 | Bit1 | Bit0) >;
 
 	enum class
 	PowerControl1 : uint8_t
@@ -116,7 +116,7 @@ struct cs43l22
 			   int(PowerControl1::PDN2) |
 			   int(PowerControl1::PDN1)
 	};
-	typedef Configuration< PowerControl1_t, Power, 0xFF > Power_t;
+	using Power_t = Configuration< PowerControl1_t, Power, 0xFF >;
 
 	enum class
 	PowerControl2 : uint8_t
@@ -143,10 +143,10 @@ struct cs43l22
 		OnAlways = 2,
 		OffAlways = 3
 	};
-	typedef Configuration< PowerControl2_t, ChannelPower, 0b11, 0> ChannelPowerSpeakerA_t;
-	typedef Configuration< PowerControl2_t, ChannelPower, 0b11, 2> ChannelPowerSpeakerB_t;
-	typedef Configuration< PowerControl2_t, ChannelPower, 0b11, 4> ChannelPowerHeadphoneA_t;
-	typedef Configuration< PowerControl2_t, ChannelPower, 0b11, 6> ChannelPowerHeadphoneB_t;
+	using ChannelPowerSpeakerA_t = Configuration< PowerControl2_t, ChannelPower, 0b11, 0>;
+	using ChannelPowerSpeakerB_t = Configuration< PowerControl2_t, ChannelPower, 0b11, 2>;
+	using ChannelPowerHeadphoneA_t = Configuration< PowerControl2_t, ChannelPower, 0b11, 4>;
+	using ChannelPowerHeadphoneB_t = Configuration< PowerControl2_t, ChannelPower, 0b11, 6>;
 
 	enum class
 	ClockingControl : uint8_t
@@ -187,7 +187,7 @@ struct cs43l22
 		Slave = 0,
 		Master = int(InterfaceControl1::MASTER)
 	};
-	typedef Configuration< InterfaceControl1_t, Role, Bit7 > Role_t;
+	using Role_t = Configuration< InterfaceControl1_t, Role, Bit7 >;
 
 	enum class
 	DacInterfaceFormat : uint8_t
@@ -196,7 +196,7 @@ struct cs43l22
 		I2sPhillipsStandard = int(InterfaceControl1::DACDIF0),
 		RightJustified      = int(InterfaceControl1::DACDIF1)
 	};
-	typedef Configuration< InterfaceControl1_t, DacInterfaceFormat, (Bit2 | Bit3) > DacInterfaceFormat_t;
+	using DacInterfaceFormat_t = Configuration< InterfaceControl1_t, DacInterfaceFormat, (Bit2 | Bit3) >;
 
 	enum class
 	MasterVolumeControl : uint8_t
@@ -211,7 +211,7 @@ struct cs43l22
 		MSTVOL7 = Bit7,
 	};
 	MODM_FLAGS8(MasterVolumeControl);
-	typedef Value< MasterVolumeControl_t, 8 > MasterVol_t;
+	using MasterVol_t = Value< MasterVolumeControl_t, 8 >;
 
 	enum class
 	AnalogZcAndSrSettings : uint8_t
@@ -229,8 +229,8 @@ struct cs43l22
 		Disabled = 0,
 		Enabled  = 1
 	};
-	typedef Configuration< AnalogZcAndSrSettings_t, SoftRamp, 0b1, 1> AnalogSoftRampA_t;
-	typedef Configuration< AnalogZcAndSrSettings_t, SoftRamp, 0b1, 3> AnalogSoftRampB_t;
+	using AnalogSoftRampA_t = Configuration< AnalogZcAndSrSettings_t, SoftRamp, 0b1, 1>;
+	using AnalogSoftRampB_t = Configuration< AnalogZcAndSrSettings_t, SoftRamp, 0b1, 3>;
 
 	enum class
 	ZeroCrossing : uint8_t
@@ -238,8 +238,8 @@ struct cs43l22
 		Disabled = 0,
 		Enabled  = 1
 	};
-	typedef Configuration< AnalogZcAndSrSettings_t, ZeroCrossing, 0b1, 0> AnalogZeroCrossingA_t;
-	typedef Configuration< AnalogZcAndSrSettings_t, ZeroCrossing, 0b1, 2> AnalogZeroCrossingB_t;
+	using AnalogZeroCrossingA_t = Configuration< AnalogZcAndSrSettings_t, ZeroCrossing, 0b1, 0>;
+	using AnalogZeroCrossingB_t = Configuration< AnalogZcAndSrSettings_t, ZeroCrossing, 0b1, 2>;
 
 	enum class
 	MiscellaneousControls
@@ -276,7 +276,7 @@ struct cs43l22
 										MasterVolumeControl_t, AnalogZcAndSrSettings_t,
 										MiscellaneousControls_t, LimiterControl1MinMaxThresholds_t >;
 
-	typedef int16_t centiBel_t;
+	using centiBel_t = int16_t;
 	static constexpr centiBel_t MaxVolume = 120;
 	static constexpr centiBel_t MinVolume = -1020;
 };  // struct cs43l22
@@ -300,10 +300,10 @@ public:
 	ResumableResult<bool>
 	initialize();
 
-    /**
-     * @note max volume is specified by cs43l22::MaxVolume
-     *       and min volume by cs43l22::MinVolume
-     */
+	/**
+	 * @note max volume is specified by cs43l22::MaxVolume
+	 *  and min volume by cs43l22::MinVolume
+	 */
 	ResumableResult<bool>
 	setMasterVolume(centiBel_t vol);
 
@@ -330,9 +330,8 @@ private:
 
 };
 
-}	// namespace modm
+}  // namespace modm
 
 #include "cs43l22_impl.hpp"
 
 #endif // MODM_CS43L22_HPP
-
