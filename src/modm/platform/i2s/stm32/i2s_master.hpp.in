@@ -25,7 +25,9 @@ namespace modm::platform
 {
 
 /**
- * Inter-IC Sound (I2C{{ id }}).
+ * Inter-IC Sound (I2S) master driver
+ *
+ * @warning Only data output (e.g. to headphone/speaker DAC) functionality is currently implemented
  *
  * @tparam	DmaChannelTX DMA channel for sending
  *
@@ -63,30 +65,48 @@ public:
 		Connector::connect();
 	}
 
-	template<class SystemClock, frequency_t samplerate, percent_t tolerance = pct(0.019)>
-	static inline void
-	initialize(BitDepth bitDepth = BitDepth::SixteenWithChannel16,
-			   MasterClockOutput masterClockOutput = MasterClockOutput::Enabled,
-			   I2sStandard i2sStandard = I2sStandard::Philips,
-			   ClockPolarity clockPolarity = ClockPolarity::Low,
-			   DmaBase::Priority dmaPriority = DmaBase::Priority::High)
+	struct I2sConfig
 	{
-		constexpr float prescaler = static_cast<float>(SystemClock::I2sPll) / (samplerate*16*2*8);
+		frequency_t samplerate = 48_kHz;
+		percent_t tolerance = pct(0.019);
+		BitDepth bitDepth = BitDepth::SixteenWithChannel16;
+		MasterClockOutput masterClockOutput = MasterClockOutput::Enabled;
+		I2sStandard i2sStandard = I2sStandard::Philips;
+		ClockPolarity clockPolarity = ClockPolarity::Low;
+		DmaBase::Priority dmaPriority = DmaBase::Priority::High;
+	};
+	static constexpr I2sConfig DefaultI2sConfig{};
+
+	template<class SystemClock, I2sConfig c = DefaultI2sConfig>
+	static inline void
+	initialize()
+	{
+		// RM0090, p.908:
+		// F_S = I2SxCLK / [(16*2)*((2*I2SDIV)+ODD)*8)] when the channel frame is 16-bit wide and MCKOE bit set
+		// F_S = I2SxCLK / [(32*2)*((2*I2SDIV)+ODD)*4)] when the channel frame is 32-bit wide and MCKOE bit set
+		// F_S = I2SxCLK / [(16*2)*((2*I2SDIV)+ODD))] when the channel frame is 16-bit wide and MCKOE bit cleared
+		// F_S = I2SxCLK / [(32*2)*((2*I2SDIV)+ODD))] when the channel frame is 32-bit wide and MCKOE bit cleared
+
+		constexpr uint8_t bits_per_channel = (c.bitDepth == BitDepth::SixteenWithChannel16) ? 16 : 32;
+		constexpr uint8_t mckoe_factor = (c.masterClockOutput == MasterClockOutput::Disabled) ? 1
+										: ((c.bitDepth == BitDepth::SixteenWithChannel16) ? 8 : 4);
+		constexpr uint16_t bits_per_cycle = bits_per_channel * 2/*channels*/ * mckoe_factor;
+		constexpr float prescaler = static_cast<float>(SystemClock::I2sPll) / (c.samplerate * bits_per_cycle);
 		constexpr uint8_t i2s_div = static_cast<uint8_t>(prescaler/2);
 		constexpr uint8_t odd_factor = ((prescaler - static_cast<float>(i2s_div*2)) >= 0.5) ? 1 : 0;
 		constexpr float real_samplerate = static_cast<float>(SystemClock::I2sPll) /
-											(16*2*8*(2*i2s_div+odd_factor));
+											(bits_per_cycle * ((2 * i2s_div) + odd_factor));
 		static_assert(i2s_div > 1, "I2S{{ id }}: i2s_div can not be 1 or 0!");
-		modm::PeripheralDriver::assertBaudrateInTolerance<uint32_t(real_samplerate), samplerate, tolerance>();
+		modm::PeripheralDriver::assertBaudrateInTolerance<uint32_t(real_samplerate), c.samplerate, c.tolerance>();
 
 		Hal::initialize(odd_factor ? Hal::OddFactor::Enabled : Hal::OddFactor::Disabled,
 						i2s_div,
 						Hal::MasterSelection::Master,
 						Hal::DirectionSelection::Transmitter,
-						bitDepth,
-						masterClockOutput,
-						i2sStandard,
-						clockPolarity);
+						c.bitDepth,
+						c.masterClockOutput,
+						c.i2sStandard,
+						c.clockPolarity);
 
 		dmaError = false;
 		Dma::TxChannel::configure(
@@ -95,9 +115,9 @@ public:
 			DmaBase::PeripheralDataSize::Bit16,
 			DmaBase::MemoryIncrementMode::Increment,
 			DmaBase::PeripheralIncrementMode::Fixed,
-			dmaPriority,
+			c.dmaPriority,
 			DmaBase::CircularMode::Disabled);
-		Dma::TxChannel::setPeripheralAddress(SPI{{ id }}_BASE + 0x0c);
+		Dma::TxChannel::setPeripheralAddress(uintptr_t(&SPI{{ id }}->DR));
 		Dma::TxChannel::setTransferErrorIrqHandler(handleDmaTransferError);
 		Dma::TxChannel::enableInterruptVector();
 		Dma::TxChannel::enableInterrupt(DmaBase::InterruptEnable::TransferError |
