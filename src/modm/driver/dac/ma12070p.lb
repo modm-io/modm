@@ -32,6 +32,12 @@ def prepare(module, options):
     return True
 
 def build(env):
+    env.substitutions = {
+        "has_io": env.has_module("modm:io"),
+    }
     env.outbasepath = "modm/src/modm/driver/dac"
     env.copy("ma12070p.hpp")
     env.copy("ma12070p_impl.hpp")
+    env.template("ma12070p_io.hpp.in")
+    if env.has_module("modm:io"):
+        env.copy("ma12070p.cpp")

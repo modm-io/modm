@@ -93,7 +93,7 @@ Ma12070p<I2cMaster>::configureI2sAndVlp(I2sAndVlpConfig c)
 
 template<typename I2cMaster>
 ResumableResult<bool>
-Ma12070p<I2cMaster>::setLimiterTreshold(quarter_decibel_t ch0l, quarter_decibel_t ch0r, quarter_decibel_t ch1l, quarter_decibel_t ch1r)
+Ma12070p<I2cMaster>::setLimiterThreshold(quarter_decibel_t ch0l, quarter_decibel_t ch0r, quarter_decibel_t ch1l, quarter_decibel_t ch1r)
 {
 	RF_BEGIN();
 	tx_buffer[0] = uint8_t(Register::Ch0LVolumeDbInteger);

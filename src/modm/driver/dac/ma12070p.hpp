@@ -126,16 +126,16 @@ struct ma12070p
 
 	struct I2sAndVlpConfig
 	{
-		const PcmWordFormat pcmWordFormat = PcmWordFormat::LeftJustifed;
-		const ClockPolarity clockPolarity = ClockPolarity::FallingEdge;
-		const FrameSize frameSize = FrameSize::Bits64;
-		const WordSelectPolarity wordSelectPolarity = WordSelectPolarity::Low;
-		const DataOrder dataOrder = DataOrder::MsbFirst;
-		const RightLeftOrder rightLeftOrder = RightLeftOrder::LeftFirst;
-		const bool useVlp = true;
-		const bool useLimiter = true;
-		const LimiterTiming limiterReleaseTime = LimiterTiming::Normal;
-		const LimiterTiming limiterAttackTime = LimiterTiming::Normal;
+		PcmWordFormat pcmWordFormat = PcmWordFormat::LeftJustifed;
+		ClockPolarity clockPolarity = ClockPolarity::FallingEdge;
+		FrameSize frameSize = FrameSize::Bits64;
+		WordSelectPolarity wordSelectPolarity = WordSelectPolarity::Low;
+		DataOrder dataOrder = DataOrder::MsbFirst;
+		RightLeftOrder rightLeftOrder = RightLeftOrder::LeftFirst;
+		bool useVlp = true;
+		bool useLimiter = true;
+		LimiterTiming limiterReleaseTime = LimiterTiming::Normal;
+		LimiterTiming limiterAttackTime = LimiterTiming::Normal;
 	};
 
 	enum class
@@ -152,32 +152,6 @@ struct ma12070p
 	};
 	MODM_FLAGS8(VlpMonitor);
 
-#if MODM_HAS_IOSTREAM
-	friend IOStream&
-	operator << (IOStream& os, const VlpMonitor_t& c)
-	{
-		os << "VlpMonitor(";
-		if(c & VlpMonitor::LimiterCh0L)
-			os << "LimiterCh0L ";
-		if(c & VlpMonitor::LimiterCh0R)
-			os << "LimiterCh0R ";
-		if(c & VlpMonitor::LimiterCh1L)
-			os << "LimiterCh1L ";
-		if(c & VlpMonitor::LimiterCh1R)
-			os << "LimiterCh1R ";
-		if(c & VlpMonitor::ClippingCh0L)
-			os << "ClippingCh0L ";
-		if(c & VlpMonitor::ClippingCh0R)
-			os << "ClippingCh0R ";
-		if(c & VlpMonitor::ClippingCh1L)
-			os << "ClippingCh1L ";
-		if(c & VlpMonitor::ClippingCh1R)
-			os << "ClippingCh1R ";
-		os << ")";
-		return os;
-	}
-#endif
-
 	enum class
 	ErrorRegister : uint8_t
 	{
@@ -191,33 +165,6 @@ struct ma12070p
 		DcProtection			= Bit7,
 	};
 	MODM_FLAGS8(ErrorRegister);
-
-#if MODM_HAS_IOSTREAM
-	friend IOStream&
-	operator << (IOStream& os, const ErrorRegister_t& c)
-	{
-		os << "ErrorRegister(";
-		if(c & ErrorRegister::FlyingCapOverVolt)
-			os << "FlyingCapOverVolt ";
-		if(c & ErrorRegister::OverCurrent)
-			os << "OverCurrent ";
-		if(c & ErrorRegister::Pll)
-			os << "Pll ";
-		if(c & ErrorRegister::PvddUnderVolt)
-			os << "PvddUnderVolt ";
-		if(c & ErrorRegister::OverTempWarning)
-			os << "OverTempWarning ";
-		if(c & ErrorRegister::OverTempError)
-			os << "OverTempError ";
-		if(c & ErrorRegister::PinToPinLowImpedance)
-			os << "PinToPinLowImpedance ";
-		if(c & ErrorRegister::DcProtection)
-			os << "DcProtection ";
-		os << ")";
-		return os;
-	}
-#endif
-
 
 	// quarter_decibel type
 	enum class
@@ -308,9 +255,9 @@ public:
 	ResumableResult<bool>
 	configureI2sAndVlp(I2sAndVlpConfig config);
 
-	/// Set the limiter treshold for individual channels (-144db to +24db)
+	/// Set the limiter threshold for individual channels (-144db to +24db)
 	ResumableResult<bool>
-	setLimiterTreshold(quarter_decibel_t ch0l, quarter_decibel_t ch0r, quarter_decibel_t ch1l = -144, quarter_decibel_t ch1r = -144);
+	setLimiterThreshold(quarter_decibel_t ch0l, quarter_decibel_t ch0r, quarter_decibel_t ch1l = -144, quarter_decibel_t ch1r = -144);
 
 	/// Set the master volume (-144db to +24db)
 	ResumableResult<bool>
@@ -361,7 +308,7 @@ private:
 
 }	// namespace modm
 
+#include "ma12070p_io.hpp"
 #include "ma12070p_impl.hpp"
 
 #endif // MODM_MA12070P_HPP
-
