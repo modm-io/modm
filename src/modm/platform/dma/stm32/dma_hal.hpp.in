@@ -257,7 +257,7 @@ public:
 	setMemoryAddress2(uintptr_t address)
 	{
 		DMA_Channel_TypeDef *Base = (DMA_Channel_TypeDef *) CHANNEL_BASE;
-%% if dmaType in ["stm32-stream-channel"]
+%% if dmaType in ["stm32-stream-channel", "stm32-mux-stream"]
 		Base->M1AR = address;
 %% endif
 	}
@@ -271,8 +271,10 @@ public:
 	isPrimaryBufferActive()
 	{
 		DMA_Channel_TypeDef *Base = (DMA_Channel_TypeDef *) CHANNEL_BASE;
-%% if dmaType in ["stm32-stream-channel"]
+%% if dmaType in ["stm32-stream-channel", "stm32-mux-stream"]
 		return (Base->CR & DMA_SxCR_CT);
+%% else
+		return true;
 %% endif
 	}
 %% endif
