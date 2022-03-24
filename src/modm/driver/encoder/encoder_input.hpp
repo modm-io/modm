@@ -22,10 +22,11 @@ namespace modm
  * @tparam SignalA		First modm::platform::Gpio pin that connects to Timer::Ch1
  * @tparam SignalB		Second modm::platform::Gpio pin that connects to Timer::Ch2
  * @tparam PRESCALER	How many encoder pulses to count as one
- * @tparam DeltaType	Fast encoders may require int16_t
+ * @tparam DeltaType	For very fast or high resolution encoder, int32_t may be required
  */
 template<class Timer, typename SignalA, typename SignalB, uint16_t PRESCALER = 4,
 	std::signed_integral DeltaType = int16_t>
+requires (std::numeric_limits<DeltaType>::max() < std::pow(2, 31))
 class EncoderInput
 {
 public:

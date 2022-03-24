@@ -35,7 +35,7 @@ template<typename SignalA, typename SignalB, uint8_t PRESCALER = 4,
 		 std::signed_integral DeltaType = int8_t>
 class BitBangEncoderInput
 {
-	static_assert(std::popcount(PRESCALER) == 1,
+	static_assert(std::has_single_bit(PRESCALER),
 				  "PRESCALER must be an integer to basis 2 and not 0: 1, 2, 4, 8, 16, ...");
 	static_assert(PRESCALER <= std::numeric_limits<DeltaType>::max(),
 				  "DeltaType is to small for PRESCALER.");
