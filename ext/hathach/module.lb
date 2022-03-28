@@ -92,7 +92,7 @@ def build(env):
     if target.platform == "stm32":
         tusb_config["CFG_TUSB_MCU"] = "OPT_MCU_STM32{}".format(target.family.upper())
         # TODO: use modm-devices driver type for this
-        fs_dev = (target.family in ["f0", "f3", "l0"] or
+        fs_dev = (target.family in ["f0", "f3", "l0", "g4"] or
                  (target.family == "f1" and target.name <= "03"))
         if fs_dev:
             # PMA buffer size: 512B or 1024B
