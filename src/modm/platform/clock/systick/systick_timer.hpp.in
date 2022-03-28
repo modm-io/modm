@@ -107,11 +107,4 @@ private:
 
 }
 
-namespace modm::cortex
-{
-	// DEPRECATE: 2022q1
-	using SysTickTimer [[deprecated("Use `modm::platform:SysTickTimer` instead!")]] =
-		::modm::platform::SysTickTimer;
-}
-
 #endif	//  MODM_STM32_CORTEX_TIMER_HPP

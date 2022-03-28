@@ -314,14 +314,6 @@ public:
 	static inline void
 	acknowledgeInterruptFlags(InterruptFlag_t flags);
 
-	// DEPRECATE: 2022q1
-	[[deprecated("Use `acknowledgeInterruptFlags(InterruptFlag_t flags)` instead!")]]
-	static inline void
-	acknowledgeInterruptFlag(InterruptFlag_t flags)
-	{
-		acknowledgeInterruptFlags(flags);
-	}
-
 public:
 	static constexpr uint8_t TS_CAL1_TEMP{30};
 %% if target.family in ["f0"]

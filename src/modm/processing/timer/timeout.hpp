@@ -108,18 +108,6 @@ public:
 	bool
 	execute();
 
-	/// @cond
-	// DEPRECATE: 2022q1
-	[[deprecated("Use `std::chrono::{milli,micro}seconds` for interval instead!")]]
-	GenericTimeout(rep interval) :
-		GenericTimeout(duration(interval)) {}
-	[[deprecated("Use `std::chrono::{milli,micro}seconds` for interval instead!")]]
-	void restart(rep interval)
-	{ restart(duration(interval)); }
-	[[deprecated("Use `Timeout.state()` instead!")]]
-	TimerState getState() const { return state(); }
-	/// @endcond
-
 protected:
 	bool
 	checkExpiration() const;
@@ -165,10 +153,6 @@ using ShortPreciseTimeout = GenericTimeout< PreciseClock, ShortPreciseDuration >
 using      PreciseTimeout = GenericTimeout< PreciseClock, PreciseDuration >;
 
 /// @}
-/// @cond
-// DEPRECATE: 2022q1
-using TimeoutState [[deprecated("Use `modm::TimerState` instead!")]] = TimerState;
-/// @endcond
 
 }	// namespace modm
 

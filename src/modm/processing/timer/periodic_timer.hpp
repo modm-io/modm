@@ -95,9 +95,5 @@ using ShortPrecisePeriodicTimer = GenericPeriodicTimer< PreciseClock, ShortPreci
 using      PrecisePeriodicTimer = GenericPeriodicTimer< PreciseClock, PreciseDuration >;
 
 /// @}
-/// @cond
-// DEPRECATE: 2022q1
-using PeriodicTimerState [[deprecated("Use `modm::TimerState` instead!")]] = TimerState;
-/// @endcond
 
 }	// namespace

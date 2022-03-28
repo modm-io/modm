@@ -5,6 +5,7 @@
  * Copyright (c) 2013, 2015, Sascha Schade
  * Copyright (c) 2015, Kevin Läufer
  * Copyright (c) 2018, Christopher Durand
+ * Copyright (c) 2022, Raphael Lehmann
  *
  * This file is part of the modm project.
  *
@@ -79,7 +80,7 @@ namespace detail
 
 	// ------------------------------------------------------------------------
 
-	// implement ArithmeticTraits<T>::WideType
+	// implement WideType<T>
 	template<typename T>
 	struct WideType
 	{ using type = T; };
@@ -156,54 +157,32 @@ using UnsignedType = typename detail::MakeUnsigned<T>::type;
 /**
  * Arithmetic Traits
  *
- * Traits to give numbers more information then they have by
- * default in C++
+ * Previously, some of the functionalities of <type_traits> and <limits> were
+ * implemented here, when they were not yet available in the C++ standard
+ * library. Only isInteger and decimalDigits are left, for all others please
+ * use the C++ standard library in the future.
  *
  * @section provides	Values provided by these traits
  *
- * - `WideType`			Type that can holds the doubled length of data.
- * 						May be used to hold the result of a multiplication.
- * - `SignedType`		Signed type for the given type. It applies
- * 						`T == SignedType` if `T` is already signed.
- * - `UnsignedType		Some as SignedType only for unsigned types
- * - `min`				smallest value.
- * - `max`				biggest value
- * - `isSigned`			is this a signed or unsigned type
- * - `isFloatingPoint`	is this a floating point type
  * - `isInteger`		is this a integer type
  * - `decimalDigits`	count of digits to display this type in decimal
  *
  * @section usage	Usage
  * @code
- * typedef typename modm::ArithmeticTraits<T>::WideType T_DOUBLE;
+ * if (modm::ArithmeticTraits<T>::isInteger)
+ *     // ...
  *
- * T min = modm::ArithmeticTraits<T>::min;
- * T max = modm::ArithmeticTraits<T>::max;
+ * constexpr unsigned char digits = modm::ArithmeticTraits<T>::decimalDigits;
  * @endcode
- *
- * @author	Martin Rosekeit <martin.rosekeit@rwth-aachen.de>
- * @author	Fabian Greif <fabian.greif@rwth-aachen.de>
- * @author	Niklas Hauser
- * @author	Christopher Durand
  */
 template<typename T>
 struct ArithmeticTraits
 {
-	// DEPRECATE: 2022q1
-	static constexpr bool isFloatingPoint [[deprecated("use std::is_floating_point_v<T> instead!")]] = std::is_floating_point_v<T>;
 	static constexpr bool isInteger = std::is_integral_v<T>
 		&& !std::is_same_v<std::decay_t<T>, bool>;
 
-	using WideType     [[deprecated("use modm::WideType<T> instead!")]]     = modm::WideType<T>;
-	using SignedType   [[deprecated("use modm::SignedType<T> instead!")]]   = modm::SignedType<T> ;
-	using UnsignedType [[deprecated("use modm::UnsignedType<T> instead!")]] = modm::UnsignedType<T>;
-
 	static constexpr unsigned char decimalDigits =
 		std::ceil(std::numeric_limits<T>::digits * log10(2)) + (std::is_signed_v<T> ? 1 : 0);
-
-	static constexpr T min [[deprecated("use std::numeric_limits<T>::min() instead!")]] = std::numeric_limits<T>::min();
-	static constexpr T max [[deprecated("use std::numeric_limits<T>::max() instead!")]] = std::numeric_limits<T>::max();
-	static constexpr T epsilon [[deprecated("use std::numeric_limits<T>::epsilon() instead!")]] = std::numeric_limits<T>::epsilon();
 };
 /// @}
 

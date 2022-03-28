@@ -238,16 +238,6 @@ def init(repo):
         config = {v.strip(): (module.parent / "board.xml") for v in versions}
         repo.add_configuration(Configuration(name, description, config, versions[0].strip()))
 
-    # DEPRECATE: 2022q1
-    repo.add_alias(Alias(name="blue-pill", destination=":blue-pill-f103",
-                         description="Renamed for clarity."))
-    repo.add_alias(Alias(name="black-pill", destination=":black-pill-f103",
-                         description="Renamed for clarity."))
-    repo.add_alias(Alias(name="mini-f401", destination=":black-pill-f401",
-                         description="Renamed for clarity."))
-    repo.add_alias(Alias(name="mini-f411", destination=":black-pill-f411",
-                         description="Renamed for clarity."))
-
     # Add Jinja2 filters commonly used in this repository
     if 'Windows' in platform.platform():
         def windowsify(path, escape_level):
