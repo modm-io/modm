@@ -27,8 +27,13 @@ extern "C" {
 /* override expensive assert implementation */
 #undef assert
 #define assert(X) modm_assert((X), "pico", __FILE__ ":" MODM_STRINGIFY(__LINE__) " -> \"" #X "\"")
+
+#ifndef hard_assert
+#define hard_assert assert
+#endif
+
 void
-panic(const char *fmt, ...);
+panic(const char* /*fmt*/, ...);
 
 #ifdef __cplusplus
 }
