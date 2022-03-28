@@ -10,7 +10,7 @@ jobs:
   build-upload-docs:
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-base:2022-01-20
+      image: ghcr.io/modm-ext/modm-build-base:2022-03-28
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
@@ -43,7 +43,7 @@ jobs:
   api-docs-all:
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-base:2022-01-20
+      image: ghcr.io/modm-ext/modm-build-base:2022-03-28
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
