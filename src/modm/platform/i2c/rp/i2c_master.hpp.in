@@ -31,9 +31,9 @@ class I2cMaster{{ id }} : public ::modm::I2cMaster
 public:
 	static inline i2c_hw_t& hw() { return *i2c{{ id }}_hw; }
 public:
-	template<class... Signals, ResetDevices reset = ResetDevices::Standard>
+	template<class... Signals>
 	static void
-	connect(PullUps pullups = PullUps::External)
+	connect(PullUps pullups = PullUps::External, ResetDevices reset = ResetDevices::Standard)
 	{
 		using Connector = GpioConnector<Peripheral::I2c{{ id }}, Signals...>;
 		using Scl = typename Connector::template GetSignal<Gpio::Signal::Scl>;
@@ -49,7 +49,7 @@ public:
 		Scl::setSlewRate(Gpio::SlewRate::Slow);
 		Sda::configure(input);
 		Sda::setSlewRate(Gpio::SlewRate::Slow);
-		if (reset != ResetDevices::NoReset) resetDevices<Scl, uint32_t(reset)>();
+		if (reset != ResetDevices::NoReset) resetDevices<Scl>(uint32_t(reset));
 		Connector::connect();
 	}
 

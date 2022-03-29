@@ -39,9 +39,9 @@ namespace platform
 class I2cMaster : public ::modm::I2cMaster, I2c
 {
 public:
-	template< class... Signals, ResetDevices reset = ResetDevices::Standard>
+	template<class... Signals>
 	static void
-	connect(PullUps pullups = PullUps::External)
+	connect(PullUps pullups = PullUps::External, ResetDevices reset = ResetDevices::Standard)
 	{
 		using Connector = GpioConnector<Peripheral::Twi, Signals...>;
 		using Scl = typename Connector::template GetSignal<Gpio::Signal::Scl>;
@@ -59,7 +59,7 @@ public:
 		SDA::configure(input);
 		SCL::setOutput();
 		SDA::setOutput();
-		if (reset != ResetDevices::NoReset) resetDevices<SCL, uint32_t(reset)>();
+		if (reset != ResetDevices::NoReset) resetDevices<SCL>(uint32_t(reset));
 		Connector::connect();
 	}
 

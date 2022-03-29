@@ -81,14 +81,14 @@ public:
 	 *
 	 * @tparam	Signals
 	 *		One Scl and one Sda signal are required and can be passed out-of-order.
-	 * @tparam	reset
-	 * 		Choose a speed to reset the I2C devices with. Can be disabled with `ResetDevices::NoReset`.
 	 * @param	pullups
 	 * 		Use external or weak internal pullups.
+	 * @param	reset
+	 * 		Choose a speed to reset the I2C devices with. Can be disabled with `ResetDevices::NoReset`.
 	 */
-	template< class... Signals, ResetDevices reset = ResetDevices::Standard >
+	template< class... Signals >
 	static void
-	connect(PullUps pullups = PullUps::External);
+	connect(PullUps pullups = PullUps::External, ResetDevices reset = ResetDevices::Standard);
 
 	/**
 	 * Initializes the hardware and sets the datarate.

@@ -51,9 +51,9 @@ class BitBangI2cMaster : public modm::I2cMaster
 
 public:
 	// start documentation inherited
-	template< class... Signals, ResetDevices reset = ResetDevices::Standard >
+	template< class... Signals >
 	static void
-	connect(PullUps pullups = PullUps::External);
+	connect(PullUps pullups = PullUps::External, ResetDevices reset = ResetDevices::Standard);
 
 	/// Initializes the hardware, with the baudrate limited to about 250kbps.
 	template< class SystemClock, baudrate_t baudrate=kHz(100), percent_t tolerance=pct(5) >
