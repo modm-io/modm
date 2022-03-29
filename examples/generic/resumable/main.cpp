@@ -10,8 +10,11 @@
 
 #include <modm/board.hpp>
 #include <modm/processing.hpp>
+#include <chrono>
 
 using Led = Board::LedGreen;
+
+using namespace std::chrono_literals;
 
 class BlinkingLight : public modm::pt::Protothread, private modm::NestedResumable<2>
 {
@@ -31,7 +34,7 @@ public:
             PT_CALL(waitForTimer());
 
             Led::reset();
-            PT_CALL(setTimer(200));
+            PT_CALL(setTimer(200ms));
 
             PT_WAIT_UNTIL(timeout.isExpired());
         }
@@ -45,7 +48,7 @@ public:
         RF_BEGIN();
 
         // nested calling is allowed
-        if (RF_CALL(setTimer(100)))
+        if (RF_CALL(setTimer(100ms)))
         {
             RF_WAIT_UNTIL(timeout.isExpired());
             RF_RETURN(true);
@@ -55,7 +58,7 @@ public:
     }
 
     modm::ResumableResult<bool>
-    setTimer(uint16_t new_timeout)
+    setTimer(std::chrono::milliseconds new_timeout)
     {
         RF_BEGIN();
 
@@ -78,7 +81,7 @@ BlinkingLight light;
 
 int main(void)
 {
-	while (true) {
-    	light.run();
-	}
+    while (true) {
+        light.run();
+    }
 }

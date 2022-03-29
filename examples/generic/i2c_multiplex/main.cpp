@@ -114,9 +114,8 @@ main()
 	modm::platform::I2cMaster1::connect<modm::platform::GpioB7::Sda, modm::platform::GpioB6::Scl>();
 	modm::platform::I2cMaster1::initialize<Board::SystemClock, 100_kHz>();
 
-	constexpr uint32_t rate = 1; // Hz
-	constexpr float interval = 1000.0 / rate; // msec
-	modm::ShortPeriodicTimer heartbeat(interval);
+	constexpr std::chrono::milliseconds interval{1000};
+	modm::ShortPeriodicTimer heartbeat{interval};
 
 	// Main loop
 	DeviceThread deviceThread;
