@@ -18,7 +18,7 @@
 template<class SignalA, class SignalB, typename PositionType, class PeriodicTimer, uint32_t period>
 modm::BitBangEncoderOutput<SignalA, SignalB, PositionType, PeriodicTimer,
 						   period>::BitBangEncoderOutput(PositionType initialValue)
-	: setpoint(initialValue), actualValue(initialValue), timer(period), state(State::State0)
+	: setpoint(initialValue), actualValue(initialValue), timer(std::chrono::microseconds{period}), state(State::State0)
 {
 	SignalA::setOutput();
 	SignalB::setOutput();
