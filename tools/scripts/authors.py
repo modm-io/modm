@@ -63,6 +63,7 @@ author_handles = {
     "Pavel Pletenev": "ASMfreaK",
     "Philipp Graf": "luxarf",
     "Raphael Lehmann": "rleh",
+    "Rasmus Kleist": "rasmuskleist",
     "Sascha Schade": "strongly-typed",
     "Sebastian Birke": "se-bi",
     "Sergiy Yevtushenko": "siy",
