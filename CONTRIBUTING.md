@@ -33,8 +33,9 @@ CI tests in order to be merged.
 
 ## When in doubt, ask
 
-The dedicated maintainers of modm are [@salkinium](https://github.com/salkinium)
-and [@rleh](https://github.com/rleh) and you can always ping them.
+The dedicated maintainers of modm are [@salkinium](https://github.com/salkinium),
+[@rleh](https://github.com/rleh) and [@chris-durand](https://github.com/chris-durand).
+You can always ping them.
 
 If you want to add a new platform, or other significant functionality, we
 [ask you to discuss that in a thread first][ideas]. We are very open to

@@ -742,15 +742,15 @@ See [CONTRIBUTING.md][contrib] for our contribution guidelines.
 
 <!--authors-->
 The modm project is maintained by
-Niklas Hauser ([\@salkinium](https://github.com/salkinium)) and
-Raphael Lehmann ([\@rleh](https://github.com/rleh)) with significant contributions from
+Niklas Hauser ([\@salkinium](https://github.com/salkinium)),
+Raphael Lehmann ([\@rleh](https://github.com/rleh)) and
+Christopher Durand ([\@chris-durand](https://github.com/chris-durand)) with significant contributions from
 Sascha Schade ([\@strongly-typed](https://github.com/strongly-typed)),
 Fabian Greif ([\@dergraaf](https://github.com/dergraaf)),
 Kevin Läufer ([\@ekiwi](https://github.com/ekiwi)),
 Martin Rosekeit ([\@thundernail](https://github.com/thundernail)),
 Daniel Krebs ([\@daniel-k](https://github.com/daniel-k)),
 Georgi Grinshpun ([\@georgi-g](https://github.com/georgi-g)),
-Christopher Durand ([\@chris-durand](https://github.com/chris-durand))
 David Hebbeker ([\@dhebbeker](https://github.com/dhebbeker)),
 Thorsten Lajewski ([\@TheTh0r](https://github.com/TheTh0r)),
 Mike Wolfram ([\@mikewolfram](https://github.com/mikewolfram))
