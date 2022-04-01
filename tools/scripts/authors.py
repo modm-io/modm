@@ -14,6 +14,7 @@
 import subprocess, locale
 from collections import defaultdict
 import argparse
+import re
 
 author_handles = {
     "Amar": "fb39ca4",
@@ -91,6 +92,20 @@ def get_author_log(since = None, until = None, handles = False, count = False):
     shortlog = defaultdict(int)
     for line in output.splitlines():
         commits, author = line.split("\t")
+        shortlog[author] += int(commits)
+
+    # get co-authors of the commits
+    co_author_command = "git log --format='%(trailers:key=Co-authored-by)'"
+    if since is not None:
+        co_author_command += " --since=\"{}\"".format(since)
+    if until is not None:
+        co_author_command += " --until=\"{}\"".format(until)
+    co_author_command += " | grep -v '^$' | sed -e 's/Co-authored-by: /\t/g' | sort | uniq -c"
+    output = subprocess.Popen(co_author_command, shell=True, stdout=subprocess.PIPE)\
+            .stdout.read().decode(locale.getpreferredencoding())
+    for line in output.splitlines():
+        commits, author = line.split("\t")
+        author = re.findall(r"(?P<name>[^<>]+) <.+>", author)[0]
         shortlog[author] += int(commits)
 
     # convert to list of tuples for sorting
