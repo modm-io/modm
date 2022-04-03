@@ -26,11 +26,14 @@ modm_gpio_enable(void)
 %% elif target.family in ["f1"]
 %%	set clock_tree = "APB2"
 %%	set prefix = "IOP"
-%% elif target.family in ["l4", "l5", "g4"]
+%% elif target.family in ["l4", "l5", "g4", "u5"]
 %%  set clock_tree = 'AHB2'
 %% elif target.family in ["g0", "l0"]
 %%  set clock_tree = 'IOP'
 %% endif
+
+%% set enr="ENR1" if target.family in ["u5"] else "ENR"
+%% set rstr="RSTR1" if target.family in ["u5"] else "RSTR"
 
 %% if target.family in ["h7"]
 	// Enable I/O compensation cell
@@ -42,20 +45,20 @@ modm_gpio_enable(void)
 %% endif
 
 	// Enable GPIO clock
-	RCC->{{ clock_tree }}ENR  |=
+	RCC->{{ clock_tree }}{{enr}}  |=
 %% for port in options.enable_ports
-		RCC_{{ clock_tree }}ENR_{{ prefix }}{{ port | upper }}EN{% if loop.last %};{% else %} |{% endif %}
+		RCC_{{ clock_tree }}{{enr}}_{{ prefix }}{{ port | upper }}EN{% if loop.last %};{% else %} |{% endif %}
 %% endfor
 
 	// Reset GPIO peripheral
-	RCC->{{ clock_tree }}RSTR |=
+	RCC->{{ clock_tree }}{{rstr}} |=
 %% for port in options.enable_ports
-		RCC_{{ clock_tree }}RSTR_{{ prefix }}{{ port | upper }}RST{% if loop.last %};{% else %} |{% endif %}
+		RCC_{{ clock_tree }}{{rstr}}_{{ prefix }}{{ port | upper }}RST{% if loop.last %};{% else %} |{% endif %}
 %% endfor
 
-	RCC->{{ clock_tree }}RSTR &= ~(
+	RCC->{{ clock_tree }}{{rstr}} &= ~(
 %% for port in options.enable_ports
-		RCC_{{ clock_tree }}RSTR_{{ prefix }}{{ port | upper }}RST{% if loop.last %});{% else %} |{% endif %}
+		RCC_{{ clock_tree }}{{rstr}}_{{ prefix }}{{ port | upper }}RST{% if loop.last %});{% else %} |{% endif %}
 %% endfor
 }
 

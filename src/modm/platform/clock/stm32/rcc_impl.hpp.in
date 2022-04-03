@@ -77,6 +77,9 @@ Rcc::setFlashLatency()
 %% elif target["family"] == "l0"
 	// enable flash prefetch and pre-read
 	acr |= FLASH_ACR_PRFTEN | FLASH_ACR_PRE_READ;
+%% elif target["family"] in ["u5"]
+	// enable flash prefetch
+	acr |= FLASH_ACR_PRFTEN;
 %% elif target["family"] not in ["h7", "l5"]
 	// enable flash prefetch
 	acr |= FLASH_ACR_PRFTBE;

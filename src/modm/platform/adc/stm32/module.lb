@@ -79,6 +79,9 @@ def prepare(module, options):
     if target["family"] in ["f2", "f4", "f7"]:
         props["shared_irqs"] = {"ADC": listify([int(i) for i in device.get_driver("adc")["instance"]])}
         props["shared_irq_ids"] = props["shared_irqs"]["ADC"]
+    elif target["family"] in ["u5"]:
+        # STM32U5 is not yet supported with any ADC implementation im modm
+        return False
     else:
         shared_irqs = [v["name"] for v in device.get_driver("core")["vector"]]
         shared_irqs = [v for v in shared_irqs if v.startswith("ADC") and "_" in v]

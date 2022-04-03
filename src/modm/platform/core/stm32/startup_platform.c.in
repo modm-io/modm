@@ -35,6 +35,8 @@ __modm_initialize_platform(void)
 	RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
 %% elif target.family == "h7"
 	RCC->APB4ENR |= RCC_APB4ENR_SYSCFGEN;
+%% elif target.family == "u5"
+	RCC->APB3ENR |= RCC_APB3ENR_SYSCFGEN;
 %% else
 	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
 %% endif
@@ -71,6 +73,14 @@ __modm_initialize_platform(void)
 	// Enable VDDIO2
 	PWR->CR2 |= PWR_CR2_IOSV;
 #endif
+%% elif target.family in ["u5"]
+	RCC->AHB3ENR |= RCC_AHB3ENR_PWREN;
+	// Enable power for VDDIO2 and USB
+	PWR->SVMCR |= PWR_SVMCR_ASV | PWR_SVMCR_IO2SV | PWR_SVMCR_USV;
+
+	// Enable Backup SRAM (BKPSRAM)
+	PWR->DBPR |= PWR_DBPR_DBP;
+	RCC->AHB1ENR |= RCC_AHB1ENR_BKPSRAMEN;
 %% endif
 
 %% if vector_table_location == "ram"

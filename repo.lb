@@ -85,6 +85,7 @@ class DevicesCache(dict):
                      "stm32g0", "stm32g4",
                      "stm32h7",
                      "stm32l0", "stm32l1", "stm32l4", "stm32l5",
+                     "stm32u5",
                      "at90", "attiny", "atmega",
                      "samd21", "samg55",
                      "same70", "sams70", "samv70", "samv71",

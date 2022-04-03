@@ -131,10 +131,10 @@ def hal_get_modules():
     mapping["I<sup>2</sup>C"].update({"sercom", "twihs"})
     mapping["USB"].update({"usb", "usbhs"})
     mapping["CAN"].update({"fdcan", "mcan"})
-    mapping["DMA"].update({"dmac", "xdmac"})
+    mapping["DMA"].update({"dmac", "xdmac", "gpdma"})
     mapping["Comparator"].update({"ac", "acc"})
     mapping["Internal Flash"].update({"efc", "nvmctrl"})
-    mapping["External Memory"].update({"sdramc", "smc", "quadspi", "xip_ssi"})
+    mapping["External Memory"].update({"sdramc", "smc", "quadspi", "xip_ssi", "octospi"})
 
     print(); print()
     return (all_targets, mapping)

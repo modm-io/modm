@@ -40,27 +40,15 @@ Rcc::enableInternalClockMHz14(uint32_t waitCycles)
 %% endif
 
 %% if hsi48
-%% if target.family in ["l4", "l5"]
 bool
 Rcc::enableInternalClockMHz48(uint32_t waitCycles)
 {
 	bool retval;
-	RCC->CRRCR |= RCC_CRRCR_HSI48ON;
-	while (not ((retval = RCC->CRRCR & RCC_CRRCR_HSI48RDY)) and --waitCycles)
+	RCC->{{hsi48_cr}} |= RCC_{{hsi48_cr}}_HSI48ON;
+	while (not (retval = (RCC->{{hsi48_cr}} & RCC_{{hsi48_cr}}_HSI48RDY)) and --waitCycles)
 		;
 	return retval;
 }
-%% else
-bool
-Rcc::enableInternalClockMHz48(uint32_t waitCycles)
-{
-	bool retval;
-	RCC->CR2 |= RCC_CR2_HSI48ON;
-	while (not (retval = (RCC->CR2 & RCC_CR2_HSI48RDY)) and --waitCycles)
-		;
-	return retval;
-}
-%% endif
 %% endif
 
 bool
@@ -91,6 +79,31 @@ Rcc::enableMultiSpeedInternalClock(MsiFrequency msi_frequency, uint32_t waitCycl
 }
 %% endif
 
+%% if target.family in ["u5"]
+// MSIxRANGE can be modified when MSIx is OFF (MSISON = 0) or when MSIx is
+// ready (MSIxRDY = 1). MSIxRANGE must NOT be modified when MSIx is ON
+// and NOT ready (MSIxON = 1 and MSIxRDY = 0)
+%% for msi in ["S", "K"]
+bool
+Rcc::enableMultiSpeedInternalClock{{msi}}(MsiFrequency msi_frequency, uint32_t waitCycles)
+{
+	bool retval;
+	uint32_t waitCycles_ = waitCycles;
+	while ((not (retval = (((RCC->CR & RCC_CR_MSI{{msi}}ON) == 0) || ((RCC->CR & RCC_CR_MSI{{msi}}RDY) == RCC_CR_MSI{{msi}}RDY)))) || --waitCycles_)
+		;
+	if (!retval)
+		return false;
+	RCC->ICSCR1 = (RCC->ICSCR1 & ~RCC_ICSCR1_MSI{{msi}}RANGE_Msk) | RCC_ICSCR1_MSIRGSEL | (static_cast<uint32_t>(msi_frequency) << RCC_ICSCR1_MSI{{msi}}RANGE_Pos);
+	RCC->CR |= RCC_CR_MSI{{msi}}ON;
+	waitCycles_ = waitCycles;
+	while (not (retval = (RCC->CR & RCC_CR_MSI{{msi}}RDY)) and --waitCycles)
+		;
+	return retval;
+}
+
+%% endfor
+%% endif
+
 bool
 Rcc::enableExternalClock(uint32_t waitCycles)
 {
@@ -111,12 +124,14 @@ Rcc::enableExternalCrystal(uint32_t waitCycles)
 	return retval;
 }
 
+
+%% set lsi_cr="BDCR" if target.family in ["u5"] else "CSR"
 bool
 Rcc::enableLowSpeedInternalClock(uint32_t waitCycles)
 {
 	bool retval;
-	RCC->CSR |= RCC_CSR_LSION;
-	while (not (retval = (RCC->CSR & RCC_CSR_LSIRDY)) and --waitCycles)
+	RCC->{{lsi_cr}} |= RCC_{{lsi_cr}}_LSION;
+	while (not (retval = (RCC->{{lsi_cr}} & RCC_{{lsi_cr}}_LSIRDY)) and --waitCycles)
 		;
 	return retval;
 }
@@ -170,6 +185,51 @@ Rcc::enablePll{{id}}(PllSource source, const PllFactors& pllFactors, uint32_t wa
 	// enable pll
 	RCC->CR |= RCC_CR_PLL{{id}}ON;
 
+	while (not (tmp = (RCC->CR & RCC_CR_PLL{{id}}RDY)) and --waitCycles)
+		;
+
+	return tmp;
+%% elif target.family in ["u5"]
+	RCC->PLL{{id}}CFGR = 0;
+
+	%% if id == "1"
+	// Voltage scaling is selected through the VOS[1:0] bits in the PWR_VOSR
+	// register. The EPOD (embedded power distribution) booster must be enabled
+	// and ready before increasing the system clock frequency above 55 MHz in
+	// range 1 and range 2.
+	//
+	// Configure the PLL1MBOOST in RCC->PLL1CFGR to generate a booster clock
+	// frequency between 4 and 16 MHz
+	RCC->PLL1CFGR = (RCC->PLL1CFGR & ~RCC_PLL1CFGR_PLL1MBOOST_Msk) | uint32_t(pllFactors.epodPrescaler);
+	%% endif
+
+	// Select clock source
+	RCC->PLL{{id}}CFGR |= (uint32_t(source) & RCC_PLL{{id}}CFGR_PLL{{id}}SRC_Msk);
+
+	// Init pre-divider
+	RCC->PLL{{id}}CFGR |= ((uint32_t(pllFactors.pllM - 1u) << RCC_PLL{{id}}CFGR_PLL{{id}}M_Pos) & RCC_PLL{{id}}CFGR_PLL{{id}}M_Msk);
+
+	// Set PLL fractional value
+	RCC->PLL{{id}}FRACR = pllFactors.pllFrac << RCC_PLL{{id}}FRACR_PLL{{id}}FRACN_Pos;
+
+	// PLL config
+	RCC->PLL{{id}}CFGR |= (uint32_t(pllFactors.range) << RCC_PLL{{id}}CFGR_PLL{{id}}RGE_Pos) |
+		((pllFactors.pllFrac > 0) ? RCC_PLL{{id}}CFGR_PLL{{id}}FRACEN : 0) |
+		RCC_PLL{{id}}CFGR_PLL{{id}}PEN |
+		RCC_PLL{{id}}CFGR_PLL{{id}}QEN |
+		RCC_PLL{{id}}CFGR_PLL{{id}}REN;
+
+	// Set PLL Dividers
+	RCC->PLL{{id}}DIVR =
+			((uint32_t(pllFactors.pllR - 1u) << RCC_PLL{{id}}DIVR_PLL{{id}}R_Pos) & RCC_PLL{{id}}DIVR_PLL{{id}}R_Msk) |
+			((uint32_t(pllFactors.pllQ - 1u) << RCC_PLL{{id}}DIVR_PLL{{id}}Q_Pos) & RCC_PLL{{id}}DIVR_PLL{{id}}Q_Msk) |
+			((uint32_t(pllFactors.pllP - 1u) << RCC_PLL{{id}}DIVR_PLL{{id}}P_Pos) & RCC_PLL{{id}}DIVR_PLL{{id}}P_Msk) |
+			((uint32_t(pllFactors.pllN - 1u) << RCC_PLL{{id}}DIVR_PLL{{id}}N_Pos) & RCC_PLL{{id}}DIVR_PLL{{id}}N_Msk);
+
+	// enable pll
+	RCC->CR |= RCC_CR_PLL{{id}}ON;
+
+	uint32_t tmp;
 	while (not (tmp = (RCC->CR & RCC_CR_PLL{{id}}RDY)) and --waitCycles)
 		;
 
@@ -427,9 +487,24 @@ Rcc::setVoltageScaling(VoltageScaling voltage, uint32_t waitCycles)
 		if (--waitCycles == 0) return false;
 	return true;
 }
-%% endif
+%% elif target.family in ["u5"]
+bool
+Rcc::setVoltageScaling(VoltageScaling voltage, uint32_t waitCycles)
+{
+	const auto currentSetting = PWR->VOSR & PWR_VOSR_VOS_Msk;
+	if (voltage == static_cast<VoltageScaling>(currentSetting)) {
+		return true;
+	}
+	const bool sysclkOver55MHz = (voltage == VoltageScaling::Range1) || (voltage == VoltageScaling::Range2);
+	const uint32_t boosten = sysclkOver55MHz ? PWR_VOSR_BOOSTEN : 0;
+	PWR->VOSR = (PWR->VOSR & ~PWR_VOSR_VOS_Msk) | uint32_t(voltage) | boosten;
 
-%% if target.family == "h7"
+	const uint32_t rdy = sysclkOver55MHz ? (PWR_VOSR_BOOSTEN | PWR_VOSR_VOSRDY) : PWR_VOSR_VOSRDY;
+	while (PWR->VOSR & rdy)
+		if (--waitCycles == 0) return false;
+	return true;
+}
+%% elif target.family == "h7"
 bool
 Rcc::setVoltageScaling(VoltageScaling voltage, uint32_t waitCycles)
 {
@@ -501,15 +576,16 @@ Rcc::setHsiPredivider4Enabled(bool divideBy4, uint32_t waitCycles)
 }
 %% endif
 
-// ----------------------------------------------------------------------------
+
+%% set sysclksrcf_cfgr="CFGR1" if target.family in ["u5"] else "CFGR"
 bool
 Rcc::enableSystemClock(SystemClockSource src, uint32_t waitCycles)
 {
-	RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_SW) | uint32_t(src);
+	RCC->{{sysclksrcf_cfgr}} = (RCC->{{sysclksrcf_cfgr}} & ~RCC_{{sysclksrcf_cfgr}}_SW) | uint32_t(src);
 
 	// Wait till the main PLL is used as system clock source
-	src = SystemClockSource(uint32_t(src) << 2);
-	while ((RCC->CFGR & RCC_CFGR_SWS) != uint32_t(src))
+	src = SystemClockSource(uint32_t(src) << RCC_{{sysclksrcf_cfgr}}_SWS_Pos);
+	while ((RCC->{{sysclksrcf_cfgr}} & RCC_{{sysclksrcf_cfgr}}_SWS) != uint32_t(src))
 		if (not --waitCycles) return false;
 
 	return true;

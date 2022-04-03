@@ -126,7 +126,7 @@ def common_header_file(env):
     define = None
 
     content = Path(localpath(folder, family_header)).read_text(encoding="utf-8", errors="replace")
-    match = re.findall(r"if defined\((?P<define>STM32[FLGH][\w\d]+)\)", content)
+    match = re.findall(r"if defined\((?P<define>STM32[FGHLU][\w\d]+)\)", content)
     define = getDefineForDevice(device.identifier, match)
     if define is None or match is None:
         raise ValidateException("No device define found for '{}'!".format(device.partname))

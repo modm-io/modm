@@ -67,7 +67,14 @@ def build(env):
     properties["hsi48"] = \
         (target["family"] == "f0" and target["name"] in ["42", "48", "71", "72", "78", "91", "98"]) or \
         (target["family"] == "l4" and target["name"][0] not in ["7", "8"]) or \
-        (target["family"] == "l5")
+        (target["family"] == "l5") or \
+        (target["family"] == "u5")
+    if target["family"] in ["l4", "l5"]:
+        properties["hsi48_cr"] = "CRRCR"
+    elif target["family"] in ["u5"]:
+        properties["hsi48_cr"] = "CR"
+    else:
+        properties["hsi48_cr"] = "CR2"
     properties["pll_p"] = ((target["family"] == "l4" and target["name"] not in ["12", "22"]) or target["family"] == "g4")
     properties["overdrive"] = (target["family"] == "f7") or \
         ((target["family"] == "f4") and target["name"] in ["27", "29", "37", "39", "46", "69", "79"])
@@ -77,21 +84,38 @@ def build(env):
         (target["family"] == "l4" and target["name"][0] in ["p", "q", "r", "s"])
     properties["pllsai_p_usb"] = (target["family"] == "f7") or \
         ((target["family"] == "f4") and target["name"] in ["46", "69", "79"])
-    properties["cfgr1"] = ("CDCFGR1" if target.name in ["a0", "a3", "b0", "b3"] else "D1CFGR") \
-                           if target.family == "h7" else "CFGR"
+
+    if target.family in ["h7"]:
+        if target.name in ["a0", "a3", "b0", "b3"]:
+            properties["cfgr_prescaler"] = "CDCFGR1"
+        else:
+            properties["cfgr_prescaler"] = "D1CFGR"
+    elif target.family in ["u5"]:
+        properties["cfgr_prescaler"] = "CFGR2"
+    else:
+        properties["cfgr_prescaler"] = "CFGR"
+
+    if target.family in ["h7"]:
+        if target.name in ["a0", "a3", "b0", "b3"]:
+            properties["cfgr2"] = "CDCFGR2"
+        else:
+            properties["cfgr2"] = "D2CFGR"
+    elif target.family in ["u5"]:
+        properties["cfgr2"] = "CFGR2"
+    else:
+        properties["cfgr2"] = "CFGR"
+
     properties["d1"] = ("CD" if target.name in ["a0", "a3", "b0", "b3"] else "D1") \
                         if target.family == "h7" else ""
-    properties["cfgr2"] = ("CDCFGR2" if target.name in ["a0", "a3", "b0", "b3"] else "D2CFGR") \
-                           if target.family == "h7" else "CFGR"
     properties["d2"] = ("CD" if target.name in ["a0", "a3", "b0", "b3"] else "D2") \
                         if target.family == "h7" else ""
     properties["cfgr3"] = ("SRDCFGR" if target.name in ["a0", "a3", "b0", "b3"] else "D3CFGR")
     properties["d3"] = ("SRD" if target.name in ["a0", "a3", "b0", "b3"] else "D3")
     properties["bdcr"] = "CSR" if target.family in ["l0", "l1"] else "BDCR"
-    properties["pll_ids"] = ["1", "2", "3"] if target.family == "h7" else [""]
+    properties["pll_ids"] = ["1", "2", "3"] if target.family in ["h7", "u5"] else [""]
     properties["has_smps"] = target["family"] == "h7" and (target["name"] in ["25", "35", "45", "47", "55", "57"] or \
         (target["name"] in ["30", "a3", "b0", "b3"] and target["variant"] == "q"))
-    properties["ccipr1"] = "CCIPR1" if target.family == "l5" else "CCIPR"
+    properties["ccipr1"] = "CCIPR1" if target.family in ["l5", "u5"] else "CCIPR"
 
     flash_latencies = {}
     for vcore in device.get_driver("flash")["latency"]:
@@ -156,8 +180,11 @@ def build(env):
         if "Eth" in all_peripherals and per == "ETHMAC":
             per = "Eth"
         # Fix USBOTG OTG
+        if target.family == "u5" and per == "OTG":
+            per = "Usbotgfs"
         if "Usbotgfs" in all_peripherals and per.startswith("OTG"):
-            if per == "OTGH": per = "OTGHS";
+            if per == "OTGH":
+                per = "OTGHS"
             per = "USB"+per
         if "Usbotgfs" in all_peripherals and per.startswith("USB"):
             per = per.replace("USB1", "USB").replace("USB2", "USB")
