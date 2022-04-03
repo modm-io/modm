@@ -119,6 +119,12 @@ run-nucleo-l552ze-q:
 	$(call run-test,nucleo-l552ze-q,size)
 
 
+compile-nucleo-u575zi-q:
+	$(call compile-test,nucleo-u575zi-q,size)
+run-nucleo-u575zi-q:
+	$(call run-test,nucleo-u575zi-q,size)
+
+
 compile-al-avreb-can:
 	$(call compile-test,al-avreb-can,size)
 run-al-avreb-can:

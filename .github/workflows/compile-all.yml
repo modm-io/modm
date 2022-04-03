@@ -526,6 +526,32 @@ jobs:
           name: stm32l5-compile-all
           path: test/all/log
 
+  stm32u5-compile-all:
+    if: github.event.label.name == 'ci:hal'
+    runs-on: ubuntu-22.04
+    container:
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-01-08
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
+        run: |
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
+      - name: Compile HAL for all STM32U5
+        run: |
+          (cd test/all && python3 run_all.py stm32u5 --quick-remaining)
+      - name: Upload log artifacts
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: stm32u5-compile-all
+          path: test/all/log
+
   stm32g0-compile-all:
     if: github.event.label.name == 'ci:hal'
     runs-on: ubuntu-22.04
