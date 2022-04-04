@@ -105,7 +105,8 @@ def build(env):
             tusb_config["CFG_TUSB_MCU"] = "OPT_MCU_SAMG"
             env.copy("tinyusb/src/portable/microchip/samg/", "portable/microchip/samg/")
         else:
-            tusb_config["CFG_TUSB_MCU"] = "OPT_MCU_SAM{}{}".format(target.family.upper(), target.series.upper())
+            series = "5X" if target.family == "e" and target.series[0] == "5" else target.series.upper()
+            tusb_config["CFG_TUSB_MCU"] = "OPT_MCU_SAM{}{}".format(target.family.upper(), series)
             env.copy("tinyusb/src/portable/microchip/samd/", "portable/microchip/samd/")
 
     elif target.platform == "rp":
@@ -181,6 +182,8 @@ def build(env):
         irqs = irq_data["port_irqs"][speed]
     elif target.platform == "sam" and target.family in ["g"]:
         irqs = ["UDP"]
+    elif target.platform == "sam" and target.family in ["d", "e"] and target.series[0] == "5":
+        irqs = ["USB_OTHER", "USB_SOF_HSOF", "USB_TRCPT0", "USB_TRCPT1"]
     elif target.platform == "rp" and target.family in ["20"]:
         irqs = ["USBCTRL_IRQ"]
     else:

@@ -46,7 +46,14 @@ public:
 		PM->APBBMASK.reg |= PM_APBBMASK_USB;
 		PM->AHBMASK.reg |= PM_AHBMASK_USB;
 		GenericClockController::connect<ClockPeripheral::Usb>(ClockGenerator::System);
+%% if target["series"][0] == "5"
+		NVIC_SetPriority(USB_0_IRQn, priority);
+		NVIC_SetPriority(USB_1_IRQn, priority);
+		NVIC_SetPriority(USB_2_IRQn, priority);
+		NVIC_SetPriority(USB_3_IRQn, priority);
+%% else
 		NVIC_SetPriority(USB_IRQn, priority);
+%% endif
 %% endif
 	}
 

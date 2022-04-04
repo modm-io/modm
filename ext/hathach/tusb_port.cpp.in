@@ -66,7 +66,7 @@ tusb_get_device_serial(uint16_t *serial_str)
 		((uint32_t *) UID_BASE), ((uint32_t *) UID_BASE) + 1,
 		((uint32_t *) UID_BASE) + 2, ((uint32_t *) UID_BASE) + 3
 	%% elif target.platform in ["sam"]
-		%% if "samd51" in target.string
+		%% if "samd51" in target.string or "same5" in target.string
 		(uint32_t *)0x008061FC, (uint32_t *)0x00806010,
 		(uint32_t *)0x00806014, (uint32_t *)0x00806018
 		%% else
