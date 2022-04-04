@@ -73,7 +73,7 @@ ClockGen::masterClkFrequency()
 %% if target.family in ["g"]
 		case MasterClkSource::PLLB_CLK:
 			return pllBFrequency() / div;
-%% elif target.family in ["v"]
+%% elif target.series[0] == "7"
 		case MasterClkSource::UPLL_CLK:
 			return 240'000'000;  // UPLLDIV2
 %% endif
@@ -115,7 +115,7 @@ ClockGen::pllAFrequency()
 %% if target.family in ["g"]
 	uint32_t freq = SlowClkFreqHz * mul;
 	if(PMC->PMC_MCKR & PMC_MCKR_PLLADIV2) freq /= 2;
-%% elif target.family in ["v"]
+%% elif target.series[0] == "7"
 	uint32_t freq = mainClkFrequency() * mul;
 	const auto diva = ((PMC->CKGR_PLLAR & CKGR_PLLAR_DIVA_Msk) >> CKGR_PLLAR_DIVA_Pos);
 	if (diva == 0) return 0;  // PLLA is disabled

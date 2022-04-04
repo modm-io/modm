@@ -100,6 +100,8 @@ def build(env):
                 signal["index"] = int(signal["index"])
                 p_signal.add(signal["index"])
             signals.append(signal)
+        # remove duplicated dicts from list of dicts
+        signals = [dict(t) for t in {tuple(d.items()) for d in signals}]
         gpio["signal"] = signals
 
     # add peripherals without gpio signals
