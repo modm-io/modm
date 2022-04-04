@@ -18,7 +18,8 @@ def _get_properties(env, instance=None):
         "peripheral" : peripheral,
         "id" : instance,
         "prefix" : "US",
-        "sr" : "CSR"
+        "sr" : "CSR",
+        "target" : device.identifier
     }
 
 

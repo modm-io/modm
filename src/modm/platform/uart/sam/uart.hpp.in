@@ -20,6 +20,11 @@
 
 %% set name="{}{}".format(type.capitalize(), id)
 %% set reg=name.upper()
+%% if type == "usart" and target.family == "e" and target.variant == "b"
+%% set reg_suffix="_USART"
+%% else
+%% set reg_suffix=""
+%% endif
 
 namespace modm::platform
 {
@@ -35,7 +40,7 @@ namespace modm::platform
  * @author		Christopher Durand
  * @ingroup		modm_platform_{{type}} modm_platform_{{type}}_{{id}}
  */
-class {{ name }} : public {{ type }}Base, public modm::Uart
+class {{ name }} : public {{ type | capitalize }}Base, public modm::Uart
 {
 private:
 	// prevent name collision between ::Uart* from SAM header with modm::Uart
@@ -104,16 +109,16 @@ public:
 
 %% if type == "usart"
 		// Use 8x oversampling (this affects baud rate generation)
-		Regs()->{{ prefix }}_MR = {{ prefix }}_MR_OVER;
+		Regs()->{{ prefix }}_MR = {{ prefix }}_MR{{reg_suffix}}_OVER;
 %% endif
 
 		setParity(parity);
 %% if type == "usart"
 		setWordLength(length);
 %% endif
-		Regs()->{{ prefix }}_CR = {{ prefix }}_CR_RXEN | {{ prefix }}_CR_TXEN;
+		Regs()->{{ prefix }}_CR = {{ prefix }}_CR_RXEN_Msk | {{ prefix }}_CR_TXEN_Msk;
 		// Enable rx interrupt
-		Regs()->{{ prefix }}_IER = {{ prefix }}_IER_RXRDY;
+		Regs()->{{ prefix }}_IER = {{ prefix }}_IER_RXRDY_Msk;
 
 		// Enable the IRQ
 		NVIC_SetPriority({{ peripheral | upper }}{{ id }}_IRQn, irq_priority);
@@ -138,9 +143,9 @@ public:
 	static void setWordLength(WordLength length);
 %% endif
 
-	static inline bool isTransmitReady() { return Regs()->{{ prefix }}_{{ sr }} & {{ prefix }}_{{ sr }}_TXRDY; }
+	static inline bool isTransmitReady() { return Regs()->{{ prefix }}_{{ sr }} & {{ prefix }}_{{ sr }}_TXRDY_Msk; }
 
-	static inline bool isReceiveReady() { return Regs()->{{ prefix }}_{{ sr }} & {{ prefix }}_{{ sr }}_RXRDY; }
+	static inline bool isReceiveReady() { return Regs()->{{ prefix }}_{{ sr }} & {{ prefix }}_{{ sr }}_RXRDY_Msk; }
 };
 
 } // namespace modm::platform

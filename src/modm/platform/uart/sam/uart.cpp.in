@@ -16,6 +16,11 @@
 
 %% set name="{}{}".format(type.capitalize(), id)
 %% set reg=name.upper()
+%% if type == "usart" and target.family == "e" and target.variant == "b"
+%% set reg_suffix="_USART"
+%% else
+%% set reg_suffix=""
+%% endif
 
 namespace
 {
@@ -34,7 +39,7 @@ MODM_ISR({{ peripheral | upper }}{{ id }})
 
 	if({{ name }}::isTransmitReady()) {
 		if(txBuffer.isEmpty()) {
-			{{ name }}::Regs()->{{ prefix }}_IDR = {{ prefix }}_IDR_TXRDY;
+			{{ name }}::Regs()->{{ prefix }}_IDR = {{ prefix }}_IDR_TXRDY_Msk;
 		} else {
 			{{ name }}::Regs()->{{ prefix }}_THR = txBuffer.get();
 			txBuffer.pop();
@@ -80,7 +85,7 @@ bool
 			return false;
 		}
 		// Enable tx interrupt
-		Regs()->{{ prefix }}_IER = {{ prefix }}_IER_TXRDY;
+		Regs()->{{ prefix }}_IER = {{ prefix }}_IER_TXRDY_Msk;
 	}
 	return true;
 }
@@ -112,7 +117,7 @@ void
 void
 {{ name }}::setParity(Parity parity)
 {
-	Regs()->{{ prefix }}_MR = (Regs()->{{ prefix }}_MR & ~{{ prefix }}_MR_PAR_Msk) | (uint32_t)parity;
+	Regs()->{{ prefix }}_MR = (Regs()->{{ prefix }}_MR & ~{{ prefix }}_MR{{reg_suffix}}_PAR_Msk) | (uint32_t)parity;
 }
 
 %% if type == "usart"
@@ -120,9 +125,9 @@ void
 {{ name }}::setWordLength(WordLength length)
 {
 	if(length == WordLength::Bit9) {
-		Regs()->{{ prefix }}_MR |= {{ prefix }}_MR_MODE9;
+		Regs()->{{ prefix }}_MR |= {{ prefix }}_MR{{reg_suffix}}_MODE9_Msk;
 	} else {
-		Regs()->{{ prefix }}_MR &= ~{{ prefix }}_MR_MODE9;
+		Regs()->{{ prefix }}_MR &= ~{{ prefix }}_MR{{reg_suffix}}_MODE9_Msk;
 		Regs()->{{ prefix }}_MR =
 			(Regs()->{{ prefix }}_MR & ~{{ prefix }}_MR_CHRL_Msk)
 				| {{ prefix }}_MR_CHRL((uint32_t)length);

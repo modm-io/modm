@@ -17,7 +17,8 @@ def _get_properties(env, instance=None):
         "peripheral" : "Uart",
         "id" : instance,
         "prefix" : "UART",
-        "sr" : "SR"
+        "sr" : "SR",
+        "target" : device.identifier
     }
 
 
