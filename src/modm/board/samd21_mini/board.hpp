@@ -97,8 +97,8 @@ initialize()
 inline void
 initializeUsbFs(uint8_t priority = 3)
 {
-	Usb::initialize<Board::SystemClock>(priority);
-	Usb::connect<GpioA24::Dm, GpioA25::Dp>();
+	modm::platform::Usb::initialize<Board::SystemClock>(priority);
+	modm::platform::Usb::connect<GpioA24::Dm, GpioA25::Dp>();
 }
 /// @}
 
