@@ -46,7 +46,8 @@ def build(env):
         "clock_map": env.query(":cmsis:device:clock-map"),
         "peripheral_clocks": driver["clock"],
         "clock_sources": driver["source"],
-        "generator_count": int(driver["generators"][0])
+        "generator_count": int(driver["generators"][0]),
+        "has_dpll": device_family in ["d2x", "e5x"]
     }
     env.outbasepath = "modm/src/modm/platform/clock"
     env.template("gclk.hpp.in")
