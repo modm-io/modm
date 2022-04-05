@@ -25,6 +25,7 @@ def prepare(module, options):
 
 def build(env):
     target = env[":target"].identifier
+    driver = env[":target"].get_driver("gclk")
 
     if target.family in ["d", "e"] and target.series.startswith("5"):
         device_family = "e5x"
@@ -42,7 +43,10 @@ def build(env):
         "target": target,
         "boot_frequency": boot_frequency,
         "device_family": device_family,
-        "clock_map": env.query(":cmsis:device:clock-map")
+        "clock_map": env.query(":cmsis:device:clock-map"),
+        "peripheral_clocks": driver["clock"],
+        "clock_sources": driver["source"],
+        "generator_count": int(driver["generators"][0])
     }
     env.outbasepath = "modm/src/modm/platform/clock"
     env.template("gclk.hpp.in")
