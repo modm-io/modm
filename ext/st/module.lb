@@ -124,6 +124,7 @@ def common_header_file(env):
     family_header = folder + ".h"
     folder = "stm32/{}/Include".format(folder)
     define = None
+    core_define = "CORE_CM{}".format(core) if device.identifier.get("core") else None
 
     content = Path(localpath(folder, family_header)).read_text(encoding="utf-8", errors="replace")
     match = re.findall(r"if defined\((?P<define>STM32[FLGH][\w\d]+)\)", content)
@@ -136,6 +137,7 @@ def common_header_file(env):
     headers = {
         "define": define,
         "family_define": family_define,
+        "core_define": core_define,
         "core_header": core_header,
         "device_header": device_header,
         "family_header": family_header,
@@ -179,7 +181,7 @@ def build(env):
     env.substitutions = bprops
     env.substitutions.update({
         "headers": [bprops["device_header"], bprops["system_header"]],
-        "defines": [bprops["define"]],
+        "defines": [bprops["define"]] + ([bprops["core_define"]] if bprops["core_define"] is not None else []),
         "target": env[":target"].identifier,
     })
     env.outbasepath = "modm/src/modm/platform"
