@@ -78,9 +78,9 @@ git clone --recurse-submodules --jobs 8 https://github.com/modm-io/modm.git
 
 ## Microcontrollers
 
-modm can create a HAL for <!--allcount-->3287<!--/allcount--> devices of these vendors:
+modm can create a HAL for <!--allcount-->3385<!--/allcount--> devices of these vendors:
 
-- STMicroelectronics STM32: <!--stmcount-->2712<!--/stmcount--> devices.
+- STMicroelectronics STM32: <!--stmcount-->2810<!--/stmcount--> devices.
 - Microchip SAM: <!--samcount-->186<!--/samcount--> devices.
 - Microchip AVR: <!--avrcount-->388<!--/avrcount--> devices.
 - Raspberry Pi: <!--rpicount-->1<!--/rpicount--> device.
@@ -595,26 +595,27 @@ We have out-of-box support for many development boards including documentation.
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-h723zg">NUCLEO-H723ZG</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-h743zi">NUCLEO-H743ZI</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-h755zi-q">NUCLEO-H755ZI-Q</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l031k6">NUCLEO-L031K6</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l053r8">NUCLEO-L053R8</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l152re">NUCLEO-L152RE</a></td>
-<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l432kc">NUCLEO-L432KC</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l432kc">NUCLEO-L432KC</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l452re">NUCLEO-L452RE</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l476rg">NUCLEO-L476RG</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l496zg-p">NUCLEO-L496ZG-P</a></td>
-<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l552ze-q">NUCLEO-L552ZE-Q</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l552ze-q">NUCLEO-L552ZE-Q</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-olimexino-stm32">OLIMEXINO-STM32</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-raspberrypi">Raspberry Pi</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-rp-pico">Raspberry Pi Pico</a></td>
-<td align="center"><a href="https://modm.io/reference/config/modm-samd21-mini">SAMD21-MINI</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/config/modm-samd21-mini">SAMD21-MINI</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-samg55-xplained-pro">SAMG55-XPLAINED-PRO</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-srxe">Smart Response XE</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-stm32_f4ve">STM32-F4VE</a></td>
-<td align="center"><a href="https://modm.io/reference/config/modm-stm32f030_demo">STM32F030-DEMO</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/config/modm-stm32f030_demo">STM32F030-DEMO</a></td>
 </tr>
 </table>
 <!--/bsptable-->
