@@ -1,0 +1,10 @@
+<library>
+  <extends>modm:nucleo-h755zi-q</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_h755zi-q/blink_cm4</option>
+    <option name="modm:target">stm32h755zit6@m4</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+  </modules>
+</library>
