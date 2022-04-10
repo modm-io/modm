@@ -59,4 +59,6 @@ modm_gpio_enable(void)
 %% endfor
 }
 
+%% if not (target.family == "h7" and target.name in ["45", "47", "55", "57"] and target.core == "m4")
 MODM_HARDWARE_INIT_ORDER(modm_gpio_enable, 80);
+%% endif

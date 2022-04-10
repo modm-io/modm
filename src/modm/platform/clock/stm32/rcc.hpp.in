@@ -865,6 +865,17 @@ public:
 	setVoltageScaling(VoltageScaling voltage, uint32_t waitCycles = 2048);
 %% endif
 
+%% if target.family == "h7" and target.name in ["45", "47", "55", "57"] and target.core == "m7"
+	/**
+	 * Release lock in Cortex-M4 startup code to continue boot. Call this function
+	 * after system initialization has been completed.
+	 *
+	 * In case automatic Cortex-M4 boot is disabled in the option bytes, the core will
+	 * be enabled.
+	 */
+	static void bootCortexM4();
+%% endif
+
 public:
 	/** Set flash latency for CPU frequency and voltage.
 	 * Does nothing if CPU frequency is too high for the available
