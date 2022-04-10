@@ -1,0 +1,67 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2022, Christopher Durand
+# Copyright (c) 2016-2018, Niklas Hauser
+# Copyright (c) 2017, Fabian Greif
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":board:nucleo-h755zi-q"
+    module.description = """\
+# NUCLEO-H755ZI-Q
+
+[Nucleo kit for STM32H755ZI-Q](https://www.st.com/en/evaluation-tools/nucleo-h755zi-q.html)
+
+The "modm:target" has to be configured in `project.xml` to select between the
+Cortex-M7 and Cortex-M4 applications:
+
+```xml
+<library>
+  <extends>modm:nucleo-h755zi-q</extends>
+  <options>
+   <!-- configure target core, "m7" or "m4" -->
+    <option name="modm:target">stm32h755zit6@m7</option>
+  </options>
+  …
+</library>
+```
+
+The STLink UART logger is only available from the Cortex-M7 core.
+
+This BSP assumes the default boot addresses are configured in the option bytes
+for both cores.
+
+"""
+
+def prepare(module, options):
+    if not options[":target"].partname.startswith("stm32h755zit"):
+        return False
+
+    module.depends(
+        ":debug",
+        ":architecture:clock",
+        ":platform:core",
+        ":platform:gpio",
+        ":platform:clock",
+        ":platform:uart:3",
+        ":platform:usb:fs")
+
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/board"
+    env.substitutions = {
+        "with_logger": env[":target"].identifier.core == "m7",
+        "with_assert": env.has_module(":architecture:assert")
+    }
+    env.template("../board.cpp.in", "board.cpp")
+    env.copy('.')
+    env.copy("../nucleo144_arduino_h745_55.hpp", "nucleo144_arduino_h745_55.hpp")
+    env.collect(":build:openocd.source", "board/st_nucleo_h745zi.cfg");
