@@ -64,7 +64,7 @@ def filtered_glob(env, pattern, omit=None, ondisk=True, source=False, strings=Fa
 
 
 def run_program(env, program):
-    return env.Command('thisfileshouldnotexist',
+    return env.Command('phony_target',
                        program,
                        '@"%s"' % program[0].abspath)
 
