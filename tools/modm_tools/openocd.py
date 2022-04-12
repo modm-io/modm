@@ -25,6 +25,14 @@ You can also reset the target:
 python3 modm/modm_tools/openocd.py -f modm/openocd.cfg --reset
 ```
 
+You can use a different OpenOCD binary by setting the `MODM_OPENOCD_BINARY`
+environment variable before calling this script. This can be useful when
+using a custom OpenOCD build for specific targets.
+
+```sh
+export MODM_OPENOCD_BINARY=/path/to/other/openocd
+```
+
 (\* *only ARM Cortex-M targets*)
 """
 
@@ -78,7 +86,10 @@ def call(commands=None, config=None, search=None, blocking=True, silent=False, v
     # See http://openocd.org/doc/html/Running.html
     # os.environ.get("OPENOCD_SCRIPTS", "")
 
-    command_openocd = "openocd {} {} {}".format(
+    binary = os.environ.get("MODM_OPENOCD_BINARY", "openocd")
+
+    command_openocd = "{} {} {} {}".format(
+        binary,
         " ".join(map('-s "{}"'.format, search)),
         " ".join(map('-f "{}"'.format, config)),
         " ".join(map('-c "{}"'.format, commands))

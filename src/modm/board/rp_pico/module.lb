@@ -21,11 +21,62 @@ See https://www.raspberrypi.com/products/raspberry-pi-pico
 
 ## Programming
 
+### UF2
+
 The RP2040 ships with a [UF2 bootloader in ROM](https://github.com/microsoft/uf2).
 
 To upload your application, connect the RP2040 via USB, convert the ELF to UF2
 format by calling `scons uf2` or `make uf2` and copy the generated `.uf2` file
 to the mounted virtual disk.
+
+
+### OpenOCD
+
+Another option is to use Picoprobe and custom version of OpenOCD provided by RPi.
+
+You would need to build and program one of the boards with the Picoprobe firmware,
+configure and build RPi OpenOCD, and connect the boards via SWD.
+The wiring diagram and detailed description is available in the
+[Pico Documentation](https://datasheets.raspberrypi.com/pico/getting-started-with-pico.pdf#Appendix%20A:%20Using%20Picoprobe).
+
+The how-to shows steps for building and installing the RPi OpenOCD into your
+system globally, however, if you still want to be able to work with other OpenOCD
+binaries, you should only install it locally:
+
+```sh
+sudo apt install automake autoconf build-essential texinfo libtool libftdi-dev libusb-1.0-0-dev
+
+cd ~/pico
+git clone https://github.com/raspberrypi/openocd.git --branch rp2040 --depth=1 --no-single-branch
+
+cd openocd
+./bootstrap
+
+mkdir build
+cd build
+../configure --enable-picoprobe --prefix=$(realpath ../install)
+
+make -j4
+make install
+```
+
+[Additional steps are needed](https://forums.raspberrypi.com/viewtopic.php?t=312867)
+to get access to the device from a non-privileged user on Linux.
+Edit or create the `/etc/udev/rules.d/60-openocd.rules` file and append these
+lines to it:
+
+```
+# Raspberry Pi Picoprobe
+ATTRS{idVendor}=="2e8a", ATTRS{idProduct}=="0004", MODE="660", GROUP="plugdev", TAG+="uaccess"
+```
+
+Once you have both of your Pico boards connected according to the wiring diagram,
+you can run `scons program` to program the dev board:
+
+```sh
+export MODM_OPENOCD_BINARY=$HOME/pico/openocd/install/bin/openocd
+scons program
+```
 """
 
 def prepare(module, options):
@@ -49,3 +100,6 @@ def build(env):
     env.template("../board.cpp.in", "board.cpp")
     env.copy('.')
 
+    env.outbasepath = "modm/openocd/modm/board/"
+    env.copy(repopath("tools/openocd/modm/rp2040_picoprobe.cfg"), "rp2040_picoprobe.cfg")
+    env.collect(":build:openocd.source", "modm/board/rp2040_picoprobe.cfg")
