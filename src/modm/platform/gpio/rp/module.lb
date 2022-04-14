@@ -36,7 +36,7 @@ def init(module):
 
 
 def prepare(module, options):
-    module.depends(":architecture:gpio", ":cmsis:device", ":math:utils")
+    module.depends(":architecture:register", ":architecture:gpio", ":cmsis:device", ":math:utils")
     return options[":target"].has_driver("gpio:rp*")
 
 
@@ -53,6 +53,18 @@ def build(env):
         "pads_names": {
             "Bank0": "bank0",
             "Qspi": "_qspi"
+        },
+        "intreg_ctrl_names": {
+            "Bank0": "irq_ctrl",
+            "Qspi": "qspi_ctrl"
+        },
+        "intreg_pin_access": {
+            "Bank0": "[pin / 8]",
+            "Qspi": ""
+        },
+        "intreg_pin_mask_shift": {
+            "Bank0": "(pin % 8)",
+            "Qspi": "pin"
         },
         "port_width": 32
     }
@@ -86,6 +98,7 @@ def build(env):
     subs["target"] = device.identifier
     subs["all_signals"] = all_signals
     subs["gpios"] = [subs[gpio["name"].capitalize()] for gpio in driver["gpio"]]
+    subs["multicore_enabled"] = env.has_module(":platform:multicore")
 
     env.substitutions = subs
     env.outbasepath = "modm/src/modm/platform/gpio"

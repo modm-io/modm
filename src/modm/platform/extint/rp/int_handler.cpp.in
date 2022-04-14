@@ -1,0 +1,98 @@
+/*
+ * Copyright (c) 2022, Nikolay Semenov
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#include <modm/platform/extint/int_handler.hpp>
+
+namespace modm::platform
+{
+
+%% if with_bank0
+void
+IntHandler::irqBank0Handler()
+{
+	using PortRegs = Gpio::PortRegs<Gpio::Port::Bank0>;
+
+	static_assert(0b1111u == static_cast<uint32_t>(Gpio::InputTrigger::All));
+
+%% if multicore_enabled
+	auto& proc_irq_ctrl = sio_hw->cpuid ? iobank0_hw->proc1_irq_ctrl : iobank0_hw->proc0_irq_ctrl;
+%% else
+	auto& proc_irq_ctrl = iobank0_hw->proc0_irq_ctrl;
+%% endif
+
+	for (size_t group = 0; group < NUM_BANK0_GPIOS / 8; ++group)
+	{
+		if (uint32_t int_status = proc_irq_ctrl.ints[group])
+		{
+			for (uint8_t pin = group * 8; int_status; ++pin, int_status >>= 4)
+			{
+				if (uint32_t triggers = int_status & 0b1111u)
+				{
+					PortRegs::acknowledge_irq(pin, static_cast<Gpio::InputTrigger>(triggers));
+					if (auto& handler = bank0Handlers[pin])
+					{
+						handler(static_cast<Gpio::InputTrigger>(triggers));
+					}
+				}
+			}
+		}
+	}
+}
+
+%% endif
+
+%% if with_qspi
+void
+IntHandler::irqQspiHandler()
+{
+	using PortRegs = Gpio::PortRegs<Gpio::Port::Qspi>;
+
+	static_assert(NUM_QSPI_GPIOS <= 8);
+	static_assert(0b1111u == static_cast<uint32_t>(Gpio::InputTrigger::All));
+
+%% if multicore_enabled
+	auto& proc_irq_ctrl = sio_hw->cpuid ? ioqspi_hw->proc1_qspi_ctrl : ioqspi_hw->proc0_qspi_ctrl;
+%% else
+	auto& proc_irq_ctrl = ioqspi_hw->proc0_qspi_ctrl;
+%% endif
+
+	uint32_t int_status = proc_irq_ctrl.ints;
+
+	for (uint8_t pin = 0; int_status; ++pin, int_status >>= 4)
+	{
+		if (uint32_t triggers = int_status & 0b1111u)
+		{
+			PortRegs::acknowledge_irq(pin, static_cast<Gpio::InputTrigger>(triggers));
+			if (auto& handler = qspiHandlers[pin])
+			{
+				handler(static_cast<Gpio::InputTrigger>(triggers));
+			}
+		}
+	}
+}
+
+%% endif
+
+%% for type in types
+IntHandler::Handler
+IntHandler::{{type}}Handlers[NUM_{{type | upper}}_GPIOS] modm_fastdata;
+
+%% endfor
+
+%% for type in types
+MODM_ISR(IO_IRQ_{{type | upper}})
+{
+	IntHandler::irq{{type | capitalize}}Handler();
+}
+
+%% endfor
+
+}  // namespace modm::platform

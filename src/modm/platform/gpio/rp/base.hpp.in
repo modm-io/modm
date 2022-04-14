@@ -14,6 +14,8 @@
 
 #include <stdint.h>
 #include <tuple>
+
+#include <modm/architecture/interface/register.hpp>
 #include <modm/platform/core/peripherals.hpp>
 %% for port in ports
 #include <hardware/structs/io{{port | lower}}.h>
@@ -35,6 +37,22 @@ struct Gpio
 		PullDown = 0x2,  ///< pull-down on input
 	};
 
+	/// @ingroup modm_platform_extint
+	enum class
+	InputTrigger : uint32_t
+	{
+		None = 0x00u,
+		LowLevel = 0x01u,
+		HighLevel = 0x02u,
+		BothLevels = LowLevel | HighLevel,
+		FallingEdge = 0x04u,
+		RisingEdge = 0x08u,
+		BothEdges = FallingEdge | RisingEdge,
+		All = BothLevels | BothEdges,
+	};
+
+	MODM_FLAGS32(InputTrigger);
+
 	enum class
 	OutputType
 	{
@@ -47,6 +65,7 @@ struct Gpio
 		Slow = 0,
 		Fast = 1,
 	};
+
 	enum class
 	DriveStrength
 	{
@@ -55,6 +74,7 @@ struct Gpio
 		mA_8 = 2,
 		mA_12 = 3,
 	};
+
 	enum class
 	SlewRate : uint8_t
 	{
@@ -133,7 +153,33 @@ struct Gpio::PortRegs<Gpio::Port::{{ port | capitalize }}>
 			PADS_BANK0_GPIO0_SLEWFAST_BITS
 		);
 	}
+	static void enable_irq(uint8_t pin, InputTrigger_t triggers)
+	{
+		uint32_t value = triggers.value << 4 * {{intreg_pin_mask_shift[port]}};
+%% if multicore_enabled
+		auto& proc_irq_ctrl = sio_hw->cpuid ? io{{port | lower}}_hw->proc1_{{intreg_ctrl_names[port]}} : io{{port | lower}}_hw->proc0_{{intreg_ctrl_names[port]}};
+%% else
+		auto& proc_irq_ctrl = io{{port | lower}}_hw->proc0_{{intreg_ctrl_names[port]}};
+%% endif
+		hw_set_bits(&proc_irq_ctrl.inte{{intreg_pin_access[port]}}, value);
+	}
+	static void disable_irq(uint8_t pin, InputTrigger_t triggers)
+	{
+		uint32_t value = triggers.value << 4 * {{intreg_pin_mask_shift[port]}};
+%% if multicore_enabled
+		auto& proc_irq_ctrl = sio_hw->cpuid ? io{{port | lower}}_hw->proc1_{{intreg_ctrl_names[port]}} : io{{port | lower}}_hw->proc0_{{intreg_ctrl_names[port]}};
+%% else
+		auto& proc_irq_ctrl = io{{port | lower}}_hw->proc0_{{intreg_ctrl_names[port]}};
+%% endif
+		hw_clear_bits(&proc_irq_ctrl.inte{{intreg_pin_access[port]}}, value);
+	}
+	static void acknowledge_irq(uint8_t pin, InputTrigger_t triggers)
+	{
+		uint32_t value = triggers.value << 4 * {{intreg_pin_mask_shift[port]}};
+		io{{port | lower}}_hw->intr{{intreg_pin_access[port]}} = value;
+	}
 };
+
 %% endfor
 /// @endcond
 
