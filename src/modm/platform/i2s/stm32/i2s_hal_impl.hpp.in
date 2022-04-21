@@ -1,0 +1,118 @@
+/*
+ * Copyright (c) 2021, Marton Ledneczki
+ * Copyright (c) 2021-2022, Raphael Lehmann
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_STM32_I2S_HAL{{ id }}_HPP
+#	error 	"Don't include this file directly, use 'i2s_hal{{ id }}.hpp' instead!"
+#endif
+
+#include <modm/platform/clock/rcc.hpp>
+
+void inline
+modm::platform::I2sHal{{ id }}::enable()
+{
+	Rcc::enable<Peripheral::Spi{{ id }}>();
+	SPI{{ id }}->CR1 = 0;
+	SPI{{ id }}->I2SCFGR = SPI_I2SCFGR_I2SMOD;
+}
+
+void inline
+modm::platform::I2sHal{{ id }}::disable()
+{
+	SPI{{ id }}->I2SCFGR = 0;
+	Rcc::disable<Peripheral::Spi{{ id }}>();
+}
+
+void inline
+modm::platform::I2sHal{{ id }}::initialize( OddFactor oddFactor, uint8_t i2s_div,
+											MasterSelection masterSelection,
+											DirectionSelection directionSelection,
+											BitDepth bitDepth,
+											MasterClockOutput masterClockOutput,
+											I2sStandard i2sStandard,
+											ClockPolarity clockPolarity)
+{
+	enable();
+	// disable peripheral, and clear all fields except I2S mode bit
+	SPI{{ id }}->I2SCFGR = SPI_I2SCFGR_I2SMOD;
+	SPI{{ id }}->I2SPR = 0x0002; // = reset value acording to reference manual
+
+	// set parameters
+	SPI{{ id }}->I2SPR |= static_cast<uint32_t>(masterClockOutput) |
+	                      static_cast<uint32_t>(oddFactor) |
+						  i2s_div;
+	SPI{{ id }}->I2SCFGR |= static_cast<uint32_t>(masterSelection) |
+							static_cast<uint32_t>(directionSelection) |
+							static_cast<uint32_t>(bitDepth) |
+							static_cast<uint32_t>(i2sStandard) |
+							static_cast<uint32_t>(clockPolarity);
+}
+
+void inline
+modm::platform::I2sHal{{ id }}::start()
+{
+	SPI{{ id }}->I2SCFGR |= SPI_I2SCFGR_I2SE;
+}
+
+void inline
+modm::platform::I2sHal{{ id }}::enableDma(bool enable)
+{
+	if (enable) {
+		SPI{{ id }}->CR2 |= SPI_CR2_TXDMAEN;
+	}
+	else {
+		SPI{{ id }}->CR2 &= ~SPI_CR2_TXDMAEN;
+	}
+}
+
+void inline
+modm::platform::I2sHal{{ id }}::write(uint16_t sample)
+{
+	SPI{{ id }}->DR = sample;
+}
+
+void inline
+modm::platform::I2sHal{{ id }}::enableInterruptVector(bool enable, uint32_t priority)
+{
+	if (enable) {
+		// Set priority for the interrupt vector
+		NVIC_SetPriority(SPI{{ id }}_IRQn, priority);
+		// register IRQ at the NVIC
+		NVIC_EnableIRQ(SPI{{ id }}_IRQn);
+	}
+	else {
+		NVIC_DisableIRQ(SPI{{ id }}_IRQn);
+	}
+}
+
+void inline
+modm::platform::I2sHal{{ id }}::enableInterrupt(Interrupt_t interrupt)
+{
+	SPI{{ id }}->CR2 |= interrupt.value;
+}
+
+void inline
+modm::platform::I2sHal{{ id }}::disableInterrupt(Interrupt_t interrupt)
+{
+	SPI{{ id }}->CR2 &= ~interrupt.value;
+}
+
+modm::platform::I2sHal{{ id }}::InterruptFlag_t inline
+modm::platform::I2sHal{{ id }}::getInterruptFlags()
+{
+	return InterruptFlag_t(SPI{{ id }}->SR);
+}
+
+void inline
+modm::platform::I2sHal{{ id }}::acknowledgeInterruptFlag(InterruptFlag_t flags)
+{
+	SPI{{ id }}->SR = flags.value;
+}

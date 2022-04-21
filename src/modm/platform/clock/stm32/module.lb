@@ -77,6 +77,7 @@ def build(env):
         (target["family"] == "l4" and target["name"][0] in ["p", "q", "r", "s"])
     properties["pllsai_p_usb"] = (target["family"] == "f7") or \
         ((target["family"] == "f4") and target["name"] in ["46", "69", "79"])
+    properties["plli2s"] = (target["family"] == "f4" and target["name"] not in ["10"])
     properties["cfgr1"] = ("CDCFGR1" if target.name in ["a0", "a3", "b0", "b3"] else "D1CFGR") \
                            if target.family == "h7" else "CFGR"
     properties["d1"] = ("CD" if target.name in ["a0", "a3", "b0", "b3"] else "D1") \

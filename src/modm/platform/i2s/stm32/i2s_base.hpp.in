@@ -1,0 +1,120 @@
+/*
+ * Copyright (c) 2021, Marton Ledneczki
+ * Copyright (c) 2021-2022, Raphael Lehmann
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_STM32_I2S_BASE_HPP
+#define MODM_STM32_I2S_BASE_HPP
+
+#include <cstdint>
+#include "../device.hpp"
+#include <modm/architecture/interface/register.hpp>
+
+namespace modm::platform
+{
+
+/**
+ * Base class for the I2S classes
+ *
+ * Provides some common enum that do not depend on the specific I2S.
+ *
+ * @author Marton Ledneczki
+ * @ingroup	modm_platform_i2s
+ */
+class I2sBase
+{
+public:
+	enum class
+	Interrupt : uint32_t
+	{
+		RxBufferNotEmpty	= SPI_CR2_RXNEIE,
+		TxBufferEmpty		= SPI_CR2_TXEIE,
+		Error				= SPI_CR2_ERRIE,
+		RxDmaEnable			= SPI_CR2_RXDMAEN,
+		TxDmaEnable			= SPI_CR2_TXDMAEN,
+	};
+	MODM_FLAGS32(Interrupt);
+
+	enum class
+	InterruptFlag : uint32_t
+	{
+		TxBufferEmpty		= SPI_SR_TXE,
+		RxBufferNotEmpty	= SPI_SR_RXNE,
+		CrcError			= SPI_SR_CRCERR,
+		ModeFaultError		= SPI_SR_MODF,
+		OverrunError		= SPI_SR_OVR,
+		Busy				= SPI_SR_BSY,
+	};
+	MODM_FLAGS32(InterruptFlag);
+
+	enum class
+	MasterSelection : uint32_t
+	{
+		Slave	= 0b0, /// Configure I2S as Slave
+		Master	= SPI_I2SCFGR_I2SCFG_1, /// Configure I2S as Master
+	};
+
+	enum class
+	DirectionSelection : uint32_t
+	{
+		Transmitter	= 0b0, /// Configure I2S as Transmitter
+		Receiver	= SPI_I2SCFGR_I2SCFG_0, /// Configure I2S as Receiver
+	};
+
+	/// Data length to be transferred (with channel length options for 16-bit data length)
+	/// For all data lengths except 16 bit the channel length is fixed to 32 bit.
+	enum class
+	BitDepth : uint32_t
+	{
+		SixteenWithChannel16	= (0b00 << SPI_I2SCFGR_DATLEN_Pos) | (0b0 << SPI_I2SCFGR_CHLEN_Pos), /// 16 bit data length with 16 bit channel length
+		SixteenWithChannel32	= (0b00 << SPI_I2SCFGR_DATLEN_Pos) | (0b1 << SPI_I2SCFGR_CHLEN_Pos), /// 16 bit data length with 32 bit channel length
+		Twentyfour				= (0b01 << SPI_I2SCFGR_DATLEN_Pos), /// 24 bit data length with 32 bit channel length
+		Thirtytwo				= (0b10 << SPI_I2SCFGR_DATLEN_Pos), /// 32 bit data length with 32 bit channel length
+	};
+
+	/// Master clock output enable
+	enum class
+	MasterClockOutput : uint32_t
+	{
+		Disabled	= 0b0,
+		Enabled		= SPI_I2SPR_MCKOE,
+	};
+
+	enum class
+	OddFactor : uint32_t
+	{
+		Disabled	= 0,
+		Enabled		= SPI_I2SPR_ODD,
+	};
+
+	/// I2S standard selection (with frame synchronization options for PCM)
+	enum class
+	I2sStandard : uint32_t
+	{
+		Philips					= (0b00 << SPI_I2SCFGR_I2SSTD_Pos), /// I2S Philips
+		MsbJustified			= (0b01 << SPI_I2SCFGR_I2SSTD_Pos), /// MSB justified standard (left justified)
+		LsbJustified			= (0b10 << SPI_I2SCFGR_I2SSTD_Pos), /// LSB justified standard (right justified)
+		PcmWithShortFrameSync	= (0b11 << SPI_I2SCFGR_I2SSTD_Pos) | (0b0 << SPI_I2SCFGR_PCMSYNC_Pos), /// PCM with short frame synchronization
+		PcmWithLongFrameSync	= (0b11 << SPI_I2SCFGR_I2SSTD_Pos) | (0b1 << SPI_I2SCFGR_PCMSYNC_Pos), /// PCM with long frame synchronization
+	};
+
+	/// Steady state clock polarity
+	enum class
+	ClockPolarity : uint32_t
+	{
+		Low		= 0, /// clock steady state is low level
+		High	= SPI_I2SCFGR_CKPOL, /// clock steady state is high level
+	};
+};
+
+} // namespace modm::platform
+
+
+#endif // MODM_STM32_I2S_BASE_HPP

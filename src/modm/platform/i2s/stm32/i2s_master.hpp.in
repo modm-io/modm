@@ -1,0 +1,179 @@
+/*
+ * Copyright (C) 2021, Marton Ledneczki
+ * Copyright (c) 2021-2022, Raphael Lehmann
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_STM32_I2S_MASTER{{ id }}_HPP
+#define MODM_STM32_I2S_MASTER{{ id }}_HPP
+
+#include <cstdlib>
+
+#include <modm/architecture/interface/i2s_master.hpp>
+#include <modm/architecture/interface/peripheral.hpp>
+#include <modm/platform/gpio/connector.hpp>
+#include <modm/math/algorithm/prescaler.hpp>
+#include "i2s_hal_{{ id }}.hpp"
+
+namespace modm::platform
+{
+
+/**
+ * Inter-IC Sound (I2S) master driver
+ *
+ * @warning Only data output (e.g. to headphone/speaker DAC) functionality is currently implemented
+ *
+ * @tparam	DmaChannelTX DMA channel for sending
+ *
+ * @author	Marton Ledneczki
+ * @author	Raphael Lehmann
+ * @ingroup	modm_platform_i2s modm_platform_i2s_{{id}}
+ */
+template <class DmaChannelTx>
+class I2sMaster{{ id }} : public modm::I2sMaster, public I2sBase
+{
+	struct Dma {
+		using TxChannel = typename DmaChannelTx::template RequestMapping<Peripheral::Spi{{ id }}, DmaBase::Signal::Tx>::Channel;
+
+		static constexpr DmaBase::Request TxRequest = DmaChannelTx::template RequestMapping<Peripheral::Spi{{ id }}, DmaBase::Signal::Tx>::Request;
+	};
+
+private:
+	using Hal = I2sHal{{ id }};
+
+public:
+	template< class... Signals >
+	static void
+	connect()
+	{
+		using Connector = GpioConnector<Peripheral::I2s{{ id }}, Signals...>;
+		using Ck = typename Connector::template GetSignal<Gpio::Signal::Ck>;
+		using Mck = typename Connector::template GetSignal<Gpio::Signal::Mck>;
+		using Sd = typename Connector::template GetSignal<Gpio::Signal::Sd>;
+		using Ws = typename Connector::template GetSignal<Gpio::Signal::Ws>;
+
+		Ck::setOutput(Gpio::OutputType::PushPull);
+		Mck::setOutput(Gpio::OutputType::PushPull);
+		Sd::setOutput(Gpio::OutputType::PushPull);
+		Ws::setOutput(Gpio::OutputType::PushPull);
+		Connector::connect();
+	}
+
+	struct I2sConfig
+	{
+		frequency_t samplerate = 48_kHz;
+		percent_t tolerance = pct(0.019);
+		BitDepth bitDepth = BitDepth::SixteenWithChannel16;
+		MasterClockOutput masterClockOutput = MasterClockOutput::Enabled;
+		I2sStandard i2sStandard = I2sStandard::Philips;
+		ClockPolarity clockPolarity = ClockPolarity::Low;
+		DmaBase::Priority dmaPriority = DmaBase::Priority::High;
+	};
+	static constexpr I2sConfig DefaultI2sConfig{};
+
+	template<class SystemClock, I2sConfig c = DefaultI2sConfig>
+	static inline void
+	initialize()
+	{
+		// RM0090, p.908:
+		// F_S = I2SxCLK / [(16*2)*((2*I2SDIV)+ODD)*8)] when the channel frame is 16-bit wide and MCKOE bit set
+		// F_S = I2SxCLK / [(32*2)*((2*I2SDIV)+ODD)*4)] when the channel frame is 32-bit wide and MCKOE bit set
+		// F_S = I2SxCLK / [(16*2)*((2*I2SDIV)+ODD))] when the channel frame is 16-bit wide and MCKOE bit cleared
+		// F_S = I2SxCLK / [(32*2)*((2*I2SDIV)+ODD))] when the channel frame is 32-bit wide and MCKOE bit cleared
+
+		constexpr uint8_t bits_per_channel = (c.bitDepth == BitDepth::SixteenWithChannel16) ? 16 : 32;
+		constexpr uint8_t mckoe_factor = (c.masterClockOutput == MasterClockOutput::Disabled) ? 1
+										: ((c.bitDepth == BitDepth::SixteenWithChannel16) ? 8 : 4);
+		constexpr uint16_t bits_per_cycle = bits_per_channel * 2/*channels*/ * mckoe_factor;
+		constexpr float prescaler = static_cast<float>(SystemClock::I2sPll) / (c.samplerate * bits_per_cycle);
+		constexpr uint8_t i2s_div = static_cast<uint8_t>(prescaler/2);
+		constexpr uint8_t odd_factor = ((prescaler - static_cast<float>(i2s_div*2)) >= 0.5) ? 1 : 0;
+		constexpr float real_samplerate = static_cast<float>(SystemClock::I2sPll) /
+											(bits_per_cycle * ((2 * i2s_div) + odd_factor));
+		static_assert(i2s_div > 1, "I2S{{ id }}: i2s_div can not be 1 or 0!");
+		modm::PeripheralDriver::assertBaudrateInTolerance<uint32_t(real_samplerate), c.samplerate, c.tolerance>();
+
+		Hal::initialize(odd_factor ? Hal::OddFactor::Enabled : Hal::OddFactor::Disabled,
+						i2s_div,
+						Hal::MasterSelection::Master,
+						Hal::DirectionSelection::Transmitter,
+						c.bitDepth,
+						c.masterClockOutput,
+						c.i2sStandard,
+						c.clockPolarity);
+
+		dmaError = false;
+		Dma::TxChannel::configure(
+			DmaBase::DataTransferDirection::MemoryToPeripheral,
+			DmaBase::MemoryDataSize::Bit16,
+			DmaBase::PeripheralDataSize::Bit16,
+			DmaBase::MemoryIncrementMode::Increment,
+			DmaBase::PeripheralIncrementMode::Fixed,
+			c.dmaPriority,
+			DmaBase::CircularMode::Disabled);
+		Dma::TxChannel::setPeripheralAddress(uintptr_t(&SPI{{ id }}->DR));
+		Dma::TxChannel::setTransferErrorIrqHandler(handleDmaTransferError);
+		Dma::TxChannel::enableInterruptVector();
+		Dma::TxChannel::enableInterrupt(DmaBase::InterruptEnable::TransferError |
+				DmaBase::InterruptEnable::TransferComplete);
+		Dma::TxChannel::template setPeripheralRequest<Dma::TxRequest>();
+		Hal::enableDma(true);
+	}
+
+	static inline void
+	setTxBuffer(uintptr_t address, std::size_t length)
+	{
+		Dma::TxChannel::setMemoryAddress(address);
+		Dma::TxChannel::setDataLength(length);
+	}
+
+	static inline void
+	setTransferCompleteIrqHandler(DmaBase::IrqHandler handleDmaTransferComplete)
+	{
+		Dma::TxChannel::setTransferCompleteIrqHandler(handleDmaTransferComplete);
+	}
+
+	static inline void
+	start()
+	{
+		Hal::start();
+		Dma::TxChannel::start();
+	}
+
+	static inline void
+	startDma()
+	{
+		Dma::TxChannel::start();
+	}
+
+	static inline void
+	stop()
+	{
+		//Hal::stop();
+		Dma::TxChannel::stop();
+	}
+
+	// end documentation inherited
+
+private:
+	static void handleDmaTransferError()
+	{
+		Hal::enableDma(false);
+		Dma::TxChannel::stop();
+		dmaError = true;
+	}
+
+	static inline bool dmaError { false };
+public:
+	static bool hasDmaError() { return dmaError; }
+};
+
+} // namespace modm::platform
+
+#endif // MODM_STM32_I2S_MASTER{{ id }}_HPP

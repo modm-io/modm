@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2021 - 2022, Raphael Lehmann
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:ma12070p"
+    module.description = """\
+# MA12070P Filterless and High-Efficiency Audio Amplifier with I2S Digital Input
+
+The MA12070P is a super-efficient audio power amplifier based on proprietary
+multi-level switching technology. It supports a 4-26V supply voltage range,
+allowing it to be used in many different applications.
+
+Datasheet: https://www.infineon.com/dgdl/Infineon-MA12070P-DS-v01_00-EN.pdf?fileId=5546d46264a8de7e0164b761f2f261e4
+
+"""
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:register",
+        ":architecture:i2c.device",
+        ":processing:resumable")
+    return True
+
+def build(env):
+    env.substitutions = {
+        "has_io": env.has_module("modm:io"),
+    }
+    env.outbasepath = "modm/src/modm/driver/dac"
+    env.copy("ma12070p.hpp")
+    env.copy("ma12070p_impl.hpp")
+    env.template("ma12070p_io.hpp.in")
+    if env.has_module("modm:io"):
+        env.copy("ma12070p.cpp")

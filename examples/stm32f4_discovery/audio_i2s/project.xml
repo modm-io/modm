@@ -1,0 +1,14 @@
+<library>
+  <extends>modm:disco-f407vg</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/stm32f4_discovery/audio_i2s</option>
+  </options>
+  <modules>
+    <module>modm:debug</module>
+    <module>modm:build:scons</module>
+    <module>modm:platform:uart:2</module>
+    <module>modm:processing:timer</module>
+    <module>modm:processing:protothread</module>
+    <module>modm:cmsis:dsp:fast_math</module>
+  </modules>
+</library>

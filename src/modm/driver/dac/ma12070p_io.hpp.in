@@ -1,0 +1,36 @@
+// coding: utf-8
+/*
+ * Copyright (c) 2022, Raphael Lehmann
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_MA12070P_IO_HPP
+#define MODM_MA12070P_IO_HPP
+
+#include "ma12070p.hpp"
+
+%% if has_io
+
+#include <modm/io/iostream.hpp>
+
+namespace modm
+{
+
+// Output operators
+IOStream&
+operator << (IOStream& os, const ma12070p::VlpMonitor_t& c);
+
+IOStream&
+operator << (IOStream& os, const ma12070p::ErrorRegister_t& c);
+
+}
+
+%% endif
+
+#endif // MODM_MA12070P_IO_HPP

@@ -186,6 +186,7 @@ def build(env):
     properties["dmaType"] = dma["type"]
     properties["dmaSignals"] = signal_names
     properties["dmaController"] = controller
+    properties["doubleBuffer"] = (dma["type"] in ["stm32-stream-channel", "stm32-mux-stream"])
 
     properties['channel_count'] = {
         "min" : min(controller, key=lambda c: c["min_channel"])["min_channel"],

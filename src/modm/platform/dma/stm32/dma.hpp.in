@@ -137,10 +137,18 @@ public:
 				MemoryIncrementMode memoryIncrement,
 				PeripheralIncrementMode peripheralIncrement,
 				Priority priority = Priority::Medium,
-				CircularMode circularMode = CircularMode::Disabled)
+				CircularMode circularMode = CircularMode::Disabled
+%% if doubleBuffer
+				,DoubleBufferMode doubleBufferMode = DoubleBufferMode::Disabled
+%% endif
+				)
 		{
-			ChannelHal::configure(direction, memoryDataSize, peripheralDataSize,
-					memoryIncrement, peripheralIncrement, priority, circularMode);
+			ChannelHal::configure(direction, memoryDataSize, peripheralDataSize, memoryIncrement,
+								  peripheralIncrement, priority, circularMode
+%% if doubleBuffer
+								  , doubleBufferMode
+%% endif
+								  );
 		}
 
 		/**
@@ -183,6 +191,33 @@ public:
 		{
 			ChannelHal::setMemoryAddress(address);
 		}
+
+%% if doubleBuffer
+		/**
+		 * Set the secondary memory address of the DMA channel
+		 *
+		 * Only used in double buffer mode
+		 *
+		 * @param[in] address Source address
+		 */
+		static void
+		setMemoryAddress2(uintptr_t address)
+		{
+			ChannelHal::setMemoryAddress2(address);
+		}
+
+		/**
+		 * Detect which buffer is currently in use
+		 *
+		 * Only meaningful in double buffer mode
+		 */
+		static bool
+		isPrimaryBufferActive()
+		{
+			return ChannelHal::isPrimaryBufferActive();
+		}
+%% endif
+
 		/**
 		 * Set the peripheral address of the DMA channel
 		 *

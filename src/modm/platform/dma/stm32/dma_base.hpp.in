@@ -196,6 +196,15 @@ public:
 		Enabled 	= {{ reg_prefix }}_CIRC, ///< circular mode
 	};
 
+%% if doubleBuffer
+	enum class
+	DoubleBufferMode : uint32_t
+	{
+		Disabled 	= 0,
+		Enabled 	= {{ reg_prefix }}_DBM, ///< double buffer mode
+	};
+%% endif
+
 	enum class
 	DataTransferDirection : uint32_t
 	{

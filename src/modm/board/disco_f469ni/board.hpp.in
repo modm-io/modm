@@ -198,6 +198,20 @@ using Uart = Usart3;
 /// @}
 }
 
+namespace microsd
+{
+/// @ingroup modm_board_disco_f469ni
+/// @{
+using Detect = GpioInputC12;
+using Cmd = GpioD2;
+using Clk = GpioC12;
+using D0  = GpioC8;
+using D1  = GpioC9;
+using D2  = GpioC10;
+using D3  = GpioC11;
+/// @}
+}
+
 /// @ingroup modm_board_disco_f469ni
 /// @{
 using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
