@@ -167,7 +167,7 @@ private:
     int32_t calibratedTemperature;
 };
 
-} // ms5611data
+} // ms5611data namespace
 
 } // modm namespace
 
