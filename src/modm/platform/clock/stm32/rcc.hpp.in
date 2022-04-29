@@ -318,7 +318,7 @@ public:
 	};
 %% endif
 
-%% if target.family in ["f2", "f4", "f7", "h7"]
+%% if target.family in ["f2", "f4", "f7"]
 	enum class
 	ClockOutput1Source : uint32_t
 	{
@@ -338,6 +338,27 @@ public:
 		Pll = RCC_CFGR_MCO2_1 | RCC_CFGR_MCO2_0,
 	};
 	%% endif
+%% elif target.family in ["h7"]
+	enum class
+	ClockOutput1Source : uint32_t
+	{
+		Hsi = 0,
+		Lse = RCC_CFGR_MCO1_0,
+		Hse = RCC_CFGR_MCO1_1,
+		Pll1Q = RCC_CFGR_MCO1_1 | RCC_CFGR_MCO1_0,
+		Hsi48 = RCC_CFGR_MCO1_2
+	};
+
+	enum class
+	ClockOutput2Source : uint32_t
+	{
+		SystemClock = 0,
+		Pll2P = RCC_CFGR_MCO2_0,
+		Hse = RCC_CFGR_MCO2_1,
+		Pll = RCC_CFGR_MCO2_1 | RCC_CFGR_MCO2_0,
+		Csi = RCC_CFGR_MCO2_2,
+		Lsi = RCC_CFGR_MCO2_2 | RCC_CFGR_MCO2_0
+	};
 %% elif target.family in ["l0", "l1", "l4", "l5", "g0", "g4"]
 	enum class
 	ClockOutputSource : uint32_t
@@ -654,7 +675,7 @@ public:
 	}
 %% endif
 
-%% if target.family in ["f2", "f4", "f7", "h7"]
+%% if target.family in ["f2", "f4", "f7"]
 	static inline bool
 	enableClockOutput1(ClockOutput1Source src, uint8_t div)
 	{
@@ -674,7 +695,24 @@ public:
 		return true;
 	}
 	%% endif
+%% elif target.family in ["h7"]
+	static inline bool
+	enableClockOutput1(ClockOutput1Source src, uint8_t div)
+	{
+		uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_MCO1 | RCC_CFGR_MCO1PRE);
+		if (div > 1) tmp |= (div << 18);
+		RCC->CFGR = tmp | uint32_t(src);
+		return true;
+	}
 
+	static inline bool
+	enableClockOutput2(ClockOutput2Source src, uint8_t div)
+	{
+		uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_MCO2 | RCC_CFGR_MCO2PRE);
+		if (div > 1) tmp |= (div << 25);
+		RCC->CFGR = tmp | uint32_t(src);
+		return true;
+	}
 %% elif target.family in ["l0", "l1", "l4", "l5", "g0", "g4"]
 	enum class
 	ClockOutputPrescaler : uint32_t
