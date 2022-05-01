@@ -4,7 +4,7 @@ on: [pull_request]
 
 jobs:
   windows_armcortexm:
-    runs-on: windows-2019
+    runs-on: windows-2022
     env:
       PYTHONIOENCODING: "utf-8"
 
