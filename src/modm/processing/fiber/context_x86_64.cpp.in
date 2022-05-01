@@ -99,16 +99,16 @@ modm_context_jump(uintptr_t*, uintptr_t)
 %#
 %% if with_windows
 		// save XMM storage
-		"movaps %xmm6,  0x00(%rsp)	\n\t"
-		"movaps %xmm7,  0x10(%rsp)	\n\t"
-		"movaps %xmm8,  0x20(%rsp)	\n\t"
-		"movaps %xmm9,  0x30(%rsp)	\n\t"
-		"movaps %xmm10, 0x40(%rsp)	\n\t"
-		"movaps %xmm11, 0x50(%rsp)	\n\t"
-		"movaps %xmm12, 0x60(%rsp)	\n\t"
-		"movaps %xmm13, 0x70(%rsp)	\n\t"
-		"movaps %xmm14, 0x80(%rsp)	\n\t"
-		"movaps %xmm15, 0x90(%rsp)	\n\t"
+		"movups %xmm6,  0x00(%rsp)	\n\t"
+		"movups %xmm7,  0x10(%rsp)	\n\t"
+		"movups %xmm8,  0x20(%rsp)	\n\t"
+		"movups %xmm9,  0x30(%rsp)	\n\t"
+		"movups %xmm10, 0x40(%rsp)	\n\t"
+		"movups %xmm11, 0x50(%rsp)	\n\t"
+		"movups %xmm12, 0x60(%rsp)	\n\t"
+		"movups %xmm13, 0x70(%rsp)	\n\t"
+		"movups %xmm14, 0x80(%rsp)	\n\t"
+		"movups %xmm15, 0x90(%rsp)	\n\t"
 %#
 %% endif
 		"stmxcsr 0xa0(%rsp)			\n\t"	// save MMX control- and status-word
@@ -135,16 +135,16 @@ modm_context_jump(uintptr_t*, uintptr_t)
 %% if with_windows
 %#
 		// restore XMM storage
-		"movaps 0x00(%rsp), %xmm6	\n\t"
-		"movaps 0x10(%rsp), %xmm7	\n\t"
-		"movaps 0x20(%rsp), %xmm8	\n\t"
-		"movaps 0x30(%rsp), %xmm9	\n\t"
-		"movaps 0x40(%rsp), %xmm10	\n\t"
-		"movaps 0x50(%rsp), %xmm11	\n\t"
-		"movaps 0x60(%rsp), %xmm12	\n\t"
-		"movaps 0x70(%rsp), %xmm13	\n\t"
-		"movaps 0x80(%rsp), %xmm14	\n\t"
-		"movaps 0x90(%rsp), %xmm15	\n\t"
+		"movups 0x00(%rsp), %xmm6	\n\t"
+		"movups 0x10(%rsp), %xmm7	\n\t"
+		"movups 0x20(%rsp), %xmm8	\n\t"
+		"movups 0x30(%rsp), %xmm9	\n\t"
+		"movups 0x40(%rsp), %xmm10	\n\t"
+		"movups 0x50(%rsp), %xmm11	\n\t"
+		"movups 0x60(%rsp), %xmm12	\n\t"
+		"movups 0x70(%rsp), %xmm13	\n\t"
+		"movups 0x80(%rsp), %xmm14	\n\t"
+		"movups 0x90(%rsp), %xmm15	\n\t"
 %% endif
 %#
 		"ldmxcsr 0xa0(%rsp)			\n\t"	// restore MMX control- and status-word
