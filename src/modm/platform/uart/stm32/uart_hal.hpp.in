@@ -118,6 +118,10 @@ public:
 	static inline bool
 	isTransmitRegisterEmpty();
 
+	/// Returns true if the transmission of a frame containing data is complete
+	static inline bool
+	isTransmissionComplete();
+
 	static inline void
 	enableInterruptVector(bool enable, uint32_t priority);
 
