@@ -158,7 +158,7 @@ modm::platform::BufferedUartFlow{{ id }}::read(uint8_t& c)
 	// Small hack: When the AVR stopped transmission due to a high RTS signal try to resume
 	// transmission now when RTS is low again and there is something to send.
 	// TODO: can be removed if RTS interrupt is included.
-	if (!RTS::read() && !txBuffer.isEmpty()) {
+	if (!RTS::read() && txBuffer.isNotEmpty()) {
 		// enable DRE interrupt to resume transmission
 		USART{{ id }}_CTRLA = USART_RXCINTLVL_MED_gc | USART_DREINTLVL_MED_gc;
 	}

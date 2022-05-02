@@ -162,7 +162,7 @@ modm::platform::Can::CAN_tx(uint8_t /* msg_obj_num */)
 		// All message objects empty. Otherwise the order of messages
 		// is not maintained
 
-		while (!txQueue.isEmpty())
+		while (txQueue.isNotEmpty())
 		{
 			// Still messages in the queue.
 
@@ -271,7 +271,7 @@ modm::platform::Can::sendMessage(const can::Message & message)
 		/* All Message Objects used for sending (17 to 32) are pending
 		 * at the moment. */
 %% if options["buffer.tx"] > 0
-		if (!txQueue.push(message)) {
+		if (not txQueue.push(message)) {
 			modm::ErrorReport::report(modm::platform::CAN_TX_OVERFLOW);
 			// All Message Objects are full and no space left in software buffer.
 			return false;
@@ -322,7 +322,7 @@ modm::platform::Can::getMessage(can::Message & message)
 			uint8_t messageObjectId = ffs(LPC_CAN->ND1 & 0xffff) - 1;
 			modm::can::Message newMessage;
 			readMessageObject(newMessage, messageObjectId);
-			if (!rxQueue.push(newMessage)) {
+			if (not rxQueue.push(newMessage)) {
 				modm::ErrorReport::report(modm::platform::CAN_RX_OVERFLOW);
 			}
 		}
@@ -349,7 +349,7 @@ bool
 modm::platform::Can::isMessageAvailable()
 {
 %% if options["buffer.rx"] > 0
-	return !rxQueue.isEmpty();
+	return rxQueue.isNotEmpty();
 %% else
 	/* Check if new data is available in the Message
 	 * Objects 1 to 16. */

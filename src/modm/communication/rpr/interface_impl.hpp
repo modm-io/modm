@@ -467,7 +467,7 @@ template <typename Device, std::size_t N>
 void
 modm::rpr::Interface<Device, N>::popMessage(Queue &queue)
 {
-	if (!queue.isEmpty())
+	if (queue.isNotEmpty())
 	{
 		// deallocate the external buffer
 		Message message = queue.get();
