@@ -21,6 +21,7 @@ BoundedQueueTest::testQueue()
 	modm::BoundedQueue<int16_t, 5> queue;
 
 	TEST_ASSERT_TRUE(queue.isEmpty());
+	TEST_ASSERT_FALSE(queue.isNotEmpty());
 
 	TEST_ASSERT_EQUALS(queue.getMaxSize(), 5U);
 
@@ -59,6 +60,7 @@ BoundedQueueTest::testQueue()
 	queue.pop();
 
 	TEST_ASSERT_TRUE(queue.isEmpty());
+	TEST_ASSERT_FALSE(queue.isNotEmpty());
 
 	// Clear empty queue
 	queue.clear();

@@ -65,6 +65,7 @@ BoundedDequeTest::testForward()
 
 	TEST_ASSERT_EQUALS(deque.getSize(), 0U);
 	TEST_ASSERT_TRUE(deque.isEmpty());
+	TEST_ASSERT_FALSE(deque.isNotEmpty());
 }
 
 void
@@ -99,6 +100,7 @@ BoundedDequeTest::testBackward()
 	deque.removeBack();
 
 	TEST_ASSERT_TRUE(deque.isEmpty());
+	TEST_ASSERT_FALSE(deque.isNotEmpty());
 }
 
 void
@@ -137,6 +139,7 @@ BoundedDequeTest::testBoth()
 	deque.removeBack();
 
 	TEST_ASSERT_TRUE(deque.isEmpty());
+	TEST_ASSERT_FALSE(deque.isNotEmpty());
 }
 
 void
@@ -180,6 +183,7 @@ BoundedDequeTest::testClear()
 	deque.removeBack();
 
 	TEST_ASSERT_TRUE(deque.isEmpty());
+	TEST_ASSERT_FALSE(deque.isNotEmpty());
 }
 
 void
@@ -234,6 +238,7 @@ BoundedDequeTest::testOneElementQueue()
 	TEST_ASSERT_EQUALS(deque.getMaxSize(), 1U);
 
 	TEST_ASSERT_TRUE(deque.isEmpty());
+	TEST_ASSERT_FALSE(deque.isNotEmpty());
 	TEST_ASSERT_FALSE(deque.isFull());
 
 	TEST_ASSERT_TRUE(deque.append(123));
@@ -249,6 +254,7 @@ BoundedDequeTest::testOneElementQueue()
 
 	deque.removeBack();
 	TEST_ASSERT_TRUE(deque.isEmpty());
+	TEST_ASSERT_FALSE(deque.isNotEmpty());
 }
 
 void
@@ -257,6 +263,7 @@ BoundedDequeTest::testOverwrite()
 	modm::BoundedDeque<int16_t, 3> deque;
 
 	TEST_ASSERT_TRUE(deque.isEmpty());
+	TEST_ASSERT_FALSE(deque.isNotEmpty());
 
 	deque.appendOverwrite(1);
 	TEST_ASSERT_EQUALS(deque.getSize(), 1U);
@@ -292,6 +299,7 @@ BoundedDequeTest::testOverwrite()
 
 
 	TEST_ASSERT_TRUE(deque.isEmpty());
+	TEST_ASSERT_FALSE(deque.isNotEmpty());
 
 	deque.prependOverwrite(1);
 	TEST_ASSERT_EQUALS(deque.getSize(), 1U);

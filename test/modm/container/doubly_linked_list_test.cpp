@@ -30,6 +30,7 @@ DoublyLinkedListTest::testConstructor()
 	modm::DoublyLinkedList< unittest::CountType > list;
 
 	TEST_ASSERT_TRUE(list.isEmpty());
+	TEST_ASSERT_FALSE(list.isNotEmpty());
 	TEST_ASSERT_EQUALS(unittest::CountType::numberOfDefaultConstructorCalls, 0U);
 }
 
@@ -41,6 +42,7 @@ DoublyLinkedListTest::testAppend()
 	list.append(1);
 
 	TEST_ASSERT_FALSE(list.isEmpty());
+	TEST_ASSERT_TRUE(list.isNotEmpty());
 	TEST_ASSERT_EQUALS(list.getFront(), 1);
 	TEST_ASSERT_EQUALS(list.getBack(), 1);
 
@@ -87,6 +89,7 @@ DoublyLinkedListTest::testPrepend()
 	list.prepend(1);
 
 	TEST_ASSERT_FALSE(list.isEmpty());
+	TEST_ASSERT_TRUE(list.isNotEmpty());
 	TEST_ASSERT_EQUALS(list.getFront(), 1);
 	TEST_ASSERT_EQUALS(list.getBack(), 1);
 
@@ -144,10 +147,12 @@ DoublyLinkedListTest::testRemoveFront()
 
 	TEST_ASSERT_EQUALS(list.getFront(), 3);
 	TEST_ASSERT_FALSE(list.isEmpty());
+	TEST_ASSERT_TRUE(list.isNotEmpty());
 
 	list.removeFront();
 
 	TEST_ASSERT_TRUE(list.isEmpty());
+	TEST_ASSERT_FALSE(list.isNotEmpty());
 }
 
 void
@@ -187,10 +192,12 @@ DoublyLinkedListTest::testRemoveBack()
 
 	TEST_ASSERT_EQUALS(list.getBack(), 1);
 	TEST_ASSERT_FALSE(list.isEmpty());
+	TEST_ASSERT_TRUE(list.isNotEmpty());
 
 	list.removeBack();
 
 	TEST_ASSERT_TRUE(list.isEmpty());
+	TEST_ASSERT_FALSE(list.isNotEmpty());
 }
 
 void

@@ -50,6 +50,9 @@ namespace modm
 		inline bool
 		isEmpty() const;
 
+		inline bool
+		isNotEmpty() const { return (not isEmpty()); }
+
 		/**
 		 * \brief	Get number of elements
 		 *
