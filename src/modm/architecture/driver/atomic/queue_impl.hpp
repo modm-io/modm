@@ -122,4 +122,12 @@ modm::atomic::Queue<T, N>::pop()
 	this->tail = tmptail;
 }
 
+template<typename T, std::size_t N>
+void
+modm::atomic::Queue<T, N>::clear()
+{
+	this->head = 0;
+	this->tail = 0;
+}
+
 #endif	// MODM_ATOMIC_QUEUE_IMPL_HPP

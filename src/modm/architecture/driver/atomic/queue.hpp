@@ -93,6 +93,9 @@ namespace modm
 			void
 			pop();
 
+			void
+			clear();
+
 		private:
 			volatile Index head;
 			volatile Index tail;

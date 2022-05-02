@@ -50,4 +50,21 @@ AtomicQueueTest::testQueue()
 	queue.pop();
 
 	TEST_ASSERT_TRUE(queue.isEmpty());
+
+	// Clear an empty queue
+	queue.clear();
+	TEST_ASSERT_TRUE(queue.isEmpty());
+
+	// Clear a queue with one element
+	TEST_ASSERT_TRUE(queue.push(1));
+	queue.clear();
+	TEST_ASSERT_TRUE(queue.isEmpty());
+
+	// Clear a full queue
+	TEST_ASSERT_TRUE(queue.push(1));
+	TEST_ASSERT_TRUE(queue.push(2));
+	TEST_ASSERT_TRUE(queue.push(3));
+	TEST_ASSERT_TRUE(queue.isFull());
+	queue.clear();
+	TEST_ASSERT_TRUE(queue.isEmpty());
 }
