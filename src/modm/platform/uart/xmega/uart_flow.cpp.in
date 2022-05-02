@@ -218,30 +218,24 @@ modm::platform::BufferedUartFlow{{ id }}::resetErrorFlags()
 uint8_t
 modm::platform::BufferedUartFlow{{ id }}::flushReceiveBuffer()
 {
-	uint8_t i = 0;
-	while(!rxBuffer.isEmpty()) {
-		rxBuffer.pop();
-		++i;
-	}
+	uint8_t count = rxBuffer.getSize();
+	rxBuffer.clear();
 
 	uint8_t c;
 	while (USART{{ id }}_STATUS & USART_RXCIF_bm) {
 		c = USART{{ id }}_DATA;
 	}
 
-	return i;
+	return count;
 }
 
 //uint8_t
 //modm::platform::BufferedUartFlow{{ id }}::flushTransmitBuffer()
 //{
-//	uint8_t i(0);
-//	while(!txBuffer.isEmpty()) {
-//		txBuffer.pop();
-//		++i;
-//	}
+//	uint8_t count = txBuffer.getSize();
+//	txBuffer.clear();
 //
-//	return i;
+//	return count;
 //}
 
 

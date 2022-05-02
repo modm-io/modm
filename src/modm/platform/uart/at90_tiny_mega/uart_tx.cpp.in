@@ -125,13 +125,9 @@ modm::platform::Uart{{ id }}::discardTransmitBuffer()
 		UCSR{{ id }}B &= ~(1 << UDRIE{{ id }});
 	}
 
-	std::size_t i = 0;
-	while(!txBuffer.isEmpty())
-	{
-		txBuffer.pop();
-		++i;
-	}
+	std::size_t count = txBuffer.getSize();
+	txBuffer.clear();
 
-	return i;
+	return count;
 }
 

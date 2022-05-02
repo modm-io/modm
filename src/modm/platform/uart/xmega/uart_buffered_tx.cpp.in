@@ -115,13 +115,9 @@ modm::platform::Uart{{ id }}::discardTransmitBuffer()
 		USART{{ id }}_CTRLA = USART_RXCINTLVL_MED_gc;
 	}
 
-	std::size_t i = 0;
-	while(!txBuffer.isEmpty())
-	{
-		txBuffer.pop();
-		++i;
-	}
+	std::size_t count = txBuffer.getSize();
+	txBuffer.clear();
 
-	return i;
+	return count;
 }
 

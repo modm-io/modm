@@ -168,11 +168,8 @@ modm::platform::Uart{{ id }}::discardTransmitBuffer()
 	std::size_t count(0);
 	// disable interrupt since buffer will be cleared
 	uart{{ id }}_hw->imsc &= UART_UARTIMSC_TXIM_BITS;
-	while(not txBuffer.isEmpty())
-	{
-		++count;
-		txBuffer.pop();
-	}
+	count = txBuffer.getSize();
+	txBuffer.clear();
 	return count;
 %% else
 	return 0;
@@ -229,11 +226,8 @@ modm::platform::Uart{{ id }}::discardReceiveBuffer()
 {
 	std::size_t count(0);
 %% if options["buffer.rx"] > fifo_size
-	while(!rxBuffer.isEmpty())
-	{
-		++count;
-		rxBuffer.pop();
-	}
+	count = rxBuffer.getSize();
+	rxBuffer.clear();
 %% endif
 	while(!rx_fifo_empty())
 	{

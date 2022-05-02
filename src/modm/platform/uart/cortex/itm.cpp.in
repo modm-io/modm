@@ -125,9 +125,8 @@ std::size_t
 Itm::discardTransmitBuffer()
 {
 %% if options["buffer.tx"]
-	std::size_t count = 0;
-	for(; not txBuffer.isEmpty(); txBuffer.pop())
-		++count;
+	std::size_t count = txBuffer.getSize();
+	txBuffer.clear();
 	return count;
 %% else
 	return 0;

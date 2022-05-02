@@ -234,14 +234,10 @@ modm::platform::Uart1::discardTransmitBuffer()
 {
 %% if options["buffer.tx"] > 16
 	atomic::Lock lock;
-	std::size_t count(0);
+	std::size_t count = txBuffer.getSize();
 	// disable interrupt since buffer will be cleared
 	LPC_UART->IER &= ~IER_THREIE;
-	while(not txBuffer.isEmpty())
-	{
-		++count;
-		txBuffer.pop();
-	}
+	txBuffer.clear();
 	return count;
 %% else
 	return 0;
@@ -298,11 +294,8 @@ modm::platform::Uart1::discardReceiveBuffer()
 {
 	std::size_t count(0);
 %% if options["buffer.rx"] > 16
-	while(!rxBuffer.isEmpty())
-	{
-		++count;
-		rxBuffer.pop();
-	}
+	count = rxBuffer.getSize();
+	rxBuffer.clear();
 %% endif
 	while(LPC_UART->LSR & LSR_RDR)
 	{

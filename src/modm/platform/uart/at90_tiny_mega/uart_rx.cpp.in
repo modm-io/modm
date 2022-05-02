@@ -100,12 +100,8 @@ modm::platform::Uart{{ id }}::read(uint8_t *buffer, std::size_t length)
 std::size_t
 modm::platform::Uart{{ id }}::discardReceiveBuffer()
 {
-	std::size_t i(0);
-	while(!rxBuffer.isEmpty())
-	{
-		rxBuffer.pop();
-		++i;
-	}
+	std::size_t count = rxBuffer.getSize();
+	rxBuffer.clear();
 
 #if defined (RXC{{ id }})
 	uint8_t c;
@@ -116,7 +112,7 @@ modm::platform::Uart{{ id }}::discardReceiveBuffer()
 	}
 #endif
 
-	return i;
+	return count;
 }
 
 // MARK: - error
