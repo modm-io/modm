@@ -59,4 +59,24 @@ BoundedQueueTest::testQueue()
 	queue.pop();
 
 	TEST_ASSERT_TRUE(queue.isEmpty());
+
+	// Clear empty queue
+	queue.clear();
+	TEST_ASSERT_TRUE(queue.isEmpty());
+
+	// Clear queue with some elements
+	TEST_ASSERT_TRUE(queue.push(0));
+	TEST_ASSERT_TRUE(queue.push(1));
+	queue.clear();
+	TEST_ASSERT_TRUE(queue.isEmpty());
+
+	// Clear full queue
+	TEST_ASSERT_TRUE(queue.push(1));
+	TEST_ASSERT_TRUE(queue.push(2));
+	TEST_ASSERT_TRUE(queue.push(3));
+	TEST_ASSERT_TRUE(queue.push(4));
+	TEST_ASSERT_TRUE(queue.push(5));
+	TEST_ASSERT_TRUE(queue.isFull());
+	queue.clear();
+	TEST_ASSERT_TRUE(queue.isEmpty());
 }

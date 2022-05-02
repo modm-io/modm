@@ -101,6 +101,12 @@ namespace modm
 			c.removeFront();
 		}
 
+		inline void
+		clear()
+		{
+			c.clear();
+		}
+
 	protected:
 		Container c;
 	};
