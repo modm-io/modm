@@ -246,6 +246,16 @@ public:
 			transferError = irqHandler;
 		}
 		/**
+		 * Set the IRQ handler for half transfer complete
+		 *
+		 * Called by the channels IRQ handler when the transfer is half complete.
+		 */
+		static void
+		setHalfTransferCompleteIrqHandler(IrqHandler irqHandler)
+		{
+			halfTransferComplete = irqHandler;
+		}
+		/**
 		 * Set the IRQ handler for transfer complete
 		 *
 		 * Called by the channels IRQ handler when the transfer is complete.
@@ -300,6 +310,9 @@ public:
 		interruptHandler()
 		{
 %% if dmaType in ["stm32-channel-request", "stm32-channel", "stm32-mux"]
+			static const uint32_t HT_Flag {
+				uint32_t(InterruptFlags::HalfTransferComplete) << (uint32_t(ChannelID) * 4)
+			};
 			static const uint32_t TC_Flag {
 				uint32_t(InterruptFlags::TransferComplete) << (uint32_t(ChannelID) * 4)
 			};
@@ -308,6 +321,9 @@ public:
 			};
 %% elif dmaType in ["stm32-stream-channel", "stm32-mux-stream"]
 			constexpr uint8_t offsetLut[8] = {0, 6, 16, 22, 0+32, 6+32, 16+32, 22+32};
+			static const uint64_t HT_Flag {
+				uint64_t(InterruptFlags::HalfTransferComplete) << offsetLut[uint32_t(ChannelID)]
+			};
 			static const uint64_t TC_Flag {
 				uint64_t(InterruptFlags::TransferComplete) << offsetLut[uint32_t(ChannelID)]
 			};
@@ -322,6 +338,8 @@ public:
 				if (transferError)
 					transferError();
 			}
+			if ((isr & HT_Flag) and halfTransferComplete)
+				halfTransferComplete();
 			if ((isr & TC_Flag) and transferComplete)
 				transferComplete();
 
@@ -380,6 +398,7 @@ public:
 
 	private:
 		static inline DmaBase::IrqHandler transferError { nullptr };
+		static inline DmaBase::IrqHandler halfTransferComplete { nullptr };
 		static inline DmaBase::IrqHandler transferComplete { nullptr };
 
 %% if dmaType in ["stm32-mux", "stm32-mux-stream"]:
