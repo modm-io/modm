@@ -30,7 +30,7 @@ Call `Board::initializeTouchscreen()` to setup the peripherals.
 
 ## Hardware Revisions
 
-The revision B-03 has a different touch sensor address from B-01, which is
+The revision B-03 has a different touch sensor address from B-01 and B-02, which is
 provided as `Board::ft6::TouchAddress`:
 
 ```cpp
