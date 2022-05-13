@@ -80,6 +80,19 @@ def build(env):
     env.template("../cortex/delay_ns.hpp.in", "delay_ns.hpp")
     env.template("../cortex/delay_impl.hpp.in", "delay_impl.hpp")
 
+def _get_memory_by_address(memories, address):
+    for memory in memories:
+        start = memory["start"]
+        end = start + memory["size"]
+        if address >= start and address < end:
+            return memory
+    raise KeyError("No memory found containing address '0x{:x}'".format(address))
+
+def _get_memory_by_name(memories, name):
+    for memory in memories:
+        if memory["name"] == name:
+            return memory
+    raise KeyError("No memory found with name '{}'".format(name))
 
 def post_build(env):
     env.substitutions = env.query("::cortex-m:linkerscript")
@@ -89,7 +102,49 @@ def post_build(env):
     linkerscript = "../cortex/ram.ld.in"
     if env.get(":platform:core:vector_table_location", "rom") == "ram":
         linkerscript = "ram_remap_vector_table.ld.in"
-    for memory in env.substitutions["memories"]:
+
+    identifier = env[":target"].identifier
+    memories = env.substitutions["memories"]
+
+    # H7 dual-core devices
+    if identifier.family == "h7" and identifier.get("core"):
+        # only use half of flash for each core of H7 dual core devices
+        # TODO: allow non-default configurations with custom boot addresses
+        core = identifier.core
+        if identifier.size == "i":
+            # one contiguous segment of flash organized in two banks
+            # bank 0: 0x0800 0000 - 0x080F FFFF, used for CM7 program
+            # bank 1: 0x0810 0000 - 0x081F FFFF, used for CM4 program
+            flash = _get_memory_by_address(memories, 0x08000000)
+            flash["size"] //= 2
+            if core == "m4":
+                flash["start"] += flash["size"]
+        elif identifier.size == "g":
+            # two discontiguous segments of flash
+            # bank 0: 0x0800 0000 - 0x0807 FFFF, used for CM7 program
+            # bank 1: 0x0810 0000 - 0x0817 FFFF, used for CM4 program
+            flash_bank0 = _get_memory_by_address(memories, 0x08000000)
+            flash_bank1 = _get_memory_by_address(memories, 0x08100000)
+            if core == "m7":
+                # remove flash segment used for CM4
+                memories.remove(flash_bank1)
+                flash_bank0["name"] = "flash"
+            else:  # m4
+                # remove flash segment used for CM7
+                memories.remove(flash_bank0)
+                flash_bank1["name"] = "flash"
+        else:
+            raise RuntimeError("H7 dual-core devices with size '{}' are not supported!".format(identifier.size))
+
+        # place CM4 stack in local d2_sram
+        # first memory in list is used as stack
+        # move d2_sram to the beginning of the list
+        if core == "m4":
+            cont_regions = env.substitutions["cont_ram_regions"]
+            d2_sram_index = cont_regions.index(_get_memory_by_name(cont_regions, "d2_sram1"))
+            cont_regions[0], cont_regions[d2_sram_index] = cont_regions[d2_sram_index], cont_regions[0]
+
+    for memory in memories:
         if memory["name"] == "ccm":
             if "x" in memory["access"]:
                 # Executable CCM (Instruction Core-Coupled Memory)

@@ -529,4 +529,22 @@ Rcc::setCanPrescaler(CanPrescaler prescaler)
 }
 %% endif
 
+%% if target.family == "h7" and target.name in ["45", "47", "55", "57"] and target.core == "m7"
+void
+Rcc::bootCortexM4()
+{
+	// Enable Cortex-M4 boot in case it is disabled via option bytes
+	RCC->GCR |= RCC_GCR_BOOT_C2;
+
+	// Lock hardware semaphore 0
+	// Cortex-M4 startup code will continue to boot
+	RCC->AHB4ENR |= RCC_AHB4ENR_HSEMEN_Msk;
+	constexpr unsigned CortexM7CoreId{3};
+	HSEM->R[0] = HSEM_R_LOCK | (CortexM7CoreId << HSEM_R_COREID_Pos);
+
+	// Wait for unlock by Cortex-M4 core
+	while((HSEM->R[0] & HSEM_R_LOCK) != 0);
+}
+%% endif
+
 }

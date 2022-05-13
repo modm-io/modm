@@ -28,6 +28,17 @@
 void
 __modm_initialize_platform(void)
 {
+%% if target.family == "h7" and target.name in ["45", "47", "55", "57"] and target.core == "m4"
+	/* Use hardware semaphore 0 as a spin lock to delay Cortex-M4 boot until
+	 * the system has been initialized by the Cortex-M7 core */
+	RCC->AHB4ENR |= RCC_AHB4ENR_HSEMEN_Msk;
+	// wait until hardware semaphore 0 has been locked by Cortex-M7
+	while((HSEM->R[0] & HSEM_R_LOCK) == 0);
+	// unlock hardware semaphore
+	const unsigned CortexM7CoreId = 3;
+	HSEM->CR = HSEM->KEYR | (CortexM7CoreId << HSEM_CR_COREID_Pos);
+%% endif
+
 	// Enable SYSCFG
 %% if target.family == "g0"
 	RCC->APBENR2 |= RCC_APBENR2_SYSCFGEN;

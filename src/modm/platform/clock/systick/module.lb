@@ -36,7 +36,8 @@ def build(env):
     # Interrupt Frequency must not overflow the 2^24 SysTick->VAL!
     freq = 1000 if "m0" in core else 4
     # STM32H7 goes up to 550MHz, so make the Frequency higher
-    if target.family == "h7": freq = 100;
+    if target.family == "h7" and target.get("core", "cm7") == "cm7":
+        freq = 100
 
     # SysTick clock prescaler is dynamically chosen as /1 or /8
     div = 8
