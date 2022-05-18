@@ -64,4 +64,3 @@ def build(env):
     env.copy("button.hpp")
     env.copy("button_impl.hpp")
     env.copy("button_group.hpp")
-    env.copy("button_group_impl.hpp")

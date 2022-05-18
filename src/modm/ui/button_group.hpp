@@ -4,6 +4,7 @@
  * Copyright (c) 2012, Sascha Schade
  * Copyright (c) 2012-2013, 2016, Niklas Hauser
  * Copyright (c) 2015, Daniel Krebs
+ * Copyright (c) 2022, Thomas Sommer
  *
  * This file is part of the modm project.
  *
@@ -12,69 +13,82 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 // ----------------------------------------------------------------------------
+#pragma once
 
-#ifndef MODM_BUTTON_GROUP_HPP
-#define MODM_BUTTON_GROUP_HPP
-
+#include <concepts>
 #include <stdint.h>
 
 #include <modm/architecture/utils.hpp>
 #include <modm/architecture/interface/atomic_lock.hpp>
 
+#include <modm/math/utils/bit_constants.hpp>
+
 namespace modm
 {
+
 /**
- * @tparam	T
- * 		Container type: `uint8_t` for eight buttons or `uint16_t` for
- * 		up to 16 buttons
+ * Button masks.
+ *
+ * Provided for convenience only.
+ * Normally it is best to define your own meaningful names for the buttons.
+ */
+enum ButtonGroupIdentifier
+{
+	NONE = 0x00,
+	BUTTON0 = Bit0,
+	BUTTON1 = Bit1,
+	BUTTON2 = Bit2,
+	BUTTON3 = Bit3,
+	BUTTON4 = Bit4,
+	BUTTON5 = Bit5,
+	BUTTON6 = Bit6,
+	BUTTON7 = Bit7,
+	ALL = 0xFF,
+};
+
+/**
+ * @tparam	T	Storage type for Button states. Each button requires one bit.
  *
  * @ingroup	modm_ui_button
  */
-template <typename T = uint8_t>
+template <std::unsigned_integral T = uint8_t>
 class ButtonGroup
 {
 public:
-	/**
-	 * Button masks.
-	 *
-	 * Provided for convenience only.
-	 * Normally it is best to define your own meaningful names for the buttons.
-	 */
-	enum Identifier
-	{
-		NONE = 0x00,
-		BUTTON0 = 0x01,
-		BUTTON1 = 0x02,
-		BUTTON2 = 0x04,
-		BUTTON3 = 0x08,
-		BUTTON4 = 0x10,
-		BUTTON5 = 0x20,
-		BUTTON6 = 0x40,
-		BUTTON7 = 0x80,
-		ALL = 0xFF,
+	struct State {
+		T value{0};
+
+		bool read(T mask) const {
+			return mask & value;
+		}
+
+		bool read_and_clear(T mask) {
+			mask &= value;
+			value ^= mask;
+			return mask;
+		}
 	};
 
-public:
+	State pressed;
+	State released;
+	State repeated;
+
 	/**
-	 * Constructor
-	 *
-	 * @param	mask
-	 * 		Repeat mask, only buttons listed here can be used with the methods
-	 * 		isRepeated(), isPressedShort() and isPressedLong()
-	 * @param	timeout
-	 * 		Timeout for the repeat operation (number of update cycles)
-	 * @param	interval
-	 * 		Repeat interval (number of update cycles)
+	 * @param	repeatmask	only buttons listed here can be used with the methods
+	 * 						isRepeated(), isPressedShort() and isPressedLong()
+	 * @param	timeout		Button press period (number of update cycles) until begin of repeat
+	 * @param	interval	Button press period (number of update cycles) for follow up repeats
 	 */
-	ButtonGroup(T mask, uint16_t timeout = 50, uint16_t interval = 20);
+	ButtonGroup(T repeatmask, uint16_t timeout = 50, uint16_t interval = 20)
+		: repeatmask(repeatmask), timeout(timeout), interval(interval), repeatCounter(timeout)
+	{}
 
 	/// Get the current (debounced) state of a key
 	T
-	getState(T mask) const;
-
-	/// Check if a key has been released
-	T
-	isReleased(T mask);
+	getState(T mask) const {
+		atomic::Lock lock;
+		return debounced.read(mask);
+	}
 
 	/**
 	 * Check if a key has been pressed.
@@ -91,8 +105,18 @@ public:
 	 * }
 	 * @endcode
 	 */
-	T
-	isPressed(T mask);
+	bool
+	isPressed(T mask) {
+		atomic::Lock lock;
+		return pressed.read_and_clear(mask);
+	}
+
+	/// Check if a key has been released
+	bool
+	isReleased(T mask) {
+		atomic::Lock lock;
+		return released.read_and_clear(mask);
+	}
 
 	/**
 	 * Check if a key has been pressed long enough such that the key repeat
@@ -117,8 +141,11 @@ public:
 	 *
 	 * @see	isPressed()
 	 */
-	T
-	isRepeated(T mask);
+	bool
+	isRepeated(T mask) {
+		atomic::Lock lock;
+		return repeated.read_and_clear(mask);
+	}
 
 	/**
 	 * Get buttons which were pressed short.
@@ -142,8 +169,18 @@ public:
 	 *
 	 * @see	isPressedLong()
 	 */
-	T
-	isPressedShort(T mask);
+	bool
+	isPressedShort(T mask) {
+		atomic::Lock lock;
+
+		// get all keys which were pressed but are currently not pressed. This
+		// must be a short press then, otherwise the isPressedLong() method
+		// would have reseted pressed.
+		mask = mask & pressed.value & ~debounced.value;
+		pressed.value ^= mask;
+
+		return mask;
+	}
 
 	/**
 	 * Get buttons which were pressed long
@@ -152,38 +189,61 @@ public:
 	 *			`isPressedShort()`, otherwise it will not work correctly!
 	 * @see	isPressedShort()
 	 */
-	T
-	isPressedLong(T mask);
+	bool
+	isPressedLong(T mask) {
+		atomic::Lock lock;
+
+		// get all keys which are long enough pressed so that the repeated
+		// variable was set
+		mask = mask & repeated.value;
+		repeated.value ^= mask;
+		mask = mask & pressed.value;
+		pressed.value ^= mask;
+
+		return mask;
+	}
 
 	/**
-	 * Update internal state.
+	 * @brief			Update internal debounced. Call this function periodically every 5 to 10ms
 	 *
-	 * Call this function periodically every 5 to 10ms
-	 *
-	 * @param	input
-	 * 		input signals
+	 * @param input		Inverted input signals
 	 */
 	void
-	update(T input);
+	update(T input) {
+		// key changed?
+		T i = debounced.value ^ ~input;
+		// reset or count ct0
+		ct0 = ~(ct0 & i);
+		// reset or count ct1
+		ct1 = ct0 ^ (ct1 & i);
+		// count until roll over?
+		i &= ct0 & ct1;
 
-protected:
-	const uint16_t timeout;
-	const uint16_t interval;
-	const T repeatMask;
-	uint16_t repeatCounter;
+		// then toggle debounced
+		debounced.value ^= i;
+		// 0->1: key press detected
+		pressed.value |= debounced.value & i;
+		// 0->1: key release detected
+		released.value |= ~debounced.value & i;
 
-	T state;		///< debounced and inverted key state:
-					///< bit = 1: key pressed
-	T pressState;
-	T releaseState;
-	T repeatState;
+		if ((debounced.value & repeatmask) == 0) {
+			repeatCounter = timeout;
+		}
+		if (--repeatCounter == 0) {
+			repeatCounter = interval;
+			repeated.value |= debounced.value & repeatmask;
+		}
+	}
 
 private:
-	T ct0;
-	T ct1;
+	const T repeatmask;
+	State debounced;
+
+	const uint16_t timeout;
+	const uint16_t interval;
+	uint16_t repeatCounter;
+
+	T ct0{0};
+	T ct1{0};
 };
 }
-
-#include "button_group_impl.hpp"
-
-#endif // MODM_BUTTON_GROUP_HPP
