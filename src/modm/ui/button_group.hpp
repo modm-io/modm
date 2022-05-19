@@ -21,31 +21,8 @@
 #include <modm/architecture/utils.hpp>
 #include <modm/architecture/interface/atomic_lock.hpp>
 
-#include <modm/math/utils/bit_constants.hpp>
-
 namespace modm
 {
-
-/**
- * Button masks.
- *
- * Provided for convenience only.
- * Normally it is best to define your own meaningful names for the buttons.
- */
-enum ButtonGroupIdentifier
-{
-	NONE = 0x00,
-	BUTTON0 = Bit0,
-	BUTTON1 = Bit1,
-	BUTTON2 = Bit2,
-	BUTTON3 = Bit3,
-	BUTTON4 = Bit4,
-	BUTTON5 = Bit5,
-	BUTTON6 = Bit6,
-	BUTTON7 = Bit7,
-	ALL = 0xFF,
-};
-
 /**
  * @tparam	T	Storage type for Button states. Each button requires one bit.
  *
