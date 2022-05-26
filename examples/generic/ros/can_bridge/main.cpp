@@ -35,7 +35,7 @@ messageRosToModm(const can_msgs::Frame& source, modm::can::Message& destination)
 bool
 messageModmToRos(const modm::can::Message& source, can_msgs::Frame& destination) {
 	destination.id = source.getIdentifier();
-	destination.dlc = source.getLength();
+	destination.dlc = source.getDataLengthCode();
 	destination.is_rtr = source.isRemoteTransmitRequest();
 	destination.is_extended = source.isExtended();
 	memcpy(destination.data, source.data, source.getLength());

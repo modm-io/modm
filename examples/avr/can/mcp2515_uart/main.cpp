@@ -109,7 +109,7 @@ main()
 				}
 				stream << modm::endl;
 
-				stream << " dlc  = " << message.getLength() << modm::endl;
+				stream << " dlc  = " << message.getDataLengthCode() << modm::endl;
 				if (!message.isRemoteTransmitRequest())
 				{
 					stream << " data = ";

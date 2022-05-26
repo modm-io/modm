@@ -121,6 +121,12 @@ class Can(Module):
         module.description = FileReader("interface/can.md")
 
     def prepare(self, module, options):
+        module.add_option(
+            NumericOption(
+                name="message.buffer",
+                description="",
+                minimum=8, maximum=64,
+                default=8))
         return True
 
     def build(self, env):
@@ -128,7 +134,7 @@ class Can(Module):
         env.copy("interface/can.hpp")
         env.copy("interface/can.cpp")
         env.copy("interface/can_filter.hpp")
-        env.copy("interface/can_message.hpp")
+        env.template("interface/can_message.hpp.in")
 # -----------------------------------------------------------------------------
 
 class Clock(Module):

@@ -102,7 +102,7 @@ modm::platform::SocketCan::getMessage(can::Message& message)
 	if (nbytes > 0)
 	{
 		message.identifier = frame.can_id;
-		message.length = frame.can_dlc;
+		message.setDataLengthCode(frame.can_dlc);
 		message.setExtended(frame.can_id & CAN_EFF_FLAG);
 		message.setRemoteTransmitRequest(frame.can_id & CAN_RTR_FLAG);
 		for (uint8_t ii = 0; ii < frame.can_dlc; ++ii) {

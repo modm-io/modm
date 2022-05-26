@@ -64,7 +64,7 @@ sendMessageObject(const modm::can::Message & message, uint8_t messageObjectId)
 	msg_obj.mask    = 0x0;
 
 	// Set up the DLC
-	msg_obj.dlc     = message.getLength();
+	msg_obj.dlc     = message.getDataLengthCode();
 
 	// Copy the data.
 	// TODO reinterpret_cast or memcpy
@@ -107,7 +107,7 @@ readMessageObject(modm::can::Message & message, uint8_t messageObjectId)
 	message.setRemoteTransmitRequest( (msg_obj.mode_id & CAN_MSGOBJ_RTR) );
 
 	// Get DLC
-	message.length = msg_obj.dlc;
+	message.setDataLengthCode(msg_obj.dlc);
 
 	// Copy Data
 	// TODO Use memcpy or reinterpret_cast

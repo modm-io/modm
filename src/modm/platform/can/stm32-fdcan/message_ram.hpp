@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2019, Raphael Lehmann
  * Copyright (c) 2021, Christopher Durand
+ * Copyright (c) 2022, Rasmus Kleist Hørlyck Sørensen
  *
  * This file is part of the modm project.
  *
@@ -50,7 +51,7 @@ public:
 		StoreEvents		= Bit23,
 		// bit 22: reserved
 		FdFrame 		= Bit21,
-		RateSwitching	= Bit20,
+		BitRateSwitching	= Bit20,
 		// bit 19-16: dlc
 		// bit 15-0: reserved
 	};
@@ -65,7 +66,7 @@ public:
 		StoreEvents		= Bit23,
 		// bit 22: reserved
 		FdFrame 		= Bit21,
-		RateSwitching	= Bit20,
+		BitRateSwitching	= Bit20,
 		// bit 19-16: dlc
 		// bit 15-0: timestamp
 	};
@@ -210,7 +211,6 @@ public:
 			// copy in 32 bit words, memcpy is optimized to single store instruction
 			// CAN message buffer must fit full multiples of 4 bytes
 			std::memcpy(&outputData, &inData[i], 4);
-
 			*messageRam++ = outputData;
 		}
 	}
@@ -224,6 +224,19 @@ public:
 
 		const auto canId = message.isExtended() ? message.getIdentifier() : (message.getIdentifier() << 18);
 		CanId_t::set(header, canId);
+
+		return header;
+	}
+
+	/// Construct Tx Header from CanMessage
+	static TxFifoHeader_t
+	txHeaderFromMessage(const modm::can::Message& message)
+	{
+		TxFifoHeader_t header = (message.isFlexibleData() ? TxFifoHeader::FdFrame : TxFifoHeader(0))
+			| (message.isBitRateSwitching() ? TxFifoHeader::BitRateSwitching : TxFifoHeader(0));
+
+		const uint8_t dlc = message.getDataLengthCode();
+		MessageRam::TxDlc_t::set(header, dlc);
 
 		return header;
 	}

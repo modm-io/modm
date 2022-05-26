@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2019, Raphael Lehmann
  * Copyright (c) 2021, Christopher Durand
+ * Copyright (c) 2022, Rasmus Kleist Hørlyck Sørensen
  *
  * This file is part of the modm project.
  *
@@ -185,10 +186,10 @@ public:
 	isMessageAvailable();
 
 	static bool
-	getMessage(can::Message& message, uint8_t *filter_id=nullptr, uint16_t *timestamp=nullptr);
+	isReadyToSend();
 
 	static bool
-	isReadyToSend();
+	getMessage(can::Message& message, uint8_t *filter_id=nullptr, uint16_t *timestamp=nullptr);
 
 	static bool
 	sendMessage(const can::Message& message);

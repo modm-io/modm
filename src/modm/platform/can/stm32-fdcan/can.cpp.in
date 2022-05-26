@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2019, Raphael Lehmann
  * Copyright (c) 2021, Christopher Durand
+ * Copyright (c) 2022, Rasmus Kleist Hørlyck Sørensen
  *
  * This file is part of the modm project.
  *
@@ -32,9 +33,9 @@ modm::atomic::Queue<modm::can::Message, {{ options["buffer.tx"] }}> txQueue;
 %% endif
 
 struct RxMessage {
-    modm::can::Message message;
-    uint8_t filter_id;
-    uint16_t timestamp;
+	modm::can::Message message;
+	uint8_t filter_id;
+	uint16_t timestamp;
 };
 %% if options["buffer.rx"] > 0
 modm::atomic::Queue<RxMessage, {{ options["buffer.rx"] }}> rxQueue;
@@ -118,11 +119,7 @@ readMsg(modm::can::Message& message, uint8_t fifoIndex, uint8_t* filter_id, uint
 	}
 
 	const uint8_t dlcValue = MessageRam::RxDlc_t::get(rxHeader);
-	// TODO: fd large frames not supported yet
-	//if (rxHeader & MessageRam::RxHeader::FdFrame)
-		//message.setDLC(dlcValue);
-	// else
-	message.setLength(std::min<uint8_t>(8u, dlcValue));
+	message.setDataLengthCode(dlcValue);
 
 	// required for optimization in MessageRam::readData()
 	static_assert((std::size(decltype(message.data){}) % 4) == 0);
@@ -142,16 +139,9 @@ sendMsg(const modm::can::Message& message)
 		return false;
 	}
 
-	// TODO: for fdcan frame format with bit rate switching set:
-	// (TxFifoHeader::FdFrame | TxFifoHeader::RateSwitching)
-	MessageRam::TxFifoHeader_t txHeader{};
-
-	// TODO: large frame support
-	const uint8_t dlc = std::min<uint8_t>(8, message.getLength());
-	MessageRam::TxDlc_t::set(txHeader, dlc);
-
 	const uint8_t putIndex = retrieveTxFifoPutIndex();
 	const auto commonHeader = MessageRam::headerFromMessage(message);
+	const auto txHeader = MessageRam::txHeaderFromMessage(message);
 	MessageRam::writeTxHeaders(putIndex, commonHeader, txHeader);
 
 	// required for optimization in MessageRam::readData()
@@ -362,7 +352,6 @@ modm::platform::Fdcan{{ id }}::isMessageAvailable()
 %% endif
 }
 
-
 bool
 modm::platform::Fdcan{{ id }}::getMessage(can::Message& message, uint8_t *filter_id, uint16_t *timestamp)
 {
@@ -396,7 +385,6 @@ modm::platform::Fdcan{{ id }}::getMessage(can::Message& message, uint8_t *filter
 %% endif
 }
 
-
 bool
 modm::platform::Fdcan{{ id }}::isReadyToSend()
 {
@@ -422,11 +410,9 @@ modm::platform::Fdcan{{ id }}::sendMessage(const can::Message& message)
 		return false;
 %% endif
 	} else {
-		sendMsg(message);
-		return true;
+		return sendMsg(message);
 	}
 }
-
 
 modm::platform::Fdcan{{ id }}::BusState
 modm::platform::Fdcan{{ id }}::getBusState()

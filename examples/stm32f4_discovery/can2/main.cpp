@@ -55,7 +55,8 @@ displayMessage(const modm::can::Message& message)
 	}
 	MODM_LOG_INFO<< modm::endl;
 
-	MODM_LOG_INFO<< "dlc =" << message.getLength() << modm::endl;
+	MODM_LOG_INFO<< "dlc =" << message.getDataLengthCode() << modm::endl;
+	MODM_LOG_INFO<< "length =" << message.getLength() << modm::endl;
 	if (!message.isRemoteTransmitRequest())
 	{
 		MODM_LOG_INFO << "data=";
