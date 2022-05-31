@@ -23,9 +23,9 @@ modm::platform::AdcInterrupt::handler([](){});
 
 // ----------------------------------------------------------------------------
 %% if target.family == "tiny" and target.name == "20"
-MODM_ISR(ADC_ADC, modm_weak)
+MODM_ISR(ADC_ADC)
 %% else
-MODM_ISR(ADC, modm_weak)
+MODM_ISR(ADC)
 %% endif
 {
 	modm::platform::AdcInterrupt::handler();
