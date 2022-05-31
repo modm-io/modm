@@ -97,7 +97,7 @@ Itm::write(uint8_t data)
 	update();
 	return txBuffer.push(data);
 %% else
-	return write_itm(data);
+	return write_itm(data << 24);
 %% endif
 }
 
