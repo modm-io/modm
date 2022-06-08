@@ -17,12 +17,12 @@
 #ifndef MODM_STM32_TIMER_{{ id }}_HPP
 #define MODM_STM32_TIMER_{{ id }}_HPP
 
+#include <chrono>
+#include <limits>
 #include "general_purpose_base.hpp"
 #include <modm/platform/gpio/connector.hpp>
 
-namespace modm
-{
-namespace platform
+namespace modm::platform
 {
 /**
  * General Purpose Timer {{ id }}
@@ -110,12 +110,13 @@ public:
 	// This type is the internal size of the counter.
 %% if id in [2, 5] and (target["family"] in ["f2", "f3", "f4", "f7", "l1", "l4", "g4"])
 	// Timer 2 and 5 are the only one which have the size of 32 bit
-	typedef uint32_t Value;
+	using Value = uint32_t;
 
 %% else
-	typedef uint16_t Value;
+	using Value = uint16_t;
 
 %% endif
+
 	template< class... Signals >
 	static void
 	connect()
@@ -167,7 +168,7 @@ public:
 	static uint16_t
 	getPrescaler()
 	{
-		return (TIM{{ id }}->PSC + 1);
+		return TIM{{ id }}->PSC + 1;
 	}
 
 	static inline void
@@ -176,27 +177,38 @@ public:
 		TIM{{ id }}->ARR = overflow;
 	}
 
-	template<class SystemClock>
-	static Value
-	setPeriod(uint32_t microseconds, bool autoApply = true)
+	static inline Value
+	getOverflow()
 	{
-		// This will be inaccurate for non-smooth frequencies (last six digits
-		// unequal to zero)
-		uint32_t cycles = microseconds * (SystemClock::Timer{{ id }} / 1'000'000UL);
-		uint16_t prescaler = (cycles + 65'535) / 65'536;	// always round up
-		Value overflow = cycles / prescaler;
+		return TIM{{ id }}->ARR;
+	}
 
-		overflow = overflow - 1;	// e.g. 36'000 cycles are from 0 to 35'999
+	template<class SystemClock, class Rep, class Period>
+	static Value
+	setPeriod(std::chrono::duration<Rep, Period> duration, bool autoApply = true)
+	{
+		// This will be inaccurate for non-smooth frequencies (last six digits unequal to zero)
+		const uint32_t cycles = duration.count() * SystemClock::Timer{{ id }} * Period::num / Period::den;
+		const uint16_t prescaler = (cycles + std::numeric_limits<Value>::max() - 1) / std::numeric_limits<Value>::max(); // always round up
+		const Value overflow = cycles / prescaler - 1;
 
 		setPrescaler(prescaler);
 		setOverflow(overflow);
 
-		if (autoApply) {
-			// Generate Update Event to apply the new settings for ARR
+		// Generate Update Event to apply the new settings for ARR
+		if (autoApply)
 			TIM{{ id }}->EGR |= TIM_EGR_UG;
-		}
 
 		return overflow;
+	}
+
+	// DEPRECATE: 2023q2
+	template<class SystemClock>
+	[[deprecated("Pass microseconds as std::chrono::duration: setPeriod( {microseconds}us ) instead!")]]
+	static Value
+	setPeriod(uint32_t microseconds, bool autoApply = true)
+	{
+		return setPeriod<SystemClock>(std::chrono::microseconds(microseconds), autoApply);
 	}
 
 	/* Returns the frequency of the timer */
@@ -543,8 +555,6 @@ public:
 	}
 };
 
-}	// namespace platform
-
-}	// namespace modm
+}	// namespace modm::platform
 
 #endif // MODM_STM32_TIMER_{{ id }}_HPP
