@@ -38,7 +38,7 @@ main()
 
 	Timer14::enable();
 	Timer14::setMode(Timer14::Mode::UpCounter);
-	Timer14::setPeriod<Board::SystemClock>(500'000 /* us */);
+	Timer14::setPeriod<Board::SystemClock>(500ms);
 	Timer14::applyAndReset();
 	Timer14::start();
 	Timer14::enableInterrupt(Timer14::Interrupt::Update);

@@ -37,7 +37,7 @@ main()
 
 	Timer2::enable();
 	Timer2::setMode(Timer2::Mode::UpCounter);
-	Timer2::setPeriod<Board::SystemClock>(500'000 /* us */);
+	Timer2::setPeriod<Board::SystemClock>(500ms);
 	Timer2::applyAndReset();
 	Timer2::start();
 	Timer2::enableInterrupt(Timer2::Interrupt::Update);

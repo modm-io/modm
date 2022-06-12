@@ -38,18 +38,19 @@ MODM_ISR(TIM2)
 	encoder.update();
 }
 
+template<class Timer, class Rep, class Period>
 void
-init_Timer2(const uint16_t period)
+initPeriodicInterrupt(std::chrono::duration<Rep, Period> period)
 {
-	Timer2::enable();
-	Timer2::setMode(Timer2::Mode::UpCounter);
+	Timer::enable();
+	Timer::setMode(Timer::Mode::UpCounter);
 
-	Timer2::template setPeriod<Board::SystemClock>(period);
-	Timer2::enableInterruptVector(true, 10);
-	Timer2::enableInterrupt(Timer2::Interrupt::Update);
+	Timer::template setPeriod<Board::SystemClock>(period);
+	Timer::enableInterruptVector(true, 10);
+	Timer::enableInterrupt(Timer::Interrupt::Update);
 
-	Timer2::applyAndReset();
-	Timer2::start();
+	Timer::applyAndReset();
+	Timer::start();
 }
 
 int
@@ -61,7 +62,7 @@ main()
 	Usart2::initialize<Board::SystemClock, 115200_Bd>();
 
 	encoder.initialize();
-	init_Timer2(1000); // 1ms period
+	initPeriodicInterrupt<Timer2>(1ms);
 
 	int value(0);
 
