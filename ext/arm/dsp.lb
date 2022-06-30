@@ -45,7 +45,9 @@ class CmsisDspModule(Module):
             "support": [],
             "svm": [],
             "tables": [":cmsis:dsp:transform"],
-            "transform": [":cmsis:dsp:basic_math", ":cmsis:dsp:complex_math", ":cmsis:dsp:tables"],
+            "transform": [":cmsis:dsp:basic_math", ":cmsis:dsp:complex_math",
+                          ":cmsis:dsp:matrix", ":cmsis:dsp:statistics",
+                          ":cmsis:dsp:tables"],
         }
         module.depends(*dependencies[self.name])
         return True
