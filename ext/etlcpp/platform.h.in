@@ -40,6 +40,12 @@ SOFTWARE.
 #define ETL_TARGET_OS_FREERTOS
 %% endif
 
+// Fix gcc 10 incorrectly reporting max C++ version as 17
+#define ETL_CPP11_SUPPORTED 1
+#define ETL_CPP14_SUPPORTED 1
+#define ETL_CPP17_SUPPORTED 1
+#define ETL_CPP20_SUPPORTED 1
+
 #include "platform_internal.h"
 
 #endif /* ETL_PLATFORM_EXTERNAL_INCLUDED */
