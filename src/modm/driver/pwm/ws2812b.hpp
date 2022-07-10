@@ -14,6 +14,7 @@
 #include <modm/architecture/interface/spi_master.hpp>
 #include <modm/architecture/interface/unaligned.hpp>
 #include <modm/ui/color.hpp>
+#include <modm/processing/resumable.hpp>
 
 namespace modm
 {
@@ -100,13 +101,10 @@ public:
 		return {color[1], color[0], color[2]};
 	}
 
-	void
+	modm::ResumableResult<void>
 	write()
 	{
-		for (const auto value : data) {
-			while (not SpiMaster::Hal::isTransmitRegisterEmpty()) ;
-			SpiMaster::Hal::write(value);
-		}
+		return SpiMaster::transfer(data, nullptr, length+1);
 	}
 };
 
