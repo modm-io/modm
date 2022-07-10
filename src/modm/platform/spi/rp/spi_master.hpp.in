@@ -27,9 +27,11 @@ namespace modm::platform
  */
 class SpiMaster{{ id }} : public modm::SpiMaster
 {
+protected:
 	// Bit0: single transfer state
 	// Bit1: block transfer state
 	static inline uint8_t state{0};
+private:
 	static inline uint8_t count{0};
 	static inline void *context{nullptr};
 	static inline ConfigurationHandler configuration{nullptr};
