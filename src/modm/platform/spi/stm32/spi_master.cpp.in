@@ -16,21 +16,6 @@
 
 #include "spi_master_{{id}}.hpp"
 
-// Bit0: single transfer state
-// Bit1: block transfer state
-uint8_t
-modm::platform::SpiMaster{{ id }}::state(0);
-
-uint8_t
-modm::platform::SpiMaster{{ id }}::count(0);
-
-void *
-modm::platform::SpiMaster{{ id }}::context(nullptr);
-
-modm::Spi::ConfigurationHandler
-modm::platform::SpiMaster{{ id }}::configuration(nullptr);
-// ----------------------------------------------------------------------------
-
 uint8_t
 modm::platform::SpiMaster{{ id }}::acquire(void *ctx, ConfigurationHandler handler)
 {
