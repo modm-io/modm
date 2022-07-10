@@ -39,6 +39,16 @@ run-nucleo-f091rc:
 	$(call run-test,nucleo-f091rc,size)
 
 
+compile-nucleo-f103rb_A:
+	$(call compile-test,nucleo-f103rb_A,size)
+run-nucleo-f103rb_A:
+	$(call run-test,nucleo-f103rb_A,size)
+compile-nucleo-f103rb_B:
+	$(call compile-test,nucleo-f103rb_B,size)
+run-nucleo-f103rb_B:
+	$(call run-test,nucleo-f103rb_B,size)
+
+
 compile-nucleo-f401re:
 	$(call compile-test,nucleo-f401re,size)
 run-nucleo-f401re:
@@ -49,6 +59,12 @@ compile-nucleo-f411re:
 	$(call compile-test,nucleo-f411re,size)
 run-nucleo-f411re:
 	$(call run-test,nucleo-f411re,size)
+
+
+compile-nucleo-f429zi:
+	$(call compile-test,nucleo-f429zi,size)
+run-nucleo-f429zi:
+	$(call run-test,nucleo-f429zi,size)
 
 
 compile-nucleo-f446re:
@@ -63,16 +79,10 @@ run-nucleo-f446ze:
 	$(call run-test,nucleo-f446ze,size)
 
 
-compile-nucleo-l432kc:
-	$(call compile-test,nucleo-l432kc,size)
-run-nucleo-l432kc:
-	$(call run-test,nucleo-l432kc,size)
-
-
-compile-nucleo-l552ze-q:
-	$(call compile-test,nucleo-l552ze-q,size)
-run-nucleo-l552ze-q:
-	$(call run-test,nucleo-l552ze-q,size)
+compile-nucleo-f767zi:
+	$(call compile-test,nucleo-f767zi,size)
+run-nucleo-f767zi:
+	$(call run-test,nucleo-f767zi,size)
 
 
 compile-nucleo-g474re:
@@ -81,15 +91,28 @@ run-nucleo-g474re:
 	$(call run-test,nucleo-g474re,size)
 
 
-compile-nucleo-f103rb_A:
-	$(call compile-test,nucleo-f103rb_A,size)
-run-nucleo-f103rb_A:
-	$(call run-test,nucleo-f103rb_A,size)
+compile-nucleo-h723zg:
+	$(call compile-test,nucleo-h723zg,size)
+run-nucleo-h723zg:
+	$(call run-test,nucleo-h723zg,size)
 
-compile-nucleo-f103rb_B:
-	$(call compile-test,nucleo-f103rb_B,size)
-run-nucleo-f103rb_B:
-	$(call run-test,nucleo-f103rb_B,size)
+
+compile-nucleo-l432kc:
+	$(call compile-test,nucleo-l432kc,size)
+run-nucleo-l432kc:
+	$(call run-test,nucleo-l432kc,size)
+
+
+compile-nucleo-l496zg-p:
+	$(call compile-test,nucleo-l496zg-p,size)
+run-nucleo-l496zg-p:
+	$(call run-test,nucleo-l496zg-p,size)
+
+
+compile-nucleo-l552ze-q:
+	$(call compile-test,nucleo-l552ze-q,size)
+run-nucleo-l552ze-q:
+	$(call run-test,nucleo-l552ze-q,size)
 
 
 compile-al-avreb-can:
