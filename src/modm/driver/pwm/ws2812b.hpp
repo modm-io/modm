@@ -21,7 +21,7 @@ namespace modm
 
 /// @ingroup modm_driver_ws2812
 template< class SpiMaster, class Output, size_t LEDs >
-class Ws2812b
+class Ws2812b : protected modm::NestedResumable<3>
 {
 protected:								  // 7654 3210 7654 3210 7654 3210
 	static constexpr uint32_t base_mask  = 0b0010'0100'1001'0010'0100'1001;
@@ -104,7 +104,9 @@ public:
 	modm::ResumableResult<void>
 	write()
 	{
-		return SpiMaster::transfer(data, nullptr, length+1);
+		RF_BEGIN();
+		RF_CALL(SpiMaster::transfer(data, nullptr, length+1));
+		RF_END_RETURN();
 	}
 };
 
