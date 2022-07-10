@@ -70,14 +70,14 @@ cd tests
 make run-hosted-linux
 make run-hosted-darwin
 # generates and compiles the unit tests for embedded targets
-make compile-nucleo-f411
-make compile-nucleo-f103_A
-make compile-nucleo-f103_B
+make compile-nucleo-f411re
+make compile-nucleo-f103rb_A
+make compile-nucleo-f103rb_B
 make compile-arduino-nano_A # to _H
 # executes the unit tests on the embedded targets
-make run-nucleo-f411
-make run-nucleo-f103_A
-make run-nucleo-f103_B
+make run-nucleo-f411re
+make run-nucleo-f103rb_A
+make run-nucleo-f103rb_B
 make run-arduino-nano_A # to _H
 ```
 

@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <library>
-  <extends>modm:nucleo-f446re</extends>
+  <extends>modm:nucleo-l432kc</extends>
   <options>
-    <option name="modm:build:build.path">../../build/generated-unittest/nucleo-f446/</option>
-    <option name="modm:build:unittest.source">../../build/generated-unittest/nucleo-f446/modm-test</option>
+    <option name="modm:build:build.path">../../build/generated-unittest/nucleo-l432kc/</option>
+    <option name="modm:build:unittest.source">../../build/generated-unittest/nucleo-l432kc/modm-test</option>
     <option name="modm:platform:exti:with_handlers">false</option>
   </options>
   <modules>

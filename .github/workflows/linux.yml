@@ -60,11 +60,17 @@ jobs:
       - name: Compile STM32 Unittests
         if: always()
         run: |
-          (cd test && make compile-nucleo-f411)
-          (cd test && make compile-nucleo-l432)
-          (cd test && make compile-nucleo-f103_A)
-          (cd test && make compile-nucleo-f103_B)
-          (cd test && make compile-nucleo-f091)
+          (cd test && make compile-nucleo-l432kc)
+          (cd test && make compile-nucleo-f091rc)
+          (cd test && make compile-nucleo-f103rb_A)
+          (cd test && make compile-nucleo-f103rb_B)
+          (cd test && make compile-nucleo-f401re)
+          (cd test && make compile-nucleo-f411re)
+          (cd test && make compile-nucleo-f446re)
+          (cd test && make compile-nucleo-f446ze)
+          (cd test && make compile-nucleo-g474re)
+          (cd test && make compile-nucleo-l432kc)
+          (cd test && make compile-nucleo-l552ze-q)
       - name: Linux Examples
         if: always()
         run: |

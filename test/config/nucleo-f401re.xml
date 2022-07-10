@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <library>
-  <extends>modm:nucleo-l552ze-q</extends>
+  <extends>modm:nucleo-f401re</extends>
   <options>
-    <option name="modm:build:build.path">../../build/generated-unittest/nucleo-l552/</option>
-    <option name="modm:build:unittest.source">../../build/generated-unittest/nucleo-l552/modm-test</option>
+    <option name="modm:build:build.path">../../build/generated-unittest/nucleo-f401re/</option>
+    <option name="modm:build:unittest.source">../../build/generated-unittest/nucleo-f401re/modm-test</option>
     <option name="modm:platform:exti:with_handlers">false</option>
   </options>
   <modules>

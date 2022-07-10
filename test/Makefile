@@ -33,28 +33,28 @@ run-hosted-windows:
 	$(call compile-test,hosted,run,-D":target=hosted-windows")
 
 
-compile-nucleo-f091:
-	$(call compile-test,nucleo-f091,size)
-run-nucleo-f091:
-	$(call run-test,nucleo-f091,size)
+compile-nucleo-f091rc:
+	$(call compile-test,nucleo-f091rc,size)
+run-nucleo-f091rc:
+	$(call run-test,nucleo-f091rc,size)
 
 
-compile-nucleo-f401:
-	$(call compile-test,nucleo-f401,size)
-run-nucleo-f401:
-	$(call run-test,nucleo-f401,size)
+compile-nucleo-f401re:
+	$(call compile-test,nucleo-f401re,size)
+run-nucleo-f401re:
+	$(call run-test,nucleo-f401re,size)
 
 
-compile-nucleo-f411:
-	$(call compile-test,nucleo-f411,size)
-run-nucleo-f411:
-	$(call run-test,nucleo-f411,size)
+compile-nucleo-f411re:
+	$(call compile-test,nucleo-f411re,size)
+run-nucleo-f411re:
+	$(call run-test,nucleo-f411re,size)
 
 
-compile-nucleo-f446:
-	$(call compile-test,nucleo-f446,size)
-run-nucleo-f446:
-	$(call run-test,nucleo-f446,size)
+compile-nucleo-f446re:
+	$(call compile-test,nucleo-f446re,size)
+run-nucleo-f446re:
+	$(call run-test,nucleo-f446re,size)
 
 
 compile-nucleo-f446ze:
@@ -63,33 +63,33 @@ run-nucleo-f446ze:
 	$(call run-test,nucleo-f446ze,size)
 
 
-compile-nucleo-l432:
-	$(call compile-test,nucleo-l432,size)
-run-nucleo-l432:
-	$(call run-test,nucleo-l432,size)
+compile-nucleo-l432kc:
+	$(call compile-test,nucleo-l432kc,size)
+run-nucleo-l432kc:
+	$(call run-test,nucleo-l432kc,size)
 
 
-compile-nucleo-l552:
-	$(call compile-test,nucleo-l552,size)
-run-nucleo-l552:
-	$(call run-test,nucleo-l552,size)
+compile-nucleo-l552ze-q:
+	$(call compile-test,nucleo-l552ze-q,size)
+run-nucleo-l552ze-q:
+	$(call run-test,nucleo-l552ze-q,size)
 
 
-compile-nucleo-g474:
-	$(call compile-test,nucleo-g474,size)
-run-nucleo-g474:
-	$(call run-test,nucleo-g474,size)
+compile-nucleo-g474re:
+	$(call compile-test,nucleo-g474re,size)
+run-nucleo-g474re:
+	$(call run-test,nucleo-g474re,size)
 
 
-compile-nucleo-f103_A:
-	$(call compile-test,nucleo-f103_A,size)
-run-nucleo-f103_A:
-	$(call run-test,nucleo-f103_A,size)
+compile-nucleo-f103rb_A:
+	$(call compile-test,nucleo-f103rb_A,size)
+run-nucleo-f103rb_A:
+	$(call run-test,nucleo-f103rb_A,size)
 
-compile-nucleo-f103_B:
-	$(call compile-test,nucleo-f103_B,size)
-run-nucleo-f103_B:
-	$(call run-test,nucleo-f103_B,size)
+compile-nucleo-f103rb_B:
+	$(call compile-test,nucleo-f103rb_B,size)
+run-nucleo-f103rb_B:
+	$(call run-test,nucleo-f103rb_B,size)
 
 
 compile-al-avreb-can:
