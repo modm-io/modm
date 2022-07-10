@@ -33,10 +33,14 @@ run-hosted-windows:
 	$(call compile-test,hosted,run,-D":target=hosted-windows")
 
 
-compile-nucleo-f091rc:
-	$(call compile-test,nucleo-f091rc,size)
-run-nucleo-f091rc:
-	$(call run-test,nucleo-f091rc,size)
+compile-nucleo-f091rc_A:
+	$(call compile-test,nucleo-f091rc_A,size)
+run-nucleo-f091rc_A:
+	$(call run-test,nucleo-f091rc_A,size)
+compile-nucleo-f091rc_B:
+	$(call compile-test,nucleo-f091rc_B,size)
+run-nucleo-f091rc_B:
+	$(call run-test,nucleo-f091rc_B,size)
 
 
 compile-nucleo-f103rb_A:

@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <extends>modm:nucleo-f091rc</extends>
+  <options>
+    <option name="modm:build:build.path">../../build/generated-unittest/nucleo-f091rc_B/</option>
+    <option name="modm:build:unittest.source">../../build/generated-unittest/nucleo-f091rc_B/modm-test</option>
+    <option name="modm:platform:exti:with_handlers">false</option>
+  </options>
+  <modules>
+    <module>modm:platform:heap</module>
+    <!-- Not everything fits -->
+    <!-- <module>modm-test:test:architecture</module>
+    <module>modm-test:test:communication</module>
+    <module>modm-test:test:container</module>
+    <module>modm-test:test:driver</module>
+    <module>modm-test:test:io</module>
+
+    <module>modm-test:test:platform:**</module>
+    <module>modm-test:test:processing</module>
+    <module>modm-test:test:ui</module> -->
+    <module>modm-test:test:math</module>
+  </modules>
+</library>
