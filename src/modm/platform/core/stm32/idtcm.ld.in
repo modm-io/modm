@@ -25,7 +25,11 @@ SECTIONS
 {{ linker.section_heap("ITCM", "heap_itcm", sections=["noinit_itcm"]) }}
 %% do table_heap.append({"name": "heap_itcm", "prop": "0x201f"})
 
+%% if cont_ram_regions[0].cont_name == "cont_dtcm"
+{{ linker.section_stack("CONT_DTCM") }}
+%% else
 {{ linker.section_stack("DTCM") }}
+%% endif
 
 {{ linker.section_ram(cont_ram_regions[0].cont_name|upper, "FLASH", table_copy, table_zero,
                       sections_data=["fastdata", "data_" + cont_ram_regions[0].contains[0].name],
