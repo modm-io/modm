@@ -139,11 +139,9 @@ public:
 };
 
 /// @ingroup modm_driver_ili9341
-template <class Interface, class Reset, class Backlight, std::size_t BufferSize = 320>
+template <class Interface, class Reset, class Backlight>
 class Ili9341 : public Interface, public modm::ColorGraphicDisplay
 {
-	static_assert(BufferSize >= 16, "at least a small buffer is required");
-
 	static constexpr uint16_t Width = 240;
 	static constexpr uint16_t Height = 320;
 	using BatchHandle = typename Interface::BatchHandle;
@@ -298,7 +296,7 @@ private:
 
 	Orientation orientation{Orientation::Landscape0};
 
-	uint8_t buffer[BufferSize * 2]{0};
+	uint8_t buffer[4];
 };
 
 } // namespace modm

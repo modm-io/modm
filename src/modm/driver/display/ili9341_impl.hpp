@@ -15,9 +15,9 @@
 namespace modm
 {
 
-template <class Interface, class Reset, class Backlight, std::size_t BufferSize>
+template <class Interface, class Reset, class Backlight>
 void
-Ili9341<Interface, Reset, Backlight, BufferSize>::initialize()
+Ili9341<Interface, Reset, Backlight>::initialize()
 {
 	constexpr uint8_t pwrCtrlA[] { 0x39, 0x2c, 0x00, 0x34, 0x02 };
 	constexpr uint8_t pwrCtrlB[] { 0x00, 0xc1, 0x30 };
@@ -78,9 +78,9 @@ Ili9341<Interface, Reset, Backlight, BufferSize>::initialize()
 	}
 }
 
-template <class Interface, class Reset, class Backlight, std::size_t BufferSize>
+template <class Interface, class Reset, class Backlight>
 void
-Ili9341<Interface, Reset, Backlight, BufferSize>::reset(bool hardReset /* = false */)
+Ili9341<Interface, Reset, Backlight>::reset(bool hardReset /* = false */)
 {
 	if (hardReset)
 	{
@@ -98,9 +98,9 @@ Ili9341<Interface, Reset, Backlight, BufferSize>::reset(bool hardReset /* = fals
 	}
 }
 
-template <class Interface, class Reset, class Backlight, std::size_t BufferSize>
+template <class Interface, class Reset, class Backlight>
 uint16_t
-Ili9341<Interface, Reset, Backlight, BufferSize>::getIcModel()
+Ili9341<Interface, Reset, Backlight>::getIcModel()
 {
 	BatchHandle h(*this);
 
@@ -109,9 +109,9 @@ Ili9341<Interface, Reset, Backlight, BufferSize>::getIcModel()
 	return (buffer[2] << 8) | buffer[3];
 }
 
-template <class Interface, class Reset, class Backlight, std::size_t BufferSize>
+template <class Interface, class Reset, class Backlight>
 inline void
-Ili9341<Interface, Reset, Backlight, BufferSize>::setOrientation(glcd::Orientation orientation)
+Ili9341<Interface, Reset, Backlight>::setOrientation(glcd::Orientation orientation)
 {
 	using MemoryAccessCtrl_t = ili9341::MemoryAccessCtrl_t;
 	using MemoryAccessCtrl = ili9341::MemoryAccessCtrl;
@@ -139,57 +139,57 @@ Ili9341<Interface, Reset, Backlight, BufferSize>::setOrientation(glcd::Orientati
 	this->writeCommandValue8(Command::MemoryAccessCtrl, madCtrl.value);
 }
 
-template <class Interface, class Reset, class Backlight, std::size_t BufferSize>
+template <class Interface, class Reset, class Backlight>
 void
-Ili9341<Interface, Reset, Backlight, BufferSize>::turnOn()
+Ili9341<Interface, Reset, Backlight>::turnOn()
 {
 	BatchHandle h(*this);
 	this->writeCommand(Command::DisplayOn);
 }
 
-template <class Interface, class Reset, class Backlight, std::size_t BufferSize>
+template <class Interface, class Reset, class Backlight>
 void
-Ili9341<Interface, Reset, Backlight, BufferSize>::turnOff()
+Ili9341<Interface, Reset, Backlight>::turnOff()
 {
 	BatchHandle h(*this);
 	this->writeCommand(Command::DisplayOff);
 }
 
-template <class Interface, class Reset, class Backlight, std::size_t BufferSize>
+template <class Interface, class Reset, class Backlight>
 void
-Ili9341<Interface, Reset, Backlight, BufferSize>::setIdle(bool enable)
+Ili9341<Interface, Reset, Backlight>::setIdle(bool enable)
 {
 	BatchHandle h(*this);
 	this->writeCommand(enable ? Command::IdleModeOn : Command::IdleModeOff);
 }
 
-template <class Interface, class Reset, class Backlight, std::size_t BufferSize>
+template <class Interface, class Reset, class Backlight>
 void
-Ili9341<Interface, Reset, Backlight, BufferSize>::enableSleep(bool enable)
+Ili9341<Interface, Reset, Backlight>::enableSleep(bool enable)
 {
 	BatchHandle h(*this);
 	this->writeCommand(enable ? Command::EnterSleep : Command::LeaveSleep);
 }
 
-template <class Interface, class Reset, class Backlight, std::size_t BufferSize>
+template <class Interface, class Reset, class Backlight>
 void
-Ili9341<Interface, Reset, Backlight, BufferSize>::setBrightness(uint8_t level)
+Ili9341<Interface, Reset, Backlight>::setBrightness(uint8_t level)
 {
 	BatchHandle h(*this);
 	this->writeCommand(Command::WriteBrightness, &level, 1);
 }
 
-template <class Interface, class Reset, class Backlight, std::size_t BufferSize>
+template <class Interface, class Reset, class Backlight>
 void
-Ili9341<Interface, Reset, Backlight, BufferSize>::setInvert(bool invert)
+Ili9341<Interface, Reset, Backlight>::setInvert(bool invert)
 {
 	BatchHandle h(*this);
 	this->writeCommand(invert ? Command::InversionOn : Command::InversionOff);
 }
 
-template <class Interface, class Reset, class Backlight, std::size_t BufferSize>
+template <class Interface, class Reset, class Backlight>
 void
-Ili9341<Interface, Reset, Backlight, BufferSize>::clear()
+Ili9341<Interface, Reset, Backlight>::clear()
 {
 	auto const saveForegroundColor { foregroundColor };
 	foregroundColor = backgroundColor;
@@ -197,82 +197,45 @@ Ili9341<Interface, Reset, Backlight, BufferSize>::clear()
 	foregroundColor = saveForegroundColor;
 }
 
-template <class Interface, class Reset, class Backlight, std::size_t BufferSize>
+template <class Interface, class Reset, class Backlight>
 void
-Ili9341<Interface, Reset, Backlight, BufferSize>::drawHorizontalLine(
+Ili9341<Interface, Reset, Backlight>::drawHorizontalLine(
 		glcd::Point start, uint16_t length)
 {
-	uint16_t const pixelValue { modm::toBigEndian(foregroundColor.color) };
-	auto minLength { std::min(std::size_t(length), BufferSize) };
-	uint16_t *buffer16 { reinterpret_cast<uint16_t *>(buffer) };
-	std::fill(buffer16, buffer16+minLength, pixelValue);
-
-	BatchHandle h(*this);
-
-	setClipping(start.getX(), start.getY(), length, 1);
-	while (length > BufferSize)
-	{
-		this->writeData(buffer, BufferSize * 2);
-		length -= BufferSize;
-	}
-	this->writeData(buffer, length * 2);
+	fillRectangle(start, length, 1);
 }
 
-template <class Interface, class Reset, class Backlight, std::size_t BufferSize>
+template <class Interface, class Reset, class Backlight>
 void
-Ili9341<Interface, Reset, Backlight, BufferSize>::drawVerticalLine(
+Ili9341<Interface, Reset, Backlight>::drawVerticalLine(
 		glcd::Point start, uint16_t length)
 {
-	uint16_t const pixelValue { modm::toBigEndian(foregroundColor.color) };
-	auto minLength { std::min(std::size_t(length), BufferSize) };
-	uint16_t *buffer16 { reinterpret_cast<uint16_t *>(buffer) };
-	std::fill(buffer16, buffer16+minLength, pixelValue);
-
-	BatchHandle h(*this);
-
-	setClipping(start.getX(), start.getY(), 1, length);
-	while (length > BufferSize)
-	{
-		this->writeData(buffer, BufferSize * 2);
-		length -= BufferSize;
-	}
-	this->writeData(buffer, length * 2);
+	fillRectangle(start, 1, length);
 }
 
-template <class Interface, class Reset, class Backlight, std::size_t BufferSize>
+template <class Interface, class Reset, class Backlight>
 void
-Ili9341<Interface, Reset, Backlight, BufferSize>::fillRectangle(
+Ili9341<Interface, Reset, Backlight>::fillRectangle(
 		glcd::Point upperLeft, uint16_t width, uint16_t height)
 {
-	auto const x { upperLeft.getX() };
-	auto const y { upperLeft.getY() };
-	std::size_t pixelCount { std::size_t(width) * std::size_t(height) };
-
-	uint16_t const pixelValue { modm::toBigEndian(foregroundColor.color) };
-	auto minLength { std::min(std::size_t(pixelCount), BufferSize) };
-	uint16_t *buffer16 { reinterpret_cast<uint16_t *>(buffer) };
-	std::fill(buffer16, buffer16+minLength, pixelValue);
+	uint64_t pixelCount = uint64_t(width) * height;
 
 	BatchHandle h(*this);
 
-	setClipping(x, y, width, height);
-	while (pixelCount > BufferSize)
+	setClipping(upperLeft.getX(), upperLeft.getY(), width, height);
+	while (pixelCount > std::numeric_limits<uint16_t>::max())
 	{
-		this->writeData(buffer, BufferSize * 2);
-		pixelCount -= BufferSize;
+		this->writeDataRepeat(foregroundColor, std::numeric_limits<uint16_t>::max());
+		pixelCount -= std::numeric_limits<uint16_t>::max();
 	}
-	if (pixelCount)
-		this->writeData(buffer, pixelCount * 2);
+	this->writeDataRepeat(foregroundColor, pixelCount);
 }
 
-template <class Interface, class Reset, class Backlight, std::size_t BufferSize>
+template <class Interface, class Reset, class Backlight>
 void
-Ili9341<Interface, Reset, Backlight, BufferSize>::fillCircle(
+Ili9341<Interface, Reset, Backlight>::fillCircle(
 		glcd::Point center, uint16_t radius)
 {
-	uint8_t const setColor[] { uint8_t((foregroundColor.color >> 8) & 0xff),
-			uint8_t(foregroundColor.color & 0xff) };
-
 	int16_t f = 1 - radius;
 	int16_t ddF_x = 0;
 	int16_t ddF_y = -2 * radius;
@@ -283,7 +246,7 @@ Ili9341<Interface, Reset, Backlight, BufferSize>::fillCircle(
 
 	setClipping(center.getX() - radius, center.getY(), 2 * radius, 1);
 	for (std::size_t i = 0; i < 2 * radius; ++i)
-		this->writeData(setColor, 2);
+		this->writeData(foregroundColor.color);
 
 	while(x < y)
 	{
@@ -299,29 +262,24 @@ Ili9341<Interface, Reset, Backlight, BufferSize>::fillCircle(
 
 		setClipping(center.getX() - x, center.getY() - y, 2 * x, 1);
 		for (std::size_t i = 0; i < 2 * x; ++i)
-			this->writeData(setColor, 2);
+			this->writeData(foregroundColor.color);
 		setClipping(center.getX() - y, center.getY() - x, 2 * y, 1);
 		for (std::size_t i = 0; i < 2 * y; ++i)
-			this->writeData(setColor, 2);
+			this->writeData(foregroundColor.color);
 		setClipping(center.getX() - x, center.getY() + y, 2 * x, 1);
 		for (std::size_t i = 0; i < 2 * x; ++i)
-			this->writeData(setColor, 2);
+			this->writeData(foregroundColor.color);
 		setClipping(center.getX() - y, center.getY() + x, 2 * y, 1);
 		for (std::size_t i = 0; i < 2 * y; ++i)
-			this->writeData(setColor, 2);
+			this->writeData(foregroundColor.color);
 	}
 }
 
-template <class Interface, class Reset, class Backlight, std::size_t BufferSize>
+template <class Interface, class Reset, class Backlight>
 void
-Ili9341<Interface, Reset, Backlight, BufferSize>::drawImageRaw(glcd::Point upperLeft,
+Ili9341<Interface, Reset, Backlight>::drawImageRaw(glcd::Point upperLeft,
 		uint16_t width, uint16_t height, modm::accessor::Flash<uint8_t> data)
 {
-	uint8_t const setColor[] { uint8_t((foregroundColor.color >> 8) & 0xff),
-			uint8_t(foregroundColor.color & 0xff) };
-	uint8_t const clearColor[] { uint8_t((backgroundColor.color >> 8) & 0xff),
-			uint8_t(backgroundColor.color & 0xff) };
-
 	BatchHandle h(*this);
 
 	setClipping(upperLeft.getX(), upperLeft.getY(), width, height);
@@ -333,9 +291,9 @@ Ili9341<Interface, Reset, Backlight, BufferSize>::drawImageRaw(glcd::Point upper
 		{
 			uint8_t byte = data[(r / 8) * width + w];
 			if (byte & bit)
-				this->writeData(setColor, 2);
+				this->writeData(foregroundColor.color);
 			else
-				this->writeData(clearColor, 2);
+				this->writeData(backgroundColor.color);
 		}
 		// TODO: optimize, use ROL (rotate left)
 		bit <<= 1;
@@ -344,25 +302,20 @@ Ili9341<Interface, Reset, Backlight, BufferSize>::drawImageRaw(glcd::Point upper
 	}
 }
 
-template <class Interface, class Reset, class Backlight, std::size_t BufferSize>
+template <class Interface, class Reset, class Backlight>
 void
-Ili9341<Interface, Reset, Backlight, BufferSize>::drawRaw(glcd::Point upperLeft,
+Ili9341<Interface, Reset, Backlight>::drawRaw(glcd::Point upperLeft,
 		uint16_t width, uint16_t height, color::Rgb565* data)
 {
 	BatchHandle h(*this);
 
-	uint16_t* buffer = (uint16_t*)data;
-	for(size_t i = 0; i < size_t(width*height); i++) {
-		buffer[i] = modm::fromBigEndian(buffer[i]);
-	}
-
 	setClipping(upperLeft.getX(), upperLeft.getY(), width, height);
-	this->writeData((uint8_t*)buffer, width * height * 2);
+	this->writeData(data, width * height);
 }
 
-template <class Interface, class Reset, class Backlight, std::size_t BufferSize>
+template <class Interface, class Reset, class Backlight>
 void
-Ili9341<Interface, Reset, Backlight, BufferSize>::setScrollArea(
+Ili9341<Interface, Reset, Backlight>::setScrollArea(
 		uint16_t topFixedRows, uint16_t bottomFixedRows, uint16_t firstRow)
 {
 	BatchHandle h(*this);
@@ -376,9 +329,9 @@ Ili9341<Interface, Reset, Backlight, BufferSize>::setScrollArea(
 	this->writeCommand(Command::VerticalScrollDefinition, arg, 6);
 }
 
-template <class Interface, class Reset, class Backlight, std::size_t BufferSize>
+template <class Interface, class Reset, class Backlight>
 void
-Ili9341<Interface, Reset, Backlight, BufferSize>::scrollTo(uint16_t row)
+Ili9341<Interface, Reset, Backlight>::scrollTo(uint16_t row)
 {
 	BatchHandle h(*this);
 
@@ -386,23 +339,20 @@ Ili9341<Interface, Reset, Backlight, BufferSize>::scrollTo(uint16_t row)
 	this->writeCommand(Command::VerticalScrollStartAddr, arg, 2);
 }
 
-template <class Interface, class Reset, class Backlight, std::size_t BufferSize>
+template <class Interface, class Reset, class Backlight>
 void
-Ili9341<Interface, Reset, Backlight, BufferSize>::setColoredPixel(
+Ili9341<Interface, Reset, Backlight>::setColoredPixel(
 		int16_t x, int16_t y, color::Rgb565 const &color)
 {
-	auto const pixelColor { color };
-	uint8_t const setColor[] { uint8_t((pixelColor.color >> 8) & 0xff), uint8_t(pixelColor.color & 0xff) };
-
 	BatchHandle h(*this);
 
 	this->setClipping(x, y, 1, 1);
-	this->writeData(setColor, 2);
+	this->writeData(color);
 }
 
-template <class Interface, class Reset, class Backlight, std::size_t BufferSize>
+template <class Interface, class Reset, class Backlight>
 void
-Ili9341<Interface, Reset, Backlight, BufferSize>::setClipping(
+Ili9341<Interface, Reset, Backlight>::setClipping(
 		uint16_t x, uint16_t y, uint16_t width, uint16_t height)
 {
 	uint8_t buffer[4];
@@ -421,9 +371,9 @@ Ili9341<Interface, Reset, Backlight, BufferSize>::setClipping(
 	this->writeCommand(Command::MemoryWrite);
 }
 
-template <class Interface, class Reset, class Backlight, std::size_t BufferSize>
+template <class Interface, class Reset, class Backlight>
 void
-Ili9341<Interface, Reset, Backlight, BufferSize>::drawBitmap(glcd::Point upperLeft,
+Ili9341<Interface, Reset, Backlight>::drawBitmap(glcd::Point upperLeft,
 		uint16_t width, uint16_t height, modm::accessor::Flash<uint8_t> data)
 {
 	BatchHandle h(*this);

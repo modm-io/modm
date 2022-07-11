@@ -53,7 +53,7 @@ namespace modm::platform
 {
 
 /// @ingroup	modm_platform_spi
-struct Spi
+struct SpiBase
 {
 	enum class
 	Prescaler : uint8_t
@@ -66,29 +66,6 @@ struct Spi
 		Div64 = (1 << SPR1{{ id }}),
 		Div128 = (1 << SPR1{{ id }}) | (1 << SPR0{{ id }}),
 	};
-
-	enum State : uint8_t {
-		Idle = Bit6,	// Transaction is running
-		Repeat = Bit7,	// Send same tx multiple times
-	};
-	MODM_FLAGS8(State);
-
-	enum DataType : uint8_t {
-		Byte = 0,			// 1 byte
-		HalfWord = 1,		// 2 bytes
-		Word = 2,			// 4 bytes
-		// WordWord = 3		// 8 bytes
-	};
-	typedef Value<State_t, 2> DataType_t;
-};
-
-	enum Type : uint8_t {
-		Byte = 0,			// 1 byte
-		HalfWord = 1,		// 2 bytes
-		Word = 2,			// 4 bytes
-		// WordWord = 3		// 8 bytes
-	};
-	typedef Value<State_t, 2> Type_t;
 };
 
 } // namespace modm::platform

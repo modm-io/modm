@@ -82,6 +82,16 @@ public:
 	isTransmitRegisterEmpty();
 
 	/**
+	 * Write up to 8 Bit to the data register
+	 *
+	 * @warning 	This method does NOT do any sanity checks!!
+	 *				It is your responsibility to check if the register
+	 *				is empty!
+	 */
+	static void
+	write(uint8_t data);
+
+	/**
 	 * Write up to 16 Bit to the data register
 	 *
 	 * @warning 	This method does NOT do any sanity checks!!
@@ -92,14 +102,14 @@ public:
 	write(uint16_t data);
 
 	/**
-	 * Write 8 Bit to the data register
+	 * Returns the value of the data register
 	 *
 	 * @warning 	This method does NOT do any sanity checks!!
 	 *				It is your responsibility to check if the register
-	 *				is empty!
+	 *				contains something useful!
 	 */
 	static void
-	write(uint8_t data);
+	read(uint8_t *data);
 
 	/**
 	 * Returns the value of the data register
@@ -109,17 +119,7 @@ public:
 	 *				contains something useful!
 	 */
 	static void
-	read(uint8_t &data);
-
-	/**
-	 * Returns the value of the data register
-	 *
-	 * @warning 	This method does NOT do any sanity checks!!
-	 *				It is your responsibility to check if the register
-	 *				contains something useful!
-	 */
-	static void
-	read(uint16_t &data);
+	read(uint16_t *data);
 
 	static void
 	enableInterruptVector(bool enable, uint32_t priority);

@@ -12,8 +12,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_INTERFACE_SPI_MASTER_HPP
-#define MODM_INTERFACE_SPI_MASTER_HPP
+#pragma once
 
 #include <modm/processing/resumable.hpp>
 #include "spi.hpp"
@@ -156,8 +155,22 @@ public:
 	static modm::ResumableResult<void>
 	transfer(const uint8_t *tx, uint8_t *rx, std::size_t length);
 #endif
+
+public:
+	enum State : uint8_t {
+		Idle = Bit6,	// Transaction is running
+		Repeat = Bit7,	// Send same tx multiple times
+	};
+	MODM_FLAGS8(State);
+
+	enum DataType : uint8_t {
+		Byte = 0,			// 1 byte
+		HalfWord = 1,		// 2 bytes
+		Word = 2,			// 4 bytes
+		// WordWord = 3		// 8 bytes
+	};
+	typedef Value<State_t, 2> DataType_t;
+	
 };
 
 } // namespace modm
-
-#endif // MODM_INTERFACE_SPI_MASTER_HPP
