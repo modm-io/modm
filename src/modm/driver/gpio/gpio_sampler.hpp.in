@@ -23,7 +23,7 @@ namespace modm
 class GpioSampler
 {
 public:
-	using Type = int32_t;
+	using Type = uint32_t;
 
 	class Channel
 	{

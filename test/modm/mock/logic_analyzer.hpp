@@ -63,10 +63,10 @@ public:
 
 					int32_t sample = ch[sidx];
 					if (*state == 'l') {
-						if (0 < sample) failure(state, sidx, 0);
+						if ((sample & 1) == 1) failure(state, sidx, 0);
 						// MODM_LOG_DEBUG << "l " << sample << modm::endl;
 					} else {
-						if (sample < 0) failure(state, sidx, 0);
+						if ((sample & 1) == 0) failure(state, sidx, 0);
 						// MODM_LOG_DEBUG << "h " << sample << modm::endl;
 					}
 					time = &tmin;

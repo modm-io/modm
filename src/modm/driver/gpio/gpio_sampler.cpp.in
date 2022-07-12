@@ -113,7 +113,7 @@ GpioSampler::Type
 GpioSampler::Channel::diff(size_t index) const
 {
 	if (index == 0) return 0;
-	return (*this)[index - 1] - (*this)[index];
+	return (*this)[index] - (*this)[index - 1];
 }
 
 } // namespace modm::platform
