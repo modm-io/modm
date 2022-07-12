@@ -171,7 +171,7 @@ MAIN_STACK_SIZE = {{ options[":platform:cortex-m:main_stack_size"] }};
 %% endmacro
 
 
-%% macro all_heap_sections(table_copy, table_zero, table_heap)
+%% macro all_heap_sections(table_copy, table_zero, table_heap, props={})
 	%% for cont_region in cont_ram_regions
 		%% for region in cont_region.contains
 	/* Sections in {{ region.name|upper }} */
@@ -181,7 +181,11 @@ MAIN_STACK_SIZE = {{ options[":platform:cortex-m:main_stack_size"] }};
 			%% endif
 {{ section_heap(region.name|upper, "heap_"+region.name, cont_region.cont_name|upper,
 				sections=(["bss_"+region.name] if region.index else []) + ["noinit_"+region.name]) }}
-			%% do table_heap.insert(region.index, {"name": "heap_"+region.name, "prop": "0x2013" if "dtcm" in region.name else "0x001f"})
+			%% for name, value in props.items() if name in region.name
+				%% do table_heap.insert(region.index, {"name": "heap_"+region.name, "prop": value})
+			%% else
+				%% do table_heap.insert(region.index, {"name": "heap_"+region.name, "prop": "0x001f"})
+			%% endfor
 			%#
 		%% endfor
 	%% endfor

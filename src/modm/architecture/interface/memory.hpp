@@ -33,8 +33,9 @@ MemoryTrait : uint16_t
 
 	AccessDMA = Bit3,			///< Memory is accessible via DMA
 	AccessDMA2D = Bit4,			///< Memory is accessible via 2D DMA
+	AccessMDMA = Bit5,			///< Memory is accessible via MDMA
 
-	// Bit5 - Bit12 are reserved
+	// Bit6 - Bit12 are reserved
 
 	TypeCoreCoupled = Bit13,	///< Memory is coupled closely to the core
 	TypeNonVolatile = Bit14,	///< Memory is non-volatile (battery-backed)
@@ -58,6 +59,9 @@ constexpr MemoryTraits MemoryDMA = (MemoryTrait::AccessSBus | MemoryTrait::Acces
 /// DMA-able memory is accessible by at least the S-Bus and 2D DMA.
 /// There is no fallback memory on exhaustion.
 constexpr MemoryTraits MemoryDMA2D = (MemoryTrait::AccessSBus | MemoryTrait::AccessDMA2D);
+/// DMA-able memory is accessible by at least the S-Bus and MDMA.
+/// There is no fallback memory on exhaustion.
+constexpr MemoryTraits MemoryMDMA = (MemoryTrait::AccessSBus | MemoryTrait::AccessMDMA);
 
 /// External memory is accessible by at least the S-Bus and it is external.
 /// Fallback memory on exhaustion is internal.

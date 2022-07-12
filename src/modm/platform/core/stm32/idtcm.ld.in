@@ -23,7 +23,7 @@ SECTIONS
 {{ linker.section_load("ITCM AT >FLASH", table_copy, sections=["fastcode", "data_itcm"]) }}
 
 {{ linker.section_heap("ITCM", "heap_itcm", sections=["noinit_itcm"]) }}
-%% do table_heap.append({"name": "heap_itcm", "prop": "0x201f"})
+%% do table_heap.append({"name": "heap_itcm", "prop": "0x2005"})
 
 %% if cont_ram_regions[0].cont_name == "cont_dtcm"
 {{ linker.section_stack("CONT_DTCM") }}
@@ -36,7 +36,7 @@ SECTIONS
                       sections_bss=["bss_" + cont_ram_regions[0].contains[0].name],
                       sections_noinit=["faststack"]) }}
 
-{{ linker.all_heap_sections(table_copy, table_zero, table_heap) }}
+{{ linker.all_heap_sections(table_copy, table_zero, table_heap, props={"dtcm": "0x2023" if target.family == "h7" else "0x202b"}) }}
 %% if with_crashcatcher
 	%#
 	/* Bottom of crash stack for `modm:platform:fault` */

@@ -153,9 +153,10 @@ The following macros are available:
   `__{name}_end` will be the maximum of the location counter and the `memory`
   section end address, so that previous sections will push this section back.
 
-- `all_heap_sections(table_copy, table_heap)`: places the heap sections as
-  described by `cont_ram_regions` of the `linkerscript` query. This also adds
-  bss and noinit sections into each region.
+- `all_heap_sections(table_copy, table_zero, table_heap, props={})`: places the
+  heap sections as described by `cont_ram_regions` of the `linkerscript` query.
+  This also adds bss and noinit sections into each region. The `props` key can
+  be used to override the default `0x001f` memory properties.
 
 - `section_rom(memory)`: place all read-only sections (`.text`, `.rodata` etc)
   into `memory`.
