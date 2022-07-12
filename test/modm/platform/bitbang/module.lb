@@ -16,6 +16,9 @@ def init(module):
 
 
 def prepare(module, options):
+    # Disable this test until a more robust logic analyzer solution can be found
+    return False
+
     target = options[":target"]
     core = target.get_driver("core:cortex-m*")
     # Cortex-M0 doesn't have the DWT->CYCCNT and Cortex-M7 support is broken
