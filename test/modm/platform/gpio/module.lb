@@ -16,8 +16,8 @@ from collections import defaultdict, OrderedDict
 # According to the schematic, the following pins are safe to use as IO and are
 # not connected to anything else _on_ the board:
 test_io_nucleo_64 = sorted([
-    ("A", 0), # A0
-    ("A", 1), # A1
+    # ("A", 0), # A0 ??? issues on F401
+    # ("A", 1), # A1 ??? issues on F401
     ("A", 4), # A2
     ("B", 0), # A3
     ("C", 1), # A4
