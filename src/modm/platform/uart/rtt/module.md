@@ -54,7 +54,7 @@ You can also call this from inside GDB via the `monitor` command:
 
 ```
 (gdb) monitor modm_rtt
-rtt: Searching for control block 'modm.rtt.modm'
+rtt: Searching for control block 'SEGGER RTT'
 rtt: Control block found at 0x20001024
 Listening on port 9090 for rtt connections
 (gdb)
@@ -72,7 +72,7 @@ it can only connect to one stream at a time (disconnect with Ctrl+D).
  $ scons log-rtt
 ╭───OpenOCD───> Real Time Transfer
 ╰─────RTT────── stm32f103rbt
-Info : rtt: Searching for control block 'modm.rtt.modm'
+Info : rtt: Searching for control block 'SEGGER RTT'
 Info : rtt: Control block found at 0x20000008
 Listening on port 9090 for rtt connections
 loop 51
@@ -81,7 +81,7 @@ loop 53
 ^D
 
  $ make log-rtt channel=0
-Info : rtt: Searching for control block 'modm.rtt.modm'
+Info : rtt: Searching for control block 'SEGGER RTT'
 Info : rtt: Control block found at 0x20000008
 Listening on port 9090 for rtt connections
 loop 58

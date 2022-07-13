@@ -24,7 +24,7 @@
                 "enabled": true,
                 "address": "0x{{"%0x" % rtt_ram.start}}",
                 "searchSize": {{ rtt_ram.size }},
-                "searchId": "modm.rtt.modm",
+                "searchId": "SEGGER RTT",
                 "polling_interval": 1,
                 "decoders": [
         %% for id in rtt_channels

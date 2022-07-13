@@ -367,7 +367,7 @@ simple telnet client. Disconnect with Ctrl+D.
 
 ```
  $ make log-rtt
-Info : rtt: Searching for control block 'modm.rtt.modm'
+Info : rtt: Searching for control block 'SEGGER RTT'
 Info : rtt: Control block found at 0x20000008
 loop: 57
 loop: 58
