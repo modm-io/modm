@@ -18,10 +18,10 @@ def prepare(module, options):
     if not options[":target"].has_driver("core:cortex-m*"):
         return False
 
-    module.add_set_option(
+    module.add_list_option(
         NumericOption(name="buffer.tx", description="Transmit buffer sizes",
             minimum=0, maximum=2**16), default=512)
-    module.add_set_option(
+    module.add_list_option(
         NumericOption(name="buffer.rx", description="Receive buffer sizes",
             minimum=0, maximum=2**16), default=0)
 
