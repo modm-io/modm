@@ -1,0 +1,30 @@
+/*
+ * Copyright (c) 2023, Raphael Lehmann
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include "can.hpp"
+
+namespace modm::platform
+{
+
+/// @ingroup modm_platform_can_{{ id }}
+/// @brief Mcan{{ id }} instance with configurable message RAM
+template<fdcan::MessageRamConfig mrc = fdcan::defaultMessageRamConfig>
+using Mcan{{ id }}Custom = modm::platform::McanDriver<{{ id }}, mrc>;
+
+
+/// @ingroup modm_platform_can_{{ id }}
+/// @brief Mcan{{ id }} instance with default message RAM config. For more
+/// filters, larger buffers or other options see `Mcan{{ id }}Custom`
+using Mcan{{ id }} = modm::platform::McanDriver<{{ id }}, fdcan::defaultMessageRamConfig>;
+
+}

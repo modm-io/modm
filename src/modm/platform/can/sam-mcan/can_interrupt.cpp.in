@@ -1,0 +1,32 @@
+/*
+ * Copyright (c) 2023, Raphael Lehmann
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#include "can_{{ id }}.hpp"
+
+namespace modm::platform
+{
+
+McanErrorCallback mcan{{ id }}ErrorCallback{nullptr};
+
+// line 0 used as TX and error interrupt
+// generated on finished frame transmission and error state
+MODM_ISR(MCAN{{ id }}_INT0)
+{
+	if (mcan{{ id }}ErrorCallback) {
+		const bool hasErrorInterrupt = (MCAN{{ id }}->MCAN_IR & (MCAN_IR_BO | MCAN_IR_EW | MCAN_IR_EP));
+		if (hasErrorInterrupt) {
+			mcan{{ id }}ErrorCallback();
+		}
+	}
+	MCAN{{ id }}->MCAN_IR = MCAN_IR_BO | MCAN_IR_EW | MCAN_IR_EP;
+}
+
+}
