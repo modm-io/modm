@@ -9,6 +9,7 @@
 profile?=release
 BUILDPATH_PREFIX := {{ build_path }}/make-
 BUILDPATH := $(BUILDPATH_PREFIX)$(profile)
+OUTPATH := {{outpath}}
 MODM_PROJECT_NAME := {{ options[":build:project.name"] }}
 
 ELF_FILE := $(BUILDPATH)/$(MODM_PROJECT_NAME).{{program_extension}}
@@ -133,14 +134,14 @@ compile_asm = \
 $(BUILDPATH)/%.o : %.c
 	@$(call compile_c,$@,$<,)
 %% if outpath != "."
-$(BUILDPATH)/%.o : {{outpath}}/%.c
+$(BUILDPATH)/%.o : $(OUTPATH)/%.c
 	@$(call compile_c,$@,$<,)
 %% endif
 %% for suffix in ["cc", "cpp", "cxx", "c++"]
 $(BUILDPATH)/%.o : %.{{suffix}}
 	@$(call compile_cpp,$@,$<,)
 %% if outpath != "."
-$(BUILDPATH)/%.o : {{outpath}}/%.{{suffix}}
+$(BUILDPATH)/%.o : $(OUTPATH)/%.{{suffix}}
 	@$(call compile_cpp,$@,$<,)
 %% endif
 %% endfor
@@ -148,7 +149,7 @@ $(BUILDPATH)/%.o : {{outpath}}/%.{{suffix}}
 $(BUILDPATH)/%.o : %.{{suffix}}
 	@$(call compile_asm,$@,$<,)
 %% if outpath != "."
-$(BUILDPATH)/%.o : {{outpath}}/%.{{suffix}}
+$(BUILDPATH)/%.o : $(OUTPATH)/%.{{suffix}}
 	@$(call compile_asm,$@,$<,)
 %% endif
 %% endfor

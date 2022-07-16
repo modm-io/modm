@@ -66,7 +66,7 @@ CPPDEFINES += \
 # Custom build rules for repo sources
 %% for file, flags in sources
 	%% if flags | length
-$(BUILDPATH)/{{ file | objectify }}: {{ file }}
+$(BUILDPATH)/{{ file | objectify }}: $(OUTPATH)/{{ file }}
 	%% set ext = {"sx":"asm","s":"asm","S":"asm"}.get(file.split(".")[-1],file.split(".")[-1])
 	@$(call compile_{{ ext }},$@,$<,{% for key, profiles in flags.items() if "" in profiles %} {{ profiles[""] | join(" ") }}{% endfor %} \
 		%% for key, profiles in flags.items()
