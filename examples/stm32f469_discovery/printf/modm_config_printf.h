@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Niklas Hauser
+ * Copyright (c) 2022, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -9,18 +9,4 @@
  */
 // ----------------------------------------------------------------------------
 
-#pragma once
-
-// empty include header for printf.c
-#include <stdarg.h>
-#include <stddef.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-void _putchar(char character);
-
-#ifdef __cplusplus
-}
-#endif
+#define PRINTF_DEFAULT_FLOAT_PRECISION  10

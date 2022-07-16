@@ -24,9 +24,26 @@
 #include <stdarg.h>	// va_list
 #include <inttypes.h>
 #include <type_traits>
+#include <climits>
 
 #include "iodevice.hpp"
 #include "iodevice_wrapper.hpp" // convenience
+
+%% if using_printf
+/// @cond
+extern "C"
+{
+struct printf_output_gadget_t
+{
+	void (*function)(char, void*);
+	void* extra_function_arg;
+	char* buffer;
+	unsigned int pos;
+	unsigned int max_chars;
+};
+}
+/// @endcond
+%% endif
 
 namespace modm
 {
@@ -149,7 +166,7 @@ public:
 	inline IOStream& operator << (const uint32_t& v)
 	{ writeIntegerMode(v); return *this; }
 
-%% if options["with_long_long"]
+%% if options.with_long_long
 #ifdef __arm__
 #ifdef __linux__
 	// This overload is used on arm32v7. See issue with OSX below
@@ -183,7 +200,7 @@ public:
 	{ writeIntegerMode(static_cast<uint32_t>(v)); return *this; }
 %% endif
 
-%% if options["with_float"]
+%% if options.with_float
 	inline IOStream&
 	operator << (const float& v)
 	{ writeFloat(v); return *this; }
@@ -212,7 +229,7 @@ public:
 	operator << (IOStream& (*format)(IOStream&))
 	{ return format(*this); }
 
-%% if options["with_printf"]
+%% if options.with_printf
 	// printf -----------------------------------------------------------------
 	IOStream&
 	printf(const char* fmt, ...)  __attribute__((format(printf, 2, 3)));
@@ -243,12 +260,12 @@ protected:
 	void writeInteger(uint16_t value);
 	void writeInteger(int32_t value);
 	void writeInteger(uint32_t value);
-%% if options["with_long_long"]
+%% if options.with_long_long
 	void writeInteger(int64_t value);
 	void writeInteger(uint64_t value);
 %% endif
 
-%% if options["with_float"]
+%% if options.with_float
 	inline void writeFloat(float value)
 	{ writeDouble(static_cast<double>(value)); }
 	void writeDouble(const double& value);
@@ -273,6 +290,11 @@ private:
 private:
 	IODevice* const	device;
 	Mode mode = Mode::Ascii;
+%% if using_printf
+	static void out_char(char c, void* arg)
+	{ if (c) reinterpret_cast<modm::IOStream*>(arg)->write(c); }
+	printf_output_gadget_t output_gadget{out_char, this, NULL, 0, INT_MAX};
+%% endif
 };
 
 /// @ingroup modm_io
