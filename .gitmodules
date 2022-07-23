@@ -40,3 +40,6 @@
 [submodule "ext/eyalroz/printf"]
 	path = ext/eyalroz/printf
 	url = https://github.com/modm-ext/printf-partial.git
+[submodule "ext/nanopb/nanopb"]
+	path = ext/nanopb/nanopb
+	url = https://github.com/modm-ext/nanopb-partial.git

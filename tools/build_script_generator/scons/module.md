@@ -600,6 +600,24 @@ are supported, this is only meant for using the IDE as an editor.
 !!! warning "Consider this an unstable feature"
 
 
+## Protobuf Generator Tool
+
+The `modm:nanopb` module contains a Python generator to translate the messages
+defined in `*.proto` files by the `modm:nanopb:source` option into `*.pb.cpp`
+and `*.pb.hpp` files.
+This module contains a SCons wrapper tool that automatically updates the
+generated files when it becomes necessary:
+
+```py
+cpp_sources += env.NanopbProtofile(
+    sources=options[":nanopb:sources"],
+    path=options[":nanopb:path"],
+)
+```
+
+The generated files are available as a top-level `#include <protofile.pb.hpp>`.
+
+
 ## XPCC Generator Tool
 
 The `modm:communication:xpcc:generator` module contains the Python tools to
@@ -611,7 +629,7 @@ The wrapper tool is automatically used when the generator module is detected,
 and its options are evaluated for the wrapper as follows:
 
 ```py
-env.XpccCommunication(
+cpp_sources += env.XpccCommunication(
     xmlfile=options["::xpcc:generator:source"],
     container=options["::xpcc:generator:container"],
     path=options["::xpcc:generator:path"],

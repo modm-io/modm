@@ -66,6 +66,14 @@ sources += env.XpccCommunication(
     namespace="{{ generator_namespace }}",
     include_paths=["."])
 %% endif
+%% if has_nanopb
+# Generating Nanopb messages
+env.Append(CPPPATH=abspath("{{ nanopb_path }}"))
+ignored.append("{{ nanopb_path }}")
+sources += env.NanopbProtofile(
+    sources={{ nanopb_source }},
+    path=abspath("{{ nanopb_path }}"))
+%% endif
 
 %% if options["::info.git"] != "Disabled"
 sources.append(env.InfoGit(with_status={{ "True" if "Status" in options["::info.git"] else "False" }}))

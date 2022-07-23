@@ -96,6 +96,9 @@ def generate(env, **kw):
         env["XPCC_TASK_CALLER_COMSTR"] = "%s╭─────XPCC───── %s$SOURCE\n" \
                                          "%s╰─Task─Caller─> %s$TARGET%s" % template
 
+        env["NANOPB_MESSAGES_COMSTR"] =  "%s╭────Nanopb──── %s$SOURCE\n" \
+                                         "%s╰───Messages──> %s$TARGET%s" % template
+
         # modm tools installing
         env["ARTIFACT_COMSTR"] =         "%s╭───Artifact─── %s$SOURCE\n" \
                                          "%s╰────Cache────> %s$ARTIFACT_FILEPATH%s" % install
