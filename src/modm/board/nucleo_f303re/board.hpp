@@ -47,8 +47,10 @@ struct SystemClock
 	static constexpr uint32_t Usart2 = Apb1;
 	static constexpr uint32_t Usart3 = Apb1;
 
-	// I2C1 clock source is HSI per default
-	static constexpr uint32_t I2c1   = 8_MHz;
+	// I2C clock source is HSI by default
+	static constexpr uint32_t I2c1 = 8_MHz;
+	static constexpr uint32_t I2c2 = 8_MHz;
+	static constexpr uint32_t I2c3 = 8_MHz;
 
 	static constexpr uint32_t Apb1Timer = Apb1 * 2;
 	static constexpr uint32_t Apb2Timer = Apb2 * 1;
