@@ -11,7 +11,7 @@
  * ---------------------- Input Capture Example -----------------------------
  *
  * 	Connect a jumper cable between PB7 and PC2 in your Nucleo G474RE.
- * 	PB7 will generate a PWM signal that will be monitored by PC2. 
+ * 	PB7 will generate a PWM signal that will be monitored by PC2.
  * 	The main goal of this example is to calculate the period of the input signal.
  *
  * --------------------------------------------------------------------------
@@ -24,7 +24,7 @@ using namespace Board;
 // Input Capture Timer Configuration
 constexpr uint8_t 	input_capture_channel 		= 2;
 constexpr uint16_t 	input_capture_overflow 		= 0xFFFF;
-constexpr float 	input_capture_freq_hz 		= 3000.00;	// Hz  
+constexpr float 	input_capture_freq_hz 		= 3000.00;	// Hz
 constexpr uint16_t 	input_capture_prescaler 	= SystemClock::Frequency / input_capture_freq_hz;
 constexpr float 	input_capture_ms_per_tick 	= ( 1.0 / input_capture_freq_hz ) * 1000.0;
 
@@ -56,20 +56,20 @@ uint8_t interrupt_priority 			= 10u;
 /**
  * @brief Function executed when a Capute Compare interruption is triggered.
  * Every time there is a rising edge in the input timer pin this code
- * will be executed (If InputCapturePrescaler is set to Div1). 
+ * will be executed (If InputCapturePrescaler is set to Div1).
  * By saving the value of the capture compare register between interruptions
  * the period of the signal can be calculated.
  */
 MODM_ISR(TIM20_CC)
 {
-	uint16_t temp_ticks_between_interrups = 0; 
+	uint16_t temp_ticks_between_interrups = 0;
 	Timer20::acknowledgeInterruptFlags(Timer20::InterruptFlag::CaptureCompare2);
 	LedD13::toggle();	// Visual Feedback of the interruption being triggered
 
 	old_input_timer_value = latest_input_timer_value;
 	latest_input_timer_value = Timer20::getCompareValue(input_capture_channel);
 	temp_ticks_between_interrups = (latest_input_timer_value-old_input_timer_value);
-	
+
 	// Ingore negative values (overflow of counter register)
 	if ( temp_ticks_between_interrups > 0)
 	{
@@ -127,7 +127,7 @@ int main()
 {
 	Board::initialize();
 	LedD13::setOutput();
-	
+
 	// Configure timers
 	generatePwm();
 	inputTimerConfig();
@@ -164,7 +164,7 @@ int main()
 	while (true)
 	{
 		modm::delay(100ms);
-		
+
 		// If USER button is pressed:
 		if (!Button::read())
 		{
