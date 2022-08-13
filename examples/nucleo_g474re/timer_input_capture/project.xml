@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:nucleo-g474re</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_g474re/timer_input_capture</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:timer:4</module>
+    <module>modm:platform:timer:20</module>
+  </modules>
+</library>
