@@ -82,7 +82,7 @@ public:
 	}
 
 	static void
-	enableExternalCrystal(uint32_t freq);
+	enableExternalCrystal(uint32_t freq, uint16_t delay_multiplier = 1);
 
 	template<Clock clk>
 	static void

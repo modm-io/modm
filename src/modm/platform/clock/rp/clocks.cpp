@@ -15,10 +15,6 @@
 
 #include "../device.hpp"
 
-#ifndef PICO_XOSC_STARTUP_DELAY_MULTIPLIER
-#define PICO_XOSC_STARTUP_DELAY_MULTIPLIER 1
-#endif
-
 // CMSIS Core compliance
 constinit uint32_t modm_fastdata SystemCoreClock(modm::platform::ClockControl::BootFrequency);
 
@@ -30,12 +26,12 @@ constinit uint16_t modm_fastdata delay_ns_per_loop(computeDelayNsPerLoop(ClockCo
 static uint32_t configured_freq[CLK_COUNT];
 
 void
-ClockControl::enableExternalCrystal(uint32_t freq)
+ClockControl::enableExternalCrystal(uint32_t freq, uint16_t delay_multiplier)
 {
 	// Assumes 1-15 MHz input, checked above.
 	xosc_hw->ctrl = XOSC_CTRL_FREQ_RANGE_VALUE_1_15MHZ;
 
-	uint32_t delay = ((((freq / 1000) + 128) / 256) * PICO_XOSC_STARTUP_DELAY_MULTIPLIER);
+	uint32_t delay = ((((freq / 1000) + 128) / 256) * delay_multiplier);
 
 	// Set xosc startup delay
 	xosc_hw->startup = delay;
