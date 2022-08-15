@@ -36,6 +36,7 @@ struct SystemClock
 	static constexpr uint32_t UsbPLLMul = 40;
 	static constexpr uint32_t RefFrequency = XOSCFrequency;
 	static constexpr uint32_t UsbFrequency = PllUsbFrequency;
+	static constexpr uint32_t AdcFrequency = PllUsbFrequency;
 	static constexpr uint32_t SysFrequency = Frequency;
 	static constexpr uint32_t PeriFrequency = SysFrequency;
 
@@ -59,6 +60,9 @@ struct SystemClock
 		// CLK USB = PLL USB (48MHz) / 1 = 48MHz
 		ClockControl::configureClock<ClockControl::Clock::Usb, ClockControl::ClockSrc::PllUsb,
 									 PllUsbFrequency, UsbFrequency>();
+		// CLK ADC = PLL USB (48MHZ) / 1 = 48MHz
+		ClockControl::configureClock<ClockControl::Clock::Adc, ClockControl::ClockSrc::PllUsb,
+									 PllUsbFrequency, AdcFrequency>();
 		// CLK PERI = clk_sys. Used as reference clock for Peripherals. No dividers so just select
 		// and enable Normally choose clk_sys or clk_usb
 		ClockControl::configureClock<ClockControl::Clock::Peri, ClockControl::ClockSrc::Sys,
