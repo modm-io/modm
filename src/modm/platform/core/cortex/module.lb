@@ -81,6 +81,13 @@ def common_memories(env):
     memories = listify(device.get_driver("core")["memory"])
 
     # Convert from string to int and add offsets
+    flash_size = env.get(":platform:core:boot2_size", 0)
+    if flash_size:
+        memories.append({
+            "name": "flash",
+            "access": "rx",
+            "start": "0x10000000",
+            "size": hex(flash_size)})
     flash_offset = env.get(":platform:cortex-m:linkerscript.flash_offset", 0)
     for m in memories:
         if m["name"] == "flash":
@@ -213,7 +220,7 @@ def prepare(module, options):
                 default=default_location))
 
     # Find the size of the flash memory
-    flash_size = next(int(x['size']) for x in memories if x['name'] == 'flash')
+    flash_size = next((int(x['size']) for x in memories if x['name'] == 'flash'), 16*1024*1024)
     module.add_option(
         NumericOption(
             name="linkerscript.flash_offset",

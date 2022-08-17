@@ -127,6 +127,13 @@ def common_memories(env):
             }
             for memory in core_driver["memory"]
         ])
+    flash_size = env.get(":platform:core:boot2_size", 0)
+    if flash_size:
+        memories.append({
+            "name": "flash",
+            "access": "rx",
+            "start": 0x10000000,
+            "size": flash_size})
     return memories
 
 def common_avrdude_options(env):

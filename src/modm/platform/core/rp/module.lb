@@ -29,6 +29,13 @@ def prepare(module, options):
             description="Second-stage bootloader variant",
             enumeration=["generic_03h", "at25sf128a", "is25lp080", "w25q080", "w25x10cl"],
             default="generic_03h"))
+    module.add_option(
+        NumericOption(
+            name="boot2_size",
+            description="Specify the size of external QSPI FLASH chip",
+            minimum=0,
+            maximum=2 ** 24,
+            default=2 ** 21))
     return True
 
 
