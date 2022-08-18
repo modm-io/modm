@@ -99,7 +99,7 @@ jobs:
       - name: Examples RP20 Devices
         if: always()
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py rp_pico feather_rp2040)
+          (cd examples && ../tools/scripts/examples_compile.py feather_rp2040 rp_pico thingplus_rp2040)
       - name: Execute Python Scripts
         if: always()
         run: |
