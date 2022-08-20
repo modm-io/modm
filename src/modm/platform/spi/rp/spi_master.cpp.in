@@ -139,8 +139,8 @@ modm::platform::SpiMaster{{ id }}::transfer(
 void modm::platform::SpiMaster{{ id }}::transferBlocking(
 		const uint8_t *tx, std::size_t length)
 {
-	uint8_t index = 0;
-	while(index < length) {
+	std::size_t index = 0;
+	while (index < length) {
 		// Wait for tx empty
 		while(txFifoFull()) __NOP();
 		// Write next byte
@@ -150,4 +150,3 @@ void modm::platform::SpiMaster{{ id }}::transferBlocking(
 
 	drainRx();
 }
-
