@@ -25,6 +25,8 @@
 #include <modm/math/geometry.hpp>
 
 #include <modm/ui/color.hpp>
+
+#include "orientation.hpp"
 #include "font.hpp"
 
 namespace modm
@@ -35,15 +37,6 @@ namespace glcd
 
 /// @ingroup modm_ui_display
 using Point = Vector<int16_t, 2>;
-
-/// @ingroup modm_ui_display
-enum Orientation : uint8_t
-{
-	Landscape0,
-	Portrait90,
-	Landscape180,
-	Portrait270,
-};
 
 }  // namespace glcd
 
