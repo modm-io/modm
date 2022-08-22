@@ -20,7 +20,7 @@
 
 %% set name="{}{}".format(type.capitalize(), id)
 %% set reg=name.upper()
-%% if type == "usart" and target.family == "e" and target.variant == "b"
+%% if type == "usart" and target.series == "e70" and target.variant == "b"
 %% set reg_suffix="_USART"
 %% else
 %% set reg_suffix=""

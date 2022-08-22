@@ -24,7 +24,7 @@ public:
 	enum class Parity : uint32_t
 	{
 %% if type == "usart"
-%% if target.family == "e" and target.variant == "b"
+%% if target.series == "e70" and target.variant == "b"
 		Disabled  = US_MR_USART_PAR_NO_Val,
 		Even      = US_MR_USART_PAR_EVEN_Val,
 		Odd       = US_MR_USART_PAR_ODD_Val,

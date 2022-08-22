@@ -118,7 +118,6 @@ def build(env):
     bprops["functions"] = sorted(list(set(s["function"] for gpio in driver["gpio"] for s in gpio["signal"])))
 
     bprops["target"] = device.identifier
-    bprops["is_d5x_e5x"] = device.identifier.family in ["d", "e"] and device.identifier.series[0] == "5"
 
     env.substitutions = bprops
     env.outbasepath = "modm/src/modm/platform/gpio"

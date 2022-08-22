@@ -24,7 +24,7 @@ namespace modm::platform
 constinit uint16_t modm_fastdata delay_fcpu_MHz(computeDelayMhz(GenericClockController::BootFrequency));
 constinit uint16_t modm_fastdata delay_ns_per_loop(computeDelayNsPerLoop(GenericClockController::BootFrequency));
 
-%% if device_family == "d2x"
+%% if target.family == "d1x/d2x/dax"
 bool
 GenericClockController::configureOsc8m(Osc8mPrescaler prescaler, uint32_t waitCycles)
 {
@@ -37,7 +37,7 @@ GenericClockController::configureOsc8m(Osc8mPrescaler prescaler, uint32_t waitCy
 }
 %% endif
 
-%% if device_family == "d2x"
+%% if target.family == "d1x/d2x/dax"
 /// Enable DFLL48M in open-loop mode
 bool
 GenericClockController::enableDfll48m(uint32_t waitCycles)

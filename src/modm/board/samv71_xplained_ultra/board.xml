@@ -6,7 +6,7 @@
   </repositories>
 
   <options>
-    <option name="modm:target">samv71q21b-aa</option>
+    <option name="modm:target">samv71q21b-aab</option>
   </options>
   <modules>
     <module>modm:board:samv71-xplained-ultra</module>

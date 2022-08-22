@@ -61,7 +61,7 @@ template< uint32_t Core_Hz, uint16_t Vdd_mV=3300 >
 uint32_t
 GenericClockController::setFlashLatency()
 {
-%% if device_family == "e5x":
+%% if target.family == "d5x/e5x":
 {% raw %}
 	// TODO: move to device files
 	constexpr std::array<std::pair<uint32_t, uint8_t>, 6> waitStates0{{
@@ -99,7 +99,7 @@ GenericClockController::enableDfll48mClosedLoop(uint32_t waitCycles)
 	static_assert(reference < 43_kHz, "DFLL48 reference frequency must be less than 33 kHz");
 	constexpr auto multiplier = uint16_t(std::round(48_MHz / double(reference)));
 
-%% if device_family == "d2x"
+%% if target.family == "d1x/d2x/dax"
 	// Errata 1.2.1: Disable OnDemand mode
 	SYSCTRL->DFLLCTRL.bit.ONDEMAND = 0;
 	// Wait for synchronization
@@ -168,7 +168,7 @@ GenericClockController::enableDfll48mClosedLoop(uint32_t waitCycles)
 	return waitCycles > 0;
 }
 
-%% if device_family == "d2x"
+%% if target.family == "d1x/d2x/dax"
 template< ClockPeripheral peripheral >
 void
 GenericClockController::connect(ClockGenerator clockGen)
@@ -196,7 +196,7 @@ GenericClockController::sync(ClockGenerator)
 	sync();
 }
 
-%% elif device_family == "e5x"
+%% elif target.family == "d5x/e5x"
 void
 GenericClockController::sync()
 {
@@ -225,18 +225,18 @@ GenericClockController::connect(ClockGenerator clockGen)
 
 template<frequency_t frequency, XoscStartupTime startupTime = XoscStartupTime::Start_15625us>
 bool
-%% if device_family == "e5x"
+%% if target.family == "d5x/e5x"
 GenericClockController::enableExternalCrystal(Xosc clock, uint32_t waitCycles)
 %% else
 GenericClockController::enableExternalCrystal(uint32_t waitCycles)
 %% endif
 {
-%% if device_family == "e5x"
+%% if target.family == "d5x/e5x"
 %%	set reg="OSCCTRL->XOSCCTRL[int(clock)]"
 %%	set prefix="OSCCTRL_XOSCCTRL"
 %%	set status="OSCCTRL->STATUS.reg & (OSCCTRL_STATUS_XOSCRDY0 << int(clock))"
 	PeripheralClock<Peripherals::Oscctrl>::enable();
-%% elif device_family == "d2x"
+%% elif target.family == "d1x/d2x/dax"
 %%	set reg="SYSCTRL->XOSC"
 %%	set prefix="SYSCTRL_XOSC"
 %%	set status="SYSCTRL->PCLKSR.bit.XOSCRDY"
@@ -245,7 +245,7 @@ GenericClockController::enableExternalCrystal(uint32_t waitCycles)
 	{{reg}}.bit.STARTUP = uint32_t(startupTime);
 	{{reg}}.bit.XTALEN = 1;
 	// Automatic gain control can only be enabled when the crystal is running
-%% if device_family == "e5x"
+%% if target.family == "d5x/e5x"
 	{{reg}}.bit.ENALC = 0;
 	if constexpr (frequency <= 8'000'000) {
 		{{reg}}.bit.IMULT = 0x3;
@@ -281,7 +281,7 @@ GenericClockController::enableExternalCrystal(uint32_t waitCycles)
 	{{reg}}.bit.ENABLE = 1;
 	while(!({{status}}) && --waitCycles);
 	// Enable automatic gain control on success
-%% if device_family == "e5x"
+%% if target.family == "d5x/e5x"
 	{{reg}}.bit.ENALC = waitCycles > 0;
 %% else
 	{{reg}}.bit.AMPGC = waitCycles > 0;
@@ -290,17 +290,17 @@ GenericClockController::enableExternalCrystal(uint32_t waitCycles)
 }
 
 bool
-%% if device_family == "e5x"
+%% if target.family == "d5x/e5x"
 GenericClockController::enableExternalClock(Xosc clock, uint32_t waitCycles)
 %% else
 GenericClockController::enableExternalClock(uint32_t waitCycles)
 %% endif
 {
-%% if device_family == "e5x"
+%% if target.family == "d5x/e5x"
 %%	set reg="OSCCTRL->XOSCCTRL[int(clock)]"
 %%	set status="OSCCTRL->STATUS.reg & (OSCCTRL_STATUS_XOSCRDY0 << int(clock))"
 	PeripheralClock<Peripherals::Oscctrl>::enable();
-%% elif device_family == "d2x"
+%% elif target.family == "d1x/d2x/dax"
 %%	set reg="SYSCTRL->XOSC"
 %%	set status="SYSCTRL->PCLKSR.bit.XOSCRDY"
 	PeripheralClock<Peripherals::Sysctrl>::enable();
@@ -318,7 +318,7 @@ GenericClockController::enableExternalClock(uint32_t waitCycles)
 bool
 GenericClockController::enableExternalCrystal32k(Xosc32StartupTime time)
 {
-%% if device_family == "d2x"
+%% if target.family == "d1x/d2x/dax"
 %%	set reg="SYSCTRL->XOSC32K"
 %%	set status="SYSCTRL->PCLKSR.bit.XOSC32KRDY"
 	PeripheralClock<Peripherals::Sysctrl>::enable();
@@ -329,7 +329,7 @@ GenericClockController::enableExternalCrystal32k(Xosc32StartupTime time)
 %% endif
 	// force oscillator start even if no clock sink is using it yet
 	{{reg}}.bit.ONDEMAND = 0;
-%% if device_family == "d2x"
+%% if target.family == "d1x/d2x/dax"
 	// disable non-functional automatic gain control, see errata 1.1.1
 	{{reg}}.bit.AAMPEN = 0;
 %% endif
@@ -346,7 +346,7 @@ GenericClockController::enableExternalCrystal32k(Xosc32StartupTime time)
 bool
 GenericClockController::enableExternalClock32k()
 {
-%% if device_family == "d2x"
+%% if target.family == "d1x/d2x/dax"
 %%	set reg="SYSCTRL->XOSC32K"
 %%	set status="SYSCTRL->PCLKSR.bit.XOSC32KRDY"
 	PeripheralClock<Peripherals::Sysctrl>::enable();
@@ -459,7 +459,7 @@ findDpllConfigXosc(double xoscClock, double target, uint16_t tolerance_ppm [[may
 
 template<DpllSource source, frequency_t output, uint16_t tolerance_ppm>
 bool
-%% if device_family == "e5x"
+%% if target.family == "d5x/e5x"
 GenericClockController::enableDpll(DpllInstance instance)
 %% else
 GenericClockController::enableDpll()
@@ -479,7 +479,7 @@ GenericClockController::enableDpll()
 	}();
 
 	static_assert(std::abs((config.bestOutputFrequency / output) - 1) <= tolerance_ppm, "DPLL clock tolerance exceeded");
-%% if device_family == "e5x"
+%% if target.family == "d5x/e5x"
 	return enableDpll<source, DpllConfig(config)>(instance);
 %% else
 	return enableDpll<source, DpllConfig(config)>();
@@ -489,7 +489,7 @@ GenericClockController::enableDpll()
 /// Enable PLL with manual configuration
 template<DpllSource source, DpllConfig config>
 bool
-%% if device_family == "e5x"
+%% if target.family == "d5x/e5x"
 GenericClockController::enableDpll(DpllInstance instance)
 %% else
 GenericClockController::enableDpll()
@@ -514,13 +514,13 @@ GenericClockController::enableDpll()
 	static_assert(output >= DpllConfig::MinOutput, "DPLL output frequency is too low");
 	static_assert(output <= DpllConfig::MaxOutput, "DPLL output frequency is too high");
 
-%% if device_family == "d2x"
+%% if target.family == "d1x/d2x/dax"
 %% set dpll_peripheral="SYSCTRL"
 %% else
 %% set dpll_peripheral="OSCCTRL"
 %% endif
 
-%% if device_family == "e5x"
+%% if target.family == "d5x/e5x"
 %% set instance="Dpll[int(instance)]."
 %% else
 %% set instance=""
@@ -530,14 +530,14 @@ GenericClockController::enableDpll()
 	{{dpll_peripheral}}->{{instance}}DPLLRATIO.bit.LDRFRAC = config.fractionalMultiplier;
 	{{dpll_peripheral}}->{{instance}}DPLLCTRLB.bit.DIV = config.xoscDivider;
 	{{dpll_peripheral}}->{{instance}}DPLLCTRLB.bit.REFCLK = static_cast<uint32_t>(source.reference);
-%% if device_family != "d2x"
+%% if target.family != "d1x/d2x/dax"
 	while({{dpll_peripheral}}->{{instance}}DPLLSYNCBUSY.bit.DPLLRATIO);
 %% endif
 	// force oscillator start even if no clock sink is using it yet
 	{{dpll_peripheral}}->{{instance}}DPLLCTRLA.bit.ONDEMAND = 0;
 
 	{{dpll_peripheral}}->{{instance}}DPLLCTRLA.bit.ENABLE = 1;
-%% if device_family == "d2x"
+%% if target.family == "d1x/d2x/dax"
 	while(!{{dpll_peripheral}}->{{instance}}DPLLSTATUS.bit.ENABLE);
 %% else
 	while({{dpll_peripheral}}->{{instance}}DPLLSYNCBUSY.bit.ENABLE);
@@ -549,14 +549,14 @@ GenericClockController::enableDpll()
 }
 
 void
-%% if device_family == "e5x"
+%% if target.family == "d5x/e5x"
 GenericClockController::disableDpll(DpllInstance instance)
 %% else
 GenericClockController::disableDpll()
 %% endif
 {
 	{{dpll_peripheral}}->{{instance}}DPLLCTRLA.bit.ENABLE = 0;
-%% if device_family == "d2x"
+%% if target.family == "d1x/d2x/dax"
 	while({{dpll_peripheral}}->{{instance}}DPLLSTATUS.bit.ENABLE);
 %% else
 	while({{dpll_peripheral}}->{{instance}}DPLLSYNCBUSY.bit.ENABLE);
@@ -573,7 +573,7 @@ GenericClockController::enableGenerator()
 	// TODO: check individual divider limits for each generator instance
 	static_assert(config.divider != 0 && dividerReg <= std::numeric_limits<uint16_t>::max(), "Divider out of range");
 
-%% if device_family == "d2x"
+%% if target.family == "d1x/d2x/dax"
 	constexpr auto gen = static_cast<uint32_t>(clockGen);
 	GCLK->GENDIV.reg =
 		GCLK_GENDIV_ID(gen) |
@@ -613,7 +613,7 @@ template<ClockGenerator clockGen>
 void
 GenericClockController::disableGenerator()
 {
-%% if device_family == "d2x"
+%% if target.family == "d1x/d2x/dax"
 	GCLK->GENCTRL.reg = GCLK_GENCTRL_ID(static_cast<uint32_t>(clockGen));
 %% else
 	GCLK->GENCTRL[static_cast<uint32_t>(clockGen)].bit.GENEN = false;

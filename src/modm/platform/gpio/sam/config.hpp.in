@@ -37,7 +37,7 @@ struct Peripherals
 	struct {{ name }}
 	{
 %% for signal, index_list in peripheral["signals"].items()
-%% if not index_list or (name in ["Adc", "Afec"] and not is_d5x_e5x)
+%% if not index_list or (name in ["Adc", "Afec"] and not target["family"] == "d5x/e5x")
 		struct {{ signal }} {};
 %% else
 		template<int index>
@@ -73,7 +73,7 @@ struct Peripherals::{{ name }}<{{ instance }}>::{{ signal }} {};
 %% endif
 %% endfor
 %% endfor
-%% elif name not in ["Adc", "Afec"] or is_d5x_e5x
+%% elif name not in ["Adc", "Afec"] or target["family"] == "d5x/e5x"
 %% for signal, index_list in peripheral["signals"].items()
 %% for index in index_list
 template<>
@@ -103,7 +103,7 @@ struct {{ gpio["port"] ~ gpio["pin"] }}
 		%% else
 		using peripheral = Peripherals::{{ signal["peripheral"] }};
 		%% endif
-		%% if "index" in signal and (signal["peripheral"] not in ["Adc", "Afec"] or is_d5x_e5x)
+		%% if "index" in signal and (signal["peripheral"] not in ["Adc", "Afec"] or target["family"] == "d5x/e5x")
 		using signal = peripheral::{{ signal["name"] }}<{{ signal["index"] }}>;
 		%% else
 		using signal = peripheral::{{ signal["name"] }};

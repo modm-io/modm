@@ -68,8 +68,8 @@ def validate(env):
 
     # Some families use the variant in header defines, some do not (e.g. SAMG)
     names = [
-        "".join([device.identifier[f] for f in ["platform", "family", "series", "pin", "flash", "variant"]]),
-        "".join([device.identifier[f] for f in ["platform", "family", "series", "pin", "flash"]]),
+        "".join([device.identifier[f] for f in ["platform", "series", "pin", "flash", "variant"]]),
+        "".join([device.identifier[f] for f in ["platform", "series", "pin", "flash"]]),
     ]
 
     device_define = None

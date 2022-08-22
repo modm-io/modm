@@ -87,12 +87,12 @@ struct DpllSource
 	enum class DpllReference
 	{
 		// values correspond to REFCLOCK field in DPLLCTRLB
-%% if device_family == "e5x"
+%% if target.family == "d5x/e5x"
 		Gclk = 0,
 		Xosc32 = 1,
 		Xosc0 = 2,
 		Xosc1 = 3
-%% elif device_family == "d2x"
+%% elif target.family == "d1x/d2x/dax"
 		Xosc32 = 0,
 		Xosc = 1,
 		Gclk = 2
@@ -104,10 +104,10 @@ struct DpllSource
 
 	constexpr bool isXoscSource() const
 	{
-%% if device_family == "e5x"
+%% if target.family == "d5x/e5x"
 		return (reference == DpllReference::Xosc0)
 			|| (reference == DpllReference::Xosc1);
-%% elif device_family == "d2x"
+%% elif target.family == "d1x/d2x/dax"
 		return reference == DpllReference::Xosc;
 %% endif
 	}
@@ -119,26 +119,26 @@ constexpr DpllSource GclkSource = DpllSource{DpllSource::DpllReference::Gclk, fr
 template<frequency_t freq = 32768>
 constexpr DpllSource Xosc32Source = DpllSource{DpllSource::DpllReference::Xosc32, freq};
 
-%% if device_family == "e5x"
+%% if target.family == "d5x/e5x"
 template<frequency_t freq>
 constexpr DpllSource Xosc0Source = DpllSource{DpllSource::DpllReference::Xosc0, freq};
 
 template<frequency_t freq>
 constexpr DpllSource Xosc1Source = DpllSource{DpllSource::DpllReference::Xosc1, freq};
-%% elif device_family == "d2x"
+%% elif target.family == "d1x/d2x/dax"
 template<frequency_t freq>
 constexpr DpllSource XoscSource = DpllSource{DpllSource::DpllReference::Xosc, freq};
 %% endif
 
 struct DpllConfig
 {
-%% if device_family == "e5x"
+%% if target.family == "d5x/e5x"
 	static constexpr uint16_t MultiplierFractionalBits{5};
 	static constexpr uint16_t MultiplierIntegerBits{13};
 	static constexpr unsigned MaxReference{kHz(3200)};
 	static constexpr unsigned MinOutput{MHz(96)};
 	static constexpr unsigned MaxOutput{MHz(200)};
-%% elif device_family == "d2x"
+%% elif target.family == "d1x/d2x/dax"
 	static constexpr uint16_t MultiplierFractionalBits{4};
 	static constexpr uint16_t MultiplierIntegerBits{12};
 	static constexpr unsigned MaxReference{MHz(2)};
@@ -154,7 +154,7 @@ struct DpllConfig
 	uint16_t xoscDivider{};
 };
 
-%% if device_family == "e5x"
+%% if target.family == "d5x/e5x"
 enum class DpllInstance
 {
 	Dpll0 = 0,
@@ -163,7 +163,7 @@ enum class DpllInstance
 %% endif
 %% endif
 
-%% if device_family == "e5x"
+%% if target.family == "d5x/e5x"
 enum class Xosc
 {
 	Xosc0 = 0,
@@ -193,7 +193,7 @@ enum class XoscStartupTime
 
 enum class Xosc32StartupTime
 {
-%% if device_family == "d2x"
+%% if target.family == "d1x/d2x/dax"
 	Start_132us = 0x0u,
 	Start_1ms = 0x1u,
 	Start_63ms = 0x2u,
@@ -213,7 +213,7 @@ enum class Xosc32StartupTime
 %% endif
 };
 
-%% if device_family == "d2x"
+%% if target.family == "d1x/d2x/dax"
 	enum class Osc8mPrescaler
 	{
 		Prescaler1 = 0x0,
@@ -243,7 +243,7 @@ public:
 	static void
 	updateCoreFrequency();
 
-%% if device_family == "d2x"
+%% if target.family == "d1x/d2x/dax"
 	/// Configure frequency of the internal oscillator
 	static bool
 	configureOsc8m(Osc8mPrescaler prescaler, uint32_t waitCycles = 10'000);
@@ -263,7 +263,7 @@ public:
 	/// If the specified tolerance is exceeded, compilation will fail.
 	template<DpllSource source, frequency_t output, uint16_t tolerance_ppm = 5>
 	static bool
-%% if device_family == "e5x"
+%% if target.family == "d5x/e5x"
 	enableDpll(DpllInstance instance = DpllInstance::Dpll0);
 %% else
 	enableDpll();
@@ -272,14 +272,14 @@ public:
 	/// Enable PLL with manual configuration
 	template<DpllSource source, DpllConfig config>
 	static bool
-%% if device_family == "e5x"
+%% if target.family == "d5x/e5x"
 	enableDpll(DpllInstance instance = DpllInstance::Dpll0);
 %% else
 	enableDpll();
 %% endif
 
 	static inline void
-%% if device_family == "e5x"
+%% if target.family == "d5x/e5x"
 	disableDpll(DpllInstance instance = DpllInstance::Dpll0);
 %% else
 	disableDpll();
@@ -287,14 +287,14 @@ public:
 
 	template<frequency_t frequency, XoscStartupTime startupTime = XoscStartupTime::Start_15625us>
 	static bool
-%% if device_family == "e5x"
+%% if target.family == "d5x/e5x"
 	enableExternalCrystal(Xosc clock, uint32_t waitCycles = (1000u << unsigned(startupTime)));
 %% else
 	enableExternalCrystal(uint32_t waitCycles = (1000u << unsigned(startupTime)));
 %% endif
 
 	static inline bool
-%% if device_family == "e5x"
+%% if target.family == "d5x/e5x"
 	enableExternalClock(Xosc clock, uint32_t waitCycles = 10'000);
 %% else
 	enableExternalClock(uint32_t waitCycles = 10'000);
