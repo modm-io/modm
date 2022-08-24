@@ -4,8 +4,8 @@
   <options>
     <option name=":target">stm32f303k8t6</option>
     <!-- <option name=":target">stm32f103c8t6</option> -->
-    <option name=":platform:uart:2:buffer.tx">2048</option>
-    <option name=":platform:uart:2:buffer.rx">2048</option>
+    <option name=":platform:uart:2:buffer.tx">2Ki</option>
+    <option name=":platform:uart:2:buffer.rx">2Ki</option>
     <option name=":build:build.path">../../../build/generic/i2c_multiplex</option>
   </options>
   <modules>

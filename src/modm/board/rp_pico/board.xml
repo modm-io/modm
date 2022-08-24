@@ -8,6 +8,7 @@
   <options>
     <option name="modm:target">rp2040</option>
     <option name="modm:platform:core:boot2">w25q080</option>
+    <option name="modm:platform:core:boot2_size">2Mi</option>
   </options>
   <modules>
     <module>modm:board:rp-pico</module>

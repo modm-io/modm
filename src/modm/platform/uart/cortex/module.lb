@@ -27,7 +27,7 @@ def prepare(module, options):
 
     module.add_option(
         NumericOption(name="buffer.tx", description=descr_buffer_tx,
-            minimum=0, maximum=2**16 - 2, default=0))
+            minimum=0, maximum="64Ki-2", default=0))
 
     return True
 

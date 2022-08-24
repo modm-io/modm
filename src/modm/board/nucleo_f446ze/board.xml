@@ -8,7 +8,7 @@
   <options>
     <option name="modm:target">stm32f446zet6</option>
 
-    <option name="modm:platform:uart:3:buffer.tx">2048</option>
+    <option name="modm:platform:uart:3:buffer.tx">2Ki</option>
   </options>
   <modules>
     <module>modm:board:nucleo-f446ze</module>

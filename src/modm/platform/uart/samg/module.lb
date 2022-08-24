@@ -28,13 +28,13 @@ class Instance(Module):
             NumericOption(
                 name="buffer.tx",
                 description="Size of transmit buffer",
-                minimum=1, maximum=2 ** 16 - 2,
+                minimum=1, maximum="64Ki-2",
                 default=64))
         module.add_option(
             NumericOption(
                 name="buffer.rx",
                 description="Size of receive buffer",
-                minimum=1, maximum=2 ** 16 - 2,
+                minimum=1, maximum="64Ki-2",
                 default=64))
 
         return True

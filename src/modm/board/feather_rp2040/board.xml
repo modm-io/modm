@@ -8,7 +8,7 @@
   <options>
     <option name="modm:target">rp2040</option>
     <option name="modm:platform:core:boot2">generic_03h</option>
-    <option name="modm:platform:core:boot2_size">8*1024*1024</option>
+    <option name="modm:platform:core:boot2_size">8Mi</option>
   </options>
   <modules>
     <module>modm:board:feather-rp2040</module>

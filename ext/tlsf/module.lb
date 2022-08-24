@@ -52,9 +52,9 @@ def prepare(module, options):
         NumericOption(
             name="minimum_pool_size",
             description="Minimum pool size in byte",
-            minimum=2**12,
-            maximum=2**29,
-            default=max_ram_size(options[":target"])))
+            minimum="4Ki",
+            maximum="512Mi",
+            default="{}Ki".format(int(max_ram_size(options[":target"])/1024))))
 
     return True
 

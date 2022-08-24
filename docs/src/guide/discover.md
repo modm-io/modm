@@ -67,13 +67,13 @@ Parser(lbuild)
     ├── Module(modm:platform)   Platform HAL
     │   ├── Module(modm:platform:cortex-m)   ARM Cortex-M Core
     │   │   ├── Option(float-abi) = hard in [hard, soft, softfp]   Floating point ABI
-    │   │   ├── Option(main_stack_size) = 3*1024 (3072) in [256 .. 3*1024 .. 65536]
+    │   │   ├── Option(main_stack_size) = 3Ki (3072) in [256 .. 3Ki .. 64Ki]
     │   │   ├── Option(vector_table_location) = rom in [ram, rom]   Vector table location
    ... ...
     │   ├── Module(modm:platform:uart)   Universal Asynchronous Receiver Transmitter (UART)
     │   │   ├── Module(modm:platform:uart:1)   Instance 1
-    │   │   │   ├── Option(buffer.rx) = 0 in [0 ... 65534]
-    │   │   │   ╰── Option(buffer.tx) = 0 in [0 ... 65534]
+    │   │   │   ├── Option(buffer.rx) = 0 in [0 ... 64Ki-2]
+    │   │   │   ╰── Option(buffer.tx) = 0 in [0 ... 64Ki-2]
 ```
 
 Since there are no more REQUIRED options, you can now discover all module and

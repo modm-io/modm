@@ -7,7 +7,7 @@
 
   <options>
     <option name="modm:target">atmega328p-au</option>
-    <option name="modm:platform:core:f_cpu">16000000</option>
+    <option name="modm:platform:core:f_cpu">16M</option>
   </options>
   <modules>
     <module>modm:board:arduino-uno</module>

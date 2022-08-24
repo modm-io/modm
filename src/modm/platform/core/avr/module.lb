@@ -24,7 +24,7 @@ def prepare(module, options):
             name="f_cpu",
             description="CPU clock frequency",
             minimum=1,
-            maximum=32000000))
+            maximum="32M"))
 
     module.depends(":architecture:interrupt", ":stdc++")
     return True

@@ -35,13 +35,13 @@ class Instance(Module):
             NumericOption(
                 name="buffer.tx",
                 description="",
-                minimum=1, maximum=2 ** 16 - 2,
+                minimum=1, maximum="64Ki-2",
                 default=250))
         module.add_option(
             NumericOption(
                 name="buffer.rx",
                 description="",
-                minimum=1, maximum=2 ** 16 - 2,
+                minimum=1, maximum="64Ki-2",
                 default=16))
 
         return True

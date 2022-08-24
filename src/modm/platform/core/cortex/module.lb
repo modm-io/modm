@@ -194,8 +194,8 @@ def prepare(module, options):
             name="main_stack_size",
             description=FileReader("option/main_stack_size.md"),
             minimum=2 ** 8,
-            maximum=2 ** 16,
-            default="3*1024"))
+            maximum="64Ki",
+            default="3Ki"))
 
     if "f" in options[":target"].get_driver("core")["type"]:
         module.add_option(

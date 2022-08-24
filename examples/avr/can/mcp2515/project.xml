@@ -1,7 +1,7 @@
 <library>
   <options>
     <option name="modm:target">atmega644-20au</option>
-    <option name="modm:platform:core:f_cpu">14745600</option>
+    <option name="modm:platform:core:f_cpu">14.7456M</option>
     <option name="modm:build:build.path">../../../../build/avr/can/mcp2515</option>
     <option name="modm:io:with_printf">True</option>
   </options>

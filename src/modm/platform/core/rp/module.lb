@@ -34,8 +34,8 @@ def prepare(module, options):
             name="boot2_size",
             description="Specify the size of external QSPI FLASH chip",
             minimum=0,
-            maximum=2 ** 24,
-            default=2 ** 21))
+            maximum="16Mi",
+            default="2Mi"))
     return True
 
 

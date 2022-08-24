@@ -33,8 +33,8 @@ def prepare(module, options):
             name="ram_length",
             description="",
             minimum=64,
-            maximum=32768,
-            default=1024))
+            maximum="32Ki",
+            default="1Ki"))
 
     return True
 

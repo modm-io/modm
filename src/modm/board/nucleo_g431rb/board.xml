@@ -8,7 +8,7 @@
   <options>
     <option name="modm:target">stm32g431rbt6</option>
 
-    <option name="modm:platform:uart:2:buffer.tx">2048</option>
+    <option name="modm:platform:uart:2:buffer.tx">2Ki</option>
   </options>
   <modules>
     <module>modm:board:nucleo-g431rb</module>
