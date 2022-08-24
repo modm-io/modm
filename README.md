@@ -8,7 +8,7 @@
 modm (pronounced like dial-up "modem") is a toolbox for
 building custom C++20 libraries tailored to your embedded device.
 modm generates startup code, HALs and their implementations, communication
-protocols, drivers for external devices, BSPs, etc… in a modular, customizable
+protocols, drivers for external devices, and BSPs in a modular, customizable
 process that you can fine-tune to your needs.
 
 <!--webignore-->
@@ -67,13 +67,15 @@ git clone --recurse-submodules --jobs 8 https://github.com/modm-io/modm.git
 - Lightweight unit testing system (suitable for AVRs).
 - Hundreds of tests to ensure correct functionality.
 - Integration of useful third-party software:
-	- [FreeRTOS][] and [FreeRTOS+TCP][].
-	- [CMSIS][] and [CMSIS-DSP][].
-	- [ETL][].
-	- [TinyUSB][].
-	- [FatFS][].
-	- [ROSserial][].
-	- [CrashCatcher][].
+	- [FreeRTOS][] and [FreeRTOS+TCP][] operating system.
+	- [CMSIS][] and [CMSIS-DSP][] interfaces.
+	- [ETL][]: Embedded Template Library.
+	- [TinyUSB][]: USB Host/Device stack.
+	- [FatFS][]: FAT/exFAT filesystem.
+	- [ROSserial][]: Embedded ROS client.
+	- [CrashCatcher][]: Crash reports for HardFaults.
+	- [printf][]: Small printf implementation.
+	- [Nanopb][]: Embedded Protocol Buffers.
 
 
 ## Microcontrollers
@@ -528,8 +530,8 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 </center>
 
 We are only a small team of developers and are limited in the amount of devices
-we can support and test in hardware. [Open an issue][issues] to ask if your
-specific device is supported out-of-the-box and what you can do if it is not.
+we can support and test in hardware. [Open a discussion][discussions] to ask if
+your specific device is supported out-of-the-box and how you can add it otherwise.
 
 
 ### Boards
@@ -752,7 +754,7 @@ See [CONTRIBUTING.md][contrib] for our contribution guidelines.
 <!--authors-->
 The modm project is maintained by
 Niklas Hauser ([\@salkinium](https://github.com/salkinium)),
-Raphael Lehmann ([\@rleh](https://github.com/rleh)) and
+Raphael Lehmann ([\@rleh](https://github.com/rleh)), and
 Christopher Durand ([\@chris-durand](https://github.com/chris-durand)) with significant contributions from
 Sascha Schade ([\@strongly-typed](https://github.com/strongly-typed)),
 Fabian Greif ([\@dergraaf](https://github.com/dergraaf)),
@@ -762,7 +764,7 @@ Daniel Krebs ([\@daniel-k](https://github.com/daniel-k)),
 Georgi Grinshpun ([\@georgi-g](https://github.com/georgi-g)),
 David Hebbeker ([\@dhebbeker](https://github.com/dhebbeker)),
 Thorsten Lajewski ([\@TheTh0r](https://github.com/TheTh0r)),
-Mike Wolfram ([\@mikewolfram](https://github.com/mikewolfram))
+Mike Wolfram ([\@mikewolfram](https://github.com/mikewolfram)),
 and [many more contributors][contributors].
 <!--/authors-->
 
@@ -830,4 +832,6 @@ and [many more contributors][contributors].
 [FatFS]:           http://elm-chan.org/fsw/ff/00index_e.html
 [ROSserial]:       https://wiki.ros.org/rosserial
 [CrashCatcher]:    https://github.com/adamgreen/CrashCatcher
+[printf]:          https://github.com/eyalroz/printf
+[Nanopb]:          https://github.com/nanopb/nanopb
 <!--/links-->
