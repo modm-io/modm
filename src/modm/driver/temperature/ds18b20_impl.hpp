@@ -2,6 +2,7 @@
  * Copyright (c) 2009, Martin Rosekeit
  * Copyright (c) 2009-2011, Fabian Greif
  * Copyright (c) 2012, Niklas Hauser
+ * Copyright (c) 2022, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -29,6 +30,21 @@ bool
 modm::Ds18b20<OneWire>::isAvailable()
 {
 	return ow.verifyDevice(this->identifier);
+}
+
+template <typename OneWire>
+bool
+modm::Ds18b20<OneWire>::configure(Resolution resolution)
+{
+	if (!selectDevice()) {
+		return false;
+	}
+
+	ow.writeByte(this->WRITE_SCRATCHPAD);
+	ow.writeByte(0); // alert high value, not supported
+	ow.writeByte(0); // alert low value, not supported
+	ow.writeByte(static_cast<uint8_t>(resolution));
+	return true;
 }
 
 // ----------------------------------------------------------------------------
@@ -79,22 +95,9 @@ modm::Ds18b20<OneWire>::readTemperature()
 	int16_t temp = ow.readByte();
 	temp |= (ow.readByte() << 8);
 
-	// ignore next two bytes
-	ow.readByte();
-	ow.readByte();
-
-	// read config register byte
-	uint8_t config = (ow.readByte() >> 5) & 0x03;
-
 	ow.touchReset();
 
-	// Calculate conversion factor depending on the sensors resolution
-	//  9 bit = 0.5 °C steps
-	// 10 bit = 0.25 °C steps
-	// etc.
-	(void) config;
-
-	int32_t convertedTemperature = 625L * temp;
+	int32_t convertedTemperature = INT32_C(625) * temp;
 
 	// round to centi-degree
 	convertedTemperature = (convertedTemperature + 50) / 100;

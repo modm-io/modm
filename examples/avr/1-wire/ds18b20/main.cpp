@@ -66,6 +66,9 @@ main()
 	// read the temperature from a connected DS18B20
 	modm::Ds18b20< OneWireMaster > ds18b20(rom);
 
+	// 12 bits resolution => max. 750 ms conversion time
+	ds18b20.configure(modm::ds18b20::Resolution::Bits12);
+
 	ds18b20.startConversion();
 
 	while (true)
