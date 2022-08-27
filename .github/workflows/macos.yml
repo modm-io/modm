@@ -24,7 +24,7 @@ jobs:
         run: |
           pip3 install --user modm scons
           echo "/usr/local/bin" >> $GITHUB_PATH
-          echo "/Users/runner/Library/Python/3.9/bin" >> $GITHUB_PATH
+          echo "/Users/runner/Library/Python/3.10/bin" >> $GITHUB_PATH
 
       - name: Dump environment
         run: |
