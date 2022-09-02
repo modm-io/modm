@@ -3,7 +3,7 @@
  * Copyright (c) 2009, 2011-2012, Georgi Grinshpun
  * Copyright (c) 2010, Martin Rosekeit
  * Copyright (c) 2011, 2013-2017, Niklas Hauser
- * Copyright (c) 2013, 2015, Sascha Schade
+ * Copyright (c) 2013, 2015, 2022, Sascha Schade
  * Copyright (c) 2013, 2016, Kevin Läufer
  *
  * This file is part of the modm project.
@@ -270,6 +270,14 @@ public:
 		TIM{{ id }}->CR2 = flags;
 	}
 
+	template<typename Signal>
+	static void
+	setOutputIdleState(OutputIdleState idle, OutputIdleState idle_n = OutputIdleState::Reset)
+	{
+		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		setOutputIdleState(channel, idle, idle_n);
+	}
+
 	/*
 	 * Set Dead Time Value
 	 *
@@ -326,17 +334,45 @@ public:
 	static void
 	configureInputChannel(uint32_t channel, uint8_t filter);
 
+	template<typename Signal>
+	static void
+	configureInputChannel(uint8_t filter)
+	{
+		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		configureInputChannel(channel, filter);
+	}
+
 	static void
 	configureInputChannel(uint32_t channel, InputCaptureMapping input,
 			InputCapturePrescaler prescaler,
 			InputCapturePolarity polarity, uint8_t filter,
 			bool xor_ch1_3=false);
 
+	template<typename Signal>
+	static void
+	configureInputChannel(InputCaptureMapping input,
+			InputCapturePrescaler prescaler,
+			InputCapturePolarity polarity, uint8_t filter,
+			bool xor_ch1_3=false)
+	{
+		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		configureInputChannel(channel, input, prescaler, polarity, filter, xor_ch1_3);
+	}
+
+
 	static void
 	configureOutputChannel(uint32_t channel, OutputCompareMode mode,
 			Value compareValue, PinState out = PinState::Enable);
 	// TODO: Maybe add some functionality from the configureOutput
 	//       function below...
+
+	template<typename Signal>
+	static void
+	configureOutputChannel(OutputCompareMode mode, Value compareValue)
+	{
+		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		configureOutputChannel(channel, mode, compareValue);
+	}
 
 	/*
 	 * Configure Output Channel without changing the Compare Value
@@ -356,6 +392,18 @@ public:
 			PinState out_n,
 			OutputComparePolarity polarity_n = OutputComparePolarity::ActiveHigh,
 			OutputComparePreload preload = OutputComparePreload::Disable);
+
+	template<typename Signal>
+	static void
+	configureOutputChannel(OutputCompareMode mode,
+			PinState out, OutputComparePolarity polarity,
+			PinState out_n,
+			OutputComparePolarity polarity_n = OutputComparePolarity::ActiveHigh,
+			OutputComparePreload preload = OutputComparePreload::Disable)
+	{
+		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		configureOutputChannel(channel, mode, out, polarity, out_n, polarity_n, preload);
+	}
 
 	/*
 	 * Configure Output Channel width Mode/OutputPort uint
@@ -380,6 +428,14 @@ public:
 	static void
 	configureOutputChannel(uint32_t channel, uint32_t modeOutputPorts);
 
+	template<typename Signal>
+	static void
+	configureOutputChannel(uint32_t modeOutputPorts)
+	{
+		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		configureOutputChannel(channel, modeOutputPorts);
+	}
+
 	static inline void
 	setCompareValue(uint32_t channel, Value value)
 	{
@@ -396,10 +452,26 @@ public:
 %% endif
 	}
 
+	template<typename Signal>
+	static void
+	setCompareValue(Value value)
+	{
+		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		setCompareValue(channel, value);
+	}
+
 	static inline Value
 	getCompareValue(uint32_t channel)
 	{
 		return *(&TIM{{ id }}->CCR1 + (channel - 1));
+	}
+
+	template<typename Signal>
+	static inline Value
+	getCompareValue()
+	{
+		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		return getCompareValue(channel);
 	}
 
 public:

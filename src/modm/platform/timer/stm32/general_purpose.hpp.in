@@ -4,7 +4,8 @@
  * Copyright (c) 2010, Martin Rosekeit
  * Copyright (c) 2011, 2013-2017, Niklas Hauser
  * Copyright (c) 2013-2014, 2016, Kevin Läufer
- * Copyright (c) 2014, Sascha Schade
+ * Copyright (c) 2014, 2022, Sascha Schade
+ * Copyright (c) 2022, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -332,16 +333,45 @@ public:
 	static void
 	configureInputChannel(uint32_t channel, uint8_t filter);
 
+	template<typename Signal>
+	static void
+	configureInputChannel(uint8_t filter)
+	{
+		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		configureInputChannel(channel, filter);
+	}
+
 	static void
 	configureInputChannel(uint32_t channel, InputCaptureMapping input,
 			InputCapturePrescaler prescaler,
 			InputCapturePolarity polarity, uint8_t filter,
 			bool xor_ch1_3=false);
 
+	template<typename Signal>
+	static void
+	configureInputChannel(InputCaptureMapping input,
+			InputCapturePrescaler prescaler,
+			InputCapturePolarity polarity, uint8_t filter,
+			bool xor_ch1_3=false)
+	{
+		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		configureInputChannel(channel, input, prescaler, polarity, filter, xor_ch1_3);
+	}
+
 	static void
 	configureOutputChannel(uint32_t channel, OutputCompareMode_t mode,
 			Value compareValue, PinState out = PinState::Enable,
 			bool enableComparePreload = true);
+
+	template<typename Signal>
+	static void
+	configureOutputChannel(OutputCompareMode_t mode,
+			Value compareValue, PinState out = PinState::Enable,
+			bool enableComparePreload = true)
+	{
+		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		configureOutputChannel(channel, mode, compareValue, out, enableComparePreload);
+	}
 
 	/// Switch to Pwm Mode 2
 	///
@@ -373,6 +403,14 @@ public:
 				TIM{{ id }}->CCMR2 = flags;
 			}
 		}
+	}
+
+	template<typename Signal>
+	static void
+	setInvertedPwm()
+	{
+		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		setInvertedPwm(channel);
 	}
 
 	/// Switch to Pwm Mode 1
@@ -407,6 +445,14 @@ public:
 		}
 	}
 
+	template<typename Signal>
+	static void
+	setNormalPwm()
+	{
+		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		setNormalPwm(channel);
+	}
+
 	/// Switch to Inactive Mode
 	///
 	/// The channel output will be forced to the inactive level.
@@ -436,6 +482,14 @@ public:
 				TIM{{ id }}->CCMR2 = flags;
 			}
 		}
+	}
+
+	template<typename Signal>
+	static void
+	forceInactive()
+	{
+		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		forceInactive(channel);
 	}
 
 	/// Switch to Active Mode
@@ -469,6 +523,14 @@ public:
 		}
 	}
 
+	template<typename Signal>
+	static void
+	forceActive()
+	{
+		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		forceActive(channel);
+	}
+
 	%% if (id !=6 and id != 7)
 	/// Returns if the capture/compare channel of the timer is configured as input.
 	///
@@ -494,10 +556,20 @@ public:
 	%% endif
 
 	%% endif
+
 	static inline void
 	setCompareValue(uint32_t channel, Value value)
 	{
 		*(&TIM{{ id }}->CCR1 + (channel - 1)) = value;
+	}
+
+
+	template<typename Signal>
+	static void
+	setCompareValue(Value value)
+	{
+		constexpr auto channel = signalToChannel<Peripheral::Tim{{id}}, Signal>();
+		setCompareValue(channel, value);
 	}
 
 	static inline Value
@@ -506,6 +578,13 @@ public:
 		return *(&TIM{{ id }}->CCR1 + (channel - 1));
 	}
 
+	template<typename Signal>
+	static inline Value
+	getCompareValue()
+	{
+		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		return getCompareValue(channel);
+	}
 public:
 	static void
 	enableInterruptVector(bool enable, uint32_t priority);

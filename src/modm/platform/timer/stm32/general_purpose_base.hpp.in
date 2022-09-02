@@ -2,6 +2,7 @@
  * Copyright (c) 2013, Kevin Läufer
  * Copyright (c) 2014, Fabian Greif
  * Copyright (c) 2014-2017, Niklas Hauser
+ * Copyright (c) 2022, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -15,6 +16,8 @@
 #define MODM_STM32_TIMER_GP_BASE_HPP
 
 #include "basic_base.hpp"
+#include <modm/platform/core/peripherals.hpp>
+#include <modm/platform/gpio/data.hpp>
 
 namespace modm
 {
@@ -265,6 +268,28 @@ public:
 	 */
 	static uint16_t
 	getCompareValue(uint32_t channel);
+
+protected:
+	template<Peripheral p, typename Signal>
+	static consteval int
+	signalToChannel()
+	{
+		modm::platform::detail::SignalConnection<Signal, p>{};
+		if constexpr (Signal::Signal == Gpio::Signal::Ch1) {
+			return 1;
+		} else if constexpr (Signal::Signal == Gpio::Signal::Ch2) {
+			return 2;
+		} else if constexpr (Signal::Signal == Gpio::Signal::Ch3) {
+			return 3;
+%% if target.family != "l0" or target.pin != "d"
+		} else if constexpr (Signal::Signal == Gpio::Signal::Ch4) {
+			return 4;
+%% endif
+		} else {
+			// assert is always false, static_assert(false) would not compile
+			static_assert(!sizeof(Signal), "Invalid timer channel");
+		}
+	}
 };
 
 } // namespace platform
