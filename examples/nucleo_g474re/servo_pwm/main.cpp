@@ -37,7 +37,7 @@ main()
 	Timer4::setPrescaler(52);
 	Timer4::setOverflow(overflow);
 
-	Timer4::configureOutputChannel(2, Timer4::OutputCompareMode::Pwm, 0);
+	Timer4::configureOutputChannel<GpioB7::Ch2>(Timer4::OutputCompareMode::Pwm, 0);
 
 	Timer4::applyAndReset();
 
@@ -49,11 +49,11 @@ main()
 	MODM_LOG_INFO << "2.0 ms pulse width for 2 s" << modm::endl;
 	MODM_LOG_INFO << "1.0 ms pulse width for 1 s" << modm::endl;
 	LedD13::set();
-	Timer4::configureOutputChannel(2, Timer4::OutputCompareMode::Pwm, minPwm);
+	Timer4::configureOutputChannel<GpioB7::Ch2>(Timer4::OutputCompareMode::Pwm, minPwm);
 	modm::delay(2000ms);
-	Timer4::configureOutputChannel(2, Timer4::OutputCompareMode::Pwm, maxPwm);
+	Timer4::configureOutputChannel<GpioB7::Ch2>(Timer4::OutputCompareMode::Pwm, maxPwm);
 	modm::delay(2000ms);
-	Timer4::configureOutputChannel(2, Timer4::OutputCompareMode::Pwm, minPwm);
+	Timer4::configureOutputChannel<GpioB7::Ch2>(Timer4::OutputCompareMode::Pwm, minPwm);
 	LedD13::reset();
 	modm::delay(1000ms);
 
@@ -65,11 +65,11 @@ main()
 		modm::delay(100ms);
 
 		if (!Button::read()) {
-			Timer4::setCompareValue(2, targetPwm);
+			Timer4::setCompareValue<GpioB7::Ch2>(targetPwm);
 			MODM_LOG_INFO << "^";
 		}
 		else {
-			Timer4::setCompareValue(2, minPwm);
+			Timer4::setCompareValue<GpioB7::Ch2>(minPwm);
 			MODM_LOG_INFO << "-";
 		}
 	}

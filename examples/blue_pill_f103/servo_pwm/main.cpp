@@ -50,7 +50,7 @@ int main()
 	Timer4::setPrescaler(22);
 	Timer4::setOverflow(overflow);
 
-	Timer4::configureOutputChannel(2, Timer4::OutputCompareMode::Pwm, 0);
+	Timer4::configureOutputChannel<GpioB7::Ch2>(Timer4::OutputCompareMode::Pwm, 0);
 
 	Timer4::applyAndReset();
 
@@ -64,11 +64,11 @@ int main()
 	MODM_LOG_INFO << "1.0 ms pulse width for 1 s" << modm::endl;
 
 	LedGreen::set();
-	Timer4::configureOutputChannel(2, Timer4::OutputCompareMode::Pwm, minPwm);
+	Timer4::configureOutputChannel<GpioB7::Ch2>(Timer4::OutputCompareMode::Pwm, minPwm);
 	modm::delay(2s);
-	Timer4::configureOutputChannel(2, Timer4::OutputCompareMode::Pwm, maxPwm);
+	Timer4::configureOutputChannel<GpioB7::Ch2>(Timer4::OutputCompareMode::Pwm, maxPwm);
 	modm::delay(2s);
-	Timer4::configureOutputChannel(2, Timer4::OutputCompareMode::Pwm, minPwm);
+	Timer4::configureOutputChannel<GpioB7::Ch2>(Timer4::OutputCompareMode::Pwm, minPwm);
 	LedGreen::reset();
 	modm::delay(1s);
 
@@ -76,7 +76,7 @@ int main()
 	MODM_LOG_INFO << modm::endl;
 
 	MODM_LOG_INFO << "Pulse width set to 1.5 ms" << modm::endl;
-	Timer4::setCompareValue(2, targetPwm);
+	Timer4::setCompareValue<GpioB7::Ch2>(targetPwm);
 
 	while (true)
 	{

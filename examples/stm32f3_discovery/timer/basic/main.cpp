@@ -29,8 +29,8 @@ main()
 	Timer1::start();
 
 	Timer1::connect<Board::LedNorth::Ch1, Board::LedNorthWest::Ch1n>();
-	Timer1::setCompareValue(1, 0);
-	Timer1::configureOutputChannel(1,
+	Timer1::setCompareValue<Board::LedNorth::Ch1>(0);
+	Timer1::configureOutputChannel<Board::LedNorth::Ch1>(
 			static_cast<uint32_t>(Timer1::OutputCompareMode::Pwm) | 0b0101);
 	Timer1::setDeadTime(7);
 
@@ -38,7 +38,7 @@ main()
 
 	uint8_t i = 0;
 	while (true){
-		Timer1::setCompareValue(1, ++i);
+		Timer1::setCompareValue<Board::LedNorth::Ch1>(++i);
 		modm::delay(10ms);
 	}
 

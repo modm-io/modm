@@ -22,14 +22,12 @@
 using namespace Board;
 
 // Input Capture Timer Configuration
-constexpr uint8_t 	input_capture_channel 		= 2;
 constexpr uint16_t 	input_capture_overflow 		= 0xFFFF;
 constexpr float 	input_capture_freq_hz 		= 3000.00;	// Hz
 constexpr uint16_t 	input_capture_prescaler 	= SystemClock::Frequency / input_capture_freq_hz;
 constexpr float 	input_capture_ms_per_tick 	= ( 1.0 / input_capture_freq_hz ) * 1000.0;
 
 // PWM Generator Timer Configuration
-constexpr uint8_t 	pwm_gen_channel 		= 2u;
 constexpr uint16_t 	pwm_gen_overflow 		= 0xFFFF;
 constexpr float 	pwm_gen_frequency_hz 	= 50.00; 	// Hz
 constexpr float 	pwm_gen_pulse_width_ms 	= 1.5f;		// Milliseconds
@@ -67,7 +65,7 @@ MODM_ISR(TIM20_CC)
 	LedD13::toggle();	// Visual Feedback of the interruption being triggered
 
 	old_input_timer_value = latest_input_timer_value;
-	latest_input_timer_value = Timer20::getCompareValue(input_capture_channel);
+	latest_input_timer_value = Timer20::getCompareValue<GpioC2::Ch2>();
 	temp_ticks_between_interrups = (latest_input_timer_value-old_input_timer_value);
 
 	// Ingore negative values (overflow of counter register)
@@ -98,7 +96,7 @@ void generatePwm()
 	Timer4::setMode(Timer4::Mode::UpCounter);
 	Timer4::setPrescaler(pwm_gen_prescaler);
 	Timer4::setOverflow(pwm_gen_overflow);
-	Timer4::configureOutputChannel(pwm_gen_channel, Timer4::OutputCompareMode::Pwm, pwm_pulse_width_in_ticks);
+	Timer4::configureOutputChannel<GpioB7::Ch2>(Timer4::OutputCompareMode::Pwm, pwm_pulse_width_in_ticks);
 	Timer4::applyAndReset();
 	Timer4::start();
 	Timer4::enableOutput();
@@ -115,7 +113,7 @@ void inputTimerConfig()
 	Timer20::setMode(Timer20::Mode::UpCounter);
 	Timer20::setPrescaler(input_capture_prescaler);
 	Timer20::setOverflow(input_capture_overflow);
-	Timer20::configureInputChannel(input_capture_channel, Timer20::InputCaptureMapping::InputOwn,
+	Timer20::configureInputChannel<GpioC2::Ch2>(Timer20::InputCaptureMapping::InputOwn,
 									interrupt_prescaler, Timer20::InputCapturePolarity::Rising, 0, false);
 	Timer20::enableInterruptVector(Timer20::Interrupt::CaptureCompare2, true, interrupt_priority);
 	Timer20::enableInterrupt(Timer20::Interrupt::CaptureCompare2);
@@ -170,7 +168,7 @@ int main()
 		{
 			float period_of_signal_ms = getPeriodOfSignalInMs();
 			MODM_LOG_INFO << "Current Timer Value: " << Timer20::getValue() << modm::endl;
-			MODM_LOG_INFO << "Capture Compare Value: " << Timer20::getCompareValue(2) << modm::endl;
+			MODM_LOG_INFO << "Capture Compare Value: " << Timer20::getCompareValue<GpioC2::Ch2>() << modm::endl;
 			MODM_LOG_INFO << "Ticks between interrupts: " << ticks_between_interrupts << modm::endl;
 			MODM_LOG_INFO.printf("Period of the signal in ms: %.2f\n", (double) period_of_signal_ms);
 			MODM_LOG_INFO << "-----------------------------" << modm::endl ;

@@ -18,22 +18,22 @@
 // create the leds with these lambda callbacks
 modm::ui::Led orange([](uint8_t brightness)
 {
-	Timer4::setCompareValue(2, modm::ui::table22_16_256[brightness]);
+	Timer4::setCompareValue<Board::LedOrange::Ch2>(modm::ui::table22_16_256[brightness]);
 });
 
 modm::ui::Led red([](uint8_t brightness)
 {
-	Timer4::setCompareValue(3, modm::ui::table22_16_256[brightness]);
+	Timer4::setCompareValue<Board::LedRed::Ch3>(modm::ui::table22_16_256[brightness]);
 });
 
 modm::ui::Led green([](uint8_t brightness)
 {
-	Timer4::setCompareValue(1, modm::ui::table22_16_256[brightness]);
+	Timer4::setCompareValue<Board::LedGreen::Ch1>(modm::ui::table22_16_256[brightness]);
 });
 
 modm::ui::Led blue([](uint8_t brightness)
 {
-	Timer4::setCompareValue(4, modm::ui::table22_16_256[brightness]);
+	Timer4::setCompareValue<Board::LedBlue::Ch4>(modm::ui::table22_16_256[brightness]);
 });
 // ----------------------------------------------------------------------------
 
@@ -93,10 +93,10 @@ main()
 	Timer4::setPrescaler(1);
 	Timer4::setOverflow(65535);
 	// configure the output channels
-	Timer4::configureOutputChannel(1, Timer4::OutputCompareMode::Pwm, 0);
-	Timer4::configureOutputChannel(2, Timer4::OutputCompareMode::Pwm, 0);
-	Timer4::configureOutputChannel(3, Timer4::OutputCompareMode::Pwm, 0);
-	Timer4::configureOutputChannel(4, Timer4::OutputCompareMode::Pwm, 0);
+	Timer4::configureOutputChannel<Board::LedGreen::Ch1>(Timer4::OutputCompareMode::Pwm, 0);
+	Timer4::configureOutputChannel<Board::LedOrange::Ch2>(Timer4::OutputCompareMode::Pwm, 0);
+	Timer4::configureOutputChannel<Board::LedRed::Ch3>(Timer4::OutputCompareMode::Pwm, 0);
+	Timer4::configureOutputChannel<Board::LedBlue::Ch4>(Timer4::OutputCompareMode::Pwm, 0);
 	Timer4::applyAndReset();
 	// start the timer
 	Timer4::start();
