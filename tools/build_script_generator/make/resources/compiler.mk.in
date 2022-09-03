@@ -18,7 +18,7 @@ else
 %% if platform == "hosted"
 	UNAME_S := $(shell uname -s)
 	ifeq ($(UNAME_S),Darwin)
-		C_SUFFIX := -11
+		C_SUFFIX := -12
         # Using homebrew include and lib paths on macOS
         CPPDEFINES += -I/usr/local/include
         LIBPATH += -L/usr/local/lib
