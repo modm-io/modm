@@ -421,7 +421,7 @@ The [Windows Subsystem for Linux 2][wsl2] allows you to run a Linux distribution
 [winterm]: https://github.com/Microsoft/Terminal
 [winwsl]: https://docs.microsoft.com/en-us/windows/wsl/about
 [wsl2]: https://docs.microsoft.com/en-us/windows/wsl/about#what-is-wsl-2    
-[wsl-connect-usb]: https://docs.microsoft.com/en-us/windows/wsl/connect-usb)
+[wsl-connect-usb]: https://docs.microsoft.com/en-us/windows/wsl/connect-usb
 [wsl-install]: https://docs.microsoft.com/en-us/windows/wsl/install
 [wsl-vscode]: https://docs.microsoft.com/en-us/windows/wsl/tutorials/wsl-vscode
 [wsl-vscode-integrated-terminal]: https://code.visualstudio.com/docs/remote/wsl-tutorial#_integrated-terminal
