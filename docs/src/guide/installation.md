@@ -269,7 +269,7 @@ The [Windows Subsystem for Linux 2](https://docs.microsoft.com/en-us/windows/wsl
     3-3    0483:374b  ST-Link Debug, USB-Massenspeichergerät, Serielles USB-Ger...  Attached - Ubuntu-22.04
     4-1    138a:003d  Synaptics FP Sensors (WBF) (PID=003d)                         Not attached
     4-3    04f2:b370  HP HD Webcam [Fixed]                                          Not attached
-    ```powershell
+    ```
 	Check the BUSID parameter and use the one that corresponds to your device in forther commands. In this example it is the `3-3`.
 	```powershell
     PS C:\Windows\system32> usbipd wsl attach --busid 3-3
