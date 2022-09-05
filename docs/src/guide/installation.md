@@ -1,4 +1,3 @@
-
 # Installation
 
 This is the required software for generating, compiling and programming projects
@@ -317,15 +316,15 @@ avrdude --version
 
 For a pure Windows installation see [above](#windows).
 
-The [Windows Subsystem for Linux 2][wsl2] allows you to run a Linux distribution in parallel to Windows. In order to use this Linux for developing you need to [bridge the USB hub to which the device is attached](https://docs.microsoft.com/en-us/windows/wsl/connect-usb).
+The [Windows Subsystem for Linux 2][wsl2] allows you to run a Linux distribution in parallel to Windows. In order to use this Linux for developing you need to [bridge the USB hub to which the device is attached][wsl-connect-usb].
 
 - Install Ubuntu-22.04 LTS as WSL2 distribution
-  - See the [general WSL doc](https://docs.microsoft.com/en-us/windows/wsl/install), but
-  - as of this writing `wsl --list --online` will not list Ubuntu 22.04.1 LTS, but it is [available in the Microsoft Store](https://www.microsoft.com/store/productId/9PN20MSR04DW). Install it from there via mouse clicks
-- Install [Visual Studio Code](https://code.visualstudio.com/) and the [remote extensions for WSL](https://docs.microsoft.com/en-us/windows/wsl/tutorials/wsl-vscode) and make sure you can log in to your linux distribution
+  - See the [general WSL doc][wsl-install], but
+  - as of this writing `wsl --list --online` will not list Ubuntu 22.04.1 LTS, but it is [available in the Microsoft Store][windows-store-ubuntu-22-04-1-lts]. Install it from there via mouse clicks
+- Install [Visual Studio Code][vscode] and the [remote extensions for WSL][wsl-vscode] and make sure you can log in to your linux distribution
 - Physically attach the microcontroller board to a USB port
-- Make sure the WSL2 instance is running, either by opening a terminal via start menu or by using the [VSCode integrated terminal](https://code.visualstudio.com/docs/remote/wsl-tutorial#_integrated-terminal). 
-- [Bridge the USB device to Linux](https://docs.microsoft.com/en-us/windows/wsl/connect-usb) using [usbipd](https://github.com/dorssel/usbipd-win)
+- Make sure the WSL2 instance is running, either by opening a terminal via start menu or by using the [VSCode integrated terminal][wsl-vscode-integrated-terminal]. 
+- [Bridge the USB device to Linux][connect-usb] using [usbipd][usbipd]
   - This works for Windows 11 and Windows 10. Your sesssion might look similar to this one:
     First find the USB port to be bridged
     ```powershell
@@ -349,7 +348,7 @@ The [Windows Subsystem for Linux 2][wsl2] allows you to run a Linux distribution
 	``` 
   - In WSL2 Ubuntu-22.04 configure the USB ports as user accessible. This requires the configuration of `udev` rules. 
     - Use an editor to create a new `udev` rules file with a high enough number in the filenam, e.g. `sudo nano /etc/udev/rules.d/100-udev-stm.rules`
-    - Add some rules similar to [the ones used in OpenOCD](https://github.com/openocd-org/openocd/blob/master/contrib/60-openocd.rules#L84-L99), e.g.
+    - Add some rules similar to [the ones used in OpenOCD][udev-rules-openocd], e.g.
       ```
 	  # STMicroelectronics ST-LINK V1
 	  ATTRS{idVendor}=="0483", ATTRS{idProduct}=="3744", MODE="660", GROUP="plugdev", TAG+="uaccess"
@@ -384,12 +383,13 @@ The [Windows Subsystem for Linux 2][wsl2] allows you to run a Linux distribution
     ```bash
 	sudo apt install picocom libncurses5 
 	```
-  - [Explore the examples](https://modm.io/guide/examples/)
+  - [Explore the examples][examples]
   - Once an example is flashed upon the device with `scons build -j4 && scons program` you can 
     - run gdb on it using `scons debug`
     - listen to debug output using picocom. Example: `picocom --baud 115200 --imap lfcrlf --echo /dev/ttyACM0`  
 
 
+[connect-usb]: https://docs.microsoft.com/en-us/windows/wsl/connect-usb
 [contribute]: https://github.com/modm-io/modm/blob/develop/CONTRIBUTING.md
 [newissue]: https://github.com/modm-io/modm/issues/new
 [examples]: https://github.com/modm-io/modm/tree/develop/examples
@@ -412,8 +412,16 @@ The [Windows Subsystem for Linux 2][wsl2] allows you to run a Linux distribution
 [modm-avr-gcc]: https://github.com/modm-io/avr-gcc
 [armgcc-issues]: https://github.com/modm-io/modm/issues/468
 [openocd-install]: https://github.com/rleh/openocd-build
+[udev-rules-openocd]: https://github.com/openocd-org/openocd/blob/master/contrib/60-openocd.rules#L84-L99
+[usbipd]: https://github.com/dorssel/usbipd-win
+[vscode]: https://code.visualstudio.com/ 
 [winavr]: https://blog.zakkemble.net/avr-gcc-builds/
+[windows-store-ubuntu-22-04-1-lts]: https://www.microsoft.com/store/productId/9PN20MSR04DW
 [wingit]: https://git-scm.com/download/win
 [winterm]: https://github.com/Microsoft/Terminal
 [winwsl]: https://docs.microsoft.com/en-us/windows/wsl/about
 [wsl2]: https://docs.microsoft.com/en-us/windows/wsl/about#what-is-wsl-2    
+[wsl-connect-usb]: https://docs.microsoft.com/en-us/windows/wsl/connect-usb)
+[wsl-install]: https://docs.microsoft.com/en-us/windows/wsl/install
+[wsl-vscode]: https://docs.microsoft.com/en-us/windows/wsl/tutorials/wsl-vscode
+[wsl-vscode-integrated-terminal]: https://code.visualstudio.com/docs/remote/wsl-tutorial#_integrated-terminal
