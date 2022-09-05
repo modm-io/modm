@@ -208,6 +208,8 @@ brew install boost gcc
 
 ## Windows
 
+For Windows with WSL2 see [below](#Windows with WSL2)
+
 In general, Windows is not a great fit for the command line tools that modm is
 built on. Consider using the [Windows subsystem for Linux (WSL)][winwsl] instead.
 Alternatively consider using a better terminal emulator than command prompt
@@ -249,7 +251,67 @@ We use [Doxypress][] to generate the API documentation.
 Download and run the [Installer][doxypress_binaries].
 
 Please use the free and open-source [7-Zip file archiver][7_zip] to extract the
-files in the next steps.
+files in the next steps. 	
+
+#### ARM Cortex-M
+
+Install the [pre-built ARM toolchain via the 32-bit installer][gcc-arm-toolchain]
+and make sure you select **Add path to environment variable** at the end!
+Open a new command prompt to test the compiler:
+
+```sh
+arm-none-eabi-gcc --version
+```
+
+Install the  and then download the latest [pre-built OpenOCD tool][openocd_binaries]:
+
+1. unpack the `.tar.gz` file using the context menu `7-Zip > Extract Here`.
+2. unpack the `.tar` file using `7-Zip > Extract to "openocd-v0.11.0-..."`
+
+Then rename and move the extracted folder to `C:\Program Files (x86)\openocd`.
+Open PowerShell to add the `\bin` folder to the `Path`:
+
+```
+[Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\Program Files (x86)\openocd\bin", "User")
+```
+
+Close the PowerShell and open a new command prompt to test openocd:
+
+```sh
+openocd --version
+```
+
+#### Microchip AVR
+
+Download the [pre-built AVR toolchain][winavr] and unpack the `.zip` file using
+the context menu `7-Zip > Extract to "avr-gcc-10.1.0-..."`
+Then rename and move the extracted folder to `C:\Program Files\avr-gcc`.
+Open PowerShell to add the `\bin` folder to the `Path`:
+
+```
+[Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\Program Files\avr-gcc\bin", "User")
+```
+
+Close the PowerShell and open a new command prompt to test avr-gcc and avrdude:
+
+```sh
+avr-gcc --version
+avrdude --version
+```
+
+
+!!! warning "For non-English speakers"
+    For now project and build paths containing non-ASCII characters are not
+    parsed correctly. [Please open an issue][newissue] if this is a problem.
+
+!!! warning "Windows paths"
+    Windows created several compatibility issues with its `\` path separator.
+    Even though we try hard to not hardcode the path separator, there may still
+    be issues related to this. [Please open an issue][newissue] in that case.
+
+!!! info "Dear Windows users"
+    We don't regularly use Windows with modm, so please [give us some feedback][newissue]
+    about the quality of these instructions.
 
 ## Windows with WSL2
 
@@ -323,68 +385,7 @@ The [Windows Subsystem for Linux 2](https://docs.microsoft.com/en-us/windows/wsl
   - [Explore the examples](https://modm.io/guide/examples/)
   - Once an example is flashed upon the device with `scons build -j4 && scons program` you can 
     - run gdb on it using `scons debug`
-    - listen to debug output using picocom. Example: `picocom --baud 115200 --imap lfcrlf --echo /dev/ttyACM0`   	
-
-#### ARM Cortex-M
-
-Install the [pre-built ARM toolchain via the 32-bit installer][gcc-arm-toolchain]
-and make sure you select **Add path to environment variable** at the end!
-Open a new command prompt to test the compiler:
-
-```sh
-arm-none-eabi-gcc --version
-```
-
-Install the  and then download the latest [pre-built OpenOCD tool][openocd_binaries]:
-
-1. unpack the `.tar.gz` file using the context menu `7-Zip > Extract Here`.
-2. unpack the `.tar` file using `7-Zip > Extract to "openocd-v0.11.0-..."`
-
-Then rename and move the extracted folder to `C:\Program Files (x86)\openocd`.
-Open PowerShell to add the `\bin` folder to the `Path`:
-
-```
-[Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\Program Files (x86)\openocd\bin", "User")
-```
-
-Close the PowerShell and open a new command prompt to test openocd:
-
-```sh
-openocd --version
-```
-
-
-#### Microchip AVR
-
-Download the [pre-built AVR toolchain][winavr] and unpack the `.zip` file using
-the context menu `7-Zip > Extract to "avr-gcc-10.1.0-..."`
-Then rename and move the extracted folder to `C:\Program Files\avr-gcc`.
-Open PowerShell to add the `\bin` folder to the `Path`:
-
-```
-[Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\Program Files\avr-gcc\bin", "User")
-```
-
-Close the PowerShell and open a new command prompt to test avr-gcc and avrdude:
-
-```sh
-avr-gcc --version
-avrdude --version
-```
-
-
-!!! warning "For non-English speakers"
-    For now project and build paths containing non-ASCII characters are not
-    parsed correctly. [Please open an issue][newissue] if this is a problem.
-
-!!! warning "Windows paths"
-    Windows created several compatibility issues with its `\` path separator.
-    Even though we try hard to not hardcode the path separator, there may still
-    be issues related to this. [Please open an issue][newissue] in that case.
-
-!!! info "Dear Windows users"
-    We don't regularly use Windows with modm, so please [give us some feedback][newissue]
-    about the quality of these instructions.
+    - listen to debug output using picocom. Example: `picocom --baud 115200 --imap lfcrlf --echo /dev/ttyACM0`  
 
 
 [contribute]: https://github.com/modm-io/modm/blob/develop/CONTRIBUTING.md
