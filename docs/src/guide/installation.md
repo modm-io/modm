@@ -250,6 +250,37 @@ Download and run the [Installer][doxypress_binaries].
 Please use the free and open-source [7-Zip file archiver][7_zip] to extract the
 files in the next steps.
 
+## Windows with WSL2
+
+The [Windows Subsystem for Linux 2](https://docs.microsoft.com/en-us/windows/wsl/about#what-is-wsl-2) allows you to run a Linux distribution in parallel to Windows. In order to use this Linux for developing you need to [bridge the USB hub to which the device is attached](https://docs.microsoft.com/en-us/windows/wsl/connect-usb).
+
+- [Install WSL2](https://docs.microsoft.com/en-us/windows/wsl/install)
+  - As of this writing `wsl --list --online` will not list Ubuntu 22.04.1 LTS, but it is [available in the Microsoft Store](https://www.microsoft.com/store/productId/9PN20MSR04DW). Install it from there via mouse clicks
+- Install [Visual Studio Code](https://code.visualstudio.com/) and the [remote extensions for WSL](https://docs.microsoft.com/en-us/windows/wsl/tutorials/wsl-vscode) and make sure you can log in
+- Attach the microcontroller board to a USB port
+- Make sure the WSL2 instance is running, either by opening a terminal via start menu or by using the [VSCode integrated terminal](https://code.visualstudio.com/docs/remote/wsl-tutorial#_integrated-terminal). 
+- [Bridge the USB device to Linux](https://docs.microsoft.com/en-us/windows/wsl/connect-usb) using [usbipd](https://github.com/dorssel/usbipd-win)
+  - This works for Windows 11 and Windows 10. Your sesssion might look similar to this one:
+    First find the USB port to be bridged
+    ```powershell
+	PS C:\Windows\system32> usbipd wsl list
+    BUSID  VID:PID    DEVICE                                                        STATE
+    3-2    1bcf:0005  USB-Eingabegerät                                              Not attached
+    3-3    0483:374b  ST-Link Debug, USB-Massenspeichergerät, Serielles USB-Ger...  Attached - Ubuntu-22.04
+    4-1    138a:003d  Synaptics FP Sensors (WBF) (PID=003d)                         Not attached
+    4-3    04f2:b370  HP HD Webcam [Fixed]                                          Not attached
+    ```powershell
+	Check the BUSID parameter and use the one that corresponds to your device in forther commands. In this example it is the `3-3`.
+	```powershell
+    PS C:\Windows\system32> usbipd wsl attach --busid 3-3
+    usbipd: info: Using default distribution 'Ubuntu-22.04'.
+    ```
+    Note: the system is not very reliable, it might be necessary to detach/attach several times until the connection is established
+    ```powershell
+	PS C:\Windows\system32> usbipd wsl detach --busid 3-3
+	PS C:\Windows\system32> usbipd wsl attach --busid 3-3
+    usbipd: info: Using default distribution 'Ubuntu-22.04'.
+	``` 
 
 #### ARM Cortex-M
 
