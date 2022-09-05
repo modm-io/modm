@@ -208,7 +208,7 @@ brew install boost gcc
 
 ## Windows
 
-For Windows with WSL2 see [below](#windows-with-wsl2)
+For Windows with WSL2 see [below](#windows-with-wsl2).
 
 In general, Windows is not a great fit for the command line tools that modm is
 built on. Consider using the [Windows subsystem for Linux (WSL)][winwsl] instead.
@@ -315,7 +315,7 @@ avrdude --version
 
 ## Windows with WSL2
 
-For a pure Windows installation see [above](#windows)
+For a pure Windows installation see [above](#windows).
 
 The [Windows Subsystem for Linux 2](https://docs.microsoft.com/en-us/windows/wsl/about#what-is-wsl-2) allows you to run a Linux distribution in parallel to Windows. In order to use this Linux for developing you need to [bridge the USB hub to which the device is attached](https://docs.microsoft.com/en-us/windows/wsl/connect-usb).
 
