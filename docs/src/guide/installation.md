@@ -281,6 +281,29 @@ The [Windows Subsystem for Linux 2](https://docs.microsoft.com/en-us/windows/wsl
 	PS C:\Windows\system32> usbipd wsl attach --busid 3-3
     usbipd: info: Using default distribution 'Ubuntu-22.04'.
 	``` 
+  - In WSL2 Ubuntu-22.04 configure the USB ports as user accessible. This requires the configuration of `udev` rules. 
+    - Use an editor to create a new `udev` rules file with a high enough number in the filenam, e.g. `sudo nano /etc/udev/rules.d/100-udev-stm.rules`
+    - Add some rules similar to [the ones used in OpenOCD](https://github.com/openocd-org/openocd/blob/master/contrib/60-openocd.rules#L84-L99)
+    - Either reboot the machine or be lucky that a combination of following commands is sufficient 
+      ```bash 
+	  sudo udevadm trigger
+	  sudo udevadm control --reload
+	  ```
+	- After adding the new `udev` rules the usb device has to be virtually detached and reattached to the Linux system via PowerShell:
+	  ```powershell
+	  usbipd wsl detach --busid 3-3
+	  usbipd wsl attach --busid 3-3
+      ``` 
+	  Alternatively remove the USB connector, reattach it, then issue the command `usbipd wsl attach --busid 3-3`
+  - On WSL2 Linux follow the [Linux installation instructions](#linux). Hint: They are made for 20.04, but work on 22.04 as well.
+  - In addition perform the following installation steps
+    ```bash
+	sudo apt install picocom libncurses5 
+	```
+  - [Explore the examples](https://modm.io/guide/examples/)
+  - Once an example is flashed upon the device with `scons build -j4 && scons program` you can 
+    - run gdb on it using `scons debug`
+    - listen to debug output using picocom. Example: `picocom --baud 115200 --imap lfcrlf --echo /dev/ttyACM0`   	
 
 #### ARM Cortex-M
 
