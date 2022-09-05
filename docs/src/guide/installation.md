@@ -317,7 +317,7 @@ avrdude --version
 
 For a pure Windows installation see [above](#windows).
 
-The [Windows Subsystem for Linux 2](https://docs.microsoft.com/en-us/windows/wsl/about#what-is-wsl-2) allows you to run a Linux distribution in parallel to Windows. In order to use this Linux for developing you need to [bridge the USB hub to which the device is attached](https://docs.microsoft.com/en-us/windows/wsl/connect-usb).
+The [Windows Subsystem for Linux 2][wsl2] allows you to run a Linux distribution in parallel to Windows. In order to use this Linux for developing you need to [bridge the USB hub to which the device is attached](https://docs.microsoft.com/en-us/windows/wsl/connect-usb).
 
 - Install Ubuntu-22.04 LTS as WSL2 distribution
   - See the [general WSL doc](https://docs.microsoft.com/en-us/windows/wsl/install), but
@@ -416,4 +416,4 @@ The [Windows Subsystem for Linux 2](https://docs.microsoft.com/en-us/windows/wsl
 [wingit]: https://git-scm.com/download/win
 [winterm]: https://github.com/Microsoft/Terminal
 [winwsl]: https://docs.microsoft.com/en-us/windows/wsl/about
-    
+[wsl2]: https://docs.microsoft.com/en-us/windows/wsl/about#what-is-wsl-2    
