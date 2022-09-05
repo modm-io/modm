@@ -257,8 +257,8 @@ The [Windows Subsystem for Linux 2](https://docs.microsoft.com/en-us/windows/wsl
 - Install Ubuntu-22.04 LTS as WSL2 distribution
   - See the [general WSL doc](https://docs.microsoft.com/en-us/windows/wsl/install), but
   - as of this writing `wsl --list --online` will not list Ubuntu 22.04.1 LTS, but it is [available in the Microsoft Store](https://www.microsoft.com/store/productId/9PN20MSR04DW). Install it from there via mouse clicks
-- Install [Visual Studio Code](https://code.visualstudio.com/) and the [remote extensions for WSL](https://docs.microsoft.com/en-us/windows/wsl/tutorials/wsl-vscode) and make sure you can log in
-- Attach the microcontroller board to a USB port
+- Install [Visual Studio Code](https://code.visualstudio.com/) and the [remote extensions for WSL](https://docs.microsoft.com/en-us/windows/wsl/tutorials/wsl-vscode) and make sure you can log in to your linux distribution
+- Physically attach the microcontroller board to a USB port
 - Make sure the WSL2 instance is running, either by opening a terminal via start menu or by using the [VSCode integrated terminal](https://code.visualstudio.com/docs/remote/wsl-tutorial#_integrated-terminal). 
 - [Bridge the USB device to Linux](https://docs.microsoft.com/en-us/windows/wsl/connect-usb) using [usbipd](https://github.com/dorssel/usbipd-win)
   - This works for Windows 11 and Windows 10. Your sesssion might look similar to this one:
