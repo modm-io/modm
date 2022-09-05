@@ -285,8 +285,26 @@ The [Windows Subsystem for Linux 2](https://docs.microsoft.com/en-us/windows/wsl
 	``` 
   - In WSL2 Ubuntu-22.04 configure the USB ports as user accessible. This requires the configuration of `udev` rules. 
     - Use an editor to create a new `udev` rules file with a high enough number in the filenam, e.g. `sudo nano /etc/udev/rules.d/100-udev-stm.rules`
-    - Add some rules similar to [the ones used in OpenOCD](https://github.com/openocd-org/openocd/blob/master/contrib/60-openocd.rules#L84-L99)
-    - Either reboot the machine or be lucky that a combination of following commands is sufficient 
+    - Add some rules similar to [the ones used in OpenOCD](https://github.com/openocd-org/openocd/blob/master/contrib/60-openocd.rules#L84-L99), e.g.
+      ```
+	  # STMicroelectronics ST-LINK V1
+	  ATTRS{idVendor}=="0483", ATTRS{idProduct}=="3744", MODE="660", GROUP="plugdev", TAG+="uaccess"
+
+	  # STMicroelectronics ST-LINK/V2
+	  ATTRS{idVendor}=="0483", ATTRS{idProduct}=="3748", MODE="660", GROUP="plugdev", TAG+="uaccess"
+
+	  # STMicroelectronics ST-LINK/V2.1
+	  ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374b", MODE="660", GROUP="plugdev", TAG+="uaccess"
+	  ATTRS{idVendor}=="0483", ATTRS{idProduct}=="3752", MODE="660", GROUP="plugdev", TAG+="uaccess"
+
+	  # STMicroelectronics STLINK-V3
+	  ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374d", MODE="660", GROUP="plugdev", TAG+="uaccess"
+	  ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374e", MODE="660", GROUP="plugdev", TAG+="uaccess"
+	  ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374f", MODE="660", GROUP="plugdev", TAG+="uaccess"
+	  ATTRS{idVendor}=="0483", ATTRS{idProduct}=="3753", MODE="660", GROUP="plugdev", TAG+="uaccess"
+	  ATTRS{idVendor}=="0483", ATTRS{idProduct}=="3754", MODE="660", GROUP="plugdev", TAG+="uaccess"
+      ```
+    - Either reboot the machine or be lucky that a combination of the following commands is sufficient 
       ```bash 
 	  sudo udevadm trigger
 	  sudo udevadm control --reload
