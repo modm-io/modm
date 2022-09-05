@@ -1,3 +1,4 @@
+
 # Installation
 
 This is the required software for generating, compiling and programming projects
@@ -271,7 +272,7 @@ The [Windows Subsystem for Linux 2](https://docs.microsoft.com/en-us/windows/wsl
     4-1    138a:003d  Synaptics FP Sensors (WBF) (PID=003d)                         Not attached
     4-3    04f2:b370  HP HD Webcam [Fixed]                                          Not attached
     ```
-	Check the BUSID parameter and use the one that corresponds to your device in forther commands. In this example it is the `3-3`.
+	Check the BUSID parameter and use the one that corresponds to your device in further commands. In this example it is the `3-3`.
 	```powershell
     PS C:\Windows\system32> usbipd wsl attach --busid 3-3
     usbipd: info: Using default distribution 'Ubuntu-22.04'.
@@ -394,3 +395,4 @@ avrdude --version
 [wingit]: https://git-scm.com/download/win
 [winterm]: https://github.com/Microsoft/Terminal
 [winwsl]: https://docs.microsoft.com/en-us/windows/wsl/about
+    
