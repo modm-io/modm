@@ -35,7 +35,7 @@ Please help us [keep these instructions up-to-date][contribute]!
 For Ubuntu 20.04LTS, these commands install the minimal build system:
 
 ```sh
-sudo apt install python3 python3-pip scons git
+sudo apt install python3 python3-pip scons git libncurses5 
 pip3 install modm
 ```
 
@@ -379,9 +379,9 @@ The [Windows Subsystem for Linux 2][wsl2] allows you to run a Linux distribution
       ``` 
 	  Alternatively remove the USB connector, reattach it, then issue the command `usbipd wsl attach --busid 3-3`
   - On WSL2 Linux follow the [Linux installation instructions](#linux). Hint: They are made for 20.04, but work on 22.04 as well.
-  - In addition perform the following installation steps
+  - In addition install picocom
     ```bash
-	sudo apt install picocom libncurses5 
+	sudo apt install picocom
 	```
   - [Explore the examples][examples]
   - Once an example is flashed upon the device with `scons build -j4 && scons program` you can 
