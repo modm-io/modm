@@ -36,7 +36,8 @@ modm::platform::Timer{{ id }}::disable()
 // ----------------------------------------------------------------------------
 void
 modm::platform::Timer{{ id }}::setMode(Mode mode, SlaveMode slaveMode,
-		SlaveModeTrigger slaveModeTrigger, MasterMode masterMode
+		SlaveModeTrigger slaveModeTrigger, MasterMode masterMode,
+		bool enableOnePulseMode
 %% if advanced_extended
 		, MasterMode2 masterMode2
 %% endif
@@ -54,7 +55,12 @@ modm::platform::Timer{{ id }}::setMode(Mode mode, SlaveMode slaveMode,
 	}
 
 	// ARR Register is buffered, only Under/Overflow generates update interrupt
-	TIM{{ id }}->CR1 = TIM_CR1_ARPE | TIM_CR1_URS | static_cast<uint32_t>(mode);
+	uint32_t cr1 = TIM_CR1_ARPE | TIM_CR1_URS | static_cast<uint32_t>(mode);
+	if (enableOnePulseMode) {
+		TIM{{ id }}->CR1 = cr1 | TIM_CR1_OPM;
+	} else {
+		TIM{{ id }}->CR1 = cr1;
+	}
 %% if advanced_extended
 	TIM{{ id }}->CR2 = 	static_cast<uint32_t>(masterMode) |
 						static_cast<uint32_t>(masterMode2);
@@ -155,7 +161,7 @@ modm::platform::Timer{{ id }}::configureInputChannel(uint32_t channel,
 // ----------------------------------------------------------------------------
 void
 modm::platform::Timer{{ id }}::configureOutputChannel(uint32_t channel,
-		OutputCompareMode mode, uint16_t compareValue)
+		OutputCompareMode mode, uint16_t compareValue, PinState out)
 {
 	channel -= 1;	// 1..4 -> 0..3
 
@@ -199,7 +205,7 @@ modm::platform::Timer{{ id }}::configureOutputChannel(uint32_t channel,
 	}
 %% endif
 
-	if (mode != OutputCompareMode::Inactive) {
+	if ((mode != OutputCompareMode::Inactive) and (out == PinState::Enable)) {
 		TIM{{ id }}->CCER |= (TIM_CCER_CC1E) << (channel * 4);
 	}
 }

@@ -108,7 +108,8 @@ public:
 	setMode(Mode mode,
 			SlaveMode slaveMode = SlaveMode::Disabled,
 			SlaveModeTrigger slaveModeTrigger = SlaveModeTrigger::Internal0,
-			MasterMode masterMode = MasterMode::Reset
+			MasterMode masterMode = MasterMode::Reset,
+			bool enableOnePulseMode = false
 %% if advanced_extended
 			, MasterMode2 masterMode2 = MasterMode2::Reset
 %% endif
@@ -333,7 +334,7 @@ public:
 
 	static void
 	configureOutputChannel(uint32_t channel, OutputCompareMode mode,
-			Value compareValue);
+			Value compareValue, PinState out = PinState::Enable);
 	// TODO: Maybe add some functionality from the configureOutput
 	//       function below...
 
