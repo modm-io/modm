@@ -46,8 +46,8 @@ public:
 		Timer::setPrescaler(PRESCALER);
 
 		if(filter) {
-			Timer::configureInputChannel(1, filter);
-			Timer::configureInputChannel(2, filter);
+			Timer::template configureInputChannel<typename SignalA::Ch1>(filter);
+			Timer::template configureInputChannel<typename SignalB::Ch2>(filter);
 		}
 
 		Timer::applyAndReset();
