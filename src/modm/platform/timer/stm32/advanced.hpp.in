@@ -368,10 +368,11 @@ public:
 
 	template<typename Signal>
 	static void
-	configureOutputChannel(OutputCompareMode mode, Value compareValue)
+	configureOutputChannel(OutputCompareMode mode,
+			Value compareValue, PinState out = PinState::Enable)
 	{
 		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
-		configureOutputChannel(channel, mode, compareValue);
+		configureOutputChannel(channel, mode, compareValue, out);
 	}
 
 	/*
