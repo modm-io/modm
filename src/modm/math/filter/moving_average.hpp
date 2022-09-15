@@ -82,7 +82,7 @@ public:
 	{
 		if constexpr(std::floating_point<T>) {
 			buffer[index] = input;
-			sum = std::accumulate(std::begin(buffer), std::end(buffer), 0);
+			sum = std::accumulate(std::begin(buffer), std::end(buffer), T{0});
 		} else {
 			sum -= buffer[index];
 			sum += input;
