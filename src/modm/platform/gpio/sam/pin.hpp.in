@@ -379,7 +379,6 @@ public:
 	setInput(InputType type)
 	{
 		configure(type);
-		setInput();
 	}
 
 	static void
