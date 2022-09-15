@@ -108,6 +108,14 @@ public:
 	/// Returns true if data can be written
 	static inline bool
 	isTransmitRegisterEmpty();
+
+	/// Configure mapping between rx pin functions and IO pads
+	static inline void
+	setRxPinout(RxPinout rxPinout);
+
+	/// Configure mapping between tx pin functions and IO pads
+	static inline void
+	setTxPinout(TxPinout txPinout);
 };
 
 }	// namespace modm::platform

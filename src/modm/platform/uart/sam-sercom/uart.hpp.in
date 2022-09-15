@@ -39,6 +39,40 @@ class {{ name }} : public UartBase, public ::modm::Uart
 			"Rx and Tx cannot use the same signal!");
 	};
 
+	template<typename RxSignal, typename TxSignal>
+	static void
+	configurePadMapping()
+	{
+		constexpr auto rxIndex = detail::get_pad_index_v<RxSignal>;
+		constexpr auto txIndex = detail::get_pad_index_v<TxSignal>;
+
+		PeripheralClock<Peripherals::{{sercom_name}}<{{id}}>>::enable();
+
+		if constexpr (rxIndex == 0) {
+			{{ hal }}::setRxPinout(RxPinout::RxPad0);
+		} else if constexpr (rxIndex == 1) {
+			{{ hal }}::setRxPinout(RxPinout::RxPad1);
+		} else if constexpr (rxIndex == 2) {
+			{{ hal }}::setRxPinout(RxPinout::RxPad2);
+		} else if constexpr (rxIndex == 3) {
+			{{ hal }}::setRxPinout(RxPinout::RxPad3);
+		} else {
+			// assert is always false
+			static_assert(!std::is_same_v<RxSignal, RxSignal>, "Invalid rx signal");
+		}
+
+		if constexpr (txIndex == 0) {
+			{{ hal }}::setTxPinout(TxPinout::TxPad0_XckPad1);
+%% if target.family != "d5x/e5x"
+		} else if constexpr (txIndex == 2) {
+			{{ hal }}::setTxPinout(TxPinout::TxPad2_XckPad3);
+%% endif
+		} else {
+			// assert is always false
+			static_assert(!std::is_same_v<TxSignal, TxSignal>, "Invalid tx signal");
+		}
+	}
+
 public:
 	template< class... Pins >
 	static void
@@ -53,6 +87,8 @@ public:
 		using RxConnector = typename RxPin::template Connector<Sercom, Sercom::Pad<0>, Sercom::Pad<1>, Sercom::Pad<2>, Sercom::Pad<3>>;
 		using TxConnector = typename TxPin::template Connector<Sercom, Sercom::Pad<0>, Sercom::Pad<2>>;
 		ValidateNotSame<typename RxConnector::Signal, typename TxConnector::Signal> {};
+
+		configurePadMapping<typename RxConnector::Signal, typename TxConnector::Signal>();
 		RxConnector::connect();
 		TxConnector::connect();
 	}

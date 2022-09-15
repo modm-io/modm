@@ -62,9 +62,6 @@ void
 	{{ peripheral }}->USART.CTRLA.bit.MODE = 0x1;
 	// Set asynchronous mode
 	{{ peripheral }}->USART.CTRLA.bit.CMODE = 0x0;
-	// Set rx/tx pins
-	{{ peripheral }}->USART.CTRLA.bit.RXPO = 0x3; // Pad3
-	{{ peripheral }}->USART.CTRLA.bit.TXPO = 0x1; // Pad2;
 	// Set character size to 8 bits
 	{{ peripheral }}->USART.CTRLB.bit.CHSIZE = 0x0;
 	// Set Data order to LSB first
@@ -137,6 +134,18 @@ bool
 {{ name }}::isTransmitRegisterEmpty()
 {
 	return {{ peripheral }}->USART.INTFLAG.bit.DRE;
+}
+
+void
+{{ name }}::setRxPinout(RxPinout rxPinout)
+{
+	{{ peripheral }}->USART.CTRLA.bit.RXPO = static_cast<uint8_t>(rxPinout);
+}
+
+void
+{{ name }}::setTxPinout(TxPinout txPinout)
+{
+	{{ peripheral }}->USART.CTRLA.bit.TXPO = static_cast<uint8_t>(txPinout);
 }
 
 }	// namespace modm::platform
