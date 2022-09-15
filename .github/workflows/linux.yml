@@ -92,7 +92,7 @@ jobs:
       - name: Examples SAMD Devices
         if: always()
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py samd)
+          (cd examples && ../tools/scripts/examples_compile.py samd samd21_xplained_pro)
       - name: Examples SAMG Devices
         if: always()
         run: |
