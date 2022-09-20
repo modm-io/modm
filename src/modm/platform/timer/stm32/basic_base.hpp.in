@@ -47,6 +47,27 @@ public:
 	};
 	MODM_FLAGS32(InterruptFlag);
 
+	enum class Event : uint32_t
+	{
+%% if advanced_extended
+		Break2 						= TIM_EGR_B2G,
+%% endif
+%% if 'advanced' in types
+		Break 						= TIM_EGR_BG,
+		CaptureCompareControlUpdate = TIM_EGR_COMG,
+%% endif
+%% if 'general_purpose' in types
+		Trigger 					= TIM_EGR_TG,
+		CaptureCompare4 			= TIM_EGR_CC4G,
+		CaptureCompare3 			= TIM_EGR_CC3G,
+		CaptureCompare2 			= TIM_EGR_CC2G,
+		CaptureCompare1 			= TIM_EGR_CC1G,
+%% endif
+%% if 'basic' in types
+		Update 						= TIM_EGR_UG,
+%% endif
+	};
+
 public:
 	// This type is the internal size of the counter.
 	using Value = uint16_t;

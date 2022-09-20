@@ -193,7 +193,7 @@ public:
 	};
 
 %% if target.family not in ["l0", "l1"]
-	/* Different Resolution Depending on DeadTime[7:5]: */
+	/* Different Resolution depending on DeadTime[7:5]: */
 	enum class DeadTimeResolution : uint32_t
 	{
 		From0With125nsStep = 0,									//0xx
