@@ -184,6 +184,13 @@ public:
 		return TIM{{ id }}->ARR;
 	}
 
+	template<class SystemClock>
+	static constexpr uint32_t
+	getClockFrequency()
+	{
+		return SystemClock::Timer{{ id }};
+	}
+
 	template<class SystemClock, class Rep, class Period>
 	static Value
 	setPeriod(std::chrono::duration<Rep, Period> duration, bool autoApply = true)
