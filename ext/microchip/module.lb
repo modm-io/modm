@@ -81,6 +81,10 @@ def validate(env):
         for n in names:
             define = "__{}__".format(n.upper())
             if match is not None and define in match:
+                # In case of multiple matches the most specific header is selected.
+                # The one with the matching variant suffix will have the longest name.
+                if device_define is not None and len(device_define) > len(define):
+                    continue
                 family_file = famfile.relative_to(localpath("."))
                 device_header = "{}.h".format(n)
                 device_define = define
