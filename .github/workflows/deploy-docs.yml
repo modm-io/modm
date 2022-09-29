@@ -10,17 +10,24 @@ jobs:
   build-upload-docs:
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-base:2022-03-28
+      image: ghcr.io/modm-ext/modm-build-base:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Update submodules and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm mkdocs mkdocs-material & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
+      - name: Mkdocs info
+        run: |
           mkdocs --version
           pip3 show mkdocs-material
       - name: Clone modm-ext/modm.io repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: modm-ext/modm.io
           ssh-key: ${{secrets.MODM_EXT_MODM_IO_DEPLOY_KEY}}
@@ -43,13 +50,18 @@ jobs:
   api-docs-all:
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-base:2022-03-28
+      image: ghcr.io/modm-ext/modm-build-base:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Update submodules and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Full run of docs.modm.io-generator-script
         run: |
           export TERM=xterm-256color

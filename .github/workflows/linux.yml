@@ -6,14 +6,19 @@ jobs:
   unittests-linux-generic:
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-03-28
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Update submodules and install lbuild
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Check environment
         run: |
           env
@@ -109,13 +114,18 @@ jobs:
   stm32-examples:
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-03-28
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Examples STM32F0 Series
         if: always()
         run: |
@@ -164,13 +174,18 @@ jobs:
   stm32f4-examples-1:
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-03-28
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Examples STM32F4 Only Discovery Board
         if: always()
         run: |
@@ -179,13 +194,21 @@ jobs:
   stm32f4-examples-2:
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-03-28
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm protobuf==3.20.1 grpcio-tools & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
+      - name: Install protobuf==3.20.1 grpcio-tools (pip)
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager protobuf==3.20.1 grpcio-tools
       - name: Examples STM32F4 Without Discovery Board
         if: always()
         run: |
@@ -194,13 +217,18 @@ jobs:
   avr-examples:
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-avr
+      image: ghcr.io/modm-ext/modm-build-avr:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Check environment
         run: |
           which avr-g++
@@ -235,13 +263,18 @@ jobs:
   hal-compile-quick-1:
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-03-28
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Quick compile HAL for Cortex-M Part 1
         if: always()
         run: |
@@ -255,13 +288,18 @@ jobs:
   hal-compile-quick-2:
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-03-28
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Quick compile HAL for Cortex-M Part 2
         if: always()
         run: |
@@ -275,13 +313,18 @@ jobs:
   hal-compile-quick-3:
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-03-28
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Quick compile HAL for Cortex-M Part 3
         if: always()
         run: |
@@ -295,13 +338,18 @@ jobs:
   hal-compile-quick-4:
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-03-28
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Quick compile HAL for Cortex-M Part 4
         if: always()
         run: |
@@ -315,13 +363,21 @@ jobs:
   build-docs-test:
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-base:2022-03-28
+      image: ghcr.io/modm-ext/modm-build-base:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Update submodules and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm mkdocs mkdocs-material & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
+      - name: Install mkdocs mkdocs-material (pip)
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager mkdocs mkdocs-material
           mkdocs --version
           pip3 show mkdocs-material
       - name: Test run of docs.modm.io-generator-script

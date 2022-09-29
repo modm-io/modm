@@ -46,12 +46,13 @@ jobs:
           python -c "import os; print(os.cpu_count())"
 
       - name: Check out repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
 
-      - name: Git Submodules
-        shell: bash
+      - name: Update lbuild
         run: |
-          git submodule update --init
+          pip3 install --upgrade --upgrade-strategy=eager modm
 
       - name: Hosted Examples
         shell: bash
