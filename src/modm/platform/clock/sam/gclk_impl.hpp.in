@@ -2,6 +2,7 @@
  * Copyright (c) 2019, Ethan Slattery
  * Copyright (c) 2020, Erik Henriksson
  * Copyright (c) 2021, Niklas Hauser
+ * Copyright (c) 2022, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -12,11 +13,40 @@
 // ----------------------------------------------------------------------------
 
 #include <cmath>
-#include <modm/math/units.hpp>
+#include <utility>
+#include <algorithm>
+#include <limits>
+#include <bit>
 
 namespace modm::platform
 {
 extern "C" uint32_t SystemCoreClock;
+
+%% for peripheral, clocks in clock_map.items()
+template<>
+%% set name=peripheral[0]
+%% set instance=peripheral[1]
+%% if instance
+struct PeripheralClock<Peripherals::{{name | capitalize}}<{{instance}}>>
+%% else
+struct PeripheralClock<Peripherals::{{name | capitalize}}>
+%% endif
+{
+	static inline void enable()
+	{
+%% for clock in clocks
+		{{clock[0]}}->{{clock[1]}}MASK.reg |= (1u << {{clock[2]}});
+%% endfor
+	}
+
+	static inline void disable()
+	{
+%% for clock in clocks
+		{{clock[0]}}->{{clock[1]}}MASK.reg &= ~(1u << {{clock[2]}});
+%% endfor
+	}
+};
+%% endfor
 
 template< uint32_t Core_Hz >
 void
@@ -27,28 +57,577 @@ GenericClockController::updateCoreFrequency()
 	delay_ns_per_loop = computeDelayNsPerLoop(Core_Hz);
 }
 
-template< uint32_t Core_Hz >
+template< uint32_t Core_Hz, uint16_t Vdd_mV=3300 >
 uint32_t
 GenericClockController::setFlashLatency()
 {
+%% if target.family == "d5x/e5x":
+{% raw %}
+	// TODO: move to device files
+	constexpr std::array<std::pair<uint32_t, uint8_t>, 6> waitStates0{{
+		{22_MHz, 0}, { 44_MHz, 1}, { 67_MHz, 2},
+		{89_MHz, 3}, {111_MHz, 4}, {120_MHz, 5}
+	}};
+	constexpr std::array<std::pair<uint32_t, uint8_t>, 6> waitStates1{{
+		{ 24_MHz, 0}, { 51_MHz, 1}, { 77_MHz, 2},
+		{101_MHz, 3}, {119_MHz, 4}, {120_MHz, 5}
+	}};
+{% endraw %}
+	constexpr auto waitStates = (Vdd_mV >= 2700) ? waitStates1 : waitStates0;
+	constexpr auto rws = std::lower_bound(std::begin(waitStates), std::end(waitStates), Core_Hz,
+		[](auto w1, auto w2) {
+			return w1.first < w2;
+		})->second;
+	NVMCTRL->CTRLA.bit.RWS = rws;
+	NVMCTRL->CTRLA.bit.AUTOWS = 0;
+%% else
 	// See table 41.11 (NVM Characteristics) in the datasheet
 	if constexpr (Core_Hz > 24_MHz) {
 		NVMCTRL->CTRLB.bit.RWS = NVMCTRL_CTRLB_RWS_HALF_Val;
 	} else {
 		NVMCTRL->CTRLB.bit.RWS = NVMCTRL_CTRLB_RWS_SINGLE_Val;
 	}
+%% endif
 	return Core_Hz;
+}
+
+template<frequency_t reference>
+bool
+GenericClockController::enableDfll48mClosedLoop(uint32_t waitCycles)
+{
+	static_assert(reference > 732_Hz, "DFLL48 reference frequency must be larger than 732 Hz");
+	static_assert(reference < 43_kHz, "DFLL48 reference frequency must be less than 33 kHz");
+	constexpr auto multiplier = uint16_t(std::round(48_MHz / double(reference)));
+
+%% if target.family == "d1x/d2x/dax"
+	// Errata 1.2.1: Disable OnDemand mode
+	SYSCTRL->DFLLCTRL.bit.ONDEMAND = 0;
+	// Wait for synchronization
+	while (!SYSCTRL->PCLKSR.bit.DFLLRDY && waitCycles > 0) --waitCycles;
+
+	// TODO: is returning the right thing to do?
+	if (waitCycles == 0)
+		return false;
+
+	// read DFLL coarse value calibration from "NVM Software Calibration Area" (0x806020, 128 bits)
+	// DFLL coarse calibration value is in bits 63:58
+	const auto calibrationData = *reinterpret_cast<const volatile uint32_t*>(0x806020 + 4);
+	const auto dfllCoarseCalibration = (calibrationData >> (58 - 32)) & 0b11'1111;
+	SYSCTRL->DFLLVAL.reg = (dfllCoarseCalibration << SYSCTRL_DFLLVAL_COARSE_Pos);
+	while (!SYSCTRL->PCLKSR.bit.DFLLRDY);
+
+	// Skip coarse lock phase with DFLLVAL.COARSE pre-programmed (17.6.7.1.2 in datasheet)
+	SYSCTRL->DFLLCTRL.bit.BPLCKC = 1;
+	while (!SYSCTRL->PCLKSR.bit.DFLLRDY);
+
+	// Set multiplier and adjustment step sizes
+	// TODO: evaluate step size values
+	SYSCTRL->DFLLMUL.reg =
+		SYSCTRL_DFLLMUL_CSTEP(8) |
+		SYSCTRL_DFLLMUL_FSTEP(8) |
+		SYSCTRL_DFLLMUL_MUL(multiplier);
+	while (!SYSCTRL->PCLKSR.bit.DFLLRDY);
+
+	// Write full configuration to DFLL control register
+	SYSCTRL->DFLLCTRL.reg = (SYSCTRL->DFLLCTRL.reg |
+		SYSCTRL_DFLLCTRL_MODE | // Enable closed-loop mode
+		SYSCTRL_DFLLCTRL_WAITLOCK | // No output until DFLL is locked.
+		SYSCTRL_DFLLCTRL_QLDIS) // Disable quick lock
+		// Disable USB clock recovery mode
+		& ~(SYSCTRL_DFLLCTRL_USBCRM);
+
+	SYSCTRL->DFLLCTRL.bit.ENABLE = true;
+	while (!SYSCTRL->PCLKSR.bit.DFLLRDY && waitCycles > 0) --waitCycles;
+	// wait for PLL lock
+	while (!SYSCTRL->PCLKSR.bit.DFLLLCKC && waitCycles > 0) --waitCycles;
+	while (!SYSCTRL->PCLKSR.bit.DFLLLCKF && waitCycles > 0) --waitCycles;
+%% else
+	// Set multiplier and adjustment step sizes
+	// TODO: evaluate step size values
+	OSCCTRL->DFLLMUL.reg =
+		OSCCTRL_DFLLMUL_CSTEP(8) |
+		OSCCTRL_DFLLMUL_FSTEP(8) |
+		OSCCTRL_DFLLMUL_MUL(multiplier);
+	while (OSCCTRL->DFLLSYNC.bit.DFLLMUL);
+
+	OSCCTRL->DFLLCTRLB.reg =
+		OSCCTRL_DFLLCTRLB_MODE | // Enable closed-loop mode
+		OSCCTRL_DFLLCTRLB_QLDIS; // Disable quick lock
+	while (OSCCTRL->DFLLSYNC.bit.DFLLCTRLB);
+
+	OSCCTRL->DFLLCTRLA.bit.ONDEMAND = 0;
+	OSCCTRL->DFLLCTRLA.bit.ENABLE = 1;
+	while (OSCCTRL->DFLLSYNC.bit.ENABLE);
+
+	// wait for PLL lock
+	while (!OSCCTRL->STATUS.bit.DFLLLCKC && waitCycles > 0) --waitCycles;
+	while (!OSCCTRL->STATUS.bit.DFLLLCKF && waitCycles > 0) --waitCycles;
+	while (!OSCCTRL->STATUS.bit.DFLLRDY && waitCycles > 0) --waitCycles;
+%% endif
+
+	return waitCycles > 0;
+}
+
+%% if target.family == "d1x/d2x/dax"
+template< ClockPeripheral peripheral >
+void
+GenericClockController::connect(ClockGenerator clockGen)
+{
+	GCLK->CLKCTRL.bit.ID = uint8_t(peripheral);
+	GCLK->CLKCTRL.bit.CLKEN = 0;
+	while (GCLK->CLKCTRL.bit.CLKEN);
+
+	GCLK->CLKCTRL.reg =
+		GCLK_CLKCTRL_CLKEN |
+		GCLK_CLKCTRL_GEN(uint32_t(clockGen)) |
+		GCLK_CLKCTRL_ID(uint8_t(peripheral));
+	sync();
+}
+
+void
+GenericClockController::sync()
+{
+	while (GCLK->STATUS.bit.SYNCBUSY);
+}
+
+void
+GenericClockController::sync(ClockGenerator)
+{
+	sync();
+}
+
+%% elif target.family == "d5x/e5x"
+void
+GenericClockController::sync()
+{
+	constexpr auto mask = GCLK_SYNCBUSY_GENCTRL_Msk | GCLK_SYNCBUSY_SWRST;
+	while (GCLK->SYNCBUSY.reg & mask);
+}
+
+void
+GenericClockController::sync(ClockGenerator clockGen)
+{
+	const auto bit = static_cast<uint32_t>(clockGen) << GCLK_SYNCBUSY_GENCTRL_Pos;
+	while (GCLK->SYNCBUSY.reg & bit);
 }
 
 template< ClockPeripheral peripheral >
 void
 GenericClockController::connect(ClockGenerator clockGen)
 {
-	GCLK->CLKCTRL.reg =
-		GCLK_CLKCTRL_CLKEN |
-		GCLK_CLKCTRL_GEN(uint32_t(clockGen)) |
-		GCLK_CLKCTRL_ID(uint32_t(peripheral));
+	auto& reg = GCLK->PCHCTRL[static_cast<uint32_t>(peripheral)].reg;
+	reg = 0;
+	while (reg != 0);
+	reg = GCLK_PCHCTRL_CHEN | (static_cast<uint32_t>(clockGen) << GCLK_PCHCTRL_GEN_Pos);
+	sync(clockGen);
+}
+%% endif
+
+template<frequency_t frequency, XoscStartupTime startupTime = XoscStartupTime::Start_15625us>
+bool
+%% if target.family == "d5x/e5x"
+GenericClockController::enableExternalCrystal(Xosc clock, uint32_t waitCycles)
+%% else
+GenericClockController::enableExternalCrystal(uint32_t waitCycles)
+%% endif
+{
+%% if target.family == "d5x/e5x"
+%%	set reg="OSCCTRL->XOSCCTRL[int(clock)]"
+%%	set prefix="OSCCTRL_XOSCCTRL"
+%%	set status="OSCCTRL->STATUS.reg & (OSCCTRL_STATUS_XOSCRDY0 << int(clock))"
+	PeripheralClock<Peripherals::Oscctrl>::enable();
+%% elif target.family == "d1x/d2x/dax"
+%%	set reg="SYSCTRL->XOSC"
+%%	set prefix="SYSCTRL_XOSC"
+%%	set status="SYSCTRL->PCLKSR.bit.XOSCRDY"
+	PeripheralClock<Peripherals::Sysctrl>::enable();
+%% endif
+	{{reg}}.bit.STARTUP = uint32_t(startupTime);
+	{{reg}}.bit.XTALEN = 1;
+	// Automatic gain control can only be enabled when the crystal is running
+%% if target.family == "d5x/e5x"
+	{{reg}}.bit.ENALC = 0;
+	if constexpr (frequency <= 8'000'000) {
+		{{reg}}.bit.IMULT = 0x3;
+		{{reg}}.bit.IPTAT = 0x2;
+	} else if constexpr (frequency <= 16'000'000) {
+		{{reg}}.bit.IMULT = 0x4;
+		{{reg}}.bit.IPTAT = 0x3;
+	} else if constexpr (frequency <= 24'000'000) {
+		{{reg}}.bit.IMULT = 0x5;
+		{{reg}}.bit.IPTAT = 0x3;
+	} else {
+		{{reg}}.bit.IMULT = 0x6;
+		{{reg}}.bit.IPTAT = 0x3;
+	}
+%% else
+	{{reg}}.bit.AMPGC = 0;
+	if constexpr (frequency <= 2'000'000) {
+		{{reg}}.bit.GAIN = 0x0;
+	} else if constexpr (frequency <= 4'000'000) {
+		{{reg}}.bit.GAIN = 0x1;
+	} else if constexpr (frequency <= 8'000'000) {
+		{{reg}}.bit.GAIN = 0x2;
+	} else if constexpr (frequency <= 16'000'000) {
+		{{reg}}.bit.GAIN = 0x3;
+	} else {
+		{{reg}}.bit.GAIN = 0x4;
+	}
+%% endif
+
+	// force oscillator start even if no clock sink is using it yet
+	{{reg}}.bit.ONDEMAND = 0;
+
+	{{reg}}.bit.ENABLE = 1;
+	while(!({{status}}) && --waitCycles);
+	// Enable automatic gain control on success
+%% if target.family == "d5x/e5x"
+	{{reg}}.bit.ENALC = waitCycles > 0;
+%% else
+	{{reg}}.bit.AMPGC = waitCycles > 0;
+%% endif
+	return waitCycles;
+}
+
+bool
+%% if target.family == "d5x/e5x"
+GenericClockController::enableExternalClock(Xosc clock, uint32_t waitCycles)
+%% else
+GenericClockController::enableExternalClock(uint32_t waitCycles)
+%% endif
+{
+%% if target.family == "d5x/e5x"
+%%	set reg="OSCCTRL->XOSCCTRL[int(clock)]"
+%%	set status="OSCCTRL->STATUS.reg & (OSCCTRL_STATUS_XOSCRDY0 << int(clock))"
+	PeripheralClock<Peripherals::Oscctrl>::enable();
+%% elif target.family == "d1x/d2x/dax"
+%%	set reg="SYSCTRL->XOSC"
+%%	set status="SYSCTRL->PCLKSR.bit.XOSCRDY"
+	PeripheralClock<Peripherals::Sysctrl>::enable();
+%% endif
+	// force oscillator start even if no clock sink is using it yet
+	{{reg}}.bit.ONDEMAND = 0;
+
+	{{reg}}.bit.STARTUP = 0;
+	{{reg}}.bit.XTALEN = 0;
+	{{reg}}.bit.ENABLE = 1;
+	while(!({{status}}) && --waitCycles);
+	return waitCycles;
+}
+
+bool
+GenericClockController::enableExternalCrystal32k(Xosc32StartupTime time)
+{
+%% if target.family == "d1x/d2x/dax"
+%%	set reg="SYSCTRL->XOSC32K"
+%%	set status="SYSCTRL->PCLKSR.bit.XOSC32KRDY"
+	PeripheralClock<Peripherals::Sysctrl>::enable();
+%% else
+%%	set reg="OSC32KCTRL->XOSC32K"
+%%	set status="OSC32KCTRL->STATUS.bit.XOSC32KRDY"
+	PeripheralClock<Peripherals::Osc32kctrl>::enable();
+%% endif
+	// force oscillator start even if no clock sink is using it yet
+	{{reg}}.bit.ONDEMAND = 0;
+%% if target.family == "d1x/d2x/dax"
+	// disable non-functional automatic gain control, see errata 1.1.1
+	{{reg}}.bit.AAMPEN = 0;
+%% endif
+	{{reg}}.bit.EN1K = 1;
+	{{reg}}.bit.EN32K = 1;
+	{{reg}}.bit.RUNSTDBY = 1;
+	{{reg}}.bit.XTALEN = 1;
+	{{reg}}.bit.STARTUP = static_cast<uint32_t>(time);
+	{{reg}}.bit.ENABLE = 1;
+	while(!({{status}}));
+	return true;
+}
+
+bool
+GenericClockController::enableExternalClock32k()
+{
+%% if target.family == "d1x/d2x/dax"
+%%	set reg="SYSCTRL->XOSC32K"
+%%	set status="SYSCTRL->PCLKSR.bit.XOSC32KRDY"
+	PeripheralClock<Peripherals::Sysctrl>::enable();
+%% else
+%%	set reg="OSC32KCTRL->XOSC32K"
+%%	set status="OSC32KCTRL->STATUS.bit.XOSC32KRDY"
+	PeripheralClock<Peripherals::Osc32kctrl>::enable();
+%% endif
+	// force oscillator start even if no clock sink is using it yet
+	{{reg}}.bit.ONDEMAND = 0;
+
+	{{reg}}.bit.EN1K = 1;
+	{{reg}}.bit.EN32K = 1;
+	{{reg}}.bit.RUNSTDBY = 1;
+	{{reg}}.bit.XTALEN = 0;
+	{{reg}}.bit.STARTUP = 0;
+	{{reg}}.bit.ENABLE = 1;
+	while(!({{status}}));
+	return true;
+}
+
+%% if has_dpll
+
+/// @cond
+namespace detail
+{
+
+struct DpllConfigCalculation : DpllConfig
+{
+	double bestOutputFrequency{};
+};
+
+consteval DpllConfigCalculation
+findDpllConfig(double inputClock, double target, bool fractional)
+{
+	uint32_t maxMultiplier = (1u << DpllConfig::MultiplierIntegerBits);
+	if (fractional) {
+		maxMultiplier = (1u << (DpllConfig::MultiplierIntegerBits + DpllConfig::MultiplierFractionalBits));
+		target *= (1 << DpllConfig::MultiplierFractionalBits);
+	}
+	// f_pll = f_reference * (1 + N_int + N_frac/(2^frac_bits))
+	const auto idealMultiplier = (target / inputClock) - 1;
+	const uint32_t multplier = std::min<uint32_t>(maxMultiplier, std::round(idealMultiplier));
+	if (fractional) {
+		const auto output = inputClock * (multplier + 1) / (1u << DpllConfig::MultiplierFractionalBits);
+		return DpllConfigCalculation {
+			{.integerMultiplier = uint16_t(multplier >> DpllConfig::MultiplierFractionalBits),
+			.fractionalMultiplier = uint16_t(multplier & ((1u << DpllConfig::MultiplierFractionalBits) - 1)),
+			.xoscDivider = 0},
+			output
+		};
+	} else {
+		const auto output = inputClock * (multplier + 1);
+		return DpllConfigCalculation {
+			{.integerMultiplier = uint16_t(multplier),
+			.fractionalMultiplier = 0,
+			.xoscDivider = 0},
+			output
+		};
+	}
+}
+
+consteval DpllConfigCalculation
+calculateDpllConfigXosc(double xoscClock, double target, bool fractional)
+{
+	DpllConfigCalculation bestConfig;
+	bestConfig.bestOutputFrequency = std::numeric_limits<double>::max();
+	auto minError = std::numeric_limits<double>::max();
+
+	for (uint32_t div = 0; div < (1u << DpllConfig::XoscDividerBits); ++div) {
+		// Xosc divider divides by / (2*(div + 1))
+		const double reference = xoscClock / (2*(div + 1));
+		if (reference < DpllConfig::MinReference || reference > DpllConfig::MaxReference) continue;
+		auto result = findDpllConfig(reference, target, fractional);
+		const auto output = result.bestOutputFrequency;
+		result.xoscDivider = div;
+		const double error = std::abs(target - output);
+		if (error < minError && output >= DpllConfig::MinOutput && output <= DpllConfig::MaxOutput) {
+			bestConfig = result;
+			minError = error;
+		}
+	}
+	return bestConfig;
+}
+
+consteval DpllConfigCalculation
+findDpllConfigXosc(double xoscClock, double target, uint16_t tolerance_ppm [[maybe_unused]])
+{
+	return calculateDpllConfigXosc(xoscClock, target, false);
+
+	// TODO: fractional mode is disabled for now, it was causing an unstable PLL for some parameters
+	// it can still be used with manually specified coefficients
+
+	// For reducing PLL jitter first try to find a suitable configuration in PLL integer mode.
+	// In case no solution is found fractional mode is used.
+	/*DpllConfigCalculation bestConfig{calculateDpllConfigXosc(xoscClock, target, false)};
+	const auto output = bestConfig.bestOutputFrequency;
+	const double error = std::abs(target - output);
+
+	// treat errors below tolerance as exact match
+	if ((error / target) < (tolerance_ppm * double(1e-6))) {
+		return bestConfig;
+	}
+
+	return calculateDpllConfigXosc(xoscClock, target, true);*/
 }
 
 }
+/// @endcond
 
+template<DpllSource source, frequency_t output, uint16_t tolerance_ppm>
+bool
+%% if target.family == "d5x/e5x"
+GenericClockController::enableDpll(DpllInstance instance)
+%% else
+GenericClockController::enableDpll()
+%% endif
+{
+	constexpr auto config = [&]() {
+		if constexpr (source.isXoscSource()) {
+			return detail::findDpllConfigXosc(source.frequency, output, tolerance_ppm);
+		} else {
+			const auto resultInt = detail::findDpllConfig(source.frequency, output, false);
+			// TODO: fractional mode is disabled for now, because of PLL instability issues
+			//if (std::abs((resultInt.bestOutputFrequency / output) - 1) < (tolerance_ppm* double(1e-6))) {
+				return resultInt;
+			//}
+			//return detail::findDpllConfig(source.frequency, output, true);
+		}
+	}();
+
+	static_assert(std::abs((config.bestOutputFrequency / output) - 1) <= tolerance_ppm, "DPLL clock tolerance exceeded");
+%% if target.family == "d5x/e5x"
+	return enableDpll<source, DpllConfig(config)>(instance);
+%% else
+	return enableDpll<source, DpllConfig(config)>();
+%% endif
+}
+
+/// Enable PLL with manual configuration
+template<DpllSource source, DpllConfig config>
+bool
+%% if target.family == "d5x/e5x"
+GenericClockController::enableDpll(DpllInstance instance)
+%% else
+GenericClockController::enableDpll()
+%% endif
+{
+	constexpr auto reference = source.isXoscSource() ?
+		double(source.frequency) / (2 * (config.xoscDivider + 1)) :
+		double(source.frequency);
+
+	static_assert(reference >= DpllConfig::MinReference, "DPLL reference frequency is too low");
+	static_assert(reference <= DpllConfig::MaxReference, "DPLL reference frequency is too high");
+
+	static_assert(config.integerMultiplier < (1 << DpllConfig::MultiplierIntegerBits),
+				  "DPLL integer multplier out of range");
+	static_assert(config.fractionalMultiplier < (1 << DpllConfig::MultiplierFractionalBits),
+				  "DPLL fractional multplier out of range");
+
+	constexpr auto intFactor = config.integerMultiplier;
+	constexpr auto fracFactor = config.fractionalMultiplier / (1 << DpllConfig::MultiplierFractionalBits);
+	constexpr auto output = reference * (1 + intFactor + fracFactor);
+
+	static_assert(output >= DpllConfig::MinOutput, "DPLL output frequency is too low");
+	static_assert(output <= DpllConfig::MaxOutput, "DPLL output frequency is too high");
+
+%% if target.family == "d1x/d2x/dax"
+%% set dpll_peripheral="SYSCTRL"
+%% else
+%% set dpll_peripheral="OSCCTRL"
+%% endif
+
+%% if target.family == "d5x/e5x"
+%% set instance="Dpll[int(instance)]."
+%% else
+%% set instance=""
+%% endif
+	PeripheralClock<Peripherals::{{dpll_peripheral | capitalize}}>::enable();
+	{{dpll_peripheral}}->{{instance}}DPLLRATIO.bit.LDR = config.integerMultiplier;
+	{{dpll_peripheral}}->{{instance}}DPLLRATIO.bit.LDRFRAC = config.fractionalMultiplier;
+	{{dpll_peripheral}}->{{instance}}DPLLCTRLB.bit.DIV = config.xoscDivider;
+	{{dpll_peripheral}}->{{instance}}DPLLCTRLB.bit.REFCLK = static_cast<uint32_t>(source.reference);
+%% if target.family != "d1x/d2x/dax"
+	while({{dpll_peripheral}}->{{instance}}DPLLSYNCBUSY.bit.DPLLRATIO);
+%% endif
+	// force oscillator start even if no clock sink is using it yet
+	{{dpll_peripheral}}->{{instance}}DPLLCTRLA.bit.ONDEMAND = 0;
+
+	{{dpll_peripheral}}->{{instance}}DPLLCTRLA.bit.ENABLE = 1;
+%% if target.family == "d1x/d2x/dax"
+	while(!{{dpll_peripheral}}->{{instance}}DPLLSTATUS.bit.ENABLE);
+%% else
+	while({{dpll_peripheral}}->{{instance}}DPLLSYNCBUSY.bit.ENABLE);
+%% endif
+	uint32_t counter{50000};
+	while (counter && !{{dpll_peripheral}}->{{instance}}DPLLSTATUS.bit.CLKRDY) --counter;
+	while (counter && !{{dpll_peripheral}}->{{instance}}DPLLSTATUS.bit.LOCK) --counter;
+	return bool(counter);
+}
+
+void
+%% if target.family == "d5x/e5x"
+GenericClockController::disableDpll(DpllInstance instance)
+%% else
+GenericClockController::disableDpll()
+%% endif
+{
+	{{dpll_peripheral}}->{{instance}}DPLLCTRLA.bit.ENABLE = 0;
+%% if target.family == "d1x/d2x/dax"
+	while({{dpll_peripheral}}->{{instance}}DPLLSTATUS.bit.ENABLE);
+%% else
+	while({{dpll_peripheral}}->{{instance}}DPLLSYNCBUSY.bit.ENABLE);
+%% endif
+}
+%% endif
+
+template<ClockGenerator clockGen, GeneratorConfiguration config>
+void
+GenericClockController::enableGenerator()
+{
+	constexpr bool powerOf2 = std::has_single_bit(config.divider) && (config.divider != 1);
+	constexpr auto dividerReg = powerOf2 ? std::countr_zero(config.divider) : config.divider;
+	// TODO: check individual divider limits for each generator instance
+	static_assert(config.divider != 0 && dividerReg <= std::numeric_limits<uint16_t>::max(), "Divider out of range");
+
+%% if target.family == "d1x/d2x/dax"
+	constexpr auto gen = static_cast<uint32_t>(clockGen);
+	GCLK->GENDIV.reg =
+		GCLK_GENDIV_ID(gen) |
+		GCLK_GENDIV_DIV(dividerReg);
+	GCLK->GENCTRL.reg =
+		GCLK_GENCTRL_ID(gen) |
+		GCLK_GENCTRL_SRC(static_cast<uint32_t>(config.source)) |
+		(powerOf2 ? GCLK_GENCTRL_DIVSEL : 0u) |
+		(config.gpioOutputEnabled ? GCLK_GENCTRL_OE : 0u) |
+		GCLK_GENCTRL_IDC |
+		GCLK_GENCTRL_GENEN;
+%% else
+	GCLK->GENCTRL[static_cast<uint32_t>(clockGen)].reg =
+		GCLK_GENCTRL_DIV(dividerReg) |
+		(powerOf2 ? GCLK_GENCTRL_DIVSEL : 0u) |
+		(config.gpioOutputEnabled ? GCLK_GENCTRL_OE : 0u) |
+		GCLK_GENCTRL_IDC |
+		GCLK_GENCTRL_GENEN |
+		GCLK_GENCTRL_SRC(static_cast<uint32_t>(config.source));
+%% endif
+	sync(clockGen);
+}
+
+template<ClockGenerator clockGen, ClockSource source>
+void
+GenericClockController::enableGenerator()
+{
+	constexpr auto config = GeneratorConfiguration {
+		.source = source,
+		.divider = 1,
+		.gpioOutputEnabled = false
+	};
+	GenericClockController::enableGenerator<clockGen, config>();
+}
+
+template<ClockGenerator clockGen>
+void
+GenericClockController::disableGenerator()
+{
+%% if target.family == "d1x/d2x/dax"
+	GCLK->GENCTRL.reg = GCLK_GENCTRL_ID(static_cast<uint32_t>(clockGen));
+%% else
+	GCLK->GENCTRL[static_cast<uint32_t>(clockGen)].bit.GENEN = false;
+%% endif
+}
+
+template<ClockSource source>
+bool
+GenericClockController::setSystemClock()
+{
+	constexpr auto config = GeneratorConfiguration{ .source = source, .divider = 1 };
+	GenericClockController::enableGenerator<ClockGenerator::Main, config>();
+	sync(ClockGenerator::Main);
+	return true;
+}
+
+}

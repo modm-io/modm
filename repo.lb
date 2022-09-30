@@ -86,7 +86,9 @@ class DevicesCache(dict):
                      "stm32h7",
                      "stm32l0", "stm32l1", "stm32l4", "stm32l5",
                      "at90", "attiny", "atmega",
-                     "samd21", "samg55", "samv70",
+                     "samd21", "samg55",
+                     "same70", "sams70", "samv70", "samv71",
+                     "samd51", "same51", "same53", "same54",
                      "rp2040",
                      "hosted"]
         device_file_names = [dfn for dfn in device_file_names if any(s in dfn for s in supported)]

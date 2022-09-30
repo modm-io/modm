@@ -31,7 +31,7 @@ jobs:
           name: avr-compile-all
           path: test/all/log
 
-  sam-compile-all:
+  sam-d0x-d1x-d2x-compile-all:
     if: github.event.label.name == 'ci:hal'
     runs-on: ubuntu-20.04
     container:
@@ -47,9 +47,61 @@ jobs:
       - name: Update lbuild
         run: |
           pip3 install --upgrade --upgrade-strategy=eager modm
-      - name: Compile HAL for all SAM
+      - name: Compile HAL for SAMD0x, SAMD1x, SAMD2x
         run: |
-          (cd test/all && python3 run_all.py sam --quick-remaining)
+          (cd test/all && python3 run_all.py samd0 samd1 samd2 --quick-remaining)
+      - name: Upload log artifacts
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: sam-compile-all
+          path: test/all/log
+
+  sam-x5x-compile-all:
+    if: github.event.label.name == 'ci:hal'
+    runs-on: ubuntu-20.04
+    container:
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
+        run: |
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
+      - name: Compile HAL for SAMD5x, SAME5x, SAMG5x
+        run: |
+          (cd test/all && python3 run_all.py samd5 same5 samg5 --quick-remaining)
+      - name: Upload log artifacts
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: sam-compile-all
+          path: test/all/log
+
+  sam-x7x-compile-all:
+    if: github.event.label.name == 'ci:hal'
+    runs-on: ubuntu-20.04
+    container:
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
+        run: |
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
+      - name: Compile HAL for SAME7x, SAMS7x, SAMV7x
+        run: |
+          (cd test/all && python3 run_all.py same7 sams7 samv7 --quick-remaining)
       - name: Upload log artifacts
         if: always()
         uses: actions/upload-artifact@v2

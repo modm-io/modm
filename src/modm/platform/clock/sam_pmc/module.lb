@@ -15,8 +15,7 @@ def init(module):
     module.description = "Clock Generator (CKGR)"
 
 def prepare(module, options):
-    if not (options[":target"].has_driver("pmc:samg*")
-        or options[":target"].has_driver("pmc:samv*")):
+    if not options[":target"].has_driver("pmc:sam*"):
         return False
 
     module.depends(":cmsis:device", ":platform:clock")

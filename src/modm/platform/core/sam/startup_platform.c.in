@@ -24,8 +24,7 @@
 void
 __modm_initialize_platform(void)
 {
-%% if target.family == "d"
-%% if target.series == "21"
+%% if target.series == "d21"
 
 	// Overwriting the default value of the NVMCTRL.CTRLB.MANW bit (errata reference 13134)
 	NVMCTRL->CTRLB.bit.MANW = 1;
@@ -41,15 +40,5 @@ __modm_initialize_platform(void)
 	DMAC->QOSCTRL.bit.DQOS = 2;
 	DMAC->QOSCTRL.bit.FQOS = 2;
 	DMAC->QOSCTRL.bit.WRBQOS = 2;
-
-%% elif target.series == "21"
 %% endif
-
-%% elif target.family == "l"
-%% if target.series == "21"
-%% endif
-
-%% elif target.family == "g"
-%% endif
-
 }

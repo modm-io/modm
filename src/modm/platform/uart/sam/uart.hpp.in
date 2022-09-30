@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2020, Erik Henriksson
+ * Copyright (c) 2021, Jeff McBride
+ * Copyright (c) 2022, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -9,37 +10,50 @@
  */
 // ----------------------------------------------------------------------------
 
-%% set hal = "UartHal" ~ id
-%% set name = "Uart" ~ id
-
 #pragma once
 
+#include "{{ type }}_base.hpp"
 #include <modm/architecture/interface/uart.hpp>
-#include "uart_base.hpp"
-#include "uart_hal_{{ id }}.hpp"
-#include <modm/platform/gpio/pin.hpp>
+#include <modm/math/algorithm/prescaler.hpp>
+#include <modm/platform/gpio/connector.hpp>
+#include <modm/platform/clock/clockgen.hpp>
+
+%% set name="{}{}".format(type.capitalize(), id)
+%% set reg=name.upper()
+%% if type == "usart" and target.family == "e7x/s7x/v7x" and target.variant == "b"
+%% set reg_suffix="_USART"
+%% else
+%% set reg_suffix=""
+%% endif
 
 namespace modm::platform
 {
 
 /**
- * Universal asynchronous receiver transmitter ({{ "Uart" | upper ~ id }})
+%% if type == "usart"
+ * Universal synchronous asynchronous receiver transmitter (USART{{ id }})
+%% else
+ * Universal asynchronous receiver transmitter (UART{{ id }})
+%% endif
  *
- * @author		Erik Henriksson
- * @ingroup		modm_platform_uart modm_platform_uart_{{id}}
+ * @author		Jeff McBride
+ * @author		Christopher Durand
+ * @ingroup		modm_platform_{{type}} modm_platform_{{type}}_{{id}}
  */
-class {{ name }} : public UartBase, public ::modm::Uart
+class {{ name }} : public {{ type | capitalize }}Base, public modm::Uart
 {
-
-	// Separate because that makes GCC print the template args.
-	template<class RxSignal, class TxSignal>
-	struct ValidateNotSame {
-		static_assert(
-			!std::is_same_v<RxSignal, TxSignal>,
-			"Rx and Tx cannot use the same signal!");
-	};
-
+private:
+	// prevent name collision between ::Uart* from SAM header with modm::Uart
+%% if type == "uart"
+	static auto* Regs() { return reinterpret_cast<::Uart*>{{ reg }}; }
+%% else
+	static auto* Regs() { return {{ reg }}; }
+%% endif
+	friend void ::{{ peripheral | upper }}{{ id }}_IRQHandler();
 public:
+	static constexpr size_t RxBufferSize = {{ options["buffer.rx"] }};
+	static constexpr size_t TxBufferSize = {{ options["buffer.tx"] }};
+
 	template< class... Pins >
 	static void
 	connect()
@@ -49,52 +63,89 @@ public:
 		static_assert(
 			!std::is_same_v<typename RxPin::Base, typename TxPin::Base>,
 			"Rx and Tx cannot use the same pin!");
-		using Sercom = Peripherals::Sercom<{{ id | int }}>;
-		using RxConnector = typename RxPin::template Connector<Sercom, Sercom::Pad<0>, Sercom::Pad<1>, Sercom::Pad<2>, Sercom::Pad<3>>;
-		using TxConnector = typename TxPin::template Connector<Sercom, Sercom::Pad<0>, Sercom::Pad<2>>;
-		ValidateNotSame<typename RxConnector::Signal, typename TxConnector::Signal> {};
+		using Peripheral = Peripherals::{{ peripheral }}<{{ id | int }}>;
+	%% if peripheral == "Flexcom"
+		using RxConnector = typename RxPin::template Connector<Peripheral, Peripheral::Rxd>;
+		using TxConnector = typename TxPin::template Connector<Peripheral, Peripheral::Txd>;
+	%% elif type == "usart"
+		using RxConnector = typename RxPin::template Connector<Peripheral, Peripheral::Rxd<{{id}}>>;
+		using TxConnector = typename TxPin::template Connector<Peripheral, Peripheral::Txd<{{id}}>>;
+	%% elif type == "uart"
+		using RxConnector = typename RxPin::template Connector<Peripheral, Peripheral::Urxd<{{id}}>>;
+		using TxConnector = typename TxPin::template Connector<Peripheral, Peripheral::Utxd<{{id}}>>;
+	%% endif
 		RxConnector::connect();
 		TxConnector::connect();
 	}
 
+
 	template< class SystemClock, baudrate_t baudrate, percent_t tolerance=pct(1) >
-	static void
-	initialize(Parity parity = Parity::Disabled)
+	static inline void
+	initialize(
+		Parity parity=Parity::Disabled,
+%% if type == "usart"
+		WordLength length=WordLength::Bit8,
+%% endif
+		uint8_t irq_priority = 5)
 	{
-		{{ hal }}::initialize<SystemClock, baudrate, tolerance>(parity);
-		{{ hal }}::setTransmitterEnable(true);
-		{{ hal }}::setReceiverEnable(true);
+		ClockGen::enable<ClockPeripheral::{{ peripheral }}{{ id }}>();
+
+%% if peripheral == "Flexcom"
+		FLEXCOM{{ id }}->FLEXCOM_MR = FLEXCOM_MR_OPMODE_USART;
+%% endif
+		constexpr auto result = Prescaler::from_function(
+			SystemClock::{{type | capitalize}}{{id}},
+			baudrate,
+			1,
+			65535,
+%% if type == "usart"
+			[](uint32_t x) { return x * 8; }
+%% else
+			[](uint32_t x) { return x * 16; }
+%% endif
+			);
+
+		Regs()->{{ prefix }}_BRGR = result.index;
+
+%% if type == "usart"
+		// Use 8x oversampling (this affects baud rate generation)
+		Regs()->{{ prefix }}_MR = {{ prefix }}_MR{{reg_suffix}}_OVER;
+%% endif
+
+		setParity(parity);
+%% if type == "usart"
+		setWordLength(length);
+%% endif
+		Regs()->{{ prefix }}_CR = {{ prefix }}_CR_RXEN_Msk | {{ prefix }}_CR_TXEN_Msk;
+		// Enable rx interrupt
+		Regs()->{{ prefix }}_IER = {{ prefix }}_IER_RXRDY_Msk;
+
+		// Enable the IRQ
+		NVIC_SetPriority({{ peripheral | upper }}{{ id }}_IRQn, irq_priority);
+		NVIC_EnableIRQ({{ peripheral | upper }}{{ id }}_IRQn);
 	}
 
-	static void
-	writeBlocking(uint8_t data);
+	static bool read(uint8_t &dataOut);
 
-	static void
-	writeBlocking(const uint8_t *data, std::size_t length);
+	static std::size_t read(uint8_t *data, std::size_t length);
 
-	static void
-	flushWriteBuffer();
+	static bool write(uint8_t data);
 
-	static bool
-	write(uint8_t data);
+	static std::size_t write(const uint8_t *data, std::size_t length);
 
-	static std::size_t
-	write(const uint8_t *data, std::size_t length);
+	static bool isWriteFinished();
 
-	static bool
-	isWriteFinished();
+	static void flushWriteBuffer();
 
-	static std::size_t
-	discardTransmitBuffer();
+	static void setParity(Parity parity);
 
-	static bool
-	read(uint8_t &data);
+%% if type == "usart"
+	static void setWordLength(WordLength length);
+%% endif
 
-	static std::size_t
-	read(uint8_t *buffer, std::size_t length);
+	static inline bool isTransmitReady() { return Regs()->{{ prefix }}_{{ sr }} & {{ prefix }}_{{ sr }}_TXRDY_Msk; }
 
-	static std::size_t
-	discardReceiveBuffer();
+	static inline bool isReceiveReady() { return Regs()->{{ prefix }}_{{ sr }} & {{ prefix }}_{{ sr }}_RXRDY_Msk; }
 };
 
-}	// namespace modm::platform
+} // namespace modm::platform

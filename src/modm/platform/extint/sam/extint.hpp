@@ -52,10 +52,10 @@ public:
 	 * @param clockGen
 	 * 	The clock generator to use for the peripheral. If any interrupts are to
 	 *  be used to akeup the CPU from standby mode, make sure this clock is
-	 *  actually running in standby. Defaults to external 32.768kHz crystal osc.
+	 *  actually running in standby.
 	 */
 	static void
-	initialize(ClockGenerator clockGen = ClockGenerator::ExternalCrystal32K,
+	initialize(ClockGenerator clockGen,
 			   int priority = (1ul << __NVIC_PRIO_BITS) - 1ul);
 
 protected:

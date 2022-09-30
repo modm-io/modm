@@ -35,9 +35,10 @@ def build(env):
     # delay code that must be tuned for each family
     # (cycles per loop, setup cost in loops, max cpu frequency)
     tuning = {
-        "d": (3, 4,  48), # CM0 tested on D21 in RAM
-        "g": (6, 4, 120), # G55
-        "v": (4, 4, 300), # V70
+        "d1x/d2x/dax": (3, 4,  48), # CM0 tested on D21 in RAM
+        "d5x/e5x":     (4, 4, 120), # CM4 tested on E54 in RAM
+        "g5x":         (6, 4, 120), # G55
+        "e7x/s7x/v7x": (4, 4, 300), # CM7 tested on V71
     }[target.family]
 
     # us_shift is an optimization to limit error via fractional math

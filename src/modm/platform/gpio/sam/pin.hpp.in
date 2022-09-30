@@ -109,7 +109,7 @@ struct OneOfSignals
 	static constexpr bool value = ((std::is_same_v<typename Signal::signal, Signals>) | ...);
 };
 
-%% if target["family"] in ["g", "v"]
+%% if target["family"] in ["g5x", "e7x/s7x/v7x"]
 
 template<class... PinConfigs>
 struct PinMuxMixin
@@ -379,7 +379,6 @@ public:
 	setInput(InputType type)
 	{
 		configure(type);
-		setInput();
 	}
 
 	static void
@@ -473,7 +472,7 @@ public:
 	inline static bool
 	read()
 	{
-%% if target["family"] in ["g", "v"]
+%% if target["family"] in ["g5x", "e7x/s7x/v7x"]
 		return Base::template readPortReg<PinConfig::port>(PIO_PDSR_OFFSET);
 %% else
 		return Base::template readPortReg<PinConfig::port>(PORT_IN_OFFSET);
@@ -483,7 +482,7 @@ public:
 	inline static bool
 	isSet()
 	{
-%% if target["family"] in ["g", "v"]
+%% if target["family"] in ["g5x", "e7x/s7x/v7x"]
 		return Base::template readPortReg<PinConfig::port>(PIO_ODSR_OFFSET);
 %% else
 		return Base::template readPortReg<PinConfig::port>(PORT_OUT_OFFSET);
@@ -547,7 +546,7 @@ struct Gpio<PinConfig>::As : public Gpio<PinConfig>
 		connect()
 		{
 
-%% if target["family"] in ["g", "v"]
+%% if target["family"] in ["g5x", "e7x/s7x/v7x"]
 			// X1 denotes an "extra function", such as an ADC pin, which is not
 			// enabled by the PIO ABCD register.
 			static_assert(PinSignal::function != PinFunction::X1,

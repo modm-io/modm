@@ -4,6 +4,7 @@
 # Copyright (c) 2016-2018, Niklas Hauser
 # Copyright (c) 2017, Fabian Greif
 # Copyright (c) 2020, Erik Henriksson
+# Copyright (c) 2022, Christopher Durand
 #
 # This file is part of the modm project.
 #
@@ -99,7 +100,19 @@ def build(env):
                 signal["index"] = int(signal["index"])
                 p_signal.add(signal["index"])
             signals.append(signal)
+        # remove duplicated dicts from list of dicts
+        signals = [dict(t) for t in {tuple(d.items()) for d in signals}]
         gpio["signal"] = signals
+
+    # add peripherals without gpio signals
+    # the generated types are used in the clock driver api to enable the peripheral clocks
+    for peripheral_clock in env.query(":cmsis:device:clock-map").keys():
+        name, instance = (peripheral_clock[0].capitalize(), peripheral_clock[1])
+        if name not in peripherals:
+            if instance:
+                peripherals[name] = {"signals" : {}, "instances" : {}}
+            else:
+                peripherals[name] = {"signals" : {}}
 
     bprops["peripherals"] = OrderedDict(sorted(peripherals.items()))
     bprops["functions"] = sorted(list(set(s["function"] for gpio in driver["gpio"] for s in gpio["signal"])))

@@ -40,8 +40,13 @@ def build(env):
 
     # SysTick clock prescaler is dynamically chosen as /1 or /8
     div = 8
-    # SAMD: Prescaler not implemented
-    if target.platform == "sam" and target.family in ["d"]:
+    # SAMD5x/E5x: Prescaler not implemented
+    if target.platform == "sam" and target.family == "d5x/e5x":
+        div = 1
+        # systick clock is too fast to run at 4 Hz, increase frequency
+        freq = 8
+    # SAMD2x: Prescaler not implemented
+    elif target.platform == "sam" and target.family == "d1x/d2x/dax":
         div = 1
     # H742/43: Prescaler not implemented in revY
     elif target.family == "h7" and target.name in ["42", "43", "50", "53"] and target.revision == "y":

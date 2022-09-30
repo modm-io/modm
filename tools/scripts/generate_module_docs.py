@@ -160,7 +160,7 @@ def replace(text, key, content):
     return re.sub(r"# {0}.*?# /{0}".format(key), "# {0}\n{1}\n# /{0}".format(key, content), text, flags=re.DOTALL | re.MULTILINE)
 
 def url_name(name):
-    for c in ":., ({": name = name.replace(c, "-");
+    for c in ":.,/ ({": name = name.replace(c, "-");
     for c in "})":     name = name.replace(c, "");
     return name
 

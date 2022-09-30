@@ -1,0 +1,12 @@
+<library>
+  <extends>modm:same54-xplained-pro</extends>
+  <options>
+    <option name="modm:tinyusb:config">device.cdc</option>
+    <option name="modm:build:build.path">../../../build/same54_xplained_pro/usbserial</option>
+  </options>
+  <modules>
+    <module>modm:tinyusb</module>
+    <module>modm:build:scons</module>
+    <module>modm:processing:timer</module>
+  </modules>
+</library>

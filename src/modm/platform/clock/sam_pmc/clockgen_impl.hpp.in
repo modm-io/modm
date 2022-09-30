@@ -49,11 +49,11 @@ ClockGen::selectMasterClk()
 {
 	// Datasheet says when selecting PLL as source, write PRES first, otherwise
 	// write CSS first.
-%% if target.family in ["g"]
+%% if target.family == "g5x"
 	static_assert(divider == MasterClkDivider::Div1, "Divider for master clock is not supported");
 	constexpr bool isPll = (src == MasterClkSource::PLLA_CLK
 		|| src == MasterClkSource::PLLB_CLK);
-%% elif target.family in ["v"]
+%% elif target.family == "e7x/s7x/v7x"
 	constexpr bool isPll = (src == MasterClkSource::PLLA_CLK
 		|| src == MasterClkSource::UPLL_CLK);
 %% endif
@@ -61,7 +61,7 @@ ClockGen::selectMasterClk()
 	if constexpr (isPll) {
 		PMC->PMC_MCKR = (PMC->PMC_MCKR & ~PMC_MCKR_PRES_Msk) | PMC_MCKR_PRES((uint32_t)pres);
 		while(!(PMC->PMC_SR & PMC_SR_MCKRDY)) {}
-%% if target.family in ["v"]
+%% if target.family == "e7x/s7x/v7x"
 		PMC->PMC_MCKR = (PMC->PMC_MCKR & ~PMC_MCKR_MDIV_Msk) | PMC_MCKR_MDIV(uint32_t(divider));
 		while(!(PMC->PMC_SR & PMC_SR_MCKRDY)) {}
 %% endif
@@ -72,7 +72,7 @@ ClockGen::selectMasterClk()
 		while(!(PMC->PMC_SR & PMC_SR_MCKRDY)) {}
 		PMC->PMC_MCKR = (PMC->PMC_MCKR & ~PMC_MCKR_PRES_Msk) | PMC_MCKR_PRES((uint32_t)pres);
 		while(!(PMC->PMC_SR & PMC_SR_MCKRDY)) {}
-%% if target.family in ["v"]
+%% if target.family == "e7x/s7x/v7x"
 		PMC->PMC_MCKR = (PMC->PMC_MCKR & ~PMC_MCKR_MDIV_Msk) | PMC_MCKR_MDIV(uint32_t(divider));
 		while(!(PMC->PMC_SR & PMC_SR_MCKRDY)) {}
 %% endif
@@ -83,10 +83,10 @@ template<uint32_t multiplier, uint32_t divider>
 void
 ClockGen::enablePllA(uint32_t wait_cycles)
 {
-%% if target.family in ["g"]
+%% if target.family == "g5x"
     static_assert(9 <= multiplier && multiplier <= 7501, "Valid PLL MUL range is 9-7501");
     static_assert(divider == 1, "PLL divider not supported");
-%% elif target.family in ["v"]
+%% elif target.family == "e7x/s7x/v7x"
     static_assert(1 <= multiplier && multiplier <= 62, "Valid PLL MUL range is 1-62");
     static_assert(1 <= divider && divider <= 255, "Valid PLL DIV range is 1-255");
 %% endif
@@ -94,9 +94,9 @@ ClockGen::enablePllA(uint32_t wait_cycles)
     PMC->CKGR_PLLAR =
         CKGR_PLLAR_MULA(multiplier-1) |
         CKGR_PLLAR_PLLACOUNT(wait_cycles) |
-%% if target.family in ["g"]
+%% if target.family == "g5x"
         CKGR_PLLAR_PLLAEN(1);
-%% elif target.family in ["v"]
+%% elif target.family == "e7x/s7x/v7x"
         CKGR_PLLAR_ONE |
         CKGR_PLLAR_DIVA(divider);
 %% endif
@@ -104,7 +104,7 @@ ClockGen::enablePllA(uint32_t wait_cycles)
     while(!(PMC->PMC_SR & PMC_SR_LOCKA)) {}
 }
 
-%% if target.family in ["g"]
+%% if target.family == "g5x"
 template<uint32_t multiplier>
 void
 ClockGen::enablePllB(uint32_t wait_cycles)
@@ -119,7 +119,7 @@ ClockGen::enablePllB(uint32_t wait_cycles)
 }
 %% endif
 
-%% if target.family in ["v"]
+%% if target.family == "e7x/s7x/v7x"
 template<UtmiRefClk refclk>
 void
 ClockGen::enableUPll(uint32_t wait_cycles)

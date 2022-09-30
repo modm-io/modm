@@ -28,7 +28,7 @@ public:
 	static void
 	initialize(uint8_t priority=3)
 	{
-%% if target["family"] in ["g"]
+%% if target["family"] == "g5x"
 		// only the USB device mode is supported for now
 		static_assert(modm::Tolerance::isValueInTolerance(48_MHz, SystemClock::Usb, 0.25_pct),
 				"The USB clock frequency must be within 0.25\% of 48MHz!");
@@ -42,18 +42,23 @@ public:
 		ClockGen::enable<ClockPeripheral::Udp>();
 		NVIC_SetPriority(UDP_IRQn, priority);
 %% else
-		static_assert(SystemClock::Frequency == 48_MHz, "Usb must have a 48MHz clock!");
-		PM->APBBMASK.reg |= PM_APBBMASK_USB;
-		PM->AHBMASK.reg |= PM_AHBMASK_USB;
-		GenericClockController::connect<ClockPeripheral::Usb>(ClockGenerator::System);
+		static_assert(SystemClock::Usb == 48_MHz, "Usb must have a 48MHz clock!");
+		PeripheralClock<Peripherals::Usb>::enable();
+%% if target["family"] == "d5x/e5x"
+		NVIC_SetPriority(USB_0_IRQn, priority);
+		NVIC_SetPriority(USB_1_IRQn, priority);
+		NVIC_SetPriority(USB_2_IRQn, priority);
+		NVIC_SetPriority(USB_3_IRQn, priority);
+%% else
 		NVIC_SetPriority(USB_IRQn, priority);
+%% endif
 %% endif
 	}
 
 // SAMG does not provide a connect method for USB. It's not defined in the SVD,
 // and the USB pins are fixed. Instead, calling Usb::initialize() switches the
 // IO pin function to the USB controller.
-%% if target["family"] not in ["g"]
+%% if target["family"] != "g5x"
 	template<class... Pins>
 	static void
 	connect()

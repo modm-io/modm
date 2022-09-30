@@ -10,7 +10,17 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-props = {}
+def _get_properties(env, instance=None):
+    device = env[":target"]
+    return {
+        "type" : "uart",
+        "peripheral" : "Uart",
+        "id" : instance,
+        "prefix" : "UART",
+        "sr" : "SR",
+        "target" : device.identifier
+    }
+
 
 class Instance(Module):
     def __init__(self, driver, instance):
@@ -40,24 +50,21 @@ class Instance(Module):
         return True
 
     def build(self, env):
-        device = env[":target"].identifier
-        global props
-        props["id"] = self.instance
-
-        env.substitutions = props
+        env.substitutions = _get_properties(env, self.instance)
         env.outbasepath = "modm/src/modm/platform/uart"
 
-        env.template("uart.hpp.in", "uart_{}.hpp".format(self.instance))
-        env.template("uart.cpp.in", "uart_{}.cpp".format(self.instance))
+        env.template("../uart.hpp.in", "uart_{}.hpp".format(self.instance))
+        env.template("../uart.cpp.in", "uart_{}.cpp".format(self.instance))
 
 
 def init(module):
     module.name = ":platform:uart"
-    module.description = "Universal Synchronous Asynchronous Receiver Transmitter (UART)"
+    module.description = "Universal Asynchronous Receiver Transmitter (UART)"
+
 
 def prepare(module, options):
     device = options[":target"]
-    if not (device.has_driver("usart:samg*")):
+    if (not device.has_driver("uart:sam*")) or device.has_driver("sercom:sam"):
         return False
 
     module.depends(
@@ -67,17 +74,15 @@ def prepare(module, options):
         ":platform:gpio",
         ":platform:clockgen")
 
-    global props
-    drivers = options[":target"].get_all_drivers("usart")
+    drivers = options[":target"].get_all_drivers("uart")
     for driver in drivers:
         for instance in driver["instance"]:
             module.add_submodule(Instance(driver, instance))
 
-    props["target"] = device.identifier
     return True
 
+
 def build(env):
-    global props
-    env.substitutions = props
+    env.substitutions = _get_properties(env)
     env.outbasepath = "modm/src/modm/platform/uart"
-    env.copy("uart_base.hpp")
+    env.template("../uart_base.hpp.in", "uart_base.hpp")

@@ -23,16 +23,53 @@ def prepare(module, options):
         return False
 
     module.depends(":cmsis:core")
+
+    module.add_query(
+        EnvironmentQuery(name="clock-map", factory=clock_map))
+
     return True
 
 pp = {}
+
+def clock_map_gclk(env, header):
+    clock_pattern = re.compile(r"^#define\s+(?P<clk_per>(MCLK|PM))_(?P<clk>(AHB|APB[A-E]))MASK_(?P<per>([A-Z0-9])+(_2X)?(_[A-Z]+)?)_Pos(\s+)(?P<pos>([0-9]+))")
+    peripheral_pattern = re.compile(r"^(?P<name>[A-Za-z]+([0-9]+[A-Za-z]+)?(_2X)?(_[A-Z]+)?)(?P<instance>[0-9]?)$")
+    clock_map = {}
+    with open(header, "r") as clock_header:
+        for line in clock_header:
+            m = clock_pattern.match(line)
+            if m:
+                m2 = peripheral_pattern.match(m.group("per"))
+                (peripheral, instance) = (m2.group("name"), m2.group("instance"))
+                if (peripheral, instance) in clock_map:
+                    clock_map[(peripheral, instance)].append((m.group("clk_per"), m.group("clk"), m.group("pos")))
+                else:
+                    clock_map[(peripheral, instance)] = [(m.group("clk_per"), m.group("clk"), m.group("pos"))]
+    return clock_map
+
+def clock_map(env):
+    folder = Path(localpath(pp["folder"])) / "component"
+    clock_file = None
+    if (folder / "mclk.h").exists():
+        clock_file = folder / "mclk.h"
+    elif (folder / "mclk_100.h").exists():
+        clock_file = folder / "mclk_100.h"
+    elif (folder / "pm.h").exists():
+        clock_file = folder / "pm.h"
+    elif (folder / "pm_100.h").exists():
+        clock_file = folder / "pm_100.h"
+
+    if clock_file is not None:
+        return clock_map_gclk(env, clock_file)
+    return {}
+
 def validate(env):
     device = env[":target"]
 
     # Some families use the variant in header defines, some do not (e.g. SAMG)
     names = [
-        "".join([device.identifier[f] for f in ["platform", "family", "series", "pin", "flash", "variant"]]),
-        "".join([device.identifier[f] for f in ["platform", "family", "series", "pin", "flash"]]),
+        "".join([device.identifier[f] for f in ["platform", "series", "pin", "flash", "variant"]]),
+        "".join([device.identifier[f] for f in ["platform", "series", "pin", "flash"]]),
     ]
 
     device_define = None
@@ -44,6 +81,10 @@ def validate(env):
         for n in names:
             define = "__{}__".format(n.upper())
             if match is not None and define in match:
+                # In case of multiple matches the most specific header is selected.
+                # The one with the matching variant suffix will have the longest name.
+                if device_define is not None and len(device_define) > len(define):
+                    continue
                 family_file = famfile.relative_to(localpath("."))
                 device_header = "{}.h".format(n)
                 device_define = define

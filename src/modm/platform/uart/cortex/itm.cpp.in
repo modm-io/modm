@@ -134,6 +134,12 @@ Itm::discardTransmitBuffer()
 %% endif
 }
 
+%% if target.platform == "sam"
+// Some SAM headers define a PORT macro
+#pragma push_macro("PORT")
+#undef PORT
+%% endif
+
 bool
 Itm::write_itm(uint32_t data, uint8_t size)
 {
@@ -162,6 +168,10 @@ Itm::write_itm(uint32_t data, uint8_t size)
 	// if ITM is disabled, just discard any writes
 	return true;
 }
+
+%% if target.platform == "sam"
+#pragma pop_macro("PORT")
+%% endif
 
 void
 Itm::update()

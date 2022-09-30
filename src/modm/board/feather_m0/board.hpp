@@ -2,6 +2,7 @@
  * Copyright (c) 2016-2017, Sascha Schade
  * Copyright (c) 2017-2018, Niklas Hauser
  * Copyright (c) 2020, Erik Henriksson
+ * Copyright (c) 2022, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -60,42 +61,39 @@ using RadioCs = GpioA06;
 // This is the red LED by the USB jack.
 using Led = D13;
 
-/// samd21g18a running at 48MHz generated from the external 32.768 KHz crystal
+/// samd21g18a running at 48MHz generated from the external 32.768 kHz crystal
 struct SystemClock
 {
-	static constexpr uint32_t Frequency = 48_MHz;
-	static constexpr uint32_t Usb = 48_MHz;
-	// static constexpr uint32_t Ahb  = Frequency;
-	// static constexpr uint32_t Apba = Frequency;
-	// static constexpr uint32_t Apbb = Frequency;
-	// static constexpr uint32_t Apbc = Frequency;
+	static constexpr uint32_t Dfll48m = 48_MHz;
+	static constexpr uint32_t Xosc32k = 32768_Hz;
 
-	// static constexpr uint32_t Adc = Apb2;
+	static constexpr uint32_t Frequency = Dfll48m;
+	static constexpr uint32_t Usb = Dfll48m;
 
-	// static constexpr uint32_t SercomSlow = Apb2;
-	// static constexpr uint32_t Sercom0 = Apb2;
-	// static constexpr uint32_t Sercom1 = Apb2;
-	// static constexpr uint32_t Sercom2 = Apb2;
-	// static constexpr uint32_t Sercom3 = Apb2;
-	// static constexpr uint32_t Sercom4 = Apb2;
-	// static constexpr uint32_t Sercom5 = Apb2;
+	static constexpr uint32_t Sercom0 = Frequency;
+	static constexpr uint32_t SercomSlow = Xosc32k;
 
-	// static constexpr uint32_t Apb1Timer = Apb1 * 2;
-	// static constexpr uint32_t Apb2Timer = Apb2 * 1;
-	// static constexpr uint32_t Timer1  = Apb2Timer;
-	// static constexpr uint32_t Timer2  = Apb1Timer;
-	// static constexpr uint32_t Timer3  = Apb1Timer;
-	// static constexpr uint32_t Timer4  = Apb1Timer;
+	static constexpr auto ClockGen32kHz = ClockGenerator::Generator2;
 
 	static bool inline
 	enable()
 	{
+		// Configure GCLK generator 2 with external 32k crystal source
+		GenericClockController::enableExternalCrystal32k(Xosc32StartupTime::Start_500ms);
+		GenericClockController::enableGenerator<ClockGen32kHz, ClockSource::Xosc32k>();
+
+		// generate 48 MHz from 32768 Hz crystal reference
+		GenericClockController::connect<ClockPeripheral::Dfll48>(ClockGen32kHz);
+		GenericClockController::enableDfll48mClosedLoop<Xosc32k>();
+
 		GenericClockController::setFlashLatency<Frequency>();
-		GenericClockController::initExternalCrystal();
-		GenericClockController::initDFLL48MHz();
-		GenericClockController::initOsc8MHz();
-		GenericClockController::setSystemClock(ClockSource::DFLL48M);
+		GenericClockController::setSystemClock<ClockSource::Dfll48m>();
 		GenericClockController::updateCoreFrequency<Frequency>();
+
+		GenericClockController::connect<ClockPeripheral::Sercom0>(ClockGenerator::System);
+		GenericClockController::connect<ClockPeripheral::Sercom0Slow>(ClockGen32kHz);
+
+		GenericClockController::connect<ClockPeripheral::Usb>(ClockGenerator::System);
 		return true;
 	}
 };

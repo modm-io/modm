@@ -41,7 +41,7 @@ def hal_get_modules():
             short_id.naming_schema = "{platform}-{family}"
 
         elif target.platform == "sam":
-            short_id.naming_schema = "{platform}{family}{series}"
+            short_id.naming_schema = "{platform}{series}"
 
         short_id.set("platform", target.platform) # invalidate caches
         minimal_targets[short_id.string].append(target)
@@ -106,6 +106,7 @@ def hal_get_modules():
                 "flash": "Internal Flash",
                 "timer": "Timer",
                 "i2c": "I<sup>2</sup>C",
+                "usart": "UART"
             }
             mname = remap.get(mname, mname.upper())
             modules.add(mname)
@@ -202,7 +203,11 @@ def hal_create_table(targets, platforms, common_table=False):
 {% endfor %}</tr><tr>
 <th align="left">Peripheral</th>
 {% for fam in families  -%}
+{% if fam[0] == "sam" -%}
+<th align="center">{{ fam[1] | upper | replace("X", "x") | replace("/", "<br/>") }}</th>
+{% else -%}
 <th align="center">{{ fam[1] | capitalize }}</th>
+{% endif -%}
 {% endfor %}
 {%- for per in pers | sort %}</tr><tr>
 <td align="left">{{ per }}</td>

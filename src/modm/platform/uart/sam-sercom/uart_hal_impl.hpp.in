@@ -55,18 +55,13 @@ void
 {{ name }}::initialize(Parity parity)
 {
 	// Enable peripheral clock in power manager.
-	PM->APBCMASK.bit.{{ peripheral }}_ = true;
-	GenericClockController::connect<ClockPeripheral::{{ sercom }}>(ClockGenerator::System);
-	while (GCLK->STATUS.bit.SYNCBUSY);
+	PeripheralClock<Peripherals::{{sercom_name}}<{{id}}>>::enable();
 	// Reset USART
 	reset();
 	// Set clock mode internal
 	{{ peripheral }}->USART.CTRLA.bit.MODE = 0x1;
 	// Set asynchronous mode
 	{{ peripheral }}->USART.CTRLA.bit.CMODE = 0x0;
-	// Set rx/tx pins
-	{{ peripheral }}->USART.CTRLA.bit.RXPO = 0x3; // Pad3
-	{{ peripheral }}->USART.CTRLA.bit.TXPO = 0x1; // Pad2;
 	// Set character size to 8 bits
 	{{ peripheral }}->USART.CTRLB.bit.CHSIZE = 0x0;
 	// Set Data order to LSB first
@@ -77,11 +72,11 @@ void
 	{{ peripheral }}->USART.CTRLB.bit.SBMODE = 0x0;
 
 	// Oversampling 8x or 16x
-	constexpr uint32_t scalar = (baudrate * 16l > SystemClock::Frequency) ? 8 : 16;
+	constexpr uint32_t scalar = (baudrate * 16l > SystemClock::{{ sercom | capitalize }}) ? 8 : 16;
 	{{ peripheral }}->USART.CTRLA.bit.SAMPR = (scalar == 16) ? 0x1 : 0x3;
 	// Prescaler 13 bit integer, 3 bit fractional
 	constexpr auto result = Prescaler::from_range(
-			SystemClock::Frequency/(scalar/8), baudrate, 1, (1ul << 16) - 1ul);
+			SystemClock::{{ sercom | capitalize }}/(scalar/8), baudrate, 1, (1ul << 16) - 1ul);
 	assertBaudrateInTolerance< result.frequency, baudrate, tolerance >();
 	{{ peripheral }}->USART.BAUD.FRAC.BAUD = result.prescaler >> 3;
 	{{ peripheral }}->USART.BAUD.FRAC.FP = result.prescaler & 0b111;
@@ -139,6 +134,18 @@ bool
 {{ name }}::isTransmitRegisterEmpty()
 {
 	return {{ peripheral }}->USART.INTFLAG.bit.DRE;
+}
+
+void
+{{ name }}::setRxPinout(RxPinout rxPinout)
+{
+	{{ peripheral }}->USART.CTRLA.bit.RXPO = static_cast<uint8_t>(rxPinout);
+}
+
+void
+{{ name }}::setTxPinout(TxPinout txPinout)
+{
+	{{ peripheral }}->USART.CTRLA.bit.TXPO = static_cast<uint8_t>(txPinout);
 }
 
 }	// namespace modm::platform

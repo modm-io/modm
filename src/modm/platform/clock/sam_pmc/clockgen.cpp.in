@@ -70,10 +70,10 @@ ClockGen::masterClkFrequency()
 			return mainClkFrequency() / div;
 		case MasterClkSource::PLLA_CLK:
 			return pllAFrequency() / div;
-%% if target.family in ["g"]
+%% if target.family == "g5x"
 		case MasterClkSource::PLLB_CLK:
 			return pllBFrequency() / div;
-%% elif target.family in ["v"]
+%% elif target.family == "e7x/s7x/v7x"
 		case MasterClkSource::UPLL_CLK:
 			return 240'000'000;  // UPLLDIV2
 %% endif
@@ -112,10 +112,10 @@ uint32_t
 ClockGen::pllAFrequency()
 {
 	uint32_t mul = ((PMC->CKGR_PLLAR & CKGR_PLLAR_MULA_Msk) >> CKGR_PLLAR_MULA_Pos) + 1;
-%% if target.family in ["g"]
+%% if target.family == "g5x"
 	uint32_t freq = SlowClkFreqHz * mul;
 	if(PMC->PMC_MCKR & PMC_MCKR_PLLADIV2) freq /= 2;
-%% elif target.family in ["v"]
+%% elif target.family == "e7x/s7x/v7x"
 	uint32_t freq = mainClkFrequency() * mul;
 	const auto diva = ((PMC->CKGR_PLLAR & CKGR_PLLAR_DIVA_Msk) >> CKGR_PLLAR_DIVA_Pos);
 	if (diva == 0) return 0;  // PLLA is disabled
@@ -124,7 +124,7 @@ ClockGen::pllAFrequency()
 	return freq;
 }
 
-%% if target.family in ["g"]
+%% if target.family == "g5x"
 uint32_t
 ClockGen::pllBFrequency()
 {

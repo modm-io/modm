@@ -20,7 +20,7 @@ def prepare(module, options):
 
     module.depends(
         ":platform:clockgen",
-        ":platform:uart:7",
+        ":platform:usart:7",
         ":platform:gpio",
         ":platform:core",
         ":platform:usb",

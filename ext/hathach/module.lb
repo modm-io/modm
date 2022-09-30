@@ -101,11 +101,12 @@ def build(env):
             env.copy("tinyusb/src/portable/st/synopsys", "portable/st/synopsys/")
 
     elif target.platform == "sam":
-        if target.family == "g":
+        if target.family == "g5x":
             tusb_config["CFG_TUSB_MCU"] = "OPT_MCU_SAMG"
             env.copy("tinyusb/src/portable/microchip/samg/", "portable/microchip/samg/")
         else:
-            tusb_config["CFG_TUSB_MCU"] = "OPT_MCU_SAM{}{}".format(target.family.upper(), target.series.upper())
+            series = "e5x" if target.series.startswith("e5") else target.series
+            tusb_config["CFG_TUSB_MCU"] = "OPT_MCU_SAM{}".format(series.upper())
             env.copy("tinyusb/src/portable/microchip/samd/", "portable/microchip/samd/")
 
     elif target.platform == "rp":
@@ -179,8 +180,10 @@ def build(env):
     if target.platform == "stm32":
         irq_data = env.query(":platform:usb:irqs")
         irqs = irq_data["port_irqs"][speed]
-    elif target.platform == "sam" and target.family in ["g"]:
+    elif target.platform == "sam" and target.family in ["g5x"]:
         irqs = ["UDP"]
+    elif target.platform == "sam" and target.family in ["d5x/e5x"]:
+        irqs = ["USB_OTHER", "USB_SOF_HSOF", "USB_TRCPT0", "USB_TRCPT1"]
     elif target.platform == "rp" and target.family in ["20"]:
         irqs = ["USBCTRL_IRQ"]
     else:

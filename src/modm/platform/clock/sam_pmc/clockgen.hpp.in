@@ -36,9 +36,9 @@ MasterClkSource : uint32_t
 	SLOW_CLK = PMC_MCKR_CSS_SLOW_CLK_Val,
 	MAIN_CLK = PMC_MCKR_CSS_MAIN_CLK_Val,
 	PLLA_CLK = PMC_MCKR_CSS_PLLA_CLK_Val,
-%% if target.family in ["g"]
+%% if target.family == "g5x"
 	PLLB_CLK = PMC_MCKR_CSS_PLLB_CLK_Val,
-%% elif target.family in ["v"]
+%% elif target.family == "e7x/s7x/v7x"
 	UPLL_CLK = PMC_MCKR_CSS_UPLL_CLK_Val,
 %% endif
 };
@@ -60,7 +60,7 @@ enum class
 MasterClkDivider : uint8_t
 {
 	Div1 = 0,
-%% if target.family in ["v"]
+%% if target.family == "e7x/s7x/v7x"
 	Div2 = PMC_MCKR_MDIV_PCK_DIV2_Val,
 	Div4 = PMC_MCKR_MDIV_PCK_DIV4_Val,
 	Div3 = PMC_MCKR_MDIV_PCK_DIV3_Val,
@@ -123,7 +123,7 @@ ClockPeripheral : uint32_t
 	Tc10 = ID_TC3_CHANNEL1,
 	Tc11 = ID_TC3_CHANNEL2,
 #endif
-%% if target.family in ["g"]
+%% if target.family == "g5x"
 	Pdmic0 = ID_PDMIC0,
 	Pdmic1 = ID_PDMIC1,
 	Mem2Mem = ID_MEM2MEM,
@@ -139,7 +139,7 @@ ClockPeripheral : uint32_t
 	Flexcom5 = ID_FLEXCOM5,
 	Flexcom6 = ID_FLEXCOM6,
 	Flexcom7 = ID_FLEXCOM7,
-%% elif target.family in ["v"]
+%% elif target.family == "e7x/s7x/v7x"
 	Xdmac = ID_XDMAC,
 #ifdef ID_UART0
 	Uart0 = ID_UART0,
@@ -199,20 +199,24 @@ ClockPeripheral : uint32_t
 	Ssc = ID_SSC,
 	Afec0 = ID_AFEC0,
 	Afec1 = ID_AFEC1,
+#ifdef ID_DACC
 	Dacc = ID_DACC,
+#endif
 	Pwm0 = ID_PWM0,
 	Pwm1 = ID_PWM1,
 	Icm = ID_ICM,
 	Acc = ID_ACC,
 	Usb = ID_USBHS,
+#ifdef ID_MLB
 	Mlb = ID_MLB,
+#endif
 	Aes = ID_AES,
 	Trng = ID_TRNG,
 	Isi = ID_ISI,
 %% endif
 };
 
-%% if target.family in ["v"]
+%% if target.family == "e7x/s7x/v7x"
 enum class
 UtmiRefClk : uint32_t
 {
@@ -273,13 +277,13 @@ public:
 	static void
 	enablePllA(uint32_t wait_cycles = 50);
 
-%% if target.family in ["g"]
+%% if target.family == "g5x"
 	template<uint32_t multiplier>
 	static void
 	enablePllB(uint32_t wait_cycles = 50);
 %% endif
 
-%% if target.family in ["v"]
+%% if target.family == "e7x/s7x/v7x"
 	template<UtmiRefClk refclk>
 	static void
 	enableUPll(uint32_t wait_cycles = 50);
@@ -310,7 +314,7 @@ public:
 	static uint32_t
 	pllAFrequency();
 
-%% if target.family in ["g"]
+%% if target.family == "g5x"
 	/** Returns the configured frequency of PLL B output */
 	static uint32_t
 	pllBFrequency();
