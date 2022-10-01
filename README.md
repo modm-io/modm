@@ -76,6 +76,7 @@ git clone --recurse-submodules --jobs 8 https://github.com/modm-io/modm.git
 	- [CrashCatcher][]: Crash reports for HardFaults.
 	- [printf][]: Small printf implementation.
 	- [Nanopb][]: Embedded Protocol Buffers.
+	- [LVGL][]: Embedded Graphics Library.
 
 
 ## Microcontrollers
@@ -857,4 +858,5 @@ and [many more contributors][contributors].
 [CrashCatcher]:    https://github.com/adamgreen/CrashCatcher
 [printf]:          https://github.com/eyalroz/printf
 [Nanopb]:          https://github.com/nanopb/nanopb
+[LVGL]:            https://lvgl.io
 <!--/links-->
