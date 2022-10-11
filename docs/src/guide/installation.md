@@ -35,7 +35,7 @@ Please help us [keep these instructions up-to-date][contribute]!
 For Ubuntu 20.04LTS, these commands install the minimal build system:
 
 ```sh
-sudo apt install python3 python3-pip scons git
+sudo apt install python3 python3-pip scons git libncurses5
 pip3 install modm
 ```
 
@@ -208,7 +208,8 @@ brew install boost gcc
 ## Windows
 
 In general, Windows is not a great fit for the command line tools that modm is
-built on. Consider using the [Windows subsystem for Linux (WSL)][winwsl] instead.
+built on. Consider using the [Windows subsystem for Linux 2 (WSL2)](#windows-with-wsl2)
+instead.
 Alternatively consider using a better terminal emulator than command prompt
 (`cmd`) or PowerShell, perhaps use the official [Windows Terminal][winterm].
 
@@ -250,7 +251,6 @@ Download and run the [Installer][doxypress_binaries].
 Please use the free and open-source [7-Zip file archiver][7_zip] to extract the
 files in the next steps.
 
-
 #### ARM Cortex-M
 
 Install the [pre-built ARM toolchain via the 32-bit installer][gcc-arm-toolchain]
@@ -278,7 +278,6 @@ Close the PowerShell and open a new command prompt to test openocd:
 ```sh
 openocd --version
 ```
-
 
 #### Microchip AVR
 
@@ -313,6 +312,81 @@ avrdude --version
     about the quality of these instructions.
 
 
+## Windows with WSL2
+
+The [Windows Subsystem for Linux 2][wsl2] allows you to run a Linux distribution
+in parallel to Windows. For a pure Windows installation see [above](#windows).
+
+Install Ubuntu-22.04 LTS as WSL2 distribution:
+See the [general WSL doc][wsl-install], but as of this writing
+`wsl --list --online` will not list Ubuntu 22.04.1 LTS, but it is
+[available in the Microsoft Store][windows-store-ubuntu-22-04-1-lts].
+Install it from there via mouse clicks.
+Make sure the WSL2 instance is running by opening a terminal via start menu.
+
+Physically attach your microcontroller development board or your debugger to a
+USB port and [bridge the USB hub to which the device is attached][wsl-connect-usb].
+Also [bridge the USB device to Linux][connect-usb] using [usbipd][usbipd]:
+
+```powershell
+PS C:\Windows\system32> usbipd wsl list
+BUSID  VID:PID    DEVICE                                STATE
+3-2    1bcf:0005  USB-Eingabegerät                      Not attached
+3-3    0483:374b  ST-Link Debug, USB-...                Attached - Ubuntu-22.04
+4-1    138a:003d  Synaptics FP Sensors (WBF) (PID=003d) Not attached
+4-3    04f2:b370  HP HD Webcam [Fixed]                  Not attached
+```
+
+Check the BUSID parameter and use the one that corresponds to your device in
+further commands. In this example it is the `3-3`.
+
+```powershell
+PS C:\Windows\system32> usbipd wsl attach --busid 3-3
+usbipd: info: Using default distribution 'Ubuntu-22.04'.
+```
+
+!!! tip "Unreliable connection"
+    If the connection is not reliable, it might be necessary to detach/attach
+    several times until the connection is established:
+
+    ```powershell
+    PS C:\Windows\system32> usbipd wsl detach --busid 3-3
+    PS C:\Windows\system32> usbipd wsl attach --busid 3-3
+    usbipd: info: Using default distribution 'Ubuntu-22.04'.
+    ```
+
+Either reboot the machine or be lucky that a combination of the following
+commands is sufficient:
+
+```sh
+sudo udevadm trigger
+sudo udevadm control --reload
+```
+
+Remove the USB connector, reattach it, then issue the command
+`usbipd wsl attach --busid 3-3`.
+
+On WSL2 Linux follow the [Linux installation instructions](#linux) and
+additionally install a terminal emulator such as _picocom_:
+
+```sh
+sudo apt install picocom
+```
+
+[Explore the examples][examples] and compile and upload a suitable one with
+`scons program`. Try to debug it with GDB using `scons debug` and listen on
+the serial output:
+
+```sh
+picocom --baud 115200 --imap lfcrlf --echo /dev/ttyACM0
+```
+
+!!! note "VSCode support"
+    You can also install the [remote extensions for WSL][wsl-vscode] and use the
+    [VSCode integrated terminal][wsl-vscode-integrated-terminal] to access WSL2.
+
+
+[connect-usb]: https://docs.microsoft.com/en-us/windows/wsl/connect-usb
 [contribute]: https://github.com/modm-io/modm/blob/develop/CONTRIBUTING.md
 [newissue]: https://github.com/modm-io/modm/issues/new
 [examples]: https://github.com/modm-io/modm/tree/develop/examples
@@ -335,7 +409,15 @@ avrdude --version
 [modm-avr-gcc]: https://github.com/modm-io/avr-gcc
 [armgcc-issues]: https://github.com/modm-io/modm/issues/468
 [openocd-install]: https://github.com/rleh/openocd-build
+[udev-rules-openocd]: https://github.com/openocd-org/openocd/blob/master/contrib/60-openocd.rules#L84-L99
+[usbipd]: https://github.com/dorssel/usbipd-win
 [winavr]: https://blog.zakkemble.net/avr-gcc-builds/
+[windows-store-ubuntu-22-04-1-lts]: https://www.microsoft.com/store/productId/9PN20MSR04DW
 [wingit]: https://git-scm.com/download/win
 [winterm]: https://github.com/Microsoft/Terminal
 [winwsl]: https://docs.microsoft.com/en-us/windows/wsl/about
+[wsl2]: https://docs.microsoft.com/en-us/windows/wsl/about#what-is-wsl-2    
+[wsl-connect-usb]: https://docs.microsoft.com/en-us/windows/wsl/connect-usb
+[wsl-install]: https://docs.microsoft.com/en-us/windows/wsl/install
+[wsl-vscode]: https://docs.microsoft.com/en-us/windows/wsl/tutorials/wsl-vscode
+[wsl-vscode-integrated-terminal]: https://code.visualstudio.com/docs/remote/wsl-tutorial#_integrated-terminal
