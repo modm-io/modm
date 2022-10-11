@@ -45,8 +45,8 @@ differences in pinout or peripherals, so check your device's identifier twice!
 %% elif "SAM" in platform
 Identifier format example for `SAMD21G18A-AU`:
 ```
-   sam       d       21     g    18       a         a       u
-{platform}{family}{series}{pin}{flash}{variant}-{package}{grade}
+   sam      d21     g    18       a         a       u
+{platform}{series}{pin}{flash}{variant}-{package}{grade}
 ```
 %% elif "Raspberry" in platform
 Identifier format example for `RP2040`:
