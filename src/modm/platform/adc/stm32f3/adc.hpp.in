@@ -2,6 +2,7 @@
  * Copyright (c) 2013-2014, Kevin Läufer
  * Copyright (c) 2014, 2016-2018, Niklas Hauser
  * Copyright (c) 2017, Sascha Schade
+ * Copyright (c) 2022, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -59,7 +60,12 @@ public:
 		BatDiv2   = 17,
 		InternalReference = 18,
 		// TODO: Add internal connections
-%% elif target["family"] in ["l4", "g4"]
+%% elif target["family"] in ["g4"]
+		Opamp1 = 13,
+		Temperature = 16,
+		BatDiv3 = 17,
+		InternalReference = 18,
+%% elif target["family"] in ["l4"]
 		Temperature = 17,
 		BatDiv3     = 18,
 %% elif target["family"] in ["l5"]
@@ -71,25 +77,49 @@ public:
 %% if target["family"] in ["f3"]
 		Opamp2 = 17,
 		InternalReference = 18,
-%% elif target["family"] in ["l4", "l5", "g4"]
+%% elif target["family"] in ["l4", "l5"]
 		Dac1 = 17,
 		Dac2 = 18,
+%% elif target["family"] in ["g4"]
+		Opamp2 = 16,
+		Opamp3 = 18,
 %% endif
 %% elif id == 3
 %% if target["family"] in ["f3"]
 		Vss    =  4,	// ADC3_IN4 not bonded and connected to VSS
 		Opamp3 = 17,
 		InternalReference = 18,
-%% elif target["family"] in ["l4", "g4"]
+%% elif target["family"] in ["l4"]
 		Dac1 = 14,
 		Dac2 = 15,
 		Vss  = 16,
 		Temperature = 17,
 		BatDiv3 = 18,
+%% elif target["family"] in ["g4"]
+		Opamp3 = 13,
+%% if target["name"] in ["91", "a1"]
+		Opamp6 = 17,
+%% else
+		BatDiv3 = 17,
+%% endif
+		InternalReference = 18,
 %% endif
 %% elif id == 4
-		Opamp3 = 17,
+%% if target["family"] in ["f3"]
+		Opamp4 = 17,
 		InternalReference = 18,
+%% elif target["family"] in ["g4"]
+		Opamp6 = 17,
+		InternalReference = 18,
+%% endif
+%% elif id == 5
+%% if target["family"] in ["g4"]
+		Opamp5 = 3,
+		Temperature = 4,
+		Opamp4 = 5,
+		BatDiv3 = 17,
+		InternalReference = 18,
+%% endif
 %% endif
 	};
 

@@ -3,6 +3,7 @@
 #
 # Copyright (c) 2016-2018, Niklas Hauser
 # Copyright (c) 2017, Fabian Greif
+# Copyright (c) 2022, Christopher Durand
 #
 # This file is part of the modm project.
 #
@@ -41,7 +42,12 @@ class Instance(Module):
                 channels = range(1,17)
             elif target["family"] == "g4":
                 # ADC1 is connected to 14 external channels + 4 internal channels
-                channels = range(1,15)
+                # Channel 13: Opamp1
+                # Channel 16: Temperature
+                # Channel 17: VBat/3
+                # Channel 18: VRefint
+                channels = [1,2,3,4,5,6,7,8,9,10,11,12,14,15]
+                assert(len(channels) == 14)
             else:
                 # 11-14 reserved
                 channels = [1,2,3,4,5,6,7,8,9,10,15,16,17,18]
@@ -51,7 +57,10 @@ class Instance(Module):
                 channels = [1,2,3,4,5,6,7,8,9,10,11,12,17,18]
             elif target["family"] == "g4":
                 # ADC2 is connected to 16 external channels + 2 internal channels
-                channels = range(1,17)
+                # Channel 16: Opamp2
+                # Channel 18: Opamp3
+                channels = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,17]
+                assert(len(channels) == 16)
             elif target["family"] == "l5":
                 # ADC1 is connected to 16 external channels + 2 internal channels
                 channels = range(1,17)
@@ -63,21 +72,34 @@ class Instance(Module):
                 channels = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]
             elif target["family"] == "g4":
                 # ADC3 is connected to 15 external channels + 3 internal channels
-                channels = range(1,16)
+                # Channel 13: Opamp3
+                # Channel 17: VBat/3
+                # Channel 18: VRefint
+                channels = [1,2,3,4,5,6,7,8,9,10,11,12,14,15,16]
+                assert(len(channels) == 15)
             else:
                 # ADC3 is connected to 12 external channels + 4 internal channels
                 channels = [1,2,3,4,6,7,8,9,10,11,12,13]
         elif instance_id == 4:
             if target["family"] == "g4":
                 # ADC4 is connected to 16 external channels + 2 internal channels
+                # Channel 17: Opamp6
+                # Channel 18: VRefint
                 channels = range(1,17)
+                assert(len(channels) == 16)
             else:
                 # 14-16 reserved
                 channels = [1,2,3,4,5,6,7,8,9,10,11,12,13,17,18]
         elif instance_id == 5:
             if target["family"] == "g4":
                 # ADC5 is connected to 13 external channels + 5 internal channels
-                channels = range(1,14)
+                # Channel 3: Opamp5
+                # Channel 4: Temperature
+                # Channel 5: Opamp4
+                # Channel 17: VBat/3
+                # Channel 18: VRefint
+                channels = [1,2,6,7,8,9,10,11,12,13,14,15,16]
+                assert(len(channels) == 13)
             else:
                 raise NotImplementedError
         properties["channels"] = sorted(channels)
