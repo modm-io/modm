@@ -158,11 +158,11 @@ var name2board = {
 
 var possible_releases = ["develop"];
 var current_year = new Date().getFullYear();
-for (var year = 2021; year <= current_year; year++) {
-   possible_releases.push(year + "q1");
-   possible_releases.push(year + "q2");
-   possible_releases.push(year + "q3");
+for (var year = current_year; year >= 2021; year--) {
    possible_releases.push(year + "q4");
+   possible_releases.push(year + "q3");
+   possible_releases.push(year + "q2");
+   possible_releases.push(year + "q1");
 }
 var releases = [];
 possible_releases.forEach(function(r, index, array) {
