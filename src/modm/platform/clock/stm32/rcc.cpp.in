@@ -23,8 +23,8 @@ modm_weak void SystemCoreClockUpdate() { /* Nothing to update */ }
 
 namespace modm::platform
 {
-constinit uint16_t modm_fastdata delay_fcpu_MHz(computeDelayMhz(Rcc::BootFrequency));
-constinit uint16_t modm_fastdata delay_ns_per_loop(computeDelayNsPerLoop(Rcc::BootFrequency));
+constinit uint16_t modm_fastdata modm_used delay_fcpu_MHz(computeDelayMhz(Rcc::BootFrequency));
+constinit uint16_t modm_fastdata modm_used delay_ns_per_loop(computeDelayNsPerLoop(Rcc::BootFrequency));
 
 // ----------------------------------------------------------------------------
 %% if target.family == "f0"
