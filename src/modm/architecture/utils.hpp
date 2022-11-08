@@ -137,6 +137,7 @@
 
 	#define modm_always_inline		inline __attribute__((always_inline))
 	#define modm_noinline			__attribute__((noinline))
+	#define modm_used				__attribute__((used))
 	#define modm_unused				__attribute__((unused))
 	#define modm_aligned(n)			__attribute__((aligned(n)))
 	#define modm_packed				__attribute__((packed))
