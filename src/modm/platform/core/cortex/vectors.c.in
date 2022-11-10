@@ -65,7 +65,7 @@ FunctionPointer vectorsRam[sizeof(vectorsRom) / sizeof(FunctionPointer)];
 #include <modm/architecture/interface/assert.h>
 %% endif
 
-modm_used void 
+modm_used void
 Undefined_Handler(void)
 {
 %% if with_assert
