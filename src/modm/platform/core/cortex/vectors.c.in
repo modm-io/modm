@@ -33,7 +33,7 @@ typedef void (* const FunctionPointer)(void);
 extern uint32_t __main_stack_top[];
 
 // Define the vector table
-modm_section(".vector_rom")
+modm_section(".vector_rom") modm_used
 FunctionPointer vectorsRom[] =
 {
 	(FunctionPointer)__main_stack_top,		// -16: stack pointer
