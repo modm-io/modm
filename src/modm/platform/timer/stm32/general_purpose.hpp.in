@@ -254,7 +254,7 @@ public:
 	}
 
 
-%% if target.family not in ["l0", "l1"]
+%% if target.family not in ["l0", "l1"] and id in [15, 16, 17]
 	static inline void
 	enableOutput()
 	{

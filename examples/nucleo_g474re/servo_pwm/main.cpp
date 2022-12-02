@@ -42,7 +42,6 @@ main()
 	Timer4::applyAndReset();
 
 	Timer4::start();
-	Timer4::enableOutput();
 
 	MODM_LOG_INFO << "Teaching sequence for electronic speed controllers:" << modm::endl;
 	MODM_LOG_INFO << "1.0 ms pulse width for 2 s" << modm::endl;

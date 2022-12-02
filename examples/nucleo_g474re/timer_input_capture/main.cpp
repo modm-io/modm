@@ -99,7 +99,6 @@ void generatePwm()
 	Timer4::configureOutputChannel<GpioB7::Ch2>(Timer4::OutputCompareMode::Pwm, pwm_pulse_width_in_ticks);
 	Timer4::applyAndReset();
 	Timer4::start();
-	Timer4::enableOutput();
 }
 
 /**

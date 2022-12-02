@@ -55,7 +55,6 @@ int main()
 	Timer4::applyAndReset();
 
 	Timer4::start();
-	Timer4::enableOutput();
 
 	MODM_LOG_INFO << modm::endl;
 	MODM_LOG_INFO << "Teaching sequence for electronic speed controllers:" << modm::endl;
