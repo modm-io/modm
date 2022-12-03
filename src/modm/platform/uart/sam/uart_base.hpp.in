@@ -25,12 +25,12 @@ public:
 	{
 %% if type == "usart"
 %% if target.family == "e7x/s7x/v7x" and target.variant == "b"
-		Disabled  = US_MR_USART_PAR_NO_Val,
-		Even      = US_MR_USART_PAR_EVEN_Val,
-		Odd       = US_MR_USART_PAR_ODD_Val,
-		Space	  = US_MR_USART_PAR_SPACE_Val,
-		Mark      = US_MR_USART_PAR_MARK_Val,
-		MultiDrop = US_MR_USART_PAR_MULTIDROP_Val
+		Disabled  = US_MR_USART_PAR_NO,
+		Even      = US_MR_USART_PAR_EVEN,
+		Odd       = US_MR_USART_PAR_ODD,
+		Space	  = US_MR_USART_PAR_SPACE,
+		Mark      = US_MR_USART_PAR_MARK,
+		MultiDrop = US_MR_USART_PAR_MULTIDROP
 %% else
 		Disabled  = US_MR_PAR_NO,
 		Even      = US_MR_PAR_EVEN,
