@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2021, Jeff McBride
+# Copyright (c) 2022, Christopher Durand
 #
 # This file is part of the modm project.
 #
@@ -14,16 +15,59 @@ def init(module):
     module.name = ":platform:adc"
     module.description = "Analog-to-Digital Converter (ADC)"
 
+
+def get_driver(device):
+    if device.has_driver("afec:sam*"):
+        return device.get_driver("afec")
+    else:
+        return device.get_driver("adc")
+
+
+def get_adc_type(device):
+    return "afec" if device.has_driver("afec:sam*") else "adc"
+
+
+def get_substitutions(device, instance=""):
+    driver = get_driver(device)
+    adc_type = get_adc_type(device)
+
+    properties = {}
+    properties["target"] = device.identifier
+    properties["driver"] = driver
+    properties["type"] = adc_type
+    properties["max_frequency"] = 40 if adc_type == "afec" else 10
+    properties["channel_count"] = 12 if adc_type == "afec" else 8
+    properties["instance"] = str(instance)
+    return properties
+
+
+class Instance(Module):
+    def __init__(self, instance):
+        self.instance = instance
+
+    def init(self, module):
+        module.name = str(self.instance)
+        module.description = "Instance {}".format(self.instance)
+
+    def prepare(self, module, options):
+        return True
+
+    def build(self, env):
+        device = env[":target"]
+        driver = get_driver(device)
+
+        properties = {}
+        properties.update(get_substitutions(device, self.instance))
+        env.substitutions = properties
+        env.outbasepath = "modm/src/modm/platform/adc"
+
+        env.template("adc.hpp.in", "{}_{}.hpp".format(get_adc_type(device), self.instance))
+
+
 def prepare(module, options):
     device = options[":target"]
-    if not device.has_driver("adc:samg*"):
+    if not device.has_driver("adc:samg*") and not device.has_driver("afec:sam*"):
         return False
-    global props
-    props = {}
-    driver = device.get_driver("adc")
-    props["target"] = device.identifier
-    props["driver"] = driver
-    props["instances"] = []
 
     module.depends(
         ":architecture:adc",
@@ -34,9 +78,25 @@ def prepare(module, options):
         ":math:algorithm",
         ":utils")
 
+    driver = get_driver(device)
+    # If there is only one instance of the peripheral it is not numbered and
+    # merged into the generic adc module.
+    if "instance" in driver:
+        for instance in listify(driver["instance"]):
+            module.add_submodule(Instance(int(instance)))
+
     return True
 
+
 def build(env):
+    device = env[":target"]
+    driver = get_driver(device)
+
+    properties = {}
+    properties.update(get_substitutions(device))
+    env.substitutions = properties
+
     env.outbasepath = "modm/src/modm/platform/adc"
 
-    env.copy("adc.hpp")
+    if "instance" not in driver:
+        env.template("adc.hpp.in", "{}.hpp".format(get_adc_type(device)))

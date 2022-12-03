@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, Jeff McBride
+ * Copyright (c) 2022, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -14,36 +15,37 @@
 #include <modm/platform/clock/clockgen.hpp>
 #include <modm/platform/gpio/connector.hpp>
 
+%% if type == "afec"
+%% set reg = "AFEC"
+%% else
+%% set reg = "ADC"
+%% endif
 
 namespace modm::platform
 {
 
 /// @ingroup modm_platform_adc
-class Adc : modm::Adc
+class {{type | capitalize}}{{instance}} : modm::Adc
 {
-	static const modm::frequency_t MaxAdcFrequency = modm::MHz(10);
+	static const modm::frequency_t MaxAdcFrequency = modm::MHz({{max_frequency}});
 
 	// Work around a name collision between 'struct modm::Adc' and 'struct Adc'
 	// defined in the CMSIS headers
-	static inline ::Adc*
+	static inline auto*
 	Regs()
 	{
-		return (::Adc*)ADC;
+		return (::{{type | capitalize}}*){{reg}}{{instance}};
 	};
 
 public:
 	enum class Channel : uint8_t
 	{
-		Ch0 = 0,
-		Ch1,
-		Ch2,
-		Ch3,
-		Ch4,
-		Ch5,
-		Ch6,
-		Ch7
+%% for i in range(channel_count)
+		Ch{{i}} = {{i}}{% if not loop.last %},{% endif %}
+%% endfor
 	};
 
+%% if target.family != "e7x/s7x/v7x"
 	/** Analog settling time setting
 	 *
 	 * Controls how many periods of ADC clock are allowed for input to settle.
@@ -55,6 +57,7 @@ public:
 		AST9,
 		AST17
 	};
+%% endif
 
 public:
 	// start inherited documentation
@@ -64,7 +67,12 @@ public:
 	{
 		// Pins are automatically connected to the ADC when they are enabled,
 		// so all this does is set the pin mode to input.
-		using Connector = typename Pin::template Connector<Peripherals::Adc, Peripherals::Adc::Ad>;
+%% if instance
+%% set peripheral = type.capitalize() + "<" + instance + ">"
+%% else
+%% set peripheral = type.capitalize()
+%% endif
+		using Connector = typename Pin::template Connector<Peripherals::{{peripheral}}, Peripherals::{{peripheral}}::Ad>;
 		static_assert(Connector::PinSignal::AdcChannel >= 0, "Pin cannot be used as ADC input");
 		Pin::setInput();
 
@@ -72,7 +80,7 @@ public:
 		if constexpr (sizeof...(Pins)) { connect<Pins...>(); }
 	}
 
-	template<class SystemClock, frequency_t frequency = MHz(10), percent_t tolerance = pct(10)>
+	template<class SystemClock, frequency_t frequency = MHz({{max_frequency}}), percent_t tolerance = pct(10)>
 	static inline void
 	initialize()
 	{
@@ -81,33 +89,63 @@ public:
 			frequency,                              // desired adc frequency
 			0,                                      // lowest prescaler value
 			255,                                    // highest prescaler value
+%% if target.family == "e7x/s7x/v7x"
+			[](uint32_t x) { return (x + 1); }      // transform function
+%% else
 			[](uint32_t x) { return 2 * (x + 1); }  // transform function
+%% endif
 		);
 		static_assert(result.frequency <= MaxAdcFrequency,
 					  "Generated ADC frequency is above maximum frequency!");
 		assertBaudrateInTolerance<result.frequency, frequency, tolerance>();
 
-		ClockGen::enable<ClockPeripheral::Adc>();
+		ClockGen::enable<ClockPeripheral::{{type | capitalize}}{{instance}}>();
 
-		Regs()->ADC_MR = ADC_MR_PRESCAL(result.index) | ADC_MR_TRANSFER(2);
+		Regs()->{{reg}}_MR =
+			{{reg}}_MR_PRESCAL(result.index) |
+%% if target.family == "e7x/s7x/v7x"
+			// 2: recommended value according to datasheet
+			{{reg}}_MR_TRANSFER(2) |
+			// The datasheet states TRACKTIM should be set to 15 AFE clock cycles.
+			// According to app note 44046 this is achieved with a value of 14.
+			// If the datasheets guidance is followed to not change this value the
+			// ADC reads wrong values half of the time.
+			// Also, none of the 3 vendor HALs use the reset value of 0.
+			{{reg}}_MR_TRACKTIM(14) |
+			{{reg}}_MR_ONE; // reserved, must always be set
+%% else
+			{{reg}}_MR_TRANSFER(2);
+%% endif
+
+%% if target.family == "e7x/s7x/v7x"
+		// Enable PGAs and set up biasing
+		Regs()->{{reg}}_ACR = {{reg}}_ACR_PGA1EN | {{reg}}_ACR_PGA0EN |
+			AFEC_ACR_IBCTL((result.frequency >= MHz(20) ? 0b11 : 0b10));
+
+		// set 10-bit offset DACs to zero offset (value 512, mid scale)
+		for (int channel = 0; channel < {{channel_count}}; ++channel) {
+			Regs()->{{reg}}_CSELR = channel; // select channel of COCR register
+			Regs()->{{reg}}_COCR = 512;
+		}
+%% endif
 	}
 
 	static inline void
 	startConversion()
 	{
-		Regs()->ADC_CR = ADC_CR_START;
+		Regs()->{{reg}}_CR = {{reg}}_CR_START;
 	}
 
 	static inline bool
 	isConversionFinished()
 	{
-		return Regs()->ADC_ISR & ADC_ISR_DRDY;
+		return Regs()->{{reg}}_ISR & {{reg}}_ISR_DRDY;
 	}
 
 	static inline uint16_t
 	getValue()
 	{
-		return (uint16_t)(Regs()->ADC_LCDR & 0xffff);
+		return (uint16_t)(Regs()->{{reg}}_LCDR & 0xffff);
 	}
 
 	static inline uint16_t
@@ -130,39 +168,42 @@ public:
 	static inline bool
 	setChannel(uint8_t channel)
 	{
-		if (channel > 7) return false;
-		Regs()->ADC_CHDR = 0xff;
-		Regs()->ADC_CHER = (1 << channel);
+		if (channel >= {{channel_count}}) return false;
+		Regs()->{{reg}}_CHDR = (1u << {{channel_count}}) - 1u;
+		Regs()->{{reg}}_CHER = (1 << channel);
 		return true;
 	}
 
 	static inline void
 	enableFreeRunningMode()
 	{
-		Regs()->ADC_MR |= ADC_MR_FREERUN;
+		Regs()->{{reg}}_MR |= {{reg}}_MR_FREERUN;
 	}
 
 	static inline void
 	disableFreeRunningMode()
 	{
-		Regs()->ADC_MR &= ~ADC_MR_FREERUN;
+		Regs()->{{reg}}_MR &= ~{{reg}}_MR_FREERUN;
 	}
 
 	// end inherited documentation
 
+%% if target.family != "e7x/s7x/v7x"
 	/** Configure the amount of time the ADC input is allowed to settle before sampling
 	 */
 	static inline void
 	setSettlingTime(SettlingTime time)
 	{
-		Regs()->ADC_MR = (Regs()->ADC_MR & ~ADC_MR_SETTLING_Msk) | ADC_MR_SETTLING((uint8_t)time);
+		Regs()->{{reg}}_MR = (Regs()->{{reg}}_MR & ~{{reg}}_MR_SETTLING_Msk) | {{reg}}_MR_SETTLING((uint8_t)time);
 	}
+%% endif
 
 	template<class Pin>
 	static inline constexpr uint8_t
 	getPinChannel()
 	{
-		using Connector = typename Pin::Ad::template Connector<Peripherals::Adc, Peripherals::Adc::Ad>;
+		using Connector = typename Pin::Ad::template Connector<Peripherals::{{peripheral}}, Peripherals::{{peripheral}}::Ad>;
+
 		static_assert(Connector::PinSignal::AdcChannel >= 0, "Pin cannot be used as ADC input");
 		return Connector::PinSignal::AdcChannel;
 	}
