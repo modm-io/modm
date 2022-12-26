@@ -43,3 +43,6 @@
 [submodule "ext/nanopb/nanopb"]
 	path = ext/nanopb/nanopb
 	url = https://github.com/modm-ext/nanopb-partial.git
+[submodule "ext/arm/cmsis-dsp"]
+	path = ext/arm/cmsis-dsp
+	url = https://github.com/modm-ext/cmsis-dsp-partial.git

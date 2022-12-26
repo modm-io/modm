@@ -13,9 +13,9 @@
 #include <arm_math.h>
 
 #define main arm_cmsis_dsp_example
-#include "../../../../ext/arm/cmsis/CMSIS/DSP/Examples/ARM/arm_fft_bin_example/arm_fft_bin_data.c"
+#include "../../../../ext/arm/cmsis-dsp/CMSIS-DSP/Examples/ARM/arm_fft_bin_example/arm_fft_bin_data.c"
 #define while return status; void
-#include "../../../../ext/arm/cmsis/CMSIS/DSP/Examples/ARM/arm_fft_bin_example/arm_fft_bin_example_f32.c"
+#include "../../../../ext/arm/cmsis-dsp/CMSIS-DSP/Examples/ARM/arm_fft_bin_example/arm_fft_bin_example_f32.c"
 #undef while
 #undef main
 

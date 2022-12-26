@@ -14,7 +14,7 @@
 
 #define main arm_cmsis_dsp_example
 #define while return index; void
-#include "../../../../ext/arm/cmsis/CMSIS/DSP/Examples/ARM/arm_bayes_example/arm_bayes_example_f32.c"
+#include "../../../../ext/arm/cmsis-dsp/CMSIS-DSP/Examples/ARM/arm_bayes_example/arm_bayes_example_f32.c"
 #undef while
 #undef main
 

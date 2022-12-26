@@ -15,11 +15,11 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wsign-compare"
 #define main arm_cmsis_dsp_example
-#include "../../../../ext/arm/cmsis/CMSIS/DSP/Examples/ARM/arm_linear_interp_example/math_helper.h"
-#include "../../../../ext/arm/cmsis/CMSIS/DSP/Examples/ARM/arm_linear_interp_example/math_helper.c"
-#include "../../../../ext/arm/cmsis/CMSIS/DSP/Examples/ARM/arm_linear_interp_example/arm_linear_interp_data.c"
+#include "../../../../ext/arm/cmsis-dsp/CMSIS-DSP/Examples/ARM/arm_linear_interp_example/math_helper.h"
+#include "../../../../ext/arm/cmsis-dsp/CMSIS-DSP/Examples/ARM/arm_linear_interp_example/math_helper.c"
+#include "../../../../ext/arm/cmsis-dsp/CMSIS-DSP/Examples/ARM/arm_linear_interp_example/arm_linear_interp_data.c"
 #define while return status; void
-#include "../../../../ext/arm/cmsis/CMSIS/DSP/Examples/ARM/arm_linear_interp_example/arm_linear_interp_example_f32.c"
+#include "../../../../ext/arm/cmsis-dsp/CMSIS-DSP/Examples/ARM/arm_linear_interp_example/arm_linear_interp_example_f32.c"
 #undef while
 #undef main
 #pragma GCC diagnostic pop

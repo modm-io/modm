@@ -26,4 +26,4 @@ Example `<arm_math_local.h>` configuration:
 ```
 
 
-[docs]: http://arm-software.github.io/CMSIS_5/DSP/html/modules.html
+[docs]: https://arm-software.github.io/CMSIS-DSP/latest/
