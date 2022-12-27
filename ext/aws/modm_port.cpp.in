@@ -12,6 +12,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <modm/architecture/interface/assert.hpp>
+#include <modm/architecture/interface/clock.hpp>
 #include <cstdlib>
 
 extern "C" void vApplicationStackOverflowHook(TaskHandle_t, char *);
@@ -39,6 +40,9 @@ void __malloc_unlock(struct _reent *)
 // ----------------------------------------------------------------------------
 // Make the FreeRTOS heap use Newlib heap
 
+#if configUSE_MALLOC_FAILED_HOOK == 1
+extern "C" void vApplicationMallocFailedHook(void);
+#endif
 extern "C" void *pvPortMalloc(size_t xWantedSize);
 void *pvPortMalloc(size_t xWantedSize)
 {
@@ -48,7 +52,6 @@ void *pvPortMalloc(size_t xWantedSize)
 #if configUSE_MALLOC_FAILED_HOOK == 1
 	if(pvReturn == nullptr)
 	{
-		extern "C" void vApplicationMallocFailedHook(void);
 		vApplicationMallocFailedHook();
 	}
 #endif
