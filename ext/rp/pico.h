@@ -32,6 +32,8 @@ extern "C" {
 #define hard_assert assert
 #endif
 
+typedef unsigned int uint;
+
 void
 panic(const char* /*fmt*/, ...);
 

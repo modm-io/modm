@@ -26,6 +26,8 @@ extern "C" void panic(const char *fmt, ...)
 	va_start(va, fmt);
 	modm::log::info.vprintf(fmt, va);
 	va_end(va);
+%% else
+	(void) fmt;
 %% endif
 	modm_assert(0, "pico", "Pico-SDK panic!");
 }

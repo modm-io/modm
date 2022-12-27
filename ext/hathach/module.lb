@@ -136,6 +136,8 @@ def build(env):
     speed = env.get("speed", "hs" if env[":target"].has_driver("usb_otg_hs") else "fs")
     port = 0 if speed == "fs" else 1
 
+    tusb_config["CFG_TUSB_RHPORT0_MODE"] = "OPT_MODE_NONE"
+    tusb_config["CFG_TUSB_RHPORT1_MODE"] = "OPT_MODE_NONE"
     mode = None
     if has_device: mode = "OPT_MODE_DEVICE";
     if has_host: mode = "OPT_MODE_HOST";
