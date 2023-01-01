@@ -52,6 +52,80 @@ pay attention to. Medium impact changes are also worth looking at.
 
 <!--releases-->
 
+## 2023-01-01: 2022q4 release
+
+This release covers everything from 2022-10-01 and has been tested with avr-gcc
+v10.2.0 from Upstream and arm-none-eabi-gcc 10.3-2022.07 from Arm.
+
+Breaking changes:
+
+- None.
+
+Features:
+
+- Basic ADC support for SAMx7x devices.
+
+Integrated Projects:
+
+- printf upgraded to v6.1.0.
+- CMSIS-DSP upgraded to v1.14.2.
+- TinyUSB upgraded to v0.14.0.
+- FreeRTOS upgraded to 202212.
+- FatFS upgraded to v0.15.
+- LVGL upgraded to v8.3.4.
+- NanoPB upgraded to v0.4.7.
+- ETL upgraded to v20.35.6.
+- STM32L5 headers upgraded to v1.12.0.
+- STM32H7 headers upgraded to v1.10.3.
+
+Fixes:
+
+- STM32G4 ADC channel mapping.
+- Initialize frame buffer memory in MonochromeGraphicDisplay.
+- Only configure BDTR register for timers with complementary PWM.
+- Fix SAMx7x b-variant USART defines.
+
+New development boards:
+
+- None.
+
+New device drivers:
+
+- None.
+
+Known bugs:
+
+- C++20 is not fully implemented by GCC10 yet, however modm does not use all
+  features yet anyways. See [#326][].
+- STM32F7: D-Cache not enabled by default. See [#485][].
+- `lbuild build` and `lbuild clean` do not remove all previously generated files
+  when the configuration changes. See [#285][].
+- Generating modm on Windows creates paths with `\` that are not compatible with
+  Unix. See [#310][].
+- `arm-none-eabi-gdb` TUI and GDBGUI interfaces are not supported on Windows.
+  See [#591][].
+
+Many thanks to all our contributors.
+A special shoutout to first timers 🎉:
+
+- Christopher Durand ([@chris-durand][])
+- Niklas Hauser ([@salkinium][])
+- Raphael Lehmann ([@rleh][])
+- Sergey Pluzhnikov ([@ser-plu][]) 🎉
+
+PR [#937][] -> [2022q4][].
+
+<details>
+<summary>Detailed changelog</summary>
+
+#### 2022-12-04: Add basic SAMx7x ADC driver
+
+PR [#935][] -> [7330500][].  
+Tested in hardware by [@chris-durand][].
+
+</details>
+
+
 ## 2022-10-01: 2022q3 release
 
 This release covers everything from 2022-07-01 and has been tested with avr-gcc
@@ -2186,6 +2260,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [2022q1]: https://github.com/modm-io/modm/releases/tag/2022q1
 [2022q2]: https://github.com/modm-io/modm/releases/tag/2022q2
 [2022q3]: https://github.com/modm-io/modm/releases/tag/2022q3
+[2022q4]: https://github.com/modm-io/modm/releases/tag/2022q4
 
 [@19joho66]: https://github.com/19joho66
 [@ASMfreaK]: https://github.com/ASMfreaK
@@ -2231,6 +2306,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [@salkinium]: https://github.com/salkinium
 [@sarahvilete]: https://github.com/sarahvilete
 [@se-bi]: https://github.com/se-bi
+[@ser-plu]: https://github.com/ser-plu
 [@strongly-typed]: https://github.com/strongly-typed
 [@tarush53]: https://github.com/tarush53
 [@twasilczyk]: https://github.com/twasilczyk
@@ -2482,6 +2558,8 @@ Please note that contributions from xpcc were continuously ported to modm.
 [#900]: https://github.com/modm-io/modm/pull/900
 [#902]: https://github.com/modm-io/modm/pull/902
 [#917]: https://github.com/modm-io/modm/pull/917
+[#935]: https://github.com/modm-io/modm/pull/935
+[#937]: https://github.com/modm-io/modm/pull/937
 [#96]: https://github.com/modm-io/modm/pull/96
 
 [00471ca]: https://github.com/modm-io/modm/commit/00471ca
@@ -2558,6 +2636,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [6e7c12f]: https://github.com/modm-io/modm/commit/6e7c12f
 [6e9f000]: https://github.com/modm-io/modm/commit/6e9f000
 [72d5ae9]: https://github.com/modm-io/modm/commit/72d5ae9
+[7330500]: https://github.com/modm-io/modm/commit/7330500
 [77ae899]: https://github.com/modm-io/modm/commit/77ae899
 [78d18f6]: https://github.com/modm-io/modm/commit/78d18f6
 [7b5827f]: https://github.com/modm-io/modm/commit/7b5827f

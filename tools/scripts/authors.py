@@ -72,6 +72,7 @@ author_handles = {
     "Sascha Schade": "strongly-typed",
     "Sebastian Birke": "se-bi",
     "Sebastian Tibor Bakonyvari": "twast92",
+    "Sergey Pluzhnikov": "ser-plu",
     "Sergiy Yevtushenko": "siy",
     "Steven Macías": "StevenMacias",
     "Tarik TIRE": "7Kronos",
