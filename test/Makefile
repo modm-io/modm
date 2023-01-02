@@ -174,3 +174,8 @@ compile-mega-2560-pro_B:
 	$(call compile-test,mega-2560-pro_B,size)
 run-mega-2560-pro_B:
 	$(call run-test,mega-2560-pro_B,size)
+
+compile-samv71-xplained-ultra:
+	$(call compile-test,samv71-xplained-ultra,size)
+run-samv71-xplained-ultra:
+	$(call run-test,samv71-xplained-ultra,size)

@@ -63,6 +63,12 @@ struct Leds
 		Led1::setOutput();
 	}
 
+	static void setOutput(bool state)
+	{
+		Led0::setOutput(state);
+		Led1::setOutput(state);
+	}
+
 	static void write(uint32_t value)
 	{
 		Led0::set(value & 1);
