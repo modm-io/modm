@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2021 Jeff McBride
  * Copyright (c) 2021, Tomasz Wasilczyk
+ * Copyright (c) 2023, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -9,6 +10,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 // ----------------------------------------------------------------------------
+
+#include <algorithm>
 
 namespace modm::platform
 {
@@ -27,6 +30,48 @@ ClockGen::enableMainInternal(MainInternalFreq freq)
 		CKGR_MOR_KEY_PASSWD;
 	while (!(PMC->PMC_SR & PMC_SR_MOSCRCS));
 }
+
+%% if target.family == "e7x/s7x/v7x"
+template<uint32_t frequency>
+bool
+ClockGen::enableMainExternalCrystal(std::chrono::microseconds startupTime)
+{
+	// disable external clock, clear startup time bits
+	PMC->CKGR_MOR = (PMC->CKGR_MOR | CKGR_MOR_KEY_PASSWD) &
+		~(CKGR_MOR_MOSCXTBY | CKGR_MOR_MOSCXTST_Msk);
+	// wait for external clock to shutdown
+	while (PMC->PMC_SR & PMC_SR_MOSCXTS);
+
+	// convert microseconds to startup time register value
+	// register unit is SCLK cycles (32768 Hz) multiplied by 8
+	const auto cycles = startupTime.count() * (32'768ll / 8) / 1'000'000;
+	const uint32_t timeSetting = std::clamp(cycles, 0ll, 255ll) << CKGR_MOR_MOSCXTST_Pos;
+
+	PMC->CKGR_MOR |= CKGR_MOR_KEY_PASSWD | CKGR_MOR_MOSCXTEN | timeSetting;
+	while (!(PMC->PMC_SR & PMC_SR_MOSCXTS));
+
+	// measure crystal frequency
+	PMC->CKGR_MCFR = CKGR_MCFR_CCSS | CKGR_MCFR_RCMEAS;
+	// two subsequent reads of MAINFRDY must be 1
+	while (!(PMC->CKGR_MCFR & CKGR_MCFR_MAINFRDY));
+	while (!(PMC->CKGR_MCFR & CKGR_MCFR_MAINFRDY));
+	const auto resultFrequency = ((PMC->CKGR_MCFR & CKGR_MCFR_MAINF_Msk) >> CKGR_MCFR_MAINF_Pos)
+		* (32768u / 16u);
+
+	// default slow clock has big tolerance (20 ... 57 kHz), only coarse check is safe
+	return (resultFrequency > (frequency / 2)) && (resultFrequency < (frequency * 2));
+}
+
+void
+ClockGen::enableMainExternalClock()
+{
+	// disable external crystal
+	PMC->CKGR_MOR = (PMC->CKGR_MOR | CKGR_MOR_KEY_PASSWD) & ~CKGR_MOR_MOSCXTEN;
+
+	// enable external clock input
+	PMC->CKGR_MOR |= CKGR_MOR_KEY_PASSWD | CKGR_MOR_MOSCXTBY;
+}
+%% endif
 
 void
 ClockGen::selectMainClockSource(MainClockSource src)

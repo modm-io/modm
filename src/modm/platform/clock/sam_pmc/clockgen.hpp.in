@@ -1,6 +1,7 @@
 /**
  * Copyright (c) 2021, Jeff McBride
  * Copyright (c) 2021, Tomasz Wasilczyk
+ * Copyright (c) 2023, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -12,7 +13,8 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
+#include <chrono>
 #include "../device.hpp"
 #include <modm/architecture/interface/delay.hpp>
 
@@ -267,8 +269,14 @@ public:
 	inline static void
 	enableMainInternal(MainInternalFreq freq);
 
+%% if target.family == "e7x/s7x/v7x"
+	template<uint32_t frequency>
+	static bool
+	enableMainExternalCrystal(std::chrono::microseconds startupTime);
+
 	inline static void
-	enableMainExternal(bool bypass);
+	enableMainExternalClock();
+%% endif
 
 	inline static void
 	selectMainClockSource(MainClockSource src);
