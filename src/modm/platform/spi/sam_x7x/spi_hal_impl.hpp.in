@@ -1,0 +1,129 @@
+/*
+ * Copyright (c) 2023, Christopher Durand
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_SAMX7X_SPI_HAL{{ id }}_HPP
+#	error 	"Don't include this file directly, use 'spi_hal{{ id }}.hpp' instead!"
+#endif
+
+#include <modm/platform/clock/clockgen.hpp>
+
+namespace modm::platform
+{
+
+inline void SpiHal{{ id }}::enable()
+{
+	ClockGen::enable<ClockPeripheral::Spi{{ id }}>();
+	regs()->SPI_CR = SPI_CR_SWRST; // reset
+}
+
+inline void SpiHal{{ id }}::disable()
+{
+	if (ClockGen::isEnabled<ClockPeripheral::Spi{{ id }}>()) {
+		regs()->SPI_CR = SPI_CR_SPIDIS; // disable
+	}
+	ClockGen::disable<ClockPeripheral::Spi{{ id }}>();
+}
+
+inline void SpiHal{{ id }}::initialize(uint8_t prescaler, DataMode dataMode,
+									   DataSize dataSize)
+{
+	enable();
+	 // master mode, no mode error detection (multi-master not supported yet)
+	regs()->SPI_MR = SPI_MR_MODFDIS | uint32_t(MasterSelection::Master);
+
+	// set prescaler
+	auto& reg = regs()->SPI_CSR[0];
+	reg = (reg & ~SPI_CSR_SCBR_Msk) | (prescaler << SPI_CSR_SCBR_Pos);
+
+	setDataMode(dataMode);
+	setDataSize(dataSize);
+
+	regs()->SPI_CR = SPI_CR_SPIEN; // enable
+}
+
+inline void SpiHal{{ id }}::setDataMode(DataMode dataMode)
+{
+	auto& reg = regs()->SPI_CSR[0];
+	reg = (reg & ~static_cast<uint32_t>(DataMode::Mask))
+		| static_cast<uint32_t>(dataMode);
+}
+
+inline void SpiHal{{ id }}::setDataSize(DataSize dataSize)
+{
+	auto& reg = regs()->SPI_CSR[0];
+	reg = (reg & ~static_cast<uint32_t>(DataSize::Mask))
+		| static_cast<uint32_t>(dataSize);
+}
+
+inline void SpiHal{{ id }}::setMasterSelection(MasterSelection masterSelection)
+{
+	auto& reg = regs()->SPI_MR;
+	reg = (reg & ~static_cast<uint32_t>(MasterSelection::Mask))
+		| static_cast<uint32_t>(masterSelection);
+}
+
+inline void SpiHal{{ id }}::setLoopbackMode(LocalLoopback loopback)
+{
+	auto& reg = regs()->SPI_MR;
+	reg = (reg & ~static_cast<uint32_t>(LocalLoopback::Mask))
+		| static_cast<uint32_t>(loopback);
+}
+
+inline void SpiHal{{ id }}::write(std::byte data)
+{
+	*(reinterpret_cast<__IO std::byte*>(&regs()->SPI_TDR)) = data;
+}
+
+inline void SpiHal{{ id }}::write(uint16_t data)
+{
+	[[gnu::may_alias]] auto* ptr = reinterpret_cast<__IO uint16_t*>(&regs()->SPI_TDR);
+	*ptr = data;
+}
+
+inline void SpiHal{{ id }}::read(std::byte& data)
+{
+	data = *(reinterpret_cast<const __IO std::byte*>(&regs()->SPI_RDR));
+}
+
+inline void SpiHal{{ id }}::read(uint16_t& data)
+{
+	[[gnu::may_alias]] auto* ptr = reinterpret_cast<const __IO uint16_t*>(&regs()->SPI_RDR);
+	data = *ptr;
+}
+
+inline void SpiHal{{ id }}::enableInterruptVector(bool enable, uint32_t priority)
+{
+	if (enable) {
+		NVIC_SetPriority(SPI{{ id }}_IRQn, priority);
+		NVIC_EnableIRQ(SPI{{ id }}_IRQn);
+	}
+	else {
+		NVIC_DisableIRQ(SPI{{ id }}_IRQn);
+	}
+}
+
+inline void SpiHal{{ id }}::enableInterrupt(Interrupt_t interrupt)
+{
+	regs()->SPI_IER = interrupt.value;
+}
+
+inline void SpiHal{{ id }}::disableInterrupt(Interrupt_t interrupt)
+{
+	regs()->SPI_IDR = interrupt.value;
+}
+
+inline auto SpiHal{{ id }}::readStatusFlags()
+	-> StatusFlag_t
+{
+	return StatusFlag_t(regs()->SPI_SR);
+}
+
+} // namespace modm::platform
