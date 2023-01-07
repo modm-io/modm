@@ -13,15 +13,16 @@
   <modules>
     <module>modm-test:test:architecture</module>
     <module>modm-test:test:communication:sab</module>
-    <module>modm-test:test:communication:xpcc</module>
     <module>modm-test:test:container</module>
     <module>modm-test:test:driver</module>
     <module>modm-test:test:stdc++</module>
     <module>modm-test:test:io</module>
 
-    <!-- <module>modm-test:test:platform:**</module>
+    <!-- <module>modm-test:test:math</module>
+
+    <module>modm-test:test:communication:xpcc</module>
+    <module>modm-test:test:platform:**</module>
     <module>modm-test:test:processing</module>
-    <module>modm-test:test:ui</module>
-    <module>modm-test:test:math</module> -->
+    <module>modm-test:test:ui</module> -->
   </modules>
 </library>

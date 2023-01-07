@@ -2,8 +2,8 @@
 <library>
   <extends>modm:mega-2560-pro</extends>
   <options>
-    <option name="modm:build:build.path">../../build/generated-unittest/mega-2560-pro_B/</option>
-    <option name="modm:build:unittest.source">../../build/generated-unittest/mega-2560-pro_B/modm-test</option>
+    <option name="modm:build:build.path">../../build/generated-unittest/mega-2560-pro_C/</option>
+    <option name="modm:build:unittest.source">../../build/generated-unittest/mega-2560-pro_C/modm-test</option>
     <option name="modm:build:info.git">Disabled</option>
     <option name="modm:io:with_float">True</option>
     <option name="modm:io:with_long_long">True</option>
@@ -16,13 +16,13 @@
     <module>modm-test:test:container</module>
     <module>modm-test:test:driver</module>
     <module>modm-test:test:stdc++</module>
-    <module>modm-test:test:io</module> -->
+    <module>modm-test:test:io</module>
 
-    <module>modm-test:test:math</module>
+    <module>modm-test:test:math</module> -->
 
-    <!-- <module>modm-test:test:communication:xpcc</module>
+    <module>modm-test:test:communication:xpcc</module>
     <module>modm-test:test:platform:**</module>
     <module>modm-test:test:processing</module>
-    <module>modm-test:test:ui</module> -->
+    <module>modm-test:test:ui</module>
   </modules>
 </library>
