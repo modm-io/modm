@@ -44,7 +44,7 @@ main()
 	{
 		Adc4::startConversion();
 		// wait for conversion to finish
-		while(!Adc4::isConversionFinished);
+		while(!Adc4::isConversionFinished());
 		// print result
 		int adcValue = Adc4::getValue();
 		MODM_LOG_INFO << "adcValue=" << adcValue;

@@ -36,7 +36,7 @@ main()
 	while (true)
 	{
 		Adc1::startConversion();
-		while(!Adc1::isConversionFinished)
+		while(!Adc1::isConversionFinished())
 			;
 		int adcValue = Adc1::getValue();
 		MODM_LOG_INFO << "adcValue=" << adcValue;
