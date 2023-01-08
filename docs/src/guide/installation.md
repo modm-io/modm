@@ -15,8 +15,8 @@ Note that the modm examples use the SCons build system by default, however,
 you are not *required* to use it. See [the reference manual](../../reference/build-systems)
 for additional build system documentation.
 
-!!! info "Use GCC 10 or newer"
-    modm uses C++20, so you need *at least* GCC 10.
+!!! info "Use GCC 12 or newer"
+    modm uses C++20, so you need *at least* GCC 10. However, we recommend using GCC12.
 
 !!! warning "Beware of AVRs"
     We **strongly discourage** using AVRs for new designs, due to a significant
@@ -32,7 +32,7 @@ Please help us [keep these instructions up-to-date][contribute]!
 
 ## Linux
 
-For Ubuntu 20.04LTS, these commands install the minimal build system:
+For Ubuntu 22.04LTS, these commands install the minimal build system:
 
 ```sh
 sudo apt install python3 python3-pip scons git libncurses5
@@ -70,7 +70,7 @@ We use [Doxypress][doxypress_binaries] to generate the API documentation:
 
 ```sh
 sudo mkdir /opt/doxypress
-wget -O- https://github.com/copperspice/doxypress/releases/download/dp-1.4.2/doxypress-1.4.2-ubuntu20.04-x64.tar.bz2 | sudo tar xj -C /opt/doxypress
+wget -O- https://github.com/copperspice/doxypress/releases/download/dp-1.5.0/doxypress-1.5.0-ubuntu22.04-x64.tar.bz2 | sudo tar xj -C /opt/doxypress
 ```
 
 Add the directory to your `PATH` variable in `~/.bashrc`:
@@ -85,18 +85,18 @@ export PATH="/opt/doxypress:$PATH"
 Install the [pre-built ARM toolchain][gcc-arm-toolchain]:
 
 ```sh
-wget -O- https://developer.arm.com/-/media/Files/downloads/gnu-rm/10.3-2021.10/gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2 | sudo tar xj -C /opt/
+wget -O- https://developer.arm.com/-/media/Files/downloads/gnu/12.2.rel1/binrel/arm-gnu-toolchain-12.2.rel1-x86_64-arm-none-eabi.tar.xz | sudo tar xj -C /opt/
 ```
 
 Add it to your `PATH` variable in `~/.bashrc`:
 
 ```sh
-export PATH="/opt/gcc-arm-none-eabi-10.3-2021.10/bin:$PATH"
+export PATH="/opt/arm-gnu-toolchain-12.2.rel1-x86_64-arm-none-eabi/bin:$PATH"
 ```
 
 !!! warning "Ubuntus 'gcc-arm-none-eabi' package"
-    The Ubuntu package 'gcc-arm-none-eabi' causes [issues at the moment][armgcc-issues]
-    and ships only version 9.3.
+    The Ubuntu package 'gcc-arm-none-eabi' can [cause issues][armgcc-issues],
+    we recommend using only the pre-built toolchain.
 
 Install the OpenOCD tool:
 
@@ -115,7 +115,7 @@ sudo apt install openocd
 Download and extract the [pre-built AVR toolchain][modm-avr-gcc]:
 
 ```sh
-wget -O- https://github.com/modm-io/avr-gcc/releases/download/v11.2.0/modm-avr-gcc.tar.bz2 | sudo tar xj -C /opt
+wget -O- https://github.com/modm-io/avr-gcc/releases/download/v12.2.0/modm-avr-gcc.tar.bz2 | sudo tar xj -C /opt
 ```
 
 !!! warning "AVR toolchain install directory"
@@ -174,7 +174,7 @@ Install the [pre-built ARM toolchain](https://github.com/osx-cross/homebrew-arm)
 
 ```sh
 brew tap osx-cross/arm
-brew install arm-gcc-bin
+brew install arm-gcc-bin@12
 brew install openocd --HEAD
 ```
 
@@ -191,8 +191,8 @@ Install the [AVR toolchain from source](https://github.com/osx-cross/homebrew-av
 
 ```sh
 brew tap osx-cross/avr
-brew install avr-gcc@10
-brew link --force avr-gcc@10
+brew install avr-gcc@12
+brew link --force avr-gcc@12
 ```
 
 
@@ -253,7 +253,7 @@ files in the next steps.
 
 #### ARM Cortex-M
 
-Install the [pre-built ARM toolchain via the 32-bit installer][gcc-arm-toolchain]
+Install the [pre-built ARM toolchain via the 64-bit installer][gcc-arm-toolchain]
 and make sure you select **Add path to environment variable** at the end!
 Open a new command prompt to test the compiler:
 
@@ -282,7 +282,7 @@ openocd --version
 #### Microchip AVR
 
 Download the [pre-built AVR toolchain][winavr] and unpack the `.zip` file using
-the context menu `7-Zip > Extract to "avr-gcc-10.1.0-..."`
+the context menu `7-Zip > Extract to "avr-gcc-12.1.0-..."`
 Then rename and move the extracted folder to `C:\Program Files\avr-gcc`.
 Open PowerShell to add the `\bin` folder to the `Path`:
 
