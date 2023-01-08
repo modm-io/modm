@@ -8,22 +8,26 @@ jobs:
 
     steps:
       # update Xcode version to fix linker bug
-      - uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: '14.1'
+      # - uses: maxim-lobanov/setup-xcode@v1
+      #   with:
+      #     xcode-version: '14.2'
 
       - name: Setup environment - Brew tap
         run: |
           brew tap modm-ext/arm
-          brew tap modm-ext/avr
+          brew tap osx-cross/avr
 
       - name: Setup environment - Brew install
         run: |
           export HOMEBREW_NO_INSTALL_CLEANUP=1 # saves time
           brew update
-          brew install doxygen boost gcc avr-gcc@10 arm-gcc-bin cmake || true
-          brew link --force avr-gcc@10
+          brew install doxygen boost gcc avr-gcc@12 arm-gcc-bin@12 cmake || true
+          brew link --force avr-gcc@12
           # brew upgrade boost gcc git || true
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
 
       - name: Setup environment - Python pip
         run: |
@@ -39,25 +43,27 @@ jobs:
           python --version  || true
           python3 --version || true
           python3 -c "import os; print(os.cpu_count())"
-          which scons
-          scons --version
           which g++
           g++ --version
+          which avr-g++
+          avr-g++ --version
           which arm-none-eabi-g++
           arm-none-eabi-g++ --version
           which lbuild
           lbuild --version
-          which avr-g++
-          avr-g++ --version
+          which scons
+          scons --version
 
       - name: Check out repository
+        if: always()
         uses: actions/checkout@v3
         with:
           submodules: 'recursive'
 
       - name: Update lbuild
+        if: always()
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --user --upgrade-strategy=eager modm
 
       - name: Hosted Unittests
         if: always()

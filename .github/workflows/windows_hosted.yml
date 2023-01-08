@@ -15,9 +15,9 @@ jobs:
         run: Set-MpPreference -DisableRealtimeMonitoring $true
 
       - name: Install Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
-          python-version: "3.8"
+          python-version: "3.11"
 
       - name: Install Python packages
         run: |
@@ -26,7 +26,7 @@ jobs:
       - name: Download GCC for Windows
         run: |
           $ProgressPreference = 'SilentlyContinue'
-          Invoke-WebRequest -OutFile winlibs-gcc.zip https://github.com/brechtsanders/winlibs_mingw/releases/download/10.3.0-12.0.0-9.0.0-r2/winlibs-x86_64-posix-seh-gcc-10.3.0-mingw-w64-9.0.0-r2.zip
+          Invoke-WebRequest -OutFile winlibs-gcc.zip https://github.com/brechtsanders/winlibs_mingw/releases/download/12.2.0-15.0.6-10.0.0-msvcrt-r3/winlibs-x86_64-posix-seh-gcc-12.2.0-mingw-w64msvcrt-10.0.0-r3.zip
 
       - name: Unpack GCC for Windows
         shell: powershell

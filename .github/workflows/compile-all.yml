@@ -7,9 +7,9 @@ on:
 jobs:
   avr-compile-all:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     container:
-      image: ghcr.io/modm-ext/modm-build-avr:2022-09-27
+      image: ghcr.io/modm-ext/modm-build-avr:2023-01-08
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -33,9 +33,9 @@ jobs:
 
   sam-d0x-d1x-d2x-compile-all:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-01-08
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -59,9 +59,9 @@ jobs:
 
   sam-x5x-compile-all:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-01-08
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -85,9 +85,9 @@ jobs:
 
   sam-x7x-compile-all:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-01-08
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -111,9 +111,9 @@ jobs:
 
   stm32f0-compile-all:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-01-08
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -137,9 +137,9 @@ jobs:
 
   stm32f1-compile-all:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-01-08
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -163,9 +163,9 @@ jobs:
 
   stm32f2-compile-all:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-01-08
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -189,9 +189,9 @@ jobs:
 
   stm32f3-compile-all:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-01-08
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -215,9 +215,9 @@ jobs:
 
   stm32f4-compile-all-1:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-01-08
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -241,9 +241,9 @@ jobs:
 
   stm32f4-compile-all-2:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-01-08
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -267,9 +267,9 @@ jobs:
 
   stm32f4-compile-all-3:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-01-08
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -293,9 +293,9 @@ jobs:
 
   stm32f7-compile-all-1:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-01-08
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -319,9 +319,9 @@ jobs:
 
   stm32f7-compile-all-2:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-01-08
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -345,9 +345,9 @@ jobs:
 
   stm32l0-compile-all-1:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-01-08
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -371,9 +371,9 @@ jobs:
 
   stm32l0-compile-all-2:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-01-08
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -398,9 +398,9 @@ jobs:
 
   stm32l1-compile-all:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-01-08
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -424,9 +424,9 @@ jobs:
 
   stm32l4-compile-all-1:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-01-08
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -450,9 +450,9 @@ jobs:
 
   stm32l4-compile-all-2:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-01-08
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -476,9 +476,9 @@ jobs:
 
   stm32l4-compile-all-3:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-01-08
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -502,9 +502,9 @@ jobs:
 
   stm32l5-compile-all:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-01-08
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -528,9 +528,9 @@ jobs:
 
   stm32g0-compile-all:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-01-08
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -554,9 +554,9 @@ jobs:
 
   stm32g4-compile-all-1:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-01-08
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -580,9 +580,9 @@ jobs:
 
   stm32g4-compile-all-2:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-01-08
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -606,9 +606,9 @@ jobs:
 
   stm32h7-compile-all-1:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-01-08
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -632,9 +632,9 @@ jobs:
 
   stm32h7-compile-all-2:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-01-08
     steps:
       - name: Check out repository
         uses: actions/checkout@v3

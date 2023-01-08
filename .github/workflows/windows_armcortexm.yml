@@ -15,9 +15,9 @@ jobs:
         run: Set-MpPreference -DisableRealtimeMonitoring $true
 
       - name: Install Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
-          python-version: "3.8"
+          python-version: "3.11"
 
       - name: Install Python packages
         run: |
@@ -27,16 +27,15 @@ jobs:
         shell: powershell
         run: |
           $ProgressPreference = 'SilentlyContinue'
-          Invoke-WebRequest -OutFile gcc-arm-none-eabi-win32.zip https://developer.arm.com/-/media/Files/downloads/gnu-rm/10.3-2021.10/gcc-arm-none-eabi-10.3-2021.10-win32.zip
+          Invoke-WebRequest -OutFile gcc-arm-none-eabi-win64.zip https://developer.arm.com/-/media/Files/downloads/gnu/12.2.rel1/binrel/arm-gnu-toolchain-12.2.rel1-mingw-w64-i686-arm-none-eabi.zip
 
       - name: Install ARM Toolchain
         shell: powershell
         run: |
-          Add-Type -Assembly "System.IO.Compression.Filesystem"
-          [System.IO.Compression.ZipFile]::ExtractToDirectory("gcc-arm-none-eabi-win32.zip", "C:\")
-          dir C:\gcc-arm-none-eabi-10.3-2021.10
-          echo "C:\gcc-arm-none-eabi-10.3-2021.10\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          rm gcc-arm-none-eabi-win32.zip
+          Expand-Archive -Path gcc-arm-none-eabi-win64.zip -DestinationPath C:\ -Force
+          dir C:\arm-gnu-toolchain-12.2.rel1-mingw-w64-i686-arm-none-eabi
+          echo "C:\arm-gnu-toolchain-12.2.rel1-mingw-w64-i686-arm-none-eabi\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          rm gcc-arm-none-eabi-win64.zip
 
       - name: Show lbuild and arm-none-eabi-gcc Version Information
         run: |
