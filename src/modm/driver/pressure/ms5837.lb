@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2023, Vivien Henry,
+# Based on the ms5611, courtesy of Rasmus Kleist Hørlyck Sørensen
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":driver:ms5837"
+    module.description = """\
+# MS5837 Pressure Sensor
+
+This sensor is optimized for water depth measurement systems with a resolution of 0.2cm.
+"""
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:i2c.device",
+        ":architecture:register",
+        ":math:utils",
+        ":processing:resumable",
+        ":processing:timer")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/pressure"
+    env.copy("ms5837.hpp")
+    env.copy("ms5837_impl.hpp")
+    env.copy("ms5837_data.hpp")
+    env.copy("ms5837_data_impl.hpp")
