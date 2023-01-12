@@ -438,6 +438,14 @@ public:
 	// For backwards compability with bitbang API
 	using InputType = ::modm::platform::InputType;
 
+	// For compability with GpioInverted
+	using Type = Gpio<PinConfig>;
+	using IO = Type;
+	using Input = Type;
+	using Output = Type;
+	using Data = PinConfig;
+	static constexpr bool isInverted = false;
+
 	template<PeripheralPin peripheral_pin_v>
 	struct As;
 
