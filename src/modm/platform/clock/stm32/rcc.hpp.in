@@ -597,6 +597,14 @@ public:
 	static bool
 	enablePll{{id}}(PllSource source, const PllFactors& pllFactors, uint32_t waitCycles = 2048);
 
+	/**
+	 * Disable PLL{{id}}.
+	 *
+	 * \param	waitCycles
+	 * 		Number of cycles to wait for the pll to stabilise. Default: 2048.
+	 */
+	static bool
+	disablePll{{id}}(uint32_t waitCycles = 2048);
 %% endfor
 
 %% if pllsai_p_usb
@@ -613,6 +621,15 @@ public:
 	 */
 	static bool
 	enablePllSai(const PllSaiFactors& pllFactors, uint32_t waitCycles = 2048);
+
+	/**
+	 * Disable PLLSAI.
+	 *
+	 * \param	waitCycles
+	 * 		Number of cycles to wait for the pll to stabilise. Default: 2048.
+	 */
+	static bool
+	disablePllSai(uint32_t waitCycles = 2048);
 %% endif
 
 %% if target.family == "l0"

@@ -315,6 +315,15 @@ Rcc::enablePll{{id}}(PllSource source, const PllFactors& pllFactors, uint32_t wa
 %% endif
 }
 
+bool
+Rcc::disablePll{{id}}(uint32_t waitCycles)
+{
+	RCC->CR &= ~RCC_CR_PLL{{id}}ON;
+	while ((RCC->CR & RCC_CR_PLL{{id}}RDY) and --waitCycles)
+		;
+	return waitCycles > 0;
+}
+
 %% endfor
 
 %% if pllsai_p_usb
@@ -348,6 +357,15 @@ Rcc::enablePllSai(const PllSaiFactors& pllFactors, uint32_t waitCycles)
 		;
 
 	return tmp;
+}
+
+bool
+Rcc::disablePllSai(uint32_t waitCycles)
+{
+	RCC->CR &= ~RCC_CR_PLLSAION;
+	while ((RCC->CR & RCC_CR_PLLSAIRDY) and --waitCycles)
+		;
+	return waitCycles > 0;
 }
 %% endif
 
