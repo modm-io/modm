@@ -11,8 +11,11 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
+import re
 import glob
 import platform
+import subprocess
+
 
 def _listify(obj):
     if obj is None:
@@ -50,3 +53,20 @@ def guess_serial_port(port_hint=None):
         ports = glob.glob('/dev/tty[A-Za-z]*')
     return next(iter(ports), None)
 
+
+def compiler_version(gcc):
+    """
+    :returns: the compiler version as a single integer with two decimals per
+              sub-version. v10.1.2 -> 100102
+    """
+    output = subprocess.run(gcc + " -dumpversion", shell=True, capture_output=True, text=True)
+    version = re.match(r"^(\d+)\.(\d+)\.(\d+)", output.stdout)
+    if version:
+        compiler_version = (int(version.group(1)) * 10000 +
+                            int(version.group(2)) * 100 +
+                            int(version.group(3)))
+    else:
+        # Compiler version could not be detected
+        compiler_version = 0
+
+    return compiler_version

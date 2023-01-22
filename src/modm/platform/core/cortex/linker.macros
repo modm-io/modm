@@ -251,6 +251,9 @@ MAIN_STACK_SIZE = {{ options[":platform:cortex-m:main_stack_size"] }};
 		*(.ARM.extab* .gnu.linkonce.armextab.*)
 		KEEP(*(.eh_frame*))
 	} >{{memory}}
+
+	/* required by libc __libc_fini_array, but never called */
+	_fini = .;
 	%% else
 	%#
 	/* C++ exception unwind tables are discarded */

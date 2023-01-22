@@ -17,6 +17,7 @@
 
 #include <string>
 #include <queue>
+#include <utility>
 #include <boost/asio.hpp>
 #include <boost/bind/bind.hpp>
 #include <boost/thread/mutex.hpp>

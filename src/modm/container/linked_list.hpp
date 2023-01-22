@@ -114,6 +114,8 @@ namespace modm
 		Node *back;
 
 	public:
+		#pragma GCC diagnostic push
+		#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 		/**
 		 * \brief	Forward iterator
 		 */
@@ -178,6 +180,7 @@ namespace modm
 			// a difference
 			Node* node;
 		};
+		#pragma GCC diagnostic pop
 
 		/**
 		 * Returns a read/write iterator that points to the first element in      the

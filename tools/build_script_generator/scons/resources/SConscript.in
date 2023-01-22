@@ -24,7 +24,7 @@ env["COMPILERPREFIX"] = "arm-none-eabi-"
 %% endif
 %% if family == "darwin"
 # Using homebrew gcc on macOS instead of clang
-env["COMPILERSUFFIX"] = env.Detect(["gcc-12", "gcc-11", "gcc-10"])[3:]
+env["COMPILERSUFFIX"] = env.Detect(["gcc-13", "gcc-12", "gcc-11", "gcc-10"])[3:]
 %% endif
 %% endif
 
@@ -81,6 +81,14 @@ if profile == "{{ profile }}":
 env.Append(CCFLAGS="$ARCHFLAGS")
 env.Append(ASFLAGS="$ARCHFLAGS")
 env.Append(LINKFLAGS="$ARCHFLAGS")
+
+%% if platform != "hosted"
+if env.CompilerVersion() >= 120000:
+	env.Append(LINKFLAGS="-Wl,--no-warn-rwx-segment")
+%% if core.startswith("avr")
+	env.Append(CCFLAGS="--param=min-pagesize=0")
+%% endif
+%% endif
 
 %% if family != "darwin"
 # Search all linked static libraries multiple times

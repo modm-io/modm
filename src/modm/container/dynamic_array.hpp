@@ -256,6 +256,8 @@ namespace modm
 		}
 
 	public:
+		#pragma GCC diagnostic push
+		#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 		/**
 		 * \brief	Forward iterator
 		 */
@@ -324,6 +326,7 @@ namespace modm
 			const DynamicArray *parent;
 			SizeType index;
 		};
+		#pragma GCC diagnostic pop
 
 		/**
 		 * Returns a read/write iterator that points to the first element in the

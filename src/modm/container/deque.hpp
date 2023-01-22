@@ -185,6 +185,8 @@ namespace modm
 		removeFront();
 
 	public:
+		#pragma GCC diagnostic push
+		#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 		/**
 		 * \brief	Bidirectional const iterator
 		 *
@@ -214,6 +216,7 @@ namespace modm
 
 			Size count;
 		};
+		#pragma GCC diagnostic pop
 
 		const_iterator
 		begin() const;

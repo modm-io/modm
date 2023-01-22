@@ -57,7 +57,7 @@ GenericClockController::updateCoreFrequency()
 	delay_ns_per_loop = computeDelayNsPerLoop(Core_Hz);
 }
 
-template< uint32_t Core_Hz, uint16_t Vdd_mV=3300 >
+template< uint32_t Core_Hz, uint16_t Vdd_mV >
 uint32_t
 GenericClockController::setFlashLatency()
 {
@@ -223,7 +223,7 @@ GenericClockController::connect(ClockGenerator clockGen)
 }
 %% endif
 
-template<frequency_t frequency, XoscStartupTime startupTime = XoscStartupTime::Start_15625us>
+template<frequency_t frequency, XoscStartupTime startupTime>
 bool
 %% if target.family == "d5x/e5x"
 GenericClockController::enableExternalCrystal(Xosc clock, uint32_t waitCycles)

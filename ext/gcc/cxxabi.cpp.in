@@ -17,6 +17,7 @@
 extern "C"
 {
 
+void *__dso_handle = &__dso_handle;
 void __cxa_pure_virtual()
 { modm_assert(0, "virt.pure", "A pure virtual function was called!"); }
 void __cxa_deleted_virtual()

@@ -15,6 +15,7 @@
 import os
 import os.path
 
+from modm_tools import utils
 from SCons.Script import *
 
 def _listify(obj):
@@ -74,6 +75,10 @@ def phony_target(env, **kw):
         env.AlwaysBuild(env.Alias(target, [], action))
 
 
+def compiler_version(env):
+    return utils.compiler_version(env.subst(env["CC"]))
+
+
 def artifact_firmware(env, source):
     firmware = ARGUMENTS.get("firmware", None)
     if firmware:
@@ -95,6 +100,8 @@ def generate(env, **kw):
     env.AddMethod(phony_target, 'Phony')
 
     env.AddMethod(listify, 'Listify')
+
+    env.AddMethod(compiler_version, 'CompilerVersion')
 
     env.AddMethod(artifact_firmware, 'ChooseFirmware')
 

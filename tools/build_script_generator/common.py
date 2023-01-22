@@ -290,6 +290,11 @@ def common_compiler_flags(compiler, target):
         flags["linkflags"] += [
             "-Wl,-Map,{target_base}.map,--cref"
         ]
+    # We still want to support GCC10 and GCC11, but this flag is GCC12 only
+    # if target.identifier["platform"] not in ["hosted"]:
+    #     flags["linkflags"] += [
+    #         "-Wl,--no-warn-rwx-segment",
+    #     ]
     # C Preprocessor defines
     flags["cppdefines"] = []
     if target.identifier["family"] == "windows":

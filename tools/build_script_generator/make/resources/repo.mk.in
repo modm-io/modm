@@ -42,6 +42,16 @@ endif
 CCFLAGS += $(ARCHFLAGS)
 ASFLAGS += $(ARCHFLAGS)
 LINKFLAGS += $(ARCHFLAGS)
+
+%% if platform != "hosted"
+# This flag is neccessary for GCC12, but fails for earlier GCCs
+ifeq "$(shell expr `echo $(COMPILER_VERSION) | cut -f1 -d.` \>= 12)" "1"
+ 	LINKFLAGS += "-Wl,--no-warn-rwx-segment"
+%% if core.startswith("avr")
+	CCFLAGS += "--param=min-pagesize=0"
+%% endif
+endif
+%% endif
 %% endif
 
 %% if include_paths | length

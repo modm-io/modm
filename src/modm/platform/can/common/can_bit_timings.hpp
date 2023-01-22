@@ -19,6 +19,7 @@
 #include <modm/math/units.hpp>
 #include <modm/math/utils/misc.hpp>
 #include <cmath>
+#include <optional>
 
 namespace modm
 {

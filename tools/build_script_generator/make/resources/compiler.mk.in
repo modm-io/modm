@@ -50,4 +50,5 @@ DEBUGGER := $(C_PREFIX)gdb
 CPPFILT := $(C_PREFIX)c++filt
 
 GCC_BASE := $(dir $(realpath $(dir $(realpath $(shell which $(CC))))))
+COMPILER_VERSION = $(shell $(CC) -dumpversion)
 
