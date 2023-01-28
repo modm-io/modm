@@ -27,7 +27,7 @@ namespace platform
 /**
  * Mock CAN peripheral interface for unittests.
  *
- * @ingroup modm_test_mock_can
+ * @ingroup modm_test_mock_can_driver
  */
 class CanDriver : public modm::Can
 {

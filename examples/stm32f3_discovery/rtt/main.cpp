@@ -33,7 +33,7 @@ modm::log::Logger modm::log::error(rtt_device);
 ╰─────RTT────── stm32f303vct6
 Info : STLINK V2J16S0 (API v2) VID:PID 0483:3748
 Info : stm32f3x.cpu: hardware has 6 breakpoints, 4 watchpoints
-Info : rtt: Searching for control block 'modm.rtt.modm'
+Info : rtt: Searching for control block 'SEGGER RTT'
 Info : rtt: Control block found at 0x20000c04
 Info : Listening on port 9090 for rtt connections
 Info

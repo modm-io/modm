@@ -20,13 +20,13 @@ def load_options(module):
         NumericOption(
             name="buffer.tx",
             description="",
-            minimum=1, maximum=2 ** 16 - 2,
+            minimum=1, maximum="64Ki-2",
             default=32))
     module.add_option(
         NumericOption(
             name="buffer.rx",
             description="",
-            minimum=1, maximum=2 ** 16 - 2,
+            minimum=1, maximum="64Ki-2",
             default=32))
 
 
@@ -84,12 +84,22 @@ def get_substitutions(instance, device, env):
     cm = can_map[target["family"]]
     is_single = (cm[instance].type == CanType.Single) or (cm[instance].associated_instance not in instances)
     other = cm[instance].associated_instance
+    cmr = cm[instance].register
+    irqs = {
+        "tx": "CAN" + cmr + "_TX",
+        "rx0": "CAN" + cmr + "_RX0",
+        "rx1": "CAN" + cmr + "_RX1",
+    }
+    if any(v["name"].startswith("USB_HP_CAN") for v in device.get_driver("core")["vector"]):
+        irqs["tx"] = "USB_HP_CAN" + cmr + "_TX"
+        irqs["rx0"] = "USB_LP_CAN" + cmr + "_RX0"
 
     subs = {
         "id": "" if instance == 0 else str(instance),
-        "own_instance": cm[instance].register,
+        "own_instance": cmr,
         "other_instance": cm[other].register if other in cm else None,
-        "reg": "CAN" + cm[instance].register,
+        "reg": "CAN" + cmr,
+        "irqs": irqs,
         "type": cm[instance].type.name if not is_single else CanType.Single.name
     }
 
@@ -115,6 +125,11 @@ class Instance(Module):
         properties = device.properties
         properties["target"] = target = device.identifier
         properties["driver"] = driver
+        if device.identifier.family == "f0":
+            properties["combined_isr"] = True
+        else:
+            properties["combined_isr"] = False
+
         properties.update(get_substitutions(self.instance, device, env))
 
         env.substitutions = properties
@@ -165,6 +180,11 @@ def build(env):
     properties = device.properties
     properties["target"] = device.identifier
     properties["driver"] = driver
+    if device.identifier.family == "f0":
+        properties["combined_isr"] = True
+    else:
+        properties["combined_isr"] = False
+    properties["target_has_can2"] = (("instance" in driver) and len(driver["instance"]) > 1)
 
     if "instance" not in driver:
         properties.update(get_substitutions(0, device, env))

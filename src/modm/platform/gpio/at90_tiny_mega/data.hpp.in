@@ -1,0 +1,84 @@
+/*
+ * Copyright (c) 2021, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include "base.hpp"
+
+/// @cond
+namespace modm::platform::detail
+{
+
+template<class Signal, Peripheral p> struct SignalConnection;
+
+struct DataUnused {};
+%% for gpio in gpios
+%% set port = gpio.gpio.port | upper
+%% set pin  = gpio.gpio.pin
+%#
+struct Data{{ port ~ pin }} {
+	static constexpr Gpio::Port port = Gpio::Port::{{port}};
+	static constexpr uint8_t pin = {{pin}};
+
+	%% if gpio.extint >= 0
+	inline static void setInputTrigger(Gpio::InputTrigger trigger) {
+		%% if gpio.extint < 4
+			%% if isc2 is defined and gpio.extint == 2
+		{{isc2}} = ({{isc2}} & ~(1 << ISC2)) | ((uint8_t(trigger) & 0b01) << ISC2);
+			%% else
+		{{eicra}} = ({{eicra}} & ~(0b11 << 2*{{gpio.extint}})) | (uint8_t(trigger) << 2*{{gpio.extint}});
+			%% endif
+		%% else
+		EICRB = (EICRB & ~(0b11 << 2*{{gpio.extint - 4}})) | (uint8_t(trigger) << 2*{{gpio.extint - 4}});
+		%% endif
+	}
+	inline static void enableExternalInterrupt() { EIMSK |= (1 << INT{{gpio.extint}}); }
+	inline static void disableExternalInterrupt() { EIMSK &= ~(1 << INT{{gpio.extint}}); }
+	inline static bool getExternalInterruptFlag() { return (EIFR & (1 << INTF{{gpio.extint}})); }
+	inline static void acknowledgeExternalInterruptFlag() { EIFR |= (1 << INTF{{gpio.extint}}); }
+	%% endif
+	%% if gpio.pcint >= 0
+		%% set af_id = gpio.pcint
+		%% set af_reg = (af_id // 8)
+		%% if target["family"] == "attiny"
+			%% if (target["name"] in ["2313", "4313"]) and af_id >= 11 and af_id <= 17
+				%% set af_reg = 2
+			%% elif (target["name"] in ["20", "40", "1634"]) and af_id >= 12 and af_id <= 17
+				%% set af_reg = 2
+			%% elif (target["name"] in ["13", "25", "45", "85", "2313", "4313"])
+				%% set af_reg = ""
+			%% endif
+		%% endif
+	inline static void enablePcInterrupt() { PCMSK{{af_reg}} |= (1 << PCINT{{af_id}}); PCICR |= (1 << PCIE{{af_reg}}); }
+	inline static void disablePcInterrupt() {
+		uint8_t pcmsk = PCMSK{{af_reg}} & ~(1 << PCINT{{af_id}}); PCMSK{{af_reg}} = pcmsk;
+		if (pcmsk == 0) PCICR &= ~(1 << PCIE{{af_reg}});
+	}
+	inline static bool getPcInterruptFlag() { return (PCIFR & (1 << PCIF{{af_reg}})); }
+	inline static void acknowledgePcInterruptFlag() { PCIFR |= (1 << PCIF{{af_reg}}); }
+	%% endif
+
+	struct BitBang { using Data = Data{{ port ~ pin }}; static constexpr Gpio::Signal Signal = Gpio::Signal::BitBang; };
+%% for signal_name in gpio.signals
+	struct {{ signal_name }} { using Data = Data{{ port ~ pin }}; static constexpr Gpio::Signal Signal = Gpio::Signal::{{ signal_name }}; };
+%% endfor
+};
+template<Peripheral p> struct SignalConnection<Data{{ port ~ pin }}::BitBang, p> {
+	static_assert(p == Peripheral::BitBang, "Gpio{{ port ~ pin }}::BitBang only connects to software drivers!"); };
+%% for signal_name, signal_group in gpio.signals.items()
+template<Peripheral p> struct SignalConnection<Data{{ port ~ pin }}::{{ signal_name }}, p> {
+	static_assert((p == Peripheral::{{ signal_group | map(attribute="driver") | join(") or (p == Peripheral::") }}),{% if signal_group | length > 1 %}
+		{% endif %}"Gpio{{ port ~ pin }}::{{ signal_name }} only connects to {{ signal_group | map(attribute="driver") | join(" or ") }}!"); };
+%% endfor
+%% endfor
+%#
+} // namespace modm::platform::detail
+/// @endcond

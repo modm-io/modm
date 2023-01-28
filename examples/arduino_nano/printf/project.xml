@@ -1,0 +1,14 @@
+<library>
+  <extends>modm:arduino-nano</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/arduino_nano/printf</option>
+    <option name="modm:io:with_long_long">yes</option>
+    <option name="modm:io:with_float">yes</option>
+    <option name="modm:io:with_printf">yes</option>
+  </options>
+  <modules>
+    <module>modm:io</module>
+    <module>modm:processing:timer</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

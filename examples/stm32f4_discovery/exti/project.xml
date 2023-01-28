@@ -5,7 +5,7 @@
   </options>
   <modules>
     <module>modm:architecture:interrupt</module>
-    <module>modm:platform:gpio</module>
+    <module>modm:platform:exti</module>
     <module>modm:build:scons</module>
   </modules>
 </library>

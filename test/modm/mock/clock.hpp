@@ -13,10 +13,10 @@
 #include <stdint.h>
 #include <modm/architecture/interface/clock.hpp>
 
-/// @ingroup modm_test_mock_clock
 namespace modm_test::chrono
 {
 
+/// @ingroup modm_test_mock_clock
 class milli_clock : modm::chrono::milli_clock
 {
 public:
@@ -29,6 +29,7 @@ public:
 	static void increment(uint32_t milliseconds);
 };
 
+/// @ingroup modm_test_mock_clock
 class micro_clock : modm::chrono::micro_clock
 {
 public:

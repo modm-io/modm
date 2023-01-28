@@ -35,7 +35,8 @@ def prepare(module, options):
     target = options[":target"].identifier
     if target.family in {"tiny"} and target.name in {"861", "88"}:
         return False
-    if target.family in {"mega"} and target.name in {"8", "16", "32", "64", "128"}:
+    if (target.family in {"mega"} and target.name in {"8", "16", "32", "64", "128"}
+            and target.type not in {"rfa1"}):
         return False
 
     module.depends(":architecture:atomic", ":architecture:clock")

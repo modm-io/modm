@@ -79,7 +79,8 @@ void setupDac4()
 	});
 
 	Dma1::Channel1::enableInterruptVector();
-	Dma1::Channel1::enableInterrupt(Dma1::Interrupt::TransferComplete | Dma1::Interrupt::Error);
+	Dma1::Channel1::enableInterrupt(Dma1::InterruptEnable::TransferComplete |
+									Dma1::InterruptEnable::TransferError);
 
 	// DAC4 channel 1 output via opamp 4 in follower mode connected to output B12
 	GpioOutputB12::setAnalogInput();

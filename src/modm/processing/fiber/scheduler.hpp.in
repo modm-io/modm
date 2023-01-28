@@ -1,0 +1,181 @@
+/*
+ * Copyright (c) 2020, Erik Henriksson
+ * Copyright (c) 2022, Andrey Kunitsyn
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include "fiber.hpp"
+%% if multicore
+#include <modm/platform/core/multicore.hpp>
+%% endif
+
+namespace modm::fiber
+{
+
+void yield();
+
+/// @ingroup    modm_processing_fiber
+class Scheduler
+{
+	friend class ::modm::Fiber;
+	friend class Waitable;
+	friend void yield();
+	Scheduler(const Scheduler&) = delete;
+	Scheduler() = delete;
+
+protected:
+	struct Data
+	{
+		/// Last fiber in the ready queue.
+		Fiber* last = nullptr;
+		/// Current running fiber
+		Fiber* current = nullptr;
+
+		inline void registerFiber(Fiber* fiber)
+		{
+			if (last == nullptr)
+			{
+				fiber->next = fiber;
+				last = fiber;
+				return;
+			}
+			runLast(fiber);
+		}
+		inline void runLast(Fiber* fiber)
+		{
+			fiber->next = last->next;
+			last->next = fiber;
+			last = fiber;
+		}
+		inline Fiber* removeCurrent()
+		{
+			if (current == last) last = nullptr;
+			else last->next = current->next;
+			current->next = nullptr;
+			return current;
+		}
+		inline bool empty() const
+		{
+			return last == nullptr;
+		}
+		inline void jump(Fiber& other)
+		{
+			auto from = current;
+			current = &other;
+			modm_context_jump(&(from->ctx.sp), other.ctx.sp);
+		}
+	};
+%% if multicore
+	%% for i in range(num_cores)
+	modm_core{{i}}_bss static inline Data data{{i}} = {nullptr, nullptr};
+	%% endfor
+	static constexpr Data* lookup[] = {
+	%% for i in range(num_cores)
+		&data{{i}},
+	%% endfor
+	};
+	static inline Data& getData()
+	{ return *lookup[::modm::platform::multicore::Core::cpuId()]; }
+%% else
+	static inline Data data = {nullptr,nullptr};
+	static inline Data& getData() { return data; }
+%% endif
+	static inline void jump(Fiber& from, Fiber& to)
+	{
+		auto& d = getData();
+		d.current = &to;
+		modm_context_jump(&(from.ctx.sp), to.ctx.sp);
+	}
+public:
+	// Should be called by the main() function.
+	static inline bool
+	run()
+	{
+		auto& d = getData();
+		if (d.last == nullptr) return false;
+		d.current = d.last->next;
+		modm_context_start(d.current->ctx.sp);
+		return true;
+	}
+
+	static inline bool
+	empty()
+	{
+		return getData().empty();
+	}
+
+	static inline Fiber*
+	removeCurrent()
+	{
+		return getData().removeCurrent();
+	}
+
+	static inline void
+	runNext(Fiber* fiber)
+	{
+		auto& d = getData();
+		fiber->next = d.current->next;
+		d.current->next = fiber;
+	}
+
+	static inline void
+	runLast(Fiber* fiber)
+	{
+		getData().runLast(fiber);
+	}
+
+protected:
+%% if multicore
+	static inline void
+	registerFiber(Fiber* fiber, size_t core)
+	{
+		::modm::platform::multicore::SystemSpinLockGuard g;
+		if (core != ::modm::platform::multicore::Core::cpuId())
+		{
+			lookup[core]->registerFiber(fiber);
+			return;
+		}
+%% else
+	static inline void
+	registerFiber(Fiber* fiber)
+	{
+%% endif
+		getData().registerFiber(fiber);
+	}
+
+	static inline void
+	deregisterFiber()
+	{
+		auto& d = getData();
+		Fiber* next = d.current->next;
+		d.removeCurrent();
+		if (d.empty())
+		{
+			d.current = nullptr;
+			modm_context_end();
+		}
+		d.jump(*next);
+	}
+};
+
+/// @ingroup    modm_processing_fiber
+inline void
+yield()
+{
+	auto& d = Scheduler::getData();
+	if (d.current == nullptr) return;
+	Fiber* next = d.current->next;
+	if (next == d.current) return;
+	d.last = d.current;
+	d.jump(*next);
+}
+
+}  // namespace modm::fiber

@@ -15,7 +15,3 @@
 using namespace modm::literals;
 using namespace std::chrono_literals;
 #endif
-
-namespace Board {
-	using systemClock [[deprecated("Use `Board::SystemClock` instead!")]] = SystemClock;
-}

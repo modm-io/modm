@@ -1,0 +1,14 @@
+<library>
+  <extends>modm:samg55-xplained-pro</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/samg55_xplained_pro/timer</option>
+    <option name="modm:build:openocd.cfg">openocd.cfg</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:timer:0</module>
+    <module>modm:platform:timer:1</module>
+    <module>modm:platform:timer:2</module>
+    <module>modm:platform:timer:3</module>
+  </modules>
+</library>

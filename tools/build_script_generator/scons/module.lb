@@ -3,6 +3,7 @@
 #
 # Copyright (c) 2017-2018, Niklas Hauser
 # Copyright (c) 2019, Raphael Lehmann
+# Copyright (c) 2022, Lucas Moesch
 #
 # This file is part of the modm project.
 #
@@ -102,11 +103,14 @@ def build(env):
     device = env.query("::device")
     if device["core"].startswith("cortex-m"):
         tools.update({"size", "log_cortex", "artifact", "openocd",
-                     "openocd_remote", "bmp", "crashdebug", "dfu"})
+                      "elf2uf2", "openocd_remote", "bmp", "crashdebug", "dfu"})
         if device["platform"] in ["sam"]:
             tools.update({"bossac"})
     elif device["core"].startswith("avr"):
         tools.update({"size", "avrdude"})
+
+    if env.has_module(":nanopb"):
+        tools.add("nanopb")
 
     env.collect("path.tools", *toolpaths)
     env.collect("tools", *tools)
@@ -117,12 +121,18 @@ def build(env):
         path = "site_tools/{}.py".format(tool)
         if exists(localpath(path)):
             env.copy(path)
+
     # Copy support files
     env.copy("site_tools/qtcreator/")
 
+    if env.has_module(":nanopb"):
+        env.copy("site_tools/nanopb_builder/")
+        env.copy(repopath("ext/nanopb/nanopb/generator"), dest="site_tools/nanopb_builder/generator")
+        env.copy(repopath("ext/nanopb/nanopb/tests/site_scons/site_tools/nanopb.py"), dest="site_tools/nanopb_builder/nanopb.py")
+
     # Generate the env.BuildTarget tool
     linkerscript = env.get(":platform:cortex-m:linkerscript.override")
-    linkerscript = env.relative_outpath(linkerscript) if linkerscript \
+    linkerscript = env.relcwdoutpath(linkerscript) if linkerscript \
                    else "$BASEPATH/modm/link/linkerscript.ld"
     env.substitutions = env.query("::device")
     env.substitutions.update({
@@ -139,8 +149,10 @@ def post_build(env):
     is_unittest = len(env["::unittest.source"])
     has_xpcc_generator = env.has_module(":communication:xpcc:generator")
     has_image_source = len(env["::image.source"])
+    has_nanopb = env.has_module(":nanopb")
     repositories = [p for p in env.buildlog.repositories if isdir(env.real_outpath(p, basepath="."))]
     repositories.sort(key=lambda name: "0" if name == "modm" else name)
+    generated_paths = [join(env.relcwdoutpath(""), r) for r in repositories]
 
     subs = env.query("::device")
     cache_dir = env["cache_dir"]
@@ -155,26 +167,29 @@ def post_build(env):
         subs["memories"] = []
     # Add SCons specific data
     subs.update({
-        "build_path": env.relative_outpath(env[":build:build.path"]),
-        "cache_dir": env.relative_outpath(cache_dir) if len(cache_dir) else "",
-        "artifact_path": env.relative_outpath(env["path.artifact"]),
-        "generated_paths": repositories,
+        "build_path": env.relcwdoutpath(env[":build:build.path"]),
+        "cache_dir": env.relcwdoutpath(cache_dir) if len(cache_dir) else "",
+        "artifact_path": env.relcwdoutpath(env["path.artifact"]),
+        "generated_paths": generated_paths,
         "is_unittest": is_unittest,
-
         "has_image_source": has_image_source,
         "has_xpcc_generator": has_xpcc_generator,
+        "has_nanopb": has_nanopb,
     })
     if has_image_source:
-        subs["image_source"] = env.relative_outpath(env["::image.source"])
+        subs["image_source"] = env.relcwdoutpath(env["::image.source"])
     if is_unittest:
-        subs["unittest_source"] = env.relative_outpath(env["::unittest.source"])
+        subs["unittest_source"] = env.relcwdoutpath(env["::unittest.source"])
     if has_xpcc_generator:
         subs.update({
-            "generator_source": env.relative_outpath(env.get(":communication:xpcc:generator:source", "")),
+            "generator_source": env.relcwdoutpath(env.get(":communication:xpcc:generator:source", "")),
             "generator_container": env.get(":communication:xpcc:generator:container", ""),
-            "generator_path": env.relative_outpath(env.get(":communication:xpcc:generator:path", "")),
+            "generator_path": env.relcwdoutpath(env.get(":communication:xpcc:generator:path", "")),
             "generator_namespace": env.get(":communication:xpcc:generator:namespace", ""),
         })
+    if has_nanopb:
+        subs["nanopb_source"] = [env.relcwdoutpath(p) for p in env.get(":nanopb:sources", [])]
+        subs["nanopb_path"] = env.relcwdoutpath(env.get(":nanopb:path", "."))
     if subs["platform"] == "avr":
         subs.update(env.query("::avrdude_options"))
     if subs["platform"] == "sam":
@@ -219,6 +234,7 @@ def post_build(env):
             "tools": tools,
             "is_modm": repo == "modm",
         })
+
         # Generate library SConscript
         env.outbasepath = repo
         env.template("resources/SConscript.in", "SConscript",
@@ -226,7 +242,7 @@ def post_build(env):
                               "relocate": lambda p: env.relative_outpath(p, repo)})
 
     # these are the ONLY files that are allowed to NOT be namespaced with modm!
-    env.outbasepath = "."
+    env.outbasepath = env.cwdpath(".")
     if env["include_sconstruct"]:
         env.template("resources/SConstruct.in", "SConstruct")
 

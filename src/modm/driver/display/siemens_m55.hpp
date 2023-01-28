@@ -41,10 +41,10 @@ namespace modm
 		update();
 
 	private:
-		modm_always_inline void
+		void
 		lcdSettings(void);
 
-		modm_always_inline void
+		void
 		lcdCls(uint16_t colour);
 	};
 }

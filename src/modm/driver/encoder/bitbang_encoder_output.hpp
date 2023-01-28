@@ -19,7 +19,7 @@ namespace modm
 {
 
 /**
- * @ingroup 				modm_driver_bitbang_encoder_output
+ * @ingroup 				modm_driver_encoder_output_bitbang
  * @author  				Raphael Lehmann
  *
  * @brief					This driver generates a AB (incremental) encoder signal to
@@ -32,10 +32,10 @@ namespace modm
  *							encoder frequencies above 1kHz by a class that offers
  *							time steps less than 1ms, e.g. `modm::PrecisePeriodicTimer`.
  * @tparam period			Timebase for the output signal. This limits the maximal
- *							frequency of the encoder signal. Defaults to `1`.
+ *							frequency of the encoder signal. Defaults to 1000us (1ms).
  */
 template<class SignalA, class SignalB, typename PositionType = int32_t,
-		 class PeriodicTimer = modm::PeriodicTimer, uint32_t period = 1>
+		 class PeriodicTimer = modm::PeriodicTimer, uint32_t period = 1000>
 class BitBangEncoderOutput
 {
 public:

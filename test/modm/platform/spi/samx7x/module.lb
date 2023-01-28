@@ -1,0 +1,35 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2023, Christopher Durand
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+
+def init(module):
+    module.name = ":test:platform:spi"
+    module.description = "Tests for SAMx7x SPI"
+
+def prepare(module, options):
+    target = options[":target"]
+
+    identifier = target.identifier
+    if identifier.platform != "sam" or identifier.family != "e7x/s7x/v7x":
+        return False
+
+    module.depends(":platform:spi:0")
+    return True
+
+def build(env):
+    if not env.has_module(":board:samv71-xplained-ultra"):
+        env.log.warn("The SPI test uses hardcoded GPIO pins."
+                     "Please make sure the pins are safe to use on other hardware.")
+        return
+
+    env.outbasepath = "modm-test/src/modm-test/platform/spi_test"
+    env.copy("spi_test.hpp")
+    env.copy("spi_test.cpp")

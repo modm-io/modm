@@ -5,6 +5,7 @@
  * Copyright (c) 2012, Georgi Grinshpun
  * Copyright (c) 2013, Kevin Läufer
  * Copyright (c) 2014, Sascha Schade
+ * Copyright (c) 2022, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -38,10 +39,15 @@ namespace platform
  */
 class SpiMaster{{ id }} : public modm::SpiMaster
 {
-	static uint8_t state;
-	static uint8_t count;
-	static void *context;
-	static ConfigurationHandler configuration;
+protected:
+	// `state` must be protected to allow access from SpiMasterDma subclass
+	// Bit0: single transfer state
+	// Bit1: block transfer state
+	static inline uint8_t state{0};
+private:
+	static inline uint8_t count{0};
+	static inline void* context{nullptr};
+	static inline ConfigurationHandler configuration{nullptr};
 public:
 	using Hal = SpiHal{{ id }};
 
@@ -67,7 +73,7 @@ public:
 	using DataSize = Hal::DataSize;
 
 public:
-	template< template<Peripheral _> class... Signals >
+	template< class... Signals >
 	static void
 	connect()
 	{
@@ -99,18 +105,18 @@ public:
 		state = 0;
 	}
 
-	static modm_always_inline void
+	static void
 	setDataMode(DataMode mode)
 	{
 		SpiHal{{ id }}::setDataMode(static_cast<SpiHal{{ id }}::DataMode>(mode));
 	}
 
-	static modm_always_inline void
+	static void
 	setDataOrder(DataOrder order)
 	{
 		SpiHal{{ id }}::setDataOrder(static_cast<SpiHal{{ id }}::DataOrder>(order));
 	}
-	static modm_always_inline void
+	static void
 	setDataSize(DataSize size)
 	{
 		SpiHal{{ id }}::setDataSize(static_cast<SpiHal{{ id }}::DataSize>(size));

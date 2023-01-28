@@ -11,8 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef	MODM_AT90_ATTINY_ATMEGA_GPIO_DEFINES_H
-#define	MODM_AT90_ATTINY_ATMEGA_GPIO_DEFINES_H
+#pragma once
 /// @cond
 
 #include <avr/io.h>
@@ -76,4 +75,4 @@
 #endif
 
 /// @endcond
-#endif	// MODM_AT90_ATTINY_ATMEGA_GPIO_DEFINES_H
+

@@ -24,7 +24,7 @@ def prepare(module, options):
             name="f_cpu",
             description="CPU clock frequency",
             minimum=1,
-            maximum=32000000))
+            maximum="32M"))
 
     module.depends(":architecture:interrupt", ":stdc++")
     return True
@@ -35,7 +35,8 @@ def build(env):
 
     env.outbasepath = "modm/link"
     env.copy("linkerscript.ld")
-    env.collect(":build:linkflags", "-L{project_source_dir}", "-Tmodm/link/linkerscript.ld")
+    env.collect(":build:linkflags", "-L{project_source_dir}",
+                "-T{}".format(env.relcwdoutpath("modm/link/linkerscript.ld")))
 
     env.substitutions = {
         "target": target.identifier,

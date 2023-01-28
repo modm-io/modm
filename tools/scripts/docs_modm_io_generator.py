@@ -13,7 +13,6 @@
 import os
 import sys
 import shutil
-import lbuild
 import zipfile
 import tempfile
 import argparse
@@ -23,6 +22,7 @@ import os, sys
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 from collections import defaultdict
+import json
 
 def repopath(path):
     return Path(__file__).absolute().parents[2] / path
@@ -38,6 +38,9 @@ def rename_board(name):
 
 sys.path.append(str(repopath("ext/modm-devices")))
 from modm_devices.device_identifier import *
+
+# sys.path.insert(0, str(repopath("../lbuild")))
+import lbuild
 
 def get_targets():
     builder = lbuild.api.Builder()
@@ -100,7 +103,7 @@ def main():
     parser.add_argument("--local-temp", "-l", action='store_true', help="Create temporary directory inside current working directory")
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--compress", "-c", action='store_true', help="Compress output into gzip archive")
-    group.add_argument("--output", "-o", type=str, help="Output directory (absolute path)")
+    group.add_argument("--output", "-o", type=str, help="Output directory")
     parser.add_argument("--overwrite", "-f", action='store_true', help="Overwrite existing data in output directory (Removes all files from output directory.)")
     parser.add_argument("--deduplicate", "-d", action='store_true', help="Deduplicate identical files with symlinks.")
     args = parser.parse_args()
@@ -110,11 +113,12 @@ def main():
         device_list = ["stm32f103c8t6", "stm32f417zgt6"] + family_list
         device_list = list(set(device_list))
         board_list = [("arduino-nano", "atmega328p-au"), ("arduino-uno", "atmega328p-au"), ("nucleo-g474re", "stm32g474ret6"),
-                      ("blue-pill", "stm32f103c8t6"), ("feather-m0", "samd21g18a-uu")]
+                      ("blue-pill", "stm32f103c8t6"), ("feather-m0", "samd21g18a-uu"), ("disco-f469ni", "stm32f469nih6")]
     elif args.test2:
-        device_list = ["hosted-linux", "atmega328p-pu", "stm32f103zgt7", "stm32g474vet7"]
-        board_list = []
+        device_list = ["hosted-linux", "atmega328p-pu", "stm32f103zgt7"]
+        board_list = [("nucleo-g474re", "stm32g474ret6")]
 
+    final_output_dir = Path(args.output).absolute() if args.output else "."
     template_path = os.path.realpath(os.path.dirname(sys.argv[0]))
     cwd = Path().cwd()
     if args.local_temp:
@@ -131,7 +135,7 @@ def main():
         os.chdir(tempdir)
         print("Starting to generate documentation...")
         template_overview(output_dir, device_list, board_list, template_path)
-        print("... for {} devices, estimated memory footprint is {} MB".format(len(device_list), (len(device_list)*70)+2000))
+        print("... for {} devices, estimated memory footprint is {} MB".format(len(device_list) + len(board_list), (len(device_list)*70)+2000))
         with multiprocessing.Pool(args.jobs) as pool:
             # We can only pass one argument to pool.map
             devices = ["{}|{}|{}||{}".format(modm_path, tempdir, dev, args.deduplicate) for dev in device_list]
@@ -144,7 +148,6 @@ def main():
             os.system("(cd {} && tar -czvf {} .)".format(str(output_dir), str(cwd / 'modm-api-docs.tar.gz')))
             # shutil.make_archive(str(cwd / 'modm-api-docs'), 'gztar', str(output_dir))
         else:
-            final_output_dir = Path(args.output)
             if args.overwrite and final_output_dir.exists():
                 for i in final_output_dir.iterdir():
                     print('Removing {}'.format(i))
@@ -189,7 +192,10 @@ def create_target(argument):
         builder.build(output_dir, modules)
 
         print('Executing: (cd {}/modm/docs/ && doxypress doxypress.json)'.format(output_dir))
-        os.system('(cd {}/modm/docs/ && doxypress doxypress.json > /dev/null 2>&1)'.format(output_dir))
+        retval = os.system('(cd {}/modm/docs/ && doxypress doxypress.json > /dev/null 2>&1)'.format(output_dir))
+        if retval != 0:
+            print("Error {} generating documentation for device {}.".format(retval, output_dir))
+            return False
         print("Finished generating documentation for device {}.".format(output_dir))
 
         srcdir = (tempdir / output_dir / "modm/docs/html")
@@ -240,6 +246,12 @@ def template_overview(output_dir, device_list, board_list, template_path):
         num_boards=len(board_list))
     with open(str(output_dir) + "/index.html","w+") as f:
         f.write(html)
+    json_data = {
+        "devices": [str(d).upper() for d in device_list] + [rename_board(b) for (b,_) in board_list],
+        "name2board": [{rename_board(b): b} for (b,_) in board_list],
+    }
+    with open(str(output_dir) + "/develop/targets.json","w+") as outfile:
+        json.dump(json_data, outfile)
     with open(str(output_dir) + "/robots.txt","w+") as f:
         robots_txt = "User-agent: *\n"
         f.write(robots_txt)

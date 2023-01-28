@@ -17,11 +17,10 @@
 
 using namespace modm::platform;
 
-
-/// @ingroup modm_board_black_pill_f401 modm_board_black_pill_f411
-/// @{
 namespace Board
 {
+/// @ingroup modm_board_black_pill_f401 modm_board_black_pill_f411
+/// @{
 using namespace modm::literals;
 
 /// STM32F4x1 running at 84MHz generated from the external 25MHz crystal
@@ -89,17 +88,22 @@ struct SystemClock
 		return true;
 	}
 };
+/// @}
 
 namespace usb
 {
+/// @ingroup modm_board_black_pill_f401 modm_board_black_pill_f411
+/// @{
 using Id = GpioA10;
 using Dm = GpioA11;
 using Dp = GpioA12;
 
 using Device = UsbFs;
+/// @}
 }
 
-// User LED (inverted, because connected to 3V3)
+/// @ingroup modm_board_black_pill_f401 modm_board_black_pill_f411
+/// @{
 using Led = GpioInverted< GpioOutputC13 >;
 using Leds = SoftwareGpioPort< Led >;
 
@@ -116,9 +120,9 @@ initialize()
 }
 
 inline void
-initializeUsbFs()
+initializeUsbFs(uint8_t priority=3)
 {
-	usb::Device::initialize<SystemClock>();
+	usb::Device::initialize<SystemClock>(priority);
 	usb::Device::connect<usb::Dm::Dm, usb::Dp::Dp, usb::Id::Id>();
 	usb::Id::configure(Gpio::InputType::PullUp);
 
@@ -127,8 +131,8 @@ initializeUsbFs()
 	USB_OTG_FS->GCCFG &= ~USB_OTG_GCCFG_VBUSBSEN;
 	USB_OTG_FS->GCCFG &= ~USB_OTG_GCCFG_VBUSASEN;
 }
+/// @}
 
 } // Board namespace
-/// @}
 
 #endif	// MODM_STM32_F4X1CEU_MINI_F4X1_HPP

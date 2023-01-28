@@ -23,14 +23,15 @@
 
 using namespace modm::platform;
 
-/// @ingroup modm_board_nucleo_f446re
 namespace Board
 {
-	using namespace modm::literals;
+/// @ingroup modm_board_nucleo_f446re
+/// @{
+using namespace modm::literals;
 
 /// STM32F446RE running at 180MHz generated from the internal 16MHz crystal
-// Dummy clock for devices
-struct SystemClock {
+struct SystemClock
+{
 	static constexpr uint32_t Frequency = 180_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency / 4;
@@ -50,6 +51,9 @@ struct SystemClock {
 	static constexpr uint32_t Uart4  = Apb1;
 	static constexpr uint32_t Uart5  = Apb1;
 	static constexpr uint32_t Usart6 = Apb2;
+
+	static constexpr uint32_t Can1   = Apb1;
+	static constexpr uint32_t Can2   = Apb1;
 
 	static constexpr uint32_t I2c1   = Apb1;
 	static constexpr uint32_t I2c2   = Apb1;
@@ -100,17 +104,21 @@ using Button = GpioInverted<GpioInputC13>;
 using LedD13 = D13;
 
 using Leds = SoftwareGpioPort< LedD13 >;
-
+/// @}
 
 namespace stlink
 {
+/// @ingroup modm_board_nucleo_f446re
+/// @{
 using Rx = GpioInputA3;
 using Tx = GpioOutputA2;
 using Uart = Usart2;
+/// @}
 }
 
+/// @ingroup modm_board_nucleo_f446re
+/// @{
 using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
-
 
 inline void
 initialize()
@@ -122,10 +130,8 @@ initialize()
 	stlink::Uart::initialize<SystemClock, 115200_Bd>();
 
 	Button::setInput();
-	Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-	Button::enableExternalInterrupt();
-//	Button::enableExternalInterruptVector(12);
 }
+/// @}
 
 }
 

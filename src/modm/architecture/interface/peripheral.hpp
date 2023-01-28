@@ -46,6 +46,7 @@ namespace modm
 class PeripheralDriver
 {
 #ifdef __DOXYGEN__
+public:
 	/// initializes the peripheral, must be called before use.
 	static void
 	initialize();

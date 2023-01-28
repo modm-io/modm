@@ -1,0 +1,13 @@
+<library>
+  <extends>modm:nucleo-f446ze</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_f446ze/dac_dma</option>
+  </options>
+  <modules>
+    <module>modm:debug</module>
+    <module>modm:platform:dac</module>
+    <module>modm:platform:dma</module>
+    <module>modm:platform:timer:4</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

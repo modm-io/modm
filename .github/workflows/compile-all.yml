@@ -9,13 +9,18 @@ jobs:
     if: github.event.label.name == 'ci:hal'
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-avr:latest
+      image: ghcr.io/modm-ext/modm-build-avr:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Compile HAL for all AVRs
         run: |
           (cd test/all && python3 run_all.py at --quick-remaining)
@@ -26,38 +31,100 @@ jobs:
           name: avr-compile-all
           path: test/all/log
 
-  samd-compile-all:
+  sam-d0x-d1x-d2x-compile-all:
     if: github.event.label.name == 'ci:hal'
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
-      - name: Compile HAL for all SAMD
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
         run: |
-          (cd test/all && python3 run_all.py samd --quick-remaining)
+          pip3 install --upgrade --upgrade-strategy=eager modm
+      - name: Compile HAL for SAMD0x, SAMD1x, SAMD2x
+        run: |
+          (cd test/all && python3 run_all.py samd0 samd1 samd2 --quick-remaining)
       - name: Upload log artifacts
         if: always()
         uses: actions/upload-artifact@v2
         with:
-          name: samd-compile-all
+          name: sam-compile-all
+          path: test/all/log
+
+  sam-x5x-compile-all:
+    if: github.event.label.name == 'ci:hal'
+    runs-on: ubuntu-20.04
+    container:
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
+        run: |
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
+      - name: Compile HAL for SAMD5x, SAME5x, SAMG5x
+        run: |
+          (cd test/all && python3 run_all.py samd5 same5 samg5 --quick-remaining)
+      - name: Upload log artifacts
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: sam-compile-all
+          path: test/all/log
+
+  sam-x7x-compile-all:
+    if: github.event.label.name == 'ci:hal'
+    runs-on: ubuntu-20.04
+    container:
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
+        run: |
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
+      - name: Compile HAL for SAME7x, SAMS7x, SAMV7x
+        run: |
+          (cd test/all && python3 run_all.py same7 sams7 samv7 --quick-remaining)
+      - name: Upload log artifacts
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: sam-compile-all
           path: test/all/log
 
   stm32f0-compile-all:
     if: github.event.label.name == 'ci:hal'
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Compile HAL for all STM32F0
         run: |
           (cd test/all && python3 run_all.py stm32f0 --quick-remaining)
@@ -72,13 +139,18 @@ jobs:
     if: github.event.label.name == 'ci:hal'
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Compile HAL for all STM32F1
         run: |
           (cd test/all && python3 run_all.py stm32f1 --quick-remaining)
@@ -93,13 +165,18 @@ jobs:
     if: github.event.label.name == 'ci:hal'
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Compile HAL for all STM32F2
         run: |
           (cd test/all && python3 run_all.py stm32f2 --quick-remaining)
@@ -114,13 +191,18 @@ jobs:
     if: github.event.label.name == 'ci:hal'
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Compile HAL for all STM32F3
         run: |
           (cd test/all && python3 run_all.py stm32f3 --quick-remaining)
@@ -135,13 +217,18 @@ jobs:
     if: github.event.label.name == 'ci:hal'
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Compile HAL for all STM32F4 Part 1
         run: |
           (cd test/all && python3 run_all.py stm32f4 --quick-remaining --split 3 --part 0)
@@ -156,13 +243,18 @@ jobs:
     if: github.event.label.name == 'ci:hal'
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Compile HAL for all STM32F4 Part 2
         run: |
           (cd test/all && python3 run_all.py stm32f4 --quick-remaining --split 3 --part 1)
@@ -177,13 +269,18 @@ jobs:
     if: github.event.label.name == 'ci:hal'
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Compile HAL for all STM32F4 Part 3
         run: |
           (cd test/all && python3 run_all.py stm32f4 --quick-remaining --split 3 --part 2)
@@ -198,13 +295,18 @@ jobs:
     if: github.event.label.name == 'ci:hal'
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Compile HAL for all STM32F7 Part 1
         run: |
           (cd test/all && python3 run_all.py stm32f7 --quick-remaining --split 2 --part 0)
@@ -219,13 +321,18 @@ jobs:
     if: github.event.label.name == 'ci:hal'
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Compile HAL for all STM32F7 Part 2
         run: |
           (cd test/all && python3 run_all.py stm32f7 --quick-remaining --split 2 --part 1)
@@ -240,13 +347,18 @@ jobs:
     if: github.event.label.name == 'ci:hal'
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Compile HAL for all STM32L0 Part 1
         run: |
           (cd test/all && python3 run_all.py stm32l0 --quick-remaining --split 2 --part 0)
@@ -261,13 +373,18 @@ jobs:
     if: github.event.label.name == 'ci:hal'
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Compile HAL for all STM32L0 Part 2
         run: |
           (cd test/all && python3 run_all.py stm32l0 --quick-remaining --split 2 --part 1)
@@ -283,13 +400,18 @@ jobs:
     if: github.event.label.name == 'ci:hal'
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Compile HAL for all STM32L1
         run: |
           (cd test/all && python3 run_all.py stm32l1 --quick-remaining)
@@ -304,13 +426,18 @@ jobs:
     if: github.event.label.name == 'ci:hal'
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Compile HAL for all STM32L4 Part 1
         run: |
           (cd test/all && python3 run_all.py stm32l4 --quick-remaining --split 3 --part 0)
@@ -325,13 +452,18 @@ jobs:
     if: github.event.label.name == 'ci:hal'
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Compile HAL for all STM32L4 Part 2
         run: |
           (cd test/all && python3 run_all.py stm32l4 --quick-remaining --split 3 --part 1)
@@ -346,13 +478,18 @@ jobs:
     if: github.event.label.name == 'ci:hal'
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Compile HAL for all STM32L4 Part 3
         run: |
           (cd test/all && python3 run_all.py stm32l4 --quick-remaining --split 3 --part 2)
@@ -363,17 +500,48 @@ jobs:
           name: stm32l4-compile-all-3
           path: test/all/log
 
+  stm32l5-compile-all:
+    if: github.event.label.name == 'ci:hal'
+    runs-on: ubuntu-20.04
+    container:
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
+        run: |
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
+      - name: Compile HAL for all STM32L5
+        run: |
+          (cd test/all && python3 run_all.py stm32l5 --quick-remaining)
+      - name: Upload log artifacts
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: stm32l5-compile-all
+          path: test/all/log
+
   stm32g0-compile-all:
     if: github.event.label.name == 'ci:hal'
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Compile HAL for all STM32G0
         run: |
           (cd test/all && python3 run_all.py stm32g0 --quick-remaining)
@@ -388,13 +556,18 @@ jobs:
     if: github.event.label.name == 'ci:hal'
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Compile HAL for all STM32G4 Part 1
         run: |
           (cd test/all && python3 run_all.py stm32g4 --quick-remaining --split 2 --part 0)
@@ -409,13 +582,18 @@ jobs:
     if: github.event.label.name == 'ci:hal'
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Compile HAL for all STM32G4 Part 2
         run: |
           (cd test/all && python3 run_all.py stm32g4 --quick-remaining --split 2 --part 1)
@@ -430,13 +608,18 @@ jobs:
     if: github.event.label.name == 'ci:hal'
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Compile HAL for all STM32H7 Part 1
         run: |
           (cd test/all && python3 run_all.py stm32h7 --quick-remaining --split 2 --part 0)
@@ -451,13 +634,18 @@ jobs:
     if: github.event.label.name == 'ci:hal'
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Compile HAL for all STM32H7 Part 2
         run: |
           (cd test/all && python3 run_all.py stm32h7 --quick-remaining --split 2 --part 1)

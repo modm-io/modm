@@ -1,0 +1,29 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2021, Jeff McBride
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":platform:clockgen"
+    module.description = "Clock Generator (CKGR)"
+
+def prepare(module, options):
+    if not options[":target"].has_driver("pmc:sam*"):
+        return False
+
+    module.depends(":cmsis:device", ":platform:clock")
+    return True
+
+def build(env):
+    env.substitutions = {"target": env[":target"].identifier}
+    env.outbasepath = "modm/src/modm/platform/clock"
+    env.template("clockgen.hpp.in")
+    env.template("clockgen_impl.hpp.in")
+    env.template("clockgen.cpp.in")

@@ -1,0 +1,82 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2021, Raphael Lehmann
+# Copyright (c) 2021, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":etl"
+    module.description = """
+# Embedded Template Library (ETL)
+
+ETL is a MIT licensed template library which augments the STL with embedded
+friendly containers and algorithms.
+
+- https://www.etlcpp.com/
+- https://github.com/ETLCPP/etl
+
+
+## Configuration
+
+This module pre-configures ETL by adding these macros:
+
+- `ETL_TARGET_OS_FREERTOS`: if built together with the `modm:freertos` module.
+
+To add your own configuration you can [create a `<etl_profile.h>` file][config]
+which will automatically be included by ETL.
+
+
+## Debugging ETL
+
+This module reroutes ETLs assertions to `modm_assert` but only for the default
+configuration. Defining any of `ETL_NO_CHECKS`, `ETL_THROW_EXCEPTIONS` or
+`ETL_LOG_ERRORS` will use original ETL mechanism.
+
+Make sure you have implemented the `modm_abandon` handler! See the
+`modm:architecture:assert` module for details.
+
+An ETL assertion failure in release mode is fairly cryptic:
+
+```
+Assertion 'etl' failed!
+Abandoning...
+```
+
+If you run this again in debug mode, you'll note a much more detailed assertion
+description:
+
+```
+Assertion 'etl' failed!
+  modm/ext/etl/etl/ipool.h:369 -> "pool_no_allocation"
+Abandoning...
+```
+
+[config]: https://www.etlcpp.com/setup.html
+"""
+
+def prepare(module, options):
+    module.depends(":architecture:assert")
+    return True
+
+def build(env):
+    env.collect(":build:path.include", "modm/ext/etl")
+    env.outbasepath = "modm/ext/etl"
+    env.substitutions = {"with_freertos": env.has_module(":freertos")}
+
+    # Ignore the preconfigured profiles (but keep determine_ headers)
+    env.copy("etl/include/etl/", dest="etl/", ignore=env.ignore_paths(
+             "*/etl/include/etl/profiles/[a-ce-z]*", "*/doxygen.h",
+             "*/error_handler.h", "*/platform.h"))
+    # Rename the original header files
+    env.copy("etl/include/etl/error_handler.h", dest="etl/error_handler_internal.h")
+    env.copy("etl/include/etl/platform.h", dest="etl/platform_internal.h")
+    # So that we can replace them with ours but not need to reproduce them
+    env.copy("error_handler.h", dest="etl/error_handler.h")
+    env.template("platform.h.in", dest="etl/platform.h")

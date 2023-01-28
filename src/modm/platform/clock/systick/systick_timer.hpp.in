@@ -20,31 +20,18 @@
 namespace modm::platform
 {
 
-typedef void (*InterruptHandler)(void);
-
-/**
- * @brief		SysTick Timer
- * @ingroup		modm_platform_clock_cortex
- */
+/// @ingroup modm_platform_clock
 class SysTickTimer
 {
 public:
 	/**
-	 * Initializes the SysTick Timer to generate periodic events.
-	 *
-	 *
-	 * @warning	The SysTick Timer is used by default to increment
-	 * 			modm::Clock, which is used by modm::Timeout and other
-	 * 			similar processing classes.
-	 * 			You must not increment the modm::Clock
-	 * 			additionally somewhere else.
+	 * Initializes the SysTick to provide a timer to `modm::Clock` and
+	 * `modm::PreciseClock`.
 	 *
 	 * @tparam	SystemClock
 	 * 		the currently active system clock
-	 * @tparam	rate
-	 * 		the desired update rate of the modm::Clock
 	 * @tparam	tolerance
-	 * 		the allowed absolute tolerance for the resulting clock rate
+	 * 		the allowed tolerance for the resulting clock rate
 	 */
 	template< class SystemClock, percent_t tolerance=pct(0) >
 	static void
@@ -85,10 +72,8 @@ public:
 	/**
 	 * Disables SysTick Timer.
 	 *
-	 * @warning	If the SysTick Timer is disabled modm::Clock is not
-	 * 			incremented automatically. Workflow classes which
-	 * 			rely on modm::Clock will not work if modm::Clock
-	 * 			is not incremented.
+	 * @warning	If the SysTick Timer is disabled, `modm::Clock` and
+	 *			`modm::PreciseClock` will stop incrementing.
 	 */
 	static void
 	disable();
@@ -120,11 +105,6 @@ private:
 	friend class modm::chrono::micro_clock;
 };
 
-}
-
-namespace modm::cortex {
-	using SysTickTimer [[deprecated("Use `modm::platform:SysTickTimer` instead!")]] =
-		::modm::platform::SysTickTimer;
 }
 
 #endif	//  MODM_STM32_CORTEX_TIMER_HPP

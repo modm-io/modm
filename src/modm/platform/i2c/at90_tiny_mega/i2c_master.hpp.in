@@ -18,6 +18,7 @@
 #include "i2c.hpp"
 #include <modm/architecture/interface/i2c_master.hpp>
 #include <modm/platform/gpio/connector.hpp>
+#include <modm/platform/gpio/open_drain.hpp>
 #include <algorithm>
 #include <cmath>
 
@@ -38,9 +39,9 @@ namespace platform
 class I2cMaster : public ::modm::I2cMaster, I2c
 {
 public:
-	template< template<Peripheral _> class... Signals, ResetDevices reset = ResetDevices::Standard>
+	template<class... Signals>
 	static void
-	connect(PullUps pullups = PullUps::External)
+	connect(PullUps pullups = PullUps::External, ResetDevices reset = ResetDevices::Standard)
 	{
 		using Connector = GpioConnector<Peripheral::Twi, Signals...>;
 		using Scl = typename Connector::template GetSignal<Gpio::Signal::Scl>;
@@ -58,12 +59,12 @@ public:
 		SDA::configure(input);
 		SCL::setOutput();
 		SDA::setOutput();
-		if (reset != ResetDevices::NoReset) resetDevices<SCL, uint32_t(reset)>();
+		if (reset != ResetDevices::NoReset) resetDevices<SCL>(uint32_t(reset));
 		Connector::connect();
 	}
 
 	template< class SystemClock, baudrate_t baudrate=kHz(100), percent_t tolerance=pct(5) >
-	static modm_always_inline void
+	static void
 	initialize()
 	{
 		// Prescalers: 1, 4, 16, 64

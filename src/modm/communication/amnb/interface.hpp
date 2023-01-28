@@ -18,8 +18,11 @@
 
 namespace modm::amnb
 {
+/// @ingroup modm_communication_amnb
+/// @{
 
-enum class InterfaceStatus : uint8_t
+enum class
+InterfaceStatus : uint8_t
 {
 	Ok = 0,
 
@@ -38,7 +41,6 @@ enum class InterfaceStatus : uint8_t
 	DataWriteFailed,
 };
 
-/// @ingroup modm_communication_amnb
 class Device
 {
 public:
@@ -52,7 +54,6 @@ public:
 	read(uint8_t *data) = 0;
 };
 
-/// @ingroup modm_communication_amnb
 template< class Uart, uint16_t TimeoutUsTx = 1000, uint16_t TimeoutUsRx = 10'000 >
 class DeviceWrapper : public Device, modm::Resumable<2>
 {
@@ -101,7 +102,6 @@ protected:
 	uint8_t rx_data;
 };
 
-/// @ingroup modm_communication_amnb
 template< size_t MaxHeapAllocation = 0 >
 class Interface : modm::Resumable<6>
 {
@@ -261,6 +261,7 @@ protected:
 	static constexpr uint8_t STX{0x7E};
 	static constexpr uint8_t DLE{0x7D};
 };
+/// @}
 
 }	// namespace modm::amnb
 
@@ -270,6 +271,7 @@ protected:
 namespace modm
 {
 
+/// @ingroup modm_communication_amnb
 inline modm::IOStream&
 operator << (modm::IOStream& s, const modm::amnb::InterfaceStatus status)
 {

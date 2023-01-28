@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2010-2011, Fabian Greif
  * Copyright (c) 2012-2014, Niklas Hauser
+ * Copyright (c) 2022, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -18,14 +19,35 @@
 namespace modm
 {
 	/**
-	 * \todo	Implement the configure() method to set the resolution
-	 * 			and the temperature alarm functionality
+	 * \brief Measurement resolution setting
+	 *
+	 * The maximum conversion time doubles for every additional bit:
+	 * 9 bits:	93.75 ms
+	 * 10 bits:	187.5 ms
+	 * 11 bits:	375 ms
+	 * 12 bits:	750 ms
+	 *
+	 * \ingroup	modm_driver_ds18b20
+	 */
+	struct ds18b20
+	{
+		enum class Resolution : uint8_t
+		{
+			Bits9  = 0b0'00'11111,
+			Bits10 = 0b0'01'11111,
+			Bits11 = 0b0'10'11111,
+			Bits12 = 0b0'11'11111
+		};
+	};
+
+	/**
+	 * \todo	Implement temperature alarm functionality
 	 *
 	 * \author	Fabian Greif
 	 * \ingroup	modm_driver_ds18b20
 	 */
 	template <typename OneWire>
-	class Ds18b20
+	class Ds18b20 : public ds18b20
 	{
 	public:
 		/**
@@ -37,9 +59,17 @@ namespace modm
 		 */
 		Ds18b20(const uint8_t *rom);
 
-		// TODO
-		//void
-		//configure();
+		/**
+		 * \brief	Configure measurement resolution
+		 *
+		 * Set the measurement resolution. Every additional bit doubles the
+		 * measurement time.
+		 *
+		 * \return	\c true if a device is found, \c false if no
+		 * 			device is available on the bus.
+		 */
+		bool
+		configure(Resolution resolution);
 
 		/**
 		 * \brief	Check if the device is present

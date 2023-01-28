@@ -13,7 +13,7 @@
 def continuous_ram_sizes(target):
     memories = listify(target.get_driver("core")["memory"])
     rams = ((int(m["start"], 16), int(m["start"], 16) + int(m["size"]))
-            for m in memories if "rw" in m["access"] and "backup" not in m["name"])
+            for m in memories if "rw" in m["access"] and "ram" in m["name"])
     rams = sorted(rams, key=lambda m: m[0])
 
     pools = [rams[0]]
@@ -38,7 +38,7 @@ def prepare(module, options):
 
     ram_sizes = continuous_ram_sizes(options[":target"])
     default_allocator = "newlib"
-    if len(ram_sizes):
+    if len(ram_sizes) > 1:
         default_allocator = "tlsf"
     elif ram_sizes[0] <= 4096:
         default_allocator = "block"

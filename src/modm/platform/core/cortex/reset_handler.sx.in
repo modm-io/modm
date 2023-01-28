@@ -1,0 +1,32 @@
+/*
+ * Copyright (c) 2019, 2021, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+.globl	Reset_Handler
+	.text
+	.syntax	unified
+	.align	4
+	.type	Reset_Handler, %function
+	.func   Reset_Handler
+Reset_Handler:
+	// Some bootloaders do not reset the stack pointer back to the VTOR entry
+	ldr r0,=__main_stack_top
+	mov sp,r0
+%% if with_fpu
+	// Enable FPU early so the compiler may use FPU registers for copying
+	// SCB->CPACR = ((3UL << 10*2) | (3UL << 11*2));
+	ldr r0,=0xe000ed88
+	ldr r1,=0x00f00000
+	str r1, [r0, #0]
+%% endif
+	bl __modm_initialize_platform
+	bl modm_initialize_platform
+	b __modm_startup
+	.endfunc

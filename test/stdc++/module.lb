@@ -13,6 +13,7 @@
 
 def init(module):
     module.name = ":test:stdc++"
+    module.description = "Tests for libstdc++"
 
 
 def prepare(module, options):

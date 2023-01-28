@@ -49,7 +49,7 @@ protected:
 	write16(uint8_t reg, uint16_t value);
 
 	/// read a 8bit value
-	modm::ResumableResult<bool> modm_always_inline
+	modm::ResumableResult<bool>
 	read(uint8_t reg, uint8_t &value)
 	{
 		return read(reg, &value, 1);
@@ -98,7 +98,7 @@ protected:
 	write16(uint8_t reg, uint16_t value);
 
 	/// read a 8bit value
-	modm::ResumableResult<bool> modm_always_inline
+	modm::ResumableResult<bool>
 	read(uint8_t reg, uint8_t &value)
 	{
 		return read(reg, &value, 1);

@@ -1,0 +1,80 @@
+/*
+ * Copyright (c) 2016-2018, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include "base.hpp"
+
+/// @cond
+namespace modm::platform::detail
+{
+
+template< Gpio::Port port >
+struct GpioPortInfo;
+template< class StartGpio, int8_t Width >
+struct GpioSetShim
+{
+	static typename GpioPortInfo<StartGpio::port>::template check<StartGpio::pin, Width> check;
+};
+
+// ------ Port Width Information ------
+%% for port in ranges
+template<>
+struct GpioPortInfo<Gpio::Port::{{port.name}}>
+{
+	static constexpr int8_t Width = {{port.width}};
+	static constexpr int8_t StartPin = {{port.start}};
+	static constexpr int8_t EndPin = StartPin + Width;
+
+	template< uint8_t QueryStartPin, int8_t QueryWidth >
+	struct check
+	{
+		static constexpr bool isNormal = QueryWidth > 0;
+		static constexpr bool isReversed = QueryWidth < 0;
+		static constexpr int8_t width = isNormal ? QueryWidth : -QueryWidth;
+		static_assert(isReversed or width <= Width,
+			"GpioPort Width out of bounds! Maximum is {{port.width}}.");
+
+		static_assert(isReversed or (QueryStartPin + QueryWidth <= EndPin),
+			"GpioPort StartPin + Width out of bounds! Maximum is {{port.start + port.width - 1}}.");
+		static_assert(isNormal or (StartPin <= QueryStartPin + QueryWidth + 1),
+			"GpioPort StartPin - Width out of bounds! Minimum is {{port.start}}.");
+	};
+};
+%% endfor
+
+// ------ Translator classes from Gpio + Width -> GpioSet ------
+template< class StartGpio, int8_t offset >
+struct GpioShim
+{
+	static constexpr typename StartGpio::Port port = StartGpio::port;
+	static constexpr uint16_t mask = (1ul << (StartGpio::pin + offset));
+	static constexpr bool isInverted = StartGpio::isInverted;
+};
+%% for width in range(-port_width, 0)
+template< class StartGpio >
+struct GpioSetShim<StartGpio, {{width}}> : public GpioSet<
+	%% for offset in (range(width + 1, 1) | reverse)
+		GpioShim<StartGpio, {{offset}}>{% if not loop.last %},{% endif %}
+	%% endfor
+		> { static typename GpioPortInfo<StartGpio::port>::template check<StartGpio::pin, {{width}}> check; };
+%% endfor
+%% for width in range(0, port_width+1)
+template< class StartGpio >
+struct GpioSetShim<StartGpio, {{width}}> : public GpioSet<
+	%% for offset in (range(width) | reverse)
+		GpioShim<StartGpio, {{offset}}>{% if not loop.last %},{% endif %}
+	%% endfor
+		> { static typename GpioPortInfo<StartGpio::port>::template check<StartGpio::pin, {{width}}> check; };
+%% endfor
+
+} // namespace modm::platform::detail
+/// @endcond

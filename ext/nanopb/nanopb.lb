@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2021, Lucas Moesch
+# Copyright (c) 2022, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+import os
+import subprocess
+import tempfile
+
+from pathlib import Path
+
+def init(module):
+    module.name = ":nanopb"
+    module.description = """
+# Nanopb - Protocol Buffers for Embedded Systems
+
+Nanopb is a small code-size Protocol Buffers (protobuf) implementation in ansi
+C. It is especially suitable for use in microcontrollers, but fits any memory
+restricted system.
+
+See https://github.com/nanopb/nanopb.
+
+
+## Build System Integration
+
+You can optionally point the build system to multiple protofiles using a
+comma-separated list of paths in the `modm:nanopb:source` option.
+You can specify the output location using the `modm:nanopb:path` option.
+See the `modm:build` submodules for further details.
+
+!!! bug "Currently only with SCons support"
+    Only the `modm:build:scons` module currently supports this feature.
+"""
+
+def prepare(module, options):
+    module.add_set_option(
+        PathOption(name="sources", absolute=True, empty_ok=True,
+                   description="Comma-separated list of paths to protofiles."),
+        default="")
+    module.add_option(
+        PathOption(name="path", default="generated/nanopb", absolute=True,
+                   description="Path to the generated messages folder"))
+    return True
+
+def build(env):
+    env.collect(":build:path.include", "modm/ext/nanopb")
+    env.outbasepath = "modm/ext/nanopb"
+
+    env.copy("nanopb/pb_common.c", dest="pb_common.c")
+    env.copy("nanopb/pb_common.h", dest="pb_common.h")
+    env.copy("nanopb/pb_decode.c", dest="pb_decode.c")
+    env.copy("nanopb/pb_decode.h", dest="pb_decode.h")
+    env.copy("nanopb/pb_encode.c", dest="pb_encode.c")
+    env.copy("nanopb/pb_encode.h", dest="pb_encode.h")
+    env.copy("nanopb/pb.h", dest="pb.h")

@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:nucleo-f042k6</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_f042k6/vector_table_ram</option>
+    <option name="modm:platform:core:vector_table_location">ram</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:timer:14</module>
+  </modules>
+</library>

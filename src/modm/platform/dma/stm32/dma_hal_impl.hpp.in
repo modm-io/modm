@@ -23,7 +23,7 @@ modm::platform::DmaChannelHal<ChannelID, CHANNEL_BASE>::start()
 {
 	DMA_Channel_TypeDef *Base = (DMA_Channel_TypeDef *) CHANNEL_BASE;
 
-%% if target["family"] == "f4"
+%% if dmaType in ["stm32-stream-channel", "stm32-mux-stream"]
 	Base->CR |= DMA_SxCR_EN;
 %% elif dmaType in ["stm32-channel-request", "stm32-channel", "stm32-mux"]
 	Base->CCR |= DMA_CCR_EN;
@@ -36,9 +36,9 @@ modm::platform::DmaChannelHal<ChannelID, CHANNEL_BASE>::stop()
 {
 	DMA_Channel_TypeDef *Base = (DMA_Channel_TypeDef *) CHANNEL_BASE;
 
-%% if target["family"] == "f4"
+%% if dmaType in ["stm32-stream-channel", "stm32-mux-stream"]
 	Base->CR &= ~DMA_SxCR_EN;
-	while (Base->SCR & DMA_SxCR_EN); // wait for stream to be stopped
+	while (Base->CR & DMA_SxCR_EN); // wait for stream to be stopped
 %% elif dmaType in ["stm32-channel-request", "stm32-channel", "stm32-mux"]
 	Base->CCR &= ~DMA_CCR_EN;
 	while (Base->CCR & DMA_CCR_EN); // wait for stream to be stopped
@@ -52,7 +52,7 @@ modm::platform::DmaChannelHal<ChannelID, CHANNEL_BASE>::getDataTransferDirection
 	DMA_Channel_TypeDef *Base = (DMA_Channel_TypeDef *) CHANNEL_BASE;
 
 	return static_cast<DataTransferDirection>(
-%% if target["family"] == "f4"
+%% if dmaType in ["stm32-stream-channel", "stm32-mux-stream"]
 		Base->CR & (DMA_SxCR_DIR_0 | DMA_SxCR_DIR_1));
 %% elif dmaType in ["stm32-channel-request", "stm32-channel", "stm32-mux"]
 		Base->CCR & (DMA_CCR_MEM2MEM | DMA_CCR_DIR));

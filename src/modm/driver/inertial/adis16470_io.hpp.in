@@ -1,0 +1,38 @@
+// coding: utf-8
+/*
+ * Copyright (c) 2022, Raphael Lehmann
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_ADIS16470_IO_HPP
+#define MODM_ADIS16470_IO_HPP
+
+#include "adis16470.hpp"
+
+%% if has_io
+
+#include <modm/io/iostream.hpp>
+
+namespace modm
+{
+
+// Output operators
+/// @ingroup modm_driver_adis16470
+IOStream&
+operator << (IOStream& os, const adis16470::DiagStat_t& c);
+
+/// @ingroup modm_driver_adis16470
+IOStream&
+operator << (IOStream& os, const adis16470::MscCtrl_t& c);
+
+}
+
+%% endif
+
+#endif // MODM_ADIS16470_IO_HPP

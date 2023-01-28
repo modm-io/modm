@@ -116,7 +116,7 @@ public:
 	///
 	Ds1631(Data &data, uint8_t address=0x90);
 
-	void modm_always_inline
+	void
 	update()
 	{ run(); }
 
@@ -137,12 +137,12 @@ public:
 	setConversionMode(ConversionMode mode);
 
 	/// Writes the upper limit of the alarm.
-	modm::ResumableResult<bool> modm_always_inline
+	modm::ResumableResult<bool>
 	setUpperLimit(float temperature)
 	{ return setLimitRegister(Command::TemperatureUpperLimit, temperature); }
 
 	/// Writes the lower limit of the alarm.
-	modm::ResumableResult<bool> modm_always_inline
+	modm::ResumableResult<bool>
 	setLowerLimit(float temperature)
 	{ return setLimitRegister(Command::TemperatureLowerLimit, temperature); }
 
@@ -152,15 +152,15 @@ public:
 	readTemperature();
 
 
-	modm::ResumableResult<bool> modm_always_inline
+	modm::ResumableResult<bool>
 	startConversion()
 	{ return writeCommand(Command::StartConvert); }
 
-	modm::ResumableResult<bool> modm_always_inline
+	modm::ResumableResult<bool>
 	stopConversion()
 	{ return writeCommand(Command::StopConvert); }
 
-	modm::ResumableResult<bool> modm_always_inline
+	modm::ResumableResult<bool>
 	reset()
 	{ return writeCommand(Command::SoftwareReset); }
 

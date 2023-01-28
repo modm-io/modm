@@ -72,7 +72,7 @@ void* __wrap__calloc_r(struct _reent *r, size_t size)
 	return ptr;
 }
 
-void* __wrap__realloc_r(struct _reent *r, void *, size_t size)
+void* __wrap__realloc_r(struct _reent *r, void *p, size_t size)
 {
 	if (!p) return __wrap__malloc_r(r, size);
 	// NOT IMPLEMENTED!

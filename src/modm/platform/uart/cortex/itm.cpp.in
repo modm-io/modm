@@ -61,7 +61,11 @@ Itm::enable(uint8_t prescaler)
 	ITM->TPR  = 0;
 
 	// Trace Control Register
+%% if target.platform == "stm32" and target.family == "l5"
+	ITM->TCR  = (1 << ITM_TCR_TRACEBUSID_Pos) |
+%% else
 	ITM->TCR  = (1 << ITM_TCR_TraceBusID_Pos) |
+%% endif
 				(1 << ITM_TCR_DWTENA_Pos)     |
 				(1 << ITM_TCR_ITMENA_Pos);
 
@@ -93,7 +97,7 @@ Itm::write(uint8_t data)
 	update();
 	return txBuffer.push(data);
 %% else
-	return write_itm(data);
+	return write_itm(data << 24);
 %% endif
 }
 
@@ -130,6 +134,12 @@ Itm::discardTransmitBuffer()
 %% endif
 }
 
+%% if target.platform == "sam"
+// Some SAM headers define a PORT macro
+#pragma push_macro("PORT")
+#undef PORT
+%% endif
+
 bool
 Itm::write_itm(uint32_t data, uint8_t size)
 {
@@ -158,6 +168,10 @@ Itm::write_itm(uint32_t data, uint8_t size)
 	// if ITM is disabled, just discard any writes
 	return true;
 }
+
+%% if target.platform == "sam"
+#pragma pop_macro("PORT")
+%% endif
 
 void
 Itm::update()

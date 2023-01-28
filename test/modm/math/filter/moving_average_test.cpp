@@ -108,6 +108,20 @@ MovingAverageTest::testAverage()
 }
 
 void
+MovingAverageTest::testReset()
+{
+	modm::filter::MovingAverage<TestData::Type, 4> filter;
+
+	for (uint_fast8_t i = 0; i < 4; ++i)
+	{
+		filter.update(data[i].input);
+	}
+
+	filter.reset(42);
+	TEST_ASSERT_EQUALS(filter.getValue(), 42);
+}
+
+void
 MovingAverageTest::testFloatAverage()
 {
 	modm::filter::MovingAverage<TestDataFloat::Type, 4> filter;
@@ -116,4 +130,18 @@ MovingAverageTest::testFloatAverage()
 		filter.update(dataF[i].input);
 		TEST_ASSERT_EQUALS_DELTA(filter.getValue(), dataF[i].output, double(1e-4));
 	}
+}
+
+void
+MovingAverageTest::testFloatReset()
+{
+	modm::filter::MovingAverage<TestDataFloat::Type, 4> filter;
+
+	for (uint_fast8_t i = 0; i < 4; ++i)
+	{
+		filter.update(dataF[i].input);
+	}
+
+	filter.reset(42.23);
+	TEST_ASSERT_EQUALS_FLOAT(filter.getValue(), 42.23);
 }

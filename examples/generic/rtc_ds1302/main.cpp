@@ -12,6 +12,9 @@
 #include <modm/board.hpp>
 #include <modm/processing/timer.hpp>
 #include <modm/driver/rtc/ds1302.hpp>
+#include <chrono>
+
+using namespace std::chrono_literals;
 
 struct ds1302_config : public modm::ds1302::Config
 {
@@ -77,9 +80,9 @@ main()
 	// Side effect: set seconds to 0
 	ds1302::enableOscillator();
 
-	uint16_t tt = 9995; // Milliseconds
+	auto tt = 9995ms;
 	modm::Timeout timeout;
-	timeout.restart(std::chrono::milliseconds(tt));
+	timeout.restart(tt);
 
 	// Periodically report progress
 	modm::PeriodicTimer blinkTimer(250ms);
@@ -102,9 +105,9 @@ main()
 			ds1302::readRtc(rtc_data);
 			uint8_t seconds = rtc_data.getSeconds();
 
-			MODM_LOG_DEBUG.printf("\b* %2d.%03d seconds from CPU are %2d seconds from RTC.\n",
-				tt / 1000,
-				tt % 1000,
+			MODM_LOG_DEBUG.printf("\b* %2lld.%03lld seconds from CPU are %2d seconds from RTC.\n",
+				tt.count() / 1000,
+				tt.count() % 1000,
 				seconds);
 
 			// Reset seconds to 0
@@ -112,9 +115,9 @@ main()
 
 			// Adjust timeout time by some milliseconds to match RTC time.
 			if (seconds >= 10) {
-				tt -= 20;
+				tt -= 20ms;
 			} else {
-				tt += 1;
+				tt += 1ms;
 			}
 
 			timeout.restart(tt);

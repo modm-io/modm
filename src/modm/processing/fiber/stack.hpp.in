@@ -1,0 +1,67 @@
+/*
+ * Copyright (c) 2020, Erik Henriksson
+ * Copyright (c) 2021, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+#include <modm/architecture/utils.hpp>
+
+namespace modm
+{
+
+class Fiber;
+
+namespace fiber
+{
+
+class Scheduler;
+/**
+ * Stack captures a memory area used as fiber stack.
+ *
+ * @author	Erik Henriksson
+ * @ingroup	modm_processing_fiber
+ */
+template<size_t Size>
+class Stack
+{
+%% if core.startswith("avr")
+	%% set alignment = 1
+	static_assert(Size >= 15*sizeof(void*), "Stack size must be ≥30B!");
+
+%% elif core.startswith("cortex-m")
+	%% set alignment = 8
+	static_assert(Size % 4 == 0, "Stack size must be multiple of 4.");
+%% if with_fpu
+	static_assert(Size >= 28*sizeof(void*), "Stack size must be ≥112B!");
+%% else
+	static_assert(Size >= 12*sizeof(void*), "Stack size must be ≥48B!");
+%% endif
+
+%% elif "x86_64" in core
+	%% set alignment = 16
+	static_assert(Size % 8 == 0, "Stack size must be multiple of 8.");
+	static_assert(Size >= 33*sizeof(void*), "Stack size must be ≥264B!");
+%% endif
+%#
+	friend class ::modm::Fiber;
+	friend class Scheduler;
+
+public:
+	constexpr Stack() = default;
+	Stack(const Stack&) = delete;
+
+private:
+	static constexpr size_t size = Size;
+	modm_aligned({{alignment}}) uintptr_t memory[size / sizeof(uintptr_t)];
+};
+
+} // namespace fiber
+
+}	// namespace modm

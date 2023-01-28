@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2021, Raphael Lehmann
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:ads816x"
+    module.description = """\
+# ADS816x ADC
+
+The ADS8166/ADS8167/ADS8168 are, 16 bit analog-digital converters with, sample
+rates of 1 MSPS (ADS8168), 500 kSPS (ADS8167), and 250 kSPS (ADS8166).
+The conversion time is determined by the chip select signal.
+A maximum Spi clock of 70 MHz is supported.
+
+This driver only implements the _manual mode_ ~~and _auto sequence mode_~~
+using the SPI interface.
+Only the default multiplexer configuration with 8 single-ended inputs and no
+pseudo-differential inputs is supported by now.
+"""
+
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:gpio",
+        ":architecture:spi.device",
+        ":io",
+        ":processing:resumable",
+        ":processing:timer")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/adc"
+    env.copy("ads816x.hpp")
+    env.copy("ads816x_impl.hpp")

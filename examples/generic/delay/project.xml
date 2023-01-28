@@ -17,6 +17,7 @@
   <!-- <extends>modm:nucleo-l432kc</extends> -->
   <!-- <extends>modm:nucleo-l476rg</extends> -->
   <!-- <extends>modm:samd21-mini</extends> -->
+  <!-- <extends>modm:rp-pico</extends> -->
   <options>
     <option name="modm:build:build.path">../../../build/generic/delay</option>
     <option name="modm:io:with_printf">true</option>

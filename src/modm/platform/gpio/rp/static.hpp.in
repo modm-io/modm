@@ -1,0 +1,79 @@
+/*
+ * Copyright (c) 2022, Andrey Kunitsyn
+ * Copyright (c) 2022, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <type_traits>
+
+#include "../device.hpp"
+#include "set.hpp"
+#include <modm/architecture/interface/gpio.hpp>
+
+namespace modm::platform
+{
+
+/// @ingroup modm_platform_gpio
+template<class GpioData>
+class GpioStatic : public Gpio, public GpioData
+{
+	template<class... Gpios> friend class GpioSet;
+	using PinSet = GpioSet<GpioStatic<GpioData>>;
+	using Regs = PortRegs<GpioData::port>;
+	static constexpr uint8_t SioFunc = 5;
+
+public:
+	using Direction = ::modm::Gpio::Direction;
+	using Type = GpioStatic<GpioData>;
+	using Output = Type;
+	using Input = Type;
+	using IO = Type;
+	using Data = GpioData;
+	using GpioData::port;
+	using GpioData::pin;
+	static constexpr Direction direction = Direction::InOut;
+	static constexpr bool isInverted = false;
+	static constexpr uint32_t mask = 1lu << pin;
+
+	static void setFunction(uint8_t func) { Regs::set_funcsel(pin, func); }
+	static void setDriveStrength(DriveStrength strength)
+	{ Regs::set_drive(pin, strength); }
+
+public:
+	static void setOutput() { PinSet::setOutput(); }
+	static void setOutput(bool value) { PinSet::setOutput(value); }
+	static void setOutput(OutputType type, OutputSpeed speed=OutputSpeed::Slow)
+	{ PinSet::setOutput(type, speed); }
+	static void configure(OutputType type, OutputSpeed speed=OutputSpeed::Slow)
+	{ PinSet::configure(type, speed); }
+
+	static void set() { PinSet::set(); }
+	static void set(bool status) { PinSet::set(status); }
+	static void reset() { PinSet::reset(); }
+	static bool isSet() { return Regs::sio_out() & mask; }
+	static void toggle() { PinSet::toggle(); }
+
+	static void setInput() { PinSet::setInput(); }
+	static void setInput(InputType type) { PinSet::setInput(type); }
+	static void configure(InputType type) { PinSet::configure(type); }
+	static void setSlewRate(SlewRate rate) { PinSet::setSlewRate(rate); }
+
+	static bool read() { return Regs::sio_in() & mask; }
+
+	static Direction getDirection()
+	{
+		if (Regs::funcsel(pin) != SioFunc) return Direction::Special;
+		return (Regs::sio_oe() & mask) ? Direction::Out : Direction::In;
+	}
+	static void disconnect() { setFunction(SioFunc); }
+};
+
+}  // namespace modm::platform

@@ -17,7 +17,7 @@
 #include "../device.hpp"
 #include <modm/platform/gpio/connector.hpp>
 #include <modm/platform/clock/rcc.hpp>
-#include <modm/src/modm/math/units.hpp>
+#include <modm/math/units.hpp>
 
 namespace modm::platform
 {
@@ -58,7 +58,7 @@ public:
 	};
 %% endif
 
-	template< template<Peripheral _> class... Signals >
+	template< class... Signals >
 	static void
 	connect()
 	{

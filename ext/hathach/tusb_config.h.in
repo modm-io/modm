@@ -35,4 +35,4 @@
 	TU_VERIFY_DEFINE(_cond, modm_assert_continue_fail(0, "tu", \
 		__FILE__ ":" MODM_STRINGIFY(__LINE__) " -> \"" #_cond "\""), _ret)
 
-#define TU_ASSERT(...) GET_3RD_ARG(__VA_ARGS__, MODM_ASSERT_2ARGS, MODM_ASSERT_1ARGS,UNUSED)(__VA_ARGS__)
+#define TU_ASSERT(...) _GET_3RD_ARG(__VA_ARGS__, MODM_ASSERT_2ARGS, MODM_ASSERT_1ARGS,UNUSED)(__VA_ARGS__)

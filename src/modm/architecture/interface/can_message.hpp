@@ -131,6 +131,7 @@ public:
 namespace modm
 {
 
+/// @ingroup modm_architecture_can
 inline modm::IOStream&
 operator << (modm::IOStream& s, const modm::can::Message& m)
 {

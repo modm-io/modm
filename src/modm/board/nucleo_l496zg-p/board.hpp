@@ -22,16 +22,15 @@
 
 using namespace modm::platform;
 
-/// @ingroup modm_board_nucleo_l496zg_p
 namespace Board
 {
-	using namespace modm::literals;
+/// @ingroup modm_board_nucleo_l496zg_p
+/// @{
+using namespace modm::literals;
 
-/// STM32L4 running at 80MHz generated from the
-/// internal Multispeed oscillator
-
-// Dummy clock for devices
-struct SystemClock {
+/// STM32L4 running at 80MHz generated from the internal Multispeed oscillator
+struct SystemClock
+{
 	static constexpr uint32_t Frequency = 80_MHz;
 	static constexpr uint32_t Ahb  = Frequency;
 	static constexpr uint32_t Apb1 = Frequency;
@@ -102,14 +101,9 @@ struct SystemClock {
 		// update clock frequencies
 		Rcc::updateCoreFrequency<Frequency>();
 
-		// Enable Hsi48 clock
-		uint32_t waitCycles = 2048;
-		RCC->CRRCR |= RCC_CRRCR_HSI48ON;
-		while (not (RCC->CRRCR & RCC_CRRCR_HSI48RDY) and --waitCycles)
-			;
-
+		Rcc::enableInternalClockMHz48();
 		// Select Hsi48 as source for CLK48 MUX (USB, SDMMC, RNG)
-		RCC->CCIPR = (RCC->CCIPR & ~RCC_CCIPR_CLK48SEL_Msk) | (0b00 << RCC_CCIPR_CLK48SEL_Pos);
+		Rcc::setClock48Source(Rcc::Clock48Source::Hsi48);
 
 		return true;
 	}
@@ -124,9 +118,12 @@ using LedGreen = GpioOutputC7;	// LED1 [Green]
 using LedBlue = GpioOutputB7;	// LED2 [Blue]
 using LedRed = GpioOutputB14;	// LED3 [Red]
 using Leds = SoftwareGpioPort< LedRed, LedBlue, LedGreen >;
+/// @}
 
 namespace usb
 {
+/// @ingroup modm_board_nucleo_l496zg_p
+/// @{
 using Vbus = GpioA9;
 using Id = GpioA10;
 using Dm = GpioA11;
@@ -136,17 +133,22 @@ using Overcurrent = GpioInputG5;	// OTG_FS_OverCurrent
 using Power = GpioOutputG6;			// OTG_FS_PowerSwitchOn
 
 using Device = UsbFs;
+/// @}
 }
 
 namespace stlink
 {
+/// @ingroup modm_board_nucleo_l496zg_p
+/// @{
 using Rx = GpioOutputG8;
 using Tx = GpioInputG7;
 using Uart = Lpuart1;
+/// @}
 }
 
+/// @ingroup modm_board_nucleo_l496zg_p
+/// @{
 using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
-
 
 inline void
 initialize()
@@ -162,20 +164,18 @@ initialize()
 	LedRed::setOutput(modm::Gpio::Low);
 
 	Button::setInput();
-//	Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-//	Button::enableExternalInterrupt();
-//	Button::enableExternalInterruptVector(12);
 }
 
 inline void
-initializeUsbFs()
+initializeUsbFs(uint8_t priority=3)
 {
-	usb::Device::initialize<SystemClock>();
+	usb::Device::initialize<SystemClock>(priority);
 	usb::Device::connect<usb::Dm::Dm, usb::Dp::Dp, usb::Id::Id>();
 
 	usb::Overcurrent::setInput();
 	usb::Vbus::setInput();
 }
+/// @}
 
 } // Board namespace
 

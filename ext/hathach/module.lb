@@ -20,9 +20,12 @@ def init(module):
     module.description = FileReader("module.md")
 
 def prepare(module, options):
-    if not (options[":target"].has_driver("usb") or
-            options[":target"].has_driver("usb_otg_fs") or
-            options[":target"].has_driver("usb_otg_hs")):
+    device = options[":target"]
+    if not (device.has_driver("usb") or
+            device.has_driver("usb_otg_fs") or
+            device.has_driver("usb_otg_hs") or
+            device.has_driver("udp") or
+            device.has_driver("uhp")):
         return False
 
     configs = {"device.cdc", "device.msc", "device.vendor", "device.midi", "device.dfu"}
@@ -40,17 +43,20 @@ def prepare(module, options):
                               dependencies=lambda vs:
                                     [":tinyusb:{}".format(v.replace(".", ":")) for v in vs]))
 
-    if options[":target"].has_driver("usb_otg_hs"):
+    # Most devices only have FS=usb, some STM32 have FS/HS=usb_otg_fs/usb_otg_hs
+    # and some STM32 only have HS=usb_otg_hs, so we only define this option if
+    # there is a choice and default this to FS by default.
+    if device.has_driver("usb_otg_hs") and device.has_driver("usb_otg_fs"):
         module.add_option(
                 EnumerationOption(name="speed",
                                   description="USB Port Speed",
                                   enumeration={"full": "fs", "high": "hs"},
-                                  default="high" if options[":target"].has_driver("usb_otg_hs") else "full",
+                                  default="full",
                                   dependencies=lambda s: ":platform:usb:{}s".format(s[0])))
 
     module.add_submodule(TinyUsbDeviceModule())
     module.add_submodule(TinyUsbHostModule())
-    module.depends(":cmsis:device", ":architecture:interrupt", ":platform:usb")
+    module.depends(":cmsis:device", ":architecture:atomic", ":architecture:interrupt", ":platform:usb")
     return True
 
 
@@ -86,7 +92,7 @@ def build(env):
     if target.platform == "stm32":
         tusb_config["CFG_TUSB_MCU"] = "OPT_MCU_STM32{}".format(target.family.upper())
         # TODO: use modm-devices driver type for this
-        fs_dev = (target.family in ["f0", "f3", "l0"] or
+        fs_dev = (target.family in ["f0", "f3", "l0", "g4"] or
                  (target.family == "f1" and target.name <= "03"))
         if fs_dev:
             # PMA buffer size: 512B or 1024B
@@ -95,18 +101,29 @@ def build(env):
             env.copy("tinyusb/src/portable/st/synopsys", "portable/st/synopsys/")
 
     elif target.platform == "sam":
-        if target.family == "g":
+        if target.family == "g5x":
             tusb_config["CFG_TUSB_MCU"] = "OPT_MCU_SAMG"
             env.copy("tinyusb/src/portable/microchip/samg/", "portable/microchip/samg/")
         else:
-            tusb_config["CFG_TUSB_MCU"] = "OPT_MCU_SAM{}{}".format(target.family.upper(), target.series.upper())
+            series = "e5x" if target.series.startswith("e5") else target.series
+            tusb_config["CFG_TUSB_MCU"] = "OPT_MCU_SAM{}".format(series.upper())
             env.copy("tinyusb/src/portable/microchip/samd/", "portable/microchip/samd/")
 
+    elif target.platform == "rp":
+        if target.family == "20":
+            tusb_config["CFG_TUSB_MCU"] = "OPT_MCU_RP2040"
+            env.copy("tinyusb/src/portable/raspberrypi/rp2040/", "portable/raspberrypi/rp2040/")
+
+    # TinyUSB has a OS abstraction layer for FreeRTOS, but it is causes problems with modm
+    # if env.has_module(":freertos"):
+    #    tusb_config["CFG_TUSB_OS"] = "OPT_OS_FREERTOS"
+    #    env.copy("tinyusb/src/osal/osal_freertos.h", "osal/osal_freertos.h")
+
     if env.has_module(":freertos"):
-        tusb_config["CFG_TUSB_OS"] = "OPT_OS_FREERTOS"
-        env.copy("tinyusb/src/osal/osal_freertos.h", "osal/osal_freertos.h")
-    else:
-        env.copy("tinyusb/src/osal/osal_none.h", "osal/osal_none.h")
+        env.log.warning("TinyUSB in modm does not currently use the FreeRTOS abstraction layer"
+                        " and is not thread-safe with FreeRTOS threads.")
+
+    env.copy("tinyusb/src/osal/osal_none.h", "osal/osal_none.h")
 
     if env.has_module(":debug"):
         tusb_config["CFG_TUSB_DEBUG_PRINTF"] = "tinyusb_debug_printf"
@@ -114,9 +131,13 @@ def build(env):
 
     has_device = env.has_module(":tinyusb:device")
     has_host = env.has_module(":tinyusb:host")
-    speed = env.get("speed", "fs")
+    # On STM32 with both speeds, the option decides, otherwise we must default
+    # to HS for the few STM32 with *only* usb_otg_hs, all other devices are FS.
+    speed = env.get("speed", "hs" if env[":target"].has_driver("usb_otg_hs") else "fs")
     port = 0 if speed == "fs" else 1
 
+    tusb_config["CFG_TUSB_RHPORT0_MODE"] = "OPT_MODE_NONE"
+    tusb_config["CFG_TUSB_RHPORT1_MODE"] = "OPT_MODE_NONE"
     mode = None
     if has_device: mode = "OPT_MODE_DEVICE";
     if has_host: mode = "OPT_MODE_HOST";
@@ -153,11 +174,20 @@ def build(env):
                 raise ValidateException("Unknown ITF device class '{}'!".format(devclass))
 
             endpoints[itf_prefix + "_OUT"] = hex(endpoint_counter)
+            # SAMG doesn't support using the same EP number for IN and OUT
+            if target.platform == "sam" and target.family in ["g"]:
+                endpoint_counter += 1
             endpoints[itf_prefix + "_IN"] = hex(0x80 | endpoint_counter)
 
     if target.platform == "stm32":
         irq_data = env.query(":platform:usb:irqs")
         irqs = irq_data["port_irqs"][speed]
+    elif target.platform == "sam" and target.family in ["g5x"]:
+        irqs = ["UDP"]
+    elif target.platform == "sam" and target.family in ["d5x/e5x"]:
+        irqs = ["USB_OTHER", "USB_SOF_HSOF", "USB_TRCPT0", "USB_TRCPT1"]
+    elif target.platform == "rp" and target.family in ["20"]:
+        irqs = ["USBCTRL_IRQ"]
     else:
         irqs = ["USB"]
 
@@ -220,9 +250,10 @@ Configuration options:
 """
 
     def prepare(self, module, options):
-        # Only OTG has Host Mode
+        # On STM32, only OTG has Host Mode
         if not (options[":target"].has_driver("usb_otg_fs") or
-                options[":target"].has_driver("usb_otg_hs")):
+                options[":target"].has_driver("usb_otg_hs") or
+                options[":target"].has_driver("uhp:samg*")):
             return False
 
         paths = {p.parent for p in Path(localpath("tinyusb/src/class/")).glob("*/*_host.h")}

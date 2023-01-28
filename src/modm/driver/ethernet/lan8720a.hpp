@@ -14,11 +14,13 @@
 namespace modm
 {
 
+/// @ingroup modm_driver_lan8720a
 struct Lan8720a
 {
 	static constexpr uint32_t Address = 0x00;
 
-	struct Register {
+	struct Register
+	{
 		static constexpr uint16_t BCR = 0x0000;
 		static constexpr uint16_t BSR = 0x0001;
 		static constexpr uint16_t AN  = 0x0004;

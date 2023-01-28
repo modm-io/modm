@@ -102,15 +102,12 @@ void __modm_startup(void)
 	SCB_EnableICache();
 %% endif
 
-%% if with_fpu
-	// Enable FPU in privileged and user mode
-	SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));
+%% if core != "cortex-m0"
+	// Set the vector table location
+	SCB->VTOR = (uint32_t)__vector_table_{{ vector_table_location }}_start;
 %% endif
 
 %% if "m0" not in core
-	// Set the vector table location
-	SCB->VTOR = (uint32_t)__vector_table_{{ vector_table_location }}_start;
-
 	// Enable trapping of divide by zero for UDIV/SDIV instructions.
 	SCB->CCR |= SCB_CCR_DIV_0_TRP_Msk;
 %% endif

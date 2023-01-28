@@ -33,8 +33,7 @@ static_assert(MAX_BLOCK_PARTS <= 127, "Core: MAX_BLOCK_PARTS must be <= 127, you
 	extern char	__heap_start;
 	extern char	__heap_end;
 
-	void initializeMemory(void) __attribute__ ((naked)) \
-								__attribute__ ((section (".init5")));
+	void initializeMemory(void) modm_naked modm_section(".init5");
 
 #else
 

@@ -12,7 +12,10 @@
 # -----------------------------------------------------------------------------
 
 def common_vector_table_location(env):
+    if env.get(":platform:core:vector_table_location", "rom") == "ram":
+        return "ram"
     return env.get(":platform:cortex-m:vector_table_location", "rom")
+
 
 def common_vector_table(env):
     """
@@ -67,6 +70,7 @@ def common_memories(env):
     Computes memory properties:
 
       - `memories`: unfiltered memory regions
+      - `ram_regions`: memory region name with `ram` in their names
       - `regions`: memory region names
       - `cont_ram_regions`: all continuous internal SRAM sections
       - `cont_ram`: largest continuous internal SRAM section
@@ -77,6 +81,13 @@ def common_memories(env):
     memories = listify(device.get_driver("core")["memory"])
 
     # Convert from string to int and add offsets
+    flash_size = env.get(":platform:core:boot2_size", 0)
+    if flash_size:
+        memories.append({
+            "name": "flash",
+            "access": "rx",
+            "start": "0x10000000",
+            "size": hex(flash_size)})
     flash_offset = env.get(":platform:cortex-m:linkerscript.flash_offset", 0)
     for m in memories:
         if m["name"] == "flash":
@@ -94,10 +105,12 @@ def common_memories(env):
             if cont and (cont[-1]["start"] + cont[-1]["size"] == m["start"]):
                 cont[-1]["size"] += m["size"]
                 cont[-1]["contains"].append({**m, "index": index})
+                if not cont[-1]["cont_name"].startswith("cont_"):
+                    cont[-1]["cont_name"] = "cont_" + cont[-1]["cont_name"]
             else:
                 cont.append(dict(m))
                 cont[-1]["contains"] = [{**m, "index": index}]
-                cont[-1]["name"] = "cont_" + cont[-1]["name"]
+                cont[-1]["cont_name"] = cont[-1]["name"]
             index += 1
 
     properties = {
@@ -118,7 +131,6 @@ def common_linkerscript(env):
     Computes linkerscript properties
     (\\* *post-build only*):
 
-      - `process_stack_size`: largest requested process stack size by any module
       - `vector_table_location`: ram or rom
 
     Stripped and newline-joined collector values of:
@@ -132,17 +144,14 @@ def common_linkerscript(env):
     Additional memory properties:
 
       - `memories`: unfiltered memory regions
+      - `ram_regions`: memory region name with `ram` in their names
       - `regions`: memory region names
-      - `ram_origin`: Lowest SRAM origin address
-      - `ram_origin`: Total size of all SRAM regions
       - `cont_ram_regions`: all continuous internal SRAM sections
       - `cont_ram`: largest continuous internal SRAM section
 
     :returns: dictionary of linkerscript properties
     """
     properties = {
-        "process_stack_size":
-            max(env.collector_values(":platform:cortex-m:linkerscript.process_stack_size", 0)),
         "vector_table_location":
             common_vector_table_location(env),
 
@@ -185,8 +194,8 @@ def prepare(module, options):
             name="main_stack_size",
             description=FileReader("option/main_stack_size.md"),
             minimum=2 ** 8,
-            maximum=2 ** 16,
-            default="3*1024"))
+            maximum="64Ki",
+            default="3Ki"))
 
     if "f" in options[":target"].get_driver("core")["type"]:
         module.add_option(
@@ -199,7 +208,7 @@ def prepare(module, options):
     memories = listify(options[":target"].get_driver("core")["memory"])
 
     # Cortex-M0 does not have remappable vector table, so it will remain in Flash
-    if not options[":target"].has_driver("core:cortex-m0*"):
+    if options[":target"].get_driver("core")["type"] != "cortex-m0":
         default_location = "rom"
         if any((m["name"] == "ccm" and "x" in m["access"]) or m["name"] == "dtcm" for m in memories):
             default_location = "ram"
@@ -211,7 +220,7 @@ def prepare(module, options):
                 default=default_location))
 
     # Find the size of the flash memory
-    flash_size = next(int(x['size']) for x in memories if x['name'] == 'flash')
+    flash_size = next((int(x['size']) for x in memories if x['name'] == 'flash'), 16*1024*1024)
     module.add_option(
         NumericOption(
             name="linkerscript.flash_offset",
@@ -249,11 +258,6 @@ def prepare(module, options):
         StringCollector(
             name="linkerscript.table_extern.heap",
             description="Additions to the linkerscript's '.table.heap' section"))
-    module.add_collector(
-        NumericCollector(
-            name="linkerscript.process_stack_size",
-            description="Maximum required size of the process stack",
-            minimum=0))
 
     module.add_query(
         EnvironmentQuery(name="vector_table", factory=common_vector_table))
@@ -289,13 +293,15 @@ def build(env):
         "with_memory_traits": env.has_module(":architecture:memory"),
         "with_assert": env.has_module(":architecture:assert"),
         "with_fpu": env.get("float-abi", "soft") != "soft",
+        "with_multicore": env.has_module(":platform:multicore"),
     })
     env.outbasepath = "modm/src/modm/platform/core"
 
     # startup script
-    env.copy("reset_handler.sx")
+    env.template("reset_handler.sx.in")
     env.template("startup.c.in")
     env.template("vectors.c.in")
+    env.template("vectors.hpp.in")
     env.collect(":build:linkflags", "-nostartfiles")
 
     # dealing with runtime assertions
@@ -340,11 +346,9 @@ def build(env):
 
     env.collect(":build:linkflags", "-Wl,--no-wchar-size-warning", "-L{project_source_dir}")
     # Linkerscript
-    linkerscript_override_option = env["linkerscript.override"]
-    if linkerscript_override_option:
-        env.collect(":build:linkflags", "-T{}".format(linkerscript_override_option))
-    else:
-        env.collect(":build:linkflags", "-Tmodm/link/linkerscript.ld")
+    linkerscript = env["linkerscript.override"]
+    env.collect(":build:linkflags", "-T{}".format(env.relcwdoutpath(
+            linkerscript if linkerscript else "modm/link/linkerscript.ld")))
 
     # Compilation for FPU
     core = env[":target"].get_driver("core")["type"]
@@ -356,6 +360,7 @@ def build(env):
     if "f" in fpu:
         fpu_spec = {
             "4f": "-mfpu=fpv4-sp-d16",
+            "33f": "-mfpu=fpv4-sp-d16",
             "7f": "-mfpu=fpv5-sp-d16",
             "7fd": "-mfpu=fpv5-d16",
         }[fpu]

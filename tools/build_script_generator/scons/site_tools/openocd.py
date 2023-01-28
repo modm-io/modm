@@ -63,10 +63,22 @@ def reset_openocd(env, alias="reset_openocd"):
 	return env.AlwaysBuild(env.Alias(alias, '', action))
 
 # -----------------------------------------------------------------------------
+def run_openocd(env, alias="run_openocd"):
+	def call_run_openocd(target, source, env):
+		config = env.Listify(env.get("MODM_OPENOCD_CONFIGFILES", []))
+		searchdir = env.Listify(env.get("MODM_OPENOCD_SEARCHDIRS", []))
+		openocd.call(config=map(env.subst, config),
+                    search=map(env.subst, searchdir), verbose=True)
+
+	action = Action(call_run_openocd, cmdstr="$RUN_OPENOCD_COMSTR")
+	return env.AlwaysBuild(env.Alias(alias, '', action))
+
+# -----------------------------------------------------------------------------
 def generate(env, **kw):
 	env.AddMethod(program_openocd, "ProgramOpenOcd")
 	env.AddMethod(debug_openocd, "DebugOpenOcd")
 	env.AddMethod(reset_openocd, "ResetOpenOcd")
+	env.AddMethod(run_openocd, "OpenOcd")
 
 def exists(env):
 	return env.Detect("openocd")

@@ -4,8 +4,11 @@
     <option name="modm:build:build.path">../../../build/stm32f469_discovery/blink</option>
   </options>
   <modules>
-    <module>modm:platform:gpio</module>
+    <module>modm:platform:exti</module>
     <module>modm:processing:timer</module>
     <module>modm:build:scons</module>
   </modules>
+  <collectors>
+    <collect name="modm:build:cppdefines">MODM_EXTI_HANDLER_STORAGE=12</collect>
+  </collectors>
 </library>

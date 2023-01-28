@@ -40,6 +40,17 @@ Rcc::enableInternalClockMHz14(uint32_t waitCycles)
 %% endif
 
 %% if hsi48
+%% if target.family in ["l4", "l5"]
+bool
+Rcc::enableInternalClockMHz48(uint32_t waitCycles)
+{
+	bool retval;
+	RCC->CRRCR |= RCC_CRRCR_HSI48ON;
+	while (not ((retval = RCC->CRRCR & RCC_CRRCR_HSI48RDY)) and --waitCycles)
+		;
+	return retval;
+}
+%% else
 bool
 Rcc::enableInternalClockMHz48(uint32_t waitCycles)
 {
@@ -49,6 +60,7 @@ Rcc::enableInternalClockMHz48(uint32_t waitCycles)
 		;
 	return retval;
 }
+%% endif
 %% endif
 
 bool
@@ -61,7 +73,7 @@ Rcc::enableInternalClock(uint32_t waitCycles)
 	return retval;
 }
 
-%% if target.family in ["l0", "l1", "l4"]
+%% if target.family in ["l0", "l1", "l4", "l5"]
 bool
 Rcc::enableMultiSpeedInternalClock(MsiFrequency msi_frequency, uint32_t waitCycles)
 {
@@ -194,7 +206,7 @@ Rcc::enablePll{{id}}(PllSource source, const PllFactors& pllFactors, uint32_t wa
 		;
 
 	return tmp;
-%% elif target.family in ["g0", "l4", "g4"]
+%% elif target.family in ["g0", "l4", "l5", "g4"]
 	// Read reserved values and clear all other values
 	uint32_t tmp = RCC->PLLCFGR & ~(
 			RCC_PLLCFGR_PLLSRC | RCC_PLLCFGR_PLLM | RCC_PLLCFGR_PLLN |
@@ -303,6 +315,15 @@ Rcc::enablePll{{id}}(PllSource source, const PllFactors& pllFactors, uint32_t wa
 %% endif
 }
 
+bool
+Rcc::disablePll{{id}}(uint32_t waitCycles)
+{
+	RCC->CR &= ~RCC_CR_PLL{{id}}ON;
+	while ((RCC->CR & RCC_CR_PLL{{id}}RDY) and --waitCycles)
+		;
+	return waitCycles > 0;
+}
+
 %% endfor
 
 %% if pllsai_p_usb
@@ -337,6 +358,15 @@ Rcc::enablePllSai(const PllSaiFactors& pllFactors, uint32_t waitCycles)
 
 	return tmp;
 }
+
+bool
+Rcc::disablePllSai(uint32_t waitCycles)
+{
+	RCC->CR &= ~RCC_CR_PLLSAION;
+	while ((RCC->CR & RCC_CR_PLLSAIRDY) and --waitCycles)
+		;
+	return waitCycles > 0;
+}
 %% endif
 
 %% if overdrive
@@ -354,6 +384,47 @@ Rcc::enableOverdriveMode(uint32_t waitCycles)
 	while (!(PWR->CSR{{suffix}} & PWR_CSR{{suffix}}_ODSWRDY))
 		if (--waitCycles == 0) return false;
 
+	return true;
+}
+%% endif
+
+%% if has_r1mode
+bool
+Rcc::setVoltageScaling(VoltageScaling voltage, uint32_t waitCycles)
+{
+	const auto currentSetting = PWR->CR1 & PWR_CR1_VOS;
+	if (voltage == VoltageScaling::Boost) {
+		PWR->CR5 &= ~PWR_CR5_R1MODE;
+	} else {
+		PWR->CR5 |= PWR_CR5_R1MODE;
+	}
+	if (voltage != VoltageScaling::Scale2) {
+		if(static_cast<VoltageScaling>(currentSetting) == VoltageScaling::Scale2) {
+			PWR->CR1 = (PWR->CR1 & ~PWR_CR1_VOS) | PWR_CR1_VOS_0;
+			while (PWR->SR2 & PWR_SR2_VOSF)
+				if (--waitCycles == 0) return false;
+		}
+	} else {
+		PWR->CR1 = (PWR->CR1 & ~PWR_CR1_VOS) | PWR_CR1_VOS_1;
+	}
+
+	return true;
+}
+%% elif target.family == "l5"
+bool
+Rcc::setVoltageScaling(VoltageScaling voltage, uint32_t waitCycles)
+{
+	// TODO: check if low power mode is active and reject changing range if active
+	// Implemented according to STHAL HAL_PWREx_ControlVoltageScaling()
+	// TODO: The reference manual describes a more complicated procedure
+	// but the CubeHal also does not implement that ...
+	const auto currentSetting = PWR->CR1 & PWR_CR1_VOS;
+	if (voltage == static_cast<VoltageScaling>(currentSetting)) {
+		return true;
+	}
+	PWR->CR1 = (PWR->CR1 & ~PWR_CR1_VOS) | uint32_t(voltage);
+	while (PWR->SR2 & PWR_SR2_VOSF)
+		if (--waitCycles == 0) return false;
 	return true;
 }
 %% endif
@@ -445,7 +516,7 @@ Rcc::enableSystemClock(SystemClockSource src, uint32_t waitCycles)
 }
 
 
-%% if target.family == "g4"
+%% if target.family in ["g4", "l5"]
 bool
 Rcc::setCanPrescaler(CanPrescaler prescaler)
 {

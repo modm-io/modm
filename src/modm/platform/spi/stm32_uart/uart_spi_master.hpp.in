@@ -27,7 +27,7 @@ namespace platform
 /**
  * Serial Peripheral Interface of the Uart module.
  *
- * @warnind	Be aware, that the uart module can send bytes only LSB first.
+ * @warning	Be aware, that the UART module can send bytes only LSB first.
  *			Therefore the data is bit reversed in software for DataOrder::MsbFirst.
  *
  * @author		Niklas Hauser
@@ -52,7 +52,7 @@ public:
 	};
 
 public:
-	template< template<Peripheral _> class... Signals >
+	template< class... Signals >
 	static void
 	connect()
 	{

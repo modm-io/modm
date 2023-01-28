@@ -29,7 +29,7 @@ modm::platform::Adc{{ id }}::initialize(const ClockMode clk,
 	uint32_t tmp = 0;
 
 	// enable clock
-%% if target["family"] in ["f3", "g4"]
+%% if target["family"] in ["f3", "g4", "l5"]
 	RCC->{{ ahb }}ENR |= RCC_{{ ahb }}ENR_ADC{{ id_common }}EN;
 %% elif target["family"] in ["l4"]
 	Rcc::enable<Peripheral::Adc1>();
@@ -37,10 +37,10 @@ modm::platform::Adc{{ id }}::initialize(const ClockMode clk,
 
 %% if clock_mux
 	// select clock source
-	RCC->CCIPR |= static_cast<uint32_t>(clk_src);
+	RCC->{{ ccipr }} |= static_cast<uint32_t>(clk_src);
 %% endif
 
-%% if target["family"] in ["l4", "g4"]
+%% if target["family"] in ["l4", "l5", "g4"]
 	// Disable deep power down
 	ADC{{ id }}->CR &= ~ADC_CR_DEEPPWD;
 %% endif
@@ -65,7 +65,7 @@ modm::platform::Adc{{ id }}::initialize(const ClockMode clk,
 	ADC{{ id }}->CR |= static_cast<uint32_t>(VoltageRegulatorState::Enabled);
 	modm::delay_us(10);	// FIXME: this is ugly -> find better solution
 
-	acknowledgeInterruptFlag(InterruptFlag::Ready);
+	acknowledgeInterruptFlags(InterruptFlag::Ready);
 
 	calibrate(cal, true);	// blocking calibration
 
@@ -77,7 +77,7 @@ modm::platform::Adc{{ id }}::initialize(const ClockMode clk,
 		while (not isReady()) {
 			ADC{{ id }}->CR |= ADC_CR_ADEN;
 		}
-		acknowledgeInterruptFlag(InterruptFlag::Ready);
+		acknowledgeInterruptFlags(InterruptFlag::Ready);
 	}
 }
 
@@ -90,7 +90,7 @@ modm::platform::Adc{{ id }}::disable(const bool blocking)
 		while(ADC{{ id }}->CR & ADC_CR_ADDIS);
 	}
 	// disable clock
-%% if target["family"] in ["f3", "g4"]
+%% if target["family"] in ["f3", "g4", "l5"]
 	RCC->{{ ahb }}ENR &= ~RCC_{{ ahb }}ENR_ADC{{ id_common }}EN;
 %% elif target["family"] in ["l4"]
 	Rcc::disable<Peripheral::Adc1>();
@@ -106,7 +106,7 @@ modm::platform::Adc{{ id }}::setPrescaler(const Prescaler pre)
 	tmp &= ~static_cast<uint32_t>(Prescaler::Div256AllBits);
 	tmp |=  static_cast<uint32_t>(pre);
 	RCC->CFGR2 = tmp;
-%% elif target["family"] in ["l4", "g4"]
+%% elif target["family"] in ["l4", "l5", "g4"]
 	tmp  = ADC{{ id_common_u }}->CCR;
 	tmp &= ~static_cast<uint32_t>(Prescaler::Div256AllBits);
 	tmp |=  static_cast<uint32_t>(pre);
@@ -189,7 +189,7 @@ void
 modm::platform::Adc{{ id }}::startConversion(void)
 {
 	// TODO: maybe add more interrupt flags
-	acknowledgeInterruptFlag(InterruptFlag::EndOfRegularConversion |
+	acknowledgeInterruptFlags(InterruptFlag::EndOfRegularConversion |
 			InterruptFlag::EndOfSampling | InterruptFlag::Overrun);
 	// starts single conversion for the regular group
 	ADC{{ id }}->CR |= ADC_CR_ADSTART;
@@ -202,29 +202,6 @@ modm::platform::Adc{{ id }}::isConversionFinished(void)
 }
 
 // ----------------------------------------------------------------------------
-// TODO: move this to some shared header for all cortex m3 platforms
-// Re-implemented here to save some code space. As all arguments in the calls
-// below are constant the compiler is able to calculate everything at
-// compile time.
-
-#ifndef MODM_CUSTOM_NVIC_FUNCTIONS
-#define MODM_CUSTOM_NVIC_FUNCTIONS
-
-static modm_always_inline void
-nvicEnableInterrupt(const IRQn_Type IRQn)
-{
-	NVIC->ISER[(static_cast<uint32_t>(IRQn) >> 5)] =
-								(1 << ((uint32_t)(IRQn) & 0x1F));
-}
-
-static modm_always_inline void
-nvicDisableInterrupt(IRQn_Type IRQn)
-{
-	NVIC_DisableIRQ(IRQn);
-}
-
-#endif // MODM_CUSTOM_NVIC_FUNCTIONS
-
 void
 modm::platform::Adc{{ id }}::enableInterruptVector(const uint32_t priority,
 												const bool enable)
@@ -237,7 +214,7 @@ modm::platform::Adc{{ id }}::enableInterruptVector(const uint32_t priority,
 
 	if (enable) {
 		NVIC_SetPriority(INTERRUPT_VECTOR, priority);
-		nvicEnableInterrupt(INTERRUPT_VECTOR);
+		NVIC_EnableIRQ(INTERRUPT_VECTOR);
 	} else {
 		NVIC_DisableIRQ(INTERRUPT_VECTOR);
 	}
@@ -262,7 +239,7 @@ modm::platform::Adc{{ id }}::getInterruptFlags()
 }
 
 void
-modm::platform::Adc{{ id }}::acknowledgeInterruptFlag(const InterruptFlag_t flags)
+modm::platform::Adc{{ id }}::acknowledgeInterruptFlags(const InterruptFlag_t flags)
 {
 	// Flags are cleared by writing a one to the flag position.
 	// Writing a zero is ignored.

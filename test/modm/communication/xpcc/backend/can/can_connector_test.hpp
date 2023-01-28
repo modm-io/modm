@@ -18,7 +18,7 @@
 
 #include "testing_can_connector.hpp"
 
-/// @ingroup modm_test_test_communication
+/// @ingroup modm_test_test_communication_xpcc
 class CanConnectorTest : public unittest::TestSuite
 {
 	void

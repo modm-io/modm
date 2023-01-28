@@ -9,16 +9,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_STM32_GPIO_SET_HPP
-#define MODM_STM32_GPIO_SET_HPP
+#pragma once
 
 #include "../device.hpp"
 #include "base.hpp"
 
-namespace modm
-{
-
-namespace platform
+namespace modm::platform
 {
 
 /// @ingroup modm_platform_gpio
@@ -64,6 +60,7 @@ protected:
 		for (const auto &m: masks) r += (m) ? 1 : 0;
 		return r;
 	}
+
 public:
 	static constexpr uint8_t width = sizeof...(Gpios);
 	static constexpr uint8_t number_of_ports = numberOfPorts();
@@ -191,8 +188,8 @@ public:
 	{
 %% for port, id in ports.items()
 		if constexpr (mask({{id}})) {
-			uint32_t are_set = (GPIO{{port}}->ODR & mask({{id}}));
-			uint32_t are_reset = mask({{id}}) ^ are_set;
+			const uint32_t are_set = (GPIO{{port}}->ODR & mask({{id}}));
+			const uint32_t are_reset = mask({{id}}) ^ are_set;
 			GPIO{{port}}->BSRR = (are_set << 16) | are_reset;
 		}
 %% endfor
@@ -216,8 +213,4 @@ public:
 	}
 };
 
-} // namespace platform
-
-} // namespace modm
-
-#endif // MODM_STM32_GPIO_SET_HPP
+} // namespace modm::platform

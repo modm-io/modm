@@ -1,0 +1,120 @@
+/*
+ * Copyright (c) 2023, Christopher Durand
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_SAMX7X_SPI_HAL{{ id }}_HPP
+#define MODM_SAMX7X_SPI_HAL{{ id }}_HPP
+
+#include <cstddef>
+#include <cstdint>
+#include "spi_base.hpp"
+
+namespace modm::platform
+{
+
+/**
+ * Serial peripheral interface (SPI{{ id }})
+ *
+ * Low-level SPI peripheral register access API
+ *
+ * @author		Christopher Durand
+ * @ingroup		modm_platform_spi modm_platform_spi_{{id}}
+ */
+class SpiHal{{ id }} : public SpiBase
+{
+public:
+	/// Enable the clock, reset and enable the peripheral
+	static void
+	enable();
+
+	/// Disable the peripheral clock
+	static void
+	disable();
+
+	/**
+	 * Enable and initialize SPI in master mode
+	 *
+	 * \param prescaler clock divider (1..255), value 0 is not allowed
+	 * \todo Support for slave mode and hardware-managed chip select
+	 */
+	static void
+	initialize(uint8_t prescaler,
+				DataMode dataMode = DataMode::Mode0,
+				DataSize dataSize = DataSize::Bit8);
+
+	static void
+	setDataMode(DataMode dataMode);
+
+	static void
+	setDataSize(DataSize dataSize);
+
+	static void
+	setMasterSelection(MasterSelection masterSelection);
+
+	static void
+	setLoopbackMode(LocalLoopback loopback);
+
+	/**
+	 * Write up to 8 bits to the data register
+	 *
+	 * \pre Transmit data register must be empty
+	 */
+	static void
+	write(std::byte data);
+
+	/**
+	 * Write up to 16 bits to the data register
+	 *
+	 * \pre Transmit data register must be empty
+	 */
+	static void
+	write(uint16_t data);
+
+	/**
+	 * Read byte value from the receive data register
+	 *
+	 * \pre the receive data register must contain a valid value
+	 */
+	static void
+	read(std::byte& data);
+
+	/**
+	 * Read 16-bit value from the receive data register
+	 *
+	 * \pre the receive data register must contain a valid value
+	 */
+	static void
+	read(uint16_t& data);
+
+	static void
+	enableInterruptVector(bool enable, uint32_t priority);
+
+	static void
+	enableInterrupt(Interrupt_t interrupt);
+
+	static void
+	disableInterrupt(Interrupt_t interrupt);
+
+	/// Read status flags
+	/// Clears all flags except rx data full, tx data empty and spi enable
+	static StatusFlag_t
+	readStatusFlags();
+
+private:
+	// workaround for vendor macros using "Spi*" which is erroneously resolved to "modm::Spi*"
+	static auto
+	regs() { return reinterpret_cast<::Spi*>(SPI{{ id }}); }
+};
+
+} // namespace modm::platform
+
+#include "spi_hal_{{ id }}_impl.hpp"
+
+#endif // MODM_SAMX7X_SPI_HAL{{ id }}_HPP

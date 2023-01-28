@@ -1,0 +1,10 @@
+<library>
+  <extends>modm:nucleo-f429zi</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_f429zi/freertos_static</option>
+  </options>
+  <modules>
+    <module>modm:freertos</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

@@ -56,3 +56,5 @@ Led::reset();
     Call `Gpio::setInput()` or `Gpio::setOutput()` before the first use,
     otherwise the GPIO state may be undefined!
 
+See the `modm:platform:gpio` module for platform-specific GPIO behaviors,
+especially signal connections to peripherals.

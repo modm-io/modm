@@ -68,7 +68,7 @@ Flash::getOffset(uint8_t index)
 }
 
 size_t
-Flash::getSize(uint8_t modm_unused index)
+Flash::getSize([[maybe_unused]] uint8_t index)
 {
 %% if has_sectors
 	if (index < 4) return (1ul << 14);
@@ -84,19 +84,32 @@ Flash::erase(uint8_t index, WordSize size)
 Flash::erase(uint8_t index)
 %% endif
 {
+%% if family != "f1"
 	FLASH->SR = FLASH_SR_ERR;
+%% endif
 %% if has_sectors
 	FLASH->CR = FLASH_CR_STRT | FLASH_CR_SER | uint32_t(size) |
 			((index << FLASH_CR_SNB_Pos) & FLASH_CR_SNB_Msk);
 %% else
+%% if family in ["g0","g4"]
 	FLASH->CR = FLASH_CR_STRT | FLASH_CR_PER |
 			((index << FLASH_CR_PNB_Pos) & FLASH_CR_PNB_Msk);
+%% else
+	FLASH->CR &= ~FLASH_CR_STRT;
+	FLASH->CR |= FLASH_CR_PER;
+	FLASH->AR = reinterpret_cast<std::uintptr_t>(getAddr(index));
+	FLASH->CR |= FLASH_CR_STRT;
+%% endif
 %% endif
 
 	while(isBusy()) ;
+%% if family == "f1"
+	FLASH->CR &= ~FLASH_CR_PER;
+	return FLASH->SR & FLASH_SR_PGERR;
+%% else
 	FLASH->CR = 0;
-
 	return FLASH->SR & FLASH_SR_ERR;
+%% endif
 }
 
 modm_ramcode uint32_t
@@ -106,7 +119,9 @@ Flash::program(uintptr_t addr, MaxWordType data, WordSize size)
 Flash::program(uintptr_t addr, MaxWordType data)
 %% endif
 {
+%% if family != "f1"
 	FLASH->SR = FLASH_SR_ERR;
+%% endif
 %% if has_sectors
 	FLASH->CR = FLASH_CR_PG | uint32_t(size);
 	switch(size)
@@ -122,14 +137,27 @@ Flash::program(uintptr_t addr, MaxWordType data)
 			break;
 	}
 %% else
+
+%% if family == "f1"
+	while(isBusy()) ;
+	FLASH->CR |= FLASH_CR_PG;
+	*(MaxWordType*) addr = data;
+%% else
 	FLASH->CR = FLASH_CR_PG;
 	*(uint64_t*) addr = data;
 %% endif
+%% endif
 
 	while(isBusy()) ;
-	FLASH->CR = 0;
 
+%% if family == "f1"
+	FLASH->CR &= ~FLASH_CR_PG;
+	return FLASH->SR & FLASH_SR_PGERR;
+%% else
+	FLASH->SR |= FLASH_SR_EOP;
+	FLASH->CR = 0;
 	return FLASH->SR & FLASH_SR_ERR;
+%% endif
 }
 
 } // namespace modm::platform

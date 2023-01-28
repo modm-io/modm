@@ -48,6 +48,11 @@ def build(env):
         properties["lsi_frequency"] = 37
         properties["msi_frequency"] = 2.097
         properties["boot_frequency"] = properties["msi_frequency"]
+    elif target["family"] in ["l5"]:
+        properties["hsi_frequency"] = 16
+        properties["lsi_frequency"] = 32
+        properties["msi_frequency"] = 4
+        properties["boot_frequency"] = properties["msi_frequency"]
     else:
         properties["hsi_frequency"] = 16
         properties["lsi_frequency"] = 32
@@ -60,12 +65,16 @@ def build(env):
     properties["pllprediv2"] = False    # FIXME: not sure what value this should have
     properties["pll_hse_prediv2"] = target["family"] == "f1" and target["name"] in ["01", "02", "03"]
     properties["hsi48"] = \
-        target["family"] == "f0" and target["name"] in ["42", "48", "71", "72", "78", "91", "98"]
+        (target["family"] == "f0" and target["name"] in ["42", "48", "71", "72", "78", "91", "98"]) or \
+        (target["family"] == "l4" and target["name"][0] not in ["7", "8"]) or \
+        (target["family"] == "l5")
     properties["pll_p"] = ((target["family"] == "l4" and target["name"] not in ["12", "22"]) or target["family"] == "g4")
     properties["overdrive"] = (target["family"] == "f7") or \
         ((target["family"] == "f4") and target["name"] in ["27", "29", "37", "39", "46", "69", "79"])
     properties["vos0_overdrive"] = (target["family"] == "h7") and \
         target["name"] in ["42", "43", "45", "47", "50", "53", "55", "57"]
+    properties["has_r1mode"] = (target["family"] == "g4") or \
+        (target["family"] == "l4" and target["name"][0] in ["p", "q", "r", "s"])
     properties["pllsai_p_usb"] = (target["family"] == "f7") or \
         ((target["family"] == "f4") and target["name"] in ["46", "69", "79"])
     properties["cfgr1"] = ("CDCFGR1" if target.name in ["a0", "a3", "b0", "b3"] else "D1CFGR") \
@@ -82,6 +91,7 @@ def build(env):
     properties["pll_ids"] = ["1", "2", "3"] if target.family == "h7" else [""]
     properties["has_smps"] = target["family"] == "h7" and (target["name"] in ["25", "35", "45", "47", "55", "57"] or \
         (target["name"] in ["30", "a3", "b0", "b3"] and target["variant"] == "q"))
+    properties["ccipr1"] = "CCIPR1" if target.family == "l5" else "CCIPR"
 
     flash_latencies = {}
     for vcore in device.get_driver("flash")["latency"]:
@@ -151,7 +161,8 @@ def build(env):
             per = "USB"+per
         if "Usbotgfs" in all_peripherals and per.startswith("USB"):
             per = per.replace("USB1", "USB").replace("USB2", "USB")
-            # print(per, mode)
+        if target.family == "l5" and per == "USBFS":
+            per = "Usb"
         if per.capitalize() not in all_peripherals:
             continue
         if "EN" in mode:

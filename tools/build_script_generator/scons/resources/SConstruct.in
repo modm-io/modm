@@ -25,7 +25,7 @@ import os
 from os.path import join, abspath
 
 %% if cache_dir | length
-CacheDir("{{ cache_dir | modm.windowsify(escape_level=1)}}")
+CacheDir(abspath("{{ cache_dir | modm.windowsify(escape_level=1)}}"))
 %% endif
 env = DefaultEnvironment(tools=[], ENV=os.environ)
 env["CONFIG_PROJECT_NAME"] = "{{ options[":build:project.name"] }}"
@@ -65,6 +65,14 @@ sources += env.XpccCommunication(
     path=abspath("{{ generator_path }}"),
     namespace="{{ generator_namespace }}",
     include_paths=["."])
+%% endif
+%% if has_nanopb
+# Generating Nanopb messages
+env.Append(CPPPATH=abspath("{{ nanopb_path }}"))
+ignored.append("{{ nanopb_path }}")
+sources += env.NanopbProtofile(
+    sources={{ nanopb_source }},
+    path=abspath("{{ nanopb_path }}"))
 %% endif
 
 %% if options["::info.git"] != "Disabled"

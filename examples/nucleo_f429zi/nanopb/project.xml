@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:nucleo-f429zi</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_f429zi/nanopb</option>
+    <option name="modm:nanopb:sources">protocol/simple.proto,protocol/complex.proto</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:nanopb</module>
+  </modules>
+</library>

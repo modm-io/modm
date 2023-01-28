@@ -1,0 +1,13 @@
+<library>
+  <extends>modm:mega-2560-pro</extends>
+  <!-- <extends>modm:arduino-nano</extends> -->
+  <options>
+    <option name="modm:build:build.path">../../../build/avr/fiber</option>
+    <option name="modm:__fibers">yes</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:processing:timer</module>
+    <module>modm:processing:fiber</module>
+  </modules>
+</library>

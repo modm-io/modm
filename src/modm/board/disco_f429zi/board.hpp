@@ -19,10 +19,11 @@
 
 using namespace modm::platform;
 
-/// @ingroup modm_board_disco_f429zi
 namespace Board
 {
-	using namespace modm::literals;
+/// @ingroup modm_board_disco_f429zi
+/// @{
+using namespace modm::literals;
 
 /// STM32F429 running at 180MHz from the external 8MHz crystal
 struct SystemClock
@@ -95,16 +96,18 @@ struct SystemClock
 	}
 };
 
-
 using Button = GpioInputA0;
 
 using LedGreen = GpioOutputG13;	// User LED (LD3)
 using LedRed   = GpioOutputG14;	// User LED (LD4)
 
 using Leds = SoftwareGpioPort< LedRed, LedGreen >;
+/// @}
 
 namespace l3g
 {
+/// @ingroup modm_board_disco_f429zi
+/// @{
 using Int1 = GpioInputA1;	// MEMS_INT1 [L3GD20_INT1]: GPXTI0
 using Int2 = GpioInputA2;	// MEMS_INT2 [L3GD20_DRDY/INT2]: GPXTI1
 
@@ -114,11 +117,13 @@ using Mosi = GpioOutputF9;	// SPI5_MOSI [L3GD20_SDA/SDI/SDO]
 using Miso = GpioInputF8;	// SPI5_MISO [L3GD20_SA0/SDO]
 
 using SpiMaster = SpiMaster5;
+/// @}
 }
-
 
 namespace fmc
 {
+/// @ingroup modm_board_disco_f429zi
+/// @{
 using Sdcke1 = GpioOutputB5;	// SDCKE1: FMC_SDCKE1
 using Sdclk  = GpioOutputG8;	// SDCLK: FMC_SDCLK
 using Sdncas = GpioOutputG15;	// SDNCAS: FMC_SDNCAS
@@ -161,11 +166,13 @@ using D12 = GpioOutputE15;	// D12: FMC_D12_DA12
 using D13 = GpioOutputD8;	// D13: FMC_D13_DA13
 using D14 = GpioOutputD9;	// D14: FMC_D14_DA14
 using D15 = GpioOutputD10;	// D15: FMC_D15_DA15
+/// @}
 }
-
 
 namespace lcd
 {
+/// @ingroup modm_board_disco_f429zi
+/// @{
 using TouchInt = GpioInputA15;	// TP_INT1 [Touch Panel]: GPXTI15
 using TouchScl = GpioA8;		// I2C3_SCL [ACP/RF_SCL]: I2C3_SCL
 using TouchSda = GpioC9;		// I2C3_SDA [ACP/RF_SDA]: I2C3_SDA
@@ -202,11 +209,13 @@ using B4 = GpioOutputG12;		// B4: LTDC_B4
 using B5 = GpioOutputA3;		// B5: LTDC_B5
 using B6 = GpioOutputB8;		// B6: LTDC_B6
 using B7 = GpioOutputB9;		// B7: LTDC_B7
+/// @}
 }
-
 
 namespace usb
 {
+/// @ingroup modm_board_disco_f429zi
+/// @{
 using Dm = GpioOutputB14;		// OTG_FS_DM: USB_OTG_HS_DM
 using Dp = GpioOutputB15;		// OTG_FS_DP: USB_OTG_HS_DP
 using Id = GpioOutputB12;		// OTG_FS_ID: USB_OTG_HS_ID
@@ -215,9 +224,12 @@ using Overcurrent = GpioC5;		// OTG_FS_OC [OTG_FS_OverCurrent]: GPXTI5
 using Power = GpioOutputC4;		// OTG_FS_PSO [OTG_FS_PowerSwitchOn]
 using VBus = GpioB13;			// VBUS_FS: USB_OTG_HS_VBUS
 //using Device = UsbFs;
+/// @}
 }
 
 
+/// @ingroup modm_board_disco_f429zi
+/// @{
 inline void
 initialize()
 {
@@ -228,31 +240,20 @@ initialize()
 	LedRed::setOutput(modm::Gpio::Low);
 
 	Button::setInput();
-	Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-	Button::enableExternalInterrupt();
-//	Button::enableExternalInterruptVector(12);
 }
-
 
 inline void
 initializeL3g()
 {
 	l3g::Int1::setInput();
-	l3g::Int1::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-	l3g::Int1::enableExternalInterrupt();
-//	l3g::Int1::enableExternalInterruptVector(12);
-
 	l3g::Int2::setInput();
-	l3g::Int2::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-	l3g::Int2::enableExternalInterrupt();
-//	l3g::Int2::enableExternalInterruptVector(12);
-
 	l3g::Cs::setOutput(modm::Gpio::High);
 
 	l3g::SpiMaster::connect<l3g::Sck::Sck, l3g::Mosi::Mosi, l3g::Miso::Miso>();
 	l3g::SpiMaster::initialize<SystemClock, 11.25_MHz>();
 	l3g::SpiMaster::setDataMode(l3g::SpiMaster::DataMode::Mode3);
 }
+/// @}
 
 }
 

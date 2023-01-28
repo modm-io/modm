@@ -70,6 +70,7 @@ def generate(env, **kw):
         env['HEXCOMSTR'] =      "%sHex File······· %s$TARGET%s" % default
         env['BINCOMSTR'] =      "%sBinary File···· %s$TARGET%s" % default
         env['LSSCOMSTR'] =      "%sListing········ %s$TARGET%s" % default
+        env['UF2COMSTR'] =      "%sUF2 File······· %s$TARGET%s" % default
 
         # modm tools format strings
         env['BITMAPCOMSTR'] =   "%sBitmap········· %s${str(TARGET).replace(BUILDPATH,CONFIG_PROFILE)}%s" % default
@@ -95,9 +96,15 @@ def generate(env, **kw):
         env["XPCC_TASK_CALLER_COMSTR"] = "%s╭─────XPCC───── %s$SOURCE\n" \
                                          "%s╰─Task─Caller─> %s$TARGET%s" % template
 
+        env["NANOPB_MESSAGES_COMSTR"] =  "%s╭────Nanopb──── %s$SOURCE\n" \
+                                         "%s╰───Messages──> %s$TARGET%s" % template
+
         # modm tools installing
         env["ARTIFACT_COMSTR"] =         "%s╭───Artifact─── %s$SOURCE\n" \
                                          "%s╰────Cache────> %s$ARTIFACT_FILEPATH%s" % install
+
+        env["RUN_OPENOCD_COMSTR"] =      "%s╭────────────── %s\n" \
+                                         "%s╰───OpenOCD───> %s$CONFIG_DEVICE_NAME%s" % install
 
         env["DEBUG_OPENOCD_COMSTR"] =    "%s╭─────GDB─────> %s$SOURCE\n" \
                                          "%s╰───OpenOCD───> %s$CONFIG_DEVICE_NAME%s" % install

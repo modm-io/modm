@@ -9,15 +9,15 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-# LBUILD = python3 ../../library-builder/scripts/lbuild
-# LBUILD = lbuild
+# LBUILD = python3 ../../lbuild
 LBUILD = $(shell which lbuild)
 # SCONS = python3 `which scons`
 SCONS = scons
 
 define compile-test
 	@$(RM) -r ../build/generated-unittest/$(1)
-	$(LBUILD) -c config/$(1).xml $(3) -p ../build/generated-unittest/$(1) build --no-log
+	$(LBUILD) -p ../build/generated-unittest/$(1) -c config/$(1).xml $(3) \
+			  -C ../build/generated-unittest/$(1) build --no-log
 	$(SCONS) -C ../build/generated-unittest/$(1) $(2)
 endef
 define run-test
@@ -33,28 +33,48 @@ run-hosted-windows:
 	$(call compile-test,hosted,run,-D":target=hosted-windows")
 
 
-compile-nucleo-f091:
-	$(call compile-test,nucleo-f091,size)
-run-nucleo-f091:
-	$(call run-test,nucleo-f091,size)
+compile-nucleo-f091rc_A:
+	$(call compile-test,nucleo-f091rc_A,size)
+run-nucleo-f091rc_A:
+	$(call run-test,nucleo-f091rc_A,size)
+compile-nucleo-f091rc_B:
+	$(call compile-test,nucleo-f091rc_B,size)
+run-nucleo-f091rc_B:
+	$(call run-test,nucleo-f091rc_B,size)
 
 
-compile-nucleo-f401:
-	$(call compile-test,nucleo-f401,size)
-run-nucleo-f401:
-	$(call run-test,nucleo-f401,size)
+compile-nucleo-f103rb_A:
+	$(call compile-test,nucleo-f103rb_A,size)
+run-nucleo-f103rb_A:
+	$(call run-test,nucleo-f103rb_A,size)
+compile-nucleo-f103rb_B:
+	$(call compile-test,nucleo-f103rb_B,size)
+run-nucleo-f103rb_B:
+	$(call run-test,nucleo-f103rb_B,size)
 
 
-compile-nucleo-f411:
-	$(call compile-test,nucleo-f411,size)
-run-nucleo-f411:
-	$(call run-test,nucleo-f411,size)
+compile-nucleo-f401re:
+	$(call compile-test,nucleo-f401re,size)
+run-nucleo-f401re:
+	$(call run-test,nucleo-f401re,size)
 
 
-compile-nucleo-f446:
-	$(call compile-test,nucleo-f446,size)
-run-nucleo-f446:
-	$(call run-test,nucleo-f446,size)
+compile-nucleo-f411re:
+	$(call compile-test,nucleo-f411re,size)
+run-nucleo-f411re:
+	$(call run-test,nucleo-f411re,size)
+
+
+compile-nucleo-f429zi:
+	$(call compile-test,nucleo-f429zi,size)
+run-nucleo-f429zi:
+	$(call run-test,nucleo-f429zi,size)
+
+
+compile-nucleo-f446re:
+	$(call compile-test,nucleo-f446re,size)
+run-nucleo-f446re:
+	$(call run-test,nucleo-f446re,size)
 
 
 compile-nucleo-f446ze:
@@ -63,27 +83,40 @@ run-nucleo-f446ze:
 	$(call run-test,nucleo-f446ze,size)
 
 
-compile-nucleo-l432:
-	$(call compile-test,nucleo-l432,size)
-run-nucleo-l432:
-	$(call run-test,nucleo-l432,size)
+compile-nucleo-f767zi:
+	$(call compile-test,nucleo-f767zi,size)
+run-nucleo-f767zi:
+	$(call run-test,nucleo-f767zi,size)
 
 
-compile-nucleo-g474:
-	$(call compile-test,nucleo-g474,size)
-run-nucleo-g474:
-	$(call run-test,nucleo-g474,size)
+compile-nucleo-g474re:
+	$(call compile-test,nucleo-g474re,size)
+run-nucleo-g474re:
+	$(call run-test,nucleo-g474re,size)
 
 
-compile-nucleo-f103_A:
-	$(call compile-test,nucleo-f103_A,size)
-run-nucleo-f103_A:
-	$(call run-test,nucleo-f103_A,size)
+compile-nucleo-h723zg:
+	$(call compile-test,nucleo-h723zg,size)
+run-nucleo-h723zg:
+	$(call run-test,nucleo-h723zg,size)
 
-compile-nucleo-f103_B:
-	$(call compile-test,nucleo-f103_B,size)
-run-nucleo-f103_B:
-	$(call run-test,nucleo-f103_B,size)
+
+compile-nucleo-l432kc:
+	$(call compile-test,nucleo-l432kc,size)
+run-nucleo-l432kc:
+	$(call run-test,nucleo-l432kc,size)
+
+
+compile-nucleo-l496zg-p:
+	$(call compile-test,nucleo-l496zg-p,size)
+run-nucleo-l496zg-p:
+	$(call run-test,nucleo-l496zg-p,size)
+
+
+compile-nucleo-l552ze-q:
+	$(call compile-test,nucleo-l552ze-q,size)
+run-nucleo-l552ze-q:
+	$(call run-test,nucleo-l552ze-q,size)
 
 
 compile-al-avreb-can:
@@ -133,7 +166,16 @@ run-arduino-nano_H:
 	$(call run-test,arduino-nano_H,size)
 
 
-compile-mega-2560-pro:
-	$(call compile-test,mega-2560-pro,size)
-run-mega-2560-pro:
-	$(call run-test,mega-2560-pro,size)
+compile-mega-2560-pro_A:
+	$(call compile-test,mega-2560-pro_A,size)
+run-mega-2560-pro_A:
+	$(call run-test,mega-2560-pro_A,size)
+compile-mega-2560-pro_B:
+	$(call compile-test,mega-2560-pro_B,size)
+run-mega-2560-pro_B:
+	$(call run-test,mega-2560-pro_B,size)
+
+compile-samv71-xplained-ultra:
+	$(call compile-test,samv71-xplained-ultra,size)
+run-samv71-xplained-ultra:
+	$(call run-test,samv71-xplained-ultra,size)

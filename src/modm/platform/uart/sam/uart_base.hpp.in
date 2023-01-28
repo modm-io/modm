@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2020, Erik Henriksson
+ * Copyright (c) 2021, Jeff McBride
+ * Copyright (c) 2022, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -11,31 +12,52 @@
 
 #pragma once
 
-#include <stdint.h>
 #include "../device.hpp"
-#include <modm/architecture/interface/register.hpp>
-#include <modm/architecture/interface/interrupt.hpp>
-#include <modm/math/units.hpp>
-
 
 namespace modm::platform
 {
-/**
- * Base class for the UART classes
- *
- * Provides some common enum that do not depend on the specific UART.
- *
- * @ingroup		modm_platform_uart
- */
-class UartBase
+
+/// @ingroup modm_platform_uart
+class {{type | capitalize}}Base
 {
 public:
 	enum class Parity : uint32_t
 	{
-		Even		= 0,
-		Odd			= 1,
-		Disabled	= 2,
+%% if type == "usart"
+%% if target.family == "e7x/s7x/v7x" and target.variant == "b"
+		Disabled  = US_MR_USART_PAR_NO,
+		Even      = US_MR_USART_PAR_EVEN,
+		Odd       = US_MR_USART_PAR_ODD,
+		Space	  = US_MR_USART_PAR_SPACE,
+		Mark      = US_MR_USART_PAR_MARK,
+		MultiDrop = US_MR_USART_PAR_MULTIDROP
+%% else
+		Disabled  = US_MR_PAR_NO,
+		Even      = US_MR_PAR_EVEN,
+		Odd       = US_MR_PAR_ODD,
+		Space	  = US_MR_PAR_SPACE,
+		Mark      = US_MR_PAR_MARK,
+		MultiDrop = US_MR_PAR_MULTIDROP
+%% endif
+%% else
+		Disabled = UART_MR_PAR_NO,
+		Even     = UART_MR_PAR_EVEN,
+		Odd      = UART_MR_PAR_ODD,
+		Space    = UART_MR_PAR_SPACE,
+		Mark     = UART_MR_PAR_MARK
+%% endif
 	};
+
+%% if type == "usart"
+	enum class WordLength : uint32_t
+	{
+		Bit5 = 0,
+		Bit6,
+		Bit7,
+		Bit8,
+		Bit9
+	};
+%% endif
 };
 
-}	// namespace modm::platform
+} // namespace modm::platform

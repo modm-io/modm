@@ -44,11 +44,7 @@
 #define RF_END_RETURN(...) \
 			RF_RETURN(__VA_ARGS__); \
 			modm_fallthrough; \
-		default: \
-			this->popRf(); \
-			return {modm::rf::WrongState}; \
-	} \
-	static_assert(uint16_t(__COUNTER__) - rfCounter < 256, "You have too many states in this resumable function!")
+		RF_INTERNAL_END()
 
 /**
  * End the resumable function. You can use this to return `void`, or if the result does not matter.
@@ -60,11 +56,7 @@
  			this->stopRf(rfIndex); \
 			this->popRf(); \
 			return {modm::rf::Stop}; \
-	default: \
-			this->popRf(); \
-			return {modm::rf::WrongState}; \
-	} \
-	static_assert(uint16_t(__COUNTER__) - rfCounter < 256, "You have too many states in this resumable function!")
+		RF_INTERNAL_END()
 
 /**
  * End the resumable function by calling another resumable function and returning its result.
@@ -75,11 +67,7 @@
 #define RF_END_RETURN_CALL(...) \
 			RF_RETURN_CALL(__VA_ARGS__); \
 			modm_fallthrough; \
-		default: \
-			this->popRf(); \
-			return {modm::rf::WrongState}; \
-	} \
-	static_assert(uint16_t(__COUNTER__) - rfCounter < 256, "You have too many states in this resumable function!")
+		RF_INTERNAL_END()
 
 /// Yield resumable function until next invocation.
 /// @hideinitializer
@@ -173,6 +161,13 @@
 			this->popRf(); \
 			return {modm::rf::Running}; \
 		case ((counter % 255) + 1): ;
+
+#define RF_INTERNAL_END() \
+		default: \
+			this->popRf(); \
+			return {modm::rf::WrongState}; \
+	} \
+	static_assert(uint16_t(__COUNTER__) - rfCounter < 256, "You have too many states in this resumable function!")
 
 #define RF_RETURN_1() \
 	do { \

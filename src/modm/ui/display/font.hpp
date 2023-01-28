@@ -18,7 +18,7 @@
  * \defgroup	modm_ui_display_font	Fonts
  *
  * Various fonts for graphical displays.
- * The fonts are created with the "FontCreator 3.0", see \c tools/font_creator.
+ * The fonts are created with the "FontCreator 3.0", see `tools/font_creator`.
  */
 
 #include "font/scripto_narrow.hpp"

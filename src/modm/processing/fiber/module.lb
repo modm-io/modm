@@ -1,0 +1,58 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2020, Erik Henriksson
+# Copyright (c) 2021, Christopher Durand
+# Copyright (c) 2021, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":processing:fiber"
+    module.description = FileReader("module.md")
+
+
+def prepare(module, options):
+    core = options[":target"].get_driver("core")["type"]
+    return ((core.startswith("cortex-m") or
+             core.startswith("avr") or
+             "x86_64" in core) and
+            options[":__fibers"])
+
+
+def build(env):
+    env.outbasepath = "modm/src/modm/processing/fiber"
+    env.copy("../fiber.hpp")
+
+    env.copy("context.h")
+
+    core = env[":target"].get_driver("core")["type"]
+    env.substitutions = {
+        "cm0": core.startswith("cortex-m0"),
+        "core": core,
+        "with_fpu": env.get(":platform:cortex-m:float-abi", "soft") != "soft",
+        "with_windows": env[":target"].identifier.family == "windows",
+        "target": env[":target"].identifier,
+        "multicore": env.has_module(":platform:multicore"),
+    }
+    if env.has_module(":platform:multicore"):
+        cores = int(env[":target"].identifier.cores)
+        env.substitutions["num_cores"] = cores
+    env.template("fiber.hpp.in")
+    env.template("scheduler.hpp.in")
+
+    env.template("stack.hpp.in")
+
+    if core.startswith("cortex-m"):
+        env.template("context_arm_m.cpp.in")
+
+    elif core.startswith("avr"):
+        env.copy("context_avr.cpp")
+
+    elif "x86_64" in core:
+        env.template("context_x86_64.cpp.in")

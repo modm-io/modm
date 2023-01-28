@@ -19,25 +19,26 @@
 namespace modm
 {
 /**
- * @ingroup 				modm_driver_bitbang_encoder_input
+ * @ingroup 				modm_driver_encoder_input_bitbang
  * @author  				Thomas Sommer
  *
  * @brief					This driver decodes a AB (incremental) encoder signal
  *
  * @tparam SignalA          First modm::platform::Gpio pin to input the encoder signal.
  * @tparam SignalB          Second modm::platform::Gpio pin to input the encoder signal.
- * @tparam POSTSCALER	 	n_cycles to count as one in-/decrement.
- * @tparam DeltaType		Must be signed integer and fit at least POSTSCALER. The Bigger
+ * @tparam PRESCALER	 	n_cycles to count as one in-/decrement.
+ * @tparam DeltaType		Must be signed integral and fit at least PRESCALER. The Bigger
  * 							DeltaType, the more inc-/decrements can be stored temporarily.
+ * @tparam ValueType		Must be unsigned integral.
  */
-template<typename SignalA, typename SignalB, uint8_t POSTSCALER = 4,
+template<typename SignalA, typename SignalB, uint8_t PRESCALER = 4,
 		 std::signed_integral DeltaType = int8_t>
 class BitBangEncoderInput
 {
-	static_assert(std::popcount(POSTSCALER) == 1,
-				  "POSTSCALER must be an integer to basis 2 and not 0: 1, 2, 4, 8, 16, ...");
-	static_assert(POSTSCALER <= std::numeric_limits<DeltaType>::max(),
-				  "DeltaType is to small for POSTSCALER.");
+	static_assert(std::has_single_bit(PRESCALER),
+				  "PRESCALER must be an integer to basis 2 and not 0: 1, 2, 4, 8, 16, ...");
+	static_assert(PRESCALER <= std::numeric_limits<DeltaType>::max(),
+				  "DeltaType is to small for PRESCALER.");
 
 	using Signals = modm::platform::SoftwareGpioPort<SignalA, SignalB>;
 
@@ -47,19 +48,19 @@ class BitBangEncoderInput
 	uint8_t inline getRaw();
 
 public:
-	using ValueType = DeltaType;
 	BitBangEncoderInput() : raw_last(0), delta(0){};
 
+	using InputType = modm::platform::Gpio::InputType;
 	// Connect SingalA and SignalB and store power-up state
 	inline void
-	connect();
+	initialize(const modm::platform::Gpio::InputType inputType = modm::platform::Gpio::InputType::PullUp);
 
 	// Call @1kHz for manual movement
 	inline void
 	update();
 
-	ValueType
-	getIncrement();
+	DeltaType
+	getDelta();
 
 private:
 	uint8_t raw_last;

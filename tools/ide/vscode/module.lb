@@ -1,0 +1,100 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2021, Raphael Lehmann
+# Copyright (c) 2021, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+import subprocess
+import platform
+
+def init(module):
+    module.name = ":ide:vscode"
+    module.description = FileReader("module.md")
+
+
+def prepare(module, options):
+    module.depends(":build")
+    return True
+
+
+def build(env):
+    pass
+
+
+def post_build(env):
+    env.outbasepath = env.relcwdoutpath(".vscode/")
+
+    configs = []
+    build_path = env.relative_outpath(env[":build:build.path"])
+    for buildtool in ["scons", "make"]:
+        for profile in ["release", "debug"]:
+            if env.has_module(":build:" + buildtool):
+                configs.append({
+                    "tool": buildtool,
+                    "profile": profile,
+                    "executable": "".join([build_path, "/", buildtool, "-", profile, "/", env[":build:project.name"], ".elf"]),
+                })
+
+    compiler = ""
+    core = ""
+    if env[":target"].has_driver("core:cortex-m*"):
+        compiler += "arm-none-eabi-"
+        core = "Arm "
+    elif env[":target"].has_driver("core:avr*"):
+        compiler += "avr-"
+        core = "AVR "
+    compiler += "g++"
+
+    # Find out the toolchain location
+    if "Windows" in platform.platform():
+        # FIXME: how do I query this on Windows?
+        compiler_path = compiler + ".exe"
+    else:
+        compiler_path = subprocess.run("which " + compiler, shell=True, stdout=subprocess.PIPE)
+        compiler_path = compiler_path.stdout.decode("ascii").strip()
+
+    flags = env.query(":build:collect_flags")(env)[None]
+    profiles = {
+        p: {f: (flags[f][""] + flags[f][p]) for f in ["cppdefines", "archflags"]}
+        for p in ["release", "debug"]
+    }
+
+    env.substitutions = {
+        "configs": configs,
+        "partname": env[":target"].partname.upper(),
+        "with_freertos": env.has_module(":freertos"),
+        "platform": core,
+        "profiles": profiles,
+        "include_paths": env.collector_values("::path.include"),
+        "compiler_path": compiler_path,
+        # FIXME: RTT block is searched for too early.
+        # See https://github.com/Marus/cortex-debug/wiki/SEGGER-RTT-support#known-issues
+        "with_rtt": False, # env.has_module(":platform:rtt"),
+    }
+    # IntelliSense config
+    env.template("c_cpp_properties.json.in")
+
+    # Only generate the tasks file for non-CMake build systems!
+    if configs:
+        env.template("tasks.json.in")
+
+    # Debugging support for Cortex-M only
+    if env[":target"].has_driver("core:cortex-m*"):
+        # rtt_ram = env.query(":platform:cortex-m:linkerscript", {})
+        # rtt_ram = rtt_ram.get("cont_ram_regions", [{"start": 0x20000000, "size": 4096}])[0]
+        # env.substitutions["rtt_ram"] = rtt_ram
+        # env.substitutions["rtt_channels"] = range(len(env.get(":platform:rtt:buffer.tx", [])))
+
+        openocd_cfg = ["modm/openocd.cfg"]
+        if env.get(":build:openocd.cfg", ""):
+            openocd_cfg.append(env[":build:openocd.cfg"])
+        env.substitutions["openocd_cfg"] = openocd_cfg
+
+        env.template("launch.json.in")

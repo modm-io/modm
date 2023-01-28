@@ -11,6 +11,7 @@
 
 #include <unittest/testsuite.hpp>
 
+/// @ingroup modm_test_test_math
 class RangeTest : public unittest::TestSuite
 {
 public:

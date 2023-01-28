@@ -1,0 +1,72 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2022, Andrey Kunitsyn
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+class Instance(Module):
+    def __init__(self, instance):
+        self.instance = instance
+
+    def init(self, module):
+        module.name = str(self.instance)
+        module.description = "UART {} instance".format(self.instance)
+
+    def prepare(self, module, options):
+        module.add_option(
+            NumericOption(
+                name="buffer.tx",
+                description="",
+                minimum=32, maximum="64Ki-2",
+                default=32))
+        module.add_option(
+            NumericOption(
+                name="buffer.rx",
+                description="",
+                minimum=32, maximum="64Ki-2",
+                default=32))
+
+        return True
+
+    def build(self, env):
+        properties = {
+            "id": self.instance,
+            "fifo_size": 32,
+        }
+        env.substitutions = properties
+        env.outbasepath = "modm/src/modm/platform/uart"
+
+        env.template("uart.hpp.in", "uart_{}.hpp".format(self.instance))
+        env.template("uart.cpp.in", "uart_{}.cpp".format(self.instance))
+
+
+def init(module):
+    module.name = ":platform:uart"
+    module.description = "Universal Asynchronous Receiver Transmitter (UART)"
+
+def prepare(module, options):
+    device = options[":target"]
+    if not device.has_driver("uart:rp*"):
+        return False
+
+    module.depends(
+        ":math:algorithm",
+        ":platform:gpio",
+        ":platform:clockgen",
+        ":architecture:uart",
+        ":architecture:interrupt")
+
+    for instance in listify(device.get_driver("uart")["instance"]):
+        module.add_submodule(Instance(instance))
+
+    return True
+
+def build(env):
+    pass

@@ -3,9 +3,6 @@
 
 {{authors}}
 
-<!-- (⚡️ expand on authors responsibilities and focus of past/current modm work) -->
-
-
 ## History of modm
 
 In the mid-2000s the [Roboterclub Aachen e.V.][rca_ev] has developed a software
@@ -14,8 +11,8 @@ PCs and microcontrollers. This library was initially used only in autonomous
 robots for the [Eurobot competition][eurobot].
 
 In 2009, XPCC became a separate project and over the years grew from a communication
-library to a general purpose framework (called lowercase xpcc, 'cos #namingthings) suitable for all
-kinds of embedded applications.
+library to a general purpose framework (called lowercase xpcc) suitable for all
+kinds of embedded applications, which made it quite messy.
 
 Between 2016 and 2018, Niklas and Fabian refactored xpcc into modm by completely
 rewriting the way the library generates its HAL. This also gave us the tools to
@@ -41,3 +38,5 @@ Check out how we're competing in the quarter finals of the Eurobot 2015 competit
 </div>
 
 {{links}}
+
+[rca_ev]: https://www.roboterclub.rwth-aachen.de

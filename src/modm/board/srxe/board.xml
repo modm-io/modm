@@ -1,0 +1,15 @@
+<library>
+  <repositories>
+    <repository>
+      <path>../../../../repo.lb</path>
+    </repository>
+  </repositories>
+
+  <options>
+    <option name="modm:target">atmega128rfa1-zu</option>
+    <option name="modm:platform:core:f_cpu">16M</option>
+  </options>
+  <modules>
+    <module>modm:board:srxe</module>
+  </modules>
+</library>

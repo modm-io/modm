@@ -1,0 +1,145 @@
+/*
+ * Copyright (c) 2022, Nikolay Semenov
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <modm/architecture/interface/interrupt.hpp>
+#include <modm/platform/extint/int_priority.hpp>
+#include <modm/platform/gpio/base.hpp>
+#include <modm/utils/inplace_function.hpp>
+
+#include <RP2040.h>
+
+#if defined __DOXYGEN__ || !defined MODM_EXTINT_HANDLER_STORAGE
+/// @ingroup modm_platform_extint
+#define MODM_EXTINT_HANDLER_STORAGE sizeof(void*)
+#endif
+
+namespace modm::platform
+{
+
+%% for type in types
+MODM_ISR_DECL(IO_IRQ_{{type | upper}});
+%% endfor
+
+/**
+ * Interrupt Handler
+ *
+ * @ingroup modm_platform_extint
+ */
+class IntHandler
+{
+public:
+	using Handler = modm::inplace_function<void(Gpio::InputTrigger_t), MODM_EXTINT_HANDLER_STORAGE, alignof(void*)>;
+
+public:
+	static void
+	enable(IRQn_Type type, IntPriority priority = IntPriority::Default)
+	{
+		if (!NVIC_GetEnableIRQ(type))
+		{
+			if (priority != static_cast<IntPriority>(NVIC_GetPriority(type)))
+			{
+				NVIC_SetPriority(type, priority);
+			}
+			NVIC_ClearPendingIRQ(type);
+			NVIC_EnableIRQ(type);
+		}
+	}
+
+	static void
+	disable(IRQn_Type type)
+	{
+		NVIC_DisableIRQ(type);
+	}
+
+	template<class Pin>
+	static void
+	connect(Gpio::InputTrigger_t triggers, Handler&& handler)
+	{
+		constexpr const auto type = irqType<Pin::port>();
+		static_assert(0 <= type, "Support for this Pin's Port is not enabled!");
+
+		enable(type);
+
+		disableInterrupts<Pin>(Gpio::InputTrigger::All);
+		acknowledgeInterrupts<Pin>(Gpio::InputTrigger::All);
+
+		irqHandler<Pin::port>(Pin::pin) = handler;
+
+		enableInterrupts<Pin>(triggers);
+	}
+
+	template<class Pin>
+	static void
+	disconnect()
+	{
+		static_assert(0 <= irqType<Pin::port>(), "Support for this Pin's Port is not enabled!");
+
+		disableInterrupts<Pin>(Gpio::InputTrigger::All);
+		irqHandler<Pin::port>(Pin::pin) = nullptr;
+	}
+
+private:
+	template<class Pin>
+	static void
+	enableInterrupts(Gpio::InputTrigger_t triggers)
+	{
+		Gpio::PortRegs<Pin::port>::enable_irq(Pin::pin, triggers);
+	}
+
+	template<class Pin>
+	static void
+	disableInterrupts(Gpio::InputTrigger_t triggers)
+	{
+		Gpio::PortRegs<Pin::port>::disable_irq(Pin::pin, triggers);
+	}
+
+	template<class Pin>
+	static void
+	acknowledgeInterrupts(Gpio::InputTrigger_t triggers)
+	{
+		Gpio::PortRegs<Pin::port>::acknowledge_irq(Pin::pin, triggers);
+	}
+
+%% for type in types
+	static void
+	irq{{type | capitalize}}Handler();
+	friend void MODM_ISR_NAME(IO_IRQ_{{type | upper}})();
+
+	// In the current implementation we do not allow handlers
+	// for the same line (pin) for more than a single core.
+	static Handler {{type}}Handlers[NUM_{{type | upper}}_GPIOS];
+
+%% endfor
+
+	template <Gpio::Port port>
+	static constexpr IRQn_Type
+	irqType()
+	{
+%% for type in types
+		if constexpr (port == Gpio::Port::{{type | capitalize}}) { return IO_IRQ_{{type | upper}}_IRQn; }
+%% endfor
+		return static_cast<IRQn_Type>(-99);
+	}
+
+	template <Gpio::Port port>
+	static constexpr Handler&
+	irqHandler(uint8_t pin)
+	{
+%% for type in types
+		if constexpr (port == Gpio::Port::{{type | capitalize}}) { return {{type}}Handlers[pin]; }
+%% endfor
+		return *static_cast<Handler*>(nullptr);
+	}
+};
+
+}  // namespace modm::platform

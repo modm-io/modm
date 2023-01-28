@@ -33,7 +33,7 @@ modm_test::SpiDevice::SpiDevice() :
 
 modm_test::SpiDevice::~SpiDevice()
 {
-	delete rxBuffer;
+	delete[] rxBuffer;
 }
 
 // ----------------------------------------------------------------------------
@@ -156,7 +156,7 @@ modm_test::SpiDevice::start(const Transmission* transmissions,
 	}
 
 	if (rxBuffer != nullptr) {
-		delete rxBuffer;
+		delete[] rxBuffer;
 		rxBuffer = nullptr;
 	}
 

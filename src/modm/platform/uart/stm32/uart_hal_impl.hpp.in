@@ -210,6 +210,16 @@ bool
 %% endif
 }
 
+bool
+{{ hal }}::isTransmissionComplete()
+{
+%% if extended_driver
+	return {{ peripheral }}->ISR & USART_ISR_TC;
+%% else
+	return {{ peripheral }}->SR & USART_SR_TC;
+%% endif
+}
+
 void
 {{ hal }}::enableInterruptVector(bool enable, uint32_t priority)
 {

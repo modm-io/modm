@@ -1,0 +1,345 @@
+/*
+ * Copyright (c) 2022, Andrey Kunitsyn
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <cstdint>
+#include <algorithm>
+#include "../device.hpp"
+#include <hardware/structs/dma.h>
+#include <hardware/regs/dreq.h>
+
+namespace modm::platform
+{
+
+/// @ingroup modm_platform_dma
+struct DmaBase
+{
+	using IrqHandler = void (*)(void);
+
+	enum class Channel : uint32_t
+	{
+%% for channel in dma.channel
+		Channel{{channel.name}},
+%% endfor
+	};
+	enum class Request : uint32_t
+	{
+		Pio0_Tx0  = DREQ_PIO0_TX0,
+		Pio0_Tx1  = DREQ_PIO0_TX1,
+		Pio0_Tx2  = DREQ_PIO0_TX2,
+		Pio0_Tx3  = DREQ_PIO0_TX3,
+		Pio0_Rx0  = DREQ_PIO0_RX0,
+		Pio0_Rx1  = DREQ_PIO0_RX1,
+		Pio0_Rx2  = DREQ_PIO0_RX2,
+		Pio0_Rx3  = DREQ_PIO0_RX3,
+		Pio1_Tx0  = DREQ_PIO1_TX0,
+		Pio1_Tx1  = DREQ_PIO1_TX1,
+		Pio1_Tx2  = DREQ_PIO1_TX2,
+		Pio1_Tx3  = DREQ_PIO1_TX3,
+		Pio1_Rx0  = DREQ_PIO1_RX0,
+		Pio1_Rx1  = DREQ_PIO1_RX1,
+		Pio1_Rx2  = DREQ_PIO1_RX2,
+		Pio1_Rx3  = DREQ_PIO1_RX3,
+		Spi0_Tx   = DREQ_SPI0_TX,
+		Spi0_Rx   = DREQ_SPI0_RX,
+		Spi1_Tx   = DREQ_SPI1_TX,
+		Spi1_Rx   = DREQ_SPI1_RX,
+		Uart0_Tx  = DREQ_UART0_TX,
+		Uart0_Rx  = DREQ_UART0_RX,
+		Uart1_Tx  = DREQ_UART1_TX,
+		Uart1_Rx  = DREQ_UART1_RX,
+		Pwm_Wrap0 = DREQ_PWM_WRAP0,
+		Pwm_Wrap1 = DREQ_PWM_WRAP1,
+		Pwm_Wrap2 = DREQ_PWM_WRAP2,
+		Pwm_Wrap3 = DREQ_PWM_WRAP3,
+		Pwm_Wrap4 = DREQ_PWM_WRAP4,
+		Pwm_Wrap5 = DREQ_PWM_WRAP5,
+		Pwm_Wrap6 = DREQ_PWM_WRAP6,
+		Pwm_Wrap7 = DREQ_PWM_WRAP7,
+		I2c0_Tx   = DREQ_I2C0_TX,
+		I2c0_Rx   = DREQ_I2C0_RX,
+		I2c1_Tx   = DREQ_I2C1_TX,
+		I2c1_Rx   = DREQ_I2C1_RX,
+		Adc       = DREQ_ADC,
+		Xip_Stream = DREQ_XIP_STREAM,
+		Xip_SsiTx = DREQ_XIP_SSITX,
+		Xip_SsiRx = DREQ_XIP_SSIRX,
+		Dma_Timer0 = DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0,
+		Dma_Timer1 = DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1,
+		Dma_Timer2 = DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2,
+		Dma_Timer3 = DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_TIMER3,
+		Force      = DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PERMANENT,
+	};
+
+	enum class
+	TransferDataSize : uint32_t
+	{
+		Byte 		= 0,
+		Bit8 		= Byte,
+		HalfWord 	= 1,
+		Bit16 		= HalfWord,
+		Word 		= 2,
+		Bit32 		= Word,
+	};
+
+	enum class
+	Priority : uint32_t
+	{
+		Normal 		= 0,
+		High 		= 1,
+	};
+};
+
+/// @author Andrey Kunitsyn
+/// @ingroup modm_platform_dma
+class DmaController : public DmaBase
+{
+public:
+	/**
+	 * Start multiple channels simultaneously
+	 */
+	template <class... Channels>
+	static inline void start() {
+		dma_hw->multi_channel_trigger = (Channels::mask | ...);
+	}
+
+	class ChannelDummy
+	{
+		public:
+			static constexpr uint32_t mask = 0;
+			static void
+			configure(TransferDataSize transferDataSize,
+					bool readIncrement,
+					bool writeIncrement) {
+				(void)transferDataSize;
+				(void)readIncrement;
+				(void)writeIncrement;
+			}
+			static void
+			start() {}
+			static void
+			setReadAddress(uintptr_t address) {
+				(void)address;
+			}
+			static void
+			setWriteAddress(uintptr_t address) {
+				(void)address;
+			}
+			static void
+			setReadIncrementMode(bool increment) {
+				(void)increment;
+			}
+			static void
+			setWriteIncrementMode(bool increment) {
+				(void)increment;
+			}
+			static void
+			setDataLength(std::size_t length) {
+				(void)length;
+			}
+
+			template <Request dmaRequest>
+			static void
+			setPeripheralRequest() {}
+			static bool isBusy() { return false; }
+	};
+
+	/// Class representing a DMA channel/stream
+	template <DmaBase::Channel ChannelID>
+	class Channel
+	{
+	public:
+		static constexpr DmaBase::Channel name = ChannelID;
+		static constexpr uint32_t idx = uint32_t(ChannelID);
+		static constexpr uint32_t mask = (1u << idx);
+
+		/**
+		 * Configure the DMA channel
+		 *
+		 * Stops the DMA channel and writes the new values to its control register.
+		 *
+		 * @param[in] transferDataSize Size of data in transfer (byte, halfword, word)
+		 * @param[in] readIncrement Defines whether the read address is incremented
+		 * 			  after a transfer completed
+		 * @param[in] writeIncrement Defines whether the write address is
+		 * 			  incremented after a transfer completed
+		 */
+		static void
+		configure(TransferDataSize transferDataSize, bool readIncrement, bool writeIncrement)
+		{
+			const uint32_t ctrl =
+					(uint32_t(transferDataSize) << DMA_CH0_CTRL_TRIG_DATA_SIZE_LSB) |
+					(readIncrement ? DMA_CH0_CTRL_TRIG_INCR_READ_BITS : 0) |
+					(writeIncrement ? DMA_CH0_CTRL_TRIG_INCR_WRITE_BITS : 0) |
+					(idx << DMA_CH0_CTRL_TRIG_CHAIN_TO_LSB) |
+					DMA_CH0_CTRL_TRIG_EN_BITS |
+					DMA_CH0_CTRL_TRIG_IRQ_QUIET_BITS;
+			// write to alt1, dnt start
+			dma_hw->ch[idx].al1_ctrl = ctrl;
+		}
+
+		/// Start the transfer of the DMA channel
+		static void
+		start()
+		{
+			dma_hw->multi_channel_trigger = mask;
+		}
+
+		/// Stop a DMA channel transfer
+		static void
+		stop()
+		{
+			dma_hw->abort = mask;
+			while (dma_hw->abort & mask) __NOP();
+		}
+
+		/**
+		 * Set the read address of the DMA channel
+		 *
+		 * @note In Mem2Mem mode use this method to set the memory source address.
+		 *
+		 * @param[in] address Source address
+		 */
+		static void
+		setReadAddress(uintptr_t address)
+		{
+			dma_hw->ch[idx].read_addr = address;
+		}
+
+		/**
+		 * Set the write address of the DMA channel
+		 *
+		 * @note In Mem2Mem mode use this method to set the memory destination address.
+		 *
+		 * @param[in] address Destination address
+		 */
+		static void
+		setWriteAddress(uintptr_t address)
+		{
+			dma_hw->ch[idx].write_addr = address;
+		}
+
+		/**
+		 * Enable/disable read increment
+		 *
+		 * When enabled, the read address is incremented by the size of the data
+		 * (e.g. 1 for byte transfers, 4 for word transfers) after the transfer
+		 * completed.
+		 *
+		 * @param[in] increment Enable/disable
+		 */
+		static void
+		setReadIncrementMode(bool increment)
+		{
+			if (increment) {
+				hw_set_bits(&dma_hw->ch[idx].al1_ctrl,DMA_CH0_CTRL_TRIG_INCR_READ_BITS);
+			} else {
+				hw_clear_bits(&dma_hw->ch[idx].al1_ctrl,DMA_CH0_CTRL_TRIG_INCR_READ_BITS);
+			}
+		}
+
+		/**
+		 * Enable/disable write increment
+		 *
+		 * When enabled, the write address is incremented by the size of the data
+		 * (e.g. 1 for byte transfers, 4 for word transfers) after the transfer
+		 * completed.
+		 *
+		 * @param[in] increment Enable/disable
+		 */
+		static void
+		setWriteIncrementMode(bool increment)
+		{
+			if (increment) {
+				hw_set_bits(&dma_hw->ch[idx].al1_ctrl,DMA_CH0_CTRL_TRIG_INCR_WRITE_BITS);
+			} else {
+				hw_clear_bits(&dma_hw->ch[idx].al1_ctrl,DMA_CH0_CTRL_TRIG_INCR_WRITE_BITS);
+			}
+		}
+
+		/// Set the length of data to be transfered (num transactions, not bytes)
+		static void
+		setDataLength(std::size_t length)
+		{
+			dma_hw->ch[idx].transfer_count = length;
+		}
+
+		/// Set the peripheral that operates the channel
+		template <Request dmaRequest>
+		static void
+		setPeripheralRequest()
+		{
+			hw_write_masked(&dma_hw->ch[idx].al1_ctrl,
+				(uint32_t(dmaRequest) << DMA_CH0_CTRL_TRIG_TREQ_SEL_LSB),
+				DMA_CH0_CTRL_TRIG_TREQ_SEL_BITS);
+		}
+
+		/// Enable the specified interrupt of the channel
+		static void
+		enableInterrupt()
+		{
+			hw_clear_bits(&dma_hw->ch[idx].al1_ctrl,DMA_CH0_CTRL_TRIG_IRQ_QUIET_BITS);
+		}
+
+		/// Disable the specified interrupt of the channel
+		static void
+		disableInterrupt()
+		{
+			hw_set_bits(&dma_hw->ch[idx].al1_ctrl,DMA_CH0_CTRL_TRIG_IRQ_QUIET_BITS);
+		}
+
+		static inline bool isBusy()
+		{
+			return dma_hw->ch[idx].al1_ctrl & DMA_CH0_CTRL_TRIG_BUSY_BITS;
+		}
+
+		static inline bool isCompleted()
+		{
+			return !isBusy();
+		}
+
+		static inline void startWrite(const void* src,std::size_t count)
+		{
+			dma_hw->ch[idx].read_addr = (uint32_t)src;
+			dma_hw->ch[idx].al1_transfer_count_trig = count;
+		}
+
+		static inline void startRead(void* dst,std::size_t count)
+		{
+			dma_hw->ch[idx].write_addr = (uint32_t)dst;
+			dma_hw->ch[idx].al1_transfer_count_trig = count;
+		}
+
+		template <class OtherChannel>
+		static inline void chainTo()
+		{
+			hw_write_masked(&dma_hw->ch[idx].al1_ctrl,
+				(OtherChannel::idx << DMA_CH0_CTRL_TRIG_CHAIN_TO_LSB),
+				DMA_CH0_CTRL_TRIG_CHAIN_TO_BITS);
+		}
+	};
+};
+
+/**
+ * Derive DMA controller classes for convenience. Every derived class defines
+ * the channels available on that controller.
+ * @ingroup modm_platform_dma
+ */
+class Dma: public DmaController
+{
+public:
+%% for channel in dma.channel
+	using Channel{{ channel.name }} = DmaController::Channel<DmaBase::Channel::Channel{{ channel.name }}>;
+%% endfor
+};
+
+}	// namespace modm::platform

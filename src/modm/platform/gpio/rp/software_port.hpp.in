@@ -1,0 +1,107 @@
+/*
+ * Copyright (c) 2018, 2022, Niklas Hauser
+ * Copyright (c) 2022, Andrey Kunitsyn
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include "set.hpp"
+#include <type_traits>
+
+namespace modm::platform
+{
+
+/**
+ * Create an up to 32-bit port from arbitrary pins.
+ *
+ * This class optimizes the data type for the `read()` and `write()` methods.
+ * Supplying up to 8 Gpios will use `uint8_t`, up to 16 Gpios `uint16_t` and
+ * up to 32 Gpios `uint32_t`.
+ *
+ * @note Since the bit order is explicitly given by the order of arguments,
+ *       this class only supports `DataOrder::Normal`.
+ *       If you need reverse bit order, reverse the order of `Gpios`!
+ *
+ * @tparam Gpios	Up to 32 GpioIO classes, ordered MSB to LSB
+ *
+ * @author	Niklas Hauser
+ * @ingroup	modm_platform_gpio
+ */
+template< class... Gpios >
+class SoftwareGpioPort : public ::modm::GpioPort, public GpioSet<Gpios...>
+{
+	using Set = GpioSet<Gpios...>;
+public:
+	using Set::width;
+	static_assert(width <= 32, "Only a maximum of 32 pins are supported by this Port!");
+	using PortType = std::conditional_t< (width > 8),
+					 std::conditional_t< (width > 16),
+										 uint32_t,
+										 uint16_t >,
+										 uint8_t >;
+	static constexpr DataOrder getDataOrder()
+	{ return ::modm::GpioPort::DataOrder::Normal; }
+
+protected:
+	static constexpr int8_t shift_masks[{{ ports | length }}][width] = {
+%% for port in ports
+		{(Gpios::port == Gpio::Port::{{port}} ? Gpios::pin : -1)...},
+%% endfor
+	};
+	static constexpr int8_t shift_mask(uint8_t id, uint8_t pos) { return shift_masks[id][width - 1 - pos]; }
+	using Set::mask;
+	using Set::inverted;
+
+public:
+	static PortType isSet()
+	{
+		PortType r{0};
+%% for port, id in ports.items()
+		if constexpr (mask({{id}})) {
+			const uint32_t p = (Gpio::PortRegs<Gpio::Port::{{port}}>::sio_out() & mask({{id}})) ^ inverted({{id}});
+	%% for pos in range(32)
+			if constexpr ({{pos}} < width) if constexpr (constexpr auto pos = shift_mask({{id}}, {{pos}}); pos >= 0) r |= ((p >> pos) & 1) << {{pos}};
+	%% endfor
+		}
+%% endfor
+		return r;
+	}
+
+	static void write(PortType data)
+	{
+%% for port, id in ports.items()
+		if constexpr (mask({{id}})) { uint32_t ps{0}; uint32_t pr{0};
+	%% for pos in range(32)
+			if constexpr ({{pos}} < width) if constexpr (constexpr auto pos = shift_mask({{id}}, {{pos}}); pos >= 0) { if (data & (1ul << {{pos}})) { ps |= (1ul << pos); } else { pr |= (1ul << pos); }}
+	%% endfor
+			ps ^= inverted({{id}});
+			pr ^= inverted({{id}});
+			if (ps) Gpio::PortRegs<Gpio::Port::{{port}}>::sio_set(ps);
+			if (pr) Gpio::PortRegs<Gpio::Port::{{port}}>::sio_clr(pr);
+		}
+%% endfor
+	}
+
+	static PortType read()
+	{
+		PortType r{0};
+%% for port, id in ports.items()
+		if constexpr (mask({{id}})) {
+			const uint32_t p = (Gpio::PortRegs<Gpio::Port::{{port}}>::sio_in() & mask({{id}})) ^ inverted({{id}});
+	%% for pos in range(32)
+			if constexpr ({{pos}} < width) if constexpr (constexpr auto pos = shift_mask({{id}}, {{pos}}); pos >= 0) r |= ((p >> pos) & 1) << {{pos}};
+	%% endfor
+		}
+%% endfor
+		return r;
+	}
+};
+
+} // namespace modm::platform

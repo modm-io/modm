@@ -4,11 +4,9 @@
   <device platform="hosted" family="darwin">
     <naming-schema>{platform}-{family}</naming-schema>
 
-    <attribute-core value="x86"/>
-
     <driver name="can" type="hosted"/>
     <driver name="can" type="canusb"/>
-    <driver name="core" type="hosted"/>
+    <driver name="core" type="hosted-x86_64"/>
     <driver name="gpio" type="hosted"/>
     <driver name="uart" type="hosted"/>
   </device>

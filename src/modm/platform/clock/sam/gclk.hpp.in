@@ -1,0 +1,365 @@
+/*
+ * Copyright (c) 2019, Ethan Slattery
+ * Copyright (c) 2020, Erik Henriksson
+ * Copyright (c) 2022, Christopher Durand
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <cstdint>
+#include "../device.hpp"
+#include <modm/architecture/interface/delay.hpp>
+#include <modm/platform/gpio/config.hpp>
+#include <modm/math/units.hpp>
+
+namespace modm::platform
+{
+/// @ingroup modm_platform_gclk
+/// @{
+
+enum class
+ClockSource : uint32_t
+{
+%% for source in clock_sources
+	{{ source.name }} = {{ source.value }}{% if not loop.last %},{% endif %}
+%% endfor
+};
+
+enum class
+ClockGenerator : uint32_t
+{
+	System = 0,
+	Main = 0,
+%% for i in range(0, generator_count)
+	Generator{{i}} = {{i}}{% if not loop.last %},{% endif %}
+%% endfor
+};
+
+struct GeneratorConfiguration
+{
+	ClockSource source{};
+
+	/**
+	 * The clock will be divided by the selected divider.
+	 * Normal integer division and division by 2^(N+1) is supported.
+	 * The registers will be automatically configured in the appropriate mode
+	 * for division by powers of 2.
+	 *
+	 * @warning Not all generator instances support the full 16 bit divider value range.
+	 * 			This is currently not checked yet at compile-time. Only the maximum limits
+	 * 			are verified.
+	 */
+	uint32_t divider = 1;
+
+	bool gpioOutputEnabled = false;
+};
+
+enum class
+ClockPeripheral : uint32_t
+{
+%% for clock in peripheral_clocks
+%%	set instance=clock.get("instance", "")
+%%	set name=clock.get("name", "")
+%%	if clock["peripheral"] in ["sysctrl", "oscctrl"]
+%% 	set peripheral=""
+%% else
+%% 	set peripheral=clock["peripheral"]
+%% endif
+%%	if clock["peripheral"] == "sercom" and name == "core"
+%% 	set name=""
+%% endif
+%% 	set id=peripheral.capitalize() + instance + name.capitalize()
+	{{ id }} = {{clock["value"]}}{% if not loop.last %},{% endif %}
+%% endfor
+};
+
+%% if has_dpll
+
+struct DpllSource
+{
+	enum class DpllReference
+	{
+		// values correspond to REFCLOCK field in DPLLCTRLB
+%% if target.family == "d5x/e5x"
+		Gclk = 0,
+		Xosc32 = 1,
+		Xosc0 = 2,
+		Xosc1 = 3
+%% elif target.family == "d1x/d2x/dax"
+		Xosc32 = 0,
+		Xosc = 1,
+		Gclk = 2
+%% endif
+	};
+
+	DpllReference reference{};
+	frequency_t frequency{};
+
+	constexpr bool isXoscSource() const
+	{
+%% if target.family == "d5x/e5x"
+		return (reference == DpllReference::Xosc0)
+			|| (reference == DpllReference::Xosc1);
+%% elif target.family == "d1x/d2x/dax"
+		return reference == DpllReference::Xosc;
+%% endif
+	}
+};
+
+template<frequency_t freq>
+constexpr DpllSource GclkSource = DpllSource{DpllSource::DpllReference::Gclk, freq};
+
+template<frequency_t freq = 32768>
+constexpr DpllSource Xosc32Source = DpllSource{DpllSource::DpllReference::Xosc32, freq};
+
+%% if target.family == "d5x/e5x"
+template<frequency_t freq>
+constexpr DpllSource Xosc0Source = DpllSource{DpllSource::DpllReference::Xosc0, freq};
+
+template<frequency_t freq>
+constexpr DpllSource Xosc1Source = DpllSource{DpllSource::DpllReference::Xosc1, freq};
+%% elif target.family == "d1x/d2x/dax"
+template<frequency_t freq>
+constexpr DpllSource XoscSource = DpllSource{DpllSource::DpllReference::Xosc, freq};
+%% endif
+
+struct DpllConfig
+{
+%% if target.family == "d5x/e5x"
+	static constexpr uint16_t MultiplierFractionalBits{5};
+	static constexpr uint16_t MultiplierIntegerBits{13};
+	static constexpr unsigned MaxReference{kHz(3200)};
+	static constexpr unsigned MinOutput{MHz(96)};
+	static constexpr unsigned MaxOutput{MHz(200)};
+%% elif target.family == "d1x/d2x/dax"
+	static constexpr uint16_t MultiplierFractionalBits{4};
+	static constexpr uint16_t MultiplierIntegerBits{12};
+	static constexpr unsigned MaxReference{MHz(2)};
+	static constexpr unsigned MinOutput{MHz(48)};
+	static constexpr unsigned MaxOutput{MHz(96)};
+%% endif
+	static constexpr unsigned MinReference{kHz(32)};
+	// divider operation: f_out = f_in / (2 * (DIV + 1))
+	static constexpr uint16_t XoscDividerBits{11};
+
+	uint16_t integerMultiplier{};
+	uint16_t fractionalMultiplier{};
+	uint16_t xoscDivider{};
+};
+
+%% if target.family == "d5x/e5x"
+enum class DpllInstance
+{
+	Dpll0 = 0,
+	Dpll1 = 1
+};
+%% endif
+%% endif
+
+%% if target.family == "d5x/e5x"
+enum class Xosc
+{
+	Xosc0 = 0,
+	Xosc1 = 1
+};
+%% endif
+
+enum class XoscStartupTime
+{
+	Start_31us = 0x0u,
+	Start_61us = 0x1u,
+	Start_122us = 0x2u,
+	Start_244us = 0x3u,
+	Start_488us = 0x4u,
+	Start_977us = 0x5u,
+	Start_1953us = 0x6u,
+	Start_3906us = 0x7u,
+	Start_7813us = 0x8u,
+	Start_15625us = 0x9u,
+	Start_31250us = 0xAu,
+	Start_61250us = 0xBu,
+	Start_125000us = 0xCu,
+	Start_250000us = 0xDu,
+	Start_500000us = 0xEu,
+	Start_1000000us = 0xFu
+};
+
+enum class Xosc32StartupTime
+{
+%% if target.family == "d1x/d2x/dax"
+	Start_132us = 0x0u,
+	Start_1ms = 0x1u,
+	Start_63ms = 0x2u,
+	Start_125ms = 0x3u,
+	Start_500ms = 0x4u,
+	Start_1000ms = 0x5u,
+	Start_2000ms = 0x6u,
+	Start_4000ms = 0x7u
+%% else
+	Start_63ms = 0x0u,
+	Start_125ms = 0x1u,
+	Start_500ms = 0x2u,
+	Start_1000ms = 0x3u,
+	Start_2000ms = 0x4u,
+	Start_4000ms = 0x5u,
+	Start_8000ms = 0x6u
+%% endif
+};
+
+%% if target.family == "d1x/d2x/dax"
+	enum class Osc8mPrescaler
+	{
+		Prescaler1 = 0x0,
+		Prescaler2 = 0x1,
+		Prescaler4 = 0x2,
+		Prescaler8 = 0x3
+	};
+%% endif
+
+/// @}
+
+/**
+ * Clock management
+ *
+ * @ingroup modm_platform_gclk
+ */
+class GenericClockController
+{
+public:
+	static constexpr uint32_t BootFrequency = {{ boot_frequency }};
+
+	template< uint32_t Core_Hz, uint16_t Vdd_mV=3300 >
+	static uint32_t
+	setFlashLatency();
+
+	template< uint32_t Core_Hz >
+	static void
+	updateCoreFrequency();
+
+%% if target.family == "d1x/d2x/dax"
+	/// Configure frequency of the internal oscillator
+	static bool
+	configureOsc8m(Osc8mPrescaler prescaler, uint32_t waitCycles = 10'000);
+
+	/// Enable DFLL48M in open-loop mode
+	static bool
+	enableDfll48m(uint32_t waitCycles = 10'000);
+%% endif
+
+	/// Enable DFLL48M in closed-loop mode
+	/// @warning The reference clock on GCLK channel 0 must be available prior to calling this function
+	template<frequency_t reference>
+	static bool
+	enableDfll48mClosedLoop(uint32_t waitCycles = 10'000);
+
+	/// Enable PLL with automatically computed coefficients
+	/// If the specified tolerance is exceeded, compilation will fail.
+	template<DpllSource source, frequency_t output, uint16_t tolerance_ppm = 5>
+	static bool
+%% if target.family == "d5x/e5x"
+	enableDpll(DpllInstance instance = DpllInstance::Dpll0);
+%% else
+	enableDpll();
+%% endif
+
+	/// Enable PLL with manual configuration
+	template<DpllSource source, DpllConfig config>
+	static bool
+%% if target.family == "d5x/e5x"
+	enableDpll(DpllInstance instance = DpllInstance::Dpll0);
+%% else
+	enableDpll();
+%% endif
+
+	static inline void
+%% if target.family == "d5x/e5x"
+	disableDpll(DpllInstance instance = DpllInstance::Dpll0);
+%% else
+	disableDpll();
+%% endif
+
+	template<frequency_t frequency, XoscStartupTime startupTime = XoscStartupTime::Start_15625us>
+	static bool
+%% if target.family == "d5x/e5x"
+	enableExternalCrystal(Xosc clock, uint32_t waitCycles = (1000u << unsigned(startupTime)));
+%% else
+	enableExternalCrystal(uint32_t waitCycles = (1000u << unsigned(startupTime)));
+%% endif
+
+	static inline bool
+%% if target.family == "d5x/e5x"
+	enableExternalClock(Xosc clock, uint32_t waitCycles = 10'000);
+%% else
+	enableExternalClock(uint32_t waitCycles = 10'000);
+%% endif
+
+	static inline bool
+	enableExternalCrystal32k(Xosc32StartupTime time);
+
+	static inline bool
+	enableExternalClock32k();
+
+	template<ClockPeripheral peripheral>
+	static void
+	connect(ClockGenerator clockGen);
+
+	template<ClockGenerator clockGen, GeneratorConfiguration config>
+	static void
+	enableGenerator();
+
+	template<ClockGenerator clockGen, ClockSource source>
+	static void
+	enableGenerator();
+
+	template<ClockGenerator clockGen>
+	static void
+	disableGenerator();
+
+	/**
+	 * Convenience function to configure "Main" clock generator source
+	 * with a divider of 1.
+	 *
+	 * Equivalent to:
+	 * @code
+	 * const auto config = GeneratorConfiguration{ .source = SOURCE, .divider = 1 };
+	 * GenericClockController::enableGenerator<ClockGenerator::Main, config>();
+	 * @endcode
+	 */
+	template<ClockSource source>
+	static bool
+	setSystemClock();
+
+private:
+	static inline void
+	sync();
+
+	static inline void
+	sync(ClockGenerator clockGen);
+};
+
+#if defined(__DOXYGEN__)
+/// Peripheral AHB/APB bus clock control
+/// @ingroup modm_platform_gclk
+template<typename Peripheral>
+struct PeripheralClock
+{
+	/// Enable peripheral clock
+	static void enable();
+	/// Disable peripheral clock
+	static void disable();
+};
+#else
+template<typename Peripheral>
+struct PeripheralClock;
+#endif
+
+}
+
+#include "gclk_impl.hpp"

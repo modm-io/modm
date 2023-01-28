@@ -151,7 +151,7 @@ void update()
 
 !!! warning "DO NOT use for hard real time systems!"
     You are responsible for polling these timers `execute()` methods as often as
-    required. If you need to meed hard real time deadlines these are not the
+    required. If you need to meet hard real time deadlines these are not the
     timers you are looking for!
 
 !!! note "Timers are stopped by default!"

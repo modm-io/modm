@@ -64,16 +64,16 @@ GpioSamplerTest::testTiming()
 		TEST_ASSERT_FALSE(r[1].read(3)); // low
 		TEST_ASSERT_TRUE( r[1].read(4)); // high
 
-		const int32_t ce = SystemCoreClock / 1000;
-		const int32_t cu = ce * 1.1f;
+		const uint32_t ce = SystemCoreClock / 1000;
+		const uint32_t cu = ce * 1.1f;
 
-		TEST_ASSERT_EQUALS(r[0].diff(0), 0);
-		TEST_ASSERT_EQUALS_RANGE(r[0].diff(1), 0l, ce);
+		TEST_ASSERT_EQUALS(r[0].diff(0), 0ul);
+		TEST_ASSERT_EQUALS_RANGE(r[0].diff(1), 0ul, ce);
 		TEST_ASSERT_EQUALS_RANGE(r[0].diff(2), ce, cu);
 		TEST_ASSERT_EQUALS_RANGE(r[0].diff(3), ce, cu);
 		TEST_ASSERT_EQUALS_RANGE(r[0].diff(4), ce, cu);
 
-		TEST_ASSERT_EQUALS(r[1].diff(0), 0);
+		TEST_ASSERT_EQUALS(r[1].diff(0), 0ul);
 		TEST_ASSERT_EQUALS_RANGE(r[1].diff(1), ce*4, ce*3 + cu);
 		TEST_ASSERT_EQUALS_RANGE(r[1].diff(2), ce, cu);
 		TEST_ASSERT_EQUALS_RANGE(r[1].diff(3), ce, cu);

@@ -74,7 +74,7 @@ private:
 	initializeWithPrescaler(uint16_t prescaler, uint8_t bs1, uint8_t bs2,
 			uint32_t interruptPriority, Mode startupMode, bool overwriteOnOverrun);
 public:
-	template< template<Peripheral _> class... Signals >
+	template< class... Signals >
 	static void
 	connect(Gpio::InputType inputType = Gpio::InputType::Floating)
 	{

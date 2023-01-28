@@ -1,0 +1,124 @@
+/*
+ * Copyright (c) 2017-2018, 2021, Niklas Hauser
+ * Copyright (c) 2022, Andrey Kunitsyn
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include "base.hpp"
+#include "data.hpp"
+#include "static.hpp"
+
+namespace modm::platform
+{
+
+/// @ingroup modm_platform_gpio
+using GpioUnused = GpioStatic<detail::DataUnused>;
+/**
+ * Dummy implementation of an I/O pin.
+ *
+ * This class can be used when a pin is not required. All functions
+ * are dummy functions which do nothing. `read()` will always
+ * return `false`.
+ *
+ * For example when creating a software SPI with the modm::SoftwareSimpleSpi
+ * class and the return channel (MISO - Master In Slave Out) is not needed,
+ * a good way is to use this class as a parameter when defining the
+ * SPI class.
+ *
+ * Example:
+ * @code
+ * #include <modm/architecture/platform.hpp>
+ *
+ * namespace pin
+ * {
+ *     typedef GpioOutputD7 Clk;
+ *     typedef GpioOutputD5 Mosi;
+ * }
+ *
+ * modm::SoftwareSpiMaster< pin::Clk, pin::Mosi, GpioUnused > Spi;
+ *
+ * ...
+ * Spi::write(0xaa);
+ * @endcode
+ *
+ * @author	Fabian Greif
+ * @author	Niklas Hauser
+ * @ingroup	modm_platform_gpio
+ */
+template<>
+class GpioStatic<detail::DataUnused> : public Gpio, public ::modm::GpioIO
+{
+public:
+	using Output = GpioUnused;
+	using Input = GpioUnused;
+	using IO = GpioUnused;
+	using Type = GpioUnused;
+	using Data = detail::DataUnused;
+	static constexpr bool isInverted = false;
+	static constexpr Port port = Port(-1);
+	static constexpr uint8_t pin = uint8_t(-1);
+	static constexpr uint{{8 if target.platform == "avr" else 16}}_t mask = 0;
+%% if target.platform in ["stm32"]
+protected:
+	static void setAlternateFunction(uint8_t) {}
+	static void setAlternateFunction() {}
+	static void setAnalogInput() {}
+%% elif target.platform in ["rp"]
+	static void setFunction(uint8_t) {}
+	static void setDriveStrength(DriveStrength) {}
+%% endif
+public:
+	// GpioOutput
+	static void setOutput() {}
+	static void setOutput(bool) {}
+%% if target.platform in ["stm32"]
+	static void setOutput(OutputType, OutputSpeed = OutputSpeed::MHz50) {}
+	static void configure(OutputType, OutputSpeed = OutputSpeed::MHz50) {}
+%% else
+	static void setOutput(OutputType) {}
+	static void configure(OutputType) {}
+%% endif
+
+	static void set() {}
+	static void set(bool) {}
+	static void reset() {}
+	static bool isSet() { return false; }
+	static void toggle() {}
+
+	// GpioInput
+	static void setInput() {}
+	static void setInput(InputType) {}
+	static void configure(InputType) {}
+	static bool read() { return false; }
+
+	// GpioIO
+	static Direction getDirection() { return Direction::In; }
+%% if target.platform in ["stm32"]
+	static void lock() {}
+%% endif
+	static void disconnect() {}
+
+public:
+	struct BitBang
+	{
+		using Data = detail::DataUnused;
+		static constexpr platform::Gpio::Signal Signal = platform::Gpio::Signal::BitBang;
+	};
+%% for name in all_signals | sort
+	struct {{ name }}
+	{
+		using Data = detail::DataUnused;
+		static constexpr platform::Gpio::Signal Signal = platform::Gpio::Signal::{{ name }};
+	};
+%% endfor
+};
+
+} // namespace modm::platform

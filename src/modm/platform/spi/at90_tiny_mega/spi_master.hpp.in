@@ -61,14 +61,14 @@ public:
 	DataMode : uint8_t
 	{
 		Mode0 = 0,	///< clock normal,   sample on rising  edge
-		Mode1 = (1 << CPOL{{ id }}),	///< clock normal,   sample on falling edge
-		Mode2 = (1 << CPHA{{ id }}),	///< clock inverted, sample on rising  edge
-		Mode3 = (1 << CPOL{{ id }}) | (1 << CPHA{{ id }}),	///< clock inverted, sample on falling edge
+		Mode1 = (1 << CPHA{{ id }}),	///< clock normal,   sample on falling edge
+		Mode2 = (1 << CPOL{{ id }}),	///< clock inverted, sample on falling  edge
+		Mode3 = (1 << CPOL{{ id }}) | (1 << CPHA{{ id }}),	///< clock inverted, sample on rising edge
 	};
 
 public:
 	// start documentation inherited
-	template< template<Peripheral _> class... Signals >
+	template< class... Signals >
 	static void
 	connect()
 	{

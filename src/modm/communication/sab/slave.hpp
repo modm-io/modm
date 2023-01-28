@@ -82,7 +82,7 @@ namespace modm
 			 * \brief	Send a response with an attached payload
 			 */
 			template <typename T>
-			modm_always_inline void
+			void
 			send(const T& payload);
 
 		protected:

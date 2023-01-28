@@ -48,7 +48,7 @@ LINKFLAGS += $(ARCHFLAGS)
 # Include paths
 CPPDEFINES += \
 %% for path in include_paths | sort
-	-I{{ path | modm.windowsify(escape_level=0) }}{% if not loop.last %} \{% endif %}
+	-I{{ path | relocate }}{% if not loop.last %} \{% endif %}
 %% endfor
 %% endif
 
@@ -57,7 +57,7 @@ CPPDEFINES += \
 # Repo sources
 {{ repo|upper }}_OBJS += \
 %% for file, _ in sources
-	$(BUILDPATH)/{{ file | modm.windowsify(escape_level=0) | objectify }}{% if not loop.last %} \{% endif %}
+	$(BUILDPATH)/{{ file | objectify }}{% if not loop.last %} \{% endif %}
 %% endfor
 
 # Include header dependencies files
@@ -66,7 +66,7 @@ CPPDEFINES += \
 # Custom build rules for repo sources
 %% for file, flags in sources
 	%% if flags | length
-$(BUILDPATH)/{{ file | modm.windowsify(escape_level=0) | objectify }}: {{ file | modm.windowsify(escape_level=0) }}
+$(BUILDPATH)/{{ file | objectify }}: $(OUTPATH)/{{ file }}
 	%% set ext = {"sx":"asm","s":"asm","S":"asm"}.get(file.split(".")[-1],file.split(".")[-1])
 	@$(call compile_{{ ext }},$@,$<,{% for key, profiles in flags.items() if "" in profiles %} {{ profiles[""] | join(" ") }}{% endfor %} \
 		%% for key, profiles in flags.items()
@@ -101,7 +101,7 @@ LIBS += \
 # Repo library paths
 LIBPATH += \
 %% for library in library_paths | sort
-	-L{{ library | modm.windowsify(escape_level=0) }}{% if not loop.last %} \{% endif %}
+	-L{{ library | relocate }}{% if not loop.last %} \{% endif %}
 %% endfor
 %% endif
 

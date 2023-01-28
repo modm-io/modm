@@ -1,0 +1,14 @@
+<library>
+  <repositories>
+    <repository>
+      <path>../../../../repo.lb</path>
+    </repository>
+  </repositories>
+
+  <options>
+    <option name="modm:target">samg55j19a-au</option>
+  </options>
+  <modules>
+    <module>modm:board:samg55-xplained-pro</module>
+  </modules>
+</library>

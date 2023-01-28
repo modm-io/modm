@@ -36,6 +36,8 @@ For *release builds*:
 For *debug builds*:
 
 - `-Og`: optimize for debugging experience.
+- `MODM_DEBUG_BUILD`: this macro is only defined in debug profile. You can use
+                      it with `#ifdef MODM_DEBUG_BUILD` to enable debug code.
 
 #### Only C
 

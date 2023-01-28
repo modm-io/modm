@@ -26,14 +26,14 @@ namespace platform
 /// @{
 
 /// enables global interrupts
-static modm_always_inline void
+static void
 enableInterrupts()
 {
 	sei();
 }
 
 /// disables global interrupts
-static modm_always_inline void
+static void
 disableInterrupts()
 {
 	cli();

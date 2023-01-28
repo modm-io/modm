@@ -404,14 +404,14 @@ protected:
 
 	/// @cond
 	/// read an 8bit value from a register
-	modm::ResumableResult<bool> modm_always_inline
+	modm::ResumableResult<bool>
 	read(Register reg, uint8_t& value)
 	{ return read(reg, &value, 1); }
 	/// @endcond
 
 	/// @cond
 	/// write to a control register
-	modm::ResumableResult<bool> modm_always_inline
+	modm::ResumableResult<bool>
 	write(Register reg, Control_t value)
 	{ return write(reg, value.value); }
 	/// @endcond

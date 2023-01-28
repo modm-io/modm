@@ -1,0 +1,10 @@
+<library>
+  <extends>modm:same54-xplained-pro</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/same54_xplained_pro/blink</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:uart:1</module>
+  </modules>
+</library>

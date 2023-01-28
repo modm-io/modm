@@ -1,0 +1,28 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2022, Andrey Kunitsyn
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":platform:multicore"
+    module.description = FileReader("multicore.md")
+
+
+def prepare(module, options):
+    if options[":target"].identifier.platform != "rp":
+        return False
+    return True
+
+
+def build(env):
+    env.outbasepath = "modm/src/modm/platform/core"
+    env.substitutions = {"num_cores": int(env[":target"].identifier.cores)}
+    env.template('multicore.hpp.in')
+    env.copy('multicore.cpp')

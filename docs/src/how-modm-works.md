@@ -284,9 +284,6 @@ bool state = Button::read();
 // Depending on your targets, additional functions are available
 Led::setOutput(Gpio::OutputType::OpenDrain);
 Button::setInput(Gpio::InputType::PullUp);
-Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-Button::enableExternalInterrupt();
-Button::acknowledgeExternalInterruptFlag();
 ```
 
 You can use these GPIOs as building blocks for more complex drivers and
@@ -341,12 +338,12 @@ sensible default size for its purpose.
 ```
  $ lbuild discover-module-options
 ...
-modm:platform:cortex-m:main_stack_size = 3040  [256 ... 65536]
+modm:platform:cortex-m:main_stack_size = 3Ki  [256 .. 3Ki .. 64Ki]
 
   Minimum size of the application main stack
 ...
-modm:platform:uart:1:buffer.rx = 16  [1 ... 65534]
-modm:platform:uart:1:buffer.tx = 250  [1 ... 65534]
+modm:platform:uart:1:buffer.rx = 16  [0 ... 64Ki-2]
+modm:platform:uart:1:buffer.tx = 250  [0 ... 64Ki-2]
 ```
 
 We transparently show you how much static memory your application is using,
@@ -363,10 +360,10 @@ Program:    8144B (0.8% used)
 (.fastcode + .fastdata + .hardware_init + .reset + .rodata + .table.copy.intern +
  .table.section_heap + .table.zero.intern + .text)
 
-Data:       3464B (1.7% used) = 424B static (0.2%) + 3040B stack (1.5%)
+Data:       3496B (1.8% used) = 424B static (0.2%) + 3072B stack (1.6%)
 (.bss + .fastdata + .stack)
 
-Heap:     197240B (98.3% available)
+Heap:     197240B (98.2% available)
 (.heap0 + .heap1 + .heap2 + .heap5)
 ```
 <!-- (⚡️ automate size generation from example output) -->

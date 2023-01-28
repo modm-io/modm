@@ -367,7 +367,7 @@ simple telnet client. Disconnect with Ctrl+D.
 
 ```
  $ make log-rtt
-Info : rtt: Searching for control block 'modm.rtt.modm'
+Info : rtt: Searching for control block 'SEGGER RTT'
 Info : rtt: Control block found at 0x20000008
 loop: 57
 loop: 58
@@ -483,6 +483,23 @@ Creates a Intel-hex file of your executable.
  $ make bin
 Hex File······· {debug|release}/blink.hex
 ```
+
+
+#### make uf2
+
+```
+make uf2 profile={debug|release} [firmware={hash or file}]
+```
+
+Creates a UF2 compatible file of your executable. UF2 is a
+[bootloader by Microsoft](https://github.com/microsoft/uf2).
+
+```
+ $ make uf2
+UF2 File······· {debug|release}/blink.uf2
+```
+
+(\* *only ARM Cortex-M targets*)
 
 
 ## Information Tool

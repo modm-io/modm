@@ -62,7 +62,7 @@ private:
 	struct Identifier
 	{
 	protected:
-		modm_always_inline
+		inline
 		Identifier(uint32_t identifier) :
 			value(identifier)
 		{
@@ -71,7 +71,7 @@ private:
 		uint32_t value;
 
 	public:
-		modm_always_inline
+		inline
 		operator uint32_t () const
 		{
 			return value;
@@ -84,7 +84,7 @@ public:
 	 */
 	struct ExtendedIdentifier : public Identifier
 	{
-		modm_always_inline
+		inline
 		ExtendedIdentifier(uint32_t identifier, RemoteRequestStatus rtr = NO_RTR) :
 			Identifier((identifier << 3) | 0x4 | ((rtr) ? 0x2 : 0))
 		{
@@ -96,13 +96,13 @@ public:
 	 */
 	struct ExtendedFilterMask
 	{
-		modm_always_inline
+		inline
 		ExtendedFilterMask(uint32_t identifier, RemoteRequestFilter rtr = RTR_MATCH) :
 			value((identifier << 3) | 0x4 | ((rtr) ? 0x2 : 0))
 		{
 		}
 
-		modm_always_inline
+		inline
 		operator uint32_t () const
 		{
 			return value;
@@ -117,7 +117,7 @@ public:
 	 */
 	struct StandardIdentifier : public Identifier
 	{
-		modm_always_inline
+		inline
 		StandardIdentifier(uint16_t identifier, RemoteRequestStatus rtr = NO_RTR) :
 			Identifier((identifier << 21) | ((rtr) ? 0x2 : 0))
 		{
@@ -129,13 +129,13 @@ public:
 	 */
 	struct StandardFilterMask
 	{
-		modm_always_inline
+		inline
 		StandardFilterMask(uint16_t identifier, RemoteRequestFilter rtr = RTR_MATCH) :
 			value((identifier << 21) | ((rtr) ? 0x2 : 0))
 		{
 		}
 
-		modm_always_inline
+		inline
 		operator uint32_t () const
 		{
 			return value;
@@ -150,7 +150,7 @@ private:
 	struct IdentifierShort
 	{
 	protected:
-		modm_always_inline
+		inline
 		IdentifierShort(uint16_t identifier) :
 			value(identifier)
 		{
@@ -159,7 +159,7 @@ private:
 		uint16_t value;
 
 	public:
-		modm_always_inline
+		inline
 		operator uint16_t () const
 		{
 			return value;
@@ -176,7 +176,7 @@ public:
 	 */
 	struct ExtendedIdentifierShort : public IdentifierShort
 	{
-		modm_always_inline
+		inline
 		ExtendedIdentifierShort(uint32_t identifier, RemoteRequestStatus rtr = NO_RTR) :
 			IdentifierShort(((identifier >> 13) & 0xffe0) |
 					((identifier >> 15) & 0x007f) |
@@ -194,7 +194,7 @@ public:
 	 */
 	struct ExtendedFilterMaskShort
 	{
-		modm_always_inline
+		inline
 		ExtendedFilterMaskShort(uint32_t identifier, RemoteRequestFilter rtr = RTR_MATCH) :
 			value(((identifier >> 13) & 0xffe0) |
 					((identifier >> 15) & 0x007f) |
@@ -203,7 +203,7 @@ public:
 		{
 		}
 
-		modm_always_inline
+		inline
 		operator uint16_t () const
 		{
 			return value;
@@ -219,7 +219,7 @@ public:
 	 */
 	struct StandardIdentifierShort : public IdentifierShort
 	{
-		modm_always_inline
+		inline
 		StandardIdentifierShort(uint16_t identifier, RemoteRequestStatus rtr = NO_RTR) :
 			IdentifierShort(((identifier << 5) & 0xffe0) | ((rtr) ? 0x10 : 0))
 		{
@@ -228,13 +228,13 @@ public:
 
 	struct StandardFilterMaskShort
 	{
-		modm_always_inline
+		inline
 		StandardFilterMaskShort(uint16_t identifier, RemoteRequestFilter rtr = RTR_MATCH) :
 			value(((identifier << 5) & 0xffe0) | ((rtr) ? 0x10 : 0))
 		{
 		}
 
-		modm_always_inline
+		inline
 		operator uint16_t () const
 		{
 			return value;
@@ -254,7 +254,7 @@ public:
 	 * @param	id		29-bit identifier
 	 * @param	mask	29-bit mask
 	 */
-	static modm_always_inline void
+	static void
 	setFilter(uint8_t bank, Fifo fifo, ExtendedIdentifier id, ExtendedFilterMask mask)
 	{
 		setFilterBase(bank, fifo | MASK_MODE | SINGLE_MODE, id, mask);
@@ -269,7 +269,7 @@ public:
 	 * @param	id		11-bit identifier
 	 * @param	mask	11-bit mask
 	 */
-	static modm_always_inline void
+	static void
 	setFilter(uint8_t bank, Fifo fifo, StandardIdentifier id, StandardFilterMask mask)
 	{
 		setFilterBase(bank, fifo | MASK_MODE | SINGLE_MODE, id, mask);
@@ -286,14 +286,14 @@ public:
 	 * @param	id		11 or 29-bit identifier
 	 * @param	id2		11 or 29-bit identifier
 	 */
-	static modm_always_inline void
+	static void
 	setIdentifierFilter(uint8_t bank, Fifo fifo, Identifier id, Identifier id2)
 	{
 		setFilterBase(bank, fifo | LIST_MODE | SINGLE_MODE, id, id2);
 	}
 
 	// ----------------------------------------------------------------
-	static modm_always_inline void
+	static void
 	setFilterShort(uint8_t bank, Fifo fifo,
 			StandardIdentifierShort id1, StandardFilterMaskShort mask1,
 			StandardIdentifierShort id2, StandardFilterMaskShort mask2)
@@ -303,7 +303,7 @@ public:
 				id2 | ((uint32_t) mask2 << 16));
 	}
 
-	static modm_always_inline void
+	static void
 	setFilterShort(uint8_t bank, Fifo fifo,
 			StandardIdentifierShort id1, StandardFilterMaskShort mask1,
 			ExtendedIdentifierShort id2, ExtendedFilterMaskShort mask2)
@@ -313,7 +313,7 @@ public:
 				id2 | ((uint32_t) mask2 << 16));
 	}
 
-	static modm_always_inline void
+	static void
 	setFilterShort(uint8_t bank, Fifo fifo,
 			ExtendedIdentifierShort id1, ExtendedFilterMaskShort mask1,
 			StandardIdentifierShort id2, StandardFilterMaskShort mask2)
@@ -323,7 +323,7 @@ public:
 				id2 | ((uint32_t) mask2 << 16));
 	}
 
-	static modm_always_inline void
+	static void
 	setFilterShort(uint8_t bank, Fifo fifo,
 			ExtendedIdentifierShort id1, ExtendedFilterMaskShort mask1,
 			ExtendedIdentifierShort id2, ExtendedFilterMaskShort mask2)
@@ -348,7 +348,7 @@ public:
 	 * @param	id3		11 or 29-bit identifier
 	 * @param	id4		11 or 29-bit identifier
 	 */
-	static modm_always_inline void
+	static void
 	setIdentifierFilterShort(uint8_t bank, Fifo fifo,
 			IdentifierShort id1, IdentifierShort id2,
 			IdentifierShort id3, IdentifierShort id4)
@@ -364,7 +364,7 @@ public:
 	static void
 	disableFilter(uint8_t bank);
 
-%% if target["family"] in ["f1", "f2", "f4"]
+%% if target_has_can2
 	/**
 	 * Set the first filter bank for CAN2.
 	 *

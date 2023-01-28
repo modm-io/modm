@@ -4,9 +4,14 @@ on: [pull_request]
 
 jobs:
   macos_testing:
-    runs-on: macos-10.15
+    runs-on: macos-12
 
     steps:
+      # update Xcode version to fix linker bug
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '14.1'
+
       - name: Setup environment - Brew tap
         run: |
           brew tap modm-ext/arm
@@ -24,7 +29,7 @@ jobs:
         run: |
           pip3 install --user modm scons
           echo "/usr/local/bin" >> $GITHUB_PATH
-          echo "/Users/runner/Library/Python/3.9/bin" >> $GITHUB_PATH
+          echo "/Users/runner/Library/Python/3.11/bin" >> $GITHUB_PATH
 
       - name: Dump environment
         run: |
@@ -46,25 +51,31 @@ jobs:
           avr-g++ --version
 
       - name: Check out repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
 
-      - name: Git Submodules
+      - name: Update lbuild
         run: |
-          git submodule update --init --jobs 8
+          pip3 install --upgrade --upgrade-strategy=eager modm
 
       - name: Hosted Unittests
+        if: always()
         run: |
           (cd test && make run-hosted-darwin)
 
       - name: Hosted Examples
+        if: always()
         run: |
           (cd examples && ../tools/scripts/examples_compile.py linux)
 
       - name: Compile STM32 Examples
+        if: always()
         run: |
           (cd examples && ../tools/scripts/examples_compile.py nucleo_f031k6 nucleo_f103rb nucleo_f303re nucleo_f411re nucleo_f746zg)
           (cd examples && ../tools/scripts/examples_compile.py nucleo_g071rb nucleo_l031k6 nucleo_l152re nucleo_l476rg nucleo_g474re)
 
       - name: Compile AVR Examples
+        if: always()
         run: |
           (cd examples && ../tools/scripts/examples_compile.py avr)

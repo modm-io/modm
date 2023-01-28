@@ -1,0 +1,13 @@
+<library>
+  <!-- CI: run fail -->
+  <options>
+    <option name="modm:target">hosted-linux</option>
+    <option name="modm:build:build.path">../../../build/linux/etl</option>
+  </options>
+  <modules>
+    <module>modm:etl</module>
+    <module>modm:debug</module>
+    <module>modm:platform:core</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

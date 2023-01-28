@@ -180,6 +180,22 @@ extern "C" void* _sbrk_r(struct _reent *,  ptrdiff_t size)
 ```
 
 
+### Providing operator delete
+
+Unfortunately virtual C++ destructors can emit a call to `operator delete` even
+for classes with static allocation and also in program without a single call to
+`operator new` or `malloc`. Therefore if this module is not included, calls to
+`operator delete` are ignored and you must overwrite this behavior with this
+function that only points to `free`.
+
+```cpp
+extern "C" void operator_delete(void* ptr)
+{
+    free(ptr);
+}
+```
+
+
 ### Wrapping malloc
 
 To use a completely custom allocator, you need to replace the newlib allocator

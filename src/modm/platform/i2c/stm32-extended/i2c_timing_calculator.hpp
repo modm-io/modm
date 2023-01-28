@@ -23,6 +23,7 @@ namespace modm
 namespace platform
 {
 
+/// @ingroup	modm_platform_i2c
 struct I2cMasterTimings
 {
 	uint8_t prescaler;
@@ -32,6 +33,7 @@ struct I2cMasterTimings
 	uint8_t sclHigh;
 };
 
+/// @ingroup	modm_platform_i2c
 struct I2cParameters
 {
 	uint32_t peripheralClock;

@@ -1,0 +1,168 @@
+/*
+ * Copyright (c) 2020, Erik Henriksson
+ * Copyright (c) 2021, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#include "context.h"
+#include <modm/architecture/detect.hpp>
+
+/* Stack layout (growing downwards):
+ *
+ * fc_mxcsr | fc_x87_cw
+ * SEE registers XMM6-XMM15 (for windows)
+ * rbp
+ * rbx
+ * rsi (for windows)
+ * rdi (for windows)
+ * r15
+ * r14
+ * r13
+ * r12
+ */
+
+static void modm_naked
+modm_context_entry()
+{
+	asm volatile
+	(
+%% if with_windows
+		"popq %rcx		\n\t" // Load arg1
+%% else
+		"popq %rdi		\n\t" // Load arg1
+%% endif
+		"ret			\n\t" // jump into function
+	);
+}
+
+modm_context_t
+modm_context_init(uintptr_t stack, uintptr_t arg, uintptr_t fn, uintptr_t end)
+{
+	uintptr_t* sp = (uintptr_t*)arg;
+	*--sp = end;
+	*--sp = fn;
+	*--sp = arg;
+	*--sp = (uintptr_t) modm_context_entry;
+	sp -= 0xe8/8;
+	asm volatile
+	(
+		// initialize stack with the right flags
+		"stmxcsr 0xa0(%0)	\n\t"
+		"fnstcw  0xa4(%0)	\n\t"
+		:: "r" (sp)
+	);
+	return {(uintptr_t) sp, arg - stack};
+}
+
+static modm_context_t main_context;
+
+void
+modm_context_start(uintptr_t to)
+{
+	modm_context_jump(&(main_context.sp), to);
+}
+
+void
+modm_context_end()
+{
+	uintptr_t dummy;
+	modm_context_jump(&dummy, main_context.sp);
+	__builtin_unreachable();
+}
+
+/*
+The assembly code below is adapted from the Boost Context library to work
+for Windows, Linux and macOS.
+See https://github.com/boostorg/context/tree/develop/src/asm
+- Windows: jump_x86_64_ms_pe_clang_gas.S
+- Linux: jump_x86_64_sysv_elf_gas.S
+- macOS: jump_x86_64_sysv_macho_gas.S
+
+			Copyright Oliver Kowalke 2009.
+   Distributed under the Boost Software License, Version 1.0.
+	  (See accompanying file LICENSE_1_0.txt or copy at
+			http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+void modm_naked
+modm_context_jump(uintptr_t*, uintptr_t)
+{
+	asm volatile
+	(
+		"leaq -0xe8(%rsp), %rsp		\n\t"	// move stack pointer down
+%#
+%% if with_windows
+		// save XMM storage
+		"movups %xmm6,  0x00(%rsp)	\n\t"
+		"movups %xmm7,  0x10(%rsp)	\n\t"
+		"movups %xmm8,  0x20(%rsp)	\n\t"
+		"movups %xmm9,  0x30(%rsp)	\n\t"
+		"movups %xmm10, 0x40(%rsp)	\n\t"
+		"movups %xmm11, 0x50(%rsp)	\n\t"
+		"movups %xmm12, 0x60(%rsp)	\n\t"
+		"movups %xmm13, 0x70(%rsp)	\n\t"
+		"movups %xmm14, 0x80(%rsp)	\n\t"
+		"movups %xmm15, 0x90(%rsp)	\n\t"
+%#
+%% endif
+		"stmxcsr 0xa0(%rsp)			\n\t"	// save MMX control- and status-word
+		"fnstcw  0xa4(%rsp)			\n\t"	// save x87 control-word
+
+		"movq %r12, 0xa8(%rsp)		\n\t"	// save R12
+		"movq %r13, 0xb0(%rsp)		\n\t"	// save R13
+		"movq %r14, 0xb8(%rsp)		\n\t"	// save R14
+		"movq %r15, 0xc0(%rsp)		\n\t"	// save R15
+%% if with_windows
+		"movq %rdi, 0xc8(%rsp)		\n\t"	// save RDI
+		"movq %rsi, 0xd0(%rsp)		\n\t"	// save RSI
+%% endif
+		"movq %rbx, 0xd8(%rsp)		\n\t"	// save RBX
+		"movq %rbp, 0xe0(%rsp)		\n\t"	// save RBP
+%#
+%% if with_windows
+		"movq %rsp, (%rcx)			\n\t"	// Store the SP in "from"
+		"movq %rdx, %rsp			\n\t"	// Restore SP from "to"
+%% else
+		"movq %rsp, (%rdi)			\n\t"	// Store the SP in "from"
+		"movq %rsi, %rsp			\n\t"	// Restore SP from "to"
+%% endif
+%% if with_windows
+%#
+		// restore XMM storage
+		"movups 0x00(%rsp), %xmm6	\n\t"
+		"movups 0x10(%rsp), %xmm7	\n\t"
+		"movups 0x20(%rsp), %xmm8	\n\t"
+		"movups 0x30(%rsp), %xmm9	\n\t"
+		"movups 0x40(%rsp), %xmm10	\n\t"
+		"movups 0x50(%rsp), %xmm11	\n\t"
+		"movups 0x60(%rsp), %xmm12	\n\t"
+		"movups 0x70(%rsp), %xmm13	\n\t"
+		"movups 0x80(%rsp), %xmm14	\n\t"
+		"movups 0x90(%rsp), %xmm15	\n\t"
+%% endif
+%#
+		"ldmxcsr 0xa0(%rsp)			\n\t"	// restore MMX control- and status-word
+		"fldcw   0xa4(%rsp)			\n\t"	// restore x87 control-word
+
+		"movq 0xa8(%rsp),  %r12		\n\t"	// restore R12
+		"movq 0xb0(%rsp),  %r13		\n\t"	// restore R13
+		"movq 0xb8(%rsp),  %r14		\n\t"	// restore R14
+		"movq 0xc0(%rsp),  %r15		\n\t"	// restore R15
+%% if with_windows
+		"movq 0xc8(%rsp),  %rdi		\n\t"	// restore RDI
+		"movq 0xd0(%rsp),  %rsi		\n\t"	// restore RSI
+%% endif
+		"movq 0xd8(%rsp), %rbx		\n\t"	// restore RBX
+		"movq 0xe0(%rsp), %rbp		\n\t"	// restore RBP
+
+		"leaq 0xe8(%rsp), %rsp		\n\t"	// move stack pointer up
+
+		"ret						\n\t"	// Perform the jump back
+	);
+}

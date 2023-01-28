@@ -16,7 +16,7 @@
 
 #include <modm/communication/xpcc.hpp>
 
-/// @ingroup modm_test_test_communication
+/// @ingroup modm_test_test_communication_xpcc
 struct Message
 {
 	Message(const xpcc::Header& header, const modm::SmartPointer& payload) :

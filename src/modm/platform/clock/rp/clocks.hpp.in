@@ -1,0 +1,204 @@
+/*
+ * Copyright (c) 2022, Andrey Kunitsyn
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <hardware/structs/clocks.h>
+#include <hardware/structs/pll.h>
+#include <stdint.h>
+
+#include <modm/architecture/interface/delay.hpp>
+#include <modm/platform/core/resets.hpp>
+#include <modm/platform/device.hpp>
+
+namespace modm::platform
+{
+
+/// @ingroup modm_platform_clockgen
+class ClockControl
+{
+public:
+	enum class Clock
+	{
+%% for clk in clocks
+		{{ clk['name'] | capitalize }} = {{ clk['idx'] | int }},
+%% endfor
+	};
+	enum class ClockSrc
+	{
+%% for src in sources
+		{{ src }},
+%% endfor
+	};
+
+	enum class Pll
+	{
+		Sys,
+		Usb,
+	};
+
+	static constexpr uint32_t BootFrequency = 125'000'000;  // after bootloader
+
+protected:
+	/// @cond
+	struct InvalidConfig
+	{
+		static constexpr uint32_t src = 0xffffffff;
+		static constexpr uint32_t aux_src = 0xffffffff;
+	};
+
+	template<Clock clk, ClockSrc src>
+	struct SrcConfig : InvalidConfig
+	{};
+
+	static void
+	configureImpl(Clock clk, uint32_t src, uint32_t auxsrc, uint32_t div, uint32_t freq);
+	static void
+	configureImpl(Clock clk, uint32_t auxsrc, uint32_t div, uint32_t freq);
+
+	static constexpr bool
+	isGlitchless(Clock clk)
+	{
+%% for clk in clocks if clk['glitchless'] == "true"
+		if (clk == Clock::{{ clk['name'] | capitalize }}) return true;
+%% endfor
+		return false;
+	}
+	/// @endcond
+
+public:
+	static inline void
+	disableResus()
+	{
+		clocks_hw->resus.ctrl = 0;
+	}
+
+	static void
+	enableExternalCrystal(uint32_t freq, uint16_t delay_multiplier = 1);
+
+	template<Clock clk>
+	static void
+	disableAux()
+	{
+		static_assert(isGlitchless(clk),"This clock has only aux sources");
+%% for clk in clocks if clk['glitchless'] == "true"
+		{% if not loop.first %}else {% endif %}if constexpr (clk == Clock::{{ clk['name'] | capitalize }})
+		{
+			hw_clear_bits(&clocks_hw->clk[uint32_t(clk)].ctrl, CLOCKS_CLK_{{ clk['name'] | upper }}_CTRL_SRC_BITS);
+		}
+%% endfor
+		while (clocks_hw->clk[uint32_t(clk)].selected != 0x1) __NOP();
+	}
+
+	template<Pll pll_name, uint32_t refdiv, uint32_t pll_mul, uint32_t post_div1,
+			 uint32_t post_div2>
+	static void
+	initPll()
+	{
+		pll_hw_t* pll = pll_name == Pll::Sys ? pll_sys_hw : pll_usb_hw;
+		static_assert(pll_mul >= 16 and pll_mul <= 320, "invalid pll_mul");
+		// Check divider ranges
+		static_assert((post_div1 >= 1 and post_div1 <= 7) and (post_div2 >= 1 and post_div2 <= 7),
+					  "invalid post div");
+		// post_div1 should be >= post_div2
+		// from appnote page 11
+		// postdiv1 is designed to operate with a higher input frequency
+		// than postdiv2
+		static_assert(post_div2 <= post_div1, "post_div2 vs post_div1");
+		uint32_t pdiv = (post_div1 << PLL_PRIM_POSTDIV1_LSB) | (post_div2 << PLL_PRIM_POSTDIV2_LSB);
+		if ((pll->cs & PLL_CS_LOCK_BITS) and (refdiv == (pll->cs & PLL_CS_REFDIV_BITS)) and
+			(pll_mul == (pll->fbdiv_int & PLL_FBDIV_INT_BITS)) and
+			(pdiv == (pll->prim & (PLL_PRIM_POSTDIV1_BITS & PLL_PRIM_POSTDIV2_BITS))))
+		{
+			// do not disrupt PLL that is already correctly configured and operating
+			return;
+		}
+		uint32_t pll_reset = (Pll::Usb == pll_name) ? RESETS_RESET_PLL_USB_BITS : RESETS_RESET_PLL_SYS_BITS;
+		Resets::reset(pll_reset);
+		Resets::unresetWait(pll_reset);
+
+		// Load VCO-related dividers before starting VCO
+		pll->cs = refdiv;
+		pll->fbdiv_int = pll_mul;
+
+		// Turn on PLL
+		uint32_t power = PLL_PWR_PD_BITS |    // Main power
+						 PLL_PWR_VCOPD_BITS;  // VCO Power
+
+		hw_clear_bits(&pll->pwr, power);
+
+		// Wait for PLL to lock
+		while (!(pll->cs & PLL_CS_LOCK_BITS)) __NOP();
+
+		// Set up post dividers
+		pll->prim = pdiv;
+
+		// Turn on post divider
+		hw_clear_bits(&pll->pwr, PLL_PWR_POSTDIVPD_BITS);
+	}
+
+	/**
+	 * Valid connections are:
+%% for clk in clocks
+%% for src in clk.source
+	 * - Clock::{{ clk.name | capitalize }} -> ClockSrc::{{ src.cname }}
+%% endfor
+%% endfor
+	 */
+	template<Clock clk, ClockSrc src, uint32_t SrcFreq, uint32_t TargetFreq>
+	static void
+	configureClock()
+	{
+		using Config = SrcConfig<clk, src>;
+		constexpr uint32_t div = (uint64_t(SrcFreq) << 8) / TargetFreq;
+		static_assert(((uint64_t(SrcFreq) << 8) / div) == TargetFreq, "invalid freq");
+
+		if constexpr (isGlitchless(clk))
+		{
+			static_assert(Config::src != InvalidConfig::src and
+				Config::aux_src != InvalidConfig::aux_src,
+				"Invalid clock config");
+			configureImpl(clk, Config::src, Config::aux_src, div, TargetFreq);
+		}
+		else {
+			static_assert(Config::aux_src != InvalidConfig::aux_src, "Invalid clock config");
+			configureImpl(clk, Config::aux_src, div, TargetFreq);
+		}
+	}
+
+	template<uint32_t Core_Hz>
+	static void
+	updateCoreFrequency()
+	{
+		SystemCoreClock = Core_Hz;
+		delay_fcpu_MHz = computeDelayMhz(Core_Hz);
+		delay_ns_per_loop = computeDelayNsPerLoop(Core_Hz);
+	}
+};
+
+/// @cond
+// clocks connections matrix
+%% for clk in clocks
+// {{ clk.name | capitalize }}
+%% for src in clk.source
+template<>
+struct ClockControl::SrcConfig<ClockControl::Clock::{{ clk.name | capitalize }}, ClockControl::ClockSrc::{{ src.cname }}>
+{
+%% if clk.glitchless == 'true'
+	static constexpr uint32_t src = {{ src.src | int }};
+%% endif
+	static constexpr uint32_t aux_src = {{ src.aux | int }};
+};
+%% endfor
+%% endfor
+/// @endcond
+
+}  // namespace modm::platform

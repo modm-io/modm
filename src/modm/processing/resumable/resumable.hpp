@@ -206,7 +206,7 @@ protected:
 
 	/// increases nesting level, call this in the switch statement!
 	/// @return current state before increasing nesting level
-	rf::State modm_always_inline
+	rf::State
 	pushRf(uint_fast8_t index) const
 	{
 		return rfStateArray[index];
@@ -214,13 +214,13 @@ protected:
 
 	/// always call this before returning from the run function!
 	/// decreases nesting level
-	void modm_always_inline
+	void
 	popRf() const
 	{}
 
 	// invalidates the parent nesting level
 	// @warning	be aware in which nesting level you call this! (before popRf()!)
-	void modm_always_inline
+	void
 	stopRf(uint_fast8_t index)
 	{
 		rfStateArray[index] = rf::Stopped;
@@ -228,20 +228,20 @@ protected:
 
 	/// sets the state of the parent nesting level
 	/// @warning	be aware in which nesting level you call this! (before popRf()!)
-	void modm_always_inline
+	void
 	setRf(rf::State state, uint_fast8_t index)
 	{
 		rfStateArray[index] = state;
 	}
 
-	bool modm_always_inline
+	bool
 	nestingOkRf() const
 	{
 		return true;
 	}
 
 	/// @return	`true` if `stopRf()` has been called before
-	bool modm_always_inline
+	bool
 	isStoppedRf(uint_fast8_t index) const
 	{
 		return (rfStateArray[index] == rf::Stopped);

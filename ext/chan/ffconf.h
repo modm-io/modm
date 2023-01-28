@@ -3,11 +3,7 @@
 /---------------------------------------------------------------------------*/
 
 #ifndef FFCONF_DEF
-#define FFCONF_DEF	86631	/* Revision ID */
-
-// Simply forward
-#define ff_memalloc malloc
-#define ff_memfree free
+#define FFCONF_DEF	80286	/* Revision ID */
 
 /* A header file that overwrites with local project settings. */
 #if __has_include(<ffconf_local.h>)
@@ -359,33 +355,25 @@
 /      lock control is independent of re-entrancy. */
 
 
-/* #include <somertos.h>	// O/S definitions */
 #ifndef FF_FS_REENTRANT
 #	define FF_FS_REENTRANT	0
 #endif
 #ifndef FF_FS_TIMEOUT
 #	define FF_FS_TIMEOUT	1000
 #endif
-#ifndef FF_SYNC_t
-#	define FF_SYNC_t		HANDLE
-#endif
 /* The option FF_FS_REENTRANT switches the re-entrancy (thread safe) of the FatFs
 /  module itself. Note that regardless of this option, file access to different
 /  volume is always re-entrant and volume control functions, f_mount(), f_mkfs()
 /  and f_fdisk() function, are always not re-entrant. Only file/directory access
-/  to the same volume is under control of this function.
+/  to the same volume is under control of this featuer.
 /
-/   0: Disable re-entrancy. FF_FS_TIMEOUT and FF_SYNC_t have no effect.
+/   0: Disable re-entrancy. FF_FS_TIMEOUT have no effect.
 /   1: Enable re-entrancy. Also user provided synchronization handlers,
-/      ff_req_grant(), ff_rel_grant(), ff_del_syncobj() and ff_cre_syncobj()
-/      function, must be added to the project. Samples are available in
-/      option/syscall.c.
+/      ff_mutex_create(), ff_mutex_delete(), ff_mutex_take() and ff_mutex_give()
+/      function, must be added to the project. Samples are available in ffsystem.c.
 /
-/  The FF_FS_TIMEOUT defines timeout period in unit of time tick.
-/  The FF_SYNC_t defines O/S dependent sync object type. e.g. HANDLE, ID, OS_EVENT*,
-/  SemaphoreHandle_t and etc. A header file for O/S definitions needs to be
-/  included somewhere in the scope of ff.h. */
-
+/  The FF_FS_TIMEOUT defines timeout period in unit of O/S time tick.
+*/
 
 /*--- End of configuration options ---*/
 

@@ -37,7 +37,6 @@ namespace modm
 template<typename T, std::size_t size>
 struct FlashReader
 {
-	modm_always_inline
 	static T
 	read(const T* p)
 	{

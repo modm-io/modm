@@ -1,0 +1,45 @@
+/*
+ * Copyright (c) 2021, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#include "exti.hpp"
+
+namespace modm::platform
+{
+
+Exti::Handler
+Exti::handlers[Exti::Lines] modm_fastdata;
+
+void Exti::irq(uint32_t mask)
+{
+	uint32_t flags = EXTI->IMR{{"1" if (extended or separate_flags) else ""}} & mask;
+	while(flags)
+	{
+		const uint8_t lmb = 31ul - __builtin_clz(flags);
+		auto& fn = handlers[lmb];
+		if (fn) fn(lmb);
+%% if separate_flags
+		EXTI->FPR1 = 1ul << lmb;
+		EXTI->RPR1 = 1ul << lmb;
+%% else
+		EXTI->PR{{"1" if extended else ""}} = 1ul << lmb;
+%% endif
+		flags &= ~(1ul << lmb);
+	}
+}
+
+%% for irq, range in extimap.items() | sort
+MODM_ISR(EXTI{{irq}})
+{
+	Exti::irq(Exti::getVectorMaskForLine({{range[0]}}));
+}
+%% endfor
+
+}

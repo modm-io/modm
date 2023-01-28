@@ -1,0 +1,50 @@
+/*
+ * Copyright (c) 2022, Andrey Kunitsyn
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#include "../device.hpp"
+#include "resets.hpp"
+%% if with_multicore
+#include "multicore.hpp"
+%% endif
+
+extern "C" void
+__modm_initialize_platform(void)
+{
+%% if with_multicore
+	modm::platform::multicore::SystemSpinLock::init();
+%% endif
+
+	// Reset all peripherals to put system into a known state,
+	// - except for QSPI pads and the XIP IO bank, as this is fatal if running from flash
+	// - and the PLLs, as this is fatal if clock muxing has not been reset on this boot
+	// - and USB, syscfg, as this disturbs USB-to-SWD on core 1
+	modm::platform::Resets::reset(~(
+			RESETS_RESET_IO_QSPI_BITS |
+			RESETS_RESET_PADS_QSPI_BITS |
+			RESETS_RESET_PLL_USB_BITS |
+			RESETS_RESET_USBCTRL_BITS |
+			RESETS_RESET_SYSCFG_BITS |
+			RESETS_RESET_PLL_SYS_BITS
+	));
+
+	// Remove reset from peripherals which are clocked only by clk_sys and
+	// clk_ref. Other peripherals stay in reset until we've configured clocks.
+	modm::platform::Resets::unresetWait(RESETS_RESET_BITS & ~(
+			RESETS_RESET_ADC_BITS |
+			RESETS_RESET_RTC_BITS |
+			RESETS_RESET_SPI0_BITS |
+			RESETS_RESET_SPI1_BITS |
+			RESETS_RESET_UART0_BITS |
+			RESETS_RESET_UART1_BITS |
+			RESETS_RESET_USBCTRL_BITS
+	));
+
+}

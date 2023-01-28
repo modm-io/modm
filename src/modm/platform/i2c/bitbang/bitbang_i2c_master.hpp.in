@@ -16,10 +16,13 @@
 #ifndef MODM_SOFTWARE_BITBANG_I2C_HPP
 #define MODM_SOFTWARE_BITBANG_I2C_HPP
 
-#include <modm/platform/gpio/connector.hpp>
 #include <modm/architecture/interface/delay.hpp>
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/architecture/interface/i2c_master.hpp>
+#include <modm/platform/gpio/connector.hpp>
+%% if target.platform in ["avr", "rp"]
+#include <modm/platform/gpio/open_drain.hpp>
+%% endif
 
 namespace modm
 {
@@ -38,7 +41,7 @@ template< class Scl,
 		  class Sda >
 class BitBangI2cMaster : public modm::I2cMaster
 {
-%% if target["platform"] == "avr"
+%% if target.platform in ["avr", "rp"]
 	using SCL = platform::GpioOpenDrain<Scl>;
 	using SDA = platform::GpioOpenDrain<Sda>;
 %% else
@@ -48,9 +51,9 @@ class BitBangI2cMaster : public modm::I2cMaster
 
 public:
 	// start documentation inherited
-	template< template<Peripheral _> class... Signals, ResetDevices reset = ResetDevices::Standard >
+	template< class... Signals >
 	static void
-	connect(PullUps pullups = PullUps::External);
+	connect(PullUps pullups = PullUps::External, ResetDevices reset = ResetDevices::Standard);
 
 	/// Initializes the hardware, with the baudrate limited to about 250kbps.
 	template< class SystemClock, baudrate_t baudrate=kHz(100), percent_t tolerance=pct(5) >
@@ -61,7 +64,7 @@ public:
 	static bool
 	start(I2cTransaction *transaction, ConfigurationHandler handler = nullptr);
 
-	static Error modm_always_inline
+	static Error
 	getErrorState()
 	{ return errorState; }
 
@@ -116,13 +119,13 @@ private:
 
 	// timings
 	/// busy waits a **half** clock cycle
-	static modm_always_inline void
+	static void
 	delay2()
 	{ modm::delay_ns(delayTime*2); }
 
 	// timings
 	/// busy waits **quarter** clock cycle
-	static modm_always_inline void
+	static void
 	delay4()
 	{ modm::delay_ns(delayTime); }
 

@@ -15,8 +15,11 @@
 #define MODM_SOFTWARE_BITBANG_ONE_WIRE_HPP
 
 #include <modm/architecture/utils.hpp>
-#include <modm/platform/gpio/connector.hpp>
 #include <modm/architecture/interface/delay.hpp>
+#include <modm/platform/gpio/connector.hpp>
+%% if target.platform in ["avr", "rp"]
+#include <modm/platform/gpio/open_drain.hpp>
+%% endif
 
 namespace modm
 {
@@ -45,14 +48,14 @@ namespace platform
 template <typename Pin>
 class BitBangOneWireMaster
 {
-%% if target["platform"] == "avr"
+%% if target.platform in ["avr", "rp"]
 	using PIN = platform::GpioOpenDrain<Pin>;
 %% else
 	using PIN = Pin;
 %% endif
 
 public:
-	template< template<Peripheral _> class... Signals >
+	template< class... Signals >
 	static void
 	connect()
 	{

@@ -59,7 +59,7 @@ main()
 				TriggerOut::set();
 
 				MODM_LOG_INFO << "Mode: PWM" << modm::endl;
-				Timer1::configureOutputChannel(1,
+				Timer1::configureOutputChannel<GpioOutputA8::Ch1>(
 						Timer1::OutputCompareMode::Pwm,
 						Timer1::PinState::Enable,
 						Timer1::OutputComparePolarity::ActiveHigh,
@@ -70,7 +70,7 @@ main()
 				break;
 			case 1:
 				MODM_LOG_INFO << "Mode: HiZ" << modm::endl;
-				Timer1::configureOutputChannel(1,
+				Timer1::configureOutputChannel<GpioOutputA8::Ch1>(
 						Timer1::OutputCompareMode::ForceActive,
 						Timer1::PinState::Enable,
 						Timer1::OutputComparePolarity::ActiveLow,
@@ -81,7 +81,7 @@ main()
 				break;
 			case 2:
 				MODM_LOG_INFO << "Mode: High" << modm::endl;
-				Timer1::configureOutputChannel(1,
+				Timer1::configureOutputChannel<GpioOutputA8::Ch1>(
 						Timer1::OutputCompareMode::ForceActive,
 						Timer1::PinState::Enable,
 						Timer1::OutputComparePolarity::ActiveHigh,
@@ -92,7 +92,7 @@ main()
 				break;
 			case 3:
 				MODM_LOG_INFO << "Mode: Low" << modm::endl;
-				Timer1::configureOutputChannel(1,
+				Timer1::configureOutputChannel<GpioOutputA8::Ch1>(
 						Timer1::OutputCompareMode::ForceActive,
 						Timer1::PinState::Enable,
 						Timer1::OutputComparePolarity::ActiveLow,
@@ -102,7 +102,7 @@ main()
 						);
 				break;
 		}
-		Timer1::setCompareValue(1, compareValue);
+		Timer1::setCompareValue<GpioOutputA8::Ch1>(compareValue);
 		Timer1::applyAndReset();
 
 		// Go to next state after 250 ms

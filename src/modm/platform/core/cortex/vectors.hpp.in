@@ -1,0 +1,79 @@
+/*
+ * Copyright (c) 2021, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <stdint.h>
+#include <modm/architecture/utils.hpp>
+#include <string_view>
+
+extern "C"
+{
+
+void Reset_Handler(void);
+void NMI_Handler(void);
+void HardFault_Handler(void);
+%% for pos in range(4 - 16, highest_irq + 1)
+%% 	if pos in vector_table
+void {{vector_table[pos]}}(void);
+%%	endif
+%% endfor
+
+}
+
+namespace modm::platform::detail
+{
+
+constexpr std::string_view vectorNames[] =
+{
+	"__main_stack_top",
+	"Reset",
+	"NMI",
+	"HardFault",
+%% for pos in range(4 - 16, highest_irq)
+%% 	if pos in vector_table
+	"{{vector_table[pos] | replace('_Handler', '') | replace('_IRQHandler', '')}}",
+%% 	else
+	"Undefined",
+%% 	endif
+%% endfor
+};
+
+
+#ifndef MODM_ISR_DISABLE_VALIDATION
+#define MODM_ISR_VALIDATE(vector_str, vector) \
+	static_assert(::modm::platform::detail::validateIrqName(vector_str), \
+			"'" vector_str "' is not a valid IRQ name!\n" \
+			"  Hint: You do not need to add '_IRQHandler' to the name.\n" \
+			"  Hint: Here are all the IRQs on this device:\n" \
+%% for pos in range(0, highest_irq)
+%% if pos in vector_table
+			"    - {{vector_table[pos] | replace('_Handler', '') | replace('_IRQHandler', '')}}\n" \
+%% endif
+%% endfor
+	)
+#else
+#define MODM_ISR_VALIDATE(...)
+#endif
+
+constexpr int getIrqPosition(std::string_view name)
+{
+	for (int pos = 0; pos < {{highest_irq+16}}; pos++)
+		if (vectorNames[pos] == name) return pos;
+	return -1;
+}
+
+constexpr bool validateIrqName(std::string_view name)
+{
+	return getIrqPosition(name) != -1;
+}
+
+}	// namespace modm::platform::detail

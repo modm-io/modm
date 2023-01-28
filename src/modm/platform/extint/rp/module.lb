@@ -1,0 +1,67 @@
+#!/usr/bin/env python3
+#
+# Copyright (c) 2022, Nikolay Semenov
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+from collections import namedtuple
+
+IntOpts = namedtuple('IntOpts', ['name', 'enabled_by_default'])
+
+int_types = {
+    "bank0": IntOpts(name="gpio", enabled_by_default=True),
+    "qspi": IntOpts(name="qspi", enabled_by_default=False),
+}
+
+
+def init(module):
+    module.name = ":platform:extint"
+    module.description = FileReader("module.md")
+
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:interrupt",
+        ":cmsis:device",
+        ":platform:gpio")
+    for _, opts in int_types.items():
+        module.add_option(
+            BooleanOption(
+                name=opts.name,
+                description="Enable IRQ support for {}".format(opts.name.upper()),
+                default=opts.enabled_by_default))
+
+    return options[":target"].identifier.platform == "rp"
+
+
+def validate(env):
+    type_ids = int_types.keys()
+    if not any([env[int_types[tid].name] for tid in type_ids]):
+        raise ValidateException("At least one of IRQ types [{}] must be enabled!"
+                                .format(", ".join([int_types[tid].name for tid in type_ids])))
+
+
+def build(env):
+    multicore_enabled = env.has_module(":platform:multicore")
+
+    type_ids = sorted(int_types.keys())
+
+    enabled_types = [tid for tid in type_ids if env[int_types[tid].name]]
+
+    env.substitutions = {
+        "multicore_enabled": multicore_enabled,
+        "types": enabled_types,
+    }
+
+    for tid in type_ids:
+        env.substitutions["with_{}".format(tid)] = tid in enabled_types
+
+    env.outbasepath = "modm/src/modm/platform/extint"
+    env.copy("int_priority.hpp")
+    env.template("int_handler.hpp.in")
+    env.template("int_handler.cpp.in")

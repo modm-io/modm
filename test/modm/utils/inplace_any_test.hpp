@@ -11,7 +11,7 @@
 
 #include <unittest/testsuite.hpp>
 
-/// @ingroup modm_test_test_inplace_any
+/// @ingroup modm_test_test_utils
 class InplaceAnyTest : public unittest::TestSuite
 {
 public:

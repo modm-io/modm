@@ -25,7 +25,7 @@ def prepare(module, options):
         return False
 
     if options[":target"].identifier["platform"] not in ["hosted"]:
-        module.depends(":freertos")
+        module.depends(":freertos",":platform:heap")
 
     return True
 

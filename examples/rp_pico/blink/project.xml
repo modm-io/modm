@@ -1,0 +1,10 @@
+<library>
+  <extends>modm:rp-pico</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/rp_pico/blink</option>
+    <option name="modm:platform:cortex-m:vector_table_location">ram</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

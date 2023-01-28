@@ -62,7 +62,7 @@ public:
 
 public:
 	template< class SystemClock, baudrate_t baudrate, percent_t tolerance=pct(1) >
-	static void modm_always_inline
+	static void
 	initialize()
 	{
 		initialize(baudrate);

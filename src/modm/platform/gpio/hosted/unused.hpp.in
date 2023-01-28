@@ -10,16 +10,11 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_HOSTED_GPIO_PIN_UNUSED_HPP
-#define MODM_HOSTED_GPIO_PIN_UNUSED_HPP
+#pragma once
 
-#include "base.hpp"
 #include <modm/architecture/interface/gpio.hpp>
 
-namespace modm
-{
-
-namespace platform
+namespace modm::platform
 {
 
 /**
@@ -86,8 +81,4 @@ public:
 	// end documentation inherited
 };
 
-} // namespace platform
-
-} // namespace modm
-
-#endif
+} // namespace modm::platform

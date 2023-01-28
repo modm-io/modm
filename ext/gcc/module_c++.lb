@@ -31,7 +31,7 @@ or:
 
 ## AVR
 
-A partial port of GCC 8 libstdc++ is provided:
+A partial port of GCC libstdc++ is provided:
 See https://github.com/modm-io/avr-libstdcpp.
 """
 
@@ -82,6 +82,7 @@ def build(env):
         "with_exceptions": with_exceptions,
         "with_threadsafe_statics": with_threadsafe_statics,
         "with_memory_traits": env.has_module(":architecture:memory"),
+        "with_heap": env.has_module(":platform:heap"),
         "is_avr": is_avr,
     }
     env.outbasepath = "modm/ext/gcc"
@@ -93,7 +94,7 @@ def build(env):
         env.copy("libstdc++", ignore=env.ignore_files("*.lb", "*.md", "*.in", "examples"))
         env.template("assert.cpp.in", "assert.cpp")
 
-    env.collect(":build:cxxflags", "-fuse-cxa-atexit")
+    env.collect(":build:cxxflags", "-fno-use-cxa-atexit")
     # Threadsafe statics
     if not with_threadsafe_statics:
         env.collect(":build:cxxflags", "-fno-threadsafe-statics")

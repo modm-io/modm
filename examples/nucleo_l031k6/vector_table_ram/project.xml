@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:nucleo-l031k6</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_l031k6/vector_table_ram</option>
+    <option name="modm:platform:cortex-m:vector_table_location">ram</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:timer:2</module>
+  </modules>
+</library>

@@ -1,0 +1,33 @@
+#include "pico.h"
+#include "hardware/resets.h"
+
+#include <modm/platform/core/resets.hpp>
+%% if with_debug
+#include <modm/debug.hpp>
+%% endif
+
+/**
+ * Pico SDK compatibility for tinyusb
+ */
+
+extern "C" void reset_block(uint32_t blocks)
+{
+	modm::platform::Resets::reset(blocks);
+}
+extern "C" void unreset_block_wait(uint32_t blocks)
+{
+	modm::platform::Resets::unresetWait(blocks);
+}
+
+extern "C" void panic(const char *fmt, ...)
+{
+%% if with_debug
+	va_list va;
+	va_start(va, fmt);
+	modm::log::info.vprintf(fmt, va);
+	va_end(va);
+%% else
+	(void) fmt;
+%% endif
+	modm_assert(0, "pico", "Pico-SDK panic!");
+}

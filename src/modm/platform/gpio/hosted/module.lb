@@ -29,8 +29,5 @@ def build(env):
     env.substitutions = {"target": env[":target"].identifier}
     env.outbasepath = "modm/src/modm/platform/gpio"
 
-    env.template("base.hpp.in")
     env.template("unused.hpp.in")
     env.copy("../common/inverted.hpp", "inverted.hpp")
-    env.copy("../common/connector.hpp", "connector.hpp")
-    env.template("../common/connector_detail.hpp.in", "connector_detail.hpp")

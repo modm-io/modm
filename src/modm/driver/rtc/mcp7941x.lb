@@ -1,0 +1,37 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2021, Odin Holmes
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:mcp7941x"
+    module.description = """\
+# MCP79410/MCP79411/MCP79412
+
+Battery-Backed I2C Real-Time Clock/Calendar with SRAM, EEPROM and Protected EEPROM
+
+[MCP7941x datasheet](http://ww1.microchip.com/downloads/en/DeviceDoc/22266A.pdf)
+
+"""
+
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:i2c.device",
+        ":architecture:register",
+        ":processing:resumable")
+    return True
+
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/rtc"
+    env.copy("mcp7941x.hpp")
+    env.copy("mcp7941x_impl.hpp")

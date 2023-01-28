@@ -12,6 +12,7 @@
 
 def init(module):
     module.name = ":test:platform:delay"
+    module.description = "Tests for Delay"
 
 def prepare(module, options):
     module.depends(":architecture:delay")

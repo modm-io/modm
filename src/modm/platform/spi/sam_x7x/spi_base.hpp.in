@@ -1,0 +1,110 @@
+/*
+ * Copyright (c) 2023, Christopher Durand
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_SAMX7X_SPI_BASE_HPP
+#define MODM_SAMX7X_SPI_BASE_HPP
+
+#include <cstdint>
+#include "../device.hpp"
+#include <modm/architecture/interface/register.hpp>
+
+namespace modm::platform
+{
+
+/**
+ * Base class for SPI classes
+ *
+ * Provides common enums that do not depend on the specific SPI instance type.
+ *
+ * @author Christopher Durand
+ * @ingroup	modm_platform_spi
+ */
+class SpiBase
+{
+public:
+	enum class
+	Interrupt : uint32_t
+	{
+		RxRegisterFull   = SPI_IMR_RDRF,
+		TxRegisterEmpty  = SPI_IMR_TDRE,
+		ModeFaultError   = SPI_IMR_MODF,
+		OverrunError     = SPI_IMR_OVRES,
+		NssRising        = SPI_IMR_NSSR,
+		TransferFinished = SPI_IMR_TXEMPTY,
+		UnderrunError    = SPI_IMR_UNDES
+	};
+	MODM_FLAGS32(Interrupt);
+
+	enum class
+	StatusFlag : uint32_t
+	{
+		RxRegisterFull   = SPI_SR_RDRF,
+		TxRegisterEmpty  = SPI_SR_TDRE,
+		ModeFaultError   = SPI_SR_MODF,
+		OverrunError     = SPI_SR_OVRES,
+		NssRising        = SPI_SR_NSSR,
+		TransferFinished = SPI_SR_TXEMPTY,
+		UnderrunError    = SPI_SR_UNDES,
+		// SFERR is defined in the datasheet but not in any device header?
+		// SlaveFrameError  = SPI_SR_SFERR,
+		EnableStatus     = SPI_SR_SPIENS
+	};
+	MODM_FLAGS32(StatusFlag);
+
+	enum class
+	MasterSelection : uint32_t
+	{
+		Slave  = 0,
+		Master = SPI_MR_MSTR,
+
+		Mask = SPI_MR_MSTR_Msk
+	};
+
+	enum class
+	LocalLoopback : uint32_t
+	{
+		Disabled = 0,
+		Enabled  = SPI_MR_LLB,
+
+		Mask = SPI_MR_LLB_Msk
+	};
+
+	enum class
+	DataMode : uint32_t
+	{
+		Mode0 = SPI_CSR_NCPHA,                ///< clock normal,   sample on rising  edge
+		Mode1 = 0,                            ///< clock normal,   sample on falling edge
+		Mode2 = SPI_CSR_CPOL | SPI_CSR_NCPHA, ///< clock inverted, sample on falling edge
+		Mode3 = SPI_CSR_CPOL,                 ///< clock inverted, sample on rising  edge
+
+		Mask = SPI_CSR_CPOL_Msk | SPI_CSR_NCPHA_Msk
+	};
+
+	enum class
+	DataSize : uint32_t
+	{
+		Bit8  = SPI_CSR_BITS_8_BIT,
+		Bit9  = SPI_CSR_BITS_9_BIT,
+		Bit10 = SPI_CSR_BITS_10_BIT,
+		Bit11 = SPI_CSR_BITS_11_BIT,
+		Bit12 = SPI_CSR_BITS_12_BIT,
+		Bit13 = SPI_CSR_BITS_13_BIT,
+		Bit14 = SPI_CSR_BITS_14_BIT,
+		Bit15 = SPI_CSR_BITS_15_BIT,
+		Bit16 = SPI_CSR_BITS_16_BIT,
+
+		Mask = SPI_CSR_BITS_Msk
+	};
+};
+
+} // namespace modm::platform
+
+#endif // MODM_SAMX7X_SPI_BASE_HPP

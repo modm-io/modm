@@ -11,6 +11,7 @@
 
 #pragma once
 
+/// @cond
 %# FIXME: Missing custom linker section support for Windows
 #define MODM_ASSERTION_HANDLER(handler) \
 %% if target.family == "darwin"
@@ -22,4 +23,4 @@
 %% endif
 	const modm::AssertionHandler \
 	handler ## _assertion_handler_ptr = handler
-
+/// @endcond

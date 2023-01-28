@@ -2,7 +2,8 @@
 
 We love receiving pull requests. We use them ourselves for reviewing new features
 and fixing issues in modm. If you want to contribute, but don't exactly know what
-or how, have a look at the [issues we tagged with "help wanted"][help_wanted].
+or how, have a look at the [issues we tagged with "help wanted"][help_wanted] or
+the [threads tagged with "💡 Ideas"][ideas].
 
 To start contributing, please fork modm and then start a new branch on top of
 the `develop` branch. We prefer to fast-forward merges, instead of creating a
@@ -32,12 +33,13 @@ CI tests in order to be merged.
 
 ## When in doubt, ask
 
-The dedicated maintainers of modm are [@salkinium](https://github.com/salkinium)
-and [@rleh](https://github.com/rleh) and you can always ping them.
+The dedicated maintainers of modm are [@salkinium](https://github.com/salkinium),
+[@rleh](https://github.com/rleh) and [@chris-durand](https://github.com/chris-durand).
+You can always ping them.
 
 If you want to add a new platform, or other significant functionality, we
-[ask you to discuss that in an issue first][issues]. We are very open to new
-helping hands, but all of this is still fairly complicated and we want to
+[ask you to discuss that in a thread first][ideas]. We are very open to
+new helping hands, but all of this is still fairly complicated and we want to
 provide you with tips and additional explanations along the way.
 
 Communication is cheap, implementation is expensive and we don't want to
@@ -45,4 +47,5 @@ frustrate you.
 
 [issues]: https://github.com/modm-io/modm/issues
 [pulls]: https://github.com/modm-io/modm/pulls
+[ideas]: https://github.com/modm-io/modm/discussions/categories/ideas
 [help_wanted]: https://github.com/modm-io/modm/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted+🛠%22

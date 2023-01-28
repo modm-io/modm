@@ -1,0 +1,52 @@
+/*
+ * Copyright (c) 2022, Andrey Kunitsyn
+ * Copyright (c) 2022, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include "base.hpp"
+
+/// @cond
+namespace modm::platform::detail
+{
+
+template<class Signal, Peripheral p> struct SignalConnection;
+
+struct DataUnused {};
+%% for gpio in gpios
+%% set name  = gpio.gpio.name | capitalize
+%#
+struct Data{{ name }}
+{
+	static constexpr Gpio::Port port = Gpio::Port::{{ gpio.gpio.port | capitalize }};
+	static constexpr uint8_t pin = {{ gpio.gpio.pin }};
+	struct BitBang { using Data = Data{{ name }}; static constexpr Gpio::Signal Signal = Gpio::Signal::BitBang; };
+%% for signal in gpio.signals
+	struct {{ signal }} { using Data = Data{{ name }}; static constexpr Gpio::Signal Signal = Gpio::Signal::{{ signal }}; };
+%% endfor
+};
+template<Peripheral p> struct SignalConnection<Data{{ name }}::BitBang, p> {
+	static_assert(p == Peripheral::BitBang, "Gpio{{ name }}::BitBang only connects to software drivers!"); };
+%% for signal_name, signal_group in gpio.signals.items()
+template<Peripheral p> struct SignalConnection<Data{{ name }}::{{ signal_name }}, p> {
+    static_assert((p == Peripheral::{{ signal_group | map(attribute="driver") | join(") or (p == Peripheral::") }}),{% if signal_group | length > 1 %}
+        {% endif %}"Gpio{{ name }}::{{ signal_name }} only connects to {{ signal_group | map(attribute="driver") | join(" or ") }}!"); };
+%% endfor
+template<> struct SignalConnection<Data{{ name }}::BitBang, Peripheral::BitBang> { static constexpr int8_t func = -1; };
+%% for signal_group in gpio.signals.values()
+    %% for signal in signal_group
+template<> struct SignalConnection<Data{{ name }}::{{ signal.name }}, Peripheral::{{ signal.driver }}> { static constexpr int8_t func = {{ signal.af }}; };
+    %% endfor
+%% endfor
+%% endfor
+
+} // namespace modm::platform::detail
+/// @endcond

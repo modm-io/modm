@@ -25,7 +25,7 @@
 
 modm_test::SpiDevice device;
 
-class Spi
+class DummySpi
 {
 public:
 	static uint8_t
@@ -55,7 +55,7 @@ struct Cs
 	}
 };
 
-typedef modm::Ad7280a<Spi, Cs, modm::platform::GpioUnused, 1> Ad7280a;
+typedef modm::Ad7280a<DummySpi, Cs, modm::platform::GpioUnused, 1> Ad7280a;
 
 // ----------------------------------------------------------------------------
 void

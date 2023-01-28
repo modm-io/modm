@@ -1,0 +1,98 @@
+/*
+ * Copyright (c) 2022, Nikolay Semenov
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <modm/architecture/interface/adc.hpp>
+#include <modm/platform/gpio/connector.hpp>
+
+namespace modm::platform
+{
+/**
+ * Analog/Digital-Converter module.
+ *
+ * Not implemented yet:
+ *  - Interrupts
+ *  - FIFO
+ *  - DMA
+ *
+ * \ingroup	modm_platform_adc
+ */
+class Adc : public modm::Adc
+{
+public:
+	static constexpr uint8_t Resolution = 12;
+
+public:
+	enum class Channel : uint8_t
+	{
+%% for channel, name in channels.items() | sort
+		{{ name }} = {{ channel }},
+%% endfor
+	};
+
+public:
+	// start inherited documentation
+	template< class... Signals >
+	static void
+	connect()
+	{
+		using Connector = GpioConnector<Peripheral::Adc{{ id }}, Signals...>;
+		Connector::connect();
+	}
+
+	static inline void
+	initialize();
+
+	static inline void
+	disable();
+
+	static inline bool
+	setChannel(Channel);
+
+	static inline Channel
+	getChannel();
+
+	static inline bool
+	isReady();
+
+	static inline bool
+	hasError();
+
+	static inline uint16_t
+	getValue();
+
+	static inline uint16_t
+	readChannel(Channel);
+
+	static inline void
+	enableTemperatureSensor();
+
+	static inline void
+	disableTemperatureSensor();
+
+	static inline float
+	convertToVoltage(uint16_t value);
+
+	static inline float
+	convertToTemperature(uint16_t value);
+
+private:
+	static inline void
+	reset();
+
+	static inline void
+	unreset();
+};
+
+} // namespace modm::platform
+
+#include "adc_impl.hpp"

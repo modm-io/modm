@@ -120,45 +120,45 @@ public:
 		Mult4X = PORTCFG_CLKOUTSEL_CLK4X_gc,
 	};
 
-	modm_always_inline static void setVirtualPort0(Port port) {
+	static void setVirtualPort0(Port port) {
 		PORTCFG_VPCTRLA = (PORTCFG_VPCTRLA & ~PORTCFG_VP0MAP_gm) | (static_cast<uint8_t>(port) & PORTCFG_VP0MAP_gm);
 	}
-	modm_always_inline static void setVirtualPort1(Port port) {
+	static void setVirtualPort1(Port port) {
 		PORTCFG_VPCTRLA = (PORTCFG_VPCTRLA & ~PORTCFG_VP1MAP_gm) | (static_cast<uint8_t>(port) & PORTCFG_VP1MAP_gm);
 	}
-	modm_always_inline static void setVirtualPort2(Port port) {
+	static void setVirtualPort2(Port port) {
 		PORTCFG_VPCTRLB = (PORTCFG_VPCTRLB & ~PORTCFG_VP2MAP_gm) | (static_cast<uint8_t>(port) & PORTCFG_VP2MAP_gm);
 	}
-	modm_always_inline static void setVirtualPort3(Port port) {
+	static void setVirtualPort3(Port port) {
 		PORTCFG_VPCTRLB = (PORTCFG_VPCTRLB & ~PORTCFG_VP3MAP_gm) | (static_cast<uint8_t>(port) & PORTCFG_VP3MAP_gm);
 	}
 
 	/// enables RTC output on `GpioC6`
-	modm_always_inline static void enableRTC_Output() {
+	static void enableRTC_Output() {
 		PORTCFG_CLKEVOUT |= PORTCFG_RTCOUT_bm;
 	}
 	/// disables RTC output on `GpioC6`
-	modm_always_inline static void disableRTC_Output() {
+	static void disableRTC_Output() {
 		PORTCFG_CLKEVOUT &= ~PORTCFG_RTCOUT_bm;
 	}
 
 	/// @warning some Xmegas output only channel 7 regardless of selection
-	modm_always_inline static void enableEventChannelOutput(Output output, uint8_t channel) {
+	static void enableEventChannelOutput(Output output, uint8_t channel) {
 		PORTCFG_CLKEVOUT = (PORTCFG_CLKEVOUT & ~(PORTCFG_CLKEVPIN_bm | PORTCFG_EVOUT_gm)) |
 				(i(output) & (PORTCFG_CLKEVPIN_bm | PORTCFG_EVOUT_gm));
 		PORTCFG_EVOUTSEL = (PORTCFG_EVOUTSEL & ~PORTCFG_EVOUTSEL_gm) | (channel & PORTCFG_EVOUTSEL_gm);
 	}
-	modm_always_inline static void disableEventChannelOutput() {
+	static void disableEventChannelOutput() {
 		PORTCFG_CLKEVOUT &= ~PORTCFG_EVOUT_gm;
 	}
 
 	/// @warning this overrides the output of `enableEventChannelOutput()`!
-	modm_always_inline static void enablePeripheralClockOutput(Output output,
+	static void enablePeripheralClockOutput(Output output,
 			ClockMultiplier multiplier = ClockMultiplier::Mult1X) {
 		PORTCFG_CLKEVOUT = (PORTCFG_CLKEVOUT & ~(PORTCFG_CLKEVPIN_bm | PORTCFG_CLKOUT_gm | PORTCFG_CLKOUTSEL_gm)) |
 				(i(output) & (PORTCFG_CLKEVPIN_bm | PORTCFG_CLKOUT_gm)) | i(multiplier);
 	}
-	modm_always_inline static void enablePeripheralClockOutput() {
+	static void enablePeripheralClockOutput() {
 		PORTCFG_CLKEVOUT &= ~PORTCFG_CLKOUT_gm;
 	}
 
@@ -193,7 +193,7 @@ private:
 	static constexpr uint16_t interrupt1VectorNumber = PORT{{port}}_INT1_vect_num;
 
 public:
-	modm_always_inline static void
+	static void
 	configure(Configuration config,
 			  Inverted invert = Inverted::No) {
 		PORT{{port}}_PIN{{pin}}CTRL = (PORT{{port}}_PIN{{pin}}CTRL & ~(PORT_OPC_gm | PORT_INVEN_bm)) |
@@ -202,91 +202,91 @@ public:
 		%% if type in ["", "Output"]
 	// GpioOutput
 	// start documentation inherited
-	modm_always_inline static void setOutput() {
+	static void setOutput() {
 		PORT{{port}}_DIRSET = mask;
 	}
-	modm_always_inline static void setOutput(bool value) {
+	static void setOutput(bool value) {
 		set(value);
 		setOutput();
 	}
-	modm_always_inline static void set() {
+	static void set() {
 		PORT{{port}}_OUTSET = mask;
 	}
-	modm_always_inline static void set(bool status) {
+	static void set(bool status) {
 		if (status) { set(); }
 		else { reset(); }
 	}
-	modm_always_inline static void reset() {
+	static void reset() {
 		PORT{{port}}_OUTCLR = mask;
 	}
-	modm_always_inline static void toggle() {
+	static void toggle() {
 		PORT{{port}}_OUTTGL = mask;
 	}
 	// end documentation inherited
-	modm_always_inline static void setOutput(Configuration config,
+	static void setOutput(Configuration config,
 										Inverted invert = Inverted::No) {
 		configure(config, invert);
 		setOutput();
 	}
-	modm_always_inline static void enableSlewRateLimit() {
+	static void enableSlewRateLimit() {
 		PORT{{port}}_PIN{{pin}}CTRL |= PORT_SRLEN_bm;
 	}
-	modm_always_inline static void disableSlewRateLimit() {
+	static void disableSlewRateLimit() {
 		PORT{{port}}_PIN{{pin}}CTRL &= ~PORT_SRLEN_bm;
 	}
 		%% endif
 		%% if type in ["", "Input"]
 	// GpioInput
 	// start documentation inherited
-	modm_always_inline static void
+	static void
 	setInput() {
 		 PORT{{port}}_DIRCLR = mask;
 	}
-	modm_always_inline static bool read() {
+	static bool read() {
 		(void) {{pin}};
 		return (PORT{{port}}_IN & mask);
 	}
 	// end documentation inherited
-	modm_always_inline static void setInput(Configuration config,
+	static void setInput(Configuration config,
 										Inverted invert = Inverted::No) {
 		setInput();
 		configure(config, invert);
 	}
-	modm_always_inline static void setInputTrigger(InputTrigger trigger) {
+	static void setInputTrigger(InputTrigger trigger) {
 		PORT{{port}}_PIN{{pin}}CTRL = (PORT{{port}}_PIN{{pin}}CTRL & ~PORT_ISC_gm) | i(trigger);
 	}
-	modm_always_inline static void enableExternalInterrupt0(InterruptLevel level) {
+	static void enableExternalInterrupt0(InterruptLevel level) {
 		PORT{{port}}_INT0MASK |= mask;
 		PORT{{port}}_INTCTRL = (PORT{{port}}_INTCTRL & ~PORT_INT0LVL_gm) | (::modm::platform::i(level) & PORT_INT0LVL_gm);
 	}
-	modm_always_inline static void enableExternalInterrupt1(InterruptLevel level) {
+	static void enableExternalInterrupt1(InterruptLevel level) {
 		PORT{{port}}_INT1MASK |= mask;
 		PORT{{port}}_INTCTRL = (PORT{{port}}_INTCTRL & ~PORT_INT1LVL_gm) | ((::modm::platform::i(level) << 2) & PORT_INT1LVL_gm);
 	}
-	modm_always_inline static void disableExternalInterrupt0() {
+	static void disableExternalInterrupt0() {
 		PORT{{port}}_INT0MASK &= ~mask;
 	}
-	modm_always_inline static void disableExternalInterrupt1() {
+	static void disableExternalInterrupt1() {
 		PORT{{port}}_INT1MASK &= ~mask;
 	}
-	modm_always_inline static bool getExternalInterruptFlag0() {
+	static bool getExternalInterruptFlag0() {
 		return (PORT{{port}}_INTFLAGS & PORT_INT0IF_bm);
 	}
-	modm_always_inline static bool getExternalInterruptFlag1() {
+	static bool getExternalInterruptFlag1() {
 		return (PORT{{port}}_INTFLAGS & PORT_INT1IF_bm);
 	}
-	modm_always_inline static void acknowledgeExternalInterruptFlag0() {
+	static void acknowledgeExternalInterruptFlag0() {
 		PORT{{port}}_INTFLAGS |= PORT_INT0IF_bm;
 	}
-	modm_always_inline static void acknowledgeExternalInterruptFlag1() {
+	static void acknowledgeExternalInterruptFlag1() {
 		PORT{{port}}_INTFLAGS |= PORT_INT1IF_bm;
 	}
 			%% if port in ['A', 'B', 'C', 'D', 'E', 'F']
-	modm_always_inline static void enableInputBuffer() {
+	static void enableInputBuffer() {
 		PORT{{port}}_PIN{{pin}}CTRL &= ~PORT_ISC_gm;
 	}
 	/// disables the input buffer, when using this pin as analog input
-	modm_always_inline static void disableInputBuffer() {
+	static void disableInputBuffer() {
 		PORT{{port}}_PIN{{pin}}CTRL = (PORT{{port}}_PIN{{pin}}CTRL & ~PORT_ISC_gm) | PORT_ISC_INPUT_DISABLE_gc;
 	}
 			%% endif
@@ -314,22 +314,22 @@ public:
 	static constexpr uint8_t width = WIDTH;
 
 public:
-	modm_always_inline static void setOutput() {
+	static void setOutput() {
 		PORT{{port.name}}_DIRSET |= portMask;
 	}
-	modm_always_inline static void setInput() {
+	static void setInput() {
 		PORT{{port.name}}_DIRCLR |= portMask;
 	}
-	modm_always_inline static void configure(Configuration config,
+	static void configure(Configuration config,
 										Inverted invert = Inverted::No) {
 		PORTCFG_MPCMASK = portMask;
 		*(&PORT{{port.name}}_PIN0CTRL + START_PIN) = i(config) | ((invert == Inverted::Yes) ? PORT_INVEN_bm : 0);
 	}
-	modm_always_inline static uint8_t read() {
+	static uint8_t read() {
 		uint8_t data = PORT{{port.name}}_IN & portMask;
 		return (data >> START_PIN);
 	}
-	modm_always_inline static void write(uint8_t data) {
+	static void write(uint8_t data) {
 		data <<= START_PIN;
 		PORT{{port.name}}_OUTCLR |= portMask;
 		PORT{{port.name}}_OUTSET |= (data & portMask);

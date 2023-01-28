@@ -1,0 +1,29 @@
+#!/usr/bin/env python3
+#
+# Copyright (c) 2022, Nikolay Semenov
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:st7789"
+    module.description = "ST7789 full-color LCD controller"
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:delay",
+        ":ui:display")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/display"
+    env.copy("st7789.hpp")
+    env.copy("st7789/st7789_driver.hpp")
+    env.copy("st7789/st7789_driver_impl.hpp")
+    env.copy("st7789/st7789_protocol.hpp")
+    env.copy("st7789/st7789_spi_interface.hpp")

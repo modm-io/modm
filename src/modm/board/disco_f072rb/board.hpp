@@ -21,15 +21,13 @@
 
 using namespace modm::platform;
 
-/// @ingroup modm_board_disco_f072rb
 namespace Board
 {
-	using namespace modm::literals;
+/// @ingroup modm_board_disco_f072rb
+/// @{
+using namespace modm::literals;
 
 /// STM32F072 running at 48MHz generated from the internal 48MHz clock
-// TODO: enable once clock driver is implemented
-//using SystemClock = SystemClock<InternalClock<48_MHz>, 48_MHz>;
-
 struct SystemClock
 {
 	static constexpr int Frequency = 48_MHz;
@@ -78,7 +76,6 @@ struct SystemClock
 	}
 };
 
-
 using Button   = GpioInputA0;
 
 using LedUp    = GpioOutputC6;
@@ -87,10 +84,12 @@ using LedLeft  = GpioOutputC8;
 using LedRight = GpioOutputC9;
 
 using Leds = SoftwareGpioPort< LedLeft, LedDown, LedRight, LedUp >;
-
+/// @}
 
 namespace l3g
 {
+/// @ingroup modm_board_disco_f072rb
+/// @{
 using Int1 = GpioInputC1;	// MEMS_INT1 [L3GD20_INT1]: GPXTI0
 using Int2 = GpioInputC2;	// MEMS_INT2 [L3GD20_DRDY/INT2]: GPXTI1
 
@@ -102,17 +101,22 @@ using Miso = GpioInputB14;	// SPI2_MISO [L3GD20_SA0/SDO]
 using SpiMaster = SpiMaster2;
 using Transport = modm::Lis3TransportSpi< SpiMaster, Cs >;
 using Gyroscope = modm::L3gd20< Transport >;
+/// @}
 }
 
 namespace usb
 {
+/// @ingroup modm_board_disco_f072rb
+/// @{
 using Dm = GpioA11;			// OTG_FS_DM: USB_OTG_FS_DM
 using Dp = GpioA12;			// OTG_FS_DP: USB_OTG_FS_DP
 
 using Device = UsbFs;
+/// @}
 }
 
-
+/// @ingroup modm_board_disco_f072rb
+/// @{
 inline void
 initialize()
 {
@@ -125,25 +129,13 @@ initialize()
 	LedRight::setOutput(modm::Gpio::Low);
 
 	Button::setInput();
-	Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-	Button::enableExternalInterrupt();
-//	Button::enableExternalInterruptVector(12);
 }
-
 
 inline void
 initializeL3g()
 {
 	l3g::Int1::setInput();
-	l3g::Int1::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-	l3g::Int1::enableExternalInterrupt();
-//	l3g::Int1::enableExternalInterruptVector(12);
-
 	l3g::Int2::setInput();
-	l3g::Int2::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-	l3g::Int2::enableExternalInterrupt();
-//	l3g::Int2::enableExternalInterruptVector(12);
-
 	l3g::Cs::setOutput(modm::Gpio::High);
 
 	l3g::SpiMaster::connect<l3g::Sck::Sck, l3g::Mosi::Mosi, l3g::Miso::Miso>();
@@ -152,11 +144,12 @@ initializeL3g()
 }
 
 inline void
-initializeUsbFs()
+initializeUsbFs(uint8_t priority=3)
 {
-	usb::Device::initialize<SystemClock>();
+	usb::Device::initialize<SystemClock>(priority);
 	usb::Device::connect<usb::Dm::Dm, usb::Dp::Dp>();
 }
+/// @}
 
 } // namespace Board
 

@@ -25,7 +25,7 @@ namespace modm
 		/**
 		 * FreeRTOS Scheduler
 		 *
-		 * <h2>Interrupt Priorities</h2>
+		 * Interrupt Priorities
 		 *
 		 * The STM32 implements only four priority bits. The lower four bits of
 		 * the eight bit priority register are unused. A lower value means a
@@ -43,11 +43,6 @@ namespace modm
 		 * Interrupts that do not use any FreeRTOS API functions can use any
 		 * interrupt priority. If the priority is higher (lower value) than 11
 		 * the execution won't be delayed by anything the kernel is doing.
-		 *
-		 *
-		 * \warning	vTaskEndScheduler() will not work for the STM32 port of
-		 * 			FreeRTOS therefore no stop() method is implemented here.
-		 * 			See the README file in ext/freertos/port for more details.
 		 *
 		 * \ingroup	modm_processing_rtos
 		 */

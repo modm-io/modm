@@ -14,6 +14,7 @@
 class Amnb(Module):
     def init(self, module):
         module.name = "amnb"
+        module.description = "Tests for AMNB"
 
     def prepare(self, module, options):
         module.depends("modm:communication:amnb", ":mock:clock", ":mock:shared_medium")
@@ -27,6 +28,7 @@ class Amnb(Module):
 class Sab(Module):
     def init(self, module):
         module.name = "sab"
+        module.description = "Tests for SAB"
 
     def prepare(self, module, options):
         module.depends("modm:communication:sab", ":mock:io.device")
@@ -40,6 +42,7 @@ class Sab(Module):
 class Xpcc(Module):
     def init(self, module):
         module.name = "xpcc"
+        module.description = "Tests for XPCC"
 
     def prepare(self, module, options):
         module.depends(
@@ -56,6 +59,7 @@ class Xpcc(Module):
 
 def init(module):
     module.name = ":test:communication"
+    module.description = "Tests for Communication Protocols"
 
 def prepare(module, options):
     module.add_submodule(Amnb())

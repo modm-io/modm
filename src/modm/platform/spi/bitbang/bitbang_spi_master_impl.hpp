@@ -40,7 +40,7 @@ modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::configuration(nullptr);
 // ----------------------------------------------------------------------------
 
 template <typename Sck, typename Mosi, typename Miso>
-template< template<modm::platform::Peripheral _> class... Signals >
+template< class... Signals >
 void
 modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::connect()
 {
@@ -215,7 +215,7 @@ modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::transfer(
 // ----------------------------------------------------------------------------
 
 template <typename Sck, typename Mosi, typename Miso>
-void modm_always_inline
+void
 modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::delay()
 {
 	modm::delay_ns(delayTime);

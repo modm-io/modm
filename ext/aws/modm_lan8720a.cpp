@@ -153,11 +153,11 @@ struct ethernet
 	using DmaDescriptor_t = DmaDescriptor;
 
 	/* Ethernet Rx DMA Descriptor */
-	modm_aligned(32) modm_fastdata
+	modm_aligned(32)
 	static DmaDescriptor_t  DmaRxDescriptorTable[RX_BUFFER_NUMBER];
 
 	/* Ethernet Tx DMA Descriptor */
-	modm_aligned(32) modm_fastdata
+	modm_aligned(32)
 	static DmaDescriptor_t  DmaTxDescriptorTable[TX_BUFFER_NUMBER];
 
 	static DmaDescriptor_t *RxDescriptor;       /*!< Rx descriptor to Get        */
