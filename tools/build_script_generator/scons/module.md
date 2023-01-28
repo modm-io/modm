@@ -283,6 +283,18 @@ scons program-remote profile={debug|release} [host={ip or hostname}] [firmware={
 
 Writes the executable onto your target connected to a remote OpenOCD process
 running on your own computer (host=`localhost`) or somewhere else.
+(\* *only ARM Cortex-M targets*)
+
+
+#### scons openocd
+
+```
+scons openocd
+```
+
+Starts an OpenOCD process to attach a remote debugger to (e.g. with
+`scons program-remote` or `scons debug-remote`).
+(\* *only ARM Cortex-M targets*)
 
 
 #### scons run
@@ -342,7 +354,7 @@ Launches GDB for post-mortem debugging with the firmware identified by the
 See the `modm:platform:fault` module for details how to receive the coredump data.
 
 
-#### scons program-remote
+#### scons debug-remote
 
 ```
 scons debug-remote profile={debug|release} ui={tui|web} [host={ip or hostname}] [firmware={hash or file}]
@@ -426,7 +438,7 @@ simple telnet client. Disconnect with Ctrl+D.
  $ scons log-rtt
 ╭───OpenOCD───> Real Time Transfer
 ╰─────RTT────── stm32f103rbt6
-Info : rtt: Searching for control block 'modm.rtt.modm'
+Info : rtt: Searching for control block 'SEGGER RTT'
 Info : rtt: Control block found at 0x20000008
 loop: 57
 loop: 58
@@ -545,6 +557,23 @@ Hex File······· {debug|release}/blink.hex
 ```
 
 
+#### scons uf2
+
+```
+scons uf2 profile={debug|release} [firmware={hash or file}]
+```
+
+Creates a UF2 compatible file of your executable. UF2 is a
+[bootloader by Microsoft](https://github.com/microsoft/uf2).
+
+```
+ $ scons uf2
+UF2 File······· {debug|release}/blink.uf2
+```
+
+(\* *only ARM Cortex-M targets*)
+
+
 #### scons artifact
 
 ```
@@ -571,6 +600,24 @@ are supported, this is only meant for using the IDE as an editor.
 !!! warning "Consider this an unstable feature"
 
 
+## Protobuf Generator Tool
+
+The `modm:nanopb` module contains a Python generator to translate the messages
+defined in `*.proto` files by the `modm:nanopb:source` option into `*.pb.cpp`
+and `*.pb.hpp` files.
+This module contains a SCons wrapper tool that automatically updates the
+generated files when it becomes necessary:
+
+```py
+cpp_sources += env.NanopbProtofile(
+    sources=options[":nanopb:sources"],
+    path=options[":nanopb:path"],
+)
+```
+
+The generated files are available as a top-level `#include <protofile.pb.hpp>`.
+
+
 ## XPCC Generator Tool
 
 The `modm:communication:xpcc:generator` module contains the Python tools to
@@ -582,7 +629,7 @@ The wrapper tool is automatically used when the generator module is detected,
 and its options are evaluated for the wrapper as follows:
 
 ```py
-env.XpccCommunication(
+cpp_sources += env.XpccCommunication(
     xmlfile=options["::xpcc:generator:source"],
     container=options["::xpcc:generator:container"],
     path=options["::xpcc:generator:path"],

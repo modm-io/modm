@@ -67,7 +67,7 @@ namespace modm
 		void
 		schedule();
 
-		modm_always_inline void
+		void
 		scheduleInterupt();
 
 	private:

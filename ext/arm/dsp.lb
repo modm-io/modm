@@ -14,6 +14,8 @@
 from collections import defaultdict
 from pathlib import Path
 
+includes = []
+
 class CmsisDspModule(Module):
 
     def __init__(self, path):
@@ -32,15 +34,20 @@ class CmsisDspModule(Module):
             "bayes": [":cmsis:dsp:statistics"],
             "complex_math": [":cmsis:dsp:fast_math"],
             "controller": [":cmsis:dsp:tables"],
-            "distance": [":cmsis:dsp:basic_math", ":cmsis:dsp:statistics"],
+            "distance": [":cmsis:dsp:statistics", ":cmsis:dsp:basic_math",
+                         ":cmsis:dsp:fast_math", ":cmsis:dsp:tables"],
             "fast_math": [":cmsis:dsp:tables"],
-            "filtering": [":cmsis:dsp:tables", ":cmsis:dsp:support"],
-            "matrix": [],
-            "statistics": [":cmsis:dsp:fast_math"],
+            "filtering": [":cmsis:dsp:fast_math", ":cmsis:dsp:tables", ":cmsis:dsp:support"],
+            "interpolation": [],
+            "matrix": [":cmsis:dsp:basic_math", ":cmsis:dsp:fast_math"],
+            "quaternion_math": [],
+            "statistics": [":cmsis:dsp:basic_math", ":cmsis:dsp:fast_math"],
             "support": [],
             "svm": [],
-            "tables": [],
-            "transform": [":cmsis:dsp:tables"],
+            "tables": [":cmsis:dsp:transform"],
+            "transform": [":cmsis:dsp:basic_math", ":cmsis:dsp:complex_math",
+                          ":cmsis:dsp:matrix", ":cmsis:dsp:statistics",
+                          ":cmsis:dsp:tables"],
         }
         module.depends(*dependencies[self.name])
         return True
@@ -51,34 +58,30 @@ class CmsisDspModule(Module):
         metadata[":build:ccflags"].append("-Wno-sign-compare")
         metadata[":build:ccflags"].append("-Wno-double-promotion")
 
-        core = env[":target"].get_driver("core")["type"]
-        if "f" in core:
-            metadata[":build:cppdefines"].append("__FPU_PRESENT=1")
-
-        if env[":cmsis:dsp:check_matrix_sizes"]:
-            metadata[":build:cppdefines"].append("ARM_MATH_MATRIX_CHECK")
-        else:
-            metadata[":build:cppdefines.debug"].append("ARM_MATH_MATRIX_CHECK")
-
-        if env[":cmsis:dsp:round_float_inputs"]:
-            metadata[":build:cppdefines"].append("ARM_MATH_ROUNDING")
-
-        if not env.get(":cmsis:dsp:unaligned_data", False):
-            metadata[":build:cppdefines"].append("UNALIGNED_SUPPORT_DISABLE")
-
-        if env.get(":cmsis:dsp:loop_unroll", False):
-            metadata[":build:cppdefines"].append("ARM_MATH_LOOPUNROLL")
-
+        operations = set()
         env.outbasepath = "modm/ext/cmsis/dsp"
-
-        if "tables" in self.name:
-            env.copy("cmsis/CMSIS/DSP/Include/arm_common_tables.h", "arm_common_tables.h")
-            env.copy("cmsis/CMSIS/DSP/Include/arm_const_structs.h", "arm_const_structs.h")
         if "support" in self.name:
-            env.copy("cmsis/CMSIS/DSP/PrivateInclude/arm_sorting.h", "arm_sorting.h")
+            env.copy("cmsis-dsp/CMSIS-DSP/PrivateInclude/arm_sorting.h", "arm_sorting.h")
+        if "transform" in self.name:
+            env.copy("cmsis-dsp/CMSIS-DSP/PrivateInclude/arm_vec_fft.h", "arm_vec_fft.h")
+        if "filtering" in self.name:
+            env.copy("cmsis-dsp/CMSIS-DSP/PrivateInclude/arm_vec_filtering.h", "arm_vec_filtering.h")
+        if "svm" in self.name:
+            env.copy("cmsis-dsp/CMSIS-DSP/Include/dsp/svm_defines.h", "dsp/svm_defines.h")
+        if "matrix" in self.name:
+            env.copy("cmsis-dsp/CMSIS-DSP/Include/dsp/matrix_utils.h", "dsp/matrix_utils.h")
 
-        operations = env.copy("cmsis/CMSIS/DSP/Source/{}".format(self.path), "{}".format(self.path),
-                              ignore=env.ignore_files("arm_bitreversal2.c"))
+        if "tables" not in self.name:
+            global includes
+            includes.append(self.name)
+            operations |= env.copy("cmsis-dsp/CMSIS-DSP/Include/dsp/{}_functions.h".format(self.name),
+                                   "dsp/{}_functions.h".format(self.name))
+            if env[":cmsis:dsp:with_f16"]:
+                operations |= env.copy("cmsis-dsp/CMSIS-DSP/Include/dsp/{}_functions_f16.h".format(self.name),
+                                       "dsp/{}_functions_f16.h".format(self.name))
+
+        operations |= env.copy("cmsis-dsp/CMSIS-DSP/Source/{}".format(self.path), self.path,
+                               ignore=env.ignore_files("" if env[":cmsis:dsp:with_f16"] else "*_f16*"))
 
         # For all sources add these compile flags
         for key, values in metadata.items():
@@ -95,63 +98,50 @@ def prepare(module, options):
     if not device.has_driver("core:cortex-m*"):
         return False
 
-    if not device.has_driver("core:cortex-m0*"):
-        module.add_option(
-            BooleanOption(
-                name="unaligned_data",
-                description=descr_unaligned_data,
-                default=False))
     module.add_option(
         BooleanOption(
-            name="check_matrix_sizes",
-            description=descr_matrix_sizes,
+            name="with_f16",
+            description=descr_f16,
             default=False))
-    module.add_option(
-        BooleanOption(
-            name="round_float_inputs",
-            description=descr_round_floats,
-            default=True))
-    module.add_option(
-        BooleanOption(
-            name="loop_unroll",
-            description=descr_loop_unroll,
-            default=True))
 
-    for path in Path(localpath("cmsis/CMSIS/DSP/Source")).iterdir():
+    for path in Path(localpath("cmsis-dsp/CMSIS-DSP/Source")).iterdir():
         if path.is_dir():
             module.add_submodule(CmsisDspModule(path))
 
     return True
 
 def build(env):
-    core = env[":target"].get_driver("core")["type"]
-    core = core.replace("cortex-m", "CM").replace("+", "PLUS").replace("f", "").replace("d", "")
-    env.collect(":build:cppdefines", "ARM_MATH_{}".format(core))
-    env.collect(":build:path.include", "modm/ext/cmsis/dsp")
-
+    env.collect(":build:path.include", "modm/ext/cmsis/dsp/")
     env.outbasepath = "modm/ext/cmsis/dsp"
-    env.copy("cmsis/CMSIS/DSP/Include/arm_math.h", "arm_math.h")
+
+    for path in Path(localpath("cmsis-dsp/CMSIS-DSP/Include/")).iterdir():
+        if path.is_file() and not ("_f16" in path.name and not env["with_f16"]):
+            # We need to replace this file to include the <cmsis_dsp_local.h>
+            if path.name in ["arm_math_types.h", "arm_math.h", "arm_math_f16.h"]: continue;
+            env.copy(path, path.name)
+
+    env.copy("cmsis-dsp/CMSIS-DSP/Include/dsp/none.h", "dsp/none.h")
+    env.copy("cmsis-dsp/CMSIS-DSP/Include/dsp/utils.h", "dsp/utils.h")
+    env.copy("cmsis-dsp/CMSIS-DSP/Include/dsp/debug.h", "dsp/debug.h")
+    env.copy("cmsis-dsp/CMSIS-DSP/Include/arm_math_types.h", "arm_math_types_internal.h")
+
+    core = env[":target"].get_driver("core")["type"][8:]
+    core = core.replace("+", "PLUS").replace("f", "").replace("d", "")
+    global includes
+    env.substitutions = {
+        "core": core,
+        "includes": includes,
+        "with_fpu": env.get(":platform:cortex-m:float-abi", "soft") != "soft",
+    }
+    env.template("arm_math_types.h.in")
+    env.template("arm_math.h.in")
+    if env["with_f16"]: env.template("arm_math_f16.h.in")
 
 
 # ============================ Option Descriptions ============================
-descr_unaligned_data = """# Allow unaligned data storage
+descr_f16 = """# Include f16 format functions
 
-If the core supports it, this options enables storing data in unaligned memory.
-This may reduce data size, but cost some speed.
+16-bit floating point is only used for storage, since the Cortex-M FPU does not
+support the format in hardware.
 """
 
-descr_matrix_sizes = """# Check input/output matrix size
-
-Check the input and output sizes of matrices and return
-`ARM_MATH_SIZE_MISMATCH` on failure.
-"""
-
-descr_round_floats = """# Round float inputs
-
-Rounds float inputs properly during all conversions.
-"""
-
-descr_loop_unroll = """# Loop Unroll
-
-Enables manual loop unrolling in DSP functions.
-"""

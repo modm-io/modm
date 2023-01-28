@@ -613,12 +613,12 @@ IoStreamTest::testPointer()
 	void * p = (void *) 0x01234567;
 	const size_t bytesWritten = 10;
 #else
-	char string[] = "0x0123456789ABCDEF";
-	void * p = (void *) 0x0123456789ABCDEF;
+	char string[] = "0x0123456789abcdef";
+	void * p = (void *) 0x0123456789abcdef;
 	const size_t bytesWritten = 18;
 #endif
 
-	(*stream).printf("0x%p", p);
+	(*stream).printf("%p", p);
 
 	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, bytesWritten);
 	TEST_ASSERT_EQUALS(device.bytesWritten, bytesWritten);

@@ -11,7 +11,7 @@
 
 #include <unittest/testsuite.hpp>
 
-/// @ingroup modm_test_test_communication
+/// @ingroup modm_test_test_communication_amnb
 class AmnbMessageTest : public unittest::TestSuite
 {
 public:

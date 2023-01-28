@@ -7,6 +7,7 @@
  * Copyright (c) 2015, Thorsten Lajewski
  * Copyright (c) 2017, Daniel Krebs
  * Copyright (c) 2018, Christopher Durand
+ * Copyright (c) 2022, Thomas Sommer
  *
  * This file is part of the modm project.
  *
@@ -15,111 +16,94 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 // ----------------------------------------------------------------------------
-
-#ifndef MODM_MOVING_AVERAGE_HPP
-#define MODM_MOVING_AVERAGE_HPP
+#pragma once
 
 #include <cstddef>
 #include <cstdint>
-#include <type_traits>
 
-namespace modm
+#include <concepts>
+#include <span>
+#include <algorithm>
+#include <numeric>
+
+#include <modm/math/utils/integer_traits.hpp>
+
+namespace modm::filter
 {
-	namespace filter{
-		/**
-		 * \brief	Moving average filter
-		 *
-		 * Calculates the average of N newest values, i.a. the sum of the last N
-		 * values have been passed to update(...), divided by N. If less than N
-		 * values have been passed to the filter, the division factor is still N,
-		 * so missing values are assumed to be zero.
-		 *
-		 * For integer types this implementation stores the current sum of all values in the buffer
-		 * and updates this value with every call of update() by subtracting
-		 * the overwritten buffer index and adding the new one.
-		 *
-		 * Due to numerical instabillity for floating value types, inside the update function
-		 * the sum has to be recalculated making it less efficient.
-		 *
-		 * The internal sum is always up to date and the getValue()
-		 * method consists of only one division.
-		 *
-		 * \warning	Input range is limited by the following equation
-		 * 			\code N * input::maxValue < T::maxValue \endcode
-		 * 			The sum off the last N input values must not be greater than
-		 * 			the maximum value of T, otherwise an overflow will occur.
-		 *
-		 * \tparam	T	Input type
-		 * \tparam	N	Number of samples (maximum is 65356 or 2**16)
-		 *
-		 * \ingroup	modm_math_filter
-		 */
-		template<typename T, std::size_t N>
-		class MovingAverage
-		{
-		private:
-			using Index = std::conditional_t<
-				(N >= 256),
-				uint_fast16_t,
-				uint_fast8_t
-			>;
 
-		public:
-			MovingAverage(const T& initialValue = 0);
-
-			/// Append new value
-			void
-			update(const T& input);
-
-			/// Get filtered value
-			const T
-			getValue() const;
-
-		private:
-			Index index;
-			T buffer[N];
-			T sum;
-		};
-	}
-}
-
-// ----------------------------------------------------------------------------
+/**
+ * \brief	Moving average filter
+ *
+ * Calculates the average of N newest values, i.a. the sum of the last N
+ * values have been passed to update(...), divided by N. If less than N
+ * values have been passed to the filter, the division factor is still N,
+ * so missing values are assumed to be zero.
+ *
+ * For integer types this implementation stores the current sum of all values in the buffer
+ * and updates this value with every call of update() by subtracting
+ * the overwritten buffer index and adding the new one.
+ *
+ * Due to numerical instabillity for floating value types, inside the update function
+ * the sum has to be recalculated making it less efficient.
+ *
+ * The internal sum is always up to date and the getValue()
+ * method consists of only one division.
+ *
+ * \warning	Input range is limited by the following equation
+ * 			\code N * input::maxValue < T::maxValue \endcode
+ * 			The sum off the last N input values must not be greater than
+ * 			the maximum value of T, otherwise an overflow will occur.
+ *
+ * \tparam	T	Input type
+ * \tparam	N	Number of samples
+ *
+ * \ingroup	modm_math_filter
+ */
 template<typename T, std::size_t N>
-modm::filter::MovingAverage<T, N>::MovingAverage(const T& initialValue) :
-	index(0), sum(N * initialValue)
+class MovingAverage
 {
-	for (Index i = 0; i < N; ++i) {
-		buffer[i] = initialValue;
+public:
+	constexpr MovingAverage(T initialValue = 0)
+	{
+		reset(initialValue);
 	}
-}
 
-// ----------------------------------------------------------------------------
-// TODO implementierung für float anpassen
-template<typename T, std::size_t N>
-void
-modm::filter::MovingAverage<T, N>::update(const T& input)
-{
-	sum -= buffer[index];
-	sum += input;
-
-	buffer[index] = input;
-
-	index++;
-	if (index >= N) {
-		index = 0;
+	/// Reset whole buffer to 'input'
+	/// Next call of getValue() returns 'input'
+	constexpr void reset(T input)
+	{
+		std::fill(std::begin(buffer), std::end(buffer), input);
+		sum = N * input;
 	}
-}
 
-// -----------------------------------------------------------------------------
+	/// Append new value
+	constexpr void
+	update(T input)
+	{
+		if constexpr(std::floating_point<T>) {
+			buffer[index] = input;
+			sum = std::accumulate(std::begin(buffer), std::end(buffer), T{0});
+		} else {
+			sum -= buffer[index];
+			sum += input;
+			buffer[index] = input;
+		}
 
+		if (++index == N)
+			index = 0;
+	}
 
-template<typename T, std::size_t N>
-const T
-modm::filter::MovingAverage<T, N>::getValue() const
-{
-	return (sum / static_cast<T>(N));
-}
+	/// Get filtered value
+	T
+	constexpr getValue() const
+	{
+		return (sum / static_cast<T>(N));
+	}
 
+private:
+	least_uint<N> index{0};
+	T buffer[N];
+	T sum;
+};
 
-#include "moving_average_float_impl.hpp"
-#endif // MODM_MOVING_AVERAGE_HPP
+} // namespace modm::filter

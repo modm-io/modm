@@ -3,6 +3,7 @@
  * Copyright (c) 2016, Fabian Greif
  * Copyright (c) 2016-2017, Sascha Schade
  * Copyright (c) 2018, Antal Szabó
+ * Copyright (c) 2021, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -24,17 +25,19 @@
 
 using namespace modm::platform;
 
-/// @ingroup modm_board_disco_f769ni
+
 namespace Board
 {
-	using namespace modm::literals;
+/// @ingroup modm_board_disco_f769ni
+/// @{
+using namespace modm::literals;
 
 /// STM32F7 running at 216MHz from the external 25MHz clock
 struct SystemClock
 {
 	static constexpr uint32_t Frequency = 216_MHz;
-	static constexpr uint32_t Apb1 = Frequency / 8;
-	static constexpr uint32_t Apb2 = Frequency / 4;
+	static constexpr uint32_t Apb1 = Frequency / 4;
+	static constexpr uint32_t Apb2 = Frequency / 2;
 
 	static constexpr uint32_t Adc1 = Apb2;
 	static constexpr uint32_t Adc2 = Apb2;
@@ -92,16 +95,13 @@ struct SystemClock
 		Rcc::enableOverdriveMode();
 		Rcc::setFlashLatency<Frequency>();
 		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
-		// APB1 is running only at 27MHz, since AHB / 4 = 54MHz > 45MHz limit!
-		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div8);
-		// APB2 is running only at 54MHz, since AHB / 2 = 108MHz > 90MHz limit!
-		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div4);
+		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div4);
+		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div2);
 		Rcc::updateCoreFrequency<Frequency>();
 
 		return true;
 	}
 };
-
 
 using Button = GpioInputA0;	// User Button
 using LedJ13 = GpioOutputJ13;	// User LED 1 (red)
@@ -110,15 +110,19 @@ using LedA12 = GpioOutputA12;	// User LED 3 (green)
 using LedD4  = GpioInverted<GpioOutputD4>;	// User Led 4 (red)
 
 using Leds = SoftwareGpioPort< LedJ13, LedJ5, LedA12, LedD4 >;
-
+/// @}
 
 namespace stlink
 {
+/// @ingroup modm_board_disco_f769ni
+/// @{
 using Tx = GpioOutputA9;
 using Rx = GpioInputA10;
 using Uart = Usart1;
+/// @}
 }
 
+/// @ingroup modm_board_disco_f769ni
 using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
 
 // Onboard MicroSD card slot
@@ -128,25 +132,32 @@ namespace usd
 // SDIO interface
 namespace sdio
 {
+/// @ingroup modm_board_disco_f769ni
+/// @{
 using Cmd = GpioOutputD7;
 using Clk = GpioOutputD7;
 using D3  = GpioB4;
 using D2  = GpioB3;
 using D1  = GpioG10;
 using D0  = GpioG9;
+/// @}
 }
 
 // SPI interface
 namespace spi
 {
+/// @ingroup modm_board_disco_f769ni
+/// @{
 using Mosi = sdio::Cmd;
 using Clk  = sdio::Clk;
 using Cs   = sdio::D3;
 using Irq  = sdio::D1;
 using Miso = sdio::D0;
+/// @}
 }
 }
 
+/// @ingroup modm_board_disco_f769ni
 inline void
 initialize()
 {
@@ -157,9 +168,6 @@ initialize()
 	stlink::Uart::initialize<SystemClock, 115200_Bd>();
 
 	Button::setInput();
-	Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-	Button::enableExternalInterrupt();
-//	Button::enableExternalInterruptVector(12);
 }
 
 }

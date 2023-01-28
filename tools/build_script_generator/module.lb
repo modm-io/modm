@@ -25,7 +25,7 @@ class BuildModuleDocs:
         if self._content is None:
             self._content = Path(localpath("module.md")).read_text(encoding="utf-8").strip()
             tools = ["avrdude", "openocd", "bmp", "gdb", "size", "info",
-                     "unit_test", "log", "build_id", "bitmap"]
+                     "unit_test", "log", "build_id", "bitmap", "elf2uf2"]
 
             for tool in tools:
                 tpath = Path(repopath("tools/modm_tools/{}.py".format(tool)))
@@ -132,10 +132,10 @@ def prepare(module, options):
     if is_cortex_m:
         module.add_collector(
             PathCollector(name="openocd.source",
-                          description="Additional OpenOCD source files."))
+                          description=descr_opencd_source))
         module.add_collector(
             PathCollector(name="path.openocd",
-                          description="Search path for OpenOCD configuration files"))
+                          description="Search path for OpenOCD configuration files."))
 
         if platform == "sam":
             module.add_collector(
@@ -206,7 +206,7 @@ def build(env):
         tools.add("unit_test")
     if is_cortex_m:
         tools.update({"bmp", "openocd", "crashdebug", "gdb", "backend",
-                      "log", "build_id", "size"})
+                      "log", "build_id", "size", "elf2uf2"})
         if platform in ["sam"]:
             tools.update({"bossac"})
     elif platform in ["avr"]:
@@ -242,7 +242,10 @@ def post_build(env):
         # prepare custom path
         openocd_cfg = env.get(":build:openocd.cfg", "")
         if len(openocd_cfg):
-            env.substitutions["openocd_user_path"] = env.relative_outpath(openocd_cfg)
+            env.substitutions["openocd_user_path"] = env.relcwdoutpath(openocd_cfg)
+        env.substitutions["openocd_search_dirs"] = \
+            [env.relcwdoutpath(path) for path in env.collector_values("path.openocd")]
+        env.substitutions["openocd_sources"] = env.collector_values("openocd.source")
 
         has_rtt = env.has_module(":platform:rtt")
         env.substitutions["has_rtt"] = has_rtt
@@ -307,4 +310,32 @@ projects using the same target (like small bring-up and test projects).
     When providing your own config file, wrap your specific commands into functions
     and do not execute them by default. A stray `init` or similar in your script
     will mess with modm's ability to program and debug a device correctly.
+"""
+
+descr_opencd_source = """# Additional OpenOCD source files
+
+You can add multiple source files that will get included by the generated
+`modm/openocd.cfg` to provide a default config for targets and boards.
+You can add source files that are shipped with OpenOCD, for example,
+`board/stm32f469discovery.cfg`, or custom source files from your own repository.
+
+To avoid name clashes with the built-in config files, you should copy your own
+source files into a separate folder and add it as a search path:
+
+```py
+def build(env):
+    # Add a custom folder to the OpenOCD search paths
+    env.collect("modm:build:path.openocd", "repo/src/openocd/")
+
+    # Namespace this folder with your repository name to prevent name clashes
+    env.outbasepath = "repo/src/openocd/repo/board"
+    env.copy("board.cfg", "name.cfg")
+    # Now use a *relative* path to the source file inside this folder
+    env.collect("modm:build:openocd.source", "repo/board/name.cfg")
+
+    # Alternatively for a target config
+    env.outbasepath = "repo/src/openocd/repo/target"
+    env.copy("target.cfg", "name.cfg")
+    env.collect("modm:build:openocd.source", "repo/target/name.cfg")
+```
 """

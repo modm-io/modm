@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <extends>modm:nucleo-f411re</extends>
+  <options>
+    <option name="modm:build:build.path">../../build/generated-unittest/nucleo-f411re/</option>
+    <option name="modm:build:unittest.source">../../build/generated-unittest/nucleo-f411re/modm-test</option>
+    <option name="modm:platform:exti:with_handlers">false</option>
+  </options>
+  <modules>
+    <module>modm:platform:heap</module>
+    <module>modm-test:test:**</module>
+  </modules>
+</library>

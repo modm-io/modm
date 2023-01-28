@@ -13,5 +13,6 @@ find ${@:1} -name Makefile -delete
 find ${@:1} -name CMakeLists.txt -delete
 
 find ${@:1} -type d -name modm -exec rm -rf "{}" \;
+find ${@:1} -type d -name modm-test -exec rm -rf "{}" \;
 find ${@:1} -type d -name generated -exec rm -rf "{}" \;
 find ${@:1} -type d -name build -exec rm -rf "{}" \;

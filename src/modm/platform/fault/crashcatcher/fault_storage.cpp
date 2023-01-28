@@ -18,7 +18,7 @@ typedef struct
 	uint32_t const traits;
 	uint8_t *const start;
 	uint8_t *const end;
-} __attribute__((packed)) table_pool_t;
+} modm_packed table_pool_t;
 
 extern "C" const table_pool_t __table_heap_start[];
 extern "C" const table_pool_t __table_heap_end[];

@@ -351,7 +351,7 @@ modm::Abandonment
 resumable_test_nesting_handler(const modm::AssertionInfo &info)
 {
 	if (testing_nesting_assertion) {
-		TEST_ASSERT_EQUALS_STRING(info.name, "rf.nesting");
+		TEST_ASSERT_EQUALS_STRING(info.name, "rf.nest");
 		return modm::Abandonment::Ignore;
 	}
 	return modm::Abandonment::DontCare;

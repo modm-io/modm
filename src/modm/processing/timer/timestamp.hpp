@@ -15,38 +15,27 @@
 
 namespace modm
 {
+/// @ingroup    modm_processing_timer
+/// @{
 
 /// 16bit duration, which can hold up to 65 seconds at millisecond resolution.
-/// @ingroup	modm_processing_timer
 using        ShortDuration = std::chrono::duration<uint16_t, std::milli>;
-
 /// 32bit duration, which can hold up to 49 days at millisecond resolution.
-/// @ingroup	modm_processing_timer
 using             Duration = std::chrono::duration<uint32_t, std::milli>;
-
 /// 16bit precise duration, which can hold up to 65 milliseconds at microsecond resolution.
-/// @ingroup	modm_processing_timer
 using ShortPreciseDuration = std::chrono::duration<uint16_t, std::micro>;
-
 /// 32bit precise duration, which can hold up to 71 minutes at microsecond resolution.
-/// @ingroup	modm_processing_timer
 using      PreciseDuration = std::chrono::duration<uint32_t, std::micro>;
 
 
 /// 16bit time point, which can hold up to 65 seconds at millisecond resolution.
-/// @ingroup	modm_processing_timer
 using        ShortTimestamp = std::chrono::time_point<modm::chrono::milli_clock, ShortDuration>;
-
 /// 32bit time point, which can hold up to 49 days at millisecond resolution.
-/// @ingroup	modm_processing_timer
 using             Timestamp = modm::chrono::milli_clock::time_point;
-
 /// 16bit precise time point, which can hold up to 65 milliseconds at microsecond resolution.
-/// @ingroup	modm_processing_timer
 using ShortPreciseTimestamp = std::chrono::time_point<modm::chrono::micro_clock, ShortPreciseDuration>;
-
 /// 32bit precise time point, which can hold up to 71 minutes at microsecond resolution.
-/// @ingroup	modm_processing_timer
 using      PreciseTimestamp = modm::chrono::micro_clock::time_point;
 
+/// @}
 }	// namespace modm

@@ -1,0 +1,17 @@
+<library>
+  <extends>modm:nucleo-f429zi</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_f429zi/usb_freertos</option>
+    <option name="modm:tinyusb:config">device.cdc</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:freertos</module>
+    <module>modm:processing:rtos</module>
+    <module>modm:processing:timer</module>
+    <module>modm:tinyusb</module>
+  </modules>
+  <collectors>
+    <collect name="modm:build:cppdefines">CFG_TUSB_DEBUG=2</collect>
+  </collectors>
+</library>

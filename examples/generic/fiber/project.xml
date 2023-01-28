@@ -1,0 +1,13 @@
+<library>
+  <extends>modm:nucleo-f429zi</extends>
+  <!-- <extends>modm:nucleo-g071rb</extends> -->
+  <options>
+    <option name="modm:build:build.path">../../../build/generic/fiber</option>
+    <option name="modm:__fibers">yes</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:processing:timer</module>
+    <module>modm:processing:fiber</module>
+  </modules>
+</library>

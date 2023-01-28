@@ -1,0 +1,34 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2022, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":printf"
+    module.description = FileReader("module.md")
+
+def prepare(module, options):
+    return True
+
+def build(env):
+    env.collect(":build:path.include", "modm/ext")
+    env.collect(":build:ccflags", "-fno-builtin-printf")
+    env.outbasepath = "modm/ext/printf"
+
+    env.copy("printf/src/printf/printf.h", "printf.h")
+    files = env.copy("printf/src/printf/printf.c", "printf.c")
+    env.collect(":build:ccflags", "-Wno-double-promotion", "-Wno-overflow", operations=files)
+
+    with_long_long = "avr" not in env[":target"].identifier.platform
+    env.substitutions = {
+        "with_long_long": env.get(":io:with_long_long", with_long_long),
+        "is_hosted": env[":target"].identifier.platform == "hosted",
+    }
+    env.template("printf_config.h.in")

@@ -21,14 +21,16 @@
 
 using namespace modm::platform;
 
-/// @ingroup modm_board_disco_f303vc
 namespace Board
 {
-	using namespace modm::literals;
+/// @ingroup modm_board_disco_f303vc
+/// @{
+using namespace modm::literals;
 
 /// STM32F303 running at 72MHz generated from the external 8MHz clock
 /// supplied by the on-board st-link
-struct SystemClock {
+struct SystemClock
+{
 	static constexpr uint32_t Frequency = 72_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency / 2;
@@ -108,7 +110,6 @@ struct SystemClock {
 	}
 };
 
-
 using Button = GpioInputA0;
 using ClockOut = GpioOutputA8;
 
@@ -122,10 +123,12 @@ using LedWest      = GpioOutputE15;		// User LED 6: Green
 using LedNorthWest = GpioOutputE8;		// User LED 4: Blue
 
 using Leds = SoftwareGpioPort< LedNorthWest, LedWest, LedSouthWest, LedSouth, LedSouthEast, LedEast, LedNorthEast, LedNorth >;
-
+/// @}
 
 namespace l3g
 {
+/// @ingroup modm_board_disco_f303vc
+/// @{
 using Int1 = GpioInputE0;	// MEMS_INT1 [L3GD20_INT1]: GPXTI0
 using Int2 = GpioInputE1;	// MEMS_INT2 [L3GD20_DRDY/INT2]: GPXTI1
 
@@ -137,11 +140,13 @@ using Miso = GpioInputA6;	// SPI1_MISO [L3GD20_SA0/SDO]
 using SpiMaster = SpiMaster1;
 using Transport = modm::Lis3TransportSpi< SpiMaster, Cs >;
 using Gyroscope = modm::L3gd20< Transport >;
+/// @}
 }
-
 
 namespace lsm3
 {
+/// @ingroup modm_board_disco_f303vc
+/// @{
 using Drdy = GpioInputE2;	// DRDY [LSM303DLHC_DRDY]: GPXTI2
 using Int1 = GpioInputE4;	// MEMS_INT3 [LSM303DLHC_INT1]: GPXTI4
 using Int2 = GpioInputE5;	// MEMS_INT4 [LSM303DLHC_INT2]: GPXTI5
@@ -151,17 +156,21 @@ using Sda = GpioB7;	// I2C1_SDA [LSM303DLHC_SDA]: I2C1_SDA
 
 using I2cMaster = I2cMaster1;
 using Accelerometer = modm::Lsm303a< I2cMaster >;
+/// @}
 }
-
 
 namespace usb
 {
+/// @ingroup modm_board_disco_f303vc
+/// @{
 using Dm = GpioA11;		// DM: USB_DM
 using Dp = GpioA12;		// DP: USB_DP
 using Device = UsbFs;
+/// @}
 }
 
-
+/// @ingroup modm_board_disco_f303vc
+/// @{
 inline void
 initialize()
 {
@@ -171,25 +180,13 @@ initialize()
 	Leds::setOutput(modm::Gpio::Low);
 
 	Button::setInput();
-	Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-	Button::enableExternalInterrupt();
-//	Button::enableExternalInterruptVector(12);
 }
-
 
 inline void
 initializeL3g()
 {
 	l3g::Int1::setInput();
-	l3g::Int1::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-	l3g::Int1::enableExternalInterrupt();
-//	l3g::Int1::enableExternalInterruptVector(12);
-
 	l3g::Int2::setInput();
-	l3g::Int2::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-	l3g::Int2::enableExternalInterrupt();
-//	l3g::Int2::enableExternalInterruptVector(12);
-
 	l3g::Cs::setOutput(modm::Gpio::High);
 
 	l3g::SpiMaster::connect<l3g::Sck::Sck, l3g::Mosi::Mosi, l3g::Miso::Miso>();
@@ -197,36 +194,24 @@ initializeL3g()
 	l3g::SpiMaster::setDataMode(l3g::SpiMaster::DataMode::Mode3);
 }
 
-
 inline void
 initializeLsm3()
 {
 	lsm3::Int1::setInput();
-	lsm3::Int1::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-	lsm3::Int1::enableExternalInterrupt();
-//	lsm3::Int1::enableExternalInterruptVector(12);
-
 	lsm3::Int2::setInput();
-	lsm3::Int2::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-	lsm3::Int2::enableExternalInterrupt();
-//	lsm3::Int2::enableExternalInterruptVector(12);
-
 	lsm3::Drdy::setInput();
-	lsm3::Drdy::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-	lsm3::Drdy::enableExternalInterrupt();
-//	lsm3::Drdy::enableExternalInterruptVector(12);
 
 	lsm3::I2cMaster::connect<lsm3::Scl::Scl, lsm3::Sda::Sda>();
 	lsm3::I2cMaster::initialize<SystemClock, 400_kHz>();
 }
 
-
 inline void
-initializeUsbFs()
+initializeUsbFs(uint8_t priority=3)
 {
-	usb::Device::initialize<SystemClock>();
+	usb::Device::initialize<SystemClock>(priority);
 	usb::Device::connect<usb::Dm::Dm, usb::Dp::Dp>();
 }
+/// @}
 
 }
 

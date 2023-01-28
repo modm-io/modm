@@ -16,13 +16,13 @@
 
 using namespace modm::platform;
 
-/// @ingroup modm_board_disco_l152rc
 namespace Board
 {
+/// @ingroup modm_board_disco_l152rc
+/// @{
 using namespace modm::literals;
 
 /// STM32L152RC running at 32MHz generated from the external 8MHz ST-Link clock
-// Dummy clock for devices
 struct SystemClock
 {
 	static constexpr uint32_t Frequency = 32_MHz;
@@ -116,9 +116,12 @@ using LedBlue = GpioOutputB6;
 using LedGreen = GpioOutputB7;
 
 using Leds = SoftwareGpioPort< LedBlue, LedGreen >;
+/// @}
 
 namespace lcd
 {
+/// @ingroup modm_board_disco_l152rc
+/// @{
 using Com0 = GpioOutputA8;
 using Com1 = GpioOutputA9;
 using Com2 = GpioOutputA10;
@@ -148,8 +151,10 @@ using Seg26 = GpioOutputC8;
 using Seg27 = GpioOutputC9;
 using Seg28 = GpioOutputC10;
 using Seg29 = GpioOutputC11;
+/// @}
 }
 
+/// @ingroup modm_board_disco_l152rc
 inline void
 initialize()
 {

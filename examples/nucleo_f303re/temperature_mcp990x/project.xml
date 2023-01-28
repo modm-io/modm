@@ -1,0 +1,12 @@
+<library>
+  <extends>modm:nucleo-f303re</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_f303re/temperature_mcp990x</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:i2c:2</module>
+    <module>modm:driver:mcp990x</module>
+    <module>modm:processing:timer</module>
+  </modules>
+</library>

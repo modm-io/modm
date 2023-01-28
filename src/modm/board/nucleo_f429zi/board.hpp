@@ -19,12 +19,13 @@
 using namespace modm::platform;
 
 /// @ingroup modm_board_nucleo_f429zi modm_board_nucleo_f439zi
-/// @{
 #define MODM_BOARD_HAS_LOGGER
 
 namespace Board
 {
-	using namespace modm::literals;
+/// @ingroup modm_board_nucleo_f429zi modm_board_nucleo_f439zi
+/// @{
+using namespace modm::literals;
 
 /// STM32F429 running at 168MHz from the external 8MHz STLink clock
 struct SystemClock
@@ -109,9 +110,12 @@ using LedGreen = GpioOutputB0;	// LED1 [Green]
 using LedBlue = GpioOutputB7;	// LED2 [Blue]
 using LedRed = GpioOutputB14;	// LED3 [Red]
 using Leds = SoftwareGpioPort< LedRed, LedBlue, LedGreen >;
+/// @}
 
 namespace usb
 {
+/// @ingroup modm_board_nucleo_f429zi modm_board_nucleo_f439zi
+/// @{
 using Vbus = GpioA9;
 using Id = GpioA10;
 using Dm = GpioA11;
@@ -121,17 +125,22 @@ using Overcurrent = GpioInputG7;	// OTG_FS_OverCurrent
 using Power = GpioOutputG6;			// OTG_FS_PowerSwitchOn
 
 using Device = UsbFs;
+/// @}
 }
 
 namespace stlink
 {
+/// @ingroup modm_board_nucleo_f429zi modm_board_nucleo_f439zi
+/// @{
 using Tx = GpioOutputD8;
 using Rx = GpioInputD9;
 using Uart = Usart3;
+/// @}
 }
 
+/// @ingroup modm_board_nucleo_f429zi modm_board_nucleo_f439zi
+/// @{
 using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
-
 
 inline void
 initialize()
@@ -147,15 +156,12 @@ initialize()
     LedRed::setOutput(modm::Gpio::Low);
 
     Button::setInput();
-    Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-    Button::enableExternalInterrupt();
-//  Button::enableExternalInterruptVector(12);
 }
 
 inline void
-initializeUsbFs()
+initializeUsbFs(uint8_t priority=3)
 {
-	usb::Device::initialize<SystemClock>();
+	usb::Device::initialize<SystemClock>(priority);
 	usb::Device::connect<usb::Dm::Dm, usb::Dp::Dp, usb::Id::Id>();
 
 	usb::Overcurrent::setInput();
@@ -164,7 +170,6 @@ initializeUsbFs()
 	USB_OTG_FS->GCCFG &= ~USB_OTG_GCCFG_NOVBUSSENS;
 	USB_OTG_FS->GCCFG |= USB_OTG_GCCFG_VBUSBSEN;
 }
-
-}
 /// @}
 
+}

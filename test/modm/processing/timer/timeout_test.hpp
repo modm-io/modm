@@ -27,9 +27,6 @@ public:
 	testZeroConstructor();
 
 	void
-	testNegativeConstructor();
-
-	void
 	testBasics();
 
 	void

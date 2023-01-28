@@ -24,17 +24,14 @@ of 20 Mhz is supported.
 
 def prepare(module, options):
     module.depends(
-        ":architecture:accessor",
         ":architecture:delay",
         ":architecture:gpio",
         ":architecture:register",
         ":architecture:spi.device",
-        ":io",
         ":processing:resumable")
     return True
 
 def build(env):
     env.outbasepath = "modm/src/modm/driver/adc"
     env.copy("ad7928.hpp")
-    env.copy("ad7928.cpp")
     env.copy("ad7928_impl.hpp")

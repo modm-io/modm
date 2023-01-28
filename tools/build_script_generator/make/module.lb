@@ -33,7 +33,7 @@ def prepare(module, options):
 def build(env):
     def flag_format(flag):
         subs = {
-            "target_base": "$(MAKE_PROJECT_NAME)",
+            "target_base": "$(BUILDPATH)/$(MODM_PROJECT_NAME)",
             "project_source_dir": "$(CURDIR)",
             "gccpath": "$(GCC_BASE)",
         }
@@ -52,23 +52,28 @@ def post_build(env):
     if subs["core"].startswith("cortex-m"):
         # get memory information
         subs["memories"] = env.query("::memories")
+        subs["uf2mem"] = ["0x{}:0x{}:{}".format(hex(m["start"]), hex(m["start"] + m["size"]),
+                          "CONTENTS" if "flash" in m["name"] else "NO_CONTENTS")
+                          for m in subs["memories"]]
     else:
         subs["memories"] = []
     # Add SCons specific data
     linkerscript = env.get(":platform:cortex-m:linkerscript.override")
-    linkerscript = env.relative_outpath(linkerscript) if linkerscript \
+    linkerscript = linkerscript if linkerscript \
                    else "modm/link/linkerscript.ld"
     subs.update({
-        "build_path": env.relative_outpath(env["::build.path"]),
-        "generated_paths": repositories,
+        "build_path": env.relcwdoutpath(env["::build.path"]),
+        "modm_path": env.relcwdoutpath("modm"),
+        "outpath": env.relcwdoutpath(""),
+        "repositories": repositories,
         "linkerscript": linkerscript,
         "is_unittest": is_unittest,
         "program_extension": "exe" if env[":target"].identifier.family == "windows" else "elf",
     })
     if is_unittest:
-        subs["unittest_source"] = env.relative_outpath(env["::unittest.source"])
+        subs["unittest_source"] = env.relcwdoutpath(env["::unittest.source"])
     if len(env["::image.source"]):
-        subs["image_source"] = env.relative_outpath(env["::image.source"])
+        subs["image_source"] = env.relcwdoutpath(env["::image.source"])
     if subs["platform"] == "avr":
         subs.update(env.query("::avrdude_options"))
     if subs["platform"] == "sam":
@@ -83,6 +88,8 @@ def post_build(env):
             nflag = fmt(flag)
             if nflag: return nflag;
         return flag
+    def relocate(path):
+        return env.relcwdoutpath(path).replace(subs["modm_path"], "$(MODM_PATH)")
 
     for repo in repositories:
         files = []
@@ -115,17 +122,17 @@ def post_build(env):
         # Generate library SConscript
         env.outbasepath = repo
         env.template("resources/repo.mk.in", "repo.mk",
-                     filters={"flags_format": flags_format,
+                     filters={"flags_format": flags_format, "relocate": relocate,
                               "objectify": lambda f: f.rsplit(".", 1)[0]+".o"})
 
     env.outbasepath = "modm"
-    env.template("resources/config.mk.in", "config.mk")
+    env.template("resources/config.mk.in", "config.mk", filters={"relocate": relocate})
     env.template("resources/compiler.mk.in", "compiler.mk")
 
     # these are the ONLY files that are allowed to NOT be namespaced with modm!
-    env.outbasepath = "."
+    env.outbasepath = env.cwdpath(".")
     if env["include_makefile"]:
-        env.template("resources/Makefile.in", "Makefile")
+        env.template("resources/Makefile.in", "Makefile", filters={"relocate": relocate})
 
 
 # ============================ Option Descriptions ============================

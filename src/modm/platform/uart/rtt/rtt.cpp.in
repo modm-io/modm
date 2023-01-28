@@ -74,10 +74,10 @@ struct RttControlBlock
 } modm_packed;
 
 // Explicitly constructed as constinit to force *only* copying via .data section.
-// This prevents the "modm.rtt.modm" identifier leaking into the stack and being
+// This prevents the identifier leaking into the stack and being
 // found by OpenOCD accidentally instead of the real RTT control block.
 static constinit RttControlBlock rtt_control{
-	"modm.rtt.modm",
+	"SEGGER RTT",
 	{{ buffer_tx | length }},
 	{{ buffer_rx | length }},
 	{

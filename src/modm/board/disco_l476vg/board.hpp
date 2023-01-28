@@ -20,9 +20,10 @@
 
 using namespace modm::platform;
 
-/// @ingroup modm_board_disco_l476vg
 namespace Board
 {
+/// @ingroup modm_board_disco_l476vg
+/// @{
 using namespace modm::literals;
 
 /// STM32L4 running at 80MHz generated from the
@@ -82,22 +83,31 @@ struct SystemClock
 };
 
 using Button = GpioInputA0;
+/// @}
 
 namespace Joystick
 {
+/// @ingroup modm_board_disco_l476vg
+/// @{
 using Left  = GpioInputA1;
 using Right = GpioInputA2;
 using Up    = GpioInputA3;
 using Down  = GpioInputA5;
+/// @}
 }
 
+/// @ingroup modm_board_disco_l476vg
+/// @{
 using LedRed   = GpioOutputB2;	// User LED 4
 using LedGreen = GpioOutputE8;	// User LED 5
 
 using Leds = SoftwareGpioPort< LedRed, LedGreen >;
+/// @}
 
 namespace usb
 {
+/// @ingroup modm_board_disco_l476vg
+/// @{
 using Overcurrent = GpioInputC10;	// OTG_FS_OverCurrent
 using Vbus = GpioInputA9; // default PC11 if SB24 open
 using Id = GpioA10; // default PC12 if SB25 left open
@@ -105,8 +115,11 @@ using Dm = GpioA11;
 using Dp = GpioA12;
 
 using Device = UsbFs;
+/// @}
 }
 
+/// @ingroup modm_board_disco_l476vg
+/// @{
 inline void
 initialize()
 {
@@ -117,16 +130,13 @@ initialize()
 	LedRed::setOutput(modm::Gpio::Low);
 
 	Button::setInput();
-	Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-	Button::enableExternalInterrupt();
-//	Button::enableExternalInterruptVector(12);
 }
 
 /// You must take out the LCD screen and close SB24 and SB25 for USB to work
 inline void
-initializeUsbFs()
+initializeUsbFs(uint8_t priority=3)
 {
-	usb::Device::initialize<SystemClock>();
+	usb::Device::initialize<SystemClock>(priority);
 	usb::Device::connect<usb::Dm::Dm, usb::Dp::Dp, usb::Id::Id>();
 
 	usb::Overcurrent::setInput();
@@ -135,6 +145,7 @@ initializeUsbFs()
 	// Enable VBUS sense (B device) via pin PA9
 	USB_OTG_FS->GCCFG |= USB_OTG_GCCFG_VBDEN;
 }
+/// @}
 
 }
 

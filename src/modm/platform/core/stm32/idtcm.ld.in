@@ -15,42 +15,48 @@ SECTIONS
 
 {{ linker.section_rom("FLASH") }}
 
-
 %% if vector_table_location == "ram"
-{{ linker.section_vector_ram("ITCM") }}
+{{ linker.section_vector_ram("ITCM", table_copy) }}
 %% endif
 
-{{ linker.section("ITCM AT >FLASH", "fastcode", sections=["data_itcm"]) }}
-%% do table_copy.append("fastcode")
+	/* Sections in memory region ITCM */
+{{ linker.section_load("ITCM AT >FLASH", table_copy, sections=["fastcode", "data_itcm"]) }}
 
 {{ linker.section_heap("ITCM", "heap_itcm", sections=["noinit_itcm"]) }}
-%% do table_heap.append({"name": "heap_itcm", "prop": "0x201f"})
+%% do table_heap.append({"name": "heap_itcm", "prop": "0x2005"})
 
-
+%% if cont_ram_regions[0].cont_name == "cont_dtcm"
 {{ linker.section_stack("CONT_DTCM") }}
-
-{{ linker.section_ram(cont_ram_regions[0].name|upper, "FLASH",
-                      sections_data=["fastdata", "data_" + cont_ram_regions[0].contains[0].name],
-                      sections_bss=["bss_" + cont_ram_regions[0].contains[0].name]) }}
-
-{{ linker.all_heap_sections(table_copy, table_zero, table_heap) }}
-%% if with_crashcatcher
-	g_crashCatcherStack = . - 500;
+%% else
+{{ linker.section_stack("DTCM") }}
 %% endif
 
+{{ linker.section_ram(cont_ram_regions[0].cont_name|upper, "FLASH", table_copy, table_zero,
+                      sections_data=["fastdata", "data_" + cont_ram_regions[0].contains[0].name],
+                      sections_bss=["bss_" + cont_ram_regions[0].contains[0].name],
+                      sections_noinit=["faststack"]) }}
+
+{{ linker.all_heap_sections(table_copy, table_zero, table_heap, props={"dtcm": "0x2023" if target.family == "h7" else "0x202b"}) }}
+%% if with_crashcatcher
+	%#
+	/* Bottom of crash stack for `modm:platform:fault` */
+	g_crashCatcherStack = . - 500;
+	%#
+%% endif
 
 %% if "backup" in regions
-{{ linker.section("BACKUP AT >FLASH", "data_backup") }}
-%% do table_copy.append("data_backup")
+	/* Sections in memory region BACKUP */
+{{ linker.section_load("BACKUP AT >FLASH", table_copy, sections=["data_backup"]) }}
 
 {{ linker.section_heap("BACKUP", "heap_backup", sections=["bss_backup", "noinit_backup"]) }}
-%% do table_heap.append({"name": "heap_backup", "prop": "0x4009"})
-%% do table_zero.append("bss_backup")
+	%% do table_heap.append({"name": "heap_backup", "prop": "0x4009"})
+	%% do table_zero.append("bss_backup")
 %% endif
 
-
+%% if linkerscript_sections
 {{ linkerscript_sections | indent(first=True) }}
-
+	%#
+%% endif
 
 {{ linker.section_tables("FLASH", table_copy, table_zero, table_heap) }}
 

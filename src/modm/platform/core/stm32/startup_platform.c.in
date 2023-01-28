@@ -3,6 +3,7 @@
  * Copyright (c) 2016-2017, Fabian Greif
  * Copyright (c) 2016-2017, 2019, Niklas Hauser
  * Copyright (c) 2021, Raphael Lehmann
+ * Copyright (c) 2021, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -57,11 +58,23 @@ __modm_initialize_platform(void)
 	PWR->CR1 |= PWR_CR1_DBP;
 	// Enable Data Tighly Coupled Memory (DTCM) and backup SRAM (BKPSRAM)
 	RCC->AHB1ENR |= RCC_AHB1ENR_DTCMRAMEN | RCC_AHB1ENR_BKPSRAMEN;
-%% elif target.family in ["g0", "l4", "l5"]
+%% elif target.family in ["g0", "g4", "l4", "l5"]
+%% if target.family in ["l4", "g4"]
+	RCC->APB1ENR1 |= RCC_APB1ENR1_PWREN;
+%% else
+#ifdef PWR_CR2_IOSV
+	RCC->APB1ENR1 |= RCC_APB1ENR1_PWREN;
+#endif
+%% endif
+
 #ifdef PWR_CR2_IOSV
 	// Enable VDDIO2
-	RCC->APB1ENR1 |= RCC_APB1ENR1_PWREN;
 	PWR->CR2 |= PWR_CR2_IOSV;
 #endif
+%% endif
+
+%% if vector_table_location == "ram"
+	// Remap SRAM to 0x0 for vector table relocation without VTOR register
+	SYSCFG->CFGR1 |= SYSCFG_CFGR1_MEM_MODE;
 %% endif
 }

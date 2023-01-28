@@ -21,14 +21,14 @@ python3 modm/modm_tools/size.py path/to/project.elf \\
     "[{'name': 'flash', 'access': 'rx', 'start': 134217728, 'size': 65536}, \\
     {'name': 'sram1', 'access': 'rwx', 'start': 536870912, 'size': 20480}]"
 
-Program:   1.4 KiB (2.2% used)
+Program:   1.4 KiB /  64.0 KiB (2.2% used)
 (.build_id + .fastcode + .fastdata + .hardware_init + .rodata +
  .table.copy.intern + .table.heap + .table.zero.intern + .text + .vector_rom)
 
-Data:      3.0 KiB (15.1% used) = 20 B static (0.1%) + 3072 B stack (15.0%)
+Data:      3.0 KiB /  20.0 KiB (15.1% used) = 20 B static (0.1%) + 3072 B stack (15.0%)
 (.bss + .fastdata + .stack)
 
-Heap:     17.0 KiB (84.9% available)
+Heap:     17.0 KiB /  20.0 KiB (84.9% available)
 (.heap1)
 ```
 
@@ -42,13 +42,13 @@ from elftools.elf.elffile import ELFFile
 
 
 TEMPLATE_SIZE = """\
-Program: {rom_fmt:>9s} ({rom_p:2.1f}% used)
+Program: {rom_fmt:>9s} / {rom_total:>9s} ({rom_p:2.1f}% used)
 ({rom_s})
 
-Data:    {ram_fmt:>9s} ({ram_p:2.1f}% used) = {static} B static ({static_p:2.1f}%) + {stack} B stack ({stack_p:2.1f}%)
+Data:    {ram_fmt:>9s} / {ram_total:>9s} ({ram_p:2.1f}% used) = {static} B static ({static_p:2.1f}%) + {stack} B stack ({stack_p:2.1f}%)
 ({ram_s})
 
-Heap:  {heap_fmt:>11s} ({heap_p:2.1f}% available)
+Heap:  {heap_fmt:>11s} / {ram_total:>9s} ({heap_p:2.1f}% available)
 ({heap_s})
 """
 
@@ -109,13 +109,14 @@ def format(source, device_memories):
 
             if is_in_memory("rom"):
                 totals["rom"] += s["size"]
-                sections["rom"].append(s["name"])
+                if not ".build_id" in s["name"]:
+                    sections["rom"].append(s["name"])
             if is_in_memory("ram"):
                 totals["static"] += s["size"]
                 sections["static"].append(s["name"])
 
     # create lists of the used sections for Flash and RAM
-    sections["rom"] = sorted(sections["rom"])
+    sections["rom"] = sorted(list(set(sections["rom"])))
     sections["ram"] = sorted(list(set(sections["static"] + sections["stack"])))
     sections["heap"] = sorted(sections["heap"])
 
@@ -138,6 +139,8 @@ def format(source, device_memories):
     output = TEMPLATE_SIZE.format(ram_fmt=human_readable_format(subs["ram"]),
                                   rom_fmt=human_readable_format(subs["rom"]),
                                   heap_fmt=human_readable_format(subs["heap"]),
+                                  ram_total=human_readable_format(ram),
+                                  rom_total=human_readable_format(flash),
                                   **subs)
     return output
 

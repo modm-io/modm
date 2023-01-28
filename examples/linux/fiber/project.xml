@@ -1,0 +1,14 @@
+<library>
+  <!-- CI: run -->
+  <options>
+    <option name="modm:target">hosted-linux</option>
+    <option name="modm:build:build.path">../../../build/linux/fiber</option>
+    <option name="modm:__fibers">yes</option>
+  </options>
+  <modules>
+    <module>modm:debug</module>
+    <module>modm:platform:core</module>
+    <module>modm:processing:fiber</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

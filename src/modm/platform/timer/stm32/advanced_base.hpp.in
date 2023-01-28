@@ -66,7 +66,7 @@ public:
 		SetComgOrRisingTrigEdge = TIM_CR2_CCUS
 	};
 
-%% if (target["family"] == "f3" and target["name"] not in ["73", "78"]) or target["family"] == "f7"
+%% if advanced_extended
 	enum class MasterMode2 : uint32_t
 	{
 		Reset			= 0,							//0b0000
@@ -124,21 +124,6 @@ public:
 	{
 		Reset = 0,
 		Set   = TIM_CR2_OIS1,
-	};
-
-	enum class Event : uint32_t
-	{
-%% if (target["family"] == "f3" and target["name"] not in ["73", "78"]) or target["family"] == "f7"
-		Break2 						= TIM_EGR_B2G,
-%% endif
-		Break 						= TIM_EGR_BG,
-		Trigger 					= TIM_EGR_TG,
-		CaptureCompareControlUpdate = TIM_EGR_COMG,
-		CaptureCompare4 			= TIM_EGR_CC4G,
-		CaptureCompare3 			= TIM_EGR_CC3G,
-		CaptureCompare2 			= TIM_EGR_CC2G,
-		CaptureCompare1 			= TIM_EGR_CC1G,
-		Update 						= TIM_EGR_UG,
 	};
 };
 

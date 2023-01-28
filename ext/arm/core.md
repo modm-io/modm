@@ -8,4 +8,4 @@ peripherals:
 
 Please [see the API documentation][docs] for their content and how to use them.
 
-[docs]: http://arm-software.github.io/CMSIS_5/Core/html/modules.html
+[docs]: https://arm-software.github.io/CMSIS_5/Core/html/modules.html

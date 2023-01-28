@@ -1,0 +1,106 @@
+/*
+ * Copyright (c) 2017-2018, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include "base.hpp"
+#include "set.hpp"
+
+namespace modm::platform
+{
+
+/// @ingroup	modm_platform_gpio
+template< class GpioData >
+class GpioStatic : public Gpio, public GpioData
+{
+	template< class... Gpios >
+	friend class GpioSet;
+	using PinSet = GpioSet<GpioStatic<GpioData>>;
+
+public:
+	using Direction = modm::Gpio::Direction;
+	using Type = GpioStatic<GpioData>;
+	using Output = Type;
+	using Input = Type;
+	using IO = Type;
+	using Data = GpioData;
+	using GpioData::port;
+	using GpioData::pin;
+	static constexpr Direction direction = Direction::InOut;
+	static constexpr bool isInverted = false;
+
+protected:
+	static constexpr uint8_t mask = (1 << pin);
+
+	static constexpr volatile uint8_t* gport() {
+%% for port in ports
+		if constexpr (port == Gpio::Port::{{port}}) return &PORT{{port}};
+%% endfor
+		return nullptr;
+	}
+	static constexpr volatile uint8_t* gpin() {
+%% for port in ports
+		if constexpr (port == Gpio::Port::{{port}}) return &PIN{{port}};
+%% endfor
+		return nullptr;
+	}
+	static constexpr volatile uint8_t* gddr() {
+%% for port in ports
+		if constexpr (port == Gpio::Port::{{port}}) return &DDR{{port}};
+%% endfor
+		return nullptr;
+	}
+%% if pue
+	static constexpr volatile uint8_t* gpue() {
+%% for port in ports
+		if constexpr (port == Gpio::Port::{{port}}) return &PUE{{port}};
+%% endfor
+		return nullptr;
+	}
+%% endif
+
+public:
+	// GpioOutput
+	inline static void setOutput() { PinSet::setOutput(); }
+	inline static void setOutput(bool status) { PinSet::setOutput(status); }
+	inline static void setOutput(OutputType type) { PinSet::setOutput(type); }
+	inline static void configure(OutputType type) { PinSet::configure(type); }
+
+	inline static void set() { PinSet::set(); }
+	inline static void set(bool status) { PinSet::set(status); }
+	inline static void reset() { PinSet::reset(); }
+	inline static bool isSet() { return (*gport() & mask); }
+	inline static void toggle() { PinSet::toggle(); }
+
+	// GpioInput
+	inline static void setInput() { PinSet::setInput(); }
+	inline static void setInput(InputType type) { PinSet::setInput(type); }
+	inline static void configure(InputType type) { PinSet::configure(type); }
+
+	inline static bool read() { return (*gpin() & mask); }
+
+	// GpioIO
+	inline static Direction getDirection()
+	{ return (*gddr() & mask) ? Direction::Out : Direction::In; }
+
+	inline static void disconnect()
+	{
+		*gddr() &= ~mask;
+		%% if pue
+		*gpue() &= ~mask;
+		%% else
+		*gport() &= ~mask;
+		%% endif
+	}
+};
+
+}	// namespace platform::modm
+

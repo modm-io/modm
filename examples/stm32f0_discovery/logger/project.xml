@@ -2,7 +2,7 @@
   <extends>modm:disco-f051r8</extends>
   <options>
     <option name="modm:build:build.path">../../../build/stm32f0_discovery/logger</option>
-    <option name="modm:platform:uart:1:buffer.tx">1024</option>
+    <option name="modm:platform:uart:1:buffer.tx">1Ki</option>
   </options>
   <modules>
     <module>modm:debug</module>

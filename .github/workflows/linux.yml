@@ -6,14 +6,19 @@ jobs:
   unittests-linux-generic:
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Update submodules and install lbuild
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Check environment
         run: |
           env
@@ -33,6 +38,11 @@ jobs:
         if: always()
         run: |
           python3 tools/scripts/rm_whitespace.py
+      - name: Check for Expired Deprecations
+        if: startsWith(github.head_ref, 'release/')
+        run: |
+          egrep -rI "DEPRECATED?:? +`basename ${{ github.head_ref }}`" . || true
+          return $(egrep -rI "DEPRECATED?:? +`basename ${{ github.head_ref }}`" . | wc -l)
       - name: Synchronize Documentation
         if: always()
         run: |
@@ -55,11 +65,22 @@ jobs:
       - name: Compile STM32 Unittests
         if: always()
         run: |
-          (cd test && make compile-nucleo-f411)
-          (cd test && make compile-nucleo-l432)
-          (cd test && make compile-nucleo-f103_A)
-          (cd test && make compile-nucleo-f103_B)
-          (cd test && make compile-nucleo-f091)
+          (cd test && make compile-nucleo-l432kc)
+          (cd test && make compile-nucleo-f091rc_A)
+          (cd test && make compile-nucleo-f091rc_B)
+          (cd test && make compile-nucleo-f103rb_A)
+          (cd test && make compile-nucleo-f103rb_B)
+          (cd test && make compile-nucleo-f401re)
+          (cd test && make compile-nucleo-f411re)
+          (cd test && make compile-nucleo-f429zi)
+          (cd test && make compile-nucleo-f446re)
+          (cd test && make compile-nucleo-f446ze)
+          (cd test && make compile-nucleo-f767zi)
+          (cd test && make compile-nucleo-g474re)
+          (cd test && make compile-nucleo-h723zg)
+          (cd test && make compile-nucleo-l432kc)
+          (cd test && make compile-nucleo-l496zg-p)
+          (cd test && make compile-nucleo-l552ze-q)
       - name: Linux Examples
         if: always()
         run: |
@@ -68,10 +89,26 @@ jobs:
         if: always()
         run: |
           (cd examples && ../tools/scripts/examples_compile.py generic)
-      - name: Examples SAM Devices
+      - name: Examples SAMD Devices
         if: always()
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py samd)
+          (cd examples && ../tools/scripts/examples_compile.py samd samd21_xplained_pro)
+      - name: Examples SAMG Devices
+        if: always()
+        run: |
+          (cd examples && ../tools/scripts/examples_compile.py samg55_xplained_pro)
+      - name: Examples SAME5x Devices
+        if: always()
+        run: |
+          (cd examples && ../tools/scripts/examples_compile.py same54_xplained_pro)
+      - name: Examples SAMV Devices
+        if: always()
+        run: |
+          (cd examples && ../tools/scripts/examples_compile.py samv samv71_xplained_ultra)
+      - name: Examples RP20 Devices
+        if: always()
+        run: |
+          (cd examples && ../tools/scripts/examples_compile.py feather_rp2040 rp_pico thingplus_rp2040)
       - name: Execute Python Scripts
         if: always()
         run: |
@@ -81,13 +118,18 @@ jobs:
   stm32-examples:
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Examples STM32F0 Series
         if: always()
         run: |
@@ -111,7 +153,7 @@ jobs:
       - name: Examples STM32L0 Series
         if: always()
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py nucleo_l031k6)
+          (cd examples && ../tools/scripts/examples_compile.py nucleo_l031k6 nucleo_l053r8)
       - name: Examples STM32L1 Series
         if: always()
         run: |
@@ -120,6 +162,10 @@ jobs:
         if: always()
         run: |
           (cd examples && ../tools/scripts/examples_compile.py stm32l476_discovery nucleo_l476rg nucleo_l432kc nucleo_l452re nucleo_l496zg-p)
+      - name: Examples STM32L5 Series
+        if: always()
+        run: |
+          (cd examples && ../tools/scripts/examples_compile.py nucleo_l552ze-q)
       - name: Examples STM32G4 Series
         if: always()
         run: |
@@ -127,18 +173,23 @@ jobs:
       - name: Examples STM32H7 Series
         if: always()
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py nucleo_h743zi nucleo_h723zg)
+          (cd examples && ../tools/scripts/examples_compile.py nucleo_h743zi nucleo_h723zg stm32h750vbt6_devebox)
 
   stm32f4-examples-1:
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Examples STM32F4 Only Discovery Board
         if: always()
         run: |
@@ -147,13 +198,21 @@ jobs:
   stm32f4-examples-2:
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
+      - name: Install protobuf==3.20.1 grpcio-tools (pip)
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager protobuf==3.20.1 grpcio-tools
       - name: Examples STM32F4 Without Discovery Board
         if: always()
         run: |
@@ -162,13 +221,18 @@ jobs:
   avr-examples:
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-avr
+      image: ghcr.io/modm-ext/modm-build-avr:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Check environment
         run: |
           which avr-g++
@@ -176,7 +240,7 @@ jobs:
       - name: Examples AVR Series
         if: always()
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py avr arduino_uno arduino_nano)
+          (cd examples && ../tools/scripts/examples_compile.py avr arduino_uno arduino_nano srxe)
       - name: Compile AVR Unittests AT90CAN
         if: always()
         run: |
@@ -189,7 +253,7 @@ jobs:
       - name: Compile AVR Unittests ATmega
         if: always()
         run: |
-          (cd test && make compile-mega-2560-pro)
+          (cd test && make compile-mega-2560-pro_A compile-mega-2560-pro_B)
       - name: Quick compile HAL for AVR Devices
         if: always()
         run: |
@@ -203,17 +267,22 @@ jobs:
   hal-compile-quick-1:
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Quick compile HAL for Cortex-M Part 1
         if: always()
         run: |
-          (cd test/all && python3 run_all.py stm32 samd --quick --split 4 --part 0)
+          (cd test/all && python3 run_all.py stm32 sam rp --quick --split 4 --part 0)
       - name: Upload log artifacts
         uses: actions/upload-artifact@v2
         with:
@@ -223,17 +292,22 @@ jobs:
   hal-compile-quick-2:
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Quick compile HAL for Cortex-M Part 2
         if: always()
         run: |
-          (cd test/all && python3 run_all.py stm32 samd --quick --split 4 --part 1)
+          (cd test/all && python3 run_all.py stm32 sam rp --quick --split 4 --part 1)
       - name: Upload log artifacts
         uses: actions/upload-artifact@v2
         with:
@@ -243,17 +317,22 @@ jobs:
   hal-compile-quick-3:
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Quick compile HAL for Cortex-M Part 3
         if: always()
         run: |
-          (cd test/all && python3 run_all.py stm32 samd --quick --split 4 --part 2)
+          (cd test/all && python3 run_all.py stm32 sam rp --quick --split 4 --part 2)
       - name: Upload log artifacts
         uses: actions/upload-artifact@v2
         with:
@@ -263,17 +342,22 @@ jobs:
   hal-compile-quick-4:
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Checkout code and update modm tools
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
       - name: Quick compile HAL for Cortex-M Part 4
         if: always()
         run: |
-          (cd test/all && python3 run_all.py stm32 samd --quick --split 4 --part 3)
+          (cd test/all && python3 run_all.py stm32 sam rp --quick --split 4 --part 3)
       - name: Upload log artifacts
         uses: actions/upload-artifact@v2
         with:
@@ -283,13 +367,23 @@ jobs:
   build-docs-test:
     runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-base:latest
+      image: ghcr.io/modm-ext/modm-build-base:2022-09-27
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Update submodules and install lbuild
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
         run: |
-          (git submodule sync && git submodule update --init --jobs 8) & pip3 install --upgrade --upgrade-strategy=eager modm & wait
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
+      - name: Install mkdocs mkdocs-material (pip)
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager mkdocs mkdocs-material
+          mkdocs --version
+          pip3 show mkdocs-material
       - name: Test run of docs.modm.io-generator-script
         if: always()
         run: |
@@ -306,6 +400,10 @@ jobs:
         run: |
           python3 tools/scripts/synchronize_docs.py
           python3 tools/scripts/generate_module_docs.py
+          cat docs/mkdocs.yml
+          ls -l docs/src/reference
+          ls -l docs/src/reference/config
+          ls -l docs/src/reference/module
           (cd docs && mkdocs build)
       - name: Upload Homepage Documentation
         uses: actions/upload-artifact@v2

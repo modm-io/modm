@@ -79,14 +79,14 @@ namespace modm
 			 * \brief	Send a message
 			 */
 			template <typename T>
-			static void modm_always_inline
+			static void
 			sendMessage(uint8_t address, Flags flags, uint8_t command,
 					const T& payload);
 
 			/**
 			 * \brief	Send a empty message
 			 */
-			static void modm_always_inline
+			static void
 			sendMessage(uint8_t address, Flags flags, uint8_t command);
 
 			/**

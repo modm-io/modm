@@ -3,6 +3,7 @@
 #
 # Copyright (c) 2016-2018, Niklas Hauser
 # Copyright (c) 2017, Fabian Greif
+# Copyright (c) 2022, Christopher Durand
 #
 # This file is part of the modm project.
 #
@@ -19,11 +20,42 @@ def prepare(module, options):
     if not options[":target"].has_driver("gclk:sam"):
         return False
 
-    module.depends(":cmsis:device", ":architecture:delay")
+    module.depends(":cmsis:device", ":architecture:delay", ":platform:clock")
     return True
 
 def build(env):
+    target = env[":target"].identifier
+    driver = env[":target"].get_driver("gclk")
+
+    if target.family not in ["d1x/d2x/dax", "d5x/e5x"]:
+        raise RuntimeError("Unsupported device")
+
+    if target.family == "d5x/e5x":
+        boot_frequency = "48'000'000"
+    else:  # d1x/d2x/dax
+        boot_frequency = "1'000'000"
+
+    clock_map = env.query(":cmsis:device:clock-map")
+    if target.series == "d21":
+        # Variant "l" devices have one comparator with instance number "1" and one without.
+        # To be compatible with the gpio data, instance number "0" is used for the first.
+        if target.variant == "l":
+            ac0 = clock_map[('AC', '')]
+            del clock_map[('AC', '')]
+            clock_map[('AC', '0')] = ac0
+        elif ('AC', '1') in clock_map:
+            del clock_map[('AC', '1')]
+
+    env.substitutions = {
+        "target": target,
+        "boot_frequency": boot_frequency,
+        "clock_map": clock_map,
+        "peripheral_clocks": driver["clock"],
+        "clock_sources": driver["source"],
+        "generator_count": int(driver["generators"][0]),
+        "has_dpll": True  # True for all supported devices for now
+    }
     env.outbasepath = "modm/src/modm/platform/clock"
-    env.copy("gclk.hpp")
+    env.template("gclk.hpp.in")
     env.template("gclk.cpp.in")
     env.template("gclk_impl.hpp.in")

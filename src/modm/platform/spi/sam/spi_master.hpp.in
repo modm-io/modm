@@ -1,0 +1,170 @@
+/**
+ * Copyright (c) 2021, Jeff McBride
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+#pragma once
+
+#include <modm/architecture/interface/spi_master.hpp>
+#include <modm/platform/gpio/connector.hpp>
+#include <modm/math/algorithm/prescaler.hpp>
+#include <modm/platform/clock/clockgen.hpp>
+
+namespace modm::platform {
+
+/**
+ * Serial peripheral interface on FLEXCOM{{ id }}.
+ *
+ * @author	Jeff McBride
+ * @ingroup	modm_platform_spi modm_platform_spi_{{id}}
+ */
+class SpiMaster{{ id }} : public modm::SpiMaster {
+	// Bit0: single transfer state
+	// Bit1: block transfer state
+	static inline uint8_t state{0};
+	static inline uint8_t count{0};
+	static inline void *context{nullptr};
+	static inline ConfigurationHandler configuration{nullptr};
+
+	// Work around a name collision between 'struct modm::Spi' and 'struct Spi'
+	// defined in the CMSIS headers
+	static inline ::Spi*
+	Regs() { return (::Spi*) SPI{{ id }}; };
+
+	static inline bool
+	isTransmitDataRegisterEmpty() {
+		return Regs()->SPI_SR & SPI_SR_TDRE;
+	}
+
+	static inline bool
+	isTxEmpty() {
+		return Regs()->SPI_SR & SPI_SR_TXEMPTY;
+	}
+
+	static inline bool
+	isReceiveDataRegisterFull() {
+		return Regs()->SPI_SR & SPI_SR_RDRF;
+	}
+
+	static inline void
+	write(uint8_t data) {
+		Regs()->SPI_TDR = data;
+	}
+
+	static inline uint8_t
+	read() {
+		return (uint8_t)Regs()->SPI_RDR;
+	}
+
+public:
+	template< class... Pins >
+	static void
+	connect()
+	{
+		using SckPin = GetPin_t<PeripheralPin::Sck, Pins...>;
+		using MisoPin = GetPin_t<PeripheralPin::Miso, Pins...>;
+		using MosiPin = GetPin_t<PeripheralPin::Mosi, Pins...>;
+		using Flexcom = Peripherals::Flexcom<{{ id | int }}>;
+
+		if constexpr (!std::is_void<SckPin>::value) {
+			using SckConnector = typename SckPin::template Connector<Flexcom, Flexcom::Sck>;
+			SckConnector::connect();
+		}
+		if constexpr (!std::is_void<MisoPin>::value) {
+			using MisoConnector = typename MisoPin::template Connector<Flexcom, Flexcom::Miso>;
+			MisoConnector::connect();
+		}
+		if constexpr (!std::is_void<MosiPin>::value) {
+			using MosiConnector = typename MosiPin::template Connector<Flexcom, Flexcom::Mosi>;
+			MosiPin::setInput(modm::platform::InputType::Floating);
+			MosiConnector::connect();
+		}
+	}
+
+	// start documentation inherited
+	template< class SystemClock, baudrate_t baudrate, percent_t tolerance=5_pct >
+	static void
+	initialize() {
+		ClockGen::enable<ClockPeripheral::Flexcom{{id}}>();
+
+		FLEXCOM{{ id }}->FLEXCOM_MR = FLEXCOM_MR_OPMODE_SPI;
+		// Note: SPI peripheral supports operating from a programmable clock
+		// output, but here we only use the main peripheral clock
+		constexpr auto result = modm::Prescaler::from_range(SystemClock::Frequency, baudrate, 2, 256);
+		assertBaudrateInTolerance< result.frequency, baudrate, tolerance >();
+
+		Regs()->SPI_CSR[0] = SPI_CSR_SCBR(result.prescaler);
+		Regs()->SPI_MR = SPI_MR_MSTR | SPI_MR_MODFDIS;
+		Regs()->SPI_CR |= SPI_CR_SPIEN;
+	}
+
+	static void
+	setDataMode(DataMode mode) {
+		uint32_t value = (uint32_t)mode ^ 1; // Flip CPHA bit
+		Regs()->SPI_CSR[0] = (Regs()->SPI_CSR[0] & ~(SPI_CSR_CPOL | SPI_CSR_NCPHA)) |
+			(((value & 2) >> 1) << SPI_CSR_CPOL_Pos) |
+			((value & 1) << SPI_CSR_NCPHA_Pos);
+	}
+
+	static void
+	setDataOrder(DataOrder order) {
+		modm_assert(order == DataOrder::MsbFirst, "SPI DataOrder", "SPI hardware does not support alternate transmit order");
+	}
+
+	static uint8_t
+	acquire(void *ctx, ConfigurationHandler handler = nullptr);
+
+	static uint8_t
+	release(void *ctx);
+
+	static uint8_t
+	transferBlocking(uint8_t data) {
+		return RF_CALL_BLOCKING(transfer(data));
+	}
+
+	static void
+	transferBlocking(const uint8_t *tx, uint8_t *rx, std::size_t length) {
+		// If we do not need to receive data, use a more efficient
+		// transmit-only routine to increase throughput
+		if(rx) {
+			RF_CALL_BLOCKING(transfer(tx, rx, length));
+		} else {
+			transferBlocking(tx, length);
+		}
+	}
+
+	static modm::ResumableResult<uint8_t>
+	transfer(uint8_t data);
+
+	static modm::ResumableResult<void>
+	transfer(const uint8_t *tx, uint8_t *rx, std::size_t length);
+	// end documentation inherited
+
+	/** Enable local loopback mode, to internally connect MOSI to MISO */
+	static void
+	setLocalLoopback(bool enable) {
+		if(enable) {
+			Regs()->SPI_MR |= SPI_MR_LLB;
+		} else {
+			Regs()->SPI_MR &= ~SPI_MR_LLB;
+		}
+	}
+
+protected:
+	/** Perform transmit-only transaction
+	 *
+	 * A faster version of blocking transfer when transmitting only.
+	 *
+	 * If no receive is needed, the next byte can be loaded while the
+	 * current transfer is in progress.
+	 */
+	static void
+	transferBlocking(const uint8_t *tx, std::size_t length);
+};
+
+} // namespace modm::platform

@@ -22,16 +22,16 @@
 
 using namespace modm::platform;
 
-/// @ingroup modm_board_nucleo_l452re
+
 namespace Board
 {
-	using namespace modm::literals;
+/// @ingroup modm_board_nucleo_l452re
+/// @{
+using namespace modm::literals;
 
-/// STM32L4 running at 80MHz generated from the
-/// internal high speed oscillator
-
-// Dummy clock for devices
-struct SystemClock {
+/// STM32L4 running at 80MHz generated from the internal high speed oscillator
+struct SystemClock
+{
 	static constexpr uint32_t Frequency = 80_MHz;
 	static constexpr uint32_t Ahb  = Frequency;
 	static constexpr uint32_t Ahb2 = Frequency;
@@ -107,16 +107,21 @@ using Button = GpioInverted<GpioInputC13>;
 // User LD2
 using LedGreen = GpioOutputA5;
 using Leds = SoftwareGpioPort< LedGreen >;
+/// @}
 
 namespace stlink
 {
+/// @ingroup modm_board_nucleo_l452re
+/// @{
 using Tx = GpioOutputA2;
 using Rx = GpioInputA3;
 using Uart = Usart2;
+/// @}
 }
 
+/// @ingroup modm_board_nucleo_l452re
+/// @{
 using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
-
 
 inline void
 initialize()
@@ -131,6 +136,7 @@ initialize()
 
 	Button::setInput();
 }
+/// @}
 
 } // Board namespace
 

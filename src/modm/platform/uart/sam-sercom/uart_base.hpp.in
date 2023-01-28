@@ -1,0 +1,77 @@
+/*
+ * Copyright (c) 2020, Erik Henriksson
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <stdint.h>
+#include "../device.hpp"
+#include <modm/architecture/interface/register.hpp>
+#include <modm/architecture/interface/interrupt.hpp>
+#include <modm/math/units.hpp>
+
+/// @cond
+namespace modm::platform::detail
+{
+	template<typename T>
+	struct get_pad_index;
+
+	template<template<int> typename T, int index>
+	struct get_pad_index<T<index>>
+	{
+		static constexpr int value{index};
+	};
+
+	template<typename T>
+	static constexpr auto get_pad_index_v = get_pad_index<T>::value;
+}
+/// @endcond
+
+namespace modm::platform
+{
+/**
+ * Base class for the UART classes
+ *
+ * Provides some common enum that do not depend on the specific UART.
+ *
+ * @ingroup		modm_platform_uart
+ */
+class UartBase
+{
+public:
+	enum class Parity : uint32_t
+	{
+		Even		= 0,
+		Odd			= 1,
+		Disabled	= 2,
+	};
+
+	enum class RxPinout : uint8_t
+	{
+		RxPad0 = 0,
+		RxPad1 = 1,
+		RxPad2 = 2,
+		RxPad3 = 3
+	};
+
+	enum class TxPinout : uint8_t
+	{
+		TxPad0_XckPad1 = 0,
+%% if target.family != "d5x/e5x"
+		TxPad2_XckPad3 = 1,
+%% endif
+		TxPad0_RtsTePad2_CtsPad3 = 2,
+%% if target.family in ["d5x/e5x", "l1x", "l2x"]
+		TxPad0_XckPad1_RtsTePad2 = 3
+%% endif
+	};
+};
+
+}	// namespace modm::platform

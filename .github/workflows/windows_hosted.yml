@@ -4,7 +4,7 @@ on: [pull_request]
 
 jobs:
   windows_hosted:
-    runs-on: windows-2019
+    runs-on: windows-2022
     env:
       PYTHONIOENCODING: "utf-8"
 
@@ -26,7 +26,7 @@ jobs:
       - name: Download GCC for Windows
         run: |
           $ProgressPreference = 'SilentlyContinue'
-          Invoke-WebRequest -OutFile winlibs-gcc.zip https://github.com/brechtsanders/winlibs_mingw/releases/download/10.2.0-11.0.0-8.0.0-r5/winlibs-x86_64-posix-seh-gcc-10.2.0-mingw-w64-8.0.0-r5.zip
+          Invoke-WebRequest -OutFile winlibs-gcc.zip https://github.com/brechtsanders/winlibs_mingw/releases/download/10.3.0-12.0.0-9.0.0-r2/winlibs-x86_64-posix-seh-gcc-10.3.0-mingw-w64-9.0.0-r2.zip
 
       - name: Unpack GCC for Windows
         shell: powershell
@@ -46,19 +46,21 @@ jobs:
           python -c "import os; print(os.cpu_count())"
 
       - name: Check out repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
 
-      - name: Git Submodules
-        shell: bash
+      - name: Update lbuild
         run: |
-          git submodule update --init
+          pip3 install --upgrade --upgrade-strategy=eager modm
 
       - name: Hosted Examples
         shell: bash
         run: |
-          (cd examples && python ../tools/scripts/examples_compile.py linux/assert linux/block_device linux/build_info linux/git linux/logger linux/printf)
+          (cd examples && python ../tools/scripts/examples_compile.py linux/assert linux/block_device linux/build_info linux/git linux/logger linux/printf linux/etl linux/fiber)
 
       - name: Hosted Unittests
+        if: always()
         shell: bash
         run: |
           (cd test && make run-hosted-windows)

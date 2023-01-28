@@ -13,9 +13,6 @@
 [submodule "ext/gcc/libstdc++"]
 	path = ext/gcc/libstdc++
 	url = https://github.com/modm-io/avr-libstdcpp.git
-[submodule "ext/mpaland/printf"]
-	path = ext/mpaland/printf
-	url = https://github.com/modm-ext/printf.git
 [submodule "ext/aws/freertos"]
 	path = ext/aws/freertos
 	url = https://github.com/modm-ext/freertos-partial.git
@@ -34,3 +31,18 @@
 [submodule "ext/lvgl/lvgl"]
 	path = ext/lvgl/lvgl
 	url = https://github.com/modm-ext/lvgl-partial.git
+[submodule "ext/etlcpp/etl"]
+	path = ext/etlcpp/etl
+	url = https://github.com/modm-ext/etl-partial.git
+[submodule "ext/rp/pico-sdk"]
+	path = ext/rp/pico-sdk
+	url = https://github.com/modm-ext/pico-sdk-partial.git
+[submodule "ext/eyalroz/printf"]
+	path = ext/eyalroz/printf
+	url = https://github.com/modm-ext/printf-partial.git
+[submodule "ext/nanopb/nanopb"]
+	path = ext/nanopb/nanopb
+	url = https://github.com/modm-ext/nanopb-partial.git
+[submodule "ext/arm/cmsis-dsp"]
+	path = ext/arm/cmsis-dsp
+	url = https://github.com/modm-ext/cmsis-dsp-partial.git

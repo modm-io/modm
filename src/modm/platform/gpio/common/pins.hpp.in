@@ -1,0 +1,38 @@
+/*
+ * Copyright (c) 2021, Niklas Hauser
+ * Copyright (c) 2022, Andrey Kunitsyn
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include "data.hpp"
+#include "static.hpp"
+
+namespace modm::platform
+{
+
+/// @ingroup modm_platform_gpio
+/// @{
+%% for gpio in gpios
+%% if target.platform in ["rp"]
+%% set name = gpio.gpio.name | capitalize
+%% else
+%% set name = gpio.gpio.port | upper ~ gpio.gpio.pin
+%% endif
+using Gpio{{ name }} = GpioStatic<detail::Data{{ name }}>;
+using GpioOutput{{ name }} = Gpio{{ name }};
+using GpioInput{{ name }}  = Gpio{{ name }};
+%#
+%% endfor
+/// @}
+
+} // namespace modm::platform
+
+

@@ -20,14 +20,14 @@ format. The `modm/repo.lb` file must be declared to find all modm modules:
 Parser(lbuild)
 ╰── Repository(modm @ .)   modm: a barebone embedded library generator
     ├── Option(target) = REQUIRED in [stm32f469ngh6, stm32f469nih6, stm32f469vet6, ...
-    ├── Config(modm:disco-f469ni)   STM32F469IDISCOVERY
+    ├── Config(modm:disco-f469ni:b-03) in [b-01, b-03]   STM32F469IDISCOVERY
    ...
 ```
 
 This gives you an overview of the repositories and their options and
-configurations. Here you can see the `modm:target` option is marked as
-*REQUIRED*, since the HAL modules obviously depend on the target device, so we
-need to discover the option in detail:
+configurations. Here you can see [the `modm:target` option](../../reference/targets)
+is marked as *REQUIRED*, since the HAL modules obviously depend on the target
+device, so we need to discover the option in detail:
 
 ```
  $ lbuild -r repo.lb discover modm:target
@@ -54,7 +54,7 @@ modules for this specific target. We will choose the `stm32f469nih6` device:
 Parser(lbuild)
 ╰── Repository(modm @ .)   modm: a barebone embedded library generator
     ├── Option(target) = stm32f469nih6 in [stm32f407vgt6, stm32f469nih6, ...
-    ├── Config(modm:disco-f469ni)   STM32F469IDISCOVERY
+    ├── Config(modm:disco-f469ni:b-03) in [b-01, b-03]   STM32F469IDISCOVERY
    ...
     ├── Module(modm:board)   Board Support Packages
     │   ╰── Module(modm:board:disco-f469ni)   STM32F469IDISCOVERY
@@ -67,13 +67,13 @@ Parser(lbuild)
     ├── Module(modm:platform)   Platform HAL
     │   ├── Module(modm:platform:cortex-m)   ARM Cortex-M Core
     │   │   ├── Option(float-abi) = hard in [hard, soft, softfp]   Floating point ABI
-    │   │   ├── Option(main_stack_size) = 3*1024 (3072) in [256 .. 3*1024 .. 65536]
+    │   │   ├── Option(main_stack_size) = 3Ki (3072) in [256 .. 3Ki .. 64Ki]
     │   │   ├── Option(vector_table_location) = rom in [ram, rom]   Vector table location
    ... ...
     │   ├── Module(modm:platform:uart)   Universal Asynchronous Receiver Transmitter (UART)
     │   │   ├── Module(modm:platform:uart:1)   Instance 1
-    │   │   │   ├── Option(buffer.rx) = 0 in [0 ... 65534]
-    │   │   │   ╰── Option(buffer.tx) = 0 in [0 ... 65534]
+    │   │   │   ├── Option(buffer.rx) = 0 in [0 ... 64Ki-2]
+    │   │   │   ╰── Option(buffer.tx) = 0 in [0 ... 64Ki-2]
 ```
 
 Since there are no more REQUIRED options, you can now discover all module and

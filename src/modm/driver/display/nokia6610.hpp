@@ -53,19 +53,19 @@ namespace modm
 		setContrast(uint8_t contrast);
 
 	private:
-		modm_always_inline void
+		void
 		lcdSettings(void);
 
-		modm_always_inline void
+		void
 		writeSpiCommand(uint16_t data);
 
-		modm_always_inline void
+		void
 		writeSpiData(uint16_t data);
 
-		modm_always_inline void
+		void
 		writeSpi9Bit(uint16_t data);
 
-		modm_always_inline void
+		void
 		writeSpi9BitFlush();
 
 		void

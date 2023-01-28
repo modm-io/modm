@@ -1,0 +1,120 @@
+/*
+ * Copyright (c) 2022, Nikolay Semenov
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <modm/platform/core/resets.hpp>
+
+#include <hardware/structs/adc.h>
+
+namespace modm::platform
+{
+
+void
+Adc::initialize()
+{
+	reset();
+	unreset();
+
+	adc_hw->cs = ADC_CS_EN_BITS;
+
+	while (!isReady()) { __NOP(); }
+}
+
+void
+Adc::disable()
+{
+	// TODO: wait for the current conversion to finish
+	adc_hw->cs = ADC_CS_EN_RESET;
+}
+
+bool
+Adc::setChannel(Channel channel)
+{
+	if (static_cast<uint32_t>(channel) > {{channels | max}}) return false;
+
+	hw_write_masked(&adc_hw->cs, static_cast<uint32_t>(channel) << ADC_CS_AINSEL_LSB, ADC_CS_AINSEL_BITS);
+	return true;
+}
+
+Adc::Channel
+Adc::getChannel()
+{
+	return static_cast<Adc::Channel>((adc_hw->cs & ADC_CS_AINSEL_BITS) >> ADC_CS_AINSEL_LSB);
+}
+
+bool
+Adc::isReady()
+{
+	return !!(adc_hw->cs & ADC_CS_READY_BITS);
+}
+
+bool
+Adc::hasError()
+{
+	return !!(adc_hw->cs & ADC_CS_ERR_BITS);
+}
+
+uint16_t
+Adc::getValue()
+{
+	// START_ONCE is ignored if START_MANY is set
+	// and isReady() will always return false.
+	hw_clear_bits(&adc_hw->cs, ADC_CS_START_MANY_BITS);
+	hw_set_bits(&adc_hw->cs, ADC_CS_START_ONCE_BITS);
+	while (!isReady()) { __NOP(); }
+	return static_cast<uint16_t>(adc_hw->result);
+}
+
+uint16_t
+Adc::readChannel(Channel channel)
+{
+	if (!setChannel(channel)) return 0;
+	return getValue();
+}
+
+void
+Adc::enableTemperatureSensor()
+{
+	hw_set_bits(&adc_hw->cs, ADC_CS_TS_EN_BITS);
+}
+
+void
+Adc::disableTemperatureSensor()
+{
+	hw_clear_bits(&adc_hw->cs, ADC_CS_TS_EN_BITS);
+}
+
+float
+Adc::convertToVoltage(uint16_t value)
+{
+	return value * (3.3f / (1 << 12));
+}
+
+float
+Adc::convertToTemperature(uint16_t value)
+{
+	return 27.f - (convertToVoltage(value) - 0.706f) * 581;
+}
+
+void
+Adc::reset()
+{
+	Resets::reset(RESETS_RESET_ADC_BITS);
+}
+
+void
+Adc::unreset()
+{
+	Resets::unresetWait(RESETS_RESET_ADC_BITS);
+}
+
+} // namespace modm::platform

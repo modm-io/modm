@@ -20,68 +20,47 @@
 #include <stdarg.h>
 #include <modm/architecture/interface/accessor.hpp>
 #include <cmath>
-
 #include "iostream.hpp"
+
+%% if using_printf
+#include <printf/printf.h>
+#include <printf/printf_config.h>
 
 extern "C"
 {
-	// configure printf implementation
-%% if not options["with_long_long"]
-	#define PRINTF_DISABLE_SUPPORT_LONG_LONG
-%% endif
-%% if not options["with_float"]
-	#define PRINTF_DISABLE_SUPPORT_FLOAT
-%% endif
-%% if not options["with_ptrdiff"]
-	#define PRINTF_DISABLE_SUPPORT_PTRDIFF_T
-%% endif
-	#define PRINTF_DEFAULT_FLOAT_PRECISION 5U
+#if PRINTF_SUPPORT_LONG_LONG
+typedef unsigned long long printf_unsigned_value_t;
+#else
+typedef unsigned long printf_unsigned_value_t;
+#endif
 
-	// include source from modm/ext/printf
-	#pragma GCC diagnostic push
-	#pragma GCC diagnostic ignored "-Wdouble-promotion"
-	#include "printf/printf.source"
-	#pragma GCC diagnostic pop
-	void _putchar(char) {};
+#define FLAGS_SHORT		(1U <<  7U)
+#define FLAGS_LONG		(1U <<  9U)
+#define FLAGS_LONG_LONG	(1U << 10U)
 
-%% if core.startswith("avr") and options["with_float"]
-	// the double arithmetric in these functions does not work on AVRs
-	static size_t _etoa(out_fct_type, [[maybe_unused]] char* buffer, size_t idx, size_t,
-						[[maybe_unused]] double value, unsigned int, unsigned int, unsigned int)
-	{
-		*reinterpret_cast<modm::IOStream*>(buffer) << value;
-		return idx;
-	}
-	static size_t _ftoa(out_fct_type, [[maybe_unused]] char* buffer, size_t idx, size_t,
-						[[maybe_unused]] double value, unsigned int, unsigned int, unsigned int)
-	{
-		*reinterpret_cast<modm::IOStream*>(buffer) << value;
-		return idx;
-	}
+extern
+void print_integer(printf_output_gadget_t* output, printf_unsigned_value_t value,
+				   bool negative, uint8_t base, unsigned int precision,
+				   unsigned int width, unsigned int flags);
+%% if options.with_float
+extern
+void print_floating_point(printf_output_gadget_t* output, double value,
+                          unsigned int precision, unsigned int width,
+                          unsigned int flags, bool prefer_exponential);
 %% endif
-}
-
-%% if not core.startswith("avr") or options["with_printf"]
-namespace
-{
-void out_char(char character, void* buffer, size_t, size_t)
-{
-	if (character)
-		reinterpret_cast<modm::IOStream*>(buffer)->write(character);
-}
 }
 %% endif
 
 namespace modm
 {
 
-%% if options["with_printf"]
+%% if options.with_printf
 IOStream&
 IOStream::printf(const char *fmt, ...)
 {
 	va_list va;
 	va_start(va, fmt);
-	vprintf(fmt, va);
+	this->vprintf(fmt, va);
 	va_end(va);
 	return *this;
 }
@@ -89,7 +68,7 @@ IOStream::printf(const char *fmt, ...)
 IOStream&
 IOStream::vprintf(const char *fmt, va_list ap)
 {
-	_vsnprintf(out_char, (char*)this, -1, fmt, ap);
+	vfctprintf(&out_char, this, fmt, ap);
 	return *this;
 }
 %% endif
@@ -97,104 +76,79 @@ IOStream::vprintf(const char *fmt, va_list ap)
 void
 IOStream::writeInteger(int16_t value)
 {
-%% if core.startswith("avr") and not options["with_printf"]
+%% if using_printf
+	print_integer(&output_gadget, uint16_t(value < 0 ? -value : value),
+	              value < 0, 10, 0, 0, FLAGS_SHORT);
+%% else
 	// hard coded for -32'768
 	char str[7 + 1]; // +1 for '\0'
 	itoa(value, str, 10);
 	device->write(str);
-%% else
-	_ntoa_long(out_char, (char*)this,
-			   0, -1,
-			   uint16_t(value < 0 ? -value : value),
-			   value < 0,
-			   10, 0, 0,
-			   FLAGS_SHORT);
 %% endif
 }
 
 void
 IOStream::writeInteger(uint16_t value)
 {
-%% if core.startswith("avr") and not options["with_printf"]
+%% if using_printf
+	print_integer(&output_gadget, value, false, 10, 0, 0, FLAGS_SHORT);
+%% else
 	// hard coded for 32'768
 	char str[6 + 1]; // +1 for '\0'
 	utoa(value, str, 10);
 	device->write(str);
-%% else
-	_ntoa_long(out_char, (char*)this,
-			   0, -1,
-			   value,
-			   false,
-			   10, 0, 0,
-			   FLAGS_SHORT);
 %% endif
 }
 
 void
 IOStream::writeInteger(int32_t value)
 {
-%% if core.startswith("avr") and not options["with_printf"]
+%% if using_printf
+	print_integer(&output_gadget, uint32_t(value < 0 ? -value : value),
+	              value < 0, 10, 0, 0, FLAGS_LONG);
+%% else
 	// hard coded for -2147483648
 	char str[11 + 1]; // +1 for '\0'
 	ltoa(value, str, 10);
 	device->write(str);
-%% else
-	_ntoa_long(out_char, (char*)this,
-			   0, -1,
-			   uint32_t(value < 0 ? -value : value),
-			   value < 0,
-			   10, 0, 0,
-			   FLAGS_LONG);
 %% endif
 }
 
 void
 IOStream::writeInteger(uint32_t value)
 {
-%% if core.startswith("avr") and not options["with_printf"]
+%% if using_printf
+	print_integer(&output_gadget, value, false, 10, 0, 0, FLAGS_LONG);
+%% else
 	// hard coded for 4294967295
 	char str[10 + 1]; // +1 for '\0'
 	ultoa(value, str, 10);
 	device->write(str);
-%% else
-	_ntoa_long(out_char, (char*)this,
-			   0, -1,
-			   value,
-			   false,
-			   10, 0, 0,
-			   FLAGS_LONG);
 %% endif
 }
 
-%% if options["with_long_long"]
+%% if options.with_long_long
 void
 IOStream::writeInteger(int64_t value)
 {
-	_ntoa_long_long(out_char, (char*)this,
-					0, -1,
-					uint64_t(value < 0 ? -value : value),
-					value < 0,
-					10, 0, 0,
-					FLAGS_LONG_LONG);
+	print_integer(&output_gadget, uint64_t(value < 0 ? -value : value),
+	              value < 0, 10, 0, 0, FLAGS_LONG_LONG);
 }
 
 void
 IOStream::writeInteger(uint64_t value)
 {
-	_ntoa_long_long(out_char, (char*)this,
-					0, -1,
-					value,
-					false,
-					10, 0, 0,
-					FLAGS_LONG_LONG);
+	print_integer(&output_gadget, value, false, 10, 0, 0, FLAGS_LONG_LONG);
 }
 %% endif
 
-%% if options["with_float"]
+%% if options.with_float
 void
 IOStream::writeDouble(const double& value)
 {
-%% if core.startswith("avr")
+%% if using_printf
+	print_floating_point(&output_gadget, value, 0, 0, 0, true);
+%% else
 	if(!std::isfinite(value)) {
 		if(std::isinf(value)) {
 			if (value < 0) device->write('-');
@@ -210,11 +164,6 @@ IOStream::writeDouble(const double& value)
 		dtostre(value, str, 5, 0);
 		device->write(str);
 	}
-%% else
-	_etoa(out_char, (char*)this,
-		  0, -1,
-		  value,
-		  0, 0, 0);
 %% endif
 }
 %% endif

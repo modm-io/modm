@@ -145,7 +145,7 @@ class TestRun:
 
             lbuild_command += ["-D:target={}".format(self.device),
                                "-D:build:build.path={}/build".format(tempdir),
-                               "-p", str(tempdir),
+                               "-p", str(tempdir), "-C", str(tempdir),
                                "build",
                                "--no-log"]
 

@@ -18,8 +18,10 @@ namespace modm::platform
 
 %% if target.family == "g4"
 template <typename SystemClock>
-%% endif
 void
+%% else
+inline void
+%% endif
 Dac{{ id }}Dma::initialize()
 {
 	Rcc::enable<Peripheral::Dac{{ id }}>();
@@ -108,13 +110,21 @@ void
 {{ channel }}::configure(const void* data, size_t dataLength, DmaBase::CircularMode circularMode,
 						 DmaBase::Priority priority)
 {
+%% if target.family in ["f2", "f4", "f7"]
+	using RequestMapping = typename DmaChannel::RequestMapping<Peripheral::Dac{{ id }}, DmaBase::Signal::Dac{{ channel_id }}>;
+%% else
 	using RequestMapping = typename DmaChannel::RequestMapping<Peripheral::Dac{{ id }}, DmaBase::Signal::Ch{{ channel_id }}>;
+%% endif
 	constexpr auto request = RequestMapping::Request;
 
 	DmaChannel::configure(
 		DmaBase::DataTransferDirection::MemoryToPeripheral,
 		DmaBase::MemoryDataSize::HalfWord,
+%% if target.family in ["f0", "f2", "f3", "f4", "f7", "h7"]
+		DmaBase::PeripheralDataSize::HalfWord,
+%% else
 		DmaBase::PeripheralDataSize::Word,
+%% endif
 		DmaBase::MemoryIncrementMode::Increment,
 		DmaBase::PeripheralIncrementMode::Fixed,
 		priority,

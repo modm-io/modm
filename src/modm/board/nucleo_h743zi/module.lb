@@ -17,6 +17,24 @@ def init(module):
 # NUCLEO-H743ZI
 
 [Nucleo kit for STM32H743ZI](https://www.st.com/en/evaluation-tools/nucleo-h743zi.html)
+
+Please note that this BSP uses the Y revision of the STM32H743, which limits the
+main clock frequency to ≤400MHz and applies an errata bug fix to the SysTick,
+whose reference clock cannot be divided by 8.
+
+See the [STM32H743 errata sheet](https://www.st.com/resource/en/errata_sheet/es0392-stm32h742xig-and-stm32h743xig-device-limitations-stmicroelectronics.pdf).
+
+In case you are using the new revision V of STM32H743, you can overwrite the
+target option in your `project.xml`:
+
+```xml
+<library>
+  <extends>modm:nucleo-h743zi</extends>
+  <options>
+    <option name="modm:target">stm32h743zit6/revV</option>
+  </options>
+</library>
+```
 """
 
 def prepare(module, options):

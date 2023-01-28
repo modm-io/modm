@@ -19,10 +19,9 @@
 namespace modm_test::platform
 {
 
-// ----------------------------------------------------------------------------
-// simple IODevice which stores all data in a memory buffer
-// used for testing the output of an IOStream
-
+/// simple IODevice which stores all data in a memory buffer
+/// used for testing the output of an IOStream
+/// @ingroup modm_test_mock_io_device
 class IODevice : public modm::IODevice
 {
 public:

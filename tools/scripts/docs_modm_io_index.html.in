@@ -116,18 +116,16 @@ input[type=text] {
 <form autocomplete="off" action="javascript:showDocumentation()">
 <table>
     <tr>
-        <!-- <td>Version/Release</td> -->
+        <td>Version/Release</td>
         <td>Device or Board</td>
         <td>&nbsp;</td>
     </tr>
     <tr>
-        <!--
         <td>
             <select id="releaseinput" name="releases">
                 <option>develop</option>
             </select>
         </td>
-        -->
         <td>
             <div class="autocomplete" style="width:300px;">
                 <input id="targetinput" type="text" name="target" placeholder="Search for e.g. 'F469' or 'NUCLEO'">
@@ -157,6 +155,48 @@ var name2board = {
 "{{ n }}": "{{ b }}",
 {% endfor %}
 };
+
+var possible_releases = ["develop"];
+var current_year = new Date().getFullYear();
+for (var year = 2021; year <= current_year; year++) {
+   possible_releases.push(year + "q1");
+   possible_releases.push(year + "q2");
+   possible_releases.push(year + "q3");
+   possible_releases.push(year + "q4");
+}
+var releases = [];
+possible_releases.forEach(function(r, index, array) {
+    var request = new XMLHttpRequest();
+    request.open("HEAD", "/" + r + "/" + "targets.json", false);
+    request.send();
+    if (request.status == 200) {
+        releases.push(r);
+    }
+});
+var releaseinput = document.getElementById("releaseinput");
+while (releaseinput.options.length) {
+    releaseinput.remove(0);
+}
+for (var i = 0; i < releases.length; i++) {
+    var release = new Option(releases[i]);
+    releaseinput.options.add(release);
+}
+releaseinput.addEventListener("change", function(event) {
+    var url ="/" + releaseinput.value + "/targets.json";
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.responseType = 'json';
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            devices = xhr.response.devices;
+            name2board = xhr.response.name2board;
+        } else {
+            console.log("Error loading target list for release" + releaseinput.value);
+        }
+    };
+    xhr.send();
+});
+
 var targetinput = document.getElementById("targetinput");
 var currentFocus;
 function showDocumentation() {
@@ -169,7 +209,6 @@ function showDocumentation() {
         }, 5000);
         return;
     }
-    /*
     if(!releaseinput.value) {
         releaseinput.style.transition = "border 5ms ease-out";
         releaseinput.style.borderColor = "red";
@@ -179,10 +218,8 @@ function showDocumentation() {
         }, 5000);
         return;
     }
-    var url = "/" + releaseinput.value + "/api/" + targetinput.value + "/";
-    */
     n2b = name2board[targetinput.value]
-    var url = "/develop/api/" + (n2b ? n2b : targetinput.value).toLowerCase() + "/";
+    var url ="/" + releaseinput.value + "/api/" + (n2b ? n2b : targetinput.value).toLowerCase() + "/";
     location.href = url;
 }
 targetinput.addEventListener("input", function(event) {

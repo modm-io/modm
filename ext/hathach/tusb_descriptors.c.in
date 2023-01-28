@@ -162,7 +162,7 @@ string_desc_arr[] =
 %% endfor
 };
 
-static uint16_t _desc_str[32];
+static uint16_t _desc_str[33];
 
 // Invoked when received GET STRING DESCRIPTOR request
 // Application return pointer to descriptor, whose contents must exist long

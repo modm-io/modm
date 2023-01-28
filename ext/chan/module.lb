@@ -64,6 +64,7 @@ def build(env):
     env.copy("fatfs/full/source/ff.h", "ff.h")
     env.copy("fatfs/full/source/ff.c", "ff.c")
     env.copy("fatfs/full/source/ffunicode.c", "ffunicode.c")
+    env.copy("fatfs/full/source/ffsystem.c", "ffsystem.c")
     env.copy("fatfs/full/LICENSE.txt", "LICENSE.txt")
 
     env.copy("ffconf.h")

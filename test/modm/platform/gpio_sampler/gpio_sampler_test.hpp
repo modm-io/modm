@@ -11,6 +11,7 @@
 
 #include <unittest/testsuite.hpp>
 
+/// @ingroup modm_test_test_platform_gpio_sampler
 class GpioSamplerTest : public unittest::TestSuite
 {
 public:

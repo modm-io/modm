@@ -13,6 +13,7 @@
 
 def init(module):
     module.name = ":test:math"
+    module.description = "Tests for Math"
 
 
 def prepare(module, options):
@@ -20,7 +21,7 @@ def prepare(module, options):
         "modm:math:filter",
         "modm:math:geometry",
         "modm:math:interpolation",
-        "modm:math:saturated",
+        "modm:math:saturation",
         "modm:math:matrix",
         "modm:math:algorithm",
         "modm:math:utils")

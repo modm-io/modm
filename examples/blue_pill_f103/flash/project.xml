@@ -1,0 +1,16 @@
+<library>
+  <extends>modm:blue-pill-f103</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/blue_pill_f103/flash</option>
+    <option name="modm:build:openocd.cfg">openocd.cfg</option>
+  </options>
+  <modules>
+    <module>modm:platform:gpio</module>
+    <module>modm:platform:flash</module>
+    <module>modm:debug</module>
+    <module>modm:platform:uart:2</module>
+    <module>modm:processing:timer</module>
+    <module>modm:build:scons</module>
+    <module>modm:build:compilation_db</module>
+  </modules>
+</library>

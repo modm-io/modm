@@ -14,14 +14,15 @@
 
 #include <modm/platform.hpp>
 #include <modm/debug/logger.hpp>
-/// @ingroup modm_board_arduino_uno
+/// @ingroup modm_board_arduino_uno modm_board_arduino_nano
 #define MODM_BOARD_HAS_LOGGER
 
 using namespace modm::platform;
 
-/// @ingroup modm_board_arduino_uno
 namespace Board
 {
+/// @ingroup modm_board_arduino_uno modm_board_arduino_nano
+/// @{
 using namespace modm::literals;
 using SystemClock = modm::platform::SystemClock;
 
@@ -66,6 +67,7 @@ initialize()
 
 	enableInterrupts();
 }
+/// @}
 
 }
 

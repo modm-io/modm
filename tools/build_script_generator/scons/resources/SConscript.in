@@ -24,14 +24,14 @@ env["COMPILERPREFIX"] = "arm-none-eabi-"
 %% endif
 %% if family == "darwin"
 # Using homebrew gcc on macOS instead of clang
-env["COMPILERSUFFIX"] = env.Detect(["gcc-11", "gcc-10"])[3:]
+env["COMPILERSUFFIX"] = env.Detect(["gcc-12", "gcc-11", "gcc-10"])[3:]
 %% endif
 %% endif
 
 # SCons tools
 env.Append(toolpath=[
 %% for toolpath in toolpaths | sort
-    abspath(r"{{ toolpath | modm.windowsify(escape_level=0) }}"),
+    abspath("{{ toolpath | modm.windowsify(escape_level=1) }}"),
 %% endfor
 ])
 %% for tool in tools | sort
@@ -50,7 +50,7 @@ env["GCC_PATH"] = dirname(dirname(realpath(c_compiler_path)))
 %% macro generate_flags_for_profile(name, profile, append=False)
 env{% if append %}.Append({{name | upper}}{% else %}["{{name | upper}}"]{% endif %} = [
 %% for flag in flags[name][profile] | sort
-    {{ flag | flags_format }},
+    {{ flag | flags_format | modm.windowsify(escape_level=1) }},
 %% endfor
 ]{% if append %}){% endif -%}
 %% endmacro
@@ -154,13 +154,13 @@ env.AppendUnique(CPPFLAGS=[
 
 env.AppendUnique(CPPPATH=[
 %% for path in include_paths | sort
-    abspath(r"{{ path | relocate | modm.windowsify(escape_level=0) }}"),
+    abspath("{{ path | relocate | modm.windowsify(escape_level=1) }}"),
 %% endfor
 ])
 
 files = [
 %% for file, flags in sources if not flags | length
-    env.File(r"{{ file | relocate | modm.windowsify(escape_level=0) }}"),
+    env.File("{{ file | relocate | modm.windowsify(escape_level=1) }}"),
 %% endfor
 ]
 %% for file, flags in sources
@@ -171,7 +171,7 @@ flags = { {%- for key, profiles in flags.items() if "" in profiles %}"{{ key | u
 if profile == "{{profile}}": flags["{{ key | upper }}"].extend({{flags}});
         %% endfor
     %% endfor
-files.append(env.Object(r"{{ file | relocate | modm.windowsify(escape_level=0) }}", **flags))
+files.append(env.Object("{{ file | relocate | modm.windowsify(escape_level=1) }}", **flags))
     %% endif
 %% endfor
 
@@ -189,7 +189,7 @@ env.AppendUnique(LIBPATH=[
 %% endif
     abspath(str(library[0].get_dir())),
 %% for library in library_paths | sort
-    abspath(r"{{ library | relocate | modm.windowsify(escape_level=0) }}"),
+    abspath("{{ library | relocate | modm.windowsify(escape_level=1) }}"),
 %% endfor
 ])
 %% if packages | length

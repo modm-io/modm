@@ -1,0 +1,244 @@
+/*
+ * Copyright (c) 2022, Andrey Kunitsyn
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+#include "i2c_master_{{ id }}.hpp"
+
+namespace modm::platform
+{
+
+	template<class SystemClock, baudrate_t baudrate, percent_t tolerance>
+	void
+	I2cMaster{{ id }}::initialize()
+	{
+		hwReset();
+		hwUnReset();
+		hw().enable = 0;
+		// Configure as a fast-mode master with RepStart support, 7-bit addresses
+		hw().con =
+			I2C_IC_CON_SPEED_VALUE_FAST << I2C_IC_CON_SPEED_LSB |
+			I2C_IC_CON_MASTER_MODE_BITS |
+			I2C_IC_CON_IC_SLAVE_DISABLE_BITS |
+			I2C_IC_CON_IC_RESTART_EN_BITS |
+			I2C_IC_CON_TX_EMPTY_CTRL_BITS;
+
+		// Set FIFO watermarks to 1 to make things simpler. This is encoded by a register value of 0.
+		hw().tx_tl = 0;
+		hw().rx_tl = 0;
+
+		// Always enable the DREQ signalling -- harmless if DMA isn't listening
+		hw().dma_cr = I2C_IC_DMA_CR_TDMAE_BITS | I2C_IC_DMA_CR_RDMAE_BITS;
+
+		setBaudrate<SystemClock, baudrate, tolerance>();
+	}
+
+	template< class SystemClock, baudrate_t baudrate, percent_t tolerance>
+	uint32_t
+	I2cMaster{{ id }}::setBaudrate()
+	{
+		// I2C is synchronous design that runs from clk_sys
+		constexpr uint32_t freq_in = SystemClock::SysFrequency;
+		constexpr uint32_t period = (freq_in + baudrate / 2) / baudrate;
+		constexpr uint32_t result = freq_in / period;
+		assertBaudrateInTolerance< result, baudrate, tolerance >();
+
+		constexpr uint32_t lcnt = period * 3 / 5;
+		constexpr uint32_t hcnt = period - lcnt;
+		// Check for out-of-range divisors:
+		static_assert((hcnt >= 8) and (hcnt <= I2C_IC_FS_SCL_HCNT_IC_FS_SCL_HCNT_BITS) and
+			(lcnt >= 8) and (lcnt <= I2C_IC_FS_SCL_LCNT_IC_FS_SCL_LCNT_BITS),
+			"Baudrate out of range");
+		constexpr uint32_t sda_tx_hold_count = (baudrate < 100'000) ?
+			// sda_tx_hold_count = freq_in [cycles/s] * 300ns * (1s / 1e9ns)
+			(((freq_in * 3) / 10000000) + 1) :
+			// sda_tx_hold_count = freq_in [cycles/s] * 120ns * (1s / 1e9ns)
+			(((freq_in * 3) / 25000000) + 1);
+		static_assert(sda_tx_hold_count <= lcnt - 2, "Invalid hold");
+		hw().enable = 0;
+		// Always use "fast" mode (<= 400 kHz, works fine for standard mode too)
+		hw_write_masked(&hw().con,
+			I2C_IC_CON_SPEED_VALUE_FAST << I2C_IC_CON_SPEED_LSB,
+			I2C_IC_CON_SPEED_BITS
+		);
+		hw().fs_scl_hcnt = hcnt;
+		hw().fs_scl_lcnt = lcnt;
+		hw().fs_spklen = lcnt < 16 ? 1 : lcnt / 16;
+
+		hw_write_masked(&hw().sda_hold,
+			sda_tx_hold_count << I2C_IC_SDA_HOLD_IC_SDA_TX_HOLD_LSB,
+			I2C_IC_SDA_HOLD_IC_SDA_TX_HOLD_BITS);
+		hw().enable = 1;
+		return result;
+	}
+	template <typename Wait>
+	I2cMaster::Error I2cMaster{{ id }}::transfer(uint8_t address,const uint8_t* write,size_t writeLen,
+		uint8_t* read, size_t readLen) {
+		hw().enable = 0;
+		hw().tar = address;
+		hw().enable = 1;
+		errorState = Error::NoError;
+		if (writeLen)
+		{
+			doWrite<Wait>(write,writeLen,readLen!=0);
+			if (errorState != Error::NoError) return errorState;
+		}
+		if (readLen)
+		{
+			doRead<Wait>(read,readLen,false);
+		}
+		return errorState;
+	}
+
+	template <typename Wait>
+	void I2cMaster{{ id }}::doWrite(const uint8_t* buffer,size_t length,bool nostop)
+	{
+		bool first = true;
+		bool abort = false;
+		bool timeout = false;
+		uint32_t abort_reason = 0;
+
+		while (length > 0)
+		{
+			bool last = length == 1;
+			typename Wait::State waitStart = Wait::start();
+
+			hw().data_cmd =
+				((first && restartOnNext) ? I2C_IC_DATA_CMD_RESTART_BITS : 0) |
+				((last && !nostop) ? I2C_IC_DATA_CMD_STOP_BITS : 0) |
+				*buffer++;
+
+			// Wait until the transmission of the address/data from the internal
+			// shift register has completed. For this to function correctly, the
+			// TX_EMPTY_CTRL flag in IC_CON must be set. The TX_EMPTY_CTRL flag
+			// was set in initialize.
+
+			do {
+				timeout = Wait::check(waitStart);
+				abort |= timeout;
+			} while (!timeout && !(hw().raw_intr_stat & I2C_IC_RAW_INTR_STAT_TX_EMPTY_BITS));
+
+			// If there was a timeout, don't attempt to do anything else.
+			if (!timeout) {
+				abort_reason = hw().tx_abrt_source;
+				if (abort_reason) {
+					// Note clearing the abort flag also clears the reason, and
+					// this instance of flag is clear-on-read! Note also the
+					// IC_CLR_TX_ABRT register always reads as 0.
+					uint32_t dummy = hw().clr_tx_abrt;
+					(void)dummy;
+					abort = true;
+				}
+				if (abort || (last && !nostop)) {
+					// If the transaction was aborted or if it completed
+					// successfully wait until the STOP condition has occured.
+
+					// TODO Could there be an abort while waiting for the STOP
+					// condition here? If so, additional code would be needed here
+					// to take care of the abort.
+					do {
+						timeout = Wait::check(waitStart);
+						abort |= timeout;
+					} while (!timeout && !(hw().raw_intr_stat & I2C_IC_RAW_INTR_STAT_STOP_DET_BITS));
+
+					// If there was a timeout, don't attempt to do anything else.
+					if (!timeout) {
+						uint32_t dummy = hw().clr_stop_det;
+						(void)dummy;
+					}
+				}
+			}
+
+			// Note the hardware issues a STOP automatically on an abort condition.
+			// Note also the hardware clears RX FIFO as well as TX on abort,
+			// because we set hwparam IC_AVOID_RX_FIFO_FLUSH_ON_TX_ABRT to 0.
+			if (abort)
+				break;
+
+			length--;
+			first = false;
+		}
+
+		// A lot of things could have just happened due to the ingenious and
+		// creative design of I2C. Try to figure things out.
+		if (abort) {
+			if (timeout)
+				errorState = modm::I2cMaster::Error::Unknown;
+			else if (!abort_reason || abort_reason & I2C_IC_TX_ABRT_SOURCE_ABRT_7B_ADDR_NOACK_BITS) {
+				// No reported errors - seems to happen if there is nothing connected to the bus.
+				// Address byte not acknowledged
+				errorState = modm::I2cMaster::Error::AddressNack;
+			} else if (abort_reason & I2C_IC_TX_ABRT_SOURCE_ABRT_TXDATA_NOACK_BITS) {
+				// Address acknowledged, some data not acknowledged
+				errorState = modm::I2cMaster::Error::DataNack;
+			} else {
+				errorState = modm::I2cMaster::Error::Unknown;
+			}
+		}
+
+		// nostop means we are now at the end of a *message* but not the end of a *transfer*
+		restartOnNext = nostop;
+	}
+
+	template <typename Wait>
+	void I2cMaster{{ id }}::doRead(uint8_t* buffer,size_t length,bool nostop)
+	{
+		bool abort = false;
+		bool timeout = false;
+		uint32_t abort_reason = 0;
+		bool first = true;
+
+		while (length > 0)
+		{
+			bool last = length == 1;
+			typename Wait::State waitStart = Wait::start();
+			while (!isWriteAvailable()) {
+				if (Wait::check(waitStart)) {
+					timeout = abort = true;
+					break;
+				}
+			}
+			if (abort)
+				break;
+
+			hw().data_cmd =
+					((first && restartOnNext) ? I2C_IC_DATA_CMD_RESTART_BITS : 0) |
+					((last && !nostop) ? I2C_IC_DATA_CMD_STOP_BITS : 0) |
+					I2C_IC_DATA_CMD_CMD_BITS; // -> 1 for read
+
+			do {
+				abort_reason = hw().tx_abrt_source;
+				abort = hw().clr_tx_abrt;
+				timeout = Wait::check(waitStart);
+				abort |= timeout;
+			} while (!abort && !isReadAvailable());
+
+			if (abort)
+				break;
+
+			*buffer++ = (uint8_t) hw().data_cmd;
+			length--;
+			first = false;
+		}
+		if (abort) {
+			if (timeout)
+				errorState = modm::I2cMaster::Error::Unknown;
+			else if (!abort_reason || abort_reason & I2C_IC_TX_ABRT_SOURCE_ABRT_7B_ADDR_NOACK_BITS) {
+				// No reported errors - seems to happen if there is nothing connected to the bus.
+				// Address byte not acknowledged
+				errorState = modm::I2cMaster::Error::AddressNack;
+			} else {
+				errorState = modm::I2cMaster::Error::Unknown;
+			}
+		}
+
+		restartOnNext = nostop;
+	}
+}

@@ -19,10 +19,11 @@
 
 using namespace modm::platform;
 
-/// @ingroup modm_board_disco_f051r8
 namespace Board
 {
-	using namespace modm::literals;
+/// @ingroup modm_board_disco_f051r8
+/// @{
+using namespace modm::literals;
 
 /// STM32F0 running at 48MHz generated from the internal 8MHz with PLL.
 struct SystemClock
@@ -56,14 +57,12 @@ struct SystemClock
 	}
 };
 
-
 using Button   = GpioInputA0;
 
 using LedGreen = GpioOutputC9;
 using LedBlue  = GpioOutputC8;
 
 using Leds = SoftwareGpioPort< LedGreen, LedBlue >;
-
 
 inline void
 initialize()
@@ -75,10 +74,8 @@ initialize()
 	LedBlue::setOutput(modm::Gpio::Low);
 
 	Button::setInput();
-	Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-	Button::enableExternalInterrupt();
-//	Button::enableExternalInterruptVector(12);
 }
+/// @}
 
 } // namespace Board
 

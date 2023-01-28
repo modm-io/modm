@@ -112,12 +112,11 @@ struct I2c
 	 *
 	 * @tparam	Scl		The clock pin of the bus to be reset.
  	 */
-	template< class Scl, uint32_t baudrate = 100'000 >
+	template< class Scl >
 	static void
-	resetDevices()
+	resetDevices(uint32_t baudrate = 100'000)
 	{
-		static_assert(baudrate <= 500'000ul, "I2c::resetDevices() can only do max. 500kHz!");
-		constexpr auto delay = 500'000ul / baudrate;
+		const auto delay = 500'000ul / baudrate;
 
 		for (uint_fast8_t ii = 0; ii < 9; ++ii) {
 			Scl::reset();
@@ -136,6 +135,9 @@ struct I2c
 
 namespace modm
 {
+
+/// @ingroup modm_architecture_i2c
+/// @{
 
 inline modm::IOStream&
 operator << (modm::IOStream& s, const modm::I2c::DetachCause detach_cause)
@@ -182,6 +184,8 @@ operator << (modm::IOStream& s, const modm::I2c::OperationAfterWrite op)
 	s << static_cast<modm::I2c::Operation>(op);
 	return s;
 }
+
+/// @}
 
 }	// namespace modm
 #endif

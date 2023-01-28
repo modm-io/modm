@@ -22,9 +22,7 @@ namespace modm
 {
 	namespace rtos
 	{
-		/**
-		 * \brief	Queue base class
-		 */
+		/// @cond
 		class QueueBase
 		{
 		public:
@@ -86,6 +84,7 @@ namespace modm
 			QueueBase&
 			operator = (const QueueBase& other);
 		};
+		/// @endcond
 
 		/**
 		 * \brief	Queue

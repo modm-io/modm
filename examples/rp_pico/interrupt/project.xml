@@ -1,0 +1,10 @@
+<library>
+  <extends>modm:rp-pico</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/rp_pico/interrupt</option>
+  </options>
+  <modules>
+    <module>modm:platform:extint</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

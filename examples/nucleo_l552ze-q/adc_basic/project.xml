@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:nucleo-l552ze-q</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_l552ze-q/adc_basic</option>
+  </options>
+  <modules>
+    <module>modm:debug</module>
+    <module>modm:platform:adc:1</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

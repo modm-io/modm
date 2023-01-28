@@ -32,8 +32,8 @@ struct Spi
 	{
 		Mode0 = 0b00,	///< clock normal,   sample on rising  edge
 		Mode1 = 0b01,	///< clock normal,   sample on falling edge
-		Mode2 = 0b10,	///< clock inverted, sample on rising  edge
-		Mode3 = 0b11,	///< clock inverted, sample on falling edge
+		Mode2 = 0b10,	///< clock inverted, sample on falling edge
+		Mode3 = 0b11,	///< clock inverted, sample on rising  edge
 	};
 
 	/// Spi Data Order, MsbFirst is the most common mode

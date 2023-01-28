@@ -22,9 +22,10 @@
 
 namespace modm
 {
+/// @ingroup	modm_processing_timer
+/// @{
 
 /// Possible states of a timeout
-/// @ingroup	modm_processing_timer
 enum class
 TimerState : uint8_t
 {
@@ -49,7 +50,6 @@ class GenericPeriodicTimer;
  *
  * @author	Fabian Greif
  * @author	Niklas Hauser
- * @ingroup	modm_processing_timer
  */
 template< class Clock, class Duration >
 class GenericTimeout
@@ -108,17 +108,6 @@ public:
 	bool
 	execute();
 
-	/// @cond
-	[[deprecated("Use `std::chrono::{milli,micro}seconds` for interval instead!")]]
-	GenericTimeout(rep interval) :
-		GenericTimeout(duration(interval)) {}
-	[[deprecated("Use `std::chrono::{milli,micro}seconds` for interval instead!")]]
-	void restart(rep interval)
-	{ restart(duration(interval)); }
-	[[deprecated("Use `Timeout.state()` instead!")]]
-	TimerState getState() const { return state(); }
-	/// @endcond
-
 protected:
 	bool
 	checkExpiration() const;
@@ -154,26 +143,16 @@ protected:
  * Always call restart() before reusing the timer to avoid this behaviour.
  *
  * If you need a longer time period, use Timeout.
- *
- * @ingroup		modm_processing_timer
  */
 using        ShortTimeout = GenericTimeout< Clock, ShortDuration >;
-
 /// Software timeout for up to 49 days with millisecond resolution.
-/// @ingroup	modm_processing_timer
 using             Timeout = GenericTimeout< Clock, Duration >;
-
 /// Software timeout for up to 65 milliseconds with microsecond resolution.
-/// @ingroup	modm_processing_timer
 using ShortPreciseTimeout = GenericTimeout< PreciseClock, ShortPreciseDuration >;
-
 /// Software timeout for up to 71 minutes with microsecond resolution.
-/// @ingroup	modm_processing_timer
 using      PreciseTimeout = GenericTimeout< PreciseClock, PreciseDuration >;
 
-/// @cond
-using TimeoutState [[deprecated("Use `modm::TimerState` instead!")]] = TimerState;
-/// @endcond
+/// @}
 
 }	// namespace modm
 

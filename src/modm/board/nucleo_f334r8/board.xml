@@ -8,7 +8,7 @@
   <options>
     <option name="modm:target">stm32f334r8t6</option>
 
-    <option name="modm:platform:uart:2:buffer.tx">2048</option>
+    <option name="modm:platform:uart:2:buffer.tx">2Ki</option>
   </options>
   <modules>
     <module>modm:board:nucleo-f334r8</module>

@@ -65,4 +65,7 @@
 #endif
 %% endif
 
+// Temporary fix for this issue: https://github.com/FreeRTOS/FreeRTOS-Plus-TCP/pull/403
+#define ipconfigTCP_SRTT_MINIMUM_VALUE_MS 50
+
 #endif // FREERTOS_IP_CONFIG_H

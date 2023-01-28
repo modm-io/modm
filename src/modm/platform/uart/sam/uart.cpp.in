@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2020, Erik Henriksson
+ * Copyright (c) 2021, Jeff McBride
+ * Copyright (c) 2022, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -9,55 +10,92 @@
  */
 // ----------------------------------------------------------------------------
 
-%% set name = "Uart" ~ id
-%% set hal = "UartHal" ~ id
+#include "{{ type }}_{{ id }}.hpp"
 
-#include "../device.hpp"
-#include "uart_hal_{{ id }}.hpp"
-#include "uart_{{ id }}.hpp"
+#include <modm/architecture/driver/atomic/queue.hpp>
+
+%% set name="{}{}".format(type.capitalize(), id)
+%% set reg=name.upper()
+%% if type == "usart" and target.family == "e7x/s7x/v7x" and target.variant == "b"
+%% set reg_suffix="_USART"
+%% else
+%% set reg_suffix=""
+%% endif
+
+namespace
+{
+	static modm::atomic::Queue<uint8_t, {{ options["buffer.rx"] }}> rxBuffer;
+	static modm::atomic::Queue<uint8_t, {{ options["buffer.tx"] }}> txBuffer;
+}
+
+MODM_ISR({{ peripheral | upper }}{{ id }})
+{
+	using namespace modm::platform;
+	if({{ name }}::isReceiveReady()) {
+		uint8_t data = (uint8_t){{ name }}::Regs()->{{ prefix }}_RHR;
+		{{ name }}::read(data);
+		rxBuffer.push(data);
+	}
+
+	if({{ name }}::isTransmitReady()) {
+		if(txBuffer.isEmpty()) {
+			{{ name }}::Regs()->{{ prefix }}_IDR = {{ prefix }}_IDR_TXRDY_Msk;
+		} else {
+			{{ name }}::Regs()->{{ prefix }}_THR = txBuffer.get();
+			txBuffer.pop();
+		}
+	}
+}
 
 namespace modm::platform
 {
 
-void
-{{ name }}::writeBlocking(uint8_t data)
-{
-	while(!{{ hal }}::isTransmitRegisterEmpty());
-	{{ hal }}::write(data);
-}
-
-void
-{{ name }}::writeBlocking(const uint8_t *data, std::size_t length)
-{
-	while (length-- != 0) {
-		writeBlocking(*data++);
+bool
+{{ name }}::read(uint8_t &dataOut) {
+	if(rxBuffer.isEmpty()) {
+		return false;
+	} else {
+		dataOut = rxBuffer.get();
+		rxBuffer.pop();
+		return true;
 	}
 }
 
-void
-{{ name }}::flushWriteBuffer()
-{
-	return;
+std::size_t
+{{ name }}::read(uint8_t *data, std::size_t length) {
+	uint32_t i = 0;
+	for(; i < length; i++) {
+		if(rxBuffer.isEmpty()) {
+			return i;
+		} else {
+			data[i] = rxBuffer.get();
+			rxBuffer.pop();
+		}
+	}
+	return i;
 }
 
 bool
 {{ name }}::write(uint8_t data)
 {
-	if({{ hal }}::isTransmitRegisterEmpty()) {
-		{{ hal }}::write(data);
-		return true;
+	if(txBuffer.isEmpty() && isTransmitReady()) {
+		Regs()->{{ prefix }}_THR = data;
 	} else {
-		return false;
+		if(!txBuffer.push(data)) {
+			return false;
+		}
+		// Enable tx interrupt
+		Regs()->{{ prefix }}_IER = {{ prefix }}_IER_TXRDY_Msk;
 	}
+	return true;
 }
 
 std::size_t
 {{ name }}::write(const uint8_t *data, std::size_t length)
 {
 	uint32_t i = 0;
-	for (; i < length; ++i)
-	{
-		if (!write(*data++)) {
+	for(; i < length; i++) {
+		if(!write(data[i])) {
 			return i;
 		}
 	}
@@ -67,41 +105,34 @@ std::size_t
 bool
 {{ name }}::isWriteFinished()
 {
-	return {{ hal }}::isTransmitRegisterEmpty();
+	return txBuffer.isEmpty() && isTransmitReady();
 }
 
-std::size_t
-{{ name }}::discardTransmitBuffer()
+void
+{{ name }}::flushWriteBuffer()
 {
-	return 0;
+	while(!isWriteFinished());
 }
 
-bool
-{{ name }}::read(uint8_t &data)
+void
+{{ name }}::setParity(Parity parity)
 {
-	if({{ hal }}::isReceiveRegisterNotEmpty()) {
-		{{ hal }}::read(data);
-		return true;
+	Regs()->{{ prefix }}_MR = (Regs()->{{ prefix }}_MR & ~{{ prefix }}_MR{{reg_suffix}}_PAR_Msk) | (uint32_t)parity;
+}
+
+%% if type == "usart"
+void
+{{ name }}::setWordLength(WordLength length)
+{
+	if(length == WordLength::Bit9) {
+		Regs()->{{ prefix }}_MR |= {{ prefix }}_MR{{reg_suffix}}_MODE9_Msk;
 	} else {
-		return false;
+		Regs()->{{ prefix }}_MR &= ~{{ prefix }}_MR{{reg_suffix}}_MODE9_Msk;
+		Regs()->{{ prefix }}_MR =
+			(Regs()->{{ prefix }}_MR & ~{{ prefix }}_MR_CHRL_Msk)
+				| {{ prefix }}_MR_CHRL((uint32_t)length);
 	}
 }
+%% endif
 
-std::size_t
-{{ name }}::read(uint8_t *data, std::size_t length)
-{
-	(void)length; // avoid compiler warning
-	if(read(*data)) {
-		return 1;
-	} else {
-		return 0;
-	}
-}
-
-std::size_t
-{{ name }}::discardReceiveBuffer()
-{
-	return 0;
-}
-
-}	// namespace modm::platform
+} // namespace modm::platform

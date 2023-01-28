@@ -48,8 +48,8 @@ your application. */
 #define configCPU_CLOCK_HZ                      ( SystemCoreClock )
 #define configTICK_RATE_HZ                      ( {{ frequency }} )
 /* Memory allocation related definitions. */
-#define configSUPPORT_STATIC_ALLOCATION         0
-#define configSUPPORT_DYNAMIC_ALLOCATION        1
+#define configSUPPORT_STATIC_ALLOCATION         1
+#define configSUPPORT_DYNAMIC_ALLOCATION        {{ 1 if with_heap else 0 }}
 // used by modm:platform:clock for modm::Clock::increment(): vApplicationTickHook()
 #define configUSE_TICK_HOOK                     1
 
@@ -90,8 +90,21 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #ifndef configUSE_IDLE_HOOK
 #	define configUSE_IDLE_HOOK						0
 #endif
+#ifndef configUSE_MALLOC_FAILED_HOOK
+#	define configUSE_MALLOC_FAILED_HOOK				0
+#endif
 #ifndef configUSE_16_BIT_TICKS
 #	define configUSE_16_BIT_TICKS					0
+#endif
+// required for Cortex M23/M33 ports
+#ifndef configENABLE_FPU
+#	define configENABLE_FPU							{{ 1 if with_fpu else 0 }}
+#endif
+#ifndef configENABLE_MPU
+#	define configENABLE_MPU							0
+#endif
+#ifndef configENABLE_TRUSTZONE
+#	define configENABLE_TRUSTZONE					0
 #endif
 
 /* Defaulted by FreeRTOS but changed by modm */

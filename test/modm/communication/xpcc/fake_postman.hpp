@@ -25,7 +25,7 @@
 /**
  * \see	DispatcherTest
  *
- * @ingroup modm_test_test_communication
+ * @ingroup modm_test_test_communication_xpcc
  */
 class FakePostman : public xpcc::Postman
 {

@@ -49,29 +49,20 @@ main()
 	// initialize Adc4
 	Adc4::initialize(Adc4::ClockMode::Asynchronous, Adc4::Prescaler::Div256,
 					Adc4::CalibrationMode::SingleEndedInputsMode, true);
+	Adc4::connect<AdcIn0::In3>();
+	Adc4::setPinChannel<AdcIn0>(Adc4::SampleTime::Cycles182);
 
 	Adc4::enableInterruptVector(5);
 	Adc4::enableInterrupt(Adc4::Interrupt::EndOfRegularConversion);
 
-	Adc4::connect<AdcIn0::In3>();
-	Adc4::setPinChannel<AdcIn0>(Adc4::SampleTime::Cycles182);
+	AdcInterrupt4::attachInterruptHandler(printAdc);
 
 	while (true)
 	{
 		Adc4::startConversion();
-		while(!Adc4::isConversionFinished);
-		printAdc();
 		modm::delay(500ms);
 	}
 
 	return 0;
 }
 
-
-MODM_ISR(ADC4)
-{
-	if (Adc4::getInterruptFlags() & Adc4::InterruptFlag::EndOfRegularConversion) {
-		Adc4::acknowledgeInterruptFlag(Adc4::InterruptFlag::EndOfRegularConversion);
-		printAdc();
-	}
-}

@@ -121,16 +121,16 @@ modm::platform::Can{{ id }}::initializeWithPrescaler(
 	NVIC_EnableIRQ(CEC_CAN_IRQn);
 %% else
 	// Set vector priority
-	NVIC_SetPriority({{ reg }}_RX0_IRQn, interruptPriority);
-	NVIC_SetPriority({{ reg }}_RX1_IRQn, interruptPriority);
+	NVIC_SetPriority({{ irqs.rx0 }}_IRQn, interruptPriority);
+	NVIC_SetPriority({{ irqs.rx1 }}_IRQn, interruptPriority);
 
 	// Register Interrupts at the NVIC
-	NVIC_EnableIRQ({{ reg }}_RX0_IRQn);
-	NVIC_EnableIRQ({{ reg }}_RX1_IRQn);
+	NVIC_EnableIRQ({{ irqs.rx0 }}_IRQn);
+	NVIC_EnableIRQ({{ irqs.rx1 }}_IRQn);
 
 	%% if options["buffer.tx"] > 0
-	NVIC_EnableIRQ({{ reg }}_TX_IRQn);
-	NVIC_SetPriority({{ reg }}_TX_IRQn, interruptPriority);
+	NVIC_EnableIRQ({{ irqs.tx }}_IRQn);
+	NVIC_SetPriority({{ irqs.tx }}_IRQn, interruptPriority);
 	%% endif
 %% endif
 
@@ -220,8 +220,11 @@ readMailbox(modm::can::Message& message, uint32_t mailboxId, uint8_t* filter_id)
  *
  * Generated when Transmit Mailbox 0..2 becomes empty.
  */
-
-MODM_ISR({{ reg }}_TX)
+%% if combined_isr
+void MODM_ISR_NAME({{ irqs.tx }})()
+%% else
+MODM_ISR({{ irqs.tx }})
+%% endif
 {
 %% if options["buffer.tx"] > 0
 	uint32_t mailbox;
@@ -254,7 +257,11 @@ MODM_ISR({{ reg }}_TX)
  * Generated on a new received message, FIFO0 full condition and Overrun
  * Condition.
  */
-MODM_ISR({{ reg }}_RX0)
+%% if combined_isr
+void MODM_ISR_NAME({{ irqs.rx0 }})()
+%% else
+MODM_ISR({{ irqs.rx0 }})
+%% endif
 {
 	if (not modm_assert_continue_ignore(not ({{ reg }}->RF0R & CAN_RF0R_FOVR0),
 			"can.rx.hw0", "CAN receive hardware buffer overflowed!", {{ 0 if id == '' else id }}))
@@ -280,7 +287,11 @@ MODM_ISR({{ reg }}_RX0)
  *
  * See FIFO0 Interrupt
  */
-MODM_ISR({{ reg }}_RX1)
+%% if combined_isr
+void MODM_ISR_NAME({{ irqs.rx1 }})()
+%% else
+MODM_ISR({{ irqs.rx1 }})
+%% endif
 {
 	if (not modm_assert_continue_ignore(not ({{ reg }}->RF1R & CAN_RF1R_FOVR1),
 			"can.rx.hw1", "CAN receive hardware buffer overflowed!", {{ 0 if id == '' else id }}))
@@ -301,7 +312,7 @@ MODM_ISR({{ reg }}_RX1)
 %% endif
 }
 
-%% if target["family"] == "f0"
+%% if combined_isr
 // On stm32f0, ST has decided to use only one interrupt vector for all
 // CAN interrupts. In order to avoide duplicate code, we try to determine
 // the interrupt source and call the correct interrupts function defined above.
@@ -310,15 +321,15 @@ MODM_ISR({{ reg }}_RX1)
 MODM_ISR(CEC_CAN)
 {
 	if({{ reg }}->TSR & (CAN_TSR_RQCP0 | CAN_TSR_RQCP1 | CAN_TSR_RQCP2)) {
-		MODM_ISR_CALL({{ reg }}_TX);
+		MODM_ISR_NAME({{ irqs.tx }})();
 	}
 
 	if({{ reg }}->RF0R & (CAN_RF0R_FMP0 | CAN_RF0R_FULL0 | CAN_RF0R_FOVR0)) {
-		MODM_ISR_CALL({{ reg }}_RX0);
+		MODM_ISR_NAME({{ irqs.rx0 }})();
 	}
 
 	if({{ reg }}->RF1R & (CAN_RF1R_FMP1 | CAN_RF1R_FULL1 | CAN_RF1R_FOVR1)) {
-		MODM_ISR_CALL({{ reg }}_RX1);
+		MODM_ISR_NAME({{ irqs.rx1 }})();
 	}
 
 	// TODO: we do not handle status changes at the moment.

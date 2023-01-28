@@ -18,5 +18,8 @@ run-sam:
 run-stm32:
 	python3 run_all.py stm32
 
+run-rp:
+	python3 run_all.py rp
+
 run-failed:
 	python3 run_all.py failed

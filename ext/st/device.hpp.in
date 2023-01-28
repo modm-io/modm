@@ -4,6 +4,7 @@
  * Copyright (c) 2009-2010, 2016, Fabian Greif
  * Copyright (c) 2012-2013, 2016, 2018 Niklas Hauser
  * Copyright (c) 2013, Kevin Laeufer
+ * Copyright (c) 2022, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -21,8 +22,14 @@
 %% endfor
 
 #include <stdint.h>
-// Defines for example the modm_always_inline macro
 #include <modm/architecture/utils.hpp>
+
+%% if target.family == "l5"
+// Suppress verbose compiler warning '"__ARMCC_VERSION" is not defined' from device header
+// '#pragma GCC diagnostic ignored "-Wundef"' does not work here because of gcc bug:
+// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53431
+#pragma GCC system_header
+%% endif
 
 // Include external device headers:
 %% for header in headers
@@ -59,7 +66,13 @@
 // the peripherals directly in GDB in any context.
 // Otherwise GDB would throw a "no symbol 'GPIO_TypeDef' in current context".
 %% for (name, type) in peripherals
+%% if type == "SAU_Type"
+#if defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)
+%% endif
 extern {{ type | lbuild.pad(19) }}	___{{ name | lbuild.pad(15) }};
+%% if type == "SAU_Type"
+#endif /* defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U) */
+%% endif
 %% endfor
 /// @endcond
 

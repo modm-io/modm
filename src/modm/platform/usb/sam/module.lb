@@ -16,7 +16,8 @@ def init(module):
 
 def prepare(module, options):
     device = options[":target"]
-    if not (device.has_driver("usb:sam*")):
+    if not (device.has_driver("usb:sam*") or
+            device.has_driver("udp:sam*")):
         return False
 
     module.depends(
@@ -27,9 +28,17 @@ def prepare(module, options):
 
     return True
 
+def validate(env):
+    if "samg" in str(env[":target"].identifier) and env.has_module(":tinyusb:host"):
+        raise ValidateException("USB HOST mode is not currently supported on SAMG family")
+
 def build(env):
+    device = env[":target"]
+    properties = device.properties
+    properties["target"] = device.identifier
+    env.substitutions = properties
     env.outbasepath = "modm/src/modm/platform/usb"
-    env.copy("usb.hpp")
+    env.template("usb.hpp.in")
     if env.has_module(":tinyusb:device:cdc"):
         env.copy(repopath("ext/hathach/uart.hpp"), "uart.hpp")
 

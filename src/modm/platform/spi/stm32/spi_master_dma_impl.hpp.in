@@ -27,8 +27,8 @@ modm::platform::SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::initialize()
 	Dma::RxChannel::setTransferErrorIrqHandler(handleDmaTransferError);
 	Dma::RxChannel::setTransferCompleteIrqHandler(handleDmaReceiveComplete);
 	Dma::RxChannel::enableInterruptVector();
-	Dma::RxChannel::enableInterrupt(DmaBase::Interrupt::Error |
-			DmaBase::Interrupt::TransferComplete);
+	Dma::RxChannel::enableInterrupt(DmaBase::InterruptEnable::TransferError |
+			DmaBase::InterruptEnable::TransferComplete);
 	Dma::RxChannel::template setPeripheralRequest<Dma::RxRequest>();
 
 	Dma::TxChannel::configure(DmaBase::DataTransferDirection::MemoryToPeripheral,
@@ -39,8 +39,8 @@ modm::platform::SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::initialize()
 	Dma::TxChannel::setTransferErrorIrqHandler(handleDmaTransferError);
 	Dma::TxChannel::setTransferCompleteIrqHandler(handleDmaTransmitComplete);
 	Dma::TxChannel::enableInterruptVector();
-	Dma::TxChannel::enableInterrupt(DmaBase::Interrupt::Error |
-			DmaBase::Interrupt::TransferComplete);
+	Dma::TxChannel::enableInterrupt(DmaBase::InterruptEnable::TransferError |
+			DmaBase::InterruptEnable::TransferComplete);
 	Dma::TxChannel::template setPeripheralRequest<Dma::TxRequest>();
 
 	SpiMaster{{ id }}::initialize<SystemClock, baudrate, tolerance>();

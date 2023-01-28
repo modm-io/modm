@@ -1,0 +1,29 @@
+{
+    "configurations": [
+%% for profile, config in profiles.items()
+         {
+            "name": "{{ platform }}GCC ({{ profile | capitalize }})",
+            "includePath": [
+    %% for path in include_paths | sort
+                "${workspaceFolder}/{{ path | modm.windowsify(escape_level=1) }}"{% if not loop.last%},{% endif %}
+    %% endfor
+            ],
+            "defines": [
+    %% for define in config.cppdefines | sort
+                "{{ define }}"{% if not loop.last%},{% endif %}
+    %% endfor
+            ],
+            "compilerPath": "{{ compiler_path }}",
+            "compilerArgs": [
+    %% for flag in config.archflags | sort
+                "{{ flag }}"{% if not loop.last%},{% endif %}
+    %% endfor
+            ],
+            "cStandard": "c17",
+            "cppStandard": "c++20",
+            "intelliSenseMode": "gcc-arm"
+        }{% if not loop.last%},{% endif %}
+%% endfor
+    ],
+    "version": 4
+}

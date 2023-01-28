@@ -32,27 +32,23 @@ def prepare(module, options):
             "stm32-channel-request",
             "stm32-channel",
             "stm32-mux",
+            "stm32-mux-stream",
+            "stm32-stream-channel",
     ]:
         return False
-
-    did = device.identifier
-
-    if did["family"] in ["f0", "f1", "f3", "l0", "l1", "l4", "g0", "g4"]:
-        return True
-
-    return False
+    return True
 
 
 def get_irq_list(device):
-    irqs = [v["name"] for v in device.get_driver("core")["vector"]]
-    irqs = [v for v in irqs if v.startswith("DMA") and v[3].isdigit() and not "DMA2D" in v]
+    irqs = {v["position"]: v["name"] for v in device.get_driver("core")["vector"]}
+    irqs = [v for v in irqs.values() if v.startswith("DMA") and v[3].isdigit() and not "DMA2D" in v]
 
-    instance_pattern = re.compile("(DMA\d_(Ch|Channel)\d(_\d)*)")
-    channel_pattern = re.compile("DMA(?P<instance>\d)_(Channel|Ch)(?P<channels>(\d(_\d)*))")
+    instance_pattern = re.compile("(DMA\d_(Ch|Channel|Stream)\d(_\d)*)")
+    channel_pattern = re.compile("DMA(?P<instance>\d)_(Ch|Channel|Stream)(?P<channels>(\d(_\d)*))")
     irq_list = []
     for irq in irqs:
         instances = []
-        # get channel definitions for each instance, e.g. [DMA1_Ch4_7, DMA2_Ch1_5]
+        # get channel definitions for each instance, e.g. [DMA1_Ch4_7, DMA2_Ch1_5] or [DMA1_Stream0, DMA2_Stream3]
         instance_data = [match[0] for match in instance_pattern.findall(irq)]
         if len(instance_data) == 0:
             raise ValueError("Failed to parse irq '{}'".format(irq))
@@ -76,6 +72,9 @@ def build(env):
     properties["target"] = device.identifier
     dma = device.get_driver("dma")
     properties["dma"] = dma
+
+    if dma["type"] in ["stm32-stream-channel"]:
+        dma["channels"] = dma["streams"]
 
     signal_names = {}
     controller = []
@@ -116,14 +115,13 @@ def build(env):
                             signal_names[signal_name] = 1
             controller.append({"instance": int(channels["instance"]),
                                "min_channel": 1, "max_channel": int(max_channels)})
-    else:  # type is stm32-mux
+    elif dma["type"] in ["stm32-mux", "stm32-mux-stream"]:
         for request_data in dma["requests"]:
             for request in request_data["request"]:
-                assert len(request["signal"]) == 1  # one signal per request for dmamux
-                signal = request["signal"][0]
-                if "name" in signal:
-                    signal_name = signal["name"].capitalize()
-                    signal_names[signal_name] = 1
+                for signal in request["signal"]:
+                    if "name" in signal:
+                        signal_name = signal["name"].capitalize()
+                        signal_names[signal_name] = 1
 
         assert len(dma["mux-channels"]) == 1  # only one DMAMUX instance is supported
         channels = dma["mux-channels"][0]["mux-channel"]
@@ -136,6 +134,20 @@ def build(env):
             min_channel = channel_list[0]
             max_channel = channel_list[-1]
             controller.append({"instance": int(instance), "min_channel": int(min_channel), "max_channel": int(max_channel)})
+    elif dma["type"] in ["stm32-stream-channel"]:
+        for channels in dma["streams"]:
+            max_channels = 0
+            for channel in channels["stream"]:
+                max_channels = channel["position"]
+                for request in channel["channel"]:
+                    for signal in request["signal"]:
+                        if "name" in signal:
+                            signal_name = signal["name"].capitalize()
+                            signal_names[signal_name] = 1
+            controller.append({"instance": int(channels["instance"]),
+                               "min_channel": 0, "max_channel": int(max_channels)})
+    else:
+        raise NotImplementedError
 
     did = device.identifier
     if (did.family in ['f0'] and did.name == '30' and did.size == 'c') or \
@@ -146,6 +158,29 @@ def build(env):
         for channels in dma["channels"]:
             if channels["instance"] == '2':
                 dma["channels"].remove(channels)
+
+    # With 'stm32-stream-channel' architecture some {peripherals, ~stream~ channel}
+    # can be used on multiple ~channels~ requests. This is not supported with the
+    # current API. The requests are de-duplicated:
+    if dma["type"] in ["stm32-stream-channel"]:
+        for channels in dma["streams"]:
+            channel_peripheral_list = list()
+            for channel in channels["stream"]:
+                for request in channel["channel"]:
+                    for signal in request["signal"]:
+                        peripheral = signal["driver"]
+                        if "instance" in signal and peripheral not in ["Dac"]:
+                            peripheral = peripheral + str(signal["instance"])
+                        name = signal["name"] if "name" in signal else ""
+                        channel_peripheral = "DMA{}, Channel{}, {}, {}".format(channels["instance"], channel["position"], peripheral, name)
+                        if channel_peripheral in channel_peripheral_list:
+                            for request in channel["channel"]:
+                                if signal in request["signal"]:
+                                    #print("Removing '{}' because there already exists another request...".format(channel_peripheral))
+                                    request["signal"].remove(signal)
+                                    break
+                        else:
+                            channel_peripheral_list.append(channel_peripheral)
 
     signal_names = sorted(list(set(signal_names)))
     properties["dmaType"] = dma["type"]

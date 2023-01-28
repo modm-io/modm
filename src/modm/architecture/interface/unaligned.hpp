@@ -67,7 +67,6 @@ protected:
  * @ingroup	modm_architecture_unaligned
  */
 template< typename T, typename U>
-modm_always_inline
 unaligned_t< typename std::remove_pointer<T>::type >*
 asUnaligned(U* value)
 {

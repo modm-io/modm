@@ -1,0 +1,125 @@
+/*
+ * Copyright (c) 2022, Andrey Kunitsyn
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#include "i2c_master_{{ id }}.hpp"
+#include <modm/platform/core/resets.hpp>
+
+
+namespace
+{
+	struct SimpleWait
+	{
+		using State = uint_fast32_t;
+		static State start() {
+			return 100'000;
+		}
+		static bool check(State& s) {
+			return --s == 0;
+		}
+	};
+}
+// ----------------------------------------------------------------------------
+
+void modm::platform::I2cMaster{{ id }}::hwReset()
+{
+	Resets::reset(RESETS_RESET_I2C{{ id }}_BITS);
+}
+
+void modm::platform::I2cMaster{{ id }}::hwUnReset()
+{
+	Resets::unresetWait(RESETS_RESET_I2C{{ id }}_BITS);
+}
+
+void
+modm::platform::I2cMaster{{ id }}::reset()
+{
+	errorState = Error::SoftwareReset;
+	restartOnNext = false;
+}
+
+bool
+modm::platform::I2cMaster{{ id }}::start(I2cTransaction *transaction, ConfigurationHandler handler)
+{
+	if (!transaction)
+	{
+		return true;
+	}
+	if (not transaction->attaching())
+	{
+		transaction->detaching(modm::I2c::DetachCause::FailedToAttach);
+		// return false; // done at the end of the function
+	}
+	else
+	{
+		// reset error state
+		errorState = Error::NoError;
+		// call the configuration function
+		if (handler and configuration != handler) {
+			configuration = handler;
+			configuration();
+		}
+
+		// ask the transaction object about address and next operation.
+		auto starting = transaction->starting();
+		uint8_t address = (starting.address & 0xfe) >> 1;
+
+		hw().enable = 0;
+		hw().tar = address;
+		hw().enable = 1;
+
+		auto nextOperation = static_cast<modm::I2c::Operation>(starting.next);
+
+		do
+		{
+			switch (nextOperation)
+			{
+				case modm::I2c::Operation::Write:
+				{
+					auto writing = transaction->writing();
+					// what next?
+					nextOperation = static_cast<modm::I2c::Operation>(writing.next);
+					doWrite<SimpleWait>(writing.buffer,writing.length,nextOperation!=I2c::Operation::Stop);
+				} break;
+
+				case I2c::Operation::Read:
+				{
+					auto reading = transaction->reading();
+					nextOperation = static_cast<modm::I2c::Operation>(reading.next);
+					doRead<SimpleWait>(reading.buffer,reading.length,nextOperation!=I2c::Operation::Stop);
+					break;
+				}
+
+				case I2c::Operation::Restart:
+					starting = transaction->starting();
+					nextOperation = static_cast<modm::I2c::Operation>(starting.next);
+					break;
+
+				default:
+				case I2c::Operation::Stop:
+					transaction->detaching(modm::I2c::DetachCause::NormalStop);
+					return true;
+			}
+			if (errorState != Error::NoError)
+			{
+				transaction->detaching(modm::I2c::DetachCause::ErrorCondition);
+				return true;
+			}
+		}
+		while (true);
+	}
+	return false;
+}
+
+modm::I2cMaster::Error
+modm::platform::I2cMaster{{ id }}::getErrorState()
+{
+	return errorState;
+}

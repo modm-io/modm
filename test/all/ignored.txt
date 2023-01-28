@@ -20,7 +20,6 @@ at90usb646
 at90usb647
 at90usb82
 atmega1284rfr2
-atmega128rfa1
 atmega128rfr2
 atmega162
 atmega165a

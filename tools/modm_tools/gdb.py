@@ -12,9 +12,15 @@
 
 import os
 import subprocess
+import signal
+
+def signal_handler(sig, frame):
+    pass
+
 if __name__ == "__main__":
     import sys
     sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+    signal.signal(signal.SIGINT, signal_handler)
 
 from modm_tools import utils, backend as bem
 from modm_tools import openocd, crashdebug, bmp

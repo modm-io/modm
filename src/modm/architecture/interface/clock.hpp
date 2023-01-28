@@ -88,7 +88,9 @@ struct micro_clock
 
 } // namespace chrono
 
+/// @ingroup modm_architecture_clock
 using Clock = chrono::milli_clock;
+/// @ingroup modm_architecture_clock
 using PreciseClock = chrono::micro_clock;
 using namespace ::std::chrono_literals;
 
@@ -100,6 +102,7 @@ using namespace ::std::chrono_literals;
 namespace modm
 {
 
+/// @ingroup modm_architecture_clock
 template<class C, class D>
 modm::IOStream&
 operator << (modm::IOStream& s, const std::chrono::time_point<C, D>& m)
@@ -108,6 +111,7 @@ operator << (modm::IOStream& s, const std::chrono::time_point<C, D>& m)
 	return s;
 }
 
+/// @ingroup modm_architecture_clock
 template<class T, class R>
 modm::IOStream&
 operator << (modm::IOStream& s, const std::chrono::duration<T, R>& m)

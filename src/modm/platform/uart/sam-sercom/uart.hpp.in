@@ -1,0 +1,136 @@
+/*
+ * Copyright (c) 2020, Erik Henriksson
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+%% set hal = "UartHal" ~ id
+%% set name = "Uart" ~ id
+
+#pragma once
+
+#include <modm/architecture/interface/uart.hpp>
+#include "uart_base.hpp"
+#include "uart_hal_{{ id }}.hpp"
+#include <modm/platform/gpio/pin.hpp>
+
+namespace modm::platform
+{
+
+/**
+ * Universal asynchronous receiver transmitter ({{ "Uart" | upper ~ id }})
+ *
+ * @author		Erik Henriksson
+ * @ingroup		modm_platform_uart modm_platform_uart_{{id}}
+ */
+class {{ name }} : public UartBase, public ::modm::Uart
+{
+
+	// Separate because that makes GCC print the template args.
+	template<class RxSignal, class TxSignal>
+	struct ValidateNotSame {
+		static_assert(
+			!std::is_same_v<RxSignal, TxSignal>,
+			"Rx and Tx cannot use the same signal!");
+	};
+
+	template<typename RxSignal, typename TxSignal>
+	static void
+	configurePadMapping()
+	{
+		constexpr auto rxIndex = detail::get_pad_index_v<RxSignal>;
+		constexpr auto txIndex = detail::get_pad_index_v<TxSignal>;
+
+		PeripheralClock<Peripherals::{{sercom_name}}<{{id}}>>::enable();
+
+		if constexpr (rxIndex == 0) {
+			{{ hal }}::setRxPinout(RxPinout::RxPad0);
+		} else if constexpr (rxIndex == 1) {
+			{{ hal }}::setRxPinout(RxPinout::RxPad1);
+		} else if constexpr (rxIndex == 2) {
+			{{ hal }}::setRxPinout(RxPinout::RxPad2);
+		} else if constexpr (rxIndex == 3) {
+			{{ hal }}::setRxPinout(RxPinout::RxPad3);
+		} else {
+			// assert is always false
+			static_assert(!std::is_same_v<RxSignal, RxSignal>, "Invalid rx signal");
+		}
+
+		if constexpr (txIndex == 0) {
+			{{ hal }}::setTxPinout(TxPinout::TxPad0_XckPad1);
+%% if target.family != "d5x/e5x"
+		} else if constexpr (txIndex == 2) {
+			{{ hal }}::setTxPinout(TxPinout::TxPad2_XckPad3);
+%% endif
+		} else {
+			// assert is always false
+			static_assert(!std::is_same_v<TxSignal, TxSignal>, "Invalid tx signal");
+		}
+	}
+
+public:
+	template< class... Pins >
+	static void
+	connect()
+	{
+		using RxPin = GetPin_t<PeripheralPin::Rx, Pins...>;
+		using TxPin = GetPin_t<PeripheralPin::Tx, Pins...>;
+		static_assert(
+			!std::is_same_v<typename RxPin::Base, typename TxPin::Base>,
+			"Rx and Tx cannot use the same pin!");
+		using Sercom = Peripherals::Sercom<{{ id | int }}>;
+		using RxConnector = typename RxPin::template Connector<Sercom, Sercom::Pad<0>, Sercom::Pad<1>, Sercom::Pad<2>, Sercom::Pad<3>>;
+		using TxConnector = typename TxPin::template Connector<Sercom, Sercom::Pad<0>, Sercom::Pad<2>>;
+		ValidateNotSame<typename RxConnector::Signal, typename TxConnector::Signal> {};
+
+		configurePadMapping<typename RxConnector::Signal, typename TxConnector::Signal>();
+		RxConnector::connect();
+		TxConnector::connect();
+	}
+
+	template< class SystemClock, baudrate_t baudrate, percent_t tolerance=pct(1) >
+	static void
+	initialize(Parity parity = Parity::Disabled)
+	{
+		{{ hal }}::initialize<SystemClock, baudrate, tolerance>(parity);
+		{{ hal }}::setTransmitterEnable(true);
+		{{ hal }}::setReceiverEnable(true);
+	}
+
+	static void
+	writeBlocking(uint8_t data);
+
+	static void
+	writeBlocking(const uint8_t *data, std::size_t length);
+
+	static void
+	flushWriteBuffer();
+
+	static bool
+	write(uint8_t data);
+
+	static std::size_t
+	write(const uint8_t *data, std::size_t length);
+
+	static bool
+	isWriteFinished();
+
+	static std::size_t
+	discardTransmitBuffer();
+
+	static bool
+	read(uint8_t &data);
+
+	static std::size_t
+	read(uint8_t *buffer, std::size_t length);
+
+	static std::size_t
+	discardReceiveBuffer();
+};
+
+}	// namespace modm::platform

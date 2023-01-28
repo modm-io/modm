@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2022, Nikolay Semenov
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":platform:adc"
+    module.description = "Analog-to-Digital Converter (ADC)"
+
+def prepare(module, options):
+    device = options[":target"]
+    if not device.has_driver("adc:rp20*"):
+        return False
+
+    module.depends(
+        ":architecture:adc",
+        ":cmsis:device",
+        ":platform:gpio")
+
+    return True
+
+def build(env):
+    device = env[":target"]
+    target = device.identifier
+    driver = device.get_driver("adc")
+
+    properties = {}
+    properties["target"] = target
+    properties["id"] = driver.get("instance", [""])[0]
+
+    channels = {ch["id"]:ch["name"] for ch in driver.get("channel", [])}
+    properties["channels"] = channels
+
+    env.substitutions = properties
+    env.outbasepath = "modm/src/modm/platform/adc"
+
+    env.template("adc.hpp.in")
+    env.template("adc_impl.hpp.in")

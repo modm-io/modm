@@ -1,0 +1,242 @@
+/*
+ * Copyright (c) 2022, Andrey Kunitsyn
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+#pragma once
+
+#include <modm/platform/device.hpp>
+#include <hardware/structs/sio.h>
+#include <atomic>
+
+namespace modm::platform::multicore
+{
+
+/**
+ * The RP2040 contains two FIFOs for passing data, messages or ordered events between the two cores. Each FIFO is 32 bits
+ * wide, and 8 entries deep. One of the FIFOs can only be written by core 0, and read by core 1. The other can only be written
+ * by core 1, and read by core 0.
+ * @ingroup modm_platform_multicore
+ */
+struct Mailbox
+{
+	static inline bool canRead()
+	{
+		return sio_hw->fifo_st & SIO_FIFO_ST_VLD_BITS;
+	}
+	static inline bool canWrite()
+	{
+		return sio_hw->fifo_st & SIO_FIFO_ST_RDY_BITS;
+	}
+	static inline bool push(uint32_t msg)
+	{
+		if (!canWrite()) return false;
+		sio_hw->fifo_wr = msg;
+		__SEV();
+		return true;
+	}
+	static inline bool pop(uint32_t& msg)
+	{
+		if (!canRead()) return false;
+		msg = sio_hw->fifo_rd;
+		return true;
+	}
+	static inline void pushBlocked(uint32_t msg)
+	{
+		while (!canWrite()) __NOP();
+		sio_hw->fifo_wr = msg;
+		__SEV();
+	}
+	static inline uint32_t popBlocked()
+	{
+		while (!canRead()) __WFE();
+		return sio_hw->fifo_rd;
+	}
+	static inline void drain()
+	{
+		while (canRead())
+			(void) sio_hw->fifo_rd;
+	}
+};
+
+/**
+ * The RP2040 provides 32 hardware spin locks, which can be used to manage mutually-exclusive access to shared software
+ * and hardware resources.
+ *
+ * Instance 0 allocated for modm usage.
+ *
+ * Acquire a spin lock without disabling interrupts (hence unsafe)
+ * @ingroup modm_platform_multicore
+ */
+template <uint8_t instance>
+class SpinLockUnsafe
+{
+	static_assert(instance < 32);
+	using LockType = volatile uint32_t;
+
+private:
+	static inline LockType* getInstance()
+	{
+		return (LockType *) (SIO_BASE + SIO_SPINLOCK0_OFFSET + instance * 4);
+	}
+
+public:
+	static void init()
+	{
+		unlock();
+	}
+	static inline void lock()
+	{
+		auto l = getInstance();
+		while (*l == 0);
+		std::atomic_thread_fence(std::memory_order_acquire);
+	}
+	static inline void unlock()
+	{
+		auto l = getInstance();
+		std::atomic_thread_fence(std::memory_order_release);
+		*l = 0;
+	}
+};
+
+/// @cond
+// for use in modm::atomic::Lock
+struct CoreLock
+{
+	CoreLock() { SpinLockUnsafe<0>::lock(); }
+	~CoreLock() { SpinLockUnsafe<0>::unlock(); }
+};
+/// @endcond
+
+/// This class will disable interrupts prior to acquiring the spinlock
+/// @ingroup modm_platform_multicore
+template <uint8_t instance>
+class SpinLockBlocking : public SpinLockUnsafe<instance>
+{
+	using Base = SpinLockUnsafe<instance>;
+
+public:
+	static inline uint32_t lock()
+	{
+		uint32_t is = __get_PRIMASK();
+		__disable_irq();
+		Base::lock();
+		return is;
+	}
+	static inline void unlock(uint32_t is)
+	{
+		Base::unlock();
+		__set_PRIMASK(is);
+	}
+};
+/// @ingroup modm_platform_multicore
+using SystemSpinLock = SpinLockBlocking<0>;
+
+
+/// RAI lock acquiring and releasing
+/// @ingroup modm_platform_multicore
+template <class SpinLock>
+class SpinLockGuard
+{
+private:
+	SpinLockGuard(const SpinLockGuard& ) = delete;
+	SpinLockGuard(SpinLockGuard&&) = delete;
+public:
+	inline SpinLockGuard() { SpinLock::lock(); }
+	inline ~SpinLockGuard() { SpinLock::unlock(); }
+};
+
+/// @ingroup modm_platform_multicore
+template <uint8_t instance>
+class SpinLockGuard<SpinLockBlocking<instance>>
+{
+private:
+	using SpinLock = SpinLockBlocking<instance>;
+	uint32_t is;
+	SpinLockGuard(const SpinLockGuard& ) = delete;
+	SpinLockGuard(SpinLockGuard&&) = delete;
+public:
+	inline SpinLockGuard() : is(SpinLock::lock()) {}
+	inline ~SpinLockGuard() { SpinLock::unlock(is); }
+};
+/// @ingroup modm_platform_multicore
+using SystemSpinLockGuard = SpinLockGuard<SystemSpinLock>;
+
+/// @ingroup modm_platform_multicore
+class Mutex
+{
+private:
+	volatile bool locked = false;
+	Mutex(const Mutex& ) = delete;
+	Mutex(Mutex&&) = delete;
+public:
+	Mutex() {}
+	void lock()
+	{
+		while(true)
+		{
+			{
+				SystemSpinLockGuard g;
+				if (!locked) {
+					locked = true;
+					return;
+				}
+			}
+			__WFE();
+		}
+	}
+	void unlock()
+	{
+		{
+			SystemSpinLockGuard g;
+			locked = false;
+		}
+		__SEV();
+	}
+};
+
+/// @ingroup modm_platform_multicore
+struct Core
+{
+	static inline uint32_t cpuId()
+	{
+		return sio_hw->cpuid;
+	}
+};
+/// Wake up (a previously reset) core 1 and enter the given function on
+/// core 1 using the default core 1 stack (below core 0 stack).
+/// @ingroup modm_platform_multicore
+struct Core1 : Core
+{
+	static void run(void(*func)());
+};
+
+} // namespace modm::platform::multicore
+
+/// @ingroup modm_platform_multicore
+/// @{
+%% for i in range(num_cores)
+/// Places initialized objects into the core{{i}}-coupled memory
+#define modm_core{{i}}_data modm_section(".data_core{{i}}")
+%% endfor
+%% for i in range(num_cores)
+/// Places zeroed objects into the core{{i}}-coupled memory
+#define modm_core{{i}}_bss modm_section(".bss_core{{i}}")
+%% endfor
+%% for i in range(num_cores)
+/// Places uninitialized objects into the core{{i}}-coupled memory
+#define modm_core{{i}}_noinit modm_section(".noinit_core{{i}}")
+%% endfor
+%% for i in range(num_cores)
+/// Places functions into the core{{i}}-coupled memory
+#define modm_core{{i}}_code modm_core{{i}}_data
+%% endfor
+/// Weak callback to initialize CPU1
+extern "C" void
+modm_initialize_core1(void);
+/// @}

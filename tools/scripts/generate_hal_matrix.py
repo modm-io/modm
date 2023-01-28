@@ -41,7 +41,7 @@ def hal_get_modules():
             short_id.naming_schema = "{platform}-{family}"
 
         elif target.platform == "sam":
-            short_id.naming_schema = "{platform}{family}{series}"
+            short_id.naming_schema = "{platform}{series}"
 
         short_id.set("platform", target.platform) # invalidate caches
         minimal_targets[short_id.string].append(target)
@@ -76,10 +76,11 @@ def hal_get_modules():
 
         modules = set()
         # We only care about some modm:platform:* modules here
-        not_interested = {"bitbang", "common", "heap", "clock", "core", "fault", "cortex-m", "uart.spi", "itm", "rtt"}
+        not_interested = {"bitbang", "common", "heap", "core", "fault", "cortex-m", "uart.spi", "itm", "rtt"}
         imodules = (m  for (repo, mfile) in mfiles  for m in lbuild.module.load_module_from_file(repo, mfile)
                     if m.available and m.fullname.startswith("modm:platform:") and
-                    all(p not in m.fullname for p in not_interested))
+                    all(p not in m.fullname for p in not_interested) and
+                    m.fullname not in {"modm:platform:clock"})
         for module in imodules:
             # lookup the mapping of a module onto the hardware names
             if module.filename not in file_cache:
@@ -97,18 +98,22 @@ def hal_get_modules():
                 "id": "Unique ID",
                 "rcc": "System Clock",
                 "gclk": "System Clock",
+                "clocks": "System Clock",
+                "clockgen": "System Clock",
                 "extint": "External Interrupt",
+                "exti": "External Interrupt",
                 "fsmc": "External Memory",
                 "flash": "Internal Flash",
                 "timer": "Timer",
                 "i2c": "I<sup>2</sup>C",
+                "usart": "UART"
             }
             mname = remap.get(mname, mname.upper())
             modules.add(mname)
             mapping[mname].update(file_cache[module.filename])
 
         # External interrupt is currently part of the GPIO module
-        if target.platform in ["avr", "stm32"] and "GPIO" in modules:
+        if target.platform in ["avr"] and "GPIO" in modules:
             modules.add("External Interrupt")
 
         # print(target, dict(modules))
@@ -116,22 +121,32 @@ def hal_get_modules():
         all_targets[target] = (drivers, modules)
 
     # Some information cannot be extracted from the module.lb files
+    mapping["ADC"].add("afec")
+    mapping["DAC"].add("dacc")
+    mapping["Ethernet"].add("gmac")
+    mapping["Random Generator"].add("trng")
     mapping["UART"].update({"usi", "sercom"})
-    mapping["Timer"].update({"tc", "tcc"})
+    mapping["Timer"].update({"tc", "tcc", "timer"})
     mapping["SPI"].add("sercom")
-    mapping["I<sup>2</sup>C"].add("sercom")
-    mapping["USB"].add("usb")
-    mapping["CAN"].add("fdcan")
-    mapping["DMA"].add("dmac")
-    mapping["Comparator"].add("ac")
-    mapping["Internal Flash"].add("nvmctrl")
-    mapping["External Memory"].add("quadspi")
+    mapping["I<sup>2</sup>C"].update({"sercom", "twihs"})
+    mapping["USB"].update({"usb", "usbhs"})
+    mapping["CAN"].update({"fdcan", "mcan"})
+    mapping["DMA"].update({"dmac", "xdmac"})
+    mapping["Comparator"].update({"ac", "acc"})
+    mapping["Internal Flash"].update({"efc", "nvmctrl"})
+    mapping["External Memory"].update({"sdramc", "smc", "quadspi", "xip_ssi"})
 
     print(); print()
     return (all_targets, mapping)
 
+def _n2f(name):
+    if name == "d21": return "d";
+    if name == "g55": return "g";
+    if name == "v70": return "v";
+    return name
+
 def hal_module_filter(targets, family):
-    family = family.replace("d21", "d")
+    family = _n2f(family)
     drivers = [v[0] for k,v in targets[0].items() if k.family == family]
     modules = [v[1] for k,v in targets[0].items() if k.family == family]
 
@@ -140,9 +155,15 @@ def hal_module_filter(targets, family):
 
     return (all_peripherals, implemented_peripherals)
 
+def _f2n(family):
+    if family == "d": return "d21";
+    if family == "g": return "g55";
+    if family == "v": return "v70";
+    return family
+
 
 def hal_create_table(targets, platforms, common_table=False):
-    families = set((t.platform.replace("avr", "at"), t.family.replace("d", "d21"))
+    families = set((t.platform.replace("avr", "at"), _f2n(t.family))
                    for t in targets[0] if any(t.platform == p for p in platforms))
     if not families: return (None, None) if common_table else None;
     modules = {f:hal_module_filter(targets, f[1]) for f in families}
@@ -155,7 +176,7 @@ def hal_create_table(targets, platforms, common_table=False):
     mapping = targets[1]
 
     print(platforms, dict(mapping))
-    values = defaultdict(lambda: defaultdict(lambda: "✗"))
+    values = defaultdict(lambda: defaultdict(lambda: "✕"))
     for driver in all_drivers:
         for f, v in modules.items():
             # mapping from driver to peripheral
@@ -182,7 +203,11 @@ def hal_create_table(targets, platforms, common_table=False):
 {% endfor %}</tr><tr>
 <th align="left">Peripheral</th>
 {% for fam in families  -%}
+{% if fam[0] == "sam" -%}
+<th align="center">{{ fam[1] | upper | replace("X", "x") | replace("/", "<br/>") }}</th>
+{% else -%}
 <th align="center">{{ fam[1] | capitalize }}</th>
+{% endif -%}
 {% endfor %}
 {%- for per in pers | sort %}</tr><tr>
 <td align="left">{{ per }}</td>
@@ -203,7 +228,7 @@ def hal_format_tables():
     # tables["stm32"] = hal_create_table(targets, ["stm32"])
     # tables["sam"] = hal_create_table(targets, ["sam"])
 
-    tables["all"] = hal_create_table(targets, ["avr", "stm32", "sam"])
+    tables["all"] = hal_create_table(targets, ["avr", "stm32", "sam", "rp"])
 
     return tables
 

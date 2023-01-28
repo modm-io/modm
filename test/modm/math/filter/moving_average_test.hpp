@@ -27,6 +27,12 @@ public:
 	void
 	testAverage();
 
+	void
+	testReset();
+
     void
     testFloatAverage();
+
+	void
+	testFloatReset();
 };

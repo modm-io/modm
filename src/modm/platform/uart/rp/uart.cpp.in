@@ -1,0 +1,275 @@
+/*
+ * Copyright (c) 2012, 2016-2017, Sascha Schade
+ * Copyright (c) 2013-2014, Kevin Läufer
+ * Copyright (c) 2013-2017, Niklas Hauser
+ * Copyright (c) 2017, Fabian Greif
+ * Copyright (c) 2022, Andrey Kunitsyn
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#include <modm/architecture/driver/atomic/queue.hpp>
+#include <modm/architecture/interface/atomic_lock.hpp>
+#include <modm/architecture/interface/interrupt.hpp>
+#include <modm/platform/core/resets.hpp>
+
+#include "../device.hpp"
+
+#include "uart_{{ id }}.hpp"
+
+// ----------------------------------------------------------------------------
+
+namespace
+{
+// If requested buffer size is larger than hardware buffer size create a
+// software queue for the remaining bytes.
+%% if options["buffer.rx"] > fifo_size
+	static modm::atomic::Queue<uint8_t, modm::platform::Uart{{ id }}::RxBufferSize - {{ fifo_size }}> rxBuffer;
+%% endif
+%% if options["buffer.tx"] > fifo_size
+	static modm::atomic::Queue<uint8_t, modm::platform::Uart{{ id }}::TxBufferSize - {{ fifo_size }}> txBuffer;
+%% endif
+
+}
+
+static inline bool tx_fifo_full()
+{
+	return uart{{ id }}_hw->fr & UART_UARTFR_TXFF_BITS;
+}
+
+static inline bool rx_fifo_empty()
+{
+	return uart{{ id }}_hw->fr & UART_UARTFR_RXFE_BITS;
+}
+
+void modm::platform::Uart{{ id }}::reset()
+{
+	Resets::reset(RESETS_RESET_UART{{ id }}_BITS);
+}
+
+void modm::platform::Uart{{ id }}::unreset()
+{
+	Resets::unresetWait(RESETS_RESET_UART{{ id }}_BITS);
+}
+
+void
+modm::platform::Uart{{ id }}::writeBlocking(uint8_t data)
+{
+	while (not write(data));
+}
+
+void
+modm::platform::Uart{{ id }}::writeBlocking(const uint8_t *data, std::size_t length)
+{
+	while (length--) writeBlocking(*data++);
+}
+
+void
+modm::platform::Uart{{ id }}::flushWriteBuffer()
+{
+	while(!isWriteFinished());
+}
+
+// ----------------------------------------------------------------------------
+bool
+modm::platform::Uart{{ id }}::write(uint8_t data)
+{
+%% if options["buffer.tx"] <= fifo_size
+	// No software buffer necessary, use hardware buffer only.
+	if (tx_fifo_full()) return false;
+	uart{{ id }}_hw->dr = data;
+	return true;
+%% else
+	atomic::Lock lock;
+	// Use hardware buffer and additional software buffer.
+	uart{{ id }}_hw->imsc |= UART_UARTIMSC_TXIM_BITS;
+
+	if (txBuffer.isEmpty() and !tx_fifo_full())
+	{
+		// If software buffer is empty try to write to hardware buffer directly.
+		// Do not write to hardware buffer while there is some data in the
+		// software buffer to maintain byte order.
+		// There is at least charsLeft bytes free in the FIFO
+		uart{{ id }}_hw->dr = data;
+		return true; // success
+	}
+
+	// Hardware buffer is full, so try software buffer.
+	// Software buffer is empty so this will succeed.
+	// Hardware buffer is not empty so at least one Tx interrupt
+	// will be generated soon.
+
+	return txBuffer.push(data);
+%% endif
+}
+
+// ----------------------------------------------------------------------------
+std::size_t
+modm::platform::Uart{{ id }}::write(const uint8_t *buffer, std::size_t length)
+{
+	std::size_t written(0);
+
+%% if options["buffer.tx"] <= fifo_size
+	// No software buffer necessary, use hardware buffer only.
+	while ( !tx_fifo_full() and written<length )
+	{
+		uart{{ id }}_hw->dr = *buffer++;
+		written++;
+	}
+%% else
+	atomic::Lock lock;
+	// Use hardware buffer and additional software buffer.
+	uart{{ id }}_hw->imsc |= UART_UARTIMSC_TXIM_BITS;
+
+	if (txBuffer.isEmpty())
+	{
+		// If software buffer is completly empty try to write to hardware buffer directly.
+		// Do not write to hardware buffer while there is some data in the
+		// software buffer to maintain byte order.
+
+		// First Copy max(length) chars from buffer to hardware FIFO.
+		while (written < length and !tx_fifo_full())
+		{
+			uart{{ id }}_hw->dr = *buffer++;
+			written++;
+		}
+	}
+
+	// If there is remaining data, put it into the software buffer
+	while (written < length)
+	{
+		if (not txBuffer.push(*buffer++)) break;
+		written++;
+	}
+%% endif
+	return written;
+}
+
+bool
+modm::platform::Uart{{ id }}::isWriteFinished()
+{
+%% if options["buffer.tx"] > fifo_size
+	return txBuffer.isEmpty() and ((uart{{ id }}_hw->fr & UART_UARTFR_BUSY_BITS) == 0);
+%% else
+	return (uart{{ id }}_hw->fr & UART_UARTFR_BUSY_BITS) == 0;
+%% endif
+}
+
+std::size_t
+modm::platform::Uart{{ id }}::discardTransmitBuffer()
+{
+%% if options["buffer.tx"] > fifo_size
+	atomic::Lock lock;
+	std::size_t count(0);
+	// disable interrupt since buffer will be cleared
+	uart{{ id }}_hw->imsc &= UART_UARTIMSC_TXIM_BITS;
+	while(not txBuffer.isEmpty())
+	{
+		++count;
+		txBuffer.pop();
+	}
+	return count;
+%% else
+	return 0;
+%% endif
+}
+
+bool
+modm::platform::Uart{{ id }}::read(uint8_t& data)
+{
+%% if options["buffer.rx"] > fifo_size
+	if (not rxBuffer.isEmpty())
+	{
+		data = rxBuffer.get();
+		rxBuffer.pop();
+		// if the hardware buffer has been used, copy all into rxBuffer
+		while(!rx_fifo_empty() and rxBuffer.isNotFull())
+		{
+			rxBuffer.push(uart{{ id }}_hw->dr);
+		}
+		if (rxBuffer.isNotFull())
+		{
+			atomic::Lock lock;
+			uart{{ id }}_hw->imsc |= UART_UARTIMSC_RXIM_BITS;
+		}
+		return true;
+	}
+%% else
+	if ((uart{{ id }}_hw->fr & UART_UARTFR_RXFE_BITS) == 0)
+	{
+		// Receive data available
+		data = uart{{ id }}_hw->dr;
+		return true;
+	}
+%% endif
+	return false;
+}
+
+std::size_t
+modm::platform::Uart{{ id }}::read(uint8_t *buffer, std::size_t length)
+{
+	std::size_t ret = 0;
+
+	while (ret < length)
+	{
+		if (not read(*buffer++)) break;
+		ret++;
+	}
+
+	return ret;
+}
+
+std::size_t
+modm::platform::Uart{{ id }}::discardReceiveBuffer()
+{
+	std::size_t count(0);
+%% if options["buffer.rx"] > fifo_size
+	while(!rxBuffer.isEmpty())
+	{
+		++count;
+		rxBuffer.pop();
+	}
+%% endif
+	while(!rx_fifo_empty())
+	{
+		(void)uart{{ id }}_hw->dr;
+		++count;
+	}
+	return count;
+}
+
+// ----------------------------------------------------------------------------
+MODM_ISR(UART{{ id }}_IRQ)
+{
+	// read Masked Interrupt Status Register, UARTMIS
+	uint32_t IValue = uart{{ id }}_hw->mis;
+	// clear
+	uart{{ id }}_hw->icr = IValue;
+%% if options["buffer.tx"] > fifo_size
+	if (IValue & UART_UARTMIS_TXMIS_BITS)
+	{
+		while (!txBuffer.isEmpty() and !tx_fifo_full())
+		{
+			// Write to the hardware buffer
+			uart{{ id }}_hw->dr = txBuffer.get();
+			txBuffer.pop();
+		}
+	}
+%% endif
+%% if options["buffer.rx"] > fifo_size
+	if (IValue & UART_UARTMIS_RXMIS_BITS)
+	{
+		while(!rx_fifo_empty()) {
+			rxBuffer.push(uart{{ id }}_hw->dr);
+		}
+		if (rxBuffer.isFull()) {
+			uart{{ id }}_hw->imsc &= ~UART_UARTIMSC_RXIM_BITS;
+		}
+	}
+%% endif
+}

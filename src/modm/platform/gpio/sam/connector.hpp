@@ -19,11 +19,12 @@ namespace modm
 namespace platform
 {
 
+/// @cond
 // For backwards compability.
 using Peripheral = PeripheralPin;
 
 // GpioConnector only exists for backwards compability with bitbang API.
-template<Peripheral peripheral, template<Peripheral _> class... Signals>
+template<Peripheral peripheral, class... Signals>
 struct GpioConnector
 {
 	template<class GpioQuery>
@@ -32,6 +33,7 @@ struct GpioConnector
 	inline static void connect() {}
 	inline static void disconnect() {}
 };
+/// @endcond
 
 }  // namespace platform
 

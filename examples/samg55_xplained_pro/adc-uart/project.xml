@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:samg55-xplained-pro</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/samg55_xplained_pro/adc-uart</option>
+    <option name="modm:build:openocd.cfg">openocd.cfg</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:adc</module>
+  </modules>
+</library>

@@ -47,7 +47,7 @@ def extract_signals(signals):
 
 def init(module):
     module.name = ":platform:gpio"
-    module.description = "General Purpose I/O (GPIO)"
+    module.description = FileReader("module.md")
 
 def prepare(module, options):
     if not options[":target"].has_driver("gpio:avr"):
@@ -108,6 +108,8 @@ def validate(env):
     bprops["all_signals"] = sorted(list(set(s["name"] for s in all_signals.values())))
     bprops["ranges"] = port_ranges(driver["gpio"])
     bprops["ports"] = {k:i for i, k in enumerate([p["name"] for p in bprops["ranges"]])}
+    bprops["gpios"] = [bprops[g["port"] + g["pin"]] for g in driver["gpio"]]
+    bprops["port_width"] = 8
 
 def build(env):
     device = env[":target"]
@@ -128,33 +130,31 @@ def build(env):
     else:
         properties["pue"] = False
 
-    if ((target["family"] == "mega" and target["name"] in ["8", "16", "32", "162", "8515", "8535"]) or
-        (target["family"] == "tiny" and target["name"] in ["13", "24", "25", "40", "44", "45", "84", "85", "261", "461", "861", "441", "841"])):
+    if ((target.family == "mega" and target.name in ["8", "16", "32", "162", "8515", "8535"]) or
+        (target.family == "tiny" and target.name in ["13", "24", "25", "40", "44", "45", "84", "85", "261", "461", "861", "441", "841"])):
         properties["eicra"] = "MCUCR"
     else:
         properties["eicra"] = "EICRA"
 
-    if target["family"] == "mega" and target["name"] in ["8", "16", "32", "8515", "8535"] and target["type"] not in ["u2", "u4", "u4rc"]:
+    if target.family == "mega" and target.name in ["8", "16", "32", "8515", "8535"] and target["type"] not in ["u2", "u4", "u4rc"]:
         properties["isc2"] = "MCUCSR"
-    if target["family"] == "mega" and target["name"] in ["162"]:
+    if target.family == "mega" and target.name in ["162"]:
         properties["isc2"] = "EMCUCR"
 
     env.substitutions = properties
     env.outbasepath = "modm/src/modm/platform/gpio"
 
-    for gpio in driver["gpio"]:
-        po, pi = gpio["port"], gpio["pin"]
-        properties.update(bprops[po + pi])
-        header_name = "gpio_{}{}.hpp".format(po.upper(), pi)
-        env.template("pin.hpp.in", header_name)
-
     env.copy("define.h")
+    env.template("data.hpp.in")
+    env.template("../common/pins.hpp.in", "pins.hpp")
+    env.template("static.hpp.in")
     env.template("base.hpp.in")
     env.template("port.hpp.in")
     env.template("software_port.hpp.in")
     env.template("set.hpp.in")
-    env.template("unused.hpp.in")
-
+    env.template("../common/unused.hpp.in", "unused.hpp")
+    env.template("../common/port_shim.hpp.in", "port_shim.hpp")
+    env.template("../common/connector.hpp.in", "connector.hpp",
+                 filters={"formatPeripheral": "", "printSignalMap": ""})
+    env.copy("../common/open_drain.hpp", "open_drain.hpp")
     env.copy("../common/inverted.hpp", "inverted.hpp")
-    env.copy("../common/connector.hpp", "connector.hpp")
-    env.template("../common/connector_detail.hpp.in", "connector_detail.hpp")

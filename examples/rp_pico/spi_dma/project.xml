@@ -1,0 +1,15 @@
+<library>
+  <extends>modm:rp-pico</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/rp_pico/spi_dma</option>
+    <option name="modm:tinyusb:config">device.cdc</option>
+  </options>
+  <modules>
+    <module>modm:platform:gpio</module>
+    <module>modm:platform:dma</module>
+    <module>modm:platform:spi:0</module>
+    <module>modm:tinyusb</module>
+    <module>modm:io</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

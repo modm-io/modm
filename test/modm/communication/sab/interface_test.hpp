@@ -13,7 +13,7 @@
 
 #include <unittest/testsuite.hpp>
 
-/// @ingroup modm_test_test_communication
+/// @ingroup modm_test_test_communication_sab
 class InterfaceTest : public unittest::TestSuite
 {
 public:

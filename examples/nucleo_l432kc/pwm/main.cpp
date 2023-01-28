@@ -39,10 +39,10 @@ main()
 	Timer1::setOverflow(65535);
 
 
-	Timer1::configureOutputChannel(1, Timer1::OutputCompareMode::Pwm, 32767);
-	Timer1::configureOutputChannel(2, Timer1::OutputCompareMode::Pwm, 32767);
-	Timer1::configureOutputChannel(3, Timer1::OutputCompareMode::Pwm, 32767);
-	Timer1::configureOutputChannel(4, Timer1::OutputCompareMode::Pwm, 32767);
+	Timer1::configureOutputChannel<GpioOutputA8::Ch1>(Timer1::OutputCompareMode::Pwm, 32767);
+	Timer1::configureOutputChannel<GpioOutputA9::Ch2>(Timer1::OutputCompareMode::Pwm, 32767);
+	Timer1::configureOutputChannel<GpioOutputA10::Ch3>(Timer1::OutputCompareMode::Pwm, 32767);
+	Timer1::configureOutputChannel<GpioOutputA11::Ch4>(Timer1::OutputCompareMode::Pwm, 32767);
 
 	Timer1::applyAndReset();
 

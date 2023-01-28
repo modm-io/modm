@@ -15,10 +15,9 @@
 
 #include <cmath>
 
-template<typename SignalA, typename SignalB, uint8_t POSTSCALER,
-		 std::signed_integral DeltaType>
+template<typename SignalA, typename SignalB, uint8_t PRESCALER, std::signed_integral DeltaType>
 inline uint8_t
-modm::BitBangEncoderInput<SignalA, SignalB, POSTSCALER, DeltaType>::getRaw()
+modm::BitBangEncoderInput<SignalA, SignalB, PRESCALER, DeltaType>::getRaw()
 {
 	const uint8_t read = Signals::read();
 	// convert graycode to binary
@@ -28,25 +27,26 @@ modm::BitBangEncoderInput<SignalA, SignalB, POSTSCALER, DeltaType>::getRaw()
 	return raw;
 }
 
-template<typename SignalA, typename SignalB, uint8_t POSTSCALER,
-		 std::signed_integral DeltaType>
+template<typename SignalA, typename SignalB, uint8_t PRESCALER, std::signed_integral DeltaType>
 inline void
-modm::BitBangEncoderInput<SignalA, SignalB, POSTSCALER, DeltaType>::connect()
+modm::BitBangEncoderInput<SignalA, SignalB, PRESCALER, DeltaType>::initialize(
+	const modm::platform::Gpio::InputType inputType
+)
 {
-	Signals::setInput(::Gpio::InputType::PullUp);
+	Signals::setInput(inputType);
 
 	// Tare power-on state
 	modm::delay(10us);
 	raw_last = getRaw();
 }
 
-template<typename SignalA, typename SignalB, uint8_t POSTSCALER,
-		 std::signed_integral DeltaType>
+template<typename SignalA, typename SignalB, uint8_t PRESCALER, std::signed_integral DeltaType>
 inline void
-modm::BitBangEncoderInput<SignalA, SignalB, POSTSCALER, DeltaType>::update()
+modm::BitBangEncoderInput<SignalA, SignalB, PRESCALER, DeltaType>::update()
 {
-	uint8_t raw = getRaw();
+	const uint8_t raw = getRaw();
 	const uint8_t diff = raw_last - raw;
+
 	if (diff & 0b01)
 	{
 		raw_last = raw;
@@ -54,16 +54,13 @@ modm::BitBangEncoderInput<SignalA, SignalB, POSTSCALER, DeltaType>::update()
 	}
 }
 
-template<typename SignalA, typename SignalB, uint8_t POSTSCALER,
-		 std::signed_integral DeltaType>
+template<typename SignalA, typename SignalB, uint8_t PRESCALER, std::signed_integral DeltaType>
 DeltaType
-modm::BitBangEncoderInput<SignalA, SignalB, POSTSCALER, DeltaType>::getIncrement()
+modm::BitBangEncoderInput<SignalA, SignalB, PRESCALER, DeltaType>::getDelta()
 {
 	::modm::atomic::Lock _;
-	DeltaType val = delta;
 
-	delta &= (POSTSCALER - 1);  // mask out higher bits
-
-	constexpr uint8_t shift = std::log2(POSTSCALER);  // Number of fraction bits
-	return val >> shift;                              // return whats left without fractions
+	DeltaType ret = delta;
+	delta &= (PRESCALER - 1);					// Only keep prescaler fraction
+	return ret >> int(std::log2(PRESCALER));	// return delta without prescaler fraction
 }

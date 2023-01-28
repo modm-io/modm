@@ -10,17 +10,15 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-import sys
-
 def init(module):
     module.name = ":platform:extint"
     module.description = "External Interrupt"
 
 def prepare(module, options):
-    if options[":target"].identifier.platform != "sam":
+    if not options[":target"].partname.startswith("samd2"):
         return False
 
-    module.depends(":cmsis:device", ":platform:clock", ":platform:gpio")
+    module.depends(":cmsis:device", ":platform:gclk", ":platform:gpio")
 
     return True
 

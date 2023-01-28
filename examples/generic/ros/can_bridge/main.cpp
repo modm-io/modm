@@ -97,9 +97,7 @@ main()
 	// Do not use it for logging because this will destroy ROS serial messages.
 	RosSerialUart::initialize<Board::SystemClock, 250_kBd>();
 
-	CanFilter::setStartFilterBankForCan2(14);
-
-	// Initialize Can1
+	// Initialize Can
 	if (false) {
 		Can::connect<GpioInputA11::Rx, GpioOutputA12::Tx>(Gpio::InputType::PullUp);
 	} else {

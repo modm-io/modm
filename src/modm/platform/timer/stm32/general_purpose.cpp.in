@@ -82,6 +82,35 @@ modm::platform::Timer{{ id }}::setMode(Mode mode, SlaveMode slaveMode,
 
 // ----------------------------------------------------------------------------
 void
+modm::platform::Timer{{ id }}::configureInputChannel(uint32_t channel, uint8_t filter) {
+		channel -= 1;	// 1..4 -> 0..3
+
+	// disable channel
+	TIM{{ id }}->CCER &= ~(TIM_CCER_CC1E << (channel * 4));
+
+	uint32_t flags = static_cast<uint32_t>(filter&0xf) << 4;
+
+	if (channel <= 1)
+	{
+		const uint32_t offset = 8 * channel;
+
+		flags <<= offset;
+		flags |= TIM{{ id }}->CCMR1 & ~(0xf0 << offset);
+
+		TIM{{ id }}->CCMR1 = flags;
+	}
+	else {
+		const uint32_t offset = 8 * (channel - 2);
+
+		flags <<= offset;
+		flags |= TIM{{ id }}->CCMR2 & ~(0xf0 << offset);
+
+		TIM{{ id }}->CCMR2 = flags;
+	}
+	TIM{{ id }}->CCER |= TIM_CCER_CC1E << (channel * 4);
+}
+
+void
 modm::platform::Timer{{ id }}::configureInputChannel(uint32_t channel,
 		InputCaptureMapping input, InputCapturePrescaler prescaler,
 		InputCapturePolarity polarity, uint8_t filter,

@@ -2,6 +2,7 @@
  * Copyright (c) 2013-2014, Kevin Läufer
  * Copyright (c) 2014, 2016-2018, Niklas Hauser
  * Copyright (c) 2017, Sascha Schade
+ * Copyright (c) 2022, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -40,6 +41,10 @@ namespace platform
  */
 class Adc{{ id }}
 {
+
+public:
+	static constexpr uint8_t Resolution = {{ resolution }};
+
 public:
 	/// Channels, which can be used with this ADC.
 	enum class Channel : uint8_t	// TODO: What is the best type?
@@ -55,7 +60,16 @@ public:
 		BatDiv2   = 17,
 		InternalReference = 18,
 		// TODO: Add internal connections
-%% elif target["family"] in ["l4", "g4"]
+%% elif target["family"] in ["g4"]
+		Opamp1 = 13,
+		Temperature = 16,
+		BatDiv3 = 17,
+		InternalReference = 18,
+%% elif target["family"] in ["l4"]
+		Temperature = 17,
+		BatDiv3     = 18,
+%% elif target["family"] in ["l5"]
+		InternalReference = 0,
 		Temperature = 17,
 		BatDiv3     = 18,
 %% endif
@@ -63,25 +77,49 @@ public:
 %% if target["family"] in ["f3"]
 		Opamp2 = 17,
 		InternalReference = 18,
-%% elif target["family"] in ["l4", "g4"]
+%% elif target["family"] in ["l4", "l5"]
 		Dac1 = 17,
 		Dac2 = 18,
+%% elif target["family"] in ["g4"]
+		Opamp2 = 16,
+		Opamp3 = 18,
 %% endif
 %% elif id == 3
 %% if target["family"] in ["f3"]
 		Vss    =  4,	// ADC3_IN4 not bonded and connected to VSS
 		Opamp3 = 17,
 		InternalReference = 18,
-%% elif target["family"] in ["l4", "g4"]
+%% elif target["family"] in ["l4"]
 		Dac1 = 14,
 		Dac2 = 15,
 		Vss  = 16,
 		Temperature = 17,
 		BatDiv3 = 18,
+%% elif target["family"] in ["g4"]
+		Opamp3 = 13,
+%% if target["name"] in ["91", "a1"]
+		Opamp6 = 17,
+%% else
+		BatDiv3 = 17,
+%% endif
+		InternalReference = 18,
 %% endif
 %% elif id == 4
-		Opamp3 = 17,
+%% if target["family"] in ["f3"]
+		Opamp4 = 17,
 		InternalReference = 18,
+%% elif target["family"] in ["g4"]
+		Opamp6 = 17,
+		InternalReference = 18,
+%% endif
+%% elif id == 5
+%% if target["family"] in ["g4"]
+		Opamp5 = 3,
+		Temperature = 4,
+		Opamp4 = 5,
+		BatDiv3 = 17,
+		InternalReference = 18,
+%% endif
 %% endif
 	};
 
@@ -103,16 +141,18 @@ public:
 		NoClock = 0, // No clock selected.
 %% if target["family"] in ["g4"]
 %% if id in [1, 2]
-		Pll = RCC_CCIPR_ADC12SEL_0, // PLL “P” clock selected as ADC clock
-		SystemClock = RCC_CCIPR_ADC12SEL_1 , // System clock selected as ADCs clock
+		Pll = RCC_{{ ccipr }}_ADC12SEL_0, // PLL “P” clock selected as ADC clock
+		SystemClock = RCC_{{ ccipr }}_ADC12SEL_1 , // System clock selected as ADCs clock
 %% elif id in [3, 4, 5]
-		Pll = RCC_CCIPR_ADC345SEL_0, // PLL “P” clock selected as ADC clock
-		SystemClock = RCC_CCIPR_ADC345SEL_1 , // System clock selected as ADCs clock
+		Pll = RCC_{{ ccipr }}_ADC345SEL_0, // PLL “P” clock selected as ADC clock
+		SystemClock = RCC_{{ ccipr }}_ADC345SEL_1 , // System clock selected as ADCs clock
 %% endif
 %% else
-		PllSai1 = RCC_CCIPR_ADCSEL_0, // PLLSAI1 "R" clock (PLLADC1CLK) selected as ADCs clock
-		PllSai2 = RCC_CCIPR_ADCSEL_1, // PLLSAI2 "R" clock (PLLADC2CLK) selected as ADCs clock
-		SystemClock = RCC_CCIPR_ADCSEL_1 | RCC_CCIPR_ADCSEL_0, // System clock selected as ADCs clock
+		PllSai1 = RCC_{{ ccipr }}_ADCSEL_0, // PLLSAI1 "R" clock (PLLADC1CLK) selected as ADCs clock
+%% if target["family"] != "l5"
+		PllSai2 = RCC_{{ ccipr }}_ADCSEL_1, // PLLSAI2 "R" clock (PLLADC2CLK) selected as ADCs clock
+%% endif
+		SystemClock = RCC_{{ ccipr }}_ADCSEL_1 | RCC_{{ ccipr }}_ADCSEL_0, // System clock selected as ADCs clock
 %% endif
 	};
 %% endif
@@ -135,7 +175,7 @@ public:
 		Div128 				= RCC_CFGR2_{{ adc_pre }}_DIV128,
 		Div256 				= RCC_CFGR2_{{ adc_pre }}_DIV256,
 		Div256AllBits 		= RCC_CFGR2_{{ adc_pre }},	// for bit clear
-%% elif target["family"] in ["l4", "g4"]
+%% elif target["family"] in ["l4", "l5", "g4"]
 		Div1 				= 0,
 		Div2 				= ADC_CCR_PRESC_0,
 		Div4 				= ADC_CCR_PRESC_1,
@@ -152,7 +192,7 @@ public:
 %% endif
 	};
 
-%% if target["family"] in ["l4", "g4"]
+%% if target["family"] in ["l4", "l5", "g4"]
 	enum class SampleTime : uint8_t	// TODO: What is the best type?
 	{
 		Cycles2 	= 0b000,	//!   1.5 ADC clock cycles
@@ -186,7 +226,7 @@ public:
 
 	enum class VoltageRegulatorState : uint32_t
 	{
-%% if target["family"] in ["l4", "g4"]
+%% if target["family"] in ["l4", "l5", "g4"]
 		Enabled 		= ADC_CR_ADVREGEN,
 %% elif target["family"] in ["f3"]
 		// Intermediate state is needed to move from enabled to disabled
@@ -226,11 +266,12 @@ public:
 		AnalogWatchdog2 					= ADC_ISR_AWD2,
 		AnalogWatchdog3 					= ADC_ISR_AWD3,
 		InjectedContextQueueOverflow 		= ADC_ISR_JQOVF,
+		All									= ADC_ISR_ADRDY | ADC_ISR_EOSMP | ADC_ISR_EOC | ADC_ISR_EOS | ADC_ISR_OVR | ADC_ISR_JEOC | ADC_ISR_JEOS | ADC_ISR_AWD1 | ADC_ISR_AWD2 | ADC_ISR_AWD3 | ADC_ISR_JQOVF,
 	};
 	MODM_FLAGS32(InterruptFlag);
 
 public:
-	template< template<Peripheral _> class... Signals >
+	template< class... Signals >
 	static void
 	connect()
 	{
@@ -336,7 +377,7 @@ public:
 	static inline constexpr Channel
 	getPinChannel()
 	{
-		constexpr int8_t channel{Gpio::template AdcChannel<Peripheral::Adc{{ id }}>};
+		constexpr int8_t channel{detail::AdcChannel<typename Gpio::Data, Peripheral::Adc{{ id }}>};
 		static_assert(channel >= 0, "Adc{{id}} does not have a channel for this pin!");
 		return Channel(channel);
 	}
@@ -403,7 +444,7 @@ public:
 	getInterruptFlags();
 
 	static inline void
-	acknowledgeInterruptFlag(const InterruptFlag_t flags);
+	acknowledgeInterruptFlags(const InterruptFlag_t flags);
 };
 
 }

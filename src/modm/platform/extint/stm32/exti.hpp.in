@@ -1,0 +1,443 @@
+/*
+ * Copyright (c) 2021, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <modm/platform/device.hpp>
+#include <modm/architecture/interface/interrupt.hpp>
+#include <modm/platform/gpio/base.hpp>
+#include <modm/utils/inplace_function.hpp>
+
+%% if options.with_handlers
+#if defined __DOXYGEN__ || !defined MODM_EXTI_HANDLER_STORAGE
+/// @ingroup modm_platform_exti
+#define MODM_EXTI_HANDLER_STORAGE sizeof(void*)
+#endif
+%% endif
+
+namespace modm::platform
+{
+
+/// @cond
+%% for irq in extimap | sort
+MODM_ISR_DECL(EXTI{{irq}});
+%% endfor
+/// @endcond
+
+/**
+ * External Interrupt/Event Controller.
+ *
+ * @author		Niklas Hauser
+ * @ingroup		modm_platform_exti
+ */
+class Exti
+{
+public:
+	enum class
+	Trigger
+	{
+		NoEdges,
+		RisingEdge,
+		FallingEdge,
+		BothEdges,
+	};
+
+	enum class
+	Vector
+	{
+		LineUnknown = 0,
+%% for irq, range in extimap.items() | sort
+		Line{{range[0]}}{% if (range | length) > 1 %}_{{range[-1]}}{% endif %} = EXTI{{irq}}_IRQn,
+%% endfor
+	};
+
+	using MaskType = uint{{ 64 if extended else 32 }}_t;
+%% if options.with_handlers
+	using Handler = modm::inplace_function<void(uint8_t), MODM_EXTI_HANDLER_STORAGE, alignof(void*)>;
+%% endif
+
+%% set pf = "1" if (extended or separate_flags) else ""
+%% if options.with_handlers
+public:
+	template< class Pin >
+	static void
+	connect(Trigger trigger, Handler&& handler, uint8_t priority=15)
+	{
+		disableInterrupts<Pin>();
+		acknowledgeFlags<Pin>();
+		// Now it's safe to copy the handler
+		handlers[Pin::pin] = handler;
+
+		// Select the source of the exti line
+		setTriggerSource<Pin>();
+		setTriggers<Pin>(trigger);
+
+		enableVector<Pin>(priority);
+		enableInterrupts<Pin>();
+	}
+
+	template< class Pin >
+	static void
+	disconnect()
+	{
+		disableInterrupts<Pin>();
+		// Disable the IRQ vector if all pins are disabled
+		if (not (EXTI->IMR{{pf}} & getVectorMaskForLine(Pin::pin)))
+			disableVector<Pin>();
+		handlers[Pin::pin] = nullptr;
+	}
+%% endif
+
+public:
+%% set pins = "((1ul" ~ ("l" if extended else "") ~ " << Pins::pin) | ...)"
+	// - - - TRIGGERS - - -
+	/// Selects the GPIO port trigger source for EXTI lines 0-{{lines}}
+	inline static void
+	setTriggerSource(uint8_t line, Gpio::Port port)
+	{
+		const uint8_t index   =  line >> 2;
+		const uint8_t bit_pos = (line & 0b0011) << 2;
+		const uint16_t syscfg_mask = 0xf << bit_pos;
+		const uint16_t syscfg_value = (uint8_t(port) & 0xf) << bit_pos;
+		{{exti_reg}}->EXTICR[index] = ({{exti_reg}}->EXTICR[index] & ~syscfg_mask) | syscfg_value;
+	}
+	template< class Pin >
+	static void setTriggerSource()
+	{
+		constexpr uint8_t index   =  Pin::pin >> 2;
+		constexpr uint8_t bit_pos = (Pin::pin & 0b0011) << 2;
+		constexpr uint16_t syscfg_mask = 0xf << bit_pos;
+		constexpr uint16_t syscfg_value = (uint8_t(Pin::port) & 0xf) << bit_pos;
+		{{exti_reg}}->EXTICR[index] = ({{exti_reg}}->EXTICR[index] & ~syscfg_mask) | syscfg_value;
+	}
+	template< class... Pins >
+	static void setTriggerSources()
+	{
+%% for line in range(lines)
+		static_assert(((Pins::pin == {{line}} ? 1 : 0) + ...) <= 1,
+		              "Only one GPIO port can trigger line {{line}}!");
+%% endfor
+		(setTriggerSource<Pins>(), ...);
+	}
+	inline static void
+	setTrigger(MaskType mask, Trigger trigger)
+	{
+		switch (trigger)
+		{
+			case Trigger::NoEdges:
+				EXTI->RTSR{{pf}} &= ~mask;
+				EXTI->FTSR{{pf}} &= ~mask;
+%% if extended
+				EXTI->RTSR2 &= ~mask >> 32;
+				EXTI->FTSR2 &= ~mask >> 32;
+%% endif
+				break;
+			case Trigger::RisingEdge:
+				EXTI->RTSR{{pf}} |=  mask;
+				EXTI->FTSR{{pf}} &= ~mask;
+%% if extended
+				EXTI->RTSR2 |=  mask >> 32;
+				EXTI->FTSR2 &= ~mask >> 32;
+%% endif
+				break;
+			case Trigger::FallingEdge:
+				EXTI->RTSR{{pf}} &= ~mask;
+				EXTI->FTSR{{pf}} |=  mask;
+%% if extended
+				EXTI->RTSR2 &= ~mask >> 32;
+				EXTI->FTSR2 |=  mask >> 32;
+%% endif
+				break;
+			case Trigger::BothEdges:
+				EXTI->RTSR{{pf}} |= mask;
+				EXTI->FTSR{{pf}} |= mask;
+%% if extended
+				EXTI->RTSR2 |= mask >> 32;
+				EXTI->FTSR2 |= mask >> 32;
+%% endif
+				break;
+		}
+	}
+	template< class... Pins >
+	static void setTriggers(Trigger trigger)
+	{ setTrigger({{pins}}, trigger); }
+
+	// - - - INTERRUPTS - - -
+	inline static void
+	enableInterrupts(MaskType mask)
+	{
+		EXTI->IMR{{pf}} |= mask;
+%% if extended
+		EXTI->IMR2 |= mask >> 32;
+%% endif
+	}
+	template< class... Pins > static void
+	enableInterrupts()
+	{ EXTI->IMR{{pf}} |= {{pins}}; }
+
+	inline static MaskType
+	getInterruptEnabled()
+	{
+		return {% if extended %}(uint64_t(EXTI->IMR2) << 32) | {% endif %}EXTI->IMR{{pf}};
+	}
+	template< class... Pins > static bool
+	areInterruptsEnabled()
+	{ return EXTI->IMR{{pf}} & {{pins}}; }
+
+	inline static void
+	disableInterrupt(MaskType mask)
+	{
+		EXTI->IMR{{pf}} &= ~mask;
+%% if extended
+		EXTI->IMR2 &= ~mask >> 32;
+%% endif
+	}
+	template< class... Pins > static void
+	disableInterrupts()
+	{ EXTI->IMR{{pf}} &= ~{{pins}}; }
+
+
+	// - - - EVENTS - - -
+	inline static void
+	enableEvent(MaskType mask)
+	{
+		EXTI->EMR{{pf}} |= mask;
+%% if extended
+		EXTI->EMR2 |= mask >> 32;
+%% endif
+	}
+	template< class... Pins > static void
+	enableEvents() { EXTI->EMR{{pf}} |= {{pins}}; }
+
+	inline static MaskType
+	getEventEnabled()
+	{
+		return {% if extended %}(uint64_t(EXTI->EMR2) << 32) | {% endif %}EXTI->EMR{{pf}};
+	}
+	template< class... Pins > static void
+	areEventsEnabled() { return EXTI->EMR{{pf}} & {{pins}}; }
+
+	inline static void
+	disableEvent(MaskType mask)
+	{
+		EXTI->EMR{{pf}} &= ~mask;
+%% if extended
+		EXTI->EMR2 &= ~mask >> 32;
+%% endif
+	}
+	template< class... Pins > static void
+	disableEvents() { EXTI->EMR{{pf}} &= ~{{pins}}; }
+
+	// - - - VECTORS - - -
+	inline static void
+	enableVector(Vector vector, uint8_t priority)
+	{
+		NVIC_SetPriority(IRQn_Type(vector), priority);
+		NVIC_EnableIRQ(IRQn_Type(vector));
+	}
+	template< class Pin > static void
+	enableVector(uint8_t priority) { enableVector(getVectorForLine(Pin::pin), priority); }
+
+	inline static void
+	enableVectors(MaskType mask, uint8_t priority)
+	{
+%% for irq, range in extimap.items() | sort
+		if (getVectorMaskForLine({{range[0]}}) & mask) enableVector(Vector::Line{{range[0]}}{% if (range | length) > 1 %}_{{range[-1]}}{% endif %}, priority);
+%% endfor
+	}
+	template< class... Pins > static void
+	enableVectors(uint8_t priority)
+	{
+		constexpr uint32_t mask = {{pins}};
+%% for irq, range in extimap.items() | sort
+		if constexpr (getVectorMaskForLine({{range[0]}}) & mask) enableVector(Vector::Line{{range[0]}}{% if (range | length) > 1 %}_{{range[-1]}}{% endif %}, priority);
+%% endfor
+	}
+
+	inline static void
+	disableVector(Vector vector)
+	{
+		NVIC_DisableIRQ(IRQn_Type(vector));
+	}
+	template< class Pin > static void
+	disableVector(uint8_t priority) { disableVector(getVectorForLine(Pin::pin)); }
+
+	inline static void
+	disableVectors(MaskType mask)
+	{
+%% for irq, range in extimap.items() | sort
+		if (getVectorMaskForLine({{range[0]}}) & mask) disableVector(Vector::Line{{range[0]}}{% if (range | length) > 1 %}_{{range[-1]}}{% endif %});
+%% endfor
+	}
+	template< class... Pins > static void
+	disableVectors()
+	{
+		constexpr uint32_t mask = {{pins}};
+%% for irq, range in extimap.items() | sort
+		if constexpr (getVectorMaskForLine({{range[0]}}) & mask) disableVector(Vector::Line{{range[0]}}{% if (range | length) > 1 %}_{{range[-1]}}{% endif %});
+%% endfor
+	}
+
+	// - - - FLAGS - - -
+%% if separate_flags
+	inline static MaskType
+	getRisingFlags()
+	{
+		return {% if extended %}(uint64_t(EXTI->RPR2) << 32) | {% endif %}EXTI->RPR1;
+	}
+	template< class... Pins > static bool
+	areRisingFlagsSet()
+	{ return EXTI->RPR1 & {{pins}}; }
+
+	inline static void
+	acknowledgeRisingFlags(MaskType mask)
+	{
+		EXTI->RPR1 = mask;
+%% if extended
+		EXTI->RPR2 = mask >> 32;
+%% endif
+	}
+	template< class... Pins > static void
+	acknowledgeRisingFlags()
+	{ EXTI->RPR1 = {{pins}}; }
+
+	inline static MaskType
+	getFallingFlags()
+	{
+		return {% if extended %}(uint64_t(EXTI->FPR2) << 32) | {% endif %}EXTI->FPR1;
+	}
+	template< class... Pins > static bool
+	areFallingFlagsSet()
+	{ return EXTI->FPR1 & {{pins}}; }
+
+	inline static void
+	acknowledgeFallingFlags(MaskType mask)
+	{
+		EXTI->FPR1 = mask;
+%% if extended
+		EXTI->FPR2 = mask >> 32;
+%% endif
+	}
+	template< class... Pins > static void
+	acknowledgeFallingFlags()
+	{ EXTI->FPR1 = {{pins}}; }
+
+	/// Returns rising or falling flags!
+	inline static MaskType
+	getFlags()
+	{ return getRisingFlags() | getFallingFlags(); }
+	template< class... Pins > static bool
+	areFlagsSet()
+	{ return areRisingFlagsSet<Pins...>() or areFallingFlagsSet<Pins...>(); }
+
+	/// Clears both rising and falling flags!
+	inline static void
+	acknowledgeFlags(MaskType mask)
+	{
+		acknowledgeRisingFlags(mask);
+		acknowledgeFallingFlags(mask);
+	}
+	template< class... Pins > static void
+	acknowledgeFlags()
+	{
+		acknowledgeRisingFlags<Pins...>();
+		acknowledgeFallingFlags<Pins...>();
+	}
+%% else
+	inline static MaskType
+	getFlags()
+	{
+%% if extended
+		return (uint64_t(EXTI->PR2) << 32) | EXTI->PR1;
+%% else
+		return EXTI->PR;
+%% endif
+	}
+	template< class... Pins >
+	static bool areFlagsSet()
+	{ return EXTI->PR{{pf}} & {{pins}}; }
+
+	inline static void
+	acknowledgeFlags(MaskType mask)
+	{
+%% if extended
+		EXTI->PR1 = mask;
+		EXTI->PR2 = mask >> 32;
+%% else
+		EXTI->PR = mask;
+%% endif
+	}
+	template< class... Pins >
+	static void acknowledgeFlags()
+	{ EXTI->PR{{pf}} = {{pins}}; }
+%% endif
+
+	inline static void
+	setFlags(MaskType mask)
+	{
+		EXTI->SWIER{{pf}} = mask;
+%% if extended
+		EXTI->SWIER2 = mask >> 32;
+%% endif
+	}
+	template< class... Pins >
+	static void setFlags()
+	{ EXTI->SWIER{{pf}} = {{pins}}; }
+
+public:
+	static constexpr Vector
+	getVectorForLine(uint8_t line)
+	{
+		switch(line)
+		{
+%% for irq, range in extimap.items() | sort
+	%% for line in range
+			case {{line}}:
+	%% endfor
+				return Vector::Line{{range[0]}}{% if (range | length) > 1 %}_{{range[-1]}}{% endif %};
+%% endfor
+		}
+		return Vector::LineUnknown;
+	}
+
+	static constexpr MaskType
+	getVectorMaskForLine(uint8_t line)
+	{
+		switch(line)
+		{
+%% for irq, range in extimap.items() | sort
+	%% for line in range
+			case {{line}}:
+	%% endfor
+	%% if (range | length) == 1
+				return 1ul << {{ range[0] }};
+	%% else
+				return ((1ul << {{range[-1]+1}}) - 1ul) & ~((1ul << {{range[0]}}) - 1ul);
+	%% endif
+%% endfor
+		}
+		return 0;
+	}
+
+%% if options.with_handlers
+protected:
+	/// @cond
+	static void irq(uint32_t mask);
+	static constexpr uint8_t Lines = {{lines}};
+	static Handler handlers[Lines];
+%% for irq in extimap | sort
+	friend void MODM_ISR_NAME(EXTI{{irq}})();
+%% endfor
+	/// @endcond
+%% endif
+};
+
+}  // namespace modm::platform

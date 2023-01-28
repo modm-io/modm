@@ -45,7 +45,7 @@ class BitBangSpiMaster : public ::modm::SpiMaster
 {
 public:
 	// start documentation inherited
-	template< template<Peripheral _> class... Signals >
+	template< class... Signals >
 	static void
 	connect();
 

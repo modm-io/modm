@@ -49,6 +49,7 @@ class Instance(Module):
         properties["channels"] = sorted(channels)
         global props
         properties["shared_irq_ids"] = props["shared_irq_ids"]
+        properties["irq"] = "1" if target.family in ["l1"] else self.instance
         props["instances"].append(self.instance)
 
         env.substitutions = properties
@@ -76,7 +77,7 @@ def prepare(module, options):
     props["instances"] = []
 
     if target["family"] in ["f2", "f4", "f7"]:
-        props["shared_irqs"] = {"ADC": listify(device.get_driver("adc")["instance"])}
+        props["shared_irqs"] = {"ADC": listify([int(i) for i in device.get_driver("adc")["instance"]])}
         props["shared_irq_ids"] = props["shared_irqs"]["ADC"]
     else:
         shared_irqs = [v["name"] for v in device.get_driver("core")["vector"]]
@@ -96,8 +97,7 @@ def prepare(module, options):
         ":cmsis:device",
         ":platform:gpio",
         ":platform:rcc",
-        ":math:algorithm",
-        ":utils")
+        ":math:algorithm")
 
     for instance in listify(device.get_driver("adc").get("instance", [])):
         module.add_submodule(Instance(int(instance)))

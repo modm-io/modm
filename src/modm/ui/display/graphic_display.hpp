@@ -25,35 +25,23 @@
 #include <modm/math/geometry.hpp>
 
 #include <modm/ui/color.hpp>
+
+#include "orientation.hpp"
 #include "font.hpp"
 
 namespace modm
 {
 
-/// @ingroup	modm_ui_display
 namespace glcd
 {
 
 /// @ingroup modm_ui_display
 using Point = Vector<int16_t, 2>;
 
-enum Orientation : uint8_t
-{
-	Landscape0,
-	Portrait90,
-	Landscape180,
-	Portrait270,
-};
-
 }  // namespace glcd
 
 /**
  * Base class for graphical displays.
- *
- * \ingroup	modm_ui_display
- */
-
-/*
  *
  * Text mode:
  * - left adjusted (default)
@@ -62,6 +50,8 @@ enum Orientation : uint8_t
  *
  * All modes relative to the current viewport. This would make
  * drawing a menu system easier.
+ *
+ * \ingroup	modm_ui_display
  */
 class GraphicDisplay : public IOStream
 {

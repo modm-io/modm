@@ -49,7 +49,7 @@ Rcc::computeFlashLatency(uint32_t Core_Hz, uint16_t Core_mV)
 	return {latency, max_freq};
 }
 
-template< uint32_t Core_Hz, uint16_t Core_mV = 3300 >
+template< uint32_t Core_Hz, uint16_t Core_mV>
 uint32_t
 Rcc::setFlashLatency()
 {
@@ -77,7 +77,7 @@ Rcc::setFlashLatency()
 %% elif target["family"] == "l0"
 	// enable flash prefetch and pre-read
 	acr |= FLASH_ACR_PRFTEN | FLASH_ACR_PRE_READ;
-%% elif target["family"] != "h7"
+%% elif target["family"] not in ["h7", "l5"]
 	// enable flash prefetch
 	acr |= FLASH_ACR_PRFTBE;
 %% endif
@@ -141,11 +141,12 @@ Rcc::disable()
 
 	__DSB();
 	%% for peripheral, (st_per, bus) in rcc_enable.items() | sort
-	if constexpr (peripheral == Peripheral::{{ peripheral }})
+	if constexpr (peripheral == Peripheral::{{ peripheral }}) {
 		RCC->{{bus}} &= ~RCC_{{bus}}_{{st_per}}EN;{% if peripheral == "Eth" %} __DSB();
 		RCC->{{bus}} &= ~RCC_{{bus}}_{{st_per}}RXEN; __DSB();
 		RCC->{{bus}} &= ~RCC_{{bus}}_{{st_per}}TXEN;{% elif peripheral == "Usbotghs" %} __DSB();
 		RCC->{{bus}} &= ~RCC_{{bus}}_{{st_per}}ULPIEN;{% endif %}
+	}
 	%% endfor
 	__DSB();
 }

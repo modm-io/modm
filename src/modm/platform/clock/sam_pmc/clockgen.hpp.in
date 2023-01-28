@@ -1,0 +1,346 @@
+/**
+ * Copyright (c) 2021, Jeff McBride
+ * Copyright (c) 2021, Tomasz Wasilczyk
+ * Copyright (c) 2023, Christopher Durand
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <cstdint>
+#include <chrono>
+#include "../device.hpp"
+#include <modm/architecture/interface/delay.hpp>
+
+extern "C" uint32_t SystemCoreClock;
+
+namespace modm::platform
+{
+/// @ingroup		modm_platform_clockgen
+/// @{
+
+enum class
+MainClockSource
+{
+	Internal,
+	External,
+};
+
+enum class
+MasterClkSource : uint32_t
+{
+	SLOW_CLK = PMC_MCKR_CSS_SLOW_CLK_Val,
+	MAIN_CLK = PMC_MCKR_CSS_MAIN_CLK_Val,
+	PLLA_CLK = PMC_MCKR_CSS_PLLA_CLK_Val,
+%% if target.family == "g5x"
+	PLLB_CLK = PMC_MCKR_CSS_PLLB_CLK_Val,
+%% elif target.family == "e7x/s7x/v7x"
+	UPLL_CLK = PMC_MCKR_CSS_UPLL_CLK_Val,
+%% endif
+};
+
+enum class
+MasterClkPrescaler : uint32_t
+{
+	CLK_1 = 0,
+	CLK_2,
+	CLK_4,
+	CLK_8,
+	CLK_16,
+	CLK_32,
+	CLK_64,
+	CLK_3
+};
+
+enum class
+MasterClkDivider : uint8_t
+{
+	Div1 = 0,
+%% if target.family == "e7x/s7x/v7x"
+	Div2 = PMC_MCKR_MDIV_PCK_DIV2_Val,
+	Div4 = PMC_MCKR_MDIV_PCK_DIV4_Val,
+	Div3 = PMC_MCKR_MDIV_PCK_DIV3_Val,
+%% endif
+};
+
+enum class
+MainInternalFreq : uint32_t
+{
+#ifdef CKGR_MOR_MOSCRCF_4_MHz_Val
+	Rc4Mhz = CKGR_MOR_MOSCRCF_4_MHz_Val,
+#endif
+#ifdef CKGR_MOR_MOSCRCF_8_MHz_Val
+	Rc8Mhz = CKGR_MOR_MOSCRCF_8_MHz_Val,
+#endif
+#ifdef CKGR_MOR_MOSCRCF_12_MHz_Val
+	Rc12Mhz = CKGR_MOR_MOSCRCF_12_MHz_Val,
+#endif
+#ifdef CKGR_MOR_MOSCRCF_16_MHz_Val
+	Rc16Mhz = CKGR_MOR_MOSCRCF_16_MHz_Val,
+#endif
+#ifdef CKGR_MOR_MOSCRCF_24_MHz_Val
+	Rc24Mhz = CKGR_MOR_MOSCRCF_24_MHz_Val,
+#endif
+};
+
+enum class
+ClockPeripheral : uint32_t
+{
+	PioA = ID_PIOA,
+	PioB = ID_PIOB,
+#ifdef ID_PIOC
+	PioC = ID_PIOC,
+#endif
+#ifdef ID_PIOD
+	PioD = ID_PIOD,
+#endif
+#ifdef ID_PIOE
+	PioE = ID_PIOE,
+#endif
+#ifdef ID_I2SC0
+	I2sc0 = ID_I2SC0,
+#endif
+#ifdef ID_I2SC1
+	I2sc1 = ID_I2SC1,
+#endif
+	Tc0 = ID_TC0_CHANNEL0,
+	Tc1 = ID_TC0_CHANNEL1,
+	Tc2 = ID_TC0_CHANNEL2,
+	Tc3 = ID_TC1_CHANNEL0,
+	Tc4 = ID_TC1_CHANNEL1,
+	Tc5 = ID_TC1_CHANNEL2,
+#ifdef ID_TC2_CHANNEL0
+	Tc6 = ID_TC2_CHANNEL0,
+	Tc7 = ID_TC2_CHANNEL1,
+	Tc8 = ID_TC2_CHANNEL2,
+#endif
+#ifdef ID_TC3_CHANNEL0
+	Tc9 = ID_TC3_CHANNEL0,
+	Tc10 = ID_TC3_CHANNEL1,
+	Tc11 = ID_TC3_CHANNEL2,
+#endif
+%% if target.family == "g5x"
+	Pdmic0 = ID_PDMIC0,
+	Pdmic1 = ID_PDMIC1,
+	Mem2Mem = ID_MEM2MEM,
+	Adc = ID_ADC,
+	Uhp = ID_UHP,
+	Udp = ID_UDP,
+	Crccu = ID_CRCCU,
+	Flexcom0 = ID_FLEXCOM0,
+	Flexcom1 = ID_FLEXCOM1,
+	Flexcom2 = ID_FLEXCOM2,
+	Flexcom3 = ID_FLEXCOM3,
+	Flexcom4 = ID_FLEXCOM4,
+	Flexcom5 = ID_FLEXCOM5,
+	Flexcom6 = ID_FLEXCOM6,
+	Flexcom7 = ID_FLEXCOM7,
+%% elif target.family == "e7x/s7x/v7x"
+	Xdmac = ID_XDMAC,
+#ifdef ID_UART0
+	Uart0 = ID_UART0,
+#endif
+#ifdef ID_UART1
+	Uart1 = ID_UART1,
+#endif
+#ifdef ID_UART2
+	Uart2 = ID_UART2,
+#endif
+#ifdef ID_UART3
+	Uart3 = ID_UART3,
+#endif
+#ifdef ID_UART4
+	Uart4 = ID_UART4,
+#endif
+#ifdef ID_USART0
+	Usart0 = ID_USART0,
+#endif
+#ifdef ID_USART1
+	Usart1 = ID_USART1,
+#endif
+#ifdef ID_USART2
+	Usart2 = ID_USART2,
+#endif
+#ifdef ID_TWIHS0
+	I2c0 = ID_TWIHS0,
+#endif
+#ifdef ID_TWIHS1
+	I2c1 = ID_TWIHS1,
+#endif
+#ifdef ID_TWIHS2
+	I2c2 = ID_TWIHS2,
+#endif
+#ifdef ID_SPI0
+	Spi0 = ID_SPI0,
+#endif
+#ifdef ID_SPI1
+	Spi1 = ID_SPI1,
+#endif
+	Qspi = ID_QSPI,
+#ifdef ID_MCAN0
+	Can0 = ID_MCAN0,
+#endif
+#ifdef ID_MCAN1
+	Can1 = ID_MCAN1,
+#endif
+#ifdef ID_SMC
+	Smc = ID_SMC,
+#endif
+#ifdef ID_SDRAMC
+	Sdramc = ID_SDRAMC,
+#endif
+#ifdef ID_HSMCI
+	Hsmci = ID_HSMCI,
+#endif
+	Ssc = ID_SSC,
+	Afec0 = ID_AFEC0,
+	Afec1 = ID_AFEC1,
+#ifdef ID_DACC
+	Dacc = ID_DACC,
+#endif
+	Pwm0 = ID_PWM0,
+	Pwm1 = ID_PWM1,
+	Icm = ID_ICM,
+	Acc = ID_ACC,
+	Usb = ID_USBHS,
+#ifdef ID_MLB
+	Mlb = ID_MLB,
+#endif
+	Aes = ID_AES,
+	Trng = ID_TRNG,
+	Isi = ID_ISI,
+%% endif
+};
+
+%% if target.family == "e7x/s7x/v7x"
+enum class
+UtmiRefClk : uint32_t
+{
+	Xtal12 = UTMI_CKTRIM_FREQ_XTAL12_Val,
+	Xtal16 = UTMI_CKTRIM_FREQ_XTAL16_Val,
+};
+%% endif
+
+static constexpr uint32_t SlowClkFreqHz = 32'768;
+/// @}
+
+/**
+ * Clock Generator Controller for SAMG5x devices
+ *
+ * This class provides control of the clock generation for the CPU and
+ * peripherals.
+ *
+ * There are two source clocks: a "slow" 32kHz clock which can be sourced from
+ * an external oscillator/crystal or internal RC oscillator, and a "main" clock which
+ * can be sourced from the 8/16/24MHz selectable internal RC oscillator, or from
+ * an external oscillator/crystal.
+ *
+ * In addition, there are two PLLs (PLLA, and PLLB), which run off of the slow
+ * clock. PLLB is used to provide a 48MHz USB clock (external slow crystal is
+ * required for USB), and PLLA can (optionally) be used to provide a faster
+ * clock for the CPU and peripherals.
+ *
+ * This class does not allow full control of all possible clock configurations.
+ *
+ * @author		Jeff McBride
+ * @ingroup		modm_platform_clockgen
+ */
+class ClockGen
+{
+public:
+	static constexpr uint32_t BootFrequency = 8'000'000;
+
+	/**
+	 * Select external source for slow clock
+	 *
+	 * \param	crystal_bypass
+	 *      Set true to enable use of external oscillator input on XIN, instead
+	 *      of crystal.
+	 */
+	static void
+	enableExternal32Khz(bool crystal_bypass = false);
+
+	inline static void
+	enableMainInternal(MainInternalFreq freq);
+
+%% if target.family == "e7x/s7x/v7x"
+	template<uint32_t frequency>
+	static bool
+	enableMainExternalCrystal(std::chrono::microseconds startupTime);
+
+	inline static void
+	enableMainExternalClock();
+%% endif
+
+	inline static void
+	selectMainClockSource(MainClockSource src);
+
+	template<uint32_t multiplier, uint32_t divider = 1>
+	static void
+	enablePllA(uint32_t wait_cycles = 50);
+
+%% if target.family == "g5x"
+	template<uint32_t multiplier>
+	static void
+	enablePllB(uint32_t wait_cycles = 50);
+%% endif
+
+%% if target.family == "e7x/s7x/v7x"
+	template<UtmiRefClk refclk>
+	static void
+	enableUPll(uint32_t wait_cycles = 50);
+%% endif
+
+	template <MasterClkSource src, MasterClkPrescaler pres,
+		MasterClkDivider divider = MasterClkDivider::Div1>
+	static void
+	selectMasterClk();
+
+	template< uint32_t Core_Hz >
+	inline static void
+	setFlashLatency();
+
+	template< uint32_t Core_Hz >
+	inline static void
+	updateCoreFrequency();
+
+	/** Returns the configured frequency of the main clock */
+	static uint32_t
+	mainClkFrequency();
+
+	/** Returns the configured frequency of the master clock */
+	static uint32_t
+	masterClkFrequency();
+
+	/** Returns the configured frequency of PLL A output */
+	static uint32_t
+	pllAFrequency();
+
+%% if target.family == "g5x"
+	/** Returns the configured frequency of PLL B output */
+	static uint32_t
+	pllBFrequency();
+%% endif
+
+	template< ClockPeripheral peripheral >
+	static void
+	enable();
+
+	template< ClockPeripheral peripheral >
+	static bool
+	isEnabled();
+
+	template< ClockPeripheral peripheral >
+	static void
+	disable();
+};
+
+} // namespace modm::platform
+
+#include "clockgen_impl.hpp"

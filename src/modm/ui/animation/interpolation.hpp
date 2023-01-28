@@ -260,28 +260,28 @@ public:
 	 * @param	end		the end of the ramp
 	 * @param	steps	the number of steps for the ramp.
 	 */
-	void modm_always_inline
+	void
 	initialize(T begin, T end, StepType steps)
 	{
 		computations.initialize(begin, end, steps);
 	}
 
 	/// update the intermediate value for one step
-	void modm_always_inline
+	void
 	step()
 	{
 		computations.step();
 	}
 
 	/// @return the intermediate value.
-	T modm_always_inline
+	T
 	getValue()
 	{
 		return computations.get();
 	}
 
 	/// stops the interpolation.
-	void modm_always_inline
+	void
 	stop()
 	{
 		computations.deltaValue = 0;

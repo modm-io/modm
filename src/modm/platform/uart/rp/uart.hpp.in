@@ -1,0 +1,186 @@
+/*
+ * Copyright (c) 2022, Andrey Kunitsyn
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <modm/architecture/interface/uart.hpp>
+#include <modm/platform/core/peripherals.hpp>
+#include <modm/platform/gpio/connector.hpp>
+#include <modm/math/algorithm/prescaler.hpp>
+
+#include <hardware/structs/uart.h>
+
+namespace modm::platform
+{
+
+
+/**
+ * Universal asynchronous receiver transmitter (UART)
+ *
+ * This implementation uses the hardware buffer and the software buffer.
+ * A software buffer is only used if more than {{ fifo_size }} bytes of buffering
+ * is requested.
+ *
+ *
+ * There is no FIFO-not-full flag. It's only possible to check if the
+ * FIFO is completely empty. This makes it impossible to add data
+ * to the FIFO after the first byte is put into the FIFO.
+ *
+ * After detecting that the FIFO is empty (THRE interrupt) the
+ * charsLeft variable is set to {{ fifo_size }} (= size of FIFO) and some accounting
+ * is done in this class.
+ *
+ * @ingroup	modm_platform_uart
+ * @author		Andrey Kunitsyn
+ */
+class Uart{{ id }} : public modm::Uart
+{
+	static void
+	initialize(uint32_t baudrate);
+
+public:
+	// Expose jinja template parameters to be checked by e.g. drivers or application
+	static constexpr size_t RxBufferSize = {{ options["buffer.rx"] }};
+	static constexpr size_t TxBufferSize = {{ options["buffer.tx"] }};
+
+public:
+	enum class
+	Parity : uint32_t
+	{
+		Even		= UART_UARTLCR_H_PEN_BITS | UART_UARTLCR_H_EPS_BITS,
+		Odd			= UART_UARTLCR_H_PEN_BITS,
+		Disabled	= 0,
+	};
+
+	enum class
+	WordLength : uint32_t
+	{
+		Bit5 = 0 << UART_UARTLCR_H_WLEN_LSB,
+		Bit6 = 1 << UART_UARTLCR_H_WLEN_LSB,
+		Bit7 = 2 << UART_UARTLCR_H_WLEN_LSB,
+		Bit8 = 3 << UART_UARTLCR_H_WLEN_LSB,
+	};
+
+	enum class
+	StopBits : uint32_t
+	{
+		Bit1 = 0,
+		Bit2 = UART_UARTLCR_H_STP2_BITS,
+	};
+
+	template< class... Signals >
+	static void
+	connect()
+	{
+		using Connector = GpioConnector<Peripheral::Uart{{ id }}, Signals...>;
+		using Tx = typename Connector::template GetSignal< Gpio::Signal::Tx >;
+		using Rx = typename Connector::template GetSignal< Gpio::Signal::Rx >;
+		static_assert(((Connector::template IsValid<Tx> and Connector::template IsValid<Rx>) and sizeof...(Signals) == 2) or
+					  ((Connector::template IsValid<Tx> or  Connector::template IsValid<Rx>) and sizeof...(Signals) == 1),
+					  "Uart{{ id }}::connect() requires one Tx and/or one Rx signal!");
+
+		Connector::connect();
+	}
+
+	static void reset();
+	static void unreset();
+
+	static void
+	setFormat(Parity parity, WordLength length, StopBits stop)
+	{
+		hw_write_masked(&uart{{ id }}_hw->lcr_h,
+				uint32_t(parity) | uint32_t(length) | uint32_t(stop),
+				UART_UARTLCR_H_WLEN_BITS | UART_UARTLCR_H_STP2_BITS |
+				UART_UARTLCR_H_PEN_BITS | UART_UARTLCR_H_EPS_BITS);
+	}
+
+	template< class SystemClock, baudrate_t baudrate, percent_t tolerance=pct(1) >
+	static baudrate_t
+	setBaudrate()
+	{
+		static_assert(baudrate * 16 <= SystemClock::PeriFrequency and
+					  SystemClock::PeriFrequency <= baudrate * 16 * 65535ull,
+				"SystemClock::PeriFrequency must be in the range [16 x baudrate, 16 x 65535 x baudrate].");
+		// 16.6 fractional baudrate generator with 16x oversampling
+		constexpr uint32_t min = (1ul << 7);
+		constexpr uint32_t max = (1ul << 22) - 1ul;
+		constexpr auto result = Prescaler::from_range(SystemClock::PeriFrequency*4, baudrate, min, max);
+		modm::PeripheralDriver::assertBaudrateInTolerance< result.frequency, baudrate, tolerance >();
+		// Load PL011's baud divisor registers
+		uart{{ id }}_hw->ibrd = result.prescaler >> 6;
+		uart{{ id }}_hw->fbrd = result.prescaler & 0x3f;
+		// PL011 needs a (dummy) line control register write to latch in the
+		// divisors. We don't want to actually change LCR contents here.
+		hw_set_bits(&uart{{ id }}_hw->lcr_h, 0);
+
+		return result.frequency;
+	}
+
+	template< class SystemClock, baudrate_t baudrate, percent_t tolerance=pct(1) >
+	static void
+	initialize(Parity parity=Parity::Disabled, WordLength length=WordLength::Bit8, StopBits stop=StopBits::Bit1)
+	{
+		reset();
+		unreset();
+		setBaudrate<SystemClock, baudrate, tolerance>();
+		setFormat(parity, length, stop);
+		// Enable the UART, both TX and RX
+		uart{{ id }}_hw->cr = UART_UARTCR_UARTEN_BITS | UART_UARTCR_TXE_BITS | UART_UARTCR_RXE_BITS;
+		// Enable FIFOs
+		hw_set_bits(&uart{{ id }}_hw->lcr_h, UART_UARTLCR_H_FEN_BITS);
+		// Always enable DREQ signals -- no harm in this if DMA is not listening
+		uart{{ id }}_hw->dmacr = UART_UARTDMACR_TXDMAE_BITS | UART_UARTDMACR_RXDMAE_BITS;
+
+%% if options["buffer.rx"] > fifo_size
+		/* If RX buffering with more than {{ fifo_size }} bytes is requested a software queue
+		 * must be used for receiving. This involves the Rx Interrupt only. */
+		uart{{ id }}_hw->imsc = UART_UARTIMSC_RXIM_BITS;
+%% endif
+
+%% if options["buffer.tx"] > fifo_size or options["buffer.rx"] > fifo_size
+		/* Enable the UART Interrupt */
+		NVIC_EnableIRQ(UART{{ id }}_IRQ_IRQn);
+%% endif
+	}
+
+	static void
+	writeBlocking(uint8_t data);
+
+	static void
+	writeBlocking(const uint8_t *data, std::size_t length);
+
+	static void
+	flushWriteBuffer();
+
+	static bool
+	write(uint8_t data);
+
+	static std::size_t
+	write(const uint8_t *data, std::size_t length);
+
+	static bool
+	isWriteFinished();
+
+	static std::size_t
+	discardTransmitBuffer();
+
+	static bool
+	read(uint8_t &data);
+
+	static std::size_t
+	read(uint8_t *buffer, std::size_t length);
+
+	static std::size_t
+	discardReceiveBuffer();
+};
+
+}	// namespace modm::platform
+

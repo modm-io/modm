@@ -89,34 +89,6 @@ TimeoutTest::testZeroConstructor()
 }
 
 void
-TimeoutTest::testNegativeConstructor()
-{
-	modm::ShortTimeout timeoutShort{-1ms};
-	modm::Timeout timeout{-10ms};
-
-	TEST_ASSERT_EQUALS(timeoutShort.remaining(), 0ms);
-	TEST_ASSERT_EQUALS(timeout.remaining(), 0ms);
-
-	TEST_ASSERT_TRUE(timeoutShort.isStopped());
-	TEST_ASSERT_TRUE(timeout.isStopped());
-
-	TEST_ASSERT_FALSE(timeoutShort.isArmed());
-	TEST_ASSERT_FALSE(timeout.isArmed());
-
-	TEST_ASSERT_FALSE(timeoutShort.isExpired());
-	TEST_ASSERT_FALSE(timeout.isExpired());
-
-	TEST_ASSERT_FALSE(timeoutShort.execute());
-	TEST_ASSERT_FALSE(timeout.execute());
-
-	TEST_ASSERT_FALSE(timeoutShort.isExpired());
-	TEST_ASSERT_FALSE(timeout.isExpired());
-
-	TEST_ASSERT_EQUALS(timeoutShort.remaining(), 0ms);
-	TEST_ASSERT_EQUALS(timeout.remaining(), 0ms);
-}
-
-void
 TimeoutTest::testBasics()
 {
 	modm::ShortTimeout timeoutShort(10ms);
@@ -231,11 +203,6 @@ TimeoutTest::testTimeOverflow()
 	timeoutShort.restart(time-1ms);
 	TEST_ASSERT_EQUALS(timeoutShort.remaining(), 65534ms);
 	TEST_ASSERT_FALSE(timeoutShort.execute());
-
-	test_clock::setTime(65534);
-	timeoutShort.restart(time+1ms);
-	TEST_ASSERT_EQUALS(timeoutShort.remaining(), 0ms);
-	TEST_ASSERT_TRUE(timeoutShort.execute());
 
 	test_clock::setTime(-1000);
 	timeoutShort.restart(500ms);

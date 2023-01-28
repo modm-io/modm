@@ -20,20 +20,15 @@
 #include <functional>
 
 #ifndef MODM_AMNB_HANDLER_STORAGE
-#define MODM_AMNB_HANDLER_STORAGE sizeof(void*)
-#endif
-
-#ifdef __DOXYGEN__
-///
 /// @ingroup modm_communication_amnb
 #define MODM_AMNB_HANDLER_STORAGE sizeof(void*)
 #endif
-
 
 namespace modm::amnb
 {
-
 /// @ingroup modm_communication_amnb
+/// @{
+
 enum class Error : uint8_t
 {
 	Ok = 0,
@@ -47,7 +42,6 @@ enum class Error : uint8_t
 	Unknown = 7,
 };
 
-/// @ingroup modm_communication_amnb
 struct Listener
 {
 	template <typename L, typename F = get_callable_signature_t<std::remove_cvref_t<L>>>
@@ -93,7 +87,6 @@ protected:
 	template< size_t, size_t > friend class Node;
 };
 
-/// @ingroup modm_communication_amnb
 struct Response
 {
 	inline
@@ -114,7 +107,6 @@ struct Response
 	Message msg;
 };
 
-/// @ingroup modm_communication_amnb
 template< typename T >
 inline Response
 ErrorResponse(T error)
@@ -124,7 +116,6 @@ ErrorResponse(T error)
 	return res;
 }
 
-/// @ingroup modm_communication_amnb
 struct Action
 {
 	template <typename A, typename F = get_callable_signature_t<std::remove_cvref_t<A>>>
@@ -220,7 +211,6 @@ protected:
 	template< size_t, size_t > friend class Node;
 };
 
-/// @ingroup modm_communication_amnb
 template< class ReturnType = void, class ErrorType = void >
 struct Result
 {
@@ -377,6 +367,7 @@ protected:
 	template< size_t, size_t > friend class Node;
 };
 /// @endcond
+/// @}
 
 }
 
@@ -386,6 +377,7 @@ protected:
 namespace modm
 {
 
+/// @ingroup modm_communication_amnb
 inline modm::IOStream&
 operator << (modm::IOStream& s, const modm::amnb::Error error)
 {

@@ -37,6 +37,12 @@ main()
 	uint32_t ms_counter{0};
 	uint32_t us_counter{0};
 
+	Exti::connect<Board::Button>(Exti::Trigger::FallingEdge, [count = uint32_t(0)](uint8_t line) mutable
+	{
+		count++;
+		MODM_LOG_INFO << "Button called " << count << " times on line " << line << modm::endl;
+	});
+
 	while (true)
 	{
 		{

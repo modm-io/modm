@@ -22,10 +22,11 @@
 
 using namespace modm::platform;
 
-/// @ingroup modm_board_nucleo_f746zg
 namespace Board
 {
-	using namespace modm::literals;
+/// @ingroup modm_board_nucleo_f746zg
+/// @{
+using namespace modm::literals;
 
 /// STM32F7 running at 216MHz from the external 8MHz clock
 struct SystemClock
@@ -117,16 +118,21 @@ using LedGreen = GpioOutputB0;	// LED1 [Green]
 using LedBlue = GpioOutputB7;	// LED2 [Blue]
 using LedRed = GpioOutputB14;	// LED3 [Red]
 using Leds = SoftwareGpioPort< LedRed, LedBlue, LedGreen >;
+/// @}
 
 namespace stlink
 {
+/// @ingroup modm_board_nucleo_f746zg
+/// @{
 using Tx = GpioOutputD8;
 using Rx = GpioInputD9;
 using Uart = Usart3;
+/// @}
 }
 
+/// @ingroup modm_board_nucleo_f746zg
+/// @{
 using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
-
 
 inline void
 initialize()
@@ -142,10 +148,8 @@ initialize()
     LedRed::setOutput(modm::Gpio::Low);
 
     Button::setInput();
-    Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);
-    Button::enableExternalInterrupt();
-//  Button::enableExternalInterruptVector(12);
 }
+/// @}
 
 }
 

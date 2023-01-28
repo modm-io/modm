@@ -69,8 +69,8 @@ public:
 	enum class
 	MasterSelection : uint32_t
 	{
-		Slave 	= 0,			///< Configure SPI as Slave
-		Master 	= SPI_CR1_MSTR,	///< Configure SPI as Master
+		Slave 	= 0,
+		Master 	= SPI_CR1_MSTR,
 		All 	= Master,
 	};
 
@@ -79,9 +79,9 @@ public:
 	{
 		Mode0 = 0b00,			///< clock normal,   sample on rising  edge
 		Mode1 = SPI_CR1_CPHA,	///< clock normal,   sample on falling edge
-		Mode2 = SPI_CR1_CPOL,	///< clock inverted, sample on falling  edge
+		Mode2 = SPI_CR1_CPOL,	///< clock inverted, sample on falling edge
+								///  clock inverted, sample on rising  edge
 		Mode3 = SPI_CR1_CPOL | SPI_CR1_CPHA,
-		///< clock inverted, sample on rising edge
 		All = Mode3
 	};
 
@@ -97,19 +97,19 @@ public:
 	DataSize : uint32_t
 	{
 %% if "data-size" in features
-		Bit4  = SPI_CR2_DS_1 | SPI_CR2_DS_0,				///< 0b0011
-		Bit5  = SPI_CR2_DS_2,								///< 0b0100
-		Bit6  = SPI_CR2_DS_2 | SPI_CR2_DS_0,				///< 0b0101
-		Bit7  = SPI_CR2_DS_2 | SPI_CR2_DS_1,				///< 0b0110
-		Bit8  = SPI_CR2_DS_2 | SPI_CR2_DS_1 | SPI_CR2_DS_0,	///< 0b0111
-		Bit9  = SPI_CR2_DS_3,								///< 0b1000
-		Bit10 = SPI_CR2_DS_3 | SPI_CR2_DS_0,				///< 0b1001
-		Bit11 = SPI_CR2_DS_3 | SPI_CR2_DS_1,				///< 0b1010
-		Bit12 = SPI_CR2_DS_3 | SPI_CR2_DS_1 | SPI_CR2_DS_0,	///< 0b1011
-		Bit13 = SPI_CR2_DS_3 | SPI_CR2_DS_2,				///< 0b1100
-		Bit14 = SPI_CR2_DS_3 | SPI_CR2_DS_2 | SPI_CR2_DS_0,	///< 0b1101
-		Bit15 = SPI_CR2_DS_3 | SPI_CR2_DS_2 | SPI_CR2_DS_1,	///< 0b1110
-		Bit16 = SPI_CR2_DS_3 | SPI_CR2_DS_2 | SPI_CR2_DS_1 | SPI_CR2_DS_0,///< 0b1111
+		Bit4  = SPI_CR2_DS_1 | SPI_CR2_DS_0,
+		Bit5  = SPI_CR2_DS_2,
+		Bit6  = SPI_CR2_DS_2 | SPI_CR2_DS_0,
+		Bit7  = SPI_CR2_DS_2 | SPI_CR2_DS_1,
+		Bit8  = SPI_CR2_DS_2 | SPI_CR2_DS_1 | SPI_CR2_DS_0,
+		Bit9  = SPI_CR2_DS_3,
+		Bit10 = SPI_CR2_DS_3 | SPI_CR2_DS_0,
+		Bit11 = SPI_CR2_DS_3 | SPI_CR2_DS_1,
+		Bit12 = SPI_CR2_DS_3 | SPI_CR2_DS_1 | SPI_CR2_DS_0,
+		Bit13 = SPI_CR2_DS_3 | SPI_CR2_DS_2,
+		Bit14 = SPI_CR2_DS_3 | SPI_CR2_DS_2 | SPI_CR2_DS_0,
+		Bit15 = SPI_CR2_DS_3 | SPI_CR2_DS_2 | SPI_CR2_DS_1,
+		Bit16 = SPI_CR2_DS_3 | SPI_CR2_DS_2 | SPI_CR2_DS_1 | SPI_CR2_DS_0,
 		All   = Bit16,
 %% else
 		Bit8  = 0,

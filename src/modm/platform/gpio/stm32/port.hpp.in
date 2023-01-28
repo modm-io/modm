@@ -9,41 +9,25 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_STM32_GPIO_PORT_HPP
-#define MODM_STM32_GPIO_PORT_HPP
+#pragma once
 
-#include "base.hpp"
+#include "port_shim.hpp"
 #include "set.hpp"
 #include <type_traits>
 #include <modm/math/utils/bit_operation.hpp>
 
-namespace modm
+namespace modm::platform
 {
-
-namespace platform
-{
-
-/// @cond
-template< Gpio::Port port >
-struct GpioPortInfo;
-template< class StartGpio, int8_t Width >
-struct GpioSetShim
-{
-	static typename GpioPortInfo<StartGpio::port>::template check<StartGpio::pin, Width> check;
-};
-/// @endcond
 
 /// @ingroup modm_platform_gpio
 template< class StartGpio, int8_t Width >
-class GpioPort : public ::modm::GpioPort/** @cond */, public GpioSetShim<StartGpio, Width> /** @endcond */
+class GpioPort : public ::modm::GpioPort/** @cond */, public detail::GpioSetShim<StartGpio, Width> /** @endcond */
 {
-	using PinSet = GpioSetShim<StartGpio, Width>;
+	using PinSet = detail::GpioSetShim<StartGpio, Width>;
 public:
 	using PinSet::width;
 	static_assert(width <= 16, "Only a maximum of 16 pins are supported by GpioPort!");
-	using PortType = std::conditional_t< (width > 8),
-										 uint16_t,
-										 uint8_t >;
+	using PortType = std::conditional_t< (width > 8), uint16_t, uint8_t >;
 	static constexpr DataOrder getDataOrder()
 	{ return Width > 0 ? GpioPort::DataOrder::Normal : GpioPort::DataOrder::Reversed; }
 
@@ -83,68 +67,12 @@ public:
 			 p = bitReverse(uint16_t(uint16_t(data) << StartPinReversed));
 		else p =            uint16_t(data) << StartPin;
 %% for port, id in ports.items()
-		if constexpr (mask({{id}})) { p ^= inverted({{id}});
+		if constexpr (mask({{id}})) {
+			p ^= inverted({{id}});
 			GPIO{{port}}->BSRR = ((~p & mask({{id}})) << 16) | (p & mask({{id}}));
 		}
 %% endfor
 	}
 };
 
-/// @cond
-// ------ Port Width Information ------
-%% for port in ranges
-template<>
-struct GpioPortInfo<Gpio::Port::{{port["name"]}}>
-{
-	static constexpr int8_t Width = {{port["width"]}};
-	static constexpr int8_t StartPin = {{port["start"]}};
-	static constexpr int8_t EndPin = StartPin + Width;
-
-	template< uint8_t QueryStartPin, int8_t QueryWidth >
-	struct check
-	{
-		static constexpr bool isNormal = QueryWidth > 0;
-		static constexpr bool isReversed = QueryWidth < 0;
-		static constexpr int8_t width = isNormal ? QueryWidth : -QueryWidth;
-		static_assert(isReversed or width <= Width,
-			"GpioPort Width out of bounds! Maximum is {{port["width"]}}.");
-
-		static_assert(isReversed or (QueryStartPin + QueryWidth <= EndPin),
-			"GpioPort StartPin + Width out of bounds! Maximum is {{port["start"] + port["width"] - 1}}.");
-		static_assert(isNormal or (StartPin <= QueryStartPin + QueryWidth + 1),
-			"GpioPort StartPin - Width out of bounds! Minimum is {{port["start"]}}.");
-	};
-};
-%% endfor
-
-// ------ Translator classes from Gpio + Width -> GpioSet ------
-template< class StartGpio, int8_t offset >
-struct GpioShim
-{
-	static constexpr typename StartGpio::Port port = StartGpio::port;
-	static constexpr uint16_t mask = (1ul << (StartGpio::pin + offset));
-	static constexpr bool isInverted = StartGpio::isInverted;
-};
-%% for width in range(-16, 0)
-template< class StartGpio >
-struct GpioSetShim<StartGpio, {{width}}> : public GpioSet<
-	%% for offset in (range(width + 1, 1) | reverse)
-		GpioShim<StartGpio, {{offset}}>{% if not loop.last %},{% endif %}
-	%% endfor
-		> { static typename GpioPortInfo<StartGpio::port>::template check<StartGpio::pin, {{width}}> check; };
-%% endfor
-%% for width in range(0, 17)
-template< class StartGpio >
-struct GpioSetShim<StartGpio, {{width}}> : public GpioSet<
-	%% for offset in (range(width) | reverse)
-		GpioShim<StartGpio, {{offset}}>{% if not loop.last %},{% endif %}
-	%% endfor
-		> { static typename GpioPortInfo<StartGpio::port>::template check<StartGpio::pin, {{width}}> check; };
-%% endfor
-/// @endcond
-
-} // namespace platform
-
-} // namespace modm
-
-#endif // MODM_STM32_GPIO_PORT_HPP
+} // namespace modm::platform

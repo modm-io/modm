@@ -12,14 +12,6 @@
  */
 // ----------------------------------------------------------------------------
 
-namespace modm
-{
-	/// @ingroup modm_math_filter
-	namespace filter
-	{
-	}
-}
-
 #include "filter/debounce.hpp"
 #include "filter/fir.hpp"
 #include "filter/median.hpp"
