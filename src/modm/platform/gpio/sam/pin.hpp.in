@@ -110,6 +110,25 @@ struct OneOfSignals
 	static constexpr bool value = ((std::is_same_v<typename Signal::signal, Signals>) | ...);
 };
 
+// Detect if a pin is inverted
+// Used to support both pins config and gpio classes being passed to GpioSet.
+// Pin config classes don't define isInverted and are treated as non-inverted.
+template<typename T>
+struct is_inverted
+{
+    static constexpr bool value = false;
+};
+
+template<typename T>
+    requires (T::isInverted == true)
+struct is_inverted<T>
+{
+    static constexpr bool value = true;
+};
+
+template<typename T>
+constexpr bool is_inverted_v = is_inverted<T>::value;
+
 %% if target["family"] in ["g5x", "e7x/s7x/v7x"]
 
 template<class... PinConfigs>
@@ -143,10 +162,22 @@ class GpioSet : protected PinMuxMixin<PinConfigs...>
 protected:
 	using PinMux = PinMuxMixin<PinConfigs...>;
 
-	static constexpr uint32_t
+	static consteval uint32_t
 	mask(PortName port)
 	{
 		return (((PinConfigs::port == port) ? 1u << PinConfigs::pin : 0u) | ...);
+	}
+
+	static consteval uint32_t
+	invertedMask(PortName port)
+	{
+		return (((PinConfigs::port == port) ? (is_inverted_v<PinConfigs> ? 1u : 0u) << PinConfigs::pin : 0u) | ...);
+	}
+
+	static consteval uint32_t
+	nonInvertedMask(PortName port)
+	{
+		return mask(port) & ~invertedMask(port);
 	}
 
 	template<PortName port>
@@ -237,7 +268,14 @@ public:
 	static void
 	set()
 	{
-		setPortReg(PIO_SODR_OFFSET);
+%% for port in ports
+		if constexpr (nonInvertedMask(PortName::{{ port }})) {
+			*getPortReg<PortName::{{ port }}>(PIO_SODR_OFFSET) = nonInvertedMask(PortName::{{ port }});
+		}
+		if constexpr (invertedMask(PortName::{{ port }})) {
+			*getPortReg<PortName::{{ port }}>(PIO_CODR_OFFSET) = invertedMask(PortName::{{ port }});
+		}
+%% endfor
 	}
 
 	static void
@@ -252,7 +290,14 @@ public:
 	static void
 	reset()
 	{
-		setPortReg(PIO_CODR_OFFSET);
+%% for port in ports
+		if constexpr (nonInvertedMask(PortName::{{ port }})) {
+			*getPortReg<PortName::{{ port }}>(PIO_CODR_OFFSET) = nonInvertedMask(PortName::{{ port }});
+		}
+		if constexpr (invertedMask(PortName::{{ port }})) {
+			*getPortReg<PortName::{{ port }}>(PIO_SODR_OFFSET) = invertedMask(PortName::{{ port }});
+		}
+%% endfor
 	}
 
 	static void
@@ -316,10 +361,22 @@ class GpioSet : protected PinCfgMixin<PinConfigs...>
 protected:
 	using PinCfg = PinCfgMixin<PinConfigs...>;
 
-	static constexpr uint32_t
+	static consteval uint32_t
 	mask(PortName port)
 	{
 		return (((PinConfigs::port == port) ? 1u << PinConfigs::pin : 0u) | ...);
+	}
+
+	static consteval uint32_t
+	invertedMask(PortName port)
+	{
+		return (((PinConfigs::port == port) ? (is_inverted_v<PinConfigs> ? 1u : 0u) << PinConfigs::pin : 0u) | ...);
+	}
+
+	static consteval uint32_t
+	nonInvertedMask(PortName port)
+	{
+		return mask(port) & ~invertedMask(port);
 	}
 
 	template<PortName port>
@@ -396,7 +453,14 @@ public:
 	static void
 	set()
 	{
-		setPortReg(PORT_OUTSET_OFFSET);
+%% for port in ports
+		if constexpr (nonInvertedMask(PortName::{{ port }})) {
+			*getPortReg<PortName::{{ port }}>(PORT_OUTSET_OFFSET) = nonInvertedMask(PortName::{{ port }});
+		}
+		if constexpr (invertedMask(PortName::{{ port }})) {
+			*getPortReg<PortName::{{ port }}>(PORT_OUTCLR_OFFSET) = invertedMask(PortName::{{ port }});
+		}
+%% endfor
 	}
 
 	static void
@@ -411,7 +475,14 @@ public:
 	static void
 	reset()
 	{
-		setPortReg(PORT_OUTCLR_OFFSET);
+%% for port in ports
+		if constexpr (nonInvertedMask(PortName::{{ port }})) {
+			*getPortReg<PortName::{{ port }}>(PORT_OUTCLR_OFFSET) = nonInvertedMask(PortName::{{ port }});
+		}
+		if constexpr (invertedMask(PortName::{{ port }})) {
+			*getPortReg<PortName::{{ port }}>(PORT_OUTSET_OFFSET) = invertedMask(PortName::{{ port }});
+		}
+%% endfor
 	}
 
 	static void
