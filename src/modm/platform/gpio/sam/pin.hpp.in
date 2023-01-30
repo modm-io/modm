@@ -446,6 +446,9 @@ public:
 	using Data = PinConfig;
 	static constexpr bool isInverted = false;
 
+	static constexpr auto pin = PinConfig::pin;
+	static constexpr auto port = PinConfig::port;
+
 	template<PeripheralPin peripheral_pin_v>
 	struct As;
 
