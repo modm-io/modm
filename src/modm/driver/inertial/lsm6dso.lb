@@ -1,0 +1,50 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2022-2023, Raphael Lehmann
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:lsm6dso"
+    module.description = """\
+# LSM6DSO 3D accelerometer and 3D gyroscope
+
+iNEMO inertial module: always-on 3D accelerometer and 3D gyroscope
+
+The LSM6DSO is a system-in-package featuring a 3D digital accelerometer and a
+3D digital gyroscope boosting performance at 0.55 mA in high-performance mode
+and enabling always-on low-power features for an optimal motion experience for
+the consumer. The LSM6DSO supports main OS requirements, offering real,
+virtual and batch sensors with 9 kbytes for dynamic data batching.
+ST's family of MEMS sensor modules leverages the robust and mature
+manufacturing processes already used for the production of micromachined
+accelerometers and gyroscopes. The various sensing elements are manufactured
+using specialized micromachining processes, while the IC interfaces are
+developed using CMOS technology that allows the design of a dedicated circuit
+which is trimmed to better match the characteristics of the sensing element.
+
+The LSM6DSO has a full-scale acceleration range of ±2/±4/±8/±16 g and an
+angular rate range of ±125/±250/±500/±1000/±2000 dps.
+
+This driver currently only implements parts of the device functionality.
+
+"""
+
+def prepare(module, options):
+    module.depends(
+        ":driver:lis3.transport",
+        ":math:utils",
+        ":math:units",)
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/inertial"
+    env.copy("lsm6dso.hpp")
+    env.copy("lsm6dso_impl.hpp")
