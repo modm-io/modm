@@ -1,0 +1,21 @@
+def init(module):
+    module.name = ":test:platform:software_gpio_port"
+    module.description = "Tests for Software GPIO port"
+
+def prepare(module, options):
+    if not options[":target"].partname == "samv71q21b-aab":
+        return False
+
+    module.depends(":platform:gpio")
+    return True
+
+def build(env):
+    if not env.has_module(":board:samv71-xplained-ultra"):
+        env.log.warn("GPIO port test has been hardcoded to the SAMV71 Xplained board"
+                     "When porting make sure this test does not damage your board!")
+        return
+
+    #env.substitutions = properties
+    env.outbasepath = "modm-test/src/modm-test/platform/software_gpio_port"
+    env.copy("gpio_port_test.hpp")
+    env.copy("gpio_port_test_samv71.cpp")
