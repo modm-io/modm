@@ -501,7 +501,7 @@ modm::platform::I2cMaster{{ id }}::initializeWithPrescaler(uint32_t timingRegist
 	Rcc::enable<Peripheral::I2c{{id}}>();
 
 	// Disable the I2C peripheral which causes a software reset
-	I2C{{ id }}->CR1 &= ~I2C_CR1_PE;
+	I2C{{ id }}->CR1 = 0;
 
 	// Configure I2Cx: Frequency range
 	// 39.4.8: Before enabling the peripheral, the I2C master clock must be configured by setting the
@@ -538,9 +538,6 @@ modm::platform::I2cMaster{{ id }}::initializeWithPrescaler(uint32_t timingRegist
 	// Disable Own Address 2
 	I2C{{ id }}->OAR2 = 0;
 
-	// Configure Generalcall and NoStretch mode
-	I2C{{ id }}->CR1 = (0 | I2C_CR1_NOSTRETCH);
-
 %% if shared_interrupt
 	// Enable Interrupt
 	NVIC_SetPriority(I2C{{ id }}_IRQn, 10);
@@ -556,7 +553,7 @@ modm::platform::I2cMaster{{ id }}::initializeWithPrescaler(uint32_t timingRegist
 %% endif
 
 	// Enable peripheral
-	I2C{{ id }}->CR1 |= I2C_CR1_PE;
+	I2C{{ id }}->CR1 = I2C_CR1_PE;
 }
 
 void
