@@ -1,0 +1,129 @@
+/*
+ * Copyright (c) 2018, Niklas Hauser
+ * Copyright (c) 2023, Christopher Durand
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include "pin.hpp"
+#include <type_traits>
+
+namespace modm::platform
+{
+
+/**
+ * Create an up to 32-bit port from arbitrary pins.
+ *
+ * This class optimizes the data type for the `read()` and `write()` methods.
+ * Supplying up to 8 Gpios will use `uint8_t`, up to 16 Gpios `uint16_t` and
+ * up to 32 Gpios `uint32_t`.
+ *
+ * @note Since the bit order is explicitly given by the order of template arguments,
+ *       this class only supports `DataOrder::Normal`.
+ *       If you need reverse bit order, reverse the order of `Gpios`!
+ *
+ * @tparam Gpios	Up to 32 GpioIO classes, ordered MSB to LSB
+ *
+ * @author	Christopher Durand
+ * @author	Niklas Hauser
+ * @ingroup	modm_platform_gpio
+ */
+template<class... Gpios>
+class SoftwareGpioPort : public ::modm::GpioPort, public GpioSet<Gpios...>
+{
+	using Set = GpioSet<Gpios...>;
+public:
+	static constexpr auto width = sizeof...(Gpios);
+	static_assert(width <= 32, "Only a maximum of 32 pins are supported by this port!");
+	using PortType = std::conditional_t< (width > 8),
+					 std::conditional_t< (width > 16),
+										 uint32_t,
+										 uint16_t >,
+										 uint8_t >;
+	static constexpr DataOrder getDataOrder()
+	{ return ::modm::GpioPort::DataOrder::Normal; }
+
+protected:
+%% for port in ports
+	static constexpr int8_t shift_masks_{{port}}[] = {
+		int8_t(Gpios::port == PortName::{{port}} ? Gpios::pin : -1)...
+	};
+	static_assert(std::size(shift_masks_{{port}}) == width);
+	static constexpr int8_t shift_mask_{{port}}(uint8_t pos) { return shift_masks_{{port}}[width - 1 - pos]; };
+%% endfor
+	using Set::mask;
+	using Set::invertedMask;
+
+public:
+	static PortType isSet()
+	{
+		PortType r{0};
+%% for port in ports
+		if constexpr (mask(PortName::{{port}})) {
+	%% if target["family"] in ["g5x", "e7x/s7x/v7x"]
+			const uint32_t p = Set::template readPortReg<PortName::{{port}}>(PIO_ODSR_OFFSET) ^ invertedMask(PortName::{{port}});
+	%% else
+			const uint32_t p = Set::template readPortReg<PortName::{{port}}>(PORT_OUT_OFFSET) ^ invertedMask(PortName::{{port}});
+	%% endif
+	%% for pos in range(32)
+			if constexpr ({{pos}} < width) if constexpr (constexpr auto pos = shift_mask_{{port}}({{pos}}); pos >= 0) r |= ((p >> pos) & 1) << {{pos}};
+	%% endfor
+		}
+%% endfor
+		return r;
+	}
+
+	static void write(PortType data)
+	{
+%% for port in ports
+		if constexpr (mask(PortName::{{port}})) {
+			uint32_t set{0};
+			uint32_t reset{0};
+	%% for pos in range(32)
+			if constexpr ({{pos}} < width) {
+				if constexpr (constexpr auto shift = shift_mask_{{port}}({{pos}}); shift >= 0) {
+					if (bool(data & (1ul << {{pos}})) != bool(invertedMask(PortName::{{port}}) & (1 << shift)))
+						set |= (1ul << shift);
+					else
+						reset |= (1ul << shift);
+				}
+			}
+	%% endfor
+	%% if target["family"] in ["g5x", "e7x/s7x/v7x"]
+			*(Set::template getPortReg<PortName::{{port}}>(PIO_SODR_OFFSET)) = set;
+			*(Set::template getPortReg<PortName::{{port}}>(PIO_CODR_OFFSET)) = reset;
+	%% else
+			*(Set::template getPortReg<PortName::{{port}}>(PORT_OUTSET_OFFSET)) = set;
+			*(Set::template getPortReg<PortName::{{port}}>(PORT_OUTCLR_OFFSET)) = reset;
+	%% endif
+		}
+%% endfor
+	}
+
+	static PortType read()
+	{
+		PortType r{0};
+%% for port in ports
+		if constexpr (mask(PortName::{{port}})) {
+	%% if target["family"] in ["g5x", "e7x/s7x/v7x"]
+			const uint32_t p = (Set::template readPortReg<PortName::{{port}}>(PIO_PDSR_OFFSET) & mask(PortName::{{port}})) ^ invertedMask(PortName::{{port}});
+	%% else
+			const uint32_t p = (Set::template readPortReg<PortName::{{port}}>(PORT_IN_OFFSET) & mask(PortName::{{port}})) ^ invertedMask(PortName::{{port}});
+	%% endif
+	%% for pos in range(32)
+			if constexpr ({{pos}} < width) if constexpr (constexpr auto pos = shift_mask_{{port}}({{pos}}); pos >= 0) r |= ((p >> pos) & 1) << {{pos}};
+	%% endfor
+		}
+%% endfor
+		return r;
+	}
+};
+
+} // namespace modm::platform

@@ -128,5 +128,6 @@ def build(env):
     if len(env["enable_ports"]):
         env.template("enable.cpp.in")
     env.template("pin.hpp.in")
+    env.template("software_port.hpp.in")
     env.copy("unused.hpp")
     env.copy("../common/inverted.hpp", "inverted.hpp")
