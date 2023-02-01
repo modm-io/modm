@@ -396,6 +396,7 @@ MODM_ISR(I2C{{ id }}_EV)
 				transaction->detaching(modm::I2c::DetachCause::ErrorCondition);
 				transaction = nullptr;
 			}
+			callNextTransaction();
 		}
 		else if (nextOperation == modm::I2c::Operation::Stop)
 		{
