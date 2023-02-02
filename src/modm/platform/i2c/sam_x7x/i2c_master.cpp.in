@@ -1,0 +1,376 @@
+// coding: utf-8
+/*
+ * Copyright (c) 2023, Christopher Durand
+ * Copyright (c) 2017, Niklas Hauser
+ * Copyright (c) 2017, Sascha Schade
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#include "i2c_master_{{ id }}.hpp"
+#include <modm/architecture/driver/atomic/queue.hpp>
+#include <modm/architecture/interface/atomic_lock.hpp>
+#include <modm/architecture/interface/interrupt.hpp>
+#include <modm/container.hpp>
+#include <modm/platform/clock/clockgen.hpp>
+
+namespace
+{
+	static modm::I2c::Operation nextOperation;
+
+	// transaction queue management
+	struct ConfiguredTransaction
+	{
+		ConfiguredTransaction()
+		:	transaction(nullptr), configuration(nullptr) {}
+
+		ConfiguredTransaction(modm::I2cTransaction* transaction, modm::I2c::ConfigurationHandler configuration)
+		:	transaction(transaction), configuration(configuration) {}
+
+		modm::I2cTransaction* transaction;
+		modm::I2c::ConfigurationHandler configuration;
+	};
+
+	static modm::BoundedQueue<ConfiguredTransaction, {{ options["buffer.transaction"] }}> queue;
+	static modm::I2c::ConfigurationHandler configuration{nullptr};
+
+	static modm::I2cTransaction* transaction{};
+	static modm::I2cMaster::Error error{modm::I2cMaster::Error::NoError};
+
+	static modm::I2cTransaction::Starting starting{0, modm::I2c::OperationAfterStart::Stop};
+	static modm::I2cTransaction::Writing writing{nullptr, 0, modm::I2c::OperationAfterWrite::Stop};
+	static modm::I2cTransaction::Reading reading{nullptr, 0, modm::I2c::OperationAfterRead::Stop};
+
+	static constexpr int MaxRetries{3};
+	static int arbitrationRetryCounter{MaxRetries};
+
+	enum class PreviousOperation
+	{
+		Idle = 0,
+		Write = 1,
+		Read = 2
+	};
+
+	static inline void
+	callStarting(PreviousOperation previous);
+
+	static inline void
+	callWriteOperation(PreviousOperation previous)
+	{
+		TWIHS{{ id }}->TWIHS_MMR = TWIHS_MMR_DADR(starting.address >> 1);
+
+		// The write transfer is started automatically when TWIHS_THR is written.
+		// In case of a repeated start TWIHS_CR_START must be set before writing
+		// the register.
+		if (previous != PreviousOperation::Idle) {
+			TWIHS{{ id }}->TWIHS_CR = TWIHS_CR_START;
+		}
+
+		// Write first data byte
+		if ((writing.length > 0) and (writing.buffer != nullptr)) {
+			TWIHS{{ id }}->TWIHS_THR = *writing.buffer++;
+			--writing.length;
+		} else {
+			// This case should never occcur.
+			// Transactions with zero data length are unsupported by hardware.
+			// A write must be performed to restore valid peripheral state.
+			writing.length = 0;
+			TWIHS{{ id }}->TWIHS_THR = 0;
+		}
+
+		if (writing.length == 0) {
+			if (nextOperation == modm::I2c::Operation::Restart) {
+				callStarting(PreviousOperation::Write);
+			} else if (nextOperation == modm::I2c::Operation::Write) {
+				writing = transaction->writing();
+				nextOperation = static_cast<modm::I2c::Operation>(writing.next);
+				TWIHS{{ id }}->TWIHS_IER = TWIHS_IER_TXRDY;
+			} else {
+				TWIHS{{ id }}->TWIHS_CR = TWIHS_CR_STOP;
+			}
+		} else {
+			TWIHS{{ id }}->TWIHS_IER = TWIHS_IER_TXRDY;
+		}
+
+		TWIHS{{ id }}->TWIHS_IER = TWIHS_IER_TXCOMP;
+	}
+
+	static inline void
+	callReadOperation(PreviousOperation previous)
+	{
+		// In case of a restart after a read, the last byte from the previous
+		// operation has not been read yet and thus may not be cleared.
+		// The next read operation must be pre-programmed before the last byte
+		// of the previous one has been read.
+		// Reading that byte will trigger transmission of the repeated
+		// start condition.
+		if (previous != PreviousOperation::Read) {
+			(void) TWIHS{{ id }}->TWIHS_RHR;
+		}
+
+		TWIHS{{ id }}->TWIHS_MMR = TWIHS_MMR_DADR(starting.address >> 1) | TWIHS_MMR_MREAD;
+		if (reading.length <= 1) {
+			// For a one byte read START and STOP must be set simultaneously
+			TWIHS{{ id }}->TWIHS_CR = TWIHS_CR_START | TWIHS_CR_STOP;
+		} else {
+			TWIHS{{ id }}->TWIHS_CR = TWIHS_CR_START;
+		}
+		TWIHS{{ id }}->TWIHS_IER = TWIHS_IER_RXRDY;
+	}
+
+	static inline void
+	callStarting(PreviousOperation previous)
+	{
+		starting = transaction->starting();
+		switch (starting.next)
+		{
+			case modm::I2c::OperationAfterStart::Read:
+				reading = transaction->reading();
+				nextOperation = static_cast<modm::I2c::Operation>(reading.next);
+
+				callReadOperation(previous);
+				break;
+
+			case modm::I2c::OperationAfterStart::Write:
+				writing = transaction->writing();
+				nextOperation = static_cast<modm::I2c::Operation>(writing.next);
+
+				callWriteOperation(previous);
+				break;
+
+			case modm::I2c::OperationAfterStart::Stop:
+				// It is impossible to do a transaction with a stop immediatately
+				// after the address has been ACK'ed. Writing the data output register is
+				// the only way to start a write transaction and TWIHS_CR_STOP will
+				// only output a stop condition after the first byte has been sent if an
+				// ACK has been received from the device.
+
+				// Use a dummy zero byte buffer, there is no way not to send the data :(
+				static constexpr uint8_t zero{0};
+				writing.length = 1;
+				writing.buffer = &zero;
+				reading.length = 0;
+				writing = transaction->writing();
+				nextOperation = modm::I2c::Operation::Stop;
+
+				callWriteOperation(previous);
+				break;
+		}
+
+		error = modm::I2cMaster::Error::NoError;
+	}
+
+	static inline void
+	callNextTransaction()
+	{
+		if (queue.isNotEmpty())
+		{
+			ConfiguredTransaction next = queue.get();
+			queue.pop();
+			// configure the peripheral if necessary
+			if (next.configuration and (configuration != next.configuration)) {
+				configuration = next.configuration;
+				configuration();
+			}
+
+			arbitrationRetryCounter = MaxRetries;
+			::transaction = next.transaction;
+			callStarting(PreviousOperation::Idle);
+		}
+	}
+}
+
+// ----------------------------------------------------------------------------
+MODM_ISR(TWIHS{{ id }})
+{
+	const uint32_t status = TWIHS{{ id }}->TWIHS_SR;
+
+	// tx ready interrupt enabled, writing operation in progress
+	if (TWIHS{{ id }}->TWIHS_IMR & TWIHS_IMR_TXRDY) {
+		if (status & TWIHS_SR_TXRDY) {
+			if ((writing.length > 0) and (writing.buffer != nullptr)) {
+				TWIHS{{ id }}->TWIHS_THR = *writing.buffer++;
+				--writing.length;
+			}
+
+			if (writing.length == 0) {
+				if (nextOperation == modm::I2c::Operation::Restart) {
+					// disable tx ready interrupt
+					TWIHS{{ id }}->TWIHS_IDR = TWIHS_IDR_TXRDY;
+					callStarting(PreviousOperation::Write);
+				} else if (nextOperation == modm::I2c::Operation::Write) {
+					// continue writing with new data buffer
+					// do not disable tx ready interrupt
+					writing = transaction->writing();
+					nextOperation = static_cast<modm::I2c::Operation>(writing.next);
+				} else {
+					// disable tx ready interrupt
+					TWIHS{{ id }}->TWIHS_IDR = TWIHS_IDR_TXRDY;
+					// send stop after write, enable completion interrupt
+					TWIHS{{ id }}->TWIHS_CR = TWIHS_CR_STOP;
+					TWIHS{{ id }}->TWIHS_IER = TWIHS_IER_TXCOMP;
+				}
+			}
+		}
+	// rx interrupt enabled, reading operation in progress
+	} else if (TWIHS{{ id }}->TWIHS_IMR & TWIHS_IMR_RXRDY) {
+		if (status & TWIHS_SR_RXRDY) {
+			if (reading.length <= 1) {
+				TWIHS{{ id }}->TWIHS_IDR = TWIHS_IDR_RXRDY;
+				// To end the current reading operation TWIHS_CR_STOP
+				// or TWIHS_CR_START must be programmed before the data of
+				// the last byte is read. Otherwise reading of the last byte
+				// would automatically start another read.
+				//
+				// Remember buffer pointer and length
+				// In case of a restart with a new reading operation
+				// reading.buffer will point to the next buffer.
+				uint8_t* const buffer = reading.buffer;
+				const auto length = reading.length;
+
+				if (nextOperation == modm::I2c::Operation::Restart) {
+					callStarting(PreviousOperation::Read);
+				} else {
+					TWIHS{{ id }}->TWIHS_CR = TWIHS_CR_STOP;
+				}
+				// must be read after setting TWIHS_CR_STOP or TWIHS_CR_START
+				const uint8_t data = TWIHS{{ id }}->TWIHS_RHR;
+				if (buffer != nullptr && length != 0) {
+					*buffer = data;
+				}
+			} else {
+				const uint8_t data = TWIHS{{ id }}->TWIHS_RHR;
+				if (reading.buffer != nullptr) {
+					*reading.buffer++ = data;
+				}
+				--reading.length;
+			}
+		}
+	}
+
+	// if transfer completed (after stop condition)
+	if (status & TWIHS_SR_TXCOMP) {
+		// disable interrupts
+		TWIHS{{ id }}->TWIHS_IDR = TWIHS_IDR_TXCOMP | TWIHS_IDR_RXRDY | TWIHS_IDR_TXRDY;
+		if (status & TWIHS_SR_NACK) { // NACK received
+			error = modm::I2cMaster::Error::AddressNack;
+			TWIHS{{ id }}->TWIHS_CR = TWIHS_CR_LOCKCLR;
+			if (transaction) {
+				transaction->detaching(modm::I2c::DetachCause::ErrorCondition);
+				transaction = nullptr;
+			}
+		} else if (status & TWIHS_SR_ARBLST) { // arbitration lost
+			if (arbitrationRetryCounter > 0) {
+				--arbitrationRetryCounter;
+				// TODO: is it safe with the transaction interface to call starting() again?
+				callStarting(PreviousOperation::Idle);
+			} else { // retries exceeded
+				error = modm::I2cMaster::Error::ArbitrationLost;
+				if (transaction) {
+					transaction->detaching(modm::I2c::DetachCause::ErrorCondition);
+					transaction = nullptr;
+				}
+			}
+		} else { // valid ACK from device
+			if (transaction) {
+				transaction->detaching(modm::I2c::DetachCause::NormalStop);
+				transaction = nullptr;
+			}
+		}
+		callNextTransaction();
+	}
+}
+
+// ----------------------------------------------------------------------------
+
+void
+modm::platform::I2cMaster{{ id }}::initializeWithClockConfig(uint32_t cwgrRegister)
+{
+	ClockGen::enable<ClockPeripheral::I2c{{ id }}>();
+
+	// disable all interrupts in case this function is called while the peripheral is operating
+	TWIHS{{ id }}->TWIHS_IDR = ~0ul;
+
+	TWIHS{{ id }}->TWIHS_CR = TWIHS_CR_SWRST;
+	TWIHS{{ id }}->TWIHS_CWGR = cwgrRegister;
+
+	// Enable master mode
+	TWIHS{{ id }}->TWIHS_CR = TWIHS_CR_MSDIS;
+	TWIHS{{ id }}->TWIHS_CR = TWIHS_CR_SVDIS;
+	TWIHS{{ id }}->TWIHS_CR = TWIHS_CR_MSEN;
+
+	// Enable arbitration lost interrupt
+	TWIHS{{ id }}->TWIHS_IER = TWIHS_IER_ARBLST;
+
+	// TODO: make priority configurable?
+	// 10 is also used in the STM32 extended driver
+	NVIC_SetPriority(TWIHS{{ id }}_IRQn, 10);
+	NVIC_EnableIRQ(TWIHS{{ id }}_IRQn);
+}
+
+void
+modm::platform::I2cMaster{{ id }}::reset()
+{
+	modm::atomic::Lock lock;
+	// TODO: reset peripheral?
+	reading.length = 0;
+	writing.length = 0;
+	error = Error::SoftwareReset;
+	if (transaction) transaction->detaching(DetachCause::ErrorCondition);
+	transaction = nullptr;
+	// remove all queued transactions
+	while (queue.isNotEmpty())
+	{
+		ConfiguredTransaction next = queue.get();
+		if (next.transaction) { next.transaction->detaching(DetachCause::ErrorCondition); }
+		queue.pop();
+	}
+}
+
+bool
+modm::platform::I2cMaster{{ id }}::start(I2cTransaction *transaction, ConfigurationHandler handler)
+{
+	modm::atomic::Lock lock;
+	// if we have a place in the queue and the transaction object is valid
+	if (queue.isNotFull() && transaction)
+	{
+		// if the transaction object wants to attach to the queue
+		if (transaction->attaching())
+		{
+			// if no current transaction is taking place
+			if (!modm::accessor::asVolatile(::transaction))
+			{
+				// configure the peripheral if necessary
+				if (handler and (configuration != handler)) {
+					configuration = handler;
+					configuration();
+				}
+
+				arbitrationRetryCounter = MaxRetries;
+				::transaction = transaction;
+				callStarting(PreviousOperation::Idle);
+			}
+			else
+			{
+				// queue the transaction for later execution
+				queue.push(ConfiguredTransaction(transaction, configuration));
+			}
+			return true;
+		}
+		else {
+			transaction->detaching(modm::I2c::DetachCause::FailedToAttach);
+		}
+	}
+	return false;
+}
+
+modm::I2cMaster::Error
+modm::platform::I2cMaster{{ id }}::getErrorState()
+{
+	return error;
+}

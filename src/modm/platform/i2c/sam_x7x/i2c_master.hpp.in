@@ -1,0 +1,180 @@
+// coding: utf-8
+/*
+ * Copyright (c) 2023, Christopher Durand
+ * Copyright (c) 2017, Sascha Schade
+ * Copyright (c) 2017-2018, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_STM32_I2C_{{ id }}_HPP
+#define MODM_STM32_I2C_{{ id }}_HPP
+
+#include <modm/architecture/interface/i2c_master.hpp>
+#include <modm/architecture/interface/clock.hpp>
+#include <modm/platform/gpio/connector.hpp>
+#include <modm/platform/gpio/pin.hpp>
+#include <algorithm>
+#include <bit>
+#include <optional>
+
+namespace modm
+{
+
+namespace platform
+{
+
+/**
+ * I2C master implementation for TWIHS{{ id }} peripheral.
+ *
+ * @ingroup		modm_platform_i2c modm_platform_i2c_{{id}}
+ */
+class I2cMaster{{ id }} : public ::modm::I2cMaster
+{
+public:
+	static constexpr size_t TransactionBufferSize = {{ options["buffer.transaction"] }};
+
+private:
+	// calculate required bits to represent value
+	static constexpr int
+	bits(uint32_t value)
+	{
+		return 32 - std::countl_zero(value);
+	}
+
+	template<auto clock, baudrate_t baudrate, percent_t tolerance,
+			uint8_t ckdiv, uint8_t cldiv, uint8_t chdiv>
+	static constexpr bool
+	checkBaudrate()
+	{
+		if (ckdiv > 7) {
+			return false;
+		}
+
+		const float tHigh = ((chdiv * (1 << ckdiv)) + 3) / float(clock);
+		const float tLow = ((cldiv * (1 << ckdiv)) + 3) / float(clock);
+		const float freq = 1.f / (tHigh + tLow);
+		const float error = std::fabs(1.f - freq / baudrate);
+
+		return error < pct2f(tolerance);
+	}
+
+	template<class SystemClock, baudrate_t baudrate, percent_t tolerance>
+	static consteval std::optional<uint32_t>
+	calculateTimings()
+	{
+		constexpr auto clock = SystemClock::Twihs{{ id }};
+
+		// hold time = (HOLD + 3) * (1 / peripheral clock)
+		// => HOLD = hold time * (peripheral clock) - 3
+		constexpr float holdTime = 300.e-9f;
+		constexpr float holdIdeal = holdTime * clock - 3.f;
+		constexpr uint8_t hold = static_cast<uint8_t>(std::clamp(std::ceil(holdIdeal), 0.f, 63.f));
+
+		constexpr bool fastMode = baudrate > 125'000;
+		// Baudrate threshold above which the low time is fixed to the minimum value of
+		// 1.3us in fast mode or 4.7us in standard mode.
+		constexpr auto minLowTime = fastMode ? 1.3e-6 : 4.7e-6;
+		constexpr auto minLowTimeLimit = 1.f / (2*minLowTime);
+
+		// t_high = ((CHDIV * 2^CKDIV) + 3) * (1 / peripheral clock)
+		// t_low  = ((CLDIV * 2^CKDIV) + 3) * (1 / peripheral clock)
+		if constexpr (baudrate > minLowTimeLimit) {
+			// calculate ideal low and high prescaler values (formula from ASF vendor HAL)
+			constexpr auto cldiv = uint32_t(std::round((minLowTime * clock) - 3));
+			constexpr auto tHigh = 1.f / ((baudrate + (baudrate - minLowTimeLimit)) * 2.f);
+			constexpr auto chdiv = uint32_t(std::round((tHigh * clock) - 3));
+
+			// use 2^N pre-divider if max. prescaler exceeds 8 bits
+			constexpr auto ckdiv = std::max(0, std::max(bits(cldiv), bits(chdiv)) - 8);
+			constexpr uint32_t cldivScaled = std::round(float(cldiv) / (1 << ckdiv));
+			constexpr uint32_t chdivScaled = std::round(float(chdiv) / (1 << ckdiv));
+
+			if (!checkBaudrate<clock, baudrate, tolerance, ckdiv, cldivScaled, chdivScaled>())
+				return std::nullopt;
+
+			return TWIHS_CWGR_HOLD(hold) | TWIHS_CWGR_CLDIV(cldivScaled) |
+				TWIHS_CWGR_CHDIV(chdivScaled) | TWIHS_CWGR_CKDIV(ckdiv);
+		} else {
+			constexpr auto div = uint32_t(std::round(clock / (baudrate * 2.f) - 3));
+
+			// use 2^N pre-divider if max. prescaler exceeds 8 bits
+			constexpr auto ckdiv = std::max(0, bits(div) - 8);
+			constexpr uint32_t divScaled = std::round(float(div) / (1 << ckdiv));
+
+			if (!checkBaudrate<clock, baudrate, tolerance, ckdiv, divScaled, divScaled>())
+				return std::nullopt;
+
+			return TWIHS_CWGR_HOLD(hold) | TWIHS_CWGR_CLDIV(divScaled) |
+				TWIHS_CWGR_CHDIV(divScaled) | TWIHS_CWGR_CKDIV(ckdiv);
+		}
+	}
+
+public:
+	template<class... Signals>
+	static void
+	connect(PullUps pullups = PullUps::External, ResetDevices reset = ResetDevices::Standard)
+	{
+		using Scl = GetPin_t<PeripheralPin::Twck, Signals...>;
+		using Sda = GetPin_t<PeripheralPin::Twd, Signals...>;
+
+		using Peripheral = Peripherals::Twihs<{{ id | int }}>;
+
+		using SclConnector = typename Scl::template Connector<Peripheral, Peripheral::Twck<{{ id | int }}>>;
+		using SdaConnector = typename Sda::template Connector<Peripheral, Peripheral::Twd<{{ id | int }}>>;
+
+		const InputType input =
+			(pullups == PullUps::Internal) ? InputType::PullUp : InputType::Floating;
+
+		Scl::configure(input);
+		Sda::configure(input);
+		if (reset != ResetDevices::NoReset) resetDevices<Scl>(uint32_t(reset));
+		SclConnector::connect();
+		SdaConnector::connect();
+	}
+
+	/**
+	 * Set up the I2C module for master operation.
+	 *
+	 * @param	rate
+	 *		`Standard` (100 kHz) or `Fast` (400 kHz)
+	 */
+	template<class SystemClock, baudrate_t baudrate=kBd(100), percent_t tolerance=pct(5)>
+	static void
+	initialize()
+	{
+		static_assert(baudrate <= 400'000, "Baudrate must not exceed 400 kHz for I2C fast mode");
+		constexpr std::optional<uint32_t> registerValue = calculateTimings<SystemClock, baudrate, tolerance>();
+		static_assert(bool(registerValue), "Could not find a valid clock configuration for the requested"
+			" baudrate and tolerance");
+
+		initializeWithClockConfig(registerValue.value());
+	}
+
+	// start documentation inherited
+	static bool
+	start(I2cTransaction* transaction, ConfigurationHandler handler = nullptr);
+
+	static Error
+	getErrorState();
+
+	static void
+	reset();
+	// end documentation inherited
+
+private:
+	static void
+	initializeWithClockConfig(uint32_t cwgrRegister);
+};
+
+
+} // namespace platform
+
+} // namespace modm
+
+#endif // MODM_STM32_I2C_{{ id }}_HPP
