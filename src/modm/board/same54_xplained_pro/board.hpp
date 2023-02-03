@@ -69,21 +69,7 @@ struct SystemClock
 using Led0 = GpioC18;
 using Button = GpioB31;
 
-// No SoftwareGpioPort yet for SAM
-struct Leds
-{
-	static constexpr std::size_t width{1};
-
-	static void setOutput()
-	{
-		Led0::setOutput();
-	}
-
-	static void write(uint32_t value)
-	{
-		Led0::set(value & 1);
-	}
-};
+using Leds = SoftwareGpioPort<Led0>;
 
 struct Debug
 {

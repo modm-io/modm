@@ -53,29 +53,7 @@ using Led0 = GpioA23;
 using Led1 = GpioC9;
 using ButtonSW0 = GpioA9;
 
-// No SoftwareGpioPort yet for SAM
-struct Leds
-{
-	static constexpr std::size_t width{2};
-
-	static void setOutput()
-	{
-		Led0::setOutput();
-		Led1::setOutput();
-	}
-
-	static void setOutput(bool state)
-	{
-		Led0::setOutput(state);
-		Led1::setOutput(state);
-	}
-
-	static void write(uint32_t value)
-	{
-		Led0::set(value & 1);
-		Led1::set(value & 2);
-	}
-};
+using Leds = SoftwareGpioPort<Led1, Led0>;
 
 struct Debug
 {
