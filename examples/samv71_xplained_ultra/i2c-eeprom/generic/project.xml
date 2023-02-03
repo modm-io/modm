@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:samv71-xplained-ultra</extends>
+  <options>
+    <option name="modm:build:build.path">../../../../build/samv71_xplained_ultra/i2c_eeprom_generic</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:driver:i2c.eeprom</module>
+    <module>modm:platform:i2c:0</module>
+  </modules>
+</library>
