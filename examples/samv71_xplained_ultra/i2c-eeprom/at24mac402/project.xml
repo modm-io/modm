@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:samv71-xplained-ultra</extends>
+  <options>
+    <option name="modm:build:build.path">../../../../build/samv71_xplained_ultra/i2c_eeprom_at24mac402</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:driver:at24mac402</module>
+    <module>modm:platform:i2c:0</module>
+  </modules>
+</library>
