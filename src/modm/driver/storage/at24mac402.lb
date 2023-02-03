@@ -1,0 +1,30 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2023, Christopher Durand
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:at24mac402"
+    module.description = """\
+# AT24MAC404 I²C EEPROM
+
+2 kBit I²C EEPROM with pre-programmed read-only 48 bit MAC address and 128 bit
+unique id.
+"""
+
+def prepare(module, options):
+    module.depends(":architecture:i2c.device", ":driver:i2c.eeprom")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/storage"
+    env.copy("at24mac402.hpp")
+    env.copy("at24mac402_impl.hpp")
