@@ -31,6 +31,7 @@ struct SystemClock
 	static constexpr uint32_t Mck = Frequency / 2;  // 150 MHz max.
 	static constexpr uint32_t Usart1 = Mck;
 	static constexpr uint32_t Spi0 = Mck;
+	static constexpr uint32_t Twihs0 = Mck;
 //	static constexpr uint32_t Usb = 48_MHz;
 
 	static bool inline
@@ -61,6 +62,10 @@ struct Debug
 	using UartTx = GpioB4;
 	using UartRx = GpioA21;
 };
+
+using I2c = I2cMaster0;
+using Sda = GpioA3;
+using Scl = GpioA4;
 
 using LoggerDevice = modm::IODeviceWrapper<Debug::Uart, modm::IOBuffer::BlockIfFull>;
 
