@@ -2,6 +2,7 @@
 // ----------------------------------------------------------------------------
 /*
  * Copyright (c) 2020, Vivien Henry
+ * Copyright (c) 2023, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -21,7 +22,9 @@ namespace modm
 
 
 template <typename SpiMaster, typename Cs, typename nReset>
-void Ads868x<SpiMaster, Cs, nReset>::initialize(){
+void
+Ads868x<SpiMaster, Cs, nReset>::initialize()
+{
 	Cs::setOutput(modm::Gpio::Low);
 
 	nReset::setOutput(modm::Gpio::Low);
@@ -29,103 +32,115 @@ void Ads868x<SpiMaster, Cs, nReset>::initialize(){
 	nReset::set();
 
 	Cs::set();
-	Cs::reset();
-	Cs::set();
 }
 
 
 template <typename SpiMaster, typename Cs, typename nReset>
-uint16_t Ads868x<SpiMaster, Cs, nReset>::singleConversion(){
-	uint16_t data = 0;
+modm::ResumableResult<uint16_t>
+Ads868x<SpiMaster, Cs, nReset>::singleConversion()
+{
+	RF_BEGIN();
 
+	RF_WAIT_UNTIL(this->acquireMaster());
 	Cs::reset();
-	data |= SpiMaster::transferBlocking(0) << 8;
-	data |= SpiMaster::transferBlocking(0);
 
-	Cs::set();
+	RF_CALL(SpiMaster::transfer(nullptr, buffer, 2));
 
-	return data;
+	if (this->releaseMaster()) Cs::set();
+
+	RF_END_RETURN( uint16_t((uint16_t(buffer[0]) << 8) | buffer[1]) );
 }
 
 
 template <typename SpiMaster, typename Cs, typename nReset>
-void Ads868x<SpiMaster, Cs, nReset>::writeRegister(Register reg, uint32_t data){
-	uint32_t cmd;
+modm::ResumableResult<void>
+Ads868x<SpiMaster, Cs, nReset>::writeRegister(Register reg, uint32_t data)
+{
+	RF_BEGIN();
 
 	// LSB (0-15)
-	cmd = (0b11010'00 << 25) | (static_cast<uint8_t>(reg) << 16) | (data & 0xFFFF);
+	buffer[0] = 0b1101'0000;
+	buffer[1] = uint8_t(reg);
+	buffer[2] = data >> 8;
+	buffer[3] = data;
 
+	RF_WAIT_UNTIL(this->acquireMaster());
 	Cs::reset();
-	SpiMaster::transferBlocking((uint8_t)(cmd >> 24));
-	SpiMaster::transferBlocking((uint8_t)(cmd >> 16));
-	SpiMaster::transferBlocking((uint8_t)(cmd >> 8));
-	SpiMaster::transferBlocking((uint8_t)(cmd >> 0));
+
+	RF_CALL(SpiMaster::transfer(buffer, nullptr, 4));
 
 	Cs::set();
 
 	// MSB (16-31)
-	cmd = (0b11010'00 << 25) | ((static_cast<uint8_t>(reg) + 2) << 16) | (data >> 16);
+	buffer[0] = 0b1101'0000;
+	buffer[1] = uint8_t(reg) + 2;
+	buffer[2] = data >> 24;
+	buffer[3] = data >> 16;
+
+	modm::delay_us(1);
 	Cs::reset();
 
-	SpiMaster::transferBlocking((uint8_t)(cmd >> 24));
-	SpiMaster::transferBlocking((uint8_t)(cmd >> 16));
-	SpiMaster::transferBlocking((uint8_t)(cmd >> 8));
-	SpiMaster::transferBlocking((uint8_t)(cmd >> 0));
+	RF_CALL(SpiMaster::transfer(buffer, nullptr, 4));
 
-	Cs::set();
+	if (this->releaseMaster()) Cs::set();
+
+	RF_END();
 }
 
 template <typename SpiMaster, typename Cs, typename nReset>
-uint32_t Ads868x<SpiMaster, Cs, nReset>::readRegister(Register reg)
+modm::ResumableResult<uint32_t>
+Ads868x<SpiMaster, Cs, nReset>::readRegister(Register reg)
 {
+	RF_BEGIN();
+
 	uint32_t cmd = 0;
 	uint32_t data = 0;
 	uint8_t byte = 0;
 
+	RF_WAIT_UNTIL(this->acquireMaster());
 	Cs::reset();
 
 	// MSB (31-16)
-	cmd = (0b11001'00 << 25) | ((static_cast<uint8_t>(reg) + 2) << 16);
-	SpiMaster::transferBlocking((uint8_t)(cmd >> 24));
-	SpiMaster::transferBlocking((uint8_t)(cmd >> 16));
-	SpiMaster::transferBlocking((uint8_t)(cmd >> 8));
-	SpiMaster::transferBlocking((uint8_t)(cmd >> 0));
+	buffer[0] = 0b1100'1000;
+	buffer[1] = uint8_t(reg) + 2;
+	buffer[2] = 0;
+	buffer[3] = 0;
+
+	RF_CALL(SpiMaster::transfer(buffer, nullptr, 4));
 
 	Cs::set();
+	modm::delay_us(1);
 	Cs::reset();
 
-	byte = SpiMaster::transferBlocking(0);
-	data |= (uint32_t)byte << 24;
-
-	byte = SpiMaster::transferBlocking(0);
-	data |= (uint32_t)byte << 16;
-	SpiMaster::transferBlocking(0);
-	SpiMaster::transferBlocking(0);
+	RF_CALL(SpiMaster::transfer(nullptr, buffer, 4));
+	// cache the MSB values temporarily
+	buffer[4] = buffer[0];
+	buffer[5] = buffer[1];
 
 	Cs::set();
+	modm::delay_us(1);
 	Cs::reset();
 
 	// LSB (0-15)
-	cmd = (0b11001'00 << 25) | (static_cast<uint8_t>(reg) << 16);
-	SpiMaster::transferBlocking((uint8_t)(cmd >> 24));
-	SpiMaster::transferBlocking((uint8_t)(cmd >> 16));
-	SpiMaster::transferBlocking((uint8_t)(cmd >> 8));
-	SpiMaster::transferBlocking((uint8_t)(cmd >> 0));
+	buffer[0] = 0b1100'1000;
+	buffer[1] = uint8_t(reg);
+	buffer[2] = 0;
+	buffer[3] = 0;
+
+	RF_CALL(SpiMaster::transfer(buffer, nullptr, 4));
 
 	Cs::set();
+	modm::delay_us(1);
 	Cs::reset();
 
-	byte = SpiMaster::transferBlocking(0);
-	data |= (uint32_t)byte << 8;
+	RF_CALL(SpiMaster::transfer(nullptr, buffer, 4));
 
-	byte = SpiMaster::transferBlocking(0);
-	data |= (uint32_t)byte;
-	SpiMaster::transferBlocking(0);
-	SpiMaster::transferBlocking(0);
+	if (this->releaseMaster()) Cs::set();
 
-	Cs::set();
-
-	return data;
+	RF_END_RETURN((uint32_t(buffer[4]) << 24) |
+	              (uint32_t(buffer[5]) << 16) |
+	              (uint32_t(buffer[0]) <<  8) |
+	               uint32_t(buffer[1]));
 }
 
 } // namespace modm

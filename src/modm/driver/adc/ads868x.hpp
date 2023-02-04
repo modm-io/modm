@@ -2,6 +2,7 @@
 // ----------------------------------------------------------------------------
 /*
  * Copyright (c) 2020, Vivien Henry
+ * Copyright (c) 2023, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -15,11 +16,10 @@
 #define MODM_ADS868x_HPP
 
 
-#include <modm/architecture/interface/spi_master.hpp>
-#include <modm/architecture/interface/accessor.hpp>
 #include <modm/architecture/interface/register.hpp>
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/architecture/interface/delay.hpp>
+#include <modm/architecture/interface/spi_device.hpp>
 #include <modm/processing/resumable.hpp>
 
 namespace modm
@@ -28,9 +28,9 @@ namespace modm
 /// @ingroup modm_driver_ads868x
 struct ads868x
 {
-public:
 	enum class
-	Register: uint8_t{
+	Register: uint8_t
+	{
 		DEV_ID_REG = 0x00,
 		RST_PWRCTRL_REG = 0x04,
 		SDI_CTL_REG = 0x08,
@@ -206,7 +206,6 @@ public:
 	};
 	typedef modm::Configuration<RangeSelectionRegister_t, RangeSel, 0b1111, 0> RangeSel_t;
 
-
 }; // struct ads868x
 
 /**
@@ -217,54 +216,67 @@ public:
  * @ingroup modm_driver_ads868x
  */
 template <typename SpiMaster, typename Cs, typename nReset>
-class Ads868x : public ads868x
+class Ads868x : public ads868x, public modm::SpiDevice<SpiMaster>, protected modm::NestedResumable<3>
 {
 public:
-	Ads868x();
-
 	/// Call this function once before using the device
-	static void initialize();
+	void
+	initialize();
 
-	static uint16_t singleConversion();
+	modm::ResumableResult<uint16_t>
+	singleConversion();
 
-	static void setDeviceAddress(uint8_t devID){
-		DeviceIDRegister_t dev_id_reg = DeviceID_t(devID);
-		uint32_t raw = dev_id_reg.value;
-		writeRegister(Register::DEV_ID_REG, raw);
+	modm::ResumableResult<void>
+	setDeviceAddress(uint8_t devID)
+	{
+		return writeRegister(Register::DEV_ID_REG, DeviceID_t(devID).value);
 	};
 
-	static uint8_t getDeviceAddress(){
-		uint32_t data = readRegister(Register::DEV_ID_REG);
-		DeviceIDRegister_t dev_id_reg(data);
-		return DeviceID_t::get(dev_id_reg);
+	modm::ResumableResult<uint8_t>
+	getDeviceAddress()
+	{
+		RF_BEGIN();
+		buffer32 = RF_CALL(readRegister(Register::DEV_ID_REG));
+		RF_END_RETURN(DeviceID_t::get(DeviceIDRegister_t(buffer32)));
 	}
 
-	static void setOutputProtocol(SDOMode mode, SourceSyncClock syncClock, SDO1Config sdo1Config){
-		SDOControlRegister_t sdo_reg = SDOMode_t(mode) | SourceSyncClock_t(syncClock) | SDO1Config_t(sdo1Config);
-		uint32_t raw = sdo_reg.value;
-		writeRegister(Register::SDO_CTL_REG, raw);
+	modm::ResumableResult<void>
+	setOutputProtocol(SDOMode mode, SourceSyncClock syncClock, SDO1Config sdo1Config)
+	{
+		RF_BEGIN();
+		{
+			SDOControlRegister_t sdo_reg = SDOMode_t(mode) | SourceSyncClock_t(syncClock) | SDO1Config_t(sdo1Config);
+			buffer32 = sdo_reg.value;
+		}
+		RF_END_RETURN_CALL(writeRegister(Register::SDO_CTL_REG, buffer32));
 	}
 
-	static void setRange(RangeSel range){
-		RangeSelectionRegister_t ran_reg = RangeSel_t(range);
-		uint32_t raw = ran_reg.value;
-		writeRegister(Register::RANGE_CTL_REG, raw);
+	modm::ResumableResult<void>
+	setRange(RangeSel range)
+	{
+		RF_BEGIN();
+		buffer32 = RangeSel_t(range).value;
+		RF_END_RETURN_CALL(writeRegister(Register::RANGE_CTL_REG, buffer32));
 	}
 
-	static RangeSel getRange(){
-		uint32_t data = readRegister(Register::RANGE_CTL_REG);
-		RangeSelectionRegister_t rang_reg(data);
-		return RangeSel_t::get(rang_reg);
+	modm::ResumableResult<RangeSel>
+	getRange()
+	{
+		RF_BEGIN();
+		buffer32 = RF_CALL(readRegister(Register::RANGE_CTL_REG));
+		RF_END_RETURN(RangeSel_t::get(RangeSelectionRegister_t(buffer32)));
 	}
 
 private:
-	static void writeRegister(Register reg, uint32_t data);
-	static uint32_t readRegister(Register reg);
+	modm::ResumableResult<void>
+	writeRegister(Register reg, uint32_t data);
 
+	modm::ResumableResult<uint32_t>
+	readRegister(Register reg);
+
+	uint8_t buffer[6];
+	uint32_t buffer32;
 };
-
-// IOStream&
-// operator<<(IOStream& out, const ad7928::Data& data);
 
 } // namespace modm
 

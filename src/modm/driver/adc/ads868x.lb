@@ -13,10 +13,8 @@
 
 def init(module):
     module.name = ":driver:ads868x"
-    module.description = """\
+    module.description = """
 # ADS868x Driver.
-
-This is a blocking driver.
 
 ADS868x 16-Bit, High-Speed, Single-Supply, SAR ADC Data Acquisition System
 With Programmable, Bipolar Input Ranges
@@ -30,8 +28,8 @@ def prepare(module, options):
         ":architecture:accessor",
         ":architecture:gpio",
         ":architecture:register",
-        ":architecture:spi",
-        )
+        ":processing:resumable",
+        ":architecture:spi.device")
     return True
 
 def build(env):
