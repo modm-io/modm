@@ -12,17 +12,17 @@
 
 import os
 import sys
+import json
 import shutil
 import zipfile
 import tempfile
 import argparse
 import datetime
-import multiprocessing
-import os, sys
+import platform
+import multiprocessing as mp
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 from collections import defaultdict
-import json
 
 def repopath(path):
     return Path(__file__).absolute().parents[2] / path
@@ -136,7 +136,7 @@ def main():
         print("Starting to generate documentation...")
         template_overview(output_dir, device_list, board_list, template_path)
         print("... for {} devices, estimated memory footprint is {} MB".format(len(device_list) + len(board_list), (len(device_list)*70)+2000))
-        with multiprocessing.Pool(args.jobs) as pool:
+        with mp.get_context("spawn").Pool(args.jobs) as pool:
             # We can only pass one argument to pool.map
             devices = ["{}|{}|{}||{}".format(modm_path, tempdir, dev, args.deduplicate) for dev in device_list]
             devices += ["{}|{}|{}|{}|{}".format(modm_path, tempdir, dev, brd, args.deduplicate) for (brd, dev) in board_list]

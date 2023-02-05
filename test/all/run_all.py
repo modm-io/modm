@@ -20,8 +20,9 @@ import lbuild
 import random
 import tempfile
 import argparse
+import platform
 import subprocess
-import multiprocessing
+import multiprocessing as mp
 from pathlib import Path
 from collections import defaultdict
 
@@ -287,7 +288,7 @@ if __name__ == "__main__":
 
     print("Using {} parallel jobs for {} devices".format(args.jobs, len(devices)))
     try:
-        with multiprocessing.Pool(args.jobs) as pool:
+        with mp.get_context("spawn").Pool(args.jobs) as pool:
             test_runs = pool.map(build_device,
                             [TestRun(x, cache_dir, cache_limit) for x in devices])
 

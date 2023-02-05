@@ -13,7 +13,7 @@ import re
 import argparse
 import platform
 import subprocess
-import multiprocessing
+import multiprocessing as mp
 from pathlib import Path
 
 is_running_in_ci = (os.getenv("CIRCLECI") is not None or
@@ -107,22 +107,24 @@ def compile_examples(paths, jobs, split, part):
     if split > 1:
         chunk_size = math.ceil(len(projects) / args.split)
         projects = projects[chunk_size*args.part:min(chunk_size*(args.part+1), len(projects))]
+
+    ctx = mp.get_context("spawn")
     # first generate all projects
-    with multiprocessing.Pool(jobs) as pool:
+    with ctx.Pool(jobs) as pool:
         projects = pool.map(generate, projects)
     results += projects.count(None)
 
     # Filter projects for successful generation
     projects = [p for p in projects if p is not None]
     # Then build the successfully generated ones
-    with multiprocessing.Pool(jobs) as pool:
+    with ctx.Pool(jobs) as pool:
         projects = pool.map(build, projects)
     results += projects.count(None)
 
     # Filter projects for successful compilation and runablity
     projects = [p for p in projects if p is not None and "CI: run" in p.read_text()]
     # Then run the successfully compiled ones
-    with multiprocessing.Pool(jobs) as pool:
+    with ctx.Pool(jobs) as pool:
         projects = pool.map(run, projects)
     results += projects.count(None)
 
