@@ -127,7 +127,7 @@ public:
 	inline void
 	clearPixel(glcd::Point p)
 	{
-		this->setPixel(p.x, p.y);
+		this->clearPixel(p.x, p.y);
 	}
 
 	/**
