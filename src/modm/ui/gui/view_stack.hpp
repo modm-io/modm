@@ -21,7 +21,6 @@
 #include <modm/ui/display/color_graphic_display.hpp>
 #include <modm/container/stack.hpp>
 #include <modm/container/linked_list.hpp>
-#include <modm/ui/menu/menu_buttons.hpp>
 #include "view.hpp"
 #include "types.hpp"
 
@@ -41,7 +40,7 @@ namespace gui
  * @ingroup modm_ui_gui
  * @author	Thorsten Lajewski
  */
-class GuiViewStack : public modm::ViewStack
+class GuiViewStack
 {
 public:
 	GuiViewStack(modm::ColorGraphicDisplay* display, modm::gui::inputQueue* queue);
@@ -84,7 +83,17 @@ public:
 	virtual void
 	update();
 
+	/**
+	 * @brief getDisplay access underlying GraphicDisplay
+	 */
+	inline modm::ColorGraphicDisplay&
+	getDisplay()
+	{
+		return *this->display;
+	}
+
 private:
+	modm::ColorGraphicDisplay *display;
 	modm::Stack< modm::gui::View* , modm::LinkedList< modm::gui::View* > > stack;
 	modm::gui::inputQueue *input_queue;
 };

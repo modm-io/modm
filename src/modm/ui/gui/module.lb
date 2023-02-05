@@ -23,9 +23,7 @@ def prepare(module, options):
         ":container",
         ":debug",
         ":processing:timer",
-        ":ui:display",
-        ":ui:gui",
-        ":ui:menu")
+        ":ui:display")
     return True
 
 def build(env):
