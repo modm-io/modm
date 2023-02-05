@@ -84,7 +84,7 @@ modm::ScrollableText::getText()
 	if(this->needsScrolling())
 	{
 		if(!this->isPaused())
-			{
+		{
 			for(uint16_t i = 0; i<this->space; ++i)
 			{
 				if( (i+this->startPosition) < this->length)
@@ -126,5 +126,4 @@ modm::ScrollableText::setToStart()
 		}
 		this->print[space]='\0';
 	}
-
 }
