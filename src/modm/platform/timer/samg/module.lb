@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2021, Jeff McBride
+# Copyright (c) 2023, Christopher Durand
 #
 # This file is part of the modm project.
 #
@@ -41,14 +42,15 @@ def init(module):
 
 def prepare(module, options):
     device = options[":target"]
-    if not device.has_driver("tc:samg*"):
+    family = device.identifier.family
+    if not device.has_driver("tc:sam*") or family not in ["g5x", "e7x/s7x/v7x"]:
         return False
 
     module.depends(
         ":cmsis:device",
         ":platform:gpio")
 
-    timers = device.get_all_drivers("tc:samg*")
+    timers = device.get_all_drivers("tc:sam*")
     for driver in timers:
         for instance in driver["instance"]:
             instance = int(instance)
@@ -64,4 +66,5 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "modm/src/modm/platform/timer"
-    env.copy("timer_channel_base.hpp")
+    env.substitutions = props
+    env.template("timer_channel_base.hpp.in", "timer_channel_base.hpp")

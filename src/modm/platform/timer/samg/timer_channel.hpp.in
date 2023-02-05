@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, Jeff McBride
+ * Copyright (c) 2023, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -17,6 +18,18 @@
 
 namespace modm::platform
 {
+
+%% if target.family == "g5x"
+%% set ch = "TC{}->TC_CHANNEL[{}]".format(module, channel)
+%% else
+%% set ch = "TC{}->TcChannel[{}]".format(module, channel)
+%% endif
+
+%% if target.family == "g5x" or (target.family == "e7x/s7x/v7x" and target.variant == "a")
+%% set cmr_wav = "TC_CMR"
+%% else
+%% set cmr_wav = "TC_CMR_WAVEFORM"
+%% endif
 
 /**
  * @brief 		Timer Channel {{ id }}
@@ -47,6 +60,26 @@ namespace modm::platform
 class TimerChannel{{ id }} : public TimerChannelBase
 {
 public:
+%% if target.family == "e7x/s7x/v7x"
+	/// Input clock selection values
+	enum class ClockSource : uint32_t
+	{
+%% if id | int == 0
+		Pck7 = 0,
+%% else
+		Pck6 = 0,
+%% endif
+		MckDiv8 = 1,
+		MckDiv32 = 2,
+		MckDiv128 = 3,
+		Slck = 4,
+		Xc0 = 5,
+		Xc1 = 6,
+		Xc2 = 7,
+		Mck = 0xFFFF'FFFF
+	};
+%% endif
+
 	template< class... Pins >
 	static void
 	connect()
@@ -86,9 +119,22 @@ public:
 	static inline void
 	setClockSource(ClockSource src)
 	{
-		uint32_t tmp = TC{{ module }}->TC_CHANNEL[{{ channel }}].TC_CMR & ~(TC_CMR_TCCLKS_Msk);
+%% if target.family == "e7x/s7x/v7x"
+		if (src == ClockSource::Mck) {
+			{{ ch }}.TC_EMR |= TC_EMR_NODIVCLK;
+			return;
+		} else {
+			uint32_t tmp = {{ ch }}.TC_CMR & ~(TC_CMR_TCCLKS_Msk);
+			tmp |= (uint32_t)src << TC_CMR_TCCLKS_Pos;
+			{{ ch }}.TC_CMR = tmp;
+
+			{{ ch }}.TC_EMR &= ~TC_EMR_NODIVCLK;
+		}
+%% else
+		uint32_t tmp = {{ ch }}.TC_CMR & ~(TC_CMR_TCCLKS_Msk);
 		tmp |= (uint32_t)src << TC_CMR_TCCLKS_Pos;
-		TC{{ module }}->TC_CHANNEL[{{ channel }}].TC_CMR = tmp;
+		{{ ch }}.TC_CMR = tmp;
+%% endif
 	}
 
 	/** Returns the currently selected clock source
@@ -96,29 +142,34 @@ public:
 	static inline ClockSource
 	getClockSource()
 	{
-		uint32_t cmr = TC{{ module }}->TC_CHANNEL[{{ channel }}].TC_CMR;
+%% if target.family == "e7x/s7x/v7x"
+	if ({{ ch }}.TC_EMR & TC_EMR_NODIVCLK) {
+		return ClockSource::Mck;
+	}
+%% endif
+		const uint32_t cmr = {{ ch }}.TC_CMR;
 		return (ClockSource)((cmr & TC_CMR_TCCLKS_Msk) >> TC_CMR_TCCLKS_Pos);
 	}
 
 	static inline void
 	setWaveformSelection(WavSel ws)
 	{
-		uint32_t cmr = TC{{ module }}->TC_CHANNEL[{{ channel }}].TC_CMR;
-		cmr &= ~TC_CMR_WAVSEL_Msk;
-		cmr |= (uint32_t)ws << TC_CMR_WAVSEL_Pos;
-		TC{{ module }}->TC_CHANNEL[{{ channel }}].TC_CMR = cmr;
+		uint32_t cmr = {{ ch }}.TC_CMR;
+		cmr &= ~{{ cmr_wav }}_WAVSEL_Msk;
+		cmr |= (uint32_t)ws << {{ cmr_wav }}_WAVSEL_Pos;
+		{{ ch }}.TC_CMR = cmr;
 	}
 
 	static inline void
 	enable()
 	{
-		TC{{ module }}->TC_CHANNEL[{{ channel }}].TC_CCR = TC_CCR_CLKEN;
+		{{ ch }}.TC_CCR = TC_CCR_CLKEN;
 	}
 
 	static inline void
 	disable()
 	{
-		TC{{ module }}->TC_CHANNEL[{{ channel }}].TC_CCR = TC_CCR_CLKDIS;
+		{{ ch }}.TC_CCR = TC_CCR_CLKDIS;
 	}
 
 	static inline void
@@ -130,49 +181,49 @@ public:
 	static inline uint16_t
 	getValue()
 	{
-		return TC{{ module }}->TC_CHANNEL[{{ channel }}].TC_CV;
+		return {{ ch }}.TC_CV;
 	}
 
 	static inline void
 	setValue(uint16_t value)
 	{
-		TC{{ module }}->TC_CHANNEL[{{ channel }}].TC_CV = value;
+		{{ ch }}.TC_CV = value;
 	}
 
 	static inline uint16_t
 	getRegA()
 	{
-		return TC{{ module }}->TC_CHANNEL[{{ channel }}].TC_RA;
+		return {{ ch }}.TC_RA;
 	}
 
 	static inline void
 	setRegA(uint16_t value)
 	{
-		TC{{ module }}->TC_CHANNEL[{{ channel }}].TC_RA = value;
+		{{ ch }}.TC_RA = value;
 	}
 
 	static inline uint16_t
 	getRegB()
 	{
-		return TC{{ module }}->TC_CHANNEL[{{ channel }}].TC_RB;
+		return {{ ch }}.TC_RB;
 	}
 
 	static inline void
 	setRegB(uint16_t value)
 	{
-		TC{{ module }}->TC_CHANNEL[{{ channel }}].TC_RB = value;
+		{{ ch }}.TC_RB = value;
 	}
 
 	static inline uint16_t
 	getRegC()
 	{
-		return TC{{ module }}->TC_CHANNEL[{{ channel }}].TC_RC;
+		return {{ ch }}.TC_RC;
 	}
 
 	static inline void
 	setRegC(uint16_t value)
 	{
-		TC{{ module }}->TC_CHANNEL[{{ channel }}].TC_RC = value;
+		{{ ch }}.TC_RC = value;
 	}
 
 	/** Return the frequency of the counter based on current configuration
@@ -186,16 +237,35 @@ public:
 	{
 		switch(getClockSource())
 		{
+%% if target.family == "e7x/s7x/v7x"
+%% if id | int == 0
+		case ClockSource::Pck7:
+			return SystemClock::Pck7;
+%% else
+		case ClockSource::Pck6:
+			return SystemClock::Pck6;
+%% endif
+%% endif
+%% if target.family == "g5x"
 		case ClockSource::MckDiv2:
 			return SystemClock::Mck / 2;
+%% endif
 		case ClockSource::MckDiv8:
 			return SystemClock::Mck / 8;
 		case ClockSource::MckDiv32:
 			return SystemClock::Mck / 32;
 		case ClockSource::MckDiv128:
 			return SystemClock::Mck / 128;
+%% if target.family == "g5x"
 		case ClockSource::Pck3:
 			return SystemClock::Pck3;
+%% endif
+%% if target.family == "e7x/s7x/v7x"
+		case ClockSource::Slck:
+			return SystemClock::Slck;
+		case ClockSource::Mck:
+			return SystemClock::Mck;
+%% endif
 		default:
 			return 0; // Clocked externally, so we can't know the frequency
 		}
@@ -218,14 +288,14 @@ public:
 	 */
 	static inline void enableInterrupt(Interrupt_t interrupts)
 	{
-		TC{{ module }}->TC_CHANNEL[{{ channel }}].TC_IER = interrupts.value;
+		{{ ch }}.TC_IER = interrupts.value;
 	}
 
 	/** Disable interrupt in peripheral interrupt mask register
 	 */
 	static inline void disableInterrupt(Interrupt_t interrupts)
 	{
-		TC{{ module }}->TC_CHANNEL[{{ channel }}].TC_IDR = interrupts.value;
+		{{ ch }}.TC_IDR = interrupts.value;
 	}
 
 	/** Reads the currently pending interrupt flags
@@ -234,13 +304,17 @@ public:
 	 */
 	static inline Interrupt_t getInterruptFlags()
 	{
-		return (Interrupt_t)(TC{{ module }}->TC_CHANNEL[{{ channel }}].TC_SR & 0x3f);
+%% if target.family == "g5x"
+		return static_cast<Interrupt_t>({{ ch }}.TC_SR & 0x3f);
+%% else
+		return static_cast<Interrupt_t>({{ ch }}.TC_SR & 0xf);
+%% endif
 	}
 
 	/** Generate a software trigger event */
 	static inline void softwareTrigger()
 	{
-		TC{{ module }}->TC_CHANNEL[{{ channel }}].TC_CCR = TC_CCR_SWTRG;
+		{{ ch }}.TC_CCR = TC_CCR_SWTRG;
 	}
 
 	/** Enable or disable waveform mode
@@ -250,9 +324,9 @@ public:
 	static inline void setWaveformMode(bool enabled)
 	{
 		if(enabled) {
-			TC{{ module }}->TC_CHANNEL[{{ channel }}].TC_CMR |= TC_CMR_WAVE;
+			{{ ch }}.TC_CMR |= TC_CMR_WAVE;
 		} else {
-			TC{{ module }}->TC_CHANNEL[{{ channel }}].TC_CMR &= ~TC_CMR_WAVE;
+			{{ ch }}.TC_CMR &= ~TC_CMR_WAVE;
 		}
 	}
 
@@ -264,10 +338,10 @@ public:
 	 */
 	static inline void setExtEventSource(ExtEventSource src)
 	{
-		uint32_t cmr = TC{{ module }}->TC_CHANNEL[{{ channel }}].TC_CMR;
-		cmr &= ~TC_CMR_EEVT_Msk;
-		cmr |= (uint32_t)src << TC_CMR_EEVT_Pos;
-		TC{{ module }}->TC_CHANNEL[{{ channel }}].TC_CMR = cmr;
+		uint32_t cmr = {{ ch }}.TC_CMR;
+		cmr &= ~{{ cmr_wav }}_EEVT_Msk;
+		cmr |= (uint32_t)src << {{ cmr_wav }}_EEVT_Pos;
+		{{ ch }}.TC_CMR = cmr;
 	}
 
 	/** Set the effect of events on the TIOA output in waveform mode
@@ -278,13 +352,13 @@ public:
 		TioEffect extEvent = TioEffect::None,
 		TioEffect swTrig = TioEffect::None)
 	{
-		uint32_t tmp = TC{{ module }}->TC_CHANNEL[{{ channel }}].TC_CMR;
-		tmp &= ~(TC_CMR_ACPA_Msk | TC_CMR_ACPC_Msk | TC_CMR_AEEVT_Msk | TC_CMR_ASWTRG_Msk);
-		tmp |= ((uint32_t)raCompare << TC_CMR_ACPA_Pos) |
-			((uint32_t)rcCompare << TC_CMR_ACPC_Pos) |
-			((uint32_t)extEvent << TC_CMR_AEEVT_Pos) |
-			((uint32_t)swTrig << TC_CMR_ASWTRG_Pos);
-		TC{{ module }}->TC_CHANNEL[{{ channel }}].TC_CMR = tmp;
+		uint32_t tmp = {{ ch }}.TC_CMR;
+		tmp &= ~({{ cmr_wav }}_ACPA_Msk | {{ cmr_wav }}_ACPC_Msk | {{ cmr_wav }}_AEEVT_Msk | {{ cmr_wav }}_ASWTRG_Msk);
+		tmp |= ((uint32_t)raCompare << {{ cmr_wav }}_ACPA_Pos) |
+			((uint32_t)rcCompare << {{ cmr_wav }}_ACPC_Pos) |
+			((uint32_t)extEvent << {{ cmr_wav }}_AEEVT_Pos) |
+			((uint32_t)swTrig << {{ cmr_wav }}_ASWTRG_Pos);
+		{{ ch }}.TC_CMR = tmp;
 	}
 
 	/** Set the effect of events on the TIOB output in waveform mode
@@ -299,13 +373,13 @@ public:
 		TioEffect extEvent = TioEffect::None,
 		TioEffect swTrig = TioEffect::None)
 	{
-		uint32_t tmp = TC{{ module }}->TC_CHANNEL[{{ channel }}].TC_CMR;
-		tmp &= ~(TC_CMR_BCPB_Msk | TC_CMR_BCPC_Msk | TC_CMR_BEEVT_Msk | TC_CMR_BSWTRG_Msk);
-		tmp |= ((uint32_t)rbCompare << TC_CMR_BCPB_Pos) |
-			((uint32_t)rcCompare << TC_CMR_BCPC_Pos) |
-			((uint32_t)extEvent << TC_CMR_BEEVT_Pos) |
-			((uint32_t)swTrig << TC_CMR_BSWTRG_Pos);
-		TC{{ module }}->TC_CHANNEL[{{ channel }}].TC_CMR = tmp;
+		uint32_t tmp = {{ ch }}.TC_CMR;
+		tmp &= ~({{ cmr_wav }}_BCPB_Msk | {{ cmr_wav }}_BCPC_Msk | {{ cmr_wav }}_BEEVT_Msk | {{ cmr_wav }}_BSWTRG_Msk);
+		tmp |= ((uint32_t)rbCompare << {{ cmr_wav }}_BCPB_Pos) |
+			((uint32_t)rcCompare << {{ cmr_wav }}_BCPC_Pos) |
+			((uint32_t)extEvent << {{ cmr_wav }}_BEEVT_Pos) |
+			((uint32_t)swTrig << {{ cmr_wav }}_BSWTRG_Pos);
+		{{ ch }}.TC_CMR = tmp;
 	}
 
 };

@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, Jeff McBride
+ * Copyright (c) 2023, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -46,6 +47,7 @@ public:
 		UpDown_Rc = 3  // UPDOWN mode with automatic trigger on RC compare
 	};
 
+%% if target.family == "g5x"
 	/// Input clock selection values
 	enum class ClockSource : uint32_t
 	{
@@ -58,6 +60,7 @@ public:
 		Xc1 = 6,
 		Xc2 = 7
 	};
+%% endif
 
 	/// Interrupt flags
 	enum class Interrupt : uint32_t
@@ -70,11 +73,14 @@ public:
 		RaLoading = TC_IER_LDRAS,
 		RbLoading = TC_IER_LDRBS,
 		ExternalTrigger = TC_IER_ETRGS,
+%% if target.family == "g5x"
 		EndOfRxTransfer = TC_IER_ENDRX,
-		RxBufferFull = TC_IER_RXBUFF,
+		RxBufferFull = TC_IER_RXBUFF
+%% endif
 	};
 	MODM_FLAGS32(Interrupt);
 
+%% if target.family == "g5x" or (target.family == "e7x/s7x/v7x" and target.variant == "a")
 	// The CMR register has dual definitions: one for capture mode and one for
 	// waveform mode. However it seems that only the capture mode bit definitions
 	// made it into the CMSIS device header. Here, the missing waveform mode
@@ -99,6 +105,7 @@ public:
 	static const uint32_t TC_CMR_BEEVT_Msk = (0x3) << TC_CMR_BEEVT_Pos;
 	static const uint32_t TC_CMR_BSWTRG_Pos = 30;
 	static const uint32_t TC_CMR_BSWTRG_Msk = (0x3) << TC_CMR_BSWTRG_Pos;
+%% endif
 };
 
 }  // namespace modm::platform
