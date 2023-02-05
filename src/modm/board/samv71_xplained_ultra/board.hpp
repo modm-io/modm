@@ -33,6 +33,10 @@ struct SystemClock
 	static constexpr uint32_t Spi0 = Mck;
 	static constexpr uint32_t Twihs0 = Mck;
 	static constexpr uint32_t Dacc = Mck;
+
+	static constexpr uint32_t Pck5 = 80_MHz;
+	static constexpr uint32_t Mcan = Pck5;
+
 //	static constexpr uint32_t Usb = 48_MHz;
 
 	static bool inline
@@ -46,6 +50,16 @@ struct SystemClock
 		ClockGen::enablePllA<PllAMult>();
 		ClockGen::selectMasterClk<MasterClkSource::PLLA_CLK, MasterClkPrescaler::CLK_1, MasterClkDivider::Div2>();
 		ClockGen::updateCoreFrequency<Frequency>();
+
+		// Enable PMC bus-independent clock output PCK5 for MCAN
+		// Manual (48.4.2): "It is recommended to use the CAN clock at frequencies of 20, 40 or 80 MHz.
+		// To achieve these frequencies, PMC PCK5 must select the UPLLCK (480 MHz) as source clock and
+		// divide by 24, 12, or 6. PCK5 allows the system bus and processor clock to be modified
+		// without affecting the bit rate communication."
+		ClockGen::enableUPll<UtmiRefClk::Xtal12>();
+		ClockGen::disablePck(Pck::Pck5);
+		ClockGen::configurePck(Pck::Pck5, PckSource::UPll, 6);
+		ClockGen::enablePck(Pck::Pck5);
 
 		return true;
 	}
@@ -70,6 +84,16 @@ using Scl = GpioA4;
 
 using LoggerDevice = modm::IODeviceWrapper<Debug::Uart, modm::IOBuffer::BlockIfFull>;
 
+namespace Can
+{
+/// @ingroup modm_board_samv71_xplained_ultra
+/// @{
+using Rx = GpioC12;
+using Tx = GpioC14;
+using Can = Mcan1;
+/// @}
+}
+
 inline void
 initialize()
 {
@@ -87,6 +111,8 @@ initialize()
 
 	Leds::setOutput();
 	ButtonSW0::setInput(InputType::PullUp);
+
+	Can::Can::connect<Can::Rx::Rx, Can::Tx::Tx>(InputType::PullUp);
 }
 
 /*
