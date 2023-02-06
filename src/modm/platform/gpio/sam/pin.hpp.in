@@ -61,6 +61,19 @@ enum class PeripheralPin
 	I2sdi,
 	I2sdo,
 	I2smck,
+	PwmH0,
+	PwmH1,
+	PwmH2,
+	PwmH3,
+	PwmL0,
+	PwmL1,
+	PwmL2,
+	PwmL3,
+	PwmFi0,
+	PwmFi1,
+	PwmFi2,
+	PwmExtrg0,
+	PwmExtrg1
 };
 
 template<typename... Tuples>
@@ -550,7 +563,19 @@ public:
 	using I2sdi = As<PeripheralPin::I2sdi>;
 	using I2sdo = As<PeripheralPin::I2sdo>;
 	using I2smck = As<PeripheralPin::I2smck>;
-
+	using PwmH0 = As<PeripheralPin::PwmH0>;
+	using PwmH1 = As<PeripheralPin::PwmH1>;
+	using PwmH2 = As<PeripheralPin::PwmH2>;
+	using PwmH3 = As<PeripheralPin::PwmH3>;
+	using PwmL0 = As<PeripheralPin::PwmL0>;
+	using PwmL1 = As<PeripheralPin::PwmL1>;
+	using PwmL2 = As<PeripheralPin::PwmL2>;
+	using PwmL3 = As<PeripheralPin::PwmL3>;
+	using PwmFi0 = As<PeripheralPin::PwmFi0>;
+	using PwmFi1 = As<PeripheralPin::PwmFi1>;
+	using PwmFi2 = As<PeripheralPin::PwmFi2>;
+	using PwmExtrg0 = As<PeripheralPin::PwmExtrg0>;
+	using PwmExtrg1 = As<PeripheralPin::PwmExtrg1>;
 
 	inline static bool
 	read()

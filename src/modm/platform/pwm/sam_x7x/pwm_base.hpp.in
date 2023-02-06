@@ -1,0 +1,298 @@
+// coding: utf-8
+/*
+ * Copyright (c) 2023, Christopher Durand
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_SAM_PWM_BASE_HPP
+#define MODM_SAM_PWM_BASE_HPP
+
+#include <cstdint>
+#include <modm/architecture/interface/register.hpp>
+#include <modm/platform/gpio/pin.hpp>
+
+namespace modm::platform
+{
+
+class PwmBase
+{
+public:
+	enum class Channel : uint8_t
+	{
+		Ch0 = 0,
+		Ch1 = 1,
+		Ch2 = 2,
+		Ch3 = 3
+	};
+
+	enum class Channels : uint8_t
+	{
+		Ch0 = Bit0,
+		Ch1 = Bit1,
+		Ch2 = Bit2,
+		Ch3 = Bit3
+	};
+	MODM_FLAGS8(Channels);
+
+	enum class PreDivider : uint8_t
+	{
+		Div1 = 0,
+		Div2 = 1,
+		Div4 = 2,
+		Div8 = 3,
+		Div16 = 4,
+		Div32 = 5,
+		Div64 = 6,
+		Div128 = 7,
+		Div256 = 8,
+		Div512 = 9,
+		Div1024 = 10
+	};
+
+	enum class DividedClock : uint8_t
+	{
+		ClockA = 0,
+		ClockB = 1
+	};
+
+	enum class Outputs : uint32_t
+	{
+		Ch0PwmH = Bit0,
+		Ch1PwmH = Bit1,
+		Ch2PwmH = Bit2,
+		Ch3PwmH = Bit3,
+		Ch0PwmL = Bit16,
+		Ch1PwmL = Bit17,
+		Ch2PwmL = Bit18,
+		Ch3PwmL = Bit19,
+
+		Mask = PWM_OS_Msk
+	};
+	MODM_FLAGS32(Outputs);
+
+	enum class Interrupt : uint32_t
+	{
+		Ch0Event = Bit0,
+		Ch1Event = Bit1,
+		Ch2Event = Bit2,
+		Ch3Event = Bit3,
+		Ch0Fault = Bit16,
+		Ch1Fault = Bit17,
+		Ch2Fault = Bit18,
+		Ch3Fault = Bit19
+	};
+	MODM_FLAGS32(Interrupt);
+
+	enum class ChannelClock
+	{
+		Mck = PWM_CMR_CPRE_MCK,
+		MckDiv2 = PWM_CMR_CPRE_MCK_DIV_2,
+		MckDiv4 = PWM_CMR_CPRE_MCK_DIV_4,
+		MckDiv8 = PWM_CMR_CPRE_MCK_DIV_8,
+		MckDiv16 = PWM_CMR_CPRE_MCK_DIV_16,
+		MckDiv32 = PWM_CMR_CPRE_MCK_DIV_32,
+		MckDiv64 = PWM_CMR_CPRE_MCK_DIV_64,
+		MckDiv128 = PWM_CMR_CPRE_MCK_DIV_128,
+		MckDiv256 = PWM_CMR_CPRE_MCK_DIV_256,
+		MckDiv512 = PWM_CMR_CPRE_MCK_DIV_512,
+		MckDiv1024 = PWM_CMR_CPRE_MCK_DIV_1024,
+		ClockA = PWM_CMR_CPRE_CLKA,
+		ClockB = PWM_CMR_CPRE_CLKB,
+
+		Mask = PWM_CMR_CPRE_Msk
+	};
+
+	enum class ChannelAlignment
+	{
+		LeftAligned = 0,
+		CenterAligned = PWM_CMR_CALG,
+
+		Mask = CenterAligned
+	};
+
+	enum class ComparatorPolarity
+	{
+		StartLow = 0,
+		StartHigh = PWM_CMR_CPOL,
+
+		Mask = StartHigh
+	};
+
+	/// Configuration for center-aligned mode counter event and update
+	/// If EnableEvent is set a counter event will also be triggered at half-period.
+	/// If EnableUpdate is set a register update will also be triggered at half-period.
+	/// Unused in left-aligned mode.
+	enum class HalfPeriodMode : uint32_t
+	{
+		EnableEvent = PWM_CMR_CES,
+		EnableUpdate = PWM_CMR_UPDS,
+
+		Mask = PWM_CMR_CES | PWM_CMR_UPDS
+	};
+	MODM_FLAGS32(HalfPeriodMode);
+
+	/// Set if the comparator output polarity is inverted in disabled state.
+	/// If normal is set the output corresponds to the setting of the comparator
+	/// polarity (CPOL bit). If inverted is selected it is inverted respective to that.
+	enum class DisabledPolarity
+	{
+		Normal = 0,
+		Inverted = PWM_CMR_DPOLI,
+
+		Mask = Inverted
+	};
+
+	/// Set source of trigger output to Timer / Counter peripheral
+	enum class TcTriggerSource
+	{
+		Comparator = 0,
+		CounterEvent = PWM_CMR_TCTS,
+
+		Mask = CounterEvent
+	};
+
+	enum class DeadTimeGeneration
+	{
+		Disabled = 0,
+		Enabled = PWM_CMR_DTE,
+
+		Mask = Enabled
+	};
+
+	/// Invert output polarity (after dead-time generator, no effect on override mode)
+	enum class OutputPolarity
+	{
+		PwmHInverted = PWM_CMR_DTHI,
+		PwmLInverted = PWM_CMR_DTLI,
+
+		Mask = (PWM_CMR_DTHI | PWM_CMR_DTLI)
+	};
+
+	enum class PushPullMode
+	{
+		Disabled = 0,
+		Enabled = PWM_CMR_PPM,
+
+		Mask = Enabled
+	};
+
+	/**
+	 * Channel mode config
+	 *
+	 * Example usage:
+	 * \code
+	 * constexpr auto mode = Pwm{{id}}::ChannelMode()
+	 *   .setClock(Pwm{{id}}::ChannelClock::Mck)
+	 *   .setDeadTimeGeneration(Pwm{{id}}::DeadTimeGeneration::Enabled);
+	 *
+	 * Pwm{{id}}::setChannelMode(Pwm{{id}}::Channel::Ch1, mode);
+	 * \endcode
+	 */
+	struct ChannelMode
+	{
+		/// Set channel clock source
+		constexpr ChannelMode
+		setClock(ChannelClock clock);
+
+		/// Read channel clock source
+		constexpr ChannelClock
+		clock() const;
+
+		/// Set channel alignment (left / center-aligned)
+		constexpr ChannelMode
+		setAlignment(ChannelAlignment alignment);
+
+		/// Read channel alignment (left / center-aligned)
+		constexpr ChannelAlignment
+		alignment() const;
+
+		/// Set channel comparator polarity
+		constexpr ChannelMode
+		setComparatorPolarity(ComparatorPolarity polarity);
+
+		/// Read channel comparator polarity
+		constexpr ComparatorPolarity
+		comparatorPolarity() const;
+
+		/// Configure center-aligned mode counter event and update at half-cycle
+		/// Unused in left-aligned mode.
+		constexpr ChannelMode
+		setHalfPeriodMode(HalfPeriodMode mode);
+
+		/// Read center-aligned mode counter event and update at half-cycle
+		constexpr HalfPeriodMode
+		halfPeriodMode() const;
+
+		// Invert channel polarity in disabled state
+		constexpr ChannelMode
+		setDisabledPolarity(DisabledPolarity polarity);
+
+		constexpr DisabledPolarity
+		disabledPolarity() const;
+
+		// Configure trigger output source to Timer / Counter peripheral
+		constexpr ChannelMode
+		setTcTriggerSource(TcTriggerSource source);
+
+		constexpr TcTriggerSource
+		tcTriggerSource() const;
+
+		/// Enable or disable dead-time generatiom
+		constexpr ChannelMode
+		setDeadTimeGeneration(DeadTimeGeneration deadTime);
+
+		constexpr DeadTimeGeneration
+		deadTimeGeneration() const;
+
+		/// Set inverted output polarity (after dead-time generator, no effect on override mode)
+		constexpr ChannelMode
+		setOutputPolarity(OutputPolarity polarity);
+
+		constexpr OutputPolarity
+		outputPolarity() const;
+
+		/// Set push-pull mode
+		/// Special mode for transformer-based power converters to avoid core DC saturation.
+		constexpr ChannelMode
+		setPushPullMode(PushPullMode mode);
+
+		constexpr PushPullMode
+		pushPullMode() const;
+
+		/// raw PWM_CMRx register value
+		uint32_t value{};
+	};
+};
+
+} // namespace modm::platform
+
+/// \cond
+namespace modm::platform::pwm
+{
+
+template <typename Peripheral, PeripheralPin pinType, typename Signal, typename... Pins>
+struct Connect
+{
+	static void connect()
+	{
+		using Pin = GetPin_t<pinType, Pins...>;
+
+		if constexpr (!std::is_void_v<Pin>) {
+			using PinConnector = typename Pin::template Connector<Peripheral, Signal>;
+			PinConnector::connect();
+		}
+	}
+}; // namespace modm::platform::pwm
+
+}
+/// \endcond
+
+#include "pwm_base_impl.hpp"
+
+#endif // MODM_SAM_PWM_BASE_HPP

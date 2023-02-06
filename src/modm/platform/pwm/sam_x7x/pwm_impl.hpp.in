@@ -1,0 +1,231 @@
+// coding: utf-8
+/*
+ * Copyright (c) 2023, Christopher Durand
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_SAM_PWM{{ id }}_HPP
+#error "Don't include this file directly, use 'pwm_{{ id }}.hpp' instead!"
+#endif
+
+namespace modm::platform
+{
+
+template<typename... Pins>
+inline void
+Pwm{{ id }}::connect()
+{
+	using P = Peripherals::Pwm<{{ id | int }}>;
+
+	pwm::Connect<P, PeripheralPin::PwmH0, P::Pwmh<0>, Pins...>::connect();
+	pwm::Connect<P, PeripheralPin::PwmH1, P::Pwmh<1>, Pins...>::connect();
+	pwm::Connect<P, PeripheralPin::PwmH2, P::Pwmh<2>, Pins...>::connect();
+	pwm::Connect<P, PeripheralPin::PwmH3, P::Pwmh<3>, Pins...>::connect();
+
+	pwm::Connect<P, PeripheralPin::PwmL0, P::Pwml<0>, Pins...>::connect();
+	pwm::Connect<P, PeripheralPin::PwmL1, P::Pwml<1>, Pins...>::connect();
+	pwm::Connect<P, PeripheralPin::PwmL2, P::Pwml<2>, Pins...>::connect();
+	pwm::Connect<P, PeripheralPin::PwmL3, P::Pwml<3>, Pins...>::connect();
+
+	pwm::Connect<P, PeripheralPin::PwmFi0, P::Pwmfi<0>, Pins...>::connect();
+	pwm::Connect<P, PeripheralPin::PwmFi1, P::Pwmfi<1>, Pins...>::connect();
+	pwm::Connect<P, PeripheralPin::PwmFi2, P::Pwmfi<2>, Pins...>::connect();
+
+	pwm::Connect<P, PeripheralPin::PwmExtrg0, P::Pwmextrg<0>, Pins...>::connect();
+	pwm::Connect<P, PeripheralPin::PwmExtrg1, P::Pwmextrg<1>, Pins...>::connect();
+}
+
+inline void
+Pwm{{ id }}::initialize()
+{
+	ClockGen::enable<ClockPeripheral::Pwm{{ id }}>();
+}
+
+inline void
+Pwm{{ id }}::configureDividedClock(DividedClock clock, PreDivider preDiv, uint8_t div)
+{
+	if (clock == DividedClock::ClockA) {
+		PWM{{ id }}->PWM_CLK = (PWM{{ id }}->PWM_CLK & ~(PWM_CLK_DIVA_Msk | PWM_CLK_PREA_Msk))
+			| (div << PWM_CLK_DIVA_Pos) | PWM_CLK_PREA(uint32_t(preDiv));
+	} else { // ClockB
+		PWM{{ id }}->PWM_CLK = (PWM{{ id }}->PWM_CLK & ~(PWM_CLK_DIVB_Msk | PWM_CLK_PREB_Msk))
+			| (div << PWM_CLK_DIVB_Pos) | PWM_CLK_PREB(uint32_t(preDiv));
+	}
+}
+
+inline void
+Pwm{{ id }}::setChannelMode(Channel channel, ChannelMode mode)
+{
+	auto& ch = PWM{{ id }}->PwmChNum[uint8_t(channel) & 0b11];
+	ch.PWM_CMR = (mode.value & PWM_CMR_Msk);
+}
+
+inline Pwm{{ id }}::ChannelMode
+Pwm{{ id }}::channelMode(Channel channel)
+{
+	const auto& ch = PWM{{ id }}->PwmChNum[uint8_t(channel) & 0b11];
+	return ChannelMode{ch.PWM_CMR};
+}
+
+inline void
+Pwm{{ id }}::setPeriod(Channel channel, uint16_t period)
+{
+	auto& ch = PWM{{ id }}->PwmChNum[uint8_t(channel) & 0b11];
+	ch.PWM_CPRD = period;
+}
+
+inline void
+Pwm{{ id }}::setPeriodUpdate(Channel channel, uint16_t period)
+{
+	auto& ch = PWM{{ id }}->PwmChNum[uint8_t(channel) & 0b11];
+	ch.PWM_CPRDUPD = period;
+}
+
+inline uint16_t
+Pwm{{ id }}::period(Channel channel)
+{
+	const auto& ch = PWM{{ id }}->PwmChNum[uint8_t(channel) & 0b11];
+	return ch.PWM_CPRD;
+}
+
+inline void
+Pwm{{ id }}::setDutyCycle(Channel channel, uint16_t dutyCycle)
+{
+	auto& ch = PWM{{ id }}->PwmChNum[uint8_t(channel) & 0b11];
+	ch.PWM_CDTY = dutyCycle;
+}
+
+inline void
+Pwm{{ id }}::setDutyCycleUpdate(Channel channel, uint16_t dutyCycle)
+{
+	auto& ch = PWM{{ id }}->PwmChNum[uint8_t(channel) & 0b11];
+	ch.PWM_CDTYUPD = dutyCycle;
+}
+
+inline uint16_t
+Pwm{{ id }}::dutyCycle(Channel channel)
+{
+	const auto& ch = PWM{{ id }}->PwmChNum[uint8_t(channel) & 0b11];
+	return ch.PWM_CDTY;
+}
+
+inline uint16_t
+Pwm{{ id }}::counter(Channel channel)
+{
+	const auto& ch = PWM{{ id }}->PwmChNum[uint8_t(channel) & 0b11];
+	return ch.PWM_CCNT;
+}
+
+inline void
+Pwm{{ id }}::enableChannelOutput(Channels_t channels)
+{
+	PWM{{ id }}->PWM_ENA = channels.value;
+}
+
+inline void
+Pwm{{ id }}::disableChannelOutput(Channels_t channels)
+{
+	PWM{{ id }}->PWM_DIS = channels.value;
+}
+
+inline Pwm{{ id }}::Channels_t
+Pwm{{ id }}::isChannelOutputEnabled()
+{
+	return Channels_t(PWM{{ id }}->PWM_SR);
+}
+
+inline void
+Pwm{{ id }}::setDeadTime(Channel channel, uint16_t pwmL, uint16_t pwmH)
+{
+	auto& ch = PWM{{ id }}->PwmChNum[uint8_t(channel) & 0b11];
+	ch.PWM_DT = (uint32_t(pwmL) << 16) | pwmH;
+}
+
+inline void
+Pwm{{ id }}::configureOutputOverrideValues(Outputs_t outputs)
+{
+	PWM{{ id }}->PWM_OOV = outputs.value;
+}
+
+inline void
+Pwm{{ id }}::setOutputOverride(Outputs_t outputs, bool immediateUpdate)
+{
+	if (immediateUpdate) {
+		PWM{{ id }}->PWM_OSS = outputs.value;
+	} else {
+		PWM{{ id }}->PWM_OSSUPD = outputs.value;
+	}
+}
+
+inline void
+Pwm{{ id }}::clearOutputOverride(Outputs_t outputs, bool immediateUpdate)
+{
+	if (immediateUpdate) {
+		PWM{{ id }}->PWM_OSC = outputs.value;
+	} else {
+		PWM{{ id }}->PWM_OSCUPD = outputs.value;
+	}
+}
+
+inline void
+Pwm{{ id }}::enableInterrupt(Interrupt_t interrupt)
+{
+	PWM{{ id }}->PWM_IER1 = interrupt.value;
+}
+
+inline void
+Pwm{{ id }}::disableInterrupt(Interrupt_t interrupt)
+{
+	PWM{{ id }}->PWM_IDR1 = interrupt.value;
+}
+
+inline Pwm{{ id }}::Interrupt_t
+Pwm{{ id }}::isInterruptEnabled()
+{
+	return Interrupt_t(PWM{{ id }}->PWM_IMR1);
+}
+
+inline void
+Pwm{{ id }}::enableInterruptVector(uint32_t priority)
+{
+	NVIC_SetPriority(PWM{{ id }}_IRQn, priority);
+	NVIC_EnableIRQ(PWM{{ id }}_IRQn);
+}
+
+inline void
+Pwm{{ id }}::disableInterruptVector()
+{
+	NVIC_DisableIRQ(PWM{{ id }}_IRQn);
+}
+
+inline Pwm{{ id }}::Interrupt_t
+Pwm{{ id }}::readInterruptFlags()
+{
+	return Interrupt_t(PWM{{ id }}->PWM_ISR1);
+}
+
+constexpr Pwm{{ id }}::Interrupt_t
+Pwm{{ id }}::eventInterruptFlags(Channels_t channels)
+{
+	return Interrupt_t(channels.value);
+}
+
+inline void
+Pwm{{ id }}::configureSynchronousChannels(Channels_t syncChannels)
+{
+	PWM{{ id }}->PWM_SCM = (PWM{{ id }}->PWM_SCM & ~0b1111ul) | syncChannels.value;
+}
+
+inline void
+Pwm{{ id }}::updateSynchronousChannels()
+{
+	PWM{{ id }}->PWM_SCUC = PWM_SCUC_UPDULOCK;
+}
+
+} // namespace modm::platform

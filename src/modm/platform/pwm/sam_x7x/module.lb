@@ -1,0 +1,67 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2021, Jeff McBride
+# Copyright (c) 2023, Christopher Durand
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+props = {}
+class Instance(Module):
+    def __init__(self, driver, instance):
+        self.driver = driver
+        self.instance = int(instance)
+
+    def init(self, module):
+        module.name = str(self.instance)
+        module.description = "Instance {}".format(self.instance)
+
+    def prepare(self, module, options):
+        return True
+
+    def build(self, env):
+        global props
+        props["id"] = self.instance
+
+        env.substitutions = props
+        env.outbasepath = "modm/src/modm/platform/pwm"
+        env.template("pwm.hpp.in", "pwm_{}.hpp".format(self.instance))
+        env.template("pwm_impl.hpp.in", "pwm_{}_impl.hpp".format(self.instance))
+
+def init(module):
+    module.name = ":platform:pwm"
+    module.description = "PWM Generator"
+
+def prepare(module, options):
+    device = options[":target"]
+    family = device.identifier.family
+    if not device.has_driver("pwm:sam*") or family != "e7x/s7x/v7x":
+        return False
+
+    module.depends(
+        ":cmsis:device",
+        ":platform:clock",
+        ":platform:gpio")
+
+    timers = device.get_all_drivers("pwm:sam*")
+    for driver in timers:
+        for instance in driver["instance"]:
+            instance = int(instance)
+            module.add_submodule(Instance(driver, instance))
+
+    global props
+    device = options[":target"]
+    props["target"] = device.identifier
+
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/platform/pwm"
+    env.substitutions = props
+    env.template("pwm_base.hpp.in", "pwm_base.hpp")
+    env.template("pwm_base_impl.hpp.in", "pwm_base_impl.hpp")

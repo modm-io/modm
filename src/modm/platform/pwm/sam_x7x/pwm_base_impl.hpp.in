@@ -1,0 +1,137 @@
+// coding: utf-8
+/*
+ * Copyright (c) 2023, Christopher Durand
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_SAM_PWM_BASE_HPP
+#error "Don't include this file directly, use 'pwm_base.hpp' instead!"
+#endif
+
+namespace modm::platform
+{
+
+constexpr PwmBase::ChannelMode
+PwmBase::ChannelMode::setClock(ChannelClock clock)
+{
+	value = (value & ~uint32_t(ChannelClock::Mask)) | uint32_t(clock);
+	return *this;
+}
+
+constexpr PwmBase::ChannelClock
+PwmBase::ChannelMode::clock() const
+{
+	return ChannelClock(value & uint32_t(ChannelClock::Mask));
+}
+
+constexpr PwmBase::ChannelMode
+PwmBase::ChannelMode::setAlignment(ChannelAlignment alignment)
+{
+	value = (value & ~uint32_t(ChannelAlignment::Mask)) | uint32_t(alignment);
+	return *this;
+}
+
+constexpr PwmBase::ChannelAlignment
+PwmBase::ChannelMode::alignment() const
+{
+	return ChannelAlignment(value & uint32_t(ChannelAlignment::Mask));
+}
+
+constexpr PwmBase::ChannelMode
+PwmBase::ChannelMode::setComparatorPolarity(ComparatorPolarity polarity)
+{
+	value = (value & ~uint32_t(ComparatorPolarity::Mask)) | uint32_t(polarity);
+	return *this;
+}
+
+constexpr PwmBase::ComparatorPolarity
+PwmBase::ChannelMode::comparatorPolarity() const
+{
+	return ComparatorPolarity(value & uint32_t(ComparatorPolarity::Mask));
+}
+
+constexpr PwmBase::ChannelMode
+PwmBase::ChannelMode::setHalfPeriodMode(HalfPeriodMode mode)
+{
+	value = (value & ~uint32_t(HalfPeriodMode::Mask)) | uint32_t(mode);
+	return *this;
+}
+
+constexpr PwmBase::HalfPeriodMode
+PwmBase::ChannelMode::halfPeriodMode() const
+{
+	return HalfPeriodMode(value & uint32_t(HalfPeriodMode::Mask));
+}
+
+constexpr PwmBase::ChannelMode
+PwmBase::ChannelMode::setDisabledPolarity(DisabledPolarity polarity)
+{
+	value = (value & ~uint32_t(DisabledPolarity::Mask)) | uint32_t(polarity);
+	return *this;
+}
+
+constexpr PwmBase::DisabledPolarity
+PwmBase::ChannelMode::disabledPolarity() const
+{
+	return DisabledPolarity(value & uint32_t(DisabledPolarity::Mask));
+}
+
+constexpr PwmBase::ChannelMode
+PwmBase::ChannelMode::setTcTriggerSource(TcTriggerSource source)
+{
+	value = (value & ~uint32_t(TcTriggerSource::Mask)) | uint32_t(source);
+	return *this;
+}
+
+constexpr PwmBase::TcTriggerSource
+PwmBase::ChannelMode::tcTriggerSource() const
+{
+	return TcTriggerSource(value & uint32_t(TcTriggerSource::Mask));
+}
+
+constexpr PwmBase::ChannelMode
+PwmBase::ChannelMode::setDeadTimeGeneration(DeadTimeGeneration deadTime)
+{
+	value = (value & ~uint32_t(TcTriggerSource::Mask)) | uint32_t(deadTime);
+	return *this;
+}
+
+constexpr PwmBase::DeadTimeGeneration
+PwmBase::ChannelMode::deadTimeGeneration() const
+{
+	return DeadTimeGeneration(value & uint32_t(DeadTimeGeneration::Mask));
+}
+
+constexpr PwmBase::ChannelMode
+PwmBase::ChannelMode::setOutputPolarity(OutputPolarity polarity)
+{
+	value = (value & ~uint32_t(OutputPolarity::Mask)) | uint32_t(polarity);
+	return *this;
+}
+
+constexpr PwmBase::OutputPolarity
+PwmBase::ChannelMode::outputPolarity() const
+{
+	return OutputPolarity(value & uint32_t(OutputPolarity::Mask));
+}
+
+constexpr PwmBase::ChannelMode
+PwmBase::ChannelMode::setPushPullMode(PushPullMode mode)
+{
+	value = (value & ~uint32_t(PushPullMode::Mask)) | uint32_t(mode);
+	return *this;
+}
+
+constexpr PwmBase::PushPullMode
+PwmBase::ChannelMode::pushPullMode() const
+{
+	return PushPullMode(value & uint32_t(PushPullMode::Mask));
+}
+
+} // namespace modm::platform

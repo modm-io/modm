@@ -1,0 +1,178 @@
+// coding: utf-8
+/*
+ * Copyright (c) 2023, Christopher Durand
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_SAM_PWM{{ id }}_HPP
+#define MODM_SAM_PWM{{ id }}_HPP
+
+#include <modm/platform/clock/clockgen.hpp>
+#include <modm/platform/pwm/pwm_base.hpp>
+
+namespace modm::platform
+{
+
+/**
+ * Four channel complementary PWM generator.
+ *
+ * \todo External trigger inputs, fault inputs and DMA are not supported.
+ *
+ * \author Christopher Durand
+ * \ingroup		modm_platform_i2c modm_platform_i2c_{{id}}
+ */
+
+class Pwm{{ id }} : public PwmBase
+{
+public:
+	/// Connect GPIO pin to peripheral
+	template<typename... Pins>
+	static void
+	connect();
+
+	/// Initialize peripheral
+	/// Must be called prior to using any other function except connect()
+	static void
+	initialize();
+
+	/// Setup ClockA or ClockB divided tinmer clocks
+	/// \param clock clock to configure
+	/// \param preDiv 2^N pre-divider
+	/// \param div 1..255 clock divider, set to 0 to disable clock
+	static void
+	configureDividedClock(DividedClock clock, PreDivider preDiv, uint8_t div);
+
+	/** Configure channel mode settings
+	 *
+	 * \warning Disable channel output before changing the configuration.
+	 *
+	 * Example usage:
+	 * \code
+	 * constexpr auto mode = Pwm{{id}}::ChannelMode()
+	 *   .setClock(Pwm{{id}}::ChannelClock::Mck)
+	 *   .setDeadTimeGeneration(Pwm{{id}}::DeadTimeGeneration::Enabled);
+	 *
+	 * Pwm{{id}}::setChannelMode(Pwm{{id}}::Channel::Ch1, mode);
+	 * \endcode
+	 */
+	static void
+	setChannelMode(Channel channel, ChannelMode mode);
+
+	/// Get current channel mode configuration
+	static ChannelMode
+	channelMode(Channel channel);
+
+	/// Set counter period (1 .. (2^16 - 1))
+	static void
+	setPeriod(Channel channel, uint16_t period);
+
+	/// Update counter period at the start of the next cycle
+	/// \warning Cannot be used for the initial configuration, no update will occur.
+	static void
+	setPeriodUpdate(Channel channel, uint16_t period);
+
+	/// Read the current counter period.
+	static uint16_t
+	period(Channel channel);
+
+	/// Set channel duty cycle (0 .. period)
+	static void
+	setDutyCycle(Channel channel, uint16_t dutyCycle);
+
+	/// Update channel duty-cycle at the start of the next cycle
+	/// \warning Cannot be used for the initial configuration, no update will occur.
+	static void
+	setDutyCycleUpdate(Channel channel, uint16_t dutyCycle);
+
+	/// Read the current duty cycle
+	static uint16_t
+	dutyCycle(Channel channel);
+
+	/// Read the current timer counter value
+	static uint16_t
+	counter(Channel channel);
+
+	/// Enable channel output
+	static void
+	enableChannelOutput(Channels_t channels);
+
+	/// Disable channel output
+	static void
+	disableChannelOutput(Channels_t channels);
+
+	/// Read currently enabled channels
+	static Channels_t
+	isChannelOutputEnabled();
+
+	/// Configure dead-time duration.
+	/// Dead-time must be enabled in the channel mode register or this setting has no effect.
+	/// \param pwmL Low output dead-time in timer ticks
+	/// \param pwmH High output dead-time in timer ticks
+	static void
+	setDeadTime(Channel channel, uint16_t pwmL, uint16_t pwmH);
+
+	/// Configure output state in override mode
+	/// \param outputHigh If the respective output flag is set the output is high, else low.
+	static void
+	configureOutputOverrideValues(Outputs_t outputHigh);
+
+	/// Enable output override mode
+	/// \param outputs Enable override for all set outputs
+	/// \param immediateUpdate Update at next cycle if false, else immediately.
+	static void
+	setOutputOverride(Outputs_t outputs, bool immediateUpdate = true);
+
+	/// Disable output override mode
+	/// \param outputs Disable override for all set outputs
+	/// \param immediateUpdate Update at next cycle if false, else immediately.
+	static void
+	clearOutputOverride(Outputs_t outputs, bool immediateUpdate = true);
+
+	/// Enable interrupt flags
+	static void
+	enableInterrupt(Interrupt_t interrupt);
+
+	/// Disable interrupt flags
+	static void
+	disableInterrupt(Interrupt_t interrupt);
+
+	/// Get enabled interrupt flags
+	static Interrupt_t
+	isInterruptEnabled();
+
+	static void
+	enableInterruptVector(uint32_t priority);
+
+	static void
+	disableInterruptVector();
+
+	/// Read interrupt flags. All flags are automatically cleared on read.
+	static Interrupt_t
+	readInterruptFlags();
+
+	/// Convert channel flags to the corresponding event interrupt flags
+	static constexpr Interrupt_t
+	eventInterruptFlags(Channels_t channels);
+
+	/// Configure channels in synchronized mode (see datasheet).
+	/// Only update method 1 (UPDM = 0) is supported for now.
+	static void
+	configureSynchronousChannels(Channels_t syncChannels);
+
+	/// Update synchronous channels period, duty cycle and dead-time at next period
+	static void
+	updateSynchronousChannels();
+};
+
+} // namespace modm::platform
+
+#include "pwm_{{ id }}_impl.hpp"
+
+#endif // MODM_SAM_PWM{{ id }}_HPP
+
