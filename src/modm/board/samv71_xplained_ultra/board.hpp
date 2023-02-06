@@ -51,7 +51,7 @@ struct SystemClock
 
 using Led0 = GpioA23;
 using Led1 = GpioC9;
-using ButtonSW0 = GpioA9;
+using ButtonSW0 = GpioInverted<GpioA9>;
 
 using Leds = SoftwareGpioPort<Led1, Led0>;
 
