@@ -169,7 +169,7 @@ template<UtmiRefClk refclk>
 void
 ClockGen::enableUPll(uint32_t wait_cycles)
 {
-	REG_UTMI_CKTRIM = refclk;
+	UTMI->UTMI_CKTRIM = static_cast<uint32_t>(refclk);
 	PMC->CKGR_UCKR =
 		CKGR_UCKR_UPLLCOUNT(wait_cycles) |
 		CKGR_UCKR_UPLLEN;

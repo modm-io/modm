@@ -11,6 +11,7 @@
 // ----------------------------------------------------------------------------
 
 #include "clockgen.hpp"
+#include <algorithm>
 #include <cmath>
 
 // CMSIS Core compliance
@@ -132,6 +133,33 @@ ClockGen::pllBFrequency()
 	uint32_t freq = SlowClkFreqHz * mul;
 	if(PMC->PMC_MCKR & PMC_MCKR_PLLBDIV2) freq /= 2;
 	return freq;
+}
+%% endif
+
+%% if target.family == "e7x/s7x/v7x"
+void
+ClockGen::enablePck(Pck clock)
+{
+	PMC->PMC_SCER = 1u << (PMC_SCER_PCK0_Pos + static_cast<uint8_t>(clock));
+
+	int_fast16_t deadlockPreventer = 10'000;  // max ~10ms
+	const uint8_t pckrdyPos = PMC_SR_PCKRDY0_Pos + static_cast<uint8_t>(clock);
+	while (((PMC->PMC_SR & (1 << pckrdyPos)) == 0) and (deadlockPreventer-- > 0))
+		modm::delay(std::chrono::microseconds{1});
+	modm_assert(deadlockPreventer > 0, "clockgen.pck.enable", "timeout expired");
+}
+
+void
+ClockGen::disablePck(Pck clock)
+{
+	PMC->PMC_SCDR = 1u << (PMC_SCDR_PCK0_Pos + static_cast<uint8_t>(clock));
+}
+
+void
+ClockGen::configurePck(Pck clock, PckSource source, uint16_t divider)
+{
+	PMC->PMC_PCK[uint8_t(clock)] = PMC_PCK_CSS(uint8_t(source)) |
+		PMC_PCK_PRES(std::clamp<uint16_t>(divider, 1, 256) - 1);
 }
 %% endif
 

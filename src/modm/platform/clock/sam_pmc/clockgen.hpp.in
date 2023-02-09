@@ -228,6 +228,32 @@ UtmiRefClk : uint32_t
 %% endif
 
 static constexpr uint32_t SlowClkFreqHz = 32'768;
+
+%% if target.family == "e7x/s7x/v7x"
+/// Programmable clocks
+enum class Pck
+{
+	Pck0 = 0,
+	Pck1 = 1,
+	Pck2 = 2,
+	Pck3 = 3,
+	Pck4 = 4,
+	Pck5 = 5,
+	Pck6 = 6,
+	Pck7 = 7
+};
+
+/// Programmable clock sources
+enum class PckSource
+{
+	SlowClock = PMC_PCK_CSS_SLOW_CLK,
+	MainClock = PMC_PCK_CSS_MAIN_CLK,
+	PllA = PMC_PCK_CSS_PLLA_CLK,
+	UPll = PMC_PCK_CSS_UPLL_CLK,
+	Mck = PMC_PCK_CSS_MCK
+};
+%% endif
+
 /// @}
 
 /**
@@ -295,6 +321,20 @@ public:
 	template<UtmiRefClk refclk>
 	static void
 	enableUPll(uint32_t wait_cycles = 50);
+
+	static void
+	enablePck(Pck clock);
+
+	static void
+	disablePck(Pck clock);
+
+	/**
+	 * Configure programmable clock.
+	 * @warning The clock must be disabled when changing configuration.
+	 * @param divider clock divider (1-256)
+	 */
+	static void
+	configurePck(Pck clock, PckSource source, uint16_t divider);
 %% endif
 
 	template <MasterClkSource src, MasterClkPrescaler pres,
