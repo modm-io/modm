@@ -47,10 +47,11 @@ jobs:
           git diff-index --quiet HEAD || git commit -m "Update"
           git push origin master
 
+  # Niklas: Running on the old container until I can figure out why the doc generator hangs
   api-docs-all:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     container:
-      image: ghcr.io/modm-ext/modm-build-base:2023-01-08
+      image: ghcr.io/modm-ext/modm-build-base:2022-09-27
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
