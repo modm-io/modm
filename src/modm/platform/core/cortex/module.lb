@@ -56,11 +56,13 @@ def common_vector_table(env):
     for vector in driver["vector"]:
         interrupts[int(vector["position"])] = vector["name"] + "_IRQHandler"
 
+    highest_irq = max(interrupts.keys()) + 1
     properties = {
         "core": core,
+        "highest_irq": highest_irq,
         "vector_table_location": common_vector_table_location(env),
         "vector_table": interrupts,
-        "highest_irq": max(interrupts.keys()) + 1,
+        "vector_table_size": (16 + highest_irq) * 4,
     }
     return properties
 

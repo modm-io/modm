@@ -207,21 +207,21 @@ function(modm_targets_create project_name)
   add_custom_command(TARGET debug
     USES_TERMINAL
     COMMAND ${PYTHON3_EXECUTABLE} modm/modm_tools/gdb.py -x modm/gdbinit -x modm/openocd_gdbinit
-        ${PROJECT_BINARY_DIR}/src/${project_name}.elf --ui=${MODM_DBG_UI} openocd -f modm/openocd.cfg
+        --elf ${PROJECT_BINARY_DIR}/src/${project_name}.elf --ui=${MODM_DBG_UI} openocd -f modm/openocd.cfg
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
   add_custom_target(debug-bmp DEPENDS ${project_name}.elf)
   add_custom_command(TARGET debug-bmp
     USES_TERMINAL
-    COMMAND ${PYTHON3_EXECUTABLE} modm/modm_tools/gdb.py -x modm/gdbinit ${PROJECT_BINARY_DIR}/src/${project_name}.elf
+    COMMAND ${PYTHON3_EXECUTABLE} modm/modm_tools/gdb.py -x modm/gdbinit --elf ${PROJECT_BINARY_DIR}/src/${project_name}.elf
         --ui=${MODM_DBG_UI} bmp -p ${MODM_BMP_PORT}
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
   add_custom_target(debug-coredump DEPENDS ${project_name}.elf)
   add_custom_command(TARGET debug-coredump
     USES_TERMINAL
-    COMMAND	${PYTHON3_EXECUTABLE} modm/modm_tools/gdb.py -x modm/gdbinit ${PROJECT_BINARY_DIR}/src/${project_name}.elf
-        --ui=${MODM_DBG_UI} crashdebug --binary-path modm/ext/crashcatcher/bins
+    COMMAND	${PYTHON3_EXECUTABLE} modm/modm_tools/gdb.py -x modm/gdbinit --elf ${PROJECT_BINARY_DIR}/src/${project_name}.elf
+        --ui=${MODM_DBG_UI} crashdebug
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
   add_custom_target(log-itm DEPENDS ${project_name}.elf)

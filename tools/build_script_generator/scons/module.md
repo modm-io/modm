@@ -328,6 +328,17 @@ This is just a convenience wrapper for the debug functionality defined in the
     program profile=debug` and try `scons debug profile=debug` again.
 
 
+#### scons debug-remote
+
+```
+scons debug-remote profile={debug|release} ui={tui|web} [host={ip or hostname}] [firmware={hash or file}]
+```
+
+Debugs the executable via a remote OpenOCD process running on your own computer
+(localhost is default) or somewhere else.
+(\* *only ARM Cortex-M targets*)
+
+
 #### scons debug-bmp
 
 ```
@@ -348,20 +359,38 @@ scons debug-coredump profile={debug|release} ui={tui|web} \
 
 Launches GDB for post-mortem debugging with the firmware identified by the
 (optional) `firmware={hash or filepath}` argument using the data from the
-`coredump={filepath}` argument.
+`coredump={filepath}` argument. Note that CrashDebug must be in your path, see
+the `modm:crashcatcher` module for details.
 (\* *only ARM Cortex-M targets*)
 
-See the `modm:platform:fault` module for details how to receive the coredump data.
+Use the `scons coredump` method to generate a coredump with a debugger attached,
+otherwise see the `modm:platform:fault` module for details how to generate and
+receive the coredump data from the device itself.
+(\* *only ARM Cortex-M targets*)
 
 
-#### scons debug-remote
+#### scons coredump
 
 ```
-scons debug-remote profile={debug|release} ui={tui|web} [host={ip or hostname}] [firmware={hash or file}]
+scons coredump
 ```
 
-Debugs the executable via a remote OpenOCD process running on your own computer
-(localhost is default) or somewhere else.
+Launches GDB via OpenOCD and creates a `coredump.txt` file containing all
+volatile memories and prints the GNU build ID of the firmware under debug.
+Note that this command does not require an ELF file, so it can be used to
+coredump any firmware whose ELF file is currently unavailable.
+You can use the GNU build ID to find the corresponding ELF file in your
+artifact store (see `scons artifact`).
+(\* *only ARM Cortex-M targets*)
+
+
+#### scons coredump-bmp
+
+```
+scons coredump-bmp
+```
+
+Creates a coredump via Black Magic Probe.
 (\* *only ARM Cortex-M targets*)
 
 

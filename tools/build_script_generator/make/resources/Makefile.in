@@ -139,22 +139,35 @@ ui?=tui
 debug: build
 	@python3 $(MODM_PATH)/modm_tools/gdb.py $(addprefix -x ,$(MODM_GDBINIT)) \
 			$(addprefix -x ,$(MODM_OPENOCD_GDBINIT)) \
-			$(ELF_FILE) --ui=$(ui) \
+			--elf $(ELF_FILE) --ui=$(ui) \
 			openocd $(addprefix -f ,$(MODM_OPENOCD_CONFIGFILES))
 
 .PHONY: debug-bmp
 debug-bmp: build
 	@python3 $(MODM_PATH)/modm_tools/gdb.py $(addprefix -x ,$(MODM_GDBINIT)) \
-			$(ELF_FILE) --ui=$(ui) \
+			--elf $(ELF_FILE) --ui=$(ui) \
 			bmp -p $(port)
 
 coredump?=coredump.txt
 .PHONY: debug-coredump
 debug-coredump: build
 	@python3 $(MODM_PATH)/modm_tools/gdb.py $(addprefix -x ,$(MODM_GDBINIT)) \
-			$(ELF_FILE) --ui=$(ui) \
-			crashdebug --binary-path $(MODM_PATH)/ext/crashcatcher/bins \
-			--dump $(coredump)
+			--elf $(ELF_FILE) --ui=$(ui) \
+			crashdebug --dump $(coredump)
+
+.PHONY: coredump
+coredump:
+	python3 $(MODM_PATH)/modm_tools/gdb.py $(addprefix -x ,$(MODM_GDBINIT)) \
+			$(addprefix -x ,$(MODM_OPENOCD_GDBINIT)) \
+			-ex "modm_coredump" -ex "print_build_id" -ex "quit" \
+			openocd $(addprefix -f ,$(MODM_OPENOCD_CONFIGFILES))
+
+.PHONY: coredump-bmp
+coredump-bmp:
+	python3 $(MODM_PATH)/modm_tools/gdb.py $(addprefix -x ,$(MODM_GDBINIT)) \
+			$(addprefix -x ,$(MODM_OPENOCD_GDBINIT)) \
+			-ex "modm_coredump" -ex "print_build_id" -ex "quit" \
+			bmp -p $(port)
 
 fcpu?=0
 .PHONY: log-itm

@@ -178,11 +178,6 @@ def build(env):
         env.collect("gitignore", "modm/src/info_build.c")
         env.copy("info_build.h")
 
-    # Copy crashcatcher binaries
-    if env.has_module(":crashcatcher"):
-        env.outbasepath = "modm/ext/crashcatcher"
-        env.copy(repopath("ext/adamgreen/crashcatcher/CrashDebug/bins/"), "bins/")
-
     # Append common search paths to metadata
     if env.has_collector(":build:path.openocd"):
         env.collect(":build:path.openocd", "modm/openocd")
@@ -247,16 +242,20 @@ def post_build(env):
             [env.relcwdoutpath(path) for path in env.collector_values("path.openocd")]
         env.substitutions["openocd_sources"] = env.collector_values("openocd.source")
 
+        linkerscript = env.query(":platform:cortex-m:linkerscript", {})
+        all_rams = [m for m in linkerscript.get("memories") if "w" in m["access"]]
+        env.substitutions["all_rams"] = all_rams
+        vector_table = env.query(":platform:cortex-m:vector_table", {"vector_table_size": 16*4})
+        env.substitutions["vector_table_size"] = vector_table["vector_table_size"]
+        env.template("gdbinit.in")
+
         has_rtt = env.has_module(":platform:rtt")
         env.substitutions["has_rtt"] = has_rtt
         if has_rtt:
-            main_ram = env.query(":platform:cortex-m:linkerscript", {})
-            main_ram = main_ram.get("cont_ram_regions", [{"start": 0x20000000, "size": 4096}])[0]
-            env.substitutions["main_ram"] = main_ram
+            env.substitutions["main_ram"] = linkerscript.get("cont_ram_regions", [{"start": 0x20000000, "size": 4096}])[0]
             env.substitutions["rtt_channels"] = len(env.get(":platform:rtt:buffer.tx", []))
         env.template("openocd.cfg.in")
         env.template("openocd_gdbinit.in")
-        env.template("gdbinit")
 
 
 # ============================ Option Descriptions ============================

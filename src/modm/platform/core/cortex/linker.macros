@@ -193,6 +193,13 @@ MAIN_STACK_SIZE = {{ options[":platform:cortex-m:main_stack_size"] }};
 
 
 %% macro section_rom(memory)
+	/* build id directly after vector table */
+	.build_id :
+	{
+		__build_id = .;
+		KEEP(*(.note.gnu.build-id))
+	} >{{memory}}
+
 	/* Read-only sections in {{memory}} */
 	.text :
 	{
@@ -221,12 +228,6 @@ MAIN_STACK_SIZE = {{ options[":platform:cortex-m:main_stack_size"] }};
 		KEEP(*(.assertion))
 		. = ALIGN(4);
 		__assertion_table_end = .;
-	} >{{memory}}
-
-	.build_id :
-	{
-		__build_id = .;
-		KEEP(*(.note.gnu.build-id))
 	} >{{memory}}
 
 	/* We do not call static destructors ever */

@@ -8,7 +8,7 @@ The tool can be called from the command line. Here is a typical use-case using
 the openocd backend with the common configuration files:
 
 ```sh
-python3 modm/modm_tools/gdb.py path/to/project.elf --ui=tui \
+python3 --elf modm/modm_tools/gdb.py path/to/project.elf --ui=tui \
         -x modm/gdbinit -x modm/openocd_gdbinit \
         openocd -f modm/openocd.cfg
 ```
@@ -32,20 +32,26 @@ remote backend with the `--host={ip or hostname}` via the command line:
 
 ```sh
 # Extended-Remote running remotely
-python3 modm/modm_tools/gdb.py path/to/project.elf -x modm/gdbinit --ui=tui \
+python3 --elf modm/modm_tools/gdb.py path/to/project.elf -x modm/gdbinit --ui=tui \
         remote --host 123.45.67.89
 ```
 
-Note that you can use different programmer backends to GDB:
+Note that you can use different programmer backends to GDB, for example the
+Black Magic Probe:
 
 ```sh
 # Black Magic Probe
-python3 modm/modm_tools/gdb.py path/to/project.elf -x modm/gdbinit --ui=tui \
+python3 --elf modm/modm_tools/gdb.py path/to/project.elf -x modm/gdbinit --ui=tui \
         bmp --port /dev/tty.usbserial-123
+```
 
-# CrashDebug for Post-Mortem debugging
-python3 modm/modm_tools/gdb.py path/to/project.elf -x modm/gdbinit --ui=tui \
-        crashdebug --binary-path modm/ext/crashcatcher/bins --dump coredump.txt
+To analyze a core dump, you can use the `CrashDebug` GDB backend.
+See the `modm:crashcatcher` module for details.
+
+```sh
+# Using CrashDebug for Post-Mortem debugging
+python3 --elf modm/modm_tools/gdb.py path/to/project.elf -x modm/gdbinit --ui=tui \
+        crashdebug --dump coredump.txt
 ```
 
 (\* *only ARM Cortex-M targets*)
@@ -98,3 +104,15 @@ IDE-independent debugging solution.
 ![](https://github.com/cs01/gdbgui/raw/master/screenshots/gdbgui_animation.gif)
 
 [gdbgui]: https://www.gdbgui.com
+
+
+#### Configuration
+
+modm configures GDB using the generated `modm/gdbinit` file which provides
+these convenience methods:
+
+- `restart`: Resets the device and halts.
+- `rerun`: Resets the device and continues.
+- `modm_coredump`: Dumps all volatile memories into a `coredump.txt` file.
+                   See the `modm:platform:fault` module for details.
+- `print_build_id`: Finds and prints the GNU build id of the firmware.

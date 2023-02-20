@@ -35,6 +35,19 @@ def black_magic_probe_debug(env, source, alias='black_magic_probe_debug'):
 	return env.AlwaysBuild(env.Alias(alias, source, action))
 
 # -----------------------------------------------------------------------------
+def black_magic_probe_coredump(env, alias='black_magic_probe_coredump'):
+	def call_bmp_coredump(target, source, env):
+		backend = bmp.BlackMagicProbeBackend(port=ARGUMENTS.get("port", "auto"))
+		commands = map(env.subst, env.Listify(env.get("MODM_GDB_COMMANDS", [])))
+		commands += ["modm_coredump", "print_build_id", "quit"]
+		gdb.call(backend=backend,
+			 	 config=map(env.subst, env.Listify(env.get("MODM_GDBINIT", []))),
+			 	 commands=commands)
+
+	action = Action(call_bmp_coredump, cmdstr="$BMP_DEBUG_COMSTR")
+	return env.AlwaysBuild(env.Alias(alias, '', action))
+
+# -----------------------------------------------------------------------------
 def black_magic_probe_reset(env, alias='black_magic_probe_reset'):
 	def call_bmp_reset(target, source, env):
 		bmp.reset(port=ARGUMENTS.get("port", "auto"))
@@ -47,6 +60,7 @@ def generate(env, **kw):
 	env.AddMethod(black_magic_probe_program, 'ProgramBMP')
 	env.AddMethod(black_magic_probe_debug, 'DebugBMP')
 	env.AddMethod(black_magic_probe_reset, 'ResetBMP')
+	env.AddMethod(black_magic_probe_coredump, 'CoredumpBMP')
 
 def exists(env):
 	return True

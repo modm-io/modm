@@ -17,9 +17,22 @@ def init(module):
 
 CrashCatcher hooks into the ARM Cortex-M HardFault handler and generates a coredump
 that can be used with CrashDebug for post-mortem debugging.
+You must place the `CrashDebug` binary in your path or alternatively set the
+environment variable `MODM_CRASHDEBUG_PATH` to point to the enclosing folder:
+
+```sh
+export MODM_CRASHDEBUG_PATH=/path/to/crashdebug/bin
+```
 
 - https://github.com/adamgreen/CrashCatcher
 - https://github.com/adamgreen/CrashDebug
+
+!!! tip "The debugger can generate coredumps too"
+    In case you encounter a hardfault while debugging or you simply want to
+    store the current system state for later analysis or to share with other
+    developers, you can simply call the `modm_coredump` function in GDB and it
+    will generate a `coredump.txt` file. Consult your chosen build system module
+    for additional integration.
 """
 
 def prepare(module, options):

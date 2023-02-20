@@ -40,6 +40,23 @@ def debug_openocd(env, source, alias="debug_openocd"):
 	return env.AlwaysBuild(env.Alias(alias, source, action))
 
 # -----------------------------------------------------------------------------
+def coredump_openocd(env, alias="coredump_openocd"):
+	def call_coredump_openocd(target, source, env):
+		config_openocd = env.Listify(env.get("MODM_OPENOCD_CONFIGFILES", []))
+		config_searchdirs = env.Listify(env.get("MODM_OPENOCD_SEARCHDIRS", []))
+		backend = OpenOcdBackend(config=map(env.subst, config_openocd),
+								 search=map(env.subst, config_searchdirs))
+		config  = env.Listify(env.get("MODM_OPENOCD_GDBINIT", []))
+		config += env.Listify(env.get("MODM_GDBINIT", []))
+		commands = env.Listify(env.get("MODM_GDB_COMMANDS", []))
+		commands += ["modm_coredump", "print_build_id", "quit"]
+		gdb.call(backend=backend, config=map(env.subst, config),
+				 commands=map(env.subst, commands))
+
+	action = Action(call_coredump_openocd, cmdstr="$COREDUMP_OPENOCD_COMSTR")
+	return env.AlwaysBuild(env.Alias(alias, '', action))
+
+# -----------------------------------------------------------------------------
 def program_openocd(env, source, alias="program_openocd"):
 	def call_program_openocd(target, source, env):
 		config = env.Listify(env.get("MODM_OPENOCD_CONFIGFILES", []))
@@ -77,6 +94,7 @@ def run_openocd(env, alias="run_openocd"):
 def generate(env, **kw):
 	env.AddMethod(program_openocd, "ProgramOpenOcd")
 	env.AddMethod(debug_openocd, "DebugOpenOcd")
+	env.AddMethod(coredump_openocd, "CoredumpOpenOcd")
 	env.AddMethod(reset_openocd, "ResetOpenOcd")
 	env.AddMethod(run_openocd, "OpenOcd")
 

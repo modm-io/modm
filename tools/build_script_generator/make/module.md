@@ -309,6 +309,29 @@ from the `coredump={filepath}` argument.
 See the `modm:platform:fault` module for details how to receive the coredump data.
 
 
+#### make coredump
+
+```
+make coredump
+```
+
+Launches GDB via OpenOCD and creates a `coredump.txt` file containing all
+volatile memories and prints the GNU build ID of the firmware under debug.
+Note that this command does not require an ELF file, so it can be used to
+coredump any firmware whose ELF file is currently unavailable.
+(\* *only ARM Cortex-M targets*)
+
+
+#### make coredump-bmp
+
+```
+make coredump-bmp
+```
+
+Creates a coredump via Black Magic Probe.
+(\* *only ARM Cortex-M targets*)
+
+
 #### make reset
 
 ```

@@ -1,0 +1,68 @@
+# Copyright (c) 2023, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+# Do not ask for confirmation when using Ctrl-D or the quit command
+define hook-quit
+    set confirm off
+end
+
+# Create a coredump.txt file in CrashDebug format
+define modm_coredump
+    set pagination off
+    set style enabled off
+    set logging file coredump.txt
+    set logging overwrite on
+    set logging enabled on
+
+    # Dump all volatile memories
+%% for ram in all_rams
+    set var $ptr = 0x{{ "%08x" % ram.start }}
+    while $ptr < 0x{{ "%08x" % (ram.start + ram.size) }}
+        x/4wx $ptr
+        set var $ptr += 16
+    end
+
+%% endfor
+
+    # Dump all CPU/FPU registers
+    info all-registers
+
+    set logging enabled off
+    set logging overwrite off
+    set logging file gdb.txt
+    set style enabled on
+    set pagination on
+end
+
+# Print the modm::build_id() content only from the firmware
+define print_build_id
+    # We want to do a coredump without an ELF file, since you may not have it at
+    # hand, so we locate it manually: it is the first entry after the vector table
+    set var $__build_id = 0x08000000 + {{ vector_table_size }}
+
+    # We want to do `__build_id.data[__build_id.namesz]` but `ElfNoteSection_t`
+    # may not even be in the ELF file, so we need to do this manually
+    set var $start = (const unsigned char*)$__build_id + 12 + *(const unsigned int*)$__build_id
+    set var $end = $start + 20
+
+    # Print the 20 bytes of the signatures as hexadecimal
+    printf "build_id = "
+    while $start < $end
+        printf "%02X", *$start
+        set var $start += 1
+    end
+    printf "\n"
+end
+
+
+set print pretty
+set print asm-demangle on
+set mem inaccessible-by-default off
+compare-sections
+b main

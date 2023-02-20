@@ -70,10 +70,14 @@ def build_target(env, sources):
 	# Start only OpenOCD to attach a external (remote) debugger
 	env.Alias("openocd", env.OpenOcd())
 
+	env.Alias("coredump-openocd", env.CoredumpOpenOcd())
+	env.Alias("coredump-bmp", env.CoredumpBMP())
+
 	# Default to OpenOCD
 	env.Alias("program", "program-openocd")
 	env.Alias("reset", "reset-openocd")
 	env.Alias("debug", "debug-openocd")
+	env.Alias("coredump", "coredump-openocd")
 
 	%% elif core.startswith("avr")
 	env.Alias("program-avrdude", env.ProgramAvrdude(chosen_program))

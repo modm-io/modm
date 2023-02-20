@@ -85,8 +85,8 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Run GDB in TUI or GUI mode')
     parser.add_argument(
+            "--elf",
             dest="source",
-            metavar="ELF",
             help="The ELF files to use for debugging.")
     parser.add_argument(
             "--ui",

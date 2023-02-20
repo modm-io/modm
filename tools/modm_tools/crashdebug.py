@@ -13,15 +13,16 @@
 import os, platform
 
 class CrashDebugBackend:
-    def __init__(self, binary_path, coredump):
+    def __init__(self, coredump, binary_path=None):
         self.coredump = coredump
+        if binary_path is None:
+            binary_path = os.environ.get("MODM_CRASHDEBUG_PATH")
 
-        crashdebug = "lin64/CrashDebug"
+        self.binary = "CrashDebug"
         if "Windows" in platform.platform():
-            crashdebug = "win32/CrashDebug.exe"
-        elif "Darwin" in platform.system():
-            crashdebug = "osx64/CrashDebug"
-        self.binary = os.path.join(binary_path, crashdebug)
+            self.binary = "CrashDebug.exe"
+        if binary_path is not None:
+            self.binary = os.path.join(binary_path, self.binary)
 
     def init(self, elf):
         init = ["set target-charset ASCII",
@@ -41,7 +42,6 @@ def add_subparser(subparser):
     parser.add_argument(
             "--binary-path",
             dest="binary_path",
-            required=True,
             help="Folder of CrashDebug Binaries.")
     parser.add_argument(
             "--dump",
@@ -49,7 +49,7 @@ def add_subparser(subparser):
             default="coredump.txt",
             help="Path to coredump file.")
     def build_backend(args):
-        return CrashDebugBackend(args.binary_path, args.coredump)
+        return CrashDebugBackend(args.coredump, args.binary_path)
     parser.set_defaults(backend=build_backend)
     return parser
 
