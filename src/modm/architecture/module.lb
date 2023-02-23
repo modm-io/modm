@@ -121,12 +121,18 @@ class Can(Module):
         module.description = FileReader("interface/can.md")
 
     def prepare(self, module, options):
+        def validate_dlc(s: int):
+            valid_dlcs = [8, 12, 16, 20, 24, 32, 48, 64]
+            if s not in valid_dlcs:
+                raise ValueError(f"Input must be a valid CAN data length: {', '.join(valid_dlcs)}!")
         module.add_option(
             NumericOption(
                 name="message.buffer",
                 description="",
                 minimum=8, maximum=64,
+                validate=validate_dlc,
                 default=8))
+        module.depends(":debug")
         return True
 
     def build(self, env):
