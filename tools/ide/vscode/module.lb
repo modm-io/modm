@@ -13,6 +13,7 @@
 
 import subprocess
 import platform
+import os
 
 def init(module):
     module.name = ":ide:vscode"
@@ -66,13 +67,18 @@ def post_build(env):
         for p in ["release", "debug"]
     }
 
+    include_path = env.collector_values("::path.include")
+    if env.has_module("::xpcc:generator"):
+        os.makedirs( env["::xpcc:generator:path"], exist_ok=True )
+        include_path.append( env.relcwdoutpath( env["::xpcc:generator:path"] ) )
+
     env.substitutions = {
         "configs": configs,
         "partname": env[":target"].partname.upper(),
         "with_freertos": env.has_module(":freertos"),
         "platform": core,
         "profiles": profiles,
-        "include_paths": env.collector_values("::path.include"),
+        "include_paths": include_path,
         "compiler_path": compiler_path,
         # FIXME: RTT block is searched for too early.
         # See https://github.com/Marus/cortex-debug/wiki/SEGGER-RTT-support#known-issues
