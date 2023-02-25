@@ -339,10 +339,12 @@ public:
 				if (transferError)
 					transferError();
 			}
-			if ((isr & HT_Flag) and halfTransferComplete)
+			if (halfTransferComplete and (isr & HT_Flag)) {
 				halfTransferComplete();
-			if ((isr & TC_Flag) and transferComplete)
+			}
+			if (transferComplete and (isr & TC_Flag)) {
 				transferComplete();
+			}
 
 			ControlHal::clearInterruptFlags(InterruptFlags::Global, ChannelID);
 		}
