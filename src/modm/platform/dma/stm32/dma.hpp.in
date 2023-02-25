@@ -307,7 +307,7 @@ public:
 		 * Reads the IRQ status and checks for error or transfer complete. In case
 		 * of error the DMA channel will be disabled.
 		 */
-		static void
+		modm_always_inline static void
 		interruptHandler()
 		{
 %% if dmaType in ["stm32-channel-request", "stm32-channel", "stm32-mux"]
