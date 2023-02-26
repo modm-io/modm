@@ -1,0 +1,13 @@
+<library>
+  <extends>modm:nucleo-l476rg</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_l476rg/itm</option>
+    <option name="modm:platform:itm:buffer.tx">250</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:build:make</module>
+    <module>modm:platform:itm</module>
+    <module>modm:processing:timer</module>
+  </modules>
+</library>
