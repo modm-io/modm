@@ -25,12 +25,10 @@ import platform
 from SCons.Script import *
 
 # -----------------------------------------------------------------------------
-def program_dfu(env, source, alias='program_dfu'):
+def program_dfu(env, source):
 	delay = ARGUMENTS.get("delay", "5")
 	actionString  = 'dfu-util -v -E{} -R -i 0 -a 0 -s 0x08000000:leave -D $SOURCE'.format(delay)
-
-	action = Action(actionString, cmdstr="$PROGRAM_DFU_COMSTR")
-	return env.AlwaysBuild(env.Alias(alias, source, action))
+	return env.AlwaysBuildAction(actionString, "$PROGRAM_DFU_COMSTR", source)
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):

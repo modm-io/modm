@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2019, Niklas Hauser
+# Copyright (c) 2019, 2023, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -31,15 +31,14 @@ def run_post_mortem_gdb(target, source, env):
 
 	backend = crashdebug.CrashDebugBackend(coredump=env["COREDUMP_FILE"])
 	gdb.call(source=source[0].path, backend=backend, ui=ARGUMENTS.get("ui", "tui"),
-			 config=map(env.subst, env.Listify(env.get("MODM_GDBINIT", []))),
-			 commands=map(env.subst, env.Listify(env.get("MODM_GDB_COMMANDS", []))))
+			 config=env.SubstList("MODM_GDBINIT"),
+			 commands=env.SubstList("MODM_GDB_COMMANDS"))
 
 	return 0
 
-def gdb_post_mortem_debug(env, source, alias="gdb_post_mortem_debug"):
+def gdb_post_mortem_debug(env, source):
 	env["COREDUMP_FILE"] = os.path.relpath(ARGUMENTS.get("coredump", "coredump.txt"))
-	action = Action(run_post_mortem_gdb, cmdstr="$DEBUG_COREDUMP_COMSTR")
-	return env.AlwaysBuild(env.Alias(alias, source, action))
+	return env.AlwaysBuildAction(run_post_mortem_gdb, "$DEBUG_COREDUMP_COMSTR", source)
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):

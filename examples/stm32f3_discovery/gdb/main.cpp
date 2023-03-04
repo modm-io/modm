@@ -22,7 +22,7 @@ Then you can start GDB in TUI mode by default:
 
 Alternatively if you installed gdbgui you can use:
 
-	scons debug profile=debug ui=web
+	scons debug profile=debug ui=gdbgui
 
 
 Useful GDB Commands:

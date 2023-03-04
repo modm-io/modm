@@ -1,8 +1,0 @@
-define restart
-  mon reset halt
-end
-
-define rerun
-  mon reset halt
-  c
-end

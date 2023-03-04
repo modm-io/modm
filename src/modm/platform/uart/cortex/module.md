@@ -58,9 +58,9 @@ for an advanced use-case (like de-multiplexing data streams).
     You must provide the CPU/HCLK frequency of your target, so that
     OpenOCD can correctly set the prescaler for the asynchronous SWO output.
 
-When using the `modm:build:scons` module, you can also use the convenience
-wrapper, which logs to a temporary file and displays it's contents on the
-terminal
+When using the `modm:build:scons` or `modm:build:make` modules, you can also use
+the convenience wrapper, which logs to a temporary file and displays its
+contents on the terminal:
 
 ```
  $ scons log-itm fcpu=64000000

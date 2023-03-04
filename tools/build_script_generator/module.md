@@ -100,10 +100,13 @@ line.
 
 ### GDB
 
-Two commands are provided for convenience via the `modm/gdbinit` configuration:
+A few commands are provided for convenience via the `modm/gdbinit` configuration:
 
-- `restart` resets the device and halts.
-- `rerun` resets the device and continues execution.
+- `reset`: resets the device and halts.
+- `rerun`: resets the device and continues execution.
+- `modm_coredump`: Dumps all volatile memories into a `coredump.txt` file.
+                   See the `modm:platform:fault` module for details.
+- `modm_build_id`: Finds and prints the GNU build id of the firmware.
 
 GDB continues running the target after attaching, but *does not* load an ELF
 file! Please pass the ELF file as a command line argument.
@@ -124,3 +127,8 @@ Here is a selection of tools that have a command line interface, so you can call
 them even without build system support in case you have a special setup.
 Note that there are even more tools that can be called in Python only, so have
 a look in your generated `modm/modm_tools` folder.
+
+!!! tip "Add `modm_tools` to your Python path"
+    To call `modm_tools` via module syntax, you need to add the generated modm
+    folder to your Python path: `export PYTHONPATH=path/to/generated/modm`.
+    You can also use the module in this repository directly.

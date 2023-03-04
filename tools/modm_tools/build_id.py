@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2018, Niklas Hauser
+# Copyright (c) 2018, 2023, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -16,14 +16,14 @@
 To extract the build ID from an ELF file:
 
 ```sh
-python3 modm/modm_tools/build_id.py path/to/project.elf
+python3 -m modm_tools.build_id path/to/project.elf
 fa8918e6971ed783b25bff0ad11a0541be47a933
 ```
 
 To copy the ELF file to a artifact cache:
 
 ```sh
-python3 modm/modm_tools/build_id.py path/to/project.elf --cache path/to/folder
+python3 -m modm_tools.build_id path/to/project.elf --cache path/to/folder
 # copies to `path/to/folder/fa8918e6971ed783b25bff0ad11a0541be47a933.elf`
 ```
 
@@ -35,6 +35,7 @@ import shutil
 from elftools.elf.elffile import ELFFile
 
 
+# -----------------------------------------------------------------------------
 def extract(source):
     with open(source, "rb") as src:
         build_id = ELFFile(src).get_section_by_name(".build_id")
@@ -55,6 +56,7 @@ def cache_elf(source, path):
     return build_id
 
 
+# -----------------------------------------------------------------------------
 if __name__ == "__main__":
     import argparse
 

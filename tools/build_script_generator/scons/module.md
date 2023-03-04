@@ -132,7 +132,7 @@ Heap:     16.4 MiB
 #### scons program
 
 ```
-scons program profile={debug|release} [port={serial-port}] [firmware={hash or file}]
+scons program profile={debug|release} [firmware={hash or file}]
 ```
 
 Writes the executable onto your target via Avrdude or OpenOCD.
@@ -231,7 +231,7 @@ scons: done building targets.
 #### scons program-bmp
 
 ```
-scons program-bmp profile={debug|release} [port={serial-port}] [firmware={hash or file}]
+scons program-bmp profile={debug|release} port={serial-port} [firmware={hash or file}]
 ```
 
 [Black Magic Probe][bmp] is convenient tool to convert cheap USB ST-LINK V2 clones
@@ -278,11 +278,12 @@ scons: done building targets.
 #### scons program-remote
 
 ```
-scons program-remote profile={debug|release} [host={ip or hostname}] [firmware={hash or file}]
+scons program-remote profile={debug|release} [host={ip or hostname:port}] [firmware={hash or file}]
 ```
 
-Writes the executable onto your target connected to a remote OpenOCD process
-running on your own computer (host=`localhost`) or somewhere else.
+Writes the executable onto your target connected to a remote backend process
+running on your own computer (`host=":3333"`) or somewhere else. You can also
+connect to JLink (`host=":2331"`) or Black Magic Probe (`host="/dev/tty.usbserial"`).
 (\* *only ARM Cortex-M targets*)
 
 
@@ -306,7 +307,7 @@ Compiles and executes your program on your computer.
 #### scons debug
 
 ```
-scons debug profile={debug|release} ui={tui|web} [firmware={hash or file}]
+scons debug profile={debug|release} ui={tui|gdbgui} [firmware={hash or file}]
 ```
 
 Launches OpenOCD in the background, then launches GDB in foreground with the
@@ -331,18 +332,19 @@ This is just a convenience wrapper for the debug functionality defined in the
 #### scons debug-remote
 
 ```
-scons debug-remote profile={debug|release} ui={tui|web} [host={ip or hostname}] [firmware={hash or file}]
+scons debug-remote profile={debug|release} ui={tui|gdbgui} [host={ip or hostname:port}] [firmware={hash or file}]
 ```
 
 Debugs the executable via a remote OpenOCD process running on your own computer
-(localhost is default) or somewhere else.
+(`host=":3333"`) or somewhere else. You can also connect to JLink (`host=":2331"`)
+or Black Magic Probe (`host="/dev/tty.usbserial"`).
 (\* *only ARM Cortex-M targets*)
 
 
 #### scons debug-bmp
 
 ```
-scons debug-bmp profile={debug|release} ui={tui|web} port={serial-port} [firmware={hash or file}]
+scons debug-bmp profile={debug|release} ui={tui|gdbgui} port={serial-port} [firmware={hash or file}]
 ```
 
 Launches GDB to debug via Black Magic Probe.
@@ -352,7 +354,7 @@ Launches GDB to debug via Black Magic Probe.
 #### scons debug-coredump
 
 ```
-scons debug-coredump profile={debug|release} ui={tui|web} \
+scons debug-coredump profile={debug|release} ui={tui|gdbgui} \
                      coredump={path/to/coredump.txt} \
                      [firmware={GNU Build ID or path/to/firmware.elf}]
 ```
@@ -361,7 +363,6 @@ Launches GDB for post-mortem debugging with the firmware identified by the
 (optional) `firmware={hash or filepath}` argument using the data from the
 `coredump={filepath}` argument. Note that CrashDebug must be in your path, see
 the `modm:crashcatcher` module for details.
-(\* *only ARM Cortex-M targets*)
 
 Use the `scons coredump` method to generate a coredump with a debugger attached,
 otherwise see the `modm:platform:fault` module for details how to generate and
@@ -387,7 +388,7 @@ artifact store (see `scons artifact`).
 #### scons coredump-bmp
 
 ```
-scons coredump-bmp
+scons coredump-bmp port={serial-port}
 ```
 
 Creates a coredump via Black Magic Probe.
@@ -407,7 +408,7 @@ Resets the executable via OpenOCD.
 #### scons reset-bmp
 
 ```
-scons reset-bmp [port={serial}]
+scons reset-bmp port={serial-port}
 ```
 
 Resets the executable via Black Magic Probe.
@@ -417,11 +418,12 @@ Resets the executable via Black Magic Probe.
 #### scons reset-remote
 
 ```
-scons reset-remote [host={ip or hostname}]
+scons reset-remote [host={ip or hostname:port}]
 ```
 
 Resets the executable via a remote OpenOCD process running on your own computer
-(localhost is default) or somewhere else.
+(`host=":3333"`) or somewhere else. You can also connect to JLink (`host=":2331"`)
+or Black Magic Probe (`host="/dev/tty.usbserial"`).
 (\* *only ARM Cortex-M targets*)
 
 

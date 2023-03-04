@@ -16,8 +16,7 @@
 This tool simply wraps the `bossac` command line tool to guess the serial port.
 
 ```sh
-python3 modm/modm_tools/bossac.py -p auto --offset=0x2000 -e \\
-                                   path/to/project.bin
+python3 -m modm_tools.bossac -p auto --offset=0x2000 -e path/to/project.bin
 ```
 
 (\* *only SAM targets*)
@@ -25,12 +24,10 @@ python3 modm/modm_tools/bossac.py -p auto --offset=0x2000 -e \\
 
 import os
 import subprocess
-if __name__ == "__main__":
-    import sys
-    sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
-from modm_tools import utils
+from . import utils
 from elftools.elf.elffile import ELFFile, NoteSection
+
 
 # -----------------------------------------------------------------------------
 def program(source, offset=None, port=None, erase=False, options=None):

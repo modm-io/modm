@@ -17,8 +17,7 @@ This tools scans a directory for files ending in `_test.hpp`, extracts their
 test cases and generates a source file containing the test runner.
 
 ```sh
-python3 modm/modm_tools/unit_test.py path/containing/tests \\
-                                    path/to/generated_runner.cpp
+python3 -m modm_tools.unit_test path/containing/tests path/to/generated_runner.cpp
 ```
 
 Note that the files containing unittests must contain *one* class that inherits
@@ -36,26 +35,24 @@ public:
 
 import re
 from pathlib import Path
-from jinja2 import Environment, StrictUndefined
-if __name__ == "__main__":
-    import sys, os
-    sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+from jinja2 import Environment
 
-from modm_tools import find_files
+from . import find_files
+
 
 # -----------------------------------------------------------------------------
 TEMPLATE_UNITTEST = """\
 #include <unittest/controller.hpp>
 
-%% for test in tests
+{% for test in tests %}
 #include "{{test.include}}"
-%% endfor
+{% endfor %}
 
 namespace
 {
-%% for test in tests
+{% for test in tests %}
 FLASH_STORAGE_STRING({{test.instance}}Name) = "{{test.file}}";
-%% endfor
+{% endfor %}
 }
 
 int unittest::Controller::run(unittest::Reporter reporter)
@@ -63,22 +60,23 @@ int unittest::Controller::run(unittest::Reporter reporter)
     using namespace modm::accessor;
     instance().setReporter(reporter);
 
-%% for test in tests
+{% for test in tests %}
     instance().nextTestSuite(asFlash({{test.instance}}Name));
     {
         {{test.class}} {{test.instance}};
-    %% for test_case in test.test_cases
+    {% for test_case in test.test_cases %}
 
         {{test.instance}}.setUp();
         {{test.instance}}.{{test_case}}();
         {{test.instance}}.tearDown();
-    %% endfor
+    {% endfor %}
     }
-%% endfor
+{% endfor %}
 
     return instance().getReporter().printSummary();
 }
 """
+
 
 # -----------------------------------------------------------------------------
 def extract_tests(headers):
@@ -110,12 +108,8 @@ def extract_tests(headers):
 
 
 def render_runner(headers, destination=None):
-    env = Environment(undefined=StrictUndefined, extensions=['jinja2.ext.do'])
-    env.line_statement_prefix = '%%'
-    env.line_comment_prefix = '%#'
-
     tests = extract_tests(headers)
-    content = env.from_string(TEMPLATE_UNITTEST).render({"tests": tests})
+    content = Environment().from_string(TEMPLATE_UNITTEST).render({"tests": tests})
 
     if destination is not None:
         Path(destination).write_text(content)

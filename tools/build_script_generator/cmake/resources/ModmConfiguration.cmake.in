@@ -1,5 +1,5 @@
 # Copyright (c) 2021, Jacob S. Andersen
-# Copyright (c) 2021, Niklas Hauser
+# Copyright (c) 2021, 2023, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -182,58 +182,91 @@ function(modm_targets_create project_name)
 %% if core.startswith("cortex-m")
   add_custom_command(TARGET ${project_name}
     POST_BUILD
-    COMMAND ${PYTHON3_EXECUTABLE} ${PROJECT_SOURCE_DIR}/modm/modm_tools/size.py ${project_name}.elf \"{{ memories }}\")
+    COMMAND PYTHONPATH=${PROJECT_SOURCE_DIR}/modm ${PYTHON3_EXECUTABLE} -m modm_tools.size ${project_name}.elf \"{{ memories }}\")
 %% endif
 
   add_custom_target(size DEPENDS ${project_name}.elf)
   add_custom_command(TARGET size
     USES_TERMINAL
-    COMMAND ${PYTHON3_EXECUTABLE} modm/modm_tools/size.py ${PROJECT_BINARY_DIR}/src/${project_name}.elf \"{{ memories }}\"
+    COMMAND PYTHONPATH=modm ${PYTHON3_EXECUTABLE} -m modm_tools.size ${PROJECT_BINARY_DIR}/src/${project_name}.elf \"{{ memories }}\"
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
   add_custom_target(program DEPENDS ${project_name}.elf)
   add_custom_command(TARGET program
     USES_TERMINAL
-    COMMAND ${PYTHON3_EXECUTABLE} modm/modm_tools/openocd.py -f modm/openocd.cfg ${PROJECT_BINARY_DIR}/src/${project_name}.elf
+    COMMAND PYTHONPATH=modm ${PYTHON3_EXECUTABLE} -m modm_tools.openocd -f modm/openocd.cfg
+        ${PROJECT_BINARY_DIR}/src/${project_name}.elf
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
   add_custom_target(program-bmp DEPENDS ${project_name}.elf)
   add_custom_command(TARGET program-bmp
     USES_TERMINAL
-    COMMAND ${PYTHON3_EXECUTABLE} modm/modm_tools/bmp.py -p ${MODM_BMP_PORT} ${PROJECT_BINARY_DIR}/src/${project_name}.elf
+    COMMAND PYTHONPATH=modm ${PYTHON3_EXECUTABLE} -m modm_tools.bmp -p ${MODM_BMP_PORT}
+        ${PROJECT_BINARY_DIR}/src/${project_name}.elf
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
   add_custom_target(debug DEPENDS ${project_name}.elf)
   add_custom_command(TARGET debug
     USES_TERMINAL
-    COMMAND ${PYTHON3_EXECUTABLE} modm/modm_tools/gdb.py -x modm/gdbinit -x modm/openocd_gdbinit
-        --elf ${PROJECT_BINARY_DIR}/src/${project_name}.elf --ui=${MODM_DBG_UI} openocd -f modm/openocd.cfg
+    COMMAND PYTHONPATH=modm ${PYTHON3_EXECUTABLE} -m modm_tools.gdb -x modm/gdbinit -x modm/openocd_gdbinit
+        --elf ${PROJECT_BINARY_DIR}/src/${project_name}.elf --ui=${MODM_DBG_UI}
+        openocd -f modm/openocd.cfg
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
   add_custom_target(debug-bmp DEPENDS ${project_name}.elf)
   add_custom_command(TARGET debug-bmp
     USES_TERMINAL
-    COMMAND ${PYTHON3_EXECUTABLE} modm/modm_tools/gdb.py -x modm/gdbinit --elf ${PROJECT_BINARY_DIR}/src/${project_name}.elf
-        --ui=${MODM_DBG_UI} bmp -p ${MODM_BMP_PORT}
+    COMMAND PYTHONPATH=modm ${PYTHON3_EXECUTABLE} -m modm_tools.gdb -x modm/gdbinit -x modm/openocd_bmp
+        --elf ${PROJECT_BINARY_DIR}/src/${project_name}.elf --ui=${MODM_DBG_UI}
+        bmp -p ${MODM_BMP_PORT}
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
   add_custom_target(debug-coredump DEPENDS ${project_name}.elf)
   add_custom_command(TARGET debug-coredump
     USES_TERMINAL
-    COMMAND	${PYTHON3_EXECUTABLE} modm/modm_tools/gdb.py -x modm/gdbinit --elf ${PROJECT_BINARY_DIR}/src/${project_name}.elf
-        --ui=${MODM_DBG_UI} crashdebug
+    COMMAND	PYTHONPATH=modm ${PYTHON3_EXECUTABLE} -m modm_tools.gdb -x modm/gdbinit
+        --elf ${PROJECT_BINARY_DIR}/src/${project_name}.elf --ui=${MODM_DBG_UI}
+        crashdebug
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
-  add_custom_target(log-itm DEPENDS ${project_name}.elf)
+  add_custom_target(coredump)
+  add_custom_command(TARGET coredump
+    USES_TERMINAL
+    COMMAND PYTHONPATH=modm ${PYTHON3_EXECUTABLE} -m modm_tools.gdb -x modm/gdbinit
+        -ex "modm_coredump" -ex "modm_build_id" -ex "quit"
+        openocd -f modm/openocd.cfg
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+
+  add_custom_target(coredump-bmp)
+  add_custom_command(TARGET coredump-bmp
+    USES_TERMINAL
+    COMMAND PYTHONPATH=modm ${PYTHON3_EXECUTABLE} -m modm_tools.gdb -x modm/gdbinit
+        -ex "modm_coredump" -ex "modm_build_id" -ex "quit"
+        bmp -p ${MODM_BMP_PORT}
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+
+  add_custom_target(reset)
+  add_custom_command(TARGET reset
+    USES_TERMINAL
+    COMMAND PYTHONPATH=modm ${PYTHON3_EXECUTABLE} -m modm_tools.openocd -f modm/openocd.cfg --reset
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+
+  add_custom_target(reset-bmp)
+  add_custom_command(TARGET reset-bmp
+    USES_TERMINAL
+    COMMAND PYTHONPATH=modm ${PYTHON3_EXECUTABLE} -m modm_tools.bmp -p ${MODM_BMP_PORT} --reset
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+
+  add_custom_target(log-itm)
   add_custom_command(TARGET log-itm
     USES_TERMINAL
-    COMMAND ${PYTHON3_EXECUTABLE} modm/modm_tools/log.py itm openocd -f modm/openocd.cfg --fcpu ${MODM_ITM_FCPU}
+    COMMAND PYTHONPATH=modm ${PYTHON3_EXECUTABLE} -m modm_tools.itm openocd -f modm/openocd.cfg --fcpu ${MODM_ITM_FCPU}
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
-  add_custom_target(log-rtt DEPENDS ${project_name}.elf)
+  add_custom_target(log-rtt)
   add_custom_command(TARGET log-rtt
     USES_TERMINAL
-    COMMAND ${PYTHON3_EXECUTABLE} modm/modm_tools/log.py rtt openocd -f modm/openocd.cfg --channel ${MODM_RTT_CHANNEL}
+    COMMAND PYTHONPATH=modm ${PYTHON3_EXECUTABLE} -m modm_tools.rtt --channel ${MODM_RTT_CHANNEL} openocd -f modm/openocd.cfg
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 endfunction()
 

@@ -3,7 +3,7 @@
 #
 # Copyright (c) 2009-2012, Fabian Greif
 # Copyright (c) 2012, Sascha Schade
-# Copyright (c) 2012, 2014, 2017, 2020, Niklas Hauser
+# Copyright (c) 2012, 2014, 2017, 2020, 2023, Niklas Hauser
 # Copyright (c) 2013, Kevin Läufer
 # Copyright (c) 2016, Daniel Krebs
 # Copyright (c) 2017, Michael Thies

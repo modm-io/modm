@@ -3,7 +3,7 @@
 #
 # Copyright (c) 2009-2012, Fabian Greif
 # Copyright (c) 2012, Sascha Schade
-# Copyright (c) 2012, 2014, 2017, 2020, Niklas Hauser
+# Copyright (c) 2012, 2014, 2017, 2020, 2023, Niklas Hauser
 # Copyright (c) 2013, Kevin Läufer
 # Copyright (c) 2016, Daniel Krebs
 # Copyright (c) 2017, Michael Thies
@@ -21,7 +21,7 @@
 This tool can convert P1 `.pbm` files into C++ source code.
 
 ```sh
-python3 modm/modm_tools/bitmap.py image.pbm --outpath .
+python3 -m modm_tools.bitmap image.pbm --outpath .
 # creates `image.hpp` and `image.cpp` in the CWD
 ```
 """
@@ -31,6 +31,7 @@ import os
 import re
 import math
 from pathlib import Path
+
 
 # -----------------------------------------------------------------------------
 TEMPLATE_HEADER = """
@@ -65,6 +66,7 @@ FLASH_STORAGE(uint8_t {name}[]) =
 
 }}
 """
+
 
 # -----------------------------------------------------------------------------
 def generate(image_data, name):
@@ -128,6 +130,7 @@ def convert(image, outpath):
     (outpath.with_suffix(".cpp")).write_text(source)
 
 
+# -----------------------------------------------------------------------------
 if __name__ == "__main__":
     import argparse
 

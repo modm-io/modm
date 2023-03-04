@@ -29,8 +29,8 @@ information changed. This prevents unnecessary rebuilding and relinking.
 #### Git Information
 
 ```sh
-python3 modm/modm_tools/info.py -o git_info.c -t git        [--check-rebuild]
-python3 modm/modm_tools/info.py -o git_info.c -t git_status [--check-rebuild]
+python3 -m modm_tools.info -o git_info.c -t git        [--check-rebuild]
+python3 -m modm_tools.info -o git_info.c -t git_status [--check-rebuild]
 ```
 
 The `git_info(directory)` function returns a dictionary with these values:
@@ -96,7 +96,7 @@ Untracked: 6
 #### Build Information
 
 ```sh
-python3 modm/modm_tools/info.py -o build_info.c -t build --compiler=gcc [--check-rebuild]
+python3 -m modm_tools.info -o build_info.c -t build --compiler=gcc [--check-rebuild]
 ```
 
 Generates a files with these values defined as `const char *` strings:

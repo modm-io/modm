@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2020, Niklas Hauser
+# Copyright (c) 2020, 2023, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -19,16 +19,16 @@ This tool simply wraps the `avrdude` command to provide two features:
 - inspecting the ELF file to decide whether EEPROM needs to be programmed.
 
 ```sh
-python3 modm/modm_tools/avrdude.py -p m328p -c arduino -P auto -b 57600 \\
-                                   path/to/project.elf
+python3 -m modm_tools.avrdude -p m328p -c arduino -P auto -b 57600 \\
+                              path/to/project.elf
 ```
 
 [Fuses stored in the ELF file](http://avr-libc.nongnu.org/user-manual/group__avr__fuse.html)
 can be programmed by passing `--fuse` arguments:
 
 ```sh
-python3 modm/modm_tools/avrdude.py -p m328p -c stk500v2 path/to/project.elf \\
-                                   --fuse hfuse --fuse lfuse --fuse efuse
+python3 -m modm_tools.avrdude -p m328p -c stk500v2 path/to/project.elf \\
+                              --fuse hfuse --fuse lfuse --fuse efuse
 ```
 
 (\* *only AVR targets*)
@@ -36,12 +36,10 @@ python3 modm/modm_tools/avrdude.py -p m328p -c stk500v2 path/to/project.elf \\
 
 import os
 import subprocess
-if __name__ == "__main__":
-    import sys
-    sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
-from modm_tools import utils
+from . import utils
 from elftools.elf.elffile import ELFFile, NoteSection
+
 
 # -----------------------------------------------------------------------------
 def program(source, device, programmer, port=None, baudrate=None, fuses=None, options=None):

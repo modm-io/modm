@@ -17,7 +17,7 @@ device's memories. You must pass the available memory segments as a Python
 dictionary:
 
 ```sh
-python3 modm/modm_tools/size.py path/to/project.elf \\
+python3 -m modm_tools.size path/to/project.elf \\
     "[{'name': 'flash', 'access': 'rx', 'start': 134217728, 'size': 65536}, \\
     {'name': 'sram1', 'access': 'rwx', 'start': 536870912, 'size': 20480}]"
 
@@ -41,6 +41,7 @@ from pathlib import Path
 from elftools.elf.elffile import ELFFile
 
 
+# -----------------------------------------------------------------------------
 TEMPLATE_SIZE = """\
 Program: {rom_fmt:>9s} / {rom_total:>9s} ({rom_p:2.1f}% used)
 ({rom_s})
@@ -53,6 +54,7 @@ Heap:  {heap_fmt:>11s} / {ram_total:>9s} ({heap_p:2.1f}% available)
 """
 
 
+# -----------------------------------------------------------------------------
 def human_readable_format(num, unit='B'):
     for prefix in ['', 'Ki', 'Mi', 'Gi', 'Ti']:
         if abs(num) < 1024.0:

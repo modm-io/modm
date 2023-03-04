@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019, Niklas Hauser
+# Copyright (c) 2017-2023, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -137,9 +137,10 @@ env["CONFIG_AVRDUDE_BAUDRATE"] = "{{ avrdude_baudrate }}"
 %% endif
 %% elif core.startswith("cortex-m")
 env.Append(MODM_OPENOCD_CONFIGFILES = "$BASEPATH/modm/openocd.cfg")
-env.Append(MODM_OPENOCD_GDBINIT = "$BASEPATH/modm/openocd_gdbinit")
 env.Append(MODM_GDBINIT = "$BASEPATH/modm/gdbinit")
-env.Append(MODM_GDB_COMMANDS = "dir $GCC_PATH")
+env.Append(MODM_GDBINIT_OPENOCD = "$BASEPATH/modm/gdbinit_openocd")
+env.Append(MODM_GDBINIT_BMP = "$BASEPATH/modm/gdbinit_bmp")
+env.Append(MODM_GDB_COMMANDS = ["dir $GCC_PATH", "modm_setup_tui"])
 %% if platform == "sam"
 %% if bossac_offset
 env.Append(MODM_BOSSAC_OFFSET = {{ bossac_offset }})

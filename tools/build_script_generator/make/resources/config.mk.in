@@ -1,4 +1,4 @@
-# Copyright (c) 2021, Niklas Hauser
+# Copyright (c) 2021, 2023, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -11,6 +11,7 @@ BUILDPATH_PREFIX := {{ build_path }}/make-
 BUILDPATH := $(BUILDPATH_PREFIX)$(profile)
 OUTPATH := {{outpath}}
 MODM_PROJECT_NAME := {{ options[":build:project.name"] }}
+PYTHON3 := PYTHONPATH=$(MODM_PATH) python3
 
 ELF_FILE := $(BUILDPATH)/$(MODM_PROJECT_NAME).{{program_extension}}
 BIN_FILE := $(BUILDPATH)/$(MODM_PROJECT_NAME).bin
@@ -41,8 +42,9 @@ CONFIG_AVRDUDE_BAUDRATE := -b {{ avrdude_baudrate }}
 %% endif
 %% elif core.startswith("cortex-m")
 MODM_OPENOCD_CONFIGFILES += $(MODM_PATH)/openocd.cfg
-MODM_OPENOCD_GDBINIT += $(MODM_PATH)/openocd_gdbinit
-MODM_GDBINIT += $(MODM_PATH)/gdbinit
+MODM_GDB_COMMANDS = -x $(MODM_PATH)/gdbinit -ex "dir $(GCC_BASE)" -ex "modm_setup_tui"
+MODM_GDB_COMMANDS_OPENOCD = -x $(MODM_PATH)/gdbinit_openocd
+MODM_GDB_COMMANDS_BMP = -x $(MODM_PATH)/gdbinit_bmp
 %% if platform == "sam"
 %% if bossac_offset
 MODM_BOSSAC_OFFSET := {{ bossac_offset }}
@@ -65,7 +67,7 @@ CPPDEFINES += -I.
 %#
 # Git information
 INFO_GIT_FILE := $(MODM_PATH)/src/info_git.c
-$(INFO_GIT_FILE): $(shell python3 $(MODM_PATH)/modm_tools/info.py \
+$(INFO_GIT_FILE): $(shell $(PYTHON3) -m modm_tools.info \
     -o $(INFO_GIT_FILE) -t {{ "git_status" if "Status" in options["::info.git"] else "git" }} --check-rebuild);
 APP_SRC += $(INFO_GIT_FILE)
 CLEAN_FILES += $(INFO_GIT_FILE)
@@ -76,7 +78,7 @@ CPPDEFINES += -DMODM_GIT_INFO{% if "Status" in options["::info.git"] %} -DMODM_G
 # Build information
 INFO_BUILD_FILE := $(MODM_PATH)/src/info_build.c
 $(INFO_BUILD_FILE):
-	@python3 $(MODM_PATH)/modm_tools/info.py -o $(INFO_BUILD_FILE) -t build --compiler $(CC) \
+	@$(PYTHON3) -m modm_tools.info -o $(INFO_BUILD_FILE) -t build --compiler $(CC) \
 		--additions MODM_BUILD_PROJECT_NAME="$(MODM_PROJECT_NAME)"
 APP_SRC += $(INFO_BUILD_FILE)
 CLEAN_FILES += $(INFO_BUILD_FILE)
@@ -88,7 +90,7 @@ CPPDEFINES += -DMODM_BUILD_INFO
 IMAGE_SOURCE := {{image_source}}
 .PRECIOUS: $(IMAGE_SOURCE)/%.cpp
 $(IMAGE_SOURCE)/%.cpp: $(IMAGE_SOURCE)/%.pbm
-	@python3 $(MODM_PATH)/modm_tools/bitmap.py $^ -o $(dir $^)
+	@$(PYTHON3) -m modm_tools.bitmap $^ -o $(dir $^)
 IMAGE_PBM := $(wildcard $(IMAGE_SOURCE)/*.pbm)
 APP_SRC += $(IMAGE_PBM:.pbm=.cpp)
 CPPDEFINES += -I$(IMAGE_SOURCE)

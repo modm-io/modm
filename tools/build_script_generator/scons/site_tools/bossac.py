@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2018, Niklas Hauser
+# Copyright (c) 2018, 2023, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -15,7 +15,7 @@ from SCons.Script import *
 from modm_tools import bossac
 
 # -----------------------------------------------------------------------------
-def bossac_program(env, source, alias="bossac_program"):
+def bossac_program(env, source):
 	def call_program(target, source, env):
 		offset = env.get("MODM_BOSSAC_OFFSET", 0)
 		if offset < 0x1000: # Is 4kB the smallest SAM-BA bootloader?
@@ -25,9 +25,7 @@ def bossac_program(env, source, alias="bossac_program"):
 			bossac.program(source=source[0], offset=offset,
 						   port=ARGUMENTS.get("port", "auto"),
 						   options=env.get("MODM_BOSSAC_OPTIONS"))
-
-	action = Action(call_program, cmdstr="$PROGRAM_BOSSAC_COMSTR")
-	return env.AlwaysBuild(env.Alias(alias, source, action))
+	return env.AlwaysBuildAction(call_program, "$PROGRAM_BOSSAC_COMSTR", source)
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2018, Niklas Hauser
+# Copyright (c) 2018, 2023, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -24,19 +24,15 @@ def call_avrdude(env, source, fuses=None):
 					fuses=fuses)
 
 # -----------------------------------------------------------------------------
-def avrdude_flash(env, source, alias="avrdude_flash"):
+def avrdude_flash(env, source):
 	def call_program(target, source, env):
 		call_avrdude(env, source[0])
+	return env.AlwaysBuildAction(call_program, "$PROGRAM_AVRDUDE_COMSTR", source)
 
-	action = Action(call_program, cmdstr="$PROGRAM_AVRDUDE_COMSTR")
-	return env.AlwaysBuild(env.Alias(alias, source, action))
-
-def avrdude_fuse(env, source, alias="avrdude_fuse"):
+def avrdude_fuse(env, source):
 	def call_fuse(target, source, env):
 		call_avrdude(env, source[0], fuses=["hfuse", "lfuse", "efuse"])
-
-	action = Action(call_fuse, cmdstr="$PROGRAM_AVRDUDE_COMSTR")
-	return env.AlwaysBuild(env.Alias(alias, source, action))
+	return env.AlwaysBuildAction(call_fuse, "$PROGRAM_AVRDUDE_COMSTR", source)
 
 # -----------------------------------------------------------------------------
 def generate(env, **kw):

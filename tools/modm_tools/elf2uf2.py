@@ -3,12 +3,12 @@
 #
 # Copyright (c) 2022, Andrey Kunitsyn
 #
+# This file is part of the modm project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-#
-# Authors:
-# - 2022, Andrey Kunitsyn
+# -----------------------------------------------------------------------------
 
 """
 ### UF2 Converter
@@ -17,7 +17,7 @@ UF2 is a [Microsoft file format](https://github.com/microsoft/uf2) to pass
 to a on-device bootloader.
 
 ```sh
-python3 modm/modm_tools/elf2uf2.py firmware.elf -o firmware.uf2 --target rp2040 \
+python3 -m modm_tools.elf2uf2 firmware.elf -o firmware.uf2 --target rp2040 \
     --range 0x10000000:0x15000000:CONTENTS \
     --range 0x20000000:0x20042000:NO_CONTENTS
 ```
@@ -30,15 +30,13 @@ import struct
 
 from pathlib import Path
 
+
 verbose = False
-
-
 
 UF2_FLAG_NOT_MAIN_FLASH     = 0x00000001
 UF2_FLAG_FILE_CONTAINER     = 0x00001000
 UF2_FLAG_FAMILY_ID_PRESENT  = 0x00002000
 UF2_FLAG_MD5_PRESENT        = 0x00004000
-
 
 uf2_config = {
     "rp2040": {
@@ -109,6 +107,8 @@ elf32_header_size = struct.calcsize(elf32_header)
 elf32_ph_entry = "<IIIIIIII"
 elf32_ph_entry_size = struct.calcsize(elf32_ph_entry)
 
+
+# -----------------------------------------------------------------------------
 def read_header(source_bytes):
     pos = 0
     eh = struct.unpack_from(elf_header,source_bytes,pos)
@@ -139,6 +139,7 @@ def read_header(source_bytes):
 
     return e32h
 
+
 def check_address_range(valid_ranges, addr, vaddr, size, uninitialized):
     for range in valid_ranges:
         if range["start"] <= addr and range["end"] >= (addr+size):
@@ -148,6 +149,7 @@ def check_address_range(valid_ranges, addr, vaddr, size, uninitialized):
                 print(("{} segment {:08x}->{:08x} ({:08x}->{:08x})").format(uninitialized and "Uninitialized" or "Mapped", addr, addr + size, vaddr, vaddr+size))
             return range
     raise Exception("Memory segment {:08x}->{:08x} is outside of valid address range for device".format(addr, addr+size))
+
 
 def read_and_check_elf32_ph_entries(buffer, eh, valid_ranges, pages, page_size):
     for i in range(eh[6]):
@@ -184,6 +186,7 @@ def read_and_check_elf32_ph_entries(buffer, eh, valid_ranges, pages, page_size):
             if entry[5] > entry[4]:
                 # we have some uninitialized data too
                 check_address_range(valid_ranges, entry[3] + entry[4], entry[2] + entry[4], entry[5] - entry[4], True);
+
 
 def realize_page(buffer, fragments):
     result = bytes(476)
@@ -233,16 +236,20 @@ def convert_data(source_bytes,target,ranges):
         file_content += block
     return file_content
 
+
 def convert(source, output, target, ranges):
     source_bytes = Path(source).read_bytes()
     uf2 = convert_data(source_bytes,target, ranges)
     Path(output).write_bytes(uf2)
+
 
 def parse_range(strval):
     if strval.startswith("0x"):
         return int(strval[2:],16)
     return int(strval)
 
+
+# -----------------------------------------------------------------------------
 if __name__ == "__main__":
     import argparse
 

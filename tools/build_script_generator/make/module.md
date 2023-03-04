@@ -124,7 +124,7 @@ Heap:     16.4 MiB
 #### make program
 
 ```
-make program profile={debug|release} [port={serial-port}]
+make program profile={debug|release} port={serial-port}
 ```
 
 Writes the executable onto your target via Avrdude or OpenOCD.
@@ -183,7 +183,7 @@ with the `delay` parameter (default is 5 seconds).
 (\* *only ARM Cortex-M targets*)
 
 ```
-$ make program-dfu
+ $ make program-dfu
 Binary File···· /build/{debug|release}/blink.bin
 dfu_stm32_programmer: program /build/{debug|release}/blink.bin
 dfu-util 0.9
@@ -218,7 +218,7 @@ Transitioning to dfuMANIFEST state
 #### make program-bmp
 
 ```
-make program-bmp profile={debug|release} [port={serial-port}]
+make program-bmp profile={debug|release} port={serial-port}
 ```
 
 [Black Magic Probe][bmp] is convenient tool to convert cheap USB ST-LINK V2 clones
@@ -239,7 +239,7 @@ crw-rw-rw-  1 root  wheel   21, 106 Feb 19 09:46 /dev/tty.usbmodemDEADBEF1
 You can let the tool guess the port or explicitly specify it:
 
 ```
-$ make program-bmp port=/dev/tty.usbmodemDEADBEEF
+ $ make program-bmp port=/dev/tty.usbmodemDEADBEEF
 Remote debugging using /dev/tty.usbmodemDEADBEEF
 Target voltage: unknown
 Available Targets:
@@ -263,7 +263,7 @@ make: done building targets.
 #### make debug
 
 ```
-make debug profile={debug|release} ui={tui|web}
+make debug profile={debug|release} ui={tui|gdbgui}
 ```
 
 Launches OpenOCD in the background, then launches GDB in foreground with the
@@ -288,7 +288,7 @@ This is just a convenience wrapper for the debug functionality defined in the
 #### make debug-bmp
 
 ```
-make debug-bmp profile={debug|release} ui={tui|web} port={serial-port}
+make debug-bmp profile={debug|release} ui={tui|gdbgui} port={serial-port}
 ```
 
 Launches GDB to debug via Black Magic Probe.
@@ -298,7 +298,7 @@ Launches GDB to debug via Black Magic Probe.
 #### make debug-coredump
 
 ```
-make debug-coredump profile={debug|release} ui={tui|web} \
+make debug-coredump profile={debug|release} ui={tui|gdbgui} \
                     coredump={path/to/coredump.txt}
 ```
 
@@ -325,7 +325,7 @@ coredump any firmware whose ELF file is currently unavailable.
 #### make coredump-bmp
 
 ```
-make coredump-bmp
+make coredump-bmp port={serial-port}
 ```
 
 Creates a coredump via Black Magic Probe.
@@ -345,7 +345,7 @@ Resets the executable via OpenOCD.
 #### make reset-bmp
 
 ```
-make reset-bmp [port={serial}]
+make reset-bmp port={serial-port}
 ```
 
 Resets the executable via Black Magic Probe.

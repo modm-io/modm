@@ -49,7 +49,7 @@ Writes the executable onto your target via Black Magic Probe.
 
 #### debug
 
-- option `MODM_DBG_UI`=tui in {`tui`, `gdbgui`}.
+- option `MODM_DBG_UI=tui` in {`tui`, `gdbgui`}.
 
 Launches OpenOCD in the background, then launches GDB in foreground with the
 correct executable with text-based or [web-based gdbgui][gdbgui] UI. When GDB
@@ -61,6 +61,14 @@ To use gdbgui you must have it installed via `pip install gdbgui`.
 **We recommend using the IDE provided debug interface instead of this!**
 
 
+#### debug-bmp
+
+- option `MODM_BMP_PORT=auto` as string.
+
+Launches GDB via Black Magic Probe.
+(\* *only ARM Cortex-M targets*)
+
+
 #### debug-coredump
 
 - option `MODM_DBG_UI=tui` in {`tui`, `gdbgui`}.
@@ -69,7 +77,36 @@ Launches GDB for post-mortem debugging with the using the data in the
 `coredump.txt` argument.
 (\* *only ARM Cortex-M targets*)
 
-See the `:platform:fault` module for details how to receive the coredump data.
+Use the `coredump` method to generate a coredump with a debugger attached,
+otherwise see the `modm:platform:fault` module for details how to generate and
+receive the coredump data from the device itself.
+
+
+#### coredump
+
+Launches GDB via OpenOCD and creates a `coredump.txt` file containing all
+volatile memories and prints the GNU build ID of the firmware under debug.
+Note that this command does not require an ELF file, so it can be used to
+coredump any firmware whose ELF file is currently unavailable.
+(\* *only ARM Cortex-M targets*)
+
+
+#### coredump-bmp
+
+Creates a coredump via Black Magic Probe.
+(\* *only ARM Cortex-M targets*)
+
+
+#### reset
+
+Resets the executable via OpenOCD.
+(\* *only ARM Cortex-M targets*)
+
+
+#### reset-bmp
+
+Resets the executable via Black Magic Probe.
+(\* *only ARM Cortex-M targets*)
 
 
 #### log-itm
@@ -78,6 +115,7 @@ See the `:platform:fault` module for details how to receive the coredump data.
 
 Configures OpenOCD in tracing mode to output ITM channel 0 on SWO pin and
 displays the serial output stream.
+(\* *only ARM Cortex-M targets*)
 
 See the `modm:platform:itm` module for details how to use the ITM as a logging
 output.

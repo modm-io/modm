@@ -57,7 +57,7 @@ You can also call this from inside GDB via the `monitor` command:
 rtt: Searching for control block 'SEGGER RTT'
 rtt: Control block found at 0x20001024
 Listening on port 9090 for rtt connections
-(gdb)
+(gdb) continue&
 ```
 
 You can then use for example `telnet 127.0.0.1 9090` to connect to the stream.

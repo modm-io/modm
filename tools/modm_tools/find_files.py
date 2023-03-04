@@ -12,11 +12,8 @@
 
 from pathlib import Path
 from os.path import join, relpath, isabs, dirname
-if __name__ == "__main__":
-    import sys
-    sys.path.append(dirname(dirname(__file__)))
 
-from modm_tools import utils
+from . import utils
 
 # -----------------------------------------------------------------------------
 HEADER = [".h", ".hh", ".hpp"]
@@ -32,6 +29,7 @@ def scan(basepath, extensions, ignorePaths=None, ignoreFiles=None):
 	return sorted(list(files))
 
 
+# -----------------------------------------------------------------------------
 if __name__ == "__main__":
     import argparse
 

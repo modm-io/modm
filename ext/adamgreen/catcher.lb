@@ -18,10 +18,10 @@ def init(module):
 CrashCatcher hooks into the ARM Cortex-M HardFault handler and generates a coredump
 that can be used with CrashDebug for post-mortem debugging.
 You must place the `CrashDebug` binary in your path or alternatively set the
-environment variable `MODM_CRASHDEBUG_PATH` to point to the enclosing folder:
+environment variable `MODM_CRASHDEBUG_BINARY` to point to the enclosing folder:
 
 ```sh
-export MODM_CRASHDEBUG_PATH=/path/to/crashdebug/bin
+export MODM_CRASHDEBUG_BINARY=/path/to/crashdebug/bin/CrashDebug
 ```
 
 - https://github.com/adamgreen/CrashCatcher

@@ -37,11 +37,10 @@ define modm_coredump
     set logging overwrite off
     set logging file gdb.txt
     set style enabled on
-    set pagination on
 end
 
 # Print the modm::build_id() content only from the firmware
-define print_build_id
+define modm_build_id
     # We want to do a coredump without an ELF file, since you may not have it at
     # hand, so we locate it manually: it is the first entry after the vector table
     set var $__build_id = 0x08000000 + {{ vector_table_size }}
@@ -60,9 +59,23 @@ define print_build_id
     printf "\n"
 end
 
+define modm_setup_tui
+    compare-sections
+    b main
+end
+
+# note: reset command is monitor specific
+define rerun
+  reset
+  continue
+end
+
+define restart
+  # DEPRECATED: 2024q1
+  printf "The `restart` command is deprecated. Use `reset` instead!\n"
+  reset
+end
 
 set print pretty
 set print asm-demangle on
 set mem inaccessible-by-default off
-compare-sections
-b main

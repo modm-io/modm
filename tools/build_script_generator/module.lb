@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2017-2018, Niklas Hauser
+# Copyright (c) 2017-2023, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -25,7 +25,7 @@ class BuildModuleDocs:
         if self._content is None:
             self._content = Path(localpath("module.md")).read_text(encoding="utf-8").strip()
             tools = ["avrdude", "openocd", "bmp", "gdb", "size", "info",
-                     "unit_test", "log", "build_id", "bitmap", "elf2uf2"]
+                     "unit_test", "itm", "rtt", "build_id", "bitmap", "elf2uf2"]
 
             for tool in tools:
                 tpath = Path(repopath("tools/modm_tools/{}.py".format(tool)))
@@ -201,7 +201,7 @@ def build(env):
         tools.add("unit_test")
     if is_cortex_m:
         tools.update({"bmp", "openocd", "crashdebug", "gdb", "backend",
-                      "log", "build_id", "size", "elf2uf2"})
+                      "itm", "rtt", "build_id", "size", "elf2uf2"})
         if platform in ["sam"]:
             tools.update({"bossac"})
     elif platform in ["avr"]:
@@ -214,6 +214,10 @@ def build(env):
         env.copy(localpath("..", tool), tool)
         if "info" in tool:
             env.copy(localpath("../modm_tools/info.c.in"), "modm_tools/info.c.in")
+
+    env.outbasepath = "modm/"
+    env.template("probe_gdbinit.in", "gdbinit_openocd", substitutions={"probe": "openocd"})
+    env.template("probe_gdbinit.in", "gdbinit_bmp", substitutions={"probe": "bmp"})
 
 def post_build(env):
     if env.buildlog._buildlog._metadata:
@@ -255,7 +259,6 @@ def post_build(env):
             env.substitutions["main_ram"] = linkerscript.get("cont_ram_regions", [{"start": 0x20000000, "size": 4096}])[0]
             env.substitutions["rtt_channels"] = len(env.get(":platform:rtt:buffer.tx", []))
         env.template("openocd.cfg.in")
-        env.template("openocd_gdbinit.in")
 
 
 # ============================ Option Descriptions ============================
