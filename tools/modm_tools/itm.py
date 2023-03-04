@@ -21,10 +21,16 @@ CPU frequency:
 python3 -m modm_tools.itm openocd -f modm/openocd.cfg --fcpu 48000000
 ```
 
+JLink is also supported and can determine the CPU frequency automatically:
+
+```sh
+python3 -m modm_tools.itm jlink -device STM32F469NI
+```
+
 (\* *only ARM Cortex-M targets*)
 """
 
-from . import openocd
+from . import openocd, jlink
 
 if __name__ == "__main__":
     import argparse
@@ -40,6 +46,7 @@ if __name__ == "__main__":
     subparsers = parser.add_subparsers(title="Backend", dest="backend")
 
     # Add backends
+    jlink.add_subparser(subparsers)
     parser_openocd = openocd.add_subparser(subparsers)
     parser_openocd.add_argument(
             "--fcpu",
@@ -52,3 +59,5 @@ if __name__ == "__main__":
 
     if isinstance(backend, openocd.OpenOcdBackend):
         openocd.itm(backend, fcpu=args.fcpu, baudrate=args.baudrate)
+    elif isinstance(backend, jlink.JLinkBackend):
+        jlink.itm(args.device, baudrate=args.baudrate)

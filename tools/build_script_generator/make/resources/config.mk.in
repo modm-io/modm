@@ -42,8 +42,10 @@ CONFIG_AVRDUDE_BAUDRATE := -b {{ avrdude_baudrate }}
 %% endif
 %% elif core.startswith("cortex-m")
 MODM_OPENOCD_CONFIGFILES += $(MODM_PATH)/openocd.cfg
+MODM_JLINK_DEVICE = "{{ jlink_partname }}"
 MODM_GDB_COMMANDS = -x $(MODM_PATH)/gdbinit -ex "dir $(GCC_BASE)" -ex "modm_setup_tui"
 MODM_GDB_COMMANDS_OPENOCD = -x $(MODM_PATH)/gdbinit_openocd
+MODM_GDB_COMMANDS_JLINK = -x $(MODM_PATH)/gdbinit_jlink
 MODM_GDB_COMMANDS_BMP = -x $(MODM_PATH)/gdbinit_bmp
 %% if platform == "sam"
 %% if bossac_offset

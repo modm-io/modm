@@ -287,6 +287,56 @@ connect to JLink (`host=":2331"`) or Black Magic Probe (`host="/dev/tty.usbseria
 (\* *only ARM Cortex-M targets*)
 
 
+#### scons program-jlink
+
+```
+scons program-jlink profile={debug|release} [firmware={hash or file}]
+```
+
+Writes the executable onto your target via JLink.
+This is a convenience wrapper around the programming options and methods
+defined in the `modm:build` module.
+(\* *only ARM Cortex-M targets*)
+
+Example for a STM32 target:
+
+```
+ $ scons program-jlink
+╭────────────── /build/{debug|release}/blink.elf
+╰────JLink────> stm32l476rgt6
+SEGGER J-Link GDB Server V7.84f Command Line Version
+
+JLinkARM.dll V7.84f (DLL compiled Feb  7 2023 16:45:51)
+
+-----GDB Server start settings-----
+GDBInit file:                  none
+GDB Server Listening port:     2331
+SWO raw output listening port: 2332
+Terminal I/O port:             2333
+Accept remote connection:      yes
+Generate logfile:              off
+Verify download:               off
+Init regs on start:            off
+Silent mode:                   on
+Single run mode:               off
+Target connection timeout:     0 ms
+------J-Link related settings------
+J-Link Host interface:         USB
+J-Link script:                 none
+J-Link settings file:          none
+------Target related settings------
+Target device:                 stm32l476rg
+Target device parameters:      none
+Target interface:              SWD
+Target interface speed:        4000kHz
+Target endian:                 little
+
+warning: Source file is more recent than executable.
+Resetting target
+scons: done building targets.
+```
+
+
 #### scons openocd
 
 ```
@@ -294,6 +344,17 @@ scons openocd
 ```
 
 Starts an OpenOCD process to attach a remote debugger to (e.g. with
+`scons program-remote` or `scons debug-remote`).
+(\* *only ARM Cortex-M targets*)
+
+
+#### scons jlink
+
+```
+scons jlink
+```
+
+Starts a JLinkGDBServer process to attach a remote debugger to (e.g. with
 `scons program-remote` or `scons debug-remote`).
 (\* *only ARM Cortex-M targets*)
 
@@ -351,6 +412,16 @@ Launches GDB to debug via Black Magic Probe.
 (\* *only ARM Cortex-M targets*)
 
 
+#### scons debug-jlink
+
+```
+scons debug-jlink profile={debug|release} ui={tui|gdbgui} [firmware={hash or file}]
+```
+
+Launches GDB to debug via JLink.
+(\* *only ARM Cortex-M targets*)
+
+
 #### scons debug-coredump
 
 ```
@@ -395,6 +466,16 @@ Creates a coredump via Black Magic Probe.
 (\* *only ARM Cortex-M targets*)
 
 
+#### scons coredump-jlink
+
+```
+scons coredump-jlink
+```
+
+Creates a coredump via JLink.
+(\* *only ARM Cortex-M targets*)
+
+
 #### scons reset
 
 ```
@@ -412,6 +493,16 @@ scons reset-bmp port={serial-port}
 ```
 
 Resets the executable via Black Magic Probe.
+(\* *only ARM Cortex-M targets*)
+
+
+#### scons reset-jlink
+
+```
+scons reset-jlink
+```
+
+Resets the executable via JLink.
 (\* *only ARM Cortex-M targets*)
 
 
@@ -455,6 +546,17 @@ See the `modm:platform:itm` module for details how to use the ITM as a logging
 output.
 
 
+#### scons log-itm-jlink
+
+```
+scons log-itm-jlink [channel={int}]
+```
+
+Outputs the ITM channel via JLinkSWOViewer. Note that JLink auto-detects the
+CPU frequency.
+(\* *only ARM Cortex-M targets*)
+
+
 #### scons log-rtt
 
 ```
@@ -479,6 +581,17 @@ loop: 61
 ```
 
 See the `modm:platform:rtt` module for details how to use RTT for data transfer.
+
+
+#### scons log-rtt-jlink
+
+```
+scons log-rtt-jlink [channel={int}]
+```
+
+Configures JLink in RTT mode to output the chosen channel (default 0) via a
+simple telnet client. Disconnect with Ctrl+D.
+(\* *only ARM Cortex-M targets*)
 
 
 #### scons library

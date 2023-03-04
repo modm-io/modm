@@ -107,12 +107,18 @@ def generate(env, **kw):
         env["RUN_OPENOCD_COMSTR"] =      "%s╭────────────── %s\n" \
                                          "%s╰───OpenOCD───> %s$CONFIG_DEVICE_NAME%s" % install
 
+        env["RUN_JLINK_COMSTR"] =        "%s╭────────────── %s\n" \
+                                         "%s╰────JLink────> %s$CONFIG_DEVICE_NAME%s" % install
+
         # Debug probes debugging
         env["DEBUG_OPENOCD_COMSTR"] =    "%s╭─────GDB─────> %s$SOURCE\n" \
                                          "%s╰───OpenOCD───> %s$CONFIG_DEVICE_NAME%s" % install
 
         env["DEBUG_BMP_COMSTR"] =        "%s╭─────GDB─────> %s$SOURCE\n" \
                                          "%s╰─────BMP─────> %s$CONFIG_DEVICE_NAME%s" % install
+
+        env["DEBUG_JLINK_COMSTR"] =      "%s╭─────GDB─────> %s$SOURCE\n" \
+                                         "%s╰────JLink────> %s$CONFIG_DEVICE_NAME%s" % install
 
         env["DEBUG_REMOTE_COMSTR"] =     "%s╭─────GDB─────> %s$SOURCE\n" \
                                          "%s╰─Rem─OpenOCD─> %s$CONFIG_DEVICE_NAME%s" % install
@@ -126,6 +132,9 @@ def generate(env, **kw):
 
         env["PROGRAM_BMP_COMSTR"] =      "%s╭─Black─Magic── %s$SOURCE\n" \
                                          "%s╰────Probe────> %s$CONFIG_DEVICE_NAME%s" % install
+
+        env["PROGRAM_JLINK_COMSTR"] =    "%s╭────────────── %s$SOURCE\n" \
+                                         "%s╰────JLink────> %s$CONFIG_DEVICE_NAME%s" % install
 
         env["PROGRAM_AVRDUDE_COMSTR"] =  "%s╭────────────── %s$SOURCE\n" \
                                          "%s╰───Avrdude───> %s$CONFIG_DEVICE_NAME%s" % install
@@ -146,6 +155,9 @@ def generate(env, **kw):
         env["RESET_BMP_COMSTR"] =        "%s╭────Reset───── %s\n" \
                                          "%s╰─────BMP─────> %s$CONFIG_DEVICE_NAME%s" % install
 
+        env["RESET_JLINK_COMSTR"] =      "%s╭────Reset───── %s\n" \
+                                         "%s╰────JLink────> %s$CONFIG_DEVICE_NAME%s" % install
+
         env["RESET_REMOTE_COMSTR"] =     "%s╭────Reset───── %s\n" \
                                          "%s╰─Remote─GDB──> %s$CONFIG_DEVICE_NAME%s" % install
 
@@ -153,11 +165,20 @@ def generate(env, **kw):
         env["COREDUMP_OPENOCD_COMSTR"] = "%s╭───Coredump──> %s$COREDUMP_FILE\n" \
                                          "%s╰───OpenOCD──── %s$CONFIG_DEVICE_NAME%s" % install
 
+        env["COREDUMP_JLINK_COMSTR"] =   "%s╭───Coredump──> %s$COREDUMP_FILE\n" \
+                                         "%s╰────JLink───── %s$CONFIG_DEVICE_NAME%s" % install
+
         # Debug probes logging
         env["ITM_OPENOCD_COMSTR"] =      "%s╭───OpenOCD───> %sSingle Wire Viewer\n" \
                                          "%s╰─────SWO────── %s$CONFIG_DEVICE_NAME%s" % install
 
+        env["ITM_JLINK_COMSTR"] =        "%s╭────JLink────> %sSingle Wire Viewer\n" \
+                                         "%s╰─────SWO────── %s$CONFIG_DEVICE_NAME%s" % install
+
         env["RTT_OPENOCD_COMSTR"] =      "%s╭───OpenOCD───> %sReal Time Transfer\n" \
+                                         "%s╰─────RTT────── %s$CONFIG_DEVICE_NAME%s" % install
+
+        env["RTT_JLINK_COMSTR"] =        "%s╭────JLink────> %sReal Time Transfer\n" \
                                          "%s╰─────RTT────── %s$CONFIG_DEVICE_NAME%s" % install
 
 def exists(env):

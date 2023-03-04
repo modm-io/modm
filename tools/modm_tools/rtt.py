@@ -21,10 +21,16 @@ built-in Python telnet client:
 python3 -m modm_tools.rtt --channel 0 openocd -f modm/openocd.cfg
 ```
 
+JLink is also supported and may have faster transfer rates:
+
+```sh
+python3 -m modm_tools.rtt --channel 0 jlink -device STM32F469NI
+```
+
 (\* *only ARM Cortex-M targets*)
 """
 
-from . import openocd
+from . import openocd, jlink
 
 if __name__ == "__main__":
     import argparse
@@ -40,9 +46,12 @@ if __name__ == "__main__":
     # Add backends
     subparsers = parser.add_subparsers(title="Backend", dest="backend")
     openocd.add_subparser(subparsers)
+    jlink.add_subparser(subparsers)
 
     args = parser.parse_args()
     backend = args.backend(args)
 
     if isinstance(backend, openocd.OpenOcdBackend):
         openocd.rtt(backend, args.channel)
+    elif isinstance(backend, jlink.JLinkBackend):
+        jlink.rtt(backend, args.channel)

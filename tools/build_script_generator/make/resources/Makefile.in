@@ -112,6 +112,10 @@ program: build
 program-bmp: build
 	@$(PYTHON3) -m modm_tools.bmp -p $(port) $(ELF_FILE)
 
+.PHONY: program-jlink
+program-jlink: build
+	@$(PYTHON3) -m modm_tools.jlink -device $(MODM_JLINK_DEVICE) $(ELF_FILE)
+
 delay?=5
 .PHONY: program-dfu
 program-dfu: bin
@@ -134,6 +138,10 @@ reset:
 reset-bmp:
 	@$(PYTHON3) -m modm_tools.bmp -p $(port) --reset
 
+.PHONY: reset-jlink
+reset-jlink:
+	@$(PYTHON3) -m modm_tools.jlink -device $(MODM_JLINK_DEVICE) --reset
+
 ui?=tui
 .PHONY: debug
 debug: build
@@ -146,6 +154,12 @@ debug-bmp: build
 	@$(PYTHON3) -m modm_tools.gdb $(MODM_GDB_COMMANDS) \
 	  		$(MODM_GDB_COMMANDS_BMP) --elf $(ELF_FILE) --ui=$(ui) \
 			bmp -p $(port)
+
+.PHONY: debug-jlink
+debug-jlink: build
+	@$(PYTHON3) -m modm_tools.gdb $(MODM_GDB_COMMANDS) \
+	  		$(MODM_GDB_COMMANDS_JLINK) --elf $(ELF_FILE) --ui=$(ui) \
+			jlink -device $(MODM_JLINK_DEVICE)
 
 coredump?=coredump.txt
 .PHONY: debug-coredump
@@ -166,13 +180,27 @@ coredump-bmp:
 			-ex "modm_coredump" -ex "modm_build_id" -ex "quit" \
 			bmp -p $(port)
 
+.PHONY: coredump-jlink
+coredump-jlink:
+	@$(PYTHON3) -m modm_tools.gdb $(MODM_GDB_COMMANDS) \
+			-ex "modm_coredump" -ex "modm_build_id" -ex "quit" \
+			jlink -device $(MODM_JLINK_DEVICE)
+
 fcpu?=0
 .PHONY: log-itm
 log-itm:
 	@$(PYTHON3) -m modm_tools.itm openocd -f $(MODM_PATH)/openocd.cfg --fcpu $(fcpu)
 
+.PHONY: log-itm-jlink
+log-itm-jlink:
+	@$(PYTHON3) -m modm_tools.itm jlink -device $(MODM_JLINK_DEVICE)
+
 channel?=0
 .PHONY: log-rtt
 log-rtt:
 	@$(PYTHON3) -m modm_tools.rtt --channel $(channel) openocd -f $(MODM_PATH)/openocd.cfg
+
+.PHONY: log-rtt-jlink
+log-rtt-jlink:
+	@$(PYTHON3) -m modm_tools.rtt --channel $(channel) jlink -device $(MODM_JLINK_DEVICE)
 %% endif

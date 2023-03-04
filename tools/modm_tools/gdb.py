@@ -64,7 +64,7 @@ def add_subparser(subparser):
 # -----------------------------------------------------------------------------
 if __name__ == "__main__":
     import argparse, signal
-    from . import openocd, crashdebug, bmp
+    from . import openocd, crashdebug, bmp, jlink
 
     # Catch Ctrl-C before it terminates the GDB subprocess call
     def empty_signal_handler(sig, frame):
@@ -100,6 +100,7 @@ if __name__ == "__main__":
     openocd.add_subparser(subparsers)
     crashdebug.add_subparser(subparsers)
     bmp.add_subparser(subparsers)
+    jlink.add_subparser(subparsers)
 
     args = parser.parse_args()
     call(args.backend(args), args.source, args.config, args.commands, args.ui)

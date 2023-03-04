@@ -95,12 +95,16 @@ def common_target(env):
     core = device.get_driver("core")["type"]
     core = core.replace("fd", "").replace("f", "")
     mcu = device._properties.get("mcu", "")
+    jlink_partname = device.partname
+    if device.partname.startswith("stm32"):
+        jlink_partname = device.partname[:11]
     p = {
         "core": core,
         "mcu": mcu,
         "platform": device.identifier["platform"],
         "family": device.identifier["family"],
         "partname": device.partname,
+        "jlink_partname": jlink_partname,
     }
     return p
 

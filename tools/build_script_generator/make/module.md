@@ -260,6 +260,60 @@ make: done building targets.
 ```
 
 
+#### make program-jlink
+
+```
+make program-jlink profile={debug|release}
+```
+
+Writes the executable onto your target via JLink.
+This is a convenience wrapper around the programming options and methods
+defined in the `modm:build` module.
+(\* *only ARM Cortex-M targets*)
+
+```
+ $ make program-jlink
+SEGGER J-Link GDB Server V7.84f Command Line Version
+
+JLinkARM.dll V7.84f (DLL compiled Feb  7 2023 16:45:51)
+
+-----GDB Server start settings-----
+GDBInit file:                  none
+GDB Server Listening port:     2331
+SWO raw output listening port: 2332
+Terminal I/O port:             2333
+Accept remote connection:      yes
+Generate logfile:              off
+Verify download:               off
+Init regs on start:            off
+Silent mode:                   on
+Single run mode:               off
+Target connection timeout:     0 ms
+------J-Link related settings------
+J-Link Host interface:         USB
+J-Link script:                 none
+J-Link settings file:          none
+------Target related settings------
+Target device:                 stm32l476rg
+Target device parameters:      none
+Target interface:              SWD
+Target interface speed:        4000kHz
+Target endian:                 little
+
+modm::delay_us (us=<optimized out>) at modm/src/modm/platform/core/delay.cpp:33
+33          if (now - start >= cycles) break;
+Loading section .text, size 0x188 lma 0x8000000
+Loading section .build_id, size 0x24 lma 0x8000188
+Loading section .text, size 0xe7c lma 0x80001b0
+Loading section .rodata, size 0x6c lma 0x800102c
+Loading section .data, size 0x4 lma 0x8001098
+Loading section .fastdata, size 0x8 lma 0x800109c
+Loading section .rodata, size 0x70 lma 0x80010a4
+Start address 0x08000a50, load size 4368
+Transfer rate: 4265 KB/sec, 624 bytes/write.
+Resetting target
+```
+
 #### make debug
 
 ```
@@ -292,6 +346,16 @@ make debug-bmp profile={debug|release} ui={tui|gdbgui} port={serial-port}
 ```
 
 Launches GDB to debug via Black Magic Probe.
+(\* *only ARM Cortex-M targets*)
+
+
+#### make debug-jlink
+
+```
+make debug-jlink profile={debug|release} ui={tui|gdbgui}
+```
+
+Launches GDB to debug via JLink.
 (\* *only ARM Cortex-M targets*)
 
 
@@ -332,6 +396,16 @@ Creates a coredump via Black Magic Probe.
 (\* *only ARM Cortex-M targets*)
 
 
+#### make coredump-jlink
+
+```
+make coredump-jlink
+```
+
+Creates a coredump via JLink.
+(\* *only ARM Cortex-M targets*)
+
+
 #### make reset
 
 ```
@@ -349,6 +423,16 @@ make reset-bmp port={serial-port}
 ```
 
 Resets the executable via Black Magic Probe.
+(\* *only ARM Cortex-M targets*)
+
+
+#### make reset-jlink
+
+```
+make reset-jlink
+```
+
+Resets the executable via JLink.
 (\* *only ARM Cortex-M targets*)
 
 
@@ -378,6 +462,17 @@ See the `modm:platform:itm` module for details how to use the ITM as a logging
 output.
 
 
+#### make log-itm-jlink
+
+```
+make log-itm-jlink [channel={int}]
+```
+
+Outputs the ITM channel via JLinkSWOViewer. Note that JLink auto-detects the
+CPU frequency.
+(\* *only ARM Cortex-M targets*)
+
+
 #### make log-rtt
 
 ```
@@ -400,6 +495,17 @@ loop: 61
 ```
 
 See the `modm:platform:rtt` module for details how to use RTT for data transfer.
+
+
+#### make log-rtt-jlink
+
+```
+make log-rtt-jlink [channel={int}]
+```
+
+Configures JLink in RTT mode to output the chosen channel (default 0) via a
+simple telnet client. Disconnect with Ctrl+D.
+(\* *only ARM Cortex-M targets*)
 
 
 #### make library

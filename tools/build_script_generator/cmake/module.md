@@ -47,6 +47,12 @@ Writes the executable onto your target via Black Magic Probe.
 (\* *only ARM Cortex-M targets*)
 
 
+#### program-jlink
+
+Writes the executable onto your target via JLink.
+(\* *only ARM Cortex-M targets*)
+
+
 #### debug
 
 - option `MODM_DBG_UI=tui` in {`tui`, `gdbgui`}.
@@ -66,6 +72,12 @@ To use gdbgui you must have it installed via `pip install gdbgui`.
 - option `MODM_BMP_PORT=auto` as string.
 
 Launches GDB via Black Magic Probe.
+(\* *only ARM Cortex-M targets*)
+
+
+#### debug-jlink
+
+Launches GDB via JLink.
 (\* *only ARM Cortex-M targets*)
 
 
@@ -97,6 +109,12 @@ Creates a coredump via Black Magic Probe.
 (\* *only ARM Cortex-M targets*)
 
 
+#### coredump-jlink
+
+Creates a coredump via JLink.
+(\* *only ARM Cortex-M targets*)
+
+
 #### reset
 
 Resets the executable via OpenOCD.
@@ -106,6 +124,12 @@ Resets the executable via OpenOCD.
 #### reset-bmp
 
 Resets the executable via Black Magic Probe.
+(\* *only ARM Cortex-M targets*)
+
+
+#### reset-jlink
+
+Resets the executable via JLink.
 (\* *only ARM Cortex-M targets*)
 
 
@@ -121,6 +145,14 @@ See the `modm:platform:itm` module for details how to use the ITM as a logging
 output.
 
 
+#### log-itm-jlink
+
+- option `MODM_ITM_FCPU` in Hz
+
+Outputs ITM channel 0 via JLinkSWOViewer.
+(\* *only ARM Cortex-M targets*)
+
+
 #### log-rtt
 
 - option `MODM_RTT_CHANNEL=0` as integer.
@@ -131,6 +163,14 @@ simple telnet client. Disconnect with Ctrl+D.
 
 See the `modm:platform:rtt` module for details how to use RTT for data transfer.
 
+
+#### log-rtt-jlink
+
+- option `MODM_RTT_CHANNEL=0` as integer.
+
+Configures JLink in RTT mode to output the chosen channel (default 0) via a
+simple telnet client. Disconnect with Ctrl+D.
+(\* *only ARM Cortex-M targets*)
 
 [cmake]: http://cmake.org
 [gdbgui]: https://www.gdbgui.com

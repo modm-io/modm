@@ -205,6 +205,13 @@ function(modm_targets_create project_name)
         ${PROJECT_BINARY_DIR}/src/${project_name}.elf
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
+  add_custom_target(program-jlink DEPENDS ${project_name}.elf)
+  add_custom_command(TARGET program-jlink
+    USES_TERMINAL
+    COMMAND PYTHONPATH=modm ${PYTHON3_EXECUTABLE} -m modm_tools.jlink -device {{ jlink_partname }}
+        ${PROJECT_BINARY_DIR}/src/${project_name}.elf
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+
   add_custom_target(debug DEPENDS ${project_name}.elf)
   add_custom_command(TARGET debug
     USES_TERMINAL
@@ -219,6 +226,14 @@ function(modm_targets_create project_name)
     COMMAND PYTHONPATH=modm ${PYTHON3_EXECUTABLE} -m modm_tools.gdb -x modm/gdbinit -x modm/openocd_bmp
         --elf ${PROJECT_BINARY_DIR}/src/${project_name}.elf --ui=${MODM_DBG_UI}
         bmp -p ${MODM_BMP_PORT}
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+
+  add_custom_target(debug-jlink DEPENDS ${project_name}.elf)
+  add_custom_command(TARGET debug-jlink
+    USES_TERMINAL
+    COMMAND PYTHONPATH=modm ${PYTHON3_EXECUTABLE} -m modm_tools.gdb -x modm/gdbinit -x modm/openocd_jlink
+        --elf ${PROJECT_BINARY_DIR}/src/${project_name}.elf --ui=${MODM_DBG_UI}
+        jlink -device {{ jlink_partname }}
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
   add_custom_target(debug-coredump DEPENDS ${project_name}.elf)
@@ -245,6 +260,14 @@ function(modm_targets_create project_name)
         bmp -p ${MODM_BMP_PORT}
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
+  add_custom_target(coredump-jlink)
+  add_custom_command(TARGET coredump-jlink
+    USES_TERMINAL
+    COMMAND PYTHONPATH=modm ${PYTHON3_EXECUTABLE} -m modm_tools.gdb -x modm/gdbinit
+        -ex "modm_coredump" -ex "modm_build_id" -ex "quit"
+        jlink -device {{ jlink_partname }}
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+
   add_custom_target(reset)
   add_custom_command(TARGET reset
     USES_TERMINAL
@@ -257,16 +280,34 @@ function(modm_targets_create project_name)
     COMMAND PYTHONPATH=modm ${PYTHON3_EXECUTABLE} -m modm_tools.bmp -p ${MODM_BMP_PORT} --reset
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
+  add_custom_target(reset-jlink)
+  add_custom_command(TARGET reset-jlink
+    USES_TERMINAL
+    COMMAND PYTHONPATH=modm ${PYTHON3_EXECUTABLE} -m modm_tools.jlink -device {{ jlink_partname }} --reset
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+
   add_custom_target(log-itm)
   add_custom_command(TARGET log-itm
     USES_TERMINAL
     COMMAND PYTHONPATH=modm ${PYTHON3_EXECUTABLE} -m modm_tools.itm openocd -f modm/openocd.cfg --fcpu ${MODM_ITM_FCPU}
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
+  add_custom_target(log-itm-jlink)
+  add_custom_command(TARGET log-itm-jlink
+    USES_TERMINAL
+    COMMAND PYTHONPATH=modm ${PYTHON3_EXECUTABLE} -m modm_tools.itm jlink -device {{ jlink_partname }}
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+
   add_custom_target(log-rtt)
   add_custom_command(TARGET log-rtt
     USES_TERMINAL
     COMMAND PYTHONPATH=modm ${PYTHON3_EXECUTABLE} -m modm_tools.rtt --channel ${MODM_RTT_CHANNEL} openocd -f modm/openocd.cfg
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+
+  add_custom_target(log-rtt-jlink)
+  add_custom_command(TARGET log-rtt-jlink
+    USES_TERMINAL
+    COMMAND PYTHONPATH=modm ${PYTHON3_EXECUTABLE} -m modm_tools.rtt --channel ${MODM_RTT_CHANNEL} jlink -device {{ jlink_partname }}
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 endfunction()
 

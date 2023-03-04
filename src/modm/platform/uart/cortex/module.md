@@ -79,4 +79,27 @@ loop 4
 loop 5
 ```
 
+Alternatively you can also use a JLink debug probe which auto-detects the CPU
+frequency:
 
+```
+  $ scons log-itm-jlink
+╭────JLink────> Single Wire Viewer
+╰─────SWO────── stm32l476rgt6
+
+Target CPU (stm32l476rg) is running @ 48251 kHz.
+Receiving SWO data @ 4500 kHz.
+Showing data from stimulus port(s): 0
+-----------------------------------------------
+Hello from the SWO.
+debug
+info
+warning
+error
+loop 0
+loop 1
+loop 2
+loop 3
+loop 4
+loop 5
+```

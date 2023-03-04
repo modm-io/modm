@@ -24,7 +24,7 @@ class BuildModuleDocs:
     def __str__(self):
         if self._content is None:
             self._content = Path(localpath("module.md")).read_text(encoding="utf-8").strip()
-            tools = ["avrdude", "openocd", "bmp", "gdb", "size", "info",
+            tools = ["avrdude", "openocd", "bmp", "gdb", "size", "info", "jlink",
                      "unit_test", "itm", "rtt", "build_id", "bitmap", "elf2uf2"]
 
             for tool in tools:
@@ -201,7 +201,7 @@ def build(env):
         tools.add("unit_test")
     if is_cortex_m:
         tools.update({"bmp", "openocd", "crashdebug", "gdb", "backend",
-                      "itm", "rtt", "build_id", "size", "elf2uf2"})
+                      "itm", "rtt", "build_id", "size", "elf2uf2", "jlink"})
         if platform in ["sam"]:
             tools.update({"bossac"})
     elif platform in ["avr"]:
@@ -217,6 +217,7 @@ def build(env):
 
     env.outbasepath = "modm/"
     env.template("probe_gdbinit.in", "gdbinit_openocd", substitutions={"probe": "openocd"})
+    env.template("probe_gdbinit.in", "gdbinit_jlink", substitutions={"probe": "jlink"})
     env.template("probe_gdbinit.in", "gdbinit_bmp", substitutions={"probe": "bmp"})
 
 def post_build(env):

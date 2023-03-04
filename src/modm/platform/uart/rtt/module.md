@@ -92,5 +92,25 @@ loop 61
 If you want to use this as a proper communication channel with a custom protocol
 you should implement the OpenOCD config yourself (with different ports).
 
+You can also use JLink to access the RTT data, which may be significantly faster
+than OpenOCD if the debug probe has hardware support for the protocol.
+
+```
+ $ scons log-rtt-jlink
+╭────JLink────> Real Time Transfer
+╰─────RTT────── stm32l476rgt6
+
+SEGGER J-Link V7.84f - Real time terminal output
+RTT Demo on Nucleo-64
+loop: 0
+loop: 1
+loop: 2
+loop: 3
+loop: 4
+loop: 5
+loop: 6
+loop: 7
+```
+
 
 [rtt]: http://openocd.org/doc/html/General-Commands.html#Real-Time-Transfer-_0028RTT_0029
