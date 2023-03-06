@@ -120,6 +120,9 @@ initialize()
 	stlink::Uart::initialize<SystemClock, 115200_Bd>();
 
 	Button::setInput();
+
+	// Enable PB4 as GPIO
+	AFIO->MAPR |= AFIO_MAPR_SWJ_CFG_JTAGDISABLE;
 }
 /// @}
 
