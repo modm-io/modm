@@ -1,5 +1,5 @@
 site_name: 'modm barebone embedded library'
-site_description: 'A modular C++20 library generator for barebone embedded programming'
+site_description: 'A modular C++23 library generator for barebone embedded programming'
 site_author: 'Niklas Hauser'
 site_url: 'http://modm.io'
 

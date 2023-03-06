@@ -263,7 +263,7 @@ def common_compiler_flags(compiler, target):
         "-Wredundant-decls",
         "-Wstrict-prototypes",
         "-Wbad-function-cast",
-        "-std=gnu11",
+        "-std=gnu2x",
         # "-pedantic",
     ]
     # flags only for C++
@@ -273,7 +273,7 @@ def common_compiler_flags(compiler, target):
         # "-Wnon-virtual-dtor",
         # "-Wold-style-cast",
         "-fstrict-enums",
-        "-std=c++20",
+        "-std=c++23",
         "-Wno-volatile",  # volatile is deprecated in C++20 but lots of our external code uses it...
         # "-pedantic",
     ]

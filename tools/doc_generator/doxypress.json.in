@@ -1,7 +1,7 @@
 {
     "clang": {
         "clang-compilation-path": "",
-        "clang-dialect": "-std=c++20",
+        "clang-dialect": "-std=c++23",
         "clang-flags": [
             ""
         ],

@@ -41,11 +41,11 @@ For *debug builds*:
 
 #### Only C
 
-- `-std=gnu11`: use C11 with GNU extensions (for `asm volatile`).
+- `-std=gnu2x`: use C23 with GNU extensions (for `asm volatile`).
 
 #### Only C++
 
-- `-std=c++20`: use C++20
+- `-std=c++23`: use C++23
 
 For exception and RTTI flags, see `modm:stdc++` module.
 

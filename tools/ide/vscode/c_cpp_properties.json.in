@@ -19,8 +19,8 @@
                 "{{ flag }}"{% if not loop.last%},{% endif %}
     %% endfor
             ],
-            "cStandard": "c17",
-            "cppStandard": "c++20",
+            "cStandard": "gnu23",
+            "cppStandard": "c++23",
             "intelliSenseMode": "gcc-arm"
         }{% if not loop.last%},{% endif %}
 %% endfor

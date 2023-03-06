@@ -6,7 +6,7 @@
 <!--/webignore-->
 
 modm (pronounced like dial-up "modem") is a toolbox for
-building custom C++20 libraries tailored to your embedded device.
+building custom C++23 libraries tailored to your embedded device.
 modm generates startup code, HALs and their implementations, communication
 protocols, drivers for external devices, and BSPs in a modular, customizable
 process that you can fine-tune to your needs.
@@ -49,7 +49,7 @@ git clone --recurse-submodules --jobs 8 https://github.com/modm-io/modm.git
 
 ## Features
 
-- Efficient and fast object-oriented C++20 API.
+- Efficient and fast object-oriented C++23 API.
 - Support for thousands of AVR and ARM Cortex-M microcontrollers from Microchip, STMicroelectronics and Raspberry Pi.
 - Build system agnostic: Choose SCons, CMake, Makefile or use your own.
 - Modular, data-driven, target-specific HAL generation using the lbuild code generator.

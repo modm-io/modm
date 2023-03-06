@@ -16,7 +16,7 @@ you are not *required* to use it. See [the reference manual](../../reference/bui
 for additional build system documentation.
 
 !!! info "Use GCC 12 or newer"
-    modm uses C++20, so you need *at least* GCC 10. However, we recommend using GCC12.
+    modm uses C++23, so you need *at least* GCC 12.
 
 !!! warning "Beware of AVRs"
     We **strongly discourage** using AVRs for new designs, due to a significant
@@ -70,7 +70,7 @@ We use [Doxypress][doxypress_binaries] to generate the API documentation:
 
 ```sh
 sudo mkdir /opt/doxypress
-wget -O- https://github.com/copperspice/doxypress/releases/download/dp-1.5.0/doxypress-1.5.0-ubuntu22.04-x64.tar.bz2 | sudo tar xj -C /opt/doxypress
+wget -O- https://github.com/copperspice/doxypress/releases/download/dp-1.5.1/doxypress-1.5.1-ubuntu22.04-x64.tar.bz2 | sudo tar xj -C /opt/doxypress
 ```
 
 Add the directory to your `PATH` variable in `~/.bashrc`:
