@@ -1,0 +1,10 @@
+<library>
+  <extends>modm:same70-xplained</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/same70_xplained/pwm</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:pwm:*</module>
+  </modules>
+</library>
