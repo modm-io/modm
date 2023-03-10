@@ -35,6 +35,20 @@ xpcc::Dispatcher::update()
 	//Check if a new packet was received by the backend
 	while (this->backend->isPacketAvailable())
 	{
+		this->updateOnceRx();
+		this->backend->dropPacket();
+	}
+
+	// check if there are packets to send
+	this->handleWaitingMessages();
+}
+
+void
+xpcc::Dispatcher::updateOnceRx()
+{
+	//Check if a new packet was received by the backend
+	if (this->backend->isPacketAvailable())
+	{
 		const Header& header = this->backend->getPacketHeader();
 		const modm::SmartPointer& payload = this->backend->getPacketPayload();
 
@@ -46,17 +60,12 @@ xpcc::Dispatcher::update()
 		{
 			const bool is_response = this->handlePacket(header, payload);
 			if (!header.isAcknowledge && header.destination != 0)
-            {
-            	if (is_response or postman->isComponentAvailable(header.destination))
-                    this->sendAcknowledge(header);
-            }
+			{
+				if (is_response or postman->isComponentAvailable(header.destination))
+					this->sendAcknowledge(header);
+			}
 		}
-
-		this->backend->dropPacket();
 	}
-
-	// check if there are packets to send
-	this->handleWaitingMessages();
 }
 
 void
