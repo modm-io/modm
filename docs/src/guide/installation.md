@@ -7,7 +7,7 @@ with modm:
 - [Software Construct][scons] or [CMake][].
 - [Library Builder][lbuild].
 - AVR toolchain: [avr-gcc][] and [avrdude][].
-- ARM toolchain: [gcc-arm-toolchain][] and [OpenOCD][] (at least v0.11!).
+- ARM toolchain: [toolchain-arm-xpack][] and [OpenOCD][] (at least v0.11!).
 - Optional: [Doxypress][].
 - Optional: [gdbgui][] for IDE-independent debugging.
 
@@ -35,7 +35,7 @@ Please help us [keep these instructions up-to-date][contribute]!
 For Ubuntu 22.04LTS, these commands install the minimal build system:
 
 ```sh
-sudo apt install python3 python3-pip scons git libncurses5
+sudo apt install python3 python3-pip scons git libncursesw5
 pip3 install modm
 ```
 
@@ -82,21 +82,19 @@ export PATH="/opt/doxypress:$PATH"
 
 #### ARM Cortex-M
 
-Install the [pre-built ARM toolchain][gcc-arm-toolchain]:
+Install the GNU toolchain for `arm-none-eabi` target in version 12 (or higher).
+If your Linux distribution provides up-to-date packages, we recommend using them.
+Otherwise, including Ubuntu 22.04, we recommend using the [*xPack GNU Arm Embedded GCC* binary distribution][toolchain-arm-xpack]:
 
 ```sh
-wget -O- https://developer.arm.com/-/media/Files/downloads/gnu/12.2.rel1/binrel/arm-gnu-toolchain-12.2.rel1-x86_64-arm-none-eabi.tar.xz | sudo tar xj -C /opt/
+wget -O- https://github.com/xpack-dev-tools/arm-none-eabi-gcc-xpack/releases/download/v12.2.1-1.2/xpack-arm-none-eabi-gcc-12.2.1-1.2-linux-x64.tar.gz | sudo tar xz -C /opt/
 ```
 
 Add it to your `PATH` variable in `~/.bashrc`:
 
 ```sh
-export PATH="/opt/arm-gnu-toolchain-12.2.rel1-x86_64-arm-none-eabi/bin:$PATH"
+export PATH="/opt/xpack-arm-none-eabi-gcc-12.2.1-1.2/bin:$PATH"
 ```
-
-!!! warning "Ubuntus 'gcc-arm-none-eabi' package"
-    The Ubuntu package 'gcc-arm-none-eabi' can [cause issues][armgcc-issues],
-    we recommend using only the pre-built toolchain.
 
 Install the OpenOCD tool:
 
@@ -104,10 +102,10 @@ Install the OpenOCD tool:
 sudo apt install openocd
 ```
 
-!!! warning "OpenOCD < v0.11"
-    Make sure to get at least OpenOCD release v0.11, since v0.10 is too old for
-    some targets (STM32G0, STM32G4, STM32F7). You can manually install an
-    up-to-date version of OpenOCD by [following the instructions here][openocd-install].
+!!! warning "OpenOCD < v0.12"
+    Make sure to get at least OpenOCD release v0.12, since v0.10 is too old for
+    some targets (STM32L5, STM32U5). You can manually install an up-to-date
+    version of OpenOCD by [following the instructions here][openocd-install].
 
 
 #### Microchip AVR
@@ -253,7 +251,7 @@ files in the next steps.
 
 #### ARM Cortex-M
 
-Install the [pre-built ARM toolchain via the 64-bit installer][gcc-arm-toolchain]
+Install the [pre-built ARM toolchain via the 64-bit installer][toolchain-arm-xpack]
 and make sure you select **Add path to environment variable** at the end!
 Open a new command prompt to test the compiler:
 
@@ -390,7 +388,7 @@ picocom --baud 115200 --imap lfcrlf --echo /dev/ttyACM0
 [contribute]: https://github.com/modm-io/modm/blob/develop/CONTRIBUTING.md
 [newissue]: https://github.com/modm-io/modm/issues/new
 [examples]: https://github.com/modm-io/modm/tree/develop/examples
-[gcc-arm-toolchain]: https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm
+[toolchain-arm-xpack]: https://xpack.github.io/dev-tools/arm-none-eabi-gcc/
 [openocd]: http://openocd.org
 [openocd-source]: https://github.com/ntfreak/openocd
 [avr-gcc]: https://www.nongnu.org/avr-libc
@@ -407,7 +405,6 @@ picocom --baud 115200 --imap lfcrlf --echo /dev/ttyACM0
 [pywin]: https://docs.python.org/3/using/windows.html
 [7_zip]: https://www.7-zip.org
 [modm-avr-gcc]: https://github.com/modm-io/avr-gcc
-[armgcc-issues]: https://github.com/modm-io/modm/issues/468
 [openocd-install]: https://github.com/rleh/openocd-build
 [udev-rules-openocd]: https://github.com/openocd-org/openocd/blob/master/contrib/60-openocd.rules#L84-L99
 [usbipd]: https://github.com/dorssel/usbipd-win
