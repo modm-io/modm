@@ -10,7 +10,7 @@ jobs:
   build-upload-docs:
     runs-on: ubuntu-22.04
     container:
-      image: ghcr.io/modm-ext/modm-build-base:2023-01-08
+      image: ghcr.io/modm-ext/modm-build-base:2023-03-12
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
