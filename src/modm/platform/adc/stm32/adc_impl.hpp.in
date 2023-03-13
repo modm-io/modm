@@ -252,3 +252,15 @@ modm::platform::Adc{{ id }}::acknowledgeInterruptFlags(const InterruptFlag_t fla
 {
 	ADC{{ per }}->SR = ~flags.value;
 }
+
+void
+modm::platform::Adc{{ id }}::enableScanMode()
+{
+	ADC{{ per }}->CR1 |= (1<<ADC_CR1_SCAN);
+}
+
+void
+modm::platform::Adc{{ id }}::disableScanMode()
+{
+	ADC{{ per }}->CR1 &= ~(1<<ADC_CR1_SCAN);
+}
