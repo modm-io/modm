@@ -218,11 +218,7 @@ def build_info(directory=None, cxx_compiler=None):
         if directory is not None and cxx_compiler is not None:
             c = subprocess.check_output([cxx_compiler, "--version"], cwd=directory)
             c = c.decode(locale.getpreferredencoding()).split("\n", 1)[0]
-
-            m = re.match(r"(?P<name>[a-z0-9\-\+]+) +.*? +(?P<version>\d+\.\d+\.\d+)", c)
-            if m: comp = "{0} {1}".format(m.group("name"), m.group("version"))
-            else: comp = c
-            info["MODM_BUILD_COMPILER"] = comp.strip()
+            info["MODM_BUILD_COMPILER"] = c.strip()
     except:
         pass
 
