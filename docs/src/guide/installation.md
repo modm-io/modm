@@ -7,7 +7,7 @@ with modm:
 - [Software Construct][scons] or [CMake][].
 - [Library Builder][lbuild].
 - AVR toolchain: [avr-gcc][] and [avrdude][].
-- ARM toolchain: [toolchain-arm-xpack][] and [OpenOCD][] (at least v0.11!).
+- ARM toolchain: [toolchain-arm-xpack][] and [OpenOCD][] (at least v0.12!).
 - Optional: [Doxypress][].
 - Optional: [gdbgui][] for IDE-independent debugging.
 
@@ -103,7 +103,7 @@ sudo apt install openocd
 ```
 
 !!! warning "OpenOCD < v0.12"
-    Make sure to get at least OpenOCD release v0.12, since v0.10 is too old for
+    Make sure to get at least OpenOCD release v0.12, since v0.11 is too old for
     some targets (STM32L5, STM32U5). You can manually install an up-to-date
     version of OpenOCD by [following the instructions here][openocd-install].
 
@@ -261,8 +261,7 @@ arm-none-eabi-gcc --version
 
 Install the  and then download the latest [pre-built OpenOCD tool][openocd_binaries]:
 
-1. unpack the `.tar.gz` file using the context menu `7-Zip > Extract Here`.
-2. unpack the `.tar` file using `7-Zip > Extract to "openocd-v0.11.0-..."`
+Unpack the `.7z` file using `7-Zip > Extract to "OpenOCD-20230202..."`.
 
 Then rename and move the extracted folder to `C:\Program Files (x86)\openocd`.
 Open PowerShell to add the `\bin` folder to the `Path`:
