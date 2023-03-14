@@ -370,18 +370,6 @@ public:
 	static inline void
 	acknowledgeInterruptFlags(const InterruptFlag_t flags);
 
-	/**
-	 * Enables scan mode
-	 */
-	static inline void
-	enableScanMode();
-
-	/**
-	 * Disables scan mode
-	 */
-	static inline void
-	disableScanMode();
-
 private:
 	/**
 	 * Select the frequency of the clock to the ADC. The clock is common
