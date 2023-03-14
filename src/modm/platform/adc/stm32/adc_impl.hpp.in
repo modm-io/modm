@@ -127,6 +127,11 @@ modm::platform::Adc{{ id }}::addChannel(const Channel channel,
 	}
 	// update channel count
 	ADC{{ per }}->SQR1 = (ADC{{ per }}->SQR1 & ~ADC_SQR1_L) | (channel_count << 20);
+%% if target["family"] not in ["f3"]
+	// set hardware scan mode
+	ADC{{ per }}->CR1 |= ADC_CR1_SCAN;
+
+%%endif
 
 	setSampleTime(channel, sampleTime);
 	return true;
@@ -251,16 +256,4 @@ void
 modm::platform::Adc{{ id }}::acknowledgeInterruptFlags(const InterruptFlag_t flags)
 {
 	ADC{{ per }}->SR = ~flags.value;
-}
-
-void
-modm::platform::Adc{{ id }}::enableScanMode()
-{
-	ADC{{ per }}->CR1 |= (1 << ADC_CR1_SCAN);
-}
-
-void
-modm::platform::Adc{{ id }}::disableScanMode()
-{
-	ADC{{ per }}->CR1 &= ~(1 << ADC_CR1_SCAN);
 }
