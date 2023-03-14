@@ -338,6 +338,12 @@ public:
 		TIM{{ id }}->BDTR = flags;
 	}
 
+	static inline void
+	setRepetitionCount(uint8_t repetitionCount)
+	{
+		TIM{{ id }}->RCR = repetitionCount;
+	}
+
 public:
 	static void
 	configureInputChannel(uint32_t channel, uint8_t filter);

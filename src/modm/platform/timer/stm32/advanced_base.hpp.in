@@ -39,9 +39,6 @@ public:
 	//configureOutputChannel(uint32_t channel, OutputCompareMode mode,
 	//		uint16_t compareValue);
 
-	// TODO Repetition Counter (TIM1_RCR)
-
-
 	enum class MasterMode : uint32_t
 	{
 		Reset 			= 0,							// 0b000
