@@ -131,6 +131,44 @@ public:
 %% endif
 	};
 
+%% if target["family"] not in ["f1", "f3"]
+	enum class ExternalTriggerPolarity
+	{
+		NoTriggerDetection = 0x0u,
+		RisingEdge = 0x1u,
+		FallingEdge = 0x2u,
+		RisingAndFallingEdge = 0x3u,
+	};
+%%endif
+
+	/**
+	 * Enum mapping all events on a external trigger converter.
+	 * The source mapped to each event varies on controller family,
+	 * refer to the ADC external trigger section on reference manual
+	 * of your controller for more information
+	 */
+	enum class RegularConversionExternalTrigger
+	{
+		Event0 = 0x0u,
+		Event1 = 0x1u,
+		Event2 = 0x2u,
+		Event3 = 0x3u,
+		Event4 = 0x4u,
+		Event5 = 0x5u,
+		Event6 = 0x6u,
+		Event7 = 0x7u,
+%% if target["family"] not in ["f1", "f3"]
+		Event8 = 0x8u,
+		Event9 = 0x9u,
+		Event10 = 0xAu,
+		Event11 = 0xBu,
+		Event12 = 0xCu,
+		Event13 = 0xDu,
+		Event14 = 0xEu,
+		Event15 = 0xFu,
+%% endif
+	};
+
 	/**
 	 * Possible interrupts.
 	 *
@@ -202,6 +240,9 @@ public:
 	initialize();
 
 	static inline void
+	enable();
+	
+	static inline void
 	disable();
 
 	/**
@@ -224,7 +265,6 @@ public:
 
 	static inline uint16_t
 	getValue();
-
 
 	static inline uint16_t
 	readChannel(Channel channel);
@@ -271,13 +311,11 @@ public:
 	static inline Channel
 	getChannel();
 
-
 	static inline void
 	enableFreeRunningMode();
 
 	static inline void
 	disableFreeRunningMode();
-
 
 	static inline void
 	setLeftAdjustResult();
@@ -370,6 +408,59 @@ public:
 	static inline void
 	acknowledgeInterruptFlags(const InterruptFlag_t flags);
 
+	static inline uintptr_t
+	getDataRegisterAddress();
+
+%% if target["family"] in ["f1","f3"]
+	static inline void
+	enableRegularConversionExternalTrigger(
+		RegularConversionExternalTrigger regularConversionExternalTrigger);
+
+%%endif
+%%if target["family"] not in ["f1","f3"]
+	static inline void
+	enableRegularConversionExternalTrigger(
+		ExternalTriggerPolarity externalTriggerPolarity,
+		RegularConversionExternalTrigger regularConversionExternalTrigger);
+
+%%endif
+
+	/**
+	 * Enable Dma mode for the ADC
+	 */
+	static inline void
+	enableDmaMode();
+
+	/**
+	 * Disable Dma mode for the ADC
+	 */
+	static inline void
+	disableDmaMode();
+
+	/**
+	 * get if adc is enabled
+	 * @return true if ADC_CR2_ADON bit is set, false otherwise
+	 */
+	static inline bool
+	getAdcEnabled();
+
+%% if target["family"] not in ["f1","f3"]
+	/**
+	* enable DMA selection for the ADC. If this is enabled DMA
+	* requests are issued as long as data are converted and
+	* the adc has dma enabled
+	 */
+	static inline void
+	enableDmaRequests();
+
+	/**
+	* disable dma selection for the ADC. If this is disabled
+	* no new DMA requests are issued after last transfer
+	 */
+	static inline void
+	disableDmaRequests();
+
+%%endif
 	/**
 	 * Enables scan mode
 	 */

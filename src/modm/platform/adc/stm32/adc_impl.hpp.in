@@ -27,7 +27,7 @@ modm::platform::Adc{{ id }}::initialize()
 	assertBaudrateInTolerance<result.frequency, frequency, tolerance >();
 
 	Rcc::enable<Peripheral::Adc{{id}}>();
-	ADC{{ per }}->CR2 |= ADC_CR2_ADON;			// switch on ADC
+	enable();  // switch on ADC
 
 	setPrescaler(Prescaler{result.index});
 }
@@ -166,6 +166,12 @@ modm::platform::Adc{{ id }}::disable()
 }
 
 void
+modm::platform::Adc{{ id }}::enable()
+{
+	ADC{{ per }}->CR2 |= ADC_CR2_ADON;  // switch on ADC
+}
+
+void
 modm::platform::Adc{{ id }}::startConversion()
 {
 	acknowledgeInterruptFlags(InterruptFlag::All);
@@ -253,14 +259,77 @@ modm::platform::Adc{{ id }}::acknowledgeInterruptFlags(const InterruptFlag_t fla
 	ADC{{ per }}->SR = ~flags.value;
 }
 
+uintptr_t
+modm::platform::Adc{{ id }}::getDataRegisterAddress()
+{
+	return (uintptr_t) &(ADC{{ per }}->DR);
+}
+%% if target["family"] in ["f1","f3"]
+void
+modm::platform::Adc{{ id }}::enableRegularConversionExternalTrigger(
+	RegularConversionExternalTrigger regularConversionExternalTrigger)
+{
+	const auto externalTrigger =
+		(static_cast<uint32_t>(regularConversionExternalTrigger) << ADC_CR2_EXTSEL_Pos);
+	const auto mask = ADC_CR2_EXTSEL_Msk;
+	ADC{{ per }}->CR2 = (ADC{{ per }}->CR2 & ~mask) | externalTrigger;
+}
+%%else
+void
+modm::platform::Adc{{ id }}::enableRegularConversionExternalTrigger(
+	ExternalTriggerPolarity externalTriggerPolarity,
+	RegularConversionExternalTrigger regularConversionExternalTrigger)
+{
+	const auto polarity =
+		(static_cast<uint32_t>(externalTriggerPolarity) << ADC_CR2_EXTEN_Pos);
+	const auto externalTrigger =
+		(static_cast<uint32_t>(regularConversionExternalTrigger) << ADC_CR2_EXTSEL_Pos);
+	const auto mask = ADC_CR2_EXTEN_Msk | ADC_CR2_EXTSEL_Msk;
+	ADC{{ per }}->CR2 = (ADC{{ per }}->CR2 & ~mask) | polarity | externalTrigger;
+}
+%%endif
+
+void
+modm::platform::Adc{{ id }}::enableDmaMode()
+{
+	ADC{{ per }}->CR2 |= ADC_CR2_DMA;
+}
+
+void
+modm::platform::Adc{{ id }}::disableDmaMode()
+{
+	ADC{{ per }}->CR2 &= ~ADC_CR2_DMA;
+}
+
+bool
+modm::platform::Adc{{ id }}::getAdcEnabled()
+{
+	return (ADC{{ per }}->CR2 & ADC_CR2_ADON) == ADC_CR2_ADON;
+}
+
+%% if target["family"] not in ["f1","f3"]
+void
+modm::platform::Adc{{ id }}::enableDmaRequests()
+{
+	ADC{{ per }}->CR2 |= ADC_CR2_DDS;
+}
+
+void
+modm::platform::Adc{{ id }}::disableDmaRequests()
+{
+	ADC{{ per }}->CR2 &= ~ADC_CR2_DDS;
+}
+
+%%endif
+
 void
 modm::platform::Adc{{ id }}::enableScanMode()
 {
-	ADC{{ per }}->CR1 |= (1 << ADC_CR1_SCAN);
+	ADC{{ per }}->CR1 |= ADC_CR1_SCAN;
 }
 
 void
 modm::platform::Adc{{ id }}::disableScanMode()
 {
-	ADC{{ per }}->CR1 &= ~(1 << ADC_CR1_SCAN);
+	ADC{{ per }}->CR1 &= ~ADC_CR1_SCAN;
 }
