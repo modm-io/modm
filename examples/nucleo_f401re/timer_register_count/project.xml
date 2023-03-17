@@ -1,0 +1,10 @@
+<library>
+  <extends>modm:nucleo-f401re</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_f401re/timer_register_count</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:timer:1</module>
+  </modules>
+</library>
