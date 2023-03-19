@@ -87,7 +87,7 @@ struct SystemClock
 		Rcc::PllFactors pllFactors{
 			.pllM = 4,	//  16MHz / M= 4 ->   4MHz
 			.pllN = 85,	//   4MHz * N=85 -> 340MHz
-			.pllR = 2,	// 336MHz / R= 2 -> 170MHz = F_cpu
+			.pllR = 2,	// 340MHz / R= 2 -> 170MHz = F_cpu
 		};
 		Rcc::enablePll(Rcc::PllSource::InternalClock, pllFactors);
 		Rcc::setFlashLatency<Frequency>();
