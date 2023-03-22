@@ -241,7 +241,7 @@ public:
 
 	static inline void
 	enable();
-	
+
 	static inline void
 	disable();
 

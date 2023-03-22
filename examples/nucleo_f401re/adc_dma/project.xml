@@ -1,0 +1,12 @@
+<library>
+  <extends>modm:nucleo-f401re</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_f401re/adc_dma</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:timer:1</module>
+    <module>modm:platform:adc:1</module>
+    <module>modm:platform:dma</module>
+  </modules>
+</library>
