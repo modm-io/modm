@@ -45,6 +45,11 @@ def build(env):
         div = 1
         # systick clock is too fast to run at 4 Hz, increase frequency
         freq = 8
+    # SAMx7x: Prescaler not implemented
+    elif target.platform == "sam" and target.family == "e7x/s7x/v7x":
+        div = 1
+        # systick clock is too fast to run at 4 Hz, increase frequency
+        freq = 20
     # SAMD2x: Prescaler not implemented
     elif target.platform == "sam" and target.family == "d1x/d2x/dax":
         div = 1
