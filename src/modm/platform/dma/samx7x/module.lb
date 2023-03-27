@@ -1,0 +1,56 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2023, Christopher Durand
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+from collections import defaultdict
+import re
+
+def init(module):
+    module.name = ":platform:dma"
+    module.description = "Direct Memory Access (DMA)"
+
+
+def prepare(module, options):
+    device = options[":target"]
+    module.depends(":cmsis:device", ":platform:clockgen")
+    return device.has_driver("xdmac")
+
+
+def get_requests(driver):
+    peripherals = defaultdict(lambda: defaultdict(list))
+    for request in driver["request"]:
+        signal = "".join([word.capitalize() for word in request["signal"].split("_")])
+        request_map = {"signal" : signal, "id" : int(request["id"])}
+        # duplicates in device data due to device file generator bugs (modm-devices issue #97)
+        if request_map not in peripherals[request["peripheral"]][request.get("instance")]:
+            peripherals[request["peripheral"]][request.get("instance")].append(request_map)
+    return peripherals
+
+
+def build(env):
+    device = env[":target"]
+
+    properties = device.properties
+    properties["target"] = device.identifier
+    properties["requests"] = get_requests(device.get_driver("xdmac"))
+
+    env.substitutions = properties
+    env.outbasepath = "modm/src/modm/platform/dma"
+
+    env.template("base.hpp.in")
+    env.copy("base_impl.hpp")
+    env.copy("channel.cpp")
+    env.copy("channel.hpp")
+    env.copy("channel_impl.hpp")
+    env.copy("transfer.hpp")
+    env.copy("transfer_impl.hpp")
+    env.copy("dma.hpp")
+    env.copy("dma.cpp")
