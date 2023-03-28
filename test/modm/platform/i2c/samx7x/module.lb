@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2023, Christopher Durand
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+
+def init(module):
+    module.name = ":test:platform:i2c"
+    module.description = "Tests for SAMx7x I2C"
+
+def prepare(module, options):
+    target = options[":target"]
+
+    identifier = target.identifier
+    if identifier.platform != "sam" or identifier.family != "e7x/s7x/v7x":
+        return False
+
+    module.depends(":platform:i2c:0")
+    module.depends(":driver:at24mac402")
+    return True
+
+def build(env):
+    if not env.has_module(":board:samv71-xplained-ultra"):
+        env.log.warn("The test requires an AT24MAC402 EEPROM to be connected to specific pins."
+                     "Only the SAMV71 Xplained Ultra board is supported for now.")
+        return
+
+    env.outbasepath = "modm-test/src/modm-test/platform/i2c_test"
+    env.copy("i2c_platform_test.hpp")
+    env.copy("i2c_platform_test.cpp")
