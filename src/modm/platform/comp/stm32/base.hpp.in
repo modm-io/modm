@@ -34,6 +34,9 @@ namespace modm::platform
 			MediumSpeed		= 0b01 << 2,
 			//MediumSpeed2	= 0b10 << 2,
 			UltraLowPower	= 0b11 << 2,
+			{% elif driver.type in ["stm32-tsmc90_orcazero_cube"] -%}
+			HighSpeed		= 0b00 << 2,
+			MediumSpeed		= 0b01 << 2,
 			{% endif -%}
 		};
 	protected:
@@ -50,7 +53,7 @@ namespace modm::platform
 	protected:
 		static constexpr uint32_t PolarityMask = 0b1 << 15;
 
-	{% if driver.type in ["stm32-v1.3", "stm32-tsmc90_cube"] -%}
+	{% if driver.type in ["stm32-v1.3", "stm32-tsmc90_cube", "stm32-tsmc90_orcazero_cube"] -%}
 	public:
 		enum class
 		Hysteresis

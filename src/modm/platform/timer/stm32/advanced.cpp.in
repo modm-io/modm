@@ -167,7 +167,7 @@ modm::platform::Timer{{ id }}::configureInputChannel(uint32_t channel,
 // ----------------------------------------------------------------------------
 void
 modm::platform::Timer{{ id }}::configureOutputChannel(uint32_t channel,
-		OutputCompareMode mode, uint16_t compareValue, PinState out)
+		OutputCompareMode mode, Value compareValue, PinState out)
 {
 	channel -= 1;	// 1..4 -> 0..3
 
@@ -214,6 +214,19 @@ modm::platform::Timer{{ id }}::configureOutputChannel(uint32_t channel,
 	if ((mode != OutputCompareMode::Inactive) and (out == PinState::Enable)) {
 		TIM{{ id }}->CCER |= (TIM_CCER_CC1E) << (channel * 4);
 	}
+}
+
+void
+modm::platform::Timer{{ id }}::configureOutputChannel(uint32_t channel,
+OutputCompareMode mode, Value compareValue,
+PinState out, OutputComparePolarity polarity,
+PinState out_n, OutputComparePolarity polarity_n,
+OutputComparePreload preload)
+{
+	// disable output
+	TIM{{ id }}->CCER &= ~(0xf << ((channel-1) * 4));
+	setCompareValue(channel, compareValue);
+	configureOutputChannel(channel, mode, out, polarity, out_n, polarity_n, preload);
 }
 
 void

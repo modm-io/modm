@@ -122,6 +122,13 @@ public:
 		Reset = 0,
 		Set   = TIM_CR2_OIS1,
 	};
+%% if target.family in ["g0"]
+	enum class BreakInputPolarity : uint32_t
+	{
+		ActiveLow = 0,
+		ActiveHigh = 1,
+	};
+%% endif
 };
 
 }	// namespace platform

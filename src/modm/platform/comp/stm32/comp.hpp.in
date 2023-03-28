@@ -108,6 +108,26 @@ namespace modm::platform
 			GpioD15			= 0b110 << 4,
 			GpioB12			= 0b111 << 4,
 			{% endif -%}
+			{% elif target.family == "g0" -%}
+			Vref1Div4		= 0b0000 << 4,
+			Vref1Div2		= 0b0001 << 4,
+			Vref3Div4		= 0b0010 << 4,
+			Vref			= 0b0011 << 4,
+			Dac1Ch1			= 0b0100 << 4,
+			Dac1Ch2			= 0b0101 << 4,
+			{% if id == 1 -%}
+			GpioB1			= 0b0110 << 4,
+			GpioC4			= 0b0111 << 4,
+			GpioA0			= 0b1000 << 4,
+			{% elif id == 2 -%}
+			GpioB3			= 0b0110 << 4,
+			GpioB7			= 0b0111 << 4,
+			GpioA2			= 0b1000 << 4,
+			{% elif id == 3 -%}
+			GpioB2			= 0b0110 << 4,
+			GpioC0			= 0b0111 << 4,
+			GpioE8			= 0b1000 << 4,
+			{% endif -%}
 			{% endif -%}
 		};
 	protected:
@@ -117,6 +137,8 @@ namespace modm::platform
 		static constexpr uint32_t InvertingInputMask = (0b111 << 4) | (0b11 << 22) | (0b11 << 25);
 		{% elif target.family in ["g4"] -%}
 		static constexpr uint32_t InvertingInputMask = (0b1111 << 4) | (0b11 << 22);
+		{% elif target.family in ["g0"] -%}
+		static constexpr uint32_t InvertingInputMask = (0b1111 << 4);
 		{% endif -%}
 
 	public:
@@ -160,6 +182,20 @@ namespace modm::platform
 			GpioB14			= 0b0 << 8,
 			GpioD14			= 0b1 << 8,
 			{% endif -%}
+			{% elif target.family in ["g0"] -%}
+			{% if id == 1 -%}
+			GpioC5			= 0b00 << 8,
+			GpioB2			= 0b01 << 8,
+			GpioA1			= 0b10 << 8,
+			{% elif id == 2 -%}
+			GpioB4			= 0b00 << 8,
+			GpioB6			= 0b01 << 8,
+			GpioA3			= 0b10 << 8,
+			{% elif id == 3 -%}
+			GpioB0			= 0b00 << 8,
+			GpioC1			= 0b01 << 8,
+			GpioE7			= 0b10 << 8,
+			{% endif -%}
 			{% endif -%}
 		};
 	protected:
@@ -169,6 +205,8 @@ namespace modm::platform
 		static constexpr uint32_t NonInvertingInputMask = 0b1 << 8;
 		{% elif target.family in ["l4"] -%}
 		static constexpr uint32_t NonInvertingInputMask = 0b11 << 7;
+		{% elif target.family in ["g0"] -%}
+		static constexpr uint32_t NonInvertingInputMask = 0b11 << 8;
 		{% endif -%}
 
 	{% if target.family == "f3" -%}
@@ -227,7 +265,7 @@ namespace modm::platform
 		static inline void
 		initialize(
 					InvertingInput n_in,
-				{% if (target.family == "f3" and id > 1) or target.family in ["l4", "g4"] -%}
+				{% if (target.family == "f3" and id > 1) or target.family in ["l4", "g4", "g0"] -%}
 					NonInvertingInput p_in,
 				{% endif -%}
 				{% if target.family == "f3" -%}
@@ -241,7 +279,7 @@ namespace modm::platform
 					bool lock_comp = false)
 		{
 			setInvertingInput(n_in);
-		{% if (target.family == "f3" and id > 1) or target.family in ["l4", "g4"] -%}
+		{% if (target.family == "f3" and id > 1) or target.family in ["l4", "g4", "g0"] -%}
 			setNonInvertingInput(p_in);
 		{% endif -%}
 		{% if target.family == "f3" -%}
@@ -350,7 +388,7 @@ namespace modm::platform
 			return static_cast<InvertingInput>(COMP{{ id }}->CSR & InvertingInputMask);
 		}
 
-	{% if (target.family == "f3" and id > 1) or target.family in ["l4", "g4"] -%}
+	{% if (target.family == "f3" and id > 1) or target.family in ["l4", "g4", "g0"] -%}
 		/**
 		 * \brief	Selects what the non-inverting input is connected to.
 		 */
@@ -370,10 +408,10 @@ namespace modm::platform
 		}
 	{% endif -%}
 
-	{% if (target.family == "f3" and (id == 2 or id == 4 or id == 6)) or (target.family == "l4" and id == 2) -%}
+	{% if (target.family == "f3" and (id == 2 or id == 4 or id == 6)) or (target.family == "l4" and id == 2) or (target.family == "g0") -%}
 		{% if target.family == "f3" -%}
 		{% set windowmode = "WNDWEN" %}
-		{% elif target.family == "l4" -%}
+		{% elif target.family in  ["l4", "g0"] -%}
 		{% set windowmode = "WINMODE" %}
 		{% endif -%}
 		/**
@@ -481,7 +519,7 @@ namespace modm::platform
 		{
 		{% if target.family == "f3" -%}
 			return COMP{{ id }}->CSR & {{ csr }}OUT;
-		{% elif target.family in ["l4", "g4"] -%}
+		{% elif target.family in ["l4", "g4", "g0"] -%}
 			return COMP{{ id }}->CSR & {{ csr }}VALUE;
 		{% endif -%}
 		}
