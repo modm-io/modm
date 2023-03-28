@@ -387,6 +387,56 @@ public:
 		configureOutputChannel(channel, mode, compareValue, out, enableComparePreload);
 	}
 
+	static void
+	configureOutputChannel(uint32_t channel, OutputCompareMode mode,
+			Value compareValue, PinState out,
+			OutputComparePolarity polarity, PinState out_n,
+			OutputComparePolarity polarity_n = OutputComparePolarity::ActiveHigh,
+			OutputComparePreload preload = OutputComparePreload::Disable);
+
+	template<typename Signal>
+	static void
+	configureOutputChannel(OutputCompareMode mode,
+			Value compareValue, PinState out,
+			OutputComparePolarity polarity, PinState out_n,
+			OutputComparePolarity polarity_n = OutputComparePolarity::ActiveHigh,
+			OutputComparePreload preload = OutputComparePreload::Disable)
+	{
+		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		configureOutputChannel(channel, mode, compareValue, out, polarity, out_n, polarity_n, preload);
+	}
+
+	/*
+	 * Configure Output Channel without changing the Compare Value
+	 *
+	 * Normally used to REconfigure the Output channel without touching
+	 * the compare value. This can e.g. be useful for commutation of a
+	 * bldc motor.
+	 *
+	 * This function probably won't be used for a one time setup but
+	 * rather for adjusting the output setting periodically.
+	 * Therefore it aims aims to provide the best performance possible
+	 * without sacrificing code readability.
+	 */
+	static void
+	configureOutputChannel(uint32_t channel, OutputCompareMode mode,
+			PinState out, OutputComparePolarity polarity,
+			PinState out_n,
+			OutputComparePolarity polarity_n = OutputComparePolarity::ActiveHigh,
+			OutputComparePreload preload = OutputComparePreload::Disable);
+
+	template<typename Signal>
+	static void
+	configureOutputChannel(OutputCompareMode mode,
+			PinState out, OutputComparePolarity polarity,
+			PinState out_n,
+			OutputComparePolarity polarity_n = OutputComparePolarity::ActiveHigh,
+			OutputComparePreload preload = OutputComparePreload::Disable)
+	{
+		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		configureOutputChannel(channel, mode, out, polarity, out_n, polarity_n, preload);
+	}
+
 	/// Switch to Pwm Mode 2
 	///
 	/// While upcounting channel will be active as long as the time value is

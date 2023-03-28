@@ -389,6 +389,25 @@ public:
 		configureOutputChannel(channel, mode, compareValue, out);
 	}
 
+	static void
+	configureOutputChannel(uint32_t channel, OutputCompareMode mode,
+			Value compareValue, PinState out,
+			OutputComparePolarity polarity, PinState out_n,
+			OutputComparePolarity polarity_n = OutputComparePolarity::ActiveHigh,
+			OutputComparePreload preload = OutputComparePreload::Disable);
+
+	template<typename Signal>
+	static void
+	configureOutputChannel(OutputCompareMode mode,
+			Value compareValue, PinState out,
+			OutputComparePolarity polarity, PinState out_n,
+			OutputComparePolarity polarity_n = OutputComparePolarity::ActiveHigh,
+			OutputComparePreload preload = OutputComparePreload::Disable)
+	{
+		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		configureOutputChannel(channel, mode, compareValue, out, polarity, out_n, polarity_n, preload);
+	}
+
 	/*
 	 * Configure Output Channel without changing the Compare Value
 	 *

@@ -197,6 +197,59 @@ modm::platform::Timer{{ id }}::configureOutputChannel(uint32_t channel,
 	}
 }
 
+void
+modm::platform::Timer{{ id }}::configureOutputChannel(uint32_t channel,
+OutputCompareMode mode, Value compareValue, 
+PinState out, OutputComparePolarity polarity,
+PinState out_n, OutputComparePolarity polarity_n,
+OutputComparePreload preload)
+{
+	// disable output
+	TIM{{ id }}->CCER &= ~(0xf << ((channel-1) * 4));
+	setCompareValue(channel, compareValue);
+	configureOutputChannel(channel, mode, out, polarity, out_n, polarity_n, preload);
+}
+
+void
+modm::platform::Timer{{ id }}::configureOutputChannel(uint32_t channel,
+OutputCompareMode mode,
+PinState out, OutputComparePolarity polarity,
+PinState out_n, OutputComparePolarity polarity_n,
+OutputComparePreload preload)
+{
+	channel -= 1;	// 1..4 -> 0..3
+
+	// disable output
+	TIM{{ id }}->CCER &= ~(0xf << (channel * 4));
+
+	uint32_t flags = static_cast<uint32_t>(mode) | static_cast<uint32_t>(preload);
+
+	if (channel <= 1)
+	{
+		const uint32_t offset = 8 * channel;
+
+		flags <<= offset;
+		flags |= TIM{{ id }}->CCMR1 & ~(0xff << offset);
+
+		TIM{{ id }}->CCMR1 = flags;
+	}
+	else {
+		const uint32_t offset = 8 * (channel - 2);
+
+		flags <<= offset;
+		flags |= TIM{{ id }}->CCMR2 & ~(0xff << offset);
+
+		TIM{{ id }}->CCMR2 = flags;
+	}
+
+	// CCER Flags (Enable/Polarity)
+	flags = (static_cast<uint32_t>(polarity_n) << 2) |
+			(static_cast<uint32_t>(out_n)      << 2) |
+			 static_cast<uint32_t>(polarity) | static_cast<uint32_t>(out);
+
+	TIM{{ id }}->CCER |= flags << (channel * 4);
+}
+
 // ----------------------------------------------------------------------------
 void
 modm::platform::Timer{{ id }}::enableInterruptVector(bool enable, uint32_t priority)
