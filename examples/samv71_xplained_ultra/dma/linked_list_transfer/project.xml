@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:samv71-xplained-ultra</extends>
+  <options>
+    <option name="modm:build:build.path">../../../../build/samv71_xplained_ultra/dma_linked_list_transfer</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:dac</module>
+    <module>modm:platform:dma</module>
+  </modules>
+</library>
