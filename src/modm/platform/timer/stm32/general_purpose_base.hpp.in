@@ -141,6 +141,42 @@ public:
 		 * capture/compare	register, else inactive.
 		 */
 		Pwm2 = TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_0,
+
+#ifdef TIM_CCMR1_OC1M_3
+		/**
+		 * Combined PWM mode 1.
+		 *
+		 *  OC1REF has the same behavior as in PWM mode 1.
+		 *  OC1REFC is the logical OR between OC1REF and OC2REF.
+		 */
+		Combined1 = TIM_CCMR1_OC1M_3 | TIM_CCMR1_OC1M_2,
+
+		/**
+		 * Combined PWM mode 2.
+		 *
+		 *  OC1REF has the same behavior as in PWM mode 2.
+		 * 	OC1REFC is the logical AND between OC1REF and OC2REF.
+		 */
+		Combined2 = TIM_CCMR1_OC1M_3 | TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1M_0,
+
+		/**
+		 *  Asymmetric PWM mode 1.
+		 *
+		 *  OC1REF has the same behavior as in PWM mode 1.
+		 *	OC1REFC outputs OC1REF when the counter is counting up,
+		 *	OC2REF when it is counting down.
+		 */
+		Asymmetric1 = TIM_CCMR1_OC1M_3 | TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1M_1,
+
+		/**
+		 * Asymmetric PWM mode 2.
+		 *
+		 * OC1REF has the same behavior as in PWM mode 2.
+		 * OC1REFC outputs OC1REF when the counter is counting up,
+		 * OC2REF when it is counting down.
+		 */
+		Asymmetric2 = TIM_CCMR1_OC1M_3 | TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_0,
+#endif
 	};
 	MODM_FLAGS32(OutputCompareMode);
 

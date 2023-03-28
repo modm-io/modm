@@ -452,7 +452,7 @@ public:
 
 		static constexpr std::array muxChannels = {
 %% for channel in dma["mux-channels"][0]["mux-channel"]
-			MuxChannel({{ channel.position }}, {{ channel["dma-instance"] }}, {{ channel["dma-channel"] }}){{ "," if not loop.last }}
+			MuxChannel({{ channel.position }}, {{ channel["dma-instance"] }}, {{ channel["dma-channel"] }}){{ "," if not loop.last else '' }}
 %% endfor
 		};
 %% endif

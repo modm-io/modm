@@ -31,7 +31,7 @@ class Instance(Module):
         instance_id = int(self.instance)
         properties["id"] = instance_id
         properties["driver"] = driver
-        properties["csr"] = "COMP_CSR_" if device.identifier["family"] in ["l4", "g4"] else "COMP_CSR_COMPx"
+        properties["csr"] = "COMP_CSR_" if device.identifier["family"] in ["l4", "g4", "g0"] else "COMP_CSR_COMPx"
         properties["blanking_source"] = dict()
         if device.identifier["family"] in ["g4"]:
             properties["blanking_source"]["b001"] = ["Tim1Oc5", "Tim1Oc5", "Tim1Oc5", "Tim3Oc4", "Tim2Oc3", "Tim8Oc5", "Tim1Oc5"][instance_id - 1]
@@ -49,6 +49,13 @@ class Instance(Module):
             properties["blanking_source"]["b001"] = "Tim1Oc5"
             properties["blanking_source"]["b010"] = "Tim2Oc3"
             properties["blanking_source"]["b011"] = "Tim3Oc3"
+        elif device.identifier["family"] in ["g0"]:
+            properties["blanking_source"]["b00000"] = None
+            properties["blanking_source"]["b00001"] = "Tim1Oc4"
+            properties["blanking_source"]["b00010"] = "Tim1Oc5"
+            properties["blanking_source"]["b00100"] = "Tim2Oc3"
+            properties["blanking_source"]["b01000"] = "Tim3Oc3"
+            properties["blanking_source"]["b10000"] = "Tim15Oc2"
 
 
 
@@ -83,7 +90,7 @@ def prepare(module, options):
         "stm32-v3.4"
         "stm32-v3.6"
     """
-    if not device.get_driver("comp")["type"] in ["stm32-v1.3", "stm32-tsmc90_cube", "stm32-tsmc90_g4_rockfish_cube"]:
+    if not device.get_driver("comp")["type"] in ["stm32-v1.3", "stm32-tsmc90_cube", "stm32-tsmc90_g4_rockfish_cube", "stm32-tsmc90_orcazero_cube"]:
         return False
 
     # Only some STM32F3 and STM32L4
@@ -94,6 +101,8 @@ def prepare(module, options):
         if not device.identifier["name"] in ["31", "32", "33", "42", "43", "51", "52", "62"]:
             return False
     elif device.identifier["family"] == "g4":
+        pass
+    elif device.identifier["family"] == "g0":
         pass
     else:
         return False
@@ -112,7 +121,7 @@ def build(env):
     properties = device.properties
     properties["target"] = device.identifier
     properties["driver"] = driver
-    properties["csr"] = "COMP_CSR_" if device.identifier["family"] in ["l4", "g4"] else "COMP_CSR_COMPx"
+    properties["csr"] = "COMP_CSR_" if device.identifier["family"] in ["l4", "g4", "g0"] else "COMP_CSR_COMPx"
 
     env.substitutions = properties
     env.outbasepath = "modm/src/modm/platform/comp"

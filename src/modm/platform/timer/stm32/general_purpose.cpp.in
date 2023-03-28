@@ -203,7 +203,18 @@ modm::platform::Timer{{ id }}::configureOutputChannel(uint32_t channel,
 	}
 }
 
-%% if id in [15, 16, 17]
+void
+modm::platform::Timer{{ id }}::configureOutputChannel(uint32_t channel,
+OutputCompareMode mode, Value compareValue,
+PinState out, OutputComparePolarity polarity,
+OutputComparePreload preload)
+{
+	// disable output
+	TIM{{ id }}->CCER &= ~(0xf << ((channel-1) * 4));
+	setCompareValue(channel, compareValue);
+	configureOutputChannel(channel, mode, out, polarity,  PinState::Disable, OutputComparePolarity::ActiveHigh, preload);
+}
+
 void
 modm::platform::Timer{{ id }}::configureOutputChannel(uint32_t channel,
 OutputCompareMode mode,
@@ -211,21 +222,34 @@ PinState out, OutputComparePolarity polarity,
 PinState out_n, OutputComparePolarity polarity_n,
 OutputComparePreload preload)
 {
+%% if id in [15, 16, 17]
 	modm_assert(channel == 1, "Timer{{ id }}", "This timer has complementary output only on channel 1!", "{{ id }}");
+%% endif
 
-	channel -= 1;
+	channel -= 1;	// 1..4 -> 0..3
 
 	// disable output
 	TIM{{ id }}->CCER &= ~(0xf << (channel * 4));
 
 	uint32_t flags = static_cast<uint32_t>(mode) | static_cast<uint32_t>(preload);
 
-	const uint32_t offset = 8 * channel;
+	if (channel <= 1)
+	{
+		const uint32_t offset = 8 * channel;
 
-	flags <<= offset;
-	flags |= TIM{{ id }}->CCMR1 & ~(0xff << offset);
+		flags <<= offset;
+		flags |= TIM{{ id }}->CCMR1 & ~(0xff << offset);
 
-	TIM{{ id }}->CCMR1 = flags;
+		TIM{{ id }}->CCMR1 = flags;
+	}
+	else {
+		const uint32_t offset = 8 * (channel - 2);
+
+		flags <<= offset;
+		flags |= TIM{{ id }}->CCMR2 & ~(0xff << offset);
+
+		TIM{{ id }}->CCMR2 = flags;
+	}
 
 	// CCER Flags (Enable/Polarity)
 	flags = (static_cast<uint32_t>(polarity_n) << 2) |
@@ -234,7 +258,6 @@ OutputComparePreload preload)
 
 	TIM{{ id }}->CCER |= flags << (channel * 4);
 }
-%% endif
 
 // ----------------------------------------------------------------------------
 void

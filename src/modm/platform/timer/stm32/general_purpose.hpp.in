@@ -257,6 +257,14 @@ public:
 		TIM{{ id }}->CNT = value;
 	}
 
+%% if id in [15, 16, 17]
+	static inline void
+	setRepetitionCount(uint8_t repetitionCount)
+	{
+		TIM{{ id }}->RCR = repetitionCount;
+	}
+%% endif
+
 
 %% if target.family not in ["l0", "l1"] and id in [15, 16, 17]
 	static inline bool
@@ -433,7 +441,35 @@ public:
 		configureOutputChannel(channel, mode, compareValue, out, enableComparePreload);
 	}
 
-%% if id in [15, 16, 17]
+	static void
+	configureOutputChannel(uint32_t channel, OutputCompareMode mode,
+			Value compareValue, PinState out,
+			OutputComparePolarity polarity,
+			OutputComparePreload preload = OutputComparePreload::Disable);
+
+	template<typename Signal>
+	static void
+	configureOutputChannel(OutputCompareMode mode,
+			Value compareValue, PinState out,
+			OutputComparePolarity polarity,
+			OutputComparePreload preload = OutputComparePreload::Disable)
+	{
+		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		configureOutputChannel(channel, mode, compareValue, out, polarity, PinState::Disable, OutputComparePolarity::ActiveHigh, preload);
+	}
+
+	/*
+	 * Configure Output Channel without changing the Compare Value
+	 *
+	 * Normally used to reconfigure the Output channel without touching
+	 * the compare value. This can e.g. be useful for commutation of a
+	 * bldc motor.
+	 *
+	 * This function probably won't be used for a one time setup but
+	 * rather for adjusting the output setting periodically.
+	 * Therefore it aims to provide the best performance possible
+	 * without sacrificing code readability.
+	 */
 	static void
 	configureOutputChannel(uint32_t channel, OutputCompareMode mode,
 			PinState out, OutputComparePolarity polarity,
@@ -450,10 +486,11 @@ public:
 			OutputComparePreload preload = OutputComparePreload::Disable)
 	{
 		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
-		static_assert(channel == 1, "Timer{{ id }} has complementary output only on channel 1");
+%% if id in [15, 16, 17]
+        static_assert(channel == 1, "Timer{{ id }} has complementary output only on channel 1");
+%% endif
 		configureOutputChannel(channel, mode, out, polarity, out_n, polarity_n, preload);
 	}
-%% endif
 
 	/// Switch to Pwm Mode 2
 	///
