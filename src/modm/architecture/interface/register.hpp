@@ -17,6 +17,7 @@
 #include <stdint.h>
 #include <modm/math/utils/bit_constants.hpp>
 #include <modm/architecture/detect.hpp>
+#include <modm/architecture/utils.hpp>
 #if MODM_HAS_IOSTREAM
 #include <modm/io/iostream.hpp>
 #endif
