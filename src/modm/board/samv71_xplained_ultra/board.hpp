@@ -32,6 +32,7 @@ struct SystemClock
 	static constexpr uint32_t Usart1 = Mck;
 	static constexpr uint32_t Spi0 = Mck;
 	static constexpr uint32_t Twihs0 = Mck;
+	static constexpr uint32_t Dacc = Mck;
 //	static constexpr uint32_t Usb = 48_MHz;
 
 	static bool inline
