@@ -73,7 +73,10 @@ enum class PeripheralPin
 	PwmFi1,
 	PwmFi2,
 	PwmExtrg0,
-	PwmExtrg1
+	PwmExtrg1,
+	Ch0,
+	Ch1,
+	Datrg
 };
 
 template<typename... Tuples>
@@ -576,6 +579,9 @@ public:
 	using PwmFi2 = As<PeripheralPin::PwmFi2>;
 	using PwmExtrg0 = As<PeripheralPin::PwmExtrg0>;
 	using PwmExtrg1 = As<PeripheralPin::PwmExtrg1>;
+	using Ch0 = As<PeripheralPin::Ch0>;
+	using Ch1 = As<PeripheralPin::Ch1>;
+	using Datrg = As<PeripheralPin::Datrg>;
 
 	inline static bool
 	read()

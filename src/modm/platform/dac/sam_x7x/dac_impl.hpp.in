@@ -1,0 +1,190 @@
+/*
+ * Copyright (c) 2023, Christopher Durand
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_SAMX7X_DAC_HPP
+#error "Do not include this file directly, use dac.hpp instead!"
+#endif
+
+namespace modm::platform
+{
+
+template<typename... Pins>
+inline void
+Dac::connect()
+{
+	using Ch0Pin = GetPin_t<PeripheralPin::Ch0, Pins...>;
+	using Ch1Pin = GetPin_t<PeripheralPin::Ch1, Pins...>;
+	using DatrgPin = GetPin_t<PeripheralPin::Datrg, Pins...>;
+
+	using Peripheral = Peripherals::Dacc;
+
+	// Output pins are automatically connected to the DAC when they are enabled,
+	// so all this does is set the pin mode to input.
+	if constexpr (!std::is_void_v<Ch0Pin>) {
+		using Ch0Connector = typename Ch0Pin::template Connector<Peripheral, Peripheral::Dac<0>>;
+		// force type instantiation for validation
+		(void) std::is_void_v<typename Ch0Connector::Signal>;
+
+		Ch0Pin::setInput();
+	}
+	if constexpr (!std::is_void_v<Ch1Pin>) {
+		using Ch1Connector = typename Ch1Pin::template Connector<Peripheral, Peripheral::Dac<1>>;
+		// force type instantiation for validation
+		(void) std::is_void_v<typename Ch1Connector::Signal>;
+
+		Ch1Pin::setInput();
+	}
+%% if target.pin != "j"
+	if constexpr (!std::is_void_v<DatrgPin>) {
+		using DatrgConnector = typename DatrgPin::template Connector<Peripheral, Peripheral::Datrg>;
+		DatrgConnector::connect();
+	}
+%% endif
+}
+
+template<typename SystemClock, frequency_t frequency, percent_t tolerance>
+inline void
+Dac::initialize()
+{
+	ClockGen::enable<ClockPeripheral::Dacc>();
+
+	DACC->DACC_CR = DACC_CR_SWRST;
+
+	constexpr auto result = modm::Prescaler::from_function(
+		SystemClock::Dacc, frequency, 0, 15,
+		[](uint32_t x) { return (x + 2); }
+	);
+
+	static_assert(result.frequency <= MaxClock,
+					"Generated DAC clock is above maximum frequency!");
+	assertBaudrateInTolerance<result.frequency, frequency, tolerance>();
+
+	DACC->DACC_MR = DACC_MR_PRESCALER(result.index);
+
+	// set analog bias, see datasheet
+	if constexpr (result.frequency / 12.f > kHz(500)) {
+		DACC->DACC_ACR = DACC_ACR_IBCTLCH1(3) | DACC_ACR_IBCTLCH0(3);
+	} else {
+		DACC->DACC_ACR = DACC_ACR_IBCTLCH1(1) | DACC_ACR_IBCTLCH0(1);
+	}
+}
+
+inline void
+Dac::enableChannel(Channel chan)
+{
+	DACC->DACC_CHER = 1u << static_cast<uint32_t>(chan);
+}
+
+inline void
+Dac::disableChannel(Channel chan)
+{
+	DACC->DACC_CHDR = 1u << static_cast<uint32_t>(chan);
+}
+
+inline void
+Dac::setChannelMode(Channel chan, Mode mode)
+{
+	if (mode == Mode::FreeRunning) {
+		// disable trigger mode
+		DACC->DACC_TRIGR &= ~(DACC_TRIGR_TRGEN0_EN << uint32_t(chan));
+		// disable max speed mode
+		DACC->DACC_MR &= ~(DACC_MR_MAXS0_Msk << uint32_t(chan));
+	} else if (mode == Mode::Trigger) {
+		// enable trigger mode
+		DACC->DACC_TRIGR |= (DACC_TRIGR_TRGEN0_EN << uint32_t(chan));
+		// disable max speed mode
+		DACC->DACC_MR &= ~(DACC_MR_MAXS0_Msk << uint32_t(chan));
+	} else {
+		// enable max speed mode
+		DACC->DACC_MR |= (DACC_MR_MAXS0_Msk << uint32_t(chan));
+	}
+}
+
+inline void
+Dac::setOutput(Channel chan, uint32_t value)
+{
+	DACC->DACC_CDR[uint32_t(chan)] = value;
+}
+
+inline void
+Dac::setOutput0(uint32_t value)
+{
+	DACC->DACC_CDR[0] = value;
+}
+
+inline void
+Dac::setOutput1(uint32_t value)
+{
+	DACC->DACC_CDR[1] = value;
+}
+
+inline void
+Dac::setWordTransferMode(bool enabled)
+{
+	if (enabled) {
+		DACC->DACC_MR |= DACC_MR_WORD_Msk;
+	} else {
+		DACC->DACC_MR &= ~DACC_MR_WORD_Msk;
+	}
+}
+
+inline volatile uint32_t*
+Dac::channel0DataRegister()
+{
+	return &DACC->DACC_CDR[0];
+}
+
+inline volatile uint32_t*
+Dac::channel1DataRegister()
+{
+	return &DACC->DACC_CDR[1];
+}
+
+inline void
+Dac::setTriggerSource(Channel channel, TriggerSource source)
+{
+	const auto pos = (channel == Channel::Channel0) ? DACC_TRIGR_TRGSEL0_Pos :
+		DACC_TRIGR_TRGSEL1_Pos;
+	DACC->DACC_TRIGR = (DACC->DACC_TRIGR & ~(UINT32_C(0b111) << pos)) | (uint32_t(source) << pos);
+}
+
+inline void
+Dac::enableInterruptFlag(Interrupt_t interrupt)
+{
+	DACC->DACC_IER = interrupt.value;
+}
+
+inline void
+Dac::disableInterruptFlag(Interrupt_t interrupt)
+{
+	DACC->DACC_IDR = interrupt.value;
+}
+
+inline Dac::Interrupt_t
+Dac::readInterruptFlags()
+{
+	return Interrupt_t(DACC->DACC_ISR);
+}
+
+inline void
+Dac::enableInterruptVector(uint32_t priority)
+{
+	NVIC_SetPriority(DACC_IRQn, priority);
+	NVIC_EnableIRQ(DACC_IRQn);
+}
+
+inline void
+Dac::disableInterruptVector()
+{
+	NVIC_DisableIRQ(DACC_IRQn);
+}
+
+} // namespace modm::platform
