@@ -146,7 +146,7 @@ public:
 		const uint32_t prescaler_ceiling = std::min(uint32_t(desired) + 1, end);
 		const T baud_lower = input_frequency / prescaler_ceiling;
 		const T baud_upper = input_frequency / prescaler_floor;
-		const double baud_middle = (baud_upper + baud_lower) / 2.0;
+		const float baud_middle = static_cast<float>((baud_upper + baud_lower) / 2.0);
 		if (desired_frequency <= baud_middle)
 			return {input_frequency, desired_frequency, prescaler_ceiling - begin, prescaler_ceiling};
 		return {input_frequency, desired_frequency, prescaler_floor - begin, prescaler_floor};
