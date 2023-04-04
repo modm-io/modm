@@ -97,6 +97,12 @@ modm::platform::Adc{{ id }}::setChannel(const Channel channel,
 	ADC{{ per }}->SQR3 = uint32_t(channel) & 0x1f;
 
 	setSampleTime(channel, sampleTime);
+%% if temperature_available
+	if(channel == Channel::TemperatureSensor || channel == Channel::InternalReference)
+	{
+		enableTemperatureRefVMeasurement();
+	}
+%%endif
 	return true;
 }
 
@@ -129,6 +135,12 @@ modm::platform::Adc{{ id }}::addChannel(const Channel channel,
 	ADC{{ per }}->SQR1 = (ADC{{ per }}->SQR1 & ~ADC_SQR1_L) | (channel_count << 20);
 
 	setSampleTime(channel, sampleTime);
+%% if temperature_available
+	if(channel == Channel::TemperatureSensor || channel == Channel::InternalReference)
+	{
+		enableTemperatureRefVMeasurement();
+	}
+%%endif
 	return true;
 }
 
