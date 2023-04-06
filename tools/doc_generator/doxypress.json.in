@@ -48,7 +48,7 @@
         "inherit-docs": true,
         "inline-grouped-classes": false,
         "inline-info": true,
-        "inline-inherited-member": false,
+        "inline-inherited-member": true,
         "inline-simple-struct": false,
         "internal-docs": false,
         "javadoc-auto-brief": false,
