@@ -201,7 +201,6 @@ public:
 	}
 		%% if type in ["", "Output"]
 	// GpioOutput
-	// start documentation inherited
 	static void setOutput() {
 		PORT{{port}}_DIRSET = mask;
 	}
@@ -222,7 +221,6 @@ public:
 	static void toggle() {
 		PORT{{port}}_OUTTGL = mask;
 	}
-	// end documentation inherited
 	static void setOutput(Configuration config,
 										Inverted invert = Inverted::No) {
 		configure(config, invert);
@@ -237,7 +235,6 @@ public:
 		%% endif
 		%% if type in ["", "Input"]
 	// GpioInput
-	// start documentation inherited
 	static void
 	setInput() {
 		 PORT{{port}}_DIRCLR = mask;
@@ -246,7 +243,6 @@ public:
 		(void) {{pin}};
 		return (PORT{{port}}_IN & mask);
 	}
-	// end documentation inherited
 	static void setInput(Configuration config,
 										Inverted invert = Inverted::No) {
 		setInput();

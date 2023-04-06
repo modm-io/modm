@@ -63,7 +63,6 @@ public:
 		initializeWithBaud(baud);
 	}
 
-	// start documentation inherited
 	static bool
 	start(modm::I2cDelegate *delegate);
 
@@ -75,7 +74,6 @@ public:
 
 	static void
 	reset(DetachCause cause=DetachCause::SoftwareReset);
-	// end documentation inherited
 
 private:
 	static void

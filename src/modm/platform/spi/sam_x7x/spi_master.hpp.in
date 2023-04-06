@@ -72,7 +72,6 @@ public:
 		}
 	}
 
-	// start documentation inherited
 	template< class SystemClock, baudrate_t baudrate, percent_t tolerance=pct(5) >
 	static void
 	initialize()
@@ -119,7 +118,6 @@ public:
 
 	static modm::ResumableResult<void>
 	transfer(const uint8_t* tx, uint8_t* rx, std::size_t length);
-	// end documentation inherited
 };
 
 } // namespace modm::platform

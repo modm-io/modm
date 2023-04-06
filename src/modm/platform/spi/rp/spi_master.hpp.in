@@ -137,7 +137,6 @@ public:
 		return result_baudrate;
 	}
 
-	// start documentation inherited
 	template< class SystemClock, baudrate_t baudrate, percent_t tolerance=5_pct >
 	static void
 	initialize()
@@ -198,7 +197,6 @@ public:
 
 	static modm::ResumableResult<void>
 	transfer(const uint8_t *tx, uint8_t *rx, std::size_t length);
-	// end documentation inherited
 
 protected:
 	/** Perform transmit-only transaction

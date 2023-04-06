@@ -61,7 +61,6 @@ public:
 		Connector::connect();
 	}
 
-	// start documentation inherited
 	template< class SystemClock, baudrate_t baudrate, percent_t tolerance=pct(2) >
 	static inline void
 	initialize()
@@ -108,7 +107,6 @@ public:
 
 	static std::size_t
 	discardTransmitBuffer();
-	// end documentation inherited
 
 	// MARK: error
 	/**

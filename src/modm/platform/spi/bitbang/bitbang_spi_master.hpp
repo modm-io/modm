@@ -44,7 +44,6 @@ template< typename Sck,
 class BitBangSpiMaster : public ::modm::SpiMaster
 {
 public:
-	// start documentation inherited
 	template< class... Signals >
 	static void
 	connect();
@@ -80,7 +79,6 @@ public:
 
 	static modm::ResumableResult<void>
 	transfer(const uint8_t *tx, uint8_t *rx, std::size_t length);
-	// end documentation inherited
 
 private:
 	static void

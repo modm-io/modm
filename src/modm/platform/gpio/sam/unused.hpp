@@ -35,7 +35,6 @@ public:
 	static constexpr uint32_t mask = 0;
 
 	// GpioOutput
-	// start documentation inherited
 	static void setOutput() {}
 	static void setOutput(bool) {}
 	static void set() {}
@@ -43,18 +42,13 @@ public:
 	static void reset() {}
 	static void toggle() {}
 	static bool isSet() { return false; }
-	// stop documentation inherited
 
 	// GpioInput
-	// start documentation inherited
 	static void setInput() {}
 	static bool read() { return false; }
-	// end documentation inherited
 
 	// GpioIO
-	// start documentation inherited
 	static Direction getDirection() { return Direction::Special; }
-	// end documentation inherited
 	static void lock() {}
 	static void disconnect() {}
 };

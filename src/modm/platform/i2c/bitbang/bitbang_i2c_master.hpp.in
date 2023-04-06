@@ -50,7 +50,6 @@ class BitBangI2cMaster : public modm::I2cMaster
 %% endif
 
 public:
-	// start documentation inherited
 	template< class... Signals >
 	static void
 	connect(PullUps pullups = PullUps::External, ResetDevices reset = ResetDevices::Standard);
@@ -70,7 +69,6 @@ public:
 
 	static inline void
 	reset();
-	// end documentation inherited
 
 private:
 	// error handling

@@ -322,7 +322,6 @@ public:
 
 	static inline void
 	setRightAdjustResult();
-	// stop documentation inherited
 
 %% if target["family"] == "f1"
 	/**

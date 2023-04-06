@@ -70,7 +70,6 @@ public:
 	static uint32_t
 	setBaudrate();
 
-	// start documentation inherited
 	static bool
 	start(I2cTransaction *transaction, ConfigurationHandler handler = nullptr);
 
@@ -79,7 +78,6 @@ public:
 
 	static void
 	reset();
-	// end documentation inherited
 
 	template <typename Wait>
 	static Error transfer(uint8_t addr,const uint8_t* write,size_t writeLen,

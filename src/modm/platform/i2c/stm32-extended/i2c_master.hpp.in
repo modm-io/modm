@@ -105,7 +105,6 @@ public:
 		initializeWithPrescaler(timingRegisterValue.value());
 	}
 
-	// start documentation inherited
 	static bool
 	start(I2cTransaction *transaction, ConfigurationHandler handler = nullptr);
 
@@ -114,7 +113,6 @@ public:
 
 	static void
 	reset();
-	// end documentation inherited
 
 private:
 	static void

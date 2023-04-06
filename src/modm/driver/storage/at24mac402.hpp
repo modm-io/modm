@@ -56,7 +56,6 @@ public:
 	modm::ResumableResult<bool>
 	readUniqueId(std::span<uint8_t, 16> data);
 
-	// start documentation inherited
 	modm::ResumableResult<bool>
 	ping();
 
@@ -79,7 +78,6 @@ public:
 	template<typename T>
 	modm::ResumableResult<bool>
 	read(uint32_t address, T& data);
-	// end documentation inherited
 private:
 	uint8_t address_{};
 };

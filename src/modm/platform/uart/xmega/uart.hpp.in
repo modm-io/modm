@@ -77,7 +77,6 @@ public:
 		initializeWithFractionalBaudrate(bsel, bscale);
 	}
 
-	// start documentation inherited
 	// MARK: write blocking
 	static void
 	writeBlocking(uint8_t data);
@@ -111,7 +110,6 @@ public:
 
 	static std::size_t
 	discardTransmitBuffer();
-	// end documentation inherited
 
 	// MARK: error
 	/**
