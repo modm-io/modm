@@ -1,0 +1,28 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2023, Zühlke Engineering (Austria) GmbH
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":platform:iwdg"
+    module.description = "Independent watchdog"
+
+def prepare(module, options):
+    device = options[":target"]
+    target = device.identifier
+    if target["family"] in ["h7"]:
+        # STM32H7 is not yet supported with any IWDG implementation im modm
+        return False
+    return device.has_driver("iwdg:stm32")
+
+def build(env):
+    env.outbasepath = "modm/src/modm/platform/iwdg"
+    env.copy("iwdg.hpp")
+    env.copy("iwdg.cpp")
