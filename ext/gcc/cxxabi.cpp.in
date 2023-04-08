@@ -37,10 +37,12 @@ enum
 	INITIALIZING = 0x100,
 };
 
-// This function is only called when `(guard & 1) != 1`!
+// This function returns 1 only if the object needs to be initialized
 extern "C" int __cxa_guard_acquire(int *guard)
 {
 	auto atomic_guard = std::atomic_ref(*guard);
+	if (atomic_guard.load() == INITIALIZED)
+		return 0;
 	if (atomic_guard.exchange(INITIALIZING) == INITIALIZING)
 	{
 		modm_assert(0, "stat.rec",
