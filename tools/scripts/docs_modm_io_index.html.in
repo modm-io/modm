@@ -128,11 +128,11 @@ input[type=text] {
         </td>
         <td>
             <div class="autocomplete" style="width:300px;">
-                <input id="targetinput" type="text" name="target" placeholder="Search for e.g. 'F469' or 'NUCLEO'">
+                <input id="targetinput" type="text" name="target" placeholder="Search for e.g. 'F469' or 'NUCLEO'" autofocus />
             </div>
         </td>
         <td>
-            <input type="submit" value="Show Documentation">
+            <input type="submit" value="Show Documentation" />
         </td>
     </tr>
 </table>
