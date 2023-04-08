@@ -52,6 +52,246 @@ pay attention to. Medium impact changes are also worth looking at.
 
 <!--releases-->
 
+## 2023-04-06: 2023q1 release
+
+This release covers everything from 2023-01-01 and has been tested with avr-gcc
+v12.2.0 from Upstream and arm-none-eabi-gcc 12.2.rel1 from Arm.
+
+
+Breaking changes:
+
+- SAMV71 Xplained Ultra button polarity.
+
+Features:
+
+- External main clock on SAMx7x.
+- SAMx7x SPI driver.
+- SAM GpioInverted.
+- CANFD large frame support.
+- SAM SoftwareGpioPort.
+- SAMx7x Timer/counter driver.
+- SAMx7x PWM generator driver.
+- GCC 12.
+- Ability to coredump from GDB directly.
+- JLink support.
+- Support for STM32U5 devices.
+- Repetition Counter on STM32 Advanced Control Timers.
+- ADC scan mode, DMA mode and external trigger for STM32F1/F2/F37/F4/F7/L1.
+- SAMx7x I2C driver.
+
+Integrated Projects:
+
+- ETL upgraded to v20.35.14.
+
+Fixes:
+
+- Multiple fixes for I²C NACK handling on STM32.
+- On Nucleo-F103RB GpioB4 is now usable.
+- Systick frequency on SAMx7x.
+- Fix static member variable initialization.
+
+New development boards:
+
+- Nucleo-U575ZI-Q as [`modm:nucleo-u575zi-q`][].
+- SAME70 Xplained as [`modm:board:same70-xplained`][].
+
+New device drivers:
+
+- LSM6DSO imu as [`modm:driver:lsm6dso`][].
+- MS5837 pressure/temperature sensor as [`modm:driver:ms5837`][].
+- AT24MAC402 I2C Eeprom as [`modm:driver:at24mac402`][].
+
+Known bugs:
+
+- STM32F7: D-Cache not enabled by default. See [#485][].
+- `lbuild build` and `lbuild clean` do not remove all previously generated files
+  when the configuration changes. See [#285][].
+- Generating modm on Windows creates paths with `\` that are not compatible with
+  Unix. See [#310][].
+- `arm-none-eabi-gdb` TUI and GDBGUI interfaces are not supported on Windows.
+  See [#591][].
+
+Many thanks to all our contributors.
+A special shoutout to first timers 🎉:
+
+- Christopher Durand ([@chris-durand][])
+- Niklas Hauser ([@salkinium][])
+- Raphael Lehmann ([@rleh][])
+- Victor Costa ([@victorandrehc][]) 🎉
+- Sascha Schade ([@strongly-typed][])
+- Vivien Henry ([@lukh][])
+- Luiz Gili ([@lgili][]) 🎉
+- Mattis Kieffer ([@mat-kie][]) 🎉
+- Rasmus Kleist ([@rasmuskleist][])
+- Sebastian Birke ([@se-bi][])
+
+PR [#995][] -> [2023q1][].
+
+<details>
+<summary>Detailed changelog</summary>
+
+#### 2023-04-08: Fix static member variable initialization
+
+Fixes `__cxa_guard_acquire` to construct a static member variable only once!
+
+PR [#995][] -> 2023q1.  
+Tested in hardware by [@salkinium][].
+
+#### 2023-04-06: Add SAMx7x I2C driver
+
+Including an unittest and examples.
+
+PR [#954][] -> [d1938eb][].  
+Tested in hardware by [@chris-durand][].
+
+#### 2023-04-06: Add AT24MAC402 I2C EEPROM driver
+
+This also adds generic support for I2C eeproms with 8 bit addressing.
+
+PR [#954][] -> [d1938eb][].  
+Tested in hardware by [@chris-durand][].
+
+#### 2023-04-01: Add ADC DMA mode and external trigger for STM32F1/F2/F37/F4/F7/L1
+
+PR [#982][] -> [04ed0a5][].  
+Tested in hardware by [@victorandrehc][].
+
+#### 2023-03-27: Fix systick frequency on SAMx7x
+
+PR [#986][] -> [589aea7][].  
+Tested in hardware by [@chris-durand][].
+
+#### 2023-03-19: Add support for Repetition Counter on STM32 Advanced Control Timers
+
+PR [#981][] -> [740fd51][].  
+Tested in hardware by [@victorandrehc][].
+
+#### 2023-03-14: Add BSP for SAM E70 Xplained with multiple examples
+
+PR [#969][] -> [a38feca][].  
+Tested in hardware by [@lgili][].
+
+#### 2023-03-14: Separate the rx handling part of the XPCC dispatcher
+
+PR [#970][] -> [2273bae][].  
+Tested in hardware by [@se-bi][].
+
+#### 2023-03-13: Add STM32U5 support
+
+Support for all devices of the new STM32U5 family with Cortex-M33 core.
+UART and RCC platform drivers are adapted and a BSP for the Nucleo-U575ZI-Q
+is also included.
+
+PR [#843][] -> [8a3a20b][].  
+Tested in hardware by [@rleh][].
+
+#### 2023-03-13: Add ADC scan mode supprot for STM32F1/F2/F37/F4/F7/L1
+
+PR [#976][] -> [08cd479][].  
+Tested in hardware by [@victorandrehc][].
+
+#### 2023-03-06: Refactor tooling and add JLink support
+
+- Refactor modm_tools module and debug tooling
+- Add JLink debug probe support
+- Add ITM and RTT on NUCLEO-64 board
+
+PR [#965][] -> [241b0d1][].  
+Tested in hardware by [@salkinium][].
+
+#### 2023-03-06: Enable GpioB4 on Nucleo-F103RB
+
+PR [#967][] -> [416ced6][].  
+Tested in hardware by [@strongly-typed][].
+
+#### 2023-02-28: Always inline DMA IRQ handler to reduce IRQ latency on STM32
+
+PR [#964][] -> [d982a85][].  
+Tested in hardware by [@strongly-typed][].
+
+#### 2023-02-20: Add ability to coredump from GDB directly
+
+PR [#961][] -> [eb2748e][].  
+Tested in hardware by [@salkinium][].
+
+#### 2023-02-18: GCC 12 update
+
+- Adapt code and build system to GCC12
+- Split AVR Mega Pro unittests into three
+- Fix function call in ADC examples
+
+PR [#940][] -> [923f9c1][].  
+Tested in hardware by [@salkinium][].
+
+#### 2023-02-15: Add Nucleo-H723ZG OpenOCD config
+
+PR [#960][] -> [3cee015][].  
+Tested in hardware by [@mat-kie][] and [@rleh][].
+
+#### 2023-02-07: Add support for PWM generator on SAMx7x
+
+PR [#957][] -> [190bc78][].  
+Tested in hardware by [@chris-durand][].
+
+#### 2023-02-06: Add support for timer/counter on SAMx7x
+
+PR [#956][] -> [95713ee][].  
+Tested in hardware by [@chris-durand][].
+
+#### 2023-02-05: Add MS5837 pressure/temperature sensor driver
+
+PR [#942][] -> [8179e6b][].  
+Tested in hardware by [@lukh][].
+
+#### 2023-02-04: Add support for SoftwareGpioPort on SAM
+
+Also adds support for inverted pins in GpioSet.
+
+PR [#952][] -> [afdb5ba][].  
+Tested in hardware by [@chris-durand][].
+
+#### 2023-02-04: Add CANFD large frame support
+
+PR [#882][] -> [e4b1a4a][].  
+Tested in hardware by [@rasmuskleist][] / [@twast92][].
+
+#### 2023-02-04: Multiple fixes for I²C on STM32
+
+- Fix stm32-extended I2C driver NACK handling
+- Start next I2C transaction also when previous failed with NACK
+- Do not set invalid I2C_CR1_NOSTRETCH bit in master mode
+
+PR [#947][] -> [ba61a34][] and PR [#951][] -> [c347f00][].  
+Tested in hardware by [@chris-durand][].
+
+#### 2023-02-01: Add ST LSM6DSO imu driver
+
+PR [#950][] -> [13ea578][].  
+Tested in hardware by [@rleh][].
+
+#### 2023-01-16: Add PLL disable function on STM32
+
+PR [#944][] -> [0f0505f][].  
+Tested in hardware by [@chris-durand][].
+
+#### 2023-01-12: Add support for GpioInverted on SAM
+
+PR [#941][] -> [4f50d00][].  
+Tested in hardware by [@chris-durand][].
+
+#### 2023-01-12: Add SPI support for SAMx7x
+
+PR [#938][] -> [c93dd2c][].  
+Tested in hardware by [@chris-durand][].
+
+#### 2023-01-03: Add external main clock support on SAMx7x
+
+PR [#939][] -> [0259ad2][].  
+Tested in hardware by [@chris-durand][].
+
+</details>
+
+
 ## 2023-01-01: 2022q4 release
 
 This release covers everything from 2022-10-01 and has been tested with avr-gcc
@@ -2261,6 +2501,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [2022q2]: https://github.com/modm-io/modm/releases/tag/2022q2
 [2022q3]: https://github.com/modm-io/modm/releases/tag/2022q3
 [2022q4]: https://github.com/modm-io/modm/releases/tag/2022q4
+[2023q1]: https://github.com/modm-io/modm/releases/tag/2023q1
 
 [@19joho66]: https://github.com/19joho66
 [@ASMfreaK]: https://github.com/ASMfreaK
@@ -2291,10 +2532,12 @@ Please note that contributions from xpcc were continuously ported to modm.
 [@henrikssn]: https://github.com/henrikssn
 [@hshose]: https://github.com/hshose
 [@jasa]: https://github.com/jasa
+[@lgili]: https://github.com/lgili
 [@linasnikis]: https://github.com/linasnikis
 [@lmoesch]: https://github.com/lmoesch
 [@lukh]: https://github.com/lukh
 [@luxarf]: https://github.com/luxarf
+[@mat-kie]: https://github.com/mat-kie
 [@mcbridejc]: https://github.com/mcbridejc
 [@mikewolfram]: https://github.com/mikewolfram
 [@nesos]: https://github.com/nesos
@@ -2311,6 +2554,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [@tarush53]: https://github.com/tarush53
 [@twasilczyk]: https://github.com/twasilczyk
 [@twast92]: https://github.com/twast92
+[@victorandrehc]: https://github.com/victorandrehc
 [@xgzeng]: https://github.com/xgzeng
 
 [`modm:board:arduino-nano`]: https://modm.io/reference/module/modm-board-arduino-nano
@@ -2343,6 +2587,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [`modm:board:samd21-mini`]: https://modm.io/reference/module/modm-board-samd21-mini
 [`modm:board:samd21-xplained-pro`]: https://modm.io/reference/module/modm-board-samd21-xplained-pro
 [`modm:board:same54-xplained-pro`]: https://modm.io/reference/module/modm-board-same54-xplained-pro
+[`modm:board:same70-xplained`]: https://modm.io/reference/module/modm-board-same70-xplained
 [`modm:board:samg55-xplained-pro`]: https://modm.io/reference/module/modm-board-samg55-xplained-pro
 [`modm:board:samv71-xplained-ultra`]: https://modm.io/reference/module/modm-board-samv71-xplained-ultra
 [`modm:board:srxe`]: https://modm.io/reference/module/modm-board-srxe
@@ -2353,6 +2598,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [`modm:driver:ads7828`]: https://modm.io/reference/module/modm-driver-ads7828
 [`modm:driver:ads816x`]: https://modm.io/reference/module/modm-driver-ads816x
 [`modm:driver:apa102`]: https://modm.io/reference/module/modm-driver-apa102
+[`modm:driver:at24mac402`]: https://modm.io/reference/module/modm-driver-at24mac402
 [`modm:driver:bno055`]: https://modm.io/reference/module/modm-driver-bno055
 [`modm:driver:cat24aa`]: https://modm.io/reference/module/modm-driver-cat24aa
 [`modm:driver:encoder.output`]: https://modm.io/reference/module/modm-driver-encoder-output
@@ -2365,10 +2611,12 @@ Please note that contributions from xpcc were continuously ported to modm.
 [`modm:driver:lis3mdl`]: https://modm.io/reference/module/modm-driver-lis3mdl
 [`modm:driver:lp503x`]: https://modm.io/reference/module/modm-driver-lp503x
 [`modm:driver:lsm6ds33`]: https://modm.io/reference/module/modm-driver-lsm6ds33
+[`modm:driver:lsm6dso`]: https://modm.io/reference/module/modm-driver-lsm6dso
 [`modm:driver:max7219`]: https://modm.io/reference/module/modm-driver-max7219
 [`modm:driver:mcp7941x`]: https://modm.io/reference/module/modm-driver-mcp7941x
 [`modm:driver:mcp990x`]: https://modm.io/reference/module/modm-driver-mcp990x
 [`modm:driver:mmc5603`]: https://modm.io/reference/module/modm-driver-mmc5603
+[`modm:driver:ms5837`]: https://modm.io/reference/module/modm-driver-ms5837
 [`modm:driver:pat9125el`]: https://modm.io/reference/module/modm-driver-pat9125el
 [`modm:driver:pca9548a`]: https://modm.io/reference/module/modm-driver-pca9548a
 [`modm:driver:sh1106`]: https://modm.io/reference/module/modm-driver-sh1106
@@ -2383,6 +2631,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [`modm:driver:tmp12x`]: https://modm.io/reference/module/modm-driver-tmp12x
 [`modm:driver:touch2046`]: https://modm.io/reference/module/modm-driver-touch2046
 [`modm:driver:ws2812`]: https://modm.io/reference/module/modm-driver-ws2812
+[`modm:nucleo-u575zi-q`]: https://modm.io/reference/module/modm-nucleo-u575zi-q
 
 [#102]: https://github.com/modm-io/modm/pull/102
 [#118]: https://github.com/modm-io/modm/pull/118
@@ -2535,6 +2784,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [#830]: https://github.com/modm-io/modm/pull/830
 [#838]: https://github.com/modm-io/modm/pull/838
 [#842]: https://github.com/modm-io/modm/pull/842
+[#843]: https://github.com/modm-io/modm/pull/843
 [#846]: https://github.com/modm-io/modm/pull/846
 [#848]: https://github.com/modm-io/modm/pull/848
 [#850]: https://github.com/modm-io/modm/pull/850
@@ -2551,6 +2801,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [#872]: https://github.com/modm-io/modm/pull/872
 [#873]: https://github.com/modm-io/modm/pull/873
 [#875]: https://github.com/modm-io/modm/pull/875
+[#882]: https://github.com/modm-io/modm/pull/882
 [#887]: https://github.com/modm-io/modm/pull/887
 [#894]: https://github.com/modm-io/modm/pull/894
 [#898]: https://github.com/modm-io/modm/pull/898
@@ -2560,27 +2811,58 @@ Please note that contributions from xpcc were continuously ported to modm.
 [#917]: https://github.com/modm-io/modm/pull/917
 [#935]: https://github.com/modm-io/modm/pull/935
 [#937]: https://github.com/modm-io/modm/pull/937
+[#938]: https://github.com/modm-io/modm/pull/938
+[#939]: https://github.com/modm-io/modm/pull/939
+[#940]: https://github.com/modm-io/modm/pull/940
+[#941]: https://github.com/modm-io/modm/pull/941
+[#942]: https://github.com/modm-io/modm/pull/942
+[#944]: https://github.com/modm-io/modm/pull/944
+[#947]: https://github.com/modm-io/modm/pull/947
+[#950]: https://github.com/modm-io/modm/pull/950
+[#951]: https://github.com/modm-io/modm/pull/951
+[#952]: https://github.com/modm-io/modm/pull/952
+[#954]: https://github.com/modm-io/modm/pull/954
+[#956]: https://github.com/modm-io/modm/pull/956
+[#957]: https://github.com/modm-io/modm/pull/957
+[#960]: https://github.com/modm-io/modm/pull/960
+[#961]: https://github.com/modm-io/modm/pull/961
+[#964]: https://github.com/modm-io/modm/pull/964
+[#965]: https://github.com/modm-io/modm/pull/965
+[#967]: https://github.com/modm-io/modm/pull/967
+[#969]: https://github.com/modm-io/modm/pull/969
 [#96]: https://github.com/modm-io/modm/pull/96
+[#970]: https://github.com/modm-io/modm/pull/970
+[#976]: https://github.com/modm-io/modm/pull/976
+[#981]: https://github.com/modm-io/modm/pull/981
+[#982]: https://github.com/modm-io/modm/pull/982
+[#986]: https://github.com/modm-io/modm/pull/986
+[#995]: https://github.com/modm-io/modm/pull/995
 
 [00471ca]: https://github.com/modm-io/modm/commit/00471ca
 [0217a19]: https://github.com/modm-io/modm/commit/0217a19
 [022a60a]: https://github.com/modm-io/modm/commit/022a60a
+[0259ad2]: https://github.com/modm-io/modm/commit/0259ad2
 [02b1571]: https://github.com/modm-io/modm/commit/02b1571
 [038657c]: https://github.com/modm-io/modm/commit/038657c
 [04688bc]: https://github.com/modm-io/modm/commit/04688bc
+[04ed0a5]: https://github.com/modm-io/modm/commit/04ed0a5
+[08cd479]: https://github.com/modm-io/modm/commit/08cd479
 [0994a55]: https://github.com/modm-io/modm/commit/0994a55
 [0cd2bc9]: https://github.com/modm-io/modm/commit/0cd2bc9
 [0cf1c65]: https://github.com/modm-io/modm/commit/0cf1c65
 [0d6a937]: https://github.com/modm-io/modm/commit/0d6a937
 [0e3d280]: https://github.com/modm-io/modm/commit/0e3d280
+[0f0505f]: https://github.com/modm-io/modm/commit/0f0505f
 [0fd53a8]: https://github.com/modm-io/modm/commit/0fd53a8
 [10fdc3f]: https://github.com/modm-io/modm/commit/10fdc3f
 [11ffe92]: https://github.com/modm-io/modm/commit/11ffe92
 [12bb41b]: https://github.com/modm-io/modm/commit/12bb41b
 [1375ff1]: https://github.com/modm-io/modm/commit/1375ff1
+[13ea578]: https://github.com/modm-io/modm/commit/13ea578
 [141aa71]: https://github.com/modm-io/modm/commit/141aa71
 [165adf0]: https://github.com/modm-io/modm/commit/165adf0
 [187ddd8]: https://github.com/modm-io/modm/commit/187ddd8
+[190bc78]: https://github.com/modm-io/modm/commit/190bc78
 [195f7e1]: https://github.com/modm-io/modm/commit/195f7e1
 [1a11b08]: https://github.com/modm-io/modm/commit/1a11b08
 [1c9c0b6]: https://github.com/modm-io/modm/commit/1c9c0b6
@@ -2588,8 +2870,10 @@ Please note that contributions from xpcc were continuously ported to modm.
 [1fc3805]: https://github.com/modm-io/modm/commit/1fc3805
 [21af57b]: https://github.com/modm-io/modm/commit/21af57b
 [21ba120]: https://github.com/modm-io/modm/commit/21ba120
+[2273bae]: https://github.com/modm-io/modm/commit/2273bae
 [22867e0]: https://github.com/modm-io/modm/commit/22867e0
 [23ec952]: https://github.com/modm-io/modm/commit/23ec952
+[241b0d1]: https://github.com/modm-io/modm/commit/241b0d1
 [276f5b3]: https://github.com/modm-io/modm/commit/276f5b3
 [295dbc3]: https://github.com/modm-io/modm/commit/295dbc3
 [2c22fae]: https://github.com/modm-io/modm/commit/2c22fae
@@ -2602,8 +2886,10 @@ Please note that contributions from xpcc were continuously ported to modm.
 [3936a28]: https://github.com/modm-io/modm/commit/3936a28
 [399a533]: https://github.com/modm-io/modm/commit/399a533
 [3ba71c9]: https://github.com/modm-io/modm/commit/3ba71c9
+[3cee015]: https://github.com/modm-io/modm/commit/3cee015
 [3ecad35]: https://github.com/modm-io/modm/commit/3ecad35
 [3f3ff3d]: https://github.com/modm-io/modm/commit/3f3ff3d
+[416ced6]: https://github.com/modm-io/modm/commit/416ced6
 [43f32e6]: https://github.com/modm-io/modm/commit/43f32e6
 [47adfd6]: https://github.com/modm-io/modm/commit/47adfd6
 [4885c53]: https://github.com/modm-io/modm/commit/4885c53
@@ -2613,12 +2899,14 @@ Please note that contributions from xpcc were continuously ported to modm.
 [4ab28fe]: https://github.com/modm-io/modm/commit/4ab28fe
 [4ce1a47]: https://github.com/modm-io/modm/commit/4ce1a47
 [4f25cdf]: https://github.com/modm-io/modm/commit/4f25cdf
+[4f50d00]: https://github.com/modm-io/modm/commit/4f50d00
 [4ff604f]: https://github.com/modm-io/modm/commit/4ff604f
 [516b2b3]: https://github.com/modm-io/modm/commit/516b2b3
 [5332765]: https://github.com/modm-io/modm/commit/5332765
 [544f6d3]: https://github.com/modm-io/modm/commit/544f6d3
 [55d5911]: https://github.com/modm-io/modm/commit/55d5911
 [564effa]: https://github.com/modm-io/modm/commit/564effa
+[589aea7]: https://github.com/modm-io/modm/commit/589aea7
 [596eafa]: https://github.com/modm-io/modm/commit/596eafa
 [599e0ba]: https://github.com/modm-io/modm/commit/599e0ba
 [5a9ad25]: https://github.com/modm-io/modm/commit/5a9ad25
@@ -2637,6 +2925,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [6e9f000]: https://github.com/modm-io/modm/commit/6e9f000
 [72d5ae9]: https://github.com/modm-io/modm/commit/72d5ae9
 [7330500]: https://github.com/modm-io/modm/commit/7330500
+[740fd51]: https://github.com/modm-io/modm/commit/740fd51
 [77ae899]: https://github.com/modm-io/modm/commit/77ae899
 [78d18f6]: https://github.com/modm-io/modm/commit/78d18f6
 [7b5827f]: https://github.com/modm-io/modm/commit/7b5827f
@@ -2646,6 +2935,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [8082f69]: https://github.com/modm-io/modm/commit/8082f69
 [80a9c66]: https://github.com/modm-io/modm/commit/80a9c66
 [80ed738]: https://github.com/modm-io/modm/commit/80ed738
+[8179e6b]: https://github.com/modm-io/modm/commit/8179e6b
 [821677b]: https://github.com/modm-io/modm/commit/821677b
 [8230fef]: https://github.com/modm-io/modm/commit/8230fef
 [82bc4a9]: https://github.com/modm-io/modm/commit/82bc4a9
@@ -2657,12 +2947,15 @@ Please note that contributions from xpcc were continuously ported to modm.
 [8820d6b]: https://github.com/modm-io/modm/commit/8820d6b
 [8896b5b]: https://github.com/modm-io/modm/commit/8896b5b
 [897579e]: https://github.com/modm-io/modm/commit/897579e
+[8a3a20b]: https://github.com/modm-io/modm/commit/8a3a20b
 [8c322a2]: https://github.com/modm-io/modm/commit/8c322a2
 [8ca2f35]: https://github.com/modm-io/modm/commit/8ca2f35
 [9036666]: https://github.com/modm-io/modm/commit/9036666
 [90774be]: https://github.com/modm-io/modm/commit/90774be
+[923f9c1]: https://github.com/modm-io/modm/commit/923f9c1
 [9381fd0]: https://github.com/modm-io/modm/commit/9381fd0
 [93bba13]: https://github.com/modm-io/modm/commit/93bba13
+[95713ee]: https://github.com/modm-io/modm/commit/95713ee
 [98a2483]: https://github.com/modm-io/modm/commit/98a2483
 [98b1337]: https://github.com/modm-io/modm/commit/98b1337
 [9b6aeee]: https://github.com/modm-io/modm/commit/9b6aeee
@@ -2673,6 +2966,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [9e7ec34]: https://github.com/modm-io/modm/commit/9e7ec34
 [a105072]: https://github.com/modm-io/modm/commit/a105072
 [a173bde]: https://github.com/modm-io/modm/commit/a173bde
+[a38feca]: https://github.com/modm-io/modm/commit/a38feca
 [a607613]: https://github.com/modm-io/modm/commit/a607613
 [a6b4186]: https://github.com/modm-io/modm/commit/a6b4186
 [a8edbe8]: https://github.com/modm-io/modm/commit/a8edbe8
@@ -2681,6 +2975,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [af2b352]: https://github.com/modm-io/modm/commit/af2b352
 [afaea7f]: https://github.com/modm-io/modm/commit/afaea7f
 [afbd533]: https://github.com/modm-io/modm/commit/afbd533
+[afdb5ba]: https://github.com/modm-io/modm/commit/afdb5ba
 [b010775]: https://github.com/modm-io/modm/commit/b010775
 [b153186]: https://github.com/modm-io/modm/commit/b153186
 [b18385c]: https://github.com/modm-io/modm/commit/b18385c
@@ -2690,24 +2985,29 @@ Please note that contributions from xpcc were continuously ported to modm.
 [b721551]: https://github.com/modm-io/modm/commit/b721551
 [b78acd5]: https://github.com/modm-io/modm/commit/b78acd5
 [b8648be]: https://github.com/modm-io/modm/commit/b8648be
+[ba61a34]: https://github.com/modm-io/modm/commit/ba61a34
 [c0a8c51]: https://github.com/modm-io/modm/commit/c0a8c51
 [c148bf8]: https://github.com/modm-io/modm/commit/c148bf8
+[c347f00]: https://github.com/modm-io/modm/commit/c347f00
 [c38550a]: https://github.com/modm-io/modm/commit/c38550a
 [c63a536]: https://github.com/modm-io/modm/commit/c63a536
 [c7b35ca]: https://github.com/modm-io/modm/commit/c7b35ca
 [c7bd876]: https://github.com/modm-io/modm/commit/c7bd876
 [c868f59]: https://github.com/modm-io/modm/commit/c868f59
+[c93dd2c]: https://github.com/modm-io/modm/commit/c93dd2c
 [c949daf]: https://github.com/modm-io/modm/commit/c949daf
 [cb82eec]: https://github.com/modm-io/modm/commit/cb82eec
 [cbbf3f6]: https://github.com/modm-io/modm/commit/cbbf3f6
 [cbce428]: https://github.com/modm-io/modm/commit/cbce428
 [cc15b1a]: https://github.com/modm-io/modm/commit/cc15b1a
 [cceb801]: https://github.com/modm-io/modm/commit/cceb801
+[d1938eb]: https://github.com/modm-io/modm/commit/d1938eb
 [d21e991]: https://github.com/modm-io/modm/commit/d21e991
 [d2d38a0]: https://github.com/modm-io/modm/commit/d2d38a0
 [d3496a3]: https://github.com/modm-io/modm/commit/d3496a3
 [d46c09d]: https://github.com/modm-io/modm/commit/d46c09d
 [d8be0a2]: https://github.com/modm-io/modm/commit/d8be0a2
+[d982a85]: https://github.com/modm-io/modm/commit/d982a85
 [dab6c79]: https://github.com/modm-io/modm/commit/dab6c79
 [dc56af2]: https://github.com/modm-io/modm/commit/dc56af2
 [dee5ea2]: https://github.com/modm-io/modm/commit/dee5ea2
@@ -2717,6 +3017,8 @@ Please note that contributions from xpcc were continuously ported to modm.
 [e3ba913]: https://github.com/modm-io/modm/commit/e3ba913
 [e3c0321]: https://github.com/modm-io/modm/commit/e3c0321
 [e46e7df]: https://github.com/modm-io/modm/commit/e46e7df
+[e4b1a4a]: https://github.com/modm-io/modm/commit/e4b1a4a
+[eb2748e]: https://github.com/modm-io/modm/commit/eb2748e
 [eba68a4]: https://github.com/modm-io/modm/commit/eba68a4
 [f4c7492]: https://github.com/modm-io/modm/commit/f4c7492
 [f4d5d6c]: https://github.com/modm-io/modm/commit/f4d5d6c
