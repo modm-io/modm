@@ -50,10 +50,12 @@ author_handles = {
     "Kevin Läufer": "ekiwi",
     "Linas Nikiperavicius": "linasnikis",
     "Lucas Mösch": "lmoesch",
+    "Luiz Gili": "lgili",
     "Lukas Güldenstein": "gueldenstone",
     "Marten Junga": "Maju-Ketchup",
     "Martin Esser": "Scabber",
     "Martin Rosekeit": "thundernail",
+    "Mattis Kieffer": "mat-kie",
     "Michael Thies": "mhthies",
     "Mike Wolfram": "mikewolfram",
     "Nick Sarten": "genbattle",
@@ -83,6 +85,7 @@ author_handles = {
     "Tomasz Chyrowicz": "tomchy",
     "Tomasz Wasilczyk": "twasilczyk",
     "Valeriy Osipov": "SgtPepperFTW",
+    "Victor Costa": "victorandrehc",
     "Vivien Henry": "lukh",
     "Zawadniak Pedro": "PDR5",
     "Álan Crístoffer": "acristoffers",
@@ -109,7 +112,7 @@ def get_author_log(since = None, until = None, handles = False, count = False):
         co_author_command += " --since=\"{}\"".format(since)
     if until is not None:
         co_author_command += " --until=\"{}\"".format(until)
-    co_author_command += " | grep -v '^$' | sed -e 's/Co-authored-by: /\t/g' | sort | uniq -c"
+    co_author_command += " | grep -v '^$' | sed -e 's/[Cc]o-authored-by: /\t/g' | sort | uniq -c"
     output = subprocess.Popen(co_author_command, shell=True, stdout=subprocess.PIPE)\
             .stdout.read().decode(locale.getpreferredencoding())
     for line in output.splitlines():
