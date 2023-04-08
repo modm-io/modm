@@ -42,7 +42,7 @@ from . import find_files
 
 # -----------------------------------------------------------------------------
 TEMPLATE_UNITTEST = """\
-#include <unittest/controller.hpp>
+#include <unittest/reporter.hpp>
 
 {% for test in tests %}
 #include "{{test.include}}"
@@ -55,13 +55,12 @@ FLASH_STORAGE_STRING({{test.instance}}Name) = "{{test.file}}";
 {% endfor %}
 }
 
-int unittest::Controller::run(unittest::Reporter reporter)
+int run_modm_unit_test()
 {
     using namespace modm::accessor;
-    instance().setReporter(reporter);
 
 {% for test in tests %}
-    instance().nextTestSuite(asFlash({{test.instance}}Name));
+    unittest::reporter.nextTestSuite(asFlash({{test.instance}}Name));
     {
         {{test.class}} {{test.instance}};
     {% for test_case in test.test_cases %}
@@ -73,7 +72,7 @@ int unittest::Controller::run(unittest::Reporter reporter)
     }
 {% endfor %}
 
-    return instance().getReporter().printSummary();
+    return unittest::reporter.printSummary();
 }
 """
 

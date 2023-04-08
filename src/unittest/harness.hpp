@@ -16,7 +16,7 @@
 #ifndef	UNITTEST_HARNESS_HPP
 #define	UNITTEST_HARNESS_HPP
 
-#include "controller.hpp"
+#include "reporter.hpp"
 
 /// @cond
 #include <modm/architecture/interface/accessor_flash.hpp>
@@ -29,6 +29,8 @@ namespace unittest
 	EXTERN_FLASH_STORAGE_STRING(stringNotTrue);
 	EXTERN_FLASH_STORAGE_STRING(stringNotFalse);
 	EXTERN_FLASH_STORAGE_STRING(stringDelta);
+
+	extern Reporter reporter;
 }
 
 #ifdef	UNITTEST_RETURN_ON_FAIL
@@ -37,7 +39,7 @@ namespace unittest
 	#define	TEST_RETURN_(x)	x
 #endif
 
-#define	TEST_REPORTER_		unittest::Controller::instance().getReporter()
+#define	TEST_REPORTER_		::unittest::reporter
 
 namespace unittest
 {

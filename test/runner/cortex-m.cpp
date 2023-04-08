@@ -15,7 +15,7 @@
 #include <modm/board.hpp>
 #include <modm/debug/logger.hpp>
 
-#include <unittest/controller.hpp>
+#include <unittest/reporter.hpp>
 
 #include <info_git.h>
 #include <info_build.h>
@@ -24,6 +24,10 @@ using namespace modm::platform;
 
 // Reuse logger from board
 extern Board::LoggerDevice loggerDevice;
+namespace unittest
+{
+	Reporter reporter(loggerDevice);
+}
 
 int
 main()
@@ -32,7 +36,7 @@ main()
 	Board::Leds::setOutput(modm::Gpio::Low);
 	Board::Leds::write(0b100);
 
-	loggerDevice.write("Unittests (" __DATE__ ", " __TIME__")\n");
+	MODM_LOG_INFO << "Unittests (" __DATE__ ", " __TIME__")\n";
 
 	MODM_LOG_INFO << "Machine:  " << MODM_BUILD_MACHINE  << modm::endl;
 	MODM_LOG_INFO << "User:     " << MODM_BUILD_USER     << modm::endl;
@@ -66,7 +70,8 @@ main()
 
 	Board::Leds::write(0b110);
 
-	unittest::Controller::run(loggerDevice);
+	extern int run_modm_unit_test();
+	run_modm_unit_test();
 
 	Board::Leds::write(0b111);
 	for (;;) {}

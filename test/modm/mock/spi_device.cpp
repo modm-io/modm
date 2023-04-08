@@ -11,8 +11,6 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <unittest/reporter.hpp>
-#include <unittest/controller.hpp>
 #include <unittest/harness.hpp>
 
 #include "spi_device.hpp"
@@ -76,23 +74,22 @@ modm_test::SpiDevice::deselect()
 
 	if (reportErrors)
 	{
-		unittest::Reporter& reporter = unittest::Controller::instance().getReporter();
 		if (error == NO_ERROR) {
-			reporter.reportPass();
+			unittest::reporter.reportPass();
 		}
 		else if (error & DOUBLE_SELECT) {
 			error &= ~DOUBLE_SELECT;
-			reporter.reportFailure(lineNumber) << "Double select detected" << modm::endl;
+			unittest::reporter.reportFailure(lineNumber) << "Double select detected" << modm::endl;
 		}
 		else if (error & WRONG_LENGTH) {
 			error &= ~WRONG_LENGTH;
-			reporter.reportFailure(lineNumber)
+			unittest::reporter.reportFailure(lineNumber)
 					<< "Wrong length (" << bytesWritten << " != "
 					<< expectedLength << ")" << modm::endl;
 		}
 		else if (error & WRONG_DATA_RECEIVED) {
 			error &= ~WRONG_DATA_RECEIVED;
-			modm::IOStream& os = reporter.reportFailure(lineNumber);
+			modm::IOStream& os = unittest::reporter.reportFailure(lineNumber);
 			os << "Error in Transmission " << currentTransmission << "\n" " expected = ";
 			std::size_t length = transmissions[currentTransmission].length;
 			unittest::printArray(os, 0, length, transmissions[currentTransmission].rx);
@@ -169,19 +166,17 @@ modm_test::SpiDevice::start(const Transmission* transmissions,
 void
 modm_test::SpiDevice::finish()
 {
-	unittest::Reporter& reporter = unittest::Controller::instance().getReporter();
-
 	if (reportErrors)
 	{
 		if (selected) {
 			deselect();
 
-			reporter.reportFailure(lineNumber) << "Device still selected\n";
+			unittest::reporter.reportFailure(lineNumber) << "Device still selected\n";
 		}
 
 		if ((error & MAX_TRANSMISSION_COUNT_EXCEEDED) || !complete) {
 			error &= ~MAX_TRANSMISSION_COUNT_EXCEEDED;
-			reporter.reportFailure(lineNumber)
+			unittest::reporter.reportFailure(lineNumber)
 					<< "Transmission Count (" << currentTransmission << " == "
 					<< transmissionCount << ")" << modm::endl;
 		}

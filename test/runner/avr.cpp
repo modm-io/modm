@@ -13,11 +13,15 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
-#include <unittest/controller.hpp>
+#include <unittest/reporter.hpp>
 
 using namespace modm::platform;
 
 extern Board::LoggerDevice loggerDevice;
+namespace unittest
+{
+	Reporter reporter(loggerDevice);
+}
 
 int
 main()
@@ -30,7 +34,8 @@ main()
 
 	Board::Leds::write(0b110);
 
-	unittest::Controller::run(loggerDevice);
+	extern int run_modm_unit_test();
+	run_modm_unit_test();
 
 	Board::Leds::write(0b111);
 	for (;;) {}

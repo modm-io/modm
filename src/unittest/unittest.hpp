@@ -13,7 +13,6 @@
 
 #include "unittest/testsuite.hpp"
 #include "unittest/harness.hpp"
-#include "unittest/controller.hpp"
 #include "unittest/reporter.hpp"
 
 #include "unittest/type/count_type.hpp"
