@@ -48,6 +48,7 @@ class CmsisDspModule(Module):
             "transform": [":cmsis:dsp:basic_math", ":cmsis:dsp:complex_math",
                           ":cmsis:dsp:matrix", ":cmsis:dsp:statistics",
                           ":cmsis:dsp:tables"],
+            "window": []
         }
         module.depends(*dependencies[self.name])
         return True
