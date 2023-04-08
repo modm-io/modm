@@ -45,6 +45,7 @@ def build(env):
         env.copy("pico.h")
         env.template("pico.cpp.in", "pico.cpp")
         env.copy("irq.h", "hardware/irq.h")
+        env.copy("timer.h", "hardware/timer.h")
         env.copy("resets.h", "hardware/resets.h")
 
     env.substitutions = {

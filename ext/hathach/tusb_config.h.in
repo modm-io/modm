@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Niklas Hauser
+ * Copyright (c) 2020, 2023, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -24,6 +24,12 @@
 
 %% endfor
 
+%% if target.platform == "rp"
+#if defined TUD_OPT_RP2040_USB_DEVICE_UFRAME_FIX && (TUD_OPT_RP2040_USB_DEVICE_UFRAME_FIX == 1)
+#	error TUD_OPT_RP2040_USB_DEVICE_UFRAME_FIX is not supported in modm currently.
+#endif
+%% endif
+%#
 #include <modm/architecture/interface/assert.h>
 
 // Redirect TinyUSB asserts to use modm_assert

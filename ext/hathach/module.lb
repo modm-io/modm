@@ -112,6 +112,7 @@ def build(env):
     elif target.platform == "rp":
         if target.family == "20":
             tusb_config["CFG_TUSB_MCU"] = "OPT_MCU_RP2040"
+            tusb_config["TUD_OPT_RP2040_USB_DEVICE_UFRAME_FIX"] = "0"
             env.copy("tinyusb/src/portable/raspberrypi/rp2040/", "portable/raspberrypi/rp2040/")
 
     # TinyUSB has a OS abstraction layer for FreeRTOS, but it is causes problems with modm
