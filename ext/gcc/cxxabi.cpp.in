@@ -40,8 +40,8 @@ enum
 // This function is only called when `(guard & 1) != 1`!
 extern "C" int __cxa_guard_acquire(int *guard)
 {
-	std::atomic_int *atomic_guard = reinterpret_cast<std::atomic_int *>(guard);
-	if (atomic_guard->exchange(INITIALIZING) == INITIALIZING)
+	auto atomic_guard = std::atomic_ref(*guard);
+	if (atomic_guard.exchange(INITIALIZING) == INITIALIZING)
 	{
 		modm_assert(0, "stat.rec",
 				"Recursive initialization of a function static!", guard);
@@ -52,8 +52,8 @@ extern "C" int __cxa_guard_acquire(int *guard)
 // After this function the compiler expects `(guard & 1) == 1`!
 extern "C" void __cxa_guard_release(int *guard) noexcept
 {
-	std::atomic_int *atomic_guard = reinterpret_cast<std::atomic_int *>(guard);
-	atomic_guard->store(INITIALIZED);
+	auto atomic_guard = std::atomic_ref(*guard);
+	atomic_guard.store(INITIALIZED);
 }
 
 // Called if the initialization terminates by throwing an exception.
@@ -61,8 +61,8 @@ extern "C" void __cxa_guard_release(int *guard) noexcept
 extern "C" void __cxa_guard_abort([[maybe_unused]] int *guard) noexcept
 {
 %% if with_exceptions
-	std::atomic_int *atomic_guard = reinterpret_cast<std::atomic_int *>(guard);
-	atomic_guard->store(UNINITIALIZED);
+	auto atomic_guard = std::atomic_ref(*guard);
+	atomic_guard.store(UNINITIALIZED);
 %% endif
 }
 %% endif
