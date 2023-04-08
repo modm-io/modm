@@ -19,5 +19,6 @@
     <module>modm-test:test:processing</module>
     <module>modm-test:test:ui</module> -->
     <module>modm-test:test:math</module>
+    <module>modm-test:test:ext</module>
   </modules>
 </library>
