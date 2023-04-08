@@ -82,14 +82,6 @@ env.Append(CCFLAGS="$ARCHFLAGS")
 env.Append(ASFLAGS="$ARCHFLAGS")
 env.Append(LINKFLAGS="$ARCHFLAGS")
 
-%% if platform != "hosted"
-if env.CompilerVersion() >= 120000:
-	env.Append(LINKFLAGS="-Wl,--no-warn-rwx-segment")
-%% if core.startswith("avr")
-	env.Append(CCFLAGS="--param=min-pagesize=0")
-%% endif
-%% endif
-
 %% if family != "darwin"
 # Search all linked static libraries multiple times
 env["_LIBFLAGS"] = "-Wl,--start-group " + env["_LIBFLAGS"] + " -Wl,--end-group"
