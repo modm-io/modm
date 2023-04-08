@@ -89,6 +89,16 @@ run-nucleo-f767zi:
 	$(call run-test,nucleo-f767zi,size)
 
 
+compile-nucleo-g071rb_A:
+	$(call compile-test,nucleo-g071rb_A,size)
+run-nucleo-g071rb_A:
+	$(call run-test,nucleo-g071rb_A,size)
+compile-nucleo-g071rb_B:
+	$(call compile-test,nucleo-g071rb_B,size)
+run-nucleo-g071rb_B:
+	$(call run-test,nucleo-g071rb_B,size)
+
+
 compile-nucleo-g474re:
 	$(call compile-test,nucleo-g474re,size)
 run-nucleo-g474re:
