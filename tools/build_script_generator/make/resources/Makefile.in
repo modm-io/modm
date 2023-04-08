@@ -146,19 +146,19 @@ ui?=tui
 .PHONY: debug
 debug: build
 	@$(PYTHON3) -m modm_tools.gdb $(MODM_GDB_COMMANDS) \
-	  		$(MODM_GDB_COMMANDS_OPENOCD) --elf $(ELF_FILE) --ui=$(ui) \
+			$(MODM_GDB_COMMANDS_OPENOCD) --elf $(ELF_FILE) --ui=$(ui) \
 			openocd $(addprefix -f ,$(MODM_OPENOCD_CONFIGFILES))
 
 .PHONY: debug-bmp
 debug-bmp: build
 	@$(PYTHON3) -m modm_tools.gdb $(MODM_GDB_COMMANDS) \
-	  		$(MODM_GDB_COMMANDS_BMP) --elf $(ELF_FILE) --ui=$(ui) \
+			$(MODM_GDB_COMMANDS_BMP) --elf $(ELF_FILE) --ui=$(ui) \
 			bmp -p $(port)
 
 .PHONY: debug-jlink
 debug-jlink: build
 	@$(PYTHON3) -m modm_tools.gdb $(MODM_GDB_COMMANDS) \
-	  		$(MODM_GDB_COMMANDS_JLINK) --elf $(ELF_FILE) --ui=$(ui) \
+			$(MODM_GDB_COMMANDS_JLINK) --elf $(ELF_FILE) --ui=$(ui) \
 			jlink -device $(MODM_JLINK_DEVICE)
 
 coredump?=coredump.txt
