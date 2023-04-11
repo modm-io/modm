@@ -11,6 +11,7 @@
 #pragma once
 
 #include <modm/architecture/interface/adc.hpp>
+#include <modm/architecture/interface/register.hpp>
 #include <modm/math/algorithm/prescaler.hpp>
 #include <modm/platform/clock/clockgen.hpp>
 #include <modm/platform/gpio/connector.hpp>
@@ -88,6 +89,29 @@ public:
 %% endif
 		AnalogComparator = AFEC_MR_TRGSEL_AFEC_TRIG6
 	};
+
+	/// AFEC interrupt flags
+	enum class Interrupt : uint32_t
+	{
+		Ch0EndOfConversion = Bit0,
+		Ch1EndOfConversion = Bit1,
+		Ch2EndOfConversion = Bit2,
+		Ch3EndOfConversion = Bit3,
+		Ch4EndOfConversion = Bit4,
+		Ch5EndOfConversion = Bit5,
+		Ch6EndOfConversion = Bit6,
+		Ch7EndOfConversion = Bit7,
+		Ch8EndOfConversion = Bit8,
+		Ch9EndOfConversion = Bit9,
+		Ch10EndOfConversion = Bit10,
+		Ch11EndOfConversion = Bit11,
+
+		DataReady = Bit24,
+		Overrun = Bit25,
+		ComparisonError = Bit26
+	};
+
+	MODM_FLAGS32(Interrupt);
 %% endif
 
 public:
@@ -179,11 +203,48 @@ public:
 		return Regs()->{{reg}}_ISR & {{reg}}_ISR_DRDY;
 	}
 
+	/// Read value of the last conversion
 	static inline uint16_t
 	getValue()
 	{
 		return (uint16_t)(Regs()->{{reg}}_LCDR & 0xffff);
 	}
+
+%% if target.family == "e7x/s7x/v7x"
+	/**
+	 * Read last valid conversion result of channel
+	 * Clears the channel end of conversion status flag
+	 * @warning Data is only valid when the corresponding channel is enabled
+	 */
+	static inline uint16_t
+	getChannelValue(Channel channel)
+	{
+		Regs()->{{reg}}_CSELR = static_cast<uint8_t>(channel);
+		return Regs()->{{reg}}_CDR;
+	}
+
+	/**
+	 * Read last valid conversion result of channel of pin
+	 * Clears the channel end of conversion status flag
+	 * @warning Data is only valid when the corresponding channel is enabled
+	 */
+	template<typename Pin>
+	static uint16_t
+	getChannelValue()
+	{
+		return getChannelValue(static_cast<Channel>(getPinChannel<Pin>()));
+	}
+
+	/**
+	 * Read interrupt status flags
+	 * DataReady, Overrun and ComparisonError flags are cleared.
+	 */
+	static inline Interrupt_t
+	readInterruptStatus()
+	{
+		return Interrupt_t{Regs()->{{reg}}_ISR};
+	}
+%% endif
 
 	static inline uint16_t
 	readChannel(uint8_t channel)
@@ -207,8 +268,42 @@ public:
 	{
 		if (channel >= {{channel_count}}) return false;
 		Regs()->{{reg}}_CHDR = (1u << {{channel_count}}) - 1u;
-		Regs()->{{reg}}_CHER = (1 << channel);
+		Regs()->{{reg}}_CHER = (1u << channel);
 		return true;
+	}
+
+	/**
+	 * Enable multi-channel conversion sequence.
+	 * Conversion order is sequential by channel number, not as specified by the arguments.
+	 * @arg channels Up to 12 channels of type @ref Channel
+	 */
+	template<typename... Cs>
+	static inline void
+	setChannels(Cs... channels)
+	{
+		static_assert((std::is_same_v<Cs, Channel> && ...));
+		static_assert(sizeof...(Cs) <= {{channel_count}});
+		Regs()->{{reg}}_CHDR = (1u << {{channel_count}}) - 1u;
+		Regs()->{{reg}}_CHER = ((1u << static_cast<uint8_t>(channels)) | ...);
+	}
+
+	template<typename Pin>
+	static inline void
+	setPinChannel()
+	{
+		setChannel(getPinChannel<Pin>());
+	}
+
+	/**
+	 * Enable multi-channel conversion sequence.
+	 * Conversion order is sequential by channel number, not as specified by the arguments.
+	 * @tparam Pins ADC channel pins
+	 */
+	template<typename... Pins>
+	static inline void
+	setPinChannels()
+	{
+		setChannels(static_cast<Channel>(getPinChannel<Pins>())...);
 	}
 
 	static inline void
@@ -272,6 +367,7 @@ public:
 		using Connector = typename Pin::Ad::template Connector<Peripherals::{{peripheral}}, Peripherals::{{peripheral}}::Ad>;
 
 		static_assert(Connector::PinSignal::AdcChannel >= 0, "Pin cannot be used as ADC input");
+		static_assert(Connector::PinSignal::AdcChannel < {{channel_count}});
 		return Connector::PinSignal::AdcChannel;
 	}
 };
