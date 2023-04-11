@@ -59,8 +59,38 @@ public:
 	};
 %% endif
 
+%% if target.family == "e7x/s7x/v7x"
+	enum class Resolution : uint32_t
+	{
+		Full_12Bit = AFEC_EMR_RES(0),
+		Low_10Bit = AFEC_EMR_RES(1),
+		Average4_13Bit = AFEC_EMR_RES(2),
+		Average16_14Bit = AFEC_EMR_RES(3),
+		Average64_15Bit = AFEC_EMR_RES(4),
+		Average256_16Bit = AFEC_EMR_RES(5)
+	};
+
+	enum class Trigger
+	{
+		Adtrg = AFEC_MR_TRGSEL_AFEC_TRIG0,
+%% if instance == "0"
+		Tc0Tioa = AFEC_MR_TRGSEL_AFEC_TRIG1,
+		Tc1Tioa = AFEC_MR_TRGSEL_AFEC_TRIG2,
+		Tc2Tioa = AFEC_MR_TRGSEL_AFEC_TRIG3,
+		Pwm0Event0 = AFEC_MR_TRGSEL_AFEC_TRIG4,
+		Pwm0Event1 = AFEC_MR_TRGSEL_AFEC_TRIG5,
+%% elif instance == "1"
+		Tc3Tioa = AFEC_MR_TRGSEL_AFEC_TRIG1,
+		Tc4Tioa = AFEC_MR_TRGSEL_AFEC_TRIG2,
+		Tc5Tioa = AFEC_MR_TRGSEL_AFEC_TRIG3,
+		Pwm1Event0 = AFEC_MR_TRGSEL_AFEC_TRIG4,
+		Pwm1Event1 = AFEC_MR_TRGSEL_AFEC_TRIG5,
+%% endif
+		AnalogComparator = AFEC_MR_TRGSEL_AFEC_TRIG6
+	};
+%% endif
+
 public:
-	// start inherited documentation
 	template<class Pin, class... Pins>
 	static inline void
 	connect()
@@ -113,6 +143,9 @@ public:
 			// Also, none of the 3 vendor HALs use the reset value of 0.
 			{{reg}}_MR_TRACKTIM(14) |
 			{{reg}}_MR_ONE; // reserved, must always be set
+
+		// Require only a single trigger for oversampled conversions
+		Regs()->{{reg}}_EMR = {{reg}}_EMR_STM;
 %% else
 			{{reg}}_MR_TRANSFER(2);
 %% endif
@@ -130,6 +163,10 @@ public:
 %% endif
 	}
 
+	/**
+	 * Software trigger to start conversion.
+	 * @warn Has no effect if hardware triggers or free-running mode are enabled.
+	 */
 	static inline void
 	startConversion()
 	{
@@ -186,8 +223,6 @@ public:
 		Regs()->{{reg}}_MR &= ~{{reg}}_MR_FREERUN;
 	}
 
-	// end inherited documentation
-
 %% if target.family != "e7x/s7x/v7x"
 	/** Configure the amount of time the ADC input is allowed to settle before sampling
 	 */
@@ -197,6 +232,38 @@ public:
 		Regs()->{{reg}}_MR = (Regs()->{{reg}}_MR & ~{{reg}}_MR_SETTLING_Msk) | {{reg}}_MR_SETTLING((uint8_t)time);
 	}
 %% endif
+
+%% if target.family == "e7x/s7x/v7x"
+	static inline void
+	setResolution(Resolution r)
+	{
+		Regs()->{{reg}}_EMR = (Regs()->{{reg}}_EMR & ~{{reg}}_EMR_RES_Msk) | static_cast<uint32_t>(r);
+	}
+
+	/**
+	 * Configure and enable hardware triggering.
+	 * @warn Triggers are ignored if free-running mode is active.
+	 */
+	static inline void
+	enableHardwareTrigger(Trigger trigger)
+	{
+		Regs()->{{reg}}_MR &= ~({{reg}}_MR_TRGEN | AFEC_MR_TRGSEL_Msk);
+		Regs()->{{reg}}_MR |= {{reg}}_MR_TRGEN | static_cast<uint32_t>(trigger);
+	}
+
+	static inline void
+	disableHardwareTrigger()
+	{
+		Regs()->{{reg}}_MR &= ~{{reg}}_MR_TRGEN;
+	}
+%% endif
+
+	/// Get data register pointer for use with DMA
+	static const volatile uint32_t*
+	dataRegister()
+	{
+		return &Regs()->{{reg}}_LCDR;
+	}
 
 	template<class Pin>
 	static inline constexpr uint8_t

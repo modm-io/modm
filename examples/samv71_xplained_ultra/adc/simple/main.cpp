@@ -15,8 +15,8 @@
 using namespace modm::platform;
 using namespace modm::literals;
 
-using Ad2 = GpioA19::Ad; // channel 0, pin AD2 on board
-using Ad3 = GpioD30::Ad; // channel 8, pin AD3 on board
+using Ad2 = GpioA19::Ad; // channel 8, pin AD2 on board
+using Ad3 = GpioD30::Ad; // channel 0, pin AD3 on board
 
 int main()
 {
@@ -24,6 +24,9 @@ int main()
 
 	Afec0::initialize<Board::SystemClock>();
 	Afec0::connect<Ad2::Ad, Ad3::Ad>();
+
+	// Enable x4 oversampling. Output resolution of averaged samples is 13 bits.
+	Afec0::setResolution(Afec0::Resolution::Average4_13Bit);
 
 	while (true)
 	{
