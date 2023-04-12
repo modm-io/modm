@@ -126,6 +126,9 @@ public:
 
 	constexpr LinkedListTransfer();
 
+	constexpr LinkedListTransfer(const LinkedListTransfer& other);
+	constexpr LinkedListTransfer& operator=(const LinkedListTransfer& other);
+
 	template<std::size_t index, typename... Ds>
 	friend auto descriptor(LinkedListTransfer<Ds...>& transfer);
 

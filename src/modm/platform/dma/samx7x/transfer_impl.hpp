@@ -188,6 +188,22 @@ constexpr LinkedListTransfer<Descriptors...>::LinkedListTransfer()
 	detail::SetupList<0, std::tuple<Descriptors...>>::setup(descriptors_);
 }
 
+template<typename... Descriptors>
+constexpr LinkedListTransfer<Descriptors...>::LinkedListTransfer(const LinkedListTransfer& other)
+	: descriptors_{other.descriptors_}
+{
+	detail::SetupList<0, std::tuple<Descriptors...>>::setAddress(descriptors_);
+}
+
+template<typename... Descriptors>
+constexpr LinkedListTransfer<Descriptors...>&
+LinkedListTransfer<Descriptors...>::operator=(const LinkedListTransfer& other)
+{
+	descriptors_ = other.descriptors_;
+	detail::SetupList<0, std::tuple<Descriptors...>>::setAddress(descriptors_);
+	return *this;
+}
+
 template<std::size_t index, typename... Descriptors>
 auto descriptor(LinkedListTransfer<Descriptors...>& transfer)
 {
