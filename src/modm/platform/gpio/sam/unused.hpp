@@ -31,7 +31,7 @@ public:
 	using Type = GpioUnused;
 	static constexpr bool isInverted = false;
 	static constexpr PortName port = PortName(-1);
-	static constexpr uint8_t pin = uint8_t(-1);
+	static constexpr uint8_t pin = 0;
 	static constexpr uint32_t mask = 0;
 
 	// GpioOutput
