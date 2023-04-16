@@ -15,7 +15,7 @@
 #include <algorithm>
 
 extern void
-board_initialize_display(uint8_t);
+board_initialize_display_nt35510(uint8_t);
 
 // Basic implementation of display running on memory mapped buffer
 class DsiDisplay : public modm::ColorGraphicDisplay
@@ -86,14 +86,14 @@ protected:
 void
 Board::initializeDisplay()
 {
-	board_initialize_display(2);
+	board_initialize_display_nt35510(2);
 }
 
 void
 Board::setDisplayBuffer(void * buffer)
 {
 	// ColorCoding: 0 = ARGB8888, 2 = RGB565
-	board_initialize_display(2);
+	board_initialize_display_nt35510(2);
 	// Configures the color frame buffer start address
 	LTDC_Layer1->CFBAR = uint32_t(buffer);
 	// Enable LTDC_Layer by setting LEN bit

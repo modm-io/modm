@@ -45,9 +45,11 @@ def build(env):
     }
     env.template("../board.cpp.in", "board.cpp")
     env.copy("board_display.cpp")
-    env.copy("board_dsi.cpp")
+    # env.copy("board_dsi.cpp")
+    env.copy("board_dsi_nt35510.cpp")
     env.copy("board_init.cpp")
-    env.copy("board_otm8009a.cpp")
+    # env.copy("board_otm8009a.cpp")
+    env.copy("board_nt35510.cpp")
     env.copy("board_sdram.cpp")
     env.template("board.hpp.in")
     env.collect(":build:openocd.source", "board/stm32f469discovery.cfg")

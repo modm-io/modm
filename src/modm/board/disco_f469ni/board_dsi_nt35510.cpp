@@ -9,15 +9,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "board.hpp"
+#include <modm/board.hpp>
 #include <modm/platform/clock/rcc.hpp>
 
 extern void
-otm8009a_init(uint8_t);
+nt35510_init(uint8_t);
 
 // ---------------------------------- DISPLAY ----------------------------------
 void
-board_initialize_display(uint8_t ColorCoding)
+board_initialize_display_nt35510(uint8_t ColorCoding)
 {
 	using namespace modm::platform;
 	if (Rcc::isEnabled<Peripheral::Ltdc>()) return;
@@ -57,12 +57,14 @@ board_initialize_display(uint8_t ColorCoding)
 		DSI->IER[1] = 0;
 	}
 
-	constexpr uint32_t VSA = 12;
-	constexpr uint32_t VBP = 12;
-	constexpr uint32_t VFP = 12;
+	constexpr uint32_t VSA = 2;
+	constexpr uint32_t VBP = 34;
+	constexpr uint32_t VFP = 34;
+
 	constexpr uint32_t HSA = 120;
-	constexpr uint32_t HBP = 120;
-	constexpr uint32_t HFP = 120;
+	constexpr uint32_t HBP = 150;
+	constexpr uint32_t HFP = 150;
+
 	constexpr uint32_t HACT = 800;
 	constexpr uint32_t VACT = 480;
 	const uint8_t pixel_size = (ColorCoding == 0) ? sizeof(uint32_t) : sizeof(uint16_t);
@@ -155,7 +157,7 @@ board_initialize_display(uint8_t ColorCoding)
 		LTDC->GCR |= LTDC_GCR_LTDCEN;
 	}
 
-	otm8009a_init(ColorCoding);
+	nt35510_init(ColorCoding);
 
 	{
 		// HAL_LTDC_ConfigLayer()
