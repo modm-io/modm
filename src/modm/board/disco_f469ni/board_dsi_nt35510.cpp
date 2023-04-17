@@ -17,7 +17,7 @@ nt35510_init(uint8_t);
 
 // ---------------------------------- DISPLAY ----------------------------------
 void
-board_initialize_display_nt35510(uint8_t ColorCoding)
+board_initialize_display(uint8_t ColorCoding)
 {
 	using namespace modm::platform;
 	if (Rcc::isEnabled<Peripheral::Ltdc>()) return;

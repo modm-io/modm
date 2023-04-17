@@ -57,12 +57,12 @@ board_initialize_display(uint8_t ColorCoding)
 		DSI->IER[1] = 0;
 	}
 
-	constexpr uint32_t VSA = 240;
-	constexpr uint32_t VBP = 255;
+	constexpr uint32_t VSA = 12;
+	constexpr uint32_t VBP = 12;
 	constexpr uint32_t VFP = 12;
-	constexpr uint32_t HSA = 800;
-	constexpr uint32_t HBP = 12;
-	constexpr uint32_t HFP = 12;
+	constexpr uint32_t HSA = 120;
+	constexpr uint32_t HBP = 120;
+	constexpr uint32_t HFP = 120;
 	constexpr uint32_t HACT = 800;
 	constexpr uint32_t VACT = 480;
 	const uint8_t pixel_size = (ColorCoding == 0) ? sizeof(uint32_t) : sizeof(uint16_t);
