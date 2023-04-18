@@ -79,7 +79,7 @@ modm::Ads7843<Spi, Cs, Int>::read(glcd::Point * point)
 
 	if (count == 9) {
 		glcd::Point p;
-		if (getAverage(bufferX, p.x) && getAverage(bufferY, p.y)) {
+		if (getAverage(bufferX, p.x()) && getAverage(bufferY, p.y())) {
 			*point = p;
 			return true;
 		}

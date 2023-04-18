@@ -72,10 +72,10 @@ modm::gui::View::update()
 bool
 modm::gui::View::pack(Widget *w, const modm::glcd::Point &coord)
 {
-	if(coord.x >= this->dimension.width ||
-	   coord.y >= this->dimension.height ||
-	   coord.x < 0 ||
-	   coord.y < 0)
+	if(coord.x() >= this->dimension.width ||
+	   coord.y() >= this->dimension.height ||
+	   coord.x() < 0 ||
+	   coord.y() < 0)
 	{
 		return false;
 	}

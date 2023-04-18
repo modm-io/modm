@@ -253,8 +253,8 @@ Polygon2DTest::testIntersectionPointsLineSegment()
 	TEST_ASSERT_TRUE(polygon.getIntersections(line, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 1U);
 
-	TEST_ASSERT_EQUALS(points[0].getX(), 18);
-	TEST_ASSERT_EQUALS(points[0].getY(), -6);
+	TEST_ASSERT_EQUALS(points[0].x(), 18);
+	TEST_ASSERT_EQUALS(points[0].y(), -6);
 
 	points.removeAll();
 
@@ -264,8 +264,8 @@ Polygon2DTest::testIntersectionPointsLineSegment()
 	TEST_ASSERT_TRUE(polygon.getIntersections(line, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 1U);
 
-	TEST_ASSERT_EQUALS(points[0].getX(),  30);
-	TEST_ASSERT_EQUALS(points[0].getY(), -10);
+	TEST_ASSERT_EQUALS(points[0].x(),  30);
+	TEST_ASSERT_EQUALS(points[0].y(), -10);
 
 	points.removeAll();
 
@@ -275,17 +275,17 @@ Polygon2DTest::testIntersectionPointsLineSegment()
 	TEST_ASSERT_TRUE(polygon.getIntersections(line, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 4U);
 
-	TEST_ASSERT_EQUALS(points[0].getX(), 32);
-	TEST_ASSERT_EQUALS(points[0].getY(), 30);
+	TEST_ASSERT_EQUALS(points[0].x(), 32);
+	TEST_ASSERT_EQUALS(points[0].y(), 30);
 
-	TEST_ASSERT_EQUALS(points[1].getX(), 37);
-	TEST_ASSERT_EQUALS(points[1].getY(), 11);
+	TEST_ASSERT_EQUALS(points[1].x(), 37);
+	TEST_ASSERT_EQUALS(points[1].y(), 11);
 
-	TEST_ASSERT_EQUALS(points[2].getX(), 42);
-	TEST_ASSERT_EQUALS(points[2].getY(), -8);
+	TEST_ASSERT_EQUALS(points[2].x(), 42);
+	TEST_ASSERT_EQUALS(points[2].y(), -8);
 
-	TEST_ASSERT_EQUALS(points[3].getX(),  44);
-	TEST_ASSERT_EQUALS(points[3].getY(), -15);
+	TEST_ASSERT_EQUALS(points[3].x(),  44);
+	TEST_ASSERT_EQUALS(points[3].y(), -15);
 
 	points.removeAll();
 
@@ -295,14 +295,14 @@ Polygon2DTest::testIntersectionPointsLineSegment()
 	TEST_ASSERT_TRUE(polygon.getIntersections(line, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 3U);
 
-	TEST_ASSERT_EQUALS(points[0].getX(), 32);
-	TEST_ASSERT_EQUALS(points[0].getY(), 30);
+	TEST_ASSERT_EQUALS(points[0].x(), 32);
+	TEST_ASSERT_EQUALS(points[0].y(), 30);
 
-	TEST_ASSERT_EQUALS(points[1].getX(), 36);
-	TEST_ASSERT_EQUALS(points[1].getY(),  9);
+	TEST_ASSERT_EQUALS(points[1].x(), 36);
+	TEST_ASSERT_EQUALS(points[1].y(),  9);
 
-	TEST_ASSERT_EQUALS(points[2].getX(), 39);
-	TEST_ASSERT_EQUALS(points[2].getY(), -6);
+	TEST_ASSERT_EQUALS(points[2].x(), 39);
+	TEST_ASSERT_EQUALS(points[2].y(), -6);
 
 	points.removeAll();
 
@@ -312,11 +312,11 @@ Polygon2DTest::testIntersectionPointsLineSegment()
 	TEST_ASSERT_TRUE(polygon.getIntersections(line, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 2U);
 
-	TEST_ASSERT_EQUALS(points[0].getX(), 50);
-	TEST_ASSERT_EQUALS(points[0].getY(), 30);
+	TEST_ASSERT_EQUALS(points[0].x(), 50);
+	TEST_ASSERT_EQUALS(points[0].y(), 30);
 
-	TEST_ASSERT_EQUALS(points[1].getX(), 50);
-	TEST_ASSERT_EQUALS(points[1].getY(), 30);
+	TEST_ASSERT_EQUALS(points[1].x(), 50);
+	TEST_ASSERT_EQUALS(points[1].y(), 30);
 
 	points.removeAll();
 }

@@ -209,7 +209,7 @@ Ili9341<Interface, Reset, Backlight, BufferSize>::drawHorizontalLine(
 
 	BatchHandle h(*this);
 
-	setClipping(start.getX(), start.getY(), length, 1);
+	setClipping(start.x(), start.y(), length, 1);
 	while (length > BufferSize)
 	{
 		this->writeData(buffer, BufferSize * 2);
@@ -230,7 +230,7 @@ Ili9341<Interface, Reset, Backlight, BufferSize>::drawVerticalLine(
 
 	BatchHandle h(*this);
 
-	setClipping(start.getX(), start.getY(), 1, length);
+	setClipping(start.x(), start.y(), 1, length);
 	while (length > BufferSize)
 	{
 		this->writeData(buffer, BufferSize * 2);
@@ -244,8 +244,8 @@ void
 Ili9341<Interface, Reset, Backlight, BufferSize>::fillRectangle(
 		glcd::Point upperLeft, uint16_t width, uint16_t height)
 {
-	auto const x { upperLeft.getX() };
-	auto const y { upperLeft.getY() };
+	auto const x { upperLeft.x() };
+	auto const y { upperLeft.y() };
 	std::size_t pixelCount { std::size_t(width) * std::size_t(height) };
 
 	uint16_t const pixelValue { modm::toBigEndian(foregroundColor.color) };
@@ -281,7 +281,7 @@ Ili9341<Interface, Reset, Backlight, BufferSize>::fillCircle(
 
 	BatchHandle h(*this);
 
-	setClipping(center.getX() - radius, center.getY(), 2 * radius, 1);
+	setClipping(center.x() - radius, center.y(), 2 * radius, 1);
 	for (std::size_t i = 0; i < 2 * radius; ++i)
 		this->writeData(setColor, 2);
 
@@ -297,16 +297,16 @@ Ili9341<Interface, Reset, Backlight, BufferSize>::fillCircle(
 		ddF_x += 2;
 		f += ddF_x + 1;
 
-		setClipping(center.getX() - x, center.getY() - y, 2 * x, 1);
+		setClipping(center.x() - x, center.y() - y, 2 * x, 1);
 		for (std::size_t i = 0; i < 2 * x; ++i)
 			this->writeData(setColor, 2);
-		setClipping(center.getX() - y, center.getY() - x, 2 * y, 1);
+		setClipping(center.x() - y, center.y() - x, 2 * y, 1);
 		for (std::size_t i = 0; i < 2 * y; ++i)
 			this->writeData(setColor, 2);
-		setClipping(center.getX() - x, center.getY() + y, 2 * x, 1);
+		setClipping(center.x() - x, center.y() + y, 2 * x, 1);
 		for (std::size_t i = 0; i < 2 * x; ++i)
 			this->writeData(setColor, 2);
-		setClipping(center.getX() - y, center.getY() + x, 2 * y, 1);
+		setClipping(center.x() - y, center.y() + x, 2 * y, 1);
 		for (std::size_t i = 0; i < 2 * y; ++i)
 			this->writeData(setColor, 2);
 	}
@@ -324,7 +324,7 @@ Ili9341<Interface, Reset, Backlight, BufferSize>::drawImageRaw(glcd::Point upper
 
 	BatchHandle h(*this);
 
-	setClipping(upperLeft.getX(), upperLeft.getY(), width, height);
+	setClipping(upperLeft.x(), upperLeft.y(), width, height);
 
 	uint8_t bit = 0x01;
 	for (uint16_t r = 0; r < height; ++r)
@@ -356,7 +356,7 @@ Ili9341<Interface, Reset, Backlight, BufferSize>::drawRaw(glcd::Point upperLeft,
 		buffer[i] = modm::fromBigEndian(buffer[i]);
 	}
 
-	setClipping(upperLeft.getX(), upperLeft.getY(), width, height);
+	setClipping(upperLeft.x(), upperLeft.y(), width, height);
 	this->writeData((uint8_t*)buffer, width * height * 2);
 }
 
@@ -428,7 +428,7 @@ Ili9341<Interface, Reset, Backlight, BufferSize>::drawBitmap(glcd::Point upperLe
 {
 	BatchHandle h(*this);
 
-	setClipping(upperLeft.getX(), upperLeft.getY(), width, height);
+	setClipping(upperLeft.x(), upperLeft.y(), width, height);
 	for (int i = 0; i < width * height; ++i) {
 		buffer[0] = data[i*2+1];
 		buffer[1] = data[i*2];

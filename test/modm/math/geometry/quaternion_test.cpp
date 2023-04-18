@@ -12,8 +12,9 @@
 
 #include <modm/math/geometry/vector.hpp>
 #include <modm/math/geometry/quaternion.hpp>
-#include "quaternion_test.hpp"
 #include <modm/math/geometry/angle.hpp>
+
+#include "quaternion_test.hpp"
 
 void
 QuaternionTest::testConstructor()

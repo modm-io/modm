@@ -135,23 +135,23 @@ static void
 drawCross(modm::ColorGraphicDisplay& display, modm::glcd::Point center)
 {
 	display.setColor(Red);
-	display.drawLine(center.x - 15, center.y, center.x - 2, center.y);
-	display.drawLine(center.x + 2, center.y, center.x + 15, center.y);
-	display.drawLine(center.x, center.y - 15, center.x, center.y - 2);
-	display.drawLine(center.x, center.y + 2, center.x, center.y + 15);
+	display.drawLine(center.x()- 15, center.y(), center.x()- 2, center.y());
+	display.drawLine(center.x()+ 2, center.y(), center.x()+ 15, center.y());
+	display.drawLine(center.x(), center.y() - 15, center.x(), center.y() - 2);
+	display.drawLine(center.x(), center.y() + 2, center.x(), center.y() + 15);
 
 	display.setColor(White);
-	display.drawLine(center.x - 15, center.y + 15, center.x - 7, center.y + 15);
-	display.drawLine(center.x - 15, center.y + 7, center.x - 15, center.y + 15);
+	display.drawLine(center.x()- 15, center.y() + 15, center.x()- 7, center.y() + 15);
+	display.drawLine(center.x()- 15, center.y() + 7, center.x()- 15, center.y() + 15);
 
-	display.drawLine(center.x - 15, center.y - 15, center.x - 7, center.y - 15);
-	display.drawLine(center.x - 15, center.y - 7, center.x - 15, center.y - 15);
+	display.drawLine(center.x()- 15, center.y() - 15, center.x()- 7, center.y() - 15);
+	display.drawLine(center.x()- 15, center.y() - 7, center.x()- 15, center.y() - 15);
 
-	display.drawLine(center.x + 7, center.y + 15, center.x + 15, center.y + 15);
-	display.drawLine(center.x + 15, center.y + 7, center.x + 15, center.y + 15);
+	display.drawLine(center.x()+ 7, center.y() + 15, center.x()+ 15, center.y() + 15);
+	display.drawLine(center.x()+ 15, center.y() + 7, center.x()+ 15, center.y() + 15);
 
-	display.drawLine(center.x + 7, center.y - 15, center.x + 15, center.y - 15);
-	display.drawLine(center.x + 15, center.y - 15, center.x + 15, center.y - 7);
+	display.drawLine(center.x()+ 7, center.y() - 15, center.x()+ 15, center.y() - 15);
+	display.drawLine(center.x()+ 15, center.y() - 15, center.x()+ 15, center.y() - 7);
 }
 
 static void
@@ -184,14 +184,14 @@ calibrateTouchscreen(modm::ColorGraphicDisplay& display)
 void
 drawPoint(modm::GraphicDisplay& display, modm::glcd::Point point)
 {
-	if (point.x < 0 || point.y < 0) {
+	if (point.x()< 0 || point.y() < 0) {
 		return;
 	}
 
-	display.setPixel(point.x, point.y);
-	display.setPixel(point.x + 1, point.y);
-	display.setPixel(point.x, point.y + 1);
-	display.setPixel(point.x + 1, point.y + 1);
+	display.setPixel(point.x(), point.y());
+	display.setPixel(point.x()+ 1, point.y());
+	display.setPixel(point.x(), point.y() + 1);
+	display.setPixel(point.x()+ 1, point.y() + 1);
 }
 
 // ----------------------------------------------------------------------------

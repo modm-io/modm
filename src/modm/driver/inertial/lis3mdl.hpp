@@ -15,7 +15,7 @@
 #include <modm/architecture/interface/register.hpp>
 #include <modm/processing/resumable.hpp>
 #include <modm/math/utils/endianness.hpp>
-#include <modm/math/geometry/vector3.hpp>
+#include <modm/math/geometry/vector.hpp>
 #include "lis3_transport.hpp"
 
 namespace modm

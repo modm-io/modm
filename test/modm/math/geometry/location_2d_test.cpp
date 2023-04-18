@@ -45,7 +45,7 @@ Location2DTest::testAccessors()
 
 	TEST_ASSERT_EQUALS(location.getPosition(), modm::Vector2i(30, 40));
 
-	location.setPosition(50, 60);
+	location.setPosition({50, 60});
 
 	TEST_ASSERT_EQUALS(location.getPosition(), modm::Vector2i(50, 60));
 
@@ -61,9 +61,9 @@ Location2DTest::testOperators()
 	modm::Location2D<int16_t> locationB;
 	modm::Location2D<int16_t> locationC;
 
-	locationA.setPosition(modm::Vector2i(30, 40));
-	locationB.setPosition(modm::Vector2i(30, 40));
-	locationC.setPosition(modm::Vector2i(30, 41));
+	locationA.position = modm::Vector2i(30, 40);
+	locationB.position = modm::Vector2i(30, 40);
+	locationC.position = modm::Vector2i(30, 41);
 
 	TEST_ASSERT_TRUE(locationA == locationA);
 	TEST_ASSERT_FALSE(locationA != locationA);
@@ -78,7 +78,13 @@ Location2DTest::testOperators()
 	TEST_ASSERT_TRUE(locationA != locationC);
 	TEST_ASSERT_TRUE(locationB != locationC);
 
-	locationA.setOrientation(0.001);
+	locationA.orientation = __FLT_EPSILON__ * 3 / 4;
+	TEST_ASSERT_TRUE(locationA == locationB);
+	TEST_ASSERT_TRUE(locationB == locationA);
+	TEST_ASSERT_FALSE(locationA != locationB);
+	TEST_ASSERT_FALSE(locationB != locationA);
+
+	locationA.orientation = 0.001;
 	TEST_ASSERT_FALSE(locationA == locationB);
 	TEST_ASSERT_FALSE(locationB == locationA);
 	TEST_ASSERT_TRUE(locationA != locationB);
@@ -110,11 +116,9 @@ Location2DTest::testMove()
 void
 Location2DTest::testConvert()
 {
-	modm::Location2D<float> a(
-			modm::Vector<float, 2>(-10.65, 20.31),
-			M_PI);
+	modm::Location2D<float> a({-10.65, 20.31}, M_PI);
 
-	modm::Location2D<int16_t> b = a.convert<int16_t>();
+	modm::Location2D<int16_t> b(a);
 
 	TEST_ASSERT_EQUALS(b.getX(), -11);
 	TEST_ASSERT_EQUALS(b.getY(), 20);

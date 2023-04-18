@@ -47,9 +47,11 @@ namespace modm
 		typedef typename GeometricTraits<T>::FloatType FloatType;
 
 	public:
-		Ray2D();
+		constexpr Ray2D() = default;
 
-		Ray2D(const Vector<T, 2>& start, const Vector<T, 2>& direction);
+		constexpr Ray2D(const Vector<T, 2>& start, const Vector<T, 2>& direction)
+			: basePoint(start), direction(direction)
+		{}
 
 		/// Set the starting point of the ray
 		inline void

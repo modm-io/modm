@@ -11,11 +11,11 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_MATRIX_HPP
-#define MODM_MATRIX_HPP
+#pragma once
 
 #include <cmath>
-#include <string.h>		// for memset() and memcmp()
+#include <span>
+#include <algorithm>
 #include <stdint.h>
 
 #include <modm/io/iostream.hpp>
@@ -31,7 +31,7 @@ namespace modm
 	 * Having the width and height as template parameters has several
 	 * advantages over the tradition dynamic matrix class:
 	 *
-	 * - The compiler knows how many elements you have in your matrix and can
+	 * - The compiler knows how many ElementCount you have in your matrix and can
 	 *   unroll and optimize loops
 	 * - You can ensure that you are not doing operations on matrices with
 	 *   incompatible sizes (multiplication for example). The compiler will
@@ -50,33 +50,40 @@ namespace modm
 	 * \author	Niklas Hauser
 	 * \author	Fabian Greif
 	 */
-	template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+	template<typename T, std::size_t ROWS, std::size_t COLUMNS>
 	class Matrix
 	{
 	public:
+		static constexpr std::size_t RowCount = ROWS;
+		static constexpr std::size_t ColumnCount = COLUMNS;
+		static constexpr std::size_t ElementCount = RowCount * ColumnCount;
+
+		T element[ElementCount]{};
+
 		/**
 		 * \brief	Default Constructor
 		 *
-		 * Creates a Matrix with uninitialized elements. Use zeroMatrix() to
-		 * create a matrix with all elements set to zero.
+		 * Creates a Matrix with uninitialized ElementCount. Use zeroMatrix() to
+		 * create a matrix with all ElementCount set to zero.
 		 */
-		Matrix();
+		constexpr Matrix() = default;
 
 		/**
 		 * \brief	Create a matrix from an array
 		 *
 		 * Example:
 		 * \code
-		 * const int16_t m[6] = {
+		 *
+		 * modm::Matrix<int16_t, 3, 2> a({
 		 *     1, 2,
 		 *     3, 4,
 		 *     5, 6,
-		 * };
-		 *
-		 * modm::Matrix<int16_t, 3, 2> a(m);
+		 * });
 		 * \endcode
 		 */
-		Matrix(const T *data);
+		constexpr Matrix(std::span<const T, ElementCount> data) {
+			std::ranges::copy(data, element);
+		}
 
 		/**
 		 * \brief	Get a zero matrix
@@ -100,52 +107,51 @@ namespace modm
 		 * \brief	Create a new sub matrix
 		 *
 		 */
-		template <uint8_t MR, uint8_t MC>
+		template <std::size_t MR, std::size_t MC>
 		Matrix<T, MR, MC>
-		subMatrix(uint8_t row, uint8_t column) const;
+		subMatrix(std::size_t row, std::size_t column) const;
 
-		bool operator == (const Matrix &m) const;
-		bool operator != (const Matrix &m) const;
+		T* operator [] (std::size_t row);
+		const T* operator [] (std::size_t row) const;
 
-		const T*
-		operator [] (uint8_t row) const;
+		std::size_t getNumberOfRows() const
+		{ return RowCount; }
 
-		T*
-		operator [] (uint8_t row);
-
-		inline uint8_t
-		getNumberOfRows() const;
-
-		inline uint8_t
-		getNumberOfColumns() const;
+		std::size_t getNumberOfColumns() const
+		{ return ColumnCount; }
 
 		Matrix<T, 1, COLUMNS>
-		getRow(uint8_t index) const;
+		getRow(std::size_t index) const;
 
 		Matrix<T, ROWS, 1>
-		getColumn(uint8_t index) const;
+		getColumn(std::size_t index) const;
 
-		// TODO remove these?
-		const T* ptr() const;
-		T* ptr();
+		[[deprecated("Access public member directly")]]
+		T* ptr() { return element; }
 
-		Matrix operator - ();
-		Matrix operator + (const Matrix &rhs) const;
-		Matrix operator - (const Matrix &rhs) const;
-		Matrix operator * (const T &rhs) const;		///< Scalar multiplication
-		Matrix operator / (const T &rhs) const;		///< Scalar division
+		[[deprecated("Access public member directly")]]
+		const T* ptr() const { return element;}
 
-		Matrix& operator += (const Matrix &rhs);
-		Matrix& operator -= (const Matrix &rhs);
-		Matrix& operator *= (const T &rhs);			///< Scalar multiplication
-		Matrix& operator /= (const T &rhs);			///< Scalar division
+		bool operator== (const Matrix &m) const
+		{ return std::equal(element, element + ElementCount, m.element); };
+
+		constexpr Matrix operator- ();
+		constexpr Matrix operator+ (const Matrix &rhs) const;
+		constexpr Matrix operator- (const Matrix &rhs) const;
+		constexpr Matrix operator* (T rhs) const;		///< Scalar multiplication
+		constexpr Matrix operator/ (T rhs) const;		///< Scalar division
+
+		Matrix& operator+= (const Matrix &rhs);
+		Matrix& operator-= (const Matrix &rhs);
+		Matrix& operator*= (T rhs);			///< Scalar multiplication
+		Matrix& operator/= (T rhs);			///< Scalar division
 
 		/// Matrix multiplication with matrices with the same size
-		Matrix operator *= (const Matrix &rhs);
+		Matrix operator*= (const Matrix &rhs);
 
 		/// Matrix multiplication with different size matrices
-		template<uint8_t RHSCOL>
-		Matrix<T, ROWS, RHSCOL>
+		template<std::size_t RHSCOL>
+		constexpr Matrix<T, ROWS, RHSCOL>
 		operator * (const Matrix<T, COLUMNS, RHSCOL> &rhs) const;
 
 		Matrix<T, COLUMNS, ROWS>
@@ -156,7 +162,7 @@ namespace modm
 		 *
 		 * \warning	Will only work if the matrix is square!
 		 */
-		inline void
+		void
 		transpose();
 
 		/**
@@ -164,7 +170,7 @@ namespace modm
 		 *
 		 * Uses modm::determinant(*this);
 		 */
-		inline T
+		T
 		determinant() const;
 
 		// TODO Implement these
@@ -183,62 +189,51 @@ namespace modm
 		replace(const U *data);
 
 		///
-		template<uint8_t MW, uint8_t MH>
+		template<std::size_t MW, std::size_t MH>
 		Matrix&
-		replace(uint8_t row, uint8_t column, const Matrix<T, MW, MH> &m);
+		replace(std::size_t row, std::size_t column, const Matrix<T, MW, MH> &m);
 
 		Matrix&
-		replaceRow(uint8_t index, const Matrix<T, 1, COLUMNS> &m);
+		replaceRow(std::size_t index, const Matrix<T, 1, COLUMNS> &m);
 
 		Matrix&
-		replaceColumn(uint8_t index, const Matrix<T, ROWS, 1> &m);
+		replaceColumn(std::size_t index, const Matrix<T, ROWS, 1> &m);
 
 
 		Matrix<T, ROWS, COLUMNS+1>
-		addColumn(uint8_t index, const Matrix<T, ROWS, 1> &c) const;
+		addColumn(std::size_t index, const Matrix<T, ROWS, 1> &c) const;
 
 		Matrix<T, ROWS+1, COLUMNS>
-		addRow(uint8_t index, const Matrix<T, 1, COLUMNS> &r) const;
+		addRow(std::size_t index, const Matrix<T, 1, COLUMNS> &r) const;
 
 
 		Matrix<T, ROWS, COLUMNS-1>
-		removeColumn(uint8_t index) const;
+		removeColumn(std::size_t index) const;
 
 		Matrix<T, ROWS-1, COLUMNS>
-		removeRow(uint8_t index) const;
-
-	public:
-		T element[ROWS * COLUMNS];
+		removeRow(std::size_t index) const;
 
 	private:
-		/// Size of the Matrix in Bytes
-		inline size_t
-		getSize() const;
-
-		/// Number of elements in the Matrix (rows * columns)
-		inline uint8_t
-		getNumberOfElements() const;
+		std::size_t getSize() const
+		{ return ElementCount * sizeof(T); }
 	};
 
-	template<typename T, uint8_t WIDTH, uint8_t HEIGHT>
+	template<typename T, std::size_t WIDTH, std::size_t HEIGHT>
 	IOStream&
 	operator << (IOStream&, const Matrix<T, WIDTH, HEIGHT>&);
 
-	typedef Matrix<float, 1, 1> Matrix1f;
-	typedef Matrix<float, 2, 2> Matrix2f;
-	typedef Matrix<float, 3, 3> Matrix3f;
-	typedef Matrix<float, 4, 4> Matrix4f;
+	using Matrix1f = Matrix<float, 1, 1>;
+	using Matrix2f = Matrix<float, 2, 2>;
+	using Matrix3f = Matrix<float, 3, 3>;
+	using Matrix4f = Matrix<float, 4, 4>;
 
 	// ------------------------------------------------------------------------
 	/// @cond
 	template<typename T>
-	T
-	determinant(const modm::Matrix<T, 1, 1> &m);
+	T determinant(const modm::Matrix<T, 1, 1> &m);
 
 	template<typename T>
-	T
-	determinant(const modm::Matrix<T, 2, 2> &m);
-	/// @endcond
+	T determinant(const modm::Matrix<T, 2, 2> &m);
 
 	/**
 	 * \brief	Calculate the determinant
@@ -246,12 +241,8 @@ namespace modm
 	 * \param	m	Matrix
 	 * \ingroup	modm_math_matrix
 	 */
-	template<typename T, uint8_t N>
-	T
-	determinant(const modm::Matrix<T, N, N> &m);
-	/// @}
+	template<typename T, std::size_t N>
+	T determinant(const modm::Matrix<T, N, N> &m);
 }
 
 #include "matrix_impl.hpp"
-
-#endif	// MODM_MATRIX_HPP

@@ -1,7 +1,5 @@
 /*
- * Copyright (c) 2009, Martin Rosekeit
- * Copyright (c) 2009-2011, Fabian Greif
- * Copyright (c) 2011-2012, Niklas Hauser
+ * Copyright (c) 2022, Thomas Sommer
  *
  * This file is part of the modm project.
  *
@@ -14,27 +12,24 @@
 #include <unittest/testsuite.hpp>
 
 /// @ingroup modm_test_test_math
-class VectorTest : public unittest::TestSuite
+class Vector5Test : public unittest::TestSuite
 {
 public:
 	void
 	testConstructor();
 
-	void
-	testAssign();
+	// void
+	// testAssign();
 
-	void
-	testCompare();
+	// void
+	// testCompare();
 
-	void
-	testRawDataAccess();
+	// void
+	// testRawDataAccess();
 
 	void
 	testOperators();
 
 	void
 	testLength();
-
-	void
-	testConvert();
 };

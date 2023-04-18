@@ -51,11 +51,8 @@ modm::Lsm6ds33<I2cMaster>::readAccelerationRaw(Vector3i& acceleration)
 {
 	RF_BEGIN();
 	success = RF_CALL(this->read(static_cast<uint8_t>(Register::OUT_X_L_XL),reinterpret_cast<uint8_t*>(readBuffer),6));
-	if(success)
-	{
-		acceleration.x = readBuffer[0];
-		acceleration.y = readBuffer[1];
-		acceleration.z = readBuffer[2];
+	if(success) {
+		acceleration = readBuffer;
 	}
 	RF_END_RETURN(success);
 }
@@ -66,11 +63,8 @@ modm::Lsm6ds33<I2cMaster>::readGyroscopeRaw(Vector3i& spinRates)
 {
 	RF_BEGIN();
 	success = RF_CALL(this->read(static_cast<uint8_t>(Register::OUT_X_L_G),reinterpret_cast<uint8_t*>(readBuffer),6));
-	if(success)
-	{
-		spinRates.x = readBuffer[0];
-		spinRates.y = readBuffer[1];
-		spinRates.z = readBuffer[2];
+	if(success) {
+		spinRates = readBuffer;
 	}
 	RF_END_RETURN(success);
 }
@@ -102,9 +96,8 @@ modm::Lsm6ds33<I2cMaster>::readAcceleration(Vector3f& acceleration)
 		uint8_t accScaleIndex = (static_cast<uint8_t>(getAccelerationScale()))>>2;
 		float conversionValue = accConvTable[accScaleIndex];
 
-		acceleration.x = static_cast<float>(readBuffer[0]) * conversionValue;
-		acceleration.y = static_cast<float>(readBuffer[1]) * conversionValue;
-		acceleration.z = static_cast<float>(readBuffer[2]) * conversionValue;
+		acceleration = readBuffer;
+		acceleration *= conversionValue;
 	}
 
 	RF_END_RETURN(success);
@@ -133,9 +126,9 @@ modm::Lsm6ds33<I2cMaster>::readGyroscope(Vector3f& acceleration)
 			conversionValue = gyroConvTable[gyroScaleIndex];
 		}
 
-		acceleration.x = static_cast<float>(readBuffer[0]) * conversionValue;
-		acceleration.y = static_cast<float>(readBuffer[1]) * conversionValue;
-		acceleration.z = static_cast<float>(readBuffer[2]) * conversionValue;
+		acceleration.x() = static_cast<float>(readBuffer[0]) * conversionValue;
+		acceleration.y() = static_cast<float>(readBuffer[1]) * conversionValue;
+		acceleration.z() = static_cast<float>(readBuffer[2]) * conversionValue;
 	}
 
 	RF_END_RETURN(success);

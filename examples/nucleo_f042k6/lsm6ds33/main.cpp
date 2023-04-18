@@ -54,15 +54,15 @@ main()
 		if(accSuccess && gyroSuccess)
 		{
 			MODM_LOG_INFO << "Acceleration Vector:" << modm::endl;
-			MODM_LOG_INFO << "X: "<< accVector.x << " g" << modm::endl;
-			MODM_LOG_INFO << "Y: "<< accVector.y << " g" << modm::endl;
-			MODM_LOG_INFO << "Z: "<< accVector.z << " g" << modm::endl;
+			MODM_LOG_INFO << "X: "<< accVector.x() << " g" << modm::endl;
+			MODM_LOG_INFO << "Y: "<< accVector.y() << " g" << modm::endl;
+			MODM_LOG_INFO << "Z: "<< accVector.z() << " g" << modm::endl;
 			MODM_LOG_INFO  << modm::endl;
 
 			MODM_LOG_INFO << "Spin Rates Vector:" << modm::endl;
-			MODM_LOG_INFO << "X: "<< gyroVector.x << " deg/s" << modm::endl;
-			MODM_LOG_INFO << "Y: "<< gyroVector.y << " deg/s" << modm::endl;
-			MODM_LOG_INFO << "Z: "<< gyroVector.z << " deg/s" << modm::endl;
+			MODM_LOG_INFO << "X: "<< gyroVector.x() << " deg/s" << modm::endl;
+			MODM_LOG_INFO << "Y: "<< gyroVector.y() << " deg/s" << modm::endl;
+			MODM_LOG_INFO << "Z: "<< gyroVector.z() << " deg/s" << modm::endl;
 			MODM_LOG_INFO  << modm::endl;
 
 		}

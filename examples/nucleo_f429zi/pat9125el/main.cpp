@@ -57,7 +57,7 @@ public:
 				position += sensor.getData();
 
 				Board::Leds::write(0b111);
-				MODM_LOG_INFO << "Position: " << position.x << ", " << position.y << modm::endl;
+				MODM_LOG_INFO << "Position: " << position << modm::endl;
 				sensor.resetMoved();
 			} else {
 				Board::Leds::write(0b000);

@@ -21,12 +21,12 @@ void
 modm::MonochromeGraphicDisplayVertical<Width, Height>::drawHorizontalLine(glcd::Point start,
 																		  uint16_t length)
 {
-	if (start.y >= 0 and start.y < Height)
+	if (start.y() >= 0 and start.y() < Height)
 	{
-		const int16_t y = start.y / 8;
+		const int16_t y = start.y() / 8;
 
-		const uint8_t byte = 1 << (start.y % 8);
-		for (int_fast16_t x = start.x; x < static_cast<int16_t>(start.x + length); ++x)
+		const uint8_t byte = 1 << (start.y() % 8);
+		for (int_fast16_t x = start.x(); x < static_cast<int16_t>(start.x() + length); ++x)
 		{
 			if (x < Width) { this->buffer[y][x] |= byte; }
 		}
@@ -38,19 +38,19 @@ void
 modm::MonochromeGraphicDisplayVertical<Width, Height>::drawVerticalLine(glcd::Point start,
 																		uint16_t length)
 {
-	if (start.x >= 0 and start.x < Width)
+	if (start.x() >= 0 and start.x() < Width)
 	{
-		const int8_t end_y = start.y + length;
+		const int8_t end_y = start.y() + length;
 		const uint8_t y_last = end_y / 8;
 
-		uint_fast8_t y = start.y / 8;
+		uint_fast8_t y = start.y() / 8;
 		// Mask out start
-		uint_fast8_t byte = 0xFF << start.y % 8;
+		uint_fast8_t byte = 0xFF << start.y() % 8;
 		while (y != y_last)
 		{
 			if (y < Height / 8)
 			{
-				this->buffer[y][start.x] |= byte;
+				this->buffer[y][(start.x())] |= byte;
 				byte = 0xFF;
 			}
 			y++;
@@ -59,7 +59,7 @@ modm::MonochromeGraphicDisplayVertical<Width, Height>::drawVerticalLine(glcd::Po
 		if (y < Height / 8)
 		{
 			byte &= 0xFF >> (8 - end_y % 8);
-			this->buffer[y][start.x] |= byte;
+			this->buffer[y][start.x()] |= byte;
 		}
 	}
 }
@@ -69,9 +69,9 @@ void
 modm::MonochromeGraphicDisplayVertical<Width, Height>::drawImageRaw(
 	glcd::Point start, uint16_t width, uint16_t height, modm::accessor::Flash<uint8_t> data)
 {
-	if ((start.y % 8) == 0)
+	if ((start.y() % 8) == 0)
 	{
-		uint16_t row = start.y / 8;
+		uint16_t row = start.y() / 8;
 		uint16_t rowCount = (height + 7) / 8;  // always round up
 
 		if ((height % 8) == 0)
@@ -80,7 +80,7 @@ modm::MonochromeGraphicDisplayVertical<Width, Height>::drawImageRaw(
 			{
 				for (uint_fast16_t k = 0; k < rowCount; k++)
 				{
-					uint16_t x = start.x + i;
+					uint16_t x = start.x() + i;
 					uint16_t y = k + row;
 
 					if (x < Width and y < Height)

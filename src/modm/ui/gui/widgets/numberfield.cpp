@@ -34,8 +34,8 @@ modm::gui::FloatField::render(View* view)
 
 	const uint16_t box_width = this->dimension.width - 4;
 	const uint16_t box_height = this->dimension.height;
-	const uint16_t box_x = this->getPosition().x + 2;
-	const uint16_t box_y = this->getPosition().y;
+	const uint16_t box_x = this->getPosition().x() + 2;
+	const uint16_t box_y = this->getPosition().y();
 
 	// clear background
 	out->setColor(cp[Color::BACKGROUND]);

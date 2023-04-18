@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Thomas Sommer
+ * Copyright (c) 2021-2022, Thomas Sommer
  *
  * This file is part of the modm project.
  *
@@ -13,6 +13,8 @@
 
 #include <limits>
 #include <type_traits>
+#include <numeric>
+#include <concepts>
 
 #include <cmath>
 namespace modm
@@ -66,7 +68,23 @@ struct fits_any {
 };
 
 template <typename ... Ts>
-using fits_any_t = typename fits_any<Ts...>::type;
+	using fits_any_t = typename fits_any<Ts...>::type;
+
+/**
+ * @brief 		Simple function that only applies std::round
+ * 				when a float/double is assigned to an integral
+ *
+ * @tparam TR 	Type of return
+ * @tparam TA 	Type of argument
+
+ */
+template <typename TR, typename TA>
+constexpr TR round_smart(TA v)
+{ return v; }
+
+template <std::integral TR, std::floating_point TA>
+constexpr TR round_smart(TA v)
+{ return std::round(v); }
 
 /// @}
 }

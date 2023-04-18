@@ -38,10 +38,7 @@ namespace modm
 		typedef typename GeometricTraits<T>::FloatType FloatType;
 
 	public:
-		/**
-		 * \brief	Default-Constructor
-		 */
-		Line2D();
+		constexpr Line2D() = default;
 
 		/**
 		 * \brief	Construct a line
@@ -49,7 +46,9 @@ namespace modm
 		 * \param	point			a point on the line
 		 * \param	directionVector	direction vector, the length doesn't matter
 		 */
-		Line2D(const Vector<T, 2>& point, const Vector<T, 2>& directionVector);
+		constexpr Line2D(const Vector<T, 2>& point, const Vector<T, 2>& directionVector)
+			: point(point), directionVector(directionVector)
+		{}
 
 
 		inline void

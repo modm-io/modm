@@ -11,8 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_LU_DECOMPOSITION_HPP
-#define MODM_LU_DECOMPOSITION_HPP
+#pragma once
 
 #include "matrix.hpp"
 #include "geometry/vector.hpp"
@@ -20,8 +19,12 @@
 namespace modm
 {
 	// forward declaration
-	template <class T, uint8_t ROWS, uint8_t COLUMNS> class Matrix;
-	template <class T, uint8_t N> class Vector;
+	template <typename T, std::size_t ROWS, std::size_t COLUMNS>
+	class Matrix;
+
+	template <typename T, std::size_t N>
+	requires (N > 0)
+	class Vector;
 
 	/**
 	 * \brief	Class for decomposing matrices
@@ -39,41 +42,41 @@ namespace modm
 	class LUDecomposition
 	{
 	public:
-		template <typename T, uint8_t N>
+		template <typename T, std::size_t SIZE>
 		static bool
-		decompose(const Matrix<T, N, N> &matrix,
-				Matrix<T, N, N> *l,
-				Matrix<T, N, N> *u);
+		decompose(const Matrix<T, SIZE, SIZE> &matrix,
+				Matrix<T, SIZE, SIZE> *l,
+				Matrix<T, SIZE, SIZE> *u);
 
-		template <typename T, uint8_t N>
+		template <typename T, std::size_t SIZE>
 		static bool
-		decompose(const Matrix<T, N, N> &matrix,
-				Matrix<T, N, N> *l,
-				Matrix<T, N, N> *u,
-				Matrix<T, N, N> *p);
+		decompose(const Matrix<T, SIZE, SIZE> &matrix,
+				Matrix<T, SIZE, SIZE> *l,
+				Matrix<T, SIZE, SIZE> *u,
+				Matrix<T, SIZE, SIZE> *p);
 
-		template <typename T, uint8_t N>
+		template <typename T, std::size_t SIZE>
 		static bool
-		decompose(const Matrix<T, N, N> &matrix,
-				Matrix<T, N, N> *l,
-				Matrix<T, N, N> *u,
-				Vector<int8_t, N> *p);
+		decompose(const Matrix<T, SIZE, SIZE> &matrix,
+				Matrix<T, SIZE, SIZE> *l,
+				Matrix<T, SIZE, SIZE> *u,
+				Vector<int8_t, SIZE> *p);
 
 
-		template <typename T, uint8_t N, uint8_t BXWIDTH>
+		template <typename T, std::size_t SIZE, std::size_t BXWIDTH>
 		static bool
-		solve(const Matrix<T, N, N> &l,
-				const Matrix<T, N, N> &u,
-				Matrix<T, N, BXWIDTH> *xb);
+		solve(const Matrix<T, SIZE, SIZE> &l,
+				const Matrix<T, SIZE, SIZE> &u,
+				Matrix<T, SIZE, BXWIDTH> *xb);
 
-		template <typename T, uint8_t N, uint8_t BXWIDTH>
+		template <typename T, std::size_t SIZE, std::size_t BXWIDTH>
 		static bool
-		solve(const Matrix<T, N, N> &A,
-				Matrix<T, N, BXWIDTH> *xb);
+		solve(const Matrix<T, SIZE, SIZE> &A,
+				Matrix<T, SIZE, BXWIDTH> *xb);
 
 
 	private:
-		template<typename T, uint8_t OFFSET, uint8_t HEIGHT, uint8_t WIDTH>
+		template<typename T, std::size_t OFFSET, std::size_t HEIGHT, std::size_t WIDTH>
 		class LUSubDecomposition
 		{
 		public:
@@ -89,19 +92,19 @@ namespace modm
 			static bool
 			decompose(T *u, T *l, int8_t *p);
 
-			template<uint8_t BXWIDTH>
+			template<std::size_t BXWIDTH>
 			static bool
 			solveLyEqualsB(
 					Matrix<T, HEIGHT, WIDTH> *l,
 					Matrix<T, HEIGHT, BXWIDTH> *bx);
 
-			template<uint8_t BXWIDTH>
+			template<std::size_t BXWIDTH>
 			static bool
 			solveUxEqualsY(
 					Matrix<T, HEIGHT, WIDTH> *u,
 					Matrix<T, HEIGHT, BXWIDTH> *bx);
 
-			template<uint8_t BXWIDTH>
+			template<std::size_t BXWIDTH>
 			static bool
 			solve(
 					const Matrix<T, HEIGHT, WIDTH> &l,
@@ -109,7 +112,7 @@ namespace modm
 					Matrix<T, HEIGHT, BXWIDTH> *bx);
 		};
 
-		template<typename T, uint8_t HEIGHT>
+		template<typename T, std::size_t HEIGHT>
 		class RowOperation
 		{
 		public:
@@ -145,7 +148,7 @@ namespace modm
 			swap(T *row1, T *row2);
 		};
 
-		template<typename T, uint8_t OFFSET, uint8_t WIDTH>
+		template<typename T, std::size_t OFFSET, std::size_t WIDTH>
 		class LUSubDecomposition<T, OFFSET, WIDTH, OFFSET>
 		{
 		public:
@@ -155,13 +158,13 @@ namespace modm
 			static bool
 			decomposeRecur(T *u, T *l);
 
-			template<uint8_t BXWIDTH>
+			template<std::size_t BXWIDTH>
 			static bool
 			solveUxEqualsY(
 					Matrix<T, WIDTH, OFFSET> *u,
 					Matrix<T, OFFSET, BXWIDTH> *bx);
 
-			template<uint8_t BXWIDTH>
+			template<std::size_t BXWIDTH>
 			static bool
 			solveLyEqualsB(
 					Matrix<T, WIDTH, OFFSET> *l,
@@ -170,5 +173,3 @@ namespace modm
 	};
 }
 #include "lu_decomposition_impl.hpp"
-
-#endif // MODM_LU_DECOMPOSITION_HPP

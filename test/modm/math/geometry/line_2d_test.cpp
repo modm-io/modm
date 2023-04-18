@@ -96,8 +96,8 @@ Line2DTest::testIntersectionPointsLine()
 	TEST_ASSERT_TRUE(line1.getIntersections(line2, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 1U);
 
-	TEST_ASSERT_EQUALS(points[0].getX(), 10);
-	TEST_ASSERT_EQUALS(points[0].getY(), 20);
+	TEST_ASSERT_EQUALS(points[0].x(), 10);
+	TEST_ASSERT_EQUALS(points[0].y(), 20);
 
 	points.removeAll();
 
@@ -106,8 +106,8 @@ Line2DTest::testIntersectionPointsLine()
 	TEST_ASSERT_TRUE(line1.getIntersections(line2, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 1U);
 
-	TEST_ASSERT_EQUALS(points[0].getX(), 10);
-	TEST_ASSERT_EQUALS(points[0].getY(), -20);
+	TEST_ASSERT_EQUALS(points[0].x(), 10);
+	TEST_ASSERT_EQUALS(points[0].y(), -20);
 }
 
 void
@@ -127,11 +127,11 @@ Line2DTest::testIntersectionPointsCircle()
 	TEST_ASSERT_TRUE(line.getIntersections(circle, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 2U);
 
-	TEST_ASSERT_EQUALS(points[0].getX(), -14);
-	TEST_ASSERT_EQUALS(points[0].getY(), -14);
+	TEST_ASSERT_EQUALS(points[0].x(), -14);
+	TEST_ASSERT_EQUALS(points[0].y(), -14);
 
-	TEST_ASSERT_EQUALS(points[1].getX(), 14);
-	TEST_ASSERT_EQUALS(points[1].getY(), 14);
+	TEST_ASSERT_EQUALS(points[1].x(), 14);
+	TEST_ASSERT_EQUALS(points[1].y(), 14);
 
 	points.removeAll();
 
@@ -142,8 +142,8 @@ Line2DTest::testIntersectionPointsCircle()
 	TEST_ASSERT_TRUE(line.getIntersections(circle, points));
 	TEST_ASSERT_EQUALS(points.getNumberOfPoints(), 1U);
 
-	TEST_ASSERT_EQUALS(points[0].getX(), 20);
-	TEST_ASSERT_EQUALS(points[0].getY(), 0);
+	TEST_ASSERT_EQUALS(points[0].x(), 20);
+	TEST_ASSERT_EQUALS(points[0].y(), 0);
 
 	points.removeAll();
 

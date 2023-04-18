@@ -129,8 +129,8 @@ introScreen()
 void
 drawSpinner(Point center, uint8_t pos)
 {
-	const uint8_t x = center.getX();
-	const uint8_t y = center.getY();
+	const uint8_t x = center.x();
+	const uint8_t y = center.y();
 
 	switch(pos % 8)
 	{

@@ -81,9 +81,7 @@ modm::Lis3mdl<I2cMaster>::readMagnetometerRaw(Vector3i& data)
 	success = RF_CALL(this->read(static_cast<uint8_t>(Register::OUT_X_L),reinterpret_cast<uint8_t*>(readBuffer),6));
 	if(success)
 	{
-		data.x = readBuffer[0];
-		data.y = readBuffer[1];
-		data.z = readBuffer[2];
+		data = readBuffer;
 	}
 	RF_END_RETURN(success);
 }
@@ -102,9 +100,8 @@ modm::Lis3mdl<I2cMaster>::readMagnetometer(Vector3f& data)
 		uint8_t scaleIndex = (static_cast<uint8_t>(getScale()))>>5;
 		float conversionValue = convTable[scaleIndex];
 
-		data.x = static_cast<float>(readBuffer[0]) * conversionValue;
-		data.y = static_cast<float>(readBuffer[1]) * conversionValue;
-		data.z = static_cast<float>(readBuffer[2]) * conversionValue;
+		data = readBuffer;
+		data *= conversionValue;
 	}
 
 	RF_END_RETURN(success);

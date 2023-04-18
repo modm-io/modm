@@ -30,6 +30,6 @@ modm::gui::Label::render(View* view)
 		out->setFont(&(this->font));
 	}
 
-	out->setCursor(this->getPosition().x, this->getPosition().y);
+	out->setCursor(this->getPosition().x(), this->getPosition().y());
 	*out << this->label;
 }

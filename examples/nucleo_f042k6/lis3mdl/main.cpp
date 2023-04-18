@@ -58,9 +58,9 @@ main()
 		if(success)
 		{
 			MODM_LOG_INFO << "Magnetic Vector:" << modm::endl;
-			MODM_LOG_INFO << "X: "<< magVector.x << " gauss" << modm::endl;
-			MODM_LOG_INFO << "Y: "<< magVector.y << " gauss" << modm::endl;
-			MODM_LOG_INFO << "Z: "<< magVector.z << " gauss" << modm::endl;
+			MODM_LOG_INFO << "X: "<< magVector.x() << " gauss" << modm::endl;
+			MODM_LOG_INFO << "Y: "<< magVector.y() << " gauss" << modm::endl;
+			MODM_LOG_INFO << "Z: "<< magVector.z() << " gauss" << modm::endl;
 			MODM_LOG_INFO  << modm::endl;
 		}
 		else
