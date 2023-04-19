@@ -251,6 +251,8 @@ public:
 	{
 		if (!setChannel(channel)) return 0;
 
+		// clear data ready by reading last value register
+		getValue();
 		startConversion();
 		while (!isConversionFinished()) {}
 
