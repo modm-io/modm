@@ -17,17 +17,20 @@
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t ROWS, uint8_t COLUMNS>
-modm::Matrix<T, ROWS, COLUMNS>::Matrix()
-{
-}
-
-// ----------------------------------------------------------------------------
-template<typename T, uint8_t ROWS, uint8_t COLUMNS>
 modm::Matrix<T, ROWS, COLUMNS>::Matrix(const T *data)
 {
 	for (uint_fast8_t i = 0; i < getNumberOfElements(); ++i) {
 		element[i] = data[i];
 	}
+}
+
+template<typename T, uint8_t ROWS, uint8_t COLUMNS>
+template<typename... U>
+constexpr modm::Matrix<T, ROWS, COLUMNS>::Matrix(U... data)
+	requires (std::is_convertible_v<U, T> && ...)
+	: element{T(data)...}
+{
+	static_assert(sizeof...(data) == ROWS * COLUMNS, "Invalid element count");
 }
 
 // ----------------------------------------------------------------------------
