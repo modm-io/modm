@@ -2,6 +2,7 @@
  * Copyright (c) 2016, Sascha Schade
  * Copyright (c) 2017, Fabian Greif
  * Copyright (c) 2017, Niklas Hauser
+ * Copyright (c) 2023, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -29,39 +30,57 @@
 #undef  MODM_LOG_LEVEL
 #define MODM_LOG_LEVEL modm::log::DEBUG
 
-modm::platform::SocketCan::SocketCan()
-{
-}
-
 modm::platform::SocketCan::~SocketCan()
 {
+	close();
 }
 
 bool
-modm::platform::SocketCan::open(std::string deviceName /*, bitrate_t canBitrate */)
+modm::platform::SocketCan::open(std::string deviceName)
 {
+	close();
+
 	skt = socket(PF_CAN, SOCK_RAW, CAN_RAW);
+	if (skt == -1) {
+		MODM_LOG_ERROR << MODM_FILE_INFO;
+		MODM_LOG_ERROR << "Could not create CAN socket: " << strerror(errno) << modm::endl;
+		return false;
+	}
 
 	/* Locate the interface you wish to use */
-	struct ifreq ifr;
-	strcpy(ifr.ifr_name, deviceName.c_str());
-	ioctl(skt, SIOCGIFINDEX, &ifr); /* ifr.ifr_ifindex gets filled with that device's index */
+	struct ifreq ifr{};
+	if (deviceName.empty() || deviceName.size() > IFNAMSIZ - 1) {
+		MODM_LOG_ERROR << MODM_FILE_INFO;
+		MODM_LOG_ERROR << "Invalid device name" << modm::endl;
+		close();
+		return false;
+	}
+	std::copy(deviceName.begin(), deviceName.end(), ifr.ifr_name);
+	ifr.ifr_name[deviceName.size()] = '\0';
+
+	/* ifr.ifr_ifindex gets filled with that device's index */
+	if (ioctl(skt, SIOCGIFINDEX, &ifr) == -1) {
+		MODM_LOG_ERROR << MODM_FILE_INFO;
+		MODM_LOG_ERROR << "Invalid CAN device: " << strerror(errno) << modm::endl;
+		close();
+		return false;
+	}
 
 	/* Select that CAN interface, and bind the socket to it. */
 	struct sockaddr_can addr;
 	addr.can_family = AF_CAN;
 	addr.can_ifindex = ifr.ifr_ifindex;
-	if (bind( skt, (struct sockaddr*)&addr, sizeof(addr) ) < 0)
-	{
+	if (bind(skt, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) < 0) {
 		MODM_LOG_ERROR << MODM_FILE_INFO;
-		MODM_LOG_ERROR << "Could not open SocketCAN" << modm::endl;
+		MODM_LOG_ERROR << "Could not bind CAN interface: " << strerror(errno) << modm::endl;
+		close();
 		return false;
-	};
+	}
 
 	fcntl(skt, F_SETFL, O_NONBLOCK);
 
-	MODM_LOG_INFO << MODM_FILE_INFO;
-	MODM_LOG_INFO << "SocketCAN opened successfully with skt = " << skt << modm::endl;
+	MODM_LOG_DEBUG << MODM_FILE_INFO;
+	MODM_LOG_DEBUG << "SocketCAN opened successfully with skt = " << skt << modm::endl;
 
 	return true;
 }
@@ -69,6 +88,10 @@ modm::platform::SocketCan::open(std::string deviceName /*, bitrate_t canBitrate 
 void
 modm::platform::SocketCan::close()
 {
+	if (skt != -1) {
+		::close(skt);
+		skt = -1;
+	}
 }
 
 modm::Can::BusState

@@ -27,12 +27,12 @@ namespace platform
 class SocketCan : public ::modm::Can
 {
 public:
-	SocketCan();
+	SocketCan() = default;
 
 	~SocketCan();
 
 	bool
-	open(std::string deviceName /*, bitrate_t canBitrate = kbps(125) */);
+	open(std::string deviceName);
 
 	void
 	close();
@@ -53,7 +53,7 @@ public:
 	sendMessage(const can::Message& message);
 
 private:
-	int skt;
+	int skt{-1};
 };
 
 } // namespace platform
