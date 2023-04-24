@@ -25,6 +25,7 @@
 #include <span>
 #include <algorithm>
 #include <numeric>
+#include <bit>
 
 #include <modm/math/utils/integer_traits.hpp>
 
@@ -101,7 +102,7 @@ public:
 	}
 
 private:
-	least_uint<N> index{0};
+	least_uint<std::bit_width(N)> index{0};
 	T buffer[N];
 	T sum;
 };
