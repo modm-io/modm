@@ -22,7 +22,7 @@ set_source_files_properties(
 %% endif
 
 %% if sources | length
-add_library(modm OBJECT
+add_library({{ repo }} OBJECT
 %% for file, flags in sources | sort
   {{ file | relocate | modm.posixify  }}
 %% endfor
@@ -37,14 +37,14 @@ add_library(modm OBJECT
 
 %% endif
 
-add_library(modm_warnings INTERFACE)
-add_library(modm_options INTERFACE)
-add_library(modm_arch_options INTERFACE)
+add_library({{ repo }}_warnings INTERFACE)
+add_library({{ repo }}_options INTERFACE)
+add_library({{ repo }}_arch_options INTERFACE)
 
-modm_target_config_create(modm modm_arch_options modm_options modm_warnings)
+modm_target_config_create({{ repo }} {{ repo }}_arch_options {{ repo }}_options {{ repo }}_warnings)
 
 %% if include_paths | length
-target_include_directories(modm SYSTEM PUBLIC
+target_include_directories({{ repo }} SYSTEM PUBLIC
 %% for path in include_paths | sort
   {{ path | relocate | modm.posixify  }}
 %% endfor
@@ -52,10 +52,10 @@ target_include_directories(modm SYSTEM PUBLIC
 
 %% endif
 
-target_link_libraries(modm
+target_link_libraries({{ repo }}
   PUBLIC
-    modm_arch_options
+    {{ repo }}_arch_options
   PRIVATE
     project_options
-    modm_options
-    modm_warnings)
+    {{ repo }}_options
+    {{ repo }}_warnings)
