@@ -30,6 +30,9 @@ def _gdb_command(backend, source=None, config=None, commands=None, ui=None):
     if ui is None:
         return f"{gdb} -nx -nh -batch {args} {source}"
 
+    elif "cmd" in ui:
+        return f"{gdb} {args} {source}"
+
     elif "tui" in ui:
         return f'{gdb} -tui -ex "layout split" -ex "focus cmd" {args} -ex "refresh" {source}'
 

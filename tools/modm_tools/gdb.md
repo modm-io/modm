@@ -56,8 +56,9 @@ python3 -m modm_tools.gdb --elf path/to/project.elf -x modm/gdbinit --ui=tui \
 
 (\* *only ARM Cortex-M targets*)
 
-Currently two UIs are implemented for debugging:
+Currently three UIs are implemented for debugging:
 
+- `--ui=cmd`: No UI, only the GDB command shell.
 - `--ui=tui`: Text-based UI in your shell.
 - `--ui=gdbgui`: Web-based UI in your browser, based on [gdbgui][].
 
