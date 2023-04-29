@@ -21,8 +21,7 @@ def prepare(module, options):
     core = options[":target"].get_driver("core")["type"]
     return ((core.startswith("cortex-m") or
              core.startswith("avr") or
-             "x86_64" in core) and
-            options[":__fibers"])
+             "x86_64" in core))
 
 
 def build(env):

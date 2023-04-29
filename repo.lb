@@ -272,10 +272,6 @@ def init(repo):
                      description=descr_target,
                      enumeration=devices))
 
-    # Invisible option guarding the Fiber API until it is ready
-    repo.add_option(BooleanOption(name="__fibers", default=False,
-                                  description="Enable unstable fiber API."))
-
 def prepare(repo, options):
     repo.add_modules_recursive("ext", modulefile="*.lb")
     repo.add_modules_recursive("src", modulefile="*.lb")
