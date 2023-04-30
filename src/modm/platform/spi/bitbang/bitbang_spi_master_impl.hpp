@@ -200,7 +200,11 @@ modm::ResumableResult<uint8_t>
 modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::transfer(uint8_t data)
 {
 	data = transferBlocking(data);
+#ifdef MODM_RESUMABLE_IS_FIBER
+	return data;
+#else
 	return {modm::rf::Stop, data};
+#endif
 }
 
 template <typename Sck, typename Mosi, typename Miso>
@@ -209,7 +213,9 @@ modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::transfer(
 		const uint8_t *tx, uint8_t *rx, std::size_t length)
 {
 	transferBlocking(tx, rx, length);
+#ifndef MODM_RESUMABLE_IS_FIBER
 	return {modm::rf::Stop, 0};
+#endif
 }
 
 // ----------------------------------------------------------------------------

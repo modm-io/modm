@@ -2,7 +2,7 @@
  * Copyright (c) 2009, Martin Rosekeit
  * Copyright (c) 2009-2012, Fabian Greif
  * Copyright (c) 2010, Georgi Grinshpun
- * Copyright (c) 2012-2017, Niklas Hauser
+ * Copyright (c) 2012-2017, 2023, Niklas Hauser
  * Copyright (c) 2013, Kevin Läufer
  * Copyright (c) 2014, Sascha Schade
  * Copyright (c) 2021, Jeff McBride
@@ -55,6 +55,23 @@ modm::platform::SpiMaster{{ id }}::release(void *ctx)
 modm::ResumableResult<uint8_t>
 modm::platform::SpiMaster{{ id }}::transfer(uint8_t data)
 {
+%% if use_fiber
+	// Clear any stale rx data ready status
+	read();
+
+	// wait for previous transfer to finish
+	while (!isTransmitDataRegisterEmpty())
+		modm::fiber::yield();
+
+	// start transfer by copying data into register
+	write(data);
+
+	// wait for current transfer to finish
+	while(!isReceiveDataRegisterFull())
+		modm::fiber::yield();
+
+	return read();
+%% else
 	// this is a manually implemented "fast resumable function"
 	// there is no context or nesting protection, since we don't need it.
 	// there are only two states encoded into 1 bit (LSB of state):
@@ -72,7 +89,7 @@ modm::platform::SpiMaster{{ id }}::transfer(uint8_t data)
 			return {modm::rf::Running};
 
 		// start transfer by copying data into register
-	    write(data);
+		write(data);
 
 		// set LSB = Bit0
 		state |= Bit0;
@@ -84,12 +101,22 @@ modm::platform::SpiMaster{{ id }}::transfer(uint8_t data)
 	// transfer finished
 	state &= ~Bit0;
 	return {modm::rf::Stop, read()};
+%% endif
 }
 
 modm::ResumableResult<void>
 modm::platform::SpiMaster{{ id }}::transfer(
 		const uint8_t * tx, uint8_t * rx, std::size_t length)
 {
+%% if use_fiber
+	for (std::size_t index = 0; index < length; index++)
+	{
+		// if tx == 0, we use a dummy byte 0x00 else we copy it from the array
+		auto result = transfer(tx ? tx[index] : 0);
+		// if rx != 0, we copy the result into the array
+		if (rx) rx[index] = result;
+	}
+%% else
 	// this is a manually implemented "fast resumable function"
 	// there is no context or nesting protection, since we don't need it.
 	// there are only two states encoded into 1 bit (Bit1 of state):
@@ -131,6 +158,7 @@ modm::platform::SpiMaster{{ id }}::transfer(
 			state &= ~Bit1;
 			return {modm::rf::Stop};
 	}
+%% endif
 }
 
 void modm::platform::SpiMaster{{ id }}::transferBlocking(

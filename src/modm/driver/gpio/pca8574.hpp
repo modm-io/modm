@@ -73,9 +73,9 @@ public:
 	modm::ResumableResult<bool> inline
 	setOutput(Pins pins)
 	{
-		// nothing needs to be changed for switching to output
+		RF_BEGIN();
 		direction.set(pins);
-		return {modm::rf::Stopped, true};
+		RF_END_RETURN(true);
 	}
 
 	modm::ResumableResult<bool>

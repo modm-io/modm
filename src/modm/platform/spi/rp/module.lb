@@ -23,7 +23,10 @@ class Instance(Module):
         return True
 
     def build(self, env):
-        env.substitutions = {"id": self.instance}
+        env.substitutions = {
+            "id": self.instance,
+            "use_fiber": env.get(":processing:protothread:use_fiber", False)
+        }
         env.outbasepath = "modm/src/modm/platform/spi"
 
         env.template("spi_master.hpp.in", "spi_master_{}.hpp".format(self.instance))
