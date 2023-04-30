@@ -51,18 +51,21 @@ static constexpr uint8_t systick_priority{(1ul << __NVIC_PRIO_BITS) - 1ul};
 
 // ----------------------------------------------------------------------------
 void
-modm::platform::SysTickTimer::enable([[maybe_unused]] uint32_t reload, [[maybe_unused]] bool prescaler8)
+modm::platform::SysTickTimer::enable([[maybe_unused]] uint32_t reload,
+									 [[maybe_unused]] bool use_processor_clock)
 {
 %% if not has_freertos
+	SysTick->CTRL = 0;
+
 	// Lower systick interrupt priority to lowest level
 	NVIC_SetPriority(SysTick_IRQn, systick_priority);
 
 	SysTick->LOAD = reload;
 	SysTick->VAL  = reload;
-	if (prescaler8) {
-		SysTick->CTRL = SysTick_CTRL_ENABLE_Msk | SysTick_CTRL_TICKINT_Msk;
-	} else {
+	if (use_processor_clock) {
 		SysTick->CTRL = SysTick_CTRL_ENABLE_Msk | SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_CLKSOURCE_Msk;
+	} else {
+		SysTick->CTRL = SysTick_CTRL_ENABLE_Msk | SysTick_CTRL_TICKINT_Msk;
 	}
 %% endif
 }

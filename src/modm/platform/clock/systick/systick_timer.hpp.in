@@ -51,7 +51,7 @@ public:
 %% if systick_frequency != 1000
 			ms_per_Ncycles = ((1ull << Ncycles) * 1'000ull) / SystemClock::Frequency;
 %% endif
-			enable(result.index, false);
+			enable(result.index, true);
 		}
 %% if ref_clk > 1
 		else
@@ -64,7 +64,7 @@ public:
 %% if systick_frequency != 1000
 			ms_per_Ncycles = ((1ull << Ncycles) * {{ref_clk}}'000ull) / SystemClock::Frequency;
 %% endif
-			enable(result.index, true);
+			enable(result.index, false);
 		}
 %% endif
 	}
@@ -80,7 +80,7 @@ public:
 
 private:
 	static void
-	enable(uint32_t reload, bool prescaler8);
+	enable(uint32_t reload, bool use_processor_clock);
 
 %% if systick_frequency != 1000
 	// FCPU < 8MHz

@@ -1,0 +1,127 @@
+/*
+ * Copyright (c) 2023, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+#include <cstdint>
+#include <modm/platform.hpp>
+
+namespace modm
+{
+
+/// @ingroup modm_driver_cycle_counter
+class CycleCounter
+{
+public:
+%% if is_avr
+    using cycle_t = uint16_t;
+%% else
+    using cycle_t = uint32_t;
+%% endif
+
+    /// @param force overwrite previous timer configuration
+    /// @param overhead total number of overhead cycles
+    void
+    initialize(bool force [[maybe_unused]] = false, uint8_t overhead = 4)
+    {
+%% if is_avr
+        if (force or not TCCR1B)
+        {
+            TCCR1A = 0;
+            TCCR1B = (1 << CS10);
+        }
+%% elif is_cm0
+        // Only configure if modm:platform:systick module hasn't already
+        if (force or not SysTick->CTRL)
+        {
+            // SysTick counts down, so start and stop are swapped!
+            SysTick->LOAD = -1ul;
+            SysTick->VAL = 0;
+            SysTick->CTRL = SysTick_CTRL_ENABLE_Msk | SysTick_CTRL_CLKSOURCE_Msk;
+        }
+%% endif
+        this->overhead = overhead;
+    }
+
+    /// Sample the timer at the start of your measurement
+    modm_always_inline void
+    start()
+    {
+%% if is_avr
+        start_ = TCNT1;
+%% elif is_cm0
+        stop_ = SysTick->VAL;
+%% else
+        start_ = DWT->CYCCNT;
+%% endif
+    }
+
+    /// Sample the timer at the end of your measurement
+    modm_always_inline void
+    stop()
+    {
+%% if is_avr
+        stop_ = TCNT1;
+%% elif is_cm0
+        start_ = SysTick->VAL;
+%% else
+        stop_ = DWT->CYCCNT;
+%% endif
+    }
+
+    /// @return the difference in cycles between start and stop.
+    cycle_t
+    cycles()
+    {
+%% if is_cm0
+        if (stop_ < start_) {
+            // The SysTick counter has underflowed
+            stop_ += SysTick->LOAD;
+        }
+        uint32_t diff = stop_ - start_;
+        // SysTick may be using the implementation defined reference clock
+        if (not (SysTick->CTRL & SysTick_CTRL_CLKSOURCE_Msk))
+            diff *= {{reference_div}};
+        return diff - overhead;
+%% else
+        return (stop_ - start_) - overhead;
+%% endif
+    }
+
+    /// @return the difference in milliseconds between start and stop.
+    uint32_t
+    milliseconds()
+    {
+        return (cycles() * 1'000ull) / SystemCoreClock;
+    }
+
+    /// @return the difference in microseconds between start and stop.
+    uint32_t
+    microseconds()
+    {
+        return (cycles() * 1'000'000ull) / SystemCoreClock;
+    }
+
+    /// @return the difference in nanoseconds between start and stop.
+    uint32_t
+    nanoseconds()
+    {
+        return (cycles() * 1'000'000'000ull) / SystemCoreClock;
+    }
+
+private:
+    cycle_t start_, stop_;
+    uint8_t overhead{4};
+%% if is_avr
+    static constexpr uint32_t SystemCoreClock = F_CPU;
+%% endif
+};
+
+}

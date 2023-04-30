@@ -1,0 +1,98 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2023, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":driver:cycle_counter"
+    module.description = """
+# Cycle Counter
+
+Allows you to measure time with cycle accuracy on AVR and ARM devices.
+This module wraps common functionality around different timers:
+
+- AVR: uses 16-bit TC1.
+- ARMv6-M (Cortex-M0/M0+): uses the 24-bit SysTick with limitations.
+- ARMv7-M (Cortex-M3 and above): uses the 32-bit DWT->CYCCNT.
+
+```cpp
+// place counter in the fastest memory to limit sampling overhead
+modm_fastdata modm::CycleCounter counter;
+// initialize once before sampling
+counter.initialize();
+
+// Sample the timer now
+counter.start();
+// perform your operation and then sample again
+counter.stop();
+
+// you can now get cycles or milli-/micro-/nanoseconds
+counter.cycles();
+counter.nanoseconds();
+counter.microseconds();
+counter.milliseconds();
+```
+
+!!! note "AVR TC1 Limitations"
+    The 16-bit timer limits the maximum measurable time to just 4ms at 16MHz!
+
+!!! note "Cortex-M0 SysTick Limitations"
+    The ARMv6-M architecture does not come with a free running counter,
+    therefore this class uses the SysTick timer. However, the timer is already
+    used by the `modm:platform:systick` module to provide `modm::Clock`, which
+    limits the maximum measurable time to just 1ms! The systick may also be run
+    with a /8 prescaler, which this class compensates for but this still
+    reduces sampling resolution to 8 cycles!
+
+    In case these limitations are not acceptable, you may force initialize the
+    SysTick, which will break `modm::Clock` functionality in favor of accurate
+    measurements. You may of course reinitialize the SysTick after your
+    measurement to regain `modm::Clock` functionality! However, the software
+    timers of the `modm:processing:timer` module may not work correctly anymore
+    and may need to be reinitialized.
+
+    ```cpp
+    // Always initializes the SysTick for `modm::Clock`
+    Board::initialize();
+
+    // but we need an accurate cycle counter
+    counter.initialize(/*force=*/true);
+    // do longer and more accurate measurement now
+    counter.start();
+    // do measurement operation
+    counter.stop();
+
+    // reinitialize the SysTick timer for `modm::Clock`
+    modm::platform::SysTick::initialize<Board::SystemClock>();
+    ```
+
+    If this solution is not acceptable either, we recommend using a platform
+    specific hardware timer instead.
+"""
+
+def prepare(module, options):
+    core = options[":target"].get_driver("core")["type"]
+    if core.startswith("cortex-m"):
+        module.depends(":platform:cortex-m")
+        return True
+    if core.startswith("avr"):
+        module.depends(":platform:core")
+        return True
+    return False
+
+def build(env):
+    core = env[":target"].get_driver("core")["type"]
+    env.substitutions = {
+        "is_avr": core.startswith("avr"),
+        "is_cm0": core.startswith("cortex-m0"),
+        "reference_div": env.query(":platform:clock:reference_clock", 1),
+    }
+    env.outbasepath = "modm/src/modm/driver/time"
+    env.template("cycle_counter.hpp.in")

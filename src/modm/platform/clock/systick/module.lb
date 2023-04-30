@@ -27,38 +27,59 @@ def prepare(module, options):
         ":math:algorithm",
         ":cmsis:device")
 
+    module.add_query(
+        EnvironmentQuery(name="reference_clock", factory=systick_reference_clock))
+
     return True
+
+def systick_reference_clock(env):
+    """
+    The SysTick can be clocked from two sources controlled by the CLKSOURCE bit:
+    1=processor clock, or 0=reference clock. Since the reference clock is
+    implementation defined, this query returns the prescaler of the reference
+    clock or 1 if it does not exist.
+
+    :returns: Divider of the processor clock.
+    """
+    target = env[":target"].identifier
+
+    # SAMD5x/E5x: Prescaler not implemented
+    if target.platform == "sam" and target.family in ["d5x/e5x", "e7x/s7x/v7x", "d1x/d2x/dax"]:
+        return 1
+    # H742/43: Prescaler not implemented in revY
+    elif target.family == "h7" and target.name in ["42", "43", "50", "53"] and target.revision == "y":
+        return 1
+    # RP2040 external reference clock need additional configuration
+    elif target.platform == "rp":
+        return 1
+    # All other STM32/SAM devices divide processor clock by 8
+    elif target.platform == "stm32" or target.platform == "sam":
+        return 8
+    # Unknown reference clock, lets be cautious and use processor clock
+    return 1
 
 def build(env):
     target = env[":target"].identifier
     core = env[":target"].get_driver("core")["type"]
 
+    # SysTick clock source can be processor or reference clock (=fcpu/div)
+    div = systick_reference_clock(env)
     # Interrupt Frequency must not overflow the 2^24 SysTick->VAL!
-    freq = 1000 if "m0" in core else 4
-    # STM32H7 goes up to 550MHz, so make the Frequency higher
-    if target.family == "h7": freq = 100;
-
-    # SysTick clock prescaler is dynamically chosen as /1 or /8
-    div = 8
-    # SAMD5x/E5x: Prescaler not implemented
-    if target.platform == "sam" and target.family == "d5x/e5x":
-        div = 1
-        # systick clock is too fast to run at 4 Hz, increase frequency
+    # TODO: compute the systick frequency from the max operating frequency and divider
+    if "m0" in core:
+        # Only 32x32=32-bit multiplication, thus not possible to shift for ms
+        freq = 1000
+    elif target.family == "h7":
+        # Up to 550MHz
+        freq = 100
+    elif target.platform == "sam" and target.family == "d5x/e5x":
+        # Up to 120MHz, but no /8 prescaler available!
         freq = 8
-    # SAMx7x: Prescaler not implemented
     elif target.platform == "sam" and target.family == "e7x/s7x/v7x":
-        div = 1
-        # systick clock is too fast to run at 4 Hz, increase frequency
+        # Up to 300MHz
         freq = 20
-    # SAMD2x: Prescaler not implemented
-    elif target.platform == "sam" and target.family == "d1x/d2x/dax":
-        div = 1
-    # H742/43: Prescaler not implemented in revY
-    elif target.family == "h7" and target.name in ["42", "43", "50", "53"] and target.revision == "y":
-        div = 1
-    # RP2040 external reference clock need additional configuration
-    elif target.platform == "rp":
-        div = 1
+    else:
+        freq = 4
 
     env.substitutions = {
         "systick_frequency": env.get(":freertos:frequency", freq),
@@ -67,8 +88,7 @@ def build(env):
         "ref_clk": div
     }
     if env.has_module(":platform:multicore"):
-        cores = int(env[":target"].identifier.cores)
-        env.substitutions["cores"] = cores
+        env.substitutions["cores"] = int(target.cores)
         env.substitutions["multicore"] = True
     env.outbasepath = "modm/src/modm/platform/clock"
     env.template("systick_timer.hpp.in")

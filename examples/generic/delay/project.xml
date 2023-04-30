@@ -26,6 +26,7 @@
   <modules>
     <module>modm:build:scons</module>
     <module>modm:debug</module>
+    <module>modm:driver:cycle_counter</module>
     <!-- <module>modm:tinyusb</module> -->
   </modules>
 </library>
