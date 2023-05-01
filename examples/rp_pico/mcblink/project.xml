@@ -1,0 +1,13 @@
+<library>
+  <extends>modm:rp-pico</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/rp_pico/mcblink</option>
+  </options>
+  <modules>
+    <module>modm:debug</module>
+    <module>modm:processing:timer</module>
+    <module>modm:platform:multicore</module>
+    <module>modm:platform:uart:0</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>
