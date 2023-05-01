@@ -13,14 +13,21 @@
 
 #include <modm/architecture/interface/atomic_lock.hpp>
 #include <modm/platform/device.hpp>
+%% if multicore
+#include <modm/platform/core/multicore.hpp>
+%% endif
 
 #include "systick_timer.hpp"
 
 static constexpr auto systick_step({{ 1000 // systick_frequency }});
-static volatile uint32_t milli_time{0};
-static volatile uint32_t micro_time{0};
-static volatile uint8_t interrupt{false};
-
+static volatile uint32_t milli_time{};
+static volatile uint32_t micro_time{};
+%% if multicore
+static volatile bool interrupts[{{cores}}]{};
+%% else
+static volatile bool interrupt{};
+%% endif
+%#
 extern "C" void
 %% if has_freertos
 vApplicationTickHook()
@@ -30,7 +37,13 @@ SysTick_Handler(void)
 {
 	milli_time += systick_step;
 	micro_time += systick_step * 1'000ul;
+%% if multicore
+%% for core in range(cores)
+	interrupts[{{core}}] = true;
+%% endfor
+%% else
 	interrupt = true;
+%% endif
 }
 
 // pick the lowest possible priority for the SysTick interrupt
@@ -69,8 +82,11 @@ modm::chrono::milli_clock::now() noexcept
 %% if systick_frequency == 1000
 	return time_point{duration{milli_time}};
 %% else
-	uint32_t val;
-	uint32_t ms;
+	uint32_t val, ms;
+%% if multicore
+	volatile bool &interrupt = interrupts[modm::platform::multicore::Core::cpuId()];
+%% endif
+%#
 	do	// We cannot use an atomic lock here, the counter still overflows even
 	{	// if the interrupt hasn't happened yet.
 		interrupt = false;
@@ -90,8 +106,11 @@ modm::chrono::milli_clock::now() noexcept
 modm::chrono::micro_clock::time_point modm_weak
 modm::chrono::micro_clock::now() noexcept
 {
-	uint32_t val;
-	uint32_t us;
+	uint32_t val, us;
+%% if multicore
+	volatile bool &interrupt = interrupts[modm::platform::multicore::Core::cpuId()];
+%% endif
+%#
 	do	// We cannot use an atomic lock here, the counter still overflows even
 	{	// if the interrupt hasn't happened yet.
 		interrupt = false;

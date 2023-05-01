@@ -63,8 +63,13 @@ def build(env):
     env.substitutions = {
         "systick_frequency": env.get(":freertos:frequency", freq),
         "has_freertos": env.has_module(":freertos"),
+        "multicore": False,
         "ref_clk": div
     }
+    if env.has_module(":platform:multicore"):
+        cores = int(env[":target"].identifier.cores)
+        env.substitutions["cores"] = cores
+        env.substitutions["multicore"] = True
     env.outbasepath = "modm/src/modm/platform/clock"
     env.template("systick_timer.hpp.in")
     env.template("systick_timer.cpp.in")
