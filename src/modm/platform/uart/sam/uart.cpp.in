@@ -39,7 +39,7 @@ MODM_ISR({{ peripheral | upper }}{{ id }})
 
 	if({{ name }}::isTransmitReady()) {
 		if(txBuffer.isEmpty()) {
-			{{ name }}::Regs()->{{ prefix }}_IDR = {{ prefix }}_IDR_TXRDY_Msk;
+			{{ name }}::Regs()->{{ prefix }}_IDR = {{ prefix }}_IDR{{reg_suffix}}_TXRDY_Msk;
 		} else {
 			{{ name }}::Regs()->{{ prefix }}_THR = txBuffer.get();
 			txBuffer.pop();
@@ -85,7 +85,7 @@ bool
 			return false;
 		}
 		// Enable tx interrupt
-		Regs()->{{ prefix }}_IER = {{ prefix }}_IER_TXRDY_Msk;
+		Regs()->{{ prefix }}_IER = {{ prefix }}_IER{{reg_suffix}}_TXRDY_Msk;
 	}
 	return true;
 }
@@ -129,8 +129,8 @@ void
 	} else {
 		Regs()->{{ prefix }}_MR &= ~{{ prefix }}_MR{{reg_suffix}}_MODE9_Msk;
 		Regs()->{{ prefix }}_MR =
-			(Regs()->{{ prefix }}_MR & ~{{ prefix }}_MR_CHRL_Msk)
-				| {{ prefix }}_MR_CHRL((uint32_t)length);
+			(Regs()->{{ prefix }}_MR & ~{{ prefix }}_MR{{reg_suffix}}_CHRL_Msk)
+				| {{ prefix }}_MR{{reg_suffix}}_CHRL((uint32_t)length);
 	}
 }
 %% endif

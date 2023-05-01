@@ -116,9 +116,9 @@ public:
 %% if type == "usart"
 		setWordLength(length);
 %% endif
-		Regs()->{{ prefix }}_CR = {{ prefix }}_CR_RXEN_Msk | {{ prefix }}_CR_TXEN_Msk;
+		Regs()->{{ prefix }}_CR = {{ prefix }}_CR{{reg_suffix}}_RXEN_Msk | {{ prefix }}_CR{{reg_suffix}}_TXEN_Msk;
 		// Enable rx interrupt
-		Regs()->{{ prefix }}_IER = {{ prefix }}_IER_RXRDY_Msk;
+		Regs()->{{ prefix }}_IER = {{ prefix }}_IER{{reg_suffix}}_RXRDY_Msk;
 
 		// Enable the IRQ
 		NVIC_SetPriority({{ peripheral | upper }}{{ id }}_IRQn, irq_priority);
@@ -143,9 +143,9 @@ public:
 	static void setWordLength(WordLength length);
 %% endif
 
-	static inline bool isTransmitReady() { return Regs()->{{ prefix }}_{{ sr }} & {{ prefix }}_{{ sr }}_TXRDY_Msk; }
+	static inline bool isTransmitReady() { return Regs()->{{ prefix }}_{{ sr }} & {{ prefix }}_{{ sr }}{{reg_suffix}}_TXRDY_Msk; }
 
-	static inline bool isReceiveReady() { return Regs()->{{ prefix }}_{{ sr }} & {{ prefix }}_{{ sr }}_RXRDY_Msk; }
+	static inline bool isReceiveReady() { return Regs()->{{ prefix }}_{{ sr }} & {{ prefix }}_{{ sr }}{{reg_suffix}}_RXRDY_Msk; }
 };
 
 } // namespace modm::platform

@@ -13,6 +13,7 @@
 #define MODM_DEVICE_HPP
 
 #define DONT_USE_CMSIS_INIT 1
+#define DO_NOT_USE_DEPRECATED_MACROS 1
 %% for define in defines
 #define {{ define }} 1
 %% endfor
