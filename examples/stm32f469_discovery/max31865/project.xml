@@ -1,0 +1,14 @@
+<library>
+	<extends>modm:disco-f469ni</extends>
+	<options>
+		<option name="modm:build:build.path">../../../build/stm32f469_discovery/max31865</option>
+	</options>
+	<modules>
+		<module>modm:driver:max31865</module>
+		<module>modm:platform:gpio</module>
+		<module>modm:platform:spi:2</module>
+		<module>modm:processing:protothread</module>
+		<module>modm:processing:timer</module>
+		<module>modm:build:scons</module>
+	</modules>
+</library>
