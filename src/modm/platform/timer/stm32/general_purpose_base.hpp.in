@@ -275,11 +275,11 @@ protected:
 	signalToChannel()
 	{
 		modm::platform::detail::SignalConnection<Signal, p>{};
-		if constexpr (Signal::Signal == Gpio::Signal::Ch1) {
+		if constexpr ((Signal::Signal == Gpio::Signal::Ch1) || (Signal::Signal == Gpio::Signal::Ch1n)) {
 			return 1;
-		} else if constexpr (Signal::Signal == Gpio::Signal::Ch2) {
+		} else if constexpr ((Signal::Signal == Gpio::Signal::Ch2)  || (Signal::Signal == Gpio::Signal::Ch2n)) {
 			return 2;
-		} else if constexpr (Signal::Signal == Gpio::Signal::Ch3) {
+		} else if constexpr ((Signal::Signal == Gpio::Signal::Ch3)  || (Signal::Signal == Gpio::Signal::Ch3n)) {
 			return 3;
 %% if target.family != "l0" or target.pin != "d"
 		} else if constexpr (Signal::Signal == Gpio::Signal::Ch4) {

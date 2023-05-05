@@ -63,6 +63,11 @@ public:
 		SetComgOrRisingTrigEdge = TIM_CR2_CCUS
 	};
 
+	enum class ComplementaryChannel : bool{
+		Ch = false,
+		ChN = true
+	};
+
 %% if advanced_extended
 	enum class MasterMode2 : uint32_t
 	{
@@ -122,6 +127,24 @@ public:
 		Reset = 0,
 		Set   = TIM_CR2_OIS1,
 	};
+
+protected:
+	template<Peripheral p, typename Signal>
+	static consteval ComplementaryChannel
+	signalIsComplementaryChannel()
+	{
+		modm::platform::detail::SignalConnection<Signal, p>{};
+		if constexpr ((Signal::Signal == Gpio::Signal::Ch1n)
+			|| (Signal::Signal == Gpio::Signal::Ch2n)
+			|| (Signal::Signal == Gpio::Signal::Ch3n)
+			|| (Signal::Signal == Gpio::Signal::Ch4n))
+		{
+			return ComplementaryChannel::ChN;
+		}
+		else {
+			return ComplementaryChannel::Ch;
+		}
+	}
 };
 
 }	// namespace platform

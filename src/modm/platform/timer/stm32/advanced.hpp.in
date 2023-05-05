@@ -376,7 +376,7 @@ public:
 
 	static void
 	configureOutputChannel(uint32_t channel, OutputCompareMode mode,
-			Value compareValue, PinState out = PinState::Enable);
+			Value compareValue, PinState out = PinState::Enable, ComplementaryChannel cc = ComplementaryChannel::Ch);
 	// TODO: Maybe add some functionality from the configureOutput
 	//       function below...
 
@@ -386,7 +386,8 @@ public:
 			Value compareValue, PinState out = PinState::Enable)
 	{
 		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
-		configureOutputChannel(channel, mode, compareValue, out);
+		constexpr auto cc = signalIsComplementaryChannel<Peripheral::Tim{{ id }}, Signal>();
+		configureOutputChannel(channel, mode, compareValue, out, cc);
 	}
 
 	/*
