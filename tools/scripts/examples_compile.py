@@ -13,7 +13,7 @@ import re
 import argparse
 import platform
 import subprocess
-import multiprocessing as mp
+from multiprocessing.pool import ThreadPool
 from pathlib import Path
 
 is_running_in_ci = (os.getenv("CIRCLECI") is not None or
@@ -31,8 +31,8 @@ def run_command(where, command, all_output=False):
     result = subprocess.run(command, shell=True, cwd=where, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output = ""
     if result.returncode or all_output:
-        output += result.stdout.decode("utf-8").strip(" \n")
-    output += result.stderr.decode("utf-8").strip(" \n")
+        output += result.stdout.decode("utf-8", errors="ignore").strip(" \n")
+    output += result.stderr.decode("utf-8", errors="ignore").strip(" \n")
     return (result.returncode, output)
 
 def generate(project):
@@ -108,23 +108,22 @@ def compile_examples(paths, jobs, split, part):
         chunk_size = math.ceil(len(projects) / args.split)
         projects = projects[chunk_size*args.part:min(chunk_size*(args.part+1), len(projects))]
 
-    ctx = mp.get_context("spawn")
     # first generate all projects
-    with ctx.Pool(jobs) as pool:
+    with ThreadPool(jobs) as pool:
         projects = pool.map(generate, projects)
     results += projects.count(None)
 
     # Filter projects for successful generation
     projects = [p for p in projects if p is not None]
     # Then build the successfully generated ones
-    with ctx.Pool(jobs) as pool:
+    with ThreadPool(jobs) as pool:
         projects = pool.map(build, projects)
     results += projects.count(None)
 
     # Filter projects for successful compilation and runablity
     projects = [p for p in projects if p is not None and "CI: run" in p.read_text()]
     # Then run the successfully compiled ones
-    with ctx.Pool(jobs) as pool:
+    with ThreadPool(jobs) as pool:
         projects = pool.map(run, projects)
     results += projects.count(None)
 
