@@ -271,4 +271,6 @@ private:
 
 } // namespace modm
 
+#include "nested_resumable.hpp"
+
 #endif // MODM_RESUMABLE_HPP

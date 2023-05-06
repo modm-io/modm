@@ -17,9 +17,22 @@ def init(module):
 
 def prepare(module, options):
     module.depends(":architecture")
+    module.add_option(
+        BooleanOption(
+            name="use_fiber",
+            default=False,
+            description="Implement via Fibers",
+            dependencies=lambda v: ":processing:fiber" if v else None))
+
     return True
 
 def build(env):
     env.outbasepath = "modm/src/modm/processing/protothread"
-    env.copy(".")
+    if env["use_fiber"]:
+        env.copy("macros_fiber.hpp", "macros.hpp")
+        env.copy("protothread_fiber.hpp", "protothread.hpp")
+    else:
+        env.copy("macros.hpp")
+        env.copy("protothread.hpp")
+    env.copy("semaphore.hpp")
     env.copy("../protothread.hpp")

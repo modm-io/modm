@@ -29,9 +29,14 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "modm/src/modm/processing/resumable"
-    env.copy(".", ignore=env.ignore_files("*.md", "*.in"))
+    if env.get(":processing:protothread:use_fiber", False):
+        env.copy("macros_fiber.hpp", "macros.hpp")
+        env.copy("resumable_fiber.hpp", "resumable.hpp")
+    else:
+        env.copy("macros.hpp")
+        env.copy("resumable.hpp")
+        env.template("nested_resumable.hpp.in")
     env.copy("../resumable.hpp")
-    env.template("nested_resumable.hpp.in")
 
 
 # ============================ Option Descriptions ============================
