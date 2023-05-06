@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2020, Erik Henriksson
- * Copyright (c) 2021, Niklas Hauser
+ * Copyright (c) 2021, 2023, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -11,57 +11,53 @@
 // ----------------------------------------------------------------------------
 
 #pragma once
+#include "context.h"
+#include <cstdint>
+#include <cstddef>
 #include <modm/architecture/utils.hpp>
 
-namespace modm
+namespace modm::fiber
 {
 
-class Fiber;
+/// @ingroup modm_processing_fiber
+/// @{
 
-namespace fiber
-{
+/// Alignment requirements for the bottom and top of the stack.
+static constexpr size_t StackAlignment = sizeof(uintptr_t) * 2;
+/// Minimum stack size required to push one full fiber context.
+static constexpr size_t StackSizeMinimum = {{ stack_minimum }};
+/// The default stack size is estimated experimentally so that a fiber can use
+/// `modm::IOStream` to log out information, which is fairly stack intensive.
+/// Use `modm::fiber::Task::stack_usage()` to determine the real stack usage.
+static constexpr size_t StackSizeDefault = {{ default_stack_size }};
 
-class Scheduler;
 /**
- * Stack captures a memory area used as fiber stack.
+ * Stack captures a memory area used as fiber stack with alignment and minimal
+ * size requirements. The stack is stored in the `.bss` section by default, but
+ * may be placed in a `.noinit` section using `modm_section(".noinit")`.
+ * For available sections on your device, see `modm:platform:core`.
  *
  * @author	Erik Henriksson
- * @ingroup	modm_processing_fiber
  */
-template<size_t Size>
+template< size_t Size = StackSizeDefault >
 class Stack
 {
-%% if core.startswith("avr")
-	%% set alignment = 1
-	static_assert(Size >= 15*sizeof(void*), "Stack size must be ≥30B!");
-
-%% elif core.startswith("cortex-m")
-	%% set alignment = 8
-	static_assert(Size % 4 == 0, "Stack size must be multiple of 4.");
-%% if with_fpu
-	static_assert(Size >= 28*sizeof(void*), "Stack size must be ≥112B!");
-%% else
-	static_assert(Size >= 12*sizeof(void*), "Stack size must be ≥48B!");
-%% endif
-
-%% elif "x86_64" in core
-	%% set alignment = 16
-	static_assert(Size % 8 == 0, "Stack size must be multiple of 8.");
-	static_assert(Size >= 33*sizeof(void*), "Stack size must be ≥264B!");
-%% endif
-%#
-	friend class ::modm::Fiber;
+	friend class Task;
 	friend class Scheduler;
+	Stack(const Stack&) = delete;
+	Stack& operator=(const Stack&) = delete;
+
+	static_assert(Size % StackAlignment == 0, "Stack size is not aligned!");
+	static_assert(Size >= StackSizeMinimum, "Stack is too small!");
+
+	static constexpr size_t size = Size;
+	static constexpr size_t words = Size / sizeof(uintptr_t);
+	alignas(StackAlignment)
+	uintptr_t memory[words];
 
 public:
 	constexpr Stack() = default;
-	Stack(const Stack&) = delete;
-
-private:
-	static constexpr size_t size = Size;
-	modm_aligned({{alignment}}) uintptr_t memory[size / sizeof(uintptr_t)];
 };
+/// @}
 
-} // namespace fiber
-
-}	// namespace modm
+} // namespace modm::fiber

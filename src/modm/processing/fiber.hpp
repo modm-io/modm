@@ -11,3 +11,4 @@
 
 #include "fiber/fiber.hpp"
 #include "fiber/scheduler.hpp"
+#include "fiber/functions.hpp"

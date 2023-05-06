@@ -60,19 +60,11 @@ modm::fiber::Stack<1024> stack1, stack2;
 
 }  // namespace
 
-__attribute__((noinline)) void
-subroutine()
-{
-	ADD_STATE(SUBROUTINE_START);
-	modm::fiber::yield();
-	ADD_STATE(SUBROUTINE_END);
-}
-
 void
 FiberTest::testOneFiber()
 {
 	states_pos = 0;
-	modm::Fiber fiber(stack1, f1);
+	modm::fiber::Task fiber(stack1, f1);
 	modm::fiber::Scheduler::run();
 	TEST_ASSERT_EQUALS(states_pos, 2u);
 	TEST_ASSERT_EQUALS(states[0], F1_START);
@@ -83,7 +75,7 @@ void
 FiberTest::testTwoFibers()
 {
 	states_pos = 0;
-	modm::Fiber fiber1(stack1, f1), fiber2(stack2, f2);
+	modm::fiber::Task fiber1(stack1, f1), fiber2(stack2, f2);
 	modm::fiber::Scheduler::run();
 	TEST_ASSERT_EQUALS(states_pos, 4u);
 	TEST_ASSERT_EQUALS(states[0], F1_START);
@@ -92,8 +84,13 @@ FiberTest::testTwoFibers()
 	TEST_ASSERT_EQUALS(states[3], F2_END);
 }
 
-namespace
+__attribute__((noinline)) void
+subroutine()
 {
+	ADD_STATE(SUBROUTINE_START);
+	modm::fiber::yield();
+	ADD_STATE(SUBROUTINE_END);
+}
 
 void
 f3()
@@ -103,13 +100,11 @@ f3()
 	ADD_STATE(F3_END);
 }
 
-}  // namespace
-
 void
 FiberTest::testYieldFromSubroutine()
 {
 	states_pos = 0;
-	modm::Fiber fiber1(stack1, f1), fiber2(stack2, f3);
+	modm::fiber::Task fiber1(stack1, f1), fiber2(stack2, f3);
 	modm::fiber::Scheduler::run();
 	TEST_ASSERT_EQUALS(states_pos, 6u);
 	TEST_ASSERT_EQUALS(states[0], F1_START);

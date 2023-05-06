@@ -39,16 +39,3 @@ extern "C" void modm_initialize_core1()
     SCB->VTOR = custom_vector_table;
 }
 ```
-
-When using the `modm:processing:fiber` module you can now schedule fibers on
-both cores, each with their own scheduler:
-
-```cpp
-modm_core0_noinit modm::fiber::Stack<256> stack0;
-modm_core0_data modm::Fiber fiber0(stack0, []() { function(); }, /* core= */0);
-
-modm_core1_noinit modm::fiber::Stack<256> stack1;
-modm_core1_data modm::Fiber fiber1(stack1, []() { function(); }, /* core= */1);
-```
-
-

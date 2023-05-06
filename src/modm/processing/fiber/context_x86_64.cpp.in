@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2020, Erik Henriksson
- * Copyright (c) 2021, Niklas Hauser
+ * Copyright (c) 2021, 2023, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -15,6 +15,15 @@
 
 /* Stack layout (growing downwards):
  *
+ * Permanent Storage:
+ * Fiber Function
+ * Fiber Function Argument
+ *
+ * Temporary Prepare:
+ * Entry Function
+ *
+ * Register file:
+ *
  * fc_mxcsr | fc_x87_cw
  * SEE registers XMM6-XMM15 (for windows)
  * rbp
@@ -27,52 +36,107 @@
  * r12
  */
 
-static void modm_naked
+namespace
+{
+
+constexpr size_t StackWordsReset = 1;
+constexpr size_t StackWordsStorage = 2;
+constexpr size_t StackWordsRegisters = 30;
+constexpr size_t StackWordsAll = StackWordsStorage + StackWordsRegisters;
+constexpr size_t StackSizeWord = sizeof(uintptr_t);
+constexpr uintptr_t StackWatermark = 0xc0ffee'f00d'facade;
+
+
+void modm_naked
 modm_context_entry()
 {
 	asm volatile
 	(
-%% if with_windows
-		"popq %rcx		\n\t" // Load arg1
+%% if is_windows
+		"mov  (%rsp), %rcx	\n\t" // Load argument pointer
+		"mov 8(%rsp), %rdx	\n\t" // Load function pointer
+		"jmp  *%rdx			\n\t" // Jump into function
 %% else
-		"popq %rdi		\n\t" // Load arg1
+		"mov  (%rsp), %rdi	\n\t" // Load argument pointer
+		"mov 8(%rsp), %rsi	\n\t" // Load function pointer
+		"jmp  *%rsi			\n\t" // Jump into function
 %% endif
-		"ret			\n\t" // jump into function
 	);
 }
 
-modm_context_t
-modm_context_init(uintptr_t stack, uintptr_t arg, uintptr_t fn, uintptr_t end)
+}
+
+void
+modm_context_init(modm_context_t *ctx,
+				  uintptr_t *bottom, uintptr_t *top,
+				  uintptr_t fn, uintptr_t fn_arg)
 {
-	uintptr_t* sp = (uintptr_t*)arg;
-	*--sp = end;
-	*--sp = fn;
-	*--sp = arg;
-	*--sp = (uintptr_t) modm_context_entry;
-	sp -= 0xe8/8;
+	ctx->bottom = bottom;
+	ctx->top = top;
+
+	ctx->sp = top;
+	*--ctx->sp = fn;
+	*--ctx->sp = fn_arg;
+}
+
+void
+modm_context_reset(modm_context_t *ctx)
+{
+	*ctx->bottom = StackWatermark;
+
+	ctx->sp = ctx->top - StackWordsStorage;
+	*--ctx->sp = (uintptr_t) modm_context_entry;
+	ctx->sp -= StackWordsRegisters - StackWordsReset;
+	// initialize stack with the right flags
 	asm volatile
 	(
-		// initialize stack with the right flags
 		"stmxcsr 0xa0(%0)	\n\t"
 		"fnstcw  0xa4(%0)	\n\t"
-		:: "r" (sp)
+		:: "r" (ctx->sp)
 	);
-	return {(uintptr_t) sp, arg - stack};
+}
+
+void
+modm_context_watermark(modm_context_t *ctx)
+{
+	// clear the register file on the stack
+	for (auto *word = ctx->top - StackWordsAll;
+		 word < ctx->top - StackWordsStorage - StackWordsReset; word++)
+		*word = 0;
+
+	// then color the whole stack *below* the register file
+	for (auto *word = ctx->bottom; word < ctx->top - StackWordsAll; word++)
+		*word = StackWatermark;
+}
+
+size_t
+modm_context_stack_usage(const modm_context_t *ctx)
+{
+	for (auto *word = ctx->bottom; word < ctx->top; word++)
+		if (StackWatermark != *word)
+			return (ctx->top - word) * StackSizeWord;
+	return 0;
+}
+
+bool
+modm_context_stack_overflow(const modm_context_t *ctx)
+{
+	return *ctx->bottom != StackWatermark;
 }
 
 static modm_context_t main_context;
 
 void
-modm_context_start(uintptr_t to)
+modm_context_start(modm_context_t *to)
 {
-	modm_context_jump(&(main_context.sp), to);
+	modm_context_jump(&main_context, to);
 }
 
 void
 modm_context_end()
 {
-	uintptr_t dummy;
-	modm_context_jump(&dummy, main_context.sp);
+	modm_context_t dummy;
+	modm_context_jump(&dummy, &main_context);
 	__builtin_unreachable();
 }
 
@@ -91,13 +155,13 @@ See https://github.com/boostorg/context/tree/develop/src/asm
 */
 
 void modm_naked
-modm_context_jump(uintptr_t*, uintptr_t)
+modm_context_jump(modm_context_t*, modm_context_t*)
 {
 	asm volatile
 	(
 		"leaq -0xe8(%rsp), %rsp		\n\t"	// move stack pointer down
 %#
-%% if with_windows
+%% if is_windows
 		// save XMM storage
 		"movups %xmm6,  0x00(%rsp)	\n\t"
 		"movups %xmm7,  0x10(%rsp)	\n\t"
@@ -118,21 +182,21 @@ modm_context_jump(uintptr_t*, uintptr_t)
 		"movq %r13, 0xb0(%rsp)		\n\t"	// save R13
 		"movq %r14, 0xb8(%rsp)		\n\t"	// save R14
 		"movq %r15, 0xc0(%rsp)		\n\t"	// save R15
-%% if with_windows
+%% if is_windows
 		"movq %rdi, 0xc8(%rsp)		\n\t"	// save RDI
 		"movq %rsi, 0xd0(%rsp)		\n\t"	// save RSI
 %% endif
 		"movq %rbx, 0xd8(%rsp)		\n\t"	// save RBX
 		"movq %rbp, 0xe0(%rsp)		\n\t"	// save RBP
 %#
-%% if with_windows
+%% if is_windows
 		"movq %rsp, (%rcx)			\n\t"	// Store the SP in "from"
-		"movq %rdx, %rsp			\n\t"	// Restore SP from "to"
+		"movq (%rdx), %rsp			\n\t"	// Restore SP from "to"
 %% else
 		"movq %rsp, (%rdi)			\n\t"	// Store the SP in "from"
-		"movq %rsi, %rsp			\n\t"	// Restore SP from "to"
+		"movq (%rsi), %rsp			\n\t"	// Restore SP from "to"
 %% endif
-%% if with_windows
+%% if is_windows
 %#
 		// restore XMM storage
 		"movups 0x00(%rsp), %xmm6	\n\t"
@@ -154,7 +218,7 @@ modm_context_jump(uintptr_t*, uintptr_t)
 		"movq 0xb0(%rsp),  %r13		\n\t"	// restore R13
 		"movq 0xb8(%rsp),  %r14		\n\t"	// restore R14
 		"movq 0xc0(%rsp),  %r15		\n\t"	// restore R15
-%% if with_windows
+%% if is_windows
 		"movq 0xc8(%rsp),  %rdi		\n\t"	// restore RDI
 		"movq 0xd0(%rsp),  %rsi		\n\t"	// restore RSI
 %% endif
