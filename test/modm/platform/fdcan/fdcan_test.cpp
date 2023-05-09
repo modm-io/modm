@@ -17,19 +17,14 @@
 using namespace modm::platform;
 
 void
-FdcanTest::setUp()
+FdcanTest::testSendReceive()
 {
 	Fdcan1::initialize<Board::SystemClock, 500_kbps, 1_pct>(9, Fdcan1::Mode::TestInternalLoopback);
-
 	// receive all extended messages
 	Fdcan1::setExtendedFilter(0, Fdcan1::FilterConfig::Fifo1,
 			modm::can::ExtendedIdentifier(0),
 			modm::can::ExtendedMask(0));
-}
 
-void
-FdcanTest::testSendReceive()
-{
 	modm::can::Message message{0x12345678, 7};
 	constexpr std::string_view data = "\xDE\xAD\xBE\xEF\x12\x34\x56";
 	std::copy(std::begin(data), std::begin(data) + 7, message.data);
@@ -51,6 +46,12 @@ FdcanTest::testSendReceive()
 void
 FdcanTest::testFilters()
 {
+	Fdcan1::initialize<Board::SystemClock, 500_kbps, 1_pct>(9, Fdcan1::Mode::TestInternalLoopback);
+	// receive all extended messages
+	Fdcan1::setExtendedFilter(0, Fdcan1::FilterConfig::Fifo1,
+			modm::can::ExtendedIdentifier(0),
+			modm::can::ExtendedMask(0));
+
 	Fdcan1::setStandardFilter(27, Fdcan1::FilterConfig::Fifo0,
 			modm::can::StandardIdentifier(0x108),
 			modm::can::StandardMask(0x1F8));
@@ -72,10 +73,20 @@ FdcanTest::testFilters()
 void
 FdcanTest::testBuffers()
 {
+	Fdcan1::initialize<Board::SystemClock, 500_kbps, 1_pct>(9, Fdcan1::Mode::TestInternalLoopback);
+	// receive all extended messages
+	Fdcan1::setExtendedFilter(0, Fdcan1::FilterConfig::Fifo1,
+			modm::can::ExtendedIdentifier(0),
+			modm::can::ExtendedMask(0));
+
+	// send (RxBufferSize + 2) messages, exceeds internal peripheral queue size (3
+	// msgs) as well as the software queue size, but not both added together. So
+	// no message should get lost.
+	const uint_fast16_t numberOfMsgs = Fdcan1::RxBufferSize + 2;
+
 	modm::can::Message message{0x4711, 0};
-	// send 8 messages, exceeds internal peripheral queue size
-	for (uint_fast8_t i = 0; i <= 8; ++i) {
-		message.setLength(i);
+	for (uint_fast16_t i = 0; i <= numberOfMsgs; ++i) {
+		message.setLength(i % 8);
 		for (uint_fast8_t dataIndex = 0; dataIndex < i; ++dataIndex) {
 			message.data[dataIndex] = i;
 		}
@@ -86,11 +97,11 @@ FdcanTest::testBuffers()
 
 	// try to receive same messages
 	modm::can::Message receivedMessage;
-	for (uint_fast8_t i = 0; i <= 8; ++i) {
+	for (uint_fast16_t i = 0; i <= numberOfMsgs; ++i) {
 		TEST_ASSERT_TRUE(Fdcan1::getMessage(receivedMessage));
 
 		TEST_ASSERT_EQUALS(receivedMessage.getIdentifier(), 0x4711u);
-		TEST_ASSERT_EQUALS(receivedMessage.getLength(), i);
+		TEST_ASSERT_EQUALS(receivedMessage.getLength(), (i % 8));
 
 		for (uint_fast8_t dataIndex = 0; dataIndex < i; ++dataIndex) {
 			TEST_ASSERT_EQUALS(receivedMessage.data[dataIndex], i);

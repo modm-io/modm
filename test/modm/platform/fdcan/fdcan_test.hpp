@@ -16,9 +16,6 @@ class FdcanTest : public unittest::TestSuite
 {
 public:
 	void
-	setUp() override;
-
-	void
 	testSendReceive();
 
 	void
