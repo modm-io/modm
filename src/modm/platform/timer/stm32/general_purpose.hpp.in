@@ -387,6 +387,28 @@ public:
 		configureOutputChannel(channel, mode, compareValue, out, enableComparePreload);
 	}
 
+%% if target.family in ["g4"] and id in [15, 16, 17]
+	static void
+	configureOutputChannel(uint32_t channel, OutputCompareMode mode,
+			PinState out, OutputComparePolarity polarity,
+			PinState out_n,
+			OutputComparePolarity polarity_n = OutputComparePolarity::ActiveHigh,
+			OutputComparePreload preload = OutputComparePreload::Disable);
+
+	template<typename Signal>
+	static void
+	configureOutputChannel(OutputCompareMode mode,
+			PinState out, OutputComparePolarity polarity,
+			PinState out_n,
+			OutputComparePolarity polarity_n = OutputComparePolarity::ActiveHigh,
+			OutputComparePreload preload = OutputComparePreload::Disable)
+	{
+		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		static_assert(channel == 1, "Timer{{ id }} has complementary output only on channel 1");
+		configureOutputChannel(channel, mode, out, polarity, out_n, polarity_n, preload);
+	}
+%% endif
+
 	/// Switch to Pwm Mode 2
 	///
 	/// While upcounting channel will be active as long as the time value is
