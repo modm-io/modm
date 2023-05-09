@@ -237,24 +237,30 @@ MODM_ISR({{ reg }}_IT0)
 MODM_ISR({{ reg }}_IT1)
 {
 %% if options["buffer.rx"] > 0
+	int_fast16_t msgRetrieveLimit = rxQueue.getMaxSize() - rxQueue.getSize();
+
 	RxMessage rxMessage;
 
-	if (rxFifo0HasMessage()) {
+	while (rxFifo0HasMessage() && (msgRetrieveLimit > 0)) {
 		readMsg(rxMessage.message, 0, &rxMessage.filter_id, &rxMessage.timestamp);
-		// acknowledge interrupt flag
-		{{ reg }}->IR = FDCAN_IR_RF0N;
-
-		modm_assert_continue_ignore(rxQueue.push(rxMessage), "fdcan.rx.buffer",
-			"CAN receive software buffer overflowed!", {{ id }});
+		rxQueue.push(rxMessage);
+		msgRetrieveLimit--;
 	}
 
-	if (rxFifo1HasMessage()) {
+	while (rxFifo1HasMessage() && (msgRetrieveLimit > 0)) {
 		readMsg(rxMessage.message, 1, &rxMessage.filter_id, &rxMessage.timestamp);
-		// acknowledge interrupt flag
-		{{ reg }}->IR = FDCAN_IR_RF1N;
+		rxQueue.push(rxMessage);
+		msgRetrieveLimit--;
+	}
 
-		modm_assert_continue_ignore(rxQueue.push(rxMessage), "fdcan.rx.buffer",
-			"CAN receive software buffer overflowed!", {{ id }});
+	if (rxQueue.isFull()){
+		modm_assert_continue_ignore(false, "fdcan.rx.buffer",
+			"CAN receive software buffer full, not reading new message(s)!");
+		// disable rx ISR until we read data from the rxQueue (IST for tx remains active)
+		// The interrupt remains unacknowledged, so it fires again after the read.
+		{{ reg }}->ILE = FDCAN_ILE_EINT0;
+	} else {
+		{{ reg }}->IR = FDCAN_IR_RF0N | FDCAN_IR_RF1N;  // acknowledge interrupt flags
 	}
 %% endif
 }
@@ -369,6 +375,7 @@ modm::platform::Fdcan{{ id }}::getMessage(can::Message& message, uint8_t *filter
 			(*timestamp) = rxMessage.timestamp;
 		}
 		rxQueue.pop();
+		{{ reg }}->ILE = FDCAN_ILE_EINT1 | FDCAN_ILE_EINT0; // reenable ISR, in case it was disabled due to rxQueue full
 		return true;
 	}
 %% else

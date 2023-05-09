@@ -14,6 +14,8 @@
 #ifndef MODM_STM32_FDCAN{{ id }}_HPP
 #define MODM_STM32_FDCAN{{ id }}_HPP
 
+#include <optional>
+
 #include <modm/architecture/interface/can.hpp>
 #include <modm/architecture/interface/can_filter.hpp>
 #include <modm/platform/gpio/connector.hpp>

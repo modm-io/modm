@@ -86,8 +86,9 @@ FdcanTest::testBuffers()
 
 	modm::can::Message message{0x4711, 0};
 	for (uint_fast16_t i = 0; i <= numberOfMsgs; ++i) {
-		message.setLength(i % 8);
-		for (uint_fast8_t dataIndex = 0; dataIndex < i; ++dataIndex) {
+		uint_fast8_t length = i % 8;
+		message.setLength(length);
+		for (uint_fast8_t dataIndex = 0; dataIndex < length; ++dataIndex) {
 			message.data[dataIndex] = i;
 		}
 		Fdcan1::sendMessage(message);
@@ -101,9 +102,9 @@ FdcanTest::testBuffers()
 		TEST_ASSERT_TRUE(Fdcan1::getMessage(receivedMessage));
 
 		TEST_ASSERT_EQUALS(receivedMessage.getIdentifier(), 0x4711u);
-		TEST_ASSERT_EQUALS(receivedMessage.getLength(), (i % 8));
-
-		for (uint_fast8_t dataIndex = 0; dataIndex < i; ++dataIndex) {
+		uint_fast8_t length = i % 8;
+		TEST_ASSERT_EQUALS(receivedMessage.getLength(), length);
+		for (uint_fast8_t dataIndex = 0; dataIndex < length; ++dataIndex) {
 			TEST_ASSERT_EQUALS(receivedMessage.data[dataIndex], i);
 		}
 	}
