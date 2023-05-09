@@ -50,7 +50,7 @@ public:
 		CaptureCompare1 = TIM_DIER_CC1IE,
 		CaptureCompare2 = TIM_DIER_CC2IE,
 		CaptureCompare3 = TIM_DIER_CC3IE,
-		CaptureCompare4= TIM_DIER_CC4IE,
+		CaptureCompare4 = TIM_DIER_CC4IE,
 		Trigger = TIM_DIER_TIE,
 %% if target.family not in ["l0", "l1"]
 		COM = TIM_DIER_COMIE,
@@ -275,6 +275,16 @@ protected:
 	signalToChannel()
 	{
 		modm::platform::detail::SignalConnection<Signal, p>{};
+%% if target.family == "g4"
+		if constexpr (Signal::Signal == Gpio::Signal::Ch1 || Signal::Signal == Gpio::Signal::Ch1n) {
+			return 1;
+		} else if constexpr (Signal::Signal == Gpio::Signal::Ch2 || Signal::Signal == Gpio::Signal::Ch2n) {
+			return 2;
+		} else if constexpr (Signal::Signal == Gpio::Signal::Ch3 || Signal::Signal == Gpio::Signal::Ch3n) {
+			return 3;
+		} else if constexpr (Signal::Signal == Gpio::Signal::Ch4 || Signal::Signal == Gpio::Signal::Ch4n) {
+			return 4;
+%% else
 		if constexpr (Signal::Signal == Gpio::Signal::Ch1) {
 			return 1;
 		} else if constexpr (Signal::Signal == Gpio::Signal::Ch2) {
@@ -284,6 +294,7 @@ protected:
 %% if target.family != "l0" or target.pin != "d"
 		} else if constexpr (Signal::Signal == Gpio::Signal::Ch4) {
 			return 4;
+%% endif
 %% endif
 		} else {
 			// assert is always false, static_assert(false) would not compile
