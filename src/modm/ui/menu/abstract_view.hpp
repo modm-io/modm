@@ -18,7 +18,7 @@
 #ifndef MODM_ABSTRACT_VIEW_HPP
 #define MODM_ABSTRACT_VIEW_HPP
 
-#include <modm/utils/allocator/static.hpp>
+#include <modm/utils/allocator.hpp>
 
 #include "iabstract_view.hpp"
 
