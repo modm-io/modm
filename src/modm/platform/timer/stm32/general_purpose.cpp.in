@@ -197,7 +197,7 @@ modm::platform::Timer{{ id }}::configureOutputChannel(uint32_t channel,
 	}
 }
 
-%% if target.family in ["g4"] and id in [15, 16, 17]
+%% if id in [15, 16, 17]
 void
 modm::platform::Timer{{ id }}::configureOutputChannel(uint32_t channel,
 OutputCompareMode mode,
@@ -207,7 +207,7 @@ OutputComparePreload preload)
 {
 	modm_assert(channel == 1, "Timer{{ id }}", "This timer has complementary output only on channel 1!", "{{ id }}");
 
-	channel -= 1;	
+	channel -= 1;
 
 	// disable output
 	TIM{{ id }}->CCER &= ~(0xf << (channel * 4));

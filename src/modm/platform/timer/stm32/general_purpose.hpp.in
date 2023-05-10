@@ -387,7 +387,7 @@ public:
 		configureOutputChannel(channel, mode, compareValue, out, enableComparePreload);
 	}
 
-%% if target.family in ["g4"] and id in [15, 16, 17]
+%% if id in [15, 16, 17]
 	static void
 	configureOutputChannel(uint32_t channel, OutputCompareMode mode,
 			PinState out, OutputComparePolarity polarity,
