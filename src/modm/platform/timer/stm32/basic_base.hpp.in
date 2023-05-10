@@ -92,6 +92,12 @@ public:
 	disable();
 
 	/**
+	 * Check, whether clock has been enabled.
+	 */
+	static bool
+	isEnabled();
+
+	/**
 	 * Pause timer operation
 	 *
 	 * All settings are stored but the timer operation is suspend until

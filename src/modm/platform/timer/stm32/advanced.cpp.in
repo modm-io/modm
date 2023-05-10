@@ -33,6 +33,12 @@ modm::platform::Timer{{ id }}::disable()
 	Rcc::disable<Peripheral::Tim{{id}}>();
 }
 
+bool
+modm::platform::Timer{{ id }}::isEnabled()
+{
+	return Rcc::isEnabled<Peripheral::Tim{{id}}>();
+}
+
 // ----------------------------------------------------------------------------
 void
 modm::platform::Timer{{ id }}::setMode(Mode mode, SlaveMode slaveMode,

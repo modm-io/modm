@@ -137,6 +137,9 @@ public:
 	static void
 	disable();
 
+	static bool
+	isEnabled();
+
 	static inline void
 	pause()
 	{
