@@ -3,7 +3,7 @@
 #
 # Copyright (c) 2016-2018, Niklas Hauser
 # Copyright (c) 2017, Fabian Greif
-# Copyright (c) 2020, Christopher Durand
+# Copyright (c) 2020-2023, Christopher Durand
 #
 # This file is part of the modm project.
 #
@@ -164,6 +164,9 @@ def prepare(module, options):
         ":cmsis:device",
         ":math:utils",
         ":platform:rcc")
+
+    module.add_query(EnvironmentQuery(name="all_signals", factory=lambda env: bprops["all_signals"]))
+
     return True
 
 def validate(env):

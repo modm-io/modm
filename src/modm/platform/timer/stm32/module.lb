@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2016-2018, Niklas Hauser
+# Copyright (c) 2023, Christopher Durand
 #
 # This file is part of the modm project.
 #
@@ -11,22 +12,9 @@
 # -----------------------------------------------------------------------------
 
 from collections import defaultdict
-props = {}
+import re
 
-def get_connectors(instance):
-    if instance in [1, 8]:
-        return ["Channel1", "Channel1N", "Channel2", "Channel2N",
-                "Channel3", "Channel3N", "Channel4", "Channel4N",
-                "ExternalTrigger", "BreakIn"]
-    elif instance in [2, 3, 4, 5, 19]:
-        return ["Channel1", "Channel2", "Channel3", "Channel4", "ExternalTrigger"]
-    elif instance in [9, 12]:
-        return ["Channel1", "Channel2"]
-    elif instance in [10, 11, 13, 14]:
-        return ["Channel1"]
-    elif instance in [15, 16, 17]:
-        return ["Channel1", "Channel1N", "Channel2", "BreakIn"]
-    return []
+props = {}
 
 class Instance(Module):
     def __init__(self, driver, instance):
@@ -73,7 +61,6 @@ class Instance(Module):
     def build(self, env):
         global props
         props["id"] = self.instance
-        props["connectors"] = get_connectors(self.instance)
         props["vectors"] = self.vectors
         props["types"].add(self.type)
 
@@ -128,6 +115,10 @@ def build(env):
     global props
     env.substitutions = props
     env.outbasepath = "modm/src/modm/platform/timer"
+
+    pattern = re.compile("^(Ch([1-6])n{0,1})$")
+    all_signals = env.query(":platform:gpio:all_signals")
+    props["signals"] = [pattern.match(s).groups() for s in all_signals if pattern.match(s)]
 
     # Only generate the base types for timers that were generated
     types = props["types"]
