@@ -210,6 +210,13 @@ public:
 	setValue(Value value);
 
 	/**
+	 * Allows to check, whether the timer has BDTR and DTR2 registers
+	 * for PWM deadtime, break and output enable control.
+	 */
+	static constexpr bool
+	hasAdvancedPwmControl();
+
+	/**
 	 * Enables or disables the Interrupt Vector.
 	 *
 	 * \param	enable

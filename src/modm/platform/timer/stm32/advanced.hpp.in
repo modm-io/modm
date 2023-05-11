@@ -234,6 +234,12 @@ public:
 		TIM{{ id }}->CNT = value;
 	}
 
+	static constexpr bool
+	hasAdvancedPwmControl()
+	{
+		return true;
+	}
+
 	static inline void
 	enableOutput()
 	{

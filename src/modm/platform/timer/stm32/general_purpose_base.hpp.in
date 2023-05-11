@@ -3,6 +3,7 @@
  * Copyright (c) 2014, Fabian Greif
  * Copyright (c) 2014-2017, Niklas Hauser
  * Copyright (c) 2022-2023, Christopher Durand
+ * Copyright (c) 2023, Sergey Pluzhnikov
  *
  * This file is part of the modm project.
  *
@@ -283,7 +284,7 @@ public:
 			return true;
 %% endif
 %% if loop.last and loop.length > 0
-		} 
+		}
 %% endif
 %% endfor
 		return false;

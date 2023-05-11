@@ -175,6 +175,12 @@ public:
 		TIM{{ id }}->CNT = value;
 	}
 
+	static constexpr bool
+	hasAdvancedPwmControl()
+	{
+		return false;
+	}
+
 	static void
 	enableInterruptVector(bool enable, uint32_t priority);
 
