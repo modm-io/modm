@@ -14,7 +14,7 @@ include(cmake/ModmConfiguration.cmake)
 %% if asm_sources | length
 set_source_files_properties(
 %% for file in asm_sources | sort
-  {{ file | relocate }}
+  {{ file | relocate | modm.posixify  }}
 %% endfor
   PROPERTIES LANGUAGE CXX
 )
@@ -24,7 +24,7 @@ set_source_files_properties(
 %% if sources | length
 add_library(modm OBJECT
 %% for file, flags in sources | sort
-  {{ file | relocate }}
+  {{ file | relocate | modm.posixify  }}
 %% endfor
 )
 
@@ -32,7 +32,7 @@ add_library(modm OBJECT
 
 %% if per_file_attr | length
 %% for section in per_file_attr | sort
-{{ section }}
+{{ section | modm.posixify }}
 %% endfor
 
 %% endif
@@ -46,7 +46,7 @@ modm_target_config_create(modm modm_arch_options modm_options modm_warnings)
 %% if include_paths | length
 target_include_directories(modm SYSTEM PUBLIC
 %% for path in include_paths | sort
-  {{ path | relocate }}
+  {{ path | relocate | modm.posixify  }}
 %% endfor
 )
 

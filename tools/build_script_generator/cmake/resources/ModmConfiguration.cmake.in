@@ -99,7 +99,7 @@ function(modm_target_config_create target target_arch target_options target_warn
 %% macro generate_flags_for_profile(name, profile)
 set({{ name | upper }}{{ "_" ~ (profile | upper) if profile | length else "" }}
 %% for flag in flags[name][profile] | sort
-    {{ flag | flags_format }}
+    {{ flag | flags_format | modm.posixify }}
 %% endfor
   )
 %% endmacro
