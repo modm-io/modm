@@ -269,6 +269,26 @@ public:
 	static uint16_t
 	getCompareValue(uint32_t channel);
 
+public:
+	template< typename Signal>
+	static consteval bool
+	isComplementaryChannel()
+	{
+%% for signal, number in signals if signal in ["Ch1n","Ch2n","Ch3n","Ch4n"]
+%% if loop.first
+		if constexpr (Signal::Signal == Gpio::Signal::{{ signal }}) {
+			return true;
+%% else
+		} else if constexpr (Signal::Signal == Gpio::Signal::{{ signal }}) {
+			return true;
+%% endif
+%% if loop.last and loop.length > 0
+		} 
+%% endif
+%% endfor
+		return false;
+	}
+
 protected:
 	template<Peripheral p, typename Signal>
 	static consteval int
