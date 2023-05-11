@@ -244,16 +244,15 @@ def init(repo):
     # Add Jinja2 filters commonly used in this repository
     if 'Windows' in platform.platform():
         def windowsify(path, escape_level):
-            path = normpath(path)
             escaped = "\\" * (2 ** escape_level)
             return path.replace("\\", escaped)
         def posixify(path):
-            return normpath(path).replace("\\", "/")
+            return path.replace("\\", "/")
     else:
         def windowsify(path, escape_level):
-            return normpath(path)
+            return path
         def posixify(path):
-            return normpath(path)
+            return path
     repo.add_filter("modm.windowsify", windowsify)
     repo.add_filter("modm.posixify", posixify)
     repo.add_filter("modm.ord", lambda letter: ord(letter[0].lower()) - ord("a"))
