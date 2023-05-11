@@ -19,11 +19,13 @@ import tempfile
 import argparse
 import datetime
 import platform
-import multiprocessing as mp
+import subprocess
+from multiprocessing.pool import ThreadPool
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 from collections import defaultdict
 
+is_running_on_macos = "macOS" in platform.platform()
 def repopath(path):
     return Path(__file__).absolute().parents[2] / path
 def relpath(path):
@@ -101,26 +103,32 @@ def main():
     test_group.add_argument("--test2", "-t2", action='store_true', help="Test mode: generate only a few targets. List has targets from the real target list.")
     parser.add_argument("--jobs", "-j", type=int, default=2, help="Number of parallel doxygen processes")
     parser.add_argument("--local-temp", "-l", action='store_true', help="Create temporary directory inside current working directory")
-    group = parser.add_mutually_exclusive_group(required=True)
+    group = parser.add_mutually_exclusive_group()
     group.add_argument("--compress", "-c", action='store_true', help="Compress output into gzip archive")
     group.add_argument("--output", "-o", type=str, help="Output directory")
     parser.add_argument("--overwrite", "-f", action='store_true', help="Overwrite existing data in output directory (Removes all files from output directory.)")
     parser.add_argument("--deduplicate", "-d", action='store_true', help="Deduplicate identical files with symlinks.")
+    parser.add_argument("--target-job", help="Create a single target from job string.")
     args = parser.parse_args()
+
+    # Called by the thread pool below as a workaround for buggy multiprocessing
+    if args.target_job:
+        exit(0 if create_target(args.target_job) else -1)
 
     device_list, board_list, family_list = get_targets()
     if args.test:
         device_list = ["stm32f103c8t6", "stm32f417zgt6"] + family_list
-        device_list = list(set(device_list))
         board_list = [("arduino-nano", "atmega328p-au"), ("arduino-uno", "atmega328p-au"), ("nucleo-g474re", "stm32g474ret6"),
                       ("blue-pill", "stm32f103c8t6"), ("feather-m0", "samd21g18a-uu"), ("disco-f469ni", "stm32f469nih6")]
     elif args.test2:
         device_list = ["hosted-linux", "atmega328p-pu", "stm32f103zgt7"]
         board_list = [("nucleo-g474re", "stm32g474ret6")]
+    device_list = list(set(device_list))
 
     final_output_dir = Path(args.output).absolute() if args.output else "."
     template_path = os.path.realpath(os.path.dirname(sys.argv[0]))
     cwd = Path().cwd()
+    filepath = os.path.abspath(__file__)
     if args.local_temp:
         temp_dir = str(cwd)
     else:
@@ -136,16 +144,16 @@ def main():
         print("Starting to generate documentation...")
         template_overview(output_dir, device_list, board_list, template_path)
         print("... for {} devices, estimated memory footprint is {} MB".format(len(device_list) + len(board_list), (len(device_list)*70)+2000))
-        with mp.get_context("spawn").Pool(args.jobs) as pool:
+        with ThreadPool(args.jobs) as pool:
             # We can only pass one argument to pool.map
-            devices = ["{}|{}|{}||{}".format(modm_path, tempdir, dev, args.deduplicate) for dev in device_list]
-            devices += ["{}|{}|{}|{}|{}".format(modm_path, tempdir, dev, brd, args.deduplicate) for (brd, dev) in board_list]
-            results = pool.map(create_target, devices)
+            devices = [f"python3 {filepath} --target-job '{modm_path}|{tempdir}|{dev}||{args.deduplicate}'" for dev in device_list]
+            devices += [f"python3 {filepath} --target-job '{modm_path}|{tempdir}|{dev}|{brd}|{args.deduplicate}'" for (brd, dev) in board_list]
+            results = pool.map(lambda d: subprocess.run(d, shell=True).returncode, list(set(devices)))
         # output_dir.rename(cwd / 'modm-api-docs')
         if args.compress:
             print("Zipping docs ...")
             # Zipping may take more than 10 minutes
-            os.system("(cd {} && tar -czvf {} .)".format(str(output_dir), str(cwd / 'modm-api-docs.tar.gz')))
+            os.system(f"(cd {str(output_dir)} && {'g' if is_running_on_macos else ''}tar --checkpoint=.100 -czf {str(cwd / 'modm-api-docs.tar.gz')} .)")
             # shutil.make_archive(str(cwd / 'modm-api-docs'), 'gztar', str(output_dir))
         else:
             if args.overwrite and final_output_dir.exists():
@@ -157,8 +165,9 @@ def main():
                         os.remove(i)
             print('Moving {} -> {}'.format(output_dir, final_output_dir))
             #shutil.move(str(output_dir) + '/', str(final_output_dir))
+            print(f"Moving {output_dir} -> {final_output_dir}")
             output_dir.rename(final_output_dir)
-        return results.count(False)
+        return results.count(0) == len(results)
 
 
 def create_target(argument):
@@ -209,6 +218,7 @@ def create_target(argument):
                 key = file.relative_to(tempdir).parts[4:]
                 if key:
                     symlinks[os.path.join(*key)].append(file)
+            dot_counter = 0
             for file in srcdir.rglob('*'):
                 if file.is_dir():
                     print(end="", flush=True)
@@ -220,7 +230,8 @@ def create_target(argument):
                     del symlinks[key]
                 fhash = hash(file.read_bytes())
                 if fhash in symlinks:
-                    print(".", end="")
+                    dot_counter += 1
+                    if dot_counter % 30 == 0: print(".", end="")
                     rpath = symlinks[fhash][0].relative_to(tempdir / 'output/develop/api')
                     lpath = os.path.relpath(srcdir, file.parent)
                     sympath = os.path.join("..", lpath, rpath)
@@ -229,8 +240,8 @@ def create_target(argument):
                     file.symlink_to(sympath)
 
         # Only move folder *after* deduplication to prevent race condition with file.unlink()
+        print(f"\nMoving {srcdir.relative_to(tempdir)} -> {destdir.relative_to(tempdir)}", flush=True)
         srcdir.rename(destdir)
-        print(end="", flush=True)
         return True
     except Exception as e:
         print("Error generating documentation for device {}: {}".format(output_dir, e))
@@ -258,4 +269,4 @@ def template_overview(output_dir, device_list, board_list, template_path):
 
 
 if __name__ == "__main__":
-    exit(main())
+    exit(0 if main() else -1)
