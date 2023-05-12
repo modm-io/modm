@@ -135,7 +135,7 @@ sendMsg(const modm::can::Message& message)
 {
 	using namespace modm::platform;
 
-	if (!Fdcan{{ id }}::isReadyToSend()) {
+	if (isHardwareTxQueueFull()) {
 		return false;
 	}
 
@@ -215,20 +215,25 @@ modm::platform::Fdcan{{ id }}::initializeWithPrescaler(
 MODM_ISR({{ reg }}_IT0)
 {
 %% if options["buffer.tx"] > 0
-	if (txQueue.isNotEmpty()) {
-		sendMsg(txQueue.get());
-		txQueue.pop();
+	if ({{ reg }}->IR & FDCAN_IR_TC) {
+		{{ reg }}->IR = FDCAN_IR_TC;
+		if (txQueue.isNotEmpty()) {
+			const bool success = sendMsg(txQueue.get());
+			if (success) {
+				txQueue.pop();
+			}
+		}
 	}
 %% endif
 
-	const auto callback = modm::platform::Fdcan{{ id }}::getErrorInterruptCallback();
-	if (callback) {
-		const bool hasErrorInterrupt = ({{ reg }}->IR & (FDCAN_IR_BO | FDCAN_IR_EW | FDCAN_IR_EP));
-		if (hasErrorInterrupt) {
+	const bool hasErrorInterrupt = ({{ reg }}->IR & (FDCAN_IR_BO | FDCAN_IR_EW | FDCAN_IR_EP));
+	if (hasErrorInterrupt) {
+		const auto callback = modm::platform::Fdcan{{ id }}::getErrorInterruptCallback();
+		if (callback) {
 			callback();
 		}
+		{{ reg }}->IR = FDCAN_IR_BO | FDCAN_IR_EW | FDCAN_IR_EP;
 	}
-	{{ reg }}->IR = FDCAN_IR_TC | FDCAN_IR_BO | FDCAN_IR_EW | FDCAN_IR_EP;
 }
 
 
@@ -258,7 +263,7 @@ MODM_ISR({{ reg }}_IT1)
 			"CAN receive software buffer full, not reading new message(s)!");
 		// disable rx ISR until we read data from the rxQueue (IST for tx remains active)
 		// The interrupt remains unacknowledged, so it fires again after the read.
-		{{ reg }}->ILE = FDCAN_ILE_EINT0;
+		{{ reg }}->ILE &= ~FDCAN_ILE_EINT1;
 	} else {
 		{{ reg }}->IR = FDCAN_IR_RF0N | FDCAN_IR_RF1N;  // acknowledge interrupt flags
 	}
@@ -402,10 +407,27 @@ modm::platform::Fdcan{{ id }}::isReadyToSend()
 %% endif
 }
 
-
 bool
 modm::platform::Fdcan{{ id }}::sendMessage(const can::Message& message)
 {
+%% if options["buffer.tx"] > 0
+	/* Disable CAN interrupts to prevent race condition:
+	 * sendMsg() could be called concurrently from the TX interrupt and
+	 * simultaneously access the same TX buffer.
+	 * isHardwareTxQueueFull() must be checked while interrupts are off to
+	 * prevent a "time-of-check to time-of-use" bug. */
+	struct Lock
+	{
+		const uint32_t flags;
+		/* An edge case could occur where the RX interrupt gets disabled
+		 * in the RX handler when the queue is full between reading ILE and
+		 * writing ILE = 0. This will invoke the RX handler once
+		 * after sendMessage() but not cause any further issues. */
+		Lock() : flags({{ reg }}->ILE) { {{ reg }}->ILE = 0; }
+		~Lock() { {{ reg }}->ILE = flags; }
+	} lock;
+%% endif
+
 	if (isHardwareTxQueueFull()) {
 %% if options["buffer.tx"] > 0
 		if (txQueue.isFull()) {
