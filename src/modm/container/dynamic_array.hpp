@@ -47,7 +47,7 @@ namespace modm
 	 * \ingroup	modm_container
 	 */
 	template <typename T, typename Allocator = std::allocator<T>>
-	class DynamicArray
+	class [[deprecated("Use std::vector instead")]] DynamicArray
 	{
 	public:
 		using SizeType = std::size_t;

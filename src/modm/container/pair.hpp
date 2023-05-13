@@ -66,7 +66,7 @@ namespace modm
 	 * \ingroup		modm_container
 	 */
 	template<typename T1, typename T2>
-	class Pair : public std::pair<T1, T2>
+	class [[deprecated("Use std::pair instead")]] Pair : public std::pair<T1, T2>
 	{
 	public:
 		using FirstType = T1;
