@@ -39,7 +39,7 @@ namespace modm
 	 * 		 This would make operations in xpcc very inefficient.
 	 */
 	template <typename T, typename Allocator = std::allocator<T>>
-	class LinkedList : public DoublyLinkedList<T, Allocator>
+	class [[deprecated("Use std::list instead")]] LinkedList : public DoublyLinkedList<T, Allocator> // DEPRECATED: 2027q4
 	{
 	public:
 		using DoublyLinkedList<T, Allocator>::DoublyLinkedList;

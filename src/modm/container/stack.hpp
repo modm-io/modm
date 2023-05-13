@@ -35,7 +35,7 @@ namespace modm
 	 */
 	template<typename T,
 			 typename Container>
-	class Stack
+	class [[deprecated("Use std::stack instead")]] Stack // DEPRECATED: 2027q4
 	{
 	public:
 		typedef typename Container::Size Size;
