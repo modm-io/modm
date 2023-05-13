@@ -35,6 +35,7 @@ namespace modm
 	public:
 		using const_iterator = std::list<T>::const_iterator;
 		using iterator = std::list<T>::iterator;
+		using Size = std::size_t;
 
 		DoublyLinkedList(const Allocator& allocator = Allocator())
 			: data_{std::move(allocator)}
@@ -63,10 +64,11 @@ namespace modm
 		}
 
 		/// Insert at the end of the list
-		void
+		bool
 		append(const T& value)
 		{
 			data_.push_back(value);
+			return true;
 		}
 
 		/// Remove the first entry
@@ -82,6 +84,12 @@ namespace modm
 			data_.pop_back();
 		}
 
+		T&
+		getFront()
+		{
+			return data_.front();
+		}
+
 		/**
 		 * \return the first node in the list
 		 */
@@ -89,6 +97,12 @@ namespace modm
 		getFront() const
 		{
 			return data_.front();
+		}
+
+		T&
+		getBack()
+		{
+			return data_.back();
 		}
 
 		/**
@@ -100,7 +114,6 @@ namespace modm
 			return data_.back();
 		}
 
-	public:
 		/**
 		 * Returns a read/write iterator that points to the first element in the
 		 * list.  Iteration is done in ordinary element order.
@@ -153,8 +166,33 @@ namespace modm
 		iterator
 		erase(iterator position)
 		{
-			return data_.erase(position);
+			if (position != data_.end()) {
+				return data_.erase(position);
+			} else {
+				return data_.end();
+			}
 		}
+
+		/**
+		 * Insert data after position iterator.
+		 *
+		 * This behavior is compatible with modm::LinkedList but different
+		 * compared to std::list which inserts before the position iterator
+		 * argument.
+		 */
+		bool
+		insert(iterator position, const T& value)
+		{
+			if (position == data_.end()) {
+				data_.push_back(value);
+			} else {
+				data_.insert(std::next(position), value);
+			}
+			return true;
+		}
+
+	private:
+		std::list<T, Allocator> data_;
 	};
 }
 
