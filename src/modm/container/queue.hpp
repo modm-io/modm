@@ -36,7 +36,7 @@ namespace modm
 	 */
 	template<typename T,
 			 typename Container>
-	class Queue
+	class [[deprecated("Use std::queue instead")]] Queue // DEPRECATED: 2027q4
 	{
 	public:
 		typedef typename Container::Size Size;
