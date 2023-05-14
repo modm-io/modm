@@ -49,7 +49,7 @@ struct RttBuffer
 	{
 		const uint32_t rhead{head};
 		const uint32_t rtail{tail};
-		return ((rhead >= rtail) ? 0 : size) + rhead - rtail;
+		return ((rhead > rtail) ? 0 : size) + rhead - rtail;
 	}
 } modm_packed;
 
