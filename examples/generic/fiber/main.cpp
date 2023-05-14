@@ -12,13 +12,15 @@
 #include <modm/board.hpp>
 #include <modm/debug/logger.hpp>
 #include <modm/processing.hpp>
+#include <modm/driver/time/cycle_counter.hpp>
 
 using namespace Board;
 using namespace std::chrono_literals;
 
-constexpr uint32_t cycles = 1'000'000;
+constexpr uint32_t cycles = 100'000;
 volatile uint32_t f1counter = 0, f2counter = 0;
 uint32_t total_counter=0;
+modm_fastdata modm::CycleCounter counter;
 
 void
 fiber_function1()
@@ -54,14 +56,29 @@ struct Test
 	volatile uint32_t f4counter{0};
 } test;
 
-modm_faststack modm::fiber::Stack<2048> stack1;
-modm_faststack modm::fiber::Stack<2048> stack2;
-modm_faststack modm::fiber::Stack<2048> stack3;
-modm_faststack modm::fiber::Stack<2048> stack4;
-modm_fastdata  modm::Fiber fiber1(stack1, fiber_function1);
-modm_fastdata  modm::Fiber fiber2(stack2, [](){ fiber_function2(cycles); });
-modm_fastdata  modm::Fiber fiber3(stack3, [](){ test.fiber_function3(); });
-modm_fastdata  modm::Fiber fiber4(stack4, [cyc=uint32_t(0)]() mutable { cyc++; test.fiber_function4(cyc); });
+// Single purpose fibers to time the yield
+modm_faststack modm::Fiber<> fiber_y1([](){ modm::fiber::yield();  counter.stop(); });
+modm_faststack modm::Fiber<> fiber_y2([](){ counter.start(); modm::fiber::yield(); });
+
+modm_faststack modm::Fiber<> fiber1(fiber_function1, modm::fiber::Start::Later);
+modm_faststack modm::Fiber<> fiber2([](){ fiber_function2(cycles); }, modm::fiber::Start::Later);
+modm_faststack modm::Fiber<> fiber3([](){ test.fiber_function3(); }, modm::fiber::Start::Later);
+modm_faststack modm::Fiber<> fiber4([cyc=uint32_t(0)]() mutable
+{ cyc = cycles; test.fiber_function4(cyc); }, modm::fiber::Start::Later);
+
+// Restartable Fibers
+extern modm::Fiber<> fiber_pong;
+extern modm::Fiber<> fiber_ping;
+modm_faststack modm::Fiber<> fiber_ping([](){
+	MODM_LOG_INFO << "ping = " << fiber_ping.stack_usage() << modm::endl;
+	modm::fiber::sleep(1s);
+	fiber_pong.start();
+}, modm::fiber::Start::Later);
+modm_faststack modm::Fiber<> fiber_pong([](){
+	MODM_LOG_INFO << "pong = " << fiber_pong.stack_usage() << modm::endl;
+	modm::fiber::sleep(1s);
+	fiber_ping.start();
+}, modm::fiber::Start::Later);
 
 // Blue pill (M3 72MHz): Executed 1000000 in 1098591us (910256.88 yields per second)
 // Feather M0 (M0+ 48MHz): Executed 1000000 in 1944692us (514220.25 yields per second)
@@ -69,9 +86,27 @@ int
 main()
 {
 	Board::initialize();
+	counter.initialize();
 	MODM_LOG_INFO << "Starting fiber modm::yield benchmark..." << modm::endl;
 	MODM_LOG_INFO.flush();
 
+	fiber_y1.watermark_stack();
+	fiber_y2.watermark_stack();
+	// fiber_y1, fiber_y2 were autostarted
+	{
+		modm::atomic::Lock l;
+		modm::fiber::Scheduler::run();
+	}
+
+	MODM_LOG_INFO << "Y1 stack usage: = " << fiber_y1.stack_usage() << modm::endl;
+	MODM_LOG_INFO << "Y2 stack usage: = " << fiber_y2.stack_usage() << modm::endl;
+	MODM_LOG_INFO.flush();
+
+	// the rest is manually started
+	fiber1.start(); fiber1.watermark_stack();
+	fiber2.start(); fiber2.watermark_stack();
+	fiber3.start(); fiber3.watermark_stack();
+	fiber4.start(); fiber4.watermark_stack();
 	const modm::PreciseTimestamp start = modm::PreciseClock::now();
 	modm::fiber::Scheduler::run();
 	const auto diff = (modm::PreciseClock::now() - start);
@@ -81,8 +116,19 @@ main()
 	MODM_LOG_INFO << ((total_counter * 1'000'000ull) / std::chrono::microseconds(diff).count());
 	MODM_LOG_INFO << " yields per second, ";
 	MODM_LOG_INFO << (std::chrono::nanoseconds(diff).count() / total_counter);
-	MODM_LOG_INFO << "ns per yield" << modm::endl;
-	MODM_LOG_INFO.flush();
+	MODM_LOG_INFO << "ns per yield slice" << modm::endl;
+	MODM_LOG_INFO << counter.cycles() << " cycles = " << counter.nanoseconds();
+	MODM_LOG_INFO << "ns per single yield" << modm::endl;
+
+	MODM_LOG_INFO << "F1 stack usage = " << fiber1.stack_usage() << modm::endl;
+	MODM_LOG_INFO << "F2 stack usage = " << fiber2.stack_usage() << modm::endl;
+	MODM_LOG_INFO << "F3 stack usage = " << fiber3.stack_usage() << modm::endl;
+	MODM_LOG_INFO << "F4 stack usage = " << fiber4.stack_usage() << modm::endl;
+
+	fiber_ping.watermark_stack();
+	fiber_pong.watermark_stack();
+	fiber_ping.start();
+	modm::fiber::Scheduler::run();
 
 	while(1) ;
 	return 0;

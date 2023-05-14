@@ -33,15 +33,14 @@ struct Test
 	}
 } test;
 
-modm::fiber::Stack<1024> stack1;
-modm::fiber::Stack<1024> stack2;
-modm::Fiber fiber1(stack1, hello);
+modm::Fiber<> fiber1(hello);
+modm::fiber::Stack<> stack2;
 
 int
 main(void)
 {
 	const char *arg = "World";
-	modm::Fiber fiber2(stack2, [=]() { test.world(arg); });
+	modm::fiber::Task fiber2(stack2, [=]() { test.world(arg); });
 
 	MODM_LOG_INFO << "Start" << modm::endl;
 	modm::fiber::Scheduler::run();

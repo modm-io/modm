@@ -18,7 +18,7 @@ using namespace Board;
 
 // maps arbitrary gpios to a bit
 using LedRingLeft = SoftwareGpioPort<
-	Board::LedSouth,		// 4
+//	Board::LedSouth,		// 4
 	Board::LedSouthWest,	// 3
 	Board::LedWest,			// 2
 	Board::LedNorthWest,	// 1
@@ -26,7 +26,7 @@ using LedRingLeft = SoftwareGpioPort<
 	>;
 // Symmetry \o/
 using LedRingRight = SoftwareGpioPort<
-	Board::LedSouth,		// 4
+//	Board::LedSouth,		// 4
 	Board::LedSouthEast,	// 3
 	Board::LedEast,			// 2
 	Board::LedNorthEast,	// 1
@@ -39,57 +39,48 @@ Board::l3g::Gyroscope::Data data;
 Board::l3g::Gyroscope gyro(data);
 
 
-class ReaderThread : public modm::pt::Protothread
+modm_faststack modm::Fiber<> fiber_gyro([]()
 {
-public:
-	bool
-	update()
+	// initialize with limited range of 250 degrees per second
+	gyro.configure(gyro.Scale::Dps250);
+
+	modm::filter::MovingAverage<float, 25> averageZ;
+	while (true)
 	{
-		PT_BEGIN();
+		// read out the sensor
+		gyro.readRotation();
 
-		// initialize with limited range of 250 degrees per second
-		PT_CALL(gyro.configure(gyro.Scale::Dps250));
+		// update the moving average
+		averageZ.update(gyro.getData().getZ());
 
-		while (true)
-		{
-			// read out the sensor
-			PT_CALL(gyro.readRotation());
+		float value = averageZ.getValue();
+		// normalize rotation and scale by 5 leds
+		uint16_t leds = abs(value / 200 * 5);
+		leds = (1ul << leds) - 1;
 
-			// update the moving average
-			averageZ.update(gyro.getData().getZ());
-
-			{
-				float value = averageZ.getValue();
-				// normalize rotation and scale by 5 leds
-				uint16_t leds = abs(value / 200 * 5);
-				leds = (1ul << leds) - 1;
-
-				// use left or right half ring depending on sign
-				if (value < 0) {
-					LedRingRight::write(0);
-					LedRingLeft::write(leds);
-				}
-				else {
-					LedRingLeft::write(0);
-					LedRingRight::write(leds);
-				}
-			}
-
-			// repeat every 5 ms
-			timeout.restart(5ms);
-			PT_WAIT_UNTIL(timeout.isExpired());
+		// use left or right half ring depending on sign
+		if (value < 0) {
+			LedRingRight::write(0);
+			LedRingLeft::write(leds);
+		}
+		else {
+			LedRingLeft::write(0);
+			LedRingRight::write(leds);
 		}
 
-		PT_END();
+		// repeat every 5 ms
+		modm::fiber::sleep(5ms);
 	}
+});
 
-private:
-	modm::ShortTimeout timeout;
-	modm::filter::MovingAverage<float, 25> averageZ;
-};
-
-ReaderThread reader;
-
+modm_faststack modm::Fiber<> fiber_blinky([]()
+{
+	while (true)
+	{
+		Board::LedSouth::toggle();
+		modm::fiber::sleep(1s);
+	}
+});
 
 int
 main()
@@ -97,10 +88,7 @@ main()
 	Board::initialize();
 	Board::initializeL3g();
 
-	while (true)
-	{
-		reader.update();
-	}
+	modm::fiber::Scheduler::run();
 
 	return 0;
 }

@@ -2,6 +2,7 @@
   <extends>modm:disco-f469ni</extends>
   <options>
     <option name="modm:build:build.path">../../../build/stm32f469_discovery/touchscreen</option>
+    <option name="modm:processing:protothread:use_fiber">yes</option>
   </options>
   <modules>
     <module>modm:processing:protothread</module>

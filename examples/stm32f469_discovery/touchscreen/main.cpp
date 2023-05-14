@@ -90,6 +90,16 @@ private:
 
 LineDrawer drawer;
 
+modm_faststack modm::Fiber<> fiber_blinky([]()
+{
+	Board::LedGreen::setOutput();
+	while(true)
+	{
+		Board::LedGreen::toggle();
+		modm::fiber::sleep(20ms);
+	}
+});
+
 // ----------------------------------------------------------------------------
 int
 main()
@@ -98,10 +108,7 @@ main()
 	Board::initializeDisplay();
 	Board::initializeTouchscreen();
 
-	while (true)
-	{
-		drawer.update();
-	}
+	modm::fiber::Scheduler::run();
 
 	return 0;
 }

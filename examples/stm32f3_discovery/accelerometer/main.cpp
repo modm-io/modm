@@ -76,17 +76,13 @@ private:
 
 ReaderThread reader;
 
-
 int
 main()
 {
 	Board::initialize();
 	Board::initializeLsm3();
 
-	while (true)
-	{
-		reader.update();
-	}
+	modm::fiber::Scheduler::run();
 
 	return 0;
 }
