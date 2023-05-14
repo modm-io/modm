@@ -61,7 +61,8 @@ git clone --recurse-submodules --jobs 8 https://github.com/modm-io/modm.git
     - UART, I<sup>2</sup>C, SPI, CAN and Ethernet.
 - Interfaces and drivers for many external I<sup>2</sup>C and SPI sensors and devices.
 - Debug/logging system with IOStream and printf interface.
-- Lightweight, stackless threads and resumable functions using cooperative multitasking.
+- Cooperative, stackless protothreads and resumable functions.
+- Cooperative, stackful fibers and scheduler.
 - Functional (partial) libstdc++ implementation for AVRs.
 - Useful filter, interpolation and geometric algorithms.
 - Lightweight unit testing system (suitable for AVRs).

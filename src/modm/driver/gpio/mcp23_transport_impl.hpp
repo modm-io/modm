@@ -79,7 +79,8 @@ template < class SpiMaster, class Cs >
 modm::ResumableResult<bool>
 modm::Mcp23TransportSpi<SpiMaster, Cs>::ping()
 {
-	return { modm::rf::Stop, true };
+	RF_BEGIN();
+	RF_END_RETURN(true);
 }
 
 // MARK: - register access

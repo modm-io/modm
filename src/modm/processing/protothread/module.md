@@ -74,3 +74,58 @@ while (true) {
     light.run();
 }
 ```
+
+
+## Using Fibers
+
+Protothreads can be implemented using stackful fibers by setting the `use_fiber`
+option, which replaces the preprocessor macros and C++ implementations of this
+and the `modm:processing:resumable` module with a fiber version.
+
+Specifically, the `PT_*` and `RF_*` macros are now forwarding their arguments
+unmodified and instead relying on `modm::fiber::yield()` for context switching:
+
+```cpp
+#define PT_YIELD() modm::fiber::yield()
+#define PT_WAIT_WHILE(cond) while(cond) { modm::fiber::yield(); }
+#define PT_CALL(func) func
+```
+
+The `modm::pt::Protothread` class is implemented using `modm::Fiber<>` with the
+default stack size `MODM_PROTOTHREAD_STACK_SIZE`. It automatically runs the two
+virtual methods `bool run()` and `bool update()` if they are defined in the
+protothread class.
+
+There should be no modification of the existing code necessary with the
+exception that you must replace the main loop calling all protothreads with the
+fiber scheduler:
+
+```cpp
+int main()
+{
+    /*
+    while(true)
+    {
+        protothread1.update();
+        protothread2.update();
+    }
+    */
+    modm::fiber::Scheduler::run();
+    return 0;
+}
+```
+
+
+### Restrictions
+
+If the default stack size is too low, you can set `MODM_PROTOTHREAD_STACK_SIZE`
+to a higher value, however, this will apply to *all* protothreads, consuming a
+lot more memory. Instead, we recommend refactoring the protothread into a fiber
+function.
+
+All functions and macros work as expected, except for the  `Protothread::stop()`
+function, which not implementable using fibers. It is left unimplemented,
+so that you may define it with the behavior most suitable to your use case.
+
+See the `modm:processing:resumable` module for additional restrictions when
+calling resumable functions from a protothread.

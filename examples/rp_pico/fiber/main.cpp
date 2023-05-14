@@ -57,23 +57,17 @@ fiber_function2(CoreData& d)
 	}
 }
 
-// put cores to mostly equalent environment
-modm_core0_data CoreData d0;
-modm_core1_data CoreData d1;
+// put cores to mostly equivalent environment
+modm_fastdata_core0 CoreData d0;
+modm_fastdata_core1 CoreData d1;
 
-modm_core0_noinit modm::fiber::Stack<384> stack01;
-modm_core0_noinit modm::fiber::Stack<384> stack02;
-modm_core1_noinit modm::fiber::Stack<384> stack11;
-modm_core1_noinit modm::fiber::Stack<384> stack12;
-
-modm_core0_data
-modm::Fiber fiber01(stack01, []() { fiber_function1(d0); }, 0);
-modm_core0_data
-modm::Fiber fiber02(stack02, []() { fiber_function2(d0); }, 0);
-modm_core1_data
-modm::Fiber fiber11(stack11, []() { fiber_function1(d1); }, 1);
-modm_core1_data
-modm::Fiber fiber12(stack12, []() { fiber_function2(d1); }, 1);
+modm_faststack_core0 modm::Fiber<256> fiber01([](){fiber_function1(d0);});
+modm_faststack_core0 modm::Fiber<256> fiber02([](){fiber_function2(d0);});
+// Do not autostart these fibers, otherwise they run on the Core0 scheduler!
+modm_faststack_core1
+modm::Fiber<256> fiber11([](){fiber_function1(d1);}, modm::fiber::Start::Later);
+modm_faststack_core1
+modm::Fiber<256> fiber12([](){fiber_function2(d1);}, modm::fiber::Start::Later);
 
 template<typename TimeDiff>
 static void
@@ -92,6 +86,9 @@ print_result(const CoreData& d, TimeDiff diff)
 void
 core1_main()
 {
+	// Start the fibers on the Core1 scheduler
+	fiber11.start();
+	fiber12.start();
 	const modm::PreciseTimestamp start = modm::PreciseClock::now();
 	modm::fiber::Scheduler::run();
 	const auto diff = (modm::PreciseClock::now() - start);

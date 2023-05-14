@@ -113,9 +113,33 @@ modm::platform::SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::waitCompleted
 
 template <class DmaChannelRx, class DmaChannelTx>
 modm::ResumableResult<void>
-modm::platform::SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(const uint8_t *tx,
-		uint8_t *rx, std::size_t length)
+modm::platform::SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(
+		const uint8_t *tx, uint8_t *rx, std::size_t length)
 {
+%% if use_fiber
+	if ((!rx and !tx) or length == 0) return;
+	if constexpr (Dma::RxChannel::mask == 0) rx = nullptr;
+
+	startTransfer(tx, rx, length);
+
+	while (Dma::TxChannel::isBusy() or (rx and Dma::RxChannel::isBusy()))
+		modm::fiber::yield();
+
+	while (!txFifoEmpty() or (rx and !rxFifoEmpty()) or isBusy())
+		modm::fiber::yield();
+
+	if (!rx) {
+		// Drain RX FIFO, then wait for shifting to finish (which
+		// may be *after* TX FIFO drains), then drain RX FIFO again
+		while (!rxFifoEmpty()) read();
+		while (isBusy()) modm::fiber::yield();
+
+		// Don't leave overrun flag set
+		spi{{ id }}_hw->icr = SPI_SSPICR_RORIC_BITS;
+	}
+
+	disableDreq(Dma::DreqTx | Dma::DreqRx);
+%% else
 	if ( (!rx && !tx) || length == 0) {
 		return {modm::rf::Stop};
 	}
@@ -137,19 +161,16 @@ modm::platform::SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(cons
 		[[fallthrough]];
 
 	default:
-		while (true) {
-			if (Dma::TxChannel::isBusy() or (rx && Dma::RxChannel::isBusy()))
-				return { modm::rf::Running };
-			if (!txFifoEmpty() or (rx && !rxFifoEmpty()) or isBusy())
-				return { modm::rf::Running };
-			break;
-		}
+		if (Dma::TxChannel::isBusy() or (rx && Dma::RxChannel::isBusy()))
+			return { modm::rf::Running };
+		if (!txFifoEmpty() or (rx && !rxFifoEmpty()) or isBusy())
+			return { modm::rf::Running };
 		if (!rx) {
 			// Drain RX FIFO, then wait for shifting to finish (which may be *after*
 			// TX FIFO drains), then drain RX FIFO again
 			while (!rxFifoEmpty())
 				(void)read();
-			while (isBusy())
+			if (isBusy())
 				return { modm::rf::Running };
 
 			// Don't leave overrun flag set
@@ -162,4 +183,5 @@ modm::platform::SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(cons
 		state &= ~Bit1;
 		return {modm::rf::Stop};
 	}
+%% endif
 }

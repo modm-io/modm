@@ -3,7 +3,6 @@
   <!-- <extends>modm:arduino-nano</extends> -->
   <options>
     <option name="modm:build:build.path">../../../build/avr/fiber</option>
-    <option name="modm:__fibers">yes</option>
   </options>
   <modules>
     <module>modm:build:scons</module>

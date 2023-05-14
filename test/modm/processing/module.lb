@@ -22,18 +22,14 @@ def prepare(module, options):
         "modm:math:utils",
         "modm:math:filter",
         "modm:processing:protothread",
+        "modm:processing:fiber",
         "modm:processing:resumable",
         "modm:processing:timer",
         "modm:processing:scheduler",
         ":mock:clock")
-    if options["modm:__fibers"]:
-        module.depends("modm:processing:fiber")
     return True
 
 
 def build(env):
     env.outbasepath = "modm-test/src/modm-test/processing"
-    if env["modm:__fibers"]:
-        env.copy('.')
-    else:
-        env.copy('.', ignore=env.ignore_files("fiber_test*"))
+    env.copy('.')

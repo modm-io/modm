@@ -54,6 +54,27 @@ template <class DmaChannelRx, class DmaChannelTx>
 modm::ResumableResult<uint8_t>
 modm::platform::SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(uint8_t data)
 {
+%% if use_fiber
+	// disable DMA for single byte transfer
+	SpiHal{{ id }}::disableInterrupt(SpiBase::Interrupt::TxDmaEnable |
+			SpiBase::Interrupt::RxDmaEnable);
+
+	// wait for previous transfer to finish
+	while(!SpiHal{{ id }}::isTransmitRegisterEmpty())
+		modm::fiber::yield();
+
+	// start transfer by copying data into register
+	SpiHal{{ id }}::write(data);
+
+	// wait for current transfer to finish
+	while(!SpiHal{{ id }}::isReceiveRegisterNotEmpty())
+		modm::fiber::yield();
+
+	// read the received byte
+	SpiHal{{ id }}::read(data);
+
+	return data;
+%% else
 	// this is a manually implemented "fast resumable function"
 	// there is no context or nesting protection, since we don't need it.
 	// there are only two states encoded into 1 bit (LSB of state):
@@ -85,13 +106,61 @@ modm::platform::SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(uint
 	// transfer finished
 	state &= ~Bit0;
 	return {modm::rf::Stop, data};
+%% endif
 }
 
 template <class DmaChannelRx, class DmaChannelTx>
 modm::ResumableResult<void>
-modm::platform::SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(const uint8_t *tx,
-		uint8_t *rx, std::size_t length)
+modm::platform::SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(
+		const uint8_t *tx, uint8_t *rx, std::size_t length)
 {
+%% if use_fiber
+	dmaError = false;
+	SpiHal{{ id }}::enableInterrupt(
+			SpiBase::Interrupt::TxDmaEnable | SpiBase::Interrupt::RxDmaEnable);
+
+	if (tx) {
+		Dma::TxChannel::setMemoryAddress(uint32_t(tx));
+		Dma::TxChannel::setMemoryIncrementMode(true);
+	} else {
+		Dma::TxChannel::setMemoryAddress(uint32_t(&dmaDummy));
+		Dma::TxChannel::setMemoryIncrementMode(false);
+	}
+	if (rx) {
+		Dma::RxChannel::setMemoryAddress(uint32_t(rx));
+		Dma::RxChannel::setMemoryIncrementMode(true);
+	} else {
+		Dma::RxChannel::setMemoryAddress(uint32_t(&dmaDummy));
+		Dma::RxChannel::setMemoryIncrementMode(false);
+	}
+
+	Dma::RxChannel::setDataLength(length);
+	dmaReceiveComplete = false;
+	Dma::RxChannel::start();
+
+	Dma::TxChannel::setDataLength(length);
+	dmaTransmitComplete = false;
+	Dma::TxChannel::start();
+
+	while (true)
+	{
+		if (dmaError) break;
+		else if (not dmaTransmitComplete and not dmaReceiveComplete)
+			modm::fiber::yield();
+%% if "fifo" in features
+		else if (SpiHal{{ id }}::getInterruptFlags() & (SpiBase::InterruptFlag::Busy
+				| SpiBase::InterruptFlag::FifoTxLevel | SpiBase::InterruptFlag::FifoRxLevel))
+%% else
+		else if (SpiHal{{ id }}::getInterruptFlags() & SpiBase::InterruptFlag::Busy)
+%% endif
+			modm::fiber::yield();
+		else break;
+	}
+
+	SpiHal{{ id }}::disableInterrupt(
+			SpiBase::Interrupt::TxDmaEnable | SpiBase::Interrupt::RxDmaEnable);
+
+%% else
 	// this is a manually implemented "fast resumable function"
 	// there is no context or nesting protection, since we don't need it.
 	// there are only two states encoded into 1 bit (Bit1 of state):
@@ -134,20 +203,17 @@ modm::platform::SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(cons
 		[[fallthrough]];
 
 	default:
-		while (true) {
-			if (dmaError)
-				break;
+		if (not dmaError)
+		{
 			if (not dmaTransmitComplete and not dmaReceiveComplete)
 				return { modm::rf::Running };
 			if (SpiHal{{ id }}::getInterruptFlags() & SpiBase::InterruptFlag::Busy)
 				return { modm::rf::Running };
 %% if "fifo" in features
-			if (SpiHal{{ id }}::getInterruptFlags() & SpiBase::InterruptFlag::FifoTxLevel)
-				return { modm::rf::Running };
-			if (SpiHal{{ id }}::getInterruptFlags() & SpiBase::InterruptFlag::FifoRxLevel)
+			if (SpiHal{{ id }}::getInterruptFlags() & (SpiBase::InterruptFlag::FifoTxLevel |
+													   SpiBase::InterruptFlag::FifoRxLevel))
 				return { modm::rf::Running };
 %% endif
-			break;
 		}
 
 		SpiHal{{ id }}::disableInterrupt(SpiBase::Interrupt::TxDmaEnable |
@@ -156,6 +222,7 @@ modm::platform::SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(cons
 		state &= ~Bit1;
 		return {modm::rf::Stop};
 	}
+%% endif
 }
 
 template <class DmaChannelRx, class DmaChannelTx>

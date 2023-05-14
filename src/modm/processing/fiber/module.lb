@@ -18,41 +18,51 @@ def init(module):
 
 
 def prepare(module, options):
+    module.depends(":processing:timer")
+    # No ARM64 support yet!
     core = options[":target"].get_driver("core")["type"]
     return ((core.startswith("cortex-m") or
              core.startswith("avr") or
-             "x86_64" in core) and
-            options[":__fibers"])
+             "x86_64" in core))
 
 
 def build(env):
     env.outbasepath = "modm/src/modm/processing/fiber"
     env.copy("../fiber.hpp")
 
-    env.copy("context.h")
-
     core = env[":target"].get_driver("core")["type"]
+    with_fpu = env.get(":platform:cortex-m:float-abi", "soft") != "soft"
     env.substitutions = {
-        "cm0": core.startswith("cortex-m0"),
+        "is_cm0": core.startswith("cortex-m0"),
+        "is_avr": core.startswith("avr"),
+        "is_windows": env[":target"].identifier.family == "windows",
         "core": core,
-        "with_fpu": env.get(":platform:cortex-m:float-abi", "soft") != "soft",
-        "with_windows": env[":target"].identifier.family == "windows",
+        "with_fpu": with_fpu,
         "target": env[":target"].identifier,
         "multicore": env.has_module(":platform:multicore"),
     }
     if env.has_module(":platform:multicore"):
         cores = int(env[":target"].identifier.cores)
         env.substitutions["num_cores"] = cores
-    env.template("fiber.hpp.in")
-    env.template("scheduler.hpp.in")
-
-    env.template("stack.hpp.in")
 
     if core.startswith("cortex-m"):
+        env.substitutions["stack_minimum"] = (2 + 9 + (16 if with_fpu else 0)) * 4
+        env.substitutions["default_stack_size"] = 512
         env.template("context_arm_m.cpp.in")
 
     elif core.startswith("avr"):
+        env.substitutions["stack_minimum"] = 4 + 18 + 6 # -2 if PC only 2B
+        env.substitutions["default_stack_size"] = 256
         env.copy("context_avr.cpp")
 
     elif "x86_64" in core:
+        env.substitutions["stack_minimum"] = (30 + 2) * 8
+        env.substitutions["default_stack_size"] = 2**20 # 1MB
         env.template("context_x86_64.cpp.in")
+
+    env.template("context.h.in")
+    env.template("stack.hpp.in")
+    env.template("scheduler.hpp.in")
+    env.copy("task.hpp")
+    env.copy("functions.hpp")
+    env.copy("fiber.hpp")

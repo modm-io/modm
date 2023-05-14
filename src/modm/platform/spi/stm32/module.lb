@@ -15,6 +15,7 @@ def get_properties(env):
     device = env[":target"]
     driver = device.get_driver("spi")
     properties = {}
+    properties["use_fiber"] = env.get(":processing:protothread:use_fiber", False)
     properties["target"] = device.identifier
     properties["features"] = driver["feature"] if "feature" in driver else []
     return properties

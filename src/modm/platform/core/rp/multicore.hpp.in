@@ -222,19 +222,23 @@ struct Core1 : Core
 /// @{
 %% for i in range(num_cores)
 /// Places initialized objects into the core{{i}}-coupled memory
-#define modm_core{{i}}_data modm_section(".data_core{{i}}")
+#define modm_fastdata_core{{i}} modm_section(".data_core{{i}}")
 %% endfor
 %% for i in range(num_cores)
 /// Places zeroed objects into the core{{i}}-coupled memory
-#define modm_core{{i}}_bss modm_section(".bss_core{{i}}")
+#define modm_bss_core{{i}} modm_section(".bss_core{{i}}")
 %% endfor
 %% for i in range(num_cores)
 /// Places uninitialized objects into the core{{i}}-coupled memory
-#define modm_core{{i}}_noinit modm_section(".noinit_core{{i}}")
+#define modm_noinit_core{{i}} modm_section(".noinit_core{{i}}")
+%% endfor
+%% for i in range(num_cores)
+/// Places stacks into the core{{i}}-coupled memory
+#define modm_faststack_core{{i}} modm_noinit_core{{i}}
 %% endfor
 %% for i in range(num_cores)
 /// Places functions into the core{{i}}-coupled memory
-#define modm_core{{i}}_code modm_core{{i}}_data
+#define modm_fastcode_core{{i}} modm_fastdata_core{{i}}
 %% endfor
 /// Weak callback to initialize CPU1
 extern "C" void

@@ -54,14 +54,10 @@ struct Test
 	volatile uint32_t f4counter{0};
 } test;
 
-modm::fiber::Stack<128> stack1;
-modm::fiber::Stack<128> stack2;
-modm::fiber::Stack<128> stack3;
-modm::fiber::Stack<128> stack4;
-modm::Fiber fiber1(stack1, fiber_function1);
-modm::Fiber fiber2(stack2, [](){ fiber_function2(cycles); });
-modm::Fiber fiber3(stack3, [](){ test.fiber_function3(); });
-modm::Fiber fiber4(stack4, [cyc=uint32_t(cycles)]() mutable { cyc++; test.fiber_function4(cyc); });
+modm::Fiber<> fiber1(fiber_function1);
+modm::Fiber<> fiber2(+[](){ fiber_function2(cycles); });
+modm::Fiber<> fiber3(+[](){ test.fiber_function3(); });
+modm::Fiber<> fiber4([cyc=uint32_t(cycles)]() mutable { cyc++; test.fiber_function4(cyc); });
 
 // ATmega2560@16MHz: 239996 yields in 2492668us, 96280 yields per second, 10386ns per yield
 int
@@ -71,6 +67,11 @@ main()
 	Board::LedD13::setOutput();
 	MODM_LOG_INFO << "Starting fiber modm::yield benchmark..." << modm::endl;
 	MODM_LOG_INFO.flush();
+
+	fiber1.watermark_stack();
+	fiber2.watermark_stack();
+	fiber3.watermark_stack();
+	fiber4.watermark_stack();
 
 	const modm::PreciseTimestamp start = modm::PreciseClock::now();
 	modm::fiber::Scheduler::run();
@@ -82,7 +83,11 @@ main()
 	MODM_LOG_INFO << " yields per second, ";
 	MODM_LOG_INFO << uint32_t(std::chrono::nanoseconds(diff).count() / total_counter);
 	MODM_LOG_INFO << "ns per yield" << modm::endl;
-	MODM_LOG_INFO.flush();
+
+	MODM_LOG_INFO << "Stack usage 1 = " << fiber1.stack_usage() << modm::endl;
+	MODM_LOG_INFO << "Stack usage 2 = " << fiber2.stack_usage() << modm::endl;
+	MODM_LOG_INFO << "Stack usage 3 = " << fiber3.stack_usage() << modm::endl;
+	MODM_LOG_INFO << "Stack usage 4 = " << fiber4.stack_usage() << modm::endl;
 
 	while(1) ;
 	return 0;
