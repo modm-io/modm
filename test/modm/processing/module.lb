@@ -22,14 +22,18 @@ def prepare(module, options):
         "modm:math:utils",
         "modm:math:filter",
         "modm:processing:protothread",
-        "modm:processing:fiber",
         "modm:processing:resumable",
         "modm:processing:timer",
         "modm:processing:scheduler",
         ":mock:clock")
+    if "arm64" not in options[":target"].get_driver("core")["type"]:
+        module.depends("modm:processing:fiber")
     return True
 
 
 def build(env):
     env.outbasepath = "modm-test/src/modm-test/processing"
-    env.copy('.')
+    if "arm64" in env[":target"].get_driver("core")["type"]:
+        env.copy('.', ignore=env.ignore_paths("fiber"))
+    else:
+        env.copy('.')

@@ -20,10 +20,7 @@ def init(module):
 def prepare(module, options):
     module.depends(":processing:timer")
     # No ARM64 support yet!
-    core = options[":target"].get_driver("core")["type"]
-    return ((core.startswith("cortex-m") or
-             core.startswith("avr") or
-             "x86_64" in core))
+    return "arm64" not in options[":target"].get_driver("core")["type"]
 
 
 def build(env):
