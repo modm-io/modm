@@ -1,5 +1,5 @@
 <library>
-  <extends>modm:disco-f469ni</extends>
+  <extends>modm:disco-f469ni:b-08</extends>
   <options>
     <option name="modm:build:build.path">../../../build/stm32f469_discovery/display</option>
   </options>

@@ -142,41 +142,43 @@ board_initialize_display(uint8_t ColorCoding)
 	{
 		// HAL_LTDC_Init(&hltdc_eval);
 		// Configures the HS, VS, DE and PC polarity
-		LTDC->GCR = 0;
+		// sets HS Polarity and VS Polarity to active high (LTDC_HSPOLARITY_AH, LTDC_VSPOLARITY_AH)
+		LTDC->GCR = (1 << 31) | (1 << 30);
 		// Sets Synchronization size
-		LTDC->SSCR = ((HSA - 1) << 16) | (VSA - 1);
+		LTDC->SSCR = (1 << 16) | (1);
 		// Sets Accumulated Back porch
-		LTDC->BPCR = ((HSA + HBP - 1) << 16) | (VSA + VBP - 1);
+		LTDC->BPCR = (2 << 16) | (2);
 		// Sets Accumulated Active Width
-		LTDC->AWCR = ((HACT + HSA + HBP - 1) << 16) | (VACT + VSA + VBP - 1);
+		LTDC->AWCR = (202 << 16) | (482);
 		// Sets Total Width and Height
-		LTDC->TWCR = ((HACT + HSA + HBP + HFP - 1) << 16) | (VACT + VSA + VBP + VFP - 1);
+		LTDC->TWCR = (203 << 16) | (483);
 		// Sets the background color value
 		LTDC->BCCR = 0;
 		// Enable LTDC by setting LTDCEN bit
 		LTDC->GCR |= LTDC_GCR_LTDCEN;
 	}
 
-	nt35510_init(ColorCoding);
-
 	{
 		// HAL_LTDC_ConfigLayer()
 		// Configures the horizontal start and stop position
-		LTDC_Layer1->WHPCR = ((HACT + HSA + HBP - 1) << 16) | (HSA + HBP);
+		LTDC_Layer1->WHPCR = 
+			(0 + ((LTDC->BPCR & LTDC_BPCR_AHBP) >> 16) + 1)
+			| ((200 + ((LTDC->BPCR & LTDC_BPCR_AHBP) >> 16)) << 16); // tmp
 		// Configures the vertical start and stop position
-		LTDC_Layer1->WVPCR  = ((VACT + VSA + VBP - 1) << 16) | (VSA + VBP);
+		LTDC_Layer1->WVPCR  = (0 + (LTDC->BPCR & LTDC_BPCR_AVBP) + 1)
+			| ((480 + (LTDC->BPCR & LTDC_BPCR_AVBP)) << 16);
 		// Specifies the pixel format
 		LTDC_Layer1->PFCR = ColorCoding;
 		// Configures the default color values
-		LTDC_Layer1->DCCR = 0xff000000;
+		LTDC_Layer1->DCCR = 0x00000000;
 		// Specifies the constant alpha value
 		LTDC_Layer1->CACR = 0xff;
 		// Specifies the blending factors
-		LTDC_Layer1->BFCR = 0x607;
+		LTDC_Layer1->BFCR = 0x00000005U | 0x00000400U;
 		// Configures the color frame buffer pitch in byte
-		LTDC_Layer1->CFBLR = ((HACT * pixel_size) << 16) | ((HACT * pixel_size) + 3);
+		LTDC_Layer1->CFBLR = ((800 * pixel_size) << 16) | ((800 * pixel_size) + 3);
 		// Configures the frame buffer line number
-		LTDC_Layer1->CFBLNR = VACT;
+		LTDC_Layer1->CFBLNR = 480;
 
 		/* Configured in display.cpp
 		// Configures the color frame buffer start address
@@ -187,4 +189,6 @@ board_initialize_display(uint8_t ColorCoding)
 		LTDC->SRCR = LTDC_SRCR_IMR;
 		*/
 	}
+
+	nt35510_init(ColorCoding);
 }

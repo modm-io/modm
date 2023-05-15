@@ -327,10 +327,7 @@ uint8_t nt35510_init(uint8_t ColorCoding)
       /* Set Pixel color format to RGB565 */
       dsi_write_command(1, nt35510_reg36);
       break;
-    case NT35510_FORMAT_RGB888 :
-      /* Set Pixel color format to RGB888 */
-      dsi_write_command(1, nt35510_reg37);
-      break;
+    case NT35510_FORMAT_RGB888:
     default :
       /* Set Pixel color format to RGB888 */
       dsi_write_command(1, nt35510_reg37);
