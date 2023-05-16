@@ -388,7 +388,7 @@ MODM_ISR(I2C{{ id }}_EV)
 		if (isr & I2C_ISR_NACKF)
 		{
 			// acknowledge fail
-			I2C1->ICR = I2C_ICR_NACKCF;
+			I2C{{ id }}->ICR = I2C_ICR_NACKCF;
 			DEBUG_STREAM("ACK FAIL");
 			// may also be ADDRESS_NACK
 			error = starting.address ? modm::I2cMaster::Error::AddressNack : modm::I2cMaster::Error::DataNack;
