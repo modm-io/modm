@@ -55,14 +55,14 @@ modm::platform::SpiMaster{{ id }}::transfer(uint8_t data)
 %% if use_fiber
 	// wait for previous transfer to finish
 	while(!SpiHal{{ id }}::isTransmitRegisterEmpty())
-		modm::fiber::yield();
+		modm::this_fiber::yield();
 
 	// start transfer by copying data into register
 	SpiHal{{ id }}::write(data);
 
 	// wait for current transfer to finish
 	while(!SpiHal{{ id }}::isReceiveRegisterNotEmpty())
-		modm::fiber::yield();
+		modm::this_fiber::yield();
 
 	// read the received byte
 	SpiHal{{ id }}::read(data);

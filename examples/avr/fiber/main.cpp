@@ -24,14 +24,14 @@ void
 fiber_function1()
 {
 	MODM_LOG_INFO << MODM_FILE_INFO << modm::endl;
-	while (++f1counter < cycles) { modm::fiber::yield(); total_counter++; }
+	while (++f1counter < cycles) { modm::this_fiber::yield(); total_counter++; }
 }
 
 void
 fiber_function2(uint32_t cyc)
 {
 	MODM_LOG_INFO << MODM_FILE_INFO << modm::endl;
-	while (++f2counter < cyc) { modm::fiber::yield(); total_counter++; }
+	while (++f2counter < cyc) { modm::this_fiber::yield(); total_counter++; }
 }
 
 struct Test
@@ -40,14 +40,14 @@ struct Test
 	fiber_function3()
 	{
 		MODM_LOG_INFO << MODM_FILE_INFO << modm::endl;
-		while (++f3counter < cycles) { modm::fiber::yield(); total_counter++; }
+		while (++f3counter < cycles) { modm::this_fiber::yield(); total_counter++; }
 	}
 
 	void
 	fiber_function4(uint32_t cyc)
 	{
 		MODM_LOG_INFO << MODM_FILE_INFO << modm::endl;
-		while (++f4counter < cyc) { modm::fiber::yield(); total_counter++; }
+		while (++f4counter < cyc) { modm::this_fiber::yield(); total_counter++; }
 	}
 
 	volatile uint32_t f3counter{0};

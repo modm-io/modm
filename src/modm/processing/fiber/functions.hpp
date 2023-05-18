@@ -16,7 +16,7 @@
 #include "scheduler.hpp"
 #include <modm/processing/timer.hpp>
 
-namespace modm::fiber
+namespace modm::this_fiber
 {
 
 /// @ingroup modm_processing_fiber
@@ -39,7 +39,7 @@ namespace modm::fiber
 inline void
 yield()
 {
-	Scheduler::instance().yield();
+	modm::fiber::Scheduler::instance().yield();
 }
 
 /**
@@ -53,7 +53,7 @@ yield()
  */
 template< typename Rep, typename Period >
 void
-sleep(std::chrono::duration<Rep, Period> interval)
+sleep_for(std::chrono::duration<Rep, Period> interval)
 {
 	// Only choose the microsecond clock if necessary
 	using TimeoutType = std::conditional_t<
@@ -65,7 +65,7 @@ sleep(std::chrono::duration<Rep, Period> interval)
 
 	TimeoutType timeout(interval);
 	while(not timeout.isExpired())
-		modm::fiber::yield();
+		modm::this_fiber::yield();
 }
 
 /// @}

@@ -26,14 +26,14 @@ void
 fiber_function1()
 {
 	MODM_LOG_INFO << MODM_FILE_INFO << modm::endl;
-	while (++f1counter < cycles) { modm::fiber::yield(); total_counter++; }
+	while (++f1counter < cycles) { modm::this_fiber::yield(); total_counter++; }
 }
 
 void
 fiber_function2(uint32_t cyc)
 {
 	MODM_LOG_INFO << MODM_FILE_INFO << modm::endl;
-	while (++f2counter < cyc) { modm::fiber::yield(); total_counter++; }
+	while (++f2counter < cyc) { modm::this_fiber::yield(); total_counter++; }
 }
 
 struct Test
@@ -42,14 +42,14 @@ struct Test
 	fiber_function3()
 	{
 		MODM_LOG_INFO << MODM_FILE_INFO << modm::endl;
-		while (++f3counter < cycles) { modm::fiber::yield(); total_counter++; }
+		while (++f3counter < cycles) { modm::this_fiber::yield(); total_counter++; }
 	}
 
 	void
 	fiber_function4(uint32_t cyc)
 	{
 		MODM_LOG_INFO << MODM_FILE_INFO << modm::endl;
-		while (++f4counter < cyc) { modm::fiber::yield(); total_counter++; }
+		while (++f4counter < cyc) { modm::this_fiber::yield(); total_counter++; }
 	}
 
 	volatile uint32_t f3counter{0};
@@ -57,8 +57,8 @@ struct Test
 } test;
 
 // Single purpose fibers to time the yield
-modm_faststack modm::Fiber<> fiber_y1([](){ modm::fiber::yield();  counter.stop(); });
-modm_faststack modm::Fiber<> fiber_y2([](){ counter.start(); modm::fiber::yield(); });
+modm_faststack modm::Fiber<> fiber_y1([](){ modm::this_fiber::yield();  counter.stop(); });
+modm_faststack modm::Fiber<> fiber_y2([](){ counter.start(); modm::this_fiber::yield(); });
 
 modm_faststack modm::Fiber<> fiber1(fiber_function1, modm::fiber::Start::Later);
 modm_faststack modm::Fiber<> fiber2([](){ fiber_function2(cycles); }, modm::fiber::Start::Later);
@@ -71,12 +71,12 @@ extern modm::Fiber<> fiber_pong;
 extern modm::Fiber<> fiber_ping;
 modm_faststack modm::Fiber<> fiber_ping([](){
 	MODM_LOG_INFO << "ping = " << fiber_ping.stack_usage() << modm::endl;
-	modm::fiber::sleep(1s);
+	modm::this_fiber::sleep_for(1s);
 	fiber_pong.start();
 }, modm::fiber::Start::Later);
 modm_faststack modm::Fiber<> fiber_pong([](){
 	MODM_LOG_INFO << "pong = " << fiber_pong.stack_usage() << modm::endl;
-	modm::fiber::sleep(1s);
+	modm::this_fiber::sleep_for(1s);
 	fiber_ping.start();
 }, modm::fiber::Start::Later);
 

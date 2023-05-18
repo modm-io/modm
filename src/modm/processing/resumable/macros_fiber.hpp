@@ -52,7 +52,7 @@
 /// Yield resumable function until next invocation.
 /// @hideinitializer
 #define RF_YIELD() \
-	modm::fiber::yield()
+	modm::this_fiber::yield()
 
 /// Cause resumable function to wait until given child protothread completes.
 /// @hideinitializer

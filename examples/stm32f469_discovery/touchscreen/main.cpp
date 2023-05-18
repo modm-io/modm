@@ -96,7 +96,7 @@ modm_faststack modm::Fiber<> fiber_blinky([]()
 	while(true)
 	{
 		Board::LedGreen::toggle();
-		modm::fiber::sleep(20ms);
+		modm::this_fiber::sleep_for(20ms);
 	}
 });
 

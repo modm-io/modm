@@ -30,7 +30,7 @@ class Protothread : public modm::Fiber< MODM_PROTOTHREAD_STACK_SIZE >
 {
 public:
 	Protothread(modm::fiber::Start start=modm::fiber::Start::Now)
-	:	Fiber([this](){ while(update()) modm::fiber::yield(); }, start)
+	:	Fiber([this](){ while(update()) modm::this_fiber::yield(); }, start)
 	{}
 
 	void restart() { this->start(); }

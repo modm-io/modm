@@ -57,9 +57,9 @@ def build(env):
         env.substitutions["default_stack_size"] = 2**20 # 1MB
         env.template("context_x86_64.cpp.in")
 
-    env.template("context.h.in")
     env.template("stack.hpp.in")
     env.template("scheduler.hpp.in")
+    env.copy("context.h")
     env.copy("task.hpp")
     env.copy("functions.hpp")
     env.copy("fiber.hpp")

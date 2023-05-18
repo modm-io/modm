@@ -7,11 +7,11 @@ simple round-robin scheduler. Here is a minimal example that blinks an LED:
 modm::Fiber<> fiber([]()
 {
 	Board::LedBlue::setOutput();
-	modm::fiber::yield();
+	modm::this_fiber::yield();
 	while(true)
 	{
 		Board::LedBlue::toggle();
-		modm::fiber::sleep(1s);
+		modm::this_fiber::sleep_for(1s);
 	}
 });
 int main(void)
@@ -80,7 +80,7 @@ modm::Fiber<> fiber(function, false);
 // fiber2 is automatically executing
 modm::Fiber<> fiber2([&]()
 {
-	modm::fiber::sleep(1s);
+	modm::this_fiber::sleep_for(1s);
 	fiber.start();
 });
 modm::fiber::Scheduler::run();
@@ -194,7 +194,7 @@ registers contain the watermark value.
 
 Fibers are implemented by saving callee registers to the current stack, then
 switching to a new stack and restoring callee registers from this stack.
-The static `modm::fiber::yield()` function wraps this functionality in a
+The static `modm::this_fiber::yield()` function wraps this functionality in a
 transparent way.
 
 ### AVR

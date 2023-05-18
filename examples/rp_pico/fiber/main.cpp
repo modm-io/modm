@@ -42,7 +42,7 @@ fiber_function1(CoreData& d)
 {
 	while (++d.f1counter < cycles)
 	{
-		modm::fiber::yield();
+		modm::this_fiber::yield();
 		d.total_counter++;
 	}
 }
@@ -52,7 +52,7 @@ fiber_function2(CoreData& d)
 {
 	while (++d.f2counter < cycles)
 	{
-		modm::fiber::yield();
+		modm::this_fiber::yield();
 		d.total_counter++;
 	}
 }

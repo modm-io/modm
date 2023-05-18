@@ -72,7 +72,7 @@ modm::platform::UartSpiMaster{{ id }}::transfer(uint8_t data)
 %% if use_fiber
 	// wait for previous transfer to finish
 	while (!UsartHal{{ id }}::isTransmitRegisterEmpty())
-		modm::fiber::yield();
+		modm::this_fiber::yield();
 
 	// start transfer by copying data into register
 	if(dataOrder == DataOrder::MsbFirst)
@@ -81,7 +81,7 @@ modm::platform::UartSpiMaster{{ id }}::transfer(uint8_t data)
 
 	// wait for current transfer to finish
 	while (!UsartHal{{ id }}::isReceiveRegisterNotEmpty())
-		modm::fiber::yield();
+		modm::this_fiber::yield();
 
 	UsartHal{{ id }}::read(data);
 

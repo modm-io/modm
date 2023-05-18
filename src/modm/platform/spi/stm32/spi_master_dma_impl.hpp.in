@@ -61,14 +61,14 @@ modm::platform::SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(uint
 
 	// wait for previous transfer to finish
 	while(!SpiHal{{ id }}::isTransmitRegisterEmpty())
-		modm::fiber::yield();
+		modm::this_fiber::yield();
 
 	// start transfer by copying data into register
 	SpiHal{{ id }}::write(data);
 
 	// wait for current transfer to finish
 	while(!SpiHal{{ id }}::isReceiveRegisterNotEmpty())
-		modm::fiber::yield();
+		modm::this_fiber::yield();
 
 	// read the received byte
 	SpiHal{{ id }}::read(data);
@@ -146,14 +146,14 @@ modm::platform::SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(
 	{
 		if (dmaError) break;
 		else if (not dmaTransmitComplete and not dmaReceiveComplete)
-			modm::fiber::yield();
+			modm::this_fiber::yield();
 %% if "fifo" in features
 		else if (SpiHal{{ id }}::getInterruptFlags() & (SpiBase::InterruptFlag::Busy
 				| SpiBase::InterruptFlag::FifoTxLevel | SpiBase::InterruptFlag::FifoRxLevel))
 %% else
 		else if (SpiHal{{ id }}::getInterruptFlags() & SpiBase::InterruptFlag::Busy)
 %% endif
-			modm::fiber::yield();
+			modm::this_fiber::yield();
 		else break;
 	}
 
