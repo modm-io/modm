@@ -31,6 +31,7 @@ LinkedListTest::testConstructor()
 	modm::LinkedList< unittest::CountType > list;
 
 	TEST_ASSERT_TRUE(list.isEmpty());
+	TEST_ASSERT_FALSE(list.isNotEmpty());
 	TEST_ASSERT_EQUALS(unittest::CountType::numberOfDefaultConstructorCalls, 0U);
 }
 

@@ -179,7 +179,7 @@ template <typename T, typename Allocator>
 void
 modm::LinkedList<T, Allocator>::removeAll()
 {
-	while (!this->isEmpty()) {
+	while (this->isNotEmpty()) {
 		this->removeFront();
 	}
 }

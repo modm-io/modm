@@ -104,6 +104,12 @@ namespace modm
 			return (this->size == 0);
 		}
 
+		inline bool
+		isNotEmpty() const
+		{
+			return not isEmpty();
+		}
+
 		/**
 		 * \brief	Return size
 		 *

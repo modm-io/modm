@@ -21,6 +21,7 @@ AtomicQueueTest::testQueue()
 	modm::atomic::Queue<int16_t, 3> queue;
 
 	TEST_ASSERT_TRUE(queue.isEmpty());
+	TEST_ASSERT_FALSE(queue.isNotEmpty());
 	TEST_ASSERT_EQUALS(queue.getMaxSize(), 3);
 
 	TEST_ASSERT_TRUE(queue.push(1));

@@ -162,7 +162,7 @@ modm::platform::Can::CAN_tx(uint8_t /* msg_obj_num */)
 		// All message objects empty. Otherwise the order of messages
 		// is not maintained
 
-		while (!txQueue.isEmpty())
+		while (txQueue.isNotEmpty())
 		{
 			// Still messages in the queue.
 
@@ -349,7 +349,7 @@ bool
 modm::platform::Can::isMessageAvailable()
 {
 %% if options["buffer.rx"] > 0
-	return !rxQueue.isEmpty();
+	return rxQueue.isNotEmpty();
 %% else
 	/* Check if new data is available in the Message
 	 * Objects 1 to 16. */

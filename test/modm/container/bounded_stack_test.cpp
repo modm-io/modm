@@ -21,6 +21,7 @@ BoundedStackTest::testStack()
 	modm::BoundedStack<int16_t, 3> stack;
 
 	TEST_ASSERT_TRUE(stack.isEmpty());
+	TEST_ASSERT_FALSE(stack.isNotEmpty());
 	TEST_ASSERT_EQUALS(stack.getMaxSize(), 3U);
 
 	TEST_ASSERT_TRUE(stack.push(1));

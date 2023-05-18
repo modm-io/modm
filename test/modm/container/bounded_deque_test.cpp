@@ -23,6 +23,7 @@ BoundedDequeTest::testForward()
 	modm::BoundedDeque<int16_t, 3> deque;
 
 	TEST_ASSERT_TRUE(deque.isEmpty());
+	TEST_ASSERT_FALSE(deque.isNotEmpty());
 	TEST_ASSERT_EQUALS(deque.getMaxSize(), 3U);
 
 	TEST_ASSERT_EQUALS(deque.getSize(), 0U);

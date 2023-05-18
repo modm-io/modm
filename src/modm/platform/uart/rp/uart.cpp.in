@@ -229,7 +229,7 @@ modm::platform::Uart{{ id }}::discardReceiveBuffer()
 {
 	std::size_t count(0);
 %% if options["buffer.rx"] > fifo_size
-	while(!rxBuffer.isEmpty())
+	while(rxBuffer.isNotEmpty())
 	{
 		++count;
 		rxBuffer.pop();
@@ -253,7 +253,7 @@ MODM_ISR(UART{{ id }}_IRQ)
 %% if options["buffer.tx"] > fifo_size
 	if (IValue & UART_UARTMIS_TXMIS_BITS)
 	{
-		while (!txBuffer.isEmpty() and !tx_fifo_full())
+		while (txBuffer.isNotEmpty() and !tx_fifo_full())
 		{
 			// Write to the hardware buffer
 			uart{{ id }}_hw->dr = txBuffer.get();

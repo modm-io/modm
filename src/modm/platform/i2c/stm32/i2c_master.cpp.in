@@ -622,7 +622,7 @@ modm::platform::I2cMaster{{ id }}::reset()
 	if (transaction) transaction->detaching(DetachCause::ErrorCondition);
 	transaction = nullptr;
 	// remove all queued transactions
-	while(!queue.isEmpty())
+	while(queue.isNotEmpty())
 	{
 		ConfiguredTransaction next = queue.get();
 		if (next.transaction) next.transaction->detaching(DetachCause::ErrorCondition);
