@@ -39,6 +39,7 @@ modm::CanLawicelFormatter::convertToCanMessage(const char* in, can::Message& out
 
 	// get the number of data-bytes for this message
 	out.length = in[dlc_pos] - '0';
+	out.dlc = out.length;
 	if (out.length > 8)
 		return false;		// too many data-bytes
 

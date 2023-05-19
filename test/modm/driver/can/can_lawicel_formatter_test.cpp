@@ -104,6 +104,7 @@ CanLawicelFormatterTest::testStringToMessage()
 	TEST_ASSERT_TRUE(modm::CanLawicelFormatter::convertToCanMessage(input, output));
 
 	TEST_ASSERT_EQUALS(output.identifier, 0x00001610U);
+	TEST_ASSERT_EQUALS(output.dlc, 8U);
 	TEST_ASSERT_EQUALS(output.length, 8U);
 	TEST_ASSERT_EQUALS(output.flags.extended, true);
 	TEST_ASSERT_EQUALS(output.flags.rtr, false);
@@ -154,6 +155,7 @@ CanLawicelFormatterTest::testRoudtripString()
 	TEST_ASSERT_TRUE(modm::CanLawicelFormatter::convertToCanMessage(buffer, myMsg));
 
 	TEST_ASSERT_EQUALS(msg.identifier, myMsg.identifier);
+	TEST_ASSERT_EQUALS(msg.dlc, myMsg.dlc);
 	TEST_ASSERT_EQUALS(msg.length, myMsg.length);
 	TEST_ASSERT_EQUALS(msg.flags.extended, myMsg.flags.extended);
 	TEST_ASSERT_EQUALS(msg.flags.rtr, myMsg.flags.rtr);
