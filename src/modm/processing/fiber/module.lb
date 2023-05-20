@@ -59,6 +59,7 @@ def build(env):
 
     env.template("stack.hpp.in")
     env.template("scheduler.hpp.in")
+    env.template("mutex.hpp.in")
     env.copy("context.h")
     env.copy("task.hpp")
     env.copy("functions.hpp")

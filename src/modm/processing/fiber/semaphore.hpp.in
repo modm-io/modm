@@ -1,0 +1,101 @@
+/*
+ * Copyright (c) 2023, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include "mutex.hpp"
+
+namespace modm::fiber
+{
+
+/// @ingroup modm_processing_fiber
+/// @{
+
+/// Implements the `std::counting_semaphore` interface for fibers.
+/// @see https://en.cppreference.com/w/cpp/thread/counting_semaphore
+template< std::ptrdiff_t LeastMaxValue = 255 >
+class counting_semaphore
+{
+	counting_semaphore(const counting_semaphore&) = delete;
+	counting_semaphore& operator=(const counting_semaphore&) = delete;
+
+	volatile uint8_t count{};
+	static_assert(LeastMaxValue <= 255, "counting_semaphore uses an 8-bit counter!");
+public:
+	constexpr explicit
+	counting_semaphore(uint8_t desired)
+	: count(desired) {}
+
+	static constexpr [[nodiscard]] std::ptrdiff_t
+	max() { return 255; }
+
+	[[nodiscard]] bool
+	try_acquire()
+	{
+%% if multicore
+		modm::platform::multicore::SystemSpinLockGuard g;
+%% endif
+		if (count == 0) return false;
+		count--;
+		return true;
+	}
+
+	void
+	acquire()
+	{
+		while(not try_acquire()) modm::this_fiber::yield();
+	}
+
+	void
+	release()
+	{
+		count++;
+	}
+
+	template< typename Rep, typename Period >
+	[[nodiscard]] bool
+	try_acquire_for(std::chrono::duration<Rep, Period> sleep_duration)
+	{
+		// Only choose the microsecond clock if necessary
+		using Clock = std::conditional_t<
+			std::is_convertible_v<std::chrono::duration<Rep, Period>,
+								  std::chrono::duration<Rep, std::milli>>,
+			modm::chrono::milli_clock, modm::chrono::micro_clock>;
+		return try_acquire_until(Clock::now() + sleep_duration);
+	}
+
+	template< class Clock, class Duration >
+	[[nodiscard]] bool
+	try_acquire_until(std::chrono::time_point<Clock, Duration> sleep_time)
+	{
+		do
+		{
+			if (try_acquire()) return true;
+			modm::this_fiber::yield();
+		}
+		while((sleep_time - Clock::now()) >= Duration(0));
+		return false;
+	}
+};
+
+/// Implements the `std::binary_semaphore` interface for fibers.
+/// @see https://en.cppreference.com/w/cpp/thread/counting_semaphore
+using binary_semaphore = counting_semaphore<1>;
+
+template< std::ptrdiff_t LeastMaxValue >
+using CountingSemaphore = counting_semaphore;
+
+using BinarySemaphore = binary_semaphore;
+
+
+/// @}
+
+}

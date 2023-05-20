@@ -29,6 +29,10 @@ Start
 	Later,	// Manually add the fiber to a scheduler.
 };
 
+/// Identifier of a fiber task.
+/// @ingroup modm_processing_fiber
+using id = uintptr_t;
+
 /**
  * The fiber task connects the callable fiber object with the fiber context and
  * scheduler. It constructs the fiber function on the stack if necessary, and
@@ -74,7 +78,7 @@ public:
 
 	/// @returns the stack usage as measured by a watermark level.
 	/// @see `modm_context_stack_usage()`.
-	size_t
+	[[nodiscard]] size_t
 	stack_usage() const
 	{
 		return modm_context_stack_usage(&ctx);
@@ -82,7 +86,7 @@ public:
 
 	/// @returns if the bottom word on the stack has been overwritten.
 	/// @see `modm_context_stack_overflow()`.
-	bool
+	[[nodiscard]] bool
 	stack_overflow() const
 	{
 		return modm_context_stack_overflow(&ctx);
@@ -94,7 +98,7 @@ public:
 	start();
 
 	/// @returns if the fiber is attached to a scheduler.
-	bool
+	[[nodiscard]] bool
 	isRunning() const
 	{
 		return scheduler;

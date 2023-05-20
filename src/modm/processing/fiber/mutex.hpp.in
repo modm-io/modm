@@ -1,0 +1,174 @@
+/*
+ * Copyright (c) 2023, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include "functions.hpp"
+%% if multicore
+#include <modm/platform/core/multicore.hpp>
+%% endif
+
+namespace modm::fiber
+{
+
+/// @ingroup modm_processing_fiber
+/// @{
+
+/// Implements the `std::mutex` interface for fibers.
+/// @see https://en.cppreference.com/w/cpp/thread/mutex
+class mutex
+{
+	mutex(const mutex&) = delete;
+	mutex& operator=(const mutex&) = delete;
+
+	volatile bool locked{false};
+public:
+	constexpr mutex() = default;
+
+	[[nodiscard]] bool
+	try_lock()
+	{
+%% if multicore
+		modm::platform::multicore::SystemSpinLockGuard g;
+%% endif
+		if (locked) return false;
+		locked = true;
+		return true;
+	}
+
+	void
+	lock()
+	{
+		while(not try_lock()) modm::this_fiber::yield();
+	}
+
+	void
+	unlock()
+	{
+		locked = false;
+	}
+};
+
+/// Implements the `std::timed_mutex` interface for fibers.
+/// @see https://en.cppreference.com/w/cpp/thread/timed_mutex
+class timed_mutex : public mutex
+{
+public:
+	template< typename Rep, typename Period >
+	[[nodiscard]] bool
+	try_lock_for(std::chrono::duration<Rep, Period> sleep_duration)
+	{
+		// Only choose the microsecond clock if necessary
+		using Clock = std::conditional_t<
+			std::is_convertible_v<std::chrono::duration<Rep, Period>,
+								  std::chrono::duration<Rep, std::milli>>,
+			modm::chrono::milli_clock, modm::chrono::micro_clock>;
+		return try_lock_until(Clock::now() + sleep_duration);
+	}
+
+	template< class Clock, class Duration >
+	[[nodiscard]] bool
+	try_lock_until(std::chrono::time_point<Clock, Duration> sleep_time)
+	{
+		do
+		{
+			if (try_lock()) return true;
+			modm::this_fiber::yield();
+		}
+		while((sleep_time - Clock::now()) >= Duration(0));
+		return false;
+	}
+};
+
+/// Implements the `std::recursive_mutex` interface for fibers.
+/// @see https://en.cppreference.com/w/cpp/thread/recursive_mutex
+class recursive_mutex
+{
+	recursive_mutex(const recursive_mutex&) = delete;
+	recursive_mutex& operator=(const recursive_mutex&) = delete;
+
+	volatile ::modm::fiber::id owner{0};
+	volatile uint8_t count{0};
+public:
+	constexpr recursive_mutex() = default;
+
+	[[nodiscard]] bool
+	try_lock()
+	{
+%% if multicore
+		modm::platform::multicore::SystemSpinLockGuard g;
+%% endif
+		const auto id = modm::this_fiber::get_id();
+		if (owner == 0) {
+			owner = id;
+			count = 1;
+			return true;
+		}
+		if (owner == id) {
+			count++;
+			return true;
+		}
+		return false;
+	}
+
+	void
+	lock()
+	{
+		while(not try_lock()) modm::this_fiber::yield();
+	}
+
+	void
+	unlock()
+	{
+		if (count > 1) count--;
+		else owner = 0;
+	}
+};
+
+/// Implements the `std::timed_recursive_mutex` interface for fibers.
+/// @see https://en.cppreference.com/w/cpp/thread/recursive_mutex
+class timed_recursive_mutex : public recursive_mutex
+{
+public:
+	template< typename Rep, typename Period >
+	[[nodiscard]] bool
+	try_lock_for(std::chrono::duration<Rep, Period> sleep_duration)
+	{
+		// Only choose the microsecond clock if necessary
+		using Clock = std::conditional_t<
+			std::is_convertible_v<std::chrono::duration<Rep, Period>,
+								  std::chrono::duration<Rep, std::milli>>,
+			modm::chrono::milli_clock, modm::chrono::micro_clock>;
+		return try_lock_until(Clock::now() + sleep_duration);
+	}
+
+	template< class Clock, class Duration >
+	[[nodiscard]] bool
+	try_lock_until(std::chrono::time_point<Clock, Duration> sleep_time)
+	{
+		do
+		{
+			if (try_lock()) return true;
+			modm::this_fiber::yield();
+		}
+		while((sleep_time - Clock::now()) >= Duration(0));
+		return false;
+	}
+};
+
+using Mutex = mutex;
+using TimedMutex = timed_mutex;
+using RecursiveMutex = recursive_mutex;
+using TimedRecursiveMutex = timed_recursive_mutex;
+
+/// @}
+
+}

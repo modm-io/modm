@@ -12,3 +12,4 @@
 #include "fiber/fiber.hpp"
 #include "fiber/scheduler.hpp"
 #include "fiber/functions.hpp"
+#include "fiber/shared_mutex.hpp"
