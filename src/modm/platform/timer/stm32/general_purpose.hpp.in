@@ -201,7 +201,16 @@ public:
 	{
 		// This will be inaccurate for non-smooth frequencies (last six digits unequal to zero)
 		const uint32_t cycles = duration.count() * SystemClock::Timer{{ id }} * Period::num / Period::den;
-		const uint16_t prescaler = (cycles + std::numeric_limits<Value>::max() - 1) / std::numeric_limits<Value>::max(); // always round up
+		uint16_t prescaler;
+		if constexpr (sizeof(Value) > sizeof(uint16_t)) {
+			// always round-up
+			prescaler = (cycles + static_cast<uint64_t>(std::numeric_limits<Value>::max()) - 1) /
+						std::numeric_limits<Value>::max();
+		} else {
+			// always round-up
+			prescaler =
+				(cycles + std::numeric_limits<Value>::max() - 1) / std::numeric_limits<Value>::max();
+		}
 		const Value overflow = cycles / prescaler - 1;
 
 		setPrescaler(prescaler);
