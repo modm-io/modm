@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:samv71-xplained-ultra</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/samv71_xplained_ultra/mcp3008</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:driver:mcp3008</module>
+    <module>modm:platform:spi:0</module>
+  </modules>
+</library>
