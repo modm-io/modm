@@ -1,0 +1,30 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2022, Christopher Durand
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:mcp3008"
+    module.description = """\
+# MCP3004/MCP3008 ADC
+MCP3004/3008 are 10-bit 200 ksps SAR ADCs with SPI interface and 4/8 channels.
+"""
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:spi.device",
+        ":processing:resumable")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/adc"
+    env.copy("mcp3008.hpp")
+    env.copy("mcp3008_impl.hpp")
