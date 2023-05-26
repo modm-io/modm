@@ -84,6 +84,9 @@ public:
 		waitCompleted([](){});
 	}
 
+	static constexpr bool
+	usesDma(){return true;};
+
 private:
 	// needed for transfers where no RX or TX buffers are given
 	static inline uint8_t dmaDummy{0};
