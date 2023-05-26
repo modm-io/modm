@@ -155,6 +155,7 @@ public:
 	 */
 	static modm::ResumableResult<void>
 	transfer(const uint8_t *tx, uint8_t *rx, std::size_t length);
+
 #endif
 };
 

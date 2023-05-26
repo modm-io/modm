@@ -103,11 +103,24 @@ public:
 
 	modm::ResumableResult<void>
 	write()
+	requires SpiMaster::usesDma
 	{
 		RF_BEGIN();
 		RF_CALL(SpiMaster::transfer(data, nullptr, length+1));
 		RF_END_RETURN();
 	}
+
+	modm::ResumableResult<void>
+	write()
+	{
+		RF_BEGIN();
+		for (const auto value : data) {
+			while (not SpiMaster::Hal::isTransmitRegisterEmpty()) ;
+			SpiMaster::Hal::write(value);
+		}
+		RF_END_RETURN();
+	}
+
 };
 
 }	// namespace modm
