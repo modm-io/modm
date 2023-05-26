@@ -23,5 +23,5 @@ void
 modm::MonochromeGraphicDisplay<Width, Height, BufferWidth, BufferHeight>::clear()
 {
 	std::fill(&buffer[0][0], &buffer[0][0] + sizeof(buffer), 0);
-	this->cursor = {0, 0};
+	this->cursor = modm::glcd::Point{0, 0};
 }
