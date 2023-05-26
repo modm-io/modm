@@ -103,7 +103,7 @@ public:
 
 	modm::ResumableResult<void>
 	write()
-	requires SpiMaster::usesDma
+	requires (SpiMaster::usesDma())
 	{
 		RF_BEGIN();
 		RF_CALL(SpiMaster::transfer(data, nullptr, length+1));
