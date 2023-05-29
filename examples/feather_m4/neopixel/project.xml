@@ -1,0 +1,10 @@
+<library>
+  <extends>modm:feather-m4</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/feather_m4/neopixel</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:architecture:delay</module>
+  </modules>
+</library>
