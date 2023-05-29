@@ -632,63 +632,65 @@ We have out-of-box support for many development boards including documentation.
 <td align="center"><a href="https://modm.io/reference/config/modm-disco-l476vg">DISCO-L476VG</a></td>
 </tr><tr>
 <td align="center"><a href="https://modm.io/reference/config/modm-feather-m0">FEATHER-M0</a></td>
+<td align="center"><a href="https://modm.io/reference/config/modm-feather-m4">FEATHER-M4</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-feather-rp2040">FEATHER-RP2040</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-mega-2560-pro">MEGA-2560-PRO</a></td>
-<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f031k6">NUCLEO-F031K6</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f031k6">NUCLEO-F031K6</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f042k6">NUCLEO-F042K6</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f072rb">NUCLEO-F072RB</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f091rc">NUCLEO-F091RC</a></td>
-<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f103rb">NUCLEO-F103RB</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f103rb">NUCLEO-F103RB</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f303k8">NUCLEO-F303K8</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f303re">NUCLEO-F303RE</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f334r8">NUCLEO-F334R8</a></td>
-<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f401re">NUCLEO-F401RE</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f401re">NUCLEO-F401RE</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f411re">NUCLEO-F411RE</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f429zi">NUCLEO-F429ZI</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f439zi">NUCLEO-F439ZI</a></td>
-<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f446re">NUCLEO-F446RE</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f446re">NUCLEO-F446RE</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f446ze">NUCLEO-F446ZE</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f746zg">NUCLEO-F746ZG</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f767zi">NUCLEO-F767ZI</a></td>
-<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-g071rb">NUCLEO-G071RB</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-g071rb">NUCLEO-G071RB</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-g431kb">NUCLEO-G431KB</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-g431rb">NUCLEO-G431RB</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-g474re">NUCLEO-G474RE</a></td>
-<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-h723zg">NUCLEO-H723ZG</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-h723zg">NUCLEO-H723ZG</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-h743zi">NUCLEO-H743ZI</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l031k6">NUCLEO-L031K6</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l053r8">NUCLEO-L053R8</a></td>
-<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l152re">NUCLEO-L152RE</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l152re">NUCLEO-L152RE</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l432kc">NUCLEO-L432KC</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l452re">NUCLEO-L452RE</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l476rg">NUCLEO-L476RG</a></td>
-<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l496zg-p">NUCLEO-L496ZG-P</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l496zg-p">NUCLEO-L496ZG-P</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l552ze-q">NUCLEO-L552ZE-Q</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-u575zi-q">NUCLEO-U575ZI-Q</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-olimexino-stm32">OLIMEXINO-STM32</a></td>
-<td align="center"><a href="https://modm.io/reference/config/modm-raspberrypi">Raspberry Pi</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/config/modm-raspberrypi">Raspberry Pi</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-rp-pico">Raspberry Pi Pico</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-samd21-mini">SAMD21-MINI</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-samd21-xplained-pro">SAMD21-XPLAINED-PRO</a></td>
-<td align="center"><a href="https://modm.io/reference/config/modm-same54-xplained-pro">SAME54-XPLAINED-PRO</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/config/modm-same54-xplained-pro">SAME54-XPLAINED-PRO</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-same70-xplained">SAME70-XPLAINED</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-samg55-xplained-pro">SAMG55-XPLAINED-PRO</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-samv71-xplained-ultra">SAMV71-XPLAINED-ULTRA</a></td>
-<td align="center"><a href="https://modm.io/reference/config/modm-srxe">Smart Response XE</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/config/modm-srxe">Smart Response XE</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-stm32_f4ve">STM32-F4VE</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-stm32f030_demo">STM32F030-DEMO</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-thingplus-rp2040">THINGPLUS-RP2040</a></td>
+</tr><tr>
 </tr>
 </table>
 <!--/bsptable-->
@@ -700,7 +702,7 @@ We have out-of-box support for many development boards including documentation.
 We also have a number of completely target-independent drivers for external
 devices connected via I<sup>2</sup>C, SPI, UART, BitBang, etc. Most of these
 also give you access to the entire device so you can easily configure them for
-you specific needs.
+your specific needs.
 
 <center>
 <!--drivertable-->

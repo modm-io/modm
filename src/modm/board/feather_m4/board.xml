@@ -1,0 +1,15 @@
+<library>
+  <repositories>
+    <repository>
+      <path>../../../../repo.lb</path>
+    </repository>
+  </repositories>
+
+  <options>
+    <option name="modm:target">samd51j19a-au</option>
+    <option name="modm:platform:cortex-m:linkerscript.flash_offset">0x4000</option>
+  </options>
+  <modules>
+    <module>modm:board:feather-m4</module>
+  </modules>
+</library>
