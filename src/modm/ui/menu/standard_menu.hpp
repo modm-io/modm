@@ -6,6 +6,7 @@
  * Copyright (c) 2013, Kevin Läufer
  * Copyright (c) 2013, Thorsten Lajewski
  * Copyright (c) 2015, Niklas Hauser
+ * Copyright (c) 2020, Matthew Arnold
  *
  * This file is part of the modm project.
  *
@@ -34,6 +35,7 @@ namespace modm
 	* \ingroup	modm_ui_menu
 	* \author	Thorsten Lajewski
 	*/
+	template<typename Allocator = allocator::Dynamic<IAbstractView> >
 	struct MenuEntry
 	{
 		/**
@@ -42,10 +44,10 @@ namespace modm
 		 * @param space, available to display menu entry in number of letters
 		 * @param func  callback, which is called when entry is chosen
 		 */
-		MenuEntry(const char* text, uint16_t space, MenuEntryCallback func);
+		MenuEntry(const char* text, uint16_t space, MenuEntryCallback<Allocator> func);
 
 		ScrollableText text;
-		MenuEntryCallback callback;
+		MenuEntryCallback<Allocator> callback;
 	};
 
 	/**
@@ -61,21 +63,22 @@ namespace modm
 	* \author	Thorsten Lajewski
 	*/
 
-	class StandardMenu : public AbstractMenu
+	template<typename Allocator = allocator::Dynamic<IAbstractView> >
+	class StandardMenu : public AbstractMenu<Allocator>
 	{
 	public:
 
-		StandardMenu(modm::ViewStack* stack, uint8_t identifier);
+		StandardMenu(modm::ViewStack<Allocator>* stack, uint8_t identifier);
 
-		virtual ~StandardMenu() = 0;
+		virtual ~StandardMenu() {}
 
-		StandardMenu(modm::ViewStack* stack, uint8_t identifier, const char* title);
+		StandardMenu(modm::ViewStack<Allocator>* stack, uint8_t identifier, const char* title);
 
 		/**
 		 * @brief addEntry adds a new option to the displayed list
 		 */
 		void
-		addEntry(const char* text, MenuEntryCallback func);
+		addEntry(const char* text, MenuEntryCallback<Allocator> func);
 
 		/**
 		 * @brief setTitle set the title of the menu displayed on top of the list
@@ -136,10 +139,14 @@ namespace modm
 
 	protected:
 
-		typedef modm::DoublyLinkedList<MenuEntry> EntryList;
-		EntryList entries;
+		template<typename T>
+		using EntryList = modm::DoublyLinkedList<MenuEntry<T> >;
+
+		EntryList<Allocator> entries;
 
 	};
 }
+
+#include "standard_menu_impl.hpp"
 
 #endif // MODM_STANDARD_MENU_HPP

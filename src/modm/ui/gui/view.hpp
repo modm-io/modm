@@ -41,7 +41,7 @@ class GuiViewStack;
  * @ingroup modm_ui_gui
  * @author	Thorsten Lajewski
  */
-class View : public modm::AbstractView
+class View
 {
 	friend class GuiViewStack;
 
@@ -61,6 +61,14 @@ public:
 	virtual void
 	update();
 
+	/**
+	 * @brief hasChanged indicates the current displayed view has changed.
+	 *        This function prevents unnecessary drawing of the display
+	 * @return if true the display has to be redrawn.
+	 */
+	virtual bool
+	hasChanged() = 0;
+
 	virtual void
 	preUpdate()
 	{
@@ -75,13 +83,42 @@ public:
 	virtual void
 	draw();
 
+	/**
+	 * @brief shortButtonPress handle the action for the pressed button
+	 */
+	virtual void
+	shortButtonPress(modm::MenuButtons::Button /*button*/)
+	{
+		// nothing to be done
+	}
+
 	/// Add widget to view
 	bool
 	pack(Widget *w, const modm::glcd::Point &coord);
 
+	/**
+	 * @brief isAlive tells the ViewStack if it should remove this screen.
+	 * @return
+	 */
+	bool
+	isAlive() const
+	{
+		return this->alive;
+	}
+
 	/// Remove the view from the screen. The viewStack handles the deletion.
 	void
 	remove();
+
+	/**
+	 * @brief onRemove will be called right before the view gets deleted,
+	 *        can be reimplemented to reset external data.
+	 */
+	virtual void
+	onRemove()
+	{
+		// nothing to be done here
+	}
 
 	/// Set color palette for every contained widget
 	void
@@ -105,12 +142,25 @@ public:
 		return stack;
 	}
 
+	modm::ColorGraphicDisplay&
+	display();
+
+	/**
+	 * @brief getIdentifier of the view.
+	 */
+	inline uint8_t getIdentifier(){
+		return this->identifier;
+	}
+
 protected:
 	modm::gui::GuiViewStack* stack;
 	Dimension dimension;
 	WidgetContainer widgets;
 
 	modm::gui::ColorPalette colorpalette;
+
+	const uint8_t identifier;
+	bool alive;
 };
 
 }	// namespace gui

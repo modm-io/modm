@@ -39,7 +39,8 @@ def prepare(module, options):
         ":communication:xpcc",
         ":container",
         ":processing:timer",
-        ":ui:display")
+        ":ui:display",
+        ":utils")
     return True
 
 def build(env):

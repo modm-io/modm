@@ -18,9 +18,10 @@
 
 // ----------------------------------------------------------------------------
 modm::gui::View::View(modm::gui::GuiViewStack* stack, uint8_t identifier, modm::gui::Dimension dimension) :
-	AbstractView(stack, identifier),
 	stack(stack),
-	dimension(dimension)
+	dimension(dimension),
+	identifier(identifier),
+	alive(true)
 {
 	this->display().clear();
 }
@@ -160,4 +161,10 @@ void modm::gui::View::markDrawn()
 	{
 		(*iter)->markDrawn();
 	}
+}
+
+modm::ColorGraphicDisplay&
+modm::gui::View::display()
+{
+	return stack->getDisplay();
 }

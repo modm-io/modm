@@ -20,7 +20,7 @@
 
 // ----------------------------------------------------------------------------
 modm::gui::GuiViewStack::GuiViewStack(modm::ColorGraphicDisplay* display, modm::gui::inputQueue* queue) :
-	ViewStack(display),
+	display(display),
 	input_queue(queue)
 {
 }

@@ -5,6 +5,7 @@
  * Copyright (c) 2012-2013, 2017-2018, Niklas Hauser
  * Copyright (c) 2013, Kevin Läufer
  * Copyright (c) 2013, Thorsten Lajewski
+ * Copyright (c) 2020, Matthew Arnold
  *
  * This file is part of the modm project.
  *
@@ -24,18 +25,19 @@
 namespace modm
 {
 	/// @ingroup modm_ui_menu
+	template<typename Allocator = allocator::Dynamic<IAbstractView> >
 	class CommunicatingView : public xpcc::Communicatable
 	{
 	public:
-		CommunicatingView(modm::CommunicatingViewStack* /*stack*/)
+		CommunicatingView(modm::CommunicatingViewStack<Allocator>* /*stack*/)
 		{
 		}
 
 	protected:
-		inline modm::CommunicatingViewStack*
-		getCommunicatingViewStack(modm::ViewStack* viewStack)
+		inline modm::CommunicatingViewStack<Allocator>*
+		getCommunicatingViewStack(modm::ViewStack<Allocator>* viewStack)
 		{
-			return static_cast<modm::CommunicatingViewStack*>(viewStack);
+			return static_cast<modm::CommunicatingViewStack<Allocator>*>(viewStack);
 		}
 	};
 }
