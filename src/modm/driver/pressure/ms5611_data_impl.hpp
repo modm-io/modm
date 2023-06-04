@@ -51,7 +51,7 @@ Data::calculateCalibratedValues()
     // Compute intermediate values used to calculate the pressure and temperature
     int32_t dT = rawTemp - (uint32_t(prom.data[5]) << 8);
     int64_t off = (int64_t(prom.data[2]) << 16) + ((int64_t(prom.data[4]) * int64_t(dT)) >> 7);
-    int64_t sens = (int64_t(prom.data[1]) << 15) + ((int64_t(prom.data[5]) * int64_t(dT)) >> 8);
+    int64_t sens = (int64_t(prom.data[1]) << 15) + ((int64_t(prom.data[3]) * int64_t(dT)) >> 8);
 
     // Compute temperature without second order compensation
     int32_t temp = 2000 + ((int64_t(dT) * prom.data[6]) >> 23);
