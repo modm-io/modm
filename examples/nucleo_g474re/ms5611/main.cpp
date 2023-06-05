@@ -32,7 +32,7 @@ public:
     {
         PT_BEGIN();
 
-        while (PT_CALL(barometer.initialize()) == 0)
+        while (PT_CALL(barometer.initialize()) == false)
         {
             MODM_LOG_ERROR << "Ms5611 PROM CRC failed" << modm::endl;
             timeout.restart(std::chrono::milliseconds(1000));

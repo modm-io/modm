@@ -90,7 +90,7 @@ public:
 
     /// Call this function before using the device to read the factory calibration
     /// @warning calls to this function resets the device
-    modm::ResumableResult<uint16_t>
+    modm::ResumableResult<bool>
     initialize();
 
     /// Do a readout sequence to convert and read temperature and then pressure from sensor

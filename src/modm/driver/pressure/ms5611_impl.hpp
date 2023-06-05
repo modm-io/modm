@@ -28,7 +28,7 @@ Ms5611<SpiMaster,Cs>::Ms5611(DataBase &data) : data(data)
 // -----------------------------------------------------------------------------
 
 template <typename SpiMaster, typename Cs>
-modm::ResumableResult<uint16_t>
+modm::ResumableResult<bool>
 Ms5611<SpiMaster,Cs>::initialize()
 {
     RF_BEGIN();
@@ -67,7 +67,7 @@ Ms5611<SpiMaster,Cs>::initialize()
     data.prom.data[6] = modm::fromBigEndian(RF_CALL(readProm(6)));
     data.prom.data[7] = modm::fromBigEndian(RF_CALL(readProm(7)));
 
-    RF_END_RETURN(data.prom.calculateCrc());
+    RF_END_RETURN(data.prom.calculateCrc() == (data.prom.data[7] & 0x000F));
 }
 
 // -----------------------------------------------------------------------------
