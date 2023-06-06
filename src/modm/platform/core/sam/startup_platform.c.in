@@ -41,4 +41,11 @@ __modm_initialize_platform(void)
 	DMAC->QOSCTRL.bit.FQOS = 2;
 	DMAC->QOSCTRL.bit.WRBQOS = 2;
 %% endif
+%% if target.family == "d5x/e5x"
+
+	// Enable cache controller
+	if (CMCC->SR.bit.CSTS == 0) {
+		CMCC->CTRL.bit.CEN = 1;
+	}
+%%endif
 }
