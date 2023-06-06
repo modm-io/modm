@@ -3,6 +3,7 @@
 #
 # Copyright (c) 2016-2018, Niklas Hauser
 # Copyright (c) 2017, Fabian Greif
+# Copyright (c) 2023, Christopher Durand
 #
 # This file is part of the modm project.
 #
@@ -36,6 +37,13 @@ class Instance(Module):
     def build(self, env):
         properties = get_properties(env)
         properties["id"] = self.instance
+
+        device = env[":target"]
+
+        irqs = [v["name"] for v in device.get_driver("core")["vector"]]
+        irqs = [irq for irq in irqs if irq.startswith("SPI") and str(self.instance) in irq]
+        assert len(irqs) == 1
+        properties["irq"] = irqs[0]
 
         env.substitutions = properties
         env.outbasepath = "modm/src/modm/platform/spi"
