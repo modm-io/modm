@@ -2,6 +2,7 @@
 /*
  * Copyright (c) 2017, Niklas Hauser
  * Copyright (c) 2017, Sascha Schade
+ * Copyright (c) 2018, 2023, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -53,7 +54,7 @@
 #include <modm/container.hpp>
 #include <modm/platform/clock/rcc.hpp>
 
-%% if not shared_interrupt
+%% if not single_interrupt
 MODM_ISR_DECL(I2C{{ id }}_ER);
 %% endif
 
@@ -323,7 +324,10 @@ namespace
 }
 
 // ----------------------------------------------------------------------------
-%% if shared_interrupt
+%% if shared_irq
+void
+modm::platform::I2cMaster{{ id }}::irq()
+%% elif single_interrupt
 MODM_ISR(I2C{{ id }})
 %% else
 MODM_ISR(I2C{{ id }}_EV)
@@ -331,12 +335,24 @@ MODM_ISR(I2C{{ id }}_EV)
 {
 	DEBUG_STREAM("\n=== IRQ ===");
 
-%% if shared_interrupt
+%% if single_interrupt
 	handleError();
 %% endif
 
-	uint16_t isr = I2C{{ id }}->ISR;
+	const uint16_t isr = I2C{{ id }}->ISR;
+%% if shared_irq
+	const auto cr1 = I2C{{ id }}->CR1;
+	const auto mask = (cr1 & (I2C_CR1_STOPIE | I2C_CR1_RXIE | I2C_CR1_TXIE))
+		| ((cr1 & I2C_CR1_TCIE) ? (I2C_ISR_TCR | I2C_ISR_TC) : 0u);
 
+	static_assert(I2C_CR1_STOPIE == I2C_ISR_STOPF);
+	static_assert(I2C_CR1_TXIE == I2C_ISR_TXIS);
+	static_assert(I2C_CR1_RXIE == I2C_ISR_RXNE);
+
+	if ((isr & mask) == 0) {
+		return;
+	}
+%% endif
 	I2C{{ id }}->CR1 &= ~(I2C_CR1_STOPIE | I2C_CR1_TCIE | I2C_CR1_RXIE | I2C_CR1_TXIE);
 
 	I2C{{ id }}->ICR = I2C_ICR_STOPCF;
@@ -487,7 +503,7 @@ MODM_ISR(I2C{{ id }}_EV)
 }
 
 // ----------------------------------------------------------------------------
-%% if not shared_interrupt
+%% if not single_interrupt
 MODM_ISR(I2C{{ id }}_ER)
 {
 	handleError();
@@ -539,7 +555,11 @@ modm::platform::I2cMaster{{ id }}::initializeWithPrescaler(uint32_t timingRegist
 	// Disable Own Address 2
 	I2C{{ id }}->OAR2 = 0;
 
-%% if shared_interrupt
+%% if shared_irq
+	// Enable Interrupt
+	NVIC_SetPriority({{ shared_irq }}_IRQn, 10);
+	NVIC_EnableIRQ({{ shared_irq }}_IRQn);
+%% elif single_interrupt
 	// Enable Interrupt
 	NVIC_SetPriority(I2C{{ id }}_IRQn, 10);
 	NVIC_EnableIRQ(I2C{{ id }}_IRQn);

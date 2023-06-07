@@ -5,7 +5,7 @@
 # Copyright (c) 2017, Fabian Greif
 # Copyright (c) 2020, Mike Wolfram
 # Copyright (c) 2021, Raphael Lehmann
-# Copyright (c) 2021, Christopher Durand
+# Copyright (c) 2021-2023, Christopher Durand
 #
 # This file is part of the modm project.
 #
@@ -129,11 +129,11 @@ def build(env):
         for channel in channels:
             instance_channels[channel["dma-instance"]].append(channel["dma-channel"])
         for instance in instance_channels:
-            channel_list = instance_channels[instance]
+            channel_list = [int(c) for c in instance_channels[instance]]
             channel_list.sort()
             min_channel = channel_list[0]
             max_channel = channel_list[-1]
-            controller.append({"instance": int(instance), "min_channel": int(min_channel), "max_channel": int(max_channel)})
+            controller.append({"instance": int(instance), "min_channel": min_channel, "max_channel": max_channel})
     elif dma["type"] in ["stm32-stream-channel"]:
         for channels in dma["streams"]:
             max_channels = 0

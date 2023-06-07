@@ -2,6 +2,7 @@
 /*
  * Copyright (c) 2017, Sascha Schade
  * Copyright (c) 2017-2018, Niklas Hauser
+ * Copyright (c) 2018, 2023, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -14,6 +15,7 @@
 #ifndef MODM_STM32_I2C_{{ id }}_HPP
 #define MODM_STM32_I2C_{{ id }}_HPP
 
+#include <modm/architecture/interface/interrupt.hpp>
 #include <modm/architecture/interface/i2c_master.hpp>
 #include <modm/architecture/interface/clock.hpp>
 #include <modm/platform/gpio/connector.hpp>
@@ -117,6 +119,13 @@ public:
 private:
 	static void
 	initializeWithPrescaler(uint32_t timingRegisterValue);
+
+%% if shared_irq
+	friend void ::{{ shared_irq }}_IRQHandler();
+
+	static void
+	irq();
+%% endif
 };
 
 

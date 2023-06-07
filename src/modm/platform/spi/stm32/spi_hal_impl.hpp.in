@@ -153,12 +153,12 @@ modm::platform::SpiHal{{ id }}::enableInterruptVector(bool enable, uint32_t prio
 {
 	if (enable) {
 		// Set priority for the interrupt vector
-		NVIC_SetPriority(SPI{{ id }}_IRQn, priority);
+		NVIC_SetPriority({{ irq }}_IRQn, priority);
 		// register IRQ at the NVIC
-		NVIC_EnableIRQ(SPI{{ id }}_IRQn);
+		NVIC_EnableIRQ({{ irq }}_IRQn);
 	}
 	else {
-		NVIC_DisableIRQ(SPI{{ id }}_IRQn);
+		NVIC_DisableIRQ({{ irq }}_IRQn);
 	}
 }
 

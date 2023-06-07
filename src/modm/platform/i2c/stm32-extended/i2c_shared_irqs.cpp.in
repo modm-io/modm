@@ -1,0 +1,25 @@
+/*
+ * Copyright (c) 2023, Christopher Durand
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+%% for ids in shared_irqs.values()
+%% for id in ids | sort
+#include "i2c_master_{{ id }}.hpp"
+%% endfor
+%% endfor
+
+%% for irq,ids in shared_irqs.items()
+MODM_ISR({{ irq }})
+{
+%% for id in ids | sort
+	modm::platform::I2cMaster{{ id }}::irq();
+%% endfor
+}
+%% endfor

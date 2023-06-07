@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2016-2018, Niklas Hauser
 # Copyright (c) 2017, Fabian Greif
+# Copyright (c) 2023, Christopher Durand
 #
 # This file is part of the modm project.
 #
@@ -9,6 +10,23 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
+
+from collections import defaultdict
+import re
+
+global_properties = {}
+
+def get_shared_irqs(device):
+    irq_re = re.compile("I2C\d(_\d)+")
+    shared_irqs = [v["name"] for v in device.get_driver("core")["vector"]]
+    shared_irqs = [v for v in shared_irqs if irq_re.fullmatch(v)]
+    shared_irq_map = {}
+    for irq in shared_irqs:
+        instances = tuple(irq[3:].split("_"))
+        for i in instances:
+            shared_irq_map[int(i)] = irq
+    return shared_irq_map
+
 
 class Instance(Module):
     def __init__(self, instance):
@@ -31,13 +49,21 @@ class Instance(Module):
         return True
 
     def build(self, env):
+        global global_properties
+
         device = env[":target"]
         driver = device.get_driver("i2c")
 
         properties = device.properties
         properties["target"] = target = device.identifier
         properties["id"] = self.instance
-        properties["shared_interrupt"] = "0" in target.family
+        properties["single_interrupt"] = "0" in target.family
+        shared_irq = get_shared_irqs(device).get(self.instance)
+        properties["shared_irq"] = shared_irq
+        if shared_irq:
+            global_properties["shared_irqs"][shared_irq].append(self.instance)
+        # shared irq is only supported with a single data and error interrupt
+        assert properties["single_interrupt"] or not shared_irq
 
         env.substitutions = properties
         env.outbasepath = "modm/src/modm/platform/i2c"
@@ -64,12 +90,17 @@ def prepare(module, options):
         ":container",
         ":platform:gpio")
 
+    global_properties["shared_irqs"] = defaultdict(list)
+
     for instance in listify(device.get_driver("i2c")["instance"]):
         module.add_submodule(Instance(int(instance)))
 
     return True
 
 def build(env):
+    env.substitutions.update(global_properties)
     env.outbasepath = "modm/src/modm/platform/i2c"
-    env.copy("i2c_timing_calculator.hpp")
 
+    env.copy("i2c_timing_calculator.hpp")
+    if len(global_properties["shared_irqs"]) > 0:
+        env.template("i2c_shared_irqs.cpp.in")

@@ -63,7 +63,7 @@ __modm_initialize_platform(void)
 %% elif target.family in ["g0", "g4", "l4", "l5"]
 %% if target.family in ["l4", "g4"]
 	RCC->APB1ENR1 |= RCC_APB1ENR1_PWREN;
-%% else
+%% elif target.family != "g0"
 #ifdef PWR_CR2_IOSV
 	RCC->APB1ENR1 |= RCC_APB1ENR1_PWREN;
 #endif

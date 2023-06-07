@@ -64,6 +64,11 @@ def prepare(module, options):
     if not device.has_driver("fdcan:stm32"):
         return False
 
+    # STM32G0 devices are currently unsupported due to shared interrupt handler
+    # TODO: fix driver
+    if device.identifier.family == "g0":
+        return False
+
     module.depends(
         ":architecture:assert",
         ":architecture:atomic",
