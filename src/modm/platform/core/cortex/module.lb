@@ -370,5 +370,4 @@ def build(env):
         env.collect(":build:archflags", "-mfloat-abi={}".format(env["float-abi"]), fpu_spec)
         single_precision = ("-sp-" in fpu_spec)
     if single_precision:
-        env.collect(":build:ccflags", "-fsingle-precision-constant",
-                                      "-Wdouble-promotion")
+        env.collect(":build:ccflags", "-Wdouble-promotion")

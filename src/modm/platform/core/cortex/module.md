@@ -327,8 +327,15 @@ This module adds these architecture specific [compiler options][options]:
 - `-mthumb`: only Thumb2 instruction set is supported.
 - `-mfloat-abi={soft, softfp, hard}`: the FPU ABI: `hard` is fastest.
 - `-mfpu=fpv{4, 5}-{sp}-d16`: single or double precision FPU.
-- `-fsingle-precision-constant`: if SP-FPU, treat all FP constants as SP.
-- `-Wdouble-promotion`: if SP-FPU, warn if FPs are promoted to doubles.
+- `-Wdouble-promotion`: if SP-FPU, warn if FPs are promoted to doubles. Note
+  that unless you use the `.f` suffix or explicitly cast floating point
+  operations to `float`, floating point constants are of `double` type, whose
+  storage can result in an increased binary size. While you can add the
+  `-fsingle-precision-constant` compiler flag to implicitly cast all doubles to
+  floats, this also impacts compile time computations and may reduce accuracy.
+  Therefore it is not enabled by default and you should carefully watch for any
+  unwanted numeric side effects if you use this compiler option.
+  See [Semantics of Floating Point Math in GCC][gcc_math].
 
 In addition, these linker options are added:
 
@@ -336,3 +343,4 @@ In addition, these linker options are added:
 - `-wrap,_{calloc, malloc, realloc, free}_r`: reimplemented Newlib with our own allocator.
 
 [options]: https://gcc.gnu.org/onlinedocs/gcc/Option-Summary.html
+[gcc_math]: https://gcc.gnu.org/wiki/FloatingPointMath
