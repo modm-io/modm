@@ -208,7 +208,7 @@ initialize()
 inline void
 initializeUsbFs(uint8_t priority=3)
 {
-	usb_fs::Device::initialize<SystemClock>();
+	usb_fs::Device::initialize<SystemClock>(priority);
 	usb_fs::Device::connect<usb_fs::Dm::Dm, usb_fs::Dp::Dp, usb_fs::Id::Id>();
 
 	USB_OTG_DeviceTypeDef *dev = (USB_OTG_DeviceTypeDef *) (USB_OTG_FS_PERIPH_BASE + USB_OTG_DEVICE_BASE);
@@ -223,9 +223,9 @@ initializeUsbFs(uint8_t priority=3)
 }
 
 inline void
-initializeUsbHs()
+initializeUsbHs(uint8_t priority=3)
 {
-	usb_hs::Device::initialize<SystemClock>();
+	usb_hs::Device::initialize<SystemClock>(priority);
 	usb_hs::Device::connect<
 		usb_hs::Ck::Ulpick,	usb_hs::Stp::Ulpistp,
 		usb_hs::Dir::Ulpidir, usb_hs::Nxt::Ulpinxt,
