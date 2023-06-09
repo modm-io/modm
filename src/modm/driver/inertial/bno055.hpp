@@ -657,7 +657,7 @@ protected:
 			this->transaction.configureWrite(buffer, 2);
 			buffer[2] = RF_CALL( this->runTransaction() );
 			if (buffer[2]) prev_reg = reg;
-			RF_RETURN(buffer[2]);
+			RF_RETURN((bool)buffer[2]);
 		}
 
 		RF_END_RETURN(true);

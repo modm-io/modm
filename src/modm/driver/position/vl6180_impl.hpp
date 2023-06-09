@@ -58,7 +58,7 @@ modm::Vl6180<I2cMaster>::initialize()
 		if (!logicBuffer.byte[0]) RF_RETURN(false);
 	}
 
-	RF_END_RETURN(logicBuffer.byte[0]);
+	RF_END_RETURN((bool)logicBuffer.byte[0]);
 }
 
 template < typename I2cMaster >
