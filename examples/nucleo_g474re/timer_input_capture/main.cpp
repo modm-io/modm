@@ -25,7 +25,7 @@ using namespace Board;
 constexpr uint16_t 	input_capture_overflow 		= 0xFFFF;
 constexpr float 	input_capture_freq_hz 		= 3000.00;	// Hz
 constexpr uint16_t 	input_capture_prescaler 	= SystemClock::Frequency / input_capture_freq_hz;
-constexpr float 	input_capture_ms_per_tick 	= ( 1.0 / input_capture_freq_hz ) * 1000.0;
+constexpr float 	input_capture_ms_per_tick 	= ( 1.0f / input_capture_freq_hz ) * 1000.0;
 
 // PWM Generator Timer Configuration
 constexpr uint16_t 	pwm_gen_overflow 		= 0xFFFF;
@@ -36,7 +36,7 @@ constexpr float 	pwm_gen_pulse_width_ms 	= 1.5f;		// Milliseconds
 // Desired PWM Freq = Clock Freq / Timer Prescaler / Overflow Value
 // Timer Prescaler = Clock Freq / (Desired PWM Freq * Overflow Value)
 constexpr uint16_t 	pwm_gen_prescaler 			= SystemClock::Frequency / ( pwm_gen_frequency_hz * pwm_gen_overflow );
-constexpr float 	pwm_gen_period_ms			= ( 1.0 / pwm_gen_frequency_hz ) * 1000;
+constexpr float 	pwm_gen_period_ms			= ( 1.0f / pwm_gen_frequency_hz ) * 1000;
 constexpr uint16_t 	pwm_gen_ticks_per_period 	= pwm_gen_overflow / pwm_gen_period_ms;
 constexpr uint16_t 	pwm_pulse_width_in_ticks 	= pwm_gen_ticks_per_period * pwm_gen_pulse_width_ms;
 // --------------------------------------------------------------------------

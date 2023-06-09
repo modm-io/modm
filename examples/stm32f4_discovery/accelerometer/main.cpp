@@ -87,10 +87,10 @@ public:
 			averageY.update(accel.getData().getY());
 #endif
 
-			Board::LedOrange::set(averageX.getValue() < -0.2);
-			Board::LedBlue::set(averageX.getValue() > 0.2);
-			Board::LedGreen::set(averageY.getValue() < -0.2);
-			Board::LedRed::set(averageY.getValue() > 0.2);
+			Board::LedOrange::set(averageX.getValue() < -0.2f);
+			Board::LedBlue::set(averageX.getValue() > 0.2f);
+			Board::LedGreen::set(averageY.getValue() < -0.2f);
+			Board::LedRed::set(averageY.getValue() > 0.2f);
 
 			timeout.restart(5ms);
 			PT_WAIT_UNTIL(timeout.isExpired());

@@ -42,7 +42,7 @@ main()
 		MODM_LOG_INFO << "adcValue=" << adcValue;
 		float voltage = adcValue * 3.3 / 0xfff;
 		MODM_LOG_INFO << " voltage=";
-		MODM_LOG_INFO.printf("%.3f\n", voltage);
+		MODM_LOG_INFO.printf("%.3f\n", (double)voltage);
 		modm::delay(500ms);
 	}
 

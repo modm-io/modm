@@ -103,7 +103,7 @@ main()
 		}
 
 		// print data anyways
-		MODM_LOG_INFO.printf("TEMP=%+2.1f degC, ", (static_cast<int16_t>(data[0] | data[1] << 8) / 256.f) + 25.f);
+		MODM_LOG_INFO.printf("TEMP=%+2.1f degC, ", (double)((static_cast<int16_t>(data[0] | data[1] << 8) / 256.f) + 25.f));
 		MODM_LOG_INFO.printf("G_X=%+05i, ", static_cast<int16_t>(data[ 2] | data[ 3] << 8));
 		MODM_LOG_INFO.printf("G_Y=%+05i, ", static_cast<int16_t>(data[ 4] | data[ 5] << 8));
 		MODM_LOG_INFO.printf("G_Z=%+05i, ", static_cast<int16_t>(data[ 6] | data[ 7] << 8));

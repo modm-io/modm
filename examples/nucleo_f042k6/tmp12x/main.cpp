@@ -44,7 +44,7 @@ main()
 	while(true) {
 		if (timer.execute()) {
 			const modm::Tmp123Temperature temperature = RF_CALL_BLOCKING(sensor.read());
-			MODM_LOG_INFO.printf("Temperature %2.2f\n", temperature.getTemperatureFloat());
+			MODM_LOG_INFO.printf("Temperature %2.2f\n", (double)temperature.getTemperatureFloat());
 		}
 	}
 }

@@ -75,8 +75,8 @@ public:
 	 */
 	template<std::unsigned_integral U>
 	constexpr BrightnessT(RgbT<U> rgb)
-		: value((0.2125 * float(rgb.red)) + (0.7154 * float(rgb.green)) +
-				(0.0721 * float(rgb.blue)))
+		: value((0.2125f * float(rgb.red)) + (0.7154f * float(rgb.green)) +
+				(0.0721f * float(rgb.blue)))
 	{}
 
 	/**

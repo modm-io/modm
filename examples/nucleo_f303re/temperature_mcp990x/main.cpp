@@ -50,7 +50,7 @@ int main()
 		{
 			if (RF_CALL_BLOCKING(sensor.readInternalTemperature()))
 			{
-				MODM_LOG_INFO.printf("temperature: %3.3f\n °C\n", data.getTemperature());
+				MODM_LOG_INFO.printf("temperature: %3.3f\n °C\n", (double)data.getTemperature());
 			}
 			else
 			{

@@ -22,13 +22,13 @@ modm::Angle::normalize(float angle)
 {
 	if (isPositive(angle))
 	{
-		while (angle > M_PI) {
-			angle -= 2 * M_PI;
+		while (angle > std::numbers::pi_v<float>) {
+			angle -= 2 * std::numbers::pi_v<float>;
 		}
 	}
 	else {
-		while (angle < -M_PI) {
-			angle += 2 * M_PI;
+		while (angle < -std::numbers::pi_v<float>) {
+			angle += 2 * std::numbers::pi_v<float>;
 		}
 	}
 
@@ -41,10 +41,10 @@ modm::Angle::reverse(float angle)
 {
 	if (isPositive(angle))
 	{
-		angle -= M_PI;
+		angle -= std::numbers::pi_v<float>;
 	}
 	else {
-		angle += M_PI;
+		angle += std::numbers::pi_v<float>;
 	}
 
 	return angle;
@@ -56,10 +56,10 @@ modm::Angle::perpendicular(float angle, const bool cw)
 {
 	if (cw)
 	{
-		angle = modm::Angle::normalize(angle - M_PI_2);
+		angle = modm::Angle::normalize(angle - std::numbers::pi_v<float>/2);
 	}
 	else {
-		angle = modm::Angle::normalize(angle + M_PI_2);
+		angle = modm::Angle::normalize(angle + std::numbers::pi_v<float>/2);
 	}
 
 	return angle;

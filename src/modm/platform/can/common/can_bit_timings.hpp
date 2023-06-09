@@ -63,7 +63,7 @@ private:
 	static constexpr uint32_t round_uint32(float f)
 	{
 		uint32_t f_int = (uint32_t) f;
-		if(f - f_int > 0.5)
+		if(f - f_int > 0.5f)
 			return f_int + 1;
 		else
 			return f_int;

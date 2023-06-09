@@ -47,84 +47,84 @@ public:
             MODM_LOG_INFO << "-------------------------------" << modm::endl << modm::endl;
             PT_CALL(adc.startMeasurement(modm::ads7828::InputChannel::Ch0));
             PT_CALL(adc.readConversionResult());
-            MODM_LOG_INFO.printf("Ch0 measuremnt is \t %.4f", data.getVoltage(3.3f));
+            MODM_LOG_INFO.printf("Ch0 measuremnt is \t %.4f", (double)data.getVoltage(3.3f));
             MODM_LOG_INFO << modm::endl;
 
             PT_CALL(adc.startMeasurement(modm::ads7828::InputChannel::Ch1));
             PT_CALL(adc.readConversionResult());
-            MODM_LOG_INFO.printf("Ch1 measuremnt is \t %.4f", data.getVoltage(3.3f));
+            MODM_LOG_INFO.printf("Ch1 measuremnt is \t %.4f", (double)data.getVoltage(3.3f));
             MODM_LOG_INFO << modm::endl;
 
             PT_CALL(adc.startMeasurement(modm::ads7828::InputChannel::Ch2));
             PT_CALL(adc.readConversionResult());
-            MODM_LOG_INFO.printf("Ch2 measuremnt is \t %.4f", data.getVoltage(3.3f));
+            MODM_LOG_INFO.printf("Ch2 measuremnt is \t %.4f", (double)data.getVoltage(3.3f));
             MODM_LOG_INFO << modm::endl;
 
             PT_CALL(adc.startMeasurement(modm::ads7828::InputChannel::Ch3));
             PT_CALL(adc.readConversionResult());
-            MODM_LOG_INFO.printf("Ch3 measuremnt is \t %.4f", data.getVoltage(3.3f));
+            MODM_LOG_INFO.printf("Ch3 measuremnt is \t %.4f", (double)data.getVoltage(3.3f));
             MODM_LOG_INFO << modm::endl;
 
             PT_CALL(adc.startMeasurement(modm::ads7828::InputChannel::Ch4));
             PT_CALL(adc.readConversionResult());
-            MODM_LOG_INFO.printf("Ch4 measuremnt is \t %.4f", data.getVoltage(3.3f));
+            MODM_LOG_INFO.printf("Ch4 measuremnt is \t %.4f", (double)data.getVoltage(3.3f));
             MODM_LOG_INFO << modm::endl;
 
             PT_CALL(adc.startMeasurement(modm::ads7828::InputChannel::Ch5));
             PT_CALL(adc.readConversionResult());
-            MODM_LOG_INFO.printf("Ch5 measuremnt is  \t %.4f", data.getVoltage(3.3f));
+            MODM_LOG_INFO.printf("Ch5 measuremnt is  \t %.4f", (double)data.getVoltage(3.3f));
             MODM_LOG_INFO << modm::endl;
 
             PT_CALL(adc.startMeasurement(modm::ads7828::InputChannel::Ch6));
             PT_CALL(adc.readConversionResult());
-            MODM_LOG_INFO.printf("Ch6 measuremnt is \t %.4f", data.getVoltage(3.3f));
+            MODM_LOG_INFO.printf("Ch6 measuremnt is \t %.4f", (double)data.getVoltage(3.3f));
             MODM_LOG_INFO << modm::endl;
 
             PT_CALL(adc.startMeasurement(modm::ads7828::InputChannel::Ch7));
             PT_CALL(adc.readConversionResult());
-            MODM_LOG_INFO.printf("Ch7 measuremnt is \t %.4f", data.getVoltage(3.3f));
+            MODM_LOG_INFO.printf("Ch7 measuremnt is \t %.4f", (double)data.getVoltage(3.3f));
             MODM_LOG_INFO << modm::endl;
 
             MODM_LOG_INFO << "----Diff Inputs-------------" << modm::endl;
 
             PT_CALL(adc.startMeasurement(modm::ads7828::InputChannel::Ch0Ch1));
             PT_CALL(adc.readConversionResult());
-            MODM_LOG_INFO.printf("Ch0 - Ch1 is \t %.4f", data.getVoltage(3.3f));
+            MODM_LOG_INFO.printf("Ch0 - Ch1 is \t %.4f", (double)data.getVoltage(3.3f));
             MODM_LOG_INFO << modm::endl;
 
             PT_CALL(adc.startMeasurement(modm::ads7828::InputChannel::Ch2Ch3));
             PT_CALL(adc.readConversionResult());
-            MODM_LOG_INFO.printf("Ch2 - Ch3 is\t %.4f", data.getVoltage(3.3f));
+            MODM_LOG_INFO.printf("Ch2 - Ch3 is\t %.4f", (double)data.getVoltage(3.3f));
             MODM_LOG_INFO << modm::endl;
 
             PT_CALL(adc.startMeasurement(modm::ads7828::InputChannel::Ch4Ch5));
             PT_CALL(adc.readConversionResult());
-            MODM_LOG_INFO.printf("Ch4 - Ch5 is \t %.4f", data.getVoltage(3.3f));
+            MODM_LOG_INFO.printf("Ch4 - Ch5 is \t %.4f", (double)data.getVoltage(3.3f));
             MODM_LOG_INFO << modm::endl;
 
             PT_CALL(adc.startMeasurement(modm::ads7828::InputChannel::Ch6Ch7));
             PT_CALL(adc.readConversionResult());
-            MODM_LOG_INFO.printf("Ch6 - Ch7 is \t %.4f", data.getVoltage(3.3f));
+            MODM_LOG_INFO.printf("Ch6 - Ch7 is \t %.4f", (double)data.getVoltage(3.3f));
             MODM_LOG_INFO << modm::endl;
 
             PT_CALL(adc.startMeasurement(modm::ads7828::InputChannel::Ch1Ch0));
             PT_CALL(adc.readConversionResult());
-            MODM_LOG_INFO.printf("Ch1 - Ch0 is \t %.4f", data.getVoltage(3.3f));
+            MODM_LOG_INFO.printf("Ch1 - Ch0 is \t %.4f", (double)data.getVoltage(3.3f));
             MODM_LOG_INFO << modm::endl;
 
             PT_CALL(adc.startMeasurement(modm::ads7828::InputChannel::Ch3Ch2));
             PT_CALL(adc.readConversionResult());
-            MODM_LOG_INFO.printf("Ch3 - Ch2 is \t %.4f", data.getVoltage(3.3f));
+            MODM_LOG_INFO.printf("Ch3 - Ch2 is \t %.4f", (double)data.getVoltage(3.3f));
             MODM_LOG_INFO << modm::endl;
 
             PT_CALL(adc.startMeasurement(modm::ads7828::InputChannel::Ch5Ch4));
             PT_CALL(adc.readConversionResult());
-            MODM_LOG_INFO.printf("Ch5 - Ch4 is \t %.4f", data.getVoltage(3.3f));
+            MODM_LOG_INFO.printf("Ch5 - Ch4 is \t %.4f", (double)data.getVoltage(3.3f));
             MODM_LOG_INFO << modm::endl;
 
             PT_CALL(adc.startMeasurement(modm::ads7828::InputChannel::Ch7Ch6));
             PT_CALL(adc.readConversionResult());
-            MODM_LOG_INFO.printf("Ch7 - Ch6 is \t %.4f", data.getVoltage(3.3f));
+            MODM_LOG_INFO.printf("Ch7 - Ch6 is \t %.4f", (double)data.getVoltage(3.3f));
             MODM_LOG_INFO << modm::endl;
 
             MODM_LOG_INFO << "---Toggling Power Down and Internal Ref----" << modm::endl;
@@ -132,25 +132,25 @@ public:
             PT_CALL(adc.setPowerDownSelection(modm::ads7828::PowerDown::InternalReferenceOffAdcConverterOff));
             PT_CALL(adc.startMeasurement(modm::ads7828::InputChannel::Ch0));
             PT_CALL(adc.readConversionResult());
-            MODM_LOG_INFO.printf("Default: \t\t\t\t %.4f", data.getVoltage(3.3f));
+            MODM_LOG_INFO.printf("Default: \t\t\t\t %.4f", (double)data.getVoltage(3.3f));
             MODM_LOG_INFO << modm::endl;
 
             PT_CALL(adc.setPowerDownSelection(modm::ads7828::PowerDown::InternalReferenceOnAdcConverterOff));
             PT_CALL(adc.startMeasurement(modm::ads7828::InputChannel::Ch0));
             PT_CALL(adc.readConversionResult());
-            MODM_LOG_INFO.printf("Internal ref on:  \t\t\t %.4f", data.getVoltage(2.5f));
+            MODM_LOG_INFO.printf("Internal ref on:  \t\t\t %.4f", (double)data.getVoltage(2.5f));
             MODM_LOG_INFO << modm::endl;
 
             PT_CALL(adc.setPowerDownSelection(modm::ads7828::PowerDown::InternalReferenceOffAdcConverterOn));
             PT_CALL(adc.startMeasurement(modm::ads7828::InputChannel::Ch0));
             PT_CALL(adc.readConversionResult());
-            MODM_LOG_INFO.printf("No power down \t\t\t\t %.4f", data.getVoltage(3.3f));
+            MODM_LOG_INFO.printf("No power down \t\t\t\t %.4f", (double)data.getVoltage(3.3f));
             MODM_LOG_INFO << modm::endl;
 
             PT_CALL(adc.setPowerDownSelection(modm::ads7828::PowerDown::InternalReferenceOnAdcConverterOn));
             PT_CALL(adc.startMeasurement(modm::ads7828::InputChannel::Ch0));
             PT_CALL(adc.readConversionResult());
-            MODM_LOG_INFO.printf("Internal ref on, no power down: \t %.4f", data.getVoltage(2.5f));
+            MODM_LOG_INFO.printf("Internal ref on, no power down: \t %.4f", (double)data.getVoltage(2.5f));
             MODM_LOG_INFO << modm::endl;
 
             MODM_LOG_INFO << "-------------------------------" << modm::endl << modm::endl;

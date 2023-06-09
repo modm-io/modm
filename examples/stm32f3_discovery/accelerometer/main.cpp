@@ -42,11 +42,11 @@ public:
 			averageY.update(accelerometer.getData().getY());
 
 			{
-				bool xs = averageX.getValue() < -0.2;
-				bool xn = averageX.getValue() >  0.2;
+				bool xs = averageX.getValue() < -0.2f;
+				bool xn = averageX.getValue() >  0.2f;
 
-				bool xe = averageY.getValue() < -0.2;
-				bool xw = averageY.getValue() >  0.2;
+				bool xe = averageY.getValue() < -0.2f;
+				bool xw = averageY.getValue() >  0.2f;
 
 				Board::LedNorth::set(xn and not (xe or xw));
 				Board::LedNorthEast::set(xn and xe);
