@@ -12,6 +12,10 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
+from collections import defaultdict
+
+global_properties = {}
+
 def load_options(module):
     module.add_option(
         NumericOption(
@@ -26,6 +30,13 @@ def load_options(module):
             minimum=1, maximum="64Ki-2",
             default=32))
 
+def get_shared_irq(device, irq):
+    irqs = [v["name"] for v in device.get_driver("core")["vector"]]
+    irqs = [v for v in irqs if irq in v]
+    assert(len(irqs) == 1)
+
+    return irqs[0]
+
 class Instance(Module):
     def __init__(self, instance):
         self.instance = instance
@@ -39,6 +50,7 @@ class Instance(Module):
         return True
 
     def build(self, env):
+        global global_properties
         device = env[":target"]
         driver = device.get_driver("fdcan")
 
@@ -47,6 +59,16 @@ class Instance(Module):
         properties["driver"] = driver
         properties["id"] = self.instance
         properties["reg"] = 'FDCAN{}'.format(self.instance)
+        properties["shared_irq_it0"] = False
+        properties["shared_irq_it1"] = False
+
+        if device.identifier.family == "g0":
+            shared_irq_it0 = get_shared_irq(device, "FDCAN_IT0")
+            properties["shared_irq_it0"] = shared_irq_it0
+            global_properties["shared_irqs"][shared_irq_it0].append([self.instance, "IT0"])
+            shared_irq_it1 = get_shared_irq(device, "FDCAN_IT1")
+            properties["shared_irq_it1"] = shared_irq_it1
+            global_properties["shared_irqs"][shared_irq_it1].append([self.instance, "IT1"])
 
         env.substitutions = properties
         env.outbasepath = "modm/src/modm/platform/can"
@@ -64,11 +86,6 @@ def prepare(module, options):
     if not device.has_driver("fdcan:stm32"):
         return False
 
-    # STM32G0 devices are currently unsupported due to shared interrupt handler
-    # TODO: fix driver
-    if device.identifier.family == "g0":
-        return False
-
     module.depends(
         ":architecture:assert",
         ":architecture:atomic",
@@ -83,6 +100,8 @@ def prepare(module, options):
         ":platform:rcc",
         ":utils")
 
+    global_properties["shared_irqs"] = defaultdict(list)
+
     driver = device.get_driver("fdcan")
 
     for instance in listify(driver["instance"]):
@@ -91,5 +110,9 @@ def prepare(module, options):
     return True
 
 def build(env):
+    env.substitutions.update(global_properties)
     env.outbasepath = "modm/src/modm/platform/can"
+
     env.copy("message_ram.hpp")
+    if len(global_properties["shared_irqs"]) > 0:
+        env.template("can_shared_irqs.cpp.in")

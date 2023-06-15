@@ -358,8 +358,21 @@ private:
 		EnterInitMode(const EnterInitMode&) = delete;
 		EnterInitMode& operator=(const EnterInitMode&) = delete;
 	};
-};
 
+%% if shared_irq_it0
+	friend void ::{{ shared_irq_it0 }}_IRQHandler();
+
+	static void
+	irqIT0();
+%% endif
+
+%% if shared_irq_it0
+	friend void ::{{ shared_irq_it1 }}_IRQHandler();
+
+	static void
+	irqIT1();
+%% endif
+};
 }	// namespace modm::platform
 
 #endif	//  MODM_STM32_FDCAN{{ id }}_HPP

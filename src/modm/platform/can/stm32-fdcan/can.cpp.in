@@ -212,7 +212,12 @@ modm::platform::Fdcan{{ id }}::initializeWithPrescaler(
 
 // line 0 used as TX and error interrupt
 // generated on finished frame transmission and error state
+%% if shared_irq_it0
+void
+modm::platform::Fdcan{{ id }}::irqIT0()
+%% else
 MODM_ISR({{ reg }}_IT0)
+%% endif
 {
 %% if options["buffer.tx"] > 0
 	if ({{ reg }}->IR & FDCAN_IR_TC) {
@@ -239,7 +244,12 @@ MODM_ISR({{ reg }}_IT0)
 
 // line 1 used as RX interrupt
 // generated on received frame
+%% if shared_irq_it1
+void
+modm::platform::Fdcan{{ id }}::irqIT1()
+%% else
 MODM_ISR({{ reg }}_IT1)
+%% endif
 {
 %% if options["buffer.rx"] > 0
 	int_fast16_t msgRetrieveLimit = rxQueue.getMaxSize() - rxQueue.getSize();
@@ -315,11 +325,21 @@ modm::platform::Fdcan{{ id }}::configureMode(Mode mode)
 void
 modm::platform::Fdcan{{ id }}::configureInterrupts(uint32_t interruptPriority)
 {
+%% if shared_irq_it0
+	NVIC_SetPriority({{ shared_irq_it0 }}_IRQn, interruptPriority);
+	NVIC_EnableIRQ({{ shared_irq_it0 }}_IRQn);
+%% else
 	NVIC_SetPriority({{ reg }}_IT0_IRQn, interruptPriority);
-	NVIC_SetPriority({{ reg }}_IT1_IRQn, interruptPriority);
-
 	NVIC_EnableIRQ({{ reg }}_IT0_IRQn);
+%% endif
+
+%% if shared_irq_it1
+	NVIC_SetPriority({{ shared_irq_it1 }}_IRQn, interruptPriority);
+	NVIC_EnableIRQ({{ shared_irq_it1 }}_IRQn);
+%% else
+	NVIC_SetPriority({{ reg }}_IT1_IRQn, interruptPriority);
 	NVIC_EnableIRQ({{ reg }}_IT1_IRQn);
+%% endif
 
 	// enable both interrupts lines (0 and 1)
 	{{ reg }}->ILE = FDCAN_ILE_EINT1 | FDCAN_ILE_EINT0;

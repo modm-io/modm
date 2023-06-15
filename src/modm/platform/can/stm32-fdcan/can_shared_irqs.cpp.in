@@ -1,0 +1,28 @@
+/*
+ * Copyright (c) 2023, Klaus Schnass (Zuehlke Engineering)
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+#include <cstring>
+#include <modm/architecture/interface/delay.hpp>
+#include <modm/architecture/interface/interrupt.hpp>
+
+%% for instances in shared_irqs.values()
+%% for instance in instances | sort
+#include "can_{{ instance[0] }}.hpp"
+%% endfor
+%% endfor
+
+%% for irq,instances in shared_irqs.items()
+MODM_ISR({{ irq }})
+{
+%% for id,line in instances | sort
+	modm::platform::Fdcan{{ id }}::irq{{ line }}();
+%% endfor
+}
+%% endfor
