@@ -52,7 +52,7 @@ def post_build(env):
     if subs["core"].startswith("cortex-m"):
         # get memory information
         subs["memories"] = env.query("::memories")
-        subs["uf2mem"] = ["0x{}:0x{}:{}".format(hex(m["start"]), hex(m["start"] + m["size"]),
+        subs["uf2mem"] = ["{:#x}:{:#x}:{}".format(m["start"], m["start"] + m["size"],
                           "CONTENTS" if "flash" in m["name"] else "NO_CONTENTS")
                           for m in subs["memories"]]
     else:
