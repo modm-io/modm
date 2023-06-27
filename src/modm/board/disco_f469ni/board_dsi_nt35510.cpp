@@ -91,6 +91,8 @@ board_initialize_display(uint8_t ColorCoding)
 		DSI->LCOLCR = ColorCoding;
 		// Select the color coding for the wrapper
 		DSI->WCFGR = ColorCoding << 1;
+		// DSI_VSYNC_RISING
+		DSI->WCFGR = DSI_WCFGR_VSPOL;
 		// Set the Horizontal Synchronization Active (HSA) in lane byte clock cycles
 		DSI->VHSACR = HSA * ClockRatio;
 		// Set the Horizontal Back Porch (HBP) in lane byte clock cycles
@@ -139,19 +141,41 @@ board_initialize_display(uint8_t ColorCoding)
 	}
 	*/
 
+	// What we messed up maybe -- just following what ST example does LOL
+	// {
+	// 	// HAL_LTDC_Init(&hltdc_eval);
+	// 	// Configures the HS, VS, DE and PC polarity
+	// 	// sets HS Polarity and VS Polarity to active high (LTDC_HSPOLARITY_AH, LTDC_VSPOLARITY_AH)
+	// 	LTDC->GCR = (1 << 31) | (1 << 30);
+	// 	// Sets Synchronization size
+	// 	LTDC->SSCR = (1 << 16) | (1);
+	// 	// Sets Accumulated Back porch
+	// 	LTDC->BPCR = (2 << 16) | (2);
+	// 	// Sets Accumulated Active Width
+	// 	LTDC->AWCR = (202 << 16) | (482);
+	// 	// Sets Total Width and Height
+	// 	LTDC->TWCR = (203 << 16) | (483);
+	// 	// Sets the background color value
+	// 	LTDC->BCCR = 0;
+	// 	// Enable LTDC by setting LTDCEN bit
+	// 	LTDC->GCR |= LTDC_GCR_LTDCEN;
+	// }
+
+
+	// what is done in otm8009a
+	// This actually makes LPWRE error goe
 	{
 		// HAL_LTDC_Init(&hltdc_eval);
 		// Configures the HS, VS, DE and PC polarity
-		// sets HS Polarity and VS Polarity to active high (LTDC_HSPOLARITY_AH, LTDC_VSPOLARITY_AH)
-		LTDC->GCR = (1 << 31) | (1 << 30);
+		LTDC->GCR = 0;
 		// Sets Synchronization size
-		LTDC->SSCR = (1 << 16) | (1);
+		LTDC->SSCR = ((HSA - 1) << 16) | (VSA - 1);
 		// Sets Accumulated Back porch
-		LTDC->BPCR = (2 << 16) | (2);
+		LTDC->BPCR = ((HSA + HBP - 1) << 16) | (VSA + VBP - 1);
 		// Sets Accumulated Active Width
-		LTDC->AWCR = (202 << 16) | (482);
+		LTDC->AWCR = ((HACT + HSA + HBP - 1) << 16) | (VACT + VSA + VBP - 1);
 		// Sets Total Width and Height
-		LTDC->TWCR = (203 << 16) | (483);
+		LTDC->TWCR = ((HACT + HSA + HBP + HFP - 1) << 16) | (VACT + VSA + VBP + VFP - 1);
 		// Sets the background color value
 		LTDC->BCCR = 0;
 		// Enable LTDC by setting LTDCEN bit
@@ -159,6 +183,8 @@ board_initialize_display(uint8_t ColorCoding)
 	}
 
 	{
+
+		// we might have messed this up
 		// HAL_LTDC_ConfigLayer()
 		// Configures the horizontal start and stop position
 		LTDC_Layer1->WHPCR = 
