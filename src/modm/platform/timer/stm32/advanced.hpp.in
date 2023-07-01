@@ -200,15 +200,6 @@ public:
 		return overflow;
 	}
 
-	// DEPRECATE: 2023q2
-	template<class SystemClock>
-	[[deprecated("Pass microseconds as std::chrono::duration: setPeriod( {microseconds}us ) instead!")]]
-	static Value
-	setPeriod(uint32_t microseconds, bool autoApply = true)
-	{
-		return setPeriod<SystemClock>(std::chrono::microseconds(microseconds), autoApply);
-	}
-
 	static inline void
 	generateEvent(Event ev)
 	{
