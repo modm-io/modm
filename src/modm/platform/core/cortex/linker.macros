@@ -5,6 +5,7 @@
  * Copyright (c) 2012, 2015-2022, Niklas Hauser
  * Copyright (c) 2013, Sascha Schade
  * Copyright (c) 2013, 2015, Kevin Läufer
+ * Copyright (c) 2023, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -172,15 +173,16 @@ MAIN_STACK_SIZE = {{ options[":platform:cortex-m:main_stack_size"] }};
 
 
 %% macro all_heap_sections(table_copy, table_zero, table_heap, props={})
+	%% set ram_first_index = cont_ram["contains"][0]["index"]
 	%% for cont_region in cont_ram_regions
 		%% for region in cont_region.contains
 	/* Sections in {{ region.name|upper }} */
-			%% if region.index
+			%% if region.index != ram_first_index
 {{ section_load(cont_region.cont_name|upper + " AT >FLASH", table_copy, sections=["data_"+region.name]) }}
 				%% do table_zero.append("bss_"+region.name)
 			%% endif
 {{ section_heap(region.name|upper, "heap_"+region.name, cont_region.cont_name|upper,
-				sections=(["bss_"+region.name] if region.index else []) + ["noinit_"+region.name]) }}
+				sections=(["bss_"+region.name] if region.index != ram_first_index else []) + ["noinit_"+region.name]) }}
 			%% for name, value in props.items() if name in region.name
 				%% do table_heap.insert(region.index, {"name": "heap_"+region.name, "prop": value})
 			%% else

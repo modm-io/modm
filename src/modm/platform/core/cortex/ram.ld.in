@@ -20,15 +20,15 @@ SECTIONS
 
 {{ linker.section_rom("FLASH") }}
 
-{{ linker.section_stack(cont_ram_regions[0].cont_name|upper, "__stack_offset" if vector_table_location == "ram" else None) }}
+{{ linker.section_stack(cont_ram.cont_name|upper, "__stack_offset" if vector_table_location == "ram" else None) }}
 
 %% if vector_table_location == "ram"
-{{ linker.section_vector_ram(cont_ram_regions[0].cont_name|upper, table_copy) }}
+{{ linker.section_vector_ram(cont_ram.cont_name|upper, table_copy) }}
 %% endif
 
-{{ linker.section_ram(cont_ram_regions[0].cont_name|upper, "FLASH", table_copy, table_zero,
-                      sections_data=["fastdata", "fastcode", "data_" + cont_ram_regions[0].contains[0].name],
-                      sections_bss=["bss_" + cont_ram_regions[0].contains[0].name],
+{{ linker.section_ram(cont_ram.cont_name|upper, "FLASH", table_copy, table_zero,
+                      sections_data=["fastdata", "fastcode", "data_" + cont_ram.contains[0].name],
+                      sections_bss=["bss_" + cont_ram.contains[0].name],
                       sections_noinit=["faststack"]) }}
 
 {{ linker.all_heap_sections(table_copy, table_zero, table_heap) }}

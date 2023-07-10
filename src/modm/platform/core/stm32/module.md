@@ -255,8 +255,7 @@ not DMA-able.
 ### Tightly-Coupled RAM (TCM)
 
 The STM32F7 devices include an Instruction TCM (ITCM) and a data TCM (DTCM).
-Note that the TCMs are DMA-able, but only the MDMA. Note that DTCM but will
-overflow into the SRAM1/2 sections.
+Note that the DTCM section will overflow into the SRAM1/2 sections.
 
 ```
             ┌────────────────────────┐◄ __backup_end
@@ -332,7 +331,8 @@ overflow into the SRAM1/2 sections.
 
 The STM32H7 memory map is more complex with multiple SRAM regions in seperate
 power domains D1, D2 and D3. Note that the main `.data` and `.bss` sections are
-placed into the 128kB DTCM, but cannot overflow into D1_SRAM section.
+placed into the D1_SRAM section because the TCMs can't be accessed by
+peripheral DMA transfers, but only the MDMA.
 
 ```
             ┌────────────────────────┐◄ __backup_end
@@ -379,18 +379,19 @@ placed into the 128kB DTCM, but cannot overflow into D1_SRAM section.
 0x2404 0000 ├────────────────────────┤◄ __d1_sram1_end, __d1_sram2_start
             │  +HEAP_D1_SRAM1        │
             │  .noinit_d1_sram1      │
+            │  .noinit               │
+            │  .faststack            │
             │  .bss_d1_sram1         │
-  D1_SRAM1  │  .data_d1_sram1        │
+            │  .bss                  │
+            │  .data_d1_sram1        │
+  D1_SRAM1  │  .data                 │
 0x2400 0000 └────────────────────────┘◄ __d1_sram1_start
 
             ┌────────────────────────┐◄ __dtcm_end
             │  +HEAP_DTCM            │
-            │  .noinit_dtcm          │
-            │  .noinit               │
-            │  .faststack            │
-   D-Code   │  .bss_dtcm             │
-    only    │  .data_dtcm            │
-   access   │  .data                 │
+   D-Code   │  .noinit_dtcm          │
+    only    │  .bss_dtcm             │
+   access   │  .data_dtcm            │
             │  .fastdata             │
     DTCM    │  +MAIN_STACK_SIZE      │◄ __main_stack_top
 0x2000 0000 └────────────────────────┘◄ __dtcm_start

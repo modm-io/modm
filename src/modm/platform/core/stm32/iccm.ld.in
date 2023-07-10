@@ -15,11 +15,11 @@ SECTIONS
 
 {{ linker.section_rom("FLASH") }}
 
-{{ linker.section_stack(cont_ram_regions[0].cont_name|upper) }}
+{{ linker.section_stack(cont_ram.cont_name|upper) }}
 
-{{ linker.section_ram(cont_ram_regions[0].cont_name|upper, "FLASH", table_copy, table_zero,
-                      sections_data=["data_" + cont_ram_regions[0].contains[0].name],
-                      sections_bss=["bss_" + cont_ram_regions[0].contains[0].name],
+{{ linker.section_ram(cont_ram.cont_name|upper, "FLASH", table_copy, table_zero,
+                      sections_data=["data_" + cont_ram.contains[0].name],
+                      sections_bss=["bss_" + cont_ram.contains[0].name],
                       sections_noinit=["faststack"]) }}
 
 {{ linker.all_heap_sections(table_copy, table_zero, table_heap) }}
