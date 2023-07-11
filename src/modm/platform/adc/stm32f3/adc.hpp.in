@@ -2,7 +2,7 @@
  * Copyright (c) 2013-2014, Kevin Läufer
  * Copyright (c) 2014, 2016-2018, Niklas Hauser
  * Copyright (c) 2017, Sascha Schade
- * Copyright (c) 2022, Christopher Durand
+ * Copyright (c) 2022-2023, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -83,6 +83,21 @@ public:
 %% elif target["family"] in ["g4"]
 		Opamp2 = 16,
 		Opamp3 = 18,
+%% elif target["family"] in ["h7"]
+%% if target["name"] in ["a3", "b0", "b3"]
+		BatDiv4 = 14,
+		Dac2Out1 = 15,
+		VSense = 18,
+		InternalReference = 19,
+%% endif
+		Dac1Out1 = 16,
+		Dac1Out2 = 17,
+%% if target["name"][0] in ["2", "3"]
+		// BatDiv4 can be connected to channel 16 by setting ADC2_ROUT0 in SYSCFG_ADC2ALT
+		BatDiv4 = 16,
+		// The internal reference can be connected to channel 17 by setting ADC2_ROUT1 in SYSCFG_ADC2ALT
+		InternalReference = 17,
+%% endif
 %% endif
 %% elif id == 3
 %% if target["family"] in ["f3"]
@@ -103,6 +118,16 @@ public:
 		BatDiv3 = 17,
 %% endif
 		InternalReference = 18,
+%% elif target["family"] in ["h7"]
+%% if resolution == 16
+		BatDiv4 = 17,
+		VSense = 18,
+		InternalReference = 19,
+%% else
+		BatDiv4 = 16,
+		VSense = 17,
+		InternalReference = 18,
+%% endif
 %% endif
 %% elif id == 4
 %% if target["family"] in ["f3"]
@@ -175,7 +200,7 @@ public:
 		Div128 				= RCC_CFGR2_{{ adc_pre }}_DIV128,
 		Div256 				= RCC_CFGR2_{{ adc_pre }}_DIV256,
 		Div256AllBits 		= RCC_CFGR2_{{ adc_pre }},	// for bit clear
-%% elif target["family"] in ["l4", "l5", "g4"]
+%% elif target["family"] in ["l4", "l5", "g4", "h7"]
 		Div1 				= 0,
 		Div2 				= ADC_CCR_PRESC_0,
 		Div4 				= ADC_CCR_PRESC_1,
@@ -192,29 +217,41 @@ public:
 %% endif
 	};
 
-%% if target["family"] in ["l4", "l5", "g4"]
+%% if resolution == 16
 	enum class SampleTime : uint8_t	// TODO: What is the best type?
 	{
-		Cycles2 	= 0b000,	//!   1.5 ADC clock cycles
-		Cycles7 	= 0b001,	//!   6.5 ADC clock cycles
-		Cycles13 	= 0b010,	//!  12.5 ADC clock cycles
-		Cycles25	= 0b011,	//!  24.5 ADC clock cycles
-		Cycles48 	= 0b100,	//!  47.5 ADC clock cycles
-		Cycles93 	= 0b101,	//!  92.5 ADC clock cycles
-		Cycles248 	= 0b110,	//! 247.5 ADC clock cycles
-		Cycles641 	= 0b111,	//! 640.5 ADC clock cycles
+		Cycles2 	= 0b000,	//<   1.5 ADC clock cycles
+		Cycles3 	= 0b001,	//<   2.5 ADC clock cycles
+		Cycles9  	= 0b010,	//<   8.5 ADC clock cycles
+		Cycles17	= 0b011,	//<  16.5 ADC clock cycles
+		Cycles33 	= 0b100,	//<  32.5 ADC clock cycles
+		Cycles65 	= 0b101,	//<  64.5 ADC clock cycles
+		Cycles388 	= 0b110,	//< 387.5 ADC clock cycles
+		Cycles811 	= 0b111,	//< 810.5 ADC clock cycles
+	};
+%% elif target["family"] in ["l4", "l5", "g4", "h7"]
+	enum class SampleTime : uint8_t	// TODO: What is the best type?
+	{
+		Cycles2 	= 0b000,	//<   1.5 ADC clock cycles
+		Cycles7 	= 0b001,	//<   6.5 ADC clock cycles
+		Cycles13 	= 0b010,	//<  12.5 ADC clock cycles
+		Cycles25	= 0b011,	//<  24.5 ADC clock cycles
+		Cycles48 	= 0b100,	//<  47.5 ADC clock cycles
+		Cycles93 	= 0b101,	//<  92.5 ADC clock cycles
+		Cycles248 	= 0b110,	//< 247.5 ADC clock cycles
+		Cycles641 	= 0b111,	//< 640.5 ADC clock cycles
 	};
 %% else
 	enum class SampleTime : uint8_t	// TODO: What is the best type?
 	{
-		Cycles2 	= 0b000,	//!   1.5 ADC clock cycles
-		Cycles3 	= 0b001,	//!   2.5 ADC clock cycles
-		Cycles5 	= 0b010,	//!   4.5 ADC clock cycles
-		Cycles8 	= 0b011,	//!   7.5 ADC clock cycles
-		Cycles20 	= 0b100,	//!  19.5 ADC clock cycles
-		Cycles62 	= 0b101,	//!  61.5 ADC clock cycles
-		Cycles182 	= 0b110,	//! 181.5 ADC clock cycles
-		Cycles602 	= 0b111,	//! 601.5 ADC clock cycles
+		Cycles2 	= 0b000,	//<   1.5 ADC clock cycles
+		Cycles3 	= 0b001,	//<   2.5 ADC clock cycles
+		Cycles5 	= 0b010,	//<   4.5 ADC clock cycles
+		Cycles8 	= 0b011,	//<   7.5 ADC clock cycles
+		Cycles20 	= 0b100,	//<  19.5 ADC clock cycles
+		Cycles62 	= 0b101,	//<  61.5 ADC clock cycles
+		Cycles182 	= 0b110,	//< 181.5 ADC clock cycles
+		Cycles602 	= 0b111,	//< 601.5 ADC clock cycles
 	};
 %% endif
 	enum class CalibrationMode : uint32_t
@@ -226,7 +263,7 @@ public:
 
 	enum class VoltageRegulatorState : uint32_t
 	{
-%% if target["family"] in ["l4", "l5", "g4"]
+%% if target["family"] in ["l4", "l5", "g4", "h7"]
 		Enabled 		= ADC_CR_ADVREGEN,
 %% elif target["family"] in ["f3"]
 		// Intermediate state is needed to move from enabled to disabled
@@ -331,6 +368,7 @@ public:
 	static inline void
 	calibrate(const CalibrationMode mode, const bool blocking = true);
 
+%% if resolution < 16
 	/**
 	 * Change the presentation of the ADC conversion result.
 	 *
@@ -343,6 +381,7 @@ public:
 	 */
 	static inline void
 	setLeftAdjustResult(const bool enable);
+%% endif
 
 	/**
 	 * Analog channel selection.
@@ -373,11 +412,20 @@ public:
 		return setChannel(getPinChannel<Gpio>(), sampleTime);
 	}
 	/// Get the channel for a Pin
+%% if target["family"] in ["h7"]
+	/// \warning Always returns the positive single-ended channel.
+	///          Differential mode is not supported yet.
+%% endif
 	template< class Gpio >
 	static inline constexpr Channel
 	getPinChannel()
 	{
+%% if target["family"] in ["h7"]
+		using modm::platform::detail::AdcPolarity;
+		constexpr int8_t channel{detail::AdcChannel<typename Gpio::Data, Peripheral::Adc{{ id }}, AdcPolarity::Positive>};
+%% else
 		constexpr int8_t channel{detail::AdcChannel<typename Gpio::Data, Peripheral::Adc{{ id }}>};
+%% endif
 		static_assert(channel >= 0, "Adc{{id}} does not have a channel for this pin!");
 		return Channel(channel);
 	}
@@ -404,14 +452,14 @@ public:
 	 * TODO: is there any limitation to when is can be called??
 	 */
 	static inline void
-	startConversion(void);
+	startConversion();
 
 	/**
 	 * @return If the conversion is finished.
 	 * @pre A conversion should have been stared with startConversion()
 	 */
 	static inline bool
-	isConversionFinished(void);
+	isConversionFinished();
 
 	/**
 	 * @return The most recent 16bit result of the ADC conversion.
@@ -426,7 +474,7 @@ public:
 		@endcode
 	 */
 	static inline uint16_t
-	getValue(void)
+	getValue()
 	{
 		return ADC{{ id }}->DR;
 	}

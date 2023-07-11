@@ -2,6 +2,7 @@
  * Copyright (c) 2013-2014, Kevin Läufer
  * Copyright (c) 2014, Sascha Schade
  * Copyright (c) 2014, 2016-2017, Niklas Hauser
+ * Copyright (c) 2023, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -29,7 +30,7 @@ modm::platform::Adc{{ id }}::initialize(const ClockMode clk,
 	uint32_t tmp = 0;
 
 	// enable clock
-%% if target["family"] in ["f3", "g4", "l5"]
+%% if target["family"] in ["f3", "g4", "l5", "h7"]
 	RCC->{{ ahb }}ENR |= RCC_{{ ahb }}ENR_ADC{{ id_common }}EN;
 %% elif target["family"] in ["l4"]
 	Rcc::enable<Peripheral::Adc1>();
@@ -40,7 +41,7 @@ modm::platform::Adc{{ id }}::initialize(const ClockMode clk,
 	RCC->{{ ccipr }} |= static_cast<uint32_t>(clk_src);
 %% endif
 
-%% if target["family"] in ["l4", "l5", "g4"]
+%% if target["family"] in ["l4", "l5", "g4", "h7"]
 	// Disable deep power down
 	ADC{{ id }}->CR &= ~ADC_CR_DEEPPWD;
 %% endif
@@ -60,10 +61,21 @@ modm::platform::Adc{{ id }}::initialize(const ClockMode clk,
 		ADC{{ id_common_u }}->CCR = tmp;
 	}
 
+%% if resolution == 16
+	// Always set boost mode for maximum clock for now.
+	// This will increase the ADC power consumption on lower ADC clocks.
+	// TODO: compute ADC input clock and choose correct setting
+	ADC{{id}}->CR |= ADC_CR_BOOST_Msk;
+%% endif
+
 	// enable regulator
 	ADC{{ id }}->CR &= ~ADC_CR_ADVREGEN;
 	ADC{{ id }}->CR |= static_cast<uint32_t>(VoltageRegulatorState::Enabled);
 	modm::delay_us(10);	// FIXME: this is ugly -> find better solution
+
+%% if resolution == 16
+	while(!(ADC{{ id }}->ISR & ADC_ISR_LDORDY));
+%% endif
 
 	acknowledgeInterruptFlags(InterruptFlag::Ready);
 
@@ -90,7 +102,7 @@ modm::platform::Adc{{ id }}::disable(const bool blocking)
 		while(ADC{{ id }}->CR & ADC_CR_ADDIS);
 	}
 	// disable clock
-%% if target["family"] in ["f3", "g4", "l5"]
+%% if target["family"] in ["f3", "g4", "l5", "h7"]
 	RCC->{{ ahb }}ENR &= ~RCC_{{ ahb }}ENR_ADC{{ id_common }}EN;
 %% elif target["family"] in ["l4"]
 	Rcc::disable<Peripheral::Adc1>();
@@ -106,7 +118,7 @@ modm::platform::Adc{{ id }}::setPrescaler(const Prescaler pre)
 	tmp &= ~static_cast<uint32_t>(Prescaler::Div256AllBits);
 	tmp |=  static_cast<uint32_t>(pre);
 	RCC->CFGR2 = tmp;
-%% elif target["family"] in ["l4", "l5", "g4"]
+%% elif target["family"] in ["l4", "l5", "g4", "h7"]
 	tmp  = ADC{{ id_common_u }}->CCR;
 	tmp &= ~static_cast<uint32_t>(Prescaler::Div256AllBits);
 	tmp |=  static_cast<uint32_t>(pre);
@@ -125,7 +137,11 @@ modm::platform::Adc{{ id }}::calibrate(const CalibrationMode mode,
 									const bool blocking)
 {
 	if (mode != CalibrationMode::DoNotCalibrate) {
+%% if resolution == 16
+		ADC{{ id }}->CR |= ADC_CR_ADCAL | ADC_CR_ADCALLIN |
+%% else
 		ADC{{ id }}->CR |= ADC_CR_ADCAL |
+%% endif
 										static_cast<uint32_t>(mode);
 		if(blocking) {
 			// wait for ADC_CR_ADCAL to be cleared by hw
@@ -134,24 +150,47 @@ modm::platform::Adc{{ id }}::calibrate(const CalibrationMode mode,
 	}
 }
 
+%% if resolution < 16
 void
 modm::platform::Adc{{ id }}::setLeftAdjustResult(const bool enable)
 {
 	if (enable) {
+%% if target["family"] in ["h7"]
+		ADC{{ id }}->CFGR |= ADC3_CFGR_ALIGN;
+%% else
 		ADC{{ id }}->CFGR |= ADC_CFGR_ALIGN;
-	}
-	else {
+%% endif
+	} else {
+%% if target["family"] in ["h7"]
+		ADC{{ id }}->CFGR &= ~ADC3_CFGR_ALIGN;
+%% else
 		ADC{{ id }}->CFGR &= ~ADC_CFGR_ALIGN;
+%% endif
 	}
 }
+%% endif
 
 bool
 modm::platform::Adc{{ id }}::setChannel(	const Channel channel,
 										const SampleTime sampleTime)
 {
-	if(static_cast<uint8_t>(channel) > 18) {
+%% if target["family"] in ["h7"] and resolution == 16:
+	if (static_cast<uint8_t>(channel) > 19) {
 		return false;
 	}
+%% else
+	if (static_cast<uint8_t>(channel) > 18) {
+		return false;
+	}
+%% endif
+
+%% if resolution == 16
+%% if target["family"] in ["h7"] and target["name"][0] in ["2", "3"]
+	ADC{{ id }}->PCSEL_RES0 = (1u << static_cast<uint8_t>(channel));
+%% else
+	ADC{{ id }}->PCSEL = (1u << static_cast<uint8_t>(channel));
+%% endif
+%% endif
 
 	uint32_t tmpreg;
 	// SQR1[10:6] contain SQ1[4:0]
@@ -206,7 +245,9 @@ void
 modm::platform::Adc{{ id }}::enableInterruptVector(const uint32_t priority,
 												const bool enable)
 {
-%% if id <= 2
+%% if id <= 2 and target["family"] in ["h7"]
+	const IRQn_Type INTERRUPT_VECTOR = ADC_IRQn;
+%% elif id <= 2 and target["family"] not in ["h7"]
 	const IRQn_Type INTERRUPT_VECTOR = ADC1_2_IRQn;
 %% elif id <= 5
 	const IRQn_Type INTERRUPT_VECTOR = ADC{{ id }}_IRQn;
