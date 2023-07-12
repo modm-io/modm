@@ -62,7 +62,7 @@ modm::platform::Adc{{ id }}::initialize(const ClockMode clk,
 	}
 
 %% if resolution == 16
-	// Always set boost mode for maximum clock for now.
+	// Always set highest boost mode for maximum clock for now.
 	// This will increase the ADC power consumption on lower ADC clocks.
 	// TODO: compute ADC input clock and choose correct setting
 	ADC{{id}}->CR |= ADC_CR_BOOST_Msk;
@@ -171,8 +171,8 @@ modm::platform::Adc{{ id }}::setLeftAdjustResult(const bool enable)
 %% endif
 
 bool
-modm::platform::Adc{{ id }}::setChannel(	const Channel channel,
-										const SampleTime sampleTime)
+modm::platform::Adc{{ id }}::configureChannel(Channel channel,
+											  SampleTime sampleTime)
 {
 %% if target["family"] in ["h7"] and resolution == 16:
 	if (static_cast<uint8_t>(channel) > 19) {
@@ -186,16 +186,13 @@ modm::platform::Adc{{ id }}::setChannel(	const Channel channel,
 
 %% if resolution == 16
 %% if target["family"] in ["h7"] and target["name"][0] in ["2", "3"]
-	ADC{{ id }}->PCSEL_RES0 = (1u << static_cast<uint8_t>(channel));
+	ADC{{ id }}->PCSEL_RES0 |= (1u << static_cast<uint8_t>(channel));
 %% else
-	ADC{{ id }}->PCSEL = (1u << static_cast<uint8_t>(channel));
+	ADC{{ id }}->PCSEL |= (1u << static_cast<uint8_t>(channel));
 %% endif
 %% endif
 
-	uint32_t tmpreg;
-	// SQR1[10:6] contain SQ1[4:0]
-	ADC{{ id }}->SQR1 = (static_cast<uint8_t>(channel) & 0b11111) << 6;
-
+	uint32_t tmpreg = 0;
 	if (static_cast<uint8_t>(channel) < 10) {
 		tmpreg = ADC{{ id }}->SMPR1
 			& ((~ADC_SMPR1_SMP0) << (static_cast<uint8_t>(channel) * 3));
@@ -211,6 +208,20 @@ modm::platform::Adc{{ id }}::setChannel(	const Channel channel,
 		ADC{{ id }}->SMPR2 = tmpreg;
 	}
 	return true;
+
+}
+
+
+bool
+modm::platform::Adc{{ id }}::setChannel(Channel channel,
+										SampleTime sampleTime)
+{
+	if (!configureChannel(channel, sampleTime)) {
+		return false;
+	}
+
+	ADC{{ id }}->SQR1 = (static_cast<uint8_t>(channel) << ADC_SQR1_SQ1_Pos) & ADC_SQR1_SQ1_Msk;
+	return true;
 }
 
 void
@@ -223,9 +234,8 @@ modm::platform::Adc{{ id }}::setFreeRunningMode(const bool enable)
 	}
 }
 
-
 void
-modm::platform::Adc{{ id }}::startConversion(void)
+modm::platform::Adc{{ id }}::startConversion()
 {
 	// TODO: maybe add more interrupt flags
 	acknowledgeInterruptFlags(InterruptFlag::EndOfRegularConversion |
@@ -235,9 +245,64 @@ modm::platform::Adc{{ id }}::startConversion(void)
 }
 
 bool
-modm::platform::Adc{{ id }}::isConversionFinished(void)
+modm::platform::Adc{{ id }}::isConversionFinished()
 {
 	return static_cast<bool>(getInterruptFlags() & InterruptFlag::EndOfRegularConversion);
+}
+
+void
+modm::platform::Adc{{ id }}::startInjectedConversionSequence()
+{
+	acknowledgeInterruptFlags(InterruptFlag::EndOfInjectedConversion |
+			InterruptFlag::EndOfInjectedSequenceOfConversions);
+
+	ADC{{ id }}->CR |= ADC_CR_JADSTART;
+}
+
+bool
+modm::platform::Adc{{ id }}::setInjectedConversionChannel(uint8_t index, Channel channel,
+														  SampleTime sampleTime)
+{
+	if (index >= 4) {
+		return false;
+	}
+	if (!configureChannel(channel, sampleTime)) {
+		return false;
+	}
+
+	static_assert(ADC_JSQR_JSQ2_Pos == ADC_JSQR_JSQ1_Pos + 6);
+	static_assert(ADC_JSQR_JSQ3_Pos == ADC_JSQR_JSQ2_Pos + 6);
+	static_assert(ADC_JSQR_JSQ4_Pos == ADC_JSQR_JSQ3_Pos + 6);
+
+	const uint32_t pos = ADC_JSQR_JSQ1_Pos + 6 * index;
+	const uint32_t mask = ADC_JSQR_JSQ1_Msk << (6 * index);
+	ADC{{ id }}->JSQR = (ADC{{ id }}->JSQR & ~mask) | (static_cast<uint32_t>(channel) << pos);
+	return true;
+}
+
+template<class Gpio>
+bool
+modm::platform::Adc{{ id }}::setInjectedConversionChannel(uint8_t index,
+														  SampleTime sampleTime)
+{
+	return setInjectedConversionChannel(index, getPinChannel<Gpio>(), sampleTime);
+}
+
+bool
+modm::platform::Adc{{ id }}::setInjectedConversionSequenceLength(uint8_t length)
+{
+	if (length < 1 or length > 4) {
+		return false;
+	}
+	ADC{{ id }}->JSQR = (ADC{{ id }}->JSQR & ~ADC_JSQR_JL)
+		| ((length - 1) << ADC_JSQR_JL_Pos);
+	return true;
+}
+
+bool
+modm::platform::Adc{{ id }}::isInjectedConversionFinished()
+{
+	return static_cast<bool>(getInterruptFlags() & InterruptFlag::EndOfInjectedSequenceOfConversions);
 }
 
 // ----------------------------------------------------------------------------

@@ -456,14 +456,51 @@ public:
 
 	/**
 	 * @return If the conversion is finished.
-	 * @pre A conversion should have been stared with startConversion()
+	 * @pre A conversion should have been started with startConversion()
 	 */
 	static inline bool
 	isConversionFinished();
 
 	/**
-	 * @return The most recent 16bit result of the ADC conversion.
-	 * @pre A conversion should have been stared with startConversion()
+	 * Start a new injected conversion sequence.
+	 *
+	 * @pre Channels must be selected with setInjectedConversionChannel().
+	 */
+	static inline void
+	startInjectedConversionSequence();
+
+	/**
+	 * @arg index Index of injected conversion in sequence (0..3)
+	 * @return true if configuration is successful, false if arguments are invalid
+	 */
+	static inline bool
+	setInjectedConversionChannel(uint8_t index, Channel channel, SampleTime sampleTime);
+
+	/**
+	 * @arg index Index of injected conversion in sequence (0..3)
+	 * @return true if configuration is successful, false if arguments are invalid
+	 */
+	template<class Gpio>
+	static inline bool
+	setInjectedConversionChannel(uint8_t index, SampleTime sampleTime);
+
+	/**
+	 * @arg length Length of injected conversion sequence (1..4)
+	 * @return true if configuration is successful, false if arguments are invalid
+	 */
+	static inline bool
+	setInjectedConversionSequenceLength(uint8_t length);
+
+	/**
+	 * @return If the injected conversion sequence is finished.
+	 * @pre An injected conversion should have been started with startInjectedConversionSequence()
+	 */
+	static inline bool
+	isInjectedConversionFinished();
+
+	/**
+	 * @return The most recent result of the ADC conversion.
+	 * @pre A conversion should have been started with startConversion()
 	 *
 	 * To have a blocking GET you might do it this way:
 	 * @code
@@ -473,10 +510,31 @@ public:
 		}
 		@endcode
 	 */
-	static inline uint16_t
+	static inline auto
 	getValue()
 	{
 		return ADC{{ id }}->DR;
+	}
+
+	/**
+	 * Get result of injected conversion.
+	 * @pre The injected conversion sequence is completed.
+	 */
+	static inline auto
+	getInjectedConversionValue(uint8_t index)
+	{
+		switch (index) {
+		case 0:
+			return ADC{{ id }}->JDR1;
+		case 1:
+			return ADC{{ id }}->JDR2;
+		case 2:
+			return ADC{{ id }}->JDR3;
+		case 3:
+			[[fallthrough]];
+		default:
+			return ADC{{ id }}->JDR4;
+		}
 	}
 
 	static inline void
@@ -493,6 +551,10 @@ public:
 
 	static inline void
 	acknowledgeInterruptFlags(const InterruptFlag_t flags);
+
+private:
+	static inline bool
+	configureChannel(Channel channel, SampleTime sampleTime);
 };
 
 }
