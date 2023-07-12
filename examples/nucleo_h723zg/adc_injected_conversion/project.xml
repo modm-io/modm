@@ -1,0 +1,10 @@
+<library>
+  <extends>modm:nucleo-h723zg</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_h723zg/adc_injected_conversion</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:adc:1</module>
+  </modules>
+</library>
