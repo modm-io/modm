@@ -268,7 +268,7 @@ public:
 		NVIC_DisableIRQ(IRQn_Type(vector));
 	}
 	template< class Pin > static void
-	disableVector(uint8_t priority) { disableVector(getVectorForLine(Pin::pin)); }
+	disableVector() { disableVector(getVectorForLine(Pin::pin)); }
 
 	inline static void
 	disableVectors(MaskType mask)
