@@ -32,6 +32,7 @@ struct SystemClock
 {
 	// Max 550MHz
 	static constexpr uint32_t SysClk = 550_MHz;
+	static constexpr uint32_t Pll1Q = SysClk / 4;
 	// Max 550MHz
 	static constexpr uint32_t Hclk = SysClk / 1; // D1CPRE
 	static constexpr uint32_t Frequency = Hclk;
@@ -53,9 +54,9 @@ struct SystemClock
 
 	static constexpr uint32_t Dac1 = Apb1;
 
-	static constexpr uint32_t Spi1 = Apb2;
-	static constexpr uint32_t Spi2 = Apb1;
-	static constexpr uint32_t Spi3 = Apb1;
+	static constexpr uint32_t Spi1 = Pll1Q;
+	static constexpr uint32_t Spi2 = Pll1Q;
+	static constexpr uint32_t Spi3 = Pll1Q;
 	static constexpr uint32_t Spi4 = Apb2;
 	static constexpr uint32_t Spi5 = Apb2;
 	static constexpr uint32_t Spi6 = Apb4;
@@ -115,9 +116,9 @@ struct SystemClock
 			.range = Rcc::PllInputRange::MHz1_2,
 			.pllM  = 4,		//   8 MHz / 4   =   2 MHz
 			.pllN  = 275,	//   2 MHz * 275 = 550 MHz
-			.pllP  = 1,		// 500 MHz / 1   = 550 MHz
-			.pllQ  = 2,		// 500 MHz / 2   = 275 MHz
-			.pllR  = 2,		// 500 MHz / 2   = 275 MHz
+			.pllP  = 1,		// 550 MHz / 1   = 550 MHz
+			.pllQ  = 4,		// 550 MHz / 4   = 137.5 MHz
+			.pllR  = 2,		// 550 MHz / 2   = 275 MHz
 		};
 		Rcc::enablePll1(Rcc::PllSource::Hse, pllFactors1);
 		Rcc::setFlashLatency<Ahb>();
