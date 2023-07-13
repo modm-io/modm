@@ -1,0 +1,209 @@
+/*
+ * Copyright (c) 2013, Kevin Läufer
+ * Copyright (c) 2013-2018, Niklas Hauser
+ * Copyright (c) 2014, Daniel Krebs
+ * Copyright (c) 2020, Mike Wolfram
+ * Copyright (c) 2023, Christopher Durand
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_STM32H7_SPI_HAL{{ id }}_HPP
+#define MODM_STM32H7_SPI_HAL{{ id }}_HPP
+
+#include "spi_base.hpp"
+
+namespace modm::platform
+{
+
+/**
+ * Serial peripheral interface (SPI{{ id }})
+ *
+ * @ingroup		modm_platform_spi modm_platform_spi_{{id}}
+ */
+class SpiHal{{ id }} : public SpiBase
+{
+public:
+	static constexpr auto peripheral = Peripheral::Spi{{ id }};
+
+	static constexpr DataSize MaxDataBits = DataSize::Bit{{ max_data_bits }};
+	static constexpr DataSize MaxCrcBits = DataSize::Bit{{ max_crc_bits }};
+
+	/// Maximum permitted size for fixed size transfers
+	static constexpr std::size_t MaxTransferSize = {{ max_transfer_size }};
+
+	/// Size of FIFO in bytes
+	static constexpr std::size_t FifoSize = {{ fifo_size }};
+
+	static void
+	enableClock();
+
+	static void
+	disableClock();
+
+	static void
+	initialize(Prescaler prescaler,
+			   MasterSelection masterSelection = MasterSelection::Master,
+			   DataMode dataMode = DataMode::Mode0,
+			   DataOrder dataOrder = DataOrder::MsbFirst,
+			   DataSize  dataSize  = DataSize::Bit8);
+
+	static void
+	enableTransfer();
+
+	static void
+	disableTransfer();
+
+	static bool
+	isTransferEnabled();
+
+	static void
+	startMasterTransfer();
+
+	static void
+	suspendMasterTransfer();
+
+	static void
+	setDataMode(DataMode dataMode);
+
+	static void
+	setDataOrder(DataOrder dataOrder);
+
+	static void
+	setDataSize(DataSize dataSize);
+
+	static void
+	setMasterSelection(MasterSelection masterSelection);
+
+	static void
+	setDuplexMode(DuplexMode mode);
+
+	static void
+	setCrcEnabled(bool enabled);
+
+	static void
+	setCrcSize(DataSize crcSize);
+
+	static void
+	setCrcPolynomial(uint32_t poly);
+
+	static void
+	setCrcInitialValue(CrcInit init);
+
+	static void
+	setDmaMode(DmaMode_t mode);
+
+	/**
+	 * Configure total amount of data items of transfer
+	 * Set size to 0 for unlimited transfers.
+	 * @param reload Next transfer size after reload
+	 */
+	static void
+	setTransferSize(uint16_t size, uint16_t reload = 0);
+
+	static void
+	setSlaveSelectMode(SlaveSelectMode mode);
+
+	static void
+	setSlaveSelectPolarity(SlaveSelectPolarity polarity);
+
+	static void
+	setSlaveSelectState(bool state);
+
+	static uint32_t
+	transmitCrc();
+
+	static uint32_t
+	receiveCrc();
+
+	static volatile uint32_t*
+	transmitRegister();
+
+	static const volatile uint32_t*
+	receiveRegister();
+
+	static StatusFlag_t
+	status();
+
+	/// @return true if SPI_SR_EOT is set
+	static bool
+	isTransferCompleted();
+
+	/// @return true if SPI_SR_TXC is set
+	static bool
+	isTxCompleted();
+
+	/// @return true if SPI_SR_TXP is not set
+	static bool
+	isTxFifoFull();
+
+	/// @return true if SPI_SR_RXP is set
+	static bool
+	isRxDataAvailable();
+
+	/**
+	 * Write up to 8 Bit to the transmit data register
+	 *
+	 * @warning Writing with a size smaller than the configured data size is not allowed.
+	 */
+	static void
+	write(uint8_t data);
+
+	/**
+	 * Write up to 16 Bit to the data register
+	 * @warning Writing with a size smaller than the configured data size is not allowed.
+	 */
+	static void
+	write16(uint16_t data);
+
+	/**
+	 * Write up to 32 Bit to the transmit data register
+	 */
+	static void
+	write32(uint32_t data);
+
+	/**
+	 * Read an 8-bit value from the receive data register.
+	 *
+	 * @warning Reading with a size smaller than the configured data size is not allowed.
+	 */
+	static uint8_t
+	read();
+
+	/**
+	 * Read a 16-bit value from the receive data register.
+	 *
+	 * @warning Reading with a size smaller than the configured data size is not allowed.
+	 */
+	static uint16_t
+	read16();
+
+	/**
+	 * Read a 32-bit value from the receive data register.
+	 */
+	static uint32_t
+	read32();
+
+	static void
+	enableInterruptVector(bool enable, uint32_t priority);
+
+	static void
+	enableInterrupt(Interrupt_t interrupt);
+
+	static void
+	disableInterrupt(Interrupt_t interrupt);
+
+	static void
+	acknowledgeInterruptFlags(StatusFlag_t flags);
+};
+
+} // namespace modm::platform
+
+#include "spi_hal_{{ id }}_impl.hpp"
+
+#endif // MODM_STM32H7_SPI_HAL{{ id }}_HPP

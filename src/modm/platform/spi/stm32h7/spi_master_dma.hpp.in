@@ -1,0 +1,132 @@
+/*
+ * Copyright (c) 2020, Mike Wolfram
+ * Copyright (c) 2023, Christopher Durand
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_STM32H7_SPI_MASTER{{ id }}_DMA_HPP
+#define MODM_STM32H7_SPI_MASTER{{ id }}_DMA_HPP
+
+#include <modm/platform/dma/dma.hpp>
+#include "spi_master_{{ id }}.hpp"
+
+namespace modm::platform
+{
+
+/**
+ * Serial peripheral interface (SPI{{ id }}) with DMA support.
+ *
+ * This class uses the DMA controller for sending and receiving data, which
+ * greatly reduces the CPU load. Beside passing the DMA channels as template
+ * parameters the class can be used in the same way like the SpiMaster{{ id }}.
+ *
+ * @tparam DmaChannelRX DMA channel for receiving
+ * @tparam DmaChannelTX DMA channel for sending
+ *
+ * @ingroup	modm_platform_spi modm_platform_spi_{{id}}
+ */
+template <class DmaChannelRx, class DmaChannelTx>
+class SpiMaster{{ id }}_Dma : public modm::SpiMaster,
+                              public SpiLock<SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>>
+{
+protected:
+	struct Dma {
+		using RxChannel = typename DmaChannelRx::template RequestMapping<
+				Peripheral::Spi{{ id }}, DmaBase::Signal::Rx>::Channel;
+		using TxChannel = typename DmaChannelTx::template RequestMapping<
+				Peripheral::Spi{{ id }}, DmaBase::Signal::Tx>::Channel;
+		static constexpr DmaBase::Request RxRequest = DmaChannelRx::template RequestMapping<
+				Peripheral::Spi{{ id }}, DmaBase::Signal::Rx>::Request;
+		static constexpr DmaBase::Request TxRequest = DmaChannelTx::template RequestMapping<
+				Peripheral::Spi{{ id }}, DmaBase::Signal::Tx>::Request;
+	};
+
+%% if not use_fiber
+	// Bit0: single transfer state
+	// Bit1: block transfer state
+	// Bit2: block transfer rx dma transfer completed
+	static inline uint8_t state{0};
+%% endif
+public:
+	using Hal = SpiHal{{ id }};
+
+	using DataMode = Hal::DataMode;
+	using DataOrder = Hal::DataOrder;
+	using DataSize = Hal::DataSize;
+
+	template< class... Signals >
+	static void
+	connect()
+	{
+		using Connector = GpioConnector<Peripheral::Spi{{ id }}, Signals...>;
+		using Sck = typename Connector::template GetSignal<Gpio::Signal::Sck>;
+		using Mosi = typename Connector::template GetSignal<Gpio::Signal::Mosi>;
+		using Miso = typename Connector::template GetSignal<Gpio::Signal::Miso>;
+
+		Sck::setOutput(Gpio::OutputType::PushPull);
+		Mosi::setOutput(Gpio::OutputType::PushPull);
+		Miso::setInput(Gpio::InputType::Floating);
+		Connector::connect();
+	}
+
+	template< class SystemClock, baudrate_t baudrate, percent_t tolerance=pct(5) >
+	static void
+	initialize();
+
+	static void
+	setDataMode(DataMode mode)
+	{
+		Hal::setDataMode(mode);
+	}
+
+	static void
+	setDataOrder(DataOrder order)
+	{
+		Hal::setDataOrder(order);
+	}
+
+	static void
+	setDataSize(DataSize size)
+	{
+		Hal::setDataSize(static_cast<SpiHal{{ id }}::DataSize>(size));
+	}
+
+	static uint8_t
+	transferBlocking(uint8_t data)
+	{
+		return RF_CALL_BLOCKING(transfer(data));
+	}
+
+	/// @pre At least one of tx or rx must not be nullptr
+	static void
+	transferBlocking(const uint8_t* tx, uint8_t* rx, std::size_t length)
+	{
+		RF_CALL_BLOCKING(transfer(tx, rx, length));
+	}
+
+	static modm::ResumableResult<uint8_t>
+	transfer(uint8_t data);
+
+	/// @pre At least one of tx or rx must not be nullptr
+	static modm::ResumableResult<void>
+	transfer(const uint8_t* tx, uint8_t* rx, std::size_t length);
+
+protected:
+	static void
+	finishTransfer();
+
+	static void
+	startDmaTransfer(const uint8_t* tx, uint8_t* rx, std::size_t length);
+};
+
+} // namespace modm::platform
+
+#include "spi_master_{{ id }}_dma_impl.hpp"
+
+#endif // MODM_STM32_SPI_MASTER{{ id }}_DMA_HPP

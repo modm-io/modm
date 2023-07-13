@@ -1,0 +1,93 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2016-2018, Niklas Hauser
+# Copyright (c) 2017, Fabian Greif
+# Copyright (c) 2023, Christopher Durand
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def get_properties(env):
+    device = env[":target"]
+    driver = device.get_driver("spi")
+    properties = {}
+    properties["use_fiber"] = env.query(":processing:fiber:__enabled", False)
+    properties["target"] = device.identifier
+
+    return properties
+
+class Instance(Module):
+    def __init__(self, driver, instance):
+        self.instance = int(instance)
+        self.driver = driver
+
+    def init(self, module):
+        module.name = str(self.instance)
+        module.description = "Instance {}".format(self.instance)
+
+    def prepare(self, module, options):
+        module.depends(":platform:spi")
+        return True
+
+    def build(self, env):
+        properties = get_properties(env)
+        properties["id"] = self.instance
+
+        device = env[":target"]
+        if device.identifier.family in ["h7"]:
+            properties["fifo_size"] = 16 if self.instance in (1, 2, 3) else 8
+            properties["max_data_bits"] = 32 if self.instance in (1, 2, 3) else 16
+            properties["max_crc_bits"] = properties["max_data_bits"]
+            properties["max_transfer_size"] = 2**16 - 1  # is smaller for some instances on U5
+            properties["i2s"] = self.instance in (1, 2, 3, 6)
+        else:
+            raise NotImplementedError("Unsupported device")
+
+        env.substitutions = properties
+        env.outbasepath = "modm/src/modm/platform/spi"
+
+        env.template("spi_hal.hpp.in", "spi_hal_{}.hpp".format(self.instance))
+        env.template("spi_hal_impl.hpp.in", "spi_hal_{}_impl.hpp".format(self.instance))
+        env.template("spi_master.hpp.in", "spi_master_{}.hpp".format(self.instance))
+        env.template("spi_master.cpp.in", "spi_master_{}.cpp".format(self.instance))
+        if env.has_module(":platform:dma"):
+            env.template("spi_master_dma.hpp.in", "spi_master_{}_dma.hpp".format(self.instance))
+            env.template("spi_master_dma_impl.hpp.in", "spi_master_{}_dma_impl.hpp".format(self.instance))
+
+
+def init(module):
+    module.name = ":platform:spi"
+    module.description = "Serial Peripheral Interface (SPI)"
+
+def prepare(module, options):
+    device = options[":target"]
+    if not device.has_driver("spi:stm32-extended"):
+        return False
+    if device.identifier.family not in ["h7"]:
+        # U5 is not supported yet
+        return False
+
+    module.depends(
+        ":architecture:register",
+        ":architecture:spi",
+        ":cmsis:device",
+        ":math:algorithm",
+        ":platform:gpio",
+        ":platform:rcc")
+
+    for driver in device.get_all_drivers("spi:stm32-extended"):
+        for instance in driver["instance"]:
+            module.add_submodule(Instance(driver, instance))
+
+    return True
+
+def build(env):
+    env.substitutions = get_properties(env)
+    env.outbasepath = "modm/src/modm/platform/spi"
+
+    env.template("spi_base.hpp.in")

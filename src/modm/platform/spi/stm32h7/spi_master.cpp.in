@@ -1,0 +1,159 @@
+/*
+* Copyright (c) 2009, Martin Rosekeit
+* Copyright (c) 2009-2012, Fabian Greif
+* Copyright (c) 2010, Georgi Grinshpun
+* Copyright (c) 2012-2017, Niklas Hauser
+* Copyright (c) 2013, Kevin Läufer
+* Copyright (c) 2014, Sascha Schade
+* Copyright (c) 2023, Christopher Durand
+*
+* This file is part of the modm project.
+*
+* This Source Code Form is subject to the terms of the Mozilla Public
+* License, v. 2.0. If a copy of the MPL was not distributed with this
+* file, You can obtain one at http://mozilla.org/MPL/2.0/.
+*/
+// ----------------------------------------------------------------------------
+
+#include "spi_master_{{id}}.hpp"
+
+namespace modm::platform
+{
+
+modm::ResumableResult<uint8_t>
+SpiMaster{{ id }}::transfer(uint8_t data)
+{
+%% if use_fiber
+	while (Hal::isTxFifoFull())
+		modm::fiber::yield();
+
+	Hal::write(data);
+
+	while (!Hal::isRxDataAvailable())
+		modm::fiber::yield();
+
+	return Hal::read();
+%% else
+	// this is a manually implemented "fast resumable function"
+	// there is no context or nesting protection, since we don't need it.
+	// there are only two states encoded into 1 bit (LSB of state):
+	//   1. waiting to start, and
+	//   2. waiting to finish.
+
+	if (!(state & Bit0))
+	{
+		// wait for previous transfer to finish
+		if (Hal::isTxFifoFull())
+			return {modm::rf::Running};
+
+		Hal::write(data);
+
+		// set LSB = Bit0
+		state |= Bit0;
+	}
+
+	if (!Hal::isRxDataAvailable())
+		return {modm::rf::Running};
+
+	data = Hal::read();
+
+	state &= ~Bit0;
+	return {modm::rf::Stop, data};
+%% endif
+}
+
+modm::ResumableResult<void>
+SpiMaster{{ id }}::transfer(
+		const uint8_t* tx, uint8_t* rx, std::size_t length)
+{
+%% if use_fiber
+	std::size_t rxIndex = 0;
+	std::size_t txIndex = 0;
+
+	while (rxIndex < length) {
+		while ((txIndex < length) and !Hal::isTxFifoFull()) {
+			Hal::write(tx ? tx[txIndex] : 0);
+			++txIndex;
+		}
+		while ((rxIndex < length) and Hal::isRxDataAvailable()) {
+			const uint8_t data = Hal::read();
+			if (rx) {
+				rx[rxIndex] = data;
+			}
+			++rxIndex;
+		}
+		if (rxIndex < length) {
+			modm::fiber::yield();
+		}
+	}
+%% else
+	// this is a manually implemented "fast resumable function"
+	// there is no context or nesting protection, since we don't need it.
+	// there are only two states encoded into 1 bit (Bit1 of state):
+	//   1. initialize index, and
+	//   2. wait for transfer to finish.
+
+	// we need to globally remember which byte we are currently transferring
+	static std::size_t rxIndex = 0;
+	static std::size_t txIndex = 0;
+
+	// we are only interested in Bit1
+	switch(state & Bit1)
+	{
+		case 0:
+			// we will only visit this state once
+			state |= Bit1;
+
+			// initialize index and check range
+			rxIndex = 0;
+			txIndex = 0;
+			while (rxIndex < length) {
+		default:
+		{
+				while ((txIndex < length) and !Hal::isTxFifoFull()) {
+					Hal::write(tx ? tx[txIndex] : 0);
+					++txIndex;
+				}
+				while ((rxIndex < length) and Hal::isRxDataAvailable()) {
+					if (rx) {
+						rx[rxIndex] = Hal::read();
+					} else {
+						Hal::read();
+					}
+					++rxIndex;
+				}
+				if (rxIndex < length) {
+					return {modm::rf::Running};
+				}
+		}
+			}
+
+			// clear the state
+			state &= ~Bit1;
+			return {modm::rf::Stop};
+	}
+%% endif
+}
+
+void
+SpiMaster{{ id }}::finishTransfer()
+{
+	if (Hal::isTransferEnabled()) {
+		while (!(Hal::status() & Hal::StatusFlag::TxTransferComplete));
+		Hal::disableTransfer();
+	}
+
+	Hal::acknowledgeInterruptFlags(
+		Hal::StatusFlag::EndOfTransfer |
+		Hal::StatusFlag::TxTransferFilled |
+		Hal::StatusFlag::Underrun |
+		Hal::StatusFlag::Overrun |
+		Hal::StatusFlag::CrcError |
+		Hal::StatusFlag::TiFrameError |
+		Hal::StatusFlag::ModeFault |
+		Hal::StatusFlag::Reload |
+		Hal::StatusFlag::Suspension
+	);
+}
+
+} // namespace modm::platform

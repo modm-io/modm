@@ -1,0 +1,254 @@
+/*
+ * Copyright (c) 2020, Mike Wolfram
+ * Copyright (c) 2023, Christopher Durand
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_STM32H7_SPI_MASTER{{ id }}_DMA_HPP
+#	error 	"Don't include this file directly, use 'spi_master_{{ id }}_dma.hpp' instead!"
+#endif
+
+namespace modm::platform
+{
+
+template <class DmaChannelRx, class DmaChannelTx>
+template <class SystemClock, modm::baudrate_t baudrate, modm::percent_t tolerance>
+void
+SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::initialize()
+{
+	Dma::RxChannel::configure(DmaBase::DataTransferDirection::PeripheralToMemory,
+			DmaBase::MemoryDataSize::Byte, DmaBase::PeripheralDataSize::Byte,
+			DmaBase::MemoryIncrementMode::Increment, DmaBase::PeripheralIncrementMode::Fixed,
+			DmaBase::Priority::Medium);
+	Dma::RxChannel::disableInterruptVector();
+	Dma::RxChannel::setPeripheralAddress(reinterpret_cast<uint32_t>(Hal::receiveRegister()));
+	Dma::RxChannel::template setPeripheralRequest<Dma::RxRequest>();
+
+	Dma::TxChannel::configure(DmaBase::DataTransferDirection::MemoryToPeripheral,
+			DmaBase::MemoryDataSize::Byte, DmaBase::PeripheralDataSize::Byte,
+			DmaBase::MemoryIncrementMode::Increment, DmaBase::PeripheralIncrementMode::Fixed,
+			DmaBase::Priority::Medium);
+	Dma::TxChannel::disableInterruptVector();
+	Dma::TxChannel::setPeripheralAddress(reinterpret_cast<uint32_t>(Hal::transmitRegister()));
+	Dma::TxChannel::template setPeripheralRequest<Dma::TxRequest>();
+
+%% if not use_fiber
+	state = 0;
+%% endif
+
+	constexpr auto result = modm::Prescaler::from_power(SystemClock::Spi{{ id }}, baudrate, 2, 256);
+	assertBaudrateInTolerance< result.frequency, baudrate, tolerance >();
+
+	constexpr Hal::Prescaler prescaler{result.index << SPI_CFG1_MBR_Pos};
+	Hal::initialize(prescaler);
+}
+
+template <class DmaChannelRx, class DmaChannelTx>
+modm::ResumableResult<uint8_t>
+SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(uint8_t data)
+{
+	// DMA is not used for single byte transfers
+%% if use_fiber
+	Hal::setDuplexMode(Hal::DuplexMode::FullDuplex);
+	Hal::setTransferSize(1);
+	Hal::enableTransfer();
+	Hal::write(data);
+	Hal::startMasterTransfer();
+
+	// wait for transfer to complete
+	while (!Hal::isTransferCompleted())
+		modm::fiber::yield();
+
+	data = SpiHal{{ id }}::read();
+	finishTransfer();
+
+	return data;
+%% else
+	// this is a manually implemented "fast resumable function"
+	// there is no context or nesting protection, since we don't need it.
+	// there are only two states encoded into 1 bit (LSB of state):
+	//   1. waiting to start, and
+	//   2. waiting to finish.
+	// LSB != Bit0 ?
+	if ( !(state & Bit0) )
+	{
+		Hal::setDuplexMode(Hal::DuplexMode::FullDuplex);
+		Hal::setTransferSize(1);
+		Hal::enableTransfer();
+		Hal::write(data);
+		Hal::startMasterTransfer();
+
+		// set LSB = Bit0
+		state |= Bit0;
+	}
+
+	if (!Hal::isTransferCompleted())
+		return {modm::rf::Running};
+
+	data = SpiHal{{ id }}::read();
+	finishTransfer();
+
+	// transfer finished
+	state &= ~Bit0;
+	return {modm::rf::Stop, data};
+%% endif
+}
+
+template <class DmaChannelRx, class DmaChannelTx>
+void
+SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::startDmaTransfer(
+		const uint8_t* tx, uint8_t* rx, std::size_t length)
+{
+	Hal::setTransferSize(length);
+
+	if (tx and rx) {
+		Hal::setDuplexMode(Hal::DuplexMode::FullDuplex);
+	} else if (rx) {
+		Hal::setDuplexMode(Hal::DuplexMode::ReceiveOnly);
+	} else { // tx only
+		Hal::setDuplexMode(Hal::DuplexMode::TransmitOnly);
+	}
+
+	/*
+	 * Required order of operations according to the reference manual:
+	 * 1. Enable SPI RX DMA
+	 * 2. Enable DMA channels
+	 * 3. Enable SPI TX DMA
+	 * 4. Start transfer
+	 */
+	if (rx) {
+		Dma::RxChannel::setMemoryAddress(reinterpret_cast<uint32_t>(rx));
+		Dma::RxChannel::setDataLength(length);
+		Hal::setDmaMode(Hal::DmaMode::Rx);
+		Dma::RxChannel::start();
+	}
+
+	if (tx) {
+		Dma::TxChannel::setMemoryAddress(reinterpret_cast<uint32_t>(tx));
+		Dma::TxChannel::setDataLength(length);
+		Dma::TxChannel::start();
+		if (rx) {
+			Hal::setDmaMode(Hal::DmaMode::Tx | Hal::DmaMode::Rx);
+		} else {
+			Hal::setDmaMode(Hal::DmaMode::Tx);
+		}
+	}
+
+	Hal::enableTransfer();
+	Hal::startMasterTransfer();
+}
+
+
+template <class DmaChannelRx, class DmaChannelTx>
+modm::ResumableResult<void>
+SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(
+		const uint8_t* tx, uint8_t* rx, std::size_t length)
+{
+	using Flags = DmaBase::InterruptFlags;
+%% if use_fiber
+	startDmaTransfer(tx, rx, length);
+
+	bool dmaRxFinished = (rx == nullptr);
+	while (!Hal::isTransferCompleted() or !dmaRxFinished) {
+		if(rx) {
+			const auto flags = DmaChannelRx::getInterruptFlags();
+			if (flags & Flags::Error) {
+				break;
+			}
+			if (flags & Flags::TransferComplete) {
+				dmaRxFinished = true;
+			}
+		}
+		if(tx) {
+			const auto flags = DmaChannelTx::getInterruptFlags();
+			if (flags & Flags::Error) {
+				break;
+			}
+		}
+		modm::fiber::yield();
+	}
+	finishTransfer();
+%% else
+	// this is a manually implemented "fast resumable function"
+	// there is no context or nesting protection, since we don't need it.
+	// there are only two states encoded into 1 bit (Bit1 of state):
+	//   1. initialize index, and
+	//   2. wait for 1-byte transfer to finish.
+
+	// we are only interested in Bit1
+	switch(state & Bit1)
+	{
+	case 0:
+		// we will only visit this state once
+		state |= Bit1;
+		startDmaTransfer(tx, rx, length);
+		if (!rx) {
+			state |= Bit2;
+		}
+		[[fallthrough]];
+
+	default:
+		if (!Hal::isTransferCompleted() or !(state & Bit2)) {
+			if(rx) {
+				static DmaBase::InterruptFlags_t flags;
+				flags = DmaChannelRx::getInterruptFlags();
+				if (flags & Flags::Error) {
+					// abort on DMA error
+					finishTransfer();
+					state &= ~(Bit2 | Bit1);
+					return {modm::rf::Stop};
+				}
+				if (flags & Flags::TransferComplete) {
+					state |= Bit2;
+				}
+			}
+			if(tx) {
+				if (DmaChannelTx::getInterruptFlags() & Flags::Error) {
+					// abort on DMA error
+					finishTransfer();
+					state &= ~(Bit2 | Bit1);
+					return {modm::rf::Stop};
+				}
+			}
+			return { modm::rf::Running };
+		}
+
+		finishTransfer();
+
+		// clear the state
+		state &= ~(Bit2 | Bit1);
+		return {modm::rf::Stop};
+	}
+%% endif
+}
+
+template <class DmaChannelRx, class DmaChannelTx>
+void
+SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::finishTransfer()
+{
+	DmaChannelTx::stop();
+	DmaChannelRx::stop();
+
+	Hal::setDmaMode(Hal::DmaMode::None);
+	Hal::disableTransfer();
+
+	Hal::acknowledgeInterruptFlags(
+		Hal::StatusFlag::EndOfTransfer |
+		Hal::StatusFlag::TxTransferFilled |
+		Hal::StatusFlag::Underrun |
+		Hal::StatusFlag::Overrun |
+		Hal::StatusFlag::CrcError |
+		Hal::StatusFlag::TiFrameError |
+		Hal::StatusFlag::ModeFault |
+		Hal::StatusFlag::Reload |
+		Hal::StatusFlag::Suspension
+	);
+}
+
+} // namespace modm::platform
