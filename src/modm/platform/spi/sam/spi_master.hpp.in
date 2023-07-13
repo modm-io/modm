@@ -10,6 +10,7 @@
 // ----------------------------------------------------------------------------
 #pragma once
 
+#include <modm/architecture/interface/spi_lock.hpp>
 #include <modm/architecture/interface/spi_master.hpp>
 #include <modm/platform/gpio/connector.hpp>
 #include <modm/math/algorithm/prescaler.hpp>
@@ -23,13 +24,11 @@ namespace modm::platform {
  * @author	Jeff McBride
  * @ingroup	modm_platform_spi modm_platform_spi_{{id}}
  */
-class SpiMaster{{ id }} : public modm::SpiMaster {
+class SpiMaster{{ id }} : public modm::SpiMaster, public SpiLock<SpiMaster{{ id }}>
+{
 	// Bit0: single transfer state
 	// Bit1: block transfer state
 	static inline uint8_t state{0};
-	static inline uint8_t count{0};
-	static inline void *context{nullptr};
-	static inline ConfigurationHandler configuration{nullptr};
 
 	// Work around a name collision between 'struct modm::Spi' and 'struct Spi'
 	// defined in the CMSIS headers
@@ -114,12 +113,6 @@ public:
 	setDataOrder(DataOrder order) {
 		modm_assert(order == DataOrder::MsbFirst, "SPI DataOrder", "SPI hardware does not support alternate transmit order");
 	}
-
-	static uint8_t
-	acquire(void *ctx, ConfigurationHandler handler = nullptr);
-
-	static uint8_t
-	release(void *ctx);
 
 	static uint8_t
 	transferBlocking(uint8_t data) {

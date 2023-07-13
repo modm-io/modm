@@ -17,39 +17,6 @@
 
 #include "spi_master_{{id}}.hpp"
 
-uint8_t
-modm::platform::SpiMaster{{ id }}::acquire(void* ctx, ConfigurationHandler handler)
-{
-	if (context == nullptr)
-	{
-		context = ctx;
-		count = 1;
-		// if handler is not nullptr and is different from previous configuration
-		if (handler and configuration != handler) {
-			configuration = handler;
-			configuration();
-		}
-		return 1;
-	}
-
-	if (ctx == context)
-		return ++count;
-
-	return 0;
-}
-
-uint8_t
-modm::platform::SpiMaster{{ id }}::release(void* ctx)
-{
-	if (ctx == context)
-	{
-		if (--count == 0)
-			context = nullptr;
-	}
-	return count;
-}
-// ----------------------------------------------------------------------------
-
 modm::ResumableResult<uint8_t>
 modm::platform::SpiMaster{{ id }}::transfer(uint8_t data)
 {

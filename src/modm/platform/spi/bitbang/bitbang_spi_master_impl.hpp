@@ -26,17 +26,6 @@ template <typename Sck, typename Mosi, typename Miso>
 uint8_t
 modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::operationMode(0);
 
-template <typename Sck, typename Mosi, typename Miso>
-uint8_t
-modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::count(0);
-
-template <typename Sck, typename Mosi, typename Miso>
-void *
-modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::context(nullptr);
-
-template <typename Sck, typename Mosi, typename Miso>
-modm::Spi::ConfigurationHandler
-modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::configuration(nullptr);
 // ----------------------------------------------------------------------------
 
 template <typename Sck, typename Mosi, typename Miso>
@@ -90,42 +79,6 @@ modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::setDataOrder(DataOrder order)
 	else
 		operationMode &= ~0b100;
 }
-// ----------------------------------------------------------------------------
-
-template <typename Sck, typename Mosi, typename Miso>
-uint8_t
-modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::acquire(void *ctx, ConfigurationHandler handler)
-{
-	if (context == nullptr)
-	{
-		context = ctx;
-		count = 1;
-		// if handler is not nullptr and is different from previous configuration
-		if (handler and configuration != handler) {
-			configuration = handler;
-			configuration();
-		}
-		return 1;
-	}
-
-	if (ctx == context)
-		return ++count;
-
-	return 0;
-}
-
-template <typename Sck, typename Mosi, typename Miso>
-uint8_t
-modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::release(void *ctx)
-{
-	if (ctx == context)
-	{
-		if (--count == 0)
-			context = nullptr;
-	}
-	return count;
-}
-// ----------------------------------------------------------------------------
 
 template <typename Sck, typename Mosi, typename Miso>
 uint8_t

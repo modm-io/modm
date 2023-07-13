@@ -16,7 +16,8 @@
 #ifndef MODM_SOFTWARE_BITBANG_SPI_MASTER_HPP
 #define MODM_SOFTWARE_BITBANG_SPI_MASTER_HPP
 
-#include <stdint.h>
+#include <cstdint>
+#include <modm/architecture/interface/spi_lock.hpp>
 #include <modm/architecture/interface/spi_master.hpp>
 #include <modm/architecture/interface/delay.hpp>
 #include <modm/platform/gpio/connector.hpp>
@@ -41,7 +42,8 @@ namespace platform
 template< typename Sck,
 		  typename Mosi,
 		  typename Miso = GpioUnused >
-class BitBangSpiMaster : public ::modm::SpiMaster
+class BitBangSpiMaster : public ::modm::SpiMaster,
+                         public SpiLock<BitBangSpiMaster<Sck, Mosi, Miso>>
 {
 public:
 	template< class... Signals >
@@ -59,20 +61,11 @@ public:
 	static void
 	setDataOrder(DataOrder order);
 
-
-	static uint8_t
-	acquire(void *ctx, ConfigurationHandler handler = nullptr);
-
-	static uint8_t
-	release(void *ctx);
-
-
 	static uint8_t
 	transferBlocking(uint8_t data);
 
 	static void
 	transferBlocking(const uint8_t *tx, uint8_t *rx, std::size_t length);
-
 
 	static modm::ResumableResult<uint8_t>
 	transfer(uint8_t data);

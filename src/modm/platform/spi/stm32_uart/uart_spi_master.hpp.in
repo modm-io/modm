@@ -14,6 +14,7 @@
 #ifndef MODM_STM32_UART_SPI_MASTER{{ id }}_HPP
 #define MODM_STM32_UART_SPI_MASTER{{ id }}_HPP
 
+#include <modm/architecture/interface/spi_lock.hpp>
 #include <modm/architecture/interface/spi_master.hpp>
 #include <modm/platform/gpio/connector.hpp>
 #include "../uart/uart_hal_{{ id }}.hpp"
@@ -33,7 +34,8 @@ namespace platform
  * @author		Niklas Hauser
  * @ingroup		modm_platform_uart_spi modm_platform_uart_spi_{{id}}
  */
-class UartSpiMaster{{ id }} : public modm::SpiMaster, public UartBase
+class UartSpiMaster{{ id }} : public modm::SpiMaster, public UartBase,
+                              public SpiLock<UartSpiMaster{{ id }}>
 {
 	static DataOrder dataOrder;
 	static uint8_t state;
@@ -102,14 +104,6 @@ public:
 	{
 		dataOrder = order;
 	}
-
-
-	static uint8_t
-	acquire(void *ctx, ConfigurationHandler handler = nullptr);
-
-	static uint8_t
-	release(void *ctx);
-
 
 	static uint8_t
 	transferBlocking(uint8_t data)

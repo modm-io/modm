@@ -19,19 +19,6 @@
 #include <modm/math/utils/bit_constants.hpp>
 #include <modm/architecture/interface/atomic_lock.hpp>
 
-// bit 7 (0x80) is used for transfer 1 byte
-// bit 6 (0x40) is used for transfer multiple byte
-// bit 5-0 (0x3f) are used to store the acquire count
-uint8_t
-modm::platform::SpiMaster{{ id }}::state(0);
-
-void *
-modm::platform::SpiMaster{{ id }}::context(nullptr);
-
-modm::Spi::ConfigurationHandler
-modm::platform::SpiMaster{{ id }}::configuration(nullptr);
-// ----------------------------------------------------------------------------
-
 void
 modm::platform::SpiMaster{{ id }}::initialize(Prescaler prescaler)
 {
@@ -39,42 +26,8 @@ modm::platform::SpiMaster{{ id }}::initialize(Prescaler prescaler)
 
 	SPCR{{ id }} = (1 << SPE{{ id }}) | (1 << MSTR{{ id }}) | (static_cast<uint8_t>(prescaler) & ~0x80);
 	SPSR{{ id }} = (static_cast<uint8_t>(prescaler) & 0x80) ? (1 << SPI2X{{ id }}) : 0;
-	state &= 0x3f;
+	state = 0;
 }
-// ----------------------------------------------------------------------------
-
-uint8_t
-modm::platform::SpiMaster{{ id }}::acquire(void *ctx, ConfigurationHandler handler)
-{
-	if (context == nullptr)
-	{
-		context = ctx;
-		state = (state & ~0x3f) | 1;
-		// if handler is not nullptr and is different from previous configuration
-		if (handler and configuration != handler) {
-			configuration = handler;
-			configuration();
-		}
-		return 1;
-	}
-
-	if (ctx == context)
-		return (++state & 0x3f);
-
-	return 0;
-}
-
-uint8_t
-modm::platform::SpiMaster{{ id }}::release(void *ctx)
-{
-	if (ctx == context)
-	{
-		if ((--state & 0x3f) == 0)
-			context = nullptr;
-	}
-	return (state & 0x3f);
-}
-// ----------------------------------------------------------------------------
 
 modm::ResumableResult<uint8_t>
 modm::platform::SpiMaster{{ id }}::transfer(uint8_t data)

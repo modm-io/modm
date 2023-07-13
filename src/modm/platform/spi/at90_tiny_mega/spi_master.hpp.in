@@ -16,6 +16,7 @@
 
 #include <avr/io.h>
 
+#include <modm/architecture/interface/spi_lock.hpp>
 #include <modm/architecture/interface/spi_master.hpp>
 #include <modm/math/algorithm/prescaler.hpp>
 #include <modm/platform/gpio/connector.hpp>
@@ -50,11 +51,8 @@ namespace platform
  * @ingroup		modm_platform_spi modm_platform_spi_{{id}}
  * @author		Niklas Hauser
  */
-class SpiMaster{{ id }} : public ::modm::SpiMaster, private Spi
+class SpiMaster{{ id }} : public ::modm::SpiMaster, public SpiLock<SpiMaster{{ id }}>, private Spi
 {
-	static uint8_t state;
-	static void *context;
-	static ConfigurationHandler configuration;
 public:
 	/// Spi Data Mode, Mode0 is the most common mode
 	enum class
@@ -120,14 +118,6 @@ public:
 		}
 	}
 
-
-	static uint8_t
-	acquire(void *ctx, ConfigurationHandler handler = nullptr);
-
-	static uint8_t
-	release(void *ctx);
-
-
 	static uint8_t
 	transferBlocking(uint8_t data)
 	{
@@ -158,6 +148,11 @@ public:
 protected:
 	static void
 	initialize(Prescaler prescaler);
+
+private:
+	// bit 7 (0x80) is used for transfer 1 byte
+	// bit 6 (0x40) is used for transfer multiple byte
+	static inline uint8_t state{};
 };
 
 } // namespace platform

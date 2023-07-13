@@ -310,6 +310,7 @@ class Spi(Module):
         env.outbasepath = "modm/src/modm/architecture"
         env.copy("interface/spi.hpp")
         env.copy("interface/spi_master.hpp")
+        env.copy("interface/spi_lock.hpp")
 # -----------------------------------------------------------------------------
 
 class SpiDevice(Module):
