@@ -3,7 +3,7 @@
  * Copyright (c) 2014-2017, Niklas Hauser
  * Copyright (c) 2020, Mike Wolfram
  * Copyright (c) 2021, Raphael Lehmann
- * Copyright (c) 2021, Christopher Durand
+ * Copyright (c) 2021-2023, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -116,6 +116,10 @@ public:
 
 		using ChannelHal = DmaChannelHal<ChannelID, CHANNEL_BASE>;
 
+%% if dmaType in ["stm32-stream-channel", "stm32-mux-stream"]
+		static constexpr uint8_t FlagOffsetLut[8] = {0, 6, 16, 22, 0+32, 6+32, 16+32, 22+32};
+%% endif
+
 	public:
 		/**
 		 * Configure the DMA channel
@@ -145,7 +149,7 @@ public:
 		}
 
 		/**
-		 * Start the transfer of the DMA channel
+		 * Start the transfer of the DMA channel and clear all interrupt flags.
 		 */
 		static void
 		start()
@@ -321,15 +325,14 @@ public:
 				uint32_t(InterruptFlags::Error) << (uint32_t(ChannelID) * 4)
 			};
 %% elif dmaType in ["stm32-stream-channel", "stm32-mux-stream"]
-			constexpr uint8_t offsetLut[8] = {0, 6, 16, 22, 0+32, 6+32, 16+32, 22+32};
 			static const uint64_t HT_Flag {
-				uint64_t(InterruptFlags::HalfTransferComplete) << offsetLut[uint32_t(ChannelID)]
+				uint64_t(InterruptFlags::HalfTransferComplete) << FlagOffsetLut[uint32_t(ChannelID)]
 			};
 			static const uint64_t TC_Flag {
-				uint64_t(InterruptFlags::TransferComplete) << offsetLut[uint32_t(ChannelID)]
+				uint64_t(InterruptFlags::TransferComplete) << FlagOffsetLut[uint32_t(ChannelID)]
 			};
 			static const uint64_t TE_Flag {
-				uint64_t(InterruptFlags::Error) << offsetLut[uint32_t(ChannelID)]
+				uint64_t(InterruptFlags::Error) << FlagOffsetLut[uint32_t(ChannelID)]
 			};
 %% endif
 
@@ -347,6 +350,41 @@ public:
 			}
 
 			ControlHal::clearInterruptFlags(InterruptFlags::Global, ChannelID);
+		}
+
+		/**
+		 * Read channel status flags when channel interrupts are disabled.
+		 * This function is useful to query the transfer state when the use of
+		 * the channel interrupt is not required for the application.
+		 *
+		 * @warning Flags are automatically cleared in the ISR if the channel
+		 * 			interrupt is enabled or when start() is called.
+		 */
+		static InterruptFlags_t
+		getInterruptFlags()
+		{
+			const auto globalFlags = ControlHal::getInterruptFlags();
+			const auto mask = static_cast<uint8_t>(InterruptFlags::All);
+%% if dmaType in ["stm32-channel-request", "stm32-channel", "stm32-mux"]
+			const auto shift = static_cast<uint32_t>(ChannelID) * 4;
+%% elif dmaType in ["stm32-stream-channel", "stm32-mux-stream"]
+			const auto shift = FlagOffsetLut[uint32_t(ChannelID)];
+%% endif
+			const auto channelFlags = static_cast<uint8_t>((globalFlags >> shift) & mask);
+			return InterruptFlags_t{channelFlags};
+		}
+
+		/**
+		 * Clear channel interrupt flags.
+		 * Use only when the channel interrupt is disabled.
+		 *
+		 * @warning Flags are automatically cleared in the ISR if the channel
+		 * 			interrupt is enabled or when start() is called.
+		 */
+		static void
+		clearInterruptFlags(InterruptFlags_t flags = InterruptFlags::All)
+		{
+			ControlHal::clearInterruptFlags(flags, ChannelID);
 		}
 
 		/**

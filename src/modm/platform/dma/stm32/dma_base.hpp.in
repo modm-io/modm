@@ -228,7 +228,7 @@ public:
 	};
 
 %% if dmaType in ["stm32-stream-channel", "stm32-mux-stream"]
-	enum class InterruptEnable {
+	enum class InterruptEnable : uint32_t {
 		DirectModeError		= DMA_SxCR_DMEIE,
 		TransferError		= DMA_SxCR_TEIE,
 		HalfTransfer		= DMA_SxCR_HTIE,
@@ -236,7 +236,7 @@ public:
 	};
 	MODM_FLAGS32(InterruptEnable);
 
-	enum class InterruptFlags {
+	enum class InterruptFlags : uint8_t {
 		FifoError = 0b00'0001,
 		DirectModeError = 0b00'0100,
 		Error = 0b00'1000,
@@ -247,14 +247,14 @@ public:
 	};
 	MODM_FLAGS32(InterruptFlags);
 %% elif dmaType in ["stm32-channel-request", "stm32-channel", "stm32-mux"]
-	enum class InterruptEnable {
+	enum class InterruptEnable : uint32_t {
 		TransferComplete	= DMA_CCR_TCIE,
 		HalfTransfer		= DMA_CCR_HTIE,
 		TransferError		= DMA_CCR_TEIE,
 	};
 	MODM_FLAGS32(InterruptEnable);
 
-	enum class InterruptFlags {
+	enum class InterruptFlags : uint8_t {
 		Global = 0b0001,
 		TransferComplete = 0b0010,
 		HalfTransferComplete = 0b0100,
