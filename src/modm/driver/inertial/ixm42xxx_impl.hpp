@@ -97,6 +97,77 @@ Ixm42xxx< Transport >::readSensorData()
 
 template < class Transport >
 modm::ResumableResult<bool>
+Ixm42xxx< Transport >::readFsyncTimestamp(uint16_t *timestamp)
+{
+    /// TODO: Verify endianess
+    return readRegister(Register::TMST_FSYNCH, reinterpret_cast<uint8_t*>(timestamp), 2);
+}
+
+// -----------------------------------------------------------------------------
+
+template < class Transport >
+modm::ResumableResult<bool>
+Ixm42xxx< Transport >::readFifoCount(uint16_t *count)
+{
+    RF_BEGIN();
+
+    /// TODO: Figure out why the endianess seem to be wrong (possibly like FIFO_CONFIG2-3)
+    /// Read FIFO_COUNTL to latch new data for both FIFO_COUNTH and FIFO_COUNTL
+    if (RF_CALL(readRegister(Register::FIFO_COUNTL, &readByte)))
+    {
+        *count = uint16_t(readByte) << 8;
+        if (RF_CALL(readRegister(Register::FIFO_COUNTH, &readByte)))
+        {
+            *count |= uint16_t(readByte);
+            RF_RETURN(true);
+        }
+    }
+
+    RF_END_RETURN(false);
+}
+
+// -----------------------------------------------------------------------------
+
+template < class Transport >
+modm::ResumableResult<bool>
+Ixm42xxx< Transport >::readFifoData()
+{
+    RF_BEGIN();
+
+    if (RF_CALL(readFifoCount(&data.fifoCount)))
+    {
+        data.fifoCount = std::min<uint16_t>(data.fifoCount, data.fifoBuffer.size());
+        if (data.fifoCount > 0)
+        {
+            RF_RETURN_CALL(readRegister(Register::FIFO_DATA, data.fifoBuffer.data(), data.fifoCount));
+        }
+    }
+
+    RF_END_RETURN(false);
+}
+
+// -----------------------------------------------------------------------------
+
+template < class Transport >
+modm::ResumableResult<bool>
+Ixm42xxx< Transport >::writeFifoWatermark(uint16_t watermark)
+{
+    RF_BEGIN();
+
+    /// TODO: Determine what endianess to use
+    if (RF_CALL(writeRegister(Register::FIFO_CONFIG2, watermark & 0xFF)) &&
+        RF_CALL(writeRegister(Register::FIFO_CONFIG3, (watermark >> 8) & 0xFF)))
+    {
+        RF_RETURN(true);
+    }
+
+    RF_END_RETURN(false);
+}
+
+// -----------------------------------------------------------------------------
+
+template < class Transport >
+modm::ResumableResult<bool>
 modm::Ixm42xxx< Transport >::updateRegister(Register reg, Register_t setMask, Register_t clearMask)
 {
     RF_BEGIN();

@@ -42,6 +42,7 @@ def build(env):
     env.copy("ixm42xxx.hpp")
     env.copy("ixm42xxx_impl.hpp")
     env.copy("ixm42xxx_data.hpp")
+    env.copy("ixm42xxx_data_impl.hpp")
     env.copy("ixm42xxx_definitions.hpp")
     env.copy("ixm42xxx_transport.hpp")
     env.copy("ixm42xxx_transport_impl.hpp")

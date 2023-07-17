@@ -83,6 +83,39 @@ public:
     modm::ResumableResult<bool>
     readSensorData();
 
+    /**
+     * @brief Read the FSYNC timestamp from the device
+     * @return False in case of any error, e.g. if some register access is not
+     * permitted.
+     */
+    modm::ResumableResult<bool>
+    readFsyncTimestamp(uint16_t *timestamp);
+
+    /**
+     * @brief Read the FIFO count from the device
+     * @return False in case of any error, e.g. if some register access is not
+     * permitted.
+     */
+    modm::ResumableResult<bool>
+    readFifoCount(uint16_t *count);
+
+    /**
+     * @brief Read the FIFO data from the device
+     * @return False in case of any error, e.g. if some register access is not
+     * permitted.
+     */
+    modm::ResumableResult<bool>
+    readFifoData();
+
+    /**
+     * @brief Set the FIFO watermark used to generate FIFO_WM_GT interrupt
+     * @warning The FIFO watermarkl should be set, before choosing this interrupt source.
+     * @return False in case of any error, e.g. if some register access is not
+     * permitted.
+     */
+    modm::ResumableResult<bool>
+    writeFifoWatermark(uint16_t watermark);
+
 public:
     /**
      * @brief update a single register.
