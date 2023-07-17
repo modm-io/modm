@@ -1,0 +1,47 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2023, Rasmus Kleist Hørlyck Sørensen
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:ixm42xxx"
+    module.description = """\
+# InvenSense 6-Axis IMU
+
+High Precision 6-Axis MEMS MotionTracking Device
+
+!!! note "The registers in user bank 1, 2, 3 and 4 are currently not mapped out"
+
+!!! note "The IXM-42xxx driver has been developed for IIM-42652"
+    Some functionality may not be implemented or may not be applicable for other InvenSense 6-Axis IMU
+
+!!! warning "The IXM-42xxx driver I2C transport layer is untested"
+
+"""
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:register",
+        ":architecture:i2c.device",
+        ":architecture:spi.device",
+        ":math:geometry",
+        ":math:utils",
+        ":processing:resumable")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/inertial"
+    env.copy("ixm42xxx.hpp")
+    env.copy("ixm42xxx_impl.hpp")
+    env.copy("ixm42xxx_data.hpp")
+    env.copy("ixm42xxx_definitions.hpp")
+    env.copy("ixm42xxx_transport.hpp")
+    env.copy("ixm42xxx_transport_impl.hpp")
