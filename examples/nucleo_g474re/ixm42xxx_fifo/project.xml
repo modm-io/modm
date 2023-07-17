@@ -1,0 +1,16 @@
+<library>
+  <extends>modm:nucleo-g474re</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_g474re/iim42652_fifo</option>
+  </options>
+  <modules>
+    <module>modm:driver:ixm42xxx</module>
+    <module>modm:math:geometry</module>
+    <module>modm:platform:exti</module>
+    <module>modm:platform:gpio</module>
+    <module>modm:platform:spi:1</module>
+    <module>modm:processing:protothread</module>
+    <module>modm:processing:timer</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>
