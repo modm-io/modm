@@ -29,7 +29,7 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "modm/src/modm/processing/resumable"
-    if env.get(":processing:protothread:use_fiber", False):
+    if env.query(":processing:fiber:__enabled", False):
         env.copy("macros_fiber.hpp", "macros.hpp")
         env.copy("resumable_fiber.hpp", "resumable.hpp")
     else:

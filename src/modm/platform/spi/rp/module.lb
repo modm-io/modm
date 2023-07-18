@@ -25,7 +25,7 @@ class Instance(Module):
     def build(self, env):
         env.substitutions = {
             "id": self.instance,
-            "use_fiber": env.get(":processing:protothread:use_fiber", False)
+            "use_fiber": env.query(":processing:fiber:__enabled", False)
         }
         env.outbasepath = "modm/src/modm/platform/spi"
 

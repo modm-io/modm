@@ -15,7 +15,7 @@ def get_properties(env):
     device = env[":target"]
     driver = device.get_driver("spi:avr")
     properties = {}
-    properties["use_fiber"] = env.get(":processing:protothread:use_fiber", False)
+    properties["use_fiber"] = env.query(":processing:fiber:__enabled", False)
     properties["target"] = device.identifier
     properties["partname"] = device.partname
     properties["driver"] = driver

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2020, Erik Henriksson
-# Copyright (c) 2021, Christopher Durand
+# Copyright (c) 2021-2023, Christopher Durand
 # Copyright (c) 2021, Niklas Hauser
 #
 # This file is part of the modm project.
@@ -16,9 +16,16 @@ def init(module):
     module.name = ":processing:fiber"
     module.description = FileReader("module.md")
 
+def is_enabled(env):
+    return env.get(":processing:protothread:use_fiber", False) or \
+        not env.has_module(":processing:protothread")
 
 def prepare(module, options):
     module.depends(":processing:timer")
+
+    module.add_query(
+        EnvironmentQuery(name="__enabled", factory=is_enabled))
+
     # No ARM64 support yet!
     return "arm64" not in options[":target"].get_driver("core")["type"]
 
