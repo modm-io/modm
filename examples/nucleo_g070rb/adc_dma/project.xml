@@ -1,0 +1,12 @@
+<library>
+    <extends>modm:nucleo-g070rb</extends>
+    <options>
+        <option name="modm:build:build.path">../../../build/nucleo_g070rb/adc_dma</option>
+    </options>
+    <modules>
+        <module>modm:build:scons</module>
+        <module>modm:platform:timer:1</module>
+        <module>modm:platform:adc</module>
+        <module>modm:platform:dma</module>
+    </modules>
+</library>
