@@ -1,0 +1,15 @@
+<library>
+  <extends>modm:nucleo-h723zg</extends>
+  <options>
+    <option name="modm:build:build.path">../../../../build/nucleo_h723zg/bmi088_spi</option>
+    <option name="modm:processing:protothread:use_fiber">yes</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:processing:fiber</module>
+    <module>modm:platform:dma</module>
+    <module>modm:platform:exti</module>
+    <module>modm:platform:spi:2</module>
+    <module>modm:driver:bmi088</module>
+  </modules>
+</library>
