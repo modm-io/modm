@@ -1,0 +1,38 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2023, Christopher Durand
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:bmi088"
+    module.description = """\
+# BMI088 Inertial Measurement Unit
+
+[Datasheet](https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bmi088-ds001.pdf)
+"""
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:gpio",
+        ":architecture:register",
+        ":architecture:spi.device",
+        ":architecture:i2c.device",
+        ":math:geometry",
+        ":processing:fiber",
+        ":processing:timer")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/inertial"
+    env.copy("bmi088.hpp")
+    env.copy("bmi088_impl.hpp")
+    env.copy("bmi088_transport.hpp")
+    env.copy("bmi088_transport_impl.hpp")
