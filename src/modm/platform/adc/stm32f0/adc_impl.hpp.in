@@ -28,6 +28,11 @@ modm::platform::Adc{{ id }}::initialize()
 {
 	Rcc::enable<Peripheral::Adc{{ id }}>();
 
+%% if target.family in ["g0"]
+	ADC1->CR |= ADC_CR_ADVREGEN;
+	modm::delay_us(20);
+%% endif
+
 	if constexpr (mode == ClockMode::Synchronous) {
 		constexpr auto result = Prescaler::from_power(
 				SystemClock::Apb, frequency, {{2 if target.family in ["f0"] else 1}}, 4);
