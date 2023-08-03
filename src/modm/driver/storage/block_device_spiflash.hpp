@@ -1,6 +1,7 @@
 // coding: utf-8
 /*
  * Copyright (c) 2018, Raphael Lehmann
+ * Copyright (c) 2023, Rasmus Kleist Hørlyck Sørensen
  *
  * This file is part of the modm project.
  *
@@ -24,9 +25,7 @@ namespace modm
 
 
 /**
- * \brief	Block device with SPI Flash (Microchip SST26VF064B)
- *
- * 64MBit flash chip in SOIJ-8, WDFN-8 or SOIC-16
+ * \brief	Block device with SPI Flash
  *
  * \tparam Spi			The SpiMaster interface
  * \tparam Cs			The GpioOutput pin connected to the flash chip select
@@ -37,9 +36,10 @@ namespace modm
  *
  * \ingroup	modm_driver_block_device_spi_flash
  * \author	Raphael Lehmann
+ * \author  Rasmus Kleist Hørlyck Sørensen
  */
 template <typename Spi, typename Cs, uint32_t flashSize>
-class BdSpiFlash : public modm::BlockDevice, public modm::SpiDevice< Spi >, protected NestedResumable<5>
+class BdSpiFlash : public modm::BlockDevice, public modm::SpiDevice< Spi >, protected NestedResumable<6>
 {
 public:
 	/// Initializes the storage hardware
@@ -146,10 +146,20 @@ public:
 	readStatus();
 
 public:
+
+	/** Software Die Select
+	*
+	*  @param die 	The pre-assigned “Die ID#” of the die to select
+	*/
+	modm::ResumableResult<void>
+	selectDie(uint8_t die);
+
+public:
 	static constexpr bd_size_t BlockSizeRead = 1;
 	static constexpr bd_size_t BlockSizeWrite = 256;
 	static constexpr bd_size_t BlockSizeErase = 4 * 1'024;
 	static constexpr bd_size_t DeviceSize = flashSize;
+	static constexpr bd_size_t ExtendedAddressThreshold = 16 * 1'024 * 1'024;
 
 private:
 	uint8_t instructionBuffer[7];
@@ -160,55 +170,53 @@ private:
 
 	size_t index;
 
-	// See http://ww1.microchip.com/downloads/en/DeviceDoc/20005119G.pdf p.13
 	enum class
 	Instruction : uint8_t
 	{
-		//Configuration
-		Nop		= 0x00, /// No Operation
-		RstEn	= 0x66, /// Reset Enable
-		Rst		= 0x99, /// Reset Memory
-		//EQio	= 0x38, /// Enable Quad IO
-		//RstQio	= 0xff, /// reste Quad IO
-		RdSr	= 0x05, /// Read Status Register
-		WrSr	= 0x01, /// Write Status Register
-		RdCr	= 0x35, /// Read Configuration Register
-		// Read
-		Read	= 0x03, /// Read
-		ReadHS	= 0x0B, /// Read High Speed
-		SQOR	= 0x6B, /// SPI Quad Output Read
-		SQIOR	= 0xEB, /// SPI Quad I/O Read
-		SDOR	= 0x3B, /// SPI Dual Output Read
-		SDIOR	= 0xBB, /// SPI Dual I/O Read
-		SB		= 0xC0, /// Set Burst Length
-		RBSQI	= 0x0C, /// SQI Read Burst with Wrap
-		RBSPI	= 0xEC, /// SPI Read Burst with Wrap
-		// Identification
-		JedecId	= 0x9f, /// JEDEC-ID Read
-		QuadJId	= 0xAF, /// Quad I/O J-ID Read
-		SFDP	= 0x5A, /// Serial Flash Discoverable Parameters
-		// Write
-		WrEn	= 0x06, /// Write Enable
-		WrDi	= 0x04, /// Write Disable
-		SE		= 0x20, /// Erase 4 KBytes of Memory Array
-		BE		= 0xD8, /// Erase 64, 32 or 8 KBytes of Memory Array
-		CE		= 0xC7, /// Erase Full Array
-		PP		= 0x02, /// Page Program
-		SQPP	= 0x32, /// SQI Quad Page Program
-		WRSU	= 0xB0, /// Suspends Program/Erase
-		WRRE	= 0x30, /// Resumes Program/Erase
-		// Protection
-		RBpR	= 0x72, /// Read Block-Protection Register
-		WBpR	= 0x42, /// Write Block-Protection Register
-		LBpR	= 0x8D, /// Lock Down Block-Protection Register
-		nVWLDR	= 0xE8, /// non-Volatile Write Lock-Down Register
-		ULBPR	= 0x98, /// Global Block Protection Unlock
-		RSID	= 0x88, /// Read Security ID
-		PSID	= 0xA5, /// Program User Security ID area
-		LSID	= 0x85, /// Lockout Security ID Programming
+		SDS		= 0xC2, ///< Software Die Select
+		WE 		= 0x06,	///< Write Enable
+		VSRWE 	= 0x50, ///< Volatile Status Register Write Enable
+		WD 		= 0x04, ///< Write Disable
+		RDI		= 0xAB, ///< Read Device ID
+		RMDI	= 0x90, ///< Read Manufactuerer/Device ID
+		RJI		= 0x9F, ///< Read JEDEC ID
+		RUI		= 0x4B, ///< Read Unique ID
+		RD		= 0x03, ///< Read Data
+		RD4BA	= 0x13, ///< Read Data with 4-Byte Address
+		FR		= 0x0B, ///< Fast Read
+		FR4BA 	= 0x0C, ///< Fast Read with 4-Byte Address
+		PP		= 0x02, ///< Page Program
+		PP4BA	= 0x12, ///< Page Program with 4-Byte Address
+		SE		= 0x20, ///< 4KB Sector Erase
+		SE4B	= 0x21, ///< 4KB Sector Erase with 4-Byte Address
+		BE32	= 0x52, ///< 32KB Block Erase
+		BE		= 0xD8, ///< 64KB Block Erase
+		BE4B	= 0xDC, ///< 64KB Block Erase with 4-Byte Address
+		CE		= 0xC7, ///< Chip Erase
+		RSR1 	= 0x05, ///< Read Status Register-1
+		WSR1 	= 0x01, ///< Write Status Register-1
+		RSR2 	= 0x35, ///< Read Status Register-2
+		WSR2 	= 0x31, ///< Write Status Register-2
+		RSR3 	= 0x15, ///< Read Status Register-3
+		WSR3 	= 0x11, ///< Write Status Register-3
+		RSFDPR	= 0x5A, ///< Read SFDP Register
+		ESR		= 0x44,	///< Erase Security Register
+		PSR 	= 0x42, ///< Program Security Register
+		RSR		= 0x48, ///< Read Security Register
+		GBL     = 0x7E, ///< Global Block Lock
+		GBU     = 0x98, ///< Global Block Unlock
+		RBL     = 0x3D, ///< Read Block Lock
+		IBL		= 0x36,	///< Individual Block Lock
+		IBU 	= 0x39, ///< Individual Block Unlock
+		EPS 	= 0x75, ///< Erase / Program Suspend
+		EPR		= 0x7A, ///< Erase / Program Resume
+		En4BAM  = 0xB7, ///< Enter 4-Byte Address Mode
+		Ex4BAM  = 0xE9, ///< Exit 4-Byte Address Mode
+		RstEn	= 0x66, ///< Enable Reset
+		Rst		= 0x99, ///< Reset Device
 	};
 
-private:
+public:
 	/** Check if device is busy
 	 *
 	 * @return True if device is busy.
@@ -222,10 +230,16 @@ private:
 	modm::ResumableResult<void>
 	waitWhileBusy();
 
-	/** Send an operation instruction to the spi flash chip
+private:
+	/** Send a non-addressed operation instruction to the spi flash chip
 	 */
 	modm::ResumableResult<void>
-	spiOperation(Instruction instruction, size_t dataLength = 0, uint8_t* rxData = nullptr, const uint8_t* txData = nullptr, uint32_t address = UINT32_MAX, uint8_t nrDummyCycles = 0);
+	spiOperation(Instruction instruction, const uint8_t* tx = nullptr, uint8_t* rx = nullptr, std::size_t length = 0, uint8_t dummyCycles = 0);
+
+	/** Send an addressed operation instruction to the spi flash chip
+	 */
+	modm::ResumableResult<void>
+	spiOperation(Instruction instruction, bd_address_t address, const uint8_t* tx = nullptr, uint8_t* rx = nullptr, std::size_t length = 0, uint8_t dummyCycles = 0);
 };
 
 }

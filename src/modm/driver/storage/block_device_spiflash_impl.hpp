@@ -1,6 +1,7 @@
 // coding: utf-8
 /*
  * Copyright (c) 2018, Raphael Lehmann
+ * Copyright (c) 2023, Rasmus Kleist Hørlyck Sørensen
  *
  * This file is part of the modm project.
  *
@@ -32,9 +33,15 @@ modm::BdSpiFlash<Spi, Cs, flashSize>::initialize()
 	RF_CALL(spiOperation(Instruction::Rst));
 	RF_CALL(waitWhileBusy());
 
-	RF_CALL(spiOperation(Instruction::WrEn));
-	RF_CALL(spiOperation(Instruction::ULBPR));
+	RF_CALL(spiOperation(Instruction::WE));
+	RF_CALL(spiOperation(Instruction::GBU));
 	RF_CALL(waitWhileBusy());
+
+	// Enter 4-Byte Address mode for serial flash memory that support 256M-bit or more
+	if (DeviceSize > ExtendedAddressThreshold) {
+		RF_CALL(spiOperation(Instruction::En4BAM));
+		RF_CALL(waitWhileBusy());
+	}
 
 	RF_END_RETURN(true);
 }
@@ -56,7 +63,7 @@ modm::BdSpiFlash<Spi, Cs, flashSize>::readId()
 {
 	RF_BEGIN();
 
-	RF_CALL(spiOperation(Instruction::JedecId, 3, resultBuffer));
+	RF_CALL(spiOperation(Instruction::RJI, nullptr, resultBuffer, 3));
 
 	RF_END_RETURN(JedecId(resultBuffer[0], resultBuffer[1], resultBuffer[2]));
 }
@@ -72,7 +79,7 @@ modm::BdSpiFlash<Spi, Cs, flashSize>::read(uint8_t* buffer, bd_address_t address
 		RF_RETURN(false);
 	}
 
-	RF_CALL(spiOperation(Instruction::ReadHS, size, buffer, nullptr, address, 1));
+	RF_CALL(spiOperation(Instruction::FR, address, nullptr, buffer, size, 1));
 
 	RF_END_RETURN(true);
 }
@@ -90,8 +97,8 @@ modm::BdSpiFlash<Spi, Cs, flashSize>::program(const uint8_t* buffer, bd_address_
 
 	index = 0;
 	while(index < size) {
-		RF_CALL(spiOperation(Instruction::WrEn));
-		RF_CALL(spiOperation(Instruction::PP, BlockSizeWrite, nullptr, &buffer[index], address+index));
+		RF_CALL(spiOperation(Instruction::WE));
+		RF_CALL(spiOperation(Instruction::PP, address + index, &buffer[index], nullptr, BlockSizeWrite));
 		RF_CALL(waitWhileBusy());
 		index += BlockSizeWrite;
 	}
@@ -113,8 +120,8 @@ modm::BdSpiFlash<Spi, Cs, flashSize>::erase(bd_address_t address, bd_size_t size
 
 	index = 0;
 	while(index < size) {
-		RF_CALL(spiOperation(Instruction::WrEn));
-		RF_CALL(spiOperation(Instruction::SE, 0, nullptr, nullptr, address+index));
+		RF_CALL(spiOperation(Instruction::WE));
+		RF_CALL(spiOperation(Instruction::SE, address + index));
 		RF_CALL(waitWhileBusy());
 		index += BlockSizeErase;
 	}
@@ -152,21 +159,41 @@ modm::ResumableResult<typename modm::BdSpiFlash<Spi, Cs, flashSize>::StatusRegis
 modm::BdSpiFlash<Spi, Cs, flashSize>::readStatus()
 {
 	RF_BEGIN();
-	RF_CALL(spiOperation(Instruction::RdSr, 1, resultBuffer));
+	RF_CALL(spiOperation(Instruction::RSR1, nullptr, resultBuffer, 1));
 	RF_END_RETURN(static_cast<StatusRegister>(resultBuffer[0]));
 }
 
+template <typename Spi, typename Cs, uint32_t flashSize>
+modm::ResumableResult<void>
+modm::BdSpiFlash<Spi, Cs, flashSize>::selectDie(uint8_t die)
+{
+	RF_BEGIN();
+
+	RF_CALL(spiOperation(Instruction::SDS, &die, nullptr, 1));
+	RF_CALL(spiOperation(Instruction::WE));
+	RF_CALL(spiOperation(Instruction::GBU));
+	RF_CALL(waitWhileBusy());
+
+	// Enter 4-Byte Address mode for serial flash memory that support 256M-bit or more
+	if (DeviceSize > ExtendedAddressThreshold) {
+		RF_CALL(spiOperation(Instruction::En4BAM));
+		RF_CALL(waitWhileBusy());
+	}
+
+	RF_END();
+}
 
 template <typename Spi, typename Cs, uint32_t flashSize>
 modm::ResumableResult<bool>
 modm::BdSpiFlash<Spi, Cs, flashSize>::isBusy()
 {
 	RF_BEGIN();
-	if(RF_CALL(readStatus()) & StatusRegister::Busy)
+
+	if(RF_CALL(readStatus()) & StatusRegister::Busy) {
 		RF_RETURN(true);
-	else
-		RF_RETURN(false);
-	RF_END();
+	}
+
+	RF_END_RETURN(false);
 }
 
 
@@ -181,16 +208,48 @@ modm::BdSpiFlash<Spi, Cs, flashSize>::waitWhileBusy()
 	RF_END();
 }
 
-
 template <typename Spi, typename Cs, uint32_t flashSize>
 modm::ResumableResult<void>
-modm::BdSpiFlash<Spi, Cs, flashSize>::spiOperation(Instruction instruction, size_t dataLength, uint8_t* rxData, const uint8_t* txData, uint32_t address, uint8_t nrDummyCycles)
+modm::BdSpiFlash<Spi, Cs, flashSize>::spiOperation(Instruction instruction, const uint8_t* tx, uint8_t* rx, std::size_t length, uint8_t nrDummyCycles)
 {
 	RF_BEGIN();
 
 	i = 0;
 	instructionBuffer[i++] = static_cast<uint8_t>(instruction);
-	if(address != UINT32_MAX) {
+	for(uint8_t j = 0; j < nrDummyCycles; j++) {
+		instructionBuffer[i++] = 0x00;
+	}
+
+	RF_WAIT_UNTIL(this->acquireMaster());
+	Cs::reset();
+
+	RF_CALL(Spi::transfer(instructionBuffer, nullptr, i));
+
+	if(length > 0) {
+		RF_CALL(Spi::transfer(const_cast<uint8_t*>(tx), rx, length));
+	}
+
+	if (this->releaseMaster()) {
+		Cs::set();
+	}
+
+	RF_END();
+}
+
+template <typename Spi, typename Cs, uint32_t flashSize>
+modm::ResumableResult<void>
+modm::BdSpiFlash<Spi, Cs, flashSize>::spiOperation(Instruction instruction, uint32_t address, const uint8_t* tx, uint8_t* rx, std::size_t length, uint8_t nrDummyCycles)
+{
+	RF_BEGIN();
+
+	i = 0;
+	instructionBuffer[i++] = static_cast<uint8_t>(instruction);
+	if constexpr (DeviceSize > ExtendedAddressThreshold) {
+		instructionBuffer[i++] = (address >> 24) & 0xFF;
+		instructionBuffer[i++] = (address >> 16) & 0xFF;
+		instructionBuffer[i++] = (address >> 8) & 0xFF;
+		instructionBuffer[i++] = address & 0xFF;
+	} else {
 		instructionBuffer[i++] = (address >> 16) & 0xFF;
 		instructionBuffer[i++] = (address >> 8) & 0xFF;
 		instructionBuffer[i++] = address & 0xFF;
@@ -204,13 +263,13 @@ modm::BdSpiFlash<Spi, Cs, flashSize>::spiOperation(Instruction instruction, size
 
 	RF_CALL(Spi::transfer(instructionBuffer, nullptr, i));
 
-	if(dataLength > 0) {
-		RF_CALL(Spi::transfer(const_cast<uint8_t*>(txData), rxData, dataLength));
+	if(length > 0) {
+		RF_CALL(Spi::transfer(const_cast<uint8_t*>(tx), rx, length));
 	}
 
 	if (this->releaseMaster()) {
 		Cs::set();
 	}
 
-	RF_END_RETURN(true);
+	RF_END();
 }
