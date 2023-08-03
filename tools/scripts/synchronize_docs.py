@@ -77,7 +77,7 @@ def name(raw_name):
                    .replace("SPI-FLASH", "SPI Flash")\
                    .replace("-SPI", "")
     if result in ["DEVICE", "LIS3-TRANSPORT", "MEMORY-BUS", "TERMINAL", "ALLOCATOR",
-                  "MIRROR", "ADC-SAMPLER", "FAT", "HEAP", "--PYCACHE--", "FILE"]:
+                  "MIRROR", "ADC-SAMPLER", "FAT", "HEAP", "--PYCACHE--", "FILE", "SPI-STACK-FLASH"]:
         return None
     return result
 
