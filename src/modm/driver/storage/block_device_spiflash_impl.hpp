@@ -118,12 +118,17 @@ modm::BdSpiFlash<Spi, Cs, flashSize>::erase(bd_address_t address, bd_size_t size
 		RF_RETURN(false);
 	}
 
-	index = 0;
-	while(index < size) {
-		RF_CALL(spiOperation(Instruction::WE));
-		RF_CALL(spiOperation(Instruction::SE, address + index));
+	if (address == 0 && size == flashSize) {
+		RF_CALL(spiOperation(Instruction::CE));
 		RF_CALL(waitWhileBusy());
-		index += BlockSizeErase;
+	} else {
+		index = 0;
+		while(index < size) {
+			RF_CALL(spiOperation(Instruction::WE));
+			RF_CALL(spiOperation(Instruction::SE, address + index));
+			RF_CALL(waitWhileBusy());
+			index += BlockSizeErase;
+		}
 	}
 
 	RF_END_RETURN(true);
