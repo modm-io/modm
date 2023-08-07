@@ -1,0 +1,235 @@
+/*
+ * Copyright (c) 2023, Rasmus Kleist Hørlyck Sørensen
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#include "rtc.hpp"
+
+namespace modm::platform
+{
+
+// ----------------------------------------------------------------------------
+
+void
+Rtc::enable()
+{
+    Rcc::enable<Peripheral::Rtc>();
+    // Enable APB for the RTC
+    /// TODO: This should be set when calling enable() function
+    // Currently rcc::enable<Rtc>() does set this value as only one enable bit can be set
+    // There is however peripheral called RTCAPB which specifies this line to enable
+    RCC->APB1ENR1 |= RCC_APB1ENR1_RTCAPBEN;
+}
+
+// ----------------------------------------------------------------------------
+
+void
+Rtc::disable()
+{
+    Rcc::disable<Peripheral::Rtc>();
+    RCC->APB1ENR1 &= ~RCC_APB1ENR1_RTCAPBEN;
+}
+
+// ----------------------------------------------------------------------------
+
+bool
+Rtc::initialize(const DateTime dateTime, const Prescaler prescaler, uint32_t waitCycles)
+{
+    /// TODO: Assert that RTC frequency is less than APB1 frequency
+
+    enable();
+    unlock();
+
+    // Enter initialization mode
+    RTC->ICSR |= RTC_ICSR_INIT;
+
+    // Wait until initialization phase mode is entered when INITF bit is set
+    while (!(RTC->ICSR & RTC_ICSR_INITF))
+        if (--waitCycles == 0) return false;
+
+    // To generate a 1 Hz clock for the calendar counter, program both the prescaler factors
+    RTC->PRER = ((prescaler.asynchronous << RTC_PRER_PREDIV_A_Pos) & RTC_PRER_PREDIV_A_Msk) |
+                ((prescaler.synchronous << RTC_PRER_PREDIV_S_Pos) & RTC_PRER_PREDIV_S_Msk);
+
+    // Configure 24 hour format
+    RTC->CR &= ~RTC_CR_FMT;
+
+    // Load the time in 24 hour format into the shadow registers
+    RTC->TR = ((convertDecimalToBcd(dateTime.hour) << RTC_TR_HU_Pos) & (RTC_TR_HT_Msk | RTC_TR_HU_Msk)) |
+              ((convertDecimalToBcd(dateTime.minute) << RTC_TR_MNU_Pos) & (RTC_TR_MNT_Msk | RTC_TR_MNU_Msk)) |
+              ((convertDecimalToBcd(dateTime.second) << RTC_TR_SU_Pos) & (RTC_TR_ST_Msk | RTC_TR_SU_Msk));
+
+    // Load the date in the shadow registers
+    RTC->DR = ((convertDecimalToBcd(dateTime.year) << RTC_DR_YU_Pos) & (RTC_DR_YT_Msk | RTC_DR_YU_Msk)) |
+              ((convertDecimalToBcd(dateTime.month) << RTC_DR_MU_Pos) & (RTC_DR_MT_Msk | RTC_DR_MU_Msk)) |
+              ((convertDecimalToBcd(dateTime.date) << RTC_DR_DU_Pos) & (RTC_DR_DT_Msk | RTC_DR_DU_Msk)) |
+              ((dateTime.weekday << RTC_DR_WDU_Pos) & RTC_DR_WDU_Msk);
+
+    // Exit the initialization mode by clearing the INIT bit
+    RTC->ICSR &= ~RTC_ICSR_INIT;
+
+    lock();
+
+    return true;
+}
+
+// ----------------------------------------------------------------------------
+
+bool
+Rtc::synchronize(float delay, uint32_t waitCycles)
+{
+    modm_assert(-1.f < delay and delay < 1.f, "rtc.synch.delay", "Delay must be a value between -1.f and 1.f, non-inclusive.");
+
+    // Check that SS[15] = 0 in order to ensure that no overflow will occur, before initiating a shift operation.
+    if (((RTC->SSR & RTC_SSR_SS_Msk) & (Bit15 << RTC_SSR_SS_Pos)) == 0) {
+        unlock();
+
+        if (delay < 0.f) {
+            // Add one second and substract SUBFS to the prescaler counter
+            uint32_t subfs = (getSynchronousPrescaler() + 1) * (1.f + delay);
+            RTC->SHIFTR = RTC_SHIFTR_ADD1S | (subfs & RTC_SHIFTR_SUBFS_Msk);
+        } else {
+            // Add SUBFS to the synchronous prescaler counter
+            uint32_t subfs = (getSynchronousPrescaler() + 1) * delay;
+            RTC->SHIFTR = subfs << RTC_SHIFTR_SUBFS_Pos & RTC_SHIFTR_SUBFS_Msk;
+        }
+
+        lock();
+
+        // Wait until pending shift operation is performed before returning
+        while (RTC->ICSR & RTC_ICSR_SHPF)
+            if (--waitCycles == 0) return false;
+
+        return true;
+    }
+    return false;
+}
+
+// ----------------------------------------------------------------------------
+
+bool
+Rtc::getDateTime(DateTime &dateTime, uint32_t waitCycles)
+{
+    /// TODO: Determine if ABP1 frequency is less than seven times RTC frequency
+    /// TODO: Determine if BYPSHAD control bit is set or cleared in the RTC_CR register
+
+    // After initialization, synchronization software must wait until RSF is set
+    while (!(RTC->ICSR & RTC_ICSR_RSF))
+        if (--waitCycles == 0) return false;
+
+    dateTime.hour     = convertBcdToDecimal((RTC->TR & (RTC_TR_HT_Msk | RTC_TR_HU_Msk)) >> RTC_TR_HU_Pos);
+    dateTime.minute   = convertBcdToDecimal((RTC->TR & (RTC_TR_MNT_Msk | RTC_TR_MNU_Msk)) >> RTC_TR_MNU_Pos);
+    dateTime.second   = convertBcdToDecimal((RTC->TR & (RTC_TR_ST_Msk | RTC_TR_SU_Msk)) >> RTC_TR_SU_Pos);
+
+    dateTime.year     = convertBcdToDecimal((RTC->DR & (RTC_DR_YT_Msk | RTC_DR_YU_Msk)) >> RTC_DR_YU_Pos);
+    dateTime.month    = convertBcdToDecimal((RTC->DR & (RTC_DR_MT_Msk | RTC_DR_MU_Msk)) >> RTC_DR_MU_Pos);
+    dateTime.date     = convertBcdToDecimal((RTC->DR & (RTC_DR_DT_Msk | RTC_DR_DU_Msk)) >> RTC_DR_DU_Pos);
+    dateTime.weekday  = ((RTC->DR & RTC_DR_WDU_Msk) >> RTC_DR_WDU_Pos);
+
+    return true;
+}
+
+// ----------------------------------------------------------------------------
+
+bool
+Rtc::getSubSecond(float &subsecond, uint32_t waitCycles)
+{
+    // After initialization, synchronization software must wait until RSF is set
+    while (!(RTC->ICSR & RTC_ICSR_RSF))
+        if (--waitCycles == 0) return false;
+
+    uint32_t predivS = getSynchronousPrescaler();
+    uint32_t ss = (RTC->SSR & RTC_SSR_SS_Msk) >> RTC_SSR_SS_Pos;
+    subsecond = float(predivS - ss) / float(predivS + 1);
+    /// TODO: Handle case when ss > predivS
+
+    return true;
+}
+
+// ----------------------------------------------------------------------------
+
+void
+Rtc::getPrescaler(Prescaler &prescaler)
+{
+    prescaler.asynchronous = getAsynchronousPrescaler();
+    prescaler.synchronous  = getSynchronousPrescaler();
+}
+
+// ----------------------------------------------------------------------------
+
+void
+Rtc::unlock()
+{
+    // DBP bit must be set in order to enable RTC registers write access.
+    PWR->CR1 |= PWR_CR1_DBP;
+
+    // Unlock the write protection on the protected RTC registers.
+    RTC->WPR = 0xCA;
+    RTC->WPR = 0x53;
+}
+
+// ----------------------------------------------------------------------------
+
+void
+Rtc::lock()
+{
+    // Lock the write protection on the protected RTC registers.
+    RTC->WPR = 0x00;
+
+    // DBP bit must be reset in order to disable RTC registers write access.
+    PWR->CR1 &= ~PWR_CR1_DBP;
+}
+
+// ----------------------------------------------------------------------------
+
+uint16_t
+Rtc::getAsynchronousPrescaler()
+{
+    return (RTC->PRER & RTC_PRER_PREDIV_A_Msk) >> RTC_PRER_PREDIV_A_Pos;
+}
+
+// ----------------------------------------------------------------------------
+
+uint16_t
+Rtc::getSynchronousPrescaler()
+{
+    return (RTC->PRER & RTC_PRER_PREDIV_S_Msk) >> RTC_PRER_PREDIV_S_Pos;
+}
+
+// ----------------------------------------------------------------------------
+
+uint32_t
+Rtc::convertDecimalToBcd(uint32_t decimal)
+{
+    uint32_t bcd = 0;
+    uint16_t remainder = decimal % 10;
+    for (uint16_t shift = 0; decimal != 0; shift += 4)
+    {
+        bcd |= remainder << shift;
+        decimal = (decimal - remainder) / 10;
+        remainder = decimal % 10;
+    }
+    return bcd;
+}
+
+// ----------------------------------------------------------------------------
+
+uint32_t
+Rtc::convertBcdToDecimal(uint32_t bcd)
+{
+    uint32_t decimal = 0;
+    for (uint16_t multiplier = 1; bcd != 0; multiplier *= 10)
+    {
+        decimal += (bcd & 0b1111) * multiplier;
+        bcd >>= 4;
+    }
+    return decimal;
+}
+
+}

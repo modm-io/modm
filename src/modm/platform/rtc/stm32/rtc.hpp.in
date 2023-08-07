@@ -1,0 +1,131 @@
+/*
+ * Copyright (c) 2023, Rasmus Kleist Hørlyck Sørensen
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_STM32_RTC_HPP
+#define MODM_STM32_RTC_HPP
+
+#include <modm/platform/clock/rcc.hpp>
+#include <modm/math/algorithm/prescaler.hpp>
+#include <modm/architecture/interface/register.hpp>
+
+namespace modm::platform
+{
+
+/**
+ * Real Time Clock (RTC) control for STM32 devices
+ *
+ * @author Rasmus Kleist Hørlyck Sørensen
+ * @ingroup modm_platform_rtc
+ */
+class Rtc
+{
+public:
+    /// prescalars
+    struct modm_packed
+    Prescaler
+    {
+        constexpr Prescaler() : asynchronous(0x7F), synchronous(0xFF) {}
+        constexpr Prescaler(uint16_t asynchronous, uint16_t synchronous) :
+            asynchronous(asynchronous),
+            synchronous(synchronous)
+        {
+        }
+
+        uint16_t asynchronous;
+        uint16_t synchronous;
+    };
+
+    /// TODO: Use std::tm instead
+    struct modm_packed
+    DateTime
+    {
+        uint8_t year;
+        uint8_t month;
+        uint8_t date;
+        uint8_t weekday;
+        uint8_t hour;
+        uint8_t minute;
+        uint8_t second;
+    };
+
+public:
+    static void
+	enable();
+
+	static void
+	disable();
+
+    /**
+     * @brief
+     *
+     * @param time
+     * @param prediv
+     * @attention the APB1 clock frequency must be equal to or greater than seven times the RTC clock frequency
+     */
+    static bool
+    initialize(const DateTime datetime, const Prescaler prescaler, uint32_t waitCycles = 2048);
+
+    /**
+     * @brief
+     *
+     * @param delay
+     */
+    static bool
+    synchronize(float delay, uint32_t waitCycles = 2048);
+
+    /**
+     * @brief
+     *
+     */
+    static bool
+    getDateTime(DateTime &dateTime, uint32_t waitCycles = 2048);
+
+    /**
+     * @brief Get the subsecond second used for synchronization
+     *
+     * @return float
+     */
+    static bool
+    getSubSecond(float &subsecond, uint32_t waitCycles = 2048);
+
+    /**
+     * @brief Get the Prescaler object
+     *
+     * @param prescaler
+     */
+    static void
+    getPrescaler(Prescaler &prescaler);
+
+private:
+    inline static void
+    unlock();
+
+    inline static void
+    lock();
+
+    inline static uint16_t
+    getAsynchronousPrescaler();
+
+    inline static uint16_t
+    getSynchronousPrescaler();
+
+    /// convert decimal number to binary coded decimal
+    inline static uint32_t
+    convertDecimalToBcd(uint32_t decimal);
+
+    /// convert binary coded decimal to decimal
+    inline static uint32_t
+    convertBcdToDecimal(uint32_t bcd);
+};
+
+} // namespace modm::platform
+
+#endif // MODM_STM32_RTC_HPP
