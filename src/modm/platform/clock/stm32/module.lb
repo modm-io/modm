@@ -155,6 +155,13 @@ def build(env):
         if "Fdcan1" in all_peripherals and per == "FDCAN":
             per = "FDCAN1"
             nper = "FDCAN"
+        # COMP12
+        if "Comp1" in all_peripherals and per == "COMP12":
+            per = "COMP1"
+            nper = "COMP12"
+        if "Comp2" in all_peripherals and per == "COMP12":
+            per = "COMP2"
+            nper = "COMP12"
         # DAC
         if "Dac1" in all_peripherals and per == "DAC":
             per = "DAC1"
