@@ -28,6 +28,29 @@ namespace modm::platform
 class Rtc
 {
 public:
+    enum class
+    Interrupt : uint32_t
+    {
+        InternalTimestamp = RTC_CR_ITSE,
+        Timestamp = RTC_CR_TSIE,
+        WakeupTimer = RTC_CR_WUTIE,
+        AlarmB = RTC_CR_ALRBIE,
+        AlarmA = RTC_CR_ALRAIE,
+    };
+    MODM_FLAGS32(Interrupt);
+
+    enum class
+    InterruptFlag : uint32_t
+    {
+        InternalTimestamp = RTC_SR_ITSF,
+        TimestampOverflow = RTC_SR_TSOVF,
+        Timestamp = RTC_SR_TSF,
+        WakeupTimer = RTC_SR_WUTF,
+        AlarmB = RTC_SR_ALRBF,
+        AlarmA = RTC_SR_ALRAF,
+    };
+    MODM_FLAGS32(InterruptFlag);
+
     /// prescalars
     struct modm_packed
     Prescaler
@@ -103,6 +126,27 @@ public:
      */
     static void
     getPrescaler(Prescaler &prescaler);
+
+public:
+    static void
+	enableInterruptVector(bool enable, uint32_t priority);
+
+	static void
+	enableInterrupt(Interrupt_t interrupt);
+
+	static void
+	disableInterrupt(Interrupt_t interrupt);
+
+	static InterruptFlag_t
+	getInterruptFlags();
+
+	/**
+	 *
+	 *
+	 * @warning 	Not all InterruptFlags can be cleared this way.
+	 */
+	static void
+	acknowledgeInterruptFlag(InterruptFlag_t flags);
 
 private:
     inline static void
