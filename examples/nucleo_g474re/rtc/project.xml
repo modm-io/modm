@@ -1,0 +1,12 @@
+<library>
+	<extends>modm:nucleo-g474re</extends>
+	<options>
+		<option name="modm:build:build.path">../../../build/nucleo_g474re/rtc</option>
+	</options>
+	<modules>
+		<module>modm:debug</module>
+		<module>modm:platform:rtc</module>
+		<module>modm:processing:timer</module>
+		<module>modm:build:scons</module>
+	</modules>
+</library>
