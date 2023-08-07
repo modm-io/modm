@@ -1,0 +1,40 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2023, Rasmus Kleist Hørlyck Sørensen
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:sx128x"
+    module.description = """\
+Semtech SX1280/SX1281 Driver
+
+Long Range, Low Power, 2.4 GHz Transceiver with Ranging Capability
+
+!!! warning "The SX128x driver UART transport layer is untested"
+"""
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:gpio",
+        ":architecture:spi.device",
+        ":architecture:uart.device",
+        ":math:utils",
+        ":processing:resumable",
+        ":processing:timer")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/radio"
+    env.copy("sx128x.hpp")
+    env.copy("sx128x_impl.hpp")
+    env.copy("sx128x_definitions.hpp")
+    env.copy("sx128x_transport.hpp")
+    env.copy("sx128x_transport_impl.hpp")
