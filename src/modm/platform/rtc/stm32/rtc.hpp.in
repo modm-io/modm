@@ -81,10 +81,10 @@ public:
 
 public:
     static void
-	enable();
+    enable();
 
-	static void
-	disable();
+    static void
+    disable();
 
     /**
      * @brief
@@ -129,24 +129,24 @@ public:
 
 public:
     static void
-	enableInterruptVector(bool enable, uint32_t priority);
+    enableInterruptVector(bool enable, uint32_t priority);
 
-	static void
-	enableInterrupt(Interrupt_t interrupt);
+    static void
+    enableInterrupt(Interrupt_t interrupt);
 
-	static void
-	disableInterrupt(Interrupt_t interrupt);
+    static void
+    disableInterrupt(Interrupt_t interrupt);
 
-	static InterruptFlag_t
-	getInterruptFlags();
+    static InterruptFlag_t
+    getInterruptFlags();
 
-	/**
-	 *
-	 *
-	 * @warning 	Not all InterruptFlags can be cleared this way.
-	 */
-	static void
-	acknowledgeInterruptFlag(InterruptFlag_t flags);
+    /**
+     *
+     *
+     * @warning 	Not all InterruptFlags can be cleared this way.
+     */
+    static void
+    acknowledgeInterruptFlag(InterruptFlag_t flags);
 
 private:
     inline static void
@@ -160,14 +160,6 @@ private:
 
     inline static uint16_t
     getSynchronousPrescaler();
-
-    /// convert decimal number to binary coded decimal
-    inline static uint32_t
-    convertDecimalToBcd(uint32_t decimal);
-
-    /// convert binary coded decimal to decimal
-    inline static uint32_t
-    convertBcdToDecimal(uint32_t bcd);
 };
 
 } // namespace modm::platform
