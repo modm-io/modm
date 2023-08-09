@@ -30,9 +30,9 @@ namespace modm::platform
 class Rtc
 {
     using duration = std::chrono::duration<float>;
-	using rep = duration::rep;
-	using period = duration::period;
-	using time_point = std::chrono::time_point<Rtc, duration>;
+    using rep = duration::rep;
+    using period = duration::period;
+    using time_point = std::chrono::time_point<Rtc, duration>;
 
 public:
 
@@ -87,7 +87,7 @@ public:
      * @param delay
      */
     template< typename Rep, typename Period >
-    static bool 
+    static bool
     synchronize(std::chrono::duration<Rep, Period> delay, uint32_t waitCycles = 2048);
 
     /**
