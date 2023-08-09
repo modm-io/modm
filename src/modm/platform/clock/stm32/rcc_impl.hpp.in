@@ -121,15 +121,17 @@ Rcc::enable()
 		"Rcc::enable() doesn't know this peripheral!");
 
 	__DSB();
-	%% for peripheral, (st_per, bus) in rcc_enable.items() | sort
+	%% for peripheral in rcc_enable | sort
 	if constexpr (peripheral == Peripheral::{{ peripheral }})
 		if (not Rcc::isEnabled<peripheral>()) {
+		%% for (st_per, bus) in rcc_enable[peripheral]
 			RCC->{{bus}} |= RCC_{{bus}}_{{st_per}}EN;{% if st_per in rcc_reset %} __DSB();
 			RCC->{{rcc_reset[st_per]}} |= RCC_{{rcc_reset[st_per]}}_{{st_per}}RST; __DSB();
 			RCC->{{rcc_reset[st_per]}} &= ~RCC_{{rcc_reset[st_per]}}_{{st_per}}RST;{% endif %}{% if peripheral == "Eth" %} __DSB();
 			RCC->{{bus}} |= RCC_{{bus}}_{{st_per}}RXEN; __DSB();
 			RCC->{{bus}} |= RCC_{{bus}}_{{st_per}}TXEN;{% elif peripheral == "Usbotghs" %} __DSB();
 			RCC->{{bus}} |= RCC_{{bus}}_{{st_per}}ULPIEN;{% endif %}
+		%% endfor
 		}
 	%% endfor
 	__DSB();
@@ -143,12 +145,14 @@ Rcc::disable()
 		"Rcc::disable() doesn't know this peripheral!");
 
 	__DSB();
-	%% for peripheral, (st_per, bus) in rcc_enable.items() | sort
+	%% for peripheral in rcc_enable | sort
 	if constexpr (peripheral == Peripheral::{{ peripheral }}) {
+		%% for (st_per, bus) in rcc_enable[peripheral]
 		RCC->{{bus}} &= ~RCC_{{bus}}_{{st_per}}EN;{% if peripheral == "Eth" %} __DSB();
 		RCC->{{bus}} &= ~RCC_{{bus}}_{{st_per}}RXEN; __DSB();
 		RCC->{{bus}} &= ~RCC_{{bus}}_{{st_per}}TXEN;{% elif peripheral == "Usbotghs" %} __DSB();
 		RCC->{{bus}} &= ~RCC_{{bus}}_{{st_per}}ULPIEN;{% endif %}
+		%% endfor
 	}
 	%% endfor
 	__DSB();
@@ -161,10 +165,14 @@ Rcc::isEnabled()
 	static_assert(rcc_check_enable(peripheral),
 		"Rcc::isEnabled() doesn't know this peripheral!");
 
-	%% for peripheral, (st_per, bus) in rcc_enable.items() | sort
-	if constexpr (peripheral == Peripheral::{{ peripheral }})
-		return RCC->{{bus}} & RCC_{{bus}}_{{st_per}}EN;
+	%% for peripheral in rcc_enable | sort
+	if constexpr (peripheral == Peripheral::{{ peripheral }}) {
+		%% for (st_per, bus) in rcc_enable[peripheral]
+		if(!(RCC->{{bus}} & RCC_{{bus}}_{{st_per}}EN)) return false;
+		%% endfor
+	}
 	%% endfor
+	return true;
 }
 
 }   // namespace modm::platform
