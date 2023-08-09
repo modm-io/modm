@@ -28,28 +28,6 @@ namespace modm::platform
 class Rtc
 {
 public:
-    enum class
-    Interrupt : uint32_t
-    {
-        InternalTimestamp = RTC_CR_ITSE,
-        Timestamp = RTC_CR_TSIE,
-        WakeupTimer = RTC_CR_WUTIE,
-        AlarmB = RTC_CR_ALRBIE,
-        AlarmA = RTC_CR_ALRAIE,
-    };
-    MODM_FLAGS32(Interrupt);
-
-    enum class
-    InterruptFlag : uint32_t
-    {
-        InternalTimestamp = RTC_SR_ITSF,
-        TimestampOverflow = RTC_SR_TSOVF,
-        Timestamp = RTC_SR_TSF,
-        WakeupTimer = RTC_SR_WUTF,
-        AlarmB = RTC_SR_ALRBF,
-        AlarmA = RTC_SR_ALRAF,
-    };
-    MODM_FLAGS32(InterruptFlag);
 
     /// prescalars
     struct modm_packed
@@ -128,6 +106,30 @@ public:
     getPrescaler(Prescaler &prescaler);
 
 public:
+
+    enum class
+    Interrupt : uint32_t
+    {
+        InternalTimestamp = RTC_CR_ITSE,
+        Timestamp = RTC_CR_TSIE,
+        WakeupTimer = RTC_CR_WUTIE,
+        AlarmB = RTC_CR_ALRBIE,
+        AlarmA = RTC_CR_ALRAIE,
+    };
+    MODM_FLAGS32(Interrupt);
+
+    enum class
+    InterruptFlag : uint32_t
+    {
+        InternalTimestamp = RTC_SR_ITSF,
+        TimestampOverflow = RTC_SR_TSOVF,
+        Timestamp = RTC_SR_TSF,
+        WakeupTimer = RTC_SR_WUTF,
+        AlarmB = RTC_SR_ALRBF,
+        AlarmA = RTC_SR_ALRAF,
+    };
+    MODM_FLAGS32(InterruptFlag);
+
     static void
     enableInterruptVector(bool enable, uint32_t priority);
 
