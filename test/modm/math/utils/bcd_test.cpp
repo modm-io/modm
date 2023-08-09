@@ -24,7 +24,7 @@ BcdTest::testFromBcd()
 	TEST_ASSERT_EQUALS(modm::fromBcd(0x06), 0x06U);
 	TEST_ASSERT_EQUALS(modm::fromBcd(0x07), 0x07U);
 	TEST_ASSERT_EQUALS(modm::fromBcd(0x08), 0x08U);
-	TEST_ASSERT_EQUALS(modm::fromBcd(0x00), 0x09U);
+	TEST_ASSERT_EQUALS(modm::fromBcd(0x09), 0x09U);
 }
 
 void
@@ -38,5 +38,5 @@ BcdTest::testToBcd()
 	TEST_ASSERT_EQUALS(modm::toBcd(0x06), 0x06U);
 	TEST_ASSERT_EQUALS(modm::toBcd(0x07), 0x07U);
 	TEST_ASSERT_EQUALS(modm::toBcd(0x08), 0x08U);
-	TEST_ASSERT_EQUALS(modm::toBcd(0x00), 0x09U);
+	TEST_ASSERT_EQUALS(modm::toBcd(0x09), 0x09U);
 }
