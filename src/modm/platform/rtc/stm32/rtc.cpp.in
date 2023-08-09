@@ -196,7 +196,7 @@ void
 Rtc::lock()
 {
     // Lock the write protection on the protected RTC registers.
-    RTC->WPR = 0x00;
+    RTC->WPR = 0xFF;
 
     // DBP bit must be reset in order to disable RTC registers write access.
     PWR->CR1 &= ~PWR_CR1_DBP;
