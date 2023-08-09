@@ -179,6 +179,9 @@ def build(env):
             nper = "DSI"
         if "Eth" in all_peripherals and per == "ETHMAC":
             per = "Eth"
+        if "Rtc" in all_peripherals and per == "RTCAPB":
+            per = "RTC"
+            nper = "RTCAPB"
         # Fix USBOTG OTG
         if target.family == "u5" and per == "OTG":
             per = "Usbotgfs"
