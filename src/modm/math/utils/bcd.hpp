@@ -12,6 +12,8 @@
 #ifndef MODM_MATH_BCD_HPP
 #define MODM_MATH_BCD_HPP
 
+#include <stdint.h>
+
 namespace modm
 {
 
