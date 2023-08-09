@@ -16,7 +16,7 @@ class BcdTest : public unittest::TestSuite
 {
 public:
 	void
-	testfromBcd();
+	testFromBcd();
 
 	void
 	testToBcd();

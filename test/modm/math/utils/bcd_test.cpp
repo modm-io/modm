@@ -16,27 +16,27 @@
 void
 BcdTest::testFromBcd()
 {
-	TEST_ASSERT_EQUALS(modm::fromBcd(0x01), 0x01);
-	TEST_ASSERT_EQUALS(modm::fromBcd(0x02), 0x02);
-	TEST_ASSERT_EQUALS(modm::fromBcd(0x03), 0x03);
-	TEST_ASSERT_EQUALS(modm::fromBcd(0x04), 0x04);
-	TEST_ASSERT_EQUALS(modm::fromBcd(0x05), 0x05);
-	TEST_ASSERT_EQUALS(modm::fromBcd(0x06), 0x06);
-	TEST_ASSERT_EQUALS(modm::fromBcd(0x07), 0x07);
-	TEST_ASSERT_EQUALS(modm::fromBcd(0x08), 0x08);
-	TEST_ASSERT_EQUALS(modm::fromBcd(0x00), 0x09);
+	TEST_ASSERT_EQUALS(modm::fromBcd(0x01), 0x01U);
+	TEST_ASSERT_EQUALS(modm::fromBcd(0x02), 0x02U);
+	TEST_ASSERT_EQUALS(modm::fromBcd(0x03), 0x03U);
+	TEST_ASSERT_EQUALS(modm::fromBcd(0x04), 0x04U);
+	TEST_ASSERT_EQUALS(modm::fromBcd(0x05), 0x05U);
+	TEST_ASSERT_EQUALS(modm::fromBcd(0x06), 0x06U);
+	TEST_ASSERT_EQUALS(modm::fromBcd(0x07), 0x07U);
+	TEST_ASSERT_EQUALS(modm::fromBcd(0x08), 0x08U);
+	TEST_ASSERT_EQUALS(modm::fromBcd(0x00), 0x09U);
 }
 
 void
 BcdTest::testToBcd()
 {
-	TEST_ASSERT_EQUALS(modm::toBcd(0x01), 0x01);
-	TEST_ASSERT_EQUALS(modm::toBcd(0x02), 0x02);
-	TEST_ASSERT_EQUALS(modm::toBcd(0x03), 0x03);
-	TEST_ASSERT_EQUALS(modm::toBcd(0x04), 0x04);
-	TEST_ASSERT_EQUALS(modm::toBcd(0x05), 0x05);
-	TEST_ASSERT_EQUALS(modm::toBcd(0x06), 0x06);
-	TEST_ASSERT_EQUALS(modm::toBcd(0x07), 0x07);
-	TEST_ASSERT_EQUALS(modm::toBcd(0x08), 0x08);
-	TEST_ASSERT_EQUALS(modm::toBcd(0x00), 0x09);
+	TEST_ASSERT_EQUALS(modm::toBcd(0x01), 0x01U);
+	TEST_ASSERT_EQUALS(modm::toBcd(0x02), 0x02U);
+	TEST_ASSERT_EQUALS(modm::toBcd(0x03), 0x03U);
+	TEST_ASSERT_EQUALS(modm::toBcd(0x04), 0x04U);
+	TEST_ASSERT_EQUALS(modm::toBcd(0x05), 0x05U);
+	TEST_ASSERT_EQUALS(modm::toBcd(0x06), 0x06U);
+	TEST_ASSERT_EQUALS(modm::toBcd(0x07), 0x07U);
+	TEST_ASSERT_EQUALS(modm::toBcd(0x08), 0x08U);
+	TEST_ASSERT_EQUALS(modm::toBcd(0x00), 0x09U);
 }
