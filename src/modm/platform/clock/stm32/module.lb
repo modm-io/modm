@@ -195,7 +195,7 @@ def build(env):
             per = "Usb"
         if per.capitalize() not in all_peripherals:
             continue
-        if "EN" in mode and per.capitalize():
+        if "EN" in mode:
             kw = per.capitalize()
             if kw not in rcc_enable:
                 rcc_enable[kw] = (nper, mode["EN"])
