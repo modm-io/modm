@@ -22,11 +22,6 @@ void
 Rtc::enable()
 {
     Rcc::enable<Peripheral::Rtc>();
-    // Enable APB for the RTC
-    /// TODO: This should be set when calling enable() function
-    // Currently rcc::enable<Rtc>() does set this value as only one enable bit can be set
-    // There is however peripheral called RTCAPB which specifies this line to enable
-    RCC->APB1ENR1 |= RCC_APB1ENR1_RTCAPBEN;
 }
 
 // ----------------------------------------------------------------------------
@@ -35,7 +30,6 @@ void
 Rtc::disable()
 {
     Rcc::disable<Peripheral::Rtc>();
-    RCC->APB1ENR1 &= ~RCC_APB1ENR1_RTCAPBEN;
 }
 
 // ----------------------------------------------------------------------------
