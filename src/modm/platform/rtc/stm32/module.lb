@@ -33,5 +33,6 @@ def build(env):
     target = env[":target"].identifier
 
     env.outbasepath = "modm/src/modm/platform/rtc"
-    env.template("rtc.hpp.in")
+    env.template("rtc_impl.hpp.in")
     env.template("rtc.cpp.in")
+    env.template("rtc.hpp.in")

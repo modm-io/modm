@@ -1,0 +1,45 @@
+/*
+ * Copyright (c) 2023, Rasmus Kleist Hørlyck Sørensen
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+namespace modm::platform
+{
+
+template< typename Rep, typename Period >
+bool 
+Rtc::synchronize(std::chrono::duration<Rep, Period> delay, uint32_t waitCycles)
+{
+    // Check that SS[15] = 0 in order to ensure that no overflow will occur, before initiating a shift operation.
+    if (((RTC->SSR & RTC_SSR_SS_Msk) & (Bit15 << RTC_SSR_SS_Pos)) == 0) {
+        unlock();
+
+        if (0 <= delay.count()) {
+            const auto cast_delay = std::chrono::duration_cast<duration>(delay);
+            const auto subfs = (getSynchronousPrescaler() + 1) * delay;
+            RTC->SHIFTR = (subfs.count() << RTC_SHIFTR_SUBFS_Pos) & RTC_SHIFTR_SUBFS_Msk;
+        }
+        else {
+            const auto cast_delay = std::chrono::duration_cast<duration>(delay);
+            const auto subfs = (getSynchronousPrescaler() + 1) * (1.f + delay);
+            RTC->SHIFTR = RTC_SHIFTR_ADD1S | ((subfs << RTC_SHIFTR_SUBFS_Pos) & RTC_SHIFTR_SUBFS_Msk);
+        }
+
+        lock();
+
+        // Wait until pending shift operation is performed before returning
+        while (RTC->ICSR & RTC_ICSR_SHPF)
+            if (--waitCycles == 0) return false;
+
+        return true;
+    }
+    return false;
+}
+
+}   // namespace modm::platform

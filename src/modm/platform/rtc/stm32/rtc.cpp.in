@@ -78,38 +78,6 @@ Rtc::initialize(const DateTime dateTime, const Prescaler prescaler, uint32_t wai
 // ----------------------------------------------------------------------------
 
 bool
-Rtc::synchronize(float delay, uint32_t waitCycles)
-{
-    modm_assert(-1.f < delay and delay < 1.f, "rtc.synch.delay", "Delay must be a value between -1.f and 1.f, non-inclusive.");
-
-    // Check that SS[15] = 0 in order to ensure that no overflow will occur, before initiating a shift operation.
-    if (((RTC->SSR & RTC_SSR_SS_Msk) & (Bit15 << RTC_SSR_SS_Pos)) == 0) {
-        unlock();
-
-        if (delay < 0.f) {
-            // Add one second and substract SUBFS to the prescaler counter
-            uint32_t subfs = (getSynchronousPrescaler() + 1) * (1.f + delay);
-            RTC->SHIFTR = RTC_SHIFTR_ADD1S | (subfs & RTC_SHIFTR_SUBFS_Msk);
-        } else {
-            // Add SUBFS to the synchronous prescaler counter
-            uint32_t subfs = (getSynchronousPrescaler() + 1) * delay;
-            RTC->SHIFTR = subfs << RTC_SHIFTR_SUBFS_Pos & RTC_SHIFTR_SUBFS_Msk;
-        }
-
-        lock();
-
-        // Wait until pending shift operation is performed before returning
-        while (RTC->ICSR & RTC_ICSR_SHPF)
-            if (--waitCycles == 0) return false;
-
-        return true;
-    }
-    return false;
-}
-
-// ----------------------------------------------------------------------------
-
-bool
 Rtc::getDateTime(DateTime &dateTime, uint32_t waitCycles)
 {
     /// TODO: Determine if ABP1 frequency is less than seven times RTC frequency

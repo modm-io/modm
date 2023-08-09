@@ -12,6 +12,8 @@
 #ifndef MODM_STM32_RTC_HPP
 #define MODM_STM32_RTC_HPP
 
+#include <chrono>
+
 #include <modm/platform/clock/rcc.hpp>
 #include <modm/math/algorithm/prescaler.hpp>
 #include <modm/architecture/interface/register.hpp>
@@ -27,6 +29,11 @@ namespace modm::platform
  */
 class Rtc
 {
+    using duration = std::chrono::duration<float>;
+	using rep = duration::rep;
+	using period = duration::period;
+	using time_point = std::chrono::time_point<Rtc, duration>;
+
 public:
 
     /// prescalars
@@ -79,8 +86,9 @@ public:
      *
      * @param delay
      */
-    static bool
-    synchronize(float delay, uint32_t waitCycles = 2048);
+    template< typename Rep, typename Period >
+    static bool 
+    synchronize(std::chrono::duration<Rep, Period> delay, uint32_t waitCycles = 2048);
 
     /**
      * @brief
@@ -165,5 +173,7 @@ private:
 };
 
 } // namespace modm::platform
+
+#include "rtc_impl.hpp"
 
 #endif // MODM_STM32_RTC_HPP
