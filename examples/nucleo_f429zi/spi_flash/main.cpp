@@ -107,24 +107,24 @@ main()
 	std::memset(bufferB, 0x55, BlockSize);
 
 	bool initializeSuccess = false;
-
-	MODM_LOG_INFO << "Erasing complete flash chip... (This may take a while)" << modm::endl;
-
-	if(!RF_CALL_BLOCKING(storageDevice.initialize())) {
+	if (RF_CALL_BLOCKING(storageDevice.initialize())) {
+		MODM_LOG_INFO << "Erasing complete flash chip... (This may take a while)" << modm::endl;
+		if (RF_CALL_BLOCKING(storageDevice.erase(0, MemorySize))) {
+			RF_CALL_BLOCKING(storageDevice.waitWhileBusy());
+			initializeSuccess = true;
+		} else {
+			MODM_LOG_INFO << "Error: Unable to erase device.";
+		}
+	} else {
 		MODM_LOG_INFO << "Error: Unable to initialize device.";
 	}
-	else if(!RF_CALL_BLOCKING(storageDevice.erase(0, MemorySize))) {
-		MODM_LOG_INFO << "Error: Unable to erase device.";
-	}
-	else {
+
+	if (initializeSuccess) {
 		auto id = RF_CALL_BLOCKING(storageDevice.readId());
 		MODM_LOG_INFO << "deviceId=" << id.deviceId << " manufacturerId=" << id.manufacturerId;
-		MODM_LOG_INFO << " deviceType=" << id.deviceType << modm::endl;
-
+		MODM_LOG_INFO << "deviceType=" << id.deviceType << modm::endl;
 		MODM_LOG_INFO << "status=" << static_cast<uint8_t>(RF_CALL_BLOCKING(storageDevice.readStatus())) << modm::endl;
-
 		MODM_LOG_INFO << "Press USER button to start the memory test." << modm::endl;
-		initializeSuccess = true;
 	}
 
 	while (true)
