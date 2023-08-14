@@ -79,7 +79,7 @@ public:
      * @attention the APB1 clock frequency must be equal to or greater than seven times the RTC clock frequency
      */
     static bool
-    initialize(const DateTime datetime, const Prescaler prescaler, uint32_t waitCycles = 2048);
+    initialize(const DateTime datetime, const Prescaler prescaler = Prescaler(), uint32_t waitCycles = 2048);
 
     /**
      * @brief
