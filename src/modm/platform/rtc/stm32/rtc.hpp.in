@@ -14,9 +14,8 @@
 
 #include <chrono>
 
-#include <modm/platform/clock/rcc.hpp>
-#include <modm/math/algorithm/prescaler.hpp>
 #include <modm/architecture/interface/register.hpp>
+#include <modm/platform/clock/rcc.hpp>
 
 namespace modm::platform
 {
