@@ -77,10 +77,9 @@ modm::BdSpiFlash<Spi, Cs, flashSize>::read(uint8_t* buffer, bd_address_t address
 
 	if((size == 0) || (size % BlockSizeRead != 0) || (address + size > flashSize)) {
 		RF_RETURN(false);
-	} else {
-		RF_CALL(waitWhileBusy());
 	}
 
+	RF_CALL(waitWhileBusy());
 	RF_CALL(spiOperation(Instruction::FR, address, nullptr, buffer, size, 1));
 
 	RF_END_RETURN(true);
@@ -95,12 +94,11 @@ modm::BdSpiFlash<Spi, Cs, flashSize>::program(const uint8_t* buffer, bd_address_
 
 	if((size == 0) || (size % BlockSizeWrite != 0) || (address + size > flashSize)) {
 		RF_RETURN(false);
-	} else {
-		RF_CALL(waitWhileBusy());
 	}
 
 	index = 0;
 	while(index < size) {
+		RF_CALL(waitWhileBusy());
 		RF_CALL(spiOperation(Instruction::WE));
 		RF_CALL(spiOperation(Instruction::PP, address + index, &buffer[index], nullptr, BlockSizeWrite));
 		index += BlockSizeWrite;
@@ -119,15 +117,15 @@ modm::BdSpiFlash<Spi, Cs, flashSize>::erase(bd_address_t address, bd_size_t size
 
 	if((size == 0) || (size % BlockSizeErase != 0) || (address + size > flashSize)) {
 		RF_RETURN(false);
-	} else {
-		RF_CALL(waitWhileBusy());
 	}
 
 	if (address == 0 && size == flashSize) {
+		RF_CALL(waitWhileBusy());
 		RF_CALL(spiOperation(Instruction::CE));
 	} else {
 		index = 0;
 		while(index < size) {
+			RF_CALL(waitWhileBusy());
 			RF_CALL(spiOperation(Instruction::WE));
 			RF_CALL(spiOperation(Instruction::SE, address + index));
 			index += BlockSizeErase;
