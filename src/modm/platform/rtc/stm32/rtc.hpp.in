@@ -162,11 +162,28 @@ public:
     acknowledgeInterruptFlag(InterruptFlag_t flags);
 
 private:
+    /// Unlock RTC register write protection
     inline static void
-    unlock();
+    unlock()
+    {
+        // DBP bit must be set in order to enable RTC registers write access.
+        PWR->CR1 |= PWR_CR1_DBP;
 
+        // Unlock the write protection on the protected RTC registers.
+        RTC->WPR = 0xCA;
+        RTC->WPR = 0x53;
+    }
+
+    /// Lock RTC register write protection
     inline static void
-    lock();
+    lock()
+    {
+        // Lock the write protection on the protected RTC registers.
+        RTC->WPR = 0xFF;
+
+        // DBP bit must be reset in order to disable RTC registers write access.
+        PWR->CR1 &= ~PWR_CR1_DBP;
+    }
 
     inline static uint16_t
     getAsynchronousPrescaler();
