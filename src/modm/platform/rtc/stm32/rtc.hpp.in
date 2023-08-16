@@ -186,12 +186,6 @@ private:
         PWR->CR1 &= ~PWR_CR1_DBP;
     }
 
-    inline static uint16_t
-    getAsynchronousPrescaler();
-
-    inline static uint16_t
-    getSynchronousPrescaler();
-
     static inline frequency_t rtc_ker_ck{0};   /// RTCCLK frequency
     static inline frequency_t ck_apre{0};      /// RTCCLK frequency / (PREDIV_A + 1)
     static inline frequency_t ck_spre{0};      /// ck_apre frequency / (PREDIV_S + 1)

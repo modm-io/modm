@@ -65,11 +65,12 @@ Rtc::getSubSecond(float &subsecond, uint32_t waitCycles)
     while (!(RTC->ICSR & RTC_ICSR_RSF))
         if (--waitCycles == 0) return false;
 
+    /*
     uint32_t predivS = getSynchronousPrescaler();
     uint32_t ss = (RTC->SSR & RTC_SSR_SS_Msk) >> RTC_SSR_SS_Pos;
     subsecond = float(predivS - ss) / float(predivS + 1);
     /// TODO: Handle case when ss > predivS
-
+    */
     return true;
 }
 
@@ -123,22 +124,6 @@ void inline
 Rtc::acknowledgeInterruptFlag(InterruptFlag_t flags)
 {
     RTC->SCR |= flags.value;
-}
-
-// ----------------------------------------------------------------------------
-
-uint16_t
-Rtc::getAsynchronousPrescaler()
-{
-    return (RTC->PRER & RTC_PRER_PREDIV_A_Msk) >> RTC_PRER_PREDIV_A_Pos;
-}
-
-// ----------------------------------------------------------------------------
-
-uint16_t
-Rtc::getSynchronousPrescaler()
-{
-    return (RTC->PRER & RTC_PRER_PREDIV_S_Msk) >> RTC_PRER_PREDIV_S_Pos;
 }
 
 }
