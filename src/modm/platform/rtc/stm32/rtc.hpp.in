@@ -164,27 +164,12 @@ public:
 
 private:
     /// Unlock RTC register write protection
-    inline static void
-    unlock()
-    {
-        // DBP bit must be set in order to enable RTC registers write access.
-        PWR->CR1 |= PWR_CR1_DBP;
-
-        // Unlock the write protection on the protected RTC registers.
-        RTC->WPR = 0xCA;
-        RTC->WPR = 0x53;
-    }
+    static void
+    unlock();
 
     /// Lock RTC register write protection
-    inline static void
-    lock()
-    {
-        // Lock the write protection on the protected RTC registers.
-        RTC->WPR = 0xFF;
-
-        // DBP bit must be reset in order to disable RTC registers write access.
-        PWR->CR1 &= ~PWR_CR1_DBP;
-    }
+    static void
+    lock();
 
     static inline frequency_t rtc_ker_ck{0};   /// RTCCLK frequency
     static inline frequency_t ck_apre{0};      /// RTCCLK frequency / (PREDIV_A + 1)

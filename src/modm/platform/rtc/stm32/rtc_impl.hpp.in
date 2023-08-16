@@ -16,6 +16,22 @@ namespace modm::platform
 
 // ----------------------------------------------------------------------------
 
+void inline
+Rtc::enable()
+{
+    Rcc::enable<Peripheral::Rtc>();
+}
+
+// ----------------------------------------------------------------------------
+
+void inline
+Rtc::disable()
+{
+    Rcc::disable<Peripheral::Rtc>();
+}
+
+// ----------------------------------------------------------------------------
+
 template< class SystemClock, frequency_t rtcclk, percent_t tolerance >
 bool
 Rtc::initialize(uint32_t waitCycles)
@@ -100,6 +116,83 @@ Rtc::synchronize(std::chrono::duration<Rep, Period> delay, uint32_t waitCycles)
         return true;
     }
     return false;
+}
+
+// ----------------------------------------------------------------------------
+
+void inline
+Rtc::enableInterruptVector(bool enable, uint32_t priority)
+{
+    /// TODO: Some devices only have a single RTC interrupt register
+    if (enable) {
+        // Set priority for the interrupt vector
+        NVIC_SetPriority(RTC_TAMP_LSECSS_IRQn, priority);
+        NVIC_SetPriority(RTC_WKUP_IRQn, priority);
+        // register IRQ at the NVIC
+        NVIC_EnableIRQ(RTC_TAMP_LSECSS_IRQn);
+        NVIC_EnableIRQ(RTC_WKUP_IRQn);
+    }
+    else {
+        NVIC_DisableIRQ(RTC_TAMP_LSECSS_IRQn);
+        NVIC_DisableIRQ(RTC_WKUP_IRQn);
+    }
+}
+
+// ----------------------------------------------------------------------------
+
+void inline
+Rtc::enableInterrupt(Interrupt_t interrupt)
+{
+    RTC->CR |= interrupt.value;
+}
+
+// ----------------------------------------------------------------------------
+
+void inline
+Rtc::disableInterrupt(Interrupt_t interrupt)
+{
+    RTC->CR &= ~interrupt.value;
+}
+
+// ----------------------------------------------------------------------------
+
+Rtc::InterruptFlag_t inline
+Rtc::getInterruptFlags()
+{
+    return InterruptFlag_t(RTC->SR);
+}
+
+// ----------------------------------------------------------------------------
+
+void inline
+Rtc::acknowledgeInterruptFlag(InterruptFlag_t flags)
+{
+    RTC->SCR |= flags.value;
+}
+
+// ----------------------------------------------------------------------------
+
+void inline
+Rtc::unlock()
+{
+    // DBP bit must be set in order to enable RTC registers write access.
+    PWR->CR1 |= PWR_CR1_DBP;
+
+    // Unlock the write protection on the protected RTC registers.
+    RTC->WPR = 0xCA;
+    RTC->WPR = 0x53;
+}
+
+// ----------------------------------------------------------------------------
+
+void inline
+Rtc::lock()
+{
+    // Lock the write protection on the protected RTC registers.
+    RTC->WPR = 0xFF;
+
+    // DBP bit must be reset in order to disable RTC registers write access.
+    PWR->CR1 &= ~PWR_CR1_DBP;
 }
 
 }   // namespace modm::platform
