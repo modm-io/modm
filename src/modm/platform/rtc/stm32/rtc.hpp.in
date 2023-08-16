@@ -37,21 +37,6 @@ class Rtc
 
 public:
 
-    /// prescalars
-    struct modm_packed
-    Prescaler
-    {
-        constexpr Prescaler() : asynchronous(0x7F), synchronous(0xFF) {}
-        constexpr Prescaler(uint16_t asynchronous, uint16_t synchronous) :
-            asynchronous(asynchronous),
-            synchronous(synchronous)
-        {
-        }
-
-        uint16_t asynchronous;
-        uint16_t synchronous;
-    };
-
     /// TODO: Use std::tm instead
     struct modm_packed
     DateTime

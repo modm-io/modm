@@ -21,7 +21,6 @@ using namespace modm::literals;
 #undef	MODM_LOG_LEVEL
 #define	MODM_LOG_LEVEL modm::log::INFO
 
-static constexpr Rtc::Prescaler prediv(127, 225);
 static constexpr Rtc::DateTime datetime = {
 	.year = 0,
 	.month = 12,
