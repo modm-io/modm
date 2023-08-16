@@ -96,6 +96,7 @@ public:
      * @brief
      *
      * @param delay
+     * @return True on success
      */
     template< typename Rep, typename Period >
     static bool
