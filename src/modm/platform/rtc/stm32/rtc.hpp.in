@@ -16,6 +16,7 @@
 
 #include <modm/architecture/interface/clock.hpp>
 #include <modm/architecture/interface/register.hpp>
+#include <modm/math/units.hpp>
 #include <modm/platform/clock/rcc.hpp>
 
 namespace modm::platform
@@ -72,14 +73,24 @@ public:
     disable();
 
     /**
-     * @brief
+	 * Initializes the Real Time Clock (RTC) to provide a timer to `modm::Clock` and
+	 * `modm::PreciseClock`.
+	 *
+	 * @tparam	SystemClock
+	 * 		the currently active system clock
+     * @tparam  rtcclk
+     *      the RTC clock frequency
+	 * @tparam	tolerance
+	 * 		the allowed tolerance for the resulting clock rate
      *
-     * @param time
-     * @param prediv
-     * @attention the APB1 clock frequency must be equal to or greater than seven times the RTC clock frequency
-     */
-    static bool
-    initialize(const DateTime datetime, const Prescaler prescaler = Prescaler(), uint32_t waitCycles = 2048);
+     * @param waitCycle Number of cycles to wait for the INITF bit to be set. (default = 2048)
+     *
+     * @attention The APB1 clock frequency must never be lower than the RTC clock frequency
+     * @return True on success
+	 */
+    template< class SystemClock, frequency_t rtcclk = 32.768_kHz, percent_t tolerance=pct(0) >
+	static bool
+    initialize(uint32_t waitCycles = 2048);
 
     /**
      * @brief
@@ -163,8 +174,9 @@ private:
     inline static uint16_t
     getSynchronousPrescaler();
 
-    static inline uint32_t ck_apre{0}; // RTCCLK frequency / (PREDIV_A+1)
-    static inline uint32_t ck_spre{0}; // ck_apre frequency / (PREDIV_S+1)
+    static inline frequency_t rtc_ker_ck{0};   /// RTCCLK frequency
+    static inline frequency_t ck_apre{0};      /// RTCCLK frequency / (PREDIV_A + 1)
+    static inline frequency_t ck_spre{0};      /// ck_apre frequency / (PREDIV_S + 1)
 
     friend class modm::chrono::milli_clock;
 	friend class modm::chrono::micro_clock;

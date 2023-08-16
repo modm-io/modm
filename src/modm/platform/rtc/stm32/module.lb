@@ -25,7 +25,8 @@ def prepare(module, options):
         ":cmsis:device",
         ":platform:rcc",
         ":architecture:register",
-        ":math:utils")
+        ":math:utils",
+        ":math:units",)
 
     return True
 

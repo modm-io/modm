@@ -35,49 +35,6 @@ Rtc::disable()
 // ----------------------------------------------------------------------------
 
 bool
-Rtc::initialize(const DateTime dateTime, const Prescaler prescaler, uint32_t waitCycles)
-{
-    /// TODO: Assert that RTC frequency is less than APB1 frequency
-
-    enable();
-    unlock();
-
-    // Enter initialization mode
-    RTC->ICSR |= RTC_ICSR_INIT;
-
-    // Wait until initialization phase mode is entered when INITF bit is set
-    while (!(RTC->ICSR & RTC_ICSR_INITF))
-        if (--waitCycles == 0) return false;
-
-    // To generate a 1 Hz clock for the calendar counter, program both the prescaler factors
-    RTC->PRER = ((prescaler.asynchronous << RTC_PRER_PREDIV_A_Pos) & RTC_PRER_PREDIV_A_Msk) |
-                ((prescaler.synchronous << RTC_PRER_PREDIV_S_Pos) & RTC_PRER_PREDIV_S_Msk);
-
-    // Configure 24 hour format
-    RTC->CR &= ~RTC_CR_FMT;
-
-    // Load the time in 24 hour format into the shadow registers
-    RTC->TR = ((toBcd(dateTime.hour) << RTC_TR_HU_Pos) & (RTC_TR_HT_Msk | RTC_TR_HU_Msk)) |
-              ((toBcd(dateTime.minute) << RTC_TR_MNU_Pos) & (RTC_TR_MNT_Msk | RTC_TR_MNU_Msk)) |
-              ((toBcd(dateTime.second) << RTC_TR_SU_Pos) & (RTC_TR_ST_Msk | RTC_TR_SU_Msk));
-
-    // Load the date in the shadow registers
-    RTC->DR = ((toBcd(dateTime.year) << RTC_DR_YU_Pos) & (RTC_DR_YT_Msk | RTC_DR_YU_Msk)) |
-              ((toBcd(dateTime.month) << RTC_DR_MU_Pos) & (RTC_DR_MT_Msk | RTC_DR_MU_Msk)) |
-              ((toBcd(dateTime.date) << RTC_DR_DU_Pos) & (RTC_DR_DT_Msk | RTC_DR_DU_Msk)) |
-              ((dateTime.weekday << RTC_DR_WDU_Pos) & RTC_DR_WDU_Msk);
-
-    // Exit the initialization mode by clearing the INIT bit
-    RTC->ICSR &= ~RTC_ICSR_INIT;
-
-    lock();
-
-    return true;
-}
-
-// ----------------------------------------------------------------------------
-
-bool
 Rtc::getDateTime(DateTime &dateTime, uint32_t waitCycles)
 {
     /// TODO: Determine if ABP1 frequency is less than seven times RTC frequency
