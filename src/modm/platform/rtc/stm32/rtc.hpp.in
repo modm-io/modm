@@ -162,6 +162,12 @@ private:
 
     inline static uint16_t
     getSynchronousPrescaler();
+
+    static inline uint32_t ck_apre{0}; // RTCCLK frequency / (PREDIV_A+1)
+    static inline uint32_t ck_spre{0}; // ck_apre frequency / (PREDIV_S+1)
+
+    friend class modm::chrono::milli_clock;
+	friend class modm::chrono::micro_clock;
 };
 
 } // namespace modm::platform
