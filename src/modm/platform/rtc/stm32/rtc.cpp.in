@@ -75,15 +75,6 @@ Rtc::getSubSecond(float &subsecond, uint32_t waitCycles)
 
 // ----------------------------------------------------------------------------
 
-void
-Rtc::getPrescaler(Prescaler &prescaler)
-{
-    prescaler.asynchronous = getAsynchronousPrescaler();
-    prescaler.synchronous  = getSynchronousPrescaler();
-}
-
-// ----------------------------------------------------------------------------
-
 void inline
 Rtc::enableInterruptVector(bool enable, uint32_t priority)
 {
