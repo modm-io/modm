@@ -14,6 +14,7 @@
 
 #include <chrono>
 
+#include <modm/architecture/interface/clock.hpp>
 #include <modm/architecture/interface/register.hpp>
 #include <modm/platform/clock/rcc.hpp>
 
@@ -28,7 +29,7 @@ namespace modm::platform
  */
 class Rtc
 {
-    using duration = std::chrono::duration<float>;
+    using duration = std::chrono::duration<int64_t>;
     using rep = duration::rep;
     using period = duration::period;
     using time_point = std::chrono::time_point<Rtc, duration>;
