@@ -105,14 +105,6 @@ public:
     static bool
     getSubSecond(float &subsecond, uint32_t waitCycles = 2048);
 
-    /**
-     * @brief Get the Prescaler object
-     *
-     * @param prescaler
-     */
-    static void
-    getPrescaler(Prescaler &prescaler);
-
 public:
 
     enum class
