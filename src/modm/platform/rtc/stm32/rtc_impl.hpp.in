@@ -23,6 +23,7 @@ Rtc::initialize(uint32_t waitCycles)
     static_assert(rtcclk < SystemClock::Apb1,
                     "The APB1 clock frequency must never be lower than the RTC clock frequency!");
 
+    /// TODO: Devise a novel algorithm for chosing prescalers
     constexpr uint32_t prediv_a = 0x007F;
     constexpr uint32_t prediv_s = 0x00FF;
     //PeripheralDriver::assertBaudrateInTolerance< result.frequency, 1, tolerance >();
@@ -75,18 +76,18 @@ template< typename Rep, typename Period >
 bool
 Rtc::synchronize(std::chrono::duration<Rep, Period> delay, uint32_t waitCycles)
 {
+    /// TODO: Check the REFCKON = 0 before synchronizing
+
     // Check that SS[15] = 0 in order to ensure that no overflow will occur, before initiating a shift operation.
     if (((RTC->SSR & RTC_SSR_SS_Msk) & (Bit15 << RTC_SSR_SS_Pos)) == 0) {
         unlock();
 
         if (0 <= delay.count()) {
-            const auto cast_delay = std::chrono::duration_cast<duration>(delay);
-            const auto subfs = (getSynchronousPrescaler() + 1) * delay;
-            RTC->SHIFTR = (subfs.count() << RTC_SHIFTR_SUBFS_Pos) & RTC_SHIFTR_SUBFS_Msk;
+            uint32_t subfs = delay.count() * Period::num * ck_spre / Period::den;
+            RTC->SHIFTR = (subfs << RTC_SHIFTR_SUBFS_Pos) & RTC_SHIFTR_SUBFS_Msk;
         }
         else {
-            const auto cast_delay = std::chrono::duration_cast<duration>(delay);
-            const auto subfs = (getSynchronousPrescaler() + 1) * (1.f + delay);
+            uint32_t subfs = ck_spre + delay.count() * Period::num * ck_spre / Period::den;
             RTC->SHIFTR = RTC_SHIFTR_ADD1S | ((subfs << RTC_SHIFTR_SUBFS_Pos) & RTC_SHIFTR_SUBFS_Msk);
         }
 
