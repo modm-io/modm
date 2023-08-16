@@ -78,11 +78,18 @@ public:
     initialize(uint32_t waitCycles = 2048);
 
     /**
-     * @brief
+	 *  Synchronized to a remote clock with a high degree of precision
+	 *
+	 * @tparam	Rep
+	 * 		an arithmetic type representing the number of ticks
+     * @tparam  Period
+     *      a std::ratio representing the tick period (i.e. the number of second's fractions per tick)
      *
-     * @param delay
+     * @param delay     The amount of time to delay (or advance) the
+     * @param waitCycle Number of cycles to wait for the INITF bit to be set. (default = 2048)
+     *
      * @return True on success
-     */
+	 */
     template< typename Rep, typename Period >
     static bool
     synchronize(std::chrono::duration<Rep, Period> delay, uint32_t waitCycles = 2048);
