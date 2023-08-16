@@ -39,11 +39,7 @@ main()
 
 	modm::PeriodicTimer timer(std::chrono::milliseconds(1000));
 
-	/// TODO: Possibly move into Board::SystemClock::enable()
-	Rcc::enableLowSpeedExternalCrystal();
-    Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::LowSpeedExternalCrystal);
-
-	Rtc::initialize(datetime, prediv);
+	Rtc::initialize<Board::SystemClock>();
 	while (true)
 	{
 		if (timer.execute())
