@@ -22,7 +22,15 @@ using namespace modm::literals;
 #define	MODM_LOG_LEVEL modm::log::INFO
 
 static constexpr Rtc::Prescaler prediv(127, 225);
-static constexpr Rtc::DateTime datetime = { year: 0, month: 12, date: 31, weekday: 1, hour: 23, minute: 59, second: 30 };
+static constexpr Rtc::DateTime datetime = {
+	.year = 0,
+	.month = 12,
+	.date = 31,
+	.weekday = 1,
+	.hour = 23,
+	.minute = 59,
+	second: 30,
+};
 
 int
 main()
