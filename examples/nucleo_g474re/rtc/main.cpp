@@ -28,7 +28,7 @@ static constexpr Rtc::DateTime datetime = {
 	.weekday = 1,
 	.hour = 23,
 	.minute = 59,
-	second: 30,
+	.second = 30,
 };
 
 int
