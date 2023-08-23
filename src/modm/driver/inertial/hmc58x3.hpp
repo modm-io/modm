@@ -47,9 +47,9 @@ protected:
 		DataZ_Lsb = 0x07,
 		DataZ_Msb = 0x08,
 		Status = 0x09,
-		IdA = 0x10,
-		IdB = 0x11,
-		IdC = 0x12,
+		IdA = 0x0a,
+		IdB = 0x0b,
+		IdC = 0x0c,
 	};
 	/// @endcond
 
