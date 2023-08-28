@@ -144,7 +144,7 @@ GpioB2::enablePcInterrupt();
 MODM_ISR(PCINT0)
 {
 	if (GpioB1::getPcInterruptFlag()) {
-		bool state = GpioB2::read();
+		bool state = GpioB1::read();
 		// your code
 		GpioB1::acknowledgePcInterruptFlag();
 	}
