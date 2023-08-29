@@ -30,7 +30,7 @@ modm::Hmc58x3<I2cMaster>::readMagneticField()
 {
 	RF_BEGIN();
 
-	if (RF_CALL(read(Register::DataX_Lsb, rawBuffer+3, 7)))
+	if (RF_CALL(read(Register::DataX_Msb, rawBuffer+3, 7)))
 	{
 		std::memcpy(data.data, rawBuffer+3, 6);
 		RF_RETURN(true);
