@@ -552,7 +552,7 @@ jobs:
           name: stm32u5-compile-all
           path: test/all/log
 
-  stm32g0-compile-all:
+  stm32g0-compile-all-1:
     if: github.event.label.name == 'ci:hal'
     runs-on: ubuntu-22.04
     container:
@@ -568,14 +568,40 @@ jobs:
       - name: Update lbuild
         run: |
           pip3 install --upgrade --upgrade-strategy=eager modm
-      - name: Compile HAL for all STM32G0
+      - name: Compile HAL for all STM32G0 Part 1
         run: |
-          (cd test/all && python3 run_all.py stm32g0 --quick-remaining)
+          (cd test/all && python3 run_all.py stm32g0 --quick-remaining --split 2 --part 0)
       - name: Upload log artifacts
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: stm32g0-compile-all
+          name: stm32g0-compile-all-1
+          path: test/all/log
+
+  stm32g0-compile-all-2:
+    if: github.event.label.name == 'ci:hal'
+    runs-on: ubuntu-22.04
+    container:
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Fix Git permission/ownership problem
+        run: |
+          git config --global --add safe.directory /__w/modm/modm
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --upgrade-strategy=eager modm
+      - name: Compile HAL for all STM32G0 Part 2
+        run: |
+          (cd test/all && python3 run_all.py stm32g0 --quick-remaining --split 2 --part 1)
+      - name: Upload log artifacts
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: stm32g0-compile-all-2
           path: test/all/log
 
   stm32g4-compile-all-1:
