@@ -257,7 +257,7 @@ def post_build(env):
         has_rtt = env.has_module(":platform:rtt")
         env.substitutions["has_rtt"] = has_rtt
         if has_rtt:
-            env.substitutions["main_ram"] = linkerscript.get("cont_ram_regions", [{"start": 0x20000000, "size": 4096}])[0]
+            env.substitutions["main_ram"] = linkerscript.get("cont_ram", {"start": 0x20000000, "size": 4096})
             env.substitutions["rtt_channels"] = len(env.get(":platform:rtt:buffer.tx", []))
         env.template("openocd.cfg.in")
 
