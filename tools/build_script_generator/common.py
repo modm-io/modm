@@ -274,6 +274,7 @@ def common_compiler_flags(compiler, target):
         # "-Wold-style-cast",
         "-fstrict-enums",
         "-std=c++23",
+        "-Wno-psabi",
         "-Wno-volatile",  # volatile is deprecated in C++20 but lots of our external code uses it...
         # "-pedantic",
     ]
