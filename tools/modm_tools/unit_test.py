@@ -91,7 +91,7 @@ def extract_tests(headers):
         name = name[0]
 
         functions = re.findall(
-            r"void\s+(test[A-Z]\w*)\s*\([\svoid]*\)\s*;", content)
+            r"void\s+(test[_a-zA-Z]\w*)\s*\([\svoid]*\)\s*;", content)
         if not functions:
             print("No tests found in {}!".format(header))
 
