@@ -213,6 +213,7 @@ def common_compiler_flags(compiler, target):
         "-Werror=maybe-uninitialized",
         "-Werror=overflow",
         "-Werror=sign-compare",
+        "-Werror=return-type",
         "-Wextra",
         "-Wlogical-op",
         "-Wpointer-arith",
