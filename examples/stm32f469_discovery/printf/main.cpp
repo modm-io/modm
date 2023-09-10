@@ -11,16 +11,6 @@
 
 #include <modm/board.hpp>
 
-extern "C"
-void putchar_(char c)
-{
-	// Redirect the printf output to UART.
-	Board::stlink::Uart::write(c);
-	// or IOStream if the board already has a logger
-	// MODM_LOG_INFO << c;
-}
-
-// ----------------------------------------------------------------------------
 int
 main()
 {

@@ -25,7 +25,8 @@ The BSPs all use a common interface within a top-level `namespace Board`:
   `modm::platform::Gpio{port}{pin}`.
 
 If the board supports a dedicated serial logging output the BSP redirects the
-`modm:debug` module debug stream `MODM_LOG_INFO` etc.
+`modm:debug` module debug stream `MODM_LOG_INFO` as well as the output of the
+standalone `printf` function.
 
 Please note that YOU must explicitly call the `Board` functions to initialize
 your hardware, just including the board module is not enough.

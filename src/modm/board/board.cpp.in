@@ -14,7 +14,7 @@
 %% if with_assert
 #include <modm/architecture/interface/assert.hpp>
 %% endif
-
+%#
 %% if with_logger
 Board::LoggerDevice loggerDevice;
 
@@ -23,8 +23,15 @@ modm::log::Logger modm::log::debug(loggerDevice);
 modm::log::Logger modm::log::info(loggerDevice);
 modm::log::Logger modm::log::warning(loggerDevice);
 modm::log::Logger modm::log::error(loggerDevice);
-%% endif
 
+// Default all calls to printf to the UART
+modm_extern_c void
+putchar_(char c)
+{
+	loggerDevice.write(c);
+}
+%% endif
+%#
 %% if with_assert
 modm_extern_c void
 modm_abandon(const modm::AssertionInfo &info)
