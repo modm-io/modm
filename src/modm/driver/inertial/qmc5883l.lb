@@ -1,0 +1,41 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2023, Alexander Solovets
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:qmc5883l"
+    module.description = """\
+# QMC5883L 3-Axis Digital Magnetometer
+
+The QMC5883L is a multi-chip three-axis magnetic sensor. This surface-mount,
+small sized chip has integrated magnetic sensors with signal condition ASIC,
+targeted for high precision applications such as compassing, navigation and
+gaming in drone, robot, mobile and personal hand-held devices.
+
+The QMC5883L is based on state-of-the-art, high resolution, magneto-resistive
+technology licensed from Honeywell AMR technology.  Along with custom-designed
+16-bit ADC ASIC, it offers the advantages of low noise, high accuracy, low
+power consumption, offset cancellation and temperature compensation. QMC5883L
+enables 1° to 2° compass heading accuracy. The I²C serial bus allows for easy
+interface.
+"""
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:i2c.device",
+        ":architecture:register",
+        ":math:utils")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/inertial"
+    env.copy("qmc5883l.hpp")

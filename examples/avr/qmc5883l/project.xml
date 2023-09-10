@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:mega-2560-pro</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/avr/qmc5883l</option>
+  </options>
+  <modules>
+    <module>modm:platform:i2c</module>
+    <module>modm:driver:qmc5883l</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>
