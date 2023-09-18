@@ -29,7 +29,8 @@ hardcoded into the sensor and cannot be changed.
 def prepare(module, options):
     module.depends(
         ":architecture:i2c.device",
-        ":architecture:register")
+        ":architecture:register",
+        ":math:utils")
     return True
 
 def build(env):
