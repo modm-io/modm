@@ -152,6 +152,15 @@ brew install python3 scons git doxygen
 pip3 install modm
 ```
 
+!!! warning "Missing pyelftools"
+    If you get errors about missing `pyelftools` when calling `scons`, you may
+    be using the system Python, rather than the Homebrew Python.
+    In that case, you can add this line to your `.bashrc` or `.zshrc`:
+
+    ```sh
+    alias scons="/usr/bin/env python3 $(which scons)"
+    ```
+
 We recommend using a graphical frontend for GDB called [gdbgui][]:
 
 ```sh
@@ -172,8 +181,8 @@ Install the [pre-built ARM toolchain](https://github.com/osx-cross/homebrew-arm)
 
 ```sh
 brew tap osx-cross/arm
-brew install arm-gcc-bin@12
-brew install openocd --HEAD
+brew install arm-gcc-bin@12 openocd
+brew link --force arm-gcc-bin@12
 ```
 
 To program Microchip SAM devices via the bootloader, install the `bossac` tool:
