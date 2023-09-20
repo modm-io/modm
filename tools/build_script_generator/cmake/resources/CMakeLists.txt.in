@@ -27,7 +27,8 @@ add_library({{ repo }} OBJECT
   {{ file | relocate | modm.posixify  }}
 %% endfor
 )
-
+%% else
+add_library({{ repo }} INTERFACE )
 %% endif
 
 %% if per_file_attr | length
@@ -44,7 +45,12 @@ add_library({{ repo }}_arch_options INTERFACE)
 modm_target_config_create({{ repo }} {{ repo }}_arch_options {{ repo }}_options {{ repo }}_warnings)
 
 %% if include_paths | length
-target_include_directories({{ repo }} SYSTEM PUBLIC
+target_include_directories({{ repo }} SYSTEM
+%% if sources | length
+  PUBLIC
+%% else
+  INTERFACE
+%% endif
 %% for path in include_paths | sort
   {{ path | relocate | modm.posixify  }}
 %% endfor
@@ -52,10 +58,18 @@ target_include_directories({{ repo }} SYSTEM PUBLIC
 
 %% endif
 
+
 target_link_libraries({{ repo }}
+%% if sources | length
   PUBLIC
+%% else
+  INTERFACE
+%%endif
     {{ repo }}_arch_options
+%% if sources | length
   PRIVATE
     project_options
     {{ repo }}_options
-    {{ repo }}_warnings)
+    {{ repo }}_warnings
+%% endif
+  )
