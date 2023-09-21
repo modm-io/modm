@@ -1,0 +1,441 @@
+/*
+ * Copyright (c) 2014, Kevin Läufer
+ * Copyright (c) 2014-2017, Niklas Hauser
+ * Copyright (c) 2020, Mike Wolfram
+ * Copyright (c) 2021, Raphael Lehmann
+ * Copyright (c) 2021-2023, Christopher Durand
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_STM32_BDMA_HPP
+#define MODM_STM32_BDMA_HPP
+
+#include <cstdint>
+#include <algorithm>
+#include <array>
+#include <modm/platform/clock/rcc.hpp>
+#include "../device.hpp"
+#include "bdma_hal.hpp"
+
+namespace modm::platform
+{
+
+%% if instance in ["", "2"]
+/// @cond
+namespace bdma
+{
+	template <typename ChannelT, Peripheral peripheral, BdmaBase::Signal signal>
+	struct RequestMapping;
+}
+/// @endcond
+%% endif
+
+/**
+ * Basic DMA controller {{ instance }}
+ *
+ * @ingroup	modm_platform_dma
+ */
+class Bdma{{ instance }} : public BdmaBase
+{
+public:
+	static void
+	enable()
+	{
+		Rcc::enable<Peripheral::Bdma{{ instance }}>();
+	}
+
+	static void
+	disable()
+	{
+		Rcc::disable<Peripheral::Bdma{{ instance }}>();
+	}
+
+	template <BdmaBase::Channel Id>
+	class Channel : public BdmaBase
+	{
+		static_assert(int(Id) >= 0 and int(Id) < {{ channel_count }}, "invalid channel");
+
+		static constexpr uint32_t ChannelBase = BDMA{{ instance }}_Channel0_BASE +
+			uint32_t(Id) * (BDMA{{ instance }}_Channel1_BASE - BDMA{{ instance }}_Channel0_BASE);
+
+		using Hal = BdmaChannelHal<ChannelBase>;
+
+	public:
+		/**
+		 * Configure the DMA channel
+		 *
+		 * Stops the DMA channel and writes the new values to its control register.
+		 *
+		 * @param[in] direction Direction of the DMA channel
+		 * @param[in] memoryDataSize Size of data in memory (byte, halfword, word)
+		 * @param[in] peripheralDataSize Size of data in peripheral (byte, halfword, word)
+		 * @param[in] memoryIncrement Defines whether the memory address is incremented
+		 * 			  after a transfer completed
+		 * @param[in] peripheralIncrement Defines whether the peripheral address is
+		 * 			  incremented after a transfer completed
+		 * @param[in] priority Priority of the DMA channel
+		 * @param[in] circularMode Transfer data in circular mode?
+		 */
+		static void
+		configure(DataTransferDirection direction, MemoryDataSize memoryDataSize,
+				PeripheralDataSize peripheralDataSize,
+				MemoryIncrementMode memoryIncrement,
+				PeripheralIncrementMode peripheralIncrement,
+				Priority priority = Priority::Medium,
+				CircularMode circularMode = CircularMode::Disabled)
+		{
+			Hal::configure(direction, memoryDataSize, peripheralDataSize,
+						   memoryIncrement, peripheralIncrement, priority, circularMode);
+		}
+
+		/**
+		 * Start the transfer of the DMA channel and clear all interrupt flags.
+		 */
+		static void
+		start()
+		{
+			clearInterruptFlags();
+			Hal::start();
+		}
+
+		/**
+		 * Stop a DMA channel transfer
+		 */
+		static void
+		stop()
+		{
+			Hal::stop();
+		}
+
+		/**
+		 * Get the direction of the data transfer
+		 */
+		static DataTransferDirection
+		getDataTransferDirection()
+		{
+			return Hal::getDataTransferDirection();
+		}
+
+		/**
+		 * Set the memory address of the DMA channel
+		 *
+		 * @note In Mem2Mem mode use this method to set the memory source address.
+		 *
+		 * @param[in] address Source address
+		 */
+		static void
+		setMemoryAddress(uintptr_t address)
+		{
+			Hal::setMemoryAddress(address);
+		}
+		/**
+		 * Set the peripheral address of the DMA channel
+		 *
+		 * @note In Mem2Mem mode use this method to set the memory destination address.
+		 *
+		 * @param[in] address Destination address
+		 */
+		static void
+		setPeripheralAddress(uintptr_t address)
+		{
+			Hal::setPeripheralAddress(address);
+		}
+
+		/**
+		 * Enable/disable memory increment
+		 *
+		 * When enabled, the memory address is incremented by the size of the data
+		 * (e.g. 1 for byte transfers, 4 for word transfers) after the transfer
+		 * completed.
+		 *
+		 * @param[in] increment Enable/disable
+		 */
+		static void
+		setMemoryIncrementMode(bool increment)
+		{
+			Hal::setMemoryIncrementMode(increment);
+		}
+		/**
+		 * Enable/disable peripheral increment
+		 *
+		 * When enabled, the peripheral address is incremented by the size of the data
+		 * (e.g. 1 for byte transfers, 4 for word transfers) after the transfer
+		 * completed.
+		 *
+		 * @param[in] increment Enable/disable
+		 */
+		static void
+		setPeripheralIncrementMode(bool increment)
+		{
+			Hal::setPeripheralIncrementMode(increment);
+		}
+
+		/**
+		 * Set the length of data to be transfered
+		 */
+		static void
+		setDataLength(std::size_t length)
+		{
+			Hal::setDataLength(length);
+		}
+
+		/**
+		 * Set the IRQ handler for transfer errors
+		 *
+		 * The handler will be called from the channels IRQ handler function
+		 * when the IRQ status indicates an error occured.
+		 */
+		static void
+		setTransferErrorIrqHandler(IrqHandler irqHandler)
+		{
+			transferError = irqHandler;
+		}
+		/**
+		 * Set the IRQ handler for half transfer complete
+		 *
+		 * Called by the channels IRQ handler when the transfer is half complete.
+		 */
+		static void
+		setHalfTransferCompleteIrqHandler(IrqHandler irqHandler)
+		{
+			halfTransferComplete = irqHandler;
+		}
+		/**
+		 * Set the IRQ handler for transfer complete
+		 *
+		 * Called by the channels IRQ handler when the transfer is complete.
+		 */
+		static void
+		setTransferCompleteIrqHandler(IrqHandler irqHandler)
+		{
+			transferComplete = irqHandler;
+		}
+
+%% if instance in ["", "2"]
+		/**
+		 * Set the peripheral that operates the channel
+		 */
+		template <Request dmaRequest>
+		static void
+		setPeripheralRequest()
+		{
+			constexpr auto muxChannel = std::find_if(muxChannels.begin(), muxChannels.end(), [](MuxChannel ch) {
+%% if instance == ""
+				return ch.dmaChannel == static_cast<uint32_t>(Id);
+%% else
+				return (ch.dmaInstance == {{ instance }}) && (ch.dmaChannel == uint32_t(Id));
+%% endif
+			})->muxChannel;
+			auto* channel = DMAMUX2_Channel0 + muxChannel;
+			channel->CCR = (channel->CCR & ~DMAMUX_CxCR_DMAREQ_ID) | uint32_t(dmaRequest);
+		}
+%% endif
+
+		/**
+		 * IRQ handler of the DMA channel
+		 *
+		 * Reads the IRQ status and checks for error or transfer complete. In case
+		 * of error the DMA channel will be disabled.
+		 */
+		modm_always_inline static void
+		interruptHandler()
+		{
+			const auto flags = getInterruptFlags();
+			if (flags & InterruptFlags::Error) {
+				disable();
+				if (transferError)
+					transferError();
+			}
+			if (halfTransferComplete and (flags & InterruptFlags::HalfTransferComplete)) {
+				halfTransferComplete();
+			}
+			if (transferComplete and (flags & InterruptFlags::TransferComplete)) {
+				transferComplete();
+			}
+
+			// only clear flags that have been handled
+			// otherwise interrupts that occur while inside the handler could be discarded
+			clearInterruptFlags(flags & ~InterruptFlags::Global);
+		}
+
+		/**
+		 * Read channel status flags when channel interrupts are disabled.
+		 * This function is useful to query the transfer state when the use of
+		 * the channel interrupt is not required for the application.
+		 *
+		 * @warning Flags are automatically cleared in the ISR if the channel
+		 * 			interrupt is enabled or when start() is called.
+		 */
+		static InterruptFlags_t
+		getInterruptFlags()
+		{
+			const auto globalFlags = BDMA{{ instance }}->ISR;
+			const auto mask = static_cast<uint8_t>(InterruptFlags::All);
+			const auto shift = static_cast<uint32_t>(Id) * 4;
+			const auto channelFlags = static_cast<uint8_t>((globalFlags >> shift) & mask);
+			return InterruptFlags_t{channelFlags};
+		}
+
+		/**
+		 * Clear channel interrupt flags.
+		 * Use only when the channel interrupt is disabled.
+		 *
+		 * @warning Flags are automatically cleared in the ISR if the channel
+		 * 			interrupt is enabled or when start() is called.
+		 */
+		static void
+		clearInterruptFlags(InterruptFlags_t flags = InterruptFlags::All)
+		{
+			BDMA{{ instance }}->IFCR = flags.value << (static_cast<uint32_t>(Id) * 4);
+		}
+
+		/**
+		 * Enable the IRQ vector of the channel
+		 *
+		 * @param[in] priority Priority of the IRQ
+		 */
+		static void
+		enableInterruptVector(uint32_t priority = 1)
+		{
+%% if instance == "1"
+			NVIC_SetPriority(BDMA1_IRQn, priority);
+			NVIC_EnableIRQ(BDMA1_IRQn);
+%% else
+			NVIC_SetPriority(irqs[uint32_t(Id)], priority);
+			NVIC_EnableIRQ(irqs[uint32_t(Id)]);
+%% endif
+		}
+		/**
+		 * Disable the IRQ vector of the channel
+		 */
+		static void
+		disableInterruptVector()
+		{
+%% if instance == "1"
+			NVIC_DisableIRQ(BDMA1_IRQn);
+%% else
+			NVIC_DisableIRQ(irqs[uint32_t(Id)]);
+%% endif
+		}
+
+		/**
+		 * Enable the specified interrupt of the channel
+		 */
+		static void
+		enableInterrupt(InterruptEnable_t irq)
+		{
+			Hal::enableInterrupt(irq);
+		}
+		/**
+		 * Disable the specified interrupt of the channel
+		 */
+		static void
+		disableInterrupt(InterruptEnable_t irq)
+		{
+			Hal::disableInterrupt(irq);
+		}
+
+%% if instance in ["", "2"]
+		template <Peripheral peripheral, Signal signal = Signal::NoSignal>
+		using RequestMapping = bdma::RequestMapping<Channel, peripheral, signal>;
+
+		static constexpr IRQn_Type irqs[] = {
+%% for channel in range(0, channel_count)
+			BDMA{{ instance }}_Channel{{ channel }}_IRQn{% if not loop.last %},{% endif %}
+%% endfor
+		};
+%% endif
+
+	private:
+		static inline BdmaBase::IrqHandler transferError { nullptr };
+		static inline BdmaBase::IrqHandler halfTransferComplete { nullptr };
+		static inline BdmaBase::IrqHandler transferComplete { nullptr };
+
+%% if instance in ["", "2"]
+		struct MuxChannel
+		{
+			uint8_t muxChannel;
+%% if instance != ""
+			uint8_t dmaInstance;
+%% endif
+			uint8_t dmaChannel;
+		};
+
+		static constexpr std::array muxChannels = {
+%% for channel in dma["mux-channels"][0]["mux-channel"]
+%% if instance == ""
+			MuxChannel({{ channel.position }}, {{ channel["dma-channel"] }}){{ "," if not loop.last }}
+%% else
+			MuxChannel({{ channel.position }}, {{ channel["dma-instance"] }}, {{ channel["dma-channel"] }}){{ "," if not loop.last }}
+%% endif
+%% endfor
+		};
+%% endif
+	};
+%% for channel in range(0, channel_count)
+	using Channel{{ channel }} = Channel<BdmaBase::Channel::Channel{{ channel }}>;
+%% endfor
+};
+
+%% if instance in ["", "2"]
+/// @cond
+/*
+ * Specialization of the RequestMapping. For all hardware supported by DMA the
+ * RequestMapping structure defines the channel and the Request. It can be used
+ * by hardware classes to verify that the provIded channel is valId and to
+ * get the value to set in setPeripheralRequest().
+ *
+ * Example:
+ * template <class DmaRx, class DmaTx>
+ * class SpiMaster1_Dma : public SpiMaster1
+ * {
+ *     using RxChannel = typename DmaRx::template RequestMapping<Peripheral::Spi1, DmaRx::Signal::Rx>::Channel;
+ * 	   using TxChannel = typename DmaTx::template RequestMapping<Peripheral::Spi1, DmaTx::Signal::Tx>::Channel;
+ * 	   static constexpr DmaRx::Request RxRequest = DmaRx::template RequestMapping<Peripheral::Spi1, DmaRx::Signal::Rx>::Request;
+ * 	   static constexpr DmaTx::Request TxRequest = DmaTx::template RequestMapping<Peripheral::Spi1, DmaTx::Signal::Tx>::Request;
+ *
+ *     ...
+ * };
+ */
+namespace bdma
+{
+
+%% for request in dma["requests"][0]["request"]
+
+%% for signal in request.signal
+%% if signal.name is defined
+%% set request_signal = "BdmaBase::Signal::" + signal.name.capitalize()
+%% else
+%% set request_signal = "BdmaBase::Signal::NoSignal"
+%% endif
+
+%% set peripheral = signal.driver.capitalize()
+%% if signal.instance is defined
+	%% set peripheral = peripheral ~ signal.instance
+%% endif
+%% if peripheral == "Bdma" and instance in ["2"]
+	%% set peripheral = peripheral ~ instance
+%% endif
+
+	template <typename ChannelT>
+	struct RequestMapping<ChannelT, Peripheral::{{ peripheral }}, {{ request_signal }}>
+	{
+		using Channel = ChannelT;
+		static constexpr BdmaBase::Request Request = BdmaBase::Request::Request{{ request.position }};
+	};
+%% endfor
+%% endfor
+}
+
+/// @endcond
+%% endif
+
+}	// namespace modm::platform
+
+#endif	// MODM_STM32_BDMA_HPP

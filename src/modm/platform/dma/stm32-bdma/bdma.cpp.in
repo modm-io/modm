@@ -1,0 +1,34 @@
+/*
+ * Copyright (c) 2023, Christopher Durand
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+%% if instance == ""
+#include "bdma.hpp"
+%% else
+#include "bdma_{{ instance }}.hpp"
+%% endif
+
+%% if instance == "1"
+MODM_ISR(BDMA1)
+{
+	using modm::platform::Bdma1;
+%% for channel in range(0, channel_count)
+	Bdma1::Channel{{ channel }}::interruptHandler();
+%% endfor
+}
+%% else
+%% for channel in range(0, channel_count)
+MODM_ISR(BDMA{{ instance }}_Channel{{ channel }})
+{
+	using modm::platform::Bdma{{ instance }};
+	Bdma{{ instance }}::Channel{{ channel }}::interruptHandler();
+}
+%% endfor
+%% endif
