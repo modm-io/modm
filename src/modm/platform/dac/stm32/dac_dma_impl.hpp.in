@@ -107,26 +107,26 @@ bool
 
 template<typename DmaChannel>
 void
-{{ channel }}::configure(const void* data, size_t dataLength, DmaBase::CircularMode circularMode,
-						 DmaBase::Priority priority)
+{{ channel }}::configure(const void* data, size_t dataLength, DmaChannel::CircularMode circularMode,
+						 DmaChannel::Priority priority)
 {
 %% if target.family in ["f2", "f4", "f7"]
-	using RequestMapping = typename DmaChannel::RequestMapping<Peripheral::Dac{{ id }}, DmaBase::Signal::Dac{{ channel_id }}>;
+	using RequestMapping = typename DmaChannel::RequestMapping<Peripheral::Dac{{ id }}, DmaChannel::Signal::Dac{{ channel_id }}>;
 %% else
-	using RequestMapping = typename DmaChannel::RequestMapping<Peripheral::Dac{{ id }}, DmaBase::Signal::Ch{{ channel_id }}>;
+	using RequestMapping = typename DmaChannel::RequestMapping<Peripheral::Dac{{ id }}, DmaChannel::Signal::Ch{{ channel_id }}>;
 %% endif
 	constexpr auto request = RequestMapping::Request;
 
 	DmaChannel::configure(
-		DmaBase::DataTransferDirection::MemoryToPeripheral,
-		DmaBase::MemoryDataSize::HalfWord,
+		DmaChannel::DataTransferDirection::MemoryToPeripheral,
+		DmaChannel::MemoryDataSize::HalfWord,
 %% if target.family in ["f0", "f2", "f3", "f4", "f7", "h7"]
-		DmaBase::PeripheralDataSize::HalfWord,
+		DmaChannel::PeripheralDataSize::HalfWord,
 %% else
-		DmaBase::PeripheralDataSize::Word,
+		DmaChannel::PeripheralDataSize::Word,
 %% endif
-		DmaBase::MemoryIncrementMode::Increment,
-		DmaBase::PeripheralIncrementMode::Fixed,
+		DmaChannel::MemoryIncrementMode::Increment,
+		DmaChannel::PeripheralIncrementMode::Fixed,
 		priority,
 		circularMode
 	);

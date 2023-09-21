@@ -18,14 +18,14 @@ from collections import defaultdict
 import re
 
 def _get_signal_names(driver):
-    signal_names = {}
+    signal_names = set()
     for request_data in driver["requests"]:
         for request in request_data["request"]:
             for signal in request["signal"]:
                 if "name" in signal:
                     signal_name = signal["name"].capitalize()
-                    signal_names[signal_name] = 1
-    return sorted(list(set(signal_names)))
+                    signal_names.add(signal_name)
+    return sorted(list(signal_names))
 
 
 def _validate_channel_count(driver):
@@ -42,7 +42,7 @@ def _validate_channel_count(driver):
 
 
 def _get_substitutions(device, instance = ""):
-    dma = device.get_driver("bdma")
+    dma = device.get_driver("bdma:stm32*")
     return {
         "target" : device.identifier,
         "dma" : dma,

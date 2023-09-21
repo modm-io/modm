@@ -127,8 +127,8 @@ public:
 		 * @param circularMode DMA circular mode setting
 		 * @param priority DMA transfer priority
 		 */
-		static void configure(const void* data, size_t dataSize, DmaBase::CircularMode circularMode,
-							  DmaBase::Priority priority = DmaBase::Priority::Medium);
+		static void configure(const void* data, size_t dataSize, DmaChannel::CircularMode circularMode,
+							  DmaChannel::Priority priority = DmaChannel::Priority::Medium);
 
 		/**
 		 * Set data to transfer

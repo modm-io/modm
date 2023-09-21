@@ -37,14 +37,12 @@ class SpiMaster{{ id }}_Dma : public modm::SpiMaster,
 {
 protected:
 	struct Dma {
-		using RxChannel = typename DmaChannelRx::template RequestMapping<
-				Peripheral::Spi{{ id }}, DmaBase::Signal::Rx>::Channel;
-		using TxChannel = typename DmaChannelTx::template RequestMapping<
-				Peripheral::Spi{{ id }}, DmaBase::Signal::Tx>::Channel;
-		static constexpr DmaBase::Request RxRequest = DmaChannelRx::template RequestMapping<
-				Peripheral::Spi{{ id }}, DmaBase::Signal::Rx>::Request;
-		static constexpr DmaBase::Request TxRequest = DmaChannelTx::template RequestMapping<
-				Peripheral::Spi{{ id }}, DmaBase::Signal::Tx>::Request;
+		using RxChannel = DmaChannelRx;
+		using TxChannel = DmaChannelTx;
+		static constexpr DmaChannelRx::Request RxRequest = DmaChannelRx::template RequestMapping<
+				Peripheral::Spi{{ id }}, DmaChannelRx::Signal::Rx>::Request;
+		static constexpr DmaChannelTx::Request TxRequest = DmaChannelTx::template RequestMapping<
+				Peripheral::Spi{{ id }}, DmaChannelTx::Signal::Tx>::Request;
 	};
 
 %% if not use_fiber

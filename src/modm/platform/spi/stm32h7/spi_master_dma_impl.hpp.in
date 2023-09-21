@@ -22,21 +22,24 @@ template <class SystemClock, modm::baudrate_t baudrate, modm::percent_t toleranc
 void
 SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::initialize()
 {
-	Dma::RxChannel::configure(DmaBase::DataTransferDirection::PeripheralToMemory,
-			DmaBase::MemoryDataSize::Byte, DmaBase::PeripheralDataSize::Byte,
-			DmaBase::MemoryIncrementMode::Increment, DmaBase::PeripheralIncrementMode::Fixed,
-			DmaBase::Priority::Medium);
-	Dma::RxChannel::disableInterruptVector();
-	Dma::RxChannel::setPeripheralAddress(reinterpret_cast<uint32_t>(Hal::receiveRegister()));
-	Dma::RxChannel::template setPeripheralRequest<Dma::RxRequest>();
+	using Rx = Dma::RxChannel;
+	using Tx = Dma::TxChannel;
 
-	Dma::TxChannel::configure(DmaBase::DataTransferDirection::MemoryToPeripheral,
-			DmaBase::MemoryDataSize::Byte, DmaBase::PeripheralDataSize::Byte,
-			DmaBase::MemoryIncrementMode::Increment, DmaBase::PeripheralIncrementMode::Fixed,
-			DmaBase::Priority::Medium);
-	Dma::TxChannel::disableInterruptVector();
-	Dma::TxChannel::setPeripheralAddress(reinterpret_cast<uint32_t>(Hal::transmitRegister()));
-	Dma::TxChannel::template setPeripheralRequest<Dma::TxRequest>();
+	Rx::configure(Rx::DataTransferDirection::PeripheralToMemory,
+			Rx::MemoryDataSize::Byte, Rx::PeripheralDataSize::Byte,
+			Rx::MemoryIncrementMode::Increment, Rx::PeripheralIncrementMode::Fixed,
+			Rx::Priority::Medium);
+	Rx::disableInterruptVector();
+	Rx::setPeripheralAddress(reinterpret_cast<uint32_t>(Hal::receiveRegister()));
+	Rx::template setPeripheralRequest<Dma::RxRequest>();
+
+	Tx::configure(Tx::DataTransferDirection::MemoryToPeripheral,
+			Tx::MemoryDataSize::Byte, Tx::PeripheralDataSize::Byte,
+			Tx::MemoryIncrementMode::Increment, Tx::PeripheralIncrementMode::Fixed,
+			Tx::Priority::Medium);
+	Tx::disableInterruptVector();
+	Tx::setPeripheralAddress(reinterpret_cast<uint32_t>(Hal::transmitRegister()));
+	Tx::template setPeripheralRequest<Dma::TxRequest>();
 
 %% if not use_fiber
 	state = 0;
@@ -150,7 +153,7 @@ modm::ResumableResult<void>
 SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(
 		const uint8_t* tx, uint8_t* rx, std::size_t length)
 {
-	using Flags = DmaBase::InterruptFlags;
+	using Flags = DmaChannelRx::InterruptFlags;
 %% if use_fiber
 	startDmaTransfer(tx, rx, length);
 
@@ -196,7 +199,7 @@ SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(
 	default:
 		if (!Hal::isTransferCompleted() or !(state & Bit2)) {
 			if(rx) {
-				static DmaBase::InterruptFlags_t flags;
+				static typename DmaChannelRx::InterruptFlags_t flags;
 				flags = DmaChannelRx::getInterruptFlags();
 				if (flags & Flags::Error) {
 					// abort on DMA error

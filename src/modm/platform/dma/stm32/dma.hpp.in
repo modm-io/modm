@@ -95,7 +95,7 @@ public:
 	 * Class representing a DMA channel/stream
 	 */
 	template <DmaBase::Channel ChannelID>
-	class Channel
+	class Channel : public DmaBase
 	{
 		static_assert(
 %% for controller in dmaController
