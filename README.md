@@ -657,40 +657,41 @@ We have out-of-box support for many development boards including documentation.
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f746zg">NUCLEO-F746ZG</a></td>
 </tr><tr>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f767zi">NUCLEO-F767ZI</a></td>
+<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-g070rb">NUCLEO-G070RB</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-g071rb">NUCLEO-G071RB</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-g431kb">NUCLEO-G431KB</a></td>
-<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-g431rb">NUCLEO-G431RB</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-g431rb">NUCLEO-G431RB</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-g474re">NUCLEO-G474RE</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-h723zg">NUCLEO-H723ZG</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-h743zi">NUCLEO-H743ZI</a></td>
-<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l031k6">NUCLEO-L031K6</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l031k6">NUCLEO-L031K6</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l053r8">NUCLEO-L053R8</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l152re">NUCLEO-L152RE</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l432kc">NUCLEO-L432KC</a></td>
-<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l452re">NUCLEO-L452RE</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l452re">NUCLEO-L452RE</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l476rg">NUCLEO-L476RG</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l496zg-p">NUCLEO-L496ZG-P</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l552ze-q">NUCLEO-L552ZE-Q</a></td>
-<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-u575zi-q">NUCLEO-U575ZI-Q</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-u575zi-q">NUCLEO-U575ZI-Q</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-olimexino-stm32">OLIMEXINO-STM32</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-rp-pico">Raspberry Pi Pico</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-samd21-mini">SAMD21-MINI</a></td>
-<td align="center"><a href="https://modm.io/reference/config/modm-samd21-xplained-pro">SAMD21-XPLAINED-PRO</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/config/modm-samd21-xplained-pro">SAMD21-XPLAINED-PRO</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-same54-xplained-pro">SAME54-XPLAINED-PRO</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-same70-xplained">SAME70-XPLAINED</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-samg55-xplained-pro">SAMG55-XPLAINED-PRO</a></td>
-<td align="center"><a href="https://modm.io/reference/config/modm-samv71-xplained-ultra">SAMV71-XPLAINED-ULTRA</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/config/modm-samv71-xplained-ultra">SAMV71-XPLAINED-ULTRA</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-srxe">Smart Response XE</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-stm32_f4ve">STM32-F4VE</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-stm32f030_demo">STM32F030-DEMO</a></td>
-<td align="center"><a href="https://modm.io/reference/config/modm-thingplus-rp2040">THINGPLUS-RP2040</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/config/modm-thingplus-rp2040">THINGPLUS-RP2040</a></td>
 </tr>
 </table>
 <!--/bsptable-->
