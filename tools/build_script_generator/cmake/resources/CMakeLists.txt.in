@@ -59,6 +59,12 @@ target_include_directories({{ repo }} SYSTEM
 %% for path in include_paths | sort
   {{ path | relocate | modm.posixify  }}
 %% endfor
+%% if sources | length
+  PRIVATE
+%% for path in private_include_paths | sort
+  {{ path | relocate | modm.posixify  }}
+%% endfor
+%% endif
 )
 
 %% endif

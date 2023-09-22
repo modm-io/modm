@@ -142,6 +142,7 @@ def post_build(env):
         files = []
         per_file_attr = []
         repo_filter = lambda scope: scope.repository == repo
+        inv_repo_filter = lambda scope: scope.repository != repo
         repo_flags = env.query("::collect_flags")(env, repo_filter)
 
         warning_pattern = re.compile("^-W")
@@ -174,6 +175,9 @@ def post_build(env):
             files.append( (sfile, profiles) )
 
         include_paths = env.collector_values("::path.include", filterfunc=repo_filter)
+        private_include_paths = env.collector_values(
+            "::path.include", filterfunc=inv_repo_filter
+        )
         libary_paths = env.collector_values("::path.library", filterfunc=repo_filter)
         libaries = env.collector_values("::library", filterfunc=repo_filter)
         packages = env.collector_values("::pkg-config", filterfunc=repo_filter)
@@ -188,6 +192,7 @@ def post_build(env):
             "libraries": libaries,
             "library_paths": libary_paths,
             "include_paths": include_paths,
+            "private_include_paths": private_include_paths,
             "packages": packages,
             "is_modm": repo == "modm",
             "per_file_attr": file_attrs,
