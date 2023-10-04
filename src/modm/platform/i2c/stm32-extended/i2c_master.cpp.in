@@ -513,7 +513,7 @@ MODM_ISR(I2C{{ id }}_ER)
 // ----------------------------------------------------------------------------
 
 void
-modm::platform::I2cMaster{{ id }}::initializeWithPrescaler(uint32_t timingRegisterValue)
+modm::platform::I2cMaster{{ id }}::initializeWithPrescaler(uint32_t timingRegisterValue, uint8_t isrPriority)
 {
 	Rcc::enable<Peripheral::I2c{{id}}>();
 
@@ -557,19 +557,19 @@ modm::platform::I2cMaster{{ id }}::initializeWithPrescaler(uint32_t timingRegist
 
 %% if shared_irq
 	// Enable Interrupt
-	NVIC_SetPriority({{ shared_irq }}_IRQn, 10);
+	NVIC_SetPriority({{ shared_irq }}_IRQn, isrPriority);
 	NVIC_EnableIRQ({{ shared_irq }}_IRQn);
 %% elif single_interrupt
 	// Enable Interrupt
-	NVIC_SetPriority(I2C{{ id }}_IRQn, 10);
+	NVIC_SetPriority(I2C{{ id }}_IRQn, isrPriority);
 	NVIC_EnableIRQ(I2C{{ id }}_IRQn);
 %% else
 	// Enable Error Interrupt
-	NVIC_SetPriority(I2C{{ id }}_ER_IRQn, 10);
+	NVIC_SetPriority(I2C{{ id }}_ER_IRQn, isrPriority);
 	NVIC_EnableIRQ(I2C{{ id }}_ER_IRQn);
 
 	// Enable Event Interrupt
-	NVIC_SetPriority(I2C{{ id }}_EV_IRQn, 10);
+	NVIC_SetPriority(I2C{{ id }}_EV_IRQn, isrPriority);
 	NVIC_EnableIRQ(I2C{{ id }}_EV_IRQn);
 %% endif
 
