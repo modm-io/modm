@@ -99,12 +99,12 @@ public:
 	 */
 	template<class SystemClock, baudrate_t baudrate=kBd(100), percent_t tolerance=pct(5)>
 	static void
-	initialize()
+	initialize(uint8_t isrPriority = 10u)
 	{
 		constexpr std::optional<uint32_t> timingRegisterValue = calculateTimings<SystemClock, baudrate, tolerance>();
 		static_assert(bool(timingRegisterValue), "Could not find a valid clock configuration for the requested baudrate");
 
-		initializeWithPrescaler(timingRegisterValue.value());
+		initializeWithPrescaler(timingRegisterValue.value(), isrPriority);
 	}
 
 	static bool
@@ -118,7 +118,7 @@ public:
 
 private:
 	static void
-	initializeWithPrescaler(uint32_t timingRegisterValue);
+	initializeWithPrescaler(uint32_t timingRegisterValue, uint8_t isrPriority = 10u);
 
 %% if shared_irq
 	friend void ::{{ shared_irq }}_IRQHandler();
