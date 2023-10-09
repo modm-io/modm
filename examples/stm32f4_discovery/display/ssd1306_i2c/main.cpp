@@ -10,7 +10,7 @@
  */
 
 #include <modm/board.hpp>
-#include <modm/driver/display/ssd1306.hpp>
+#include <modm/driver/display/ssd1306_i2c.hpp>
 
 /**
  * Example to demonstrate a MODM graphics display SSD1306.
@@ -24,7 +24,7 @@
 typedef GpioB9 Sda;
 typedef GpioB8 Scl;
 typedef I2cMaster1 MyI2cMaster;
-modm::Ssd1306<MyI2cMaster> display;
+modm::Ssd1306I2c<MyI2cMaster> display;
 
 // ----------------------------------------------------------------------------
 int

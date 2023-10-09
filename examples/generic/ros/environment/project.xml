@@ -7,7 +7,7 @@
   </options>
   <modules>
     <module>modm:driver:bme280</module>
-    <module>modm:driver:ssd1306</module>
+    <module>modm:driver:ssd1306.i2c</module>
     <module>modm:ros</module>
     <module>modm:communication:ros</module>
     <module>modm:processing:timer</module>

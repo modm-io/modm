@@ -14,7 +14,7 @@
 #include <modm/processing/timer.hpp>
 #include <modm/processing/protothread.hpp>
 
-#include <modm/driver/display/ssd1306.hpp>
+#include <modm/driver/display/ssd1306_i2c.hpp>
 
 #include "hardware.hpp"
 
@@ -55,7 +55,7 @@ public:
 	}
 
 protected:
-	modm::Ssd1306<MyI2cMaster, 64> display;
+	modm::Ssd1306I2c<MyI2cMaster, 64> display;
 	modm::ShortTimeout boot_timeout;
 	bool _dirty;
 	int32_t _seq;
