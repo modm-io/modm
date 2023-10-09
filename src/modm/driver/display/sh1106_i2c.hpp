@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "ssd1306.hpp"
+#include "ssd1306_i2c.hpp"
 
 namespace modm
 {
@@ -26,10 +26,10 @@ namespace modm
  * @ingroup modm_driver_sh1106
  */
 template<class I2cMaster, uint8_t Height = 64>
-class Sh1106 : public Ssd1306<I2cMaster, Height>
+class Sh1106I2c : public Ssd1306I2c<I2cMaster, Height>
 {
 public:
-	Sh1106(uint8_t address = 0x3C) : Ssd1306<I2cMaster, Height>(address) {}
+	Sh1106I2c(uint8_t address = 0x3C) : Ssd1306I2c<I2cMaster, Height>(address) {}
 
 protected:
 	modm::ResumableResult<void>
@@ -39,13 +39,10 @@ protected:
 
 		this->transaction_success = true;
 
-		this->commandBuffer[0] = ssd1306::AdressingCommands::HigherColumnStartAddress;
-		this->commandBuffer[1] = 0x02;
-
 		for (page = 0; page < Height / 8; page++)
 		{
-			this->commandBuffer[2] = 0xB0 | page;
-			this->transaction_success &= RF_CALL(this->writeCommands(3));
+			this->commandBuffer[0] = std::to_underlying(ssd1306::AdressingCommands::PageStartAddress) | page;
+			this->transaction_success &= RF_CALL(this->writeCommands(1));
 
 			RF_WAIT_UNTIL(
 				this->transaction.configureDisplayWrite((uint8_t*)&this->buffer[page], 128));
@@ -62,14 +59,14 @@ protected:
 	{
 		RF_BEGIN();
 		// Default on Power-up - can be omitted
-		this->commandBuffer[0] = ssd1306::AdressingCommands::MemoryMode;
-		this->commandBuffer[1] = ssd1306::MemoryMode::PAGE;
+		this->commandBuffer[0] = std::to_underlying(ssd1306::AdressingCommands::MemoryMode);
+		this->commandBuffer[1] = std::to_underlying(ssd1306::MemoryMode::PAGE);
 		this->transaction_success &= RF_CALL(this->writeCommands(2));
 		RF_END();
 	}
 
 private:
-	size_t page;
+	uint8_t page;
 };
 
 }  // namespace modm

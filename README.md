@@ -792,7 +792,7 @@ your specific needs.
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-pca9685">PCA9685</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-qmc5883l">QMC5883L</a></td>
 </tr><tr>
-<td align="center"><a href="https://modm.io/reference/module/modm-driver-sh1106">SH1106</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-sh1106-i2c">SH1106-I2C</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-siemens_s65">SIEMENS-S65</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-siemens_s75">SIEMENS-S75</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-sk6812">SK6812</a></td>
