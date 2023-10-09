@@ -1,0 +1,12 @@
+<library>
+  <extends>modm:nucleo-g474re</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_g474re/ssd1306_spi</option>
+  </options>
+  <modules>
+    <module>modm:driver:ssd1306.spi</module>
+    <module>modm:platform:gpio</module>
+    <module>modm:platform:spi:1</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>
