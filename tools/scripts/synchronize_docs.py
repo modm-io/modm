@@ -74,10 +74,9 @@ def name(raw_name):
                    .replace("-BITBANG", " BitBang")\
                    .replace("GPIO-SAMPLER", "Gpio Sampler")\
                    .replace("BLOCK-", "")\
-                   .replace("SPI-FLASH", "SPI Flash")\
-                   .replace("-SPI", "")
+                   .replace("SPI-FLASH", "SPI Flash")
     if result in ["DEVICE", "LIS3-TRANSPORT", "MEMORY-BUS", "TERMINAL", "ALLOCATOR",
-                  "MIRROR", "ADC-SAMPLER", "FAT", "HEAP", "--PYCACHE--", "FILE", "SPI-STACK-FLASH"]:
+                  "MIRROR", "ADC-SAMPLER", "FAT", "HEAP", "--PYCACHE--", "FILE", "SPI-STACK-FLASH", "SSD1306-COMMON"]:
         return None
     return result
 
