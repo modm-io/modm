@@ -1,0 +1,13 @@
+<library>
+  <extends>modm:nucleo-g474re</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_g474re/sh1106_i2c</option>
+  </options>
+  <modules>
+    <module>modm:driver:sh1106.i2c</module>
+    <module>modm:driver:ssd1306.i2c</module>
+    <module>modm:platform:gpio</module>
+    <module>modm:platform:i2c:1</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>
