@@ -166,6 +166,18 @@ public:
 		TIM{{ id }}->CNT = value;
 	}
 
+	static inline bool
+	isCountingUp()
+	{
+		return true;
+	}
+
+	static inline bool
+	isCountingDown()
+	{
+		return false;
+	}
+
 	static constexpr bool
 	hasAdvancedPwmControl()
 	{

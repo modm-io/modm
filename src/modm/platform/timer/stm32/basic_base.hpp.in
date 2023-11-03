@@ -217,6 +217,14 @@ public:
 	hasAdvancedPwmControl();
 
 	/**
+	 * Check current count direction
+	 */
+	static inline bool
+	isCountingUp();
+	static inline bool
+	isCountingDown();
+
+	/**
 	 * Enables or disables the Interrupt Vector.
 	 *
 	 * \param	enable
