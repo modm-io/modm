@@ -91,7 +91,7 @@ def build(env):
 
     def flag_format(flag):
         subs = {
-            "target_base": "${CMAKE_PROJECT_NAME}",
+            "target_base": "${PROJECT_NAME}",
             "project_source_dir": "${CMAKE_SOURCE_DIR}",
             "gccpath": "${MODM_GCC_PATH}",
         }
