@@ -259,6 +259,18 @@ public:
 
 
 %% if target.family not in ["l0", "l1"] and id in [15, 16, 17]
+	static inline bool
+	isCountingUp()
+	{
+		return true;
+	}
+
+	static inline bool
+	isCountingDown()
+	{
+		return false;
+	}
+
 	static constexpr bool
 	hasAdvancedPwmControl()
 	{
@@ -355,6 +367,18 @@ public:
 	hasAdvancedPwmControl()
 	{
 		return false;
+	}
+
+	static inline bool
+	isCountingUp()
+	{
+		return (TIM{{ id }}->CR1 & TIM_CR1_DIR) == 0;
+	}
+
+	static inline bool
+	isCountingDown()
+	{
+		return !isCountingUp();
 	}
 %% endif
 
