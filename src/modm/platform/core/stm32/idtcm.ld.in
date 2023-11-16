@@ -31,7 +31,11 @@ SECTIONS
 %% set dtcm_section = "DTCM"
 %% endif
 
+%% if stack_in_dtcm
 {{ linker.section_stack(dtcm_section) }}
+%% else
+{{ linker.section_stack(cont_ram.cont_name|upper) }}
+%% endif
 
 %% if "dtcm" in cont_ram.cont_name
 {{ linker.section_ram(cont_ram.cont_name|upper, "FLASH", table_copy, table_zero,

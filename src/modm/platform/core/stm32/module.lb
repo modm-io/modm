@@ -30,6 +30,15 @@ def prepare(module, options):
                 default="rom")
             )
 
+    if options[":target"].identifier.family == "h7":
+        module.add_option(
+            EnumerationOption(
+                name="main_stack_location",
+                description="SRAM (default) or DTCM (faster, but not DMA-capable)",
+                enumeration=["sram", "dtcm"],
+                default="sram")
+            )
+
     module.depends(":platform:cortex-m")
     return True
 
@@ -100,5 +109,6 @@ def post_build(env):
                 linkerscript = "dccm.ld.in"
         elif memory["name"] == "dtcm":
             # Executable ITCM and DTCM (Tightly-Coupled Memory)
+            env.substitutions["stack_in_dtcm"] = env.get(":platform:core:main_stack_location", "dtcm") == "dtcm"
             linkerscript = "idtcm.ld.in"
     env.template(linkerscript, "linkerscript.ld")
