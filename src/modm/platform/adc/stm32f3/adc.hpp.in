@@ -163,8 +163,8 @@ public:
 	// ADCs clock source selection
 	enum class ClockSource : uint32_t
 	{
-		NoClock = 0, // No clock selected.
 %% if target["family"] in ["g4"]
+		NoClock = 0, // No clock selected.
 %% if id in [1, 2]
 		Pll = RCC_{{ ccipr }}_ADC12SEL_0, // PLL “P” clock selected as ADC clock
 		SystemClock = RCC_{{ ccipr }}_ADC12SEL_1 , // System clock selected as ADCs clock
@@ -172,7 +172,13 @@ public:
 		Pll = RCC_{{ ccipr }}_ADC345SEL_0, // PLL “P” clock selected as ADC clock
 		SystemClock = RCC_{{ ccipr }}_ADC345SEL_1 , // System clock selected as ADCs clock
 %% endif
+%% elif target["family"] in ["h7"]
+		Pll2P = 0,
+		Pll3R = RCC_{{ ccipr }}_ADCSEL_0,
+		PerClk = RCC_{{ ccipr }}_ADCSEL_1,
+		NoClock = PerClk, // for compatibility if sync. clock is used and setting is ignored
 %% else
+		NoClock = 0, // No clock selected.
 		PllSai1 = RCC_{{ ccipr }}_ADCSEL_0, // PLLSAI1 "R" clock (PLLADC1CLK) selected as ADCs clock
 %% if target["family"] != "l5"
 		PllSai2 = RCC_{{ ccipr }}_ADCSEL_1, // PLLSAI2 "R" clock (PLLADC2CLK) selected as ADCs clock
@@ -337,7 +343,11 @@ public:
 	static inline void
 	initialize(	const ClockMode clk = ClockMode::DoNotChange,
 %% if clock_mux
+%% if target["family"] == "h7"
+				const ClockSource clk_src = ClockSource::PerClk,
+%% else
 				const ClockSource clk_src = ClockSource::SystemClock,
+%% endif
 %% endif
 				const Prescaler pre = Prescaler::Disabled,
 				const CalibrationMode cal = CalibrationMode::DoNotCalibrate,
