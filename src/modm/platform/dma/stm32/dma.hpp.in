@@ -384,7 +384,7 @@ public:
 		static void
 		clearInterruptFlags(InterruptFlags_t flags = InterruptFlags::All)
 		{
-			ControlHal::clearInterruptFlags(flags, ChannelID);
+			ControlHal::clearInterruptFlags(InterruptFlags(flags.value), ChannelID);
 		}
 
 		/**
