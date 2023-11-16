@@ -21,7 +21,7 @@ class Instance(Module):
         module.description = "Instance {}".format(self.instance)
 
     def prepare(self, module, options):
-        module.depends(":platform:adc")
+        module.depends(":platform:adc", ":math:algorithm")
         return True
 
     def build(self, env):

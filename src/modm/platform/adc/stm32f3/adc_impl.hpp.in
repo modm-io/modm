@@ -211,7 +211,6 @@ modm::platform::Adc{{ id }}::configureChannel(Channel channel,
 
 }
 
-
 bool
 modm::platform::Adc{{ id }}::setChannel(Channel channel,
 										SampleTime sampleTime)
@@ -221,6 +220,42 @@ modm::platform::Adc{{ id }}::setChannel(Channel channel,
 	}
 
 	ADC{{ id }}->SQR1 = (static_cast<uint8_t>(channel) << ADC_SQR1_SQ1_Pos) & ADC_SQR1_SQ1_Msk;
+	return true;
+}
+
+bool
+modm::platform::Adc{{ id }}::setChannelSequence(std::span<const SequenceChannel> sequence)
+{
+	if (sequence.size() > 16 || sequence.size() == 0) {
+		return false;
+	}
+
+	ADC{{ id }}->SQR1 = sequence.size() - 1;
+
+	for (const auto [i, config] : modm::enumerate(sequence)) {
+		const auto [channel, sampleTime] = config;
+		if (!configureChannel(channel, sampleTime)) {
+			return false;
+		}
+
+		if (i < 4) {
+			const auto shift = (i + 1) * 6;
+			const auto mask = 0b111111u << shift;
+			ADC{{ id }}->SQR1 = (ADC{{ id }}->SQR1 & ~mask) | (std::to_underlying(channel) << shift);
+		} else if (i < 9) {
+			const auto shift = (i - 4) * 6;
+			const auto mask = 0b111111u << shift;
+			ADC{{ id }}->SQR2 = (ADC{{ id }}->SQR2 & ~mask) | (std::to_underlying(channel) << shift);
+		} else if (i < 14) {
+			const auto shift = (i - 9) * 6;
+			const auto mask = 0b111111u << shift;
+			ADC{{ id }}->SQR3 = (ADC{{ id }}->SQR3 & ~mask) | (std::to_underlying(channel) << shift);
+		} else {
+			const auto shift = (i - 14) * 6;
+			const auto mask = 0b111111u << shift;
+			ADC{{ id }}->SQR4 = (ADC{{ id }}->SQR4 & ~mask) | (std::to_underlying(channel) << shift);
+		}
+	}
 	return true;
 }
 
@@ -239,15 +274,32 @@ modm::platform::Adc{{ id }}::startConversion()
 {
 	// TODO: maybe add more interrupt flags
 	acknowledgeInterruptFlags(InterruptFlag::EndOfRegularConversion |
-			InterruptFlag::EndOfSampling | InterruptFlag::Overrun);
+			InterruptFlag::EndOfSampling | InterruptFlag::Overrun |
+			InterruptFlag::EndOfRegularSequenceOfConversions);
 	// starts single conversion for the regular group
 	ADC{{ id }}->CR |= ADC_CR_ADSTART;
+}
+
+void
+modm::platform::Adc{{ id }}::stopConversion()
+{
+	ADC{{ id }}->CR |= ADC_CR_ADSTP | ADC_CR_JADSTP;
+	while ((ADC{{ id }}->CR & (ADC_CR_ADSTP | ADC_CR_JADSTP)) != 0);
+
+	acknowledgeInterruptFlags(InterruptFlag::EndOfRegularConversion |
+			InterruptFlag::EndOfSampling | InterruptFlag::Overrun);
 }
 
 bool
 modm::platform::Adc{{ id }}::isConversionFinished()
 {
 	return static_cast<bool>(getInterruptFlags() & InterruptFlag::EndOfRegularConversion);
+}
+
+bool
+modm::platform::Adc{{ id }}::isConversionSequenceFinished()
+{
+	return static_cast<bool>(getInterruptFlags() & InterruptFlag::EndOfRegularSequenceOfConversions);
 }
 
 void

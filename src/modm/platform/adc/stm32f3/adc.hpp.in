@@ -15,10 +15,13 @@
 #ifndef MODM_STM32F3_ADC{{ id }}_HPP
 #define MODM_STM32F3_ADC{{ id }}_HPP
 
-#include <stdint.h>
+#include <cstdint>
+#include <span>
+#include <utility>
 #include "../device.hpp"
 #include <modm/architecture/interface/register.hpp>
 #include <modm/platform/gpio/connector.hpp>
+#include <modm/math/algorithm/enumerate.hpp>
 
 namespace modm
 {
@@ -260,6 +263,13 @@ public:
 		Cycles602 	= 0b111,	//< 601.5 ADC clock cycles
 	};
 %% endif
+
+	struct SequenceChannel
+	{
+		Channel channel{};
+		SampleTime sampleTime{};
+	};
+
 	enum class CalibrationMode : uint32_t
 	{
 		SingleEndedInputsMode = 0,
@@ -414,6 +424,9 @@ public:
 	setChannel(const Channel channel,
 			const SampleTime sampleTime=static_cast<SampleTime>(0b000));
 
+	static inline bool
+	setChannelSequence(std::span<const SequenceChannel> sequence);
+
 	/// Setting the channel for a Pin
 	template< class Gpio >
 	static inline bool
@@ -464,12 +477,18 @@ public:
 	static inline void
 	startConversion();
 
+	static inline void
+	stopConversion();
+
 	/**
 	 * @return If the conversion is finished.
 	 * @pre A conversion should have been started with startConversion()
 	 */
 	static inline bool
 	isConversionFinished();
+
+	static inline bool
+	isConversionSequenceFinished();
 
 	/**
 	 * Start a new injected conversion sequence.
