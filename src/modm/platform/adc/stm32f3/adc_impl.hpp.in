@@ -195,14 +195,14 @@ modm::platform::Adc{{ id }}::configureChannel(Channel channel,
 	uint32_t tmpreg = 0;
 	if (static_cast<uint8_t>(channel) < 10) {
 		tmpreg = ADC{{ id }}->SMPR1
-			& ((~ADC_SMPR1_SMP0) << (static_cast<uint8_t>(channel) * 3));
+			& ~((ADC_SMPR1_SMP0) << (static_cast<uint8_t>(channel) * 3));
 		tmpreg |= static_cast<uint32_t>(sampleTime) <<
 						(static_cast<uint8_t>(channel) * 3);
 		ADC{{ id }}->SMPR1 = tmpreg;
 	}
 	else {
 		tmpreg = ADC{{ id }}->SMPR2
-			& ((~ADC_SMPR2_SMP10) << ((static_cast<uint8_t>(channel)-10) * 3));
+			& ~((ADC_SMPR2_SMP10) << ((static_cast<uint8_t>(channel)-10) * 3));
 		tmpreg |= static_cast<uint32_t>(sampleTime) <<
 						((static_cast<uint8_t>(channel)-10) * 3);
 		ADC{{ id }}->SMPR2 = tmpreg;
