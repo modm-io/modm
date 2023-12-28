@@ -68,6 +68,10 @@ jobs:
           export TERM=xterm-256color
           export COLUMNS=120
           python3 tools/scripts/docs_modm_io_generator.py -c -j4 -d
+      - name: Size of documentation archive
+        if: always()
+        run: |
+          ls -lh modm-api-docs.tar.gz
       - name: Upload api documentation to docs.modm.io
         if: always()
         env:

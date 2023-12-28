@@ -13,8 +13,9 @@
 import os
 import sys
 import json
+import gzip
 import shutil
-import zipfile
+import hashlib
 import tempfile
 import argparse
 import datetime
@@ -71,7 +72,8 @@ def get_targets():
         elif target.platform == "sam":
             short_id.naming_schema = "{platform}{family}{series}"
 
-        short_id.set("platform", target.platform) # invalidate caches
+        # invalidate id cache due to lack of proper API
+        short_id.set("platform", target.platform)
         minimal_targets[short_id.string].append(target)
 
     target_list = []
@@ -99,15 +101,15 @@ def get_targets():
 def main():
     parser = argparse.ArgumentParser()
     test_group = parser.add_mutually_exclusive_group()
-    test_group.add_argument("--test", "-t", action='store_true', help="Test mode: generate only a few targets. List includes targets with multiple board modules.")
-    test_group.add_argument("--test2", "-t2", action='store_true', help="Test mode: generate only a few targets. List has targets from the real target list.")
+    test_group.add_argument("--test", "-t", action="store_true", help="Test mode: generate only a few targets. List includes targets with multiple board modules.")
+    test_group.add_argument("--test2", "-t2", action="store_true", help="Test mode: generate only a few targets. List has targets from the real target list.")
     parser.add_argument("--jobs", "-j", type=int, default=2, help="Number of parallel doxygen processes")
-    parser.add_argument("--local-temp", "-l", action='store_true', help="Create temporary directory inside current working directory")
+    parser.add_argument("--local-temp", "-l", action="store_true", help="Create temporary directory inside current working directory")
     group = parser.add_mutually_exclusive_group()
-    group.add_argument("--compress", "-c", action='store_true', help="Compress output into gzip archive")
+    group.add_argument("--compress", "-c", action="store_true", help="Compress output into gzip archive")
     group.add_argument("--output", "-o", type=str, help="Output directory")
-    parser.add_argument("--overwrite", "-f", action='store_true', help="Overwrite existing data in output directory (Removes all files from output directory.)")
-    parser.add_argument("--deduplicate", "-d", action='store_true', help="Deduplicate identical files with symlinks.")
+    parser.add_argument("--overwrite", "-f", action="store_true", help="Overwrite existing data in output directory (Removes all files from output directory.)")
+    parser.add_argument("--deduplicate", "-d", action="store_true", help="Deduplicate identical files with symlinks.")
     parser.add_argument("--target-job", help="Create a single target from job string.")
     args = parser.parse_args()
 
@@ -136,48 +138,52 @@ def main():
     with tempfile.TemporaryDirectory(dir=temp_dir) as tempdir:
         tempdir = Path(tempdir)
         modm_path = os.path.abspath(os.path.dirname(sys.argv[0]) + "/../..")
-        print("Modm Path: {}".format(modm_path))
-        print("Temporary directory: {}".format(str(tempdir)))
+        print(f"Modm Path: {modm_path}")
+        print(f"Temporary directory: {tempdir}")
         output_dir = (tempdir / "output")
         (output_dir / "develop/api").mkdir(parents=True)
         os.chdir(tempdir)
         print("Starting to generate documentation...")
         template_overview(output_dir, device_list, board_list, template_path)
-        print("... for {} devices, estimated memory footprint is {} MB".format(len(device_list) + len(board_list), (len(device_list)*70)+2000))
+        print(f"... for {len(device_list) + len(board_list)} devices, estimated memory footprint is {len(device_list)*70+2000} MB")
         with ThreadPool(args.jobs) as pool:
             # We can only pass one argument to pool.map
-            devices = [f"python3 {filepath} --target-job '{modm_path}|{tempdir}|{dev}||{args.deduplicate}'" for dev in device_list]
-            devices += [f"python3 {filepath} --target-job '{modm_path}|{tempdir}|{dev}|{brd}|{args.deduplicate}'" for (brd, dev) in board_list]
-            results = pool.map(lambda d: subprocess.run(d, shell=True).returncode, list(set(devices)))
-        # output_dir.rename(cwd / 'modm-api-docs')
+            devices = [f'python3 {filepath} --target-job "{modm_path}|{tempdir}|{dev}||{args.deduplicate}|{args.compress}"' for dev in device_list]
+            devices += [f'python3 {filepath} --target-job "{modm_path}|{tempdir}|{dev}|{brd}|{args.deduplicate}|{args.compress}"' for (brd, dev) in board_list]
+            devices = list(set(devices))
+            # Run the first generation first so that the other jobs can already deduplicate properly
+            results = [subprocess.call(devices[0], shell=True)]
+            results += pool.map(lambda d: subprocess.call(d, shell=True), devices[1:])
+            # remove all the hash files
+            for file in (output_dir / "develop/api").glob("*.hash"):
+                file.unlink()
         if args.compress:
             print("Zipping docs ...")
-            # Zipping may take more than 10 minutes
-            os.system(f"(cd {str(output_dir)} && {'g' if is_running_on_macos else ''}tar --checkpoint=.100 -czf {str(cwd / 'modm-api-docs.tar.gz')} .)")
-            # shutil.make_archive(str(cwd / 'modm-api-docs'), 'gztar', str(output_dir))
+            # Zipping is *much* faster via command line than via python!
+            tar = "gtar" if is_running_on_macos else "tar"
+            zip_cmd = f"(cd {str(output_dir)} && {tar} --checkpoint=.100 -czf {str(cwd)}/modm-api-docs.tar.gz .)"
+            subprocess.call(zip_cmd, shell=True)
         else:
             if args.overwrite and final_output_dir.exists():
                 for i in final_output_dir.iterdir():
-                    print('Removing {}'.format(i))
+                    print(f"Removing {i}")
                     if i.is_dir():
                         shutil.rmtree(i)
                     else:
                         os.remove(i)
-            print('Moving {} -> {}'.format(output_dir, final_output_dir))
-            #shutil.move(str(output_dir) + '/', str(final_output_dir))
             print(f"Moving {output_dir} -> {final_output_dir}")
             output_dir.rename(final_output_dir)
-        return results.count(0) == len(results)
+        return len(results) - results.count(0)
 
 
 def create_target(argument):
-    modm_path, tempdir, device, board, deduplicate = argument.split("|")
+    modm_path, tempdir, device, board, deduplicate, compress = argument.split("|")
     tempdir = Path(tempdir)
     output_dir = board if board else device
     try:
-        print("Generating documentation for {} ...".format(output_dir))
+        print(f"Generating documentation for {output_dir}...")
 
-        options = ["modm:target={0}".format(device)]
+        options = [f"modm:target={device}"]
         if device.startswith("at"):
             options.append("modm:platform:core:f_cpu=16000000")
         builder = lbuild.api.Builder(options=options)
@@ -185,7 +191,7 @@ def create_target(argument):
         modules = sorted(builder.parser.modules.keys())
 
         if board:
-            chosen_board = "modm:board:{}".format(board)
+            chosen_board = f"modm:board:{board}"
         else:
             # Only allow the first board module to be built (they overwrite each others files)
             chosen_board = next((m for m in modules if ":board:" in m), None)
@@ -200,51 +206,71 @@ def create_target(argument):
 
         builder.build(output_dir, modules)
 
-        print('Executing: (cd {}/modm/docs/ && doxypress doxypress.json)'.format(output_dir))
-        retval = os.system('(cd {}/modm/docs/ && doxypress doxypress.json > /dev/null 2>&1)'.format(output_dir))
+        print(f"Executing: (cd {output_dir}/modm/docs/ && doxypress doxypress.json)")
+        retval = subprocess.call(f"(cd {output_dir}/modm/docs/ && doxypress doxypress.json > /dev/null 2>&1)", shell=True)
+        # retval = subprocess.call(f"(cd {output_dir}/modm/docs/ && doxygen doxyfile.cfg > /dev/null 2>&1)", shell=True)
         if retval != 0:
-            print("Error {} generating documentation for device {}.".format(retval, output_dir))
+            print(f"Error {retval} generating documentation for device {output_dir}.")
             return False
-        print("Finished generating documentation for device {}.".format(output_dir))
+        print(f"Finished generating documentation for device {output_dir}.")
 
         srcdir = (tempdir / output_dir / "modm/docs/html")
-        destdir = tempdir / 'output/develop/api' / output_dir
+        destdir = tempdir / "output/develop/api" / output_dir
 
         if deduplicate == "True":
-            print("Deduplicating files for {}...".format(device))
-            symlinks = defaultdict(list)
-            for file in (tempdir / 'output').rglob('*'):
-                if file.is_dir() or file.is_symlink(): continue;
-                key = file.relative_to(tempdir).parts[4:]
-                if key:
-                    symlinks[os.path.join(*key)].append(file)
+            print(f"Deduplicating files for {device}...")
+            # Find and build the hash symlink database
+            hashdb = {}
+            for hashes in tempdir.glob("output/develop/api/*.hash"):
+                for line in hashes.read_text().splitlines():
+                    fhash, path = line.split(" ", 1)
+                    hashdb[fhash] = os.path.join(hashes.stem, path)
+            # Generate a list of files and replace them with symlinks
+            our_hashdb = {}
+            # symlinks = {}
             dot_counter = 0
-            for file in srcdir.rglob('*'):
+            for file in srcdir.rglob("*"):
                 if file.is_dir():
                     print(end="", flush=True)
                     continue
-                key = str(file.relative_to(srcdir))
-                if key in symlinks:
-                    for kfile in symlinks[key]:
-                        symlinks[hash(kfile.read_bytes())].append(kfile)
-                    del symlinks[key]
-                fhash = hash(file.read_bytes())
-                if fhash in symlinks:
-                    dot_counter += 1
-                    if dot_counter % 30 == 0: print(".", end="")
-                    rpath = symlinks[fhash][0].relative_to(tempdir / 'output/develop/api')
-                    lpath = os.path.relpath(srcdir, file.parent)
-                    sympath = os.path.join("..", lpath, rpath)
-                    # print("Linking {} -> {}".format(file.relative_to(srcdir), sympath))
+                dot_counter += 1
+                if dot_counter % 30 == 0: print(".", end="")
+                file_bytes = file.read_bytes()
+                if compress == "True":
+                    cfile = file.with_suffix(file.suffix + ".gz")
+                    file_bytes = gzip.compress(file_bytes, mtime=0)
+                    cfile.write_bytes(file_bytes)
+                    file.unlink()
+                    file = cfile
+                relpath = file.relative_to(srcdir)
+                fhash = hashlib.md5(file_bytes).hexdigest()
+                if (rpath := hashdb.get(fhash)) is not None:
+                    # Previously seen file can be symlinked
+                    lpath = os.path.relpath(srcdir.parent, file.parent)
+                    sympath = os.path.join(lpath, rpath)
+                    # symlinks[relpath] = sympath
                     file.unlink()
                     file.symlink_to(sympath)
+                    # print(f"Symlinking {file.relative_to(srcdir)} to {sympath}")
+                else:
+                    # This is a new file, store it in our hashdb
+                    our_hashdb[fhash] = relpath
+
+            # Write the symlink file
+            # if symlinks:
+            #     lines = [f"{path} -> {sympath}" for path, sympath in symlinks.items()]
+            #     (srcdir / "symlinks.txt").write_text("\n".join(lines))
+            # Write out our hashdb
+            if our_hashdb:
+                lines = [f"{fhash} {relpath}" for fhash, relpath in our_hashdb.items()]
+                destdir.with_suffix(".hash").write_text("\n".join(lines))
 
         # Only move folder *after* deduplication to prevent race condition with file.unlink()
         print(f"\nMoving {srcdir.relative_to(tempdir)} -> {destdir.relative_to(tempdir)}", flush=True)
         srcdir.rename(destdir)
         return True
     except Exception as e:
-        print("Error generating documentation for device {}: {}".format(output_dir, e))
+        print(f"Error generating documentation for device {output_dir}: {e}")
         return False
 
 
@@ -255,18 +281,14 @@ def template_overview(output_dir, device_list, board_list, template_path):
         date=datetime.datetime.now().strftime("%d.%m.%Y, %H:%M"),
         num_devices=len(device_list),
         num_boards=len(board_list))
-    with open(str(output_dir) + "/index.html","w+") as f:
-        f.write(html)
+    (output_dir / "index.html").write_text(html)
     json_data = {
         "devices": [str(d).upper() for d in device_list] + [rename_board(b) for (b,_) in board_list],
         "name2board": [{rename_board(b): b} for (b,_) in board_list],
     }
-    with open(str(output_dir) + "/develop/targets.json","w+") as outfile:
+    with (output_dir / "develop/targets.json").open("w+", encoding="UTF-8") as outfile:
         json.dump(json_data, outfile)
-    with open(str(output_dir) + "/robots.txt","w+") as f:
-        robots_txt = "User-agent: *\n"
-        f.write(robots_txt)
-
+    (output_dir / "robots.txt").write_text("User-agent: *\n")
 
 if __name__ == "__main__":
-    exit(0 if main() else -1)
+    exit(main())

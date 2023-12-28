@@ -219,7 +219,7 @@ function showDocumentation() {
         return;
     }
     n2b = name2board[targetinput.value]
-    var url ="/" + releaseinput.value + "/api/" + (n2b ? n2b : targetinput.value).toLowerCase() + "/";
+    var url ="/" + releaseinput.value + "/api/" + (n2b ? n2b : targetinput.value).toLowerCase() + "/index.html";
     location.href = url;
 }
 targetinput.addEventListener("input", function(event) {
