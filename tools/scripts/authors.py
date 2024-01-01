@@ -17,6 +17,7 @@ import argparse
 import re
 
 author_handles = {
+    "Alexander Solovets": "mbait",
     "Amar": "fb39ca4",
     "Amarok McLion": "amarokmclion",
     "Andre Gilerson": "AndreGilerson",
@@ -42,12 +43,14 @@ author_handles = {
     "Jacob Schultz Andersen": "jasa",
     "Jakob Riepler": "XDjackieXD",
     "Jeff McBride": "mcbridejc",
+    "Jens Böckmann": "jensboe",
     "Jonas Kazem Andersen": "JKazem",
     "Jonas Kazem Andersen": "JKazem",
     "Julia Gutheil": None,
     "Jörg Hoffmann": "19joho66",
     "Kaelin Laundry": "WasabiFan",
     "Kevin Läufer": "ekiwi",
+    "Klaus Schnass": "klsc-zeat",
     "Linas Nikiperavicius": "linasnikis",
     "Lucas Mösch": "lmoesch",
     "Luiz Gili": "lgili",
@@ -89,8 +92,6 @@ author_handles = {
     "Vivien Henry": "lukh",
     "Zawadniak Pedro": "PDR5",
     "Álan Crístoffer": "acristoffers",
-    "Klaus Schnass": "klsc-zeat",
-    "Alexander Solovets": "mbait",
 }
 
 def get_author_log(since = None, until = None, handles = False, count = False):

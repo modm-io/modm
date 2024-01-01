@@ -52,6 +52,72 @@ pay attention to. Medium impact changes are also worth looking at.
 
 <!--releases-->
 
+## 2024-01-01: 2023q4 release
+
+This release covers everything from 2023-10-01 and has been tested with avr-gcc
+v12.2.0 from Upstream and arm-none-eabi-gcc v12.2.1 from xpack.
+
+Features:
+
+- STM32H7 SPI driver with DMA support.
+
+Integrated Projects:
+
+- ETL upgraded to v20.38.10.
+- LVGL upgraded to v8.3.11.
+- Nanopb upgraded to v0.4.8.
+- STM32G0 headers upgraded to v1.4.3.
+- STM32F4 headers upgraded to v2.6.9.
+- STM32U5 headers upgraded to v1.3.1.
+
+Fixes:
+
+- Fix SPI clocks on Nucleo-H723ZG boards.
+- Do not require protothreads to use SPI with fibers.
+- Place main stack in DMA-able SRAM on STM32H7.
+
+New device drivers:
+
+- BMI088 IMU driver as [`modm:driver:bmi088`][].
+
+Known bugs:
+
+- Fibers are not implemented for ARM64 targets. See [#1111][].
+- OpenOCD cannot enable SWO on STM32H7 targets. See [#1079][].
+- STM32F7: D-Cache not enabled by default. See [#485][].
+- `lbuild build` and `lbuild clean` do not remove all previously generated files
+  when the configuration changes. See [#285][].
+- Generating modm on Windows creates paths with `\` that are not compatible with
+  Unix. See [#310][].
+- `arm-none-eabi-gdb` TUI and GDBGUI interfaces are not supported on Windows.
+  See [#591][].
+
+Many thanks to all our contributors.
+A special shoutout to first timers 🎉:
+
+- Christopher Durand ([@chris-durand][])
+- Jens Böckmann ([@jensboe][]) 🎉
+- Niklas Hauser ([@salkinium][])
+- Sergey Pluzhnikov ([@ser-plu][])
+
+PR [#1112][] -> [2023q4][].
+
+<details>
+<summary>Detailed changelog</summary>
+
+#### 2023-10-04: Add STM32H7 SPI driver with DMA support
+
+PR [#1052][] -> [53796b0][].  
+Tested in hardware by [@chris-durand][].
+
+#### 2023-10-05: Add BMI088 driver
+
+PR [#1052][] -> [a771042][].  
+Tested in hardware by [@chris-durand][].
+
+</details>
+
+
 ## 2023-10-01: 2023q3 release
 
 This release covers everything from 2023-07-01 and has been tested with avr-gcc
@@ -2769,6 +2835,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [2023q1]: https://github.com/modm-io/modm/releases/tag/2023q1
 [2023q2]: https://github.com/modm-io/modm/releases/tag/2023q2
 [2023q3]: https://github.com/modm-io/modm/releases/tag/2023q3
+[2023q4]: https://github.com/modm-io/modm/releases/tag/2023q4
 
 [@19joho66]: https://github.com/19joho66
 [@ASMfreaK]: https://github.com/ASMfreaK
@@ -2799,6 +2866,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [@henrikssn]: https://github.com/henrikssn
 [@hshose]: https://github.com/hshose
 [@jasa]: https://github.com/jasa
+[@jensboe]: https://github.com/jensboe
 [@klsc-zeat]: https://github.com/klsc-zeat
 [@lgili]: https://github.com/lgili
 [@linasnikis]: https://github.com/linasnikis
@@ -2869,6 +2937,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [`modm:driver:apa102`]: https://modm.io/reference/module/modm-driver-apa102
 [`modm:driver:at24mac402`]: https://modm.io/reference/module/modm-driver-at24mac402
 [`modm:driver:block.device:spi.stack.flash`]: https://modm.io/reference/module/modm-driver-block-device-spi-stack-flash
+[`modm:driver:bmi088`]: https://modm.io/reference/module/modm-driver-bmi088
 [`modm:driver:bno055`]: https://modm.io/reference/module/modm-driver-bno055
 [`modm:driver:cat24aa`]: https://modm.io/reference/module/modm-driver-cat24aa
 [`modm:driver:cycle_counter`]: https://modm.io/reference/module/modm-driver-cycle_counter
@@ -2927,11 +2996,15 @@ Please note that contributions from xpcc were continuously ported to modm.
 [#1049]: https://github.com/modm-io/modm/pull/1049
 [#1050]: https://github.com/modm-io/modm/pull/1050
 [#1051]: https://github.com/modm-io/modm/pull/1051
+[#1052]: https://github.com/modm-io/modm/pull/1052
 [#1053]: https://github.com/modm-io/modm/pull/1053
 [#1054]: https://github.com/modm-io/modm/pull/1054
 [#1063]: https://github.com/modm-io/modm/pull/1063
 [#1066]: https://github.com/modm-io/modm/pull/1066
+[#1079]: https://github.com/modm-io/modm/pull/1079
 [#1088]: https://github.com/modm-io/modm/pull/1088
+[#1111]: https://github.com/modm-io/modm/pull/1111
+[#1112]: https://github.com/modm-io/modm/pull/1112
 [#118]: https://github.com/modm-io/modm/pull/118
 [#122]: https://github.com/modm-io/modm/pull/122
 [#132]: https://github.com/modm-io/modm/pull/132
@@ -3212,6 +3285,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [516b2b3]: https://github.com/modm-io/modm/commit/516b2b3
 [517bd84]: https://github.com/modm-io/modm/commit/517bd84
 [5332765]: https://github.com/modm-io/modm/commit/5332765
+[53796b0]: https://github.com/modm-io/modm/commit/53796b0
 [544f6d3]: https://github.com/modm-io/modm/commit/544f6d3
 [55d5911]: https://github.com/modm-io/modm/commit/55d5911
 [564effa]: https://github.com/modm-io/modm/commit/564effa
@@ -3288,6 +3362,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [a38feca]: https://github.com/modm-io/modm/commit/a38feca
 [a607613]: https://github.com/modm-io/modm/commit/a607613
 [a6b4186]: https://github.com/modm-io/modm/commit/a6b4186
+[a771042]: https://github.com/modm-io/modm/commit/a771042
 [a8edbe8]: https://github.com/modm-io/modm/commit/a8edbe8
 [ab9bcee]: https://github.com/modm-io/modm/commit/ab9bcee
 [ac46099]: https://github.com/modm-io/modm/commit/ac46099
