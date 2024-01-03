@@ -34,11 +34,14 @@
 
 // Redirect TinyUSB asserts to use modm_assert
 #define MODM_ASSERT_1ARGS(_cond) \
-	TU_VERIFY_DEFINE(_cond, modm_assert(0, "tu", \
-		__FILE__ ":" MODM_STRINGIFY(__LINE__) " -> \"" #_cond "\""), false)
+	do { \
+		modm_assert(_cond, "tu", __FILE__ ":" MODM_STRINGIFY(__LINE__) " -> \"" #_cond "\""); \
+	} while(0)
 
 #define MODM_ASSERT_2ARGS(_cond, _ret) \
-	TU_VERIFY_DEFINE(_cond, modm_assert_continue_fail(0, "tu", \
-		__FILE__ ":" MODM_STRINGIFY(__LINE__) " -> \"" #_cond "\""), _ret)
+	do { \
+		if (!modm_assert_continue_fail(_cond, "tu", __FILE__ ":" MODM_STRINGIFY(__LINE__) " -> \"" #_cond "\"")) \
+		{ return _ret; } \
+	} while(0)
 
 #define TU_ASSERT(...) _GET_3RD_ARG(__VA_ARGS__, MODM_ASSERT_2ARGS, MODM_ASSERT_1ARGS,UNUSED)(__VA_ARGS__)

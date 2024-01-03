@@ -98,7 +98,7 @@ def build(env):
             # PMA buffer size: 512B or 1024B
             env.copy("tinyusb/src/portable/st/stm32_fsdev/", "portable/st/stm32_fsdev/")
         else:
-            env.copy("tinyusb/src/portable/st/synopsys", "portable/st/synopsys/")
+            env.copy("tinyusb/src/portable/synopsys/dwc2/", "portable/synopsys/dwc2/")
 
     elif target.platform == "sam":
         if target.family == "g5x":

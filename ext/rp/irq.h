@@ -24,7 +24,7 @@ irq_set_enabled(int irqn, bool enable)
 }
 
 static inline void
-irq_set_exclusive_handler(int irqn, void (*handler)())
+irq_set_exclusive_handler(int irqn, void (*handler)(void))
 {
 	(void) irqn;
 	(void) handler;
@@ -32,11 +32,11 @@ irq_set_exclusive_handler(int irqn, void (*handler)())
 }
 
 static inline void
-irq_add_shared_handler(unsigned int irqn, void (*handler)(), uint8_t order_priority)
+irq_add_shared_handler(unsigned int irqn, void (*handler)(void), uint8_t order_priority)
 {
-    (void) irqn;
-    (void) handler;
-    (void) order_priority;
+	(void) irqn;
+	(void) handler;
+	(void) order_priority;
 }
 
 #define PICO_SHARED_IRQ_HANDLER_HIGHEST_ORDER_PRIORITY 0xff

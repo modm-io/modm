@@ -47,6 +47,7 @@ def build(env):
         env.copy("irq.h", "hardware/irq.h")
         env.copy("timer.h", "hardware/timer.h")
         env.copy("resets.h", "hardware/resets.h")
+        env.copy("sync.h", "hardware/sync.h")
 
     env.substitutions = {
         "headers": headers,
