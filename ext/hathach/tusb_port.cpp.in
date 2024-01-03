@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2020, Erik Henriksson
- * Copyright (c) 2020, Niklas Hauser
+ * Copyright (c) 2020, 2024, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -15,10 +15,10 @@
 #include <modm/architecture/interface/atomic_lock.hpp>
 #include "tusb.h"
 
-%% for irq in irqs | sort
+%% for irq, port, mode in irqs | sort
 MODM_ISR({{irq}})
 {
-	tud_int_handler({{port}});
+	tu{{mode}}_int_handler({{port}});
 }
 %% endfor
 

@@ -12,10 +12,11 @@
 
 #pragma once
 
+#include "tusb.h"
+
 #if defined(CFG_TUD_CDC) && CFG_TUD_CDC
 
 #include <modm/architecture/interface/uart.hpp>
-#include "tusb.h"
 
 namespace modm::platform
 {

@@ -2,7 +2,7 @@
   <extends>modm:disco-f303vc</extends>
   <options>
     <option name="modm:build:build.path">../../../build/stm32f3_discovery/usb_dfu</option>
-    <option name="modm:tinyusb:config">device.dfu</option>
+    <option name="modm:tinyusb:config">device.dfu_rt</option>
    </options>
    <modules>
      <module>modm:build:scons</module>

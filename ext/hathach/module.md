@@ -10,6 +10,64 @@ correct interrupt mapping, a serial number based on the UID of the device,
 as well as remapping the assertions of TinyUSB.
 
 
+## Full vs High Speed Ports
+
+Some microcontroller have USB peripherals capable of using external high speed
+transceivers via an ULPI interface. TinyUSB can be configured to run device
+and host classes on one port or both on separate ports at the same time.
+You can configure this via these module options:
+
+```xml
+<option name="modm:tinyusb:device:port">fs</option>
+<option name="modm:tinyusb:host:port">hs</option>
+```
+
+However, the high speed capable port can also run in full speed mode, in which
+case you must configure TinyUSB to *not* use the ULPI interface:
+
+```xml
+<option name="modm:tinyusb:max-speed">full</option>
+```
+
+
+## Initializing USB
+
+The `modm:platform:usb` module provides the correct way of initializing the USB
+peripheral, however, you must connect the right signals too:
+
+```cpp
+// USB is timing-sensitive, so prioritize the IRQs accordingly
+Usb::initialize<SystemClock>(/*priority=*/3);
+
+// For Device-Only USB implementations, this is enough
+Usb::connect<GpioA11::Dm, GpioA12::Dp>();
+
+// But for On-The-Go (OTG) USB implementations, you need more:
+Usb::connect<GpioA11::Dm, GpioA12::Dp, GpioA10::Id>();
+
+// For high speed USB ports, you need to connect all ULPI signals:
+UsbHs::connect<
+		GpioA5::Ulpick,	GpioC0::Ulpistp, GpioC2::Ulpidir, GpioH4::Ulpinxt,
+		GpioA3::Ulpid0, GpioB0::Ulpid1, GpioB1::Ulpid2, GpioB10::Ulpid3,
+		GpioB11::Ulpid4, GpioB12::Ulpid5, GpioB13::Ulpid6, GpioB5::Ulpid7>();
+```
+
+Note that depending on your specific hardware setup, you may need to fiddle
+around to find the right VBus sensing mechanism. Please look at the TinyUSB
+board definitions and examples for inspiration.
+
+```cpp
+// Enable hardware Vbus sensing on GpioA9 (this can be tricky to get right!)
+USB_OTG_FS->GCCFG |= USB_OTG_GCCFG_VBDEN;
+```
+
+!!! warning "USB shares resources with CAN"
+	Note that on STM32F1 and STM32F3 the USB interrupts and RAM are shared with CAN,
+	thus there are conflicts in IRQ definitions as well as resource limitions in
+	hardware. On some STM32F3, the USB IRQs can be remapped, this is done
+	automatically by our port.
+
+
 ## Autogeneration of USB Descriptors
 
 You can select the device classes you want to use via the `modm:tinyusb:config`
@@ -19,7 +77,7 @@ list option:
 - `device.msc`: Mass Storage class.
 - `device.midi`: MIDI device.
 - `device.vendor`: WebUSB device.
-- `device.dfu`: DFU (runtime only).
+- `device.dfu_rt`: DFU runtime.
 
 Note that you can add multiple devices at the same time, as long as there are
 enough endpoints and USB RAM available:
@@ -56,7 +114,8 @@ descriptors:
   `tusb_desc_device_t` descriptor.
 - `const uint8_t* tud_descriptor_configuration_cb(uint8_t index)` to replace
   the endpoint descriptions.
-- `const char* string_desc_arr[]` to replace the string descriptors.
+- `const char* tud_string_desc_arr[]` to replace the string descriptors.
+- `const uint16_t* tud_descriptor_string_cb(uint8_t index, uint16_t langid)`
 
 
 ## Manual USB Descriptors
@@ -68,9 +127,17 @@ manually depend on the device classes you want to implement:
 ```xml
 <module>modm:tinyusb:device:audio</module>
 <module>modm:tinyusb:device:bth</module>
+<module>modm:tinyusb:device:cdc</module>
+<module>modm:tinyusb:device:dfu</module>
+<module>modm:tinyusb:device:dfu_rt</module>
+<module>modm:tinyusb:device:ecm_rndis</module>
 <module>modm:tinyusb:device:hid</module>
-<module>modm:tinyusb:device:net</module>
+<module>modm:tinyusb:device:midi</module>
+<module>modm:tinyusb:device:msc</module>
+<module>modm:tinyusb:device:ncm</module>
 <module>modm:tinyusb:device:usbtmc</module>
+<module>modm:tinyusb:device:vendor</module>
+<module>modm:tinyusb:device:video</module>
 ```
 
 Some of these classes require a lot of configuration that you must provide via
@@ -78,33 +145,18 @@ the `<tusb_config_local.h>` file. Please consult the TinyUSB documentation and
 examples for their purpose.
 
 
-## Initializing USB
+## Host classes
 
-The `modm:platform:usb` module provides the correct way of initializing the USB
-peripheral, however, you must connect the right signals too:
+To use the host classes you must depend on them manually as modm does not
+provide a configuration option for them:
 
-```cpp
-// USB is timing-sensitive, so prioritize the IRQs accordingly
-Usb::initialize<SystemClock>(/*priority=*/3);
-
-// For Device-Only USB implementations, this is enough
-Usb::connect<GpioA11::Dm, GpioA12::Dp>();
-
-// But for On-The-Go (OTG) USB implementations, you need more:
-Usb::connect<GpioA11::Dm, GpioA12::Dp, GpioA10::Id>();
-// Enable hardware Vbus sensing on GpioA9 (this can be tricky to get right!)
-USB_OTG_FS->GCCFG |= USB_OTG_GCCFG_VBDEN;
+```xml
+<module>modm:tinyusb:host:cdc</module>
+<module>modm:tinyusb:host:cdc_rndis</module>
+<module>modm:tinyusb:host:hid</module>
+<module>modm:tinyusb:host:msc</module>
+<module>modm:tinyusb:host:vendor</module>
 ```
-
-Note that depending on your specific hardware setup, you may need to fiddle
-around to find the right VBus sensing mechanism. Please look at the TinyUSB
-board definitions and examples for inspiration.
-
-!!! warning "USB shares resources with CAN"
-	Note that on STM32F1 and STM32F3 the USB interrupts and RAM are shared with CAN,
-	thus there are conflicts in IRQ definitions as well as resource limitions in
-	hardware. On some STM32F3, the USB IRQs can be remapped, this is done
-	automatically by our port.
 
 
 ## Debugging TinyUSB
@@ -130,9 +182,9 @@ Assertion 'tu' failed!
 Abandoning...
 ```
 
-To trace the TinyUSB core, you can add `CFG_TUSB_DEBUG=2` to your CPP flags and
+To trace the TinyUSB core, you can add `CFG_TUSB_DEBUG=3` to your CPP flags and
 the output will be forwarded to `MODM_LOG_DEBUG`.
 
 ```
-<collect name="modm:build:cppdefines">CFG_TUSB_DEBUG=2</collect>
+<collect name="modm:build:cppdefines">CFG_TUSB_DEBUG=3</collect>
 ```

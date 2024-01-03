@@ -28,10 +28,6 @@ def prepare(module, options):
 
     return True
 
-def validate(env):
-    if "samg" in str(env[":target"].identifier) and env.has_module(":tinyusb:host"):
-        raise ValidateException("USB HOST mode is not currently supported on SAMG family")
-
 def build(env):
     device = env[":target"]
     properties = device.properties

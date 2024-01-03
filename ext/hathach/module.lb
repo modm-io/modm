@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2020, Niklas Hauser
+# Copyright (c) 2020, 2024, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -13,6 +13,7 @@
 from pathlib import Path
 from collections import defaultdict
 tusb_config = {}
+default_port = 0
 
 # -----------------------------------------------------------------------------
 def init(module):
@@ -21,14 +22,16 @@ def init(module):
 
 def prepare(module, options):
     device = options[":target"]
+    has_otg_hs = device.has_driver("usb_otg_hs")
+    has_otg_fs = device.has_driver("usb_otg_fs")
     if not (device.has_driver("usb") or
-            device.has_driver("usb_otg_fs") or
-            device.has_driver("usb_otg_hs") or
+            has_otg_fs or
+            has_otg_hs or
             device.has_driver("udp") or
             device.has_driver("uhp")):
         return False
 
-    configs = {"device.cdc", "device.msc", "device.vendor", "device.midi", "device.dfu"}
+    configs = ["device.cdc", "device.dfu_rt", "device.midi", "device.msc", "device.vendor"]
     # TODO: Allow all device classes
     # configs  = {"device.{}".format(p.parent.name)
     #            for p in Path(localpath("tinyusb/src/class/")).glob("*/*_device.h")}
@@ -39,30 +42,42 @@ def prepare(module, options):
     module.add_list_option(
             EnumerationOption(name="config",
                               description="Endpoint Configuration",
-                              enumeration=sorted(configs),
+                              enumeration=configs,
                               dependencies=lambda vs:
-                                    [":tinyusb:{}".format(v.replace(".", ":")) for v in vs]))
+                                    [":tinyusb:" + v.replace(".", ":") for v in vs]))
+
 
     # Most devices only have FS=usb, some STM32 have FS/HS=usb_otg_fs/usb_otg_hs
     # and some STM32 only have HS=usb_otg_hs, so we only define this option if
     # there is a choice and default this to FS by default.
-    if device.has_driver("usb_otg_hs") and device.has_driver("usb_otg_fs"):
+    if has_otg_hs:
         module.add_option(
-                EnumerationOption(name="speed",
-                                  description="USB Port Speed",
-                                  enumeration={"full": "fs", "high": "hs"},
-                                  default="full",
-                                  dependencies=lambda s: ":platform:usb:{}s".format(s[0])))
-
-    module.add_submodule(TinyUsbDeviceModule())
-    module.add_submodule(TinyUsbHostModule())
+                EnumerationOption(name="max-speed", description="Maximum HS port speed",
+                                  enumeration=["full", "high"], default="high"))
+        # DEPRECATED: 2025q1
+        module.add_alias(
+                Alias(name="speed", description="Renamed for more clarity",
+                      destination=":tinyusb:max-speed"))
+    # Detect the number of ports and the default port
+    ports = 2 if (has_otg_hs and has_otg_fs) else 1
+    if has_otg_hs and not has_otg_fs:
+        global default_port
+        default_port = 1
+    # Generate the host and device modules
+    module.add_submodule(TinyUsbDeviceModule(ports))
+    module.add_submodule(TinyUsbHostModule(ports))
     module.depends(":cmsis:device", ":architecture:atomic", ":architecture:interrupt", ":platform:usb")
     return True
 
 
 def validate(env):
-    if env.has_module(":tinyusb:device") and env.has_module(":tinyusb:host"):
-        raise ValidateException("TinyUSB won't let you use both Device *and* Host at the same time!")
+    has_device = env.has_module(":tinyusb:device")
+    has_host = env.has_module(":tinyusb:host")
+    if has_device and has_host:
+        device_port = env.get(":tinyusb:device:port")
+        host_port = env.get(":tinyusb:host:port")
+        if device_port == host_port and host_port is not None:
+            raise ValidateException("You cannot place Device and Host on the same USB port!")
 
 
 def build(env):
@@ -90,7 +105,7 @@ def build(env):
 
     target = env[":target"].identifier
     if target.platform == "stm32":
-        tusb_config["CFG_TUSB_MCU"] = "OPT_MCU_STM32{}".format(target.family.upper())
+        tusb_config["CFG_TUSB_MCU"] = f"OPT_MCU_STM32{target.family.upper()}"
         # TODO: use modm-devices driver type for this
         fs_dev = (target.family in ["f0", "f3", "l0", "g4"] or
                  (target.family == "f1" and target.name <= "03"))
@@ -106,7 +121,7 @@ def build(env):
             env.copy("tinyusb/src/portable/microchip/samg/", "portable/microchip/samg/")
         else:
             series = "e5x" if target.series.startswith("e5") else target.series
-            tusb_config["CFG_TUSB_MCU"] = "OPT_MCU_SAM{}".format(series.upper())
+            tusb_config["CFG_TUSB_MCU"] = f"OPT_MCU_SAM{series.upper()}"
             env.copy("tinyusb/src/portable/microchip/samd/", "portable/microchip/samd/")
 
     elif target.platform == "rp":
@@ -130,21 +145,16 @@ def build(env):
         tusb_config["CFG_TUSB_DEBUG_PRINTF"] = "tinyusb_debug_printf"
         # env.collect(":build:cppdefines.debug", "CFG_TUSB_DEBUG=2")
 
-    has_device = env.has_module(":tinyusb:device")
-    has_host = env.has_module(":tinyusb:host")
-    # On STM32 with both speeds, the option decides, otherwise we must default
-    # to HS for the few STM32 with *only* usb_otg_hs, all other devices are FS.
-    speed = env.get("speed", "hs" if env[":target"].has_driver("usb_otg_hs") else "fs")
-    port = 0 if speed == "fs" else 1
-
-    tusb_config["CFG_TUSB_RHPORT0_MODE"] = "OPT_MODE_NONE"
-    tusb_config["CFG_TUSB_RHPORT1_MODE"] = "OPT_MODE_NONE"
-    mode = None
-    if has_device: mode = "OPT_MODE_DEVICE";
-    if has_host: mode = "OPT_MODE_HOST";
-    if mode is not None:
-        if "hs" in speed: mode = "({} | OPT_MODE_HIGH_SPEED)".format(mode);
-        tusb_config["CFG_TUSB_RHPORT{}_MODE".format(port)] = mode
+    ports = {}
+    global default_port
+    for mode in ["device", "host"]:
+        if env.has_module(f":tinyusb:{mode}"):
+            port = env.get(f":tinyusb:{mode}:port", default_port)
+            ports[port] = mode[0]
+            mode = f"OPT_MODE_{mode.upper()}"
+            if port == 1 and (speed := env.get("max-speed")) is not None:
+                mode = f"({mode} | OPT_MODE_{speed.upper()}_SPEED)"
+            tusb_config[f"CFG_TUSB_RHPORT{port}_MODE"] = mode
 
     itf_config = env["config"]
     # Enumerate the configurations
@@ -160,7 +170,7 @@ def build(env):
     endpoints = {}
     endpoint_counter = 0
     for devclass, devitfs in config_enum.items():
-        prefix = "{}".format(devclass.upper())
+        prefix = devclass.upper()
         for itf in devitfs:
             endpoint_counter += 1
             itf_prefix = prefix + str(itf)
@@ -169,10 +179,10 @@ def build(env):
                 itf_enum.extend([itf_prefix, itf_prefix + "_DATA"])
                 endpoints[itf_prefix + "_NOTIF"] = hex(0x80 | endpoint_counter)
                 endpoint_counter += 1
-            elif devclass in ["msc", "midi", "vendor", "dfu"]:
+            elif devclass in ["msc", "midi", "vendor", "dfu_rt"]:
                 itf_enum.append(itf_prefix)
             else:
-                raise ValidateException("Unknown ITF device class '{}'!".format(devclass))
+                raise ValidateException(f"Unknown ITF device class '{devclass}'!")
 
             endpoints[itf_prefix + "_OUT"] = hex(endpoint_counter)
             # SAMG doesn't support using the same EP number for IN and OUT
@@ -181,22 +191,26 @@ def build(env):
             endpoints[itf_prefix + "_IN"] = hex(0x80 | endpoint_counter)
 
     if target.platform == "stm32":
-        irq_data = env.query(":platform:usb:irqs")
-        irqs = irq_data["port_irqs"][speed]
+        irqs = []
+        for port, uirqs in env.query(":platform:usb:irqs")["port_irqs"].items():
+            port = {"fs": 0, "hs": 1}[port]
+            if port in ports:
+                irqs.extend([(irq, port, ports[port]) for irq in uirqs])
     elif target.platform == "sam" and target.family in ["g5x"]:
-        irqs = ["UDP"]
+        irqs = [("UDP", 0, "d")]
     elif target.platform == "sam" and target.family in ["d5x/e5x"]:
-        irqs = ["USB_OTHER", "USB_SOF_HSOF", "USB_TRCPT0", "USB_TRCPT1"]
+        irqs = [("USB_OTHER", 0, "d"), ("USB_SOF_HSOF", 0, "d"),
+                ("USB_TRCPT0", 0, "d"), ("USB_TRCPT1", 0, "d")]
     elif target.platform == "rp" and target.family in ["20"]:
-        irqs = ["USBCTRL_IRQ"]
+        irqs = [("USBCTRL_IRQ", 0, "d")]
     else:
-        irqs = ["USB"]
+        irqs = [("USB", 0, "d")]
 
     env.substitutions = {
         "target": target,
         "config": tusb_config,
         "irqs": irqs,
-        "port": port,
+        "ports": ports,
         "with_debug": env.has_module(":debug"),
         "with_cdc": env.has_module(":tinyusb:device:cdc"),
         "itfs": itfs,
@@ -207,9 +221,24 @@ def build(env):
     if len(itf_config): env.template("tusb_descriptors.c.in");
     env.template("tusb_port.cpp.in")
 
+    # Add support files shared between device and host classes
+    classes = env.generated_local_files(filterfunc=lambda path: "_device.c" in path or "_host.c" in path)
+    classes = {(Path(c).parent.name, Path(c).name.rsplit("_", 1)[0]) for c in classes}
+    # Add support files outside of naming scheme
+    if any(p == "net" for p, _ in classes): classes.update({("net", "ncm"), ("net", "net_device")})
+    if ("dfu", "dfu_rt") in classes: classes.add(("dfu", "dfu"))
+    # Filter out classes without support files
+    classes = ((p, n) for p, n in classes if n not in ["bth", "dfu_rt", "vendor", "ecm_rndis", "ecm"])
+    # Now copy the shared support file
+    for parent, name in classes:
+        env.copy(f"tinyusb/src/class/{parent}/{name}.h", f"class/{parent}/{name}.h")
+
 
 # -----------------------------------------------------------------------------
 class TinyUsbDeviceModule(Module):
+    def __init__(self, ports):
+        self.ports = ports
+
     def init(self, module):
         module.name = ":tinyusb:device"
         module.description = """
@@ -223,10 +252,20 @@ Configuration options:
 """
 
     def prepare(self, module, options):
-        paths = {p.parent for p in Path(localpath("tinyusb/src/class/")).glob("*/*_device.h")}
-        for path in paths:
-            module.add_submodule(TinyUsbClassModule(path, "device"))
+        classes = {(p.parent.name, p.name.replace("_device.c", ""))
+                   for p in Path(localpath("tinyusb/src/class/")).glob("*/*_device.c")}
+        for parent, name in classes:
+            module.add_submodule(TinyUsbClassModule(parent, name, "device"))
+        if self.ports == 2:
+            module.add_option(
+                    EnumerationOption(name="port", description="USB Port selection",
+                                      enumeration={"fs": 0, "hs": 1}, default="fs",
+                                      dependencies=lambda s: f":platform:usb:{s[0]}s"))
         return True
+
+    # def validate(self, env):
+    #     if env.has_module(":tinyusb:device:ncm") and env.has_module(":tinyusb:device:ecm_rndis"):
+    #         raise ValidateException("TinyUSB cannot enable both ECM_RNDIS and NCM network drivers!")
 
     def build(self, env):
         env.outbasepath = "modm/ext/tinyusb"
@@ -235,8 +274,9 @@ Configuration options:
 
 # -----------------------------------------------------------------------------
 class TinyUsbHostModule(Module):
-    def __init__(self):
+    def __init__(self, ports):
         self.config = {}
+        self.ports = ports
 
     def init(self, module):
         module.name = ":tinyusb:host"
@@ -257,9 +297,15 @@ Configuration options:
                 options[":target"].has_driver("uhp:samg*")):
             return False
 
-        paths = {p.parent for p in Path(localpath("tinyusb/src/class/")).glob("*/*_host.h")}
-        for path in paths:
-            module.add_submodule(TinyUsbClassModule(path, "host"))
+        classes = {(p.parent.name, p.name.replace("_host.c", ""))
+                   for p in Path(localpath("tinyusb/src/class/")).glob("*/*_host.c")}
+        for parent, name in classes:
+            module.add_submodule(TinyUsbClassModule(parent, name, "host"))
+        if self.ports == 2:
+            module.add_option(
+                    EnumerationOption(name="port", description="USB Port selection",
+                                      enumeration={"fs": 0, "hs": 1}, default="hs",
+                                      dependencies=lambda s: f":platform:usb:{s[0]}s"))
         return True
 
     def build(self, env):
@@ -270,6 +316,9 @@ Configuration options:
 # -----------------------------------------------------------------------------
 # Only contains those configurations that this modules can generate a descriptor for
 tu_config_descr = {"device": {
+    "bth": """
+- `CFG_TUD_BTH_ISO_ALT_COUNT` = [undef] modm default: 1
+""",
     "cdc": """
 - `CFG_TUD_CDC_EP_BUFSIZE` = 64/512 (fs/hs)
 - `CFG_TUD_CDC_RX_BUFSIZE` = [undef] modm default: 512
@@ -291,13 +340,14 @@ tu_config_descr = {"device": {
 }
 }
 class TinyUsbClassModule(Module):
-    def __init__(self, path, mode):
+    def __init__(self, parent, name, mode):
+        self.parent = parent
+        self.name = name
         self.mode = mode
-        self.name = str(path.name)
 
     def init(self, module):
-        module.name = ":tinyusb:{}:{}".format(self.mode, self.name)
-        descr = "# {} class {}".format(self.mode.capitalize(), self.name.upper())
+        module.name = f":tinyusb:{self.mode}:{self.name}"
+        descr = f"# {self.mode.capitalize()} class {self.name.upper()}"
         conf = tu_config_descr.get(self.mode, {}).get(self.name, "")
         if conf: descr += "\n\nConfiguration options:\n" + conf
         else: descr += "\n\nPlease consult the TinyUSB docs for configuration options.\n"
@@ -314,19 +364,25 @@ class TinyUsbClassModule(Module):
 
     def build(self, env):
         env.outbasepath = "modm/ext/tinyusb"
-        env.copy("tinyusb/src/class/{}".format(self.name), "class/{}".format(self.name),
-                 ignore=env.ignore_files("*_host.*" if "device" in self.mode else "*_device.*"))
+        for suffix in ["h", "c"]:
+            # both classes share the `net_device.h` file
+            if self.name in ["ncm", "ecm_rndis"] and suffix == "h":
+                continue
+            file = f"class/{self.parent}/{self.name}_{self.mode}.{suffix}"
+            env.copy(f"tinyusb/src/{file}", file)
 
         global tusb_config
-        cfg_name = "CFG_TU{}_{}".format(self.mode[0].upper(), self.name.upper())
-        if "DFU" in cfg_name: cfg_name += "_RUNTIME";
-        tusb_config[cfg_name] = env[":tinyusb:config"].count("{}.{}".format(self.mode, self.name))
-        speed = env.get(":tinyusb:speed", 0)
+        cfg_name = f"CFG_TU{self.mode[0].upper()}_{self.name.upper()}"
+        if "DFU_RT" in cfg_name: cfg_name = cfg_name.replace("_RT", "_RUNTIME")
+        tusb_config[cfg_name] = env[":tinyusb:config"].count(f"{self.mode}.{self.name}")
+        is_hs = env.get(":tinyusb:max-speed", "full") == "high"
 
         if self.mode == "device":
             # These are the defaults that don't crash TinyUSB.
             if self.name in ["cdc", "midi", "vendor"]:
-                tusb_config[cfg_name+"_RX_BUFSIZE"] = 512 if speed else 64
-                tusb_config[cfg_name+"_TX_BUFSIZE"] = 512 if speed else 64
+                tusb_config[cfg_name+"_RX_BUFSIZE"] = 512 if is_hs else 64
+                tusb_config[cfg_name+"_TX_BUFSIZE"] = 512 if is_hs else 64
             if self.name in ["msc"]:
                 tusb_config[cfg_name+"_EP_BUFSIZE"] = 512
+            if self.name in ["bth"]:
+                tusb_config[cfg_name+"_ISO_ALT_COUNT"] = 1
