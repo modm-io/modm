@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2020, Niklas Hauser
+# Copyright (c) 2020, 2024, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -58,6 +58,11 @@ def common_usb_irqs(env):
 def generate_instance(env, port, otg=False):
     env.outbasepath = "modm/src/modm/platform/usb"
     irq_data = env.query(":platform:usb:irqs")
+    all_signals = env.query(":platform:gpio:all_signals")
+    ulpi_signals = {"Ulpick", "Ulpistp", "Ulpidir", "Ulpinxt",
+                    "Ulpid0", "Ulpid1", "Ulpid2", "Ulpid3",
+                    "Ulpid4", "Ulpid5", "Ulpid6", "Ulpid7"}
+    is_ulpi = len(ulpi_signals & set(all_signals)) == len(ulpi_signals)
     env.substitutions = {
         "port": port,
         "peripheral": "Usbotg{}".format(port) if otg else "Usb",
@@ -65,6 +70,7 @@ def generate_instance(env, port, otg=False):
         "is_remap": irq_data["is_remap"],
         "irqs": irq_data["port_irqs"][port],
         "target": env[":target"].identifier,
+        "is_ulpi": port == "hs" and is_ulpi,
     }
     if otg:
         env.template("usb.hpp.in", "usb_{}.hpp".format(port))
@@ -118,6 +124,7 @@ class UsbInstance(Module):
         module.description = "{} Speed".format("Full" if self.speed == "fs" else "High")
 
     def prepare(self, module, options):
+        module.depends(":platform:gpio")
         return True
 
     def build(self, env):
