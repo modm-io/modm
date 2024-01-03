@@ -178,6 +178,8 @@ def common_peripherals(env):
             all_peripherals.add(dname)
         if dname == "Dma" and d["type"] == "stm32-mux":
             all_peripherals.add("Dmamux1")
+        if dname == "Usbotghs":
+            all_peripherals.add("Usbotghsulpi")
 
     all_peripherals.discard(None)
     all_peripherals = sorted(list(all_peripherals))

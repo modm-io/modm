@@ -177,11 +177,10 @@ def build(env):
         # Fix USBOTG OTG
         if target.family == "u5" and per == "OTG":
             per = "Usbotgfs"
-        if "Usbotgfs" in all_peripherals and per.startswith("OTG"):
-            if per == "OTGH":
-                per = "OTGHS"
+        if ("Usbotgfs" in all_peripherals or "Usbotghs" in all_peripherals) and per.startswith("OTG"):
+            if per == "OTGH": per = "OTGHS"
             per = "USB"+per
-        if "Usbotgfs" in all_peripherals and per.startswith("USB"):
+        if ("Usbotgfs" in all_peripherals or "Usbotghs" in all_peripherals) and per.startswith("USB"):
             per = per.replace("USB1", "USB").replace("USB2", "USB")
         if target.family == "l5" and per == "USBFS":
             per = "Usb"
@@ -190,7 +189,7 @@ def build(env):
         if "EN" in mode:
             rcc_enable[per.capitalize()] = (nper, mode["EN"])
         if "RST" in mode:
-            rcc_reset[nper] = mode["RST"]
+            rcc_reset[per.capitalize()] = (nper, mode["RST"])
 
     env.substitutions.update({
         "rcc_enable": rcc_enable,

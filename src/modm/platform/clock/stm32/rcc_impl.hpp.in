@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, 2021 Niklas Hauser
+ * Copyright (c) 2019, 2021, 2024, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -123,13 +123,12 @@ Rcc::enable()
 	__DSB();
 	%% for peripheral, (st_per, bus) in rcc_enable.items() | sort
 	if constexpr (peripheral == Peripheral::{{ peripheral }})
-		if (not Rcc::isEnabled<peripheral>()) {
-			RCC->{{bus}} |= RCC_{{bus}}_{{st_per}}EN;{% if st_per in rcc_reset %} __DSB();
-			RCC->{{rcc_reset[st_per]}} |= RCC_{{rcc_reset[st_per]}}_{{st_per}}RST; __DSB();
-			RCC->{{rcc_reset[st_per]}} &= ~RCC_{{rcc_reset[st_per]}}_{{st_per}}RST;{% endif %}{% if peripheral == "Eth" %} __DSB();
+		{% if peripheral in rcc_reset %}if (not Rcc::isEnabled<peripheral>()) {% endif %}{
+			RCC->{{bus}} |= RCC_{{bus}}_{{st_per}}EN;{% if peripheral in rcc_reset %} __DSB();
+			RCC->{{rcc_reset[peripheral][1]}} |= RCC_{{rcc_reset[peripheral][1]}}_{{rcc_reset[peripheral][0]}}RST; __DSB();
+			RCC->{{rcc_reset[peripheral][1]}} &= ~RCC_{{rcc_reset[peripheral][1]}}_{{rcc_reset[peripheral][0]}}RST;{% endif %}{% if peripheral == "Eth" %} __DSB();
 			RCC->{{bus}} |= RCC_{{bus}}_{{st_per}}RXEN; __DSB();
-			RCC->{{bus}} |= RCC_{{bus}}_{{st_per}}TXEN;{% elif peripheral == "Usbotghs" %} __DSB();
-			RCC->{{bus}} |= RCC_{{bus}}_{{st_per}}ULPIEN;{% endif %}
+			RCC->{{bus}} |= RCC_{{bus}}_{{st_per}}TXEN;{% endif %}
 		}
 	%% endfor
 	__DSB();
@@ -147,8 +146,7 @@ Rcc::disable()
 	if constexpr (peripheral == Peripheral::{{ peripheral }}) {
 		RCC->{{bus}} &= ~RCC_{{bus}}_{{st_per}}EN;{% if peripheral == "Eth" %} __DSB();
 		RCC->{{bus}} &= ~RCC_{{bus}}_{{st_per}}RXEN; __DSB();
-		RCC->{{bus}} &= ~RCC_{{bus}}_{{st_per}}TXEN;{% elif peripheral == "Usbotghs" %} __DSB();
-		RCC->{{bus}} &= ~RCC_{{bus}}_{{st_per}}ULPIEN;{% endif %}
+		RCC->{{bus}} &= ~RCC_{{bus}}_{{st_per}}TXEN;{% endif %}
 	}
 	%% endfor
 	__DSB();
