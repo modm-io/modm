@@ -30,7 +30,7 @@ def translate(s):
     return s.replace("_", "").capitalize()
 
 def get_driver(s):
-    name = "None"
+    name = None
     if "driver" in s: name = translate(s["driver"]);
     if "instance" in s: name += translate(s["instance"]);
     return name
@@ -42,6 +42,7 @@ def extract_signals(signals):
     afs = {}
     for s in signals:
         driver = get_driver(s)
+        if driver is None: continue
         name = get_name(s)
         key = driver + name
         afs[key] = {"driver": driver, "name": name, "af": s["af"]}
@@ -238,22 +239,6 @@ def validate(env):
                 "remap_value": remapped_gpios[key]
             })
 
-    all_peripherals = [s["driver"] for s in all_signals.values()]
-    # Signals are not enough, since there are peripherals that don't have signals.
-    # Example: STM32F401RE < 64pins: SPI4 cannot be connected to any pins.
-    # FIXME: Allow accessing device file more freely
-    all_drivers = [d for d in device._properties["driver"] if d["name"] not in ["gpio", "core"]]
-    for d in all_drivers:
-        dname = translate(d["name"])
-        if "instance" in d:
-            all_peripherals.extend([dname + translate(i) for i in d["instance"]])
-        else:
-            all_peripherals.append(dname)
-        if dname == "Dma" and d["type"] == "stm32-mux":
-            all_peripherals.append("Dmamux1")
-    if "remap" in driver:
-        all_peripherals.extend([get_driver(r) for r in driver["remap"]])
-    bprops["all_peripherals"] = sorted(list(set(all_peripherals)))
     bprops["all_signals"] = sorted(list(set(s["name"] for s in all_signals.values())))
     bprops["gpios"] = [bprops[g["port"] + g["pin"]] for g in driver["gpio"]]
     bprops["port_width"] = 16
@@ -285,7 +270,3 @@ def build(env):
     env.template("../common/connector.hpp.in", "connector.hpp",
                  filters={"formatPeripheral": get_driver,
                           "printSignalMap": print_remap_group_table})
-
-    # FIXME: Move to modm:platform:core!
-    env.outbasepath = "modm/src/modm/platform/core"
-    env.template("peripherals.hpp.in")

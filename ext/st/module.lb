@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2016, Fabian Greif
-# Copyright (c) 2017, Niklas Hauser
+# Copyright (c) 2017, 2024, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -101,6 +101,7 @@ def common_rcc_map(env):
     bprops["peripherals"] = peripherals
     return rcc_map
 
+
 def common_header_file(env):
     """
     Gives information about the STM32 header files. For example the STM32F469:
@@ -145,6 +146,45 @@ def common_header_file(env):
     bprops["folder"] = folder
     return headers
 
+
+def common_peripherals(env):
+    """
+    All peripherals translated to the modm naming convention.
+
+    :returns: a sorted list of all peripheral names.
+    """
+    def get_driver(s):
+        name = None
+        if "driver" in s: name = translate(s["driver"])
+        if "instance" in s: name += translate(s["instance"])
+        return name
+
+    def translate(s):
+        return s.replace("_", "").capitalize()
+
+    device = env[":target"]
+    gpio_driver = device.get_driver("gpio")
+    # Get all the peripherals from the GPIO remap-able signals
+    all_peripherals = {get_driver(remap) for remap in gpio_driver.get("remap", [])}
+    # Get all the peripherals from the normal GPIO signals
+    all_peripherals.update(get_driver(s) for gpio in gpio_driver["gpio"] for s in gpio.get("signal", []))
+    # Get all peripherals from the driver instances
+    all_drivers = (d for d in device._properties["driver"] if d["name"] not in ["gpio", "core"])
+    for d in all_drivers:
+        dname = translate(d["name"])
+        if "instance" in d:
+            all_peripherals.update(dname + translate(i) for i in d["instance"])
+        else:
+            all_peripherals.add(dname)
+        if dname == "Dma" and d["type"] == "stm32-mux":
+            all_peripherals.add("Dmamux1")
+
+    all_peripherals.discard(None)
+    all_peripherals = sorted(list(all_peripherals))
+    bprops["all_peripherals"] = all_peripherals
+    return all_peripherals
+
+
 # -----------------------------------------------------------------------------
 def init(module):
     module.name = ":cmsis:device"
@@ -158,6 +198,8 @@ def prepare(module, options):
     module.add_query(
         EnvironmentQuery(name="rcc-map", factory=common_rcc_map))
     module.add_query(
+        EnvironmentQuery(name="peripherals", factory=common_peripherals))
+    module.add_query(
         EnvironmentQuery(name="headers", factory=common_header_file))
 
     module.depends(":cmsis:core")
@@ -165,6 +207,7 @@ def prepare(module, options):
 
 def validate(env):
     env.query("rcc-map")
+    env.query("peripherals")
 
 def build(env):
     env.collect(":build:path.include", "modm/ext")
@@ -184,3 +227,6 @@ def build(env):
     })
     env.outbasepath = "modm/src/modm/platform"
     env.template("device.hpp.in")
+
+    env.outbasepath = "modm/src/modm/platform/core"
+    env.template("peripherals.hpp.in")
