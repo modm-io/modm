@@ -1,0 +1,13 @@
+<library>
+  <repositories>
+    <repository>
+      <path>../../../../repo.lb</path>
+    </repository>
+  </repositories>
+  <options>
+    <option name="modm:target">stm32f401vct6</option>
+  </options>
+  <modules>
+    <module>modm:board:disco-f401vc</module>
+  </modules>
+</library>
