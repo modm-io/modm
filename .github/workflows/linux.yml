@@ -201,7 +201,7 @@ jobs:
       - name: Examples STM32F4 Only Discovery Board
         if: always()
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py stm32f4_discovery stm32f429_discovery stm32f469_discovery)
+          (cd examples && ../tools/scripts/examples_compile.py stm32f4_discovery stm32f429_discovery stm32f469_discovery stm32f401_discovery)
 
   stm32f4-examples-2:
     runs-on: ubuntu-22.04
