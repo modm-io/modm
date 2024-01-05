@@ -27,7 +27,7 @@ namespace Board
 /// @{
 using namespace modm::literals;
 
-/// STM32H723ZG running at 500MHz from PLL clock generated from 8 MHz HSE
+/// STM32H723ZG running at 550MHz from PLL clock generated from 8 MHz HSE
 struct SystemClock
 {
 	// Max 550MHz
@@ -102,7 +102,7 @@ struct SystemClock
 	static constexpr uint32_t Timer23 = Apb1Timer;
 	static constexpr uint32_t Timer24 = Apb1Timer;
 
-	static constexpr uint32_t Usb = Ahb1;
+	static constexpr uint32_t Usb = 48_MHz; // From PLL3Q
 
 	static bool inline
 	enable()
@@ -121,6 +121,16 @@ struct SystemClock
 			.pllR  = 2,		// 550 MHz / 2   = 275 MHz
 		};
 		Rcc::enablePll1(Rcc::PllSource::Hse, pllFactors1);
+		// Use PLL3 for USB 48MHz
+		const Rcc::PllFactors pllFactors3{
+			.range = Rcc::PllInputRange::MHz4_8,
+			.pllM = 2,		//   8MHz / M=   4MHz
+			.pllN = 60,		//   4MHz * N= 240MHz
+			.pllP = 5,		// 240MHz / P=  48MHz
+			.pllQ = 5,		// 240MHz / Q=  48MHz = F_usb
+			.pllR = 5,		// 240MHz / R=  48MHz
+		};
+		Rcc::enablePll3(Rcc::PllSource::ExternalClock, pllFactors3);
 		Rcc::setFlashLatency<Ahb>();
 
 		// max. 275MHz
@@ -133,6 +143,7 @@ struct SystemClock
 
 		// update clock frequencies
 		Rcc::updateCoreFrequency<Frequency>();
+		Rcc::enableUsbClockSource(Rcc::UsbClockSource::Pll3Q);
 		// switch system clock to pll
 		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll1P);
 
@@ -152,6 +163,22 @@ using LedRed = GpioOutputB14;
 using Leds = SoftwareGpioPort< LedRed, LedYellow, LedGreen >;
 /// @}
 
+namespace usb
+{
+/// @ingroup modm_board_nucleo_h723zg
+/// @{
+using Vbus = GpioA9;
+using Id = GpioA10;
+using Dm = GpioA11;
+using Dp = GpioA12;
+
+using Overcurrent = GpioInputG7;
+using Power = GpioOutputG6;
+
+using Device = UsbHs;
+/// @}
+}
+
 namespace stlink
 {
 /// @ingroup modm_board_nucleo_h723zg
@@ -169,20 +196,31 @@ using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockI
 inline void
 initialize()
 {
-    SystemClock::enable();
-    SysTickTimer::initialize<SystemClock>();
+	SystemClock::enable();
+	SysTickTimer::initialize<SystemClock>();
 
-    stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>();
-    stlink::Uart::initialize<SystemClock, 115200_Bd>();
+	stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>();
+	stlink::Uart::initialize<SystemClock, 115200_Bd>();
 
-    LedGreen::setOutput(modm::Gpio::Low);
-    LedYellow::setOutput(modm::Gpio::Low);
-    LedRed::setOutput(modm::Gpio::Low);
+	LedGreen::setOutput(modm::Gpio::Low);
+	LedYellow::setOutput(modm::Gpio::Low);
+	LedRed::setOutput(modm::Gpio::Low);
 
-    Button::setInput();
+	Button::setInput();
+}
+
+inline void
+initializeUsbFs(uint8_t priority=3)
+{
+	usb::Device::initialize<SystemClock>(priority);
+	usb::Device::connect<usb::Dm::Dm, usb::Dp::Dp, usb::Id::Id>();
+
+	usb::Overcurrent::setInput();
+	usb::Vbus::setInput();
+	// Enable VBUS sense (B device) via pin PA9
+	USB_OTG_HS->GCCFG |= USB_OTG_GCCFG_VBDEN;
 }
 /// @}
 
 }
-/// @}
 

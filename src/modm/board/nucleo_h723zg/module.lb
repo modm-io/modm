@@ -17,6 +17,14 @@ def init(module):
 # NUCLEO-H723ZG
 
 [Nucleo kit for STM32H723ZG](https://www.st.com/en/evaluation-tools/nucleo-h723zg.html)
+
+## TinyUSB
+
+To use the USB port, you must configure TinyUSB to use the HS port in FS mode:
+
+```xml
+<option name="modm:tinyusb:max-speed">full</option>
+```
 """
 
 def prepare(module, options):
@@ -29,7 +37,8 @@ def prepare(module, options):
         ":platform:core",
         ":platform:gpio",
         ":platform:clock",
-        ":platform:uart:3")
+        ":platform:uart:3",
+        ":platform:usb:hs")
 
     return True
 

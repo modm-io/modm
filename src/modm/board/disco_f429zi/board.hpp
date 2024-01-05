@@ -16,8 +16,12 @@
 
 #include <modm/platform.hpp>
 #include <modm/architecture/interface/clock.hpp>
+#include <modm/debug/logger.hpp>
 
 using namespace modm::platform;
+
+/// @ingroup modm_board_disco_f429zi
+#define MODM_BOARD_HAS_LOGGER
 
 namespace Board
 {
@@ -25,10 +29,10 @@ namespace Board
 /// @{
 using namespace modm::literals;
 
-/// STM32F429 running at 180MHz from the external 8MHz crystal
+/// STM32F429 running at 168MHz from the external 8MHz crystal
 struct SystemClock
 {
-	static constexpr uint32_t Frequency = 180_MHz;
+	static constexpr uint32_t Frequency = 168_MHz;
 	static constexpr uint32_t Apb1 = Frequency / 4;
 	static constexpr uint32_t Apb2 = Frequency / 2;
 
@@ -74,14 +78,17 @@ struct SystemClock
 	static constexpr uint32_t Timer13 = Apb1Timer;
 	static constexpr uint32_t Timer14 = Apb1Timer;
 
+	static constexpr uint32_t Usb = 48_MHz;
+
 	static bool inline
 	enable()
 	{
 		Rcc::enableExternalCrystal(); // 8 MHz
 		const Rcc::PllFactors pllFactors{
-			.pllM = 4,		// 8MHz / M=4 -> 2MHz
-			.pllN = 180,	// 2MHz * N=180 -> 360MHz
-			.pllP = 2		// 360MHz / P=2 -> 180MHz = F_cpu
+			.pllM = 4,		// 8MHz / M -> 2MHz
+			.pllN = 168,	// 2MHz * N -> 336MHz
+			.pllP = 2,		// 336MHz / P -> 168MHz = F_cpu
+			.pllQ = 7		// 336MHz / Q ->  48MHz = F_usb
 		};
 		Rcc::enablePll(Rcc::PllSource::ExternalCrystal, pllFactors);
 		// Required for 180 MHz clock
@@ -222,19 +229,36 @@ using Id = GpioOutputB12;		// OTG_FS_ID: USB_OTG_HS_ID
 
 using Overcurrent = GpioC5;		// OTG_FS_OC [OTG_FS_OverCurrent]: GPXTI5
 using Power = GpioOutputC4;		// OTG_FS_PSO [OTG_FS_PowerSwitchOn]
-using VBus = GpioB13;			// VBUS_FS: USB_OTG_HS_VBUS
-//using Device = UsbFs;
+using Vbus = GpioB13;			// VBUS_FS: USB_OTG_HS_VBUS
+
+using Device = UsbHs;
+/// @}
+}
+
+namespace stlink
+{
+/// @ingroup modm_board_nucleo_h743zi
+/// @{
+using Tx = GpioOutputA9;
+using Rx = GpioInputA10;
+using Uart = Usart1;
 /// @}
 }
 
 
+
 /// @ingroup modm_board_disco_f429zi
 /// @{
+using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
+
 inline void
 initialize()
 {
 	SystemClock::enable();
 	SysTickTimer::initialize<SystemClock>();
+
+	stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>();
+	stlink::Uart::initialize<SystemClock, 115200_Bd>();
 
 	LedGreen::setOutput(modm::Gpio::Low);
 	LedRed::setOutput(modm::Gpio::Low);
@@ -250,8 +274,22 @@ initializeL3g()
 	l3g::Cs::setOutput(modm::Gpio::High);
 
 	l3g::SpiMaster::connect<l3g::Sck::Sck, l3g::Mosi::Mosi, l3g::Miso::Miso>();
-	l3g::SpiMaster::initialize<SystemClock, 11.25_MHz>();
+	l3g::SpiMaster::initialize<SystemClock, 10.5_MHz>();
 	l3g::SpiMaster::setDataMode(l3g::SpiMaster::DataMode::Mode3);
+}
+
+inline void
+initializeUsbFs(uint8_t priority=3)
+{
+	Rcc::enable<Peripheral::Usbotgfs>();
+	usb::Device::initialize<SystemClock>(priority);
+	usb::Device::connect<usb::Dm::Dm, usb::Dp::Dp, usb::Id::Id>();
+
+	usb::Overcurrent::setInput();
+	usb::Vbus::setInput();
+	// Enable VBUS sense (B device) via pin PA9
+	USB_OTG_HS->GCCFG &= ~USB_OTG_GCCFG_NOVBUSSENS;
+	USB_OTG_HS->GCCFG |= USB_OTG_GCCFG_VBUSBSEN;
 }
 /// @}
 

@@ -145,17 +145,17 @@ using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockI
 inline void
 initialize()
 {
-    SystemClock::enable();
-    SysTickTimer::initialize<SystemClock>();
+	SystemClock::enable();
+	SysTickTimer::initialize<SystemClock>();
 
-    stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>();
-    stlink::Uart::initialize<SystemClock, 115200_Bd>();
+	stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>();
+	stlink::Uart::initialize<SystemClock, 115200_Bd>();
 
-    LedGreen::setOutput(modm::Gpio::Low);
-    LedBlue::setOutput(modm::Gpio::Low);
-    LedRed::setOutput(modm::Gpio::Low);
+	LedGreen::setOutput(modm::Gpio::Low);
+	LedBlue::setOutput(modm::Gpio::Low);
+	LedRed::setOutput(modm::Gpio::Low);
 
-    Button::setInput();
+	Button::setInput();
 }
 
 inline void

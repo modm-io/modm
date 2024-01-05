@@ -1,25 +1,39 @@
 <library>
   <extends>modm:blue-pill-f103</extends>
-  <!-- <extends>modm:disco-f072rb</extends> -->
   <!-- <extends>modm:black-pill-f401</extends> -->
   <!-- <extends>modm:black-pill-f411</extends> -->
-  <!-- <extends>modm:feather-m0</extends> -->
-  <!-- <extends>modm:samd21-mini</extends> -->
-  <!-- <extends>modm:nucleo-f429zi</extends> -->
+  <!-- <extends>modm:disco-f072rb</extends> -->
   <!-- <extends>modm:disco-f303vc</extends> -->
   <!-- <extends>modm:disco-f407vg</extends> -->
+  <!-- <extends>modm:disco-f429zi</extends> -->
+  <!-- <extends>modm:disco-f469ni</extends> -->
   <!-- <extends>modm:disco-f746ng</extends> -->
+  <!-- <extends>modm:disco-l476vg</extends> -->
+  <!-- <extends>modm:feather-m0</extends> -->
+  <!-- <extends>modm:nucleo-f429zi</extends> -->
+  <!-- <extends>modm:nucleo-h723zg</extends> -->
+  <!-- <extends>modm:nucleo-h743zi</extends> -->
   <!-- <extends>modm:rp-pico</extends> -->
+  <!-- <extends>modm:samd21-mini</extends> -->
   <options>
     <option name="modm:build:build.path">../../../build/generic/usb</option>
     <option name="modm:build:openocd.cfg">openocd.cfg</option>
     <option name="modm:tinyusb:config">device.cdc,device.msc</option>
     <!-- <option name="modm:tinyusb:config">device.cdc,device.midi</option> -->
-   </options>
-   <modules>
-     <module>modm:build:scons</module>
-     <module>modm:tinyusb</module>
-     <module>modm:processing:timer</module>
-     <module>modm:io</module>
-   </modules>
- </library>
+
+    <!-- Required for modm:disco-f429zi -->
+    <!-- <option name="modm:tinyusb:device:port">hs</option> -->
+
+    <!-- Required for modm:nucleo-h723zg, modm:disco-f429zi -->
+    <!-- <option name="modm:tinyusb:max-speed">full</option> -->
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:tinyusb</module>
+    <module>modm:processing:timer</module>
+    <module>modm:io</module>
+  </modules>
+  <collectors>
+    <!-- <collect name="modm:build:cppdefines">CFG_TUSB_DEBUG=3</collect> -->
+  </collectors>
+</library>

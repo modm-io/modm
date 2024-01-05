@@ -20,8 +20,17 @@ main()
 	Board::initialize();
 
 	LedRed::set();
-	usb::VBus::setOutput(modm::Gpio::Low);
+	usb::Vbus::setOutput(modm::Gpio::Low);
 	usb::Overcurrent::setOutput(modm::Gpio::Low);
+
+	// Use the logging streams to print some messages.
+	// Change MODM_LOG_LEVEL above to enable or disable these messages
+	MODM_LOG_DEBUG   << "debug"   << modm::endl;
+	MODM_LOG_INFO    << "info"    << modm::endl;
+	MODM_LOG_WARNING << "warning" << modm::endl;
+	MODM_LOG_ERROR   << "error"   << modm::endl;
+
+	uint32_t counter(0);
 
 	while (true)
 	{
@@ -30,10 +39,12 @@ main()
 
 		modm::delay(Button::read() ? 125ms : 500ms);
 
-		usb::VBus::toggle();
+		usb::Vbus::toggle();
 		usb::Overcurrent::toggle();
 
 		modm::delay(Button::read() ? 125ms : 500ms);
+
+		MODM_LOG_INFO << "loop: " << counter++ << modm::endl;
 	}
 
 	return 0;

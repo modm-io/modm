@@ -17,6 +17,46 @@ def init(module):
 # STM32F7DISCOVERY
 
 [Discovery kit for STM32F746](https://www.st.com/en/evaluation-tools/32f746gdiscovery.html)
+
+## TinyUSB
+
+This board has two USB ports: one with Full Speed support and another with true
+High Speed support. By default, TinyUSB runs the device classes on the FS port,
+however, you can reassign it to HS via this option:
+
+```xml
+<options>
+  <option name="modm:tinyusb:config">device.cdc,device.msc</option>
+  <option name="modm:tinyusb:device:port">hs</option>
+</options>
+```
+
+Remember to initialize the HS instead of the FS port via the BSP:
+
+```cpp
+Board::initialize();
+Board::initializeUsbHs();
+```
+
+Note that can use TinyUSB with both the device and host classes at the same time
+if you assign them to different ports:
+
+```xml
+```xml
+<options>
+  <option name="modm:tinyusb:config">device.cdc,device.msc</option>
+  <option name="modm:tinyusb:device:port">fs</option>
+  <option name="modm:tinyusb:host:port">hs</option>
+</options>
+```
+
+You must initialize both ports via the BSP:
+
+```cpp
+Board::initialize();
+Board::initializeUsbFs();
+Board::initializeUsbHs();
+```
 """
 
 def prepare(module, options):

@@ -148,9 +148,12 @@ using LedGreen = GpioOutputB0;
 using LedBlue = GpioOutputB7;
 using LedRed = GpioOutputB14;
 using Leds = SoftwareGpioPort< LedRed, LedBlue, LedGreen >;
+/// @}
 
 namespace usb
 {
+/// @ingroup modm_board_nucleo_h743zi
+/// @{
 using Vbus = GpioA9;
 using Id = GpioA10;
 using Dm = GpioA11;
@@ -160,41 +163,45 @@ using Overcurrent = GpioInputG7;	// OTG_FS_OverCurrent
 using Power = GpioOutputG6;			// OTG_FS_PowerSwitchOn
 
 using Device = UsbFs;
+/// @}
 }
 
 namespace stlink
 {
+/// @ingroup modm_board_nucleo_h743zi
+/// @{
 using Tx = GpioOutputD8;
 using Rx = GpioInputD9;
 using Uart = Usart3;
+/// @}
 }
 
+/// @ingroup modm_board_nucleo_h743zi
+/// @{
 using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
 
 
 inline void
 initialize()
 {
-    SystemClock::enable();
-    SysTickTimer::initialize<SystemClock>();
+	SystemClock::enable();
+	SysTickTimer::initialize<SystemClock>();
 
-    stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>();
-    stlink::Uart::initialize<SystemClock, 115200_Bd>();
+	stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>();
+	stlink::Uart::initialize<SystemClock, 115200_Bd>();
 
-    LedGreen::setOutput(modm::Gpio::Low);
-    LedBlue::setOutput(modm::Gpio::Low);
-    LedRed::setOutput(modm::Gpio::Low);
+	LedGreen::setOutput(modm::Gpio::Low);
+	LedBlue::setOutput(modm::Gpio::Low);
+	LedRed::setOutput(modm::Gpio::Low);
 
-    Button::setInput();
+	Button::setInput();
 }
 
-/// FIXME: USB does not work on this board.
 inline void
 initializeUsbFs(uint8_t priority=3)
 {
 	usb::Device::initialize<SystemClock>(priority);
 	usb::Device::connect<usb::Dm::Dm, usb::Dp::Dp, usb::Id::Id>();
-	usb::Id::configure(Gpio::InputType::Floating);
 
 	usb::Overcurrent::setInput();
 	usb::Vbus::setInput();
