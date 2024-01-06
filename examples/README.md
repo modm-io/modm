@@ -117,6 +117,12 @@ Here are some additional examples of displays and sensors we like:
 <!--/checkrepourls-->
 
 
+<!--webignore-->
+### Compiling Examples for Multiple Targets
+
+
+<!--/webignore-->
+
 ### Copy Carefully
 
 When copying from our examples make sure to set the repository path correctly!
@@ -134,10 +140,10 @@ The `modm/examples/lbuild.xml` file:
        When you write your own application, you must set this
        path yourself! -->
   <repositories>
-  	<repository><path>../repo.lb</path></repository>
+    <repository><path>../repo.lb</path></repository>
   </repositories>
   <modules>
-  	<module>modm:docs</module>
+    <module>modm:docs</module>
   </modules>
 </library>
 ```
