@@ -1,6 +1,22 @@
 <library>
-  <extends>modm:nucleo-f429zi</extends>
+  <!-- Try and cover every main AVR and Cortex-M design-->
+  <!-- AVR -->
+  <!-- <extends>modm:mega-2560-pro</extends> -->
+  <!-- <extends>modm:arduino-nano</extends> -->
+  <!-- Cortex-M0 -->
+  <extends>modm:nucleo-f072rb</extends>
+  <!-- Cortex-M0+ -->
   <!-- <extends>modm:nucleo-g071rb</extends> -->
+  <!-- Cortex-M3 -->
+  <!-- <extends>modm:nucleo-f103rb</extends> -->
+  <!-- Cortex-M4 -->
+  <!-- <extends>modm:nucleo-f429zi</extends> -->
+  <!-- Cortex-M7 -->
+  <!-- <extends>modm:nucleo-f767zi</extends> -->
+  <!-- <extends>modm:nucleo-h743zi</extends> -->
+  <!-- Cortex-M33 -->
+  <!-- <extends>modm:nucleo-u575zi-q</extends> -->
+  <!-- <extends>modm:nucleo-l552ze-q</extends> -->
   <options>
     <option name="modm:build:build.path">../../../build/generic/fiber</option>
     <option name="modm:io:with_long_long">yes</option>
