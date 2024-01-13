@@ -9,25 +9,15 @@
  */
 
 #include <modm/board.hpp>
-#include <modm/debug.hpp>
 #include <modm/processing.hpp>
 
 using namespace std::chrono_literals;
-
-modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice;
-modm::log::Logger modm::log::info(loggerDevice);
-
-// Set the log level
-#undef	MODM_LOG_LEVEL
-#define	MODM_LOG_LEVEL modm::log::INFO
 
 // ----------------------------------------------------------------------------
 int
 main()
 {
 	Board::initialize();
-	Usart2::connect<GpioOutputA2::Tx, GpioOutputA3::Rx>();
-	Usart2::initialize<Board::SystemClock, 115200_Bd>();
 
 	MODM_LOG_INFO << "\n\nReboot\n";
 	if (not Flash::unlock()) {
@@ -46,7 +36,7 @@ main()
 
 	{
 		uint32_t err{0};
-		const uint8_t sector_start = Flash::getSector(Flash::Size / 2);
+		const uint8_t sector_start = Flash::getSector(Flash::Size/2);
 		const uint8_t sector_end = Flash::getSector(Flash::Size);
 		MODM_LOG_INFO << "Erasing sectors [" << sector_start << ", " << sector_end << ")" << modm::endl;
 		MODM_LOG_INFO.flush();
@@ -54,9 +44,8 @@ main()
 
 		const modm::PreciseTimestamp start = modm::PreciseClock::now();
 
-		for (uint8_t sector{sector_start}; sector < sector_end; sector++){
+		for (uint8_t sector{sector_start}; sector < sector_end; sector++)
 			err |= Flash::erase(sector);
-		}
 
 		const auto diff = (modm::PreciseClock::now() - start);
 		MODM_LOG_INFO << "Erasing done in " << diff << " with errors: " << err << modm::endl;
