@@ -44,3 +44,24 @@ extern "C" void putchar_(char c)
     // MODM_LOG_INFO << c;
 }
 ```
+
+
+## printf is not implemented Error
+
+This module is not included by default and any attempt to use any of the printf
+methods fails with one or multiple linker error messages similiar to this:
+
+```
+`printf' referenced in section `.text.startup.main'
+    of main.o: defined in discarded section
+      `.printf_is_not_implemented!_
+           _Please_include_the__modm:printf__module_in_your_project!'
+    of libmodm.a(no_printf.o)
+```
+
+This is to prevent you from *accidentally* using the Newlib implementation of
+printf, which is very expensive and also dynamically allocated memory.
+You can either:
+
+1. Include this module, which provides a fast printf implementation.
+2. Provide your own implementation by strongly linking against printf functions.

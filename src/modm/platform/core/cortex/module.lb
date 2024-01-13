@@ -127,6 +127,11 @@ def common_memories(env):
 # See :platform:heap for explanation
 common_no_heap_section = (".Heap_is_not_implemented!__"
         "Please_include_the__modm:platform:heap__module_in_your_project!")
+# See :printf for explanation
+common_no_printf_section = (".printf_is_not_implemented!__"
+        "Please_include_the__modm:printf__module_in_your_project!")
+
+
 
 def common_linkerscript(env):
     """
@@ -170,8 +175,10 @@ def common_linkerscript(env):
 
         "with_cpp_exceptions": env.get(":stdc++:exceptions", False),
         "with_heap": env.has_module(":platform:heap"),
+        "with_printf": env.has_module(":printf"),
         "with_crashcatcher": env.has_module(":crashcatcher"),
         "no_heap_section": common_no_heap_section,
+        "no_printf_section": common_no_printf_section,
     }
     properties.update(common_memories(env))
     return properties
@@ -336,6 +343,11 @@ def build(env):
     if not env.has_module(":platform:heap"):
         env.substitutions["no_heap_section"] = common_no_heap_section
         env.template("../../heap/cortex/no_heap.c.in", "no_heap.c")
+    # Deprecate printf functions if not implemented!
+    env.collect(":build:ccflags", "-fno-builtin-printf")
+    if not env.has_module(":printf"):
+        env.substitutions["no_printf_section"] = common_no_printf_section
+        env.template(repopath("ext/eyalroz/no_printf.c.in"), "no_printf.c")
 
     if env.has_module(":architecture:atomic"):
         env.template("atomic_lock_impl.hpp.in")

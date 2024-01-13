@@ -19,7 +19,6 @@ def prepare(module, options):
 
 def build(env):
     env.collect(":build:path.include", "modm/ext")
-    env.collect(":build:ccflags", "-fno-builtin-printf")
     env.outbasepath = "modm/ext/printf"
 
     env.copy("printf/src/printf/printf.h", "printf.h")

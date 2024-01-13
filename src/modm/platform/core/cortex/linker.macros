@@ -231,14 +231,8 @@ MAIN_STACK_SIZE = {{ options[":platform:cortex-m:main_stack_size"] }};
 		. = ALIGN(4);
 		__assertion_table_end = .;
 	} >{{memory}}
-
-	/* We do not call static destructors ever */
-	/DISCARD/ :
-	{
-		*(.fini_array .fini_array.*)
-	}
-	%% if with_cpp_exceptions
 	%#
+	%% if with_cpp_exceptions
 	/* C++ exception unwind tables */
 	.exidx :
 	{
@@ -257,24 +251,27 @@ MAIN_STACK_SIZE = {{ options[":platform:cortex-m:main_stack_size"] }};
 
 	/* required by libc __libc_fini_array, but never called */
 	_fini = .;
-	%% else
-	%#
-	/* C++ exception unwind tables are discarded */
+	%% endif
+
 	/DISCARD/ :
 	{
+		/* We do not call static destructors ever */
+		*(.fini_array .fini_array.*)
+		%% if not with_cpp_exceptions
+		/* C++ exception unwind tables are discarded */
 		*(.ARM.extab* .gnu.linkonce.armextab.*)
 		*(.ARM.exidx* .gnu.linkonce.armexidx.*)
 		*(.eh_frame*)
-	}
-	%% endif
-	%% if not with_heap
-	%#
-	/* Catch use of dynamic memory without `modm:platform:heap` module. */
-	/DISCARD/ :
-	{
+		%% endif
+		%% if not with_heap
+		/* Catch use of dynamic memory without `modm:platform:heap` module. */
 		*({{no_heap_section}})
+		%% endif
+		%% if not with_printf
+		/* Catch use of printf without `modm:printf` module. */
+		*({{no_printf_section}})
+		%% endif
 	}
-	%% endif
 %% endmacro
 
 
