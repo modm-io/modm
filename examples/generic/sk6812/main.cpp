@@ -16,15 +16,15 @@
 
 using namespace Board;
 
-using Output = Board::D11;
-modm::Sk6812w<SpiMaster1, Output, 8*8> leds;
+using Output = Board::spi::Sdo;
+modm::Sk6812w<Board::spi::Controller, Output, 8*8> leds;
 modm::ShortPeriodicTimer tmr{33ms};
 
 int
 main()
 {
 	Board::initialize();
-	LedD13::setOutput();
+	Leds::setOutput();
 	leds.initialize<Board::SystemClock>();
 
 	constexpr uint8_t max = 62;
@@ -45,7 +45,7 @@ main()
 		leds.write();
 
 		while(not tmr.execute()) ;
-		LedD13::toggle();
+		Leds::toggle();
 	}
 
 	return 0;
