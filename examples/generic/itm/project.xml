@@ -1,7 +1,9 @@
 <library>
   <extends>modm:nucleo-f303re</extends>
+  <!-- <extends>modm:nucleo-l476rg</extends> -->
+  <!-- <extends>modm:nucleo-f103rb</extends> -->
   <options>
-    <option name="modm:build:build.path">../../../build/nucleo_f303re/itm</option>
+    <option name="modm:build:build.path">../../../build/generic/itm</option>
     <option name="modm:platform:itm:buffer.tx">250</option>
   </options>
   <modules>

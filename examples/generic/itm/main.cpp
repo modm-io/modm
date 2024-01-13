@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2016, 2021, Sascha Schade
- * Copyright (c) 2017, Niklas Hauser
+ * Copyright (c) 2019, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -12,40 +11,29 @@
 
 #include <modm/board.hpp>
 #include <modm/processing.hpp>
-#include <modm/debug/logger.hpp>
 
 using namespace Board;
 
 modm::IODeviceWrapper<Itm, modm::IOBuffer::DiscardIfFull> itm_device;
+// Set all four logger streams to use ITM
 modm::IOStream stream(itm_device);
-
-/*
- * Blinks the green user LED with 1 Hz and outputs the loop counter over ITM.
- * SWO pin is PB3. openocd > 0.11.0 is required. Receive data with:
- * scons log-itm fcpu=72000000
- */
 
 int
 main()
 {
 	Board::initialize();
 	Itm::initialize();
+	Leds::setOutput();
 
 	stream << "Hello from the SWO." << modm::endl;
-	stream << "debug"   << modm::endl;
-	stream << "info"    << modm::endl;
-	stream << "warning" << modm::endl;
-	stream << "error"   << modm::endl;
-
-	LedGreen::set();
 
 	while (true)
 	{
 		static modm::PeriodicTimer tmr{500ms};
-
 		if (tmr.execute())
 		{
-			LedGreen::toggle();
+			tmr.restart(Button::read() ? 100ms : 500ms);
+			Leds::toggle();
 
 			static uint32_t counter{0};
 			stream << "loop: " << counter++ << modm::endl;
