@@ -1,0 +1,24 @@
+<library>
+  <!-- Cortex-M0 -->
+  <extends>modm:nucleo-f072rb</extends>
+  <!-- Cortex-M0+ -->
+  <!-- <extends>modm:nucleo-g071rb</extends> -->
+  <!-- Cortex-M3 -->
+  <!-- <extends>modm:nucleo-f103rb</extends> -->
+  <!-- Cortex-M4 -->
+  <!-- <extends>modm:nucleo-f429zi</extends> -->
+  <!-- Cortex-M7 -->
+  <!-- <extends>modm:nucleo-f767zi</extends> -->
+  <!-- <extends>modm:nucleo-h743zi</extends> -->
+  <!-- Cortex-M33 -->
+  <!-- <extends>modm:nucleo-u575zi-q</extends> -->
+  <!-- <extends>modm:nucleo-l552ze-q</extends> -->
+  <options>
+    <option name="modm:build:build.path">../../../build/generic/rtos</option>
+  </options>
+  <modules>
+    <module>modm:processing:rtos</module>
+    <module>modm:platform:heap</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

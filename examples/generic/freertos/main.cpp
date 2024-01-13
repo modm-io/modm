@@ -15,7 +15,6 @@
 #include <modm/processing/rtos.hpp>
 
 using namespace modm::platform;
-using namespace modm::literals;
 
 /**
  * This example uses four threads to check if task switching works correctly.
@@ -36,23 +35,24 @@ using namespace modm::literals;
  */
 
 // ----------------------------------------------------------------------------
-template <typename Gpio, int SleepTime>
-class P: modm::rtos::Thread
+class BlinkThread: modm::rtos::Thread
 {
 	char c;
+	uint8_t position;
+	uint16_t delay;
 	uint8_t i = 0;
 	volatile float a = 10.f;
 public:
-	P(char c): Thread(2,1<<10), c(c) {}
+	BlinkThread(char c, uint16_t delay, uint8_t position)
+	: Thread(2, 1024), c{c}, position{position}, delay{delay} {}
 
 	void run()
 	{
-		Gpio::setOutput();
 		while (true)
 		{
-			sleep(SleepTime * MILLISECONDS);
+			sleep(delay * MILLISECONDS);
 
-			Gpio::toggle();
+			Board::Leds::write((1ul << position) ^ Board::Leds::read());
 			{
 				static modm::rtos::Mutex lm;
 				modm::rtos::MutexGuard m(lm);
@@ -64,10 +64,10 @@ public:
 	}
 };
 
-P< Board::LedD13, 260      > p1('0');
-P< Board::LedD13, 260 + 10 > p2('a');
-P< Board::LedD13, 260 + 20 > p3('A');
-P< Board::LedD13, 260 + 30 > p4('!');
+BlinkThread p1('0', 260     , 0);
+BlinkThread p2('a', 260 + 10, 1);
+BlinkThread p3('A', 260 + 20, 2);
+BlinkThread p4('!', 260 + 30, 3);
 
 
 // ----------------------------------------------------------------------------
@@ -75,6 +75,10 @@ int
 main()
 {
 	Board::initialize();
+	Board::Leds::setOutput();
+
+	MODM_LOG_INFO << "\n\nReboot: FreeRTOS blink example" << modm::endl;
+
 	modm::rtos::Scheduler::schedule();
 	return 0;
 }
