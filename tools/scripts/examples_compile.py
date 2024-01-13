@@ -10,6 +10,7 @@
 import os
 import sys
 import re
+import shutil
 import argparse
 import platform
 import subprocess
@@ -21,12 +22,15 @@ is_running_in_ci = (os.getenv("CIRCLECI") is not None or
                     os.getenv("GITHUB_ACTIONS") is not None)
 is_running_on_windows = "Windows" in platform.platform()
 is_running_on_arm64 = "arm64" in platform.machine()
-build_dir = (Path(os.path.abspath(__file__)).parents[2] / "build")
+repo_dir = Path(os.path.abspath(__file__)).parents[2]
+build_dir = repo_dir / "build"
 cache_dir = build_dir / "cache"
-global_options = {}
-if is_running_in_ci:
-    global_options["::build.path"] = "build/"
-    global_options[":::cache_dir"] = str(cache_dir)
+repo_file = repo_dir / "repo.lb"
+option_collector_pattern = r'<!--(.+?)-->\n\s+<!-- *<(option|collect) +name="(.+?)">(.+?)</(?:option|collect)> *-->'
+option_map = {"option": "-D", "collect": "--collect"}
+module_pattern = r'<!--(.+?)-->\n\s+<!-- *<module>(.+?)</module> *-->'
+global_options = f" -D modm:build:build.path=build/ -D modm:build:scons:cache_dir={cache_dir}" if is_running_in_ci else ""
+
 
 def run_command(where, command, all_output=False):
     result = subprocess.run(command, shell=True, cwd=where, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -45,18 +49,45 @@ def enable(projects):
         filtered_projects.append(project)
     return filtered_projects
 
+def prepare(project):
+    project_cfg = project.read_text()
+    configs = set(re.findall(r"<extends>(.+?)</extends>", project_cfg))
+
+    if len(configs) >= 2:
+        output = ["=" * 90, f"Preparing: {project.parent}\n"]
+        config_options_collectors = re.findall(option_collector_pattern, project_cfg, flags=re.MULTILINE)
+        config_modules = re.findall(module_pattern, project_cfg, flags=re.MULTILINE)
+        generators = []
+        for config in sorted(configs):
+            config_name = re.sub(r"[:-]+", "_", config)
+            new_project_xml = re.search(r'<option +name="modm:build:build\.path">(.*?)</option>', project_cfg)[1]
+            new_project_xml = (project.parent / new_project_xml / config_name.replace("modm_", "") / "project.xml")
+            shutil.copytree(project.parent, new_project_xml.parent, dirs_exist_ok=True)
+            new_project_cfg = re.sub(r"<extends>.*?</extends>", "", project_cfg)
+            new_project_cfg = re.sub(r"<library>", f"<library>\n  <extends>{config}</extends>", new_project_cfg)
+            new_project_xml.write_text(new_project_cfg)
+            options = "".join(f" {option_map[t]} {k}={v}" for d,t,k,v in config_options_collectors if config in d)
+            build_options = "".join(f" -m {m}" for d,m in config_modules if config in d)
+            lbuild_options = f"-r {repo_file} -D modm:build:build.path=build/" + options
+            generators.append((project, config, lbuild_options, build_options, new_project_xml))
+            output.append(f"- {config:30}{options}{build_options}")
+        print("\n".join(output))
+        return generators
+
+    if '<option name="modm:target">hosted-linux</option>' in project_cfg:
+        target = "hosted-" + platform.system().lower()
+        if is_running_on_arm64: target += "-arm64"
+        return [(project, target, "-D modm:target=" + target, "", project)]
+
+    return [(project, "project.xml", "", "", project)]
 
 def generate(project):
-    path = project.parent
-    output = ["=" * 90, "Generating: {}".format(path)]
-    options = " ".join("-D{}={}".format(k, v) for k,v in global_options.items())
-    # Compile Linux examples under macOS with hosted-darwin target
-    if "hosted-linux" in project.read_text():
-        options += " -D:target=hosted-{}".format(platform.system().lower())
-        if is_running_on_arm64: options += "-arm64"
-    rc, ro = run_command(path, "lbuild {} build".format(options))
+    project, config, lbuild_options, build_options, project_xml = project
+    output = ["=" * 90, f"Generating: {project.parent} for {config}"]
+    cmd = f"lbuild {global_options} {lbuild_options} build {build_options} --no-log"
+    rc, ro = run_command(project_xml.parent, cmd)
     print("\n".join(output + [ro]))
-    return None if rc else project
+    return None if rc else project_xml.resolve()
 
 def build(project):
     path = project.parent
@@ -68,14 +99,14 @@ def build(project):
         commands.append( ("make build", "Make") )
     elif ":build:cmake" in project_cfg and not is_running_on_windows:
         build_dir = re.search(r'name=".+?:build:build.path">(.*?)</option>', project_cfg)[1]
-        cmd = "cmake -E make_directory {}/cmake-build-release; ".format(build_dir)
-        cmd += '(cd {}/cmake-build-release && cmake -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles" {}); '.format(build_dir, path.absolute())
-        cmd += "cmake --build {}/cmake-build-release".format(build_dir)
+        cmd = f"cmake -E make_directory {build_dir}/cmake-build-release; "
+        cmd += f'(cd {build_dir}/cmake-build-release && cmake -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles" {path.absolute()}); '
+        cmd += f"cmake --build {build_dir}/cmake-build-release"
         commands.append( (cmd, "CMake") )
 
     rcs = 0
     for command, build_system in commands:
-        output = ["=" * 90, "Building: {} with {}".format(path / "main.cpp", build_system)]
+        output = ["=" * 90, f"Building: {path.relative_to(repo_dir)}/main.cpp with {build_system}"]
         rc, ro = run_command(path, command)
         rcs += rc
         print("\n".join(output + [ro]))
@@ -93,7 +124,7 @@ def run(project):
 
     rcs = 0
     for command, build_system in commands:
-        output = ["=" * 90, "Running: {} with {}".format(path / "main.cpp", build_system)]
+        output = ["=" * 90, f"Running: {path.relative_to(repo_dir)}/main.cpp with {build_system}"]
         rc, ro = run_command(path, command, all_output=True)
         print("\n".join(output + [ro]))
         if "CI: run fail" in project_cfg:
@@ -104,7 +135,7 @@ def run(project):
     return None if rcs else project
 
 def compile_examples(paths, jobs, split, part):
-    print("Using {}x parallelism".format(jobs))
+    print(f"Using {jobs}x parallelism")
     # Create build folder to prevent process race
     cache_dir.mkdir(exist_ok=True, parents=True)
     (cache_dir / "config").write_text('{"prefix_len": 2}')
@@ -122,9 +153,17 @@ def compile_examples(paths, jobs, split, part):
     # Filter projects
     projects = enable(projects)
 
+    # first prepare all projects
+    with ThreadPool(jobs) as pool:
+        projects = pool.map(prepare, projects)
+    # Unlistify the project preparations
+    projects = [p for plist in projects for p in plist]
+    results += projects.count(None)
+
     # first generate all projects
     with ThreadPool(jobs) as pool:
         projects = pool.map(generate, projects)
+    # Unlistify the project configs
     results += projects.count(None)
 
     # Filter projects for successful generation
