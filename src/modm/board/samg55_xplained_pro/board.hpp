@@ -63,6 +63,7 @@ struct SystemClock
 };
 
 using Led = GpioA6;
+using Leds = SoftwareGpioPort<GpioA6>;
 using Button = GpioA2;
 using DebugUart = Usart7;
 using TxPin = GpioA28;

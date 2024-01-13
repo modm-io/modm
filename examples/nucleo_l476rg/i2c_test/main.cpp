@@ -29,8 +29,6 @@
 
 using MyI2cMaster = modm::platform::I2cMaster1;
 
-using namespace Board;
-
 template < class I2cMaster >
 class I2cTestDevice : public modm::I2cDevice<I2cMaster, 2>
 {
@@ -136,7 +134,7 @@ main()
 	MyI2cMaster::connect<Board::D14::Sda, Board::D15::Scl>();
 	MyI2cMaster::initialize<Board::SystemClock, 100_kHz>();
 
-	LedGreen::set();
+	Board::LedGreen::set();
 
 	RF_CALL_BLOCKING(i2c.ping());
 	modm::delay(25us);
@@ -161,7 +159,7 @@ main()
 
 	// Blink if run without hanging.
 	while(true) {
-		LedGreen::toggle();
+		Board::LedGreen::toggle();
 		modm::delay(500ms);
 	};
 

@@ -1,0 +1,73 @@
+<library>
+  <extends>modm:nucleo-l476rg</extends>
+  <!-- <extends>modm:arduino-uno</extends> -->
+  <!-- <extends>modm:black-pill-f103</extends> -->
+  <!-- <extends>modm:black-pill-f401</extends> -->
+  <!-- <extends>modm:black-pill-f411</extends> -->
+  <!-- <extends>modm:blue-pill-f103</extends> -->
+  <!-- <extends>modm:devebox-stm32f4xx</extends> -->
+  <!-- <extends>modm:devebox-stm32h750vb</extends> -->
+  <!-- <extends>modm:disco-f051r8</extends> -->
+  <!-- <extends>modm:disco-f072rb</extends> -->
+  <!-- <extends>modm:disco-f100rb</extends> -->
+  <!-- <extends>modm:disco-f303vc</extends> -->
+  <!-- <extends>modm:disco-f401vc</extends> -->
+  <!-- <extends>modm:disco-f407vg</extends> -->
+  <!-- <extends>modm:disco-f429zi</extends> -->
+  <!-- <extends>modm:disco-f469ni</extends> -->
+  <!-- <extends>modm:disco-f746ng</extends> -->
+  <!-- <extends>modm:disco-f769ni</extends> -->
+  <!-- <extends>modm:disco-l152rc</extends> -->
+  <!-- <extends>modm:disco-l476vg</extends> -->
+  <!-- <extends>modm:feather-m0</extends> -->
+  <!-- <extends>modm:feather-m4</extends> -->
+  <!-- <extends>modm:nucleo-f031k6</extends> -->
+  <!-- <extends>modm:nucleo-f042k6</extends> -->
+  <!-- <extends>modm:nucleo-f072rb</extends> -->
+  <!-- <extends>modm:nucleo-f091rc</extends> -->
+  <!-- <extends>modm:nucleo-f103rb</extends> -->
+  <!-- <extends>modm:nucleo-f303k8</extends> -->
+  <!-- <extends>modm:nucleo-f303re</extends> -->
+  <!-- <extends>modm:nucleo-f334r8</extends> -->
+  <!-- <extends>modm:nucleo-f401re</extends> -->
+  <!-- <extends>modm:nucleo-f411re</extends> -->
+  <!-- <extends>modm:nucleo-f429zi</extends> -->
+  <!-- <extends>modm:nucleo-f446re</extends> -->
+  <!-- <extends>modm:nucleo-f446ze</extends> -->
+  <!-- <extends>modm:nucleo-f746zg</extends> -->
+  <!-- <extends>modm:nucleo-f767zi</extends> -->
+  <!-- <extends>modm:nucleo-g071rb</extends> -->
+  <!-- <extends>modm:nucleo-g431kb</extends> -->
+  <!-- <extends>modm:nucleo-g431rb</extends> -->
+  <!-- <extends>modm:nucleo-g474re</extends> -->
+  <!-- <extends>modm:nucleo-h723zg</extends> -->
+  <!-- <extends>modm:nucleo-h743zi</extends> -->
+  <!-- <extends>modm:nucleo-l031k6</extends> -->
+  <!-- <extends>modm:nucleo-l053r8</extends> -->
+  <!-- <extends>modm:nucleo-l152re</extends> -->
+  <!-- <extends>modm:nucleo-l432kc</extends> -->
+  <!-- <extends>modm:nucleo-l452re</extends> -->
+  <!-- <extends>modm:nucleo-l476rg</extends> -->
+  <!-- <extends>modm:nucleo-l496zg-p</extends> -->
+  <!-- <extends>modm:nucleo-l552ze-q</extends> -->
+  <!-- <extends>modm:nucleo-u575zi-q</extends> -->
+  <!-- <extends>modm:olimexino-stm32</extends> -->
+  <!-- <extends>modm:rp-pico</extends> -->
+  <!-- <extends>modm:samd21-xplained-pro</extends> -->
+  <!-- <extends>modm:same54-xplained-pro</extends> -->
+  <!-- <extends>modm:same70-xplained</extends> -->
+  <!-- <extends>modm:samg55-xplained-pro</extends> -->
+  <!-- <extends>modm:samv71-xplained-ultra</extends> -->
+  <!-- <extends>modm:srxe</extends> -->
+  <!-- <extends>modm:stm32f030_demo</extends> -->
+  <!-- <extends>modm:thingplus-rp2040</extends> -->
+  <options>
+    <option name="modm:build:build.path">../../../build/generic/blink</option>
+    <!-- Required for modm:black-pill-f103, modm:blue-pill-f103, modm:stm32f030_demo, modm:devebox-stm32f4xx, modm:devebox-stm32h750vb -->
+    <!-- <option name="modm:build:openocd.cfg">../stlink.cfg</option> -->
+  </options>
+  <modules>
+    <module>modm:architecture:delay</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>
