@@ -1,0 +1,18 @@
+<library>
+  <extends>modm:disco-f303vc</extends>
+  <!-- <extends>modm:blue-pill-f103</extends> -->
+  <!-- <extends>modm:black-pill-f401</extends> -->
+  <options>
+    <option name="modm:build:build.path">../../../build/generic/rtt</option>
+    <option name="modm:platform:rtt:buffer.tx">256</option>
+    <option name="modm:platform:rtt:buffer.rx">16</option>
+    <!-- Required for modm:blue-pill-f103, modm:black-pill-f401 -->
+    <!-- <option name="modm:build:openocd.cfg">../stlink.cfg</option> -->
+  </options>
+  <modules>
+    <module>modm:platform:rtt</module>
+    <module>modm:processing:timer</module>
+    <module>modm:build:scons</module>
+    <module>modm:debug</module>
+  </modules>
+</library>

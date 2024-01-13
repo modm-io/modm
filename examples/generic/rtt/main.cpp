@@ -59,6 +59,7 @@ int
 main()
 {
 	Board::initialize();
+	Leds::setOutput();
 
 	MODM_LOG_DEBUG << "Debug" << modm::endl;
 	MODM_LOG_INFO << "Info" << modm::endl;
@@ -83,7 +84,7 @@ main()
 		}
 		if (tmr.execute())
 		{
-			LedNorth::toggle();
+			Leds::toggle();
 
 			MODM_LOG_INFO << "loop: " << counter++ << modm::endl;
 		}
