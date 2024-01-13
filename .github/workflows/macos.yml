@@ -67,13 +67,18 @@ jobs:
         run: |
           (cd examples && ../tools/scripts/examples_compile.py linux)
 
-      - name: Compile STM32 Examples
+      - name: Generic Examples
         if: always()
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py nucleo_f031k6 nucleo_f103rb nucleo_f303re nucleo_f411re nucleo_f746zg)
-          (cd examples && ../tools/scripts/examples_compile.py nucleo_g071rb nucleo_l031k6 nucleo_l152re nucleo_l476rg nucleo_g474re)
+          (cd examples && ../tools/scripts/examples_compile.py generic)
+
+      - name: Compile STM32 Discovery Examples
+        if: always()
+        run: |
+          (cd examples && ../tools/scripts/examples_compile.py stm32f0_discovery stm32f072_discovery stm32f1_discovery stm32f3_discovery stm32f4_discovery)
+          (cd examples && ../tools/scripts/examples_compile.py stm32f401_discovery stm32f469_discovery stm32f746g_discovery stm32f769i_discovery)
 
       - name: Compile AVR Examples
         if: always()
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py avr)
+          (cd examples && ../tools/scripts/examples_compile.py avr arduino_nano arduino_uno srxe)
