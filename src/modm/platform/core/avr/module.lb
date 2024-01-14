@@ -36,7 +36,6 @@ def build(env):
     env.outbasepath = "modm/link"
     env.copy("linkerscript.ld")
     env.collect(":build:linkflags", "-L{project_source_dir}",
-                "-Wl,--no-warn-rwx-segment",
                 "-T{}".format(env.relcwdoutpath("modm/link/linkerscript.ld")))
 
     env.substitutions = {
