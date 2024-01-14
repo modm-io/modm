@@ -260,7 +260,7 @@ files in the next steps.
 
 #### ARM Cortex-M
 
-Install the [pre-built ARM toolchain via the 64-bit installer][toolchain-arm-xpack]
+Install the [pre-built ARM toolchain via the 64-bit installer](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads)
 and make sure you select **Add path to environment variable** at the end!
 Open a new command prompt to test the compiler:
 
@@ -416,12 +416,12 @@ picocom --baud 115200 --imap lfcrlf --echo /dev/ttyACM0
 [openocd-install]: https://github.com/rleh/openocd-build
 [udev-rules-openocd]: https://github.com/openocd-org/openocd/blob/master/contrib/60-openocd.rules#L84-L99
 [usbipd]: https://github.com/dorssel/usbipd-win
-[winavr]: https://blog.zakkemble.net/avr-gcc-builds/
+[winavr]: https://github.com/ZakKemble/avr-gcc-build/releases/tag/v12.1.0-1
 [windows-store-ubuntu-22-04-1-lts]: https://www.microsoft.com/store/productId/9PN20MSR04DW
 [wingit]: https://git-scm.com/download/win
 [winterm]: https://github.com/Microsoft/Terminal
 [winwsl]: https://docs.microsoft.com/en-us/windows/wsl/about
-[wsl2]: https://docs.microsoft.com/en-us/windows/wsl/about#what-is-wsl-2    
+[wsl2]: https://docs.microsoft.com/en-us/windows/wsl/about#what-is-wsl-2
 [wsl-connect-usb]: https://docs.microsoft.com/en-us/windows/wsl/connect-usb
 [wsl-install]: https://docs.microsoft.com/en-us/windows/wsl/install
 [wsl-vscode]: https://docs.microsoft.com/en-us/windows/wsl/tutorials/wsl-vscode
