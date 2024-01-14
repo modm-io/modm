@@ -1,0 +1,126 @@
+name: Run tests on Windows
+
+on: [pull_request]
+
+jobs:
+  windows_testing:
+    runs-on: windows-2022
+    env:
+      PYTHONIOENCODING: "utf-8"
+
+    steps:
+
+      # Disabling snake-oil for performance reasons
+      - name: Disable Windows Defender
+        run: Set-MpPreference -DisableRealtimeMonitoring $true
+
+      # This doesn't work due to files getting overwritten from inside the zip
+      #   [System.IO.Compression.ZipFile]::ExtractToDirectory("gcc-arm-none-eabi-win64.zip", "C:\")
+      # And this manual expansion code
+      #   function Unzip($zipfile, $outdir)
+      #   {
+      #     Add-Type -AssemblyName System.IO.Compression.FileSystem
+      #     $archive = [System.IO.Compression.ZipFile]::OpenRead($zipfile)
+      #     foreach ($entry in $archive.Entries)
+      #     {
+      #       $entryTargetFilePath = [System.IO.Path]::Combine($outdir, $entry.FullName)
+      #       $entryDir = [System.IO.Path]::GetDirectoryName($entryTargetFilePath)
+      #       if(!(Test-Path $entryDir )){
+      #           New-Item -ItemType Directory -Path $entryDir | Out-Null
+      #       }
+      #       if (!$entryTargetFilePath.EndsWith("\") -And !$entryTargetFilePath.EndsWith("/")) {
+      #         [System.IO.Compression.ZipFileExtensions]::ExtractToFile($entry, $entryTargetFilePath, $true);
+      #       }
+      #     }
+      #   }
+      #   Unzip -zipfile "gcc-arm-none-eabi-win64.zip" -outdir "C:\"
+      # is not faster than
+      #   Expand-Archive -Path gcc-arm-none-eabi-win64.zip -DestinationPath C:\ -Force
+      - name: Download and Unzip GCCs
+        shell: powershell
+        run: |
+          $ProgressPreference = 'SilentlyContinue'
+          Start-Job {
+            Set-Location $using:PWD
+            Add-Type -Assembly "System.IO.Compression.Filesystem"
+            Invoke-WebRequest -OutFile gcc-win64.zip https://github.com/brechtsanders/winlibs_mingw/releases/download/12.2.0-15.0.6-10.0.0-msvcrt-r3/winlibs-x86_64-posix-seh-gcc-12.2.0-mingw-w64msvcrt-10.0.0-r3.zip
+            [System.IO.Compression.ZipFile]::ExtractToDirectory("gcc-win64.zip", "C:\")
+          }
+          Start-Job {
+            Set-Location $using:PWD
+            Invoke-WebRequest -OutFile gcc-arm-none-eabi-win64.zip https://developer.arm.com/-/media/Files/downloads/gnu/12.2.rel1/binrel/arm-gnu-toolchain-12.2.rel1-mingw-w64-i686-arm-none-eabi.zip
+            Expand-Archive -Path gcc-arm-none-eabi-win64.zip -DestinationPath C:\ -Force
+          }
+          Start-Job {
+            Set-Location $using:PWD
+            Add-Type -Assembly "System.IO.Compression.Filesystem"
+            Invoke-WebRequest -OutFile gcc-avr-win64.zip https://github.com/ZakKemble/avr-gcc-build/releases/download/v12.1.0-1/avr-gcc-12.1.0-x64-windows.zip
+            [System.IO.Compression.ZipFile]::ExtractToDirectory("gcc-avr-win64.zip", "C:\")
+          }
+          Get-Job | Wait-Job
+
+      - name: Install GCCs
+        if: always()
+        shell: powershell
+        run: |
+          dir C:\
+          dir C:\mingw64
+          dir C:\arm-gnu-toolchain-12.2.rel1-mingw-w64-i686-arm-none-eabi
+          dir C:\avr-gcc-12.1.0-x64-windows
+          echo "C:\mingw64\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "C:\arm-gnu-toolchain-12.2.rel1-mingw-w64-i686-arm-none-eabi\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "C:\avr-gcc-12.1.0-x64-windows\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          rm gcc-arm-none-eabi-win64.zip
+
+      - name: Install Python
+        if: always()
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install Python packages
+        if: always()
+        run: |
+          pip install --upgrade --upgrade-strategy=eager modm scons future
+
+      - name: Show Version Information
+        if: always()
+        run: |
+          gcc --version
+          g++ --version
+          make --version
+          arm-none-eabi-g++ --version
+          avr-g++ --version
+          lbuild --version
+          python -c "import os; print(os.cpu_count())"
+
+      - name: Check out repository
+        if: always()
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+
+      - name: Hosted Examples
+        if: always()
+        shell: bash
+        run: |
+          (cd examples && python ../tools/scripts/examples_compile.py linux/assert linux/block_device/ram linux/build_info linux/git linux/logger linux/printf linux/etl linux/fiber)
+
+      - name: Hosted Unittests
+        if: always()
+        shell: bash
+        run: |
+          (cd test && make run-hosted-windows)
+
+      - name: Compile STM32 Examples
+        if: always()
+        shell: bash
+        run: |
+          (cd examples && python ../tools/scripts/examples_compile.py nucleo_f031k6 nucleo_f103rb nucleo_f303re nucleo_f411re nucleo_f746zg)
+          (cd examples && python ../tools/scripts/examples_compile.py nucleo_g071rb nucleo_l031k6 nucleo_l152re nucleo_l476rg nucleo_g474re)
+
+      - name: Compile AVR Examples
+        if: always()
+        shell: bash
+        run: |
+          (cd examples && ../tools/scripts/examples_compile.py avr arduino_nano arduino_uno srxe)
