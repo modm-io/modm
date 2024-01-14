@@ -19,8 +19,6 @@ void function1(uint32_t bla)
 
 	if (Button::read()) {
 		// execute undefined instructed
-		// the hard fault handler will blink the blue LED
-		// or, if the debugger is connected, will trigger a breakpoint
 		asm volatile (".short 0xde00");
 	}
 }
@@ -46,10 +44,10 @@ int
 main()
 {
 	Board::initialize();
-	LedOrange::set();
+	Board::Leds::setOutput(modm::Gpio::High);
 
-	uint32_t *const ptr = new uint32_t[20*1024];
-	MODM_LOG_INFO << "Can I allocate 20kB? answer: " << ptr << modm::endl;
+	uint32_t *const ptr = new uint32_t[2*1024];
+	MODM_LOG_INFO << "Can I allocate 2kB? answer: " << ptr << modm::endl;
 
 	if (FaultReporter::hasReport())
 	{
@@ -60,10 +58,6 @@ main()
 #endif
 		MODM_LOG_ERROR << "firmware=" << modm::hex;
 		for (const auto data : FaultReporter::buildId()) MODM_LOG_ERROR << data;
-		MODM_LOG_ERROR << "\nor\n\tmake debug-coredump";
-#ifdef MODM_DEBUG_BUILD
-		MODM_LOG_ERROR << " profile=debug";
-#endif
 		MODM_LOG_ERROR << "\n\n";
 		for (const auto data : FaultReporter())
 			MODM_LOG_ERROR << modm::hex << data << modm::flush;
@@ -73,16 +67,15 @@ main()
 
 	MODM_LOG_INFO << "Hold Button to cause a Hardfault!" << modm::endl;
 
+#ifdef CoreDebug_DHCSR_C_DEBUGEN_Msk
 	if (CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) {
-		// if this LED is on, the debugger is connected
-		LedRed::set();
 		MODM_LOG_INFO << "Debugger connected!" << modm::endl;
 	}
+#endif
 
 	while (true)
 	{
-		LedGreen::toggle();
-		LedOrange::toggle();
+		Board::Leds::toggle();
 
 		function2(23, 43);
 

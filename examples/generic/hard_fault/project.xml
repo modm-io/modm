@@ -1,0 +1,18 @@
+<library>
+  <extends>modm:nucleo-f072rb</extends>
+  <!-- <extends>modm:nucleo-f103rb</extends> -->
+  <!-- <extends>modm:nucleo-f446ze</extends> -->
+  <!-- <extends>modm:nucleo-f746zg</extends> -->
+  <!-- <extends>modm:nucleo-g071rb</extends> -->
+  <!-- <extends>modm:nucleo-h743zi</extends> -->
+  <!-- <extends>modm:nucleo-l552ze-q</extends> -->
+  <!-- <extends>modm:nucleo-u575zi-q</extends> -->
+  <options>
+    <option name="modm:build:build.path">../../../build/generic/hard_fault</option>
+  </options>
+  <modules>
+    <module>modm:platform:fault</module>
+    <module>modm:platform:heap</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>
