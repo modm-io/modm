@@ -14,15 +14,17 @@ def init(module):
     module.name = ":platform:iwdg"
     module.description = "Independent watchdog"
 
+
 def prepare(module, options):
     device = options[":target"]
-    target = device.identifier
-    if target["family"] in ["h7"]:
-        # STM32H7 is not yet supported with any IWDG implementation im modm
+    # STM32H7 is not yet supported with any IWDG implementation
+    if device.identifier.family in ["h7"]:
         return False
+
+    module.depends(":cmsis:device")
     return device.has_driver("iwdg:stm32")
+
 
 def build(env):
     env.outbasepath = "modm/src/modm/platform/iwdg"
     env.copy("iwdg.hpp")
-    env.copy("iwdg.cpp")

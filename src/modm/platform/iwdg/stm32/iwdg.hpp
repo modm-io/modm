@@ -12,11 +12,16 @@
 #pragma once
 #include "../device.hpp"
 
+
+namespace modm::platform
+{
+
+/// @ingroup modm_platform_iwdg
 class Iwdg
 {
 public:
 	enum class
-	Prescaler : uint32_t
+	Prescaler : uint8_t
 	{
 		Div4 = 0,
 		Div8 = IWDG_PR_PR_0,
@@ -29,7 +34,7 @@ public:
 	};
 
 	enum class
-	Status : uint32_t
+	Status : uint8_t
 	{
 		None = 0,
 		Prescaler = IWDG_SR_PVU,
@@ -37,20 +42,44 @@ public:
 		All = IWDG_SR_PVU | IWDG_SR_RVU,
 	};
 
-	static void
-	initialize(Prescaler prescaler, uint32_t reload);
-	static void
-	enable();
-	static void
-	trigger();
-	static Status
-	getStatus();
+public:
+	static inline void
+	initialize(Prescaler prescaler, uint32_t reload)
+	{
+		writeKey(writeCommand);
+		IWDG->PR = uint32_t(prescaler);
+		IWDG->RLR = reload;
+		writeKey(0); // disable access to PR and RLR registers
+	}
+
+	static inline void
+	enable()
+	{
+		writeKey(enableCommand);
+	}
+
+	static inline void
+	trigger()
+	{
+		writeKey(reloadCommand);
+	}
+
+	static inline Status
+	getStatus()
+	{
+		return Status(IWDG->SR);
+	}
 
 private:
-	static constexpr uint32_t reloadCommand = 0xAAAA;
-	static constexpr uint32_t writeCommand = 0x5555;
-	static constexpr uint32_t enableCommand = 0xCCCC;
+	static constexpr uint16_t reloadCommand = 0xAAAA;
+	static constexpr uint16_t writeCommand = 0x5555;
+	static constexpr uint16_t enableCommand = 0xCCCC;
 
-	static void
-	writeKey(uint32_t key);
+	static inline void
+	writeKey(uint16_t key)
+	{
+		IWDG->KR = key;
+	}
 };
+
+}
