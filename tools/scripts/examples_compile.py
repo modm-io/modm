@@ -35,6 +35,16 @@ def run_command(where, command, all_output=False):
     output += result.stderr.decode("utf-8", errors="ignore").strip(" \n")
     return (result.returncode, output)
 
+def enable(projects):
+    filtered_projects = []
+    for project in projects:
+        if (query := re.search(r"<!-- CI: enable (.*?) -->", project.read_text())) is not None and not eval(query[1]):
+            print(f"Filtering out {project}: {query[1]}")
+            continue
+        filtered_projects.append(project)
+    return filtered_projects
+
+
 def generate(project):
     path = project.parent
     output = ["=" * 90, "Generating: {}".format(path)]
@@ -54,7 +64,7 @@ def build(project):
         commands.append( ("scons build --cache-show --random", "SCons") )
     if ":build:make" in project_cfg and not is_running_on_windows:
         commands.append( ("make build", "Make") )
-    elif ":build:cmake" in project_cfg:
+    elif ":build:cmake" in project_cfg and not is_running_on_windows:
         build_dir = re.search(r'name=".+?:build:build.path">(.*?)</option>', project_cfg)[1]
         cmd = "cmake -E make_directory {}/cmake-build-release; ".format(build_dir)
         cmd += '(cd {}/cmake-build-release && cmake -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles" {}); '.format(build_dir, path.absolute())
@@ -107,6 +117,8 @@ def compile_examples(paths, jobs, split, part):
     if split > 1:
         chunk_size = math.ceil(len(projects) / args.split)
         projects = projects[chunk_size*args.part:min(chunk_size*(args.part+1), len(projects))]
+    # Filter projects
+    projects = enable(projects)
 
     # first generate all projects
     with ThreadPool(jobs) as pool:
