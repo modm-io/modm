@@ -39,7 +39,7 @@
 /// Yield protothread till next call to its run().
 /// \hideinitializer
 #define PT_YIELD() \
-	modm::fiber::yield()
+	modm::this_fiber::yield()
 
 /// Cause protothread to wait **while** given condition is true.
 /// \hideinitializer

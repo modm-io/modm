@@ -26,14 +26,14 @@ modm::platform::SpiMaster{{ id }}::transfer(uint8_t data)
 
 	// wait for previous transfer to finish
 	while (!isTransmitDataRegisterEmpty())
-		modm::fiber::yield();
+		modm::this_fiber::yield();
 
 	// start transfer by copying data into register
 	write(data);
 
 	// wait for current transfer to finish
 	while(!isReceiveDataRegisterFull())
-		modm::fiber::yield();
+		modm::this_fiber::yield();
 
 	return read();
 %% else

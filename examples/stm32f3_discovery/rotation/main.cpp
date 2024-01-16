@@ -69,7 +69,7 @@ modm_faststack modm::Fiber<> fiber_gyro([]()
 		}
 
 		// repeat every 5 ms
-		modm::fiber::sleep(5ms);
+		modm::this_fiber::sleep_for(5ms);
 	}
 });
 
@@ -78,7 +78,7 @@ modm_faststack modm::Fiber<> fiber_blinky([]()
 	while (true)
 	{
 		Board::LedSouth::toggle();
-		modm::fiber::sleep(1s);
+		modm::this_fiber::sleep_for(1s);
 	}
 });
 

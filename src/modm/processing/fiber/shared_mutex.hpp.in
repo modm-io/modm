@@ -1,0 +1,141 @@
+/*
+ * Copyright (c) 2023, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include "mutex.hpp"
+
+namespace modm::fiber
+{
+
+/// @ingroup modm_processing_fiber
+/// @{
+
+/// Implements the `std::shared_mutex` interface for fibers.
+/// @see https://en.cppreference.com/w/cpp/thread/shared_mutex
+class shared_mutex
+{
+	shared_mutex(const shared_mutex&) = delete;
+	shared_mutex& operator=(const shared_mutex&) = delete;
+
+	volatile ::modm::fiber::id owner{0};
+public:
+	constexpr shared_mutex() = default;
+
+	[[nodiscard]] bool
+	try_lock()
+	{
+%% if multicore
+		modm::platform::multicore::SystemSpinLockGuard g;
+%% endif
+		if (owner) return false;
+		owner = modm::this_fiber::get_id();
+		return true;
+	}
+
+	void
+	lock()
+	{
+		while(not try_lock()) modm::this_fiber::yield();
+	}
+
+	void
+	unlock()
+	{
+		owner = 0;
+	}
+
+	[[nodiscard]] bool
+	try_lock_shared()
+	{
+%% if multicore
+		modm::platform::multicore::SystemSpinLockGuard g;
+%% endif
+		if (owner > 1) return false;
+		owner = 1;
+		return true;
+	}
+
+	void
+	lock_shared()
+	{
+		while(not try_lock_shared()) modm::this_fiber::yield();
+	}
+
+	void
+	unlock_shared()
+	{
+		owner = 0;
+	}
+};
+
+/// Implements the `std::timed_shared_mutex` interface for fibers.
+/// @see https://en.cppreference.com/w/cpp/thread/timed_shared_mutex
+class timed_shared_mutex : public shared_mutex
+{
+public:
+	template< typename Rep, typename Period >
+	[[nodiscard]] bool
+	try_lock_for(std::chrono::duration<Rep, Period> sleep_duration)
+	{
+		// Only choose the microsecond clock if necessary
+		using Clock = std::conditional_t<
+			std::is_convertible_v<std::chrono::duration<Rep, Period>,
+								  std::chrono::duration<Rep, std::milli>>,
+			modm::chrono::milli_clock, modm::chrono::micro_clock>;
+		return try_lock_until(Clock::now() + sleep_duration);
+	}
+
+	template< class Clock, class Duration >
+	[[nodiscard]] bool
+	try_lock_until(std::chrono::time_point<Clock, Duration> sleep_time)
+	{
+		do
+		{
+			if (try_lock()) return true;
+			modm::this_fiber::yield();
+		}
+		while((sleep_time - Clock::now()) >= Duration(0));
+		return false;
+	}
+
+	template< typename Rep, typename Period >
+	[[nodiscard]] bool
+	try_lock_shared_for(std::chrono::duration<Rep, Period> sleep_duration)
+	{
+		// Only choose the microsecond clock if necessary
+		using Clock = std::conditional_t<
+			std::is_convertible_v<std::chrono::duration<Rep, Period>,
+								  std::chrono::duration<Rep, std::milli>>,
+			modm::chrono::milli_clock, modm::chrono::micro_clock>;
+		return try_lock_shared_until(Clock::now() + sleep_duration);
+	}
+
+	template< class Clock, class Duration >
+	[[nodiscard]] bool
+	try_lock_shared_until(std::chrono::time_point<Clock, Duration> sleep_time)
+	{
+		do
+		{
+			if (try_lock_shared()) return true;
+			modm::this_fiber::yield();
+		}
+		while((sleep_time - Clock::now()) >= Duration(0));
+		return false;
+	}
+};
+
+using SharedMuted = shared_mutex;
+using TimedSharedMuted = timed_shared_mutex;
+
+/// @}
+
+}

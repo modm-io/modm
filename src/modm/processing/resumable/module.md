@@ -164,17 +164,17 @@ preprocessor macros and C++ implementations of this and the
 `modm:processing:protothreads` module with a fiber version.
 
 Specifically, the `PT_*` and `RF_*` macros are now forwarding their arguments
-unmodified and instead relying on `modm::fiber::yield()` for context switching:
+unmodified and instead relying on `modm::this_fiber::yield()` for context switching:
 
 ```cpp
-#define RF_YIELD() modm::fiber::yield()
-#define RF_WAIT_WHILE(cond) while(cond) { modm::fiber::yield(); }
+#define RF_YIELD() modm::this_fiber::yield()
+#define RF_WAIT_WHILE(cond) while(cond) { modm::this_fiber::yield(); }
 #define RF_CALL(func) func
 #define RF_RETURN(value) return value
 ```
 
 You may call `RF_CALL_BLOCKING(resumable)` outside a fiber context, in which
-case the `modm::fiber::yield()` will return immediately, which is the same
+case the `modm::this_fiber::yield()` will return immediately, which is the same
 behavior as before.
 
 However, the `modm::ResumableResult`, `modm::Resumable`, and `modm::NestedResumable`

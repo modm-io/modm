@@ -30,12 +30,12 @@ modm::platform::SpiMaster{{ id }}::transfer(uint8_t data)
 {
 %% if use_fiber
 	// wait for previous transfer to finish
-	while (txFifoFull()) modm::fiber::yield();
+	while (txFifoFull()) modm::this_fiber::yield();
 
 	// start transfer by copying data into register
 	write(data);
 
-	while (rxFifoEmpty()) modm::fiber::yield();
+	while (rxFifoEmpty()) modm::this_fiber::yield();
 
 	return read();
 %% else

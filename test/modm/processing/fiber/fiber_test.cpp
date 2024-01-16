@@ -44,7 +44,7 @@ void
 f1()
 {
 	ADD_STATE(F1_START);
-	modm::fiber::yield();
+	modm::this_fiber::yield();
 	ADD_STATE(F1_END);
 }
 
@@ -52,7 +52,7 @@ void
 f2()
 {
 	ADD_STATE(F2_START);
-	modm::fiber::yield();
+	modm::this_fiber::yield();
 	ADD_STATE(F2_END);
 }
 
@@ -88,7 +88,7 @@ __attribute__((noinline)) void
 subroutine()
 {
 	ADD_STATE(SUBROUTINE_START);
-	modm::fiber::yield();
+	modm::this_fiber::yield();
 	ADD_STATE(SUBROUTINE_END);
 }
 

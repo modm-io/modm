@@ -15,8 +15,9 @@
 
 #include "scheduler.hpp"
 #include <modm/processing/timer.hpp>
+#include <type_traits>
 
-namespace modm::fiber
+namespace modm::this_fiber
 {
 
 /// @ingroup modm_processing_fiber
@@ -39,33 +40,49 @@ namespace modm::fiber
 inline void
 yield()
 {
-	Scheduler::instance().yield();
+	modm::fiber::Scheduler::instance().yield();
+}
+
+/// Returns the id of the current fiber
+inline modm::fiber::id
+get_id()
+{
+	return modm::fiber::Scheduler::instance().get_id();
 }
 
 /**
- * Yields the current fiber until the time interval has elapsed.
+ * Yields the current fiber until the time duration has elapsed.
  * This functionality is a convenience wrapper around `modm::Timeout`
- * if interval ≥1ms or `modm::PreciseTimeout` if interval ≥1µs.
+ * if duration ≥1ms or `modm::PreciseTimeout` if duration ≥1µs.
  * For nanosecond delays, use `modm::delay(ns)`.
  *
  * @note Due to the overhead of `yield()` and the scheduling other fibers, the
- *       sleep interval may be longer without any guarantee of an upper limit.
+ *       sleep duration may be longer without any guarantee of an upper limit.
  */
 template< typename Rep, typename Period >
 void
-sleep(std::chrono::duration<Rep, Period> interval)
+sleep_for(std::chrono::duration<Rep, Period> sleep_duration)
 {
 	// Only choose the microsecond clock if necessary
-	using TimeoutType = std::conditional_t<
+	using Clock = std::conditional_t<
 		std::is_convertible_v<std::chrono::duration<Rep, Period>,
 							  std::chrono::duration<Rep, std::milli>>,
-		modm::GenericTimeout< modm::chrono::milli_clock, modm::chrono::milli_clock::duration>,
-		modm::GenericTimeout< modm::chrono::micro_clock, modm::chrono::micro_clock::duration>
-	>;
+		modm::chrono::milli_clock, modm::chrono::micro_clock>;
+	return sleep_until(Clock::now() + sleep_duration);
+}
 
-	TimeoutType timeout(interval);
-	while(not timeout.isExpired())
-		modm::fiber::yield();
+/**
+ * Yields the current fiber until the sleep time has been reached.
+ *
+ * @note Due to the overhead of `yield()` and the scheduling other fibers, the
+ *       sleep duration may be longer without any guarantee of an upper limit.
+ */
+template< class Clock, class Duration >
+void
+sleep_until(std::chrono::time_point<Clock, Duration> sleep_time)
+{
+	do modm::this_fiber::yield();
+	while((sleep_time - Clock::now()) >= Duration(0));
 }
 
 /// @}

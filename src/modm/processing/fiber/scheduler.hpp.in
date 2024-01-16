@@ -13,11 +13,14 @@
 
 #pragma once
 
-#include "fiber.hpp"
+#include "task.hpp"
 #include <modm/processing/timer.hpp>
 %% if multicore
 #include <modm/platform/core/multicore.hpp>
 %% endif
+
+// forward declaration
+namespace modm::this_fiber { void yield(); modm::fiber::id get_id(); }
 
 namespace modm::fiber
 {
@@ -33,13 +36,20 @@ namespace modm::fiber
 class Scheduler
 {
 	friend class Task;
-	friend void yield();
+	friend void modm::this_fiber::yield();
+	friend modm::fiber::id modm::this_fiber::get_id();
 	Scheduler(const Scheduler&) = delete;
 	Scheduler& operator=(const Scheduler&) = delete;
 
 protected:
 	Task* last{nullptr};
 	Task* current{nullptr};
+
+	uintptr_t
+	get_id() const
+	{
+		return reinterpret_cast<uintptr_t>(current);
+	}
 
 	void
 	runNext(Task* task)

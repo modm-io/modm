@@ -45,7 +45,7 @@ modm::platform::SpiMaster{{ id }}::transfer(uint8_t data)
 	// start transfer by copying data into register
 	SPDR{{ id }} = data;
 
-	do modm::fiber::yield();
+	do modm::this_fiber::yield();
 	while (!(SPSR{{ id }} & (1 << SPIF{{ id }})));
 
 	return SPDR{{ id }};

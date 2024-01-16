@@ -17,7 +17,7 @@ void hello()
 	for(int ii=0; ii<10; ii++)
 	{
 		MODM_LOG_INFO << "Hello ";
-		modm::fiber::yield();
+		modm::this_fiber::yield();
 	}
 }
 
@@ -28,7 +28,7 @@ struct Test
 		for(int ii=0; ii<10; ii++)
 		{
 			MODM_LOG_INFO << arg << modm::endl;
-			modm::fiber::yield();
+			modm::this_fiber::yield();
 		}
 	}
 } test;

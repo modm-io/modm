@@ -83,11 +83,11 @@ option, which replaces the preprocessor macros and C++ implementations of this
 and the `modm:processing:resumable` module with a fiber version.
 
 Specifically, the `PT_*` and `RF_*` macros are now forwarding their arguments
-unmodified and instead relying on `modm::fiber::yield()` for context switching:
+unmodified and instead relying on `modm::this_fiber::yield()` for context switching:
 
 ```cpp
-#define PT_YIELD() modm::fiber::yield()
-#define PT_WAIT_WHILE(cond) while(cond) { modm::fiber::yield(); }
+#define PT_YIELD() modm::this_fiber::yield()
+#define PT_WAIT_WHILE(cond) while(cond) { modm::this_fiber::yield(); }
 #define PT_CALL(func) func
 ```
 

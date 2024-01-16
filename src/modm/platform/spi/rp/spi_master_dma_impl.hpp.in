@@ -123,16 +123,16 @@ modm::platform::SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(
 	startTransfer(tx, rx, length);
 
 	while (Dma::TxChannel::isBusy() or (rx and Dma::RxChannel::isBusy()))
-		modm::fiber::yield();
+		modm::this_fiber::yield();
 
 	while (!txFifoEmpty() or (rx and !rxFifoEmpty()) or isBusy())
-		modm::fiber::yield();
+		modm::this_fiber::yield();
 
 	if (!rx) {
 		// Drain RX FIFO, then wait for shifting to finish (which
 		// may be *after* TX FIFO drains), then drain RX FIFO again
 		while (!rxFifoEmpty()) read();
-		while (isBusy()) modm::fiber::yield();
+		while (isBusy()) modm::this_fiber::yield();
 
 		// Don't leave overrun flag set
 		spi{{ id }}_hw->icr = SPI_SSPICR_RORIC_BITS;

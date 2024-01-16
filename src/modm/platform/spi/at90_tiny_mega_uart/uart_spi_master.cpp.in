@@ -62,7 +62,7 @@ modm::platform::UartSpiMaster{{id}}::transfer(uint8_t data)
 %% if use_fiber
 	// wait for transmit register empty
 	while (!((UCSR{{id}}A & (1 << UDRE{{id}}))))
-		modm::fiber::yield();
+		modm::this_fiber::yield();
 
 %% if not extended
 	if(dataOrder == DataOrder::MsbFirst) {
@@ -72,7 +72,7 @@ modm::platform::UartSpiMaster{{id}}::transfer(uint8_t data)
 	UDR{{id}} = data;
 
 	// wait for receive register not empty
-	do modm::fiber::yield();
+	do modm::this_fiber::yield();
 	while (!((UCSR{{id}}A & (1 << RXC{{id}}))));
 
 	data = UDR{{id}};
