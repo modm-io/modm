@@ -36,26 +36,26 @@ def build(env):
     properties["core"] = core = device.get_driver("core")["type"]
 
     if target["family"] in ["f1", "f3"]:
-        properties["hsi_frequency"] = 8
-        properties["lsi_frequency"] = 40
+        properties["hsi_frequency"] = 8_000_000
+        properties["lsi_frequency"] = 40_000
         properties["boot_frequency"] = properties["hsi_frequency"]
     elif target["family"] in ["h7"]:
-        properties["hsi_frequency"] = 64
-        properties["lsi_frequency"] = 32
+        properties["hsi_frequency"] = 64_000_000
+        properties["lsi_frequency"] = 32_000
         properties["boot_frequency"] = properties["hsi_frequency"]
     elif target["family"] in ["l0", "l1"]:
-        properties["hsi_frequency"] = 16
-        properties["lsi_frequency"] = 37
-        properties["msi_frequency"] = 2.097
+        properties["hsi_frequency"] = 16_000_000
+        properties["lsi_frequency"] = 37_000
+        properties["msi_frequency"] = 2_097_000
         properties["boot_frequency"] = properties["msi_frequency"]
     elif target["family"] in ["l5"]:
-        properties["hsi_frequency"] = 16
-        properties["lsi_frequency"] = 32
-        properties["msi_frequency"] = 4
+        properties["hsi_frequency"] = 16_000_000
+        properties["lsi_frequency"] = 32_000
+        properties["msi_frequency"] = 4_000_000
         properties["boot_frequency"] = properties["msi_frequency"]
     else:
-        properties["hsi_frequency"] = 16
-        properties["lsi_frequency"] = 32
+        properties["hsi_frequency"] = 16_000_000
+        properties["lsi_frequency"] = 32_000
         properties["boot_frequency"] = properties["hsi_frequency"]
 
     # TODO: Move this data into the device files

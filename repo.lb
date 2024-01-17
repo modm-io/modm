@@ -257,6 +257,7 @@ def init(repo):
     repo.add_filter("modm.posixify", posixify)
     repo.add_filter("modm.ord", lambda letter: ord(letter[0].lower()) - ord("a"))
     repo.add_filter("modm.chr", lambda num: chr(num + ord("A")))
+    repo.add_filter("modm.digsep", lambda num: f"{num:,}".replace(",", "'"))
 
     # Compute the available data from modm-devices
     devices = DevicesCache()

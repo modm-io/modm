@@ -39,7 +39,9 @@ namespace modm::platform
 class Rcc
 {
 public:
-	static constexpr uint32_t BootFrequency = {{ "{0:,}".format((1000000 * boot_frequency)|int).replace(',', "'") }};
+	static constexpr uint32_t LsiFrequency = {{ lsi_frequency | modm.digsep }};
+	static constexpr uint32_t HsiFrequency = {{ hsi_frequency | modm.digsep }};
+	static constexpr uint32_t BootFrequency = {{ boot_frequency | modm.digsep }};
 
 	enum class
 	PllSource : uint32_t
