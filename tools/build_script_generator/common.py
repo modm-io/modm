@@ -244,9 +244,10 @@ def common_compiler_flags(compiler, target):
             "-finline-limit=10000",
             "-funsigned-bitfields",
         ]
-    flags["ccflags.release"] = [
-        "-Os",
-    ]
+    if target.identifier["platform"] in ["hosted"]:
+        flags["ccflags.release"] = ["-O3"]
+    else:
+        flags["ccflags.release"] = ["-Os"]
     # not a valid profile
     # flags["ccflags.fast"] = [
     #     "-O3",
