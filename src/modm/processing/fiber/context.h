@@ -72,7 +72,7 @@ modm_context_start(modm_context_t *to);
  * to jump from one fiber to the next.
  */
 void
-modm_context_jump(modm_context_t *from, modm_context_t *to);
+modm_context_jump(modm_context_t *from, modm_context_t *to) asm("modm_context_jump");
 
 /**
  * Switches control from the fiber context back to the main context.

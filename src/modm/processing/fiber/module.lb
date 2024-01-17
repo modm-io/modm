@@ -26,8 +26,9 @@ def prepare(module, options):
     module.add_query(
         EnvironmentQuery(name="__enabled", factory=is_enabled))
 
-    # No ARM64 support yet!
-    return "arm64" not in options[":target"].get_driver("core")["type"]
+    core = options[":target"].get_driver("core")["type"]
+    return (core.startswith("cortex-m") or core.startswith("avr") or
+            "x86_64" in core or "arm64" in core)
 
 
 def build(env):
@@ -40,6 +41,7 @@ def build(env):
         "is_cm0": core.startswith("cortex-m0"),
         "is_avr": core.startswith("avr"),
         "is_windows": env[":target"].identifier.family == "windows",
+        "is_darwin": env[":target"].identifier.family == "darwin",
         "core": core,
         "with_fpu": with_fpu,
         "target": env[":target"].identifier,
@@ -64,7 +66,12 @@ def build(env):
         env.substitutions["default_stack_size"] = 2**20 # 1MB
         env.template("context_x86_64.cpp.in")
 
-    env.template("context.h.in")
+    elif "arm64" in core:
+        env.substitutions["stack_minimum"] = (20 + 2) * 8
+        env.substitutions["default_stack_size"] = 2**20 # 1MB
+        env.copy("context_arm64.cpp")
+
+    env.copy("context.h")
     env.template("stack.hpp.in")
     env.template("scheduler.hpp.in")
     env.copy("task.hpp")
