@@ -126,13 +126,13 @@ Task::Task(Stack<Size>& stack, T&& closure, Start start)
 	}
 	else
 	{
-		// lambda functions with a closure must be allocated on the stack
-		constexpr size_t closure_size = sizeof(std::decay_t<T>);
+		// lambda functions with a closure must be allocated on the stack ALIGNED!
+		constexpr size_t align_mask = std::max(StackAlignment, alignof(std::decay_t<T>)) - 1u;
+		constexpr size_t closure_size = (sizeof(std::decay_t<T>) + align_mask) & ~align_mask;
 		static_assert(Size >= closure_size + StackSizeMinimum,
-					  "Stack size must ≥({{min_stack_size}}B + sizeof(closure))!");
+					  "Stack size must ≥({{min_stack_size}}B + aligned sizeof(closure))!");
 		// Find a suitable aligned area at the top of stack to allocate the closure
-		uintptr_t ptr = uintptr_t(stack.memory + stack.words) - closure_size;
-		ptr &= ~(std::max(sizeof(uintptr_t), alignof(std::decay_t<T>)) - 1u);
+		const uintptr_t ptr = uintptr_t(stack.memory + stack.words) - closure_size;
 		// construct closure in place
 		::new ((void*)ptr) std::decay_t<T>{std::forward<T>(closure)};
 		// Encapsulate the proper ABI function call into a simpler function
