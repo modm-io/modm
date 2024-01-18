@@ -36,8 +36,7 @@ def rename_board(name):
                .replace("BLUE-PILL", "Blue Pill") \
                .replace("BLACK-PILL", "Black Pill") \
                .replace("ARDUINO-UNO", "Arduino UNO") \
-               .replace("ARDUINO-NANO", "Arduino NANO") \
-               .replace("RASPBERRYPI", "Raspberry Pi")
+               .replace("ARDUINO-NANO", "Arduino NANO")
 
 sys.path.append(str(repopath("ext/modm-devices")))
 from modm_devices.device_identifier import *

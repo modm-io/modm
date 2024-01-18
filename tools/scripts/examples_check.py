@@ -64,7 +64,7 @@ def check_is_part_of_ci(projects):
 	result = 0
 	# Linux files
 	paths = _get_paths_from_ci([repopath(".github/workflows/linux.yml")])
-	paths = folders - paths - {'rpi'}
+	paths = folders - paths
 	if paths:
 		print("\nLinux CI is missing examples: '{}'"
 		      .format("', '".join(sorted(list(paths)))), file=sys.stderr)
