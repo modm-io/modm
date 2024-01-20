@@ -27,8 +27,12 @@ endef
 
 run-hosted-linux:
 	$(call compile-test,hosted,run,-D":target=hosted-linux")
+run-hosted-linux-arm64:
+	$(call compile-test,hosted,run,-D":target=hosted-linux-arm64")
 run-hosted-darwin:
 	$(call compile-test,hosted,run,-D":target=hosted-darwin")
+run-hosted-darwin-arm64:
+	$(call compile-test,hosted,run,-D":target=hosted-darwin-arm64")
 run-hosted-windows:
 	$(call compile-test,hosted,run,-D":target=hosted-windows")
 

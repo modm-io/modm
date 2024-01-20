@@ -20,6 +20,7 @@ is_running_in_ci = (os.getenv("CIRCLECI") is not None or
                     os.getenv("TRAVIS") is not None or
                     os.getenv("GITHUB_ACTIONS") is not None)
 is_running_on_windows = "Windows" in platform.platform()
+is_running_on_arm64 = "arm64" in platform.machine()
 build_dir = (Path(os.path.abspath(__file__)).parents[2] / "build")
 cache_dir = build_dir / "cache"
 global_options = {}
@@ -52,6 +53,7 @@ def generate(project):
     # Compile Linux examples under macOS with hosted-darwin target
     if "hosted-linux" in project.read_text():
         options += " -D:target=hosted-{}".format(platform.system().lower())
+        if is_running_on_arm64: options += "-arm64"
     rc, ro = run_command(path, "lbuild {} build".format(options))
     print("\n".join(output + [ro]))
     return None if rc else project

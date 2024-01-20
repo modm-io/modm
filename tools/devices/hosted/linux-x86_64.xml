@@ -1,11 +1,14 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE rca SYSTEM "../devicefile.dtd">
 <modm version="1.0">
-  <device platform="hosted" family="windows" arch="x86_64">
+  <device platform="hosted" family="linux" arch="x86_64">
     <naming-schema>{platform}-{family}</naming-schema>
 
+    <driver name="can" type="socketcan"/>
+    <driver name="can" type="canusb"/>
     <driver name="core" type="hosted-x86_64"/>
     <driver name="graphics" type="hosted"/>
     <driver name="gpio" type="hosted"/>
+    <driver name="uart" type="hosted"/>
   </device>
 </modm>
