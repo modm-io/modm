@@ -23,8 +23,8 @@ env["COMPILERPREFIX"] = "avr-"
 env["COMPILERPREFIX"] = "arm-none-eabi-"
 %% endif
 %% if family == "darwin"
-# Using homebrew gcc on macOS instead of clang
-env["COMPILERSUFFIX"] = env.Detect(["gcc-12", "gcc-11", "gcc-10"])[3:]
+# Using homebrew gcc-12 on macOS instead of clang
+env["COMPILERSUFFIX"] = "-12"
 %% endif
 %% endif
 
