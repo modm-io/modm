@@ -43,7 +43,7 @@ public:
 		if constexpr (SystemClock::Frequency < {{ref_clk}}'000'000)
 %% endif
 		{
-			constexpr auto result = Prescaler::from_range(
+			constexpr auto result = Prescaler::from_linear(
 					SystemClock::Frequency, {{ systick_frequency }}, 1, (1ul << 24)-1);
 			PeripheralDriver::assertBaudrateInTolerance< result.frequency, {{ systick_frequency }}, tolerance >();
 
@@ -56,7 +56,7 @@ public:
 %% if ref_clk > 1
 		else
 		{
-			constexpr auto result = Prescaler::from_range(
+			constexpr auto result = Prescaler::from_linear(
 					SystemClock::Frequency/{{ref_clk}}, {{ systick_frequency }}, 1, (1ul << 24)-1);
 			PeripheralDriver::assertBaudrateInTolerance< result.frequency, {{ systick_frequency }}, tolerance >();
 

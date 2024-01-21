@@ -67,7 +67,7 @@ public:
 	{
 		// use double speed when necessary
 		constexpr uint32_t scalar = (baudrate * 16l > SystemClock::Uart) ? 8 : 16;
-		constexpr auto result = Prescaler::from_range(
+		constexpr auto result = Prescaler::from_linear(
 				SystemClock::Uart / scalar, baudrate, 1, 4095);
 		assertBaudrateInTolerance< result.frequency, baudrate, tolerance >();
 		constexpr uint16_t ubrr = result.index | ((scalar == 8) ? 0x8000 : 0);

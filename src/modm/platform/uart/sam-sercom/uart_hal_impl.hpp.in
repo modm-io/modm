@@ -75,7 +75,7 @@ void
 	constexpr uint32_t scalar = (baudrate * 16l > SystemClock::{{ sercom | capitalize }}) ? 8 : 16;
 	{{ peripheral }}->USART.CTRLA.bit.SAMPR = (scalar == 16) ? 0x1 : 0x3;
 	// Prescaler 13 bit integer, 3 bit fractional
-	constexpr auto result = Prescaler::from_range(
+	constexpr auto result = Prescaler::from_linear(
 			SystemClock::{{ sercom | capitalize }}/(scalar/8), baudrate, 1, (1ul << 16) - 1ul);
 	assertBaudrateInTolerance< result.frequency, baudrate, tolerance >();
 	{{ peripheral }}->USART.BAUD.FRAC.BAUD = result.prescaler >> 3;

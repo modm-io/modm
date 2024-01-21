@@ -93,7 +93,7 @@ public:
 		FLEXCOM{{ id }}->FLEXCOM_MR = FLEXCOM_MR_OPMODE_SPI;
 		// Note: SPI peripheral supports operating from a programmable clock
 		// output, but here we only use the main peripheral clock
-		constexpr auto result = modm::Prescaler::from_range(SystemClock::Frequency, baudrate, 2, 256);
+		constexpr auto result = modm::Prescaler::from_linear(SystemClock::Frequency, baudrate, 2, 256);
 		assertBaudrateInTolerance< result.frequency, baudrate, tolerance >();
 
 		Regs()->SPI_CSR[0] = SPI_CSR_SCBR(result.prescaler);

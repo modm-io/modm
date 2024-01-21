@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Niklas Hauser
+ * Copyright (c) 2024, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -12,7 +12,7 @@
 #include <unittest/testsuite.hpp>
 
 /// @ingroup modm_test_test_math
-class PrescalerTest : public unittest::TestSuite
+class PrescalerCounterTest : public unittest::TestSuite
 {
 public:
 	void

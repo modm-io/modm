@@ -121,7 +121,7 @@ public:
 
 		// Find largest post-divide which makes output closest to baudrate. Post-divide is
 		// an integer in the range 1 to 256 inclusive.
-		constexpr uint32_t postdiv = Prescaler::from_range(freq_in / prescale, baudrate, 1, 256).prescaler;
+		constexpr uint32_t postdiv = Prescaler::from_linear(freq_in / prescale, baudrate, 1, 256).prescaler;
 
 		constexpr uint32_t result_baudrate = freq_in / (prescale * postdiv);
 

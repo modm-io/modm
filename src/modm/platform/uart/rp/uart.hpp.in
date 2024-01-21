@@ -112,7 +112,7 @@ public:
 		// 16.6 fractional baudrate generator with 16x oversampling
 		constexpr uint32_t min = (1ul << 7);
 		constexpr uint32_t max = (1ul << 22) - 1ul;
-		constexpr auto result = Prescaler::from_range(SystemClock::PeriFrequency*4, baudrate, min, max);
+		constexpr auto result = Prescaler::from_linear(SystemClock::PeriFrequency*4, baudrate, min, max);
 		modm::PeripheralDriver::assertBaudrateInTolerance< result.frequency, baudrate, tolerance >();
 		// Load PL011's baud divisor registers
 		uart{{ id }}_hw->ibrd = result.prescaler >> 6;

@@ -76,7 +76,7 @@ public:
 		constexpr uint8_t scalar = (baudrate <= 100'000) ? 2 : ((baudrate <= 300'000) ? 3 : 25);
 		constexpr uint16_t range_begin = (scalar == 2) ? 4 : 1;
 
-		constexpr auto result = Prescaler::from_range(
+		constexpr auto result = Prescaler::from_linear(
 				SystemClock::I2c{{ id }} / scalar, baudrate, range_begin, 4095);
 		assertBaudrateInTolerance< result.frequency, baudrate, tolerance >();
 

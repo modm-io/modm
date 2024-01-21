@@ -169,11 +169,11 @@ PrescalerTest::testFunction()
 }
 
 void
-PrescalerTest::testRange()
+PrescalerTest::testLinear()
 {
 	// one prescaler
 	{
-		const auto result = modm::Prescaler::from_range(
+		const auto result = modm::Prescaler::from_linear(
 				1_MHz, 0.25_MHz, 1, 1);
 		TEST_ASSERT_EQUALS(result.index, 0ul);
 		TEST_ASSERT_EQUALS(result.prescaler, 1ul);
@@ -181,7 +181,7 @@ PrescalerTest::testRange()
 	}
 	// two prescalers
 	{
-		const auto result = modm::Prescaler::from_range(
+		const auto result = modm::Prescaler::from_linear(
 				1_MHz, 0.25_MHz, 1, 2);
 		TEST_ASSERT_EQUALS(result.index, 1ul);
 		TEST_ASSERT_EQUALS(result.prescaler, 2ul);
@@ -189,7 +189,7 @@ PrescalerTest::testRange()
 	}
 	// clamp lower range
 	{
-		const auto result = modm::Prescaler::from_range(
+		const auto result = modm::Prescaler::from_linear(
 				1_MHz, 2_MHz, 1, 10);
 		TEST_ASSERT_EQUALS(result.index, 0ul);
 		TEST_ASSERT_EQUALS(result.prescaler, 1ul);
@@ -197,7 +197,7 @@ PrescalerTest::testRange()
 	}
 	// clamp upper range
 	{
-		const auto result = modm::Prescaler::from_range(
+		const auto result = modm::Prescaler::from_linear(
 				1_MHz, 0.05_MHz, 1, 10);
 		TEST_ASSERT_EQUALS(result.index, 9ul);
 		TEST_ASSERT_EQUALS(result.prescaler, 10ul);
@@ -205,7 +205,7 @@ PrescalerTest::testRange()
 	}
 	// decide on error border
 	{
-		const auto result = modm::Prescaler::from_range(
+		const auto result = modm::Prescaler::from_linear(
 				1_MHz, 0.75_MHz, 1, 10);
 		TEST_ASSERT_EQUALS(result.index, 1ul);
 		TEST_ASSERT_EQUALS(result.prescaler, 2ul);

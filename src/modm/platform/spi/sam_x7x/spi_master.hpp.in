@@ -74,7 +74,7 @@ public:
 	static void
 	initialize()
 	{
-		constexpr auto result = modm::Prescaler::from_range(SystemClock::Spi{{ id }}, baudrate, 1, 255);
+		constexpr auto result = modm::Prescaler::from_linear(SystemClock::Spi{{ id }}, baudrate, 1, 255);
 		assertBaudrateInTolerance<result.frequency, baudrate, tolerance>();
 
 		SpiHal{{ id }}::initialize(result.prescaler);
