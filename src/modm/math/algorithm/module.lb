@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":math:algorithm"
-    module.description = "Math Algorithms"
+    module.description = FileReader("module.md")
 
 def prepare(module, options):
     module.depends(":math:units")

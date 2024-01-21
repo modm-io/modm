@@ -29,21 +29,20 @@ namespace modm
  * @note For ranges the end is *inclusive*: [begin, end]!
  * @ingroup	modm_math_algorithm
  */
-template<std::unsigned_integral T>
+template<typename T>
 class
 GenericPrescaler
 {
 public:
 	struct Result
 	{
-		constexpr Result(T input_frequency,
-		                 T desired_frequency,
-		                 uint32_t index, uint32_t prescaler) :
+		constexpr Result(T input_frequency, T desired_frequency,
+						 uint32_t index, uint32_t prescaler) :
 			index{index}, prescaler{prescaler},
 			frequency{input_frequency / prescaler},
 			input_frequency{input_frequency},
 			desired_frequency{desired_frequency},
-			error{1.f - float(input_frequency / prescaler) / desired_frequency}
+			error{1.f - float(input_frequency) / float(prescaler * desired_frequency)}
 		{}
 		/// Zero-indexed prescaler result
 		const uint32_t index;
@@ -61,12 +60,11 @@ public:
 
 public:
 	/// From any iterable container.
-	/// @note container must have `begin()`, `end()` and `size()` function!
+	/// @note The container must have `begin()`, `end()` and `size()` function!
+	/// @pre The container must be sorted from low to high numbers!
 	template<class Iterator>
 	static constexpr Result
-	from_iterator(T input_frequency,
-				  T desired_frequency,
-				  Iterator prescalers)
+	from_iterator(T input_frequency, T desired_frequency, Iterator prescalers)
 	{
 		const double desired = double(input_frequency) / desired_frequency;
 		uint32_t prescaler_floor{*prescalers.begin()};
@@ -91,9 +89,9 @@ public:
 	}
 
 	/// From a initializer list.
+	/// @pre The list must be sorted from low to high numbers!
 	static constexpr Result
-	from_list(T input_frequency,
-			  T desired_frequency,
+	from_list(T input_frequency, T desired_frequency,
 			  std::initializer_list<uint32_t> prescalers)
 	{
 		return from_iterator(input_frequency, desired_frequency, prescalers);
@@ -101,12 +99,11 @@ public:
 
 	/// From any linear range via modifier function.
 	/// @note the range end is *inclusive*: [begin, end].
+	/// @pre begin must be smaller or equal than end!
 	template< typename Function >
 	static constexpr Result
-	from_function(T input_frequency,
-			      T desired_frequency,
-			      uint32_t begin, uint32_t end,
-			      Function prescaler_modifier)
+	from_function(T input_frequency, T desired_frequency,
+				  uint32_t begin, uint32_t end, Function prescaler_modifier)
 	{
 		struct linear_range_iterator
 		{
@@ -131,14 +128,13 @@ public:
 
 	/// From any linear range.
 	/// @note the range end is *inclusive*: [begin, end].
+	/// @pre begin must be smaller or equal than end!
 	static constexpr Result
-	from_range(T input_frequency,
-			   T desired_frequency,
-			   uint32_t begin, uint32_t end)
+	from_range(T input_frequency, T desired_frequency, uint32_t begin, uint32_t end)
 	{
 		const double desired = double(input_frequency) / desired_frequency;
-		const uint32_t prescaler_floor = std::max(uint32_t(std::floor(desired)), begin);
-		const uint32_t prescaler_ceiling = std::min(uint32_t(std::ceil(desired)), end);
+		const uint32_t prescaler_floor = std::max(uint32_t(desired), begin);
+		const uint32_t prescaler_ceiling = std::min(uint32_t(desired) + 1, end);
 		const T baud_lower = input_frequency / prescaler_ceiling;
 		const T baud_upper = input_frequency / prescaler_floor;
 		const double baud_middle = (baud_upper + baud_lower) / 2.0;
@@ -149,12 +145,10 @@ public:
 
 	/// From any 2-logarithmic range.
 	/// @note the range end is *inclusive*: [begin, end].
-	/// @param begin	must be a power-of-two!
-	/// @param end		must be a power-of-two!
+	/// @pre `begin` and `end` must be powers of two!
+	/// @pre `begin` must be smaller or equal than `end`!
 	static constexpr Result
-	from_power(T input_frequency,
-			   T desired_frequency,
-			   uint32_t begin, uint32_t end)
+	from_power(T input_frequency, T desired_frequency, uint32_t begin, uint32_t end)
 	{
 		const double desired = double(input_frequency) / desired_frequency;
 		uint32_t ii{0}; uint32_t power{begin};
