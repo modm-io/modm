@@ -9,6 +9,11 @@ jobs:
       PYTHONIOENCODING: "utf-8"
 
     steps:
+      - name: Collect Workflow Telemetry
+        uses: catchpoint/workflow-telemetry-action@v1
+        with:
+          comment_on_pr: false
+          metric_frequency: 3
 
       # Disabling snake-oil for performance reasons
       - name: Disable Windows Defender

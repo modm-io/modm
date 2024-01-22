@@ -4,6 +4,10 @@ on:
   pull_request:
     types: [labeled]
 
+env:
+  SCONSFLAGS: -j8
+  MAKEFLAGS: -j8
+
 jobs:
   avr-compile-all:
     if: github.event.label.name == 'ci:hal'

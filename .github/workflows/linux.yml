@@ -2,6 +2,10 @@ name: Run tests on Linux
 
 on: [pull_request]
 
+env:
+  SCONSFLAGS: -j8
+  MAKEFLAGS: -j8
+
 jobs:
   unittests-linux-generic:
     runs-on: ubuntu-22.04

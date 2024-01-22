@@ -7,6 +7,11 @@ jobs:
     runs-on: macos-13
 
     steps:
+      - name: Collect Workflow Telemetry
+        uses: catchpoint/workflow-telemetry-action@v1
+        with:
+          comment_on_pr: false
+          metric_frequency: 3
 
       - name: Setup environment - Brew tap
         run: |
