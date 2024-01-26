@@ -60,6 +60,24 @@ percent_t tolerance = modm::pct(10);
 ```
 
 
+## Time
+
+Simplified types allow passing `std::chrono::duration` values as template
+parameters:
+
+```cpp
+seconds_t duration = 10s;
+milliseconds_t duration = 10ms;
+microseconds_t duration = 10us;
+
+auto count = duration.count();
+
+template< milliseconds_t period >
+void setPeriod()
+{
+    auto seconds = 1000.0 / period.count();
+}
+```
 """
 
 def prepare(module, options):
