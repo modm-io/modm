@@ -14,6 +14,7 @@
 
 #include <stdint.h>
 #include <modm/architecture/utils.hpp>
+#include <chrono>
 
 #ifdef __DOXYGEN__
 
@@ -38,6 +39,10 @@ namespace modm
 
 	using percent_t = float;
 	template<typename T> constexpr percent_t pct(T value);
+
+	using seconds_t = std::chrono::seconds;
+	using milliseconds_t = std::chrono::milliseconds;
+	using microseconds_t = std::chrono::microseconds;
 	/// @}
 
 	namespace literals
@@ -76,6 +81,15 @@ namespace literals { \
 	constexpr MODM_CONCAT(name, _t) MODM_CONCAT(operator""_M, symbol)(long double value)            { return MODM_CONCAT(M, symbol)(value); } \
 }
 
+#define MODM_UNITS_TIME_DEFINITION(type) \
+struct MODM_CONCAT(type, _t) { \
+	template< class Rep, class Period > \
+	constexpr MODM_CONCAT(type, _t)(std::chrono::duration<Rep, Period> duration) \
+	: count_{std::chrono::duration_cast<std::chrono::type>(duration).count()} {} \
+	std::chrono::type::rep count_; \
+	constexpr std::chrono::type::rep count() const { return count_; } \
+};
+
 namespace modm
 {
 
@@ -92,6 +106,11 @@ namespace literals
 	constexpr percent_t operator""_pct(long double value) { return pct(value); }
 	constexpr percent_t operator""_pct(unsigned long long int value) { return pct(value); }
 }
+
+MODM_UNITS_TIME_DEFINITION(seconds)
+MODM_UNITS_TIME_DEFINITION(milliseconds)
+MODM_UNITS_TIME_DEFINITION(microseconds)
+
 using namespace ::modm::literals;
 }
 
