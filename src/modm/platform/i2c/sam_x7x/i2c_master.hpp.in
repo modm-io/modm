@@ -61,7 +61,7 @@ private:
 		const float freq = 1.f / (tHigh + tLow);
 		const float error = std::fabs(1.f - freq / baudrate);
 
-		return error < pct2f(tolerance);
+		return error < tolerance;
 	}
 
 	template<class SystemClock, baudrate_t baudrate, percent_t tolerance>

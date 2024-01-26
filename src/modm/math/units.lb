@@ -45,25 +45,20 @@ bitrate_t bitrate = modm::kbps(125);
 frequency = 4295_MHz; // OVERFLOW at 2^32 units!
 ```
 
-## Integral Percentages
 
-Since `float` cannot be used as a non-type template argument, an integer type
-for providing tolerances in `percent_t` is available.
-Note that `percent_t` is implemented as an enum class, which prevents implicit
-conversions, since the base for this is not 1.
-You must therefore use the `modm::pct(T value)` or `_pct` constructors.
+## Percentages
+
+Percentages are stored as normalized floating point numbers and can be converted
+using these convenience constructors:
 
 ```cpp
 using namespace modm::literals;
 
 percent_t tolerance = modm::pct(10);
           tolerance = 10_pct;
-
-// convert back to float. *internal use only*
-float percent = modm::pct2f(tolerance);
+          tolerance = 0.1f;
 ```
 
-!!! warning "This type is not guaranteed to hold more than 100 percent!"
 
 """
 

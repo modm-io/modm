@@ -97,7 +97,7 @@ public:
 				float speed = calculateSpeed(prescaler, sclLow, sclHigh);
 				auto error = std::fabs((speed / params.targetSpeed) - 1.0f);
 				// modm::Tolerance value is in unit [1/1000]
-				if ((error < pct2f(params.tolerance)) && (error <= lastError) && (prescaler <= bestPrescaler)) {
+				if ((error < params.tolerance) && (error <= lastError) && (prescaler <= bestPrescaler)) {
 					lastError = error;
 					bestPrescaler = prescaler;
 					bestSclLow = sclLow;
@@ -290,7 +290,7 @@ private:
 		auto clockPeriod = float(prescaler + 1) / params.peripheralClock;
 
 		auto targetSclTime = 1.f / params.targetSpeed;
-		auto sclTimeMax = targetSclTime * (1.f + pct2f(params.tolerance));
+		auto sclTimeMax = targetSclTime * (1.f + params.tolerance);
 		auto maxSclSum = ((sclTimeMax - params.riseTime - params.fallTime - 2*SyncTime)
 				/ clockPeriod) - 2;
 

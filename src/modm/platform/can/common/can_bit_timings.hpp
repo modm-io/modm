@@ -115,7 +115,7 @@ public:
 	template<percent_t tolerance>
 	static constexpr void assertBitrateInTolerance()
 	{
-		static_assert(pct2f(tolerance) >= BestConfig.error,
+		static_assert(tolerance >= BestConfig.error,
 			"The closest available bitrate exceeds the specified maximum tolerance!");
 	}
 
