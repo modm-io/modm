@@ -93,9 +93,9 @@ void ColorTest::testRgbHsvPingPongConvertion_8bit()
 
 	// Convertion can distort - allow some tolerance.
 	using namespace modm;
-	TEST_ASSERT_TRUE(modm::Tolerance::isValueInTolerance(rgb8.red, rgb8_b.red, 1_pct));
-	TEST_ASSERT_TRUE(modm::Tolerance::isValueInTolerance(rgb8.green, rgb8_b.green, 1_pct));
-	TEST_ASSERT_TRUE(modm::Tolerance::isValueInTolerance(rgb8.blue, rgb8_b.blue, 1_pct));
+	TEST_ASSERT_TRUE(modm::isValueInTolerance(rgb8.red, rgb8_b.red, 1_pct));
+	TEST_ASSERT_TRUE(modm::isValueInTolerance(rgb8.green, rgb8_b.green, 1_pct));
+	TEST_ASSERT_TRUE(modm::isValueInTolerance(rgb8.blue, rgb8_b.blue, 1_pct));
 }
 
 // TODO 16bit convertion not yet working
@@ -109,7 +109,7 @@ void ColorTest::testRgbHsvPingPongConvertion_8bit()
 
 // 	// Convertion can distort - allow some tolerance.
 // 	using namespace modm;
-// 	TEST_ASSERT_TRUE(modm::Tolerance::isValueInTolerance(rgb.red, rgb16_b.red, 1_pct));
-// 	TEST_ASSERT_TRUE(modm::Tolerance::isValueInTolerance(rgb.green, rgb16_b.green, 1_pct));
-// 	TEST_ASSERT_TRUE(modm::Tolerance::isValueInTolerance(rgb.blue, rgb16_b.blue, 1_pct));
+// 	TEST_ASSERT_TRUE(modm::isValueInTolerance(rgb.red, rgb16_b.red, 1_pct));
+// 	TEST_ASSERT_TRUE(modm::isValueInTolerance(rgb.green, rgb16_b.green, 1_pct));
+// 	TEST_ASSERT_TRUE(modm::isValueInTolerance(rgb.blue, rgb16_b.blue, 1_pct));
 // }

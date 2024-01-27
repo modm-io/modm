@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015, 2018, Niklas Hauser
+ * Copyright (c) 2013-2015, 2018, 2024, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -9,60 +9,20 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_MATH_TOLERANCE_HPP
-#define MODM_MATH_TOLERANCE_HPP
+#pragma once
 
-#include <stdint.h>
 #include <modm/math/units.hpp>
+#include <cmath>
 
 namespace modm
 {
 
-/**
- * This class checks if values are within a certain tolerance.
- *
- * This can be used to guarantee the quality of certain parameters,
- * mostly baudrate or datarate.
- *
- * @ingroup	modm_math
- */
-class
-Tolerance
+/// @ingroup modm_math
+template< typename T >
+constexpr bool
+isValueInTolerance(T reference, T actual, percent_t tolerance)
 {
-public:
-	static constexpr int64_t
-	absoluteError(uint32_t reference, uint32_t actual)
-	{
-		return (int64_t(reference) - actual);
-	}
-
-	static constexpr float
-	relativeError(uint32_t reference, uint32_t actual)
-	{
-		return (1.f - float(actual) / reference);
-	}
-
-	static constexpr bool
-	isErrorInTolerance(float error, percent_t tolerance)
-	{
-		return (error == 0) or (((error > 0) ? error : -error) <= pct2f(tolerance));
-	}
-
-	static constexpr bool
-	isValueInTolerance(uint32_t reference, uint32_t actual, percent_t tolerance)
-	{
-		return isErrorInTolerance(relativeError(reference, actual), tolerance);
-	}
-
-	template< uint32_t reference, uint32_t actual, percent_t tolerance >
-	static void
-	assertValueInTolerance()
-	{
-		static_assert(isValueInTolerance(reference, actual, tolerance),
-				"The actual value exceeds the tolerance of reference!");
-	}
-};
+	return std::abs(1.0 - double(actual) / double(reference)) <= std::abs(double(tolerance));
+}
 
 } // namespace modm
-
-#endif	// MODM_MATH_TOLERANCE_HPP
