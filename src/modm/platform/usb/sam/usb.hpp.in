@@ -30,7 +30,7 @@ public:
 	{
 %% if target["family"] == "g5x"
 		// only the USB device mode is supported for now
-		static_assert(modm::Tolerance::isValueInTolerance(48_MHz, SystemClock::Usb, 0.25_pct),
+		static_assert(modm::isValueInTolerance(48_MHz, SystemClock::Usb, 0.25_pct),
 				"The USB clock frequency must be within 0.25\% of 48MHz!");
 		// Select DM/DP function for PA21/22
 		MATRIX->CCFG_SYSIO &= ~(CCFG_SYSIO_SYSIO11 | CCFG_SYSIO_SYSIO10);

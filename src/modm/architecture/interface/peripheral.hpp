@@ -88,7 +88,7 @@ public:
 	static void
 	assertBaudrateInTolerance()
 	{
-		static_assert(modm::Tolerance::isValueInTolerance(requested, available, tolerance),
+		static_assert(modm::isValueInTolerance(requested, available, tolerance),
 				"The closest available baudrate exceeds the tolerance of the requested baudrate!");
 	}
 };
