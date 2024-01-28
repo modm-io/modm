@@ -21,7 +21,7 @@ def prepare(module, options):
     if device.identifier.family in ["h7"]:
         return False
 
-    module.depends(":cmsis:device")
+    module.depends(":cmsis:device", ":math:algorithm")
     return device.has_driver("iwdg:stm32")
 
 

@@ -13,6 +13,7 @@
 #include <modm/platform.hpp>
 
 using namespace Board;
+using namespace std::chrono_literals;
 
 /**
  * If the button is pressed for more than 4 seconds, the MCU will be reset by the Watchdog.
@@ -25,7 +26,7 @@ main()
 	Board::initialize();
 	LedD13::setOutput();
 	// set the watchdog timeout to 4 seconds
-	Iwdg::initialize(Iwdg::Prescaler::Div32, 0x0FFFu);
+	Iwdg::initialize<SystemClock, 4s>();
 
 	// Use the logging streams to print some messages.
 	// Change MODM_LOG_LEVEL above to enable or disable these messages
