@@ -70,7 +70,7 @@ void
 %% if over8
 	constexpr uint32_t scalar = (baudrate * 16 > SystemClock::{{ name }}) ? 8 : 16;
 	constexpr uint32_t max = ((scalar == 16) ? (1ul << 16) : (1ul << 15)) - 1ul;
-	constexpr auto result = Prescaler::from_range(SystemClock::{{ name }}, baudrate, 1, max);
+	constexpr auto result = Prescaler::from_range(SystemClock::{{ name }}, baudrate, scalar, max);
 %% elif uart_type == "Lpuart"
 	static_assert(SystemClock::{{ name }} >= baudrate * 3,
 		"fck must be in the range [3 x baud rate, 4096 x baud rate].");
@@ -83,7 +83,7 @@ void
 		0x300, max);
 %% else
 	constexpr uint32_t max = (1ul << 16) - 1ul;
-	constexpr auto result = Prescaler::from_range(SystemClock::{{ name }}, baudrate, 1, max);
+	constexpr auto result = Prescaler::from_range(SystemClock::{{ name }}, baudrate, 16, max);
 %% endif
 	modm::PeripheralDriver::assertBaudrateInTolerance< result.frequency, baudrate, tolerance >();
 
