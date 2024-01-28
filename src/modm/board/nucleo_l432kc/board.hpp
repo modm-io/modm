@@ -43,6 +43,7 @@ struct SystemClock
 
 	static constexpr uint32_t Spi1 = Apb2;
 	static constexpr uint32_t Spi2 = Apb2;
+	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
 
 	static bool inline
 	enable()

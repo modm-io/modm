@@ -70,7 +70,7 @@ struct SystemClock
 	static constexpr uint32_t Usart3	= Apb;
 	static constexpr uint32_t Usart2	= Apb;
 	static constexpr uint32_t Spi2		= Apb;
-	static constexpr uint32_t Iwdg		= Apb;
+	static constexpr uint32_t Iwdg		= Rcc::LsiFrequency;
 	static constexpr uint32_t Wwdg		= Apb;
 	static constexpr uint32_t Rtc		= Apb;
 	static constexpr uint32_t Timer14	= Apb;

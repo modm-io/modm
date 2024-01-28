@@ -53,6 +53,7 @@ struct SystemClock
 	static constexpr uint32_t Usart3 = Apb1;
 	static constexpr uint32_t Usart4 = Apb1;
 	static constexpr uint32_t Usart5 = Apb1;
+	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
 
 	static bool inline
 	enable()

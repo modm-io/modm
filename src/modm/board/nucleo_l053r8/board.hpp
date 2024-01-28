@@ -59,6 +59,7 @@ struct SystemClock
 	static constexpr uint32_t Timer6  = Apb1Timer;
 	static constexpr uint32_t Timer21 = Apb2Timer;
 	static constexpr uint32_t Timer22 = Apb2Timer;
+	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
 
 	static bool inline
 	enable()

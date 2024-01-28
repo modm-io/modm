@@ -32,6 +32,7 @@ struct SystemClock
 	static constexpr int Usart1 = Frequency;
 	static constexpr int Usart2 = Frequency;
 	static constexpr int Spi2 = Frequency;
+	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
 
 	static bool inline
 	enable()
