@@ -57,6 +57,7 @@ struct SystemClock
 	static constexpr uint32_t Timer4  = Apb1Timer;
 
 	static constexpr uint32_t Usb = Ahb / 1.5;
+	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
 
 	static bool inline
 	enable()

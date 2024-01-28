@@ -82,6 +82,7 @@ struct SystemClock
 	static constexpr uint32_t Usb = 48_MHz;
 	static constexpr uint32_t Rng = 48_MHz;
 	static constexpr uint32_t Sdmmc = 48_MHz;
+	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
 
 	static bool inline
 	enable()
