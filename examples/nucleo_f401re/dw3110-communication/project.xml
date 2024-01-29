@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:nucleo-f401re</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_f401re/dw3110-communication</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:driver:dw3110</module>
+    <module>modm:platform:spi:1</module>
+  </modules>
+</library>
