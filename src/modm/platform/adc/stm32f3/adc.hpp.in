@@ -290,6 +290,25 @@ public:
 %% endif
 	};
 
+	enum class DmaMode : uint32_t
+	{
+		Disabled = 0,
+%% if target["family"] in ["h7"] and resolution == 12:
+		OneShot = ADC3_CFGR_DMAEN,
+		Circular = ADC3_CFGR_DMACFG | ADC3_CFGR_DMAEN,
+		Mask = Circular
+%% elif target["family"] in ["h7"] and resolution == 16:
+		OneShot = ADC_CFGR_DMNGT_0,
+		Dfsdm = ADC_CFGR_DMNGT_1,
+		Circular = ADC_CFGR_DMNGT_1 | ADC_CFGR_DMNGT_0,
+		Mask = ADC_CFGR_DMNGT_Msk
+%% else
+		OneShot = ADC_CFGR_DMAEN,
+		Circular = ADC_CFGR_DMACFG | ADC_CFGR_DMAEN,
+		Mask = Circular
+%% endif
+	};
+
 	enum class Interrupt : uint32_t
 	{
 		Ready 								= ADC_IER_ADRDYIE,
@@ -580,6 +599,16 @@ public:
 
 	static inline void
 	acknowledgeInterruptFlags(const InterruptFlag_t flags);
+
+	/// @return ADC data register pointer, for DMA use only.
+	static inline volatile uint32_t*
+	dataRegister()
+	{
+		return &(ADC{{ id }}->DR);
+	}
+
+	static inline void
+	setDmaMode(DmaMode mode);
 
 private:
 	static inline bool

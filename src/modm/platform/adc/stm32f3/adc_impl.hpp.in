@@ -357,6 +357,13 @@ modm::platform::Adc{{ id }}::isInjectedConversionFinished()
 	return static_cast<bool>(getInterruptFlags() & InterruptFlag::EndOfInjectedSequenceOfConversions);
 }
 
+void
+modm::platform::Adc{{ id }}::setDmaMode(DmaMode mode)
+{
+	constexpr uint32_t mask = std::to_underlying(DmaMode::Mask);
+	ADC{{ id }}->CFGR = (ADC{{ id }}->CFGR & ~mask) | std::to_underlying(mode);
+}
+
 // ----------------------------------------------------------------------------
 void
 modm::platform::Adc{{ id }}::enableInterruptVector(const uint32_t priority,
