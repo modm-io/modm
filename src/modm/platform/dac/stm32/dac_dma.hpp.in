@@ -17,7 +17,7 @@
 #include <modm/platform/dma/dma.hpp>
 #include <modm/platform/gpio/connector.hpp>
 #include <modm/platform/clock/rcc.hpp>
-#include <modm/src/modm/math/units.hpp>
+#include <modm/math/units.hpp>
 
 namespace modm::platform
 {
