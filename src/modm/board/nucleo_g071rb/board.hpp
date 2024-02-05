@@ -14,14 +14,14 @@
 #include <modm/platform.hpp>
 #include <modm/architecture/interface/clock.hpp>
 #include <modm/debug/logger.hpp>
-/// @ingroup modm_board_nucleo_g071rb
+/// @ingroup modm_board_nucleo_g071rb modm_board_nucleo_g070rb
 #define MODM_BOARD_HAS_LOGGER
 
 using namespace modm::platform;
 
 namespace Board
 {
-/// @ingroup modm_board_nucleo_g071rb
+/// @ingroup modm_board_nucleo_g071rb modm_board_nucleo_g070rb
 /// @{
 using namespace modm::literals;
 
@@ -135,7 +135,7 @@ using Leds = SoftwareGpioPort< LedD13 >;
 
 namespace stlink
 {
-/// @ingroup modm_board_nucleo_g071rb
+/// @ingroup modm_board_nucleo_g071rb modm_board_nucleo_g070rb
 /// @{
 using Rx = GpioInputA3;
 using Tx = GpioOutputA2;
@@ -143,7 +143,7 @@ using Uart = Usart2;
 /// @}
 }
 
-/// @ingroup modm_board_nucleo_g071rb
+/// @ingroup modm_board_nucleo_g071rb modm_board_nucleo_g070rb
 /// @{
 using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
 

@@ -34,7 +34,7 @@ def build(env):
         "with_assert": env.has_module(":architecture:assert")
     }
     env.template("../board.cpp.in", "board.cpp")
-    env.copy('.')
+    env.copy("../nucleo_g071rb/board.hpp", "board.hpp")
 
     env.outbasepath = "modm/openocd/modm/board/"
     env.copy(repopath("tools/openocd/modm/st_nucleo_g0.cfg"), "st_nucleo_g0.cfg")
