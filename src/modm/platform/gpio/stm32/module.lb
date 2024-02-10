@@ -265,7 +265,9 @@ def build(env):
     env.template("../common/port_shim.hpp.in", "port_shim.hpp")
     if len(env["enable_ports"]):
         env.template("enable.cpp.in")
+    env.template("gpio_accessor.hpp.in")
 
+    env.copy("random_access_port.hpp")
     env.copy("../common/inverted.hpp", "inverted.hpp")
     env.template("../common/connector.hpp.in", "connector.hpp",
                  filters={"formatPeripheral": get_driver,
