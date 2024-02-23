@@ -12,7 +12,7 @@ jobs:
       image: ghcr.io/modm-ext/modm-build-avr:2023-03-12
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - name: Fix Git permission/ownership problem
@@ -26,7 +26,7 @@ jobs:
           (cd test/all && python3 run_all.py at --quick-remaining)
       - name: Upload log artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: avr-compile-all
           path: test/all/log
@@ -38,7 +38,7 @@ jobs:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - name: Fix Git permission/ownership problem
@@ -52,9 +52,9 @@ jobs:
           (cd test/all && python3 run_all.py samd0 samd1 samd2 --quick-remaining)
       - name: Upload log artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: sam-compile-all
+          name: samdx-compile-all
           path: test/all/log
 
   sam-x5x-compile-all:
@@ -64,7 +64,7 @@ jobs:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - name: Fix Git permission/ownership problem
@@ -78,9 +78,9 @@ jobs:
           (cd test/all && python3 run_all.py samd5 same5 samg5 --quick-remaining)
       - name: Upload log artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: sam-compile-all
+          name: samx5-compile-all
           path: test/all/log
 
   sam-x7x-compile-all:
@@ -90,7 +90,7 @@ jobs:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - name: Fix Git permission/ownership problem
@@ -104,9 +104,9 @@ jobs:
           (cd test/all && python3 run_all.py same7 sams7 samv7 --quick-remaining)
       - name: Upload log artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: sam-compile-all
+          name: samx7-compile-all
           path: test/all/log
 
   stm32f0-compile-all:
@@ -116,7 +116,7 @@ jobs:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - name: Fix Git permission/ownership problem
@@ -130,7 +130,7 @@ jobs:
           (cd test/all && python3 run_all.py stm32f0 --quick-remaining)
       - name: Upload log artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: stm32f0-compile-all
           path: test/all/log
@@ -142,7 +142,7 @@ jobs:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - name: Fix Git permission/ownership problem
@@ -156,7 +156,7 @@ jobs:
           (cd test/all && python3 run_all.py stm32f1 --quick-remaining)
       - name: Upload log artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: stm32f1-compile-all
           path: test/all/log
@@ -168,7 +168,7 @@ jobs:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - name: Fix Git permission/ownership problem
@@ -182,7 +182,7 @@ jobs:
           (cd test/all && python3 run_all.py stm32f2 --quick-remaining)
       - name: Upload log artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: stm32f2-compile-all
           path: test/all/log
@@ -194,7 +194,7 @@ jobs:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - name: Fix Git permission/ownership problem
@@ -208,7 +208,7 @@ jobs:
           (cd test/all && python3 run_all.py stm32f3 --quick-remaining)
       - name: Upload log artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: stm32f3-compile-all
           path: test/all/log
@@ -220,7 +220,7 @@ jobs:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - name: Fix Git permission/ownership problem
@@ -234,7 +234,7 @@ jobs:
           (cd test/all && python3 run_all.py stm32f4 --quick-remaining --split 3 --part 0)
       - name: Upload log artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: stm32f4-compile-all-1
           path: test/all/log
@@ -246,7 +246,7 @@ jobs:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - name: Fix Git permission/ownership problem
@@ -260,7 +260,7 @@ jobs:
           (cd test/all && python3 run_all.py stm32f4 --quick-remaining --split 3 --part 1)
       - name: Upload log artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: stm32f4-compile-all-2
           path: test/all/log
@@ -272,7 +272,7 @@ jobs:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - name: Fix Git permission/ownership problem
@@ -286,7 +286,7 @@ jobs:
           (cd test/all && python3 run_all.py stm32f4 --quick-remaining --split 3 --part 2)
       - name: Upload log artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: stm32f4-compile-all-3
           path: test/all/log
@@ -298,7 +298,7 @@ jobs:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - name: Fix Git permission/ownership problem
@@ -312,7 +312,7 @@ jobs:
           (cd test/all && python3 run_all.py stm32f7 --quick-remaining --split 2 --part 0)
       - name: Upload log artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: stm32f7-compile-all-1
           path: test/all/log
@@ -324,7 +324,7 @@ jobs:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - name: Fix Git permission/ownership problem
@@ -338,7 +338,7 @@ jobs:
           (cd test/all && python3 run_all.py stm32f7 --quick-remaining --split 2 --part 1)
       - name: Upload log artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: stm32f7-compile-all-2
           path: test/all/log
@@ -350,7 +350,7 @@ jobs:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - name: Fix Git permission/ownership problem
@@ -364,7 +364,7 @@ jobs:
           (cd test/all && python3 run_all.py stm32l0 --quick-remaining --split 2 --part 0)
       - name: Upload log artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: stm32l0-compile-all-1
           path: test/all/log
@@ -376,7 +376,7 @@ jobs:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - name: Fix Git permission/ownership problem
@@ -390,7 +390,7 @@ jobs:
           (cd test/all && python3 run_all.py stm32l0 --quick-remaining --split 2 --part 1)
       - name: Upload log artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: stm32l0-compile-all-2
           path: test/all/log
@@ -403,7 +403,7 @@ jobs:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - name: Fix Git permission/ownership problem
@@ -417,7 +417,7 @@ jobs:
           (cd test/all && python3 run_all.py stm32l1 --quick-remaining)
       - name: Upload log artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: stm32l1-compile-all
           path: test/all/log
@@ -429,7 +429,7 @@ jobs:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - name: Fix Git permission/ownership problem
@@ -443,7 +443,7 @@ jobs:
           (cd test/all && python3 run_all.py stm32l4 --quick-remaining --split 3 --part 0)
       - name: Upload log artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: stm32l4-compile-all-1
           path: test/all/log
@@ -455,7 +455,7 @@ jobs:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - name: Fix Git permission/ownership problem
@@ -469,7 +469,7 @@ jobs:
           (cd test/all && python3 run_all.py stm32l4 --quick-remaining --split 3 --part 1)
       - name: Upload log artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: stm32l4-compile-all-2
           path: test/all/log
@@ -481,7 +481,7 @@ jobs:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - name: Fix Git permission/ownership problem
@@ -495,7 +495,7 @@ jobs:
           (cd test/all && python3 run_all.py stm32l4 --quick-remaining --split 3 --part 2)
       - name: Upload log artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: stm32l4-compile-all-3
           path: test/all/log
@@ -507,7 +507,7 @@ jobs:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - name: Fix Git permission/ownership problem
@@ -521,7 +521,7 @@ jobs:
           (cd test/all && python3 run_all.py stm32l5 --quick-remaining)
       - name: Upload log artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: stm32l5-compile-all
           path: test/all/log
@@ -533,7 +533,7 @@ jobs:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - name: Fix Git permission/ownership problem
@@ -547,7 +547,7 @@ jobs:
           (cd test/all && python3 run_all.py stm32u5 --quick-remaining)
       - name: Upload log artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: stm32u5-compile-all
           path: test/all/log
@@ -559,7 +559,7 @@ jobs:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - name: Fix Git permission/ownership problem
@@ -573,7 +573,7 @@ jobs:
           (cd test/all && python3 run_all.py stm32g0 --quick-remaining --split 2 --part 0)
       - name: Upload log artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: stm32g0-compile-all-1
           path: test/all/log
@@ -585,7 +585,7 @@ jobs:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - name: Fix Git permission/ownership problem
@@ -599,7 +599,7 @@ jobs:
           (cd test/all && python3 run_all.py stm32g0 --quick-remaining --split 2 --part 1)
       - name: Upload log artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: stm32g0-compile-all-2
           path: test/all/log
@@ -611,7 +611,7 @@ jobs:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - name: Fix Git permission/ownership problem
@@ -625,7 +625,7 @@ jobs:
           (cd test/all && python3 run_all.py stm32g4 --quick-remaining --split 2 --part 0)
       - name: Upload log artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: stm32g4-compile-all-1
           path: test/all/log
@@ -637,7 +637,7 @@ jobs:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - name: Fix Git permission/ownership problem
@@ -651,7 +651,7 @@ jobs:
           (cd test/all && python3 run_all.py stm32g4 --quick-remaining --split 2 --part 1)
       - name: Upload log artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: stm32g4-compile-all-2
           path: test/all/log
@@ -663,7 +663,7 @@ jobs:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - name: Fix Git permission/ownership problem
@@ -677,7 +677,7 @@ jobs:
           (cd test/all && python3 run_all.py stm32h7 --quick-remaining --split 2 --part 0)
       - name: Upload log artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: stm32h7-compile-all-1
           path: test/all/log
@@ -689,7 +689,7 @@ jobs:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - name: Fix Git permission/ownership problem
@@ -703,7 +703,7 @@ jobs:
           (cd test/all && python3 run_all.py stm32h7 --quick-remaining --split 2 --part 1)
       - name: Upload log artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: stm32h7-compile-all-2
           path: test/all/log
