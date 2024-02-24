@@ -1,0 +1,31 @@
+digraph dependencies
+{
+	bgcolor = transparent;
+	rankdir = LR;
+	subgraph modm
+	{
+		label = "modm";
+		node [style=filled, shape=box];
+
+		modm_config [label="Config", style="filled,solid", fillcolor=lightsalmon];
+		modm_application [label="Application", style="filled,solid", fillcolor=lightsalmon, rank=1];
+
+		modm_lbuild [label="lbuild", style="filled,solid", fillcolor=lightblue];
+		modm_modules [label="modm", style="filled,solid,bold", fillcolor=lightblue];
+		modm_devices [label="Database", style="filled,solid", fillcolor=lightblue];
+
+		modm_build_system [label="Build System", style="filled,solid", fillcolor=lightgreen];
+		modm_custom_library [label="C++ Library", style="filled,solid", fillcolor=lightgreen];
+		modm_build_artifacts [label="Build Artifacts", style="filled,solid", fillcolor=lightgreen];
+	}
+	modm_config -> modm_lbuild [constraint=false];
+
+	modm_lbuild -> modm_modules;
+	modm_devices -> modm_modules [constraint=false];
+	modm_modules -> modm_build_system;
+	modm_modules -> modm_custom_library;
+
+	modm_application -> modm_build_system;
+	modm_custom_library -> modm_build_system [constraint=false];
+	modm_build_system -> modm_build_artifacts;
+}

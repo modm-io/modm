@@ -13,15 +13,14 @@ specifically for your targets and needs and generate a custom library.
 You can generate more than just code, in this example, lbuild also generates a
 build system which then compiles and links the application into a executable.
 
-<style scoped>@media(prefers-color-scheme:dark){img{filter:invert(100%)}}</style>
-![](images/system_overview.png)
+<center>
+![](images/system-overview.svg)
+</center>
 
 We've also put a lot of thought into modm-devices, about what data to extract,
 how to format and store it. We automated the entire process to get the high
 quality data we use to build our library.
 You can read all [about modm-devices in this blog post](http://blog.salkinium.com/modm-devices).
-
-![](http://blog.salkinium.com/assets/dfg_architecture.png)
 
 
 ## modm is highly modular

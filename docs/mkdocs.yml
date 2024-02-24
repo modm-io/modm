@@ -49,8 +49,6 @@ extra:
   social:
     - icon: fontawesome/brands/github-alt
       link: https://github.com/modm-io
-    - icon: fontawesome/brands/twitter
-      link: https://twitter.com/modm_embedded
 
 markdown_extensions:
   - markdown.extensions.admonition
