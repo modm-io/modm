@@ -262,6 +262,18 @@ public:
 	}
 %% if target.family in ["g0"]
 	static inline void
+	enableBreak()
+	{
+		TIM{{ id }}->BDTR |= TIM_BDTR_BKE;
+	}
+
+	static inline void
+	disableBreak()
+	{
+		TIM{{ id }}->BDTR &= ~(TIM_BDTR_BKE);
+	}
+
+	static inline void
 	enableBreakInput()
 	{
 		TIM{{ id }}->AF1 |= TIM{{ id }}_AF1_BKINE;
