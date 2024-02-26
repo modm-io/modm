@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2021, Thomas Sommer
+# Copyright (c) 2018, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -12,13 +12,20 @@
 
 
 def init(module):
-    module.name = ":driver:sh1106"
-    module.description = "SH1106 Display"
+    module.name = ":driver:ssd1306.i2c"
+    module.description = "SSD1306 Display in I2C mode"
 
 def prepare(module, options):
-    module.depends(":driver:ssd1306")
+    module.depends(
+        ":architecture:i2c.device",
+        ":driver:ssd1306.common",
+        ":processing:timer",
+        ":ui:display")
     return True
 
 def build(env):
     env.outbasepath = "modm/src/modm/driver/display"
-    env.copy("sh1106.hpp")
+    env.copy("ssd1306.hpp") # DEPRECATE 2024q4
+    env.copy("ssd1306_i2c.hpp")
+    env.copy("ssd1306_i2c_impl.hpp")
+    env.copy("ssd1306_i2c_transaction_impl.cpp")

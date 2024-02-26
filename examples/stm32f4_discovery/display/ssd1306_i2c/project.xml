@@ -1,10 +1,10 @@
 <library>
   <extends>modm:disco-f407vg</extends>
   <options>
-    <option name="modm:build:build.path">../../../../build/stm32f4_discovery/display/ssd1306</option>
+    <option name="modm:build:build.path">../../../../build/stm32f4_discovery/display/ssd1306_i2c</option>
   </options>
   <modules>
-    <module>modm:driver:ssd1306</module>
+    <module>modm:driver:ssd1306.i2c</module>
     <module>modm:platform:gpio</module>
     <module>modm:platform:i2c:1</module>
     <module>modm:build:scons</module>
