@@ -46,6 +46,15 @@ public:
 	};
 
 public:
+	static inline void
+	initialize(Prescaler prescaler, uint16_t reload)
+	{
+		writeKey(writeCommand);
+		IWDG->PR = uint32_t(prescaler);
+		IWDG->RLR = reload;
+		writeKey(0); // disable access to PR and RLR registers
+	}
+
 	template< class SystemClock, milliseconds_t timeout, percent_t tolerance=pct(1) >
 	static void
 	initialize()
@@ -55,9 +64,8 @@ public:
 			SystemClock::Iwdg, frequency, 1ul << 12, 256, 4);
 		assertDurationInTolerance< 1.0 / result.frequency, 1.0 / frequency, tolerance >();
 
-		configure(Prescaler(result.index), result.counter - 1);
+		initialize(Prescaler(result.index), result.counter - 1);
 	}
-
 
 	static inline void
 	enable()
@@ -78,15 +86,6 @@ public:
 	}
 
 private:
-	static inline void
-	configure(Prescaler prescaler, uint16_t reload)
-	{
-		writeKey(writeCommand);
-		IWDG->PR = uint32_t(prescaler);
-		IWDG->RLR = reload;
-		writeKey(0); // disable access to PR and RLR registers
-	}
-
 	static inline void
 	writeKey(uint16_t key)
 	{
