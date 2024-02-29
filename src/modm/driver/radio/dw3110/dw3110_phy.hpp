@@ -12,38 +12,41 @@
 #ifndef MODM_DW3110_PHY_HPP
 #define MODM_DW3110_PHY_HPP
 
+#include <array>
 #include <cstdint>
-#include <modm/architecture/interface/spi_device.hpp>
 #include <modm/architecture/interface/gpio.hpp>
+#include <modm/architecture/interface/spi_device.hpp>
 #include <modm/processing/resumable.hpp>
 
 namespace modm
 {
 
-
 /**
  * Hardware abstraction layer for DW3110
  *
  * @ingroup  modm_driver_dw3110
- * @author   Elias Harrer
+ * @author   Elias H.
  * @author   Raphael Lehmann
  */
-template <typename SpiMaster, typename Cs>
-class Dw3110Phy : public modm::SpiDevice< SpiMaster >, protected modm::NestedResumable<3>
+template<typename SpiMaster, typename Cs>
+class Dw3110Phy : public modm::SpiDevice<SpiMaster>, protected modm::NestedResumable<3>
 {
 
 public:
-
 	/**
 	 */
 	modm::ResumableResult<void>
 	initialize();
 
-private:
+	modm::ResumableResult<bool>
+	ping();
 
+private:
+	std::array<uint8_t, 2 + 4> tx_buffer;
+	std::array<uint8_t, 2 + 4> rx_buffer;
 };
 
-} // namespace modm
+}  // namespace modm
 
 #include "dw3110_phy_impl.hpp"
 
