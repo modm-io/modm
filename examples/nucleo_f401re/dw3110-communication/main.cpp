@@ -45,6 +45,7 @@ main()
 		LedD13::toggle();
 		modm::delay(Button::read() ? 100ms : 500ms);
 
+		MODM_LOG_DEBUG << "Ping: " << RF_CALL_BLOCKING(myDw3110.ping()) << modm::endl;
 		MODM_LOG_INFO << "loop: " << counter++ << modm::endl;
 	}
 

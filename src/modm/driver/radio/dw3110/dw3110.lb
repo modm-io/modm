@@ -28,3 +28,4 @@ def build(env):
     env.outbasepath = "modm/src/modm/driver/radio/dw3110"
     env.copy("dw3110_phy.hpp")
     env.copy("dw3110_phy_impl.hpp")
+    env.copy("dw3110_definitions.hpp")
