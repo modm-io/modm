@@ -15,7 +15,7 @@
 using namespace Board;
 
 using MySpiMaster = modm::platform::SpiMaster1;
-using MyDw3110 = modm::Dw3110Phy<MySpiMaster, GpioA0>;
+using MyDw3110 = modm::Dw3110Phy<MySpiMaster, GpioB6>;
 
 MyDw3110 myDw3110;
 
@@ -24,8 +24,9 @@ main()
 {
 	Board::initialize();
 	LedD13::setOutput();
+	GpioB6::setOutput();
 
-	MySpiMaster::initialize<Board::SystemClock, 1_MHz>();
+	MySpiMaster::initialize<Board::SystemClock, 21_MHz>();
 	MySpiMaster::connect<GpioA6::Miso, GpioA7::Mosi, GpioA5::Sck>();
 
 	// Use the logging streams to print some messages.
