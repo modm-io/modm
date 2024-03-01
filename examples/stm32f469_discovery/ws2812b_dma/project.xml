@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <extends>modm:disco-f469ni</extends>
+  <options>
+    <option name=":build:build.path">../../../build/stm32f469_discovery/ws2812b_dma</option>
+  </options>
+  <modules>
+    <module>modm:driver:ws2812</module>
+    <module>modm:platform:spi:2</module>
+    <module>modm:platform:dma</module>
+    <module>modm:ui:led</module>
+    <module>modm:build:scons</module>
+    <module>modm:processing:timer</module>
+  </modules>
+</library>
