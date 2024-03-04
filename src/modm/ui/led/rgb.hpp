@@ -46,9 +46,9 @@ public:
 	{
 		absolute = color;
 
-		red.setBrightness(color.red().value());
-		green.setBrightness(color.green().value());
-		blue.setBrightness(color.blue().value());
+		red.setBrightness(color.red());
+		green.setBrightness(color.green());
+		blue.setBrightness(color.blue());
 	}
 
 	inline ::modm::color::Rgb888
