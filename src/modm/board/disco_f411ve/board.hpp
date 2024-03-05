@@ -14,6 +14,8 @@
 #include <modm/driver/inertial/lis3dsh.hpp>
 #include <modm/platform.hpp>
 
+#include "rcc_prototype.hpp"
+
 using namespace modm::platform;
 
 namespace Board
@@ -22,13 +24,53 @@ namespace Board
 /// @{
 using namespace modm::literals;
 
-/// STM32F411 running at 96MHz generated from the external 8MHz crystal
+
 struct SystemClock
 {
-	static constexpr uint32_t Frequency = 96_MHz;
-	static constexpr uint32_t Ahb = Frequency;
-	static constexpr uint32_t Apb1 = Frequency / 2;
-	static constexpr uint32_t Apb2 = Frequency;
+	// static constexpr uint32_t ExternalLSEclock = ;
+	static constexpr uint32_t ExternalHSEclock = 8_MHz;
+
+	static constexpr Rcc::PllFactors pllFactors{
+		.pllM = 8,
+		.pllN = 336,
+		.pllP = 4,
+		.pllQ = 7,
+	};
+	static constexpr Rcc::AhbPrescaler Ahb_prescaler = Rcc::AhbPrescaler::Div1;
+	static constexpr Rcc::Apb1Prescaler Apb1_prescaler = Rcc::Apb1Prescaler::Div2;
+	static constexpr Rcc::Apb2Prescaler Apb2_prescaler = Rcc::Apb2Prescaler::Div1;
+
+	// ------------------------------------------
+
+	static constexpr int HsePredivision = 1;
+	static constexpr uint32_t PllClock = ExternalHSEclock / HsePredivision / pllFactors.pllM * pllFactors.pllN;
+
+	static constexpr uint32_t Clock = PllClock / pllFactors.pllP; // 96_Mhz
+	static_assert(Clock <= 100_MHz, "Clock has max. 100MHz!");
+
+	static constexpr uint32_t Ahb = Clock / RccProto::prescalerToValue<Ahb_prescaler>();
+	static_assert(Ahb <= 100_MHz, "Ahb has max. 100MHz!");
+
+	static constexpr uint32_t Apb1 = Ahb / RccProto::prescalerToValue<Apb1_prescaler>();
+	static_assert(Apb1 <= 50_MHz, "Apb1 has max. 50MHz!");
+
+	static constexpr uint32_t Apb2 = Ahb / RccProto::prescalerToValue<Apb2_prescaler>();
+	static_assert(Apb2 <= 100_MHz, "Apb2 has max. 100MHz!");
+
+	// @todo is this correct?
+	// prescaler is one ? -> multiply by one, otherwise multiply by two
+	static constexpr uint32_t Apb1Timer = Apb1 * (RccProto::prescalerToValue<Apb1_prescaler>() ==  1 ? 1 : 2);
+	static constexpr uint32_t Apb2Timer = Apb2 * (RccProto::prescalerToValue<Apb2_prescaler>() ==  1 ? 1 : 2);
+
+	// static_assert(Ahb == 84_MHz, "Wrong");
+	// static_assert(Apb1 == 42_MHz, "Wrong");
+	// static_assert(Apb2 == 84_MHz, "Wrong");
+	// static_assert(Apb1Timer == 84_MHz, "Wrong");
+	// static_assert(Apb2Timer == 84_MHz, "Wrong");
+
+	// ------------------------------------------
+
+	static constexpr uint32_t Frequency = Ahb;
 
 	static constexpr uint32_t Adc = Apb2;
 
@@ -51,8 +93,6 @@ struct SystemClock
 	static constexpr uint32_t I2c2 = Apb1;
 	static constexpr uint32_t I2c3 = Apb1;
 
-	static constexpr uint32_t Apb1Timer = Apb1 * 2;
-	static constexpr uint32_t Apb2Timer = Apb2 * 2;
 	static constexpr uint32_t Timer1 = Apb2Timer;
 	static constexpr uint32_t Timer2 = Apb1Timer;
 	static constexpr uint32_t Timer3 = Apb1Timer;
@@ -62,27 +102,20 @@ struct SystemClock
 	static constexpr uint32_t Timer10 = Apb2Timer;
 	static constexpr uint32_t Timer11 = Apb2Timer;
 
-	static constexpr uint32_t Usb = 48_MHz;
+	static constexpr uint32_t Usb = PllClock / pllFactors.pllQ; // 48_Mhz
 
 	static bool inline enable()
 	{
-		Rcc::enableExternalCrystal();  // 8MHz
-		const Rcc::PllFactors pllFactors{
-			.pllM = 7,    // 8MHz / M=7 -> ~1.14MHz
-			.pllN = 336,  // 1.14MHz * N=336 -> 384MHz
-			.pllP = 4,    // 384MHz / P=4 -> 96MHz = F_cpu
-			.pllQ = 8,    // 384MHz / P=8 -> 48MHz = F_usb
-		};
+		/// STM32F411 running at 84MHz generated from the external 8MHz crystal
+		Rcc::enableExternalCrystal();
 		Rcc::enablePll(Rcc::PllSource::ExternalCrystal, pllFactors);
 		// set flash latency for 100MHz
 		Rcc::setFlashLatency<Frequency>();
 		// switch system clock to PLL output
 		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
-		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
-		// APB1 has max. 50MHz
-		// APB2 has max. 100MHz
-		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div2);
-		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div1);
+		Rcc::setAhbPrescaler(Ahb_prescaler);
+		Rcc::setApb1Prescaler(Apb1_prescaler);
+		Rcc::setApb2Prescaler(Apb2_prescaler);
 		// update frequencies for busy-wait delay functions
 		Rcc::updateCoreFrequency<Frequency>();
 
@@ -188,7 +221,7 @@ initializeLis3()
 	lis3::Cs::setOutput(modm::Gpio::High);
 
 	lis3::SpiMaster::connect<lis3::Sck::Sck, lis3::Mosi::Mosi, lis3::Miso::Miso>();
-	lis3::SpiMaster::initialize<SystemClock, 6_MHz>();
+	lis3::SpiMaster::initialize<SystemClock, 5.25_MHz>();
 	lis3::SpiMaster::setDataMode(lis3::SpiMaster::DataMode::Mode3);
 }
 
