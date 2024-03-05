@@ -71,7 +71,7 @@ modm::Dw3110Phy<SpiMaster, Cs>::send(modm::Dw3110Register::SpiMode mode,
 	send_tx_header = static_cast<uint16_t>(mode) << 8;
 	send_tx_header |= static_cast<uint16_t>(address);
 	*((uint16_t *)tx_buffer.data()) = modm::toBigEndian(send_tx_header);
-	*((uint32_t *)((uint16_t *)tx_buffer.data() + 1)) = modm::toBigEndian(data)
+	*((uint32_t *)((uint16_t *)tx_buffer.data() + 1)) = modm::toBigEndian(data);
 
 		RF_CALL(SpiMaster::transfer(tx_buffer.data(), rx_buffer.data(), 2 + 4));
 
