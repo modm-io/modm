@@ -18,6 +18,8 @@
 #include <modm/architecture/interface/spi_device.hpp>
 #include <modm/processing/resumable.hpp>
 
+#include "dw3110_definitions.hpp"
+
 namespace modm
 {
 
@@ -44,6 +46,17 @@ public:
 private:
 	std::array<uint8_t, 2 + 4> tx_buffer;
 	std::array<uint8_t, 2 + 4> rx_buffer;
+
+	uint32_t ping_result = 0;
+
+	modm::ResumableResult<uint32_t>
+	send(modm::Dw3110Register::SpiMode mode, modm::Dw3110Register::DwRegister address);
+
+	modm::ResumableResult<uint32_t>
+	send(modm::Dw3110Register::SpiMode mode, modm::Dw3110Register::DwRegister address,
+		 uint32_t data);
+	uint16_t send_tx_header = 0;
+	uint32_t send_rx_data = 0;
 };
 
 }  // namespace modm
