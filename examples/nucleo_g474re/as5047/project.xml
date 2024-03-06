@@ -1,0 +1,14 @@
+<library>
+  <extends>modm:nucleo-g474re</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_g474re/as5047</option>
+  </options>
+  <modules>
+    <module>modm:driver:as5047</module>
+    <module>modm:platform:gpio</module>
+    <module>modm:platform:spi:1</module>
+    <module>modm:processing:protothread</module>
+    <module>modm:processing:timer</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>
