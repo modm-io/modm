@@ -188,7 +188,7 @@ initializeLis3()
 	lis3::Cs::setOutput(modm::Gpio::High);
 
 	lis3::SpiMaster::connect<lis3::Sck::Sck, lis3::Mosi::Mosi, lis3::Miso::Miso>();
-	lis3::SpiMaster::initialize<SystemClock, 5.25_MHz>();
+	lis3::SpiMaster::initialize<SystemClock, 6_MHz>();
 	lis3::SpiMaster::setDataMode(lis3::SpiMaster::DataMode::Mode3);
 }
 
