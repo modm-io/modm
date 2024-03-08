@@ -1,0 +1,38 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2018, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:ads868x"
+    module.description = """
+# ADS868x Driver.
+
+ADS868x 16-Bit, High-Speed, Single-Supply, SAR ADC Data Acquisition System
+With Programmable, Bipolar Input Ranges
+
+https://www.ti.com/lit/ds/symlink/ads8685.pdf
+"""
+
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:accessor",
+        ":architecture:gpio",
+        ":architecture:register",
+        ":processing:resumable",
+        ":architecture:spi.device")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/adc"
+    env.copy("ads868x.hpp")
+    env.copy("ads868x_impl.hpp")
