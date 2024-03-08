@@ -15,9 +15,11 @@
 using namespace Board;
 
 using MySpiMaster = modm::platform::SpiMaster1;
-using MyDw3110 = modm::Dw3110Phy<MySpiMaster, GpioB6>;
+using MyDw3110_a = modm::Dw3110Phy<MySpiMaster, GpioB6>;
+using MyDw3110_b = modm::Dw3110Phy<MySpiMaster, GpioA10>;
 
-MyDw3110 myDw3110;
+MyDw3110_a myDw3110_a;
+MyDw3110_b myDw3110_b;
 
 int
 main()
@@ -35,7 +37,8 @@ main()
 	MODM_LOG_WARNING << "warning" << modm::endl;
 	MODM_LOG_ERROR   << "error"   << modm::endl;
 
-	RF_CALL_BLOCKING(myDw3110.initialize());
+	RF_CALL_BLOCKING(myDw3110_a.initialize());
+	RF_CALL_BLOCKING(myDw3110_b.initialize());
 
 	uint32_t counter(0);
 
@@ -44,7 +47,8 @@ main()
 		LedD13::toggle();
 		modm::delay(Button::read() ? 100ms : 500ms);
 
-		MODM_LOG_DEBUG << "Ping: " << RF_CALL_BLOCKING(myDw3110.ping()) << modm::endl;
+		MODM_LOG_DEBUG << "Ping a: " << RF_CALL_BLOCKING(myDw3110_a.ping()) << modm::endl;
+		MODM_LOG_DEBUG << "Ping b: " << RF_CALL_BLOCKING(myDw3110_b.ping()) << modm::endl;
 		MODM_LOG_INFO << "loop: " << counter++ << modm::endl;
 	}
 
