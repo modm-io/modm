@@ -24,14 +24,7 @@ modm::ResumableResult<void>
 modm::Dw3110Phy<SpiMaster, Cs>::initialize()
 {
 	RF_BEGIN();
-
-	RF_WAIT_UNTIL(this->acquireMaster());
-	Cs::reset();
-
-	RF_CALL(SpiMaster::transfer(nullptr, nullptr, 1));
-
-	if (this->releaseMaster()) { Cs::set(); }
-
+	Cs::setOutput();
 	RF_END();
 }
 
