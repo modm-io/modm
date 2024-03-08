@@ -47,8 +47,10 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_library(project_options INTERFACE)
 
-# Compile modm
-add_subdirectory(modm)
+# Compile libraries
+%% for repo in generated_paths | sort
+add_subdirectory({{ repo }})
+%% endfor
 
 # Find application sources: Never do this, file changes are not detected by make.
 file(GLOB APP_SOURCE_FILES *.c *.cpp */*.c */*.cpp)
@@ -57,9 +59,11 @@ add_executable(${CMAKE_PROJECT_NAME} ${APP_SOURCE_FILES})
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC include)
 
 target_link_libraries(${CMAKE_PROJECT_NAME}
+%% for repo in generated_paths | sort
+  {{ repo }}
+%% endfor
   modm_options
-  modm_warnings
-  modm)
+  modm_warnings)
 
 # Outputs hex and bin files.
 modm_targets_create(${CMAKE_PROJECT_NAME})
