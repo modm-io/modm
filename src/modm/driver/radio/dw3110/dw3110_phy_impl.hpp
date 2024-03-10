@@ -24,7 +24,7 @@ modm::ResumableResult<void>
 modm::Dw3110Phy<SpiMaster, Cs>::initialize()
 {
 	RF_BEGIN();
-	Cs::setOutput();
+	Cs::setOutput(true);
 	RF_END();
 }
 
