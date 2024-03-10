@@ -327,11 +327,10 @@ public:
 	}
 
 protected:
-	template<Peripheral p, typename Signal>
+	template<typename Signal>
 	static consteval int
 	signalToChannel()
 	{
-		modm::platform::detail::SignalConnection<Signal, p>{};
 %% for signal, number in signals
 %% if loop.first
 		if constexpr (Signal::Signal == Gpio::Signal::{{ signal }}) {

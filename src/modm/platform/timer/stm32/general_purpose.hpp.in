@@ -405,7 +405,7 @@ public:
 	static void
 	configureInputChannel(uint8_t filter)
 	{
-		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		constexpr auto channel = signalToChannel<Signal>();
 		configureInputChannel(channel, filter);
 	}
 
@@ -422,7 +422,7 @@ public:
 			InputCapturePolarity polarity, uint8_t filter,
 			bool xor_ch1_3=false)
 	{
-		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		constexpr auto channel = signalToChannel<Signal>();
 		configureInputChannel(channel, input, prescaler, polarity, filter, xor_ch1_3);
 	}
 
@@ -437,7 +437,7 @@ public:
 			Value compareValue, PinState out = PinState::Enable,
 			bool enableComparePreload = true)
 	{
-		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		constexpr auto channel = signalToChannel<Signal>();
 		configureOutputChannel(channel, mode, compareValue, out, enableComparePreload);
 	}
 
@@ -454,7 +454,7 @@ public:
 			OutputComparePolarity polarity,
 			OutputComparePreload preload = OutputComparePreload::Disable)
 	{
-		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		constexpr auto channel = signalToChannel<Signal>();
 		configureOutputChannel(channel, mode, compareValue, out, polarity, PinState::Disable, OutputComparePolarity::ActiveHigh, preload);
 	}
 
@@ -485,7 +485,7 @@ public:
 			OutputComparePolarity polarity_n = OutputComparePolarity::ActiveHigh,
 			OutputComparePreload preload = OutputComparePreload::Disable)
 	{
-		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		constexpr auto channel = signalToChannel<Signal>();
 %% if id in [15, 16, 17]
         static_assert(channel == 1, "Timer{{ id }} has complementary output only on channel 1");
 %% endif
@@ -528,7 +528,7 @@ public:
 	static void
 	setInvertedPwm()
 	{
-		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		constexpr auto channel = signalToChannel<Signal>();
 		setInvertedPwm(channel);
 	}
 
@@ -568,7 +568,7 @@ public:
 	static void
 	setNormalPwm()
 	{
-		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		constexpr auto channel = signalToChannel<Signal>();
 		setNormalPwm(channel);
 	}
 
@@ -607,7 +607,7 @@ public:
 	static void
 	forceInactive()
 	{
-		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		constexpr auto channel = signalToChannel<Signal>();
 		forceInactive(channel);
 	}
 
@@ -646,7 +646,7 @@ public:
 	static void
 	forceActive()
 	{
-		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		constexpr auto channel = signalToChannel<Signal>();
 		forceActive(channel);
 	}
 
@@ -687,7 +687,7 @@ public:
 	static void
 	setCompareValue(Value value)
 	{
-		constexpr auto channel = signalToChannel<Peripheral::Tim{{id}}, Signal>();
+		constexpr auto channel = signalToChannel<Signal>();
 		setCompareValue(channel, value);
 	}
 
@@ -701,7 +701,7 @@ public:
 	static inline Value
 	getCompareValue()
 	{
-		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		constexpr auto channel = signalToChannel<Signal>();
 		return getCompareValue(channel);
 	}
 public:

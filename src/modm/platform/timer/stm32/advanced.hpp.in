@@ -338,7 +338,7 @@ public:
 	static void
 	setOutputIdleState(OutputIdleState idle, OutputIdleState idle_n = OutputIdleState::Reset)
 	{
-		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		constexpr auto channel = signalToChannel<Signal>();
 		setOutputIdleState(channel, idle, idle_n);
 	}
 
@@ -408,7 +408,7 @@ public:
 	static void
 	configureInputChannel(uint8_t filter)
 	{
-		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		constexpr auto channel = signalToChannel<Signal>();
 		configureInputChannel(channel, filter);
 	}
 
@@ -425,7 +425,7 @@ public:
 			InputCapturePolarity polarity, uint8_t filter,
 			bool xor_ch1_3=false)
 	{
-		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		constexpr auto channel = signalToChannel<Signal>();
 		configureInputChannel(channel, input, prescaler, polarity, filter, xor_ch1_3);
 	}
 
@@ -441,7 +441,7 @@ public:
 	configureOutputChannel(OutputCompareMode mode,
 			Value compareValue, PinState out = PinState::Enable)
 	{
-		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		constexpr auto channel = signalToChannel<Signal>();
 		configureOutputChannel(channel, mode, compareValue, out);
 	}
 
@@ -460,7 +460,7 @@ public:
 			OutputComparePolarity polarity_n = OutputComparePolarity::ActiveHigh,
 			OutputComparePreload preload = OutputComparePreload::Disable)
 	{
-		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		constexpr auto channel = signalToChannel<Signal>();
 		configureOutputChannel(channel, mode, compareValue, out, polarity, out_n, polarity_n, preload);
 	}
 
@@ -491,7 +491,7 @@ public:
 			OutputComparePolarity polarity_n = OutputComparePolarity::ActiveHigh,
 			OutputComparePreload preload = OutputComparePreload::Disable)
 	{
-		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		constexpr auto channel = signalToChannel<Signal>();
 		configureOutputChannel(channel, mode, out, polarity, out_n, polarity_n, preload);
 	}
 
@@ -522,7 +522,7 @@ public:
 	static void
 	configureOutputChannel(uint32_t modeOutputPorts)
 	{
-		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		constexpr auto channel = signalToChannel<Signal>();
 		configureOutputChannel(channel, modeOutputPorts);
 	}
 
@@ -546,7 +546,7 @@ public:
 	static void
 	setCompareValue(Value value)
 	{
-		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		constexpr auto channel = signalToChannel<Signal>();
 		setCompareValue(channel, value);
 	}
 
@@ -560,7 +560,7 @@ public:
 	static inline Value
 	getCompareValue()
 	{
-		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
+		constexpr auto channel = signalToChannel<Signal>();
 		return getCompareValue(channel);
 	}
 
