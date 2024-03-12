@@ -37,7 +37,10 @@ def build(env):
         ftype = "sector"
         busy_bit = "FLASH_SR_BSY"
     elif target.family in ["f1"]:
-        block_shift = 10
+        if target.name in  ["05", "07"] or int(flash["size"]) >= 262144:
+            block_shift = 11
+        else:
+            block_shift = 10
         ftype = "page"
         busy_bit = "FLASH_SR_BSY"
     elif target.family in ["g0"]:
