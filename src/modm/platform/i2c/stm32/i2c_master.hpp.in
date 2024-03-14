@@ -70,7 +70,7 @@ public:
 	 */
 	template<class SystemClock, baudrate_t baudrate=kBd(100), percent_t tolerance=pct(5)>
 	static void
-	initialize()
+	initialize(uint8_t isrPriority = 10u)
 	{
 		// calculate the expected clock ratio
 		constexpr uint8_t scalar = (baudrate <= 100'000) ? 2 : ((baudrate <= 300'000) ? 3 : 25);
@@ -96,7 +96,7 @@ public:
 		constexpr float trise_raw = max_rise_time < 0 ? 0 : std::floor(max_rise_time / (1'000.f / freq));
 		constexpr uint8_t trise = trise_raw > 62 ? 63 : (trise_raw + 1);
 
-		initializeWithPrescaler(freq, trise, prescaler);
+		initializeWithPrescaler(freq, trise, prescaler, isrPriority);
 	}
 
 	static bool
@@ -110,7 +110,7 @@ public:
 
 private:
 	static void
-	initializeWithPrescaler(uint8_t peripheralFrequency, uint8_t riseTime, uint16_t prescaler);
+	initializeWithPrescaler(uint8_t peripheralFrequency, uint8_t riseTime, uint16_t prescaler, uint8_t isrPriority);
 };
 
 } // namespace platform

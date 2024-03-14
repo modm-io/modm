@@ -289,7 +289,7 @@ MODM_ISR(TWIHS{{ id }})
 // ----------------------------------------------------------------------------
 
 void
-modm::platform::I2cMaster{{ id }}::initializeWithClockConfig(uint32_t cwgrRegister)
+modm::platform::I2cMaster{{ id }}::initializeWithClockConfig(uint32_t cwgrRegister, uint8_t isrPriority)
 {
 	ClockGen::enable<ClockPeripheral::I2c{{ id }}>();
 
@@ -307,9 +307,7 @@ modm::platform::I2cMaster{{ id }}::initializeWithClockConfig(uint32_t cwgrRegist
 	// Enable arbitration lost interrupt
 	TWIHS{{ id }}->TWIHS_IER = TWIHS_IER_ARBLST;
 
-	// TODO: make priority configurable?
-	// 10 is also used in the STM32 extended driver
-	NVIC_SetPriority(TWIHS{{ id }}_IRQn, 10);
+	NVIC_SetPriority(TWIHS{{ id }}_IRQn, isrPriority);
 	NVIC_EnableIRQ(TWIHS{{ id }}_IRQn);
 }
 

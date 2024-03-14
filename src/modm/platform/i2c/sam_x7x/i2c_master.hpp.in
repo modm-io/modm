@@ -146,14 +146,14 @@ public:
 	 */
 	template<class SystemClock, baudrate_t baudrate=kBd(100), percent_t tolerance=pct(5)>
 	static void
-	initialize()
+	initialize(uint8_t isrPriority = 10u)
 	{
 		static_assert(baudrate <= 400'000, "Baudrate must not exceed 400 kHz for I2C fast mode");
 		constexpr std::optional<uint32_t> registerValue = calculateTimings<SystemClock, baudrate, tolerance>();
 		static_assert(bool(registerValue), "Could not find a valid clock configuration for the requested"
 			" baudrate and tolerance");
 
-		initializeWithClockConfig(registerValue.value());
+		initializeWithClockConfig(registerValue.value(), isrPriority);
 	}
 
 	static bool
@@ -167,7 +167,7 @@ public:
 
 private:
 	static void
-	initializeWithClockConfig(uint32_t cwgrRegister);
+	initializeWithClockConfig(uint32_t cwgrRegister, uint8_t isrPriority);
 };
 
 
