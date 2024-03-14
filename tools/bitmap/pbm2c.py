@@ -34,7 +34,7 @@ if __name__ == '__main__':
 		# switch to the next line
 		input = input[input.find("\n") + 1:]
 
-	result = re.match("^(\d+) (\d+)\n", input)
+	result = re.match(r"^(\d+) (\d+)\n", input)
 	if not result:
 		print("bad format!")
 

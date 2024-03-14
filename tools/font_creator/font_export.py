@@ -135,7 +135,7 @@ def read_font_file(filename):
 	lines = open(filename).readlines()
 	for line_number, line in enumerate(lines):
 		if char_mode:
-			result = re.match("^\[([ #]+)\]\n", line)
+			result = re.match(r"^\[([ #]+)\]\n", line)
 			if not result:
 				raise ParseException("Illegal Format in: %s" % line[:-1], line_number)
 
@@ -165,7 +165,7 @@ def read_font_file(filename):
 			if char_line_count == 0:
 				char_mode = False
 		elif line[0] == '#':
-			result = re.match("^#(\w+)[ \t]+:[ \t]+(.*)\n", line)
+			result = re.match(r"^#(\w+)[ \t]+:[ \t]+(.*)\n", line)
 			if not result:
 				print("Error in: ", line)
 				exit(1)
@@ -184,7 +184,7 @@ def read_font_file(filename):
 				elif key == "vspace":
 					font.vspace = int(value)
 				elif key == "char":
-					charMatch = re.match("^(\d+)([ \t]*.*)", value)
+					charMatch = re.match(r"^(\d+)([ \t]*.*)", value)
 					if not charMatch:
 						raise ParseException("Illegal Format in: %s" % line[:-1], line_number)
 					number = int(charMatch.group(1))

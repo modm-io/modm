@@ -17,7 +17,7 @@ import re
 global_properties = {}
 
 def get_shared_irqs(device):
-    irq_re = re.compile("I2C\d(_\d)+")
+    irq_re = re.compile(r"I2C\d(_\d)+")
     shared_irqs = [v["name"] for v in device.get_driver("core")["vector"]]
     shared_irqs = [v for v in shared_irqs if irq_re.fullmatch(v)]
     shared_irq_map = {}
