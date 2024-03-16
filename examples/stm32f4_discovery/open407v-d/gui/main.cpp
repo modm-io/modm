@@ -21,7 +21,6 @@
 #include <modm/ui/display/image.hpp>
 #include <modm/driver/touch/ads7843.hpp>
 #include <modm/container.hpp>
-#include <modm/utils/allocator.hpp>
 
 #include <modm/ui/gui.hpp>
 
