@@ -87,6 +87,9 @@ struct ads816x
 	};
 };
 
+template<typename SpiMaster>
+constexpr auto Ads816xSpiConfig = SpiConfiguration<SpiMaster>{SpiMaster::DataMode::Mode0, SpiMaster::DataOrder::MsbFirst};
+
 /**
  * @tparam	SpiMaster	SpiMaster interface
  * @tparam	Cs			Chip-select pin
@@ -95,7 +98,9 @@ struct ads816x
  * @ingroup modm_driver_ads816x
  */
 template <typename SpiMaster, typename Cs>
-class Ads816x : public ads816x, public modm::SpiDevice<SpiMaster>, protected modm::NestedResumable<3>
+class Ads816x : public ads816x,
+				public modm::SpiDevice<SpiMaster, Ads816xSpiConfig<SpiMaster>>,
+				protected modm::NestedResumable<3>
 {
 public:
 	Ads816x() = default;
