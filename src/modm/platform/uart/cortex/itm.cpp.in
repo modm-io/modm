@@ -126,7 +126,7 @@ Itm::discardTransmitBuffer()
 {
 %% if options["buffer.tx"]
 	std::size_t count = 0;
-	for(; not txBuffer.isEmpty(); txBuffer.pop())
+	for(; txBuffer.isNotEmpty(); txBuffer.pop())
 		++count;
 	return count;
 %% else
@@ -180,7 +180,7 @@ Itm::update()
 	static uint32_t buffer{0};
 	static uint8_t size{0};
 
-	while (not txBuffer.isEmpty() and size < 4)
+	while (txBuffer.isNotEmpty() and size < 4)
 	{
 		const uint8_t data = txBuffer.get();
 		txBuffer.pop();

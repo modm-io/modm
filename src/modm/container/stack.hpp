@@ -47,6 +47,12 @@ namespace modm
 			return c.isEmpty();
 		}
 
+		inline bool
+		isNotEmpty()
+		{
+			return not c.isEmpty();
+		}
+
 		bool
 		isFull()
 		{

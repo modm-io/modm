@@ -83,7 +83,7 @@ std::size_t
 modm::platform::Uart{{ id }}::discardReceiveBuffer()
 {
 	std::size_t i(0);
-	while(!rxBuffer.isEmpty())
+	while(rxBuffer.isNotEmpty())
 	{
 		rxBuffer.pop();
 		++i;

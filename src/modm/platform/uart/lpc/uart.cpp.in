@@ -252,7 +252,7 @@ bool
 modm::platform::Uart1::read(uint8_t& data)
 {
 %% if options["buffer.rx"] > 16
-	if (not rxBuffer.isEmpty())
+	if (rxBuffer.isNotEmpty())
 	{
 		data = rxBuffer.get();
 		rxBuffer.pop();
@@ -298,7 +298,7 @@ modm::platform::Uart1::discardReceiveBuffer()
 {
 	std::size_t count(0);
 %% if options["buffer.rx"] > 16
-	while(!rxBuffer.isEmpty())
+	while(rxBuffer.isNotEmpty())
 	{
 		++count;
 		rxBuffer.pop();
@@ -346,7 +346,7 @@ MODM_ISR(UART)
 			return;
 		}
 
-		while (!txBuffer.isEmpty() and (charsLeft-- > 0))
+		while (txBuffer.isNotEmpty() and (charsLeft-- > 0))
 		{
 			// Write to the hardware buffer
 			LPC_UART->THR = txBuffer.get();

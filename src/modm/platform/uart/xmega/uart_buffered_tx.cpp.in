@@ -116,7 +116,7 @@ modm::platform::Uart{{ id }}::discardTransmitBuffer()
 	}
 
 	std::size_t i = 0;
-	while(!txBuffer.isEmpty())
+	while(txBuffer.isNotEmpty())
 	{
 		txBuffer.pop();
 		++i;

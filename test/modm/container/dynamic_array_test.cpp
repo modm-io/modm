@@ -30,6 +30,7 @@ DynamicArrayTest::testDefaultConstrutor()
 	Container array;
 
 	TEST_ASSERT_TRUE(array.isEmpty());
+	TEST_ASSERT_FALSE(array.isNotEmpty());
 	TEST_ASSERT_EQUALS(array.getSize(), 0U);
 }
 

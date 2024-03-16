@@ -131,7 +131,7 @@ std::size_t
 	std::size_t count = 0;
 	// disable interrupt since buffer will be cleared
 	{{ hal }}::disableInterrupt({{ hal }}::Interrupt::TxEmpty);
-	while(!txBuffer.isEmpty()) {
+	while(txBuffer.isNotEmpty()) {
 		++count;
 		txBuffer.pop();
 	}
@@ -202,7 +202,7 @@ std::size_t
 {
 %% if options["buffer.rx"]
 	std::size_t count = 0;
-	while(!rxBuffer.isEmpty()) {
+	while(rxBuffer.isNotEmpty()) {
 		++count;
 		rxBuffer.pop();
 	}

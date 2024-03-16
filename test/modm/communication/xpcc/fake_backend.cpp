@@ -30,7 +30,7 @@ FakeBackend::sendPacket(const xpcc::Header &header,
 bool
 FakeBackend::isPacketAvailable() const
 {
-	return !this->messagesToReceive.isEmpty();
+	return this->messagesToReceive.isNotEmpty();
 }
 
 const xpcc::Header&

@@ -40,7 +40,7 @@ modm::gui::View::update()
 
 	modm::gui::inputQueue* input_queue = this->stack->getInputQueue();
 
-	while(!input_queue->isEmpty()) {
+	while(input_queue->isNotEmpty()) {
 
 		// pop input event
 		ev = input_queue->get();
