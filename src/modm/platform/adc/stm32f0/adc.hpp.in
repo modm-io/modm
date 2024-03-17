@@ -4,6 +4,7 @@
  * Copyright (c) 2018, Carl Treudler
  * Copyright (c) 2018-2019, Niklas Hauser
  * Copyright (c) 2023, Daniel Waldhaeusl (Zuehlke Engineering)
+ * Copyright (c) 2024, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -16,7 +17,10 @@
 #ifndef MODM_STM32{{ target.family | upper }}_ADC{{ id }}_HPP
 #define MODM_STM32{{ target.family | upper }}_ADC{{ id }}_HPP
 
-#include <stdint.h>
+#include <array>
+#include <cstdint>
+#include <span>
+#include <utility>
 #include "../device.hpp"
 #include <modm/architecture/interface/adc.hpp>
 #include <modm/architecture/interface/register.hpp>
@@ -48,6 +52,14 @@ public:
 		{{ name }} = {{ channel }},
 %% endfor
 	};
+
+	enum class ChannelMask : uint32_t
+	{
+%% for channel, name in channels.items() | sort
+		{{ name }} = (1u << {{ channel }}),
+%% endfor
+	};
+	MODM_FLAGS32(ChannelMask);
 
 	enum class ClockMode
 	{
@@ -228,6 +240,9 @@ public:
 	static inline void
 	startConversion();
 
+	static inline void
+	stopConversion();
+
 	static inline bool
 	isConversionFinished();
 
@@ -281,6 +296,37 @@ public:
 	setChannel(Channel channel);
 %% endif
 
+	/**
+	 * Set channel scan sequence mask. All selected channels will be converted
+	 * sequentially starting from the lowest.
+	 *
+	 * @param channels Mask of channels to convert
+	 */
+	static inline void
+	setChannels(ChannelMask_t channels);
+
+	template<typename... Gpios>
+	static consteval ChannelMask_t
+	channelMaskFromPins();
+
+%% if target.family in ["g0"]
+	/**
+	 * Set channel scan sequence to convert up to 8 channels in arbitrary order.
+	 *
+	 * @warning The sequence provided must contain at least one but no more than 8 channels.
+	 * 			Channels above 15 are not supported due to hardware limitations. If channels
+	 * 			16 to 18 should be sampled the in-order conversion sequence must be used instead.
+	 * @param channels Flag mask of channels to convert
+	 * @return true if provided channel sequence is valid, false otherwise.
+	 */
+	static inline bool
+	setChannels(std::span<const Channel> channels);
+
+	template<typename... Gpios>
+	static consteval std::array<Channel, sizeof...(Gpios)>
+	channelSequenceFromPins();
+%% endif
+
 	static inline void
 	clearChannel(Channel channel);
 
@@ -317,6 +363,9 @@ public:
 %% if target.family in ["g0"]
 	static inline void
 	setSampleTime(SampleTime sampleTime, SampleTimeGroup group = SampleTimeGroup::Group1);
+
+	static inline void
+	setSampleTimeGroup(Channel channel, SampleTimeGroup group = SampleTimeGroup::Group1);
 %% else
 	static inline void
 	setSampleTime(SampleTime sampleTime);
@@ -344,7 +393,6 @@ public:
 	static inline void
 	acknowledgeInterruptFlags(InterruptFlag_t flags);
 
-%% if target.family in ["g0"]
 	static inline uintptr_t
 	getDataRegisterAddress();
 
@@ -352,10 +400,6 @@ public:
 	enableRegularConversionExternalTrigger(
 		ExternalTriggerPolarity externalTriggerPolarity,
 		RegularConversionExternalTrigger regularConversionExternalTrigger);
-
-	/// Add a channel to conversion group.
-	static inline bool
-	addChannel(const Channel channel);
 
 	/**
 	 * Enable Dma mode for the ADC
@@ -391,29 +435,23 @@ public:
 	static inline void
 	disableDmaRequests();
 
-	/**
-	 * Waits until the CCR bit is set.
-	 */
+
+	static inline void
+	enableInternalChannel(Channel channel);
+
+private:
+%% if target.family in ["g0"]
 	static inline void
 	waitChannelConfigReady();
 
-	/**
-	 * Resets the CCR bit.
-	 */
 	static inline void
 	resetChannelConfigReady();
 
-	/**
-	 * Enables scan mode
-	 */
 	static inline void
-	enableScanMode();
+	enableOrderedSequenceMode();
 
-	/**
-	 * Disables scan mode
-	 */
 	static inline void
-	disableScanMode();
+	disableOrderedSequenceMode();
 %% endif
 
 public:

@@ -4,6 +4,7 @@
  * Copyright (c) 2018, Carl Treudler
  * Copyright (c) 2019, Niklas Hauser
  * Copyright (c) 2023, Daniel Waldhaeusl (Zuehlke Engineering)
+ * Copyright (c) 2024, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -20,7 +21,8 @@
 #include <modm/platform/clock/rcc.hpp>
 #include <modm/architecture/interface/delay.hpp>
 #include <modm/math/algorithm/prescaler.hpp>
-
+#include <modm/math/algorithm/enumerate.hpp>
+#include <algorithm>
 
 template< class SystemClock, modm::platform::Adc{{ id }}::ClockMode mode,
 		  modm::frequency_t frequency, modm::percent_t tolerance >
@@ -77,10 +79,7 @@ modm::platform::Adc{{ id }}::enable()
 void
 modm::platform::Adc{{ id }}::disable()
 {
-	if (ADC1->CR & ADC_CR_ADSTART) {
-		ADC1->CR |= ADC_CR_ADSTP;
-		while (ADC1->CR & ADC_CR_ADSTP) ;
-	}
+	stopConversion();
 
 	ADC1->CR |= ADC_CR_ADDIS;
 	while (ADC1->CR & ADC_CR_ADEN) ;
@@ -139,6 +138,91 @@ modm::platform::Adc{{ id }}::setChannel(const Channel channel, const SampleTimeG
 	if(uint32_t(channel) > {{channels | max}})
 		return false;
 
+%% if target.family in ["g0"]
+	disableOrderedSequenceMode();
+	resetChannelConfigReady();
+%% endif
+
+	enableInternalChannel(channel);
+%% if target.family in ["g0"]
+	setSampleTimeGroup(channel, group);
+	// clear Channel Configuration Ready flag
+	resetChannelConfigReady();
+	ADC1->CHSELR = 1 << uint32_t(channel);
+	waitChannelConfigReady();
+%% else
+	ADC1->CHSELR = 1 << uint32_t(channel);
+%% endif
+
+	return true;
+}
+
+void
+modm::platform::Adc{{ id }}::setChannels(ChannelMask_t channels)
+{
+%% if target.family in ["g0"]
+	disableOrderedSequenceMode();
+	resetChannelConfigReady();
+%% endif
+	ADC1->CHSELR = channels.value;
+%% if target.family in ["g0"]
+	waitChannelConfigReady();
+%% endif
+}
+
+template<typename... Gpios>
+consteval auto
+modm::platform::Adc{{ id }}::channelMaskFromPins() -> ChannelMask_t
+{
+	return (static_cast<ChannelMask>(1u << std::to_underlying(getPinChannel<Gpios>())) | ...);
+}
+
+%% if target.family in ["g0"]
+bool
+modm::platform::Adc{{ id }}::setChannels(std::span<const Channel> channels)
+{
+	if (channels.size() < 1 || channels.size() > 8)
+		return false;
+
+	const bool invalid = std::ranges::any_of(channels, [](Channel c) {
+		return std::to_underlying(c) > 15;
+	});
+	if (invalid)
+		return false;
+
+	enableOrderedSequenceMode();
+	resetChannelConfigReady();
+
+	uint32_t config = 0xFFFF'FFFF;
+	for (const auto [i, ch] : modm::enumerate(channels)) {
+		enableInternalChannel(ch);
+		config = (config & ~((0xF) << i)) | (std::to_underlying(ch) << i);
+	}
+	ADC1->CHSELR = config;
+	waitChannelConfigReady();
+	return true;
+}
+
+template<typename... Gpios>
+consteval auto
+modm::platform::Adc{{ id }}::channelSequenceFromPins() -> std::array<Channel, sizeof...(Gpios)>
+{
+	const auto length = sizeof...(Gpios);
+	static_assert(length > 0 && length <= 8, "Invalid channel count");
+	constexpr auto channels = std::array{getPinChannel<Gpios>()...};
+
+	constexpr bool valid = std::ranges::all_of(channels, [](Channel c) {
+		return std::to_underlying(c) <= 15;
+	});
+	static_assert(valid, "Channels 16-18 are not supported, use ordered sequence with mask");
+
+	return channels;
+}
+%% endif
+
+void
+modm::platform::Adc{{ id }}::enableInternalChannel(Channel channel)
+{
 	if (channel == Channel::InternalReference and
 	    not (ADC1_COMMON->CCR & ADC_CCR_VREFEN))
 	{
@@ -159,29 +243,19 @@ modm::platform::Adc{{ id }}::setChannel(const Channel channel, const SampleTimeG
 		ADC1_COMMON->CCR |= ADC_CCR_TSEN;
 		modm::delay_us(135);
 	}
+}
 
 %% if target.family in ["g0"]
+void
+modm::platform::Adc{{ id }}::setSampleTimeGroup(Channel channel, SampleTimeGroup group)
+{
 	if (group == SampleTimeGroup::Group1) {
 		ADC1->SMPR &= ~(0x100ul << uint32_t(channel));
 	} else {
 		ADC1->SMPR |=  (0x100ul << uint32_t(channel));
 	}
-%% else
-%% endif
-
-	// clear Channel Configuration Ready flag
-%% if target.family in ["g0"]
-	ADC1->ISR = ADC_ISR_CCRDY;
-	ADC1->CHSELR = 1 << uint32_t(channel);
-	while(not (ADC1->ISR & ADC_ISR_CCRDY)) ;
-%% else
-	ADC1->CHSELR = 1 << uint32_t(channel);
-%% endif
-
-	return true;
 }
 
-%% if target.family in ["g0"]
 void
 modm::platform::Adc{{ id }}::enableOversampling(OversampleRatio ratio, OversampleShift shift)
 {
@@ -301,6 +375,15 @@ modm::platform::Adc{{ id }}::startConversion()
 	ADC1->CR |= ADC_CR_ADSTART;
 }
 
+void
+modm::platform::Adc{{ id }}::stopConversion()
+{
+	if (ADC1->CR & ADC_CR_ADSTART) {
+		ADC1->CR |= ADC_CR_ADSTP;
+		while (ADC1->CR & ADC_CR_ADSTP);
+	}
+}
+
 bool
 modm::platform::Adc{{ id }}::isConversionFinished()
 {
@@ -368,7 +451,6 @@ modm::platform::Adc{{ id }}::setWaitMode(const bool enable)
 	}
 }
 
-%% if target.family in ["g0"]
 uintptr_t
 modm::platform::Adc{{ id }}::getDataRegisterAddress()
 {
@@ -419,75 +501,36 @@ modm::platform::Adc{{ id }}::disableDmaRequests()
 	ADC1->CFGR1 &= ~ADC_CFGR1_DMACFG;
 }
 
+%% if target.family in ["g0"]
 void
 modm::platform::Adc{{ id }}::waitChannelConfigReady()
 {
-	while (!(ADC1->ISR & ADC_ISR_CCRDY));
+	while (not (ADC1->ISR & ADC_ISR_CCRDY));
 }
 
 void
-modm::platform::Adc{{ id }}::resetChannelConfigReady(){ADC1->ISR &= ~ADC_ISR_CCRDY;}
-
-void
-modm::platform::Adc{{ id }}::enableScanMode()
+modm::platform::Adc{{ id }}::resetChannelConfigReady()
 {
-	resetChannelConfigReady();
-	ADC1->CFGR1 |= ADC_CFGR1_CHSELRMOD;
-	waitChannelConfigReady();
-
-	resetChannelConfigReady();
-	ADC1->CHSELR = uint32_t(0xFFFFFFFF);
-	waitChannelConfigReady();
+	ADC1->ISR = ADC_ISR_CCRDY;
 }
 
 void
-modm::platform::Adc{{ id }}::disableScanMode()
+modm::platform::Adc{{ id }}::enableOrderedSequenceMode()
 {
-	ADC1->CFGR1 &= ~ADC_CFGR1_CHSELRMOD;
+	if ((ADC1->CFGR1 & ADC_CFGR1_CHSELRMOD) == 0u) {
+		resetChannelConfigReady();
+		ADC1->CFGR1 |= ADC_CFGR1_CHSELRMOD;
+		waitChannelConfigReady();
+	}
 }
 
-bool
-modm::platform::Adc{{ id }}::addChannel(const Channel channel)
+void
+modm::platform::Adc{{ id }}::disableOrderedSequenceMode()
 {
-	uint32_t position = 0;
-	uint32_t position_value = 0;
-
-	if (channel == Channel::InternalReference and
-	    not (ADC1_COMMON->CCR & ADC_CCR_VREFEN))
-	{
-%% if target.family in ["g0"]
-		ADC1->CR |= ADC_CR_ADVREGEN;
-		modm::delay_us(30);
-%% endif
-		ADC1_COMMON->CCR |= ADC_CCR_VREFEN;
+	if (ADC1->CFGR1 & ADC_CFGR1_CHSELRMOD) {
+		resetChannelConfigReady();
+		ADC1->CFGR1 &= ~ADC_CFGR1_CHSELRMOD;
+		waitChannelConfigReady();
 	}
-%% if "Battery" in channels.values()
-	else if (channel == Channel::Battery) {
-		ADC1_COMMON->CCR |= ADC_CCR_VBATEN;
-	}
-%% endif
-	else if (channel == Channel::Temperature and
-	         not (ADC1_COMMON->CCR & ADC_CCR_TSEN))
-	{
-		ADC1_COMMON->CCR |= ADC_CCR_TSEN;
-		modm::delay_us(135);
-	}
-
-	/* Find empty sequence slot */
-	while (0x0F != position_value)
-	{
-		if (position > 7)
-			return false;
-		position_value = ADC1->CHSELR & (ADC_CHSELR_SQ1_Msk << (4 * position));
-		position_value = position_value >> (4 * position);
-		++position;
-	}
-	--position;
-	uint32_t shift = 4 * position;
-	uint32_t mask = uint32_t(ADC_CHSELR_SQ1_Msk) << shift;
-	resetChannelConfigReady();
-	ADC1->CHSELR &= (~mask | (uint32_t(channel) << shift));
-	waitChannelConfigReady();
-	return true;
 }
 %% endif
