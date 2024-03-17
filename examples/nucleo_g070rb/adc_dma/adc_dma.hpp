@@ -12,6 +12,7 @@
 #define EXAMPLE_ADCDMA_HPP
 
 #include <modm/platform.hpp>
+#include <span>
 
 template<class Adc, class DmaChannel>
 class AdcDma
@@ -31,7 +32,7 @@ public:
 	 */
 	template<class SystemClock>
 	static void
-	initialize(uintptr_t destination_ptr, size_t length,
+	initialize(std::span<uint16_t> buffer,
 			   modm::platform::DmaBase::Priority priority = modm::platform::DmaBase::Priority::Low,
 			   modm::platform::DmaBase::CircularMode circularMode =
 				   modm::platform::DmaBase::CircularMode::Enabled,
@@ -46,8 +47,8 @@ public:
 			modm::platform::DmaBase::MemoryIncrementMode::Increment,
 			modm::platform::DmaBase::PeripheralIncrementMode::Fixed, priority, circularMode);
 		Dma::AdcChannel::setPeripheralAddress(Adc::getDataRegisterAddress());
-		Dma::AdcChannel::setDataLength(length);
-		Dma::AdcChannel::setMemoryAddress(destination_ptr);
+		Dma::AdcChannel::setDataLength(buffer.size());
+		Dma::AdcChannel::setMemoryAddress(reinterpret_cast<uintptr_t>(buffer.data()));
 
 		setTransferErrorCallback(transferErrorCallback);
 		setHalfCompletedConversionCallback(halfCompletedCallback);

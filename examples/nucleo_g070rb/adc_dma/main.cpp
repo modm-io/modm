@@ -27,7 +27,7 @@ using namespace Board;
 using namespace modm::platform;
 using Adc1Dma = AdcDma<Adc1, Dma1::Channel1>;
 
-std::array<uint16_t, 100> adc_results;
+std::array<uint16_t, 100> adc_results{};
 volatile bool dma_completed = false;
 
 void
@@ -49,26 +49,21 @@ main()
 	LedD13::setOutput();
 	LedD13::reset();
 
-	adc_results.fill(0);
-
 	Adc1::connect<GpioInputA0::In0>();
 	Adc1::connect<GpioInputA1::In1>();
 
-	const auto a0_channel = Adc1::getPinChannel<GpioInputA0>();
-	const auto a1_channel = Adc1::getPinChannel<GpioInputA1>();
 	Adc1::setSampleTime(Adc1::SampleTime::Cycles3_5);
 	Adc1::initialize<SystemClock, Adc1::ClockMode::Asynchronous>();
-	Adc1::enableScanMode();
 	modm::delay(500ms);
 	// On STM32G0 Event1 means TIM1's channel 4 capture and compare event.
 	// Each controller has a different trigger mapping, check the reference
 	// manual for more information on the trigger mapping of your controller.
 	Adc1::enableRegularConversionExternalTrigger(Adc1::ExternalTriggerPolarity::RisingEdge,
 												 Adc1::RegularConversionExternalTrigger::Event1);
-	Adc1::addChannel(a0_channel);
-	Adc1::addChannel(a1_channel);
+
+	Adc1::setChannels(Adc1::channelSequenceFromPins<GpioInputA0, GpioInputA1>());
 	Dma1::enable();
-	Adc1Dma::initialize<SystemClock>((uintptr_t)(&adc_results[0]), adc_results.size());
+	Adc1Dma::initialize<SystemClock>(adc_results);
 	Adc1Dma::setCompletedConversionCallback(completedCallback);
 	Adc1Dma::startDma();
 	Adc1::startConversion();
@@ -83,7 +78,7 @@ main()
 		dma_completed = false;
 		MODM_LOG_INFO << "Measurements"
 					  << "\r" << modm::endl;
-		for (const uint16_t& sample : adc_results) { MODM_LOG_INFO << sample << ", "; }
+		for (uint16_t sample : adc_results) { MODM_LOG_INFO << sample << ", "; }
 		MODM_LOG_INFO << "\r" << modm::endl;
 		adc_results.fill(0);
 		timerStart<Timer1>();
