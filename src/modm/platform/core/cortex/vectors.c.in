@@ -33,7 +33,7 @@ typedef void (* const FunctionPointer)(void);
 extern uint32_t __main_stack_top[];
 
 // Define the vector table
-modm_section(".vector_rom")
+modm_section(".vector_rom") modm_used
 FunctionPointer vectorsRom[] =
 {
 	(FunctionPointer)__main_stack_top,		// -16: stack pointer
@@ -50,7 +50,7 @@ FunctionPointer vectorsRom[] =
 };
 %% if vector_table_location == "ram"
 // reserve space for the remapped vector table in RAM
-modm_section(".vector_ram")
+modm_section(".vector_ram") modm_used
 FunctionPointer vectorsRam[sizeof(vectorsRom) / sizeof(FunctionPointer)];
 %% endif
 
@@ -65,7 +65,8 @@ FunctionPointer vectorsRam[sizeof(vectorsRom) / sizeof(FunctionPointer)];
 #include <modm/architecture/interface/assert.h>
 %% endif
 
-void Undefined_Handler(void)
+modm_used void
+Undefined_Handler(void)
 {
 %% if with_assert
 	const int32_t irqn = ((int32_t)__get_IPSR()) - 16;

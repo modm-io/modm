@@ -40,7 +40,7 @@ void __modm_initialize_memory(void)
  *  Note:  This implementation is not thread safe (despite taking a
  *         _reent structure as a parameter).
  */
-void *
+modm_used void *
 _sbrk_r(struct _reent *,  ptrdiff_t size)
 {
 	const uint8_t *const heap = heap_top;

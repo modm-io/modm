@@ -19,7 +19,7 @@ void __modm_initialize_memory(void)
 }
 
 // ----------------------------------------------------------------------------
-modm_weak modm_section("{{ no_heap_section }}")
+modm_weak modm_used modm_section("{{ no_heap_section }}")
 void* _sbrk_r(struct _reent *r, ptrdiff_t size)
 {
 	(void) r;
