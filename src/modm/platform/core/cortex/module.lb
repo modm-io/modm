@@ -90,11 +90,22 @@ def common_memories(env):
             "access": "rx",
             "start": "0x10000000",
             "size": hex(flash_size)})
+    flash_reserved = env.get(":platform:cortex-m:linkerscript.flash_reserved", 0)
+    if flash_reserved:
+        memories.append({
+            "name": "flash_reserved",
+            "access": "rx",
+            "start": hex(0x10000000+flash_size),
+            "size": 0})
     flash_offset = env.get(":platform:cortex-m:linkerscript.flash_offset", 0)
     for m in memories:
         if m["name"] == "flash":
             m["start"] = int(m["start"], 0) + flash_offset
-            m["size"] = int(m["size"], 0) - flash_offset
+            m["size"] = int(m["size"], 0) - flash_offset - flash_reserved
+            flash_reserved_start = m["start"] + m["size"]
+        elif m["name"] == "flash_reserved":
+            m["start"] = flash_reserved_start
+            m["size"] = flash_reserved
         else:
             m["start"] = int(m["start"], 0)
             m["size"] = int(m["size"], 0)
@@ -237,6 +248,14 @@ def prepare(module, options):
             minimum=0,
             maximum=hex(flash_size),
             default=0))
+    
+    module.add_option(
+        NumericOption(
+            name="linkerscript.flash_reserved",
+            description="Add a reseved section at the end of the flash.",
+            minimum=0,
+            maximum=hex(flash_size),
+            default=0))
 
     module.add_option(
         PathOption(
@@ -292,6 +311,17 @@ def validate(env):
                                     .format(flash_offset_option_name,
                                             flash_offset,
                                             bit_alignment))
+    
+    flash_size = env.get(":platform:core:boot2_size", 0)
+    flash_reserved_option_name = "modm:platform:cortex-m:linkerscript.flash_reserved"
+    flash_reserved = env[flash_reserved_option_name]
+    if flash_reserved != 0:
+        if flash_reserved + flash_offset > flash_size:
+            raise ValidateException("Invalid reserved flash size in option '{}'. "
+                                    "The requested reserved flash of {} will collide with the requested flash offset of {}."
+                                    .format(flash_reserved_option_name,
+                                            flash_reserved,
+                                            flash_offset))
 
 
 def build(env):
