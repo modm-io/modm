@@ -24,13 +24,21 @@ def prepare(module, options):
 
     module.depends(":cmsis:device", ":platform:rcc",
                    ":architecture:register")
+
+    if device.identifier.family in ["g4"]:
+        module.add_option(
+            EnumerationOption(
+                name="dual_bank",
+                description="Flash is configured in single or dual bank mode",
+                enumeration=["yes", "no"],
+                default="no"))
     return True
 
 def build(env):
     target = env[":target"].identifier
     memories = listify(env[":target"].get_driver("core")["memory"])
     flash = next(filter(lambda m: m["name"] == "flash", memories))
-
+    dual_bank = False
     family = target.family
     if target.family in ["f4"]:
         block_shift = 17
@@ -47,10 +55,12 @@ def build(env):
         block_shift = 11
         ftype = "page"
         busy_bit = "FLASH_SR_BSY1"
+        dual_bank = int(flash["size"]) > 128*1024
     elif target.family in ["g4"]:
         block_shift = 11
         ftype = "page"
         busy_bit = "FLASH_SR_BSY"
+        dual_bank = ( env["modm:platform:flash:dual_bank"] == "yes")
 
     env.substitutions = {
         "start": int(flash["start"], 16),
@@ -59,7 +69,8 @@ def build(env):
         "shift": block_shift,
         "has_sectors": ftype == "sector",
         "busy_bit": busy_bit,
-        "family": family
+        "family": family,
+        "dual_bank": dual_bank
     }
     env.outbasepath = "modm/src/modm/platform/flash"
     env.template("flash.hpp.in")

@@ -92,8 +92,20 @@ Flash::erase(uint8_t index)
 			((index << FLASH_CR_SNB_Pos) & FLASH_CR_SNB_Msk);
 %% else
 %% if family in ["g0","g4"]
+%% if dual_bank
+%% if family == "g0"
+	const bool index_is_on_second_bank{index >= 256};
+%% else
+	const bool index_is_on_second_bank{index >= (Size/2048/2)};
+%% endif
+	const uint8_t page = index_is_on_second_bank ? index - Size/2048/2 : index;
+	FLASH->CR = FLASH_CR_STRT | FLASH_CR_PER |
+			((index_is_on_second_bank << FLASH_CR_BKER_Pos) & FLASH_CR_BKER_Msk) |
+			((page << FLASH_CR_PNB_Pos) & FLASH_CR_PNB_Msk);
+%% else
 	FLASH->CR = FLASH_CR_STRT | FLASH_CR_PER |
 			((index << FLASH_CR_PNB_Pos) & FLASH_CR_PNB_Msk);
+%% endif
 %% else
 	FLASH->CR &= ~FLASH_CR_STRT;
 	FLASH->CR |= FLASH_CR_PER;
