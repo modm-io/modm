@@ -312,16 +312,19 @@ def validate(env):
                                             flash_offset,
                                             bit_alignment))
 
-    flash_size = env.get(":platform:core:boot2_size", 0)
+    device = env[":target"]
+    memories = listify(device.get_driver("core")["memory"])
+    flash_size = next((int(x['size']) for x in memories if x['name'] == 'flash'), 16*1024*1024)
     flash_reserved_option_name = "modm:platform:cortex-m:linkerscript.flash_reserved"
     flash_reserved = env[flash_reserved_option_name]
     if flash_reserved != 0:
         if flash_reserved + flash_offset > flash_size:
             raise ValidateException("Invalid reserved flash size in option '{}'. "
-                                    "The requested reserved flash of {} will collide with the requested flash offset of {}."
+                                    "The requested reserved flash of {} will collide with the requested flash offset of {} due to flash size {}."
                                     .format(flash_reserved_option_name,
                                             flash_reserved,
-                                            flash_offset))
+                                            flash_offset,
+                                            flash_size))
 
 
 def build(env):
