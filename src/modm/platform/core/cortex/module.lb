@@ -91,13 +91,22 @@ def common_memories(env):
             "start": "0x10000000",
             "size": hex(flash_size)})
     flash_offset = env.get(":platform:cortex-m:linkerscript.flash_offset", 0)
+    flash_reserved = env.get(":platform:cortex-m:linkerscript.flash_reserved", 0)
     for m in memories:
         if m["name"] == "flash":
             m["start"] = int(m["start"], 0) + flash_offset
-            m["size"] = int(m["size"], 0) - flash_offset
+            m["size"] = int(m["size"], 0) - flash_offset - flash_reserved
         else:
             m["start"] = int(m["start"], 0)
             m["size"] = int(m["size"], 0)
+
+    # Add reserved FLASH section to memories
+    if flash_reserved:
+        memories.append({
+            "name": "flash_reserved",
+            "access": "rx",
+            "start": next(m["start"] + m["size"] for m in memories if m["name"] == "flash"),
+            "size": flash_reserved})
 
     # Find all continuous internal SRAM sections
     cont = []
@@ -229,11 +238,19 @@ def prepare(module, options):
                 default=default_location))
 
     # Find the size of the flash memory
-    flash_size = next((int(x['size']) for x in memories if x['name'] == 'flash'), 16*1024*1024)
+    flash_size = next((int(x["size"]) for x in memories if x["name"] == "flash"), 16*1024*1024)
     module.add_option(
         NumericOption(
             name="linkerscript.flash_offset",
             description=FileReader("option/flash_offset.md"),
+            minimum=0,
+            maximum=hex(flash_size),
+            default=0))
+
+    module.add_option(
+        NumericOption(
+            name="linkerscript.flash_reserved",
+            description="Add a reserved section at the end of the flash.",
             minimum=0,
             maximum=hex(flash_size),
             default=0))
@@ -290,8 +307,21 @@ def validate(env):
             raise ValidateException("Invalid flash offset in option '{}' (value=0x{:X}). "
                                     "The offset needs to be {} bit aligned."
                                     .format(flash_offset_option_name,
-                                            flash_offset,
-                                            bit_alignment))
+                                            flash_offset, bit_alignment))
+
+    device = env[":target"]
+    memories = listify(device.get_driver("core")["memory"])
+    flash_size = next((int(x["size"]) for x in memories if x["name"] == "flash"), 16*1024*1024)
+    flash_reserved_option_name = "modm:platform:cortex-m:linkerscript.flash_reserved"
+    flash_reserved = env[flash_reserved_option_name]
+    if flash_reserved != 0:
+        if flash_reserved + flash_offset > flash_size:
+            raise ValidateException("Invalid reserved flash size in option '{}'. "
+                                    "The 'linkerscript.flash_offset' of {} at the beginning "
+                                    "of FLASH is growing into the 'linkerscript.flash_reserved' "
+                                    "of {} at the end of FLASH due to flash size {}."
+                                    .format(flash_reserved_option_name, flash_offset,
+                                            flash_reserved, flash_size))
 
 
 def build(env):
