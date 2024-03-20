@@ -102,7 +102,8 @@ main()
 
 		// put BSON in reserved flash
 		uint32_t err{0};
-		const size_t page_start = Flash::getPage(reinterpret_cast<uint32_t>(&__flash_reserved_start)) + 1;
+		const size_t page_start =
+			Flash::getPage(reinterpret_cast<uint32_t>(&__flash_reserved_start));
 		const size_t num_bytes = alice_binary.size();
 		const size_t flash_page_size = Flash::getSize(page_start);
 		const size_t end_page = page_start + (num_bytes + flash_page_size - 1) / flash_page_size;
@@ -144,12 +145,12 @@ main()
 					  << ", num of bytes (payload): " << unpadded_size
 					  << ", num of bytes (padded): " << alice_binary.size() << "... ";
 
-		for (uint32_t src_addr = reinterpret_cast<uint32_t>(&alice_binary[0]),
-					  dst_addr{reinterpret_cast<uint32_t>(Flash::getAddr(page_start))};
-			 src_addr < (reinterpret_cast<uint32_t>(&alice_binary[0]) + alice_binary.size());
-			 src_addr += sizeof(Flash::MaxWordType), dst_addr += sizeof(Flash::MaxWordType))
+		const auto flash_write_base_addr{reinterpret_cast<uint32_t>(Flash::getAddr(page_start))};
+		for (size_t ii = 0; ii < alice_binary.size(); ii += sizeof(Flash::MaxWordType))
 		{
-			err |= Flash::program(dst_addr, *(Flash::MaxWordType*)src_addr);
+			Flash::MaxWordType outdata;
+			memcpy(&outdata, &alice_binary[ii], sizeof(Flash::MaxWordType));
+			err |= Flash::program(flash_write_base_addr + ii, outdata);
 		}
 		if (err != 0)
 		{
@@ -161,7 +162,8 @@ main()
 		MODM_LOG_INFO.flush();
 
 		// we can now read BSON back from flash, first 4 bytes entry is the size
-		uint32_t read_len = *(reinterpret_cast<uint32_t*>(Flash::getAddr(page_start)));
+		uint32_t read_len;
+		memcpy(&read_len, Flash::getAddr(page_start), sizeof(read_len));
 
 		// read the actual data
 		MODM_LOG_INFO << "\nReading BSON of size " << read_len << " from flash: ";
