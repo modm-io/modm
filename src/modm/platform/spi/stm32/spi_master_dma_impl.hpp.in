@@ -122,6 +122,9 @@ modm::platform::SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(
 	if (tx) {
 		Dma::TxChannel::setMemoryAddress(uint32_t(tx));
 		Dma::TxChannel::setMemoryIncrementMode(true);
+		Dma::TxChannel::setDataLength(length);
+		dmaTransmitComplete = false;
+		Dma::TxChannel::start();
 	} else {
 		Dma::TxChannel::setMemoryAddress(uint32_t(&dmaDummy));
 		Dma::TxChannel::setMemoryIncrementMode(false);
@@ -129,18 +132,13 @@ modm::platform::SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(
 	if (rx) {
 		Dma::RxChannel::setMemoryAddress(uint32_t(rx));
 		Dma::RxChannel::setMemoryIncrementMode(true);
+		Dma::RxChannel::setDataLength(length);
+		dmaReceiveComplete = false;
+		Dma::RxChannel::start();
 	} else {
 		Dma::RxChannel::setMemoryAddress(uint32_t(&dmaDummy));
 		Dma::RxChannel::setMemoryIncrementMode(false);
 	}
-
-	Dma::RxChannel::setDataLength(length);
-	dmaReceiveComplete = false;
-	Dma::RxChannel::start();
-
-	Dma::TxChannel::setDataLength(length);
-	dmaTransmitComplete = false;
-	Dma::TxChannel::start();
 
 	while (true)
 	{
@@ -180,6 +178,9 @@ modm::platform::SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(
 		if (tx) {
 			Dma::TxChannel::setMemoryAddress(uint32_t(tx));
 			Dma::TxChannel::setMemoryIncrementMode(true);
+			Dma::TxChannel::setDataLength(length);
+			dmaTransmitComplete = false;
+			Dma::TxChannel::start();
 		} else {
 			Dma::TxChannel::setMemoryAddress(uint32_t(&dmaDummy));
 			Dma::TxChannel::setMemoryIncrementMode(false);
@@ -187,18 +188,13 @@ modm::platform::SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(
 		if (rx) {
 			Dma::RxChannel::setMemoryAddress(uint32_t(rx));
 			Dma::RxChannel::setMemoryIncrementMode(true);
+			Dma::RxChannel::setDataLength(length);
+			dmaReceiveComplete = false;
+			Dma::RxChannel::start();
 		} else {
 			Dma::RxChannel::setMemoryAddress(uint32_t(&dmaDummy));
 			Dma::RxChannel::setMemoryIncrementMode(false);
 		}
-
-		Dma::RxChannel::setDataLength(length);
-		dmaReceiveComplete = false;
-		Dma::RxChannel::start();
-
-		Dma::TxChannel::setDataLength(length);
-		dmaTransmitComplete = false;
-		Dma::TxChannel::start();
 
 		[[fallthrough]];
 
