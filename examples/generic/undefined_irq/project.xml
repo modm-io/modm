@@ -1,0 +1,12 @@
+<library>
+  <extends>modm:blue-pill-f103</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/blue_pill_f103/undefined_irq</option>
+    <option name="modm:build:openocd.cfg">openocd.cfg</option>
+  </options>
+  <modules>
+    <module>modm:debug</module>
+    <module>modm:build:scons</module>
+    <module>modm:platform:uart:2</module>
+  </modules>
+</library>
