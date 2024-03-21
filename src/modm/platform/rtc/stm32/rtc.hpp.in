@@ -1,0 +1,178 @@
+/*
+ * Copyright (c) 2023, Rasmus Kleist Hørlyck Sørensen
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_STM32_RTC_HPP
+#define MODM_STM32_RTC_HPP
+
+#include <chrono>
+
+#include <modm/architecture/interface/clock.hpp>
+#include <modm/architecture/interface/register.hpp>
+#include <modm/math/units.hpp>
+#include <modm/platform/clock/rcc.hpp>
+
+namespace modm::platform
+{
+
+/**
+ * Real Time Clock (RTC) control for STM32 devices
+ *
+ * @author Rasmus Kleist Hørlyck Sørensen
+ * @ingroup modm_platform_rtc
+ */
+class Rtc
+{
+    using duration = std::chrono::duration<int64_t>;
+    using rep = duration::rep;
+    using period = duration::period;
+    using time_point = std::chrono::time_point<Rtc, duration>;
+
+public:
+
+    /// TODO: Use std::tm instead
+    struct modm_packed
+    DateTime
+    {
+        uint8_t year;
+        uint8_t month;
+        uint8_t date;
+        uint8_t weekday;
+        uint8_t hour;
+        uint8_t minute;
+        uint8_t second;
+    };
+
+public:
+    static void
+    enable();
+
+    static void
+    disable();
+
+    /**
+	 * Initializes the Real Time Clock (RTC) to provide a timer to `modm::Clock` and
+	 * `modm::PreciseClock`.
+	 *
+	 * @tparam	SystemClock
+	 * 		the currently active system clock
+     * @tparam  rtcclk
+     *      the RTC clock frequency
+	 * @tparam	tolerance
+	 * 		the allowed tolerance for the resulting clock rate
+     *
+     * @param waitCycle Number of cycles to wait for the INITF bit to be set. (default = 2048)
+     *
+     * @attention The APB1 clock frequency must never be lower than the RTC clock frequency
+     * @return True on success
+	 */
+    template< class SystemClock, frequency_t rtcclk = 32.768_kHz, percent_t tolerance=pct(0) >
+	static bool
+    initialize(uint32_t waitCycles = 2048);
+
+    /**
+	 *  Synchronized to a remote clock with a high degree of precision
+	 *
+	 * @tparam	Rep
+	 * 		an arithmetic type representing the number of ticks
+     * @tparam  Period
+     *      a std::ratio representing the tick period (i.e. the number of second's fractions per tick)
+     *
+     * @param delay     The amount of time to delay (or advance) the
+     * @param waitCycle Number of cycles to wait for the INITF bit to be set. (default = 2048)
+     *
+     * @return True on success
+	 */
+    template< typename Rep, typename Period >
+    static bool
+    synchronize(std::chrono::duration<Rep, Period> delay, uint32_t waitCycles = 2048);
+
+    /**
+     * @brief
+     *
+     */
+    static bool
+    getDateTime(DateTime &dateTime, uint32_t waitCycles = 2048);
+
+    /**
+     * @brief Get the subsecond second used for synchronization
+     *
+     * @return float
+     */
+    static bool
+    getSubSecond(float &subsecond, uint32_t waitCycles = 2048);
+
+public:
+
+    enum class
+    Interrupt : uint32_t
+    {
+        InternalTimestamp = RTC_CR_ITSE,
+        Timestamp = RTC_CR_TSIE,
+        WakeupTimer = RTC_CR_WUTIE,
+        AlarmB = RTC_CR_ALRBIE,
+        AlarmA = RTC_CR_ALRAIE,
+    };
+    MODM_FLAGS32(Interrupt);
+
+    enum class
+    InterruptFlag : uint32_t
+    {
+        InternalTimestamp = RTC_SR_ITSF,
+        TimestampOverflow = RTC_SR_TSOVF,
+        Timestamp = RTC_SR_TSF,
+        WakeupTimer = RTC_SR_WUTF,
+        AlarmB = RTC_SR_ALRBF,
+        AlarmA = RTC_SR_ALRAF,
+    };
+    MODM_FLAGS32(InterruptFlag);
+
+    static void
+    enableInterruptVector(bool enable, uint32_t priority);
+
+    static void
+    enableInterrupt(Interrupt_t interrupt);
+
+    static void
+    disableInterrupt(Interrupt_t interrupt);
+
+    static InterruptFlag_t
+    getInterruptFlags();
+
+    /**
+     *
+     *
+     * @warning 	Not all InterruptFlags can be cleared this way.
+     */
+    static void
+    acknowledgeInterruptFlag(InterruptFlag_t flags);
+
+private:
+    /// Unlock RTC register write protection
+    static void
+    unlock();
+
+    /// Lock RTC register write protection
+    static void
+    lock();
+
+    static inline frequency_t rtc_ker_ck{0};   /// RTCCLK frequency
+    static inline frequency_t ck_apre{0};      /// RTCCLK frequency / (PREDIV_A + 1)
+    static inline frequency_t ck_spre{0};      /// ck_apre frequency / (PREDIV_S + 1)
+
+    friend class modm::chrono::milli_clock;
+	friend class modm::chrono::micro_clock;
+};
+
+} // namespace modm::platform
+
+#include "rtc_impl.hpp"
+
+#endif // MODM_STM32_RTC_HPP

@@ -61,6 +61,8 @@ __modm_initialize_platform(void)
 	// Enable Data Tighly Coupled Memory (DTCM) and backup SRAM (BKPSRAM)
 	RCC->AHB1ENR |= RCC_AHB1ENR_DTCMRAMEN | RCC_AHB1ENR_BKPSRAMEN;
 %% elif target.family in ["g0", "g4", "l4", "l5"]
+	// Enable access to RTC and Backup registers
+	PWR->CR1 |= PWR_CR1_DBP;
 %% if target.family in ["l4", "g4"]
 	RCC->APB1ENR1 |= RCC_APB1ENR1_PWREN;
 %% elif target.family != "g0"

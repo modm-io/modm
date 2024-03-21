@@ -1,0 +1,196 @@
+/*
+ * Copyright (c) 2023, Rasmus Kleist Hørlyck Sørensen
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#include <modm/math/algorithm/prescaler.hpp>
+
+namespace modm::platform
+{
+
+// ----------------------------------------------------------------------------
+
+void inline
+Rtc::enable()
+{
+    Rcc::enable<Peripheral::Rtc>();
+}
+
+// ----------------------------------------------------------------------------
+
+void inline
+Rtc::disable()
+{
+    Rcc::disable<Peripheral::Rtc>();
+}
+
+// ----------------------------------------------------------------------------
+
+template< class SystemClock, frequency_t rtcclk, percent_t tolerance >
+bool
+Rtc::initialize(uint32_t waitCycles)
+{
+    static_assert(rtcclk < SystemClock::Apb1,
+                    "The APB1 clock frequency must never be lower than the RTC clock frequency!");
+
+    /// TODO: Devise a novel algorithm for chosing prescalers
+    constexpr uint32_t prediv_a = 0x007F;
+    constexpr uint32_t prediv_s = 0x00FF;
+    //PeripheralDriver::assertBaudrateInTolerance< result.frequency, 1, tolerance >();
+
+    rtc_ker_ck = rtcclk;
+    ck_apre = rtcclk / (prediv_a + 1);
+    ck_spre = ck_apre / (prediv_s + 1);
+
+    enable();
+    unlock();
+
+    // Enter initialization mode
+    RTC->ICSR |= RTC_ICSR_INIT;
+
+    // Wait until initialization phase mode is entered when INITF bit is set
+    while (!(RTC->ICSR & RTC_ICSR_INITF))
+        if (--waitCycles == 0) return false;
+
+    // To generate a 1 Hz clock for the calendar counter, program both the prescaler factors
+    RTC->PRER = ((prediv_a << RTC_PRER_PREDIV_A_Pos) & RTC_PRER_PREDIV_A_Msk) |
+                ((prediv_s << RTC_PRER_PREDIV_S_Pos) & RTC_PRER_PREDIV_S_Msk);
+
+    // Configure 24 hour format
+    RTC->CR &= ~RTC_CR_FMT;
+
+    /*
+    // Load the time in 24 hour format into the shadow registers
+    RTC->TR = ((toBcd(dateTime.hour) << RTC_TR_HU_Pos) & (RTC_TR_HT_Msk | RTC_TR_HU_Msk)) |
+              ((toBcd(dateTime.minute) << RTC_TR_MNU_Pos) & (RTC_TR_MNT_Msk | RTC_TR_MNU_Msk)) |
+              ((toBcd(dateTime.second) << RTC_TR_SU_Pos) & (RTC_TR_ST_Msk | RTC_TR_SU_Msk));
+
+    // Load the date in the shadow registers
+    RTC->DR = ((toBcd(dateTime.year) << RTC_DR_YU_Pos) & (RTC_DR_YT_Msk | RTC_DR_YU_Msk)) |
+              ((toBcd(dateTime.month) << RTC_DR_MU_Pos) & (RTC_DR_MT_Msk | RTC_DR_MU_Msk)) |
+              ((toBcd(dateTime.date) << RTC_DR_DU_Pos) & (RTC_DR_DT_Msk | RTC_DR_DU_Msk)) |
+              ((dateTime.weekday << RTC_DR_WDU_Pos) & RTC_DR_WDU_Msk);
+    */
+
+    // Exit the initialization mode by clearing the INIT bit
+    RTC->ICSR &= ~RTC_ICSR_INIT;
+
+    lock();
+
+    return true;
+}
+
+// ----------------------------------------------------------------------------
+
+template< typename Rep, typename Period >
+bool
+Rtc::synchronize(std::chrono::duration<Rep, Period> delay, uint32_t waitCycles)
+{
+    // Check that SS[15] = 0 in order to ensure that no overflow will occur, before initiating a shift operation.
+    if (((RTC->SSR & RTC_SSR_SS_Msk) & (Bit15 << RTC_SSR_SS_Pos)) == 0 && RTC->CR & RTC_CR_REFCKON == 0) {
+        unlock();
+
+        if (0 <= delay.count()) {
+            uint32_t subfs = delay.count() * Period::num * ck_spre / Period::den;
+            RTC->SHIFTR = (subfs << RTC_SHIFTR_SUBFS_Pos) & RTC_SHIFTR_SUBFS_Msk;
+        }
+        else {
+            uint32_t subfs = ck_spre + delay.count() * Period::num * ck_spre / Period::den;
+            RTC->SHIFTR = RTC_SHIFTR_ADD1S | ((subfs << RTC_SHIFTR_SUBFS_Pos) & RTC_SHIFTR_SUBFS_Msk);
+        }
+
+        lock();
+
+        // Wait until pending shift operation is performed before returning
+        while (RTC->ICSR & RTC_ICSR_SHPF)
+            if (--waitCycles == 0) return false;
+
+        return true;
+    }
+    return false;
+}
+
+// ----------------------------------------------------------------------------
+
+void inline
+Rtc::enableInterruptVector(bool enable, uint32_t priority)
+{
+    /// TODO: Some devices only have a single RTC interrupt register
+    if (enable) {
+        // Set priority for the interrupt vector
+        NVIC_SetPriority(RTC_TAMP_LSECSS_IRQn, priority);
+        NVIC_SetPriority(RTC_WKUP_IRQn, priority);
+        // register IRQ at the NVIC
+        NVIC_EnableIRQ(RTC_TAMP_LSECSS_IRQn);
+        NVIC_EnableIRQ(RTC_WKUP_IRQn);
+    }
+    else {
+        NVIC_DisableIRQ(RTC_TAMP_LSECSS_IRQn);
+        NVIC_DisableIRQ(RTC_WKUP_IRQn);
+    }
+}
+
+// ----------------------------------------------------------------------------
+
+void inline
+Rtc::enableInterrupt(Interrupt_t interrupt)
+{
+    RTC->CR |= interrupt.value;
+}
+
+// ----------------------------------------------------------------------------
+
+void inline
+Rtc::disableInterrupt(Interrupt_t interrupt)
+{
+    RTC->CR &= ~interrupt.value;
+}
+
+// ----------------------------------------------------------------------------
+
+Rtc::InterruptFlag_t inline
+Rtc::getInterruptFlags()
+{
+    return InterruptFlag_t(RTC->SR);
+}
+
+// ----------------------------------------------------------------------------
+
+void inline
+Rtc::acknowledgeInterruptFlag(InterruptFlag_t flags)
+{
+    RTC->SCR |= flags.value;
+}
+
+// ----------------------------------------------------------------------------
+
+void inline
+Rtc::unlock()
+{
+    // DBP bit must be set in order to enable RTC registers write access.
+    PWR->CR1 |= PWR_CR1_DBP;
+
+    // Unlock the write protection on the protected RTC registers.
+    RTC->WPR = 0xCA;
+    RTC->WPR = 0x53;
+}
+
+// ----------------------------------------------------------------------------
+
+void inline
+Rtc::lock()
+{
+    // Lock the write protection on the protected RTC registers.
+    RTC->WPR = 0xFF;
+
+    // DBP bit must be reset in order to disable RTC registers write access.
+    PWR->CR1 &= ~PWR_CR1_DBP;
+}
+
+}   // namespace modm::platform

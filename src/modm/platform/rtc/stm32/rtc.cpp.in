@@ -1,0 +1,61 @@
+/*
+ * Copyright (c) 2023, Rasmus Kleist Hørlyck Sørensen
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#include "rtc.hpp"
+
+#include <modm/math/utils.hpp>
+
+namespace modm::platform
+{
+
+// ----------------------------------------------------------------------------
+
+bool
+Rtc::getDateTime(DateTime &dateTime, uint32_t waitCycles)
+{
+    /// TODO: Determine if ABP1 frequency is less than seven times RTC frequency
+    /// TODO: Determine if BYPSHAD control bit is set or cleared in the RTC_CR register
+
+    // After initialization, synchronization software must wait until RSF is set
+    while (!(RTC->ICSR & RTC_ICSR_RSF))
+        if (--waitCycles == 0) return false;
+
+    dateTime.hour     = fromBcd((RTC->TR & (RTC_TR_HT_Msk | RTC_TR_HU_Msk)) >> RTC_TR_HU_Pos);
+    dateTime.minute   = fromBcd((RTC->TR & (RTC_TR_MNT_Msk | RTC_TR_MNU_Msk)) >> RTC_TR_MNU_Pos);
+    dateTime.second   = fromBcd((RTC->TR & (RTC_TR_ST_Msk | RTC_TR_SU_Msk)) >> RTC_TR_SU_Pos);
+
+    dateTime.year     = fromBcd((RTC->DR & (RTC_DR_YT_Msk | RTC_DR_YU_Msk)) >> RTC_DR_YU_Pos);
+    dateTime.month    = fromBcd((RTC->DR & (RTC_DR_MT_Msk | RTC_DR_MU_Msk)) >> RTC_DR_MU_Pos);
+    dateTime.date     = fromBcd((RTC->DR & (RTC_DR_DT_Msk | RTC_DR_DU_Msk)) >> RTC_DR_DU_Pos);
+    dateTime.weekday  = ((RTC->DR & RTC_DR_WDU_Msk) >> RTC_DR_WDU_Pos);
+
+    return true;
+}
+
+// ----------------------------------------------------------------------------
+
+bool
+Rtc::getSubSecond(float &subsecond, uint32_t waitCycles)
+{
+    // After initialization, synchronization software must wait until RSF is set
+    while (!(RTC->ICSR & RTC_ICSR_RSF))
+        if (--waitCycles == 0) return false;
+
+    /*
+    uint32_t predivS = getSynchronousPrescaler();
+    uint32_t ss = (RTC->SSR & RTC_SSR_SS_Msk) >> RTC_SSR_SS_Pos;
+    subsecond = float(predivS - ss) / float(predivS + 1);
+    /// TODO: Handle case when ss > predivS
+    */
+    return true;
+}
+
+}

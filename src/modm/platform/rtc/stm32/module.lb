@@ -1,0 +1,39 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2023, Rasmus Kleist Hørlyck Sørensen
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":platform:rtc"
+    module.description = "Real Time Clock (RTC)"
+
+def prepare(module, options):
+    device = options[":target"]
+    if device.identifier.family not in ["g4"]:
+        return False
+    if not device.has_driver("rtc:stm32*"):
+        return False
+
+    module.depends(
+        ":cmsis:device",
+        ":platform:rcc",
+        ":architecture:register",
+        ":math:utils",
+        ":math:units",)
+
+    return True
+
+def build(env):
+    target = env[":target"].identifier
+
+    env.outbasepath = "modm/src/modm/platform/rtc"
+    env.template("rtc_impl.hpp.in")
+    env.template("rtc.cpp.in")
+    env.template("rtc.hpp.in")

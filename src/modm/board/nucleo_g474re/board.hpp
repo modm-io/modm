@@ -115,6 +115,9 @@ struct SystemClock
 		// update frequencies for busy-wait delay functions
 		Rcc::updateCoreFrequency<Frequency>();
 
+		Rcc::enableLowSpeedExternalCrystal();
+    	Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::LowSpeedExternalCrystal);
+
 		Rcc::setCanClockSource(Rcc::CanClockSource::Pclk);
 		return true;
 	}
