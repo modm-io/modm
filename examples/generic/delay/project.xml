@@ -13,20 +13,22 @@
   <!-- <extends>modm:nucleo-f446re</extends> -->
   <!-- <extends>modm:nucleo-g071rb</extends> -->
   <!-- <extends>modm:nucleo-h743zi</extends> -->
-  <extends>modm:nucleo-l152re</extends>
+  <!-- <extends>modm:nucleo-l152re</extends> -->
   <!-- <extends>modm:nucleo-l432kc</extends> -->
   <!-- <extends>modm:nucleo-l476rg</extends> -->
-  <!-- <extends>modm:samd21-mini</extends> -->
   <!-- <extends>modm:rp-pico</extends> -->
+  <!-- <extends>modm:samd21-mini</extends> -->
   <options>
     <option name="modm:build:build.path">../../../build/generic/delay</option>
     <option name="modm:io:with_printf">true</option>
+    <!-- Required for modm:samd21-mini, modm:rp-pico -->
     <!-- <option name="modm:tinyusb:config">device.cdc</option> -->
   </options>
   <modules>
     <module>modm:build:scons</module>
     <module>modm:debug</module>
     <module>modm:driver:cycle_counter</module>
+    <!-- Required for modm:samd21-mini, modm:rp-pico -->
     <!-- <module>modm:tinyusb</module> -->
   </modules>
 </library>

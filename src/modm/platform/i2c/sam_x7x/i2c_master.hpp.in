@@ -79,7 +79,7 @@ private:
 		constexpr bool fastMode = baudrate > 125'000;
 		// Baudrate threshold above which the low time is fixed to the minimum value of
 		// 1.3us in fast mode or 4.7us in standard mode.
-		constexpr auto minLowTime = fastMode ? 1.3e-6 : 4.7e-6;
+		constexpr auto minLowTime = fastMode ? 1.3e-6f : 4.7e-6f;
 		constexpr auto minLowTimeLimit = 1.f / (2*minLowTime);
 
 		// t_high = ((CHDIV * 2^CKDIV) + 3) * (1 / peripheral clock)
@@ -87,7 +87,7 @@ private:
 		if constexpr (baudrate > minLowTimeLimit) {
 			// calculate ideal low and high prescaler values (formula from ASF vendor HAL)
 			constexpr auto cldiv = uint32_t(std::round((minLowTime * clock) - 3));
-			constexpr auto tHigh = 1.f / ((baudrate + (baudrate - minLowTimeLimit)) * 2.f);
+			constexpr auto tHigh = 1.f / ((baudrate + float(baudrate - minLowTimeLimit)) * 2.f);
 			constexpr auto chdiv = uint32_t(std::round((tHigh * clock) - 3));
 
 			// use 2^N pre-divider if max. prescaler exceeds 8 bits

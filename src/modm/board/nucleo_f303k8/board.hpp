@@ -21,14 +21,15 @@
 
 using namespace modm::platform;
 
-/// @ingroup modm_board_nucleo_f303k8
 namespace Board
 {
-	using namespace modm::literals;
+/// @ingroup modm_board_nucleo_f303k8
+/// @{
+using namespace modm::literals;
 
 /// STM32F303K8 running at 64MHz generated from the internal 8MHz clock
-// Dummy clock for devices
-struct SystemClock {
+struct SystemClock
+{
 	static constexpr uint32_t Frequency = 64_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency / 2;
@@ -93,15 +94,42 @@ using Button = GpioUnused;
 using LedD13 = D13;
 
 using Leds = SoftwareGpioPort< LedD13 >;
-
+/// @}
 
 namespace stlink
 {
+/// @ingroup modm_board_nucleo_f303k8
+/// @{
 using Rx = GpioInputA15;
 using Tx = GpioOutputA2;
 using Uart = Usart2;
+/// @}
 }
 
+namespace i2c
+{
+/// @ingroup modm_board_nucleo_f303k8
+/// @{
+using Sda = D4;
+using Scl = D5;
+using Controller = I2cMaster1;
+/// @}
+}
+
+namespace spi
+{
+/// @ingroup modm_board_nucleo_f303k8
+/// @{
+using Cs = D10;
+using Sck = D13;
+using Sdi = D12;
+using Sdo = D11;
+using Controller = SpiMaster1;
+/// @}
+}
+
+/// @ingroup modm_board_nucleo_f303k8
+/// @{
 using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
 
 
@@ -114,6 +142,21 @@ initialize()
 	stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>();
 	stlink::Uart::initialize<SystemClock, 115200_Bd>();
 }
+
+inline void
+initializeI2c()
+{
+	i2c::Controller::connect<i2c::Sda::Sda, i2c::Scl::Scl>();
+	i2c::Controller::initialize<SystemClock, 400_kHz>();
+}
+
+inline void
+initializeSpi()
+{
+	spi::Controller::connect<spi::Sck::Sck, spi::Sdo::Mosi, spi::Sdi::Miso>();
+	spi::Controller::initialize<SystemClock, 4_MHz>();
+}
+/// @}
 
 }
 

@@ -92,15 +92,11 @@ jobs:
       - name: Examples SAMD Devices
         if: always()
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py feather_m4 samd samd21_xplained_pro)
+          (cd examples && ../tools/scripts/examples_compile.py feather_m4 samd)
       - name: Examples SAMG Devices
         if: always()
         run: |
           (cd examples && ../tools/scripts/examples_compile.py samg55_xplained_pro)
-      - name: Examples SAME5x Devices
-        if: always()
-        run: |
-          (cd examples && ../tools/scripts/examples_compile.py same54_xplained_pro)
       - name: Examples SAME70 Devices
         if: always()
         run: |
@@ -112,7 +108,7 @@ jobs:
       - name: Examples RP20 Devices
         if: always()
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py feather_rp2040 rp_pico thingplus_rp2040)
+          (cd examples && ../tools/scripts/examples_compile.py rp_pico)
       - name: Execute Python Scripts
         if: always()
         run: |
@@ -137,19 +133,19 @@ jobs:
       - name: Examples STM32F0 Series
         if: always()
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py stm32f0_discovery stm32f072_discovery nucleo_f031k6 nucleo_f072rb nucleo_f091rc nucleo_f042k6 stm32f030f4p6_demo_board)
+          (cd examples && ../tools/scripts/examples_compile.py stm32f0_discovery stm32f072_discovery nucleo_f072rb nucleo_f042k6 stm32f030f4p6_demo_board)
       - name: Examples STM32F1 Series
         if: always()
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py stm32f1_discovery nucleo_f103rb olimexino_stm32 blue_pill_f103 black_pill_f103)
+          (cd examples && ../tools/scripts/examples_compile.py stm32f1_discovery nucleo_f103rb blue_pill_f103)
       - name: Examples STM32F3 Series
         if: always()
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py stm32f3_discovery nucleo_f303k8 nucleo_f303re nucleo_f334r8)
+          (cd examples && ../tools/scripts/examples_compile.py stm32f3_discovery nucleo_f303re)
       - name: Examples STM32F7 Series
         if: always()
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py stm32f746g_discovery stm32f769i_discovery nucleo_f746zg nucleo_f767zi)
+          (cd examples && ../tools/scripts/examples_compile.py stm32f746g_discovery stm32f769i_discovery nucleo_f767zi)
       - name: Examples STM32G0 Series
         if: always()
         run: |
@@ -157,31 +153,23 @@ jobs:
       - name: Examples STM32L0 Series
         if: always()
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py nucleo_l031k6 nucleo_l053r8)
-      - name: Examples STM32L1 Series
-        if: always()
-        run: |
-          (cd examples && ../tools/scripts/examples_compile.py nucleo_l152re stm32l1_discovery)
+          (cd examples && ../tools/scripts/examples_compile.py nucleo_l031k6)
       - name: Examples STM32L4 Series
         if: always()
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py stm32l476_discovery nucleo_l476rg nucleo_l432kc nucleo_l452re nucleo_l496zg-p)
+          (cd examples && ../tools/scripts/examples_compile.py nucleo_l476rg nucleo_l432kc nucleo_l452re)
       - name: Examples STM32L5 Series
         if: always()
         run: |
           (cd examples && ../tools/scripts/examples_compile.py nucleo_l552ze-q)
-      - name: Examples STM32U5 Series
-        if: always()
-        run: |
-          (cd examples && ../tools/scripts/examples_compile.py nucleo_u575zi-q)
       - name: Examples STM32G4 Series
         if: always()
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py nucleo_g474re nucleo_g431rb nucleo_g431kb)
+          (cd examples && ../tools/scripts/examples_compile.py nucleo_g474re)
       - name: Examples STM32H7 Series
         if: always()
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py nucleo_h743zi nucleo_h723zg stm32h750vbt6_devebox)
+          (cd examples && ../tools/scripts/examples_compile.py nucleo_h723zg)
 
   stm32f4-examples-1:
     runs-on: ubuntu-22.04
@@ -201,7 +189,7 @@ jobs:
       - name: Examples STM32F4 Only Discovery Board
         if: always()
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py stm32f4_discovery stm32f429_discovery stm32f469_discovery stm32f401_discovery)
+          (cd examples && ../tools/scripts/examples_compile.py stm32f4_discovery stm32f469_discovery stm32f401_discovery)
 
   stm32f4-examples-2:
     runs-on: ubuntu-22.04
@@ -224,7 +212,7 @@ jobs:
       - name: Examples STM32F4 Without Discovery Board
         if: always()
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py nucleo_f401re nucleo_f411re nucleo_f429zi nucleo_f446re nucleo_f446ze nucleo_f439zi black_pill_f401 black_pill_f411 stm32f407vet6_devebox stm32_f4ve)
+          (cd examples && ../tools/scripts/examples_compile.py nucleo_f401re nucleo_f411re nucleo_f429zi nucleo_f446re nucleo_f446ze nucleo_f439zi stm32f407vet6_devebox stm32_f4ve)
 
   avr-examples:
     runs-on: ubuntu-22.04

@@ -67,7 +67,7 @@ struct SystemClock
 
 using Led0 = GpioInverted<GpioA23>;
 using Led1 = GpioInverted<GpioC9>;
-using ButtonSW0 = GpioInverted<GpioA9>;
+using Button = GpioInverted<GpioA9>;
 
 using Leds = SoftwareGpioPort<Led1, Led0>;
 
@@ -111,7 +111,7 @@ initialize()
 
 	Leds::reset();
 	Leds::setOutput();
-	ButtonSW0::setInput(InputType::PullUp);
+	Button::setInput(InputType::PullUp);
 
 	Can::Can::connect<Can::Rx::Rx, Can::Tx::Tx>(InputType::PullUp);
 }

@@ -142,6 +142,7 @@ struct SystemClock
 };
 
 using Leds = SoftwareGpioPort<Led>;
+using Button = GpioUnused;
 
 struct Debug
 {

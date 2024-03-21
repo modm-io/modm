@@ -63,6 +63,7 @@ struct SystemClock
 };
 
 using Led = GpioA6;
+using Leds = SoftwareGpioPort<GpioA6>;
 using Button = GpioA2;
 using DebugUart = Usart7;
 using TxPin = GpioA28;
@@ -88,6 +89,12 @@ initialize()
 inline void
 initializeUsbFs()
 {
+	// Pull DP low briefly on reset to make sure USB host disconnects/reconnects
+	MATRIX->CCFG_SYSIO |= (CCFG_SYSIO_SYSIO11 | CCFG_SYSIO_SYSIO10);
+	GpioA22::setOutput(false);
+	modm::delay_ms(5);
+	GpioA22::setInput();
+
 	SystemClock::enableUsb();
 	Usb::initialize<Board::SystemClock>();
 }

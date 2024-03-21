@@ -30,20 +30,49 @@ using namespace modm::literals;
 struct SystemClock
 {
 	static constexpr uint32_t Frequency = 80_MHz;
-	static constexpr uint32_t Ahb = Frequency;
+	static constexpr uint32_t Ahb  = Frequency;
+	static constexpr uint32_t Ahb2 = Frequency;
 	static constexpr uint32_t Apb1 = Frequency;
 	static constexpr uint32_t Apb2 = Frequency;
+
+	static constexpr uint32_t Adc1 = Ahb2;
+
+	static constexpr uint32_t Can1 = Apb1;
+
+	static constexpr uint32_t Comp1 = Apb2;
+	static constexpr uint32_t Comp2 = Apb2;
+
+	static constexpr uint32_t Dac1 = Apb1;
+
+	static constexpr uint32_t I2c1 = Apb1;
+	static constexpr uint32_t I2c2 = Apb1;
+	static constexpr uint32_t I2c3 = Apb1;
+	static constexpr uint32_t I2c4 = Apb1;
+
+	static constexpr uint32_t Spi1 = Apb2;
+
+	static constexpr uint32_t Spi2 = Apb1;
+	static constexpr uint32_t Spi3 = Apb1;
+
+	static constexpr uint32_t Timer1 = Apb2;
+
+	static constexpr uint32_t Timer2 = Apb1;
+	static constexpr uint32_t Timer6 = Apb1;
+
+	static constexpr uint32_t Timer15 = Apb2;
+	static constexpr uint32_t Timer16 = Apb2;
+
+	static constexpr uint32_t Uart4 = Apb1;
 
 	static constexpr uint32_t Usart1 = Apb2;
 
 	static constexpr uint32_t Usart2 = Apb1;
 	static constexpr uint32_t Usart3 = Apb1;
-	static constexpr uint32_t Usart4 = Apb1;
-	static constexpr uint32_t Usart5 = Apb1;
 
 	static constexpr uint32_t Spi1 = Apb2;
 	static constexpr uint32_t Spi2 = Apb2;
 	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
+	static constexpr uint32_t Usb = Apb1;
 
 	static bool inline
 	enable()
@@ -111,6 +140,28 @@ using Uart = Usart2;
 /// @}
 }
 
+namespace i2c
+{
+/// @ingroup modm_board_nucleo_l432kc
+/// @{
+using Sda = D4;
+using Scl = D5;
+using Controller = I2cMaster1;
+/// @}
+}
+
+namespace spi
+{
+/// @ingroup modm_board_nucleo_l432kc
+/// @{
+using Cs = D10;
+using Sck = D13;
+using Sdi = D12;
+using Sdo = D11;
+using Controller = SpiMaster1;
+/// @}
+}
+
 /// @ingroup modm_board_nucleo_l432kc
 /// @{
 using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
@@ -123,6 +174,20 @@ initialize()
 
 	stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>(Gpio::InputType::PullUp);
 	stlink::Uart::initialize<SystemClock, 115200_Bd>();
+}
+
+inline void
+initializeI2c()
+{
+	i2c::Controller::connect<i2c::Sda::Sda, i2c::Scl::Scl>();
+	i2c::Controller::initialize<SystemClock, 400_kHz>();
+}
+
+inline void
+initializeSpi()
+{
+	spi::Controller::connect<spi::Sck::Sck, spi::Sdo::Mosi, spi::Sdi::Miso>();
+	spi::Controller::initialize<SystemClock, 5_MHz>();
 }
 /// @}
 

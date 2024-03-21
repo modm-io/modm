@@ -100,24 +100,28 @@ jobs:
         with:
           submodules: 'recursive'
 
-      - name: Hosted Examples
-        if: always()
-        shell: bash
-        run: |
-          (cd examples && python ../tools/scripts/examples_compile.py linux/assert linux/block_device/ram linux/build_info linux/git linux/logger linux/printf linux/etl linux/fiber)
-
       - name: Hosted Unittests
         if: always()
         shell: bash
         run: |
           (cd test && make run-hosted-windows)
 
-      - name: Compile STM32 Examples
+      - name: Hosted Examples
         if: always()
         shell: bash
         run: |
-          (cd examples && python ../tools/scripts/examples_compile.py nucleo_f031k6 nucleo_f103rb nucleo_f303re nucleo_f411re nucleo_f746zg)
-          (cd examples && python ../tools/scripts/examples_compile.py nucleo_g071rb nucleo_l031k6 nucleo_l152re nucleo_l476rg nucleo_g474re)
+          (cd examples && python ../tools/scripts/examples_compile.py linux)
+
+      - name: Generic Examples
+        if: always()
+        run: |
+          (cd examples && ../tools/scripts/examples_compile.py generic)
+
+      - name: Compile STM32 Discovery Examples
+        if: always()
+        run: |
+          (cd examples && ../tools/scripts/examples_compile.py stm32f0_discovery stm32f072_discovery stm32f1_discovery stm32f3_discovery stm32f4_discovery)
+          (cd examples && ../tools/scripts/examples_compile.py stm32f401_discovery stm32f469_discovery stm32f746g_discovery stm32f769i_discovery)
 
       - name: Compile AVR Examples
         if: always()

@@ -11,11 +11,16 @@
   <!-- <extends>modm:disco-f746ng</extends> -->
   <!-- <extends>modm:disco-l476vg</extends> -->
   <!-- <extends>modm:feather-m0</extends> -->
+  <!-- <extends>modm:feather-m4</extends> -->
   <!-- <extends>modm:nucleo-f429zi</extends> -->
   <!-- <extends>modm:nucleo-h723zg</extends> -->
   <!-- <extends>modm:nucleo-h743zi</extends> -->
   <!-- <extends>modm:rp-pico</extends> -->
   <!-- <extends>modm:samd21-mini</extends> -->
+  <!-- <extends>modm:samd21-xplained-pro</extends> -->
+  <!-- <extends>modm:same54-xplained-pro</extends> -->
+  <!-- <extends>modm:samg55-xplained-pro</extends> -->
+  <!-- <extends>modm:nucleo-f446ze</extends> -->
   <options>
     <option name="modm:build:build.path">../../../build/generic/usb</option>
     <option name="modm:build:openocd.cfg">openocd.cfg</option>
@@ -35,6 +40,7 @@
     <module>modm:io</module>
   </modules>
   <collectors>
+    <!-- Optional for modm:disco-f746ng -->
     <!-- <collect name="modm:build:cppdefines">CFG_TUSB_DEBUG=3</collect> -->
   </collectors>
 </library>

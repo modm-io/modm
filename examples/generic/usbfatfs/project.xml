@@ -1,0 +1,22 @@
+<library>
+  <extends>modm:black-pill-f411</extends>
+  <!-- <extends>modm:nucleo-f429zi</extends> -->
+  <options>
+    <option name="modm:build:build.path">../../../build/generic/usb_fatfs</option>
+    <option name="modm:tinyusb:config">device.msc, device.cdc</option>
+  </options>
+  <modules>
+    <module>modm:processing:timer</module>
+    <module>modm:tinyusb</module>
+    <module>modm:fatfs</module>
+    <module>modm:platform:flash</module>
+    <module>modm:build:scons</module>
+    <module>modm:math:utils</module>
+    <!-- Required when using CFG_TUSB_DEBUG on e.g. modm:nucleo-f429zi -->
+    <!-- <module>modm:printf</module> -->
+  </modules>
+  <collectors>
+    <!-- For debug output via STLink on e.g. modm:nucleo-f429zi -->
+    <!-- <collect name="modm:build:cppdefines">CFG_TUSB_DEBUG=2</collect> -->
+  </collectors>
+</library>
