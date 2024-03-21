@@ -10,11 +10,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_STM32_F103C8T6_BLUE_PILL_HPP
-#define MODM_STM32_F103C8T6_BLUE_PILL_HPP
+#pragma once
 
 #include <modm/platform.hpp>
 #include <modm/architecture/interface/clock.hpp>
+
+#include "rcc_prototype.hpp"
 
 using namespace modm::platform;
 
@@ -24,13 +25,44 @@ namespace Board
 /// @{
 using namespace modm::literals;
 
-/// STM32F103 running at 72MHz generated from the external 8MHz crystal
 struct SystemClock
 {
-	static constexpr uint32_t Frequency = 72_MHz;
-	static constexpr uint32_t Ahb = Frequency;
-	static constexpr uint32_t Apb1 = Frequency / 2;
-	static constexpr uint32_t Apb2 = Frequency;
+	// static constexpr uint32_t ExternalLSEclock = ;
+	static constexpr uint32_t ExternalHSEclock = 8_MHz;
+
+	static constexpr Rcc::PllFactors pllFactors{
+		.pllMul = 9,
+		.usbPrediv = Rcc::UsbPrescaler::Div1_5
+	};
+	static constexpr Rcc::AhbPrescaler Ahb_prescaler = Rcc::AhbPrescaler::Div1;
+	static constexpr Rcc::Apb1Prescaler Apb1_prescaler = Rcc::Apb1Prescaler::Div2;
+	static constexpr Rcc::Apb2Prescaler Apb2_prescaler = Rcc::Apb2Prescaler::Div1;
+
+	// ------------------------------------------
+
+	static constexpr int HsePredivision = 1;
+	static constexpr int PllClock = ExternalHSEclock / HsePredivision * pllFactors.pllMul; // 72 Mhz
+
+	// System Clock MUX
+	static constexpr uint32_t Clock = PllClock;
+	static_assert(Clock <= 72_MHz, "Clock has max. 72MHz!");
+
+	static constexpr uint32_t Ahb = Clock / RccProto::prescalerToValue<Ahb_prescaler>();
+	static_assert(Ahb <= 72_MHz, "Ahb has max. 72MHz!");
+
+	static constexpr uint32_t Apb1 = Ahb / RccProto::prescalerToValue<Apb1_prescaler>();
+	static_assert(Apb1 <= 36_MHz, "Apb1 has max. 36MHz!");
+
+	static constexpr uint32_t Apb2 = Ahb / RccProto::prescalerToValue<Apb2_prescaler>();
+	static_assert(Apb2 <= 72_MHz, "Apb2 has max. 72MHz!");
+
+	// @todo is this correct?
+	static constexpr uint32_t Apb1Timer = Apb1 * (RccProto::prescalerToValue<Apb1_prescaler>() ==  1 ? 1 : 2);
+	static constexpr uint32_t Apb2Timer = Apb2 * (RccProto::prescalerToValue<Apb2_prescaler>() ==  1 ? 1 : 2);
+
+	// ------------------------------------------
+
+	static constexpr uint32_t Frequency = Ahb;
 
 	static constexpr uint32_t Adc  = Apb2;
 
@@ -49,26 +81,18 @@ struct SystemClock
 	static constexpr uint32_t I2c1   = Apb1;
 	static constexpr uint32_t I2c2   = Apb1;
 
-	static constexpr uint32_t Apb1Timer = Apb1 * 2;
-	static constexpr uint32_t Apb2Timer = Apb2 * 1;
 	static constexpr uint32_t Timer1  = Apb2Timer;
 	static constexpr uint32_t Timer2  = Apb1Timer;
 	static constexpr uint32_t Timer3  = Apb1Timer;
 	static constexpr uint32_t Timer4  = Apb1Timer;
 
-	static constexpr uint32_t Usb = Ahb / 1.5;
+	static constexpr uint32_t Usb = Ahb / RccProto::prescalerToValue<pllFactors.usbPrediv>(); // 48 MHz!
 	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
 
 	static bool inline
 	enable()
 	{
 		Rcc::enableExternalCrystal();
-
-		// external clock * 9 = 72MHz, => 72/1.5 = 48 => good for USB
-		const Rcc::PllFactors pllFactors{
-			.pllMul = 9,
-			.usbPrediv = Rcc::UsbPrescaler::Div1_5
-		};
 		Rcc::enablePll(Rcc::PllSource::ExternalCrystal, pllFactors);
 
 		// set flash latency for 72MHz
@@ -76,15 +100,9 @@ struct SystemClock
 
 		// switch system clock to PLL output
 		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
-
-		// AHB has max 72MHz
-		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
-
-		// APB1 has max. 36MHz
-		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div2);
-
-		// APB2 has max. 72MHz
-		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div1);
+		Rcc::setAhbPrescaler(Ahb_prescaler);
+		Rcc::setApb1Prescaler(Apb1_prescaler);
+		Rcc::setApb2Prescaler(Apb2_prescaler);
 
 		// update frequencies for busy-wait delay functions
 		Rcc::updateCoreFrequency<Frequency>();
@@ -129,5 +147,3 @@ initializeUsbFs(uint8_t priority=3)
 /// @}
 
 } // Board namespace
-
-#endif	// MODM_STM32_F103C8T6_BLUE_PILL_HPP
