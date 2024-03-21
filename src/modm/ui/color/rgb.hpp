@@ -1,9 +1,5 @@
 /*
- * Copyright (c) 2009, Martin Rosekeit
- * Copyright (c) 2009-2013, Fabian Greif
- * Copyright (c) 2012-2013, 2015, Niklas Hauser
- * Copyright (c) 2013, David Hebbeker
- * Copyright (c) 2021, Thomas Sommer
+ * Copyright (c) 2021-2023, Thomas Sommer
  *
  * This file is part of the modm project.
  *
@@ -12,9 +8,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 // ----------------------------------------------------------------------------
-
-#ifndef MODM_COLOR_RGB_HPP
-#define MODM_COLOR_RGB_HPP
+#pragma once
 
 #include <stdint.h>
 #include <bit>
@@ -24,102 +18,200 @@
 #include <modm/math/utils/arithmetic_traits.hpp>
 #include <type_traits>
 
-#include "brightness.hpp"
-#include "hsv.hpp"
-#include "rgb565.hpp"
+#include "concepts.hpp"
+#include "gray.hpp"
 
 namespace modm::color
 {
 
-// forward declarations for convertion constructors
-template<std::unsigned_integral T>
-class HsvT;
-
-template<std::unsigned_integral T>
-class BrightnessT;
-
-class Rgb565;
-
 /**
- * Color in HSV Colorspace
+ * @brief 			Color in RGB space. Each channel has a memoryaddress on its own.
  *
- * @author		Martin Rosekeit, Fabian Greif, Niklas Hauser, David Hebbeker, Thomas Sommer
- * @ingroup		modm_ui_color
+ * @tparam DR 		Digits for red channel
+ * @tparam DG 		Digits for green channel
+ * @tparam DB 		Digits for blue channel
+ *
+ * @author			Thomas Sommer
+ * @ingroup			modm_ui_color
  */
-template<std::unsigned_integral T>
-class RgbT
+template<int DR, int DG = DR, int DB = DR>
+requires (DR > 0) && (DG > 0) && (DB > 0)
+class Rgb
 {
 public:
-	T red{0};
-	T green{0};
-	T blue{0};
+	using RedType = Gray<DR>;
+	using GreenType = Gray<DG>;
+	using BlueType = Gray<DB>;
 
-	using TSum = modm::WideType<T>;
+	// using RgbSumValueType = modm::fits_any<RedType::T, GreenType::T, BlueType::T>;
 
-	constexpr RgbT() = default;
+	constexpr Rgb() = default;
 
-	constexpr RgbT(T red, T green, T blue) : red(red), green(green), blue(blue) {}
+	// TODO Support for https://en.cppreference.com/w/cpp/utility/initializer_list
 
-	/**
-	 * Copy Constructor 8bit->16bit
-	 */
-	template<std::unsigned_integral U>
-		requires std::is_same_v<T, uint16_t> && std::is_same_v<U, uint8_t>
-	constexpr RgbT(const RgbT<U> &rgb_other)
-		: red(rgb_other.red << 8), green(rgb_other.green << 8), blue(rgb_other.blue << 8)
+	constexpr Rgb(RedType red, GreenType green, BlueType blue)
+		: red_(red), green_(green), blue_(blue)
 	{}
 
-	/**
-	 * Copy Constructor 16bit->8bit
-	 */
-	template<std::unsigned_integral U>
-		requires std::is_same_v<T, uint8_t> && std::is_same_v<U, uint16_t>
-	constexpr RgbT(const RgbT<U> &rgb_other)
-		: red(rgb_other.red >> 8), green(rgb_other.green >> 8), blue(rgb_other.blue >> 8)
+	template<class C>
+	requires ColorRgb<C> || ColorRgbPallete<C>
+	constexpr Rgb(const C& other)
+		: red_(other.red()), green_(other.green()), blue_(other.blue())
 	{}
 
-	/**
-	 * Convertion Constructor for HSV Color
-	 *
-	 * @param hsv	HSV Color
-	 */
-	template<std::unsigned_integral U>
-	constexpr RgbT(const HsvT<U>& hsv);
-
-	/**
-	 * Convertion Constructor for Brightness
-	 *
-	 * @param brightness	Brightness 'Color'-object
-	 */
-	// TODO Plump conversion, implement the right way
-	template<std::unsigned_integral U>
-	constexpr RgbT(const BrightnessT<U> brightness)
-		: red(brightness), green(brightness), blue(brightness)
+	template<ColorGray C>
+	constexpr Rgb(const C &gray)
+		: red_(gray), green_(gray), blue_(gray)
 	{}
 
-	/**
-	 * Convertion Constructor for RGB565 Color
-	 *
-	 * @param rgb565	RGB565 Color
-	 */
-	constexpr RgbT(const Rgb565& rgb565)
-		: red((rgb565.color >> 8) & 0xF8),
-		  green((rgb565.color >> 3) & 0xFC),
-		  blue(rgb565.color << 3)
-	{}
+	template<ColorHsv C>
+	constexpr Rgb(const C& hsv)
+	{
+		// No need to calculate sharper than the output
+		// OPTIMIZE Develop CalcType from types of conversion target: RedType, GreenType and BlueType.
+		using CalcType = C::ValueType;
+		using T = CalcType::T;
+
+		using WideType = modm::WideType<T>;
+		using WideWideType = modm::WideType<WideType>;
+		static_assert(!std::is_same_v<WideType, WideWideType>, "C::T too big");
+
+		const T hue = CalcType(Gray<std::numeric_limits<typename C::HueType>::digits>(hsv.hue()));
+		const T saturation = CalcType(hsv.saturation());
+		const T value = CalcType(hsv.value());
+
+		const WideType vs = value * saturation;
+		const WideType h6 = 6 * hue;
+
+		T i = h6 >> CalcType::digits;
+		WideType f = ((i | 1) << CalcType::digits) - h6;
+		if (i & 1) f = -f;
+
+		CalcType p(((value << CalcType::digits) - vs) >> CalcType::digits);
+		CalcType u(((WideWideType(value) << 2 * CalcType::digits) - WideWideType(vs) * f) >> 2 * CalcType::digits);
+
+		switch (i)
+		{
+			case 0: red_ = hsv.value(); green_ = u; blue_ = p; break;
+			case 1: red_ = u; green_ = hsv.value(); blue_ = p; break;
+			case 2: red_ = p; green_ = hsv.value(); blue_ = u; break;
+			case 3: red_ = p; green_ = u; blue_ = hsv.value(); break;
+			case 4: red_ = u; green_ = p; blue_ = hsv.value(); break;
+			case 5: red_ = hsv.value(); green_ = p; blue_ = u; break;
+		}
+	}
+
+	// accessors
+	constexpr RedType red() const { return red_; }
+	constexpr GreenType green() const { return green_; }
+	constexpr BlueType blue() const { return blue_; }
+
+	RedType& red() { return red_; }
+	GreenType& green() { return green_; }
+	BlueType& blue() { return blue_; }
+
+	// operator +=, -=, *=, /=
+	Rgb& operator+=(const Rgb& other) {
+		red_ += other.red();
+		green_ += other.green();
+		blue_ += other.blue();
+		return *this;
+	}
+
+	Rgb& operator-=(const Rgb& other) {
+		red_ -= other.red();
+		green_ -= other.green();
+		blue_ -= other.blue();
+		return *this;
+	}
+
+	template <typename S>
+	Rgb operator*= (S scale) {
+		red_ *= scale;
+		green_ *= scale;
+		blue_ *= scale;
+		return *this;
+	}
+
+	template <typename S>
+	Rgb operator/= (S scale) {
+		red_ *= scale;
+		green_ *= scale;
+		blue_ *= scale;
+		return *this;
+	}
+
+	// operator +, -, *, /
+	constexpr Rgb
+	operator+(const Rgb& rgb) const {
+		return {
+			red_ + rgb.red(),
+			green_ + rgb.green(),
+			blue_ + rgb.blue()
+		};
+	}
+
+	constexpr Rgb
+	operator-(const Rgb& rgb) const {
+		return {
+			red_ - rgb.red(),
+			green_ - rgb.green(),
+			blue_ - rgb.blue()
+		};
+	}
+
+	template <typename S>
+	constexpr Rgb
+	operator*(S scale) const {
+		return {
+			red_ * scale,
+			green_ * scale,
+			blue_ * scale
+		};
+	}
+
+	template <typename S>
+	constexpr Rgb
+	operator/(S scale) const {
+		return {
+			red_ / scale,
+			green_ / scale,
+			blue_ / scale
+		};
+	}
 
 	constexpr bool
-	operator==(const RgbT<T>& other) const = default;
+	operator==(const Rgb& other) const = default;
+
+	// Compare perceived brightness. For performance and simplicity reasons,
+	// the intermediate brightness type is hardcoded to Gray8.
+	constexpr auto
+	operator<=>(const Gray8& gray) const noexcept {
+		return Gray8(*this) <=> gray;
+	};
+
+	void invert() {
+		red_.invert();
+		green_.invert();
+		blue_.invert();
+	}
 
 private:
-	template<std::unsigned_integral U>
-	friend IOStream&
-	operator<<(IOStream&, const RgbT<U>&);
+	RedType red_{0};
+	GreenType green_{0};
+	BlueType blue_{0};
+
+	template<int ER, int EG, int EB>
+	requires (ER > 0) && (EG > 0) && (EB > 0)
+	friend class Rgb;
 };
 
-/// @ingroup modm_ui_color
-using Rgb = RgbT<uint8_t>;
+template<std::unsigned_integral U>
+using RgbT = Rgb<std::numeric_limits<U>::digits>;
 
+/// @ingroup modm_ui_color
+using Rgb888 = RgbT<uint8_t>;
+using Rgb161616 = RgbT<uint16_t>;
 
 /**
  * Normalize color values based on a clear value
@@ -133,33 +225,31 @@ using Rgb = RgbT<uint8_t>;
  *
  * @ingroup modm_ui_color
  */
-template<std::unsigned_integral T, typename IntermediateType = float, std::unsigned_integral ReturnType = T>
+template<ColorRgb C, typename IntermediateType = float, ColorRgb ReturnColor = C>
 	requires std::is_fundamental_v<IntermediateType>
-constexpr RgbT<ReturnType>
-normalizeColor(RgbT<T> rgb, IntermediateType multiplier = 1)
+constexpr ReturnColor
+normalizeColor(C rgb, IntermediateType multiplier = 1)
 {
-	const IntermediateType sum = IntermediateType(rgb.red) + rgb.green + rgb.blue;
-	return RgbT<ReturnType>(IntermediateType(rgb.red) * multiplier / sum,
-							IntermediateType(rgb.green) * multiplier / sum,
-							IntermediateType(rgb.blue) * multiplier / sum);
+	// OPTIMIZE This should also work with fixed point and Colors integrated operator* and operator/
+	const IntermediateType sum = IntermediateType(rgb.red() + rgb.green() + rgb.blue());
+	return {
+		IntermediateType(rgb.red()) * multiplier / sum,
+		IntermediateType(rgb.green()) * multiplier / sum,
+		IntermediateType(rgb.blue()) * multiplier / sum
+	};
 }
-
 
 #if __has_include(<modm/io/iostream.hpp>)
 #include <modm/io/iostream.hpp>
 
 /// @ingroup modm_ui_color
-template<std::unsigned_integral U>
+template<ColorRgb C>
 IOStream&
-operator<<(IOStream& os, const color::RgbT<U>& color)
+operator<<(IOStream& os, const C& rgb)
 {
-	os << color.red << "\t" << color.green << "\t" << color.blue;
+	os << rgb.red() << "\t" << rgb.green() << "\t" << rgb.blue();
 	return os;
 }
 #endif
 
 }  // namespace modm::color
-
-#include "rgb_impl.hpp"
-
-#endif  // MODM_COLOR_RGB_HPP

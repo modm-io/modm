@@ -49,7 +49,7 @@ public:
 	void
 	clear() final
 	{
-		std::fill(buffer, buffer + this->getBufferWidth()*this->getBufferHeight(), this->backgroundColor.color);
+		std::fill(buffer, buffer + this->getBufferWidth()*this->getBufferHeight(), this->backgroundColor.value());
 	}
 
 	void
@@ -62,21 +62,21 @@ public:
 	setPixel(int16_t x, int16_t y) final
 	{
 		if (x < 0 or 800 <= x or y < 0 or 480 <= y) return;
-		buffer[y * 800 + x] = this->foregroundColor.color;
+		buffer[y * 800 + x] = this->foregroundColor.value();
 	}
 
 	void
 	clearPixel(int16_t x, int16_t y) final
 	{
 		if (x < 0 or 800 <= x or y < 0 or 480 <= y) return;
-		buffer[y * 800 + x] = this->backgroundColor.color;
+		buffer[y * 800 + x] = this->backgroundColor.value();
 	}
 
 	modm::color::Rgb565
 	getPixel(int16_t x, int16_t y) const final
 	{
-		if (x < 0 or 800 <= x or y < 0 or 480 <= y) return false;
-		return buffer[y * 800 + x];
+		if (x < 0 or 800 <= x or y < 0 or 480 <= y) return modm::color::html::Black;
+		return modm::color::Rgb565(buffer[y * 800 + x]);
 	}
 
 protected:

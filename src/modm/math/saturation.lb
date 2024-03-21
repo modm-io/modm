@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2018, Thomas Sommer
+# Copyright (c) 2022, Thomas Sommer
 #
 # This file is part of the modm project.
 #
@@ -19,5 +19,5 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "modm/src/modm/math/saturation"
-    env.copy(".")
+    env.outbasepath = "modm/src/modm/math"
+    env.copy("saturated.hpp")

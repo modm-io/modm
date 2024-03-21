@@ -2,7 +2,7 @@
  * Copyright (c) 2009, Martin Rosekeit
  * Copyright (c) 2009-2010, Fabian Greif
  * Copyright (c) 2012, Niklas Hauser
- * Copyright (c) 2021, Thomas Sommer
+ * Copyright (c) 2022, Thomas Sommer
  *
  * This file is part of the modm project.
  *
@@ -19,14 +19,17 @@ class SaturationTest : public unittest::TestSuite
 {
 public:
 	void
-	testSigned8bit();
+	testSaturated_int8_t();
 
 	void
-	testUnsigned8bit();
+	testSaturated_uint8_t();
 
 	void
-	testSigned16bit();
+	testSaturated_int16_t();
 
 	void
-	testUnsigned16bit();
+	testSaturated_uint16_t();
+
+	void
+	testSaturated_uint8_t_ref();
 };

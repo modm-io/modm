@@ -43,29 +43,28 @@ public:
 	}
 
 	bool
-	setColorBrightness(size_t index, const color::Rgb &color, uint8_t brightness)
+	setColorBrightness(size_t index, const color::RgbPallete<8,8,8> &color, uint8_t brightness)
 	{
 		if (index >= LEDs) return false;
-		uint32_t value = (color.red << 24) | (color.green << 16) |
-						 (color.blue << 8) | (brightness | 0xe0);
+		uint32_t value = color.value() << 8 | (brightness | 0xe0);
 		reinterpret_cast<uint32_t*>(data)[1+index] = value;
 		return true;
 	}
 
 	bool
-	setColor(size_t index, const color::Rgb &color)
+	setColor(size_t index, const color::RgbPallete<8,8,8> &color)
 	{
 		if (index >= LEDs) return false;
 		// read the brightness value and clear all colors
 		uint32_t value = reinterpret_cast<const uint32_t*>(data)[1+index] & 0xfful;
 		// set all colors
-		value |= (color.red << 24) | (color.green << 16) | (color.blue << 8);
+		value |= color.value() << 8;
 		// write back entire value
 		reinterpret_cast<uint32_t*>(data)[1+index] = value;
 		return true;
 	}
 
-	color::Rgb
+	color::Rgb888
 	getColor(size_t index) const
 	{
 		if (index >= LEDs) return {};

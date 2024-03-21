@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Thomas Sommer
+ * Copyright (c) 2022, Thomas Sommer
  *
  * This file is part of the modm project.
  *
@@ -19,29 +19,28 @@ class ColorTest : public unittest::TestSuite
 {
 public:
 	void
-	testRgbCopyConstructors();
+	testGray();
 
 	void
-	testHsvCopyConstructors();
+	testRgb();
 
 	void
-	testBrightnessCopyConstructors();
+	testHsv();
 
 	void
 	testConvertion_8bit();
 
-	// TODO 16bit convertion not yet working
-	// see hsv_impl.hpp and rgb_impl.hpp
-	// void
-	// testConvertion_16bit();
+	void
+	testConvertion_16bit();
 
 	void
 	testRgbHsvPingPongConvertion_8bit();
 
-	// TODO 16bit convertion not yet working
-	// see hsv_impl.hpp and rgb_impl.hpp
-	// void
-	// testRgbHsvPingPongConvertion_16bit();
+	void
+	testRgbHsvPingPongConvertion_16bit();
+
+	void
+	testConstevalOperators();
 };
 
 #endif	// COLOR_TEST_HPP
