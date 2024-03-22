@@ -11,15 +11,20 @@
 
 #include <modm/board.hpp>
 #include <modm/driver/radio/dw3110/dw3110_phy.hpp>
+#include <span>
 
 using namespace Board;
 
 using MySpiMaster = modm::platform::SpiMaster1;
-using MyDw3110_a = modm::Dw3110Phy<MySpiMaster, GpioB6>;
-using MyDw3110_b = modm::Dw3110Phy<MySpiMaster, GpioA10>;
+using MyDw3110_a = modm::Dw3110Phy<MySpiMaster, GpioB6, 10>;
+using MyDw3110_b = modm::Dw3110Phy<MySpiMaster, GpioA10, 10>;
 
 MyDw3110_a myDw3110_a;
 MyDw3110_b myDw3110_b;
+
+uint8_t data_array[4] = {0xBA, 0xDE, 0xAF, 0xFE};
+// uint8_t data_array[4] = {0xF0, 0xF0, 0xF0, 0xF0};
+std::span<uint8_t> data(data_array);
 
 int
 main()
@@ -46,10 +51,11 @@ main()
 	{
 		LedD13::toggle();
 		modm::delay(Button::read() ? 100ms : 500ms);
+		MODM_LOG_INFO << "loop: " << counter++ << modm::endl;
 
 		MODM_LOG_DEBUG << "Ping a: " << RF_CALL_BLOCKING(myDw3110_a.ping()) << modm::endl;
-		MODM_LOG_DEBUG << "Ping b: " << RF_CALL_BLOCKING(myDw3110_b.ping()) << modm::endl;
-		MODM_LOG_INFO << "loop: " << counter++ << modm::endl;
+		RF_CALL_BLOCKING(myDw3110_b.transmit(data));
+		RF_CALL_BLOCKING(myDw3110_a.receive());
 	}
 
 	return 0;
