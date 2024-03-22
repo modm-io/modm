@@ -1,0 +1,31 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2024, Elias H.
+# Copyright (c) 2024, Raphael Lehmann
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:dw3110"
+    module.description = "NRF24 Drivers"
+
+def prepare(module, options):
+    module.depends(
+        #":architecture:register",
+        ":architecture:spi.device",
+        ":debug",
+        ":processing:resumable")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/radio/dw3110"
+    env.copy("dw3110_phy.hpp")
+    env.copy("dw3110_phy_impl.hpp")
+    env.copy("dw3110_definitions.hpp")

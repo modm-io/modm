@@ -736,6 +736,7 @@ your specific needs.
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-ds1302">DS1302</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-ds1631">DS1631</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-ds18b20">DS18B20</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-dw3110">DW3110</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-ea_dog">EA-DOG</a></td>
 </tr><tr>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-encoder_input">Encoder Input</a></td>
