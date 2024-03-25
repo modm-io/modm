@@ -248,7 +248,7 @@ def prepare(module, options):
             minimum=0,
             maximum=hex(flash_size),
             default=0))
-
+    
     module.add_option(
         NumericOption(
             name="linkerscript.flash_reserved",
@@ -311,7 +311,7 @@ def validate(env):
                                     .format(flash_offset_option_name,
                                             flash_offset,
                                             bit_alignment))
-
+    
     flash_size = env.get(":platform:core:boot2_size", 0)
     flash_reserved_option_name = "modm:platform:cortex-m:linkerscript.flash_reserved"
     flash_reserved = env[flash_reserved_option_name]
