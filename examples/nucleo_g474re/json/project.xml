@@ -3,7 +3,6 @@
   <options>
     <option name="modm:build:build.path">../../../build/nucleo_g474re/json</option>
     <option name="modm:platform:cortex-m:linkerscript.flash_reserved">1024*16</option>
-    <option name="modm:platform:flash:dual_bank">yes</option>
   </options>
   <modules>
     <module>modm:debug</module>

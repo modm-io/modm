@@ -59,7 +59,7 @@ main()
 	MODM_LOG_INFO << "+++++++++++++++++++++++++++\n" << modm::endl;
 
 	// data::person alice_struct = {"Alice", 50};
-	data::person alice_struct = {"Alice", 1.85, 80};
+	data::person alice_struct = {"Alice", 1.85, 50};
 	json alice_json = alice_struct;
 
 	// basic JSON character string usage
@@ -112,8 +112,7 @@ main()
 			MODM_LOG_ERROR << "\nRequested flash end page exceeds flash [" << page_start << ", "
 						   << end_page << ")" << modm::endl;
 			MODM_LOG_INFO.flush();
-			while (1)
-				;
+			while (1);
 		}
 
 		// erase the pages before programming
@@ -123,16 +122,14 @@ main()
 		if (not Flash::unlock())
 		{
 			MODM_LOG_INFO << "Flash unlock failed!" << modm::endl;
-			while (1)
-				;
+			while (1);
 		}
 		for (size_t page{page_start}; page < end_page; page++) err |= Flash::erase(page);
 		if (err != 0)
 		{
 			MODM_LOG_ERROR << "\nThere was an error while erasing flash!" << modm::endl;
 			MODM_LOG_INFO.flush();
-			while (1)
-				;
+			while (1);
 		}
 
 		// pad the data with zeros to fit flash words
@@ -155,13 +152,11 @@ main()
 			memcpy(&outdata, &alice_binary[ii], sizeof(Flash::MaxWordType));
 			err |= Flash::program(flash_write_base_addr + ii, outdata);
 		}
-
 		if (err != 0)
 		{
 			MODM_LOG_ERROR << "\nThere was an error while programming flash!" << modm::endl;
 			MODM_LOG_INFO.flush();
-			while (1)
-				;
+			while (1);
 		}
 		MODM_LOG_INFO << "Writing complete! " << modm::endl;
 		MODM_LOG_INFO.flush();
@@ -189,7 +184,6 @@ main()
 		MODM_LOG_INFO.flush();
 	}
 
-	while (1)
-		;
+	while (1);
 	return 0;
 }
