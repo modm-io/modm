@@ -46,6 +46,3 @@
 [submodule "ext/arm/cmsis-dsp"]
 	path = ext/arm/cmsis-dsp
 	url = https://github.com/modm-ext/cmsis-dsp-partial.git
-[submodule "ext/nlohmann-json/nlohmann-json"]
-	path = ext/nlohmann-json/nlohmann-json
-	url = git@github.com:hshose/nlohmann-json.git
