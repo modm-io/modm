@@ -17,11 +17,10 @@
 
 // ----------------------------------------------------------------------------
 
-extern "C" const uint32_t __flash_reserved_start[];
-
+extern "C" const uint32_t __rom_end[];
 using json = nlohmann::json;
 
-constexpr auto max_flash_pages{256};
+constexpr auto max_flash_pages{64};
 
 namespace data
 {
@@ -100,9 +99,9 @@ main()
 		for (const auto& byte : alice_binary) { MODM_LOG_INFO.printf(" 0x%02x", byte); }
 		MODM_LOG_INFO << modm::endl;
 
-		// put BSON in reserved flash
+		// put BSON in first flash page after program
 		uint32_t err{0};
-		const size_t page_start = Flash::getPage(reinterpret_cast<uint32_t>(&__flash_reserved_start)) + 1;
+		const size_t page_start = Flash::getPage(reinterpret_cast<uint32_t>(&__rom_end)) + 1;
 		const size_t num_bytes = alice_binary.size();
 		const size_t flash_page_size = Flash::getSize(page_start);
 		const size_t end_page = page_start + (num_bytes + flash_page_size - 1) / flash_page_size;
