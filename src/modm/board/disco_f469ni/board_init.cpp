@@ -18,6 +18,7 @@ void
 modm_board_init(void)
 {
 	// Reset LCD
+	Board::DisplayReset::setOutput(Gpio::OutputType::PushPull, Gpio::OutputSpeed::High);
 	Board::DisplayReset::setOutput(modm::Gpio::Low);
 	modm::delay_ms(20);
 	Board::DisplayReset::set();
