@@ -54,9 +54,9 @@ def guess_serial_port(port_hint=None):
             # Symlink created by BMP udev rules
             # https://github.com/blackmagic-debug/blackmagic/blob/main/driver/99-blackmagic-plugdev.rules
             if os.path.exists('/dev/ttyBmpGdb'):
-                ports = ['/dev/ttyBmpGdb']:
+                ports = ['/dev/ttyBmpGdb']
             elif os.path.exists('/dev/ttyACM0'):
-                ports = ['/dev/ttyACM0']:
+                ports = ['/dev/ttyACM0']
             else:
                 ports = [None]
         else:
