@@ -73,6 +73,7 @@ def add_subparser(subparser):
 # -----------------------------------------------------------------------------
 if __name__ == "__main__":
     import argparse
+    import os.path
 
     parser = argparse.ArgumentParser(
         description='Program ELF file or reset device via Black Magic Probe')
