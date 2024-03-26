@@ -51,6 +51,7 @@ def guess_serial_port(port_hint=None):
             ports = glob.glob('/dev/tty.usb*')
     else:
         if port_hint == 'bmp':
+            import os.path
             # Symlink created by BMP udev rules
             # https://github.com/blackmagic-debug/blackmagic/blob/main/driver/99-blackmagic-plugdev.rules
             if os.path.exists('/dev/ttyBmpGdb'):
