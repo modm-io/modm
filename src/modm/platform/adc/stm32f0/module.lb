@@ -62,3 +62,5 @@ def build(env):
 
     env.template("adc.hpp.in")
     env.template("adc_impl.hpp.in")
+    env.template("adc_interrupt.hpp.in", "adc_interrupt.hpp")
+    env.template("adc_interrupt.cpp.in", "adc_interrupt.cpp")
