@@ -95,7 +95,7 @@ Flash::erase(uint8_t index)
 %% if dual_bank
 	uint32_t cr = FLASH_CR_STRT | FLASH_CR_PER;
 	uint32_t page = index;
-	%% set second_bank = 256 if family == "g0" else "(Size/2 >> 11)"
+	%% set second_bank = "(Size/2 >> 11)"
 	if (FLASH->OPTR & {{dual_bank}} and index >= {{second_bank}})
 	{
 		page -= {{second_bank}};

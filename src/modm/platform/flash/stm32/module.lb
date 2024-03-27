@@ -45,8 +45,9 @@ def build(env):
             block_shift = 10
     elif target.family in ["g0"]:
         busy_bit = "FLASH_SR_BSY1"
-        dual_bank = "FLASH_OPTR_DUAL_BANK"
-        block_shift = "(FLASH->OPTR & FLASH_OPTR_DUAL_BANK ? 11 : 12)"
+        block_shift = 11
+        if target.name[0] in ["b", "c"]:
+            dual_bank = "FLASH_OPTR_DUAL_BANK"
     elif target.family in ["g4"]:
         block_shift = 11
         # Only Cat3 devices have dual bank, so g47x or g48x
