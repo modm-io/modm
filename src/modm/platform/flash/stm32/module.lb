@@ -30,29 +30,29 @@ def build(env):
     target = env[":target"].identifier
     memories = listify(env[":target"].get_driver("core")["memory"])
     flash = next(filter(lambda m: m["name"] == "flash", memories))
+
     dual_bank = False
     family = target.family
+    busy_bit = "FLASH_SR_BSY"
+    ftype = "page"
     if target.family in ["f4"]:
         block_shift = 17
         ftype = "sector"
-        busy_bit = "FLASH_SR_BSY"
     elif target.family in ["f1"]:
         if target.name in  ["05", "07"] or int(flash["size"]) >= 262144:
             block_shift = 11
         else:
             block_shift = 10
-        ftype = "page"
-        busy_bit = "FLASH_SR_BSY"
     elif target.family in ["g0"]:
-        block_shift = 11
-        ftype = "page"
         busy_bit = "FLASH_SR_BSY1"
         dual_bank = "FLASH_OPTR_DUAL_BANK"
+        block_shift = "(FLASH->OPTR & FLASH_OPTR_DUAL_BANK ? 11 : 12)"
     elif target.family in ["g4"]:
         block_shift = 11
-        ftype = "page"
-        busy_bit = "FLASH_SR_BSY"
-        dual_bank = "FLASH_OPTR_DBANK"
+        # Only Cat3 devices have dual bank, so g47x or g48x
+        if target.name[0] in ["7", "8"]:
+            dual_bank = "FLASH_OPTR_DBANK"
+            block_shift = "(FLASH->OPTR & FLASH_OPTR_DBANK ? 11 : 12)"
 
     env.substitutions = {
         "start": int(flash["start"], 16),
