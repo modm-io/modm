@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2024, Henrik Hose
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":nlohmann-json"
+    module.description = """
+# Header-only JSON library
+
+The nlohmann JSON C++ library
+
+- https://json.nlohmann.me/
+- https://github.com/nlohmann/json
+
+"""
+
+def prepare(module, options):
+    if options[":target"].identifier.platform != "hosted":
+        module.depends(":platform:heap")
+
+    return True
+
+def build(env):
+    env.collect(":build:path.include", "modm/ext/nlohmann-json")
+    env.outbasepath = "modm/ext/nlohmann-json"
+
+    env.copy("json/single_include/nlohmann/json.hpp", dest="json.hpp")
+    env.copy("json/single_include/nlohmann/json_fwd.hpp", dest="json_fwd.hpp")

@@ -31,26 +31,29 @@ def build(env):
     memories = listify(env[":target"].get_driver("core")["memory"])
     flash = next(filter(lambda m: m["name"] == "flash", memories))
 
+    dual_bank = False
     family = target.family
+    busy_bit = "FLASH_SR_BSY"
+    ftype = "page"
     if target.family in ["f4"]:
         block_shift = 17
         ftype = "sector"
-        busy_bit = "FLASH_SR_BSY"
     elif target.family in ["f1"]:
         if target.name in  ["05", "07"] or int(flash["size"]) >= 262144:
             block_shift = 11
         else:
             block_shift = 10
-        ftype = "page"
-        busy_bit = "FLASH_SR_BSY"
     elif target.family in ["g0"]:
-        block_shift = 11
-        ftype = "page"
         busy_bit = "FLASH_SR_BSY1"
+        block_shift = 11
+        if target.name[0] in ["b", "c"]:
+            dual_bank = "FLASH_OPTR_DUAL_BANK"
     elif target.family in ["g4"]:
         block_shift = 11
-        ftype = "page"
-        busy_bit = "FLASH_SR_BSY"
+        # Only Cat3 devices have dual bank, so g47x or g48x
+        if target.name[0] in ["7", "8"]:
+            dual_bank = "FLASH_OPTR_DBANK"
+            block_shift = "(FLASH->OPTR & FLASH_OPTR_DBANK ? 11 : 12)"
 
     env.substitutions = {
         "start": int(flash["start"], 16),
@@ -59,7 +62,8 @@ def build(env):
         "shift": block_shift,
         "has_sectors": ftype == "sector",
         "busy_bit": busy_bit,
-        "family": family
+        "family": family,
+        "dual_bank": dual_bank
     }
     env.outbasepath = "modm/src/modm/platform/flash"
     env.template("flash.hpp.in")
