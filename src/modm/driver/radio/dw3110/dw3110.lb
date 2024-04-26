@@ -3,6 +3,7 @@
 #
 # Copyright (c) 2024, Elias H.
 # Copyright (c) 2024, Raphael Lehmann
+# Copyright (c) 2024, Michael Jossen
 #
 # This file is part of the modm project.
 #
@@ -21,6 +22,7 @@ def prepare(module, options):
         #":architecture:register",
         ":architecture:spi.device",
         ":debug",
+        ":processing:timer",
         ":processing:resumable")
     return True
 
