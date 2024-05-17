@@ -1,8 +1,5 @@
 <library>
   <extends>modm:rp-pico</extends>
-  <options>
-    <option name="modm:build:build.path">../../../build/rp_pico/logger</option>
-  </options>
   <modules>
     <module>modm:debug</module>
     <module>modm:platform:gpio</module>

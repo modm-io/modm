@@ -1,8 +1,5 @@
 <library>
   <extends>modm:disco-f407vg</extends>
-  <options>
-    <option name="modm:build:build.path">../../../build/stm32f4_discovery/led_matrix_display</option>
-  </options>
   <modules>
     <module>modm:driver:max7219</module>
     <module>modm:platform:gpio</module>

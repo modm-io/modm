@@ -52,33 +52,39 @@ def check_builds_paths(projects):
 
 	return result
 
-def _get_paths_from_ci(files):
-	paths = set()
-	for file in files:
-		matches = re.findall(r"examples_compile.py (.*?)\)", file.read_text())
-		paths |= set(m  for match in matches  for m in match.split(" "))
-	return paths
+def check_ci_workflows(folders):
+	def _check(path, missing=None):
+		path = ".github/workflows/" + path
+		matches = re.findall(r"examples_compile.py (.*?)\)", repopath(path).read_text())
+		paths = set(m  for match in matches  for m in match.split(" "))
 
-def check_is_part_of_ci(projects):
-	folders = set(p.relative_to(repopath("examples")).parts[0] for p in projects)
-	result = 0
-	# Linux files
-	paths = _get_paths_from_ci([repopath(".github/workflows/linux.yml")])
-	paths = folders - paths
-	if paths:
-		print("\nLinux CI is missing examples: '{}'"
-		      .format("', '".join(sorted(list(paths)))), file=sys.stderr)
-		print("    Please add these example folders to the appropriate CI job in\n"
-		      "    '.github/workflows/linux.yml'!")
+		if nonexistant_paths := paths - folders:
+			print("\nThe CI is trying to build examples that don't exist:\n\n- " +
+				  "\n- ".join(sorted(list(nonexistant_paths))) +
+				  "\n\n  Please remove these example folders from the CI configuration:"
+				 f"\n    '{path}'!", file=sys.stderr)
 
-	return len(paths)
+		if missing is not None and (missing_paths := folders - paths - missing):
+			print("\nThe CI is missing examples:\n\n- " +
+				  "\n- ".join(sorted(list(missing_paths))) +
+				  "\n\n  Please add these example folders to the appropriate CI job in"
+				 f"\n    '{path}'!", file=sys.stderr)
+			return len(missing_paths) + len(nonexistant_paths)
+
+		return len(nonexistant_paths)
+
+	errors = _check("linux.yml", {'rpi'})
+	errors += _check("macos.yml")
+	errors += _check("windows.yml")
+	return errors
 
 if __name__ == "__main__":
 	# Find all project files
 	projects = list(repopath("examples").rglob("*/project.xml"))
+	folders = set(p.relative_to(repopath("examples")).parts[0] for p in projects)
 	# Run a bunch of checks on them
 	result = check_builds_paths(projects)
-	result += check_is_part_of_ci(projects)
+	result += check_ci_workflows(folders)
 	# Return code if any
 	exit(result)
 

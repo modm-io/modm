@@ -1,8 +1,5 @@
 <library>
   <extends>modm:disco-f769ni</extends>
-  <options>
-    <option name="modm:build:build.path">../../../build/stm32f769i_discovery/dac_dma</option>
-  </options>
   <modules>
     <module>modm:debug</module>
     <module>modm:platform:dac</module>

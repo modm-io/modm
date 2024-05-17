@@ -1,8 +1,5 @@
 <library>
   <extends>modm:nucleo-f411re</extends>
-  <options>
-    <option name="modm:build:build.path">../../../build/nucleo_f411re/bno055</option>
-  </options>
   <modules>
     <module>modm:debug</module>
     <module>modm:driver:bno055</module>

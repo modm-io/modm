@@ -18,7 +18,7 @@ Change directory into any of the examples and compile it:
 
 ```sh
 # cd into any example you like
-cd modm/examples/generic/blinky
+cd modm/examples/core/blinky
 # generate modm library (call only once)
 lbuild build
 # compile the example
@@ -54,6 +54,69 @@ lbuild clean
 
 Have a look at the [build system documentation][build_docs] and the
 [online documentation][docs].
+
+
+## Structure
+
+- core
+  - custom_allocator
+  - delay
+  - exceptions_rtti
+  - fiber
+  - flash
+  - hard_fault
+  - itm
+  - multi-core
+  - resumable
+  - rtt
+  - threadsafe_statics
+  - tlsf_allocator
+  - unaligned_access
+  - vector_table_ram
+- gpio
+  - blinky
+  - exti
+  - gpio
+  - ports
+- analog
+  - adc_dma
+  - comp
+  - dac
+- timer
+  - encoder_input
+  - pwm
+  - timer
+- logging
+  - logger
+  - printf
+  - uart
+- ui
+  - game_of_life
+  - graphics
+- driver
+  - can
+  - i2c
+  - single wire
+  - spi
+- communication
+  - amnb
+  - ethernet_freertos
+  - nrf24
+  - sab
+  - xpcc
+- ext
+  - cmsis_dsp
+  - etl
+  - freertos
+  - nanopb
+  - usb
+  - usb_dfu
+  - usbfatfs
+  - lvgl
+  - ros
+- board
+  - super custom board-specific examples
+  - ideally we get rid of this section
 
 
 ## Interesting Examples
@@ -117,6 +180,12 @@ Here are some additional examples of displays and sensors we like:
 <!--/checkrepourls-->
 
 
+<!--webignore-->
+### Compiling Examples for Multiple Targets
+
+
+<!--/webignore-->
+
 ### Copy Carefully
 
 When copying from our examples make sure to set the repository path correctly!
@@ -134,10 +203,10 @@ The `modm/examples/lbuild.xml` file:
        When you write your own application, you must set this
        path yourself! -->
   <repositories>
-  	<repository><path>../repo.lb</path></repository>
+    <repository><path>../repo.lb</path></repository>
   </repositories>
   <modules>
-  	<module>modm:docs</module>
+    <module>modm:docs</module>
   </modules>
 </library>
 ```

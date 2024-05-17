@@ -1,7 +1,6 @@
 <library>
   <extends>modm:nucleo-f429zi</extends>
   <options>
-    <option name="modm:build:build.path">../../../build/nucleo_f429zi/spi_flash_fatfs</option>
     <option name="modm:platform:rtt:buffer.tx">4096</option>
     <option name="modm:processing:protothread:use_fiber">yes</option>
   </options>

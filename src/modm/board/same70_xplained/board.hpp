@@ -51,7 +51,7 @@ struct SystemClock
 };
 
 using Led0 = GpioC8;
-using ButtonSW0 = GpioInverted<GpioA11>;
+using Button = GpioInverted<GpioA11>;
 
 using Leds = SoftwareGpioPort<Led0>;
 
@@ -80,7 +80,7 @@ initialize()
 	Debug::Uart::connect<Debug::UartTx::Tx, Debug::UartRx::Rx>();
 
 	Leds::setOutput();
-	ButtonSW0::setInput(InputType::PullUp);
+	Button::setInput(InputType::PullUp);
 }
 
 /*

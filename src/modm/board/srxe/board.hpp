@@ -26,6 +26,7 @@ using namespace modm::literals;
 using SystemClock = modm::platform::SystemClock;
 
 using LedDebug = GpioB0;
+using Button = GpioUnused;
 using Leds = SoftwareGpioPort<LedDebug>;
 /// @}
 

@@ -269,7 +269,9 @@ Configuration options:
 
     def build(self, env):
         env.outbasepath = "modm/ext/tinyusb"
-        env.copy("tinyusb/src/device/", "device/")
+        operations = env.copy("tinyusb/src/device/", "device/")
+        operations = [o for o in operations if "usbd.c" in o.filename]
+        env.collect(":build:ccflags", "-Wno-bad-function-cast", operations=operations)
 
 
 # -----------------------------------------------------------------------------

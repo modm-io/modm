@@ -1,8 +1,5 @@
 <library>
   <extends>modm:nucleo-g474re</extends>
-  <options>
-    <option name="modm:build:build.path">../../../build/nucleo_g474re/sx128x_lora</option>
-  </options>
   <modules>
     <module>modm:driver:sx128x</module>
     <module>modm:platform:exti</module>

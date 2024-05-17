@@ -1,9 +1,0 @@
-<library>
-  <extends>modm:feather-rp2040</extends>
-  <options>
-    <option name="modm:build:build.path">../../../build/feather_rp2040/blink</option>
-  </options>
-  <modules>
-    <module>modm:build:scons</module>
-  </modules>
-</library>

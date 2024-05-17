@@ -1,8 +1,5 @@
 <library>
   <extends>modm:nucleo-g474re</extends>
-  <options>
-    <option name="modm:build:build.path">../../../build/nucleo_g474re/ms5611</option>
-  </options>
   <modules>
     <module>modm:driver:ms5611</module>
     <module>modm:platform:gpio</module>

@@ -1,7 +1,6 @@
 <library>
   <extends>modm:al-avreb-can</extends>
   <options>
-    <option name="modm:build:build.path">../../../build/avr/ports</option>
     <option name="modm:build:avrdude.programmer">usbasp-clone</option>
   </options>
   <modules>

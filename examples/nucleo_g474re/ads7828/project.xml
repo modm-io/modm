@@ -1,8 +1,5 @@
 <library>
   <extends>modm:nucleo-g474re</extends>
-  <options>
-    <option name="modm:build:build.path">../../../build/nucleo_g474re/ads7828</option>
-  </options>
   <modules>
     <module>modm:driver:ads7828</module>
     <module>modm:platform:gpio</module>

@@ -1,8 +1,5 @@
 <library>
   <extends>modm:rp-pico</extends>
-  <options>
-    <option name="modm:build:build.path">../../../build/rp_pico/st7789</option>
-  </options>
   <modules>
     <module>modm:platform:spi:0</module>
     <module>modm:platform:uart:0</module>

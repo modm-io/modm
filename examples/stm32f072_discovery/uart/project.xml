@@ -1,8 +1,5 @@
 <library>
   <extends>modm:disco-f072rb</extends>
-  <options>
-    <option name="modm:build:build.path">../../../build/stm32f072_discovery/uart</option>
-  </options>
   <modules>
     <module>modm:platform:gpio</module>
     <module>modm:platform:uart:1</module>

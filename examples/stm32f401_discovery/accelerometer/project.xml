@@ -1,7 +1,6 @@
 <library>
   <extends>modm:disco-f401vc</extends>
   <options>
-    <option name="modm:build:build.path">../../../build/stm32f401_discovery/accelerometer</option>
     <option name="modm:processing:protothread:use_fiber">yes</option>
   </options>
   <modules>

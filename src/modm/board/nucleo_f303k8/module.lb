@@ -23,8 +23,16 @@ def prepare(module, options):
     if not options[":target"].partname.startswith("stm32f303k8t"):
         return False
 
-    module.depends(":platform:core", ":platform:gpio", ":platform:clock", ":platform:uart:2",
-                   ":debug", ":architecture:clock")
+    module.depends(
+        ":architecture:clock",
+        ":debug",
+        ":platform:clock",
+        ":platform:core",
+        ":platform:gpio",
+        ":platform:i2c:1",
+        ":platform:spi:1",
+        ":platform:uart:2"
+    )
     return True
 
 def build(env):

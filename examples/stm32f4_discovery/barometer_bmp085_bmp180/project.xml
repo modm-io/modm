@@ -1,8 +1,5 @@
 <library>
   <extends>modm:disco-f407vg</extends>
-  <options>
-    <option name="modm:build:build.path">../../../build/stm32f4_discovery/barometer_bmp085_bmp180</option>
-  </options>
   <modules>
     <module>modm:driver:bmp085</module>
     <module>modm:io</module>

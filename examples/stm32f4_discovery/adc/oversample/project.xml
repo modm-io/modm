@@ -1,8 +1,5 @@
 <library>
   <extends>modm:disco-f407vg</extends>
-  <options>
-    <option name="modm:build:build.path">../../../../build/stm32f4_discovery/adc/oversample</option>
-  </options>
   <modules>
     <module>modm:debug</module>
     <module>modm:driver:adc_sampler</module>

@@ -140,6 +140,7 @@ struct SystemClock
 
 using ButtonK1 = GpioInverted<GpioInputE3>;
 using ButtonK2 = GpioInverted<GpioInputC5>;
+using Button = ButtonK1;
 
 using LedGreen = GpioInverted<GpioOutputA1>;	// User LED
 

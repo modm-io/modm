@@ -1,8 +1,5 @@
 <library>
   <extends>modm:srxe</extends>
-  <options>
-    <option name="modm:build:build.path">../../../build/srxe/display</option>
-  </options>
   <modules>
     <module>modm:build:scons</module>
   </modules>

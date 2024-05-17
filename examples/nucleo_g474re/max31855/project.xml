@@ -1,8 +1,5 @@
 <library>
   <extends>modm:nucleo-g474re</extends>
-  <options>
-    <option name="modm:build:build.path">../../../build/nucleo_g474re/max31855</option>
-  </options>
   <modules>
     <module>modm:driver:max31855</module>
     <module>modm:platform:gpio</module>

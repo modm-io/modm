@@ -125,6 +125,28 @@ using Uart = Usart2;
 /// @}
 }
 
+namespace i2c
+{
+/// @ingroup modm_board_nucleo_g431rb
+/// @{
+using Sda = D14;
+using Scl = D15;
+using Controller = I2cMaster1;
+/// @}
+}
+
+namespace spi
+{
+/// @ingroup modm_board_nucleo_g431rb
+/// @{
+using Cs = D10;
+using Sck = D13;
+using Sdi = D12;
+using Sdo = D11;
+using Controller = SpiMaster1;
+/// @}
+}
+
 /// @ingroup modm_board_nucleo_g431rb
 /// @{
 using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
@@ -139,6 +161,20 @@ initialize()
 	stlink::Uart::initialize<SystemClock, 115200_Bd>();
 
 	Button::setInput();
+}
+
+inline void
+initializeI2c()
+{
+	i2c::Controller::connect<i2c::Sda::Sda, i2c::Scl::Scl>();
+	i2c::Controller::initialize<SystemClock, 400_kHz>();
+}
+
+inline void
+initializeSpi()
+{
+	spi::Controller::connect<spi::Sck::Sck, spi::Sdo::Mosi, spi::Sdi::Miso>();
+	spi::Controller::initialize<SystemClock, 5.3125_MHz>();
 }
 /// @}
 

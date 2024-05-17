@@ -1,0 +1,8 @@
+<library>
+  <extends>modm:nucleo-l476rg</extends>
+  <modules>
+    <module>modm:driver:ds1302</module>
+    <module>modm:processing:timer</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

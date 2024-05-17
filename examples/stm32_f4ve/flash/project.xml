@@ -1,8 +1,5 @@
 <library>
   <extends>modm:stm32_f4ve</extends>
-  <options>
-    <option name="modm:build:build.path">../../../build/stm32_f4ve/flash</option>
-  </options>
   <modules>
     <module>modm:platform:gpio</module>
     <module>modm:platform:uart:2</module>
