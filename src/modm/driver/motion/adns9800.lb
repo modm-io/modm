@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2018, Niklas Hauser
+# Copyright (c) 2024, Thomas Sommer
 #
 # This file is part of the modm project.
 #
@@ -14,10 +14,13 @@
 def init(module):
     module.name = ":driver:adns9800"
     module.description = """\
-# ADNS-9800 Laser Motion Sensor
+# ADNS9800 Laser Motion Sensor
 
-Based on work of Alexander Entinger, MSc / LXRobotics
-Based on https://github.com/mrjohnk/ADNS-9800
+The ADNS-9800 comprises of sensor and VCSEL in a single chip-on-board (COB) package.
+It provides enhanced features like programmable frame rate, programmable resolution,
+configurable sleep and wake up time.
+
+Great Video showing the working of such a sensor: https://youtu.be/SAaESb4wTCM
 """
 
 def prepare(module, options):
@@ -29,13 +32,22 @@ def prepare(module, options):
             default="a6"))
 
     module.depends(
-        ":architecture:delay",
-        ":architecture:spi",
-        ":debug")
+        ":processing:resumable",
+        ":architecture:spi.device",
+        ":math:geometry",
+        ":ui:color"
+        )
     return True
+
+# @fixme check if modm:processing:protothread:use_fiber is true, otherwise use_pure_fiber wont work
 
 def build(env):
     env.outbasepath = "modm/src/modm/driver/motion"
+    env.copy("adns9800_firmware_{}.cpp".format(env["firmware"]), "adns9800_firmware.cpp")
+
+    if not env.has_module(":processing:fiber"):
+        env.copy("adns9800.rf.hpp", "adns9800.hpp")
+        return
+
     env.copy("adns9800.hpp")
-    env.copy("adns9800_impl.hpp")
-    env.copy("adns9800_srom_{}.hpp".format(env["firmware"]), "adns9800_srom.hpp")
+    env.copy("adns9800_data.hpp")
