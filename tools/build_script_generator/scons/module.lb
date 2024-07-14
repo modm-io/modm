@@ -30,6 +30,10 @@ def prepare(module, options):
         PathOption(name="path.artifact", default="artifacts", absolute=True,
                    description=descr_path_artifact))
 
+    module.add_option(
+        StringOption(name="include_repos", default="",
+                    description=descr_include_repos))
+
     module.add_collector(
         CallableCollector(name="flag_format",
                           description="Formatting compile flags for SCons"))
@@ -150,8 +154,15 @@ def post_build(env):
     has_xpcc_generator = env.has_module(":communication:xpcc:generator")
     has_image_source = len(env["::image.source"])
     has_nanopb = env.has_module(":nanopb")
-    repositories = [p for p in env.buildlog.repositories if isdir(env.real_outpath(p, basepath="."))]
-    repositories.sort(key=lambda name: "0" if name == "modm" else name)
+
+    repositories = ["modm"]
+    for token in env["include_repos"].split(","):
+        repo = token.strip()
+        if repo in env.buildlog.repositories and isdir(env.real_outpath(repo, basepath=".")):
+            repositories.append(repo)
+        elif repo != "":
+            env.log.error(f"\"{repo}\" is not a valid repository!")
+
     generated_paths = [join(env.relcwdoutpath(""), r) for r in repositories]
 
     subs = env.query("::device")
@@ -266,4 +277,13 @@ descr_path_artifact = """# Path to Artifact Store
 The artifact folder contains ELF files named by their GNU build id hash. This
 allows identification of firmware on the device via serial output and is useful
 for archiving or post-mortem debugging.
+"""
+
+descr_include_repos = """# Include Additional Repositories
+
+This should be a comma-separated list of repository names for which to generate
+additional SConscript files. Note: `include_sconstruct` should generally be
+disabled when using this option, as you will want to write a custom SConstruct.
+
+!!! warning "This overwrites any existing `../[repo]/SConscript` files!"
 """
