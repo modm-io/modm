@@ -209,11 +209,9 @@ def post_build(env):
         return '"{}"'.format(flag)
 
     # Generate SConscript files for each repository that doesn't already have one
-    repos_without_sconscript = repositories.copy()
-    for op in env.buildlog.operations:
-        repo, relpath = op.repository, env.relative_outpath(op.filename, op.repository)
-        if relpath == "SConscript" and repo in repos_without_sconscript:
-            repos_without_sconscript.remove(repo)
+    repos_with_sconscript = set(op.repository for op in env.buildlog.operations
+                                if op.filename == f"{op.repository}/SConscript")
+    repos_without_sconscript = set(repositories) - repos_with_sconscript
 
     for repo in repos_without_sconscript:
         files = []
