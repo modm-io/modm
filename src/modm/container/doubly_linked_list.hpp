@@ -4,6 +4,7 @@
  * Copyright (c) 2012, Niklas Hauser
  * Copyright (c) 2013, Sascha Schade
  * Copyright (c) 2014, Daniel Krebs
+ * Copyright (c) 2023, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -16,9 +17,7 @@
 #ifndef	MODM_DOUBLY_LINKED_LIST_HPP
 #define	MODM_DOUBLY_LINKED_LIST_HPP
 
-#include <stdint.h>
-#include <modm/utils/allocator.hpp>
-#include <iterator>
+#include <list>
 
 namespace modm
 {
@@ -30,153 +29,100 @@ namespace modm
 	 * \author	Fabian Greif
 	 * \ingroup	modm_container
 	 */
-	template <typename T, typename Allocator = allocator::Dynamic<T> >
-	class DoublyLinkedList
+	template <typename T, typename Allocator = std::allocator<T>>
+	class [[deprecated("Use std::list instead")]] DoublyLinkedList
 	{
 	public:
-		DoublyLinkedList(const Allocator& allocator = Allocator());
+		using const_iterator = std::list<T>::const_iterator;
+		using iterator = std::list<T>::iterator;
+		using Size = std::size_t;
 
-		~DoublyLinkedList();
+		DoublyLinkedList(const Allocator& allocator = Allocator())
+			: data_{std::move(allocator)}
+		{}
 
 		/// check if there are any nodes in the list
-		inline bool
-		isEmpty() const;
+		bool
+		isEmpty() const
+		{
+			return data_.empty();
+		}
 
-		/**
-		 * \brief	Get number of items in the list
-		 *
-		 * Very slow for a long list as it needs to iterate through all
-		 * items in the list.
-		 */
+		/// Get number of items in the list
 		std::size_t
-		getSize() const;
+		getSize() const
+		{
+			return data_.size();
+		}
 
 		/// Insert in front
 		bool
-		prepend(const T& value);
+		prepend(const T& value)
+		{
+			data_.push_front(value);
+			return true;
+		}
 
 		/// Insert at the end of the list
-		void
-		append(const T& value);
+		bool
+		append(const T& value)
+		{
+			data_.push_back(value);
+			return true;
+		}
 
 		/// Remove the first entry
 		void
-		removeFront();
+		removeFront()
+		{
+			data_.pop_front();
+		}
 
 		void
-		removeBack();
+		removeBack()
+		{
+			data_.pop_back();
+		}
+
+		T&
+		getFront()
+		{
+			return data_.front();
+		}
 
 		/**
 		 * \return the first node in the list
 		 */
-		inline const T&
-		getFront() const;
+		const T&
+		getFront() const
+		{
+			return data_.front();
+		}
+
+		T&
+		getBack()
+		{
+			return data_.back();
+		}
 
 		/**
 		 * \return the last node in the list
 		 */
-		inline const T&
-		getBack() const;
-
-	protected:
-		struct Node
+		const T&
+		getBack() const
 		{
-			T value;
-
-			Node *previous;
-			Node *next;
-		};
-
-		// The stored instance is not actually of type Allocator. Instead we
-		// rebind the type to Allocator<Node<T>>. Node<T> is not the same
-		// size as T (it's one pointer larger), and specializations on T may go
-		// unused because Node<T> is being bound instead.
-		typedef typename Allocator::template rebind< Node >::other NodeAllocator;
-
-		NodeAllocator nodeAllocator;
-
-		Node *front;
-		Node *back;
-
-	public:
-		#pragma GCC diagnostic push
-		#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-		/**
-		 * \brief	Forward iterator
-		 *
-		 * \todo	decrement operator doesn't work correctly
-		 */
-		class iterator : public std::iterator<std::forward_iterator_tag, T>
-		{
-			friend class DoublyLinkedList;
-			friend class const_iterator;
-
-		public:
-			/// Default constructor
-			iterator();
-			iterator(const iterator& other);
-
-			iterator& operator = (const iterator& other);
-			iterator& operator ++ ();
-			iterator& operator -- ();
-			bool operator == (const iterator& other) const;
-			bool operator != (const iterator& other) const;
-			T& operator * ();
-			T* operator -> ();
-
-		private:
-			iterator(Node* node);
-
-			Node* node;
-		};
+			return data_.back();
+		}
 
 		/**
-		 * \brief	forward const iterator
-		 *
-		 * \todo	decrement operator doesn't work correctly
-		 */
-		class const_iterator : public std::iterator<std::forward_iterator_tag, T>
-		{
-			friend class DoublyLinkedList;
-
-		public:
-			/// Default constructor
-			const_iterator();
-
-			/**
-			 * \brief	Copy constructor
-			 *
-			 * Used to convert a normal iterator to a const iterator.
-			 * The other way is not possible.
-			 */
-			const_iterator(const iterator& other);
-
-			/**
-			 * \brief	Copy constructor
-			 */
-			const_iterator(const const_iterator& other);
-
-			const_iterator& operator = (const const_iterator& other);
-			const_iterator& operator ++ ();
-			const_iterator& operator -- ();
-			bool operator == (const const_iterator& other) const;
-			bool operator != (const const_iterator& other) const;
-			const T& operator * () const;
-			const T* operator -> () const;
-
-		private:
-			const_iterator(const Node* node);
-
-			const Node* node;
-		};
-		#pragma GCC diagnostic pop
-
-		/**
-		 * Returns a read/write iterator that points to the first element in      the
+		 * Returns a read/write iterator that points to the first element in the
 		 * list.  Iteration is done in ordinary element order.
 		 */
 		iterator
-		begin();
+		begin()
+		{
+			return data_.begin();
+		}
 
 		/**
 		 * Returns a read-only (constant) iterator that points to the
@@ -184,7 +130,10 @@ namespace modm
 		 * element order.
 		 */
 		const_iterator
-		begin() const;
+		begin() const
+		{
+			return data_.begin();
+		}
 
 		/**
 		 * Returns a read/write iterator that points one past the last
@@ -192,7 +141,10 @@ namespace modm
 		 * order.
 		 */
 		iterator
-		end();
+		end()
+		{
+			return data_.end();
+		}
 
 		/**
 		 * Returns a read-only (constant) iterator that points one past
@@ -200,7 +152,10 @@ namespace modm
 		 * element order.
 		 */
 		const_iterator
-		end() const;
+		end() const
+		{
+			return data_.end();
+		}
 
 		/**
 		 * Deletes element pointed to by iterator and returns an iterator
@@ -209,20 +164,36 @@ namespace modm
 		 * Warning: you must not use the iterator after calling erase()
 		 */
 		iterator
-		erase(iterator position);
+		erase(iterator position)
+		{
+			if (position != data_.end()) {
+				return data_.erase(position);
+			} else {
+				return data_.end();
+			}
+		}
+
+		/**
+		 * Insert data after position iterator.
+		 *
+		 * This behavior is compatible with modm::LinkedList but different
+		 * compared to std::list which inserts before the position iterator
+		 * argument.
+		 */
+		bool
+		insert(iterator position, const T& value)
+		{
+			if (position == data_.end()) {
+				data_.push_back(value);
+			} else {
+				data_.insert(std::next(position), value);
+			}
+			return true;
+		}
 
 	private:
-		friend class const_iterator;
-		friend class iterator;
-
-		DoublyLinkedList(const DoublyLinkedList& other);
-
-		DoublyLinkedList&
-		operator = (const DoublyLinkedList& other);
+		std::list<T, Allocator> data_;
 	};
 }
-
-#include "doubly_linked_list_impl.hpp"
-#include "doubly_linked_list_iterator_impl.hpp"
 
 #endif	// MODM_DOUBLY_LINKED_LIST_HPP
