@@ -196,7 +196,7 @@ modm::platform::Adc{{ id }}::setChannels(std::span<const Channel> channels)
 	uint32_t config = 0xFFFF'FFFF;
 	for (const auto [i, ch] : modm::enumerate(channels)) {
 		enableInternalChannel(ch);
-		config = (config & ~((0xF) << i)) | (std::to_underlying(ch) << i);
+		config = (config & ~((0xF) << i*4)) | (std::to_underlying(ch) << i*4);
 	}
 	ADC1->CHSELR = config;
 	waitChannelConfigReady();
