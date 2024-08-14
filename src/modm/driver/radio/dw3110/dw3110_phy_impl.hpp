@@ -439,10 +439,10 @@ modm::Dw3110Phy<SpiMaster, Cs>::setChannel(Dw3110::Channel channel)
 {
 	RF_BEGIN();
 	RF_WAIT_UNTIL(this->acquireMaster());
-	MODM_LOG_DEBUG << "Setting Channel..." << modm::endl;
 
 	if (channel == Dw3110::Channel::Channel9)
 	{
+		MODM_LOG_DEBUG << "Setting Channel 9..." << modm::endl;
 		// Set DGC_KICK and DGC_SEL appropriately
 		constexpr static uint8_t or_mask[] = {0x40, 0x20};
 		constexpr static uint8_t and_mask[] = {0xF0, 0xFF};
@@ -455,8 +455,14 @@ modm::Dw3110Phy<SpiMaster, Cs>::setChannel(Dw3110::Channel channel)
 
 		constexpr static uint8_t pll_cfg_magic[] = {0x3c, 0x0f};
 		RF_CALL(writeRegister<Dw3110::PLL_CFG, 2>(pll_cfg_magic));
+
+		// Actually set Channel
+		constexpr static uint8_t chan_ctrl_or[] = {0x01};
+		constexpr static uint8_t chan_ctrl_and[] = {0xFF};
+		RF_CALL(writeRegisterMasked<Dw3110::CHAN_CTRL, 1>(chan_ctrl_or, chan_ctrl_and));
 	} else if (channel == Dw3110::Channel::Channel5)
 	{
+		MODM_LOG_DEBUG << "Setting Channel 5..." << modm::endl;
 		// Set DGC_KICK and DGC_SEL appropriately
 		constexpr static uint8_t or_mask[] = {0x40, 0x00};
 		constexpr static uint8_t and_mask[] = {0xF0, 0xDF};
@@ -469,6 +475,11 @@ modm::Dw3110Phy<SpiMaster, Cs>::setChannel(Dw3110::Channel channel)
 
 		constexpr static uint8_t pll_cfg_magic[] = {0x3c, 0x1f};
 		RF_CALL(writeRegister<Dw3110::PLL_CFG, 2>(pll_cfg_magic));
+
+		// Actually set Channel
+		constexpr static uint8_t chan_ctrl_or[] = {0x00};
+		constexpr static uint8_t chan_ctrl_and[] = {0xFE};
+		RF_CALL(writeRegisterMasked<Dw3110::CHAN_CTRL, 1>(chan_ctrl_or, chan_ctrl_and));
 	}
 
 	constexpr static uint8_t pll_cfg_ld_magic[] = {0x81};
