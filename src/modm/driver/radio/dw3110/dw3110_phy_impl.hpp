@@ -646,6 +646,16 @@ modm::Dw3110Phy<SpiMaster, Cs>::transmit(const std::span<const uint8_t, Len> pay
 	if (payload_len > payload.size()) RF_RETURN(false);
 	RF_WAIT_UNTIL(this->acquireMaster());
 
+	RF_CALL(fetchChipState());
+	if (chip_state == Dw3110::SystemState::TX || chip_state == Dw3110::SystemState::TX_WAIT)
+	{
+		this->releaseMaster();
+		RF_RETURN(false);
+	}
+
+	// Go idle
+	RF_CALL(sendCommand<Dw3110::FastCommand::CMD_TXRXOFF>());
+
 	// Clear TXFRS flag
 	constexpr static uint8_t txfr_or[] = {0x20};
 	constexpr static uint8_t txfr_and[] = {0xFF};
@@ -665,7 +675,7 @@ modm::Dw3110Phy<SpiMaster, Cs>::transmit(const std::span<const uint8_t, Len> pay
 	RF_CALL(writeRegister<Dw3110::TX_FCTRL, 6>(tx_info));
 	RF_CALL(sendCommand<Dw3110::FastCommand::CMD_TX>());
 
-	timeout.restart(2ms);
+	timeout.restart(10ms);
 	RF_CALL(fetchSystemStatus());
 	while (((uint64_t)Dw3110::SystemStatusBits::TXFRS & system_status) == 0)
 	{
@@ -698,6 +708,9 @@ modm::Dw3110Phy<SpiMaster, Cs>::startReceive()
 		RF_RETURN();
 	}
 
+	// Go idle
+	RF_CALL(sendCommand<Dw3110::FastCommand::CMD_TXRXOFF>());
+
 	// Clear RXFR RXPHE RXFCG and RXFCE flag
 	constexpr static uint8_t rxfr_or[] = {0xF0};
 	constexpr static uint8_t rxfr_and[] = {0xFF};
@@ -728,7 +741,8 @@ modm::Dw3110Phy<SpiMaster, Cs>::fetchPacket(std::span<uint8_t> payload, size_t& 
 	RF_BEGIN();
 	RF_WAIT_UNTIL(this->acquireMaster());
 	RF_CALL(readRegister<Dw3110::RX_FINFO, 4>(rx_finfo));
-	payload_len = (rx_finfo[0] | ((rx_finfo[1] & 0x03) << 8)) - fcs_len;
+	payload_len = (rx_finfo[0] | ((rx_finfo[1] & 0x03) << 8));
+	if (payload_len >= fcs_len) payload_len -= fcs_len;
 	if (payload.size() < payload_len)
 	{
 		this->releaseMaster();
