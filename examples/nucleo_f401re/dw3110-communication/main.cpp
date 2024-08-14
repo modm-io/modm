@@ -41,10 +41,14 @@ main()
 	MODM_LOG_WARNING << "warning" << modm::endl;
 	MODM_LOG_ERROR   << "error"   << modm::endl;
 
-	auto ret = RF_CALL_BLOCKING(myDw3110_a.initialize());
+	auto ret = RF_CALL_BLOCKING(myDw3110_a.initialize(
+		modm::Dw3110::Channel::Channel5, modm::Dw3110::PreambleCode::Code_64Mhz_9,
+		modm::Dw3110::PreambleLength::Preamble_4096, modm::Dw3110::StartFrameDelimiter::Decawave_8));
 	if (!ret) { MODM_LOG_ERROR << "Failed to initialize Dw3110 Number 1" << modm::endl; }
-	auto ret2 = RF_CALL_BLOCKING(myDw3110_b.initialize());
-	if (!ret || !ret2) { MODM_LOG_ERROR << "Failed to initialize Dw3110 Number 2" << modm::endl; }
+	auto ret2 = RF_CALL_BLOCKING(myDw3110_b.initialize(
+		modm::Dw3110::Channel::Channel5, modm::Dw3110::PreambleCode::Code_64Mhz_9,
+		modm::Dw3110::PreambleLength::Preamble_4096, modm::Dw3110::StartFrameDelimiter::Decawave_8));
+	if (!ret2) { MODM_LOG_ERROR << "Failed to initialize Dw3110 Number 2" << modm::endl; }
 
 	if (!ret || !ret2)
 	{
@@ -52,9 +56,9 @@ main()
 	}
 
 	std::array<uint8_t, 5> txdata = {0xDE, 0xAD, 0xBE, 0xEF, 0x00};
-	std::array<uint8_t, 5> rxdata = {};
+	std::array<uint8_t, 32> rxdata = {};
 	std::span<const uint8_t, 5> view{txdata};
-	std::span<uint8_t, 5> recv{rxdata};
+	std::span<uint8_t, 32> recv{rxdata};
 	MODM_LOG_INFO << "Starting ping pong..." << modm::endl;
 	while (true)
 	{
