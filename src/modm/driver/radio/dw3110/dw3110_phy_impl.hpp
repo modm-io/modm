@@ -40,14 +40,6 @@ modm::Dw3110Phy<SpiMaster, Cs>::initialize(Dw3110::Channel channel, Dw3110::Prea
 	MODM_LOG_DEBUG << "Initializing..." << modm::endl;
 	RF_WAIT_UNTIL(this->acquireMaster());
 
-	// Check if SPIRDY returns a correct value
-	RF_CALL(fetchSystemStatus());
-	if (!((uint64_t)Dw3110::SystemStatusBits::SPIRDY & system_status))  // Check SPIRDY
-	{
-		MODM_LOG_DEBUG << "Not ready!" << modm::endl;
-		this->releaseMaster();
-		RF_RETURN(false);
-	}
 	// Loop until valid state
 	// TODO add exit on failure
 	MODM_LOG_DEBUG << "Waiting on system ready..." << modm::endl;
@@ -57,17 +49,27 @@ modm::Dw3110Phy<SpiMaster, Cs>::initialize(Dw3110::Channel channel, Dw3110::Prea
 	{
 		MODM_LOG_DEBUG << "Device already active, resetting!" << modm::endl;
 		RF_CALL(sendCommand<Dw3110::FastCommand::CMD_TXRXOFF>());
+		timeout.restart(10ms);
+		RF_WAIT_UNTIL(timeout.execute());
 	}
 
+	timeout.restart(1ms);
 	while (chip_state != Dw3110::SystemState::IDLE_RC &&
 		   chip_state != Dw3110::SystemState::IDLE_PLL)
 	{
+		if (timeout.execute())
+		{
+			MODM_LOG_DEBUG << "Timeout waiting for IDLE State!" << (int)chip_state << modm::endl;
+			this->releaseMaster();
+			RF_RETURN(false);
+		}
 		RF_YIELD();
-		fetchSystemStatus();
+		fetchChipState();
 	}
 	if (!RF_CALL(testSPIConnection()))
 	{
 		this->releaseMaster();
+		MODM_LOG_DEBUG << "Failed SPI connection test!" << modm::endl;
 		RF_RETURN(false);
 	}
 
