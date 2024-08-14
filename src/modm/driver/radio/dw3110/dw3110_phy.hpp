@@ -40,81 +40,56 @@ class Dw3110Phy : public modm::SpiDevice<SpiMaster>, protected modm::NestedResum
 public:
 	// Unsupported Features: AES encryption, Double buffering, GPIO, Temperature and Voltage, Pulse
 	// Generator calibration, RX antenna delay temp compensation, Soft reset, Packet filtering,
-	// Sleep, Sniff mode
+	// Sleep, Sniff mode, Delayed transmission, STS
 
-	// Notes:
-	// Communication is little endian!
-	// IRQ Pin floats when in SLEEP/DEEPSLEEP
-	// TODO Sts, Rx/Tx Timestamps
-	// CMD_TRXOFF disabled TX/RX states
-	// KICK for OTP may not be doing anything
-	// TODO Find default value of RF_RX_CTRL_HI for setting to ch5
-	// TODO Set RF_RX_CTRL_HI to 0x08B5A833 for ch9
 	Dw3110Phy();
 
 	// Set the UWB channel used
-	modm::ResumableResult<void> setChannel(Dw3110::Channel);
+	modm::ResumableResult<void>
+	setChannel(Dw3110::Channel channel);
 
-	// Change Header format to non-standard to allow 1023 Byte payloads instead of default 127
-	// TODO set PHR_MODE in SYS_CFG
+	// Change Header format to non-standard to allow 1021 Byte payloads instead of default 125
 	modm::ResumableResult<void>
 	setEnableLongFrames(bool value);
 
 	// Send the PHR at 6.8Mbps
 	// By default the PHR is always sent at 850kb/s
-	// TODO set PHR_6M8 in SYS_CFG
 	modm::ResumableResult<void>
 	setSendHeaderFast(bool value);
 
 	// Set the timeout to wait on arriving packets after startReceive()
 	//  0 = No Timeout
-	// TODO Set RXWTOE in SYS_CFG
-	// TODO Write timeout to RX_FWTO
-	// TODO register resolution is ~1µs
+	// Register resolution is ~1µs
+	// TODO test
 	modm::ResumableResult<void>
-	setReceiveWaitTimeout(modm::PreciseClock::duration duration);
+	setReceiveWaitTimeout(modm::chrono::micro_clock::duration duration);
 
 	// Set whether to stay in receive mode after receive failure
-	// TODO Set RXAUTR in SYS_CFG
+	// TODO test
 	modm::ResumableResult<void>
 	setReenableOnRxFailure(bool value);
 
 	// Set the time spent listening for competing transmissions on CCA commands
 	// Unit is in counts of PAC symbols
-	// TODO write to PRE_TOC
+	// TODO test
 	modm::ResumableResult<void>
 	setCCATimeout(uint16_t timeout);
 
 	// Enable the device to automatically respond to any received frames with an ACK
-	// TODO set AUTO_ACK in SYS_CFG
+	// TODO test
 	modm::ResumableResult<void>
 	setEnableAutoAcknowledge(bool value);
-
-	// Set whether the device expects and sends an STS in between SDF and PHR
-	// Must be the same on receiving and transmitting devices.
-	// Other STS modes are unsupported by this driver as of now
-	// TODO set value 1/0 to CP_SPC in SYS_CFG
-	modm::ResumableResult<void>
-	setEnableSTS(bool value);
-
-	// Set whether to use a user defined key for the STS or a predefined key
-	// The predefined key is hard coded across all DW3000 and as such not secure!
-	// The key is supposedly optimized for ToA performance (e.g Ranging)
-	// TODO set CP_SDC in SYS_CFG
-	modm::ResumableResult<void>
-	setSTSIgnoreKey(bool value);
 
 	// Enable a faster TX/RX turnaround.
 	// The Frame will be set ready before computation of ToA data has finished and any ACKs will be
 	// sent
 	// Time of Arrival may not be ready when the frame is made available
-	// TODO set FAST_AAT in SYS_CFG
+	// TODO test
 	modm::ResumableResult<void>
 	setEnableFastTurnaround(bool value);
 
 	// Read the value of the internal chip clock
-	// TODO write SYS_TIME to clear latched value
-	// TODO read SYS_TIME
+	// TODO test
 	modm::ResumableResult<uint32_t>
 	readChipTime();
 
@@ -126,37 +101,25 @@ public:
 
 	// Get the timestamp of the last arrived packet.
 	// This timestamp already has various correction factors applied to it.
-	// TODO read RX_TIME
-	// TODO the registers cannot be read in one! (assuming only the jump to Raw is invalid)
+	// It is given in ~15.65 picoseconds per unit
 	modm::ResumableResult<uint64_t>
 	getReceiveTimestamp();
 
 	// Analogous to getReceiveTimestamp
-	// TODO read TX_TIME
 	modm::ResumableResult<uint64_t>
 	getTransmitTimestamp();
 
-	// Get the delay compensation for the antenna
-	// TODO read TX_ANTD
-	modm::ResumableResult<uint16_t>
-	getAntennaDelay();
-
-	// Set the delay compensating for the antenna
-	// Useful for calibration
-	// TODO write to TX_ANTD
-	// TODO write to RX_ANTD in CIA_CONF
-	modm::ResumableResult<void> setAntennaDelay(uint16_t);
-
 	// Set the time between RX of a packet and the TX of the acknowledgement
 	// Specified in number of preamble symbols, so time depends on the PRF
-	// TODO write to ACK_TIM in ACK_RESP_T
+	// TODO test
 	modm::ResumableResult<void>
 	setAcknowledgeTurnaround(uint8_t time);
 
 	// Set the time between a transmission and the start of RX on any of the RX after TX commands
 	// This can be used to delay turning on of the receiver after transmission to save on power.
-	// TODO write value to W4R_TIM in ACK_RESP_T
-	modm::ResumableResult<void> setWaitForResponseTime(modm::PreciseClock::duration);
+	// TODO test
+	modm::ResumableResult<void>
+	setWaitForResponseTime(modm::PreciseClock::duration time);
 
 	// Set the start frame delimiter used by the chip
 	modm::ResumableResult<void>
@@ -166,55 +129,6 @@ public:
 	// Note that this implicitly sets the PRF as codes >8 use the 64MHz PRF instead of 16MHz
 	modm::ResumableResult<void>
 	setPreambleCode(Dw3110::PreambleCode rx, Dw3110::PreambleCode tx);
-
-	// Set the STS length in multiples of 8, each block taking ~1µs to transmit
-	// Note a value of 0 equals 8 blocks
-	// Note values lower than 3 are not supported
-	// TODO write to CPS_LEN in STS_CFG
-	modm::ResumableResult<void>
-	setSTSLength(uint8_t length);
-
-	// Load the STS IV into the AES Block, resetting any counter
-	// The STS transmission will cause the lower bits of the IV in the AES block to be incremented
-	// If Receiver and Transmitter are out of sync, this will cause failures and degrade ToA
-	// This resets the loaded value to the one stored in STS_IV
-	// TODO set bit LOAD_IV in STS_CTRL
-	modm::ResumableResult<void>
-	loadSTSIV();
-
-	// Reset the counter in the AES Block to before the last transmission
-	// See loadSTSIV
-	// TODO set bit RST_LAST in STS_CTRL
-	modm::ResumableResult<void>
-	useLastSTSCounter();
-
-	// Read the quality of the last received STS
-	// If this is degraded, ToA may be inaccurate
-	// TODO find out what the values mean
-	// TODO read ACC_QUAL in STS_STS
-	modm::ResumableResult<uint16_t>
-	getSTSQuality();
-
-	// Set the AES key used for generating the STS
-	// TODO explain and implement
-	modm::ResumableResult<void>
-	setSTSKey(const std::array<uint8_t, 16>&);
-
-	// Set the AES IVs used for generating the STS
-	// TODO explain and implement
-	modm::ResumableResult<void>
-	setSTSIV(const std::array<uint8_t, 16>&);
-
-	// Get the STS time of arrival computet by the CIR
-	// TODO read STS_TS
-	modm::ResumableResult<uint64_t>
-	getSTSTimestamp();
-
-	// Get the associated status bits for the STS timestamp
-	// true for an okay ToA, false if failed for any reason
-	// TODO read STS_TOAST
-	modm::ResumableResult<bool>
-	getSTSStatus();
 
 	// Read the reported state of the chip
 	modm::ResumableResult<Dw3110::SystemState>
@@ -235,41 +149,27 @@ public:
 			   Dw3110::PreambleLength plen = Dw3110::PreambleLength::Preamble_64,
 			   Dw3110::StartFrameDelimiter sfd = Dw3110::StartFrameDelimiter::IEEE802_15_4z_8);
 
+	// Set the chip into receive mode
 	modm::ResumableResult<void>
 	startReceive();
 
-	// TODO check RXFR and RXFCG
+	// Check if a packet has been successfully received
 	modm::ResumableResult<bool>
-	packetReady();  // TODO
+	packetReady();
 
+	// Copy received packet into the provided payload buffer, clear packet received flags
 	modm::ResumableResult<bool>
 	fetchPacket(std::span<uint8_t> payload, size_t& payload_len);
 
-	template<size_t Len>
-	bool
-	transmitBlocking(const std::span<const uint8_t, Len> payload, size_t payload_len);
-
-	// TODO allow setting of ranging bit TR
-	// TODO allow setting of bitrate TXBR
-	// TODO set LOAD_IV in STS_CTRL if STS is enabled
-	// TODO add 2 to TXFlen to allow for CRC since DIS_FCS_TX is not set
-	// TODO allow delayed transmission
+	// Transmit a given package using the current configuration
+	// fast parameter decides if the data portion is sent at 850kbps or 6.8Mbps
 	template<size_t Len>
 	modm::ResumableResult<bool>
-	transmit(const std::span<const uint8_t, Len> payload, size_t payload_len);
+	transmit(const std::span<const uint8_t, Len> payload, size_t payload_len, bool fast = true);
 
 	// Read the current system status register
 	modm::ResumableResult<Dw3110::SystemStatus>
 	getStatus();
-
-	// TODO change enum
-	// TODO write resulting value to SYS_ENABLE to change config of IRQ Pin
-	modm::ResumableResult<void>
-	setInterrupts(Dw3110::SystemStatus bits);
-
-	// TODO write 1s to SYS_STATUS to reset any bits
-	modm::ResumableResult<void>
-	resetStatus(Dw3110::SystemStatus bits);
 
 private:
 	// Only load configuration independent stuff, everything else should be initialized when
@@ -277,38 +177,49 @@ private:
 	modm::ResumableResult<void>
 	loadOTP();
 
+	// Perform some test writes and readbacks over the SPI interface
 	modm::ResumableResult<bool>
 	testSPIConnection();
 
+	// Helper function checking equality of two spans
 	template<size_t Len>
 	bool
 	checkResult(std::span<const uint8_t, Len> expected, std::span<const uint8_t, Len> got);
 
+	// Send a command to the chip
 	template<Dw3110::FastCommand Cmd>
 	modm::ResumableResult<void>
 	sendCommand();
 
+	// Recompute the SFD TOC
 	modm::ResumableResult<void>
 	setRX_SFD_TOC();
 
+	// Update the local system_status variable
 	modm::ResumableResult<void>
 	fetchSystemStatus();
 
+	// Update the local chip_state variable
 	modm::ResumableResult<void>
 	fetchChipState();
 
+	// Read a variable from the OTP memory
 	template<Dw3110::OTPAddr Addr>
 	modm::ResumableResult<void>
 	readOTPMemory(std::span<uint8_t, 4> out);
 
+	// Read a variable from a register
 	template<Dw3110::Register Reg, size_t Len, size_t Offset = 0>
 	modm::ResumableResult<void>
 	readRegister(std::span<uint8_t, Len> out);
 
+	// Read a number of bytes from a register bank, useful for RX buffers and other large read
+	// transfers
 	template<Dw3110::RegisterBank Reg>
 	modm::ResumableResult<void>
 	readRegisterBank(std::span<uint8_t> out, size_t len);
 
+	// Write a variable to a register
 	template<Dw3110::Register Reg, size_t Len, size_t Offset = 0>
 	modm::ResumableResult<void>
 	writeRegister(const std::span<const uint8_t, Len> val);
@@ -326,6 +237,8 @@ private:
 	writeRegisterMasked(const std::span<const uint8_t, Len> or_mask,
 						const std::span<const uint8_t, Len> and_mask);
 
+	// Write a number of bytes to a register bank, useful for TX buffers and other large write
+	// transfers
 	template<Dw3110::RegisterBank Reg>
 	modm::ResumableResult<void>
 	writeRegisterBank(const std::span<const uint8_t> val, size_t len);
@@ -338,7 +251,8 @@ private:
 	std::array<uint8_t, 16> scratch{};
 	std::array<uint8_t, 6> sys_status{}, tx_info{};
 	std::array<uint8_t, 2> tx_buffer{}, chan_ctrl{}, rx_sfd_toc{};
-	std::array<uint8_t, 4> otp_read{}, rx_cal_res{}, sys_state{}, ldo_config{}, temp_rw{}, rx_finfo{};
+	std::array<uint8_t, 4> otp_read{}, rx_cal_res{}, sys_state{}, ldo_config{}, temp_rw{},
+		rx_finfo{};
 	std::array<uint8_t, 1> xtal{}, bias_ctrl{}, rx_cal_sts{};
 };
 

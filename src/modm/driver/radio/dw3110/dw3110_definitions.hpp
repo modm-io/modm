@@ -224,7 +224,7 @@ struct Dw3110
 	static constexpr Register TX_FCTRL{.bank = GEN_CFG_AES_0, .offset = 0x24, .length = 6};
 	static constexpr Register DX_TIME{.bank = GEN_CFG_AES_0, .offset = 0x2C, .length = 4};
 	static constexpr Register DREF_TIME{.bank = GEN_CFG_AES_0, .offset = 0x30, .length = 4};
-	static constexpr Register RX_FTWO{.bank = GEN_CFG_AES_0, .offset = 0x34, .length = 3};
+	static constexpr Register RX_FWTO{.bank = GEN_CFG_AES_0, .offset = 0x34, .length = 3};
 	static constexpr Register SYS_CTRL{.bank = GEN_CFG_AES_0, .offset = 0x38, .length = 1};
 	static constexpr Register SYS_ENABLE{.bank = GEN_CFG_AES_0, .offset = 0x3C, .length = 6};
 	static constexpr Register SYS_STATUS{.bank = GEN_CFG_AES_0, .offset = 0x44, .length = 6};
@@ -350,6 +350,7 @@ struct Dw3110
 	static constexpr Register OTP_SRDATA{.bank = OTP_IF, .offset = 0x14, .length = 4};
 
 	// TODO CIA 0-3
+	static constexpr Register CIA_CONF{.bank = CIA_2, .offset = 0x0, .length = 4};
 	static constexpr Register STS_CONF_1{.bank = CIA_2, .offset = 0x16, .length = 4};
 
 	// Subregisters for DIG_DIAG

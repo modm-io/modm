@@ -132,6 +132,8 @@ modm::Dw3110Phy<SpiMaster, Cs>::initialize(Dw3110::Channel channel, Dw3110::Prea
 	RF_CALL(setPreambleCode(pcode, pcode));
 	RF_CALL(setPreambleLength(plen));
 	RF_CALL(setSFD(sfd));
+	RF_CALL(setEnableLongFrames(false));
+	RF_CALL(setSendHeaderFast(false));
 	MODM_LOG_DEBUG << "System ready!" << modm::endl;
 
 	this->releaseMaster();
@@ -242,6 +244,190 @@ modm::Dw3110Phy<SpiMaster, Cs>::testSPIConnection()
 	MODM_LOG_DEBUG << "SPI connection works!" << modm::endl;
 	this->releaseMaster();
 	RF_END_RETURN(true);
+}
+
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<void>
+modm::Dw3110Phy<SpiMaster, Cs>::setEnableLongFrames(bool value)
+{
+	RF_BEGIN()
+	if (value)
+	{
+		constexpr static uint8_t or_mask_true[] = {0x10};
+		constexpr static uint8_t and_mask_true[] = {0xFF};
+		RF_CALL(writeRegisterMasked<Dw3110::SYS_CFG, 1>(or_mask_true, and_mask_true));
+	} else
+	{
+		constexpr static uint8_t or_mask_false[] = {0x00};
+		constexpr static uint8_t and_mask_false[] = {0xEF};
+		RF_CALL(writeRegisterMasked<Dw3110::SYS_CFG, 1>(or_mask_false, and_mask_false));
+	}
+	RF_END();
+}
+
+// TODO Write timeout to RX_FWTO
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<void>
+modm::Dw3110Phy<SpiMaster, Cs>::setReceiveWaitTimeout(modm::chrono::micro_clock::duration duration)
+{
+	RF_BEGIN()
+	if (duration.count() == 0)
+	{
+		constexpr static uint8_t or_mask[] = {0x00};
+		constexpr static uint8_t and_mask[] = {0xDF};
+		RF_CALL(writeRegisterMasked<Dw3110::SYS_CFG, 1, 1>(or_mask, and_mask));
+	} else
+	{
+		scratch[0] = (duration.count() >> 0) & 0xFF;
+		scratch[1] = (duration.count() >> 8) & 0xFF;
+		scratch[2] = (duration.count() >> 16) & 0xFF;
+		RF_CALL(writeRegister<Dw3110::RX_FWTO, 3>(std::span<uint8_t>(scratch).first<3>()));
+
+		constexpr static uint8_t or_mask[] = {0x20};
+		constexpr static uint8_t and_mask[] = {0xFF};
+		RF_CALL(writeRegisterMasked<Dw3110::SYS_CFG, 1, 1>(or_mask, and_mask));
+	}
+	RF_END();
+}
+
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<void>
+modm::Dw3110Phy<SpiMaster, Cs>::setSendHeaderFast(bool value)
+{
+	RF_BEGIN()
+	if (value)
+	{
+		constexpr static uint8_t or_mask_true[] = {0x20};
+		constexpr static uint8_t and_mask_true[] = {0xFF};
+		RF_CALL(writeRegisterMasked<Dw3110::SYS_CFG, 1>(or_mask_true, and_mask_true));
+	} else
+	{
+		constexpr static uint8_t or_mask_false[] = {0x00};
+		constexpr static uint8_t and_mask_false[] = {0xDF};
+		RF_CALL(writeRegisterMasked<Dw3110::SYS_CFG, 1>(or_mask_false, and_mask_false));
+	}
+	RF_END();
+}
+
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<void>
+modm::Dw3110Phy<SpiMaster, Cs>::setReenableOnRxFailure(bool value)
+{
+	RF_BEGIN()
+	if (value)
+	{
+		constexpr static uint8_t or_mask_true[] = {0x04};
+		constexpr static uint8_t and_mask_true[] = {0xFF};
+		RF_CALL(writeRegisterMasked<Dw3110::SYS_CFG, 1, 1>(or_mask_true, and_mask_true));
+	} else
+	{
+		constexpr static uint8_t or_mask_false[] = {0x00};
+		constexpr static uint8_t and_mask_false[] = {0xFB};
+		RF_CALL(writeRegisterMasked<Dw3110::SYS_CFG, 1, 1>(or_mask_false, and_mask_false));
+	}
+	RF_END();
+}
+
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<void>
+modm::Dw3110Phy<SpiMaster, Cs>::setCCATimeout(uint16_t timeout)
+{
+	RF_BEGIN();
+	RF_CALL(writeRegister<Dw3110::PRE_TOC, 2>(std::span<uint8_t, 2>(&timeout)));
+	RF_END();
+}
+
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<void>
+modm::Dw3110Phy<SpiMaster, Cs>::setEnableAutoAcknowledge(bool value)
+{
+	RF_BEGIN()
+	if (value)
+	{
+		constexpr static uint8_t or_mask_true[] = {0x08};
+		constexpr static uint8_t and_mask_true[] = {0xFF};
+		RF_CALL(writeRegisterMasked<Dw3110::SYS_CFG, 1, 1>(or_mask_true, and_mask_true));
+	} else
+	{
+		constexpr static uint8_t or_mask_false[] = {0x00};
+		constexpr static uint8_t and_mask_false[] = {0xF7};
+		RF_CALL(writeRegisterMasked<Dw3110::SYS_CFG, 1, 1>(or_mask_false, and_mask_false));
+	}
+	RF_END();
+}
+
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<void>
+modm::Dw3110Phy<SpiMaster, Cs>::setEnableFastTurnaround(bool value)
+{
+	RF_BEGIN()
+	if (value)
+	{
+		constexpr static uint8_t or_mask_true[] = {0x04};
+		constexpr static uint8_t and_mask_true[] = {0xFF};
+		RF_CALL(writeRegisterMasked<Dw3110::SYS_CFG, 1, 2>(or_mask_true, and_mask_true));
+	} else
+	{
+		constexpr static uint8_t or_mask_false[] = {0x04};
+		constexpr static uint8_t and_mask_false[] = {0xFB};
+		RF_CALL(writeRegisterMasked<Dw3110::SYS_CFG, 1, 2>(or_mask_false, and_mask_false));
+	}
+	RF_END();
+}
+
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<uint32_t>
+modm::Dw3110Phy<SpiMaster, Cs>::readChipTime()
+{
+	RF_BEGIN();
+	const static uint8_t zero[] = {0x0, 0x0, 0x0, 0x0};
+	RF_CALL(writeRegister<Dw3110::SYS_TIME, 4>(zero));
+	RF_CALL(readRegister<Dw3110::SYS_TIME, 4>(std::span<uint8_t>(scratch).first<4>()));
+	RF_END_RETURN((uint32_t)scratch[0] | ((uint32_t)scratch[1] << 8) |
+				  ((uint32_t)scratch[2] << 16) | ((uint32_t)scratch[3] << 24));
+}
+
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<uint64_t>
+modm::Dw3110Phy<SpiMaster, Cs>::getReceiveTimestamp()
+{
+	RF_BEGIN();
+	RF_CALL(readRegister<Dw3110::RX_TIME, 5>(std::span<uint8_t>(scratch).first<5>()));
+	RF_END_RETURN((uint64_t)scratch[0] | ((uint64_t)scratch[1] << 8) |
+				  ((uint64_t)scratch[2] << 16) | ((uint64_t)scratch[3] << 24) |
+				  ((uint64_t)scratch[4] << 32));
+}
+
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<uint64_t>
+modm::Dw3110Phy<SpiMaster, Cs>::getTransmitTimestamp()
+{
+	RF_BEGIN();
+	RF_CALL(readRegister<Dw3110::TX_TIME, 5>(std::span<uint8_t>(scratch).first<5>()));
+	RF_END_RETURN((uint64_t)scratch[0] | ((uint64_t)scratch[1] << 8) |
+				  ((uint64_t)scratch[2] << 16) | ((uint64_t)scratch[3] << 24) |
+				  ((uint64_t)scratch[4] << 32));
+}
+
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<void>
+modm::Dw3110Phy<SpiMaster, Cs>::setAcknowledgeTurnaround(uint8_t time)
+{
+	RF_BEGIN();
+	RF_CALL(writeRegister<Dw3110::ACK_RESP_T, 1, 3>(std::span<uint8_t, 1>(&time)));
+	RF_END();
+}
+
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<void>
+modm::Dw3110Phy<SpiMaster, Cs>::setWaitForResponseTime(modm::PreciseClock::duration time)
+{
+	RF_BEGIN();
+	scratch[0] = time.count() & 0xFF;
+	scratch[1] = (time.count() >> 8) & 0xFF;
+	scratch[2] = (time.count() >> 16) & 0x0F;
+	RF_CALL(writeRegister<Dw3110::ACK_RESP_T, 3>(std::span<uint8_t>(scratch).first<3>));
+	RF_END();
 }
 
 template<typename SpiMaster, typename Cs>
@@ -458,6 +644,8 @@ modm::Dw3110Phy<SpiMaster, Cs>::setChannel(Dw3110::Channel channel)
 		constexpr static uint8_t pll_cfg_magic[] = {0x3c, 0x0f};
 		RF_CALL(writeRegister<Dw3110::PLL_CFG, 2>(pll_cfg_magic));
 
+		// TODO Set RF_RX_CTRL_HI to 0x08B5A833 for ch9
+
 		// Actually set Channel
 		constexpr static uint8_t chan_ctrl_or[] = {0x01};
 		constexpr static uint8_t chan_ctrl_and[] = {0xFF};
@@ -477,6 +665,8 @@ modm::Dw3110Phy<SpiMaster, Cs>::setChannel(Dw3110::Channel channel)
 
 		constexpr static uint8_t pll_cfg_magic[] = {0x3c, 0x1f};
 		RF_CALL(writeRegister<Dw3110::PLL_CFG, 2>(pll_cfg_magic));
+
+		// TODO Find default value of RF_RX_CTRL_HI for setting to ch5
 
 		// Actually set Channel
 		constexpr static uint8_t chan_ctrl_or[] = {0x00};
@@ -629,18 +819,9 @@ modm::Dw3110Phy<SpiMaster, Cs>::setRX_SFD_TOC()
 
 template<typename SpiMaster, typename Cs>
 template<size_t Len>
-bool
-modm::Dw3110Phy<SpiMaster, Cs>::transmitBlocking(const std::span<const uint8_t, Len> payload,
-												 size_t payload_len)
-{
-	return RF_CALL_BLOCKING(transmit(payload, payload_len));
-}
-
-template<typename SpiMaster, typename Cs>
-template<size_t Len>
 modm::ResumableResult<bool>
 modm::Dw3110Phy<SpiMaster, Cs>::transmit(const std::span<const uint8_t, Len> payload,
-										 size_t payload_len)
+										 size_t payload_len, bool fast)
 {
 	RF_BEGIN();
 	if (payload_len > payload.size()) RF_RETURN(false);
@@ -667,7 +848,9 @@ modm::Dw3110Phy<SpiMaster, Cs>::transmit(const std::span<const uint8_t, Len> pay
 	RF_CALL(readRegister<Dw3110::TX_FCTRL, 6>(tx_info));
 	payload_len += fcs_len;
 	tx_info[0] = (uint8_t)(0xFF & payload_len);  // Set Payload length
-	tx_info[1] = (tx_info[1] & 0xFC) | ((uint8_t)(payload_len >> 8) & 0x03);
+	tx_info[1] = (tx_info[1] & 0xFB) | ((uint8_t)(payload_len >> 8) & 0x03);
+	
+	if (fast) tx_info[1] |= 0x04; //Set TXBR if fast is selected
 
 	tx_info[2] = 0;  // Clear TXB_OFFSET
 	tx_info[3] &= 0x3;
