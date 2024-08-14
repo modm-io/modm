@@ -168,10 +168,10 @@ struct Dw3110
 		CCA_FAIL = (1ll << 44),
 	};
 
-	static constexpr OTPAddr XTAL_TRIM{.or_mask = {0x00, 0x13}, .and_mask = {0xFC, 0x13}};
-	static constexpr OTPAddr BIASTUNE_CAL{.or_mask = {0x00, 0x0A}, .and_mask = {0xFC, 0x0A}};
-	static constexpr OTPAddr LDOTUNE_CAL_1{.or_mask = {0x00, 0x0A}, .and_mask = {0xFC, 0x0A}};
-	static constexpr OTPAddr LDOTUNE_CAL_2{.or_mask = {0x00, 0x0A}, .and_mask = {0xFC, 0x0A}};
+	static constexpr OTPAddr XTAL_TRIM{.or_mask = {0x13, 0x00}, .and_mask = {0x13, 0xFC}};
+	static constexpr OTPAddr BIASTUNE_CAL{.or_mask = {0x0A, 0x00}, .and_mask = {0x0A, 0xFC}};
+	static constexpr OTPAddr LDOTUNE_CAL_1{.or_mask = {0x04, 0x00}, .and_mask = {0x04, 0xFC}};
+	static constexpr OTPAddr LDOTUNE_CAL_2{.or_mask = {0x05, 0x00}, .and_mask = {0x05, 0xFC}};
 
 	struct RegisterBank
 	{
@@ -259,7 +259,8 @@ struct Dw3110
 	static constexpr Register STS_IV{.bank = STS_CONFIG, .offset = 0x1C, .length = 16};
 
 	// Subregisters for RX_TUNE
-	static constexpr Register DGC_CFG{.bank = RX_TUNE, .offset = 0x18, .length = 2};  // Confusing names i know
+	static constexpr Register DGC_CFG{
+		.bank = RX_TUNE, .offset = 0x18, .length = 2};  // Confusing names i know
 	static constexpr Register DGC_CFG0{.bank = RX_TUNE, .offset = 0x1C, .length = 4};
 	static constexpr Register DGC_CFG1{.bank = RX_TUNE, .offset = 0x20, .length = 4};
 	static constexpr Register DGC_LUT_0{.bank = RX_TUNE, .offset = 0x38, .length = 4};
@@ -304,7 +305,8 @@ struct Dw3110
 	static constexpr Register RF_ENABLE{.bank = RF_CONF, .offset = 0x0, .length = 4};
 	static constexpr Register RF_CTRL_MASK{.bank = RF_CONF, .offset = 0x4, .length = 4};
 	static constexpr Register RF_SWITCH{.bank = RF_CONF, .offset = 0x14, .length = 4};
-	static constexpr Register RF_RX_CTRL_HI{.bank = RF_CONF, .offset = 0x10, .length = 4}; //Undocumented
+	static constexpr Register RF_RX_CTRL_HI{
+		.bank = RF_CONF, .offset = 0x10, .length = 4};  // Undocumented
 	static constexpr Register RF_TX_CTRL_1{.bank = RF_CONF, .offset = 0x1A, .length = 1};
 	static constexpr Register RF_TX_CTRL_2{.bank = RF_CONF, .offset = 0x1C, .length = 4};
 	static constexpr Register TX_TEST{.bank = RF_CONF, .offset = 0x28, .length = 1};

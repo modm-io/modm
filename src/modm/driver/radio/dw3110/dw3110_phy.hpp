@@ -235,9 +235,6 @@ public:
 			   Dw3110::PreambleLength plen = Dw3110::PreambleLength::Preamble_64,
 			   Dw3110::StartFrameDelimiter sfd = Dw3110::StartFrameDelimiter::IEEE802_15_4z_8);
 
-	modm::ResumableResult<bool>
-	isCalibrated();  // TODO
-
 	modm::ResumableResult<void>
 	startReceive();
 
@@ -245,9 +242,8 @@ public:
 	modm::ResumableResult<bool>
 	packetReady();  // TODO
 
-	template<size_t Len>
 	modm::ResumableResult<bool>
-	fetchPacket(std::span<uint8_t, Len> payload, size_t& payload_len);
+	fetchPacket(std::span<uint8_t> payload, size_t& payload_len);
 
 	template<size_t Len>
 	bool
@@ -262,7 +258,7 @@ public:
 	modm::ResumableResult<bool>
 	transmit(const std::span<const uint8_t, Len> payload, size_t payload_len);
 
-	//Read the current system status register
+	// Read the current system status register
 	modm::ResumableResult<Dw3110::SystemStatus>
 	getStatus();
 
@@ -280,6 +276,13 @@ private:
 	// changing those parts
 	modm::ResumableResult<void>
 	loadOTP();
+
+	modm::ResumableResult<bool>
+	testSPIConnection();
+
+	template<size_t Len>
+	bool
+	checkResult(std::span<const uint8_t, Len> expected, std::span<const uint8_t, Len> got);
 
 	template<Dw3110::FastCommand Cmd>
 	modm::ResumableResult<void>
@@ -302,13 +305,20 @@ private:
 	modm::ResumableResult<void>
 	readRegister(std::span<uint8_t, Len> out);
 
-	template<Dw3110::RegisterBank Reg, size_t Len>
+	template<Dw3110::RegisterBank Reg>
 	modm::ResumableResult<void>
-	readRegisterBank(std::span<uint8_t, Len> out);
+	readRegisterBank(std::span<uint8_t> out, size_t len);
 
 	template<Dw3110::Register Reg, size_t Len, size_t Offset = 0>
 	modm::ResumableResult<void>
 	writeRegister(const std::span<const uint8_t, Len> val);
+
+	// Simple implementation of read modify write using and and or masks
+	// Use on registers that do not support native write register masked
+	template<Dw3110::Register Reg, size_t Len, size_t Offset = 0>
+	modm::ResumableResult<void>
+	readModifyWriteRegister(const std::span<const uint8_t, Len> or_mask,
+							const std::span<const uint8_t, Len> and_mask);
 
 	// Do not use to clear "write 1 to clear" bits (2.3.1.2 Table 3)
 	template<Dw3110::Register Reg, size_t Len, size_t Offset = 0>
@@ -316,20 +326,20 @@ private:
 	writeRegisterMasked(const std::span<const uint8_t, Len> or_mask,
 						const std::span<const uint8_t, Len> and_mask);
 
-	template<Dw3110::RegisterBank Reg, size_t Len>
+	template<Dw3110::RegisterBank Reg>
 	modm::ResumableResult<void>
-	writeRegisterBank(const std::span<const uint8_t, Len> val);
+	writeRegisterBank(const std::span<const uint8_t> val, size_t len);
 
-	ShortPreciseTimeout timeout;
+	PreciseTimeout timeout;
 
 	Dw3110::SystemStatus system_status{0};
-	uint16_t preamble_len{0}, sfd_len{0}, pac_len{0}, sfd_toc_val{0};
+	uint16_t preamble_len{0}, sfd_len{0}, pac_len{0}, sfd_toc_val{0}, fcs_len{2};
 	Dw3110::SystemState chip_state{Dw3110::SystemState::OFF};
-	std::array<uint8_t, 6> sys_status{};
+	std::array<uint8_t, 16> scratch{};
+	std::array<uint8_t, 6> sys_status{}, tx_info{};
 	std::array<uint8_t, 2> tx_buffer{}, chan_ctrl{}, rx_sfd_toc{};
-	std::array<uint8_t, 4> otp_read{}, rx_cal_res{}, sys_state{}, ldo_config{};
+	std::array<uint8_t, 4> otp_read{}, rx_cal_res{}, sys_state{}, ldo_config{}, temp_rw{}, rx_finfo{};
 	std::array<uint8_t, 1> xtal{}, bias_ctrl{}, rx_cal_sts{};
-	std::array<uint8_t, 6> tx_info{};
 };
 
 }  // namespace modm
