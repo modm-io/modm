@@ -28,7 +28,9 @@ namespace modm
 
 /**
  * Hardware abstraction layer for DW3110
- *
+ * Unsupported Features: AES encryption, Double buffering, GPIO, Temperature and Voltage, Pulse
+ * Generator calibration, RX antenna delay temp compensation, Soft reset, Packet filtering,
+ * Sleep, Sniff mode, Delayed transmission, STS
  * @ingroup  modm_driver_dw3110
  * @author   Elias H.
  * @author   Raphael Lehmann
@@ -38,10 +40,6 @@ template<typename SpiMaster, typename Cs>
 class Dw3110Phy : public modm::SpiDevice<SpiMaster>, protected modm::NestedResumable<6>
 {
 public:
-	// Unsupported Features: AES encryption, Double buffering, GPIO, Temperature and Voltage, Pulse
-	// Generator calibration, RX antenna delay temp compensation, Soft reset, Packet filtering,
-	// Sleep, Sniff mode, Delayed transmission, STS
-
 	Dw3110Phy();
 
 	// Set the UWB channel used
@@ -58,7 +56,7 @@ public:
 	setSendHeaderFast(bool value);
 
 	// Set the timeout to wait on arriving packets after startReceive()
-	//  0 = No Timeout
+	// 0 = No Timeout
 	// Register resolution is ~1µs
 	// TODO test
 	modm::ResumableResult<void>
@@ -150,7 +148,7 @@ public:
 			   Dw3110::StartFrameDelimiter sfd = Dw3110::StartFrameDelimiter::IEEE802_15_4z_8);
 
 	// Set the chip into receive mode
-	modm::ResumableResult<void>
+	modm::ResumableResult<bool>
 	startReceive();
 
 	// Check if a packet has been successfully received

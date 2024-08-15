@@ -37,46 +37,41 @@ modm::Dw3110Phy<SpiMaster, Cs>::initialize(Dw3110::Channel channel, Dw3110::Prea
 {
 	using namespace std::chrono_literals;
 	RF_BEGIN();
-	MODM_LOG_DEBUG << "Initializing..." << modm::endl;
 	RF_WAIT_UNTIL(this->acquireMaster());
 
-	// Loop until valid state
-	// TODO add exit on failure
-	MODM_LOG_DEBUG << "Waiting on system ready..." << modm::endl;
 	RF_CALL(fetchChipState());
 	if (chip_state == Dw3110::SystemState::TX || chip_state == Dw3110::SystemState::RX ||
 		chip_state == Dw3110::SystemState::TX_WAIT || chip_state == Dw3110::SystemState::RX_WAIT)
 	{
-		MODM_LOG_DEBUG << "Device already active, resetting!" << modm::endl;
 		RF_CALL(sendCommand<Dw3110::FastCommand::CMD_TXRXOFF>());
-		timeout.restart(10ms);
-		RF_WAIT_UNTIL(timeout.execute());
 	}
 
+	// Loop until valid state
 	timeout.restart(1ms);
 	while (chip_state != Dw3110::SystemState::IDLE_RC &&
 		   chip_state != Dw3110::SystemState::IDLE_PLL)
 	{
 		if (timeout.execute())
 		{
-			MODM_LOG_DEBUG << "Timeout waiting for IDLE State!" << (int)chip_state << modm::endl;
+			MODM_LOG_ERROR << "Timeout waiting for IDLE State!" << (int)chip_state << modm::endl;
 			this->releaseMaster();
 			RF_RETURN(false);
 		}
 		RF_YIELD();
 		fetchChipState();
 	}
+
 	if (!RF_CALL(testSPIConnection()))
 	{
 		this->releaseMaster();
-		MODM_LOG_DEBUG << "Failed SPI connection test!" << modm::endl;
+		MODM_LOG_ERROR << "Failed SPI connection test!" << modm::endl;
 		RF_RETURN(false);
 	}
 
+	// Initialize factory programmed defaults
 	RF_CALL(loadOTP());
 
-	// Load magic constants
-	MODM_LOG_DEBUG << "Writing magic constants..." << modm::endl;
+	// Load magic constants mentioned in various places in the manual
 	constexpr static uint8_t rf_tx_ctrl_1_magic[] = {0x0E};
 	RF_CALL(writeRegister<Dw3110::RF_TX_CTRL_1, 1>(rf_tx_ctrl_1_magic));
 
@@ -86,9 +81,8 @@ modm::Dw3110Phy<SpiMaster, Cs>::initialize(Dw3110::Channel channel, Dw3110::Prea
 	constexpr static uint8_t res_b0_magic[] = {0x9B};
 	RF_CALL(writeRegister<Dw3110::STS_CONF_1, 1>(res_b0_magic));
 
-	// constexpr static uint8_t dtune3_magic[] = {0xCC, 0x35, 0x5F, 0xAF};
 	// Magic value from the user manual (8.2.7.4)
-
+	// constexpr static uint8_t dtune3_magic[] = {0xCC, 0x35, 0x5F, 0xAF};
 	// RF_CALL(writeRegister<Dw3110::DTUNE3, 4>(dtune3_magic));
 	// TODO maybe only when sending packets with no payload,
 	// investigate (github.com/egnor/DW3000_notes.md))
@@ -98,17 +92,7 @@ modm::Dw3110Phy<SpiMaster, Cs>::initialize(Dw3110::Channel channel, Dw3110::Prea
 	constexpr static uint8_t or_mask[] = {0x01};
 	RF_CALL(writeRegisterMasked<Dw3110::SEQ_CTRL, 1, 1>(or_mask, and_mask));
 
-	// Wait for a bit to reach IDLE_PLL
-	timeout.restart(1ms);
-	RF_WAIT_UNTIL(timeout.execute());
-	RF_CALL(fetchSystemStatus());
-	// Check if PLL is locked and ready
-	if (!((uint64_t)Dw3110::SystemStatusBits::CPLOCK & system_status))
-	{
-		MODM_LOG_DEBUG << "PLL is not locked!" << modm::endl;
-	}
-
-	// Loop until valid state
+	// Loop until we are in IDLE_PLL
 	timeout.restart(1ms);
 	RF_CALL(fetchChipState());
 	while (chip_state != Dw3110::SystemState::IDLE_PLL)
@@ -116,7 +100,7 @@ modm::Dw3110Phy<SpiMaster, Cs>::initialize(Dw3110::Channel channel, Dw3110::Prea
 		RF_YIELD();
 		if (timeout.execute())
 		{
-			MODM_LOG_DEBUG << "Failed to reach IDLE_PLL State!" << modm::endl;
+			MODM_LOG_ERROR << "Failed to reach IDLE_PLL State!" << modm::endl;
 			this->releaseMaster();
 			RF_RETURN(false);
 		}
@@ -134,7 +118,6 @@ modm::Dw3110Phy<SpiMaster, Cs>::initialize(Dw3110::Channel channel, Dw3110::Prea
 	RF_CALL(setSFD(sfd));
 	RF_CALL(setEnableLongFrames(false));
 	RF_CALL(setSendHeaderFast(false));
-	MODM_LOG_DEBUG << "System ready!" << modm::endl;
 
 	this->releaseMaster();
 	RF_END_RETURN(true);
@@ -146,15 +129,10 @@ modm::Dw3110Phy<SpiMaster, Cs>::testSPIConnection()
 {
 	RF_BEGIN();
 	RF_WAIT_UNTIL(this->acquireMaster());
-	MODM_LOG_DEBUG << "Testing SPI connection..." << modm::endl;
 
 	// Check we actually read registers correctly by checking for the device type
 	constexpr static uint8_t DEV_ID_MATCH[] = {0x03, 0xCA, 0xDE};
 	RF_CALL(readRegister<Dw3110::DEV_ID, 4, 0>(std::span<uint8_t>(scratch).first<4>()));
-
-	MODM_LOG_INFO << "Got Device Type: 0x" << modm::hex;
-	for (size_t i = 0; i < 4; i++) { MODM_LOG_INFO << scratch[3 - i]; }
-	MODM_LOG_INFO << modm::ascii << modm::endl;
 
 	if (!checkResult<3>(DEV_ID_MATCH, std::span<uint8_t>(scratch).subspan<1, 3>()))
 	{
@@ -205,8 +183,6 @@ modm::Dw3110Phy<SpiMaster, Cs>::testSPIConnection()
 
 	// Save Unique device identifier EUI_64
 	RF_CALL(readRegister<Dw3110::EUI_64, 4>(std::span<uint8_t>(scratch).subspan<4, 4>()));
-	MODM_LOG_INFO << "Unique Device ID: 0x" << modm::hex << scratch[7] << scratch[6] << scratch[5]
-				  << scratch[4] << modm::ascii << modm::endl;
 
 	// Run tests on EUI_64 since SCRATCH_RAM does not support masked writes
 	constexpr static uint8_t TEST_PATTERN_00[] = {0x00, 0x00, 0x00, 0x00};
@@ -240,8 +216,7 @@ modm::Dw3110Phy<SpiMaster, Cs>::testSPIConnection()
 
 	// Restore EUI_64
 	RF_CALL(writeRegister<Dw3110::EUI_64, 4>(std::span<uint8_t>(scratch).subspan<4, 4>()));
-
-	MODM_LOG_DEBUG << "SPI connection works!" << modm::endl;
+	
 	this->releaseMaster();
 	RF_END_RETURN(true);
 }
@@ -453,7 +428,6 @@ modm::Dw3110Phy<SpiMaster, Cs>::loadOTP()
 {
 	RF_BEGIN();
 	RF_WAIT_UNTIL(this->acquireMaster());
-	MODM_LOG_DEBUG << "Loading OTP..." << modm::endl;
 
 	// Check LDO and kick if not 0
 	RF_CALL(readOTPMemory<Dw3110::LDOTUNE_CAL_1>(otp_read));
@@ -461,43 +435,34 @@ modm::Dw3110Phy<SpiMaster, Cs>::loadOTP()
 	{
 		RF_CALL(readOTPMemory<Dw3110::LDOTUNE_CAL_2>(otp_read));
 	}
-	if (otp_read[0] != 0 || otp_read[1] != 0 || otp_read[2] != 0 || otp_read[3] != 0)
+	if (otp_read[0] != 0 || otp_read[1] != 0 || otp_read[2] != 0 ||
+		otp_read[3] != 0)  // TODO find default if 0
 	{
 		// Set LDO_KICK
 		constexpr static uint8_t or_mask[] = {0xC0};
 		constexpr static uint8_t and_mask[] = {0xF0};
 		RF_CALL(writeRegisterMasked<Dw3110::OTP_CFG, 1>(or_mask, and_mask));
-	} else
-	{
-		// TODO find default if 0
-		MODM_LOG_DEBUG << "Not writing LDO_KICK, is Zero!" << modm::endl;
 	}
 
 	// Load from OTP according to (github.com/egnor/DW3000_notes.md))
 	// XTAL_TRIM = 0x13 |  Len = 2, need bits 0-5 -> XTAL:0-5
 	RF_CALL(readOTPMemory<Dw3110::XTAL_TRIM>(otp_read));
 	RF_CALL(readRegister<Dw3110::XTAL, 1>(xtal));
-	if (xtal[0] & 0x1F)
+	if (xtal[0] & 0x1F)  // TODO find default if 0
 	{
 		xtal[0] = (xtal[0] & 0xE0) | (otp_read[0] & 0x1F);
 		RF_CALL(writeRegister<Dw3110::XTAL, 1>(xtal));
-	} else
-	{
-		MODM_LOG_DEBUG << "Not writing XTAL_TRIM, is Zero!" << modm::endl;
 	}
 
 	// BIASTUNE_CAL = 0x0A | Len = ?? need bits 16-20 -> BIAS_CTRL:0-5
 	RF_CALL(readOTPMemory<Dw3110::BIASTUNE_CAL>(otp_read));
-	if (otp_read[0] != 0 || otp_read[1] != 0 || otp_read[2] != 0 || otp_read[3] != 0)
+	if (otp_read[0] != 0 || otp_read[1] != 0 || otp_read[2] != 0 ||
+		otp_read[3] != 0)  // TODO find default if 0
 	{
 		// Set BIAS_KICK
 		constexpr static uint8_t or_mask[] = {0x01};
 		constexpr static uint8_t and_mask[] = {0xFF};
 		RF_CALL(writeRegisterMasked<Dw3110::OTP_CFG, 1, 1>(or_mask, and_mask));
-	} else
-	{
-		// TODO find default if 0
-		MODM_LOG_DEBUG << "Not writing BIAS_KICK, is Zero!" << modm::endl;
 	}
 
 	// Fix incomplete bias initialization
@@ -506,11 +471,7 @@ modm::Dw3110Phy<SpiMaster, Cs>::loadOTP()
 	{
 		bias_ctrl[0] = (bias_ctrl[0] & 0xE0) | (otp_read[2] & 0x1F);
 		RF_CALL(writeRegister<Dw3110::BIAS_CTRL, 1>(bias_ctrl));
-	} else
-	{
-		MODM_LOG_DEBUG << "Not fixing BIAS_KICK, is Zero!" << modm::endl;
-	}
-	MODM_LOG_DEBUG << "Finished OTP initialization!" << modm::endl;
+	}  // TODO find default if 0
 	this->releaseMaster();
 	RF_END();
 }
@@ -542,7 +503,6 @@ modm::ResumableResult<bool>
 modm::Dw3110Phy<SpiMaster, Cs>::calibrate()
 {
 	RF_BEGIN();
-	MODM_LOG_DEBUG << "Calibrating...";
 	RF_WAIT_UNTIL(this->acquireMaster());
 
 	// Save LDO configuration
@@ -580,7 +540,6 @@ modm::Dw3110Phy<SpiMaster, Cs>::calibrate()
 		if (timeout.execute())
 		{
 			this->releaseMaster();
-			MODM_LOG_DEBUG << "failed! Timeout!" << modm::endl;
 			RF_RETURN(false);
 		}
 		RF_CALL(readRegister<Dw3110::RX_CAL_STS, 1>(rx_cal_sts));
@@ -595,7 +554,6 @@ modm::Dw3110Phy<SpiMaster, Cs>::calibrate()
 	if (rx_cal_res[0] == 0xFF && rx_cal_res[1] == 0xFF && rx_cal_res[2] == 0xFF &&
 		(rx_cal_res[3] & 0x1F) == 0x1F)
 	{
-		MODM_LOG_DEBUG << " failed! RESI incorrect!" << modm::endl;
 		this->releaseMaster();
 		RF_RETURN(false);
 	}
@@ -604,7 +562,6 @@ modm::Dw3110Phy<SpiMaster, Cs>::calibrate()
 	if (rx_cal_res[0] == 0xFF && rx_cal_res[1] == 0xFF && rx_cal_res[2] == 0xFF &&
 		(rx_cal_res[3] & 0x1F) == 0x1F)
 	{
-		MODM_LOG_DEBUG << " failed! RESQ incorrect!" << modm::endl;
 		this->releaseMaster();
 		RF_RETURN(false);
 	}
@@ -616,7 +573,6 @@ modm::Dw3110Phy<SpiMaster, Cs>::calibrate()
 	constexpr static uint8_t reset_val[] = {0x0, 0x0, 0x2, 0x0};
 	RF_CALL(writeRegister<Dw3110::RX_CAL, 4>(reset_val));
 
-	MODM_LOG_DEBUG << " done!" << modm::endl;
 	this->releaseMaster();
 	RF_END_RETURN(true);
 }
@@ -630,7 +586,6 @@ modm::Dw3110Phy<SpiMaster, Cs>::setChannel(Dw3110::Channel channel)
 
 	if (channel == Dw3110::Channel::Channel9)
 	{
-		MODM_LOG_DEBUG << "Setting Channel 9..." << modm::endl;
 		// Set DGC_KICK and DGC_SEL appropriately
 		constexpr static uint8_t or_mask[] = {0x40, 0x20};
 		constexpr static uint8_t and_mask[] = {0xF0, 0xFF};
@@ -652,7 +607,6 @@ modm::Dw3110Phy<SpiMaster, Cs>::setChannel(Dw3110::Channel channel)
 		RF_CALL(writeRegisterMasked<Dw3110::CHAN_CTRL, 1>(chan_ctrl_or, chan_ctrl_and));
 	} else if (channel == Dw3110::Channel::Channel5)
 	{
-		MODM_LOG_DEBUG << "Setting Channel 5..." << modm::endl;
 		// Set DGC_KICK and DGC_SEL appropriately
 		constexpr static uint8_t or_mask[] = {0x40, 0x00};
 		constexpr static uint8_t and_mask[] = {0xF0, 0xDF};
@@ -690,7 +644,6 @@ modm::Dw3110Phy<SpiMaster, Cs>::setPreambleCode(Dw3110::PreambleCode rx, Dw3110:
 {
 	RF_BEGIN();
 	RF_WAIT_UNTIL(this->acquireMaster());
-	MODM_LOG_DEBUG << "Setting preable code..." << modm::endl;
 
 	// Read modify write pcodes into CHAN_CTRL
 	RF_CALL(readRegister<Dw3110::CHAN_CTRL, 2>(chan_ctrl));
@@ -721,7 +674,6 @@ modm::Dw3110Phy<SpiMaster, Cs>::setPreambleLength(Dw3110::PreambleLength plen)
 {
 	RF_BEGIN();
 	RF_WAIT_UNTIL(this->acquireMaster());
-	MODM_LOG_DEBUG << "Setting preable length..." << modm::endl;
 	// Write length to TX_FCTRL
 	RF_CALL(readRegister<Dw3110::TX_FCTRL, 6>(tx_info));
 	tx_info[1] = (tx_info[1] & 0x0F) | (((uint8_t)plen << 4) & 0xF0);
@@ -788,7 +740,6 @@ modm::Dw3110Phy<SpiMaster, Cs>::setSFD(Dw3110::StartFrameDelimiter sfd)
 {
 	RF_BEGIN();
 	RF_WAIT_UNTIL(this->acquireMaster());
-	MODM_LOG_DEBUG << "Setting Start frame delimiter..." << modm::endl;
 	RF_CALL(readRegister<Dw3110::CHAN_CTRL, 2>(chan_ctrl));
 	chan_ctrl[0] = (chan_ctrl[0] & 0xF9) | (((uint8_t)sfd & 0x03) << 1);
 	RF_CALL(writeRegister<Dw3110::CHAN_CTRL, 2>(chan_ctrl));
@@ -830,7 +781,7 @@ template<typename SpiMaster, typename Cs>
 template<size_t Len>
 modm::ResumableResult<bool>
 modm::Dw3110Phy<SpiMaster, Cs>::transmitAndStartReceive(const std::span<const uint8_t, Len> payload,
-										 size_t payload_len, bool fast)
+														size_t payload_len, bool fast)
 {
 	return transmitGeneric<Len, Dw3110::FastCommand::CMD_TX_W4R>(payload, payload_len, fast);
 }
@@ -845,16 +796,10 @@ modm::Dw3110Phy<SpiMaster, Cs>::transmitGeneric(const std::span<const uint8_t, L
 	if (payload_len > payload.size()) RF_RETURN(false);
 	RF_WAIT_UNTIL(this->acquireMaster());
 
-	RF_CALL(fetchChipState());
-	if (chip_state == Dw3110::SystemState::TX || chip_state == Dw3110::SystemState::TX_WAIT)
-	{
-		this->releaseMaster();
-		RF_RETURN(false);
-	}
-
 	RF_CALL(readRegister<Dw3110::SYS_CFG, 1>(std::span<uint8_t>(scratch).first<1>()));
 	if (((scratch[0] & 0x10) && payload_len > 1021) || (!(scratch[0] & 0x10) && payload_len > 125))
 	{
+		MODM_LOG_ERROR << "Payload is too long to transmit!" << modm::endl;
 		this->releaseMaster();
 		RF_RETURN(false);
 	}
@@ -883,14 +828,13 @@ modm::Dw3110Phy<SpiMaster, Cs>::transmitGeneric(const std::span<const uint8_t, L
 	RF_CALL(writeRegister<Dw3110::TX_FCTRL, 6>(tx_info));
 	RF_CALL(sendCommand<Cmd>());
 
-	timeout.restart(10ms);
+	timeout.restart(60ms);
 	RF_CALL(fetchSystemStatus());
 	while (((uint64_t)Dw3110::SystemStatusBits::TXFRS & system_status) == 0)
 	{
 		RF_YIELD();
 		if (timeout.execute())
 		{
-			MODM_LOG_DEBUG << "Failed to send packet!" << modm::endl;
 			this->releaseMaster();
 			RF_RETURN(false);
 		}
@@ -902,11 +846,11 @@ modm::Dw3110Phy<SpiMaster, Cs>::transmitGeneric(const std::span<const uint8_t, L
 }
 
 template<typename SpiMaster, typename Cs>
-modm::ResumableResult<void>
+modm::ResumableResult<bool>
 modm::Dw3110Phy<SpiMaster, Cs>::startReceive()
 {
 	RF_BEGIN();
-	if (RF_CALL(this->packetReady())) RF_RETURN();
+	if (RF_CALL(this->packetReady())) RF_RETURN(true);
 
 	RF_WAIT_UNTIL(this->acquireMaster());
 
@@ -914,7 +858,7 @@ modm::Dw3110Phy<SpiMaster, Cs>::startReceive()
 	if (chip_state == Dw3110::SystemState::RX || chip_state == Dw3110::SystemState::RX_WAIT)
 	{
 		this->releaseMaster();
-		RF_RETURN();
+		RF_RETURN(true);
 	}
 
 	// Go idle
@@ -935,12 +879,11 @@ modm::Dw3110Phy<SpiMaster, Cs>::startReceive()
 		if (timeout.execute())
 		{
 			this->releaseMaster();
-			MODM_LOG_DEBUG << "Failed to go into RX state!" << modm::endl;
-			RF_RETURN();
+			RF_RETURN(false);
 		}
 	}
 	this->releaseMaster();
-	RF_END();
+	RF_END_RETURN(true);
 }
 
 template<typename SpiMaster, typename Cs>
@@ -976,10 +919,6 @@ modm::Dw3110Phy<SpiMaster, Cs>::packetReady()
 	RF_WAIT_UNTIL(this->acquireMaster());
 	RF_CALL(fetchSystemStatus());
 	this->releaseMaster();
-	if ((uint64_t)Dw3110::SystemStatusBits::RXFCE & system_status)
-	{
-		MODM_LOG_DEBUG << "CRC Error!" << modm::endl;
-	}
 	RF_END_RETURN(((uint64_t)Dw3110::SystemStatusBits::RXFR & system_status) &&
 				  ((uint64_t)Dw3110::SystemStatusBits::RXFCG & system_status));
 }
@@ -1190,12 +1129,7 @@ modm::Dw3110Phy<SpiMaster, Cs>::checkResult(std::span<const uint8_t, Len> expect
 	bool result = true;
 	for (size_t i = 0; i < Len; i++)
 	{
-		if (expected[i] != got[i])
-		{
-			result = false;
-			MODM_LOG_DEBUG << "Mismatch " << i << ": expected 0x" << modm::hex << expected[i]
-						   << " got 0x" << got[i] << modm::ascii << modm::endl;
-		}
+		if (expected[i] != got[i]) { result = false; }
 	}
 	return result;
 }
