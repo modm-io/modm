@@ -58,7 +58,7 @@ modm::Dw3110Phy<SpiMaster, Cs>::initialize(Dw3110::Channel channel, Dw3110::Prea
 			RF_RETURN(false);
 		}
 		RF_YIELD();
-		fetchChipState();
+		RF_CALL(fetchChipState());
 	}
 
 	if (!RF_CALL(testSPIConnection()))
