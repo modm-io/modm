@@ -823,12 +823,37 @@ modm::ResumableResult<bool>
 modm::Dw3110Phy<SpiMaster, Cs>::transmit(const std::span<const uint8_t, Len> payload,
 										 size_t payload_len, bool fast)
 {
+	return transmitGeneric<Len, Dw3110::FastCommand::CMD_TX>(payload, payload_len, fast);
+}
+
+template<typename SpiMaster, typename Cs>
+template<size_t Len>
+modm::ResumableResult<bool>
+modm::Dw3110Phy<SpiMaster, Cs>::transmitAndStartReceive(const std::span<const uint8_t, Len> payload,
+										 size_t payload_len, bool fast)
+{
+	return transmitGeneric<Len, Dw3110::FastCommand::CMD_TX_W4R>(payload, payload_len, fast);
+}
+
+template<typename SpiMaster, typename Cs>
+template<size_t Len, modm::Dw3110::FastCommand Cmd>
+modm::ResumableResult<bool>
+modm::Dw3110Phy<SpiMaster, Cs>::transmitGeneric(const std::span<const uint8_t, Len> payload,
+												size_t payload_len, bool fast)
+{
 	RF_BEGIN();
 	if (payload_len > payload.size()) RF_RETURN(false);
 	RF_WAIT_UNTIL(this->acquireMaster());
 
 	RF_CALL(fetchChipState());
 	if (chip_state == Dw3110::SystemState::TX || chip_state == Dw3110::SystemState::TX_WAIT)
+	{
+		this->releaseMaster();
+		RF_RETURN(false);
+	}
+
+	RF_CALL(readRegister<Dw3110::SYS_CFG, 1>(std::span<uint8_t>(scratch).first<1>()));
+	if (((scratch[0] & 0x10) && payload_len > 1021) || (!(scratch[0] & 0x10) && payload_len > 125))
 	{
 		this->releaseMaster();
 		RF_RETURN(false);
@@ -849,14 +874,14 @@ modm::Dw3110Phy<SpiMaster, Cs>::transmit(const std::span<const uint8_t, Len> pay
 	payload_len += fcs_len;
 	tx_info[0] = (uint8_t)(0xFF & payload_len);  // Set Payload length
 	tx_info[1] = (tx_info[1] & 0xFB) | ((uint8_t)(payload_len >> 8) & 0x03);
-	
-	if (fast) tx_info[1] |= 0x04; //Set TXBR if fast is selected
+
+	if (fast) tx_info[1] |= 0x04;  // Set TXBR if fast is selected
 
 	tx_info[2] = 0;  // Clear TXB_OFFSET
 	tx_info[3] &= 0x3;
 
 	RF_CALL(writeRegister<Dw3110::TX_FCTRL, 6>(tx_info));
-	RF_CALL(sendCommand<Dw3110::FastCommand::CMD_TX>());
+	RF_CALL(sendCommand<Cmd>());
 
 	timeout.restart(10ms);
 	RF_CALL(fetchSystemStatus());
@@ -875,6 +900,7 @@ modm::Dw3110Phy<SpiMaster, Cs>::transmit(const std::span<const uint8_t, Len> pay
 	this->releaseMaster();
 	RF_END_RETURN(true);
 }
+
 template<typename SpiMaster, typename Cs>
 modm::ResumableResult<void>
 modm::Dw3110Phy<SpiMaster, Cs>::startReceive()
