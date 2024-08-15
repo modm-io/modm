@@ -314,25 +314,6 @@ modm::Dw3110Phy<SpiMaster, Cs>::setCCATimeout(uint16_t timeout)
 
 template<typename SpiMaster, typename Cs>
 modm::ResumableResult<void>
-modm::Dw3110Phy<SpiMaster, Cs>::setEnableAutoAcknowledge(bool value)
-{
-	RF_BEGIN()
-	if (value)
-	{
-		constexpr static uint8_t or_mask_true[] = {0x08};
-		constexpr static uint8_t and_mask_true[] = {0xFF};
-		RF_CALL(writeRegisterMasked<Dw3110::SYS_CFG, 1, 1>(or_mask_true, and_mask_true));
-	} else
-	{
-		constexpr static uint8_t or_mask_false[] = {0x00};
-		constexpr static uint8_t and_mask_false[] = {0xF7};
-		RF_CALL(writeRegisterMasked<Dw3110::SYS_CFG, 1, 1>(or_mask_false, and_mask_false));
-	}
-	RF_END();
-}
-
-template<typename SpiMaster, typename Cs>
-modm::ResumableResult<void>
 modm::Dw3110Phy<SpiMaster, Cs>::setEnableFastTurnaround(bool value)
 {
 	RF_BEGIN()

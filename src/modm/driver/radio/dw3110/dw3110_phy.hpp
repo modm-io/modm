@@ -73,11 +73,6 @@ public:
 	modm::ResumableResult<void>
 	setCCATimeout(uint16_t timeout);
 
-	// Enable the device to automatically respond to any received frames with an ACK
-	// TODO test
-	modm::ResumableResult<void>
-	setEnableAutoAcknowledge(bool value);
-
 	// Enable a faster TX/RX turnaround.
 	// The Frame will be set ready before computation of ToA data has finished and any ACKs will be
 	// sent
