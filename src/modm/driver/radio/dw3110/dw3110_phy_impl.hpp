@@ -37,7 +37,6 @@ modm::Dw3110Phy<SpiMaster, Cs>::initialize(Dw3110::Channel channel, Dw3110::Prea
 {
 	using namespace std::chrono_literals;
 	RF_BEGIN();
-	RF_WAIT_UNTIL(this->acquireMaster());
 
 	RF_CALL(fetchChipState());
 	if (chip_state == Dw3110::SystemState::TX || chip_state == Dw3110::SystemState::RX ||
@@ -54,7 +53,6 @@ modm::Dw3110Phy<SpiMaster, Cs>::initialize(Dw3110::Channel channel, Dw3110::Prea
 		if (timeout.execute())
 		{
 			MODM_LOG_ERROR << "Timeout waiting for IDLE State!" << (int)chip_state << modm::endl;
-			this->releaseMaster();
 			RF_RETURN(false);
 		}
 		RF_YIELD();
@@ -63,7 +61,6 @@ modm::Dw3110Phy<SpiMaster, Cs>::initialize(Dw3110::Channel channel, Dw3110::Prea
 
 	if (!RF_CALL(testSPIConnection()))
 	{
-		this->releaseMaster();
 		MODM_LOG_ERROR << "Failed SPI connection test!" << modm::endl;
 		RF_RETURN(false);
 	}
@@ -101,25 +98,18 @@ modm::Dw3110Phy<SpiMaster, Cs>::initialize(Dw3110::Channel channel, Dw3110::Prea
 		if (timeout.execute())
 		{
 			MODM_LOG_ERROR << "Failed to reach IDLE_PLL State!" << modm::endl;
-			this->releaseMaster();
 			RF_RETURN(false);
 		}
 		fetchSystemStatus();
 	}
 
-	if (!RF_CALL(calibrate()))
-	{
-		this->releaseMaster();
-		RF_RETURN(false);
-	}
+	if (!RF_CALL(calibrate())) { RF_RETURN(false); }
 	RF_CALL(setChannel(channel));
 	RF_CALL(setPreambleCode(pcode, pcode));
 	RF_CALL(setPreambleLength(plen));
 	RF_CALL(setSFD(sfd));
 	RF_CALL(setEnableLongFrames(false));
 	RF_CALL(setSendHeaderFast(false));
-
-	this->releaseMaster();
 	RF_END_RETURN(true);
 }
 
@@ -128,7 +118,6 @@ modm::ResumableResult<bool>
 modm::Dw3110Phy<SpiMaster, Cs>::testSPIConnection()
 {
 	RF_BEGIN();
-	RF_WAIT_UNTIL(this->acquireMaster());
 
 	// Check we actually read registers correctly by checking for the device type
 	constexpr static uint8_t DEV_ID_MATCH[] = {0x03, 0xCA, 0xDE};
@@ -137,8 +126,6 @@ modm::Dw3110Phy<SpiMaster, Cs>::testSPIConnection()
 	if (!checkResult<3>(DEV_ID_MATCH, std::span<uint8_t>(scratch).subspan<1, 3>()))
 	{
 		MODM_LOG_ERROR << "Device did not return valid Dw3000 device ID!" << modm::endl;
-
-		this->releaseMaster();
 		RF_RETURN(false);
 	}
 
@@ -150,7 +137,6 @@ modm::Dw3110Phy<SpiMaster, Cs>::testSPIConnection()
 	RF_CALL(readRegister<Dw3110::SCRATCH_RAM, 9, 0>(std::span<uint8_t>(scratch).first<9>()));
 	if (!checkResult<9>(TEST_PATTERN_1, std::span<uint8_t>(scratch).first<9>()))
 	{
-		this->releaseMaster();
 		RF_RETURN(false);
 	}
 
@@ -165,7 +151,6 @@ modm::Dw3110Phy<SpiMaster, Cs>::testSPIConnection()
 	RF_CALL(readRegister<Dw3110::SCRATCH_RAM, 12, 0>(std::span<uint8_t>(scratch).first<12>()));
 	if (!checkResult<12>(TEST_PATTERN_3, std::span<uint8_t>(scratch).first<12>()))
 	{
-		this->releaseMaster();
 		RF_RETURN(false);
 	}
 
@@ -173,11 +158,7 @@ modm::Dw3110Phy<SpiMaster, Cs>::testSPIConnection()
 												 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x00};
 	RF_CALL(writeRegisterBank<Dw3110::SCRATCH_RAM_BANK>(TEST_PATTERN_4, 16));
 	RF_CALL(readRegisterBank<Dw3110::SCRATCH_RAM_BANK>(std::span<uint8_t, 16>(scratch), 16));
-	if (!checkResult<16>(TEST_PATTERN_4, std::span<uint8_t, 16>(scratch)))
-	{
-		this->releaseMaster();
-		RF_RETURN(false);
-	}
+	if (!checkResult<16>(TEST_PATTERN_4, std::span<uint8_t, 16>(scratch))) { RF_RETURN(false); }
 
 	// Test masked writes by writing 0xAA, oring it with 0x55, and anding it again with 0x55.
 
@@ -194,7 +175,6 @@ modm::Dw3110Phy<SpiMaster, Cs>::testSPIConnection()
 	RF_CALL(readRegister<Dw3110::EUI_64, 4>(std::span<uint8_t>(scratch).first<4>()));
 	if (!checkResult<4>(TEST_PATTERN_AA, std::span<uint8_t>(scratch).first<4>()))
 	{
-		this->releaseMaster();
 		RF_RETURN(false);
 	}
 
@@ -202,7 +182,6 @@ modm::Dw3110Phy<SpiMaster, Cs>::testSPIConnection()
 	RF_CALL(readRegister<Dw3110::EUI_64, 4>(std::span<uint8_t>(scratch).first<4>()));
 	if (!checkResult<4>(TEST_PATTERN_FF, std::span<uint8_t>(scratch).first<4>()))
 	{
-		this->releaseMaster();
 		RF_RETURN(false);
 	}
 
@@ -210,14 +189,11 @@ modm::Dw3110Phy<SpiMaster, Cs>::testSPIConnection()
 	RF_CALL(readRegister<Dw3110::EUI_64, 4>(std::span<uint8_t>(scratch).first<4>()));
 	if (!checkResult<4>(TEST_PATTERN_55, std::span<uint8_t>(scratch).first<4>()))
 	{
-		this->releaseMaster();
 		RF_RETURN(false);
 	}
 
 	// Restore EUI_64
 	RF_CALL(writeRegister<Dw3110::EUI_64, 4>(std::span<uint8_t>(scratch).subspan<4, 4>()));
-	
-	this->releaseMaster();
 	RF_END_RETURN(true);
 }
 
@@ -408,8 +384,6 @@ modm::ResumableResult<void>
 modm::Dw3110Phy<SpiMaster, Cs>::loadOTP()
 {
 	RF_BEGIN();
-	RF_WAIT_UNTIL(this->acquireMaster());
-
 	// Check LDO and kick if not 0
 	RF_CALL(readOTPMemory<Dw3110::LDOTUNE_CAL_1>(otp_read));
 	if (otp_read[0] == 0 && otp_read[1] == 0 && otp_read[2] == 0 && otp_read[3] == 0)
@@ -453,7 +427,7 @@ modm::Dw3110Phy<SpiMaster, Cs>::loadOTP()
 		bias_ctrl[0] = (bias_ctrl[0] & 0xE0) | (otp_read[2] & 0x1F);
 		RF_CALL(writeRegister<Dw3110::BIAS_CTRL, 1>(bias_ctrl));
 	}  // TODO find default if 0
-	this->releaseMaster();
+
 	RF_END();
 }
 
@@ -463,7 +437,6 @@ modm::ResumableResult<void>
 modm::Dw3110Phy<SpiMaster, Cs>::readOTPMemory(std::span<uint8_t, 4> out)
 {
 	RF_BEGIN();
-	RF_WAIT_UNTIL(this->acquireMaster());
 	constexpr static uint8_t or_mask_one[] = {0x01};
 	constexpr static uint8_t and_mask_one[] = {0xF1};
 	RF_CALL(writeRegisterMasked<Dw3110::OTP_CFG, 1>(or_mask_one, and_mask_one));
@@ -475,7 +448,6 @@ modm::Dw3110Phy<SpiMaster, Cs>::readOTPMemory(std::span<uint8_t, 4> out)
 	constexpr static uint8_t or_mask_zero[] = {0x00};
 	constexpr static uint8_t and_mask_zero[] = {0xF0};
 	RF_CALL(writeRegisterMasked<Dw3110::OTP_CFG, 1>(or_mask_zero, and_mask_zero));
-	this->releaseMaster();
 	RF_END();
 }
 
@@ -484,7 +456,6 @@ modm::ResumableResult<bool>
 modm::Dw3110Phy<SpiMaster, Cs>::calibrate()
 {
 	RF_BEGIN();
-	RF_WAIT_UNTIL(this->acquireMaster());
 
 	// Save LDO configuration
 	RF_CALL(readRegister<Dw3110::LDO_CTRL, 4>(ldo_config));
@@ -518,11 +489,7 @@ modm::Dw3110Phy<SpiMaster, Cs>::calibrate()
 	while (rx_cal_sts[0] == 0)
 	{
 		RF_YIELD();
-		if (timeout.execute())
-		{
-			this->releaseMaster();
-			RF_RETURN(false);
-		}
+		if (timeout.execute()) { RF_RETURN(false); }
 		RF_CALL(readRegister<Dw3110::RX_CAL_STS, 1>(rx_cal_sts));
 	}
 
@@ -535,7 +502,6 @@ modm::Dw3110Phy<SpiMaster, Cs>::calibrate()
 	if (rx_cal_res[0] == 0xFF && rx_cal_res[1] == 0xFF && rx_cal_res[2] == 0xFF &&
 		(rx_cal_res[3] & 0x1F) == 0x1F)
 	{
-		this->releaseMaster();
 		RF_RETURN(false);
 	}
 
@@ -543,7 +509,6 @@ modm::Dw3110Phy<SpiMaster, Cs>::calibrate()
 	if (rx_cal_res[0] == 0xFF && rx_cal_res[1] == 0xFF && rx_cal_res[2] == 0xFF &&
 		(rx_cal_res[3] & 0x1F) == 0x1F)
 	{
-		this->releaseMaster();
 		RF_RETURN(false);
 	}
 
@@ -554,7 +519,6 @@ modm::Dw3110Phy<SpiMaster, Cs>::calibrate()
 	constexpr static uint8_t reset_val[] = {0x0, 0x0, 0x2, 0x0};
 	RF_CALL(writeRegister<Dw3110::RX_CAL, 4>(reset_val));
 
-	this->releaseMaster();
 	RF_END_RETURN(true);
 }
 
@@ -563,7 +527,6 @@ modm::ResumableResult<void>
 modm::Dw3110Phy<SpiMaster, Cs>::setChannel(Dw3110::Channel channel)
 {
 	RF_BEGIN();
-	RF_WAIT_UNTIL(this->acquireMaster());
 
 	if (channel == Dw3110::Channel::Channel9)
 	{
@@ -615,7 +578,6 @@ modm::Dw3110Phy<SpiMaster, Cs>::setChannel(Dw3110::Channel channel)
 	constexpr static uint8_t cal_enable_or[] = {0x01};
 	constexpr static uint8_t cal_enable_and[] = {0xFF};
 	RF_CALL(writeRegisterMasked<Dw3110::PLL_CAL, 1, 1>(cal_enable_or, cal_enable_and));
-	this->releaseMaster();
 	RF_END_RETURN();
 }
 
@@ -624,7 +586,6 @@ modm::ResumableResult<void>
 modm::Dw3110Phy<SpiMaster, Cs>::setPreambleCode(Dw3110::PreambleCode rx, Dw3110::PreambleCode tx)
 {
 	RF_BEGIN();
-	RF_WAIT_UNTIL(this->acquireMaster());
 
 	// Read modify write pcodes into CHAN_CTRL
 	RF_CALL(readRegister<Dw3110::CHAN_CTRL, 2>(chan_ctrl));
@@ -644,8 +605,6 @@ modm::Dw3110Phy<SpiMaster, Cs>::setPreambleCode(Dw3110::PreambleCode rx, Dw3110:
 		constexpr static uint8_t rx_tune_en_and[] = {0xFE, 0xE5};
 		RF_CALL(writeRegisterMasked<Dw3110::DGC_CFG, 2>(rx_tune_en_or, rx_tune_en_and));
 	}
-
-	this->releaseMaster();
 	RF_END_RETURN();
 }
 
@@ -654,7 +613,7 @@ modm::ResumableResult<void>
 modm::Dw3110Phy<SpiMaster, Cs>::setPreambleLength(Dw3110::PreambleLength plen)
 {
 	RF_BEGIN();
-	RF_WAIT_UNTIL(this->acquireMaster());
+
 	// Write length to TX_FCTRL
 	RF_CALL(readRegister<Dw3110::TX_FCTRL, 6>(tx_info));
 	tx_info[1] = (tx_info[1] & 0x0F) | (((uint8_t)plen << 4) & 0xF0);
@@ -711,7 +670,6 @@ modm::Dw3110Phy<SpiMaster, Cs>::setPreambleLength(Dw3110::PreambleLength plen)
 		RF_CALL(writeRegisterMasked<Dw3110::OTP_CFG, 1, 1>(otp_val_or, otp_val_and));
 	}
 
-	this->releaseMaster();
 	RF_END_RETURN();
 }
 
@@ -720,7 +678,6 @@ modm::ResumableResult<void>
 modm::Dw3110Phy<SpiMaster, Cs>::setSFD(Dw3110::StartFrameDelimiter sfd)
 {
 	RF_BEGIN();
-	RF_WAIT_UNTIL(this->acquireMaster());
 	RF_CALL(readRegister<Dw3110::CHAN_CTRL, 2>(chan_ctrl));
 	chan_ctrl[0] = (chan_ctrl[0] & 0xF9) | (((uint8_t)sfd & 0x03) << 1);
 	RF_CALL(writeRegister<Dw3110::CHAN_CTRL, 2>(chan_ctrl));
@@ -729,7 +686,6 @@ modm::Dw3110Phy<SpiMaster, Cs>::setSFD(Dw3110::StartFrameDelimiter sfd)
 	else
 		sfd_len = 8;
 	RF_CALL(setRX_SFD_TOC());
-	this->releaseMaster();
 	RF_END_RETURN();
 }
 
@@ -737,51 +693,42 @@ template<typename SpiMaster, typename Cs>
 modm::ResumableResult<void>
 modm::Dw3110Phy<SpiMaster, Cs>::setRX_SFD_TOC()
 {
-
 	RF_BEGIN();
 	if (pac_len == 0 || preamble_len == 0 || sfd_len == 0) RF_RETURN();
-	RF_WAIT_UNTIL(this->acquireMaster());
+
 	sfd_toc_val = preamble_len + 1 - pac_len + sfd_len;
 	rx_sfd_toc[0] = (uint8_t)(sfd_toc_val & 0xFF);
 	rx_sfd_toc[1] = (uint8_t)((sfd_toc_val >> 8) & 0xFF);
 	RF_CALL(writeRegister<Dw3110::RX_SFD_TOC, 2>(rx_sfd_toc));
-	this->releaseMaster();
 	RF_END_RETURN();
 }
 
 template<typename SpiMaster, typename Cs>
-template<size_t Len>
 modm::ResumableResult<bool>
-modm::Dw3110Phy<SpiMaster, Cs>::transmit(const std::span<const uint8_t, Len> payload,
-										 size_t payload_len, bool fast)
+modm::Dw3110Phy<SpiMaster, Cs>::transmit(const std::span<const uint8_t> payload, bool fast)
 {
-	return transmitGeneric<Len, Dw3110::FastCommand::CMD_TX>(payload, payload_len, fast);
+	return transmitGeneric<Dw3110::FastCommand::CMD_TX>(payload, fast);
 }
 
 template<typename SpiMaster, typename Cs>
-template<size_t Len>
 modm::ResumableResult<bool>
-modm::Dw3110Phy<SpiMaster, Cs>::transmitAndStartReceive(const std::span<const uint8_t, Len> payload,
-														size_t payload_len, bool fast)
+modm::Dw3110Phy<SpiMaster, Cs>::transmitAndStartReceive(const std::span<const uint8_t> payload,
+														bool fast)
 {
-	return transmitGeneric<Len, Dw3110::FastCommand::CMD_TX_W4R>(payload, payload_len, fast);
+	return transmitGeneric<Dw3110::FastCommand::CMD_TX_W4R>(payload, fast);
 }
 
 template<typename SpiMaster, typename Cs>
-template<size_t Len, modm::Dw3110::FastCommand Cmd>
+template<modm::Dw3110::FastCommand Cmd>
 modm::ResumableResult<bool>
-modm::Dw3110Phy<SpiMaster, Cs>::transmitGeneric(const std::span<const uint8_t, Len> payload,
-												size_t payload_len, bool fast)
+modm::Dw3110Phy<SpiMaster, Cs>::transmitGeneric(const std::span<const uint8_t> payload, bool fast)
 {
 	RF_BEGIN();
-	if (payload_len > payload.size()) RF_RETURN(false);
-	RF_WAIT_UNTIL(this->acquireMaster());
-
 	RF_CALL(readRegister<Dw3110::SYS_CFG, 1>(std::span<uint8_t>(scratch).first<1>()));
-	if (((scratch[0] & 0x10) && payload_len > 1021) || (!(scratch[0] & 0x10) && payload_len > 125))
+	if (((scratch[0] & 0x10) && payload.size() > 1021) ||
+		(!(scratch[0] & 0x10) && payload.size() > 125))
 	{
 		MODM_LOG_ERROR << "Payload is too long to transmit!" << modm::endl;
-		this->releaseMaster();
 		RF_RETURN(false);
 	}
 
@@ -794,12 +741,11 @@ modm::Dw3110Phy<SpiMaster, Cs>::transmitGeneric(const std::span<const uint8_t, L
 	RF_CALL(writeRegisterMasked<Dw3110::SYS_STATUS, 1, 0>(txfr_or, txfr_and));
 
 	// Write payload to buffer
-	RF_CALL(writeRegisterBank<Dw3110::TX_BUFFER_BANK>(payload, payload_len));
+	RF_CALL(writeRegisterBank<Dw3110::TX_BUFFER_BANK>(payload, payload.size()));
 
 	RF_CALL(readRegister<Dw3110::TX_FCTRL, 6>(tx_info));
-	payload_len += fcs_len;
-	tx_info[0] = (uint8_t)(0xFF & payload_len);  // Set Payload length
-	tx_info[1] = (tx_info[1] & 0xFB) | ((uint8_t)(payload_len >> 8) & 0x03);
+	tx_info[0] = (uint8_t)(0xFF & (payload.size() + fcs_len));  // Set Payload length
+	tx_info[1] = (tx_info[1] & 0xFB) | ((uint8_t)((payload.size() + fcs_len) >> 8) & 0x03);
 
 	if (fast) tx_info[1] |= 0x04;  // Set TXBR if fast is selected
 
@@ -814,15 +760,9 @@ modm::Dw3110Phy<SpiMaster, Cs>::transmitGeneric(const std::span<const uint8_t, L
 	while (((uint64_t)Dw3110::SystemStatusBits::TXFRS & system_status) == 0)
 	{
 		RF_YIELD();
-		if (timeout.execute())
-		{
-			this->releaseMaster();
-			RF_RETURN(false);
-		}
+		if (timeout.execute()) { RF_RETURN(false); }
 		RF_CALL(fetchSystemStatus());
 	}
-
-	this->releaseMaster();
 	RF_END_RETURN(true);
 }
 
@@ -833,12 +773,9 @@ modm::Dw3110Phy<SpiMaster, Cs>::startReceive()
 	RF_BEGIN();
 	if (RF_CALL(this->packetReady())) RF_RETURN(true);
 
-	RF_WAIT_UNTIL(this->acquireMaster());
-
 	RF_CALL(fetchChipState());
 	if (chip_state == Dw3110::SystemState::RX || chip_state == Dw3110::SystemState::RX_WAIT)
 	{
-		this->releaseMaster();
 		RF_RETURN(true);
 	}
 
@@ -857,13 +794,9 @@ modm::Dw3110Phy<SpiMaster, Cs>::startReceive()
 	{
 		RF_YIELD();
 		RF_CALL(fetchChipState());
-		if (timeout.execute())
-		{
-			this->releaseMaster();
-			RF_RETURN(false);
-		}
+		if (timeout.execute()) { RF_RETURN(false); }
 	}
-	this->releaseMaster();
+
 	RF_END_RETURN(true);
 }
 
@@ -872,22 +805,18 @@ modm::ResumableResult<bool>
 modm::Dw3110Phy<SpiMaster, Cs>::fetchPacket(std::span<uint8_t> payload, size_t& payload_len)
 {
 	RF_BEGIN();
-	RF_WAIT_UNTIL(this->acquireMaster());
+
 	RF_CALL(readRegister<Dw3110::RX_FINFO, 4>(rx_finfo));
 	payload_len = (rx_finfo[0] | ((rx_finfo[1] & 0x03) << 8));
 	if (payload_len >= fcs_len) payload_len -= fcs_len;
-	if (payload.size() < payload_len)
-	{
-		this->releaseMaster();
-		RF_RETURN(false);
-	}
+	if (payload.size() < payload_len) { RF_RETURN(false); }
 	RF_CALL(readRegisterBank<Dw3110::RX_BUFFER_0_BANK>(payload, payload_len));
 
 	// Clear RXFR RXPHE RXFCG and RXFCE flag
 	constexpr static uint8_t rxfr_or[] = {0xF0};
 	constexpr static uint8_t rxfr_and[] = {0xFF};
 	RF_CALL(writeRegisterMasked<Dw3110::SYS_STATUS, 1, 1>(rxfr_or, rxfr_and));
-	this->releaseMaster();
+
 	RF_END_RETURN(true);
 }
 
@@ -897,9 +826,7 @@ modm::Dw3110Phy<SpiMaster, Cs>::packetReady()
 {
 
 	RF_BEGIN();
-	RF_WAIT_UNTIL(this->acquireMaster());
 	RF_CALL(fetchSystemStatus());
-	this->releaseMaster();
 	RF_END_RETURN(((uint64_t)Dw3110::SystemStatusBits::RXFR & system_status) &&
 				  ((uint64_t)Dw3110::SystemStatusBits::RXFCG & system_status));
 }
@@ -909,12 +836,10 @@ modm::ResumableResult<void>
 modm::Dw3110Phy<SpiMaster, Cs>::fetchSystemStatus()
 {
 	RF_BEGIN();
-	RF_WAIT_UNTIL(this->acquireMaster());
 	RF_CALL(readRegister<Dw3110::SYS_STATUS, 6>(sys_status));
 	system_status = (uint64_t)sys_status[0] | ((uint64_t)sys_status[1] << 8) |
 					((uint64_t)sys_status[2] << 16) | ((uint64_t)sys_status[3] << 24) |
 					((uint64_t)sys_status[4] << 32) | ((uint64_t)sys_status[5] << 40);
-	this->releaseMaster();
 	RF_END();
 }
 

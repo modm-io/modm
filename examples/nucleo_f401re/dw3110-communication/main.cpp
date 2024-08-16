@@ -66,7 +66,7 @@ main()
 		txdata[4]++;
 		modm::delay(Button::read() ? 100ms : 500ms);
 		RF_CALL_BLOCKING(myDw3110_a.startReceive());
-		if (!RF_CALL_BLOCKING(myDw3110_b.transmit(view, view.size())))
+		if (!RF_CALL_BLOCKING(myDw3110_b.transmit(view)))
 		{
 			MODM_LOG_DEBUG << "Failed to trasmit!" << modm::endl;
 		} else
