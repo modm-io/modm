@@ -832,6 +832,15 @@ modm::Dw3110Phy<SpiMaster, Cs>::packetReady()
 }
 
 template<typename SpiMaster, typename Cs>
+modm::ResumableResult<bool>
+modm::Dw3110Phy<SpiMaster, Cs>::isReceiving()
+{
+	RF_BEGIN();
+	RF_CALL(fetchChipState());
+	RF_END_RETURN(chip_state == Dw3110::SystemState::RX);
+}
+
+template<typename SpiMaster, typename Cs>
 modm::ResumableResult<void>
 modm::Dw3110Phy<SpiMaster, Cs>::fetchSystemStatus()
 {

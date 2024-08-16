@@ -85,12 +85,14 @@ public:
 		PT_BEGIN();
 		while (true)
 		{
-			MODM_LOG_INFO << "Starting RX..." << modm::endl;
-			PT_CALL(radio.startReceive());
-
 			MODM_LOG_INFO << "Checking Packet..." << modm::endl;
 			while (!PT_CALL(radio.packetReady()))
-			{  // DONT FORMAT
+			{
+				if (!PT_CALL(radio.isReceiving()))
+				{
+					MODM_LOG_INFO << "Starting RX..." << modm::endl;
+					PT_CALL(radio.startReceive());
+				}
 				PT_YIELD();
 			}
 
@@ -120,13 +122,13 @@ main()
 
 	MySpiMaster::initialize<Board::SystemClock, 21_MHz>();
 	MySpiMaster::connect<GpioA6::Miso, GpioA7::Mosi, GpioA5::Sck>();
-	
+
 	// Use the logging streams to print some messages.
 	// Change MODM_LOG_LEVEL above to enable or disable these messages
-	MODM_LOG_DEBUG   << "debug"   << modm::endl;
-	MODM_LOG_INFO    << "info"    << modm::endl;
+	MODM_LOG_DEBUG << "debug" << modm::endl;
+	MODM_LOG_INFO << "info" << modm::endl;
 	MODM_LOG_WARNING << "warning" << modm::endl;
-	MODM_LOG_ERROR   << "error"   << modm::endl;
+	MODM_LOG_ERROR << "error" << modm::endl;
 
 	MODM_LOG_INFO << "Initializing Devices..." << modm::endl;
 	bool success = true;

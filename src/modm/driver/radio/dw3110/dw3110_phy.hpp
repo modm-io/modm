@@ -150,6 +150,10 @@ public:
 	modm::ResumableResult<bool>
 	packetReady();
 
+	// Check if the chip is currently in RX mode
+	modm::ResumableResult<bool>
+	isReceiving();
+
 	// Copy received packet into the provided payload buffer, clear packet received flags
 	modm::ResumableResult<bool>
 	fetchPacket(std::span<uint8_t> payload, size_t& payload_len);
