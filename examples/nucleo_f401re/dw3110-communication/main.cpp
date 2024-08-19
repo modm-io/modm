@@ -23,16 +23,20 @@ using MySpiMaster = modm::platform::SpiMaster1;
 using MyDw3110_a = modm::Dw3110Phy<MySpiMaster, GpioB6>;
 using MyDw3110_b = modm::Dw3110Phy<MySpiMaster, GpioA10>;
 
+constexpr static size_t PacketLength = 1021;
+
 class TXThread : public modm::pt::Protothread
 {
 public:
 	bool
 	init()
 	{
-		return RF_CALL_BLOCKING(radio.initialize(modm::Dw3110::Channel::Channel5,
-												 modm::Dw3110::PreambleCode::Code_64Mhz_9,
-												 modm::Dw3110::PreambleLength::Preamble_4096,
-												 modm::Dw3110::StartFrameDelimiter::Decawave_8));
+		auto ret = RF_CALL_BLOCKING(radio.initialize(
+			modm::Dw3110::Channel::Channel9, modm::Dw3110::PreambleCode::Code_64Mhz_9,
+			modm::Dw3110::PreambleLength::Preamble_128,
+			modm::Dw3110::StartFrameDelimiter::Decawave_8));
+		RF_CALL_BLOCKING(radio.setEnableLongFrames(true));
+		return ret;
 	}
 
 	bool
@@ -41,30 +45,32 @@ public:
 		PT_BEGIN();
 		while (true)
 		{
+
 			txdata[txdata.size() - 1]++;
-			timeout.restart(Button::read() ? 100ms : 500ms);
+			timeout.restart(Button::read() ? 500ms : 10ms);
 			PT_WAIT_UNTIL(timeout.execute());
-			MODM_LOG_INFO << "Transmitting Packet..." << modm::endl;
-			if (!PT_CALL(radio.transmit(txdata)))
+			if (PT_CALL(radio.transmit(txdata, true)))
 			{
-				MODM_LOG_DEBUG << "Failed to trasmit!" << modm::endl;
+				sentCount++;
 			} else
 			{
-				MODM_LOG_DEBUG << "Transmitted 0x";
-				for (size_t i = 0; i < txdata.size(); i++)
-				{
-					MODM_LOG_DEBUG << modm::hex << txdata[i];
-				}
-				MODM_LOG_DEBUG << modm::endl;
+				MODM_LOG_DEBUG << "[TX] Failed to trasmit!" << modm::endl;
 			}
 		}
 		PT_END();
 	}
 
+	size_t
+	getCount()
+	{
+		return sentCount;
+	}
+
 private:
 	MyDw3110_b radio{};
-	std::array<uint8_t, 5> txdata = {0xBA, 0xDE, 0xAF, 0xFE, 0x00};
-	modm::Timeout timeout{100ms};
+	std::array<uint8_t, PacketLength> txdata = {0xBA, 0xDE, 0xAF, 0xFE, 0x00};
+	modm::Timeout timeout{10ms};
+	size_t sentCount{0};
 };
 
 class RXThread : public modm::pt::Protothread
@@ -73,10 +79,12 @@ public:
 	bool
 	init()
 	{
-		return RF_CALL_BLOCKING(radio.initialize(modm::Dw3110::Channel::Channel5,
-												 modm::Dw3110::PreambleCode::Code_64Mhz_9,
-												 modm::Dw3110::PreambleLength::Preamble_4096,
-												 modm::Dw3110::StartFrameDelimiter::Decawave_8));
+		auto ret = RF_CALL_BLOCKING(radio.initialize(
+			modm::Dw3110::Channel::Channel9, modm::Dw3110::PreambleCode::Code_64Mhz_9,
+			modm::Dw3110::PreambleLength::Preamble_128,
+			modm::Dw3110::StartFrameDelimiter::Decawave_8));
+		RF_CALL_BLOCKING(radio.setEnableLongFrames(true));
+		return ret;
 	}
 
 	bool
@@ -85,33 +93,31 @@ public:
 		PT_BEGIN();
 		while (true)
 		{
-			MODM_LOG_INFO << "Checking Packet..." << modm::endl;
 			while (!PT_CALL(radio.packetReady()))
 			{
 				if (!PT_CALL(radio.isReceiving()))
 				{
-					MODM_LOG_INFO << "Starting RX..." << modm::endl;
+					// KEEP ON SEPERATE LINE
 					PT_CALL(radio.startReceive());
 				}
 				PT_YIELD();
 			}
 
-			MODM_LOG_INFO << "Fetching Packet..." << modm::endl;
-			if (PT_CALL(radio.fetchPacket(rxdata, rxlen)))
-			{
-				MODM_LOG_DEBUG << modm::ascii << "Got packet of length " << rxlen << modm::endl;
-				MODM_LOG_DEBUG << "Got 0x";
-				for (size_t i = 0; i < rxlen; i++) { MODM_LOG_DEBUG << modm::hex << rxdata[i]; }
-				MODM_LOG_DEBUG << modm::endl;
-			}
+			if (PT_CALL(radio.fetchPacket(rxdata, rxlen))) { recvCount++; }
 		}
 		PT_END();
 	}
 
+	size_t
+	getCount()
+	{
+		return recvCount;
+	}
+
 private:
 	MyDw3110_a radio{};
-	size_t rxlen = 0;
-	std::array<uint8_t, 125> rxdata = {};
+	size_t rxlen{0}, recvCount{0};
+	std::array<uint8_t, PacketLength> rxdata = {};
 };
 
 int
@@ -148,11 +154,17 @@ main()
 	if (!success)
 		while (true) {}
 
+	modm::PeriodicTimer timer{1000ms};
 	MODM_LOG_INFO << "Starting ping pong..." << modm::endl;
 	while (true)
 	{
 		rx.run();
 		tx.run();
+		if (timer.execute())
+		{
+			MODM_LOG_DEBUG << "Sent " << tx.getCount() << ", received " << rx.getCount()
+						   << ". Diff:" << tx.getCount() - rx.getCount() << modm::endl;
+		}
 	}
 
 	return 0;
