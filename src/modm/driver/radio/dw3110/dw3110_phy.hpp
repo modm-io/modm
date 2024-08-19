@@ -170,7 +170,7 @@ public:
 	transmitAndStartReceive(const std::span<const uint8_t> payload, bool fast = true);
 
 	// Read the current system status register
-	modm::ResumableResult<Dw3110::SystemStatus>
+	modm::ResumableResult<Dw3110::SystemStatus_t>
 	getStatus();
 
 private:
@@ -253,7 +253,7 @@ private:
 
 	PreciseTimeout timeout;
 
-	Dw3110::SystemStatus system_status{0};
+	Dw3110::SystemStatus_t system_status{0};
 	uint16_t preamble_len{0}, sfd_len{0}, pac_len{0}, sfd_toc_val{0}, fcs_len{2};
 	Dw3110::SystemState chip_state{Dw3110::SystemState::OFF};
 	std::array<uint8_t, 16> scratch{};

@@ -363,7 +363,7 @@ modm::Dw3110Phy<SpiMaster, Cs>::setWaitForResponseTime(modm::PreciseClock::durat
 }
 
 template<typename SpiMaster, typename Cs>
-modm::ResumableResult<modm::Dw3110::SystemStatus>
+modm::ResumableResult<modm::Dw3110::SystemStatus_t>
 modm::Dw3110Phy<SpiMaster, Cs>::getStatus()
 {
 	RF_BEGIN();
@@ -757,7 +757,7 @@ modm::Dw3110Phy<SpiMaster, Cs>::transmitGeneric(const std::span<const uint8_t> p
 
 	timeout.restart(60ms);
 	RF_CALL(fetchSystemStatus());
-	while (((uint64_t)Dw3110::SystemStatusBits::TXFRS & system_status) == 0)
+	while (system_status.none(Dw3110::SystemStatus::TXFRS))
 	{
 		RF_YIELD();
 		if (timeout.execute()) { RF_RETURN(false); }
@@ -824,11 +824,9 @@ template<typename SpiMaster, typename Cs>
 modm::ResumableResult<bool>
 modm::Dw3110Phy<SpiMaster, Cs>::packetReady()
 {
-
 	RF_BEGIN();
 	RF_CALL(fetchSystemStatus());
-	RF_END_RETURN(((uint64_t)Dw3110::SystemStatusBits::RXFR & system_status) &&
-				  ((uint64_t)Dw3110::SystemStatusBits::RXFCG & system_status));
+	RF_END_RETURN(system_status.all(Dw3110::SystemStatus::RXFR | Dw3110::SystemStatus::RXFCG));
 }
 
 template<typename SpiMaster, typename Cs>
@@ -846,9 +844,10 @@ modm::Dw3110Phy<SpiMaster, Cs>::fetchSystemStatus()
 {
 	RF_BEGIN();
 	RF_CALL(readRegister<Dw3110::SYS_STATUS, 6>(sys_status));
-	system_status = (uint64_t)sys_status[0] | ((uint64_t)sys_status[1] << 8) |
-					((uint64_t)sys_status[2] << 16) | ((uint64_t)sys_status[3] << 24) |
-					((uint64_t)sys_status[4] << 32) | ((uint64_t)sys_status[5] << 40);
+	system_status =
+		Dw3110::SystemStatus_t((uint64_t)sys_status[0] | ((uint64_t)sys_status[1] << 8) |
+					   ((uint64_t)sys_status[2] << 16) | ((uint64_t)sys_status[3] << 24) |
+					   ((uint64_t)sys_status[4] << 32) | ((uint64_t)sys_status[5] << 40));
 	RF_END();
 }
 

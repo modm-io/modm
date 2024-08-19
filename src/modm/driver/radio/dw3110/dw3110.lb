@@ -19,7 +19,7 @@ def init(module):
 
 def prepare(module, options):
     module.depends(
-        #":architecture:register",
+        ":architecture:register",
         ":architecture:spi.device",
         ":debug",
         ":processing:timer",

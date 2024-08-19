@@ -123,9 +123,7 @@ struct Dw3110
 		IEEE802_15_4z_8 = 3,
 	};
 
-	using SystemStatus = uint64_t;
-
-	enum class SystemStatusBits : uint64_t
+	enum class SystemStatus : uint64_t
 	{
 		IRQS = (1ll << 0),
 		CPLOCK = (1ll << 1),
@@ -167,6 +165,8 @@ struct Dw3110
 		SPIERR = (1ll << 43),
 		CCA_FAIL = (1ll << 44),
 	};
+	typedef ::modm::Flags<SystemStatus,uint64_t> SystemStatus_t;
+	MODM_INT_TYPE_FLAGS(SystemStatus_t);
 
 	static constexpr OTPAddr XTAL_TRIM{.or_mask = {0x13, 0x00}, .and_mask = {0x13, 0xFC}};
 	static constexpr OTPAddr BIASTUNE_CAL{.or_mask = {0x0A, 0x00}, .and_mask = {0x0A, 0xFC}};
