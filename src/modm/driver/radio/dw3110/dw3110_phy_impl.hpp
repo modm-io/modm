@@ -705,23 +705,25 @@ modm::Dw3110Phy<SpiMaster, Cs>::setRX_SFD_TOC()
 
 template<typename SpiMaster, typename Cs>
 modm::ResumableResult<bool>
-modm::Dw3110Phy<SpiMaster, Cs>::transmit(const std::span<const uint8_t> payload, bool fast)
+modm::Dw3110Phy<SpiMaster, Cs>::transmit(const std::span<const uint8_t> payload, bool ranging,
+										 bool fast)
 {
-	return transmitGeneric<Dw3110::FastCommand::CMD_TX>(payload, fast);
+	return transmitGeneric<Dw3110::FastCommand::CMD_TX>(payload, ranging, fast);
 }
 
 template<typename SpiMaster, typename Cs>
 modm::ResumableResult<bool>
 modm::Dw3110Phy<SpiMaster, Cs>::transmitAndStartReceive(const std::span<const uint8_t> payload,
-														bool fast)
+														bool ranging, bool fast)
 {
-	return transmitGeneric<Dw3110::FastCommand::CMD_TX_W4R>(payload, fast);
+	return transmitGeneric<Dw3110::FastCommand::CMD_TX_W4R>(payload, ranging, fast);
 }
 
 template<typename SpiMaster, typename Cs>
 template<modm::Dw3110::FastCommand Cmd>
 modm::ResumableResult<bool>
-modm::Dw3110Phy<SpiMaster, Cs>::transmitGeneric(const std::span<const uint8_t> payload, bool fast)
+modm::Dw3110Phy<SpiMaster, Cs>::transmitGeneric(const std::span<const uint8_t> payload,
+												bool ranging, bool fast)
 {
 	RF_BEGIN();
 	RF_CALL(readRegister<Dw3110::SYS_CFG, 1>(std::span<uint8_t>(scratch).first<1>()));
@@ -745,9 +747,10 @@ modm::Dw3110Phy<SpiMaster, Cs>::transmitGeneric(const std::span<const uint8_t> p
 
 	RF_CALL(readRegister<Dw3110::TX_FCTRL, 6>(tx_info));
 	tx_info[0] = (uint8_t)(0xFF & (payload.size() + fcs_len));  // Set Payload length
-	tx_info[1] = (tx_info[1] & 0xFB) | ((uint8_t)((payload.size() + fcs_len) >> 8) & 0x03);
+	tx_info[1] = (tx_info[1] & 0xF0) | ((uint8_t)((payload.size() + fcs_len) >> 8) & 0x03);
 
-	if (fast) tx_info[1] |= 0x04;  // Set TXBR if fast is selected
+	if (fast) tx_info[1] |= 0x04;     // Set TXBR if fast is selected
+	if (ranging) tx_info[1] |= 0x08;  // Set TXR if ranging is selected
 
 	tx_info[2] = 0;  // Clear TXB_OFFSET
 	tx_info[3] &= 0x3;

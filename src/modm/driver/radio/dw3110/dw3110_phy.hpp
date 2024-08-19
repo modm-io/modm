@@ -161,13 +161,14 @@ public:
 	// Transmit a given package using the current configuration
 	// fast parameter decides if the data portion is sent at 850kbps or 6.8Mbps
 	modm::ResumableResult<bool>
-	transmit(const std::span<const uint8_t> payload, bool fast = true);
+	transmit(const std::span<const uint8_t> payload, bool ranging = true, bool fast = true);
 
 	// Transmit a given package using the current configuration and instantly enter a receiving
 	// state
 	// fast parameter decides if the data portion is sent at 850kbps or 6.8Mbps
 	modm::ResumableResult<bool>
-	transmitAndStartReceive(const std::span<const uint8_t> payload, bool fast = true);
+	transmitAndStartReceive(const std::span<const uint8_t> payload, bool ranging = true,
+							bool fast = true);
 
 	// Read the current system status register
 	modm::ResumableResult<Dw3110::SystemStatus_t>
@@ -178,7 +179,7 @@ private:
 	// fast parameter decides if the data portion is sent at 850kbps or 6.8Mbps
 	template<modm::Dw3110::FastCommand Cmd>
 	modm::ResumableResult<bool>
-	transmitGeneric(const std::span<const uint8_t> payload, bool fast);
+	transmitGeneric(const std::span<const uint8_t> payload, bool ranging, bool fast);
 
 	// Only load configuration independent stuff, everything else should be initialized when
 	// changing those parts
