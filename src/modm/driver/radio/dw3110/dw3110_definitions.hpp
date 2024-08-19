@@ -168,6 +168,27 @@ struct Dw3110
 	typedef ::modm::Flags<SystemStatus,uint64_t> SystemStatus_t;
 	MODM_INT_TYPE_FLAGS(SystemStatus_t);
 
+	enum class FilterConfig: uint16_t
+	{
+		AllowBeacon = (1u << 0),
+		AllowData = (1u << 1),
+		AllowACK = (1u << 2),
+		AllowMAC = (1u << 3),
+		AllowReserved = (1u << 4),
+		AllowMultiPurpose = (1u << 5),
+		AllowFragmented = (1u << 6),
+		AllowExtended = (1u << 7),
+		BehaveAsPANCoordinator = (1u << 8),
+		AllowImplicitBroadcast = (1u << 9),
+		LE0HasPending = (1u << 10),
+		LE1HasPending = (1u << 11),
+		LE2HasPending = (1u << 12),
+		LE3HasPending = (1u << 13),
+		EnablePendingShort = (1u << 14),
+		EnablePendingLong = (1u << 15),
+	};
+	MODM_FLAGS16(FilterConfig);
+
 	static constexpr OTPAddr XTAL_TRIM{.or_mask = {0x13, 0x00}, .and_mask = {0x13, 0xFC}};
 	static constexpr OTPAddr BIASTUNE_CAL{.or_mask = {0x0A, 0x00}, .and_mask = {0x0A, 0xFC}};
 	static constexpr OTPAddr LDOTUNE_CAL_1{.or_mask = {0x04, 0x00}, .and_mask = {0x04, 0xFC}};

@@ -29,7 +29,7 @@ namespace modm
 /**
  * Hardware abstraction layer for DW3110
  * Unsupported Features: AES encryption, Double buffering, GPIO, Temperature and Voltage, Pulse
- * Generator calibration, RX antenna delay temp compensation, Soft reset, Packet filtering,
+ * Generator calibration, RX antenna delay temp compensation, Soft reset,
  * Sleep, Sniff mode, Delayed transmission, STS
  * @ingroup  modm_driver_dw3110
  * @author   Elias H.
@@ -122,6 +122,58 @@ public:
 	// Note that this implicitly sets the PRF as codes >8 use the 64MHz PRF instead of 16MHz
 	modm::ResumableResult<void>
 	setPreambleCode(Dw3110::PreambleCode rx, Dw3110::PreambleCode tx);
+
+	/**
+	 * MAC and Frame filtering
+	 *
+	 * Does minimal filtering and processing and AUTO-ACK.
+	 * Proper IEEE802.15.4 frames have to be provided for this to work.
+	 *
+	 */
+
+	// Get devices unique id
+	modm::ResumableResult<uint64_t>
+	getDeviceUID();
+
+	// Set devices unique id
+	modm::ResumableResult<void>
+	setDeviceUID(uint64_t uid);
+
+	// Get devices pan id
+	modm::ResumableResult<uint16_t>
+	getPanUID();
+
+	// Get devices short id
+	modm::ResumableResult<uint16_t>
+	getShortUID();
+
+	// Set devices pan id
+	modm::ResumableResult<void>
+	setPanUID(uint16_t pid);
+
+	// Set devices short id
+	modm::ResumableResult<void>
+	setShortUID(uint16_t pid);
+
+	//Enable or disable the frame filtering
+	modm::ResumableResult<void>
+	setFrameFilterEnabled(bool value);
+
+	// Get current filtering config
+	modm::ResumableResult<Dw3110::FilterConfig_t>
+	getFilterConfig();
+
+	// Set frame filtering config
+	modm::ResumableResult<void>
+	setFilterConfig(Dw3110::FilterConfig_t fc);
+
+	// Enable auto acknowledgment
+	// Will automatically respond to valid 802.5.14 Frames with the ACK request bit set
+	// Only active when Frame filtering is enabled
+	modm::ResumableResult<void>
+	setAutoAckEnabled(bool value);
+
+	//-----------------------------------
 
 	// Read the reported state of the chip
 	modm::ResumableResult<Dw3110::SystemState>

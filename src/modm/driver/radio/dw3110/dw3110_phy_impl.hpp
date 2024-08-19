@@ -704,6 +704,134 @@ modm::Dw3110Phy<SpiMaster, Cs>::setRX_SFD_TOC()
 }
 
 template<typename SpiMaster, typename Cs>
+modm::ResumableResult<uint64_t>
+modm::Dw3110Phy<SpiMaster, Cs>::getDeviceUID()
+{
+	RF_BEGIN();
+	RF_CALL(readRegister<Dw3110::EUI_64, 8>(std::span<uint8_t>(scratch).first<8>()));
+	RF_END_RETURN((uint64_t)scratch[0] | ((uint64_t)scratch[1] << 8) |
+				  ((uint64_t)scratch[2] << 16) | ((uint64_t)scratch[3] << 24) |
+				  ((uint64_t)scratch[4] << 32) | ((uint64_t)scratch[5] << 40) |
+				  ((uint64_t)scratch[6] << 48) | ((uint64_t)scratch[7] << 56));
+}
+
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<void>
+modm::Dw3110Phy<SpiMaster, Cs>::setDeviceUID(uint64_t uid)
+{
+	RF_BEGIN();
+	scratch[0] = (uid >> 0) & 0xFF;
+	scratch[1] = (uid >> 8) & 0xFF;
+	scratch[2] = (uid >> 16) & 0xFF;
+	scratch[3] = (uid >> 24) & 0xFF;
+	scratch[4] = (uid >> 32) & 0xFF;
+	scratch[5] = (uid >> 40) & 0xFF;
+	scratch[6] = (uid >> 48) & 0xFF;
+	scratch[7] = (uid >> 56) & 0xFF;
+	RF_CALL(writeRegister<Dw3110::EUI_64, 8>(std::span<const uint8_t>(scratch).first<8>()));
+	RF_END();
+}
+
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<uint16_t>
+modm::Dw3110Phy<SpiMaster, Cs>::getPanUID()
+{
+	RF_BEGIN();
+	RF_CALL(readRegister<Dw3110::PANADR, 2, 2>(std::span<uint8_t>(scratch).first<2>()));
+	RF_END_RETURN((uint64_t)scratch[0] | ((uint64_t)scratch[1] << 8));
+}
+
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<uint16_t>
+modm::Dw3110Phy<SpiMaster, Cs>::getShortUID()
+{
+	RF_BEGIN();
+	RF_CALL(readRegister<Dw3110::PANADR, 2, 0>(std::span<uint8_t>(scratch).first<2>()));
+	RF_END_RETURN((uint64_t)scratch[0] | ((uint64_t)scratch[1] << 8));
+}
+
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<void>
+modm::Dw3110Phy<SpiMaster, Cs>::setPanUID(uint16_t pid)
+{
+	RF_BEGIN();
+	scratch[0] = (pid >> 0) & 0xFF;
+	scratch[1] = (pid >> 8) & 0xFF;
+	RF_CALL(writeRegister<Dw3110::PANADR, 2, 2>(std::span<const uint8_t>(scratch).first<2>()));
+	RF_END();
+}
+
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<void>
+modm::Dw3110Phy<SpiMaster, Cs>::setShortUID(uint16_t sid)
+{
+	RF_BEGIN();
+	scratch[0] = (sid >> 0) & 0xFF;
+	scratch[1] = (sid >> 8) & 0xFF;
+	RF_CALL(writeRegister<Dw3110::PANADR, 2, 0>(std::span<const uint8_t>(scratch).first<2>()));
+	RF_END();
+}
+
+// Enable or disable the frame filtering
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<void>
+modm::Dw3110Phy<SpiMaster, Cs>::setFrameFilterEnabled(bool value)
+{
+	RF_BEGIN();
+	if (value)
+	{
+		constexpr static uint8_t FFEN_or[] = {0x01};
+		constexpr static uint8_t FFEN_and[] = {0xFF};
+		RF_CALL(writeRegisterMasked<Dw3110::SYS_CFG, 1, 0>(FFEN_or, FFEN_and));
+	} else
+	{
+		constexpr static uint8_t FFEN_or[] = {0x00};
+		constexpr static uint8_t FFEN_and[] = {0xFE};
+		RF_CALL(writeRegisterMasked<Dw3110::SYS_CFG, 1, 0>(FFEN_or, FFEN_and));
+	}
+	RF_END();
+}
+
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<modm::Dw3110::FilterConfig_t>
+modm::Dw3110Phy<SpiMaster, Cs>::getFilterConfig()
+{
+	RF_BEGIN();
+	RF_CALL(readRegister<Dw3110::FF_CFG, 2, 0>(std::span<uint8_t>(scratch).first<2>()));
+	RF_END_RETURN(Dw3110::FilterConfig_t(scratch[0] | scratch[1] << 8));
+}
+
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<void>
+modm::Dw3110Phy<SpiMaster, Cs>::setFilterConfig(Dw3110::FilterConfig_t fc)
+{
+	RF_BEGIN();
+	scratch[0] = (fc.value & 0xFF) >> 0;
+	scratch[1] = (fc.value & 0xFF) >> 8;
+	RF_CALL(writeRegister<Dw3110::FF_CFG, 2, 0>(std::span<const uint8_t>(scratch).first<2>()));
+	RF_END();
+}
+
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<void>
+modm::Dw3110Phy<SpiMaster, Cs>::setAutoAckEnabled(bool value)
+{
+	RF_BEGIN();
+	if (value)
+	{
+		constexpr static uint8_t AUTO_ACK_or[] = {0x08};
+		constexpr static uint8_t AUTO_ACK_and[] = {0xFF};
+		RF_CALL(writeRegisterMasked<Dw3110::SYS_CFG, 1, 1>(AUTO_ACK_or, AUTO_ACK_and));
+	} else
+	{
+		constexpr static uint8_t AUTO_ACK_or[] = {0x00};
+		constexpr static uint8_t AUTO_ACK_and[] = {0xF7};
+		RF_CALL(writeRegisterMasked<Dw3110::SYS_CFG, 1, 1>(AUTO_ACK_or, AUTO_ACK_and));
+	}
+	RF_END();
+}
+
+template<typename SpiMaster, typename Cs>
 modm::ResumableResult<bool>
 modm::Dw3110Phy<SpiMaster, Cs>::transmit(const std::span<const uint8_t> payload, bool ranging,
 										 bool fast)
