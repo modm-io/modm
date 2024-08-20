@@ -372,6 +372,22 @@ modm::Dw3110Phy<SpiMaster, Cs>::getStatus()
 	RF_CALL(fetchSystemStatus());
 	RF_END_RETURN(system_status);
 }
+
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<void>
+modm::Dw3110Phy<SpiMaster, Cs>::clearStatusBits(Dw3110::SystemStatus_t mask)
+{
+	RF_BEGIN();
+	scratch[0] = (mask.value >> 0) & 0xFF;
+	scratch[1] = (mask.value >> 8) & 0xFF;
+	scratch[2] = (mask.value >> 16) & 0xFF;
+	scratch[3] = (mask.value >> 24) & 0xFF;
+	scratch[4] = (mask.value >> 32) & 0xFF;
+	scratch[5] = (mask.value >> 40) & 0xFF;
+	RF_CALL(writeRegister<Dw3110::SYS_STATUS, 6>(std::span<const uint8_t>(scratch).first<6>()));
+	RF_END();
+}
+
 template<typename SpiMaster, typename Cs>
 modm::ResumableResult<modm::Dw3110::SystemState>
 modm::Dw3110Phy<SpiMaster, Cs>::getChipState()
@@ -867,10 +883,8 @@ modm::Dw3110Phy<SpiMaster, Cs>::transmitGeneric(const std::span<const uint8_t> p
 	// Go idle
 	RF_CALL(sendCommand<Dw3110::FastCommand::CMD_TXRXOFF>());
 
-	// Clear TXFRS flag
-	constexpr static uint8_t txfr_or[] = {0x20};
-	constexpr static uint8_t txfr_and[] = {0xFF};
-	RF_CALL(writeRegisterMasked<Dw3110::SYS_STATUS, 1, 0>(txfr_or, txfr_and));
+	// Clear TXFRS and CCA_FAIL flag
+	RF_CALL(clearStatusBits(Dw3110::SystemStatus::TXFRS | Dw3110::SystemStatus::CCA_FAIL));
 
 	// Write payload to buffer
 	RF_CALL(writeRegisterBank<Dw3110::TX_BUFFER_BANK>(payload, payload.size()));
@@ -916,9 +930,8 @@ modm::Dw3110Phy<SpiMaster, Cs>::startReceive()
 	RF_CALL(sendCommand<Dw3110::FastCommand::CMD_TXRXOFF>());
 
 	// Clear RXFR RXPHE RXFCG and RXFCE flag
-	constexpr static uint8_t rxfr_or[] = {0xF0};
-	constexpr static uint8_t rxfr_and[] = {0xFF};
-	RF_CALL(writeRegisterMasked<Dw3110::SYS_STATUS, 1, 1>(rxfr_or, rxfr_and));
+	RF_CALL(clearStatusBits(Dw3110::SystemStatus::RXFR | Dw3110::SystemStatus::RXPHE |
+							Dw3110::SystemStatus::RXFCG | Dw3110::SystemStatus::RXFCE));
 
 	RF_CALL(sendCommand<Dw3110::FastCommand::CMD_RX>());
 	RF_CALL(fetchChipState());
@@ -946,10 +959,8 @@ modm::Dw3110Phy<SpiMaster, Cs>::fetchPacket(std::span<uint8_t> payload, size_t &
 	RF_CALL(readRegisterBank<Dw3110::RX_BUFFER_0_BANK>(payload, payload_len));
 
 	// Clear RXFR RXPHE RXFCG and RXFCE flag
-	constexpr static uint8_t rxfr_or[] = {0xF0};
-	constexpr static uint8_t rxfr_and[] = {0xFF};
-	RF_CALL(writeRegisterMasked<Dw3110::SYS_STATUS, 1, 1>(rxfr_or, rxfr_and));
-
+	RF_CALL(clearStatusBits(Dw3110::SystemStatus::RXFR | Dw3110::SystemStatus::RXPHE |
+							Dw3110::SystemStatus::RXFCG | Dw3110::SystemStatus::RXFCE));
 	RF_END_RETURN(true);
 }
 

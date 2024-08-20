@@ -229,6 +229,10 @@ public:
 	modm::ResumableResult<Dw3110::SystemStatus_t>
 	getStatus();
 
+	// Clear the given bits in the status register
+	modm::ResumableResult<void>
+	clearStatusBits(Dw3110::SystemStatus_t mask);
+
 private:
 	// Transmit a given package using the current configuration and a specific command
 	// fast parameter decides if the data portion is sent at 850kbps or 6.8Mbps
