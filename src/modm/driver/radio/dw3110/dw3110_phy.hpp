@@ -59,7 +59,6 @@ public:
 	// Set the timeout to wait on arriving packets after startReceive()
 	// 0 = No Timeout
 	// Register resolution is ~1µs
-	// TODO test
 	modm::ResumableResult<void>
 	setReceiveWaitTimeout(modm::chrono::micro_clock::duration duration);
 

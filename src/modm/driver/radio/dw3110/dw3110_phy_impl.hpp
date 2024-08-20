@@ -226,7 +226,7 @@ modm::Dw3110Phy<SpiMaster, Cs>::setReceiveWaitTimeout(modm::chrono::micro_clock:
 	if (duration.count() == 0)
 	{
 		constexpr static uint8_t or_mask[] = {0x00};
-		constexpr static uint8_t and_mask[] = {0xDF};
+		constexpr static uint8_t and_mask[] = {0xFD};
 		RF_CALL(writeRegisterMasked<Dw3110::SYS_CFG, 1, 1>(or_mask, and_mask));
 	} else
 	{
@@ -235,7 +235,7 @@ modm::Dw3110Phy<SpiMaster, Cs>::setReceiveWaitTimeout(modm::chrono::micro_clock:
 		scratch[2] = (duration.count() >> 16) & 0xFF;
 		RF_CALL(writeRegister<Dw3110::RX_FWTO, 3>(std::span<uint8_t>(scratch).first<3>()));
 
-		constexpr static uint8_t or_mask[] = {0x20};
+		constexpr static uint8_t or_mask[] = {0x02};
 		constexpr static uint8_t and_mask[] = {0xFF};
 		RF_CALL(writeRegisterMasked<Dw3110::SYS_CFG, 1, 1>(or_mask, and_mask));
 	}
