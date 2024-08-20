@@ -28,9 +28,9 @@ namespace modm
 
 /**
  * Hardware abstraction layer for DW3110
- * Unsupported Features: AES encryption, Double buffering, GPIO, Temperature and Voltage, Pulse
- * Generator calibration, RX antenna delay temp compensation, Soft reset,
- * Sleep, Sniff mode, Delayed transmission, STS
+ * Unsupported Features: AES encryption, Double buffering, GPIO, Temperature and
+ * Voltage, Pulse Generator calibration, RX antenna delay temp compensation,
+ * Soft reset, Sleep, Sniff mode, Delayed transmission, STS
  * @ingroup  modm_driver_dw3110
  * @author   Elias H.
  * @author   Raphael Lehmann
@@ -46,7 +46,8 @@ public:
 	modm::ResumableResult<void>
 	setChannel(Dw3110::Channel channel);
 
-	// Change Header format to non-standard to allow 1021 Byte payloads instead of default 125
+	// Change Header format to non-standard to allow 1021 Byte payloads instead of
+	// default 125
 	modm::ResumableResult<void>
 	setEnableLongFrames(bool value);
 
@@ -74,9 +75,9 @@ public:
 	setCCATimeout(uint16_t timeout);
 
 	// Enable a faster TX/RX turnaround.
-	// The Frame will be set ready before computation of ToA data has finished and any ACKs will be
-	// sent
-	// Time of Arrival may not be ready when the frame is made available
+	// The Frame will be set ready before computation of ToA data has finished and
+	// any ACKs will be sent Time of Arrival may not be ready when the frame is
+	// made available
 	// TODO test
 	modm::ResumableResult<void>
 	setEnableFastTurnaround(bool value);
@@ -88,7 +89,8 @@ public:
 
 	// Set the number of preamble symbols sent with each transmission
 	// Each symbol takes ~1µs to send
-	// Note: Fine tuning of preamble length is currently unsupported by this driver
+	// Note: Fine tuning of preamble length is currently unsupported by this
+	// driver
 	modm::ResumableResult<void>
 	setPreambleLength(Dw3110::PreambleLength len);
 
@@ -108,8 +110,9 @@ public:
 	modm::ResumableResult<void>
 	setAcknowledgeTurnaround(uint8_t time);
 
-	// Set the time between a transmission and the start of RX on any of the RX after TX commands
-	// This can be used to delay turning on of the receiver after transmission to save on power.
+	// Set the time between a transmission and the start of RX on any of the RX
+	// after TX commands This can be used to delay turning on of the receiver
+	// after transmission to save on power.
 	// TODO test
 	modm::ResumableResult<void>
 	setWaitForResponseTime(modm::PreciseClock::duration time);
@@ -119,7 +122,8 @@ public:
 	setSFD(Dw3110::StartFrameDelimiter sfd);
 
 	// Set the preamble code used and looked for.
-	// Note that this implicitly sets the PRF as codes >8 use the 64MHz PRF instead of 16MHz
+	// Note that this implicitly sets the PRF as codes >8 use the 64MHz PRF
+	// instead of 16MHz
 	modm::ResumableResult<void>
 	setPreambleCode(Dw3110::PreambleCode rx, Dw3110::PreambleCode tx);
 
@@ -155,7 +159,7 @@ public:
 	modm::ResumableResult<void>
 	setShortUID(uint16_t pid);
 
-	//Enable or disable the frame filtering
+	// Enable or disable the frame filtering
 	modm::ResumableResult<void>
 	setFrameFilterEnabled(bool value);
 
@@ -168,8 +172,8 @@ public:
 	setFilterConfig(Dw3110::FilterConfig_t fc);
 
 	// Enable auto acknowledgment
-	// Will automatically respond to valid 802.5.14 Frames with the ACK request bit set
-	// Only active when Frame filtering is enabled
+	// Will automatically respond to valid 802.5.14 Frames with the ACK request
+	// bit set Only active when Frame filtering is enabled
 	modm::ResumableResult<void>
 	setAutoAckEnabled(bool value);
 
@@ -179,10 +183,9 @@ public:
 	modm::ResumableResult<Dw3110::SystemState>
 	getChipState();
 
-	// Runs the RX calibration, needs to be done after startup, wake and after 20C temperature
-	// change
-	// Needs to be run in IDLE_PLL state
-	// Automatically run in initialize
+	// Runs the RX calibration, needs to be done after startup, wake and after 20C
+	// temperature change Needs to be run in IDLE_PLL state Automatically run in
+	// initialize
 	modm::ResumableResult<bool>
 	calibrate();
 
@@ -206,18 +209,19 @@ public:
 	modm::ResumableResult<bool>
 	isReceiving();
 
-	// Copy received packet into the provided payload buffer, clear packet received flags
+	// Copy received packet into the provided payload buffer, clear packet
+	// received flags
 	modm::ResumableResult<bool>
-	fetchPacket(std::span<uint8_t> payload, size_t& payload_len);
+	fetchPacket(std::span<uint8_t> payload, size_t &payload_len);
 
 	// Transmit a given package using the current configuration
 	// fast parameter decides if the data portion is sent at 850kbps or 6.8Mbps
 	modm::ResumableResult<bool>
 	transmit(const std::span<const uint8_t> payload, bool ranging = true, bool fast = true);
 
-	// Transmit a given package using the current configuration and instantly enter a receiving
-	// state
-	// fast parameter decides if the data portion is sent at 850kbps or 6.8Mbps
+	// Transmit a given package using the current configuration and instantly
+	// enter a receiving state fast parameter decides if the data portion is sent
+	// at 850kbps or 6.8Mbps
 	modm::ResumableResult<bool>
 	transmitAndStartReceive(const std::span<const uint8_t> payload, bool ranging = true,
 							bool fast = true);
@@ -229,12 +233,14 @@ public:
 private:
 	// Transmit a given package using the current configuration and a specific command
 	// fast parameter decides if the data portion is sent at 850kbps or 6.8Mbps
+	// command fast parameter decides if the data portion is sent at 850kbps
+	// or 6.8Mbps
 	template<modm::Dw3110::FastCommand Cmd>
 	modm::ResumableResult<bool>
 	transmitGeneric(const std::span<const uint8_t> payload, bool ranging, bool fast);
 
-	// Only load configuration independent stuff, everything else should be initialized when
-	// changing those parts
+	// Only load configuration independent stuff, everything else should be
+	// initialized when changing those parts
 	modm::ResumableResult<void>
 	loadOTP();
 
@@ -274,8 +280,8 @@ private:
 	modm::ResumableResult<void>
 	readRegister(std::span<uint8_t, Len> out);
 
-	// Read a number of bytes from a register bank, useful for RX buffers and other large read
-	// transfers
+	// Read a number of bytes from a register bank, useful for RX buffers and
+	// other large read transfers
 	template<Dw3110::RegisterBank Reg>
 	modm::ResumableResult<void>
 	readRegisterBank(std::span<uint8_t> out, size_t len);
@@ -298,8 +304,8 @@ private:
 	writeRegisterMasked(const std::span<const uint8_t, Len> or_mask,
 						const std::span<const uint8_t, Len> and_mask);
 
-	// Write a number of bytes to a register bank, useful for TX buffers and other large write
-	// transfers
+	// Write a number of bytes to a register bank, useful for TX buffers and other
+	// large write transfers
 	template<Dw3110::RegisterBank Reg>
 	modm::ResumableResult<void>
 	writeRegisterBank(const std::span<const uint8_t> val, size_t len);

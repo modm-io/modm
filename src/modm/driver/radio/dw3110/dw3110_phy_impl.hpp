@@ -160,7 +160,8 @@ modm::Dw3110Phy<SpiMaster, Cs>::testSPIConnection()
 	RF_CALL(readRegisterBank<Dw3110::SCRATCH_RAM_BANK>(std::span<uint8_t, 16>(scratch), 16));
 	if (!checkResult<16>(TEST_PATTERN_4, std::span<uint8_t, 16>(scratch))) { RF_RETURN(false); }
 
-	// Test masked writes by writing 0xAA, oring it with 0x55, and anding it again with 0x55.
+	// Test masked writes by writing 0xAA, oring it with 0x55, and anding it again
+	// with 0x55.
 
 	// Save Unique device identifier EUI_64
 	RF_CALL(readRegister<Dw3110::EUI_64, 4>(std::span<uint8_t>(scratch).subspan<4, 4>()));
@@ -346,7 +347,8 @@ modm::ResumableResult<void>
 modm::Dw3110Phy<SpiMaster, Cs>::setAcknowledgeTurnaround(uint8_t time)
 {
 	RF_BEGIN();
-	RF_CALL(writeRegister<Dw3110::ACK_RESP_T, 1, 3>(std::span<uint8_t, 1>(&time)));
+	scratch[0] = time;
+	RF_CALL(writeRegister<Dw3110::ACK_RESP_T, 1, 3>(std::span<const uint8_t>(scratch).first<1>()));
 	RF_END();
 }
 
@@ -358,7 +360,7 @@ modm::Dw3110Phy<SpiMaster, Cs>::setWaitForResponseTime(modm::PreciseClock::durat
 	scratch[0] = time.count() & 0xFF;
 	scratch[1] = (time.count() >> 8) & 0xFF;
 	scratch[2] = (time.count() >> 16) & 0x0F;
-	RF_CALL(writeRegister<Dw3110::ACK_RESP_T, 3>(std::span<uint8_t>(scratch).first<3>));
+	RF_CALL(writeRegister<Dw3110::ACK_RESP_T, 3>(std::span<const uint8_t>(scratch).first<3>()));
 	RF_END();
 }
 
@@ -933,7 +935,7 @@ modm::Dw3110Phy<SpiMaster, Cs>::startReceive()
 
 template<typename SpiMaster, typename Cs>
 modm::ResumableResult<bool>
-modm::Dw3110Phy<SpiMaster, Cs>::fetchPacket(std::span<uint8_t> payload, size_t& payload_len)
+modm::Dw3110Phy<SpiMaster, Cs>::fetchPacket(std::span<uint8_t> payload, size_t &payload_len)
 {
 	RF_BEGIN();
 
@@ -977,8 +979,8 @@ modm::Dw3110Phy<SpiMaster, Cs>::fetchSystemStatus()
 	RF_CALL(readRegister<Dw3110::SYS_STATUS, 6>(sys_status));
 	system_status =
 		Dw3110::SystemStatus_t((uint64_t)sys_status[0] | ((uint64_t)sys_status[1] << 8) |
-					   ((uint64_t)sys_status[2] << 16) | ((uint64_t)sys_status[3] << 24) |
-					   ((uint64_t)sys_status[4] << 32) | ((uint64_t)sys_status[5] << 40));
+							   ((uint64_t)sys_status[2] << 16) | ((uint64_t)sys_status[3] << 24) |
+							   ((uint64_t)sys_status[4] << 32) | ((uint64_t)sys_status[5] << 40));
 	RF_END();
 }
 
