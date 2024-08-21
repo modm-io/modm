@@ -110,6 +110,7 @@ modm::Dw3110Phy<SpiMaster, Cs>::initialize(Dw3110::Channel channel, Dw3110::Prea
 	RF_CALL(setSFD(sfd));
 	RF_CALL(setEnableLongFrames(false));
 	RF_CALL(setSendHeaderFast(false));
+	RF_CALL(setCCATimeout(256));
 	RF_END_RETURN(true);
 }
 
@@ -285,7 +286,9 @@ modm::ResumableResult<void>
 modm::Dw3110Phy<SpiMaster, Cs>::setCCATimeout(uint16_t timeout)
 {
 	RF_BEGIN();
-	RF_CALL(writeRegister<Dw3110::PRE_TOC, 2>(std::span<uint8_t, 2>(&timeout)));
+	scratch[0] = (timeout >> 0) & 0xFF;
+	scratch[1] = (timeout >> 8) & 0xFF;
+	RF_CALL(writeRegister<Dw3110::PRE_TOC, 2>(std::span<const uint8_t>(scratch).first<2>()));
 	RF_END();
 }
 
@@ -854,7 +857,7 @@ modm::ResumableResult<bool>
 modm::Dw3110Phy<SpiMaster, Cs>::transmit(const std::span<const uint8_t> payload, bool ranging,
 										 bool fast)
 {
-	return transmitGeneric<Dw3110::FastCommand::CMD_TX>(payload, ranging, fast);
+	return transmitGeneric<Dw3110::FastCommand::CMD_CCA_TX>(payload, ranging, fast);
 }
 
 template<typename SpiMaster, typename Cs>
@@ -862,7 +865,7 @@ modm::ResumableResult<bool>
 modm::Dw3110Phy<SpiMaster, Cs>::transmitAndStartReceive(const std::span<const uint8_t> payload,
 														bool ranging, bool fast)
 {
-	return transmitGeneric<Dw3110::FastCommand::CMD_TX_W4R>(payload, ranging, fast);
+	return transmitGeneric<Dw3110::FastCommand::CMD_CCA_TX_W4R>(payload, ranging, fast);
 }
 
 template<typename SpiMaster, typename Cs>
@@ -906,6 +909,11 @@ modm::Dw3110Phy<SpiMaster, Cs>::transmitGeneric(const std::span<const uint8_t> p
 	RF_CALL(fetchSystemStatus());
 	while (system_status.none(Dw3110::SystemStatus::TXFRS))
 	{
+		if (system_status.all(Dw3110::SystemStatus::CCA_FAIL))
+		{
+			MODM_LOG_DEBUG << "Channel is busy!" << modm::endl;
+			RF_RETURN(false);
+		}
 		RF_YIELD();
 		if (timeout.execute()) { RF_RETURN(false); }
 		RF_CALL(fetchSystemStatus());
