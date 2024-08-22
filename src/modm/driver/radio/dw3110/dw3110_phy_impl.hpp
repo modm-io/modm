@@ -59,11 +59,7 @@ modm::Dw3110Phy<SpiMaster, Cs>::initialize(Dw3110::Channel channel, Dw3110::Prea
 		RF_CALL(fetchChipState());
 	}
 
-	if (!RF_CALL(testSPIConnection()))
-	{
-		MODM_LOG_ERROR << "Failed SPI connection test!" << modm::endl;
-		RF_RETURN(false);
-	}
+	if (!RF_CALL(checkDevID())) { RF_RETURN(false); }
 
 	// Initialize factory programmed defaults
 	RF_CALL(loadOTP());
@@ -116,7 +112,7 @@ modm::Dw3110Phy<SpiMaster, Cs>::initialize(Dw3110::Channel channel, Dw3110::Prea
 
 template<typename SpiMaster, typename Cs>
 modm::ResumableResult<bool>
-modm::Dw3110Phy<SpiMaster, Cs>::testSPIConnection()
+modm::Dw3110Phy<SpiMaster, Cs>::checkDevID()
 {
 	RF_BEGIN();
 
@@ -129,73 +125,6 @@ modm::Dw3110Phy<SpiMaster, Cs>::testSPIConnection()
 		MODM_LOG_ERROR << "Device did not return valid Dw3000 device ID!" << modm::endl;
 		RF_RETURN(false);
 	}
-
-	// Test write pattern and read it back
-	constexpr static uint8_t TEST_PATTERN_1[] = {0x01, 0x02, 0x03, 0x04, 0x05,
-												 0x06, 0x07, 0x08, 0x09};
-
-	RF_CALL(writeRegister<Dw3110::SCRATCH_RAM, 9, 0>(TEST_PATTERN_1));
-	RF_CALL(readRegister<Dw3110::SCRATCH_RAM, 9, 0>(std::span<uint8_t>(scratch).first<9>()));
-	if (!checkResult<9>(TEST_PATTERN_1, std::span<uint8_t>(scratch).first<9>()))
-	{
-		RF_RETURN(false);
-	}
-
-	// Test write another pattern with offset and check the combined pattern
-	constexpr static uint8_t TEST_PATTERN_2[] = {0xFF, 0x7F, 0x3F, 0x1F, 0x0F,
-												 0x07, 0x03, 0x01, 0x00};
-
-	constexpr static uint8_t TEST_PATTERN_3[] = {0x01, 0x02, 0x03, 0xFF, 0x7F, 0x3F,
-												 0x1F, 0x0F, 0x07, 0x03, 0x01, 0x00};
-
-	RF_CALL(writeRegister<Dw3110::SCRATCH_RAM, 9, 3>(TEST_PATTERN_2));
-	RF_CALL(readRegister<Dw3110::SCRATCH_RAM, 12, 0>(std::span<uint8_t>(scratch).first<12>()));
-	if (!checkResult<12>(TEST_PATTERN_3, std::span<uint8_t>(scratch).first<12>()))
-	{
-		RF_RETURN(false);
-	}
-
-	constexpr static uint8_t TEST_PATTERN_4[] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
-												 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x00};
-	RF_CALL(writeRegisterBank<Dw3110::SCRATCH_RAM_BANK>(TEST_PATTERN_4, 16));
-	RF_CALL(readRegisterBank<Dw3110::SCRATCH_RAM_BANK>(std::span<uint8_t, 16>(scratch), 16));
-	if (!checkResult<16>(TEST_PATTERN_4, std::span<uint8_t, 16>(scratch))) { RF_RETURN(false); }
-
-	// Test masked writes by writing 0xAA, oring it with 0x55, and anding it again
-	// with 0x55.
-
-	// Save Unique device identifier EUI_64
-	RF_CALL(readRegister<Dw3110::EUI_64, 4>(std::span<uint8_t>(scratch).subspan<4, 4>()));
-
-	// Run tests on EUI_64 since SCRATCH_RAM does not support masked writes
-	constexpr static uint8_t TEST_PATTERN_00[] = {0x00, 0x00, 0x00, 0x00};
-	constexpr static uint8_t TEST_PATTERN_55[] = {0x55, 0x55, 0x55, 0x55};
-	constexpr static uint8_t TEST_PATTERN_AA[] = {0xAA, 0xAA, 0xAA, 0xAA};
-	constexpr static uint8_t TEST_PATTERN_FF[] = {0xFF, 0xFF, 0xFF, 0xFF};
-
-	RF_CALL(writeRegister<Dw3110::EUI_64, 4>(TEST_PATTERN_AA));
-	RF_CALL(readRegister<Dw3110::EUI_64, 4>(std::span<uint8_t>(scratch).first<4>()));
-	if (!checkResult<4>(TEST_PATTERN_AA, std::span<uint8_t>(scratch).first<4>()))
-	{
-		RF_RETURN(false);
-	}
-
-	RF_CALL(writeRegisterMasked<Dw3110::EUI_64, 4, 0>(TEST_PATTERN_55, TEST_PATTERN_FF));
-	RF_CALL(readRegister<Dw3110::EUI_64, 4>(std::span<uint8_t>(scratch).first<4>()));
-	if (!checkResult<4>(TEST_PATTERN_FF, std::span<uint8_t>(scratch).first<4>()))
-	{
-		RF_RETURN(false);
-	}
-
-	RF_CALL(writeRegisterMasked<Dw3110::EUI_64, 4, 0>(TEST_PATTERN_00, TEST_PATTERN_55));
-	RF_CALL(readRegister<Dw3110::EUI_64, 4>(std::span<uint8_t>(scratch).first<4>()));
-	if (!checkResult<4>(TEST_PATTERN_55, std::span<uint8_t>(scratch).first<4>()))
-	{
-		RF_RETURN(false);
-	}
-
-	// Restore EUI_64
-	RF_CALL(writeRegister<Dw3110::EUI_64, 4>(std::span<uint8_t>(scratch).subspan<4, 4>()));
 	RF_END_RETURN(true);
 }
 

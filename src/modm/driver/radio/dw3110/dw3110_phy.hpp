@@ -257,9 +257,9 @@ private:
 	modm::ResumableResult<void>
 	loadOTP();
 
-	// Perform some test writes and readbacks over the SPI interface
+	// Check the device ID over SPI
 	modm::ResumableResult<bool>
-	testSPIConnection();
+	checkDevID();
 
 	// Helper function checking equality of two spans
 	template<size_t Len>
