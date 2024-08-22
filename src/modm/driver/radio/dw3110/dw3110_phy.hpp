@@ -69,7 +69,6 @@ public:
 
 	// Set the time spent listening for competing transmissions on CCA commands
 	// Unit is in counts of PAC symbols
-	// TODO test
 	modm::ResumableResult<void>
 	setCCATimeout(uint16_t timeout);
 
@@ -82,7 +81,6 @@ public:
 	setEnableFastTurnaround(bool value);
 
 	// Read the value of the internal chip clock
-	// TODO test
 	modm::ResumableResult<uint32_t>
 	readChipTime();
 
@@ -105,14 +103,12 @@ public:
 
 	// Set the time between RX of a packet and the TX of the acknowledgement
 	// Specified in number of preamble symbols, so time depends on the PRF
-	// TODO test
 	modm::ResumableResult<void>
 	setAcknowledgeTurnaround(uint8_t time);
 
 	// Set the time between a transmission and the start of RX on any of the RX
 	// after TX commands This can be used to delay turning on of the receiver
 	// after transmission to save on power.
-	// TODO test
 	modm::ResumableResult<void>
 	setWaitForResponseTime(modm::PreciseClock::duration time);
 
