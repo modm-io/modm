@@ -24,6 +24,26 @@ namespace modm
 /// @ingroup modm_driver_dw3110
 struct Dw3110
 {
+	enum class TXMode
+	{
+		Default,
+		DefaultAndReceive,
+		Force,
+		ForceAndReceive,
+	};
+
+	enum class DelayTXMode
+	{
+		AtTime,
+		AtTimeAndReceive,
+		DelayWRTRX,
+		DelayWRTRXAndReceive,
+		DelayWRTTX,
+		DelayWRTTXAndReceive,
+		DelayWRTRef,
+		DelayWRTRefAndReceive,
+	};
+
 	enum class FastCommand : uint8_t
 	{
 		CMD_TXRXOFF = (0x0 << 1) | 1,  //< Puts the device into IDLE state and clears any events.

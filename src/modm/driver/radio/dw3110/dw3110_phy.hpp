@@ -213,17 +213,27 @@ public:
 	modm::ResumableResult<bool>
 	fetchPacket(std::span<uint8_t> payload, size_t &payload_len);
 
-	// Transmit a given package using the current configuration
+	// Transmit a given package using the current configuration using a given transmission mode
+	// ranging parameter  decides whether or not to set the ranging bit in the header
 	// fast parameter decides if the data portion is sent at 850kbps or 6.8Mbps
+	template<Dw3110::TXMode tmode = Dw3110::TXMode::Default>
 	modm::ResumableResult<bool>
 	transmit(const std::span<const uint8_t> payload, bool ranging = true, bool fast = true);
 
-	// Transmit a given package using the current configuration and instantly
-	// enter a receiving state fast parameter decides if the data portion is sent
-	// at 850kbps or 6.8Mbps
+	// Set the reference time value
+	// Used as the reference in DelayMode::DelayWRTRef
+	modm::ResumableResult<void>
+	setReferenceTime(uint32_t time);
+
+	// Transmit a given package using the current configuration using a given delayed transmission
+	// mode ranging parameter  decides whether or not to set the ranging bit in the header fast
+	// parameter decides if the data portion is sent at 850kbps or 6.8Mbps parameter time is
+	// dependent on the DelayTXMode provided but is in units of 4ns
+	// Note that this transmission mode does not respect the clear channel assessment
+	template<Dw3110::DelayTXMode dmode = Dw3110::DelayTXMode::AtTime>
 	modm::ResumableResult<bool>
-	transmitAndStartReceive(const std::span<const uint8_t> payload, bool ranging = true,
-							bool fast = true);
+	transmitDelayed(uint32_t time, const std::span<const uint8_t> payload, bool ranging = true,
+					bool fast = true);
 
 	// Read the current system status register
 	modm::ResumableResult<Dw3110::SystemStatus_t>
@@ -317,6 +327,7 @@ private:
 
 	Dw3110::SystemStatus_t system_status{0};
 	uint16_t preamble_len{0}, sfd_len{0}, pac_len{0}, sfd_toc_val{0}, fcs_len{2};
+	bool long_frames{false};
 	Dw3110::SystemState chip_state{Dw3110::SystemState::OFF};
 	std::array<uint8_t, 16> scratch{};
 	std::array<uint8_t, 6> sys_status{}, tx_info{};

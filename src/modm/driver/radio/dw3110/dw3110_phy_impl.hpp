@@ -204,6 +204,7 @@ modm::ResumableResult<void>
 modm::Dw3110Phy<SpiMaster, Cs>::setEnableLongFrames(bool value)
 {
 	RF_BEGIN()
+	long_frames = value;
 	if (value)
 	{
 		constexpr static uint8_t or_mask_true[] = {0x10};
@@ -852,20 +853,92 @@ modm::Dw3110Phy<SpiMaster, Cs>::setAutoAckEnabled(bool value)
 	RF_END();
 }
 
+template<modm::Dw3110::TXMode mode>
+consteval modm::Dw3110::FastCommand
+txModeToCmd()
+{
+	static_assert(
+		mode == modm::Dw3110::TXMode::Default || mode == modm::Dw3110::TXMode::DefaultAndReceive ||
+			mode == modm::Dw3110::TXMode::Force || mode == modm::Dw3110::TXMode::ForceAndReceive,
+		"Unknown TXMode in txModeToCmd!");
+	if constexpr (mode == modm::Dw3110::TXMode::Default)
+	{
+		return modm::Dw3110::FastCommand::CMD_CCA_TX;
+	} else if constexpr (mode == modm::Dw3110::TXMode::DefaultAndReceive)
+	{
+		return modm::Dw3110::FastCommand::CMD_CCA_TX_W4R;
+	} else if constexpr (mode == modm::Dw3110::TXMode::Force)
+	{
+		return modm::Dw3110::FastCommand::CMD_TX;
+	} else if constexpr (mode == modm::Dw3110::TXMode::ForceAndReceive)
+	{
+		return modm::Dw3110::FastCommand::CMD_TX_W4R;
+	}
+}
+
+template<modm::Dw3110::DelayTXMode dmode>
+consteval modm::Dw3110::FastCommand
+txModeToCmdDelay()
+{
+	static_assert(dmode == modm::Dw3110::DelayTXMode::AtTime ||
+					  dmode == modm::Dw3110::DelayTXMode::DelayWRTRX ||
+					  dmode == modm::Dw3110::DelayTXMode::DelayWRTTX ||
+					  dmode == modm::Dw3110::DelayTXMode::DelayWRTRef ||
+					  dmode == modm::Dw3110::DelayTXMode::AtTimeAndReceive ||
+					  dmode == modm::Dw3110::DelayTXMode::DelayWRTRXAndReceive ||
+					  dmode == modm::Dw3110::DelayTXMode::DelayWRTTXAndReceive ||
+					  dmode == modm::Dw3110::DelayTXMode::DelayWRTRefAndReceive,
+				  "Unknown DelayTXMode in txModeToCmdDelay!");
+	if constexpr (dmode == modm::Dw3110::DelayTXMode::AtTime)
+	{
+		return modm::Dw3110::FastCommand::CMD_DTX;
+	} else if constexpr (dmode == modm::Dw3110::DelayTXMode::DelayWRTRX)
+	{
+		return modm::Dw3110::FastCommand::CMD_DTX_RS;
+	} else if constexpr (dmode == modm::Dw3110::DelayTXMode::DelayWRTTX)
+	{
+		return modm::Dw3110::FastCommand::CMD_DTX_TS;
+	} else if constexpr (dmode == modm::Dw3110::DelayTXMode::DelayWRTRef)
+	{
+		return modm::Dw3110::FastCommand::CMD_DTX_REF;
+	} else if constexpr (dmode == modm::Dw3110::DelayTXMode::AtTimeAndReceive)
+	{
+		return modm::Dw3110::FastCommand::CMD_DTX_W4R;
+	} else if constexpr (dmode == modm::Dw3110::DelayTXMode::DelayWRTRXAndReceive)
+	{
+		return modm::Dw3110::FastCommand::CMD_DTX_RS_W4R;
+	} else if constexpr (dmode == modm::Dw3110::DelayTXMode::DelayWRTTXAndReceive)
+	{
+		return modm::Dw3110::FastCommand::CMD_DTX_TS_W4R;
+	} else if constexpr (dmode == modm::Dw3110::DelayTXMode::DelayWRTRefAndReceive)
+	{
+		return modm::Dw3110::FastCommand::CMD_DTX_REF_W4R;
+	}
+}
+
 template<typename SpiMaster, typename Cs>
+template<modm::Dw3110::DelayTXMode dmode>
+modm::ResumableResult<bool>
+modm::Dw3110Phy<SpiMaster, Cs>::transmitDelayed(uint32_t time,
+												const std::span<const uint8_t> payload,
+												bool ranging, bool fast)
+{
+	RF_BEGIN();
+	scratch[0] = (time >> 0) & 0xFF;
+	scratch[1] = (time >> 8) & 0xFF;
+	scratch[2] = (time >> 16) & 0xFF;
+	scratch[3] = (time >> 24) & 0xFF;
+	RF_CALL(writeRegister<Dw3110::DX_TIME, 4>(std::span<const uint8_t>(scratch).first<4>()));
+	RF_END_RETURN_CALL(transmitGeneric<txModeToCmdDelay<dmode>()>(payload, ranging, fast));
+}
+
+template<typename SpiMaster, typename Cs>
+template<modm::Dw3110::TXMode tmode>
 modm::ResumableResult<bool>
 modm::Dw3110Phy<SpiMaster, Cs>::transmit(const std::span<const uint8_t> payload, bool ranging,
 										 bool fast)
 {
-	return transmitGeneric<Dw3110::FastCommand::CMD_CCA_TX>(payload, ranging, fast);
-}
-
-template<typename SpiMaster, typename Cs>
-modm::ResumableResult<bool>
-modm::Dw3110Phy<SpiMaster, Cs>::transmitAndStartReceive(const std::span<const uint8_t> payload,
-														bool ranging, bool fast)
-{
-	return transmitGeneric<Dw3110::FastCommand::CMD_CCA_TX_W4R>(payload, ranging, fast);
+	return transmitGeneric<txModeToCmd<tmode>()>(payload, ranging, fast);
 }
 
 template<typename SpiMaster, typename Cs>
@@ -875,9 +948,7 @@ modm::Dw3110Phy<SpiMaster, Cs>::transmitGeneric(const std::span<const uint8_t> p
 												bool ranging, bool fast)
 {
 	RF_BEGIN();
-	RF_CALL(readRegister<Dw3110::SYS_CFG, 1>(std::span<uint8_t>(scratch).first<1>()));
-	if (((scratch[0] & 0x10) && payload.size() > 1021) ||
-		(!(scratch[0] & 0x10) && payload.size() > 125))
+	if ((long_frames && payload.size() > 1021) || (!long_frames && payload.size() > 125))
 	{
 		MODM_LOG_ERROR << "Payload is too long to transmit!" << modm::endl;
 		RF_RETURN(false);
@@ -919,6 +990,19 @@ modm::Dw3110Phy<SpiMaster, Cs>::transmitGeneric(const std::span<const uint8_t> p
 		RF_CALL(fetchSystemStatus());
 	}
 	RF_END_RETURN(true);
+}
+
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<void>
+modm::Dw3110Phy<SpiMaster, Cs>::setReferenceTime(uint32_t time)
+{
+	RF_BEGIN();
+	scratch[0] = (time >> 0) & 0xFF;
+	scratch[1] = (time >> 8) & 0xFF;
+	scratch[2] = (time >> 16) & 0xFF;
+	scratch[3] = (time >> 24) & 0xFF;
+	RF_CALL(writeRegister<Dw3110::DREF_TIME, 4>(std::span<const uint8_t>(scratch).first<4>()));
+	RF_END();
 }
 
 template<typename SpiMaster, typename Cs>
