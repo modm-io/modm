@@ -44,6 +44,15 @@ struct Dw3110
 		DelayWRTRefAndReceive,
 	};
 
+	enum class Error
+	{
+		None,
+		DelayTooShort,
+		ChannelBusy,
+		TimedOut,
+		PayloadTooLarge
+	};
+
 	enum class FastCommand : uint8_t
 	{
 		CMD_TXRXOFF = (0x0 << 1) | 1,  //< Puts the device into IDLE state and clears any events.
@@ -185,10 +194,10 @@ struct Dw3110
 		SPIERR = (1ll << 43),
 		CCA_FAIL = (1ll << 44),
 	};
-	typedef ::modm::Flags<SystemStatus,uint64_t> SystemStatus_t;
+	typedef ::modm::Flags<SystemStatus, uint64_t> SystemStatus_t;
 	MODM_INT_TYPE_FLAGS(SystemStatus_t);
 
-	enum class FilterConfig: uint16_t
+	enum class FilterConfig : uint16_t
 	{
 		AllowBeacon = (1u << 0),
 		AllowData = (1u << 1),

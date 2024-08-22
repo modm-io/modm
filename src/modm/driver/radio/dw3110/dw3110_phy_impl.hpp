@@ -847,7 +847,7 @@ txModeToCmdDelay()
 
 template<typename SpiMaster, typename Cs>
 template<modm::Dw3110::DelayTXMode dmode>
-modm::ResumableResult<bool>
+modm::ResumableResult<modm::Dw3110::Error>
 modm::Dw3110Phy<SpiMaster, Cs>::transmitDelayed(uint32_t time,
 												const std::span<const uint8_t> payload,
 												bool ranging, bool fast)
@@ -863,7 +863,7 @@ modm::Dw3110Phy<SpiMaster, Cs>::transmitDelayed(uint32_t time,
 
 template<typename SpiMaster, typename Cs>
 template<modm::Dw3110::TXMode tmode>
-modm::ResumableResult<bool>
+modm::ResumableResult<modm::Dw3110::Error>
 modm::Dw3110Phy<SpiMaster, Cs>::transmit(const std::span<const uint8_t> payload, bool ranging,
 										 bool fast)
 {
@@ -872,7 +872,7 @@ modm::Dw3110Phy<SpiMaster, Cs>::transmit(const std::span<const uint8_t> payload,
 
 template<typename SpiMaster, typename Cs>
 template<modm::Dw3110::FastCommand Cmd>
-modm::ResumableResult<bool>
+modm::ResumableResult<modm::Dw3110::Error>
 modm::Dw3110Phy<SpiMaster, Cs>::transmitGeneric(const std::span<const uint8_t> payload,
 												bool ranging, bool fast)
 {
@@ -880,14 +880,11 @@ modm::Dw3110Phy<SpiMaster, Cs>::transmitGeneric(const std::span<const uint8_t> p
 	if ((long_frames && payload.size() > 1021) || (!long_frames && payload.size() > 125))
 	{
 		MODM_LOG_ERROR << "Payload is too long to transmit!" << modm::endl;
-		RF_RETURN(false);
+		RF_RETURN(Dw3110::Error::PayloadTooLarge);
 	}
 
 	// Go idle
 	RF_CALL(sendCommand<Dw3110::FastCommand::CMD_TXRXOFF>());
-
-	// Clear TXFRS and CCA_FAIL flag
-	RF_CALL(clearStatusBits(Dw3110::SystemStatus::TXFRS | Dw3110::SystemStatus::CCA_FAIL));
 
 	// Write payload to buffer
 	RF_CALL(writeRegisterBank<Dw3110::TX_BUFFER_BANK>(payload, payload.size()));
@@ -905,22 +902,57 @@ modm::Dw3110Phy<SpiMaster, Cs>::transmitGeneric(const std::span<const uint8_t> p
 	RF_CALL(writeRegister<Dw3110::TX_FCTRL, 6>(tx_info));
 	RF_CALL(sendCommand<Cmd>());
 
-	timeout.restart(60ms);
 	RF_CALL(fetchSystemStatus());
+	RF_CALL(fetchChipState());
 	while (system_status.none(Dw3110::SystemStatus::TXFRS))
 	{
-		if (system_status.all(Dw3110::SystemStatus::CCA_FAIL))
+		last_err = RF_CALL(checkTXFailed());
+		if (last_err != Dw3110::Error::None)
 		{
-			MODM_LOG_DEBUG << "Channel is busy!" << modm::endl;
-			RF_RETURN(false);
+			RF_CALL(sendCommand<Dw3110::FastCommand::CMD_TXRXOFF>());
+			RF_CALL(
+				clearStatusBits(Dw3110::SystemStatus::CCA_FAIL | Dw3110::SystemStatus::HPDWARN));
+			RF_RETURN(last_err);
 		}
+
 		RF_YIELD();
-		if (timeout.execute()) { RF_RETURN(false); }
 		RF_CALL(fetchSystemStatus());
+		RF_CALL(fetchChipState());
 	}
-	RF_END_RETURN(true);
+
+	// Clear TX related flags
+	RF_CALL(clearStatusBits(Dw3110::SystemStatus::TXFRS | Dw3110::SystemStatus::TXFRB |
+							Dw3110::SystemStatus::TXPHS | Dw3110::SystemStatus::TXPRS |
+							Dw3110::SystemStatus::CCA_FAIL | Dw3110::SystemStatus::HPDWARN));
+	RF_END_RETURN(modm::Dw3110::Error::None);
 }
 
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<modm::Dw3110::Error>
+modm::Dw3110Phy<SpiMaster, Cs>::checkTXFailed()
+{
+	RF_BEGIN();
+	if (system_status.any(Dw3110::SystemStatus::CCA_FAIL))
+	{
+		RF_RETURN(Dw3110::Error::ChannelBusy);
+	}
+
+	if (system_status.any(Dw3110::SystemStatus::HPDWARN))
+	{
+		RF_RETURN(Dw3110::Error::DelayTooShort);
+	}
+
+	if (sys_state[0] == 0x0 && sys_state[1] == 0x0 && sys_state[2] == 0x0D && sys_state[3] == 0x0)
+	{
+		RF_CALL(fetchChipState());
+		if (sys_state[0] == 0x0 && sys_state[1] == 0x0 && sys_state[2] == 0x0D &&
+			sys_state[3] == 0x0)
+		{
+			RF_RETURN(Dw3110::Error::DelayTooShort);
+		}
+	}
+	RF_END_RETURN(Dw3110::Error::None);
+}
 template<typename SpiMaster, typename Cs>
 modm::ResumableResult<void>
 modm::Dw3110Phy<SpiMaster, Cs>::setReferenceTime(uint32_t time)

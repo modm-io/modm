@@ -217,7 +217,7 @@ public:
 	// ranging parameter  decides whether or not to set the ranging bit in the header
 	// fast parameter decides if the data portion is sent at 850kbps or 6.8Mbps
 	template<Dw3110::TXMode tmode = Dw3110::TXMode::Default>
-	modm::ResumableResult<bool>
+	modm::ResumableResult<Dw3110::Error>
 	transmit(const std::span<const uint8_t> payload, bool ranging = true, bool fast = true);
 
 	// Set the reference time value
@@ -231,7 +231,7 @@ public:
 	// dependent on the DelayTXMode provided but is in units of 4ns
 	// Note that this transmission mode does not respect the clear channel assessment
 	template<Dw3110::DelayTXMode dmode = Dw3110::DelayTXMode::AtTime>
-	modm::ResumableResult<bool>
+	modm::ResumableResult<Dw3110::Error>
 	transmitDelayed(uint32_t time, const std::span<const uint8_t> payload, bool ranging = true,
 					bool fast = true);
 
@@ -249,7 +249,7 @@ private:
 	// command fast parameter decides if the data portion is sent at 850kbps
 	// or 6.8Mbps
 	template<modm::Dw3110::FastCommand Cmd>
-	modm::ResumableResult<bool>
+	modm::ResumableResult<Dw3110::Error>
 	transmitGeneric(const std::span<const uint8_t> payload, bool ranging, bool fast);
 
 	// Only load configuration independent stuff, everything else should be
@@ -282,6 +282,11 @@ private:
 	// Update the local chip_state variable
 	modm::ResumableResult<void>
 	fetchChipState();
+
+	// Due to an errata the check is a bit more complicated
+	// Relies on system_status and chip_state being up to date
+	modm::ResumableResult<modm::Dw3110::Error>
+	checkTXFailed();
 
 	// Read a variable from the OTP memory
 	template<Dw3110::OTPAddr Addr>
@@ -335,6 +340,7 @@ private:
 	std::array<uint8_t, 4> otp_read{}, rx_cal_res{}, sys_state{}, ldo_config{}, temp_rw{},
 		rx_finfo{};
 	std::array<uint8_t, 1> xtal{}, bias_ctrl{}, rx_cal_sts{};
+	Dw3110::Error last_err;
 };
 
 }  // namespace modm
