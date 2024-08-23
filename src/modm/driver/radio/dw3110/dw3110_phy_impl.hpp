@@ -782,72 +782,74 @@ modm::Dw3110Phy<SpiMaster, Cs>::setAutoAckEnabled(bool value)
 	RF_END();
 }
 
-template<modm::Dw3110::TXMode mode>
+template<typename SpiMaster, typename Cs>
+template<modm::Dw3110Phy<SpiMaster, Cs>::TXMode mode>
 consteval modm::Dw3110::FastCommand
-txModeToCmd()
+modm::Dw3110Phy<SpiMaster, Cs>::txModeToCmd()
 {
 	static_assert(
-		mode == modm::Dw3110::TXMode::Default || mode == modm::Dw3110::TXMode::DefaultAndReceive ||
-			mode == modm::Dw3110::TXMode::Force || mode == modm::Dw3110::TXMode::ForceAndReceive,
+		mode == TXMode::Default || mode == TXMode::DefaultAndReceive ||
+			mode == TXMode::Force || mode == TXMode::ForceAndReceive,
 		"Unknown TXMode in txModeToCmd!");
-	if constexpr (mode == modm::Dw3110::TXMode::Default)
+	if constexpr (mode == TXMode::Default)
 	{
 		return modm::Dw3110::FastCommand::CMD_CCA_TX;
-	} else if constexpr (mode == modm::Dw3110::TXMode::DefaultAndReceive)
+	} else if constexpr (mode == TXMode::DefaultAndReceive)
 	{
 		return modm::Dw3110::FastCommand::CMD_CCA_TX_W4R;
-	} else if constexpr (mode == modm::Dw3110::TXMode::Force)
+	} else if constexpr (mode == TXMode::Force)
 	{
 		return modm::Dw3110::FastCommand::CMD_TX;
-	} else if constexpr (mode == modm::Dw3110::TXMode::ForceAndReceive)
+	} else if constexpr (mode == TXMode::ForceAndReceive)
 	{
 		return modm::Dw3110::FastCommand::CMD_TX_W4R;
 	}
 }
 
-template<modm::Dw3110::DelayTXMode dmode>
+template<typename SpiMaster, typename Cs>
+template<modm::Dw3110Phy<SpiMaster, Cs>::DelayTXMode dmode>
 consteval modm::Dw3110::FastCommand
-txModeToCmdDelay()
+modm::Dw3110Phy<SpiMaster, Cs>::txModeToCmdDelay()
 {
-	static_assert(dmode == modm::Dw3110::DelayTXMode::AtTime ||
-					  dmode == modm::Dw3110::DelayTXMode::DelayWRTRX ||
-					  dmode == modm::Dw3110::DelayTXMode::DelayWRTTX ||
-					  dmode == modm::Dw3110::DelayTXMode::DelayWRTRef ||
-					  dmode == modm::Dw3110::DelayTXMode::AtTimeAndReceive ||
-					  dmode == modm::Dw3110::DelayTXMode::DelayWRTRXAndReceive ||
-					  dmode == modm::Dw3110::DelayTXMode::DelayWRTTXAndReceive ||
-					  dmode == modm::Dw3110::DelayTXMode::DelayWRTRefAndReceive,
+	static_assert(dmode == DelayTXMode::AtTime ||
+					  dmode == DelayTXMode::DelayWRTRX ||
+					  dmode == DelayTXMode::DelayWRTTX ||
+					  dmode ==DelayTXMode::DelayWRTRef ||
+					  dmode == DelayTXMode::AtTimeAndReceive ||
+					  dmode == DelayTXMode::DelayWRTRXAndReceive ||
+					  dmode == DelayTXMode::DelayWRTTXAndReceive ||
+					  dmode == DelayTXMode::DelayWRTRefAndReceive,
 				  "Unknown DelayTXMode in txModeToCmdDelay!");
-	if constexpr (dmode == modm::Dw3110::DelayTXMode::AtTime)
+	if constexpr (dmode == DelayTXMode::AtTime)
 	{
 		return modm::Dw3110::FastCommand::CMD_DTX;
-	} else if constexpr (dmode == modm::Dw3110::DelayTXMode::DelayWRTRX)
+	} else if constexpr (dmode == DelayTXMode::DelayWRTRX)
 	{
 		return modm::Dw3110::FastCommand::CMD_DTX_RS;
-	} else if constexpr (dmode == modm::Dw3110::DelayTXMode::DelayWRTTX)
+	} else if constexpr (dmode == DelayTXMode::DelayWRTTX)
 	{
 		return modm::Dw3110::FastCommand::CMD_DTX_TS;
-	} else if constexpr (dmode == modm::Dw3110::DelayTXMode::DelayWRTRef)
+	} else if constexpr (dmode == DelayTXMode::DelayWRTRef)
 	{
 		return modm::Dw3110::FastCommand::CMD_DTX_REF;
-	} else if constexpr (dmode == modm::Dw3110::DelayTXMode::AtTimeAndReceive)
+	} else if constexpr (dmode == DelayTXMode::AtTimeAndReceive)
 	{
 		return modm::Dw3110::FastCommand::CMD_DTX_W4R;
-	} else if constexpr (dmode == modm::Dw3110::DelayTXMode::DelayWRTRXAndReceive)
+	} else if constexpr (dmode == DelayTXMode::DelayWRTRXAndReceive)
 	{
 		return modm::Dw3110::FastCommand::CMD_DTX_RS_W4R;
-	} else if constexpr (dmode == modm::Dw3110::DelayTXMode::DelayWRTTXAndReceive)
+	} else if constexpr (dmode == DelayTXMode::DelayWRTTXAndReceive)
 	{
 		return modm::Dw3110::FastCommand::CMD_DTX_TS_W4R;
-	} else if constexpr (dmode == modm::Dw3110::DelayTXMode::DelayWRTRefAndReceive)
+	} else if constexpr (dmode == DelayTXMode::DelayWRTRefAndReceive)
 	{
 		return modm::Dw3110::FastCommand::CMD_DTX_REF_W4R;
 	}
 }
 
 template<typename SpiMaster, typename Cs>
-template<modm::Dw3110::DelayTXMode dmode>
-modm::ResumableResult<modm::Dw3110::Error>
+template<modm::Dw3110Phy<SpiMaster, Cs>::DelayTXMode dmode>
+modm::ResumableResult<typename modm::Dw3110Phy<SpiMaster, Cs>::Error>
 modm::Dw3110Phy<SpiMaster, Cs>::transmitDelayed(uint32_t time,
 												const std::span<const uint8_t> payload,
 												bool ranging, bool fast)
@@ -862,8 +864,8 @@ modm::Dw3110Phy<SpiMaster, Cs>::transmitDelayed(uint32_t time,
 }
 
 template<typename SpiMaster, typename Cs>
-template<modm::Dw3110::TXMode tmode>
-modm::ResumableResult<modm::Dw3110::Error>
+template<modm::Dw3110Phy<SpiMaster, Cs>::TXMode tmode>
+modm::ResumableResult<typename modm::Dw3110Phy<SpiMaster, Cs>::Error>
 modm::Dw3110Phy<SpiMaster, Cs>::transmit(const std::span<const uint8_t> payload, bool ranging,
 										 bool fast)
 {
@@ -872,7 +874,7 @@ modm::Dw3110Phy<SpiMaster, Cs>::transmit(const std::span<const uint8_t> payload,
 
 template<typename SpiMaster, typename Cs>
 template<modm::Dw3110::FastCommand Cmd>
-modm::ResumableResult<modm::Dw3110::Error>
+modm::ResumableResult<typename modm::Dw3110Phy<SpiMaster, Cs>::Error>
 modm::Dw3110Phy<SpiMaster, Cs>::transmitGeneric(const std::span<const uint8_t> payload,
 												bool ranging, bool fast)
 {
@@ -880,7 +882,7 @@ modm::Dw3110Phy<SpiMaster, Cs>::transmitGeneric(const std::span<const uint8_t> p
 	if ((long_frames && payload.size() > 1021) || (!long_frames && payload.size() > 125))
 	{
 		MODM_LOG_ERROR << "Payload is too long to transmit!" << modm::endl;
-		RF_RETURN(Dw3110::Error::PayloadTooLarge);
+		RF_RETURN(Error::PayloadTooLarge);
 	}
 
 	// Go idle
@@ -907,7 +909,7 @@ modm::Dw3110Phy<SpiMaster, Cs>::transmitGeneric(const std::span<const uint8_t> p
 	while (system_status.none(Dw3110::SystemStatus::TXFRS))
 	{
 		last_err = RF_CALL(checkTXFailed());
-		if (last_err != Dw3110::Error::None)
+		if (last_err != Error::None)
 		{
 			RF_CALL(sendCommand<Dw3110::FastCommand::CMD_TXRXOFF>());
 			RF_CALL(
@@ -924,22 +926,22 @@ modm::Dw3110Phy<SpiMaster, Cs>::transmitGeneric(const std::span<const uint8_t> p
 	RF_CALL(clearStatusBits(Dw3110::SystemStatus::TXFRS | Dw3110::SystemStatus::TXFRB |
 							Dw3110::SystemStatus::TXPHS | Dw3110::SystemStatus::TXPRS |
 							Dw3110::SystemStatus::CCA_FAIL | Dw3110::SystemStatus::HPDWARN));
-	RF_END_RETURN(modm::Dw3110::Error::None);
+	RF_END_RETURN(Error::None);
 }
 
 template<typename SpiMaster, typename Cs>
-modm::ResumableResult<modm::Dw3110::Error>
+modm::ResumableResult<typename modm::Dw3110Phy<SpiMaster, Cs>::Error>
 modm::Dw3110Phy<SpiMaster, Cs>::checkTXFailed()
 {
 	RF_BEGIN();
 	if (system_status.any(Dw3110::SystemStatus::CCA_FAIL))
 	{
-		RF_RETURN(Dw3110::Error::ChannelBusy);
+		RF_RETURN(Error::ChannelBusy);
 	}
 
 	if (system_status.any(Dw3110::SystemStatus::HPDWARN))
 	{
-		RF_RETURN(Dw3110::Error::DelayTooShort);
+		RF_RETURN(Error::DelayTooShort);
 	}
 
 	if (sys_state[0] == 0x0 && sys_state[1] == 0x0 && sys_state[2] == 0x0D && sys_state[3] == 0x0)
@@ -948,11 +950,12 @@ modm::Dw3110Phy<SpiMaster, Cs>::checkTXFailed()
 		if (sys_state[0] == 0x0 && sys_state[1] == 0x0 && sys_state[2] == 0x0D &&
 			sys_state[3] == 0x0)
 		{
-			RF_RETURN(Dw3110::Error::DelayTooShort);
+			RF_RETURN(Error::DelayTooShort);
 		}
 	}
-	RF_END_RETURN(Dw3110::Error::None);
+	RF_END_RETURN(Error::None);
 }
+
 template<typename SpiMaster, typename Cs>
 modm::ResumableResult<void>
 modm::Dw3110Phy<SpiMaster, Cs>::setReferenceTime(uint32_t time)

@@ -40,6 +40,35 @@ template<typename SpiMaster, typename Cs>
 class Dw3110Phy : public modm::SpiDevice<SpiMaster>, protected modm::NestedResumable<6>
 {
 public:
+	enum class TXMode
+	{
+		Default,
+		DefaultAndReceive,
+		Force,
+		ForceAndReceive,
+	};
+
+	enum class DelayTXMode
+	{
+		AtTime,
+		AtTimeAndReceive,
+		DelayWRTRX,
+		DelayWRTRXAndReceive,
+		DelayWRTTX,
+		DelayWRTTXAndReceive,
+		DelayWRTRef,
+		DelayWRTRefAndReceive,
+	};
+
+	enum class Error
+	{
+		None,
+		DelayTooShort,
+		ChannelBusy,
+		TimedOut,
+		PayloadTooLarge
+	};
+
 	Dw3110Phy();
 
 	/// Set the UWB channel used
@@ -208,8 +237,8 @@ public:
 	/// @param payload Span to the desired payload
 	/// @param ranging Decides whether or not to set the ranging bit in the header
 	/// @param fast Decides if the data portion is sent at 850kbps or 6.8Mbps
-	template<Dw3110::TXMode tmode = Dw3110::TXMode::Default>
-	modm::ResumableResult<Dw3110::Error>
+	template<TXMode tmode = TXMode::Default>
+	modm::ResumableResult<Error>
 	transmit(const std::span<const uint8_t> payload, bool ranging = true, bool fast = true);
 
 	/// Set the reference time value \n
@@ -226,8 +255,8 @@ public:
 	/// @param time Either the transmission time or a delay in units of 4ns dependent on the
 	/// DelayTXMode provided
 	/// @warning This transmission mode does not respect the clear channel assessment
-	template<Dw3110::DelayTXMode dmode = Dw3110::DelayTXMode::AtTime>
-	modm::ResumableResult<Dw3110::Error>
+	template<DelayTXMode dmode = DelayTXMode::AtTime>
+	modm::ResumableResult<Error>
 	transmitDelayed(uint32_t time, const std::span<const uint8_t> payload, bool ranging = true,
 					bool fast = true);
 
@@ -246,7 +275,7 @@ protected:
 	/// @param fast Decides if the data portion is sent at 850kbps or 6.8Mbps
 	/// command
 	template<modm::Dw3110::FastCommand Cmd>
-	modm::ResumableResult<Dw3110::Error>
+	modm::ResumableResult<Error>
 	transmitGeneric(const std::span<const uint8_t> payload, bool ranging, bool fast);
 
 	/// Only load configuration independent stuff, everything else should be
@@ -282,7 +311,7 @@ protected:
 
 	/// Due to an errata the check is a bit more complicated \n
 	/// Relies on system_status and chip_state being up to date
-	modm::ResumableResult<modm::Dw3110::Error>
+	modm::ResumableResult<Error>
 	checkTXFailed();
 
 	/// Read a variable from the OTP memory
@@ -325,6 +354,14 @@ protected:
 	modm::ResumableResult<void>
 	writeRegisterBank(const std::span<const uint8_t> val, size_t len);
 
+	template<TXMode mode>
+	static consteval modm::Dw3110::FastCommand
+	txModeToCmd();
+
+	template<DelayTXMode dmode>
+	static consteval modm::Dw3110::FastCommand
+	txModeToCmdDelay();
+
 private:
 	PreciseTimeout timeout;
 
@@ -338,7 +375,7 @@ private:
 	std::array<uint8_t, 4> otp_read{}, rx_cal_res{}, sys_state{}, ldo_config{}, temp_rw{},
 		rx_finfo{};
 	std::array<uint8_t, 1> xtal{}, bias_ctrl{}, rx_cal_sts{};
-	Dw3110::Error last_err;
+	Error last_err;
 };
 
 }  // namespace modm

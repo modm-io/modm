@@ -49,7 +49,7 @@ public:
 			txdata[txdata.size() - 1]++;
 			timeout.restart(Button::read() ? 500ms : 10ms);
 			PT_WAIT_UNTIL(timeout.execute());
-			if (PT_CALL(radio.transmit(txdata, true)) == modm::Dw3110::Error::None)
+			if (PT_CALL(radio.transmit(txdata, true)) == MyDw3110_b::Error::None)
 			{
 				sentCount++;
 			} else
