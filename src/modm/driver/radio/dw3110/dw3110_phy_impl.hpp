@@ -234,7 +234,7 @@ modm::Dw3110Phy<SpiMaster, Cs>::setEnableFastTurnaround(bool value)
 		RF_CALL(writeRegisterMasked<Dw3110::SYS_CFG, 1, 2>(or_mask_true, and_mask_true));
 	} else
 	{
-		constexpr static uint8_t or_mask_false[] = {0x04};
+		constexpr static uint8_t or_mask_false[] = {0x00};
 		constexpr static uint8_t and_mask_false[] = {0xFB};
 		RF_CALL(writeRegisterMasked<Dw3110::SYS_CFG, 1, 2>(or_mask_false, and_mask_false));
 	}
