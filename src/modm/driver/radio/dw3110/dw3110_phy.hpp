@@ -199,6 +199,27 @@ public:
 	modm::ResumableResult<Dw3110::SystemState>
 	getChipState();
 
+	/// Set both the RX and TX antenna delay \n
+	/// Unit is approx 15.65ps
+	modm::ResumableResult<void>
+	setAntennaDelay(uint16_t delay);
+
+	/// Get the currently programmed RX antenna delay \n
+	/// Unit is approx 15.65ps
+	modm::ResumableResult<uint16_t>
+	getRXAntennaDelay();
+
+	/// Get the currently programmed TX antenna delay \n
+	/// Unit is approx 15.65ps
+	modm::ResumableResult<uint16_t>
+	getTXAntennaDelay();
+
+	/// Get the Clock offset multiplier for the received packet \n
+	/// Can be used to recover the clock drift compared to a packets sender \n
+	/// Unit is in parts per million (ppm)
+	modm::ResumableResult<float>
+	getReceiverClockOffset();
+
 	/// Runs the RX calibration. \n
 	/// Needs to be done after startup, wake and after 20C temperature change \n
 	/// Needs to be run when chip is in IDLE_PLL state \n

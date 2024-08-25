@@ -764,6 +764,45 @@ modm::Dw3110Phy<SpiMaster, Cs>::setFilterConfig(Dw3110::FilterConfig_t fc)
 }
 
 template<typename SpiMaster, typename Cs>
+modm::ResumableResult<uint16_t>
+modm::Dw3110Phy<SpiMaster, Cs>::getRXAntennaDelay()
+{
+	RF_BEGIN();
+	RF_CALL(readRegister<Dw3110::CIA_CONF, 2, 0>(std::span<uint8_t>(scratch).first<2>()));
+	RF_END_RETURN(uint16_t(scratch[0] << 0 | scratch[1] << 8));
+}
+
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<uint16_t>
+modm::Dw3110Phy<SpiMaster, Cs>::getTXAntennaDelay()
+{
+	RF_BEGIN();
+	RF_CALL(readRegister<Dw3110::TX_ANTD, 2, 0>(std::span<uint8_t>(scratch).first<2>()));
+	RF_END_RETURN(uint16_t(scratch[0] << 0 | scratch[1] << 8));
+}
+
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<float>
+modm::Dw3110Phy<SpiMaster, Cs>::getReceiverClockOffset()
+{
+	RF_BEGIN();
+	RF_CALL(readRegister<Dw3110::CIA_DIAG_0, 2>(std::span<uint8_t>(scratch).first<2>()));
+	RF_END_RETURN(float(scratch[0] << 0 | (scratch[1] & 0x1F) << 8) / 67108864.0f * 1000000.0f);
+}
+
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<void>
+modm::Dw3110Phy<SpiMaster, Cs>::setAntennaDelay(uint16_t delay)
+{
+	RF_BEGIN();
+	scratch[0] = (delay >> 0) & 0xFF;
+	scratch[1] = (delay >> 8) & 0xFF;
+	RF_CALL(writeRegister<Dw3110::CIA_CONF, 2, 0>(std::span<const uint8_t>(scratch).first<2>()));
+	RF_CALL(writeRegister<Dw3110::TX_ANTD, 2, 0>(std::span<const uint8_t>(scratch).first<2>()));
+	RF_END();
+}
+
+template<typename SpiMaster, typename Cs>
 modm::ResumableResult<void>
 modm::Dw3110Phy<SpiMaster, Cs>::setAutoAckEnabled(bool value)
 {
@@ -787,10 +826,9 @@ template<modm::Dw3110Phy<SpiMaster, Cs>::TXMode mode>
 consteval modm::Dw3110::FastCommand
 modm::Dw3110Phy<SpiMaster, Cs>::txModeToCmd()
 {
-	static_assert(
-		mode == TXMode::Default || mode == TXMode::DefaultAndReceive ||
-			mode == TXMode::Force || mode == TXMode::ForceAndReceive,
-		"Unknown TXMode in txModeToCmd!");
+	static_assert(mode == TXMode::Default || mode == TXMode::DefaultAndReceive ||
+					  mode == TXMode::Force || mode == TXMode::ForceAndReceive,
+				  "Unknown TXMode in txModeToCmd!");
 	if constexpr (mode == TXMode::Default)
 	{
 		return modm::Dw3110::FastCommand::CMD_CCA_TX;
@@ -811,10 +849,8 @@ template<modm::Dw3110Phy<SpiMaster, Cs>::DelayTXMode dmode>
 consteval modm::Dw3110::FastCommand
 modm::Dw3110Phy<SpiMaster, Cs>::txModeToCmdDelay()
 {
-	static_assert(dmode == DelayTXMode::AtTime ||
-					  dmode == DelayTXMode::DelayWRTRX ||
-					  dmode == DelayTXMode::DelayWRTTX ||
-					  dmode ==DelayTXMode::DelayWRTRef ||
+	static_assert(dmode == DelayTXMode::AtTime || dmode == DelayTXMode::DelayWRTRX ||
+					  dmode == DelayTXMode::DelayWRTTX || dmode == DelayTXMode::DelayWRTRef ||
 					  dmode == DelayTXMode::AtTimeAndReceive ||
 					  dmode == DelayTXMode::DelayWRTRXAndReceive ||
 					  dmode == DelayTXMode::DelayWRTTXAndReceive ||
@@ -934,15 +970,9 @@ modm::ResumableResult<typename modm::Dw3110Phy<SpiMaster, Cs>::Error>
 modm::Dw3110Phy<SpiMaster, Cs>::checkTXFailed()
 {
 	RF_BEGIN();
-	if (system_status.any(Dw3110::SystemStatus::CCA_FAIL))
-	{
-		RF_RETURN(Error::ChannelBusy);
-	}
+	if (system_status.any(Dw3110::SystemStatus::CCA_FAIL)) { RF_RETURN(Error::ChannelBusy); }
 
-	if (system_status.any(Dw3110::SystemStatus::HPDWARN))
-	{
-		RF_RETURN(Error::DelayTooShort);
-	}
+	if (system_status.any(Dw3110::SystemStatus::HPDWARN)) { RF_RETURN(Error::DelayTooShort); }
 
 	if (sys_state[0] == 0x0 && sys_state[1] == 0x0 && sys_state[2] == 0x0D && sys_state[3] == 0x0)
 	{
