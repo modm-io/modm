@@ -1277,3 +1277,38 @@ modm::Dw3110Phy<SpiMaster, Cs>::checkResult(std::span<const uint8_t, Len> expect
 	}
 	return result;
 }
+
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<void>
+modm::Dw3110Phy<SpiMaster, Cs>::setInterruptsEnabled(Dw3110::SystemStatus_t mask)
+{
+	RF_BEGIN();
+	scratch[0] = (mask.value >> 0) & 0xFF;
+	scratch[1] = (mask.value >> 8) & 0xFF;
+	scratch[2] = (mask.value >> 16) & 0xFF;
+	scratch[3] = (mask.value >> 24) & 0xFF;
+	scratch[4] = (mask.value >> 32) & 0xFF;
+	scratch[5] = (mask.value >> 40) & 0xFF;
+	RF_CALL(writeRegister<Dw3110::SYS_ENABLE, 6>(std::span<const uint8_t>(scratch).first<6>()));
+	RF_END();
+}
+
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<void>
+modm::Dw3110Phy<SpiMaster, Cs>::setIRQPolarity(bool high)
+{
+	RF_BEGIN();
+	if (high)
+	{
+		constexpr static uint8_t or_mask[] = {0x20};
+		constexpr static uint8_t and_mask[] = {0xFF};
+		RF_CALL(writeRegisterMasked<Dw3110::DIAG_TMC, 1, 2>(or_mask, and_mask));
+	} else
+	{
+
+		constexpr static uint8_t or_mask[] = {0x00};
+		constexpr static uint8_t and_mask[] = {0xDF};
+		RF_CALL(writeRegisterMasked<Dw3110::DIAG_TMC, 1, 2>(or_mask, and_mask));
+	}
+	RF_END();
+}

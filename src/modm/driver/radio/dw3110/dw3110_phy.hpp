@@ -289,6 +289,22 @@ public:
 	modm::ResumableResult<void>
 	clearStatusBits(Dw3110::SystemStatus_t mask);
 
+	/// Set interrupt bits \n
+	/// Set on which status events the IRQ Pin of the chip should be pulled high \n
+	/// Interrupt condition can be cleared by clearing the corresponding status bit using \ref
+	/// clearStatusBits() \n
+	/// Polarity of the line can be changed with \ref setIRQPolarity() \n
+	/// @warning Dw3110::SystemStatus::IRQS will be ignored since it does not correspond to an
+	/// interrupt
+	modm::ResumableResult<void>
+	setInterruptsEnabled(Dw3110::SystemStatus_t mask);
+
+	/// Set the polarity of the interrupt line \n
+	/// Default is active high \n
+	/// @param high If true sets the line to active high
+	modm::ResumableResult<void>
+	setIRQPolarity(bool high);
+
 protected:
 	/// Transmit a given package using the current configuration and a specific command
 	/// @param payload Span to the desired payload
