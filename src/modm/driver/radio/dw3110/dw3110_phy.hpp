@@ -30,7 +30,7 @@ namespace modm
  * Hardware abstraction layer for DW3110 \n
  * Unsupported Features: AES encryption, Double buffering, GPIO, Temperature and
  * Voltage, Pulse Generator calibration, RX antenna delay temp compensation,
- * Soft reset, Sleep, Sniff mode, Delayed transmission, STS
+ * Soft reset, Sleep, Sniff mode
  * @ingroup  modm_driver_dw3110
  * @author   Elias H.
  * @author   Raphael Lehmann
@@ -304,6 +304,57 @@ public:
 	/// @param high If true sets the line to active high
 	modm::ResumableResult<void>
 	setIRQPolarity(bool high);
+
+	/// Set the length of the generated Secure timestamp
+	///@param len Length in units of 8 chips (~1µs), minimum supported is 32 chips(e.g a value of 3)
+	modm::ResumableResult<bool>
+	setSTSLength(uint8_t len);
+
+	/// Set the STS mode \n
+	/// @param mode Defines where to place the STS inside the packet
+	/// @param sdc If true IV and Key are ignored and a deterministic code is used
+	modm::ResumableResult<void>
+	setSTSMode(Dw3110::STSMode mode, bool sdc);
+
+	/// Return the 12-bit quality assessment of the last received STS
+	modm::ResumableResult<uint16_t>
+	getSTSQuality();
+
+	/// Return whether or not the STS quality is in an acceptable range
+	modm::ResumableResult<bool>
+	getSTSGood();
+
+	/// Set the Key to use for AES generation of the STS \n
+	/// Ignored if SDC is set in \ref setSTSMode()
+	modm::ResumableResult<void>
+	setSTSKey(std::span<const uint8_t, 16> key);
+
+	/// Set the IV to use for AES generation of the STS \n
+	/// Ignored if SDC is set in \ref setSTSMode()
+	modm::ResumableResult<void>
+	setSTSIV(std::span<const uint8_t, 16> iv);
+
+	/// Get the Key to use for AES generation of the STS
+	modm::ResumableResult<void>
+	getSTSKey(std::span<uint8_t, 16> key);
+
+	/// Get the IV to use for AES generation of the STS
+	/// @warning Will only return the programmed IV, to get the incremented value use \ref
+	/// getCurrentCounter()
+	modm::ResumableResult<void>
+	getSTSIV(std::span<uint8_t, 16> iv);
+
+	/// Get lower 32 bits of the currently used STS IV
+	modm::ResumableResult<uint32_t>
+	getCurrentCounter();
+
+	/// Reload the STS IV from the STSIV registers
+	modm::ResumableResult<void>
+	reloadSTSIV();
+
+	/// Don't increment the STS IV for the next RX/TX
+	modm::ResumableResult<void>
+	reuseLastSTSIV();
 
 protected:
 	/// Transmit a given package using the current configuration and a specific command

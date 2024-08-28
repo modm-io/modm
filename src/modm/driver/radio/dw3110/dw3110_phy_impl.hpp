@@ -107,6 +107,7 @@ modm::Dw3110Phy<SpiMaster, Cs>::initialize(Dw3110::Channel channel, Dw3110::Prea
 	RF_CALL(setEnableLongFrames(false));
 	RF_CALL(setSendHeaderFast(false));
 	RF_CALL(setCCATimeout(256));
+	RF_CALL(reloadSTSIV());
 	RF_END_RETURN(true);
 }
 
@@ -1044,9 +1045,11 @@ modm::Dw3110Phy<SpiMaster, Cs>::fetchPacket(std::span<uint8_t> payload, size_t &
 	if (payload.size() < payload_len) { RF_RETURN(false); }
 	RF_CALL(readRegisterBank<Dw3110::RX_BUFFER_0_BANK>(payload, payload_len));
 
-	// Clear RXFR RXPHE RXFCG and RXFCE flag
+	// Clear most rx flags
 	RF_CALL(clearStatusBits(Dw3110::SystemStatus::RXFR | Dw3110::SystemStatus::RXPHE |
-							Dw3110::SystemStatus::RXFCG | Dw3110::SystemStatus::RXFCE));
+							Dw3110::SystemStatus::RXFCG | Dw3110::SystemStatus::RXFCE |
+							Dw3110::SystemStatus::RXSFDD | Dw3110::SystemStatus::RXPRD |
+							Dw3110::SystemStatus::RXPHD | Dw3110::SystemStatus::RXFSL));
 	RF_END_RETURN(true);
 }
 
@@ -1311,4 +1314,102 @@ modm::Dw3110Phy<SpiMaster, Cs>::setIRQPolarity(bool high)
 		RF_CALL(writeRegisterMasked<Dw3110::DIAG_TMC, 1, 2>(or_mask, and_mask));
 	}
 	RF_END();
+}
+
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<bool>
+modm::Dw3110Phy<SpiMaster, Cs>::setSTSLength(uint8_t len)
+{
+	RF_BEGIN();
+	if (len < 3) { RF_RETURN(false); }
+	scratch[0] = len;
+	RF_CALL(writeRegister<Dw3110::STS_CFG, 1>(std::span<const uint8_t>(scratch).first<1>()));
+	RF_END_RETURN(true);
+}
+
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<void>
+modm::Dw3110Phy<SpiMaster, Cs>::setSTSMode(Dw3110::STSMode mode, bool sdc)
+{
+	RF_BEGIN();
+	scratch[0] = ((uint8_t)mode << 4) | (sdc ? 0x80 : 0x00);
+	scratch[1] = 0x4F | scratch[0];
+	RF_CALL(writeRegisterMasked<Dw3110::SYS_CFG, 1, 1>(
+		std::span<const uint8_t>(scratch).first<1>(),
+		std::span<const uint8_t>(scratch).subspan<1, 1>()));
+	RF_END();
+}
+
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<uint16_t>
+modm::Dw3110Phy<SpiMaster, Cs>::getSTSQuality()
+{
+	RF_BEGIN();
+	RF_CALL(readRegister<Dw3110::STS_STS, 2>(std::span<uint8_t>(scratch).first<2>()));
+	RF_END_RETURN((uint16_t)(scratch[0] << 0 | (scratch[1] & 0x0F) << 8));
+}
+
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<bool>
+modm::Dw3110Phy<SpiMaster, Cs>::getSTSGood()
+{
+	RF_BEGIN();
+	RF_CALL(readRegister<Dw3110::STS_CFG, 1>(std::span<uint8_t>(scratch).first<1>()));
+	RF_CALL(readRegister<Dw3110::STS_STS, 2>(std::span<uint8_t>(scratch).subspan<1, 2>()));
+	RF_END_RETURN((scratch[0] + 1) * 8.0f * 0.6f < (scratch[1] | (scratch[2] << 8)));
+}
+
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<void>
+modm::Dw3110Phy<SpiMaster, Cs>::setSTSKey(std::span<const uint8_t, 16> key)
+{
+	return writeRegister<Dw3110::STS_KEY, 16, 0>(key);
+}
+
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<void>
+modm::Dw3110Phy<SpiMaster, Cs>::setSTSIV(std::span<const uint8_t, 16> iv)
+{
+	return writeRegister<Dw3110::STS_IV, 16, 0>(iv);
+}
+
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<void>
+modm::Dw3110Phy<SpiMaster, Cs>::getSTSKey(std::span<uint8_t, 16> key)
+{
+	return readRegister<Dw3110::STS_KEY, 16, 0>(key);
+}
+
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<void>
+modm::Dw3110Phy<SpiMaster, Cs>::getSTSIV(std::span<uint8_t, 16> iv)
+{
+	return readRegister<Dw3110::STS_IV, 16, 0>(iv);
+}
+
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<uint32_t>
+modm::Dw3110Phy<SpiMaster, Cs>::getCurrentCounter()
+{
+	RF_BEGIN();
+	RF_CALL(readRegister<Dw3110::CTR_DBG, 4, 0>(std::span<uint8_t>(scratch).first<4>()));
+	RF_END_RETURN((uint32_t)scratch[0] | (uint32_t)scratch[1] << 8 | (uint32_t)scratch[2] << 16 |
+				  (uint32_t)scratch[3] << 24);
+}
+
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<void>
+modm::Dw3110Phy<SpiMaster, Cs>::reloadSTSIV()
+{
+	constexpr static uint8_t sts_ctrl[] = {0x01};
+	return writeRegister<Dw3110::STS_CTRL, 1>(sts_ctrl);
+}
+
+template<typename SpiMaster, typename Cs>
+modm::ResumableResult<void>
+modm::Dw3110Phy<SpiMaster, Cs>::reuseLastSTSIV()
+{
+
+	constexpr static uint8_t sts_ctrl[] = {0x02};
+	return writeRegister<Dw3110::STS_CTRL, 1>(sts_ctrl);
 }

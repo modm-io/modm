@@ -115,6 +115,14 @@ struct Dw3110
 		Code_64Mhz_12 = 12,
 	};
 
+	enum class STSMode : uint8_t
+	{
+		SP0 = 0b00,  // No STS
+		SP1 = 0b01,  // STS between SDF and PHR
+		SP2 = 0b10,  // STS at the end (vulnerable to attack!)
+		SP3 = 0b11   // STS after SDF but no PHR or data
+	};
+
 	enum class StartFrameDelimiter : uint8_t
 	{
 		IEEE802_15_4_8 = 0,
