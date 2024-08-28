@@ -15,7 +15,7 @@
 
 def init(module):
     module.name = ":driver:dw3110"
-    module.description = "NRF24 Drivers"
+    module.description = "DW3110 Drivers"
 
 def prepare(module, options):
     module.depends(
