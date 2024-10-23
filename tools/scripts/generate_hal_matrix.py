@@ -113,6 +113,7 @@ def hal_get_modules():
                 "i2c": "I<sup>2</sup>C",
                 "usart": "UART",
                 "uarte": "UART",
+                "pio": "GPIO"
             }
             mname = remap.get(mname, mname.upper())
             modules.add(mname)

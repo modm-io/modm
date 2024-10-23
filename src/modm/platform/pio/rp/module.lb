@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2024, Andrey Kunitsyn
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+class Instance(Module):
+    def __init__(self, instance):
+        self.instance = instance
+
+    def init(self, module):
+        module.name = str(self.instance)
+        module.description = "PIO {} instance".format(self.instance)
+
+    def prepare(self, module, options):
+        return True
+
+    def build(self, env):
+        properties = {
+            "id": self.instance,
+        }
+        env.substitutions = properties
+        env.outbasepath = "modm/src/modm/platform/pio"
+
+        env.template("pio.hpp.in", "pio_{}.hpp".format(self.instance))
+        env.template("pio.cpp.in", "pio_{}.cpp".format(self.instance))
+
+
+
+def init(module):
+    module.name = ":platform:pio"
+    module.description = "Programmable IO block (PIO)"
+
+def prepare(module, options):
+    device = options[":target"]
+    if not device.has_driver("pio:rp*"):
+        return False
+
+    module.depends(
+        ":platform:gpio",
+        ":platform:clockgen",
+        ":architecture:interrupt",
+        ":architecture:fiber")
+
+    for instance in listify(device.get_driver("pio")["instance"]):
+        module.add_submodule(Instance(instance))
+
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/platform/pio"
+    env.copy("pio_asm.hpp")
+    env.copy("pio_program.hpp")
+    env.copy("pio_sm.hpp")
+    pass

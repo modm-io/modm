@@ -1,0 +1,98 @@
+/*
+ * Copyright (c) 2022, Andrey Kunitsyn
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <modm/architecture/interface/peripheral.hpp>
+#include <modm/platform/core/peripherals.hpp>
+#include <modm/platform/gpio/connector.hpp>
+#include <modm/math/algorithm/prescaler.hpp>
+
+#include "pio_program.hpp"
+#include "pio_sm.hpp"
+#include <hardware/structs/pio.h>
+
+namespace modm::platform
+{
+
+
+    /**
+     * Programmable IO block (PIO)
+     *
+     * @ingroup	modm_platform_pio
+     * @author		Andrey Kunitsyn
+     */
+    class Pio{{ id }} : public ::modm::PeripheralDriver
+    {
+    	static inline pio_hw_t& pio() { return *pio{{ id }}_hw; }
+
+        static uint32_t used_instruction_space;
+        static int findOffset(const PIOProgram& prg) {
+            uint32_t program_mask = (1u << prg.length) - 1;
+            if (prg.origin >= 0) {
+                if (prg.origin > 32 - prg.length) return -1;
+                return used_instruction_space & (program_mask << prg.origin) ? -1 : prg.origin;
+            } else {
+                // work down from the top always
+                for (int i = 32 - prg.length; i >= 0; i--) {
+                    if ((used_instruction_space & (program_mask << static_cast<unsigned int>(i)))==0) {
+                        return i;
+                    }
+                }
+                return -1;
+            }
+        }
+        static void addProgramAtOffset(size_t offset,const PIOProgram& prg) {
+            for (uint8_t i = 0; i < prg.length; ++i) {
+                auto& instr = prg.instructions[i];
+                pio().instr_mem[offset + i] = instr.store(offset);
+            }
+            uint32_t program_mask = (1u << prg.length) - 1;
+            used_instruction_space |= program_mask << offset;
+        }
+
+        template <typename Pio,size_t SM>
+        friend class pio::implementation::StateMachine;
+
+    public:
+        static constexpr Peripheral peripherial = Peripheral::Pio{{ id }};
+        template <size_t SM>
+        class StateMachine : public modm::platform::pio::implementation::StateMachine<Pio{{ id }},SM> {};
+
+        template< class... Signals >
+        static void
+        connect()
+        {
+            using Connector = GpioConnector<peripherial, Signals...>;
+            Connector::connect();
+        }
+
+        template< class Pin >
+        static void connectPin() {
+            using Connector = GpioConnector<peripherial, typename Pin::Pad>;
+            Connector::connect();
+        }
+
+        template <typename Program>
+        static size_t addProgram(const Program& prg_data) {
+            auto prg = PIOProgram::get(prg_data);
+            auto offset = findOffset(prg);
+            if (offset < 0) {
+                return offset;
+            }
+            auto res = static_cast<size_t>(offset);
+            addProgramAtOffset(res,prg);
+            return res;
+        }
+    };
+
+}	// namespace modm::platform
+

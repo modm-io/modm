@@ -1,0 +1,10 @@
+<library>
+  <extends>modm:rp-pico</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/rp_pico/pio_ws2812</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:pio:0</module>
+  </modules>
+</library>
