@@ -45,14 +45,14 @@ public:
 
 	static void setFunction(uint8_t func) { Regs::set_funcsel(pin, func); }
 	static void setDriveStrength(DriveStrength strength)
-	{ Regs::set_drive(pin, strength); }
+	{ Regs::set_drive(pin, uint8_t(strength)); }
 
 public:
 	static void setOutput() { PinSet::setOutput(); }
 	static void setOutput(bool value) { PinSet::setOutput(value); }
-	static void setOutput(OutputType type, OutputSpeed speed=OutputSpeed::Slow)
+	static void setOutput(OutputType type, SlewRate speed=SlewRate::Slow)
 	{ PinSet::setOutput(type, speed); }
-	static void configure(OutputType type, OutputSpeed speed=OutputSpeed::Slow)
+	static void configure(OutputType type, SlewRate speed=SlewRate::Slow)
 	{ PinSet::configure(type, speed); }
 
 	static void set() { PinSet::set(); }

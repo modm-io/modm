@@ -62,15 +62,15 @@ public:
 		setOutput();
 	}
 
-	static void setOutput(OutputType type, OutputSpeed speed = OutputSpeed::Slow)
+	static void setOutput(OutputType type, SlewRate speed = SlewRate::Slow)
 	{
 		setOutput();
 		configure(type, speed);
 	}
 
-	static void configure(OutputType, OutputSpeed speed = OutputSpeed::Slow)
+	static void configure(OutputType, SlewRate speed = SlewRate::Slow)
 	{
-		(PortRegs<Gpios::port>::set_speed(Gpios::pin, speed), ...);
+		(PortRegs<Gpios::port>::set_slewrate(Gpios::pin, uint8_t(speed)), ...);
 	}
 
 	static void setInput()
@@ -94,6 +94,11 @@ public:
 	static void setSlewRate(SlewRate rate)
 	{
 		(PortRegs<Gpios::port>::set_slewrate(Gpios::pin, uint8_t(rate)), ...);
+	}
+
+	static void setDriveStrength(DriveStrength drive)
+	{
+		(PortRegs<Gpios::port>::set_drive(Gpios::pin, uint8_t(drive)), ...);
 	}
 
 	static void set()
