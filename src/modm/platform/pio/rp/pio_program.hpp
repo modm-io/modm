@@ -17,12 +17,12 @@ namespace modm::platform
 {
 
 	struct PIOProgram {
-		const pio::Instruction* instructions;
+		const pio::implementation::Instruction* instructions;
 		const uint8_t length;
 		int8_t origin;
-		constexpr PIOProgram(const pio::Instruction* code,uint8_t length,int8_t origin) : instructions(code),length(length),origin(origin) {}
-		static constexpr pio::EmptyProgram begin() {
-			return pio::ProgramBegin();
+		constexpr PIOProgram(const pio::implementation::Instruction* code,uint8_t length,int8_t origin) : instructions(code),length(length),origin(origin) {}
+		static constexpr pio::implementation::EmptyProgram begin() {
+			return pio::implementation::ProgramBegin();
 		}
 		template <typename Program>
 		static constexpr PIOProgram get(const Program& data) {

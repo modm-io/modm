@@ -14,7 +14,7 @@
 #include <modm/processing/resumable/resumable.hpp>
 #include <hardware/structs/pio.h>
 
-namespace modm::platform::pio
+namespace modm::platform::pio::implementation
 {
 
 	template <typename Pio,size_t SM>
@@ -25,7 +25,7 @@ namespace modm::platform::pio
 			return Pio::pio().sm[SM];
 		}
 		struct Encoder {
-			constexpr uint16_t encodeSideDelay(const pio::OptionalValue& /*side*/,uint16_t /*delay*/) const {
+			constexpr uint16_t encodeSideDelay(const pio::implementation::OptionalValue& /*side*/,uint16_t /*delay*/) const {
 				return 0;
 			}
 		};
@@ -34,9 +34,9 @@ namespace modm::platform::pio
 			sm().pinctrl =
                 (1u << PIO_SM0_PINCTRL_SET_COUNT_LSB) |
                 (uint32_t(Pin::pin) << PIO_SM0_PINCTRL_SET_BASE_LSB);
-            exec(pio::Set().pindirs<isOut?1:0>().encode(Encoder()));
+            exec(pio::Set.pindirs<isOut?1:0>.encode(Encoder()));
 		}
-		static inline void exec(const pio::Instruction& instr) {
+		static inline void exec(const pio::implementation::Instruction& instr) {
 			sm().instr = instr.value;
 		}
 		static constexpr uint32_t STALL_MASK = 1u << (PIO_FDEBUG_TXSTALL_LSB + SM);
@@ -216,7 +216,7 @@ namespace modm::platform::pio
 		}
 
 		static void jump(uint16_t pc) {
-			exec(pio::Jmp().encode(Encoder())|pc);
+			exec(pio::Jmp.encode(Encoder())|pc);
 		}
 
 		static inline bool txFifoFull() {

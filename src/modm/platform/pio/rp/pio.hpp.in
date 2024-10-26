@@ -60,12 +60,12 @@ namespace modm::platform
         }
 
         template <typename Pio,size_t SM>
-        friend class pio::StateMachine;
+        friend class pio::implementation::StateMachine;
 
     public:
         static constexpr Peripheral peripherial = Peripheral::Pio{{ id }};
         template <size_t SM>
-        class StateMachine : public modm::platform::pio::StateMachine<Pio{{ id }},SM> {};
+        class StateMachine : public modm::platform::pio::implementation::StateMachine<Pio{{ id }},SM> {};
 
         template< class... Signals >
         static void

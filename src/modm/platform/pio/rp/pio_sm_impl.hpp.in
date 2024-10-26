@@ -15,7 +15,7 @@
 
 template <typename Pio,size_t SM>
 modm::ResumableResult<uint32_t>
-modm::platform::pio::StateMachine<Pio, SM>::read()
+modm::platform::pio::implementation::StateMachine<Pio, SM>::read()
 {
 %% if use_fiber
     // wait data
@@ -29,7 +29,7 @@ modm::platform::pio::StateMachine<Pio, SM>::read()
 
 template <typename Pio,size_t SM>
 modm::ResumableResult<void>
-modm::platform::pio::StateMachine<Pio, SM>::write(uint32_t val)
+modm::platform::pio::implementation::StateMachine<Pio, SM>::write(uint32_t val)
 {
 %% if use_fiber
     // wait data

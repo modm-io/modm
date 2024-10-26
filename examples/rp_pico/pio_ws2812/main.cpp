@@ -54,17 +54,17 @@ do_zero:
 .wrap
 */
 // PIO program
-static constexpr auto pio_prog = modm::platform::PIOProgram::begin()
-	.sideset<1>()
-	.wrapTarget()
-	.label<bitloop>()
-		.instr(pio::Out().x<1>()				.side<0>().delay<TL_Common-1>())
-		.instr(pio::Jmp().not_x().to<do_zero>()	.side<1>().delay<TH_Common-1>())
-	.label<do_one>()
-		.instr(pio::Jmp().to<bitloop>()			.side<1>().delay<TH_Add-1>())
-	.label<do_zero>()
-		.instr(pio::Nop()						.side<0>().delay<TL_Add-1>())
-	.wrap()
+static constexpr auto pio_prog = PIOProgram::begin()
+	.sideset<1>
+	.wrapTarget<>
+	.label<bitloop>
+		.instr(pio::Out.x<1>				.side<0>.delay<TL_Common-1>)
+		.instr(pio::Jmp.not_x.to<do_zero>	.side<1>.delay<TH_Common-1>)
+	.label<do_one>
+		.instr(pio::Jmp.to<bitloop>			.side<1>.delay<TH_Add-1>)
+	.label<do_zero>
+		.instr(pio::Nop						.side<0>.delay<TL_Add-1>)
+	.wrap<>
 	.end();
 
 
