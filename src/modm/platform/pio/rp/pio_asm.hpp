@@ -162,7 +162,7 @@ namespace modm::platform::pio
 					return Base::encode(coder) | (uint16_t(condition_value) << Base::ARG1_SHIFT) | getJmpAddr<LabelName>(coder,addr_value);
 				}
 				template <typename ToLabel>
-				static constexpr auto to = JmpImpl<condition_value,ToLabel>(); 
+				static constexpr auto to = JmpImpl<condition_value,ToLabel>();
 			};
 
 			explicit constexpr Jmp() {}
@@ -171,7 +171,7 @@ namespace modm::platform::pio
 			static constexpr auto not_y = JmpImpl<JmpCondition::NOT_Y>();
 			static constexpr auto y_dec = JmpImpl<JmpCondition::Y_DEC>();
 			static constexpr auto x_ne_y = JmpImpl<JmpCondition::X_NE_Y>();
-			static constexpr auto pin = JmpImpl<JmpCondition::PIN>(); 
+			static constexpr auto pin = JmpImpl<JmpCondition::PIN>();
 			static constexpr auto not_osre = JmpImpl<JmpCondition::NOT_ORSE>();
 
 			template <typename ToLabel>
@@ -221,7 +221,6 @@ namespace modm::platform::pio
 			template <uint16_t irq_num>
 			static constexpr auto irq = WaitImpl<WaitSource::IRQ,irq_num>();
 		};
-		
 
 		enum class InSource : uint16_t {
 			PINS 		= 0x00,
@@ -331,7 +330,7 @@ namespace modm::platform::pio
 		};
 		struct Push : PushImpl<false,true> {
 			constexpr Push() {}
-			
+
 			static constexpr auto iffull = PushImplIF();
 			static constexpr auto block = PushImpl<false,true>();
 			static constexpr auto noblock = PushImpl<false,false>();
@@ -576,7 +575,7 @@ namespace modm::platform::pio
 			static constexpr size_t length = 1 + InstructionsList<Instructions...>::length;
 			using head = FirstInstruction ;
 			using tail = InstructionsList<Instructions...>;
-			
+
 			template <typename Instruction>
 			struct add_s {
 				using result = InstructionsList<Instruction,FirstInstruction,Instructions...>;
@@ -656,7 +655,7 @@ namespace modm::platform::pio
 			using wrap_settings = WrapSettingsT;
 
 			explicit constexpr ProgramBuilder() {}
-			
+
 			template <size_t count>
 			static constexpr auto sideset = ProgramBuilder<typename ProgramSettingsSideset<count>::result,labels,instructions,wrap_settings>();
 
@@ -690,7 +689,7 @@ namespace modm::platform::pio
 
 			template <typename dummy=void>
 			static constexpr auto wrapTarget = ProgramBuilder<settings,labels,instructions,WrapSettings<{ instructions::length, true },wrap_settings::wrap_instr>>();
-			
+
 			template <typename LabelName>
 			static constexpr auto label = ProgramBuilder<settings,typename Labels::template add<LabelName,instructions::length>,instructions,wrap_settings>();
 
