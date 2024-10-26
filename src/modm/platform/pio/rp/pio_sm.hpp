@@ -31,10 +31,9 @@ namespace modm::platform::pio::implementation
 		};
 		template <class Pin,bool isOut>
 		static inline void addPin() {
-			sm().pinctrl =
-                (1u << PIO_SM0_PINCTRL_SET_COUNT_LSB) |
-                (uint32_t(Pin::pin) << PIO_SM0_PINCTRL_SET_BASE_LSB);
-            exec(pio::Set.pindirs<isOut?1:0>.encode(Encoder()));
+			sm().pinctrl = (1u << PIO_SM0_PINCTRL_SET_COUNT_LSB) |
+				(uint32_t(Pin::pin) << PIO_SM0_PINCTRL_SET_BASE_LSB);
+			exec(pio::Set.pindirs<isOut?1:0>.encode(Encoder()));
 		}
 		static inline void exec(const pio::implementation::Instruction& instr) {
 			sm().instr = instr.value;
@@ -63,43 +62,43 @@ namespace modm::platform::pio::implementation
 		struct Config {
 			using settings = Setting;
 			uint32_t clkdiv{0};
-	    uint32_t execctrl{0};
-	    uint32_t shiftctrl{0};
-	    uint32_t pinctrl{0};
-	    
-		  template <  uint16_t div_int, uint8_t div_frac >
-		    constexpr Config& setClkDiv() {
+			uint32_t execctrl{0};
+			uint32_t shiftctrl{0};
+			uint32_t pinctrl{0};
+
+			template <  uint16_t div_int, uint8_t div_frac >
+			constexpr Config& setClkDiv() {
 				clkdiv = 	(uint32_t(div_frac) << PIO_SM0_CLKDIV_FRAC_LSB) |
-            				(uint32_t(div_int) << PIO_SM0_CLKDIV_INT_LSB);
-            	return *this;
+									(uint32_t(div_int) << PIO_SM0_CLKDIV_INT_LSB);
+				return *this;
 			}
 			constexpr Config& setWrap(uint32_t wrap_target,uint32_t wrap) {
-				execctrl = (execctrl & ~(PIO_SM0_EXECCTRL_WRAP_TOP_BITS | PIO_SM0_EXECCTRL_WRAP_BOTTOM_BITS)) |
-                  (wrap_target << PIO_SM0_EXECCTRL_WRAP_BOTTOM_LSB) |
-                  (wrap << PIO_SM0_EXECCTRL_WRAP_TOP_LSB);
-                return *this;
+				execctrl = 	(execctrl & ~(PIO_SM0_EXECCTRL_WRAP_TOP_BITS | PIO_SM0_EXECCTRL_WRAP_BOTTOM_BITS)) |
+										(wrap_target << PIO_SM0_EXECCTRL_WRAP_BOTTOM_LSB) |
+										(wrap << PIO_SM0_EXECCTRL_WRAP_TOP_LSB);
+				return *this;
 			}
 			template <bool shiftRight,bool autoPush,size_t pushThreshold>
 			constexpr Config& setInShift() {
 				shiftctrl = (shiftctrl &
-                    ~(PIO_SM0_SHIFTCTRL_IN_SHIFTDIR_BITS |
-                      PIO_SM0_SHIFTCTRL_AUTOPUSH_BITS |
-                      PIO_SM0_SHIFTCTRL_PUSH_THRESH_BITS)) |
-                   ((shiftRight?1:0) << PIO_SM0_SHIFTCTRL_IN_SHIFTDIR_LSB) |
-                   ((autoPush?1:0) << PIO_SM0_SHIFTCTRL_AUTOPUSH_LSB) |
-                   ((pushThreshold & 0x1fu) << PIO_SM0_SHIFTCTRL_PUSH_THRESH_LSB);
-                return *this;
+											~(PIO_SM0_SHIFTCTRL_IN_SHIFTDIR_BITS |
+												PIO_SM0_SHIFTCTRL_AUTOPUSH_BITS |
+												PIO_SM0_SHIFTCTRL_PUSH_THRESH_BITS)) |
+										((shiftRight?1:0) << PIO_SM0_SHIFTCTRL_IN_SHIFTDIR_LSB) |
+										((autoPush?1:0) << PIO_SM0_SHIFTCTRL_AUTOPUSH_LSB) |
+										((pushThreshold & 0x1fu) << PIO_SM0_SHIFTCTRL_PUSH_THRESH_LSB);
+				return *this;
 			}
 			template <bool shiftRight,bool autoPull,size_t pullThreshold>
 			constexpr Config& setOutShift() {
 				shiftctrl = (shiftctrl &
-                    ~(PIO_SM0_SHIFTCTRL_OUT_SHIFTDIR_BITS |
-                      PIO_SM0_SHIFTCTRL_AUTOPULL_BITS |
-                      PIO_SM0_SHIFTCTRL_PULL_THRESH_BITS)) |
-                   ((shiftRight?1:0) << PIO_SM0_SHIFTCTRL_OUT_SHIFTDIR_LSB) |
-                   ((autoPull?1:0) << PIO_SM0_SHIFTCTRL_AUTOPULL_LSB) |
-                   ((pullThreshold & 0x1fu) << PIO_SM0_SHIFTCTRL_PULL_THRESH_LSB);
-                return *this;
+										~(PIO_SM0_SHIFTCTRL_OUT_SHIFTDIR_BITS |
+											PIO_SM0_SHIFTCTRL_AUTOPULL_BITS |
+											PIO_SM0_SHIFTCTRL_PULL_THRESH_BITS)) |
+										((shiftRight?1:0) << PIO_SM0_SHIFTCTRL_OUT_SHIFTDIR_LSB) |
+										((autoPull?1:0) << PIO_SM0_SHIFTCTRL_AUTOPULL_LSB) |
+										((pullThreshold & 0x1fu) << PIO_SM0_SHIFTCTRL_PULL_THRESH_LSB);
+				return *this;
 			}
 			constexpr Config& setSideset() {
 					constexpr auto bit_count = settings::sideset_count;
@@ -109,15 +108,14 @@ namespace modm::platform::pio::implementation
 					static_assert(!optional || bit_count >= 1,"invalid config");
 
 					pinctrl = (pinctrl & ~PIO_SM0_PINCTRL_SIDESET_COUNT_BITS) |
-                 (bit_count << PIO_SM0_PINCTRL_SIDESET_COUNT_LSB);
+										(bit_count << PIO_SM0_PINCTRL_SIDESET_COUNT_LSB);
     			execctrl = (execctrl & ~(PIO_SM0_EXECCTRL_SIDE_EN_BITS | PIO_SM0_EXECCTRL_SIDE_PINDIR_BITS)) |
-                  ((optional?1:0) << PIO_SM0_EXECCTRL_SIDE_EN_LSB) |
-                  ((pindirs?1:0) << PIO_SM0_EXECCTRL_SIDE_PINDIR_LSB);
+										((optional?1:0) << PIO_SM0_EXECCTRL_SIDE_EN_LSB) |
+										((pindirs?1:0) << PIO_SM0_EXECCTRL_SIDE_PINDIR_LSB);
           return *this;
 			}
 			template < class StartPin>
 			constexpr Config& setSidesetPins() {
-				
 				pinctrl = (pinctrl & ~(PIO_SM0_PINCTRL_SIDESET_BASE_BITS)) |
 								(uint32_t(StartPin::pin) << PIO_SM0_PINCTRL_SIDESET_BASE_LSB);
 				return *this;
@@ -125,38 +123,38 @@ namespace modm::platform::pio::implementation
 			template < class StartPin , size_t count>
 			constexpr Config& setOutPins() {
 				pinctrl = (pinctrl & ~(PIO_SM0_PINCTRL_OUT_BASE_BITS | PIO_SM0_PINCTRL_OUT_COUNT_BITS)) |
-                	(uint32_t(StartPin::pin) << PIO_SM0_PINCTRL_OUT_BASE_LSB) |
-                	(count << PIO_SM0_PINCTRL_OUT_COUNT_LSB);
-                return *this;
+									(uint32_t(StartPin::pin) << PIO_SM0_PINCTRL_OUT_BASE_LSB) |
+									(count << PIO_SM0_PINCTRL_OUT_COUNT_LSB);
+				return *this;
 			}
 			template < class StartPin , size_t count>
 			constexpr Config& setSetPins() {
 				pinctrl = (pinctrl & ~(PIO_SM0_PINCTRL_SET_BASE_BITS | PIO_SM0_PINCTRL_SET_COUNT_BITS)) |
-                	(uint32_t(StartPin::pin) << PIO_SM0_PINCTRL_SET_BASE_LSB) |
-                	(count << PIO_SM0_PINCTRL_SET_COUNT_LSB);
-                return *this;
+									(uint32_t(StartPin::pin) << PIO_SM0_PINCTRL_SET_BASE_LSB) |
+									(count << PIO_SM0_PINCTRL_SET_COUNT_LSB);
+				return *this;
 			}
 			template < class StartPin>
 			constexpr Config& setInPins() {
 				pinctrl = (pinctrl & ~PIO_SM0_PINCTRL_IN_BASE_BITS) |
-                	(uint32_t(StartPin::pin) << PIO_SM0_PINCTRL_IN_BASE_LSB);
-                return *this;
+									(uint32_t(StartPin::pin) << PIO_SM0_PINCTRL_IN_BASE_LSB);
+				return *this;
 			}
 			constexpr Config& setFifoJoinTx() {
 				shiftctrl = (shiftctrl & ~(PIO_SM0_SHIFTCTRL_FJOIN_TX_BITS | PIO_SM0_SHIFTCTRL_FJOIN_RX_BITS)) |
-                   PIO_SM0_SHIFTCTRL_FJOIN_TX_BITS;
-                return *this;
+										PIO_SM0_SHIFTCTRL_FJOIN_TX_BITS;
+				return *this;
 			}
 			constexpr Config& setFifoJoinRx() {
 				shiftctrl = (shiftctrl & ~(PIO_SM0_SHIFTCTRL_FJOIN_TX_BITS | PIO_SM0_SHIFTCTRL_FJOIN_RX_BITS)) |
-                   PIO_SM0_SHIFTCTRL_FJOIN_RX_BITS;
-                return *this;
+										PIO_SM0_SHIFTCTRL_FJOIN_RX_BITS;
+				return *this;
 			}
 			constexpr Config& setFifoJoinNone() {
 				shiftctrl = (shiftctrl & ~(PIO_SM0_SHIFTCTRL_FJOIN_TX_BITS | PIO_SM0_SHIFTCTRL_FJOIN_RX_BITS));
 				return *this;
 			}
-			
+
 			void init(uint16_t startPC) {
 				StateMachine::setEnabled(false);
 
@@ -167,15 +165,15 @@ namespace modm::platform::pio::implementation
 
 				StateMachine::clearFifos();
 				// Clear FIFO debug flags
-			    constexpr uint32_t fdebug_sm_mask =
-			            (1u << PIO_FDEBUG_TXOVER_LSB) |
-			            (1u << PIO_FDEBUG_RXUNDER_LSB) |
-			            (1u << PIO_FDEBUG_TXSTALL_LSB) |
-			            (1u << PIO_FDEBUG_RXSTALL_LSB);
-			    Pio::pio().fdebug = fdebug_sm_mask << SM;
-			    StateMachine::restart();
-			    StateMachine::clkDivRestart();
-			    StateMachine::jump(startPC);
+			  constexpr uint32_t fdebug_sm_mask =
+											(1u << PIO_FDEBUG_TXOVER_LSB) |
+											(1u << PIO_FDEBUG_RXUNDER_LSB) |
+											(1u << PIO_FDEBUG_TXSTALL_LSB) |
+											(1u << PIO_FDEBUG_RXSTALL_LSB);
+				Pio::pio().fdebug = fdebug_sm_mask << SM;
+				StateMachine::restart();
+				StateMachine::clkDivRestart();
+				StateMachine::jump(startPC);
 			}
 
 			template< class SystemClock, frequency_t freq, percent_t tolerance=pct(1) >
@@ -196,7 +194,7 @@ namespace modm::platform::pio::implementation
 				modm::PeripheralDriver::assertBaudrateInTolerance< res_freq, uint64_t(freq), tolerance >();
 
 				clkdiv = 	(uint32_t(prescaler & 0xff) << PIO_SM0_CLKDIV_FRAC_LSB) |
-            				(uint32_t(prescaler>>8) << PIO_SM0_CLKDIV_INT_LSB);
+									(uint32_t(prescaler>>8) << PIO_SM0_CLKDIV_INT_LSB);
 
 				return *this;
 			}
