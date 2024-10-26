@@ -59,12 +59,15 @@ namespace modm::platform::pio::implementation
 			(addPin<Pins,false>(),...);
 			sm().pinctrl = pinctrlSaved;
 		}
+		template <typename Setting  >
 		struct Config {
+			using settings = Setting;
 			uint32_t clkdiv{0};
-		    uint32_t execctrl{0};
-		    uint32_t shiftctrl{0};
-		    uint32_t pinctrl{0};
-		    template <  uint16_t div_int, uint8_t div_frac >
+	    uint32_t execctrl{0};
+	    uint32_t shiftctrl{0};
+	    uint32_t pinctrl{0};
+	    
+		  template <  uint16_t div_int, uint8_t div_frac >
 		    constexpr Config& setClkDiv() {
 				clkdiv = 	(uint32_t(div_frac) << PIO_SM0_CLKDIV_FRAC_LSB) |
             				(uint32_t(div_int) << PIO_SM0_CLKDIV_INT_LSB);
@@ -98,16 +101,26 @@ namespace modm::platform::pio::implementation
                    ((pullThreshold & 0x1fu) << PIO_SM0_SHIFTCTRL_PULL_THRESH_LSB);
                 return *this;
 			}
-			template < class StartPin , size_t count, bool optional, bool pindirs>
-			constexpr Config& setSidesetPins() {
-				static_assert((count+(optional?1:0)) <= 5,"too many sideset pins");
-				pinctrl = (pinctrl & ~(PIO_SM0_PINCTRL_SIDESET_COUNT_BITS | PIO_SM0_PINCTRL_SIDESET_BASE_BITS)) |
-								((count+(optional?1:0)) << PIO_SM0_PINCTRL_SIDESET_COUNT_LSB) |
-								(uint32_t(StartPin::pin) << PIO_SM0_PINCTRL_SIDESET_BASE_LSB);
-				execctrl = (execctrl & ~(PIO_SM0_EXECCTRL_SIDE_EN_BITS | PIO_SM0_EXECCTRL_SIDE_PINDIR_BITS)) |
+			constexpr Config& setSideset() {
+					constexpr auto bit_count = settings::sideset_count;
+					constexpr auto optional = settings::sideset_is_opt;
+					constexpr auto pindirs = settings::sideset_pindirs;
+					static_assert(bit_count <= 5,"too many sideset pins");
+					static_assert(!optional || bit_count >= 1,"invalid config");
+
+					pinctrl = (pinctrl & ~PIO_SM0_PINCTRL_SIDESET_COUNT_BITS) |
+                 (bit_count << PIO_SM0_PINCTRL_SIDESET_COUNT_LSB);
+    			execctrl = (execctrl & ~(PIO_SM0_EXECCTRL_SIDE_EN_BITS | PIO_SM0_EXECCTRL_SIDE_PINDIR_BITS)) |
                   ((optional?1:0) << PIO_SM0_EXECCTRL_SIDE_EN_LSB) |
                   ((pindirs?1:0) << PIO_SM0_EXECCTRL_SIDE_PINDIR_LSB);
-                return *this;
+          return *this;
+			}
+			template < class StartPin>
+			constexpr Config& setSidesetPins() {
+				
+				pinctrl = (pinctrl & ~(PIO_SM0_PINCTRL_SIDESET_BASE_BITS)) |
+								(uint32_t(StartPin::pin) << PIO_SM0_PINCTRL_SIDESET_BASE_LSB);
+				return *this;
 			}
 			template < class StartPin , size_t count>
 			constexpr Config& setOutPins() {
@@ -143,11 +156,7 @@ namespace modm::platform::pio::implementation
 				shiftctrl = (shiftctrl & ~(PIO_SM0_SHIFTCTRL_FJOIN_TX_BITS | PIO_SM0_SHIFTCTRL_FJOIN_RX_BITS));
 				return *this;
 			}
-			template <typename Program>
-			constexpr Config& setup(size_t offset,const Program& prg) {
-				setWrap(prg.wrap_target+offset,prg.wrap+offset);
-				return *this;
-			}
+			
 			void init(uint16_t startPC) {
 				StateMachine::setEnabled(false);
 
@@ -192,10 +201,12 @@ namespace modm::platform::pio::implementation
 				return *this;
 			}
 		};
-		static constexpr Config config() {
-			return Config()
+		template <typename Program>
+		static constexpr auto config(size_t offset,const Program& ) {
+			return Config<typename Program::settings>()
+				.setSideset()
 				.template setClkDiv<1,0>()
-				.setWrap(0,31)
+				.setWrap(Program::wrap_target+offset,Program::wrap+offset)
 				.template setInShift<true,false,32>()
 				.template setOutShift<true,false,32>();
 		}

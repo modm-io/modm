@@ -150,12 +150,12 @@ namespace modm::platform::pio
 			using Base = InstructionEncoding<Jmp<Label,addr>>;
 
 			template <JmpCondition condition,typename LabelImpl = Label>
-			struct JmpImpl : InstructionEncoding<JmpImpl<condition>>{
+			struct JmpImpl : InstructionEncoding<JmpImpl<condition,LabelImpl>>{
 				static constexpr const Opcode opcode = Opcode::JMP;
 				static constexpr const JmpCondition condition_value = condition;
 				static constexpr const uint16_t addr_value = addr;
 				using LabelName = LabelImpl;
-				using Base = InstructionEncoding<JmpImpl<condition>>;
+				using Base = InstructionEncoding<JmpImpl<condition,LabelImpl>>;
 				constexpr JmpImpl() {}
 				template <typename Encoder>
 				static constexpr Instruction encode(const Encoder& coder) {
@@ -605,12 +605,13 @@ namespace modm::platform::pio
 		};
 
 
-		template <size_t Length,typename Labels>
+		template <size_t Length,typename Labels,typename ProgramSettings,uint16_t wrap_target_t,uint16_t wrap_t>
 		struct ProgramCode  {
+			using settings = ProgramSettings;
 			static constexpr const size_t length = Length;
-			const uint16_t wrap_target;
-			const uint16_t wrap;
-			constexpr ProgramCode( std::array<Instruction,Length>&& code,uint16_t wrap_target,uint16_t wrap) : wrap_target(wrap_target),wrap(wrap),code(std::move(code)) {
+			static constexpr const uint16_t wrap_target = wrap_target_t;
+			static constexpr const uint16_t wrap = wrap_t;
+			explicit constexpr ProgramCode( std::array<Instruction,Length>&& code) : code(std::move(code)) {
 
 			}
 			const std::array<Instruction,Length> code;
@@ -621,12 +622,14 @@ namespace modm::platform::pio
 		};
 
 
-		template <uint32_t sideset_count_t = 0,bool sideset_is_opt_t = true, uint16_t delay_max_t = 31, uint16_t sideset_max_t = 0>
+		template <uint32_t count_t = 0,bool sideset_is_opt_t = true, uint16_t delay_max_t = 31, uint16_t sideset_max_t = 0>
 		struct ProgramSettings {
-			static constexpr uint32_t sideset_count = sideset_count_t;
+			static constexpr uint32_t count = count_t;
+			static constexpr uint32_t sideset_count = sideset_is_opt_t ? (count_t+1) : count_t;
 			static constexpr bool sideset_is_opt = sideset_is_opt_t;
 			static constexpr uint16_t delay_max = delay_max_t;
 			static constexpr uint16_t sideset_max = sideset_max_t;
+			static constexpr bool sideset_pindirs = false;
 		};
 		template <size_t count>
 		struct ProgramSettingsSideset {
@@ -636,7 +639,7 @@ namespace modm::platform::pio
 		template <size_t count>
 		struct ProgramSettingsOptSideset {
 			static_assert(count <= 4,"maximum number of side set bits is 4");
-			using result = ProgramSettings<count+1,true,(1u << (5 - (count+1))) - 1,(1u << count) - 1>;
+			using result = ProgramSettings<count,true,(1u << (5 - (count+1))) - 1,(1u << count) - 1>;
 		};
 
 		template <OptionalValue target = OptionalValue{},OptionalValue instr = OptionalValue{}>
@@ -696,11 +699,12 @@ namespace modm::platform::pio
 				using AddedInstructions = typename instructions::add<Instr>;
 				return ProgramBuilder<settings,labels,AddedInstructions,wrap_settings>();
 			}
-			static constexpr ProgramCode<Instructions::length,Labels> end()  {
+			static constexpr auto end() {
 				ProgramBuilder pb;
-				return ProgramCode<instructions::length,Labels>(instructions::build(pb),
+				return ProgramCode<instructions::length,Labels,settings,
 					wrap_settings::wrap_target.is_set?wrap_settings::wrap_target.value:0,
-					wrap_settings::wrap_instr.is_set?wrap_settings::wrap_instr.value:(Instructions::length-1));
+					wrap_settings::wrap_instr.is_set?wrap_settings::wrap_instr.value:(Instructions::length-1)
+					>(instructions::build(pb));
 			}
 		};
 
