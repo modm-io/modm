@@ -203,13 +203,9 @@ drawNumber(modm::glcd::Point cursor, uint8_t number)
 int
 main()
 {
-	led::R::set();
-	led::G::set();
-	led::B::reset();
-
-	led::R::setOutput();
-	led::G::setOutput();
-	led::B::setOutput();
+	led::R::setOutput(true);
+	led::G::setOutput(true);
+	led::B::setOutput(false);
 
 	lcd::SPI::connect<lcd::Sck::BitBang, lcd::Mosi::BitBang>();
 	lcd::SPI::initialize<SystemClock, 2_MHz>();

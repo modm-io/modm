@@ -72,11 +72,11 @@ public:
 	}
 
 	void
-	setColor(size_t index, const color::Rgb &color)
+	setColor(size_t index, const color::Rgb888 &color)
 	{
 		if (index >= LEDs) return;
 
-		const uint8_t colors[3] = {color.green, color.red, color.blue};
+		const uint8_t colors[3] = {color.green(), color.red(), color.blue()};
 		for (size_t ii = 0; ii < 3; ii++)
 		{
 			const uint32_t c = (spread(colors[ii]) << 12) | spread(colors[ii] >> 4);
@@ -85,7 +85,7 @@ public:
 		}
 	}
 
-	color::Rgb
+	color::Rgb888
 	getColor(size_t index) const
 	{
 		if (index >= LEDs) return {};

@@ -31,9 +31,9 @@ void
 modm::VirtualGraphicDisplay::clear()
 {
 	//TODO switch black , white
-	this->display->setColor(color::Rgb(0, 0, 0));
+	this->display->setColor(color::Rgb888(0, 0, 0));
 	this->display->fillRectangle(this->leftUpper, width, height);
-	this->display->setColor(color::Rgb(255, 255, 255));
+	this->display->setColor(color::Rgb888(255, 255, 255));
 }
 
 void

@@ -123,7 +123,7 @@ struct tcs3414
 	};
 
 
-	using Rgb = color::RgbT<uint16_t>;
+	using Rgb = color::Rgb161616;
 
 	struct modm_packed
 	Data

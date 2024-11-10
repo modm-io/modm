@@ -86,7 +86,7 @@ public:
 	getColor(Color name) const
 	{
 		if (name >= Color::PALETTE_SIZE)
-			return modm::color::Rgb565(0xffff);
+			return modm::color::html::White;
 		return colors[name];
 	}
 

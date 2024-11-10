@@ -82,14 +82,14 @@ public:
 	void
 	clearPixel(int16_t x, int16_t y) final
 	{
-		setPixel(x, y, backgroundColor);
+		setPixel(x, y, backgroundColor.value());
 	}
 
 	using Driver::clear;
 	void
 	clear() final
 	{
-		Driver::clear(backgroundColor.color);
+		Driver::clear(backgroundColor.value());
 	}
 
 	void

@@ -35,26 +35,26 @@ class RgbLed
 	Led& green;
 	Led& blue;
 
-	::modm::color::Rgb absolute;
+	::modm::color::Rgb888 absolute;
 
 public:
 	RgbLed(Led& red, Led& green, Led& blue):
 		red(red), green(green), blue(blue) {}
 
 	inline void
-	setColor(::modm::color::Rgb color)
+	setColor(::modm::color::Rgb888 color)
 	{
 		absolute = color;
 
-		red.setBrightness(color.red);
-		green.setBrightness(color.green);
-		blue.setBrightness(color.blue);
+		red.setBrightness(color.red());
+		green.setBrightness(color.green());
+		blue.setBrightness(color.blue());
 	}
 
-	inline ::modm::color::Rgb
+	inline ::modm::color::Rgb888
 	getColor()
 	{
-		return ::modm::color::Rgb(
+		return ::modm::color::Rgb888(
 			red.getBrightness(), green.getBrightness(), blue.getBrightness());
 	}
 
@@ -65,13 +65,13 @@ public:
 	}
 
 	inline void
-	fadeTo(::modm::color::Rgb color, uint16_t time)
+	fadeTo(::modm::color::Rgb888 color, uint16_t time)
 	{
 		absolute = color;
 
-		red.fadeTo(absolute.red, time);
-		green.fadeTo(absolute.green, time);
-		blue.fadeTo(absolute.blue, time);
+		red.fadeTo(absolute.red().value(), time);
+		green.fadeTo(absolute.green().value(), time);
+		blue.fadeTo(absolute.blue().value(), time);
 	}
 
 	/// should be called every 1ms or more.
