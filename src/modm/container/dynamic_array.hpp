@@ -173,7 +173,9 @@ namespace modm
 		clear()
 		{
 			data_.clear();
-			data_.shrink_to_fit();
+			// shrink vector to zero capacity
+			// shrink_to_fit() is a no-op with exceptions disabled
+			std::vector(data_).swap(data_);
 		}
 
 		/**
