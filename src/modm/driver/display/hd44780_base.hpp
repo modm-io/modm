@@ -126,7 +126,7 @@ public:
 	isBusy();
 
 	static inline bool
-	writeCGRAM(uint8_t character, uint8_t *cg);
+	writeCGRAM(uint8_t character, const uint8_t *cg);
 
 protected:
 	/// unconditionally write data to the controller

@@ -21,7 +21,7 @@ namespace modm
 {
 
 template <typename I2cMaster>
-Ads7828<I2cMaster>::Ads7828(Data &data, uint8_t address) : data(data), modm::I2cDevice<I2cMaster, 1>(address)
+Ads7828<I2cMaster>::Ads7828(Data &data, uint8_t address) : modm::I2cDevice<I2cMaster, 1>(address), data(data)
 {
 }
 

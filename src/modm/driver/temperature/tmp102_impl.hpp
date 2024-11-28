@@ -22,12 +22,11 @@ modm::Tmp102<I2cMaster>::Tmp102(Data &data, uint8_t address)
 	updateTime(250), timeout(modm::ShortDuration(updateTime)),
 	config_lsb(ConversionRate_t(ConversionRate::Hz4))
 {
-	this->stop();
 }
 
 template < typename I2cMaster >
 bool
-modm::Tmp102<I2cMaster>::run()
+modm::Tmp102<I2cMaster>::update()
 {
 	PT_BEGIN();
 

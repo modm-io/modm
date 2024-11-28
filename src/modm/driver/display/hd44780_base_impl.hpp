@@ -172,7 +172,7 @@ modm::Hd44780Base<DATA, RW, RS, E>::isBusy()
 
 template <typename DATA, typename RW, typename RS, typename E>
 bool
-modm::Hd44780Base<DATA, RW, RS, E>::writeCGRAM(uint8_t character, uint8_t *cg)
+modm::Hd44780Base<DATA, RW, RS, E>::writeCGRAM(uint8_t character, const uint8_t *cg)
 {
 	while(not writeCommand(SetCGRAM_Address | (character << 3)))
 		;

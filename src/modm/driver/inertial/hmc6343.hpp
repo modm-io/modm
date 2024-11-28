@@ -13,7 +13,6 @@
 #define MODM_HMC6343_HPP
 
 #include <modm/architecture/interface/i2c_device.hpp>
-#include <modm/processing/protothread.hpp>
 
 namespace modm
 {

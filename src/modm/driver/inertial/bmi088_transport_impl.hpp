@@ -13,7 +13,7 @@
 #error "Don't include this file directly, use 'bmi088_transport.hpp' instead!"
 #endif
 
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 
 namespace modm
 {

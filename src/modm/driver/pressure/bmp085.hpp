@@ -13,8 +13,6 @@
 #ifndef MODM_BMP085_HPP
 #define MODM_BMP085_HPP
 
-#include <modm/processing/protothread.hpp>
-#include <modm/processing/resumable.hpp>
 #include <modm/architecture/interface/i2c_device.hpp>
 #include <modm/processing/timer.hpp>
 

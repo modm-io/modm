@@ -116,9 +116,8 @@ public:
 	///
 	Ds1631(Data &data, uint8_t address=0x90);
 
-	void
-	update()
-	{ run(); }
+	bool
+	update();
 
 	modm::ResumableResult<bool>
 	initialize();
@@ -170,9 +169,6 @@ public:
 	{ return data; }
 
 private:
-	bool
-	run();
-
 	modm::ResumableResult<bool>
 	writeCommand(Command cmd);
 

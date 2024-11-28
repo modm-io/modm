@@ -118,9 +118,8 @@ public:
 	/// sets address to default of 0x48 (alternatives are 0x49, 0x4A and 0x4B).
 	Tmp102(Data &data, uint8_t address=0x48);
 
-	void
-	update()
-	{ run(); }
+	bool
+	update();
 
 	// MARK: Configuration
 	// @param	rate	Update rate in Hz: 0 to 33. (Use 0 to update at 0.25Hz).
@@ -153,9 +152,6 @@ public:
 	getData();
 
 private:
-	bool
-	run();
-
 	modm::ResumableResult<bool>
 	writeConfiguration(uint8_t length=3);
 

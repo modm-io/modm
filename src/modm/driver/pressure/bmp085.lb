@@ -33,7 +33,6 @@ def prepare(module, options):
         ":architecture:i2c.device",
         ":math:utils",
         ":debug",
-        ":processing:protothread",
         ":processing:timer")
     return True
 

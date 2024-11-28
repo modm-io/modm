@@ -64,7 +64,7 @@ modm::Hd44780<DATA, RW, RS, E>::execute(Command command)
 
 template <typename DATA, typename RW, typename RS, typename E>
 void
-modm::Hd44780<DATA, RW, RS, E>::writeCGRAM(uint8_t character, uint8_t *cg)
+modm::Hd44780<DATA, RW, RS, E>::writeCGRAM(uint8_t character, const uint8_t *cg)
 {
 	// There are only 8 characters in CGRAM
 	if (character > 8) {

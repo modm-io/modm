@@ -41,7 +41,7 @@ modm::Ds1631<I2cMaster>::initialize()
 
 template < typename I2cMaster >
 bool
-modm::Ds1631<I2cMaster>::run()
+modm::Ds1631<I2cMaster>::update()
 {
 	PT_BEGIN();
 

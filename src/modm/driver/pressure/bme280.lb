@@ -29,9 +29,7 @@ def prepare(module, options):
         ":architecture:i2c.device",
         ":architecture:register",
         ":math:utils",
-        ":debug",
-        ":processing:protothread",
-        ":processing:timer")
+        ":debug")
     return True
 
 def build(env):

@@ -36,7 +36,8 @@ def prepare(module, options):
         ":architecture:register",
         ":driver:lm75",
         ":math:utils",
-        ":processing:protothread")
+        ":processing:protothread",
+        ":processing:timer")
     return True
 
 def build(env):

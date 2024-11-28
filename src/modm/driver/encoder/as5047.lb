@@ -11,21 +11,21 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-	module.name = ":driver:as5047"
-	module.description = """\
+    module.name = ":driver:as5047"
+    module.description = """\
 # AS5047 14 bit Absolute Encoder SPI Driver
 
 [Datasheet](https://ams.com/documents/20143/36005/AS5047D_DS000394_2-00.pdf)
 """
 
 def prepare(module, options):
-	module.depends(
-		":architecture:gpio",
-		":architecture:spi.device",
-		":processing:resumable",
-		":math:geometry"
+    module.depends(
+        ":architecture:gpio",
+        ":architecture:spi.device",
+        ":processing:resumable",
+        ":math:geometry"
     )
-	return True
+    return True
 
 def build(env):
     env.outbasepath = "modm/src/modm/driver/encoder"

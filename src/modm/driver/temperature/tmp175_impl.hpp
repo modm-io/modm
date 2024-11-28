@@ -27,7 +27,7 @@ modm::Tmp175<I2cMaster>::Tmp175(Data &data, uint8_t address)
 
 template < typename I2cMaster >
 bool
-modm::Tmp175<I2cMaster>::run()
+modm::Tmp175<I2cMaster>::update()
 {
 	PT_BEGIN();
 

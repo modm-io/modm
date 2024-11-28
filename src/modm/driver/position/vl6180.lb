@@ -22,9 +22,7 @@ def prepare(module, options):
         ":architecture:register",
         ":architecture:unaligned",
         ":math:utils",
-        ":debug",
-        ":processing:protothread",
-        ":processing:timer",)
+        ":processing:timer")
     return True
 
 def build(env):

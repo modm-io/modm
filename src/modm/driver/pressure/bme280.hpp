@@ -13,11 +13,8 @@
 #ifndef MODM_BME280_HPP
 #define MODM_BME280_HPP
 
-#include <modm/processing/protothread.hpp>
-#include <modm/processing/resumable.hpp>
 #include <modm/architecture/interface/i2c_device.hpp>
 #include <modm/architecture/interface/register.hpp>
-#include <modm/processing/timer.hpp>
 
 #include "bme280_data.hpp"
 

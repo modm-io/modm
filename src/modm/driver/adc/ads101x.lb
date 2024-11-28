@@ -21,8 +21,7 @@ The ADS1013/ADS1014/ADS1015 are ultra-low power, high precision analog-digital c
 def prepare(module, options):
     module.depends(
         ":architecture:i2c.device",
-        ":architecture:register",
-        ":processing:protothread")
+        ":architecture:register")
     return True
 
 def build(env):

@@ -13,7 +13,7 @@
 #define MODM_TMP12x_HPP
 
 #include <modm/architecture/interface/spi_device.hpp>
-#include <modm/processing/resumable/nested_resumable.hpp>
+#include <modm/processing/resumable.hpp>
 #include <array>
 #include <ratio>
 
