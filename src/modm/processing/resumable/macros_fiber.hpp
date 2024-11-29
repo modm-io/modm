@@ -13,7 +13,7 @@
 #define MODM_RF_MACROS_FIBER_HPP
 
 #include <modm/processing/fiber.hpp>
-#include <modm/processing/fiber/mutex.hpp>
+#include <mutex>
 
 /// @ingroup modm_processing_resumable
 /// @{
@@ -109,12 +109,12 @@
 
 #define RF_BEGIN_0() \
 	this->template checkRfType<true>(); \
-	modm::fiber::lock_guard rfLockGuardState{this->rfState};
+	::std::lock_guard rfLockGuardState{this->rfState};
 
 #define RF_BEGIN_1(index) \
 	this->template checkRfType<false>(); \
 	this->template checkRfFunctions<index>(); \
-	modm::fiber::lock_guard rfLockGuardState{this->rfStateArray[index]};
+	::std::lock_guard rfLockGuardState{this->rfStateArray[index]};
 
 #define MODM_RF_GET_MACRO(_0, _1, NAME, ...) NAME
 #define RF_BEGIN(...) MODM_RF_GET_MACRO(_0 __VA_OPT__(,) __VA_ARGS__, RF_BEGIN_1, RF_BEGIN_0)(__VA_ARGS__)

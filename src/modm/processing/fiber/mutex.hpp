@@ -22,14 +22,6 @@
 #include <atomic>
 #include <mutex>
 
-/// @cond
-namespace modm
-{
-template< uint8_t Functions > class Resumable;
-template< uint8_t Levels > class NestedResumable;
-}
-/// @endcond
-
 namespace modm::fiber
 {
 
@@ -40,9 +32,6 @@ namespace modm::fiber
 /// @see https://en.cppreference.com/w/cpp/thread/mutex
 class mutex
 {
-	template< uint8_t Functions > friend class ::modm::Resumable;
-	template< uint8_t Levels > friend class ::modm::NestedResumable;
-
 	mutex(const mutex&) = delete;
 	mutex& operator=(const mutex&) = delete;
 
@@ -98,9 +87,6 @@ public:
 /// @see https://en.cppreference.com/w/cpp/thread/recursive_mutex
 class recursive_mutex
 {
-	template< uint8_t Functions > friend class ::modm::Resumable;
-	template< uint8_t Levels > friend class ::modm::NestedResumable;
-
 	recursive_mutex(const recursive_mutex&) = delete;
 	recursive_mutex& operator=(const recursive_mutex&) = delete;
 	using count_t = uint16_t;
