@@ -1,7 +1,5 @@
 /*
- * Copyright (c) 2009-2010, Fabian Greif
- * Copyright (c) 2009-2010, Martin Rosekeit
- * Copyright (c) 2012, 2015, 2017-2018, Niklas Hauser
+ * Copyright (c) 2024, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -11,11 +9,11 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_PROCESSING_HPP
-#define	MODM_PROCESSING_HPP
-
-%% for header in headers
-#include "{{ header | modm.posixify }}"
-%% endfor
-
-#endif	// MODM_PROCESSING_HPP
+#include <modm/architecture/interface/fiber.hpp>
+%% if with_task
+// pulls in the fiber and scheduler implementation
+#include "fiber/task.hpp"
+%% else
+// polyfill implementation of an empty yield
+#include "fiber/no_yield.hpp"
+%% endif

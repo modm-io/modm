@@ -68,23 +68,23 @@ public:
 	setDataOrder(DataOrder order);
 
 	/**
-	 * Request access to the spi master within a context.
-	 * You may acquire the spi master multiple times within the same context.
+	 * Request access to the SPI master within a context.
+	 * You may acquire the SPI master multiple times within the same context.
 	 *
-	 * The configuration handler will only be called when aquiring the spi
+	 * The configuration handler will only be called when acquiring the SPI
 	 * master for the first time (if it is not a `nullptr`).
 	 *
-	 * @warning		Aquires must be balanced with releases of the **same** context!
-	 * @warning		Aquires are persistent even after calling `initialize()`!
+	 * @warning		Acquires must be balanced with releases of the **same** context!
+	 * @warning		Acquires are persistent even after calling `initialize()`!
 	 *
-	 * @return	`0` if another context is using the spi master, otherwise
+	 * @return	`0` if another context is using the SPI master, otherwise
 	 * 			`>0` as the number of times this context acquired the master.
 	 */
 	static uint8_t
 	acquire(void *ctx, ConfigurationHandler handler = nullptr);
 
 	/**
-	 * Release access to the spi master within a context.
+	 * Release access to the SPI master within a context.
 	 *
 	 * @warning		Releases must be balanced with acquires of the **same** context!
 	 * @warning		Releases are persistent even after calling `initialize()`!
@@ -96,36 +96,9 @@ public:
 	release(void *ctx);
 
 	/**
-	 * Swap a single byte and wait for completion.
-	 *
-	 * @param	data
-	 * 		data to be sent
-	 * @return	received data
-	 */
-	static uint8_t
-	transferBlocking(uint8_t data);
-
-	/**
-	 * Set the data buffers and length with options and starts a transfer.
-	 * This may be hardware accelerated (DMA or Interrupt), but not guaranteed.
-	 *
-	 * @param[in]   tx
-	 *      pointer to transmit buffer, set to `nullptr` to send dummy bytes
-	 * @param[out]  rx
-	 *      pointer to receive buffer, set to `nullptr` to discard received bytes
-	 * @param       length
-	 *      number of bytes to be shifted out
-	 */
-	static void
-	transferBlocking(const uint8_t *tx, uint8_t *rx, std::size_t length);
-
-	/**
 	 * Swap a single byte and wait for completion non-blocking!.
 	 *
-	 * You must call this inside a Protothread or Resumable
-	 * using `PT_CALL` or `RF_CALL` respectively.
-	 * @warning	These methods differ from Resumables by lacking context protection!
-	 * 			You must ensure that only one driver is accessing this resumable function
+	 * @warning	You must ensure that only one driver is accessing this resumable function
 	 * 			by using `acquire(ctx)` and `release(ctx)`.
 	 *
 	 * @param	data
@@ -140,10 +113,7 @@ public:
 	 * starts a non-blocking transfer.
 	 * This may be hardware accelerated (DMA or Interrupt), but not guaranteed.
 	 *
-	 * You must call this inside a Protothread or Resumable
-	 * using `PT_CALL` or `RF_CALL` respectively.
-	 * @warning	These methods differ from Resumables by lacking context protection!
-	 * 			You must ensure that only one driver is accessing this resumable function
+	 * @warning	You must ensure that only one driver is accessing this resumable function
 	 * 			by using `acquire(ctx)` and `release(ctx)`.
 	 *
 	 * @param[in]   tx

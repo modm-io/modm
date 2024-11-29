@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "functions.hpp"
+#include <modm/architecture/interface/fiber.hpp>
 #include <limits>
 #include <atomic>
 

@@ -56,8 +56,11 @@ modm_test::platform::SpiMaster::transfer(uint8_t data)
 	else {
 		tmp = 0;
 	}
-
+%% if use_fiber
+	return tmp;
+%% else
 	return {modm::rf::Stop, tmp};
+%% endif
 }
 
 modm::ResumableResult<void>
@@ -89,5 +92,7 @@ modm_test::platform::SpiMaster::transfer(uint8_t * tx, uint8_t * rx, std::size_t
 		}
 	}
 
+%% if not use_fiber
 	return {modm::rf::Stop};
+%% endif
 }

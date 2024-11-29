@@ -15,6 +15,7 @@
 #define MODM_PT_MACROS_FIBERS_HPP
 
 #include <modm/architecture/utils.hpp>
+#include <modm/processing/fiber.hpp>
 
 /// @ingroup modm_processing_protothread
 /// @{

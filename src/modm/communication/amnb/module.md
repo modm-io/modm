@@ -187,9 +187,8 @@ transmit queue, the size of which you can control. It returns false if the queue
 is full.
 
 Requests `node.request<ReturnType=void>(id, args)` must be made from within a
-protothread, since they can take some time. The response is a
-`modm::amnb::Result` object, which contains the result, system error and user
-error.
+fiber, since they can take some time. The response is a `modm::amnb::Result`
+object, which contains the result, system error and user error.
 
 Note that if a request returns a user error type, you must define it as
 `node.request<ReturnType, UserErrorType>(id, args)` and then explicitly check
@@ -201,9 +200,9 @@ receiver will return with a `modm::amnb::Error::RequestAllocationFailed` error.
     The result is only valid until the next call to `node.update()`, therefore
     you must copy the result into your own storage!
 
-!!! warning "Do not use `RF_CALL_BLOCKING` for requests!"
+!!! warning "Do not use requests in the main function!"
     `node.update()` must be called during requests to service the protocol and
-    `RF_CALL_BLOCKING(node.request(...))` won't call it, creating a deadlock!
+    `node.request(...)` won't call it, creating a deadlock!
 
 
 ```cpp
@@ -213,42 +212,35 @@ DeviceWrapper<Usart1> device;
 Node</* TX msg queue size =*/10, /* max heap allocation = */1024>
     node(device, /*address=*/0x10, actions, listeners);
 
-
-// Broadcasts are buffered in a transmit queue
-node.broadcast(0);                     // no payload
-node.broadcast(1, ArgumentType());     // with argument
-node.broadcast(2, data, sizeof(data)); // with memory buffer
-
-
-// Responses must be called from within a protothread
-response = PT_CALL(node.request<>(0));
-// The request may fail, in that case check the error
-if (not response) Error error = response.error();
-
-// Responses can also be called from within a resumable function
-response = RF_CALL(node.request<ReturnType>(1, ArgumentType()));
-// The response is temporary, copy it before the next call to node.update()
-if (response) ReturnType result = *response;
-
-// User Error types must be declared
-response = RF_CALL(node.request<ReturnType, UserErrorType>(2, data, sizeof(data)));
-// The user error must be checked for explicitly now
-if (response) ReturnType result = *response;
-else if (response.hasUserError())
-    UserErrorType error = *response.userError();
-else Error error = response.error();
-
-
-/// node.update_{transmit, receive}() must be called as often as possible!
-while(true)
+modm::Fiber fiberComms([]
 {
-    node.update_transmit();
-    node.update_receive();
-}
+    // Broadcasts are buffered in a transmit queue
+    node.broadcast(0);                     // no payload
+    node.broadcast(1, ArgumentType());     // with argument
+    node.broadcast(2, data, sizeof(data)); // with memory buffer
 
-// Alternatively you require one fiber per update function
-modm::Fiber<> fiberNodeTransmit([]{ node.update_transmit(); });
-modm::Fiber<> fiberNodeReceive([]{ node.update_receive(); });
+    // Requests must be called from within a fiber
+    auto response = node.request<>(0);
+    // The request may fail, in that case check the error
+    if (not response) Error error = response.error();
+
+    // Responses can also be called from within a resumable function
+    auto response = node.request<ReturnType>(1, ArgumentType());
+    // The response is temporary, copy it before the next call to node.update()
+    if (response) ReturnType result = *response;
+
+    // User Error types must be declared
+    auto response = node.request<ReturnType, UserErrorType>(2, data, sizeof(data));
+    // The user error must be checked for explicitly now
+    if (response) ReturnType result = *response;
+    else if (response.hasUserError())
+        UserErrorType error = *response.userError();
+    else Error error = response.error();
+});
+
+// One fiber per update function
+modm::Fiber fiberNodeTransmit([]{ node.update_transmit(); });
+modm::Fiber fiberNodeReceive([]{ node.update_receive(); });
 ```
 
 

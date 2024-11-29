@@ -372,64 +372,47 @@ Heap:     197240B (98.2% available)
 
 <!-- (⚡️ requires module documentation for protothread/resumable) -->
 
-modm uses stackless cooperative multitasking, for which we have ported
-protothreads to C++ and extended them with resumable functions.
+modm implements stackful, cooperative fibers and provides a concurrency
+support library based on the C++ interface.
 This enables you to split up your application into separate tasks, and use
 synchronous APIs in all of them, without sacrificing overall responsiveness.
-This works on even the most resource restricted AVRs, since each task only
-requires 2 bytes of static RAM!
-
-All our IC drivers are implemented using resumable functions, which can be
-called from within protothreads or explicitly blocking outside of them.
 Here is an example of [reading out the accelerometer][accel]:
 
 ```cpp
-class ReaderThread : public modm::pt::Protothread
+// This accelerometer is connected via I2C.
+modm::Lis3dsh< modm::Lis3TransportI2c< I2cMaster > > accelerometer;
+modm::filter::MovingAverage<float, 25> averageX;
+modm::filter::MovingAverage<float, 25> averageY;
+modm::Fiber fiber_sensor([]
 {
-public:
-    bool run()
+    // The driver does several I2C transfer here to initialize and configure the
+    // external sensor. The CPU is free to do other things while this happens though.
+    accelerometer.configure(accelerometer.Scale::G2);
+
+    while (true)
     {
-        PT_BEGIN();
-        // The driver does several I2C transfer here to initialize and configure the
-        // external sensor. The CPU is free to do other things while this happens though.
-        PT_CALL(accelerometer.configure(accelerometer.Scale::G2));
+        // More I2C transfers in the background
+        accelerometer.readAcceleration();
 
-        while (true)    // this feels quite similar to regular threads
-        {
-            // this resumable function will defer execution back to other protothreads
-            PT_CALL(accelerometer.readAcceleration());
+        // smooth out the acceleration data a little bit
+        averageX.update(accelerometer.getData().getX());
+        averageY.update(accelerometer.getData().getY());
 
-            // smooth out the acceleration data a little bit
-            averageX.update(accelerometer.getData().getX());
-            averageY.update(accelerometer.getData().getY());
+        // set the boards LEDs depending on the acceleration values
+        LedUp::set(   averageX.getValue() < -0.2);
+        LedDown::set( averageX.getValue() >  0.2);
+        LedLeft::set( averageY.getValue() < -0.2);
+        LedRight::set(averageY.getValue() >  0.2);
 
-            // set the boards LEDs depending on the acceleration values
-            LedUp::set(   averageX.getValue() < -0.2);
-            LedDown::set( averageX.getValue() >  0.2);
-            LedLeft::set( averageY.getValue() < -0.2);
-            LedRight::set(averageY.getValue() >  0.2);
-
-            // defer back to other protothreads until the timer fires
-            PT_WAIT_UNTIL(timer.execute());
-        }
-        PT_END();
+        // defer back to other fiber while this one sleeps
+        modm::this_fiber::sleep_for(5ms);
     }
-private:
-    // This accelerometer is connected via I2C.
-    modm::Lis3dsh< modm::Lis3TransportI2c< I2cMaster > > accelerometer;
-    modm::PeriodicTimer timer = modm::PeriodicTimer(5); // 5ms periodic timer.
-    modm::filter::MovingAverage<float, 25> averageX;
-    modm::filter::MovingAverage<float, 25> averageY;
-};
-ReaderThread reader;    // Protothread is statically allocated!
+});
 
-int main() // Execution entry point.
+int main()
 {
-    while(true)
-    {   // the main loop with implicit round robin cooperative scheduling.
-        reader.run();
-        otherProtothreads.run();
-    }
+    Board::initialize();
+    modm::fiber::Scheduler::run();
     return 0;
 }
 ```

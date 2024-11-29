@@ -16,15 +16,9 @@ def init(module):
     module.name = ":processing:fiber"
     module.description = FileReader("module.md")
 
-def is_enabled(env):
-    return env.get(":processing:protothread:use_fiber", False) or \
-        not env.has_module(":processing:protothread")
-
 def prepare(module, options):
-    module.depends(":architecture:clock", ":architecture:atomic", ":architecture:assert")
-
-    module.add_query(
-        EnvironmentQuery(name="__enabled", factory=is_enabled))
+    module.depends(":architecture:clock", ":architecture:atomic",
+                   ":architecture:assert", ":architecture:fiber", ":stdc++")
 
     core = options[":target"].get_driver("core")["type"]
     if core.startswith("cortex-m"): module.depends(":cmsis:device")
@@ -34,7 +28,10 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "modm/src/modm/processing/fiber"
-    env.copy("../fiber.hpp")
+    env.substitutions = {
+        "with_task": True,
+    }
+    env.template("../fiber.hpp.in")
 
     core = env[":target"].get_driver("core")["type"]
     with_fpu = env.get(":platform:cortex-m:float-abi", "soft") != "soft"
@@ -80,7 +77,6 @@ def build(env):
     env.copy("scheduler.cpp")
     env.copy("task.hpp")
     env.copy("task_impl.hpp")
-    env.copy("functions.hpp")
 
     env.copy("mutex.hpp")
     env.copy("shared_mutex.hpp")

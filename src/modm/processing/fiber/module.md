@@ -20,7 +20,6 @@ int main()
 }
 ```
 
-
 ## Construction
 
 You can construct a fiber from any function without return type or arguments:
@@ -153,6 +152,38 @@ task in combination with the `modm_section()` macros and its specializations:
 modm_section(".sdram_noinit") modm::fiber::Stack<1024*10> large_stack;
 // But keep the task control structure in internal memory
 modm_fastdata modm::fiber::Task fiber(large_stack, big_function);
+```
+
+
+### Subclassing
+
+You can inherit from the `modm::Fiber` class to extend a fiber with a proper
+object interface. This is useful for providing a more expressive interface to a
+fiber by means of shared memory.
+
+```cpp
+class CustomFiber : public modm::Fiber<>
+{
+public:
+	CustomFiber() : Fiber([this]{ run(); }) {}
+
+	// called from another fiber
+	void trigger() { trigger_ = true; }
+
+private:
+	bool trigger_{false}; // shared memory between fibers
+
+	void inline
+	run()
+	{
+		while(true)
+		{
+			modm::this_fiber::poll([&]{ return trigger_; });
+			trigger_ = false;
+			// long running response to the trigger
+		}
+	}
+};
 ```
 
 

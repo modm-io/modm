@@ -17,7 +17,7 @@ def init(module):
     module.description = FileReader("module.md")
 
 def prepare(module, options):
-    module.depends(":architecture:assert")
+    module.depends(":architecture:assert", ":architecture:fiber")
 
     module.add_option(
         BooleanOption(
@@ -27,9 +27,13 @@ def prepare(module, options):
 
     return True
 
+def validate(env):
+    if not env.get(":processing:protothread:use_fiber", True):
+        env.log.warning(descr_deprecated)
+
 def build(env):
     env.outbasepath = "modm/src/modm/processing/resumable"
-    if env.query(":processing:fiber:__enabled", False):
+    if env.get(":processing:protothread:use_fiber", True):
         env.copy("macros_fiber.hpp", "macros.hpp")
         env.copy("resumable_fiber.hpp", "resumable.hpp")
     else:
@@ -56,4 +60,15 @@ function polling and just continuing program execution.
     This check is performed during the call to `RF_BEGIN(N)`, so exactly once
     on function entry and not during every polling call, so the performance
     penalty is relatively small.
+"""
+
+descr_deprecated = """
+
+        ####  Resumable Functions are deprecated!  ####
+
+Unfortunately GCC12 is the last version that supported the way we implemented
+Resumables. Since GCC13 the implementation does not compile anymore and cannot
+be fixed without significant breaking changes.
+
+Please port your code to use `modm:processing:fiber` instead.
 """

@@ -268,7 +268,7 @@ modm_context_end(uintptr_t)
 }
 
 %% if with_psplim
-#include <modm/processing/fiber/functions.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 #include <modm/platform.hpp>
 
 void modm_context_stkof_init()

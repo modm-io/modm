@@ -22,6 +22,7 @@ def prepare(module, options):
         ":architecture:delay",
         ":architecture:gpio",
         ":architecture:i2c",
+        ":architecture:fiber",
         ":platform:gpio")
     return True
 

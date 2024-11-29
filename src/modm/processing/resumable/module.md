@@ -1,5 +1,11 @@
 # Resumable Functions
 
+!!! warning "Resumable Functions are deprecated!"
+    Unfortunately GCC12 is the last version that supported the way we
+    implemented Resumables. Since GCC13 the implementation does not compile
+    anymore and cannot be fixed without significant breaking changes. Please
+    port your code to use `modm:processing:fiber` instead.
+
 An implementation of lightweight resumable functions which allow for nested
 calling.
 
@@ -79,8 +85,8 @@ another resumable function using `RF_END_RETURN_CALL(resumable())`.
 Here is a (slightly over-engineered) example:
 
 ```cpp
-#include <modm/platform/platform.hpp>
-#include <modm/processing/processing.hpp>
+#include <modm/platform.hpp>
+#include <modm/processing.hpp>
 
 using Led = GpioOutputB0;
 
@@ -159,7 +165,7 @@ The given example is in `modm/examples/generic/resumable`.
 ## Using Fibers
 
 Resumable functions can be implemented using stackful fibers by setting the
-`modm:processing:protothreads:use_fiber` option, which replaces the
+`modm:processing:protothread:use_fiber` option, which replaces the
 preprocessor macros and C++ implementations of this and the
 `modm:processing:protothreads` module with a fiber version.
 
@@ -194,20 +200,18 @@ There should be no modification necessary to the resumable functions itself.
 
 ### Restrictions
 
-There are three minor limitations with using fibers:
+There is one minor limitations when using fibers:
 1) no nesting depth checking for `NestedResumable`,
-2) no mutually exclusive execution for `NestedResumable`, and
-3) no implementation of `(Nested)Resumable` class member functions.
+2) stopping resumable functions is not implementable.
 
 The nesting depth is limited by the stack size of the fiber, so it would
 manifest as a stack overflow, which would need to be checked differently.
 
-The mutual exclusion of two protothreads accessing the same resumable function
-cannot be transparently implemented in fibers, it must be implemented more
-traditionally using a mutex or counting semaphore. If your code depends on this
-feature, you must refactor it.
-
-The classes member functions are not implementable using fibers, therefore they
-are only declared, but not implemented. You may stub them in you application to
-achieve the necessary behavior. If that does not work, you need to refactor
-your class to use fibers natively.
+The utility member functions
+- `Resumable::stopAllResumables()`,
+- `Resumable::stopResumable(uint8_t)`, and
+- `NestedResumable::stopResumable()`
+cannot be implemented using fibers as that would require the resumable to
+implement a cancellation point using `modm::fiber::stop_token`. However, since
+there is no concept of this in the original API, it is simply missing and thus
+cannot be implemented transparently.

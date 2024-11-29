@@ -12,17 +12,12 @@
 #pragma once
 
 #include "macros.hpp"
-#include <modm/processing/fiber.hpp>
-#include <modm/processing/fiber/mutex.hpp>
 #include <stdint.h>
 
 #define MODM_RESUMABLE_IS_FIBER
 
 namespace modm
 {
-
-/// @ingroup	modm_processing_resumable
-/// @{
 
 /// @cond
 // Reimplementations of modm::fiber::(recursive_)mutex without atomics
@@ -50,6 +45,9 @@ struct ResumableRecursiveMutex
 	void inline unlock() { if (count > 1) count--; else owner = NoOwner; }
 };
 /// @endcond
+
+/// @ingroup	modm_processing_resumable
+/// @{
 
 /// Resumable functions implemented via fibers return like a normal function
 template < typename T >

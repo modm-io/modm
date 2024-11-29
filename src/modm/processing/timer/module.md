@@ -58,95 +58,84 @@ public:
 ```
 
 However, for more complex use-cases, these classes are intended to be used with
-Protothreads (from module `modm:processing:protothread`) or Resumable Functions
-(from module `modm:processing:resumable`) to implement non-blocking delays.
+fibers (from module `modm:processing:fiber`) to implement non-blocking delays.
 
 ```cpp
-class FancyDelayEvents : public modm::pt::Protothread
+modm::Fiber fiber_timeout([]
 {
-    modm::Timeout timeout;
-public:
-    void event()
-    {
-        this->restart(); // restart entire protothread
-    }
-    bool update()
-    {
-        PT_BEGIN();
-
-        // pre-delay computation
-        timeout.restart(100ms);
-        PT_WAIT_UNTIL(timeout.isExpired());
-        // post-delay computation
-
-        PT_END();
-    }
-}
+    modm::Timeout timeout(100ms);
+    timeout.wait();
+    // NOTE: for such simple delays, use the built-in fiber sleep function!
+    modm::this_fiber::sleep_for(100ms);
+});
 ```
 
 For periodic timeouts, you could simply restart the timeout, however, the
 `restart()` method schedules a timeout from the *current* time onwards:
 
 ```cpp
-void update()
+modm::Timeout timeout(100ms);
+modm::Fiber fiber_timeout([]
 {
-    if (timeout.execute())
+    while(true)
     {
-        // delayed code
+        timeout.wait(); // yields fiber until timeout
+        // delayed code introduces latency
         timeout.restart(); // restarts but with *current* time!!!
     }
-}
-
+});
 ```
 
 This can lead to longer period than required, particularly in a system that has
 a lot to do and cannot service every timeout immediately. The solution is to use
-a `modm::PeriodicTimer`, which only reimplements the `execute()` method to
+a `modm::PeriodicTimer`, which only reimplements the `wait()` method to
 automatically restart the timer, by adding the interval to the *old* time, thus
 keeping the period accurate:
 
 ```cpp
 modm::PeriodicTimer timer{100ms};
-void update()
+modm::Fiber fiber_timer([]
 {
-    if (timer.execute()) // automatically restarts
+    while(true)
     {
-        // blink an LED or something
+        timer.wait(); // automatically restarts
+        // code can take up to 100ms, but timer period won't drift
     }
-}
+});
 ```
 
-The `execute()` method actually returns the number of missed periods, so that in
-a heavily congested system you do not need to keep track of time yourself. This
-can be particularly useful when dealing with soft-time physical systems like LED
-animations or control loops:
+The `wait()` method actually returns the number of missed periods, so that in a
+heavily congested system you do not need to keep track of time yourself. This
+can be particularly useful when dealing with soft real-time physical systems
+like LED animations or control loops:
 
 ```cpp
 modm::PeriodicTimer timer{1ms}; // render at 1kHz ideally
-void update()
+modm::Fiber fiber_timer([]
 {
-    // call only once regarless of the number of periods
-    if (const size_t periods = timer.execute(); periods)
+    while(true)
     {
-        animation.step(periods); // still compute the missing steps
-        animation.render();      // but only render once please
+        // call only once regardless of the number of periods
+        animation.step(timer.wait()); // still compute the missing steps
+        animation.render();           // but only render once please
+
+        // or alternatively to call the code the number of missed periods
+        for (auto periods{timer.wait()}; periods; periods--)
+        {
+            // periods is decreasing!
+        }
+        // This is fine, since execute() is evaluated only once!
+        for (auto periods : modm::range(timer.wait()))
+        {
+            // periods is increasing!
+        }
+        // THIS WILL NOT WORK, since execute() reschedules itself immediately!
+        for (auto periods{0}; periods < timer.wait(); periods++)
+        {
+            // called at most only once!!! periods == 0 always!
+        }
     }
-    // or alternatively to call the code the number of missed periods
-    for (auto periods{timer.execute()}; periods; periods--)
-    {
-        // periods is decreasing!
-    }
-    // This is fine, since execute() is evaluated only once!
-    for (auto periods : modm::range(timer.execute()))
-    {
-        // periods is increasing!
-    }
-    // THIS WILL NOT WORK, since execute() reschedules itself immediately!
-    for (auto periods{0}; periods < timer.execute(); periods++)
-    {
-        // called at most only once!!! periods == 0 always!
-    }
-}
+});
 ```
 
 !!! warning "DO NOT use for hard real time systems!"
@@ -157,6 +146,7 @@ void update()
 !!! note "Timers are stopped by default!"
     If you want to start a timer at construction time, give the constructor a
     duration. Duration Zero will expire the timer immediately
+
 
 ## Resolution
 
@@ -174,5 +164,3 @@ If you deal with short time periods, you can save a little memory by using the
   and 4 bytes.
 - `modm::ShortPreciseTimeout`, `modm::ShortPrecisePeriodicTimer`: 65
   milliseconds in microseconds and 4 bytes.
-
-

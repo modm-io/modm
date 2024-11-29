@@ -14,7 +14,7 @@
 #include "context.h"
 #include "stack.hpp"
 #include "stop_token.hpp"
-#include "functions.hpp"
+#include <modm/architecture/interface/fiber.hpp>
 #include <type_traits>
 
 namespace modm

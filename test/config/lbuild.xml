@@ -5,10 +5,10 @@
     <repository><path>../repo.lb</path></repository>
   </repositories>
   <options>
-    <option name="modm:build:scons:include_sconstruct">True</option>
-    <option name="modm:build:info.build">True</option>
+    <option name="modm:build:scons:include_sconstruct">yes</option>
+    <option name="modm:build:info.build">yes</option>
     <option name="modm:build:info.git">Info+Status</option>
-    <option name="modm:build:scons:cache_dir">$cache</option>
+    <option name="modm:processing:protothread:use_fiber">no</option>
   </options>
   <modules>
     <module>modm:build:scons</module>

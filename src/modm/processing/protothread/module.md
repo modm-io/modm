@@ -1,5 +1,10 @@
 # Protothreads
 
+!!! warning "Protothreads are deprecated!"
+    Protothreads are deprecated and will be removed in the future! Please use
+    the fiber shim layer by setting the modm:processing:protothread:use_fiber`
+    option and then port your code to use `modm:processing:fiber` directly.
+
 Protothreads are extremely lightweight stackless threads designed for
 severely memory constrained systems, such as small embedded systems or
 wireless sensor network nodes. Protothreads provide linear code execution

@@ -11,6 +11,8 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
+import os
+
 def init(module):
     module.name = ":processing"
     module.description = """\
@@ -27,12 +29,12 @@ def build(env):
     env.outbasepath = "modm/src/modm/processing"
     env.copy("task.hpp")
 
-    if not env.has_module(":processing:fiber"):
+    if env.has_module(":architecture:fiber") and not env.has_module(":processing:fiber"):
         env.outbasepath = "modm/src/modm/processing/"
-        env.copy("fiber/functions.hpp")
+        env.substitutions = {"with_task": False}
         env.copy("fiber/no_yield.hpp")
-        env.copy("fiber.hpp")
+        env.template("fiber.hpp.in")
 
     env.outbasepath = "modm/src/modm"
-    headers = env.generated_local_files(filterfunc=lambda path: ".h" in path and not "_impl.h" in path)
+    headers = env.generated_local_files(filterfunc=lambda path: ".hpp" in path and path.count(os.path.sep) == 1)
     env.template("processing.hpp.in", substitutions={"headers": sorted(headers)})

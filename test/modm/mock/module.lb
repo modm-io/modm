@@ -49,8 +49,11 @@ class SpiMaster(Module):
 
     def build(self, env):
         env.outbasepath = "modm-test/src/modm-test/mock"
+        env.substitutions = {
+            "use_fiber": env.get(":processing:protothread:use_fiber", True)
+        }
         env.copy("spi_master.hpp")
-        env.copy("spi_master.cpp")
+        env.template("spi_master.cpp.in")
 
 class CanDriver(Module):
     def init(self, module):

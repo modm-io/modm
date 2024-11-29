@@ -170,6 +170,20 @@ class Delay(Module):
         env.copy("interface/delay.hpp")
 # -----------------------------------------------------------------------------
 
+class Fiber(Module):
+    def init(self, module):
+        module.name = "fiber"
+        module.description = FileReader("interface/fiber.md")
+
+    def prepare(self, module, options):
+        module.depends(":stdc++", ":architecture:clock", ":processing")
+        return True
+
+    def build(self, env):
+        env.outbasepath = "modm/src/modm/architecture"
+        env.copy("interface/fiber.hpp")
+# -----------------------------------------------------------------------------
+
 class Gpio(Module):
     def init(self, module):
         module.name = "gpio"
@@ -389,6 +403,7 @@ def prepare(module, options):
     module.add_submodule(Can())
     module.add_submodule(Clock())
     module.add_submodule(Delay())
+    module.add_submodule(Fiber())
     module.add_submodule(Gpio())
     module.add_submodule(GpioExpander())
     module.add_submodule(I2c())

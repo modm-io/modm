@@ -33,9 +33,10 @@ modm::platform::SpiMaster{{ id }}::transfer(uint8_t data)
 		modm::this_fiber::yield();
 
 	// read the received byte
-	SpiHal{{ id }}::read(data);
+	std::byte value;
+	SpiHal{{ id }}::read(value);
 
-	return data;
+	return uint8_t(value);
 %% else
 	// this is a manually implemented "fast resumable function"
 	// there is no context or nesting protection, since we don't need it.

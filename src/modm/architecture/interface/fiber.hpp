@@ -21,7 +21,7 @@ namespace modm::fiber
 {
 
 /// Identifier of a fiber task.
-/// @ingroup modm_processing_fiber
+/// @ingroup modm_architecture_fiber
 using id = uintptr_t;
 
 } // namespace modm::fiber
@@ -29,7 +29,7 @@ using id = uintptr_t;
 namespace modm::this_fiber
 {
 
-/// @ingroup modm_processing_fiber
+/// @ingroup modm_architecture_fiber
 /// @{
 
 /**
