@@ -23,13 +23,11 @@
  *
  */
 
-#include <modm/debug/logger.hpp>
-#include <modm/processing/timer.hpp>
-#include <modm/processing/protothread.hpp>
+#include <modm/board.hpp>
+#include <modm/debug.hpp>
+#include <modm/processing.hpp>
 #include <modm/driver/display/hd44780.hpp>
 #include <modm/driver/gpio/pca8574.hpp>
-
-#include <modm/board.hpp>
 
 using Usart2 = BufferedUart<UsartHal2>;
 modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > device;
@@ -48,7 +46,6 @@ modm::log::Logger modm::log::error(device);
 using namespace Board;
 
 typedef I2cMaster2 MyI2cMaster;
-// typedef BitBangI2cMaster<GpioB10, GpioB11> MyI2cMaster;
 
 // define the pins used by the LCD when not using a port expander
 namespace lcd
@@ -99,92 +96,70 @@ namespace expander
 
 // create a LCD object with an 4bit data port at a I2C Gpio port expander
 modm::Hd44780< expander::Data4BitGpio, expander::Rw, expander::Rs, expander::E  > display(20, 4);
+const uint8_t cgA[8] = {0, 0b00100, 0b01110, 0b11111, 0b11111, 0b01110, 0b00100, 0};
+const uint8_t cgB[8] = {0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55};
 
-class ThreadOne : public modm::pt::Protothread
+modm::Fiber fiber_sensor([]
 {
-public:
-	ThreadOne()
+	MODM_LOG_DEBUG << "Ping the device from ThreadOne" << modm::endl;
+
+	// ping the device until it responds
+	while (not gpioExpander.ping())
 	{
+		MODM_LOG_DEBUG << "Device did not respond" << modm::endl;
+		modm::this_fiber::sleep_for(1s);
 	}
+	MODM_LOG_DEBUG << "Device responded" << modm::endl;
 
-	bool
-	update()
+	// Actually, this is not needed because of hardware defaults, but this is better style.
+	expander::Backlight::setOutput();
+	expander::Data4BitGpio::setOutput();
+
+	// Actually, this is not needed because of initialze of display driver.
+	expander::Rs::setOutput();
+	expander::Rw::setOutput();
+	expander::E::setOutput();
+
+	// Actually, this is not needed because of hardware defaults.
+	expander::Backlight::set();
+
+	// Initialize twice as some display are not initialised after first try.
+	display.initialize();
+	display.initialize();
+
+	// Fill CGRAM
+	display.writeCGRAM(0, cgA);
+	display.writeCGRAM(1, cgB);
+
+	display.setCursor(0, 0);
+
+	// Write the standard welcome message ;-)
+	display << "Hello modm.io **\n";
+
+	// Write two special characters in second row
+	display.setCursor(0, 1);
+	display.write(0);
+	display.write(1);
+
+	uint8_t counter{};
+	while (true)
 	{
-		PT_BEGIN();
-		MODM_LOG_DEBUG << "Ping the device from ThreadOne" << modm::endl;
+		display.setCursor(3, 1);
+		display << counter++ << "   ";
 
-		// ping the device until it responds
-		while (true)
-		{
-			// we wait until the task started
-			if (PT_CALL(gpioExpander.ping())) {
-			 	break;
-			}
-			MODM_LOG_DEBUG << "Device did not respond" << modm::endl;
-
-			// otherwise, try again in 100ms
-			timeout.restart(1s);
-			PT_WAIT_UNTIL(timeout.isExpired());
-		}
-
-		MODM_LOG_DEBUG << "Device responded" << modm::endl;
-
-		// Actually, this is not needed because of hardware defaults, but this is better style.
-		expander::Backlight::setOutput();
-		expander::Data4BitGpio::setOutput();
-
-		// Actually, this is not needed because of initialze of display driver.
-		expander::Rs::setOutput();
-		expander::Rw::setOutput();
-		expander::E::setOutput();
-
-		// Actually, this is not needed because of hardware defaults.
-		expander::Backlight::set();
-
-		// Initialize twice as some display are not initialised after first try.
-		display.initialize();
-		display.initialize();
-
-		// Fill CGRAM
-		display.writeCGRAM(0, cgA);
-		display.writeCGRAM(1, cgB);
-
-		display.setCursor(0, 0);
-
-		// Write the standard welcome message ;-)
-		display << "Hello modm.io **\n";
-
-		// Write two special characters in second row
-		display.setCursor(0, 1);
-		display.write(0);
-		display.write(1);
-
-		counter = 0;
-
-		while (true)
-		{
-			display.setCursor(3, 1);
-			display << counter << "   ";
-
-			counter++;
-
-			timeout.restart(1s);
-			PT_WAIT_UNTIL(timeout.isExpired());
-		}
-
-		PT_END();
+		modm::this_fiber::sleep_for(1s);
 	}
+});
 
-private:
-	modm::ShortTimeout timeout;
-	uint8_t counter;
-
-	// Bitmaps for special characters
-	uint8_t cgA[8] = {0, 0b00100, 0b01110, 0b11111, 0b11111, 0b01110, 0b00100, 0};
-	uint8_t cgB[8] = {0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55};
-};
-
-ThreadOne one;
+modm::Fiber fiber_blink([]
+{
+	Board::LedOrange::setOutput();
+	while(true)
+	{
+		Board::LedOrange::toggle();
+		modm::this_fiber::sleep_for(0.5s);
+	}
+});
 
 int
 main()
@@ -199,13 +174,6 @@ main()
 	MyI2cMaster::connect<GpioB11::Sda, GpioB10::Scl>(MyI2cMaster::PullUps::Internal);
 	MyI2cMaster::initialize<Board::SystemClock, 100_kHz>();
 
-	modm::ShortPeriodicTimer tmr(500ms);
-
-	while(true)
-	{
-		one.update();
-		if (tmr.execute()) {
-			Board::LedOrange::toggle();
-		}
-	}
+	modm::fiber::Scheduler::run();
+	return 0;
 }

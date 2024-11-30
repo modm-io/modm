@@ -15,65 +15,59 @@
 
 using namespace modm::platform;
 
-class Sensorthread : public modm::pt::Protothread
+modm::Fiber fiber_blink([]
 {
-private:
-	modm::ShortTimeout timeout;
-
-	modm::tcs3472::Data data;
-	modm::Tcs3472<I2cMaster> sensor{data};
-	using TCS3472_INT = Board::D2;
-
-public:
-	bool
-	update()
+	LedD13::setOutput();
+	while (true)
 	{
-		PT_BEGIN();
-
-		TCS3472_INT::setInput(Gpio::InputType::PullUp);
-
-		MODM_LOG_INFO << "Ping TCS34725" << modm::endl;
-		// ping the device until it responds
-		while (true)
-		{
-			// we wait until the task started
-			if (PT_CALL(sensor.ping())) { break; }
-			// otherwise, try again in 100ms
-			timeout.restart(100ms);
-			PT_WAIT_UNTIL(timeout.isExpired());
-		}
-
-		MODM_LOG_INFO << "TCS34725 responded" << modm::endl;
-
-		PT_CALL(sensor.initialize(sensor.Enable_InterruptMode_Waittime));
-		PT_CALL(sensor.configure(modm::tcs3472::Gain::X16, modm::tcs3472::IntegrationTime::MSEC_2_4));
-		PT_CALL(sensor.setInterruptPersistenceFilter(modm::tcs3472::InterruptPersistence::CNT_20));
-		// Setup WaitTime to further slow down samplerate
-		PT_CALL(sensor.setWaitTime(modm::tcs3472::WaitTime::MSEC_2_4));
-
-		// Dummy read required
-		PT_CALL(sensor.readColor());
-		// Fetch one sample ...
-		PT_CALL(sensor.readColor());
-		// ...and set the high threshold 20% above current clear
-		PT_CALL(sensor.setInterruptHighThreshold(data.getClear() * 1.2));
-
-		while (true)
-		{
-			PT_CALL(sensor.reloadInterrupt());
-			PT_WAIT_UNTIL(TCS3472_INT::read() == false);
-			if (PT_CALL(sensor.readColor()))
-			{
-				const auto rgb = data.getColor();
-				MODM_LOG_INFO << "RGB: " << rgb << "\tHSV: " << modm::color::Hsv(rgb) << modm::endl;
-			}
-		}
-
-		PT_END();
+		LedD13::toggle();
+		modm::this_fiber::sleep_for(0.5s);
 	}
-};
+});
 
-Sensorthread sensorthread;
+modm::tcs3472::Data data;
+modm::Tcs3472<I2cMaster> sensor{data};
+using TCS3472_INT = Board::D2;
+modm::Fiber fiber_sensor([]
+{
+	TCS3472_INT::setInput(Gpio::InputType::PullUp);
+
+	MODM_LOG_INFO << "Ping TCS34725" << modm::endl;
+	// ping the device until it responds
+	while (true)
+	{
+		// we wait until the task started
+		if (sensor.ping()) break;
+		// otherwise, try again in 100ms
+		modm::this_fiber::sleep_for(100ms);
+	}
+
+	MODM_LOG_INFO << "TCS34725 responded" << modm::endl;
+
+	sensor.initialize(sensor.Enable_InterruptMode_Waittime);
+	sensor.configure(modm::tcs3472::Gain::X16, modm::tcs3472::IntegrationTime::MSEC_2_4);
+	sensor.setInterruptPersistenceFilter(modm::tcs3472::InterruptPersistence::CNT_20);
+	// Setup WaitTime to further slow down samplerate
+	sensor.setWaitTime(modm::tcs3472::WaitTime::MSEC_2_4);
+
+	// Dummy read required
+	sensor.readColor();
+	// Fetch one sample ...
+	sensor.readColor();
+	// ...and set the high threshold 20% above current clear
+	sensor.setInterruptHighThreshold(data.getClear() * 1.2);
+
+	while (true)
+	{
+		sensor.reloadInterrupt();
+		modm::this_fiber::poll([]{ return not TCS3472_INT::read(); });
+		if (sensor.readColor())
+		{
+			const auto rgb = data.getColor();
+			MODM_LOG_INFO << "RGB: " << rgb << "\tHSV: " << modm::color::Hsv(rgb) << modm::endl;
+		}
+	}
+});
 
 int
 main()
@@ -81,12 +75,6 @@ main()
 	Board::initialize();
 	I2cMaster::initialize<Board::SystemClock, 100_kHz>();
 
-	LedD13::setOutput();
-	modm::ShortPeriodicTimer heartbeat(500ms);
-
-	while (true)
-	{
-		sensorthread.update();
-		if (heartbeat.execute()) Board::LedD13::toggle();
-	}
+	modm::fiber::Scheduler::run();
+	return 0;
 }

@@ -21,18 +21,16 @@
 
 // ----------------------------------------------------------------------------
 DisplayThread::DisplayThread() :
+	Fiber([this]{ this->update(); }),
 	_dirty(true), _seq(0), _temp(0), _pres(0), _humi(0)
 {
 }
 
-bool
+void
 DisplayThread::update()
 {
-	PT_BEGIN();
-
 	// Wait for 100 msec unitl display powered up.
-	boot_timeout.restart(100ms);
-	PT_WAIT_UNTIL(boot_timeout.isExpired());
+	modm::this_fiber::sleep_for(100ms);
 
 	display.initializeBlocking();
 	display.setFont(modm::font::Assertion);
@@ -42,7 +40,7 @@ DisplayThread::update()
 
 	while(true)
 	{
-		PT_WAIT_UNTIL(_dirty);
+		modm::this_fiber::poll([&]{ return _dirty; });
 
 		display.clear();
 
@@ -54,6 +52,4 @@ DisplayThread::update()
 
 		_dirty = false;
 	}
-
-	PT_END();
 }

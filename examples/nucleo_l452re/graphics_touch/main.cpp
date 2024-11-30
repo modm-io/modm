@@ -113,7 +113,7 @@ main()
 	{
 		LedGreen::set();
 
-		std::tie(X, Y, Z) = RF_CALL_BLOCKING(touchController.getRawValues());
+		std::tie(X, Y, Z) = touchController.getRawValues();
 		tftController.setColor(Red);
 		tftController.fillRectangle({30, 50}, 90, 115);
 		tftController.setColor(Black);
@@ -127,8 +127,8 @@ main()
 		tftController.setColor(Red);
 		tftController.fillRectangle({30, 220}, 120, 35);
 		tftController.setColor(Black);
-		if(RF_CALL_BLOCKING(touchController.isTouched())) {
-			std::tie(X, Y) = RF_CALL_BLOCKING(touchController.getTouchPosition());
+		if(touchController.isTouched()) {
+			std::tie(X, Y) = touchController.getTouchPosition();
 			tftController.setCursor(5, 220);
 			tftController << "> (" << X << "," << Y << ")";
 		}

@@ -10,41 +10,38 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
-#include <modm/processing/protothread.hpp>
+#include <modm/processing.hpp>
 
 using namespace Board;
 using namespace modm::glcd;
 using namespace Board::ft6;
 
-class LineDrawer : public modm::pt::Protothread
+class LineDrawer : public modm::Fiber<>
 {
 public:
 	LineDrawer() :
-		touch(touchData, TouchAddress),
-		display{Board::getDisplay()},
-		px{-1, -1}, py{-1, -1},
-		c{modm::color::html::White, modm::color::html::White}
+		Fiber([this]{ update(); }),
+		display{Board::getDisplay()}
 		{}
 
-	bool
+	void
 	update()
 	{
-		PT_BEGIN();
 
 		// Configure the touchscreen to sample with 60Hz in active and monitor mode.
-		PT_CALL(touch.configure(Touch::InterruptMode::Trigger, 60, 60));
+		touch.configure(Touch::InterruptMode::Trigger, 60, 60);
 
 		while (true)
 		{
 			do {
 				// Wait for either touchscreen interrupt or clear screen button
-				PT_WAIT_UNTIL(Int::read() or Button::read());
+				modm::this_fiber::poll([&]{ return Int::read() or Button::read(); });
 				if (Button::read()) display.clear();
 			} while (not Int::read());
 
 			LedRed::set();
 
-			PT_CALL(touch.readTouches());
+			touch.readTouches();
 
 			for (int ii=0; ii < 2; ii++)
 			{
@@ -76,21 +73,17 @@ public:
 			}
 			LedRed::reset();
 		}
-
-		PT_END();
 	}
 
 private:
 	Touch::Data touchData;
-	Touch touch;
+	Touch touch{touchData, TouchAddress};
 	modm::ColorGraphicDisplay& display;
-	int16_t px[2], py[2];
-	modm::color::Rgb565 c[2];
-};
+	int16_t px[2]{-1, -1}, py[2]{-1, -1};
+	modm::color::Rgb565 c[2]{modm::color::html::White, modm::color::html::White};
+} drawer;
 
-LineDrawer drawer;
-
-modm_faststack modm::Fiber<> fiber_blinky([]()
+modm_faststack modm::Fiber fiber_blinky([]
 {
 	Board::LedGreen::setOutput();
 	while(true)
@@ -109,6 +102,5 @@ main()
 	Board::initializeTouchscreen();
 
 	modm::fiber::Scheduler::run();
-
 	return 0;
 }

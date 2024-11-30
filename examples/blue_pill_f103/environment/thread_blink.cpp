@@ -21,32 +21,24 @@
 #undef	MODM_LOG_LEVEL
 #define	MODM_LOG_LEVEL modm::log::INFO
 
+modm::ShortPeriodicTimer timer(5s);
+uint32_t uptime;
+
 // ----------------------------------------------------------------------------
-BlinkThread::BlinkThread() :
-	timer(5s),
-	uptime(0)
+modm::Fiber fiber_blink([]
 {
-}
-
-bool
-BlinkThread::update()
-{
-	PT_BEGIN();
-
 	while (true)
 	{
-		PT_WAIT_UNTIL(timer.execute());
-		timeout.restart(100ms);
+		timer.wait();
 		Board::LedGreen::set();
 
 		bmp180Thread.startMeasurement();
 		bme280Thread.startMeasurement();
 
-
-		PT_WAIT_UNTIL(timeout.isExpired()) ;
+		modm::this_fiber::sleep_for(100ms);
 		Board::LedGreen::reset();
 
-		PT_WAIT_UNTIL(bmp180Thread.isNewDataAvailable() and bme280Thread.isNewDataAvailable());
+		modm::this_fiber::poll([&]{ return bmp180Thread.isNewDataAvailable() and bme280Thread.isNewDataAvailable(); });
 
 		int16_t bmp180_a_temp  = bmp180Thread.getTemperatureA();
 		int32_t bmp180_a_press = bmp180Thread.getPressureA();
@@ -73,6 +65,4 @@ BlinkThread::update()
 
 		++uptime;
 	}
-
-	PT_END();
-}
+});

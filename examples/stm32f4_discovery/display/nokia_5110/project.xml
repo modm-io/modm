@@ -6,12 +6,9 @@
   <modules>
     <module>modm:debug</module>
     <module>modm:driver:nokia5110</module>
-    <module>modm:platform:gpio</module>
-    <module>modm:platform:spi.bitbang</module>
     <module>modm:platform:spi:2</module>
     <module>modm:platform:uart:2</module>
-    <module>modm:processing:protothread</module>
-    <module>modm:processing:timer</module>
+    <module>modm:processing:fiber</module>
     <module>modm:build:scons</module>
   </modules>
 </library>

@@ -6,9 +6,7 @@
   <modules>
     <module>modm:architecture:i2c.device</module>
     <module>modm:platform:i2c:1</module>
-    <module>modm:processing:protothread</module>
-    <module>modm:processing:resumable</module>
-    <module>modm:processing:timer</module>
+    <module>modm:processing:fiber</module>
     <module>modm:build:scons</module>
   </modules>
 </library>

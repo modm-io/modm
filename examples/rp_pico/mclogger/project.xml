@@ -8,8 +8,7 @@
     <module>modm:platform:gpio</module>
     <module>modm:platform:uart:0</module>
     <module>modm:platform:multicore</module>
-    <module>modm:processing:timer</module>
-    <module>modm:processing:protothread</module>
+    <module>modm:processing:fiber</module>
     <module>modm:build:scons</module>
   </modules>
 </library>

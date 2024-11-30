@@ -13,8 +13,7 @@
 #include <modm/board.hpp>
 #include <modm/debug/logger.hpp>
 #include <modm/driver/radio/dw3110/dw3110_phy.hpp>
-#include <modm/processing/protothread.hpp>
-#include <modm/processing/timer.hpp>
+#include <modm/processing.hpp>
 
 using namespace Board;
 using namespace std::chrono_literals;
@@ -23,39 +22,20 @@ using MySpiMaster = modm::platform::SpiMaster1;
 using MyDw3110_a = modm::Dw3110Phy<MySpiMaster, GpioB6>;
 using MyDw3110_b = modm::Dw3110Phy<MySpiMaster, GpioA10>;
 
-class TXThread : public modm::pt::Protothread
+class TXThread : public modm::Fiber<>
 {
 public:
+	TXThread() : Fiber([this]{ run(); }) {}
+
 	bool
 	init()
 	{
-		auto ret = RF_CALL_BLOCKING(radio.initialize(
+		auto ret = radio.initialize(
 			modm::Dw3110::Channel::Channel9, modm::Dw3110::PreambleCode::Code_64Mhz_9,
 			modm::Dw3110::PreambleLength::Preamble_128,
-			modm::Dw3110::StartFrameDelimiter::Decawave_8));
-		RF_CALL_BLOCKING(radio.setEnableLongFrames(true));
+			modm::Dw3110::StartFrameDelimiter::Decawave_8);
+		radio.setEnableLongFrames(true);
 		return ret;
-	}
-
-	bool
-	run()
-	{
-		PT_BEGIN();
-		while (true)
-		{
-
-			txdata[txdata.size() - 1]++;
-			timeout.restart(Button::read() ? 500ms : 10ms);
-			PT_WAIT_UNTIL(timeout.execute());
-			if (PT_CALL(radio.transmit(txdata, true)) == MyDw3110_b::Error::None)
-			{
-				sentCount++;
-			} else
-			{
-				MODM_LOG_DEBUG << "[TX] Failed to trasmit!" << modm::endl;
-			}
-		}
-		PT_END();
 	}
 
 	size_t
@@ -65,45 +45,42 @@ public:
 	}
 
 private:
+	bool
+	run()
+	{
+		while (true)
+		{
+			txdata[txdata.size() - 1]++;
+			modm::this_fiber::sleep_for(Button::read() ? 500ms : 10ms);
+
+			if (radio.transmit(txdata, true) == MyDw3110_b::Error::None) {
+				sentCount++;
+			} else {
+				MODM_LOG_DEBUG << "[TX] Failed to trasmit!" << modm::endl;
+			}
+		}
+	}
+
 	MyDw3110_b radio{};
 	std::array<uint8_t, 5> txdata = {0xBA, 0xDE, 0xAF, 0xFE, 0x00};
 	modm::Timeout timeout{10ms};
 	size_t sentCount{0};
-};
+} tx;
 
-class RXThread : public modm::pt::Protothread
+class RXThread : public modm::Fiber<>
 {
 public:
+	RXThread() : Fiber([this]{ run(); }) {}
+
 	bool
 	init()
 	{
-		auto ret = RF_CALL_BLOCKING(radio.initialize(
+		auto ret = radio.initialize(
 			modm::Dw3110::Channel::Channel9, modm::Dw3110::PreambleCode::Code_64Mhz_9,
 			modm::Dw3110::PreambleLength::Preamble_128,
-			modm::Dw3110::StartFrameDelimiter::Decawave_8));
-		RF_CALL_BLOCKING(radio.setEnableLongFrames(true));
+			modm::Dw3110::StartFrameDelimiter::Decawave_8);
+		radio.setEnableLongFrames(true);
 		return ret;
-	}
-
-	bool
-	run()
-	{
-		PT_BEGIN();
-		while (true)
-		{
-			while (!PT_CALL(radio.packetReady()))
-			{
-				if (!PT_CALL(radio.isReceiving()))
-				{
-					// KEEP ON SEPERATE LINE
-					PT_CALL(radio.startReceive());
-				}
-				PT_YIELD();
-			}
-
-			if (PT_CALL(radio.fetchPacket(rxdata, rxlen))) { recvCount++; }
-		}
-		PT_END();
 	}
 
 	size_t
@@ -113,11 +90,37 @@ public:
 	}
 
 private:
+	bool
+	run()
+	{
+		while (true)
+		{
+			while (not radio.packetReady())
+			{
+				if (not radio.isReceiving())
+					radio.startReceive();
+				modm::this_fiber::yield();
+			}
+			if (radio.fetchPacket(rxdata, rxlen)) recvCount++;
+			modm::this_fiber::yield();
+		}
+	}
+
 	constexpr static size_t RxBufferSize = 1021;  // Maximum supported packet size
 	MyDw3110_a radio{};
 	size_t rxlen{0}, recvCount{0};
 	std::array<uint8_t, RxBufferSize> rxdata = {};
-};
+} rx;
+
+modm::Fiber fiber_report([]
+{
+	while(true)
+	{
+		modm::this_fiber::sleep_for(1s);
+		MODM_LOG_DEBUG << "Sent " << tx.getCount() << ", received " << rx.getCount()
+					   << ". Diff:" << tx.getCount() - rx.getCount() << modm::endl;
+	}
+});
 
 int
 main()
@@ -137,34 +140,20 @@ main()
 
 	MODM_LOG_INFO << "Initializing Devices..." << modm::endl;
 	bool success = true;
-	TXThread tx;
-	if (!tx.init())
+	if (not tx.init())
 	{
 		MODM_LOG_ERROR << "Failed to initialize TX Device!" << modm::endl;
 		success = false;
 	}
-
-	RXThread rx;
-	if (!rx.init())
+	if (not rx.init())
 	{
 		MODM_LOG_ERROR << "Failed to initialize TR Device!" << modm::endl;
 		success = false;
 	}
-	if (!success)
-		while (true) { __NOP(); }
+	modm_assert(success, "user", "Failed to initialize devices!");
 
-	modm::PeriodicTimer timer{1000ms};
 	MODM_LOG_INFO << "Starting ping pong..." << modm::endl;
-	while (true)
-	{
-		rx.run();
-		tx.run();
-		if (timer.execute())
-		{
-			MODM_LOG_DEBUG << "Sent " << tx.getCount() << ", received " << rx.getCount()
-						   << ". Diff:" << tx.getCount() - rx.getCount() << modm::endl;
-		}
-	}
+	modm::fiber::Scheduler::run();
 
 	return 0;
 }

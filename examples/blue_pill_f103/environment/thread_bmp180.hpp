@@ -12,19 +12,18 @@
 #ifndef THREAD_BMP180
 #define THREAD_BMP180
 
-#include <modm/processing/timer.hpp>
-#include <modm/processing/protothread.hpp>
+#include <modm/processing.hpp>
 
 #include <modm/driver/pressure/bmp085.hpp>
 
 #include "hardware.hpp"
 
-class Bmp180Thread: public modm::pt::Protothread
+class Bmp180Thread: public modm::Fiber<>
 {
 public:
 	Bmp180Thread();
 
-	bool
+	void
 	update();
 
 	bool
@@ -56,8 +55,6 @@ public:
 	}
 
 private:
-	modm::ShortTimeout timeout;
-
 	modm::bmp085::Data dataA;
 	modm::Bmp085<SensorsAI2cMaster> barometerA;
 

@@ -334,7 +334,5 @@ main()
     /* Check function/compatibility of the physical drive #0 */
     modm::fiber::Scheduler::run();
 
-    while (true);
-
     return 0;
 }

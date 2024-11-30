@@ -1,16 +1,14 @@
 <library>
   <extends>modm:disco-f407vg</extends>
   <options>
-    <option name="modm:build:build.path">../../../build/stm32f4_discovery/protothreads</option>
+    <option name="modm:build:build.path">../../../build/stm32f4_discovery/tmp102</option>
   </options>
   <modules>
     <module>modm:driver:tmp102</module>
     <module>modm:io</module>
-    <module>modm:platform:gpio</module>
     <module>modm:platform:i2c:1</module>
     <module>modm:platform:uart:2</module>
-    <module>modm:processing:protothread</module>
-    <module>modm:processing:timer</module>
+    <module>modm:processing:fiber</module>
     <module>modm:build:scons</module>
   </modules>
 </library>

@@ -8,8 +8,7 @@
     <module>modm:driver:ssd1306</module>
     <module>modm:ros</module>
     <module>modm:communication:ros</module>
-    <module>modm:processing:timer</module>
-    <module>modm:processing:protothread</module>
+    <module>modm:processing:fiber</module>
     <module>modm:platform:i2c:1</module>
     <module>modm:build:scons</module>
     <module>modm:platform:heap</module>

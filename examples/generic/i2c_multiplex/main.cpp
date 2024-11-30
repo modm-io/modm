@@ -8,8 +8,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 #include <modm/board.hpp>
-#include <modm/processing/timer.hpp>
-#include <modm/processing/protothread.hpp>
+#include <modm/processing.hpp>
 #include <modm/architecture/interface/i2c_device.hpp>
 #include <modm/architecture/interface/i2c_multiplexer.hpp>
 #include <modm/driver/gpio/pca9548a.hpp>
@@ -54,32 +53,13 @@ namespace multiplexer
 	using Ch7 = I2cMultiplexer::Ch7< i2cMultiplexer >;
 }
 
+modm::I2cDevice<multiplexer::Ch1> dev0(0x29);
+modm::I2cDevice<multiplexer::Ch2> dev1(0x29);
+modm::I2cDevice<multiplexer::Ch3> dev2(0x29);
+modm::I2cDevice<multiplexer::Ch7> dev3(0x29);
 
-class DeviceThread: public modm::pt::Protothread
+modm::Fiber fiber_ping([]
 {
-public:
-	DeviceThread() : dev0(0x29), dev1(0x29), dev2(0x29), dev3(0x29)
-	{}
-
-	bool
-	update();
-
-private:
-	modm::ShortTimeout timeout;
-
-	// Simple devices which are just pingable.
-	// Independent of real device. Any I2C device should be pingable at its address.
-	modm::I2cDevice<multiplexer::Ch1> dev0;
-	modm::I2cDevice<multiplexer::Ch2> dev1;
-	modm::I2cDevice<multiplexer::Ch3> dev2;
-	modm::I2cDevice<multiplexer::Ch7> dev3;
-};
-
-bool
-DeviceThread::update()
-{
-	PT_BEGIN();
-
 	MODM_LOG_DEBUG << MODM_FILE_INFO;
 	MODM_LOG_DEBUG << "Ping the Devices" << modm::endl;
 
@@ -87,20 +67,28 @@ DeviceThread::update()
 	while(true)
 	{
 		MODM_LOG_DEBUG.printf("[dev  ] ping0\n");
-		MODM_LOG_DEBUG.printf("[dev  ] ping0 res: %d\n", PT_CALL(dev0.ping()));
+		MODM_LOG_DEBUG.printf("[dev  ] ping0 res: %d\n", dev0.ping());
 		MODM_LOG_DEBUG.printf("[dev  ] ping1\n");
-		MODM_LOG_DEBUG.printf("[dev  ] ping1 res: %d\n", PT_CALL(dev1.ping()));
+		MODM_LOG_DEBUG.printf("[dev  ] ping1 res: %d\n", dev1.ping());
 		MODM_LOG_DEBUG.printf("[dev  ] ping2\n");
-		MODM_LOG_DEBUG.printf("[dev  ] ping2 res: %d\n", PT_CALL(dev2.ping()));
+		MODM_LOG_DEBUG.printf("[dev  ] ping2 res: %d\n", dev2.ping());
 		MODM_LOG_DEBUG.printf("[dev  ] ping3\n");
-		MODM_LOG_DEBUG.printf("[dev  ] ping3 res: %d\n", PT_CALL(dev3.ping()));
+		MODM_LOG_DEBUG.printf("[dev  ] ping3 res: %d\n", dev3.ping());
 		// Do again in 1s
-		timeout.restart(1s);
-		PT_WAIT_UNTIL(timeout.isExpired());
+		modm::this_fiber::sleep_for(1s);
 	}
+});
 
-	PT_END();
-}
+modm::Fiber fiber_blink([]
+{
+	uint32_t counter{};
+	while (true)
+	{
+		Board::Leds::toggle();
+		MODM_LOG_INFO << "Loop counter: " << (counter++) << modm::endl;
+		modm::this_fiber::sleep_for(1s);
+	}
+});
 
 int
 main()
@@ -115,22 +103,7 @@ main()
 	modm::platform::I2cMaster1::connect<modm::platform::GpioB7::Sda, modm::platform::GpioB6::Scl>();
 	modm::platform::I2cMaster1::initialize<Board::SystemClock, 100_kHz>();
 
-	constexpr std::chrono::milliseconds interval{1000};
-	modm::ShortPeriodicTimer heartbeat{interval};
-
-	// Main loop
-	DeviceThread deviceThread;
-
-	uint32_t counter(0);
-	while (true)
-	{
-		deviceThread.update();
-
-		if (heartbeat.execute()) {
-			Board::Leds::toggle();
-			MODM_LOG_INFO << "Loop counter: " << (counter++) << modm::endl;
-		}
-	}
+	modm::fiber::Scheduler::run();
 
 	return 0;
 }

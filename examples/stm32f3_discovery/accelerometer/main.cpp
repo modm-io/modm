@@ -14,67 +14,13 @@
 #include <modm/processing.hpp>
 #include <modm/math/filter.hpp>
 
-using namespace Board;
-
 // create the data object
 Board::lsm3::Accelerometer::Data data;
 // and hand it to the sensor driver
 Board::lsm3::Accelerometer accelerometer(data);
 
-
-class ReaderThread : public modm::pt::Protothread
-{
-public:
-	bool
-	update()
-	{
-		PT_BEGIN();
-
-		// initialize with limited range of ±2g
-		PT_CALL(accelerometer.configure(accelerometer.Scale::G2));
-
-		while (true)
-		{
-			// read out the sensor
-			PT_CALL(accelerometer.readAcceleration());
-
-			averageX.update(accelerometer.getData().getX());
-			averageY.update(accelerometer.getData().getY());
-
-			{
-				bool xs = averageX.getValue() < -0.2f;
-				bool xn = averageX.getValue() >  0.2f;
-
-				bool xe = averageY.getValue() < -0.2f;
-				bool xw = averageY.getValue() >  0.2f;
-
-				Board::LedNorth::set(xn and not (xe or xw));
-				Board::LedNorthEast::set(xn and xe);
-				Board::LedNorthWest::set(xn and xw);
-
-				Board::LedEast::set(xe and not (xs or xn));
-				Board::LedWest::set(xw and not (xs or xn));
-
-				Board::LedSouthEast::set(xs and xe);
-				Board::LedSouthWest::set(xs and xw);
-				Board::LedSouth::set(xs and not (xe or xw));
-			}
-
-			// repeat every 5 ms
-			timeout.restart(5ms);
-			PT_WAIT_UNTIL(timeout.isExpired());
-		}
-
-		PT_END();
-	}
-
-private:
-	modm::ShortTimeout timeout;
-	modm::filter::MovingAverage<float, 25> averageX;
-	modm::filter::MovingAverage<float, 25> averageY;
-};
-
-ReaderThread reader;
+modm::filter::MovingAverage<float, 25> averageX;
+modm::filter::MovingAverage<float, 25> averageY;
 
 int
 main()
@@ -82,7 +28,36 @@ main()
 	Board::initialize();
 	Board::initializeLsm3();
 
-	modm::fiber::Scheduler::run();
+	// initialize with limited range of ±2g
+	accelerometer.configure(accelerometer.Scale::G2);
 
+	while (true)
+	{
+		// read out the sensor
+		accelerometer.readAcceleration();
+
+		averageX.update(accelerometer.getData().getX());
+		averageY.update(accelerometer.getData().getY());
+
+		const bool xs = averageX.getValue() < -0.2f;
+		const bool xn = averageX.getValue() >  0.2f;
+
+		const bool xe = averageY.getValue() < -0.2f;
+		const bool xw = averageY.getValue() >  0.2f;
+
+		Board::LedNorth::set(xn and not (xe or xw));
+		Board::LedNorthEast::set(xn and xe);
+		Board::LedNorthWest::set(xn and xw);
+
+		Board::LedEast::set(xe and not (xs or xn));
+		Board::LedWest::set(xw and not (xs or xn));
+
+		Board::LedSouthEast::set(xs and xe);
+		Board::LedSouthWest::set(xs and xw);
+		Board::LedSouth::set(xs and not (xe or xw));
+
+		// repeat every 5 ms
+		modm::delay(5ms);
+	}
 	return 0;
 }

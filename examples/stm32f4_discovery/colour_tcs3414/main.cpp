@@ -11,13 +11,9 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
-
 #include <modm/processing.hpp>
 #include <modm/driver/color/tcs3414.hpp>
-
-#include <modm/io/iostream.hpp>
-
-#include <modm/architecture/interface/gpio.hpp>
+#include <modm/io.hpp>
 
 using Usart2 = BufferedUart<UsartHal2>;
 modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > device;
@@ -37,85 +33,42 @@ modm::IOStream stream(device);
 
 // typedef I2cMaster1 MyI2cMaster;
 typedef I2cMaster2 MyI2cMaster;
-// typedef BitBangI2cMaster<GpioB10, GpioB11> MyI2cMaster;
+modm::tcs3414::Data data;
+modm::Tcs3414<MyI2cMaster> sensor{data};
 
-class ThreadOne : public modm::pt::Protothread
+modm::Fiber fiber_sensor([]
 {
-public:
-	bool
-	update()
+	stream << "Ping the device from ThreadOne" << modm::endl;
+	while (not sensor.ping()) modm::this_fiber::sleep_for(100ms);
+	stream << "Device responded" << modm::endl;
+
+	sensor.initialize();
+	stream << "Device initialized" << modm::endl;
+
+	sensor.configure(modm::tcs3414::Gain::X16, modm::tcs3414::Prescaler::D1);
+	sensor.setIntegrationTime(modm::tcs3414::IntegrationMode::INTERNAL,
+							  modm::tcs3414::NominalIntegrationTime::MSEC_100);
+	stream << "Device configured" << modm::endl;
+
+	while (true)
 	{
-		PT_BEGIN();
-
-		stream << "Ping the device from ThreadOne" << modm::endl;
-
-		// ping the device until it responds
-		while (true)
-		{
-			// we wait until the task started
-			if (PT_CALL(sensor.ping())) {
-			 	break;
-			}
-			// otherwise, try again in 100ms
-			timeout.restart(100ms);
-			PT_WAIT_UNTIL(timeout.isExpired());
+		if (sensor.readColor()) {
+			const auto rgb = data.getColor();
+			stream << "RGB: " << rgb << "\tHSV: " << modm::color::Hsv(rgb) << modm::endl;
 		}
-
-		stream << "Device responded" << modm::endl;
-
-		while (true)
-		{
-			if (PT_CALL(sensor.initialize())) {
-				break;
-			}
-			// otherwise, try again in 100ms
-			timeout.restart(100ms);
-			PT_WAIT_UNTIL(timeout.isExpired());
-		}
-
-		stream << "Device initialized" << modm::endl;
-
-		while (true)
-		{
-			if (PT_CALL(sensor.configure(
-					modm::tcs3414::Gain::X16,
-					modm::tcs3414::Prescaler::D1)))
-			{
-				if (PT_CALL(sensor.setIntegrationTime(
-						modm::tcs3414::IntegrationMode::INTERNAL,
-						modm::tcs3414::NominalIntegrationTime::MSEC_100)))
-				{
-					break;
-				}
-				break;
-			}
-			// otherwise, try again in 100ms
-			timeout.restart(100ms);
-			PT_WAIT_UNTIL(timeout.isExpired());
-		}
-
-		stream << "Device configured" << modm::endl;
-
-		while (true)
-		{
-			if (PT_CALL(sensor.readColor())) {
-				const auto rgb = data.getColor();
-				stream << "RGB: " << rgb << "\tHSV: " << modm::color::Hsv(rgb) << modm::endl;
-			}
-			timeout.restart(500ms);
-			PT_WAIT_UNTIL(timeout.isExpired());
-		}
-
-		PT_END();
+		modm::this_fiber::sleep_for(500ms);
 	}
+});
 
-private:
-	modm::ShortTimeout timeout;
-	modm::tcs3414::Data data;
-	modm::Tcs3414<MyI2cMaster> sensor{data};
-};
-
-ThreadOne one;
+modm::Fiber fiber_blink([]
+{
+	Board::LedOrange::setOutput();
+	while(true)
+	{
+		Board::LedOrange::toggle();
+		modm::this_fiber::sleep_for(0.5s);
+	}
+});
 
 // ----------------------------------------------------------------------------
 int
@@ -131,15 +84,6 @@ main()
 
 	stream << "\n\nWelcome to TCS3414 demo!\n\n";
 
-	modm::ShortPeriodicTimer tmr(500ms);
-
-	while (true)
-	{
-		one.update();
-		if (tmr.execute()) {
-			Board::LedOrange::toggle();
-		}
-	}
-
+	modm::fiber::Scheduler::run();
 	return 0;
 }

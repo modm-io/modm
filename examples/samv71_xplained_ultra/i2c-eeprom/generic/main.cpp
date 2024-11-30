@@ -38,11 +38,11 @@ int main()
 	constexpr auto AddressWidth = 1; // use 2 for 16 bit address EEPROMs
 	modm::I2cEeprom<I2c, AddressWidth> eeprom{0x57};
 
-	MODM_LOG_INFO << "EEPROM detected: " << RF_CALL_BLOCKING(eeprom.ping()) << "\n\n";
+	MODM_LOG_INFO << "EEPROM detected: " << eeprom.ping() << "\n\n";
 
 	// Write 4 data bytes to address 0x80
 	/*constexpr std::array<uint8_t, 4> data = {0xAA, 0xBB, 0xCC, 0xDD};
-	const bool writeSuccess = RF_CALL_BLOCKING(eeprom.write(0x80, data.data(), 4));
+	const bool writeSuccess = eeprom.write(0x80, data.data(), 4);
 	MODM_LOG_INFO << "write successful: " << writeSuccess << "\n\n";*/
 
 	// Read 4 data bytes from address 0x80
@@ -51,7 +51,7 @@ int main()
 	// retry read until device responds after finishing previous write
 	while (!readSuccess)
 	{
-		readSuccess = RF_CALL_BLOCKING(eeprom.read(0x80, buffer.data(), buffer.size()));
+		readSuccess = eeprom.read(0x80, buffer.data(), buffer.size());
 	}
 	MODM_LOG_INFO << "read successful: " << readSuccess << "\n";
 	MODM_LOG_INFO.printf("data: 0x%02x 0x%02x 0x%02x 0x%02x\n\n", buffer[0], buffer[1], buffer[2], buffer[3]);

@@ -45,19 +45,19 @@ main()
 	Sx1276<SpiMaster1,SpiCs> loraModem;
 
 	// Initialize the modem
-	RF_CALL_BLOCKING(loraModem.initialize());
+	loraModem.initialize();
 
 	// Set Modulation Parameters
-	RF_CALL_BLOCKING(loraModem.setModemParams(sx1276::Bandwidth::BW_7,
-											  sx1276::SpreadingFactor::SF_8,
-											  sx1276::CodingRate::CR_4_8,
-											  false,
-											  false));
+	loraModem.setModemParams(sx1276::Bandwidth::BW_7,
+							 sx1276::SpreadingFactor::SF_8,
+							 sx1276::CodingRate::CR_4_8,
+							 false,
+							 false);
 	// Set Carrier Frequency
-	RF_CALL_BLOCKING(loraModem.setCarrierFrequency(433.920_MHz));
+	loraModem.setCarrierFrequency(433.920_MHz);
 
 	// Enable the continous listening mode
-	RF_CALL_BLOCKING(loraModem.enableListening());
+	loraModem.enableListening();
 
 	//the variable to hold the counter transmitted by the tx example
 	uint32_t rxCounter(0);
@@ -65,16 +65,16 @@ main()
 	while (true)
 	{
 		//check the modem if new data is available and read it
-		uint8_t bytesReceived = RF_CALL_BLOCKING(loraModem.readPacket(reinterpret_cast<uint8_t*>(&rxCounter),4));
+		uint8_t bytesReceived = loraModem.readPacket(reinterpret_cast<uint8_t*>(&rxCounter),4);
 		if(bytesReceived > 0)
 		{
-			int8_t snr = RF_CALL_BLOCKING(loraModem.getPacketSnr());
+			int8_t snr = loraModem.getPacketSnr();
 
 			//dirty fixed point numbers
 			uint8_t snr_dec = (snr & 0x03) * 25;
 			snr = snr >> 2;
 
-			int16_t rssi = RF_CALL_BLOCKING(loraModem.getPacketRssi());
+			int16_t rssi = loraModem.getPacketRssi();
 
 			MODM_LOG_DEBUG << "Received Message" << modm::endl;
 			MODM_LOG_DEBUG << "Counter Value: " << rxCounter << modm::endl;

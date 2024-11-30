@@ -32,11 +32,11 @@ main()
 	modm::Lsm6ds33<I2cMaster1> sensor(0x6B);
 
 	// Turn on and configure the acceleration sensor
-	bool accSuccess = RF_CALL_BLOCKING(sensor.configureAccelerationSensor(modm::lsm6ds33::AccDataRate::Rate_13_Hz,
-																		  modm::lsm6ds33::AccScale::Scale_16_G));
+	bool accSuccess = sensor.configureAccelerationSensor(modm::lsm6ds33::AccDataRate::Rate_13_Hz,
+														 modm::lsm6ds33::AccScale::Scale_16_G);
 	// Turn on and configure the gyroscope
-	bool gyroSuccess = RF_CALL_BLOCKING(sensor.configureGyroscope(modm::lsm6ds33::GyroDataRate::Rate_13_Hz,
-														 modm::lsm6ds33::GyroScale::Scale_125_dps));
+	bool gyroSuccess = sensor.configureGyroscope(modm::lsm6ds33::GyroDataRate::Rate_13_Hz,
+												 modm::lsm6ds33::GyroScale::Scale_125_dps);
 
 	if(!(accSuccess && gyroSuccess))
 	{
@@ -49,8 +49,8 @@ main()
 	while (true)
 	{
 		//Read the sensor data and print it out
-		accSuccess = RF_CALL_BLOCKING(sensor.readAcceleration(accVector));
-		gyroSuccess = RF_CALL_BLOCKING(sensor.readGyroscope(gyroVector));
+		accSuccess = sensor.readAcceleration(accVector);
+		gyroSuccess = sensor.readGyroscope(gyroVector);
 		if(accSuccess && gyroSuccess)
 		{
 			MODM_LOG_INFO << "Acceleration Vector:" << modm::endl;
@@ -64,7 +64,6 @@ main()
 			MODM_LOG_INFO << "Y: "<< gyroVector.y << " deg/s" << modm::endl;
 			MODM_LOG_INFO << "Z: "<< gyroVector.z << " deg/s" << modm::endl;
 			MODM_LOG_INFO  << modm::endl;
-
 		}
 		else
 		{

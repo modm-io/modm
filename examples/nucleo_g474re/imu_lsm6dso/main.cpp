@@ -56,24 +56,24 @@ main()
 
 	MODM_LOG_INFO << "Resetting and rebooting imu (BOOT | SW_RESET)..." << modm::endl;
 	// Write bits BOOT | SW_RESET (and IF_INC, because it default to 1) to reboot imu
-	if(!RF_CALL_BLOCKING(imu.writeRegister(modm::lsm6dso::Register::CTRL3_C, 0b1000'0101))) {
+	if(!imu.writeRegister(modm::lsm6dso::Register::CTRL3_C, 0b1000'0101)) {
 		MODM_LOG_INFO.printf(" ... failed.");
 		Board::Leds::set();
 	}
 
 	MODM_LOG_INFO << "Initializing IMU..." << modm::endl;
-	RF_CALL_BLOCKING(imu.initialize());
+	imu.initialize();
 
 	MODM_LOG_INFO << "Enable IMU by configuring data rate and range" << modm::endl;
-	if(!RF_CALL_BLOCKING(imu.setOutputDataRateAndRange<12_Hz, 5_pct>(
+	if(!imu.setOutputDataRateAndRange<12_Hz, 5_pct>(
 				modm::lsm6dso::LinearRange::G2,
-				modm::lsm6dso::AngularRange::dps125))) {
+				modm::lsm6dso::AngularRange::dps125)) {
 		MODM_LOG_INFO.printf(" ... failed.");
 		Board::Leds::set();
 	}
 
 	// Reading CTRL1_XL register
-	std::optional<uint8_t> reg = RF_CALL_BLOCKING(imu.readRegister(modm::lsm6dso::Register::CTRL1_XL));
+	std::optional<uint8_t> reg = imu.readRegister(modm::lsm6dso::Register::CTRL1_XL);
 	if (reg.has_value()) {
 		MODM_LOG_INFO << "Reading CTRL1_XL register = " << *reg << modm::endl;
 	}
@@ -82,7 +82,7 @@ main()
 	}
 
 	MODM_LOG_INFO << "Enable accelerometer and gyroscope data-ready interrupts on INT1 pin" << modm::endl;
-	if(!RF_CALL_BLOCKING(imu.writeRegister(modm::lsm6dso::Register::INT1_CTRL, 0b0000'0011))) {
+	if(!imu.writeRegister(modm::lsm6dso::Register::INT1_CTRL, 0b0000'0011)) {
 		MODM_LOG_INFO.printf(" ... failed.");
 		Board::Leds::set();
 	}
@@ -97,7 +97,7 @@ main()
 		while (Int1::read()) {}
 		while (!Int1::read()) {}
 
-		if(!RF_CALL_BLOCKING(imu.readRegisters(modm::lsm6dso::Register::OUT_TEMP_L, data))) {
+		if(!imu.readRegisters(modm::lsm6dso::Register::OUT_TEMP_L, data)) {
 			MODM_LOG_INFO.printf("failed. ");
 			Board::Leds::set();
 		}

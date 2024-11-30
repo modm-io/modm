@@ -23,6 +23,7 @@
 
 // ----------------------------------------------------------------------------
 Bme280Thread::Bme280Thread() :
+	Fiber([this] { this->update(); }),
 	barometerA(dataA, 0x76),
 	barometerB(dataB, 0x76),
 	start_measurement(false),
@@ -38,11 +39,9 @@ Bme280Thread::startMeasurement()
 	return true;
 }
 
-bool
+void
 Bme280Thread::update()
 {
-	PT_BEGIN()
-
 	MODM_LOG_DEBUG << MODM_FILE_INFO;
 	MODM_LOG_DEBUG << "Ping the BME280" << modm::endl;
 
@@ -50,21 +49,19 @@ Bme280Thread::update()
 	while(true)
 	{
 		// we wait until the task started
-		if (PT_CALL(barometerA.ping()))
+		if (barometerA.ping())
 			break;
 		// otherwise, try again in 100ms
-		timeout.restart(100ms);
-		PT_WAIT_UNTIL(timeout.isExpired());
+		modm::this_fiber::sleep_for(100ms);
 	}
 
 	while(true)
 	{
 		// we wait until the task started
-		if (PT_CALL(barometerB.ping()))
+		if (barometerB.ping())
 			break;
 		// otherwise, try again in 100ms
-		timeout.restart(100ms);
-		PT_WAIT_UNTIL(timeout.isExpired());
+		modm::this_fiber::sleep_for(100ms);
 	}
 
 	// stream << "Barometer BME280 responded" << modm::endl;
@@ -73,21 +70,19 @@ Bme280Thread::update()
 	while(true)
 	{
 		// we wait until the task started
-		if (PT_CALL(barometerA.initialize()))
+		if (barometerA.initialize())
 			break;
 		// otherwise, try again in 100ms
-		timeout.restart(100ms);
-		PT_WAIT_UNTIL(timeout.isExpired());
+		modm::this_fiber::sleep_for(100ms);
 	}
 
 	while(true)
 	{
 		// we wait until the task started
-		if (PT_CALL(barometerB.initialize()))
+		if (barometerB.initialize())
 			break;
 		// otherwise, try again in 100ms
-		timeout.restart(100ms);
-		PT_WAIT_UNTIL(timeout.isExpired());
+		modm::this_fiber::sleep_for(100ms);
 	}
 
 	MODM_LOG_DEBUG << MODM_FILE_INFO;
@@ -145,28 +140,24 @@ Bme280Thread::update()
 
 	while (true)
 	{
-		PT_WAIT_UNTIL(start_measurement);
+		modm::this_fiber::poll([&]{ return start_measurement; });
 
 		// Returns when new data was read from the sensor
-		PT_CALL(barometerA.readout());
-		PT_CALL(barometerB.readout());
+		barometerA.readout();
+		barometerB.readout();
 		new_data = true;
 
-		{
-			int32_t temp = dataA.getTemperature();
-			int32_t press = dataA.getPressure();
-			int32_t hum = dataA.getHumidity();
-			MODM_LOG_DEBUG << MODM_FILE_INFO;
-			MODM_LOG_DEBUG.printf("BME280: Calibrated temperature in 0.01 degree Celsius is: %" PRId32 "\n", temp  );
-			MODM_LOG_DEBUG << MODM_FILE_INFO;
-			MODM_LOG_DEBUG.printf("BME280: Calibrated pressure in mPa is                   : %" PRId32 "\n", press );
-			MODM_LOG_DEBUG << MODM_FILE_INFO;
-			MODM_LOG_DEBUG.printf("BME280: Calibrated humidity in 0.001 %% is               : %" PRId32 "\n", hum );
-		}
+		int32_t temp = dataA.getTemperature();
+		int32_t press = dataA.getPressure();
+		int32_t hum = dataA.getHumidity();
+		MODM_LOG_DEBUG << MODM_FILE_INFO;
+		MODM_LOG_DEBUG.printf("BME280: Calibrated temperature in 0.01 degree Celsius is: %" PRId32 "\n", temp  );
+		MODM_LOG_DEBUG << MODM_FILE_INFO;
+		MODM_LOG_DEBUG.printf("BME280: Calibrated pressure in mPa is                   : %" PRId32 "\n", press );
+		MODM_LOG_DEBUG << MODM_FILE_INFO;
+		MODM_LOG_DEBUG.printf("BME280: Calibrated humidity in 0.001 %% is               : %" PRId32 "\n", hum );
 
 
 		start_measurement = false;
 	}
-
-	PT_END();
 }

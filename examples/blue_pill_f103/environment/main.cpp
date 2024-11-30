@@ -13,15 +13,13 @@
 #include <modm/board.hpp>
 #include <modm/debug/logger.hpp>
 
-#include <modm/processing/timer.hpp>
-#include <modm/processing/protothread.hpp>
+#include <modm/processing.hpp>
 
 #include "hardware.hpp"
 
 // ----------------------------------------------------------------------------
 #include "threads.hpp"
 
-BlinkThread  blinkThread;
 Bmp180Thread bmp180Thread;
 Bme280Thread bme280Thread;
 
@@ -65,14 +63,7 @@ main()
 
 	MODM_LOG_DEBUG << "Welcome to Environment Sensor Test" << modm::endl;
 
-	LedGreen::set();
-
-	while (true)
-	{
-		blinkThread.update();
-		bmp180Thread.update();
-		bme280Thread.update();
-	}
+	modm::fiber::Scheduler::run();
 
 	return 0;
 }

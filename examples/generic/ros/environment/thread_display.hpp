@@ -11,19 +11,18 @@
 #ifndef THREAD_DISPLAY
 #define THREAD_DISPLAY
 
-#include <modm/processing/timer.hpp>
-#include <modm/processing/protothread.hpp>
+#include <modm/processing.hpp>
 
 #include <modm/driver/display/ssd1306.hpp>
 
 #include "hardware.hpp"
 
-class DisplayThread: public modm::pt::Protothread
+class DisplayThread: public modm::Fiber<>
 {
 public:
 	DisplayThread();
 
-	bool
+	void
 	update();
 
 	bool
@@ -56,7 +55,6 @@ public:
 
 protected:
 	modm::Ssd1306<MyI2cMaster, 64> display;
-	modm::ShortTimeout boot_timeout;
 	bool _dirty;
 	int32_t _seq;
 	int32_t _temp;

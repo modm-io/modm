@@ -43,7 +43,7 @@ main()
 	modm::PeriodicTimer timer{500ms};
 	while(true) {
 		if (timer.execute()) {
-			const modm::Tmp123Temperature temperature = RF_CALL_BLOCKING(sensor.read());
+			const modm::Tmp123Temperature temperature = sensor.read();
 			MODM_LOG_INFO.printf("Temperature %2.2f\n", (double)temperature.getTemperatureFloat());
 		}
 	}

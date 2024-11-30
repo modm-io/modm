@@ -49,63 +49,8 @@ modm::Lis3dsh< lis::Transport > accel(data);
 modm::lis302dl::Data data;
 modm::Lis302dl< lis::Transport > accel(data);
 #endif
-
-
-class ReaderThread : public modm::pt::Protothread
-{
-public:
-	bool
-	update()
-	{
-		PT_BEGIN();
-
-		// ping the device until it responds
-		while(true)
-		{
-			// we wait until the task started
-			if (PT_CALL(accel.ping()))
-				break;
-			// otherwise, try again in 100ms
-			timeout.restart(100ms);
-			Board::LedOrange::set();
-			PT_WAIT_UNTIL(timeout.isExpired());
-			Board::LedOrange::reset();
-		}
-
-		// initialize with limited range of ~2.3G
-		PT_CALL(accel.configure(accel.Scale::G2, accel.MeasurementRate::Hz400));
-
-		while (true)
-		{
-			PT_CALL(accel.readAcceleration());
-
-#if REVISION_C
-			averageX.update(-accel.getData().getY());
-			averageY.update(accel.getData().getX());
-#else
-			averageX.update(accel.getData().getX());
-			averageY.update(accel.getData().getY());
-#endif
-
-			Board::LedOrange::set(averageX.getValue() < -0.2f);
-			Board::LedBlue::set(averageX.getValue() > 0.2f);
-			Board::LedGreen::set(averageY.getValue() < -0.2f);
-			Board::LedRed::set(averageY.getValue() > 0.2f);
-
-			timeout.restart(5ms);
-			PT_WAIT_UNTIL(timeout.isExpired());
-		}
-
-		PT_END();
-	}
-
-private:
-	modm::ShortTimeout timeout;
-	modm::filter::MovingAverage<float, 25> averageX;
-	modm::filter::MovingAverage<float, 25> averageY;
-};
-
-ReaderThread reader;
+modm::filter::MovingAverage<float, 25> averageX;
+modm::filter::MovingAverage<float, 25> averageY;
 
 int
 main()
@@ -122,9 +67,34 @@ main()
 	Board::initializeLis3();
 #endif
 
+	while(not accel.ping())
+	{
+		Board::LedOrange::set();
+		modm::delay(100ms);
+		Board::LedOrange::reset();
+	}
+
+	// initialize with limited range of ~2.3G
+	accel.configure(accel.Scale::G2, accel.MeasurementRate::Hz400);
+
 	while (true)
 	{
-		reader.update();
+		accel.readAcceleration();
+
+#if REVISION_C
+		averageX.update(-accel.getData().getY());
+		averageY.update(accel.getData().getX());
+#else
+		averageX.update(accel.getData().getX());
+		averageY.update(accel.getData().getY());
+#endif
+
+		Board::LedOrange::set(averageX.getValue() < -0.2f);
+		Board::LedBlue::set(averageX.getValue() > 0.2f);
+		Board::LedGreen::set(averageY.getValue() < -0.2f);
+		Board::LedRed::set(averageY.getValue() > 0.2f);
+
+		modm::delay(5ms);
 	}
 
 	return 0;

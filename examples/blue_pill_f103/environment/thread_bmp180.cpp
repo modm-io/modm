@@ -23,6 +23,7 @@
 
 // ----------------------------------------------------------------------------
 Bmp180Thread::Bmp180Thread() :
+	Fiber([this] { this->update(); }),
 	barometerA(dataA, 0x77),
 	barometerB(dataB, 0x77),
 	start_measurement(false),
@@ -38,11 +39,9 @@ Bmp180Thread::startMeasurement()
 	return true;
 }
 
-bool
+void
 Bmp180Thread::update()
 {
-	PT_BEGIN();
-
 	MODM_LOG_DEBUG << MODM_FILE_INFO;
 	MODM_LOG_DEBUG << "Ping the Barometer BMP180" << modm::endl;
 
@@ -50,21 +49,19 @@ Bmp180Thread::update()
 	while(true)
 	{
 		// we wait until the task started
-		if (PT_CALL(barometerA.ping()))
+		if (barometerA.ping())
 			break;
 		// otherwise, try again in 100ms
-		timeout.restart(100ms);
-		PT_WAIT_UNTIL(timeout.isExpired());
+		modm::this_fiber::sleep_for(100ms);
 	}
 
 	while(true)
 	{
 		// we wait until the task started
-		if (PT_CALL(barometerB.ping()))
+		if (barometerB.ping())
 			break;
 		// otherwise, try again in 100ms
-		timeout.restart(100ms);
-		PT_WAIT_UNTIL(timeout.isExpired());
+		modm::this_fiber::sleep_for(100ms);
 	}
 
 	MODM_LOG_DEBUG << MODM_FILE_INFO;
@@ -74,21 +71,19 @@ Bmp180Thread::update()
 	while(true)
 	{
 		// we wait until the task started
-		if (PT_CALL(barometerA.initialize()))
+		if (barometerA.initialize())
 			break;
 		// otherwise, try again in 100ms
-		timeout.restart(100ms);
-		PT_WAIT_UNTIL(timeout.isExpired());
+		modm::this_fiber::sleep_for(100ms);
 	}
 
 	while(true)
 	{
 		// we wait until the task started
-		if (PT_CALL(barometerB.initialize()))
+		if (barometerB.initialize())
 			break;
 		// otherwise, try again in 100ms
-		timeout.restart(100ms);
-		PT_WAIT_UNTIL(timeout.isExpired());
+		modm::this_fiber::sleep_for(100ms);
 	}
 
 	MODM_LOG_DEBUG << MODM_FILE_INFO;
@@ -111,25 +106,23 @@ Bmp180Thread::update()
 
 	while (true)
 	{
-		PT_WAIT_UNTIL(start_measurement);
+		modm::this_fiber::poll([&]{ return start_measurement; });
 
 		// Returns when new data was read from the sensor
-		PT_CALL(barometerA.readout());
-		PT_CALL(barometerB.readout());
+		barometerA.readout();
+		barometerB.readout();
 		new_data = true;
 
-		{
-			auto temp = dataA.getTemperature();
-			auto press = dataA.getPressure();
+		auto temp = dataA.getTemperature();
+		auto press = dataA.getPressure();
 
-			MODM_LOG_DEBUG << MODM_FILE_INFO;
-			MODM_LOG_DEBUG.printf("BMP180: Calibrated temperature in 0.1 degree Celsius is : %d\n", temp  );
-			MODM_LOG_DEBUG << MODM_FILE_INFO;
-			MODM_LOG_DEBUG.printf("BMP180: Calibrated pressure in Pa is                    : %" PRId32 "\n", press );
-		}
+		MODM_LOG_DEBUG << MODM_FILE_INFO;
+		MODM_LOG_DEBUG.printf("BMP180: Calibrated temperature in 0.1 degree Celsius is : %d\n", temp  );
+		MODM_LOG_DEBUG << MODM_FILE_INFO;
+		MODM_LOG_DEBUG.printf("BMP180: Calibrated pressure in Pa is                    : %" PRId32 "\n", press );
 
 		start_measurement = false;
 	}
 
-	PT_END();
+
 }

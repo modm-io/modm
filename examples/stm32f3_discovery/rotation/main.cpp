@@ -37,14 +37,13 @@ using LedRingRight = SoftwareGpioPort<
 Board::l3g::Gyroscope::Data data;
 // and hand it to the sensor driver
 Board::l3g::Gyroscope gyro(data);
+modm::filter::MovingAverage<float, 25> averageZ;
 
-
-modm_faststack modm::Fiber<> fiber_gyro([]()
+modm_faststack modm::Fiber fiber_gyro([]
 {
 	// initialize with limited range of 250 degrees per second
 	gyro.configure(gyro.Scale::Dps250);
 
-	modm::filter::MovingAverage<float, 25> averageZ;
 	while (true)
 	{
 		// read out the sensor
@@ -73,7 +72,7 @@ modm_faststack modm::Fiber<> fiber_gyro([]()
 	}
 });
 
-modm_faststack modm::Fiber<> fiber_blinky([]()
+modm_faststack modm::Fiber fiber_blinky([]
 {
 	while (true)
 	{
@@ -89,6 +88,5 @@ main()
 	Board::initializeL3g();
 
 	modm::fiber::Scheduler::run();
-
 	return 0;
 }

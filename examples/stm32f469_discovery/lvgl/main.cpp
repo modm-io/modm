@@ -31,7 +31,7 @@ Touch touch{touchData, TouchAddress};
 
 void my_touchpad_read(lv_indev_t*, lv_indev_data_t* data)
 {
-	RF_CALL_BLOCKING(touch.readTouches());
+	touch.readTouches();
 	Touch::touch_t tp;
 	touch.getData().getTouch(&tp, 0);
 	// mirror and rotate correctly
@@ -62,7 +62,7 @@ main()
 
 	MODM_LOG_INFO << "modm LVGL example on STM32F469-Discovery board!\n\n";
 
-	RF_CALL_BLOCKING(touch.configure(Touch::InterruptMode::Trigger, 60, 60));
+	touch.configure(Touch::InterruptMode::Trigger, 60, 60);
 
 	// Initialize the display:
 	lv_display_t *disp = lv_display_create(LV_HOR_RES_MAX, LV_VER_RES_MAX);

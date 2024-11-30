@@ -11,7 +11,6 @@
 
 #include <modm/board.hpp>
 #include <modm/driver/encoder/as5047.hpp>
-#include <modm/processing.hpp>
 
 using SpiMaster = SpiMaster1;
 
@@ -20,41 +19,8 @@ using Mosi = modm::platform::GpioB5;
 using Miso = modm::platform::GpioB4;
 using Sck = modm::platform::GpioB3;
 
-using namespace Board;
-using namespace modm::literals;
-
-class EncoderThread : public modm::pt::Protothread
-{
-public:
-	EncoderThread() : encoder(data) {}
-
-	bool
-	run()
-	{
-		PT_BEGIN();
-
-		while (true)
-		{
-			PT_CALL(encoder.read());
-
-			MODM_LOG_INFO << "\nNew readout:" << modm::endl;
-			MODM_LOG_INFO << "  angle degree: " << data.toDegree() << " degrees" << modm::endl;
-			MODM_LOG_INFO << "     angle rad: " << data.toRadian() << " radians" << modm::endl;
-			MODM_LOG_INFO << "     angle raw: " << data.data << modm::endl;
-
-			timeout.restart(500ms);
-			PT_WAIT_UNTIL(timeout.isExpired());
-		}
-
-		PT_END();
-	}
-
-private:
-	modm::as5047::Data data{0};
-	modm::As5047<SpiMaster, Cs> encoder;
-
-	modm::ShortTimeout timeout;
-} encoderThread;
+modm::as5047::Data data{0};
+modm::As5047<SpiMaster, Cs> encoder{data};
 
 int
 main()
@@ -73,7 +39,17 @@ main()
 	MODM_LOG_ERROR << "Error logging here" << modm::endl;
 	MODM_LOG_INFO << "===============================" << modm::endl;
 
-	while (true) { encoderThread.run(); }
+	while (true)
+	{
+		encoder.read();
+
+		MODM_LOG_INFO << "\nNew readout:" << modm::endl;
+		MODM_LOG_INFO << "  angle degree: " << data.toDegree() << " degrees" << modm::endl;
+		MODM_LOG_INFO << "     angle rad: " << data.toRadian() << " radians" << modm::endl;
+		MODM_LOG_INFO << "     angle raw: " << data.data << modm::endl;
+
+		modm::delay(500ms);
+	}
 
 	return 0;
 }

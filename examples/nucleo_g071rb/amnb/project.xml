@@ -2,7 +2,7 @@
   <extends>modm:nucleo-g071rb</extends>
   <options>
     <option name="modm:build:build.path">../../../build/nucleo_g071rb/amnb</option>
-    <option name="modm:communication:amnb:with_heap">False</option>
+    <option name="modm:communication:amnb:with_heap">no</option>
   </options>
   <modules>
     <module>modm:platform:gpio</module>
@@ -11,6 +11,6 @@
     <module>modm:platform:uart:3</module>
     <module>modm:platform:uart:4</module>
     <module>modm:build:scons</module>
-    <module>modm:processing:protothread</module>
+    <module>modm:processing:fiber</module>
   </modules>
 </library>

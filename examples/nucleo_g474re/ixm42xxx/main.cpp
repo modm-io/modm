@@ -21,59 +21,57 @@ using Mosi = GpioA7;
 using Miso = GpioA6;
 using Sck = GpioA5;
 using Cs = GpioC5;
+using Transport = modm::Ixm42xxxTransportSpi< SpiMaster, Cs >;
 
-class ImuThread : public modm::pt::Protothread, public modm::ixm42xxx
+modm::ixm42xxxdata::Data data;
+modm::Ixm42xxx< Transport > imu{data};
+
+modm::Fiber fiber_sensor([]
 {
-    using Transport = modm::Ixm42xxxTransportSpi< SpiMaster, Cs >;
-
-public:
-    ImuThread() : imu(data), timer(std::chrono::milliseconds(500)) {}
-
-    bool
-    run()
+    /// Initialize the IMU and verify that it is connected
+    imu.initialize();
+    while (not imu.ping())
     {
-        PT_BEGIN();
-
-        /// Initialize the IMU and verify that it is connected
-        PT_CALL(imu.initialize());
-        while (not PT_CALL(imu.ping()))
-        {
-            MODM_LOG_ERROR << "Cannot ping IXM42xxx" << modm::endl;
-            PT_WAIT_UNTIL(timer.execute());
-        }
-
-        /// Configure data sensors
-        PT_CALL(imu.updateRegister(Register::GYRO_CONFIG0, GyroFs_t(GyroFs::dps2000) | GyroOdr_t(GyroOdr::kHz1)));
-        PT_CALL(imu.updateRegister(Register::ACCEL_CONFIG0, AccelFs_t(AccelFs::g16) | AccelOdr_t(AccelOdr::kHz1)));
-        PT_CALL(imu.updateRegister(Register::PWR_MGMT0, GyroMode_t(GyroMode::LowNoise) | AccelMode_t(AccelMode::LowNoise)));
-
-        while (true)
-        {
-            PT_WAIT_UNTIL(timer.execute());
-            PT_CALL(imu.readSensorData());
-
-            data.getTemp(&temp);
-            data.getAccel(&accel);
-            data.getGyro(&gyro);
-
-            MODM_LOG_INFO.printf("Temp: %.3f\n", temp);
-            MODM_LOG_INFO.printf("Accel: (%.3f, %.3f, %.3f)\n", accel.x, accel.y, accel.z);
-            MODM_LOG_INFO.printf("Gyro: (%.3f, %.3f, %.3f)\n", gyro.x, gyro.y, gyro.z);
-        }
-        PT_END();
+        MODM_LOG_ERROR << "Cannot ping IXM42xxx" << modm::endl;
+        modm::this_fiber::sleep_for(100ms);
     }
+    using ixm = modm::ixm42xxx;
 
-private:
-    float temp;
-    modm::Vector3f accel;
-    modm::Vector3f gyro;
+    /// Configure data sensors
+    imu.updateRegister(ixm::Register::GYRO_CONFIG0,
+                       ixm::GyroFs_t(ixm::GyroFs::dps2000) | ixm::GyroOdr_t(ixm::GyroOdr::kHz1));
+    imu.updateRegister(ixm::Register::ACCEL_CONFIG0,
+                       ixm::AccelFs_t(ixm::AccelFs::g16) | ixm::AccelOdr_t(ixm::AccelOdr::kHz1));
+    imu.updateRegister(ixm::Register::PWR_MGMT0,
+                       ixm::GyroMode_t(ixm::GyroMode::LowNoise) | ixm::AccelMode_t(ixm::AccelMode::LowNoise));
 
-    modm::ixm42xxxdata::Data data;
-    modm::Ixm42xxx< Transport > imu;
+    while (true)
+    {
+        modm::this_fiber::sleep_for(500ms);
+        imu.readSensorData();
 
-    modm::PeriodicTimer timer;
+        float temp;
+        modm::Vector3f accel;
+        modm::Vector3f gyro;
+        data.getTemp(&temp);
+        data.getAccel(&accel);
+        data.getGyro(&gyro);
 
-} imuThread;
+        MODM_LOG_INFO.printf("Temp: %.3f\n", temp);
+        MODM_LOG_INFO.printf("Accel: (%.3f, %.3f, %.3f)\n", accel.x, accel.y, accel.z);
+        MODM_LOG_INFO.printf("Gyro: (%.3f, %.3f, %.3f)\n", gyro.x, gyro.y, gyro.z);
+    }
+});
+
+modm::Fiber fiber_blink([]
+{
+    Board::LedD13::setOutput();
+    while(true)
+    {
+        Board::LedD13::toggle();
+        modm::this_fiber::sleep_for(0.5s);
+    }
+});
 
 int
 main()
@@ -85,16 +83,8 @@ main()
     SpiMaster::initialize<Board::SystemClock, 21.5_MHz>();
 
     MODM_LOG_INFO       << "==========IXM-42xxx Test==========" << modm::endl;
-    MODM_LOG_DEBUG      << "Debug logging here" << modm::endl;
-    MODM_LOG_INFO       << "Info logging here" << modm::endl;
-    MODM_LOG_WARNING    << "Warning logging here" << modm::endl;
-    MODM_LOG_ERROR      << "Error logging here" << modm::endl;
-    MODM_LOG_INFO       << "==================================" << modm::endl;
 
-    while (true)
-    {
-        imuThread.run();
-    }
+    modm::fiber::Scheduler::run();
 
     return 0;
 }

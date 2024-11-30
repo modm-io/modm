@@ -5,10 +5,7 @@
   </options>
   <modules>
     <module>modm:driver:ms5611</module>
-    <module>modm:platform:gpio</module>
     <module>modm:platform:spi:1</module>
-    <module>modm:processing:protothread</module>
-    <module>modm:processing:timer</module>
     <module>modm:build:scons</module>
   </modules>
 </library>

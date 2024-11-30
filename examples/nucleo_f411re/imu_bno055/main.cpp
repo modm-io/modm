@@ -39,81 +39,49 @@ using MyI2cMaster = I2cMaster1;
 modm::bno055::Data data;
 modm::Bno055<MyI2cMaster> imu(data);
 
-class ThreadOne : public modm::pt::Protothread
+modm::Fiber fiber_bno055([]
 {
-public:
-	bool
-	update()
+	using namespace modm::this_fiber;
+	MODM_LOG_DEBUG << "Ping the device from ThreadOne" << modm::endl;
+
+	// ping the device until it responds
+	while(not imu.ping()) sleep_for(100ms);
+	MODM_LOG_DEBUG << "Device responded" << modm::endl;
+
+	while(not imu.configure()) sleep_for(100ms);
+	MODM_LOG_DEBUG << "Device configured" << modm::endl;
+
+	while (true)
 	{
-		PT_BEGIN();
-
-		MODM_LOG_DEBUG << "Ping the device from ThreadOne" << modm::endl;
-
-		// ping the device until it responds
-		while (true)
-		{
-			// we wait until the device started
-			if (PT_CALL(imu.ping())) {
-				break;
-			}
-			PT_WAIT_UNTIL(timer.execute());
-		}
-
-		MODM_LOG_DEBUG << "Device responded" << modm::endl;
-
-		while (true)
-		{
-			if (PT_CALL(imu.configure())) {
-				break;
-			}
-
-			PT_WAIT_UNTIL(timer.execute());
-		}
-
-		MODM_LOG_DEBUG << "Device configured" << modm::endl;
-
-		while (true)
-		{
-			PT_WAIT_UNTIL(timer.execute());
-			PT_CALL(imu.readData());
-			MODM_LOG_INFO << (int)imu.getData().heading() << modm::endl;
-		}
-
-		PT_END();
+		sleep_for(100ms);
+		imu.readData();
+		MODM_LOG_INFO << (int)imu.getData().heading() << modm::endl;
 	}
+});
 
-private:
-	modm::ShortPeriodicTimer timer{100ms};
-};
-
-ThreadOne one;
+modm::Fiber fiber_blink([]
+{
+	LedD13::setOutput();
+	while(true)
+	{
+		LedD13::toggle();
+		modm::this_fiber::sleep_for(0.5s);
+	}
+});
 
 // ----------------------------------------------------------------------------
 int
 main()
 {
 	Board::initialize();
-	LedD13::setOutput();
 
-	// Board::D13::setOutput(modm::Gpio::Low);
 	MyI2cMaster::connect<Board::D15::Scl, Board::D14::Sda>();
 	MyI2cMaster::initialize<Board::SystemClock, 400_kHz>();
 
 	MODM_LOG_INFO << "\n\nWelcome to BNO055 demo!\n\n" << modm::endl;
 
-	modm::ShortPeriodicTimer tmr(500ms);
-
-	// Board::D15::setOutput();
-
-	while (true)
-	{
-		one.update();
-		if(tmr.execute()) {
-			LedD13::toggle();
-			// Board::D15::toggle();
-		}
-
-	}
-
+	modm::fiber::Scheduler::run();
 	return 0;
 }
+
+

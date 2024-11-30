@@ -54,12 +54,12 @@ main()
 
 	modm::BdFile<Filename, MemorySize> storageDevice;
 
-	if(!RF_CALL_BLOCKING(storageDevice.initialize())) {
+	if(!storageDevice.initialize()) {
 		MODM_LOG_INFO << "Error: Unable to initialize device.";
 		exit(1);
 	}
 
-	if(!RF_CALL_BLOCKING(storageDevice.erase(0, MemorySize))) {
+	if(!storageDevice.erase(0, MemorySize)) {
 		MODM_LOG_INFO << "Error: Unable to erase device.";
 		exit(1);
 	}
@@ -70,14 +70,14 @@ main()
 		uint8_t* pattern = (iteration % 2 == 0) ? bufferA : bufferB;
 
 		for(uint32_t i = 0; i < MemorySize; i += BlockSize) {
-			if(!RF_CALL_BLOCKING(storageDevice.write(pattern, i, BlockSize))) {
+			if(!storageDevice.write(pattern, i, BlockSize)) {
 				MODM_LOG_INFO << "Error: Unable to write data.";
 				exit(1);
 			}
 		}
 
 		for(uint32_t i = 0; i < MemorySize; i += BlockSize) {
-			if(!RF_CALL_BLOCKING(storageDevice.read(bufferC, i, BlockSize))) {
+			if(!storageDevice.read(bufferC, i, BlockSize)) {
 				MODM_LOG_INFO << "Error: Unable to read data.";
 				exit(1);
 			}

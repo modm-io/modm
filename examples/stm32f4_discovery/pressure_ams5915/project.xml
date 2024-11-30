@@ -5,14 +5,10 @@
   </options>
   <modules>
     <module>modm:driver:ams5915</module>
-    <module>modm:io</module>
     <module>modm:debug</module>
-    <module>modm:platform:gpio</module>
-    <module>modm:platform:i2c.bitbang</module>
     <module>modm:platform:i2c:2</module>
     <module>modm:platform:uart:2</module>
-    <module>modm:processing:protothread</module>
-    <module>modm:processing:timer</module>
+    <module>modm:processing:fiber</module>
     <module>modm:build:scons</module>
   </modules>
 </library>

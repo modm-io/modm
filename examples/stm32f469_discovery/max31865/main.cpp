@@ -22,45 +22,39 @@ using Mosi = D11;
 using Miso = D12;
 using Sck = D13;
 
-class ThermocoupleThread : public modm::pt::Protothread
+using Max31865 = modm::Max31865<SpiMaster, Cs, modm::max31865::pt100>;
+Max31865::Data data;
+Max31865 pt100{data};
+
+modm::Fiber fiber_sensor([]
 {
-public:
-	ThermocoupleThread() : data{}, pt100(data) {}
+	pt100.initialize();
 
-	bool
-	run()
+	while (true)
 	{
-		PT_BEGIN();
-		PT_CALL(pt100.initialize());
+		MODM_LOG_INFO << "\nNew readout:" << modm::endl;
+		pt100.readout();
 
-		while (true)
-		{
-			MODM_LOG_INFO << "\nNew readout:" << modm::endl;
-			PT_CALL(pt100.readout());
+		MODM_LOG_INFO << "          resistance : " << data.getResistance() << " Ohm"
+					  << modm::endl;
+		MODM_LOG_INFO << "     temperature fast: " << data.getTemperatureFast() << " degrees"
+					  << modm::endl;
+		MODM_LOG_INFO << "  temperature precise: " << data.getTemperaturePrecise() << " degrees"
+					  << modm::endl;
 
-			MODM_LOG_INFO << "          resistance : " << data.getResistance() << " Ohm"
-						  << modm::endl;
-			MODM_LOG_INFO << "     temperature fast: " << data.getTemperatureFast() << " degrees"
-						  << modm::endl;
-			MODM_LOG_INFO << "  temperature precise: " << data.getTemperaturePrecise() << " degrees"
-						  << modm::endl;
-
-			timeout.restart(std::chrono::milliseconds(1000));
-			PT_WAIT_UNTIL(timeout.isExpired());
-		}
-
-		PT_END();
+		modm::this_fiber::sleep_for(1s);
 	}
+});
 
-private:
-	using Max31865 = modm::Max31865<SpiMaster, Cs, modm::max31865::pt100>;
-	Max31865::Data data;
-	Max31865 pt100;
-
-	modm::ShortTimeout timeout;
-};
-
-ThermocoupleThread pt100Thread{};
+modm::Fiber fiber_blink([]
+{
+	Board::LedOrange::setOutput();
+	while(true)
+	{
+		Board::LedOrange::toggle();
+		modm::this_fiber::sleep_for(0.5s);
+	}
+});
 
 int
 main()
@@ -72,17 +66,7 @@ main()
 	SpiMaster::initialize<Board::SystemClock, 351_kHz>();
 
 	MODM_LOG_INFO << "==========MAX 31865 Test==========" << modm::endl;
-	MODM_LOG_DEBUG << "Debug logging here" << modm::endl;
-	MODM_LOG_INFO << "Info logging here" << modm::endl;
-	MODM_LOG_WARNING << "Warning logging here" << modm::endl;
-	MODM_LOG_ERROR << "Error logging here" << modm::endl;
-	MODM_LOG_INFO << "===============================" << modm::endl;
 
-	while (true)
-	{
-		pt100Thread.run();
-		Board::LedOrange::toggle();
-	}
-
+	modm::fiber::Scheduler::run();
 	return 0;
 }

@@ -15,8 +15,6 @@
 
 #include <modm/board.hpp>
 #include <modm/debug/logger.hpp>
-#include <modm/processing/protothread.hpp>
-#include <modm/processing/timer.hpp>
 
 // ----------------------------------------------------------------------------
 // Set the log level
@@ -31,41 +29,6 @@ modm::log::Logger modm::log::debug(loggerDevice);
 modm::log::Logger modm::log::info(loggerDevice);
 modm::log::Logger modm::log::warning(loggerDevice);
 modm::log::Logger modm::log::error(loggerDevice);
-
-class BlinkThread : public modm::pt::Protothread
-{
-public:
-	BlinkThread() { timeout.restart(100ms); }
-
-	bool
-	update()
-	{
-		PT_BEGIN();
-
-		while (true)
-		{
-			Board::LedGreen::reset();
-
-			PT_WAIT_UNTIL(timeout.isExpired());
-			timeout.restart(100ms);
-
-			Board::LedGreen::set();
-
-			PT_WAIT_UNTIL(timeout.isExpired());
-			timeout.restart(900ms);
-
-			MODM_LOG_INFO << "Seconds since reboot: " << ++uptime << modm::endl;
-		}
-
-		PT_END();
-	}
-
-private:
-	modm::ShortTimeout timeout;
-	uint32_t uptime;
-};
-
-BlinkThread blinkThread;
 
 // ----------------------------------------------------------------------------
 int
@@ -84,7 +47,17 @@ main()
 	MODM_LOG_WARNING << "warning" << modm::endl;
 	MODM_LOG_ERROR << "error" << modm::endl;
 
-	while (true) { blinkThread.update(); }
+	uint32_t uptime{};
+	while (true)
+	{
+		Board::LedGreen::reset();
+		modm::delay(100ms);
+
+		Board::LedGreen::set();
+		modm::delay(900ms);
+
+		MODM_LOG_INFO << "Seconds since reboot: " << ++uptime << modm::endl;
+	}
 
 	return 0;
 }

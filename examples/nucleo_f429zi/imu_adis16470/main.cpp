@@ -51,23 +51,23 @@ main()
 	modm::delay(252ms);
 
 	MODM_LOG_INFO << "Initializing IMU..." << modm::endl;
-	RF_CALL_BLOCKING(imu.initialize());
+	imu.initialize();
 
 	// Software reset
-	RF_CALL_BLOCKING(imu.writeGlobCmd(modm::adis16470::GlobCmd::SoftwareReset));
+	imu.writeGlobCmd(modm::adis16470::GlobCmd::SoftwareReset);
 	// Wait start-up time after reset
 	modm::delay(252ms);
 
 	// Trigger self test
-	RF_CALL_BLOCKING(imu.writeGlobCmd(modm::adis16470::GlobCmd::SensorSelfTest));
+	imu.writeGlobCmd(modm::adis16470::GlobCmd::SensorSelfTest);
 	// Wait for self test to complete
 	modm::delay(14ms);
 
-	modm::adis16470::DiagStat_t diagStat = RF_CALL_BLOCKING(imu.readDiagStat());
+	modm::adis16470::DiagStat_t diagStat = imu.readDiagStat();
 	MODM_LOG_INFO << "Reading DIAG_STAT register = " << diagStat << modm::endl;
 
 	modm::delay(1ms);
-	auto result = RF_CALL_BLOCKING(imu.readRegister(modm::adis16470::Register::PROD_ID));
+	auto result = imu.readRegister(modm::adis16470::Register::PROD_ID);
 	if (result.has_value()) {
 		MODM_LOG_INFO << "ADIS16470 product id = " << *result << " (should be 16470==0x4056)" << modm::endl;
 	}
@@ -75,25 +75,25 @@ main()
 		MODM_LOG_INFO << "Unable to reag PROD_ID register" << modm::endl;
 	}
 
-	modm::adis16470::MscCtrl_t mscCtrl = RF_CALL_BLOCKING(imu.readMscCtrl());
+	modm::adis16470::MscCtrl_t mscCtrl = imu.readMscCtrl();
 	MODM_LOG_INFO << "Reading MSC_CTRL register = " << mscCtrl << modm::endl;
 
-	RF_CALL_BLOCKING(imu.setDataOutputFrequency<10_Hz>());
+	imu.setDataOutputFrequency<10_Hz>();
 
-	RF_CALL_BLOCKING(imu.writeRegister(modm::adis16470::Register::FILT_CTRL, 8)); // N_B = 2^8 = 64
+	imu.writeRegister(modm::adis16470::Register::FILT_CTRL, 8); // N_B = 2^8 = 64
 
 	mscCtrl = modm::adis16470::MscCtrl::DrPolarity | modm::adis16470::MscCtrl::PointOfPercussionAlign;
 	MODM_LOG_INFO << "Writing MSC_CTRL register = " << mscCtrl << modm::endl;
-	RF_CALL_BLOCKING(imu.writeMscCtrl(mscCtrl));
+	imu.writeMscCtrl(mscCtrl);
 
-	diagStat = RF_CALL_BLOCKING(imu.readDiagStat());
+	diagStat = imu.readDiagStat();
 	MODM_LOG_INFO << "Reading DIAG_STAT register = " << diagStat << modm::endl;
 
-	mscCtrl = RF_CALL_BLOCKING(imu.readMscCtrl());
+	mscCtrl = imu.readMscCtrl();
 	MODM_LOG_INFO << "Reading MSC_CTRL register = " << mscCtrl << modm::endl;
 
 	// Writing and reading USER_SCR1 register
-	std::optional<uint16_t> scr1 = RF_CALL_BLOCKING(imu.readRegister(modm::adis16470::Register::USER_SCR1));
+	std::optional<uint16_t> scr1 = imu.readRegister(modm::adis16470::Register::USER_SCR1);
 	if (scr1.has_value()) {
 		MODM_LOG_INFO << "Reading USER_SCR1 register = " << *scr1 << modm::endl;
 	}
@@ -101,8 +101,8 @@ main()
 		MODM_LOG_INFO << "Unable to USER_SCR1 register." << modm::endl;
 	}
 	MODM_LOG_INFO << "Writing USER_SCR1 register = 42" << modm::endl;
-	RF_CALL_BLOCKING(imu.writeRegister(modm::adis16470::Register::USER_SCR1, 42));
-	scr1 = RF_CALL_BLOCKING(imu.readRegister(modm::adis16470::Register::USER_SCR1));
+	imu.writeRegister(modm::adis16470::Register::USER_SCR1, 42);
+	scr1 = imu.readRegister(modm::adis16470::Register::USER_SCR1);
 	if (scr1.has_value()) {
 		MODM_LOG_INFO << "Reading USER_SCR1 register = " << *scr1 << modm::endl;
 	}
@@ -119,7 +119,7 @@ main()
 		while (!Dr::read()) {}
 		while (Dr::read()) {}
 
-		if( !RF_CALL_BLOCKING(imu.readRegisterBurst(data))) {
+		if( !imu.readRegisterBurst(data)) {
 			MODM_LOG_INFO.printf("checksum mismatch! ");
 			Board::LedRed::toggle();
 		}

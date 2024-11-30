@@ -4,11 +4,7 @@
     <option name="modm:build:build.path">../../../build/stm32f401_discovery/gyroscope</option>
   </options>
   <modules>
-    <module>modm:driver:l3gd20</module>
     <module>modm:math:filter</module>
-    <module>modm:platform:spi:1</module>
-    <module>modm:processing:timer</module>
-    <module>modm:processing:protothread</module>
     <module>modm:build:scons</module>
   </modules>
 </library>

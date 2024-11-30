@@ -14,7 +14,7 @@
 #include <modm/board.hpp>
 
 #include <modm/architecture/interface/clock.hpp>
-#include <modm/processing/protothread.hpp>
+#include <modm/processing.hpp>
 #include <modm/driver/position/vl53l0.hpp>
 #include <modm/debug/logger.hpp>
 
@@ -45,112 +45,85 @@ modm::Vl53l0<MyI2cMaster> distance(data);
 constexpr uint32_t MeasurementTimeFast      = 30000;
 constexpr uint32_t MeasurementTimePrecision = 200000;
 
-class ThreadOne : public modm::pt::Protothread
+modm::Fiber fiber_name([]
 {
-public:
-	bool
-	update()
+	using namespace modm::this_fiber;
+	MODM_LOG_DEBUG << "Ping the device from ThreadOne" << modm::endl;
+
+	// ping the device until it responds
+
+	while(not distance.ping()) sleep_for(100ms);
+	MODM_LOG_DEBUG << "Device responded" << modm::endl;
+
+	while(not distance.initialize()) sleep_for(100ms);
+	MODM_LOG_DEBUG << "Device initialized" << modm::endl;
+
+	// set measurement time to 200ms (high accuracy mode)
+	bool highAccuracyMode = distance.setMaxMeasurementTime(MeasurementTimePrecision);
+	if(not highAccuracyMode) {
+		MODM_LOG_DEBUG << "Setting measurement time failed" << modm::endl;
+	}
+
+	modm::ShortPeriodicTimer timer(1s);
+
+	while (true)
 	{
-		PT_BEGIN();
+		modm::Timestamp stamp = modm::Clock::now();
 
-		MODM_LOG_DEBUG << "Ping the device from ThreadOne" << modm::endl;
-
-		// ping the device until it responds
-		while (true)
+		if (distance.readDistance())
 		{
-			// we wait until the device started
-			if (PT_CALL(distance.ping())) {
-				break;
-			}
-
-			// otherwise, try again in 100ms
-			timeout.restart(100ms);
-			PT_WAIT_UNTIL(timeout.isExpired());
-		}
-
-		MODM_LOG_DEBUG << "Device responded" << modm::endl;
-
-		while (true)
-		{
-			if (PT_CALL(distance.initialize())) {
-				break;
-			}
-
-			// otherwise, try again in 200ms
-			timeout.restart(200ms);
-			PT_WAIT_UNTIL(timeout.isExpired());
-		}
-
-		MODM_LOG_DEBUG << "Device initialized" << modm::endl;
-
-		// set measurement time to 200ms (high accuracy mode)
-		if(not PT_CALL(distance.setMaxMeasurementTime(MeasurementTimePrecision))) {
-			MODM_LOG_DEBUG << "Setting measurement time failed" << modm::endl;
-		} else {
-			this->highAccuracyMode = true;
-		}
-
-		timeout.restart(1s);
-
-		while (true)
-		{
-			stamp = modm::Clock::now();
-
-			if (PT_CALL(distance.readDistance()))
+			modm::vl53l0::RangeErrorCode error = distance.getRangeError();
+			if (distance.getData().isValid())
 			{
-				modm::vl53l0::RangeErrorCode error = distance.getRangeError();
-				if (distance.getData().isValid())
+				uint16_t mm = distance.getData().getDistance();
+				MODM_LOG_DEBUG << "mm: " << mm;
+			}
+			else
+			{
+				MODM_LOG_DEBUG << "Error: " << static_cast<uint8_t>(error);
+			}
+		}
+		MODM_LOG_DEBUG << ", t = " << (modm::Clock::now() - stamp) << "ms" << modm::endl;
+
+		// query button state every 1s
+		if(timer.execute())
+		{
+			// toggle between fast and high accuracy mode when button is pressed
+			if(Button::read())
+			{
+				if(highAccuracyMode)
 				{
-					uint16_t mm = distance.getData().getDistance();
-					MODM_LOG_DEBUG << "mm: " << mm;
+					if(distance.setMaxMeasurementTime(MeasurementTimeFast)) {
+						MODM_LOG_DEBUG << "Enable fast mode" << modm::endl;
+						highAccuracyMode = false;
+					} else {
+						MODM_LOG_DEBUG << "Setting measurement time failed" << modm::endl;
+					}
 				}
 				else
 				{
-					MODM_LOG_DEBUG << "Error: " << static_cast<uint8_t>(error);
-				}
-			}
-			MODM_LOG_DEBUG << ", t = " << (modm::Clock::now() - stamp) << "ms" << modm::endl;
-
-			// query button state every 1s
-			if(timeout.isExpired())
-			{
-				// toggle between fast and high accuracy mode when button is pressed
-				if(Button::read())
-				{
-					if(this->highAccuracyMode)
-					{
-						if(PT_CALL(distance.setMaxMeasurementTime(MeasurementTimeFast))) {
-							MODM_LOG_DEBUG << "Enable fast mode" << modm::endl;
-							this->highAccuracyMode = false;
-						} else {
-							MODM_LOG_DEBUG << "Setting measurement time failed" << modm::endl;
-						}
-					}
-					else
-					{
-						if(PT_CALL(distance.setMaxMeasurementTime(MeasurementTimePrecision))) {
-							MODM_LOG_DEBUG << "Enable high accuracy mode" << modm::endl;
-							this->highAccuracyMode = true;
-						} else {
-							MODM_LOG_DEBUG << "Setting measurement time failed" << modm::endl;
-						}
+					if(distance.setMaxMeasurementTime(MeasurementTimePrecision)) {
+						MODM_LOG_DEBUG << "Enable high accuracy mode" << modm::endl;
+						highAccuracyMode = true;
+					} else {
+						MODM_LOG_DEBUG << "Setting measurement time failed" << modm::endl;
 					}
 				}
-
-				timeout.restart(1s);
 			}
 		}
 
-		PT_END();
+		sleep_for(100ms);
 	}
+});
 
-private:
-	modm::ShortTimeout timeout;
-	modm::Timestamp stamp;
-	bool highAccuracyMode = true;
-};
-
-ThreadOne one;
+modm::Fiber fiber_blink([]
+{
+	while(true)
+	{
+		LedD13::toggle();
+		modm::this_fiber::sleep_for(0.5s);
+	}
+});
 
 // ----------------------------------------------------------------------------
 int
@@ -164,16 +137,7 @@ main()
 
 	MODM_LOG_INFO << "\n\nWelcome to VL53L0X demo!\n\n";
 
-	modm::ShortPeriodicTimer tmr(500ms);
-
-	while (true)
-	{
-		one.update();
-		if(tmr.execute()) {
-			LedD13::toggle();
-		}
-
-	}
+	modm::fiber::Scheduler::run();
 
 	return 0;
 }

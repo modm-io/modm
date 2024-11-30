@@ -44,16 +44,16 @@ main()
 
 	Board::LedUp::set();
 
-	RF_CALL_BLOCKING(usb.configurePdo(1, 5000, 500)); // must be set to 5V according to USB standard
-	RF_CALL_BLOCKING(usb.configurePdo(2, 20000, 1500)); // 20V, 1.5A -> 30W
-	RF_CALL_BLOCKING(usb.configurePdo(3, 20000, 4000)); // 20V, 4A -> 80W
+	usb.configurePdo(1, 5000, 500); // must be set to 5V according to USB standard
+	usb.configurePdo(2, 20000, 1500); // 20V, 1.5A -> 30W
+	usb.configurePdo(3, 20000, 4000); // 20V, 4A -> 80W
 
-	RF_CALL_BLOCKING(usb.setValidPdo(3)); // we prefer PDO 3 (more current)
+	usb.setValidPdo(3); // we prefer PDO 3 (more current)
 
 	modm::delay(200ms);
 
 	// check results
-	modm::stusb4500::RdoRegStatusData status = RF_CALL_BLOCKING(usb.getRdoRegStatus());
+	modm::stusb4500::RdoRegStatusData status = usb.getRdoRegStatus();
 
 	MODM_LOG_INFO << "Maximum current: " << status.MaxCurrent << " mA" << modm::endl;
 

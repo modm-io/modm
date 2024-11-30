@@ -14,8 +14,7 @@
 
 #include <modm/processing.hpp>
 #include <modm/driver/pressure/ams5915.hpp>
-#include <modm/io/iostream.hpp>
-#include <modm/debug/logger.hpp>
+#include <modm/debug.hpp>
 
 using Usart2 = BufferedUart<UsartHal2, UartTxBuffer<2048>>;
 modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > device;
@@ -42,57 +41,35 @@ modm::log::Logger modm::log::error(device);
  */
 
 typedef I2cMaster2 MyI2cMaster;
-// typedef modm::SoftwareI2cMaster<GpioB10, GpioB11> MyI2cMaster;
 
 modm::ams5915::Data data;
 modm::Ams5915<MyI2cMaster> pressureSensor(data);
 
-class ThreadOne : public modm::pt::Protothread
+modm::Fiber fiber_sensor([]
 {
-public:
-	bool
-	update()
+	MODM_LOG_DEBUG << "Ping the device from ThreadOne" << modm::endl;
+	while (not pressureSensor.ping()) modm::this_fiber::sleep_for(100ms);
+	MODM_LOG_DEBUG << "Device responded" << modm::endl;
+
+	while (true)
 	{
-		PT_BEGIN();
-
-		MODM_LOG_DEBUG << "Ping the device from ThreadOne" << modm::endl;
-
-		// ping the device until it responds
-		while (true)
-		{
-			// we wait until the task started
-			if (PT_CALL(pressureSensor.ping())) {
-			 	break;
-			}
-			// otherwise, try again in 10ms
-			timeout.restart(10ms);
-			PT_WAIT_UNTIL(timeout.isExpired());
-		}
-
-		MODM_LOG_DEBUG << "Device responded" << modm::endl;
-
-		while (true)
-		{
-			while (! PT_CALL(pressureSensor.readPressure()))
-			{
-				PT_YIELD();
-			}
-
-			MODM_LOG_INFO << "Pressure [0..1]: " << data.getPressure() << modm::endl;
-			MODM_LOG_INFO << "Temperature [degree centigrade]: " << data.getTemperature() << modm::endl;
-
-			// read next pressure measurement in 1ms
-			timeout.restart(1ms);
-			PT_WAIT_UNTIL(timeout.isExpired());
-		}
-
-		PT_END();
+		pressureSensor.readPressure();
+		MODM_LOG_INFO << "Pressure [0..1]: " << data.getPressure() << modm::endl;
+		MODM_LOG_INFO << "Temperature [degree centigrade]: " << data.getTemperature() << modm::endl;
+		modm::this_fiber::sleep_for(1ms);
 	}
-private:
-	modm::ShortTimeout timeout;
-};
+});
 
-ThreadOne one;
+modm::Fiber fiber_blink([]
+{
+	Board::LedOrange::setOutput();
+	while(true)
+	{
+		Board::LedOrange::toggle();
+		modm::this_fiber::sleep_for(0.5s);
+	}
+});
+
 
 // ----------------------------------------------------------------------------
 int
@@ -108,15 +85,6 @@ main()
 
 	MODM_LOG_INFO << "\n\nWelcome to AMSYS 5915 pressure sensor demo!\n\n";
 
-	modm::ShortPeriodicTimer tmr(500ms);
-
-	while (true)
-	{
-		one.update();
-		if (tmr.execute()) {
-			Board::LedOrange::toggle();
-		}
-	}
-
+	modm::fiber::Scheduler::run();
 	return 0;
 }

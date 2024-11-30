@@ -67,9 +67,9 @@ static modm_aligned(4) lv_color_t buf[buf_size];
 
 void my_touchpad_read(lv_indev_t*, lv_indev_data_t* data)
 {
-	data->state = RF_CALL_BLOCKING(touchController.isTouched()) ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
+	data->state = touchController.isTouched() ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
 	if(data->state == LV_INDEV_STATE_PRESSED) {
-		auto xy = RF_CALL_BLOCKING(touchController.getTouchPosition());
+		auto xy = touchController.getTouchPosition();
 		data->point.x = std::get<0>(xy);
 		data->point.y = std::get<1>(xy);
 	}

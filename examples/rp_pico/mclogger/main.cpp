@@ -11,8 +11,7 @@
 
 #include <modm/board.hpp>
 #include <modm/debug/logger.hpp>
-#include <modm/processing/protothread.hpp>
-#include <modm/processing/timer.hpp>
+#include <modm/processing.hpp>
 #include <mutex>
 
 // ----------------------------------------------------------------------------
@@ -45,21 +44,20 @@ static multicore::Mutex log_mutex;
 #endif
 
 template<size_t Core, size_t Instance>
-class Thread : public modm::pt::Protothread
+class Thread : public modm::Fiber<>
 {
 	static constexpr auto delay = 10ms + 1ms * Instance;
 
 public:
-	Thread() { timeout.restart(delay); }
+	Thread() : Fiber([this]{ run(); }, Core == 0 ? modm::fiber::Start::Now : modm::fiber::Start::Later) {}
 
-	bool
-	update()
+	void
+	run()
 	{
-		PT_BEGIN();
+		uint32_t uptime{};
 		while (true)
 		{
-			PT_WAIT_UNTIL(timeout.isExpired());
-			timeout.restart(delay);
+			modm::this_fiber::sleep_for(delay);
 			{
 				// try without this line for intermixed output
 				LOG_GUARD();
@@ -67,42 +65,27 @@ public:
 							  << " thread: " << Instance << " uptime: " << ++uptime << modm::endl;
 			}
 		}
-
-		PT_END();
-	}
-
-private:
-	modm::ShortTimeout timeout;
-	uint32_t uptime;
-};
-
-template<size_t Core>
-class Threads
-{
-private:
-	Thread<Core, 0> t0;
-	Thread<Core, 1> t1;
-	Thread<Core, 2> t2;
-	Thread<Core, 3> t3;
-
-public:
-	void
-	update()
-	{
-		t0.update();
-		t1.update();
-		t2.update();
-		t3.update();
 	}
 };
 
-Threads<0> core0;
-Threads<1> core1;
+Thread<0, 0> t00;
+Thread<0, 1> t01;
+Thread<0, 2> t02;
+Thread<0, 3> t03;
+
+Thread<1, 0> t10;
+Thread<1, 1> t11;
+Thread<1, 2> t12;
+Thread<1, 3> t13;
 
 void
 core1_main()
 {
-	while (true) { core1.update(); }
+	t10.start();
+	t11.start();
+	t12.start();
+	t13.start();
+	modm::fiber::Scheduler::run();
 }
 
 // ----------------------------------------------------------------------------
@@ -125,8 +108,6 @@ main()
 	INIT_GUARD();
 
 	multicore::Core1::run(core1_main);
-
-	while (true) { core0.update(); }
-
+	modm::fiber::Scheduler::run();
 	return 0;
 }

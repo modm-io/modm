@@ -35,12 +35,12 @@ int main()
 	// with A0 = A1 = A2 = 1 connected to 3.3V
 	modm::At24Mac402<I2c> eeprom{0x57};
 
-	MODM_LOG_INFO << "EEPROM detected: " << RF_CALL_BLOCKING(eeprom.ping()) << "\n\n";
+	MODM_LOG_INFO << "EEPROM detected: " << eeprom.ping() << "\n\n";
 
 	std::array<uint8_t, 6> buffer{};
 
 	// Read pre-programmed MAC address
-	bool readSuccess = RF_CALL_BLOCKING(eeprom.readMac(buffer));
+	bool readSuccess = eeprom.readMac(buffer);
 	if (readSuccess)
 	{
 		MODM_LOG_INFO.printf("MAC: %02x:%02x:%02x:%02x:%02x:%02x\n\n",
@@ -55,7 +55,7 @@ int main()
 
 	// Write 4 data bytes to address 0x80
 	/*constexpr std::array<uint8_t, 4> data = {0xAA, 0xBB, 0xCC, 0xDD};
-	const bool writeSuccess = RF_CALL_BLOCKING(eeprom.write(0x80, data.data(), 4));
+	const bool writeSuccess = eeprom.write(0x80, data.data(), 4);
 	MODM_LOG_INFO << "write successful: " << writeSuccess << "\n\n";*/
 
 	// Read 4 data bytes from address 0x80
@@ -63,7 +63,7 @@ int main()
 	readSuccess = false;
 	while (!readSuccess)
 	{
-		readSuccess = RF_CALL_BLOCKING(eeprom.read(0x80, buffer.data(), buffer.size()));
+		readSuccess = eeprom.read(0x80, buffer.data(), buffer.size());
 	}
 	MODM_LOG_INFO.printf("data: 0x%02x 0x%02x 0x%02x 0x%02x\n\n",
 						 buffer[0], buffer[1], buffer[2], buffer[3]);

@@ -39,7 +39,7 @@ main()
 		{
 			tlc594x.setAllChannels(0x000);
 			tlc594x.setChannel(i, 0xfff);
-			RF_CALL_BLOCKING(tlc594x.writeChannels());
+			tlc594x.writeChannels();
 
 			modm::delay(500ms);
 		}

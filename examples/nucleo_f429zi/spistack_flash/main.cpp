@@ -60,13 +60,13 @@ void doMemoryTest()
 
 			auto dv = std::ldiv(address, DieSize);
 			uint8_t* pattern = (iteration % 2 == dv.quot) ? bufferA : bufferB;
-			if(!RF_CALL_BLOCKING(storageDeviceStack.erase(address, TestMemorySize))) {
+			if(!storageDeviceStack.erase(address, TestMemorySize)) {
 				MODM_LOG_INFO << "Error: Unable to erase device.";
 				return;
 			}
 
 			for(uint32_t i = 0; i < TestMemorySize; i += BlockSize) {
-				if(!RF_CALL_BLOCKING(storageDeviceStack.program(pattern, address + i, BlockSize))) {
+				if(!storageDeviceStack.program(pattern, address + i, BlockSize)) {
 					MODM_LOG_INFO << "Error: Unable to write data.";
 					return;
 				}
@@ -79,7 +79,7 @@ void doMemoryTest()
 			auto dv = std::ldiv(address, DieSize);
 			uint8_t* pattern = (iteration % 2 == dv.quot) ? bufferA : bufferB;
 			for(uint32_t i = 0; i < TestMemorySize; i += BlockSize) {
-				if(!RF_CALL_BLOCKING(storageDeviceStack.read(bufferC, address + i, BlockSize))) {
+				if(!storageDeviceStack.read(bufferC, address + i, BlockSize)) {
 					MODM_LOG_INFO << "Error: Unable to read data.";
 					return;
 				}
@@ -125,10 +125,10 @@ main()
 	std::memset(bufferB, 0x55, BlockSize);
 
 	bool initializeSuccess = false;
-	if (RF_CALL_BLOCKING(storageDeviceStack.initialize())) {
+	if (storageDeviceStack.initialize()) {
 		MODM_LOG_INFO << "Erasing complete flash chip... (This may take a while)" << modm::endl;
-		if (RF_CALL_BLOCKING(storageDeviceStack.erase(0, MemorySize))) {
-			RF_CALL_BLOCKING(storageDeviceStack.waitWhileBusy());
+		if (storageDeviceStack.erase(0, MemorySize)) {
+			storageDeviceStack.waitWhileBusy();
 			initializeSuccess = true;
 		} else {
 			MODM_LOG_INFO << "Error: Unable to erase device.";
@@ -138,10 +138,10 @@ main()
 	}
 
 	if (initializeSuccess) {
-		auto id = RF_CALL_BLOCKING(storageDevice.readId());
+		auto id = storageDevice.readId();
 		MODM_LOG_INFO << "deviceId=" << id.deviceId << " manufacturerId=" << id.manufacturerId;
 		MODM_LOG_INFO << "deviceType=" << id.deviceType << modm::endl;
-		MODM_LOG_INFO << "status=" << static_cast<uint8_t>(RF_CALL_BLOCKING(storageDevice.readStatus())) << modm::endl;
+		MODM_LOG_INFO << "status=" << static_cast<uint8_t>(storageDevice.readStatus()) << modm::endl;
 		MODM_LOG_INFO << "Press USER button to start the memory test." << modm::endl;
 	}
 

@@ -14,90 +14,56 @@
 #include <modm/driver/color/tcs3472.hpp>
 #include <modm/processing.hpp>
 
-class ThreadOne : public modm::pt::Protothread
+modm::tcs3472::Data data;
+modm::Tcs3472<I2cMaster1> sensor{data};
+
+modm::Fiber fiber_sensor([]
 {
-public:
-	bool
-	update()
+	MODM_LOG_INFO << "Ping the device from ThreadOne" << modm::endl;
+
+	// ping the device until it responds
+	while (not sensor.ping()) modm::this_fiber::sleep_for(100ms);
+	MODM_LOG_INFO << "Device responded" << modm::endl;
+
+	while (not sensor.initialize()) modm::this_fiber::sleep_for(100ms);
+	MODM_LOG_INFO << "Device initialized" << modm::endl;
+
+	while (not sensor.configure(sensor.Gain::X4, sensor.IntegrationTime::MSEC_101))
+		modm::this_fiber::sleep_for(100ms);
+	MODM_LOG_INFO << "Device configured" << modm::endl;
+
+	while (true)
 	{
-		PT_BEGIN();
-
-		MODM_LOG_INFO << "Ping the device from ThreadOne" << modm::endl;
-
-		// ping the device until it responds
-		while (true)
+		if (sensor.readColor())
 		{
-			// we wait until the task started
-			if (PT_CALL(sensor.ping())) { break; }
-			// otherwise, try again in 100ms
-			timeout.restart(100ms);
-			PT_WAIT_UNTIL(timeout.isExpired());
+			const auto rgb = data.getColor();
+			MODM_LOG_INFO << "RGB: " << rgb << "\tHSV: " << modm::color::Hsv(rgb) << modm::endl;
 		}
-
-		MODM_LOG_INFO << "Device responded" << modm::endl;
-
-		while (true)
-		{
-			if (PT_CALL(sensor.initialize())) { break; }
-			// otherwise, try again in 100ms
-			timeout.restart(100ms);
-			PT_WAIT_UNTIL(timeout.isExpired());
-		}
-
-		MODM_LOG_INFO << "Device initialized" << modm::endl;
-
-		while (true)
-		{
-			if (PT_CALL(sensor.configure(sensor.Gain::X4, sensor.IntegrationTime::MSEC_101)))
-			{
-				break;
-			}
-			// otherwise, try again in 100ms
-			timeout.restart(100ms);
-			PT_WAIT_UNTIL(timeout.isExpired());
-		}
-
-		MODM_LOG_INFO << "Device configured" << modm::endl;
-
-		while (true)
-		{
-			if (PT_CALL(sensor.readColor()))
-			{
-				const auto rgb = data.getColor();
-				MODM_LOG_INFO << "RGB: " << rgb << "\tHSV: " << modm::color::Hsv(rgb) << modm::endl;
-			}
-			timeout.restart(500ms);
-			PT_WAIT_UNTIL(timeout.isExpired());
-		}
-
-		PT_END();
+		modm::this_fiber::sleep_for(500ms);
 	}
+});
 
-private:
-	modm::ShortTimeout timeout;
-	modm::tcs3472::Data data;
-	modm::Tcs3472<I2cMaster1> sensor{data};
-};
-ThreadOne one;
+modm::Fiber fiber_blink([]
+{
+	Board::LedD13::setOutput();
+	while(true)
+	{
+		Board::LedD13::toggle();
+		modm::this_fiber::sleep_for(0.5s);
+	}
+});
 
 // ----------------------------------------------------------------------------
 int
 main()
 {
 	Board::initialize();
-	Board::LedD13::setOutput();
 
 	I2cMaster1::connect<Board::D14::Sda, Board::D15::Scl>();
 	I2cMaster1::initialize<Board::SystemClock, 100_kHz>();
 
 	MODM_LOG_INFO << "\n\nWelcome to TCS3472 demo!\n\n";
 
-	modm::ShortPeriodicTimer tmr(500ms);
-	while (true)
-	{
-		one.update();
-		if (tmr.execute()) Board::LedD13::toggle();
-	}
-
+	modm::fiber::Scheduler::run();
 	return 0;
 }

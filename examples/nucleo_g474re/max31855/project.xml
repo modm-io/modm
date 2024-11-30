@@ -5,10 +5,7 @@
   </options>
   <modules>
     <module>modm:driver:max31855</module>
-    <module>modm:platform:gpio</module>
     <module>modm:platform:spi:2</module>
-    <module>modm:processing:protothread</module>
-    <module>modm:processing:timer</module>
     <module>modm:build:scons</module>
   </modules>
 </library>

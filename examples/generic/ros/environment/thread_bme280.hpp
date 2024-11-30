@@ -11,19 +11,18 @@
 #ifndef THREAD_BME280
 #define THREAD_BME280
 
-#include <modm/processing/timer.hpp>
-#include <modm/processing/protothread.hpp>
+#include <modm/processing.hpp>
 
 #include <modm/driver/pressure/bme280.hpp>
 
 #include "hardware.hpp"
 
-class Bme280Thread: public modm::pt::Protothread
+class Bme280Thread: public modm::Fiber<>
 {
 public:
 	Bme280Thread();
 
-	bool
+	void
 	update();
 
 	bool
@@ -50,8 +49,6 @@ public:
 	}
 
 private:
-	modm::ShortTimeout timeout;
-
 	modm::bme280::Data data;
 	modm::Bme280<MyI2cMaster> barometer;
 

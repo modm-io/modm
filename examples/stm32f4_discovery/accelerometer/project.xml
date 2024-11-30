@@ -6,11 +6,7 @@
   <modules>
     <module>modm:driver:lis302dl</module>
     <module>modm:math:filter</module>
-    <module>modm:platform:gpio</module>
-    <module>modm:platform:i2c</module>
     <module>modm:platform:i2c.bitbang</module>
-    <module>modm:processing:timer</module>
-    <module>modm:processing:protothread</module>
     <module>modm:build:scons</module>
   </modules>
 </library>

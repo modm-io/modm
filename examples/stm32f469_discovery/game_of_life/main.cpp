@@ -40,11 +40,11 @@ void read_touch()
 	static bool initialized = false;
 	if (not initialized) {
 		// Configure the touchscreen to sample with 60Hz in active and monitor mode.
-		RF_CALL_BLOCKING(touchSensor.configure(Touch::InterruptMode::Polling, 60, 60));
+		touchSensor.configure(Touch::InterruptMode::Polling, 60, 60);
 		initialized = true;
 	}
 
-	RF_CALL_BLOCKING(touchSensor.readTouches());
+	touchSensor.readTouches();
 
 	for_i(0, ii, 2)
 	{

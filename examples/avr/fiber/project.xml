@@ -1,12 +1,14 @@
 <library>
-  <extends>modm:mega-2560-pro</extends>
-  <!-- <extends>modm:arduino-nano</extends> -->
   <options>
+    <option name="modm:target">atmega644-20au</option>
+    <option name="modm:platform:core:f_cpu">14.7456M</option>
     <option name="modm:build:build.path">../../../build/avr/fiber</option>
   </options>
   <modules>
-    <module>modm:build:scons</module>
-    <module>modm:processing:timer</module>
+    <module>modm:platform:core</module>
+    <module>modm:platform:clock</module>
+    <module>modm:platform:gpio</module>
     <module>modm:processing:fiber</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

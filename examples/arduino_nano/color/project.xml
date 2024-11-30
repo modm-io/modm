@@ -5,8 +5,7 @@
   </options>
   <modules>
     <module>modm:build:scons</module>
-    <module>modm:processing:protothread</module>
-    <module>modm:processing:timer</module>
+    <module>modm:processing:fiber</module>
     <module>modm:platform:i2c</module>
     <module>modm:driver:tcs3472</module>
   </modules>

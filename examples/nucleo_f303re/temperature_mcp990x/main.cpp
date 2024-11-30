@@ -37,7 +37,7 @@ int main()
 	// wait for sensor boot-up time
 	modm::delay(15ms);
 
-	bool success = RF_CALL_BLOCKING(sensor.initialize());
+	bool success = sensor.initialize();
 	if (!success)
 	{
 		MODM_LOG_ERROR << "Initialization failed" << modm::endl;
@@ -48,7 +48,7 @@ int main()
 	{
 		if (timer.execute())
 		{
-			if (RF_CALL_BLOCKING(sensor.readInternalTemperature()))
+			if (sensor.readInternalTemperature())
 			{
 				MODM_LOG_INFO.printf("temperature: %3.3f\n °C\n", (double)data.getTemperature());
 			}

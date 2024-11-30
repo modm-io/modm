@@ -11,11 +11,9 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
-
 #include <modm/processing.hpp>
 #include <modm/driver/position/vl6180.hpp>
-#include <modm/io/iostream.hpp>
-#include <modm/debug/logger.hpp>
+#include <modm/debug.hpp>
 
 using Usart2 = BufferedUart<UsartHal2>;
 modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > device;
@@ -47,98 +45,71 @@ typedef I2cMaster2 MyI2cMaster;
 modm::vl6180::Data data;
 modm::Vl6180<MyI2cMaster> distance(data);
 
-class ThreadOne : public modm::pt::Protothread
+modm::Fiber fiber_sensor([]
 {
-public:
-	bool
-	update()
+	MODM_LOG_DEBUG << "Ping the device from ThreadOne" << modm::endl;
+	while (not distance.ping()) modm::this_fiber::sleep_for(100ms);
+	MODM_LOG_DEBUG << "Device responded" << modm::endl;
+
+	distance.initialize();
+	MODM_LOG_DEBUG << "Device initialized" << modm::endl;
+
+	distance.setIntegrationTime(10);
+
+	while (true)
 	{
-		PT_BEGIN();
+		auto stamp = modm::Clock::now();
 
-		MODM_LOG_DEBUG << "Ping the device from ThreadOne" << modm::endl;
-
-		// ping the device until it responds
-		while (true)
+		if (distance.readDistance())
 		{
-			// we wait until the task started
-			if (PT_CALL(distance.ping())) {
-			 	break;
-			}
-			// otherwise, try again in 100ms
-			timeout.restart(100ms);
-			PT_WAIT_UNTIL(timeout.isExpired());
-		}
-
-		MODM_LOG_DEBUG << "Device responded" << modm::endl;
-
-		while (true)
-		{
-			if (PT_CALL(distance.initialize()))
-				break;
-			// otherwise, try again in 100ms
-			timeout.restart(100ms);
-			PT_WAIT_UNTIL(timeout.isExpired());
-		}
-
-		MODM_LOG_DEBUG << "Device initialized" << modm::endl;
-		timeout.restart(1ms);
-
-		PT_CALL(distance.setIntegrationTime(10));
-
-		while (true)
-		{
-			stamp = modm::Clock::now();
-
-			if (PT_CALL(distance.readDistance()))
+			const auto error = distance.getRangeError();
+			if (error == distance.RangeErrorCode::NoError)
 			{
-				modm::vl6180::RangeErrorCode error = distance.getRangeError();
-				if (error == distance.RangeErrorCode::NoError)
-				{
-					uint8_t mm = distance.getData().getDistance();
-					MODM_LOG_DEBUG << "mm: " << mm;
-					Board::LedGreen::set(mm > 160);
-					Board::LedBlue::set(mm > 110);
-					Board::LedRed::set(mm > 25);
-				}
-				else {
-					MODM_LOG_DEBUG << "Error: " << (uint8_t(error) >> 4);
-					Board::LedGreen::set();
-					Board::LedBlue::set();
-					Board::LedRed::set();
-				}
+				const uint8_t mm = distance.getData().getDistance();
+				MODM_LOG_DEBUG << "mm: " << mm;
+				Board::LedGreen::set(mm > 160);
+				Board::LedBlue::set(mm > 110);
+				Board::LedRed::set(mm > 25);
 			}
-
-			MODM_LOG_DEBUG << "\tt=" << (modm::Clock::now() - stamp);
-			stamp = modm::Clock::now();
-
-			if (PT_CALL(distance.readAmbientLight()))
-			{
-				modm::vl6180::ALS_ErrorCode error = distance.getALS_Error();
-				if (error == distance.ALS_ErrorCode::NoError)
-				{
-					uint32_t lux = distance.getData().getAmbientLight();
-					MODM_LOG_DEBUG << "\tLux: " << lux;
-				}
-				else {
-					MODM_LOG_DEBUG << "\tError: " << (uint8_t(error) >> 4);
-				}
+			else {
+				MODM_LOG_DEBUG << "Error: " << (uint8_t(error) >> 4);
+				Board::LedGreen::set();
+				Board::LedBlue::set();
+				Board::LedRed::set();
 			}
-
-			MODM_LOG_DEBUG << " \tt=" << (modm::Clock::now() - stamp) << modm::endl;
-
-			PT_WAIT_UNTIL(timeout.isExpired());
-			timeout.restart(40ms);
 		}
 
-		PT_END();
+		MODM_LOG_DEBUG << "\tt=" << (modm::Clock::now() - stamp);
+		stamp = modm::Clock::now();
+
+		if (distance.readAmbientLight())
+		{
+			modm::vl6180::ALS_ErrorCode error = distance.getALS_Error();
+			if (error == distance.ALS_ErrorCode::NoError)
+			{
+				uint32_t lux = distance.getData().getAmbientLight();
+				MODM_LOG_DEBUG << "\tLux: " << lux;
+			}
+			else {
+				MODM_LOG_DEBUG << "\tError: " << (uint8_t(error) >> 4);
+			}
+		}
+
+		MODM_LOG_DEBUG << " \tt=" << (modm::Clock::now() - stamp) << modm::endl;
+
+		modm::this_fiber::sleep_for(40ms);
 	}
+});
 
-private:
-	modm::Timeout timeout;
-	modm::Timestamp stamp;
-};
-
-ThreadOne one;
+modm::Fiber fiber_blink([]
+{
+	Board::LedOrange::setOutput();
+	while(true)
+	{
+		Board::LedOrange::toggle();
+		modm::this_fiber::sleep_for(0.5s);
+	}
+});
 
 // ----------------------------------------------------------------------------
 int
@@ -154,15 +125,6 @@ main()
 
 	MODM_LOG_INFO << "\n\nWelcome to VL6180X demo!\n\n";
 
-	modm::ShortPeriodicTimer tmr(500ms);
-
-	while (true)
-	{
-		one.update();
-		if (tmr.execute()) {
-			Board::LedOrange::toggle();
-		}
-	}
-
+	modm::fiber::Scheduler::run();
 	return 0;
 }

@@ -3,8 +3,8 @@
 This module provides an interface to yield control back to a scheduler. The
 basic functionality is provided by the `yield()` function which transparently
 gives control back to the scheduler and returns afterwards. It is particularly
-important to call yield in long running loops to prevent the system from locking
-up and preventing other fibers from making progress:
+important to yield in long running loops to prevent the system from locking up
+by preventing other fibers from making progress:
 
 ```cpp
 while(true)
@@ -31,8 +31,8 @@ bool condition_met = modm::this_fiber::poll_for(1s, [&]{ return condition; });
 ```
 
 If microseconds are passed for the duration, the functions use the
-`modm::chrono::micro_clock` (= `modm::PreciseClock`), otherwise they use
-`modm::chrono::milli_clock` (= `modm::Clock`). This requires that these clocks
+`modm::chrono::micro_clock` (=`modm::PreciseClock`), otherwise they use
+`modm::chrono::milli_clock` (=`modm::Clock`). This requires that these clocks
 are already initialized and running.
 
 These basic building blocks are then used to implement the `sleep_for()` and
@@ -104,13 +104,11 @@ function:
 ```cpp
 auto id = modm::this_fiber::get_id();
 // if (id == 0) called outside a fiber
-// if (id < 1024) called from inside an interrupt
 // else called from inside a fiber
 ```
 
 The returned ID is the address of the currently running fiber object. If called
 outside of a fiber, for example, in the main function before the scheduler is
-running, the function returns `0`. If called inside a ARM Cortex-M interrupt,
-the ID returns the IRQ number. The implementation ensures that all returned
+running, the function returns `0`. The implementation ensures that all returned
 values are unique and thus allow the ID to be used for tracking ownership of
 various recursive locks, for example.

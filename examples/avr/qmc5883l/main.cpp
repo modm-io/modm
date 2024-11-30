@@ -36,17 +36,17 @@ main()
 	Board::D19::setInputTrigger(Gpio::InputTrigger::RisingEdge);
 	Board::D19::enableExternalInterrupt();
 
-	RF_CALL_BLOCKING(compass.initialize());
+	compass.initialize();
 	auto mode = Compass::Mode_t(Compass::Mode::Continious);
 	auto rate = Compass::OutputDataRate_t(Compass::OutputDataRate::_10Hz);
 	auto scale = Compass::FullScale_t(Compass::FullScale::_8G);
-	RF_CALL_BLOCKING(compass.configure(mode, rate | scale));
+	compass.configure(mode, rate | scale);
 
 	for (;;)
 	{
 		if (dataReady.testAndSet(false))
 		{
-			if (RF_CALL_BLOCKING(compass.readData()))
+			if (compass.readData())
 			{
 				MODM_LOG_INFO << "X:" << compass.x() << " Y: " << compass.y()
 							  << " Z: " << compass.z()

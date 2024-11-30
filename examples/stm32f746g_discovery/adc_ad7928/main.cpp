@@ -12,7 +12,6 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
-#include <modm/processing.hpp>
 #include <modm/driver/adc/ad7928.hpp>
 
 /**
@@ -34,70 +33,17 @@ using Miso = GpioInputB14;
 using Cs = GpioOutputA8;
 using SpiMaster = SpiMaster2;
 
-using namespace Board;
-
 using modm::ad7928;
+modm::Ad7928<SpiMaster, Cs> adc;
 
-class ThreadOne : public modm::pt::Protothread
-{
-public:
-	static constexpr ad7928::SequenceChannels_t sequence1 =
-		ad7928::SequenceChannels::Ch0 |
-		ad7928::SequenceChannels::Ch1 |
-		ad7928::SequenceChannels::Ch2;
-
-	static constexpr ad7928::SequenceChannels_t sequence2 =
-		ad7928::SequenceChannels::Ch0 |
-		ad7928::SequenceChannels::Ch4 |
-		ad7928::SequenceChannels::Ch5;
-
-	bool
-	update()
-	{
-		PT_BEGIN();
-
-		MODM_LOG_INFO << "Initialize device" << modm::endl;
-		PT_CALL(adc.initialize());
-
-		MODM_LOG_INFO << "Test single conversions (Ch 0-2):" << modm::endl;
-
-		// Initiate first conversion, result will be output during the next conversion
-		PT_CALL(adc.singleConversion(ad7928::InputChannel::Ch0));
-
-		MODM_LOG_INFO << PT_CALL(adc.singleConversion(ad7928::InputChannel::Ch1)) << modm::endl;
-		MODM_LOG_INFO << PT_CALL(adc.singleConversion(ad7928::InputChannel::Ch2)) << modm::endl;
-
-		// Enable auto-shutdown
-		adc.setAutoShutdownEnabled(true);
-
-		MODM_LOG_INFO << PT_CALL(adc.singleConversion(ad7928::InputChannel::Ch2)) << modm::endl;
-
-		MODM_LOG_INFO << "Test single conversion with auto-shutdown (Ch 5):" << modm::endl;
-		PT_CALL(adc.singleConversion(ad7928::InputChannel::Ch5));
-		MODM_LOG_INFO << PT_CALL(adc.singleConversion(ad7928::InputChannel::Ch0)) << modm::endl;
-
-		adc.setAutoShutdownEnabled(false);
-
-		MODM_LOG_INFO << "Test sequence mode" << modm::endl;
-		MODM_LOG_INFO << "Program sequence Ch0,Ch1,Ch5, Ch0,Ch4,Ch5" << modm::endl;
-		PT_CALL(adc.startSequence(sequence1, sequence2));
-
-		// Run forever
-		while (true)
-		{
-			MODM_LOG_INFO << PT_CALL(adc.nextSequenceConversion()) << modm::endl;
-
-			timeout.restart(500ms);
-			PT_WAIT_UNTIL(timeout.isExpired());
-		}
-
-		PT_END();
-	}
-
-private:
-	modm::ShortTimeout timeout;
-	modm::Ad7928<SpiMaster, Cs> adc;
-} thread;
+static constexpr ad7928::SequenceChannels_t sequence1 =
+	ad7928::SequenceChannels::Ch0 |
+	ad7928::SequenceChannels::Ch1 |
+	ad7928::SequenceChannels::Ch2;
+static constexpr ad7928::SequenceChannels_t sequence2 =
+	ad7928::SequenceChannels::Ch0 |
+	ad7928::SequenceChannels::Ch4 |
+	ad7928::SequenceChannels::Ch5;
 
 // ----------------------------------------------------------------------------
 int
@@ -112,8 +58,32 @@ main()
 
 	MODM_LOG_INFO << "AD7928/AD7918/AD7908 Example" << modm::endl;
 
-	while (true) {
-		thread.update();
+	MODM_LOG_INFO << "Initialize device" << modm::endl;
+	adc.initialize();
+
+	MODM_LOG_INFO << "Test single conversions (Ch 0-2):" << modm::endl;
+	// Initiate first conversion, result will be output during the next conversion
+	adc.singleConversion(ad7928::InputChannel::Ch0);
+	MODM_LOG_INFO << adc.singleConversion(ad7928::InputChannel::Ch1) << modm::endl;
+	MODM_LOG_INFO << adc.singleConversion(ad7928::InputChannel::Ch2) << modm::endl;
+	// Enable auto-shutdown
+	adc.setAutoShutdownEnabled(true);
+	MODM_LOG_INFO << adc.singleConversion(ad7928::InputChannel::Ch2) << modm::endl;
+
+	MODM_LOG_INFO << "Test single conversion with auto-shutdown (Ch 5):" << modm::endl;
+	adc.singleConversion(ad7928::InputChannel::Ch5);
+	MODM_LOG_INFO << adc.singleConversion(ad7928::InputChannel::Ch0) << modm::endl;
+	adc.setAutoShutdownEnabled(false);
+
+	MODM_LOG_INFO << "Test sequence mode" << modm::endl;
+	MODM_LOG_INFO << "Program sequence Ch0,Ch1,Ch5, Ch0,Ch4,Ch5" << modm::endl;
+	adc.startSequence(sequence1, sequence2);
+
+	// Run forever
+	while (true)
+	{
+		MODM_LOG_INFO << adc.nextSequenceConversion() << modm::endl;
+		modm::delay(500ms);
 	}
 
 	return 0;

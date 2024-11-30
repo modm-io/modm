@@ -38,12 +38,12 @@ main()
 	I2cInstance::initialize<SystemClock, 400_kHz>();
 	I2cInstance::connect<PinScl::BitBang, PinSda::BitBang>();
 
-	RF_CALL_BLOCKING(driver.reset());
-	RF_CALL_BLOCKING(driver.clearSoftwareShutdown());
-	RF_CALL_BLOCKING(driver.setGlobalCurrent(1));
+	driver.reset();
+	driver.clearSoftwareShutdown();
+	driver.setGlobalCurrent(1);
 
 	driver.enableAll();
-	RF_CALL_BLOCKING(driver.writeOnOff());
+	driver.writeOnOff();
 
 	uint8_t pwm{0};
 	while (true)
@@ -53,7 +53,7 @@ main()
 				driver.setPwm(x, y, pi++);
 			}
 		}
-		RF_CALL_BLOCKING(driver.writePwm());
+		driver.writePwm();
 		modm::delay(10ms);
 		pwm++;
 	}

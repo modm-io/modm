@@ -52,13 +52,13 @@ void doMemoryTest()
 	for (uint16_t iteration = 0; iteration < 4; iteration++) {
 		uint8_t* pattern = (iteration % 2 == 0) ? bufferA : bufferB;
 
-		if (not RF_CALL_BLOCKING(storageDevice.erase(0, TestMemorySize))) {
+		if (not storageDevice.erase(0, TestMemorySize)) {
 			MODM_LOG_INFO << "Error: Unable to erase device.";
 			return;
 		}
 
 		for (uint32_t ii = 0; ii < TestMemorySize; ii += Board::w25q16::BlockSize) {
-			if (not RF_CALL_BLOCKING(storageDevice.program(pattern, ii, Board::w25q16::BlockSize))) {
+			if (not storageDevice.program(pattern, ii, Board::w25q16::BlockSize)) {
 				MODM_LOG_INFO << "Error: Unable to write data.";
 				return;
 			}
@@ -66,7 +66,7 @@ void doMemoryTest()
 		}
 
 		for (uint32_t ii = 0; ii < TestMemorySize; ii += Board::w25q16::BlockSize) {
-			if (not RF_CALL_BLOCKING(storageDevice.read(bufferC, ii, Board::w25q16::BlockSize))) {
+			if (not storageDevice.read(bufferC, ii, Board::w25q16::BlockSize)) {
 				MODM_LOG_INFO << "Error: Unable to read data.";
 				return;
 			}
@@ -108,18 +108,18 @@ main()
 
 	MODM_LOG_INFO << "Erasing complete flash chip... (This may take a while)" << modm::endl;
 
-	if (not RF_CALL_BLOCKING(storageDevice.initialize())) {
+	if (not storageDevice.initialize()) {
 		MODM_LOG_INFO << "Error: Unable to initialize device.";
 	}
-	else if (not RF_CALL_BLOCKING(storageDevice.erase(0, Board::w25q16::MemorySize))) {
+	else if (not storageDevice.erase(0, Board::w25q16::MemorySize)) {
 		MODM_LOG_INFO << "Error: Unable to erase device.";
 	}
 	else {
-		auto id = RF_CALL_BLOCKING(storageDevice.readId());
+		auto id = storageDevice.readId();
 		MODM_LOG_INFO << "deviceId=" << id.deviceId << " manufacturerId=" << id.manufacturerId;
 		MODM_LOG_INFO << " deviceType=" << id.deviceType << modm::endl;
 
-		MODM_LOG_INFO << "status=" << static_cast<uint8_t>(RF_CALL_BLOCKING(storageDevice.readStatus())) << modm::endl;
+		MODM_LOG_INFO << "status=" << static_cast<uint8_t>(storageDevice.readStatus()) << modm::endl;
 
 		MODM_LOG_INFO << "Press USER button to start the memory test." << modm::endl;
 		initializeSuccess = true;

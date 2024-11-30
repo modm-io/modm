@@ -32,7 +32,7 @@ main()
 	modm::stts22h::Data data{};
 	modm::Stts22h<I2cMaster> sensor{data, 0x3f};
 
-	bool success = RF_CALL_BLOCKING(sensor.initialize());
+	bool success = sensor.initialize();
 	if(!success)
 	{
 		MODM_LOG_ERROR << "Initialization failed" << modm::endl;
@@ -45,7 +45,7 @@ main()
 		{
 			LedD13::toggle();
 
-			RF_CALL_BLOCKING(sensor.readTemperature());
+			sensor.readTemperature();
 			MODM_LOG_INFO << "temperature: " << data.getTemperatureFractional();
 			MODM_LOG_INFO << " [1/100th °C]" << modm::endl;
 		}

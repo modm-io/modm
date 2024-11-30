@@ -19,12 +19,10 @@
 *
 */
 
-#include <modm/debug/logger.hpp>
-#include <modm/processing/timer.hpp>
-#include <modm/processing/protothread.hpp>
-#include <modm/driver/display/nokia5110.hpp>
-
 #include <modm/board.hpp>
+#include <modm/debug.hpp>
+#include <modm/processing.hpp>
+#include <modm/driver/display/nokia5110.hpp>
 
 using Usart2 = BufferedUart<UsartHal2>;
 modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > device;
@@ -53,61 +51,45 @@ namespace lcd
 	using Backlight = GpioOutputE5;
 }
 
-// Select if hardware or software SPI Master shall be used
-// typedef BitBangSpiMaster< lcd::Clk, lcd::Din> mySpiMaster;
-typedef SpiMaster2 mySpiMaster;
+using SpiMaster = SpiMaster2;
 
 // create a LCD object
-modm::Nokia5110< mySpiMaster, lcd::Ce, lcd::Dc, lcd::Reset > display;
+modm::Nokia5110< SpiMaster, lcd::Ce, lcd::Dc, lcd::Reset > display;
 
-class ThreadOne : public modm::pt::Protothread
+modm::Fiber fiber_sensor([]
 {
-public:
-	ThreadOne()
+	lcd::Reset::setOutput(modm::Gpio::Low);
+	lcd::Ce::setOutput(modm::Gpio::High);
+	lcd::Dc::setOutput(modm::Gpio::Low);
+	lcd::Backlight::setOutput(modm::Gpio::High);
+
+	// Initialize
+	display.initialize();
+	display.setCursor(0, 0);
+
+	// Write the standard welcome message ;-)
+	display << "Hello modm.io\n";
+
+	uint8_t counter{};
+	while (true)
 	{
-	}
+		display.setCursor(0, 10);
+		display << counter++ << "   ";
+		display.update();
 
-	bool
-	update()
+		modm::this_fiber::sleep_for(1s);
+	}
+});
+
+modm::Fiber fiber_blink([]
+{
+	Board::LedOrange::setOutput();
+	while(true)
 	{
-		PT_BEGIN();
-
-		lcd::Reset::setOutput(modm::Gpio::Low);
-		lcd::Ce::setOutput(modm::Gpio::High);
-		lcd::Dc::setOutput(modm::Gpio::Low);
-		lcd::Backlight::setOutput(modm::Gpio::High);
-
-		// Initialize
-		display.initialize();
-
-		display.setCursor(0, 0);
-
-		// Write the standard welcome message ;-)
-		display << "Hello modm.io";
-
-		counter = 0;
-
-		while (true)
-		{
-			display.setCursor(0, 10);
-			display << counter << "   ";
-			display.update();
-
-			counter++;
-
-			timeout.restart(1s);
-			PT_WAIT_UNTIL(timeout.isExpired());
-		}
-
-		PT_END();
+		Board::LedOrange::toggle();
+		modm::this_fiber::sleep_for(0.5s);
 	}
-
-private:
-	modm::ShortTimeout timeout;
-	uint8_t counter;
-};
-
-ThreadOne one;
+});
 
 int
 main()
@@ -119,21 +101,10 @@ main()
 
 	MODM_LOG_INFO << "\n\nWelcome to Nokia 5110 display demo!\n\n";
 
-	// Software SPI Master
-	// GpioOutputB15::setOutput();
-	// GpioOutputB13::setOutput();
-
 	// Hardware SPI Master
-	SpiMaster2::connect<GpioB15::Mosi, GpioB13::Sck>();
-	mySpiMaster::initialize<Board::SystemClock, 2625000ul>();
+	SpiMaster::connect<GpioB15::Mosi, GpioB13::Sck>();
+	SpiMaster::initialize<Board::SystemClock, 2625000ul>();
 
-	modm::ShortPeriodicTimer tmr(500ms);
-
-	while(true)
-	{
-		one.update();
-		if (tmr.execute()) {
-			Board::LedOrange::toggle();
-		}
-	}
+	modm::fiber::Scheduler::run();
+	return 0;
 }

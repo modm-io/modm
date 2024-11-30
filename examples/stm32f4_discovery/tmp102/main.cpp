@@ -13,22 +13,19 @@
 #include <modm/board.hpp>
 #include <modm/processing.hpp>
 #include <modm/driver/temperature/tmp102.hpp>
-
 #include <modm/io/iostream.hpp>
 
-using Usart1 = BufferedUart<UsartHal1>;
-modm::IODeviceWrapper< Usart1, modm::IOBuffer::BlockIfFull > device;
+using Usart2 = BufferedUart<UsartHal2>;
+modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > device;
 modm::IOStream stream(device);
 
 typedef I2cMaster1 MyI2cMaster;
-
 modm::tmp102::Data temperatureData;
 modm::Tmp102<MyI2cMaster> temp(temperatureData, 0x48);
 
 modm::Fiber fiber_sensor([]
 {
-	// ping the device until it responds
-	while(not temp.ping()) modm::delay(100ms);
+	while(not temp.ping()) modm::this_fiber::sleep_for(100ms);
 
 	temp.setUpdateRate(200);
 	temp.enableExtendedMode();
@@ -40,39 +37,32 @@ modm::Fiber fiber_sensor([]
 	temp.setLowerLimit(28.f);
 	temp.setUpperLimit(30.f);
 
+	bool result{};
 	while (true)
 	{
-		bool result{};
 		temp.readComparatorMode(result);
 		float temperature = temperatureData.getTemperature();
 		uint8_t tI = (int) temperature;
 		uint16_t tP = (temperature - tI) * 10000;
+
 		stream << "T= " << tI << ".";
-		if (tP == 0)
-		{
-			stream << "0000 C";
-		}
-		else if (tP == 625)
-		{
-			stream << "0" << tP << " C";
-		}
-		else
-		{
-			stream << tP << " C";
-		}
+		if (tP == 0) stream << "0000 C";
+		else if (tP == 625) stream << "0" << tP << " C";
+		else stream << tP << " C";
 		stream << modm::endl;
 		if (result) stream << "Heat me up!" << modm::endl;
+
 		modm::this_fiber::sleep_for(200ms);
-		Board::LedDown::toggle();
+		Board::LedRed::toggle();
 	}
 });
 
 modm::Fiber fiber_blink([]
 {
-	Board::LedUp::setOutput();
+	Board::LedOrange::setOutput();
 	while(true)
 	{
-		Board::LedUp::toggle();
+		Board::LedOrange::toggle();
 		modm::this_fiber::sleep_for(0.5s);
 	}
 });
@@ -83,15 +73,14 @@ main()
 {
 	Board::initialize();
 
-	Usart1::connect<GpioA9::Tx>();
-	Usart1::initialize<Board::SystemClock, 115'200_Bd>();
+	Usart2::connect<GpioA2::Tx>();
+	Usart2::initialize<Board::SystemClock, 38400_Bd>();
 
-	MyI2cMaster::connect<GpioB7::Sda, GpioB8::Scl>();
-	MyI2cMaster::initialize<Board::SystemClock, 400_kHz>();
+	MyI2cMaster::connect<GpioB7::Sda, GpioB8::Scl>(MyI2cMaster::PullUps::Internal);
+	MyI2cMaster::initialize<Board::SystemClock, 100_kHz>();
 
 	stream << "\n\nRESTART\n\n";
 
 	modm::fiber::Scheduler::run();
-
 	return 0;
 }

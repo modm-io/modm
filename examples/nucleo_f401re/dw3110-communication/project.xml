@@ -7,6 +7,6 @@
     <module>modm:build:scons</module>
     <module>modm:driver:dw3110</module>
     <module>modm:platform:spi:1</module>
-    <module>modm:processing:protothread</module>
+    <module>modm:processing:fiber</module>
   </modules>
 </library>

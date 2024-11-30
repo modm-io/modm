@@ -2,13 +2,10 @@
   <extends>modm:disco-f303vc</extends>
   <options>
     <option name="modm:build:build.path">../../../build/stm32f3_discovery/rotation</option>
-    <option name="modm:processing:protothread:use_fiber">yes</option>
   </options>
   <modules>
     <module>modm:math:filter</module>
-    <module>modm:platform:gpio</module>
-    <module>modm:processing:timer</module>
-    <module>modm:processing:protothread</module>
+    <module>modm:processing:fiber</module>
     <module>modm:build:scons</module>
   </modules>
 </library>

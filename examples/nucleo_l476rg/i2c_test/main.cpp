@@ -9,10 +9,7 @@
  */
 
 #include <modm/board.hpp>
-#include <modm/processing/timer.hpp>
-
-#include <modm/processing/protothread.hpp>
-#include <modm/processing/resumable.hpp>
+#include <modm/processing.hpp>
 #include <modm/architecture/interface/i2c_device.hpp>
 
 /*
@@ -37,14 +34,14 @@ class I2cTestDevice : public modm::I2cDevice<I2cMaster, 2>
 public:
 	I2cTestDevice(uint8_t address = 0x3C);
 
-	modm::ResumableResult<bool>
-	write(uint16_t len);
+	bool
+	write(size_t len);
 
-	modm::ResumableResult<bool>
-	read(uint16_t len);
+	bool
+	read(size_t len);
 
-	modm::ResumableResult<bool>
-	writeRead(uint16_t write_len, uint16_t read_len);
+	bool
+	writeRead(size_t write_len, size_t read_len);
 
 private:
 	uint8_t buffer[1024];
@@ -57,72 +54,45 @@ I2cTestDevice<I2cMaster>::I2cTestDevice(uint8_t address) :
 }
 
 template < typename I2cMaster >
-modm::ResumableResult<bool>
-I2cTestDevice<I2cMaster>::write(uint16_t len)
+bool
+I2cTestDevice<I2cMaster>::write(size_t len)
 {
-	RF_BEGIN();
-
-	buffer[0] = 0xaa;
-	buffer[1] = 0x55;
-	buffer[2] = 0x82;
-	buffer[3] = 0x11;
-	buffer[4] = 0x22;
-
-	for (uint16_t ii = 0; ii < 1024; ++ii) {
+	for (size_t ii = 0; ii < 1024; ++ii) {
 		buffer[ii] = ii + 1;
 	}
 	buffer[255] = 0x82;
-	this->transaction.configureWrite(buffer, len);
-
-	if (not RF_CALL( this->runTransaction() )) {
-		RF_RETURN(false);
-	}
-
-	RF_END_RETURN(true);
+	return modm::I2cDevice<I2cMaster, 2>::write(buffer, len);
 }
 
 template < typename I2cMaster >
-modm::ResumableResult<bool>
-I2cTestDevice<I2cMaster>::read(uint16_t len)
+bool
+I2cTestDevice<I2cMaster>::read(size_t len)
 {
-	RF_BEGIN();
+	if (not modm::I2cDevice<I2cMaster, 2>::read(buffer, len)) return false;
 
-	this->transaction.configureRead(buffer, len);
-
-	if (not RF_CALL( this->runTransaction() )) {
-		RF_RETURN(false);
-	}
-	for (uint16_t ii = 0; ii < len; ++ii) {
+	for (size_t ii = 0; ii < len; ++ii) {
 		MODM_LOG_DEBUG.printf("%02x ", buffer[ii]);
 	}
 	MODM_LOG_DEBUG << modm::endl;
-
-	RF_END_RETURN(true);
+	return true;
 }
 
 template < typename I2cMaster >
-modm::ResumableResult<bool>
-I2cTestDevice<I2cMaster>::writeRead(uint16_t write_len, uint16_t read_len)
+bool
+I2cTestDevice<I2cMaster>::writeRead(size_t write_len, size_t read_len)
 {
-	RF_BEGIN();
-
-	for (uint16_t ii = 0; ii < 1024; ++ii) {
+	for (size_t ii = 0; ii < 1024; ++ii) {
 		buffer[ii] = ii + 1;
 	}
 	buffer[255] = 0x82;
+	if (not modm::I2cDevice<I2cMaster, 2>::writeRead(buffer, write_len, buffer, read_len))
+		return false;
 
-	this->transaction.configureWriteRead(buffer, write_len, buffer, read_len);
-
-	if (not RF_CALL( this->runTransaction() )) {
-		RF_RETURN(false);
-	}
-
-	for (uint16_t ii = 0; ii < read_len; ++ii) {
+	for (size_t ii = 0; ii < read_len; ++ii) {
 		MODM_LOG_DEBUG.printf("%02x ", buffer[ii]);
 	}
 	MODM_LOG_DEBUG << modm::endl;
-
-	RF_END_RETURN(true);
+	return true;
 }
 
 I2cTestDevice< MyI2cMaster > i2c;
@@ -138,32 +108,33 @@ main()
 
 	LedGreen::set();
 
-	RF_CALL_BLOCKING(i2c.ping());
+	i2c.ping();
 	modm::delay(25us);
 
-	RF_CALL_BLOCKING(i2c.write(0));
+	i2c.write(0);
 	modm::delay(25us);
 
-	RF_CALL_BLOCKING(i2c.write(1));
+	i2c.write(1);
 	modm::delay(25us);
 
-	RF_CALL_BLOCKING(i2c.write(2));
+	i2c.write(2);
 	modm::delay(25us);
 
-	RF_CALL_BLOCKING(i2c.writeRead(0, 5));
+	i2c.writeRead(0, 5);
 	modm::delay(25us);
 
-	RF_CALL_BLOCKING(i2c.writeRead(1, 5));
+	i2c.writeRead(1, 5);
 	modm::delay(25us);
 
-	RF_CALL_BLOCKING(i2c.writeRead(2, 5));
+	i2c.writeRead(2, 5);
 	modm::delay(25us);
 
 	// Blink if run without hanging.
-	while(true) {
+	while(true)
+	{
 		LedGreen::toggle();
 		modm::delay(500ms);
-	};
+	}
 
 	return 0;
 }

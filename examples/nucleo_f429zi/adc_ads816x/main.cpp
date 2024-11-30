@@ -47,7 +47,7 @@ main()
 	modm::delay(1ms);
 
 	MODM_LOG_INFO << "Initializing ADC in manual mode..." << modm::endl;
-	RF_CALL_BLOCKING(adc.initialize(modm::ads816x::Mode::Manual));
+	adc.initialize(modm::ads816x::Mode::Manual);
 
 	adc.setTConv(3us);
 
@@ -62,10 +62,10 @@ main()
 			if (i == 0) {
 				// Set channel 0 and 1 as next channels, throw away first two
 				//  conversion results
-				RF_CALL_BLOCKING(adc.manualModeConversion(0));
-				RF_CALL_BLOCKING(adc.manualModeConversion(1));
+				adc.manualModeConversion(0);
+				adc.manualModeConversion(1);
 			}
-			uint16_t result = RF_CALL_BLOCKING(adc.manualModeConversion((i + 2) % 8));
+			uint16_t result = adc.manualModeConversion((i + 2) % 8);
 			MODM_LOG_INFO.printf(" %05u", result);
 		}
 

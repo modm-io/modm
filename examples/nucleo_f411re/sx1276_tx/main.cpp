@@ -43,16 +43,16 @@ main()
 	Sx1276<SpiMaster1,SpiCs> loraModem;
 
 	// Initialize the modem
-	RF_CALL_BLOCKING(loraModem.initialize());
+	loraModem.initialize();
 
 	// Set Modulation Parameters
-	RF_CALL_BLOCKING(loraModem.setModemParams(sx1276::Bandwidth::BW_7,
-											  sx1276::SpreadingFactor::SF_8,
-											  sx1276::CodingRate::CR_4_8,
-											  false,
-											  false));
+	loraModem.setModemParams(sx1276::Bandwidth::BW_7,
+							 sx1276::SpreadingFactor::SF_8,
+							 sx1276::CodingRate::CR_4_8,
+							 false,
+							 false);
 	// Set Carrier Frequency
-	RF_CALL_BLOCKING(loraModem.setCarrierFrequency(433.920_MHz));
+	loraModem.setCarrierFrequency(433.920_MHz);
 
 	//The message to be sent
 	uint32_t counter(0);
@@ -60,7 +60,7 @@ main()
 	while (true)
 	{
 		MODM_LOG_INFO << "Trasmitting Message " << counter << modm::endl;
-		RF_CALL_BLOCKING(loraModem.transmit(reinterpret_cast<uint8_t*>(&counter),4));
+		loraModem.transmit(reinterpret_cast<uint8_t*>(&counter),4);
 		counter++;
 		modm::delay(1000ms);
 	}

@@ -41,7 +41,7 @@ main()
 			if (g++ >= max) g = 0;
 			if (b++ >= max) b = 0;
 		}
-		RF_CALL_BLOCKING(leds.write());
+		leds.write();
 
 		while(not tmr.execute()) ;
 	}

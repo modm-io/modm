@@ -12,8 +12,7 @@
 #include <modm/board.hpp>
 #include <modm/debug/logger.hpp>
 #include <modm/driver/rtc/mcp7941x.hpp>
-#include <modm/processing/protothread.hpp>
-#include <modm/processing/timer.hpp>
+#include <modm/processing.hpp>
 #include <optional>
 
 
@@ -35,72 +34,65 @@ using MyI2cMaster	= modm::platform::I2cMaster0;
 using I2cScl 		= modm::platform::Gpio1;
 using I2cSda 		= modm::platform::Gpio0;
 
+modm::Mcp7941x<MyI2cMaster> rtc{};
 
-class RtcThread : public modm::pt::Protothread
+modm::Fiber fiber_rtc([]
 {
-public:
-	bool
-	update()
-	{
-		PT_BEGIN();
-
-		if(PT_CALL(rtc.oscillatorRunning())) {
-			MODM_LOG_ERROR << "RTC oscillator is running." << modm::endl;
-		}
-		else {
-			MODM_LOG_ERROR << "RTC oscillator is NOT running." << modm::endl;
-		}
-
-		MODM_LOG_INFO << "Setting date/time to 01.01.2020 00:00.00h" << modm::endl;
-		dateTime.days = 1;
-		dateTime.months = 1;
-		dateTime.years = 20;
-		dateTime.hours = 0;
-		dateTime.minutes = 0;
-		dateTime.seconds = 0;
-		while(not PT_CALL(rtc.setDateTime(dateTime))) {
-			MODM_LOG_ERROR << "Unable to set date/time." << modm::endl;
-			timeout.restart(500ms);
-			PT_WAIT_UNTIL(timeout.isExpired());
-		}
-
-		timeout.restart(500ms);
-		PT_WAIT_UNTIL(timeout.isExpired());
-
-		if(PT_CALL(rtc.oscillatorRunning())) {
-			MODM_LOG_ERROR << "RTC oscillator is running." << modm::endl;
-		}
-		else {
-			MODM_LOG_ERROR << "RTC oscillator is NOT running." << modm::endl;
-		}
-
-		while (true)
-		{
-			dateTime2 = PT_CALL(rtc.getDateTime());
-			if(dateTime2.has_value()) {
-				MODM_LOG_INFO.printf("%02u.%02u.%02u ", dateTime2->days, dateTime2->months, dateTime2->years);
-				MODM_LOG_INFO.printf("%02u:%02u.%02uh\n", dateTime2->hours, dateTime2->minutes, dateTime2->seconds);
-			}
-			else {
-				MODM_LOG_ERROR << "Unable to read from RTC." << modm::endl;
-			}
-
-			timeout.restart(2500ms);
-			PT_WAIT_UNTIL(timeout.isExpired());
-		}
-
-		PT_END();
+	if(rtc.oscillatorRunning()) {
+		MODM_LOG_ERROR << "RTC oscillator is running." << modm::endl;
+	}
+	else {
+		MODM_LOG_ERROR << "RTC oscillator is NOT running." << modm::endl;
 	}
 
-private:
-	modm::Mcp7941x<MyI2cMaster> rtc{};
+	MODM_LOG_INFO << "Setting date/time to 01.01.2020 00:00.00h" << modm::endl;
 	modm::mcp7941x::DateTime dateTime{};
-	std::optional<modm::mcp7941x::DateTime> dateTime2{};
-	modm::ShortTimeout timeout;
-};
+	dateTime.days = 1;
+	dateTime.months = 1;
+	dateTime.years = 20;
+	dateTime.hours = 0;
+	dateTime.minutes = 0;
+	dateTime.seconds = 0;
+	while(not rtc.setDateTime(dateTime)) {
+		MODM_LOG_ERROR << "Unable to set date/time." << modm::endl;
+		modm::this_fiber::sleep_for(500ms);
+	}
 
+	modm::this_fiber::sleep_for(500ms);
 
-using namespace Board;
+	if(rtc.oscillatorRunning()) {
+		MODM_LOG_ERROR << "RTC oscillator is running." << modm::endl;
+	}
+	else {
+		MODM_LOG_ERROR << "RTC oscillator is NOT running." << modm::endl;
+	}
+
+	while (true)
+	{
+		auto dateTime2 = rtc.getDateTime();
+		if(dateTime2.has_value()) {
+			MODM_LOG_INFO.printf("%02u.%02u.%02u ", dateTime2->days, dateTime2->months, dateTime2->years);
+			MODM_LOG_INFO.printf("%02u:%02u.%02uh\n", dateTime2->hours, dateTime2->minutes, dateTime2->seconds);
+		}
+		else {
+			MODM_LOG_ERROR << "Unable to read from RTC." << modm::endl;
+		}
+
+		modm::this_fiber::sleep_for(2.5s);
+	}
+});
+
+modm::Fiber fiber_blink([]
+{
+	Board::LedGreen::setOutput();
+	while(true)
+	{
+		Board::LedGreen::toggle();
+		modm::this_fiber::sleep_for(0.5s);
+	}
+});
+
+modm::Mcp7941xEeprom<MyI2cMaster> eeprom{};
 
 int
 main()
@@ -111,37 +103,28 @@ main()
 	Uart0::connect<GpioOutput16::Tx>();
 	Uart0::initialize<Board::SystemClock, 115200_Bd>();
 
-	Leds::setOutput();
-
 	MyI2cMaster::connect<I2cScl::Scl, I2cSda::Sda>();
-	MyI2cMaster::initialize<SystemClock, 100_kHz>();
+	MyI2cMaster::initialize<Board::SystemClock, 100_kHz>();
 
 	MODM_LOG_INFO << "RTC MCP7941x Example on Raspberry Pico" << modm::endl;
 
-	modm::Mcp7941xEeprom<MyI2cMaster> eeprom{};
-	if (auto data = RF_CALL_BLOCKING(eeprom.getUniqueId())) {
-		MODM_LOG_INFO << "Unique ID (EUI-48/64): ";
-		MODM_LOG_INFO << modm::hex << (*data)[0] << modm::ascii << ":";
-		MODM_LOG_INFO << modm::hex << (*data)[1] << modm::ascii << ":";
-		MODM_LOG_INFO << modm::hex << (*data)[2] << modm::ascii << ":";
-		MODM_LOG_INFO << modm::hex << (*data)[3] << modm::ascii << ":";
-		MODM_LOG_INFO << modm::hex << (*data)[4] << modm::ascii << ":";
-		MODM_LOG_INFO << modm::hex << (*data)[5] << modm::ascii << ":";
-		MODM_LOG_INFO << modm::hex << (*data)[6] << modm::ascii << ":";
-		MODM_LOG_INFO << modm::hex << (*data)[7] << modm::ascii << modm::endl;
+
+	if (auto data = eeprom.getUniqueId()) {
+		MODM_LOG_INFO << "Unique ID (EUI-48/64): " << modm::hex;
+		MODM_LOG_INFO << (*data)[0] << ":";
+		MODM_LOG_INFO << (*data)[1] << ":";
+		MODM_LOG_INFO << (*data)[2] << ":";
+		MODM_LOG_INFO << (*data)[3] << ":";
+		MODM_LOG_INFO << (*data)[4] << ":";
+		MODM_LOG_INFO << (*data)[5] << ":";
+		MODM_LOG_INFO << (*data)[6] << ":";
+		MODM_LOG_INFO << (*data)[7] << modm::endl;
 	}
 	else {
 		MODM_LOG_ERROR << "Unable to read unique ID from RTC." << modm::endl;
 	}
 	modm::delay(500ms);
 
-	RtcThread rtcThread;
-
-	while (true)
-	{
-		LedGreen::toggle();
-		rtcThread.update();
-	}
-
+	modm::fiber::Scheduler::run();
 	return 0;
 }

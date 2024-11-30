@@ -12,13 +12,10 @@
 
 #include <modm/board.hpp>
 #include <modm/driver/inertial/ixm42xxx.hpp>
-#include <modm/platform.hpp>
 #include <modm/processing.hpp>
+#include <atomic>
 
-namespace
-{
-    volatile bool interrupt = false;
-}
+std::atomic_bool interrupt{};
 
 using SpiMaster = modm::platform::SpiMaster1;
 using Mosi = GpioA7;
@@ -28,61 +25,57 @@ using Cs = GpioC5;
 
 using Int1 = GpioC3;
 
-class ImuThread : public modm::pt::Protothread, public modm::ixm42xxx
+class ImuThread : public modm::Fiber<>, public modm::ixm42xxx
 {
     using Transport = modm::Ixm42xxxTransportSpi< SpiMaster, Cs >;
 
 public:
-    ImuThread() : imu(fifoData), timer(std::chrono::milliseconds(500)) {}
+    ImuThread() : Fiber([this]{ run(); }) {}
 
-    bool
+private:
+    void
     run()
     {
-        PT_BEGIN();
-
         Int1::setInput(modm::platform::Gpio::InputType::PullDown);
         Exti::connect<Int1>(Exti::Trigger::RisingEdge, [](uint8_t)
         {
             interrupt = true;
         });
 
-        /// Initialize the IMU and verify that it is connected
-        PT_CALL(imu.initialize());
-        while (not PT_CALL(imu.ping()))
+        while (not imu.ping())
         {
             MODM_LOG_ERROR << "Cannot ping IXM-42xxx" << modm::endl;
-            PT_WAIT_UNTIL(timer.execute());
+            modm::this_fiber::sleep_for(0.5s);
         }
+        /// Initialize the IMU and verify that it is connected
+        imu.initialize();
 
         MODM_LOG_INFO << "IXM-42xxx Initialized" << modm::endl;
         MODM_LOG_INFO << "Fifo Buffer Size: " << fifoData.getFifoBufferSize() << modm::endl;
 
         /// Configure FIFO
-        PT_CALL(imu.updateRegister(Register::FIFO_CONFIG, FifoMode_t(FifoMode::StopOnFull)));
-        PT_CALL(imu.updateRegister(Register::FIFO_CONFIG1, FifoConfig1::FIFO_HIRES_EN | FifoConfig1::FIFO_TEMP_EN | FifoConfig1::FIFO_GYRO_EN | FifoConfig1::FIFO_ACCEL_EN));
-        PT_CALL(imu.writeFifoWatermark(1024));
+        imu.updateRegister(Register::FIFO_CONFIG, FifoMode_t(FifoMode::StopOnFull));
+        imu.updateRegister(Register::FIFO_CONFIG1, FifoConfig1::FIFO_HIRES_EN | FifoConfig1::FIFO_TEMP_EN | FifoConfig1::FIFO_GYRO_EN | FifoConfig1::FIFO_ACCEL_EN);
+        imu.writeFifoWatermark(1024);
 
         /// Configure interrupt
-        PT_CALL(imu.updateRegister(Register::INT_CONFIG, IntConfig::INT1_MODE | IntConfig::INT1_DRIVE_CIRCUIT | IntConfig::INT1_POLARITY));
-        PT_CALL(imu.updateRegister(Register::INT_CONFIG1, IntConfig1::INT_ASYNC_RESET));
-        PT_CALL(imu.updateRegister(Register::INT_SOURCE0, IntSource0::FIFO_THS_INT1_EN | IntSource0::FIFO_FULL_INT1_EN, IntSource0::UI_DRDY_INT1_EN));
+        imu.updateRegister(Register::INT_CONFIG, IntConfig::INT1_MODE | IntConfig::INT1_DRIVE_CIRCUIT | IntConfig::INT1_POLARITY);
+        imu.updateRegister(Register::INT_CONFIG1, IntConfig1::INT_ASYNC_RESET);
+        imu.updateRegister(Register::INT_SOURCE0, IntSource0::FIFO_THS_INT1_EN | IntSource0::FIFO_FULL_INT1_EN, IntSource0::UI_DRDY_INT1_EN);
 
         /// Configure data sensors
-        PT_CALL(imu.updateRegister(Register::GYRO_CONFIG0, GyroFs_t(GyroFs::dps2000) | GyroOdr_t(GyroOdr::kHz1)));
-        PT_CALL(imu.updateRegister(Register::ACCEL_CONFIG0, AccelFs_t(AccelFs::g16) | AccelOdr_t(AccelOdr::kHz1)));
-        PT_CALL(imu.updateRegister(Register::PWR_MGMT0, GyroMode_t(GyroMode::LowNoise) | AccelMode_t(AccelMode::LowNoise)));
+        imu.updateRegister(Register::GYRO_CONFIG0, GyroFs_t(GyroFs::dps2000) | GyroOdr_t(GyroOdr::kHz1));
+        imu.updateRegister(Register::ACCEL_CONFIG0, AccelFs_t(AccelFs::g16) | AccelOdr_t(AccelOdr::kHz1));
+        imu.updateRegister(Register::PWR_MGMT0, GyroMode_t(GyroMode::LowNoise) | AccelMode_t(AccelMode::LowNoise));
 
         while (true)
         {
-            if (interrupt)
-            {
-                PT_CALL(imu.readRegister(Register::INT_STATUS, &intStatus.value));
-                interrupt = false;
-            }
+            if (interrupt.exchange(false))
+                imu.readRegister(Register::INT_STATUS, &intStatus.value);
 
             if (intStatus.any(IntStatus::FIFO_FULL_INT | IntStatus::FIFO_THS_INT))
             {
-                if (PT_CALL(imu.readFifoData()))
+                if (imu.readFifoData())
                 {
                     // Count packets in FIFO buffer and print contents of last packet
                     uint16_t count = 0;
@@ -108,20 +101,26 @@ public:
                 }
                 intStatus.reset(IntStatus::FIFO_FULL_INT | IntStatus::FIFO_THS_INT);
             }
+            modm::this_fiber::yield();
         }
-        PT_END();
-    }
 
-private:
+    }
 
     /// Due to the non-deterministic nature of system operation, driver memory allocation should always be the largest size of 2080 bytes.
     modm::ixm42xxxdata::FifoData<2080> fifoData;
     modm::ixm42xxx::IntStatus_t intStatus;
-    modm::Ixm42xxx< Transport > imu;
-
-    modm::PeriodicTimer timer;
-
+    modm::Ixm42xxx< Transport > imu{fifoData};
 } imuThread;
+
+modm::Fiber fiber_blink([]
+{
+    Board::LedD13::setOutput();
+    while(true)
+    {
+        Board::LedD13::toggle();
+        modm::this_fiber::sleep_for(0.5s);
+    }
+});
 
 int
 main()
@@ -139,10 +138,6 @@ main()
     MODM_LOG_ERROR      << "Error logging here" << modm::endl;
     MODM_LOG_INFO       << "==================================" << modm::endl;
 
-    while (true)
-    {
-        imuThread.run();
-    }
-
+    modm::fiber::Scheduler::run();
     return 0;
 }

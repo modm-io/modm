@@ -37,7 +37,7 @@ main()
 	float press_f, temp_f;
 
 	// Turn on and configure the pressure sensor
-	bool success = RF_CALL_BLOCKING(sensor.initialize());
+	bool success = sensor.initialize();
 
 	if(!success)
 	{
@@ -47,7 +47,7 @@ main()
 	while (true)
 	{
 		//Read the sensor data and print it out
-		success = RF_CALL_BLOCKING(sensor.readout());
+		success = sensor.readout();
 
 		if(success)
 		{

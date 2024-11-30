@@ -7,8 +7,6 @@
     <module>modm:driver:l3gd20</module>
     <module>modm:math:filter</module>
     <module>modm:platform:uart.spi:1</module>
-    <module>modm:processing:timer</module>
-    <module>modm:processing:protothread</module>
     <module>modm:build:scons</module>
   </modules>
 </library>

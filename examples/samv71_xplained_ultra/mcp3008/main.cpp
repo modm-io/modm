@@ -45,7 +45,7 @@ int main()
 
 	while (true) {
 		for (auto [i, ch] : channels) {
-			const auto value = RF_CALL_BLOCKING(adc.read(ch));
+			const auto value = adc.read(ch);
 			MODM_LOG_INFO << "channel " << i << ": " << value << '\n';
 		}
 

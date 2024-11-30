@@ -7,7 +7,7 @@
     <module>modm:driver:ads101x</module>
     <module>modm:platform:gpio</module>
     <module>modm:platform:i2c:4</module>
-    <module>modm:processing:protothread</module>
+    <module>modm:processing:fiber</module>
     <module>modm:processing:timer</module>
     <module>modm:build:scons</module>
   </modules>

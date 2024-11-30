@@ -17,6 +17,9 @@ using namespace std::chrono_literals;
 using I2cSda	= GpioA10;
 using I2cScl	= GpioA9;
 
+// Create a sensor object with the adress of the sensor built onto the Pololu AltIMU-10 v5
+modm::Lis3mdl<I2cMaster1> sensor(0x1E);
+
 int
 main()
 {
@@ -28,22 +31,15 @@ main()
 	I2cMaster1::connect<I2cSda::Sda, I2cScl::Scl>();
 	I2cMaster1::initialize<SystemClock, 400_kBd>();
 
-	// Create a sensor object with the adress of the sensor built onto the Pololu AltIMU-10 v5
-	modm::Lis3mdl<I2cMaster1> sensor(0x1E);
-
 	// Turn on and configure the magnetometer
-	bool success = RF_CALL_BLOCKING(sensor.configure(modm::lis3mdl::DataRate::Rate_5_Hz,
-													 modm::lis3mdl::Scale::Scale_8_gauss));
-
-
-	if(!success)
+	if(not sensor.configure(modm::lis3mdl::DataRate::Rate_5_Hz,
+							modm::lis3mdl::Scale::Scale_8_gauss))
 	{
 		MODM_LOG_INFO << "Sensor could not be configured!" << modm::endl;
 	}
 
 	// Set the sensor to continous acquistion and turn on the temperature sensing
-	success = RF_CALL_BLOCKING(sensor.setMode(modm::lis3mdl::OperationMode::Continous));
-	if(!success)
+	if(not sensor.setMode(modm::lis3mdl::OperationMode::Continous))
 	{
 		MODM_LOG_INFO << "Sensor could not be started!" << modm::endl;
 	}
@@ -53,7 +49,7 @@ main()
 	while (true)
 	{
 		//Read the sensor data and print it out
-		success = RF_CALL_BLOCKING(sensor.readMagnetometer(magVector));
+		const bool success = sensor.readMagnetometer(magVector);
 
 		if(success)
 		{

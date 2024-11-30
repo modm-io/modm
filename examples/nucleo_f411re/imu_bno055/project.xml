@@ -9,7 +9,7 @@
     <module>modm:platform:gpio</module>
     <module>modm:platform:i2c:1</module>
     <module>modm:platform:i2c.bitbang</module>
-    <module>modm:processing:protothread</module>
+    <module>modm:processing:fiber</module>
     <module>modm:build:scons</module>
   </modules>
 </library>

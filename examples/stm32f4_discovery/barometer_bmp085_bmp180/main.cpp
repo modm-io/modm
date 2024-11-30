@@ -12,9 +12,7 @@
 
 #include <inttypes.h>
 #include <modm/board.hpp>
-#include <modm/processing.hpp>
-#include <modm/io/iostream.hpp>
-#include <modm/architecture/interface/gpio.hpp>
+#include <modm/io.hpp>
 #include <modm/driver/pressure/bmp085.hpp>
 
 using Usart2 = BufferedUart<UsartHal2>;
@@ -34,92 +32,8 @@ modm::IOStream stream(device);
 
 typedef I2cMaster1 MyI2cMaster;
 
-class ThreadOne : public modm::pt::Protothread
-{
-public:
-	ThreadOne() :
-		barometer(data, 0x77)
-	{
-	}
-
-	bool
-	update()
-	{
-		PT_BEGIN()
-
-		stream << "Ping the device from ThreadOne" << modm::endl;
-
-		// ping the device until it responds
-		while(true)
-		{
-			// we wait until the task started
-			if (PT_CALL(barometer.ping()))
-				break;
-			// otherwise, try again in 100ms
-			timeout.restart(100ms);
-			PT_WAIT_UNTIL(timeout.isExpired());
-		}
-
-		stream << "Device responded" << modm::endl;
-
-		// Configure the device until it responds
-		while(true)
-		{
-			// we wait until the task started
-			if (PT_CALL(barometer.initialize()))
-				break;
-			// otherwise, try again in 100ms
-			timeout.restart(100ms);
-			PT_WAIT_UNTIL(timeout.isExpired());
-		}
-
-		stream << "Device configured" << modm::endl;
-
-		static modm::bmp085::Calibration &cal = data.getCalibration();
-
-		stream << "Calibration data is: ";
-		stream.printf(" ac1 %d\n", cal.ac1);
-		stream.printf(" ac2 %d\n", cal.ac2);
-		stream.printf(" ac3 %d\n", cal.ac3);
-		stream.printf(" ac4 %d\n", cal.ac4);
-		stream.printf(" ac5 %d\n", cal.ac5);
-		stream.printf(" ac6 %d\n", cal.ac6);
-		stream.printf(" b1 %d\n", cal.b1);
-		stream.printf(" b2 %d\n", cal.b2);
-		stream.printf(" mb %d\n", cal.mb);
-		stream.printf(" mc %d\n", cal.mc);
-		stream.printf(" md %d\n", cal.md);
-
-		while (true)
-		{
-			static modm::ShortPeriodicTimer timer(250ms);
-
-			PT_WAIT_UNTIL(timer.execute());
-
-			// Returns when new data was read from the sensor
-			PT_CALL(barometer.readout());
-
-			{
-				int16_t temp  = data.getTemperature();
-				int32_t press = data.getPressure();
-
-				stream.printf("Calibrated temperature in 0.1 degree Celsius is: %" PRId16 "\n",   temp  );
-				stream.printf("Calibrated pressure in Pa is                   : %" PRId32 "\n\n", press );
-			}
-		}
-
-		PT_END();
-	}
-
-private:
-	modm::ShortTimeout timeout;
-
-	modm::bmp085::Data data;
-	modm::Bmp085<MyI2cMaster> barometer;
-};
-
-
-ThreadOne one;
+modm::bmp085::Data data;
+modm::Bmp085<MyI2cMaster> barometer{data, 0x77};
 
 // ----------------------------------------------------------------------------
 int
@@ -135,10 +49,43 @@ main()
 
 	stream << "\n\nWelcome to BMP085 demo!\n\n";
 
+	// ping the device until it responds
+	while(not barometer.ping()) modm::delay(100ms);
+	stream << "Device responded" << modm::endl;
+
+	// Configure the device until it responds
+	while(not barometer.initialize()) modm::delay(100ms);
+	stream << "Device configured" << modm::endl;
+
+	modm::bmp085::Calibration &cal = data.getCalibration();
+
+	stream << "Calibration data is: ";
+	stream.printf(" ac1 %d\n", cal.ac1);
+	stream.printf(" ac2 %d\n", cal.ac2);
+	stream.printf(" ac3 %d\n", cal.ac3);
+	stream.printf(" ac4 %d\n", cal.ac4);
+	stream.printf(" ac5 %d\n", cal.ac5);
+	stream.printf(" ac6 %d\n", cal.ac6);
+	stream.printf(" b1 %d\n", cal.b1);
+	stream.printf(" b2 %d\n", cal.b2);
+	stream.printf(" mb %d\n", cal.mb);
+	stream.printf(" mc %d\n", cal.mc);
+	stream.printf(" md %d\n", cal.md);
+
 	while (true)
 	{
-		one.update();
-		Board::LedOrange::toggle();
+		modm::delay(250ms);
+
+		// Returns when new data was read from the sensor
+		barometer.readout();
+
+		{
+			int16_t temp  = data.getTemperature();
+			int32_t press = data.getPressure();
+
+			stream.printf("Calibrated temperature in 0.1 degree Celsius is: %" PRId16 "\n",   temp  );
+			stream.printf("Calibrated pressure in Pa is                   : %" PRId32 "\n\n", press );
+		}
 	}
 
 	return 0;

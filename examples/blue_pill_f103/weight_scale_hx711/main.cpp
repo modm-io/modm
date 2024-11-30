@@ -11,8 +11,7 @@
 
 #include <modm/board.hpp>
 #include <modm/debug/logger.hpp>
-#include <modm/processing/timer.hpp>
-#include <modm/processing/protothread.hpp>
+#include <modm/processing.hpp>
 #include <modm/driver/adc/hx711.hpp>
 
 using namespace Board;
@@ -40,54 +39,25 @@ struct hx711_config : public modm::hx711::Config
 	// static const modm::hx711::InputChannelAndGain mode = modm::hx711::InputChannelAndGain::ChA_64;
 };
 using Hx711 = modm::Hx711< hx711_config >;
+Hx711 hx711;
 
-class Hx711Thread : public modm::pt::Protothread
+modm::Fiber fiber_hx711([]
 {
-public:
-	bool
-	run()
+	while (true)
 	{
-		PT_BEGIN();
-
-		while (true)
-		{
-			result = PT_CALL(hx711.singleConversion());
-			MODM_LOG_DEBUG.printf("%" PRIi32 "\n", result);
-		}
-
-		PT_END();
+		const int32_t result = hx711.singleConversion();
+		MODM_LOG_DEBUG.printf("%" PRIi32 "\n", result);
 	}
+});
 
-protected:
-	Hx711 hx711;
-	int32_t result;
-};
-
-Hx711Thread hx711_thread;
-
-
-class BlinkThread : public modm::pt::Protothread
+modm::Fiber fiber_blink([]
 {
-public:
-	bool
-	run()
+	while (true)
 	{
-		PT_BEGIN();
-
-		while (true) {
-			PT_WAIT_UNTIL(timer.execute());
-			LedGreen::toggle();
-		}
-
-		PT_END();
+		modm::this_fiber::sleep_for(1s);
+		LedGreen::toggle();
 	}
-
-protected:
-	modm::ShortPeriodicTimer timer{1s};
-};
-
-BlinkThread blink_thread;
-
+});
 
 /*
  * Blinks the green user LED with 1 Hz while measuring.
@@ -106,18 +76,12 @@ main()
 	Usart1::initialize<Board::SystemClock, 115200_Bd>();
 
 	// Use the logging streams to print some messages.
-	MODM_LOG_DEBUG   << "HX711 demo"   << modm::endl;
+	MODM_LOG_DEBUG << "HX711 demo" << modm::endl;
 
 	hx711_config::Sck::setOutput();
 	hx711_config::Data::setInput();
 
-	LedGreen::set();
-
-	while (true)
-	{
-		blink_thread.run();
-		hx711_thread.run();
-	}
+	modm::fiber::Scheduler::run();
 
 	return 0;
 }
