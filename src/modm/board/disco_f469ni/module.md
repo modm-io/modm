@@ -30,13 +30,17 @@ Call `Board::initializeTouchscreen()` to setup the peripherals.
 
 ## Hardware Revisions
 
-The revision B-03 has a different touch sensor address from B-01 and B-02, which is
-provided as `Board::ft6::TouchAddress`:
+The revision B-03 has a different touch sensor address from B-01 and B-02.
+The correct address for the revision is provided as `Board::ft6::TouchAddress`:
 
 ```cpp
 Board::ft6::Touch::Data data;
 Board::ft6::Touch touchSensor(data, Board::ft6::TouchAddress);
 ```
 
-If you have an earlier revision, you can extend your configuration from
-`modm:disco-f469ni:b-01`.
+If you want to provide the same code for both revisions, you can change the
+address at runtime if the device does not respond to a ping:
+
+```cpp
+if (not touchSensor.ping()) touchSensor.setAddress(Board::ft6::TouchAddress2);
+```

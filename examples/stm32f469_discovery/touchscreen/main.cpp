@@ -27,6 +27,7 @@ public:
 	void
 	update()
 	{
+		if (not touch.ping()) touch.setAddress(TouchAddress2);
 
 		// Configure the touchscreen to sample with 60Hz in active and monitor mode.
 		touch.configure(Touch::InterruptMode::Trigger, 60, 60);

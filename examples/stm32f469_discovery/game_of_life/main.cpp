@@ -39,6 +39,7 @@ void read_touch()
 	static Touch touchSensor(touchData, TouchAddress);
 	static bool initialized = false;
 	if (not initialized) {
+		if (not touchSensor.ping()) touchSensor.setAddress(TouchAddress2);
 		// Configure the touchscreen to sample with 60Hz in active and monitor mode.
 		touchSensor.configure(Touch::InterruptMode::Polling, 60, 60);
 		initialized = true;

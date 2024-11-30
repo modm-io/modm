@@ -38,10 +38,14 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "modm/src/modm/board"
+    a1, a2 = [0x2a, 0x38]
+    if env[":disco-f469ni"] == "b-03":
+        a1, a2 = a2, a1
     env.substitutions = {
         "with_logger": True,
         "with_assert": env.has_module(":architecture:assert"),
-        "touch_address": 0x38 if env[":disco-f469ni"] == "b-03" else 0x2a,
+        "touch_address": a1,
+        "touch_address2": a2,
     }
     env.template("../board.cpp.in", "board.cpp")
     env.copy("board_display.cpp")
