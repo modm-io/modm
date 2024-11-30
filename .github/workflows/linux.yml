@@ -262,11 +262,11 @@ jobs:
         if: always()
         run: |
           (cd test && make compile-arduino-uno)
-          (cd test && make compile-arduino-nano_A compile-arduino-nano_C compile-arduino-nano_D compile-arduino-nano_E compile-arduino-nano_G)
+          (cd test && make compile-arduino-nano_A compile-arduino-nano_B compile-arduino-nano_C compile-arduino-nano_D compile-arduino-nano_E compile-arduino-nano_F compile-arduino-nano_G)
       - name: Compile AVR Unittests ATmega
         if: always()
         run: |
-          (cd test && make compile-mega-2560-pro_A compile-mega-2560-pro_B)
+          (cd test && make compile-mega-2560-pro_A compile-mega-2560-pro_B compile-mega-2560-pro_C)
       - name: Quick compile HAL for AVR Devices
         if: always()
         run: |

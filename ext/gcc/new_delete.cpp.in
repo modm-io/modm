@@ -88,6 +88,11 @@ void* operator new  (std::size_t size, const std::nothrow_t&) noexcept { return 
 modm_weak
 void* operator new[](std::size_t size, const std::nothrow_t&) noexcept { return malloc(size); }
 
+modm_weak
+void* operator new  (std::size_t size, std::align_val_t) { return new_assert<false>(size); }
+modm_weak
+void* operator new[](std::size_t size, std::align_val_t) { return new_assert<false>(size); }
+
 %% if with_memory_traits
 modm_weak
 void* operator new  (std::size_t size, modm::MemoryTraits traits) { return new_assert<true>(size, traits); }
@@ -126,3 +131,8 @@ modm_weak
 void operator delete  (void* ptr, const std::nothrow_t&) noexcept { operator_delete(ptr); }
 modm_weak
 void operator delete[](void* ptr, const std::nothrow_t&) noexcept { operator_delete(ptr); }
+
+modm_weak
+void operator delete  (void* ptr, std::size_t, std::align_val_t) noexcept { operator_delete(ptr); }
+modm_weak
+void operator delete[](void* ptr, std::size_t, std::align_val_t) noexcept { operator_delete(ptr); }
