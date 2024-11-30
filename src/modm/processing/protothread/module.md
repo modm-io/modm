@@ -128,9 +128,5 @@ to a higher value, however, this will apply to *all* protothreads, consuming a
 lot more memory. Instead, we recommend refactoring the protothread into a fiber
 function.
 
-All functions and macros work as expected, except for the  `Protothread::stop()`
-function, which not implementable using fibers. It is left unimplemented,
-so that you may define it with the behavior most suitable to your use case.
-
 See the `modm:processing:resumable` module for additional restrictions when
 calling resumable functions from a protothread.
