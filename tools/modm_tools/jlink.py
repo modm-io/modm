@@ -39,7 +39,6 @@ import os
 import time
 import signal
 import platform
-import telnetlib
 import subprocess
 
 from . import gdb
@@ -99,10 +98,15 @@ def itm(device, baudrate=None):
 
 
 def rtt(backend, channel=0):
+    try:
+        import telnetlib3
+    except ImportError:
+        print("Please upgrade modm: pip3 install -U modm")
+        import telnetlib as telnetlib3
     # Start JLinkGDBServer in the background
     with backend.scope():
         time.sleep(0.5)
-        with telnetlib.Telnet("localhost", 19021) as tn:
+        with telnetlib3.Telnet("localhost", 19021) as tn:
             try:
                 tn.interact()
             except KeyboardInterrupt:
