@@ -393,9 +393,18 @@ jobs:
       - name: Fix Git permission/ownership problem
         run: |
           git config --global --add safe.directory /__w/modm/modm
+      - name: Check environment
+        run: |
+          env
+          locale -a
+          python --version  || true
+          python3 --version || true
+          python3 -c "import os; print(os.cpu_count())"
       - name: Update lbuild
         run: |
           pip3 install --upgrade --upgrade-strategy=eager modm
+          which lbuild
+          lbuild --version
       - name: Install mkdocs mkdocs-material (pip)
         run: |
           pip3 install --upgrade --upgrade-strategy=eager mkdocs mkdocs-material

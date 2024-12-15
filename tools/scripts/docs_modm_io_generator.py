@@ -145,17 +145,17 @@ def main():
         print("Starting to generate documentation...")
         template_overview(output_dir, device_list, board_list, template_path)
         print(f"... for {len(device_list) + len(board_list)} devices, estimated memory footprint is {len(device_list)*70+2000} MB")
+        # We can only pass one argument to pool.map
+        devices = [f'python3 {filepath} --target-job "{modm_path}|{tempdir}|{dev}||{args.deduplicate}|{args.compress}"' for dev in device_list]
+        devices += [f'python3 {filepath} --target-job "{modm_path}|{tempdir}|{dev}|{brd}|{args.deduplicate}|{args.compress}"' for (brd, dev) in board_list]
+        devices = list(set(devices))
+        # Run the first generation first so that the other jobs can already deduplicate properly
+        results = [subprocess.call(devices[0], shell=True)]
         with ThreadPool(args.jobs) as pool:
-            # We can only pass one argument to pool.map
-            devices = [f'python3 {filepath} --target-job "{modm_path}|{tempdir}|{dev}||{args.deduplicate}|{args.compress}"' for dev in device_list]
-            devices += [f'python3 {filepath} --target-job "{modm_path}|{tempdir}|{dev}|{brd}|{args.deduplicate}|{args.compress}"' for (brd, dev) in board_list]
-            devices = list(set(devices))
-            # Run the first generation first so that the other jobs can already deduplicate properly
-            results = [subprocess.call(devices[0], shell=True)]
             results += pool.map(lambda d: subprocess.call(d, shell=True), devices[1:])
-            # remove all the hash files
-            for file in (output_dir / "develop/api").glob("*.hash"):
-                file.unlink()
+        # remove all the hash files
+        for file in (output_dir / "develop/api").glob("*.hash"):
+            file.unlink()
         if args.compress:
             print("Zipping docs ...")
             # Zipping is *much* faster via command line than via python!
@@ -180,7 +180,7 @@ def create_target(argument):
     tempdir = Path(tempdir)
     output_dir = board if board else device
     try:
-        print(f"Generating documentation for {output_dir}...")
+        print(f"Generating documentation for {output_dir}...", flush=True)
 
         options = [f"modm:target={device}"]
         if device.startswith("at"):
@@ -202,19 +202,19 @@ def create_target(argument):
 
         builder.build(output_dir, modules)
 
-        print(f"Executing: (cd {output_dir}/modm/docs/ && doxypress doxypress.json)")
+        print(f"Executing: (cd {output_dir}/modm/docs/ && doxypress doxypress.json)", flush=True)
         retval = subprocess.call(f"(cd {output_dir}/modm/docs/ && doxypress doxypress.json > /dev/null 2>&1)", shell=True)
         # retval = subprocess.call(f"(cd {output_dir}/modm/docs/ && doxygen doxyfile.cfg > /dev/null 2>&1)", shell=True)
         if retval != 0:
-            print(f"Error {retval} generating documentation for device {output_dir}.")
+            print(f"Error {retval} generating documentation for device {output_dir}.", flush=True)
             return False
-        print(f"Finished generating documentation for device {output_dir}.")
+        print(f"Finished generating documentation for device {output_dir}.", flush=True)
 
         srcdir = (tempdir / output_dir / "modm/docs/html")
         destdir = tempdir / "output/develop/api" / output_dir
 
         if deduplicate == "True":
-            print(f"Deduplicating files for {device}...")
+            print(f"Deduplicating files for {device}...", flush=True)
             # Find and build the hash symlink database
             hashdb = {}
             for hashes in tempdir.glob("output/develop/api/*.hash"):
@@ -266,7 +266,7 @@ def create_target(argument):
         srcdir.rename(destdir)
         return True
     except Exception as e:
-        print(f"Error generating documentation for device {output_dir}: {e}")
+        print(f"Error generating documentation for device {output_dir}: {e}", flush=True)
         return False
 
 
