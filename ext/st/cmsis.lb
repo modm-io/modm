@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2016, Fabian Greif
-# Copyright (c) 2017, 2024, Niklas Hauser
+# Copyright (c) 2017, 2024, 2025, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -14,6 +14,8 @@
 import re
 from pathlib import Path
 from collections import defaultdict
+import subprocess
+
 
 def getDefineForDevice(device_id, familyDefines):
     """
@@ -61,45 +63,67 @@ def getDefineForDevice(device_id, familyDefines):
 
     return None
 
+
+class RegisterMap:
+    def __init__(self, defines, logger):
+        self._defs = defines
+        self._log = logger
+        self.result = None
+
+    def _result(self, query, value, ll):
+        self.result = value
+        self._log(f"{query} -{ll}-> {self.result}")
+        return self.result
+
+    def findall(self, query, default=None):
+        if matches := re.findall(f"#define (?:{query}) ", self._defs):
+            return self._result(query, matches, "fn")
+        return self._result(query, default or [], "fd")
+
+    def search(self, query, default=None):
+        if (match := re.search(f"#define (?:{query}) ", self._defs)) is not None:
+            if not (groups := match.groups()):
+                return self._result(query, match.group(0)[8:-1], "s0")
+            if len(groups) == 1:
+                return self._result(query, groups[0], "s1")
+            return self._result(query, groups, "sn")
+        return self._result(query, default, "sd")
+
+    def _ops(self, re_pers, re_regs, re_bits, bit_fmt):
+        reg_bits = defaultdict(list)
+        matches = re.findall(f"#define (({re_pers})_({re_regs})_(?:{re_bits})) ", self._defs)
+        for whole, per, reg in matches:
+            reg_bits[f"{per}->{reg}"].append(whole)
+        statements = [f"{reg}{bit_fmt(' | '.join(bits))};" for reg, bits in reg_bits.items()]
+        return self._result((re_pers, re_regs, re_bits), "\n".join(statements), "r")
+
+    def set(self, pers, regs, bits):
+        return self._ops(pers, regs, bits, lambda bits: f" |= {bits}")
+
+    def clear(self, pers, regs, bits):
+        return self._ops(pers, regs, bits, lambda bits: f" &= ~({bits})")
+
+
 bprops = {}
-def common_rcc_map(env):
+def common_register_map(env):
     """
-    Finds all CMSIS bit fields related to enabling and resetting peripherals
-    in the RCC of the format `RCC_(REGISTER)_(PERIPHERAL)_(TYPE)` where:
+    Finds all register and bit names in the CMSIS header file.
 
-      - REGISTER: a variation of `(BUS)(ID?)(ENR|RSTR)`, e.g. `AHB1ENR`
-      - PERIPHERAL: typical peripheral name, e.g. `GPIOA`
-      - TYPE: either `EN` or `RST`.
-
-    :returns: a 2D-dictionary: `map[PERIPHERAL][TYPE] = REGISTER`
+    :returns: a RegisterMap object that allows regex-ing for register names.
     """
-    headers = env.query("headers")
-    core_header = repopath("ext/arm/cmsis/CMSIS/Core/Include", headers["core_header"])
+    cmsis = env.query(":cmsis:device:headers")
+    include_paths = [repopath("ext/arm/cmsis/CMSIS/Core/Include"), localpath(bprops["folder"])]
+    headers = [Path(localpath(bprops["folder"], cmsis["device_header"]))]
+    headers += env.query(":cmsis:ll:__headers", [])
 
-    content = ""
-    for header_path in [core_header, localpath(bprops["folder"], headers["device_header"])]:
-        content += Path(header_path).read_text(encoding="utf-8", errors="replace")
+    cmd = "arm-none-eabi-gcc"
+    cmd += " -dM -E -mcpu=" + cmsis["core_header"][:-2].replace("core_c", "cortex-")
+    cmd += " -D " + cmsis["define"]
+    for p in include_paths: cmd += f" -I {p}"
+    for h in headers: cmd += f" {h}"
+    output = subprocess.run(cmd, shell=True, capture_output=True)
 
-    # find mpu and fpu features
-    features = re.findall(r"#define +__([MF]PU)_PRESENT +([01])", content)
-    core_features = {f[0]:bool(int(f[1])) for f in features}
-    # find all peripherals
-    mperipherals = re.findall(r"#define +(.*?) +\(\((.*?_Type(?:Def)?)", content)
-    # We only care about the absolute peripheral addresses
-    peripherals = [(p[0],p[1]) for p in mperipherals]
-    # filter out MPU and/or FPU if required
-    peripherals = filter(lambda p: p[0] not in core_features or core_features[p[0]], peripherals)
-    peripherals = sorted(peripherals, key=lambda p: p[0])
-    # print("\n".join([s+" -> "+hex(a) for (s,k,a) in peripherals]))
-
-    # Find all RCC enable and reset definitions
-    match = re.findall(r"RCC_([A-Z0-9]*?)_([A-Z0-9]+?)(EN|RST) ", content)
-    rcc_map = defaultdict(dict)
-    for (reg, per, typ) in match:
-        rcc_map[per][typ] = reg
-
-    bprops["peripherals"] = peripherals
-    return rcc_map
+    return RegisterMap(output.stdout.decode("utf-8"), env.log.debug)
 
 
 def common_header_file(env):
@@ -127,7 +151,7 @@ def common_header_file(env):
     define = None
 
     content = Path(localpath(folder, family_header)).read_text(encoding="utf-8", errors="replace")
-    match = re.findall(r"if defined\((?P<define>STM32[CFGHLU][\w\d]+)\)", content)
+    match = re.findall(r"if defined\((STM32[A-Z][\w\d]+)\)", content)
     define = getDefineForDevice(device.identifier, match)
     if define is None or match is None:
         raise ValidateException("No device define found for '{}'!".format(device.partname))
@@ -198,17 +222,17 @@ def prepare(module, options):
         return False
 
     module.add_query(
-        EnvironmentQuery(name="rcc-map", factory=common_rcc_map))
+        EnvironmentQuery(name="headers", factory=common_header_file))
     module.add_query(
         EnvironmentQuery(name="peripherals", factory=common_peripherals))
     module.add_query(
-        EnvironmentQuery(name="headers", factory=common_header_file))
+        EnvironmentQuery(name="registers", factory=common_register_map))
 
     module.depends(":cmsis:core")
     return True
 
 def validate(env):
-    env.query("rcc-map")
+    env.query("headers")
     env.query("peripherals")
 
 def build(env):

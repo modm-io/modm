@@ -41,8 +41,15 @@ def prepare(module, options):
         return False
 
     folder = f"stm32{target.family}xx"
+    headers = []
     for header in Path(localpath(f"cube-hal/{folder}/Inc")).glob("*_ll_*.h"):
-        module.add_submodule(Header(header))
+        module.add_submodule(header := Header(header))
+        headers.append(header)
+
+    module.add_query(
+        EnvironmentQuery(name="__headers", factory=lambda env:
+                         [header.header for header in headers
+                          if env.has_module(f":cmsis:ll:{header.name}")]))
 
     module.depends(":cmsis:device")
     return True
