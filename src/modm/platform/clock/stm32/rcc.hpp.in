@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2012, 2016, Sascha Schade
  * Copyright (c) 2012, 2017, Fabian Greif
- * Copyright (c) 2012, 2014-2017, Niklas Hauser
+ * Copyright (c) 2012, 2014-2017, 2025, Niklas Hauser
  * Copyright (c) 2013-2014, Kevin Läufer
  * Copyright (c) 2018, 2021-2022, Christopher Durand
  *
@@ -21,6 +21,7 @@
 #include <modm/platform/core/peripherals.hpp>
 #include <modm/platform/gpio/connector.hpp>
 #include <modm/architecture/interface/delay.hpp>
+#include <st/ll/rcc.h>
 
 namespace modm::platform
 {
@@ -33,503 +34,171 @@ namespace modm::platform
  * sources & outputs, set PLL parameters and AHB & APB prescalers.
  * Don't forget to set the flash latencies.
  *
- * @author		Niklas Hauser
  * @ingroup		modm_platform_rcc
  */
 class Rcc
 {
 public:
-	static constexpr uint32_t LsiFrequency = {{ lsi_frequency | modm.digsep }};
-	static constexpr uint32_t HsiFrequency = {{ hsi_frequency | modm.digsep }};
-	static constexpr uint32_t BootFrequency = {{ boot_frequency | modm.digsep }};
-
-%% if target.family == "c0"
-	enum class
-	HsiSysDivider : uint32_t
-	{
-		Div1   = 0,
-		Div2   = RCC_CR_HSIDIV_0,
-		Div4   = RCC_CR_HSIDIV_1,
-		Div8   = RCC_CR_HSIDIV_1 | RCC_CR_HSIDIV_0,
-		Div16  = RCC_CR_HSIDIV_2,
-		Div64  = RCC_CR_HSIDIV_2 | RCC_CR_HSIDIV_1,
-		Div128 = RCC_CR_HSIDIV_2 | RCC_CR_HSIDIV_1 | RCC_CR_HSIDIV_0,
-	};
-
-%% else
-	enum class
-	PllSource : uint32_t
-	{
-%% if target.family == "h7"
-		/// High speed internal clock (4-64 MHz)
-		Hsi = RCC_PLLCKSELR_PLLSRC_HSI,
-		InternalClock = Hsi,
-		/// Low speed internal clock (4MHz)
-		Cse = RCC_PLLCKSELR_PLLSRC_CSI,
-		/// High speed external clock
-		Hse = RCC_PLLCKSELR_PLLSRC_HSE,
-%% elif target.family in ["f2", "f4", "f7", "l4", "g0", "g4"]
-		/// High speed internal clock (16 MHz)
-		Hsi = RCC_PLLCFGR_PLLSRC_HSI,
-		InternalClock = Hsi,
-		/// High speed external clock
-		Hse = RCC_PLLCFGR_PLLSRC_HSE,
-%% elif target.family in ["f0", "f3"]
-		/// High speed internal clock (8 MHz)
-		// On STM32F0 and STM32F3 some devices have a fixed /2 pre-divider, some have a configurable
-		// pre-divider and some have both, selectable via pll source mux
-	%% if (target.family == "f0" and (target.name in ["42", "48", "70", "71", "72", "78", "91", "98"] or (target.name in ["30"] and target.size in ["c"]))) or (target.family == "f3" and target.name in ["02", "03", "98"] and target.size in ["d", "e"])
-		Hsi = RCC_CFGR_PLLSRC_HSI_PREDIV,
-		InternalClock = Hsi,
-	%% endif
-	%% if (target.family == "f0") or (target.family == "f3" and target.name in ["18", "28", "58", "73", "78"]) or (target.family == "f3" and target.size in ["8", "c"])
-		HsiDiv2 = RCC_CFGR_PLLSRC_HSI_DIV2,
-	%% endif
-		/// High speed external clock
-		Hse = RCC_CFGR_PLLSRC_HSE_PREDIV,
-%% elif target.family in ["f1", "l1"]
-		/// High speed internal clock (8 MHz)
-		Hsi = 0,
-		InternalClock = Hsi,
-		/// High speed external clock
-		Hse = RCC_CFGR_PLLSRC,
-%% elif target.family == "l0"
-		/// High speed internal clock (16 MHz)
-		Hsi = 0,
-		Hsi16 = Hsi,
-		InternalClock = Hsi16,
-		/// High speed external clock
-		Hse = RCC_CFGR_PLLSRC,
-%% elif target.family == "l5"
-		/// High speed internal clock (16 MHz)
-		Hsi = RCC_PLLCFGR_PLLSRC_1,
-		Hsi16 = Hsi,
-		InternalClock = Hsi16,
-		/// High speed external clock
-		Hse = RCC_PLLCFGR_PLLSRC_1 | RCC_PLLCFGR_PLLSRC_0,
-		/// Multi speed internal clock
-		Msi = RCC_PLLCFGR_PLLSRC_0,
-		MultiSpeedInternalClock = Msi,
-%% elif target.family in ["u5"]
-		None = 0b00,
-		MsiS = 0b01,
-		Hsi16 = 0b10,
-		Hse = 0b11,
-%% endif
-%% if hsi48 and target.family in ["f0"]
-		/// High speed internal clock (48 MHz)
-		Hsi48 = RCC_CFGR_PLLSRC_HSI48_PREDIV,
-		InternalClockMHz48 = Hsi48,
-%% endif
-%% if target.family in ["l4"]
-		Msi = RCC_PLLCFGR_PLLSRC_MSI,
-		MultiSpeedInternalClock = Msi,
-%% endif
-		ExternalClock = Hse,
-		ExternalCrystal = Hse,
-	};
-%% endif
-
-%% if target.family in ["l0", "l1"]
-	enum class
-	PllMultiplier : uint32_t
-	{
-		Mul3 = RCC_CFGR_PLLMUL3,
-		Mul4 = RCC_CFGR_PLLMUL4,
-		Mul6 = RCC_CFGR_PLLMUL6,
-		Mul8 = RCC_CFGR_PLLMUL8,
-		Mul12 = RCC_CFGR_PLLMUL12,
-		Mul16 = RCC_CFGR_PLLMUL16,
-		Mul24 = RCC_CFGR_PLLMUL24,
-		Mul32 = RCC_CFGR_PLLMUL32,
-		Mul48 = RCC_CFGR_PLLMUL48,
-	};
-%% endif
+	static constexpr uint32_t LsiFrequency = LSI_VALUE;
+	static constexpr uint32_t HsiFrequency = HSI_VALUE;
+	static constexpr uint32_t BootFrequency = {{ boot_frequency }};
 
 	enum class
 	SystemClockSource : uint32_t
 	{
-%% if target.family == "c0"
-		Hsi = RCC_CFGR_SWS_HSI,
-		Hse = RCC_CFGR_SWS_HSE,
-		Lsi = RCC_CFGR_SWS_LSI,
-		Lse = RCC_CFGR_SWS_LSE,
-%% elif target.family == "l5"
-		Msi = 0,
-		Hsi = RCC_CFGR_SW_0,
-		Hsi16 = Hsi,
-		Hse = RCC_CFGR_SW_1,
-		Pll = RCC_CFGR_SW_1 | RCC_CFGR_SW_0,
-%% elif target.family in ["u5"]
-		Msi = 0b00,
-		Hsi16 = 0b01,
-		Hse = 0b10,
-		Pll = 0b11,
-%% else
-		Hsi = RCC_CFGR_SW_HSI,
-%% if target.family == "l0"
-		Hsi16 = Hsi,
-%% endif
-		Hse = RCC_CFGR_SW_HSE,
-%% if hsi48 and target.family in ["f0"]
-		Hsi48 = RCC_CFGR_SW_HSI48,
-		InternalClockMHz48 = Hsi48,
-%% endif
-%% if target.family in ["l0", "l4"]
-		Msi = RCC_CFGR_SW_MSI,
-		MultiSpeedInternalClock = Msi,
-%% endif
-
-		InternalClock = Hsi,
-		ExternalClock = Hse,
-		ExternalCrystal = Hse,
-%% if target.family == "h7"
-		Pll1P = RCC_CFGR_SW_PLL1,
-%% else
-		Pll = RCC_CFGR_SW_PLL,
-%% endif
-%% endif
+%% for val, name in sys_source | sort
+		{{name | capitalize }} = {{val}},
+%% endfor
 	};
+	static bool
+	enableSystemClock(SystemClockSource src, uint32_t waitCycles = 2048)
+	{
+		LL_RCC_SetSysClkSource(uint32_t(src));
+		const uint32_t sws = uint32_t(src) << {{cfgr_sws_pos}};
+		while (LL_RCC_GetSysClkSource() != sws and --waitCycles) ;
+		return waitCycles;
+	}
 
 	enum class
 	RealTimeClockSource : uint32_t
 	{
-		Lsi = RCC_{{bdcr}}_RTCSEL_1,
-		Lse = RCC_{{bdcr}}_RTCSEL_0,
-		Hse = RCC_{{bdcr}}_RTCSEL_0 | RCC_{{bdcr}}_RTCSEL_1,
-
-		ExternalClock = Hse,
-		ExternalCrystal = Hse,
-		LowSpeedInternalClock = Lsi,
-		LowSpeedExternalClock = Lse,
-		LowSpeedExternalCrystal = Lse
+%% for val, name in rtc_source | sort
+		{{name | capitalize}} = {{val}},
+%% endfor
 	};
+	static inline void
+	enableRealTimeClock(RealTimeClockSource src)
+	{
+		LL_RCC_SetRTCClockSource(uint32_t(src));
+	}
 
 	enum class
 	WatchdogClockSource : uint32_t
 	{
-		LowSpeedInternalClock = 0
+		Lsi = 0
 	};
+	static inline void
+	enableWatchdogClock(WatchdogClockSource src = WatchdogClockSource::Lsi)
+	{
+		(void) src;
+	}
 
 	enum class
 	AhbPrescaler : uint32_t
 	{
-%% if target.family in ["c0", "l5", "u5"]
-		Div1   = 0b0000 << RCC_{{cfgr_prescaler}}_HPRE_Pos,
-		Div2   = 0b1000 << RCC_{{cfgr_prescaler}}_HPRE_Pos,
-		Div4   = 0b1001 << RCC_{{cfgr_prescaler}}_HPRE_Pos,
-		Div8   = 0b1010 << RCC_{{cfgr_prescaler}}_HPRE_Pos,
-		Div16  = 0b1011 << RCC_{{cfgr_prescaler}}_HPRE_Pos,
-		Div64  = 0b1100 << RCC_{{cfgr_prescaler}}_HPRE_Pos,
-		Div128 = 0b1101 << RCC_{{cfgr_prescaler}}_HPRE_Pos,
-		Div256 = 0b1110 << RCC_{{cfgr_prescaler}}_HPRE_Pos,
-		Div512 = 0b1111 << RCC_{{cfgr_prescaler}}_HPRE_Pos
+%% for val, div in ahb_prescaler | sort
+		Div{{div}} = {{val}},
+%% endfor
+	};
+	static inline void
+	setAhbPrescaler(AhbPrescaler prescaler)
+	{
+		LL_RCC_SetAHBPrescaler(uint32_t(prescaler));
+	}
+
+%% for bus, vals in apb_prescaler | items | sort
+	enum class
+	Apb{{bus}}Prescaler : uint32_t
+	{
+%% for val, div in vals | sort
+		Div{{div}} = {{val}},
+%% endfor
+	};
+	static inline void
+	setApb{{bus}}Prescaler(Apb{{bus}}Prescaler prescaler)
+	{
+		LL_RCC_SetAPB{{bus}}Prescaler(uint32_t(prescaler));
+	}
+%#
+%% endfor
+
+%% for mco, (sources, divs) in mco_source | items | sort
+	enum class
+	ClockOutput{{mco}}Source : uint32_t
+	{
+%% for val, name in sources | sort
+		{{name | capitalize}} = {{val}},
+%% endfor
+	};
+	enum class
+	ClockOutput{{mco}}Prescaler : uint32_t
+	{
+%% for val, div in divs | sort
+		Div{{div}} = {{val}},
+%% endfor
+	};
+	static inline void
+	enableClockOutput{{mco}}(ClockOutput{{mco}}Source src, ClockOutput{{mco}}Prescaler div = ClockOutput{{mco}}Prescaler::Div1)
+	{
+		LL_RCC_ConfigMCO{{mco if target.family == "c0" else ""}}(uint32_t(src), uint32_t(div));
+	}
+%#
+%% endfor
+
+%% if hsi_div
+	enum class
+	HsiSysPrescaler : uint32_t
+	{
+%% for val, div in hsi_div | sort
+		Div{{div}} = {{val}},
+%% endfor
+	};
+	static inline void
+	setHsiSysPrescaler(HsiSysPrescaler div)
+	{
+%% if hsi_div4
+		if (div == HsiSysPrescaler::Div1) LL_RCC_HSI_DisableDivider();
+		else LL_RCC_HSI_EnableDivider();
 %% else
-		Div1   = RCC_{{cfgr_prescaler}}_HPRE_DIV1,
-		Div2   = RCC_{{cfgr_prescaler}}_HPRE_DIV2,
-		Div4   = RCC_{{cfgr_prescaler}}_HPRE_DIV4,
-		Div8   = RCC_{{cfgr_prescaler}}_HPRE_DIV8,
-		Div16  = RCC_{{cfgr_prescaler}}_HPRE_DIV16,
-		Div64  = RCC_{{cfgr_prescaler}}_HPRE_DIV64,
-		Div128 = RCC_{{cfgr_prescaler}}_HPRE_DIV128,
-		Div256 = RCC_{{cfgr_prescaler}}_HPRE_DIV256,
-		Div512 = RCC_{{cfgr_prescaler}}_HPRE_DIV512
+		RCC->CR = (RCC->CR & ~RCC_CR_HSIDIV_Msk) | uint32_t(div);
 %% endif
-	};
-
-%% if target.family in ["c0"]
-	enum class
-	ApbPrescaler : uint32_t
-	{
-		Div1   = RCC_CFGR_PPRE_0,
-		Div2   = RCC_CFGR_PPRE_2,
-		Div4   = RCC_CFGR_PPRE_2 | RCC_CFGR_PPRE_0,
-		Div8   = RCC_CFGR_PPRE_2 | RCC_CFGR_PPRE_1,
-		Div16  = RCC_CFGR_PPRE_2 | RCC_CFGR_PPRE_1 | RCC_CFGR_PPRE_0
-	};
-%% elif target.family in ["f0", "g0"]
-	enum class
-	ApbPrescaler : uint32_t
-	{
-		Div1   = RCC_CFGR_PPRE_DIV1,
-		Div2   = RCC_CFGR_PPRE_DIV2,
-		Div4   = RCC_CFGR_PPRE_DIV4,
-		Div8   = RCC_CFGR_PPRE_DIV8,
-		Div16  = RCC_CFGR_PPRE_DIV16
-	};
-%% else
-	enum class
-	Apb1Prescaler : uint32_t
-	{
-%% if target.family in ["l5", "u5"]
-		Div1   = 0b000 << RCC_{{cfgr_prescaler}}_{{d2}}PPRE1_Pos,
-		Div2   = 0b100 << RCC_{{cfgr_prescaler}}_{{d2}}PPRE1_Pos,
-		Div4   = 0b101 << RCC_{{cfgr_prescaler}}_{{d2}}PPRE1_Pos,
-		Div8   = 0b110 << RCC_{{cfgr_prescaler}}_{{d2}}PPRE1_Pos,
-		Div16  = 0b111 << RCC_{{cfgr_prescaler}}_{{d2}}PPRE1_Pos
-%% else
-		Div1   = RCC_{{cfgr2}}_{{d2}}PPRE1_DIV1,
-		Div2   = RCC_{{cfgr2}}_{{d2}}PPRE1_DIV2,
-		Div4   = RCC_{{cfgr2}}_{{d2}}PPRE1_DIV4,
-		Div8   = RCC_{{cfgr2}}_{{d2}}PPRE1_DIV8,
-		Div16  = RCC_{{cfgr2}}_{{d2}}PPRE1_DIV16
-%% endif
-	};
-
-	enum class
-	Apb2Prescaler : uint32_t
-	{
-%% if target.family in ["l5", "u5"]
-		Div1   = 0b000 << RCC_{{cfgr_prescaler}}_{{d2}}PPRE2_Pos,
-		Div2   = 0b100 << RCC_{{cfgr_prescaler}}_{{d2}}PPRE2_Pos,
-		Div4   = 0b101 << RCC_{{cfgr_prescaler}}_{{d2}}PPRE2_Pos,
-		Div8   = 0b110 << RCC_{{cfgr_prescaler}}_{{d2}}PPRE2_Pos,
-		Div16  = 0b111 << RCC_{{cfgr_prescaler}}_{{d2}}PPRE2_Pos
-%% else
-		Div1   = RCC_{{cfgr2}}_{{d2}}PPRE2_DIV1,
-		Div2   = RCC_{{cfgr2}}_{{d2}}PPRE2_DIV2,
-		Div4   = RCC_{{cfgr2}}_{{d2}}PPRE2_DIV4,
-		Div8   = RCC_{{cfgr2}}_{{d2}}PPRE2_DIV8,
-		Div16  = RCC_{{cfgr2}}_{{d2}}PPRE2_DIV16
-%% endif
-	};
+	}
+%#
 %% endif
 
-%% if target.family == "h7"
-	enum class
-	Apb3Prescaler : uint32_t
-	{
-		Div1   = RCC_{{cfgr_prescaler}}_{{d1}}PPRE_DIV1,
-		Div2   = RCC_{{cfgr_prescaler}}_{{d1}}PPRE_DIV2,
-		Div4   = RCC_{{cfgr_prescaler}}_{{d1}}PPRE_DIV4,
-		Div8   = RCC_{{cfgr_prescaler}}_{{d1}}PPRE_DIV8,
-		Div16  = RCC_{{cfgr_prescaler}}_{{d1}}PPRE_DIV16
-	};
-
-	enum class
-	Apb4Prescaler : uint32_t
-	{
-		Div1   = RCC_{{cfgr3}}_{{d3}}PPRE_DIV1,
-		Div2   = RCC_{{cfgr3}}_{{d3}}PPRE_DIV2,
-		Div4   = RCC_{{cfgr3}}_{{d3}}PPRE_DIV4,
-		Div8   = RCC_{{cfgr3}}_{{d3}}PPRE_DIV8,
-		Div16  = RCC_{{cfgr3}}_{{d3}}PPRE_DIV16
-	};
-
-	enum class
-	PllInputRange : uint8_t
-	{
-		MHz1_2 = 0,
-		MHz2_4 = 1,
-		MHz4_8 = 2,
-		MHz8_16 = 3,
-	};
-%% elif target.family in ["u5"]
-	enum class
-	Apb3Prescaler : uint32_t
-	{
-		Div1   = 0b000 << RCC_CFGR3_PPRE3_Pos,
-		Div2   = 0b100 << RCC_CFGR3_PPRE3_Pos,
-		Div4   = 0b101 << RCC_CFGR3_PPRE3_Pos,
-		Div8   = 0b110 << RCC_CFGR3_PPRE3_Pos,
-		Div16  = 0b111 << RCC_CFGR3_PPRE3_Pos,
-	};
-
-	enum class
-	PllInputRange : uint8_t
-	{
-		MHz4_8  = 0b00,
-		MHz8_16 = 0b11,
-	};
-%% endif
-
-%% if usbprescaler
-	enum class
-	UsbPrescaler : uint32_t
-	{
-		Div1 = RCC_CFGR_USBPRE,	///< do not divide
-		Div1_5 = 0,				///< divide by 1.5
-	};
-%% endif
-
-%% if pllsai_p_usb
-	enum class Clock48Source
-	{
-		PllQ = 0,
-	%% if target.family == "f4" and target.name in ["69", "79"]
-		PllSaiP = RCC_DCKCFGR_CK48MSEL
-	%% else
-		PllSaiP = RCC_DCKCFGR2_CK48MSEL
-	%% endif
-	};
-%% elif target.family in ["g4", "l4", "l5"]
-	enum class Clock48Source
-	{
-%% set sel48="MSEL" if target.family in ["l5"] else "SEL"
-%% if target.family == "l4" and target.name[0] in ["7", "8"]
-		None = 0,
-%% else
-		Hsi48 = 0,
-%% endif
-		PllSai1Q = RCC_{{ccipr1}}_CLK48{{sel48}}_0,
-		PllQ = RCC_{{ccipr1}}_CLK48{{sel48}}_1,
-		Msi = RCC_{{ccipr1}}_CLK48{{sel48}}_1 | RCC_{{ccipr1}}_CLK48{{sel48}}_0
-	};
-%% elif target.family in ["u5"]
-	enum class Clock48Source
-	{
-		Hsi48 = 0b00 << RCC_CCIPR1_ICLKSEL_Pos,
-		Pll2Q = 0b01 << RCC_CCIPR1_ICLKSEL_Pos,
-		Pll1Q = 0b10 << RCC_CCIPR1_ICLKSEL_Pos,
-		Msik  = 0b11 << RCC_CCIPR1_ICLKSEL_Pos,
-	};
-%% elif hsi48 and target.family in ["l0"]
-	enum class Clock48Source
-	{
-		PllQ = 0,
-		Hsi48 = RCC_CCIPR_HSI48SEL,
-	};
-%% endif
-
-%% if target.family in ["f2", "f4", "f7"]
-	enum class
-	ClockOutput1Source : uint32_t
-	{
-		InternalClock = 0,
-		ExternalClock = RCC_CFGR_MCO1_1,
-		ExternalCrystal = RCC_CFGR_MCO1_1,
-		Pll = RCC_CFGR_MCO1_1 | RCC_CFGR_MCO1_0,
-	};
-
-	%% if not partname.startswith("stm32f412c")
-	enum class
-	ClockOutput2Source : uint32_t
-	{
-		SystemClock = 0,
-		ExternalClock = RCC_CFGR_MCO2_1,
-		ExternalCrystal = RCC_CFGR_MCO2_1,
-		Pll = RCC_CFGR_MCO2_1 | RCC_CFGR_MCO2_0,
-	};
-	%% endif
-%% elif target.family in ["h7"]
-	enum class
-	ClockOutput1Source : uint32_t
-	{
-		Hsi = 0,
-		Lse = RCC_CFGR_MCO1_0,
-		Hse = RCC_CFGR_MCO1_1,
-		Pll1Q = RCC_CFGR_MCO1_1 | RCC_CFGR_MCO1_0,
-		Hsi48 = RCC_CFGR_MCO1_2
-	};
-
-	enum class
-	ClockOutput2Source : uint32_t
-	{
-		SystemClock = 0,
-		Pll2P = RCC_CFGR_MCO2_0,
-		Hse = RCC_CFGR_MCO2_1,
-		Pll = RCC_CFGR_MCO2_1 | RCC_CFGR_MCO2_0,
-		Csi = RCC_CFGR_MCO2_2,
-		Lsi = RCC_CFGR_MCO2_2 | RCC_CFGR_MCO2_0
-	};
-%% elif target.family in ["l0", "l1", "l4", "l5", "g0", "g4", "u5", "c0"]
-%% set cfgr_mco="CFGR1" if target.family in ["u5"] else "CFGR"
-	enum class
-	ClockOutputSource : uint32_t
-	{
-		Disable = 0b0000,
-		SystemClock = (0b0001 << RCC_{{cfgr_mco}}_MCOSEL_Pos), // SYSCLK
-	%% if target.family in ["l4", "l5"]
-		MultiSpeedInternalClock = (0b0010 << RCC_{{cfgr_mco}}_MCOSEL_Pos), // MSI
-	%% elif target.family in ["u5"]
-		MultiSpeedInternalClockS = (0b0010 << RCC_{{cfgr_mco}}_MCOSEL_Pos), // MSIS
-	%% endif
-	%% if target.family in ["l0", "l1"]
-		InternalClock = (0b0010 << RCC_{{cfgr_mco}}_MCOSEL_Pos), // HSI16
-		MultiSpeedInternalClock = (0b0011 << RCC_{{cfgr_mco}}_MCOSEL_Pos), // MSI
-	%% else
-		InternalClock = (0b0011 << RCC_{{cfgr_mco}}_MCOSEL_Pos), // HSI16
-	%% endif
-		ExternalClock = (0b0100 << RCC_{{cfgr_mco}}_MCOSEL_Pos), // HSE
-		ExternalCrystal = ExternalClock, // HSE
-		Pll = (0b0101 << RCC_{{cfgr_mco}}_MCOSEL_Pos), // Main PLL
-		LowSpeedInternalClock = (0b0110 << RCC_{{cfgr_mco}}_MCOSEL_Pos), // LSI
-		LowSpeedExternalClock = (0b0111 << RCC_{{cfgr_mco}}_MCOSEL_Pos), // LSE
-	%% if target.family in ["l5"]
-		Hsi48 = (0b1000 << RCC_{{cfgr_mco}}_MCOSEL_Pos), // HSI48
-	%% elif target.family in ["u5"]
-		Hsi48 = (0b1000 << RCC_{{cfgr_mco}}_MCOSEL_Pos), // HSI48
-		MultiSpeedInternalClockK = (0b1001 << RCC_{{cfgr_mco}}_MCOSEL_Pos), // MSIK
-	%% endif
-	};
-%% elif target.family in ["f0", "f1", "f3"]
-	enum class
-	ClockOutputSource : uint32_t
-	{
-		SystemClock   = RCC_CFGR_MCO_SYSCLK,
-		InternalClock = RCC_CFGR_MCO_HSI,
-		ExternalClock = RCC_CFGR_MCO_HSE,
-		ExternalCrystal = RCC_CFGR_MCO_HSE,
-	%% if target.family == "f0"
-		InternalClockMHz14 = RCC_CFGR_MCO_HSI14,
-	%% endif
-	%% if hsi48
-		InternalClockMHz48 = RCC_CFGR_MCO_HSI48,
-	%% endif
-	%% if target.family == "f1"
-		Pll = RCC_CFGR_MCO_PLLCLK_DIV2,	///< divided by 2
-	%% else
-		Pll = RCC_CFGR_MCO_PLL,
-	%% endif
-	};
-%% endif
-
-%% if target.family in ["g4", "l5", "u5", "h7"]
+%% if can_source
 	enum class
 	CanClockSource : uint32_t
 	{
-		Hse = 0,
-%% if target.family == "g4"
-		PllQ = RCC_{{ccipr1}}_FDCANSEL_0,
-		Pclk = RCC_{{ccipr1}}_FDCANSEL_1,
-%% elif target.family == "l5"
-		PllQ = RCC_{{ccipr1}}_FDCANSEL_0,
-		PllSai1P = RCC_{{ccipr1}}_FDCANSEL_1,
-%% elif target.family in ["u5"]
-		Pll1Q = 0b01 << RCC_{{ccipr1}}_FDCANSEL_Pos,
-		Pll2P = 0b10 << RCC_{{ccipr1}}_FDCANSEL_Pos,
-%% elif target.family in ["h7"]
-		Pll1Q = 0b01 << RCC_{{ccipr1}}_FDCANSEL_Pos,
-		Pll2Q = 0b10 << RCC_{{ccipr1}}_FDCANSEL_Pos,
-%% endif
+%% for val, name in can_source
+		{{name | capitalize}} = {{val}},
+%% endfor
 	};
 
-	static void
+	static inline void
 	setCanClockSource(CanClockSource source)
 	{
-		RCC->{{ccipr1}} = (RCC->{{ccipr1}} & ~RCC_{{ccipr1}}_FDCANSEL_Msk) | uint32_t(source);
+		LL_RCC_SetFDCANClockSource(uint32_t(source));
 	}
+%#
+%% endif
 
-	/// FDCAN subsystem prescaler common to all FDCAN instances
+%% if clk48_source
+	enum class
+	ClockMHz48Source : uint32_t
+	{
+%% for val, name in clk48_source | sort
+		{{name | capitalize}} = {{val}},
+%% endfor
+	};
+
+	static inline void
+	setClockMHz48Source(ClockMHz48Source source)
+	{
+		LL_RCC_SetUSBClockSource(uint32_t(source));
+	}
+%#
+%% endif
+
+%% if target.family in ["g4", "l5"]
+%# FIXME: Move to CAN driver. What is it even doing here???
 	enum class
 	CanPrescaler : uint8_t
 	{
-		Div1  = 0b0000,
-		Div2  = 0b0001,
-		Div4  = 0b0010,
-		Div6  = 0b0011,
-		Div8  = 0b0100,
-		Div10 = 0b0101,
-		Div12 = 0b0110,
-		Div14 = 0b0111,
-		Div16 = 0b1000,
-		Div18 = 0b1001,
-		Div20 = 0b1010,
-		Div22 = 0b1011,
-		Div24 = 0b1100,
-		Div26 = 0b1101,
-		Div28 = 0b1110,
-		Div30 = 0b1111,
+		Div1 = 0,
+%% for value in range(1, 16)
+		Div{{2*value}} = {{value}},
+%% endfor
 	};
 
 	/// Configure CAN subsystem prescaler
@@ -541,118 +210,169 @@ public:
 
 public:
 	// sources
-	static bool
-	enableInternalClock(uint32_t waitCycles = 2048);
+	static inline bool
+	enableInternalClock(uint32_t waitCycles = 2048)
+	{
+		LL_RCC_HSI_Enable();
+		while(not LL_RCC_HSI_IsReady() and --waitCycles) ;
+		return waitCycles;
+	}
 
-%% if target.family == "f0"
-	static bool
-	enableInternalClockMHz14(uint32_t waitCycles = 2048);
+%% if hsi14
+	static inline bool
+	enableInternalClockMHz14(uint32_t waitCycles = 2048)
+	{
+		LL_RCC_HSI14_Enable();
+		while(not LL_RCC_HSI48_IsReady() and --waitCycles) ;
+		return waitCycles;
+	}
+%#
 %% endif
 
 %% if hsi48
 	static bool
-	enableInternalClockMHz48(uint32_t waitCycles = 2048);
+	enableInternalClockMHz48(uint32_t waitCycles = 2048)
+	{
+		LL_RCC_HSI48_Enable();
+		while(not LL_RCC_HSI48_IsReady() and --waitCycles) ;
+		return waitCycles;
+	}
+%#
 %% endif
 
-%% if target.family in ["l0", "l1", "l4", "l5", "u5"]
+%% if msi_range
 	enum class
 	MsiFrequency : uint32_t
 	{
-%% if target.family in ["l0", "l1"]
-		kHz65  = RCC_ICSCR_MSIRANGE_0,
-		kHz131 = RCC_ICSCR_MSIRANGE_1,
-		kHz262 = RCC_ICSCR_MSIRANGE_2,
-		kHz524 = RCC_ICSCR_MSIRANGE_3,
-		MHz1   = RCC_ICSCR_MSIRANGE_4,
-		MHz2   = RCC_ICSCR_MSIRANGE_5,
-		MHz4   = RCC_ICSCR_MSIRANGE_6,
-%% elif target.family in ["l4"]
-		kHz100 = RCC_CR_MSIRANGE_0,
-		kHz200 = RCC_CR_MSIRANGE_1,
-		kHz400 = RCC_CR_MSIRANGE_2,
-		kHz800 = RCC_CR_MSIRANGE_3,
-		MHz1   = RCC_CR_MSIRANGE_4,
-		MHz2   = RCC_CR_MSIRANGE_5,
-		MHz4   = RCC_CR_MSIRANGE_6,
-		MHz8   = RCC_CR_MSIRANGE_7,
-		MHz16  = RCC_CR_MSIRANGE_8,
-		MHz24  = RCC_CR_MSIRANGE_9,
-		MHz32  = RCC_CR_MSIRANGE_10,
-		MHz48  = RCC_CR_MSIRANGE_11,
-%% elif target.family in ["l5"]
-		kHz100 = 0b0000 << RCC_CR_MSIRANGE_Pos,
-		kHz200 = 0b0001 << RCC_CR_MSIRANGE_Pos,
-		kHz400 = 0b0010 << RCC_CR_MSIRANGE_Pos,
-		kHz800 = 0b0011 << RCC_CR_MSIRANGE_Pos,
-		MHz1   = 0b0100 << RCC_CR_MSIRANGE_Pos,
-		MHz2   = 0b0101 << RCC_CR_MSIRANGE_Pos,
-		MHz4   = 0b0110 << RCC_CR_MSIRANGE_Pos,
-		MHz8   = 0b0111 << RCC_CR_MSIRANGE_Pos,
-		MHz16  = 0b1000 << RCC_CR_MSIRANGE_Pos,
-		MHz24  = 0b1001 << RCC_CR_MSIRANGE_Pos,
-		MHz32  = 0b1010 << RCC_CR_MSIRANGE_Pos,
-		MHz48  = 0b1011 << RCC_CR_MSIRANGE_Pos,
-%% elif target.family in ["u5"]
-		MHz48   = 0b0000,
-		MHz24   = 0b0001,
-		MHz16   = 0b0010,
-		MHz12   = 0b0011,
-		MHz4    = 0b0100,
-		MHz2    = 0b0101,
-		kHz1330 = 0b0110,
-		kHz1000 = 0b0111,
-		kHz3072 = 0b1000,
-		kHz1536 = 0b1001,
-		kHz1024 = 0b1010,
-		kHz768  = 0b1011,
-		kHz400  = 0b1100,
-		kHz200  = 0b1101,
-		kHz133  = 0b1110,
-		kHz100  = 0b1111,
+%% for name in msi_range[1]
+		{{name}} = {{msi_range[0]}}{{loop.index0}},
+%% endfor
+	};
+%#
 %% endif
+
+%% for msi in msi_clocks
+	static bool
+	enableMultiSpeedInternalClock{{msi}}(MsiFrequency msi_frequency = MsiFrequency::MHz4, uint32_t waitCycles = 2048)
+	{
+		LL_RCC_MSI{{msi}}_SetRange(uint32_t(msi_frequency){% if msi == "S" %} << 4{% endif %});
+%% if msi_range_selection
+		LL_RCC_MSI_EnableRangeSelection();
+%% endif
+		LL_RCC_MSI{{msi}}_Enable();
+		while (not LL_RCC_MSI{{msi}}_IsReady() and --waitCycles) ;
+		return waitCycles;
+	}
+%#
+%% endfor
+	static inline bool
+	enableExternalClock(uint32_t waitCycles = 2048)
+	{
+		LL_RCC_HSE_EnableBypass();
+		LL_RCC_HSE_Enable();
+		while(not LL_RCC_HSE_IsReady() and --waitCycles) ;
+		return waitCycles;
+	}
+
+	static inline bool
+	enableExternalCrystal(uint32_t waitCycles = 2048)
+	{
+		LL_RCC_HSE_DisableBypass();
+		LL_RCC_HSE_Enable();
+		while(not LL_RCC_HSE_IsReady() and --waitCycles) ;
+		return waitCycles;
+	}
+
+	static inline bool
+	enableLowSpeedInternalClock(uint32_t waitCycles = 2048)
+	{
+		LL_RCC_LSI_Enable();
+		while(not LL_RCC_LSI_IsReady() and --waitCycles) ;
+		return waitCycles;
+	}
+
+	static inline bool
+	enableLowSpeedExternalClock(uint32_t waitCycles = 2048)
+	{
+		LL_RCC_LSE_EnableBypass();
+		LL_RCC_LSE_Enable();
+		while(not LL_RCC_LSE_IsReady() and --waitCycles) ;
+		return waitCycles;
+	}
+
+%% if lse_drive
+	enum class
+	LseDrive : uint32_t
+	{
+%% for val, name in lse_drive | sort
+		{{name | capitalize }} = {{val}},
+%% endfor
+	};
+%% endif
+
+	static inline bool
+	enableLowSpeedExternalCrystal({% if lse_drive %}LseDrive drive = LseDrive::Low, {% endif %}uint32_t waitCycles = 2048)
+	{
+		LL_RCC_LSE_DisableBypass();
+%% if lse_drive
+		LL_RCC_LSE_SetDriveCapability(uint32_t(drive));
+%% endif
+		LL_RCC_LSE_Enable();
+		while(not LL_RCC_LSE_IsReady() and --waitCycles) ;
+		return waitCycles;
+	}
+
+public: // PLLs
+	enum class
+	PllSource : uint32_t
+	{
+%% for val, name in pll_source | sort
+		{{name | capitalize }} = {{val}},
+%% endfor
 	};
 
-%% if target.family in ["u5"]
-	static bool
-	enableMultiSpeedInternalClockS(MsiFrequency msi_frequency = MsiFrequency::MHz4, uint32_t waitCycles = 2048);
-	static bool
-	enableMultiSpeedInternalClockK(MsiFrequency msi_frequency = MsiFrequency::MHz4, uint32_t waitCycles = 2048);
-%% else
-	static bool
-	enableMultiSpeedInternalClock(MsiFrequency msi_frequency = MsiFrequency::MHz4, uint32_t waitCycles = 2048);
+%% if pll_mul
+	enum class
+	PllMultiplier : uint32_t
+	{
+%% for val, mul in pll_mul | sort
+		Mul{{mul}} = {{val}},
+%% endfor
+	};
+%#
 %% endif
+
+%% if pll_input_range
+	enum class
+	PllInputRange : uint8_t
+	{
+%% for val, name in pll_input_range | sort
+		MHz{{name}} = {{val}},
+%% endfor
+	};
+%#
 %% endif
 
-	static bool
-	enableExternalClock(uint32_t waitCycles = 2048);
+%% if usbprescaler
+	enum class
+	UsbPrescaler : uint32_t
+	{
+		Div1 = RCC_CFGR_USBPRE,	///< do not divide
+		Div1_5 = 0,				///< divide by 1.5
+	};
+%#
+%% endif
 
-	static bool
-	enableExternalCrystal(uint32_t waitCycles = 2048);
-
-	static bool
-	enableLowSpeedInternalClock(uint32_t waitCycles = 2048);
-
-	static bool
-	enableLowSpeedExternalClock(uint32_t waitCycles = 2048);
-
-	static bool
-	enableLowSpeedExternalCrystal(uint32_t waitCycles = 2048);
-
-%% if target.family in ["u5"]
+%% if epod_booster
 	enum class
 	EpodBoosterPrescaler : uint32_t
 	{
-		Div1  = 0b0000 << RCC_PLL1CFGR_PLL1MBOOST_Pos,
-		Div2  = 0b0001 << RCC_PLL1CFGR_PLL1MBOOST_Pos,
-		Div4  = 0b0010 << RCC_PLL1CFGR_PLL1MBOOST_Pos,
-		Div6  = 0b0011 << RCC_PLL1CFGR_PLL1MBOOST_Pos,
-		Div8  = 0b0100 << RCC_PLL1CFGR_PLL1MBOOST_Pos,
-		Div10 = 0b0101 << RCC_PLL1CFGR_PLL1MBOOST_Pos,
-		Div12 = 0b0110 << RCC_PLL1CFGR_PLL1MBOOST_Pos,
-		Div14 = 0b0111 << RCC_PLL1CFGR_PLL1MBOOST_Pos,
-		Div16 = 0b1000 << RCC_PLL1CFGR_PLL1MBOOST_Pos,
+%% for val, name in epod_booster | sort
+		{{name | capitalize }} = {{val}},
+%% endfor
 	};
 %% endif
+
 
 %% if target.family != "c0"
 	struct PllFactors
@@ -772,61 +492,7 @@ public:
 	disablePllSai(uint32_t waitCycles = 2048);
 %% endif
 
-%% if target.family == "l0"
-	static inline bool
-	isHsiPredivider4Active()
-	{
-		return (RCC->CR & RCC_CR_HSIDIVF);
-	}
-
-	static bool
-	setHsiPredivider4Enabled(bool divideBy4, uint32_t waitCycles = 2048);
-%% endif
-
 	// sinks
-	static bool
-	enableSystemClock(SystemClockSource src, uint32_t waitCycles = 2048);
-
-	static inline bool
-	enableRealTimeClock(RealTimeClockSource src)
-	{
-		RCC->{{bdcr}} = (RCC->{{bdcr}} & ~RCC_{{bdcr}}_RTCSEL) | RCC_{{bdcr}}_RTCEN | uint32_t(src);
-		return true;
-	}
-
-	static inline bool
-	enableWatchdogClock(WatchdogClockSource /*src*/)
-	{ return true; }
-
-%% if pllsai_p_usb
-	static inline void
-	setClock48Source(Clock48Source source)
-	{
-	%% if target.family == "f4" and target.name in ["69", "79"]
-		RCC->DCKCFGR = (RCC->DCKCFGR & ~RCC_DCKCFGR_CK48MSEL) | uint32_t(source);
-	%% else
-		RCC->DCKCFGR2 = (RCC->DCKCFGR2 & ~RCC_DCKCFGR2_CK48MSEL) | uint32_t(source);
-	%% endif
-	}
-%% elif target.family in ["g4", "l4", "l5"]
-	static inline void
-	setClock48Source(Clock48Source source)
-	{
-		RCC->{{ccipr1}} = (RCC->{{ccipr1}} & ~RCC_{{ccipr1}}_CLK48{{sel48}}_Msk) | uint32_t(source);
-	}
-%% elif target.family in ["u5"]
-	static inline void
-	setClock48Source(Clock48Source source)
-	{
-		RCC->CCIPR1 = (RCC->CCIPR1 & ~RCC_CCIPR1_ICLKSEL_Msk) | uint32_t(source);
-	}
-%% elif hsi48 and target.family in ["l0"]
-	static inline void
-	setClock48Source(Clock48Source source)
-	{
-		RCC->CCIPR = (RCC->CCIPR & ~RCC_CCIPR_HSI48SEL_Msk) | uint32_t(source);
-	}
-%% endif
 
 %% if target.family == "h7"
 	enum class
@@ -869,137 +535,7 @@ public:
 	}
 %% endif
 
-%% if target.family in ["f2", "f4", "f7"]
-	static inline bool
-	enableClockOutput1(ClockOutput1Source src, uint8_t div)
-	{
-		uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_MCO1 | RCC_CFGR_MCO1PRE);
-		if (div > 1) tmp |= (div + 2) << 24;
-		RCC->CFGR = tmp | uint32_t(src);
-		return true;
-	}
-
-	%% if not partname.startswith("stm32f412c")
-	static inline bool
-	enableClockOutput2(ClockOutput2Source src, uint8_t div)
-	{
-		uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_MCO2 | RCC_CFGR_MCO2PRE);
-		if (div > 1) tmp |= (div + 2) << 27;
-		RCC->CFGR = tmp | uint32_t(src);
-		return true;
-	}
-	%% endif
-%% elif target.family in ["h7"]
-	static inline bool
-	enableClockOutput1(ClockOutput1Source src, uint8_t div)
-	{
-		uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_MCO1 | RCC_CFGR_MCO1PRE);
-		if (div > 1) tmp |= (div << 18);
-		RCC->CFGR = tmp | uint32_t(src);
-		return true;
-	}
-
-	static inline bool
-	enableClockOutput2(ClockOutput2Source src, uint8_t div)
-	{
-		uint32_t tmp = RCC->CFGR & ~(RCC_CFGR_MCO2 | RCC_CFGR_MCO2PRE);
-		if (div > 1) tmp |= (div << 25);
-		RCC->CFGR = tmp | uint32_t(src);
-		return true;
-	}
-%% elif target.family in ["l0", "l1", "l4", "l5", "g0", "g4", "u5", "c0"]
-	enum class
-	ClockOutputPrescaler : uint32_t
-	{
-		Div1 = 0,
-		Div2 = (1 << RCC_{{cfgr_mco}}_MCOPRE_Pos),
-		Div4 = (2 << RCC_{{cfgr_mco}}_MCOPRE_Pos),
-		Div8 = (3 << RCC_{{cfgr_mco}}_MCOPRE_Pos),
-		Div16 = (4 << RCC_{{cfgr_mco}}_MCOPRE_Pos),
-%% if target.family in ["c0", "g0"]
-		Div32 = (5 << RCC_{{cfgr_mco}}_MCOPRE_Pos),
-		Div64 = (6 << RCC_{{cfgr_mco}}_MCOPRE_Pos),
-		Div128 = (7 << RCC_{{cfgr_mco}}_MCOPRE_Pos),
-%% endif
-	};
-
-	static inline bool
-	enableClockOutput(ClockOutputSource src, ClockOutputPrescaler div = ClockOutputPrescaler::Div1)
-	{
-		RCC->{{cfgr_mco}} = (RCC->{{cfgr_mco}} & ~(RCC_{{cfgr_mco}}_MCOPRE)) | uint32_t(src) | uint32_t(div);
-		return true;
-	}
-%% else
-	static inline bool
-	enableClockOutput(ClockOutputSource src)
-	{
-		RCC->CFGR = (RCC->CFGR & ~(RCC_CFGR_MCO)) | uint32_t(src);
-		return true;
-	}
-%% endif
-
 public:
-%% if target.family in ["c0"]
-	static inline bool
-	setHsiSysDivider(HsiSysDivider hsisysdivider)
-	{
-		RCC->CR = (RCC->CR & ~RCC_CR_HSIDIV_Msk) | uint32_t(hsisysdivider);
-		return true;
-	}
-
-%% endif
-	static inline bool
-	setAhbPrescaler(AhbPrescaler prescaler)
-	{
-		RCC->{{cfgr_prescaler}} = (RCC->{{cfgr_prescaler}} & ~RCC_{{cfgr_prescaler}}_HPRE) | uint32_t(prescaler);
-		return true;
-	}
-
-%% if target.family in ["c0", "f0", "g0"]
-	static inline bool
-	setApbPrescaler(ApbPrescaler prescaler)
-	{
-		RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_PPRE) | uint32_t(prescaler);
-		return true;
-	}
-%% else
-	static inline bool
-	setApb1Prescaler(Apb1Prescaler prescaler)
-	{
-		RCC->{{cfgr2}} = (RCC->{{cfgr2}} & ~RCC_{{cfgr2}}_{{d2}}PPRE1) | uint32_t(prescaler);
-		return true;
-	}
-
-	static inline bool
-	setApb2Prescaler(Apb2Prescaler prescaler)
-	{
-		RCC->{{cfgr2}} = (RCC->{{cfgr2}} & ~RCC_{{cfgr2}}_{{d2}}PPRE2) | uint32_t(prescaler);
-		return true;
-	}
-%% endif
-
-%% if target.family == "h7"
-	static inline bool
-	setApb3Prescaler(Apb3Prescaler prescaler)
-	{
-		RCC->{{cfgr_prescaler}} = (RCC->{{cfgr_prescaler}} & ~RCC_{{cfgr_prescaler}}_{{d1}}PPRE) | uint32_t(prescaler);
-		return true;
-	}
-	static inline bool
-	setApb4Prescaler(Apb4Prescaler prescaler)
-	{
-		RCC->{{cfgr3}} = (RCC->{{cfgr3}} & ~RCC_{{cfgr3}}_{{d3}}PPRE) | uint32_t(prescaler);
-		return true;
-	}
-%% endif
-%% if target.family in ["u5"]
-	static inline bool
-	setApb3Prescaler(Apb3Prescaler prescaler)
-	{
-		RCC->CFGR3 = (RCC->CFGR3 & ~RCC_CFGR3_PPRE3) | uint32_t(prescaler);
-		return true;
-	}
-%% endif
 
 %% if overdrive
 	static bool
@@ -1133,7 +669,7 @@ private:
 	computeFlashLatency(uint32_t Core_Hz, uint16_t Core_mV);
 };
 
-}   // namespace modm::platform
+} // namespace modm::platform
 
 
 #include "rcc_impl.hpp"
