@@ -185,6 +185,10 @@ modm::platform::Fdcan{{ id }}::initializeWithPrescaler(
 			((timings.bs1 - 1) << FDCAN_DBTP_DTSEG1_Pos) |
 			((timings.prescaler - 1) << FDCAN_DBTP_DBRP_Pos)/* |
 			FDCAN_DBTP_TDC*/; // enable "Transceiver Delay Compensation"
+	} else
+	{
+               FDCAN1->DBTP = 0x80D40;//0x8B0A60;
+               FDCAN_CCU->CCFG |= 0x14;
 	}
 
 	// Timestamp: FDCAN internal counter with prescaler=1
