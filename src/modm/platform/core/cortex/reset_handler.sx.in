@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2019, 2021, Niklas Hauser
+ * Copyright (c) 2025, Felix Passenberg
  *
  * This file is part of the modm project.
  *
@@ -11,6 +12,7 @@
 
 .globl	Reset_Handler
 	.text
+	.section .text.Reset_Handler
 	.syntax	unified
 	.align	4
 	.type	Reset_Handler, %function
