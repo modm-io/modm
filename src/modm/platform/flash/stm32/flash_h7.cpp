@@ -48,24 +48,6 @@ Flash::lock(uint8_t bank)
 	return isLocked(bank);
 }
 
-uint8_t
-Flash::getPage(uintptr_t offset)
-{
-	return (offset >> SectorShift);
-}
-
-uint32_t
-Flash::getOffset(uint8_t index)
-{
-	return SectorSize * index;
-}
-
-size_t
-Flash::getSize([[maybe_unused]] uint8_t index)
-{
-	return SectorSize;
-}
-
 modm_ramcode void
 Flash::initiateErase(uint8_t index)
 {
