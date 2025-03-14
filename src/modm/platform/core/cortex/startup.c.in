@@ -108,17 +108,6 @@ void __modm_startup(void)
 	table_copy(__table_copy_intern_start, __table_copy_intern_end);
 	table_zero(__table_zero_intern_start, __table_zero_intern_end);
 %#
-%% if with_icache
-	// Enable instruction cache
-	SCB_InvalidateICache();
-	SCB_EnableICache();
-%% endif
-%% if with_dcache
-	// Enable data cache with default WBWA policy
-	//SCB_CleanInvalidateDCache();
-	SCB_EnableDCache();
-%% endif
-%#
 %% if core != "cortex-m0"
 	// Set the vector table location
 	SCB->VTOR = (uint32_t)__vector_table_{{ vector_table_location }}_start;
