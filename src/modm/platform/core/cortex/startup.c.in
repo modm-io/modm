@@ -29,17 +29,17 @@ extern int main(void);
 
 // ----------------------------------------------------------------------------
 // Linker section start and end pointers
-extern const uint64_t __table_copy_intern_start[];
-extern const uint64_t __table_copy_intern_end[];
+extern const uint32_t __table_copy_intern_start[];
+extern const uint32_t __table_copy_intern_end[];
 
-extern const uint64_t __table_zero_intern_start[];
-extern const uint64_t __table_zero_intern_end[];
+extern const uint32_t __table_zero_intern_start[];
+extern const uint32_t __table_zero_intern_end[];
 
-extern const uint64_t __table_copy_extern_start[];
-extern const uint64_t __table_copy_extern_end[];
+extern const uint32_t __table_copy_extern_start[];
+extern const uint32_t __table_copy_extern_end[];
 
-extern const uint64_t __table_zero_extern_start[];
-extern const uint64_t __table_zero_extern_end[];
+extern const uint32_t __table_zero_extern_start[];
+extern const uint32_t __table_zero_extern_end[];
 
 extern const uint32_t __vector_table_{{ vector_table_location }}_start[];
 
@@ -64,13 +64,13 @@ table_call(const FunctionPointer *const start, const FunctionPointer *const end)
 
 // Copies the section defined by a table of {loadaddr, dest start, dest end}
 static inline void
-table_copy(const uint64_t *const start, const uint64_t *const end)
+table_copy(const uint32_t *const start, const uint32_t *const end)
 {
-	uint64_t **table = (uint64_t **)start;
-	while(table < (uint64_t **)end)
+	uint32_t **table = (uint32_t **)start;
+	while(table < (uint32_t **)end)
 	{
-		const uint64_t *src  = table[0]; // load address
-		      uint64_t *dest = table[1]; // destination start
+		const uint32_t *src  = table[0]; // load address
+		      uint32_t *dest = table[1]; // destination start
 		while (dest < table[2])          // destination end
 			*(dest++) = *(src++);
 		table += 3;
@@ -79,12 +79,12 @@ table_copy(const uint64_t *const start, const uint64_t *const end)
 
 // Zeros the section defined by a table of {start, end}
 static inline void
-table_zero(const uint64_t *const start, const uint64_t *const end)
+table_zero(const uint32_t *const start, const uint32_t *const end)
 {
-	uint64_t **table = (uint64_t **)start;
-	while(table < (uint64_t **)end)
+	uint32_t **table = (uint32_t **)start;
+	while(table < (uint32_t **)end)
 	{
-		uint64_t *dest = table[0]; // destination start
+		uint32_t *dest = table[0]; // destination start
 		while (dest < table[1])    // destination end
 			*(dest++) = 0;
 		table += 2;
@@ -95,18 +95,19 @@ table_zero(const uint64_t *const start, const uint64_t *const end)
 // Called by Reset_Handler in reset_handler.s
 void __modm_startup(void)
 {
-%% if enable_icache
-	SCB_EnableICache();
-%% elif has_icache
-	SCB_DisableICache();
-%% endif
-%% if has_dcache
-	SCB_DisableDCache();
-%% endif
-%#
 	// Copy and zero all internal memory
 	table_copy(__table_copy_intern_start, __table_copy_intern_end);
 	table_zero(__table_zero_intern_start, __table_zero_intern_end);
+%#
+%% if has_icache
+	// Enable instruction cache
+	SCB_InvalidateICache();
+	SCB_EnableICache();
+%% endif
+%% if has_dcache
+	// Enable data cache with default WBWA policy
+	SCB_EnableDCache();
+%% endif
 %#
 %% if core != "cortex-m0"
 	// Set the vector table location
@@ -127,12 +128,7 @@ void __modm_startup(void)
 
 	// Initialize heap as implemented by the heap option
 	__modm_initialize_memory();
-%#
-%% if enable_dcache
-	// Enable D-Cache with default WBWA policy *after* all memory operations
-	SCB_EnableDCache();
-%#
-%% endif
+
 	// Call all constructors of static objects
 	table_call(__init_array_start, __init_array_end);
 
