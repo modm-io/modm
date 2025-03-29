@@ -99,8 +99,6 @@ MODM_UNITS_LITERAL_DEFINITION(uint32_t, bitrate, bps)
 
 using percent_t = float;
 template<typename T> constexpr percent_t pct(T value) { return value / 100.f; }
-// DEPRECATED: 2025q1
-modm_deprecated("Access the value directly.") constexpr float pct2f(percent_t value) { return value; }
 namespace literals
 {
 	constexpr percent_t operator""_pct(long double value) { return pct(value); }

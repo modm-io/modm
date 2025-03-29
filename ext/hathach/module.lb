@@ -54,10 +54,6 @@ def prepare(module, options):
         module.add_option(
                 EnumerationOption(name="max-speed", description="Maximum HS port speed",
                                   enumeration=["full", "high"], default="high"))
-        # DEPRECATED: 2025q1
-        module.add_alias(
-                Alias(name="speed", description="Renamed for more clarity",
-                      destination=":tinyusb:max-speed"))
     # Detect the number of ports and the default port
     ports = 2 if (has_otg_hs and has_otg_fs) else 1
     if has_otg_hs and not has_otg_fs:

@@ -52,6 +52,58 @@ pay attention to. Medium impact changes are also worth looking at.
 
 <!--releases-->
 
+## 2025-04-01: 2025q1 release
+
+This release covers everything from 2025-01-01 and has been tested with avr-gcc
+v13.2.0 from upstream and arm-none-eabi-gcc v13.2.1 from xpack.
+
+Features:
+
+- Add missing HSI48-related functionality for some STM32.
+- Enable Cortex-M7 I/D-Cache via lbuild.
+- Speed up startup copying and zeroing of data sections.
+
+Fixes:
+
+- Fix wrong CMake program target `*.elf` path.
+
+Known bugs:
+
+- STM32F723 is missing support to use built-in USB HS PHY. See [#1171][].
+- OpenOCD cannot enable SWO on STM32H7 targets. See [#1079][].
+- `arm-none-eabi-gdb` TUI and GDBGUI interfaces are not supported on Windows.
+  See [#591][].
+- Generating modm on Windows creates paths with `\` that are not compatible with
+  Unix. See [#310][].
+- `lbuild build` and `lbuild clean` do not remove all previously generated files
+  when the configuration changes. See [#285][].
+
+Many thanks to all our contributors.
+A special shoutout to first timers 🎉:
+
+- Joshua ([@JeyRunner][]) 🎉
+- Niklas Hauser ([@salkinium][])
+- dokee ([@dokee39][]) 🎉
+
+PR [#1260][] -> [2025q1][].
+
+<details>
+<summary>Detailed changelog</summary>
+
+#### 2025-01-29: Enable Cortex-M7 I/D-Cache via lbuild
+
+PR [#1255][] -> [13e35ea][].  
+Tested in hardware by [@salkinium][].
+
+#### 2025-01-05: STM32: Add missing HSI48-related functionality
+
+Added for STM32G0/G4/L0/H7/H5/U0
+
+PR [#1252][] -> [e39bca4][].
+
+</details>
+
+
 ## 2025-01-01: 2024q4 release
 
 This release covers everything from 2024-10-01 and has been tested with avr-gcc
@@ -3404,6 +3456,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [2024q2]: https://github.com/modm-io/modm/releases/tag/2024q2
 [2024q3]: https://github.com/modm-io/modm/releases/tag/2024q3
 [2024q4]: https://github.com/modm-io/modm/releases/tag/2024q4
+[2025q1]: https://github.com/modm-io/modm/releases/tag/2025q1
 
 [@19joho66]: https://github.com/19joho66
 [@ASMfreaK]: https://github.com/ASMfreaK
@@ -3412,6 +3465,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [@FelixPetriconi]: https://github.com/FelixPetriconi
 [@JKazem]: https://github.com/JKazem
 [@Javask]: https://github.com/Javask
+[@JeyRunner]: https://github.com/JeyRunner
 [@MatthewMArnold]: https://github.com/MatthewMArnold
 [@OperativeF]: https://github.com/OperativeF
 [@PDR5]: https://github.com/PDR5
@@ -3435,6 +3489,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [@delphi]: https://github.com/delphi
 [@dergraaf]: https://github.com/dergraaf
 [@dhebbeker]: https://github.com/dhebbeker
+[@dokee39]: https://github.com/dokee39
 [@el-han]: https://github.com/el-han
 [@frnktank]: https://github.com/frnktank
 [@gueldenstone]: https://github.com/gueldenstone
@@ -3635,6 +3690,9 @@ Please note that contributions from xpcc were continuously ported to modm.
 [#1242]: https://github.com/modm-io/modm/pull/1242
 [#1248]: https://github.com/modm-io/modm/pull/1248
 [#1249]: https://github.com/modm-io/modm/pull/1249
+[#1252]: https://github.com/modm-io/modm/pull/1252
+[#1255]: https://github.com/modm-io/modm/pull/1255
+[#1260]: https://github.com/modm-io/modm/pull/1260
 [#132]: https://github.com/modm-io/modm/pull/132
 [#136]: https://github.com/modm-io/modm/pull/136
 [#153]: https://github.com/modm-io/modm/pull/153
@@ -3865,6 +3923,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [12bb41b]: https://github.com/modm-io/modm/commit/12bb41b
 [1319de9]: https://github.com/modm-io/modm/commit/1319de9
 [1375ff1]: https://github.com/modm-io/modm/commit/1375ff1
+[13e35ea]: https://github.com/modm-io/modm/commit/13e35ea
 [13ea578]: https://github.com/modm-io/modm/commit/13ea578
 [141aa71]: https://github.com/modm-io/modm/commit/141aa71
 [165adf0]: https://github.com/modm-io/modm/commit/165adf0
@@ -4072,6 +4131,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [e0d1327]: https://github.com/modm-io/modm/commit/e0d1327
 [e1d8a17]: https://github.com/modm-io/modm/commit/e1d8a17
 [e233708]: https://github.com/modm-io/modm/commit/e233708
+[e39bca4]: https://github.com/modm-io/modm/commit/e39bca4
 [e3ba913]: https://github.com/modm-io/modm/commit/e3ba913
 [e3c0321]: https://github.com/modm-io/modm/commit/e3c0321
 [e46e7df]: https://github.com/modm-io/modm/commit/e46e7df
