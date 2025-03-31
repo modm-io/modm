@@ -38,6 +38,8 @@ def build(env):
         "with_ssr": target.family not in ["f1", "f2", "l1"],
         # F2, L1 have a smaller PREDIV_S register field.
         "bits_prediv_s": 13 if target.family in ["f2", "l1"] else 15,
+        # H7 calibration via CALP and CALM in RTC_CALR
+        "with_calpm" : target.family in ["h7"],
     }
     env.template("rtc.hpp.in")
     env.template("rtc_impl.hpp.in")

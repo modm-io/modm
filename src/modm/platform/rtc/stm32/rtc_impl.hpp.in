@@ -15,51 +15,63 @@
 
 // Fix the inconsistent naming in ST's register files
 #ifdef RTC_ICSR_INIT
-#	define RTC_ICSR RTC->ICSR
+#define RTC_ICSR RTC->ICSR
 #else
-#	define RTC_ICSR_INIT RTC_ISR_INIT
-#	define RTC_ICSR_INITS RTC_ISR_INITS
-#	define RTC_ICSR_INITF RTC_ISR_INITF
-#	define RTC_ICSR_RSF RTC_ISR_RSF
-#	define RTC_ICSR RTC->ISR
+#define RTC_ICSR_INIT  RTC_ISR_INIT
+#define RTC_ICSR_INITS RTC_ISR_INITS
+#define RTC_ICSR_INITF RTC_ISR_INITF
+#define RTC_ICSR_RSF   RTC_ISR_RSF
+#define RTC_ICSR       RTC->ISR
 #endif
-
 
 namespace modm::platform
 {
 
-template< class SystemClock >
-requires requires { SystemClock::Rtc; }
+template<class SystemClock>
+	requires requires { SystemClock::Rtc; }
 bool
 Rtc::initialize(bool forced)
 {
 	// Fastest tick2ms on 37kHz LSI requires prediv_a = 74, not 125!
 	constexpr uint8_t max_prediv_a = (SystemClock::Rtc == 37_kHz) ? 74 : 128;
 	constexpr auto result = modm::PrescalerCounter::from_linear(
-			SystemClock::Rtc, 1_Hz, 1ul << {{bits_prediv_s}}, max_prediv_a, 1);
-	modm::PeripheralDriver::assertBaudrateInTolerance< result.frequency, 1_Hz, 0.f >();
+		SystemClock::Rtc, 1_Hz, 1ul << {{bits_prediv_s}}, max_prediv_a, 1);
+	modm::PeripheralDriver::assertBaudrateInTolerance<result.frequency, 1_Hz, 0.f>();
 	constexpr uint32_t c_prediv_a = result.prescaler - 1;
 	constexpr uint32_t c_prediv_s = result.counter - 1;
-	constexpr uint32_t prer = (c_prediv_a << RTC_PRER_PREDIV_A_Pos) | (c_prediv_s << RTC_PRER_PREDIV_S_Pos);
-%% if with_ssr
+	constexpr uint32_t prer =
+		(c_prediv_a << RTC_PRER_PREDIV_A_Pos) | (c_prediv_s << RTC_PRER_PREDIV_S_Pos);
+%% if with_ssr 
 %#
 	// Manually optimize division away for common LSE frequencies:
-	switch(result.counter)
+	switch (result.counter)
 	{
 		// 32kHz: prediv_a=128, prediv_s=250 -> 1000/250 = 4
-		case 250: t2ms = [](uint32_t ticks) -> uint32_t { return (c_prediv_s - ticks) << 2; }; break;
+		case 250:
+			t2ms = [](uint32_t ticks) -> uint32_t { return (c_prediv_s - ticks) << 2; };
+			break;
 		// 32.768kHz: prediv_a=128, prediv_s=256 -> 1000/256 = 1000 >> 8
-		case 256: t2ms = [](uint32_t ticks) -> uint32_t { return ((c_prediv_s - ticks) * 1000u) >> 8; }; break;
+		case 256:
+			t2ms = [](uint32_t ticks) -> uint32_t { return ((c_prediv_s - ticks) * 1000u) >> 8; };
+			break;
 		// 40kHz: prediv_a=125, prediv_s=320 -> 1000/320 = 25 >> 3
-		case 320: t2ms = [](uint32_t ticks) -> uint32_t { return ((c_prediv_s - ticks) * 25u) >> 3; }; break;
+		case 320:
+			t2ms = [](uint32_t ticks) -> uint32_t { return ((c_prediv_s - ticks) * 25u) >> 3; };
+			break;
 		// 37kHz: prediv_a=74, prediv_s=500 -> 1000/500 = 2
-		case 500: t2ms = [](uint32_t ticks) -> uint32_t { return (c_prediv_s - ticks) << 1; }; break;
+		case 500:
+			t2ms = [](uint32_t ticks) -> uint32_t { return (c_prediv_s - ticks) << 1; };
+			break;
 		// Otherwise just do the division
-		default: t2ms = [](uint32_t ticks) -> uint32_t { return ((c_prediv_s - ticks) * 1000u) / (c_prediv_s + 1); }; break;
+		default:
+			t2ms = [](uint32_t ticks) -> uint32_t {
+				return ((c_prediv_s - ticks) * 1000u) / (c_prediv_s + 1);
+			};
+			break;
 	}
 	// other way around for setting the SSR register
 	ms2t = [](uint32_t ms) -> uint32_t { return c_prediv_s - ((c_prediv_s + 1) * ms) / 1000u; };
-%% endif
+%% endif 
 %#
 	enable();
 	// Do not initialize again to prevent clock drift
@@ -70,7 +82,7 @@ Rtc::initialize(bool forced)
 	RTC_ICSR |= RTC_ICSR_INIT;
 
 	// Wait until initialization phase mode is entered when INITF bit is set
-	modm::this_fiber::poll([]{ return RTC_ICSR & RTC_ICSR_INITF; });
+	modm::this_fiber::poll([] { return RTC_ICSR & RTC_ICSR_INITF; });
 
 	// To generate a 1 Hz clock for the calendar counter, program both the prescaler factors
 	RTC->PRER = prer;
@@ -83,7 +95,7 @@ Rtc::initialize(bool forced)
 	lock();
 
 	// wait until the RTC registers are synchronized
-	modm::this_fiber::poll([]{ return RTC_ICSR & RTC_ICSR_RSF; });
+	modm::this_fiber::poll([] { return RTC_ICSR & RTC_ICSR_RSF; });
 
 	return true;
 }
@@ -94,49 +106,52 @@ Rtc::setDateTime(const modm::DateTime &dateTime)
 	unlock();
 	RTC_ICSR |= RTC_ICSR_INIT;
 	// Wait until initialization phase mode is entered when INITF bit is set
-	modm::this_fiber::poll([]{ return RTC_ICSR & RTC_ICSR_INITF; });
+	modm::this_fiber::poll([] { return RTC_ICSR & RTC_ICSR_INITF; });
 
-	RTC->DR = ((toBcd(int(dateTime.year()) - epoch) << RTC_DR_YU_Pos) & (RTC_DR_YT_Msk | RTC_DR_YU_Msk)) |
-			  ((toBcd(unsigned(dateTime.month())) << RTC_DR_MU_Pos) & (RTC_DR_MT_Msk | RTC_DR_MU_Msk)) |
-			  ((toBcd(unsigned(dateTime.day())) << RTC_DR_DU_Pos) & (RTC_DR_DT_Msk | RTC_DR_DU_Msk)) |
-			  ((dateTime.weekday().iso_encoding() << RTC_DR_WDU_Pos) & RTC_DR_WDU_Msk);
+	RTC->DR =
+		((toBcd(int(dateTime.year()) - epoch) << RTC_DR_YU_Pos) & (RTC_DR_YT_Msk | RTC_DR_YU_Msk)) |
+		((toBcd(unsigned(dateTime.month())) << RTC_DR_MU_Pos) & (RTC_DR_MT_Msk | RTC_DR_MU_Msk)) |
+		((toBcd(unsigned(dateTime.day())) << RTC_DR_DU_Pos) & (RTC_DR_DT_Msk | RTC_DR_DU_Msk)) |
+		((dateTime.weekday().iso_encoding() << RTC_DR_WDU_Pos) & RTC_DR_WDU_Msk);
 
-	RTC->TR = ((toBcd(dateTime.hours().count()) << RTC_TR_HU_Pos) & (RTC_TR_HT_Msk | RTC_TR_HU_Msk)) |
-			  ((toBcd(dateTime.minutes().count()) << RTC_TR_MNU_Pos) & (RTC_TR_MNT_Msk | RTC_TR_MNU_Msk)) |
-			  ((toBcd(dateTime.seconds().count()) << RTC_TR_SU_Pos) & (RTC_TR_ST_Msk | RTC_TR_SU_Msk));
-%% if with_ssr
+	RTC->TR =
+		((toBcd(dateTime.hours().count()) << RTC_TR_HU_Pos) & (RTC_TR_HT_Msk | RTC_TR_HU_Msk)) |
+		((toBcd(dateTime.minutes().count()) << RTC_TR_MNU_Pos) &
+		 (RTC_TR_MNT_Msk | RTC_TR_MNU_Msk)) |
+		((toBcd(dateTime.seconds().count()) << RTC_TR_SU_Pos) & (RTC_TR_ST_Msk | RTC_TR_SU_Msk));
+%% if with_ssr 
 %#
 	RTC->SSR = ms2t(dateTime.subseconds().count());
-%% endif
+%% endif 
 %#
 	RTC_ICSR &= ~RTC_ICSR_INIT;
 	lock();
-	modm::this_fiber::poll([]{ return RTC_ICSR & RTC_ICSR_RSF; });
+	modm::this_fiber::poll([] { return RTC_ICSR & RTC_ICSR_RSF; });
 }
-%#
-%% if with_ssr
-inline uint16_t
-%% else
-inline void
+%# 
+%% if with_ssr 
+inline uint16_t 
+%% else 
+inline void 
 %% endif
 Rtc::read()
 {
 	const uint32_t tr = RTC->TR;
-%% if with_ssr
+%% if with_ssr 
 	const uint16_t ssr = RTC->SSR;
-%% endif
+%% endif 
 	const uint32_t dr = RTC->DR;
 
-	data.year  = modm::fromBcd((dr & (RTC_DR_YT_Msk | RTC_DR_YU_Msk)) >> RTC_DR_YU_Pos);
+	data.year = modm::fromBcd((dr & (RTC_DR_YT_Msk | RTC_DR_YU_Msk)) >> RTC_DR_YU_Pos);
 	data.month = modm::fromBcd((dr & (RTC_DR_MT_Msk | RTC_DR_MU_Msk)) >> RTC_DR_MU_Pos);
-	data.day   = modm::fromBcd((dr & (RTC_DR_DT_Msk | RTC_DR_DU_Msk)) >> RTC_DR_DU_Pos);
+	data.day = modm::fromBcd((dr & (RTC_DR_DT_Msk | RTC_DR_DU_Msk)) >> RTC_DR_DU_Pos);
 
 	data.weekday = (dr & RTC_DR_WDU_Msk) >> RTC_DR_WDU_Pos;
 
-	data.hour   = modm::fromBcd((tr & (RTC_TR_HT_Msk | RTC_TR_HU_Msk)) >> RTC_TR_HU_Pos);
+	data.hour = modm::fromBcd((tr & (RTC_TR_HT_Msk | RTC_TR_HU_Msk)) >> RTC_TR_HU_Pos);
 	data.minute = modm::fromBcd((tr & (RTC_TR_MNT_Msk | RTC_TR_MNU_Msk)) >> RTC_TR_MNU_Pos);
 	data.second = modm::fromBcd((tr & (RTC_TR_ST_Msk | RTC_TR_SU_Msk)) >> RTC_TR_SU_Pos);
-%% if with_ssr
+%% if with_ssr 
 %#
 	return t2ms(ssr);
 %% endif
@@ -145,49 +160,51 @@ Rtc::read()
 inline modm::DateTime
 Rtc::dateTime()
 {
-%% if with_ssr
+%% if with_ssr 
 	const auto milliseconds = read();
-%% else
+%% else 
 	read();
-%% endif
-	return DateTime(data.year + epoch, data.month, data.day,
-					data.hour, data.minute, data.second,
-%% if with_ssr
-					milliseconds, data.weekday);
+%%endif 
+	return DateTime(data.year + epoch, data.month, data.day, data.hour, data.minute,
+							  data.second, 
+%% if with_ssr 
+							milliseconds, data.weekday);
 %% else
-					0, data.weekday);
+							0, data.weekday);
 %% endif
 }
 
 inline void
 Rtc::update_cache()
 {
-	static constexpr uint32_t seconds_per_day{24*60*60};
-	static constexpr uint32_t seconds_per_year{365*seconds_per_day};
-	static constexpr uint16_t m2d[] = {0, /* 1-index shortcut */
-			0, 31, 59 /* or 60 if leap year */, 90, 120, 151, 181, 212, 243, 273, 304, 334};
+	static constexpr uint32_t seconds_per_day{24 * 60 * 60};
+	static constexpr uint32_t seconds_per_year{365 * seconds_per_day};
+	static constexpr uint16_t m2d[] = {
+		0, /* 1-index shortcut */
+		0, 31, 59 /* or 60 if leap year */, 90, 120, 151, 181, 212, 243, 273, 304, 334};
 
 	if (cache_date != data.date32)
 	{
 		uint16_t day_of_year = m2d[data.month] + data.day - 1u;
 		// Every forth year from 1972 until 2068 is a leap year
 		if ((data.year & 0b11) == 0b10 and data.month > 2u) day_of_year++;
-		// We must not count the leap day of the current leap year, since that's already part of day_of_year!
+		// We must not count the leap day of the current leap year, since that's already part of
+		// day_of_year!
 		const uint8_t leap_days_since_epoch = (data.year + 2u - 1u) / 4u;
 
 		// won't overflow since year≤100 -> less than 3.2e9 ≤ max(uint32_t)
-		cache_date_seconds = data.year * seconds_per_year +
-				(leap_days_since_epoch + day_of_year) * seconds_per_day;
+		cache_date_seconds =
+			data.year * seconds_per_year + (leap_days_since_epoch + day_of_year) * seconds_per_day;
 		cache_date = data.date32;
 	}
 	if (cache_time != data.time32)
 	{
-		cache_time_seconds = cache_date_seconds +
-				(data.hour * 60ul + data.minute) * 60ul + data.second;
+		cache_time_seconds =
+			cache_date_seconds + (data.hour * 60ul + data.minute) * 60ul + data.second;
 %% if with_ssr
 		// but this will overflow therefore use of ull
 		cache_time_milliseconds = cache_time_seconds * 1000ull;
-%% endif
+%% endif 
 		cache_time = data.time32;
 	}
 }
@@ -195,11 +212,11 @@ Rtc::update_cache()
 inline Rtc::time_point
 Rtc::now()
 {
-%% if with_ssr
+%% if with_ssr 
 	const auto milliseconds = read();
 	update_cache();
 	return time_point{duration{cache_time_milliseconds + milliseconds}};
-%% else
+%% else 
 	return time_point{duration{Rtc::time_t()}};
 %% endif
 }
@@ -215,18 +232,17 @@ Rtc::time_t()
 inline struct timeval
 Rtc::timeval()
 {
-%% if with_ssr
+%% if with_ssr 
 	const auto milliseconds = read();
 	update_cache();
 	return {cache_time_seconds, milliseconds * 1000};
-%% else
+%% else 
 	return {Rtc::time_t(), 0};
 %% endif
 }
 
 // ----------------------------------------------------------------------------
-void inline
-Rtc::unlock()
+void inline Rtc::unlock()
 {
 	// Unlock the write protection on the protected RTC registers.
 	RTC->WPR = 0xCA;
@@ -234,25 +250,62 @@ Rtc::unlock()
 	__DSB();
 }
 
-void inline
-Rtc::lock()
+void inline Rtc::lock()
 {
 	// Lock the write protection on the protected RTC registers.
 	RTC->WPR = 0xFF;
 }
 
-void inline
-Rtc::enable()
+void inline Rtc::enable()
 {
 	Rcc::enable<Peripheral::Rtc>();
 }
 
-void inline
-Rtc::disable()
+void inline Rtc::disable()
 {
 	Rcc::disable<Peripheral::Rtc>();
 }
 
-} // namespace modm::platform
+%% if with_calpm 
+inline bool
+Rtc::setCalibration(int32_t ppb)
+{
+	uint32_t cal = RTC->CALR;
+	if (ppb > 0)
+	{
+		cal |= RTC_CALR_CALP;
+		ppb -= 488500;
+	} else
+	{
+		cal &= ~RTC_CALR_CALP;
+	}
+
+	uint32_t calm = std::abs(ppb) / 954;
+
+	if (calm > 0x01ff) { return false; }
+
+	cal &= 0x01ff;
+	cal |= calm;
+
+	// Wait until recalibration is done (RECALPF bit is reset)
+	modm::this_fiber::poll([] { return ((RTC->ISR & RTC_ISR_RECALPF) == 0U); });
+
+	RTC->CALR = cal;
+
+	return true;
+}
+
+inline int32_t
+Rtc::getCalibration()
+{
+	const uint32_t calr = RTC->CALR;
+
+	int32_t ppb = (calr & RTC_CALR_CALP) ? 488500 : 0;
+	ppb -= static_cast<int32_t>(calr & 0x01FF) * 954;
+	return ppb;
+}
+%% endif
+
+}  // namespace modm::platform
 
 #undef RTC_ICSR

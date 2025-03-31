@@ -12,10 +12,10 @@
 #ifndef MODM_STM32_RTC_HPP
 #define MODM_STM32_RTC_HPP
 
-#include <chrono>
-#include <ctime>
 #include <sys/time.h>
 
+#include <chrono>
+#include <ctime>
 #include <modm/architecture.hpp>
 #include <modm/math.hpp>
 
@@ -32,11 +32,11 @@ namespace modm::platform
 class Rtc : public modm::PeripheralDriver
 {
 public:
-%% if with_ssr
+%% if with_ssr 
 	using duration = std::chrono::milliseconds;
-%% else
+%% else 
 	using duration = std::chrono::seconds;
-%% endif
+%% endif 
 	using rep = duration::rep;
 	using period = duration::period;
 	using time_point = std::chrono::time_point<Rtc, duration>;
@@ -49,7 +49,7 @@ public:
 
 	/// Consider using the optimized `Rtc::time_t()` function directly instead!
 	static std::time_t
-	to_time_t(const time_point& t) noexcept
+	to_time_t(const time_point &t) noexcept
 	{
 		return std::time_t(duration_cast<std::chrono::seconds>(t.time_since_epoch()).count());
 	}
@@ -84,16 +84,24 @@ public:
 	enable();
 
 	/// Initialize the RTC clock
-	template< class SystemClock >
-	requires requires { SystemClock::Rtc; }
+	template<class SystemClock>
+		requires requires { SystemClock::Rtc; }
 	static bool
-	initialize(bool forced=false);
+	initialize(bool forced = false);
 
 	/// Disable the RTC clock
 	static void
 	disable();
 
-private:
+%% if with_calpm 
+	static bool
+	setCalibration(int32_t ppb);
+
+	static int32_t
+	getCalibration();
+%%endif
+
+	protected :
 	/// Unlock RTC register write protection
 	static void
 	unlock();
@@ -103,12 +111,12 @@ private:
 	lock();
 
 	/// Read the RTC registers and store them in the data field.
-%% if with_ssr
+%%if with_ssr
 	/// Returns the milliseconds converted from the SSR register
-	static uint16_t
-%% else
-	static void
-%% endif
+	static uint16_t 
+%% else 
+	static void 
+%%endif
 	read();
 
 	/// Update the cached seconds if necessary
@@ -117,8 +125,7 @@ private:
 
 	struct Data
 	{
-		union
-		{
+		union {
 			struct
 			{
 				/// milliseconds are NOT cached
@@ -128,8 +135,7 @@ private:
 			} modm_packed;
 			uint32_t time32;
 		};
-		union
-		{
+		union {
 			struct
 			{
 				uint8_t weekday;
@@ -144,25 +150,25 @@ private:
 	static inline Data data{};
 
 	/// Cached computed values
-%% if with_ssr
+%%if with_ssr 
 	static inline uint64_t cache_time_milliseconds{};
-%% endif
+%% endif 
 	static inline uint32_t cache_time_seconds{};
 	static inline uint32_t cache_date_seconds{};
 	static inline uint32_t cache_time{};
 	static inline uint32_t cache_date{};
-%% if with_ssr
+%% if with_ssr 
 %#
 	/// Function points for efficient implementations of the SSR <=> millisecond conversion
 	static inline uint32_t (*t2ms)(uint32_t) = [](uint32_t) { return 0ul; };
 	static inline uint32_t (*ms2t)(uint32_t) = [](uint32_t) { return 0ul; };
-%% endif
+%% endif 
 %#
 	static constexpr uint16_t epoch{1970};
 };
 
-} // namespace modm::platform
+}  // namespace modm::platform
 
 #include "rtc_impl.hpp"
 
-#endif // MODM_STM32_RTC_HPP
+#endif  // MODM_STM32_RTC_HPP
