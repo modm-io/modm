@@ -97,7 +97,7 @@ modm::Dw3110Phy<SpiMaster, Cs>::initialize(Dw3110::Channel channel, Dw3110::Prea
 			MODM_LOG_ERROR << "Failed to reach IDLE_PLL State!" << modm::endl;
 			RF_RETURN(false);
 		}
-		fetchSystemStatus();
+		fetchChipState();
 	}
 
 	if (!RF_CALL(calibrate())) { RF_RETURN(false); }
