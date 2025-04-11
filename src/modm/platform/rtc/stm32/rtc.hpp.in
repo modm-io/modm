@@ -1,0 +1,174 @@
+/*
+ * Copyright (c) 2024, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_STM32_RTC_HPP
+#define MODM_STM32_RTC_HPP
+
+#include <sys/time.h>
+
+#include <chrono>
+#include <ctime>
+#include <modm/architecture.hpp>
+#include <modm/math.hpp>
+
+namespace modm::platform
+{
+
+/**
+ * Real Time Clock (RTC) control for STM32 devices
+ *
+ * @author Niklas Hauser
+ * @author Rasmus Kleist Hørlyck Sørensen
+ * @ingroup modm_platform_rtc
+ */
+class Rtc : public modm::PeripheralDriver
+{
+public:
+%% if with_ssr 
+	using duration = std::chrono::milliseconds;
+%% else 
+	using duration = std::chrono::seconds;
+%% endif 
+	using rep = duration::rep;
+	using period = duration::period;
+	using time_point = std::chrono::time_point<Rtc, duration>;
+	/// RTC time can be changed forward/backward at any time
+	static constexpr bool is_steady = false;
+
+	/// Reads the RTC atomically and converts it to a time_point
+	static time_point
+	now() noexcept;
+
+	/// Consider using the optimized `Rtc::time_t()` function directly instead!
+	static std::time_t
+	to_time_t(const time_point &t) noexcept
+	{
+		return std::time_t(duration_cast<std::chrono::seconds>(t.time_since_epoch()).count());
+	}
+
+	static time_point
+	from_time_t(std::time_t t) noexcept
+	{
+		using from_t = std::chrono::time_point<Rtc, std::chrono::seconds>;
+		return time_point_cast<duration>(from_t(std::chrono::seconds(t)));
+	}
+
+public:
+	/// Reads the RTC and converts to seconds in an optimized way
+	static std::time_t
+	time_t();
+
+	/// Reads the RTC and converts to `struct timeval` in an optimized way
+	static struct timeval
+	timeval();
+
+	/// Reads the RTC and returns the split up calendar and time values in an optimized way
+	static modm::DateTime
+	dateTime();
+
+	/// Sets the RTC time
+	static void
+	setDateTime(const modm::DateTime &dt);
+
+public:
+	/// Enable the RTC clock
+	static void
+	enable();
+
+	/// Initialize the RTC clock
+	template<class SystemClock>
+		requires requires { SystemClock::Rtc; }
+	static bool
+	initialize(bool forced = false);
+
+	/// Disable the RTC clock
+	static void
+	disable();
+
+%% if with_calpm 
+	static bool
+	setCalibration(int32_t ppb);
+
+	static int32_t
+	getCalibration();
+%%endif
+
+	protected :
+	/// Unlock RTC register write protection
+	static void
+	unlock();
+
+	/// Lock RTC register write protection
+	static void
+	lock();
+
+	/// Read the RTC registers and store them in the data field.
+%%if with_ssr
+	/// Returns the milliseconds converted from the SSR register
+	static uint16_t 
+%% else 
+	static void 
+%%endif
+	read();
+
+	/// Update the cached seconds if necessary
+	static void
+	update_cache();
+
+	struct Data
+	{
+		union {
+			struct
+			{
+				/// milliseconds are NOT cached
+				uint8_t second;
+				uint8_t minute;
+				uint8_t hour;
+			} modm_packed;
+			uint32_t time32;
+		};
+		union {
+			struct
+			{
+				uint8_t weekday;
+				uint8_t day;
+				uint8_t month;
+				uint8_t year;
+			} modm_packed;
+			uint32_t date32;
+		};
+	};
+
+	static inline Data data{};
+
+	/// Cached computed values
+%%if with_ssr 
+	static inline uint64_t cache_time_milliseconds{};
+%% endif 
+	static inline uint32_t cache_time_seconds{};
+	static inline uint32_t cache_date_seconds{};
+	static inline uint32_t cache_time{};
+	static inline uint32_t cache_date{};
+%% if with_ssr 
+%#
+	/// Function points for efficient implementations of the SSR <=> millisecond conversion
+	static inline uint32_t (*t2ms)(uint32_t) = [](uint32_t) { return 0ul; };
+	static inline uint32_t (*ms2t)(uint32_t) = [](uint32_t) { return 0ul; };
+%% endif 
+%#
+	static constexpr uint16_t epoch{1970};
+};
+
+}  // namespace modm::platform
+
+#include "rtc_impl.hpp"
+
+#endif  // MODM_STM32_RTC_HPP

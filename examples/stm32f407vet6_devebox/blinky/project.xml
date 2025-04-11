@@ -2,9 +2,11 @@
   <extends>modm:devebox-stm32f4xx</extends>
   <options>
     <option name="modm:build:build.path">../../../build/stm32f4xx_devebox/blinky</option>
-    <option name="modm:build:openocd.cfg">openocd.cfg</option>
   </options>
   <modules>
     <module>modm:build:scons</module>
   </modules>
+  <collectors>
+    <collect name="modm:build:openocd.source">interface/stlink.cfg</collect>
+  </collectors>
 </library>

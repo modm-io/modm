@@ -18,7 +18,6 @@
   <!-- <extends>modm:samd21-mini</extends> -->
   <options>
     <option name="modm:build:build.path">../../../build/generic/usb</option>
-    <option name="modm:build:openocd.cfg">openocd.cfg</option>
     <option name="modm:tinyusb:config">device.cdc,device.msc</option>
     <!-- <option name="modm:tinyusb:config">device.cdc,device.midi</option> -->
 
@@ -36,5 +35,6 @@
   </modules>
   <collectors>
     <!-- <collect name="modm:build:cppdefines">CFG_TUSB_DEBUG=3</collect> -->
+    <collect name="modm:build:openocd.source">interface/stlink.cfg</collect>
   </collectors>
 </library>

@@ -38,5 +38,6 @@ def build(env):
     env.copy("../nucleo64_arduino.hpp", "nucleo64_arduino.hpp")
 
     env.outbasepath = "modm/openocd/modm/board/"
-    env.copy(repopath("tools/openocd/modm/st_nucleo_l0.cfg"), "st_nucleo_l0.cfg")
-    env.collect(":build:openocd.source", "modm/board/st_nucleo_l0.cfg")
+    env.template(repopath("tools/openocd/modm/st_nucleo_swd.cfg.in"), "board.cfg",
+                 substitutions={"target": "stm32l0"})
+    env.collect(":build:openocd.source", "modm/board/board.cfg")

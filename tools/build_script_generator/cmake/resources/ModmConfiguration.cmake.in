@@ -181,35 +181,35 @@ function(modm_targets_create project_name)
   add_custom_target(size DEPENDS ${project_name}.elf)
   add_custom_command(TARGET size
     USES_TERMINAL
-    COMMAND cmake -E env PYTHONPATH=modm ${Python3_EXECUTABLE} -m modm_tools.size ${PROJECT_BINARY_DIR}/src/${project_name}.elf \"{{ memories }}\"
+    COMMAND cmake -E env PYTHONPATH=modm ${Python3_EXECUTABLE} -m modm_tools.size ${PROJECT_BINARY_DIR}/${project_name}.elf \"{{ memories }}\"
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
   add_custom_target(program DEPENDS ${project_name}.elf)
   add_custom_command(TARGET program
     USES_TERMINAL
     COMMAND cmake -E env PYTHONPATH=modm ${Python3_EXECUTABLE} -m modm_tools.openocd -f modm/openocd.cfg
-        ${PROJECT_BINARY_DIR}/src/${project_name}.elf
+        ${PROJECT_BINARY_DIR}/${project_name}.elf
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
   add_custom_target(program-bmp DEPENDS ${project_name}.elf)
   add_custom_command(TARGET program-bmp
     USES_TERMINAL
     COMMAND cmake -E env PYTHONPATH=modm ${Python3_EXECUTABLE} -m modm_tools.bmp -p ${MODM_BMP_PORT}
-        ${PROJECT_BINARY_DIR}/src/${project_name}.elf
+        ${PROJECT_BINARY_DIR}/${project_name}.elf
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
   add_custom_target(program-jlink DEPENDS ${project_name}.elf)
   add_custom_command(TARGET program-jlink
     USES_TERMINAL
     COMMAND cmake -E env PYTHONPATH=modm ${Python3_EXECUTABLE} -m modm_tools.jlink -device {{ jlink_partname }}
-        ${PROJECT_BINARY_DIR}/src/${project_name}.elf
+        ${PROJECT_BINARY_DIR}/${project_name}.elf
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
   add_custom_target(debug DEPENDS ${project_name}.elf)
   add_custom_command(TARGET debug
     USES_TERMINAL
     COMMAND cmake -E env PYTHONPATH=modm ${Python3_EXECUTABLE} -m modm_tools.gdb -x modm/gdbinit -x modm/openocd_gdbinit
-        --elf ${PROJECT_BINARY_DIR}/src/${project_name}.elf --ui=${MODM_DBG_UI}
+        --elf ${PROJECT_BINARY_DIR}/${project_name}.elf --ui=${MODM_DBG_UI}
         openocd -f modm/openocd.cfg
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
@@ -217,7 +217,7 @@ function(modm_targets_create project_name)
   add_custom_command(TARGET debug-bmp
     USES_TERMINAL
     COMMAND cmake -E env PYTHONPATH=modm ${Python3_EXECUTABLE} -m modm_tools.gdb -x modm/gdbinit -x modm/openocd_bmp
-        --elf ${PROJECT_BINARY_DIR}/src/${project_name}.elf --ui=${MODM_DBG_UI}
+        --elf ${PROJECT_BINARY_DIR}/${project_name}.elf --ui=${MODM_DBG_UI}
         bmp -p ${MODM_BMP_PORT}
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
@@ -225,7 +225,7 @@ function(modm_targets_create project_name)
   add_custom_command(TARGET debug-jlink
     USES_TERMINAL
     COMMAND cmake -E env PYTHONPATH=modm ${Python3_EXECUTABLE} -m modm_tools.gdb -x modm/gdbinit -x modm/openocd_jlink
-        --elf ${PROJECT_BINARY_DIR}/src/${project_name}.elf --ui=${MODM_DBG_UI}
+        --elf ${PROJECT_BINARY_DIR}/${project_name}.elf --ui=${MODM_DBG_UI}
         jlink -device {{ jlink_partname }}
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
@@ -233,7 +233,7 @@ function(modm_targets_create project_name)
   add_custom_command(TARGET debug-coredump
     USES_TERMINAL
     COMMAND cmake -E env	PYTHONPATH=modm ${Python3_EXECUTABLE} -m modm_tools.gdb -x modm/gdbinit
-        --elf ${PROJECT_BINARY_DIR}/src/${project_name}.elf --ui=${MODM_DBG_UI}
+        --elf ${PROJECT_BINARY_DIR}/${project_name}.elf --ui=${MODM_DBG_UI}
         crashdebug
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 

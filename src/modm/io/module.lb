@@ -41,16 +41,20 @@ def prepare(module, options):
 
 def build(env):
     core = env[":target"].get_driver("core")["type"]
+    target = env[":target"].identifier
     env.substitutions = {
-        "is_hosted": env[":target"].identifier.platform == "hosted",
-        "family": env[":target"].identifier.family,
+        "is_hosted": target.platform == "hosted",
+        "is_avr": target.platform == "avr",
+        "family": target.family,
         "core": core,
-        "using_printf": env.has_module(":printf"),
     }
     env.outbasepath = "modm/src/modm/io"
-    env.copy(".", ignore=env.ignore_files("io.hpp", "iostream_printf.cpp.in", "iostream.hpp.in"))
+    env.copy("iodevice.hpp")
+    env.copy("iodevice_wrapper.hpp")
     env.template("iostream_printf.cpp.in")
     env.template("iostream.hpp.in")
+    env.template("iostream_chrono.hpp.in")
+    env.copy("iostream.cpp")
 
     env.outbasepath = "modm/src/modm"
     env.copy("io.hpp")

@@ -151,7 +151,7 @@ def post_build(env):
     has_xpcc_generator = env.has_module(":communication:xpcc:generator")
     has_image_source = len(env["::image.source"])
     has_nanopb = env.has_module(":nanopb")
-    repositories = [p for p in env.buildlog.repositories if isdir(env.real_outpath(p, basepath="."))]
+    repositories = [p for p in env.buildlog.repositories]
     repositories.sort(key=lambda name: "0" if name == "modm" else name)
     generated_paths = [join(env.relcwdoutpath(""), r) for r in repositories]
 
@@ -211,7 +211,9 @@ def post_build(env):
     # Generate SConscript files for each repository that doesn't already have one
     repos_with_sconscript = set(op.repository for op in env.buildlog.operations
                                 if op.filename == f"{op.repository}/SConscript")
+
     repos_without_sconscript = set(repositories) - repos_with_sconscript
+
 
     for repo in repos_without_sconscript:
         files = []

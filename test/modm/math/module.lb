@@ -25,9 +25,14 @@ def prepare(module, options):
         "modm:math:matrix",
         "modm:math:algorithm",
         "modm:math:utils")
+    if options[":target"].identifier.platform != "avr":
+        module.depends("modm:math:calendar")
     return True
 
 
 def build(env):
     env.outbasepath = "modm-test/src/modm-test/math"
-    env.copy('.')
+    patterns = []
+    if env[":target"].identifier.platform == "avr":
+        patterns += ["*calendar*"]
+    env.copy('.', ignore=env.ignore_patterns(*patterns))

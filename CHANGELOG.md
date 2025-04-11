@@ -52,6 +52,139 @@ pay attention to. Medium impact changes are also worth looking at.
 
 <!--releases-->
 
+## 2025-01-01: 2024q4 release
+
+This release covers everything from 2024-10-01 and has been tested with avr-gcc
+v13.2.0 from Upstream and arm-none-eabi-gcc v13.2.1 from xpack.
+
+Breaking changes:
+
+**Protothreads and Resumables are deprecated! Please use Fibers instead!**
+Note that you can disable the deprecation by resetting the option
+`modm:processing:protothread:use_fiber` to `false`, however, you will be limited
+to using GCC12 as GCC13 and newer does not compile our implementation anymore.
+
+A shim is provided to allow the use of Protothreads and Resumables with Fibers
+without any significant modification of the existing code. However you must
+replace the main loop calling all protothreads with the fiber scheduler:
+
+```cpp
+int main()
+{
+    /*
+    while(true)
+    {
+        protothread1.update();
+        protothread2.update();
+    }
+    */
+    modm::fiber::Scheduler::run();
+    return 0;
+}
+```
+
+The `modm:processing:protothread` and `modm:processing:resumable` modules will
+be removed by the end of 2025. Please port your code to use fibers instead.
+Consult the `modm:processing:fiber` module docs for more information.
+
+Features:
+
+- Add efficient stack overflow check in fiber yield function.
+- Enable D-Cache for Cortex-M7 if DMA is not used.
+- Support for GCC13 which was blocked on deprecating Resumables and Protothreads.
+- Add RTC driver for STM32.
+- Enable low speed clock input on all STM32 boards.
+
+Integrated Projects:
+
+- CMSIS-Core upgraded to v6.1.0.
+- CMSIS-DSP upgraded to v1.16.2.
+- STM32L4 headers upgraded to v1.7.4.
+- STM32F1 headers upgraded to v4.3.5.
+- LVGL upgraded to v9.2.0.
+- TinyUSB upgraded to v0.17.
+- printf upgraded to v6.2.0.
+- ETL upgraded to v20.39.4.
+- nanopb upgraded to v0.4.9.
+
+Fixes:
+
+- Make AMNB usable in Fibers.
+- Reset AVRs on abandonment.
+- Prevent RX FIFO overflow in STM32 SPI master.
+- Fix `Timeout::wait()` implementation not waiting.
+- Fix IWDG prescaler computation on STM32.
+- Support Python 3.13 in modm_tools.
+
+New device drivers:
+
+- DW3310 Ultra-Wide Band driver as [`modm:driver:dw3110`][].
+
+New development boards:
+
+- WeAct Studio STM32C011F6 as [`modm:board:weact-c011f6`][].
+
+Known bugs:
+
+- STM32F723 is missing support to use built-in USB HS PHY. See [#1171][].
+- OpenOCD cannot enable SWO on STM32H7 targets. See [#1079][].
+- `arm-none-eabi-gdb` TUI and GDBGUI interfaces are not supported on Windows.
+  See [#591][].
+- Generating modm on Windows creates paths with `\` that are not compatible with
+  Unix. See [#310][].
+- `lbuild build` and `lbuild clean` do not remove all previously generated files
+  when the configuration changes. See [#285][].
+
+Many thanks to all our contributors.
+A special shoutout to first timers 🎉:
+
+- Andrey Kunitsyn ([@andryblack][])
+- Christopher Durand ([@chris-durand][])
+- Elias H. 🎉
+- Frank Altheim ([@frnktank][]) 🎉
+- Jan-Gerd Meß ([@jgmess-dlr][]) 🎉
+- Kaelin Laundry ([@WasabiFan][])
+- Michael Jossen ([@Javask][])
+- Niklas Hauser ([@salkinium][])
+- Raphael Lehmann ([@rleh][])
+- Rasmus Kleist ([@rasmuskleist][])
+- Vishwanath Martur ([@vishwamartur][]) 🎉
+
+PR [#1248][] -> [2024q4][].
+
+<details>
+<summary>Detailed changelog</summary>
+
+#### 2025-01-01: Add WeAct Studio STM32C011F6 board
+
+PR [#1249][] -> [7ba2fbb][].  
+Tested in hardware by [@salkinium][].
+
+#### 2024-12-30: Add RTC peripheral driver for STM32
+
+PR [#1242][] -> [f402893][].  
+Tested in hardware by [@salkinium][].
+
+#### 2024-12-01: Deprecate Protothreads and Resumable Functions
+
+PR [#1232][] -> [e92dc1d][].  
+Tested in hardware by [@salkinium][].
+
+#### 2024-11-10: Add stack overflow check to fibers
+
+Stack overflows lead to abandonment with the `fbr.stkof` assertion.
+
+PR [#1219][] -> [ae74049][].  
+Tested in hardware by [@salkinium][].
+
+#### 2024-11-05: Add driver for DW3110
+
+PR [#1210][] -> [e579250][].  
+Tested in hardware by [@Javask][] and [@rleh][].
+
+</details>
+
+
 ## 2024-10-01: 2024q3 release
 
 This release covers everything from 2024-07-01 and has been tested with avr-gcc
@@ -3270,6 +3403,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [2024q1]: https://github.com/modm-io/modm/releases/tag/2024q1
 [2024q2]: https://github.com/modm-io/modm/releases/tag/2024q2
 [2024q3]: https://github.com/modm-io/modm/releases/tag/2024q3
+[2024q4]: https://github.com/modm-io/modm/releases/tag/2024q4
 
 [@19joho66]: https://github.com/19joho66
 [@ASMfreaK]: https://github.com/ASMfreaK
@@ -3302,11 +3436,13 @@ Please note that contributions from xpcc were continuously ported to modm.
 [@dergraaf]: https://github.com/dergraaf
 [@dhebbeker]: https://github.com/dhebbeker
 [@el-han]: https://github.com/el-han
+[@frnktank]: https://github.com/frnktank
 [@gueldenstone]: https://github.com/gueldenstone
 [@henrikssn]: https://github.com/henrikssn
 [@hshose]: https://github.com/hshose
 [@jasa]: https://github.com/jasa
 [@jensboe]: https://github.com/jensboe
+[@jgmess-dlr]: https://github.com/jgmess-dlr
 [@kapacuk]: https://github.com/kapacuk
 [@klsc-zeat]: https://github.com/klsc-zeat
 [@lgili]: https://github.com/lgili
@@ -3335,6 +3471,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [@twasilczyk]: https://github.com/twasilczyk
 [@twast92]: https://github.com/twast92
 [@victorandrehc]: https://github.com/victorandrehc
+[@vishwamartur]: https://github.com/vishwamartur
 [@xgzeng]: https://github.com/xgzeng
 
 [`modm:board:arduino-nano`]: https://modm.io/reference/module/modm-board-arduino-nano
@@ -3374,6 +3511,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [`modm:board:srxe`]: https://modm.io/reference/module/modm-board-srxe
 [`modm:board:stm32_f32ve`]: https://modm.io/reference/module/modm-board-stm32_f32ve
 [`modm:board:thingplus-rp2040`]: https://modm.io/reference/module/modm-board-thingplus-rp2040
+[`modm:board:weact-c011f6`]: https://modm.io/reference/module/modm-board-weact-c011f6
 [`modm:disco-f401vc`]: https://modm.io/reference/module/modm-disco-f401vc
 [`modm:disco-f411ve`]: https://modm.io/reference/module/modm-disco-f411ve
 [`modm:disco-f469ni:b-03`]: https://modm.io/reference/module/modm-disco-f469ni-b-03
@@ -3389,6 +3527,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [`modm:driver:bno055`]: https://modm.io/reference/module/modm-driver-bno055
 [`modm:driver:cat24aa`]: https://modm.io/reference/module/modm-driver-cat24aa
 [`modm:driver:cycle_counter`]: https://modm.io/reference/module/modm-driver-cycle_counter
+[`modm:driver:dw3110`]: https://modm.io/reference/module/modm-driver-dw3110
 [`modm:driver:encoder.output`]: https://modm.io/reference/module/modm-driver-encoder-output
 [`modm:driver:encoder_input.bitbang`]: https://modm.io/reference/module/modm-driver-encoder_input-bitbang
 [`modm:driver:encoder_input`]: https://modm.io/reference/module/modm-driver-encoder_input
@@ -3489,7 +3628,13 @@ Please note that contributions from xpcc were continuously ported to modm.
 [#1204]: https://github.com/modm-io/modm/pull/1204
 [#1206]: https://github.com/modm-io/modm/pull/1206
 [#1209]: https://github.com/modm-io/modm/pull/1209
+[#1210]: https://github.com/modm-io/modm/pull/1210
+[#1219]: https://github.com/modm-io/modm/pull/1219
 [#122]: https://github.com/modm-io/modm/pull/122
+[#1232]: https://github.com/modm-io/modm/pull/1232
+[#1242]: https://github.com/modm-io/modm/pull/1242
+[#1248]: https://github.com/modm-io/modm/pull/1248
+[#1249]: https://github.com/modm-io/modm/pull/1249
 [#132]: https://github.com/modm-io/modm/pull/132
 [#136]: https://github.com/modm-io/modm/pull/136
 [#153]: https://github.com/modm-io/modm/pull/153
@@ -3818,6 +3963,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [77ae899]: https://github.com/modm-io/modm/commit/77ae899
 [78d18f6]: https://github.com/modm-io/modm/commit/78d18f6
 [7b5827f]: https://github.com/modm-io/modm/commit/7b5827f
+[7ba2fbb]: https://github.com/modm-io/modm/commit/7ba2fbb
 [7d1f7cc]: https://github.com/modm-io/modm/commit/7d1f7cc
 [7d7490d]: https://github.com/modm-io/modm/commit/7d7490d
 [7df2e7d]: https://github.com/modm-io/modm/commit/7df2e7d
@@ -3874,6 +4020,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [a8edbe8]: https://github.com/modm-io/modm/commit/a8edbe8
 [ab9bcee]: https://github.com/modm-io/modm/commit/ab9bcee
 [ac46099]: https://github.com/modm-io/modm/commit/ac46099
+[ae74049]: https://github.com/modm-io/modm/commit/ae74049
 [af2b352]: https://github.com/modm-io/modm/commit/af2b352
 [afaea7f]: https://github.com/modm-io/modm/commit/afaea7f
 [afbd533]: https://github.com/modm-io/modm/commit/afbd533
@@ -3929,9 +4076,12 @@ Please note that contributions from xpcc were continuously ported to modm.
 [e3c0321]: https://github.com/modm-io/modm/commit/e3c0321
 [e46e7df]: https://github.com/modm-io/modm/commit/e46e7df
 [e4b1a4a]: https://github.com/modm-io/modm/commit/e4b1a4a
+[e579250]: https://github.com/modm-io/modm/commit/e579250
+[e92dc1d]: https://github.com/modm-io/modm/commit/e92dc1d
 [eb2748e]: https://github.com/modm-io/modm/commit/eb2748e
 [eba68a4]: https://github.com/modm-io/modm/commit/eba68a4
 [eda224e]: https://github.com/modm-io/modm/commit/eda224e
+[f402893]: https://github.com/modm-io/modm/commit/f402893
 [f4c7492]: https://github.com/modm-io/modm/commit/f4c7492
 [f4d5d6c]: https://github.com/modm-io/modm/commit/f4d5d6c
 [f5cdf6a]: https://github.com/modm-io/modm/commit/f5cdf6a

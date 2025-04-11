@@ -66,6 +66,45 @@ int main()
 	same functions resulting in naming conflicts.
 
 
+## Programming
+
+Most development boards have a programmer on-board and the BSPs are configured
+to use them automatically.
+
+However, for development boards without a programmer on-board, you need to use
+your own and *specify* which one you're using. For simple configuration, adding
+a collector is enough:
+
+```xml
+<library>
+  <collectors>
+    <collect name="modm:build:openocd.source">interface/stlink.cfg</collect>
+  </collectors>
+</library>
+```
+
+For more complex configuration, add a custom `openocd.cfg` file:
+
+```tcl
+# Replace this with your custom programmer
+source [find interface/stlink.cfg]
+
+# To select a specific programmer you can specify its serial number
+hla_serial "\\x53\\x3f\\x6f\\x06\\x50\\x77\\x50\\x57\\x12\\x17\\x14\\x3f"
+# You can discover the serial via `lsusb -v`.
+```
+
+Then include this file in your build options like so:
+
+```xml
+<library>
+  <options>
+    <option name="modm:build:openocd.cfg">openocd.cfg</option>
+  </options>
+</library>
+```
+
+
 ## Customization
 
 The BSPs contain an opinionated set of pre-defined functionality and settings.

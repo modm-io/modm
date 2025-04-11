@@ -53,6 +53,7 @@ EXCEPTION_FRAME_SIZE = {{ exception_frame_size }};
 		__vector_table_rom_start = .;
 		__vector_table_ram_load = .;
 		KEEP(*(.vector_rom))
+		. = ALIGN(8);
 		__vector_table_rom_end = .;
 	} >{{memory}}
 %% endmacro
@@ -65,7 +66,7 @@ EXCEPTION_FRAME_SIZE = {{ exception_frame_size }};
 	{
 		__vector_table_ram_start = .;
 		KEEP(*(.vector_ram))
-		. = ALIGN(4);
+		. = ALIGN(8);
 		__vector_table_ram_end = .;
 	} >{{memory}}
 %% endmacro
@@ -144,10 +145,11 @@ EXCEPTION_FRAME_SIZE = {{ exception_frame_size }};
 	%#
 	.{{section}} :
 	{
+		. = ALIGN(8);
 		__{{section}}_load = LOADADDR(.{{section}});
 		__{{section}}_start = .;
 		*(.{{section}} .{{section}}.*)
-		. = ALIGN(4);
+		. = ALIGN(8);
 		__{{section}}_end = .;
 	} >{{memory}}
 	%% endfor
@@ -284,11 +286,11 @@ EXCEPTION_FRAME_SIZE = {{ exception_frame_size }};
 	%% do table_copy.append("data")
 	.data :
 	{
-		. = ALIGN(4);
+		. = ALIGN(8);
 		__data_load = LOADADDR(.data);
 		__data_start = .;
 		*(.data .data.* .gnu.linkonce.d.*)
-		. = ALIGN(4);
+		. = ALIGN(8);
 		__data_end = .;
 	} >{{memory}} AT >{{rom}}
 	%% do table_copy.extend(sections_data)
@@ -299,7 +301,7 @@ EXCEPTION_FRAME_SIZE = {{ exception_frame_size }};
 		__{{section}}_load = LOADADDR(.{{section}});
 		__{{section}}_start = .;
 		*(.{{section}} .{{section}}.*)
-		. = ALIGN(4);
+		. = ALIGN(8);
 		__{{section}}_end = .;
 	} >{{memory}} AT >{{rom}}
 	%% endfor
@@ -320,6 +322,7 @@ EXCEPTION_FRAME_SIZE = {{ exception_frame_size }};
 		. = ALIGN(4);
 		__{{section}}_end = .;
 	%% endfor
+		. = ALIGN(8);
 		__bss_end = .;
 	} >{{memory}}
 	%#
@@ -330,7 +333,7 @@ EXCEPTION_FRAME_SIZE = {{ exception_frame_size }};
 	{
 		__{{section}}_start = . ;
 		*(.{{section}} .{{section}}.*)
-		. = ALIGN(4);
+		. = ALIGN(8);
 		__{{section}}_end = .;
 	} >{{memory}}
 	%% endfor

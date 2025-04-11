@@ -2,6 +2,10 @@ name: Run tests on Windows
 
 on: [pull_request]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   windows_testing:
     runs-on: windows-2022
@@ -43,18 +47,18 @@ jobs:
           Start-Job {
             Set-Location $using:PWD
             Add-Type -Assembly "System.IO.Compression.Filesystem"
-            Invoke-WebRequest -OutFile gcc-win64.zip https://github.com/brechtsanders/winlibs_mingw/releases/download/12.2.0-15.0.6-10.0.0-msvcrt-r3/winlibs-x86_64-posix-seh-gcc-12.2.0-mingw-w64msvcrt-10.0.0-r3.zip
+            Invoke-WebRequest -OutFile gcc-win64.zip https://github.com/brechtsanders/winlibs_mingw/releases/download/13.2.0posix-18.1.5-11.0.1-msvcrt-r8/winlibs-x86_64-posix-seh-gcc-13.2.0-mingw-w64msvcrt-11.0.1-r8.zip
             [System.IO.Compression.ZipFile]::ExtractToDirectory("gcc-win64.zip", "C:\")
           }
           Start-Job {
             Set-Location $using:PWD
-            Invoke-WebRequest -OutFile gcc-arm-none-eabi-win64.zip https://developer.arm.com/-/media/Files/downloads/gnu/12.2.rel1/binrel/arm-gnu-toolchain-12.2.rel1-mingw-w64-i686-arm-none-eabi.zip
+            Invoke-WebRequest -OutFile gcc-arm-none-eabi-win64.zip https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-mingw-w64-i686-arm-none-eabi.zip
             Expand-Archive -Path gcc-arm-none-eabi-win64.zip -DestinationPath C:\ -Force
           }
           Start-Job {
             Set-Location $using:PWD
             Add-Type -Assembly "System.IO.Compression.Filesystem"
-            Invoke-WebRequest -OutFile gcc-avr-win64.zip https://github.com/ZakKemble/avr-gcc-build/releases/download/v12.1.0-1/avr-gcc-12.1.0-x64-windows.zip
+            Invoke-WebRequest -OutFile gcc-avr-win64.zip https://github.com/ZakKemble/avr-gcc-build/releases/download/v13.2.0-1/avr-gcc-13.2.0-x64-windows.zip
             [System.IO.Compression.ZipFile]::ExtractToDirectory("gcc-avr-win64.zip", "C:\")
           }
           Get-Job | Wait-Job
@@ -65,11 +69,11 @@ jobs:
         run: |
           dir C:\
           dir C:\mingw64
-          dir C:\arm-gnu-toolchain-12.2.rel1-mingw-w64-i686-arm-none-eabi
-          dir C:\avr-gcc-12.1.0-x64-windows
+          dir C:\arm-gnu-toolchain-13.2.rel1-mingw-w64-i686-arm-none-eabi
+          dir C:\avr-gcc-13.2.0-x64-windows
           echo "C:\mingw64\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          echo "C:\arm-gnu-toolchain-12.2.rel1-mingw-w64-i686-arm-none-eabi\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          echo "C:\avr-gcc-12.1.0-x64-windows\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "C:\arm-gnu-toolchain-13.2.rel1-mingw-w64-i686-arm-none-eabi\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "C:\avr-gcc-13.2.0-x64-windows\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           rm gcc-arm-none-eabi-win64.zip
 
       - name: Install Python
@@ -117,7 +121,7 @@ jobs:
         shell: bash
         run: |
           (cd examples && python ../tools/scripts/examples_compile.py nucleo_f031k6 nucleo_f103rb nucleo_f303re nucleo_f411re nucleo_f746zg)
-          (cd examples && python ../tools/scripts/examples_compile.py nucleo_g071rb nucleo_l031k6 nucleo_l152re nucleo_l476rg nucleo_g474re)
+          (cd examples && python ../tools/scripts/examples_compile.py nucleo_g071rb nucleo_l031k6 nucleo_l152re nucleo_l432kc nucleo_g474re)
 
       - name: Compile AVR Examples
         if: always()

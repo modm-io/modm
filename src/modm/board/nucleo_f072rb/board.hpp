@@ -30,7 +30,7 @@ using namespace modm::literals;
 /// STM32f072rb running at 48MHz generated from the internal 8MHz crystal
 struct SystemClock
 {
-	static constexpr int Frequency = 48_MHz;
+	static constexpr uint32_t Frequency = 48_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb = Frequency;
 
@@ -60,10 +60,14 @@ struct SystemClock
 
 	static constexpr uint32_t Usb = 48_MHz;
 	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
+	static constexpr uint32_t Rtc = 32.768_kHz;
 
 	static bool inline
 	enable()
 	{
+		Rcc::enableLowSpeedExternalCrystal();
+		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::LowSpeedExternalCrystal);
+
 		// Enable the internal 48MHz clock
 		Rcc::enableInternalClockMHz48();
 		// set flash latency for 48MHz

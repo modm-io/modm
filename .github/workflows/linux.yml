@@ -2,11 +2,15 @@ name: Run tests on Linux
 
 on: [pull_request]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   unittests-linux-generic:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2024-12-01
 
     steps:
       - name: Check out repository
@@ -18,7 +22,7 @@ jobs:
           git config --global --add safe.directory /__w/modm/modm
       - name: Update lbuild
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
       - name: Check environment
         run: |
           env
@@ -121,9 +125,9 @@ jobs:
           python3 tools/font_creator/font_export.py tools/font_creator/fonts/all_caps_3x5.font /tmp/all_caps_converted
 
   stm32-examples:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2024-12-01
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -134,7 +138,7 @@ jobs:
           git config --global --add safe.directory /__w/modm/modm
       - name: Update lbuild
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
       - name: Examples STM32C0 Series
         if: always()
         run: |
@@ -189,9 +193,9 @@ jobs:
           (cd examples && ../tools/scripts/examples_compile.py nucleo_h743zi nucleo_h723zg stm32h750vbt6_devebox)
 
   stm32f4-examples-1:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2024-12-01
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -202,16 +206,16 @@ jobs:
           git config --global --add safe.directory /__w/modm/modm
       - name: Update lbuild
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
       - name: Examples STM32F4 Only Discovery Board
         if: always()
         run: |
           (cd examples && ../tools/scripts/examples_compile.py stm32f4_discovery stm32f429_discovery stm32f469_discovery stm32f401_discovery)
 
   stm32f4-examples-2:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2024-12-01
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -222,19 +226,19 @@ jobs:
           git config --global --add safe.directory /__w/modm/modm
       - name: Update lbuild
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
       - name: Install protobuf==3.20.1 grpcio-tools (pip)
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager protobuf==3.20.1 grpcio-tools
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages protobuf grpcio-tools
       - name: Examples STM32F4 Without Discovery Board
         if: always()
         run: |
           (cd examples && ../tools/scripts/examples_compile.py nucleo_f401re nucleo_f411re nucleo_f429zi nucleo_f446re nucleo_f446ze nucleo_f439zi black_pill_f401 black_pill_f411 stm32f407vet6_devebox stm32_f4ve)
 
   avr-examples:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-avr:2023-03-12
+      image: ghcr.io/modm-ext/modm-build-avr:2024-12-01
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -245,8 +249,9 @@ jobs:
           git config --global --add safe.directory /__w/modm/modm
       - name: Update lbuild
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
       - name: Check environment
+        if: always()
         run: |
           which avr-g++
           avr-g++ --version
@@ -272,15 +277,16 @@ jobs:
         run: |
           (cd test/all && python3 run_all.py at --quick)
       - name: Upload log artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: hal-compile-quick-avr
           path: test/all/log
 
   hal-compile-quick-1:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2024-12-01
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -291,7 +297,7 @@ jobs:
           git config --global --add safe.directory /__w/modm/modm
       - name: Update lbuild
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
       - name: Quick compile HAL for Cortex-M Part 1
         if: always()
         run: |
@@ -303,9 +309,9 @@ jobs:
           path: test/all/log
 
   hal-compile-quick-2:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2024-12-01
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -316,7 +322,7 @@ jobs:
           git config --global --add safe.directory /__w/modm/modm
       - name: Update lbuild
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
       - name: Quick compile HAL for Cortex-M Part 2
         if: always()
         run: |
@@ -328,9 +334,9 @@ jobs:
           path: test/all/log
 
   hal-compile-quick-3:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2024-12-01
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -341,7 +347,7 @@ jobs:
           git config --global --add safe.directory /__w/modm/modm
       - name: Update lbuild
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
       - name: Quick compile HAL for Cortex-M Part 3
         if: always()
         run: |
@@ -353,9 +359,9 @@ jobs:
           path: test/all/log
 
   hal-compile-quick-4:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2024-12-01
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -366,7 +372,7 @@ jobs:
           git config --global --add safe.directory /__w/modm/modm
       - name: Update lbuild
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
       - name: Quick compile HAL for Cortex-M Part 4
         if: always()
         run: |
@@ -391,9 +397,18 @@ jobs:
       - name: Fix Git permission/ownership problem
         run: |
           git config --global --add safe.directory /__w/modm/modm
+      - name: Check environment
+        run: |
+          env
+          locale -a
+          python --version  || true
+          python3 --version || true
+          python3 -c "import os; print(os.cpu_count())"
       - name: Update lbuild
         run: |
           pip3 install --upgrade --upgrade-strategy=eager modm
+          which lbuild
+          lbuild --version
       - name: Install mkdocs mkdocs-material (pip)
         run: |
           pip3 install --upgrade --upgrade-strategy=eager mkdocs mkdocs-material

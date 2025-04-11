@@ -58,10 +58,14 @@ struct SystemClock
 	static constexpr uint32_t Timer10 = Apb2Timer;
 	static constexpr uint32_t Timer11 = Apb2Timer;
 	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
+	static constexpr uint32_t Rtc = 32.768_kHz;
 
 	static bool inline
 	enable()
 	{
+		Rcc::enableLowSpeedExternalCrystal();
+		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::LowSpeedExternalCrystal);
+
 		// Enable power scaling for 1.8V
 		PWR->CR = (PWR->CR & ~PWR_CR_VOS) | PWR_CR_VOS_0;
 		while(PWR->CSR & PWR_CSR_VOSF) ;

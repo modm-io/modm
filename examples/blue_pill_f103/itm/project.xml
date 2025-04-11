@@ -2,7 +2,6 @@
   <extends>modm:blue-pill-f103</extends>
   <options>
     <option name="modm:build:build.path">../../../build/blue_pill_f103/itm</option>
-    <option name="modm:build:openocd.cfg">openocd.cfg</option>
     <option name="modm:platform:itm:buffer.tx">250</option>
   </options>
   <modules>
@@ -11,4 +10,7 @@
     <module>modm:platform:itm</module>
     <module>modm:processing:timer</module>
   </modules>
+  <collectors>
+    <collect name="modm:build:openocd.source">interface/stlink.cfg</collect>
+  </collectors>
 </library>

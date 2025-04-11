@@ -2,11 +2,13 @@
   <extends>modm:blue-pill-f103</extends>
   <options>
     <option name="modm:build:build.path">../../../build/blue_pill_f103/graphics</option>
-    <option name="modm:build:openocd.cfg">openocd.cfg</option>
   </options>
   <modules>
     <module>modm:build:scons</module>
     <module>modm:driver:ili9341</module>
     <module>modm:platform:spi:1</module>
   </modules>
+  <collectors>
+    <collect name="modm:build:openocd.source">interface/stlink.cfg</collect>
+  </collectors>
 </library>

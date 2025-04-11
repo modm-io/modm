@@ -66,7 +66,6 @@ struct SystemClock
 	static constexpr uint32_t I2c4      = I2c;
 	static constexpr uint32_t Lptim     = Apb1;
 	static constexpr uint32_t Lpuart    = Apb1;
-	static constexpr uint32_t Rtc       = Apb1;
 	static constexpr uint32_t Spi2      = Apb1;
 	static constexpr uint32_t Spi3      = Apb1;
 	static constexpr uint32_t Uart4     = Apb1;
@@ -94,6 +93,8 @@ struct SystemClock
 	static constexpr uint32_t Timer20   = Apb2Timer;
 	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
 
+	static constexpr uint32_t Rtc = 32.768_kHz;
+
 	static bool inline
 	enable()
 	{
@@ -114,6 +115,9 @@ struct SystemClock
 		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div1);
 		// update frequencies for busy-wait delay functions
 		Rcc::updateCoreFrequency<Frequency>();
+
+		Rcc::enableLowSpeedExternalCrystal();
+		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::LowSpeedExternalCrystal);
 
 		Rcc::setCanClockSource(Rcc::CanClockSource::Pclk);
 		return true;

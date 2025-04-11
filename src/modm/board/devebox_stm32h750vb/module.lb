@@ -10,7 +10,9 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-description = """
+def init(module):
+    module.name = ":board:devebox-stm32h750vb"
+    module.description = """
 # STM32F750VB mcudev DevEBox
 
 [STM32F750VB mcudev DevEBox H7xx](https://github.com/mcauser/MCUDEV_DEVEBOX_H7XX_M)
@@ -32,39 +34,7 @@ target option in your `project.xml`:
   </options>
 </library>
 ```
-
-## Programming
-
-Since the board doesn't have a programmer on-board, you need to use your
-own and *specify* which one you're using in a custom `openocd.cfg` file:
-
-```
-# Replace this with your custom programmer
-source [find interface/stlink.cfg]
-
-# If you use the clone CKS32F103C8T6 chip you need to overwrite this ID
-#set CPUTAPID 0x2ba01477
-
-# To select a specific programmer you can specify its serial number
-#hla_serial "\\x53\\x3f\\x6f\\x06\\x50\\x77\\x50\\x57\\x12\\x17\\x13\\x3f"
-# You can discover the serial via `stlink --hla-serial` or `st-info --hla-serial`.
-```
-
-Then include this file in your build options like so:
-
-```xml
-<library>
-  <extends>modm:devebox-stm32h750vb</extends>
-  <options>
-    <option name="modm:build:openocd.cfg">openocd.cfg</option>
-  </options>
-</library>
-```
 """
-
-def init(module):
-    module.name = ":board:devebox-stm32h750vb"
-    module.description = description
 
 def prepare(module, options):
     if not options[":target"].partname.startswith("stm32h750vbt"):
@@ -90,9 +60,6 @@ def build(env):
     env.copy('.')
 
     env.outbasepath = "modm/openocd/modm/board/"
-    env.copy(repopath("tools/openocd/modm/stm32h7xx_devebox.cfg"), "stm32h7xx_devebox.cfg")
-    env.collect(":build:openocd.source", "modm/board/stm32h7xx_devebox.cfg")
-
-    # Warn the user if they forgot to set a custom openocd config
-    if env.has_option(":build:openocd.cfg") and not len(env.get(":build:openocd.cfg", "")):
-        env.log.warning("You need to provide the programmer via a custom OpenOCD config!\n" + description)
+    env.template(repopath("tools/openocd/modm/stm32_swd.cfg.in"), "board.cfg",
+                 substitutions={"target": "stm32h7x"})
+    env.collect(":build:openocd.source", "modm/board/board.cfg")

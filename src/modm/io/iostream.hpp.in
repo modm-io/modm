@@ -25,11 +25,13 @@
 #include <inttypes.h>
 #include <type_traits>
 #include <climits>
+#include <chrono>
+#include <string_view>
 
 #include "iodevice.hpp"
 #include "iodevice_wrapper.hpp" // convenience
 
-%% if using_printf
+%% if options.with_printf
 /// @cond
 extern "C"
 {
@@ -214,6 +216,13 @@ public:
 	operator << (const char* s)
 	{ device->write(s); return *this; }
 
+	inline IOStream&
+	operator << (const std::string_view sv)
+	{
+		for (const auto c : sv) device->write(c);
+		return *this;
+	}
+
 	/// write the hex value of a pointer
 	inline IOStream&
 	operator << (const void* p)
@@ -290,7 +299,7 @@ private:
 private:
 	IODevice* const	device;
 	Mode mode = Mode::Ascii;
-%% if using_printf
+%% if options.with_printf
 	static void out_char(char c, void* arg)
 	{ if (c) reinterpret_cast<modm::IOStream*>(arg)->write(c); }
 	printf_output_gadget_t output_gadget{out_char, this, NULL, 0, INT_MAX};
@@ -362,5 +371,7 @@ white(IOStream& ios);
 /// @}
 
 }	// namespace modm
+
+#include "iostream_chrono.hpp"
 
 #endif // MODM_IOSTREAM_HPP

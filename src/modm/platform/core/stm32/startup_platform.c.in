@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2016, Sascha Schade
  * Copyright (c) 2016-2017, Fabian Greif
- * Copyright (c) 2016-2017, 2019, Niklas Hauser
+ * Copyright (c) 2016-2017, 2019, 2024, Niklas Hauser
  * Copyright (c) 2021, Raphael Lehmann
  * Copyright (c) 2021, Christopher Durand
  *
@@ -30,60 +30,75 @@ __modm_initialize_platform(void)
 {
 	// Enable SYSCFG
 %% if target.family in ["c0", "g0"]
-	RCC->APBENR2 |= RCC_APBENR2_SYSCFGEN;
+	RCC->APBENR2 |= RCC_APBENR2_SYSCFGEN; __DSB();
+%% elif target.family == "f0"
+	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGCOMPEN; __DSB();
 %% elif target.family == "f1"
-	RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
+	RCC->APB2ENR |= RCC_APB2ENR_AFIOEN; __DSB();
 %% elif target.family == "h7"
-	RCC->APB4ENR |= RCC_APB4ENR_SYSCFGEN;
+	RCC->APB4ENR |= RCC_APB4ENR_SYSCFGEN; __DSB();
 %% elif target.family == "u5"
-	RCC->APB3ENR |= RCC_APB3ENR_SYSCFGEN;
+	RCC->APB3ENR |= RCC_APB3ENR_SYSCFGEN; __DSB();
 %% else
-	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
+	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN; __DSB();
+%% endif
+
+	// Enable power to backup domain
+%% if target.family == "f1"
+	RCC->APB1ENR |= RCC_APB1ENR_PWREN | RCC_APB1ENR_BKPEN; __DSB();
+%% elif target.family in ["f0", "f2", "f3", "f4", "f7", "l0", "l1"]
+	RCC->APB1ENR |= RCC_APB1ENR_PWREN; __DSB();
+%% elif target.family in ["c0", "g0", "u0"]
+	RCC->APBENR1 |= RCC_APBENR1_PWREN; __DSB();
+%% elif target.family in ["g4", "l4", "l5"]
+	RCC->APB1ENR1 |= RCC_APB1ENR1_PWREN; __DSB();
+%% elif target.family == "u5"
+	RCC->AHB3ENR |= RCC_AHB3ENR_PWREN; __DSB();
+%% endif
+
+%% if target.family in ["f0", "f1", "f2", "f3", "f4", "l0", "l1"]
+	PWR->CR |= PWR_CR_DBP;
+%% elif target.family in ["f7", "g0", "g4", "h7", "l4", "l5", "u0", "wb", "wl"]
+	PWR->CR1 |= PWR_CR1_DBP;
+%% elif target.family == "h5"
+	PWR->DBPCR |= PWR_DBPCR_DBP;
+%% elif target.family in ["u5", "wba"]
+	PWR->DBPR |= PWR_DBPR_DBP;
 %% endif
 
 %% if target.family == "f4"
-// Only the more powerful F4 targets have CCM or Backup SRAM
+	// Only the more powerful F4 targets have CCM or Backup SRAM
 #ifdef RCC_AHB1ENR_CCMDATARAMEN
-	// Enable power to backup domain
-	RCC->APB1ENR |= RCC_APB1ENR_PWREN;
-	// Enable write access to backup SRAM
-	PWR->CR |= PWR_CR_DBP;
 	// Enable Core Coupled Memory (CCM) and backup SRAM (BKPSRAM)
 	RCC->AHB1ENR |= RCC_AHB1ENR_CCMDATARAMEN | RCC_AHB1ENR_BKPSRAMEN;
 #endif
 %% elif target.family == "f7"
 	// Reset from DFU settings to reset values.
 	RCC->DCKCFGR2 = 0;
-	// Enable power to backup domain
-	RCC->APB1ENR |= RCC_APB1ENR_PWREN;
-	// Enable write access to backup SRAM
-	PWR->CR1 |= PWR_CR1_DBP;
 	// Enable Data Tighly Coupled Memory (DTCM) and backup SRAM (BKPSRAM)
 	RCC->AHB1ENR |= RCC_AHB1ENR_DTCMRAMEN | RCC_AHB1ENR_BKPSRAMEN;
-%% elif target.family in ["g0", "g4", "l4", "l5"]
-%% if target.family in ["l4", "g4"]
-	RCC->APB1ENR1 |= RCC_APB1ENR1_PWREN;
-%% elif target.family != "g0"
-#ifdef PWR_CR2_IOSV
-	RCC->APB1ENR1 |= RCC_APB1ENR1_PWREN;
-#endif
-%% endif
-
+%% elif target.family == "h7"
+	// Enable all SRAMs
+	%% if target.name[0].isnumeric()
+	RCC->AHB2ENR |= RCC_AHB2ENR_SRAM1EN | RCC_AHB2ENR_SRAM2EN;
+	%% else
+	RCC->AHB2ENR |= RCC_AHB2ENR_AHBSRAM1EN | RCC_AHB2ENR_AHBSRAM2EN;
+	%% endif
+	RCC->AHB4ENR |= RCC_AHB4ENR_BKPRAMEN;
+%% elif target.family in ["g4", "l4", "l5"]
 #ifdef PWR_CR2_IOSV
 	// Enable VDDIO2
 	PWR->CR2 |= PWR_CR2_IOSV;
 #endif
-%% elif target.family in ["u5"]
-	RCC->AHB3ENR |= RCC_AHB3ENR_PWREN;
+%% elif target.family == "u5"
 	// Enable power for VDDIO2 and USB
 	PWR->SVMCR |= PWR_SVMCR_ASV | PWR_SVMCR_IO2SV | PWR_SVMCR_USV;
-
 	// Enable Backup SRAM (BKPSRAM)
-	PWR->DBPR |= PWR_DBPR_DBP;
 	RCC->AHB1ENR |= RCC_AHB1ENR_BKPSRAMEN;
 %% endif
 
 %% if vector_table_location == "ram"
+	__DSB();
 	// Remap SRAM to 0x0 for vector table relocation without VTOR register
 	SYSCFG->CFGR1 |= SYSCFG_CFGR1_MEM_MODE;
 %% endif

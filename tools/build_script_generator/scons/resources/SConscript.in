@@ -8,8 +8,7 @@
 
 #!/usr/bin/env python3
 
-from os.path import join, abspath, realpath, dirname
-import shutil
+from os.path import join, abspath
 Import("env")
 
 profile = ARGUMENTS.get("profile", "release")
@@ -23,29 +22,22 @@ env["COMPILERPREFIX"] = "avr-"
 env["COMPILERPREFIX"] = "arm-none-eabi-"
 %% endif
 %% if family == "darwin"
-# Using homebrew gcc-12 on macOS instead of clang
-env["COMPILERSUFFIX"] = "-12"
+# Using homebrew gcc-13 on macOS instead of clang
+env["COMPILERSUFFIX"] = "-13"
 %% endif
 %% endif
 
+%% if toolpaths
 # SCons tools
 env.Append(toolpath=[
 %% for toolpath in toolpaths | sort
     abspath("{{ toolpath | modm.windowsify(escape_level=1) }}"),
 %% endfor
 ])
+%% endif
 %% for tool in tools | sort
 env.Tool("{{tool}}")
 %% endfor
-
-c_compiler_name = env["CC"]
-c_compiler_path = shutil.which(c_compiler_name)
-
-if c_compiler_path is None:
-    print(f'Selected compiler "{c_compiler_name}" not found on PATH. Please add its installation directory to the PATH environment variable.')
-    exit(1)
-
-env["GCC_PATH"] = dirname(dirname(realpath(c_compiler_path)))
 
 %% macro generate_flags_for_profile(name, profile, append=False)
 env{% if append %}.Append({{name | upper}}{% else %}["{{name | upper}}"]{% endif %} = [
@@ -205,6 +197,7 @@ env.AppendUnique(LIBPATH=[
 env.ParseConfig("pkg-config --cflags --libs {{ packages | sort | join(" ") }}")
 %% endif
 
+%% if is_modm
 for flags in ["CCFLAGS", "CFLAGS", "CXXFLAGS", "ASFLAGS", "ARCHFLAGS", "LINKFLAGS"]:
 	flags_str = ARGUMENTS.get(flags)
 	if flags_str is not None:
@@ -220,5 +213,6 @@ for flags in ["CCFLAGS", "CFLAGS", "CXXFLAGS", "ASFLAGS", "ARCHFLAGS", "LINKFLAG
 					exit(1)
 			else:
 				env[flags].append(flag)
+%% endif
 
 Return("library")

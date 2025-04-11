@@ -13,6 +13,8 @@
 # - 2018, Niklas Hauser
 
 import os
+from os.path import realpath, dirname
+import shutil
 
 from SCons.Script import *
 
@@ -92,7 +94,13 @@ def generate(env, **kw):
     env.AddMethod(strip_binary, 'Strip')
     env.AddMethod(list_symbols, 'Symbols')
 
+    c_compiler_name = env["CC"]
+    assert (c_compiler_path := shutil.which(c_compiler_name)), \
+            f'Selected compiler "{c_compiler_name}" not found on PATH. ' \
+            "Please add its installation directory to the PATH environment variable."
+    env["GCC_PATH"] = dirname(dirname(realpath(c_compiler_path)))
+
 
 def exists(env):
-    return True
+    return env.Detect(env["CC"])
 

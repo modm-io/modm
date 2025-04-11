@@ -12,13 +12,13 @@
 
 def init(module):
     module.name = ":board:black-pill-f411"
-    module.description = """\
+    module.description = """
 # Black Pill F411
 
 STM32F411CEU "Mini-F411" Minimum System Development Board
 
 Cheap and bread-board-friendly board for STM32F411 series.
-Sold for less than 5 USD on well known Internet shops from China.
+Sold for less than 5 USD on Aliexpress.
 Attention: There are two variants: Mini-F411 and the cheaper Mini-F401.
 
 https://stm32-base.org/boards/STM32F401CEU6-WeAct-Black-Pill-V3.0
@@ -31,25 +31,6 @@ A DFU command is integrated into the `modm:build:scons` tool and can be called a
 
 ```
 scons program-dfu
-```
-
-Alternatively you can go for an external programmer
-and *specify* which one you're using in a custom `openocd.cfg` file:
-
-```
-# Replace this with your custom programmer
-source [find interface/stlink-v2.cfg]
-```
-
-Then include this file in your build options like so:
-
-```xml
-<library>
-  <extends>modm:black-pill-f411</extends>
-  <options>
-    <option name="modm:build:openocd.cfg">openocd.cfg</option>
-  </options>
-</library>
 ```
 """
 
@@ -75,5 +56,6 @@ def build(env):
     env.copy('.')
 
     env.outbasepath = "modm/openocd/modm/board/"
-    env.copy(repopath("tools/openocd/modm/stm32f4x1_mini_f4x1.cfg"), "stm32f4x1_mini_f4x1.cfg")
-    env.collect(":build:openocd.source", "modm/board/stm32f4x1_mini_f4x1.cfg")
+    env.template(repopath("tools/openocd/modm/stm32_swd.cfg.in"), "board.cfg",
+                 substitutions={"target": "stm32f4x"})
+    env.collect(":build:openocd.source", "modm/board/board.cfg")

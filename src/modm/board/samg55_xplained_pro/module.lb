@@ -31,4 +31,6 @@ def build(env):
     env.outbasepath = "modm/src/modm/board"
     env.copy('board.hpp')
 
-    # TODO: openocd config?
+    env.outbasepath = "modm/openocd/modm/board/"
+    env.copy(repopath("tools/openocd/modm/atmel_samg55_xplained_pro.cfg"), "atmel_samg55_xplained_pro.cfg")
+    env.collect(":build:openocd.source", "modm/board/atmel_samg55_xplained_pro.cfg")

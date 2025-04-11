@@ -41,7 +41,6 @@ import time
 import signal
 import tempfile
 import platform
-import telnetlib
 import subprocess
 
 from . import utils
@@ -126,11 +125,16 @@ def itm(backend, fcpu, baudrate=None):
                 pass
 
 def rtt(backend, channel=0):
+    try:
+        import telnetlib3
+    except ImportError:
+        print("Please upgrade modm: pip3 install -U modm")
+        import telnetlib as telnetlib3
     backend.commands.append("modm_rtt")
     # Start OpenOCD in the background
     with backend.scope():
         time.sleep(0.5)
-        with telnetlib.Telnet("localhost", 9090+channel) as tn:
+        with telnetlib3.Telnet("localhost", 9090+channel) as tn:
             try:
                 tn.interact()
             except KeyboardInterrupt:

@@ -171,10 +171,10 @@ modm::platform::Fdcan{{ id }}::initializeWithPrescaler(
 
 	// Configure nominal bitrate
 	{{ reg }}->NBTP =
-		((standardTimings.sjw - 1) << FDCAN_NBTP_NSJW_Pos) |
-		((standardTimings.bs2 - 1) << FDCAN_NBTP_NTSEG2_Pos) |
-		((standardTimings.bs1 - 1) << FDCAN_NBTP_NTSEG1_Pos) |
-		((standardTimings.prescaler - 1) << FDCAN_NBTP_NBRP_Pos);
+		((0) << FDCAN_NBTP_NSJW_Pos) |
+		((5) << FDCAN_NBTP_NTSEG2_Pos) |
+		((8) << FDCAN_NBTP_NTSEG1_Pos) |
+		((60) << FDCAN_NBTP_NBRP_Pos);
 
 	if(fdDataTimings) {
 		// Configure FD mode fast data bitrate

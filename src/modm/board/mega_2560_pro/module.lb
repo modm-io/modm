@@ -44,7 +44,7 @@ def build(env):
     }
     env.template("../board.cpp.in", "board.cpp")
     env.copy('.')
-    env.collect(":build:default.avrdude.programmer", "stk500v2");
-    env.collect(":build:default.avrdude.baudrate", "115200");
+    env.collect(":build:default.avrdude.programmer", "stk500v2")
+    env.collect(":build:default.avrdude.baudrate", "115200")
     # The STK500v2 bootloader of the atmega is unwilling to chip erase
-    env.collect(":build:default.avrdude.options", "-D");
+    env.collect(":build:default.avrdude.options", "-D")

@@ -8,7 +8,6 @@
     <option name="modm:build:scons:include_sconstruct">yes</option>
     <option name="modm:build:info.build">yes</option>
     <option name="modm:build:info.git">Info+Status</option>
-    <option name="modm:processing:protothread:use_fiber">no</option>
   </options>
   <modules>
     <module>modm:build:scons</module>

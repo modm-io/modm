@@ -219,7 +219,20 @@ def prepare(module, options):
             maximum="64Ki",
             default="3Ki"))
 
-    if "f" in options[":target"].get_driver("core")["type"]:
+    core = options[":target"].get_driver("core")["type"]
+    if "m7" in core:
+        module.add_option(
+            BooleanOption(
+                name="enable_icache",
+                description="Enable Instruction-Cache",
+                default=True))
+        module.add_option(
+            BooleanOption(
+                name="enable_dcache",
+                description="Enable Data-Cache",
+                default=True))
+
+    if "f" in core:
         module.add_option(
             EnumerationOption(
                 name="float-abi",
@@ -331,8 +344,7 @@ def validate(env):
 def build(env):
     env.substitutions = env.query("vector_table")
     core = env.substitutions["core"]
-    with_icache = "m7" in core
-    with_dcache = with_icache and not (env.has_module(":platform:dma") or env.has_module(":platform:bdma"))
+    enable_dcache = env.get("enable_dcache", False) and not (env.has_module(":platform:dma") or env.has_module(":platform:bdma"))
     env.substitutions.update({
         "target": env[":target"].identifier,
         "with_fault_storage": env.has_module(":platform:fault"),
@@ -341,20 +353,25 @@ def build(env):
         "with_fpu": env.get("float-abi", "soft") != "soft",
         "with_multicore": env.has_module(":platform:multicore"),
         "with_msplim": sum(c.isnumeric() for c in core) == 2,
-        "with_icache": with_icache,
-        "with_dcache": with_dcache,
+        "enable_icache": env.get("enable_icache", False),
+        "enable_dcache": enable_dcache,
+        "has_icache": env.has_option("enable_icache"),
+        "has_dcache": env.has_option("enable_dcache"),
     })
     env.outbasepath = "modm/src/modm/platform/core"
 
-    if env.substitutions["with_icache"] and not env.substitutions["with_dcache"]:
+    if env.get("enable_dcache", False) and not enable_dcache:
         env.log.warning("Cortex-M7 D-Cache is disabled due to using DMA!")
 
     # startup script
     env.template("reset_handler.sx.in")
-    env.template("startup.c.in")
+    ops = env.template("startup.c.in")
+    # Prevent use of slow bytewise memcpy and memset in startup code
+    env.collect(":build:cflags", "-fno-builtin", operations=ops)
+    env.collect(":build:linkflags", "-nostartfiles")
+
     env.template("vectors.c.in")
     env.template("vectors.hpp.in")
-    env.collect(":build:linkflags", "-nostartfiles")
 
     # dealing with runtime assertions
     if env.has_module(":architecture:assert"):

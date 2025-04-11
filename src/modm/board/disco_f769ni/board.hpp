@@ -81,10 +81,14 @@ struct SystemClock
 	static constexpr uint32_t Timer13 = Apb1Timer;
 	static constexpr uint32_t Timer14 = Apb1Timer;
 	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
+	static constexpr uint32_t Rtc = 32.768_kHz;
 
 	static bool inline
 	enable()
 	{
+		Rcc::enableLowSpeedExternalCrystal();
+		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::LowSpeedExternalCrystal);
+
 		Rcc::enableExternalClock(); // 25 MHz
 		const Rcc::PllFactors pllFactors{
 			.pllM = 25,		// 25MHz / M=25 -> 1MHz

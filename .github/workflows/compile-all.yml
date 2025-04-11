@@ -4,12 +4,16 @@ on:
   pull_request:
     types: [labeled]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   avr-compile-all:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-avr:2023-03-12
+      image: ghcr.io/modm-ext/modm-build-avr:2024-12-01
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -20,7 +24,7 @@ jobs:
           git config --global --add safe.directory /__w/modm/modm
       - name: Update lbuild
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
       - name: Compile HAL for all AVRs
         run: |
           (cd test/all && python3 run_all.py at --quick-remaining)
@@ -33,9 +37,9 @@ jobs:
 
   sam-d0x-d1x-d2x-compile-all:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2024-12-01
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -46,7 +50,7 @@ jobs:
           git config --global --add safe.directory /__w/modm/modm
       - name: Update lbuild
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
       - name: Compile HAL for SAMD0x, SAMD1x, SAMD2x
         run: |
           (cd test/all && python3 run_all.py samd0 samd1 samd2 --quick-remaining)
@@ -59,9 +63,9 @@ jobs:
 
   sam-x5x-compile-all:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2024-12-01
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -72,7 +76,7 @@ jobs:
           git config --global --add safe.directory /__w/modm/modm
       - name: Update lbuild
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
       - name: Compile HAL for SAMD5x, SAME5x, SAMG5x
         run: |
           (cd test/all && python3 run_all.py samd5 same5 samg5 --quick-remaining)
@@ -85,9 +89,9 @@ jobs:
 
   sam-x7x-compile-all:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2024-12-01
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -98,7 +102,7 @@ jobs:
           git config --global --add safe.directory /__w/modm/modm
       - name: Update lbuild
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
       - name: Compile HAL for SAME7x, SAMS7x, SAMV7x
         run: |
           (cd test/all && python3 run_all.py same7 sams7 samv7 --quick-remaining)
@@ -111,9 +115,9 @@ jobs:
 
   stm32c0-compile-all:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2024-12-01
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -124,7 +128,7 @@ jobs:
           git config --global --add safe.directory /__w/modm/modm
       - name: Update lbuild
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
       - name: Compile HAL for all STM32C0
         run: |
           (cd test/all && python3 run_all.py stm32c0 --quick-remaining)
@@ -137,9 +141,9 @@ jobs:
 
   stm32f0-compile-all:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2024-12-01
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -150,7 +154,7 @@ jobs:
           git config --global --add safe.directory /__w/modm/modm
       - name: Update lbuild
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
       - name: Compile HAL for all STM32F0
         run: |
           (cd test/all && python3 run_all.py stm32f0 --quick-remaining)
@@ -163,9 +167,9 @@ jobs:
 
   stm32f1-compile-all:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2024-12-01
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -176,7 +180,7 @@ jobs:
           git config --global --add safe.directory /__w/modm/modm
       - name: Update lbuild
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
       - name: Compile HAL for all STM32F1
         run: |
           (cd test/all && python3 run_all.py stm32f1 --quick-remaining)
@@ -189,9 +193,9 @@ jobs:
 
   stm32f2-compile-all:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2024-12-01
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -202,7 +206,7 @@ jobs:
           git config --global --add safe.directory /__w/modm/modm
       - name: Update lbuild
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
       - name: Compile HAL for all STM32F2
         run: |
           (cd test/all && python3 run_all.py stm32f2 --quick-remaining)
@@ -215,9 +219,9 @@ jobs:
 
   stm32f3-compile-all:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2024-12-01
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -228,7 +232,7 @@ jobs:
           git config --global --add safe.directory /__w/modm/modm
       - name: Update lbuild
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
       - name: Compile HAL for all STM32F3
         run: |
           (cd test/all && python3 run_all.py stm32f3 --quick-remaining)
@@ -241,9 +245,9 @@ jobs:
 
   stm32f4-compile-all-1:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2024-12-01
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -254,7 +258,7 @@ jobs:
           git config --global --add safe.directory /__w/modm/modm
       - name: Update lbuild
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
       - name: Compile HAL for all STM32F4 Part 1
         run: |
           (cd test/all && python3 run_all.py stm32f4 --quick-remaining --split 3 --part 0)
@@ -267,9 +271,9 @@ jobs:
 
   stm32f4-compile-all-2:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2024-12-01
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -280,7 +284,7 @@ jobs:
           git config --global --add safe.directory /__w/modm/modm
       - name: Update lbuild
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
       - name: Compile HAL for all STM32F4 Part 2
         run: |
           (cd test/all && python3 run_all.py stm32f4 --quick-remaining --split 3 --part 1)
@@ -293,9 +297,9 @@ jobs:
 
   stm32f4-compile-all-3:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2024-12-01
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -306,7 +310,7 @@ jobs:
           git config --global --add safe.directory /__w/modm/modm
       - name: Update lbuild
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
       - name: Compile HAL for all STM32F4 Part 3
         run: |
           (cd test/all && python3 run_all.py stm32f4 --quick-remaining --split 3 --part 2)
@@ -319,9 +323,9 @@ jobs:
 
   stm32f7-compile-all-1:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2024-12-01
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -332,7 +336,7 @@ jobs:
           git config --global --add safe.directory /__w/modm/modm
       - name: Update lbuild
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
       - name: Compile HAL for all STM32F7 Part 1
         run: |
           (cd test/all && python3 run_all.py stm32f7 --quick-remaining --split 2 --part 0)
@@ -345,9 +349,9 @@ jobs:
 
   stm32f7-compile-all-2:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2024-12-01
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -358,7 +362,7 @@ jobs:
           git config --global --add safe.directory /__w/modm/modm
       - name: Update lbuild
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
       - name: Compile HAL for all STM32F7 Part 2
         run: |
           (cd test/all && python3 run_all.py stm32f7 --quick-remaining --split 2 --part 1)
@@ -371,9 +375,9 @@ jobs:
 
   stm32l0-compile-all-1:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2024-12-01
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -384,7 +388,7 @@ jobs:
           git config --global --add safe.directory /__w/modm/modm
       - name: Update lbuild
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
       - name: Compile HAL for all STM32L0 Part 1
         run: |
           (cd test/all && python3 run_all.py stm32l0 --quick-remaining --split 2 --part 0)
@@ -397,9 +401,9 @@ jobs:
 
   stm32l0-compile-all-2:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2024-12-01
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -410,7 +414,7 @@ jobs:
           git config --global --add safe.directory /__w/modm/modm
       - name: Update lbuild
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
       - name: Compile HAL for all STM32L0 Part 2
         run: |
           (cd test/all && python3 run_all.py stm32l0 --quick-remaining --split 2 --part 1)
@@ -424,9 +428,9 @@ jobs:
 
   stm32l1-compile-all:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2024-12-01
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -437,7 +441,7 @@ jobs:
           git config --global --add safe.directory /__w/modm/modm
       - name: Update lbuild
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
       - name: Compile HAL for all STM32L1
         run: |
           (cd test/all && python3 run_all.py stm32l1 --quick-remaining)
@@ -450,9 +454,9 @@ jobs:
 
   stm32l4-compile-all-1:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2024-12-01
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -463,7 +467,7 @@ jobs:
           git config --global --add safe.directory /__w/modm/modm
       - name: Update lbuild
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
       - name: Compile HAL for all STM32L4 Part 1
         run: |
           (cd test/all && python3 run_all.py stm32l4 --quick-remaining --split 3 --part 0)
@@ -476,9 +480,9 @@ jobs:
 
   stm32l4-compile-all-2:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2024-12-01
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -489,7 +493,7 @@ jobs:
           git config --global --add safe.directory /__w/modm/modm
       - name: Update lbuild
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
       - name: Compile HAL for all STM32L4 Part 2
         run: |
           (cd test/all && python3 run_all.py stm32l4 --quick-remaining --split 3 --part 1)
@@ -502,9 +506,9 @@ jobs:
 
   stm32l4-compile-all-3:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2024-12-01
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -515,7 +519,7 @@ jobs:
           git config --global --add safe.directory /__w/modm/modm
       - name: Update lbuild
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
       - name: Compile HAL for all STM32L4 Part 3
         run: |
           (cd test/all && python3 run_all.py stm32l4 --quick-remaining --split 3 --part 2)
@@ -528,9 +532,9 @@ jobs:
 
   stm32l5-compile-all:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2024-12-01
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -541,7 +545,7 @@ jobs:
           git config --global --add safe.directory /__w/modm/modm
       - name: Update lbuild
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
       - name: Compile HAL for all STM32L5
         run: |
           (cd test/all && python3 run_all.py stm32l5 --quick-remaining)
@@ -554,9 +558,9 @@ jobs:
 
   stm32u5-compile-all:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2024-12-01
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -567,7 +571,7 @@ jobs:
           git config --global --add safe.directory /__w/modm/modm
       - name: Update lbuild
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
       - name: Compile HAL for all STM32U5
         run: |
           (cd test/all && python3 run_all.py stm32u5 --quick-remaining)
@@ -580,9 +584,9 @@ jobs:
 
   stm32g0-compile-all-1:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2024-12-01
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -593,7 +597,7 @@ jobs:
           git config --global --add safe.directory /__w/modm/modm
       - name: Update lbuild
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
       - name: Compile HAL for all STM32G0 Part 1
         run: |
           (cd test/all && python3 run_all.py stm32g0 --quick-remaining --split 2 --part 0)
@@ -606,9 +610,9 @@ jobs:
 
   stm32g0-compile-all-2:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2024-12-01
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -619,7 +623,7 @@ jobs:
           git config --global --add safe.directory /__w/modm/modm
       - name: Update lbuild
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
       - name: Compile HAL for all STM32G0 Part 2
         run: |
           (cd test/all && python3 run_all.py stm32g0 --quick-remaining --split 2 --part 1)
@@ -632,9 +636,9 @@ jobs:
 
   stm32g4-compile-all-1:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2024-12-01
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -645,7 +649,7 @@ jobs:
           git config --global --add safe.directory /__w/modm/modm
       - name: Update lbuild
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
       - name: Compile HAL for all STM32G4 Part 1
         run: |
           (cd test/all && python3 run_all.py stm32g4 --quick-remaining --split 2 --part 0)
@@ -658,9 +662,9 @@ jobs:
 
   stm32g4-compile-all-2:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2024-12-01
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -671,7 +675,7 @@ jobs:
           git config --global --add safe.directory /__w/modm/modm
       - name: Update lbuild
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
       - name: Compile HAL for all STM32G4 Part 2
         run: |
           (cd test/all && python3 run_all.py stm32g4 --quick-remaining --split 2 --part 1)
@@ -684,9 +688,9 @@ jobs:
 
   stm32h7-compile-all-1:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2024-12-01
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -697,7 +701,7 @@ jobs:
           git config --global --add safe.directory /__w/modm/modm
       - name: Update lbuild
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
       - name: Compile HAL for all STM32H7 Part 1
         run: |
           (cd test/all && python3 run_all.py stm32h7 --quick-remaining --split 2 --part 0)
@@ -710,9 +714,9 @@ jobs:
 
   stm32h7-compile-all-2:
     if: github.event.label.name == 'ci:hal'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2023-03-12
+      image: ghcr.io/modm-ext/modm-build-cortex-m:2024-12-01
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -723,7 +727,7 @@ jobs:
           git config --global --add safe.directory /__w/modm/modm
       - name: Update lbuild
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
       - name: Compile HAL for all STM32H7 Part 2
         run: |
           (cd test/all && python3 run_all.py stm32h7 --quick-remaining --split 2 --part 1)

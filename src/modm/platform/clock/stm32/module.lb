@@ -39,7 +39,7 @@ def build(env):
         properties["hsi_frequency"] = 48_000_000
         properties["lsi_frequency"] = 32_000
         properties["boot_frequency"] = 12_000_000
-    elif target["family"] in ["f1", "f3"]:
+    elif target["family"] in ["f0", "f1", "f3"]:
         properties["hsi_frequency"] = 8_000_000
         properties["lsi_frequency"] = 40_000
         properties["boot_frequency"] = properties["hsi_frequency"]
@@ -69,15 +69,16 @@ def build(env):
     properties["pllprediv2"] = False    # FIXME: not sure what value this should have
     properties["pll_hse_prediv2"] = target["family"] == "f1" and target["name"] in ["01", "02", "03"]
     properties["hsi48"] = \
+        (target["family"] in ["g4", "h5", "h7", "l5", "u0", "u5"]) or \
         (target["family"] == "f0" and target["name"] in ["42", "48", "71", "72", "78", "91", "98"]) or \
-        (target["family"] == "l4" and target["name"][0] not in ["7", "8"]) or \
-        (target["family"] == "l5") or \
-        (target["family"] == "u5")
-    if target["family"] in ["l4", "l5"]:
+        (target["family"] == "g0" and target["name"] in ["b1", "c1"]) or \
+        (target["family"] == "l0" and target["name"][1] == "2") or \
+        (target["family"] == "l4" and target["name"][0] not in ["7", "8"])
+    if target["family"] in ["g4", "l0", "l4", "l5", "u0"]:
         properties["hsi48_cr"] = "CRRCR"
-    elif target["family"] in ["c0", "u5"]:
+    elif target["family"] in ["g0", "h5", "h7", "u5"]:
         properties["hsi48_cr"] = "CR"
-    else:
+    elif target["family"] in ["f0"]:
         properties["hsi48_cr"] = "CR2"
     properties["pll_p"] = ((target["family"] == "l4" and target["name"] not in ["12", "22"]) or target["family"] == "g4")
     properties["overdrive"] = (target["family"] == "f7") or \
@@ -187,6 +188,9 @@ def build(env):
             nper = "DSI"
         if "Eth" in all_peripherals and per == "ETHMAC":
             per = "Eth"
+        if "Rtc" in all_peripherals and per == "RTCAPB":
+            per = "RTC"
+            nper = "RTCAPB"
         # Fix USBOTG OTG
         if target.family == "u5" and per == "OTG":
             per = "Usbotgfs"
@@ -200,7 +204,9 @@ def build(env):
         if per.capitalize() not in all_peripherals:
             continue
         if "EN" in mode:
-            rcc_enable[per.capitalize()] = (nper, mode["EN"])
+            kw = per.capitalize()
+            if kw not in rcc_enable:
+                rcc_enable[kw] = (nper, mode["EN"])
         if "RST" in mode:
             rcc_reset[per.capitalize()] = (nper, mode["RST"])
 

@@ -95,3 +95,10 @@ modm_weak int _gettimeofday(void *tp, void *tzp)
 	(void) tzp;
 	return -1;
 }
+
+modm_weak int _getentropy(void *buffer, size_t length)
+{
+	(void) buffer;
+	(void) length;
+	return -1;
+}

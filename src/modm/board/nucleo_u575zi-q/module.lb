@@ -42,6 +42,8 @@ def build(env):
     env.template("../board.cpp.in", "board.cpp")
     env.copy('.')
     env.copy("../nucleo144_arduino_u5.hpp", "nucleo144_arduino_u5.hpp")
+
     env.outbasepath = "modm/openocd/modm/board/"
-    env.copy(repopath("tools/openocd/modm/st_nucleo_u5.cfg"), "st_nucleo_u5.cfg")
-    env.collect(":build:openocd.source", "modm/board/st_nucleo_u5.cfg")
+    env.template(repopath("tools/openocd/modm/st_nucleo_dap.cfg.in"), "board.cfg",
+                 substitutions={"target": "stm32u5x"})
+    env.collect(":build:openocd.source", "modm/board/board.cfg")

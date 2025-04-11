@@ -22,7 +22,7 @@
 #include <cmath>
 #include "iostream.hpp"
 
-%% if using_printf
+%% if options.with_printf
 #include <printf/printf.h>
 #include <printf/printf_config.h>
 
@@ -76,7 +76,7 @@ IOStream::vprintf(const char *fmt, va_list ap)
 void
 IOStream::writeInteger(int16_t value)
 {
-%% if using_printf
+%% if options.with_printf
 	print_integer(&output_gadget, uint16_t(value < 0 ? -value : value),
 	              value < 0, 10, 0, 0, FLAGS_SHORT);
 %% else
@@ -90,7 +90,7 @@ IOStream::writeInteger(int16_t value)
 void
 IOStream::writeInteger(uint16_t value)
 {
-%% if using_printf
+%% if options.with_printf
 	print_integer(&output_gadget, value, false, 10, 0, 0, FLAGS_SHORT);
 %% else
 	// hard coded for 32'768
@@ -103,7 +103,7 @@ IOStream::writeInteger(uint16_t value)
 void
 IOStream::writeInteger(int32_t value)
 {
-%% if using_printf
+%% if options.with_printf
 	print_integer(&output_gadget, uint32_t(value < 0 ? -value : value),
 	              value < 0, 10, 0, 0, FLAGS_LONG);
 %% else
@@ -117,7 +117,7 @@ IOStream::writeInteger(int32_t value)
 void
 IOStream::writeInteger(uint32_t value)
 {
-%% if using_printf
+%% if options.with_printf
 	print_integer(&output_gadget, value, false, 10, 0, 0, FLAGS_LONG);
 %% else
 	// hard coded for 4294967295
@@ -146,7 +146,7 @@ IOStream::writeInteger(uint64_t value)
 void
 IOStream::writeDouble(const double& value)
 {
-%% if using_printf
+%% if options.with_printf
 	print_floating_point(&output_gadget, value, 0, 0, 0, true);
 %% else
 	if(!std::isfinite(value)) {

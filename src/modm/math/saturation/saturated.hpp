@@ -320,7 +320,8 @@ public:
 	// @see: https://stackoverflow.com/questions/1374037/ambiguous-overload-call-to-absdouble
 	{ value = abs(value); }
 
-	template<typename>
+	template<typename U>
+	requires std::integral<std::remove_reference_t<U>>
 	friend class Saturated;
 };
 

@@ -1,0 +1,4 @@
+source [find interface/stlink-dap.cfg]
+transport select dapdirect_swd
+source [find target/{{target}}.cfg]
+reset_config srst_only srst_nogate

@@ -87,7 +87,7 @@ namespace modm
 			std::queue<char> writeBuffer;
 			std::queue<char> readBuffer;
 
-			boost::asio::io_service  io_service;
+			boost::asio::io_context  io_context;
 			boost::asio::serial_port port;
 			boost::thread* 			 thread;
 

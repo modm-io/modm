@@ -34,11 +34,9 @@ def build(env):
     # FIXME: boost/type_traits/detail/config.hpp:85:69: warning: "__clang_major___WORKAROUND_GUARD" is not defined, evaluates to 0
     env.collect(":build:cppdefines.release", "__clang_major___WORKAROUND_GUARD=4")
 
-    env.collect(":build:library", "boost_system")
+    env.collect(":build:library", "boost_system", "boost_thread")
     if env[":target"].identifier.family == "linux":
-        env.collect(":build:library", "boost_thread", "pthread")
-    else:
-        env.collect(":build:library", "boost_thread-mt")
+        env.collect(":build:library", "pthread")
 
     env.outbasepath = "modm/src/modm/platform/uart"
     env.copy(".")

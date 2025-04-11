@@ -28,7 +28,8 @@ namespace Board
 
 /// STM32F303K8 running at 64MHz generated from the internal 8MHz clock
 // Dummy clock for devices
-struct SystemClock {
+struct SystemClock
+{
 	static constexpr uint32_t Frequency = 64_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency / 2;
@@ -60,10 +61,14 @@ struct SystemClock {
 	static constexpr uint32_t Timer16 = Apb2Timer;
 	static constexpr uint32_t Timer17 = Apb2Timer;
 	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
+	static constexpr uint32_t Rtc = Rcc::LsiFrequency;
 
 	static bool inline
 	enable()
 	{
+		Rcc::enableLowSpeedInternalClock();
+		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::Lsi);
+
 		Rcc::enableInternalClock();	// 8MHz
 		// 8MHz / 2 * 16 = 64MHz
 		const Rcc::PllFactors pllFactors{

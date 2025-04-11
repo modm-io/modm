@@ -108,10 +108,14 @@ struct SystemClock
 
 	static constexpr uint32_t Usb = 48_MHz; // From PLL3Q
 	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
+	static constexpr uint32_t Rtc = 32.768_kHz;
 
 	static bool inline
 	enable()
 	{
+		Rcc::enableLowSpeedExternalCrystal();
+		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::LowSpeedExternalCrystal);
+
 		// Switch core supply voltage to maximum level
 		// Required for running at 550 MHz
 		Rcc::setVoltageScaling(Rcc::VoltageScaling::Scale0);

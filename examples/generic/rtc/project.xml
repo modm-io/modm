@@ -1,0 +1,51 @@
+  <library>
+  <!-- <extends>modm:nucleo-c031c6</extends> -->
+
+  <!-- <extends>modm:nucleo-g071rb</extends> -->
+
+  <!-- <extends>modm:stm32f030_demo</extends> -->
+  <!-- <extends>modm:disco-f051r8</extends> -->
+  <!-- <extends>modm:disco-f072rb</extends> -->
+  <!-- <extends>modm:nucleo-f072rb</extends> -->
+  <!-- <extends>modm:nucleo-f091rc</extends> -->
+
+  <!-- <extends>modm:nucleo-l053r8</extends> -->
+  <!-- <extends>modm:nucleo-l152re</extends> -->
+  <!-- <extends>modm:disco-l152rc</extends> -->
+  <!-- <extends>modm:nucleo-l476rg</extends> -->
+  <!-- <extends>modm:disco-l476vg</extends> -->
+  <extends>modm:nucleo-l432kc</extends>
+  <!-- <extends>modm:weact-c011f6</extends> -->
+
+  <!-- <extends>modm:disco-f303vc</extends> -->
+  <!-- <extends>modm:nucleo-f303k8</extends> -->
+  <!-- <extends>modm:nucleo-f334r8</extends> -->
+
+
+  <!-- <extends>modm:black-pill-f401</extends> -->
+  <!-- <extends>modm:nucleo-f401re</extends> -->
+  <!-- <extends>modm:disco-f407vg</extends> -->
+  <!-- <extends>modm:black-pill-f411</extends> -->
+  <!-- <extends>modm:nucleo-f411re</extends> -->
+  <!-- <extends>modm:nucleo-f429zi</extends> -->
+  <!-- <extends>modm:disco-f429zi</extends> -->
+  <!-- <extends>modm:nucleo-f446re</extends> -->
+  <!-- <extends>modm:disco-f469ni</extends> -->
+
+  <!-- <extends>modm:nucleo-g474re</extends> -->
+
+  <!-- <extends>modm:disco-f746ng</extends> -->
+  <!-- <extends>modm:nucleo-h723zg</extends> -->
+  <!-- <extends>modm:nucleo-h743zi</extends> -->
+  <!-- <extends>modm:nucleo-u575zi-q</extends> -->
+  <options>
+    <option name="modm:build:build.path">../../../build/generic/rtc</option>
+  </options>
+  <modules>
+    <module>modm:platform:rtc</module>
+    <module>modm:build:scons</module>
+  </modules>
+  <collectors>
+    <!-- <collect name="modm:build:openocd.source">interface/stlink.cfg</collect> -->
+  </collectors>
+</library>

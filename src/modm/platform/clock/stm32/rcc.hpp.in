@@ -116,7 +116,7 @@ public:
 		Hsi16 = 0b10,
 		Hse = 0b11,
 %% endif
-%% if hsi48 and target.family not in ["l4", "l5", "u5"]
+%% if hsi48 and target.family in ["f0"]
 		/// High speed internal clock (48 MHz)
 		Hsi48 = RCC_CFGR_PLLSRC_HSI48_PREDIV,
 		InternalClockMHz48 = Hsi48,
@@ -171,7 +171,7 @@ public:
 		Hsi16 = Hsi,
 %% endif
 		Hse = RCC_CFGR_SW_HSE,
-%% if hsi48 and target.family != "l4"
+%% if hsi48 and target.family in ["f0"]
 		Hsi48 = RCC_CFGR_SW_HSI48,
 		InternalClockMHz48 = Hsi48,
 %% endif
@@ -383,6 +383,12 @@ public:
 		Pll1Q = 0b10 << RCC_CCIPR1_ICLKSEL_Pos,
 		Msik  = 0b11 << RCC_CCIPR1_ICLKSEL_Pos,
 	};
+%% elif hsi48 and target.family in ["l0"]
+	enum class Clock48Source
+	{
+		PllQ = 0,
+		Hsi48 = RCC_CCIPR_HSI48SEL,
+	};
 %% endif
 
 %% if target.family in ["f2", "f4", "f7"]
@@ -456,7 +462,7 @@ public:
 		MultiSpeedInternalClockK = (0b1001 << RCC_{{cfgr_mco}}_MCOSEL_Pos), // MSIK
 	%% endif
 	};
-%% else
+%% elif target.family in ["f0", "f1", "f3"]
 	enum class
 	ClockOutputSource : uint32_t
 	{
@@ -814,6 +820,12 @@ public:
 	{
 		RCC->CCIPR1 = (RCC->CCIPR1 & ~RCC_CCIPR1_ICLKSEL_Msk) | uint32_t(source);
 	}
+%% elif hsi48 and target.family in ["l0"]
+	static inline void
+	setClock48Source(Clock48Source source)
+	{
+		RCC->CCIPR = (RCC->CCIPR & ~RCC_CCIPR_HSI48SEL_Msk) | uint32_t(source);
+	}
 %% endif
 
 %% if target.family == "h7"
@@ -829,6 +841,31 @@ public:
 	enableUsbClockSource(UsbClockSource source)
 	{
 		RCC->{{d2}}CCIP2R = (RCC->{{d2}}CCIP2R & ~RCC_{{d2}}CCIP2R_USBSEL_Msk) | uint32_t(source);
+	}
+%% elif hsi48 and target.family in ["f0"] and (target.name in ["42", "48", "72", "78"])
+	enum class
+	UsbClockSource : uint32_t
+	{
+		Hsi48 = 0,
+		Pll = RCC_CFGR3_USBSW_PLLCLK,
+	};
+	static inline void
+	enableUsbClockSource(UsbClockSource source)
+	{
+		RCC->CFGR3 = (RCC->CFGR3 & ~RCC_CFGR3_USBSW_Msk) | uint32_t(source);
+	}
+%% elif hsi48 and target.family in ["g0"]
+	enum class
+	UsbClockSource : uint32_t
+	{
+		Hsi48 = 0,
+		Hse = RCC_CCIPR2_USBSEL_0,
+		Pll = RCC_CCIPR2_USBSEL_1,
+	};
+	static inline void
+	enableUsbClockSource(UsbClockSource source)
+	{
+		RCC->CCIPR2 = (RCC->CCIPR2 & ~RCC_CCIPR2_USBSEL_Msk) | uint32_t(source);
 	}
 %% endif
 

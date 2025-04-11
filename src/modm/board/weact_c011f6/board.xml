@@ -1,0 +1,15 @@
+<library>
+  <repositories>
+    <repository>
+      <path>../../../../repo.lb</path>
+    </repository>
+  </repositories>
+
+  <options>
+    <option name="modm:target">stm32c011f6p6</option>
+    <option name="modm:platform:cortex-m:main_stack_size">1Ki</option>
+  </options>
+  <modules>
+    <module>modm:board:weact-c011f6</module>
+  </modules>
+</library>

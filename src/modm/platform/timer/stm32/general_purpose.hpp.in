@@ -455,7 +455,7 @@ public:
 			OutputComparePreload preload = OutputComparePreload::Disable)
 	{
 		constexpr auto channel = signalToChannel<Peripheral::Tim{{ id }}, Signal>();
-		configureOutputChannel(channel, mode, compareValue, out, polarity, PinState::Disable, OutputComparePolarity::ActiveHigh, preload);
+		configureOutputChannel(channel, mode, compareValue, out, polarity, preload);
 	}
 
 	/*

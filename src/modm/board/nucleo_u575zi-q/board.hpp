@@ -85,10 +85,14 @@ struct SystemClock
 	static constexpr uint32_t Rng = Hsi48;
 	static constexpr uint32_t Sdmmc = Pll1P;
 	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
+	static constexpr uint32_t Rtc = 32.768_kHz;
 
 	static bool inline
 	enable()
 	{
+		Rcc::enableLowSpeedExternalCrystal();
+		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::LowSpeedExternalCrystal);
+
 		Rcc::setVoltageScaling(Rcc::VoltageScaling::Range1);
 		Rcc::enableInternalClock(); // HSI16
 		const Rcc::PllFactors pllFactors{

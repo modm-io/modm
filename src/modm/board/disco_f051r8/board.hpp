@@ -28,15 +28,19 @@ using namespace modm::literals;
 /// STM32F0 running at 48MHz generated from the internal 8MHz with PLL.
 struct SystemClock
 {
-	static constexpr int Frequency = 48_MHz;
-	static constexpr int Usart1 = Frequency;
-	static constexpr int Usart2 = Frequency;
-	static constexpr int Spi2 = Frequency;
+	static constexpr uint32_t Frequency = 48_MHz;
+	static constexpr uint32_t Usart1 = Frequency;
+	static constexpr uint32_t Usart2 = Frequency;
+	static constexpr uint32_t Spi2 = Frequency;
 	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
+	static constexpr uint32_t Rtc = Rcc::LsiFrequency;
 
 	static bool inline
 	enable()
 	{
+		Rcc::enableLowSpeedInternalClock();
+		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::Lsi);
+
 		// enable internal 8 MHz HSI RC clock
 		Rcc::enableInternalClock();
 		// (internal clock / 2) * 12 = 48MHz

@@ -100,10 +100,14 @@ struct SystemClock
 
 	static constexpr uint32_t Usb = 48_MHz; // From PLL3Q
 	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
+	static constexpr uint32_t Rtc = 32.768_kHz;
 
 	static bool inline
 	enable()
 	{
+		Rcc::enableLowSpeedExternalCrystal();
+		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::LowSpeedExternalCrystal);
+
 		Rcc::enableExternalClock(); // 8 MHz
 		Rcc::setVoltageScaling(Rcc::VoltageScaling::Scale0); // required for 400MHz/480MHz
 		const Rcc::PllFactors pllFactors1{

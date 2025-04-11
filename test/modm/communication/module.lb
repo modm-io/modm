@@ -22,7 +22,13 @@ class Amnb(Module):
 
     def build(self, env):
         env.outbasepath = "modm-test/src/modm-test/communication"
-        env.copy("amnb")
+        env.copy("amnb/message_test.cpp")
+        env.copy("amnb/message_test.hpp")
+        if not env.get("modm:processing:protothread:use_fiber", True):
+            env.copy("amnb/interface_test.cpp")
+            env.copy("amnb/interface_test.hpp")
+            env.copy("amnb/node_test.cpp")
+            env.copy("amnb/node_test.hpp")
 
 
 class Sab(Module):

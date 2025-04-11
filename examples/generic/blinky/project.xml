@@ -7,4 +7,7 @@
     <module>modm:architecture:delay</module>
     <module>modm:build:scons</module>
   </modules>
+  <collectors>
+    <!-- <collect name="modm:build:openocd.source">interface/stlink.cfg</collect> -->
+  </collectors>
 </library>

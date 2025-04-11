@@ -29,8 +29,8 @@ using namespace modm::literals;
 struct SystemClock
 {
 	static constexpr uint32_t Frequency = 64_MHz;
-	static constexpr uint32_t Ahb = Frequency;
-	static constexpr uint32_t Apb = Frequency;
+	static constexpr uint32_t Ahb		= Frequency;
+	static constexpr uint32_t Apb		= Frequency;
 
 	static constexpr uint32_t Aes		= Ahb;
 	static constexpr uint32_t Rng		= Ahb;
@@ -72,16 +72,19 @@ struct SystemClock
 	static constexpr uint32_t Spi2		= Apb;
 	static constexpr uint32_t Iwdg		= Rcc::LsiFrequency;
 	static constexpr uint32_t Wwdg		= Apb;
-	static constexpr uint32_t Rtc		= Apb;
 	static constexpr uint32_t Timer14	= Apb;
 	static constexpr uint32_t Timer7	= Apb;
 	static constexpr uint32_t Timer6	= Apb;
 	static constexpr uint32_t Timer3	= Apb;
 	static constexpr uint32_t Timer2	= Apb;
+	static constexpr uint32_t Rtc		= 32.768_kHz;
 
 	static bool inline
 	enable()
 	{
+		Rcc::enableLowSpeedExternalCrystal();
+		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::LowSpeedExternalCrystal);
+
 		Rcc::enableInternalClock();	// 16MHz
 		// (internal clock / 1_M) * 8_N / 2_R = 128MHz / 2 = 64MHz
 		const Rcc::PllFactors pllFactors{

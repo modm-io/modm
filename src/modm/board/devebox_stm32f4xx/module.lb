@@ -40,5 +40,6 @@ def build(env):
     env.copy('.')
 
     env.outbasepath = "modm/openocd/modm/board/"
-    env.copy(repopath("tools/openocd/modm/stm32f4x1_mini_f4x1.cfg"), "stm32f4x1_mini_f4x1.cfg")
-    env.collect(":build:openocd.source", "modm/board/stm32f4x1_mini_f4x1.cfg")
+    env.template(repopath("tools/openocd/modm/stm32_swd.cfg.in"), "board.cfg",
+                 substitutions={"target": "stm32f4x"})
+    env.collect(":build:openocd.source", "modm/board/board.cfg")

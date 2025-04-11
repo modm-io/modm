@@ -16,7 +16,7 @@
 
 modm::platform::SerialPort::SerialPort():
 	shutdown(true),
-	port(io_service)
+	port(io_context)
 {
 }
 
@@ -28,7 +28,7 @@ modm::platform::SerialPort::~SerialPort()
 void
 modm::platform::SerialPort::write(char c)
 {
-	this->io_service.post(boost::bind(&modm::platform::SerialPort::doWrite, this, c));
+	boost::asio::post(this->io_context, boost::bind(&modm::platform::SerialPort::doWrite, this, c));
 }
 
 
@@ -84,9 +84,9 @@ modm::platform::SerialPort::open(std::string deviceName, unsigned int baudRate)
 		this->port.set_option(boost::asio::serial_port_base::character_size(8));
 		this->port.set_option(boost::asio::serial_port_base::stop_bits(boost::asio::serial_port_base::stop_bits::one));
 
-		this->io_service.post(boost::bind(&SerialPort::readStart, this));
+		boost::asio::post(this->io_context, boost::bind(&SerialPort::readStart, this));
 
-		this->thread = new boost::thread(boost::bind(&boost::asio::io_service::run, &this->io_service));
+		this->thread = new boost::thread(boost::bind(&boost::asio::io_context::run, &this->io_context));
 	}
 	else {
 		std::cerr << "Port already open!" << std::endl;
@@ -108,14 +108,14 @@ modm::platform::SerialPort::close()
 	if (!this->isOpen())
 		return;
 
-	this->io_service.post(boost::bind(
+	boost::asio::post(this->io_context, boost::bind(
 			&modm::platform::SerialPort::doClose,
 			this,
 			boost::system::error_code()));
 
 	this->thread->join();
 	delete this->thread;
-	this->io_service.reset();
+	this->io_context.restart();
 }
 
 void
@@ -124,14 +124,14 @@ modm::platform::SerialPort::kill()
 	if (!this->isOpen())
 		return;
 
-	this->io_service.post(boost::bind(
+	boost::asio::post(this->io_context, boost::bind(
 				&modm::platform::SerialPort::doAbort,
 				this,
 				boost::system::error_code()));
 	this->shutdown = true;
 	this->thread->join();
 	delete this->thread;
-	this->io_service.reset();
+	this->io_context.restart();
 }
 
 void

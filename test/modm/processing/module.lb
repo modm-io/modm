@@ -32,4 +32,9 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "modm-test/src/modm-test/processing"
-    env.copy('.')
+    env.copy("fiber")
+    env.copy("scheduler")
+    env.copy("timer")
+    if not env.get("modm:processing:protothread:use_fiber", True):
+        env.copy("protothread")
+        env.copy("resumable")

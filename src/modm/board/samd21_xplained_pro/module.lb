@@ -32,4 +32,4 @@ def build(env):
     env.copy('board.hpp')
 
     env.outbasepath = "modm/openocd/modm/board/"
-    env.collect(":build:openocd.source", "board/atmel_samd21_xplained_pro.cfg");
+    env.collect(":build:openocd.source", "board/atmel_samd21_xplained_pro.cfg")

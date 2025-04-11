@@ -16,7 +16,7 @@
 	.syntax	unified
 	.align	4
 	.type	Reset_Handler, %function
-	.func   Reset_Handler
+	.func	Reset_Handler
 Reset_Handler:
 	// Some bootloaders do not reset the stack pointer back to the VTOR entry
 	ldr r0,=__main_stack_top
@@ -34,5 +34,6 @@ Reset_Handler:
 %% endif
 	bl __modm_initialize_platform
 	bl modm_initialize_platform
-	b __modm_startup
+	ldr r0,=__modm_startup
+	bx r0
 	.endfunc

@@ -233,7 +233,6 @@ def common_compiler_flags(compiler, target):
         "-ffile-prefix-map={project_source_dir}=.",
         "-ffile-prefix-map={gccpath}=.",
 
-        "-g3",
         "-gdwarf-3",
     ]
 
@@ -282,10 +281,12 @@ def common_compiler_flags(compiler, target):
     ]
     # flags only for Assembly
     flags["asflags"] = [
-        "-g3",
         "-gdwarf-3",
         # "-xassembler-with-cpp",
     ]
+    if target.identifier["platform"] not in ["hosted"]:
+        flags["cflags"].append("-g3")
+        flags["cxxflags"].append("-g3")
     # flags for the linker
     if target.identifier["family"] != "darwin":
         flags["linkflags"] = [

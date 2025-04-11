@@ -17,6 +17,7 @@ namespace modm
 {
 
 template<typename Interface, uint16_t Width, uint16_t Height>
+		requires(Width <= detail::st7789::MaxWidth && Height <= detail::st7789::MaxHeight)
 void
 St7789Driver<Interface, Width, Height>::initialize()
 {
@@ -45,6 +46,7 @@ St7789Driver<Interface, Width, Height>::initialize()
 }
 
 template<typename Interface, uint16_t Width, uint16_t Height>
+	requires(Width <= detail::st7789::MaxWidth && Height <= detail::st7789::MaxHeight)
 void
 St7789Driver<Interface, Width, Height>::clear(uint16_t color)
 {
@@ -62,6 +64,7 @@ St7789Driver<Interface, Width, Height>::clear(uint16_t color)
 }
 
 template<typename Interface, uint16_t Width, uint16_t Height>
+	requires(Width <= detail::st7789::MaxWidth && Height <= detail::st7789::MaxHeight)
 void
 St7789Driver<Interface, Width, Height>::setClipping(uint16_t x, uint16_t y, uint16_t width,
 													uint16_t height)
@@ -75,6 +78,7 @@ St7789Driver<Interface, Width, Height>::setClipping(uint16_t x, uint16_t y, uint
 }
 
 template<typename Interface, uint16_t Width, uint16_t Height>
+	requires(Width <= detail::st7789::MaxWidth && Height <= detail::st7789::MaxHeight)
 void
 St7789Driver<Interface, Width, Height>::sendCommand(Command command)
 {
@@ -82,6 +86,7 @@ St7789Driver<Interface, Width, Height>::sendCommand(Command command)
 }
 
 template<typename Interface, uint16_t Width, uint16_t Height>
+	requires(Width <= detail::st7789::MaxWidth && Height <= detail::st7789::MaxHeight)
 template<typename Data>
 void
 St7789Driver<Interface, Width, Height>::sendCommand(Command command, Data &&data)
@@ -90,6 +95,7 @@ St7789Driver<Interface, Width, Height>::sendCommand(Command command, Data &&data
 }
 
 template<typename Interface, uint16_t Width, uint16_t Height>
+	requires(Width <= detail::st7789::MaxWidth && Height <= detail::st7789::MaxHeight)
 template<St7789Driver<Interface, Width, Height>::ByteOrder OrderOfBytes>
 void
 St7789Driver<Interface, Width, Height>::writeData(data data)
@@ -111,6 +117,7 @@ St7789Driver<Interface, Width, Height>::writeData(data data)
 }
 
 template<typename Interface, uint16_t Width, uint16_t Height>
+	requires(Width <= detail::st7789::MaxWidth && Height <= detail::st7789::MaxHeight)
 void
 St7789Driver<Interface, Width, Height>::hardReset()
 {
@@ -123,6 +130,7 @@ St7789Driver<Interface, Width, Height>::hardReset()
 }
 
 template<typename Interface, uint16_t Width, uint16_t Height>
+	requires(Width <= detail::st7789::MaxWidth && Height <= detail::st7789::MaxHeight)
 void
 St7789Driver<Interface, Width, Height>::softReset()
 {
@@ -130,6 +138,7 @@ St7789Driver<Interface, Width, Height>::softReset()
 }
 
 template<typename Interface, uint16_t Width, uint16_t Height>
+	requires(Width <= detail::st7789::MaxWidth && Height <= detail::st7789::MaxHeight)
 void
 St7789Driver<Interface, Width, Height>::setInversion(bool inversion)
 {
@@ -137,6 +146,7 @@ St7789Driver<Interface, Width, Height>::setInversion(bool inversion)
 }
 
 template<typename Interface, uint16_t Width, uint16_t Height>
+	requires(Width <= detail::st7789::MaxWidth && Height <= detail::st7789::MaxHeight)
 void
 St7789Driver<Interface, Width, Height>::turnOn()
 {
@@ -144,6 +154,7 @@ St7789Driver<Interface, Width, Height>::turnOn()
 }
 
 template<typename Interface, uint16_t Width, uint16_t Height>
+	requires(Width <= detail::st7789::MaxWidth && Height <= detail::st7789::MaxHeight)
 void
 St7789Driver<Interface, Width, Height>::turnOff()
 {
@@ -151,6 +162,7 @@ St7789Driver<Interface, Width, Height>::turnOff()
 }
 
 template<typename Interface, uint16_t Width, uint16_t Height>
+	requires(Width <= detail::st7789::MaxWidth && Height <= detail::st7789::MaxHeight)
 void
 St7789Driver<Interface, Width, Height>::setIdle(bool idle)
 {
@@ -158,6 +170,7 @@ St7789Driver<Interface, Width, Height>::setIdle(bool idle)
 }
 
 template<typename Interface, uint16_t Width, uint16_t Height>
+	requires(Width <= detail::st7789::MaxWidth && Height <= detail::st7789::MaxHeight)
 void
 St7789Driver<Interface, Width, Height>::setSleep(bool sleep)
 {
@@ -165,6 +178,7 @@ St7789Driver<Interface, Width, Height>::setSleep(bool sleep)
 }
 
 template<typename Interface, uint16_t Width, uint16_t Height>
+	requires(Width <= detail::st7789::MaxWidth && Height <= detail::st7789::MaxHeight)
 void
 St7789Driver<Interface, Width, Height>::setRgbBgrOrder(RgbBgrOrder rgb_bgr_order)
 {
@@ -173,6 +187,7 @@ St7789Driver<Interface, Width, Height>::setRgbBgrOrder(RgbBgrOrder rgb_bgr_order
 }
 
 template<typename Interface, uint16_t Width, uint16_t Height>
+	requires(Width <= detail::st7789::MaxWidth && Height <= detail::st7789::MaxHeight)
 void
 St7789Driver<Interface, Width, Height>::setOrientation(Orientation orientation)
 {
@@ -218,6 +233,7 @@ St7789Driver<Interface, Width, Height>::setOrientation(Orientation orientation)
 }
 
 template<typename Interface, uint16_t Width, uint16_t Height>
+	requires(Width <= detail::st7789::MaxWidth && Height <= detail::st7789::MaxHeight)
 glcd::Orientation
 St7789Driver<Interface, Width, Height>::getOrientation() const
 {

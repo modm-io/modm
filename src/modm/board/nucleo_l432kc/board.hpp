@@ -44,10 +44,14 @@ struct SystemClock
 	static constexpr uint32_t Spi1 = Apb2;
 	static constexpr uint32_t Spi2 = Apb2;
 	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
+	static constexpr uint32_t Rtc = 32.768_kHz;
 
 	static bool inline
 	enable()
 	{
+		Rcc::enableLowSpeedExternalCrystal();
+		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::LowSpeedExternalCrystal);
+
 		const Rcc::PllFactors pllFactors{
 			.pllM = 1,	//   4MHz /  1 -> 4MHz
 			.pllN = 40,	//   4MHz * 40 -> 160MHz <= 344MHz = PLL VCO output max, >= 64 MHz = PLL VCO out min

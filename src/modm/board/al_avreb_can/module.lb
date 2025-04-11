@@ -40,5 +40,5 @@ def build(env):
     }
     env.template("../board.cpp.in", "board.cpp")
     env.copy('.')
-    env.collect(":build:default.avrdude.port", "usb");
-    env.collect(":build:default.avrdude.programmer", "avrispmkII");
+    env.collect(":build:default.avrdude.port", "usb")
+    env.collect(":build:default.avrdude.programmer", "avrispmkII")

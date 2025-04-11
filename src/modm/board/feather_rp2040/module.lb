@@ -43,7 +43,4 @@ def build(env):
     }
     env.template("../board.cpp.in", "board.cpp")
     env.copy('.')
-
-    env.outbasepath = "modm/openocd/modm/board/"
-    env.copy(repopath("tools/openocd/modm/rp2040_picoprobe.cfg"), "rp2040_picoprobe.cfg")
-    env.collect(":build:openocd.source", "modm/board/rp2040_picoprobe.cfg")
+    env.collect(":build:openocd.source", "interface/picoprobe.cfg", "target/rp2040.cfg")

@@ -50,4 +50,4 @@ def prepare(module, options):
 def build(env):
     env.outbasepath = "modm/src/modm/board"
     env.copy('.')
-    env.collect(":build:default.avrdude.programmer", "usbasp");
+    env.collect(":build:default.avrdude.programmer", "usbasp")

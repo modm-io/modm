@@ -2,6 +2,10 @@ name: Run tests on MacOS
 
 on: [pull_request]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   macos_testing:
     runs-on: macos-13
@@ -13,7 +17,7 @@ jobs:
 
       - name: Setup environment - Brew tap
         run: |
-          brew tap modm-ext/arm
+          brew tap osx-cross/arm
           brew tap osx-cross/avr
 
       - name: Setup environment - Brew install
@@ -21,19 +25,14 @@ jobs:
           export HOMEBREW_NO_INSTALL_CLEANUP=1 # saves time
           brew update
           # brew unlink gcc
-          brew install doxygen boost gcc@12 avr-gcc@12 arm-gcc-bin@12 cmake || true
-          brew link --force avr-gcc@12
+          brew install doxygen boost gcc@13 avr-gcc@13 arm-gcc-bin@13 cmake || true
+          brew link --force avr-gcc@13 arm-gcc-bin@13
           # brew upgrade boost gcc git || true
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
 
       - name: Setup environment - Python pip
         run: |
-          pip3 install --user modm scons
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm scons
           echo "/usr/local/bin" >> $GITHUB_PATH
-          echo "/Users/runner/Library/Python/3.11/bin" >> $GITHUB_PATH
 
       - name: Dump environment
         run: |

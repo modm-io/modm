@@ -85,6 +85,7 @@ def build(env):
     env.copy("lvgl/lvgl.h")
     env.copy("lvgl/lv_version.h")
     env.template("lv_conf.h.in")
-    env.copy("lvgl/src")
+    files = env.copy("lvgl/src")
+    env.collect(":build:ccflags", "-Wno-maybe-uninitialized", operations=files)
     env.substitutions = {"has_debug": env.has_module(":debug")}
     env.template("lv_modm_port.cpp.in")

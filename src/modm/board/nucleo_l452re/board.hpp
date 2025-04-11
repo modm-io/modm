@@ -74,10 +74,14 @@ struct SystemClock
 
 	static constexpr uint32_t Usb = Apb1;
 	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
+	static constexpr uint32_t Rtc = 32.768_kHz;
 
 	static bool inline
 	enable()
 	{
+		Rcc::enableLowSpeedExternalCrystal();
+		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::LowSpeedExternalCrystal);
+
 		Rcc::enableInternalClock();	// 16MHz
 		Rcc::PllFactors pllFactors{
 			.pllM = 1,	//  16MHz / M= 1 ->  16MHz

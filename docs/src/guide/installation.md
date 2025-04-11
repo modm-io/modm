@@ -16,7 +16,7 @@ you are not *required* to use it. See [the reference manual](../../reference/bui
 for additional build system documentation.
 
 !!! info "Use GCC 12 or newer"
-    modm uses C++23, so you need *at least* GCC 12.
+    modm uses C++23, so you need *at least* GCC 12, we recommend GCC 13.
 
 !!! warning "Beware of AVRs"
     We **strongly discourage** using AVRs for new designs, due to a significant
@@ -32,10 +32,10 @@ Please help us [keep these instructions up-to-date][contribute]!
 
 ## Linux
 
-For Ubuntu 22.04LTS, these commands install the minimal build system:
+For Ubuntu 24.04LTS, these commands install the minimal build system:
 
 ```sh
-sudo apt install python3 python3-pip scons git libncursesw5
+sudo apt install python3 python3-pip scons git libncursesw6
 pip3 install modm
 ```
 
@@ -54,23 +54,11 @@ pip3 install gdbgui
     export PATH="$HOME/.local/bin:$PATH"
     ```
 
-!!! warning "Ubuntu ≤ 19.10"
-    Ubuntu ≤ 19.10 unfortunately defaults to Python 2, however, our SCons tools
-    require Python 3. For a less intrusive way to run all scons scripts with
-    Python 3 add this to your `.bashrc` or `.zshrc`:
-
-    ```sh
-    alias scons="/usr/bin/env python3 $(which scons)"
-    ```
-
-    If you get errors about missing `pyelftools`, check that you're really
-    running SCons with Python 3!
-
 We use [Doxypress][doxypress_binaries] to generate the API documentation:
 
 ```sh
 sudo mkdir /opt/doxypress
-wget -O- https://github.com/copperspice/doxypress/releases/download/dp-1.5.1/doxypress-1.5.1-ubuntu22.04-x64.tar.bz2 | sudo tar xj -C /opt/doxypress
+wget -O- https://github.com/copperspice/doxypress/releases/download/dp-1.7.0/doxypress-1.7.0-ubuntu24.04-x64.tar.bz2 | sudo tar xj -C /opt/doxypress
 ```
 
 Add the directory to your `PATH` variable in `~/.bashrc`:
@@ -84,16 +72,16 @@ export PATH="/opt/doxypress:$PATH"
 
 Install the GNU toolchain for `arm-none-eabi` target in version 12 (or higher).
 If your Linux distribution provides up-to-date packages, we recommend using them.
-Otherwise, including Ubuntu 22.04, we recommend using the [*xPack GNU Arm Embedded GCC* binary distribution][toolchain-arm-xpack]:
+Otherwise, including Ubuntu 24.04, we recommend using the [*xPack GNU Arm Embedded GCC* binary distribution][toolchain-arm-xpack]:
 
 ```sh
-wget -O- https://github.com/xpack-dev-tools/arm-none-eabi-gcc-xpack/releases/download/v12.2.1-1.2/xpack-arm-none-eabi-gcc-12.2.1-1.2-linux-x64.tar.gz | sudo tar xz -C /opt/
+wget -O- https://github.com/xpack-dev-tools/arm-none-eabi-gcc-xpack/releases/download/v13.3.1-1.1/xpack-arm-none-eabi-gcc-13.3.1-1.1-linux-x64.tar.gz | sudo tar xz -C /opt/
 ```
 
 Add it to your `PATH` variable in `~/.bashrc`:
 
 ```sh
-export PATH="/opt/xpack-arm-none-eabi-gcc-12.2.1-1.2/bin:$PATH"
+export PATH="/opt/xpack-arm-none-eabi-gcc-13.3.1-1.1/bin:$PATH"
 ```
 
 Install the OpenOCD tool:
@@ -113,7 +101,7 @@ sudo apt install openocd
 Download and extract the [pre-built AVR toolchain][modm-avr-gcc]:
 
 ```sh
-wget -O- https://github.com/modm-io/avr-gcc/releases/download/v12.2.0/modm-avr-gcc.tar.bz2 | sudo tar xj -C /opt
+wget -O- https://github.com/modm-io/avr-gcc/releases/download/v13.2.0/modm-avr-gcc.tar.bz2 | sudo tar xj -C /opt
 ```
 
 !!! warning "AVR toolchain install directory"
@@ -181,8 +169,8 @@ Install the [pre-built ARM toolchain](https://github.com/osx-cross/homebrew-arm)
 
 ```sh
 brew tap osx-cross/arm
-brew install arm-gcc-bin@12 openocd
-brew link --force arm-gcc-bin@12
+brew install arm-gcc-bin@13 openocd
+brew link --force arm-gcc-bin@13
 ```
 
 To program Microchip SAM devices via the bootloader, install the `bossac` tool:
@@ -198,8 +186,8 @@ Install the [AVR toolchain from source](https://github.com/osx-cross/homebrew-av
 
 ```sh
 brew tap osx-cross/avr
-brew install avr-gcc@12
-brew link --force avr-gcc@12
+brew install avr-gcc@13
+brew link --force avr-gcc@13
 ```
 
 
@@ -208,7 +196,7 @@ brew link --force avr-gcc@12
 To compile modm *for x86_64 macOS* you need to install these tools too:
 
 ```sh
-brew install boost gcc
+brew install boost gcc@13
 ```
 
 
@@ -270,7 +258,7 @@ arm-none-eabi-gcc --version
 
 Install the  and then download the latest [pre-built OpenOCD tool][openocd_binaries]:
 
-Unpack the `.7z` file using `7-Zip > Extract to "OpenOCD-20230202..."`.
+Unpack the `.7z` file using `7-Zip > Extract to "OpenOCD-20240916..."`.
 
 Then rename and move the extracted folder to `C:\Program Files (x86)\openocd`.
 Open PowerShell to add the `\bin` folder to the `Path`:
@@ -288,7 +276,7 @@ openocd --version
 #### Microchip AVR
 
 Download the [pre-built AVR toolchain][winavr] and unpack the `.zip` file using
-the context menu `7-Zip > Extract to "avr-gcc-12.1.0-..."`
+the context menu `7-Zip > Extract to "avr-gcc-13.2.0-..."`
 Then rename and move the extracted folder to `C:\Program Files\avr-gcc`.
 Open PowerShell to add the `\bin` folder to the `Path`:
 
@@ -416,7 +404,7 @@ picocom --baud 115200 --imap lfcrlf --echo /dev/ttyACM0
 [openocd-install]: https://github.com/rleh/openocd-build
 [udev-rules-openocd]: https://github.com/openocd-org/openocd/blob/master/contrib/60-openocd.rules#L84-L99
 [usbipd]: https://github.com/dorssel/usbipd-win
-[winavr]: https://github.com/ZakKemble/avr-gcc-build/releases/tag/v12.1.0-1
+[winavr]: https://github.com/ZakKemble/avr-gcc-build/releases/tag/v13.2.0-1
 [windows-store-ubuntu-22-04-1-lts]: https://www.microsoft.com/store/productId/9PN20MSR04DW
 [wingit]: https://git-scm.com/download/win
 [winterm]: https://github.com/Microsoft/Terminal

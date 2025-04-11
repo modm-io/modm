@@ -1,0 +1,46 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2023, Rasmus Kleist Hørlyck Sørensen
+# Copyright (c) 2024, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":platform:rtc"
+    module.description = FileReader("module.md")
+
+def prepare(module, options):
+    device = options[":target"]
+    if not device.has_driver("rtc:stm32*") or device.identifier.family in ["f1"]:
+        return False
+
+    module.depends(
+        ":cmsis:device",
+        ":platform:rcc",
+        ":math:calendar",
+        ":architecture:fiber",
+    )
+
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/platform/rtc"
+    target = env[":target"].identifier
+    env.substitutions = {
+        # F1, F2, L1 do not have the RTC->SSR register.
+        # (Some L1 device do have a SSR field, but the CMSIS headers are inconsistent).
+        "with_ssr": target.family not in ["f1", "f2", "l1"],
+        # F2, L1 have a smaller PREDIV_S register field.
+        "bits_prediv_s": 13 if target.family in ["f2", "l1"] else 15,
+        # H7 calibration via CALP and CALM in RTC_CALR
+        "with_calpm" : target.family in ["h7"],
+    }
+    env.template("rtc.hpp.in")
+    env.template("rtc_impl.hpp.in")
+    env.copy("rtc.cpp")

@@ -62,6 +62,48 @@ SpiMaster{{ id }}::transfer(uint8_t data)
 %% endif
 }
 
+modm::ResumableResult<uint16_t>
+SpiMaster{{ id }}::transfer(uint16_t data)
+{
+%% if use_fiber
+	while (Hal::isTxFifoFull())
+		modm::this_fiber::yield();
+
+	Hal::write16(data);
+
+	while (!Hal::isRxDataAvailable())
+		modm::this_fiber::yield();
+
+	return Hal::read16();
+%% else
+	// this is a manually implemented "fast resumable function"
+	// there is no context or nesting protection, since we don't need it.
+	// there are only two states encoded into 1 bit (LSB of state):
+	//   1. waiting to start, and
+	//   2. waiting to finish.
+
+	if (!(state & Bit0))
+	{
+		// wait for previous transfer to finish
+		if (Hal::isTxFifoFull())
+			return {modm::rf::Running};
+
+		Hal::write16(data);
+
+		// set LSB = Bit0
+		state |= Bit0;
+	}
+
+	if (!Hal::isRxDataAvailable())
+		return {modm::rf::Running};
+
+	data = Hal::read16();
+
+	state &= ~Bit0;
+	return {modm::rf::Stop, data};
+%% endif
+}
+
 modm::ResumableResult<void>
 SpiMaster{{ id }}::transfer(
 		const uint8_t* tx, uint8_t* rx, std::size_t length)
@@ -77,6 +119,79 @@ SpiMaster{{ id }}::transfer(
 		}
 		while ((rxIndex < length) and Hal::isRxDataAvailable()) {
 			const uint8_t data = Hal::read();
+			if (rx) {
+				rx[rxIndex] = data;
+			}
+			++rxIndex;
+		}
+		if (rxIndex < length) {
+			modm::this_fiber::yield();
+		}
+	}
+%% else
+	// this is a manually implemented "fast resumable function"
+	// there is no context or nesting protection, since we don't need it.
+	// there are only two states encoded into 1 bit (Bit1 of state):
+	//   1. initialize index, and
+	//   2. wait for transfer to finish.
+
+	// we need to globally remember which byte we are currently transferring
+	static std::size_t rxIndex = 0;
+	static std::size_t txIndex = 0;
+
+	// we are only interested in Bit1
+	switch(state & Bit1)
+	{
+		case 0:
+			// we will only visit this state once
+			state |= Bit1;
+
+			// initialize index and check range
+			rxIndex = 0;
+			txIndex = 0;
+			while (rxIndex < length) {
+		default:
+		{
+				while ((txIndex < length) and !Hal::isTxFifoFull() and (txIndex - rxIndex) < Hal::FifoSize) {
+					Hal::write(tx ? tx[txIndex] : 0);
+					++txIndex;
+				}
+				while ((rxIndex < length) and Hal::isRxDataAvailable()) {
+					if (rx) {
+						rx[rxIndex] = Hal::read();
+					} else {
+						Hal::read();
+					}
+					++rxIndex;
+				}
+				if (rxIndex < length) {
+					return {modm::rf::Running};
+				}
+		}
+			}
+
+			// clear the state
+			state &= ~Bit1;
+			return {modm::rf::Stop};
+	}
+%% endif
+}
+
+modm::ResumableResult<void>
+SpiMaster{{ id }}::transfer(
+		const uint16_t* tx, uint16_t* rx, std::size_t length)
+{
+%% if use_fiber
+	std::size_t rxIndex = 0;
+	std::size_t txIndex = 0;
+
+	while (rxIndex < length) {
+		while ((txIndex < length) and !Hal::isTxFifoFull() and (txIndex - rxIndex) < Hal::FifoSize) {
+			Hal::write16(tx ? tx[txIndex] : 0);
+			++txIndex;
+		}
+		while ((rxIndex < length) and Hal::isRxDataAvailable()) {
+			const uint16_t data = Hal::read16();
 			if (rx) {
 				rx[rxIndex] = data;
 			}

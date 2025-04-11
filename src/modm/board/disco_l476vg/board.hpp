@@ -44,10 +44,14 @@ struct SystemClock
 	static constexpr uint32_t Usart4 = Apb1;
 	static constexpr uint32_t Usart5 = Apb1;
 	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
+	static constexpr uint32_t Rtc = 32.768_kHz;
 
 	static bool inline
 	enable()
 	{
+		Rcc::enableLowSpeedExternalCrystal();
+		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::LowSpeedExternalCrystal);
+
 		// set flash latency first because system already runs from MSI
 		Rcc::setFlashLatency<Frequency>();
 
