@@ -164,7 +164,7 @@ public:
 	static inline uint32_t (*ms2t)(uint32_t) = [](uint32_t) { return 0ul; };
 %% endif 
 %#
-	static constexpr uint16_t epoch{1970};
+	static constexpr uint16_t epoch{1958};
 };
 
 }  // namespace modm::platform
