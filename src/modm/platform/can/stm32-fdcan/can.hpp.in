@@ -15,7 +15,10 @@
 #define MODM_STM32_FDCAN{{ id }}_HPP
 
 #include <optional>
+#include <cstring>
 
+#include <modm/architecture/interface/assert.h>
+#include <modm/architecture/interface/delay.hpp>
 #include <modm/architecture/interface/can.hpp>
 #include <modm/architecture/interface/can_filter.hpp>
 #include <modm/platform/gpio/connector.hpp>
