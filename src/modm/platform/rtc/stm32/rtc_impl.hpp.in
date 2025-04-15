@@ -13,6 +13,8 @@
 #include <modm/platform/clock/rcc.hpp>
 #include <modm/processing/fiber.hpp>
 
+#include <modm/debug.hpp>
+
 // Fix the inconsistent naming in ST's register files
 #ifdef RTC_ICSR_INIT
 #define RTC_ICSR RTC->ICSR
@@ -284,13 +286,17 @@ Rtc::setCalibration(int32_t ppb)
 
 	if (calm > 0x01ff) { return false; }
 
-	cal &= 0x01ff;
+	uint32_t mask = 0x01ff;
+	cal &= ~mask;
 	cal |= calm;
 
 	// Wait until recalibration is done (RECALPF bit is reset)
 	modm::this_fiber::poll([] { return ((RTC->ISR & RTC_ISR_RECALPF) == 0U); });
-
+	unlock();
 	RTC->CALR = cal;
+	lock();
+
+	modm::log::info.hex() << " CALR: " << cal << modm::endl;
 
 	return true;
 }
@@ -299,7 +305,7 @@ inline int32_t
 Rtc::getCalibration()
 {
 	const uint32_t calr = RTC->CALR;
-
+	modm::log::info.hex() << " CALR: " << calr << modm::endl;
 	int32_t ppb = (calr & RTC_CALR_CALP) ? 488500 : 0;
 	ppb -= static_cast<int32_t>(calr & 0x01FF) * 954;
 	return ppb;
