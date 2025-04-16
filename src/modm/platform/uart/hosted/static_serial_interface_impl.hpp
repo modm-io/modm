@@ -76,6 +76,13 @@ modm::platform::StaticSerialInterface<N>::isWriteFinished()
 }
 
 template<int N>
+std::size_t
+modm::platform::StaticSerialInterface<N>::receiveBufferSize()
+{
+	return backend->bytesAvailable();
+}
+
+template<int N>
 bool
 modm::platform::StaticSerialInterface<N>::read(uint8_t &data)
 {

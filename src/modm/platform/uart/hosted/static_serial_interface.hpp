@@ -83,6 +83,9 @@ namespace modm
 			static bool
 			isWriteFinished();
 
+			static std::size_t
+			receiveBufferSize();
+
 			static bool
 			read(uint8_t &data);
 
