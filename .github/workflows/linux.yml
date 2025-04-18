@@ -385,7 +385,7 @@ jobs:
 
   # Niklas: Running on the old container until I can figure out why the doc generator hangs
   build-docs-test:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     container:
       image: ghcr.io/modm-ext/modm-build-base:2022-09-27
