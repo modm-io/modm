@@ -3,7 +3,7 @@
 /---------------------------------------------------------------------------*/
 
 #ifndef FFCONF_DEF
-#define FFCONF_DEF	80286	/* Revision ID */
+#define FFCONF_DEF	5380	/* Revision ID */
 
 /* A header file that overwrites with local project settings. */
 #if __has_include(<ffconf_local.h>)
