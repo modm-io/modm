@@ -98,10 +98,10 @@ void __modm_startup(void)
 %% if enable_icache
 	SCB_EnableICache();
 %% elif has_icache
-	SCB_DisableICache();
+	if (SCB->CCR & SCB_CCR_IC_Msk) SCB_DisableICache();
 %% endif
 %% if has_dcache
-	SCB_DisableDCache();
+	if (SCB->CCR & SCB_CCR_DC_Msk) SCB_DisableDCache();
 %% endif
 %#
 	// Copy and zero all internal memory
