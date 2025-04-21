@@ -11,14 +11,15 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/platform/device.hpp>
-#include <modm/architecture/interface/interrupt.hpp>
 #include <modm/architecture/interface/atomic_lock.hpp>
+#include <modm/architecture/interface/delay.hpp>
+#include <modm/architecture/interface/interrupt.hpp>
 #include "tusb.h"
 
-%% for irq, port, mode in irqs | sort
+%% for irq, port, _ in irqs | sort
 MODM_ISR({{irq}})
 {
-	tu{{mode}}_int_handler({{port}});
+	tusb_int_handler({{port}}, true);
 }
 %% endfor
 
@@ -97,6 +98,12 @@ tusb_get_device_serial(uint16_t *serial_str)
 	}
 
 	return sizeof(raw_id) * 2;
+}
+
+extern "C" void
+tusb_time_delay_ms_api(uint32_t ms)
+{
+	modm::delay_ms(ms);
 }
 
 %% if with_debug
