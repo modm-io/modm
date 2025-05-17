@@ -67,6 +67,7 @@ def generate_instance(env, port, otg=False):
         "port": port,
         "peripheral": "Usbotg{}".format(port) if otg else "Usb",
         "is_otg": otg,
+        "is_phyc": port == "hs" and not is_ulpi,
         "is_remap": irq_data["is_remap"],
         "irqs": irq_data["port_irqs"][port],
         "target": env[":target"].identifier,

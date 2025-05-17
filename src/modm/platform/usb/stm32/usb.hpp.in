@@ -43,6 +43,14 @@ public:
 #endif
 %% endif
 		Rcc::enable<Peripheral::{{ peripheral }}>();
+%% if is_phyc
+		Rcc::enable<Peripheral::Usbotghsulpi>();
+#ifdef RCC_APB2ENR_OTGPHYCEN
+		RCC->APB2ENR |= RCC_APB2ENR_OTGPHYCEN; __DSB();
+#elif defined RCC_AHB2ENR1_USBPHYCEN
+		RCC->AHB2ENR1 |= RCC_AHB2ENR1_USBPHYCEN; __DSB();
+#endif
+%% endif
 %% if is_remap
 		SYSCFG->CFGR1 |= SYSCFG_CFGR1_USB_IT_RMP;
 %% endif
