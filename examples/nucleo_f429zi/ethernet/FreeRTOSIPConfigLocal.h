@@ -71,14 +71,6 @@ a socket. */
 #define ipconfigDNS_CACHE_ENTRIES			( 4 )
 #define ipconfigDNS_REQUEST_ATTEMPTS		( 2 )
 
-/* ipconfigRAND32() is called by the IP stack to generate random numbers for
-things such as a DHCP transaction number or initial sequence number.  Random
-number generation is performed via this macro to allow applications to use their
-own random number generation method.  For example, it might be possible to
-generate a random number by sampling noise on an analogue input. */
-extern UBaseType_t uxRand(void);
-#define ipconfigRAND32()	uxRand()
-
 /* If ipconfigUSE_NETWORK_EVENT_HOOK is set to 1 then FreeRTOS+TCP will call the
 network event hook at the appropriate times.  If ipconfigUSE_NETWORK_EVENT_HOOK
 is not set to 1 then the network event hook will never be called.  See
