@@ -23,7 +23,7 @@ int
 main()
 {
 	initialize();
-	initializeUsbFs();
+	initializeUsb();
 
 	tusb_init();
 

@@ -22,7 +22,7 @@ int
 main()
 {
 	Board::initialize();
-	Board::initializeUsbFs();
+	Board::initializeUsb();
 
 	tusb_init();
 

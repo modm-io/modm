@@ -169,7 +169,7 @@ initialize()
 }
 
 inline void
-initializeUsbFs(uint8_t priority=3)
+initializeUsb(uint8_t priority=3)
 {
 	usb::Device::initialize<SystemClock>(priority);
 	usb::Device::connect<usb::Dm::Dm, usb::Dp::Dp, usb::Id::Id>();
@@ -182,6 +182,12 @@ initializeUsbFs(uint8_t priority=3)
 	// Enable VBUS sense (B device) via pin PA9
 	USB_OTG_FS->GCCFG |= USB_OTG_GCCFG_VBDEN;
 }
+
+// DEPRECATE: 2026q2
+[[deprecated("Use initializeUsb() instead!")]]
+inline void
+initializeUsbFs(uint8_t priority=3)
+{ initializeUsb(priority); }
 /// @}
 
 }

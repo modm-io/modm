@@ -38,9 +38,7 @@ void midi_task();
 int main()
 {
 	Board::initialize();
-	Board::initializeUsbFs();
-	// DISCO-F746NG also has a HS port:
-	// Board::initializeUsbHs();
+	Board::initializeUsb();
 	tusb_init();
 
 	while (true)

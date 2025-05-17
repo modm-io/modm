@@ -141,7 +141,7 @@ int
 main()
 {
 	Board::initialize();
-	Board::initializeUsbFs();
+	Board::initializeUsb();
 	initializeFatFs();
 	tusb_init();
 

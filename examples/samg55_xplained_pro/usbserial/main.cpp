@@ -12,7 +12,7 @@ int main() {
 	modm::delay_ms(5);
 	GpioA22::setInput();
 
-	Board::initializeUsbFs();
+	Board::initializeUsb();
 
 	tusb_init();
 

@@ -151,7 +151,7 @@ int main()
 int main()
 {
 	Board::initialize();
-	Board::initializeUsbFs();
+	Board::initializeUsb();
 	counter.initialize(true);
 	tusb_init();
 

@@ -55,7 +55,7 @@ void tud_resume_cb() { tmr.restart(1s); }
 int main()
 {
 	Board::initialize();
-	Board::initializeUsbFs();
+	Board::initializeUsb();
 
 	// Output 500hz PWM on D12 so we can validate the GCLK0 clock speed.
 	PM->APBCMASK.reg |= PM_APBCMASK_TCC0;

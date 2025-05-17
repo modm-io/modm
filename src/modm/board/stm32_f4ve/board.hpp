@@ -280,16 +280,6 @@ initialize()
 	Usart1::initialize<Board::SystemClock, 115200_Bd>();
 }
 
-/// not supported yet, due to missing USB driver
-inline void
-initializeUsb()
-{
-	usb::Power::setOutput(Gpio::OutputType::PushPull, Gpio::OutputSpeed::MHz2);
-
-	usb::Overcurrent::setInput(Gpio::InputType::Floating);
-	usb::VBus::setInput(Gpio::InputType::Floating);
-}
-
 inline void
 initializeW25q16()
 {

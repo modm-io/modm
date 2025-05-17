@@ -82,15 +82,6 @@ initialize()
 	Leds::setOutput();
 	ButtonSW0::setInput(InputType::PullUp);
 }
-
-/*
-// TODO: usb
-inline void initializeUsbFs()
-{
-	//SystemClock::enableUsb();
-	//modm::platform::Usb::initialize<Board::SystemClock>();
-}
-*/
 /// @}
 
 } // namespace Board

@@ -92,11 +92,17 @@ initialize()
 }
 
 inline void
-initializeUsbFs(uint8_t priority=3)
+initializeUsb(uint8_t priority=3)
 {
 	usb::Device::initialize<SystemClock>(priority);
 	usb::Device::connect<>();
 }
+
+// DEPRECATE: 2026q2
+[[deprecated("Use initializeUsb() instead!")]]
+inline void
+initializeUsbFs(uint8_t priority=3)
+{ initializeUsb(priority); }
 /// @}
 
 }  // namespace Board

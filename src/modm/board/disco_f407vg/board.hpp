@@ -210,31 +210,8 @@ initializeLis3()
 	lis3::SpiMaster::setDataMode(lis3::SpiMaster::DataMode::Mode3);
 }
 
-/// not supported yet, due to missing I2S driver
 inline void
-initializeCs43()
-{
-//	cs43::Lrck::connect(cs43::I2sMaster::Ws);
-//	cs43::Mclk::connect(cs43::I2sMaster::Mck);
-//	cs43::Sclk::connect(cs43::I2sMaster::Ck);
-//	cs43::Sdin::connect(cs43::I2sMaster::Sd);
-
-	cs43::Reset::setOutput(modm::Gpio::High);
-
-	cs43::I2cMaster::connect<cs43::Scl::Scl, cs43::Sda::Sda>();
-	cs43::I2cMaster::initialize<SystemClock, 100_kHz>();
-}
-
-/// not supported yet, due to missing I2S driver
-inline void
-initializeMp45()
-{
-//	mp45::Clk::connect(mp45::I2sMaster::Ck);
-//	mp45::Dout::connect(mp45::I2sMaster::Sd);
-}
-
-inline void
-initializeUsbFs(uint8_t priority=3)
+initializeUsb(uint8_t priority=3)
 {
 	usb::Device::initialize<SystemClock>(priority);
 	usb::Device::connect<usb::Dm::Dm, usb::Dp::Dp, usb::Id::Id>();
@@ -245,6 +222,12 @@ initializeUsbFs(uint8_t priority=3)
 	USB_OTG_FS->GCCFG &= ~USB_OTG_GCCFG_NOVBUSSENS;
 	USB_OTG_FS->GCCFG |= USB_OTG_GCCFG_VBUSBSEN;
 }
+
+// DEPRECATE: 2026q2
+[[deprecated("Use initializeUsb() instead!")]]
+inline void
+initializeUsbFs(uint8_t priority=3)
+{ initializeUsb(priority); }
 /// @}
 
 }

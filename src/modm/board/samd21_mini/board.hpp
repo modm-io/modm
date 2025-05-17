@@ -95,11 +95,17 @@ initialize()
 }
 
 inline void
-initializeUsbFs(uint8_t priority = 3)
+initializeUsb(uint8_t priority=3)
 {
 	modm::platform::Usb::initialize<Board::SystemClock>(priority);
 	modm::platform::Usb::connect<GpioA24::Dm, GpioA25::Dp>();
 }
+
+// DEPRECATE: 2026q2
+[[deprecated("Use initializeUsb() instead!")]]
+inline void
+initializeUsbFs(uint8_t priority=3)
+{ initializeUsb(priority); }
 /// @}
 
 } // Board namespace

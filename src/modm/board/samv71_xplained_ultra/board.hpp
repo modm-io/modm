@@ -115,15 +115,6 @@ initialize()
 
 	Can::Can::connect<Can::Rx::Rx, Can::Tx::Tx>(InputType::PullUp);
 }
-
-/*
-// TODO: usb
-inline void initializeUsbFs()
-{
-	//SystemClock::enableUsb();
-	//modm::platform::Usb::initialize<Board::SystemClock>();
-}
-*/
 /// @}
 
 } // namespace Board

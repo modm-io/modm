@@ -211,8 +211,9 @@ initialize()
 }
 
 inline void
-initializeUsbFs(uint8_t priority=3)
+initializeUsb(uint8_t priority=3)
 {
+	// Full-speed USB port
 	usb_fs::Device::initialize<SystemClock>(priority);
 	usb_fs::Device::connect<usb_fs::Dm::Dm, usb_fs::Dp::Dp, usb_fs::Id::Id>();
 
@@ -225,11 +226,8 @@ initializeUsbFs(uint8_t priority=3)
 	// B-peripheral session valid override enable
 	USB_OTG_FS->GOTGCTL |= USB_OTG_GOTGCTL_BVALOEN;
 	USB_OTG_FS->GOTGCTL |= USB_OTG_GOTGCTL_BVALOVAL;
-}
 
-inline void
-initializeUsbHs(uint8_t priority=3)
-{
+	// High-speed USB port
 	usb_hs::Device::initialize<SystemClock>(priority);
 	usb_hs::Device::connect<
 		usb_hs::Ck::Ulpick,	usb_hs::Stp::Ulpistp,
@@ -251,6 +249,18 @@ initializeUsbHs(uint8_t priority=3)
 	USB_OTG_HS->GUSBCFG &= ~USB_OTG_GUSBCFG_FHMOD;
 	USB_OTG_HS->GUSBCFG |= USB_OTG_GUSBCFG_FDMOD;
 }
+
+// DEPRECATE: 2026q2
+[[deprecated("Use initializeUsb() instead!")]]
+inline void
+initializeUsbFs(uint8_t priority=3)
+{ initializeUsb(priority); }
+
+// DEPRECATE: 2026q2
+[[deprecated("Use initializeUsb() instead!")]]
+inline void
+initializeUsbHs(uint8_t priority=3)
+{ initializeUsb(priority); }
 /// @}
 
 }

@@ -50,8 +50,8 @@ public:
 	void
 	run()
 	{
-		MODM_LOG_INFO << "USBTask: Calling Board::initializeUsbFs() ..." << modm::endl;
-		Board::initializeUsbFs(4);
+		MODM_LOG_INFO << "USBTask: Calling Board::initializeUsb() ..." << modm::endl;
+		Board::initializeUsb(4);
 		MODM_LOG_INFO << "USBTask: Calling tusb_init() ..." << modm::endl;
 		tusb_init();
 		MODM_LOG_INFO << "... done!" << modm::endl;

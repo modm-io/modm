@@ -29,7 +29,7 @@ using Spi = SpiMaster0_Dma<DmaRx, DmaTx>;
 int main()
 {
 	Board::initialize();
-	Board::initializeUsbFs();
+	Board::initializeUsb();
 	tusb_init();
 
 	Spi::connect<Mosi::Tx, Miso::Rx, Sck::Sclk>();

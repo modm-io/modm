@@ -88,11 +88,18 @@ initialize()
 	Button::setInput(Button::InputType::PullUp);
 }
 
-inline void initializeUsbFs()
+inline void
+initializeUsb()
 {
 	modm::platform::Usb::initialize<Board::SystemClock>();
 	modm::platform::Usb::connect<GpioA24::Dm, GpioA25::Dp>();
 }
+
+// DEPRECATE: 2026q2
+[[deprecated("Use initializeUsb() instead!")]]
+inline void
+initializeUsbFs()
+{ initializeUsb(); }
 /// @}
 
 } // namespace Board

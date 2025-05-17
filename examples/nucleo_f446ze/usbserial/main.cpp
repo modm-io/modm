@@ -36,7 +36,7 @@ void tud_resume_cb() { tmr.restart(1s); }
 int main()
 {
 	Board::initialize();
-	Board::initializeUsbFs();
+	Board::initializeUsb();
 
 	tusb_init();
 
