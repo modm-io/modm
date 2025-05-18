@@ -69,7 +69,7 @@ def build(project):
     elif ":build:cmake" in project_cfg and not is_running_on_windows:
         build_dir = re.search(r'name=".+?:build:build.path">(.*?)</option>', project_cfg)[1]
         cmd = "cmake -E make_directory {}/cmake-build-release; ".format(build_dir)
-        cmd += '(cd {}/cmake-build-release && cmake -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles" {}); '.format(build_dir, path.absolute())
+        cmd += '(cd {}/cmake-build-release && cmake -DCMAKE_BUILD_TYPE=MinSizeRel -G "Unix Makefiles" {}); '.format(build_dir, path.absolute())
         cmd += "cmake --build {}/cmake-build-release".format(build_dir)
         commands.append( (cmd, "CMake") )
 
