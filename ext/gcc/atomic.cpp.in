@@ -16,11 +16,27 @@
  *
  * We ignore the memory order, since the runtime switching takes longer than
  * the DMB instruction.
+ *
+ * These functions cannot be inlined, since the compiler builtins are named the
+ * same. Terrible design really.
  */
 
+// ============================ atomics for bools ============================
+extern "C" bool
+__atomic_test_and_set(volatile void *ptr, int /*memorder*/)
+{
+	bool value{};
+	__modm_atomic_pre_barrier(__ATOMIC_SEQ_CST);
+	{
+		modm::atomic::Lock _;
+		value = *reinterpret_cast<volatile bool*>(ptr);
+		*reinterpret_cast<volatile bool*>(ptr) = true;
+	}
+	__modm_atomic_post_barrier(__ATOMIC_SEQ_CST);
+	return value;
+}
+
 // ============================ atomics for arrays ============================
-// These functions cannot be inlined, since the compiler builtins are named the
-// same. Terrible design really.
 extern "C" void
 __atomic_load(unsigned int size, const volatile void *src, void *dest, int /*memorder*/)
 {
