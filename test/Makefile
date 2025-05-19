@@ -185,6 +185,10 @@ compile-arduino-nano_H:
 	$(call compile-test,arduino-nano_H,size)
 run-arduino-nano_H:
 	$(call run-test,arduino-nano_H,size)
+compile-arduino-nano_I:
+	$(call compile-test,arduino-nano_I,size)
+run-arduino-nano_I:
+	$(call run-test,arduino-nano_I,size)
 
 
 compile-mega-2560-pro_A:

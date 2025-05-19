@@ -135,7 +135,7 @@ public:
 	modm::ResumableResult<bool>
 	setDisplayMode(DisplayMode mode = DisplayMode::Normal)
 	{
-		commandBuffer[0] = mode;
+		commandBuffer[0] = uint8_t(mode);
 		return writeCommands(1);
 	}
 

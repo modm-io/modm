@@ -14,7 +14,7 @@ jobs:
   build-upload-docs:
     runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-base:2024-12-01
+      image: ghcr.io/modm-ext/modm-build-base:2025-05-18
     steps:
       - name: Check out repository
         uses: actions/checkout@v4

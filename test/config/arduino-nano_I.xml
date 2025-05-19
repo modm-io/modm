@@ -2,8 +2,8 @@
 <library>
   <extends>modm:arduino-nano</extends>
   <options>
-    <option name="modm:build:build.path">../../build/generated-unittest/arduino-nano_F/</option>
-    <option name="modm:build:unittest.source">../../build/generated-unittest/arduino-nano_F/modm-test</option>
+    <option name="modm:build:build.path">../../build/generated-unittest/arduino-nano_I/</option>
+    <option name="modm:build:unittest.source">../../build/generated-unittest/arduino-nano_I/modm-test</option>
     <option name="modm:build:info.git">Disabled</option>
     <option name="modm:io:with_float">True</option>
     <option name="modm:io:with_long_long">True</option>
@@ -27,14 +27,14 @@
     <module>modm-test:test:stdc++</module> -->
 
 
-    <module>modm-test:test:io</module>
-    <module>modm-test:test:platform:**</module>
+    <!-- <module>modm-test:test:io</module>
+    <module>modm-test:test:platform:**</module> -->
 
 
     <!-- <module>modm-test:test:processing</module> -->
 
 
-    <!-- <module>modm-test:test:ui</module>
-    <module>modm-test:test:math</module> -->
+    <!-- <module>modm-test:test:ui</module> -->
+    <module>modm-test:test:math</module>
   </modules>
 </library>

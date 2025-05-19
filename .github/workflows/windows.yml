@@ -40,41 +40,48 @@ jobs:
       #   Unzip -zipfile "gcc-arm-none-eabi-win64.zip" -outdir "C:\"
       # is not faster than
       #   Expand-Archive -Path gcc-arm-none-eabi-win64.zip -DestinationPath C:\ -Force
+      # GCC 12 comes with the Windows image now
+      #   Start-Job {
+      #     Set-Location $using:PWD
+      #     Add-Type -Assembly "System.IO.Compression.Filesystem"
+      #     Invoke-WebRequest -OutFile gcc-win64.zip https://github.com/brechtsanders/winlibs_mingw/releases/download/14.2.0posix-19.1.7-12.0.0-msvcrt-r3/winlibs-x86_64-posix-seh-gcc-14.2.0-mingw-w64msvcrt-12.0.0-r3.zip
+      #     [System.IO.Compression.ZipFile]::ExtractToDirectory("gcc-win64.zip", "C:\")
+      #   }
       - name: Download and Unzip GCCs
         shell: powershell
         run: |
           $ProgressPreference = 'SilentlyContinue'
           Start-Job {
             Set-Location $using:PWD
-            Add-Type -Assembly "System.IO.Compression.Filesystem"
-            Invoke-WebRequest -OutFile gcc-win64.zip https://github.com/brechtsanders/winlibs_mingw/releases/download/13.2.0posix-18.1.5-11.0.1-msvcrt-r8/winlibs-x86_64-posix-seh-gcc-13.2.0-mingw-w64msvcrt-11.0.1-r8.zip
-            [System.IO.Compression.ZipFile]::ExtractToDirectory("gcc-win64.zip", "C:\")
-          }
-          Start-Job {
-            Set-Location $using:PWD
-            Invoke-WebRequest -OutFile gcc-arm-none-eabi-win64.zip https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-mingw-w64-i686-arm-none-eabi.zip
-            Expand-Archive -Path gcc-arm-none-eabi-win64.zip -DestinationPath C:\ -Force
+            Invoke-WebRequest -OutFile gcc-arm-none-eabi-win64-14.zip https://developer.arm.com/-/media/Files/downloads/gnu/14.2.rel1/binrel/arm-gnu-toolchain-14.2.rel1-mingw-w64-x86_64-arm-none-eabi.zip
+            New-Item -Path "C:\" -Name "arm-none-eabi-14" -ItemType "Directory"
+            Expand-Archive -Path gcc-arm-none-eabi-win64-14.zip -DestinationPath C:\arm-none-eabi-14 -Force
+            Remove-Item gcc-arm-none-eabi-win64-14.zip
           }
           Start-Job {
             Set-Location $using:PWD
             Add-Type -Assembly "System.IO.Compression.Filesystem"
-            Invoke-WebRequest -OutFile gcc-avr-win64.zip https://github.com/ZakKemble/avr-gcc-build/releases/download/v13.2.0-1/avr-gcc-13.2.0-x64-windows.zip
+            Invoke-WebRequest -OutFile gcc-avr-win64.zip https://github.com/ZakKemble/avr-gcc-build/releases/download/v14.1.0-1/avr-gcc-14.1.0-x64-windows.zip
             [System.IO.Compression.ZipFile]::ExtractToDirectory("gcc-avr-win64.zip", "C:\")
+            Remove-Item gcc-avr-win64.zip
           }
           Get-Job | Wait-Job
 
+      # No need for this anymore
+      # dir C:\mingw64
+      # dir C:\mingw64\bin
+      # echo "C:\mingw64\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       - name: Install GCCs
         if: always()
         shell: powershell
         run: |
           dir C:\
-          dir C:\mingw64
-          dir C:\arm-gnu-toolchain-13.2.rel1-mingw-w64-i686-arm-none-eabi
-          dir C:\avr-gcc-13.2.0-x64-windows
-          echo "C:\mingw64\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          echo "C:\arm-gnu-toolchain-13.2.rel1-mingw-w64-i686-arm-none-eabi\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          echo "C:\avr-gcc-13.2.0-x64-windows\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          rm gcc-arm-none-eabi-win64.zip
+          dir C:\arm-none-eabi-14\
+          dir C:\arm-none-eabi-14\bin
+          dir C:\avr-gcc-14.1.0-x64-windows
+          dir C:\avr-gcc-14.1.0-x64-windows\bin
+          echo "C:\arm-none-eabi-14\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "C:\avr-gcc-14.1.0-x64-windows\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Install Python
         if: always()

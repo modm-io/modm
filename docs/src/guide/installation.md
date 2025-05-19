@@ -15,8 +15,8 @@ Note that the modm examples use the SCons build system by default, however,
 you are not *required* to use it. See [the reference manual](../../reference/build-systems)
 for additional build system documentation.
 
-!!! info "Use GCC 12 or newer"
-    modm uses C++23, so you need *at least* GCC 12, we recommend GCC 13.
+!!! info "Use GCC 13 or newer"
+    modm uses C++23, so you need *at least* GCC 13, we recommend GCC 14.
 
 !!! warning "Beware of AVRs"
     We **strongly discourage** using AVRs for new designs, due to a significant
@@ -58,7 +58,7 @@ We use [Doxypress][doxypress_binaries] to generate the API documentation:
 
 ```sh
 sudo mkdir /opt/doxypress
-wget -O- https://github.com/copperspice/doxypress/releases/download/dp-1.7.0/doxypress-1.7.0-ubuntu24.04-x64.tar.bz2 | sudo tar xj -C /opt/doxypress
+wget -O- https://github.com/copperspice/doxypress/releases/download/dp-2.0.0/doxypress-2.0.0-ubuntu24.04-x64.tar.bz2 | sudo tar xj -C /opt/doxypress
 ```
 
 Add the directory to your `PATH` variable in `~/.bashrc`:
@@ -75,13 +75,13 @@ If your Linux distribution provides up-to-date packages, we recommend using them
 Otherwise, including Ubuntu 24.04, we recommend using the [*xPack GNU Arm Embedded GCC* binary distribution][toolchain-arm-xpack]:
 
 ```sh
-wget -O- https://github.com/xpack-dev-tools/arm-none-eabi-gcc-xpack/releases/download/v13.3.1-1.1/xpack-arm-none-eabi-gcc-13.3.1-1.1-linux-x64.tar.gz | sudo tar xz -C /opt/
+wget -O- https://github.com/xpack-dev-tools/arm-none-eabi-gcc-xpack/releases/download/v14.2.1-1.1/xpack-arm-none-eabi-gcc-14.2.1-1.1-linux-x64.tar.gz | sudo tar xz -C /opt/
 ```
 
 Add it to your `PATH` variable in `~/.bashrc`:
 
 ```sh
-export PATH="/opt/xpack-arm-none-eabi-gcc-13.3.1-1.1/bin:$PATH"
+export PATH="/opt/xpack-arm-none-eabi-gcc-14.2.1-1.1/bin:$PATH"
 ```
 
 Install the OpenOCD tool:
@@ -101,7 +101,7 @@ sudo apt install openocd
 Download and extract the [pre-built AVR toolchain][modm-avr-gcc]:
 
 ```sh
-wget -O- https://github.com/modm-io/avr-gcc/releases/download/v13.2.0/modm-avr-gcc.tar.bz2 | sudo tar xj -C /opt
+wget -O- https://github.com/modm-io/avr-gcc/releases/download/v14.2.0/modm-avr-gcc.tar.bz2 | sudo tar xj -C /opt
 ```
 
 !!! warning "AVR toolchain install directory"
@@ -169,8 +169,8 @@ Install the [pre-built ARM toolchain](https://github.com/osx-cross/homebrew-arm)
 
 ```sh
 brew tap osx-cross/arm
-brew install arm-gcc-bin@13 openocd
-brew link --force arm-gcc-bin@13
+brew install arm-gcc-bin@14 openocd
+brew link --force arm-gcc-bin@14
 ```
 
 To program Microchip SAM devices via the bootloader, install the `bossac` tool:
@@ -186,8 +186,8 @@ Install the [AVR toolchain from source](https://github.com/osx-cross/homebrew-av
 
 ```sh
 brew tap osx-cross/avr
-brew install avr-gcc@13
-brew link --force avr-gcc@13
+brew install avr-gcc@14
+brew link --force avr-gcc@14
 ```
 
 
@@ -196,7 +196,7 @@ brew link --force avr-gcc@13
 To compile modm *for x86_64 macOS* you need to install these tools too:
 
 ```sh
-brew install boost gcc@13
+brew install boost gcc@14
 ```
 
 
@@ -276,7 +276,7 @@ openocd --version
 #### Microchip AVR
 
 Download the [pre-built AVR toolchain][winavr] and unpack the `.zip` file using
-the context menu `7-Zip > Extract to "avr-gcc-13.2.0-..."`
+the context menu `7-Zip > Extract to "avr-gcc-14.2.0-..."`
 Then rename and move the extracted folder to `C:\Program Files\avr-gcc`.
 Open PowerShell to add the `\bin` folder to the `Path`:
 
@@ -404,7 +404,7 @@ picocom --baud 115200 --imap lfcrlf --echo /dev/ttyACM0
 [openocd-install]: https://github.com/rleh/openocd-build
 [udev-rules-openocd]: https://github.com/openocd-org/openocd/blob/master/contrib/60-openocd.rules#L84-L99
 [usbipd]: https://github.com/dorssel/usbipd-win
-[winavr]: https://github.com/ZakKemble/avr-gcc-build/releases/tag/v13.2.0-1
+[winavr]: https://github.com/ZakKemble/avr-gcc-build/releases
 [windows-store-ubuntu-22-04-1-lts]: https://www.microsoft.com/store/productId/9PN20MSR04DW
 [wingit]: https://git-scm.com/download/win
 [winterm]: https://github.com/Microsoft/Terminal

@@ -25,8 +25,8 @@ jobs:
           export HOMEBREW_NO_INSTALL_CLEANUP=1 # saves time
           brew update
           # brew unlink gcc
-          brew install doxygen boost gcc@13 avr-gcc@13 arm-gcc-bin@13 cmake || true
-          brew link --force avr-gcc@13 arm-gcc-bin@13
+          brew install doxygen boost gcc@14 avr-gcc@14 arm-gcc-bin@14 cmake || true
+          brew link --force avr-gcc@14 arm-gcc-bin@14
           # brew upgrade boost gcc git || true
 
       - name: Setup environment - Python pip
