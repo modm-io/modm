@@ -13,9 +13,7 @@ specifically for your targets and needs and generate a custom library.
 You can generate more than just code, in this example, lbuild also generates a
 build system which then compiles and links the application into a executable.
 
-<center>
-![](images/system-overview.svg)
-</center>
+<img src="../images/system-overview.svg" style="display: block; margin: auto;"/>
 
 We've also put a lot of thought into modm-devices, about what data to extract,
 how to format and store it. We automated the entire process to get the high
@@ -34,7 +32,7 @@ by looking at the dependency graph before, or by inspecting the generated code
 after calling lbuild, and gives you the opportunity to only use the parts of
 modm you really like.
 
-![](images/uart-dep-graph.svg)
+<img src="../images/uart-dep-graph.svg" style="display: block; margin: auto;"/>
 
 A lbuild module is just a few lines of Python code. Here we can see the code for
 the `modm:platform:uart` module from the example above. It declares its name,
