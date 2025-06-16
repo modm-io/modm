@@ -106,7 +106,7 @@ void __modm_startup(void)
 %% endif
 %% if has_dcache
 	// Enable data cache with default WBWA policy
-	SCB_EnableDCache();
+	// SCB_EnableDCache();
 %% endif
 %#
 %% if core != "cortex-m0"
