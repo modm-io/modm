@@ -165,20 +165,3 @@ sleep_until(std::chrono::time_point<Clock, Duration> sleep_time)
 /// @}
 
 } // namespace modm::this_fiber
-
-/// @cond
-// DEPRECATE: 2025q2
-namespace modm::fiber
-{
-
-[[deprecated("Use `modm::this_fiber::yield()` instead!")]]
-void inline yield()
-{ this_fiber::yield(); }
-
-template< class Rep, class Period >
-[[deprecated("Use `modm::this_fiber::sleep_for()` instead!")]]
-void sleep(std::chrono::duration<Rep, Period> sleep_duration)
-{ this_fiber::sleep_for(sleep_duration); }
-
-}
-/// @endcond

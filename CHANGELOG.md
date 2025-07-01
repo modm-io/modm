@@ -52,6 +52,73 @@ pay attention to. Medium impact changes are also worth looking at.
 
 <!--releases-->
 
+## 2025-07-01: 2025q2 release
+
+This release covers everything from 2025-04-01 and has been tested with avr-gcc
+v14.2.0 from upstream and arm-none-eabi-gcc v14.2.1 from xpack.
+
+Features:
+
+- Support for GCC14.
+- Support for 48 more STM32 devices.
+
+Integrated Projects:
+
+- ETL upgraded from v20.39.4 to v20.40.0.
+- FatFS upgraded from v0.15a to v0.15a_p1.
+- JSON upgraded from v3.11.3 to v3.12.0.
+- LVGL upgraded from v9.2.0 to v9.2.2.
+- NanoPB upgraded from v0.4.9 to v0.4.9.1.
+- STM32C0 headers upgraded from v1.2.0 to v1.3.0.
+- STM32G4 headers upgraded from v1.2.4 to v1.2.5.
+- STM32H5 headers upgraded from v1.3.0 to v1.4.0.
+- STM32H7 headers upgraded from v1.10.4 to v1.10.6.
+- STM32L0 headers upgraded from v1.9.3 to v1.9.4.
+- STM32L1 headers upgraded from v2.3.3 to v2.3.4.
+- STM32U0 headers upgraded from v1.1.0 to v1.2.0.
+- STM32U5 headers upgraded from v1.4.0 to v1.4.1.
+- TinyUSB upgraded from v0.17.0 to v0.18.0.
+
+Fixes:
+
+- DW3110 initialization on fast CPUs.
+- Support for STM32F723 HS USB PHY.
+- Only disable previously enabled caches on Cortex-M7.
+
+New development boards:
+
+- DISCO-F723IE as [`modm:board:disco-f723ie`][].
+
+Known bugs:
+
+- OpenOCD cannot enable SWO on STM32H7 targets. See [#1079][].
+- `arm-none-eabi-gdb` TUI and GDBGUI interfaces are not supported on Windows.
+  See [#591][].
+- Generating modm on Windows creates paths with `\` that are not compatible with
+  Unix. See [#310][].
+- `lbuild build` and `lbuild clean` do not remove all previously generated files
+  when the configuration changes. See [#285][].
+
+Many thanks to all our contributors:
+
+- Michael Jossen ([@Javask][])
+- Niklas Hauser ([@salkinium][])
+
+PR [#1274][] -> [2025q2][].
+
+<details>
+<summary>Detailed changelog</summary>
+
+#### 2025-05-17: Add DISCO-F723IE board
+
+Adds support for internal HS USB PHY on STM32.
+
+PR [#1264][] -> [4fdd2a1][].  
+Tested in hardware by [@salkinium][].
+
+</details>
+
+
 ## 2025-04-01: 2025q1 release
 
 This release covers everything from 2025-01-01 and has been tested with avr-gcc
@@ -3457,6 +3524,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [2024q3]: https://github.com/modm-io/modm/releases/tag/2024q3
 [2024q4]: https://github.com/modm-io/modm/releases/tag/2024q4
 [2025q1]: https://github.com/modm-io/modm/releases/tag/2025q1
+[2025q2]: https://github.com/modm-io/modm/releases/tag/2025q2
 
 [@19joho66]: https://github.com/19joho66
 [@ASMfreaK]: https://github.com/ASMfreaK
@@ -3532,6 +3600,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [`modm:board:arduino-nano`]: https://modm.io/reference/module/modm-board-arduino-nano
 [`modm:board:devebox-stm32f4xx`]: https://modm.io/reference/module/modm-board-devebox-stm32f4xx
 [`modm:board:devebox-stm32h750vb`]: https://modm.io/reference/module/modm-board-devebox-stm32h750vb
+[`modm:board:disco-f723ie`]: https://modm.io/reference/module/modm-board-disco-f723ie
 [`modm:board:feather-m0`]: https://modm.io/reference/module/modm-board-feather-m0
 [`modm:board:feather-rp2040`]: https://modm.io/reference/module/modm-board-feather-rp2040
 [`modm:board:mega-2560-pro`]: https://modm.io/reference/module/modm-board-mega-2560-pro
@@ -3693,6 +3762,8 @@ Please note that contributions from xpcc were continuously ported to modm.
 [#1252]: https://github.com/modm-io/modm/pull/1252
 [#1255]: https://github.com/modm-io/modm/pull/1255
 [#1260]: https://github.com/modm-io/modm/pull/1260
+[#1264]: https://github.com/modm-io/modm/pull/1264
+[#1274]: https://github.com/modm-io/modm/pull/1274
 [#132]: https://github.com/modm-io/modm/pull/132
 [#136]: https://github.com/modm-io/modm/pull/136
 [#153]: https://github.com/modm-io/modm/pull/153
@@ -3978,6 +4049,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [4d69227]: https://github.com/modm-io/modm/commit/4d69227
 [4f25cdf]: https://github.com/modm-io/modm/commit/4f25cdf
 [4f50d00]: https://github.com/modm-io/modm/commit/4f50d00
+[4fdd2a1]: https://github.com/modm-io/modm/commit/4fdd2a1
 [4ff604f]: https://github.com/modm-io/modm/commit/4ff604f
 [516b2b3]: https://github.com/modm-io/modm/commit/516b2b3
 [517bd84]: https://github.com/modm-io/modm/commit/517bd84
