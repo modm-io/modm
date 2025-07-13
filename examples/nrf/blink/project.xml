@@ -1,7 +1,7 @@
 <library>
   <options>
     <option name="modm:target">nrf52840-xxaa</option>
-    <option name="modm:build:build.path">../../../../build/nrf/blink</option>
+    <option name="modm:build:build.path">../../../build/nrf/blink</option>
   </options>
   <modules>
     <module>modm:architecture:delay</module>

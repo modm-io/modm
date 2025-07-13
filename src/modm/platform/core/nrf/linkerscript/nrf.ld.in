@@ -2,15 +2,9 @@
 {{ linker.copyright() }}
 
 {{ linker.prefix() }}
-
-%% if vector_table_location == "ram"
-/* Round up the number of vector table entries to the nearest power-of-two and multiply by 8. */
-VECTOR_TABLE_ALIGNMENT = (1 << LOG2CEIL({{ number_of_interrupts + 16 }})) * 8;
-/* compute the vector table offset from start of RAM */
-VECTOR_TABLE_OFFSET = ALIGN(TOTAL_STACK_SIZE, VECTOR_TABLE_ALIGNMENT);
-%% else
-VECTOR_TABLE_OFFSET = TOTAL_STACK_SIZE;
-%% endif
+%% set table_heap = []
+%% set table_copy = []
+%% set table_zero = []
 
 SECTIONS
 {
