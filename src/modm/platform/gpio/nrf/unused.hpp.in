@@ -92,19 +92,6 @@ public:
 	// start documentation inherited
 	static Direction getDirection() { return Direction::Special; }
 	// end documentation inherited
-
-public:
-	/// @cond
-%% for name in all_signals
-	template< Peripheral _ >
-	struct {{ name }}
-	{
-		using Gpio = GpioUnused;
-		static constexpr Gpio::Signal Signal = Gpio::Signal::{{ name }};
-		static void connect() {}
-	};
-%% endfor
-	/// @endcond
 };
 
 } // namespace platform

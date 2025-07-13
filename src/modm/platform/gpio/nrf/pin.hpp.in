@@ -9,19 +9,21 @@
  */
 // ----------------------------------------------------------------------------
 
-%% set port = "P" ~ gpio["port"] | upper
-%% set reg  = "NRF_" ~ port
-%% set pin  = gpio["pin"]
-%% set pinname = port ~ "_" ~ pin
-
-#ifndef MODM_NRF_GPIO_PIN_{{ pinname }}_HPP
-#define MODM_NRF_GPIO_PIN_{{ pinname }}_HPP
+#ifndef MODM_NRF_GPIO_HPP
+#define MODM_NRF_GPIO_HPP
 
 #include "../device.hpp"
 #include "base.hpp"
 
 namespace modm::platform
 {
+
+%% for gpio in gpios
+
+%% set port = "P" ~ gpio["port"] | upper
+%% set reg  = "NRF_" ~ port
+%% set pin  = gpio["pin"]
+%% set pinname = port ~ "_" ~ pin
 
 /// @cond
 class Gpio{{ pinname }};
@@ -92,12 +94,23 @@ public:
 	/// @{
 	/// Connect to any software peripheral
 	using BitBang = GpioSignal;
-	%% for name, group in signals.items()
-	/// Connect to {% for sig in group %}{{ sig.driver }}{{ "" if loop.last else " or "}}{% endfor %}
-	using {{ name }} = GpioSignal;
+	%% for sig in all_signals
+	/// Connect to {{ sig }}
+	using {{ sig }} = GpioSignal;
 	%% endfor
 	/// @}
 #endif
+
+	/// @cond
+	enum class
+	Signal
+	{
+		BitBang,
+%% for sig in all_signals | sort
+		{{ sig }},
+%% endfor
+	};
+
 	/// @cond
 	template< Peripheral peripheral >
 	struct BitBang { static void connect();
@@ -105,15 +118,9 @@ public:
 			(peripheral == Peripheral::BitBang),
 			"Gpio{{ pinname }}::BitBang only connects to software drivers!");
 	};
-	%% for signal_name, signal_group in signals.items()
+	%% for sig in all_signals
 	template< Peripheral peripheral >
-	struct {{ signal_name }} { static void connect();
-		static_assert(
-		%% for signal in signal_group
-			(peripheral == Peripheral::{{ signal.driver }}){% if loop.last %},{% else %} ||{% endif %}
-		%% endfor
-			"Gpio{{ pinname }}::{{ signal_name }} only connects to {% for signal in signal_group %}{{signal.driver}}{% if not loop.last %} or {% endif %}{% endfor %}!");
-	};
+	struct {{ sig }} { static void connect(); };
 	%% endfor
 	/// @endcond
 };
@@ -127,8 +134,10 @@ struct Gpio{{ pinname }}::BitBang<Peripheral::BitBang>
 	inline static void connect() {}
 };
 
+%% endfor
+
 /// @endcond
 
 } // namespace modm::platform
 
-#endif // MODM_NRF_GPIO_PIN_{{ pinname }}_HPP
+#endif // MODM_NRF_GPIO_HPP
