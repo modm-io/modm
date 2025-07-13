@@ -10,6 +10,8 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
+import math
+
 def init(module):
     module.name = ":platform:core"
     module.description = """\
@@ -32,8 +34,25 @@ def build(env):
     # startup helper code
     env.template("startup_platform.c.in")
 
+    # us_shift is an optimization to limit error via fractional math
+    frequency = 64e6
+    us_shift = 32 - math.ceil(math.log2(frequency))
+
+    env.substitutions.update({
+        "with_cm0": env[":target"].has_driver("core:cortex-m0*"),
+        "with_cm7": env[":target"].has_driver("core:cortex-m7*"),
+        "loop": 4,
+        "shift": 4,
+        "us_shift": us_shift,
+        "with_assert": env.has_module(":architecture:assert")
+    })
+    env.template("../cortex/delay_ns.cpp.in", "delay_ns.cpp")
+    env.template("../cortex/delay_ns.hpp.in", "delay_ns.hpp")
+    env.template("../cortex/delay_impl.hpp.in", "delay_impl.hpp")
+
 
 def post_build(env):
     env.substitutions = env.query("::cortex-m:linkerscript")
+    env.substitutions.update(env.query("::cortex-m:vector_table"))
     env.outbasepath = "modm/link"
-    env.template("linkerscript/nrf.ld.in", "linkerscript.ld")
+    env.template("../cortex/ram.ld.in", "linkerscript.ld")
