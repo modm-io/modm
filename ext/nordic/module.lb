@@ -14,9 +14,11 @@
 import re
 from pathlib import Path
 
+
 # -----------------------------------------------------------------------------
 def init(module):
     module.name = ":cmsis:device"
+
 
 def prepare(module, options):
     device = options[":target"]
@@ -26,7 +28,10 @@ def prepare(module, options):
     module.depends(":cmsis:core")
     return True
 
+
 pp = {}
+
+
 def validate(env):
     device = env[":target"]
     device_name = device.identifier.string.split("-")[0]
@@ -44,7 +49,12 @@ def validate(env):
         raise ValidateException("No device define found for '{}'!".format(device.partname))
 
     family_folder = family_file.parent
-    device_header = "{}.h".format(device_name)
+    if device_name == "nrf51822":
+        device_header = "nrf51.h"
+    elif device_name == "nrf52832":
+        device_header = "nrf52.h"
+    else:
+        device_header = "{}.h".format(device_name)
 
     global pp
     pp = {
@@ -52,6 +62,7 @@ def validate(env):
         "folder": family_folder,
         "device_header": device_header,
     }
+
 
 def build(env):
     global pp
