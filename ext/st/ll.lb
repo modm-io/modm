@@ -1,0 +1,59 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2025, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+import re
+from pathlib import Path
+
+class Header(Module):
+    def __init__(self, header):
+        self.name = header.stem.split("_ll_")[1]
+        self.header = header
+
+    def init(self, module):
+        module.name = self.name
+        module.description = self.name.replace("_", " ").upper()
+
+    def prepare(self, module, options):
+        return True
+
+    def build(self, env):
+        env.outbasepath = "modm/ext/st/ll"
+        env.copy(self.header, f"{self.name}.h")
+
+
+def init(module):
+    module.name = ":cmsis:ll"
+    module.description = "STM32 Low-Level (LL) Library"
+
+
+def prepare(module, options):
+    target = options[":target"].identifier
+    if target.platform != "stm32":
+        return False
+
+    folder = f"stm32{target.family}xx"
+    headers = []
+    for header in Path(localpath(f"cube-hal/{folder}/Inc")).glob("*_ll_*.h"):
+        module.add_submodule(header := Header(header))
+        headers.append(header)
+
+    module.add_query(
+        EnvironmentQuery(name="__headers", factory=lambda env:
+                         [header.header for header in headers
+                          if env.has_module(f":cmsis:ll:{header.name}")]))
+
+    module.depends(":cmsis:device")
+    return True
+
+
+def build(env):
+    pass

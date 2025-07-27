@@ -49,3 +49,6 @@
 [submodule "ext/nlohmann/json"]
 	path = ext/nlohmann/json
 	url = https://github.com/modm-ext/json-partial.git
+[submodule "ext/st/cube-hal"]
+	path = ext/st/cube-hal
+	url = https://github.com/modm-ext/stm32-cube-hal-drivers.git
