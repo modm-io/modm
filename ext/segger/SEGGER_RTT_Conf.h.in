@@ -1,0 +1,73 @@
+/*********************************************************************
+*            (c) 1995 - 2020 SEGGER Microcontroller GmbH             *
+*                                                                    *
+* All rights reserved.                                               *
+*                                                                    *
+* Redistribution and use in source and binary forms, with or         *
+* without modification, are permitted provided that the following    *
+* condition is met:                                                  *
+*                                                                    *
+* o Redistributions of source code must retain the above copyright   *
+*   notice, this condition and the following disclaimer.             *
+*                                                                    *
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND             *
+* CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,        *
+* INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF           *
+* MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE           *
+* DISCLAIMED. IN NO EVENT SHALL SEGGER Microcontroller BE LIABLE FOR *
+* ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR           *
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT  *
+* OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;    *
+* OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF      *
+* LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT          *
+* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE  *
+* USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH   *
+* DAMAGE.                                                            *
+*                                                                    *
+*********************************************************************/
+
+#ifndef SEGGER_RTT_CONF_H
+#define SEGGER_RTT_CONF_H
+
+/// @ingroup   modm_rtt
+/// @{
+
+#define SEGGER_RTT_MAX_NUM_UP_BUFFERS             ({{ options["buffer.tx"] | length }})
+#define SEGGER_RTT_MAX_NUM_DOWN_BUFFERS           ({{ options["buffer.rx"] | length }})
+
+#define BUFFER_SIZE_UP                            ({{ options["buffer.tx"][0] }})
+#define BUFFER_SIZE_DOWN                          ({{ options["buffer.rx"][0] }})
+
+
+#ifndef SEGGER_RTT_ASM
+
+#include <modm/platform/device.hpp>
+
+#ifndef SEGGER_RTT_MAX_INTERRUPT_PRIORITY
+#  define SEGGER_RTT_MAX_INTERRUPT_PRIORITY       ((1ul << __NVIC_PRIO_BITS) - 1ul)
+#endif
+
+// Non-standard useful functions
+unsigned SEGGER_RTT_GetBytesInDownBuffer(unsigned BufferIndex);
+
+// RTT lock configuration for GCC
+#if (defined(__ARM_ARCH_6M__) || defined(__ARM_ARCH_8M_BASE__))
+
+  #define SEGGER_RTT_LOCK()   { const unsigned int _SEGGER_RTT__LockState = __get_PRIMASK(); \
+                                __disable_irq();
+  #define SEGGER_RTT_UNLOCK()   __set_PRIMASK(_SEGGER_RTT__LockState); }
+
+#elif (defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) || defined(__ARM_ARCH_8M_MAIN__) || defined(__ARM_ARCH_8_1M_MAIN__))
+
+  #define SEGGER_RTT_LOCK()   { const unsigned int _SEGGER_RTT__LockState = __get_BASEPRI(); \
+                                __set_BASEPRI_MAX(SEGGER_RTT_MAX_INTERRUPT_PRIORITY);
+  #define SEGGER_RTT_UNLOCK()   __set_BASEPRI(_SEGGER_RTT__LockState); }
+  #define RTT_USE_ASM 1
+
+#endif
+
+#endif // SEGGER_RTT_ASM
+
+/// @}
+
+#endif // SEGGER_RTT_CONF_H
