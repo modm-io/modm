@@ -1,0 +1,51 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2025, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":rtt"
+    module.description = FileReader("module.md")
+
+
+def prepare(module, options):
+    module.add_list_option(
+        NumericOption(name="buffer.tx", description="Transmit buffer sizes",
+                      minimum=0), default=512)
+    module.add_list_option(
+        NumericOption(name="buffer.rx", description="Receive buffer sizes",
+                      minimum=0), default=0)
+
+    return options[":target"].has_driver("core:cortex-m*")
+
+
+def validate(env):
+    if len(env["buffer.tx"]) != len(env["buffer.rx"]):
+        raise ValidateException("There must be the same number of TX buffers as RX buffers!")
+    if not env["buffer.tx"]:
+        raise ValidateException("There must be at least one TX buffer or RX buffer!")
+
+
+def build(env):
+    env.collect(":build:path.include", "modm/ext/rtt")
+    env.outbasepath = "modm/ext/rtt"
+    env.substitutions = {
+        "buffer_tx": env["buffer.tx"],
+        "buffer_rx": env["buffer.rx"],
+        "with_printf": env.has_module(":printf")
+    }
+
+    env.template("SEGGER_RTT_Conf.h.in")
+    env.template("rtt_modm_port.cpp.in")
+
+    env.copy("rtt/RTT/SEGGER_RTT.h", dest="SEGGER_RTT.h")
+    env.copy("rtt/RTT/SEGGER_RTT.c", dest="SEGGER_RTT.c")
+    if "m0" not in env[":target"].get_driver("core")["type"]:
+        env.copy("rtt/RTT/SEGGER_RTT_ASM_ARMv7M.S", dest="SEGGER_RTT_ASM.S")

@@ -49,3 +49,6 @@
 [submodule "ext/nlohmann/json"]
 	path = ext/nlohmann/json
 	url = https://github.com/modm-ext/json-partial.git
+[submodule "ext/segger/rtt"]
+	path = ext/segger/rtt
+	url = git@github.com:modm-ext/segger-rtt.git
