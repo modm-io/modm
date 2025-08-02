@@ -11,11 +11,6 @@
 
 #pragma once
 
-// Required to convince libstdc++ to enable scoped lock
-#ifndef __cpp_lib_scoped_lock
-#	define __cpp_lib_scoped_lock 201703L
-#endif
-
 #include <modm/architecture/interface/fiber.hpp>
 #include <modm/architecture/interface/atomic_lock.hpp>
 #include <limits>
@@ -192,8 +187,10 @@ call_once(once_flag& flag, Callable&& f, Args&&... args)
 /// @see https://en.cppreference.com/w/cpp/thread/lock_guard
 using ::std::lock_guard;
 
+#ifdef __cpp_lib_scoped_lock
 /// @see https://en.cppreference.com/w/cpp/thread/scoped_lock
 using ::std::scoped_lock;
+#endif
 /// @see https://en.cppreference.com/w/cpp/thread/unique_lock
 using ::std::unique_lock;
 
