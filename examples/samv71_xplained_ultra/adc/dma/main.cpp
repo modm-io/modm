@@ -9,7 +9,7 @@
  */
 
 #include <modm/board.hpp>
-#include <modm/io/iostream.hpp>
+#include <modm/io.hpp>
 #include <array>
 #include <atomic>
 

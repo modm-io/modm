@@ -18,7 +18,7 @@
 #define MODM_LOGGER_HPP
 
 #include <modm/architecture/utils.hpp>
-#include <modm/io/iostream.hpp>
+#include <modm/io.hpp>
 
 #include "level.hpp"
 #include "style.hpp"

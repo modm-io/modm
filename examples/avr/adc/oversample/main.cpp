@@ -19,7 +19,7 @@ using namespace std::chrono_literals;
 
 // Create a new UART object
 
-#include <modm/io/iostream.hpp>
+#include <modm/io.hpp>
 // Create a IOStream for complex formatting tasks
 modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull > device;
 modm::IOStream output(device);

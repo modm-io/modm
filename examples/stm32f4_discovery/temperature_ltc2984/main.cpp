@@ -13,7 +13,7 @@
 #include <modm/board.hpp>
 #include <modm/processing.hpp>
 #include <modm/driver/temperature/ltc2984.hpp>
-#include <modm/io/iostream.hpp>
+#include <modm/io.hpp>
 
 using Usart2 = BufferedUart<UsartHal2, UartTxBuffer<2048>>;
 modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > device;

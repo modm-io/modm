@@ -13,7 +13,7 @@
 
 #include <modm/platform.hpp>
 #include <modm/driver/display/ea_dog.hpp>
-#include <modm/io/iostream.hpp>
+#include <modm/io.hpp>
 #include <modm/architecture/interface/clock.hpp>
 
 using namespace modm::platform;

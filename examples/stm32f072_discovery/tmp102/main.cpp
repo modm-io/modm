@@ -14,7 +14,7 @@
 #include <modm/processing.hpp>
 #include <modm/driver/temperature/tmp102.hpp>
 
-#include <modm/io/iostream.hpp>
+#include <modm/io.hpp>
 
 using Usart1 = BufferedUart<UsartHal1>;
 modm::IODeviceWrapper< Usart1, modm::IOBuffer::BlockIfFull > device;

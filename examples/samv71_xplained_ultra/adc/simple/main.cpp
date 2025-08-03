@@ -10,7 +10,7 @@
  */
 
 #include <modm/board.hpp>
-#include <modm/io/iostream.hpp>
+#include <modm/io.hpp>
 
 using namespace modm::platform;
 using namespace modm::literals;

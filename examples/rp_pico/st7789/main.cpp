@@ -10,6 +10,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
+#include <modm/io.hpp>
 #include <modm/driver/display/st7789.hpp>
 #include <modm/driver/display/st7789/st7789_spi_interface.hpp>
 #include <modm/processing/timer/periodic_timer.hpp>
