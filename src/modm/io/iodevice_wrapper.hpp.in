@@ -16,7 +16,10 @@
 #define MODM_IODEVICE_WRAPPER_HPP
 
 #include <stdint.h>
-
+%% if with_fiber
+#include <modm/processing/fiber.hpp>
+%% endif
+%#
 #include "iodevice.hpp"
 
 namespace modm
@@ -39,6 +42,10 @@ IOBuffer
 template< class Device, IOBuffer behavior >
 class IODeviceWrapper : public IODevice
 {
+%% if with_fiber
+	static constexpr fiber::id NoOwner{fiber::id(-1)};
+	static inline fiber::id id{NoOwner};
+%% endif
 public:
 	IODeviceWrapper() = default;
 	using IODevice::write;
@@ -46,18 +53,38 @@ public:
 	void
 	write(char c) override
 	{
-		bool written;
-		do
+		if constexpr (behavior == IOBuffer::BlockIfFull)
+%% if with_fiber
 		{
-			written = Device::write(uint8_t(c));
+			// lock this device to one fiber until a newline is received
+			const auto me = this_fiber::get_id();
+			this_fiber::poll([&]{ return id == NoOwner or id == me; });
+			id = me;
+
+			this_fiber::poll([&]{ return Device::write(uint8_t(c)); });
+
+			if (c == '\n') id = NoOwner;
 		}
-		while(behavior == IOBuffer::BlockIfFull and not written);
+%% else
+			while (not Device::write(uint8_t(c))) ;
+%% endif
+		else Device::write(uint8_t(c));
 	}
 
 	void
 	flush() override
 	{
+%% if with_fiber
+		const auto me = this_fiber::get_id();
+		this_fiber::poll([&]{ return id == NoOwner; });
+		id = me;
+
+		this_fiber::poll([&]{ return Device::isWriteFinished(); });
+
+		id = NoOwner;
+%% else
 		Device::flushWriteBuffer();
+%% endif
 	}
 
 	bool
@@ -71,6 +98,10 @@ public:
 template< class Device, IOBuffer behavior >
 class IODeviceObjectWrapper : public IODevice
 {
+%% if with_fiber
+	static constexpr fiber::id NoOwner{fiber::id(-1)};
+	fiber::id id{NoOwner};
+%% endif
 	Device &device;
 public:
 	IODeviceObjectWrapper(Device& device) : device{device} {}
@@ -79,18 +110,38 @@ public:
 	void
 	write(char c) override
 	{
-		bool written;
-		do
+		if constexpr (behavior == IOBuffer::BlockIfFull)
+%% if with_fiber
 		{
-			written = device.write(uint8_t(c));
+			// lock this device to one fiber until a newline is received
+			const auto me = this_fiber::get_id();
+			this_fiber::poll([&]{ return id == NoOwner or id == me; });
+			id = me;
+
+			this_fiber::poll([&]{ return device.write(uint8_t(c)); });
+
+			if (c == '\n') id = NoOwner;
 		}
-		while(behavior == IOBuffer::BlockIfFull and not written);
+%% else
+			while (not device.write(uint8_t(c))) ;
+%% endif
+		else device.write(uint8_t(c));
 	}
 
 	void
 	flush() override
 	{
+%% if with_fiber
+		const auto me = this_fiber::get_id();
+		this_fiber::poll([&]{ return id == NoOwner; });
+		id = me;
+
+		this_fiber::poll([&]{ return device.isWriteFinished(); });
+
+		id = NoOwner;
+%% else
 		device.flushWriteBuffer();
+%% endif
 	}
 
 	bool

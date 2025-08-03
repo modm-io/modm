@@ -24,41 +24,14 @@ stream.printf("format number 8: %u or as signed -100: %d", 8, -100);
 ## Redirecting IOStreams
 
 The `modm::IODeviceWrapper` transforms any peripheral device that provides static
-`write()` and `read()` functions into an `IODevice`.
-
-You have to decide what happens when the device buffer is full and you cannot
-write to it at the moment. There are two options:
-
-1. busy wait until the buffer is free, or
-2. discard the bytes that cannot be written.
-
-Option 1 has the advantage, that none of your data will be lost,
-however, busy-waiting can take a long time and can mess up your
-program timings.
-There is also a **high risk of deadlock**, when writing to a
-IODevice inside of an interrupt and then busy-waiting forever
-because the IODevice requires interrupts itself to send out
-the data.
-
-It is therefore highly recommended to use option 2, where surplus
-data will be discarded.
-You should increase the IODevice buffer size, if you experience
-missing data from your connection.
-This behavior is also deadlock safe when called from inside another
-interrupt, and your program timing is minimally affected (essentially
-only coping data into the buffer).
-
-There is no default template argument, so that you hopefully make
-a conscious decision and be aware of this behavior.
-
-Example:
+`write()` and `read()` functions into an `IODevice`:
 
 ```cpp
 // configure a UART
 using Uart = Uart0;
 
 // wrap it into an IODevice
-modm::IODeviceWrapper<Uart, modm::IOBuffer::DiscardIfFull> device;
+modm::IODeviceWrapper<Uart, modm::IOBuffer::BlockIfFull> device;
 
 // use this device to print a message
 device.write("Hello");
@@ -67,3 +40,18 @@ device.write("Hello");
 modm::IOStream stream(device);
 stream << " World!";
 ```
+
+
+## IODevice Buffer Behavior
+
+The `modm::IODeviceWrapper` can be configured to discard or block in case the
+device is full. Discarding data is always non-blocking, however, blocking on
+write involves waiting in a loop until the device has space. This can cause a
+deadlock when called inside an interrupt!
+
+If compiled with the `modm:processing:fiber` module, the blocking behavior
+allows the fiber to yield while waiting for the device. To prevent interlaced
+output from different fibers, the `write(char)` function is protected by a
+mutex that releases when a newline character `\n` is written. The `flush()`
+function is also mutex protected to allow one fiber to reliably flush the
+stream without having other fibers push data into the device.

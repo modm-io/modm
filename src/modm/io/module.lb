@@ -18,6 +18,7 @@ def init(module):
 def prepare(module, options):
     module.depends(
         ":architecture:accessor",
+        ":architecture:fiber",
         ":math:utils")
 
     is_avr = options[":target"].identifier.platform in ["avr"]
@@ -45,12 +46,13 @@ def build(env):
     env.substitutions = {
         "is_hosted": target.platform == "hosted",
         "is_avr": target.platform == "avr",
+        "with_fiber": env.has_module(":processing:fiber"),
         "family": target.family,
         "core": core,
     }
     env.outbasepath = "modm/src/modm/io"
     env.copy("iodevice.hpp")
-    env.copy("iodevice_wrapper.hpp")
+    env.template("iodevice_wrapper.hpp.in")
     env.template("iostream_printf.cpp.in")
     env.template("iostream.hpp.in")
     env.template("iostream_chrono.hpp.in")
