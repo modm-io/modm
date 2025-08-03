@@ -309,6 +309,14 @@ public:
 %% endif
 	};
 
+	enum class ExternalTriggerPolarity
+	{
+		NoTriggerDetection = 0x0u,
+		RisingEdge = 0x1u,
+		FallingEdge = 0x2u,
+		RisingAndFallingEdge = 0x3u,
+	};
+
 	enum class Interrupt : uint32_t
 	{
 		Ready 								= ADC_IER_ADRDYIE,
@@ -341,6 +349,57 @@ public:
 		All									= ADC_ISR_ADRDY | ADC_ISR_EOSMP | ADC_ISR_EOC | ADC_ISR_EOS | ADC_ISR_OVR | ADC_ISR_JEOC | ADC_ISR_JEOS | ADC_ISR_AWD1 | ADC_ISR_AWD2 | ADC_ISR_AWD3 | ADC_ISR_JQOVF,
 	};
 	MODM_FLAGS32(InterruptFlag);
+
+	/**
+	 * Enum mapping all events on a external trigger converter.
+	 * The source mapped to each event varies on controller family,
+	 * refer to the ADC external trigger section on reference manual
+	 * of your controller for more information
+	 */
+	enum class ExternalTriggerEvent
+	{
+		Event0 = 0x00u,
+		Event1 = 0x01u,
+		Event2 = 0x02u,
+		Event3 = 0x03u,
+		Event4 = 0x04u,
+		Event5 = 0x05u,
+		Event6 = 0x06u,
+		Event7 = 0x07u,
+		Event9 = 0x09u,
+		Event10 = 0x0Au,
+		Event11 = 0x0Bu,
+		Event12 = 0x0Cu,
+		Event13 = 0x0Du,
+		Event14 = 0x0Eu,
+		Event15 = 0x0Fu,
+%% if target["family"] in ["g4", "h7"]
+		Event16 = 0x10u,
+		Event17 = 0x11u,
+		Event18 = 0x12u,
+		Event19 = 0x13u,
+		Event20 = 0x14u,
+		Event21 = 0x15u,
+		Event22 = 0x16u,
+		Event23 = 0x17u,
+		Event24 = 0x18u,
+		Event25 = 0x19u,
+		Event26 = 0x1Au,
+		Event27 = 0x1Bu,
+		Event28 = 0x1Cu,
+		Event29 = 0x1Du,
+		Event30 = 0x1Eu,
+		Event31 = 0x1Fu,
+%% endif
+	};
+
+	enum class OffsetSlot : uint8_t
+	{
+		Slot0 = 0,
+		Slot1 = 1,
+		Slot2 = 2,
+		Slot3 = 3,
+	};
 
 public:
 	template< class... Signals >
@@ -500,6 +559,23 @@ public:
 	stopConversion();
 
 	/**
+	 * enable regular conversions on external trigger.
+	 *
+	 * @param externalTriggerPolarity
+	 * 		Polarity of the external trigger signal.
+	 * @param externalTriggerEvent
+	 * 		Regular conversion external trigger source.
+	 */
+	static inline void enableRegularConversionExternalTrigger(
+		ExternalTriggerPolarity externalTriggerPolarity,
+		ExternalTriggerEvent externalTriggerEvent);
+
+	/**
+	 * Disable regular conversions external trigger.
+	 */
+	static inline void disableRegularConversionExternalTrigger( void );
+
+	/**
 	 * @return If the conversion is finished.
 	 * @pre A conversion should have been started with startConversion()
 	 */
@@ -538,6 +614,23 @@ public:
 	 */
 	static inline bool
 	setInjectedConversionSequenceLength(uint8_t length);
+
+	/**
+	 * enable injected conversions on external trigger.
+	 *
+	 * @param externalTriggerPolarity
+	 * 		Polarity of the external trigger signal.
+	 * @param externalTriggerEvent
+	 * 		External trigger source.
+	 */
+	static inline void enableInjectedConversionExternalTrigger(
+		ExternalTriggerPolarity externalTriggerPolarity,
+		ExternalTriggerEvent externalTriggerEvent);
+
+	/**
+	 * Disable injected conversions external trigger.
+	 */
+	static inline void disableInjectedConversionExternalTrigger();
 
 	/**
 	 * @return If the injected conversion sequence is finished.
@@ -583,6 +676,76 @@ public:
 		default:
 			return ADC{{ id }}->JDR4;
 		}
+	}
+
+%% if target["family"] in ["f3", "l4", "l5"] or (target["family"] in ["h7"] and resolution == 16):
+	/**
+	 * @arg slot for the offset register (0..3)
+	 * @arg channel channel to which the offset is applied
+	 * @arg offset offset value to be applied to the channel
+	 * @return true if the offset was successfully enabled, false if the slot is invalid
+	 * @note The offset can only be applied when the adc is stopped!
+	 */
+	static inline bool
+	enableChannelOffset(const OffsetSlot slot, const Channel channel, const uint16_t offset);
+
+	/**
+	 * @arg slot for the offset register (0..3)
+	 * @arg offset value applied to the channel
+	 * @return true if the offset was successfully enabled, false if the slot is invalid
+	 * @note The channel is determined by the GPIO pin type.
+	 * @note The offset can only be applied when the adc is stopped!
+	 */
+	template<class Gpio>
+	static inline bool enableChannelOffset(const OffsetSlot slot, const uint16_t offset)
+	{
+		return enableChannelOffset(slot, getPinChannel<Gpio>(), offset);
+	}
+
+%% else
+	/**
+	 * @arg slot for the offset register (0..3)
+	 * @arg channel channel to which the offset is applied
+	 * @arg offset offset value to be applied to the channel
+	 * @arg saturate if true, the adc result value is saturated to the range of the ADC
+	 * @return true if the offset was successfully enabled, false if the slot is invalid
+	 * @note The offset can only be applied when the adc is stopped!
+	 */
+	static inline bool
+	enableChannelOffset(const OffsetSlot slot, const Channel channel, const int16_t offset, const bool saturate = false);
+
+	/**
+	 * @arg slot for the offset register (0..3)
+	 * @arg offset value applied to the channel
+	 * @arg saturate if true, the adc result value is saturated to the range of the ADC
+	 * @return true if the offset was successfully enabled, false if the slot is invalid
+	 * @note The channel is determined by the GPIO pin type.
+	 * @note The offset can only be applied when the adc is stopped!
+	 */
+	template<class Gpio>
+	static inline bool enableChannelOffset(const OffsetSlot slot, const int16_t offset, const bool saturate = false)
+	{
+		return enableChannelOffset(slot, getPinChannel<Gpio>(), offset, saturate);
+	}
+%% endif
+
+	/**
+	 * @arg slot for the offset register (0..3)
+	 * @return true if the offset was successfully disabled, false if the slot is invalid
+	 * @note The offset can only be disabled when the adc is stopped!
+	 */
+	static inline bool disableChannelOffset(OffsetSlot slot);
+
+	/**
+	 * @arg slot for the offset register (0..3)
+	 * @return true if the offset was successfully disabled, false if the slot is invalid
+	 * @note The channel is determined by the GPIO pin type.
+	 * @note The offset can only be disabled when the adc is stopped!
+	 */
+	template<class Gpio>
+	static inline bool disableChannelOffset(OffsetSlot slot)
+	{
+		return disableChannelOffset(slot);
 	}
 
 	static inline void
