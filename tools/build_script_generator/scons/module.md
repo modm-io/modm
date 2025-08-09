@@ -563,8 +563,8 @@ CPU frequency.
 scons log-rtt [channel={int}]
 ```
 
-Configures OpenOCD in RTT mode to output the chosen channel (default 0) via a
-simple telnet client. Disconnect with Ctrl+D.
+Configures OpenOCD in RTT mode to output the chosen channel (default 0) via
+netcat. Stop listening with Ctrl+C.
 (\* *only ARM Cortex-M targets*)
 
 ```
@@ -589,8 +589,8 @@ See the `modm:platform:rtt` module for details how to use RTT for data transfer.
 scons log-rtt-jlink [channel={int}]
 ```
 
-Configures JLink in RTT mode to output the chosen channel (default 0) via a
-simple telnet client. Disconnect with Ctrl+D.
+Configures JLink in RTT mode to output the chosen channel (default 0) via
+netcat. Stop listening with Ctrl+C.
 (\* *only ARM Cortex-M targets*)
 
 

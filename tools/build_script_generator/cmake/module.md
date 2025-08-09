@@ -157,8 +157,8 @@ Outputs ITM channel 0 via JLinkSWOViewer.
 
 - option `MODM_RTT_CHANNEL=0` as integer.
 
-Configures OpenOCD in RTT mode to output the chosen channel (default 0) via a
-simple telnet client. Disconnect with Ctrl+D.
+Configures OpenOCD in RTT mode to output the chosen channel (default 0) via
+netcat. Stop listening with Ctrl+C.
 (\* *only ARM Cortex-M targets*)
 
 See the `modm:platform:rtt` module for details how to use RTT for data transfer.
@@ -168,8 +168,8 @@ See the `modm:platform:rtt` module for details how to use RTT for data transfer.
 
 - option `MODM_RTT_CHANNEL=0` as integer.
 
-Configures JLink in RTT mode to output the chosen channel (default 0) via a
-simple telnet client. Disconnect with Ctrl+D.
+Configures JLink in RTT mode to output the chosen channel (default 0) via
+netcat. Stop listening with Ctrl+C.
 (\* *only ARM Cortex-M targets*)
 
 [cmake]: http://cmake.org

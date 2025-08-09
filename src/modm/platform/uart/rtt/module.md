@@ -1,116 +1,22 @@
-# Real Time Transfer (RTT)
-
-This module implements the RTT protocol compatible with OpenOCD. RTT works by
-placing multiple ring-buffers in RAM which the debugger read and writes using
-background memory accesses via SWD. It therefore works on any Cortex-M devices
-without extra pins except for the SWDCLK and SWDIO.
-
-See https://www.segger.com/jlink-rtt.html
+# UART over RTT
 
 The RTT channels are exposed as a UART interface which you can use like so:
 
 ```cpp
-modm::platform::Rtt rtt(/* channel= */0);
-// Access data directly via UART interface: eg. loop back
-if (uint8_t data; rtt.read(data)) { rtt.write(data); }
-// Or wrap into an IOStream for printing
-modm::IODeviceObjectWrapper<modm::platform::Rtt,
-                            modm::IOBuffer::DiscardIfFull> rtt_device(rtt);
+// Access data via static methods
+using Rtt = modm::platform::Rtt<0>;
+// Create a software loopback
+if (uint8_t data; Rtt::read(data)) { Rtt::write(data); }
+
+// Wrap into an IOStream
+modm::IODeviceWrapper<Rtt, modm::IOBuffer::BlockIfFull> rtt_device;
 modm::IOStream stream(rtt_device);
+// Writing data
 stream << "Hello World" << modm::endl;
-// Reading is more annoying
-char data;
-stream.get(data);
-if (data != modm::IOStream::eof) { /* process new data */ }
+
+// Reading data from an IOStream
+if (char data; stream.get(data), data != modm::IOStream::eof)
+{ /* process new data */ }
 ```
 
-You can define the number of channels and their buffer size by setting the
-`buffer.tx` and `buffer.rx` set options. Note that you can define *multiple*
-buffer sizes indexed by channel. Here is an example of three channels:
-
-```xml
-<!-- Channel0: TX only with 256B buffer -->
-<!-- Channel1: RX only with 128B buffer -->
-<!-- Channel2: TX with 512B and RX with 64B buffer -->
-<option name="modm:platform:rtt:buffer.tx">256, 0, 512</option>
-<option name="modm:platform:rtt:buffer.rx">0, 128, 64</option>
-```
-
-You can set the buffer size to `0` if you don't want to use this channel
-direction. This won't allocate a buffer and save a little RAM.
-
-
-## Accessing Data
-
-[OpenOCD has built-in support for RTT][rtt] and modm generates a config that
-opens each RTT channel as a TCP port starting at 9090 (ie. 9090=channel 0,
-9091=channel 1, etc).
-
-```sh
-openocd -f modm/openocd.cfg -c modm_rtt
-```
-
-You can also call this from inside GDB via the `monitor` command:
-
-```
-(gdb) monitor modm_rtt
-rtt: Searching for control block 'SEGGER RTT'
-rtt: Control block found at 0x20001024
-Listening on port 9090 for rtt connections
-(gdb) continue&
-```
-
-You can then use for example `telnet 127.0.0.1 9090` to connect to the stream.
-
-Note that this connection does not halt the target, you should therefore be able
-to use this at any point during program execution.
-
-A simple telnet client is integrated into the build system generator, however,
-it can only connect to one stream at a time (disconnect with Ctrl+D).
-
-```
- $ scons log-rtt
-╭───OpenOCD───> Real Time Transfer
-╰─────RTT────── stm32f103rbt
-Info : rtt: Searching for control block 'SEGGER RTT'
-Info : rtt: Control block found at 0x20000008
-Listening on port 9090 for rtt connections
-loop 51
-loop 52
-loop 53
-^D
-
- $ make log-rtt channel=0
-Info : rtt: Searching for control block 'SEGGER RTT'
-Info : rtt: Control block found at 0x20000008
-Listening on port 9090 for rtt connections
-loop 58
-loop 60
-loop 61
-```
-
-If you want to use this as a proper communication channel with a custom protocol
-you should implement the OpenOCD config yourself (with different ports).
-
-You can also use JLink to access the RTT data, which may be significantly faster
-than OpenOCD if the debug probe has hardware support for the protocol.
-
-```
- $ scons log-rtt-jlink
-╭────JLink────> Real Time Transfer
-╰─────RTT────── stm32l476rgt6
-
-SEGGER J-Link V7.84f - Real time terminal output
-RTT Demo on Nucleo-64
-loop: 0
-loop: 1
-loop: 2
-loop: 3
-loop: 4
-loop: 5
-loop: 6
-loop: 7
-```
-
-
-[rtt]: http://openocd.org/doc/html/General-Commands.html#Real-Time-Transfer-_0028RTT_0029
+To configure the number and size of RTT channels, see the `modm:rtt` module.
