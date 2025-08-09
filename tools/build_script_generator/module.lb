@@ -254,11 +254,11 @@ def post_build(env):
         env.substitutions["vector_table_size"] = vector_table["vector_table_size"]
         env.template("gdbinit.in")
 
-        has_rtt = env.has_module(":platform:rtt")
+        has_rtt = env.has_module(":rtt")
         env.substitutions["has_rtt"] = has_rtt
         if has_rtt:
             env.substitutions["main_ram"] = linkerscript.get("cont_ram", {"start": 0x20000000, "size": 4096})
-            env.substitutions["rtt_channels"] = len(env.get(":platform:rtt:buffer.tx", []))
+            env.substitutions["rtt_channels"] = len(env.get(":rtt:buffer.tx", []))
         env.template("openocd.cfg.in")
 
 

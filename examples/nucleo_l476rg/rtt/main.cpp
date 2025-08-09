@@ -15,8 +15,7 @@
 
 using namespace Board;
 
-Rtt rtt(0);
-modm::IODeviceObjectWrapper< Rtt, modm::IOBuffer::DiscardIfFull > rtt_device(rtt);
+modm::IODeviceWrapper< Rtt<0>, modm::IOBuffer::DiscardIfFull > rtt_device;
 modm::IOStream rtt_stream(rtt_device);
 
 #undef MODM_LOG_LEVEL

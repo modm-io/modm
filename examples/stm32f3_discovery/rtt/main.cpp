@@ -15,8 +15,7 @@
 
 using namespace Board;
 
-Rtt rtt(0);
-modm::IODeviceObjectWrapper< Rtt, modm::IOBuffer::DiscardIfFull > rtt_device(rtt);
+modm::IODeviceWrapper< Rtt<0>, modm::IOBuffer::DiscardIfFull > rtt_device;
 // Set all four logger streams to use RTT
 modm::log::Logger modm::log::debug(rtt_device);
 modm::log::Logger modm::log::info(rtt_device);
@@ -85,7 +84,13 @@ main()
 		{
 			LedNorth::toggle();
 
-			MODM_LOG_INFO << "loop: " << counter++ << modm::endl;
+			MODM_LOG_INFO << "loop: " << counter << modm::endl;
+			counter++;
+		}
+		// loopback: read from channel 1, output on channel 2
+		if (uint8_t value; SEGGER_RTT_ReadNoLock(1, &value, 1))
+		{
+			SEGGER_RTT_WriteNoLock(2, &value, 1);
 		}
 	}
 

@@ -77,6 +77,7 @@ git clone --recurse-submodules --jobs 8 https://github.com/modm-io/modm.git
 	- [printf][]: Small printf implementation.
 	- [Nanopb][]: Embedded Protocol Buffers.
 	- [LVGL][]: Embedded Graphics Library.
+	- [RTT][]: Segger Real-Time Transport.
 
 
 ## Microcontrollers
@@ -972,4 +973,5 @@ and [many more contributors][contributors].
 [printf]:          https://github.com/eyalroz/printf
 [Nanopb]:          https://github.com/nanopb/nanopb
 [LVGL]:            https://lvgl.io
+[RTT]:             https://kb.segger.com/RTT
 <!--/links-->
