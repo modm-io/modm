@@ -25,13 +25,15 @@ void HardFault_Handler(void)					__attribute__((weak, alias("Undefined_Handler")
 {{ ("void " ~ vector_table[pos] ~ "(void)") | lbuild.pad(47)}}__attribute__((weak, alias("Undefined_Handler")));
 %%	endif
 %% endfor
-
+%#
 // ----------------------------------------------------------------------------
 typedef void (* const FunctionPointer)(void);
 
-// defined in the linkerscript
-extern uint32_t __main_stack_top[];
-
+extern uint32_t __main_stack_top[]; // from linkerscript
+%% if with_rtt
+extern uint32_t _SEGGER_RTT;        // from modm:rtt
+%% endif
+%#
 // Define the vector table
 modm_section(".vector_rom")
 FunctionPointer vectorsRom[] =
@@ -41,11 +43,13 @@ FunctionPointer vectorsRom[] =
 	NMI_Handler,							// -14: Non Maskable Interrupt handler
 	HardFault_Handler,						// -13: hard fault handler
 %% for pos in range(4 - 16, highest_irq)
-%% 	if pos in vector_table
+%% if pos in vector_table
 	{{ (vector_table[pos] ~ ",") | lbuild.pad(39) }}// {{ (pos|string).rjust(3) }}
-%% 	else
+%% elif with_rtt and pos == -8
+	(FunctionPointer)(((uint32_t)&_SEGGER_RTT) + 2ul),
+%% else
 	Undefined_Handler,						// {{ (pos|string).rjust(3) }}
-%% 	endif
+%% endif
 %% endfor
 };
 %% if vector_table_location == "ram"
@@ -53,7 +57,7 @@ FunctionPointer vectorsRom[] =
 modm_section(".vector_ram")
 FunctionPointer vectorsRam[sizeof(vectorsRom) / sizeof(FunctionPointer)];
 %% endif
-
+%#
 // ----------------------------------------------------------------------------
 // Ignore redeclaration of interrupt handlers in vendor headers
 #pragma GCC diagnostic push
@@ -64,7 +68,7 @@ FunctionPointer vectorsRam[sizeof(vectorsRom) / sizeof(FunctionPointer)];
 %% if with_assert
 #include <modm/architecture/interface/assert.h>
 %% endif
-
+%#
 void Undefined_Handler(void)
 {
 %% if with_assert
