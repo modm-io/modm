@@ -14,9 +14,13 @@
 #define MODM_STM32_F103C8T6_BLUE_PILL_HPP
 
 #include <modm/platform.hpp>
-#include <modm/architecture/interface/clock.hpp>
+#include <modm/architecture.hpp>
+#include <modm/debug.hpp>
 
 using namespace modm::platform;
+
+/// @ingroup modm_board_blue_pill_f103
+#define MODM_BOARD_HAS_LOGGER
 
 namespace Board
 {
@@ -114,6 +118,8 @@ using LedGreen = GpioInverted< GpioOutputC13 >;
 using Leds = SoftwareGpioPort< LedGreen >;
 
 using Button = GpioUnused;
+
+using LoggerDevice = modm::IODeviceWrapper< Rtt<0>, modm::IOBuffer::DiscardIfFull >;
 
 inline void
 initialize()

@@ -13,10 +13,14 @@
 #ifndef MODM_STM32_F030F4P6_DEMO_BOARD_HPP
 #define MODM_STM32_F030F4P6_DEMO_BOARD_HPP
 
+#include <modm/architecture.hpp>
 #include <modm/platform.hpp>
-#include <modm/architecture/interface/clock.hpp>
+#include <modm/debug.hpp>
 
 using namespace modm::platform;
+
+/// @ingroup modm_board_stm32f030_demo
+#define MODM_BOARD_HAS_LOGGER
 
 namespace Board
 {
@@ -89,6 +93,8 @@ using LedOrange = GpioInverted< GpioOutputA4 >;
 using Leds = SoftwareGpioPort< LedOrange >;
 
 using Button = GpioUnused;
+
+using LoggerDevice = modm::IODeviceWrapper< Rtt<0>, modm::IOBuffer::DiscardIfFull >;
 
 inline void
 initialize()

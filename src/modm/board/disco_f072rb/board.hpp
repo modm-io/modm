@@ -18,8 +18,12 @@
 #include <modm/platform.hpp>
 #include <modm/architecture/interface/clock.hpp>
 #include <modm/driver/inertial/l3gd20.hpp>
+#include <modm/debug/logger.hpp>
 
 using namespace modm::platform;
+
+/// @ingroup modm_board_disco_f072rb
+#define MODM_BOARD_HAS_LOGGER
 
 namespace Board
 {
@@ -122,6 +126,8 @@ using Device = UsbFs;
 
 /// @ingroup modm_board_disco_f072rb
 /// @{
+using LoggerDevice = modm::IODeviceWrapper< Rtt<0>, modm::IOBuffer::DiscardIfFull >;
+
 inline void
 initialize()
 {

@@ -15,11 +15,15 @@
 #define MODM_STM32_F3_DISCOVERY_HPP
 
 #include <modm/platform.hpp>
-#include <modm/architecture/interface/clock.hpp>
+#include <modm/architecture.hpp>
 #include <modm/driver/inertial/l3gd20.hpp>
 #include <modm/driver/inertial/lsm303a.hpp>
+#include <modm/debug.hpp>
 
 using namespace modm::platform;
+
+/// @ingroup modm_board_disco_f303vc
+#define MODM_BOARD_HAS_LOGGER
 
 namespace Board
 {
@@ -176,6 +180,8 @@ using Device = UsbFs;
 
 /// @ingroup modm_board_disco_f303vc
 /// @{
+using LoggerDevice = modm::IODeviceWrapper< Rtt<0>, modm::IOBuffer::DiscardIfFull >;
+
 inline void
 initialize()
 {

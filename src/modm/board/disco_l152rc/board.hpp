@@ -12,9 +12,13 @@
 #pragma once
 
 #include <modm/platform.hpp>
-#include <modm/architecture/interface/clock.hpp>
+#include <modm/architecture.hpp>
+#include <modm/debug.hpp>
 
 using namespace modm::platform;
+
+/// @ingroup modm_board_disco_l152rc
+#define MODM_BOARD_HAS_LOGGER
 
 namespace Board
 {
@@ -121,6 +125,8 @@ using LedBlue = GpioOutputB6;
 using LedGreen = GpioOutputB7;
 
 using Leds = SoftwareGpioPort< LedBlue, LedGreen >;
+
+using LoggerDevice = modm::IODeviceWrapper< Rtt<0>, modm::IOBuffer::DiscardIfFull >;
 /// @}
 
 namespace lcd

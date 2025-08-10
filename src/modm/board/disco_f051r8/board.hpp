@@ -16,8 +16,12 @@
 
 #include <modm/platform.hpp>
 #include <modm/architecture/interface/clock.hpp>
+#include <modm/debug/logger.hpp>
 
 using namespace modm::platform;
+
+/// @ingroup modm_board_disco_f051r8
+#define MODM_BOARD_HAS_LOGGER
 
 namespace Board
 {
@@ -68,6 +72,8 @@ using LedGreen = GpioOutputC9;
 using LedBlue  = GpioOutputC8;
 
 using Leds = SoftwareGpioPort< LedGreen, LedBlue >;
+
+using LoggerDevice = modm::IODeviceWrapper< Rtt<0>, modm::IOBuffer::DiscardIfFull >;
 
 inline void
 initialize()

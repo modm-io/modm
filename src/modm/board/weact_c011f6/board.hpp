@@ -14,8 +14,12 @@
 
 #include <modm/architecture.hpp>
 #include <modm/platform.hpp>
+#include <modm/debug.hpp>
 
 using namespace modm::platform;
+
+/// @ingroup modm_board_nucleo_c011f6
+#define MODM_BOARD_HAS_LOGGER
 
 namespace Board
 {
@@ -73,10 +77,8 @@ using Button = GpioInputA14; // SWDCLK!
 using LedA4 = GpioInverted<GpioOutputA4>;
 
 using Leds = SoftwareGpioPort< LedA4 >;
-/// @}
 
-/// @ingroup modm_board_nucleo_c011f6
-/// @{
+using LoggerDevice = modm::IODeviceWrapper< Rtt<0>, modm::IOBuffer::DiscardIfFull >;
 
 inline void
 initialize()

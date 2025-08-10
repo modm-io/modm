@@ -11,7 +11,11 @@
 #pragma once
 
 #include <modm/platform.hpp>
+#include <modm/debug.hpp>
 using namespace modm::platform;
+
+/// @ingroup modm_board_samg55_xplained_pro
+#define MODM_BOARD_HAS_LOGGER
 
 namespace Board
 {
@@ -67,6 +71,8 @@ using Button = GpioA2;
 using DebugUart = Usart7;
 using TxPin = GpioA28;
 using RxPin = GpioA27;
+
+using LoggerDevice = modm::IODeviceWrapper< DebugUart, modm::IOBuffer::BlockIfFull >;
 
 inline void
 initialize()

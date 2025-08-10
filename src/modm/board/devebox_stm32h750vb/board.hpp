@@ -13,9 +13,13 @@
 #define MODM_STM32_H750VB_DEVEBOX_HPP
 
 #include <modm/platform.hpp>
-#include <modm/architecture/interface/clock.hpp>
+#include <modm/architecture.hpp>
+#include <modm/debug.hpp>
 
 using namespace modm::platform;
+
+/// @ingroup modm_board_devebox_stm32h750vb
+#define MODM_BOARD_HAS_LOGGER
 
 namespace Board
 {
@@ -144,10 +148,13 @@ struct SystemClock
 
 using ButtonK1 = GpioInverted<GpioInputE3>;
 using ButtonK2 = GpioInverted<GpioInputC5>;
+using Button = ButtonK1;
 
 using LedGreen = GpioInverted<GpioOutputA1>;	// User LED
 
 using Leds = SoftwareGpioPort< LedGreen >;
+
+using LoggerDevice = modm::IODeviceWrapper< Rtt<0>, modm::IOBuffer::DiscardIfFull >;
 /// @}
 
 namespace usb

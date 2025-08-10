@@ -24,7 +24,7 @@ def prepare(module, options):
         ":platform:gpio",
         ":platform:core",
         ":platform:usb",
-        ":io")
+        ":debug")
     return True
 
 def build(env):

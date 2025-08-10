@@ -13,11 +13,14 @@
 #define MODM_STM32_F4XX_DEVEBOX_HPP
 
 #include <modm/platform.hpp>
-#include <modm/architecture/interface/clock.hpp>
+#include <modm/architecture.hpp>
+#include <modm/debug.hpp>
 #include <modm/driver/storage/block_device_spiflash.hpp>
 
 using namespace modm::platform;
 
+/// @ingroup modm_board_devebox_f4xx
+#define MODM_BOARD_HAS_LOGGER
 
 namespace Board
 {
@@ -114,6 +117,8 @@ using SystemClockOut = GpioOutputC9;
 using LedGreen = GpioInverted<GpioOutputA1>;	// User LED
 
 using Leds = SoftwareGpioPort< LedGreen >;
+
+using LoggerDevice = modm::IODeviceWrapper< Rtt<0>, modm::IOBuffer::DiscardIfFull >;
 /// @}
 
 namespace usb

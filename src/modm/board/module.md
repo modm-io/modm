@@ -68,12 +68,12 @@ int main()
 
 ## Programming
 
-Most development boards have a programmer on-board and the BSPs are configured
+Most development boards have a debug probe on-board and the BSPs are configured
 to use them automatically.
 
-However, for development boards without a programmer on-board, you need to use
-your own and *specify* which one you're using. For simple configuration, adding
-a collector is enough:
+However, for development boards without a debug probe, you need to use an
+external debug probe (like an STLinkv3) and *specify* which one you're using.
+For simple configuration, adding a collector is enough:
 
 ```xml
 <library>
@@ -103,6 +103,36 @@ Then include this file in your build options like so:
   </options>
 </library>
 ```
+
+
+## Logging
+
+Most development boards have a dedicated serial port for logging connected to
+the on-board debug probe. In that case you can open the serial port
+independently using the program of your choice, for example `picocom`:
+
+```sh
+picocom --imap lfcrlf -b 115200 /dev/tty.usbmodem1142101
+```
+
+In case that the on-board debug probe does not have a dedicated serial port or
+there is no debug probe at all, the modm boards use RTT as a fallback solution.
+This requires you to run the debug probe to receive logging data.
+
+```
+ $ scons log-rtt
+╭───OpenOCD───> Real Time Transfer
+╰─────RTT────── stm32f103rbt
+Info : rtt: Searching for control block 'SEGGER RTT'
+Info : rtt: Control block found at 0x20000008
+Listening on port 9090 for rtt connections
+loop 51
+loop 52
+loop 53
+^C
+```
+
+See the `modm:rtt` module for more options.
 
 
 ## Customization

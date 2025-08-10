@@ -7,6 +7,9 @@
 
   <options>
     <option name="modm:target">stm32f030f4p6</option>
+    <option name="modm:rtt:buffer.tx">256</option>
+    <option name="modm:rtt:buffer.rx">16</option>
+    <option name="modm:platform:cortex-m:main_stack_size">1Ki</option>
   </options>
   <modules>
     <module>modm:board:stm32f030_demo</module>

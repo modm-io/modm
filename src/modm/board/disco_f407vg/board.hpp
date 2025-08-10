@@ -16,10 +16,14 @@
 #define MODM_STM32_F4_DISCOVERY_HPP
 
 #include <modm/platform.hpp>
-#include <modm/architecture/interface/clock.hpp>
+#include <modm/architecture.hpp>
+#include <modm/debug.hpp>
 #include <modm/driver/inertial/lis3dsh.hpp>
 
 using namespace modm::platform;
+
+/// @ingroup modm_board_disco_f407vg
+#define MODM_BOARD_HAS_LOGGER
 
 namespace Board
 {
@@ -188,6 +192,8 @@ using Device = UsbFs;
 
 /// @ingroup modm_board_disco_f407vg
 /// @{
+using LoggerDevice = modm::IODeviceWrapper< Rtt<0>, modm::IOBuffer::DiscardIfFull >;
+
 inline void
 initialize()
 {
