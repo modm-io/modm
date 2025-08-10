@@ -25,18 +25,19 @@ proc modm_program { SOURCE } {
 
 %% if has_rtt
 proc modm_rtt { {POLLING 1} {CHANNELS {{rtt_channels}}} {IDENTIFIER "SEGGER RTT"} } {
-	set hint [mrw 0x08000020]
-	if {$hint & 0x2} {
-		set hint [expr {$hint & ~0x2}]
-		puts [format "Info : Searching 0x%08x from IRQ table" $hint]
-		rtt setup $hint 16 $IDENTIFIER
+	set vtor [mrw 0xE000ED08]
+	set ctrl [mrw [expr {$vtor + 0x20}]]
+	if {$ctrl & 0x2} {
+		set ctrl [expr {$ctrl & ~0x2}]
+		puts [format "Info : Searching 0x%08x from IRQ table" $ctrl]
+		rtt setup $ctrl 16 $IDENTIFIER
 	} else {
 		puts [format "Info : Searching \[0x{{"%0x" % main_ram.start}}, 0x{{"%0x" % (main_ram.start + main_ram.size)}}\]"]
 		rtt setup 0x{{"%0x" % main_ram.start}} {{main_ram.size}} $IDENTIFIER
 	}
 	rtt start
 	rtt polling_interval $POLLING
-	rtt channels
+	puts [rtt channels]
 	for {set i 0} {$i < $CHANNELS} {incr i} {
 		rtt server start [expr {9090 + $i}] $i
 	}
