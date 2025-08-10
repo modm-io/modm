@@ -5,9 +5,7 @@
   </options>
   <modules>
     <module>modm:driver:bmp085</module>
-    <module>modm:io</module>
     <module>modm:platform:i2c:1</module>
-    <module>modm:platform:uart:2</module>
     <module>modm:build:scons</module>
   </modules>
 </library>

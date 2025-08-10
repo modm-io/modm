@@ -4,7 +4,6 @@
     <option name="modm:build:build.path">../../../build/stm32f401_discovery/uart</option>
   </options>
   <modules>
-    <module>modm:platform:gpio</module>
     <module>modm:platform:uart:2</module>
     <module>modm:build:scons</module>
   </modules>

@@ -13,11 +13,6 @@
 #include <modm/board.hpp>
 #include <modm/processing.hpp>
 #include <modm/driver/temperature/ltc2984.hpp>
-#include <modm/io.hpp>
-
-using Usart2 = BufferedUart<UsartHal2, UartTxBuffer<2048>>;
-modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > device;
-modm::IOStream logger(device);
 
 /**
  * Example to demonstrate a modm driver for LTC2984 (or LTC2983) with a Pt100 temperature sensor.
@@ -71,7 +66,7 @@ modm::Fiber fiber_sensor([]
 {
 	while(not tempSensor.ping())
 	{
-		logger << "Device not reachable" << modm::endl;
+		MODM_LOG_INFO << "Device not reachable" << modm::endl;
 		modm::this_fiber::sleep_for(100ms);
 	}
 
@@ -91,7 +86,7 @@ modm::Fiber fiber_sensor([]
 	tempSensor.enableChannel(modm::ltc2984::Configuration::MuxChannel::Ch4);
 	tempSensor.setChannels();
 
-	logger << "Device configured" << modm::endl;
+	MODM_LOG_INFO << "Device configured" << modm::endl;
 
 	while (true)
 	{
@@ -103,13 +98,13 @@ modm::Fiber fiber_sensor([]
 		while (tempSensor.isBusy())
 		{
 		}
-		logger << "Temperature measurement finished." << modm::endl;
+		MODM_LOG_INFO << "Temperature measurement finished." << modm::endl;
 
 		modm::ltc2984::Data temp;
 		tempSensor.readChannel(modm::ltc2984::Channel::Ch4, temp);
-		logger << "Temperature: " << temp << modm::endl;
+		MODM_LOG_INFO << "Temperature: " << temp << modm::endl;
 
-		logger << "Time: " << (modm::Clock::now() - stamp) << modm::endl;
+		MODM_LOG_INFO << "Time: " << (modm::Clock::now() - stamp) << modm::endl;
 
 		modm::this_fiber::sleep_for(1s);
 	}
@@ -131,15 +126,12 @@ main()
 {
 	Board::initialize();
 
-	Usart2::connect<GpioOutputA2::Tx>();
-	Usart2::initialize<Board::SystemClock, 115200_Bd>();
-
 	// Connect the GPIOs to the SPIs alternate function
 	SpiMaster::connect<Sck::Sck, Mosi::Mosi, Miso::Miso>();
 	// Initialize the SPI with a 1.3MHz clock
 	SpiMaster::initialize<Board::SystemClock, 1.3125_MHz>();
 
-	logger << "\n\nWelcome to LTC2983/LTC2984 demo!\n\n";
+	MODM_LOG_INFO << "\n\nWelcome to LTC2983/LTC2984 demo!\n\n";
 
 	modm::fiber::Scheduler::run();
 	return 0;

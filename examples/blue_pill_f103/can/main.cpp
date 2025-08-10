@@ -10,16 +10,6 @@
  */
 
 #include <modm/board.hpp>
-#include <modm/debug/logger.hpp>
-
-
-using Usart2 = BufferedUart<UsartHal2, UartTxBuffer<256>>;
-modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice;
-modm::log::Logger modm::log::info(loggerDevice);
-
-// Set the log level
-#undef	MODM_LOG_LEVEL
-#define	MODM_LOG_LEVEL modm::log::INFO
 
 static void
 displayMessage(const modm::can::Message& message, const uint8_t& filter_id)
@@ -36,10 +26,6 @@ int
 main()
 {
 	Board::initialize();
-
-	// Initialize Usart
-	Usart2::connect<GpioOutputA2::Tx>();
-	Usart2::initialize<Board::SystemClock, 115200_Bd>();
 
 	MODM_LOG_INFO << "CAN Test Program" << modm::endl;
 

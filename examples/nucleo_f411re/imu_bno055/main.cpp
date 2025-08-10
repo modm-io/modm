@@ -14,7 +14,6 @@
 
 #include <modm/processing.hpp>
 #include <modm/driver/inertial/bno055.hpp>
-#include <modm/debug.hpp>
 
 // Set the log level
 #undef	MODM_LOG_LEVEL

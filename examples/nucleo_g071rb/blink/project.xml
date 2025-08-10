@@ -4,7 +4,6 @@
     <option name="modm:build:build.path">../../../build/nucleo_g071rb/blink</option>
   </options>
   <modules>
-    <module>modm:platform:gpio</module>
     <module>modm:processing:timer</module>
     <module>modm:build:scons</module>
   </modules>

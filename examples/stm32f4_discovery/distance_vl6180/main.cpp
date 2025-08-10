@@ -13,21 +13,6 @@
 #include <modm/board.hpp>
 #include <modm/processing.hpp>
 #include <modm/driver/position/vl6180.hpp>
-#include <modm/debug.hpp>
-
-using Usart2 = BufferedUart<UsartHal2>;
-modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > device;
-
-// Set all four logger streams to use the UART
-modm::log::Logger modm::log::debug(device);
-modm::log::Logger modm::log::info(device);
-modm::log::Logger modm::log::warning(device);
-modm::log::Logger modm::log::error(device);
-
-// Set the log level
-#undef	MODM_LOG_LEVEL
-#define	MODM_LOG_LEVEL modm::log::DEBUG
-
 /**
  * Example to demonstrate a MODM driver for distance sensor VL6180
  *
@@ -116,9 +101,6 @@ int
 main()
 {
 	Board::initialize();
-
-	Usart2::connect<GpioA2::Tx>();
-	Usart2::initialize<Board::SystemClock, 115200_Bd>();
 
 	MyI2cMaster::connect<GpioB11::Sda, GpioB10::Scl>();
 	MyI2cMaster::initialize<Board::SystemClock, 400_kHz>();

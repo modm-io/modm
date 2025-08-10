@@ -12,12 +12,7 @@
 
 #include <inttypes.h>
 #include <modm/board.hpp>
-#include <modm/io.hpp>
 #include <modm/driver/pressure/bmp085.hpp>
-
-using Usart2 = BufferedUart<UsartHal2>;
-modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > device;
-modm::IOStream stream(device);
 
 /**
  * Example to demonstrate a MODM driver for barometer and
@@ -41,36 +36,33 @@ main()
 {
 	Board::initialize();
 
-	Usart2::connect<GpioA2::Tx>();
-	Usart2::initialize<Board::SystemClock, 115200_Bd>();
-
 	MyI2cMaster::connect<GpioB9::Sda, GpioB8::Scl>();
 	MyI2cMaster::initialize<Board::SystemClock, 100_kHz>();
 
-	stream << "\n\nWelcome to BMP085 demo!\n\n";
+	MODM_LOG_INFO << "\n\nWelcome to BMP085 demo!\n\n";
 
 	// ping the device until it responds
 	while(not barometer.ping()) modm::delay(100ms);
-	stream << "Device responded" << modm::endl;
+	MODM_LOG_INFO << "Device responded" << modm::endl;
 
 	// Configure the device until it responds
 	while(not barometer.initialize()) modm::delay(100ms);
-	stream << "Device configured" << modm::endl;
+	MODM_LOG_INFO << "Device configured" << modm::endl;
 
 	modm::bmp085::Calibration &cal = data.getCalibration();
 
-	stream << "Calibration data is: ";
-	stream.printf(" ac1 %d\n", cal.ac1);
-	stream.printf(" ac2 %d\n", cal.ac2);
-	stream.printf(" ac3 %d\n", cal.ac3);
-	stream.printf(" ac4 %d\n", cal.ac4);
-	stream.printf(" ac5 %d\n", cal.ac5);
-	stream.printf(" ac6 %d\n", cal.ac6);
-	stream.printf(" b1 %d\n", cal.b1);
-	stream.printf(" b2 %d\n", cal.b2);
-	stream.printf(" mb %d\n", cal.mb);
-	stream.printf(" mc %d\n", cal.mc);
-	stream.printf(" md %d\n", cal.md);
+	MODM_LOG_INFO << "Calibration data is: ";
+	MODM_LOG_INFO.printf(" ac1 %d\n", cal.ac1);
+	MODM_LOG_INFO.printf(" ac2 %d\n", cal.ac2);
+	MODM_LOG_INFO.printf(" ac3 %d\n", cal.ac3);
+	MODM_LOG_INFO.printf(" ac4 %d\n", cal.ac4);
+	MODM_LOG_INFO.printf(" ac5 %d\n", cal.ac5);
+	MODM_LOG_INFO.printf(" ac6 %d\n", cal.ac6);
+	MODM_LOG_INFO.printf(" b1 %d\n", cal.b1);
+	MODM_LOG_INFO.printf(" b2 %d\n", cal.b2);
+	MODM_LOG_INFO.printf(" mb %d\n", cal.mb);
+	MODM_LOG_INFO.printf(" mc %d\n", cal.mc);
+	MODM_LOG_INFO.printf(" md %d\n", cal.md);
 
 	while (true)
 	{
@@ -83,8 +75,8 @@ main()
 			int16_t temp  = data.getTemperature();
 			int32_t press = data.getPressure();
 
-			stream.printf("Calibrated temperature in 0.1 degree Celsius is: %" PRId16 "\n",   temp  );
-			stream.printf("Calibrated pressure in Pa is                   : %" PRId32 "\n\n", press );
+			MODM_LOG_INFO.printf("Calibrated temperature in 0.1 degree Celsius is: %" PRId16 "\n",   temp  );
+			MODM_LOG_INFO.printf("Calibrated pressure in Pa is                   : %" PRId32 "\n\n", press );
 		}
 	}
 

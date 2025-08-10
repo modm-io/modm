@@ -4,6 +4,7 @@
     <option name="modm:build:build.path">../../../build/blue_pill_f103/blink</option>
   </options>
   <modules>
+    <module>modm:processing:timer</module>
     <module>modm:build:scons</module>
   </modules>
   <collectors>

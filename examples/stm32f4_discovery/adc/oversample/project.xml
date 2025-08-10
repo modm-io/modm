@@ -4,11 +4,8 @@
     <option name="modm:build:build.path">../../../../build/stm32f4_discovery/adc/oversample</option>
   </options>
   <modules>
-    <module>modm:debug</module>
     <module>modm:driver:adc_sampler</module>
     <module>modm:platform:adc:2</module>
-    <module>modm:platform:gpio</module>
-    <module>modm:platform:uart:2</module>
     <module>modm:processing:timer</module>
     <module>modm:build:scons</module>
   </modules>

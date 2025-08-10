@@ -28,9 +28,6 @@ modm::log::Logger modm::log::info(loggerDevice);
 modm::log::Logger modm::log::warning(loggerDevice);
 modm::log::Logger modm::log::error(loggerDevice);
 
-// Set the log level
-#undef	MODM_LOG_LEVEL
-#define	MODM_LOG_LEVEL modm::log::INFO
 
 void printMemoryContent(const uint8_t* address, std::size_t size) {
 	for (std::size_t i = 0; i < size; i++) {

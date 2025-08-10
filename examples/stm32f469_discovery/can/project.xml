@@ -4,10 +4,8 @@
     <option name="modm:build:build.path">../../../build/stm32f469_discovery/can</option>
   </options>
   <modules>
-    <module>modm:debug</module>
     <module>modm:platform:can:1</module>
     <module>modm:platform:can:2</module>
-    <module>modm:platform:gpio</module>
     <module>modm:processing:timer</module>
     <module>modm:build:scons</module>
   </modules>

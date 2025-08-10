@@ -4,11 +4,9 @@
     <option name="modm:build:build.path">../../../../build/stm32f4_discovery/display/hd44780</option>
   </options>
   <modules>
-    <module>modm:debug</module>
     <module>modm:driver:pca8574</module>
     <module>modm:driver:hd44780</module>
     <module>modm:platform:i2c:2</module>
-    <module>modm:platform:uart:2</module>
     <module>modm:processing:fiber</module>
     <module>modm:build:scons</module>
   </modules>

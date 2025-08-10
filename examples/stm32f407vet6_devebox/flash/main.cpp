@@ -11,24 +11,10 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
-#include <modm/debug/logger.hpp>
 
 #include <modm/driver/storage/block_device_spiflash.hpp>
 
 using namespace Board;
-
-using Usart1 = BufferedUart<UsartHal1>;
-modm::IODeviceWrapper< Usart1, modm::IOBuffer::BlockIfFull > loggerDevice;
-
-// Set all four logger streams to use the UART
-modm::log::Logger modm::log::debug(loggerDevice);
-modm::log::Logger modm::log::info(loggerDevice);
-modm::log::Logger modm::log::warning(loggerDevice);
-modm::log::Logger modm::log::error(loggerDevice);
-
-// Set the log level
-#undef	MODM_LOG_LEVEL
-#define	MODM_LOG_LEVEL modm::log::DEBUG
 
 Board::w25q16::StorageDevice storageDevice;
 
@@ -93,9 +79,6 @@ main()
 	Board::initialize();
 
 	Board::initializeW25q16();
-
-	Usart1::connect<GpioInputA9::Tx>();
-	Usart1::initialize<Board::SystemClock, 115200_Bd>();
 
 	// Use the logging streams to print some messages.
 	// Change MODM_LOG_LEVEL above to enable or disable these messages

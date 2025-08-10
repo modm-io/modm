@@ -6,7 +6,6 @@
   </options>
   <modules>
     <module>modm:build:scons</module>
-    <module>modm:debug</module>
     <module>modm:platform:itm</module>
     <module>modm:processing:timer</module>
   </modules>

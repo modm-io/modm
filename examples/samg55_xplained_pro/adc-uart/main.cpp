@@ -9,15 +9,9 @@
  */
 
 #include <modm/board.hpp>
-#include <modm/io.hpp>
 
 using namespace modm::platform;
 using namespace modm::literals;
-
-// Create IO wrapper for the debug UART, which is connected to the built-in
-// USB debugger's virtual COM port
-modm::IODeviceWrapper<Board::DebugUart, modm::IOBuffer::BlockIfFull> debugDevice;
-modm::IOStream debugStream(debugDevice);
 
 // Rename because the ::Adc typename defined in the CMSIS header conflicts with
 // the name imported from the modm::platform namespace
@@ -43,12 +37,12 @@ main()
 
 	while (true)
 	{
-		debugStream.printf("ADC Readings: ");
+		MODM_LOG_INFO << "ADC Readings: ";
 		for(uint32_t i=0; i<6; i++)
 		{
-			debugStream.printf("%5d ", AdcDev::readChannel(i));
+			MODM_LOG_INFO.printf("%5d ", AdcDev::readChannel(i));
 		}
-		debugStream.printf("\r\n");
+		MODM_LOG_INFO << modm::endl;
 
 		modm::delay(500ms);
 	}

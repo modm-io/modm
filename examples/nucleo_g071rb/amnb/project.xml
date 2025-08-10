@@ -5,7 +5,6 @@
     <option name="modm:communication:amnb:with_heap">no</option>
   </options>
   <modules>
-    <module>modm:platform:gpio</module>
     <module>modm:communication:amnb</module>
     <module>modm:platform:uart:1</module>
     <module>modm:platform:uart:3</module>

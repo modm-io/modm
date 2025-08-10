@@ -11,16 +11,8 @@
 
 #include <modm/board.hpp>
 #include <modm/processing.hpp>
-#include <modm/debug.hpp>
 
 using namespace Board;
-
-modm::IODeviceWrapper< Rtt<0>, modm::IOBuffer::DiscardIfFull > rtt_device;
-// Set all four logger streams to use RTT
-modm::log::Logger modm::log::debug(rtt_device);
-modm::log::Logger modm::log::info(rtt_device);
-modm::log::Logger modm::log::warning(rtt_device);
-modm::log::Logger modm::log::error(rtt_device);
 
 #undef MODM_LOG_LEVEL
 #define MODM_LOG_LEVEL modm::log::INFO
@@ -49,7 +41,7 @@ loop: 5
 Type number 0-9, then press enter to send.
 The LED should blink slower or faster.
 
-Ctrl+D to exit
+Ctrl+C to exit
 
 */
 
@@ -67,18 +59,20 @@ main()
 	uint32_t counter(0);
 	modm::PeriodicTimer tmr(100ms);
 
-	char data;
 	while (true)
 	{
-		MODM_LOG_INFO.get(data);
-		switch(data)
+		if (char data; modm::log::info.get(data), data != modm::IOStream::eof)
 		{
-			case '0':
-				tmr.restart(1s);
-				break;
-			case '1'...'9':
-				tmr.restart(std::chrono::milliseconds((data - '0') * 100));
-				break;
+			MODM_LOG_INFO << data;
+			switch(data)
+			{
+				case '0':
+					tmr.restart(1s);
+					break;
+				case '1'...'9':
+					tmr.restart(std::chrono::milliseconds((data - '0') * 100));
+					break;
+			}
 		}
 		if (tmr.execute())
 		{
@@ -86,11 +80,6 @@ main()
 
 			MODM_LOG_INFO << "loop: " << counter << modm::endl;
 			counter++;
-		}
-		// loopback: read from channel 1, output on channel 2
-		if (uint8_t value; SEGGER_RTT_ReadNoLock(1, &value, 1))
-		{
-			SEGGER_RTT_WriteNoLock(2, &value, 1);
 		}
 	}
 

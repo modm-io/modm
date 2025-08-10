@@ -2,12 +2,9 @@
   <extends>modm:blue-pill-f103</extends>
   <options>
     <option name="modm:build:build.path">../../../build/blue_pill_f103/servo_pwm</option>
-    <option name="modm:rtt:buffer.tx">128</option>
   </options>
   <modules>
     <module>modm:build:scons</module>
-    <module>modm:debug</module>
-    <module>modm:platform:rtt</module>
     <module>modm:platform:timer:4</module>
   </modules>
   <collectors>

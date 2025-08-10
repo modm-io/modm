@@ -66,13 +66,25 @@ struct SystemClock
 	}
 };
 
-using Led = GpioA6;
 using Button = GpioA2;
-using DebugUart = Usart7;
-using TxPin = GpioA28;
-using RxPin = GpioA27;
+using Led = GpioA6;
 
-using LoggerDevice = modm::IODeviceWrapper< DebugUart, modm::IOBuffer::BlockIfFull >;
+using Leds = SoftwareGpioPort< Led >;
+/// @}
+
+namespace debug
+{
+/// @ingroup modm_board_samg55_xplained_pro
+/// @{
+using Rx = GpioA27;
+using Tx = GpioA28;
+using Uart = Usart7;
+/// @}
+}
+
+/// @ingroup modm_board_samg55_xplained_pro
+/// @{
+using LoggerDevice = modm::IODeviceWrapper< debug::Uart, modm::IOBuffer::BlockIfFull >;
 
 inline void
 initialize()
@@ -83,8 +95,8 @@ initialize()
 	SystemClock::enable();
 	SysTickTimer::initialize<SystemClock>();
 
-	DebugUart::initialize<SystemClock, 115200>();
-	DebugUart::connect<TxPin::Tx, RxPin::Rx>();
+	debug::Uart::connect<debug::Tx::Tx, debug::Rx::Rx>();
+	debug::Uart::initialize<SystemClock, 115200>();
 
 	Led::setOutput(modm::Gpio::Low);
 

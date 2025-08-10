@@ -18,26 +18,6 @@ using Mpx = modm::Pca9548a<MyI2cMaster>;
 using I2cMultiplexer = modm::I2cMultiplexer<MyI2cMaster, Mpx>;
 
 
-#ifndef MODM_BOARD_HAS_LOGGER
-#include <modm/debug.hpp>
-// Add logger manually
-using Usart2 = BufferedUart<UsartHal2, UartTxBuffer<2048>, UartRxBuffer<2048>>;
-using LoggerUsart = Usart2;
-using LoggerUsartTx = modm::platform::GpioA2;
-using LoggerUsartRx = modm::platform::GpioA3;
-modm::IODeviceWrapper< LoggerUsart, modm::IOBuffer::BlockIfFull > loggerDevice;
-
-// Set all four logger streams to use the UART
-modm::log::Logger modm::log::debug(loggerDevice);
-modm::log::Logger modm::log::info(loggerDevice);
-modm::log::Logger modm::log::warning(loggerDevice);
-modm::log::Logger modm::log::error(loggerDevice);
-#endif
-
-#undef	MODM_LOG_LEVEL
-#define	MODM_LOG_LEVEL modm::log::DEBUG
-
-
 namespace multiplexer
 {
 	I2cMultiplexer i2cMultiplexer;
@@ -94,11 +74,6 @@ int
 main()
 {
 	Board::initialize();
-
-#ifndef MODM_BOARD_HAS_LOGGER
-	LoggerUsart::connect<LoggerUsartTx::Tx, LoggerUsartRx::Rx>();
-	LoggerUsart::initialize<Board::SystemClock, 115200_Bd>();
-#endif
 
 	modm::platform::I2cMaster1::connect<modm::platform::GpioB7::Sda, modm::platform::GpioB6::Scl>();
 	modm::platform::I2cMaster1::initialize<Board::SystemClock, 100_kHz>();

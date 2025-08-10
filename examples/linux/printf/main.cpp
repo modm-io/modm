@@ -16,9 +16,6 @@
 #include <info_build.h>
 #include <cstdio>
 
-// Set the log level
-#undef	MODM_LOG_LEVEL
-#define	MODM_LOG_LEVEL modm::log::INFO
 
 int
 main()

@@ -10,25 +10,10 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
-#include <modm/debug/logger.hpp>
 #include <modm/processing/timer.hpp>
 #include <modm/driver/encoder/bitbang_encoder_input.hpp>
 
 // ----------------------------------------------------------------------------
-// Set the log level
-#undef	MODM_LOG_LEVEL
-#define	MODM_LOG_LEVEL modm::log::INFO
-
-// Create an IODeviceWrapper around the Uart Peripheral we want to use
-using Usart2 = BufferedUart<UsartHal2, UartTxBuffer<256>>;
-modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice;
-
-// Set all four logger streams to use the UART
-modm::log::Logger modm::log::debug(loggerDevice);
-modm::log::Logger modm::log::info(loggerDevice);
-modm::log::Logger modm::log::warning(loggerDevice);
-modm::log::Logger modm::log::error(loggerDevice);
-
 // Connect the encoders outputs to D7 and D8 Pins (usually the outer pins)
 // The common third pin (usually in the middle) is connected to GND.
 modm::BitBangEncoderInput<GpioInputB6, GpioInputB7, 4, int16_t> encoder;
@@ -58,9 +43,6 @@ int
 main()
 {
 	Board::initialize();
-
-	Usart2::connect<GpioOutputA2::Tx>();
-	Usart2::initialize<Board::SystemClock, 115200_Bd>();
 
 	encoder.initialize();
 	initPeriodicInterrupt<Timer2>(1ms);

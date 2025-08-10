@@ -1,8 +1,19 @@
+/*
+ * Copyright (c) 2021, Jeff McBride
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 #include <modm/board.hpp>
 
 using namespace modm::platform;
 
-int main() {
+int main()
+{
 	// Test SPI send and receive in loopback mode. If we receive the expected
 	// characters back, flash slowly. Otherwise, flash fast.
 	Board::initialize();
@@ -26,7 +37,8 @@ int main() {
 			flash_time_ms = 100;
 		}
 
-		for(uint32_t i=0; i<5; i++) {
+		for(uint32_t i=0; i<5; i++)
+		{
 			Board::Led::set();
 			modm::delay_ms(flash_time_ms);
 			Board::Led::reset();

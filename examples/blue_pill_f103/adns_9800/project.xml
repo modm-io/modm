@@ -4,11 +4,8 @@
     <option name="modm:build:build.path">../../../build/blue_pill_f103/adns_9800</option>
   </options>
   <modules>
-    <module>modm:debug</module>
     <module>modm:driver:adns9800</module>
-    <module>modm:platform:gpio</module>
     <module>modm:platform:spi:1</module>
-    <module>modm:platform:uart:2</module>
     <module>modm:processing:fiber</module>
     <module>modm:processing:timer</module>
     <module>modm:build:scons</module>

@@ -6,7 +6,6 @@
   <modules>
     <module>modm:platform:adc:1</module>
     <module>modm:platform:clock</module>
-    <module>modm:platform:gpio</module>
     <module>modm:build:scons</module>
   </modules>
 </library>

@@ -12,25 +12,11 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
-#include <modm/debug/logger.hpp>
 #include <modm/processing/timer.hpp>
 #include <inttypes.h>
 
 using Usart1 = BufferedUart<UsartHal1>;
-using Usart2 = BufferedUart<UsartHal2>;
 using Usart3 = BufferedUart<UsartHal3>;
-modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice;
-
-// Set all four logger streams to use the UART
-modm::log::Logger modm::log::debug(loggerDevice);
-modm::log::Logger modm::log::info(loggerDevice);
-modm::log::Logger modm::log::warning(loggerDevice);
-modm::log::Logger modm::log::error(loggerDevice);
-
-// Set the log level
-#undef	MODM_LOG_LEVEL
-#define	MODM_LOG_LEVEL modm::log::DEBUG
-
 
 
 enum class Direction {
@@ -86,10 +72,6 @@ int
 main()
 {
 	Board::initialize();
-
-	// Enable USART 2: To / from PC
-	Usart2::connect<GpioOutputA2::Tx, GpioInputA3::Rx>();
-	Usart2::initialize<Board::SystemClock, 115200_Bd>();
 
 	// Enable USART 1 Host To Node
 	Usart1::connect<GpioInputA10::Rx>();

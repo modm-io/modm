@@ -10,22 +10,12 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
-#include <modm/debug/logger.hpp>
 #include <modm/processing/timer.hpp>
 #include <modm/driver/adc/adc_sampler.hpp>
-
-// ----------------------------------------------------------------------------
-// Set the log level
-#undef	MODM_LOG_LEVEL
-#define	MODM_LOG_LEVEL modm::log::INFO
 
 typedef GpioInputA7 AdcIn0;
 typedef GpioInputA4 AdcIn1;
 typedef GpioInputA2 AdcIn2;
-
-using Usart2 = BufferedUart<UsartHal2>;
-modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice;
-modm::log::Logger modm::log::info(loggerDevice);
 
 // the three sensors are mapped: x = ch1, y = ch2, z = ch0
 Adc2::Channel sensorMapping[3] = {
@@ -44,10 +34,6 @@ int
 main()
 {
 	Board::initialize();
-
-	// initialize Uart2 for MODM_LOG_INFO
-	Usart2::connect<GpioOutputA2::Tx>();
-	Usart2::initialize<Board::SystemClock, 115200_Bd>();
 
 	// initialize Adc2
 	Adc2::connect<AdcIn0::In7, AdcIn1::In4, AdcIn2::In2>();

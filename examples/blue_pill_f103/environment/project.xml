@@ -4,13 +4,10 @@
     <option name="modm:build:build.path">../../../build/blue_pill_f103/environment</option>
   </options>
   <modules>
-    <module>modm:debug</module>
     <module>modm:driver:bme280</module>
     <module>modm:driver:bmp085</module>
-    <module>modm:platform:gpio</module>
     <module>modm:platform:i2c:1</module>
     <module>modm:platform:i2c:2</module>
-    <module>modm:platform:uart:2</module>
     <module>modm:processing:timer</module>
     <module>modm:processing:fiber</module>
     <module>modm:build:scons</module>

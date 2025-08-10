@@ -4,7 +4,6 @@
     <option name="modm:build:build.path">../../../build/nucleo_l432kc/uart_spi</option>
   </options>
   <modules>
-    <module>modm:platform:gpio</module>
     <module>modm:platform:uart.spi:1</module>
     <module>modm:build:scons</module>
   </modules>

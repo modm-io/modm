@@ -9,20 +9,41 @@
  */
 
 #include <modm/board.hpp>
+#include <modm/processing.hpp>
 
-using namespace Board;
+// ----------------------------------------------------------------------------
+// Set the log level
+#undef  MODM_LOG_LEVEL
+#define MODM_LOG_LEVEL modm::log::INFO
 
 int
 main()
 {
 	Board::initialize();
 
-	LedGreen::set();
-	LedBlue::reset();
+	// Use the logging streams to print some messages.
+	// Change MODM_LOG_LEVEL above to enable or disable these messages
+	MODM_LOG_DEBUG   << "debug"   << modm::endl;
+	MODM_LOG_INFO    << "info"    << modm::endl;
+	MODM_LOG_WARNING << "warning" << modm::endl;
+	MODM_LOG_ERROR   << "error"   << modm::endl;
+
+	Board::LedBlue::reset();
+
+	uint32_t seconds(1);
+	modm::Timeout timeout;
 
 	while (true) {
-		LedGreen::toggle();
-		LedBlue::toggle();
-		modm::delay(Board::Button::read() ? 0.5s : 1s);
+		Board::LedBlue::set();
+		timeout.restart(100ms);
+		while(not timeout.isExpired())
+			{};
+
+		Board::LedBlue::reset();
+		timeout.restart(900ms);
+		while(not timeout.isExpired())
+			{};
+
+		MODM_LOG_INFO << "Seconds since reboot: " << seconds++ << modm::endl;
 	}
 }

@@ -10,17 +10,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
-#include <modm/debug/logger.hpp>
 #include <modm/driver/usb/stusb4500.hpp>
-
-using Usart1 = BufferedUart<UsartHal1>;
-modm::IODeviceWrapper< Usart1, modm::IOBuffer::BlockIfFull > loggerDevice;
-#undef	MODM_LOG_LEVEL
-#define	MODM_LOG_LEVEL modm::log::INFO
-modm::log::Logger modm::log::debug(loggerDevice);
-modm::log::Logger modm::log::info(loggerDevice);
-modm::log::Logger modm::log::warning(loggerDevice);
-modm::log::Logger modm::log::error(loggerDevice);
 
 using Sda = GpioB7;
 using Scl = GpioB6;
@@ -32,10 +22,6 @@ int
 main()
 {
 	Board::initialize();
-
-	// Enable USART 1 (TX only)
-	Usart1::connect<GpioOutputA9::Tx>();
-	Usart1::initialize<Board::SystemClock, 115200_Bd>();
 
 	MODM_LOG_INFO << "STM32F072 Discovery Example: USB-PD with STUSB4500 chip" << modm::endl;
 

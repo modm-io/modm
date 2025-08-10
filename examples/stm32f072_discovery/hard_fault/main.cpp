@@ -10,32 +10,11 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
-#include <modm/debug/logger.hpp>
-
-// ----------------------------------------------------------------------------
-// Set the log level
-#undef	MODM_LOG_LEVEL
-#define	MODM_LOG_LEVEL modm::log::INFO
-
-// Create an IODeviceWrapper around the Uart Peripheral we want to use
-using Usart1 = BufferedUart<UsartHal1>;
-modm::IODeviceWrapper< Usart1, modm::IOBuffer::BlockIfFull > loggerDevice;
-
-// Set all four logger streams to use the UART
-modm::log::Logger modm::log::debug(loggerDevice);
-modm::log::Logger modm::log::info(loggerDevice);
-modm::log::Logger modm::log::warning(loggerDevice);
-modm::log::Logger modm::log::error(loggerDevice);
-
 
 int
 main()
 {
 	Board::initialize();
-
-	// initialize Uart for MODM_LOG
-	Usart1::connect<GpioOutputA9::Tx>();
-	Usart1::initialize<Board::SystemClock, 115200_Bd>();
 
 	if (FaultReporter::hasReport())
 	{

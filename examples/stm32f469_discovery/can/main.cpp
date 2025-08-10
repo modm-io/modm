@@ -13,8 +13,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
-#include <modm/processing/timer.hpp>
-#include <modm/debug/logger.hpp>
+#include <modm/processing.hpp>
 
 /**
  * Example of CAN Hardware on STM32 F469 Discovery Board (with display).

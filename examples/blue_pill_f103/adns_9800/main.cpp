@@ -13,7 +13,6 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
-#include <modm/debug.hpp>
 #include <modm/processing.hpp>
 
 #include <modm/driver/motion/adns9800.hpp>
@@ -21,21 +20,6 @@
 #include <inttypes.h>
 
 // ----------------------------------------------------------------------------
-// Set the log level
-#undef	MODM_LOG_LEVEL
-#define	MODM_LOG_LEVEL modm::log::DEBUG
-
-using Usart2 = BufferedUart<UsartHal2, UartTxBuffer<256>>;
-// Create an IODeviceWrapper around the Uart Peripheral we want to use
-modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice;
-
-// Set all four logger streams to use the UART
-modm::log::Logger modm::log::debug(loggerDevice);
-modm::log::Logger modm::log::info(loggerDevice);
-modm::log::Logger modm::log::warning(loggerDevice);
-modm::log::Logger modm::log::error(loggerDevice);
-
-
 modm::Fiber fiber_blink([]
 {
 	modm::ShortTimeout timeout(100ms);
@@ -101,17 +85,6 @@ int
 main()
 {
 	Board::initialize();
-
-	// initialize Uart2 for MODM_LOG_*
-	Usart2::connect<GpioOutputA2::Tx>();
-	Usart2::initialize<Board::SystemClock, 115200_Bd>();
-
-	// Use the logging streams to print some messages.
-	// Change MODM_LOG_LEVEL above to enable or disable these messages
-	MODM_LOG_DEBUG   << "debug"   << modm::endl;
-	MODM_LOG_INFO    << "info"    << modm::endl;
-	MODM_LOG_WARNING << "warning" << modm::endl;
-	MODM_LOG_ERROR   << "error"   << modm::endl;
 
 	MODM_LOG_INFO << "Welcome to ADNS 9800 demo." << modm::endl;
 

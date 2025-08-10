@@ -29,7 +29,12 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "modm/src/modm/board"
-    env.copy('board.hpp')
+    env.substitutions = {
+        "with_logger": True,
+        "with_assert": env.has_module(":architecture:assert")
+    }
+    env.template("../board.cpp.in", "board.cpp")
+    env.copy("board.hpp")
 
     env.outbasepath = "modm/openocd/modm/board/"
     env.copy(repopath("tools/openocd/modm/atmel_samg55_xplained_pro.cfg"), "atmel_samg55_xplained_pro.cfg")

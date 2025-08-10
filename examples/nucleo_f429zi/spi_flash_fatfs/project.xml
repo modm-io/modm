@@ -8,7 +8,6 @@
     <module>modm:driver:block.device:spi.flash</module>
     <module>modm:fatfs</module>
     <module>modm:platform:spi:1</module>
-    <module>modm:platform:gpio</module>
     <module>modm:processing:fiber</module>
   </modules>
 </library>

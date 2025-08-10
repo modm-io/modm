@@ -17,9 +17,6 @@
 #include "thread_bme280.hpp"
 
 // ----------------------------------------------------------------------------
-// Set the log level
-#undef	MODM_LOG_LEVEL
-#define	MODM_LOG_LEVEL modm::log::INFO
 
 // ----------------------------------------------------------------------------
 Bme280Thread::Bme280Thread() :

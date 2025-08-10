@@ -10,26 +10,10 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
-#include <modm/debug/logger.hpp>
 #include <modm/processing.hpp>
 #include <modm/driver/adc/hx711.hpp>
 
 using namespace Board;
-
-// ----------------------------------------------------------------------------
-// Set the log level
-#undef	MODM_LOG_LEVEL
-#define	MODM_LOG_LEVEL modm::log::DEBUG
-
-// Create an IODeviceWrapper around the Uart Peripheral we want to use
-using Usart1 = BufferedUart<UsartHal1, UartTxBuffer<256>>;
-modm::IODeviceWrapper< Usart1, modm::IOBuffer::BlockIfFull > loggerDevice;
-
-// Set all four logger streams to use the UART
-modm::log::Logger modm::log::debug(loggerDevice);
-modm::log::Logger modm::log::info(loggerDevice);
-modm::log::Logger modm::log::warning(loggerDevice);
-modm::log::Logger modm::log::error(loggerDevice);
 
 
 struct hx711_config : public modm::hx711::Config
@@ -70,10 +54,6 @@ int
 main()
 {
 	Board::initialize();
-
-	// Initialize Uart1 for MODM_LOG_*
-	Usart1::connect<GpioOutputB6::Tx, GpioInputB7::Rx>();
-	Usart1::initialize<Board::SystemClock, 115200_Bd>();
 
 	// Use the logging streams to print some messages.
 	MODM_LOG_DEBUG << "HX711 demo" << modm::endl;

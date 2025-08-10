@@ -10,42 +10,14 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
-#include <modm/debug/logger.hpp>
 
-#include <modm/platform/comp/comp_2.hpp>
-
-// Set the log level
-#undef	MODM_LOG_LEVEL
-#define	MODM_LOG_LEVEL modm::log::INFO
-
-// Create an IODeviceWrapper around the Uart Peripheral we want to use
-using Usart2 = BufferedUart<UsartHal2>;
-modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice;
-
-// Set all four logger streams to use the UART
-modm::log::Logger modm::log::debug(loggerDevice);
-modm::log::Logger modm::log::info(loggerDevice);
-modm::log::Logger modm::log::warning(loggerDevice);
-modm::log::Logger modm::log::error(loggerDevice);
+using Comparator = modm::platform::Comp2;
 
 int
 main()
 {
 	Board::initialize();
 	Board::LedNorth::setOutput();
-
-	// initialize Uart2 for MODM_LOG_
-	Usart2::connect<GpioOutputA2::Tx>();
-	Usart2::initialize<Board::SystemClock, 115200_Bd>();
-
-	// Use the logging streams to print some messages.
-	// Change MODM_LOG_LEVEL above to enable or disable these messages
-	MODM_LOG_DEBUG   << "debug"   << modm::endl;
-	MODM_LOG_INFO    << "info"    << modm::endl;
-	MODM_LOG_WARNING << "warning" << modm::endl;
-	MODM_LOG_ERROR   << "error"   << modm::endl;
-
-	using Comparator = modm::platform::Comp2;
 
 	Comparator::connect<GpioA7::Inp, GpioA2::Out>();
 

@@ -13,7 +13,6 @@
 
 #include <modm/board.hpp>
 #include <modm/processing/timer.hpp>
-#include <modm/debug/logger.hpp>
 
 /**
  * Example of CAN Hardware on STM32 F0 Discovery Board.
@@ -21,20 +20,6 @@
  * Connect PB8 / PB9 to a CAN transceiver which is connected to a CAN bus.
  *
  */
-
-// Create an IODeviceWrapper around the Uart Peripheral we want to use
-using Usart1 = BufferedUart<UsartHal1>;
-modm::IODeviceWrapper< Usart1, modm::IOBuffer::BlockIfFull > loggerDevice;
-
-// Set all four logger streams to use the UART
-modm::log::Logger modm::log::debug(loggerDevice);
-modm::log::Logger modm::log::info(loggerDevice);
-modm::log::Logger modm::log::warning(loggerDevice);
-modm::log::Logger modm::log::error(loggerDevice);
-
-// Set the log level
-#undef	MODM_LOG_LEVEL
-#define	MODM_LOG_LEVEL modm::log::DEBUG
 
 static void
 displayMessage(const modm::can::Message& message)
@@ -74,10 +59,6 @@ main()
 	Board::initialize();
 
 	Board::LedUp::set();
-
-	// Initialize Usart
-	Usart1::connect<GpioOutputA9::Tx>();
-	Usart1::initialize<Board::SystemClock, 115200_Bd>();
 
 	MODM_LOG_INFO << "CAN Test Program" << modm::endl;
 

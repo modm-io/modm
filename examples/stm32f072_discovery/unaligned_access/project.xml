@@ -6,7 +6,6 @@
   <modules>
     <module>modm:architecture:unaligned</module>
     <module>modm:container</module>
-    <module>modm:platform:gpio</module>
     <module>modm:platform:heap</module>
     <module>modm:build:scons</module>
   </modules>

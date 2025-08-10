@@ -17,9 +17,6 @@
 #include "threads.hpp"
 
 // ----------------------------------------------------------------------------
-// Set the log level
-#undef	MODM_LOG_LEVEL
-#define	MODM_LOG_LEVEL modm::log::INFO
 
 modm::ShortPeriodicTimer timer(5s);
 uint32_t uptime;

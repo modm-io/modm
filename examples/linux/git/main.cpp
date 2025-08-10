@@ -14,9 +14,6 @@
 #include <modm/debug/logger.hpp>
 #include <info_git.h>
 
-// Set the log level
-#undef	MODM_LOG_LEVEL
-#define	MODM_LOG_LEVEL modm::log::INFO
 
 int
 main()

@@ -12,28 +12,16 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
-#include <modm/debug/logger.hpp>
 
 // ----------------------------------------------------------------------------
-// Set the log level
-#undef	MODM_LOG_LEVEL
-#define	MODM_LOG_LEVEL modm::log::INFO
 
 typedef GpioInputB12 AdcIn0;
-
-using Usart2 = BufferedUart<UsartHal2>;
-modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice;
-modm::log::Logger modm::log::info(loggerDevice);
 
 // ----------------------------------------------------------------------------
 int
 main()
 {
 	Board::initialize();
-
-	// initialize Uart2 for MODM_LOG_INFO
-	Usart2::connect<GpioOutputA2::Tx>();
-	Usart2::initialize<Board::SystemClock, 115200_Bd>();
 
 	// initialize Adc4
 	Adc4::initialize(Adc4::ClockMode::Asynchronous, Adc4::Prescaler::Div256,

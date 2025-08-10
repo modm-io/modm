@@ -16,7 +16,6 @@
 #include <modm/architecture/interface/clock.hpp>
 #include <modm/processing.hpp>
 #include <modm/driver/position/vl53l0.hpp>
-#include <modm/debug/logger.hpp>
 
 // Set the log level
 #undef	MODM_LOG_LEVEL

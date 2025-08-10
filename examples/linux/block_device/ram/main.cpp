@@ -14,9 +14,6 @@
 #include <modm/driver/storage/block_device_heap.hpp>
 #include <stdlib.h>
 
-// Set the log level
-#undef	MODM_LOG_LEVEL
-#define	MODM_LOG_LEVEL modm::log::INFO
 
 void printMemoryContent(const uint8_t* address, std::size_t size) {
 	for (std::size_t i = 0; i < size; i++) {

@@ -5,13 +5,9 @@
     <option name=":build:build.path">../../../build/generic/i2c_multiplex</option>
   </options>
   <modules>
-    <module>:debug</module>
-    <module>:platform:gpio</module>
-    <module>:driver</module>
-    <module>:driver:pca9548a</module>
-    <module>:platform:i2c:1</module>
-    <module>:platform:uart:2</module>
-    <module>:processing:fiber</module>
-    <module>:build:scons</module>
+    <module>modm:driver:pca9548a</module>
+    <module>modm:platform:i2c:1</module>
+    <module>modm:processing:fiber</module>
+    <module>modm:build:scons</module>
   </modules>
 </library>

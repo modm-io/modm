@@ -16,7 +16,6 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
-#include <modm/debug/logger.hpp>
 #include <modm/driver/display/ili9341_parallel.hpp>
 #include <modm/driver/bus/tft_memory_bus.hpp>
 #include <modm/ui/display/image.hpp>

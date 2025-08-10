@@ -4,10 +4,7 @@
     <option name="modm:build:build.path">../../../build/blue_pill_f103/can</option>
   </options>
   <modules>
-    <module>modm:debug</module>
     <module>modm:platform:can</module>
-    <module>modm:platform:gpio</module>
-    <module>modm:platform:uart:2</module>
     <module>modm:build:scons</module>
   </modules>
   <collectors>

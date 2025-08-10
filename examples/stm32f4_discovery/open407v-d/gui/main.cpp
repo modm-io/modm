@@ -15,7 +15,6 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
-#include <modm/debug/logger.hpp>
 #include <modm/driver/display/parallel_tft.hpp>
 #include <modm/driver/bus/tft_memory_bus.hpp>
 #include <modm/ui/display/image.hpp>
@@ -30,33 +29,6 @@
 #include "images/bluetooth_12x16.hpp"
 
 using namespace modm::color::html;
-
-// ----------------------------------------------------------------------------
-/*
- * Setup UART Logger
- */
-
-// Set the log level
-#undef	MODM_LOG_LEVEL
-#define	MODM_LOG_LEVEL modm::log::DEBUG
-
-// Create an IODeviceWrapper around the Uart Peripheral we want to use
-using Usart2 = BufferedUart<UsartHal2>;
-modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > loggerDevice;
-
-// Set all four logger streams to use the UART
-modm::log::Logger modm::log::debug(loggerDevice);
-modm::log::Logger modm::log::info(loggerDevice);
-modm::log::Logger modm::log::warning(loggerDevice);
-modm::log::Logger modm::log::error(loggerDevice);
-
-
-void
-initLogger()
-{
-	Usart2::connect<GpioA2::Tx>();
-	Usart2::initialize<Board::SystemClock, 115200_Bd>();
-}
 
 // ----------------------------------------------------------------------------
 
@@ -421,8 +393,6 @@ int
 main()
 {
 	Board::initialize();
-
-	initLogger();
 
 	MODM_LOG_DEBUG << "Hello from modm gui example!" << modm::endl;
 

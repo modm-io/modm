@@ -4,7 +4,6 @@
     <option name="modm:build:build.path">../../../build/nucleo_f446re/flash</option>
   </options>
   <modules>
-    <module>modm:platform:gpio</module>
     <module>modm:platform:flash</module>
     <module>modm:processing:timer</module>
     <module>modm:build:scons</module>

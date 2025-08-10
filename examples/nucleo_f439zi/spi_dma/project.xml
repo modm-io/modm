@@ -4,7 +4,6 @@
     <option name="modm:build:build.path">../../../build/nucleo_f439zi/spi_dma</option>
   </options>
   <modules>
-    <module>modm:platform:gpio</module>
     <module>modm:platform:dma</module>
     <module>modm:platform:spi:1</module>
     <module>modm:build:scons</module>

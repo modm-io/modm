@@ -10,19 +10,8 @@
  */
 
 #include <modm/board.hpp>
-#include <modm/debug.hpp>
 
 using namespace Board;
-
-modm::IODeviceWrapper< Rtt<0>, modm::IOBuffer::DiscardIfFull > rtt_device;
-// Set all four logger streams to use RTT
-modm::log::Logger modm::log::debug(rtt_device);
-modm::log::Logger modm::log::info(rtt_device);
-modm::log::Logger modm::log::warning(rtt_device);
-modm::log::Logger modm::log::error(rtt_device);
-
-#undef MODM_LOG_LEVEL
-#define MODM_LOG_LEVEL modm::log::INFO
 
 
 int main()

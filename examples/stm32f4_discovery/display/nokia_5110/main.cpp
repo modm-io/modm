@@ -20,23 +20,8 @@
 */
 
 #include <modm/board.hpp>
-#include <modm/debug.hpp>
 #include <modm/processing.hpp>
 #include <modm/driver/display/nokia5110.hpp>
-
-using Usart2 = BufferedUart<UsartHal2>;
-modm::IODeviceWrapper< Usart2, modm::IOBuffer::BlockIfFull > device;
-modm::IOStream stream(device);
-
-// Set all four logger streams to use the UART
-modm::log::Logger modm::log::debug(device);
-modm::log::Logger modm::log::info(device);
-modm::log::Logger modm::log::warning(device);
-modm::log::Logger modm::log::error(device);
-
-// Set the log level
-#undef	MODM_LOG_LEVEL
-#define	MODM_LOG_LEVEL modm::log::DEBUG
 
 using namespace Board;
 
@@ -95,9 +80,6 @@ int
 main()
 {
 	Board::initialize();
-
-	Usart2::connect<GpioA2::Tx>();
-	Usart2::initialize<Board::SystemClock, 115200_Bd>();
 
 	MODM_LOG_INFO << "\n\nWelcome to Nokia 5110 display demo!\n\n";
 

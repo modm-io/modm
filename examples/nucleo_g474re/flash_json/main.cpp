@@ -9,7 +9,6 @@
  */
 
 #include <modm/board.hpp>
-#include <modm/debug/logger.hpp>
 #include <nlohmann-json/json.hpp>
 
 #undef MODM_LOG_LEVEL

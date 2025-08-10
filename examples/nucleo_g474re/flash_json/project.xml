@@ -5,8 +5,6 @@
     <option name="modm:platform:cortex-m:linkerscript.flash_reserved">1024*16</option>
   </options>
   <modules>
-    <module>modm:debug</module>
-    <module>modm:platform:gpio</module>
     <module>modm:platform:flash</module>
     <module>modm:nlohmann-json</module>
     <module>modm:build:scons</module>
