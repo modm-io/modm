@@ -1,4 +1,4 @@
 source [find interface/stlink.cfg]
-transport select hla_swd
+transport select swd
 source [find target/{{target}}.cfg]
 reset_config srst_only srst_nogate
