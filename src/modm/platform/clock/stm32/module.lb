@@ -89,6 +89,10 @@ def build(env):
         (target["family"] == "l4" and target["name"][0] in ["p", "q", "r", "s"])
     properties["pllsai_p_usb"] = (target["family"] == "f7") or \
         ((target["family"] == "f4") and target["name"] in ["46", "69", "79"])
+    properties["rtcpre"] = target.family in ["f2", "f4", "f7", "h7", "l0", "l1"]
+    properties["cfgr_rtc"] = "CR" if target.family in ["l0", "l1"] else \
+        ("CFGR1" if target.family in ["h5"]  else "CFGR")
+
 
     if target.family in ["h7"]:
         if target.name in ["a3", "b0", "b3"]:

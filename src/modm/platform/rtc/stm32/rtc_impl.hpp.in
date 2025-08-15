@@ -54,6 +54,12 @@ Rtc::initialize(bool forced)
 		case 320: t2ms = [](uint32_t ticks) -> uint32_t { return ((c_prediv_s - ticks) * 25u) >> 3; }; break;
 		// 37kHz: prediv_a=74, prediv_s=500 -> 1000/500 = 2
 		case 500: t2ms = [](uint32_t ticks) -> uint32_t { return (c_prediv_s - ticks) << 1; }; break;
+		// 250kHz: prediv_a=125, prediv_s=2000 -> 1000/2000 = 1 >> 1
+		case 2000: t2ms = [](uint32_t ticks) -> uint32_t { return (c_prediv_s - ticks) >> 1; }; break;
+		// 320kHz: prediv_a=125, prediv_s=2560 -> 1000/2560 = 25 >> 6
+		case 2560: t2ms = [](uint32_t ticks) -> uint32_t { return ((c_prediv_s - ticks) * 25u) >> 6; }; break;
+		// 1MHz: prediv_a=125, prediv_s=8000 -> 1000/8000 = 1 >> 3
+		case 8000: t2ms = [](uint32_t ticks) -> uint32_t { return (c_prediv_s - ticks) >> 3; }; break;
 		// Otherwise just do the division
 		default: t2ms = [](uint32_t ticks) -> uint32_t { return ((c_prediv_s - ticks) * 1000u) / (c_prediv_s + 1); }; break;
 	}

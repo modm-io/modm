@@ -204,6 +204,16 @@ public:
 		LowSpeedExternalClock = Lse,
 		LowSpeedExternalCrystal = Lse
 	};
+%% if target.family in ["l0", "l1"]
+	enum class
+	RealTimeClockHsePrescaler : uint8_t
+	{
+		Div2 = 0,
+		Div4 = 1,
+		Div8 = 2,
+		Div16 = 3,
+	};
+%% endif
 
 	enum class
 	WatchdogClockSource : uint32_t
@@ -788,8 +798,11 @@ public:
 	enableSystemClock(SystemClockSource src, uint32_t waitCycles = 2048);
 
 	static inline bool
-	enableRealTimeClock(RealTimeClockSource src)
+	enableRealTimeClock(RealTimeClockSource src{% if rtcpre %}, {% if target.family in ["l0", "l1"] %}RealTimeClockHsePrescaler hseDiv = RealTimeClockHsePrescaler::Div16{% else %}uint8_t hseDiv = 0xff{% endif %}{% endif %})
 	{
+%% if rtcpre
+		RCC->{{cfgr_rtc}} = (RCC->{{cfgr_rtc}} & ~RCC_{{cfgr_rtc}}_RTCPRE_Msk) | ((uint8_t(hseDiv) << RCC_{{cfgr_rtc}}_RTCPRE_Pos) & RCC_{{cfgr_rtc}}_RTCPRE_Msk);
+%% endif
 		RCC->{{bdcr}} = (RCC->{{bdcr}} & ~RCC_{{bdcr}}_RTCSEL) | RCC_{{bdcr}}_RTCEN | uint32_t(src);
 		return true;
 	}
