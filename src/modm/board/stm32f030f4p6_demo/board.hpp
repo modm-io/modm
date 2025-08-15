@@ -31,6 +31,7 @@ using namespace modm::literals;
 /// STM32F030 running at 48MHz generated from the external 8MHz crystal
 struct SystemClock
 {
+	static constexpr uint32_t Hse = 8_MHz;
 	static constexpr uint32_t Frequency = 48_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb = Frequency;
@@ -52,15 +53,13 @@ struct SystemClock
 	static constexpr uint32_t Timer16 = Apb;
 	static constexpr uint32_t Timer17 = Apb;
 	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
-	static constexpr uint32_t Rtc = Rcc::LsiFrequency;
+	static constexpr uint32_t Rtc = Hse / 32;
 
 	static bool inline
 	enable()
 	{
-		Rcc::enableLowSpeedInternalClock();
-		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::Lsi);
-
 		Rcc::enableExternalCrystal(); // 8MHz
+		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::ExternalClock);
 
 		// external clock / 1 * 6 = 48MHz
 		const Rcc::PllFactors pllFactors{

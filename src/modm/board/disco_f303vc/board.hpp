@@ -35,6 +35,7 @@ using namespace modm::literals;
 /// supplied by the on-board st-link
 struct SystemClock
 {
+	static constexpr uint32_t Hse = 8_MHz;
 	static constexpr uint32_t Frequency = 72_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency / 2;
@@ -89,13 +90,12 @@ struct SystemClock
 
 	static constexpr uint32_t Usb = Ahb / 1.5;
 	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
-	static constexpr uint32_t Rtc = Rcc::LsiFrequency;
+	static constexpr uint32_t Rtc = Hse / 32;
 
 	static bool inline
 	enable()
 	{
-		Rcc::enableLowSpeedInternalClock();
-		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::Lsi);
+		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::ExternalClock);
 
 		Rcc::enableExternalClock();	// 8MHz
 		const Rcc::PllFactors pllFactors{

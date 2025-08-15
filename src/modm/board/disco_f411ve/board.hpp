@@ -29,6 +29,7 @@ using namespace modm::literals;
 /// STM32F411 running at 96MHz generated from the external 8MHz crystal
 struct SystemClock
 {
+	static constexpr uint32_t Hse = 8_MHz;
 	static constexpr uint32_t Frequency = 96_MHz;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency / 2;
@@ -68,15 +69,14 @@ struct SystemClock
 
 	static constexpr uint32_t Usb = 48_MHz;
 	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
-	static constexpr uint32_t Rtc = Rcc::LsiFrequency;
+	static constexpr uint32_t Rtc = Hse / 25;
 
 	static bool inline
 	enable()
 	{
-		Rcc::enableLowSpeedInternalClock();
-		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::Lsi);
-
 		Rcc::enableExternalCrystal();  // 8MHz
+		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::ExternalClock, 25);
+
 		const Rcc::PllFactors pllFactors{
 			.pllM = 7,    // 8MHz / M=7 -> ~1.14MHz
 			.pllN = 336,  // 1.14MHz * N=336 -> 384MHz
