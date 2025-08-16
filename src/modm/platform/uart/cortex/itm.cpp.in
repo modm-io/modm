@@ -10,6 +10,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/platform/device.hpp>
+#include <modm/processing/fiber.hpp>
 #include "itm.hpp"
 
 %% if options["buffer.tx"]
@@ -74,14 +75,18 @@ Itm::enable(uint8_t prescaler)
 void
 Itm::writeBlocking(uint8_t data)
 {
-	while(not write(data)) ;
+	modm::this_fiber::poll([&]{ return write(data); });
 }
 
 void
 Itm::flushWriteBuffer()
 {
 %% if options["buffer.tx"]
-	while(!isWriteFinished()) update();
+	while(!isWriteFinished())
+	{
+		update();
+		modm::this_fiber::yield();
+	}
 %% else
 	return;
 %% endif
@@ -91,6 +96,7 @@ bool
 Itm::write(uint8_t data)
 {
 %% if options["buffer.tx"]
+	update();
 	if (txBuffer.push(data)) return true;
 	update();
 	return txBuffer.push(data);
@@ -107,16 +113,6 @@ Itm::write(const uint8_t *data, std::size_t length)
 		if (not write(*data++))
 			return sent;
 	return sent;
-}
-
-bool
-Itm::isWriteFinished()
-{
-%% if options["buffer.tx"]
-	return txBuffer.isEmpty();
-%% else
-	return true;
-%% endif
 }
 
 std::size_t
@@ -137,6 +133,16 @@ Itm::discardTransmitBuffer()
 #pragma push_macro("PORT")
 #undef PORT
 %% endif
+
+bool
+Itm::isWriteFinished()
+{
+%% if options["buffer.tx"]
+	return txBuffer.isEmpty() and ITM->PORT[0].u32 != 0;
+%% else
+	return ITM->PORT[0].u32 != 0;
+%% endif
+}
 
 bool
 Itm::write_itm(uint32_t data, uint8_t size)

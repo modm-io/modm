@@ -24,6 +24,7 @@
 #include <modm/architecture/driver/atomic/queue.hpp>
 #include <modm/architecture/interface/atomic_lock.hpp>
 #include <modm/architecture/interface/interrupt.hpp>
+#include <modm/processing/fiber.hpp>
 
 #include "uart_defines.h"
 
@@ -50,12 +51,7 @@ void
 modm::platform::Uart{{ id }}::writeBlocking(uint8_t data)
 {
 	// wait until there is some place in the buffer
-	while (!write(data))
-		;
-
-	// wait until everything has been sent
-	while (!isWriteFinished())
-		;
+	modm::this_fiber::poll([&]{ return write(data); });
 }
 
 void
@@ -67,18 +63,13 @@ modm::platform::Uart{{ id }}::writeBlocking(const uint8_t *data, std::size_t len
 		while (!write(*data++))
 			;
 	}
-
-	// then wait
-	while (!isWriteFinished())
-		;
 }
 
 void
 modm::platform::Uart{{ id }}::flushWriteBuffer()
 {
 	// just wait until the last byte has been sent
-	while (!isWriteFinished())
-		;
+	modm::this_fiber::poll([&]{ return isWriteFinished(); });
 }
 
 // MARK: - write

@@ -17,6 +17,7 @@
 #include <modm/architecture/interface/atomic_lock.hpp>
 #include <modm/architecture/interface/interrupt.hpp>
 #include <modm/platform/core/resets.hpp>
+#include <modm/processing/fiber.hpp>
 
 #include "../device.hpp"
 
@@ -60,7 +61,7 @@ void modm::platform::Uart{{ id }}::unreset()
 void
 modm::platform::Uart{{ id }}::writeBlocking(uint8_t data)
 {
-	while (not write(data));
+	modm::this_fiber::poll([&]{ return write(data); });
 }
 
 void
@@ -72,7 +73,7 @@ modm::platform::Uart{{ id }}::writeBlocking(const uint8_t *data, std::size_t len
 void
 modm::platform::Uart{{ id }}::flushWriteBuffer()
 {
-	while(!isWriteFinished());
+	modm::this_fiber::poll([&]{ return isWriteFinished(); });
 }
 
 // ----------------------------------------------------------------------------

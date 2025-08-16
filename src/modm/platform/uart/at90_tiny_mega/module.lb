@@ -42,7 +42,6 @@ class Instance(Module):
         module.description = "Instance {}".format(self.instance)
 
     def prepare(self, module, options):
-        module.depends(":platform:uart")
         load_options(module)
         return True
 
@@ -77,6 +76,7 @@ def prepare(module, options):
         ":architecture:atomic",
         ":architecture:interrupt",
         ":architecture:uart",
+        ":architecture:fiber",
         ":math:algorithm",
         ":platform:gpio")
 

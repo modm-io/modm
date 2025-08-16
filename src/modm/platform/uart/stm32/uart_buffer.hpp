@@ -110,7 +110,7 @@ public:
 	}
 
 	static void
-	flushWriteBuffer() { while(not isWriteFinished()); }
+	flushWriteBuffer() { modm::this_fiber::poll([&]{ return isWriteFinished(); }); }
 
 	static bool
 	isWriteFinished() { return txBuffer.isEmpty() and Hal::isTransmitRegisterEmpty(); }

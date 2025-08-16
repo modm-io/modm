@@ -23,6 +23,7 @@ def prepare(module, options):
 
     module.depends(
         ":architecture:uart",
+        ":architecture:fiber",
         ":cmsis:device")
 
     module.add_option(

@@ -21,6 +21,7 @@
 #include <modm/architecture/interface/uart.hpp>
 #include <modm/platform/gpio/connector.hpp>
 #include <modm/architecture/interface/atomic_lock.hpp>
+#include <modm/processing/fiber.hpp>
 #include "uart_base.hpp"
 
 namespace modm::platform
@@ -73,7 +74,7 @@ struct BufferedUart : public UartBase, public ::modm::Uart
 	static void
 	writeBlocking(uint8_t data)
 	{
-		while(!Hal::isTransmitRegisterEmpty());
+		modm::this_fiber::poll([&]{ return Hal::isTransmitRegisterEmpty(); });
 		Hal::write(data);
 	}
 
@@ -86,7 +87,10 @@ struct BufferedUart : public UartBase, public ::modm::Uart
 	}
 
 	static void
-	flushWriteBuffer() { while(!isWriteFinished()); }
+	flushWriteBuffer()
+	{
+		modm::this_fiber::poll([&]{ return isWriteFinished(); });
+	}
 
 	static bool
 	write(uint8_t data)

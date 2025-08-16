@@ -61,6 +61,7 @@ def prepare(module, options):
         ":platform:gpio",
         ":platform:clockgen",
         ":architecture:uart",
+        ":architecture:fiber",
         ":architecture:interrupt")
 
     for instance in listify(device.get_driver("uart")["instance"]):

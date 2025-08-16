@@ -15,6 +15,7 @@
 #include "../device.hpp"
 #include "uart_hal_{{ id }}.hpp"
 #include "uart_{{ id }}.hpp"
+#include <modm/processing/fiber.hpp>
 
 namespace modm::platform
 {
@@ -22,7 +23,7 @@ namespace modm::platform
 void
 {{ name }}::writeBlocking(uint8_t data)
 {
-	while(!{{ hal }}::isTransmitRegisterEmpty());
+	modm::this_fiber::poll([&]{ return {{ hal }}::isTransmitRegisterEmpty(); });
 	{{ hal }}::write(data);
 }
 
@@ -37,7 +38,7 @@ void
 void
 {{ name }}::flushWriteBuffer()
 {
-	return;
+	modm::this_fiber::poll([&]{ return isWriteFinished(); });
 }
 
 bool

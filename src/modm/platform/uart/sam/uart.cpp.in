@@ -13,6 +13,7 @@
 #include "{{ type }}_{{ id }}.hpp"
 
 #include <modm/architecture/driver/atomic/queue.hpp>
+#include <modm/processing/fiber.hpp>
 
 %% set name="{}{}".format(type.capitalize(), id)
 %% set reg=name.upper()
@@ -111,7 +112,7 @@ bool
 void
 {{ name }}::flushWriteBuffer()
 {
-	while(!isWriteFinished());
+	modm::this_fiber::poll([&]{ return isWriteFinished(); });
 }
 
 void
