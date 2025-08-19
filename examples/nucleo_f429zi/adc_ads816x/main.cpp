@@ -36,6 +36,7 @@ main()
 
 	SpiMaster::initialize<Board::SystemClock, 10_MHz>();
 	SpiMaster::connect<Sck::Sck, Mosi::Mosi, Miso::Miso>();
+	adc.configureBus();
 
 	Rst::setOutput();
 	Cs::setOutput(true);

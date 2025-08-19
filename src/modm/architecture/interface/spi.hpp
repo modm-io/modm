@@ -15,6 +15,7 @@
 #ifndef MODM_INTERFACE_SPI_HPP
 #define MODM_INTERFACE_SPI_HPP
 
+#include <compare>
 #include <modm/architecture/interface/peripheral.hpp>
 
 namespace modm
@@ -43,6 +44,15 @@ struct Spi
 		MsbFirst = 0b0,
 		LsbFirst = 0b1,
 	};
+};
+
+template <typename SpiMaster>
+struct SpiConfiguration
+{
+	SpiMaster::DataMode dataMode{};
+	SpiMaster::DataOrder dataOrder{};
+
+	constexpr auto operator<=>(const SpiConfiguration&) const = default;
 };
 
 } // namespace modm
