@@ -22,7 +22,7 @@ namespace modm::amnb
 /// @author	Niklas Hauser
 /// @ingroup modm_communication_amnb
 template < size_t TxBufferSize = 2, size_t MaxHeapAllocation = 0 >
-class Node : public modm::Resumable<6>
+class Node
 {
 	static_assert(2 <= TxBufferSize, "TxBuffer must have at least two messages!");
 public:
@@ -90,122 +90,113 @@ public:
 	}
 
 	template< class ReturnType = void, class ErrorType = void >
-	modm::ResumableResult< Result<ReturnType, ErrorType> >
+	Result<ReturnType, ErrorType>
 	request(uint8_t from, uint8_t command)
 	{
-		RF_BEGIN(0);
 		request_msg = Message(from, command, Type::Request);
-		RF_CALL(request());
-		RF_END_RETURN(request_msg);
+		request();
+		return request_msg;
 	}
 
 	template< class ReturnType = void, class ErrorType = void >
-	modm::ResumableResult< Result<ReturnType, ErrorType> >
+	Result<ReturnType, ErrorType>
 	request(uint8_t from, uint8_t command, const uint8_t *data, size_t length)
 	{
-		RF_BEGIN(1);
 		{
 			request_msg = Message(from, command, length, Type::Request);
 			uint8_t* arg = request_msg.get<uint8_t>();
 			if (arg == nullptr) {
 				request_msg = Response(Error::RequestAllocationFailed).msg;
-				RF_RETURN(request_msg);
+				return request_msg;
 			}
 			std::memcpy(arg, data, length);
 		}
-		RF_CALL(request());
-		RF_END_RETURN(request_msg);
+		request();
+		return request_msg;
 	}
 
 	template< class ReturnType = void, class ErrorType = void, class T >
-	modm::ResumableResult< Result<ReturnType, ErrorType> >
+	Result<ReturnType, ErrorType>
 	request(uint8_t from, uint8_t command, const T &argument)
 	{
 		return request<ReturnType, ErrorType>(from, command, (uint8_t*)&argument, sizeof(T));
 	}
 
 public:
-	modm::ResumableResult<void>
+	void
 	update_transmit()
 	{
-		RF_BEGIN(2);
 		while(1)
 		{
 			if (not tx_queue.isEmpty())
 			{
-				RF_WAIT_WHILE(isResumableRunning(3));
-				RF_CALL(send(tx_queue.get()));
+				modm::this_fiber::poll([&]{ return not is_sending; });
+				send(tx_queue.get());
 				tx_queue.pop();
 			}
-			RF_YIELD();
+			modm::this_fiber::yield();
 		}
-		RF_END();
 	}
 
-	modm::ResumableResult<void>
+	void
 	update_receive()
 	{
-		RF_BEGIN(5);
 		while(1)
 		{
 			rx_msg.deallocate();	// deallocates previous message
-			if (RF_CALL(interface.receiveHeader(&rx_msg)) == InterfaceStatus::Ok)
+			if (interface.receiveHeader(&rx_msg) == InterfaceStatus::Ok)
 			{
 				// Check lists if we are interested in this message
 				is_rx_msg_for_us = handleRxMessage(false);
 				// Receive the message data, only allocate if it's for us
-				if (RF_CALL(interface.receiveData(&rx_msg, is_rx_msg_for_us)) == InterfaceStatus::Ok)
+				if (interface.receiveData(&rx_msg, is_rx_msg_for_us) == InterfaceStatus::Ok)
 				{
 					// Only handle message *with* data if it's for us
 					if (is_rx_msg_for_us) handleRxMessage(true);
 				}
 			}
-			RF_YIELD();
+			modm::this_fiber::yield();
 		}
-		RF_END();
 	}
 
 protected:
-	modm::ResumableResult<void>
+	void
 	send(Message &msg)
 	{
-		RF_BEGIN(3);
-
+		is_sending = true;
 		msg.setValid();
 		tx_counter = std::min(MIN_TX_TRIES, uint8_t(msg.command() >> (8 - PRIORITY_BITS)));
 		while(1)
 		{
 			while (interface.isMediumBusy())
 			{
-				RF_WAIT_WHILE(interface.isMediumBusy());
+				modm::this_fiber::poll([&]{ return not interface.isMediumBusy(); });
 				reschedule(RESCHEDULE_MASK_SHORT);
-				RF_WAIT_UNTIL(tx_timer.isExpired());
+				modm::this_fiber::poll([&]{ return tx_timer.isExpired(); });
 			}
 
-			if (RF_CALL(interface.transmit(&msg)) == InterfaceStatus::Ok)
+			if (interface.transmit(&msg) == InterfaceStatus::Ok)
 				break;
 
 			if (--tx_counter == 0) break;
 
 			// a collision or other write issue occurred
-			RF_WAIT_WHILE(interface.isMediumBusy());
+			modm::this_fiber::poll([&]{ return not interface.isMediumBusy(); });
 			reschedule(RESCHEDULE_MASK_LONG);
-			RF_WAIT_UNTIL(tx_timer.isExpired());
+			modm::this_fiber::poll([&]{ return tx_timer.isExpired(); });
 		}
-		RF_END();
+		is_sending = false;
 	}
 
-	modm::ResumableResult<void>
+	void
 	request()
 	{
-		RF_BEGIN(4);
-
-		RF_WAIT_WHILE(isResumableRunning(3));
+		modm::this_fiber::poll([&]{ return not is_sending; });
 		response_status = ResponseStatus::Waiting;
-		RF_CALL(send(request_msg));
+		send(request_msg);
 
 		response_timer.restart(1s);
-		RF_WAIT_UNTIL((response_status == ResponseStatus::Received) or response_timer.isExpired());
+		modm::this_fiber::poll([&]{ return (response_status == ResponseStatus::Received) or response_timer.isExpired(); });
 		response_status = ResponseStatus::NotWaiting;
 
 		if (response_timer.isExpired()) {
@@ -213,7 +204,6 @@ protected:
 			*request_msg.get<Error>() = Error::RequestTimeout;
 		}
 
-		RF_END();
 	}
 
 protected:
@@ -306,6 +296,7 @@ protected:
 	const uint8_t actionCount{0};
 	const uint8_t listenerCount{0};
 	uint8_t address;
+	bool is_sending{false};
 
 	uint8_t tx_counter;
 	bool is_rx_msg_for_us;

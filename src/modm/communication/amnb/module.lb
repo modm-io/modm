@@ -17,7 +17,7 @@ def init(module):
 def prepare(module, options):
     module.depends(
         ":math:utils",
-        ":processing:resumable",
+        ":architecture:fiber",
         ":processing:timer",
         ":container",
         ":utils")

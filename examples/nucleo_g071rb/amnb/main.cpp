@@ -36,16 +36,14 @@ Listener listeners[] =
 };
 Action actions[] =
 {
-	{1, []() -> Response
+	{1, [counter=uint8_t{}]() mutable -> Response
 		{
-			static uint8_t counter{0};
 			MODM_LOG_INFO << "Node1 or Node3 received Action 1" << modm::endl;
 			return counter++;
 		}
 	},
-	{2, [](const uint32_t& data) -> Response
+	{2, [counter=uint8_t{}](const uint32_t& data) mutable -> Response
 		{
-			static uint8_t counter{0};
 			MODM_LOG_INFO << "Node1 or Node3 received Action 2 with argument: " << data << modm::endl;
 			return ErrorResponse(counter++);
 		}
@@ -82,15 +80,17 @@ modm::Fiber fiber_demo([]
 		node1.broadcast(1, counter++);
 		node3.broadcast(2);
 
-		auto res1 = node2.request<uint8_t>(1, 1);
+		auto res1 = node1.request<uint8_t>(1, 1);
 		MODM_LOG_INFO << "Node1 responded with: " << res1.error();
-		if (res1) { MODM_LOG_INFO << " " << *res1 << modm::endl; }
+		if (res1) { MODM_LOG_INFO << " " << *res1; }
+		MODM_LOG_INFO << modm::endl;
 
 		auto res2 = node1.request<uint8_t, uint8_t>(3, 2, counter);
-		MODM_LOG_INFO << "Node3 responded with: " << res2.error();
+		MODM_LOG_INFO << "Node1 responded with: " << res2.error();
 		if (res2.hasUserError()) {
-			MODM_LOG_INFO << " " << *res2.userError() << modm::endl;
+			MODM_LOG_INFO << " " << *res2.userError();
 		}
+		MODM_LOG_INFO << modm::endl;
 
 		if (counter % 10 == 0)
 		{
