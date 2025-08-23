@@ -19,7 +19,7 @@ def prepare(module, options):
     module.depends(
         ":architecture:i2c.device",
         ":architecture:spi.device",
-        ":processing:resumable")
+        ":architecture:fiber")
     return True
 
 def build(env):

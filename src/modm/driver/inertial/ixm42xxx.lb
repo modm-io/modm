@@ -34,7 +34,7 @@ def prepare(module, options):
         ":architecture:spi.device",
         ":math:geometry",
         ":math:utils",
-        ":processing:resumable")
+        ":architecture:fiber")
     return True
 
 def build(env):

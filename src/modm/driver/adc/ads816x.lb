@@ -33,7 +33,7 @@ def prepare(module, options):
         ":architecture:gpio",
         ":architecture:spi.device",
         ":io",
-        ":processing:resumable",
+        ":architecture:fiber",
         ":processing:timer")
     return True
 

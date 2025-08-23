@@ -94,7 +94,6 @@ class BlockDevice(Module):
         module.description = "Block Devices"
 
     def prepare(self, module, options):
-        module.depends(":processing:resumable")
         return True
 
     def build(self, env):
@@ -203,8 +202,7 @@ class GpioExpander(Module):
         module.description = "GPIO Expanders"
 
     def prepare(self, module, options):
-        module.depends(":architecture:gpio", ":architecture:register",
-                       ":processing:resumable", ":math:utils")
+        module.depends(":architecture:gpio", ":architecture:register", ":math:utils")
         return True
 
     def build(self, env):
@@ -218,7 +216,7 @@ class I2c(Module):
         module.description = "Inter-Integrated Circuit (I²C)"
 
     def prepare(self, module, options):
-        module.depends(":architecture:gpio", ":architecture:delay")
+        module.depends(":architecture:gpio", ":architecture:fiber")
         return True
 
     def build(self, env):
@@ -234,7 +232,7 @@ class I2cDevice(Module):
         module.description = "I²C Devices"
 
     def prepare(self, module, options):
-        module.depends(":architecture:i2c", ":processing:resumable")
+        module.depends(":architecture:i2c", ":architecture:fiber")
         return True
 
     def build(self, env):
@@ -248,8 +246,7 @@ class I2cMultiplexer(Module):
         module.description = "I²C Multiplexer"
 
     def prepare(self, module, options):
-        module.depends(":architecture:i2c", ":architecture:register",
-                       ":processing:resumable", ":math:utils")
+        module.depends(":architecture:i2c")
         return True
 
     def build(self, env):
@@ -317,7 +314,6 @@ class Spi(Module):
         module.description = "Serial Peripheral Interface (SPI)"
 
     def prepare(self, module, options):
-        module.depends(":processing:resumable")
         return True
 
     def build(self, env):

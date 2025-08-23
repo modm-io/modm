@@ -27,7 +27,7 @@ def prepare(module, options):
         ":architecture:spi.device",
         ":architecture:uart.device",
         ":math:utils",
-        ":processing:resumable",
+        ":architecture:fiber",
         ":processing:timer")
     return True
 

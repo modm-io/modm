@@ -24,7 +24,7 @@ def prepare(module, options):
         ":architecture:i2c.device",
         ":architecture:register",
         ":math:utils",
-        ":processing:resumable",
+        ":architecture:fiber",
         ":processing:timer")
     return True
 

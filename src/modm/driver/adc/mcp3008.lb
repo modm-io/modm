@@ -21,7 +21,7 @@ MCP3004/3008 are 10-bit 200 ksps SAR ADCs with SPI interface and 4/8 channels.
 def prepare(module, options):
     module.depends(
         ":architecture:spi.device",
-        ":processing:resumable")
+        ":architecture:fiber")
     return True
 
 def build(env):

@@ -23,7 +23,7 @@ def prepare(module, options):
         ":architecture:spi.device",
         ":debug",
         ":processing:timer",
-        ":processing:resumable")
+        ":architecture:fiber")
     return True
 
 def build(env):

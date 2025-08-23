@@ -26,7 +26,7 @@ def prepare(module, options):
         ":architecture:register",
         ":driver:lis3.transport",
         ":math:utils",
-        ":processing:resumable")
+        ":architecture:fiber")
     return True
 
 def build(env):

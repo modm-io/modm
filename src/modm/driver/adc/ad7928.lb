@@ -28,7 +28,7 @@ def prepare(module, options):
         ":architecture:gpio",
         ":architecture:register",
         ":architecture:spi.device",
-        ":processing:resumable")
+        ":architecture:fiber")
     return True
 
 def build(env):

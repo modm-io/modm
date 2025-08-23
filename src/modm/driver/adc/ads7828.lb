@@ -21,7 +21,7 @@ The ADS7828 is a single-supply, low-power, 12-bit data acquisition device
 def prepare(module, options):
     module.depends(
         ":architecture:i2c.device",
-        ":processing:resumable")
+        ":architecture:fiber")
     return True
 
 def build(env):

@@ -29,7 +29,7 @@ All of these are compatible with the TSC2046.
 def prepare(module, options):
     module.depends(
         ":architecture:spi.device",
-        ":processing:resumable")
+        ":architecture:fiber")
     return True
 
 def build(env):

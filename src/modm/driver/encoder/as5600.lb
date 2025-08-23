@@ -22,7 +22,7 @@ def prepare(module, options):
 	module.depends(
 		":architecture:gpio",
 		":architecture:i2c.device",
-		":processing:resumable",
+		":architecture:fiber",
 		":math:geometry"
     )
 	return True

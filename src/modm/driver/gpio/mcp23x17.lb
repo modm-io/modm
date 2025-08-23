@@ -34,7 +34,7 @@ def prepare(module, options):
         ":architecture:i2c.device",
         ":architecture:register",
         ":architecture:spi.device",
-        ":processing:resumable")
+        ":architecture:fiber")
     return True
 
 def build(env):

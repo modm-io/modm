@@ -27,7 +27,7 @@ def prepare(module, options):
     module.depends(
         ":architecture:delay",
         ":architecture:gpio",
-        ":processing:resumable")
+        ":architecture:fiber")
     return True
 
 def build(env):

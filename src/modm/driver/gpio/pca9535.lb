@@ -49,7 +49,7 @@ def prepare(module, options):
         ":architecture:gpio.expander",
         ":architecture:i2c.device",
         ":architecture:register",
-        ":processing:resumable",
+        ":architecture:fiber",
         ":math:utils")
     return True
 

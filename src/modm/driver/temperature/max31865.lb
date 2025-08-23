@@ -23,7 +23,7 @@ def prepare(module, options):
 	module.depends(
 		":architecture:gpio",
 		":architecture:spi.device",
-		":processing:resumable",
+		":architecture:fiber",
 		":processing:timer")
 	return True
 
