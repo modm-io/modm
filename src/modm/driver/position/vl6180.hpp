@@ -361,34 +361,34 @@ public:
 
 	/// Ping the I2C device.
 	/// This overwrites the build-in ping method of I2cDevice with a read of the model number.
-	modm::ResumableResult<bool>
+	bool
 	ping();
 
-	modm::ResumableResult<bool>
+	bool
 	initialize();
 
 	/// Set a new I2C address (< 128) for this device.
 	/// The address is not permanent and must be set again after every device boot.
-	modm::ResumableResult<bool>
+	bool
 	setDeviceAddress(uint8_t address);
 
 	/// Sets a new analog gain for ALS.
-	modm::ResumableResult<bool>
+	bool
 	setGain(AnalogGain gain);
 
 	/// Sets a new integration time for ALS.
 	/// @param	time	integration time in ms, max ~500ms.
-	modm::ResumableResult<bool>
+	bool
 	setIntegrationTime(uint16_t time);
 
 	/// Reads the distance and buffer the results (can take 10-55ms).
-	modm::ResumableResult<bool>
+	bool
 	readDistance()
 	{ return readSensor(true); }
 
 	/// Reads the ambient light and buffer the results.
 	/// This takes as long as the chosen integration time (100ms default).
-	modm::ResumableResult<bool>
+	bool
 	readAmbientLight()
 	{ return readSensor(false); }
 
@@ -402,7 +402,7 @@ public:
 
 
 	template <typename T>
-	modm::ResumableResult<bool>
+	bool
 	updateRegister(Register reg, T setMask, T clearMask = T(0xff))
 	{
 		return updateControlRegister(reg, Control_t(setMask), Control_t(clearMask));
@@ -410,14 +410,14 @@ public:
 
 public:
 	/// write a 8bit value a register
-	modm::ResumableResult<bool>
+	bool
 	write(Register reg, uint8_t value)
 	{ return write(reg, value, 1); }
 
 protected:
 	/// @cond
 	/// read a 8bit value from a register
-	modm::ResumableResult<bool>
+	bool
 	read(Register reg, uint8_t &value)
 	{ return read(reg, &value, 1); }
 	/// @endcond
@@ -431,23 +431,23 @@ public:
 protected:
 	/// @cond
 	/// write multiple 8bit values from a start register
-	modm::ResumableResult<bool>
+	bool
 	write(Register reg, uint8_t value, uint8_t length);
 	/// @endcond
 
 public:
 	/// read multiple 8bit values from a start register
-	modm::ResumableResult<bool>
+	bool
 	read(Register reg, uint8_t *buffer, uint8_t length);
 
 protected:
 	/// @cond
-	modm::ResumableResult<bool>
+	bool
 	updateControlRegister(Register reg, Control_t setMask, Control_t clearMask = Control_t(0xff));
 	/// @endcond
 
 private:
-	modm::ResumableResult<bool>
+	bool
 	readSensor(bool isDistance = true);
 
 private:

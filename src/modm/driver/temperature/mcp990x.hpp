@@ -108,26 +108,26 @@ public:
 	Mcp990x(Data& data, uint8_t address = 0x4d);
 
 	/// Initialize sensor
-	modm::ResumableResult<bool>
+	bool
 	initialize();
 
 	/// Detect sensor
-	modm::ResumableResult<bool>
+	bool
 	ping();
 
 	/// Read internal temperature sensor
 	/// \pre sensor is succesfully initialized
-	modm::ResumableResult<bool>
+	bool
 	readInternalTemperature();
 
 	/// Read external diode temperature sensor
 	/// \pre sensor is succesfully initialized
-	modm::ResumableResult<bool>
+	bool
 	readExternalDiodeTemperature(ExternalDiode diode);
 
 	/// Set external diode ideality factor
 	/// See datasheet for values
-	modm::ResumableResult<bool>
+	bool
 	setExternalDiodeIdealityFactor(ExternalDiode diode, uint8_t idealitySetting);
 
 	inline Data&
@@ -154,13 +154,13 @@ private:
 		Register::Ext3Ideality
 	};
 
-	modm::ResumableResult<bool>
+	bool
 	write(Register reg, uint8_t config);
 
-	modm::ResumableResult<bool>
+	bool
 	read(Register reg, uint8_t& value);
 
-	modm::ResumableResult<bool>
+	bool
 	readTemperature(Register highReg, Register lowReg);
 
 	Data& data_;

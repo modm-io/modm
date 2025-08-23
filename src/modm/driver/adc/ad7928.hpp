@@ -159,24 +159,24 @@ public:
 	Ad7928();
 
 	/// Call this function once before using the device
-	modm::ResumableResult<void>
+	void
 	initialize();
 
 	/// Initiate a single conversion and return the result of the previous conversion
 	/// A running sequence will be aborted.
 	/// If the device is in full shutdown, it will be woken up.
-	modm::ResumableResult<Data>
+	Data
 	singleConversion(InputChannel channel);
 
 	/// Start a conversion sequence.
 	/// The device will automatically cycle through the specified channels, starting
 	/// with the lowest channel index in sequence1, when nextSequenceConversion() is called.
-	modm::ResumableResult<void>
+	void
 	startSequence(SequenceChannels_t channels1, SequenceChannels_t channels2 = SequenceChannels_t(0));
 
 	/// Perform the next sequence conversion
 	/// The result is undefined if the device is not in sequence mode or not in normal power mode.
-	modm::ResumableResult<Data>
+	Data
 	nextSequenceConversion();
 
 	/// Enable extended range mode (0V < input < 2*Vref)
@@ -199,15 +199,15 @@ public:
 
 	/// Shutdown device
 	/// Calling wakeup() or initiating a conversion will wake up the device
-	modm::ResumableResult<void>
+	void
 	fullShutdown();
 
 	/// Wake up the device from full shutdown mode
-	modm::ResumableResult<void>
+	void
 	wakeup();
 
 private:
-	modm::ResumableResult<void>
+	void
 	transfer(Register_t reg);
 
 	ControlRegister_t config;

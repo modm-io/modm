@@ -357,7 +357,7 @@ public:
 	 * \param accScale The full scale of the acceleration data
 	 * \return Whether the configuration was successful
 	 */
-	modm::ResumableResult<bool>
+	bool
 	configureAccelerationSensor(AccDataRate accRate, AccScale accScale);
 
 	/**
@@ -369,7 +369,7 @@ public:
 	 * \param accScale The full scale of the spin rate data
 	 * \return Whether the configuration was successful
 	 */
-	modm::ResumableResult<bool>
+	bool
 	configureGyroscope(GyroDataRate gyroRate, GyroScale gyroScale);
 
 	/**
@@ -378,7 +378,7 @@ public:
 	 * @param acceleration A reference to a Vector3i object the data will be written to
 	 * @return Whether the sensor data have been read
 	 */
-	modm::ResumableResult<bool>
+	bool
 	readAccelerationRaw(Vector3i& acceleration);
 
 	/**
@@ -387,7 +387,7 @@ public:
 	 * @param spinRates A reference to a Vector3i object the data will be written to
 	 * @return Whether the sensor data have been read
 	 */
-	modm::ResumableResult<bool>
+	bool
 	readGyroscopeRaw(Vector3i& spinRates);
 
 	/**
@@ -413,7 +413,7 @@ public:
 	 * \param acceleration A reference to a Vector3f object the data will be written to
 	 * \return Whether the sensor data have been read
 	 */
-	modm::ResumableResult<bool>
+	bool
 	readAcceleration(Vector3f& acceleration);
 
 	/**
@@ -422,7 +422,7 @@ public:
 	 * \param spinRates A reference to a Vector3f object the data will be written to
 	 * \return Whether the sensor data have been read
 	 */
-	modm::ResumableResult<bool>
+	bool
 	readGyroscope(Vector3f& spinRates);
 
 private:

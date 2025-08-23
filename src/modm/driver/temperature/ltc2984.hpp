@@ -358,7 +358,7 @@ public:
 	 *
 	 * \return	config	True if the device is reachable.
 	 */
-	modm::ResumableResult<bool>
+	bool
 	ping();
 
 	/**
@@ -369,7 +369,7 @@ public:
 	 * \param	temperatureUnit	Temperature unit to use, °C or °F
 	 * \param	muxDelay		Mux configuration delay in 100 microseconds (maximum: 255 x 100us = 25.5ms)
 	 */
-	modm::ResumableResult<void>
+	void
 	configure(ltc2984::Configuration::Rejection rejection,
 	          ltc2984::Configuration::TemperatureUnit temperatureUnit,
 	          uint8_t muxDelay = 0);
@@ -380,7 +380,7 @@ public:
 	 *
 	 * \return True if device is busy.
 	 */
-	modm::ResumableResult<bool>
+	bool
 	isBusy();
 
 	/**
@@ -389,7 +389,7 @@ public:
 	 * \param	channel	The channel to configure.
 	 * \param	config	The configuration for the channel.
 	 */
-	modm::ResumableResult<void>
+	void
 	configureChannel(ltc2984::Channel channel, uint32_t config);
 
 	/**
@@ -397,13 +397,13 @@ public:
 	 *
 	 * \param	channel	The channel to measure.
 	 */
-	modm::ResumableResult<void>
+	void
 	initiateSingleMeasurement(ltc2984::Channel channel);
 
 	/**
 	 * \brief	Initiate measurements for all actived channels
 	 */
-	modm::ResumableResult<void>
+	void
 	initiateMeasurements();
 
 	/**
@@ -429,13 +429,13 @@ public:
 	/**
 	 * \brief	Write actived channel configuartion to device
 	 */
-	modm::ResumableResult<void>
+	void
 	setChannels();
 
 	/**
 	 * \brief	Enter sleep mode
 	 */
-	modm::ResumableResult<void>
+	void
 	enterSleepMode();
 
 	/**
@@ -445,20 +445,20 @@ public:
 	 * \param	value	The temperature value as configured before.
 	 * \return	True if result is valid.
 	 */
-	modm::ResumableResult<void>
+	void
 	readChannel(ltc2984::Channel channel, ltc2984::Data& value);
 
 protected:
 	/// Write 32-bit word to ltc2984 memory
-	modm::ResumableResult<void>
+	void
 	writeData(Register address, uint8_t* word, size_t length);
-	modm::ResumableResult<void>
+	void
 	writeData(Register address, CommandStatus command);
 
 	/// Read 32-bit word to ltc2984 memory
-	modm::ResumableResult<void>
+	void
 	readFourBytes(Register address, uint8_t* data);
-	modm::ResumableResult<void>
+	void
 	readByte(Register address, uint8_t& byte);
 
 private:

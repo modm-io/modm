@@ -119,47 +119,47 @@ public:
 	bool
 	update();
 
-	modm::ResumableResult<bool>
+	bool
 	initialize();
 
 	// @param	rate	Update rate in Hz: 1 to 33.
-	modm::ResumableResult<bool>
+	bool
 	setUpdateRate(uint8_t rate);
 
-	modm::ResumableResult<bool>
+	bool
 	setResolution(Resolution resolution);
 
-	modm::ResumableResult<bool>
+	bool
 	setAlertPolarity(AlertPolarity polarity);
 
-	modm::ResumableResult<bool>
+	bool
 	setConversionMode(ConversionMode mode);
 
 	/// Writes the upper limit of the alarm.
-	modm::ResumableResult<bool>
+	bool
 	setUpperLimit(float temperature)
 	{ return setLimitRegister(Command::TemperatureUpperLimit, temperature); }
 
 	/// Writes the lower limit of the alarm.
-	modm::ResumableResult<bool>
+	bool
 	setLowerLimit(float temperature)
 	{ return setLimitRegister(Command::TemperatureLowerLimit, temperature); }
 
 
 	/// reads the Temperature registers and buffers the results
-	modm::ResumableResult<bool>
+	bool
 	readTemperature();
 
 
-	modm::ResumableResult<bool>
+	bool
 	startConversion()
 	{ return writeCommand(Command::StartConvert); }
 
-	modm::ResumableResult<bool>
+	bool
 	stopConversion()
 	{ return writeCommand(Command::StopConvert); }
 
-	modm::ResumableResult<bool>
+	bool
 	reset()
 	{ return writeCommand(Command::SoftwareReset); }
 
@@ -169,13 +169,13 @@ public:
 	{ return data; }
 
 private:
-	modm::ResumableResult<bool>
+	bool
 	writeCommand(Command cmd);
 
-	modm::ResumableResult<bool>
+	bool
 	writeConfiguration();
 
-	modm::ResumableResult<bool>
+	bool
 	setLimitRegister(Command cmd, float temperature);
 
 	Data &data;

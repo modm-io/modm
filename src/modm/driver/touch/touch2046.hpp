@@ -86,7 +86,7 @@ public:
 	 *
 	 * \return	Position and intensity of touch point. Full int16_t range.
 	 */
-	modm::ResumableResult<std::tuple<uint16_t,uint16_t,uint16_t>>
+	std::tuple<uint16_t,uint16_t,uint16_t>
 	getRawValues();
 
 	/**
@@ -94,7 +94,7 @@ public:
 	 *
 	 * \return bool true if screen is touched
 	 */
-	modm::ResumableResult<bool>
+	bool
 	isTouched();
 
 	/**
@@ -102,7 +102,7 @@ public:
 	 *
 	 * \return	Position (X, Y) of touch point.
 	 */
-	modm::ResumableResult<std::tuple<uint16_t,uint16_t>>
+	std::tuple<uint16_t,uint16_t>
 	getTouchPosition();
 
 private:

@@ -126,7 +126,7 @@ public:
      *      The ads7828 has an internal reference which can be on or off, and the adc itself can be on or off.
      *		INTERNAL_REFERENCE_mode_ADC_mode, where mode is either ON or OFF. Does not have to be the same
         */
-    modm::ResumableResult<bool>
+    bool
     startMeasurement(InputChannel input);
 
     /**
@@ -136,13 +136,13 @@ public:
      *      PD1 = 1 to have internal reference ON
      *      PD0 = 1 to have A/D converter ON
      */
-    modm::ResumableResult<bool>
+    bool
     setPowerDownSelection(PowerDown powerDownSelection);
 
     /**
      * @brief Reads the latest measurement result
      **/
-    modm::ResumableResult<bool>
+    bool
     readConversionResult();
 
     inline Data &

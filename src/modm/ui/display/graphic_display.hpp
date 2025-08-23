@@ -74,8 +74,7 @@ public:
 	virtual uint16_t
 	getHeight() const = 0;
 
-	// TODO Requires all inherited drivers work with resumable functions
-	// virtual modm::ResumableResult<bool>
+	// virtual bool
 	// setOrientation() = 0;
 
 	/**
@@ -142,8 +141,7 @@ public:
 	virtual void
 	update() = 0;
 
-	// TODO Requires all inherited drivers work with resumable functions
-	// modm::ResumableResult<bool>
+	// bool
 	// writeDisplay();
 
 	// TODO Set a clipping area

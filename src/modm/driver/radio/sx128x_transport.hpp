@@ -90,13 +90,13 @@ public:
     Sx128xTransportSpi() = default;
 
 protected:
-    modm::ResumableResult<bool>
+    bool
     writeCommandSingleData(Command command, uint8_t *data = nullptr);
 
-    modm::ResumableResult<bool>
+    bool
     writeCommand(Command command, std::span<const uint8_t> data);
 
-    modm::ResumableResult<bool>
+    bool
     readCommand(Command command, std::span<uint8_t> data);
 
 private:
@@ -118,13 +118,13 @@ public:
     Sx128xTransportUart() = default;
 
 protected:
-    modm::ResumableResult<bool>
+    bool
     writeCommandSingleData(Command command, uint8_t *data = nullptr);
 
-    modm::ResumableResult<bool>
+    bool
     writeCommand(Command command, std::span<const uint8_t> data);
 
-    modm::ResumableResult<bool>
+    bool
     readCommand(Command command, std::span<uint8_t> data);
 
 private:

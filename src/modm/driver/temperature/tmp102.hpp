@@ -123,39 +123,39 @@ public:
 
 	// MARK: Configuration
 	// @param	rate	Update rate in Hz: 0 to 33. (Use 0 to update at 0.25Hz).
-	modm::ResumableResult<bool>
+	bool
 	setUpdateRate(uint8_t rate);
 
 	/// Enables extended mode with 13 bit data format.
-	modm::ResumableResult<bool>
+	bool
 	enableExtendedMode(bool enable = true);
 
 	/// param[out]	result	contains comparator mode alert in the configured polarity
-	modm::ResumableResult<bool>
+	bool
 	readComparatorMode(bool &result);
 
 	/// Writes the upper limit of the alarm.
-	modm::ResumableResult<bool>
+	bool
 	setUpperLimit(float temperature)
 	{ return setLimitRegister(Register::TemperatureUpperLimit, temperature); }
 
 	/// Writes the lower limit of the alarm.
-	modm::ResumableResult<bool>
+	bool
 	setLowerLimit(float temperature)
 	{ return setLimitRegister(Register::TemperatureLowerLimit, temperature); }
 
 	/// starts a temperature conversion right now
-	modm::ResumableResult<bool>
+	bool
 	startConversion();
 
 	inline Data&
 	getData();
 
 private:
-	modm::ResumableResult<bool>
+	bool
 	writeConfiguration(uint8_t length=3);
 
-	modm::ResumableResult<bool>
+	bool
 	setLimitRegister(Register reg, float temperature);
 
 	uint16_t updateTime;

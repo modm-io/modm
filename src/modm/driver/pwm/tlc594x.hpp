@@ -110,11 +110,11 @@ public:
 	getDotCorrection(uint16_t channel);
 
 	/// transfer channel data to driver chip
-	modm::ResumableResult<void>
+	void
 	writeChannels(bool flush=true);
 
 	/// transfer dot correction data to driver chip
-	modm::ResumableResult<void>
+	void
 	writeDotCorrection(bool flush=true);
 
 	/// writes data from the input shift register to either GS or DC register.

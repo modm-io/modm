@@ -102,7 +102,7 @@ public:
 	As5047(Data &data);
 
 	/// Read the raw data from the sensor
-	modm::ResumableResult<void>
+	void
 	read();
 
 	/// Get the data object for this sensor

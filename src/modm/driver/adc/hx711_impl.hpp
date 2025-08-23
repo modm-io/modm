@@ -17,7 +17,7 @@ namespace modm
 {
 
 template <typename Cfg>
-ResumableResult<int32_t>
+int32_t
 Hx711<Cfg>::singleConversion()
 {
 	modm::this_fiber::poll([&]{ return Data::read() == modm::Gpio::Low; });

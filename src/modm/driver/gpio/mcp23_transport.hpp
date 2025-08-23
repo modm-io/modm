@@ -41,22 +41,22 @@ public:
 protected:
 	// RAW REGISTER ACCESS
 	/// write a 8bit value
-	modm::ResumableResult<bool>
+	bool
 	write(uint8_t reg, uint8_t value);
 
 	/// write a 16bit value
-	modm::ResumableResult<bool>
+	bool
 	write16(uint8_t reg, uint16_t value);
 
 	/// read a 8bit value
-	modm::ResumableResult<bool>
+	bool
 	read(uint8_t reg, uint8_t &value)
 	{
 		return read(reg, &value, 1);
 	}
 
 	/// read multiple 8bit values from a start register
-	modm::ResumableResult<bool>
+	bool
 	read(uint8_t reg, uint8_t *buffer, uint8_t length);
 
 private:
@@ -84,28 +84,28 @@ public:
 	Mcp23TransportSpi(uint8_t address);
 
 	/// pings the sensor
-	modm::ResumableResult<bool>
+	bool
 	ping();
 
 protected:
 	// RAW REGISTER ACCESS
 	/// write a 8bit value
-	modm::ResumableResult<bool>
+	bool
 	write(uint8_t reg, uint8_t value);
 
 	/// write a 16bit value
-	modm::ResumableResult<bool>
+	bool
 	write16(uint8_t reg, uint16_t value);
 
 	/// read a 8bit value
-	modm::ResumableResult<bool>
+	bool
 	read(uint8_t reg, uint8_t &value)
 	{
 		return read(reg, &value, 1);
 	}
 
 	/// read multiple 8bit values from a start register
-	modm::ResumableResult<bool>
+	bool
 	read(uint8_t reg, uint8_t *buffer, uint8_t length);
 
 private:

@@ -40,15 +40,15 @@ public:
 protected:
     // RAW REGISTER ACCESS
     /// write a 8bit value
-    modm::ResumableResult<bool>
+    bool
     write(uint8_t reg, uint8_t value);
 
     /// read a 8bit value
-    modm::ResumableResult<bool>
+    bool
     read(uint8_t reg, uint8_t &value);
 
     /// read multiple 8bit values from a start register
-    modm::ResumableResult<bool>
+    bool
     read(uint8_t reg, uint8_t *buffer, std::size_t length);
 
 private:
@@ -73,21 +73,21 @@ public:
     Ixm42xxxTransportSpi(uint8_t /*address*/);
 
     /// pings the sensor
-    modm::ResumableResult<bool>
+    bool
     ping();
 
 protected:
     // RAW REGISTER ACCESS
     /// write a 8bit value
-    modm::ResumableResult<bool>
+    bool
     write(uint8_t reg, uint8_t value);
 
     /// read a 8bit value
-    modm::ResumableResult<bool>
+    bool
     read(uint8_t reg, uint8_t &value);
 
     /// read multiple 8bit values from a start register
-    modm::ResumableResult<bool>
+    bool
     read(uint8_t reg, uint8_t *buffer, std::size_t length);
 
 private:

@@ -39,7 +39,7 @@ public:
 	/**
 	 * \brief Initialize the modem into Lora mode
 	 */
-	modm::ResumableResult<void>
+	void
 	initialize();
 
 	/**
@@ -51,7 +51,7 @@ public:
 	 * \param implicitHeader Run the modem in implicit header mode
 	 * \param payloadCrc Append CRC checksums to validate the packages
 	 */
-	modm::ResumableResult<void>
+	void
 	setModemParams( Bandwidth bw,
 					SpreadingFactor sf,
 					CodingRate cr,
@@ -63,7 +63,7 @@ public:
 	 *
 	 * \param freq The Carrier frequency the modem will be tuned to
 	 */
-	modm::ResumableResult<void>
+	void
 	setCarrierFrequency(frequency_t freq);
 
 	/**
@@ -71,7 +71,7 @@ public:
 	 *
 	 * \param syncWord The new sync word of upcoming lora packages
 	 */
-	modm::ResumableResult<void>
+	void
 	setSyncWord(uint8_t syncWord);
 
 	/**
@@ -81,19 +81,19 @@ public:
 	 * \param length The length of the payload data in bytes
 	 * \return Returns true if transmission has started. False if the buffer was already sending
 	 */
-	modm::ResumableResult<bool>
+	bool
 	transmit(uint8_t* data, uint8_t length);
 
 	/**
 	 * \brief Enable the Rx mode and start listening for packages
 	 */
-	modm::ResumableResult<void>
+	void
 	enableListening();
 
 	/**
 	 * \brief Disable Rx mode
 	 */
-	modm::ResumableResult<void>
+	void
 	disableListening();
 
 	/**
@@ -106,7 +106,7 @@ public:
 	 * \param maxLength The maximum amount of bytes that can be read
 	 * \return The amount of bytes in the last package
 	 */
-	modm::ResumableResult<uint8_t>
+	uint8_t
 	readPacket(uint8_t* data, uint8_t maxLength);
 
 	/**
@@ -114,7 +114,7 @@ public:
 	 *
 	 * \return The raw signal to noise ratio in dB (has to be divided by 4 for the actual value)
 	 */
-	modm::ResumableResult<int8_t>
+	int8_t
 	getPacketSnr();
 
 	/**
@@ -122,7 +122,7 @@ public:
 	 *
 	 * \return The RSSI value of the last received packet
 	 */
-	modm::ResumableResult<int16_t>
+	int16_t
 	getPacketRssi();
 
 	/**
@@ -130,7 +130,7 @@ public:
 	 *
 	 * \return The RSSI value of the last received packet
 	 */
-	modm::ResumableResult<int16_t>
+	int16_t
 	getCurrentRssi();
 
 private:
@@ -160,19 +160,19 @@ private:
 	int16_t tempRssi;
 
 	/// Reads a single register
-	modm::ResumableResult<uint8_t>
+	uint8_t
 	readRegister(Sx1276Register reg);
 
 	/// Writes a single register with a given value
-	modm::ResumableResult<void>
+	void
 	writeRegister(Sx1276Register reg, uint8_t value);
 
 	/// Transfers the buffer to the SPI bus
-	modm::ResumableResult<void>
+	void
 	transferBuffer(uint8_t length);
 
 	/// change the operation mode of the modem
-	modm::ResumableResult<void>
+	void
 	changeMode(ModemMode mode);
 
 };

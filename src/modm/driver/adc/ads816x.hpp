@@ -102,14 +102,14 @@ public:
 
 	/// Call this function before using the device or to change operation mode
 	/// \warning Only Mode::Manual is currently supported!
-	modm::ResumableResult<void>
+	void
 	initialize(Mode mode = Mode::Manual);
 
 	/// Initiate a single conversion and return the result of the conversion.
 	/// Simultanously the channel for the after next conversion will be set,
 	/// i.e. before reading the first valid data two dummy conversions have to
 	/// be executed.
-	modm::ResumableResult<uint16_t>
+	uint16_t
 	manualModeConversion(uint8_t afterNextChannel);
 
 	/*
@@ -118,7 +118,7 @@ public:
 	/// The device will automatically cycle through the specified channels in
 	/// the bitmask.
 	template<std::size_t N>
-	modm::ResumableResult<void>
+	void
 	autoSequenceConversion(uint8_t channelsBitmask, std::span<uint16_t, N> result);
 	*/
 
@@ -133,7 +133,7 @@ public:
 	}
 
 private:
-	modm::ResumableResult<uint8_t>
+	uint8_t
 	registerAccess(Command command, Register reg, uint8_t value = 0);
 
 	uint8_t buffer[3];

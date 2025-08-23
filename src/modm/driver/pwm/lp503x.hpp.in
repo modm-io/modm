@@ -104,20 +104,20 @@ public:
 	Lp503x(uint8_t i2cAddress);
 
 	/// Initialize device, call before using any other function
-	modm::ResumableResult<bool>
+	bool
 	initialize();
 
 	/// Enable device
-	modm::ResumableResult<bool>
+	bool
 	enable();
 
 	/// Disable device
-	modm::ResumableResult<bool>
+	bool
 	disable();
 
 	/// Set device configuration
 	/// AutoIncrement is always set
-	modm::ResumableResult<bool>
+	bool
 	setConfiguration(DeviceConfig1_t configuration);
 
 	/**
@@ -131,7 +131,7 @@ public:
 	 * @param channel output channel index
 	 * @param value   8-bit brightness value
 	 */
-	modm::ResumableResult<bool>
+	bool
 	setChannelBrightness(uint8_t channel, uint8_t value);
 
 %% if options.multichannel_write
@@ -145,7 +145,7 @@ public:
 	 * @param numChannels number of values to write
 	 * @param value       8-bit brightness value
 	 */
-	modm::ResumableResult<bool>
+	bool
 	setChannelBrightnessValues(uint8_t startChannel,
 							   const uint8_t* values, uint8_t numChannels);
 %% endif
@@ -166,7 +166,7 @@ public:
 	 *
 	 * @param value 8-bit brightness value
 	 */
-	modm::ResumableResult<bool>
+	bool
 	setLedGroupBrightness(uint8_t index, uint8_t value);
 
 	/**
@@ -180,46 +180,46 @@ public:
 	 * and the BankBrightness register.
 	 * The inidividual channel settings are ignored then.
 	 */
-	modm::ResumableResult<bool>
+	bool
 	setBankModeEnabled(LedBankMode_t bankMode);
 
 	/**
 	 * Set bank brightness multiplicator. This controls
 	 * all channels in bank mode.
 	 */
-	modm::ResumableResult<bool>
+	bool
 	setBankBrightness(uint8_t value);
 
 	/**
 	 * Set brightness for all channels 3n
 	 * configured in bank mode.
 	 */
-	modm::ResumableResult<bool>
+	bool
 	setBankABrightness(uint8_t value);
 
 	/**
 	 * Set brightness for all channels 3n+1
 	 * configured in bank mode.
 	 */
-	modm::ResumableResult<bool>
+	bool
 	setBankBBrightness(uint8_t value);
 
 	/**
 	 * Set brightness for all channels 3n+2
 	 * configured in bank mode.
 	 */
-	modm::ResumableResult<bool>
+	bool
 	setBankCBrightness(uint8_t value);
 
 private:
-	modm::ResumableResult<bool>
+	bool
 	writeRegister(Register reg, uint8_t value);
 
-	modm::ResumableResult<bool>
+	bool
 	writeRegister(Register reg, RegisterValue_t value);
 
 %% if options.multichannel_write
-	modm::ResumableResult<bool>
+	bool
 	writeRegisters(Register startRegister, const uint8_t* values,
 				   uint8_t numValues);
 %% endif

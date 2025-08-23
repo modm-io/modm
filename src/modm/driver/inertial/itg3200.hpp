@@ -197,27 +197,27 @@ public:
 	Itg3200(Data &data, uint8_t address=0x68);
 
 
-	modm::ResumableResult<bool>
+	bool
 	configure(LowPassFilter filter=LowPassFilter::Hz20, uint8_t divider=0);
 
 	/// reads the temperature and gyro registers and buffer the results
-	modm::ResumableResult<bool>
+	bool
 	readRotation();
 
 
-	modm::ResumableResult<bool> inline
+	bool inline
 	setLowPassFilter(LowPassFilter filter)
 	{ return updateFilter(filter, Filter::DLPF_CFG_Mask); }
 
-	modm::ResumableResult<bool> inline
+	bool inline
 	setSampleRateDivider(uint8_t divider);
 
 
-	modm::ResumableResult<bool> inline
+	bool inline
 	updateInterrupt(Interrupt_t setMask, Interrupt_t clearMask = Interrupt_t(0xf5))
 	{ return updateRegister(1, setMask.value, clearMask.value); }
 
-	modm::ResumableResult<bool> inline
+	bool inline
 	updatePower(Power_t setMask, Power_t clearMask = Power_t(0xff))
 	{ return updateRegister(11, setMask.value, clearMask.value); }
 
@@ -236,12 +236,12 @@ public:
 	Status_t getStatus()
 	{ return Status_t(rawBuffer[2]); }
 
-	modm::ResumableResult<bool>
+	bool
 	readStatus();
 
 protected:
 	/// @cond
-	modm::ResumableResult<bool> inline
+	bool inline
 	updateFilter(Filter_t setMask, Filter_t clearMask = Filter_t(0x1f))
 	{ return updateRegister(0, setMask.value, clearMask.value); }
 
@@ -259,25 +259,25 @@ public:
 protected:
 	/// @cond
 	/// write a 8bit value a register
-	modm::ResumableResult<bool>
+	bool
 	write(Register reg, uint8_t &value)
 	{ return write(reg, &value, 1); }
 
 	/// write multiple 8bit values from a start register
-	modm::ResumableResult<bool>
+	bool
 	write(Register reg, uint8_t *buffer, uint8_t length, bool copyBuffer=true);
 
 	/// read a 8bit value from a register
-	modm::ResumableResult<bool>
+	bool
 	read(Register reg, uint8_t &value)
 	{ return read(reg, &value, 1); }
 
 	/// read multiple 8bit values from a start register
-	modm::ResumableResult<bool>
+	bool
 	read(Register reg, uint8_t *buffer, uint8_t length);
 
 private:
-	modm::ResumableResult<bool>
+	bool
 	updateRegister(uint8_t index, uint8_t setMask, uint8_t clearMask = 0xff);
 	/// @endcond
 

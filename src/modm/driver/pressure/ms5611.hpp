@@ -90,11 +90,11 @@ public:
 
     /// Call this function before using the device to read the factory calibration
     /// @warning calls to this function resets the device
-    modm::ResumableResult<bool>
+    bool
     initialize();
 
     /// Do a readout sequence to convert and read temperature and then pressure from sensor
-    modm::ResumableResult<void>
+    void
     readout(OversamplingRatio osrPressure = OversamplingRatio::Osr256,
             OversamplingRatio osrTemperature = OversamplingRatio::Osr256);
 
@@ -105,7 +105,7 @@ public:
 
 private:
     /// Read the PROM register at the address
-    modm::ResumableResult<uint16_t>
+    uint16_t
     readProm(uint8_t addr);
 
 private:

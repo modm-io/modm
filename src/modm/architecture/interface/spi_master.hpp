@@ -105,7 +105,7 @@ public:
 	 * 		data to be sent
 	 * @return	received data
 	 */
-	static modm::ResumableResult<uint8_t>
+	static uint8_t
 	transfer(uint8_t data);
 
 	/**
@@ -123,7 +123,7 @@ public:
 	 * @param       length
 	 *      number of bytes to be shifted out
 	 */
-	static modm::ResumableResult<void>
+	static void
 	transfer(const uint8_t *tx, uint8_t *rx, std::size_t length);
 #endif
 };

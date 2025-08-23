@@ -22,7 +22,7 @@ namespace modm
 {
 
 template <typename SpiMaster, typename Cs>
-ResumableResult<void>
+void
 Ads816x<SpiMaster, Cs>::initialize(Mode mode)
 {
 	// Unlock register access by writing magic byte
@@ -48,7 +48,7 @@ Ads816x<SpiMaster, Cs>::initialize(Mode mode)
 }
 
 template <typename SpiMaster, typename Cs>
-ResumableResult<uint16_t>
+uint16_t
 Ads816x<SpiMaster, Cs>::manualModeConversion(uint8_t afterNextChannel)
 {
 	modm::this_fiber::poll([&]{ return this->acquireMaster(); });
@@ -71,7 +71,7 @@ Ads816x<SpiMaster, Cs>::manualModeConversion(uint8_t afterNextChannel)
 // FIXME: Does not work correctly...
 template <typename SpiMaster, typename Cs>
 template<std::size_t N>
-ResumableResult<void>
+void
 Ads816x<SpiMaster, Cs>::autoSequenceConversion(uint8_t channelsBitmask, std::span<uint16_t, N> result)
 {
 	if (std::popcount(channelsBitmask) > N) {

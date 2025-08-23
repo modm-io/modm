@@ -46,7 +46,7 @@ class Hx711 : public hx711, protected modm::NestedResumable<2>
 	using Data = typename Cfg::Data;
 
 public:
-	modm::ResumableResult<int32_t>
+	int32_t
 	singleConversion();
 
 private:

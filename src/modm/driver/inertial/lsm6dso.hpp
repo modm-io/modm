@@ -204,7 +204,7 @@ public:
 	 *
 	 * @return False in case of any error
 	 */
-	modm::ResumableResult<bool>
+	bool
 	initialize();
 
 	/**
@@ -214,7 +214,7 @@ public:
 	 * @return The register value in case of a read access, or std::nullopt if
 	 * an error occured
 	 */
-	modm::ResumableResult<std::optional<uint8_t>>
+	std::optional<uint8_t>
 	readRegister(Register reg);
 
 	/**
@@ -224,7 +224,7 @@ public:
 	 * @param values Results of the read operations
 	 * @return False in case of any error
 	 */
-	modm::ResumableResult<bool>
+	bool
 	readRegisters(Register reg, std::span<uint8_t> values);
 
 	/**
@@ -234,7 +234,7 @@ public:
 	 * @param value The value to be written to the register.
 	 * @return False in case of any error
 	 */
-	modm::ResumableResult<bool>
+	bool
 	writeRegister(Register reg, uint8_t value);
 
 	/**
@@ -247,7 +247,7 @@ public:
 	 * @return False in case of any error
 	 */
 	template<frequency_t frequency, percent_t tolerance=pct(1)>
-	modm::ResumableResult<bool>
+	bool
 	setOutputDataRate();
 
 	/**
@@ -258,7 +258,7 @@ public:
 	 * ±1000dps, ±2000dps)
 	 * @return False in case of any error
 	 */
-	modm::ResumableResult<bool>
+	bool
 	setRange(LinearRange lr, AngularRange ar);
 
 	/**
@@ -275,7 +275,7 @@ public:
 	 * @return False in case of any error
 	 */
 	template<frequency_t frequency, percent_t tolerance=pct(1)>
-	modm::ResumableResult<bool>
+	bool
 	setOutputDataRateAndRange(LinearRange lr, AngularRange ar);
 
 private:

@@ -23,7 +23,7 @@ Stts22h<I2cMaster>::Stts22h(Data &data, uint8_t address) :
 }
 
 template<class I2cMaster>
-ResumableResult<bool>
+bool
 Stts22h<I2cMaster>::write(Register reg, RegisterValue value)
 {
 	buffer_[0] = static_cast<uint8_t>(reg);
@@ -35,14 +35,14 @@ Stts22h<I2cMaster>::write(Register reg, RegisterValue value)
 }
 
 template<class I2cMaster>
-ResumableResult<bool>
+bool
 Stts22h<I2cMaster>::read(Register reg, uint8_t& value)
 {
 	return read(reg, &value, 1);
 }
 
 template<class I2cMaster>
-ResumableResult<bool>
+bool
 Stts22h<I2cMaster>::read(Register reg, uint8_t* data, uint8_t length)
 {
 	buffer_[0] = static_cast<uint8_t>(reg);
@@ -52,7 +52,7 @@ Stts22h<I2cMaster>::read(Register reg, uint8_t* data, uint8_t length)
 }
 
 template<class I2cMaster>
-ResumableResult<bool>
+bool
 Stts22h<I2cMaster>::initialize()
 {
 	if (!this->ping()) {
@@ -68,7 +68,7 @@ Stts22h<I2cMaster>::initialize()
 }
 
 template<class I2cMaster>
-ResumableResult<bool>
+bool
 Stts22h<I2cMaster>::ping()
 {
 	// It's ok here to use buffer_[1] as temporary storage
@@ -80,7 +80,7 @@ Stts22h<I2cMaster>::ping()
 }
 
 template<class I2cMaster>
-ResumableResult<bool>
+bool
 Stts22h<I2cMaster>::readTemperature()
 {
 	return read(Register::TempLOut, data_.data, 2);

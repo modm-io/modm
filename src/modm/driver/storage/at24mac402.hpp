@@ -49,34 +49,34 @@ public:
 	setAddress(uint8_t address);
 
 	// Read 48 bit pre-programmed MAC
-	modm::ResumableResult<bool>
+	bool
 	readMac(std::span<uint8_t, 6> data);
 
 	// Read 128 bit pre-programmed unique id
-	modm::ResumableResult<bool>
+	bool
 	readUniqueId(std::span<uint8_t, 16> data);
 
-	modm::ResumableResult<bool>
+	bool
 	ping();
 
-	modm::ResumableResult<bool>
+	bool
 	writeByte(uint32_t address, uint8_t data);
 
-	modm::ResumableResult<bool>
+	bool
 	write(uint32_t address, const uint8_t* data, std::size_t length);
 
 	template<typename T>
-	modm::ResumableResult<bool>
+	bool
 	write(uint32_t address, const T& data);
 
-	modm::ResumableResult<bool>
+	bool
 	readByte(uint32_t address, uint8_t& data);
 
-	modm::ResumableResult<bool>
+	bool
 	read(uint32_t address, uint8_t* data, std::size_t length);
 
 	template<typename T>
-	modm::ResumableResult<bool>
+	bool
 	read(uint32_t address, T& data);
 private:
 	uint8_t address_{};

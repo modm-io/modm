@@ -229,7 +229,7 @@ public:
 	 * \param scale The full scale of the output data
 	 * \return Whether the configuration was successful
 	 */
-	modm::ResumableResult<bool>
+	bool
 	configure(DataRate rate, Scale scale);
 
 	/**
@@ -238,7 +238,7 @@ public:
 	 * @param mode The mode on which the magnetometer operates
 	 * @return Whether the mode has been set
 	 */
-	modm::ResumableResult<bool>
+	bool
 	setMode(OperationMode mode);
 
 
@@ -256,7 +256,7 @@ public:
 	 * @param data A reference to a Vector3i object the data will be written to
 	 * @return Whether the sensor data have been read
 	 */
-	modm::ResumableResult<bool>
+	bool
 	readMagnetometerRaw(Vector3i& data);
 
 	/**
@@ -265,7 +265,7 @@ public:
 	 * \param data A reference to a Vector3f object the data will be written to
 	 * \return Whether the sensor data have been read
 	 */
-	modm::ResumableResult<bool>
+	bool
 	readMagnetometer(Vector3f& data);
 
 private:

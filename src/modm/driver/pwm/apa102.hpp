@@ -87,7 +87,7 @@ public:
 		return data[4 + index*4] & ~0xe0;
 	}
 
-	modm::ResumableResult<void>
+	void
 	write()
 	{
 		return SpiMaster::transfer(data, nullptr, length);

@@ -191,11 +191,11 @@ public:
 	Max31865(Data &data);
 
 	/// Call this function once before using the device
-	modm::ResumableResult<void>
+	void
 	initialize();
 
 	/// Read the raw data from the sensor
-	modm::ResumableResult<void>
+	void
 	readout();
 
 	/// Get the data object for this sensor
@@ -213,13 +213,13 @@ private:
 
 	modm::ShortTimeout timeout;
 
-	modm::ResumableResult<void>
+	void
 	writeSingleRegister(Register address, uint8_t data);
 
-	modm::ResumableResult<uint8_t>
+	uint8_t
 	readSingleRegister(Register address);
 
-	modm::ResumableResult<uint16_t>
+	uint16_t
 	readTwoRegisters(Register address);
 };
 

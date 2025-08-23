@@ -81,31 +81,31 @@ public:
 	void
 	setUpdateRate(uint8_t rate);
 
-	modm::ResumableResult<bool>
+	bool
 	setResolution(Resolution resolution);
 
 	/// Writes the upper limit of the alarm.
-	modm::ResumableResult<bool>
+	bool
 	setUpperLimit(float temperature)
 	{ return setLimitRegister(Register::TemperatureUpperLimit, temperature); }
 
 	/// Writes the lower limit of the alarm.
-	modm::ResumableResult<bool>
+	bool
 	setLowerLimit(float temperature)
 	{ return setLimitRegister(Register::TemperatureLowerLimit, temperature); }
 
 	/// starts a temperature conversion right now
-	modm::ResumableResult<bool>
+	bool
 	startConversion();
 
 	inline Data&
 	getData();
 
 private:
-	modm::ResumableResult<bool>
+	bool
 	writeConfiguration();
 
-	modm::ResumableResult<bool>
+	bool
 	setLimitRegister(Register reg, float temperature);
 
 	modm::ShortDuration updateTime;

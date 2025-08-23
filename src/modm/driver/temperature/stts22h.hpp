@@ -109,16 +109,16 @@ public:
 	Stts22h(Data& data, uint8_t address = 0x3f);
 
 	/// Initialize sensor
-	modm::ResumableResult<bool>
+	bool
 	initialize();
 
 	/// Detect sensor
-	modm::ResumableResult<bool>
+	bool
 	ping();
 
 	/// Read temperature from device
 	/// \pre sensor is succesfully initialized
-	modm::ResumableResult<bool>
+	bool
 	readTemperature();
 
 	inline Data&
@@ -128,13 +128,13 @@ public:
 private:
 	static constexpr inline uint8_t DeviceId{0xA0};
 
-	modm::ResumableResult<bool>
+	bool
 	write(Register reg, RegisterValue value);
 
-	modm::ResumableResult<bool>
+	bool
 	read(Register reg, uint8_t& value);
 
-	modm::ResumableResult<bool>
+	bool
 	read(Register reg, uint8_t* buffer, uint8_t length);
 
 	Data& data_;

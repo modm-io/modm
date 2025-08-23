@@ -65,7 +65,7 @@ public:
     void initialize();
 
     /// Read ADC channel
-    modm::ResumableResult<uint16_t>
+    uint16_t
     read(Channel channel);
 
 private:

@@ -23,7 +23,7 @@ Mcp990x<I2cMaster>::Mcp990x(Data &data, uint8_t address) :
 }
 
 template<class I2cMaster>
-ResumableResult<bool>
+bool
 Mcp990x<I2cMaster>::write(Register reg, uint8_t value)
 {
 	buffer_[0] = static_cast<uint8_t>(reg);
@@ -35,7 +35,7 @@ Mcp990x<I2cMaster>::write(Register reg, uint8_t value)
 }
 
 template<class I2cMaster>
-ResumableResult<bool>
+bool
 Mcp990x<I2cMaster>::read(Register reg, uint8_t& value)
 {
 	buffer_[0] = static_cast<uint8_t>(reg);
@@ -45,7 +45,7 @@ Mcp990x<I2cMaster>::read(Register reg, uint8_t& value)
 }
 
 template<class I2cMaster>
-ResumableResult<bool>
+bool
 Mcp990x<I2cMaster>::initialize()
 {
 	if (!this->ping()) {
@@ -55,7 +55,7 @@ Mcp990x<I2cMaster>::initialize()
 }
 
 template<class I2cMaster>
-ResumableResult<bool>
+bool
 Mcp990x<I2cMaster>::ping()
 {
 	// It's ok here to use buffer_[1] as temporary storage
@@ -67,14 +67,14 @@ Mcp990x<I2cMaster>::ping()
 }
 
 template<class I2cMaster>
-ResumableResult<bool>
+bool
 Mcp990x<I2cMaster>::readInternalTemperature()
 {
 	return readTemperature(Register::IntTempHigh, Register::IntTempLow);
 }
 
 template<class I2cMaster>
-ResumableResult<bool>
+bool
 Mcp990x<I2cMaster>::readExternalDiodeTemperature(ExternalDiode diode)
 {
 	const auto index = static_cast<uint8_t>(diode);
@@ -82,7 +82,7 @@ Mcp990x<I2cMaster>::readExternalDiodeTemperature(ExternalDiode diode)
 }
 
 template<class I2cMaster>
-ResumableResult<bool>
+bool
 Mcp990x<I2cMaster>::setExternalDiodeIdealityFactor(ExternalDiode diode, uint8_t idealitySetting)
 {
 	const auto index = static_cast<uint8_t>(diode);
@@ -90,7 +90,7 @@ Mcp990x<I2cMaster>::setExternalDiodeIdealityFactor(ExternalDiode diode, uint8_t 
 }
 
 template<class I2cMaster>
-ResumableResult<bool>
+bool
 Mcp990x<I2cMaster>::readTemperature(Register highReg, Register lowReg)
 {
 	if (!read(highReg, data_.data[1])) {

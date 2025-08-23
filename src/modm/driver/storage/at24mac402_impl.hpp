@@ -30,7 +30,7 @@ modm::At24Mac402<I2cMaster>::setAddress(uint8_t address)
 }
 
 template<typename I2cMaster>
-modm::ResumableResult<bool>
+bool
 modm::At24Mac402<I2cMaster>::readMac(std::span<uint8_t, 6> data)
 {
 	Base::setAddress(address_ | 0b1'000);
@@ -38,7 +38,7 @@ modm::At24Mac402<I2cMaster>::readMac(std::span<uint8_t, 6> data)
 }
 
 template<typename I2cMaster>
-modm::ResumableResult<bool>
+bool
 modm::At24Mac402<I2cMaster>::readUniqueId(std::span<uint8_t, 16> data)
 {
 	Base::setAddress(address_ | 0b1'000);
@@ -46,7 +46,7 @@ modm::At24Mac402<I2cMaster>::readUniqueId(std::span<uint8_t, 16> data)
 }
 
 template<typename I2cMaster>
-modm::ResumableResult<bool>
+bool
 modm::At24Mac402<I2cMaster>::ping()
 {
 	Base::setAddress(address_);
@@ -54,7 +54,7 @@ modm::At24Mac402<I2cMaster>::ping()
 }
 
 template<typename I2cMaster>
-modm::ResumableResult<bool>
+bool
 modm::At24Mac402<I2cMaster>::writeByte(uint32_t address, uint8_t data)
 {
 	Base::setAddress(address_);
@@ -62,7 +62,7 @@ modm::At24Mac402<I2cMaster>::writeByte(uint32_t address, uint8_t data)
 }
 
 template<typename I2cMaster>
-modm::ResumableResult<bool>
+bool
 modm::At24Mac402<I2cMaster>::write(uint32_t address, const uint8_t* data, std::size_t length)
 {
 	Base::setAddress(address_);
@@ -71,7 +71,7 @@ modm::At24Mac402<I2cMaster>::write(uint32_t address, const uint8_t* data, std::s
 
 template<typename I2cMaster>
 template<typename T>
-modm::ResumableResult<bool>
+bool
 modm::At24Mac402<I2cMaster>::write(uint32_t address, const T& data)
 {
 	Base::setAddress(address_);
@@ -79,7 +79,7 @@ modm::At24Mac402<I2cMaster>::write(uint32_t address, const T& data)
 }
 
 template<typename I2cMaster>
-modm::ResumableResult<bool>
+bool
 modm::At24Mac402<I2cMaster>::readByte(uint32_t address, uint8_t& data)
 {
 	Base::setAddress(address_);
@@ -87,7 +87,7 @@ modm::At24Mac402<I2cMaster>::readByte(uint32_t address, uint8_t& data)
 }
 
 template<typename I2cMaster>
-modm::ResumableResult<bool>
+bool
 modm::At24Mac402<I2cMaster>::read(uint32_t address, uint8_t* data, std::size_t length)
 {
 	Base::setAddress(address_);
@@ -96,7 +96,7 @@ modm::At24Mac402<I2cMaster>::read(uint32_t address, uint8_t* data, std::size_t l
 
 template<typename I2cMaster>
 template<typename T>
-modm::ResumableResult<bool>
+bool
 modm::At24Mac402<I2cMaster>::read(uint32_t address, T& data)
 {
 	Base::setAddress(address_);

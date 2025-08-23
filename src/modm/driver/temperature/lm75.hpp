@@ -135,21 +135,21 @@ public:
 	/// sets address to default of 0x48 (7 alternative addresses up to 0x4F possible).
 	Lm75(Data &data, uint8_t address=0x48);
 
-	modm::ResumableResult<bool>
+	bool
 	configureAlertMode(ThermostatMode mode, AlertPolarity polarity, FaultQueue faults);
 
 	/// Writes the upper limit of the alarm.
-	modm::ResumableResult<bool>
+	bool
 	setUpperLimit(float temperature)
 	{ return setLimitRegister(Register::TemperatureUpperLimit, temperature); }
 
 	/// Writes the lower limit of the alarm.
-	modm::ResumableResult<bool>
+	bool
 	setLowerLimit(float temperature)
 	{ return setLimitRegister(Register::TemperatureLowerLimit, temperature); }
 
 	/// reads the Temperature registers and buffers the results
-	modm::ResumableResult<bool>
+	bool
 	readTemperature();
 
 	inline Data&
@@ -157,7 +157,7 @@ public:
 	{ return data; }
 
 private:
-	modm::ResumableResult<bool>
+	bool
 	setLimitRegister(Register reg, float temperature);
 
 	Data &data;

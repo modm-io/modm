@@ -95,13 +95,13 @@ public:
 	 * @param xResolution x resolution in unit of 5 counts per inch
 	 * @param yResolution y resolution in unit of 5 counts per inch
 	 */
-	modm::ResumableResult<bool>
+	bool
 	configure(uint8_t xResolution = 0x14, uint8_t yResolution = 0x14);
 
 	/**
 	 * Check if the device is available
 	 */
-	modm::ResumableResult<bool>
+	bool
 	ping();
 
 	/**
@@ -113,7 +113,7 @@ public:
 	/**
 	 * Read movement measurement from the device
 	 */
-	modm::ResumableResult<bool>
+	bool
 	readData();
 
 	/**
@@ -126,13 +126,13 @@ public:
 	resetMoved();
 
 private:
-	modm::ResumableResult<bool>
+	bool
 	writeRegister(Register reg, uint8_t data);
 
-	modm::ResumableResult<bool>
+	bool
 	readRegister(Register reg, uint8_t& data);
 
-	modm::ResumableResult<bool>
+	bool
 	readRegister(Register reg, uint8_t* data, size_t size);
 
 	void

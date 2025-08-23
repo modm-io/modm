@@ -73,27 +73,27 @@ public:
 
 public:
 	/// Sets one or more pins to output
-	modm::ResumableResult<bool>
+	bool
 	setOutput(Pins pins);
 
 	/// Sets one or more pins to logic high
 	/// @warning only modifies pins that have previously been set to output!
-	modm::ResumableResult<bool>
+	bool
 	set(Pins pins);
 
 	/// Resets one or more pins to logic low
 	/// @warning only modifies pins that have previously been set to output!
-	modm::ResumableResult<bool>
+	bool
 	reset(Pins pins);
 
 	/// Toggles one or more pins
 	/// @warning only modifies pins that have previously been set to output!
-	modm::ResumableResult<bool>
+	bool
 	toggle(Pins pins);
 
 	/// sets one or more pins to high or low level
 	/// @warning only modifies pins that have previously been set to output!
-	modm::ResumableResult<bool>
+	bool
 	set(Pins pins, bool value);
 
 	/// Returns the set logical output state of the pin.
@@ -106,7 +106,7 @@ public:
 
 public:
 	/// Sets one or more pins to input
-	modm::ResumableResult<bool>
+	bool
 	setInput(Pins pins);
 
 	/// Returns true if **all** pins have a high level
@@ -116,17 +116,17 @@ public:
 	read(Pins pins) const;
 
 	/// Reads the inputs and buffers them
-	modm::ResumableResult<bool>
+	bool
 	readInput();
 
 public:
 	/// Writes data to the entire port
 	/// @warning only modifies pins that have previously been set to output!
-	modm::ResumableResult<bool>
+	bool
 	writePort(PortType data);
 
 	/// Reads the entire port, buffers them and outputs the result to data.
-	modm::ResumableResult<bool>
+	bool
 	readPort(PortType &data);
 
 public:

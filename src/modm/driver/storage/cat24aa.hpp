@@ -72,7 +72,7 @@ public:
 	 * @return	`true`	if the data could be written,
 	 * 			`false` otherwise
 	 */
-	inline modm::ResumableResult<bool>
+	inline bool
 	writeByte(uint32_t address, uint8_t data)
 	{
 		return write(address, &data, 1);
@@ -88,7 +88,7 @@ public:
 	 * @return	`true`	if the data could be written,
 	 * 			`false` otherwise
 	 */
-	modm::ResumableResult<bool>
+	bool
 	write(uint32_t address, const uint8_t *data, std::size_t length);
 
 	/**
@@ -100,21 +100,21 @@ public:
 	 * @endcode
 	 */
 	template <typename T>
-	inline modm::ResumableResult<bool>
+	inline bool
 	write(uint32_t address, const T& data)
 	{
 		return write(address, reinterpret_cast<const uint8_t *>(&data), sizeof(T));
 	}
 
 	/// Read byte
-	inline modm::ResumableResult<bool>
+	inline bool
 	readByte(uint32_t address, uint8_t &data)
 	{
 		return read(address, &data, 1);
 	}
 
 	/// Read block
-	modm::ResumableResult<bool>
+	bool
 	read(uint32_t address, uint8_t *data, std::size_t length);
 
 	/**
@@ -126,7 +126,7 @@ public:
 	 * @endcode
 	 */
 	template <typename T>
-	inline modm::ResumableResult<bool>
+	inline bool
 	read(uint16_t address, T& data)
 	{
 		return read(address, reinterpret_cast<uint8_t *>(&data), sizeof(T));

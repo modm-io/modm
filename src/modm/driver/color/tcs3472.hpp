@@ -192,57 +192,57 @@ public:
 	static constexpr Enable_t Enable_InterruptMode_Waittime = Enable_InterruptMode | Enable::INTERRUPT_ENABLE;
 
 	/// Power up sensor and start conversions
-	modm::ResumableResult<bool>
+	bool
 	initialize(Enable_t flags = Enable_PollingMode)
 	{ return writeRegister(RegisterAddress::ENABLE, flags.value); }
 
-	modm::ResumableResult<bool>
+	bool
 	configure(Gain gain = Gain::X1,
 			  IntegrationTime int_time = IntegrationTime::MSEC_2_4);
 
 public:
 	/// The gain can be used to adjust the sensitivity of all ADC output channels.
-	modm::ResumableResult<bool>
+	bool
 	setGain(Gain gain = Gain::X1)
 	{ return writeRegister(RegisterAddress::GAIN, uint8_t(gain)); }
 
 	/// Sets the integration time for the ADCs.
-	modm::ResumableResult<bool>
+	bool
 	setIntegrationTime(IntegrationTime int_time = tcs3472::IntegrationTime::MSEC_2_4)
 	{ return writeRegister(RegisterAddress::INTEGRATION_TIME, uint8_t(int_time)); }
 
 	/// Sets the wait time for the ADCs.
-	modm::ResumableResult<bool>
+	bool
 	setWaitTime(WaitTime wait_time, bool wait_long = false);
 
 	/// Sets the low threshold for the interrupt-comparator
-	modm::ResumableResult<bool>
+	bool
 	setInterruptLowThreshold(uint16_t threshold);
 
 	/// Sets the high threshold for the interrupt-comparator
-	modm::ResumableResult<bool>
+	bool
 	setInterruptHighThreshold(uint16_t threshold);
 
 	/// The gain can be used to adjust the sensitivity of all ADC output channels.
-	modm::ResumableResult<bool>
+	bool
 	setInterruptPersistenceFilter(InterruptPersistence value)
 	{ return writeRegister(RegisterAddress::INTERRUPT_PERSIST_FILTER, uint8_t(value)); }
 
 public:
 	/// Resets the interrupt output.
-	modm::ResumableResult<bool>
+	bool
 	reloadInterrupt();
 
 	/// Read current samples of ADC conversions for all channels.
-	modm::ResumableResult<bool>
+	bool
 	readColor()
 	{ return readRegisters(RegisterAddress::CDATALOW, data.data, sizeof(data.data)); }
 
 public:
-	modm::ResumableResult<bool>
+	bool
 	readRegisters(RegisterAddress address, uint8_t *values, uint8_t count = 1);
 
-	modm::ResumableResult<bool>
+	bool
 	writeRegister(RegisterAddress address, uint8_t value);
 
 	Data& getData() { return data; }

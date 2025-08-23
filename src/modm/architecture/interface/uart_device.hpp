@@ -55,7 +55,7 @@ public:
 	}
 
 protected:
-	modm::ResumableResult<bool>
+	bool
 	write(uint8_t data)
 	{
 		timeout.restart(txTimeout);
@@ -70,7 +70,7 @@ protected:
 		return true;
 	}
 
-	modm::ResumableResult<bool>
+	bool
 	write(const uint8_t *data, std::size_t length)
 	{
 		writeIndex = 0;
@@ -95,7 +95,7 @@ protected:
 		return true;
 	}
 
-	modm::ResumableResult<bool>
+	bool
 	read(uint8_t &data)
 	{
 		timeout.restart(rxTimeout);
@@ -109,7 +109,7 @@ protected:
 		return true;
 	}
 
-	modm::ResumableResult<bool>
+	bool
 	read(uint8_t *buffer, std::size_t length)
 	{
 		readIndex = 0;

@@ -31,13 +31,13 @@ class Pat9125elI2cTransport : public I2cDevice<I2cMaster, 4>
 protected:
 	Pat9125elI2cTransport(uint8_t address);
 
-	modm::ResumableResult<bool>
+	bool
 	write(uint8_t reg, uint8_t value);
 
-	modm::ResumableResult<bool>
+	bool
 	read(uint8_t reg, uint8_t& value);
 
-	modm::ResumableResult<bool>
+	bool
 	read(uint8_t reg, uint8_t* buffer, uint8_t length);
 
 private:

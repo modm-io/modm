@@ -171,41 +171,41 @@ class Tcs3414 : public tcs3414, public modm::I2cDevice< I2cMaster, 2 >
 public:
 	Tcs3414(Data &data, uint8_t address = addr());
 
-	modm::ResumableResult<bool>
+	bool
 	initialize()
 	{ return writeRegister(RegisterAddress::CONTROL, 0b11); };
 
-	modm::ResumableResult<bool>
+	bool
 	configure(Gain gain = Gain::X1, Prescaler prescaler = Prescaler::D1)
 	{ return setGain(gain, prescaler); }
 
 public:
 	/// The gain can be used to adjust the sensitivity of all ADC output channels.
-	modm::ResumableResult<bool>
+	bool
 	setGain(Gain gain = Gain::X1, Prescaler prescaler = Prescaler::D1)
 	{ return writeRegister(RegisterAddress::GAIN, uint8_t(gain) | uint8_t(prescaler)); }
 
 	/// Sets the integration time for the ADCs.
-	modm::ResumableResult<bool>
+	bool
 	setIntegrationTime(IntegrationMode mode, NominalIntegrationTime time)
 	{ return writeRegister(RegisterAddress::TIMING, uint8_t(mode) | uint8_t(time)); }
 
 	/// Sets the integration time for the ADCs.
-	modm::ResumableResult<bool>
+	bool
 	setIntegrationTime(IntegrationMode mode, SyncPulseCount time)
 	{ return writeRegister(RegisterAddress::TIMING, uint8_t(mode) | uint8_t(time)); }
 
 public:
 	/// Read current samples of ADC conversions for all channels.
-	modm::ResumableResult<bool>
+	bool
 	readColor()
 	{ return readRegisters(RegisterAddress::DATA1LOW, data.data+1, sizeof(data.data)); }
 
 public:
-	modm::ResumableResult<bool>
+	bool
 	readRegisters(RegisterAddress address, uint8_t *values, uint8_t count = 1);
 
-	modm::ResumableResult<bool>
+	bool
 	writeRegister(RegisterAddress address, uint8_t value);
 
 protected:

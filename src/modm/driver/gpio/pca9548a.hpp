@@ -33,13 +33,13 @@ class Pca9548a : public modm::I2cDevice< I2cMaster, 2 >
 public:
 	Pca9548a(uint8_t address=0b1110000);
 
-	modm::ResumableResult<bool>
+	bool
 	setActiveChannel(uint8_t channel);
 
-	modm::ResumableResult<bool>
+	bool
 	readCommandRegister(uint8_t &command_register);
 
-	modm::ResumableResult<bool>
+	bool
 	writeCommandRegister(uint8_t command_register);
 
 private:

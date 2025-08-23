@@ -197,52 +197,52 @@ public:
     Ads101x(Data &data, uint8_t address = 0x49);
 
     /// Call this function before using the device
-    modm::ResumableResult<bool>
+    bool
     initialize();
 
     /// Determine if the device is currently performing a conversion
-    modm::ResumableResult<bool>
+    bool
     isBusy();
 
     /// Start a single conversion with the specified input
-    modm::ResumableResult<bool>
+    bool
     startSingleShotConversion();
 
     /// Start continuous conversions with the specified datarate and input
-    modm::ResumableResult<bool>
+    bool
     startContinuousConversion(DataRate dataRate = DataRate::Sps1600);
 
     /// Start a single conversion with the specified input
     /// @warning ADS1015 only
-    modm::ResumableResult<bool>
+    bool
     startSingleShotConversion(InputMultiplexer input = InputMultiplexer::Input0);
 
     /// Start continuous conversions with the specified datarate and input
     /// @warning ADS1015 only
-    modm::ResumableResult<bool>
+    bool
     startContinuousConversion(InputMultiplexer input = InputMultiplexer::Input0, DataRate dataRate = DataRate::Sps1600);
 
     /// Read the last conversion result
     /// @attention Following power-up, the conversion result remains zero until the first conversion is completed
-    modm::ResumableResult<bool>
+    bool
     readConversionResult();
 
     /// Enable the conversion-ready function of the ALERT/RDY pin
     /// @attention enabling the conversion-ready function disables the comparator and sets the ComparatorQue value to one conversion
-    modm::ResumableResult<bool>
+    bool
     enableConversionReadyFunction();
 
     /// Enable the comparator
     /// @warning ADS1014 and ADS1015 only
     /// @warning To use the comparator-function the high threshold must be greater than the low threshold
-    modm::ResumableResult<bool>
+    bool
     enableComparator(ComparatorMode mode, ComparatorPolarity polarity, ComparatorLatch latch, ComparatorQueue queue);
 
     /// Set the low threshold used by the comparator queue
     /// @warning ADS1014 and ADS1015 only
     /// @warning The low threshold value must be smaller than the high threshold value
     /// @attention The high threshold value must be updated whenever the PGA settings are changed
-    modm::ResumableResult<bool>
+    bool
     setLowThreshold(uint16_t threshold)
     {
         return writeRegister(Register::LowThreshold, (threshold << 4) & 0xFFF0);
@@ -252,18 +252,18 @@ public:
     /// @warning ADS1014 and ADS1015 only
     /// @warning The high threshold value must be greater than the low threshold value
     /// @attention The high threshold value must be updated whenever the PGA settings are changed
-    modm::ResumableResult<bool>
+    bool
     setHighThreshold(uint16_t threshold)
     {
         return writeRegister(Register::HighThreshold, (threshold << 4) | 0x0F);
     }
 
     /// Set the full scale range by programming the PGA and corresponding LSB size
-    modm::ResumableResult<bool>
+    bool
     setFullScaleRange(FullScaleRange fullScaleRange);
 
 private:
-    modm::ResumableResult<bool>
+    bool
     writeRegister(Register reg, uint16_t data);
 
     Data &data;

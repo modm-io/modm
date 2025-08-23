@@ -173,11 +173,11 @@ public:
 	/// Constructor, requires an ft6x06::Data object, sets address to default of 0x2A
 	Ft6x06(Data &data, uint8_t address=0x2A);
 
-	modm::ResumableResult<bool>
+	bool
 	configure(InterruptMode mode, uint8_t activeRate = 60, uint8_t monitorRate = 25);
 
 	/// Reads all touches and writes the result to the data object
-	modm::ResumableResult<bool>
+	bool
 	readTouches();
 
 public:
@@ -189,11 +189,11 @@ public:
 protected:
 	/// @cond
 	/// write a 8bit value a register
-	modm::ResumableResult<bool>
+	bool
 	write(Register reg, uint8_t value);
 
 	/// read multiple 8bit values from a start register
-	modm::ResumableResult<bool>
+	bool
 	read(Register reg, uint8_t *buffer, uint8_t length);
 	/// @endcond
 

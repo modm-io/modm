@@ -48,7 +48,7 @@ public:
      * @brief Initialize the device to use default settings and the endianess of the microcontroller
      * @warning Calling this functions resets the device and blocks for 1 ms
      */
-    modm::ResumableResult<void>
+    void
     initialize();
 
     /**
@@ -56,7 +56,7 @@ public:
      * @return False in case of any error, e.g. if some register access is not
      * permitted.
      */
-    modm::ResumableResult<bool>
+    bool
     readTempData();
 
     /**
@@ -64,7 +64,7 @@ public:
      * @return False in case of any error, e.g. if some register access is not
      * permitted.
      */
-    modm::ResumableResult<bool>
+    bool
     readAccelData();
 
     /**
@@ -72,7 +72,7 @@ public:
      * @return False in case of any error, e.g. if some register access is not
      * permitted.
      */
-    modm::ResumableResult<bool>
+    bool
     readGyroData();
 
     /**
@@ -80,7 +80,7 @@ public:
      * @return False in case of any error, e.g. if some register access is not
      * permitted.
      */
-    modm::ResumableResult<bool>
+    bool
     readSensorData();
 
     /**
@@ -88,7 +88,7 @@ public:
      * @return False in case of any error, e.g. if some register access is not
      * permitted.
      */
-    modm::ResumableResult<bool>
+    bool
     readFsyncTimestamp(uint16_t *timestamp);
 
     /**
@@ -96,7 +96,7 @@ public:
      * @return False in case of any error, e.g. if some register access is not
      * permitted.
      */
-    modm::ResumableResult<bool>
+    bool
     readFifoCount(uint16_t *count);
 
     /**
@@ -104,7 +104,7 @@ public:
      * @return False in case of any error, e.g. if some register access is not
      * permitted.
      */
-    modm::ResumableResult<bool>
+    bool
     readFifoData();
 
     /**
@@ -113,7 +113,7 @@ public:
      * @return False in case of any error, e.g. if some register access is not
      * permitted.
      */
-    modm::ResumableResult<bool>
+    bool
     writeFifoWatermark(uint16_t watermark);
 
 public:
@@ -129,7 +129,7 @@ public:
      * @warning Only the registers GYRO_CONFIG0, ACCEL_CONFIG0 and PWR_MGMT0
      * can be modified during sensor operation
      */
-    modm::ResumableResult<bool>
+    bool
     updateRegister(Register reg, Register_t setMask, Register_t clearMask = Register_t(0xff));
 
     /**
@@ -143,7 +143,7 @@ public:
      * @warning Only the registers GYRO_CONFIG0, ACCEL_CONFIG0 and PWR_MGMT0
      * can be modified during sensor operation
      */
-    modm::ResumableResult<bool>
+    bool
     writeRegister(Register reg, uint8_t value);
 
     /**
@@ -154,7 +154,7 @@ public:
      * @return False in case of any error, e.g. if some register access is not
      * permitted.
      */
-    modm::ResumableResult<bool>
+    bool
     readRegister(Register reg, uint8_t *value);
 
     /**
@@ -165,7 +165,7 @@ public:
      * @return False in case of any error, e.g. if some register access is not
      * permitted.
      */
-    modm::ResumableResult<bool>
+    bool
     readRegister(Register reg, uint8_t *buffer, std::size_t length);
 
 public:
@@ -175,7 +175,7 @@ public:
     { return data; }
 
 protected:
-    inline modm::ResumableResult<bool>
+    inline bool
     setRegisterBank(Register regi);
 
 private:

@@ -43,11 +43,11 @@ class BdSpiFlash : public modm::BlockDevice, public modm::SpiDevice< Spi >, prot
 {
 public:
 	/// Initializes the storage hardware
-	modm::ResumableResult<bool>
+	bool
 	initialize();
 
 	/// Deinitializes the storage hardware
-	modm::ResumableResult<bool>
+	bool
 	deinitialize();
 
 	/** Read data from one or more blocks
@@ -57,7 +57,7 @@ public:
 	 *  @param size		Size to read in bytes (multiple of read block size)
 	 *  @return			True on success
 	 */
-	modm::ResumableResult<bool>
+	bool
 	read(uint8_t* buffer, bd_address_t address, bd_size_t size);
 
 	/** Program blocks with data
@@ -69,7 +69,7 @@ public:
 	 *  @param size		Size to write in bytes (multiple of read block size)
 	 *  @return			True on success
 	 */
-	modm::ResumableResult<bool>
+	bool
 	program(const uint8_t* buffer, bd_address_t address, bd_size_t size);
 
 	/** Erase blocks
@@ -80,7 +80,7 @@ public:
 	 *  @param size		Size to erase in bytes (multiple of read block size)
 	 *  @return			True on success
 	 */
-	modm::ResumableResult<bool>
+	bool
 	erase(bd_address_t address, bd_size_t size);
 
 	/** Writes data to one or more blocks after erasing them
@@ -92,7 +92,7 @@ public:
 	*  @param size		Size to write in bytes (multiple of read block size)
 	*  @return			True on success
 	*/
-	modm::ResumableResult<bool>
+	bool
 	write(const uint8_t* buffer, bd_address_t address, bd_size_t size);
 
 public:
@@ -120,7 +120,7 @@ public:
 	*
 	*  @return The Jedec Id returned from the flash chip
 	*/
-	modm::ResumableResult<JedecId>
+	JedecId
 	readId();
 
 public:
@@ -142,7 +142,7 @@ public:
 	*
 	*  @return	Status register
 	*/
-	modm::ResumableResult<StatusRegister>
+	StatusRegister
 	readStatus();
 
 public:
@@ -151,7 +151,7 @@ public:
 	*
 	*  @param die 	The pre-assigned “Die ID#” of the die to select
 	*/
-	modm::ResumableResult<void>
+	void
 	selectDie(uint8_t die);
 
 public:
@@ -221,24 +221,24 @@ public:
 	 *
 	 * @return True if device is busy.
 	 */
-	modm::ResumableResult<bool>
+	bool
 	isBusy();
 
 	/** This function can be used in another resumable function
 	 * to wait until the flash operation is finished.
 	 */
-	modm::ResumableResult<void>
+	void
 	waitWhileBusy();
 
 private:
 	/** Send a non-addressed operation instruction to the spi flash chip
 	 */
-	modm::ResumableResult<void>
+	void
 	spiOperation(Instruction instruction, const uint8_t* tx = nullptr, uint8_t* rx = nullptr, std::size_t length = 0, uint8_t dummyCycles = 0);
 
 	/** Send an addressed operation instruction to the spi flash chip
 	 */
-	modm::ResumableResult<void>
+	void
 	spiOperation(Instruction instruction, bd_address_t address, const uint8_t* tx = nullptr, uint8_t* rx = nullptr, std::size_t length = 0, uint8_t dummyCycles = 0);
 };
 

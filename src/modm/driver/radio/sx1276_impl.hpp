@@ -36,7 +36,7 @@ Sx1276<SpiMaster, Cs>::Sx1276()
 // -----------------------------------------------------------------------------
 
 template <typename SpiMaster, typename Cs>
-ResumableResult<void>
+void
 Sx1276<SpiMaster, Cs>::initialize()
 {
 	// set the mode to sleep

@@ -307,31 +307,31 @@ public:
 	 */
 	Drv832xSpi();
 
-	modm::ResumableResult<void>
+	void
 	readFaultStatus1();
 
-	modm::ResumableResult<void>
+	void
 	readVgsStatus2();
 
-	modm::ResumableResult<void>
+	void
 	readDriverControl();
 
-	modm::ResumableResult<void>
+	void
 	readGateDriveHS();
 
-	modm::ResumableResult<void>
+	void
 	readGateDriveLS();
 
-	modm::ResumableResult<void>
+	void
 	readOcpControl();
 
-	modm::ResumableResult<void>
+	void
 	readCsaControl();
 
-	modm::ResumableResult<void>
+	void
 	readAll();
 
-	modm::ResumableResult<void>
+	void
 	initialize();
 
 private:
@@ -373,17 +373,17 @@ public:
 		return _csaControl;
 	}
 
-	modm::ResumableResult<void>
+	void
 	commit();
 
 protected:
-	modm::ResumableResult<void>
+	void
 	writeData(Register address, uint16_t data);
 
-	modm::ResumableResult<uint16_t>
+	uint16_t
 	readData(Register address);
 
-	modm::ResumableResult<void>
+	void
 	readData(Register address, uint16_t& data);
 
 private:

@@ -346,23 +346,23 @@ public:
 
 	/// Ping the I2C device.
 	/// This overwrites the build-in ping method of I2cDevice with a read of the model number.
-	modm::ResumableResult<bool>
+	bool
 	ping();
 
 	/// Soft reset of device.
-	modm::ResumableResult<bool>
+	bool
 	reset();
 
-	modm::ResumableResult<bool>
+	bool
 	initialize();
 
 	/// Set a new I2C address (< 128) for this device.
 	/// The address is not permanent and must be set again after every device boot.
-	modm::ResumableResult<bool>
+	bool
 	setDeviceAddress(uint8_t address);
 
 	/// Reads the distance and buffers the result
-	inline modm::ResumableResult<bool>
+	inline bool
 	readDistance()
 	{ return readSensor(); }
 
@@ -371,7 +371,7 @@ public:
 	{ return data.error; }
 
 	template <typename T>
-	modm::ResumableResult<bool>
+	bool
 	updateRegister(Register reg, T setMask, T clearMask = T(0xff))
 	{
 		return updateControlRegister(reg, Control_t(setMask), Control_t(clearMask));
@@ -388,7 +388,7 @@ public:
 	/// The default is ~30ms. ST recommends 2'000'000us = 200ms for high precision.
 	///
 	/// useful range of values: ~20'000us - 2'000'000us (20ms - 2s)
-	modm::ResumableResult<bool>
+	bool
 	setMaxMeasurementTime(uint32_t timeUs);
 
 	/// Get the configured maximum measurement time.
@@ -398,38 +398,38 @@ public:
 protected:
 	/// @cond
 	/// read multiple 8bit values from subsequent registers
-	modm::ResumableResult<bool>
+	bool
 	read(Register reg, uint8_t *buffer, uint8_t length);
 	/// @endcond
 
 	/// @cond
 	/// read an 8bit value from a register
-	modm::ResumableResult<bool>
+	bool
 	read(Register reg, uint8_t& value)
 	{ return read(reg, &value, 1); }
 	/// @endcond
 
 	/// @cond
 	/// write to a control register
-	modm::ResumableResult<bool>
+	bool
 	write(Register reg, Control_t value)
 	{ return write(reg, value.value); }
 	/// @endcond
 
 	/// @cond
 	/// write an 8bit value to a register
-	modm::ResumableResult<bool>
+	bool
 	write(Register reg, uint8_t value);
 	/// @endcond
 
 	/// @cond
 	/// write a 16bit value to 2 subsequent registers in big endian format
-	modm::ResumableResult<bool>
+	bool
 	writeUInt16(Register reg, uint16_t value);
 	/// @endcond
 
 	/// @cond
-	modm::ResumableResult<bool>
+	bool
 	updateControlRegister(Register reg, Control_t setMask, Control_t clearMask = Control_t(0xff));
 	/// @endcond
 
@@ -439,7 +439,7 @@ protected:
 	///
 	/// the predicate must take a uint8_t argument and return a bool
 	template < typename Predicate >
-	modm::ResumableResult<bool>
+	bool
 	poll(Register reg, Predicate pred, uint16_t timeoutMs = 20, uint16_t stepMs = 4);
 	/// @endcond
 private:
@@ -449,30 +449,30 @@ private:
 	///
 	/// The maximum data length is 6 since i2cBuffer[0]
 	/// will contain the register address.
-	modm::ResumableResult<bool>
+	bool
 	writeI2CBuffer(Register reg, uint8_t dataLength);
 	/// @endcond
 
-	modm::ResumableResult<bool>
+	bool
 	readSensor();
 
-	modm::ResumableResult<bool>
+	bool
 	checkModelID();
 
-	modm::ResumableResult<bool>
+	bool
 	checkRevisionID();
 
-	modm::ResumableResult<bool>
+	bool
 	loadTuningSettings();
 
 	// SPAD = "single photon avalanche diode"
-	modm::ResumableResult<bool>
+	bool
 	initializeSpadConfig();
 
-	modm::ResumableResult<bool>
+	bool
 	performReferenceCalibration(Start_t modeFlags = Start_t(0));
 
-	modm::ResumableResult<bool>
+	bool
 	readSequenceInfo();
 
 private:

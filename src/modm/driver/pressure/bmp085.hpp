@@ -113,11 +113,11 @@ public:
 
 	// MARK: - TASKS
 	/// Reads out and stores the calibration bytes
-	modm::ResumableResult<bool>
+	bool
 	initialize(Mode mode = Mode::Standard);
 
 	/// Do a readout sequence to convert and read temperature and then pressure from sensor
-	modm::ResumableResult<bool>
+	bool
 	readout();
 
 	/// Configures the sensor

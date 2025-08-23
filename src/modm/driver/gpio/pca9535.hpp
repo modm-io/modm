@@ -98,19 +98,19 @@ public:
 	Pca9535(uint8_t address=0x20);
 
 public:
-	modm::ResumableResult<bool>
+	bool
 	setOutput(Pins pins);
 
-	modm::ResumableResult<bool>
+	bool
 	set(Pins pins);
 
-	modm::ResumableResult<bool>
+	bool
 	reset(Pins pins);
 
-	modm::ResumableResult<bool>
+	bool
 	toggle(Pins pins);
 
-	modm::ResumableResult<bool>
+	bool
 	set(Pins pins, bool value);
 
 	bool inline
@@ -130,13 +130,13 @@ public:
 	}
 
 public:
-	modm::ResumableResult<bool>
+	bool
 	setInput(Pins pins);
 
-	modm::ResumableResult<bool>
+	bool
 	setInvertInput(Pins pins);
 
-	modm::ResumableResult<bool>
+	bool
 	resetInvertInput(Pins pins);
 
 	bool inline
@@ -146,15 +146,15 @@ public:
 		return memory.input.all(pins);
 	}
 
-	modm::ResumableResult<bool> inline
+	bool inline
 	readInput()
 	{ return readMemory(Index::Input); }
 
 public:
-	modm::ResumableResult<bool>
+	bool
 	writePort(PortType data);
 
-	modm::ResumableResult<bool>
+	bool
 	readPort(PortType &data);
 
 
@@ -218,10 +218,10 @@ public:
 	using Port = GpioExpanderPort< Pca9535<I2cMaster>, object, StartPin, Width, DataOrder >;
 
 private:
-	modm::ResumableResult<bool>
+	bool
 	writeMemory(Index index);
 
-	modm::ResumableResult<bool>
+	bool
 	readMemory(Index index);
 
 	/// @cond

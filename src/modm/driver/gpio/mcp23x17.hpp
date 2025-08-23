@@ -114,22 +114,22 @@ public:
 	Mcp23x17(uint8_t address=0x20);
 
 public:
-	modm::ResumableResult<bool>
+	bool
 	initialize();
 
-	modm::ResumableResult<bool>
+	bool
 	setOutput(Pins pins);
 
-	modm::ResumableResult<bool>
+	bool
 	set(Pins pins);
 
-	modm::ResumableResult<bool>
+	bool
 	reset(Pins pins);
 
-	modm::ResumableResult<bool>
+	bool
 	toggle(Pins pins);
 
-	modm::ResumableResult<bool>
+	bool
 	set(Pins pins, bool value);
 
 	bool
@@ -149,19 +149,19 @@ public:
 	}
 
 public:
-	modm::ResumableResult<bool>
+	bool
 	setInput(Pins pins);
 
-	modm::ResumableResult<bool>
+	bool
 	setPullUp(Pins pins);
 
-	modm::ResumableResult<bool>
+	bool
 	resetPullUp(Pins pins);
 
-	modm::ResumableResult<bool>
+	bool
 	setInvertInput(Pins pins);
 
-	modm::ResumableResult<bool>
+	bool
 	resetInvertInput(Pins pins);
 
 	bool
@@ -171,19 +171,19 @@ public:
 		return memory.gpio.any(pin);
 	}
 
-	modm::ResumableResult<bool> inline
+	bool inline
 	readInput()
 	{ return Transport::read(i(Register::GPIO), buffer + 18, 2); }
 
-	modm::ResumableResult<bool> inline
+	bool inline
 	readAllInput()
 	{ return Transport::read(i(Register::INTF), buffer + 14, 8); }
 
 public:
-	modm::ResumableResult<bool>
+	bool
 	writePort(PortType data);
 
-	modm::ResumableResult<bool>
+	bool
 	readPort(PortType &data);
 
 public:

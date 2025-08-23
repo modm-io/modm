@@ -209,7 +209,7 @@ public:
 
 	// MARK: - TASKS
 	/// Reads out and stores the calibration bytes
-	modm::ResumableResult<bool>
+	bool
 	initialize(
 			Mode mode = Mode::Normal,
 			Oversampling temperature = Oversampling::Single,
@@ -217,13 +217,13 @@ public:
 			Oversampling humidity = Oversampling::Single);
 
 	/// Read the raw data from the sensor. Conversion must be freerunning.
-	modm::ResumableResult<bool>
+	bool
 	readout();
 
 	/// Start a single measurement in forced mode. Sensor will go to standby after this.
 	/// To reduce bus traffic only the absolute necessary register (CTRL_MEAS) is written.
 	/// If oversampling of humidity shall be changed, another method must be used.
-	modm::ResumableResult<bool>
+	bool
 	startMeasurement(
 			Oversampling temperature = Oversampling::Single,
 			Oversampling pressure = Oversampling::Single);

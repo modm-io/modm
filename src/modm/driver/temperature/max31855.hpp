@@ -84,7 +84,7 @@ public:
     initialize();
 
     /// Read the raw data from the sensor
-    modm::ResumableResult<void>
+    void
     readout();
 
 public:

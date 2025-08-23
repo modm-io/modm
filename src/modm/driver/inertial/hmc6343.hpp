@@ -215,7 +215,7 @@ public:
 
 	// READING RAM
 	/// read operation mode register 2
-	modm::ResumableResult<bool>
+	bool
 	readOperationMode()
 	{ return readPostData(Command::PostOperationMode, 20, 1); }
 
@@ -223,22 +223,22 @@ public:
 
 	// WRITING EEPROM
 	/// Configures the sensor to normal orientation mode with 10Hz data rate.
-	modm::ResumableResult<bool>
+	bool
 	setMeasurementRate(MeasurementRate measurementRate=MeasurementRate::Hz10)
 	{ return writeRegister(Register::OperationMode2, i(measurementRate)); }
 
 	/// sets a new deviation angle in eeprom
-	modm::ResumableResult<bool> inline
+	bool inline
 	setDeviationAngle(int16_t angle)
 	{ return writeRegister(Register16::DeviationAngle, static_cast<uint16_t>(angle)); }
 
 	/// sets a new variation angle in eeprom
-	modm::ResumableResult<bool> inline
+	bool inline
 	setVariationAngle(int16_t angle)
 	{ return writeRegister(Register16::VariationAngle, static_cast<uint16_t>(angle)); }
 
 	/// sets a new IIR filter in eeprom
-	modm::ResumableResult<bool>
+	bool
 	setIIR_Filter(uint8_t filter)
 	{ return writeRegister(Register::Filter, filter & 0x0f); }
 
@@ -246,12 +246,12 @@ public:
 
 	// READING EEPROM
 	/// reads the device id from eeprom
-	modm::ResumableResult<bool>
+	bool
 	getDeviceId(uint16_t &value)
 	{ return readRegister(Register16::DeviceSerial, value); }
 
 	/// sets a new IIR filter in eeprom
-	modm::ResumableResult<bool>
+	bool
 	getIIR_Filter(uint8_t &value)
 	{ return readRegister(Register::Filter, value); }
 
@@ -259,42 +259,42 @@ public:
 
 	// COMMANDS
 	/// Sets the specified orientation
-	modm::ResumableResult<bool>
+	bool
 	setOrientation(Orientation orientation)
 	{ return writeCommand(static_cast<Command>(orientation)); }
 
 	/// enters run mode
-	modm::ResumableResult<bool>
+	bool
 	enterRunMode()
 	{ return writeCommand(Command::EnterRunMode); }
 
 	/// enters standby mode
-	modm::ResumableResult<bool>
+	bool
 	enterStandbyMode()
 	{ return writeCommand(Command::EnterStandbyMode); }
 
 	/// enters sleep mode
-	modm::ResumableResult<bool>
+	bool
 	enterSleepMode()
 	{ return writeCommand(Command::EnterSleepMode); }
 
 	/// exit sleep mode
-	modm::ResumableResult<bool>
+	bool
 	exitSleepMode()
 	{ return writeCommand(Command::ExitSleepMode, 20); }
 
 	/// enters user calibration mode
-	modm::ResumableResult<bool>
+	bool
 	enterUserCalibrationMode()
 	{ return writeCommand(Command::EnterUserCalibrationMode); }
 
 	/// exit user calibration mode
-	modm::ResumableResult<bool>
+	bool
 	exitUserCalibrationMode()
 	{ return writeCommand(Command::ExitUserCalibrationMode, 50); }
 
 	/// resets the processor, any new command is delayed by 500ms
-	modm::ResumableResult<bool>
+	bool
 	resetProcessor()
 	{ return writeCommand(Command::ResetProcessor, 500); }
 
@@ -302,22 +302,22 @@ public:
 
 	// DATA REQUESTS
 	/// reads the Acceleration registers and buffer the results
-	modm::ResumableResult<bool>
+	bool
 	readAcceleration()
 	{ return readPostData(Command::PostAccelData, 0, 6); }
 
 	/// reads the Magnetometer registers and buffer the results
-	modm::ResumableResult<bool>
+	bool
 	readMagneticField()
 	{ return readPostData(Command::PostMagData, 6, 6); }
 
 	/// reads the Heading registers and buffer the results
-	modm::ResumableResult<bool>
+	bool
 	readHeading()
 	{ return readPostData(Command::PostHeadingData, 12, 6); }
 
 	/// reads the Tilt registers and buffer the results
-	modm::ResumableResult<bool>
+	bool
 	readTilt()
 	{ return readPostData(Command::PostTiltData, 14, 6); }
 
@@ -328,19 +328,19 @@ protected:
 
 	// RAW REGISTER ACCESS
 	/// write a 8bit value into the eeprom
-	modm::ResumableResult<bool>
+	bool
 	writeRegister(Register reg, uint8_t value);
 
 	/// write a 16bit value into the eeprom
-	modm::ResumableResult<bool>
+	bool
 	writeRegister(Register16 reg, uint16_t value);
 
 	/// read a 8bit value from the eeprom
-	modm::ResumableResult<bool>
+	bool
 	readRegister(Register reg, uint8_t &value);
 
 	/// read a 16bit value from the eeprom
-	modm::ResumableResult<bool>
+	bool
 	readRegister(Register16 reg, uint16_t &value);
 
 	/// @}
@@ -352,10 +352,10 @@ public:
 	{ return data; }
 
 private:
-	modm::ResumableResult<bool>
+	bool
 	writeCommand(Command command, uint16_t timeout = 1);
 
-	modm::ResumableResult<bool>
+	bool
 	readPostData(Command command, uint8_t offset, uint8_t readSize);
 
 private:

@@ -31,7 +31,7 @@ Ad7928<SpiMaster, Cs>::Ad7928() : currentPowerMode{PowerMode::Normal}
 
 // ----------------------------------------------------------------------------
 template <typename SpiMaster, typename Cs>
-ResumableResult<void>
+void
 Ad7928<SpiMaster, Cs>::initialize()
 {
 	Cs::setOutput(modm::Gpio::High);
@@ -55,7 +55,7 @@ Ad7928<SpiMaster, Cs>::initialize()
 
 // ----------------------------------------------------------------------------
 template <typename SpiMaster, typename Cs>
-ResumableResult<ad7928::Data>
+ad7928::Data
 Ad7928<SpiMaster, Cs>::singleConversion(ad7928::InputChannel channel)
 {
 	SequenceMode_t::set(config, SequenceMode::NoSequence);
@@ -80,7 +80,7 @@ Ad7928<SpiMaster, Cs>::singleConversion(ad7928::InputChannel channel)
 
 // ----------------------------------------------------------------------------
 template <typename SpiMaster, typename Cs>
-ResumableResult<void>
+void
 Ad7928<SpiMaster, Cs>::startSequence(ad7928::SequenceChannels_t channels1,
 									 ad7928::SequenceChannels_t channels2)
 {
@@ -106,7 +106,7 @@ Ad7928<SpiMaster, Cs>::startSequence(ad7928::SequenceChannels_t channels1,
 
 // ----------------------------------------------------------------------------
 template <typename SpiMaster, typename Cs>
-ResumableResult<ad7928::Data>
+ad7928::Data
 Ad7928<SpiMaster, Cs>::nextSequenceConversion()
 {
 	SequenceMode_t::set(config, SequenceMode::ContinueSequence);
@@ -164,7 +164,7 @@ Ad7928<SpiMaster, Cs>::isAutoShutdownEnabled()
 
 // ----------------------------------------------------------------------------
 template <typename SpiMaster, typename Cs>
-ResumableResult<void>
+void
 Ad7928<SpiMaster, Cs>::fullShutdown()
 {
 	SequenceMode_t::set(config, SequenceMode::NoSequence);
@@ -179,7 +179,7 @@ Ad7928<SpiMaster, Cs>::fullShutdown()
 
 // ----------------------------------------------------------------------------
 template <typename SpiMaster, typename Cs>
-ResumableResult<void>
+void
 Ad7928<SpiMaster, Cs>::wakeup()
 {
 	SequenceMode_t::set(config, SequenceMode::NoSequence);
@@ -195,7 +195,7 @@ Ad7928<SpiMaster, Cs>::wakeup()
 
 // ----------------------------------------------------------------------------
 template <typename SpiMaster, typename Cs>
-ResumableResult<void>
+void
 Ad7928<SpiMaster, Cs>::transfer(Register_t reg)
 {
 	modm::this_fiber::poll([&]{ return this->acquireMaster(); });

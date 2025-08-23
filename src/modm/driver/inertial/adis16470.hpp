@@ -198,7 +198,7 @@ public:
 	 * @warning The SPI frequency must not exceed 2 MHz for this chip,
 	 * or 1 MHz with burst mode.
 	 */
-	modm::ResumableResult<void>
+	void
 	initialize();
 
 	/**
@@ -208,7 +208,7 @@ public:
 	 * @return The register value in case of a read access, or std::nullopt if
 	 * an error occured, e.g. if some register access is not permitted.
 	 */
-	modm::ResumableResult<std::optional<uint16_t>>
+	std::optional<uint16_t>
 	readRegister(Register reg);
 
 	/**
@@ -216,7 +216,7 @@ public:
 	 *
 	 * @return The register value
 	 */
-	modm::ResumableResult<modm::adis16470::DiagStat_t>
+	modm::adis16470::DiagStat_t
 	readDiagStat();
 
 	/**
@@ -224,7 +224,7 @@ public:
 	 *
 	 * @return The register value
 	 */
-	modm::ResumableResult<modm::adis16470::MscCtrl_t>
+	modm::adis16470::MscCtrl_t
 	readMscCtrl();
 
 	/**
@@ -235,7 +235,7 @@ public:
 	 * @return False in case of any error, e.g. if some register acces is not
 	 * permitted.
 	 */
-	modm::ResumableResult<bool>
+	bool
 	writeRegister(Register reg, uint16_t value);
 
 	/**
@@ -243,7 +243,7 @@ public:
 	 *
 	 * @param value The value to be written to the MSC_CTRL register.
 	 */
-	modm::ResumableResult<void>
+	void
 	writeMscCtrl(modm::adis16470::MscCtrl_t value);
 
 	/**
@@ -251,7 +251,7 @@ public:
 	 *
 	 * @param value The value to be written to the MSC_CTRL register.
 	 */
-	modm::ResumableResult<void>
+	void
 	writeGlobCmd(modm::adis16470::GlobCmd_t value);
 
 	/**
@@ -261,7 +261,7 @@ public:
 	 * @tparam tolerance: acceptable tolerance, default 1%
 	 */
 	template<frequency_t frequency, percent_t tolerance=pct(1)>
-	modm::ResumableResult<void>
+	void
 	setDataOutputFrequency();
 
 	/**
@@ -274,7 +274,7 @@ public:
 	 * @return False in case of any error, e.g. if some register access is not
 	 * permitted.
 	 */
-	modm::ResumableResult<bool>
+	bool
 	readRegisterSequence(std::span<const Register> sequence, std::span<uint16_t> values);
 
 	/**
@@ -302,7 +302,7 @@ public:
 	 * has already been checked by this driver.
 	 * @return False in case of a checksum mismatch.
 	 */
-	modm::ResumableResult<bool>
+	bool
 	readRegisterBurst(std::array<uint16_t, 11>& data);
 
 private:
