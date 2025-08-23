@@ -178,9 +178,7 @@ struct max31865
  * @ingroup modm_driver_max31865
  */
 template<typename SpiMaster, typename Cs, max31865::Pt pt = max31865::pt100>
-class Max31865 : public max31865,
-				 public modm::SpiDevice<SpiMaster>,
-				 protected modm::NestedResumable<3>
+class Max31865 : public max31865, public modm::SpiDevice<SpiMaster>
 {
 public:
 	using Data = max31865::Data<pt>;

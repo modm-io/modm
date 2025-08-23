@@ -64,7 +64,7 @@ template<
 	typename Xblank=modm::platform::GpioUnused,
 	typename Vprog=modm::platform::GpioUnused,
 	typename Xerr=modm::platform::GpioUnused >
-class TLC594X : private modm::NestedResumable< 1 >
+class TLC594X
 {
 public:
 	static_assert(CHANNELS % 4 ==  0, "Template parameter CHANNELS must be a multiple of 4.");

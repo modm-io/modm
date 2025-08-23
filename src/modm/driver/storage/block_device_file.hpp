@@ -32,7 +32,7 @@ namespace modm
  * \author	Raphael Lehmann
  */
 template <class Filename, size_t DeviceSize_>
-class BdFile : public modm::BlockDevice, protected modm::NestedResumable<3>
+class BdFile : public modm::BlockDevice
 {
 public:
 	/// Initializes the storage hardware

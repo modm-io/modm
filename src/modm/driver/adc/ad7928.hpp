@@ -153,7 +153,7 @@ public:
  * @ingroup modm_driver_ad7928
  */
 template <typename SpiMaster, typename Cs>
-class Ad7928 : public ad7928, public modm::SpiDevice<SpiMaster>, protected modm::NestedResumable<3>
+class Ad7928 : public ad7928, public modm::SpiDevice<SpiMaster>
 {
 public:
 	Ad7928();

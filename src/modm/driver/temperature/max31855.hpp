@@ -71,7 +71,7 @@ struct max31855
  * @ingroup modm_driver_max31855
  */
 template <typename SpiMaster, typename Cs>
-class Max31855 : public max31855, public modm::SpiDevice<SpiMaster>, protected modm::NestedResumable<1>
+class Max31855 : public max31855, public modm::SpiDevice<SpiMaster>
 {
 public:
     /**

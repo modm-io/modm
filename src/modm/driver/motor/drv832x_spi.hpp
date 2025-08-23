@@ -297,7 +297,7 @@ struct drv832xSpi
  * \author	Raphael Lehmann
  */
 template < class SpiMaster, class Cs >
-class Drv832xSpi : public drv832xSpi, public modm::SpiDevice< SpiMaster >, protected modm::NestedResumable<3>
+class Drv832xSpi : public drv832xSpi, public modm::SpiDevice< SpiMaster >
 {
 public:
 	/**

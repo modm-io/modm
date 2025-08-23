@@ -91,7 +91,7 @@ struct as5047
  * @ingroup modm_driver_as5047
  */
 template<typename SpiMaster, typename Cs>
-class As5047 : public as5047, public modm::SpiDevice<SpiMaster>, protected modm::NestedResumable<5>
+class As5047 : public as5047, public modm::SpiDevice<SpiMaster>
 {
 public:
 	using Data = as5047::Data;

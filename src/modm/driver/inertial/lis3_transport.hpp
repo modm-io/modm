@@ -83,7 +83,7 @@ private:
  * @author	Niklas Hauser
  */
 template < class SpiMaster, class Cs >
-class Lis3TransportSpi : public modm::SpiDevice< SpiMaster >, protected modm::NestedResumable<2>
+class Lis3TransportSpi : public modm::SpiDevice< SpiMaster >
 {
 public:
 	Lis3TransportSpi(uint8_t /*address*/);

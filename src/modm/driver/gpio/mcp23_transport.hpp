@@ -78,7 +78,7 @@ private:
  * @author	Niklas Hauser
  */
 template < class SpiMaster, class Cs >
-class Mcp23TransportSpi : public modm::SpiDevice< SpiMaster >, protected modm::NestedResumable<2>
+class Mcp23TransportSpi : public modm::SpiDevice< SpiMaster >
 {
 public:
 	Mcp23TransportSpi(uint8_t address);

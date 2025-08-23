@@ -34,7 +34,7 @@ namespace modm
  * \author	Raphael Lehmann
  */
 template <typename BlockDeviceA, typename BlockDeviceB>
-class BdMirror : public modm::BlockDevice, protected NestedResumable<3>
+class BdMirror : public modm::BlockDevice
 {
 public:
 	/// Initializes the storage hardware

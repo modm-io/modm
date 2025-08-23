@@ -84,7 +84,7 @@ public:
  * @author	Rasmus Kleist Hørlyck Sørensen
  */
 template < class SpiMaster, class Cs >
-class Sx128xTransportSpi : public Sx128xTransport, public SpiDevice< SpiMaster >, protected NestedResumable<2>
+class Sx128xTransportSpi : public Sx128xTransport, public SpiDevice< SpiMaster >
 {
 public:
     Sx128xTransportSpi() = default;
@@ -112,7 +112,7 @@ private:
  * @author	Rasmus Kleist Hørlyck Sørensen
  */
 template < class Uart >
-class Sx128xTransportUart : public Sx128xTransport, public UartDevice< Uart, 2 >
+class Sx128xTransportUart : public Sx128xTransport, public UartDevice< Uart >
 {
 public:
     Sx128xTransportUart() = default;

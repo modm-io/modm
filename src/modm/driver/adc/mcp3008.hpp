@@ -56,7 +56,7 @@ struct mcp3008
  * @ingroup modm_driver_mcp3008
  */
 template <typename SpiMaster, typename Cs>
-class Mcp3008 : public mcp3008, public modm::SpiDevice<SpiMaster>, protected modm::NestedResumable<1>
+class Mcp3008 : public mcp3008, public modm::SpiDevice<SpiMaster>
 {
 public:
     Mcp3008() = default;

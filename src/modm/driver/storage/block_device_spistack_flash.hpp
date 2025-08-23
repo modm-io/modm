@@ -34,7 +34,7 @@ namespace modm
  * \author	Rasmus Kleist Hørlyck Sørensen
  */
 template <typename SpiBlockDevice, uint8_t DieCount>
-class BdSpiStackFlash : public modm::BlockDevice, protected NestedResumable<3>
+class BdSpiStackFlash : public modm::BlockDevice
 {
 public:
 	/// Initializes the storage hardware

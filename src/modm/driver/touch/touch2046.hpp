@@ -68,7 +68,7 @@ struct touch2046 {
  * Datasheet TSC2046: https://www.ti.com/lit/ds/symlink/tsc2046.pdf
  */
 template < class SpiMaster, class Cs>
-class Touch2046 : public touch2046, public modm::SpiDevice< SpiMaster >, protected modm::NestedResumable<3>
+class Touch2046 : public touch2046, public modm::SpiDevice< SpiMaster >
 {
 public:
 	/**

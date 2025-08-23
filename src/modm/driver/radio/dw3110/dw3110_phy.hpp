@@ -37,7 +37,7 @@ namespace modm
  * @author   Michael Jossen
  */
 template<typename SpiMaster, typename Cs>
-class Dw3110Phy : public modm::SpiDevice<SpiMaster>, protected modm::NestedResumable<6>
+class Dw3110Phy : public modm::SpiDevice<SpiMaster>
 {
 public:
 	enum class TXMode

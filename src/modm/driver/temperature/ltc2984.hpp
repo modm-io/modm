@@ -340,7 +340,7 @@ inline ltc2984::CommandStatus operator |(ltc2984::CommandStatus r, ltc2984::Chan
  * \author	Raphael Lehmann
  */
 template < class SpiMaster, class Cs >
-class Ltc2984 : public ltc2984, public modm::SpiDevice< SpiMaster >, protected modm::NestedResumable<3>
+class Ltc2984 : public ltc2984, public modm::SpiDevice< SpiMaster >
 {
 public:
 	/**

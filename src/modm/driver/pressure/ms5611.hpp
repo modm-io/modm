@@ -80,7 +80,7 @@ protected:
  * @ingroup modm_driver_ms5611
  */
 template <typename SpiMaster, typename Cs>
-class Ms5611 : public ms5611, public modm::SpiDevice<SpiMaster>, protected modm::NestedResumable<2>
+class Ms5611 : public ms5611, public modm::SpiDevice<SpiMaster>
 {
 public:
     /**

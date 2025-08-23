@@ -67,7 +67,7 @@ private:
  * @author	Rasmus Kleist Hørlyck Sørensen
  */
 template < class SpiMaster, class Cs >
-class Ixm42xxxTransportSpi : public modm::SpiDevice< SpiMaster >, protected modm::NestedResumable< 4 >
+class Ixm42xxxTransportSpi : public modm::SpiDevice< SpiMaster >
 {
 public:
     Ixm42xxxTransportSpi(uint8_t /*address*/);

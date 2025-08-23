@@ -39,7 +39,7 @@ namespace modm
  * \author  Rasmus Kleist Hørlyck Sørensen
  */
 template <typename Spi, typename Cs, uint32_t flashSize>
-class BdSpiFlash : public modm::BlockDevice, public modm::SpiDevice< Spi >, protected NestedResumable<6>
+class BdSpiFlash : public modm::BlockDevice, public modm::SpiDevice< Spi >
 {
 public:
 	/// Initializes the storage hardware

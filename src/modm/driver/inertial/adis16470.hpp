@@ -184,9 +184,7 @@ struct adis16470
  * \author	Raphael Lehmann
  */
 template<class SpiMaster, class Cs>
-class Adis16470 : public adis16470,
-				  public modm::SpiDevice<SpiMaster>,
-				  protected modm::NestedResumable<2>
+class Adis16470 : public adis16470, public modm::SpiDevice<SpiMaster>
 {
 public:
 	/**

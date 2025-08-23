@@ -40,7 +40,7 @@ struct hx711
 
 /// @ingroup modm_driver_hx711
 template <typename Cfg>
-class Hx711 : public hx711, protected modm::NestedResumable<2>
+class Hx711 : public hx711
 {
 	using Sck = typename Cfg::Sck;
 	using Data = typename Cfg::Data;

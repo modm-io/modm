@@ -100,7 +100,7 @@ using Tmp125Temperature = Tmp12xTemperature<10, 5, 1, 4>; // 10 bit, 1/4 °C res
  * @tparam TemperatureT Sensor temperature type
  */
 template<typename SpiMaster, typename Cs, typename TemperatureT>
-class Tmp12x : public modm::SpiDevice<SpiMaster>, protected modm::NestedResumable<1>
+class Tmp12x : public modm::SpiDevice<SpiMaster>
 {
 public:
 	using Temperature = TemperatureT;

@@ -26,8 +26,8 @@ namespace modm
  * @author	Rasmus Kleist Hørlyck Sørensen
  * @ingroup modm_architecture_uart_device
  */
-template < class Uart, uint8_t NestingLevels = 10 >
-class UartDevice : protected modm::NestedResumable< NestingLevels + 1 >
+template < class Uart >
+class UartDevice
 {
 public:
 	UartDevice() :

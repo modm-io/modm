@@ -41,7 +41,7 @@ namespace modm
  * @ingroup modm_architecture_i2c_device
  */
 template < class I2cMaster, uint8_t NestingLevels = 10, class Transaction = I2cWriteReadTransaction >
-class I2cDevice : protected modm::NestedResumable< NestingLevels + 1 >
+class I2cDevice
 {
 public:
 	///	@param	address	the slave address not yet shifted left (address < 128).

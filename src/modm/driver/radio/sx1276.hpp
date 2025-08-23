@@ -28,7 +28,7 @@ namespace modm
  * @ingroup   modm_driver_sx1276
  */
 template <typename SpiMaster, typename Cs>
-class Sx1276 : public sx1276, public modm::SpiDevice<SpiMaster>, protected modm::NestedResumable<6>
+class Sx1276 : public sx1276, public modm::SpiDevice<SpiMaster>
 {
 public:
 	/**
