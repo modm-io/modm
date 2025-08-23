@@ -62,9 +62,9 @@ void
 modm::SiemensM55<SPI, CS, RS, Reset>::lcdSettings()
 {
 	// Hardware reset is low from initialize
-	modm::delay_ms(10);
+	modm::this_fiber::sleep_for(10ms);
 	Reset::set();
-	modm::delay_ms(10);
+	modm::this_fiber::sleep_for(10ms);
 
 	RS::set();	// command mode
 	CS::reset();	// select display
@@ -73,10 +73,10 @@ modm::SiemensM55<SPI, CS, RS, Reset>::lcdSettings()
 	{
 	  SPI::write(initData_lm15[ii]);   // send initialization data
 	}
-	modm::delay_ms(1);
+	modm::this_fiber::sleep_for(1ms);
 	CS::set();	// deactivate LCD CS
 
-	modm::delay_ms(1);
+	modm::this_fiber::sleep_for(1ms);
 	CS::reset();	// activate LCD CS
 
 	SPI::write(0xF0);
@@ -99,7 +99,7 @@ modm::SiemensM55<SPI, CS, RS, Reset>::lcdSettings()
 	CS::set();	 // deactivate LCD CS
 	RS::reset();	// set LCD to data mode
 
-	modm::delay_ms(10);
+	modm::this_fiber::sleep_for(10ms);
 
 
 	static uint8_t contrast = 22;

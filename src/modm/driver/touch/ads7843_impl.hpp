@@ -94,13 +94,13 @@ uint16_t
 modm::Ads7843<Spi, Cs, Int>::readData(uint8_t command)
 {
 	Cs::reset();
-	modm::delay_us(1);	// modm::delay_ns(100);
+	modm::this_fiber::sleep_for(1us);	// modm::delay_ns(100);
 	Spi::transfer(command);
-	modm::delay_us(1);
+	modm::this_fiber::sleep_for(1us);
 
 	uint16_t temp = Spi::transfer(0x00);
 	temp <<= 8;
-	modm::delay_us(1);
+	modm::this_fiber::sleep_for(1us);
 
 	temp |= Spi::transfer(0x00);
 	temp >>= 3;

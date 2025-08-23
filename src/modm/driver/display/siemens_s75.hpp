@@ -15,7 +15,7 @@
 #ifndef MODM_SIEMENS_S75_HPP
 #define MODM_SIEMENS_S75_HPP
 
-#include <modm/architecture/interface/delay.hpp>
+#include <modm/processing/fiber.hpp>
 #include <modm/driver/bus/bitbang_memory_interface.hpp>
 #include <modm/ui/display/monochrome_graphic_display_vertical.hpp>
 

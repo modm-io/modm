@@ -36,7 +36,7 @@ modm::BitBangEncoderInput<SignalA, SignalB, PRESCALER, DeltaType>::initialize(
 	Signals::setInput(inputType);
 
 	// Tare power-on state
-	modm::delay(10us);
+	modm::this_fiber::sleep_for(10us);
 	raw_last = getRaw();
 }
 

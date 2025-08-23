@@ -24,11 +24,10 @@ of 20 Mhz is supported.
 
 def prepare(module, options):
     module.depends(
-        ":architecture:delay",
+        ":architecture:fiber",
         ":architecture:gpio",
         ":architecture:register",
-        ":architecture:spi.device",
-        ":architecture:fiber")
+        ":architecture:spi.device")
     return True
 
 def build(env):

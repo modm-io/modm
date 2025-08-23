@@ -16,6 +16,7 @@
 
 #include <modm/architecture/utils.hpp>
 #include <modm/architecture/interface/gpio.hpp>
+#include <modm/processing/fiber.hpp>
 
 namespace modm
 {

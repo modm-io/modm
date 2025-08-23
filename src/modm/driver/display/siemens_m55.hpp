@@ -15,7 +15,7 @@
 #ifndef MODM_SIEMENS_M55_HPP
 #define MODM_SIEMENS_M55_HPP
 
-#include <modm/architecture/interface/delay.hpp>
+#include <modm/processing/fiber.hpp>
 #include <modm/ui/display/monochrome_graphic_display_vertical.hpp>
 
 namespace modm

@@ -35,7 +35,7 @@ void
 Ad7928<SpiMaster, Cs>::initialize()
 {
 	Cs::setOutput(modm::Gpio::High);
-	modm::delay_us(1);
+	modm::this_fiber::sleep_for(1us);
 
 	// reset device
 	transfer(Register_t(0xFF));
@@ -188,7 +188,7 @@ Ad7928<SpiMaster, Cs>::wakeup()
 	transfer(config);
 
 	// Wait for the device to power up
-	modm::delay_us(1);
+	modm::this_fiber::sleep_for(1us);
 
 	currentPowerMode = PowerMode::Normal;
 }

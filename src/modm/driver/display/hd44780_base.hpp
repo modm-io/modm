@@ -13,6 +13,8 @@
 #ifndef MODM_HD44780_BASE_HPP
 #define MODM_HD44780_BASE_HPP
 
+#include <modm/architecture/interface/delay.hpp>
+
 namespace modm
 {
 

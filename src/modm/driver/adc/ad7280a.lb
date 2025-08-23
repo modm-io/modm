@@ -36,7 +36,7 @@ be lower than 1 MHz because delays introduced in each stage of the chain.
 
 def prepare(module, options):
     module.depends(
-        ":architecture:delay",
+        ":architecture:fiber",
         ":architecture:gpio",
         ":architecture:spi",
         ":math:utils")

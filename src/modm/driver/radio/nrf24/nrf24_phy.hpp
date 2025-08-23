@@ -18,7 +18,7 @@
 #include <stdint.h>
 #include <modm/debug/logger.hpp>
 
-#include <modm/architecture/interface/delay.hpp>
+#include <modm/processing/fiber.hpp>
 #include "nrf24_definitions.hpp"
 
 

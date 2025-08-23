@@ -13,7 +13,7 @@
 #ifndef MODM_DS1302_HPP
 #define MODM_DS1302_HPP
 
-#include <modm/architecture/interface/delay.hpp>
+#include <modm/processing/fiber.hpp>
 
 namespace modm
 {

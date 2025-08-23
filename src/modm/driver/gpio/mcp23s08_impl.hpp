@@ -36,7 +36,7 @@ modm::Mcp23s08<Spi, Cs, Int>::initialize()
 	cs.setOutput();
 	interrupt.setInput();
 
-	modm::delay_us(1);
+	modm::this_fiber::sleep_for(1us);
 
 	// disable address pins (as they are by default) and enable the
 	// open-drain output from the interrupt line
@@ -46,7 +46,7 @@ modm::Mcp23s08<Spi, Cs, Int>::initialize()
 	spi.write(1 << 2);
 	cs.set();
 
-	modm::delay_us(1);
+	modm::this_fiber::sleep_for(1us);
 }
 
 template <typename Spi, typename Cs, typename Int>
@@ -59,7 +59,7 @@ modm::Mcp23s08<Spi, Cs, Int>::configure(uint8_t inputMask, uint8_t pullupMask)
 	spi.write(inputMask);
 	cs.set();
 
-	modm::delay_us(1);
+	modm::this_fiber::sleep_for(1us);
 
 	cs.reset();
 	spi.write(deviceAddress | WRITE);
@@ -67,7 +67,7 @@ modm::Mcp23s08<Spi, Cs, Int>::configure(uint8_t inputMask, uint8_t pullupMask)
 	spi.write(pullupMask);
 	cs.set();
 
-	modm::delay_us(1);
+	modm::this_fiber::sleep_for(1us);
 }
 
 //void
@@ -85,7 +85,7 @@ modm::Mcp23s08<Spi, Cs, Int>::read()
 	uint8_t value = spi.write(0x00);
 	cs.set();
 
-	modm::delay_us(1);
+	modm::this_fiber::sleep_for(1us);
 
 	return value;
 }
@@ -100,5 +100,5 @@ modm::Mcp23s08<Spi, Cs, Int>::write(uint8_t output)
 	spi.write(output);
 	cs.set();
 
-	modm::delay_us(1);
+	modm::this_fiber::sleep_for(1us);
 }

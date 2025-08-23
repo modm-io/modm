@@ -30,7 +30,7 @@ def prepare(module, options):
         ":architecture:assert",
         ":architecture:can",
         ":architecture:clock",
-        ":architecture:delay",
+        ":architecture:fiber",
         ":debug")
     return True
 

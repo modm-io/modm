@@ -30,7 +30,7 @@ modm::Tcs3472<I2cMaster>::setInterruptLowThreshold(uint16_t threshold)
 {
 	if (writeRegister(RegisterAddress::LOW_THRESH_LOW_BYTE, threshold))
 	{
-		modm::delay(20us);
+		modm::this_fiber::sleep_for(20us);
 		if (writeRegister(RegisterAddress::LOW_THRESH_HIGH_BYTE, threshold >> 8))
 		{
 			return true;

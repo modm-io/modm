@@ -15,7 +15,7 @@
 	#error	"Don't include this file directly, use 'spi_ram.hpp' instead!"
 #endif
 
-#include <modm/architecture/interface/delay.hpp>
+#include <modm/processing/fiber.hpp>
 
 template <typename Spi, typename Cs, typename Hold>
 Spi modm::SpiRam<Spi, Cs, Hold>::spi;
@@ -39,14 +39,14 @@ modm::SpiRam<Spi, Cs, Hold>::initialize()
 	hold.set();
 	hold.setOutput();
 
-	modm::delay_us(1);
+	modm::this_fiber::sleep_for(1us);
 
 	cs.reset();
 	spi.write(WRITE_STATUS_REGISTER);
 	spi.write(SEQUENTIAL_MODE);
 	cs.set();
 
-	modm::delay_us(1);
+	modm::this_fiber::sleep_for(1us);
 
 	// Check if the status register has the right content. This also used
 	// as a general check that the device is available.

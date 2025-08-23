@@ -22,25 +22,25 @@ Hx711<Cfg>::singleConversion()
 {
 	modm::this_fiber::poll([&]{ return Data::read() == modm::Gpio::Low; });
 
-	modm::delay_us(1);
+	modm::this_fiber::sleep_for(1us);
 
 	data = 0;
 	for (uint8_t ii = 0; ii < 24; ++ii)
 	{
 		Sck::set();
-		modm::delay_us(1);
+		modm::this_fiber::sleep_for(1us);
 		data = (data << 1) | Data::read();
-		modm::delay_us(1);
+		modm::this_fiber::sleep_for(1us);
 		Sck::reset();
-		modm::delay_us(1);
+		modm::this_fiber::sleep_for(1us);
 	}
 
 	// Additional pulses for mode of next conversion
 	for (uint8_t ii = 0; ii < static_cast<uint8_t>(Cfg::mode); ++ii) {
 		Sck::set();
-		modm::delay_us(1);
+		modm::this_fiber::sleep_for(1us);
 		Sck::reset();
-		modm::delay_us(1);
+		modm::this_fiber::sleep_for(1us);
 	}
 
 	// Fill up MSBs for negative numbers

@@ -18,8 +18,8 @@
 
 #include <stdint.h>
 #include <modm/architecture/interface/accessor.hpp>
-#include <modm/architecture/interface/delay.hpp>
 #include <modm/architecture/interface/can.hpp>
+#include <modm/processing/fiber.hpp>
 #include <modm/debug/logger.hpp>
 
 #include "mcp2515_definitions.hpp"

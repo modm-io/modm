@@ -14,7 +14,7 @@
 #define TFT_MEMORY_BUS_HPP_
 
 #include <modm/architecture/utils.hpp>
-#include <modm/architecture/interface/delay.hpp>
+#include <modm/processing/fiber.hpp>
 
 namespace modm
 {
@@ -153,13 +153,13 @@ public:
 		PORT::write(data);
 
 		// t_AS
-		modm::delay_us(1);
+		modm::this_fiber::sleep_for(1us);
 		WR::reset();
 
-		modm::delay_us(1);
+		modm::this_fiber::sleep_for(1us);
 		WR::set();
 
-		modm::delay_us(1);
+		modm::this_fiber::sleep_for(1us);
 		PORT::setInput();
 
 		CS::set();
@@ -172,11 +172,11 @@ public:
 		CS::reset();
 		WR::set();
 
-		modm::delay_us(1);
+		modm::this_fiber::sleep_for(1us);
 
 		RD::reset();
 
-		modm::delay_us(1);
+		modm::this_fiber::sleep_for(1us);
 		ret = PORT::read();
 
 		RD::set();

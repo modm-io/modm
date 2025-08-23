@@ -47,17 +47,17 @@ void modm::BitbangMemoryInterface<PORT, CS, CD, WR>::writeRegister(uint8_t reg)
 	WR::reset();
 	PORT::write(0);
 
-	modm::delay_us(1);
+	modm::this_fiber::sleep_for(1us);
 	WR::set();		// Low-to-High strobe
-	modm::delay_us(1);
+	modm::this_fiber::sleep_for(1us);
 
 
 	WR::reset();
 	PORT::write(reg);
 
-	modm::delay_us(1);
+	modm::this_fiber::sleep_for(1us);
 	WR::set();		// Low-to-High strobe
-	modm::delay_us(1);
+	modm::this_fiber::sleep_for(1us);
 
 
 	CS::set();
@@ -73,17 +73,17 @@ void modm::BitbangMemoryInterface<PORT, CS, CD, WR>::writeData(const uint16_t da
 	WR::reset();
 	PORT::write(data >> 8);
 
-	modm::delay_us(1);
+	modm::this_fiber::sleep_for(1us);
 	WR::set();		// Low-to-High strobe
-	modm::delay_us(1);
+	modm::this_fiber::sleep_for(1us);
 
 
 	WR::reset();
 	PORT::write(data);
 
-	modm::delay_us(1);
+	modm::this_fiber::sleep_for(1us);
 	WR::set();		// Low-to-High strobe
-	modm::delay_us(1);
+	modm::this_fiber::sleep_for(1us);
 
 	CS::set();
 }
@@ -99,15 +99,15 @@ void modm::BitbangMemoryInterface<PORT, CS, CD, WR>::writeDataMult(const uint16_
 	{
 		WR::reset();
 		PORT::write(data >> 8);
-		modm::delay_us(1);
+		modm::this_fiber::sleep_for(1us);
 		WR::set();		// Low-to-High strobe
 
 		WR::reset();
 		PORT::write(data);
 
-		modm::delay_us(1);
+		modm::this_fiber::sleep_for(1us);
 		WR::set();		// Low-to-High strobe
-		modm::delay_us(1);
+		modm::this_fiber::sleep_for(1us);
 
 	}
 
@@ -134,9 +134,9 @@ void modm::BitbangMemoryInterface<PORT, CS, CD, WR>::writeRam(uint8_t * addr, co
 		WR::reset();
 		PORT::write( *(addr++) );
 
-		modm::delay_us(1);
+		modm::this_fiber::sleep_for(1us);
 		WR::set();		// Low-to-high strobe
-		modm::delay_us(1);
+		modm::this_fiber::sleep_for(1us);
 	}
 
 	CS::set();

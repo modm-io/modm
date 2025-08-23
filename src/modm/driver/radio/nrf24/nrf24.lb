@@ -17,7 +17,7 @@ def init(module):
 
 def prepare(module, options):
     module.depends(
-        ":architecture:delay",
+        ":architecture:fiber",
         ":architecture:register",
         ":architecture:spi",
         ":architecture:clock",

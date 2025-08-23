@@ -164,7 +164,7 @@ modm::MAX6966<Spi, Cs, DRIVERS>::readFromDriver(uint8_t driver, max6966::Registe
 	Cs::set();
 
 	// TODO: Add delay here?
-//	modm::delay_ms(1);
+//	modm::this_fiber::sleep_for(1ms);
 
 	// send dummy data and get the right register
 	uint8_t data=0;

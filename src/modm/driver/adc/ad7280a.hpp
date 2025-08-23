@@ -16,7 +16,7 @@
 #include <stdint.h>
 
 #include <modm/architecture/interface/gpio.hpp>
-#include <modm/architecture/interface/delay.hpp>
+#include <modm/processing/fiber.hpp>
 
 #include <modm/io/iostream.hpp>
 

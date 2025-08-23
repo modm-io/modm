@@ -29,7 +29,7 @@ def prepare(module, options):
             default="a6"))
 
     module.depends(
-        ":architecture:delay",
+        ":architecture:fiber",
         ":architecture:spi",
         ":debug")
     return True

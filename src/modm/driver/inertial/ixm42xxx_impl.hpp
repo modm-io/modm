@@ -36,7 +36,7 @@ Ixm42xxx< Transport >::initialize()
 
     /// Reset the device and wait 1 ms for the reset to be effective
     writeRegister(Register::DEVICE_CONFIG, uint8_t(DeviceConfig::SOFT_RESET_CONFIG));
-    modm::delay_ms(1);
+    modm::this_fiber::sleep_for(1ms);
 
     /// Configure the device to use the endianess of the microcontroller
     if (isBigEndian())

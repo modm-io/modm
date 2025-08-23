@@ -17,13 +17,9 @@ def init(module):
 
 def prepare(module, options):
     module.depends(
-        ":architecture:delay",
         ":architecture:register",
-        ":architecture:spi",
         ":architecture:spi.device",
-        ":architecture:clock",
-        ":debug",
-        ":processing:timer")
+        ":debug")
     return True
 
 def build(env):

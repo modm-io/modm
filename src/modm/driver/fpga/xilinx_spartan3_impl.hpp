@@ -71,7 +71,7 @@ modm::XilinxSpartan3<Cclk, Din, ProgB, InitB, Done, DataSource>::configure(const
 		while (InitB::read() == modm::Gpio::High ||
 				Done::read() == modm::Gpio::High)
 		{
-			modm::delay_us(1);
+			modm::this_fiber::sleep_for(1us);
 			if (counter++ > 1000) {
 				// Timeout (1ms) reached, FPGA is not responding abort configuration
 				MODM_LOG_ERROR << MODM_FILE_INFO;
@@ -82,14 +82,14 @@ modm::XilinxSpartan3<Cclk, Din, ProgB, InitB, Done, DataSource>::configure(const
 	}
 	// Led1::reset();
 
-	modm::delay_us(1);
+	modm::this_fiber::sleep_for(1us);
 	ProgB::set();
 
 	// Wait until INIT_B goes high
 	uint32_t counter = 0;
 	while (InitB::read() == modm::Gpio::Low)
 	{
-		modm::delay_us(1);
+		modm::this_fiber::sleep_for(1us);
 		if (counter++ > 1000) {
 			// Timeout (1ms) reached, FPGA is not responding abort configuration
 			MODM_LOG_ERROR << MODM_FILE_INFO;
@@ -100,7 +100,7 @@ modm::XilinxSpartan3<Cclk, Din, ProgB, InitB, Done, DataSource>::configure(const
 	// Led2::reset();
 
 	// wait 0.5..4us before starting the configuration
-	modm::delay_us(4);
+	modm::this_fiber::sleep_for(4us);
 
 	uint8_t buffer[256];
 

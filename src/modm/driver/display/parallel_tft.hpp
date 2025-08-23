@@ -15,7 +15,6 @@
 #ifndef MODM_PARALLEL_TFT_HPP
 #define MODM_PARALLEL_TFT_HPP
 
-#include <modm/architecture/interface/delay.hpp>
 #include <modm/ui/display/color_graphic_display.hpp>
 
 namespace modm

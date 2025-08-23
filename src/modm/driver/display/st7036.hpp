@@ -15,6 +15,7 @@
 #define MODM_ST7036_HPP
 
 #include <modm/ui/display/character_display.hpp>
+#include <modm/processing/fiber.hpp>
 
 namespace modm
 {

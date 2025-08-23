@@ -16,7 +16,7 @@
 	#error	"Don't include this file directly, use 'hd44780_base.hpp' instead!"
 #endif
 
-#include <modm/architecture/interface/delay.hpp>
+#include <modm/processing/fiber.hpp>
 
 // ----------------------------------------------------------------------------
 template <typename DATA, typename RW, typename RS, typename E>
@@ -29,11 +29,11 @@ modm::Hd44780Base<DATA, RW, RS, E>::initialize(LineMode lineMode)
 
 	Bus<DATA, E, DATA::width>::writeHighNibble(Set8BitBus);
 
-	modm::delay_ms(5);
+	modm::this_fiber::sleep_for(5ms);
 
 	Bus<DATA, E, DATA::width>::writeHighNibble(Set8BitBus);
 
-	modm::delay_us(100);
+	modm::this_fiber::sleep_for(100us);
 
 	Bus<DATA, E, DATA::width>::writeHighNibble(Set8BitBus);
 
@@ -164,7 +164,7 @@ modm::Hd44780Base<DATA, RW, RS, E>::isBusy()
 
 	if (read() & BusyFlagMask)
 	{
-		modm::delay_us(2);
+		modm::this_fiber::sleep_for(2us);
 		return true;
 	}
 	return false;
@@ -177,7 +177,7 @@ modm::Hd44780Base<DATA, RW, RS, E>::writeCGRAM(uint8_t character, const uint8_t 
 	while(not writeCommand(SetCGRAM_Address | (character << 3)))
 		;
 	for (std::size_t ii = 0; ii < 8; ++ii) {
-		modm::delay(50us);
+		modm::this_fiber::sleep_for(50us);
 		writeRAM(cg[ii]);
 	}
 	return true;
@@ -194,14 +194,14 @@ modm::Hd44780Base<DATA, RW, RS, E>::Bus<Data, Enable, 4>::write(uint8_t data)
 	DATA::write(data >> 4);
 
 	E::set();
-	modm::delay_us(1);
+	modm::this_fiber::sleep_for(1us);
 	E::reset();
 	modm::delay_ns(10);
 
 	DATA::write(data);
 
 	E::set();
-	modm::delay_us(1);
+	modm::this_fiber::sleep_for(1us);
 	E::reset();
 	modm::delay_ns(10);
 }
@@ -223,7 +223,7 @@ modm::Hd44780Base<DATA, RW, RS, E>::Bus<Data, Enable, 4>::read()
 	DATA::setInput();
 
 	E::set();
-	modm::delay_us(1);
+	modm::this_fiber::sleep_for(1us);
 	data = DATA::read();
 	E::reset();
 	modm::delay_ns(10);
@@ -231,7 +231,7 @@ modm::Hd44780Base<DATA, RW, RS, E>::Bus<Data, Enable, 4>::read()
 	data <<= 4;
 
 	E::set();
-	modm::delay_us(1);
+	modm::this_fiber::sleep_for(1us);
 	data |= DATA::read();
 	E::reset();
 	modm::delay_ns(10);
@@ -249,7 +249,7 @@ modm::Hd44780Base<DATA, RW, RS, E>::Bus<Data, Enable, 8>::write(uint8_t data)
 	DATA::write(data);
 
 	E::set();
-	modm::delay_us(1);
+	modm::this_fiber::sleep_for(1us);
 	E::reset();
 	modm::delay_ns(500);
 }
@@ -271,7 +271,7 @@ modm::Hd44780Base<DATA, RW, RS, E>::Bus<Data, Enable, 8>::read()
 	DATA::setInput();
 
 	E::set();
-	modm::delay_us(1);
+	modm::this_fiber::sleep_for(1us);
 	data = DATA::read();
 	E::reset();
 	modm::delay_ns(500);

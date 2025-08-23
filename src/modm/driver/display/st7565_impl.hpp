@@ -78,7 +78,7 @@ modm::St7565<SPI, CS, A0, Reset, Width, Height, TopView>::initialize(
 	// reset the controller
 	reset.setOutput();
 	reset.reset();
-	modm::delay_ms(50);
+	modm::this_fiber::sleep_for(50ms);
 	reset.set();
 
 	cs.reset();

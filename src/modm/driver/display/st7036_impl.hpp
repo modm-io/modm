@@ -15,8 +15,6 @@
 	#error	"Don't include this file directly, use 'st7036.hpp' instead!"
 #endif
 
-#include <modm/architecture/interface/delay.hpp>
-
 // ----------------------------------------------------------------------------
 
 namespace modm {
@@ -90,9 +88,9 @@ modm::St7036<SPI, CS, RS, Width, Heigth>::writeCommand(uint8_t inCommand)
 	// check if the command is 'clear display' oder 'return home', these
 	// commands take a bit longer until they are finished.
 	if ((inCommand & 0xfc) == 0) {
-		modm::delay_us(1200);
+		modm::this_fiber::sleep_for(1200us);
 	}
 	else {
-		modm::delay_us(27);
+		modm::this_fiber::sleep_for(27us);
 	}
 }

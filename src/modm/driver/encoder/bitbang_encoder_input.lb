@@ -22,7 +22,7 @@ https://www.mikrocontroller.net/articles/Drehgeber.
 
 
 def prepare(module, options):
-    module.depends(":architecture:atomic")
+    module.depends(":architecture:atomic", ":architecture:fiber", ":platform:gpio")
     return True
 
 

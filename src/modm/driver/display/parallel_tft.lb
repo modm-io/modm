@@ -16,9 +16,7 @@ def init(module):
     module.description = "Parallel Bus TFT Display"
 
 def prepare(module, options):
-    module.depends(
-        ":architecture:delay",
-        ":ui:display")
+    module.depends(":ui:display")
     return True
 
 def build(env):

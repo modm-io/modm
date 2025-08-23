@@ -101,7 +101,7 @@ modm::Scp1000<Spi, Cs, Int>::setOperation(scp1000::Operation opMode)
 	uint8_t retries = 16;
 	// wait for the sensor to complete setting the operation
 	while (--retries && (readStatus(true) & scp1000::OPERATION_STATUS_RUNNING)) {
-		modm::delay_ms(1);
+		modm::this_fiber::sleep_for(1ms);
 	}
 
 	// The sensor took too long to complete the operation
@@ -129,12 +129,12 @@ modm::Scp1000<Spi, Cs, Int>::reset(uint8_t timeout=50)
 	writeRegister(scp1000::REGISTER_RSTR, scp1000::RESET);
 
 	// wait a bit to give the Scp1000 some time to restart
-	modm::delay_ms(151);
+	modm::this_fiber::sleep_for(151ms);
 
 	uint8_t retries = timeout;
 	// wait for the sensor to complete start up, this should take 160ms
 	while (--retries && (readStatus() & scp1000::STATUS_STARTUP_RUNNING_bm)) {
-		modm::delay_ms(1);
+		modm::this_fiber::sleep_for(1ms);
 	}
 
 	if (retries > 0) {

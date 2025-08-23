@@ -21,7 +21,7 @@ TLC594* multi-channel, daisy-chainable, constant-current sink, 12bit PWM LED dri
 
 def prepare(module, options):
     module.depends(
-	    ":architecture:delay",
+	    ":architecture:fiber",
 	    ":architecture:gpio",
 	    ":architecture:spi")
     return True

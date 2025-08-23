@@ -31,9 +31,9 @@ modm::Nokia6610<SPI, CS, Reset, GE12>::initialize()
 	// Reset pin
 	Reset::setOutput();
 	Reset::reset();
-	modm::delay_ms(1);
+	modm::this_fiber::sleep_for(1ms);
 	Reset::set();
-	modm::delay_ms(10);
+	modm::this_fiber::sleep_for(10ms);
 
 
 	lcdSettings();
@@ -108,9 +108,9 @@ modm::Nokia6610<SPI, CS, Reset, GE12>::lcdSettings()
 	else{
 		// Hardware reset
 		Reset::reset();
-		modm::delay_ms(50);
+		modm::this_fiber::sleep_for(50ms);
 		Reset::set();
-		modm::delay_ms(50);
+		modm::this_fiber::sleep_for(50ms);
 
 		// Display vontrol
 		writeSpiCommand(nokia::NOKIA_GE8_DISCTL);
@@ -129,7 +129,7 @@ modm::Nokia6610<SPI, CS, Reset, GE12>::lcdSettings()
 
 		CS::set();
 		// wait aproximetly 100ms
-		modm::delay_ms(100);
+		modm::this_fiber::sleep_for(100ms);
 		CS::reset();
 
 		// Sleep out
@@ -221,7 +221,7 @@ modm::Nokia6610<SPI, CS, Reset, GE12>::update()
 	else
 	{
 		// wait approximately 100ms
-		modm::delay_ms(100);
+		modm::this_fiber::sleep_for(100ms);
 
 		// Display On
 		writeSpiCommand(nokia::NOKIA_GE8_DISON);

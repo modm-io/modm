@@ -12,7 +12,7 @@
 #define MODM_ILI9341_HPP
 
 #include <modm/architecture/utils.hpp>
-#include <modm/architecture/interface/delay.hpp>
+#include <modm/processing/fiber.hpp>
 #include <modm/architecture/interface/register.hpp>
 #include <modm/math/utils/endianness.hpp>
 #include <modm/platform/gpio/base.hpp>

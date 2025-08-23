@@ -25,9 +25,8 @@ In a complete system the SCK pin's timing while reading must be met.
 
 def prepare(module, options):
     module.depends(
-        ":architecture:delay",
-        ":architecture:gpio",
-        ":architecture:fiber")
+        ":architecture:fiber",
+        ":architecture:gpio")
     return True
 
 def build(env):

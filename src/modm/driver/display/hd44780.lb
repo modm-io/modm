@@ -18,8 +18,9 @@ def init(module):
 
 def prepare(module, options):
     module.depends(
-        ":architecture:delay",
+        ":architecture:fiber",
         ":architecture:gpio",
+        ":architecture:delay",
         ":ui:display")
     return True
 

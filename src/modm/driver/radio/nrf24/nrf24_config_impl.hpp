@@ -33,7 +33,7 @@ modm::Nrf24Config<Nrf24Phy>::setMode(Mode mode)
 	case Mode::Rx:
 //		MODM_LOG_DEBUG << "[nrf24] Set mode Rx" << modm::endl;
 //		Nrf24Phy::resetCe();
-//		modm::delay_us(30);
+//		modm::this_fiber::sleep_for(30us);
 		Nrf24Phy::flushRxFifo();
 		Nrf24Phy::setBits(NrfRegister::CONFIG, Config::PRIM_RX);
 

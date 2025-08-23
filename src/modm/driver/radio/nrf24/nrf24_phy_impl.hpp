@@ -320,7 +320,7 @@ modm::Nrf24Phy<Spi, Csn, Ce>::pulseCe()
 	Ce::toggle();
 
 	// delay might not be precise enough
-	modm::delay_us(15);
+	modm::this_fiber::sleep_for(15us);
 
 	Ce::toggle();
 }

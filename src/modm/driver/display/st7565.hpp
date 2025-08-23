@@ -15,7 +15,7 @@
 #define MODM_ST7565_HPP
 
 #include <modm/architecture/interface/accessor_flash.hpp>
-#include <modm/architecture/interface/delay.hpp>
+#include <modm/processing/fiber.hpp>
 
 #include <modm/ui/display/monochrome_graphic_display_vertical.hpp>
 

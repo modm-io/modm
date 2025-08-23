@@ -135,12 +135,12 @@ void
 modm::SiemensS75Common<MEMORY, RESET, WIDTH, HEIGHT, ORIENTATION>::lcdSettings()
 {
 	// Hardware reset is low from initialize
-	modm::delay_ms(50);
+	modm::this_fiber::sleep_for(50ms);
 	RESET::set();
-	modm::delay_ms(50);
+	modm::this_fiber::sleep_for(50ms);
 
 	interface.writeRegister(0x00, 0x0001); // R00: Start oscillation
-	modm::delay_ms(10);
+	modm::this_fiber::sleep_for(10ms);
 
 	//power on sequence
 	interface.writeRegister(0x10, 0x1f92);	// R10: Power Control 1
@@ -152,7 +152,7 @@ modm::SiemensS75Common<MEMORY, RESET, WIDTH, HEIGHT, ORIENTATION>::lcdSettings()
 	interface.writeRegister(0x02, 0x0000);	// R02: LCD drive AC control
 	interface.writeRegister(0x12, 0x040f);	// R12: Power Control 2
 
-	modm::delay_ms(100);
+	modm::this_fiber::sleep_for(100ms);
 
 	// R03: Entry mode
 	switch(ORIENTATION)
@@ -190,7 +190,7 @@ modm::SiemensS75Common<MEMORY, RESET, WIDTH, HEIGHT, ORIENTATION>::lcdSettings()
 
 	interface.writeRegister(0x44, 0x8300); // Horizontal RAM Address
 	interface.writeRegister(0x45, 0xaf00); // Vertical RAM Address
-	modm::delay_ms(10);
+	modm::this_fiber::sleep_for(10ms);
 
 	// colourful test
 	lcdCls(0x0000); // black

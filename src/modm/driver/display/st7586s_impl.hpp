@@ -45,14 +45,14 @@ St7586s<SPI, CS, RST, DC, Width, Height>::initialize()
 	DC::setOutput();
 
 	// Reset display
-	modm::delay(10us);
+	modm::this_fiber::sleep_for(10us);
 	RST::set();
-	modm::delay(120ms);
+	modm::this_fiber::sleep_for(120ms);
 
 	// Power ON operation flow (see datasheet)
 	sendCommand(Command::SleepOff);
 	sendCommand(Command::DisplayOff);
-	modm::delay(50ms);  // t_{ON-V2}
+	modm::this_fiber::sleep_for(50ms);  // t_{ON-V2}
 	sendCommand(Command::SetVop, payload::SetVop(13.52f));
 	sendCommand(Command::SetBias, payload::SetBias::Ratio_1_11);
 	sendCommand(Command::SetBooster, payload::SetBooster::x8);

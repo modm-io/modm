@@ -42,7 +42,7 @@ modm::TLC594X<CHANNELS, Spi, Xlat, Xblank, Vprog, Xerr>::latch()
 	Xlat::set();
 	// datasheet says 20ns but that is unreliable
 	// => wait for at least 1000ns
-	modm::delay_us(1);
+	modm::this_fiber::sleep_for(1us);
 	Xlat::reset();
 	if (enabled) Xblank::reset();
 }

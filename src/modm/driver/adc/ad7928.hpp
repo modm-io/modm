@@ -18,7 +18,6 @@
 #include <modm/architecture/interface/spi_device.hpp>
 #include <modm/architecture/interface/register.hpp>
 #include <modm/architecture/interface/gpio.hpp>
-#include <modm/architecture/interface/delay.hpp>
 #include <modm/processing/fiber.hpp>
 
 namespace modm

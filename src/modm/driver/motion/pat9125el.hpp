@@ -14,8 +14,8 @@
 
 #include <array>
 #include <type_traits>
-#include <modm/driver/motion/pat9125el_transport.hpp>
 #include <modm/math/geometry/vector2.hpp>
+#include "pat9125el_transport.hpp"
 
 namespace modm
 {

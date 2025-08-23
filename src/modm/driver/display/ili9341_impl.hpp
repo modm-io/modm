@@ -70,7 +70,7 @@ Ili9341<Interface, Reset, Backlight, BufferSize>::initialize()
 				sizeof(negativeGammaCorr));
 
 		this->writeCommand(Command::LeaveSleep);
-		modm::delay_ms(120);
+		modm::this_fiber::sleep_for(120ms);
 		this->writeCommand(Command::InversionOff);
 		this->writeCommand(Command::DisplayOn);
 
@@ -85,16 +85,16 @@ Ili9341<Interface, Reset, Backlight, BufferSize>::reset(bool hardReset /* = fals
 	if (hardReset)
 	{
 		Reset::set();
-		modm::delay_ms(5);
+		modm::this_fiber::sleep_for(5ms);
 		Reset::reset();
-		modm::delay_ms(5);
+		modm::this_fiber::sleep_for(5ms);
 		Reset::set();
-		modm::delay_ms(5);
+		modm::this_fiber::sleep_for(5ms);
 	}
 	else {
 		BatchHandle h(*this);
 		this->writeCommand(Command::SwReset);
-		modm::delay_ms(5);
+		modm::this_fiber::sleep_for(5ms);
 	}
 }
 

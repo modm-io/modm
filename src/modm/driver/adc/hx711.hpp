@@ -12,7 +12,7 @@
 #ifndef MODM_HX711_HPP
 #define MODM_HX711_HPP
 
-#include <modm/architecture/interface/delay.hpp>
+#include <modm/processing/fiber.hpp>
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/processing/fiber.hpp>
 

@@ -229,7 +229,7 @@ modm::Ad7280a<Spi, Cs, Cnvst, N>::performSelftest()
 
 	// Allow sufficient time for the self-test conversions to be
 	// completed plus tWAIT.
-	modm::delay_ms(50);		// TODO
+	modm::this_fiber::sleep_for(50ms);		// TODO
 
 	// The register address corresponding to the self-test
 	// conversion should be written to the read register of all
@@ -290,7 +290,7 @@ modm::Ad7280a<Spi, Cs, Cnvst, N>::readChannel(uint8_t device,
 			AD7280A_CTRL_HB_CONV_START_CS);
 
 	// Wait for the conversion to finish
-	modm::delay_ms(5);
+	modm::this_fiber::sleep_for(5ms);
 
 	// Read one channel
 	write(device, ad7280a::READ, false, channel);
@@ -323,7 +323,7 @@ modm::Ad7280a<Spi, Cs, Cnvst, N>::readAllChannels(uint16_t *values)
 			AD7280A_CTRL_HB_CONV_START_CS);
 
 	// Allow sufficient time for all conversions to be completed plus tWAIT.
-	modm::delay_ms(5);
+	modm::this_fiber::sleep_for(5ms);
 
 	// Apply a CS low pulse that frames 32 SCLKs to read back
 	// the desired voltage. This frame should simultaneously
@@ -401,7 +401,7 @@ modm::Ad7280a<Spi, Cs, Cnvst, N>::write(uint8_t device, ad7280a::Register reg,
 	Cs::set();
 
 	// TODO remove this
-	modm::delay_us(1);
+	modm::this_fiber::sleep_for(1us);
 	return true;
 }
 

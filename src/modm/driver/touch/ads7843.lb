@@ -28,7 +28,7 @@ with the ADS7843 and have their own driver "modm:driver:touch2046".
 
 def prepare(module, options):
     module.depends(
-        ":architecture:delay",
+        ":architecture:fiber",
         ":ui:display")
     return True
 

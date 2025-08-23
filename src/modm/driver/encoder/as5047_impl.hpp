@@ -33,7 +33,7 @@ As5047<SpiMaster, Cs>::read()
 	SpiMaster::transfer(outBuffer, inBuffer, 2);
 	Cs::set();
 
-	modm::delay(1us);
+	modm::this_fiber::sleep_for(1us);
 
 	Cs::reset();
 	outBuffer[1] = 0;

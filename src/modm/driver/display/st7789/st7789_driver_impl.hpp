@@ -26,10 +26,10 @@ St7789Driver<Interface, Width, Height>::initialize()
 	hardReset();
 
 	softReset();
-	modm::delay(10ms);
+	modm::this_fiber::sleep_for(10ms);
 
 	Interface::sendCommand(Command::SleepOff);
-	modm::delay(10ms);
+	modm::this_fiber::sleep_for(10ms);
 
 	using detail::st7789::InterfacePixelFormat;
 	InterfacePixelFormat ipf;
@@ -42,7 +42,7 @@ St7789Driver<Interface, Width, Height>::initialize()
 	Interface::sendCommand(Command::NormalDisplayModeOn);
 
 	Interface::sendCommand(Command::DisplayOn);
-	modm::delay(10ms);
+	modm::this_fiber::sleep_for(10ms);
 }
 
 template<typename Interface, uint16_t Width, uint16_t Height>
@@ -122,11 +122,11 @@ void
 St7789Driver<Interface, Width, Height>::hardReset()
 {
 	Interface::Reset::set();
-	modm::delay(10ms);
+	modm::this_fiber::sleep_for(10ms);
 	Interface::Reset::reset();
-	modm::delay(100ms);
+	modm::this_fiber::sleep_for(100ms);
 	Interface::Reset::set();
-	modm::delay(10ms);
+	modm::this_fiber::sleep_for(10ms);
 }
 
 template<typename Interface, uint16_t Width, uint16_t Height>

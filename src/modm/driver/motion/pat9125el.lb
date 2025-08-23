@@ -17,8 +17,6 @@ def init(module):
 
 def prepare(module, options):
     module.depends(
-        ":architecture:delay",
-        ":architecture:spi",
         ":architecture:i2c.device",
         ":math:geometry",
         ":debug")

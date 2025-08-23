@@ -25,7 +25,7 @@ def prepare(module, options):
 
     module.depends(
         ":architecture:accessor",
-        ":architecture:delay",
+        ":architecture:fiber",
         ":ui:display")
     return True
 
