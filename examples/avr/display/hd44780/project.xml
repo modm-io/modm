@@ -8,6 +8,7 @@
     <module>modm:driver:hd44780</module>
     <module>modm:platform:gpio</module>
     <module>modm:platform:core</module>
+    <module>modm:platform:clock</module>
     <module>modm:build:scons</module>
   </modules>
 </library>

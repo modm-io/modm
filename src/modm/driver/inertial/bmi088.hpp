@@ -311,9 +311,6 @@ private:
 	bool
 	enableAccelerometer();
 
-	void
-	timerWait();
-
 	std::optional<uint8_t>
 	readRegister(auto reg);
 

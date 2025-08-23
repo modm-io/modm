@@ -28,11 +28,15 @@ template < class I2cMaster >
 bool
 modm::Hmc6343<I2cMaster>::writeCommand(Command command, uint16_t timeout)
 {
-	modm::this_fiber::poll([&]{ return this->timeout.isExpired() });
-	this->timeout.restart(std::chrono::milliseconds(timeout));
+	timeout.wait();
 
 	buffer[0] = i(command);
-	return I2cDevice<I2cMaster>::write(buffer, 1);
+	if (I2cDevice<I2cMaster>::write(buffer, 1))
+	{
+		timeout.restart(std::chrono::milliseconds(timeout));
+		return true;
+	}
+	return false;
 }
 
 // MARK: write register
@@ -40,13 +44,17 @@ template < class I2cMaster >
 bool
 modm::Hmc6343<I2cMaster>::writeRegister(Register reg, uint8_t value)
 {
-	modm::this_fiber::poll([&]{ return this->timeout.isExpired() });
-	timeout.restart(10ms);
+	timeout.wait();
 
 	buffer[0] = i(Command::WriteEeprom);
 	buffer[1] = i(reg);
 	buffer[2] = value;
-	return I2cDevice<I2cMaster>::write(buffer, 3);
+	if (I2cDevice<I2cMaster>::write(buffer, 3))
+	{
+		timeout.restart(10ms);
+		return true;
+	}
+	return false;
 }
 
 // MARK: write 16bit register
@@ -75,13 +83,12 @@ bool
 modm::Hmc6343<I2cMaster>::readRegister(Register reg, uint8_t &value)
 {
 	timeout.wait();
-	timeout.restart(10ms);
 
 	buffer[0] = i(Command::ReadEeprom);
 	buffer[1] = i(reg);
 	if(I2cDevice<I2cMaster>::write(buffer, 2))
 	{
-		timeout.wait();
+		modm::this_fiber::sleep_for(20ms);
 		return I2cDevice<I2cMaster>::read(&value, 1);
 	}
 	return false;

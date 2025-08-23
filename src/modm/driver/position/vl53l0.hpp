@@ -17,7 +17,6 @@
 #include <modm/architecture/interface/i2c_device.hpp>
 #include <modm/architecture/interface/register.hpp>
 #include <modm/architecture/interface/accessor.hpp>
-#include <modm/processing/timer.hpp>
 
 namespace modm
 {
@@ -500,8 +499,6 @@ private:
 	static constexpr uint32_t MaxMeasurementTimeUs = 4'000'000;
 
 	Data &data;
-
-	modm::ShortTimeout timeout;
 
 	// Internal I2C write buffer
 	// 0: Index[7:0]

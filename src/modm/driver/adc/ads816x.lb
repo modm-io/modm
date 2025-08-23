@@ -33,8 +33,7 @@ def prepare(module, options):
         ":architecture:gpio",
         ":architecture:spi.device",
         ":io",
-        ":architecture:fiber",
-        ":processing:timer")
+        ":architecture:fiber")
     return True
 
 def build(env):

@@ -130,7 +130,7 @@ Adis16470<SpiMaster, Cs>::writeMscCtrl(modm::adis16470::MscCtrl_t value)
 	writeRegister(Register::MSC_CTRL, value.value);
 
 	// Writing to MSC_CTRL take approx. 3ms
-	timeout.restart(std::chrono::milliseconds(3));
+	timeout.restart(3ms);
 }
 
 template<class SpiMaster, class Cs>

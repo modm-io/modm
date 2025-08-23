@@ -40,7 +40,7 @@ Bmi088<Transport>::initialize(bool runSelfTest)
 		return false;
 	}
 
-	timerWait();
+	timer_.wait();
 	const bool ok = this->writeRegister(GyroRegister::InterruptControl,
 										uint8_t(GyroInterruptControl::DataReady));
 	timer_.restart(WriteTimeout);
@@ -87,7 +87,7 @@ template<Bmi088Transport Transport>
 bool
 Bmi088<Transport>::setAccRate(AccRate config)
 {
-	timerWait();
+	timer_.wait();
 	const bool ok = this->writeRegister(AccRegister::Config, uint8_t(config));
 	timer_.restart(ResetTimeout);
 	return ok;
@@ -97,7 +97,7 @@ template<Bmi088Transport Transport>
 bool
 Bmi088<Transport>::setAccRange(AccRange range)
 {
-	timerWait();
+	timer_.wait();
 	const bool ok = this->writeRegister(AccRegister::Range, uint8_t(range));
 	timer_.restart(ResetTimeout);
 	if (ok) {
@@ -111,7 +111,7 @@ template<Bmi088Transport Transport>
 bool
 Bmi088<Transport>::setAccInt1GpioConfig(AccGpioConfig_t config)
 {
-	timerWait();
+	timer_.wait();
 	const bool ok = this->writeRegister(AccRegister::Int1Control, config.value);
 	timer_.restart(ResetTimeout);
 	return ok;
@@ -121,7 +121,7 @@ template<Bmi088Transport Transport>
 bool
 Bmi088<Transport>::setAccInt2GpioConfig(AccGpioConfig_t config)
 {
-	timerWait();
+	timer_.wait();
 	const bool ok = this->writeRegister(AccRegister::Int2Control, config.value);
 	timer_.restart(ResetTimeout);
 	return ok;
@@ -131,7 +131,7 @@ template<Bmi088Transport Transport>
 bool
 Bmi088<Transport>::setAccGpioMap(AccGpioMap_t map)
 {
-	timerWait();
+	timer_.wait();
 	const bool ok = this->writeRegister(AccRegister::IntMap, map.value);
 	timer_.restart(ResetTimeout);
 	return ok;
@@ -169,7 +169,7 @@ template<Bmi088Transport Transport>
 bool
 Bmi088<Transport>::setGyroRate(GyroRate rate)
 {
-	timerWait();
+	timer_.wait();
 	const bool ok = this->writeRegister(GyroRegister::Bandwidth, uint8_t(rate));
 	timer_.restart(ResetTimeout);
 	return ok;
@@ -179,7 +179,7 @@ template<Bmi088Transport Transport>
 bool
 Bmi088<Transport>::setGyroRange(GyroRange range)
 {
-	timerWait();
+	timer_.wait();
 	const bool ok = this->writeRegister(GyroRegister::Range, uint8_t(range));
 	timer_.restart(ResetTimeout);
 	if (ok) {
@@ -193,7 +193,7 @@ template<Bmi088Transport Transport>
 bool
 Bmi088<Transport>::setGyroGpioConfig(GyroGpioConfig_t config)
 {
-	timerWait();
+	timer_.wait();
 	const bool ok = this->writeRegister(GyroRegister::Int3Int4Conf, config.value);
 	timer_.restart(ResetTimeout);
 	return ok;
@@ -203,7 +203,7 @@ template<Bmi088Transport Transport>
 bool
 Bmi088<Transport>::setGyroGpioMap(GyroGpioMap_t map)
 {
-	timerWait();
+	timer_.wait();
 	const bool ok = this->writeRegister(GyroRegister::Int3Int4Map, map.value);
 	timer_.restart(ResetTimeout);
 	return ok;
@@ -218,15 +218,6 @@ Bmi088<Transport>::checkChipId()
 	const bool gyroIdValid = gyroId.value_or(0) == GyroChipId;
 	const bool accIdValid = accId.value_or(0) == AccChipId;
 	return gyroIdValid and accIdValid;
-}
-
-template<Bmi088Transport Transport>
-void
-Bmi088<Transport>::timerWait()
-{
-	while (timer_.isArmed()) {
-		modm::this_fiber::yield();
-	}
 }
 
 template<Bmi088Transport Transport>
@@ -255,7 +246,7 @@ Bmi088<Transport>::reset()
 	gyroRange_ = GyroRange::Range2000dps;
 
 	timer_.restart(ResetTimeout);
-	timerWait();
+	timer_.wait();
 
 	// required to switch the accelerometer to SPI mode if SPI is used
 	Transport::initialize();
@@ -273,13 +264,13 @@ Bmi088<Transport>::selfTest()
 		return false;
 	}
 	timer_.restart(2ms);
-	timerWait();
+	timer_.wait();
 	ok = this->writeRegister(AccRegister::SelfTest, uint8_t(AccSelfTest::Positive));
 	if (!ok) {
 		return false;
 	}
 	timer_.restart(50ms);
-	timerWait();
+	timer_.wait();
 	const auto positiveData = readAccData();
 	if (!positiveData) {
 		return false;
@@ -289,7 +280,7 @@ Bmi088<Transport>::selfTest()
 		return false;
 	}
 	timer_.restart(50ms);
-	timerWait();
+	timer_.wait();
 	const auto negativeData = readAccData();
 	if (!negativeData) {
 		return false;
@@ -305,7 +296,7 @@ Bmi088<Transport>::selfTest()
 		return false;
 	}
 	timer_.restart(30ms);
-	timerWait();
+	timer_.wait();
 	const auto gyroTest = GyroSelfTest_t(readRegister(GyroRegister::SelfTest).value_or(0));
 	if (gyroTest != (GyroSelfTest::Ready | GyroSelfTest::RateOk)) {
 		return false;
@@ -317,13 +308,13 @@ template<Bmi088Transport Transport>
 bool
 Bmi088<Transport>::enableAccelerometer()
 {
-	timerWait();
+	timer_.wait();
 	bool ok = this->writeRegister(AccRegister::PowerConfig, uint8_t(AccPowerConf::Active));
 	timer_.restart(AccSuspendTimeout);
 	if (!ok) {
 		return false;
 	}
-	timerWait();
+	timer_.wait();
 
 	ok = this->writeRegister(AccRegister::PowerControl, uint8_t(AccPowerControl::On));
 	timer_.restart(WriteTimeout);

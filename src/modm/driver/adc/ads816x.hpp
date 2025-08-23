@@ -18,7 +18,6 @@
 #include <modm/architecture/interface/spi_device.hpp>
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/processing/fiber.hpp>
-#include <modm/processing/timer/timeout.hpp>
 
 namespace modm
 {
@@ -127,7 +126,7 @@ public:
 	/// for ADS8167 and 2500ns (3us) for ADS8166 are the minimal values.
 	/// Defaults to 3us, which works for all variants of the chip.
 	void
-	setTConv(modm::ShortPreciseDuration t)
+	setTConv(std::chrono::microseconds t)
 	{
 		tConv = t;
 	}
@@ -139,8 +138,7 @@ private:
 	uint8_t buffer[3];
 	uint8_t buffer2[3];
 
-	modm::ShortPreciseTimeout timeout;
-	modm::ShortPreciseDuration tConv = std::chrono::microseconds(3);
+	std::chrono::microseconds tConv{3us};
 };
 
 } // namespace modm

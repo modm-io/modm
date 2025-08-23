@@ -54,10 +54,7 @@ modm::Vl53l0<I2cMaster>::reset()
 	// Wait until the device responds again
 	// After releasing reset it does not accept any I2C transactions
 	// for some time and will respond with NACKs
-	timeout.restart(500ms);
-	modm::this_fiber::poll([&]{ return ping() or timeout.isExpired(); });
-
-	return not timeout.isExpired();
+	return modm::this_fiber::poll_for(500ms, [&]{ return ping(); });
 }
 
 template < typename I2cMaster >

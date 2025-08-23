@@ -17,7 +17,7 @@
 
 #include <modm/architecture/detect.hpp>
 #include <modm/architecture/interface/gpio.hpp>
-#include <modm/architecture/interface/delay.hpp>
+#include <modm/processing/fiber.hpp>
 
 namespace modm
 {
@@ -116,13 +116,13 @@ struct I2c
 	static void
 	resetDevices(uint32_t baudrate = 100'000)
 	{
-		const auto delay = 500'000ul / baudrate;
+		const std::chrono::microseconds delay{500'000ul / baudrate};
 
 		for (uint_fast8_t ii = 0; ii < 9; ++ii) {
 			Scl::reset();
-			modm::delay_us(delay);
+			modm::this_fiber::sleep_for(delay);
 			Scl::set();
-			modm::delay_us(delay);
+			modm::this_fiber::sleep_for(delay);
 		}
 	}
 
