@@ -12,7 +12,8 @@
 #ifndef MODM_I2C_MULTIPLEXER_HPP
 #define MODM_I2C_MULTIPLEXER_HPP
 
-#include <modm/processing/resumable.hpp>
+#include <type_traits>
+#include "i2c_transaction.hpp"
 
 namespace modm
 {

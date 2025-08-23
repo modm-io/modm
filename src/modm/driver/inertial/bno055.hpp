@@ -13,7 +13,7 @@
 
 #include <modm/architecture/interface/register.hpp>
 #include <modm/architecture/interface/i2c_device.hpp>
-#include <modm/processing/resumable.hpp>
+#include <modm/processing/fiber.hpp>
 #include <modm/math/geometry/vector3.hpp>
 #include <modm/math/geometry/quaternion.hpp>
 

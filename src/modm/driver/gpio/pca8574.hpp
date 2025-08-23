@@ -16,7 +16,7 @@
 #include <modm/architecture/interface/i2c_device.hpp>
 #include <modm/architecture/interface/register.hpp>
 #include <modm/architecture/interface/gpio_expander.hpp>
-#include <modm/processing/resumable.hpp>
+#include <modm/processing/fiber.hpp>
 
 namespace modm
 {

@@ -15,7 +15,6 @@
 #ifndef MODM_INTERFACE_SPI_MASTER_HPP
 #define MODM_INTERFACE_SPI_MASTER_HPP
 
-#include <modm/processing/resumable.hpp>
 #include "spi.hpp"
 
 namespace modm

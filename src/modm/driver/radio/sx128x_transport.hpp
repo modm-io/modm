@@ -20,7 +20,7 @@
 #include <modm/architecture/interface/spi_device.hpp>
 #include <modm/architecture/interface/uart.hpp>
 #include <modm/math/utils/endianness.hpp>
-#include <modm/processing/resumable.hpp>
+#include <modm/processing/fiber.hpp>
 #include <modm/processing/timer.hpp>
 
 namespace modm

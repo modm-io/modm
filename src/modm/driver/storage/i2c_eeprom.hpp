@@ -16,7 +16,7 @@
 #ifndef MODM_I2C_EEPROM_HPP
 #define MODM_I2C_EEPROM_HPP
 
-#include <modm/processing/resumable.hpp>
+#include <modm/processing/fiber.hpp>
 #include <modm/architecture/interface/i2c_device.hpp>
 
 namespace modm

@@ -13,7 +13,7 @@
 #define MODM_LIS302DL_HPP
 
 #include <modm/architecture/interface/register.hpp>
-#include <modm/processing/resumable.hpp>
+#include <modm/processing/fiber.hpp>
 #include "lis3_transport.hpp"
 
 namespace modm

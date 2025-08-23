@@ -14,7 +14,6 @@
 #define MODM_INTERFACE_BLOCK_DEVICE_HPP
 
 #include <stdint.h>
-#include <modm/processing/resumable.hpp>
 
 namespace modm
 {

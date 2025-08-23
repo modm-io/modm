@@ -14,7 +14,7 @@
 #ifndef MODM_MAX31855_HPP
 #define MODM_MAX31855_HPP
 
-#include <modm/processing/resumable.hpp>
+#include <modm/processing/fiber.hpp>
 #include <modm/architecture/interface/spi_device.hpp>
 
 namespace modm

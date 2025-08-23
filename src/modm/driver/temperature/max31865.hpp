@@ -17,7 +17,7 @@
 #include <array>
 #include <modm/architecture/interface/register.hpp>
 #include <modm/architecture/interface/spi_device.hpp>
-#include <modm/processing/resumable.hpp>
+#include <modm/processing/fiber.hpp>
 #include <modm/processing/timer.hpp>
 
 namespace modm

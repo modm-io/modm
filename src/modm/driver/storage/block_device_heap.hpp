@@ -15,7 +15,7 @@
 
 #include <modm/architecture/interface/block_device.hpp>
 #include <type_traits>
-#include <modm/processing/resumable.hpp>
+#include <modm/processing/fiber.hpp>
 
 namespace modm
 {

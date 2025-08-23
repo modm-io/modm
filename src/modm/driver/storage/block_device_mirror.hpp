@@ -14,7 +14,7 @@
 #define MODM_BLOCK_DEVICE_MIRROR_HPP
 
 #include <modm/architecture/interface/block_device.hpp>
-#include <modm/processing/resumable.hpp>
+#include <modm/processing/fiber.hpp>
 #include <algorithm>
 
 namespace modm

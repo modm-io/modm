@@ -13,7 +13,7 @@
 #define MODM_LSM303A_HPP
 
 #include <modm/architecture/interface/register.hpp>
-#include <modm/processing/resumable.hpp>
+#include <modm/processing/fiber.hpp>
 #include <modm/math/utils/endianness.hpp>
 #include "lis3_transport.hpp"
 

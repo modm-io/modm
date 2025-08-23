@@ -17,7 +17,7 @@
 #include <numbers>
 #include <modm/architecture/interface/register.hpp>
 #include <modm/architecture/interface/spi_device.hpp>
-#include <modm/processing/resumable.hpp>
+#include <modm/processing/fiber.hpp>
 #include <modm/math/geometry/angle_int.hpp>
 
 namespace modm

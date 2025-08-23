@@ -14,7 +14,6 @@
 
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/architecture/interface/register.hpp>
-#include <modm/processing/resumable.hpp>
 #include <modm/math/utils/bit_operation.hpp>
 
 namespace modm

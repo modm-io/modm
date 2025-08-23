@@ -13,7 +13,7 @@
 #define MODM_LSM6DS33_HPP
 
 #include <modm/architecture/interface/register.hpp>
-#include <modm/processing/resumable.hpp>
+#include <modm/processing/fiber.hpp>
 #include <modm/math/utils/endianness.hpp>
 #include <modm/math/geometry/vector3.hpp>
 #include "lis3_transport.hpp"

@@ -14,7 +14,7 @@
 
 #include <modm/architecture/interface/delay.hpp>
 #include <modm/architecture/interface/gpio.hpp>
-#include <modm/processing/resumable.hpp>
+#include <modm/processing/fiber.hpp>
 
 namespace modm
 {
