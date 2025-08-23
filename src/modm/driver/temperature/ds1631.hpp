@@ -109,7 +109,7 @@ public:
  * @author	Niklas Hauser
  */
 template < typename I2cMaster >
-class Ds1631 :	public ds1631, public I2cDevice< I2cMaster, 2 >,
+class Ds1631 :	public ds1631, public I2cDevice< I2cMaster >,
 				protected modm::pt::Protothread
 {
 public:

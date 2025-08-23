@@ -187,7 +187,7 @@ protected:
  * @ingroup modm_driver_ads101x
  */
 template <typename I2cMaster>
-class Ads101x : public ads101x, public modm::I2cDevice<I2cMaster, 2>
+class Ads101x : public ads101x, public modm::I2cDevice<I2cMaster>
 {
 public:
     /**

@@ -22,7 +22,7 @@ namespace modm
 {
 
 template < typename I2cMaster >
-Ms5837<I2cMaster>::Ms5837(DataBase &data, uint8_t address) : I2cDevice<I2cMaster, 2>(address), data(data)
+Ms5837<I2cMaster>::Ms5837(DataBase &data, uint8_t address) : I2cDevice<I2cMaster>(address), data(data)
 {
 }
 

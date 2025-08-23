@@ -167,7 +167,7 @@ public:
  * @ingroup modm_driver_ft6x06
  */
 template < typename I2cMaster >
-class Ft6x06 : public ft6x06, public modm::I2cDevice< I2cMaster, 3 >
+class Ft6x06 : public ft6x06, public modm::I2cDevice< I2cMaster >
 {
 public:
 	/// Constructor, requires an ft6x06::Data object, sets address to default of 0x2A

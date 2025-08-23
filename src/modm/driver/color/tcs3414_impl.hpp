@@ -18,7 +18,7 @@
 
 template < typename I2cMaster >
 modm::Tcs3414<I2cMaster>::Tcs3414(Data &data, uint8_t address)
-	: I2cDevice<I2cMaster,2>(address), data(data)
+	: I2cDevice<I2cMaster>(address), data(data)
 {}
 
 // ----------------------------------------------------------------------------

@@ -18,7 +18,7 @@ namespace modm
 
 template < typename I2cMaster >
 Stts22h<I2cMaster>::Stts22h(Data &data, uint8_t address) :
-	I2cDevice<I2cMaster, 3>{address}, data_{data}
+	I2cDevice<I2cMaster>{address}, data_{data}
 {
 }
 

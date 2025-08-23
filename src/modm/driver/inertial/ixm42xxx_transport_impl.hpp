@@ -19,7 +19,7 @@
 
 template < class I2cMaster >
 modm::Ixm42xxxTransportI2c<I2cMaster>::Ixm42xxxTransportI2c(uint8_t address)
-    : I2cDevice<I2cMaster, 2>(address)
+    : I2cDevice<I2cMaster>(address)
 {
 }
 

@@ -52,7 +52,7 @@ public:
  * @author  Niklas Hauser
  */
 template < class I2cMaster >
-class Pca8574 : public pca8574, public modm::I2cDevice< I2cMaster, 2 >, public modm::GpioExpander
+class Pca8574 : public pca8574, public modm::I2cDevice< I2cMaster >, public modm::GpioExpander
 {
 public:
 	static constexpr uint8_t width = 8;

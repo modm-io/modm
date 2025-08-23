@@ -18,7 +18,7 @@ namespace modm
 
 template<class I2cMaster>
 Pat9125elI2cTransport<I2cMaster>::Pat9125elI2cTransport(uint8_t address)
-	: I2cDevice<I2cMaster, 4>{address}
+	: I2cDevice<I2cMaster>{address}
 {
 }
 

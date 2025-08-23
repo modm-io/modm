@@ -26,7 +26,7 @@ namespace modm
  * @ingroup modm_driver_pat9125el
  */
 template<class I2cMaster>
-class Pat9125elI2cTransport : public I2cDevice<I2cMaster, 4>
+class Pat9125elI2cTransport : public I2cDevice<I2cMaster>
 {
 protected:
 	Pat9125elI2cTransport(uint8_t address);

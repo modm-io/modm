@@ -105,7 +105,7 @@ public:
  * @ingroup modm_driver_ads101x
  */
 template <typename I2cMaster>
-class Ads7828 : public ads7828, public modm::I2cDevice<I2cMaster, 1>
+class Ads7828 : public ads7828, public modm::I2cDevice<I2cMaster>
 {
 public:
     /**

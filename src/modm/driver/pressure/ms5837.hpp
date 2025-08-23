@@ -82,7 +82,7 @@ protected:
  * @ingroup modm_driver_ms5837
  */
 template < typename I2cMaster >
-class Ms5837 : public ms5837, public modm::I2cDevice<I2cMaster, 2>
+class Ms5837 : public ms5837, public modm::I2cDevice<I2cMaster>
 {
 public:
 	/**

@@ -206,7 +206,7 @@ protected:
  * @author	Niklas Hauser
  */
 template < class I2cMaster >
-class Hmc6343 : public hmc6343, public modm::I2cDevice< I2cMaster, 2 >
+class Hmc6343 : public hmc6343, public modm::I2cDevice< I2cMaster >
 {
 public:
 	/// Constructor, requires a hmc6343::Data object, sets address to default of 0x19

@@ -23,7 +23,7 @@
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
 modm::Bme280<I2cMaster>::Bme280(Data &data, uint8_t address) :
-	I2cDevice<I2cMaster, 1>(address), data(data)
+	I2cDevice<I2cMaster>(address), data(data)
 {
 }
 

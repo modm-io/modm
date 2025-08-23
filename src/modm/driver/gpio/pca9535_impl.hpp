@@ -16,7 +16,7 @@
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
 modm::Pca9535<I2cMaster>::Pca9535(uint8_t address)
-:	I2cDevice<I2cMaster,2>(address), memory()
+:	I2cDevice<I2cMaster>(address), memory()
 {
 }
 

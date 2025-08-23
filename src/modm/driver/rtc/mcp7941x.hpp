@@ -46,7 +46,7 @@ struct mcp7941x
  */
 template < class I2cMaster >
 class Mcp7941x :	public mcp7941x,
-					public modm::I2cDevice<I2cMaster, 2>
+					public modm::I2cDevice<I2cMaster>
 {
 public:
 	Mcp7941x(uint8_t address = 0x6f);
@@ -93,7 +93,7 @@ private:
  * @author	Raphael Lehmann
  */
 template < class I2cMaster >
-class Mcp7941xEeprom :	public modm::I2cDevice<I2cMaster, 2>
+class Mcp7941xEeprom :	public modm::I2cDevice<I2cMaster>
 {
 public:
 	Mcp7941xEeprom(uint8_t address = 0x57);

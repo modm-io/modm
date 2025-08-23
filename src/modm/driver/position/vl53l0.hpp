@@ -338,7 +338,7 @@ operator << (IOStream& os, const vl53l0::RangeErrorCode& c);
  * @ingroup modm_driver_vl53l0
  */
 template < typename I2cMaster >
-class Vl53l0 : public vl53l0, public modm::I2cDevice< I2cMaster, 5 >
+class Vl53l0 : public vl53l0, public modm::I2cDevice< I2cMaster >
 {
 public:
 	/// Constructor, requires an vl53l0::Data object, sets address to default of 0x29

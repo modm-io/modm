@@ -102,7 +102,7 @@ public:
  * @author Christopher Durand
  */
 template <class I2cMaster>
-class Stts22h : public stts22h, public I2cDevice<I2cMaster, 3>
+class Stts22h : public stts22h, public I2cDevice<I2cMaster>
 {
 public:
 	/// \param address I2C address, selectable on device between 0x38 and 0x3f

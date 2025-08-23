@@ -16,7 +16,7 @@
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
 modm::Itg3200<I2cMaster>::Itg3200(Data &data, uint8_t address)
-:	I2cDevice<I2cMaster,2>(address), data(data),
+:	I2cDevice<I2cMaster>(address), data(data),
 	rawBuffer{0x00, 0x00, 0x00, 0,0,0,0,0,0,0,0, 0x00}
 {
 }

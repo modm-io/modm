@@ -17,7 +17,7 @@
 // MARK: I2C TRANSPORT
 template < class I2cMaster >
 modm::Lis3TransportI2c<I2cMaster>::Lis3TransportI2c(uint8_t address)
-:	I2cDevice<I2cMaster, 2>(address)
+:	I2cDevice<I2cMaster>(address)
 {
 }
 

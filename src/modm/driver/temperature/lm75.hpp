@@ -122,7 +122,7 @@ public:
  * @author	Niklas Hauser
  */
 template < class I2cMaster >
-class Lm75 : public lm75, public I2cDevice< I2cMaster, 2 >
+class Lm75 : public lm75, public I2cDevice< I2cMaster >
 {
 	template < class OtherI2cMaster >
 	friend class Tmp102;

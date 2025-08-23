@@ -16,7 +16,7 @@
 
 template < class I2cMaster >
 modm::Pca8574<I2cMaster>::Pca8574(uint8_t address):
-	I2cDevice<I2cMaster, 2>(address),
+	I2cDevice<I2cMaster>(address),
 	direction(Pins(0xff)), output(Pins(0xff)), input(Pins(0xff))
 {
 }

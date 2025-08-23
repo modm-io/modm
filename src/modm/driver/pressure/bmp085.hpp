@@ -102,7 +102,7 @@ protected:
  * @tparam I2cMaster I2C interface
  */
 template < typename I2cMaster >
-class Bmp085 : public bmp085, public modm::I2cDevice<I2cMaster, 1>
+class Bmp085 : public bmp085, public modm::I2cDevice<I2cMaster>
 {
 public:
 	/**

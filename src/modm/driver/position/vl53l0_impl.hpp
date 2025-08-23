@@ -20,7 +20,7 @@
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
 modm::Vl53l0<I2cMaster>::Vl53l0(Data &data, uint8_t address)
-:	I2cDevice<I2cMaster, 5>{address}, data{data},
+:	I2cDevice<I2cMaster>{address}, data{data},
 	i2cBuffer{0,0,0,0,0,0,0}, index{0}, measurementTimeUs{DefaultMeasurementTime}
 {
 }

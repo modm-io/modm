@@ -109,11 +109,11 @@ protected:
  * @author  Niklas Hauser
  */
 template < class I2cMaster >
-class Is31fl3733 : public is31fl3733, public modm::I2cDevice<I2cMaster, 4>
+class Is31fl3733 : public is31fl3733, public modm::I2cDevice<I2cMaster>
 {
 public:
 	Is31fl3733(uint8_t address=addr()):
-		I2cDevice<I2cMaster,4>(address)
+		I2cDevice<I2cMaster>(address)
 	{}
 
 	bool

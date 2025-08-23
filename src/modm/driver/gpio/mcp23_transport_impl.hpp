@@ -17,7 +17,7 @@
 // MARK: I2C TRANSPORT
 template < class I2cMaster >
 modm::Mcp23TransportI2c<I2cMaster>::Mcp23TransportI2c(uint8_t address)
-:	I2cDevice<I2cMaster, 2>(address)
+:	I2cDevice<I2cMaster>(address)
 {
 }
 

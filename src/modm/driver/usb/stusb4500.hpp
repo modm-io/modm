@@ -47,11 +47,11 @@ public:
  * @author Henrik Hose, Raphael Lehmann
  */
 template<class I2cMaster>
-class Stusb4500 : public stusb4500, public modm::I2cDevice< I2cMaster, 4 >
+class Stusb4500 : public stusb4500, public modm::I2cDevice< I2cMaster >
 {
 public:
 	Stusb4500(uint8_t address=0x28):
-		modm::I2cDevice<I2cMaster,4>(address)
+		modm::I2cDevice<I2cMaster>(address)
 	{};
 
 	/**

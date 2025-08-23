@@ -586,12 +586,12 @@ public:
  * @author	Niklas Hauser
  */
 template < class I2cMaster >
-class Bno055 : public bno055, public modm::I2cDevice<I2cMaster, 4>
+class Bno055 : public bno055, public modm::I2cDevice<I2cMaster>
 {
 public:
 	/// Constructor, requires a bno055::Data object.
 	inline Bno055(Data &data, uint8_t address=addr()):
-		I2cDevice<I2cMaster,4>(address), data(data) {}
+		I2cDevice<I2cMaster>(address), data(data) {}
 
 	inline bool
 	configure(OperationMode mode=OperationMode::NDOF)

@@ -71,7 +71,7 @@ public:
  * @ingroup modm_driver_pca9535
  */
 template < typename I2cMaster >
-class Pca9535 : public pca9535, public modm::I2cDevice< I2cMaster, 2 >, public modm::GpioExpander
+class Pca9535 : public pca9535, public modm::I2cDevice< I2cMaster >, public modm::GpioExpander
 {
 	enum class
 	Index : uint8_t

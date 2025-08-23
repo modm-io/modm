@@ -181,7 +181,7 @@ struct tcs3472
  * @ingroup	modm_driver_tcs3472
  */
 template<typename I2cMaster>
-class Tcs3472 : public tcs3472, public modm::I2cDevice<I2cMaster, 2>
+class Tcs3472 : public tcs3472, public modm::I2cDevice<I2cMaster>
 {
 public:
 	Tcs3472(Data &data, uint8_t address = addr());

@@ -90,7 +90,7 @@ struct lp503x
  * @ingroup modm_driver_lp503x
  */
 template<typename I2cMaster, size_t Channels>
-class Lp503x : public lp503x, public modm::I2cDevice<I2cMaster, 3>
+class Lp503x : public lp503x, public modm::I2cDevice<I2cMaster>
 {
 public:
 	static_assert(Channels == 30 || Channels == 36);

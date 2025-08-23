@@ -32,7 +32,7 @@ namespace modm
  * @author	Rasmus Kleist Hørlyck Sørensen
  */
 template < class I2cMaster >
-class Ixm42xxxTransportI2c : public modm::I2cDevice< I2cMaster, 4 >
+class Ixm42xxxTransportI2c : public modm::I2cDevice< I2cMaster >
 {
 public:
     Ixm42xxxTransportI2c(uint8_t address);

@@ -101,7 +101,7 @@ public:
  * @author Christopher Durand
  */
 template <class I2cMaster>
-class Mcp990x : public mcp990x, public I2cDevice<I2cMaster, 3>
+class Mcp990x : public mcp990x, public I2cDevice<I2cMaster>
 {
 public:
 	/// \param address I2C address, MCP990xT-1: 0x4c, -2: 0x4d, -A: adjustable, see datasheet

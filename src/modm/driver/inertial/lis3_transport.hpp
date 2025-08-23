@@ -36,7 +36,7 @@ namespace modm
  * @author	Niklas Hauser
  */
 template < class I2cMaster >
-class Lis3TransportI2c : public modm::I2cDevice< I2cMaster, 2 >
+class Lis3TransportI2c : public modm::I2cDevice< I2cMaster >
 {
 public:
 	Lis3TransportI2c(uint8_t address);

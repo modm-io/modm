@@ -20,7 +20,7 @@ namespace modm
 
 template<typename I2cMaster, size_t Channels>
 Lp503x<I2cMaster, Channels>::Lp503x(uint8_t i2cAddress)
-	: I2cDevice<I2cMaster, 3>(i2cAddress)
+	: I2cDevice<I2cMaster>(i2cAddress)
 {
 }
 

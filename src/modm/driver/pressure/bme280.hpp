@@ -198,7 +198,7 @@ protected:
  * @tparam I2cMaster I2C interface
  */
 template < typename I2cMaster >
-class Bme280 : public bme280, public modm::I2cDevice<I2cMaster, 1>
+class Bme280 : public bme280, public modm::I2cDevice<I2cMaster>
 {
 public:
 	/**

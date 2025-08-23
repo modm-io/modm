@@ -28,7 +28,7 @@ namespace modm
  * @author  Sascha Schade
  */
 template < typename I2cMaster >
-class Pca9548a : public modm::I2cDevice< I2cMaster, 2 >
+class Pca9548a : public modm::I2cDevice< I2cMaster >
 {
 public:
 	Pca9548a(uint8_t address=0b1110000);

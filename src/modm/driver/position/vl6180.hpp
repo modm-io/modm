@@ -353,7 +353,7 @@ public:
  * @ingroup modm_driver_vl6180
  */
 template < typename I2cMaster >
-class Vl6180 : public vl6180, public modm::I2cDevice< I2cMaster, 2 >
+class Vl6180 : public vl6180, public modm::I2cDevice< I2cMaster >
 {
 public:
 	/// Constructor, requires an vl6180::Data object, sets address to default of 0x29
