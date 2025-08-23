@@ -20,7 +20,7 @@ def prepare(module, options):
         ":architecture:i2c.device",
         ":architecture:register",
         ":driver:lm75",
-        ":processing:protothread")
+        ":processing:timer")
     return True
 
 def build(env):

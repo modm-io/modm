@@ -13,7 +13,6 @@
 #include <modm/board.hpp>
 
 #include <modm/processing/timer.hpp>
-#include <modm/processing/protothread.hpp>
 #include <modm/driver/temperature/tmp102.hpp>
 
 typedef I2cMaster1 MyI2cMaster;

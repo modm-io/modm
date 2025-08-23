@@ -12,7 +12,6 @@
 #pragma once
 
 #include <modm/architecture/interface/i2c_device.hpp>
-#include <modm/processing/protothread.hpp>
 #include <modm/math/utils.hpp>
 
 namespace modm

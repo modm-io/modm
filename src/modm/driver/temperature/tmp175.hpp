@@ -16,7 +16,7 @@
 
 #include <modm/architecture/interface/register.hpp>
 #include <modm/architecture/interface/i2c_device.hpp>
-#include <modm/processing/protothread.hpp>
+#include <modm/processing/timer.hpp>
 #include "lm75.hpp"
 
 namespace modm
@@ -66,8 +66,7 @@ protected:
  * @tparam I2cMaster Asynchronous Interface
  */
 template < typename I2cMaster >
-class Tmp175 :	public tmp175, public Lm75< I2cMaster >,
-				protected modm::pt::Protothread
+class Tmp175 :	public tmp175, public Lm75< I2cMaster >
 {
 public:
 	/// Constructor, requires a tmp175::Data object,
@@ -108,10 +107,8 @@ private:
 	bool
 	setLimitRegister(Register reg, float temperature);
 
-	modm::ShortDuration updateTime;
-	modm::ShortDuration conversionTime;
-	modm::ShortTimeout periodTimeout;
-	modm::ShortTimeout conversionTimeout;
+	modm::ShortDuration conversionTime{232ms};
+	modm::ShortPeriodicTimer timer{250ms};
 };
 
 } // namespace modm

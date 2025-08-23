@@ -17,7 +17,7 @@
 
 #include <modm/architecture/interface/register.hpp>
 #include <modm/architecture/interface/i2c_device.hpp>
-#include <modm/processing/protothread.hpp>
+#include <modm/processing/timer.hpp>
 #include "lm75.hpp"
 
 namespace modm
@@ -109,8 +109,7 @@ public:
  * @author	Niklas Hauser
  */
 template < typename I2cMaster >
-class Ds1631 :	public ds1631, public I2cDevice< I2cMaster >,
-				protected modm::pt::Protothread
+class Ds1631 :	public ds1631, public I2cDevice< I2cMaster >
 {
 public:
 	///
@@ -180,12 +179,10 @@ private:
 
 	Data &data;
 	uint8_t buffer[3];
-	Config_t config;
+	Config_t config{0};
 
-	modm::ShortDuration updateTime;
-	modm::ShortDuration conversionTime;
-	modm::ShortTimeout periodTimeout;
-	modm::ShortTimeout conversionTimeout;
+	modm::ShortDuration conversionTime{232ms};
+	modm::ShortPeriodicTimer timer{250ms};
 };
 
 }	// namespace modm

@@ -18,9 +18,7 @@
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
 modm::Tmp102<I2cMaster>::Tmp102(Data &data, uint8_t address)
-:	Lm75<I2cMaster>(reinterpret_cast<lm75::Data&>(data), address),
-	updateTime(250), timeout(modm::ShortDuration(updateTime)),
-	config_lsb(ConversionRate_t(ConversionRate::Hz4))
+:	Lm75<I2cMaster>(reinterpret_cast<lm75::Data&>(data), address)
 {
 }
 
@@ -28,25 +26,17 @@ template < typename I2cMaster >
 bool
 modm::Tmp102<I2cMaster>::update()
 {
-	PT_BEGIN();
-
-	while(true)
+	if (timer.execute())
 	{
-		PT_WAIT_UNTIL(timeout.isExpired());
-
-		if (updateTime & (1 << 15))
+		if (withConversion)
 		{
-			PT_CALL(startConversion());
-			timeout.restart(29ms);
+			startConversion();
+			modm::this_fiber::sleep_for(29ms);
 		}
-
-		PT_WAIT_UNTIL(timeout.isExpired());
-		timeout.restart(std::chrono::milliseconds(updateTime & ~(1 << 15)));
-
-		PT_CALL(this->readTemperature());
+		this->readTemperature();
+		return true;
 	}
-
-	PT_END();
+	return false;
 }
 
 template < typename I2cMaster >
@@ -62,7 +52,6 @@ template < typename I2cMaster >
 bool
 modm::Tmp102<I2cMaster>::setUpdateRate(uint8_t rate)
 {
-	this->restart();
 	// clamp conversion rate to max 33Hz (=~30ms)
 	if (rate > 33) rate = 33;
 
@@ -81,20 +70,18 @@ modm::Tmp102<I2cMaster>::setUpdateRate(uint8_t rate)
 		if (rate & 0b1100) ConversionRate_t::set(config_lsb, ConversionRate::Hz4);
 		if ( writeConfiguration(3) )
 		{
-			if (rate == 0) updateTime = 4000;
-			else updateTime = 1000/rate;
-			timeout.restart(std::chrono::milliseconds(updateTime & ~(1 << 15)));
+			if (rate == 0) timer.restart(4s);
+			else timer.restart(std::chrono::milliseconds(1000/rate));
+			withConversion = false;
 			return true;
 		}
 	}
 	else
 	{
-		updateTime = (1000/rate - 29) | (1 << 15);
-		timeout.restart(std::chrono::milliseconds(updateTime & ~(1 << 15)));
+		timer.restart(std::chrono::milliseconds(1000/rate - 29));
+		withConversion = true;
 		return true;
 	}
-
-	this->stop();
 
 	return false;
 }

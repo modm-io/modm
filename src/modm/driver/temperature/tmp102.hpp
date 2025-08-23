@@ -16,8 +16,8 @@
 
 #include <modm/architecture/interface/register.hpp>
 #include <modm/architecture/interface/i2c_device.hpp>
-#include <modm/processing/protothread.hpp>
 #include <modm/math/utils/endianness.hpp>
+#include <modm/processing/fiber.hpp>
 
 #include "lm75.hpp"
 
@@ -110,8 +110,7 @@ public:
  * @author	Niklas Hauser
  */
 template < class I2cMaster >
-class Tmp102 :	public tmp102, public Lm75< I2cMaster >,
-				protected modm::pt::Protothread
+class Tmp102 :	public tmp102, public Lm75< I2cMaster >
 {
 public:
 	/// Constructor, requires a tmp102::Data object,
@@ -158,10 +157,10 @@ private:
 	bool
 	setLimitRegister(Register reg, float temperature);
 
-	uint16_t updateTime;
-	modm::ShortTimeout timeout;
+	modm::ShortPeriodicTimer timer{250ms};
+	bool withConversion{false};
 
-	Config2_t config_lsb;
+	Config2_t config_lsb{ConversionRate_t(ConversionRate::Hz4)};
 };
 
 } // namespace modm

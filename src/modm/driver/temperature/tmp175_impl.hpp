@@ -18,33 +18,23 @@
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
 modm::Tmp175<I2cMaster>::Tmp175(Data &data, uint8_t address)
-:	Lm75<I2cMaster>(reinterpret_cast<lm75::Data&>(data), address),
-	updateTime(250), conversionTime(232),
-	periodTimeout(updateTime), conversionTimeout(conversionTime)
+:	Lm75<I2cMaster>(reinterpret_cast<lm75::Data&>(data), address)
 {
-	this->stop();
 }
 
 template < typename I2cMaster >
 bool
 modm::Tmp175<I2cMaster>::update()
 {
-	PT_BEGIN();
-
-	while(true)
+	if (timer.execute())
 	{
-		PT_WAIT_UNTIL(periodTimeout.isExpired());
-		periodTimeout.restart(updateTime);
+		startConversion();
+		modm::this_fiber::sleep_for(std::chrono::milliseconds(conversionTime.count()));
 
-		PT_CALL(startConversion());
-
-		conversionTimeout.restart(conversionTime);
-		PT_WAIT_UNTIL(conversionTimeout.isExpired());
-
-		PT_CALL(this->readTemperature());
+		readTemperature();
+		return true;
 	}
-
-	PT_END();
+	return false;
 }
 
 template < typename I2cMaster >
@@ -63,10 +53,7 @@ modm::Tmp175<I2cMaster>::setUpdateRate(uint8_t rate)
 	if (rate == 0) rate = 1;
 	if (rate > 33) rate = 33;
 
-	updateTime = modm::ShortDuration(1000/rate - 29);
-	periodTimeout.restart(updateTime);
-
-	this->restart();
+	timer.restart(1000/rate - 29);
 }
 
 template < typename I2cMaster >

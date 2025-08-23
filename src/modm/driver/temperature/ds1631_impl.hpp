@@ -19,11 +19,8 @@
 // ----------------------------------------------------------------------------
 template <typename I2cMaster>
 modm::Ds1631<I2cMaster>::Ds1631(Data &data, uint8_t address) :
-	I2cDevice<I2cMaster>(address), data(data), config(0),
-	updateTime(250), conversionTime(232),
-	periodTimeout(updateTime), conversionTimeout(conversionTime)
+	I2cDevice<I2cMaster>(address), data(data)
 {
-	this->stop();
 }
 
 template < typename I2cMaster >
@@ -38,25 +35,18 @@ template < typename I2cMaster >
 bool
 modm::Ds1631<I2cMaster>::update()
 {
-	PT_BEGIN();
-
-	while(true)
+	if (timer.execute())
 	{
-		PT_WAIT_UNTIL(periodTimeout.isExpired());
-		periodTimeout.restart(updateTime);
-
 		if (config.none(Config::OneShot))
 		{
-			PT_CALL(startConversion());
-
-			conversionTimeout.restart(conversionTime);
-			PT_WAIT_UNTIL(conversionTimeout.isExpired());
+			startConversion();
+			modm::this_fiber::sleep_for(std::chrono::milliseconds(conversionTime.count()));
 		}
 
-		PT_CALL(readTemperature());
+		readTemperature();
+		return true;
 	}
-
-	PT_END();
+	return false;
 }
 
 template < typename I2cMaster >
@@ -73,10 +63,7 @@ modm::Ds1631<I2cMaster>::setUpdateRate(uint8_t rate)
 			return false;
 	}
 
-	updateTime = modm::ShortDuration(1000/rate - 29);
-	periodTimeout.restart(updateTime);
-	this->restart();
-
+	periodTimeout.restart(1000/rate - 29);
 	return true;
 }
 

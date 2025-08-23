@@ -31,8 +31,8 @@ def prepare(module, options):
     module.depends(
         ":architecture:i2c.device",
         ":architecture:register",
-        ":driver:lm75",
-        ":processing:protothread")
+        ":processing:timer",
+        ":driver:lm75")
     return True
 
 def build(env):
