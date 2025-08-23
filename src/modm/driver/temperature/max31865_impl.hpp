@@ -42,13 +42,11 @@ Max31865<SpiMaster, Cs, pt>::readout()
 {
 	config.set(Config::VBias);
 	writeSingleRegister(Register::WriteConfiguration, config.value);
-	timeout.restart(10ms);
-	modm::this_fiber::poll([&]{ return timeout.isExpired(); });
+	modm::this_fiber::sleep_for(10ms);
 
 	config.set(Config::OneShot);
 	writeSingleRegister(Register::WriteConfiguration, config.value);
-	timeout.restart(65ms);
-	modm::this_fiber::poll([&]{ return timeout.isExpired(); });
+	modm::this_fiber::sleep_for(65ms);
 
 	// data.data = readTwoRegisters(Register::ReadRtdMsb);
 	d = readTwoRegisters(Register::ReadRtdMsb);

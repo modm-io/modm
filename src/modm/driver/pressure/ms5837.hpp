@@ -20,7 +20,6 @@
 #include <modm/processing/fiber.hpp>
 #include <modm/architecture/interface/i2c_device.hpp>
 #include <modm/architecture/interface/register.hpp>
-#include <modm/processing/timer.hpp>
 
 
 namespace modm
@@ -112,7 +111,6 @@ private:
 
 private:
 	DataBase &data;
-	modm::ShortTimeout timeout;
 
 	/**
 	 * Conversion time of the Analog Digital Convert for different oversampling ratios

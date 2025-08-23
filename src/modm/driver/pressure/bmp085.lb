@@ -32,8 +32,7 @@ def prepare(module, options):
     module.depends(
         ":architecture:i2c.device",
         ":math:utils",
-        ":debug",
-        ":processing:timer")
+        ":debug")
     return True
 
 def build(env):

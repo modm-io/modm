@@ -17,7 +17,6 @@
 #include "ms5611_data.hpp"
 
 #include <modm/processing/fiber.hpp>
-#include <modm/processing/timer/timeout.hpp>
 #include <modm/architecture/interface/spi_device.hpp>
 
 namespace modm
@@ -110,7 +109,6 @@ private:
 
 private:
     DataBase &data;
-    modm::ShortTimeout timeout;
 
     /**
      * Conversion time of the Analog Digital Convert for different oversampling ratios

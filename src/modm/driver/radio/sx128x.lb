@@ -27,8 +27,7 @@ def prepare(module, options):
         ":architecture:spi.device",
         ":architecture:uart.device",
         ":math:utils",
-        ":architecture:fiber",
-        ":processing:timer")
+        ":architecture:fiber")
     return True
 
 def build(env):

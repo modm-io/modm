@@ -81,16 +81,14 @@ Ads816x<SpiMaster, Cs>::autoSequenceConversion(uint8_t channelsBitmask, std::spa
 	// Write channel bitmask config (AUTO_SEQ_CH)
 	registerAccess(Command::Write, Register::AUTO_SEQ_CFG1, channelsBitmask);
 
-	timeout.restart(tConv);
-	modm::this_fiber::poll([&]{ return timeout.isExpired(); });
+	modm::this_fiber::sleep_for(tConv);
 
 	// Set SEQ_START (0b1 << 0) bit
 	registerAccess(Command::SetBits, Register::SEQ_START, 0b1);
 
 	// Read conversion results
 	for (buffer2[0] = 0; buffer2[0] < std::popcount(channelsBitmask); buffer2[0]++) {
-		timeout.restart(tConv);
-		modm::this_fiber::poll([&]{ return timeout.isExpired(); });
+		modm::this_fiber::sleep_for(tConv);
 
 		modm::this_fiber::poll([&]{ return this->acquireMaster(); });
 		Cs::reset();
@@ -121,8 +119,7 @@ Ads816x<SpiMaster, Cs>::registerAccess(Command command, Register reg, uint8_t va
 
 	if (command == Command::Read) {
 		Cs::set();
-		timeout.restart(tConv);
-		modm::this_fiber::poll([&]{ return timeout.isExpired(); });
+		modm::this_fiber::sleep_for(tConv);
 
 		// To retrieve the result of the read command we issue another 3 byte
 		// transfer, nullptr instead of manual NoOperation (= 0b000...) command

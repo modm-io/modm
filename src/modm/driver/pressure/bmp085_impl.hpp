@@ -67,8 +67,7 @@ modm::Bmp085<I2cMaster>::readout()
 		return false;
 
 	// Wait until temperature reading is succeeded
-	timeout.restart(5ms);
-	modm::this_fiber::poll([&]{ return timeout.isExpired(); });
+	modm::this_fiber::sleep_for(5ms);
 
 	// Get the temperature from sensor
 	buffer[0] = i(Register::MSB);
@@ -87,8 +86,7 @@ modm::Bmp085<I2cMaster>::readout()
 		return false;
 
 	// Wait until sensor has converted the pressure
-	timeout.restart(std::chrono::milliseconds(conversionDelay[bufferedMode >> 6]));
-	modm::this_fiber::poll([&]{ return timeout.isExpired(); });
+	modm::this_fiber::sleep_for(std::chrono::milliseconds(conversionDelay[bufferedMode >> 6]));
 
 	// Get the pressure from sensor
 	buffer[0] = i(Register::MSB);

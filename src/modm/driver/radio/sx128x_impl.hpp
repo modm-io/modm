@@ -35,12 +35,10 @@ void
 Sx128x< Transport, Reset, Busy >::reset()
 {
     Reset::setOutput(modm::Gpio::Low);
-    timeout.restart(std::chrono::milliseconds(50));
-    modm::this_fiber::poll([&]{ return timeout.isExpired(); });
+    modm::this_fiber::sleep_for(50ms);
 
     Reset::setOutput(modm::Gpio::High);
-    timeout.restart(std::chrono::milliseconds(20));
-    modm::this_fiber::poll([&]{ return timeout.isExpired(); });
+    modm::this_fiber::sleep_for(20ms);
 }
 
 // ----------------------------------------------------------------------------

@@ -18,7 +18,6 @@
 #include <modm/architecture/interface/register.hpp>
 #include <modm/architecture/interface/spi_device.hpp>
 #include <modm/processing/fiber.hpp>
-#include <modm/processing/timer.hpp>
 
 namespace modm
 {
@@ -208,8 +207,6 @@ private:
 	std::array<uint8_t, 2> buffer;
 	Config_t config;
 	uint16_t d;
-
-	modm::ShortTimeout timeout;
 
 	void
 	writeSingleRegister(Register address, uint8_t data);

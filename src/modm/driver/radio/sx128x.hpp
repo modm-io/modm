@@ -16,8 +16,6 @@
 #include "sx128x_definitions.hpp"
 #include "sx128x_transport.hpp"
 
-#include <modm/processing/timer.hpp>
-
 namespace modm
 {
 
@@ -236,7 +234,6 @@ public:
     static constexpr float frequencyLsb = float(52_MHz) / 262144.f;
 
 private:
-    ShortPreciseTimeout timeout;
     uint8_t buffer[8];
 };
 

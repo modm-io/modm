@@ -40,8 +40,7 @@ Ms5837<I2cMaster>::initialize()
 	}
 
 	// 4 ms reload (?: from MS5611)
-	timeout.restart(std::chrono::milliseconds(4));
-	modm::this_fiber::poll([&]{ return timeout.isExpired(); });
+	modm::this_fiber::sleep_for(4us);
 
 	// Read the factory calibration from PROM
 	data.prom.data[0] = readProm(0);
@@ -70,8 +69,7 @@ Ms5837<I2cMaster>::readout(OversamplingRatio osrPressure, OversamplingRatio osrT
 	}
 
 	// Wait until pressure conversion has finished
-	timeout.restart(std::chrono::milliseconds(conversionDelay[i(osrPressure) >> 1]));
-	modm::this_fiber::poll([&]{ return timeout.isExpired(); });
+	modm::this_fiber::sleep_for(std::chrono::milliseconds(conversionDelay[i(osrPressure) >> 1]));
 
 	// Get the pressure conversion result from sensor
 	buffer[0] = i(Command::AdcRead);
@@ -91,8 +89,7 @@ Ms5837<I2cMaster>::readout(OversamplingRatio osrPressure, OversamplingRatio osrT
 
 
 	// Wait until temperature conversion has finished
-	timeout.restart(std::chrono::milliseconds(conversionDelay[i(osrTemperature) >> 1]));
-	modm::this_fiber::poll([&]{ return timeout.isExpired(); });
+	modm::this_fiber::sleep_for(std::chrono::milliseconds(conversionDelay[i(osrTemperature) >> 1]));
 
 	// Get the temperature conversion result from sensor
 	buffer[0] = i(Command::AdcRead);

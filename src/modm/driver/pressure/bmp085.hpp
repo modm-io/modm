@@ -14,7 +14,6 @@
 #define MODM_BMP085_HPP
 
 #include <modm/architecture/interface/i2c_device.hpp>
-#include <modm/processing/timer.hpp>
 
 #include "bmp085_data.hpp"
 
@@ -136,7 +135,6 @@ public:
 
 private:
 	DataBase &data;
-	modm::ShortTimeout timeout;
 
 	/**
 	 * Maximum conversion time for pressure from datasheet for

@@ -614,8 +614,7 @@ modm::Vl53l0<I2cMaster>::poll(Register reg, Predicate pred, const uint16_t timeo
 			break;
 		}
 
-		timeout.restart(std::chrono::milliseconds(stepMs));
-		modm::this_fiber::poll([&]{ return timeout.isExpired(); });
+		modm::this_fiber::sleep_for(std::chrono::milliseconds(stepMs));
 
 		if(index >= stepMs) {
 			index -= stepMs;

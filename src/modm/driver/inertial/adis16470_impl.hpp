@@ -43,7 +43,7 @@ Adis16470<SpiMaster, Cs>::readRegister(Register reg)
 	}
 
 	// Ensure CS was not asserted for T_stall
-	modm::this_fiber::poll([&]{ return timeout.isExpired(); });
+	timeout.wait();
 
 	modm::this_fiber::poll([&]{ return this->acquireMaster(); });
 	Cs::reset();
@@ -55,8 +55,7 @@ Adis16470<SpiMaster, Cs>::readRegister(Register reg)
 	if (this->releaseMaster()) {
 		Cs::set();
 	}
-	timeout.restart(tStall);
-	modm::this_fiber::poll([&]{ return timeout.isExpired(); });
+	modm::this_fiber::sleep_for(tStall);
 	modm::this_fiber::poll([&]{ return this->acquireMaster(); });
 	Cs::reset();
 
@@ -96,7 +95,7 @@ Adis16470<SpiMaster, Cs>::writeRegister(Register reg, uint16_t value)
 	}
 
 	// Ensure CS was not asserted for T_stall
-	modm::this_fiber::poll([&]{ return timeout.isExpired(); });
+	timeout.wait();
 
 	modm::this_fiber::poll([&]{ return this->acquireMaster(); });
 	Cs::reset();
@@ -108,8 +107,7 @@ Adis16470<SpiMaster, Cs>::writeRegister(Register reg, uint16_t value)
 	if (this->releaseMaster()) {
 		Cs::set();
 	}
-	timeout.restart(tStall);
-	modm::this_fiber::poll([&]{ return timeout.isExpired(); });
+	modm::this_fiber::sleep_for(tStall);
 	modm::this_fiber::poll([&]{ return this->acquireMaster(); });
 	Cs::reset();
 
@@ -166,7 +164,7 @@ Adis16470<SpiMaster, Cs>::readRegisterSequence(std::span<const Register> sequenc
 	}
 
 	// Ensure CS was not asserted for T_stall
-	modm::this_fiber::poll([&]{ return timeout.isExpired(); });
+	timeout.wait();
 
 	modm::this_fiber::poll([&]{ return this->acquireMaster(); });
 	Cs::reset();
@@ -189,8 +187,7 @@ Adis16470<SpiMaster, Cs>::readRegisterSequence(std::span<const Register> sequenc
 			Cs::set();
 		}
 
-		timeout.restart(tStall);
-		modm::this_fiber::poll([&]{ return timeout.isExpired(); });
+		modm::this_fiber::sleep_for(tStall);
 
 		modm::this_fiber::poll([&]{ return this->acquireMaster(); });
 		Cs::reset();

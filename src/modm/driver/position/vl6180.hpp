@@ -18,7 +18,6 @@
 #include <modm/architecture/interface/unaligned.hpp>
 #include <modm/architecture/interface/accessor.hpp>
 #include <modm/math/utils/endianness.hpp>
-#include <modm/processing/timer.hpp>
 
 namespace modm
 {
@@ -453,7 +452,6 @@ private:
 private:
 	Data &data;
 
-	modm::ShortTimeout timeout;
 	RangeErrorCode rangeError;
 	ALS_ErrorCode alsError;
 

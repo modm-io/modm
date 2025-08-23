@@ -74,14 +74,14 @@ template < class I2cMaster >
 bool
 modm::Hmc6343<I2cMaster>::readRegister(Register reg, uint8_t &value)
 {
-	modm::this_fiber::poll([&]{ return timeout.isExpired(); });
+	timeout.wait();
 	timeout.restart(10ms);
 
 	buffer[0] = i(Command::ReadEeprom);
 	buffer[1] = i(reg);
 	if(I2cDevice<I2cMaster>::write(buffer, 2))
 	{
-		modm::this_fiber::poll([&]{ return timeout.isExpired(); });
+		timeout.wait();
 		return I2cDevice<I2cMaster>::read(&value, 1);
 	}
 	return false;
@@ -115,7 +115,7 @@ modm::Hmc6343<I2cMaster>::readPostData(Command command, uint8_t offset, uint8_t 
 {
 	if (writeCommand(command, 1))
 	{
-		modm::this_fiber::poll([&]{ return timeout.isExpired(); });
+		timeout.wait();
 		return I2cDevice<I2cMaster>::read(data.data + offset, readSize);
 	}
 	return false;

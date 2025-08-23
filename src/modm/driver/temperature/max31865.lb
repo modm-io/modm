@@ -23,8 +23,7 @@ def prepare(module, options):
 	module.depends(
 		":architecture:gpio",
 		":architecture:spi.device",
-		":architecture:fiber",
-		":processing:timer")
+		":architecture:fiber")
 	return True
 
 def build(env):

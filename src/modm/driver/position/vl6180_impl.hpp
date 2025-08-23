@@ -71,8 +71,7 @@ modm::Vl6180<I2cMaster>::readSensor(bool isDistance)
 	{
 		// Measurement will take 7.5ms + convergence time (< ~10ms) for ranging
 		// or the analog integration time for ALS
-		timeout.restart(milliseconds(isDistance ? 10 : data.time));
-		modm::this_fiber::poll([&]{ return timeout.isExpired(); });
+		modm::this_fiber::sleep_for(milliseconds(isDistance ? 10 : data.time));
 
 		// When the measurement is completed, the interrupt source of ALS or range
 		// in RESULT_INTERRUPT_STATUS_GPIO will set to New Sample Ready.
@@ -94,14 +93,13 @@ modm::Vl6180<I2cMaster>::readSensor(bool isDistance)
 			}
 
 			// otherwise wait 2ms longer on every try
-			timeout.restart(milliseconds(logicBuffer.byte[0]));
 			logicBuffer.byte[0] += 2;
 
 			// 168ms timeout
 			if (logicBuffer.byte[0] > 25)
 				return false;
 
-			modm::this_fiber::poll([&]{ return timeout.isExpired(); });
+			modm::this_fiber::sleep_for(milliseconds(logicBuffer.byte[0]));
 		}
 
 		// The range result is read from RESULT_RANGE_VAL or RESULT_ALS_VAL.
@@ -136,8 +134,7 @@ modm::Vl6180<I2cMaster>::readSensor(bool isDistance)
 					}
 
 					// otherwise wait 4ms and try again
-					timeout.restart(4ms);
-					modm::this_fiber::poll([&]{ return timeout.isExpired(); });
+					modm::this_fiber::sleep_for(4ms);
 
 					if (i2cBuffer[3]++ > 15)
 						return false;

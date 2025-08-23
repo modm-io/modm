@@ -21,8 +21,7 @@ def prepare(module, options):
         ":architecture:i2c.device",
         ":architecture:register",
         ":architecture:unaligned",
-        ":math:utils",
-        ":processing:timer")
+        ":math:utils")
     return True
 
 def build(env):

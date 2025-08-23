@@ -52,8 +52,7 @@ Ms5611<SpiMaster,Cs>::initialize()
     }
 
     // 2.8 ms reload
-    timeout.restart(std::chrono::milliseconds(3));
-    modm::this_fiber::poll([&]{ return timeout.isExpired(); });
+    modm::this_fiber::sleep_for(3ms);
 
     // Read the factory calibration from PROM
     data.prom.data[0] = modm::fromBigEndian(readProm(0));
@@ -88,8 +87,7 @@ Ms5611<SpiMaster,Cs>::readout(OversamplingRatio osrPressure, OversamplingRatio o
     }
 
     // Wait until pressure conversion has finished
-    timeout.restart(std::chrono::milliseconds(conversionDelay[i(osrPressure) >> 1]));
-    modm::this_fiber::poll([&]{ return timeout.isExpired(); });
+    modm::this_fiber::sleep_for(std::chrono::milliseconds(conversionDelay[i(osrPressure) >> 1]));
 
     // Get the pressure conversion result from sensor
     buffer[0] = i(Command::AdcRead);
@@ -122,8 +120,7 @@ Ms5611<SpiMaster,Cs>::readout(OversamplingRatio osrPressure, OversamplingRatio o
     }
 
     // Wait until temperature conversion has finished
-    timeout.restart(std::chrono::milliseconds(conversionDelay[i(osrTemperature) >> 1]));
-    modm::this_fiber::poll([&]{ return timeout.isExpired(); });
+    modm::this_fiber::sleep_for(std::chrono::milliseconds(conversionDelay[i(osrTemperature) >> 1]));
 
     // Get the temperature conversion result from sensor
     buffer[0] = i(Command::AdcRead);
