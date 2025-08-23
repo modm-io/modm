@@ -146,7 +146,7 @@ struct pca9685
  * @ingroup modm_driver_pca9685
  */
 template<typename I2cMaster>
-class Pca9685 : public pca9685, public modm::I2cDevice< I2cMaster, 1, I2cWriteTransaction >
+class Pca9685 : public pca9685, public modm::I2cDevice< I2cMaster >
 {
 	uint8_t buffer[3];
 

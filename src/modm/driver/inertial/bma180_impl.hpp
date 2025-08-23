@@ -16,9 +16,8 @@
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
 modm::Bma180<I2cMaster>::Bma180(uint8_t* data, uint8_t address)
-:	I2cWriteReadTransaction(address), status(0), data(data)
+:	I2cDevice<I2cMaster>(address), status(0), data(data)
 {
-	configureWriteRead(buffer, 0, data, 0);
 }
 
 template < typename I2cMaster >
@@ -66,19 +65,11 @@ template < typename I2cMaster >
 void
 modm::Bma180<I2cMaster>::update()
 {
-	if (status & READ_ACCELEROMETER_RUNNING &&
-		getAdapterState() == modm::I2c::AdapterState::Idle) {
-		status &= ~READ_ACCELEROMETER_RUNNING;
-		status |= NEW_ACCELEROMETER_DATA;
-	}
-	else if (status & READ_ACCELEROMETER_PENDING)
+	if (status & READ_ACCELEROMETER_PENDING)
 	{
 		buffer[0] = bma180::REGISTER_DATA_X0;
-		configureWriteRead(buffer, 1, data, 7);
-
-		if (I2cMaster::start(this)) {
+		if (I2cDevice<I2cMaster>::writeRead(buffer, 1, data, 7)) {
 			status &= ~READ_ACCELEROMETER_PENDING;
-			status |= READ_ACCELEROMETER_RUNNING;
 		}
 	}
 }
@@ -103,26 +94,17 @@ template < typename I2cMaster >
 bool
 modm::Bma180<I2cMaster>::writeRegister(bma180::Register reg, uint8_t value)
 {
-	while (getAdapterState() == modm::I2c::AdapterState::Busy)
-		;
 	buffer[0] = reg;
 	buffer[1] = value;
-	configureWriteRead(buffer, 2, data, 0);
-
-	return I2cMaster::startBlocking(this);
+	return I2cDevice<I2cMaster>::writeRead(buffer, 2, data, 0);
 }
 
 template < typename I2cMaster >
 uint8_t
 modm::Bma180<I2cMaster>::readRegister(bma180::Register reg)
 {
-	while (getAdapterState() == modm::I2c::AdapterState::Busy)
-		;
 	buffer[0] = reg;
-	configureWriteRead(buffer, 1, buffer, 1);
-
-	while (!I2cMaster::startBlocking(this))
-		;
+	if (not I2cDevice<I2cMaster>::writeRead(buffer, 1, buffer, 1)) return 0;
 	return buffer[0];
 }
 

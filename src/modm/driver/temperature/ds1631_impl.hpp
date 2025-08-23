@@ -31,10 +31,7 @@ bool
 modm::Ds1631<I2cMaster>::initialize()
 {
 	buffer[0] = uint8_t(Command::Configuration);
-
-	this->transaction.configureWriteRead(buffer, 1, &config, 1);
-
-	return this->runTransaction();
+	return I2cDevice<I2cMaster>::writeRead(buffer, 1, &config, 1);
 }
 
 template < typename I2cMaster >
@@ -116,9 +113,7 @@ bool
 modm::Ds1631<I2cMaster>::readTemperature()
 {
 	buffer[0] = uint8_t(Command::Temperature);
-	this->transaction.configureWriteRead(buffer, 1, data.data, 2);
-
-	return this->runTransaction();
+	return I2cDevice<I2cMaster>::writeRead(buffer, 1, data.data, 2);
 }
 
 // MARK: configuration
@@ -128,10 +123,7 @@ modm::Ds1631<I2cMaster>::writeConfiguration()
 {
 	buffer[0] = uint8_t(Command::Configuration);
 	buffer[1] = config.value;
-
-	this->transaction.configureWrite(buffer, 2);
-
-	return this->runTransaction();
+	return I2cDevice<I2cMaster>::write(buffer, 2);
 }
 
 template < typename I2cMaster >
@@ -139,9 +131,7 @@ bool
 modm::Ds1631<I2cMaster>::writeCommand(Command cmd)
 {
 	buffer[0] = uint8_t(cmd);
-	this->transaction.configureWrite(buffer, 1);
-
-	return this->runTransaction();
+	return I2cDevice<I2cMaster>::write(buffer, 1);
 }
 
 template < typename I2cMaster >
@@ -158,8 +148,5 @@ modm::Ds1631<I2cMaster>::setLimitRegister(Command cmd, float temperature)
 		buffer[1] = (temp >> 8);
 		buffer[2] = temp;
 	}
-
-	this->transaction.configureWrite(buffer, 3);
-
-	return this->runTransaction();
+	return I2cDevice<I2cMaster>::write(buffer, 3);
 }

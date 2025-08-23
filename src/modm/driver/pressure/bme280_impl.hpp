@@ -37,10 +37,7 @@ modm::Bme280<I2cMaster>::initialize(Mode mode, Oversampling pressure, Oversampli
 	{
 		buffer[0] = i(Register::CHIP_ID);
 		uint8_t chid;
-
-		this->transaction.configureWriteRead(buffer, 1, &chid, 1);
-
-		if (this->runTransaction())
+		if (I2cDevice<I2cMaster>::writeRead(buffer, 1, &chid, 1))
 		{
 			MODM_LOG_DEBUG.printf("BME280 Chip Id check. Read %02x, expected %02x\n", chid, ChipId);
 			if (chid != ChipId) {
@@ -60,8 +57,7 @@ modm::Bme280<I2cMaster>::initialize(Mode mode, Oversampling pressure, Oversampli
 		buffer[0] = i(Register::CTRL_HUM);
 		buffer[1] = ctrl_hum.value;
 	}
-	this->transaction.configureWrite(buffer, 2);
-	if (not this->runTransaction()) {
+	if (not I2cDevice<I2cMaster>::write(buffer, 2)) {
 		return false;
 	}
 
@@ -75,9 +71,7 @@ modm::Bme280<I2cMaster>::initialize(Mode mode, Oversampling pressure, Oversampli
 		buffer[0] = i(Register::CTRL_MEAS);
 		buffer[1] = ctrl_meas.value;
 	}
-
-	this->transaction.configureWrite(buffer, 2);
-	if (not this->runTransaction()) {
+	if (not I2cDevice<I2cMaster>::write(buffer, 2)) {
 		return false;
 	}
 
@@ -89,18 +83,14 @@ modm::Bme280<I2cMaster>::initialize(Mode mode, Oversampling pressure, Oversampli
 		buffer[0] = i(Register::CONFIG);
 		buffer[1] = config.value;
 	}
-	this->transaction.configureWrite(buffer, 2);
-	if (not this->runTransaction()) {
+	if (not I2cDevice<I2cMaster>::write(buffer, 2)) {
 		return false;
 	}
 
 
 	// Read 26 bytes of Calib00 to Calib25
 	buffer[0] = i(Register::CALIB00);
-
-	this->transaction.configureWriteRead(buffer, 1, reinterpret_cast<uint8_t*>(&data.calibration), 26);
-
-	if (this->runTransaction())
+	if (I2cDevice<I2cMaster>::writeRead(buffer, 1, reinterpret_cast<uint8_t*>(&data.calibration), 26))
 	{
 		{
 			MODM_LOG_DEBUG << "Raw calibration data: ";
@@ -140,10 +130,7 @@ modm::Bme280<I2cMaster>::initialize(Mode mode, Oversampling pressure, Oversampli
 	// H2=359, H3=0, H4=326, H5=0, H6=30 (decimal)
 
 	buffer[0] = i(Register::CALIB26);
-
-	this->transaction.configureWriteRead(buffer, 1, calBuffer, 7);
-
-	if (this->runTransaction())
+	if (I2cDevice<I2cMaster>::writeRead(buffer, 1, calBuffer, 7))
 	{
 		data.calibration.H2 = (calBuffer[1] << 8) | calBuffer[0];
 		data.calibration.H3 =  calBuffer[2];
@@ -167,18 +154,19 @@ modm::Bme280<I2cMaster>::readout()
 	// And a single 8-byte transaction is even faster than multiple 3-byte
 	// transactions.
 	buffer[0] = i(Register::PRESS_MSB);
-	this->transaction.configureWriteRead(buffer, 1, data.raw, 8);
+	if (I2cDevice<I2cMaster>::writeRead(buffer, 1, data.raw, 8))
+	{
+		MODM_LOG_DEBUG.printf("RAW: %02x %02x %02x %02x %02x %02x %02x %02x\n",
+			data.raw[0], data.raw[1], data.raw[2], data.raw[3],
+			data.raw[4], data.raw[5], data.raw[6], data.raw[7]);
 
-	MODM_LOG_DEBUG.printf("RAW: %02x %02x %02x %02x %02x %02x %02x %02x\n",
-		data.raw[0], data.raw[1], data.raw[2], data.raw[3],
-		data.raw[4], data.raw[5], data.raw[6], data.raw[7]);
-
-	// There will come new data, so new calculation necessary
-	data.rawTemperatureTouched();
-	data.rawPressureTouched();
-	data.rawHumidityTouched();
-
-	return this->runTransaction();
+		// There will come new data, so new calculation necessary
+		data.rawTemperatureTouched();
+		data.rawPressureTouched();
+		data.rawHumidityTouched();
+		return true;
+	}
+	return false;
 }
 
 template < typename I2cMaster >
@@ -195,7 +183,5 @@ modm::Bme280<I2cMaster>::startMeasurement(Oversampling pressure, Oversampling te
 		buffer[0] = i(Register::CTRL_MEAS);
 		buffer[1] = ctrl_meas.value;
 	}
-
-	this->transaction.configureWrite(buffer, 2);
-	return this->runTransaction();
+	return I2cDevice<I2cMaster>::write(buffer, 2);
 }

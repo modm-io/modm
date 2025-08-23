@@ -34,8 +34,7 @@ Ms5837<I2cMaster>::initialize()
 {
 	// Reset sensor once after power-on to load calibration PROM into the internal registers
 	buffer[0] = i(Command::Reset);
-	this->transaction.configureWrite(buffer, 1);
-	if (!this->runTransaction())
+	if (!I2cDevice<I2cMaster>::write(buffer, 1))
 	{
 		return false;
 	}
@@ -66,8 +65,7 @@ Ms5837<I2cMaster>::readout(OversamplingRatio osrPressure, OversamplingRatio osrT
 {
 	// start a pressure conversion
 	buffer[0] = i(Command::Convert) | i(Conversion::Pressure) | i(osrPressure);
-	this->transaction.configureWrite(buffer, 1);
-	if (!this->runTransaction()){
+	if (!I2cDevice<I2cMaster>::write(buffer, 1)){
 		return false;
 	}
 
@@ -77,9 +75,7 @@ Ms5837<I2cMaster>::readout(OversamplingRatio osrPressure, OversamplingRatio osrT
 
 	// Get the pressure conversion result from sensor
 	buffer[0] = i(Command::AdcRead);
-
-	this->transaction.configureWriteRead(buffer, 1, data.raw, 3);
-	if (!this->runTransaction()){
+	if (!I2cDevice<I2cMaster>::writeRead(buffer, 1, data.raw, 3)){
 		return false;
 	}
 
@@ -89,8 +85,7 @@ Ms5837<I2cMaster>::readout(OversamplingRatio osrPressure, OversamplingRatio osrT
 
 	// start a temperature conversion
 	buffer[0] = i(Command::Convert) | i(Conversion::Temperature) | i(osrTemperature);
-	this->transaction.configureWrite(buffer, 1);
-	if (!this->runTransaction()){
+	if (!I2cDevice<I2cMaster>::write(buffer, 1)){
 		return false;
 	}
 
@@ -101,9 +96,7 @@ Ms5837<I2cMaster>::readout(OversamplingRatio osrPressure, OversamplingRatio osrT
 
 	// Get the temperature conversion result from sensor
 	buffer[0] = i(Command::AdcRead);
-
-	this->transaction.configureWriteRead(buffer, 1, data.raw + 3, 3);
-	if (!this->runTransaction()){
+	if (!I2cDevice<I2cMaster>::writeRead(buffer, 1, data.raw + 3, 3)){
 		return false;
 	}
 
@@ -122,8 +115,7 @@ Ms5837<I2cMaster>::readProm(uint8_t address)
 	// MODM_LOG_DEBUG.printf("MS5837 readProm(%02x)\n", address);
 
 	buffer[0] = i(Command::PromRead) | ((address & 0b111) << 1);
-	this->transaction.configureWriteRead(buffer, 1, buffer, 2);
-	if (! this->runTransaction())
+	if (! I2cDevice<I2cMaster>::writeRead(buffer, 1, buffer, 2))
 	{
 		// MODM_LOG_DEBUG.printf("MS5837 readProm(%02x) Failed\n", address);
 		return 0;

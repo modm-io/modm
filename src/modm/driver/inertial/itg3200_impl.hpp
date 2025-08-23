@@ -84,10 +84,7 @@ modm::Itg3200<I2cMaster>::write(Register reg, uint8_t *buffer, uint8_t length, b
 
 	rawBuffer[3] = uint8_t(reg);
 	if (copyBuffer) std::memcpy(rawBuffer+4, buffer, length);
-
-	this->transaction.configureWrite(rawBuffer+3, length+1);
-
-	return this->runTransaction();
+	return I2cDevice<I2cMaster>::write(rawBuffer+3, length+1);
 }
 
 // MARK: read multilength register
@@ -96,7 +93,5 @@ bool
 modm::Itg3200<I2cMaster>::read(Register reg, uint8_t *buffer, uint8_t length)
 {
 	rawBuffer[3] = uint8_t(reg);
-	this->transaction.configureWriteRead(rawBuffer+3, 1, buffer, length);
-
-	return this->runTransaction();
+	return I2cDevice<I2cMaster>::writeRead(rawBuffer+3, 1, buffer, length);
 }

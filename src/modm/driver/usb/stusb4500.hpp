@@ -122,8 +122,7 @@ public:
 	readRegister(Register reg, uint8_t* output, size_t length)
 	{
 		buffer[0] = uint8_t(reg);
-		this->transaction.configureWriteRead(buffer.data(), 1, output, length);
-		return this->runTransaction();
+		return I2cDevice<I2cMaster>::writeRead(buffer.data(), 1, output, length);
 	}
 
 	bool
@@ -133,8 +132,7 @@ public:
 			return false;
 		buffer[0] = uint8_t(reg);
 		std::memcpy(&buffer[1], data, length);
-		this->transaction.configureWriteRead(buffer.data(), length + 1, nullptr, 0);
-		return this->runTransaction();
+		return I2cDevice<I2cMaster>::writeRead(buffer.data(), length + 1, nullptr, 0);
 	}
 
 private:

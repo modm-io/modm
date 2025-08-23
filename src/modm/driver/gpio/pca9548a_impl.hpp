@@ -38,11 +38,9 @@ template < typename I2cMaster >
 bool
 modm::Pca9548a<I2cMaster>::readCommandRegister(uint8_t &command_register)
 {
-	this->transaction.configureRead(buffer, 1);
 	command_register = buffer[0];
 	current_command_register = command_register;
-
-	return this->runTransaction();
+	return I2cDevice<I2cMaster>::read(buffer, 1);
 }
 
 template < typename I2cMaster >
@@ -56,7 +54,5 @@ modm::Pca9548a<I2cMaster>::writeCommandRegister(uint8_t command_register)
 	current_command_register = command_register;
 
 	buffer[0] = command_register;
-	this->transaction.configureWrite(buffer, 1);
-
-	return this->runTransaction();
+	return I2cDevice<I2cMaster>::write(buffer, 1);
 }

@@ -142,10 +142,7 @@ Bmi088I2cTransport<I2cMaster>::readRegisters(uint8_t startReg, uint8_t count)
 		return {};
 	}
 
-	this->transaction.configureWriteRead(&startReg, 1, &buffer_[0], count);
-	const bool success = this->runTransaction();
-
-	if (success) {
+	if (I2cDevice<I2cMaster>::writeRead(&startReg, 1, &buffer_[0], count)) {
 		return std::span{&buffer_[0], count};
 	} else {
 		return {};
@@ -174,9 +171,7 @@ Bmi088I2cTransport<I2cMaster>::writeRegister(uint8_t reg, uint8_t data)
 {
 	buffer_[0] = reg;
 	buffer_[1] = data;
-	this->transaction.configureWrite(&buffer_[0], 2);
-
-	return this->runTransaction();
+	return I2cDevice<I2cMaster>::write(&buffer_[0], 2);
 }
 
 } // namespace modm

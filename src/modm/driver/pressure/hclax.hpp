@@ -64,7 +64,7 @@ struct hclax
  * @author	Niklas Hauser
  */
 template < typename I2cMaster >
-class HclaX : public hclax, public modm::I2cDevice<I2cMaster, 1, I2cReadTransaction>
+class HclaX : public hclax, public modm::I2cDevice<I2cMaster>
 {
 public:
 	/**
@@ -74,29 +74,14 @@ public:
 	 *      You have to use a MUX or two seperate I2C busses.
 	 */
 	HclaX(Data &data)
-	:	I2cDevice<I2cMaster,1,I2cReadTransaction>(0x78), data(data)
-	{
-		this->transaction.configureRead(data.data, 2);
-	}
-
-	/// pings the sensor
-	bool
-	ping()
-	{
-		modm::this_fiber::poll([&]{ return this->transaction.configurePing() and this->startTransaction(); });
-
-		modm::this_fiber::poll([&]{ return not this->isTransactionRunning(); });
-
-		this->transaction.configureRead(data.data, 2);
-
-		return this->wasTransactionSuccessful();
-	}
+	:	I2cDevice<I2cMaster>(0x78), data(data)
+	{}
 
 	/// reads the Pressure registers and buffers the results
 	bool
 	readPressure()
 	{
-		return this->runTransaction();
+		return I2cDevice<I2cMaster>::read(data.data, 2);
 	}
 
 public:

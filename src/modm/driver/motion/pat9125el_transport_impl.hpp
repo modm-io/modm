@@ -28,10 +28,7 @@ Pat9125elI2cTransport<I2cMaster>::write(uint8_t reg, uint8_t value)
 {
 	buffer[0] = reg;
 	buffer[1] = value;
-
-	this->transaction.configureWrite(&buffer[0], 2);
-
-	return this->runTransaction();
+	return I2cDevice<I2cMaster>::write(&buffer[0], 2);
 }
 
 template<class I2cMaster>
@@ -46,9 +43,7 @@ bool
 Pat9125elI2cTransport<I2cMaster>::read(uint8_t reg, uint8_t* buffer, uint8_t length)
 {
 	buffer[0] = reg;
-	this->transaction.configureWriteRead(&buffer[0], 1, buffer, length);
-
-	return this->runTransaction();
+	return I2cDevice<I2cMaster>::writeRead(&buffer[0], 1, buffer, length);
 }
 
 }

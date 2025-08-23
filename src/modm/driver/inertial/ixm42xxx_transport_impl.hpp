@@ -31,10 +31,7 @@ modm::Ixm42xxxTransportI2c<I2cMaster>::write(uint8_t reg, uint8_t value)
 {
     buffer[0] = reg;
     buffer[1] = value;
-
-    this->transaction.configureWrite(buffer, 2);
-
-    return this->runTransaction();
+    return I2cDevice<I2cMaster>::write(buffer, 2);
 }
 
 // ----------------------------------------------------------------------------
@@ -53,9 +50,7 @@ bool
 modm::Ixm42xxxTransportI2c<I2cMaster>::read(uint8_t reg, uint8_t *buffer, std::size_t length)
 {
     this->buffer[0] = reg;
-    this->transaction.configureWriteRead(this->buffer, 1, buffer, length);
-
-    return this->runTransaction();
+    return I2cDevice<I2cMaster>::writeRead(this->buffer, 1, buffer, length);
 }
 
 // ----------------------------------------------------------------------------

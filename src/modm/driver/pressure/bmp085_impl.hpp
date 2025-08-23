@@ -33,9 +33,7 @@ modm::Bmp085<I2cMaster>::initialize(Mode mode)
 	setMode(mode);
 	buffer[0] = i(Register::CAL_AC1);
 
-	this->transaction.configureWriteRead(buffer, 1, reinterpret_cast<uint8_t*>(&data.calibration), 22);
-
-	if (this->runTransaction())
+	if (I2cDevice<I2cMaster>::writeRead(buffer, 1, reinterpret_cast<uint8_t*>(&data.calibration), 22))
 	{
 		uint16_t* element = reinterpret_cast<uint16_t*>(&data.calibration);
 		element[ 0] = modm::fromBigEndian(element[0]);
@@ -65,10 +63,7 @@ modm::Bmp085<I2cMaster>::readout()
 	// Start temperature reading
 	buffer[0] = i(Register::CONTROL);
 	buffer[1] = i(Conversion::Temperature);
-
-	this->transaction.configureWrite(buffer, 2);
-
-	if (not this->runTransaction())
+	if (not I2cDevice<I2cMaster>::write(buffer, 2))
 		return false;
 
 	// Wait until temperature reading is succeeded
@@ -77,23 +72,18 @@ modm::Bmp085<I2cMaster>::readout()
 
 	// Get the temperature from sensor
 	buffer[0] = i(Register::MSB);
-	this->transaction.configureWriteRead(buffer, 1, data.raw, 2);
+	if (not I2cDevice<I2cMaster>::writeRead(buffer, 1, data.raw, 2))
+		return false;
 
 	// Notify data class about changed buffer.
 	data.rawTemperatureTouched();
-
-	if (not this->runTransaction())
-		return false;
 
 	// buffer the mode for the timer later
 	bufferedMode = data.meta & i(Mode::Mask);
 	// Now start converting the pressure
 	buffer[0] = i(Register::CONTROL);
 	buffer[1] = i(Conversion::Pressure) | bufferedMode;
-
-	this->transaction.configureWrite(buffer, 2);
-
-	if (not this->runTransaction())
+	if (not I2cDevice<I2cMaster>::write(buffer, 2))
 		return false;
 
 	// Wait until sensor has converted the pressure
@@ -102,12 +92,13 @@ modm::Bmp085<I2cMaster>::readout()
 
 	// Get the pressure from sensor
 	buffer[0] = i(Register::MSB);
-	this->transaction.configureWriteRead(buffer, 1, data.raw + 2, 3);
+	if (not I2cDevice<I2cMaster>::writeRead(buffer, 1, data.raw + 2, 3))
+		return false;
 
 	// Notify data class about changed buffer.
 	data.rawPressureTouched();
 
-	return this->runTransaction();
+	return true;
 }
 
 template < typename I2cMaster >

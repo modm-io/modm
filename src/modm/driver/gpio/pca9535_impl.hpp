@@ -130,9 +130,7 @@ template < class I2cMaster >
 bool
 modm::Pca9535<I2cMaster>::writeMemory(Index index)
 {
-	this->transaction.configureWrite(buffer + uint8_t(index), 3);
-
-	return this->runTransaction();
+	return I2cDevice<I2cMaster>::write(buffer + uint8_t(index), 3);
 }
 
 // MARK: read multilength register
@@ -140,9 +138,7 @@ template < class I2cMaster >
 bool
 modm::Pca9535<I2cMaster>::readMemory(Index index)
 {
-	this->transaction.configureWriteRead(
+	retur I2cDevice<I2cMaster>::writeRead(
 			buffer + uint8_t(index)    , 1,
 			buffer + uint8_t(index) + 1, 2);
-
-	return this->runTransaction();
 }

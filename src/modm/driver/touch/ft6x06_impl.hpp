@@ -57,9 +57,7 @@ modm::Ft6x06<I2cMaster>::write(Register reg, uint8_t value)
 {
 	buffer[0] = uint8_t(reg);
 	buffer[1] = value;
-	this->transaction.configureWrite(buffer, 2);
-
-	return this->runTransaction();
+	return I2cDevice<I2cMaster>::write(buffer, 2);
 }
 
 // MARK: read multilength register
@@ -68,7 +66,5 @@ bool
 modm::Ft6x06<I2cMaster>::read(Register reg, uint8_t *buffer, uint8_t length)
 {
 	this->buffer[0] = uint8_t(reg);
-	this->transaction.configureWriteRead(this->buffer, 1, buffer, length);
-
-	return this->runTransaction();
+	return I2cDevice<I2cMaster>::writeRead(this->buffer, 1, buffer, length);
 }

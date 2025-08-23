@@ -36,10 +36,7 @@ modm::Lm75<I2cMaster>::configureAlertMode(ThermostatMode mode, AlertPolarity pol
 
 	buffer[0] = uint8_t(Register::Configuration);
 	buffer[1] = config_msb.value;
-
-	this->transaction.configureWrite(buffer, 2);
-
-	return this->runTransaction();
+	return I2cDevice<I2cMaster>::write(buffer, 2);
 }
 
 // MARK: read temperature
@@ -48,9 +45,7 @@ bool
 modm::Lm75<I2cMaster>::readTemperature()
 {
 	buffer[0] = uint8_t(Register::Temperature);
-	this->transaction.configureWriteRead(buffer, 1, data.data, 2);
-
-	return this->runTransaction();
+	return I2cDevice<I2cMaster>::writeRead(buffer, 1, data.data, 2);
 }
 
 // MARK: configuration
@@ -66,8 +61,5 @@ modm::Lm75<I2cMaster>::setLimitRegister(Register reg, float temperature)
 		buffer[1] = (temp >> 8);
 		buffer[2] = temp;
 	}
-
-	this->transaction.configureWrite(buffer, 3);
-
-	return this->runTransaction();
+	return I2cDevice<I2cMaster>::write(buffer, 3);
 }

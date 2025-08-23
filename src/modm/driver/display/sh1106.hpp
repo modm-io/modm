@@ -46,9 +46,7 @@ protected:
 			this->transaction_success &= this->writeCommands(3);
 
 			modm::this_fiber::poll([&]{ return this->transaction.configureDisplayWrite((uint8_t*)&this->buffer[page], 128); });
-			modm::this_fiber::poll([&]{ return this->startTransaction(); });
-			modm::this_fiber::poll([&]{ return not this->isTransactionRunning(); });
-			this->transaction_success &= this->wasTransactionSuccessful();
+			this->transaction_success &= this->runTransaction();
 		};
 
 		return this->transaction_success;

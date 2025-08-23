@@ -25,8 +25,7 @@ template < typename I2cMaster >
 std::optional<modm::mcp7941x::DateTime>
 modm::Mcp7941x<I2cMaster>::getDateTime()
 {
-	this->transaction.configureWriteRead(&addr_seconds, 1, scratch, 7);
-	if (this->runTransaction()) {
+	if (I2cDevice<I2cMaster>::writeRead(&addr_seconds, 1, scratch, 7)) {
 		dateTime.seconds = decodeBcd(scratch[0] & 0b0111'1111);
 		dateTime.minutes = decodeBcd(scratch[1]);
 		dateTime.hours = decodeBcd(scratch[2] & 0b0011'1111);
@@ -51,22 +50,19 @@ modm::Mcp7941x<I2cMaster>::setDateTime(DateTime dt)
 	scratch[5] = encodeBcd(dt.days);
 	scratch[6] = encodeBcd(dt.months);
 	scratch[7] = encodeBcd(dt.years);
-	this->transaction.configureWrite(scratch, 8);
-	if (not this->runTransaction()) {
+	if (not I2cDevice<I2cMaster>::write(scratch, 8)) {
 		return false;
 	}
 	scratch[0] = addr_seconds;
 	scratch[1] = encodeBcd(dt.seconds) | 0b1000'0000 /* Start oscillator bit */;
-	this->transaction.configureWrite(scratch, 2);
-	return this->runTransaction();
+	return I2cDevice<I2cMaster>::write(scratch, 2);
 }
 
 template < typename I2cMaster >
 bool
 modm::Mcp7941x<I2cMaster>::oscillatorRunning()
 {
-	this->transaction.configureWriteRead(&addr_weekday, 1, scratch, 1);
-	if (this->runTransaction()) {
+	if (I2cDevice<I2cMaster>::writeRead(&addr_weekday, 1, scratch, 1)) {
 		return (scratch[0] | 0b0010'0000 /* OSCRUN bit */) > 0;
 	}
 	return false;
@@ -83,8 +79,7 @@ template < typename I2cMaster >
 std::optional<std::array<uint8_t, 8>>
 modm::Mcp7941xEeprom<I2cMaster>::getUniqueId()
 {
-	this->transaction.configureWriteRead(&addr_unique_id, 1, data.data(), 8);
-	if (not this->runTransaction()) {
+	if (not I2cDevice<I2cMaster>::writeRead(&addr_unique_id, 1, data.data(), 8)) {
 		return std::nullopt;
 	}
 	return data;

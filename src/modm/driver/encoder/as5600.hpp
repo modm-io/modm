@@ -170,10 +170,7 @@ public:
 			buffer[1] = 0;
 			buffer[2] = 0;
 
-			this->transaction.configureWrite(buffer, 3);
-
-			this->runTransaction();
-			success &= this->wasTransactionSuccessful();
+			success &= I2cDevice<I2cMaster>::write(buffer, 3);
 		}
 
 		return success;
@@ -288,10 +285,7 @@ private:
 			buffer[1] = value >> 8;
 			buffer[2] = value;
 		}
-
-		this->transaction.configureWrite(buffer, 1 + sizeof(T));
-
-		return this->runTransaction();
+		return I2cDevice<I2cMaster>::write(buffer, 1 + sizeof(T));
 	}
 
 	template<std::unsigned_integral T>
@@ -299,9 +293,8 @@ private:
 	read(Register reg)
 	{
 		buffer[0] = reg;
-		this->transaction.configureWriteRead(buffer, 1, buffer + 1, sizeof(T));
-
-		this->runTransaction();
+		if (not I2cDevice<I2cMaster>::writeRead(buffer, 1, buffer + 1, sizeof(T)))
+			return 0;
 
 		T result;
 

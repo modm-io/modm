@@ -96,36 +96,21 @@ struct ams5915
  * @author	Raphael Lehman, Niklas Hauser
  */
 template < typename I2cMaster >
-class Ams5915 : public ams5915, public modm::I2cDevice<I2cMaster, 1, I2cReadTransaction>
+class Ams5915 : public ams5915, public modm::I2cDevice<I2cMaster>
 {
 public:
 	/**
 	 * @param	data	a ams5915::Data object
 	 */
 	Ams5915(Data &data, uint8_t i2cAddress = 0x28)
-	:	I2cDevice<I2cMaster,1,I2cReadTransaction>(i2cAddress), data(data)
-	{
-		this->transaction.configureRead(data.data, 4);
-	}
-
-	/// pings the sensor
-	bool
-	ping()
-	{
-		modm::this_fiber::poll([&]{ return this->transaction.configurePing() and this->startTransaction(); });
-
-		modm::this_fiber::poll([&]{ return not this->isTransactionRunning(); });
-
-		this->transaction.configureRead(data.data, 4);
-
-		return this->wasTransactionSuccessful();
-	}
+	:	I2cDevice<I2cMaster>(i2cAddress), data(data)
+	{}
 
 	/// reads the Pressure registers and buffers the results
 	inline bool
 	readPressure()
 	{
-		return this->runTransaction();
+		return I2cDevice<I2cMaster>::read(data.data, 4);
 	}
 
 public:

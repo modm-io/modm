@@ -136,9 +136,7 @@ class Qmc5883l : public Qmc5883lRegisters, public modm::I2cDevice<I2cMaster>
 	{
 		buffer[0] = uint8_t(reg);
 		buffer[1] = value;
-		this->transaction.configureWrite(buffer, 2);
-
-		return this->runTransaction();
+		return I2cDevice<I2cMaster>::write(buffer, 2);
 	}
 
 public:
@@ -179,9 +177,7 @@ public:
 	readData()
 	{
 		buffer[0] = uint8_t(Register::DataX_Lsb);
-		this->transaction.configureWriteRead(buffer, 1, buffer, sizeof buffer);
-
-		if (this->runTransaction())
+		if (I2cDevice<I2cMaster>::writeRead(buffer, 1, buffer, sizeof buffer))
 		{
 			std::copy_n(buffer, sizeof data.data, data.data);
 			return true;

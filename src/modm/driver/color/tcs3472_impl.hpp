@@ -93,10 +93,7 @@ modm::Tcs3472<I2cMaster>::reloadInterrupt()
 {
 	// Only send command, don't append data! otherwise the reload is not working!
 	buffer[0] = 0x80 | uint8_t(RegisterAddress::RELOAD_INTERRUPT);
-
-	this->transaction.configureWrite(buffer, 1);
-
-	return this->runTransaction();
+	return I2cDevice<I2cMaster>::write(buffer, 1);
 }
 
 // ----------------------------------------------------------------------------
@@ -106,10 +103,7 @@ modm::Tcs3472<I2cMaster>::writeRegister(RegisterAddress address, uint8_t value)
 {
 	buffer[0] = 0x80 | uint8_t(address);
 	buffer[1] = value;
-
-	this->transaction.configureWrite(buffer, 2);
-
-	return this->runTransaction();
+	return I2cDevice<I2cMaster>::write(buffer, 2);
 }
 
 template<typename I2cMaster>
@@ -119,8 +113,5 @@ modm::Tcs3472<I2cMaster>::readRegisters(RegisterAddress address, uint8_t *const 
 {
 	buffer[0] = 0x80 | 0x20 |		// read command auto increment
 				uint8_t(address);	// at this address
-
-	this->transaction.configureWriteRead(buffer, 1, values, count);
-
-	return this->runTransaction();
+	return I2cDevice<I2cMaster>::writeRead(buffer, 1, values, count);
 }

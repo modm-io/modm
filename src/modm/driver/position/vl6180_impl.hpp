@@ -221,10 +221,7 @@ modm::Vl6180<I2cMaster>::write(Register reg, uint8_t value, uint8_t length)
 	i2cBuffer[0] = uint16_t(reg) >> 8;
 	i2cBuffer[1] = uint8_t(reg);
 	i2cBuffer[2] = value;
-
-	this->transaction.configureWrite(i2cBuffer, length+2);
-
-	return this->runTransaction();
+	return I2cDevice<I2cMaster>::write(i2cBuffer, length+2);
 }
 
 // MARK: read multilength register
@@ -234,8 +231,5 @@ modm::Vl6180<I2cMaster>::read(Register reg, uint8_t *buffer, uint8_t length)
 {
 	i2cBuffer[0] = uint16_t(reg) >> 8;
 	i2cBuffer[1] = uint8_t(reg);
-
-	this->transaction.configureWriteRead(i2cBuffer, 2, buffer, length);
-
-	return this->runTransaction();
+	return I2cDevice<I2cMaster>::writeRead(i2cBuffer, 2, buffer, length);
 }

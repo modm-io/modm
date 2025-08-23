@@ -82,17 +82,15 @@ bool
 modm::Pca8574<I2cMaster>::writePort(uint8_t value)
 {
 	output.value = value;
-	this->transaction.configureWrite(&output.value, 1);
-
-	return this->runTransaction();
+	return I2cDevice<I2cMaster>::write(&output.value, 1);
 };
 
 template < class I2cMaster >
 bool
 modm::Pca8574<I2cMaster>::readPort(uint8_t &value)
 {
-	this->transaction.configureRead(&input.value, 1);
-	if (this->runTransaction())
+
+	if (I2cDevice<I2cMaster>::read(&input.value, 1))
 	{
 		value = input.value;
 		return true;

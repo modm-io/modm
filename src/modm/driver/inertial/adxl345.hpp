@@ -14,7 +14,7 @@
 #ifndef MODM_ADXL345_HPP
 #define MODM_ADXL345_HPP
 
-#include <modm/architecture/interface/i2c_adapter.hpp>
+#include <modm/architecture/interface/i2c_device.hpp>
 
 namespace modm
 {
@@ -158,7 +158,7 @@ namespace modm
 	 * \tparam I2cMaster Asynchronous Two Wire interface
 	 */
 	template < typename I2cMaster >
-	class Adxl345 : protected modm::I2cWriteReadTransaction
+	class Adxl345 : protected modm::I2cDevice<I2cMaster>
 	{
 	public:
 		/**

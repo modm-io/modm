@@ -131,9 +131,7 @@ bool
 modm::Tmp102<I2cMaster>::readComparatorMode(bool &result)
 {
 	this->buffer[0] = uint8_t(Register::Configuration);
-	this->transaction.configureWriteRead(this->buffer, 1, this->buffer, 2);
-
-	if (this->runTransaction())
+	if (I2cDevice<I2cMaster>::writeRead(this->buffer, 1, this->buffer, 2))
 	{
 		reinterpret_cast<Config1_t&>(this->config_msb) = Config1_t(this->buffer[0]) & ~Resolution_t::mask();
 		result = static_cast<bool>(Config2_t(this->buffer[1]) & Config2::Alert);
@@ -152,10 +150,7 @@ modm::Tmp102<I2cMaster>::writeConfiguration(uint8_t length)
 	this->buffer[0] = uint8_t(Register::Configuration);
 	this->buffer[1] = reinterpret_cast<Config1_t&>(this->config_msb).value;
 	this->buffer[2] = config_lsb.value;
-
-	this->transaction.configureWrite(this->buffer, length);
-
-	return this->runTransaction();
+	return I2cDevice<I2cMaster>::write(this->buffer, length);
 }
 
 template < typename I2cMaster >
@@ -170,8 +165,5 @@ modm::Tmp102<I2cMaster>::setLimitRegister(Register reg, float temperature)
 		this->buffer[1] = (temp >> 8);
 		this->buffer[2] = temp;
 	}
-
-	this->transaction.configureWrite(this->buffer, 3);
-
-	return this->runTransaction();
+	return I2cDevice<I2cMaster>::write(this->buffer, 3);
 }

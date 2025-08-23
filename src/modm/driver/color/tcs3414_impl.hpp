@@ -31,10 +31,7 @@ modm::Tcs3414<I2cMaster>::writeRegister(RegisterAddress address, uint8_t value)
 				uint8_t(address);	// at this address
 	// buffer[1] contains ignored byte count
 	buffer[2] = value;
-
-	this->transaction.configureWrite(buffer, 2);
-
-	return this->runTransaction();
+	return I2cDevice<I2cMaster>::write(buffer, 2);
 }
 
 template<typename I2cMaster>
@@ -45,8 +42,5 @@ modm::Tcs3414<I2cMaster>::readRegisters(RegisterAddress address, uint8_t* values
 	buffer[0] =	0x80 |				// write command
 				0x40 |				// with SMB read/write block protocol
 				uint8_t(address);	// at this address
-
-	this->transaction.configureWriteRead(buffer, 1, values, count);
-
-	return this->runTransaction();
+	return I2cDevice<I2cMaster>::writeRead(buffer, 1, values, count);
 }

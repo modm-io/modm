@@ -570,9 +570,7 @@ modm::Vl53l0<I2cMaster>::writeI2CBuffer(Register reg, uint8_t dataLength)
 	}
 
 	i2cBuffer[0] = uint8_t(reg);
-	this->transaction.configureWrite(i2cBuffer, dataLength + 1);
-
-	return this->runTransaction();
+	return I2cDevice<I2cMaster>::write(i2cBuffer, dataLength + 1);
 }
 
 template < class I2cMaster >
@@ -582,10 +580,7 @@ modm::Vl53l0<I2cMaster>::writeUInt16(Register reg, uint16_t value)
 	i2cBuffer[0] = uint8_t(reg);
 	i2cBuffer[1] = (value & 0xFF00) >> 8;
 	i2cBuffer[2] = value & 0xFF;
-
-	this->transaction.configureWrite(i2cBuffer, 3);
-
-	return this->runTransaction();
+	return I2cDevice<I2cMaster>::write(i2cBuffer, 3);
 }
 
 // MARK: read multilength register
@@ -594,10 +589,7 @@ bool
 modm::Vl53l0<I2cMaster>::read(Register reg, uint8_t *buffer, uint8_t length)
 {
 	i2cBuffer[0] = uint8_t(reg);
-
-	this->transaction.configureWriteRead(i2cBuffer, 1, buffer, length);
-
-	return this->runTransaction();
+	return I2cDevice<I2cMaster>::writeRead(i2cBuffer, 1, buffer, length);
 }
 
 template < class I2cMaster >

@@ -194,26 +194,21 @@ public:
 		if (not setPage(Register::LED_OPEN)) return false;
 
 		buffer[0] = uint8_t(Register::LED_OPEN);
-		this->transaction.configureWriteRead(buffer, 1, (uint8_t*)&led_open, LED_OPEN_size + LED_SHORT_size);
-		return this->runTransaction();
+		return I2cDevice<I2cMaster>::writeRead(buffer, 1, (uint8_t*)&led_open, LED_OPEN_size + LED_SHORT_size);
 	}
 
 	bool
 	writeOnOff()
 	{
 		if (not setPage(Register::LED_ON_OFF)) return false;
-
-		this->transaction.configureWrite(&data.addr_led_on_off, LED_ON_OFF_size+1);
-		return this->runTransaction();
+		return I2cDevice<I2cMaster>::write(&data.addr_led_on_off, LED_ON_OFF_size+1);
 	}
 
 	bool
 	writePwm()
 	{
 		if (not setPage(Register::PWM)) return false;
-
-		this->transaction.configureWrite(&data.addr_led_pwm, PWM_size+1);
-		return this->runTransaction();
+		return I2cDevice<I2cMaster>::write(&data.addr_led_pwm, PWM_size+1);
 	}
 
 public:
@@ -224,9 +219,7 @@ public:
 
 		buffer[0] = uint8_t(reg) + offset;
 		buffer[1] = value;
-
-		this->transaction.configureWrite(buffer, 2);
-		return this->runTransaction();
+		return I2cDevice<I2cMaster>::write(buffer, 2);
 	}
 
 	bool
@@ -235,9 +228,7 @@ public:
 		if (not setPage(reg)) return false;
 
 		buffer[0] = uint8_t(reg) + offset;
-		this->transaction.configureWriteRead(buffer, 1, value, 1);
-
-		return this->runTransaction();
+		return I2cDevice<I2cMaster>::writeRead(buffer, 1, value, 1);
 	}
 
 protected:
@@ -248,12 +239,12 @@ protected:
 		{
 			buffer[0] = uint8_t(Register::COMMAND_WRITE_LOCK);
 			buffer[1] = 0xC5; // command write key
-			this->transaction.configureWrite(buffer, 2);
-			if (not this->runTransaction()) return false;
+
+			if (not I2cDevice<I2cMaster>::write(buffer, 2)) return false;
 
 			buffer[0] = uint8_t(Register::COMMAND);
 			buffer[1] = getPage(reg);
-			if (not this->runTransaction()) return false;
+			if (not I2cDevice<I2cMaster>::write(buffer, 2)) return false;
 			current_page = getPage(reg);
 		}
 
@@ -263,10 +254,10 @@ protected:
 protected:
 	struct LedData
 	{
-        const uint8_t addr_led_on_off{uint8_t(Register::LED_ON_OFF)};
+		const uint8_t addr_led_on_off{uint8_t(Register::LED_ON_OFF)};
 		uint16_t led_on_off[SizeX];
 
-        const uint8_t addr_led_pwm{uint8_t(Register::PWM)};
+		const uint8_t addr_led_pwm{uint8_t(Register::PWM)};
 		uint8_t led_pwm[SizeX][SizeY];
 	} modm_packed;
 

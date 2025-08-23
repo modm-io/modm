@@ -618,13 +618,11 @@ public:
 		setPageId(reg);
 
 		buffer[0] = uint8_t(reg);
-		this->transaction.configureWriteRead(buffer, 1, buffer, 1);
-		this->runTransaction();
+		if (not I2cDevice<I2cMaster>::writeRead(buffer, 1, buffer, 1)) return false;
 
 		buffer[1] = (buffer[0] & ~clearMask.value) | setMask.value;
 		buffer[0] = uint8_t(reg);
-		this->transaction.configureWrite(buffer, 2);
-		return this->runTransaction();
+		return I2cDevice<I2cMaster>::write(buffer, 2);
 	}
 
 	inline bool
@@ -633,8 +631,7 @@ public:
 		setPageId(reg);
 
 		buffer[0] = uint8_t(reg);
-		this->transaction.configureWriteRead(buffer, 1, output, length);
-		return this->runTransaction();
+		return I2cDevice<I2cMaster>::writeRead(buffer, 1, output, length);
 	}
 
 public:
@@ -651,8 +648,7 @@ protected:
 		if ((reg ^ prev_reg) & 0x80) {
 			buffer[0] = uint8_t(Register::PAGE_ID);
 			buffer[1] = reg >> 7;
-			this->transaction.configureWrite(buffer, 2);
-			buffer[2] = this->runTransaction();
+			buffer[2] = I2cDevice<I2cMaster>::write(buffer, 2);
 			if (buffer[2]) prev_reg = reg;
 			return (bool)buffer[2];
 		}

@@ -96,8 +96,8 @@ template<class I2cMaster, uint8_t Height>
 void
 modm::Ssd1306<I2cMaster, Height>::startWriteDisplay()
 {
-	modm::this_fiber::poll([&]{ return this->transaction.configureDisplayWrite((uint8_t*)(&this->buffer), sizeof(this->buffer)) and
-		this->startTransaction(); });
+	modm::this_fiber::poll([&]{ return this->transaction.configureDisplayWrite((uint8_t*)(&this->buffer), sizeof(this->buffer)); });
+	modm::this_fiber::poll([&]{ return this->startTransaction(); });
 }
 
 template<class I2cMaster, uint8_t Height>
@@ -161,9 +161,6 @@ template<class I2cMaster, uint8_t Height>
 bool
 modm::Ssd1306<I2cMaster, Height>::writeCommands(std::size_t length)
 {
-	modm::this_fiber::poll([&]{ return this->startWrite(commandBuffer, length); });
-
-	modm::this_fiber::poll([&]{ return not this->isTransactionRunning(); });
-
-	return this->wasTransactionSuccessful();
+	modm::this_fiber::poll([&]{ return this->transaction.configureWrite(commandBuffer, length); });
+	return this->runTransaction();
 }

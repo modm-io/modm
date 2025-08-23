@@ -28,13 +28,11 @@ template < class I2cMaster >
 bool
 modm::Hmc6343<I2cMaster>::writeCommand(Command command, uint16_t timeout)
 {
-	buffer[0] = i(command);
-	modm::this_fiber::poll([&]{ return this->timeout.isExpired() and this->startWrite(buffer, 1); });
-
+	modm::this_fiber::poll([&]{ return this->timeout.isExpired() });
 	this->timeout.restart(std::chrono::milliseconds(timeout));
-	modm::this_fiber::poll([&]{ return not this->isTransactionRunning(); });
 
-	return this->wasTransactionSuccessful();
+	buffer[0] = i(command);
+	return I2cDevice<I2cMaster>::write(buffer, 1);
 }
 
 // MARK: write register
@@ -42,16 +40,13 @@ template < class I2cMaster >
 bool
 modm::Hmc6343<I2cMaster>::writeRegister(Register reg, uint8_t value)
 {
+	modm::this_fiber::poll([&]{ return this->timeout.isExpired() });
+	timeout.restart(10ms);
+
 	buffer[0] = i(Command::WriteEeprom);
 	buffer[1] = i(reg);
 	buffer[2] = value;
-
-	modm::this_fiber::poll([&]{ return timeout.isExpired() and this->startWrite(buffer, 3); });
-
-	timeout.restart(10ms);
-	modm::this_fiber::poll([&]{ return not this->isTransactionRunning(); });
-
-	return this->wasTransactionSuccessful();
+	return I2cDevice<I2cMaster>::write(buffer, 3);
 }
 
 // MARK: write 16bit register
@@ -79,22 +74,16 @@ template < class I2cMaster >
 bool
 modm::Hmc6343<I2cMaster>::readRegister(Register reg, uint8_t &value)
 {
+	modm::this_fiber::poll([&]{ return timeout.isExpired(); });
+	timeout.restart(10ms);
+
 	buffer[0] = i(Command::ReadEeprom);
 	buffer[1] = i(reg);
-	modm::this_fiber::poll([&]{ return timeout.isExpired() and this->startWrite(buffer, 2); });
-
-	timeout.restart(10ms);
-	modm::this_fiber::poll([&]{ return not this->isTransactionRunning(); });
-
-	if( this->wasTransactionSuccessful() )
+	if(I2cDevice<I2cMaster>::write(buffer, 2))
 	{
-		modm::this_fiber::poll([&]{ return timeout.isExpired() and this->startRead(&value, 1); });
-
-		modm::this_fiber::poll([&]{ return not this->isTransactionRunning(); });
-
-		return this->wasTransactionSuccessful();
+		modm::this_fiber::poll([&]{ return timeout.isExpired(); });
+		return I2cDevice<I2cMaster>::read(&value, 1);
 	}
-
 	return false;
 }
 
@@ -126,12 +115,8 @@ modm::Hmc6343<I2cMaster>::readPostData(Command command, uint8_t offset, uint8_t 
 {
 	if (writeCommand(command, 1))
 	{
-		modm::this_fiber::poll([&]{ return timeout.isExpired() and this->startRead(data.data + offset, readSize); });
-
-		modm::this_fiber::poll([&]{ return not this->isTransactionRunning(); });
-
-		return this->wasTransactionSuccessful();
+		modm::this_fiber::poll([&]{ return timeout.isExpired(); });
+		return I2cDevice<I2cMaster>::read(data.data + offset, readSize);
 	}
-
 	return false;
 }

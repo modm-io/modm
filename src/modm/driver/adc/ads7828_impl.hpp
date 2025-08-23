@@ -32,8 +32,7 @@ bool
 Ads7828<I2cMaster>::startMeasurement(InputChannel channel)
 {
     InputChannel_t::set(commandByte, channel);
-    this->transaction.configureWrite(&commandByte.value, 1);
-    return this->runTransaction();
+    return I2cDevice<I2cMaster>::write(&commandByte.value, 1);
 }
 
 // ----------------------------------------------------------------------------
@@ -43,8 +42,7 @@ bool
 Ads7828<I2cMaster>::setPowerDownSelection(PowerDown powerDownSelection)
 {
     PowerDown_t::set(commandByte, powerDownSelection);
-    this->transaction.configureWrite(&commandByte.value, 1);
-    return this->runTransaction();
+    return I2cDevice<I2cMaster>::write(&commandByte.value, 1);
 }
 
 // ----------------------------------------------------------------------------
@@ -53,8 +51,7 @@ template <typename I2cMaster>
 bool
 Ads7828<I2cMaster>::readConversionResult()
 {
-    this->transaction.configureRead(data.data, 2);
-    return this->runTransaction();
+    return I2cDevice<I2cMaster>::read(data.data, 2);
 }
 
 } // modm namespace

@@ -331,8 +331,7 @@ public:
 	{
 		buffer[0] = i(reg);
 		buffer[1] = value;
-		this->transaction.configureWrite(buffer, 2);
-		return this->runTransaction();
+		return I2cDevice<I2cMaster>::write(buffer, 2);
 	}
 
 	bool
@@ -343,8 +342,7 @@ public:
 	read(Register reg, uint8_t *data, uint8_t size)
 	{
 		buffer[0] = i(reg);
-		this->transaction.configureWriteRead(buffer, 1, data, size);
-		return this->runTransaction();
+		return I2cDevice<I2cMaster>::writeRead(buffer, 1, data, size);
 	}
 
 protected:

@@ -103,10 +103,7 @@ modm::Tmp175<I2cMaster>::writeConfiguration()
 {
 	this->buffer[0] = uint8_t(Register::Configuration);
 	this->buffer[1] = reinterpret_cast<Config1_t&>(this->config_msb).value;
-
-	this->transaction.configureWrite(this->buffer, 2);
-
-	return this->runTransaction();
+	return I2cDevice<I2cMaster>::write(this->buffer, 2);
 }
 
 template < typename I2cMaster >
@@ -123,9 +120,6 @@ modm::Tmp175<I2cMaster>::setLimitRegister(Register reg, float temperature)
 		this->buffer[1] = (temp >> 8);
 		this->buffer[2] = temp;
 	}
-
-	this->transaction.configureWrite(this->buffer, 3);
-
-	return this->runTransaction();
+	return I2cDevice<I2cMaster>::write(this->buffer, 3);
 }
 

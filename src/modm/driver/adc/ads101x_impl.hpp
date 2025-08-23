@@ -45,9 +45,7 @@ bool
 Ads101x<I2cMaster>::isBusy()
 {
     buffer[0] = i(Register::Config);
-    this->transaction.configureWriteRead(buffer, 1, buffer, 2);
-
-    if (this->runTransaction())
+    if (I2cDevice<I2cMaster>::writeRead(buffer, 1, buffer, 2))
     {
         return (static_cast<uint16_t>(buffer[0] << 8) & i(ConfigRegister::OS)) == 0;
     }
@@ -109,9 +107,7 @@ bool
 Ads101x<I2cMaster>::readConversionResult()
 {
     buffer[0] = i(Register::Conversion);
-    this->transaction.configureWriteRead(buffer, 1, data.data, 2);
-
-    return this->runTransaction();
+    return I2cDevice<I2cMaster>::writeRead(buffer, 1, data.data, 2);
 }
 
 // ----------------------------------------------------------------------------
@@ -173,10 +169,7 @@ Ads101x<I2cMaster>::writeRegister(Register reg, uint16_t data)
     buffer[0] = i(reg);
     buffer[1] = (data >> 8) & 0xFF;
     buffer[2] = data & 0xFF;
-
-    this->transaction.configureWrite(buffer, 3);
-
-    return this->runTransaction();
+    return I2cDevice<I2cMaster>::write(buffer, 3);
 }
 
 } // modm namespace

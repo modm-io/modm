@@ -28,10 +28,7 @@ Stts22h<I2cMaster>::write(Register reg, RegisterValue value)
 {
 	buffer_[0] = static_cast<uint8_t>(reg);
 	buffer_[1] = value.value;
-
-	this->transaction.configureWrite(&buffer_[0], 2);
-
-	return this->runTransaction();
+	return I2cDevice<I2cMaster>::write(&buffer_[0], 2);
 }
 
 template<class I2cMaster>
@@ -46,9 +43,7 @@ bool
 Stts22h<I2cMaster>::read(Register reg, uint8_t* data, uint8_t length)
 {
 	buffer_[0] = static_cast<uint8_t>(reg);
-	this->transaction.configureWriteRead(&buffer_[0], 1, data, length);
-
-	return this->runTransaction();
+	return I2cDevice<I2cMaster>::writeRead(&buffer_[0], 1, data, length);
 }
 
 template<class I2cMaster>
