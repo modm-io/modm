@@ -24,10 +24,10 @@ St7586s<SPI, CS, RST, DC, Width, Height>::sendCommand(Command cmd, const void *d
 {
 	CS::reset();
 	DC::reset();  // command mode
-	SPI::transferBlocking(static_cast<uint8_t>(cmd));
+	SPI::transfer(static_cast<uint8_t>(cmd));
 	DC::set();  // data mode
 	if (len > 0) {
-		SPI::transferBlocking(reinterpret_cast<const uint8_t*>(data), nullptr, len);
+		SPI::transfer(reinterpret_cast<const uint8_t*>(data), nullptr, len);
 	}
 	CS::set();
 	// exit with data mode on
@@ -117,7 +117,7 @@ St7586s<SPI, CS, RST, DC, Width, Height>::update()
 			validBits -= 3;
 			currentByte >>= 3;
 
-			SPI::transferBlocking(cell);
+			SPI::transfer(cell);
 		}
 	}
 	CS::set();

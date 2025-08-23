@@ -54,7 +54,7 @@ main()
 							  << modm::endl;
 			} else
 			{
-				MODM_LOG_INFO << "readDataBlocking(): Error: " << uint8_t(I2cMaster::getErrorState())
+				MODM_LOG_INFO << "readData(): Error: " << uint8_t(I2cMaster::getErrorState())
 							  << modm::endl;
 			}
 		}

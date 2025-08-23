@@ -33,10 +33,10 @@ int main()
 		uint8_t receiveBuffer[13];
 
 		// send out 12 bytes, don't care about response
-		Spi::transferBlocking(sendBuffer, nullptr, 12);
+		Spi::transfer(sendBuffer, nullptr, 12);
 
 		// send out 12 bytes, read in 12 bytes
-		Spi::transferBlocking(sendBuffer, receiveBuffer, 12);
+		Spi::transfer(sendBuffer, receiveBuffer, 12);
 	}
 
 	return 0;

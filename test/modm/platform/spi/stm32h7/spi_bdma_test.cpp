@@ -37,17 +37,17 @@ SpiBdmaTest::testReceive()
 
 	Miso::configure(Miso::InputType::PullUp);
 	modm::delay_ns(500);
-	Spi::transferBlocking(nullptr, buffer.data(), buffer.size());
+	Spi::transfer(nullptr, buffer.data(), buffer.size());
 	TEST_ASSERT_TRUE(buffer == ones);
 
 	Miso::configure(Miso::InputType::PullDown);
 	modm::delay_ns(500);
-	Spi::transferBlocking(nullptr, buffer.data(), buffer.size());
+	Spi::transfer(nullptr, buffer.data(), buffer.size());
 	TEST_ASSERT_TRUE(buffer == zeros);
 
 	Miso::configure(Miso::InputType::PullUp);
 	modm::delay_ns(500);
-	Spi::transferBlocking(nullptr, buffer.data(), buffer.size());
+	Spi::transfer(nullptr, buffer.data(), buffer.size());
 	TEST_ASSERT_TRUE(buffer == ones);
 
 	Miso::configure(Miso::InputType::Floating);

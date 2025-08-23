@@ -84,8 +84,8 @@ public:
             CS::reset();
             for (uint8_t i = 0; i < MODULES; ++i)
             {
-                SPI::transferBlocking(col + 1);
-                SPI::transferBlocking(0);
+                SPI::transfer(col + 1);
+                SPI::transfer(0);
             }
             CS::set();
         };
@@ -102,8 +102,8 @@ public:
         CS::reset();
         for (uint8_t i = 0; i < MODULES; ++i)
         {
-            SPI::transferBlocking(col + 1);
-            SPI::transferBlocking(*data++);
+            SPI::transfer(col + 1);
+            SPI::transfer(*data++);
         }
         CS::set();
     }
@@ -127,8 +127,8 @@ public:
         // Write the command multiple times, for each MODULES
         for (uint8_t i = 0; i < MODULES; ++i)
         {
-            SPI::transferBlocking(uint8_t(reg));
-            SPI::transferBlocking(data);
+            SPI::transfer(uint8_t(reg));
+            SPI::transfer(data);
         }
         CS::set();
     }

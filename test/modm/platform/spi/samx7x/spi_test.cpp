@@ -32,7 +32,7 @@ SpiTest::testTransferLoopback()
 {
 	SpiHal0::setLoopbackMode(SpiHal0::LocalLoopback::Enabled);
 
-	uint8_t value = SpiMaster0::transferBlocking(0xAB);
+	uint8_t value = SpiMaster0::transfer(0xAB);
 	TEST_ASSERT_EQUALS(value, 0xAB);
 
 	value = SpiMaster0::transfer(0x12);
@@ -40,7 +40,7 @@ SpiTest::testTransferLoopback()
 
 	constexpr std::array<uint8_t, 7> tx{0xDE, 0xAD, 0xBE, 0xEF, 0x12, 0x34, 0x56};
 	std::array<uint8_t, 7> rx{};
-	SpiMaster0::transferBlocking(tx.data(), rx.data(), 7);
+	SpiMaster0::transfer(tx.data(), rx.data(), 7);
 	TEST_ASSERT_TRUE(rx == tx);
 
 	rx.fill(0);
@@ -55,12 +55,12 @@ SpiTest::testReceivePin()
 {
 	Miso::configure(Miso::InputType::PullUp);
 	modm::delay_us(1);
-	uint8_t value = SpiMaster0::transferBlocking(0xAB);
+	uint8_t value = SpiMaster0::transfer(0xAB);
 	TEST_ASSERT_EQUALS(value, 0xFF);
 
 	Miso::configure(Miso::InputType::PullDown);
 	modm::delay_us(1);
-	value = SpiMaster0::transferBlocking(0xAB);
+	value = SpiMaster0::transfer(0xAB);
 	TEST_ASSERT_EQUALS(value, 0x00);
 
 	Miso::configure(Miso::InputType::Floating);

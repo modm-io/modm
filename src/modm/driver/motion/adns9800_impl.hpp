@@ -45,7 +45,7 @@ modm::Adns9800< Spi, Cs>::getDeltaXY(int16_t &delta_x, int16_t &delta_y)
 	Cs::reset();
 	modm::delay_us(100); // tSRAD
 
-	Spi::transferBlocking(static_cast<uint8_t>(Register::Motion_Burst));
+	Spi::transfer(static_cast<uint8_t>(Register::Motion_Burst));
 
 	// Delay tSRAD
 	modm::delay_us(100);
@@ -54,7 +54,7 @@ modm::Adns9800< Spi, Cs>::getDeltaXY(int16_t &delta_x, int16_t &delta_y)
 	uint8_t tx_buf[buf_size];
 	uint8_t rx_buf[buf_size];
 
-	Spi::transferBlocking(tx_buf, rx_buf, buf_size);
+	Spi::transfer(tx_buf, rx_buf, buf_size);
 
 	modm::delay_ns(120); // tSCLK-NCS for read operation is 120ns
 	Cs::set();
@@ -77,11 +77,11 @@ modm::Adns9800< Spi, Cs>::readReg(Register const reg)
 	uint8_t address = static_cast<uint8_t>(reg);
 
 	// send adress of the register, with MSBit = 0 to indicate it's a read
-	Spi::transferBlocking(address & 0x7f);
+	Spi::transfer(address & 0x7f);
 	modm::delay_us(100); // tSRAD
 
 	// read data
-	uint8_t data = Spi::transferBlocking(0);
+	uint8_t data = Spi::transfer(0);
 
 	modm::delay_ns(120); // tSCLK-NCS for read operation is 120ns
 	Cs::set();
@@ -99,10 +99,10 @@ modm::Adns9800< Spi, Cs>::writeReg(Register const reg, uint8_t const data)
 	uint8_t address = static_cast<uint8_t>(reg);
 
 	//send adress of the register, with MSBit = 1 to indicate it's a write
-	Spi::transferBlocking(address | 0x80);
+	Spi::transfer(address | 0x80);
 
 	//send data
-	Spi::transferBlocking(data);
+	Spi::transfer(data);
 
 	modm::delay_us(20); // tSCLK-NCS for write operation
 	Cs::set();
@@ -130,13 +130,13 @@ modm::Adns9800< Spi, Cs >::uploadFirmware()
 
 	// write burst destination address
 	uint8_t address = static_cast<uint8_t>(Register::SROM_Load_Burst) | 0x80;
-	Spi::transferBlocking(address);
+	Spi::transfer(address);
 	modm::delay_us(15);
 
 	// send all bytes of the firmware
 	for(int ii = 0; ii < firmware_length; ++ii)
 	{
-		Spi::transferBlocking(firmware_data[ii]);
+		Spi::transfer(firmware_data[ii]);
 		modm::delay_us(15);
 	}
 

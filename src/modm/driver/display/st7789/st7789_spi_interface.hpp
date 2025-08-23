@@ -43,7 +43,7 @@ struct St7789SPIInterface
 	{
 		DataCommands::reset();
 		Cs::reset();
-		Spi::transferBlocking(command);
+		Spi::transfer(command);
 	}
 
 	template<Enum8 Command>
@@ -100,7 +100,7 @@ struct St7789SPIInterface
 	sendData(uint8_t data)
 	{
 		switchToDataMode();
-		Spi::transferBlocking(data);
+		Spi::transfer(data);
 		end();
 	}
 
@@ -108,7 +108,7 @@ struct St7789SPIInterface
 	sendData(data_t data)
 	{
 		switchToDataMode();
-		Spi::transferBlocking(data.data(), nullptr, data.size());
+		Spi::transfer(data.data(), nullptr, data.size());
 		end();
 	}
 
@@ -117,7 +117,7 @@ struct St7789SPIInterface
 	sendData(const Data &data)
 	{
 		switchToDataMode();
-		Spi::transferBlocking(reinterpret_cast<const uint8_t *>(&data), nullptr, sizeof(data));
+		Spi::transfer(reinterpret_cast<const uint8_t *>(&data), nullptr, sizeof(data));
 		end();
 	}
 
@@ -125,20 +125,20 @@ struct St7789SPIInterface
 	static void
 	continueData(uint8_t data)
 	{
-		Spi::transferBlocking(data);
+		Spi::transfer(data);
 	}
 
 	static void
 	continueData(data_t data)
 	{
-		Spi::transferBlocking(data.data(), nullptr, data.size());
+		Spi::transfer(data.data(), nullptr, data.size());
 	}
 
 	template<typename Data>
 	static void
 	continueData(const Data &data)
 	{
-		Spi::transferBlocking(reinterpret_cast<const uint8_t *>(&data), nullptr, sizeof(data));
+		Spi::transfer(reinterpret_cast<const uint8_t *>(&data), nullptr, sizeof(data));
 	}
 
 	//--

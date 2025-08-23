@@ -29,7 +29,7 @@ int main()
 		uint8_t tx[] = {0xa5, 0x21};
 		uint8_t rx[2];
 
-		SpiMaster0::transferBlocking(tx, rx, 2);
+		SpiMaster0::transfer(tx, rx, 2);
 
 		if(rx[0] == 0xa5 && rx[1] == 0x21) {
 			flash_time_ms = 500;

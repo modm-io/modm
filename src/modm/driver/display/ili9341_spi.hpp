@@ -36,24 +36,24 @@ public:
 	writeCommand(Command command)
 	{
 		Dc::reset(); // enable command
-		SPI::transferBlocking(i(command));
+		SPI::transfer(i(command));
 		Dc::set(); // reset to data
 	}
 	modm_noinline void
 	writeCommand(Command command, uint8_t const *args, std::size_t length)
 	{
 		Dc::reset(); // enable command
-		SPI::transferBlocking(i(command));
+		SPI::transfer(i(command));
 		Dc::set(); // reset to data
 		if (length != 0)
 		{
-			SPI::transferBlocking(const_cast<unsigned char *>(args), nullptr, length);
+			SPI::transfer(const_cast<unsigned char *>(args), nullptr, length);
 		}
 	}
 	void
 	writeData(uint8_t const *data, std::size_t length)
 	{
-		SPI::transferBlocking(const_cast<unsigned char *>(data), nullptr, length);
+		SPI::transfer(const_cast<unsigned char *>(data), nullptr, length);
 	}
 	void
 	writeCommandValue8(Command command, uint8_t value)
@@ -69,16 +69,16 @@ public:
 
 		Dc::reset(); // enable command
 		// SPI::Hal::setDataSize(SpiBase::DataSize::Bit9);
-		SPI::transferBlocking(i(command) << 1);
+		SPI::transfer(i(command) << 1);
 		SPI::Hal::setDataSize(SpiBase::DataSize::Bit8);
 		Dc::set(); // reset to data
-		SPI::transferBlocking(b /*nullptr*/, buffer, length);
+		SPI::transfer(b /*nullptr*/, buffer, length);
 	}
 	uint8_t
 	readData(Command command)
 	{
 		writeCommand(command);
-		return SPI::transferBlocking(0x00);
+		return SPI::transfer(0x00);
 	}
 
 public:

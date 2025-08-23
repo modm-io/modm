@@ -24,7 +24,7 @@ main()
 
 	while (true)
 	{
-		UartSpiMaster2::transferBlocking(0xF0);
+		UartSpiMaster2::transfer(0xF0);
 	}
 
 	return 0;

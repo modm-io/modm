@@ -36,7 +36,7 @@ main()
 	while (true)
 	{
 		// Connect Mosi to Miso to create a loopback
-		data = SpiMaster::transferBlocking(data);
+		data = SpiMaster::transfer(data);
 		data++;
 		// This will be spamming the bus
 	}

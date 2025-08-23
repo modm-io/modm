@@ -33,8 +33,8 @@ modm::MAX6966<Spi, Cs, DRIVERS>::setAllConfiguration(uint8_t config)
 	Cs::reset();
 	for (uint_fast8_t i=0; i < DRIVERS; ++i)
 	{
-		Spi::transferBlocking(max6966::REGISTER_CONFIGURATION);
-		Spi::transferBlocking(config);
+		Spi::transfer(max6966::REGISTER_CONFIGURATION);
+		Spi::transfer(config);
 	}
 	Cs::set();
 }
@@ -64,8 +64,8 @@ modm::MAX6966<Spi, Cs, DRIVERS>::setChannels(uint8_t * values)
 		// for all drivers
 		for (uint_fast8_t dr = 0; dr < DRIVERS; ++dr)
 		{
-			Spi::transferBlocking(max6966::REGISTER_PORT0 + ch);
-			Spi::transferBlocking(values[ch + dr * 10]);
+			Spi::transfer(max6966::REGISTER_PORT0 + ch);
+			Spi::transfer(values[ch + dr * 10]);
 		}
 		Cs::set();
 	}
@@ -78,8 +78,8 @@ modm::MAX6966<Spi, Cs, DRIVERS>::setAllChannels(uint8_t value)
 	Cs::reset();
 	for (uint_fast8_t i=0; i < DRIVERS; ++i)
 	{
-		Spi::transferBlocking(max6966::REGISTER_PORT0_9);
-		Spi::transferBlocking(value);
+		Spi::transfer(max6966::REGISTER_PORT0_9);
+		Spi::transfer(value);
 	}
 	Cs::set();
 }
@@ -130,8 +130,8 @@ modm::MAX6966<Spi, Cs, DRIVERS>::setAllCurrent(max6966::Current current)
 	Cs::reset();
 	for (uint_fast8_t i=0; i < DRIVERS; ++i)
 	{
-		Spi::transferBlocking(max6966::REGISTER_GLOBAL_CURRENT);
-		Spi::transferBlocking(current);
+		Spi::transfer(max6966::REGISTER_GLOBAL_CURRENT);
+		Spi::transfer(current);
 	}
 	Cs::set();
 }
@@ -144,8 +144,8 @@ modm::MAX6966<Spi, Cs, DRIVERS>::writeToDriver(uint8_t driver, max6966::Register
 	Cs::reset();
 	for (uint_fast8_t i=0; i < DRIVERS; ++i)
 	{
-		Spi::transferBlocking((i == driver) ? (reg | max6966::WRITE) : max6966::REGISTER_NO_OP);
-		Spi::transferBlocking(data);
+		Spi::transfer((i == driver) ? (reg | max6966::WRITE) : max6966::REGISTER_NO_OP);
+		Spi::transfer(data);
 	}
 	Cs::set();
 }
@@ -158,8 +158,8 @@ modm::MAX6966<Spi, Cs, DRIVERS>::readFromDriver(uint8_t driver, max6966::Registe
 	Cs::reset();
 	for (uint_fast8_t i=0; i < DRIVERS; ++i)
 	{
-		Spi::transferBlocking((i == driver) ? (reg | max6966::READ) : max6966::REGISTER_NO_OP);
-		Spi::transferBlocking(0xff);
+		Spi::transfer((i == driver) ? (reg | max6966::READ) : max6966::REGISTER_NO_OP);
+		Spi::transfer(0xff);
 	}
 	Cs::set();
 
@@ -172,8 +172,8 @@ modm::MAX6966<Spi, Cs, DRIVERS>::readFromDriver(uint8_t driver, max6966::Registe
 	Cs::reset();
 	for (uint_fast8_t i=0; i < DRIVERS; ++i)
 	{
-		Spi::transferBlocking(max6966::REGISTER_NO_OP);
-		buffer = Spi::transferBlocking(0xff);
+		Spi::transfer(max6966::REGISTER_NO_OP);
+		buffer = Spi::transfer(0xff);
 		if (i == driver) data = buffer;
 	}
 	Cs::set();

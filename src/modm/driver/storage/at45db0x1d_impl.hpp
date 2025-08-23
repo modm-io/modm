@@ -37,10 +37,10 @@ modm::At45db0x1d<Spi, Cs>::initialize()
 		Cs::reset();
 
 		// send page size change sequence (fixed sequence)
-		Spi::transferBlocking(0x3d);
-		Spi::transferBlocking(0x2a);
-		Spi::transferBlocking(0x80);
-		Spi::transferBlocking(0xa6);
+		Spi::transfer(0x3d);
+		Spi::transfer(0x2a);
+		Spi::transfer(0x80);
+		Spi::transfer(0xa6);
 
 		Cs::set();
 	}
@@ -58,16 +58,16 @@ modm::At45db0x1d<Spi, Cs>::copyPageToBuffer(uint16_t pageAddress, at45db::Buffer
 	Cs::reset();
 
 	if (buffer == at45db::BUFFER_0) {
-		Spi::transferBlocking(MAIN_MEMORY_PAGE_TO_BUFFER_1_TRANSFER);
+		Spi::transfer(MAIN_MEMORY_PAGE_TO_BUFFER_1_TRANSFER);
 	}
 	else {
-		Spi::transferBlocking(MAIN_MEMORY_PAGE_TO_BUFFER_2_TRANSFER);
+		Spi::transfer(MAIN_MEMORY_PAGE_TO_BUFFER_2_TRANSFER);
 	}
 
 	// set address
-	Spi::transferBlocking(pageAddress >> 8);
-	Spi::transferBlocking(pageAddress & 0xff);
-	Spi::transferBlocking(0);
+	Spi::transfer(pageAddress >> 8);
+	Spi::transfer(pageAddress & 0xff);
+	Spi::transfer(0);
 
 	Cs::set();
 }
@@ -80,16 +80,16 @@ modm::At45db0x1d<Spi, Cs>::comparePageToBuffer(uint16_t pageAddress, at45db::Buf
 	Cs::reset();
 
 	if (buffer == at45db::BUFFER_0) {
-		Spi::transferBlocking(MAIN_MEMORY_PAGE_TO_BUFFER_1_COMPARE);
+		Spi::transfer(MAIN_MEMORY_PAGE_TO_BUFFER_1_COMPARE);
 	}
 	else {
-		Spi::transferBlocking(MAIN_MEMORY_PAGE_TO_BUFFER_2_COMPARE);
+		Spi::transfer(MAIN_MEMORY_PAGE_TO_BUFFER_2_COMPARE);
 	}
 
 	// set address
-	Spi::transferBlocking(pageAddress >> 8);
-	Spi::transferBlocking(pageAddress & 0xff);
-	Spi::transferBlocking(0);
+	Spi::transfer(pageAddress >> 8);
+	Spi::transfer(pageAddress & 0xff);
+	Spi::transfer(0);
 
 	Cs::set();
 }
@@ -110,16 +110,16 @@ modm::At45db0x1d<Spi, Cs>::copyBufferToPage(at45db::Buffer buffer, uint16_t page
 	Cs::reset();
 
 	if (buffer == at45db::BUFFER_0) {
-		Spi::transferBlocking(BUFFER_1_TO_MAIN_MEMORY_PAGE_PROGRAM_WITH_ERASE);
+		Spi::transfer(BUFFER_1_TO_MAIN_MEMORY_PAGE_PROGRAM_WITH_ERASE);
 	}
 	else {
-		Spi::transferBlocking(BUFFER_2_TO_MAIN_MEMORY_PAGE_PROGRAM_WITH_ERASE);
+		Spi::transfer(BUFFER_2_TO_MAIN_MEMORY_PAGE_PROGRAM_WITH_ERASE);
 	}
 
 	// set address
-	Spi::transferBlocking(pageAddress >> 8);
-	Spi::transferBlocking(pageAddress & 0xff);
-	Spi::transferBlocking(0);
+	Spi::transfer(pageAddress >> 8);
+	Spi::transfer(pageAddress & 0xff);
+	Spi::transfer(0);
 
 	Cs::set();
 }
@@ -132,16 +132,16 @@ modm::At45db0x1d<Spi, Cs>::copyBufferToPageWithoutErase(at45db::Buffer buffer, u
 	Cs::reset();
 
 	if (buffer == at45db::BUFFER_0) {
-		Spi::transferBlocking(BUFFER_1_TO_MAIN_MEMORY_PAGE_PROGRAM_WITHOUT_ERASE);
+		Spi::transfer(BUFFER_1_TO_MAIN_MEMORY_PAGE_PROGRAM_WITHOUT_ERASE);
 	}
 	else {
-		Spi::transferBlocking(BUFFER_2_TO_MAIN_MEMORY_PAGE_PROGRAM_WITHOUT_ERASE);
+		Spi::transfer(BUFFER_2_TO_MAIN_MEMORY_PAGE_PROGRAM_WITHOUT_ERASE);
 	}
 
 	// set address
-	Spi::transferBlocking(pageAddress >> 8);
-	Spi::transferBlocking(pageAddress & 0xff);
-	Spi::transferBlocking(0);
+	Spi::transfer(pageAddress >> 8);
+	Spi::transfer(pageAddress & 0xff);
+	Spi::transfer(0);
 
 	Cs::set();
 }
@@ -154,22 +154,22 @@ modm::At45db0x1d<Spi, Cs>::readFromBuffer(at45db::Buffer buffer,
 {
 	Cs::reset();
 	if (buffer == at45db::BUFFER_0) {
-		Spi::transferBlocking(BUFFER_1_READ);
+		Spi::transfer(BUFFER_1_READ);
 	}
 	else {
-		Spi::transferBlocking(BUFFER_2_READ);
+		Spi::transfer(BUFFER_2_READ);
 	}
 
 	// set address
-	Spi::transferBlocking(0);
-	Spi::transferBlocking(0);
-	Spi::transferBlocking(address);
+	Spi::transfer(0);
+	Spi::transfer(0);
+	Spi::transfer(address);
 
 	// don't care byte
-	Spi::transferBlocking(0);
+	Spi::transfer(0);
 
 	for (std::size_t i = 0; i < size; ++i) {
-		*data++ = Spi::transferBlocking(0);
+		*data++ = Spi::transfer(0);
 	}
 	Cs::set();
 }
@@ -182,19 +182,19 @@ modm::At45db0x1d<Spi, Cs>::writeToBuffer(at45db::Buffer buffer,
 {
 	Cs::reset();
 	if (buffer == at45db::BUFFER_0) {
-		Spi::transferBlocking(BUFFER_1_WRITE);
+		Spi::transfer(BUFFER_1_WRITE);
 	}
 	else {
-		Spi::transferBlocking(BUFFER_2_WRITE);
+		Spi::transfer(BUFFER_2_WRITE);
 	}
 
 	// set address
-	Spi::transferBlocking(0);
-	Spi::transferBlocking(0);
-	Spi::transferBlocking(address);
+	Spi::transfer(0);
+	Spi::transfer(0);
+	Spi::transfer(address);
 
 	for (std::size_t i = 0; i < size; ++i) {
-		Spi::transferBlocking(*data++);
+		Spi::transfer(*data++);
 	}
 	Cs::set();
 }
@@ -205,15 +205,15 @@ void
 modm::At45db0x1d<Spi, Cs>::readFromMemory(uint32_t address, uint8_t *data, std::size_t size)
 {
 	Cs::reset();
-	Spi::transferBlocking(CONTINOUS_ARRAY_READ);
+	Spi::transfer(CONTINOUS_ARRAY_READ);
 
 	// set address
-	Spi::transferBlocking(address >> 16);
-	Spi::transferBlocking(address >> 8);
-	Spi::transferBlocking(address);
+	Spi::transfer(address >> 16);
+	Spi::transfer(address >> 8);
+	Spi::transfer(address);
 
 	for (std::size_t i = 0; i < size; ++i) {
-		*data++ = Spi::transferBlocking(0);
+		*data++ = Spi::transfer(0);
 	}
 	Cs::set();
 }
@@ -224,21 +224,21 @@ void
 modm::At45db0x1d<Spi, Cs>::readPageFromMemory(uint32_t address, uint8_t *data, std::size_t size)
 {
 	Cs::reset();
-	Spi::transferBlocking(MAIN_MEMORY_PAGE_READ);
+	Spi::transfer(MAIN_MEMORY_PAGE_READ);
 
 	// set address
-	Spi::transferBlocking(address >> 16);
-	Spi::transferBlocking(address >> 8);
-	Spi::transferBlocking(address);
+	Spi::transfer(address >> 16);
+	Spi::transfer(address >> 8);
+	Spi::transfer(address);
 
 	// don't care
-	Spi::transferBlocking(0);
-	Spi::transferBlocking(0);
-	Spi::transferBlocking(0);
-	Spi::transferBlocking(0);
+	Spi::transfer(0);
+	Spi::transfer(0);
+	Spi::transfer(0);
+	Spi::transfer(0);
 
 	for (std::size_t i = 0; i < size; ++i) {
-		*data++ = Spi::transferBlocking(0);
+		*data++ = Spi::transfer(0);
 	}
 	Cs::set();
 }
@@ -253,9 +253,9 @@ modm::At45db0x1d<Spi, Cs>::pageErase(uint16_t pageAddress)
 	Cs::reset();
 
 	// set address
-	Spi::transferBlocking(pageAddress >> 8);
-	Spi::transferBlocking(pageAddress & 0xff);
-	Spi::transferBlocking(0);
+	Spi::transfer(pageAddress >> 8);
+	Spi::transfer(pageAddress & 0xff);
+	Spi::transfer(0);
 
 	Cs::set();
 }
@@ -268,16 +268,16 @@ modm::At45db0x1d<Spi, Cs>::pageRewrite(uint16_t pageAddress, at45db::Buffer buff
 	Cs::reset();
 
 	if (buffer == at45db::BUFFER_0) {
-		Spi::transferBlocking(BUFFER_1_PAGE_REWRITE);
+		Spi::transfer(BUFFER_1_PAGE_REWRITE);
 	}
 	else {
-		Spi::transferBlocking(BUFFER_2_PAGE_REWRITE);
+		Spi::transfer(BUFFER_2_PAGE_REWRITE);
 	}
 
 	// set address
-	Spi::transferBlocking(pageAddress >> 8);
-	Spi::transferBlocking(pageAddress & 0xff);
-	Spi::transferBlocking(0);
+	Spi::transfer(pageAddress >> 8);
+	Spi::transfer(pageAddress & 0xff);
+	Spi::transfer(0);
 
 	Cs::set();
 }
@@ -292,9 +292,9 @@ modm::At45db0x1d<Spi, Cs>::blockErase(uint16_t blockAddress)
 	Cs::reset();
 
 	// set address
-	Spi::transferBlocking(blockAddress >> 8);
-	Spi::transferBlocking(blockAddress & 0xf8);
-	Spi::transferBlocking(0);
+	Spi::transfer(blockAddress >> 8);
+	Spi::transfer(blockAddress & 0xf8);
+	Spi::transfer(0);
 
 	Cs::set();
 }
@@ -309,10 +309,10 @@ modm::At45db0x1d<Spi, Cs>::chipErase()
 	Cs::reset();
 
 	// send chip erase sequence (fixed sequence)
-	Spi::transferBlocking(0xc7);
-	Spi::transferBlocking(0x94);
-	Spi::transferBlocking(0x80);
-	Spi::transferBlocking(0x9a);
+	Spi::transfer(0xc7);
+	Spi::transfer(0x94);
+	Spi::transfer(0x80);
+	Spi::transfer(0x9a);
 
 	Cs::set();
 }
@@ -341,8 +341,8 @@ uint8_t
 modm::At45db0x1d<Spi, Cs>::readStatus()
 {
 	Cs::reset();
-	Spi::transferBlocking(READ_STATUS_REGISTER);
-	uint8_t result = Spi::transferBlocking(0);		// dummy write to get result
+	Spi::transfer(READ_STATUS_REGISTER);
+	uint8_t result = Spi::transfer(0);		// dummy write to get result
 	Cs::set();
 
 	return result;

@@ -105,10 +105,12 @@ public:
 	Ssd1306(uint8_t address = 0x3C);
 
 	/// Pings the display
+	[[deprecated("Use ping() instead!")]] // DEPRECATE: 2026q3
 	bool inline pingBlocking()
 	{ return this->ping(); }
 
 	/// initializes for 3V3 with charge-pump
+	[[deprecated("Use initialize() instead!")]] // DEPRECATE: 2026q3
 	bool inline initializeBlocking()
 	{ return initialize(); }
 

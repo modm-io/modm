@@ -26,7 +26,7 @@ modm::Nrf24Phy<Spi, Csn, Ce>::writeCommandNoData(Command_t cmd)
 {
 	Csn::reset();
 
-	status = Spi::transferBlocking(cmd.value);
+	status = Spi::transfer(cmd.value);
 
 	Csn::set();
 }
@@ -39,9 +39,9 @@ modm::Nrf24Phy<Spi, Csn, Ce>::writeCommandSingleData(Command_t cmd, uint8_t data
 {
 	Csn::reset();
 
-	status = Spi::transferBlocking(cmd.value);
+	status = Spi::transfer(cmd.value);
 
-	uint8_t ret = Spi::transferBlocking(data);
+	uint8_t ret = Spi::transfer(data);
 
 	Csn::set();
 
@@ -56,11 +56,11 @@ modm::Nrf24Phy<Spi, Csn, Ce>::writeCommandMultiData(Command_t cmd, uint8_t* argv
 {
 	Csn::reset();
 
-	status = Spi::transferBlocking(cmd.value);
+	status = Spi::transfer(cmd.value);
 
 	for(uint8_t i = 0; i < argc; i++) {
 		uint8_t arg = (argv == nullptr) ? 0 : argv[i];
-		uint8_t data = Spi::transferBlocking(arg);
+		uint8_t data = Spi::transfer(arg);
 
 		if(retv != nullptr) {
 			retv[i] = data;

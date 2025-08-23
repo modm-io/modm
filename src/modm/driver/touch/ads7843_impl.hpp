@@ -95,14 +95,14 @@ modm::Ads7843<Spi, Cs, Int>::readData(uint8_t command)
 {
 	Cs::reset();
 	modm::delay_us(1);	// modm::delay_ns(100);
-	Spi::transferBlocking(command);
+	Spi::transfer(command);
 	modm::delay_us(1);
 
-	uint16_t temp = Spi::transferBlocking(0x00);
+	uint16_t temp = Spi::transfer(0x00);
 	temp <<= 8;
 	modm::delay_us(1);
 
-	temp |= Spi::transferBlocking(0x00);
+	temp |= Spi::transfer(0x00);
 	temp >>= 3;
 
 	Cs::set();

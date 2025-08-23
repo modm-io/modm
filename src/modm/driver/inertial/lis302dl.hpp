@@ -313,6 +313,7 @@ public:
 	/// For I2c this also sets the address to 0x1D (alternative: 0x1C).
 	Lis302dl(Data &data, uint8_t address=0x1D);
 
+	[[deprecated("Use configure() instead!")]] // DEPRECATE: 2026q3
 	bool inline
 	configureBlocking(Scale scale, MeasurementRate rate = MeasurementRate::Hz100)
 	{

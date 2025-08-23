@@ -28,20 +28,20 @@ modm::St7565<SPI, CS, A0, Reset, Width, Height, TopView>::update()
 	{
 		// command mode
 		a0.reset();
-		spi.transferBlocking(ST7565_PAGE_ADDRESS | y);		// Row select
-		spi.transferBlocking(ST7565_COL_ADDRESS_MSB);		// Column select high
+		spi.transfer(ST7565_PAGE_ADDRESS | y);		// Row select
+		spi.transfer(ST7565_COL_ADDRESS_MSB);		// Column select high
 
 		if (TopView) {
-			spi.transferBlocking(ST7565_COL_ADDRESS_LSB | 4);	// Column select low
+			spi.transfer(ST7565_COL_ADDRESS_LSB | 4);	// Column select low
 		}
 		else {
-			spi.transferBlocking(ST7565_COL_ADDRESS_LSB);	// Column select low
+			spi.transfer(ST7565_COL_ADDRESS_LSB);	// Column select low
 		}
 
 		// switch to data mode
 		a0.set();
 		for(uint8_t x = 0; x < Width; ++x) {
-			spi.transferBlocking(this->buffer[x][y]);
+			spi.transfer(this->buffer[x][y]);
 		}
 	}
 	cs.set();
@@ -55,10 +55,10 @@ modm::St7565<SPI, CS, A0, Reset, Width, Height, TopView>::setInvert(bool invert)
 	a0.reset();
 
 	if (invert) {
-		spi.transferBlocking(ST7565_REVERSE);
+		spi.transfer(ST7565_REVERSE);
 	}
 	else {
-		spi.transferBlocking(ST7565_NORMAL);
+		spi.transfer(ST7565_NORMAL);
 	}
 	cs.set();
 }
@@ -86,16 +86,16 @@ modm::St7565<SPI, CS, A0, Reset, Width, Height, TopView>::initialize(
 
 	// View direction
 	if (TopView) {
-		spi.transferBlocking(ST7565_ADC_NORMAL);		// ADC normal
-		spi.transferBlocking(ST7565_SCAN_DIR_REVERSE);	// reverse COM0~COM63
+		spi.transfer(ST7565_ADC_NORMAL);		// ADC normal
+		spi.transfer(ST7565_SCAN_DIR_REVERSE);	// reverse COM0~COM63
 	}
 	else {
-		spi.transferBlocking(ST7565_ADC_REVERSE);
-		spi.transferBlocking(ST7565_SCAN_DIR_NORMAL);
+		spi.transfer(ST7565_ADC_REVERSE);
+		spi.transfer(ST7565_SCAN_DIR_NORMAL);
 	}
 
 	for (uint8_t i = 0; i < size; ++i) {
-		spi.transferBlocking(configuration[i]);
+		spi.transfer(configuration[i]);
 	}
 
 	cs.set();

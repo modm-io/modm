@@ -42,12 +42,12 @@ int main()
 		usb_stream0 << "Spi tx only" << modm::endl;
 		tud_task();
 		// send out 12 bytes, don't care about response
-		Spi::transferBlocking(sendBuffer, nullptr, 12);
+		Spi::transfer(sendBuffer, nullptr, 12);
 
 		usb_stream0 << "Spi send \"" << reinterpret_cast<const char*>(sendBuffer) << "\"" << modm::endl;
 		tud_task();
 		// send out 12 bytes, read in 12 bytes
-		Spi::transferBlocking(sendBuffer, receiveBuffer, 12);
+		Spi::transfer(sendBuffer, receiveBuffer, 12);
 		receiveBuffer[12] = 0;
 		usb_stream0 << "Spi received \"" << reinterpret_cast<const char*>(receiveBuffer) << "\"" << modm::endl;
 		tud_task();

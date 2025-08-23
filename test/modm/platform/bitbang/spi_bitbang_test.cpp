@@ -33,7 +33,7 @@ SpiBitbangTest::testSpiMaster()
 
 	{
 		auto r = Start(50);
-		SpiMaster::transferBlocking(0);
+		SpiMaster::transfer(0);
 		TEST_ASSERT_EQUALS(r[1].size(), 1u);
 		TEST_ASSERT_EQUALS(r[0].size(), 17u);
 
@@ -44,7 +44,7 @@ SpiBitbangTest::testSpiMaster()
 		r[1].dump();
 
 		r.restart();
-		SpiMaster::transferBlocking(0b1010'1010);
+		SpiMaster::transfer(0b1010'1010);
 		TEST_ASSERT_EQUALS(r[1].size(), 9u);
 		TEST_ASSERT_EQUALS(r[0].size(), 17u);
 
@@ -54,7 +54,7 @@ SpiBitbangTest::testSpiMaster()
 		r[1].dump();
 
 		r.restart();
-		SpiMaster::transferBlocking(0b0001'1110);
+		SpiMaster::transfer(0b0001'1110);
 		TEST_ASSERT_EQUALS(r[1].size(), 3u);
 		TEST_ASSERT_EQUALS(r[0].size(), 17u);
 
@@ -65,7 +65,7 @@ SpiBitbangTest::testSpiMaster()
 
 		r.restart();
 		SpiMaster::setDataOrder(SpiMaster::DataOrder::LsbFirst);
-		SpiMaster::transferBlocking(0b0001'1110);
+		SpiMaster::transfer(0b0001'1110);
 		TEST_ASSERT_EQUALS(r[1].size(), 3u);
 		TEST_ASSERT_EQUALS(r[0].size(), 17u);
 

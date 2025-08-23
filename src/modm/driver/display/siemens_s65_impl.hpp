@@ -78,9 +78,9 @@ void
 modm::SiemensS65Common<SPI, CS, RS, Reset>::writeReg(uint8_t reg)
 {
 	CS::reset();
-	SPI::transferBlocking(0x74); // start byte, RS = 0, R/W = 0, write index register
-	SPI::transferBlocking(0x00);
-	SPI::transferBlocking(reg);
+	SPI::transfer(0x74); // start byte, RS = 0, R/W = 0, write index register
+	SPI::transfer(0x00);
+	SPI::transfer(reg);
 	CS::set();
 }
 
@@ -89,9 +89,9 @@ void
 modm::SiemensS65Common<SPI, CS, RS, Reset>::writeData(uint16_t data)
 {
 	CS::reset();
-	SPI::transferBlocking(0x76);	// start byte, RS = 1, R/W = 0, write instruction or RAM data
-	SPI::transferBlocking(data>>8);
-	SPI::transferBlocking(data);
+	SPI::transfer(0x76);	// start byte, RS = 1, R/W = 0, write instruction or RAM data
+	SPI::transfer(data>>8);
+	SPI::transfer(data);
 	CS::set();
 }
 
@@ -156,7 +156,7 @@ modm::SiemensS65Common<SPI, CS, RS, Reset>::lcdCls(uint16_t colour) {
 	writeReg(0x22);
 
 	CS::reset();
-	SPI::transferBlocking(0x76);	// start byte
+	SPI::transfer(0x76);	// start byte
 
 	// start data transmission
 
@@ -183,8 +183,8 @@ modm::SiemensS65Common<SPI, CS, RS, Reset>::lcdCls(uint16_t colour) {
 	uint8_t c1 = colour >> 8;
 	uint8_t c2 = colour & 0xff;
 	for (uint16_t i = 0; i < (132 * 176); ++i) {
-		SPI::transferBlocking(c1);
-		SPI::transferBlocking(c2);
+		SPI::transfer(c1);
+		SPI::transfer(c2);
 	}
 #endif
 
@@ -202,7 +202,7 @@ modm::SiemensS65Portrait<SPI, CS, RS, Reset>::update() {
 
 	// WRITE MEMORY
 	CS::reset();
-	SPI::transferBlocking(0x76);	// start byte
+	SPI::transfer(0x76);	// start byte
 
 	const uint16_t maskBlank  = 0x0000; // RRRR RGGG GGGB BBBB
 	const uint16_t maskFilled = 0x37e0; // RRRR RGGG GGGB BBBB
@@ -280,7 +280,7 @@ modm::SiemensS65Portrait<SPI, CS, RS, Reset>::update() {
 			} // pix
 
 			// use transfer() of SPI to transfer spiBuffer
-			SPI::transferBlocking(spiBuffer, nullptr, 16);
+			SPI::transfer(spiBuffer, nullptr, 16);
 		} // y
 	} // x
 #endif
@@ -299,7 +299,7 @@ modm::SiemensS65Landscape<SPI, CS, RS, Reset>::update() {
 
 	// WRITE MEMORY
 	CS::reset();
-	SPI::transferBlocking(0x76);	// start byte
+	SPI::transfer(0x76);	// start byte
 
 	const uint16_t maskBlank  = 0x0000; // RRRR RGGG GGGB BBBB
 	const uint16_t maskFilled = 0x37e0; // RRRR RGGG GGGB BBBB
@@ -383,7 +383,7 @@ modm::SiemensS65Landscape<SPI, CS, RS, Reset>::update() {
 			} // pix
 
 			// use transfer() of SPI to transfer spiBuffer
-			SPI::transferBlocking(spiBuffer, nullptr, bufSize);
+			SPI::transfer(spiBuffer, nullptr, bufSize);
 		} // y
 	} // x
 #endif

@@ -32,7 +32,7 @@ DisplayThread::update()
 	// Wait for 100 msec unitl display powered up.
 	modm::this_fiber::sleep_for(100ms);
 
-	display.initializeBlocking();
+	display.initialize();
 	display.setFont(modm::font::Assertion);
 	display.clear();
 	display << "Hello World!";
