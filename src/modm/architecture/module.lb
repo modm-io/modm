@@ -356,7 +356,7 @@ class UartDevice(Module):
         module.description = "UART Devices"
 
     def prepare(self, module, options):
-        module.depends(":architecture:uart")
+        module.depends(":architecture:uart", ":processing:timer")
         return True
 
     def build(self, env):
