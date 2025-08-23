@@ -1,9 +1,23 @@
+/*
+ * Copyright (c) 2023, Alexander Solovets
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
 #pragma once
 
 #include <algorithm>
 #include <modm/architecture/interface/i2c_device.hpp>
 #include <modm/architecture/interface/register.hpp>
 #include <modm/math/utils/endianness.hpp>
+
+namespace modm
+{
 
 template<typename I2cMaster>
 class Qmc5883l;
@@ -124,7 +138,7 @@ public:
 };
 
 template<class I2cMaster>
-class Qmc5883l : public Qmc5883lRegisters, public modm::I2cDevice<I2cMaster>
+class Qmc5883l : public Qmc5883lRegisters, public I2cDevice<I2cMaster>
 {
 	/// @cond
 	Data &data;
@@ -186,3 +200,5 @@ public:
 		return false;
 	}
 };
+
+}	// namespace modm

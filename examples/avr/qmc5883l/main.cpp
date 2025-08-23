@@ -17,7 +17,7 @@
 using namespace Board;
 using namespace std::chrono_literals;
 
-using Compass = Qmc5883l<I2cMaster>;
+using Compass = modm::Qmc5883l<I2cMaster>;
 Compass::Data data;
 Compass compass(data);
 modm::atomic::Flag dataReady(true);
