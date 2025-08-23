@@ -593,50 +593,48 @@ public:
 	inline Bno055(Data &data, uint8_t address=addr()):
 		I2cDevice<I2cMaster,4>(address), data(data) {}
 
-	inline modm::ResumableResult<bool>
+	inline bool
 	configure(OperationMode mode=OperationMode::NDOF)
 	{
 		return updateRegister(Register::OPR_MODE, mode);
 	}
 
-	inline modm::ResumableResult<bool>
+	inline bool
 	readData()
 	{
 		return readRegister(Register::ACCEL_DATA_X_LSB, (uint8_t*)&data.r, Data::size);
 	}
 
-	inline modm::ResumableResult<bool>
+	inline bool
 	enableExternalClock()
 	{
 		return updateRegister(Register::SYS_TRIGGER, SystemTrigger::CLK_SEL, Registers_t(0));
 	}
 
 public:
-	inline modm::ResumableResult<bool>
+	inline bool
 	updateRegister(Register reg, Registers_t setMask, Registers_t clearMask = Registers_t(0xff))
 	{
-		RF_BEGIN();
-		RF_CALL(setPageId(reg));
+		setPageId(reg);
 
 		buffer[0] = uint8_t(reg);
 		this->transaction.configureWriteRead(buffer, 1, buffer, 1);
-		RF_CALL( this->runTransaction() );
+		this->runTransaction();
 
 		buffer[1] = (buffer[0] & ~clearMask.value) | setMask.value;
 		buffer[0] = uint8_t(reg);
 		this->transaction.configureWrite(buffer, 2);
-		RF_END_RETURN_CALL( this->runTransaction() );
+		return this->runTransaction();
 	}
 
-	inline modm::ResumableResult<bool>
+	inline bool
 	readRegister(Register reg, uint8_t *output, size_t length=1)
 	{
-		RF_BEGIN();
-		RF_CALL(setPageId(reg));
+		setPageId(reg);
 
 		buffer[0] = uint8_t(reg);
 		this->transaction.configureWriteRead(buffer, 1, output, length);
-		RF_END_RETURN_CALL( this->runTransaction() );
+		return this->runTransaction();
 	}
 
 public:
@@ -645,22 +643,21 @@ public:
 	{ return data; }
 
 protected:
-	inline modm::ResumableResult<bool>
+	inline bool
 	setPageId(Register regi)
 	{
 		const uint8_t reg = uint8_t(regi);
-		RF_BEGIN();
 
 		if ((reg ^ prev_reg) & 0x80) {
 			buffer[0] = uint8_t(Register::PAGE_ID);
 			buffer[1] = reg >> 7;
 			this->transaction.configureWrite(buffer, 2);
-			buffer[2] = RF_CALL( this->runTransaction() );
+			buffer[2] = this->runTransaction();
 			if (buffer[2]) prev_reg = reg;
-			RF_RETURN((bool)buffer[2]);
+			return (bool)buffer[2];
 		}
 
-		RF_END_RETURN(true);
+		return true;
 	}
 
 private:

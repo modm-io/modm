@@ -18,33 +18,29 @@
 
 // ----------------------------------------------------------------------------
 template <typename BlockDeviceA, typename BlockDeviceB>
-modm::ResumableResult<bool>
+bool
 modm::BdMirror<BlockDeviceA, BlockDeviceB>::initialize()
 {
-	RF_BEGIN();
+	resultA = blockDeviceA.initialize();
+	resultB = blockDeviceB.initialize();
 
-	resultA = RF_CALL(blockDeviceA.initialize());
-	resultB = RF_CALL(blockDeviceB.initialize());
-
-	RF_END_RETURN(resultA && resultA);
+	return resultA && resultA;
 }
 
 // ----------------------------------------------------------------------------
 template <typename BlockDeviceA, typename BlockDeviceB>
-modm::ResumableResult<bool>
+bool
 modm::BdMirror<BlockDeviceA, BlockDeviceB>::deinitialize()
 {
-	RF_BEGIN();
+	resultA = blockDeviceA.deinitialize();
+	resultB = blockDeviceB.deinitialize();
 
-	resultA = RF_CALL(blockDeviceA.deinitialize());
-	resultB = RF_CALL(blockDeviceB.deinitialize());
-
-	RF_END_RETURN(resultA && resultA);
+	return resultA && resultA;
 }
 
 // ----------------------------------------------------------------------------
 template <typename BlockDeviceA, typename BlockDeviceB>
-modm::ResumableResult<bool>
+bool
 modm::BdMirror<BlockDeviceA, BlockDeviceB>::read(uint8_t* buffer, bd_address_t address, bd_size_t size)
 {
 	return blockDeviceA.read(buffer, address, size);
@@ -52,53 +48,47 @@ modm::BdMirror<BlockDeviceA, BlockDeviceB>::read(uint8_t* buffer, bd_address_t a
 
 // ----------------------------------------------------------------------------
 template <typename BlockDeviceA, typename BlockDeviceB>
-modm::ResumableResult<bool>
+bool
 modm::BdMirror<BlockDeviceA, BlockDeviceB>::program(const uint8_t* buffer, bd_address_t address, bd_size_t size)
 {
-	RF_BEGIN();
-
 	if((size == 0) || (size % BlockSizeWrite != 0)) {
-		RF_RETURN(false);
+		return false;
 	}
 
-	resultA = RF_CALL(blockDeviceA.program(buffer, address, size));
-	resultB = RF_CALL(blockDeviceB.program(buffer, address, size));
+	resultA = blockDeviceA.program(buffer, address, size);
+	resultB = blockDeviceB.program(buffer, address, size);
 
-	RF_END_RETURN(resultA && resultA);
+	return resultA && resultA;
 }
 
 
 // ----------------------------------------------------------------------------
 template <typename BlockDeviceA, typename BlockDeviceB>
-modm::ResumableResult<bool>
+bool
 modm::BdMirror<BlockDeviceA, BlockDeviceB>::erase(bd_address_t address, bd_size_t size)
 {
-	RF_BEGIN();
-
 	if((size == 0) || (size % BlockSizeErase != 0)) {
-		RF_RETURN(false);
+		return false;
 	}
 
-	resultA = RF_CALL(blockDeviceA.erase(address, size));
-	resultB = RF_CALL(blockDeviceB.erase(address, size));
+	resultA = blockDeviceA.erase(address, size);
+	resultB = blockDeviceB.erase(address, size);
 
-	RF_END_RETURN(resultA && resultA);
+	return resultA && resultA;
 }
 
 
 // ----------------------------------------------------------------------------
 template <typename BlockDeviceA, typename BlockDeviceB>
-modm::ResumableResult<bool>
+bool
 modm::BdMirror<BlockDeviceA, BlockDeviceB>::write(const uint8_t* buffer, bd_address_t address, bd_size_t size)
 {
-	RF_BEGIN();
-
 	if((size == 0) || (size % BlockSizeErase != 0) || (size % BlockSizeWrite != 0)) {
-		RF_RETURN(false);
+		return false;
 	}
 
-	resultA = RF_CALL(blockDeviceA.write(buffer, address, size));
-	resultB = RF_CALL(blockDeviceB.write(buffer, address, size));
+	resultA = blockDeviceA.write(buffer, address, size);
+	resultB = blockDeviceB.write(buffer, address, size);
 
-	RF_END_RETURN(resultA && resultA);
+	return resultA && resultA;
 }

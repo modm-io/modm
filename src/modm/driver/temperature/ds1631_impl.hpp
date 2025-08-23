@@ -27,16 +27,14 @@ modm::Ds1631<I2cMaster>::Ds1631(Data &data, uint8_t address) :
 }
 
 template < typename I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Ds1631<I2cMaster>::initialize()
 {
-	RF_BEGIN();
-
 	buffer[0] = uint8_t(Command::Configuration);
 
 	this->transaction.configureWriteRead(buffer, 1, &config, 1);
 
-	RF_END_RETURN_CALL( this->runTransaction() );
+	return this->runTransaction();
 }
 
 template < typename I2cMaster >
@@ -65,107 +63,91 @@ modm::Ds1631<I2cMaster>::update()
 }
 
 template < typename I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Ds1631<I2cMaster>::setUpdateRate(uint8_t rate)
 {
-	RF_BEGIN();
-
 	// clamp conversion rate to max 33Hz (=~30ms)
 	if (rate == 0) rate = 1;
 	if (rate > 33) rate = 33;
 
 	if (config.any(Config::OneShot))
 	{
-		if (not RF_CALL(startConversion()))
-			RF_RETURN(false);
+		if (not startConversion())
+			return false;
 	}
 
 	updateTime = modm::ShortDuration(1000/rate - 29);
 	periodTimeout.restart(updateTime);
 	this->restart();
 
-	RF_END_RETURN(true);
+	return true;
 }
 
 template < typename I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Ds1631<I2cMaster>::setResolution(Resolution resolution)
 {
-	RF_BEGIN();
-
 	Resolution_t::set(config, resolution);
 
-	RF_END_RETURN_CALL( writeConfiguration() );
+	return writeConfiguration();
 }
 
 template < typename I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Ds1631<I2cMaster>::setAlertPolarity(AlertPolarity polarity)
 {
-	RF_BEGIN();
-
 	config.update(Config::Polarity, bool(polarity));
 
-	RF_END_RETURN_CALL( writeConfiguration() );
+	return writeConfiguration();
 }
 
 template < typename I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Ds1631<I2cMaster>::setConversionMode(ConversionMode mode)
 {
-	RF_BEGIN();
-
 	config.update(Config::OneShot, bool(mode));
 
-	RF_END_RETURN_CALL( writeConfiguration() );
+	return writeConfiguration();
 }
 
 // MARK: read temperature
 template < typename I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Ds1631<I2cMaster>::readTemperature()
 {
-	RF_BEGIN();
-
 	buffer[0] = uint8_t(Command::Temperature);
 	this->transaction.configureWriteRead(buffer, 1, data.data, 2);
 
-	RF_END_RETURN_CALL( this->runTransaction() );
+	return this->runTransaction();
 }
 
 // MARK: configuration
 template < typename I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Ds1631<I2cMaster>::writeConfiguration()
 {
-	RF_BEGIN();
-
 	buffer[0] = uint8_t(Command::Configuration);
 	buffer[1] = config.value;
 
 	this->transaction.configureWrite(buffer, 2);
 
-	RF_END_RETURN_CALL( this->runTransaction() );
+	return this->runTransaction();
 }
 
 template < typename I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Ds1631<I2cMaster>::writeCommand(Command cmd)
 {
-	RF_BEGIN();
-
 	buffer[0] = uint8_t(cmd);
 	this->transaction.configureWrite(buffer, 1);
 
-	RF_END_RETURN_CALL( this->runTransaction() );
+	return this->runTransaction();
 }
 
 template < typename I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Ds1631<I2cMaster>::setLimitRegister(Command cmd, float temperature)
 {
-	RF_BEGIN();
-
 	{
 		uint8_t res = uint8_t(Resolution_t::get(config));
 
@@ -179,5 +161,5 @@ modm::Ds1631<I2cMaster>::setLimitRegister(Command cmd, float temperature)
 
 	this->transaction.configureWrite(buffer, 3);
 
-	RF_END_RETURN_CALL( this->runTransaction() );
+	return this->runTransaction();
 }

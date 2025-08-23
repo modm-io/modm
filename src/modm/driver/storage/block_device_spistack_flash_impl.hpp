@@ -17,164 +17,149 @@
 // ----------------------------------------------------------------------------
 
 template <typename SpiBlockDevice, uint8_t DieCount>
-modm::ResumableResult<bool>
+bool
 modm::BdSpiStackFlash<SpiBlockDevice, DieCount>::initialize()
 {
-	RF_BEGIN();
-
-	if (RF_CALL(spiBlockDevice.initialize())) {
-		RF_CALL(spiBlockDevice.selectDie(currentDie = 0x00));
-		RF_RETURN(true);
+	if (spiBlockDevice.initialize()) {
+		spiBlockDevice.selectDie(currentDie = 0x00);
+		return true;
 	}
 
-	RF_END_RETURN(false);
+	return false;
 }
 
 // ----------------------------------------------------------------------------
 
 template <typename SpiBlockDevice, uint8_t DieCount>
-modm::ResumableResult<bool>
+bool
 modm::BdSpiStackFlash<SpiBlockDevice, DieCount>::deinitialize()
 {
-	RF_BEGIN();
-	RF_END_RETURN_CALL(spiBlockDevice.deinitialize());
+	return spiBlockDevice.deinitialize();
 }
 
 // ----------------------------------------------------------------------------
 
 template <typename SpiBlockDevice, uint8_t DieCount>
-modm::ResumableResult<bool>
+bool
 modm::BdSpiStackFlash<SpiBlockDevice, DieCount>::read(uint8_t* buffer, bd_address_t address, bd_size_t size)
 {
-	RF_BEGIN();
-
 	if((size == 0) || (size % BlockSizeRead != 0) || (address + size > DeviceSize)) {
-		RF_RETURN(false);
+		return false;
 	}
 
 	index = 0;
 	while (index < size) {
 		dv = std::ldiv(index + address, DieSize); // dv.quot = die #ID, dv.rem = die address
 		if (currentDie != dv.quot) {
-			RF_CALL(spiBlockDevice.selectDie(currentDie = dv.quot));
+			spiBlockDevice.selectDie(currentDie = dv.quot);
 		}
-		if (RF_CALL(spiBlockDevice.read(&buffer[index], dv.rem, std::min(size - index, DieSize - dv.rem)))) {
+		if (spiBlockDevice.read(&buffer[index], dv.rem, std::min(size - index, DieSize - dv.rem))) {
 			index += DieSize - dv.rem; // size - index <= DieSize - dv.rem only on last iteration!
 		} else {
-			RF_RETURN(false);
+			return false;
 		}
 	}
 
-	RF_END_RETURN(true);
+	return true;
 }
 
 // ----------------------------------------------------------------------------
 
 template <typename SpiBlockDevice, uint8_t DieCount>
-modm::ResumableResult<bool>
+bool
 modm::BdSpiStackFlash<SpiBlockDevice, DieCount>::program(const uint8_t* buffer, bd_address_t address, bd_size_t size)
 {
-	RF_BEGIN();
-
 	if((size == 0) || (size % BlockSizeWrite != 0) || (address + size > DeviceSize)) {
-		RF_RETURN(false);
+		return false;
 	}
 
 	index = 0;
 	while (index < size) {
 		dv = std::ldiv(index + address, DieSize); // dv.quot = die #ID, dv.rem = die address
 		if (currentDie != dv.quot) {
-			RF_CALL(spiBlockDevice.selectDie(currentDie = dv.quot));
+			spiBlockDevice.selectDie(currentDie = dv.quot);
 		}
-		if (RF_CALL(spiBlockDevice.program(&buffer[index], dv.rem, std::min(size - index, DieSize - dv.rem)))) {
+		if (spiBlockDevice.program(&buffer[index], dv.rem, std::min(size - index, DieSize - dv.rem))) {
 			index += DieSize - dv.rem; // size - index <= DieSize - dv.rem only on last iteration!
 		} else {
-			RF_RETURN(false);
+			return false;
 		}
 	}
 
-	RF_END_RETURN(true);
+	return true;
 }
 
 // ----------------------------------------------------------------------------
 
 template <typename SpiBlockDevice, uint8_t DieCount>
-modm::ResumableResult<bool>
+bool
 modm::BdSpiStackFlash<SpiBlockDevice, DieCount>::erase(bd_address_t address, bd_size_t size)
 {
-	RF_BEGIN();
-
 	if((size == 0) || (size % BlockSizeErase != 0) || (address + size > DeviceSize)) {
-		RF_RETURN(false);
+		return false;
 	}
 
 	index = 0;
 	while (index < size) {
 		dv = std::ldiv(index + address, DieSize); // dv.quot = die #ID, dv.rem = die address
 		if (currentDie != dv.quot) {
-			RF_CALL(spiBlockDevice.selectDie(currentDie = dv.quot));
+			spiBlockDevice.selectDie(currentDie = dv.quot);
 		}
-		if (RF_CALL(spiBlockDevice.erase(dv.rem, std::min(size - index, DieSize - dv.rem)))) {
+		if (spiBlockDevice.erase(dv.rem, std::min(size - index, DieSize - dv.rem))) {
 			index += DieSize - dv.rem; // size - index <= DieSize - dv.rem only on last iteration!
 		} else {
-			RF_RETURN(false);
+			return false;
 		}
 	}
 
-	RF_END_RETURN(true);
+	return true;
 }
 
 // ----------------------------------------------------------------------------
 
 template <typename SpiBlockDevice, uint8_t DieCount>
-modm::ResumableResult<bool>
+bool
 modm::BdSpiStackFlash<SpiBlockDevice, DieCount>::write(const uint8_t* buffer, bd_address_t address, bd_size_t size)
 {
-	RF_BEGIN();
-
 	if((size == 0) || (size % BlockSizeErase != 0) || (size % BlockSizeWrite != 0) || (address + size > DeviceSize)) {
-		RF_RETURN(false);
+		return false;
 	}
 
-	if(!RF_CALL(this->erase(address, size))) {
-		RF_RETURN(false);
+	if(!this->erase(address, size)) {
+		return false;
 	}
 
-	if(!RF_CALL(this->program(buffer, address, size))) {
-		RF_RETURN(false);
+	if(!this->program(buffer, address, size)) {
+		return false;
 	}
 
-	RF_END_RETURN(true);
+	return true;
 }
 
 // ----------------------------------------------------------------------------
 
 template <typename SpiBlockDevice, uint8_t DieCount>
-modm::ResumableResult<bool>
+bool
 modm::BdSpiStackFlash<SpiBlockDevice, DieCount>::isBusy()
 {
-	RF_BEGIN();
-
 	currentDie = DieCount;
 	while (currentDie > 0) {
-		RF_CALL(spiBlockDevice.selectDie(--currentDie));
-		if (RF_CALL(spiBlockDevice.isBusy())) {
-			RF_RETURN(true);
+		spiBlockDevice.selectDie(--currentDie);
+		if (spiBlockDevice.isBusy()) {
+			return true;
 		}
 	}
 
-	RF_END_RETURN(false);
+	return false;
 }
 
 // ----------------------------------------------------------------------------
 
 template <typename SpiBlockDevice, uint8_t DieCount>
-modm::ResumableResult<void>
+void
 modm::BdSpiStackFlash<SpiBlockDevice, DieCount>::waitWhileBusy()
 {
-	RF_BEGIN();
-	while(RF_CALL(isBusy())) {
-		RF_YIELD();
+	while(isBusy()) {
+		modm::this_fiber::yield();
 	}
-	RF_END();
 }

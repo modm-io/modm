@@ -26,23 +26,21 @@ modm::Ixm42xxxTransportI2c<I2cMaster>::Ixm42xxxTransportI2c(uint8_t address)
 // ----------------------------------------------------------------------------
 
 template < class I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Ixm42xxxTransportI2c<I2cMaster>::write(uint8_t reg, uint8_t value)
 {
-    RF_BEGIN();
-
     buffer[0] = reg;
     buffer[1] = value;
 
     this->transaction.configureWrite(buffer, 2);
 
-    RF_END_RETURN_CALL( this->runTransaction() );
+    return this->runTransaction();
 }
 
 // ----------------------------------------------------------------------------
 
 template < class I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Ixm42xxxTransportI2c<I2cMaster>::read(uint8_t reg, uint8_t &value)
 {
     return read(reg, &value, 1);
@@ -51,15 +49,13 @@ modm::Ixm42xxxTransportI2c<I2cMaster>::read(uint8_t reg, uint8_t &value)
 // ----------------------------------------------------------------------------
 
 template < class I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Ixm42xxxTransportI2c<I2cMaster>::read(uint8_t reg, uint8_t *buffer, std::size_t length)
 {
-    RF_BEGIN();
-
     this->buffer[0] = reg;
     this->transaction.configureWriteRead(this->buffer, 1, buffer, length);
 
-    RF_END_RETURN_CALL( this->runTransaction() );
+    return this->runTransaction();
 }
 
 // ----------------------------------------------------------------------------
@@ -74,41 +70,37 @@ modm::Ixm42xxxTransportSpi<SpiMaster, Cs>::Ixm42xxxTransportSpi(uint8_t /*addres
 // ----------------------------------------------------------------------------
 
 template < class SpiMaster, class Cs >
-modm::ResumableResult<bool>
+bool
 modm::Ixm42xxxTransportSpi<SpiMaster, Cs>::ping()
 {
-    RF_BEGIN();
-
     whoAmI = 0;
-    RF_CALL(read(0x75, whoAmI));
+    read(0x75, whoAmI);
 
-    RF_END_RETURN(whoAmI != 0);
+    return whoAmI != 0;
 }
 
 // ----------------------------------------------------------------------------
 
 template < class SpiMaster, class Cs >
-modm::ResumableResult<bool>
+bool
 modm::Ixm42xxxTransportSpi<SpiMaster, Cs>::write(uint8_t reg, uint8_t value)
 {
-    RF_BEGIN();
-
-    RF_WAIT_UNTIL(this->acquireMaster());
+    modm::this_fiber::poll([&]{ return this->acquireMaster(); });
     Cs::reset();
 
-    RF_CALL(SpiMaster::transfer(reg | Write));
-    RF_CALL(SpiMaster::transfer(value));
+    SpiMaster::transfer(reg | Write);
+    SpiMaster::transfer(value);
 
     if (this->releaseMaster())
         Cs::set();
 
-    RF_END_RETURN(true);
+    return true;
 }
 
 // ----------------------------------------------------------------------------
 
 template < class SpiMaster, class Cs >
-modm::ResumableResult<bool>
+bool
 modm::Ixm42xxxTransportSpi<SpiMaster, Cs>::read(uint8_t reg, uint8_t &value)
 {
     return read(reg, &value, 1);
@@ -117,19 +109,17 @@ modm::Ixm42xxxTransportSpi<SpiMaster, Cs>::read(uint8_t reg, uint8_t &value)
 // ----------------------------------------------------------------------------
 
 template < class SpiMaster, class Cs >
-modm::ResumableResult<bool>
+bool
 modm::Ixm42xxxTransportSpi<SpiMaster, Cs>::read(uint8_t reg, uint8_t *buffer, std::size_t length)
 {
-    RF_BEGIN();
-
-    RF_WAIT_UNTIL(this->acquireMaster());
+    modm::this_fiber::poll([&]{ return this->acquireMaster(); });
     Cs::reset();
 
-    RF_CALL(SpiMaster::transfer(reg | Read));
-    RF_CALL(SpiMaster::transfer(nullptr, buffer, length));
+    SpiMaster::transfer(reg | Read);
+    SpiMaster::transfer(nullptr, buffer, length);
 
     if (this->releaseMaster())
         Cs::set();
 
-    RF_END_RETURN(true);
+    return true;
 }

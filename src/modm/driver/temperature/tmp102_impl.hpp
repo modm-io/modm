@@ -59,11 +59,9 @@ modm::Tmp102<I2cMaster>::getData()
 // ----------------------------------------------------------------------------
 // MARK: - tasks
 template < typename I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Tmp102<I2cMaster>::setUpdateRate(uint8_t rate)
 {
-	RF_BEGIN();
-
 	this->restart();
 	// clamp conversion rate to max 33Hz (=~30ms)
 	if (rate > 33) rate = 33;
@@ -81,99 +79,89 @@ modm::Tmp102<I2cMaster>::setUpdateRate(uint8_t rate)
 		// 8 to 0b11
 		if (rate & 0b1001) ConversionRate_t::set(config_lsb, ConversionRate::Hz1);
 		if (rate & 0b1100) ConversionRate_t::set(config_lsb, ConversionRate::Hz4);
-		if ( RF_CALL(writeConfiguration(3)) )
+		if ( writeConfiguration(3) )
 		{
 			if (rate == 0) updateTime = 4000;
 			else updateTime = 1000/rate;
 			timeout.restart(std::chrono::milliseconds(updateTime & ~(1 << 15)));
-			RF_RETURN(true);
+			return true;
 		}
 	}
 	else
 	{
 		updateTime = (1000/rate - 29) | (1 << 15);
 		timeout.restart(std::chrono::milliseconds(updateTime & ~(1 << 15)));
-		RF_RETURN(true);
+		return true;
 	}
 
 	this->stop();
 
-	RF_END_RETURN(false);
+	return false;
 }
 
 // MARK: Extended mode
 template < typename I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Tmp102<I2cMaster>::enableExtendedMode(bool enable)
 {
-	RF_BEGIN();
-
 	config_lsb.update(Config2::ExtendedMode, enable);
 
-	RF_END_RETURN_CALL(writeConfiguration(3));
+	return writeConfiguration(3);
 }
 
 // MARK: conversion
 template < typename I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Tmp102<I2cMaster>::startConversion()
 {
-	RF_BEGIN();
-
 	reinterpret_cast<Config1_t&>(this->config_msb).set(Config1::OneShot);
 
-	if ( RF_CALL(writeConfiguration(2)) )
+	if ( writeConfiguration(2) )
 	{
 		reinterpret_cast<Config1_t&>(this->config_msb).reset(Config1::OneShot);
-		RF_RETURN(true);
+		return true;
 	}
 
-	RF_END_RETURN(false);
+	return false;
 }
 
 // MARK: read temperature
 template < typename I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Tmp102<I2cMaster>::readComparatorMode(bool &result)
 {
-	RF_BEGIN();
-
 	this->buffer[0] = uint8_t(Register::Configuration);
 	this->transaction.configureWriteRead(this->buffer, 1, this->buffer, 2);
 
-	if (RF_CALL( this->runTransaction() ))
+	if (this->runTransaction())
 	{
 		reinterpret_cast<Config1_t&>(this->config_msb) = Config1_t(this->buffer[0]) & ~Resolution_t::mask();
 		result = static_cast<bool>(Config2_t(this->buffer[1]) & Config2::Alert);
 		config_lsb = Config2_t(this->buffer[1]) & ~Config2::Alert;
-		RF_RETURN(true);
+		return true;
 	}
 
-	RF_END_RETURN(false);
+	return false;
 }
 
 // MARK: configuration
 template < typename I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Tmp102<I2cMaster>::writeConfiguration(uint8_t length)
 {
-	RF_BEGIN();
-
 	this->buffer[0] = uint8_t(Register::Configuration);
 	this->buffer[1] = reinterpret_cast<Config1_t&>(this->config_msb).value;
 	this->buffer[2] = config_lsb.value;
 
 	this->transaction.configureWrite(this->buffer, length);
 
-	RF_END_RETURN_CALL( this->runTransaction() );
+	return this->runTransaction();
 }
 
 template < typename I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Tmp102<I2cMaster>::setLimitRegister(Register reg, float temperature)
 {
-	RF_BEGIN();
-
 	{
 		int16_t temp = temperature * 16.f;
 		temp <<= (config_lsb & Config2::ExtendedMode) ? 3 : 4;
@@ -185,5 +173,5 @@ modm::Tmp102<I2cMaster>::setLimitRegister(Register reg, float temperature)
 
 	this->transaction.configureWrite(this->buffer, 3);
 
-	RF_END_RETURN_CALL( this->runTransaction() );
+	return this->runTransaction();
 }

@@ -27,11 +27,9 @@ modm::I2cEeprom<I2cMaster, AddressBytes>::I2cEeprom(uint8_t address) :
 
 // MARK: - write operations
 template <typename I2cMaster, size_t AddressBytes>
-modm::ResumableResult<bool>
+bool
 modm::I2cEeprom<I2cMaster, AddressBytes>::write(uint32_t address, const uint8_t *data, std::size_t length)
 {
-	RF_BEGIN();
-
 	if constexpr (AddressBytes > 1) {
 		if (address & 0x10000) this->setAddress(this->transaction.getAddress() | 0b100);
 		else this->setAddress(this->transaction.getAddress() & ~0b100);
@@ -39,20 +37,18 @@ modm::I2cEeprom<I2cMaster, AddressBytes>::write(uint32_t address, const uint8_t 
 		this->setAddress(this->transaction.getAddress());
 	}
 
-	RF_WAIT_UNTIL( this->transaction.configureWrite(address, data, length) and this->startTransaction() );
+	modm::this_fiber::poll([&]{ return this->transaction.configureWrite(address, data, length) and this->startTransaction(); });
 
-	RF_WAIT_WHILE( this->isTransactionRunning() );
+	modm::this_fiber::poll([&]{ return not this->isTransactionRunning(); });
 
-	RF_END_RETURN( this->wasTransactionSuccessful() );
+	return this->wasTransactionSuccessful();
 }
 
 // MARK: - read operations
 template <typename I2cMaster, size_t AddressBytes>
-modm::ResumableResult<bool>
+bool
 modm::I2cEeprom<I2cMaster, AddressBytes>::read(uint32_t address, uint8_t *data, std::size_t length)
 {
-	RF_BEGIN();
-
 	if constexpr (AddressBytes > 1) {
 		if (address & 0x10000) this->setAddress(this->transaction.getAddress() | 0b100);
 		else this->setAddress(this->transaction.getAddress() & ~0b100);
@@ -60,11 +56,11 @@ modm::I2cEeprom<I2cMaster, AddressBytes>::read(uint32_t address, uint8_t *data, 
 		this->setAddress(this->transaction.getAddress());
 	}
 
-	RF_WAIT_UNTIL( this->transaction.configureRead(address, data, length) and this->startTransaction() );
+	modm::this_fiber::poll([&]{ return this->transaction.configureRead(address, data, length) and this->startTransaction(); });
 
-	RF_WAIT_WHILE( this->isTransactionRunning() );
+	modm::this_fiber::poll([&]{ return not this->isTransactionRunning(); });
 
-	RF_END_RETURN( this->wasTransactionSuccessful() );
+	return this->wasTransactionSuccessful();
 }
 
 namespace modm::i2c_eeprom::detail

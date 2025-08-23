@@ -28,11 +28,9 @@ modm::Lis3mdl<I2cMaster>::Lis3mdl( uint8_t address)
 }
 
 template < class I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Lis3mdl<I2cMaster>::configure(DataRate rate, Scale scale)
 {
-	RF_BEGIN();
-
 	DataRate_t::set(control1Shadow,rate);
 
 	// if FAST_ODR is requested, copy the highsped modes for the Z axis
@@ -44,26 +42,25 @@ modm::Lis3mdl<I2cMaster>::configure(DataRate rate, Scale scale)
 
 	Scale_t::set(control2Shadow,scale);
 
-	success = RF_CALL(this->write(static_cast<uint8_t>(Register::CTRL1),control1Shadow.value));
+	success = this->write(static_cast<uint8_t>(Register::CTRL1),control1Shadow.value);
 	if (success)
 	{
-		success = RF_CALL(this->write(static_cast<uint8_t>(Register::CTRL2),control2Shadow.value));
+		success = this->write(static_cast<uint8_t>(Register::CTRL2),control2Shadow.value);
 		if(success)
 		{
-			success = RF_CALL(this->write(static_cast<uint8_t>(Register::CTRL4),control4Shadow.value));
+			success = this->write(static_cast<uint8_t>(Register::CTRL4),control4Shadow.value);
 		}
 	}
-	RF_END_RETURN(success);
+	return success;
 }
 
 
 template < class I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Lis3mdl<I2cMaster>::setMode(OperationMode mode)
 {
-	RF_BEGIN();
 	OperationMode_t::set(control3Shadow,mode);
-	RF_END_RETURN_CALL(this->write(static_cast<uint8_t>(Register::CTRL3),control3Shadow.value));
+	return this->write(static_cast<uint8_t>(Register::CTRL3),control3Shadow.value);
 }
 
 template < class I2cMaster >
@@ -74,27 +71,25 @@ modm::Lis3mdl<I2cMaster>::getScale()
 }
 
 template < class I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Lis3mdl<I2cMaster>::readMagnetometerRaw(Vector3i& data)
 {
-	RF_BEGIN();
-	success = RF_CALL(this->read(static_cast<uint8_t>(Register::OUT_X_L),reinterpret_cast<uint8_t*>(readBuffer),6));
+	success = this->read(static_cast<uint8_t>(Register::OUT_X_L),reinterpret_cast<uint8_t*>(readBuffer),6);
 	if(success)
 	{
 		data.x = readBuffer[0];
 		data.y = readBuffer[1];
 		data.z = readBuffer[2];
 	}
-	RF_END_RETURN(success);
+	return success;
 }
 
 
 template < class I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Lis3mdl<I2cMaster>::readMagnetometer(Vector3f& data)
 {
-	RF_BEGIN();
-	success = RF_CALL(this->read(static_cast<uint8_t>(Register::OUT_X_L),reinterpret_cast<uint8_t*>(readBuffer),6));
+	success = this->read(static_cast<uint8_t>(Register::OUT_X_L),reinterpret_cast<uint8_t*>(readBuffer),6);
 
 	if(success)
 	{
@@ -107,5 +102,5 @@ modm::Lis3mdl<I2cMaster>::readMagnetometer(Vector3f& data)
 		data.z = static_cast<float>(readBuffer[2]) * conversionValue;
 	}
 
-	RF_END_RETURN(success);
+	return success;
 }

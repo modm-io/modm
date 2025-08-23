@@ -23,36 +23,32 @@ Pat9125elI2cTransport<I2cMaster>::Pat9125elI2cTransport(uint8_t address)
 }
 
 template<class I2cMaster>
-modm::ResumableResult<bool>
+bool
 Pat9125elI2cTransport<I2cMaster>::write(uint8_t reg, uint8_t value)
 {
-	RF_BEGIN();
-
 	buffer[0] = reg;
 	buffer[1] = value;
 
 	this->transaction.configureWrite(&buffer[0], 2);
 
-	RF_END_RETURN_CALL(this->runTransaction());
+	return this->runTransaction();
 }
 
 template<class I2cMaster>
-modm::ResumableResult<bool>
+bool
 Pat9125elI2cTransport<I2cMaster>::read(uint8_t reg, uint8_t& value)
 {
 	return read(reg, &value, 1);
 }
 
 template<class I2cMaster>
-modm::ResumableResult<bool>
+bool
 Pat9125elI2cTransport<I2cMaster>::read(uint8_t reg, uint8_t* buffer, uint8_t length)
 {
-	RF_BEGIN();
-
 	buffer[0] = reg;
 	this->transaction.configureWriteRead(&buffer[0], 1, buffer, length);
 
-	RF_END_RETURN_CALL(this->runTransaction());
+	return this->runTransaction();
 }
 
 }

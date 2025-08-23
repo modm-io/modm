@@ -17,100 +17,89 @@
 
 // ----------------------------------------------------------------------------
 template <size_t DeviceSize, bool externalMemory>
-modm::ResumableResult<bool>
+bool
 modm::BdHeap<DeviceSize, externalMemory>::initialize()
 {
 	static_assert(externalMemory == false, "Use modm::BdHeap::initialize(uint8_t* memory) for externalMemory==true");
-	RF_BEGIN();
 	std::memset(data, 0, DeviceSize);
-	RF_END_RETURN(true);
+	return true;
 }
 
 template <size_t DeviceSize, bool externalMemory>
-modm::ResumableResult<bool>
+bool
 modm::BdHeap<DeviceSize, externalMemory>::initialize(uint8_t* memory)
 {
 	static_assert(externalMemory == true, "modm::BdHeap::initialize(uint8_t* memory) is only allowed for externalMemory==true");
-	RF_BEGIN();
 	data = memory;
-	RF_END_RETURN(true);
+	return true;
 }
 
 
 // ----------------------------------------------------------------------------
 template <size_t DeviceSize, bool externalMemory>
-modm::ResumableResult<bool>
+bool
 modm::BdHeap<DeviceSize, externalMemory>::deinitialize()
 {
-	RF_BEGIN();
-	RF_END_RETURN(true);
+	return true;
 }
 
 
 // ----------------------------------------------------------------------------
 template <size_t DeviceSize, bool externalMemory>
-modm::ResumableResult<bool>
+bool
 modm::BdHeap<DeviceSize, externalMemory>::read(uint8_t* buffer, bd_address_t address, bd_size_t size)
 {
-	RF_BEGIN();
-
 	if((size == 0) || (size % BlockSizeRead != 0) || (address + size > DeviceSize)) {
-		RF_RETURN(false);
+		return false;
 	}
 
 	std::memcpy(buffer, &data[address], size);
 
-	RF_END_RETURN(true);
+	return true;
 }
 
 
 // ----------------------------------------------------------------------------
 template <size_t DeviceSize, bool externalMemory>
-modm::ResumableResult<bool>
+bool
 modm::BdHeap<DeviceSize, externalMemory>::program(const uint8_t* buffer, bd_address_t address, bd_size_t size)
 {
-	RF_BEGIN();
-
 	if((size == 0) || (size % BlockSizeWrite != 0) || (address + size > DeviceSize)) {
-		RF_RETURN(false);
+		return false;
 	}
 
 	std::memcpy(&data[address], buffer, size);
 
-	RF_END_RETURN(true);
+	return true;
 }
 
 
 // ----------------------------------------------------------------------------
 template <size_t DeviceSize, bool externalMemory>
-modm::ResumableResult<bool>
+bool
 modm::BdHeap<DeviceSize, externalMemory>::erase(bd_address_t address, bd_size_t size)
 {
-	RF_BEGIN();
-
 	if((size == 0) || (size % BlockSizeErase != 0) || (address + size > DeviceSize)) {
-		RF_RETURN(false);
+		return false;
 	}
 
 	// erasing does nothing, memory is undefined after erase and has to be programed first
-	RF_END_RETURN(true);
+	return true;
 }
 
 
 // ----------------------------------------------------------------------------
 template <size_t DeviceSize, bool externalMemory>
-modm::ResumableResult<bool>
+bool
 modm::BdHeap<DeviceSize, externalMemory>::write(const uint8_t* buffer, bd_address_t address, bd_size_t size)
 {
-	RF_BEGIN();
-
 	if((size == 0) || (size % BlockSizeErase != 0) || (size % BlockSizeWrite != 0) || (address + size > DeviceSize)) {
-		RF_RETURN(false);
+		return false;
 	}
 
-	if(!RF_CALL(this->erase(address, size))) {
-		RF_RETURN(false);
+	if(!this->erase(address, size)) {
+		return false;
 	}
 
-	RF_END_RETURN_CALL(this->program(buffer, address, size));
+	return this->program(buffer, address, size);
 }

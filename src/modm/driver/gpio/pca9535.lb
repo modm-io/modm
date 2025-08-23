@@ -31,12 +31,12 @@ getters.
 using Pin = expander.Pin;
 using Pins = expander.Pins;
 
-RF_CALL_BLOCKING(expander.setOutput(Pins(0xff)); // set all lower 8 pins to output
-RF_CALL_BLOCKING(expander.set(Pin::P0_0));       // set only pin 00 high
-RF_CALL_BLOCKING(expander.reset(Pin::P0_1 | Pin::P0_2)); // reset 2 pins
-RF_CALL_BLOCKING(expander.toggle(Pin::P0_3 | Pin::P0_4 | Pin::P0_5));    // toggle 3 pins
+expander.setOutput(Pins(0xff); // set all lower 8 pins to output
+expander.set(Pin::P0_0);       // set only pin 00 high
+expander.reset(Pin::P0_1 | Pin::P0_2); // reset 2 pins
+expander.toggle(Pin::P0_3 | Pin::P0_4 | Pin::P0_5);    // toggle 3 pins
 
-RF_CALL_BLOCKING(expander.readInput());  // transfer input states from the external chip
+expander.readInput();  // transfer input states from the external chip
 bool high = expander.read(Pin::P1_0);    // check a single pin
 
 Pins input = expander.getInputs();   // get all 16 input states

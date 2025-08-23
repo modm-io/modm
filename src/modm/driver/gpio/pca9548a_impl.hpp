@@ -23,46 +23,40 @@ modm::Pca9548a<I2cMaster>::Pca9548a(uint8_t address)
 }
 
 template < typename I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Pca9548a<I2cMaster>::setActiveChannel(uint8_t channel)
 {
-	RF_BEGIN();
-
 	if (channel >= CHANNELS) {
-		RF_RETURN(false);
+		return false;
 	}
 
 	// Channel to mask
-	RF_END_RETURN_CALL( writeCommandRegister(1 << channel) );
+	return writeCommandRegister(1 << channel);
 }
 
 template < typename I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Pca9548a<I2cMaster>::readCommandRegister(uint8_t &command_register)
 {
-	RF_BEGIN();
-
 	this->transaction.configureRead(buffer, 1);
 	command_register = buffer[0];
 	current_command_register = command_register;
 
-	RF_END_RETURN_CALL( this->runTransaction() );
+	return this->runTransaction();
 }
 
 template < typename I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Pca9548a<I2cMaster>::writeCommandRegister(uint8_t command_register)
 {
-	RF_BEGIN();
-
 	if (current_command_register == command_register) {
 		// No change, return without bus operation
-		RF_RETURN(true);
+		return true;
 	}
 	current_command_register = command_register;
 
 	buffer[0] = command_register;
 	this->transaction.configureWrite(buffer, 1);
 
-	RF_END_RETURN_CALL( this->runTransaction() );
+	return this->runTransaction();
 }

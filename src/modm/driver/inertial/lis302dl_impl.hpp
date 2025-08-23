@@ -22,27 +22,25 @@ modm::Lis302dl<Transport>::Lis302dl(Data &data, uint8_t address)
 }
 
 template < class Transport >
-modm::ResumableResult<bool>
+bool
 modm::Lis302dl<Transport>::configure(Scale scale, MeasurementRate rate)
 {
 	return updateControlRegister(r(scale) | r(rate) | Control1_t(0x47));
 }
 
 template < class Transport >
-modm::ResumableResult<bool>
+bool
 modm::Lis302dl<Transport>::updateControlRegister(uint8_t index, Control_t setMask, Control_t clearMask)
 {
-	RF_BEGIN();
-
 	rawBuffer[index] = (rawBuffer[index] & ~clearMask.value) | setMask.value;
 	if (index == 0)
 		data.meta = bool(Control1_t(rawBuffer[0]) & Control1::FS);
 
-	RF_END_RETURN_CALL(this->write(i(Register::CtrlReg1) + index, rawBuffer[index]));
+	return this->write(i(Register::CtrlReg1) + index, rawBuffer[index]);
 }
 
 template < class Transport >
-modm::ResumableResult<bool>
+bool
 modm::Lis302dl<Transport>::setClickThreshold(Axis axis, uint8_t threshold)
 {
 	switch(axis)
@@ -60,34 +58,30 @@ modm::Lis302dl<Transport>::setClickThreshold(Axis axis, uint8_t threshold)
 }
 
 template < class Transport >
-modm::ResumableResult<bool>
+bool
 modm::Lis302dl<Transport>::readAcceleration()
 {
-	RF_BEGIN();
-
-	if (RF_CALL(this->read(i(Register::Status) | Transport::AddressIncrement, rawBuffer + 3, 7)))
+	if (this->read(i(Register::Status) | Transport::AddressIncrement, rawBuffer + 3, 7))
 	{
 		data.data[0] = rawBuffer[5];
 		data.data[1] = rawBuffer[7];
 		data.data[2] = rawBuffer[9];
-		RF_RETURN(true);
+		return true;
 	}
 
-	RF_END_RETURN(false);
+	return false;
 }
 
 // ----------------------------------------------------------------------------
 template < class Transport >
-modm::ResumableResult<bool>
+bool
 modm::Lis302dl<Transport>::updateRegister(uint8_t reg, uint8_t setMask, uint8_t clearMask)
 {
-	RF_BEGIN();
-
-	if (RF_CALL(this->read(reg, rawBuffer[4])))
+	if (this->read(reg, rawBuffer[4]))
 	{
 		rawBuffer[4] = (rawBuffer[4] & ~clearMask) | setMask;
-		RF_RETURN_CALL(this->write(reg, rawBuffer[4]));
+		return this->write(reg, rawBuffer[4]);
 	}
 
-	RF_END_RETURN(false);
+	return false;
 }

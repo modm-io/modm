@@ -17,13 +17,12 @@
 
 // ----------------------------------------------------------------------------
 template <class Filename, size_t DeviceSize>
-modm::ResumableResult<bool>
+bool
 modm::BdFile<Filename, DeviceSize>::initialize()
 {
-	RF_BEGIN();
 	file.open(Filename::name, std::fstream::binary | std::fstream::in | std::fstream::out | std::fstream::ate);
 	if(!file.is_open())
-		RF_RETURN(false);
+		return false;
 	if(file.tellg() != DeviceSize) {
 		if(file.tellg() == 0) {
 			// create empty file with size of DeviceSize
@@ -32,89 +31,80 @@ modm::BdFile<Filename, DeviceSize>::initialize()
 			}
 		}
 		else {
-			RF_RETURN(false);
+			return false;
 		}
 	}
-	RF_END_RETURN(true);
+	return true;
 }
 
 // ----------------------------------------------------------------------------
 template <class Filename, size_t DeviceSize>
-modm::ResumableResult<bool>
+bool
 modm::BdFile<Filename, DeviceSize>::deinitialize()
 {
-	RF_BEGIN();
 	file.close();
-	RF_END_RETURN(true);
+	return true;
 }
 
 
 // ----------------------------------------------------------------------------
 template <class Filename, size_t DeviceSize>
-modm::ResumableResult<bool>
+bool
 modm::BdFile<Filename, DeviceSize>::read(uint8_t* buffer, bd_address_t address, bd_size_t size)
 {
-	RF_BEGIN();
-
 	if((size == 0) || (size % BlockSizeRead != 0) || (address + size > DeviceSize)) {
-		RF_RETURN(false);
+		return false;
 	}
 
 	file.seekg(address);
 	file.read(reinterpret_cast<char*>(buffer), size);
 
-	RF_END_RETURN(true);
+	return true;
 }
 
 
 // ----------------------------------------------------------------------------
 template <class Filename, size_t DeviceSize>
-modm::ResumableResult<bool>
+bool
 modm::BdFile<Filename, DeviceSize>::program(const uint8_t* buffer, bd_address_t address, bd_size_t size)
 {
-	RF_BEGIN();
-
 	if((size == 0) || (size % BlockSizeWrite != 0) || (address + size > DeviceSize)) {
-		RF_RETURN(false);
+		return false;
 	}
 
 	file.seekp(address);
 	file.write(reinterpret_cast<char*>(const_cast<uint8_t*>(buffer)), size);
 
-	RF_END_RETURN(true);
+	return true;
 }
 
 
 // ----------------------------------------------------------------------------
 template <class Filename, size_t DeviceSize>
-modm::ResumableResult<bool>
+bool
 modm::BdFile<Filename, DeviceSize>::erase(bd_address_t address, bd_size_t size)
 {
-	RF_BEGIN();
-
 	if((size == 0) || (size % BlockSizeErase != 0) || (address + size > DeviceSize)) {
-		RF_RETURN(false);
+		return false;
 	}
 
 	// erasing does nothing, memory is undefined after erase and has to be programed first
-	RF_END_RETURN(true);
+	return true;
 }
 
 
 // ----------------------------------------------------------------------------
 template <class Filename, size_t DeviceSize>
-modm::ResumableResult<bool>
+bool
 modm::BdFile<Filename, DeviceSize>::write(const uint8_t* buffer, bd_address_t address, bd_size_t size)
 {
-	RF_BEGIN();
-
 	if((size == 0) || (size % BlockSizeErase != 0) || (size % BlockSizeWrite != 0) || (address + size > DeviceSize)) {
-		RF_RETURN(false);
+		return false;
 	}
 
-	if(!RF_CALL(this->erase(address, size))) {
-		RF_RETURN(false);
+	if(!this->erase(address, size)) {
+		return false;
 	}
 
-	RF_END_RETURN_CALL(this->program(buffer, address, size));
+	return this->program(buffer, address, size);
 }

@@ -35,21 +35,18 @@ Max31855<SpiMaster, Cs>::initialize()
 // -----------------------------------------------------------------------------
 
 template <typename SpiMaster, typename Cs>
-modm::ResumableResult<void>
+void
 Max31855<SpiMaster, Cs>::readout()
 {
-    RF_BEGIN();
-    RF_WAIT_UNTIL(this->acquireMaster());
+    modm::this_fiber::poll([&]{ return this->acquireMaster(); });
 
     Cs::reset();
-    RF_CALL(SpiMaster::transfer(nullptr, data.data, 4));
+    SpiMaster::transfer(nullptr, data.data, 4);
 
     if (this->releaseMaster())
     {
         Cs::set();
     }
-
-    RF_END();
 }
 
 } // namespace modm

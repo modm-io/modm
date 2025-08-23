@@ -25,116 +25,102 @@ modm::Tcs3472<I2cMaster>::Tcs3472(Data &data, uint8_t address)
 
 // ----------------------------------------------------------------------------
 template<typename I2cMaster>
-modm::ResumableResult<bool>
+bool
 modm::Tcs3472<I2cMaster>::setInterruptLowThreshold(uint16_t threshold)
 {
-	RF_BEGIN();
-
-	if (RF_CALL(writeRegister(RegisterAddress::LOW_THRESH_LOW_BYTE, threshold)))
+	if (writeRegister(RegisterAddress::LOW_THRESH_LOW_BYTE, threshold))
 	{
 		modm::delay(20us);
-		if (RF_CALL(writeRegister(RegisterAddress::LOW_THRESH_HIGH_BYTE, threshold >> 8)))
+		if (writeRegister(RegisterAddress::LOW_THRESH_HIGH_BYTE, threshold >> 8))
 		{
-			RF_RETURN(true);
+			return true;
 		}
 	}
 
-	RF_END_RETURN(false);
+	return false;
 }
 
 template<typename I2cMaster>
-modm::ResumableResult<bool>
+bool
 modm::Tcs3472<I2cMaster>::setInterruptHighThreshold(uint16_t threshold)
 {
-	RF_BEGIN();
-
-	if (RF_CALL(writeRegister(RegisterAddress::HIGH_THRESH_LOW_BYTE, threshold)))
+	if (writeRegister(RegisterAddress::HIGH_THRESH_LOW_BYTE, threshold))
 	{
-		if (RF_CALL(writeRegister(RegisterAddress::HIGH_THRESH_HIGH_BYTE, threshold >> 8)))
+		if (writeRegister(RegisterAddress::HIGH_THRESH_HIGH_BYTE, threshold >> 8))
 		{
-			RF_RETURN(true);
+			return true;
 		}
 	}
 
-	RF_END_RETURN(false);
+	return false;
 }
 
 template<typename I2cMaster>
-modm::ResumableResult<bool>
+bool
 modm::Tcs3472<I2cMaster>::setWaitTime(WaitTime wait_time, bool wait_long)
 {
-	RF_BEGIN();
-
-	if (RF_CALL(writeRegister(RegisterAddress::CONFIGURATION, wait_long ? 1 << 1 : 0)))
+	if (writeRegister(RegisterAddress::CONFIGURATION, wait_long ? 1 << 1 : 0))
 	{
-		if (RF_CALL(writeRegister(RegisterAddress::WAIT_TIME, uint8_t(wait_time))))
+		if (writeRegister(RegisterAddress::WAIT_TIME, uint8_t(wait_time)))
 		{
-			RF_RETURN(true);
+			return true;
 		}
 	}
 
-	RF_END_RETURN(false);
+	return false;
 }
 
 template<typename I2cMaster>
-modm::ResumableResult<bool>
+bool
 modm::Tcs3472<I2cMaster>::configure(Gain gain, IntegrationTime int_time)
 {
-	RF_BEGIN();
-
-	if (RF_CALL(setGain(gain)))
+	if (setGain(gain))
 	{
-		if (RF_CALL(setIntegrationTime(int_time)))
+		if (setIntegrationTime(int_time))
 		{
-			RF_RETURN(true);
+			return true;
 		}
 	}
 
-	RF_END_RETURN(false);
+	return false;
 }
 
 // ----------------------------------------------------------------------------
 // MARK: - Tasks
 template<typename I2cMaster>
-modm::ResumableResult<bool>
+bool
 modm::Tcs3472<I2cMaster>::reloadInterrupt()
 {
-	RF_BEGIN();
-
 	// Only send command, don't append data! otherwise the reload is not working!
 	buffer[0] = 0x80 | uint8_t(RegisterAddress::RELOAD_INTERRUPT);
 
 	this->transaction.configureWrite(buffer, 1);
 
-	RF_END_RETURN_CALL(this->runTransaction());
+	return this->runTransaction();
 }
 
 // ----------------------------------------------------------------------------
 template<typename I2cMaster>
-modm::ResumableResult<bool>
+bool
 modm::Tcs3472<I2cMaster>::writeRegister(RegisterAddress address, uint8_t value)
 {
-	RF_BEGIN();
-
 	buffer[0] = 0x80 | uint8_t(address);
 	buffer[1] = value;
 
 	this->transaction.configureWrite(buffer, 2);
 
-	RF_END_RETURN_CALL(this->runTransaction());
+	return this->runTransaction();
 }
 
 template<typename I2cMaster>
-modm::ResumableResult<bool>
+bool
 modm::Tcs3472<I2cMaster>::readRegisters(RegisterAddress address, uint8_t *const values,
 										uint8_t count)
 {
-	RF_BEGIN();
-
 	buffer[0] = 0x80 | 0x20 |		// read command auto increment
 				uint8_t(address);	// at this address
 
 	this->transaction.configureWriteRead(buffer, 1, values, count);
 
-	RF_END_RETURN_CALL(this->runTransaction());
+	return this->runTransaction();
 }

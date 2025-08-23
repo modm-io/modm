@@ -208,7 +208,7 @@ public:
 	static void
 	setOutput()
 	{
-		RF_CALL_BLOCKING(expander.setOutput(pin));
+		expander.setOutput(pin);
 	}
 
 	static void inline
@@ -220,25 +220,25 @@ public:
 	static void
 	set()
 	{
-		RF_CALL_BLOCKING(expander.set(pin));
+		expander.set(pin);
 	}
 
 	static void
 	set(bool value)
 	{
-		RF_CALL_BLOCKING(expander.set(pin, value));
+		expander.set(pin, value);
 	}
 
 	static void
 	reset()
 	{
-		RF_CALL_BLOCKING(expander.reset(pin));
+		expander.reset(pin);
 	}
 
 	static void
 	toggle()
 	{
-		RF_CALL_BLOCKING(expander.toggle(pin));
+		expander.toggle(pin);
 	}
 
 	static bool inline
@@ -250,13 +250,13 @@ public:
 	static void
 	setInput()
 	{
-		RF_CALL_BLOCKING(expander.setInput(pin));
+		expander.setInput(pin);
 	}
 
 	static bool
 	read()
 	{
-		RF_CALL_BLOCKING(expander.readInput());
+		expander.readInput();
 
 		return expander.read(pin);
 	}
@@ -370,19 +370,19 @@ public:
 	static void
 	setOutput()
 	{
-		RF_CALL_BLOCKING(expander.setOutput(Pins(portMask)));
+		expander.setOutput(Pins(portMask));
 	}
 
 	static void
 	setInput()
 	{
-		RF_CALL_BLOCKING(expander.setInput(Pins(portMask)));
+		expander.setInput(Pins(portMask));
 	}
 
 	static PortType
 	read()
 	{
-		RF_CALL_BLOCKING(expander.readInput());
+		expander.readInput();
 
 		return (expander.getInputs().value & portMask) >> StartIndex;
 	}
@@ -392,13 +392,13 @@ public:
 	{
 		data = (data & dataMask) << StartIndex;
 		data = (expander.getOutputs().value & ~portMask) | data;
-		RF_CALL_BLOCKING( expander.writePort(data) );
+		expander.writePort(data);
 	}
 
 	static void
 	toggle()
 	{
-		RF_CALL_BLOCKING( expander.toggle(Pins(portMask)) );
+		expander.toggle(Pins(portMask));
 	}
 };
 
@@ -439,19 +439,19 @@ public:
 	static void
 	setOutput()
 	{
-		RF_CALL_BLOCKING(expander.setOutput(Pins(portMask)));
+		expander.setOutput(Pins(portMask));
 	}
 
 	static void
 	setInput()
 	{
-		RF_CALL_BLOCKING(expander.setInput(Pins(portMask)));
+		expander.setInput(Pins(portMask));
 	}
 
 	static PortType
 	read()
 	{
-		RF_CALL_BLOCKING(expander.readInput());
+		expander.readInput();
 
 		return (modm::bitReverse(PortType(expander.getInputs().value & portMask))) >> StartIndexReversed;
 	}
@@ -461,13 +461,13 @@ public:
 	{
 		data = modm::bitReverse(PortType(data << StartIndexReversed));
 		data = (expander.getOutputs().value & ~portMask) | (data & portMask);
-		RF_CALL_BLOCKING( expander.writePort(data) );
+		expander.writePort(data);
 	}
 
 	static void
 	toggle()
 	{
-		RF_CALL_BLOCKING( expander.toggle(Pins(portMask)) );
+		expander.toggle(Pins(portMask));
 	}
 };
 /// @endcond

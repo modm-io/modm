@@ -26,53 +26,49 @@ modm::Lsm6ds33<I2cMaster>::Lsm6ds33( uint8_t address)
 }
 
 template < class I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Lsm6ds33<I2cMaster>::configureAccelerationSensor(AccDataRate accRate, AccScale accScale)
 {
-	RF_BEGIN();
 	AccDataRate_t::set(control1Shadow,accRate);
 	AccScale_t::set(control1Shadow,accScale);
-	RF_END_RETURN_CALL(this->write(static_cast<uint8_t>(Register::CTRL1),control1Shadow.value));
+	return this->write(static_cast<uint8_t>(Register::CTRL1),control1Shadow.value);
 }
 
 template < class I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Lsm6ds33<I2cMaster>::configureGyroscope(GyroDataRate gyroRate, GyroScale gyroScale)
 {
-	RF_BEGIN();
 	GyroDataRate_t::set(control2Shadow,gyroRate);
 	GyroScale_t::set(control2Shadow,gyroScale);
-	RF_END_RETURN_CALL( this->write(static_cast<uint8_t>(Register::CTRL2),control2Shadow.value));
+	return this->write(static_cast<uint8_t>(Register::CTRL2),control2Shadow.value);
 }
 
 template < class I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Lsm6ds33<I2cMaster>::readAccelerationRaw(Vector3i& acceleration)
 {
-	RF_BEGIN();
-	success = RF_CALL(this->read(static_cast<uint8_t>(Register::OUT_X_L_XL),reinterpret_cast<uint8_t*>(readBuffer),6));
+	success = this->read(static_cast<uint8_t>(Register::OUT_X_L_XL),reinterpret_cast<uint8_t*>(readBuffer),6);
 	if(success)
 	{
 		acceleration.x = readBuffer[0];
 		acceleration.y = readBuffer[1];
 		acceleration.z = readBuffer[2];
 	}
-	RF_END_RETURN(success);
+	return success;
 }
 
 template < class I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Lsm6ds33<I2cMaster>::readGyroscopeRaw(Vector3i& spinRates)
 {
-	RF_BEGIN();
-	success = RF_CALL(this->read(static_cast<uint8_t>(Register::OUT_X_L_G),reinterpret_cast<uint8_t*>(readBuffer),6));
+	success = this->read(static_cast<uint8_t>(Register::OUT_X_L_G),reinterpret_cast<uint8_t*>(readBuffer),6);
 	if(success)
 	{
 		spinRates.x = readBuffer[0];
 		spinRates.y = readBuffer[1];
 		spinRates.z = readBuffer[2];
 	}
-	RF_END_RETURN(success);
+	return success;
 }
 
 template < class I2cMaster >
@@ -90,11 +86,10 @@ modm::Lsm6ds33<I2cMaster>::getGyroscopeScale()
 }
 
 template < class I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Lsm6ds33<I2cMaster>::readAcceleration(Vector3f& acceleration)
 {
-	RF_BEGIN();
-	success = RF_CALL(this->read(static_cast<uint8_t>(Register::OUT_X_L_XL),reinterpret_cast<uint8_t*>(readBuffer),6));
+	success = this->read(static_cast<uint8_t>(Register::OUT_X_L_XL),reinterpret_cast<uint8_t*>(readBuffer),6);
 
 	if(success)
 	{
@@ -107,15 +102,14 @@ modm::Lsm6ds33<I2cMaster>::readAcceleration(Vector3f& acceleration)
 		acceleration.z = static_cast<float>(readBuffer[2]) * conversionValue;
 	}
 
-	RF_END_RETURN(success);
+	return success;
 }
 
 template < class I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Lsm6ds33<I2cMaster>::readGyroscope(Vector3f& acceleration)
 {
-	RF_BEGIN();
-	success = RF_CALL(this->read(static_cast<uint8_t>(Register::OUT_X_L_G),reinterpret_cast<uint8_t*>(readBuffer),6));
+	success = this->read(static_cast<uint8_t>(Register::OUT_X_L_G),reinterpret_cast<uint8_t*>(readBuffer),6);
 
 	if(success)
 	{
@@ -138,5 +132,5 @@ modm::Lsm6ds33<I2cMaster>::readGyroscope(Vector3f& acceleration)
 		acceleration.z = static_cast<float>(readBuffer[2]) * conversionValue;
 	}
 
-	RF_END_RETURN(success);
+	return success;
 }

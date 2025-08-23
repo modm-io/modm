@@ -316,32 +316,32 @@ public:
 	bool inline
 	configureBlocking(Scale scale, MeasurementRate rate = MeasurementRate::Hz100)
 	{
-		return RF_CALL_BLOCKING(configure(scale, rate));
+		return configure(scale, rate);
 	}
 
-	modm::ResumableResult<bool>
+	bool
 	configure(Scale scale, MeasurementRate rate = MeasurementRate::Hz100);
 
 	// MARK: Control Registers
-	modm::ResumableResult<bool> inline
+	bool inline
 	updateControlRegister(Control1_t setMask, Control1_t clearMask = Control1_t(0xff))
 	{
 		return updateControlRegister(0, setMask, clearMask);
 	}
 
-	modm::ResumableResult<bool> inline
+	bool inline
 	updateControlRegister(Control2_t setMask, Control2_t clearMask = Control2_t(0xff))
 	{
 		return updateControlRegister(1, setMask, clearMask);
 	}
 
-	modm::ResumableResult<bool> inline
+	bool inline
 	updateControlRegister(Control3_t setMask, Control3_t clearMask = Control3_t(0xff))
 	{
 		return updateControlRegister(2, setMask, clearMask);
 	}
 
-	modm::ResumableResult<bool> inline
+	bool inline
 	writeInterruptSource(Interrupt interrupt, InterruptSource source)
 	{
 		if (interrupt == Interrupt::One)
@@ -351,65 +351,65 @@ public:
 	}
 
 	// MARK: Free Fall Registers
-	modm::ResumableResult<bool> inline
+	bool inline
 	updateFreeFallConfiguration(Interrupt interrupt, FreeFallConfig_t setMask, FreeFallConfig_t clearMask = FreeFallConfig_t(0xff))
 	{
 		return updateRegister(i(Register::FfWuCfg1) | i(interrupt), setMask.value, clearMask.value);
 	}
 
-	modm::ResumableResult<bool> inline
+	bool inline
 	readFreeFallSource(Interrupt interrupt, FreeFallSource_t &source)
 	{
 		return this->read(i(Register::FfWuSrc1) | i(interrupt), source.value);
 	}
 
-	modm::ResumableResult<bool> inline
+	bool inline
 	setFreeFallThreshold(Interrupt interrupt, uint8_t threshold)
 	{
 		return this->write(i(Register::FfWuThs1) | i(interrupt), threshold);
 	}
 
-	modm::ResumableResult<bool> inline
+	bool inline
 	setFreeFallDuration(Interrupt interrupt, uint8_t duration)
 	{
 		return this->write(i(Register::FfWuDuration1) | i(interrupt), duration);
 	}
 
 	// MARK: Clock Registers
-	modm::ResumableResult<bool> inline
+	bool inline
 	updateClickConfiguration(ClickConfig_t setMask, ClickConfig_t clearMask)
 	{
 		return updateRegister(i(Register::ClickCfg), setMask, clearMask);
 	}
 
-	modm::ResumableResult<bool> inline
+	bool inline
 	readClickSource(ClickSource_t &source)
 	{
 		return this->read(i(Register::ClickSrc), source);
 	}
 
-	modm::ResumableResult<bool> inline
+	bool inline
 	setClickThreshold(Axis axis, uint8_t threshold);
 
-	modm::ResumableResult<bool> inline
+	bool inline
 	setClickTimeLimit(uint8_t limit)
 	{
 		return this->write(i(Register::ClickTimeLimit), limit);
 	}
 
-	modm::ResumableResult<bool> inline
+	bool inline
 	setClickLatency(uint8_t latency)
 	{
 		return this->write(i(Register::ClickLatency), latency);
 	}
 
-	modm::ResumableResult<bool> inline
+	bool inline
 	setClickWindow(uint8_t window)
 	{
 		return this->write(i(Register::ClickWindow), window);
 	}
 
-	modm::ResumableResult<bool>
+	bool
 	readAcceleration();
 
 	Status_t
@@ -435,10 +435,10 @@ public:
 	{ return data; }
 
 private:
-	modm::ResumableResult<bool>
+	bool
 	updateControlRegister(uint8_t index, Control_t setMask, Control_t clearMask = Control_t(0xff));
 
-	modm::ResumableResult<bool>
+	bool
 	updateRegister(uint8_t reg, uint8_t setMask, uint8_t clearMask = 0xff);
 
 	Data &data;

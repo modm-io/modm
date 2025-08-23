@@ -34,14 +34,12 @@ template <typename SpiMaster, typename Cs>
 ResumableResult<void>
 Ad7928<SpiMaster, Cs>::initialize()
 {
-	RF_BEGIN();
-
 	Cs::setOutput(modm::Gpio::High);
 	modm::delay_us(1);
 
 	// reset device
-	RF_CALL(transfer(Register_t(0xFF)));
-	RF_CALL(transfer(Register_t(0xFF)));
+	transfer(Register_t(0xFF));
+	transfer(Register_t(0xFF));
 
 	config |= ControlRegister::WriteControlReg;
 	config |= ControlRegister::UnsignedOutput;
@@ -51,10 +49,8 @@ Ad7928<SpiMaster, Cs>::initialize()
 	InputChannel_t::reset(config);
 
 	// write configuration
-	RF_CALL(transfer(config));
+	transfer(config);
 	currentPowerMode = PowerMode::Normal;
-
-	RF_END();
 }
 
 // ----------------------------------------------------------------------------
@@ -62,26 +58,24 @@ template <typename SpiMaster, typename Cs>
 ResumableResult<ad7928::Data>
 Ad7928<SpiMaster, Cs>::singleConversion(ad7928::InputChannel channel)
 {
-	RF_BEGIN();
-
 	SequenceMode_t::set(config, SequenceMode::NoSequence);
 
 	if(currentPowerMode == PowerMode::FullShutdown) {
 		// power up device, will be in normal mode afterwards
-		RF_CALL(wakeup());
+		wakeup();
 	} else if(currentPowerMode == PowerMode::AutoShutdown) {
 		// dummy conversion to power up device
 		// does not alter control register (write bit = 0)
-		RF_CALL(transfer(ControlRegister(0)));
+		transfer(ControlRegister(0));
 	}
 
 	InputChannel_t::set(config, channel);
-	RF_CALL(transfer(config));
+	transfer(config);
 	InputChannel_t::reset(config);
 
 	currentPowerMode = PowerMode_t::get(config);
 
-	RF_END_RETURN(data);
+	return data;
 }
 
 // ----------------------------------------------------------------------------
@@ -90,28 +84,24 @@ ResumableResult<void>
 Ad7928<SpiMaster, Cs>::startSequence(ad7928::SequenceChannels_t channels1,
 									 ad7928::SequenceChannels_t channels2)
 {
-	RF_BEGIN();
-
 	if(currentPowerMode == PowerMode::FullShutdown) {
 		// power up device, will be in normal mode afterwards
-		RF_CALL(wakeup());
+		wakeup();
 	} else if(currentPowerMode == PowerMode::AutoShutdown) {
 		// dummy conversion to power up device
 		// does not alter control register (write bit = 0)
-		RF_CALL(transfer(ControlRegister_t(0)));
+		transfer(ControlRegister_t(0));
 	}
 
 	PowerMode_t::set(config, PowerMode::Normal);
 	SequenceMode_t::set(config, SequenceMode::ProgramShadowRegister);
-	RF_CALL(transfer(config));
+	transfer(config);
 	currentPowerMode = PowerMode::Normal;
 
 	// The next transfer writes to the shadow register
 	Sequence1Channels_t::set(sequenceChannels, static_cast<SequenceChannels>(channels1.value));
 	Sequence2Channels_t::set(sequenceChannels, static_cast<SequenceChannels>(channels2.value));
-	RF_CALL(transfer(sequenceChannels));
-
-	RF_END();
+	transfer(sequenceChannels);
 }
 
 // ----------------------------------------------------------------------------
@@ -119,19 +109,17 @@ template <typename SpiMaster, typename Cs>
 ResumableResult<ad7928::Data>
 Ad7928<SpiMaster, Cs>::nextSequenceConversion()
 {
-	RF_BEGIN();
-
 	SequenceMode_t::set(config, SequenceMode::ContinueSequence);
 
 	// invalid if device is not in normal mode
 	if(currentPowerMode != PowerMode::Normal) {
-		RF_RETURN(data);
+		return data;
 	}
 
-	RF_CALL(transfer(config));
+	transfer(config);
 	currentPowerMode = PowerMode_t::get(config);
 
-	RF_END_RETURN(data);
+	return data;
 }
 
 // ----------------------------------------------------------------------------
@@ -194,18 +182,15 @@ template <typename SpiMaster, typename Cs>
 ResumableResult<void>
 Ad7928<SpiMaster, Cs>::wakeup()
 {
-	RF_BEGIN();
 	SequenceMode_t::set(config, SequenceMode::NoSequence);
 	PowerMode_t::set(config, PowerMode::Normal);
 
-	RF_CALL(transfer(config));
+	transfer(config);
 
 	// Wait for the device to power up
 	modm::delay_us(1);
 
 	currentPowerMode = PowerMode::Normal;
-
-	RF_END();
 }
 
 // ----------------------------------------------------------------------------
@@ -213,9 +198,7 @@ template <typename SpiMaster, typename Cs>
 ResumableResult<void>
 Ad7928<SpiMaster, Cs>::transfer(Register_t reg)
 {
-	RF_BEGIN();
-
-	RF_WAIT_UNTIL(this->acquireMaster());
+	modm::this_fiber::poll([&]{ return this->acquireMaster(); });
 
 	SpiMaster::setDataMode(SpiMaster::DataMode::Mode1);
 
@@ -224,12 +207,10 @@ Ad7928<SpiMaster, Cs>::transfer(Register_t reg)
 	outBuffer[0] = (reg.value & 0xFF00) >> 8;
 	outBuffer[1] = reg.value & 0xFF;
 
-	RF_CALL(SpiMaster::transfer(outBuffer, data.data, 2));
+	SpiMaster::transfer(outBuffer, data.data, 2);
 
 	if (this->releaseMaster())
 		Cs::set();
-
-	RF_END();
 }
 
 } // namespace modm

@@ -39,36 +39,30 @@ template <typename SpiMaster, typename Cs>
 ResumableResult<void>
 Sx1276<SpiMaster, Cs>::initialize()
 {
-	RF_BEGIN();
-
 	// set the mode to sleep
-	RF_CALL(changeMode(ModemMode::SLEEP));
+	changeMode(ModemMode::SLEEP);
 
 	// change to the Lora mode
 	opModeShadow.set(OpModeRegister::LoraMode);
 	opModeShadow.reset(OpModeRegister::AccessSharedReg);
 	opModeShadow.set(OpModeRegister::LowFrequencyMode);
 
-	RF_CALL(writeRegister(Sx1276Register::OpMode,opModeShadow.value));
+	writeRegister(Sx1276Register::OpMode,opModeShadow.value);
 
 	//mask out all interrupts
 	irqMaskShadow.value = 0xFF;
-	RF_CALL(writeRegister(Sx1276Register::IrqFlagsMask,irqMaskShadow.value));
+	writeRegister(Sx1276Register::IrqFlagsMask,irqMaskShadow.value);
 
 	// set the mode back to standby
-	RF_CALL(changeMode(ModemMode::STDBY));
-
-	RF_END();
+	changeMode(ModemMode::STDBY);
 }
 
 // -----------------------------------------------------------------------------
 
 template <typename SpiMaster, typename Cs>
-modm::ResumableResult<void>
+void
 Sx1276<SpiMaster, Cs>::setCarrierFrequency(frequency_t freq)
 {
-	RF_BEGIN();
-
 	frfShadow = static_cast<uint32_t>(freq * (static_cast<float>(1<<19) / static_cast<float>(osc_freq)));
 
 	// do a burst write to the three frequency registers instead of seperate register write calls
@@ -77,22 +71,19 @@ Sx1276<SpiMaster, Cs>::setCarrierFrequency(frequency_t freq)
 	buffer[2] = static_cast<uint8_t>((frfShadow >> 8) & 0xFF);
 	buffer[3] = static_cast<uint8_t>(frfShadow & 0xFF);
 
-	RF_CALL(transferBuffer(4));
-
-	RF_END();
+	transferBuffer(4);
 }
 
 // -----------------------------------------------------------------------------
 
 template <typename SpiMaster, typename Cs>
-modm::ResumableResult<void>
+void
 Sx1276<SpiMaster, Cs>::setModemParams(  Bandwidth bw,
 										SpreadingFactor sf,
 										CodingRate cr,
 										bool implicitHeader,
 										bool payloadCrc)
 {
-	RF_BEGIN();
 	//configure the modem config shadow registers
 	Bandwidth_t::set(modemConf1Shadow,bw);
 	CodingRate_t::set(modemConf1Shadow,cr);
@@ -119,148 +110,134 @@ Sx1276<SpiMaster, Cs>::setModemParams(  Bandwidth bw,
 	}
 
 	// Write out the config registers
-	RF_CALL(writeRegister(Sx1276Register::ModemConfig1,modemConf1Shadow.value));
-	RF_CALL(writeRegister(Sx1276Register::ModemConfig2,modemConf2Shadow.value));
-	RF_CALL(writeRegister(Sx1276Register::ModemConfig3,modemConf3Shadow.value));
+	writeRegister(Sx1276Register::ModemConfig1,modemConf1Shadow.value);
+	writeRegister(Sx1276Register::ModemConfig2,modemConf2Shadow.value);
+	writeRegister(Sx1276Register::ModemConfig3,modemConf3Shadow.value);
 
 	//Configure the optimizations
 	if(sf == SpreadingFactor::SF_6)
 	{
-		RF_CALL(writeRegister(Sx1276Register::DetectOptimize,0x05));
-		RF_CALL(writeRegister(Sx1276Register::DetectionThreshold,0x0C));
+		writeRegister(Sx1276Register::DetectOptimize,0x05);
+		writeRegister(Sx1276Register::DetectionThreshold,0x0C);
 	}
 	else
 	{
-		RF_CALL(writeRegister(Sx1276Register::DetectOptimize,0x03));
-		RF_CALL(writeRegister(Sx1276Register::DetectionThreshold,0x0A));
+		writeRegister(Sx1276Register::DetectOptimize,0x03);
+		writeRegister(Sx1276Register::DetectionThreshold,0x0A);
 	}
-
-	RF_END();
 }
 
 // -----------------------------------------------------------------------------
 
 template<typename SpiMaster, typename Cs>
-modm::ResumableResult<void>
+void
 Sx1276<SpiMaster, Cs>::setSyncWord(uint8_t syncWord)
 {
-	RF_BEGIN();
-	RF_CALL(writeRegister(Sx1276Register::SyncWord,syncWord));
-	RF_END();
+	writeRegister(Sx1276Register::SyncWord,syncWord);
 }
 
 // -----------------------------------------------------------------------------
 
 template <typename SpiMaster, typename Cs>
-modm::ResumableResult<bool>
+bool
 Sx1276<SpiMaster, Cs>::transmit(uint8_t* data, uint8_t length)
 {
-	RF_BEGIN();
-
 	lastTransmitResult = false;
 
 	//read the mode register and check if we're in the RX Mode
-	opModeShadow.value = RF_CALL(readRegister(Sx1276Register::OpMode));
+	opModeShadow.value = readRegister(Sx1276Register::OpMode);
 	if(ModemMode_t::get(opModeShadow) == ModemMode::STDBY)
 	{
-		RF_CALL(writeRegister(Sx1276Register::PayloadLength,length));
-		RF_CALL(writeRegister(Sx1276Register::FifoTxBaseAddr,0x00));
-		RF_CALL(writeRegister(Sx1276Register::FifoAddrPtr,0x00));
+		writeRegister(Sx1276Register::PayloadLength,length);
+		writeRegister(Sx1276Register::FifoTxBaseAddr,0x00);
+		writeRegister(Sx1276Register::FifoAddrPtr,0x00);
 
-		RF_WAIT_UNTIL(this->acquireMaster());
+		modm::this_fiber::poll([&]{ return this->acquireMaster(); });
 
 		buffer[0] = 0x80 | static_cast<uint8_t>(Sx1276Register::Fifo);
 
 		Cs::reset();
 
-		RF_CALL(SpiMaster::transfer(buffer,nullptr,1));
-		RF_CALL(SpiMaster::transfer(data,nullptr,length));
+		SpiMaster::transfer(buffer,nullptr,1);
+		SpiMaster::transfer(data,nullptr,length);
 
 		if(this->releaseMaster())
 		{
 			Cs::set();
 		}
 
-		RF_CALL(changeMode(ModemMode::TX));
+		changeMode(ModemMode::TX);
 	}
 	else
 	{
 		MODM_LOG_ERROR<<"SX1276: Transmission failed as the modem is busy"<<modm::endl;
 	}
 
-	RF_END_RETURN(lastTransmitResult);
+	return lastTransmitResult;
 }
 
 // -----------------------------------------------------------------------------
 
 template <typename SpiMaster, typename Cs>
-modm::ResumableResult<void>
+void
 Sx1276<SpiMaster, Cs>::enableListening()
 {
-	RF_BEGIN();
 	//enable the rx interrupts
 	irqMaskShadow.reset(Interrupts::RX_DONE);
 
-	RF_CALL(writeRegister(Sx1276Register::FifoAddrPtr,0x00));
-	RF_CALL(writeRegister(Sx1276Register::FifoRxBaseAddr,0x00));
+	writeRegister(Sx1276Register::FifoAddrPtr,0x00);
+	writeRegister(Sx1276Register::FifoRxBaseAddr,0x00);
 
-	RF_CALL(writeRegister(Sx1276Register::IrqFlagsMask,irqMaskShadow.value));
-	RF_CALL(writeRegister(Sx1276Register::IrqFlags, 0xFF));
+	writeRegister(Sx1276Register::IrqFlagsMask,irqMaskShadow.value);
+	writeRegister(Sx1276Register::IrqFlags, 0xFF);
 
-	RF_CALL(changeMode(ModemMode::RXCONTINOUS));
-	RF_END();
+	changeMode(ModemMode::RXCONTINOUS);
 }
 
 // -----------------------------------------------------------------------------
 
 template <typename SpiMaster, typename Cs>
-modm::ResumableResult<void>
+void
 Sx1276<SpiMaster, Cs>::disableListening()
 {
-	RF_BEGIN();
-
 	irqMaskShadow.set(Interrupts::RX_DONE);
-	RF_CALL(writeRegister(Sx1276Register::IrqFlagsMask,irqMaskShadow.value));
+	writeRegister(Sx1276Register::IrqFlagsMask,irqMaskShadow.value);
 
-	RF_CALL(changeMode(ModemMode::SLEEP));
-
-	RF_END();
+	changeMode(ModemMode::SLEEP);
 }
 
 // -----------------------------------------------------------------------------
 
 template <typename SpiMaster, typename Cs>
-modm::ResumableResult<uint8_t>
+uint8_t
 Sx1276<SpiMaster, Cs>::readPacket(uint8_t* data, uint8_t maxLength)
 {
-	RF_BEGIN();
-
 	lastPacketSize = 0;
 
 	//read the mode register and check if we're in the RX Mode
-	opModeShadow.value = RF_CALL(readRegister(Sx1276Register::OpMode));
+	opModeShadow.value = readRegister(Sx1276Register::OpMode);
 	if(ModemMode_t::get(opModeShadow) == ModemMode::RXCONTINOUS)
 	{
-		irqFlags.value = RF_CALL(readRegister(Sx1276Register::IrqFlags));
+		irqFlags.value = readRegister(Sx1276Register::IrqFlags);
 		if(irqFlags & Interrupts::RX_DONE)
 		{
-			lastPacketSize = RF_CALL(readRegister(Sx1276Register::RxNbBytes));
-			RF_WAIT_UNTIL(this->acquireMaster());
+			lastPacketSize = readRegister(Sx1276Register::RxNbBytes);
+			modm::this_fiber::poll([&]{ return this->acquireMaster(); });
 
 			buffer[0] = static_cast<uint8_t>(Sx1276Register::Fifo);
 
 			Cs::reset();
 
-			RF_CALL(SpiMaster::transfer(buffer,nullptr,1));
+			SpiMaster::transfer(buffer,nullptr,1);
 			if(lastPacketSize > maxLength)
 			{
 				MODM_LOG_ERROR<<"SX1276: Read buffer is too small, packet discarded!"<<modm::endl;
 				//read it out anyway to clean the fifo
-				RF_CALL(SpiMaster::transfer(nullptr,nullptr,lastPacketSize));
+				SpiMaster::transfer(nullptr,nullptr,lastPacketSize);
 			}
 			else
 			{
-				RF_CALL(SpiMaster::transfer(nullptr,data,lastPacketSize));
+				SpiMaster::transfer(nullptr,data,lastPacketSize);
 			}
 
 			if(this->releaseMaster())
@@ -268,7 +245,7 @@ Sx1276<SpiMaster, Cs>::readPacket(uint8_t* data, uint8_t maxLength)
 				Cs::set();
 			}
 
-			RF_CALL(writeRegister(Sx1276Register::IrqFlags, static_cast<uint8_t>(Interrupts::RX_DONE)));
+			writeRegister(Sx1276Register::IrqFlags, static_cast<uint8_t>(Interrupts::RX_DONE));
 
 		}
 	}
@@ -277,108 +254,91 @@ Sx1276<SpiMaster, Cs>::readPacket(uint8_t* data, uint8_t maxLength)
 		MODM_LOG_ERROR<<"SX1276: ReadPacket can only called when enabling listening first!"<<modm::endl;
 	}
 
-	RF_END_RETURN(lastPacketSize);
+	return lastPacketSize;
 }
 
 // -----------------------------------------------------------------------------
 
 template <typename SpiMaster, typename Cs>
-modm::ResumableResult<int8_t>
+int8_t
 Sx1276<SpiMaster, Cs>::getPacketSnr()
 {
-	RF_BEGIN();
-	RF_CALL(readRegister(Sx1276Register::PktSnrValue));
-	RF_END_RETURN(static_cast<int8_t>(buffer[1]));
+	readRegister(Sx1276Register::PktSnrValue);
+	return static_cast<int8_t>(buffer[1]);
 }
 
 // -----------------------------------------------------------------------------
 
 template <typename SpiMaster, typename Cs>
-modm::ResumableResult<int16_t>
+int16_t
 Sx1276<SpiMaster, Cs>::getPacketRssi()
 {
-	RF_BEGIN();
-	tempRssi = static_cast<int16_t>(RF_CALL(readRegister(Sx1276Register::PktRssiValue)));
+	tempRssi = static_cast<int16_t>(readRegister(Sx1276Register::PktRssiValue));
 	tempRssi += rssiOffsetLF;
-	RF_END_RETURN(tempRssi);
+	return tempRssi;
 }
 // -----------------------------------------------------------------------------
 
 template <typename SpiMaster, typename Cs>
-modm::ResumableResult<int16_t>
+int16_t
 Sx1276<SpiMaster, Cs>::getCurrentRssi()
 {
-	RF_BEGIN();
-	tempRssi = static_cast<int16_t>(RF_CALL(readRegister(Sx1276Register::RssiValue)));
+	tempRssi = static_cast<int16_t>(readRegister(Sx1276Register::RssiValue));
 	tempRssi += rssiOffsetLF;
-	RF_END_RETURN(tempRssi);
+	return tempRssi;
 }
 
 // -----------------------------------------------------------------------------
 
 template <typename SpiMaster, typename Cs>
-modm::ResumableResult<void>
+void
 Sx1276<SpiMaster, Cs>::transferBuffer(uint8_t length)
 {
-	RF_BEGIN();
-
-	RF_WAIT_UNTIL(this->acquireMaster());
+	modm::this_fiber::poll([&]{ return this->acquireMaster(); });
 	Cs::reset();
 
-	RF_CALL(SpiMaster::transfer(buffer,buffer,length));
+	SpiMaster::transfer(buffer,buffer,length);
 
 	if(this->releaseMaster())
 	{
 		Cs::set();
 	}
-
-	RF_END();
 }
 
 // -----------------------------------------------------------------------------
 
 template <typename SpiMaster, typename Cs>
-modm::ResumableResult<void>
+void
 Sx1276<SpiMaster, Cs>::writeRegister(Sx1276Register reg, uint8_t value)
 {
-	RF_BEGIN();
-
 	buffer[0] = 0x80 | static_cast<uint8_t>(reg);
 	buffer[1] = value;
 
-	RF_CALL(transferBuffer(2));
-
-	RF_END();
+	transferBuffer(2);
 }
 
 // -----------------------------------------------------------------------------
 
 template <typename SpiMaster, typename Cs>
-modm::ResumableResult<uint8_t>
+uint8_t
 Sx1276<SpiMaster, Cs>::readRegister(Sx1276Register reg)
 {
-	RF_BEGIN();
-
 	buffer[0] = static_cast<uint8_t>(reg);
 	buffer[1] = 0x00;
 
-	RF_CALL(transferBuffer(2));
+	transferBuffer(2);
 
-	RF_END_RETURN(buffer[1]);
+	return buffer[1];
 }
 
 // -----------------------------------------------------------------------------
 
 template <typename SpiMaster, typename Cs>
-modm::ResumableResult<void>
+void
 Sx1276<SpiMaster, Cs>::changeMode(ModemMode mode)
 {
-	RF_BEGIN();
-
 	ModemMode_t::set(opModeShadow,mode);
-	RF_CALL(writeRegister(Sx1276Register::OpMode,opModeShadow.value));
-
-	RF_END();
+	writeRegister(Sx1276Register::OpMode,opModeShadow.value);
 }
 
 }

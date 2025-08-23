@@ -36,14 +36,14 @@ I2cPlatformTest::testPing()
 	// ping at wrong address
 	for (uint8_t address = 0x50; address <= 0x56; ++address) {
 		eeprom.setAddress(address);
-		const bool response = RF_CALL_BLOCKING(eeprom.ping());
+		const bool response = eeprom.ping();
 		TEST_ASSERT_FALSE(response);
 	}
 	// set correct address 0x57
 	eeprom.setAddress(0x57);
 	// ping at correct address
 	for (int i = 0; i < 20; ++i) {
-		const bool response = RF_CALL_BLOCKING(eeprom.ping());
+		const bool response = eeprom.ping();
 		TEST_ASSERT_TRUE(response);
 	}
 }
@@ -57,12 +57,12 @@ I2cPlatformTest::testDataRead()
 
 	// read at wrong address
 	eeprom.setAddress(0x55);
-	bool readSuccess = RF_CALL_BLOCKING(eeprom.readMac(buffer));
+	bool readSuccess = eeprom.readMac(buffer);
 	TEST_ASSERT_FALSE(readSuccess);
 
 	// read at correct address
 	eeprom.setAddress(0x57);
-	readSuccess = RF_CALL_BLOCKING(eeprom.readMac(buffer));
+	readSuccess = eeprom.readMac(buffer);
 	TEST_ASSERT_TRUE(readSuccess);
 
 	TEST_ASSERT_EQUALS(buffer[0], 0xfc);

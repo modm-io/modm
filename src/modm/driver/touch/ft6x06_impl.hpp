@@ -22,61 +22,53 @@ modm::Ft6x06<I2cMaster>::Ft6x06(Data &data, uint8_t address)
 
 // MARK: - Tasks
 template < typename I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Ft6x06<I2cMaster>::configure(InterruptMode mode, uint8_t activeRate, uint8_t monitorRate)
 {
-	RF_BEGIN();
-
-	if (RF_CALL(write(Register::G_MODE, uint8_t(mode))))
+	if (write(Register::G_MODE, uint8_t(mode)))
 	{
-		if (RF_CALL(write(Register::PERIOD_ACTIVE, activeRate)))
+		if (write(Register::PERIOD_ACTIVE, activeRate))
 		{
-			RF_RETURN_CALL(write(Register::PERIOD_MONITOR, monitorRate));
+			return write(Register::PERIOD_MONITOR, monitorRate);
 		}
 	}
 
-	RF_END_RETURN(false);
+	return false;
 }
 
 template < typename I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Ft6x06<I2cMaster>::readTouches()
 {
-	RF_BEGIN();
-
-	if (RF_CALL(read(Register::GEST_ID, buffer, 14)))
+	if (read(Register::GEST_ID, buffer, 14))
 	{
 		std::memcpy(data.data, buffer, 14);
-		RF_RETURN(true);
+		return true;
 	}
 
-	RF_END_RETURN(false);
+	return false;
 }
 
 // ----------------------------------------------------------------------------
 // MARK: write register
 template < class I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Ft6x06<I2cMaster>::write(Register reg, uint8_t value)
 {
-	RF_BEGIN();
-
 	buffer[0] = uint8_t(reg);
 	buffer[1] = value;
 	this->transaction.configureWrite(buffer, 2);
 
-	RF_END_RETURN_CALL( this->runTransaction() );
+	return this->runTransaction();
 }
 
 // MARK: read multilength register
 template < class I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Ft6x06<I2cMaster>::read(Register reg, uint8_t *buffer, uint8_t length)
 {
-	RF_BEGIN();
-
 	this->buffer[0] = uint8_t(reg);
 	this->transaction.configureWriteRead(this->buffer, 1, buffer, length);
 
-	RF_END_RETURN_CALL( this->runTransaction() );
+	return this->runTransaction();
 }

@@ -24,40 +24,37 @@ Pat9125el<Transport, IntPin>::Pat9125el(TransportParams&&... params)
 }
 
 template<typename Transport, typename IntPin>
-modm::ResumableResult<bool>
+bool
 Pat9125el<Transport, IntPin>::configure(uint8_t xResolution, uint8_t yResolution)
 {
-	RF_BEGIN();
-
-	success = RF_CALL(writeRegister(Register::WriteProtect, uint8_t(WriteProtect::Disabled)));
+	success = writeRegister(Register::WriteProtect, uint8_t(WriteProtect::Disabled));
 	if(!success) {
-		RF_RETURN(false);
+		return false;
 	}
 
-	success = RF_CALL(writeRegister(Register::ResolutionX, xResolution));
+	success = writeRegister(Register::ResolutionX, xResolution);
 	if(!success) {
-		RF_RETURN(false);
+		return false;
 	}
 
-	success = RF_CALL(writeRegister(Register::ResolutionY, yResolution));
+	success = writeRegister(Register::ResolutionY, yResolution);
 	if(!success) {
-		RF_RETURN(false);
+		return false;
 	}
 
-	RF_END_RETURN_CALL(writeRegister(Register::WriteProtect, uint8_t(WriteProtect::Enabled)));
+	return writeRegister(Register::WriteProtect, uint8_t(WriteProtect::Enabled));
 }
 
 template<typename Transport, typename IntPin>
-modm::ResumableResult<bool>
+bool
 Pat9125el<Transport, IntPin>::ping()
 {
-	RF_BEGIN();
-	success = RF_CALL(readRegister(Register::ProductId1, readBuffer[0]));
+	success = readRegister(Register::ProductId1, readBuffer[0]);
 	if(!success) {
-		RF_RETURN(false);
+		return false;
 	}
 
-	RF_END_RETURN(readBuffer[0] == ProductId1);
+	return readBuffer[0] == ProductId1;
 }
 
 template<typename Transport, typename IntPin>
@@ -68,39 +65,37 @@ Pat9125el<Transport, IntPin>::getData() const
 }
 
 template<typename Transport, typename IntPin>
-modm::ResumableResult<bool>
+bool
 Pat9125el<Transport, IntPin>::readData()
 {
-	RF_BEGIN();
-
 	if constexpr(UseInterruptPin) {
 		if(IntPin::read()) {
-			RF_RETURN(false);
+			return false;
 		}
 	}
 
-	success = RF_CALL(readRegister(Register::MotionStatus, status));
+	success = readRegister(Register::MotionStatus, status);
 	if(!success) {
-		RF_RETURN(false);
+		return false;
 	}
 
 	if(MotionStatus_t{status} & MotionStatus::DataAvailable) {
 		// read x and y low data registers
-		success = RF_CALL(readRegister(Register::DeltaXLow, &readBuffer[0], 2));
+		success = readRegister(Register::DeltaXLow, &readBuffer[0], 2);
 		if(!success) {
-			RF_RETURN(false);
+			return false;
 		}
 
 		// read x/y high data register
-		success = RF_CALL(readRegister(Register::DeltaXYHigh, &readBuffer[2], 1));
+		success = readRegister(Register::DeltaXYHigh, &readBuffer[2], 1);
 		if(!success) {
-			RF_RETURN(false);
+			return false;
 		}
 
 		updateData();
 	}
 
-	RF_END_RETURN(true);
+	return true;
 }
 
 template<typename Transport, typename IntPin>
@@ -131,21 +126,21 @@ Pat9125el<Transport, IntPin>::resetMoved()
 }
 
 template<typename Transport, typename IntPin>
-modm::ResumableResult<bool>
+bool
 Pat9125el<Transport, IntPin>::writeRegister(Register reg, uint8_t data)
 {
 	return this->write(static_cast<uint8_t>(reg), data);
 }
 
 template<typename Transport, typename IntPin>
-modm::ResumableResult<bool>
+bool
 Pat9125el<Transport, IntPin>::readRegister(Register reg, uint8_t& data)
 {
 	return this->read(static_cast<uint8_t>(reg), data);
 }
 
 template<typename Transport, typename IntPin>
-modm::ResumableResult<bool>
+bool
 Pat9125el<Transport, IntPin>::readRegister(Register reg, uint8_t* data, size_t size)
 {
 	return this->read(static_cast<uint8_t>(reg), data, size);

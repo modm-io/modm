@@ -22,17 +22,15 @@ As5047<SpiMaster, Cs>::As5047(Data &data) : data(data)
 }
 
 template<typename SpiMaster, typename Cs>
-modm::ResumableResult<void>
+void
 As5047<SpiMaster, Cs>::read()
 {
-	RF_BEGIN();
-
-	RF_WAIT_UNTIL(this->acquireMaster());
+	modm::this_fiber::poll([&]{ return this->acquireMaster(); });
 
 	Cs::reset();
 	outBuffer[1] = static_cast<uint8_t>(Register::ReadAngleunc);
 	outBuffer[0] = static_cast<uint8_t>(static_cast<uint16_t>(Register::ReadAngleunc) >> 8);
-	RF_CALL(SpiMaster::transfer(outBuffer, inBuffer, 2));
+	SpiMaster::transfer(outBuffer, inBuffer, 2);
 	Cs::set();
 
 	modm::delay(1us);
@@ -40,11 +38,10 @@ As5047<SpiMaster, Cs>::read()
 	Cs::reset();
 	outBuffer[1] = 0;
 	outBuffer[0] = 0;
-	RF_CALL(SpiMaster::transfer(outBuffer, inBuffer, 2));
+	SpiMaster::transfer(outBuffer, inBuffer, 2);
 	data.data = static_cast<uint16_t>(inBuffer[1]) | (static_cast<uint16_t>(inBuffer[0]) << 8);
 
 	if (this->releaseMaster()) { Cs::set(); }
-	RF_END();
 }
 
 }  // namespace modm

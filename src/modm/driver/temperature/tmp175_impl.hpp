@@ -70,57 +70,49 @@ modm::Tmp175<I2cMaster>::setUpdateRate(uint8_t rate)
 }
 
 template < typename I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Tmp175<I2cMaster>::setResolution(Resolution resolution)
 {
-	RF_BEGIN();
-
 	Resolution_t::set(reinterpret_cast<Config1_t&>(this->config_msb), resolution);
 
 	conversionTime = modm::ShortDuration((uint8_t(resolution) + 1) * 29);
 
-	RF_END_RETURN_CALL( writeConfiguration() );
+	return writeConfiguration();
 }
 
 // MARK: conversion
 template < typename I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Tmp175<I2cMaster>::startConversion()
 {
-	RF_BEGIN();
-
 	reinterpret_cast<Config1_t&>(this->config_msb).set(Config1::OneShot);
 
-	if ( RF_CALL(writeConfiguration()) )
+	if ( writeConfiguration() )
 	{
 		reinterpret_cast<Config1_t&>(this->config_msb).reset(Config1::OneShot);
-		RF_RETURN(true);
+		return true;
 	}
 
-	RF_END_RETURN(false);
+	return false;
 }
 
 // MARK: configuration
 template < typename I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Tmp175<I2cMaster>::writeConfiguration()
 {
-	RF_BEGIN();
-
 	this->buffer[0] = uint8_t(Register::Configuration);
 	this->buffer[1] = reinterpret_cast<Config1_t&>(this->config_msb).value;
 
 	this->transaction.configureWrite(this->buffer, 2);
 
-	RF_END_RETURN_CALL( this->runTransaction() );
+	return this->runTransaction();
 }
 
 template < typename I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Tmp175<I2cMaster>::setLimitRegister(Register reg, float temperature)
 {
-	RF_BEGIN();
-
 	{
 		uint8_t res = uint8_t(Resolution_t::get(reinterpret_cast<Config1_t&>(this->config_msb)));
 
@@ -134,6 +126,6 @@ modm::Tmp175<I2cMaster>::setLimitRegister(Register reg, float temperature)
 
 	this->transaction.configureWrite(this->buffer, 3);
 
-	RF_END_RETURN_CALL( this->runTransaction() );
+	return this->runTransaction();
 }
 

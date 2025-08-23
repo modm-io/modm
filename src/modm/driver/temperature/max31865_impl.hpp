@@ -26,92 +26,82 @@ Max31865<SpiMaster, Cs, pt>::Max31865(Data &data) : data(data)
 }
 
 template<typename SpiMaster, typename Cs, max31865::Pt pt>
-modm::ResumableResult<void>
+void
 Max31865<SpiMaster, Cs, pt>::initialize()
 {
-	RF_BEGIN();
 	config = Config();
 	config.set(Config::FaultStatusClear);
 	config.set(Rejection_t(Rejection::Rejection50Hz));
-	RF_CALL(writeSingleRegister(Register::WriteConfiguration, config.value));
-	config = Config_t(RF_CALL(readSingleRegister(Register::ReadConfiguration)));
-	RF_END();
+	writeSingleRegister(Register::WriteConfiguration, config.value);
+	config = Config_t(readSingleRegister(Register::ReadConfiguration));
 }
 
 template<typename SpiMaster, typename Cs, max31865::Pt pt>
-modm::ResumableResult<void>
+void
 Max31865<SpiMaster, Cs, pt>::readout()
 {
-	RF_BEGIN();
 	config.set(Config::VBias);
-	RF_CALL(writeSingleRegister(Register::WriteConfiguration, config.value));
+	writeSingleRegister(Register::WriteConfiguration, config.value);
 	timeout.restart(10ms);
-	RF_WAIT_UNTIL(timeout.isExpired());
+	modm::this_fiber::poll([&]{ return timeout.isExpired(); });
 
 	config.set(Config::OneShot);
-	RF_CALL(writeSingleRegister(Register::WriteConfiguration, config.value));
+	writeSingleRegister(Register::WriteConfiguration, config.value);
 	timeout.restart(65ms);
-	RF_WAIT_UNTIL(timeout.isExpired());
+	modm::this_fiber::poll([&]{ return timeout.isExpired(); });
 
-	// data.data = RF_CALL(readTwoRegisters(Register::ReadRtdMsb));
-	d = RF_CALL(readTwoRegisters(Register::ReadRtdMsb));
+	// data.data = readTwoRegisters(Register::ReadRtdMsb);
+	d = readTwoRegisters(Register::ReadRtdMsb);
 	data.data = d;
 
 	config.reset(Config::VBias);
-	RF_CALL(writeSingleRegister(Register::WriteConfiguration, config.value));
-
-	RF_END();
+	writeSingleRegister(Register::WriteConfiguration, config.value);
 }
 
 template<typename SpiMaster, typename Cs, max31865::Pt pt>
-modm::ResumableResult<uint8_t>
+uint8_t
 Max31865<SpiMaster, Cs, pt>::readSingleRegister(Register address)
 {
-	RF_BEGIN();
-	RF_WAIT_UNTIL(this->acquireMaster());
+	modm::this_fiber::poll([&]{ return this->acquireMaster(); });
 
 	Cs::reset();
 	buffer[0] = uint8_t(address);
-	RF_CALL(SpiMaster::transfer(buffer.data(), nullptr, 1));
-	RF_CALL(SpiMaster::transfer(nullptr, buffer.data(), 1));
+	SpiMaster::transfer(buffer.data(), nullptr, 1);
+	SpiMaster::transfer(nullptr, buffer.data(), 1);
 
 	if (this->releaseMaster()) { Cs::set(); }
 
-	RF_END_RETURN(buffer[0]);
+	return buffer[0];
 }
 
 template<typename SpiMaster, typename Cs, max31865::Pt pt>
-modm::ResumableResult<uint16_t>
+uint16_t
 Max31865<SpiMaster, Cs, pt>::readTwoRegisters(Register address)
 {
-	RF_BEGIN();
-	RF_WAIT_UNTIL(this->acquireMaster());
+	modm::this_fiber::poll([&]{ return this->acquireMaster(); });
 
 	Cs::reset();
 	buffer[0] = uint8_t(address);
-	RF_CALL(SpiMaster::transfer(buffer.data(), nullptr, 1));
-	RF_CALL(SpiMaster::transfer(nullptr, buffer.data(), 2));
+	SpiMaster::transfer(buffer.data(), nullptr, 1);
+	SpiMaster::transfer(nullptr, buffer.data(), 2);
 
 	if (this->releaseMaster()) { Cs::set(); }
 
-	RF_END_RETURN(static_cast<uint16_t>(buffer[0] << 8 | buffer[1]));
+	return static_cast<uint16_t>(buffer[0] << 8 | buffer[1]);
 }
 
 template<typename SpiMaster, typename Cs, max31865::Pt pt>
-modm::ResumableResult<void>
+void
 Max31865<SpiMaster, Cs, pt>::writeSingleRegister(Register address, uint8_t data)
 {
-	RF_BEGIN();
-	RF_WAIT_UNTIL(this->acquireMaster());
+	modm::this_fiber::poll([&]{ return this->acquireMaster(); });
 
 	Cs::reset();
 	buffer[0] = uint8_t(address);
 	buffer[1] = data;
-	RF_CALL(SpiMaster::transfer(buffer.data(), nullptr, 2));
+	SpiMaster::transfer(buffer.data(), nullptr, 2);
 
 	if (this->releaseMaster()) { Cs::set(); }
-
-	RF_END();
 }
 
 }  // namespace modm

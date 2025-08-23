@@ -58,25 +58,21 @@ protected:
 	modm::ResumableResult<bool>
 	write(uint8_t data)
 	{
-		RF_BEGIN(0);
-
 		timeout.restart(txTimeout);
-		RF_WAIT_UNTIL(Uart::write(data) or timeout.isExpired() or Uart::hasError());
+		modm::this_fiber::poll([&]{ return Uart::write(data) or timeout.isExpired() or Uart::hasError(); });
 		if (timeout.isExpired() or Uart::hasError())
 		{
 			Uart::discardTransmitBuffer();
 			Uart::discardReceiveBuffer();
 			Uart::clearError();
-			RF_RETURN(false);
+			return false;
 		}
-		RF_END_RETURN(true);
+		return true;
 	}
 
 	modm::ResumableResult<bool>
 	write(const uint8_t *data, std::size_t length)
 	{
-		RF_BEGIN(0);
-
 		writeIndex = 0;
 		timeout.restart(txTimeout);
 		while (writeIndex < length)
@@ -91,35 +87,31 @@ protected:
 			{
 				Uart::discardReceiveBuffer();
 				Uart::clearError();
-				RF_RETURN(false);
+				return false;
 			}
-			RF_YIELD();
+			modm::this_fiber::yield();
 		}
 
-		RF_END_RETURN(true);
+		return true;
 	}
 
 	modm::ResumableResult<bool>
 	read(uint8_t &data)
 	{
-		RF_BEGIN(1);
-
 		timeout.restart(rxTimeout);
-		RF_WAIT_UNTIL(Uart::read(data) or timeout.isExpired() or Uart::hasError());
+		modm::this_fiber::poll([&]{ return Uart::read(data) or timeout.isExpired() or Uart::hasError(); });
 		if (timeout.isExpired() or Uart::hasError())
 		{
 			Uart::discardReceiveBuffer();
 			Uart::clearError();
-			RF_RETURN(false);
+			return false;
 		}
-		RF_END_RETURN(true);
+		return true;
 	}
 
 	modm::ResumableResult<bool>
 	read(uint8_t *buffer, std::size_t length)
 	{
-		RF_BEGIN(1);
-
 		readIndex = 0;
 		timeout.restart(rxTimeout);
 		while (readIndex < length)
@@ -134,12 +126,12 @@ protected:
 			{
 				Uart::discardReceiveBuffer();
 				Uart::clearError();
-				RF_RETURN(false);
+				return false;
 			}
-			RF_YIELD();
+			modm::this_fiber::yield();
 		}
 
-		RF_END_RETURN(true);
+		return true;
 	}
 
 private:

@@ -26,14 +26,12 @@ template<class I2cMaster>
 ResumableResult<bool>
 Stts22h<I2cMaster>::write(Register reg, RegisterValue value)
 {
-	RF_BEGIN();
-
 	buffer_[0] = static_cast<uint8_t>(reg);
 	buffer_[1] = value.value;
 
 	this->transaction.configureWrite(&buffer_[0], 2);
 
-	RF_END_RETURN_CALL(this->runTransaction());
+	return this->runTransaction();
 }
 
 template<class I2cMaster>
@@ -47,42 +45,38 @@ template<class I2cMaster>
 ResumableResult<bool>
 Stts22h<I2cMaster>::read(Register reg, uint8_t* data, uint8_t length)
 {
-	RF_BEGIN();
-
 	buffer_[0] = static_cast<uint8_t>(reg);
 	this->transaction.configureWriteRead(&buffer_[0], 1, data, length);
 
-	RF_END_RETURN_CALL(this->runTransaction());
+	return this->runTransaction();
 }
 
 template<class I2cMaster>
 ResumableResult<bool>
 Stts22h<I2cMaster>::initialize()
 {
-	RF_BEGIN();
-	if (!RF_CALL(this->ping())) {
-		RF_RETURN(false);
+	if (!this->ping()) {
+		return false;
 	}
-	if (!RF_CALL(write(Register::SoftwareReset, SoftwareReset::SwReset))) {
-		RF_RETURN(false);
+	if (!write(Register::SoftwareReset, SoftwareReset::SwReset)) {
+		return false;
 	}
-	if (!RF_CALL(write(Register::SoftwareReset, SoftwareReset{}))) {
-		RF_RETURN(false);
+	if (!write(Register::SoftwareReset, SoftwareReset{})) {
+		return false;
 	}
-	RF_END_RETURN_CALL(write(Register::Ctrl, Ctrl::FreeRun | Ctrl::IfAddInc));
+	return write(Register::Ctrl, Ctrl::FreeRun | Ctrl::IfAddInc);
 }
 
 template<class I2cMaster>
 ResumableResult<bool>
 Stts22h<I2cMaster>::ping()
 {
-	RF_BEGIN();
 	// It's ok here to use buffer_[1] as temporary storage
 	// since read() only uses buffer_[0]
-	if (!RF_CALL(read(Register::WhoAmI, buffer_[1]))) {
-		RF_RETURN(false);
+	if (!read(Register::WhoAmI, buffer_[1])) {
+		return false;
 	}
-	RF_END_RETURN(buffer_[1] == DeviceId);
+	return buffer_[1] == DeviceId;
 }
 
 template<class I2cMaster>

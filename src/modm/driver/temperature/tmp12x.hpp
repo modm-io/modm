@@ -120,20 +120,18 @@ public:
 		Cs::setOutput(true);
 	}
 
-	modm::ResumableResult<Temperature>
+	Temperature
 	read()
 	{
-		RF_BEGIN();
-
-		RF_WAIT_UNTIL(this->acquireMaster());
+		modm::this_fiber::poll([&]{ return this->acquireMaster(); });
 		Cs::reset();
-		RF_CALL(SpiMaster::transfer(nullptr, buffer_.data(), 2));
+		SpiMaster::transfer(nullptr, buffer_.data(), 2);
 
 		if (this->releaseMaster()) {
 			Cs::set();
 		}
 
-		RF_END_RETURN(Temperature(buffer_[1] | (buffer_[0] << 8)));
+		return Temperature(buffer_[1] | (buffer_[0] << 8));
 	}
 private:
 	std::array<uint8_t, 2> buffer_{};

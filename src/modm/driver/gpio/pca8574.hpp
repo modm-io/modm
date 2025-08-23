@@ -70,24 +70,23 @@ public:
 	Pca8574(uint8_t address=0x27);
 
 public:
-	modm::ResumableResult<bool> inline
+	bool inline
 	setOutput(Pins pins)
 	{
-		RF_BEGIN();
 		direction.set(pins);
-		RF_END_RETURN(true);
+		return true;
 	}
 
-	modm::ResumableResult<bool>
+	bool
 	set(Pins pins);
 
-	modm::ResumableResult<bool>
+	bool
 	reset(Pins pins);
 
-	modm::ResumableResult<bool>
+	bool
 	toggle(Pins pins);
 
-	modm::ResumableResult<bool>
+	bool
 	set(Pins pins, bool value);
 
 	bool inline
@@ -105,7 +104,7 @@ public:
 	}
 
 public:
-	modm::ResumableResult<bool>
+	bool
 	setInput(Pins pins);
 
 	bool inline
@@ -116,15 +115,15 @@ public:
 	}
 
 public:
-	modm::ResumableResult<bool> inline
+	bool inline
 	readInput()
 	{ return readPort(input.value); }
 
 public:
-	modm::ResumableResult<bool>
+	bool
 	writePort(PortType value);
 
-	modm::ResumableResult<bool>
+	bool
 	readPort(PortType &value);
 
 public:

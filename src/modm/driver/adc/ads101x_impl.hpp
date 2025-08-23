@@ -25,11 +25,9 @@ Ads101x<I2cMaster>::Ads101x(Data &data, uint8_t address) : I2cDevice<I2cMaster, 
 // ----------------------------------------------------------------------------
 
 template <typename I2cMaster>
-modm::ResumableResult<bool>
+bool
 Ads101x<I2cMaster>::initialize()
 {
-    RF_BEGIN();
-
     InputMultiplexer_t::set(config, InputMultiplexer::Input0);
     FullScaleRange_t::set(config, FullScaleRange::V2_048);
     DeviceOperatingMode_t::set(config, DeviceOperatingMode::SingleShot);
@@ -37,168 +35,148 @@ Ads101x<I2cMaster>::initialize()
     ComparatorQueue_t::set(config, ComparatorQueue::Disable);
     data.lsbSizeIndex = i(FullScaleRange::V2_048) >> 9;
 
-    RF_END_RETURN_CALL(writeRegister(Register::Config, config.value));
+    return writeRegister(Register::Config, config.value);
 }
 
 // ----------------------------------------------------------------------------
 
 template <typename I2cMaster>
-modm::ResumableResult<bool>
+bool
 Ads101x<I2cMaster>::isBusy()
 {
-    RF_BEGIN();
-
     buffer[0] = i(Register::Config);
     this->transaction.configureWriteRead(buffer, 1, buffer, 2);
 
-    if (RF_CALL(this->runTransaction()))
+    if (this->runTransaction())
     {
-        RF_RETURN((static_cast<uint16_t>(buffer[0] << 8) & i(ConfigRegister::OS)) == 0);
+        return (static_cast<uint16_t>(buffer[0] << 8) & i(ConfigRegister::OS)) == 0;
     }
-    RF_END_RETURN(false);
+    return false;
 }
 
 // ----------------------------------------------------------------------------
 
 template <typename I2cMaster>
-modm::ResumableResult<bool>
+bool
 Ads101x<I2cMaster>::startSingleShotConversion()
 {
-    RF_BEGIN();
-
     DeviceOperatingMode_t::set(config, DeviceOperatingMode::SingleShot);
 
-    RF_END_RETURN_CALL(writeRegister(Register::Config, i(ConfigRegister::OS) | config.value));
+    return writeRegister(Register::Config, i(ConfigRegister::OS) | config.value);
 }
 
 // ----------------------------------------------------------------------------
 
 template <typename I2cMaster>
-modm::ResumableResult<bool>
+bool
 Ads101x<I2cMaster>::startContinuousConversion(DataRate dataRate)
 {
-    RF_BEGIN();
-
     DataRate_t::set(config, dataRate);
     DeviceOperatingMode_t::set(config, DeviceOperatingMode::Continuous);
 
-    RF_END_RETURN_CALL(writeRegister(Register::Config, config.value));
+    return writeRegister(Register::Config, config.value);
 }
 
 // ----------------------------------------------------------------------------
 
 template <typename I2cMaster>
-modm::ResumableResult<bool>
+bool
 Ads101x<I2cMaster>::startSingleShotConversion(InputMultiplexer input)
 {
-    RF_BEGIN();
-
     InputMultiplexer_t::set(config, input);
     DeviceOperatingMode_t::set(config, DeviceOperatingMode::SingleShot);
 
-    RF_END_RETURN_CALL(writeRegister(Register::Config, i(ConfigRegister::OS) | config.value));
+    return writeRegister(Register::Config, i(ConfigRegister::OS) | config.value);
 }
 
 // ----------------------------------------------------------------------------
 
 template <typename I2cMaster>
-modm::ResumableResult<bool>
+bool
 Ads101x<I2cMaster>::startContinuousConversion(InputMultiplexer input, DataRate dataRate)
 {
-    RF_BEGIN();
-
     DataRate_t::set(config, dataRate);
     InputMultiplexer_t::set(config, input);
     DeviceOperatingMode_t::set(config, DeviceOperatingMode::Continuous);
 
-    RF_END_RETURN_CALL(writeRegister(Register::Config, config.value));
+    return writeRegister(Register::Config, config.value);
 }
 
 // ----------------------------------------------------------------------------
 
 template <typename I2cMaster>
-modm::ResumableResult<bool>
+bool
 Ads101x<I2cMaster>::readConversionResult()
 {
-    RF_BEGIN();
-
     buffer[0] = i(Register::Conversion);
     this->transaction.configureWriteRead(buffer, 1, data.data, 2);
 
-    RF_END_RETURN_CALL(this->runTransaction());
+    return this->runTransaction();
 }
 
 // ----------------------------------------------------------------------------
 
 template <typename I2cMaster>
-modm::ResumableResult<bool>
+bool
 Ads101x<I2cMaster>::enableConversionReadyFunction()
 {
-    RF_BEGIN();
-
-    if (not RF_CALL(writeRegister(Register::LowThreshold, 0x0000)))
+    if (not writeRegister(Register::LowThreshold, 0x0000))
     {
-        RF_RETURN(false);
+        return false;
     }
-    if (not RF_CALL(writeRegister(Register::HighThreshold, 0xFFFF)))
+    if (not writeRegister(Register::HighThreshold, 0xFFFF))
     {
-        RF_RETURN(false);
+        return false;
     }
 
     ComparatorQueue_t::set(config, ComparatorQueue::OneConversion);
-    if (not RF_CALL(writeRegister(Register::Config, config.value)))
+    if (not writeRegister(Register::Config, config.value))
     {
-        RF_RETURN(false);
+        return false;
     }
 
-    RF_END_RETURN(true);
+    return true;
 }
 
 // ----------------------------------------------------------------------------
 
 template <typename I2cMaster>
-modm::ResumableResult<bool>
+bool
 Ads101x<I2cMaster>::enableComparator(ComparatorMode mode, ComparatorPolarity polarity, ComparatorLatch latch, ComparatorQueue queue)
 {
-    RF_BEGIN();
-
     ComparatorMode_t::set(config, mode);
     ComparatorPolarity_t::set(config, polarity);
     ComparatorLatch_t::set(config, latch);
     ComparatorQueue_t::set(config, queue);
 
-    RF_END_RETURN_CALL(writeRegister(Register::Config, config.value));
+    return writeRegister(Register::Config, config.value);
 }
 
 // ----------------------------------------------------------------------------
 
 template <typename I2cMaster>
-modm::ResumableResult<bool>
+bool
 Ads101x<I2cMaster>::setFullScaleRange(FullScaleRange fullScaleRange)
 {
-    RF_BEGIN();
-
     FullScaleRange_t::set(config, fullScaleRange);
     data.lsbSizeIndex = i(fullScaleRange) >> 9;
 
-    RF_END_RETURN_CALL(writeRegister(Register::Config, config.value));
+    return writeRegister(Register::Config, config.value);
 }
 
 // ----------------------------------------------------------------------------
 
 template <typename I2cMaster>
-modm::ResumableResult<bool>
+bool
 Ads101x<I2cMaster>::writeRegister(Register reg, uint16_t data)
 {
-    RF_BEGIN();
-
     buffer[0] = i(reg);
     buffer[1] = (data >> 8) & 0xFF;
     buffer[2] = data & 0xFF;
 
     this->transaction.configureWrite(buffer, 3);
 
-    RF_END_RETURN_CALL(this->runTransaction());
+    return this->runTransaction();
 }
 
 } // modm namespace

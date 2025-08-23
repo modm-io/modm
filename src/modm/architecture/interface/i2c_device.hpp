@@ -71,13 +71,8 @@ public:
 	modm::ResumableResult<bool>
 	ping()
 	{
-		RF_BEGIN();
-
-		RF_WAIT_UNTIL( transaction.configurePing() and startTransaction() );
-
-		RF_WAIT_WHILE( isTransactionRunning() );
-
-		RF_END_RETURN( wasTransactionSuccessful() );
+		modm::this_fiber::poll([&]{ return transaction.configurePing(); });
+		return runTransaction();
 	}
 
 	/// Starts a write-read transaction and waits until finished.
@@ -85,65 +80,24 @@ public:
 	writeRead(const uint8_t *writeBuffer, std::size_t writeSize,
 			  uint8_t *readBuffer, std::size_t readSize)
 	{
-		RF_BEGIN();
-
-		RF_WAIT_UNTIL( startWriteRead(writeBuffer, writeSize, readBuffer, readSize) );
-
-		RF_WAIT_WHILE( isTransactionRunning() );
-
-		RF_END_RETURN( wasTransactionSuccessful() );
+		modm::this_fiber::poll([&]{ return transaction.configureWriteRead(writeBuffer, writeSize, readBuffer, readSize); });
+		return runTransaction();
 	}
 
 	/// Starts a write transaction and waits until finished.
 	modm::ResumableResult<bool>
 	write(const uint8_t *buffer, std::size_t size)
 	{
-		RF_BEGIN();
-
-		RF_WAIT_UNTIL( startWrite(buffer, size) );
-
-		RF_WAIT_WHILE( isTransactionRunning() );
-
-		RF_END_RETURN( wasTransactionSuccessful() );
+		modm::this_fiber::poll([&]{ return transaction.configureWrite(buffer, size); });
+		return runTransaction();
 	}
 
 	/// Starts a write transaction and waits until finished.
 	modm::ResumableResult<bool>
 	read(uint8_t *buffer, std::size_t size)
 	{
-		RF_BEGIN();
-
-		RF_WAIT_UNTIL( startRead(buffer, size) );
-
-		RF_WAIT_WHILE( isTransactionRunning() );
-
-		RF_END_RETURN( wasTransactionSuccessful() );
-	}
-
-protected:
-	/// Configures the transaction with a write/read operation and starts it.
-	bool inline
-	startWriteRead(const uint8_t *writeBuffer, std::size_t writeSize,
-			uint8_t *readBuffer, std::size_t readSize)
-	{
-		return ( transaction.configureWriteRead(writeBuffer, writeSize, readBuffer, readSize) and
-				startTransaction() );
-	}
-
-	/// Configures the transaction with a write operation and starts it.
-	bool inline
-	startWrite(const uint8_t *buffer, std::size_t size)
-	{
-		return ( transaction.configureWrite(buffer, size) and
-				startTransaction() );
-	}
-
-	/// Configures the transaction with a read operation and starts it.
-	bool inline
-	startRead(uint8_t *buffer, std::size_t size)
-	{
-		return ( transaction.configureRead(buffer, size) and
-				startTransaction() );
+		modm::this_fiber::poll([&]{ return transaction.configureRead(buffer, size); });
+		return runTransaction();
 	}
 
 protected:
@@ -179,13 +133,9 @@ protected:
 	modm::ResumableResult<bool>
 	runTransaction()
 	{
-		RF_BEGIN();
-
-		RF_WAIT_UNTIL( startTransaction() );
-
-		RF_WAIT_WHILE( isTransactionRunning() );
-
-		RF_END_RETURN( wasTransactionSuccessful() );
+		modm::this_fiber::poll([&]{ return startTransaction(); });
+		modm::this_fiber::poll([&]{ return isTransactionRunning(); });
+		return wasTransactionSuccessful();
 	}
 
 protected:

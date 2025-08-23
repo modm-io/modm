@@ -28,8 +28,8 @@ modm::TLC594X<CHANNELS, Spi, Xlat, Xblank, Vprog, Xerr>::initialize(uint16_t cha
 	if (channels != 0xffff) setAllChannels(channels);
 	if (dots != 0xff) setAllDotCorrection(dots);
 
-	if (writeCH) RF_CALL_BLOCKING(writeChannels());
-	if (writeDC) RF_CALL_BLOCKING(writeDotCorrection());
+	if (writeCH) writeChannels();
+	if (writeDC) writeDotCorrection();
 
 	if (enable) this->enable();
 }
@@ -205,30 +205,22 @@ modm::TLC594X<CHANNELS, Spi, Xlat, Xblank, Vprog, Xerr>::getDotCorrection(uint16
 }
 
 template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Xblank, typename Vprog, typename Xerr>
-modm::ResumableResult<void>
+void
 modm::TLC594X<CHANNELS, Spi, Xlat, Xblank, Vprog, Xerr>::writeChannels(bool flush)
 {
-	RF_BEGIN();
-
-	RF_CALL(Spi::transfer(gs, status, CHANNELS*3/2));
+	Spi::transfer(gs, status, CHANNELS*3/2);
 	if (flush) latch();
-
-	RF_END();
 }
 
 template<uint16_t CHANNELS, typename Spi, typename Xlat, typename Xblank, typename Vprog, typename Xerr>
-modm::ResumableResult<void>
+void
 modm::TLC594X<CHANNELS, Spi, Xlat, Xblank, Vprog, Xerr>::writeDotCorrection(bool flush)
 {
-	RF_BEGIN();
-
 	Vprog::set();
 
 	// transfer
-	RF_CALL(Spi::transfer(dc, nullptr, CHANNELS*3/4));
+	Spi::transfer(dc, nullptr, CHANNELS*3/4);
 	if (flush) latch();
 
 	Vprog::reset();
-
-	RF_END();
 }

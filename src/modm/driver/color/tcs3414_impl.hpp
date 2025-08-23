@@ -23,11 +23,9 @@ modm::Tcs3414<I2cMaster>::Tcs3414(Data &data, uint8_t address)
 
 // ----------------------------------------------------------------------------
 template<typename I2cMaster>
-modm::ResumableResult<bool>
+bool
 modm::Tcs3414<I2cMaster>::writeRegister(RegisterAddress address, uint8_t value)
 {
-	RF_BEGIN();
-
 	buffer[0] =	0x80 |				// write command
 				0x40 |				// with SMB read/write block protocol
 				uint8_t(address);	// at this address
@@ -36,21 +34,19 @@ modm::Tcs3414<I2cMaster>::writeRegister(RegisterAddress address, uint8_t value)
 
 	this->transaction.configureWrite(buffer, 2);
 
-	RF_END_RETURN_CALL(this->runTransaction());
+	return this->runTransaction();
 }
 
 template<typename I2cMaster>
-modm::ResumableResult<bool>
+bool
 modm::Tcs3414<I2cMaster>::readRegisters(RegisterAddress address, uint8_t* values,
                                         uint8_t count)
 {
-	RF_BEGIN();
-
 	buffer[0] =	0x80 |				// write command
 				0x40 |				// with SMB read/write block protocol
 				uint8_t(address);	// at this address
 
 	this->transaction.configureWriteRead(buffer, 1, values, count);
 
-	RF_END_RETURN_CALL(this->runTransaction());
+	return this->runTransaction();
 }

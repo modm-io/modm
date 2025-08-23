@@ -26,50 +26,44 @@ template<class I2cMaster>
 ResumableResult<bool>
 Mcp990x<I2cMaster>::write(Register reg, uint8_t value)
 {
-	RF_BEGIN();
-
 	buffer_[0] = static_cast<uint8_t>(reg);
 	buffer_[1] = value;
 
 	this->transaction.configureWrite(&buffer_[0], 2);
 
-	RF_END_RETURN_CALL(this->runTransaction());
+	return this->runTransaction();
 }
 
 template<class I2cMaster>
 ResumableResult<bool>
 Mcp990x<I2cMaster>::read(Register reg, uint8_t& value)
 {
-	RF_BEGIN();
-
 	buffer_[0] = static_cast<uint8_t>(reg);
 	this->transaction.configureWriteRead(&buffer_[0], 1, &value, 1);
 
-	RF_END_RETURN_CALL(this->runTransaction());
+	return this->runTransaction();
 }
 
 template<class I2cMaster>
 ResumableResult<bool>
 Mcp990x<I2cMaster>::initialize()
 {
-	RF_BEGIN();
-	if (!RF_CALL(this->ping())) {
-		RF_RETURN(false);
+	if (!this->ping()) {
+		return false;
 	}
-	RF_END_RETURN_CALL(write(Register::Config, uint8_t(Config::ExtendedRange)));
+	return write(Register::Config, uint8_t(Config::ExtendedRange));
 }
 
 template<class I2cMaster>
 ResumableResult<bool>
 Mcp990x<I2cMaster>::ping()
 {
-	RF_BEGIN();
 	// It's ok here to use buffer_[1] as temporary storage
 	// since read() only uses buffer_[0]
-	if (!RF_CALL(read(Register::ProductId, buffer_[1]))) {
-		RF_RETURN(false);
+	if (!read(Register::ProductId, buffer_[1])) {
+		return false;
 	}
-	RF_END_RETURN(buffer_[1] == DeviceIds[0] || buffer_[1] == DeviceIds[1] || buffer_[1] == DeviceIds[2]);
+	return buffer_[1] == DeviceIds[0] || buffer_[1] == DeviceIds[1] || buffer_[1] == DeviceIds[2];
 }
 
 template<class I2cMaster>
@@ -99,11 +93,10 @@ template<class I2cMaster>
 ResumableResult<bool>
 Mcp990x<I2cMaster>::readTemperature(Register highReg, Register lowReg)
 {
-	RF_BEGIN();
-	if (!RF_CALL(read(highReg, data_.data[1]))) {
-		RF_RETURN(false);
+	if (!read(highReg, data_.data[1])) {
+		return false;
 	}
-	RF_END_RETURN_CALL(read(lowReg, data_.data[0]));
+	return read(lowReg, data_.data[0]);
 }
 
 } // namespace modm

@@ -164,107 +164,100 @@ public:
 	{ return led_short; }
 
 public:
-	modm::ResumableResult<bool>
+	bool
 	reset()
 	{ return readRegister(Register::RESET, buffer); }
 
-	modm::ResumableResult<bool>
+	bool
 	setGlobalCurrent(uint8_t current)
 	{ return writeRegister(Register::GLOBAL_CURRENT_CONTROL, current); }
 
-	modm::ResumableResult<bool>
+	bool
 	clearSoftwareShutdown()
 	{ return writeRegister(Register::CONFIGURATION, 0x01); }
 
-	modm::ResumableResult<bool>
+	bool
 	setSwPullUp(Resistor value)
 	{ return writeRegister(Register::SW_PULL_UP, uint8_t(value)); }
 
-	modm::ResumableResult<bool>
+	bool
 	setCsPullDown(Resistor value)
 	{ return writeRegister(Register::CS_PULL_DOWN, uint8_t(value)); }
 
-	modm::ResumableResult<bool>
+	bool
 	triggerOpenShortDetection()
 	{ return writeRegister(Register::CONFIGURATION, 0b101); }
 
-	modm::ResumableResult<bool>
+	bool
 	readOpenShort()
 	{
-		RF_BEGIN();
-		if (not RF_CALL(setPage(Register::LED_OPEN))) RF_RETURN(false);
+		if (not setPage(Register::LED_OPEN)) return false;
 
 		buffer[0] = uint8_t(Register::LED_OPEN);
 		this->transaction.configureWriteRead(buffer, 1, (uint8_t*)&led_open, LED_OPEN_size + LED_SHORT_size);
-		RF_END_RETURN_CALL(this->runTransaction());
+		return this->runTransaction();
 	}
 
-	modm::ResumableResult<bool>
+	bool
 	writeOnOff()
 	{
-		RF_BEGIN();
-		if (not RF_CALL(setPage(Register::LED_ON_OFF))) RF_RETURN(false);
+		if (not setPage(Register::LED_ON_OFF)) return false;
 
 		this->transaction.configureWrite(&data.addr_led_on_off, LED_ON_OFF_size+1);
-		RF_END_RETURN_CALL(this->runTransaction());
+		return this->runTransaction();
 	}
 
-	modm::ResumableResult<bool>
+	bool
 	writePwm()
 	{
-		RF_BEGIN();
-		if (not RF_CALL(setPage(Register::PWM))) RF_RETURN(false);
+		if (not setPage(Register::PWM)) return false;
 
 		this->transaction.configureWrite(&data.addr_led_pwm, PWM_size+1);
-		RF_END_RETURN_CALL(this->runTransaction());
+		return this->runTransaction();
 	}
 
 public:
-	modm::ResumableResult<bool>
+	bool
 	writeRegister(Register reg, uint8_t value, uint8_t offset=0)
 	{
-		RF_BEGIN();
-		if (not RF_CALL(setPage(reg))) RF_RETURN(false);
+		if (not setPage(reg)) return false;
 
 		buffer[0] = uint8_t(reg) + offset;
 		buffer[1] = value;
 
 		this->transaction.configureWrite(buffer, 2);
-		RF_END_RETURN_CALL(this->runTransaction());
+		return this->runTransaction();
 	}
 
-	modm::ResumableResult<bool>
+	bool
 	readRegister(Register reg, uint8_t *const value, uint8_t offset=0)
 	{
-		RF_BEGIN();
-		if (not RF_CALL( setPage(reg) )) RF_RETURN(false);
+		if (not setPage(reg)) return false;
 
 		buffer[0] = uint8_t(reg) + offset;
 		this->transaction.configureWriteRead(buffer, 1, value, 1);
 
-		RF_END_RETURN_CALL(this->runTransaction());
+		return this->runTransaction();
 	}
 
 protected:
-	modm::ResumableResult<bool>
+	bool
 	setPage(Register reg)
 	{
-		RF_BEGIN();
-
 		if (hasPage(reg) and (getPage(reg) != current_page))
 		{
 			buffer[0] = uint8_t(Register::COMMAND_WRITE_LOCK);
 			buffer[1] = 0xC5; // command write key
 			this->transaction.configureWrite(buffer, 2);
-			if (not RF_CALL(this->runTransaction())) RF_RETURN(false);
+			if (not this->runTransaction()) return false;
 
 			buffer[0] = uint8_t(Register::COMMAND);
 			buffer[1] = getPage(reg);
-			if (not RF_CALL(this->runTransaction())) RF_RETURN(false);
+			if (not this->runTransaction()) return false;
 			current_page = getPage(reg);
 		}
 
-		RF_END_RETURN(true);
+		return true;
 	}
 
 protected:

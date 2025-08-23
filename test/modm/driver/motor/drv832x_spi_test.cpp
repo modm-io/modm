@@ -69,7 +69,7 @@ Drv832xSpiTest::testSpi()
 	modm::Drv832xSpi<SpiMaster, modm::platform::GpioUnused> gateDriver;
 
 	// Real DRV832x device has default register values, but we expect all flags zero because SpiMasterMock reads zero per default
-	RF_CALL_BLOCKING(gateDriver.initialize());
+	gateDriver.initialize();
 	// initialize reads 14 bytes, but we don't care
 	SpiMaster::clearBuffers();
 
@@ -77,7 +77,7 @@ Drv832xSpiTest::testSpi()
 	gateDriver.driverControl() |= modm::drv832xSpi::PwmMode_t(modm::drv832xSpi::PwmMode::PwmModeIndependent);
 	// Spi transfer should not occure before commit()
 	TEST_ASSERT_EQUALS(SpiMaster::getTxBufferLength(), 0u);
-	RF_CALL_BLOCKING(gateDriver.commit());
+	gateDriver.commit();
 	TEST_ASSERT_EQUALS(SpiMaster::getTxBufferLength(), 2u);
 	uint8_t txBuffer[2];
 	SpiMaster::popTxBuffer(txBuffer);
@@ -86,14 +86,14 @@ Drv832xSpiTest::testSpi()
 
 	// Test csa control register write
 	gateDriver.csaControl() |= modm::drv832xSpi::CsaControl::DisableOvercurrentSense | modm::drv832xSpi::CsaControl::VrefDiv2;
-	RF_CALL_BLOCKING(gateDriver.commit());
+	gateDriver.commit();
 	TEST_ASSERT_EQUALS(SpiMaster::getTxBufferLength(), 2u);
 	SpiMaster::popTxBuffer(txBuffer);
 	uint8_t txBufferCompare2[] = {(0x6 << 3 | 0b1 << 1), (0b1 << 5)};
 	TEST_ASSERT_EQUALS_ARRAY(txBuffer, txBufferCompare2, 2u);
 
 	// Test fault status register read
-	RF_CALL_BLOCKING(gateDriver.readFaultStatus1());
+	gateDriver.readFaultStatus1();
 	TEST_ASSERT_EQUALS(SpiMaster::getTxBufferLength(), 2u);
 	SpiMaster::popTxBuffer(txBuffer);
 	uint8_t txBufferCompare3[] = {(0b1 << 7 | 0x0 << 3), 0x00};

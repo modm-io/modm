@@ -24,45 +24,39 @@ modm::Mcp23TransportI2c<I2cMaster>::Mcp23TransportI2c(uint8_t address)
 // MARK: - register access
 // MARK: write register
 template < class I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Mcp23TransportI2c<I2cMaster>::write(uint8_t reg, uint8_t value)
 {
-	RF_BEGIN();
-
 	buffer[0] = reg;
 	buffer[1] = value;
 
 	this->transaction.configureWrite(buffer, 2);
 
-	RF_END_RETURN_CALL( this->runTransaction() );
+	return this->runTransaction();
 }
 
 template < class I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Mcp23TransportI2c<I2cMaster>::write16(uint8_t reg, uint16_t value)
 {
-	RF_BEGIN();
-
 	buffer[0] = reg;
 	buffer[1] = value;
 	buffer[2] = (value >> 8);
 
 	this->transaction.configureWrite(buffer, 3);
 
-	RF_END_RETURN_CALL( this->runTransaction() );
+	return this->runTransaction();
 }
 
 // MARK: read register
 template < class I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Mcp23TransportI2c<I2cMaster>::read(uint8_t reg, uint8_t *buffer, uint8_t length)
 {
-	RF_BEGIN();
-
 	this->buffer[0] = reg;
 	this->transaction.configureWriteRead(this->buffer, 1, buffer, length);
 
-	RF_END_RETURN_CALL( this->runTransaction() );
+	return this->runTransaction();
 }
 
 // ============================================================================
@@ -76,72 +70,65 @@ modm::Mcp23TransportSpi<SpiMaster, Cs>::Mcp23TransportSpi(uint8_t address)
 
 // MARK: ping
 template < class SpiMaster, class Cs >
-modm::ResumableResult<bool>
+bool
 modm::Mcp23TransportSpi<SpiMaster, Cs>::ping()
 {
-	RF_BEGIN();
-	RF_END_RETURN(true);
+	return true;
 }
 
 // MARK: - register access
 // MARK: write register
 template < class SpiMaster, class Cs >
-modm::ResumableResult<bool>
+bool
 modm::Mcp23TransportSpi<SpiMaster, Cs>::write(uint8_t reg, uint8_t value)
 {
-	RF_BEGIN();
-
-	RF_WAIT_UNTIL(this->acquireMaster());
+	modm::this_fiber::poll([&]{ return this->acquireMaster(); });
 	Cs::reset();
 
-	RF_CALL(SpiMaster::transfer(address | Write));
-	RF_CALL(SpiMaster::transfer(reg));
-	RF_CALL(SpiMaster::transfer(value));
+	SpiMaster::transfer(address | Write);
+	SpiMaster::transfer(reg);
+	SpiMaster::transfer(value);
 
 	if (this->releaseMaster())
 		Cs::set();
 
-	RF_END_RETURN(true);
+	return true;
 }
 
 template < class SpiMaster, class Cs >
-modm::ResumableResult<bool>
+bool
 modm::Mcp23TransportSpi<SpiMaster, Cs>::write16(uint8_t reg, uint16_t value)
 {
-	RF_BEGIN();
-
-	RF_WAIT_UNTIL(this->acquireMaster());
+	modm::this_fiber::poll([&]{ return this->acquireMaster(); });
 	Cs::reset();
 
-	RF_CALL(SpiMaster::transfer(address | Write));
-	RF_CALL(SpiMaster::transfer(reg));
-	RF_CALL(SpiMaster::transfer(value));
-	RF_CALL(SpiMaster::transfer(value >> 8));
+	SpiMaster::transfer(address | Write);
+	SpiMaster::transfer(reg);
+	SpiMaster::transfer(value);
+	SpiMaster::transfer(value >> 8);
 
 	if (this->releaseMaster())
 		Cs::set();
 
-	RF_END_RETURN(true);
+	return true;
 }
 
 // MARK: read register
 template < class SpiMaster, class Cs >
-modm::ResumableResult<bool>
+bool
 modm::Mcp23TransportSpi<SpiMaster, Cs>::read(uint8_t reg, uint8_t *buffer, uint8_t length)
 {
-	RF_BEGIN();
-
-	RF_WAIT_UNTIL(this->acquireMaster());
+	modm::this_fiber::poll([&]{ return this->acquireMaster(); });
 	Cs::reset();
 
-	RF_CALL(SpiMaster::transfer(address | Read));
-	RF_CALL(SpiMaster::transfer(reg));
+	SpiMaster::transfer(address | Read);
+	SpiMaster::transfer(reg);
 
-	RF_CALL(SpiMaster::transfer(nullptr, buffer, length));
+	SpiMaster::transfer(nullptr, buffer, length);
 
 	if (this->releaseMaster())
 		Cs::set();
 
-	RF_END_RETURN(true);
+	return true;
 }
 

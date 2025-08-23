@@ -19,32 +19,28 @@ namespace modm
 {
 
 template < class SpiMaster, class Cs >
-modm::ResumableResult<bool>
+bool
 Sx128xTransportSpi<SpiMaster, Cs>::writeCommandSingleData(Command command, uint8_t *data)
 {
-    RF_BEGIN();
-
-    RF_WAIT_UNTIL(this->acquireMaster());
+    modm::this_fiber::poll([&]{ return this->acquireMaster(); });
     Cs::reset();
 
     command.getOpcode(commandBuffer);
-    RF_CALL(SpiMaster::transfer(commandBuffer, data, 1));
+    SpiMaster::transfer(commandBuffer, data, 1);
 
     if (this->releaseMaster())
         Cs::set();
 
-    RF_END_RETURN(true);
+    return true;
 }
 
 // ----------------------------------------------------------------------------
 
 template < class SpiMaster, class Cs >
-modm::ResumableResult<bool>
+bool
 Sx128xTransportSpi<SpiMaster, Cs>::writeCommand(Command command, std::span<const uint8_t> data)
 {
-    RF_BEGIN();
-
-    RF_WAIT_UNTIL(this->acquireMaster());
+    modm::this_fiber::poll([&]{ return this->acquireMaster(); });
     Cs::reset();
 
     command.getOpcode(commandBuffer);
@@ -53,24 +49,22 @@ Sx128xTransportSpi<SpiMaster, Cs>::writeCommand(Command command, std::span<const
         std::memcpy(commandBuffer + 1, vargs.data(), vargs.size());
     }
 
-    RF_CALL(SpiMaster::transfer(commandBuffer, nullptr, command.getVargsCount() + 1));
-    RF_CALL(SpiMaster::transfer(&data[0], nullptr, data.size()));
+    SpiMaster::transfer(commandBuffer, nullptr, command.getVargsCount() + 1);
+    SpiMaster::transfer(&data[0], nullptr, data.size());
 
     if (this->releaseMaster())
         Cs::set();
 
-    RF_END_RETURN(true);
+    return true;
 }
 
 // ----------------------------------------------------------------------------
 
 template < class SpiMaster, class Cs >
-modm::ResumableResult<bool>
+bool
 Sx128xTransportSpi<SpiMaster, Cs>::readCommand(Command command, std::span<uint8_t> data)
 {
-    RF_BEGIN();
-
-    RF_WAIT_UNTIL(this->acquireMaster());
+    modm::this_fiber::poll([&]{ return this->acquireMaster(); });
     Cs::reset();
 
     command.getOpcode(commandBuffer);
@@ -82,43 +76,39 @@ Sx128xTransportSpi<SpiMaster, Cs>::readCommand(Command command, std::span<uint8_
         commandBuffer[1] = 0x00;
     }
 
-    RF_CALL(SpiMaster::transfer(commandBuffer, nullptr, command.getVargsCount() + 2));
-    RF_CALL(SpiMaster::transfer(nullptr, &data[0], data.size()));
+    SpiMaster::transfer(commandBuffer, nullptr, command.getVargsCount() + 2);
+    SpiMaster::transfer(nullptr, &data[0], data.size());
 
     if (this->releaseMaster())
         Cs::set();
 
-    RF_END_RETURN(true);
+    return true;
 }
 
 // ----------------------------------------------------------------------------
 
 template < class Uart >
-modm::ResumableResult<bool>
+bool
 Sx128xTransportUart<Uart>::writeCommandSingleData(Command command, uint8_t *data)
 {
-    RF_BEGIN();
-
     command.getOpcode(commandBuffer);
-    if (RF_CALL(this->write(commandBuffer[0]))) {
+    if (this->write(commandBuffer[0])) {
         if (data != nullptr) {
-            RF_RETURN_CALL(this->read(data));
+            return this->read(data);
         } else {
-            RF_RETURN(true);
+            return true;
         }
     }
 
-    RF_END_RETURN(false);
+    return false;
 }
 
 // ----------------------------------------------------------------------------
 
 template < class Uart >
-modm::ResumableResult<bool>
+bool
 Sx128xTransportUart<Uart>::writeCommand(Command command, std::span<const uint8_t> data)
 {
-    RF_BEGIN();
-
     command.getOpcode(commandBuffer);
     if (command.hasVargs()) {
         auto vargs = command.getVargs();
@@ -128,21 +118,19 @@ Sx128xTransportUart<Uart>::writeCommand(Command command, std::span<const uint8_t
         commandBuffer[1] = data.size();
     }
 
-    if (RF_CALL(this->write(commandBuffer, 2 + command.getVargsCount()))) {
-        RF_RETURN_CALL(this->write(&data[0], data.size()));
+    if (this->write(commandBuffer, 2 + command.getVargsCount())) {
+        return this->write(&data[0], data.size());
     }
 
-    RF_END_RETURN(false);
+    return false;
 }
 
 // ----------------------------------------------------------------------------
 
 template < class Uart >
-modm::ResumableResult<bool>
+bool
 Sx128xTransportUart<Uart>::readCommand(Command command, std::span<uint8_t> data)
 {
-    RF_BEGIN();
-
     command.getOpcode(commandBuffer);
     if (command.hasVargs()) {
         auto vargs = command.getVargs();
@@ -152,11 +140,11 @@ Sx128xTransportUart<Uart>::readCommand(Command command, std::span<uint8_t> data)
         commandBuffer[1] = data.size();
     }
 
-    if (RF_CALL(this->write(commandBuffer, 2 + command.getVargsCount()))) {
-        RF_RETURN_CALL(this->read(&data[0], data.size()));
+    if (this->write(commandBuffer, 2 + command.getVargsCount())) {
+        return this->read(&data[0], data.size());
     }
 
-    RF_END_RETURN(false);
+    return false;
 }
 
 } // namespace modm

@@ -22,12 +22,11 @@ modm::Mcp7941x<I2cMaster>::Mcp7941x(uint8_t address)
 }
 
 template < typename I2cMaster >
-modm::ResumableResult<std::optional<modm::mcp7941x::DateTime>>
+std::optional<modm::mcp7941x::DateTime>
 modm::Mcp7941x<I2cMaster>::getDateTime()
 {
-	RF_BEGIN();
 	this->transaction.configureWriteRead(&addr_seconds, 1, scratch, 7);
-	if (RF_CALL(this->runTransaction())) {
+	if (this->runTransaction()) {
 		dateTime.seconds = decodeBcd(scratch[0] & 0b0111'1111);
 		dateTime.minutes = decodeBcd(scratch[1]);
 		dateTime.hours = decodeBcd(scratch[2] & 0b0011'1111);
@@ -35,16 +34,15 @@ modm::Mcp7941x<I2cMaster>::getDateTime()
 		dateTime.days = decodeBcd(scratch[4]);
 		dateTime.months = decodeBcd(scratch[5] & 0b0001'1111);
 		dateTime.years = decodeBcd(scratch[6]);
-		RF_RETURN(dateTime);
+		return dateTime;
 	}
-	RF_END_RETURN(std::nullopt);
+	return std::nullopt;
 }
 
 template < typename I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Mcp7941x<I2cMaster>::setDateTime(DateTime dt)
 {
-	RF_BEGIN();
 	scratch[0] = addr_seconds;
 	scratch[1] = 0x00; // stop oscillator
 	scratch[2] = encodeBcd(dt.minutes);
@@ -54,25 +52,24 @@ modm::Mcp7941x<I2cMaster>::setDateTime(DateTime dt)
 	scratch[6] = encodeBcd(dt.months);
 	scratch[7] = encodeBcd(dt.years);
 	this->transaction.configureWrite(scratch, 8);
-	if (not RF_CALL(this->runTransaction())) {
-		RF_RETURN(false);
+	if (not this->runTransaction()) {
+		return false;
 	}
 	scratch[0] = addr_seconds;
 	scratch[1] = encodeBcd(dt.seconds) | 0b1000'0000 /* Start oscillator bit */;
 	this->transaction.configureWrite(scratch, 2);
-	RF_END_RETURN_CALL(this->runTransaction());
+	return this->runTransaction();
 }
 
 template < typename I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Mcp7941x<I2cMaster>::oscillatorRunning()
 {
-	RF_BEGIN();
 	this->transaction.configureWriteRead(&addr_weekday, 1, scratch, 1);
-	if (RF_CALL(this->runTransaction())) {
-		RF_RETURN((scratch[0] | 0b0010'0000 /* OSCRUN bit */) > 0);
+	if (this->runTransaction()) {
+		return (scratch[0] | 0b0010'0000 /* OSCRUN bit */) > 0;
 	}
-	RF_END_RETURN(false);
+	return false;
 }
 
 
@@ -83,13 +80,12 @@ modm::Mcp7941xEeprom<I2cMaster>::Mcp7941xEeprom(uint8_t address)
 }
 
 template < typename I2cMaster >
-modm::ResumableResult<std::optional<std::array<uint8_t, 8>>>
+std::optional<std::array<uint8_t, 8>>
 modm::Mcp7941xEeprom<I2cMaster>::getUniqueId()
 {
-	RF_BEGIN();
 	this->transaction.configureWriteRead(&addr_unique_id, 1, data.data(), 8);
-	if (not RF_CALL(this->runTransaction())) {
-		RF_RETURN(std::nullopt);
+	if (not this->runTransaction()) {
+		return std::nullopt;
 	}
-	RF_END_RETURN(data);
+	return data;
 }

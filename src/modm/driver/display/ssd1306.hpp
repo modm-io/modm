@@ -106,16 +106,16 @@ public:
 
 	/// Pings the display
 	bool inline pingBlocking()
-	{ return RF_CALL_BLOCKING(this->ping()); }
+	{ return this->ping(); }
 
 	/// initializes for 3V3 with charge-pump
 	bool inline initializeBlocking()
-	{ return RF_CALL_BLOCKING(initialize()); }
+	{ return initialize(); }
 
 	/// Update the display with the content of the RAM buffer.
 	void
 	update() override
-	{ RF_CALL_BLOCKING(startWriteDisplay()); }
+	{ startWriteDisplay(); }
 
 	/// Use this method to synchronize writing to the displays buffer
 	/// to avoid tearing.
@@ -125,21 +125,21 @@ public:
 
 	// MARK: - TASKS
 	/// initializes for 3V3 with charge-pump asynchronously
-	modm::ResumableResult<bool>
+	bool
 	initialize();
 
 	// starts a frame transfer and waits for completion
-	virtual modm::ResumableResult<bool>
+	virtual bool
 	writeDisplay();
 
-	modm::ResumableResult<bool>
+	bool
 	setDisplayMode(DisplayMode mode = DisplayMode::Normal)
 	{
 		commandBuffer[0] = uint8_t(mode);
 		return writeCommands(1);
 	}
 
-	modm::ResumableResult<bool>
+	bool
 	setContrast(uint8_t contrast = 0xCE)
 	{
 		commandBuffer[0] = FundamentalCommands::ContrastControl;
@@ -150,20 +150,20 @@ public:
 	/**
 	 * \param orientation	glcd::Orientation::Landscape0 or glcd::Orientation::Landscape180
 	 */
-	modm::ResumableResult<bool>
+	bool
 	setOrientation(glcd::Orientation orientation);
 
-	modm::ResumableResult<bool>
+	bool
 	configureScroll(uint8_t origin, uint8_t size, ScrollDirection direction, ScrollStep steps);
 
-	modm::ResumableResult<bool>
+	bool
 	enableScroll()
 	{
 		commandBuffer[0] = ScrollingCommands::EnableScroll;
 		return writeCommands(1);
 	}
 
-	modm::ResumableResult<bool>
+	bool
 	disableScroll()
 	{
 		commandBuffer[0] = ScrollingCommands::DisableScroll;
@@ -171,13 +171,13 @@ public:
 	}
 
 protected:
-	modm::ResumableResult<bool>
+	bool
 	writeCommands(std::size_t length);
 
-	virtual modm::ResumableResult<void>
+	virtual void
 	initializeMemoryMode();
 
-	virtual modm::ResumableResult<void>
+	virtual void
 	startWriteDisplay();
 
 	uint8_t commandBuffer[7];

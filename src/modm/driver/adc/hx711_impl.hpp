@@ -20,9 +20,7 @@ template <typename Cfg>
 ResumableResult<int32_t>
 Hx711<Cfg>::singleConversion()
 {
-	RF_BEGIN();
-
-	RF_WAIT_UNTIL(Data::read() == modm::Gpio::Low);
+	modm::this_fiber::poll([&]{ return Data::read() == modm::Gpio::Low; });
 
 	modm::delay_us(1);
 
@@ -50,7 +48,7 @@ Hx711<Cfg>::singleConversion()
 		data |= 0xff000000;
 	}
 
-	RF_END_RETURN(data);
+	return data;
 }
 
 } // modm namespace

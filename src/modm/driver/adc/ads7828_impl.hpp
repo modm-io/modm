@@ -28,36 +28,33 @@ Ads7828<I2cMaster>::Ads7828(Data &data, uint8_t address) : modm::I2cDevice<I2cMa
 // ----------------------------------------------------------------------------
 
 template <typename I2cMaster>
-modm::ResumableResult<bool>
+bool
 Ads7828<I2cMaster>::startMeasurement(InputChannel channel)
 {
-    RF_BEGIN();
     InputChannel_t::set(commandByte, channel);
     this->transaction.configureWrite(&commandByte.value, 1);
-    RF_END_RETURN_CALL(this->runTransaction());
+    return this->runTransaction();
 }
 
 // ----------------------------------------------------------------------------
 
 template <typename I2cMaster>
-modm::ResumableResult<bool>
+bool
 Ads7828<I2cMaster>::setPowerDownSelection(PowerDown powerDownSelection)
 {
-    RF_BEGIN();
     PowerDown_t::set(commandByte, powerDownSelection);
     this->transaction.configureWrite(&commandByte.value, 1);
-    RF_END_RETURN_CALL(this->runTransaction());
+    return this->runTransaction();
 }
 
 // ----------------------------------------------------------------------------
 
 template <typename I2cMaster>
-modm::ResumableResult<bool>
+bool
 Ads7828<I2cMaster>::readConversionResult()
 {
-    RF_BEGIN();
     this->transaction.configureRead(data.data, 2);
-    RF_END_RETURN_CALL(this->runTransaction());
+    return this->runTransaction();
 }
 
 } // modm namespace

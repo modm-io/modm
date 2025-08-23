@@ -64,15 +64,13 @@ public:
 	 * @param	voltage	  in mV
 	 * @param	current	  in mA
 	 */
-	modm::ResumableResult<bool>
+	bool
 	configurePdo(uint8_t pdoNumber, uint32_t voltage, uint32_t current)
 	{
-		RF_BEGIN();
-
 		if((pdoNumber < 1) || (pdoNumber > 3))
-			RF_RETURN(false);
+			return false;
 
-		RF_CALL(readRegister(DpmSnkPdos[pdoNumber - 1], buffer2.data(), 4));
+		readRegister(DpmSnkPdos[pdoNumber - 1], buffer2.data(), 4);
 
 		current /= 10;
 		voltage /= 50;
@@ -81,7 +79,7 @@ public:
 		buffer2[1] = ((current >> 8) & 0b11) | ((voltage & 0b11'1111 ) << 2);
 		buffer2[2] = (buffer2[2] & 0b1111'0000) | ((voltage >> 6) & 0b1111);
 
-		RF_END_RETURN_CALL(updateRegister(DpmSnkPdos[pdoNumber - 1], buffer2.data(), 4));
+		return updateRegister(DpmSnkPdos[pdoNumber - 1], buffer2.data(), 4);
 	}
 
 	/**
@@ -89,15 +87,13 @@ public:
 	 *
 	 * @param	pdoNumber Which PDO to set valid, range 1 to 3.
 	 */
-	modm::ResumableResult<bool>
+	bool
 	setValidPdo(uint8_t pdoNumber)
 	{
-		RF_BEGIN();
-
 		if((pdoNumber < 1) || (pdoNumber > 3))
-			RF_RETURN(false);
+			return false;
 
-		RF_END_RETURN_CALL(updateRegister(Register::DpmPdoNumb, &pdoNumber, 1));
+		return updateRegister(Register::DpmPdoNumb, &pdoNumber, 1);
 	}
 
 	/**
@@ -106,12 +102,10 @@ public:
 	 * @return	RdoRegStatusData object. Typically only
 	 *  RdoRegStatusData::MaxCurrent [mA] is of interest.
 	 */
-	modm::ResumableResult<RdoRegStatusData>
+	RdoRegStatusData
 	getRdoRegStatus()
 	{
-		RF_BEGIN();
-
-		RF_CALL(readRegister(Register::RdoRegStatus, buffer2.data(), 4));
+		readRegister(Register::RdoRegStatus, buffer2.data(), 4);
 
 		// MaxCurrent: Bits 9..0; OperatingCurrent: Bits 19..10; ObjectPos: Bits 30..28
 		rdoRegStatusData.MaxCurrent = buffer2[0] | ((buffer2[1] & 0b11) << 8);
@@ -120,29 +114,27 @@ public:
 		rdoRegStatusData.OperatingCurrent *= 10;
 		rdoRegStatusData.ObjectPos = (buffer2[3] & 0b0110'0000) >> 5;
 
-		RF_END_RETURN(rdoRegStatusData);
+		return rdoRegStatusData;
 	}
 
 public:
-	modm::ResumableResult<bool>
+	bool
 	readRegister(Register reg, uint8_t* output, size_t length)
 	{
-		RF_BEGIN();
 		buffer[0] = uint8_t(reg);
 		this->transaction.configureWriteRead(buffer.data(), 1, output, length);
-		RF_END_RETURN_CALL( this->runTransaction() );
+		return this->runTransaction();
 	}
 
-	modm::ResumableResult<bool>
+	bool
 	updateRegister(Register reg, const uint8_t* data, size_t length)
 	{
-		RF_BEGIN();
 		if(length > (std::tuple_size<decltype(buffer)>::value - 1))
-			RF_RETURN(false);
+			return false;
 		buffer[0] = uint8_t(reg);
 		std::memcpy(&buffer[1], data, length);
 		this->transaction.configureWriteRead(buffer.data(), length + 1, nullptr, 0);
-		RF_END_RETURN_CALL( this->runTransaction() );
+		return this->runTransaction();
 	}
 
 private:

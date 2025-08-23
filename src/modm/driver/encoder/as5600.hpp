@@ -158,11 +158,9 @@ public:
 	/** Reset to Power up state.
 	 * Useful for developement, not required in production.
 	 */
-	modm::ResumableResult<bool>
+	bool
 	reset()
 	{
-		RF_BEGIN();
-
 		bool success = true;
 
 		/// The config registers span from 0x00 to 0x08
@@ -174,40 +172,40 @@ public:
 
 			this->transaction.configureWrite(buffer, 3);
 
-			RF_CALL(this->runTransaction());
+			this->runTransaction();
 			success &= this->wasTransactionSuccessful();
 		}
 
-		RF_END_RETURN(success);
+		return success;
 	}
 
-	modm::ResumableResult<bool>
+	bool
 	configure(Config_t config)
 	{
 		return write(Register::CONF, config.value);
 	}
 
-	modm::ResumableResult<bool>
+	bool
 	setI2cAddress(uint8_t address)
 	{
 		return write(Register::I2C_ADDR, address);
 	}
 
   /// Wait 1ms after setting the lower limit
-	modm::ResumableResult<bool>
+	bool
 	setLowerLimit(Data data)
 	{
 		return write(Register::ZPOS, data.data);
 	}
 
   /// Wait 1ms after setting the upper limit
-	modm::ResumableResult<bool>
+	bool
 	setUpperLimit(Data data)
 	{
 		return write(Register::MPOS, data.data);
 	}
 
-	modm::ResumableResult<bool>
+	bool
 	setMaxAngle(Data data)
 	{
 		return write(Register::MANG, data.data);
@@ -215,31 +213,29 @@ public:
 
   /// Permanently burn configurations
 	/// @warning As5600 can be burned only 3 times!
-	modm::ResumableResult<bool>
+	bool
 	burn(Burn flags)
 	{
 		buffer[0] = static_cast<uint8_t>(flags);
 		return write(Register::BURN, buffer, 1);
 	}
 
-	modm::ResumableResult<Data>
+	Data
 	getRawValue()
 	{
-		RF_BEGIN();
-
-		const uint16_t result = RF_CALL(read<uint16_t>(Register::ANGLE_RAW));
+		const uint16_t result = read<uint16_t>(Register::ANGLE_RAW);
 
 		// Raw value requires masking
-		RF_END_RETURN(Data(result & Data::max));
+		return Data(result & Data::max);
 	}
 
-	modm::ResumableResult<Status>
+	Status
 	getStatus()
 	{
 		return static_cast<Status>(read<uint8_t>(Register::STATUS));
 	}
 
-	modm::ResumableResult<uint16_t>
+	uint16_t
 	getMagnitude()
 	{
 		return read<uint16_t>(Register::MAGNITUDE);
@@ -257,20 +253,18 @@ public:
 	 * In 5V operation, range is 0-255
 	 * In 3.3V operation, range is reduced to 0-128
 	 */
-	modm::ResumableResult<uint8_t>
+	uint8_t
 	getAgcValue()
 	{
 		return read<uint8_t>(Register::AGC);
 	}
 
-	modm::ResumableResult<bool>
+	bool
 	read()
 	{
-		RF_BEGIN();
+		data.data = read<uint16_t>(Register::ANGLE);
 
-		data.data = RF_CALL(read<uint16_t>(Register::ANGLE));
-
-		RF_END_RETURN(this->wasTransactionSuccessful());
+		return this->wasTransactionSuccessful();
 	}
 
 	inline Data &
@@ -281,11 +275,9 @@ public:
 
 private:
 	template<std::unsigned_integral T>
-	modm::ResumableResult<bool>
+	bool
 	write(Register reg, T value)
 	{
-		RF_BEGIN();
-
 		buffer[0] = reg;
 
 		if constexpr (std::is_same_v<T, uint8_t>)
@@ -299,19 +291,17 @@ private:
 
 		this->transaction.configureWrite(buffer, 1 + sizeof(T));
 
-		RF_END_RETURN_CALL(this->runTransaction());
+		return this->runTransaction();
 	}
 
 	template<std::unsigned_integral T>
-	modm::ResumableResult<T>
+	T
 	read(Register reg)
 	{
-		RF_BEGIN();
-
 		buffer[0] = reg;
 		this->transaction.configureWriteRead(buffer, 1, buffer + 1, sizeof(T));
 
-		RF_CALL(this->runTransaction());
+		this->runTransaction();
 
 		T result;
 
@@ -323,7 +313,7 @@ private:
 			result = buffer[1] << 8 | buffer[2];
 		}
 
-		RF_END_RETURN(result);
+		return result;
 	}
 
 	Data &data;

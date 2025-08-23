@@ -13,8 +13,6 @@
 #error "Don't include this file directly, use 'bmi088_transport.hpp' instead!"
 #endif
 
-#include <modm/architecture/interface/fiber.hpp>
-
 namespace modm
 {
 
@@ -56,9 +54,7 @@ Bmi088SpiTransport<SpiMaster, AccCs, GyroCs>::readRegisters(uint8_t startReg,
 		return {};
 	}
 
-	while (!this->acquireMaster()) {
-		modm::this_fiber::yield();
-	}
+	modm::this_fiber::poll([&]{ return this->acquireMaster(); });
 	Cs::reset();
 
 	const uint8_t dataOffset = (dummyByte ? 2 : 1);
@@ -94,9 +90,7 @@ template<typename Cs>
 bool
 Bmi088SpiTransport<SpiMaster, AccCs, GyroCs>::writeRegister(uint8_t reg, uint8_t data)
 {
-	while (!this->acquireMaster()) {
-		modm::this_fiber::yield();
-	}
+	modm::this_fiber::poll([&]{ return this->acquireMaster(); });
 	Cs::reset();
 
 	txBuffer_[0] = reg;

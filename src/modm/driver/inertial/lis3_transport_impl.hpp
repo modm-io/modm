@@ -24,30 +24,26 @@ modm::Lis3TransportI2c<I2cMaster>::Lis3TransportI2c(uint8_t address)
 // MARK: - register access
 // MARK: write register
 template < class I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Lis3TransportI2c<I2cMaster>::write(uint8_t reg, uint8_t value)
 {
-	RF_BEGIN();
-
 	buffer[0] = reg;
 	buffer[1] = value;
 
 	this->transaction.configureWrite(buffer, 2);
 
-	RF_END_RETURN_CALL( this->runTransaction() );
+	return this->runTransaction();
 }
 
 // MARK: read register
 template < class I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Lis3TransportI2c<I2cMaster>::read(uint8_t reg, uint8_t *buffer, uint8_t length)
 {
-	RF_BEGIN();
-
 	this->buffer[0] = reg;
 	this->transaction.configureWriteRead(this->buffer, 1, buffer, length);
 
-	RF_END_RETURN_CALL( this->runTransaction() );
+	return this->runTransaction();
 }
 
 // ============================================================================
@@ -61,55 +57,49 @@ modm::Lis3TransportSpi<SpiMaster, Cs>::Lis3TransportSpi(uint8_t /*address*/)
 
 // MARK: ping
 template < class SpiMaster, class Cs >
-modm::ResumableResult<bool>
+bool
 modm::Lis3TransportSpi<SpiMaster, Cs>::ping()
 {
-	RF_BEGIN();
-
 	whoAmI = 0;
 
-	RF_CALL(read(0x0F, whoAmI));
+	read(0x0F, whoAmI);
 
-	RF_END_RETURN(whoAmI != 0);
+	return whoAmI != 0;
 }
 
 // MARK: - register access
 // MARK: write register
 template < class SpiMaster, class Cs >
-modm::ResumableResult<bool>
+bool
 modm::Lis3TransportSpi<SpiMaster, Cs>::write(uint8_t reg, uint8_t value)
 {
-	RF_BEGIN();
-
-	RF_WAIT_UNTIL(this->acquireMaster());
+	modm::this_fiber::poll([&]{ return this->acquireMaster(); });
 	Cs::reset();
 
-	RF_CALL(SpiMaster::transfer(reg | Write));
-	RF_CALL(SpiMaster::transfer(value));
+	SpiMaster::transfer(reg | Write);
+	SpiMaster::transfer(value);
 
 	if (this->releaseMaster())
 		Cs::set();
 
-	RF_END_RETURN(true);
+	return true;
 }
 
 // MARK: read register
 template < class SpiMaster, class Cs >
-modm::ResumableResult<bool>
+bool
 modm::Lis3TransportSpi<SpiMaster, Cs>::read(uint8_t reg, uint8_t *buffer, uint8_t length)
 {
-	RF_BEGIN();
-
-	RF_WAIT_UNTIL(this->acquireMaster());
+	modm::this_fiber::poll([&]{ return this->acquireMaster(); });
 	Cs::reset();
 
-	RF_CALL(SpiMaster::transfer(reg | Read));
+	SpiMaster::transfer(reg | Read);
 
-	RF_CALL(SpiMaster::transfer(nullptr, buffer, length));
+	SpiMaster::transfer(nullptr, buffer, length);
 
 	if (this->releaseMaster())
 		Cs::set();
 
-	RF_END_RETURN(true);
+	return true;
 }
 

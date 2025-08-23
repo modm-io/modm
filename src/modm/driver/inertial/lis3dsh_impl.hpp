@@ -24,11 +24,9 @@ modm::Lis3dsh<Transport>::Lis3dsh(Data &data, uint8_t address)
 }
 
 template < class Transport >
-modm::ResumableResult<bool>
+bool
 modm::Lis3dsh<Transport>::configure(Scale scale, MeasurementRate rate)
 {
-	RF_BEGIN();
-
 	// MeasurementRate must be set in Control4
 	rawBuffer[0] = i(rate) | 0x07;
 	// Scale must be set in Control5
@@ -41,22 +39,20 @@ modm::Lis3dsh<Transport>::configure(Scale scale, MeasurementRate rate)
 
 	rawBuffer[5] = uint8_t(Control6::ADD_INC);
 
-	if ( RF_CALL(this->write(i(Register::CTRL_REG4), rawBuffer[0])) )
+	if ( this->write(i(Register::CTRL_REG4), rawBuffer[0]) )
 	{
-		if ( RF_CALL(this->write(i(Register::CTRL_REG5), rawBuffer[4])) )
+		if ( this->write(i(Register::CTRL_REG5), rawBuffer[4]) )
 		{
-			RF_RETURN_CALL(this->write(i(Register::CTRL_REG6), rawBuffer[5]));
+			return this->write(i(Register::CTRL_REG6), rawBuffer[5]);
 		}
 	}
-	RF_END_RETURN(false);
+	return false;
 }
 
 template < class Transport >
-modm::ResumableResult<bool>
+bool
 modm::Lis3dsh<Transport>::updateControlRegister(uint8_t index, Control_t setMask, Control_t clearMask)
 {
-	RF_BEGIN();
-
 	rawBuffer[index] = (rawBuffer[index] & ~clearMask.value) | setMask.value;
 	// update the scale in the data object, if we update CTRL_REG5 (index 4)
 	if (index == 4)
@@ -68,37 +64,33 @@ modm::Lis3dsh<Transport>::updateControlRegister(uint8_t index, Control_t setMask
 		data.scale = (scale == 8) ? scale + 8 : scale + 2;
 	}
 
-	RF_END_RETURN_CALL(this->write(0x20 + index, rawBuffer[index]));
+	return this->write(0x20 + index, rawBuffer[index]);
 }
 
 template < class Transport >
-modm::ResumableResult<bool>
+bool
 modm::Lis3dsh<Transport>::readAcceleration()
 {
-	RF_BEGIN();
-
-	if (RF_CALL(this->read(i(Register::STATUS), rawBuffer + 6, 9)))
+	if (this->read(i(Register::STATUS), rawBuffer + 6, 9))
 	{
 		// copy the memory
 		std::memcpy(data.data, rawBuffer + 7, 6);
-		RF_RETURN(true);
+		return true;
 	}
 
-	RF_END_RETURN(false);
+	return false;
 }
 
 // ----------------------------------------------------------------------------
 template < class Transport >
-modm::ResumableResult<bool>
+bool
 modm::Lis3dsh<Transport>::updateRegister(uint8_t reg, uint8_t setMask, uint8_t clearMask)
 {
-	RF_BEGIN();
-
-	if (RF_CALL(this->read(reg, rawBuffer[7])))
+	if (this->read(reg, rawBuffer[7]))
 	{
 		rawBuffer[7] = (rawBuffer[7] & ~clearMask) | setMask;
-		RF_RETURN_CALL(this->write(reg, rawBuffer[7]));
+		return this->write(reg, rawBuffer[7]);
 	}
 
-	RF_END_RETURN(false);
+	return false;
 }

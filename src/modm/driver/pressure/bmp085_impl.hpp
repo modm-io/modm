@@ -27,17 +27,15 @@ modm::Bmp085<I2cMaster>::Bmp085(DataBase &data, uint8_t address) :
 // ----------------------------------------------------------------------------
 // MARK: - Tasks
 template < typename I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Bmp085<I2cMaster>::initialize(Mode mode)
 {
-	RF_BEGIN();
-
 	setMode(mode);
 	buffer[0] = i(Register::CAL_AC1);
 
 	this->transaction.configureWriteRead(buffer, 1, reinterpret_cast<uint8_t*>(&data.calibration), 22);
 
-	if (RF_CALL( this->runTransaction() ))
+	if (this->runTransaction())
 	{
 		uint16_t* element = reinterpret_cast<uint16_t*>(&data.calibration);
 		element[ 0] = modm::fromBigEndian(element[0]);
@@ -54,30 +52,28 @@ modm::Bmp085<I2cMaster>::initialize(Mode mode)
 		element[ 9] = modm::fromBigEndian(element[9]);
 		element[10] = modm::fromBigEndian(element[10]);
 
-		RF_RETURN(true);
+		return true;
 	}
 
-	RF_END_RETURN(false);
+	return false;
 }
 
 template < typename I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Bmp085<I2cMaster>::readout()
 {
-	RF_BEGIN();
-
 	// Start temperature reading
 	buffer[0] = i(Register::CONTROL);
 	buffer[1] = i(Conversion::Temperature);
 
 	this->transaction.configureWrite(buffer, 2);
 
-	if (not RF_CALL( this->runTransaction() ))
-		RF_RETURN(false);
+	if (not this->runTransaction())
+		return false;
 
 	// Wait until temperature reading is succeeded
 	timeout.restart(5ms);
-	RF_WAIT_UNTIL(timeout.isExpired());
+	modm::this_fiber::poll([&]{ return timeout.isExpired(); });
 
 	// Get the temperature from sensor
 	buffer[0] = i(Register::MSB);
@@ -86,8 +82,8 @@ modm::Bmp085<I2cMaster>::readout()
 	// Notify data class about changed buffer.
 	data.rawTemperatureTouched();
 
-	if (not RF_CALL( this->runTransaction() ))
-		RF_RETURN(false);
+	if (not this->runTransaction())
+		return false;
 
 	// buffer the mode for the timer later
 	bufferedMode = data.meta & i(Mode::Mask);
@@ -97,12 +93,12 @@ modm::Bmp085<I2cMaster>::readout()
 
 	this->transaction.configureWrite(buffer, 2);
 
-	if (not RF_CALL( this->runTransaction() ))
-		RF_RETURN(false);
+	if (not this->runTransaction())
+		return false;
 
 	// Wait until sensor has converted the pressure
 	timeout.restart(std::chrono::milliseconds(conversionDelay[bufferedMode >> 6]));
-	RF_WAIT_UNTIL(timeout.isExpired());
+	modm::this_fiber::poll([&]{ return timeout.isExpired(); });
 
 	// Get the pressure from sensor
 	buffer[0] = i(Register::MSB);
@@ -111,7 +107,7 @@ modm::Bmp085<I2cMaster>::readout()
 	// Notify data class about changed buffer.
 	data.rawPressureTouched();
 
-	RF_END_RETURN_CALL( this->runTransaction() );
+	return this->runTransaction();
 }
 
 template < typename I2cMaster >

@@ -131,16 +131,14 @@ class Qmc5883l : public Qmc5883lRegisters, public modm::I2cDevice<I2cMaster>
 	/// @endcond
 	uint8_t buffer[sizeof data.data];
 
-	modm::ResumableResult<bool>
+	bool
 	writeRegister(Register reg, uint8_t value)
 	{
-		RF_BEGIN();
-
 		buffer[0] = uint8_t(reg);
 		buffer[1] = value;
 		this->transaction.configureWrite(buffer, 2);
 
-		RF_END_RETURN_CALL(this->runTransaction());
+		return this->runTransaction();
 	}
 
 public:
@@ -156,7 +154,7 @@ public:
 	auto status() { return Status_t(data.data[uint8_t(Register::Status)]); }
 
 public:
-	modm::ResumableResult<bool>
+	bool
 	initialize()
 	{
 		// Per datasheet:
@@ -164,33 +162,31 @@ public:
 		return writeRegister(Register::SetReset, 0x01);
 	}
 
-	modm::ResumableResult<bool>
+	bool
 	configure(Mode_t mode, Control1_t control)
 	{
 		control |= mode;
 		return writeRegister(Register::Control1, control.value);
 	}
 
-	modm::ResumableResult<bool>
+	bool
 	configure(Control2_t control)
 	{
 		return writeRegister(Register::Control2, control.value);
 	}
 
-	modm::ResumableResult<bool>
+	bool
 	readData()
 	{
-		RF_BEGIN();
-
 		buffer[0] = uint8_t(Register::DataX_Lsb);
 		this->transaction.configureWriteRead(buffer, 1, buffer, sizeof buffer);
 
-		if (RF_CALL(this->runTransaction()))
+		if (this->runTransaction())
 		{
 			std::copy_n(buffer, sizeof data.data, data.data);
-			RF_RETURN(true);
+			return true;
 		}
 
-		RF_END_RETURN(false);
+		return false;
 	}
 };

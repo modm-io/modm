@@ -32,11 +32,9 @@ public:
 	Sh1106(uint8_t address = 0x3C) : Ssd1306<I2cMaster, Height>(address) {}
 
 protected:
-	modm::ResumableResult<void>
+	void
 	startWriteDisplay() override
 	{
-		RF_BEGIN();
-
 		this->transaction_success = true;
 
 		this->commandBuffer[0] = ssd1306::AdressingCommands::HigherColumnStartAddress;
@@ -45,28 +43,25 @@ protected:
 		for (page = 0; page < Height / 8; page++)
 		{
 			this->commandBuffer[2] = 0xB0 | page;
-			this->transaction_success &= RF_CALL(this->writeCommands(3));
+			this->transaction_success &= this->writeCommands(3);
 
-			RF_WAIT_UNTIL(
-				this->transaction.configureDisplayWrite((uint8_t*)&this->buffer[page], 128));
-			RF_WAIT_UNTIL(this->startTransaction());
-			RF_WAIT_WHILE(this->isTransactionRunning());
+			modm::this_fiber::poll([&]{ return this->transaction.configureDisplayWrite((uint8_t*)&this->buffer[page], 128); });
+			modm::this_fiber::poll([&]{ return this->startTransaction(); });
+			modm::this_fiber::poll([&]{ return not this->isTransactionRunning(); });
 			this->transaction_success &= this->wasTransactionSuccessful();
 		};
 
-		RF_END_RETURN(this->transaction_success);
+		return this->transaction_success;
 	}
 
-	modm::ResumableResult<void>
+	void
 	initializeMemoryMode() override
 	{
-		RF_BEGIN();
 		// Default on Power-up - can be omitted
 		this->commandBuffer[0] = ssd1306::AdressingCommands::MemoryMode;
 		this->commandBuffer[1] = ssd1306::MemoryMode::PAGE;
-		this->transaction_success &= RF_CALL(this->writeCommands(2));
-		RF_END();
-	}
+		this->transaction_success &= this->writeCommands(2);
+}
 
 private:
 	size_t page;

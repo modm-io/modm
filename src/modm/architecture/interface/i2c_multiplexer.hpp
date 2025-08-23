@@ -99,10 +99,9 @@ bool
 modm::I2cMultiplexerChannel<multiplexer, channel>::start(modm::I2cTransaction *transaction, ConfigurationHandler handler)
 {
 	// If call to multiplexer failed, return without doing the actual transaction
-	if (RF_CALL_BLOCKING(multiplexer.multiplexerDevice.setActiveChannel(static_cast<uint8_t>(channel))) == false) {
+	if (not multiplexer.multiplexerDevice.setActiveChannel(uint8_t(channel))) {
 		return false;
 	}
-
 	return multiplexer.start(transaction, handler);
 }
 

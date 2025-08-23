@@ -28,23 +28,21 @@ Mcp3008<SpiMaster, Cs>::initialize()
 }
 
 template <typename SpiMaster, typename Cs>
-modm::ResumableResult<uint16_t>
+uint16_t
 Mcp3008<SpiMaster, Cs>::read(Channel channel)
 {
-    RF_BEGIN();
-
-    RF_WAIT_UNTIL(this->acquireMaster());
+    modm::this_fiber::poll([&]{ return this->acquireMaster(); });
     Cs::reset();
 
     txBuffer_[1] = static_cast<uint8_t>(channel) << 4;
 
-    RF_CALL(SpiMaster::transfer(txBuffer_, rxBuffer_, 3));
+    SpiMaster::transfer(txBuffer_, rxBuffer_, 3);
 
     if (this->releaseMaster()) {
         Cs::set();
     }
 
-    RF_END_RETURN(uint16_t(((rxBuffer_[1] & 0b11) << 8) | rxBuffer_[2]));
+    return uint16_t(((rxBuffer_[1] & 0b11) << 8) | rxBuffer_[2]);
 }
 
 } // namespace modm

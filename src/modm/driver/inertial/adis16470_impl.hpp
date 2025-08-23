@@ -20,11 +20,9 @@ namespace modm
 {
 
 template<class SpiMaster, class Cs>
-modm::ResumableResult<void>
+void
 Adis16470<SpiMaster, Cs>::initialize()
 {
-	RF_BEGIN();
-
 	this->attachConfigurationHandler([]() {
 		SpiMaster::setDataMode(SpiMaster::DataMode::Mode3);
 		SpiMaster::setDataOrder(SpiMaster::DataOrder::MsbFirst);
@@ -32,135 +30,121 @@ Adis16470<SpiMaster, Cs>::initialize()
 
 	Cs::setOutput(modm::Gpio::High);
 	timeout.restart(tStall);
-
-	RF_END();
 }
 
 
 template<class SpiMaster, class Cs>
-modm::ResumableResult<std::optional<uint16_t>>
+std::optional<uint16_t>
 Adis16470<SpiMaster, Cs>::readRegister(Register reg)
 {
-	RF_BEGIN();
-
 	if (getRegisterAccess(reg) == AccessMethod::Write) {
 		// Reading this register is not permitted
-		RF_RETURN(std::nullopt);
+		return std::nullopt;
 	}
 
 	// Ensure CS was not asserted for T_stall
-	RF_WAIT_UNTIL(timeout.isExpired());
+	modm::this_fiber::poll([&]{ return timeout.isExpired(); });
 
-	RF_WAIT_UNTIL(this->acquireMaster());
+	modm::this_fiber::poll([&]{ return this->acquireMaster(); });
 	Cs::reset();
 
 	buffer[0] = uint8_t(reg) & 0b0111'1111;
 	buffer[1] = 0;
-	RF_CALL(SpiMaster::transfer(buffer.data(), nullptr, 2));
+	SpiMaster::transfer(buffer.data(), nullptr, 2);
 
 	if (this->releaseMaster()) {
 		Cs::set();
 	}
 	timeout.restart(tStall);
-	RF_WAIT_UNTIL(timeout.isExpired());
-	RF_WAIT_UNTIL(this->acquireMaster());
+	modm::this_fiber::poll([&]{ return timeout.isExpired(); });
+	modm::this_fiber::poll([&]{ return this->acquireMaster(); });
 	Cs::reset();
 
-	RF_CALL(SpiMaster::transfer(buffer.data(), &buffer[2], 2));
+	SpiMaster::transfer(buffer.data(), &buffer[2], 2);
 
 	if (this->releaseMaster()) {
 		Cs::set();
 	}
 	timeout.restart(tStall);
 
-	RF_END_RETURN((static_cast<uint16_t>(buffer[2]) << 8) | buffer[3]);
+	return (static_cast<uint16_t>(buffer[2]) << 8) | buffer[3];
 }
 
 template<class SpiMaster, class Cs>
-modm::ResumableResult<modm::adis16470::DiagStat_t>
+modm::adis16470::DiagStat_t
 Adis16470<SpiMaster, Cs>::readDiagStat()
 {
-	RF_BEGIN();
-	tmp = RF_CALL(readRegister(Register::DIAG_STAT));
-	RF_END_RETURN(DiagStat_t(*tmp));
+	tmp = readRegister(Register::DIAG_STAT);
+	return DiagStat_t(*tmp);
 }
 
 template<class SpiMaster, class Cs>
-modm::ResumableResult<modm::adis16470::MscCtrl_t>
+modm::adis16470::MscCtrl_t
 Adis16470<SpiMaster, Cs>::readMscCtrl()
 {
-	RF_BEGIN();
-	tmp = RF_CALL(readRegister(Register::MSC_CTRL));
-	RF_END_RETURN(MscCtrl_t(*tmp));
+	tmp = readRegister(Register::MSC_CTRL);
+	return MscCtrl_t(*tmp);
 }
 
 template<class SpiMaster, class Cs>
-modm::ResumableResult<bool>
+bool
 Adis16470<SpiMaster, Cs>::writeRegister(Register reg, uint16_t value)
 {
-	RF_BEGIN();
-
 	if (getRegisterAccess(reg) == AccessMethod::Read) {
 		// Writing to this register is not permitted
-		RF_RETURN(false);
+		return false;
 	}
 
 	// Ensure CS was not asserted for T_stall
-	RF_WAIT_UNTIL(timeout.isExpired());
+	modm::this_fiber::poll([&]{ return timeout.isExpired(); });
 
-	RF_WAIT_UNTIL(this->acquireMaster());
+	modm::this_fiber::poll([&]{ return this->acquireMaster(); });
 	Cs::reset();
 
 	buffer[0] = (uint8_t(reg) & 0b0111'1111) | 0b1000'0000;
 	buffer[1] = static_cast<uint8_t>(value);
-	RF_CALL(SpiMaster::transfer(buffer.data(), nullptr, 2));
+	SpiMaster::transfer(buffer.data(), nullptr, 2);
 
 	if (this->releaseMaster()) {
 		Cs::set();
 	}
 	timeout.restart(tStall);
-	RF_WAIT_UNTIL(timeout.isExpired());
-	RF_WAIT_UNTIL(this->acquireMaster());
+	modm::this_fiber::poll([&]{ return timeout.isExpired(); });
+	modm::this_fiber::poll([&]{ return this->acquireMaster(); });
 	Cs::reset();
 
 	buffer[0] = ((uint8_t(reg) + 1) & 0b0111'1111) | 0b1000'0000;
 	buffer[1] = static_cast<uint8_t>(value >> 8);
-	RF_CALL(SpiMaster::transfer(buffer.data(), nullptr, 2));
+	SpiMaster::transfer(buffer.data(), nullptr, 2);
 
 	if (this->releaseMaster()) {
 		Cs::set();
 	}
 	timeout.restart(tStall);
 
-	RF_END_RETURN(true);
+	return true;
 }
 
 template<class SpiMaster, class Cs>
-modm::ResumableResult<void>
+void
 Adis16470<SpiMaster, Cs>::writeMscCtrl(modm::adis16470::MscCtrl_t value)
 {
-	RF_BEGIN();
-
-	RF_CALL(writeRegister(Register::MSC_CTRL, value.value));
+	writeRegister(Register::MSC_CTRL, value.value);
 
 	// Writing to MSC_CTRL take approx. 3ms
 	timeout.restart(std::chrono::milliseconds(3));
-
-	RF_END();
 }
 
 template<class SpiMaster, class Cs>
-modm::ResumableResult<void>
+void
 Adis16470<SpiMaster, Cs>::writeGlobCmd(modm::adis16470::GlobCmd_t value)
 {
-	RF_BEGIN();
-	RF_CALL(writeRegister(Register::GLOB_CMD, value.value));
-	RF_END();
+	writeRegister(Register::GLOB_CMD, value.value);
 }
 
 template<class SpiMaster, class Cs>
 template<frequency_t frequency, percent_t tolerance>
-modm::ResumableResult<void>
+void
 Adis16470<SpiMaster, Cs>::setDataOutputFrequency()
 {
 	// Output data rate R = 2000SPS / (DEC_RATE + 1)
@@ -169,27 +153,22 @@ Adis16470<SpiMaster, Cs>::setDataOutputFrequency()
 
 	static_assert(frequency < 2000, "Maximum data output rate is 2000Hz");
 	modm::PeripheralDriver::assertBaudrateInTolerance<actualFrequency, frequency, tolerance>();
-
-	RF_BEGIN();
-	RF_CALL(writeRegister(Register::DEC_RATE, decRate));
-	RF_END();
+	writeRegister(Register::DEC_RATE, decRate);
 }
 
 template<class SpiMaster, class Cs>
-modm::ResumableResult<bool>
+bool
 Adis16470<SpiMaster, Cs>::readRegisterSequence(std::span<const Register> sequence, std::span<uint16_t> values)
 {
-	RF_BEGIN();
-
 	if(sequence.size() != values.size()) {
 		// Mismatching std::span sizes
-		RF_RETURN(false);
+		return false;
 	}
 
 	// Ensure CS was not asserted for T_stall
-	RF_WAIT_UNTIL(timeout.isExpired());
+	modm::this_fiber::poll([&]{ return timeout.isExpired(); });
 
-	RF_WAIT_UNTIL(this->acquireMaster());
+	modm::this_fiber::poll([&]{ return this->acquireMaster(); });
 	Cs::reset();
 
 	for (i = 0; i < sequence.size(); i++) {
@@ -199,21 +178,21 @@ Adis16470<SpiMaster, Cs>::readRegisterSequence(std::span<const Register> sequenc
 				Cs::set();
 			}
 			timeout.restart(tStall);
-			RF_RETURN(false);
+			return false;
 		}
 
 		buffer[0] = uint8_t(sequence[i]) & 0b0111'1111;
 		buffer[1] = 0;
-		RF_CALL(SpiMaster::transfer(buffer.data(), &buffer[2], 2));
+		SpiMaster::transfer(buffer.data(), &buffer[2], 2);
 
 		if (this->releaseMaster()) {
 			Cs::set();
 		}
 
 		timeout.restart(tStall);
-		RF_WAIT_UNTIL(timeout.isExpired());
+		modm::this_fiber::poll([&]{ return timeout.isExpired(); });
 
-		RF_WAIT_UNTIL(this->acquireMaster());
+		modm::this_fiber::poll([&]{ return this->acquireMaster(); });
 		Cs::reset();
 
 		if (i != 0) {
@@ -224,7 +203,7 @@ Adis16470<SpiMaster, Cs>::readRegisterSequence(std::span<const Register> sequenc
 	// one additionl transfer to retrieve value of last register
 	buffer[0] = uint8_t(sequence[0]) & 0b0111'1111;
 	buffer[1] = 0;
-	RF_CALL(SpiMaster::transfer(buffer.data(), &buffer[2], 2));
+	SpiMaster::transfer(buffer.data(), &buffer[2], 2);
 	values[values.size()-1] = (static_cast<uint16_t>(buffer[2]) << 8) | buffer[3];
 
 	if (this->releaseMaster()) {
@@ -232,22 +211,20 @@ Adis16470<SpiMaster, Cs>::readRegisterSequence(std::span<const Register> sequenc
 	}
 	timeout.restart(tStall);
 
-	RF_END_RETURN(true);
+	return true;
 }
 
 template<class SpiMaster, class Cs>
-modm::ResumableResult<bool>
+bool
 Adis16470<SpiMaster, Cs>::readRegisterBurst(std::array<uint16_t, 11>& data)
 {
-	RF_BEGIN();
-
 	buffer.fill(0);
 	buffer[0] = 0x68;
 
-	RF_WAIT_UNTIL(this->acquireMaster());
+	modm::this_fiber::poll([&]{ return this->acquireMaster(); });
 	Cs::reset();
 
-	RF_CALL(SpiMaster::transfer(buffer.data(), reinterpret_cast<uint8_t*>(data.data()), 22));
+	SpiMaster::transfer(buffer.data(), reinterpret_cast<uint8_t*>(data.data()), 22);
 
 	if (this->releaseMaster()) {
 		Cs::set();
@@ -265,7 +242,7 @@ Adis16470<SpiMaster, Cs>::readRegisterBurst(std::array<uint16_t, 11>& data)
 		data[i] = modm::fromBigEndian(data[i]);
 	}
 
-	RF_END_RETURN(checksum == data[10]);
+	return checksum == data[10];
 }
 
 } // namespace modm

@@ -16,18 +16,16 @@
 
 
 template < class SpiMaster, class Cs >
-modm::ResumableResult<std::tuple<uint16_t,uint16_t,uint16_t>>
+std::tuple<uint16_t,uint16_t,uint16_t>
 modm::Touch2046<SpiMaster, Cs>::getRawValues()
 {
-	RF_BEGIN();
-
-	RF_WAIT_UNTIL(this->acquireMaster());
+	modm::this_fiber::poll([&]{ return this->acquireMaster(); });
 	Cs::reset();
 
-	RF_CALL(SpiMaster::transfer(
+	SpiMaster::transfer(
 		bufferWrite.data(),
 		reinterpret_cast<uint8_t*>(bufferRead.data()) + 1,
-		17));
+		17);
 
 	z = 4095 + (modm::fromBigEndian(bufferRead[1]) >> 3)
 		- (modm::fromBigEndian(bufferRead[2]) >> 3);
@@ -44,25 +42,22 @@ modm::Touch2046<SpiMaster, Cs>::getRawValues()
 		Cs::set();
 	}
 
-	RF_END_RETURN(std::make_tuple(x, y, z));
+	return std::make_tuple(x, y, z);
 }
 
 template < class SpiMaster, class Cs >
-modm::ResumableResult<bool>
+bool
 modm::Touch2046<SpiMaster, Cs>::isTouched()
 {
-	RF_BEGIN();
-	std::tie(std::ignore, std::ignore, z) = RF_CALL(getRawValues());
-	RF_END_RETURN(z > cal.ThresholdZ);
+	std::tie(std::ignore, std::ignore, z) = getRawValues();
+	return z > cal.ThresholdZ;
 }
 
 template < class SpiMaster, class Cs >
-modm::ResumableResult<std::tuple<uint16_t,uint16_t>>
+std::tuple<uint16_t,uint16_t>
 modm::Touch2046<SpiMaster, Cs>::getTouchPosition()
 {
-	RF_BEGIN();
-
-	std::tie(x, y, std::ignore) = RF_CALL(getRawValues());
+	std::tie(x, y, std::ignore) = getRawValues();
 
 	x = std::min<uint16_t>(
 		((static_cast<int32_t>(x * cal.FactorX) / 1'000'000)
@@ -75,5 +70,5 @@ modm::Touch2046<SpiMaster, Cs>::getTouchPosition()
 
 	// todo: orientation processing
 
-	RF_END_RETURN(std::make_tuple(x, y));
+	return std::make_tuple(x, y);
 }

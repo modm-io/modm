@@ -24,11 +24,9 @@ modm::Lsm303a<I2cMaster>::Lsm303a(Data &data, uint8_t address)
 }
 
 template < class I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Lsm303a<I2cMaster>::configure(Scale scale, MeasurementRate rate)
 {
-	RF_BEGIN();
-
 	// MeasurementRate must be set in Control1
 	rawBuffer[0] = i(rate) | 0x07;
 	// Scale must be set in Control4
@@ -39,19 +37,17 @@ modm::Lsm303a<I2cMaster>::configure(Scale scale, MeasurementRate rate)
 	else if (scale == Scale::G8) data.scale = 4;
 	else data.scale = 12;
 
-	if ( RF_CALL(this->write(i(Register::CTRL1), rawBuffer[0])) )
+	if ( this->write(i(Register::CTRL1), rawBuffer[0]) )
 	{
-		RF_RETURN_CALL( this->write(i(Register::CTRL4), rawBuffer[3]) );
+		return this->write(i(Register::CTRL4), rawBuffer[3]);
 	}
-	RF_END_RETURN(false);
+	return false;
 }
 
 template < class I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Lsm303a<I2cMaster>::updateControlRegister(uint8_t index, Control_t setMask, Control_t clearMask)
 {
-	RF_BEGIN();
-
 	rawBuffer[index] = (rawBuffer[index] & ~clearMask.value) | setMask.value;
 	// update the scale in the data object, if we update CTRL_REG4 (index 3)
 	if (index == 3)
@@ -63,37 +59,33 @@ modm::Lsm303a<I2cMaster>::updateControlRegister(uint8_t index, Control_t setMask
 		else data.scale = 12;
 	}
 
-	RF_END_RETURN_CALL(this->write(0x20 + index, rawBuffer[index]));
+	return this->write(0x20 + index, rawBuffer[index]);
 }
 
 template < class I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Lsm303a<I2cMaster>::readAcceleration()
 {
-	RF_BEGIN();
-
-	if (RF_CALL(this->read(i(Register::STATUS) | 0x80, rawBuffer + 7, 9)))
+	if (this->read(i(Register::STATUS) | 0x80, rawBuffer + 7, 9))
 	{
 		// copy the memory
 		std::memcpy(data.data, rawBuffer + 7, 6);
-		RF_RETURN(true);
+		return true;
 	}
 
-	RF_END_RETURN(false);
+	return false;
 }
 
 // ----------------------------------------------------------------------------
 template < class I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Lsm303a<I2cMaster>::updateRegister(uint8_t reg, uint8_t setMask, uint8_t clearMask)
 {
-	RF_BEGIN();
-
-	if (RF_CALL(this->read(reg, rawBuffer[8])))
+	if (this->read(reg, rawBuffer[8]))
 	{
 		rawBuffer[8] = (rawBuffer[8] & ~clearMask) | setMask;
-		RF_RETURN_CALL(this->write(reg, rawBuffer[8]));
+		return this->write(reg, rawBuffer[8]);
 	}
 
-	RF_END_RETURN(false);
+	return false;
 }

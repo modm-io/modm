@@ -24,35 +24,33 @@ Lsm6dso<Transport>::Lsm6dso(uint8_t address)
 }
 
 template<class Transport>
-modm::ResumableResult<bool>
+bool
 Lsm6dso<Transport>::initialize()
 {
-	RF_BEGIN();
 	// nothing
-	RF_END_RETURN(true);
+	return true;
 }
 
 template<class Transport>
-modm::ResumableResult<std::optional<uint8_t>>
+std::optional<uint8_t>
 Lsm6dso<Transport>::readRegister(Register reg)
 {
-	RF_BEGIN();
-	if (!RF_CALL(this->read(i(reg), buffer[0])))
+	if (!this->read(i(reg), buffer[0]))
 	{
-		RF_RETURN(std::nullopt);
+		return std::nullopt;
 	}
-	RF_END_RETURN(buffer[0]);
+	return buffer[0];
 }
 
 template<class Transport>
-modm::ResumableResult<bool>
+bool
 Lsm6dso<Transport>::readRegisters(Register reg, std::span<uint8_t> values)
 {
 	return this->read(i(reg), &values[0], values.size());
 }
 
 template<class Transport>
-modm::ResumableResult<bool>
+bool
 Lsm6dso<Transport>::writeRegister(Register reg, uint8_t value)
 {
 	return this->write(i(reg), value);
@@ -60,63 +58,59 @@ Lsm6dso<Transport>::writeRegister(Register reg, uint8_t value)
 
 template<class Transport>
 template<frequency_t outputDataRate, percent_t tolerance>
-modm::ResumableResult<bool>
+bool
 Lsm6dso<Transport>::setOutputDataRate()
 {
 	constexpr auto actualOutputDataRate = getClosestOdr<outputDataRate>();
 	modm::PeripheralDriver::assertBaudrateInTolerance<std::lround(actualOutputDataRate.first * 100), outputDataRate * 100, tolerance>();
 
 	// Set linear and angular ODR
-	RF_BEGIN();
-	if (! RF_CALL(this->read(i(Register::CTRL1_XL), buffer, 2)))
+	if (! this->read(i(Register::CTRL1_XL), buffer, 2))
 	{
-		RF_RETURN(false);
+		return false;
 	}
 
 	buffer[0] = (actualOutputDataRate.second << 4) | (buffer[0] & ~Ctrl1XlOutputDataRateMask);
 	buffer[1] = (actualOutputDataRate.second << 4) | (buffer[1] & ~Ctrl2GOutputDataRateMask);
 
-	if (!RF_CALL(writeRegister(Register::CTRL1_XL, buffer[0])))
+	if (!writeRegister(Register::CTRL1_XL, buffer[0]))
 	{
-		RF_RETURN(false);
+		return false;
 	}
-	RF_END_RETURN_CALL(writeRegister(Register::CTRL2_G, buffer[1]));
+	return writeRegister(Register::CTRL2_G, buffer[1]);
 }
 
 template<class Transport>
-modm::ResumableResult<bool>
+bool
 Lsm6dso<Transport>::setRange(LinearRange lr, AngularRange ar)
 {
-	RF_BEGIN();
-	if (! RF_CALL(this->read(i(Register::CTRL1_XL), buffer, 2)))
+	if (! this->read(i(Register::CTRL1_XL), buffer, 2))
 	{
-		RF_RETURN(false);
+		return false;
 	}
 
 	buffer[0] = i(lr) | (buffer[0] & ~Ctrl1XlLinearRangeMask);
 	buffer[1] = i(ar) | (buffer[1] & ~Ctrl2GAngularRangeMask);
 
-	if (!RF_CALL(writeRegister(Register::CTRL1_XL, buffer[0])))
+	if (!writeRegister(Register::CTRL1_XL, buffer[0]))
 	{
-		RF_RETURN(false);
+		return false;
 	}
-	RF_END_RETURN_CALL(writeRegister(Register::CTRL2_G, buffer[1]));
+	return writeRegister(Register::CTRL2_G, buffer[1]);
 }
 
 template<class Transport>
 template<frequency_t outputDataRate, percent_t tolerance>
-modm::ResumableResult<bool>
+bool
 Lsm6dso<Transport>::setOutputDataRateAndRange(LinearRange lr, AngularRange ar)
 {
 	constexpr auto actualOutputDataRate = getClosestOdr<outputDataRate>();
 	modm::PeripheralDriver::assertBaudrateInTolerance<std::lround(actualOutputDataRate.first * 100), outputDataRate * 100, tolerance>();
-
-	RF_BEGIN();
-	if (!RF_CALL(writeRegister(Register::CTRL1_XL, (actualOutputDataRate.second << 4) | i(lr))))
+	if (!writeRegister(Register::CTRL1_XL, (actualOutputDataRate.second << 4) | i(lr)))
 	{
-		RF_RETURN(false);
+		return false;
 	}
-	RF_END_RETURN_CALL(writeRegister(Register::CTRL2_G, (actualOutputDataRate.second << 4) | i(ar)));
+	return writeRegister(Register::CTRL2_G, (actualOutputDataRate.second << 4) | i(ar));
 }
 
 } // namespace modm

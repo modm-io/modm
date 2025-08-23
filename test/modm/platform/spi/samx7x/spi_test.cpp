@@ -35,7 +35,7 @@ SpiTest::testTransferLoopback()
 	uint8_t value = SpiMaster0::transferBlocking(0xAB);
 	TEST_ASSERT_EQUALS(value, 0xAB);
 
-	value = RF_CALL_BLOCKING(SpiMaster0::transfer(0x12));
+	value = SpiMaster0::transfer(0x12);
 	TEST_ASSERT_EQUALS(value, 0x12);
 
 	constexpr std::array<uint8_t, 7> tx{0xDE, 0xAD, 0xBE, 0xEF, 0x12, 0x34, 0x56};
@@ -44,7 +44,7 @@ SpiTest::testTransferLoopback()
 	TEST_ASSERT_TRUE(rx == tx);
 
 	rx.fill(0);
-	RF_CALL_BLOCKING(SpiMaster0::transfer(tx.data(), rx.data(), 7));
+	SpiMaster0::transfer(tx.data(), rx.data(), 7);
 	TEST_ASSERT_TRUE(rx == tx);
 
 	SpiHal0::setLoopbackMode(SpiHal0::LocalLoopback::Disabled);

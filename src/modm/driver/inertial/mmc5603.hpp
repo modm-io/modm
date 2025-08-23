@@ -276,31 +276,29 @@ public:
 	:	I2cDevice<I2cMaster,3>(address), data(data)
 	{}
 
-	modm::ResumableResult<bool>
+	bool
 	ping()
 	{
-		RF_BEGIN();
 		buffer[1] = 0;
-		RF_CALL(read(Register::ProductID, buffer[1]));
-		RF_END_RETURN(buffer[1] == ProductID);
+		read(Register::ProductID, buffer[1]);
+		return buffer[1] == ProductID;
 	}
 
-	modm::ResumableResult<bool>
+	bool
 	startTemperatureMeasurement()
 	{ return update(Register::InternalControl0, Control0::Take_meas_T); }
 
 	/// Continuous Mode up to 250Hz with Automatic Set/Reset, 2ms Measurement Time
-	modm::ResumableResult<bool>
+	bool
 	configureContinuousMode(uint8_t frequency, Bandwidth bandwidth=Bandwidth::Ms2_0)
 	{
-		RF_BEGIN();
-		if (not RF_CALL(write(Register::ODR, frequency)))
-			RF_RETURN(false);
-		if (not RF_CALL(update(Register::InternalControl1, Register_t(i(bandwidth)))))
-		    RF_RETURN(false);
-		if (not RF_CALL(update(Register::InternalControl0, Control0::Cmm_freq_en | Control0::Auto_SR_en)))
-		    RF_RETURN(false);
-		RF_END_RETURN_CALL(update(Register::InternalControl2, Control2::Cmm_en));
+		if (not write(Register::ODR, frequency))
+			return false;
+		if (not update(Register::InternalControl1, Register_t(i(bandwidth))))
+		    return false;
+		if (not update(Register::InternalControl0, Control0::Cmm_freq_en | Control0::Auto_SR_en))
+		    return false;
+		return update(Register::InternalControl2, Control2::Cmm_en);
 	}
 
 public:
@@ -312,44 +310,41 @@ public:
 	Control2_t getControl2() { return rb(Register::InternalControl2); }
 
 public:
-	modm::ResumableResult<bool>
+	bool
 	readProductId(uint8_t &value)
 	{ return read(Register::ProductID, value); }
 
-	modm::ResumableResult<bool>
+	bool
 	readMagneticField()
 	{ return read(Register::Xout0, data.data, 10); }
 
 public:
-	modm::ResumableResult<bool>
+	bool
 	update(Register reg, Register_t setMask, Register_t clearMask = Register_t(0))
 	{
-		RF_BEGIN();
 		rb(reg) = (rb(reg) & ~clearMask.value) | setMask.value;
-		RF_END_RETURN_CALL(write(reg, rb(reg)));
+		return write(reg, rb(reg));
 	}
 
-	modm::ResumableResult<bool>
+	bool
 	write(Register reg, uint8_t value)
 	{
-		RF_BEGIN();
 		buffer[0] = i(reg);
 		buffer[1] = value;
 		this->transaction.configureWrite(buffer, 2);
-		RF_END_RETURN_CALL(this->runTransaction());
+		return this->runTransaction();
 	}
 
-	modm::ResumableResult<bool>
+	bool
 	read(Register reg, uint8_t &value)
 	{ return read(reg, &value, 1); }
 
-	modm::ResumableResult<bool>
+	bool
 	read(Register reg, uint8_t *data, uint8_t size)
 	{
-		RF_BEGIN();
 		buffer[0] = i(reg);
 		this->transaction.configureWriteRead(buffer, 1, data, size);
-		RF_END_RETURN_CALL(this->runTransaction());
+		return this->runTransaction();
 	}
 
 protected:

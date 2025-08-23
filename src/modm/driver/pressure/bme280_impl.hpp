@@ -30,11 +30,9 @@ modm::Bme280<I2cMaster>::Bme280(Data &data, uint8_t address) :
 // ----------------------------------------------------------------------------
 // MARK: - Tasks
 template < typename I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Bme280<I2cMaster>::initialize(Mode mode, Oversampling pressure, Oversampling temperature, Oversampling humidity)
 {
-	RF_BEGIN();
-
 	// Very first verify Chip Id
 	{
 		buffer[0] = i(Register::CHIP_ID);
@@ -42,15 +40,15 @@ modm::Bme280<I2cMaster>::initialize(Mode mode, Oversampling pressure, Oversampli
 
 		this->transaction.configureWriteRead(buffer, 1, &chid, 1);
 
-		if (RF_CALL( this->runTransaction() ))
+		if (this->runTransaction())
 		{
 			MODM_LOG_DEBUG.printf("BME280 Chip Id check. Read %02x, expected %02x\n", chid, ChipId);
 			if (chid != ChipId) {
 				MODM_LOG_ERROR.printf("BME280 Chip Id mismatch. Read %02x, expected %02x\n", chid, ChipId);
-				RF_RETURN(false);
+				return false;
 			}
 		} else {
-			RF_RETURN(false);
+			return false;
 		}
 	}
 
@@ -63,8 +61,8 @@ modm::Bme280<I2cMaster>::initialize(Mode mode, Oversampling pressure, Oversampli
 		buffer[1] = ctrl_hum.value;
 	}
 	this->transaction.configureWrite(buffer, 2);
-	if (not RF_CALL( this->runTransaction() )) {
-		RF_RETURN(false);
+	if (not this->runTransaction()) {
+		return false;
 	}
 
 
@@ -79,8 +77,8 @@ modm::Bme280<I2cMaster>::initialize(Mode mode, Oversampling pressure, Oversampli
 	}
 
 	this->transaction.configureWrite(buffer, 2);
-	if (not RF_CALL( this->runTransaction() )) {
-		RF_RETURN(false);
+	if (not this->runTransaction()) {
+		return false;
 	}
 
 
@@ -92,8 +90,8 @@ modm::Bme280<I2cMaster>::initialize(Mode mode, Oversampling pressure, Oversampli
 		buffer[1] = config.value;
 	}
 	this->transaction.configureWrite(buffer, 2);
-	if (not RF_CALL( this->runTransaction() )) {
-		RF_RETURN(false);
+	if (not this->runTransaction()) {
+		return false;
 	}
 
 
@@ -102,7 +100,7 @@ modm::Bme280<I2cMaster>::initialize(Mode mode, Oversampling pressure, Oversampli
 
 	this->transaction.configureWriteRead(buffer, 1, reinterpret_cast<uint8_t*>(&data.calibration), 26);
 
-	if (RF_CALL( this->runTransaction() ))
+	if (this->runTransaction())
 	{
 		{
 			MODM_LOG_DEBUG << "Raw calibration data: ";
@@ -130,7 +128,7 @@ modm::Bme280<I2cMaster>::initialize(Mode mode, Oversampling pressure, Oversampli
 		element[11] = modm::fromLittleEndian(element[11]);
 		element[12] = modm::fromLittleEndian(element[12]);
 	} else {
-		RF_RETURN(false);
+		return false;
 	}
 
 	// Read 7 bytes of Calib26 to Calib32
@@ -145,7 +143,7 @@ modm::Bme280<I2cMaster>::initialize(Mode mode, Oversampling pressure, Oversampli
 
 	this->transaction.configureWriteRead(buffer, 1, calBuffer, 7);
 
-	if (RF_CALL( this->runTransaction() ))
+	if (this->runTransaction())
 	{
 		data.calibration.H2 = (calBuffer[1] << 8) | calBuffer[0];
 		data.calibration.H3 =  calBuffer[2];
@@ -153,18 +151,16 @@ modm::Bme280<I2cMaster>::initialize(Mode mode, Oversampling pressure, Oversampli
 		data.calibration.H5 = (uint16_t(calBuffer[5]) << 4) | (calBuffer[4] >>   4);
 		data.calibration.H6 =  calBuffer[6];
 
-		RF_RETURN(true);
+		return true;
 	}
 
-	RF_END_RETURN(false);
+	return false;
 }
 
 template < typename I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Bme280<I2cMaster>::readout()
 {
-	RF_BEGIN();
-
 	// Get the raw data from sensor
 	// It is advised by the datasheet to readout the complete sensor
 	// data at once to avoid mixing old and new data.
@@ -182,15 +178,13 @@ modm::Bme280<I2cMaster>::readout()
 	data.rawPressureTouched();
 	data.rawHumidityTouched();
 
-	RF_END_RETURN_CALL( this->runTransaction() );
+	return this->runTransaction();
 }
 
 template < typename I2cMaster >
-modm::ResumableResult<bool>
+bool
 modm::Bme280<I2cMaster>::startMeasurement(Oversampling pressure, Oversampling temperature)
 {
-	RF_BEGIN();
-
 	{
 		Mode mode = Mode::Forced;
 
@@ -203,5 +197,5 @@ modm::Bme280<I2cMaster>::startMeasurement(Oversampling pressure, Oversampling te
 	}
 
 	this->transaction.configureWrite(buffer, 2);
-	RF_END_RETURN_CALL( this->runTransaction() );
+	return this->runTransaction();
 }

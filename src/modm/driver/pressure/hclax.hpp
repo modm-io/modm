@@ -80,27 +80,23 @@ public:
 	}
 
 	/// pings the sensor
-	modm::ResumableResult<bool>
+	bool
 	ping()
 	{
-		RF_BEGIN();
+		modm::this_fiber::poll([&]{ return this->transaction.configurePing() and this->startTransaction(); });
 
-		RF_WAIT_UNTIL(this->transaction.configurePing() and this->startTransaction());
-
-		RF_WAIT_WHILE( this->isTransactionRunning() );
+		modm::this_fiber::poll([&]{ return not this->isTransactionRunning(); });
 
 		this->transaction.configureRead(data.data, 2);
 
-		RF_END_RETURN( this->wasTransactionSuccessful() );
+		return this->wasTransactionSuccessful();
 	}
 
 	/// reads the Pressure registers and buffers the results
-	modm::ResumableResult<bool>
+	bool
 	readPressure()
 	{
-		RF_BEGIN();
-
-		RF_END_RETURN_CALL( this->runTransaction() );
+		return this->runTransaction();
 	}
 
 public:

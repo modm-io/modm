@@ -522,44 +522,44 @@ public:
 	bool inline
 	configureBlocking(Scale scale, MeasurementRate rate = MeasurementRate::Hz100)
 	{
-		return RF_CALL_BLOCKING(configure(scale, rate));
+		return configure(scale, rate);
 	}
 
-	modm::ResumableResult<bool>
+	bool
 	configure(Scale scale, MeasurementRate rate = MeasurementRate::Hz100);
 
 	// MARK: Control Registers
-	modm::ResumableResult<bool> inline
+	bool inline
 	updateSmControl1(SmControl_t setMask, SmControl_t clearMask = SmControl_t(0xff))
 	{
 		return updateControlRegister(1, setMask, clearMask);
 	}
 
-	modm::ResumableResult<bool> inline
+	bool inline
 	updateSmControl2(SmControl_t setMask, SmControl_t clearMask = SmControl_t(0xff))
 	{
 		return updateControlRegister(2, setMask, clearMask);
 	}
 
-	modm::ResumableResult<bool> inline
+	bool inline
 	updateControl(Control3_t setMask, Control3_t clearMask = Control3_t(0xff))
 	{
 		return updateControlRegister(3, setMask, clearMask);
 	}
 
-	modm::ResumableResult<bool> inline
+	bool inline
 	updateControl(Control4_t setMask, Control4_t clearMask = Control4_t(0xff))
 	{
 		return updateControlRegister(0, setMask, clearMask);
 	}
 
-	modm::ResumableResult<bool> inline
+	bool inline
 	updateControl(Control5_t setMask, Control5_t clearMask = Control5_t(0xff))
 	{
 		return updateControlRegister(4, setMask, clearMask);
 	}
 
-	modm::ResumableResult<bool> inline
+	bool inline
 	updateControl(Control6_t setMask, Control6_t clearMask = Control6_t(0xff))
 	{
 		return updateControlRegister(5, setMask, clearMask);
@@ -567,7 +567,7 @@ public:
 
 
 	// MARK: Read access
-	modm::ResumableResult<bool>
+	bool
 	readAcceleration();
 
 	// MARK: Registers with instant access
@@ -606,10 +606,10 @@ public:
 	{ return data; }
 
 private:
-	modm::ResumableResult<bool>
+	bool
 	updateControlRegister(uint8_t index, Control_t setMask, Control_t clearMask = static_cast<Control_t>(0xff));
 
-	modm::ResumableResult<bool>
+	bool
 	updateRegister(uint8_t reg, uint8_t setMask, uint8_t clearMask = 0xff);
 
 	Data &data;

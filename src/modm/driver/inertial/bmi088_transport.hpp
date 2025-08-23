@@ -16,12 +16,12 @@
 #include <cstdint>
 #include <optional>
 #include <span>
+#include <modm/processing/fiber.hpp>
 #include <modm/architecture/interface/delay.hpp>
 #include <modm/architecture/interface/i2c_device.hpp>
 #include <modm/architecture/interface/spi_device.hpp>
 #include <modm/architecture/interface/register.hpp>
 #include <modm/architecture/interface/gpio.hpp>
-#include <modm/processing/timer/timeout.hpp>
 
 namespace modm
 {

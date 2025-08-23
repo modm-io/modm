@@ -21,32 +21,28 @@ modm::Cat24Aa<I2cMaster>::Cat24Aa() :
 }
 
 template <typename I2cMaster>
-modm::ResumableResult<bool>
+bool
 modm::Cat24Aa<I2cMaster>::write(uint32_t address, const uint8_t *data,
 		std::size_t length)
 {
-	RF_BEGIN();
-
 	this->setAddress(this->transaction.getAddress() | ((address >> 8) & 0x07));
 
-	RF_WAIT_UNTIL( this->transaction.configureWrite(address, data, length) and this->startTransaction() );
+	modm::this_fiber::poll([&]{ return this->transaction.configureWrite(address, data, length) and this->startTransaction(); });
 
-	RF_WAIT_WHILE( this->isTransactionRunning() );
+	modm::this_fiber::poll([&]{ return not this->isTransactionRunning(); });
 
-	RF_END_RETURN( this->wasTransactionSuccessful() );
+	return this->wasTransactionSuccessful();
 }
 
 template <typename I2cMaster>
-modm::ResumableResult<bool>
+bool
 modm::Cat24Aa<I2cMaster>::read(uint32_t address, uint8_t *data, std::size_t length)
 {
-	RF_BEGIN();
-
 	this->setAddress(this->transaction.getAddress() | ((address >> 8) & 0x07));
 
-	RF_WAIT_UNTIL( this->transaction.configureRead(address, data, length) and this->startTransaction() );
+	modm::this_fiber::poll([&]{ return this->transaction.configureRead(address, data, length) and this->startTransaction(); });
 
-	RF_WAIT_WHILE( this->isTransactionRunning() );
+	modm::this_fiber::poll([&]{ return not this->isTransactionRunning(); });
 
-	RF_END_RETURN( this->wasTransactionSuccessful() );
+	return this->wasTransactionSuccessful();
 }
