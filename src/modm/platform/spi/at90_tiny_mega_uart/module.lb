@@ -29,8 +29,6 @@ class Instance(Module):
         module.description = "Instance {}".format(self.instance)
 
     def prepare(self, module, options):
-        module.depends(":platform:spi_uart")
-
         module.add_option(
             BooleanOption(
                 name="buffered",

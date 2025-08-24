@@ -17,15 +17,6 @@
 #ifndef MODM_SOFTWARE_BITBANG_SPI_MASTER_HPP
 #	error	"Don't include this file directly, use 'bitbang_spi_master.hpp' instead!"
 #endif
-#include <modm/processing/fiber.hpp>
-
-template <typename Sck, typename Mosi, typename Miso>
-uint16_t
-modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::delayTime(1);
-
-template <typename Sck, typename Mosi, typename Miso>
-uint8_t
-modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::operationMode(0);
 
 // ----------------------------------------------------------------------------
 
@@ -83,7 +74,7 @@ modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::setDataOrder(DataOrder order)
 
 template <typename Sck, typename Mosi, typename Miso>
 uint8_t
-modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::transferBlocking(uint8_t data)
+modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::transfer(uint8_t data)
 {
 	modm::this_fiber::yield();
 
@@ -135,7 +126,7 @@ modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::transferBlocking(uint8_t data
 
 template <typename Sck, typename Mosi, typename Miso>
 void
-modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::transferBlocking(
+modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::transfer(
 		const uint8_t *tx, uint8_t *rx, std::size_t length)
 {
 	uint8_t tx_byte = 0xff;
@@ -145,33 +136,25 @@ modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::transferBlocking(
 	{
 		if (tx) tx_byte = tx[i];
 
-		rx_byte = transferBlocking(tx_byte);
+		rx_byte = transfer(tx_byte);
 
 		if (rx) rx[i] = rx_byte;
 	}
 }
 
 template <typename Sck, typename Mosi, typename Miso>
-modm::ResumableResult<uint8_t>
-modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::transfer(uint8_t data)
+uint8_t
+modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::transferBlocking(uint8_t data)
 {
-	data = transferBlocking(data);
-#ifdef MODM_RESUMABLE_IS_FIBER
-	return data;
-#else
-	return {modm::rf::Stop, data};
-#endif
+	return transfer(data);
 }
 
 template <typename Sck, typename Mosi, typename Miso>
-modm::ResumableResult<void>
-modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::transfer(
+void
+modm::platform::BitBangSpiMaster<Sck, Mosi, Miso>::transferBlocking(
 		const uint8_t *tx, uint8_t *rx, std::size_t length)
 {
-	transferBlocking(tx, rx, length);
-#ifndef MODM_RESUMABLE_IS_FIBER
-	return {modm::rf::Stop, 0};
-#endif
+	transfer(tx, rx, length);
 }
 
 // ----------------------------------------------------------------------------

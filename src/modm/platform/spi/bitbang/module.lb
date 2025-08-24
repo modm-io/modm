@@ -19,6 +19,7 @@ def prepare(module, options):
         return False
 
     module.depends(
+        ":architecture:fiber",
         ":architecture:delay",
         ":architecture:spi",
         ":platform:gpio")

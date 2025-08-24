@@ -15,6 +15,7 @@
 #include <modm/platform/gpio/connector.hpp>
 #include <modm/math/algorithm/prescaler.hpp>
 #include <modm/platform/clock/clockgen.hpp>
+#include <modm/processing/fiber.hpp>
 
 namespace modm::platform {
 
@@ -114,26 +115,22 @@ public:
 		modm_assert(order == DataOrder::MsbFirst, "SPI DataOrder", "SPI hardware does not support alternate transmit order");
 	}
 
+	[[deprecated("Use transfer() instead!")]] // DEPRECATED: 2026q3
 	static uint8_t
 	transferBlocking(uint8_t data) {
-		return RF_CALL_BLOCKING(transfer(data));
+		return transfer(data);
 	}
 
+	[[deprecated("Use transfer() instead!")]] // DEPRECATED: 2026q3
 	static void
 	transferBlocking(const uint8_t *tx, uint8_t *rx, std::size_t length) {
-		// If we do not need to receive data, use a more efficient
-		// transmit-only routine to increase throughput
-		if(rx) {
-			RF_CALL_BLOCKING(transfer(tx, rx, length));
-		} else {
-			transferBlocking(tx, length);
-		}
+		transfer(tx, rx, length);
 	}
 
-	static modm::ResumableResult<uint8_t>
+	static uint8_t
 	transfer(uint8_t data);
 
-	static modm::ResumableResult<void>
+	static void
 	transfer(const uint8_t *tx, uint8_t *rx, std::size_t length);
 
 	/** Enable local loopback mode, to internally connect MOSI to MISO */
@@ -145,17 +142,6 @@ public:
 			Regs()->SPI_MR &= ~SPI_MR_LLB;
 		}
 	}
-
-protected:
-	/** Perform transmit-only transaction
-	 *
-	 * A faster version of blocking transfer when transmitting only.
-	 *
-	 * If no receive is needed, the next byte can be loaded while the
-	 * current transfer is in progress.
-	 */
-	static void
-	transferBlocking(const uint8_t *tx, std::size_t length);
 };
 
 } // namespace modm::platform

@@ -15,18 +15,10 @@ def get_properties(env):
     device = env[":target"]
     driver = device.get_driver("spi:avr")
     properties = {}
-    properties["use_fiber"] = env.get(":processing:protothread:use_fiber", True)
     properties["target"] = device.identifier
     properties["partname"] = device.partname
     properties["driver"] = driver
     return properties
-
-def load_options(module):
-    module.add_option(
-        BooleanOption(
-            name="busywait",
-            description="",
-            default=False))
 
 
 class Instance(Module):
@@ -38,8 +30,6 @@ class Instance(Module):
         module.description = "Instance {}".format(self.instance)
 
     def prepare(self, module, options):
-        module.depends(":platform:spi")
-        load_options(module)
         return True
 
     def build(self, env):
@@ -66,11 +56,10 @@ def prepare(module, options):
     if "instance" in driver:
         for instance in listify(driver["instance"]):
             module.add_submodule(Instance(int(instance)))
-    else:
-        load_options(module)
 
     module.depends(
         ":architecture:atomic",
+        ":architecture:fiber",
         ":architecture:spi",
         ":platform:gpio",
         ":math:algorithm",

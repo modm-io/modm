@@ -16,7 +16,6 @@ def get_properties(env):
     device = env[":target"]
     driver = device.get_driver("spi")
     properties = {}
-    properties["use_fiber"] = env.get(":processing:protothread:use_fiber", True)
     properties["target"] = device.identifier
     properties["features"] = driver["feature"] if "feature" in driver else []
     return properties
@@ -69,6 +68,7 @@ def prepare(module, options):
     module.depends(
         ":architecture:register",
         ":architecture:spi",
+        ":architecture:fiber",
         ":cmsis:device",
         ":math:algorithm",
         ":platform:gpio",

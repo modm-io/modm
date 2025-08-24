@@ -73,23 +73,25 @@ public:
 	release(void *ctx);
 
 
+	[[deprecated("Use transfer() instead!")]] // DEPRECATED: 2026q3
 	static uint8_t
 	transferBlocking(uint8_t data)
 	{
-		return RF_CALL_BLOCKING(transfer(data));
+		return transfer(data);
 	}
 
+	[[deprecated("Use transfer() instead!")]] // DEPRECATED: 2026q3
 	static void
 	transferBlocking(uint8_t *tx, uint8_t *rx, std::size_t length)
 	{
-		RF_CALL_BLOCKING(transfer(tx, rx, length));
+		transfer(tx, rx, length);
 	}
 
 
-	static modm::ResumableResult<uint8_t>
+	static uint8_t
 	transfer(uint8_t data);
 
-	static modm::ResumableResult<void>
+	static void
 	transfer(uint8_t *tx, uint8_t *rx, std::size_t length);
 
 public:

@@ -13,6 +13,7 @@
 #define MODM_STM32_SPI_MASTER{{ id }}_DMA_HPP
 
 #include <modm/platform/dma/dma.hpp>
+#include <modm/processing/fiber.hpp>
 #include "spi_master_{{ id }}.hpp"
 
 namespace modm
@@ -56,22 +57,24 @@ public:
 	static void
 	initialize();
 
+	[[deprecated("Use transfer() instead!")]] // DEPRECATED: 2026q3
 	static uint8_t
 	transferBlocking(uint8_t data)
 	{
-		return RF_CALL_BLOCKING(transfer(data));
+		return transfer(data);
 	}
 
+	[[deprecated("Use transfer() instead!")]] // DEPRECATED: 2026q3
 	static void
 	transferBlocking(const uint8_t *tx, uint8_t *rx, std::size_t length)
 	{
-		RF_CALL_BLOCKING(transfer(tx, rx, length));
+		transfer(tx, rx, length);
 	}
 
-	static modm::ResumableResult<uint8_t>
+	static uint8_t
 	transfer(uint8_t data);
 
-	static modm::ResumableResult<void>
+	static void
 	transfer(const uint8_t *tx, uint8_t *rx, std::size_t length);
 
 private:

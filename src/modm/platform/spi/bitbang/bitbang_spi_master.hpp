@@ -21,6 +21,7 @@
 #include <modm/architecture/interface/spi_master.hpp>
 #include <modm/architecture/interface/delay.hpp>
 #include <modm/platform/gpio/connector.hpp>
+#include <modm/processing/fiber.hpp>
 
 namespace modm
 {
@@ -61,28 +62,26 @@ public:
 	static void
 	setDataOrder(DataOrder order);
 
+	[[deprecated("Use transfer() instead!")]] // DEPRECATED: 2026q3
 	static uint8_t
 	transferBlocking(uint8_t data);
 
+	[[deprecated("Use transfer() instead!")]] // DEPRECATED: 2026q3
 	static void
 	transferBlocking(const uint8_t *tx, uint8_t *rx, std::size_t length);
 
-	static modm::ResumableResult<uint8_t>
+	static uint8_t
 	transfer(uint8_t data);
 
-	static modm::ResumableResult<void>
+	static void
 	transfer(const uint8_t *tx, uint8_t *rx, std::size_t length);
 
 private:
 	static void
 	delay();
 
-	static uint16_t delayTime;
-
-	static uint8_t operationMode;
-	static uint8_t count;
-	static void *context;
-	static ConfigurationHandler configuration;
+	static inline uint16_t delayTime{1};
+	static inline uint8_t operationMode{0};
 };
 
 } // namespace platform

@@ -21,6 +21,7 @@
 #include <modm/architecture/interface/spi_lock.hpp>
 #include <modm/architecture/interface/spi_master.hpp>
 #include <modm/platform/gpio/connector.hpp>
+#include <modm/processing/fiber.hpp>
 #include <modm/math/algorithm/prescaler.hpp>
 #include "spi_hal_{{ id }}.hpp"
 
@@ -36,10 +37,6 @@ namespace modm::platform
  */
 class SpiMaster{{ id }} : public modm::SpiMaster, public SpiLock<SpiMaster{{ id }}>, public SpiBase
 {
-private:
-	// Bit0: single transfer state
-	// Bit1: block transfer state
-	static inline uint8_t state{0};
 public:
 	using DataMode = SpiBase::DataMode;
 	using Hal = SpiHal{{ id }};
@@ -78,7 +75,6 @@ public:
 		assertBaudrateInTolerance<result.frequency, baudrate, tolerance>();
 
 		SpiHal{{ id }}::initialize(result.prescaler);
-		state = 0;
 	}
 
 	static void
@@ -93,22 +89,24 @@ public:
 		SpiHal{{ id }}::setDataSize(size);
 	}
 
+	[[deprecated("Use transfer() instead!")]] // DEPRECATED: 2026q3
 	static uint8_t
 	transferBlocking(uint8_t data)
 	{
-		return RF_CALL_BLOCKING(transfer(data));
+		return transfer(data);
 	}
 
+	[[deprecated("Use transfer() instead!")]] // DEPRECATED: 2026q3
 	static void
 	transferBlocking(const uint8_t* tx, uint8_t* rx, std::size_t length)
 	{
-		RF_CALL_BLOCKING(transfer(tx, rx, length));
+		transfer(tx, rx, length);
 	}
 
-	static modm::ResumableResult<uint8_t>
+	static uint8_t
 	transfer(uint8_t data);
 
-	static modm::ResumableResult<void>
+	static void
 	transfer(const uint8_t* tx, uint8_t* rx, std::size_t length);
 };
 

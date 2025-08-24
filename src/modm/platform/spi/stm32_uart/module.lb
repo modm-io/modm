@@ -17,7 +17,6 @@ def get_properties(env):
         "target": device.identifier,
         "driver": driver,
         "over8_sampling": ("feature" in driver) and ("over8" in driver["feature"]),
-        "use_fiber": env.get(":processing:protothread:use_fiber", True)
     }
     return properties
 
@@ -56,6 +55,7 @@ def prepare(module, options):
 
     module.depends(
         ":architecture:spi",
+        ":architecture:fiber",
         ":cmsis:device",
         ":platform:gpio",
         ":platform:uart")

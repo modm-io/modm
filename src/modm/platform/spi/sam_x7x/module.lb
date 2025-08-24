@@ -15,7 +15,6 @@
 def get_properties(env):
     device = env[":target"]
     properties = {}
-    properties["use_fiber"] = env.get(":processing:protothread:use_fiber", True)
     properties["target"] = device.identifier
     return properties
 
@@ -29,7 +28,6 @@ class Instance(Module):
         module.description = "Instance {}".format(self.instance)
 
     def prepare(self, module, options):
-        module.depends(":platform:spi")
         return True
 
     def build(self, env):
@@ -61,6 +59,7 @@ def prepare(module, options):
     module.depends(
         ":architecture:register",
         ":architecture:spi",
+        ":architecture:fiber",
         ":cmsis:device",
         ":math:algorithm",
         ":platform:gpio")

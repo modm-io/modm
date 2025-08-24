@@ -19,6 +19,7 @@
 #include <modm/architecture/interface/spi_lock.hpp>
 #include <modm/architecture/interface/spi_master.hpp>
 #include <modm/platform/gpio/connector.hpp>
+#include <modm/processing/fiber.hpp>
 
 
 namespace modm
@@ -142,35 +143,33 @@ public:
 %% endif
 	}
 
+	[[deprecated("Use transfer() instead!")]] // DEPRECATED: 2026q3
 	static uint8_t
 	transferBlocking(uint8_t data)
 	{
-		return RF_CALL_BLOCKING(transfer(data));
+		return transfer(data);
 	}
 
+	[[deprecated("Use transfer() instead!")]] // DEPRECATED: 2026q3
 	static void
 	transferBlocking(const uint8_t *tx, uint8_t *rx, std::size_t length)
 	{
-		RF_CALL_BLOCKING(transfer(tx, rx, length));
+		transfer(tx, rx, length);
 	}
 
 
-	static modm::ResumableResult<uint8_t>
+	static uint8_t
 	transfer(uint8_t data);
 
-	static modm::ResumableResult<void>
+	static void
 	transfer(const uint8_t *tx, uint8_t *rx, std::size_t length);
 
 protected:
 	static void
 	initialize(uint16_t prescaler);
-
-private:
-	// bit 7 (0x80) is used for transfer 1 byte
-	// bit 6 (0x40) is used for transfer multiple byte
-	static inline uint8_t state{};
-
 %% if not extended
+%#
+private:
 	static inline DataOrder dataOrder = DataOrder::MsbFirst;
 %% endif
 };

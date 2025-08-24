@@ -44,7 +44,7 @@ modm_test::platform::SpiMaster::release(void *ctx)
 }
 // ----------------------------------------------------------------------------
 
-modm::ResumableResult<uint8_t>
+uint8_t
 modm_test::platform::SpiMaster::transfer(uint8_t data)
 {
 	txBuffer.append(data);
@@ -56,14 +56,10 @@ modm_test::platform::SpiMaster::transfer(uint8_t data)
 	else {
 		tmp = 0;
 	}
-%% if use_fiber
 	return tmp;
-%% else
-	return {modm::rf::Stop, tmp};
-%% endif
 }
 
-modm::ResumableResult<void>
+void
 modm_test::platform::SpiMaster::transfer(uint8_t * tx, uint8_t * rx, std::size_t length)
 {
 	for(std::size_t i = 0; i < length; ++i) {
@@ -91,8 +87,4 @@ modm_test::platform::SpiMaster::transfer(uint8_t * tx, uint8_t * rx, std::size_t
 			rxBuffer.removeFront();
 		}
 	}
-
-%% if not use_fiber
-	return {modm::rf::Stop};
-%% endif
 }

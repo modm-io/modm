@@ -14,27 +14,17 @@
 #include "uart_spi_master_{{id}}.hpp"
 #include <modm/math/utils/bit_operation.hpp>
 
-modm::platform::UartSpiMaster{{ id }}::DataOrder
-	modm::platform::UartSpiMaster{{ id }}::dataOrder =
-	modm::platform::UartSpiMaster{{ id }}::DataOrder::MsbFirst;
-
-// Bit0: single transfer state
-// Bit1: block transfer state
-uint8_t
-modm::platform::UartSpiMaster{{ id }}::state(0);
-
 // ----------------------------------------------------------------------------
 
-modm::ResumableResult<uint8_t>
+uint8_t
 modm::platform::UartSpiMaster{{ id }}::transfer(uint8_t data)
 {
-%% if use_fiber
 	// wait for previous transfer to finish
 	while (!UsartHal{{ id }}::isTransmitRegisterEmpty())
 		modm::this_fiber::yield();
 
 	// start transfer by copying data into register
-	if(dataOrder == DataOrder::MsbFirst)
+	if (dataOrder == DataOrder::MsbFirst)
 		data = ::modm::bitReverse(data);
 	UsartHal{{ id }}::write(data);
 
@@ -44,54 +34,16 @@ modm::platform::UartSpiMaster{{ id }}::transfer(uint8_t data)
 
 	UsartHal{{ id }}::read(data);
 
-	if(dataOrder == DataOrder::MsbFirst)
+	if (dataOrder == DataOrder::MsbFirst)
 		data = ::modm::bitReverse(data);
 
 	return data;
-%% else
-	// this is a manually implemented "fast resumable function"
-	// there is no context or nesting protection, since we don't need it.
-	// there are only two states encoded into 1 bit (LSB of state):
-	//   1. waiting to start, and
-	//   2. waiting to finish.
-
-	// LSB == Bit0 ?
-	if ( !(state & Bit0) )
-	{
-		// wait for previous transfer to finish
-		if (!UsartHal{{ id }}::isTransmitRegisterEmpty())
-			return {modm::rf::Running};
-
-		// start transfer by copying data into register
-		if(dataOrder == DataOrder::MsbFirst) {
-			data = ::modm::bitReverse(data);
-		}
-		UsartHal{{ id }}::write(data);
-
-		// set LSB = 1
-		state |= Bit0;
-	}
-
-	if (!UsartHal{{ id }}::isReceiveRegisterNotEmpty())
-		return {modm::rf::Running};
-
-	UsartHal{{ id }}::read(data);
-
-	if(dataOrder == DataOrder::MsbFirst) {
-		data = ::modm::bitReverse(data);
-	}
-
-	// transfer finished
-	state &= ~Bit0;
-	return {modm::rf::Stop, data};
-%% endif
 }
 
-modm::ResumableResult<void>
+void
 modm::platform::UartSpiMaster{{ id }}::transfer(
 		const uint8_t * tx, uint8_t * rx, std::size_t length)
 {
-%% if use_fiber
 	for (std::size_t index = 0; index < length; index++)
 	{
 		// if tx == 0, we use a dummy byte 0x00 else we copy it from the array
@@ -99,45 +51,4 @@ modm::platform::UartSpiMaster{{ id }}::transfer(
 		// if rx != 0, we copy the result into the array
 		if (rx) rx[index] = result;
 	}
-%% else
-	// this is a manually implemented "fast resumable function"
-	// there is no context or nesting protection, since we don't need it.
-	// there are only two states encoded into 1 bit (0x02 of state):
-	//   1. initialize index, and
-	//   2. wait for 1-byte transfer to finish.
-
-	// we need to globally remember which byte we are currently transferring
-	static std::size_t index = 0;
-
-	// we are only interested in Bit1
-	switch(state & Bit1)
-	{
-		case 0:
-			// we will only visit this state once
-			state |= Bit1;
-
-			// initialize index and check range
-			index = 0;
-			while (index < length)
-			{
-		default:
-		{
-				// call the resumable function
-				modm::ResumableResult<uint8_t> result = transfer(tx ? tx[index] : 0);
-
-				// if the resumable function is still running, so are we
-				if (result.getState() > modm::rf::NestingError)
-					return {modm::rf::Running};
-
-				// if rx != 0, we copy the result into the array
-				if (rx) rx[index] = result.getResult();
-		}
-				index++;
-			}
-
-			// clear the state
-			state &= ~Bit1;
-			return {modm::rf::Stop};
-	}
-%% endif
 }

@@ -29,7 +29,7 @@ modm::platform::SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::initialize()
 }
 
 template <class DmaChannelRx, class DmaChannelTx>
-modm::ResumableResult<uint8_t>
+uint8_t
 modm::platform::SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(uint8_t data)
 {
 	// this is a manually implemented "fast resumable function"
@@ -112,11 +112,10 @@ modm::platform::SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::waitCompleted
 }
 
 template <class DmaChannelRx, class DmaChannelTx>
-modm::ResumableResult<void>
+void
 modm::platform::SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(
 		const uint8_t *tx, uint8_t *rx, std::size_t length)
 {
-%% if use_fiber
 	if ((!rx and !tx) or length == 0) return;
 	if constexpr (Dma::RxChannel::mask == 0) rx = nullptr;
 
@@ -139,49 +138,4 @@ modm::platform::SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(
 	}
 
 	disableDreq(Dma::DreqTx | Dma::DreqRx);
-%% else
-	if ( (!rx && !tx) || length == 0) {
-		return {modm::rf::Stop};
-	}
-	if constexpr (Dma::RxChannel::mask == 0) rx = nullptr;
-	// this is a manually implemented "fast resumable function"
-	// there is no context or nesting protection, since we don't need it.
-	// there are only two states encoded into 1 bit (Bit1 of state):
-	//   1. initialize index, and
-	//   2. wait for 1-byte transfer to finish.
-
-	// we are only interested in Bit1
-	switch(state & Bit1)
-	{
-	case 0:
-		// we will only visit this state once
-		state |= Bit1;
-		startTransfer(tx,rx,length);
-
-		[[fallthrough]];
-
-	default:
-		if (Dma::TxChannel::isBusy() or (rx && Dma::RxChannel::isBusy()))
-			return { modm::rf::Running };
-		if (!txFifoEmpty() or (rx && !rxFifoEmpty()) or isBusy())
-			return { modm::rf::Running };
-		if (!rx) {
-			// Drain RX FIFO, then wait for shifting to finish (which may be *after*
-			// TX FIFO drains), then drain RX FIFO again
-			while (!rxFifoEmpty())
-				(void)read();
-			if (isBusy())
-				return { modm::rf::Running };
-
-			// Don't leave overrun flag set
-			spi{{ id }}_hw->icr = SPI_SSPICR_RORIC_BITS;
-		}
-
-
-		disableDreq(Dma::DreqTx|Dma::DreqRx);
-		// clear the state
-		state &= ~Bit1;
-		return {modm::rf::Stop};
-	}
-%% endif
 }

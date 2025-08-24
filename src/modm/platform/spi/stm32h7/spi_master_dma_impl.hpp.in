@@ -41,10 +41,6 @@ SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::initialize()
 	Tx::setPeripheralAddress(reinterpret_cast<uint32_t>(Hal::transmitRegister()));
 	Tx::template setPeripheralRequest<Dma::TxRequest>();
 
-%% if not use_fiber
-	state = 0;
-%% endif
-
 	constexpr auto result = modm::Prescaler::from_power(SystemClock::Spi{{ id }}, baudrate, 2, 256);
 	assertBaudrateInTolerance< result.frequency, baudrate, tolerance >();
 
@@ -53,11 +49,10 @@ SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::initialize()
 }
 
 template <class DmaChannelRx, class DmaChannelTx>
-modm::ResumableResult<uint8_t>
+uint8_t
 SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(uint8_t data)
 {
 	// DMA is not used for single byte transfers
-%% if use_fiber
 	Hal::setDuplexMode(Hal::DuplexMode::FullDuplex);
 	Hal::setTransferSize(1);
 	Hal::enableTransfer();
@@ -72,35 +67,6 @@ SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(uint8_t data)
 	finishTransfer();
 
 	return data;
-%% else
-	// this is a manually implemented "fast resumable function"
-	// there is no context or nesting protection, since we don't need it.
-	// there are only two states encoded into 1 bit (LSB of state):
-	//   1. waiting to start, and
-	//   2. waiting to finish.
-	// LSB != Bit0 ?
-	if ( !(state & Bit0) )
-	{
-		Hal::setDuplexMode(Hal::DuplexMode::FullDuplex);
-		Hal::setTransferSize(1);
-		Hal::enableTransfer();
-		Hal::write(data);
-		Hal::startMasterTransfer();
-
-		// set LSB = Bit0
-		state |= Bit0;
-	}
-
-	if (!Hal::isTransferCompleted())
-		return {modm::rf::Running};
-
-	data = SpiHal{{ id }}::read();
-	finishTransfer();
-
-	// transfer finished
-	state &= ~Bit0;
-	return {modm::rf::Stop, data};
-%% endif
 }
 
 template <class DmaChannelRx, class DmaChannelTx>
@@ -149,12 +115,11 @@ SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::startDmaTransfer(
 
 
 template <class DmaChannelRx, class DmaChannelTx>
-modm::ResumableResult<void>
+void
 SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(
 		const uint8_t* tx, uint8_t* rx, std::size_t length)
 {
 	using Flags = DmaChannelRx::InterruptFlags;
-%% if use_fiber
 	startDmaTransfer(tx, rx, length);
 
 	bool dmaRxFinished = (rx == nullptr);
@@ -177,58 +142,6 @@ SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(
 		modm::this_fiber::yield();
 	}
 	finishTransfer();
-%% else
-	// this is a manually implemented "fast resumable function"
-	// there is no context or nesting protection, since we don't need it.
-	// there are only two states encoded into 1 bit (Bit1 of state):
-	//   1. initialize index, and
-	//   2. wait for 1-byte transfer to finish.
-
-	// we are only interested in Bit1
-	switch(state & Bit1)
-	{
-	case 0:
-		// we will only visit this state once
-		state |= Bit1;
-		startDmaTransfer(tx, rx, length);
-		if (!rx) {
-			state |= Bit2;
-		}
-		[[fallthrough]];
-
-	default:
-		if (!Hal::isTransferCompleted() or !(state & Bit2)) {
-			if(rx) {
-				static typename DmaChannelRx::InterruptFlags_t flags;
-				flags = DmaChannelRx::getInterruptFlags();
-				if (flags & Flags::Error) {
-					// abort on DMA error
-					finishTransfer();
-					state &= ~(Bit2 | Bit1);
-					return {modm::rf::Stop};
-				}
-				if (flags & Flags::TransferComplete) {
-					state |= Bit2;
-				}
-			}
-			if(tx) {
-				if (DmaChannelTx::getInterruptFlags() & Flags::Error) {
-					// abort on DMA error
-					finishTransfer();
-					state &= ~(Bit2 | Bit1);
-					return {modm::rf::Stop};
-				}
-			}
-			return { modm::rf::Running };
-		}
-
-		finishTransfer();
-
-		// clear the state
-		state &= ~(Bit2 | Bit1);
-		return {modm::rf::Stop};
-	}
-%% endif
 }
 
 template <class DmaChannelRx, class DmaChannelTx>
