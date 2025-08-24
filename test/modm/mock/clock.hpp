@@ -20,6 +20,9 @@ namespace modm_test::chrono
 class milli_clock : modm::chrono::milli_clock
 {
 public:
+	static void enable();
+	static void disable();
+
 	static inline void setTime(std::chrono::milliseconds time)
 	{ setTime(time.count()); }
 	static void setTime(uint32_t milliseconds);
@@ -33,6 +36,9 @@ public:
 class micro_clock : modm::chrono::micro_clock
 {
 public:
+	static void enable();
+	static void disable();
+
 	static inline void setTime(std::chrono::microseconds time)
 	{ setTime(time.count()); }
 	static void setTime(uint32_t microseconds);

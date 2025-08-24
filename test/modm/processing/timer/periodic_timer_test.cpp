@@ -22,7 +22,14 @@ using test_clock = modm_test::chrono::milli_clock;
 void
 PeriodicTimerTest::setUp()
 {
+	test_clock::enable();
 	test_clock::setTime(0);
+}
+
+void
+PeriodicTimerTest::tearDown()
+{
+	test_clock::disable();
 }
 
 void

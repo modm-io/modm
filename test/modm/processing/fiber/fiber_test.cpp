@@ -23,7 +23,16 @@ using test_clock_us = modm_test::chrono::micro_clock;
 void
 FiberTest::setUp()
 {
+	test_clock_ms::enable();
+	test_clock_us::enable();
 	state = 0;
+}
+
+void
+FiberTest::tearDown()
+{
+	test_clock_ms::disable();
+	test_clock_us::disable();
 }
 
 // ================================== FIBER ===================================

@@ -21,6 +21,7 @@ using test_clock = modm_test::chrono::milli_clock;
 void
 DispatcherTest::setUp()
 {
+	test_clock::enable();
 	backend = new FakeBackend();
 	postman = new FakePostman();
 	dispatcher = new xpcc::Dispatcher(backend, postman);
@@ -36,6 +37,7 @@ DispatcherTest::setUp()
 void
 DispatcherTest::tearDown()
 {
+	test_clock::disable();
 	delete component2;
 	delete component1;
 	delete timeline;

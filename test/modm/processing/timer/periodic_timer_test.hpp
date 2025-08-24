@@ -17,8 +17,11 @@
 class PeriodicTimerTest : public unittest::TestSuite
 {
 public:
-	virtual void
-	setUp();
+	void
+	setUp() override;
+
+	void
+	tearDown() override;
 
 
 	void

@@ -25,6 +25,12 @@ class ClockTest : public unittest::TestSuite
 {
 public:
 	void
+	setUp() override;
+
+	void
+	tearDown() override;
+
+	void
 	testClock();
 };
 

@@ -18,7 +18,10 @@ class FiberTest : public unittest::TestSuite
 {
 public:
 	void
-	setUp();
+	setUp() override;
+
+	void
+	tearDown() override;
 
 	void
 	testOneFiber();

@@ -14,11 +14,16 @@
 
 // ----------------------------------------------------------------------------
 static uint32_t milli_time{0};
+static bool milli_enabled{false};
+
+modm::chrono::milli_clock::time_point
+modm_platform_milli_now() noexcept;
 
 modm::chrono::milli_clock::time_point
 modm::chrono::milli_clock::now() noexcept
 {
-	return time_point{duration{milli_time}};
+	if (milli_enabled) return time_point{duration{milli_time}};
+	return modm_platform_milli_now();
 }
 
 void
@@ -33,15 +38,31 @@ modm_test::chrono::milli_clock::increment(uint32_t milliseconds)
 	milli_time += milliseconds;
 }
 
+void
+modm_test::chrono::milli_clock::enable()
+{
+	milli_enabled = true;
+}
+
+void
+modm_test::chrono::milli_clock::disable()
+{
+	milli_enabled = false;
+}
+
 // ----------------------------------------------------------------------------
 static uint32_t micro_time{0};
+static bool micro_enabled{false};
+
+modm::chrono::micro_clock::time_point
+modm_platform_micro_now() noexcept;
 
 modm::chrono::micro_clock::time_point
 modm::chrono::micro_clock::now() noexcept
 {
-	return time_point{duration{micro_time}};
+	if (micro_enabled) return time_point{duration{micro_time}};
+	return modm_platform_micro_now();
 }
-
 void
 modm_test::chrono::micro_clock::setTime(uint32_t microseconds)
 {
@@ -52,4 +73,16 @@ void
 modm_test::chrono::micro_clock::increment(uint32_t microseconds)
 {
 	micro_time += microseconds;
+}
+
+void
+modm_test::chrono::micro_clock::enable()
+{
+	micro_enabled = true;
+}
+
+void
+modm_test::chrono::micro_clock::disable()
+{
+	micro_enabled = false;
 }

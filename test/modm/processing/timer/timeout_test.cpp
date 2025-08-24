@@ -25,8 +25,16 @@ using test_clock = modm_test::chrono::milli_clock;
 void
 TimeoutTest::setUp()
 {
+	test_clock::enable();
 	test_clock::setTime(0);
 }
+
+void
+TimeoutTest::tearDown()
+{
+	test_clock::disable();
+}
+
 
 void
 TimeoutTest::testDefaultConstructor()

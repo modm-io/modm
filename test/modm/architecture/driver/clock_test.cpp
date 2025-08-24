@@ -18,6 +18,18 @@
 using test_clock = modm_test::chrono::milli_clock;
 
 void
+ClockTest::setUp()
+{
+	test_clock::enable();
+}
+
+void
+ClockTest::tearDown()
+{
+	test_clock::disable();
+}
+
+void
 ClockTest::testClock()
 {
 	using time_point = modm::Clock::time_point;

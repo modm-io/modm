@@ -12,4 +12,8 @@
   <modules>
     <module>modm:build:scons</module>
   </modules>
+  <collectors>
+    <collect name="modm:build:cppdefines">MODM_CHRONO_MILLI_CLOCK_NOW=modm_platform_milli_now</collect>
+    <collect name="modm:build:cppdefines">MODM_CHRONO_MICRO_CLOCK_NOW=modm_platform_micro_now</collect>
+  </collectors>
 </library>
