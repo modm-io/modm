@@ -15,21 +15,23 @@
 
 #include <modm/driver/adc/ad7280a.hpp>
 #include <modm/platform/gpio/unused.hpp>
+#include <modm/architecture/interface/spi_master.hpp>
 
 #include "ad7280a_test.hpp"
 
 // ----------------------------------------------------------------------------
 #define ENABLE_MACRO_EXPORT
 #include <modm-test/mock/spi_device.hpp>
+#include <modm-test/mock/spi_master.hpp>
 #undef ENABLE_MACRO_EXPORT
 
 modm_test::SpiDevice device;
 
-class DummySpi
+class DummySpi : public modm_test::platform::SpiMaster
 {
 public:
 	static uint8_t
-	write(uint8_t data)
+	transfer(uint8_t data)
 	{
 		return device.write(data);
 	}
@@ -55,19 +57,19 @@ struct Cs
 	}
 };
 
-typedef modm::Ad7280a<DummySpi, Cs, modm::platform::GpioUnused, 1> Ad7280a;
+modm::Ad7280a<DummySpi, Cs, modm::platform::GpioUnused, 1> ad7280a;
 
 // ----------------------------------------------------------------------------
 void
 Ad7280aTest::testCrcByte()
 {
-	TEST_ASSERT_EQUALS(Ad7280a::updateCrc(0x00),   0);
-	TEST_ASSERT_EQUALS(Ad7280a::updateCrc(0x10), 174);
-	TEST_ASSERT_EQUALS(Ad7280a::updateCrc(0x20), 115);
-	TEST_ASSERT_EQUALS(Ad7280a::updateCrc(0x51), 103);
-	TEST_ASSERT_EQUALS(Ad7280a::updateCrc(0xAB), 182);
-	TEST_ASSERT_EQUALS(Ad7280a::updateCrc(0xEF), 236);
-	TEST_ASSERT_EQUALS(Ad7280a::updateCrc(0xFF),  66);
+	TEST_ASSERT_EQUALS(ad7280a.updateCrc(0x00),   0);
+	TEST_ASSERT_EQUALS(ad7280a.updateCrc(0x10), 174);
+	TEST_ASSERT_EQUALS(ad7280a.updateCrc(0x20), 115);
+	TEST_ASSERT_EQUALS(ad7280a.updateCrc(0x51), 103);
+	TEST_ASSERT_EQUALS(ad7280a.updateCrc(0xAB), 182);
+	TEST_ASSERT_EQUALS(ad7280a.updateCrc(0xEF), 236);
+	TEST_ASSERT_EQUALS(ad7280a.updateCrc(0xFF),  66);
 }
 
 // ----------------------------------------------------------------------------
@@ -75,16 +77,16 @@ void
 Ad7280aTest::testCrcMessage()
 {
 	// Datasheet Example 1
-	TEST_ASSERT_EQUALS(Ad7280a::calculateCrc(0x003430), 0x51);
+	TEST_ASSERT_EQUALS(ad7280a.calculateCrc(0x003430), 0x51);
 
 	// Datasheet Example 2
-	TEST_ASSERT_EQUALS(Ad7280a::calculateCrc(0x103430), 0x74);
+	TEST_ASSERT_EQUALS(ad7280a.calculateCrc(0x103430), 0x74);
 
 	// Datasheet Example 3
-	TEST_ASSERT_EQUALS(Ad7280a::calculateCrc(0x0070A1), 0x9A);
+	TEST_ASSERT_EQUALS(ad7280a.calculateCrc(0x0070A1), 0x9A);
 
 	// Datasheet Example 4
-	TEST_ASSERT_EQUALS(Ad7280a::calculateCrc(0x205335), 0x46);
+	TEST_ASSERT_EQUALS(ad7280a.calculateCrc(0x205335), 0x46);
 }
 
 // ----------------------------------------------------------------------------
@@ -112,7 +114,7 @@ Ad7280aTest::testChainSetup()
 
 	device.start(transmissionsInitialize, ARRAY_SIZE(transmissionsInitialize), __LINE__);
 
-	TEST_ASSERT_TRUE(Ad7280a::chainSetup());
+	TEST_ASSERT_TRUE(ad7280a.chainSetup());
 
 	device.finish();
 }
@@ -144,7 +146,7 @@ Ad7280aTest::testSelftest()
 
 	device.start(transmissionsInitialize, ARRAY_SIZE(transmissionsInitialize), __LINE__);
 
-	TEST_ASSERT_TRUE(Ad7280a::performSelftest());
+	TEST_ASSERT_TRUE(ad7280a.performSelftest());
 
 	device.finish();
 }
@@ -166,7 +168,7 @@ Ad7280aTest::testSoftwareReset()
 
 	device.start(transmissionsInitialize, ARRAY_SIZE(transmissionsInitialize), __LINE__);
 
-	Ad7280a::softwareReset();
+	ad7280a.softwareReset();
 
 	device.finish();
 }
@@ -198,7 +200,7 @@ Ad7280aTest::testChannelRead()
 	device.start(transmissionsInitialize, ARRAY_SIZE(transmissionsInitialize), __LINE__);
 
 	uint16_t value = 0;
-	TEST_ASSERT_TRUE(Ad7280a::readChannel(0, modm::ad7280a::CELL_VOLTAGE_4, &value));
+	TEST_ASSERT_TRUE(ad7280a.readChannel(0, modm::ad7280a::CELL_VOLTAGE_4, &value));
 
 	TEST_ASSERT_EQUALS(value, 549u);
 
@@ -248,7 +250,7 @@ Ad7280aTest::testAllChannelRead()
 	device.start(transmissionsInitialize, ARRAY_SIZE(transmissionsInitialize), __LINE__);
 
 	uint16_t values[6];
-	TEST_ASSERT_TRUE(Ad7280a::readAllChannels(values));
+	TEST_ASSERT_TRUE(ad7280a.readAllChannels(values));
 
 	TEST_ASSERT_EQUALS(values[0], 100u);
 	TEST_ASSERT_EQUALS(values[1], 200u);
@@ -273,7 +275,7 @@ Ad7280aTest::testBalancer()
 
 	device.start(transmissionsInitialize, ARRAY_SIZE(transmissionsInitialize), __LINE__);
 
-	Ad7280a::enableBalancer(0, modm::ad7280a::CB1 | modm::ad7280a::CB2);
+	ad7280a.enableBalancer(0, modm::ad7280a::CB1 | modm::ad7280a::CB2);
 
 	device.finish();
 }

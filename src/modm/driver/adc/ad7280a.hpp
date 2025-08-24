@@ -15,6 +15,7 @@
 
 #include <stdint.h>
 
+#include <modm/architecture/interface/spi_device.hpp>
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/processing/fiber.hpp>
 
@@ -145,38 +146,38 @@ namespace modm
 	 *
 	 * @ingroup modm_driver_ad7280a
 	 */
-	template <typename Spi, typename Cs, typename Cnvst, int N>
-	class Ad7280a
+	template <typename SpiMaster, typename Cs, typename Cnvst, int N>
+	class Ad7280a: public modm::SpiDevice<SpiMaster>
 	{
 		// used for Unittests
 		friend class ::Ad7280aTest;
 
 	public:
-		static void
+		void
 		initialize(ad7280a::Average average = ad7280a::NO_AVERAGE);
 
 		/*
 		 * Initialize daisy chain.
 		 */
-		static bool
+		bool
 		chainSetup();
 
 		/**
 		 * Enable/Disable the six cell balance outputs.
 		 */
-		static void
+		void
 		enableBalancer(uint8_t device, uint8_t cells);
 
-		static bool
+		bool
 		performSelftest();
 
-		static void
+		void
 		softwareReset();
 
 		/**
 		 * Read a single channel
 		 */
-		static bool
+		bool
 		readChannel(uint8_t device, ad7280a::Channel channel, uint16_t *value);
 
 		/**
@@ -184,14 +185,14 @@ namespace modm
 		 *
 		 * \param[out]	values		Array containing the results
 		 */
-		static bool
+		bool
 		readAllChannels(uint16_t *values);
 
 	private:
 		/**
 		 * Calculate the CRC for one byte
 		 */
-		static uint8_t
+		uint8_t
 		updateCrc(uint8_t data);
 
 		/**
@@ -206,30 +207,30 @@ namespace modm
 		 * uint8_t crc = calculateCrc(reg >> 10);
 		 * \endcode
 		 */
-		static uint8_t
+		uint8_t
 		calculateCrc(uint32_t data);
 
-		static bool
+		bool
 		write(uint8_t device, ad7280a::Register reg, bool addressAll, uint8_t value);
 
-		static bool
+		bool
 		read(uint32_t *value);
 
 
-		static bool
+		bool
 		readRegister(ad7280a::RegisterValue* result);
 
-		static bool
+		bool
 		readConversionResult(ad7280a::ConversionValue* result);
 
 
 		/*static void
 		dumpRegisterRead(uint32_t value);
 
-		static void
+		void
 		dumpConversion(uint32_t value);*/
 
-		static uint8_t controlHighByte;
+		uint8_t controlHighByte{};
 	};
 
 #if __has_include(<modm/io/iostream.hpp>)

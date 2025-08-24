@@ -131,13 +131,9 @@
 #define AD7280A_READ_TXVAL      0xF800030A
 
 // ----------------------------------------------------------------------------
-template <typename Spi, typename Cs, typename Cnvst, int N>
-uint8_t modm::Ad7280a<Spi, Cs, Cnvst, N>::controlHighByte = 0;
-
-// ----------------------------------------------------------------------------
-template <typename Spi, typename Cs, typename Cnvst, int N>
+template <typename SpiMaster, typename Cs, typename Cnvst, int N>
 void
-modm::Ad7280a<Spi, Cs, Cnvst, N>::initialize(ad7280a::Average average)
+modm::Ad7280a<SpiMaster, Cs, Cnvst, N>::initialize(ad7280a::Average average)
 {
 	static_assert(N == 1, "Daisy chain length is currently limited to 1!");
 
@@ -148,9 +144,9 @@ modm::Ad7280a<Spi, Cs, Cnvst, N>::initialize(ad7280a::Average average)
 }
 
 // ----------------------------------------------------------------------------
-template <typename Spi, typename Cs, typename Cnvst, int N>
+template <typename SpiMaster, typename Cs, typename Cnvst, int N>
 bool
-modm::Ad7280a<Spi, Cs, Cnvst, N>::chainSetup()
+modm::Ad7280a<SpiMaster, Cs, Cnvst, N>::chainSetup()
 {
 	// Set reset bit for all devices
 	write(ad7280a::MASTER, ad7280a::CTRL_LB, true,
@@ -200,17 +196,17 @@ modm::Ad7280a<Spi, Cs, Cnvst, N>::chainSetup()
 }
 
 // ----------------------------------------------------------------------------
-template <typename Spi, typename Cs, typename Cnvst, int N>
+template <typename SpiMaster, typename Cs, typename Cnvst, int N>
 void
-modm::Ad7280a<Spi, Cs, Cnvst, N>::enableBalancer(uint8_t device, uint8_t cells)
+modm::Ad7280a<SpiMaster, Cs, Cnvst, N>::enableBalancer(uint8_t device, uint8_t cells)
 {
 	write(device, ad7280a::CELL_BALANCE, false, cells);
 }
 
 // ----------------------------------------------------------------------------
-template <typename Spi, typename Cs, typename Cnvst, int N>
+template <typename SpiMaster, typename Cs, typename Cnvst, int N>
 bool
-modm::Ad7280a<Spi, Cs, Cnvst, N>::performSelftest()
+modm::Ad7280a<SpiMaster, Cs, Cnvst, N>::performSelftest()
 {
 	// Set Bit D0 of the control register to 1 on all parts. This
 	// setting enables the daisy-chain register read operation on
@@ -256,9 +252,9 @@ modm::Ad7280a<Spi, Cs, Cnvst, N>::performSelftest()
 }
 
 // ----------------------------------------------------------------------------
-template <typename Spi, typename Cs, typename Cnvst, int N>
+template <typename SpiMaster, typename Cs, typename Cnvst, int N>
 void
-modm::Ad7280a<Spi, Cs, Cnvst, N>::softwareReset()
+modm::Ad7280a<SpiMaster, Cs, Cnvst, N>::softwareReset()
 {
 	// Set reset bit for all devices
 	write(ad7280a::MASTER, ad7280a::CTRL_LB, true,
@@ -275,9 +271,9 @@ modm::Ad7280a<Spi, Cs, Cnvst, N>::softwareReset()
 }
 
 // ----------------------------------------------------------------------------
-template <typename Spi, typename Cs, typename Cnvst, int N>
+template <typename SpiMaster, typename Cs, typename Cnvst, int N>
 bool
-modm::Ad7280a<Spi, Cs, Cnvst, N>::readChannel(uint8_t device,
+modm::Ad7280a<SpiMaster, Cs, Cnvst, N>::readChannel(uint8_t device,
 		ad7280a::Channel channel, uint16_t *value)
 {
 	write(ad7280a::MASTER, ad7280a::CTRL_HB, true,
@@ -308,9 +304,9 @@ modm::Ad7280a<Spi, Cs, Cnvst, N>::readChannel(uint8_t device,
 }
 
 // ----------------------------------------------------------------------------
-template <typename Spi, typename Cs, typename Cnvst, int N>
+template <typename SpiMaster, typename Cs, typename Cnvst, int N>
 bool
-modm::Ad7280a<Spi, Cs, Cnvst, N>::readAllChannels(uint16_t *values)
+modm::Ad7280a<SpiMaster, Cs, Cnvst, N>::readAllChannels(uint16_t *values)
 {
 	// Write Register Address 0x00 to the read register on all
 	// parts. A device address of 0x00 is used when computing
@@ -350,9 +346,9 @@ modm::Ad7280a<Spi, Cs, Cnvst, N>::readAllChannels(uint16_t *values)
 /*
  * P(x) = x^8 + x^5 + x^3 + x^2 + x^1 + x^0 = 0b100101111 => 0x2F
  */
-template <typename Spi, typename Cs, typename Cnvst, int N>
+template <typename SpiMaster, typename Cs, typename Cnvst, int N>
 uint8_t
-modm::Ad7280a<Spi, Cs, Cnvst, N>::updateCrc(uint8_t data)
+modm::Ad7280a<SpiMaster, Cs, Cnvst, N>::updateCrc(uint8_t data)
 {
 	for (uint_fast8_t i = 0; i < 8; i++) {
 		uint8_t bit = data & 0x80;
@@ -366,9 +362,9 @@ modm::Ad7280a<Spi, Cs, Cnvst, N>::updateCrc(uint8_t data)
 }
 
 // ----------------------------------------------------------------------------
-template <typename Spi, typename Cs, typename Cnvst, int N>
+template <typename SpiMaster, typename Cs, typename Cnvst, int N>
 uint8_t
-modm::Ad7280a<Spi, Cs, Cnvst, N>::calculateCrc(uint32_t data)
+modm::Ad7280a<SpiMaster, Cs, Cnvst, N>::calculateCrc(uint32_t data)
 {
 	uint8_t crc;
 
@@ -379,9 +375,9 @@ modm::Ad7280a<Spi, Cs, Cnvst, N>::calculateCrc(uint32_t data)
 }
 
 // ----------------------------------------------------------------------------
-template <typename Spi, typename Cs, typename Cnvst, int N>
+template <typename SpiMaster, typename Cs, typename Cnvst, int N>
 bool
-modm::Ad7280a<Spi, Cs, Cnvst, N>::write(uint8_t device, ad7280a::Register reg,
+modm::Ad7280a<SpiMaster, Cs, Cnvst, N>::write(uint8_t device, ad7280a::Register reg,
 		bool addressAll, uint8_t value)
 {
 	// The device address is send with LSB first
@@ -393,12 +389,14 @@ modm::Ad7280a<Spi, Cs, Cnvst, N>::write(uint8_t device, ad7280a::Register reg,
 
 	t |= calculateCrc(t >> 11) << 3 | 0x2;
 
+	modm::this_fiber::poll([&]{ return this->acquireMaster(); });
 	Cs::reset();
-	Spi::write((t >> 24) & 0xff);
-	Spi::write((t >> 16) & 0xff);
-	Spi::write((t >> 8) & 0xff);
-	Spi::write((t >> 0) & 0xff);
-	Cs::set();
+	SpiMaster::transfer((t >> 24) & 0xff);
+	SpiMaster::transfer((t >> 16) & 0xff);
+	SpiMaster::transfer((t >> 8) & 0xff);
+	SpiMaster::transfer((t >> 0) & 0xff);
+
+	if (this->releaseMaster()) Cs::set();
 
 	// TODO remove this
 	modm::this_fiber::sleep_for(1us);
@@ -406,16 +404,19 @@ modm::Ad7280a<Spi, Cs, Cnvst, N>::write(uint8_t device, ad7280a::Register reg,
 }
 
 // ----------------------------------------------------------------------------
-template <typename Spi, typename Cs, typename Cnvst, int N>
+template <typename SpiMaster, typename Cs, typename Cnvst, int N>
 bool
-modm::Ad7280a<Spi, Cs, Cnvst, N>::read(uint32_t *value)
+modm::Ad7280a<SpiMaster, Cs, Cnvst, N>::read(uint32_t *value)
 {
+	modm::this_fiber::poll([&]{ return this->acquireMaster(); });
 	Cs::reset();
-	*value  = static_cast<uint32_t>(Spi::write(0xF8)) << 24;
-	*value |= static_cast<uint32_t>(Spi::write(0x00)) << 16;
-	*value |= static_cast<uint32_t>(Spi::write(0x03)) << 8;
-	*value |= static_cast<uint32_t>(Spi::write(0x0A));
-	Cs::set();
+
+	*value  = static_cast<uint32_t>(SpiMaster::transfer(0xF8)) << 24;
+	*value |= static_cast<uint32_t>(SpiMaster::transfer(0x00)) << 16;
+	*value |= static_cast<uint32_t>(SpiMaster::transfer(0x03)) << 8;
+	*value |= static_cast<uint32_t>(SpiMaster::transfer(0x0A));
+
+	if (this->releaseMaster()) Cs::set();
 
 	//MODM_LOG_DEBUG << "read = " << modm::hex << *value << modm::ascii << modm::endl;
 
@@ -430,9 +431,9 @@ modm::Ad7280a<Spi, Cs, Cnvst, N>::read(uint32_t *value)
 }
 
 // ----------------------------------------------------------------------------
-template <typename Spi, typename Cs, typename Cnvst, int N>
+template <typename SpiMaster, typename Cs, typename Cnvst, int N>
 bool
-modm::Ad7280a<Spi, Cs, Cnvst, N>::readRegister(ad7280a::RegisterValue* result)
+modm::Ad7280a<SpiMaster, Cs, Cnvst, N>::readRegister(ad7280a::RegisterValue* result)
 {
 	uint32_t value;
 	if (read(&value))
@@ -449,9 +450,9 @@ modm::Ad7280a<Spi, Cs, Cnvst, N>::readRegister(ad7280a::RegisterValue* result)
 }
 
 // ----------------------------------------------------------------------------
-template <typename Spi, typename Cs, typename Cnvst, int N>
+template <typename SpiMaster, typename Cs, typename Cnvst, int N>
 bool
-modm::Ad7280a<Spi, Cs, Cnvst, N>::readConversionResult(ad7280a::ConversionValue* result)
+modm::Ad7280a<SpiMaster, Cs, Cnvst, N>::readConversionResult(ad7280a::ConversionValue* result)
 {
 	uint32_t value;
 	if (read(&value))
