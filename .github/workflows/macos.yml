@@ -67,7 +67,7 @@ jobs:
       - name: Hosted Examples
         if: always()
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py linux)
+          (cd examples/linux && ../../tools/scripts/examples_compile.py block_device assert build_info etl fiber git logger printf threads)
 
       - name: Compile STM32 Examples
         if: always()
