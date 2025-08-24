@@ -14,6 +14,7 @@
 #include <cmath>
 
 #include <modm/debug/logger/logger.hpp>
+#include <modm/math/utils/bit_constants.hpp>
 
 #ifndef MODM_BMP085_DATA_HPP
 #define MODM_BMP085_DATA_HPP
