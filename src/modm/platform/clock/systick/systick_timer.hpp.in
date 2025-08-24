@@ -82,6 +82,8 @@ private:
 	static void
 	enable(uint32_t reload, bool use_processor_clock);
 
+public:
+	/// @cond
 %% if systick_frequency != 1000
 	// FCPU < 8MHz
 	// 536e6/4 < 27-bit, 8e6/4 < 21-bit
@@ -101,8 +103,7 @@ private:
 	static constexpr uint8_t Ncycles{20};
 %% endif
 	static inline uint32_t us_per_Ncycles{0};
-	friend class modm::chrono::milli_clock;
-	friend class modm::chrono::micro_clock;
+	/// @endcond
 };
 
 }

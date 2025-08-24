@@ -11,16 +11,27 @@
 
 #include <modm/architecture/interface/clock.hpp>
 
+// Allow the ability to override the clock now functions
+#ifndef MODM_CHRONO_MILLI_CLOCK_NOW
+#	define MODM_CHRONO_MILLI_CLOCK_NOW modm::chrono::milli_clock::now
+#else
+#endif
+#ifndef MODM_CHRONO_MICRO_CLOCK_NOW
+#	define MODM_CHRONO_MICRO_CLOCK_NOW modm::chrono::micro_clock::now
+#endif
+
 modm::chrono::milli_clock::time_point modm_weak
-modm::chrono::milli_clock::now() noexcept
+MODM_CHRONO_MILLI_CLOCK_NOW() noexcept
 {
 	const auto time = std::chrono::steady_clock::now().time_since_epoch();
-	return time_point{std::chrono::duration_cast<duration>(time)};
+	return modm::chrono::milli_clock::time_point{
+		std::chrono::duration_cast<modm::chrono::milli_clock::duration>(time)};
 }
 
 modm::chrono::micro_clock::time_point modm_weak
-modm::chrono::micro_clock::now() noexcept
+MODM_CHRONO_MICRO_CLOCK_NOW() noexcept
 {
 	const auto time = std::chrono::high_resolution_clock::now().time_since_epoch();
-	return time_point{std::chrono::duration_cast<duration>(time)};
+	return modm::chrono::micro_clock::time_point{
+		std::chrono::duration_cast<modm::chrono::micro_clock::duration>(time)};
 }

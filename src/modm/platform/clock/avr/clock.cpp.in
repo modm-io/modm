@@ -72,8 +72,17 @@ MODM_ISR(TIMER0_COMPA)
 	interrupt = true;
 }
 
+// ----------------------------------------------------------------------------
+// Allow the ability to override the clock now functions
+#ifndef MODM_CHRONO_MILLI_CLOCK_NOW
+#	define MODM_CHRONO_MILLI_CLOCK_NOW modm::chrono::milli_clock::now
+#endif
+#ifndef MODM_CHRONO_MICRO_CLOCK_NOW
+#	define MODM_CHRONO_MICRO_CLOCK_NOW modm::chrono::micro_clock::now
+#endif
+
 modm::chrono::milli_clock::time_point modm_weak
-modm::chrono::milli_clock::now() noexcept
+MODM_CHRONO_MILLI_CLOCK_NOW() noexcept
 {
 	uint32_t time;
 	do
@@ -82,11 +91,11 @@ modm::chrono::milli_clock::now() noexcept
 		time = milli_time;
 	}
 	while(interrupt);
-	return time_point{duration{time}};
+	return modm::chrono::milli_clock::time_point{modm::chrono::milli_clock::duration{time}};
 }
 
 modm::chrono::micro_clock::time_point modm_weak
-modm::chrono::micro_clock::now() noexcept
+MODM_CHRONO_MICRO_CLOCK_NOW() noexcept
 {
 	uint32_t time;
 	uint8_t val;
@@ -101,5 +110,5 @@ modm::chrono::micro_clock::now() noexcept
 
 	time += uint16_t(val * uint16_t({{scaler}})) >> {{shift}};
 
-	return time_point{duration{time}};
+	return modm::chrono::micro_clock::time_point{modm::chrono::micro_clock::duration{time}};
 }
