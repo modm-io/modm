@@ -112,11 +112,6 @@ public:
 private:
 	BlockDeviceA blockDeviceA;
 	BlockDeviceB blockDeviceB;
-
-private:
-	bool resultA;
-	bool resultB;
-
 };
 
 }

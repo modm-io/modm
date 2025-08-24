@@ -21,10 +21,7 @@ template <typename BlockDeviceA, typename BlockDeviceB>
 bool
 modm::BdMirror<BlockDeviceA, BlockDeviceB>::initialize()
 {
-	resultA = blockDeviceA.initialize();
-	resultB = blockDeviceB.initialize();
-
-	return resultA && resultA;
+	return blockDeviceA.initialize() and blockDeviceB.initialize();
 }
 
 // ----------------------------------------------------------------------------
@@ -32,10 +29,7 @@ template <typename BlockDeviceA, typename BlockDeviceB>
 bool
 modm::BdMirror<BlockDeviceA, BlockDeviceB>::deinitialize()
 {
-	resultA = blockDeviceA.deinitialize();
-	resultB = blockDeviceB.deinitialize();
-
-	return resultA && resultA;
+	return blockDeviceA.deinitialize() and blockDeviceB.deinitialize();
 }
 
 // ----------------------------------------------------------------------------
@@ -55,10 +49,7 @@ modm::BdMirror<BlockDeviceA, BlockDeviceB>::program(const uint8_t* buffer, bd_ad
 		return false;
 	}
 
-	resultA = blockDeviceA.program(buffer, address, size);
-	resultB = blockDeviceB.program(buffer, address, size);
-
-	return resultA && resultA;
+	return blockDeviceA.program(buffer, address, size) and blockDeviceB.program(buffer, address, size);
 }
 
 
@@ -71,10 +62,7 @@ modm::BdMirror<BlockDeviceA, BlockDeviceB>::erase(bd_address_t address, bd_size_
 		return false;
 	}
 
-	resultA = blockDeviceA.erase(address, size);
-	resultB = blockDeviceB.erase(address, size);
-
-	return resultA && resultA;
+	return blockDeviceA.erase(address, size) and blockDeviceB.erase(address, size);
 }
 
 
@@ -87,8 +75,5 @@ modm::BdMirror<BlockDeviceA, BlockDeviceB>::write(const uint8_t* buffer, bd_addr
 		return false;
 	}
 
-	resultA = blockDeviceA.write(buffer, address, size);
-	resultB = blockDeviceB.write(buffer, address, size);
-
-	return resultA && resultA;
+	return blockDeviceA.write(buffer, address, size) and blockDeviceB.write(buffer, address, size);
 }
