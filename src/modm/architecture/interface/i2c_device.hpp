@@ -179,13 +179,9 @@ protected:
 	modm::ResumableResult<bool>
 	runTransaction()
 	{
-		RF_BEGIN();
-
-		RF_WAIT_UNTIL( startTransaction() );
-
-		RF_WAIT_WHILE( isTransactionRunning() );
-
-		RF_END_RETURN( wasTransactionSuccessful() );
+		modm::this_fiber::poll([&]{ return startTransaction(); });
+		modm::this_fiber::poll([&]{ return not isTransactionRunning(); });
+		return wasTransactionSuccessful();
 	}
 
 protected:
