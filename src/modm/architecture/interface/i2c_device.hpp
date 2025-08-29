@@ -134,7 +134,7 @@ protected:
 	runTransaction()
 	{
 		modm::this_fiber::poll([&]{ return startTransaction(); });
-		modm::this_fiber::poll([&]{ return isTransactionRunning(); });
+		modm::this_fiber::poll([&]{ return not isTransactionRunning(); });
 		return wasTransactionSuccessful();
 	}
 
