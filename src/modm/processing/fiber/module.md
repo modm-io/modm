@@ -4,7 +4,7 @@ This module provides a lightweight stackful fiber implementation including a
 simple round-robin scheduler. Here is a minimal example that blinks an LED:
 
 ```cpp
-modm::Fiber<> fiber([]
+modm::Fiber fiber([]
 {
 	Board::LedBlue::setOutput();
 	while(true)
@@ -25,9 +25,9 @@ int main()
 You can construct a fiber from any function without return type or arguments:
 
 ```cpp
-modm::Fiber<> fiber([]{});
+modm::Fiber fiber([]{});
 void function() {}
-modm::Fiber<> fiber2(function);
+modm::Fiber fiber2(function);
 ```
 
 To call objects with arguments, wrap the data into a lambda closure and
@@ -40,7 +40,7 @@ struct DataObject
 	void member_function(int arg);
 } object;
 int number{42};
-modm::Fiber<> fiber([&]
+modm::Fiber fiber([&]
 {
 	object.member_function(number);
 });
@@ -52,7 +52,7 @@ capture, or construct them in the capture directly, if they would get destroyed
 after fiber construction. You may need to mark the lambda mutable:
 
 ```cpp
-modm::Fiber<> fiber2([obj=std::move(object), obj2=DataObject()] mutable
+modm::Fiber fiber2([obj=std::move(object), obj2=DataObject()] mutable
 {
 	obj.member_function(24);
 	obj2.member_function(42);
@@ -68,7 +68,7 @@ A fiber can be passed a `modm::fiber::stop_token` to allow the fiber to be
 stopped cooperatively.
 
 ```cpp
-modm::Fiber<> fiber([](modm::fiber::stop_token stoken)
+modm::Fiber fiber([](modm::fiber::stop_token stoken)
 {
 	// set up
 	while(not stoken.stop_requested())
@@ -96,9 +96,9 @@ when it is ready, also from another fiber:
 
 ```cpp
 // fiber does not automatically start executing
-modm::Fiber<> fiber2(function, modm::fiber::Start::Later);
+modm::Fiber fiber2(function, modm::fiber::Start::Later);
 // fiber2 is automatically executing
-modm::Fiber<> fiber1([&]
+modm::Fiber fiber1([&]
 {
 	modm::this_fiber::sleep_for(1s);
 	fiber2.start();
@@ -115,7 +115,7 @@ restarts. If you need a fiber that is only callable once, you can implement this
 behavior manually with a boolean in the capture:
 
 ```cpp
-modm::Fiber<> fiber([ran=false]
+modm::Fiber fiber([ran=false]
 {
 	if (ran) return;
 	ran = true;
@@ -139,7 +139,7 @@ the fibers into the `.faststack` section, which is not zeroed and thus saves a
 bit of time on startup:
 
 ```cpp
-modm_faststack modm::Fiber<>(stack, function);
+modm_faststack modm::Fiber(stack, function);
 ```
 
 However, it may be desirable to control the placement of the fiber task
@@ -380,9 +380,9 @@ and task into the core-affine memory:
 
 ```cpp
 // allocate into core0 memory
-modm_faststack_core0 modm::Fiber<> fiber0(function);
+modm_faststack_core0 modm::Fiber fiber0(function);
 // allocate into core1 memory but DO NOT start yet!
-modm_faststack_core1 modm::Fiber<> fiber1(function, modm::fiber::Start::Later);
+modm_faststack_core1 modm::Fiber fiber1(function, modm::fiber::Start::Later);
 
 void core1_main()
 {
