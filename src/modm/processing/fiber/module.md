@@ -279,16 +279,13 @@ Counts are implemented as 16-bits.
 
 ## Stack Usage
 
-To measure the stack usage of a fiber, you need to explicitly watermark the
-stack *before* running the fiber, then you may query the stack usage inside or
-outside the fiber:
+To measure the stack usage of a fiber, you need to start the scheduler with the
+`AutoWatermark` option, then you may query the stack usage inside or outside
+the fiber:
 
 ```cpp
-// You must watermark the stack *before* running the fiber!
-fiber1.stack_watermark();
-// now you can run the fibers via the scheduler
-modm::fiber::Scheduler::run();
-// can be called from inside or outside the fiber, before or after running!
+modm::fiber::Scheduler::run(modm::fiber::Scheduler::AutoWatermark);
+// can be called from anywhere at any time!
 size_t total = fiber.stack_size();
 size_t used = fiber.stack_usage();
 ```

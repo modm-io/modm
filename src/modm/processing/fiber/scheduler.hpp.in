@@ -36,15 +36,26 @@ namespace modm::fiber
  */
 class Scheduler
 {
+public:
+	/// Scheduling options
+	enum
+	Options : uint8_t
+	{
+		/// On every fiber start, watermark the fiber stack
+		AutoWatermark = 0b1,
+	};
+
+protected:
+	/// @cond
 	friend class Task;
 	friend void modm::this_fiber::yield();
 	friend modm::fiber::id modm::this_fiber::get_id();
 	Scheduler(const Scheduler&) = delete;
 	Scheduler& operator=(const Scheduler&) = delete;
 
-protected:
 	Task* last{nullptr};
 	Task* current{nullptr};
+	Options options{0};
 
 	uintptr_t inline
 	get_id() const
@@ -136,6 +147,9 @@ protected:
 	void inline
 	add(Task* task)
 	{
+		if (options & Options::AutoWatermark) {
+			task->stack_watermark();
+		}
 		task->scheduler = this;
 		if (last == nullptr)
 		{
@@ -147,10 +161,17 @@ protected:
 	}
 
 	bool inline
-	start()
+	start(Options options)
 	{
+		this->options = options;
 		if (empty()) return false;
 		current = last->next;
+		if (options & Options::AutoWatermark) {
+			do {
+				current->stack_watermark();
+				current = current->next;
+			} while (current != last->next);
+		}
 %% if with_psplim
 		modm_context_start(&current->ctx);
 %% else
@@ -159,6 +180,7 @@ protected:
 %% endif
 		return true;
 	}
+	/// @endcond
 
 protected:
 	/// Returns the currently active scheduler.
@@ -187,9 +209,9 @@ public:
 
 	/// Runs the currently active scheduler.
 	static inline void
-	run()
+	run(Options options = Options(0))
 	{
-		instance().start();
+		instance().start(options);
 	}
 };
 
