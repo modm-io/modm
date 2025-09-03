@@ -146,6 +146,12 @@ modm_context_stack_usage(const modm_context_t *ctx)
 	return 0;
 }
 
+size_t
+modm_context_stack_size(const modm_context_t *ctx)
+{
+	return (ctx->top - ctx->bottom) * StackSizeWord;
+}
+
 extern "C" uintptr_t modm_context_jump_entry(modm_context_t*, modm_context_t*);
 extern "C" void modm_context_jump_return(uintptr_t, modm_context_t*);
 static uintptr_t main_context_sp;

@@ -97,6 +97,12 @@ modm_context_stack_watermark(modm_context_t *ctx);
  */
 size_t
 modm_context_stack_usage(const modm_context_t *ctx);
+
+/**
+ * Returns the configured stack size.
+ */
+size_t
+modm_context_stack_size(const modm_context_t *ctx);
 /// @}
 
 #ifdef __cplusplus

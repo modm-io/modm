@@ -289,7 +289,8 @@ fiber1.stack_watermark();
 // now you can run the fibers via the scheduler
 modm::fiber::Scheduler::run();
 // can be called from inside or outside the fiber, before or after running!
-size_t bytes = fiber.stack_usage();
+size_t total = fiber.stack_size();
+size_t used = fiber.stack_usage();
 ```
 
 Note that stack usage measurement through watermarking can be inaccurate if the

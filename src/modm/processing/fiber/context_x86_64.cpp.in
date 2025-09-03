@@ -120,6 +120,12 @@ modm_context_stack_usage(const modm_context_t *ctx)
 	return 0;
 }
 
+size_t
+modm_context_stack_size(const modm_context_t *ctx)
+{
+	return (ctx->top - ctx->bottom) * StackSizeWord;
+}
+
 static modm_context_t main_context;
 
 uintptr_t

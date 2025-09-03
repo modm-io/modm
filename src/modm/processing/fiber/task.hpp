@@ -142,6 +142,14 @@ public:
 		return modm_context_stack_usage(&ctx);
 	}
 
+	/// @returns the available stack size excluding the storage of the callable.
+	/// @see `modm_context_stack_size()`.
+	[[nodiscard]] size_t inline
+	stack_size() const
+	{
+		return modm_context_stack_size(&ctx);
+	}
+
 	/// Adds the task to the currently active scheduler, if not already running.
 	/// @returns if the fiber has been scheduled.
 	bool
