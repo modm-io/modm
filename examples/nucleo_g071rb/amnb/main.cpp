@@ -137,14 +137,7 @@ main()
 	USART4->CR3 = USART_CR3_HDSEL;
 	USART4->CR1 |= USART_CR1_UE;
 
-	fiberNode1t.stack_watermark();
-	fiberNode1r.stack_watermark();
-	fiberNode2t.stack_watermark();
-	fiberNode2r.stack_watermark();
-	fiberNode3t.stack_watermark();
-	fiberNode3r.stack_watermark();
-
-	modm::fiber::Scheduler::run();
+	modm::fiber::Scheduler::run(modm::fiber::Scheduler::AutoWatermark);
 
 	return 0;
 }

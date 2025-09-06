@@ -125,15 +125,6 @@ public:
 		return stop.request_stop();
 	}
 
-
-	/// Watermarks the stack to measure `stack_usage()` later.
-	/// @see `modm_context_stack_watermark()`.
-	void inline
-	stack_watermark()
-	{
-		modm_context_stack_watermark(&ctx);
-	}
-
 	/// @returns the stack usage as measured by a watermark level.
 	/// @see `modm_context_stack_usage()`.
 	[[nodiscard]] size_t inline
@@ -163,6 +154,13 @@ public:
 	}
 
 	/// @cond
+	// Always use Scheduler::run(Scheduler::AutoWatermark) instead!
+	// For performance sensitive use cases you may call this function manually.
+	void inline
+	stack_watermark()
+	{
+		modm_context_stack_watermark(&ctx);
+	}
 	// DEPRECATE: 2025q4
 	[[deprecated("Use `stack_watermark()` instead!")]]
 	void inline watermark_stack() { stack_watermark(); }
