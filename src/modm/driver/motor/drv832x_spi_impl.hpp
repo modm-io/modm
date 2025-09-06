@@ -19,7 +19,8 @@
 template < class SpiMaster, class Cs >
 modm::Drv832xSpi<SpiMaster, Cs>::Drv832xSpi()
 {
-	this->attachConfigurationHandler([]() {
+	this->attachConfigurationHandler([]
+	{
 		SpiMaster::setDataMode(SpiMaster::DataMode::Mode1);
 		SpiMaster::setDataOrder(SpiMaster::DataOrder::MsbFirst);
 	});

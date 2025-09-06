@@ -57,24 +57,24 @@ struct Test
 } test;
 
 // Single purpose fibers to time the yield
-modm_faststack modm::Fiber fiber_y1([](){ modm::this_fiber::yield();  counter.stop(); });
-modm_faststack modm::Fiber fiber_y2([](){ counter.start(); modm::this_fiber::yield(); });
+modm_faststack modm::Fiber fiber_y1([]{ modm::this_fiber::yield();  counter.stop(); });
+modm_faststack modm::Fiber fiber_y2([]{ counter.start(); modm::this_fiber::yield(); });
 
 modm_faststack modm::Fiber fiber1(fiber_function1, modm::fiber::Start::Later);
-modm_faststack modm::Fiber fiber2([](){ fiber_function2(cycles); }, modm::fiber::Start::Later);
-modm_faststack modm::Fiber fiber3([](){ test.fiber_function3(); }, modm::fiber::Start::Later);
+modm_faststack modm::Fiber fiber2([]{ fiber_function2(cycles); }, modm::fiber::Start::Later);
+modm_faststack modm::Fiber fiber3([]{ test.fiber_function3(); }, modm::fiber::Start::Later);
 modm_faststack modm::Fiber fiber4([cyc=uint32_t(0)]() mutable
 { cyc = cycles; test.fiber_function4(cyc); }, modm::fiber::Start::Later);
 
 // Restartable Fibers
 extern modm::Fiber<> fiber_pong;
 extern modm::Fiber<> fiber_ping;
-modm_faststack modm::Fiber<> fiber_ping([](){
+modm_faststack modm::Fiber<> fiber_ping([]{
 	MODM_LOG_INFO << "ping = " << fiber_ping.stack_usage() << modm::endl;
 	modm::this_fiber::sleep_for(1s);
 	fiber_pong.start();
 }, modm::fiber::Start::Later);
-modm_faststack modm::Fiber<> fiber_pong([](){
+modm_faststack modm::Fiber<> fiber_pong([]{
 	MODM_LOG_INFO << "pong = " << fiber_pong.stack_usage() << modm::endl;
 	modm::this_fiber::sleep_for(1s);
 	fiber_ping.start();

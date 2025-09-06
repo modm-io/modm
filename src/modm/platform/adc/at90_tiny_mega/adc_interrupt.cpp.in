@@ -19,7 +19,7 @@
 
 // ----------------------------------------------------------------------------
 modm::platform::AdcInterrupt::Handler
-modm::platform::AdcInterrupt::handler([](){});
+modm::platform::AdcInterrupt::handler([]{});
 
 // ----------------------------------------------------------------------------
 %% if target.family == "tiny" and target.name == "20"

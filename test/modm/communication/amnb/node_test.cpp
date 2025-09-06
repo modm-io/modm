@@ -155,7 +155,7 @@ AmnbNodeTest::testAction()
 				return uint32_t(0x07060504);
 			}
 		},
-		{4, []() -> Response
+		{4, [] -> Response
 			{
 				trig |= 8;
 				return ErrorResponse(uint8_t(3));

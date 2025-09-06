@@ -96,7 +96,7 @@ GpioSampler::Create(size_t max_samples)
 			const Type start[] = {(Gpios::read() ? (time | 1) : time)...};
 			h.set_start_time(start);
 		},
-		[]() {
+		[] {
 			platform::Exti::disableInterrupts<Gpios...>();
 			// only reset the vectors that contain at least one GPIO
 %% for vector in extis
@@ -107,7 +107,7 @@ GpioSampler::Create(size_t max_samples)
 %% for vector, pos_map in extis.items()
 	// only reset the vectors that contain at least one GPIO
 	if constexpr (pin_count_{{vector | lower}}) {
-		setHandler(Interrupt::{{ vector | capitalize }}, []()
+		setHandler(Interrupt::{{ vector | capitalize }}, []
 		{
 			const Type time = getTime();
 			auto *h = reinterpret_cast<Handle<sizeof...(Gpios)>*>(GpioSampler::context);

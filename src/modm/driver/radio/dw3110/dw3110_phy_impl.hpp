@@ -23,7 +23,8 @@
 template<typename SpiMaster, typename Cs>
 modm::Dw3110Phy<SpiMaster, Cs>::Dw3110Phy()
 {
-	this->attachConfigurationHandler([]() {
+	this->attachConfigurationHandler([]
+	{
 		SpiMaster::setDataMode(SpiMaster::DataMode::Mode0);
 		SpiMaster::setDataOrder(SpiMaster::DataOrder::MsbFirst);
 	});

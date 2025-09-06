@@ -21,7 +21,7 @@ namespace modm
 template<typename SpiMaster, typename Cs, max31865::Pt pt>
 Max31865<SpiMaster, Cs, pt>::Max31865(Data &data) : data(data)
 {
-	this->attachConfigurationHandler([]() { SpiMaster::setDataMode(SpiMaster::DataMode::Mode3); });
+	this->attachConfigurationHandler([]{ SpiMaster::setDataMode(SpiMaster::DataMode::Mode3); });
 	Cs::setOutput(modm::Gpio::High);
 }
 

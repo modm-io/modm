@@ -17,7 +17,7 @@ namespace modm
 template<typename SpiMaster, typename Cs>
 As5047<SpiMaster, Cs>::As5047(Data &data) : data(data)
 {
-	this->attachConfigurationHandler([]() { SpiMaster::setDataMode(SpiMaster::DataMode::Mode1); });
+	this->attachConfigurationHandler([] { SpiMaster::setDataMode(SpiMaster::DataMode::Mode1); });
 	Cs::setOutput(modm::Gpio::High);
 }
 

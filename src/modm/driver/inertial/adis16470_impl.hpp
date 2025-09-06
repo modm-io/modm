@@ -23,7 +23,8 @@ template<class SpiMaster, class Cs>
 void
 Adis16470<SpiMaster, Cs>::initialize()
 {
-	this->attachConfigurationHandler([]() {
+	this->attachConfigurationHandler([]
+	{
 		SpiMaster::setDataMode(SpiMaster::DataMode::Mode3);
 		SpiMaster::setDataOrder(SpiMaster::DataOrder::MsbFirst);
 	});

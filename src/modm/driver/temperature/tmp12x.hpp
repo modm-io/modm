@@ -107,7 +107,8 @@ public:
 
 	Tmp12x()
 	{
-		this->attachConfigurationHandler([]() {
+		this->attachConfigurationHandler([]
+		{
 			SpiMaster::setDataMode(SpiMaster::DataMode::Mode0);
 			SpiMaster::setDataOrder(SpiMaster::DataOrder::MsbFirst);
 			SpiMaster::setDataSize(SpiMaster::DataSize::Bit8);

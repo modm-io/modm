@@ -32,7 +32,8 @@ bool
 Ms5611<SpiMaster,Cs>::initialize()
 {
     // Command sequence must be clocked out with MSB first
-    this->attachConfigurationHandler([]() {
+    this->attachConfigurationHandler([]
+    {
         SpiMaster::setDataMode(SpiMaster::DataMode::Mode0);
         SpiMaster::setDataOrder(SpiMaster::DataOrder::MsbFirst);
     });

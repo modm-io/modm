@@ -37,7 +37,7 @@ main()
 
 	Mcan1::setMode(Mcan1::Mode::TestExternalLoopback);
 
-	Mcan1::setErrorInterruptCallback([](){
+	Mcan1::setErrorInterruptCallback([]{
 		Board::Led1::set();
 	});
 

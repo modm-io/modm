@@ -61,13 +61,13 @@ fiber_function2(CoreData& d)
 modm_fastdata_core0 CoreData d0;
 modm_fastdata_core1 CoreData d1;
 
-modm_faststack_core0 modm::Fiber<256> fiber01([](){fiber_function1(d0);});
-modm_faststack_core0 modm::Fiber<256> fiber02([](){fiber_function2(d0);});
+modm_faststack_core0 modm::Fiber<256> fiber01([]{fiber_function1(d0);});
+modm_faststack_core0 modm::Fiber<256> fiber02([]{fiber_function2(d0);});
 // Do not autostart these fibers, otherwise they run on the Core0 scheduler!
 modm_faststack_core1
-modm::Fiber<256> fiber11([](){fiber_function1(d1);}, modm::fiber::Start::Later);
+modm::Fiber<256> fiber11([]{fiber_function1(d1);}, modm::fiber::Start::Later);
 modm_faststack_core1
-modm::Fiber<256> fiber12([](){fiber_function2(d1);}, modm::fiber::Start::Later);
+modm::Fiber<256> fiber12([]{fiber_function2(d1);}, modm::fiber::Start::Later);
 
 template<typename TimeDiff>
 static void

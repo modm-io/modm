@@ -24,7 +24,8 @@ class Ili9341SPIInterface: public ili9341, public modm::SpiDevice<SPI>
 public:
 	Ili9341SPIInterface()
 	{
-		this->attachConfigurationHandler([]() {
+		this->attachConfigurationHandler([]
+		{
 			SPI::setDataMode(SPI::DataMode::Mode0);
 			SPI::setDataOrder(SPI::DataOrder::MsbFirst);
 		});

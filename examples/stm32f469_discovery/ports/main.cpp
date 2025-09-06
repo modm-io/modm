@@ -83,7 +83,8 @@ main()
 
 	PinGroup::setOutput(modm::Gpio::High); modm::delay(1s);
 
-	const auto fn_report = []() {
+	const auto fn_report = []
+	{
 		MODM_LOG_INFO << modm::bin << PinGroup::read() << modm::endl; modm::delay(200ms);
 	};
 

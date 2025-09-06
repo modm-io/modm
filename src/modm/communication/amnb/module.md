@@ -149,12 +149,12 @@ using namespace modm::amnb;
 
 Action actions[] =
 {
-    {0, []()
+    {0, []
         {
             // request without payload, automatic good reponse
         }
     },
-    {1, []() -> Response
+    {1, [] -> Response
         {
             // return user error or response without payloads
             return failure ? ErrorReponse() : Response();

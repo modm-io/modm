@@ -82,7 +82,7 @@ RangeTest::testRange()
 	}
 	// constexpr calls
 	{
-		auto get_counter = []() constexpr
+		auto get_counter = [] constexpr
 		{
 			int counter{0};
 			for (auto ii : modm::range(10))
@@ -92,7 +92,7 @@ RangeTest::testRange()
 		static_assert(45 == get_counter());
 	}
 	{
-		auto get_counter = []() constexpr
+		auto get_counter = [] constexpr
 		{
 			int counter{0};
 			for (auto ii : modm::range(5, 10, 2))
@@ -102,7 +102,7 @@ RangeTest::testRange()
 		static_assert(21 == get_counter());
 	}
 	{
-		auto get_counter = []() constexpr
+		auto get_counter = [] constexpr
 		{
 			int counter{0};
 			for (auto ii : modm::range(10, 5, -2))
@@ -168,7 +168,7 @@ RangeTest::testInvalidRange()
 	}
 	// constexpr
 	{
-		auto get_counter = []() constexpr
+		auto get_counter = [] constexpr
 		{
 			int counter{0};
 			for (auto ii : modm::range(0))
@@ -178,7 +178,7 @@ RangeTest::testInvalidRange()
 		static_assert(0 == get_counter());
 	}
 	{
-		auto get_counter = []() constexpr
+		auto get_counter = [] constexpr
 		{
 			int counter{0};
 			for (auto ii : modm::range(10, 0))
@@ -188,7 +188,7 @@ RangeTest::testInvalidRange()
 		static_assert(0 == get_counter());
 	}
 	{
-		auto get_counter = []() constexpr
+		auto get_counter = [] constexpr
 		{
 			int counter{0};
 			for (auto ii : modm::range(0, 10, -1))

@@ -20,7 +20,8 @@ template <typename SpiMaster, typename Cs>
 void
 Mcp3008<SpiMaster, Cs>::initialize()
 {
-    this->attachConfigurationHandler([]() {
+    this->attachConfigurationHandler([]
+    {
         SpiMaster::setDataMode(SpiMaster::DataMode::Mode0);
     });
 

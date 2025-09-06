@@ -21,7 +21,8 @@ template <typename Spi, typename Cs, uint32_t flashSize>
 bool
 modm::BdSpiFlash<Spi, Cs, flashSize>::initialize()
 {
-	this->attachConfigurationHandler([]() {
+	this->attachConfigurationHandler([]
+	{
 		Spi::setDataMode(Spi::DataMode::Mode0);
 		Spi::setDataOrder(Spi::DataOrder::MsbFirst);
 	});

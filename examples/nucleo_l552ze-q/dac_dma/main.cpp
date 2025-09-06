@@ -47,7 +47,8 @@ void setupDac()
 
 	// switch between signals when transfer completed
 	static bool toggleBit = false;
-	Dma1::Channel1::setTransferCompleteIrqHandler([]() {
+	Dma1::Channel1::setTransferCompleteIrqHandler([]
+	{
 		DacChannel::stopDma();
 		toggleBit = !toggleBit;
 		if (toggleBit) {
