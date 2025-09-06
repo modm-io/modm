@@ -18,7 +18,7 @@ using namespace std::chrono_literals;
 
 bool overflow{false};
 
-modm::Fiber<> bad_fiber([]
+modm::Fiber bad_fiber([]
 {
 	while(1)
 	{
@@ -31,7 +31,7 @@ modm::Fiber<> bad_fiber([]
 	}
 });
 
-modm::Fiber<> blinky([]
+modm::Fiber blinky([]
 {
 	while(1)
 	{

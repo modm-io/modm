@@ -54,10 +54,10 @@ struct Test
 	volatile uint32_t f4counter{0};
 } test;
 
-modm::Fiber<> fiber1(fiber_function1);
-modm::Fiber<> fiber2(+[](){ fiber_function2(cycles); });
-modm::Fiber<> fiber3(+[](){ test.fiber_function3(); });
-modm::Fiber<> fiber4([cyc=uint32_t(cycles)]() mutable { cyc++; test.fiber_function4(cyc); });
+modm::Fiber fiber1(fiber_function1);
+modm::Fiber fiber2(+[](){ fiber_function2(cycles); });
+modm::Fiber fiber3(+[](){ test.fiber_function3(); });
+modm::Fiber fiber4([cyc=uint32_t(cycles)]() mutable { cyc++; test.fiber_function4(cyc); });
 
 // ATmega2560@16MHz: 239996 yields in 2492668us, 96280 yields per second, 10386ns per yield
 int

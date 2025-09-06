@@ -311,9 +311,9 @@ int test_diskio()
     return 0;
 }
 
-modm_faststack modm::Fiber<> testFiber(test_diskio);
+modm_faststack modm::Fiber testFiber(test_diskio);
 
-modm_faststack modm::Fiber<> blinkyFiber([]()
+modm_faststack modm::Fiber blinkyFiber([]()
 {
     Board::Leds::setOutput();
     while(true)

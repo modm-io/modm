@@ -33,8 +33,8 @@ struct Test
 	}
 } test;
 
-modm::Fiber<> fiber1(hello);
-modm::fiber::Stack<> stack2;
+modm::Fiber fiber1(hello);
+modm::fiber::Stack stack2;
 
 int
 main(void)

@@ -57,13 +57,13 @@ struct Test
 } test;
 
 // Single purpose fibers to time the yield
-modm_faststack modm::Fiber<> fiber_y1([](){ modm::this_fiber::yield();  counter.stop(); });
-modm_faststack modm::Fiber<> fiber_y2([](){ counter.start(); modm::this_fiber::yield(); });
+modm_faststack modm::Fiber fiber_y1([](){ modm::this_fiber::yield();  counter.stop(); });
+modm_faststack modm::Fiber fiber_y2([](){ counter.start(); modm::this_fiber::yield(); });
 
-modm_faststack modm::Fiber<> fiber1(fiber_function1, modm::fiber::Start::Later);
-modm_faststack modm::Fiber<> fiber2([](){ fiber_function2(cycles); }, modm::fiber::Start::Later);
-modm_faststack modm::Fiber<> fiber3([](){ test.fiber_function3(); }, modm::fiber::Start::Later);
-modm_faststack modm::Fiber<> fiber4([cyc=uint32_t(0)]() mutable
+modm_faststack modm::Fiber fiber1(fiber_function1, modm::fiber::Start::Later);
+modm_faststack modm::Fiber fiber2([](){ fiber_function2(cycles); }, modm::fiber::Start::Later);
+modm_faststack modm::Fiber fiber3([](){ test.fiber_function3(); }, modm::fiber::Start::Later);
+modm_faststack modm::Fiber fiber4([cyc=uint32_t(0)]() mutable
 { cyc = cycles; test.fiber_function4(cyc); }, modm::fiber::Start::Later);
 
 // Restartable Fibers
