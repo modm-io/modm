@@ -178,6 +178,7 @@ protected:
 		const auto overflow = (Task *) modm_context_start(&current->ctx);
 		modm_assert(not overflow, "fbr.stkof", "Fiber stack overflow", overflow);
 %% endif
+		this->options = Options(0);
 		return true;
 	}
 	/// @endcond
