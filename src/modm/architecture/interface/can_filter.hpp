@@ -8,10 +8,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef MODM_CAN_FILTER_HPP
-#define MODM_CAN_FILTER_HPP
-
-#include <modm/io/iostream.hpp>
+#pragma once
 
 namespace modm::can
 {
@@ -69,5 +66,3 @@ struct ExtendedMask
 };
 
 }
-
-#endif

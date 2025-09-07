@@ -11,8 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_INTERFACE_CAN_HPP
-#define MODM_INTERFACE_CAN_HPP
+#pragma once
 
 #include <modm/architecture/interface/peripheral.hpp>
 #include "can_message.hpp"
@@ -118,10 +117,36 @@ public:
 #endif
 };
 
+} // namespace modm
+
+#if MODM_HAS_IOSTREAM
+#include <modm/io/iostream.hpp>
+
+namespace modm
+{
+
 /// @ingroup modm_architecture_can
-modm::IOStream&
-operator << (modm::IOStream& stream, const Can::BusState state);
+inline modm::IOStream&
+operator << (modm::IOStream& stream, const Can::BusState state)
+{
+	switch (state)
+	{
+		case Can::BusState::Connected:
+			stream << "connected";
+			break;
+		case Can::BusState::ErrorWarning:
+			stream << "error warning";
+			break;
+		case Can::BusState::ErrorPassive:
+			stream << "error passive";
+			break;
+		case Can::BusState::Off:
+			stream << "off";
+			break;
+	}
+	return stream;
+}
 
 } // namespace modm
 
-#endif // MODM_INTERFACE_CAN_HPP
+#endif

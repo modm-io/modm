@@ -131,13 +131,11 @@ class Can(Module):
                 minimum=8, maximum=64,
                 validate=validate_dlc,
                 default=8))
-        module.depends(":debug")
         return True
 
     def build(self, env):
         env.outbasepath = "modm/src/modm/architecture"
         env.copy("interface/can.hpp")
-        env.copy("interface/can.cpp")
         env.copy("interface/can_filter.hpp")
         env.template("interface/can_message.hpp.in")
 # -----------------------------------------------------------------------------
