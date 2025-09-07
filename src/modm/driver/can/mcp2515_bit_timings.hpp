@@ -32,35 +32,41 @@ private:
 		uint8_t prescaler;
 	};
 
-	static constexpr uint8_t calcSJW() {
+	static constexpr uint8_t calcSJW()
+	{
 		return (Clk ==  8_MHz)? 1 :
 			   (Clk == 16_MHz)? 1 :
 			   (Clk == 20_MHz)? ( (Bitrate == 1_Mbps) ? 1 : 3 ) : 0;
 	}
 
-	static constexpr uint8_t calcProp() {
+	static constexpr uint8_t calcProp()
+	{
 		return (Clk ==  8_MHz)? 1 :
 			   (Clk == 16_MHz)? ( (Bitrate == 1_Mbps) ? 1 : 3 ) :
 			   (Clk == 20_MHz)? ( (Bitrate == 1_Mbps) ? 3 : 5 ) : 0;
 	}
 
-	static constexpr uint8_t calcPS1() {
+	static constexpr uint8_t calcPS1()
+	{
 		return (Clk ==  8_MHz)? ( (Bitrate == 1_Mbps) ? 1 : 4 ) :
 			   (Clk == 16_MHz)? ( (Bitrate == 1_Mbps) ? 4 : 8 ) :
 			   (Clk == 20_MHz)? ( (Bitrate == 1_Mbps) ? 4 : 8 ) : 0;
 	}
 
-	static constexpr uint8_t calcPS2() {
+	static constexpr uint8_t calcPS2()
+	{
 		return (Clk ==  8_MHz)? ( (Bitrate == 1_Mbps) ? 1 : 2) :
 			   (Clk == 16_MHz)? ( (Bitrate == 1_Mbps) ? 2 : 4 ) :
 			   (Clk == 20_MHz)? ( (Bitrate == 1_Mbps) ? 2 : 4 ) : 0;
 	}
 
-	static constexpr uint8_t calcPrescaler(uint8_t sjw, uint8_t prop, uint8_t ps1, uint8_t ps2) {
+	static constexpr uint8_t calcPrescaler(uint8_t sjw, uint8_t prop, uint8_t ps1, uint8_t ps2)
+	{
 		return Clk / (Bitrate * (sjw + prop + ps1 + ps2));
 	}
 
-	static constexpr CanBitTimingConfiguration calculateBestConfig() {
+	static constexpr CanBitTimingConfiguration calculateBestConfig()
+	{
 		return { calcSJW(), calcProp(), calcPS1(), calcPS2(),
 			calcPrescaler(calcSJW(), calcProp(), calcPS1(), calcPS2()) };
 	}
@@ -83,7 +89,7 @@ private:
 	static_assert(getProp() + getPS1() >= getPS2(), "Condition Prop + PS1 >= PS2 not fulfilled.");
 
 	// (Clk / getPrescaler()) / Sum TQ == Baudrate
-	static_assert((Clk / getPrescaler()) / (getSJW() + getProp() + getPS1() + getPS2()) == Bitrate, "Desired baud rate not achived.");
+	static_assert((Clk / getPrescaler()) / (getSJW() + getProp() + getPS1() + getPS2()) == Bitrate, "Desired baud rate not achieved.");
 
 	// Sampling point >= 75%, <= 80% of Nominal Bit Time (NBT)
 	static_assert((double(getSJW() + getProp() + getPS1()) / double(getSJW() + getProp() + getPS1() + getPS2())) >= double(0.75) ,"Sampling point is earlier than 75% of nominal bit time.");
