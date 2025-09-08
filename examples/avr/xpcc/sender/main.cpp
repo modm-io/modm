@@ -63,7 +63,7 @@ Postman postman;
 xpcc::Dispatcher dispatcher(&connector, &postman);
 
 // Default filters to receive any extended CAN frame
-FLASH_STORAGE(uint8_t canFilter[]) =
+const uint8_t canFilter[] =
 {
 	MCP2515_FILTER_EXTENDED(0),	// Filter 0
 	MCP2515_FILTER_EXTENDED(0),	// Filter 1
@@ -98,7 +98,7 @@ main()
 
 	// Configure MCP2515 and set the filters
 	device.initialize<8_MHz, 125_kbps>();
-	device.setFilter(modm::accessor::asFlash(canFilter));
+	device.setFilter(canFilter);
 
 	// Enable Interrupts
 	enableInterrupts();

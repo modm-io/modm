@@ -30,7 +30,7 @@ typedef SpiMaster SPI;
 modm::Mcp2515<SPI, Cs, Int> mcp2515;
 
 // Default filters to receive any extended CAN frame
-FLASH_STORAGE(uint8_t canFilter[]) =
+const uint8_t canFilter[] =
 {
 	MCP2515_FILTER_EXTENDED(0),	// Filter 0
 	MCP2515_FILTER_EXTENDED(0),	// Filter 1
@@ -56,7 +56,7 @@ main()
 
 	// Configure MCP2515 and set the filters
 	mcp2515.initialize<8_MHz, 125_kbps>();
-	mcp2515.setFilter(modm::accessor::asFlash(canFilter));
+	mcp2515.setFilter(canFilter);
 
 	// Create a new message
 	modm::can::Message message(0x123456);

@@ -13,7 +13,8 @@
 
 #include <modm/platform.hpp>
 #include <modm/driver/can/mcp2515.hpp>
-#include <modm/processing/timer.hpp>
+#include <modm/processing.hpp>
+#include <modm/io.hpp>
 
 using namespace modm::platform;
 using namespace modm::literals;
@@ -34,7 +35,7 @@ typedef BitBangSpiMaster<Sclk, Mosi, Miso> SPI;
 modm::Mcp2515<SPI, Cs, Int> mcp2515;
 
 // Default filters to receive any extended CAN frame
-FLASH_STORAGE(uint8_t canFilter[]) =
+const uint8_t canFilter[] =
 {
 	MCP2515_FILTER_EXTENDED(0),	// Filter 0
 	MCP2515_FILTER_EXTENDED(0),	// Filter 1
@@ -48,6 +49,10 @@ FLASH_STORAGE(uint8_t canFilter[]) =
 	MCP2515_FILTER_EXTENDED(0),	// Mask 1
 };
 
+// Create a IOStream for complex formatting tasks
+modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull > device;
+modm::IOStream stream(device);
+
 int
 main()
 {
@@ -57,10 +62,6 @@ main()
 
 	Uart0::connect<GpioD1::Txd, GpioD0::Rxd>();
 	Uart0::initialize<SystemClock, 115200_Bd>();
-
-	// Create a IOStream for complex formatting tasks
-	modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull > device;
-	modm::IOStream stream(device);
 
 	// enable interrupts
 	enableInterrupts();
@@ -76,7 +77,7 @@ main()
 
 	// Configure MCP2515 and set the filters
 	mcp2515.initialize<8_MHz, 125_kbps>();
-	mcp2515.setFilter(modm::accessor::asFlash(canFilter));
+	mcp2515.setFilter(canFilter);
 
 	// Create a new message
 	modm::can::Message message(0x123456);
