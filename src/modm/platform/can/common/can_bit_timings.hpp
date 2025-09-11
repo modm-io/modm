@@ -71,7 +71,7 @@ private:
 
 	static constexpr CanBitTimingConfiguration calculateBestConfig()
 	{
-		constexpr uint8_t minBs1Bs2 = 14;
+		constexpr uint8_t minBs1Bs2 = 15;
 		constexpr uint8_t maxBs1Bs2 = 20;
 
 		float minError = 10'000.0;
@@ -84,7 +84,7 @@ private:
 
 			if(intPrescaler < ((1 << prescaler_width) - 1)) {
 				float error = constexpr_fabs(1 - intPrescaler/idealPrescaler);
-				if(error <= minError) {
+				if(error < minError) {
 					bestPrescaler = intPrescaler;
 					minError = error;
 					bestBs1Bs2 = bs1Bs2;
