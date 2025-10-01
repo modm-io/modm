@@ -18,6 +18,7 @@ import re
 
 author_handles = {
     "Akos Becsey": "becseya",
+    "Alex Evers": "Tecnologic",
     "Alexander Solovets": "mbait",
     "Amar": "fb39ca4",
     "Amarok McLion": "amarokmclion",
@@ -51,10 +52,10 @@ author_handles = {
     "Jeff McBride": "mcbridejc",
     "Jens Böckmann": "jensboe",
     "Jonas Kazem Andersen": "JKazem",
+    "Joshua": "JeyRunner",
     "Julia Gutheil": None,
     "Jörg Ebeling": "Apehaenger",
     "Jörg Hoffmann": "19joho66",
-    "Joshua": "JeyRunner",
     "Kaelin Laundry": "WasabiFan",
     "Kevin Läufer": "ekiwi",
     "Klaus Schnass": "klsc-zeat",
@@ -71,6 +72,7 @@ author_handles = {
     "Michael Jossen": "Javask",
     "Michael Thies": "mhthies",
     "Mike Wolfram": "mikewolfram",
+    "Nick Fiege": "kikass13",
     "Nick Sarten": "genbattle",
     "Niclas Rohrer": None,
     "Nicolai Bruhn": "nicoBruhn",

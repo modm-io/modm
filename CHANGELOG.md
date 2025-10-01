@@ -52,6 +52,127 @@ pay attention to. Medium impact changes are also worth looking at.
 
 <!--releases-->
 
+## 2025-10-01: 2025q3 release
+
+This release covers everything from 2025-07-01 and has been tested with avr-gcc
+v14.2.0 from upstream and arm-none-eabi-gcc v14.2.1 from xpack.
+
+Breaking changes:
+
+1. **Protothreads and Resumables are removed!**
+
+   They were announced as deprecated in 2024q4 and now all usage of them has
+   been removed from modm's code base. The modules are still available in the
+   source code, but nothing in modm uses them anymore. The modules will be
+   deleted in the future. Please port your code to use fibers instead. Consult
+   the `modm:processing:fiber` module docs for more information.
+
+2. RTT IODevice has been re-implemented as a static template class:
+
+   ```cpp
+   Rtt rtt(0);
+   modm::IODeviceObjectWrapper< Rtt, modm::IOBuffer::DiscardIfFull > rtt_device(rtt);
+   // has been replaced with
+   modm::IODeviceWrapper< Rtt<0>, modm::IOBuffer::DiscardIfFull > rtt_device;
+   ```
+
+3. The class `Qmc5883l` has been properly namespaced into `modm::Qmc5883l`.
+
+4. The MCP2515 driver has been re-implemented to be compatible with fibers.
+   The API has changed slightly. Please consult the module documentation for
+   details.
+
+
+Features:
+
+- Support for blocking IODevice in fibers.
+- Use of RTT for boards without serial connections.
+- Fiberize all UART drivers to yield in blocking calls.
+- Add option to automatically watermark fiber stacks.
+- Add external triggers and offset for the STM32F3/G4/L4/H7 ADC driver.
+
+Integrated Projects:
+
+- Segger RTT added at v8.54.
+
+Fixes:
+
+- Use HSE as RTC clock source instead of LSI for boards when possible.
+
+New device drivers:
+
+- ADS868x ADC as [`modm:driver:ads868x`][].
+
+Known bugs:
+
+- OpenOCD cannot enable SWO on STM32H7 targets. See [#1079][].
+- `arm-none-eabi-gdb` TUI and GDBGUI interfaces are not supported on Windows.
+  See [#591][].
+- Generating modm on Windows creates paths with `\` that are not compatible with
+  Unix. See [#310][].
+- `lbuild build` and `lbuild clean` do not remove all previously generated files
+  when the configuration changes. See [#285][].
+
+Many thanks to all our contributors:
+
+- Alex Evers ([@Tecnologic][]) 🎉
+- Nick Fiege ([@kikass13][]) 🎉
+- Niklas Hauser ([@salkinium][])
+- Vivien Henry ([@lukh][])
+
+PR [#1293][] -> [2025q3][].
+
+<details>
+<summary>Detailed changelog</summary>
+
+#### 2025-09-27: Add external triggers and offsets to STM32 ADC driver
+
+PR [#1275][] -> [9c6d656][].  
+Tested in hardware by [@Tecnologic][] and [@chris-durand][].
+
+#### 2025-09-08: Refactor MCP2515 driver
+
+PR [#817][] -> [3db3bcd][].
+
+#### 2025-09-07: Add ADS868x ADC driver
+
+PR [#860][] -> [7b8f2cc][].
+
+#### 2025-09-03: Add automatic fiber stack watermarking
+
+PR [#1290][] -> [5f8a558][].  
+Tested in hardware by [@salkinium][].
+
+#### 2025-08-24: Remove all Protothread and Resumable code
+
+PR [#1285][] -> [211f24e][].  
+Tested in hardware by [@salkinium][].
+
+#### 2025-08-17: Fiberize all UART drivers
+
+PR [#1284][] -> [93c4805][].  
+Tested in hardware by [@salkinium][].
+
+#### 2025-08-15: Use HSE as RTC clock when possible
+
+PR [#1282][] -> [aeee675][].  
+Tested in hardware by [@salkinium][].
+
+#### 2025-08-11: Integrate Segger RTT code
+
+PR [#1281][] -> [89f387f][].  
+Tested in hardware by [@salkinium][].
+
+#### 2025-08-03: Implement blocking IODevice for fibers
+
+It blocks until a newline character has been sent.
+
+PR [#1279][] -> [7d9070d][].  
+Tested in hardware by [@salkinium][].
+
+</details>
+
+
 ## 2025-07-01: 2025q2 release
 
 This release covers everything from 2025-04-01 and has been tested with avr-gcc
@@ -3525,6 +3646,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [2024q4]: https://github.com/modm-io/modm/releases/tag/2024q4
 [2025q1]: https://github.com/modm-io/modm/releases/tag/2025q1
 [2025q2]: https://github.com/modm-io/modm/releases/tag/2025q2
+[2025q3]: https://github.com/modm-io/modm/releases/tag/2025q3
 
 [@19joho66]: https://github.com/19joho66
 [@ASMfreaK]: https://github.com/ASMfreaK
@@ -3540,6 +3662,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [@SgtPepperFTW]: https://github.com/SgtPepperFTW
 [@Sh4rK]: https://github.com/Sh4rK
 [@StevenMacias]: https://github.com/StevenMacias
+[@Tecnologic]: https://github.com/Tecnologic
 [@TomSaw]: https://github.com/TomSaw
 [@WasabiFan]: https://github.com/WasabiFan
 [@XDjackieXD]: https://github.com/XDjackieXD
@@ -3567,6 +3690,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [@jensboe]: https://github.com/jensboe
 [@jgmess-dlr]: https://github.com/jgmess-dlr
 [@kapacuk]: https://github.com/kapacuk
+[@kikass13]: https://github.com/kikass13
 [@klsc-zeat]: https://github.com/klsc-zeat
 [@lgili]: https://github.com/lgili
 [@linasnikis]: https://github.com/linasnikis
@@ -3642,6 +3766,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [`modm:driver:adis16470`]: https://modm.io/reference/module/modm-driver-adis16470
 [`modm:driver:ads7828`]: https://modm.io/reference/module/modm-driver-ads7828
 [`modm:driver:ads816x`]: https://modm.io/reference/module/modm-driver-ads816x
+[`modm:driver:ads868x`]: https://modm.io/reference/module/modm-driver-ads868x
 [`modm:driver:apa102`]: https://modm.io/reference/module/modm-driver-apa102
 [`modm:driver:as5047`]: https://modm.io/reference/module/modm-driver-as5047
 [`modm:driver:as5600`]: https://modm.io/reference/module/modm-driver-as5600
@@ -3764,6 +3889,14 @@ Please note that contributions from xpcc were continuously ported to modm.
 [#1260]: https://github.com/modm-io/modm/pull/1260
 [#1264]: https://github.com/modm-io/modm/pull/1264
 [#1274]: https://github.com/modm-io/modm/pull/1274
+[#1275]: https://github.com/modm-io/modm/pull/1275
+[#1279]: https://github.com/modm-io/modm/pull/1279
+[#1281]: https://github.com/modm-io/modm/pull/1281
+[#1282]: https://github.com/modm-io/modm/pull/1282
+[#1284]: https://github.com/modm-io/modm/pull/1284
+[#1285]: https://github.com/modm-io/modm/pull/1285
+[#1290]: https://github.com/modm-io/modm/pull/1290
+[#1293]: https://github.com/modm-io/modm/pull/1293
 [#132]: https://github.com/modm-io/modm/pull/132
 [#136]: https://github.com/modm-io/modm/pull/136
 [#153]: https://github.com/modm-io/modm/pull/153
@@ -3901,6 +4034,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [#805]: https://github.com/modm-io/modm/pull/805
 [#806]: https://github.com/modm-io/modm/pull/806
 [#816]: https://github.com/modm-io/modm/pull/816
+[#817]: https://github.com/modm-io/modm/pull/817
 [#819]: https://github.com/modm-io/modm/pull/819
 [#81]: https://github.com/modm-io/modm/pull/81
 [#821]: https://github.com/modm-io/modm/pull/821
@@ -3922,6 +4056,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [#856]: https://github.com/modm-io/modm/pull/856
 [#858]: https://github.com/modm-io/modm/pull/858
 [#859]: https://github.com/modm-io/modm/pull/859
+[#860]: https://github.com/modm-io/modm/pull/860
 [#861]: https://github.com/modm-io/modm/pull/861
 [#862]: https://github.com/modm-io/modm/pull/862
 [#864]: https://github.com/modm-io/modm/pull/864
@@ -4007,6 +4142,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [1f210c1]: https://github.com/modm-io/modm/commit/1f210c1
 [1f5d06e]: https://github.com/modm-io/modm/commit/1f5d06e
 [1fc3805]: https://github.com/modm-io/modm/commit/1fc3805
+[211f24e]: https://github.com/modm-io/modm/commit/211f24e
 [21af57b]: https://github.com/modm-io/modm/commit/21af57b
 [21ba120]: https://github.com/modm-io/modm/commit/21ba120
 [2273bae]: https://github.com/modm-io/modm/commit/2273bae
@@ -4034,6 +4170,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [39a9f4d]: https://github.com/modm-io/modm/commit/39a9f4d
 [3ba71c9]: https://github.com/modm-io/modm/commit/3ba71c9
 [3cee015]: https://github.com/modm-io/modm/commit/3cee015
+[3db3bcd]: https://github.com/modm-io/modm/commit/3db3bcd
 [3ecad35]: https://github.com/modm-io/modm/commit/3ecad35
 [3f3ff3d]: https://github.com/modm-io/modm/commit/3f3ff3d
 [416ced6]: https://github.com/modm-io/modm/commit/416ced6
@@ -4067,6 +4204,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [5d03d53]: https://github.com/modm-io/modm/commit/5d03d53
 [5dcdf1d]: https://github.com/modm-io/modm/commit/5dcdf1d
 [5dd598c]: https://github.com/modm-io/modm/commit/5dd598c
+[5f8a558]: https://github.com/modm-io/modm/commit/5f8a558
 [5fcd015]: https://github.com/modm-io/modm/commit/5fcd015
 [6057873]: https://github.com/modm-io/modm/commit/6057873
 [623a13b]: https://github.com/modm-io/modm/commit/623a13b
@@ -4094,9 +4232,11 @@ Please note that contributions from xpcc were continuously ported to modm.
 [77ae899]: https://github.com/modm-io/modm/commit/77ae899
 [78d18f6]: https://github.com/modm-io/modm/commit/78d18f6
 [7b5827f]: https://github.com/modm-io/modm/commit/7b5827f
+[7b8f2cc]: https://github.com/modm-io/modm/commit/7b8f2cc
 [7ba2fbb]: https://github.com/modm-io/modm/commit/7ba2fbb
 [7d1f7cc]: https://github.com/modm-io/modm/commit/7d1f7cc
 [7d7490d]: https://github.com/modm-io/modm/commit/7d7490d
+[7d9070d]: https://github.com/modm-io/modm/commit/7d9070d
 [7df2e7d]: https://github.com/modm-io/modm/commit/7df2e7d
 [7f30961]: https://github.com/modm-io/modm/commit/7f30961
 [8012d82]: https://github.com/modm-io/modm/commit/8012d82
@@ -4116,6 +4256,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [8820d6b]: https://github.com/modm-io/modm/commit/8820d6b
 [8896b5b]: https://github.com/modm-io/modm/commit/8896b5b
 [897579e]: https://github.com/modm-io/modm/commit/897579e
+[89f387f]: https://github.com/modm-io/modm/commit/89f387f
 [8a3a20b]: https://github.com/modm-io/modm/commit/8a3a20b
 [8a924f9]: https://github.com/modm-io/modm/commit/8a924f9
 [8bcbe25]: https://github.com/modm-io/modm/commit/8bcbe25
@@ -4127,12 +4268,14 @@ Please note that contributions from xpcc were continuously ported to modm.
 [923f9c1]: https://github.com/modm-io/modm/commit/923f9c1
 [9381fd0]: https://github.com/modm-io/modm/commit/9381fd0
 [93bba13]: https://github.com/modm-io/modm/commit/93bba13
+[93c4805]: https://github.com/modm-io/modm/commit/93c4805
 [94580b4]: https://github.com/modm-io/modm/commit/94580b4
 [95713ee]: https://github.com/modm-io/modm/commit/95713ee
 [972b74b]: https://github.com/modm-io/modm/commit/972b74b
 [98a2483]: https://github.com/modm-io/modm/commit/98a2483
 [98b1337]: https://github.com/modm-io/modm/commit/98b1337
 [9b6aeee]: https://github.com/modm-io/modm/commit/9b6aeee
+[9c6d656]: https://github.com/modm-io/modm/commit/9c6d656
 [9cbea26]: https://github.com/modm-io/modm/commit/9cbea26
 [9d33843]: https://github.com/modm-io/modm/commit/9d33843
 [9d8bbfa]: https://github.com/modm-io/modm/commit/9d8bbfa
@@ -4152,6 +4295,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [ab9bcee]: https://github.com/modm-io/modm/commit/ab9bcee
 [ac46099]: https://github.com/modm-io/modm/commit/ac46099
 [ae74049]: https://github.com/modm-io/modm/commit/ae74049
+[aeee675]: https://github.com/modm-io/modm/commit/aeee675
 [af2b352]: https://github.com/modm-io/modm/commit/af2b352
 [afaea7f]: https://github.com/modm-io/modm/commit/afaea7f
 [afbd533]: https://github.com/modm-io/modm/commit/afbd533
