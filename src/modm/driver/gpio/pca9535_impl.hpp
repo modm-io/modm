@@ -138,7 +138,7 @@ template < class I2cMaster >
 bool
 modm::Pca9535<I2cMaster>::readMemory(Index index)
 {
-	retur I2cDevice<I2cMaster>::writeRead(
+	return I2cDevice<I2cMaster>::writeRead(
 			buffer + uint8_t(index)    , 1,
 			buffer + uint8_t(index) + 1, 2);
 }
