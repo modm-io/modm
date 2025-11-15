@@ -70,7 +70,7 @@ unsigned SEGGER_RTT_GetBytesInDownBuffer(unsigned BufferIndex) {
 }
 %#
 %% if with_printf
-#include <modm/ext/printf/printf.h>
+#include <printf/printf.h>
 
 static void output_gadget(char c, void* BufferIndex)
 {
