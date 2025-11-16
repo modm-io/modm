@@ -8,24 +8,24 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef MODM_STM32_NUCLEO_G071RB_HPP
-#define MODM_STM32_NUCLEO_G071RB_HPP
+#ifndef MODM_STM32_NUCLEO_G0x1Rx_HPP
+#define MODM_STM32_NUCLEO_G0x1Rx_HPP
 
 #include <modm/platform.hpp>
 #include <modm/architecture/interface/clock.hpp>
 #include <modm/debug/logger.hpp>
-/// @ingroup modm_board_nucleo_g071rb modm_board_nucleo_g070rb
+/// @ingroup modm_board_nucleo_g070rb modm_board_nucleo_g071rb modm_board_nucleo_g0b1re
 #define MODM_BOARD_HAS_LOGGER
 
 using namespace modm::platform;
 
 namespace Board
 {
-/// @ingroup modm_board_nucleo_g071rb modm_board_nucleo_g070rb
+/// @ingroup modm_board_nucleo_g070rb modm_board_nucleo_g071rb modm_board_nucleo_g0b1re
 /// @{
 using namespace modm::literals;
 
-/// STM32G071RB running at 64MHz generated from the internal 16MHz crystal
+/// STM32G0x1Rx running at 64MHz generated from the internal 16MHz crystal
 struct SystemClock
 {
 	static constexpr uint32_t Frequency = 64_MHz;
@@ -40,11 +40,14 @@ struct SystemClock
 	static constexpr uint32_t Rcc		= Ahb;
 	static constexpr uint32_t Dmamux	= Ahb;
 	static constexpr uint32_t Dma		= Ahb;
+	static constexpr uint32_t Dma2		= Ahb;
+	static constexpr uint32_t Dma1		= Ahb;
 
 	static constexpr uint32_t Dbg		= Apb;
 	static constexpr uint32_t Timer17	= Apb;
 	static constexpr uint32_t Timer16	= Apb;
 	static constexpr uint32_t Timer15	= Apb;
+	static constexpr uint32_t Usart6	= Apb;
 	static constexpr uint32_t Usart1	= Apb;
 	static constexpr uint32_t Spi1		= Apb;
 	static constexpr uint32_t I2s1		= Apb;
@@ -59,25 +62,35 @@ struct SystemClock
 	static constexpr uint32_t Ucpd2		= Apb;
 	static constexpr uint32_t Ucpd1		= Apb;
 	static constexpr uint32_t LpTimer2	= Apb;
+	static constexpr uint32_t I2c3		= Apb;
+	static constexpr uint32_t LpUart2	= Apb;
 	static constexpr uint32_t LpUart1	= Apb;
 	static constexpr uint32_t LpTimer1	= Apb;
 	static constexpr uint32_t HdmiCec	= Apb;
 	static constexpr uint32_t Dac		= Apb;
 	static constexpr uint32_t Pwr		= Apb;
+	static constexpr uint32_t Crs		= Apb;
+	static constexpr uint32_t Fdcan2	= Apb;
+	static constexpr uint32_t Fdcan1	= Apb;
+	static constexpr uint32_t Usb		= Apb;
 	static constexpr uint32_t I2c2		= Apb;
 	static constexpr uint32_t I2c1		= Apb;
+	static constexpr uint32_t Usart5	= Apb;
 	static constexpr uint32_t Usart4	= Apb;
 	static constexpr uint32_t Usart3	= Apb;
 	static constexpr uint32_t Usart2	= Apb;
+	static constexpr uint32_t Spi3		= Apb;
 	static constexpr uint32_t Spi2		= Apb;
+	static constexpr uint32_t I2s2		= Apb;
 	static constexpr uint32_t Iwdg		= Rcc::LsiFrequency;
 	static constexpr uint32_t Wwdg		= Apb;
+	static constexpr uint32_t Rtc		= 32.768_kHz;
 	static constexpr uint32_t Timer14	= Apb;
 	static constexpr uint32_t Timer7	= Apb;
 	static constexpr uint32_t Timer6	= Apb;
+	static constexpr uint32_t Timer4	= Apb;
 	static constexpr uint32_t Timer3	= Apb;
 	static constexpr uint32_t Timer2	= Apb;
-	static constexpr uint32_t Rtc		= 32.768_kHz;
 
 	static bool inline
 	enable()
@@ -138,7 +151,7 @@ using Leds = SoftwareGpioPort< LedD13 >;
 
 namespace stlink
 {
-/// @ingroup modm_board_nucleo_g071rb modm_board_nucleo_g070rb
+/// @ingroup modm_board_nucleo_g070rb modm_board_nucleo_g071rb modm_board_nucleo_g0b1re
 /// @{
 using Rx = GpioInputA3;
 using Tx = GpioOutputA2;
@@ -146,7 +159,7 @@ using Uart = BufferedUart<UsartHal2, UartTxBuffer<2048>>;
 /// @}
 }
 
-/// @ingroup modm_board_nucleo_g071rb modm_board_nucleo_g070rb
+/// @ingroup modm_board_nucleo_g070rb modm_board_nucleo_g071rb modm_board_nucleo_g0b1re
 /// @{
 using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
 
@@ -165,4 +178,4 @@ initialize()
 
 }
 
-#endif	// MODM_STM32_NUCLEO_G071RB_HPP
+#endif	// MODM_STM32_NUCLEO_G0x1Rx_HPP
