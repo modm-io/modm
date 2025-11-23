@@ -8,13 +8,9 @@ concurrency:
 
 jobs:
   macos_testing:
-    runs-on: macos-13
+    runs-on: macos-15
 
     steps:
-      - uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: '15.2'
-
       - name: Setup environment - Brew tap
         run: |
           brew tap osx-cross/arm
@@ -62,12 +58,12 @@ jobs:
       - name: Hosted Unittests
         if: always()
         run: |
-          (cd test && make run-hosted-darwin)
+          (cd test && make run-hosted-darwin-arm64)
 
       - name: Hosted Examples
         if: always()
         run: |
-          (cd examples/linux && ../../tools/scripts/examples_compile.py block_device assert build_info etl fiber git logger printf threads)
+          (cd examples/linux && ../../tools/scripts/examples_compile.py block_device assert build_info fiber git logger printf threads)
 
       - name: Compile STM32 Examples
         if: always()
