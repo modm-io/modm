@@ -57,22 +57,22 @@ void
 modm_assert_report(_modm_assertion_info *cinfo)
 {
 	auto info = reinterpret_cast<modm::AssertionInfo *>(cinfo);
-	AbandonmentBehavior behavior(info->behavior);
+	uint8_t behavior(uint8_t(info->behavior));
 
 	for (const AssertionHandler *handler = &__assertion_table_start;
 		 handler < &__assertion_table_end; handler++)
 	{
 %% if core.startswith("avr")
-		behavior |= ((AssertionHandler)pgm_read_ptr(handler))(*info);
+		behavior |= (uint8_t)((AssertionHandler)pgm_read_ptr(handler))(*info);
 %% else
-		behavior |= (*handler)(*info);
+		behavior |= (uint8_t)(*handler)(*info);
 %% endif
 	}
 
-	info->behavior = behavior;
-	behavior.reset(Abandonment::Debug);
-	if ((behavior == Abandonment::DontCare) or
-		(behavior & Abandonment::Fail))
+	info->behavior = AbandonmentBehavior(behavior);
+	behavior &= ~uint8_t(Abandonment::Debug);
+	if ((behavior == uint8_t(Abandonment::DontCare)) or
+		(behavior & uint8_t(Abandonment::Fail)))
 	{
 		modm_abandon(*info);
 %% if core.startswith("cortex-m")

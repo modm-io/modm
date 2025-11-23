@@ -44,6 +44,7 @@ def prepare(module, options):
         return False
 
     module.depends(
+        ":architecture:register",
         ":cmsis:device",
         ":platform:clock",
         ":platform:gpio")

@@ -27,6 +27,7 @@ def prepare(module, options):
 
     module.depends(
         ":architecture:adc",
+        ":architecture:register",
         ":architecture:interrupt",
         ":platform:gpio",
         ":math:algorithm")

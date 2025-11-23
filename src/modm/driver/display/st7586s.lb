@@ -18,6 +18,7 @@ def init(module):
 def prepare(module, options):
     module.depends(
         ":architecture:fiber",
+        ":architecture:register",
         ":ui:display")
     return True
 

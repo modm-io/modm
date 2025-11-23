@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include <modm/architecture/interface/register.hpp>
 #include <modm/math/utils/endianness.hpp>
 
 /// @cond

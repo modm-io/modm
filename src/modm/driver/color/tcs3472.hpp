@@ -17,6 +17,7 @@
 
 #include <stdint.h>
 #include <modm/architecture/interface/i2c_device.hpp>
+#include <modm/architecture/interface/register.hpp>
 #include <modm/math/utils.hpp>
 #include <modm/ui/color.hpp>
 

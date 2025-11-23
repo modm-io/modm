@@ -12,7 +12,6 @@
 #pragma once
 
 #include "assert.h"
-#include <modm/architecture/interface/register.hpp>
 %% if core.startswith("avr")
 #include <modm/architecture/interface/accessor_flash.hpp>
 %% endif
@@ -27,13 +26,13 @@ namespace modm
 enum class
 Abandonment : uint8_t
 {
-	DontCare = Bit0,	///< Do not care about failure.
-	Ignore = Bit1,		///< Ignore this failure.
-	Fail = Bit2,		///< This failure is reason for abandonment.
-	Debug = Bit7		///< Only set for a debug-only failure.
+	DontCare = 0b001,	///< Do not care about failure.
+	Ignore = 0b010,		///< Ignore this failure.
+	Fail = 0b100,		///< This failure is reason for abandonment.
+	Debug = 0x80,		///< Only set for a debug-only failure.
 };
-using AbandonmentBehavior = Flags8<Abandonment>;
-MODM_TYPE_FLAGS(AbandonmentBehavior);
+/// Contains the superset of Abandonment behavior
+using AbandonmentBehavior = Abandonment;
 
 /// Contains information about the failed assertion.
 struct modm_packed

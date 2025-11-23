@@ -12,6 +12,7 @@
 #pragma once
 
 #include "../device.hpp"
+#include <modm/architecture/interface/register.hpp>
 
 namespace modm::platform
 {
