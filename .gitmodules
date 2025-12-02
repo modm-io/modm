@@ -52,3 +52,6 @@
 [submodule "ext/segger/rtt"]
 	path = ext/segger/rtt
 	url = https://github.com/modm-ext/segger-rtt.git
+[submodule "ext/vl53/vl53"]
+	path = ext/vl53/vl53
+	url = https://github.com/modm-ext/vl53-partial.git

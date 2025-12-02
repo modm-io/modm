@@ -1,0 +1,72 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2025, Henrik Hose
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+class Vl53l5cx(Module):
+    def init(self, module):
+        module.name = "vl53l5cx"
+        module.description = "Driver for ST VL53L5CX Multi-Zone Time-of-Flight Sensor"
+
+    def prepare(self, module, options):
+        return True
+
+    def build(self, env):
+        env.outbasepath = "modm/ext"
+        env.copy("vl53/vl53l5cx/src")
+        env.copy("vl53/vl53l5cx/inc")
+        env.copy("vl53/vl53l5cx/LICENSE.txt")
+        env.collect(":build:path.include", "modm/ext/vl53/vl53l5cx/inc")
+
+class Vl53lmz(Module):
+    def init(self, module):
+        module.name = "vl53lmz"
+        module.description = "Driver for ST VL53L7 and VL53L8 Multi-Zone Time-of-Flight Sensors"
+
+    def prepare(self, module, options):
+        return True
+
+    def build(self, env):
+        env.outbasepath = "modm/ext"
+        env.copy("vl53/vl53lmz/src")
+        env.copy("vl53/vl53lmz/inc")
+        env.copy("vl53/vl53lmz/LICENSE.txt")
+        env.collect(":build:path.include", "modm/ext/vl53/vl53lmz/inc")
+
+def init(module):
+    module.name = ":vl53"
+    module.description = """\
+# ST's VL53 Time-of-Flight ULD Drivers
+
+Currently supported sensors:
+ - With VL53LMZ driver: VL53L7CX, VL53L7CH, VL53L8CX, VL53L8CH
+ - VL53L5CX driver
+
+"""
+
+def prepare(module, options):
+    module.add_submodule(Vl53l5cx())
+    module.add_submodule(Vl53lmz())
+    module.depends(
+        ":architecture:spi.device",
+        ":architecture:i2c.device",
+        ":architecture:fiber",
+        ":driver:i2c.eeprom")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/vl53"
+    env.copy("vl53.cpp")
+    env.copy("vl53_transport.hpp")
+    env.copy("vl53_transport_impl.hpp")
+
+    env.outbasepath = "modm/ext/vl53"
+    env.collect(":build:path.include", "modm/ext/vl53")
+    env.copy("vl53_platform.h")
