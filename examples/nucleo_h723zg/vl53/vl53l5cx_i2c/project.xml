@@ -1,0 +1,12 @@
+<library>
+  <extends>modm:nucleo-h723zg</extends>
+  <options>
+    <option name="modm:build:build.path">../../../../build/nucleo_h723zg/vl53l5cx_i2c</option>
+    <option name="modm:platform:cortex-m:main_stack_size">8Ki</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:i2c:1</module>
+    <module>modm:vl53:vl53l5cx</module>
+  </modules>
+</library>

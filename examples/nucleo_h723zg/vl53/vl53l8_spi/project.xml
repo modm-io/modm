@@ -1,0 +1,13 @@
+<library>
+  <extends>modm:nucleo-h723zg</extends>
+  <options>
+    <option name="modm:build:build.path">../../../../build/nucleo_h723zg/vl53l8_spi</option>
+    <option name="modm:platform:cortex-m:main_stack_size">12Ki</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:dma</module>
+    <module>modm:platform:spi:2</module>
+    <module>modm:vl53:vl53lmz</module>
+  </modules>
+</library>
