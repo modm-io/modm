@@ -1,0 +1,53 @@
+/*
+ * Copyright (c) 2025, Henrik Hose
+ * Copyright (c) 2025, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#if __has_include(<modm_conf_eigen.h>)
+#  include <modm_conf_eigen.h>
+#endif
+%% if with_io
+#include <modm/io.hpp>
+%#
+%% else
+%#
+#define EIGEN_NO_IO
+%% endif
+#define EIGEN_DONT_VECTORIZE
+#define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT
+#define EIGEN_DONT_PARALLELIZE
+
+#define EIGEN_MALLOC_ALREADY_ALIGNED 1
+#ifndef EIGEN_MAX_ALIGN_BYTES
+#define EIGEN_MAX_ALIGN_BYTES 0
+#endif
+#ifndef EIGEN_MAX_STATIC_ALIGN_BYTES
+#define EIGEN_MAX_STATIC_ALIGN_BYTES 4
+#endif
+%#
+%% if not with_heap
+#define EIGEN_NO_MALLOC
+%% endif
+#ifndef EIGEN_STACK_ALLOCATION_LIMIT
+#define EIGEN_STACK_ALLOCATION_LIMIT 1024
+#endif
+
+#ifndef MODM_DEBUG_BUILD
+#define EIGEN_NO_DEBUG
+#endif
+
+#include <modm/architecture/interface/assert.hpp>
+
+#define eigen_assert(cond) \
+    modm_assert(cond, "eigen", __FILE__ ":" MODM_STRINGIFY(__LINE__) " -> \"" #cond "\"")
+
+#include "Version_orig"

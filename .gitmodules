@@ -55,3 +55,6 @@
 [submodule "ext/vl53/vl53"]
 	path = ext/vl53/vl53
 	url = https://github.com/modm-ext/vl53-partial.git
+[submodule "ext/libeigen/eigen"]
+	path = ext/libeigen/eigen
+	url = https://github.com/modm-ext/eigen-partial.git

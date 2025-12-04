@@ -1,0 +1,34 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2025, Henrik Hose
+# Copyright (c) 2025, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":eigen"
+    module.description = FileReader("module.md")
+
+
+def prepare(module, options):
+    module.depends(":architecture:assert")
+    return True
+
+
+def build(env):
+    env.outbasepath = "modm/ext/eigen"
+    env.collect(":build:path.include", "modm/ext/eigen")
+
+    env.substitutions = {
+        "with_heap": env.has_module(":platform:heap"),
+        "with_io": env.has_module(":io") and env.has_module(":platform:heap"),
+    }
+    env.copy("eigen/Eigen", "Eigen", ignore=env.ignore_files("Version"))
+    env.copy("eigen/Eigen/Version", "Eigen/Version_orig")
+    env.template("Version.in", "Eigen/Version")
