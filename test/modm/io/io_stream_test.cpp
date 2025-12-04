@@ -216,45 +216,45 @@ IoStreamTest::testStreamInt64()
 void
 IoStreamTest::testFloat()
 {
-	char string[] = "1.23000e+00";
+	char string[] = "1.23";
 
 	(*stream) << 1.23f;
 
-	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 11);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 11U);
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 4);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 4U);
 }
 
 void
 IoStreamTest::testFloat2()
 {
-	char string[] = "4.57000e+02";
+	char string[] = "457";
 
 	(*stream) << 457.0f;
 
-	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 11);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 11U);
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 3);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 3U);
 }
 
 void
 IoStreamTest::testFloat3()
 {
-	char string[] = "-5.12314e+07";
+	char string[] = "-51231400";
 
 	(*stream) << -51231400.0f;
 
-	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 12);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 12U);
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 9);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 9U);
 }
 
 void
 IoStreamTest::testFloat4()
 {
-	char string[] = "-7.23400e-04";
+	char string[] = "-0.000723";
 
 	(*stream) << -0.0007234f;
 
-	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 12);
-	TEST_ASSERT_EQUALS(device.bytesWritten, 12U);
+	TEST_ASSERT_EQUALS_ARRAY(string, device.buffer, 9);
+	TEST_ASSERT_EQUALS(device.bytesWritten, 9U);
 }
 
 void

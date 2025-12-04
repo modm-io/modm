@@ -34,14 +34,17 @@ typedef unsigned long long printf_unsigned_value_t;
 typedef unsigned long printf_unsigned_value_t;
 #endif
 
+#define FLAGS_SPACE		(1U <<  3U)
 #define FLAGS_SHORT		(1U <<  7U)
 #define FLAGS_LONG		(1U <<  9U)
 #define FLAGS_LONG_LONG	(1U << 10U)
+#define FLAGS_PRECISION	(1U << 11U)
+#define FLAGS_ADAPT_EXP	(1U << 12U)
 
 extern
 void print_integer(printf_output_gadget_t* output, printf_unsigned_value_t value,
-				   bool negative, uint8_t base, unsigned int precision,
-				   unsigned int width, unsigned int flags);
+                   bool negative, uint8_t base, unsigned int precision,
+                   unsigned int width, unsigned int flags);
 %% if options.with_float
 extern
 void print_floating_point(printf_output_gadget_t* output, double value,
@@ -78,7 +81,7 @@ IOStream::writeInteger(int16_t value)
 {
 %% if options.with_printf
 	print_integer(&output_gadget, uint16_t(value < 0 ? -value : value),
-	              value < 0, 10, 0, 0, FLAGS_SHORT);
+	              value < 0, 10, 0, printf_width, (printf_width ? FLAGS_SPACE : 0) | FLAGS_SHORT);
 %% else
 	// hard coded for -32'768
 	char str[7 + 1]; // +1 for '\0'
@@ -91,7 +94,8 @@ void
 IOStream::writeInteger(uint16_t value)
 {
 %% if options.with_printf
-	print_integer(&output_gadget, value, false, 10, 0, 0, FLAGS_SHORT);
+	print_integer(&output_gadget, value, false, 10,
+	              0, printf_width, (printf_width ? FLAGS_SPACE : 0) | FLAGS_SHORT);
 %% else
 	// hard coded for 32'768
 	char str[6 + 1]; // +1 for '\0'
@@ -105,7 +109,7 @@ IOStream::writeInteger(int32_t value)
 {
 %% if options.with_printf
 	print_integer(&output_gadget, uint32_t(value < 0 ? -value : value),
-	              value < 0, 10, 0, 0, FLAGS_LONG);
+	              value < 0, 10, 0, printf_width, (printf_width ? FLAGS_SPACE : 0) | FLAGS_LONG);
 %% else
 	// hard coded for -2147483648
 	char str[11 + 1]; // +1 for '\0'
@@ -118,7 +122,8 @@ void
 IOStream::writeInteger(uint32_t value)
 {
 %% if options.with_printf
-	print_integer(&output_gadget, value, false, 10, 0, 0, FLAGS_LONG);
+	print_integer(&output_gadget, value, false, 10, 0,
+	              printf_width, (printf_width ? FLAGS_SPACE : 0) | FLAGS_LONG);
 %% else
 	// hard coded for 4294967295
 	char str[10 + 1]; // +1 for '\0'
@@ -132,13 +137,14 @@ void
 IOStream::writeInteger(int64_t value)
 {
 	print_integer(&output_gadget, uint64_t(value < 0 ? -value : value),
-	              value < 0, 10, 0, 0, FLAGS_LONG_LONG);
+	              value < 0, 10, 0, printf_width, (printf_width ? FLAGS_SPACE : 0) | FLAGS_LONG_LONG);
 }
 
 void
 IOStream::writeInteger(uint64_t value)
 {
-	print_integer(&output_gadget, value, false, 10, 0, 0, FLAGS_LONG_LONG);
+	print_integer(&output_gadget, value, false, 10, 0,
+	              printf_width, (printf_width ? FLAGS_SPACE : 0) | FLAGS_LONG_LONG);
 }
 %% endif
 
@@ -147,7 +153,8 @@ void
 IOStream::writeDouble(const double& value)
 {
 %% if options.with_printf
-	print_floating_point(&output_gadget, value, 0, 0, 0, true);
+	print_floating_point(&output_gadget, value, printf_precision, printf_width,
+	                     (printf_width ? FLAGS_SPACE : 0) | FLAGS_PRECISION | FLAGS_ADAPT_EXP, false);
 %% else
 	if(!std::isfinite(value)) {
 		if(std::isinf(value)) {

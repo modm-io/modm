@@ -246,6 +246,29 @@ public:
 	vprintf(const char *fmt, va_list vlist) __attribute__((format(printf, 2, 0)));
 %% endif
 
+%% if options.with_printf
+	inline int width() const { return printf_width; }
+	inline int width(int w) {
+		const size_t old = printf_width;
+		if (w < 0) w = 0;
+		printf_width = w;
+		return old;
+	}
+%% if options.with_float
+	inline int precision() const { return printf_precision; }
+	inline int precision(int p) {
+		const size_t old = printf_precision;
+		if (p < 0) p = 6;
+		printf_precision = p;
+		return old;
+	}
+%% endif
+%% endif
+	inline char fill() const { return ' '; }
+	inline char fill(char) {
+		return ' ';
+	}
+
 
 protected:
 	template< typename T >
@@ -302,6 +325,10 @@ private:
 	static void out_char(char c, void* arg)
 	{ if (c) reinterpret_cast<modm::IOStream*>(arg)->write(c); }
 	printf_output_gadget_t output_gadget{out_char, this, NULL, 0, INT_MAX};
+%% if options.with_float
+	size_t printf_precision{6};
+%% endif
+	size_t printf_width{};
 %% endif
 };
 
