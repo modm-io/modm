@@ -74,67 +74,31 @@ public:
 %% if is_ulpi
 		static constexpr bool any_usb =
 			Connector::template IsValid<Dp> or Connector::template IsValid<Dm>;
-
-		using Ulpick = typename Connector::template GetSignal< Gpio::Signal::Ulpick >;
-		using Ulpistp = typename Connector::template GetSignal< Gpio::Signal::Ulpistp >;
-		using Ulpidir = typename Connector::template GetSignal< Gpio::Signal::Ulpidir >;
-		using Ulpinxt = typename Connector::template GetSignal< Gpio::Signal::Ulpinxt >;
-		using Ulpid0 = typename Connector::template GetSignal< Gpio::Signal::Ulpid0 >;
-		using Ulpid1 = typename Connector::template GetSignal< Gpio::Signal::Ulpid1 >;
-		using Ulpid2 = typename Connector::template GetSignal< Gpio::Signal::Ulpid2 >;
-		using Ulpid3 = typename Connector::template GetSignal< Gpio::Signal::Ulpid3 >;
-		using Ulpid4 = typename Connector::template GetSignal< Gpio::Signal::Ulpid4 >;
-		using Ulpid5 = typename Connector::template GetSignal< Gpio::Signal::Ulpid5 >;
-		using Ulpid6 = typename Connector::template GetSignal< Gpio::Signal::Ulpid6 >;
-		using Ulpid7 = typename Connector::template GetSignal< Gpio::Signal::Ulpid7 >;
-
+%#
+%% for signal in ulpi_signals
+		using {{signal}} = typename Connector::template GetSignal< Gpio::Signal::{{signal}} >;
+%% endfor
+%#
 		static constexpr bool all_ulpi =
-			Connector::template IsValid< Ulpick > and
-			Connector::template IsValid< Ulpistp > and
-			Connector::template IsValid< Ulpidir > and
-			Connector::template IsValid< Ulpinxt > and
-			Connector::template IsValid< Ulpid0 > and
-			Connector::template IsValid< Ulpid1 > and
-			Connector::template IsValid< Ulpid2 > and
-			Connector::template IsValid< Ulpid3 > and
-			Connector::template IsValid< Ulpid4 > and
-			Connector::template IsValid< Ulpid5 > and
-			Connector::template IsValid< Ulpid6 > and
-			Connector::template IsValid< Ulpid7 >;
+%% for signal in ulpi_signals
+			Connector::template IsValid< {{signal}} >{% if loop.last %};{% else %} and{% endif %}
+%% endfor
+%#
 		static constexpr bool any_ulpi =
-			Connector::template IsValid< Ulpick > or
-			Connector::template IsValid< Ulpistp > or
-			Connector::template IsValid< Ulpidir > or
-			Connector::template IsValid< Ulpinxt > or
-			Connector::template IsValid< Ulpid0 > or
-			Connector::template IsValid< Ulpid1 > or
-			Connector::template IsValid< Ulpid2 > or
-			Connector::template IsValid< Ulpid3 > or
-			Connector::template IsValid< Ulpid4 > or
-			Connector::template IsValid< Ulpid5 > or
-			Connector::template IsValid< Ulpid6 > or
-			Connector::template IsValid< Ulpid7 >;
-
+%% for signal in ulpi_signals
+			Connector::template IsValid< {{signal}} >{% if loop.last %};{% else %} or{% endif %}
+%% endfor
+%#
 		static_assert((any_ulpi xor any_usb) and (all_ulpi or all_usb),
 			"{{ name }}::connect() requires at least Dp, Dm (+Id) signals OR 12 ULPI signals:\n"
-			"    - CK\n"
-			"    - STP\n"
-			"    - DIR\n"
-			"    - NXT\n"
-			"    - D0\n"
-			"    - D1\n"
-			"    - D2\n"
-			"    - D3\n"
-			"    - D4\n"
-			"    - D5\n"
-			"    - D6\n"
-			"    - D7");
-
+%% for signal in ulpi_signals
+			"    - {{ signal.replace("Ulpi", "") | upper }}{% if loop.last %}");{% else %}\n"{% endif %}
+%% endfor
+%#
 		if constexpr (all_ulpi and not all_usb)
 		{
 			Rcc::enable<Peripheral::{{ peripheral }}ulpi>();
-			GpioSet< Ulpick, Ulpistp, Ulpidir, Ulpinxt, Ulpid0, Ulpid1,
-					 Ulpid2, Ulpid3, Ulpid4, Ulpid5, Ulpid6, Ulpid7>::configure(
+			GpioSet< {{ ulpi_signals | join(", ") }} >::configure(
 					Gpio::OutputType::PushPull, Gpio::OutputSpeed::High);
 		}
 		else if constexpr (not all_ulpi and all_usb)
