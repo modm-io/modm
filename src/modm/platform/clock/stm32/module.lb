@@ -22,125 +22,122 @@ def prepare(module, options):
         return False
 
     module.depends(":cmsis:device", ":utils", ":platform:clock", ":architecture:delay")
-    # FIXME: Move Peripherals enum somewhere better
-    module.depends(":platform:gpio")
     return True
 
 def build(env):
     device = env[":target"]
-    driver = device.get_driver("rcc")
 
-    properties = {}
-    properties["target"] = target = device.identifier
-    properties["partname"] = device.partname
-    properties["core"] = core = device.get_driver("core")["type"]
+    p = {}
+    p["target"] = t = device.identifier
+    p["partname"] = device.partname
+    p["core"] = device.get_driver("core")["type"]
 
-    if target["family"] in ["c0"]:
-        properties["hsi_frequency"] = 48_000_000
-        properties["lsi_frequency"] = 32_000
-        properties["boot_frequency"] = 12_000_000
-    elif target["family"] in ["f0", "f1", "f3"]:
-        properties["hsi_frequency"] = 8_000_000
-        properties["lsi_frequency"] = 40_000
-        properties["boot_frequency"] = properties["hsi_frequency"]
-    elif target["family"] in ["h7"]:
-        properties["hsi_frequency"] = 64_000_000
-        properties["lsi_frequency"] = 32_000
-        properties["boot_frequency"] = properties["hsi_frequency"]
-    elif target["family"] in ["l0", "l1"]:
-        properties["hsi_frequency"] = 16_000_000
-        properties["lsi_frequency"] = 37_000
-        properties["msi_frequency"] = 2_097_000
-        properties["boot_frequency"] = properties["msi_frequency"]
-    elif target["family"] in ["l5"]:
-        properties["hsi_frequency"] = 16_000_000
-        properties["lsi_frequency"] = 32_000
-        properties["msi_frequency"] = 4_000_000
-        properties["boot_frequency"] = properties["msi_frequency"]
+    if t.family in ["c0"]:
+        p["hsi_frequency"] = 48_000_000
+        p["lsi_frequency"] = 32_000
+        p["boot_frequency"] = 12_000_000
+    elif t.family in ["f0", "f1", "f3"]:
+        p["hsi_frequency"] = 8_000_000
+        p["lsi_frequency"] = 40_000
+        p["boot_frequency"] = p["hsi_frequency"]
+    elif t.family in ["h7"]:
+        p["hsi_frequency"] = 64_000_000
+        p["lsi_frequency"] = 32_000
+        p["boot_frequency"] = p["hsi_frequency"]
+    elif t.family in ["l0", "l1"]:
+        p["hsi_frequency"] = 16_000_000
+        p["lsi_frequency"] = 37_000
+        p["msi_frequency"] = 2_097_000
+        p["boot_frequency"] = p["msi_frequency"]
+    elif t.family in ["l5"]:
+        p["hsi_frequency"] = 16_000_000
+        p["lsi_frequency"] = 32_000
+        p["msi_frequency"] = 4_000_000
+        p["boot_frequency"] = p["msi_frequency"]
     else:
-        properties["hsi_frequency"] = 16_000_000
-        properties["lsi_frequency"] = 32_000
-        properties["boot_frequency"] = properties["hsi_frequency"]
+        p["hsi_frequency"] = 16_000_000
+        p["lsi_frequency"] = 32_000
+        p["boot_frequency"] = p["hsi_frequency"]
 
     # TODO: Move this data into the device files
-    properties["usbprescaler"] = device.has_driver("usb") and target.family in ["f0", "f1", "f3"]
-    properties["pllprediv"] = \
-        (target["family"] in ["f0", "f3"] or (target["family"] == "f1" and target["name"] in ["00", "05", "07"]))
-    properties["pllprediv2"] = False    # FIXME: not sure what value this should have
-    properties["pll_hse_prediv2"] = target["family"] == "f1" and target["name"] in ["01", "02", "03"]
-    properties["hsi48"] = \
-        (target["family"] in ["g4", "h5", "h7", "l5", "u0", "u5"]) or \
-        (target["family"] == "f0" and target["name"] in ["42", "48", "71", "72", "78", "91", "98"]) or \
-        (target["family"] == "g0" and target["name"] in ["b1", "c1"]) or \
-        (target["family"] == "l0" and target["name"][1] == "2") or \
-        (target["family"] == "l4" and target["name"][0] not in ["7", "8"])
-    if target["family"] in ["g4", "l0", "l4", "l5", "u0"]:
-        properties["hsi48_cr"] = "CRRCR"
-    elif target["family"] in ["g0", "h5", "h7", "u5"]:
-        properties["hsi48_cr"] = "CR"
-    elif target["family"] in ["f0"]:
-        properties["hsi48_cr"] = "CR2"
-    properties["pll_p"] = ((target["family"] == "l4" and target["name"] not in ["12", "22"]) or target["family"] == "g4")
-    properties["overdrive"] = (target["family"] == "f7") or \
-        ((target["family"] == "f4") and target["name"] in ["27", "29", "37", "39", "46", "69", "79"])
-    properties["vos0_overdrive"] = (target["family"] == "h7") and \
-        target["name"] in ["42", "43", "45", "47", "50", "53", "55", "57"]
-    properties["has_r1mode"] = (target["family"] == "g4") or \
-        (target["family"] == "l4" and target["name"][0] in ["p", "q", "r", "s"])
-    properties["pllsai_p_usb"] = (target["family"] == "f7") or \
-        ((target["family"] == "f4") and target["name"] in ["46", "69", "79"])
-    properties["rtcpre"] = target.family in ["f2", "f4", "f7", "h7", "l0", "l1"]
-    properties["cfgr_rtc"] = "CR" if target.family in ["l0", "l1"] else \
-        ("CFGR1" if target.family in ["h5"]  else "CFGR")
+    p["usbprescaler"] = device.has_driver("usb") and t.family in ["f0", "f1", "f3"]
+    p["pllprediv"] = \
+        (t.family in ["f0", "f3"] or (t.family == "f1" and t.name in ["00", "05", "07"]))
+    p["pllprediv2"] = False    # FIXME: not sure what value this should have
+    p["pll_hse_prediv2"] = t.family == "f1" and t.name in ["01", "02", "03"]
+    p["hsi48"] = \
+        (t.family in ["g4", "h5", "h7", "l5", "u0", "u5"]) or \
+        (t.family == "f0" and t.name in ["42", "48", "71", "72", "78", "91", "98"]) or \
+        (t.family == "g0" and t.name in ["b1", "c1"]) or \
+        (t.family == "l0" and t.name[1] == "2") or \
+        (t.family == "l4" and t.name[0] not in ["7", "8"])
+    if t.family in ["g4", "l0", "l4", "l5", "u0"]:
+        p["hsi48_cr"] = "CRRCR"
+    elif t.family in ["g0", "h5", "h7", "u5"]:
+        p["hsi48_cr"] = "CR"
+    elif t.family in ["f0"]:
+        p["hsi48_cr"] = "CR2"
+    p["pll_p"] = ((t.family == "l4" and t.name not in ["12", "22"]) or t.family == "g4")
+    p["overdrive"] = (t.family == "f7") or \
+        ((t.family == "f4") and t.name in ["27", "29", "37", "39", "46", "69", "79"])
+    p["vos0_overdrive"] = (t.family == "h7") and \
+        t.name in ["42", "43", "45", "47", "50", "53", "55", "57"]
+    p["has_r1mode"] = (t.family == "g4") or \
+        (t.family == "l4" and t.name[0] in ["p", "q", "r", "s"])
+    p["pllsai_p_usb"] = (t.family == "f7") or \
+        ((t.family == "f4") and t.name in ["46", "69", "79"])
+    p["rtcpre"] = t.family in ["f2", "f4", "f7", "h7", "l0", "l1"]
+    p["cfgr_rtc"] = "CR" if t.family in ["l0", "l1"] else \
+        ("CFGR1" if t.family in ["h5"]  else "CFGR")
 
 
-    if target.family in ["h7"]:
-        if target.name in ["a3", "b0", "b3"]:
-            properties["cfgr_prescaler"] = "CDCFGR1"
+    if t.family in ["h7"]:
+        if t.name in ["a3", "b0", "b3"]:
+            p["cfgr_prescaler"] = "CDCFGR1"
         else:
-            properties["cfgr_prescaler"] = "D1CFGR"
-    elif target.family in ["u5"]:
-        properties["cfgr_prescaler"] = "CFGR2"
+            p["cfgr_prescaler"] = "D1CFGR"
+    elif t.family in ["u5"]:
+        p["cfgr_prescaler"] = "CFGR2"
     else:
-        properties["cfgr_prescaler"] = "CFGR"
+        p["cfgr_prescaler"] = "CFGR"
 
-    if target.family in ["h7"]:
-        if target.name in ["a3", "b0", "b3"]:
-            properties["cfgr2"] = "CDCFGR2"
+    if t.family in ["h7"]:
+        if t.name in ["a3", "b0", "b3"]:
+            p["cfgr2"] = "CDCFGR2"
         else:
-            properties["cfgr2"] = "D2CFGR"
-    elif target.family in ["u5"]:
-        properties["cfgr2"] = "CFGR2"
+            p["cfgr2"] = "D2CFGR"
+    elif t.family in ["u5"]:
+        p["cfgr2"] = "CFGR2"
     else:
-        properties["cfgr2"] = "CFGR"
+        p["cfgr2"] = "CFGR"
 
-    if target.family in ["h7"]:
-        if target.name in ["a3", "b0", "b3"]:
-            properties["ccipr1"] = "CDCCIP1R"
+    if t.family in ["h7"]:
+        if t.name in ["a3", "b0", "b3"]:
+            p["ccipr1"] = "CDCCIP1R"
         else:
-            properties["ccipr1"] = "D2CCIP1R"
-    elif target.family in ["l5", "u5"]:
-        properties["ccipr1"] = "CCIPR1"
+            p["ccipr1"] = "D2CCIP1R"
+    elif t.family in ["l5", "u5"]:
+        p["ccipr1"] = "CCIPR1"
     else:
-        properties["ccipr1"] = "CCIPR"
+        p["ccipr1"] = "CCIPR"
 
-    properties["d1"] = ("CD" if target.name in ["a3", "b0", "b3"] else "D1") \
-                        if target.family == "h7" else ""
-    properties["d2"] = ("CD" if target.name in ["a3", "b0", "b3"] else "D2") \
-                        if target.family == "h7" else ""
-    properties["cfgr3"] = ("SRDCFGR" if target.name in ["a0", "a3", "b0", "b3"] else "D3CFGR")
-    properties["d3"] = ("SRD" if target.name in ["a0", "a3", "b0", "b3"] else "D3")
-    properties["bdcr"] = "CSR1" if target.family in ["c0"] else "CSR" if target.family in ["l0", "l1"] else "BDCR"
-    properties["pll_ids"] = ["1", "2", "3"] if target.family in ["h7", "u5"] else [] if target.family in ["c0"] else [""]
-    properties["has_smps"] = target["family"] == "h7" and (target["name"] in ["25", "35", "45", "47", "55", "57"] or \
-        (target["name"] in ["30", "a3", "b0", "b3"] and target["variant"] == "q"))
+    p["d1"] = ("CD" if t.name in ["a3", "b0", "b3"] else "D1") \
+                        if t.family == "h7" else ""
+    p["d2"] = ("CD" if t.name in ["a3", "b0", "b3"] else "D2") \
+                        if t.family == "h7" else ""
+    p["cfgr3"] = ("SRDCFGR" if t.name in ["a0", "a3", "b0", "b3"] else "D3CFGR")
+    p["d3"] = ("SRD" if t.name in ["a0", "a3", "b0", "b3"] else "D3")
+    p["bdcr"] = "CSR1" if t.family in ["c0"] else "CSR" if t.family in ["l0", "l1"] else "BDCR"
+    p["pll_ids"] = ["1", "2", "3"] if t.family in ["h7", "u5"] else [] if t.family in ["c0"] else [""]
+    p["has_smps"] = t.family == "h7" and (t.name in ["25", "35", "45", "47", "55", "57"] or \
+        (t.name in ["30", "a3", "b0", "b3"] and t.variant == "q"))
 
     flash_latencies = {}
     for vcore in device.get_driver("flash")["latency"]:
         flash_latencies[int(vcore["vcore-min"])] = sorted([int(f["hclk-max"]) for f in vcore["wait-state"]])
 
-    properties["table"] = flash_latencies
-    env.substitutions = properties
+    p["table"] = flash_latencies
+    env.substitutions = p
     env.outbasepath = "modm/src/modm/platform/clock"
 
     env.template("rcc.cpp.in")
@@ -196,14 +193,14 @@ def build(env):
             per = "RTC"
             nper = "RTCAPB"
         # Fix USBOTG OTG
-        if target.family == "u5" and per == "OTG":
+        if t.family == "u5" and per == "OTG":
             per = "Usbotgfs"
         if ("Usbotgfs" in all_peripherals or "Usbotghs" in all_peripherals) and per.startswith("OTG"):
             if per == "OTGH": per = "OTGHS"
             per = "USB"+per
         if ("Usbotgfs" in all_peripherals or "Usbotghs" in all_peripherals) and per.startswith("USB"):
             per = per.replace("USB1", "USB").replace("USB2", "USB")
-        if target.family == "l5" and per == "USBFS":
+        if t.family == "l5" and per == "USBFS":
             per = "Usb"
         if per.capitalize() not in all_peripherals:
             continue
