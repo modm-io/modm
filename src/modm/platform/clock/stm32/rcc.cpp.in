@@ -237,7 +237,7 @@ Rcc::enablePll{{id}}(PllSource source, const PllFactors& pllFactors, uint32_t wa
 %% elif target.family in ["f2", "f4", "f7"]
 	// Read reserved values and clear all other values
 	uint32_t tmp = RCC->PLLCFGR & ~(RCC_PLLCFGR_PLLSRC | RCC_PLLCFGR_PLLM
-			| RCC_PLLCFGR_PLLN | RCC_PLLCFGR_PLLP);
+			| RCC_PLLCFGR_PLLN | RCC_PLLCFGR_PLLP | RCC_PLLCFGR_PLLQ);
 
 	// PLLSRC source for pll and for plli2s
 	tmp |= static_cast<uint32_t>(source);
@@ -247,13 +247,14 @@ Rcc::enablePll{{id}}(PllSource source, const PllFactors& pllFactors, uint32_t wa
 
 	// PLLN (6) = factor is user defined
 	tmp |= (((uint32_t) pllFactors.pllN) << RCC_PLLCFGR_PLLN_Pos) & RCC_PLLCFGR_PLLN;
-
+%% if pll_p
+%#
 	// PLLP (16) divider for CPU frequency; (00: PLLP = 2, 01: PLLP = 4, etc.)
-	tmp |= (((uint32_t) (pllFactors.pllP / 2) - 1) << RCC_PLLCFGR_PLLP_Pos) & RCC_PLLCFGR_PLLP;
-
+	tmp |= (((uint32_t) (pllFactors.pllP / 2) - 1u) << RCC_PLLCFGR_PLLP_Pos) & RCC_PLLCFGR_PLLP;
+%% endif
+%#
 	// PLLQ (24) divider for USB frequency; (0-15)
-	if (pllFactors.pllQ != 0xff) {
-		tmp &= ~RCC_PLLCFGR_PLLQ;
+	if (pllFactors.pllQ != PllFactors::Disabled) {
 		tmp |= (((uint32_t) pllFactors.pllQ) << RCC_PLLCFGR_PLLQ_Pos) & RCC_PLLCFGR_PLLQ;
 	}
 
@@ -271,7 +272,10 @@ Rcc::enablePll{{id}}(PllSource source, const PllFactors& pllFactors, uint32_t wa
 	uint32_t tmp = RCC->PLLCFGR & ~(
 			RCC_PLLCFGR_PLLSRC | RCC_PLLCFGR_PLLM | RCC_PLLCFGR_PLLN |
 %% if pll_p
-			// RCC_PLLCFGR_PLLPEN | RCC_PLLCFGR_PLLP |
+			RCC_PLLCFGR_PLLPEN | RCC_PLLCFGR_PLLP |
+%% endif
+%% if pll_q
+			RCC_PLLCFGR_PLLQEN | RCC_PLLCFGR_PLLQ |
 %% endif
 			RCC_PLLCFGR_PLLREN | RCC_PLLCFGR_PLLR);
 
@@ -279,30 +283,46 @@ Rcc::enablePll{{id}}(PllSource source, const PllFactors& pllFactors, uint32_t wa
 	tmp |= static_cast<uint32_t>(source);
 
 	// PLLM factor is user defined VCO input frequency must be configured between 4MHz and 16Mhz
-	tmp |= (uint32_t(pllFactors.pllM - 1) << RCC_PLLCFGR_PLLM_Pos) & RCC_PLLCFGR_PLLM;
+	tmp |= (uint32_t(pllFactors.pllM - 1u) << RCC_PLLCFGR_PLLM_Pos) & RCC_PLLCFGR_PLLM;
 
 	// PLLN factor is user defined: between 64 and 344 MHz
 	tmp |= (uint32_t(pllFactors.pllN) << RCC_PLLCFGR_PLLN_Pos) & RCC_PLLCFGR_PLLN;
-
+%#
+%% if pll_p
+	// PLLP divider for P frequency
+	if (pllFactors.pllP != PllFactors::Disabled) {
+%% if target.family in ["g4", "l4", "l5"]
+		if (pllFactors.pllP == 17) tmp |= RCC_PLLCFGR_PLLP_Pos;
+%% else
+		tmp |= ((uint32_t(pllFactors.pllP) - 1u) << RCC_PLLCFGR_PLLP_Pos) & RCC_PLLCFGR_PLLP;
+%% endif
+		tmp |= RCC_PLLCFGR_PLLPEN;
+	}
+%#
+%% endif
 	// PLLR divider for CPU frequency
 %% if target.family in ["g0"]
-	tmp |= ((uint32_t(pllFactors.pllR) - 1) << RCC_PLLCFGR_PLLR_Pos) & RCC_PLLCFGR_PLLR;
-	// PLLP divider for P frequency
-	// tmp |= ((uint32_t(pllP) - 1) << RCC_PLLCFGR_PLLP_Pos) & RCC_PLLCFGR_PLLP;
-%% else
-	tmp |= ((uint32_t(pllFactors.pllR / 2) - 1) << RCC_PLLCFGR_PLLR_Pos) & RCC_PLLCFGR_PLLR;
-	// PLLQ (21) divider for USB frequency; (00: PLLQ = 2, 01: PLLQ = 4, etc.)
-	if (pllFactors.pllQ != 0xff) {
-		tmp &= ~RCC_PLLCFGR_PLLQ;
-		tmp |= (((uint32_t) (pllFactors.pllQ / 2) - 1) << RCC_PLLCFGR_PLLQ_Pos) & RCC_PLLCFGR_PLLQ;
-		// enable pll USB clock output
+	if (pllFactors.pllR != PllFactors::Disabled) {
+		tmp |= ((uint32_t(pllFactors.pllR) - 1u) << RCC_PLLCFGR_PLLR_Pos) & RCC_PLLCFGR_PLLR;
+		tmp |= RCC_PLLCFGR_PLLREN;
+	}
+
+%% if pll_q
+	if (pllFactors.pllQ != PllFactors::Disabled) {
+		tmp |= ((uint32_t(pllFactors.pllQ) - 1u) << RCC_PLLCFGR_PLLQ_Pos) & RCC_PLLCFGR_PLLQ;
 		tmp |= RCC_PLLCFGR_PLLQEN;
 	}
 %% endif
-
-	// enable pll CPU clock output
+%% elif target.family in ["g4", "l4", "l5"]
+	tmp |= ((uint32_t(pllFactors.pllR / 2u) - 1u) << RCC_PLLCFGR_PLLR_Pos) & RCC_PLLCFGR_PLLR;
 	tmp |= RCC_PLLCFGR_PLLREN;
 
+	if (pllFactors.pllQ != PllFactors::Disabled) {
+		tmp |= (((uint32_t) (pllFactors.pllQ / 2u) - 1u) << RCC_PLLCFGR_PLLQ_Pos) & RCC_PLLCFGR_PLLQ;
+		tmp |= RCC_PLLCFGR_PLLQEN;
+	}
+%% endif
+%#
 	RCC->PLLCFGR = tmp;
 
 	// enable pll

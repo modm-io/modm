@@ -667,35 +667,31 @@ public:
 %% if target.family != "c0"
 	struct PllFactors
 	{
-%% if target.family in ["h7"]
+%% if target.family in ["h7", "u5"]
 		PllInputRange range;
 		uint8_t pllM;
 		uint16_t pllN;
 		uint8_t pllP;
 		uint8_t pllQ;
 		uint8_t pllR;
-		uint16_t pllFrac = 0;
-%% elif target.family in ["u5"]
-		PllInputRange range;
-		uint8_t pllM;
-		uint16_t pllN;
-		uint8_t pllP;
-		uint8_t pllQ;
-		uint8_t pllR;
+	%% if target.family in ["u5"]
 		/// Only used with PLL1:
 		/// Configure the PLL1MBOOST in RCC->PLL1CFGR to generate a booster
 		/// clock frequency between 4 and 16 MHz.
 		EpodBoosterPrescaler epodPrescaler = EpodBoosterPrescaler::Div1;
+	%% endif
 		uint16_t pllFrac = 0;
 %% elif target.family in ["f2", "f4", "f7", "l4", "l5", "g0", "g4"]
+		static constexpr uint8_t Disabled = 0xff;
 		uint8_t pllM;
 		uint16_t pllN;
 	%% if target.family in ["l4", "l5", "g0", "g4"]
-		uint8_t pllR;
-	%% else
-		uint8_t pllP;
+		uint8_t pllR = Disabled;
 	%% endif
-		uint8_t pllQ = 0xff;
+	%% if pll_p
+		uint8_t pllP = Disabled;
+	%% endif
+		uint8_t pllQ = Disabled;
 %% elif target.family in ["l0", "l1"]
 		PllMultiplier pllMul;
 		uint8_t pllDiv;

@@ -77,7 +77,8 @@ def build(env):
         p["hsi48_cr"] = "CR"
     elif t.family in ["f0"]:
         p["hsi48_cr"] = "CR2"
-    p["pll_p"] = ((t.family == "l4" and t.name not in ["12", "22"]) or t.family == "g4")
+    p["pll_p"] = ((t.family == "l4" and t.name not in ["12", "22"]) or t.family in ["g0", "g4", "l5", "f2", "f4", "f7", "u0"])
+    p["pll_q"] = (t.family == "g0" and (t.name[1] == "1" or t.name == "b0")) or t.family in ["g4", "l4", "l5"]
     p["overdrive"] = (t.family == "f7") or \
         ((t.family == "f4") and t.name in ["27", "29", "37", "39", "46", "69", "79"])
     p["vos0_overdrive"] = (t.family == "h7") and \
