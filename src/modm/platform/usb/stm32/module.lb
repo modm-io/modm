@@ -24,6 +24,7 @@ def common_usb_irqs(env):
 
      - OTG_FS (no suffix)
      - USB
+     - USB_UCPD* (any suffix)
      - USBWakeUp (no suffix)
      - USB_LP* (any suffix)
      - USB_HP* (any suffix)
@@ -123,7 +124,7 @@ class UsbInstance(Module):
 
     def init(self, module):
         module.name = self.speed
-        module.description = "{} Speed".format("Full" if self.speed == "fs" else "High")
+        module.description = "USB {} Speed Port".format("Full" if self.speed == "fs" else "High")
 
     def prepare(self, module, options):
         module.depends(":platform:gpio")
