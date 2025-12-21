@@ -6,7 +6,7 @@
   </repositories>
 
   <options>
-    <option name="modm:target">same70q21a-an</option>
+    <option name="modm:target">same70q21b-an</option>
   </options>
   <modules>
     <module>modm:board:same70-xplained</module>

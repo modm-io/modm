@@ -17,7 +17,7 @@ def init(module):
     module.description = "Microchip SAME70 Xplained"
 
 def prepare(module, options):
-    if not options[":target"].partname == "same70q21a-an":
+    if not options[":target"].partname == "same70q21b-an":
         return False
 
     module.depends(":debug", ":platform:clockgen", ":platform:gpio", ":platform:core", ":platform:usart:1")

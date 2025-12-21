@@ -69,18 +69,18 @@ public:
 		using SckPin = GetPin_t<PeripheralPin::Sck, Pins...>;
 		using MisoPin = GetPin_t<PeripheralPin::Miso, Pins...>;
 		using MosiPin = GetPin_t<PeripheralPin::Mosi, Pins...>;
-		using Flexcom = Peripherals::Flexcom<{{ id | int }}>;
+		using Spi = Peripherals::Spi<{{ id | int }}>;
 
 		if constexpr (!std::is_void<SckPin>::value) {
-			using SckConnector = typename SckPin::template Connector<Flexcom, Flexcom::Sck>;
+			using SckConnector = typename SckPin::template Connector<Spi, Spi::Spck>;
 			SckConnector::connect();
 		}
 		if constexpr (!std::is_void<MisoPin>::value) {
-			using MisoConnector = typename MisoPin::template Connector<Flexcom, Flexcom::Miso>;
+			using MisoConnector = typename MisoPin::template Connector<Spi, Spi::Miso>;
 			MisoConnector::connect();
 		}
 		if constexpr (!std::is_void<MosiPin>::value) {
-			using MosiConnector = typename MosiPin::template Connector<Flexcom, Flexcom::Mosi>;
+			using MosiConnector = typename MosiPin::template Connector<Spi, Spi::Mosi>;
 			MosiPin::setInput(modm::platform::InputType::Floating);
 			MosiConnector::connect();
 		}

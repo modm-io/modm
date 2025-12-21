@@ -63,14 +63,16 @@ public:
 		static_assert(
 			!std::is_same_v<typename RxPin::Base, typename TxPin::Base>,
 			"Rx and Tx cannot use the same pin!");
-		using Peripheral = Peripherals::{{ peripheral }}<{{ id | int }}>;
 	%% if peripheral == "Flexcom"
+		using Peripheral = Peripherals::Usart<{{ id | int }}>;
 		using RxConnector = typename RxPin::template Connector<Peripheral, Peripheral::Rxd>;
 		using TxConnector = typename TxPin::template Connector<Peripheral, Peripheral::Txd>;
 	%% elif type == "usart"
+		using Peripheral = Peripherals::Usart<{{ id | int }}>;
 		using RxConnector = typename RxPin::template Connector<Peripheral, Peripheral::Rxd<{{id}}>>;
 		using TxConnector = typename TxPin::template Connector<Peripheral, Peripheral::Txd<{{id}}>>;
 	%% elif type == "uart"
+		using Peripheral = Peripherals::Uart<{{ id | int }}>;
 		using RxConnector = typename RxPin::template Connector<Peripheral, Peripheral::Urxd<{{id}}>>;
 		using TxConnector = typename TxPin::template Connector<Peripheral, Peripheral::Utxd<{{id}}>>;
 	%% endif

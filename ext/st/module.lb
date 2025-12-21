@@ -121,7 +121,10 @@ def common_header_file(env):
     core = core.replace("cortex-m", "").replace("+", "plus").replace("f", "").replace("d", "")
     core_header = "core_cm{}.h".format(core)
 
-    folder = "stm32{}xx".format(device.identifier.family)
+    if device.identifier.string[5:8] in ["h7r", "h7s"]:
+        folder = "stm32h7rsxx"
+    else:
+        folder = "stm32{}xx".format(device.identifier.family)
     family_header = folder + ".h"
     folder = "stm32/{}/Include".format(folder)
     define = None
