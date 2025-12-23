@@ -743,6 +743,7 @@ We have out-of-box support for many development boards including documentation.
 </tr><tr>
 <td align="center"><a href="https://modm.io/reference/config/modm-thingplus-rp2040">THINGPLUS-RP2040</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-weact-c011f6">WEACT-C011F6</a></td>
+<td align="center"><a href="https://modm.io/reference/config/modm-weact-g0b1cb">WEACT-G0B1CB</a></td>
 </tr>
 </table>
 <!--/bsptable-->
