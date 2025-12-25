@@ -28,8 +28,14 @@
 #if defined TUD_OPT_RP2040_USB_DEVICE_UFRAME_FIX && (TUD_OPT_RP2040_USB_DEVICE_UFRAME_FIX == 1)
 #	error TUD_OPT_RP2040_USB_DEVICE_UFRAME_FIX is not supported in modm currently.
 #endif
+#include <modm/architecture/utils.hpp>
+#define __not_in_flash(...) modm_fastcode
 %% endif
 %#
+#if defined(CFG_TUSB_DEBUG) && CFG_TUSB_DEBUG
+#	include <stdio.h>
+#endif
+
 #include <modm/architecture/interface/assert.h>
 
 // Redirect TinyUSB asserts to use modm_assert
