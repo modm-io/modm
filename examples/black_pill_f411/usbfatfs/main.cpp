@@ -81,7 +81,6 @@ check_for_update()
 {
 	// FAT12 max filename length is 8.3, so this is the max:
 	static const char *firmware_name = "USBFATFS.BIN";
-	static constexpr uint8_t buffer_sector{7};
 	// Note: This allocates all FatFs buffers *ON THE STACK*!
 	// It may be desirable to allocate them statically for your code!
 	if (FATFS fs; f_mount(&fs, "", 0) == FR_OK)
@@ -94,22 +93,24 @@ check_for_update()
 				if (is_valid(&fil, fno.fsize))
 				{
 					Board::Led::set();
-					// We first copy the file into the last Flash section of 128kB.
+					// We first copy the file into the middle of the flash.
 					// It's not guaranteed that the file is stored in FatFs in *one*
-					// continous chunk and we cannot access FatFs code in ram_apply!!!
+					// continuous chunk and we cannot access FatFs code in ram_apply!!!
 					Flash::unlock();
-					Flash::erase(buffer_sector);
-					uint32_t dst_addr{uint32_t(Flash::getAddr(buffer_sector))};
+					uint32_t dst_addr{Flash::Size/2};
+					for (auto page{Flash::getPage(dst_addr)};
+						 page <= Flash::getPage(dst_addr+fno.fsize);
+						 page++) Flash::erase(page);
 					for (FSIZE_t offset{0}; offset < fno.fsize;
-					     offset += sizeof(Flash::MaxWordType),
-					     dst_addr += sizeof(Flash::MaxWordType))
+						 offset += sizeof(Flash::MaxWordType),
+						 dst_addr += sizeof(Flash::MaxWordType))
 					{
 						Flash::MaxWordType buffer; UINT read;
 						f_read(&fil, &buffer, sizeof(Flash::MaxWordType), &read);
 						Flash::program(dst_addr, buffer);
 					}
 					// Jump into RAM and copy from last flash page to first pages
-					ram_apply(Flash::getPage(fno.fsize), Flash::getAddr(buffer_sector), fno.fsize);
+					ram_apply(Flash::getPage(fno.fsize), Flash::Origin + Flash::Size/2, fno.fsize);
 				}
 				f_close(&fil);
 			}

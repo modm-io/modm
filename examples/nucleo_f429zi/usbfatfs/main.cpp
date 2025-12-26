@@ -81,7 +81,6 @@ check_for_update()
 {
 	// FAT12 max filename length is 8.3, so this is the max:
 	static const char *firmware_name = "USBFATFS.BIN";
-	static constexpr uint8_t buffer_sector{7};
 	// Note: This allocates all FatFs buffers *ON THE STACK*!
 	// It may be desirable to allocate them statically for your code!
 	if (FATFS fs; f_mount(&fs, "", 0) == FR_OK)
@@ -96,7 +95,7 @@ check_for_update()
 					Board::LedBlue::set();
 					// We first copy the file into the middle of the flash.
 					// It's not guaranteed that the file is stored in FatFs in *one*
-					// continous chunk and we cannot access FatFs code in ram_apply!!!
+					// continuous chunk and we cannot access FatFs code in ram_apply!!!
 					Flash::unlock();
 					uint32_t dst_addr{Flash::Size/2};
 					for (auto page{Flash::getPage(dst_addr)};
