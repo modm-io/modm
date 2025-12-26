@@ -51,7 +51,7 @@
 	url = https://github.com/modm-ext/json-partial.git
 [submodule "ext/segger/rtt"]
 	path = ext/segger/rtt
-	url = https://github.com/modm-ext/segger-rtt.git
+	url = https://github.com/modm-ext/rtt-partial.git
 [submodule "ext/vl53/vl53"]
 	path = ext/vl53/vl53
 	url = https://github.com/modm-ext/vl53-partial.git
