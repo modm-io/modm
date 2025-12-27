@@ -420,7 +420,8 @@ def build(env):
         env.template("unaligned_impl.hpp.in")
 
     env.collect(":build:linkflags", "-Wl,--no-wchar-size-warning",
-                "-Wl,--no-warn-rwx-segment", "-L{project_source_dir}")
+                "-Wl,--no-warn-rwx-segment", "-L{project_source_dir}",
+                "-Wl,-z,execstack")
     # Linkerscript
     linkerscript = env["linkerscript.override"]
     env.collect(":build:linkflags", "-T{}".format(env.relcwdoutpath(

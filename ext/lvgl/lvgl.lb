@@ -22,6 +22,7 @@ and low memory footprint.
 - https://lvgl.io/
 - https://github.com/lvgl/lvgl
 
+
 ## Configuration
 
 LVGL defines defaults for all it's configuration settings, which you can find in
@@ -62,11 +63,16 @@ Example `<lv_conf_local.h>` configuration:
 #define LV_ANTIALIAS  0
 ```
 
+
 ## Initialization
 
 modm will call `lv_init()` as a constructor with priority 1000 and then set the
 required callbacks for the modm port to work. Static constructors are called
 afterwards therefore can already use the LVGL functions.
+
+Calling the `lv_timer_handler()` may require a few kB of stack, so increasing
+the main stack size via the `modm:platform:cortex-m:main_stack_size` option or
+a fiber stack size via the template parameter may be necessary.
 
 [conf_template]: https://github.com/lvgl/lvgl/blob/master/lv_conf_template.h
 """
@@ -84,6 +90,7 @@ def build(env):
 
     env.copy("lvgl/lvgl.h")
     env.copy("lvgl/lv_version.h")
+    env.copy("lvgl/lvgl_private.h")
     env.template("lv_conf.h.in")
     files = env.copy("lvgl/src")
     env.collect(":build:ccflags", "-Wno-maybe-uninitialized", operations=files)
