@@ -318,7 +318,6 @@ private:
 	IOStream(const IOStream&) = delete;
 	IOStream& operator =(const IOStream&) = delete;
 
-private:
 	IODevice* const	device;
 	Mode mode = Mode::Ascii;
 %% if options.with_printf
@@ -330,6 +329,7 @@ private:
 %% endif
 	size_t printf_width{};
 %% endif
+	friend class OSizeStream;
 };
 
 /// @ingroup modm_io
@@ -394,6 +394,57 @@ cyan(IOStream& ios);
 
 IOStream&
 white(IOStream& ios);
+
+
+class OSizeStream : public IOStream
+{
+public:
+	class Buffer : public IODevice
+	{
+		size_t buffer_size{};
+	public:
+		inline constexpr Buffer() = default;
+		using IODevice::write;
+		inline void write(char) override { buffer_size++; }
+		inline void flush() override { buffer_size = 0; }
+		inline bool read(char&) override { return false; }
+
+		inline size_t
+		size() const
+		{
+			return buffer_size;
+		}
+
+		inline size_t
+		length() const
+		{
+			return buffer_size;
+		}
+	};
+
+	inline OSizeStream() : IOStream(buffer) {}
+
+	inline const Buffer&
+	str() const
+	{
+		return buffer;
+	}
+
+	inline void
+	copyfmt(const IOStream& other)
+	{
+		this->mode = other.mode;
+%% if options.with_printf
+%% if options.with_float
+		this->printf_precision = other.printf_precision;
+%% endif
+		this->printf_width = other.printf_width;
+%% endif
+	}
+
+private:
+	Buffer buffer;
+};
 /// @}
 
 }	// namespace modm
