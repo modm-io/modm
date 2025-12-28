@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:nucleo-g474re</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_g474re/eigen</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:heap</module>
+    <module>modm:eigen</module>
+  </modules>
+</library>
