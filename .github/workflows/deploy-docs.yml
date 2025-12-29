@@ -57,6 +57,14 @@ jobs:
     container:
       image: ghcr.io/modm-ext/modm-build-base:2022-09-27
     steps:
+      - name: Maximize build space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 512
+          swap-size-mb: 1024
+          remove-android: 'true'
+          remove-codeql: 'true'
+          remove-dotnet: 'true'
       - name: Check out repository
         uses: actions/checkout@v4
         with:
