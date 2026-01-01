@@ -161,9 +161,6 @@ public:
 	{
 		modm_context_stack_watermark(&ctx);
 	}
-	// DEPRECATE: 2025q4
-	[[deprecated("Use `stack_watermark()` instead!")]]
-	void inline watermark_stack() { stack_watermark(); }
 	/// @endcond
 };
 

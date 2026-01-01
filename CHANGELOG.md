@@ -52,6 +52,87 @@ pay attention to. Medium impact changes are also worth looking at.
 
 <!--releases-->
 
+## 2026-01-01: 2025q4 release
+
+This release covers everything from 2025-10-01 and has been tested with avr-gcc
+v14.2.0 from upstream and arm-none-eabi-gcc v14.2.1 from xpack.
+
+Features:
+
+- libeigen integration added.
+- Support for precision() and width() added to IOStream.
+
+Integrated Projects:
+
+- CMSIS Core upgraded from v6.1.0 to v6.2.0.
+- Eigen added at v5.0.1.
+- ETL upgraded from v20.40.0 to v20.44.1.
+- FatFS upgraded from v0.15a_p1 to v0.16.
+- LVGL upgraded from v9.2.2 to v9.4.0.
+- RTT upgraded from v8.54 to v8.56a.
+- STM32F4 headers upgraded from v2.6.10 to v2.6.11.
+- STM32F7 headers upgraded from v1.2.9 to v1.2.10.
+- STM32L4 headers upgraded from v1.7.4 to v1.7.5.
+- STM32L5 headers upgraded from v1.0.6 to v1.0.7
+- TinyUSB upgraded from v0.18.0 to v0.20.0.
+
+Fixes:
+
+- Compilation of PCB9535 driver.
+- Compatibility with Python 3.14.
+- PLL configuration for STM32G0, G4, L4, L5 families.
+- TinyUSB integration for STM32G0.
+- Fix recursive header dependency issue in assert implementation.
+
+New device drivers:
+
+- VL53L5CX distance sensor as [`modm:driver:vl53:vl53l5cx`][].
+- VL53L7/VL53L8 distance sensor as [`modm:driver:vl53:vl53lmz`][].
+
+New development boards:
+
+- NUCLEO-F071RB as [`modm:board:disco-g071rb`][].
+- WeAct-G0B1CB as [`modm:board:weact-g0b1cb`][].
+
+Known bugs:
+
+- OpenOCD cannot enable SWO on STM32H7 targets. See [#1079][].
+- `arm-none-eabi-gdb` TUI and GDBGUI interfaces are not supported on Windows.
+  See [#591][].
+- Generating modm on Windows creates paths with `\` that are not compatible with
+  Unix. See [#310][].
+- `lbuild build` and `lbuild clean` do not remove all previously generated files
+  when the configuration changes. See [#285][].
+
+Many thanks to all our contributors:
+
+- Alex Evers ([@Tecnologic][])
+- Henrik Hose ([@hshose][])
+- Niklas Hauser ([@salkinium][])
+
+PR [#1311][] -> [2025q4][].
+
+<details>
+<summary>Detailed changelog</summary>
+
+#### 2025-12-24: Add WeAct-G0B1CB board
+
+PR [#1306][] -> [10eff63][].  
+Tested in hardware by [@salkinium][].
+
+#### 2025-12-04: Add VL53L5/7/8 drivers
+
+PR [#1296][] -> [a40f206][].  
+Tested in hardware by [@hshose][].
+
+#### 2025-11-16: Add NUCLEO-F071RB board
+
+PR [#1300][] -> [584f5e3][].  
+Tested in hardware by [@salkinium][].
+
+</details>
+
+
 ## 2025-10-01: 2025q3 release
 
 This release covers everything from 2025-07-01 and has been tested with avr-gcc
@@ -3647,6 +3728,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [2025q1]: https://github.com/modm-io/modm/releases/tag/2025q1
 [2025q2]: https://github.com/modm-io/modm/releases/tag/2025q2
 [2025q3]: https://github.com/modm-io/modm/releases/tag/2025q3
+[2025q4]: https://github.com/modm-io/modm/releases/tag/2025q4
 
 [@19joho66]: https://github.com/19joho66
 [@ASMfreaK]: https://github.com/ASMfreaK
@@ -3725,6 +3807,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [`modm:board:devebox-stm32f4xx`]: https://modm.io/reference/module/modm-board-devebox-stm32f4xx
 [`modm:board:devebox-stm32h750vb`]: https://modm.io/reference/module/modm-board-devebox-stm32h750vb
 [`modm:board:disco-f723ie`]: https://modm.io/reference/module/modm-board-disco-f723ie
+[`modm:board:disco-g071rb`]: https://modm.io/reference/module/modm-board-disco-g071rb
 [`modm:board:feather-m0`]: https://modm.io/reference/module/modm-board-feather-m0
 [`modm:board:feather-rp2040`]: https://modm.io/reference/module/modm-board-feather-rp2040
 [`modm:board:mega-2560-pro`]: https://modm.io/reference/module/modm-board-mega-2560-pro
@@ -3760,6 +3843,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [`modm:board:stm32_f32ve`]: https://modm.io/reference/module/modm-board-stm32_f32ve
 [`modm:board:thingplus-rp2040`]: https://modm.io/reference/module/modm-board-thingplus-rp2040
 [`modm:board:weact-c011f6`]: https://modm.io/reference/module/modm-board-weact-c011f6
+[`modm:board:weact-g0b1cb`]: https://modm.io/reference/module/modm-board-weact-g0b1cb
 [`modm:disco-f401vc`]: https://modm.io/reference/module/modm-disco-f401vc
 [`modm:disco-f411ve`]: https://modm.io/reference/module/modm-disco-f411ve
 [`modm:disco-f469ni:b-03`]: https://modm.io/reference/module/modm-disco-f469ni-b-03
@@ -3811,6 +3895,8 @@ Please note that contributions from xpcc were continuously ported to modm.
 [`modm:driver:tlc594x`]: https://modm.io/reference/module/modm-driver-tlc594x
 [`modm:driver:tmp12x`]: https://modm.io/reference/module/modm-driver-tmp12x
 [`modm:driver:touch2046`]: https://modm.io/reference/module/modm-driver-touch2046
+[`modm:driver:vl53:vl53l5cx`]: https://modm.io/reference/module/modm-driver-vl53-vl53l5cx
+[`modm:driver:vl53:vl53lmz`]: https://modm.io/reference/module/modm-driver-vl53-vl53lmz
 [`modm:driver:ws2812`]: https://modm.io/reference/module/modm-driver-ws2812
 [`modm:feather-m4`]: https://modm.io/reference/module/modm-feather-m4
 [`modm:nucleo-g070rb`]: https://modm.io/reference/module/modm-nucleo-g070rb
@@ -3897,6 +3983,10 @@ Please note that contributions from xpcc were continuously ported to modm.
 [#1285]: https://github.com/modm-io/modm/pull/1285
 [#1290]: https://github.com/modm-io/modm/pull/1290
 [#1293]: https://github.com/modm-io/modm/pull/1293
+[#1296]: https://github.com/modm-io/modm/pull/1296
+[#1300]: https://github.com/modm-io/modm/pull/1300
+[#1306]: https://github.com/modm-io/modm/pull/1306
+[#1311]: https://github.com/modm-io/modm/pull/1311
 [#132]: https://github.com/modm-io/modm/pull/132
 [#136]: https://github.com/modm-io/modm/pull/136
 [#153]: https://github.com/modm-io/modm/pull/153
@@ -4124,6 +4214,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [0e3d280]: https://github.com/modm-io/modm/commit/0e3d280
 [0f0505f]: https://github.com/modm-io/modm/commit/0f0505f
 [0fd53a8]: https://github.com/modm-io/modm/commit/0fd53a8
+[10eff63]: https://github.com/modm-io/modm/commit/10eff63
 [10fdc3f]: https://github.com/modm-io/modm/commit/10fdc3f
 [11ffe92]: https://github.com/modm-io/modm/commit/11ffe92
 [12bb41b]: https://github.com/modm-io/modm/commit/12bb41b
@@ -4196,6 +4287,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [55c88ba]: https://github.com/modm-io/modm/commit/55c88ba
 [55d5911]: https://github.com/modm-io/modm/commit/55d5911
 [564effa]: https://github.com/modm-io/modm/commit/564effa
+[584f5e3]: https://github.com/modm-io/modm/commit/584f5e3
 [589aea7]: https://github.com/modm-io/modm/commit/589aea7
 [596eafa]: https://github.com/modm-io/modm/commit/596eafa
 [599e0ba]: https://github.com/modm-io/modm/commit/599e0ba
@@ -4287,6 +4379,7 @@ Please note that contributions from xpcc were continuously ported to modm.
 [a173bde]: https://github.com/modm-io/modm/commit/a173bde
 [a371df6]: https://github.com/modm-io/modm/commit/a371df6
 [a38feca]: https://github.com/modm-io/modm/commit/a38feca
+[a40f206]: https://github.com/modm-io/modm/commit/a40f206
 [a607613]: https://github.com/modm-io/modm/commit/a607613
 [a6b4186]: https://github.com/modm-io/modm/commit/a6b4186
 [a771042]: https://github.com/modm-io/modm/commit/a771042
