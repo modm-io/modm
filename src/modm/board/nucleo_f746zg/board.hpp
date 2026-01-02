@@ -11,20 +11,19 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_STM32_NUCLEO_F746ZG_HPP
-#define MODM_STM32_NUCLEO_F746ZG_HPP
+#pragma once
 
 #include <modm/platform.hpp>
 #include <modm/architecture/interface/clock.hpp>
 #include <modm/debug/logger.hpp>
-/// @ingroup modm_board_nucleo_f746zg
+/// @ingroup modm_board_nucleo_f746zg modm_board_nucleo_f722ze
 #define MODM_BOARD_HAS_LOGGER
 
 using namespace modm::platform;
 
 namespace Board
 {
-/// @ingroup modm_board_nucleo_f746zg
+/// @ingroup modm_board_nucleo_f746zg modm_board_nucleo_f722ze
 /// @{
 using namespace modm::literals;
 
@@ -127,7 +126,7 @@ using Leds = SoftwareGpioPort< LedRed, LedBlue, LedGreen >;
 
 namespace stlink
 {
-/// @ingroup modm_board_nucleo_f746zg
+/// @ingroup modm_board_nucleo_f746zg modm_board_nucleo_f722ze
 /// @{
 using Tx = GpioOutputD8;
 using Rx = GpioInputD9;
@@ -135,27 +134,25 @@ using Uart = BufferedUart<UsartHal3, UartTxBuffer<2048>>;
 /// @}
 }
 
-/// @ingroup modm_board_nucleo_f746zg
+/// @ingroup modm_board_nucleo_f746zg modm_board_nucleo_f722ze
 /// @{
 using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
 
 inline void
 initialize()
 {
-    SystemClock::enable();
-    SysTickTimer::initialize<SystemClock>();
+	SystemClock::enable();
+	SysTickTimer::initialize<SystemClock>();
 
-    stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>();
-    stlink::Uart::initialize<SystemClock, 115200_Bd>();
+	stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>();
+	stlink::Uart::initialize<SystemClock, 115200_Bd>();
 
-    LedGreen::setOutput(modm::Gpio::Low);
-    LedBlue::setOutput(modm::Gpio::Low);
-    LedRed::setOutput(modm::Gpio::Low);
+	LedGreen::setOutput(modm::Gpio::Low);
+	LedBlue::setOutput(modm::Gpio::Low);
+	LedRed::setOutput(modm::Gpio::Low);
 
-    Button::setInput();
+	Button::setInput();
 }
 /// @}
 
 }
-
-#endif  // MODM_STM32_NUCLEO_F746ZG_HPP

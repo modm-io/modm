@@ -158,7 +158,7 @@ jobs:
       - name: Examples STM32F7 Series
         if: always()
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py stm32f746g_discovery stm32f769i_discovery nucleo_f746zg nucleo_f767zi)
+          (cd examples && ../tools/scripts/examples_compile.py stm32f746g_discovery stm32f769i_discovery nucleo_f746zg nucleo_f767zi nucleo_f722ze)
       - name: Examples STM32G0 Series
         if: always()
         run: |
