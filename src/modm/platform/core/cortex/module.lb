@@ -112,6 +112,7 @@ def common_memories(env):
     cont = []
     index = 0
     for m in memories:
+        if "alias" in m: continue
         if cont and (cont[-1]["start"] + cont[-1]["size"] == m["start"]):
             cont[-1]["size"] += m["size"]
             cont[-1]["contains"].append({**m, "index": index})
@@ -236,8 +237,8 @@ def prepare(module, options):
             maximum="64Ki",
             default="3Ki"))
 
-    core = options[":target"].get_driver("core")["type"]
-    if "m7" in core:
+    core = options[":target"].get_driver("core")
+    if "m7" in core["type"]:
         module.add_option(
             BooleanOption(
                 name="enable_icache",
@@ -249,7 +250,7 @@ def prepare(module, options):
                 description="Enable Data-Cache",
                 default=True))
 
-    if "f" in core:
+    if core.get("fpu"):
         module.add_option(
             EnumerationOption(
                 name="float-abi",
@@ -257,10 +258,10 @@ def prepare(module, options):
                 enumeration=["soft", "softfp", "hard"],
                 default="hard"))
 
-    memories = listify(options[":target"].get_driver("core")["memory"])
+    memories = listify(core["memory"])
 
     # Cortex-M0 does not have remappable vector table, so it will remain in Flash
-    if options[":target"].get_driver("core")["type"] != "cortex-m0":
+    if core["type"] != "cortex-m0":
         default_location = "rom"
         if any((m["name"] == "ccm" and "x" in m["access"]) or m["name"] == "dtcm" for m in memories):
             default_location = "ram"
@@ -447,20 +448,12 @@ def build(env):
             linkerscript if linkerscript else "modm/link/linkerscript.ld")))
 
     # Compilation for FPU
-    core = env[":target"].get_driver("core")["type"]
-    cpu = core.replace("fd", "").replace("f", "").replace("+", "plus")
-    env.collect(":build:archflags", "-mcpu={}".format(cpu), "-mthumb")
+    core = env[":target"].get_driver("core")
+    env.collect(":build:archflags", "-mcpu=" + core["type"], "-mthumb")
 
     single_precision = True
-    fpu = core.replace("cortex-m", "").replace("+", "")
-    if "f" in fpu:
-        fpu_spec = {
-            "4f": "-mfpu=fpv4-sp-d16",
-            "33f": "-mfpu=fpv4-sp-d16",
-            "7f": "-mfpu=fpv5-sp-d16",
-            "7fd": "-mfpu=fpv5-d16",
-        }[fpu]
-        env.collect(":build:archflags", "-mfloat-abi={}".format(env["float-abi"]), fpu_spec)
+    if (fpu_spec := core.get("fpu")):
+        env.collect(":build:archflags", "-mfloat-abi=" + env["float-abi"], "-mfpu=" + fpu_spec)
         single_precision = ("-sp-" in fpu_spec)
     if single_precision:
         env.collect(":build:ccflags", "-Wdouble-promotion")

@@ -19,8 +19,7 @@ def prepare(module, options):
     return options[":target"].has_driver("core:cortex-m*")
 
 def build(env):
-    core = env[":target"].get_driver("core")["type"]
-    core = core.replace("cortex-m", "").replace("+", "plus").replace("f", "").replace("d", "")
+    core = env[":target"].get_driver("core")["type"][8:]
 
     env.outbasepath = "modm/ext/cmsis/core"
     env.copy("cmsis/CMSIS/Core/Include/core_cm{}.h".format(core), "core_cm{}.h".format(core))

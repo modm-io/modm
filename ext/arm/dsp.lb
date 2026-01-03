@@ -125,8 +125,7 @@ def build(env):
     env.copy("cmsis-dsp/CMSIS-DSP/Include/dsp/utils.h", "dsp/utils.h")
     env.copy("cmsis-dsp/CMSIS-DSP/Include/dsp/debug.h", "dsp/debug.h")
 
-    core = env[":target"].get_driver("core")["type"][8:]
-    core = core.replace("+", "PLUS").replace("f", "").replace("d", "")
+    core = env[":target"].get_driver("core")["type"][8:].upper()
     global includes
     env.substitutions = {
         "core": core,

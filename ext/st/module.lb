@@ -15,52 +15,6 @@ import re
 from pathlib import Path
 from collections import defaultdict
 
-def getDefineForDevice(device_id, familyDefines):
-    """
-    Returns the STM32 specific define from an identifier
-    """
-    # get all defines for this device name
-    devName = "STM32{}{}".format(device_id.family.upper(), device_id.name.upper())
-
-    # Map STM32F7x8 -> STM32F7x7
-    if device_id.family == "f7" and devName[8] == "8":
-        devName = devName[:8] + "7"
-
-    deviceDefines = sorted([define for define in familyDefines if define.startswith(devName)])
-    # if there is only one define thats the one
-    if len(deviceDefines) == 1:
-        return deviceDefines[0]
-
-    # sort with respecting variants
-    minlen = min(len(d) for d in deviceDefines)
-    deviceDefines.sort(key=lambda d: (d[:minlen], d[minlen:]))
-
-    # now we match for the size-id (and variant-id if applicable).
-    if device_id.family == "h7":
-        devNameMatch = devName + "xx"
-    else:
-        devNameMatch = devName + "x{}".format(device_id.size.upper())
-    if device_id.family == "l1":
-        # Map STM32L1xxQC and STM32L1xxZC -> STM32L162QCxA variants
-        if device_id.pin in ["q", "z"] and device_id.size == "c":
-            devNameMatch += "A"
-        else:
-            devNameMatch += device_id.variant.upper()
-    elif device_id.family == "h7":
-        if device_id.variant:
-            devNameMatch += device_id.variant.upper()
-    for define in deviceDefines:
-        if devNameMatch <= define:
-            return define
-
-    # now we match for the pin-id.
-    devNameMatch = devName + "{}x".format(device_id.pin.upper())
-    for define in deviceDefines:
-        if devNameMatch <= define:
-            return define
-
-    return None
-
 bprops = {}
 def common_rcc_map(env):
     """
@@ -117,23 +71,16 @@ def common_header_file(env):
     """
     device = env[":target"]
 
-    core = device.get_driver("core")["type"]
-    core = core.replace("cortex-m", "").replace("+", "plus").replace("f", "").replace("d", "")
-    core_header = "core_cm{}.h".format(core)
+    core = device.get_driver("core")
+    core_header = "core_cm{}.h".format(core["type"][8:])
 
-    if device.identifier.string[5:8] in ["h7r", "h7s"]:
-        folder = "stm32h7rsxx"
-    else:
-        folder = "stm32{}xx".format(device.identifier.family)
+    folder = core["cmsis-header"]
+    define = core["cmsis-define"]
+
     family_header = folder + ".h"
+    if "xx" not in folder: folder += "x"
     folder = "stm32/{}/Include".format(folder)
-    define = None
 
-    content = Path(localpath(folder, family_header)).read_text(encoding="utf-8", errors="replace")
-    match = re.findall(r"if defined\((?P<define>STM32[CFGHLU][\w\d]+)\)", content)
-    define = getDefineForDevice(device.identifier, match)
-    if define is None or match is None:
-        raise ValidateException("No device define found for '{}'!".format(device.partname))
     device_header = define.lower() + ".h"
     family_define = "STM32{}".format(device.identifier.family.upper())
 
