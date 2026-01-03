@@ -114,3 +114,8 @@ stm32h757
 # These are incompatible with the previous H7 series
 stm32h7r
 stm32h7s
+# Undocumented and inconsistent header and device file
+stm32g411
+stm32g414
+# Not implemented
+rp2350

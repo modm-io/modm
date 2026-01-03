@@ -1,0 +1,7 @@
+{
+    "hosted-darwin": "hosted/darwin-x86_64.xml",
+    "hosted-darwin-arm64": "hosted/darwin-arm64.xml",
+    "hosted-linux": "hosted/linux-x86_64.xml",
+    "hosted-linux-arm64": "hosted/linux-arm64.xml",
+    "hosted-windows": "hosted/windows.xml"
+}
