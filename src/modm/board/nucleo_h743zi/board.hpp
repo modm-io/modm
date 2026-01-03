@@ -132,16 +132,6 @@ struct SystemClock
 		Rcc::enablePll2(Rcc::PllSource::ExternalClock, pllFactors2);
 		Rcc::setCanClockSource(Rcc::CanClockSource::Pll2Q);
 
-		// Use PLL3 for USB 48MHz
-		const Rcc::PllFactors pllFactors3{
-			.range = Rcc::PllInputRange::MHz4_8,
-			.pllM = 2,		//   8MHz / M=   4MHz
-			.pllN = 60,		//   4MHz * N= 240MHz
-			.pllP = 5,		// 240MHz / P=  48MHz
-			.pllQ = 5,		// 240MHz / Q=  48MHz = F_usb
-			.pllR = 5,		// 240MHz / R=  48MHz
-		};
-		Rcc::enablePll3(Rcc::PllSource::ExternalClock, pllFactors3);
 		Rcc::setFlashLatency<Ahb>();
 		// max 240MHz on AHB
 		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div2);
@@ -152,9 +142,20 @@ struct SystemClock
 		Rcc::setApb4Prescaler(Rcc::Apb4Prescaler::Div2);
 		// update clock frequencies
 		Rcc::updateCoreFrequency<Hclk>();
-		Rcc::enableUsbClockSource(Rcc::UsbClockSource::Pll3Q);
 		// Switch the main clock source to PLL
 		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll1P);
+
+		// Use PLL3 for USB 48MHz
+		const Rcc::PllFactors pllFactors3{
+			.range = Rcc::PllInputRange::MHz1_2,
+			.pllM = 4,		//   8MHz / M=   2MHz
+			.pllN = 120,	//   2MHz * N= 240MHz
+			.pllP = 5,		// 240MHz / P=  48MHz
+			.pllQ = 5,		// 240MHz / Q=  48MHz = F_usb
+			.pllR = 5,		// 240MHz / R=  48MHz
+		};
+		Rcc::enablePll3(Rcc::PllSource::ExternalClock, pllFactors3);
+		Rcc::enableUsbClockSource(Rcc::UsbClockSource::Pll3Q);
 
 		return true;
 	}
