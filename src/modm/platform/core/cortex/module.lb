@@ -97,43 +97,60 @@ def common_memories(env):
     flash_offset = env.get(":platform:cortex-m:linkerscript.flash_offset", 0)
     flash_reserved = env.get(":platform:cortex-m:linkerscript.flash_reserved", 0)
     for m in memories:
-        if m["name"] == "flash":
+        if m["name"] in ["flash", "flash1"]:
             m["start"] = int(m["start"], 0) + flash_offset
-            m["size"] = int(m["size"], 0) - flash_offset - flash_reserved
+            m["size"] = int(m["size"], 0) - flash_offset
+        elif m["name"] in ["flash2", "flash"]:
+            m["start"] = int(m["start"], 0)
+            m["size"] = int(m["size"], 0) - flash_reserved
         else:
             m["start"] = int(m["start"], 0)
             m["size"] = int(m["size"], 0)
+
+    memories.sort(key=lambda m: m["start"])
+    # Find all continuous memory sections
+    cont = []
+    index = 0
+    for m in memories:
+        if cont and (cont[-1]["start"] + cont[-1]["size"] == m["start"]):
+            cont[-1]["size"] += m["size"]
+            cont[-1]["contains"].append({**m, "index": index})
+            if not cont[-1]["cont_name"].startswith("cont_"):
+                cont[-1]["cont_name"] = "cont_" + cont[-1]["cont_name"]
+        else:
+            cont.append(dict(m))
+            cont[-1]["contains"] = [{**m, "index": index}]
+            cont[-1]["cont_name"] = cont[-1]["name"]
+        index += 1
+
+    cont_flash_regions = list(c for c in cont if "flash" in c["name"])
+    cont_flash = sorted(cont_flash_regions, key=lambda m: -m["size"])[0]
+    cont_flash_name = cont_flash["cont_name"] if len(cont_flash["contains"]) > 1 else cont_flash["name"]
+
+    ram_regions = list(sorted(m["name"] for m in memories if "ram" in m["name"]))
+    cont_ram_regions = list(c for c in cont if "ram" in c["name"] or "dtcm" in c["name"])
+    cont_ram = sorted(cont_ram_regions, key=lambda m: -m["size"])[0]
+    cont_ram_name = cont_ram["cont_name"] if len(cont_ram["contains"]) > 1 else cont_ram["name"]
 
     # Add reserved FLASH section to memories
     if flash_reserved:
         memories.append({
             "name": "flash_reserved",
             "access": "rx",
-            "start": next(m["start"] + m["size"] for m in memories if m["name"] == "flash"),
+            "start": next(m["start"] + m["size"] for m in memories if m["name"] in ["flash2", "flash1", "flash"]),
             "size": flash_reserved})
-
-    # Find all continuous internal SRAM sections
-    cont = []
-    index = 0
-    for m in memories:
-        if "ram" in m["name"] or "dtcm" in m["name"]:
-            if cont and (cont[-1]["start"] + cont[-1]["size"] == m["start"]):
-                cont[-1]["size"] += m["size"]
-                cont[-1]["contains"].append({**m, "index": index})
-                if not cont[-1]["cont_name"].startswith("cont_"):
-                    cont[-1]["cont_name"] = "cont_" + cont[-1]["cont_name"]
-            else:
-                cont.append(dict(m))
-                cont[-1]["contains"] = [{**m, "index": index}]
-                cont[-1]["cont_name"] = cont[-1]["name"]
-            index += 1
+        memories.sort(key=lambda m: m["start"])
 
     properties = {
         "memories": memories,
         "regions": [m["name"] for m in memories],
-        "ram_regions": list(sorted(m["name"] for m in memories if "ram" in m["name"])),
-        "cont_ram_regions": cont,
-        "cont_ram": sorted(cont, key=lambda m: -m["size"])[0],
+        "ram_regions": ram_regions,
+        "cont_flash_regions": cont_flash_regions,
+        "cont_flash": cont_flash,
+        "cont_flash_name": cont_flash_name.upper(),
+        "cont_ram_regions": cont_ram_regions,
+        "cont_ram": cont_ram,
+        "cont_ram_name": cont_ram_name.upper(),
     }
     return properties
 
@@ -304,6 +321,8 @@ def prepare(module, options):
 
     module.add_query(
         EnvironmentQuery(name="vector_table", factory=common_vector_table))
+    module.add_query(
+        EnvironmentQuery(name="memories", factory=common_memories))
     module.add_query(
         EnvironmentQuery(name="linkerscript", factory=common_linkerscript))
 

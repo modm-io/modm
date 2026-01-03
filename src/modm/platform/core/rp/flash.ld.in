@@ -8,7 +8,7 @@
 
 SECTIONS
 {
-{{ linker.section_rom_start("FLASH") }}
+{{ linker.section_rom_start(cont_flash_name) }}
 
 	.boot2 :
 	{
@@ -27,19 +27,19 @@ SECTIONS
 		__vector_table_rom_end = .;
 	} > FLASH
 
-{{ linker.section_rom("FLASH") }}
+{{ linker.section_rom(cont_flash_name) }}
 
 
 %% if vector_table_location == "ram"
 {{ linker.section_vector_ram("RAM", table_copy) }}
 %% endif
 
-{{ linker.section_ram(cont_ram_regions[0].cont_name|upper, "FLASH", table_copy, table_zero,
+{{ linker.section_ram(cont_ram_name, cont_flash_name, table_copy, table_zero,
 					  sections_data=["fastdata", "fastcode", "data_" + cont_ram_regions[0].contains[0].name],
 					  sections_bss=["bss_" + cont_ram_regions[0].contains[0].name],
 					  sections_noinit=["faststack"]) }}
 
-{{ linker.all_heap_sections(table_copy, table_zero, table_heap) }}
+{{ linker.all_heap_sections(cont_flash_name, table_copy, table_zero, table_heap) }}
 
 %% if with_crashcatcher
 	%#
@@ -94,9 +94,9 @@ SECTIONS
 	%#
 %% endif
 
-{{ linker.section_tables("FLASH", table_copy, table_zero, table_heap) }}
+{{ linker.section_tables(cont_flash_name, table_copy, table_zero, table_heap) }}
 
-{{ linker.section_rom_end("FLASH") }}
+{{ linker.section_rom_end(cont_flash_name) }}
 
 {{ linker.section_debug() }}
 }

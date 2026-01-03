@@ -25,7 +25,7 @@ MEMORY
 	%% for memory in memories
 	{{ memory.name | upper }} ({{ memory.access }}) : ORIGIN = {{ "0x%08X" % memory.start }}, LENGTH = {{ memory.size }}
 	%% endfor
-	%% for memory in cont_ram_regions
+	%% for memory in (cont_flash_regions + cont_ram_regions)
 	%% if memory.cont_name != memory.name
 	{{ memory.cont_name | upper }} ({{ memory.access }}) : ORIGIN = {{ "0x%08X" % memory.start }}, LENGTH = {{ memory.size }}
 	%% endif
@@ -178,13 +178,13 @@ EXCEPTION_FRAME_SIZE = {{ exception_frame_size }};
 %% endmacro
 
 
-%% macro all_heap_sections(table_copy, table_zero, table_heap, props={})
+%% macro all_heap_sections(memory, table_copy, table_zero, table_heap, props={})
 	%% set ram_first_index = cont_ram["contains"][0]["index"]
 	%% for cont_region in cont_ram_regions
 		%% for region in cont_region.contains
 	/* Sections in {{ region.name|upper }} */
 			%% if region.index != ram_first_index
-{{ section_load(cont_region.cont_name|upper + " AT >FLASH", table_copy, sections=["data_"+region.name]) }}
+{{ section_load(cont_region.cont_name|upper + " AT >" + memory, table_copy, sections=["data_"+region.name]) }}
 				%% do table_zero.append("bss_"+region.name)
 			%% endif
 {{ section_heap(region.name|upper, "heap_"+region.name, cont_region.cont_name|upper,

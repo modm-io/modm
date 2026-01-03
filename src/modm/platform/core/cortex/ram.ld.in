@@ -14,24 +14,24 @@ __stack_offset = ALIGN(MAIN_STACK_SIZE, (1 << LOG2CEIL({{ highest_irq + 16 }})) 
 
 SECTIONS
 {
-{{ linker.section_rom_start("FLASH") }}
+{{ linker.section_rom_start(cont_flash_name) }}
 
-{{ linker.section_vector_rom("FLASH") }}
+{{ linker.section_vector_rom(cont_flash_name) }}
 
-{{ linker.section_rom("FLASH") }}
+{{ linker.section_rom(cont_flash_name) }}
 
-{{ linker.section_stack(cont_ram.cont_name|upper, "__stack_offset" if vector_table_location == "ram" else None) }}
+{{ linker.section_stack(cont_ram_name, "__stack_offset" if vector_table_location == "ram" else None) }}
 
 %% if vector_table_location == "ram"
-{{ linker.section_vector_ram(cont_ram.cont_name|upper, table_copy) }}
+{{ linker.section_vector_ram(cont_ram_name, table_copy) }}
 %% endif
 
-{{ linker.section_ram(cont_ram.cont_name|upper, "FLASH", table_copy, table_zero,
+{{ linker.section_ram(cont_ram_name, cont_flash_name, table_copy, table_zero,
                       sections_data=["fastdata", "fastcode", "data_" + cont_ram.contains[0].name],
                       sections_bss=["bss_" + cont_ram.contains[0].name],
                       sections_noinit=["faststack"]) }}
 
-{{ linker.all_heap_sections(table_copy, table_zero, table_heap) }}
+{{ linker.all_heap_sections(cont_flash_name, table_copy, table_zero, table_heap) }}
 
 %% if with_crashcatcher
     %#
@@ -45,9 +45,9 @@ SECTIONS
     %#
 %% endif
 
-{{ linker.section_tables("FLASH", table_copy, table_zero, table_heap) }}
+{{ linker.section_tables(cont_flash_name, table_copy, table_zero, table_heap) }}
 
-{{ linker.section_rom_end("FLASH") }}
+{{ linker.section_rom_end(cont_flash_name) }}
 
 {{ linker.section_debug() }}
 }

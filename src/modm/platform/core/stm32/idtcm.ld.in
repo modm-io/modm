@@ -9,24 +9,24 @@
 
 SECTIONS
 {
-{{ linker.section_rom_start("FLASH") }}
+{{ linker.section_rom_start(cont_flash_name) }}
 
-{{ linker.section_vector_rom("FLASH") }}
+{{ linker.section_vector_rom(cont_flash_name) }}
 
-{{ linker.section_rom("FLASH") }}
+{{ linker.section_rom(cont_flash_name) }}
 
 %% if vector_table_location == "ram"
 {{ linker.section_vector_ram("ITCM", table_copy) }}
 %% endif
 
 	/* Sections in memory region ITCM */
-{{ linker.section_load("ITCM AT >FLASH", table_copy, sections=["fastcode", "data_itcm"]) }}
+{{ linker.section_load("ITCM AT >" + cont_flash_name, table_copy, sections=["fastcode", "data_itcm"]) }}
 
 {{ linker.section_heap("ITCM", "heap_itcm", sections=["noinit_itcm"]) }}
 %% do table_heap.append({"name": "heap_itcm", "prop": "0x2005"})
 
-%% if cont_ram_regions[0].cont_name == "cont_dtcm"
-%% set dtcm_section = "CONT_DTCM"
+%% if "DTCM" in cont_ram_name
+%% set dtcm_section = cont_ram_name
 %% else
 %% set dtcm_section = "DTCM"
 %% endif
@@ -34,23 +34,23 @@ SECTIONS
 %% if stack_in_dtcm
 {{ linker.section_stack(dtcm_section) }}
 %% else
-{{ linker.section_stack(cont_ram.cont_name|upper) }}
+{{ linker.section_stack(cont_ram_name) }}
 %% endif
 
 %% if "dtcm" in cont_ram.cont_name
-{{ linker.section_ram(cont_ram.cont_name|upper, "FLASH", table_copy, table_zero,
+{{ linker.section_ram(cont_ram_name, cont_flash_name, table_copy, table_zero,
                       sections_data=["fastdata", "data_" + cont_ram.contains[0].name],
                       sections_bss=["bss_" + cont_ram.contains[0].name],
                       sections_noinit=["faststack"]) }}
 %% else
-{{ linker.section_ram(cont_ram.cont_name|upper, "FLASH", table_copy, table_zero,
+{{ linker.section_ram(cont_ram_name, cont_flash_name, table_copy, table_zero,
                       sections_data=["data_" + cont_ram.contains[0].name],
                       sections_bss=["bss_" + cont_ram.contains[0].name],
                       sections_noinit=["faststack"]) }}
-{{ linker.section_load(dtcm_section + " AT >FLASH", table_copy, sections=["fastdata"]) }}
+{{ linker.section_load(dtcm_section + " AT >" + cont_flash_name, table_copy, sections=["fastdata"]) }}
 %% endif
 
-{{ linker.all_heap_sections(table_copy, table_zero, table_heap, props={"dtcm": "0x2023" if target.family == "h7" else "0x202b"}) }}
+{{ linker.all_heap_sections(cont_flash_name, table_copy, table_zero, table_heap, props={"dtcm": "0x2023" if target.family == "h7" else "0x202b"}) }}
 %% if with_crashcatcher
 	%#
 	/* Bottom of crash stack for `modm:platform:fault` */
@@ -60,7 +60,7 @@ SECTIONS
 
 %% if "backup" in regions
 	/* Sections in memory region BACKUP */
-{{ linker.section_load("BACKUP AT >FLASH", table_copy, sections=["data_backup"]) }}
+{{ linker.section_load("BACKUP AT >" + cont_flash_name, table_copy, sections=["data_backup"]) }}
 
 {{ linker.section_heap("BACKUP", "heap_backup", sections=["bss_backup", "noinit_backup"]) }}
 	%% do table_heap.append({"name": "heap_backup", "prop": "0x4009"})
@@ -72,9 +72,9 @@ SECTIONS
 	%#
 %% endif
 
-{{ linker.section_tables("FLASH", table_copy, table_zero, table_heap) }}
+{{ linker.section_tables(cont_flash_name, table_copy, table_zero, table_heap) }}
 
-{{ linker.section_rom_end("FLASH") }}
+{{ linker.section_rom_end(cont_flash_name) }}
 
 {{ linker.section_debug() }}
 }

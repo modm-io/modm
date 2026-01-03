@@ -28,8 +28,7 @@ def prepare(module, options):
 
 def build(env):
     target = env[":target"].identifier
-    memories = listify(env[":target"].get_driver("core")["memory"])
-    flash = next(filter(lambda m: m["name"] == "flash", memories))
+    flash = env.query(":platform:cortex-m:memories")["cont_flash"]
 
     dual_bank = False
     family = target.family
@@ -56,8 +55,8 @@ def build(env):
             block_shift = "(FLASH->OPTR & FLASH_OPTR_DBANK ? 11 : 12)"
 
     env.substitutions = {
-        "start": int(flash["start"], 16),
-        "size": int(flash["size"]),
+        "start": flash["start"],
+        "size": flash["size"],
         "type": ftype,
         "shift": block_shift,
         "has_sectors": ftype == "sector",
