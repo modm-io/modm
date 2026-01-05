@@ -53,32 +53,42 @@ jobs:
 
   # Niklas: Running on the old container until I can figure out why the doc generator hangs
   api-docs-all:
-    runs-on: ubuntu-24.04
-    container:
-      image: ghcr.io/modm-ext/modm-build-base:2022-09-27
+    runs-on: ubuntu-latest
     steps:
+      - name: Free up disk space
+        run: |
+          df -h
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /opt/hostedtoolcache/CodeQL
+          sudo docker image prune --all --force
+          df -h
+
       - name: Check out repository
         uses: actions/checkout@v4
         with:
           submodules: 'recursive'
-      - name: Fix Git permission/ownership problem
-        run: |
-          git config --global --add safe.directory /__w/modm/modm
-      - name: Update lbuild
-        run: |
-          pip3 install --upgrade --upgrade-strategy=eager modm
-      - name: Full run of docs.modm.io-generator-script
-        run: |
-          export TERM=xterm-256color
-          export COLUMNS=120
-          python3 tools/scripts/docs_modm_io_generator.py -c -j4 -d
-      - name: Size of documentation archive
-        if: always()
-        run: |
-          ls -lh modm-api-docs.tar.gz
-      - name: Upload api documentation to docs.modm.io
-        if: always()
+
+      - name: Build Documentation inside Container
         env:
           DOCS_MODM_IO_UPLOAD: ${{ secrets.DOCS_MODM_IO_UPLOAD }}
         run: |
-          curl https://docs.modm.io/upload/compressed --upload-file modm-api-docs.tar.gz --user $DOCS_MODM_IO_UPLOAD
+          # We mount the current working directory into the container
+          # and run the build commands as a single bash sequence.
+          docker run --rm \
+            -v ${{ github.workspace }}:/github/workspace \
+            -w /github/workspace \
+            -e DOCS_MODM_IO_UPLOAD="$DOCS_MODM_IO_UPLOAD" \
+            ghcr.io/modm-ext/modm-build-base:2022-09-27 \
+            /bin/bash -c "
+              git config --global --add safe.directory /github/workspace && \
+              pip3 install --upgrade --upgrade-strategy=eager modm && \
+              export TERM=xterm-256color && \
+              export COLUMNS=120 && \
+              python3 tools/scripts/docs_modm_io_generator.py -c -j4 -d && \
+              curl https://docs.modm.io/upload/compressed --upload-file modm-api-docs.tar.gz --user \$DOCS_MODM_IO_UPLOAD
+            "
+
+      - name: Final Disk Check
+        if: always()
+        run: |
+          df -h
+          ls -lh modm-api-docs.tar.gz || true
