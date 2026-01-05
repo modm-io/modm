@@ -17,6 +17,8 @@
   <!-- <extends>modm:nucleo-h743zi</extends> -->
   <!-- <extends>modm:rp-pico</extends> -->
   <!-- <extends>modm:samd21-mini</extends> -->
+  <!-- <extends>modm:weact-g0b1cb</extends> -->
+  <!-- <extends>modm:weact-u585ci</extends> -->
   <options>
     <option name="modm:build:build.path">../../../build/generic/usb</option>
     <option name="modm:tinyusb:config">device.cdc,device.msc</option>

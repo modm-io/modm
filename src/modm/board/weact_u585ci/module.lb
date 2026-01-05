@@ -1,0 +1,57 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2025, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":board:weact-u585ci"
+    module.description = """
+# WeAct Studio STM32U585Cx Core Board
+
+[Documentation](https://github.com/WeActStudio/WeActStudio.STM32U585Cx_CoreBoard)
+
+Cheap and bread-board-friendly board for the STM32U585 series.
+
+## Programming
+
+Since the board has no St-Link programmer on the board,
+you must use DFU (Device Firmware Update (via USB)) to program the board.
+A DFU command is integrated into the `modm:build:scons` tool:
+
+```
+scons program-dfu
+```
+"""
+
+def prepare(module, options):
+    if not options[":target"].partname.startswith("stm32u585ciu"):
+        return False
+
+    module.depends(
+        ":architecture:clock",
+        ":platform:clock",
+        ":platform:core",
+        ":platform:gpio",
+        ":platform:usb:fs")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/board"
+    env.substitutions = {
+        "with_logger": False,
+        "with_assert": env.has_module(":architecture:assert")
+    }
+    env.template("../board.cpp.in", "board.cpp")
+    env.copy('.')
+
+    env.outbasepath = "modm/openocd/modm/board/"
+    env.template(repopath("tools/openocd/modm/stm32_swd.cfg.in"), "board.cfg",
+                 substitutions={"target": "stm32u5x"})
+    env.collect(":build:openocd.source", "modm/board/board.cfg")
