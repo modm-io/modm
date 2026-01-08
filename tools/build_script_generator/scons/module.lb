@@ -133,7 +133,7 @@ def build(env):
 
     # Generate the env.BuildTarget tool
     linkerscript = env.get(":platform:cortex-m:linkerscript.override")
-    linkerscript = env.relcwdoutpath(linkerscript) if linkerscript \
+    linkerscript = "$BASEPATH/{}".format(linkerscript) if linkerscript \
                    else "$BASEPATH/modm/link/linkerscript.ld"
     env.substitutions = env.query("::device")
     env.substitutions.update({
