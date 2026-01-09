@@ -39,7 +39,7 @@ __modm_initialize_platform(void)
 	RCC->APB4ENR |= RCC_APB4ENR_SYSCFGEN; __DSB();
 %% elif target.family == "u5"
 	RCC->APB3ENR |= RCC_APB3ENR_SYSCFGEN; __DSB();
-%% else
+%% elif target.family not in ["h5"]
 	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN; __DSB();
 %% endif
 
@@ -95,11 +95,41 @@ __modm_initialize_platform(void)
 	PWR->SVMCR |= PWR_SVMCR_ASV | PWR_SVMCR_IO2SV | PWR_SVMCR_USV;
 	// Enable Backup SRAM (BKPSRAM)
 	RCC->AHB1ENR |= RCC_AHB1ENR_BKPSRAMEN;
+%% elif target.family == "h5"
+	// Enable the IO compensation cells
+	RCC->APB3ENR |= RCC_APB3ENR_SBSEN;
+	__DSB();
+	SBS->CCCSR |= SBS_CCCSR_EN1 | SBS_CCCSR_EN2;
+	// Enable Backup SRAM (BKPSRAM)
+	RCC->AHB1ENR |= RCC_AHB1ENR_BKPRAMEN;
 %% endif
 
 %% if vector_table_location == "ram"
 	__DSB();
 	// Remap SRAM to 0x0 for vector table relocation without VTOR register
 	SYSCFG->CFGR1 |= SYSCFG_CFGR1_MEM_MODE;
+%% endif
+
+%% if enable_icache
+	// We need to define the OTP as non-cachable otherwise the ICACHE access will cause a Hardfault
+	// 1. Define Attribute 0 as Non-Cacheable (0x44)
+	MPU->MAIR[1] = (0x44UL << 24);
+	// Use last region to keep 0-3 aliases free
+	MPU->RNR = 7;
+	// 2. Configure Region 0: Base Address + Read-Only (0x2 << 1) + Execute-Never (1)
+	MPU->RBAR = 0x08FFF000UL | (0x2UL << 1) | 1UL;
+	// 3. Configure Region 0: Limit Address + Enable (1) + Attribute Index 0 (0 << 1)
+	MPU->RLAR = 0x08FFFFFFUL | (7UL << 1) | 1UL;
+	// 4. Enable MPU with Background Map (to keep the rest of Flash/RAM working)
+	MPU->CTRL = MPU_CTRL_PRIVDEFENA_Msk | MPU_CTRL_ENABLE_Msk;
+	__DMB();
+	// Enable the Instruction Cache
+	ICACHE->CR |= ICACHE_CR_EN;
+	__DMB();
+%% endif
+%% if enable_dcache
+	// Enable the Data Cache
+	DCACHE1->CR |= DCACHE_CR_EN;
+	__DMB();
 %% endif
 }

@@ -41,7 +41,7 @@ def build(env):
         p["hsi_frequency"] = 8_000_000
         p["lsi_frequency"] = 40_000
         p["boot_frequency"] = p["hsi_frequency"]
-    elif t.family in ["h7"]:
+    elif t.family in ["h5", "h7"]:
         p["hsi_frequency"] = 64_000_000
         p["lsi_frequency"] = 32_000
         p["boot_frequency"] = p["hsi_frequency"]
@@ -142,8 +142,18 @@ def build(env):
     env.substitutions = p
     env.outbasepath = "modm/src/modm/platform/clock"
 
-    env.template("rcc.cpp.in")
-    env.template("rcc.hpp.in")
+    if t.family in ["h5"]:
+        uart_ids = device.get_driver("usart")["instance"]
+        if device.has_driver("uart"):
+            uart_ids += device.get_driver("uart")["instance"]
+        p["uart_ids"] = list(map(int, uart_ids))
+        p["spi_ids"] = list(map(int, device.get_driver("spi")["instance"]))
+        p["i2c_ids"] = list(map(int, device.get_driver("i2c")["instance"]))
+        env.template("rcc_h5.hpp.in", "rcc.hpp")
+    else:
+        env.template("rcc.hpp.in")
+        env.template("rcc.cpp.in")
+    env.copy("rcc_defs.cpp")
 
     all_peripherals = env.query(":cmsis:device:peripherals")
     rcc_map = env.query(":cmsis:device:rcc-map")

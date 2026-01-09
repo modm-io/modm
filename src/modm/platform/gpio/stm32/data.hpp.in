@@ -17,7 +17,7 @@
 namespace modm::platform::detail
 {
 
-%% if target.family in ["h7"]
+%% if target.family in ["h5", "h7"]
 enum class
 AdcPolarity
 {
@@ -26,7 +26,7 @@ AdcPolarity
 };
 %% endif
 template<class Signal, Peripheral p> struct SignalConnection;
-template<class Data, Peripheral p{% if target.family in ["h7"] %}, AdcPolarity ap{% endif %}> static constexpr int8_t AdcChannel = -1;
+template<class Data, Peripheral p{% if target.family in ["h5", "h7"] %}, AdcPolarity ap{% endif %}> static constexpr int8_t AdcChannel = -1;
 template<class Data, Peripheral p> static constexpr int8_t DacChannel = -1;
 
 struct DataUnused {};

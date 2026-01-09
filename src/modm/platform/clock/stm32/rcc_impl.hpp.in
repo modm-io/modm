@@ -60,27 +60,27 @@ Rcc::setFlashLatency()
 	uint32_t acr = FLASH->ACR & ~FLASH_ACR_LATENCY;
 	// set flash latency
 	acr |= fl.latency;
-%% if target["family"] in ["f2", "f4", "l4", "g4"]
+%% if target.family in ["f2", "f4", "l4", "g4"]
 	// enable flash prefetch and data and instruction cache
 	acr |= FLASH_ACR_PRFTEN | FLASH_ACR_DCEN | FLASH_ACR_ICEN;
-%% elif target["family"] in ["c0", "g0"]
+%% elif target.family in ["c0", "g0"]
 	// enable flash prefetch and instruction cache
 	acr |= FLASH_ACR_PRFTEN | FLASH_ACR_ICEN;
-%% elif target["family"] == "f7"
+%% elif target.family == "f7"
 	// enable flash prefetch and flash accelerator
 	acr |= FLASH_ACR_PRFTEN | FLASH_ACR_ARTEN;
-%% elif target["family"] in ["l1"]
+%% elif target.family in ["l1"]
 	// enable 64-bit access, must be enabled *before* prefetch and latency!
 	FLASH->ACR |= FLASH_ACR_ACC64;
 	// enable flash prefetch
 	acr |= FLASH_ACR_PRFTEN;
-%% elif target["family"] == "l0"
+%% elif target.family == "l0"
 	// enable flash prefetch and pre-read
 	acr |= FLASH_ACR_PRFTEN | FLASH_ACR_PRE_READ;
-%% elif target["family"] in ["u5"]
+%% elif target.family in ["u5"]
 	// enable flash prefetch
 	acr |= FLASH_ACR_PRFTEN;
-%% elif target["family"] not in ["h7", "l5"]
+%% elif target.family not in ["h7", "l5", "h5"]
 	// enable flash prefetch
 	acr |= FLASH_ACR_PRFTBE;
 %% endif
