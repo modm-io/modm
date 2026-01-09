@@ -31,6 +31,7 @@ def build(env):
     p["target"] = t = device.identifier
     p["partname"] = device.partname
     p["core"] = device.get_driver("core")["type"]
+    p["max_frequency"] = int(device.get_driver("rcc")["max-frequency"][0])
 
     if t.family in ["c0"]:
         p["hsi_frequency"] = 48_000_000
