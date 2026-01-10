@@ -1,4 +1,10 @@
-source [find interface/stlink.cfg]
-transport select swd
+if { [catch {source [find interface/stlink-dap.cfg]}] } {
+	source [find interface/stlink.cfg]
+}
+if { [catch {transport select dapdirect_swd}] } {
+	if { [catch {transport select swd}] } {
+		transport select hla_swd
+	}
+}
 source [find target/{{target}}.cfg]
 reset_config srst_only srst_nogate

@@ -1,3 +1,7 @@
-transport select swd
+if { [catch {transport select dapdirect_swd}] } {
+	if { [catch {transport select swd}] } {
+		transport select hla_swd
+	}
+}
 source [find target/{{target}}.cfg]
 reset_config none
