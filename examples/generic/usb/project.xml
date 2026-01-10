@@ -19,9 +19,14 @@
   <!-- <extends>modm:samd21-mini</extends> -->
   <!-- <extends>modm:weact-g0b1cb</extends> -->
   <!-- <extends>modm:weact-u585ci</extends> -->
+  <!-- <extends>modm:nucleo-h503rb</extends> -->
+  <!-- <extends>modm:weact-h503cb</extends> -->
+  <!-- <extends>modm:weact-h562rg</extends> -->
   <options>
     <option name="modm:build:build.path">../../../build/generic/usb</option>
     <option name="modm:tinyusb:config">device.cdc,device.msc</option>
+    <!-- <option name="modm:board:weact-h562rg:logger">RTT</option> -->
+    <!-- <option name="modm:board:weact-h503cb:with_rtt">yes</option> -->
     <!-- <option name="modm:tinyusb:config">device.cdc,device.midi</option> -->
 
     <!-- Required for modm:disco-f429zi -->
@@ -38,6 +43,7 @@
   </modules>
   <collectors>
     <!-- <collect name="modm:build:cppdefines">CFG_TUSB_DEBUG=3</collect> -->
-    <collect name="modm:build:openocd.source">interface/stlink.cfg</collect>
+    <!-- <collect name="modm:build:openocd.source">interface/stlink.cfg</collect> -->
+    <!-- <collect name="modm:build:openocd.source">interface/stlink-dap.cfg</collect> -->
   </collectors>
 </library>

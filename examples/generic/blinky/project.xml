@@ -9,5 +9,6 @@
   </modules>
   <collectors>
     <!-- <collect name="modm:build:openocd.source">interface/stlink.cfg</collect> -->
+    <!-- <collect name="modm:build:openocd.source">interface/stlink-dap.cfg</collect> -->
   </collectors>
 </library>

@@ -1,0 +1,91 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2026, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":board:weact-h562rg"
+    module.description = """
+# WeAct Studio STM32H562RG Core Board
+
+[Documentation](https://github.com/WeActStudio/WeActStudio.STM32H5_64Pin_CoreBoard)
+
+Cheap and bread-board-friendly board for the STM32H562 series.
+
+
+## Programming
+
+Since the board has no programmer on the board, you must use DFU(Device Firmware
+Update (via USB)) to program the board. A DFU command is integrated into the
+`modm:build:scons` tool:
+
+```
+scons program-dfu
+```
+
+Note that you need to manually reset the board due to a bug in the DFU
+implementation.
+
+
+## Logging
+
+To log via RTT attach a debugger to the SWD port and select the RTT option:
+
+```xml
+<option name="modm:board:weact-h562rg:logger">RTT</option>
+```
+
+Then log using:
+
+```sh
+scons log-rtt
+```
+
+To log via UART, attach a serial adapter to the log pins and select the UART option:
+
+```xml
+<option name="modm:board:weact-h562rg:logger">UART</option>
+```
+"""
+
+def prepare(module, options):
+    if not options[":target"].partname.startswith("stm32h562rgt"):
+        return False
+
+    module.depends(
+        ":debug",
+        ":architecture:clock",
+        ":platform:core",
+        ":platform:gpio",
+        ":platform:clock",
+        ":platform:usb")
+
+    values = {"Disabled": None, "RTT": ":platform:rtt", "UART": ":platform:uart:1"}
+    module.add_option(
+            EnumerationOption(name="logger", description="Logging mechanism",
+                              enumeration=list(values.keys()), default="Disabled",
+                              dependencies=lambda v: values[v]))
+
+    return True
+
+
+def build(env):
+    env.outbasepath = "modm/src/modm/board"
+    env.substitutions = {
+        "with_logger": False if env["logger"] == "Disabled" else env["logger"],
+        "with_assert": env.has_module(":architecture:assert"),
+    }
+    env.template("../board.cpp.in", "board.cpp")
+    env.template("board.hpp.in")
+
+    env.outbasepath = "modm/openocd/modm/board/"
+    env.template(repopath("tools/openocd/modm/stm32_swd.cfg.in"), "board.cfg",
+                 substitutions={"target": "stm32h5x"})
+    env.collect(":build:openocd.source", "modm/board/board.cfg")

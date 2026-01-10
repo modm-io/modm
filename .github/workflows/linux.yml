@@ -187,6 +187,10 @@ jobs:
         if: always()
         run: |
           (cd examples && ../tools/scripts/examples_compile.py nucleo_g474re nucleo_g431rb nucleo_g431kb)
+      - name: Examples STM32H5 Series
+        if: always()
+        run: |
+          (cd examples && ../tools/scripts/examples_compile.py nucleo_h503rb weact_h503cb weact_h562rg)
       - name: Examples STM32H7 Series
         if: always()
         run: |

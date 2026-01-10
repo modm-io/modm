@@ -1,0 +1,14 @@
+<library>
+  <extends>modm:weact-h503cb</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/weact_h503cb/blink</option>
+    <option name="modm:board:weact-h503cb:with_rtt">yes</option>
+  </options>
+  <modules>
+    <module>modm:architecture:delay</module>
+    <module>modm:build:scons</module>
+  </modules>
+  <collectors>
+    <collect name="modm:build:openocd.source">interface/stlink-dap.cfg</collect>
+  </collectors>
+</library>

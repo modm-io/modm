@@ -1,0 +1,167 @@
+/*
+ * Copyright (c) 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <modm/platform.hpp>
+#include <modm/architecture.hpp>
+#include <modm/debug.hpp>
+
+using namespace modm::platform;
+%#
+%% if with_logger
+/// @ingroup modm_board_weact_h503cb
+#define MODM_BOARD_HAS_LOGGER
+%#
+%% endif
+namespace Board
+{
+/// @ingroup modm_board_weact_h503cb
+/// @{
+using namespace modm::literals;
+
+/// STM32H503CB running at 250MHz from PLL clock generated from 8 MHz HSE
+struct SystemClock
+{
+	static constexpr uint32_t Hse = 8_MHz;
+
+	static constexpr Rcc::PllConfig pll1
+	{
+		.range = Rcc::PllInputRange::MHz2_4,
+		.M = 4,   //   8 MHz /   4 =   2 MHz
+		.N = 250, //   2 MHz * 120 = 500 MHz
+		.P = 2,   // 500 MHz /   2 = 250 MHz = F_cpu
+	};
+	static constexpr uint32_t Pll1P = Hse / pll1.M * pll1.N / pll1.P;
+	static_assert(Pll1P == Rcc::MaxFrequency);
+
+	static constexpr Rcc::PllConfig pll2
+	{
+		.range = Rcc::PllInputRange::MHz8_16,
+		.M = 1,  //   8 MHz /  1 =   8 MHz
+		.N = 18, //   8 MHz * 18 = 144 MHz
+		.Q = 3,  // 144 MHz /  3 =  48 MHz = F_usb
+	};
+	static constexpr uint32_t Pll2Q = Hse / pll2.M * pll2.N / pll2.Q;
+
+	static constexpr uint32_t SysClk = Pll1P;
+	static constexpr uint32_t Frequency = SysClk;
+
+	// AHB Bus - Max 250MHz
+	static constexpr uint32_t Hclk = SysClk / 1;
+	static constexpr uint32_t Ahb = Hclk;
+
+	// APB Buses - Max 250MHz
+	static constexpr uint32_t Apb1 = Hclk / 1;
+	static constexpr uint32_t Apb2 = Hclk / 1;
+	static constexpr uint32_t Apb3 = Hclk / 1;
+
+	// Peripherals on AHB2
+	static constexpr uint32_t Adc1 = Hclk;
+	static constexpr uint32_t Dac1 = Hclk;
+
+	// Peripherals on APB2
+	static constexpr uint32_t Spi1 = Apb2;
+	static constexpr uint32_t Usart1 = Apb2;
+
+	// Peripherals on APB1
+	static constexpr uint32_t Spi2 = Apb1;
+	static constexpr uint32_t Spi3 = Apb1;
+	static constexpr uint32_t Usart2 = Apb1;
+	static constexpr uint32_t Usart3 = Apb1;
+	static constexpr uint32_t Fdcan1 = Apb1;
+
+	// Peripherals on APB3
+	static constexpr uint32_t LpUart1 = Apb3;
+
+	// Timer Clocks
+	static constexpr uint32_t Apb1Timer = Apb1 * 1;
+	static constexpr uint32_t Apb2Timer = Apb2 * 1;
+
+	static constexpr uint32_t Timer1 = Apb2Timer;
+	static constexpr uint32_t Timer2 = Apb1Timer;
+	static constexpr uint32_t Timer3 = Apb1Timer;
+	static constexpr uint32_t Timer6 = Apb1Timer;
+	static constexpr uint32_t Timer7 = Apb1Timer;
+
+	static constexpr uint32_t Usb = Pll2Q;
+	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
+
+	static bool inline
+	enable()
+	{
+		Rcc::enableLowSpeedExternalCrystal();
+		Rcc::enableExternalCrystal();
+
+		Rcc::setVoltageScaling(Rcc::VoltageScaling::Scale0);
+		Rcc::setFlashLatency<Frequency>();
+
+		Rcc::enablePll1(Rcc::PllSource::Hse, pll1);
+		Rcc::enablePll2(Rcc::PllSource::Hse, pll2);
+
+		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
+		Rcc::setApb1Prescaler(Rcc::ApbPrescaler::Div1);
+		Rcc::setApb2Prescaler(Rcc::ApbPrescaler::Div1);
+		Rcc::setApb3Prescaler(Rcc::ApbPrescaler::Div1);
+
+		Rcc::updateCoreFrequency<Frequency>();
+
+		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll1P);
+		Rcc::enableUsbClockSource(Rcc::UsbClockSource::Pll2Q);
+
+		return true;
+	}
+
+};
+
+using Button = GpioInverted<GpioInputA0>;
+
+using Led = GpioInverted<GpioOutputC13>;
+using Leds = SoftwareGpioPort< Led >;
+/// @}
+
+namespace usb
+{
+/// @ingroup modm_board_weact_h503cb
+/// @{
+using Dm = GpioA11;
+using Dp = GpioA12;
+
+using Device = UsbFs;
+/// @}
+}
+
+/// @ingroup modm_board_weact_h503cb
+/// @{
+%% if with_logger
+using LoggerDevice = modm::IODeviceWrapper< Rtt<0>, modm::IOBuffer::DiscardIfFull >;
+%#
+%% endif
+inline void
+initialize()
+{
+	SystemClock::enable();
+	SysTickTimer::initialize<SystemClock>();
+
+	Led::setOutput(modm::Gpio::Low);
+	Button::setInput(Gpio::InputType::PullUp);
+}
+
+inline void
+initializeUsb(uint8_t priority=3)
+{
+	usb::Device::initialize<SystemClock>(priority);
+	usb::Device::connect<usb::Dm::Dm, usb::Dp::Dp>();
+}
+/// @}
+
+}
+
