@@ -29,7 +29,7 @@ void
 __modm_initialize_platform(void)
 {
 	// Enable SYSCFG
-%% if target.family in ["c0", "g0"]
+%% if target.family in ["c0", "g0", "u0"]
 	RCC->APBENR2 |= RCC_APBENR2_SYSCFGEN; __DSB();
 %% elif target.family == "f0"
 	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGCOMPEN; __DSB();

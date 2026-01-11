@@ -75,6 +75,7 @@ def build(env):
         "c0": (3,  4), # CM0+ tested on C031 in RAM
         "l0": (3,  4), # CM0+ tested on L031 in RAM
         "g0": (3,  4), # CM0+ tested on G072 in RAM
+        "u0": (3,  4), # CM0+ tested on U083 in RAM
         "f7": (4,  4), # CM7  tested on F767 in ITCM
         "h5": (4,  4), # CM7  tested on H503 in ITCM
         "h7": (4,  4), # CM7  tested on H743 in ITCM

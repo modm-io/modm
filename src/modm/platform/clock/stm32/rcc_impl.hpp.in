@@ -63,7 +63,7 @@ Rcc::setFlashLatency()
 %% if target.family in ["f2", "f4", "l4", "g4"]
 	// enable flash prefetch and data and instruction cache
 	acr |= FLASH_ACR_PRFTEN | FLASH_ACR_DCEN | FLASH_ACR_ICEN;
-%% elif target.family in ["c0", "g0"]
+%% elif target.family in ["c0", "g0", "u0"]
 	// enable flash prefetch and instruction cache
 	acr |= FLASH_ACR_PRFTEN | FLASH_ACR_ICEN;
 %% elif target.family == "f7"

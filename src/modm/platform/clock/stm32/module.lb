@@ -40,24 +40,21 @@ def build(env):
     elif t.family in ["f0", "f1", "f3"]:
         p["hsi_frequency"] = 8_000_000
         p["lsi_frequency"] = 40_000
-        p["boot_frequency"] = p["hsi_frequency"]
     elif t.family in ["h5", "h7"]:
         p["hsi_frequency"] = 64_000_000
         p["lsi_frequency"] = 32_000
-        p["boot_frequency"] = p["hsi_frequency"]
     elif t.family in ["l0", "l1"]:
         p["hsi_frequency"] = 16_000_000
         p["lsi_frequency"] = 37_000
-        p["msi_frequency"] = 2_097_000
-        p["boot_frequency"] = p["msi_frequency"]
+        p["msi_frequency"] = p["boot_frequency"] = 2_097_000
     elif t.family in ["l5"]:
         p["hsi_frequency"] = 16_000_000
         p["lsi_frequency"] = 32_000
-        p["msi_frequency"] = 4_000_000
-        p["boot_frequency"] = p["msi_frequency"]
+        p["msi_frequency"] = p["boot_frequency"] = 4_000_000
     else:
         p["hsi_frequency"] = 16_000_000
         p["lsi_frequency"] = 32_000
+    if "boot_frequency" not in p:
         p["boot_frequency"] = p["hsi_frequency"]
 
     # TODO: Move this data into the device files
@@ -142,14 +139,21 @@ def build(env):
     env.substitutions = p
     env.outbasepath = "modm/src/modm/platform/clock"
 
-    if t.family in ["h5"]:
-        uart_ids = device.get_driver("usart")["instance"]
-        if device.has_driver("uart"):
-            uart_ids += device.get_driver("uart")["instance"]
-        p["uart_ids"] = list(map(int, uart_ids))
-        p["spi_ids"] = list(map(int, device.get_driver("spi")["instance"]))
-        p["i2c_ids"] = list(map(int, device.get_driver("i2c")["instance"]))
-        env.template("rcc_h5.hpp.in", "rcc.hpp")
+    def instances(*drivers):
+        ids = []
+        for driver in drivers:
+            if device.has_driver(driver):
+                ids += device.get_driver(driver)["instance"]
+        return list(map(int, ids))
+
+    if t.family in ["h5", "u0"]:
+        p["uart_ids"] = instances("usart", "uart")
+        p["lpuart_ids"] = instances("lpuart")
+        p["spi_ids"] = instances("spi")
+        p["i2c_ids"] = instances("i2c")
+        p["tim_ids"] = instances("tim")
+        p["lptim_ids"] = instances("lptim")
+        env.template(f"rcc_{t.family}.hpp.in", "rcc.hpp")
     else:
         env.template("rcc.hpp.in")
         env.template("rcc.cpp.in")

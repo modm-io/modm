@@ -36,7 +36,7 @@ def prepare(module, options):
             "stm32-stream-channel",
     ]:
         return False
-    return True
+    return device.identifier.family not in ["u0"]
 
 
 def get_irq_list(device):

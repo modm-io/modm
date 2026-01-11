@@ -124,23 +124,14 @@ def validate_alternate_functions(driver, env):
 
 def get_remap_command(family, key):
     reg = 'SYSCFG->CFGR1'
-    mask = {
-        ('c0', 'a9') : 'SYSCFG_CFGR1_PA11_RMP',
-        ('c0', 'a10'): 'SYSCFG_CFGR1_PA12_RMP',
-        ('c0', 'a11'): 'SYSCFG_CFGR1_PA11_RMP',
-        ('c0', 'a12'): 'SYSCFG_CFGR1_PA12_RMP',
-        ('f0', 'a9') : 'SYSCFG_CFGR1_PA11_PA12_RMP',
-        ('f0', 'a10'): 'SYSCFG_CFGR1_PA11_PA12_RMP',
-        ('f0', 'a11'): 'SYSCFG_CFGR1_PA11_PA12_RMP',
-        ('f0', 'a12'): 'SYSCFG_CFGR1_PA11_PA12_RMP',
-        ('g0', 'a9') : 'SYSCFG_CFGR1_PA11_RMP',
-        ('g0', 'a10'): 'SYSCFG_CFGR1_PA12_RMP',
-        ('g0', 'a11'): 'SYSCFG_CFGR1_PA11_RMP',
-        ('g0', 'a12'): 'SYSCFG_CFGR1_PA12_RMP',
-    }.get((family, key))
-    if mask is None:
-        raise ValidateException("Unknown Remap for GPIO: 'P{}'".format(key.upper()))
-    return (reg, mask)
+    if family == "f0":
+        return (reg, 'SYSCFG_CFGR1_PA11_PA12_RMP')
+    else:
+        if key in ['a9', 'a11']:
+            return (reg, 'SYSCFG_CFGR1_PA11_RMP')
+        if key in ['a10', 'a12']:
+            return (reg, 'SYSCFG_CFGR1_PA12_RMP')
+    raise ValidateException("Unknown Remap for GPIO: 'P{}'".format(key.upper()))
 
 bprops = {}
 
