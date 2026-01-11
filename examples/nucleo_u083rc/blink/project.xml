@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:nucleo-u083rc</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_u083rc/blink</option>
+  </options>
+  <modules>
+    <module>modm:architecture:memory</module>
+    <module>modm:build:scons</module>
+    <module>modm:processing:timer</module>
+  </modules>
+</library>
