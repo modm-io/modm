@@ -96,8 +96,8 @@ struct SystemClock
 	static bool inline
 	enable()
 	{
-		Rcc::enableLowSpeedExternalCrystal();
-		Rcc::enableExternalCrystal();
+		Rcc::enableLseCrystal();
+		Rcc::enableHseCrystal();
 
 		Rcc::setVoltageScaling(Rcc::VoltageScaling::Scale0);
 		Rcc::setFlashLatency<Frequency>();
@@ -113,11 +113,10 @@ struct SystemClock
 		Rcc::updateCoreFrequency<Frequency>();
 
 		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll1P);
-		Rcc::enableUsbClockSource(Rcc::UsbClockSource::Pll2Q);
+		Rcc::setUsbClockSource(Rcc::UsbClockSource::Pll2Q);
 
 		return true;
 	}
-
 };
 
 using A0 = GpioA0;

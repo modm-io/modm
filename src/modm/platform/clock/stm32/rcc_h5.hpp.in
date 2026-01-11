@@ -1,9 +1,5 @@
 /*
- * Copyright (c) 2012, 2016, Sascha Schade
- * Copyright (c) 2012, 2017, Fabian Greif
- * Copyright (c) 2012, 2014-2017, 2025, Niklas Hauser
- * Copyright (c) 2013-2014, Kevin Läufer
- * Copyright (c) 2018, 2021-2022, Christopher Durand
+ * Copyright (c) 2026, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -13,8 +9,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_STM32_RCC_HPP
-#define MODM_STM32_RCC_HPP
+#pragma once
 
 #include <cstdint>
 #include "../device.hpp"
@@ -26,7 +21,7 @@ namespace modm::platform
 {
 
 /**
- * Reset and Clock Control for STM32 devices.
+ * Reset and Clock Control for STM32H5 devices.
  *
  * This class abstracts access to clock settings on the STM32.
  * You need to use this class to enable internal and external clock
@@ -40,9 +35,9 @@ class Rcc
 {
 public:
 	static constexpr uint32_t CsiFrequency = 4'000'000;
-	static constexpr uint32_t LsiFrequency = {{ lsi_frequency | modm.digsep }};
-	static constexpr uint32_t HsiFrequency = {{ hsi_frequency | modm.digsep }};
-	static constexpr uint32_t BootFrequency = {{ boot_frequency | modm.digsep }};
+	static constexpr uint32_t LsiFrequency = 32'000;
+	static constexpr uint32_t HsiFrequency = 64'000'000;
+	static constexpr uint32_t BootFrequency = HsiFrequency;
 	static constexpr uint32_t MaxFrequency = {{ max_frequency | modm.digsep }};
 
 	/// Connect GPIO signals like MCO to the clock tree
@@ -92,92 +87,76 @@ public:
 public:
 	// clock sources
 	static inline bool
-	enableInternalClock(uint32_t waitCycles = 0x10000)
+	enableHsi(uint32_t waitCycles = 0x10000)
 	{
-		bool retval;
 		RCC->CR |= RCC_CR_HSION;
-		while (not (retval = (RCC->CR & RCC_CR_HSIRDY)) and --waitCycles)
-			;
-		return retval;
+		while (not (RCC->CR & RCC_CR_HSIRDY) and --waitCycles) ;
+		return waitCycles;
 	}
 
 	static inline bool
-	enableInternalClockMHz4(uint32_t waitCycles = 0x10000)
+	enableCsi(uint32_t waitCycles = 0x10000)
 	{
-		bool retval;
 		RCC->CR |= RCC_CR_CSION;
-		while (not (retval = (RCC->CR & RCC_CR_CSIRDY)) and --waitCycles)
-			;
-		return retval;
+		while (not (RCC->CR & RCC_CR_CSIRDY) and --waitCycles) ;
+		return waitCycles;
 	}
 
 	static inline bool
-	enableInternalClockMHz48(uint32_t waitCycles = 0x10000)
+	enableHsi48(uint32_t waitCycles = 0x10000)
 	{
-		bool retval;
 		RCC->CR |= RCC_CR_HSI48ON;
-		while (not (retval = (RCC->CR & RCC_CR_HSI48RDY)) and --waitCycles)
-			;
-		return retval;
+		while (not (RCC->CR & RCC_CR_HSI48RDY) and --waitCycles) ;
+		return waitCycles;
 	}
 
 	static inline bool
-	enableExternalClock(uint32_t waitCycles = 0x10000)
+	enableHseClock(uint32_t waitCycles = 0x10000)
 	{
-		bool retval;
 		RCC->CR |= RCC_CR_HSEBYP | RCC_CR_HSEON;
-		while (not (retval = (RCC->CR & RCC_CR_HSERDY)) and --waitCycles)
-			;
-		return retval;
+		while (not (RCC->CR & RCC_CR_HSERDY) and --waitCycles) ;
+		return waitCycles;
 	}
 
 	static inline bool
-	enableExternalCrystal(uint32_t waitCycles = 0x10000)
+	enableHseCrystal(uint32_t waitCycles = 0x10000)
 	{
-		bool retval;
 		RCC->CR = (RCC->CR & ~RCC_CR_HSEBYP) | RCC_CR_HSEON;
-		while (not (retval = (RCC->CR & RCC_CR_HSERDY)) and --waitCycles)
-			;
-		return retval;
+		while (not (RCC->CR & RCC_CR_HSERDY) and --waitCycles) ;
+		return waitCycles;
 	}
 
 	static inline bool
-	enableLowSpeedInternalClock(uint32_t waitCycles = 0x10000)
+	enableLsi(uint32_t waitCycles = 0x10000)
 	{
-		bool retval;
 		RCC->BDCR |= RCC_BDCR_LSION;
-		while (not (retval = (RCC->BDCR & RCC_BDCR_LSIRDY)) and --waitCycles)
-			;
-		return retval;
+		while (not (RCC->BDCR & RCC_BDCR_LSIRDY) and --waitCycles) ;
+		return waitCycles;
 	}
 
-	static bool
-	enableLowSpeedExternalClock(uint32_t waitCycles = 0x10000)
+	static inline bool
+	enableLseClock(uint32_t waitCycles = 0x10000)
 	{
-		bool retval;
 		RCC->BDCR |= RCC_BDCR_LSEBYP | RCC_BDCR_LSEON;
-		while (not (retval = (RCC->BDCR & RCC_BDCR_LSERDY)) and --waitCycles)
-			;
-		return retval;
+		while (not (RCC->BDCR & RCC_BDCR_LSERDY) and --waitCycles) ;
+		return waitCycles;
 	}
 
 	enum class
-	LseDrive : uint32_t
+	LseDrive : uint8_t
 	{
-		Low        = 0b00 << RCC_BDCR_LSEDRV_Pos,
-		MediumLow  = 0b01 << RCC_BDCR_LSEDRV_Pos,
-		MediumHigh = 0b10 << RCC_BDCR_LSEDRV_Pos,
-		High       = 0b11 << RCC_BDCR_LSEDRV_Pos,
+		Low        = 0b00,
+		MediumLow  = 0b01,
+		MediumHigh = 0b10,
+		High       = 0b11,
 	};
-	static bool
-	enableLowSpeedExternalCrystal(LseDrive drive = LseDrive::Low, uint32_t waitCycles = 0x10000)
+	static inline bool
+	enableLseCrystal(LseDrive drive = LseDrive::Low, uint32_t waitCycles = 0x10000)
 	{
-		bool retval;
-		RCC->BDCR = (RCC->BDCR & ~(RCC_BDCR_LSEDRV | RCC_BDCR_LSEBYP)) | uint32_t(drive);
-		RCC->BDCR |= RCC_BDCR_LSEON;
-		while (not (retval = (RCC->BDCR & RCC_BDCR_LSERDY)) and --waitCycles)
-			;
-		return retval;
+		RCC->BDCR = (RCC->BDCR & ~(RCC_BDCR_LSEDRV | RCC_BDCR_LSEBYP)) |
+					(uint32_t(drive) << RCC_BDCR_LSEDRV_Pos) | RCC_BDCR_LSEON;
+		while (not (RCC->BDCR & RCC_BDCR_LSERDY) and --waitCycles) ;
+		return waitCycles;
 	}
 
 	// clock modifiers
@@ -206,15 +185,15 @@ public:
 	struct PllConfig
 	{
 		PllInputRange range;
-		uint8_t M;
-		uint16_t N;
-		uint8_t P = 0xff;
-		uint8_t Q = 0xff;
-		uint8_t R = 0xff;
-		uint8_t Frac = 0;
+		uint8_t M; ///< Div
+		uint16_t N; ///< Mul 4-512
+		uint8_t P = 0; ///< Div 1-128, must be even for PLL1
+		uint8_t Q = 0; ///< Div 1-128
+		uint8_t R = 0; ///< Div 1-128
+		uint16_t Frac = 0; ///< Mul 0 - 8191
 		PllVcoRange vcoRange = PllVcoRange::Wide;
 	};
-
+%#
 %% set pll_ids = ([1,2] if target.name == "03" else [1,2,3])
 %% for id in pll_ids
 	/// Configure and enable PLL{{id}}
@@ -237,7 +216,7 @@ public:
 		// VCO range
 		cfgr |= (uint32_t(cfg.vcoRange) << RCC_PLL{{id}}CFGR_PLL{{id}}VCOSEL_Pos);
 		// Set PLL fractional value
-		if (cfg.Frac != 0)
+		if (cfg.Frac)
 		{
 			RCC->PLL{{id}}FRACR = uint32_t(cfg.Frac) << RCC_PLL{{id}}FRACR_PLL{{id}}FRACN_Pos;
 			cfgr |= RCC_PLL{{id}}CFGR_PLL{{id}}FRACEN;
@@ -245,17 +224,17 @@ public:
 
 		// Set all dividers
 		uint32_t divr{(uint32_t(cfg.N - 1u) << RCC_PLL{{id}}DIVR_PLL{{id}}N_Pos) & RCC_PLL{{id}}DIVR_PLL{{id}}N};
-		if (cfg.R != 0xff)
+		if (cfg.R)
 		{
 			cfgr |= RCC_PLL{{id}}CFGR_PLL{{id}}REN;
 			divr |= ((uint32_t(cfg.R - 1u) << RCC_PLL{{id}}DIVR_PLL{{id}}R_Pos) & RCC_PLL{{id}}DIVR_PLL{{id}}R);
 		}
-		if (cfg.Q != 0xff)
+		if (cfg.Q)
 		{
 			cfgr |= RCC_PLL{{id}}CFGR_PLL{{id}}QEN;
 			divr |= ((uint32_t(cfg.Q - 1u) << RCC_PLL{{id}}DIVR_PLL{{id}}Q_Pos) & RCC_PLL{{id}}DIVR_PLL{{id}}Q);
 		}
-		if (cfg.P != 0xff)
+		if (cfg.P)
 		{
 			cfgr |= RCC_PLL{{id}}CFGR_PLL{{id}}PEN;
 			divr |= ((uint32_t(cfg.P - 1u) << RCC_PLL{{id}}DIVR_PLL{{id}}P_Pos) & RCC_PLL{{id}}DIVR_PLL{{id}}P);
@@ -266,11 +245,8 @@ public:
 		RCC->PLL{{id}}DIVR = divr;
 		RCC->CR |= RCC_CR_PLL{{id}}ON;
 
-		uint32_t tmp;
-		while (not (tmp = (RCC->CR & RCC_CR_PLL{{id}}RDY)) and --waitCycles)
-			;
-
-		return tmp;
+		while (not (RCC->CR & RCC_CR_PLL{{id}}RDY) and --waitCycles) ;
+		return waitCycles;
 	}
 
 	/// Disable PLL{{id}}.
@@ -278,15 +254,13 @@ public:
 	disablePll{{id}}(uint32_t waitCycles = 0x10000)
 	{
 		RCC->CR &= ~RCC_CR_PLL{{id}}ON;
-		while ((RCC->CR & RCC_CR_PLL{{id}}RDY) and --waitCycles)
-			;
+		while ((RCC->CR & RCC_CR_PLL{{id}}RDY) and --waitCycles) ;
 		RCC->PLL{{id}}CFGR = 0;
 		RCC->PLL{{id}}DIVR = 0;
-		return waitCycles > 0;
+		return waitCycles;
 	}
-
-%% endfor
 %#
+%% endfor
 	enum class
 	AhbPrescaler : uint8_t
 	{
@@ -300,12 +274,10 @@ public:
 		Div256 = 0b1110,
 		Div512 = 0b1111,
 	};
-	static inline bool
+	static inline void
 	setAhbPrescaler(AhbPrescaler prescaler)
 	{
-		RCC->CFGR2 = (RCC->CFGR2 & ~RCC_CFGR2_HPRE) |
-					 (uint32_t(prescaler) << RCC_CFGR2_HPRE_Pos);
-		return true;
+		RCC->CFGR2 = (RCC->CFGR2 & ~RCC_CFGR2_HPRE) | (uint32_t(prescaler) << RCC_CFGR2_HPRE_Pos);
 	}
 
 	enum class
@@ -318,12 +290,10 @@ public:
 		Div16  = 0b111
 	};
 %% for id in [1,2,3]
-	static inline bool
+	static inline void
 	setApb{{id}}Prescaler(ApbPrescaler prescaler)
 	{
-		RCC->CFGR2 = (RCC->CFGR2 & ~RCC_CFGR2_PPRE{{id}}) |
-					 (uint32_t(prescaler) << RCC_CFGR2_PPRE{{id}}_Pos);
-		return true;
+		RCC->CFGR2 = (RCC->CFGR2 & ~RCC_CFGR2_PPRE{{id}}) | (uint32_t(prescaler) << RCC_CFGR2_PPRE{{id}}_Pos);
 	}
 %% endfor
 %#
@@ -335,21 +305,14 @@ public:
 		Csi = 0b01,
 		Hse = 0b10,
 		Pll1P = 0b11,
-
-		InternalClock = Hsi,
-		ExternalClock = Hse,
-		ExternalCrystal = Hse,
 	};
 	static inline bool
 	enableSystemClock(SystemClockSource src, uint32_t waitCycles = 0x10000)
 	{
 		RCC->CFGR1 = (RCC->CFGR1 & ~RCC_CFGR1_SW) | uint32_t(src);
-
 		// Wait till the main PLL is used as system clock source
-		while ((RCC->CFGR1 & RCC_CFGR1_SWS) != (uint32_t(src) << RCC_CFGR1_SWS_Pos))
-			if (not --waitCycles) return false;
-
-		return true;
+		while ((RCC->CFGR1 & RCC_CFGR1_SWS) != (uint32_t(src) << RCC_CFGR1_SWS_Pos) and --waitCycles) ;
+		return waitCycles;
 	}
 
 	enum class
@@ -359,13 +322,8 @@ public:
 		Lse = 0b01 << RCC_BDCR_RTCSEL_Pos,
 		Lsi = 0b10 << RCC_BDCR_RTCSEL_Pos,
 		Hse = 0b11 << RCC_BDCR_RTCSEL_Pos,
-
-		ExternalClock = Hse,
-		ExternalCrystal = Hse,
-		LowSpeedInternalClock = Lsi,
-		LowSpeedExternalClock = Lse,
-		LowSpeedExternalCrystal = Lse
 	};
+	/// @param hseDiv Division factor for HSE to get ≤1MHz clock for RTC: range 2-63
 	static inline bool
 	enableRealTimeClock(RealTimeClockSource src, uint8_t hseDiv = 0xff)
 	{
@@ -373,15 +331,6 @@ public:
 		RCC->BDCR = (RCC->BDCR & ~RCC_BDCR_RTCSEL) | RCC_BDCR_RTCEN | uint32_t(src);
 		return true;
 	}
-
-	enum class
-	WatchdogClockSource : uint32_t
-	{
-		LowSpeedInternalClock = 0
-	};
-	static inline bool
-	enableWatchdogClock(WatchdogClockSource /*src*/ = WatchdogClockSource::LowSpeedInternalClock)
-	{ return true; }
 
 	// CCIPR1
 	enum class
@@ -400,7 +349,7 @@ public:
 	%% set s = "s" if id in [1,2,3,6,10,11] else ""
 	%% set c = 2 if id in [11,12] else 1
 	static inline void
-	enableU{{s}}art{{id}}ClockSource(UartClockSource src)
+	setU{{s}}art{{id}}ClockSource(UartClockSource src)
 	{
 		RCC->CCIPR{{c}} = (RCC->CCIPR{{c}} & ~RCC_CCIPR{{c}}_U{{s|upper}}ART{{id}}SEL) |
 					  (uint32_t(src) << RCC_CCIPR{{c}}_U{{s|upper}}ART{{id}}SEL_Pos);
@@ -421,10 +370,9 @@ public:
 		Lse   = 0b101
 	};
 	static inline void
-	enableLpUart1ClockSource(LpUartClockSource src)
+	setLpUart1ClockSource(LpUartClockSource src)
 	{
-		RCC->CCIPR3 = (RCC->CCIPR3 & ~RCC_CCIPR3_LPUART1SEL) |
-					  (uint32_t(src) << RCC_CCIPR3_LPUART1SEL_Pos);
+		RCC->CCIPR3 = (RCC->CCIPR3 & ~RCC_CCIPR3_LPUART1SEL) | (uint32_t(src) << RCC_CCIPR3_LPUART1SEL_Pos);
 	}
 
 	enum class
@@ -440,10 +388,9 @@ public:
 	};
 %% for id in spi_ids | sort if id in [1,2,3]
 	static inline void
-	enableSpi{{id}}ClockSource(Spi123ClockSource src)
+	setSpi{{id}}ClockSource(Spi123ClockSource src)
 	{
-		RCC->CCIPR3 = (RCC->CCIPR3 & ~RCC_CCIPR3_SPI{{id}}SEL) |
-					  (uint32_t(src) << RCC_CCIPR3_SPI{{id}}SEL_Pos);
+		RCC->CCIPR3 = (RCC->CCIPR3 & ~RCC_CCIPR3_SPI{{id}}SEL) | (uint32_t(src) << RCC_CCIPR3_SPI{{id}}SEL_Pos);
 	}
 %% endfor
 %% if target.name != "03"
@@ -459,10 +406,9 @@ public:
 	};
 %% for id in spi_ids | sort if id in [1,2,3]
 	static inline void
-	enableSpi{{id}}ClockSource(Spi456ClockSource src)
+	setSpi{{id}}ClockSource(Spi456ClockSource src)
 	{
-		RCC->CCIPR3 = (RCC->CCIPR3 & ~RCC_CCIPR3_SPI{{id}}SEL) |
-					  (uint32_t(src) << RCC_CCIPR3_SPI{{id}}SEL_Pos);
+		RCC->CCIPR3 = (RCC->CCIPR3 & ~RCC_CCIPR3_SPI{{id}}SEL) | (uint32_t(src) << RCC_CCIPR3_SPI{{id}}SEL_Pos);
 	}
 %% endfor
 %% endif
@@ -478,10 +424,9 @@ public:
 	};
 %% for id in i2c_ids | sort
 	static inline void
-	enableI2c{{id}}ClockSource(I2cClockSource src)
+	setI2c{{id}}ClockSource(I2cClockSource src)
 	{
-		RCC->CCIPR4 = (RCC->CCIPR4 & ~RCC_CCIPR4_I2C{{id}}SEL) |
-					  (uint32_t(src) << RCC_CCIPR4_I2C{{id}}SEL_Pos);
+		RCC->CCIPR4 = (RCC->CCIPR4 & ~RCC_CCIPR4_I2C{{id}}SEL) | (uint32_t(src) << RCC_CCIPR4_I2C{{id}}SEL_Pos);
 	}
 %% endfor
 %#
@@ -494,7 +439,7 @@ public:
 		Hsi48 = 0b11 << RCC_CCIPR4_USBSEL_Pos,
 	};
 	static inline void
-	enableUsbClockSource(UsbClockSource src)
+	setUsbClockSource(UsbClockSource src)
 	{
 		RCC->CCIPR4 = (RCC->CCIPR4 & ~RCC_CCIPR4_USBSEL) | uint32_t(src);
 	}
@@ -508,7 +453,7 @@ public:
 		Pll2Q = 0b10 << RCC_CCIPR5_FDCANSEL_Pos,
 		Disabled = 0b11 << RCC_CCIPR5_FDCANSEL_Pos,
 	};
-	static void
+	static inline void
 	setCanClockSource(CanClockSource src)
 	{
 		RCC->CCIPR5 = (RCC->CCIPR5 & ~RCC_CCIPR5_FDCANSEL) | uint32_t(src);
@@ -522,8 +467,8 @@ public:
 		Lse   = 0b10 << RCC_CCIPR5_RNGSEL_Pos,
 		Lsi   = 0b11 << RCC_CCIPR5_RNGSEL_Pos,
 	};
-	static void
-	setCanClockSource(RngClockSource src)
+	static inline void
+	setRngClockSource(RngClockSource src)
 	{
 		RCC->CCIPR5 = (RCC->CCIPR5 & ~RCC_CCIPR5_RNGSEL) | uint32_t(src);
 	}
@@ -538,7 +483,7 @@ public:
 		Hsi    = 0b100 << RCC_CCIPR5_ADCDACSEL_Pos,
 		Csi    = 0b101 << RCC_CCIPR5_ADCDACSEL_Pos,
 	};
-	static void
+	static inline void
 	setAdcDacClockSource(AdcDacClockSource src)
 	{
 		RCC->CCIPR5 = (RCC->CCIPR5 & ~RCC_CCIPR5_ADCDACSEL) | uint32_t(src);
@@ -547,7 +492,7 @@ public:
 public:
 	// outputs
 	enum class
-	ClockOutput1Source : uint32_t
+	Mco1ClockSource : uint32_t
 	{
 		Hsi = 0,
 		Lse = RCC_CFGR1_MCO1SEL_0,
@@ -556,7 +501,7 @@ public:
 		Hsi48 = RCC_CFGR1_MCO1SEL_2
 	};
 	enum class
-	ClockOutput2Source : uint32_t
+	Mco2ClockSource : uint32_t
 	{
 		SystemClock = 0,
 		Pll2P = RCC_CFGR1_MCO2SEL_0,
@@ -566,12 +511,11 @@ public:
 		Lsi = RCC_CFGR1_MCO2SEL_2 | RCC_CFGR1_MCO2SEL_0
 	};
 %% for id in [1,2]
-	static inline bool
-	enableClockOutput{{id}}(ClockOutput{{id}}Source src, uint8_t div)
+	static inline void
+	setMco{{id}}ClockSource(Mco{{id}}ClockSource src, uint8_t div)
 	{
 		RCC->CFGR1 = (RCC->CFGR1 & ~(RCC_CFGR1_MCO{{id}}SEL | RCC_CFGR1_MCO{{id}}PRE)) |
 					 uint32_t(src) | ((div << RCC_CFGR1_MCO{{id}}PRE_Pos) & RCC_CFGR1_MCO{{id}}PRE);
-		return true;
 	}
 %% endfor
 
@@ -593,10 +537,8 @@ public:
 		if (voltage == static_cast<VoltageScaling>(currentSetting)) return true;
 
 		PWR->VOSCR = (PWR->VOSCR & ~PWR_VOSCR_VOS) | uint32_t(voltage);
-
-		while (PWR->VOSSR & PWR_VOSSR_VOSRDY)
-			if (--waitCycles == 0) return false;
-		return true;
+		while ((PWR->VOSSR & PWR_VOSSR_VOSRDY) and --waitCycles) ;
+		return waitCycles;
 	}
 
 
@@ -614,5 +556,3 @@ private:
 
 
 #include "rcc_impl.hpp"
-
-#endif	//  MODM_STM32_RCC_HPP
