@@ -28,16 +28,26 @@ using namespace modm::literals;
 /// STM32G0x1Rx running at 64MHz generated from the internal 16MHz crystal
 struct SystemClock
 {
-	static constexpr uint32_t Frequency = 64_MHz;
-	static constexpr uint32_t Ahb		= Frequency;
-	static constexpr uint32_t Apb		= Frequency;
+	static constexpr Rcc::PllConfig pll{
+		.M = 1, //  16 MHz / 1 =  16 MHz
+		.N = 8, //  16 MHz * 8 = 128 MHz
+		.R = 2, // 128 MHz / 2 =  64 MHz = F_cpu
+	};
+	static constexpr uint32_t PllR = Rcc::HsiFrequency / pll.M * pll.N / pll.R;
+	static_assert(PllR == Rcc::MaxFrequency);
+
+	static constexpr uint32_t SysClk = PllR;
+	static constexpr uint32_t Frequency = SysClk;
+
+	static constexpr uint32_t Hclk      = SysClk / 1;
+	static constexpr uint32_t Ahb		= Hclk;
+	static constexpr uint32_t Apb		= Hclk / 1;
 
 	static constexpr uint32_t Aes		= Ahb;
 	static constexpr uint32_t Rng		= Ahb;
 	static constexpr uint32_t Crc		= Ahb;
 	static constexpr uint32_t Flash		= Ahb;
 	static constexpr uint32_t Exti		= Ahb;
-	static constexpr uint32_t Rcc		= Ahb;
 	static constexpr uint32_t Dmamux	= Ahb;
 	static constexpr uint32_t Dma		= Ahb;
 	static constexpr uint32_t Dma2		= Ahb;
@@ -95,24 +105,19 @@ struct SystemClock
 	static bool inline
 	enable()
 	{
-		Rcc::enableLowSpeedExternalCrystal();
-		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::LowSpeedExternalCrystal);
-
-		Rcc::enableInternalClock();	// 16MHz
-		// (internal clock / 1_M) * 8_N / 2_R = 128MHz / 2 = 64MHz
-		const Rcc::PllFactors pllFactors{
-			.pllM = 1,
-			.pllN = 8,
-			.pllR = 2,
-		};
-		Rcc::enablePll(Rcc::PllSource::InternalClock, pllFactors);
+		Rcc::enableLseCrystal();
+		Rcc::enableHsiClock();
 		Rcc::setFlashLatency<Frequency>();
-		// switch system clock to PLL output
-		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
+
+		Rcc::enablePll(Rcc::PllSource::Hsi16, pll);
+
+		Rcc::enableSystemClock(Rcc::SystemClockSource::PllR);
 		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
 		Rcc::setApbPrescaler(Rcc::ApbPrescaler::Div1);
-		// update frequencies for busy-wait delay functions
+
 		Rcc::updateCoreFrequency<Frequency>();
+
+		Rcc::setRealTimeClockSource(Rcc::RealTimeClockSource::Lse);
 
 		return true;
 	}

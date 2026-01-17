@@ -25,17 +25,29 @@ using namespace modm::literals;
 /// STM32G0B1 running at 64MHz generated from the external 8MHz crystal
 struct SystemClock
 {
-	static constexpr uint32_t Frequency = 64_MHz;
-	static constexpr uint32_t Ahb = Frequency;
-	static constexpr uint32_t Apb = Frequency / 2;
-	static constexpr uint32_t ApbTimer = Apb * 2;
+	static constexpr uint32_t Hse = 8_MHz;
+	static constexpr Rcc::PllConfig pll{
+		.M = 2,  //   8 MHz /  2 =   4 MHz
+		.N = 48, //   4 MHz * 48 = 192 MHz
+		.Q = 4,  // 192 MHz /  4 =  48 MHz = F_usb
+		.R = 3,  // 192 MHz /  3 =  64 MHz = F_cpu
+	};
+	static constexpr uint32_t PllR = Hse / pll.M * pll.N / pll.R;
+	static constexpr uint32_t PllQ = Hse / pll.M * pll.N / pll.Q;
+	static_assert(PllR == Rcc::MaxFrequency);
+
+	static constexpr uint32_t SysClk = PllR;
+	static constexpr uint32_t Frequency = SysClk;
+
+	static constexpr uint32_t Ahb = SysClk;
+	static constexpr uint32_t Apb = SysClk / 1;
+	static constexpr uint32_t ApbTimer = Apb * 1;
 
 	static constexpr uint32_t Aes  = Ahb;
 	static constexpr uint32_t Rng  = Ahb;
 	static constexpr uint32_t Crc  = Ahb;
 	static constexpr uint32_t Flash  = Ahb;
 	static constexpr uint32_t Exti = Ahb;
-	static constexpr uint32_t Rcc = Ahb;
 	static constexpr uint32_t DmaMux = Ahb;
 	static constexpr uint32_t Dma2 = Ahb;
 	static constexpr uint32_t Dma1 = Ahb;
@@ -88,39 +100,27 @@ struct SystemClock
 	static constexpr uint32_t Timer3 = ApbTimer;
 	static constexpr uint32_t Timer2 = ApbTimer;
 
-	static constexpr uint32_t Usb = 48_MHz;
+	static constexpr uint32_t Usb = PllQ;
 	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
 	static constexpr uint32_t Rtc = 32.768_kHz;
 
 	static bool inline
 	enable()
 	{
-		Rcc::enableLowSpeedExternalCrystal();
-		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::LowSpeedExternalCrystal);
-
-		Rcc::enableExternalCrystal();
-		const Rcc::PllFactors pllFactors{
-			.pllM = 2,		// 8MHz / M=2 -> 4MHz
-			.pllN = 48,		// 4MHz * N=48 -> 192MHz
-			.pllR = 3,		// 192MHz / R=3 -> 64MHz = F_cpu
-			.pllQ = 4,		// 192MHz / Q=4 -> 48MHz = F_usb
-		};
-		Rcc::enablePll(Rcc::PllSource::ExternalCrystal, pllFactors);
-
-		// set flash latency
+		Rcc::enableLseCrystal();
+		Rcc::enableHseCrystal();
 		Rcc::setFlashLatency<Frequency>();
 
-		// Enable 48MHz clock for USB
-		Rcc::enableUsbClockSource(Rcc::UsbClockSource::Pll);
+		Rcc::enablePll(Rcc::PllSource::Hse, pll);
 
-		// switch system clock to PLL output
-		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
-
+		Rcc::enableSystemClock(Rcc::SystemClockSource::PllR);
 		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
-		Rcc::setApbPrescaler(Rcc::ApbPrescaler::Div2);
+		Rcc::setApbPrescaler(Rcc::ApbPrescaler::Div1);
 
-		// update frequencies for busy-wait delay functions
 		Rcc::updateCoreFrequency<Frequency>();
+
+		Rcc::setRealTimeClockSource(Rcc::RealTimeClockSource::Lse);
+		Rcc::setUsbClockSource(Rcc::UsbClockSource::PllQ);
 
 		return true;
 	}

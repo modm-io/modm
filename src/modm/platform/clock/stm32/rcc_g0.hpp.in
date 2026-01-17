@@ -1,0 +1,497 @@
+/*
+ * Copyright (c) 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <cstdint>
+#include "../device.hpp"
+#include <modm/platform/core/peripherals.hpp>
+#include <modm/platform/gpio/connector.hpp>
+#include <modm/architecture/interface/delay.hpp>
+
+namespace modm::platform
+{
+
+/**
+ * Reset and Clock Control for STM32G0 devices.
+ *
+ * This class abstracts access to clock settings on the STM32.
+ * You need to use this class to enable internal and external clock
+ * sources & outputs, set PLL parameters and AHB & APB prescalers.
+ * Don't forget to set the flash latencies.
+ *
+ * @author		Niklas Hauser
+ * @ingroup		modm_platform_rcc
+ */
+class Rcc
+{
+public:
+	static constexpr uint32_t LsiFrequency = 32'000;
+	static constexpr uint32_t HsiFrequency = 16'000'000;
+	static constexpr uint32_t BootFrequency = HsiFrequency; // HSI after reset
+	static constexpr uint32_t MaxFrequency = 64'000'000;
+
+	/// Connect GPIO signals like MCO to the clock tree
+	template< class... Signals >
+	static void
+	connect()
+	{
+		using Connector = GpioConnector<Peripheral::Rcc, Signals...>;
+		Connector::connect();
+	}
+
+	/// Enable the clock for a peripheral
+	template< Peripheral peripheral >
+	static void
+	enable();
+
+	/// Check if a peripheral clock is enabled
+	template< Peripheral peripheral >
+	static bool
+	isEnabled();
+
+	/// Disable the clock for a peripheral
+	template< Peripheral peripheral >
+	static void
+	disable();
+
+
+public:
+	/** Set flash latency for CPU frequency and voltage.
+	 * Does nothing if CPU frequency is too high for the available
+	 * voltage.
+	 *
+	 * @returns maximum CPU frequency for voltage.
+	 * @retval	<=CPU_Frequency flash latency has been set correctly.
+	 * @retval	>CPU_Frequency requested frequency too high for voltage.
+	 */
+	template< uint32_t Core_Hz, uint16_t Core_mV = 3300>
+	static uint32_t
+	setFlashLatency();
+
+	/// Update the SystemCoreClock and delay variables.
+	template< uint32_t Core_Hz >
+	static void
+	updateCoreFrequency();
+
+
+public:
+	// clock sources
+	enum class
+	HsiPrescaler : uint8_t
+	{
+		Div1   = 0b000,
+		Div2   = 0b001,
+		Div4   = 0b010,
+		Div8   = 0b011,
+		Div16  = 0b100,
+		Div32  = 0b101,
+		Div64  = 0b110,
+		Div128 = 0b111,
+	};
+	static inline bool
+	enableHsiClock(HsiPrescaler div = HsiPrescaler::Div1, uint32_t waitLoops = 0x10000)
+	{
+		RCC->CR = (RCC->CR & ~RCC_CR_HSIDIV_Msk) | (uint32_t(div) << RCC_CR_HSIDIV_Pos) | RCC_CR_HSION;
+		while (not (RCC->CR & RCC_CR_HSIRDY) and --waitLoops) ;
+		return waitLoops;
+	}
+%#
+%% if target.name >= "b1"
+	static inline bool
+	enableHsi48Clock(uint32_t waitLoops = 0x10000)
+	{
+		RCC->CR |= RCC_CR_HSI48ON;
+		while (not (RCC->CR & RCC_CR_HSI48RDY) and --waitLoops) ;
+		return waitLoops;
+	}
+%#
+%% endif
+	static inline bool
+	enableHseClock(uint32_t waitLoops = 0x10000)
+	{
+		RCC->CR |= RCC_CR_HSEBYP | RCC_CR_HSEON;
+		while (not (RCC->CR & RCC_CR_HSERDY) and --waitLoops) ;
+		return waitLoops;
+	}
+
+	static inline bool
+	enableHseCrystal(uint32_t waitLoops = 0x10000)
+	{
+		RCC->CR = (RCC->CR & ~RCC_CR_HSEBYP) | RCC_CR_HSEON;
+		while (not (RCC->CR & RCC_CR_HSERDY) and --waitLoops) ;
+		return waitLoops;
+	}
+
+	static inline bool
+	enableLsiClock(uint32_t waitLoops = 0x10000)
+	{
+		RCC->CSR |= RCC_CSR_LSION;
+		while (not (RCC->CSR & RCC_CSR_LSIRDY) and --waitLoops) ;
+		return waitLoops;
+	}
+
+	static inline bool
+	enableLseClock(uint32_t waitLoops = 0x10000)
+	{
+		RCC->BDCR |= RCC_BDCR_LSEBYP | RCC_BDCR_LSEON;
+		while (not (RCC->BDCR & RCC_BDCR_LSERDY) and --waitLoops) ;
+		return waitLoops;
+	}
+
+	enum class
+	LseDrive : uint8_t
+	{
+		Low        = 0b00,
+		MediumLow  = 0b01,
+		MediumHigh = 0b10,
+		High       = 0b11,
+	};
+	static inline bool
+	enableLseCrystal(LseDrive drive = LseDrive::Low, uint32_t waitLoops = 0x10000)
+	{
+		RCC->BDCR = (RCC->BDCR & ~(RCC_BDCR_LSEDRV | RCC_BDCR_LSEBYP)) |
+					(uint32_t(drive) << RCC_BDCR_LSEDRV_Pos) | RCC_BDCR_LSEON;
+		while (not (RCC->BDCR & RCC_BDCR_LSERDY) and --waitLoops) ;
+		return waitLoops;
+	}
+
+
+	// clock modifiers
+	enum class
+	PllSource : uint8_t
+	{
+		Disabled = 0b00,
+		Hsi16 = 0b10,
+		Hse   = 0b11,
+	};
+	struct PllConfig
+	{
+		uint8_t M; ///< Div 1-8, frequency after div must be in [2.66, 16]MHz
+		uint8_t N; ///< Mul 8-86, frequency after mul must be in [96, 344]MHz
+		uint8_t P = 0; ///< Div 2-32, frequency ≤ 122MHz
+%% if target.name not in ("30", "50", "70")
+		uint8_t Q = 0; ///< Div 2-8, frequency ≤ 56MHz
+%% endif
+		uint8_t R = 0; ///< Div 2-8, frequency ≤ 56MHz
+	};
+
+	/// Configure and enable PLL
+	static inline bool
+	enablePll(PllSource source, const PllConfig& cfg, uint32_t waitLoops = 0x10000)
+	{
+		if (cfg.R == 1{% if target.name not in ("30", "50", "70") %} or cfg.Q == 1{% endif %} or cfg.P == 1 or cfg.N < 4 or cfg.M == 0) return false;
+
+		// Select clock source
+		uint32_t cfgr{uint32_t(source) & RCC_PLLCFGR_PLLSRC};
+		// Set PLL M divider
+		cfgr |= ((uint32_t(cfg.M - 1u) << RCC_PLLCFGR_PLLM_Pos) & RCC_PLLCFGR_PLLM);
+
+		// Set all dividers
+		cfgr |= ((uint32_t(cfg.N) << RCC_PLLCFGR_PLLN_Pos) & RCC_PLLCFGR_PLLN);
+		if (cfg.R)
+		{
+			cfgr |= RCC_PLLCFGR_PLLREN;
+			cfgr |= ((uint32_t(cfg.R - 1u) << RCC_PLLCFGR_PLLR_Pos) & RCC_PLLCFGR_PLLR);
+		}
+%% if target.name not in ("30", "50", "70")
+		if (cfg.Q)
+		{
+			cfgr |= RCC_PLLCFGR_PLLQEN;
+			cfgr |= ((uint32_t(cfg.Q - 1u) << RCC_PLLCFGR_PLLQ_Pos) & RCC_PLLCFGR_PLLQ);
+		}
+%% endif
+		if (cfg.P)
+		{
+			cfgr |= RCC_PLLCFGR_PLLPEN;
+			cfgr |= ((uint32_t(cfg.P - 1u) << RCC_PLLCFGR_PLLP_Pos) & RCC_PLLCFGR_PLLP);
+		}
+
+		// enable pll
+		RCC->PLLCFGR = cfgr;
+		RCC->CR |= RCC_CR_PLLON;
+
+		while (not (RCC->CR & RCC_CR_PLLRDY) and --waitLoops) ;
+		return waitLoops;
+	}
+
+	/// Disable PLL.
+	static inline bool
+	disablePll(uint32_t waitLoops = 0x10000)
+	{
+		RCC->CR &= ~RCC_CR_PLLON;
+		while ((RCC->CR & RCC_CR_PLLRDY) and --waitLoops) ;
+		RCC->PLLCFGR = 0;
+		return waitLoops;
+	}
+
+	enum class
+	AhbPrescaler : uint8_t
+	{
+		Div1   = 0b0000,
+		Div2   = 0b1000,
+		Div4   = 0b1001,
+		Div8   = 0b1010,
+		Div16  = 0b1011,
+		Div64  = 0b1100,
+		Div128 = 0b1101,
+		Div256 = 0b1110,
+		Div512 = 0b1111,
+	};
+	static inline void
+	setAhbPrescaler(AhbPrescaler prescaler)
+	{
+		RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_HPRE) | (uint32_t(prescaler) << RCC_CFGR_HPRE_Pos);
+	}
+
+	enum class
+	ApbPrescaler : uint8_t
+	{
+		Div1   = 0b000,
+		Div2   = 0b100,
+		Div4   = 0b101,
+		Div8   = 0b110,
+		Div16  = 0b111
+	};
+	static inline void
+	setApbPrescaler(ApbPrescaler prescaler)
+	{
+		RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_PPRE) | (uint32_t(prescaler) << RCC_CFGR_PPRE_Pos);
+	}
+
+	// clock sinks
+	enum class
+	SystemClockSource : uint8_t
+	{
+		HsiSys = 0b000,
+		Hse    = 0b001,
+		PllR   = 0b010,
+		Lsi    = 0b011,
+		Lse    = 0b100,
+	};
+	static inline bool
+	enableSystemClock(SystemClockSource src, uint32_t waitLoops = 0x10000)
+	{
+		RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_SW) | (uint32_t(src) << RCC_CFGR_SW_Pos);
+		// Wait till the main PLL is used as system clock source
+		while ((RCC->CFGR & RCC_CFGR_SWS) != (uint32_t(src) << RCC_CFGR_SWS_Pos) and --waitLoops) ;
+		return waitLoops;
+	}
+
+	enum class
+	RealTimeClockSource : uint32_t
+	{
+		Disabled = 0,
+		Lse      = 0b01 << RCC_BDCR_RTCSEL_Pos,
+		Lsi      = 0b10 << RCC_BDCR_RTCSEL_Pos,
+		HseDiv32 = 0b11 << RCC_BDCR_RTCSEL_Pos,
+	};
+	static inline void
+	setRealTimeClockSource(RealTimeClockSource src)
+	{
+		RCC->BDCR = (RCC->BDCR & ~RCC_BDCR_RTCSEL) | RCC_BDCR_RTCEN | uint32_t(src);
+	}
+
+	// CCIPR
+	enum class
+	UartClockSource : uint8_t
+	{
+		Bus    = 0b00,
+		SysClk = 0b01,
+		Hsi16  = 0b10,
+		Lse    = 0b11,
+	};
+%% for id in uart_ids | sort if (id == 1 or (id == 2 and target.name >= "70") or (id == 3 and target.name >= "b0"))
+	static inline void
+	setUsart{{id}}ClockSource(UartClockSource src)
+	{
+		RCC->CCIPR = (RCC->CCIPR & ~RCC_CCIPR_USART{{id}}SEL) | (uint32_t(src) << RCC_CCIPR_USART{{id}}SEL_Pos);
+	}
+%% endfor
+%#
+%% for id in lpuart_ids | sort if id in [1,2]
+	static inline void
+	setLpUart{{id}}ClockSource(UartClockSource src)
+	{
+		RCC->CCIPR = (RCC->CCIPR & ~RCC_CCIPR_LPUART{{id}}SEL) | (uint32_t(src) << RCC_CCIPR_LPUART{{id}}SEL_Pos);
+	}
+%% endfor
+%#
+	enum class
+	I2cClockSource : uint8_t
+	{
+		Bus    = 0b00,
+		SysClk = 0b01,
+		Hsi16  = 0b10,
+	};
+%% for id in i2c_ids | sort if id in ([1,2] if target.name >= "b0" else [1])
+	static inline void
+	setI2c{{id}}ClockSource(I2cClockSource src)
+	{
+		RCC->CCIPR = (RCC->CCIPR & ~RCC_CCIPR_I2C{{id}}SEL) | (uint32_t(src) << RCC_CCIPR_I2C{{id}}SEL_Pos);
+	}
+%% endfor
+%% if 2 in i2c_ids and target.name < "b0"
+	static inline void
+	setI2c2ClockSource(I2cClockSource src)
+	{
+		RCC->CCIPR = (RCC->CCIPR & ~RCC_CCIPR_I2S1SEL) | (uint32_t(src) << RCC_CCIPR_I2S1SEL_Pos);
+	}
+%% endif
+%#
+	enum class
+	LpTimerClockSource : uint8_t
+	{
+		Bus   = 0b00,
+		Lsi   = 0b01,
+		Hsi16 = 0b10,
+		Lse   = 0b11,
+	};
+%% for id in lptim_ids | sort if id in [1,2,3]
+	static inline void
+	setLpTimer{{id}}ClockSource(LpTimerClockSource src)
+	{
+		RCC->CCIPR = (RCC->CCIPR & ~RCC_CCIPR_LPTIM{{id}}SEL) | (uint32_t(src) << RCC_CCIPR_LPTIM{{id}}SEL_Pos);
+	}
+%% endfor
+%#
+%% if target.name[1] == "1"
+	enum class
+	TimerClockSource : uint8_t
+	{
+		Bus  = 0b0,
+		PllQ = 0b1,
+	};
+%% for id in tim_ids | sort if id in [1,15]
+	static inline void
+	setTimer{{id}}ClockSource(TimerClockSource src)
+	{
+		RCC->CCIPR = (RCC->CCIPR & ~RCC_CCIPR_TIM{{id}}SEL) | (uint32_t(src) << RCC_CCIPR_TIM{{id}}SEL_Pos);
+	}
+%% endfor
+%% endif
+%#
+%% if target.name >= "b1"
+	// USB clock source (only on G0B1/G0C1)
+	enum class
+	UsbClockSource : uint32_t
+	{
+		Hsi48 = 0b00 << RCC_CCIPR2_USBSEL_Pos,
+		Hse   = 0b01 << RCC_CCIPR2_USBSEL_Pos,
+		PllQ  = 0b10 << RCC_CCIPR2_USBSEL_Pos,
+	};
+	static inline void
+	setUsbClockSource(UsbClockSource src)
+	{
+		RCC->CCIPR2 = (RCC->CCIPR2 & ~RCC_CCIPR2_USBSEL) | uint32_t(src);
+	}
+%% endif
+
+	enum class
+	AdcClockSource : uint32_t
+	{
+		SysClk = 0,
+		PllP   = 0b01u << RCC_CCIPR_ADCSEL_Pos,
+		Hsi16  = 0b10u << RCC_CCIPR_ADCSEL_Pos,
+	};
+	static inline void
+	setAdcClockSource(AdcClockSource src)
+	{
+		RCC->CCIPR = (RCC->CCIPR & ~RCC_CCIPR_ADCSEL) | uint32_t(src);
+	}
+
+public:
+	// MCO outputs
+	enum class
+	McoPrescaler : uint8_t
+	{
+		Div1    = 0b0000,
+		Div2    = 0b0001,
+		Div4    = 0b0010,
+		Div8    = 0b0011,
+		Div16   = 0b0100,
+		Div32   = 0b0101,
+		Div64   = 0b0110,
+		Div128  = 0b0111,
+%% if target.name >= "b1"
+		Div256  = 0b1000,
+		Div512  = 0b1001,
+		Div1024 = 0b1010,
+%% endif
+	};
+	enum class
+	McoClockSource : uint8_t
+	{
+		Disabled  = 0b0000,
+		SysClk    = 0b0001,
+		Hsi16     = 0b0011,
+		Hse       = 0b0100,
+		PllR      = 0b0101,
+		Lsi       = 0b0110,
+		Lse       = 0b0111,
+%% if target.name >= "b1"
+		Hsi48     = 0b1000,
+%% endif
+	};
+	static inline void
+%% if target.name >= "b1"
+	setMco1ClockSource(McoClockSource src, McoPrescaler div)
+%% else
+	setMcoClockSource(McoClockSource src, McoPrescaler div)
+%% endif
+	{
+		RCC->CFGR = (RCC->CFGR & ~(RCC_CFGR_MCOSEL | RCC_CFGR_MCOPRE)) |
+					(uint32_t(src) << RCC_CFGR_MCOSEL_Pos) |
+					(uint32_t(div) << RCC_CFGR_MCOPRE_Pos);
+	}
+%% if target.name >= "b1"
+	static inline void
+	setMco2ClockSource(McoClockSource src, McoPrescaler div)
+	{
+		RCC->CFGR = (RCC->CFGR & ~(RCC_CFGR_MCO2SEL | RCC_CFGR_MCO2PRE)) |
+					(uint32_t(src) << RCC_CFGR_MCO2SEL_Pos) |
+					(uint32_t(div) << RCC_CFGR_MCO2PRE_Pos);
+	}
+%% endif
+%#
+public:
+	// TODO: move to Pwr module
+	enum class
+	VoltageScaling : uint32_t
+	{
+		Range1 = 0b01 << PWR_CR1_VOS_Pos,
+		Range2 = 0b10 << PWR_CR1_VOS_Pos,
+	};
+	static inline bool
+	setVoltageScaling(VoltageScaling voltage, uint32_t waitLoops = 0x10000)
+	{
+		const auto currentSetting = PWR->CR1 & PWR_CR1_VOS;
+		if (voltage == static_cast<VoltageScaling>(currentSetting)) return true;
+
+		PWR->CR1 = (PWR->CR1 & ~PWR_CR1_VOS) | uint32_t(voltage);
+
+		while (not (PWR->SR2 & PWR_SR2_VOSF) and --waitLoops) ;
+		return waitLoops;
+	}
+
+private:
+	struct flash_latency
+	{
+		uint32_t latency;
+		uint32_t max_frequency;
+	};
+	static constexpr flash_latency
+	computeFlashLatency(uint32_t Core_Hz, uint16_t Core_mV);
+};
+
+} // namespace modm::platform
+
+#include "rcc_impl.hpp"
