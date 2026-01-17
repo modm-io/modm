@@ -162,7 +162,7 @@ jobs:
       - name: Examples STM32G0 Series
         if: always()
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py nucleo_g070rb nucleo_g071rb)
+          (cd examples && ../tools/scripts/examples_compile.py nucleo_g070rb nucleo_g071rb weact_g0b1cb)
       - name: Examples STM32L0 Series
         if: always()
         run: |
