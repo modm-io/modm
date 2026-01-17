@@ -86,37 +86,37 @@ public:
 public:
 	// clock sources
 	static inline bool
-	enableHsi(uint32_t waitCycles = 0x10000)
+	enableHsiClock(uint32_t waitLoops = 0x10000)
 	{
 		RCC->CR |= RCC_CR_HSION;
-		while (not (RCC->CR & RCC_CR_HSIRDY) and --waitCycles) ;
-		return waitCycles;
+		while (not (RCC->CR & RCC_CR_HSIRDY) and --waitLoops) ;
+		return waitLoops;
 	}
 %#
 %% if target.name != "31"
 	static inline bool
-	enableHsi48(uint32_t waitCycles = 0x10000)
+	enableHsi48Clock(uint32_t waitLoops = 0x10000)
 	{
 		RCC->CRRCR |= RCC_CRRCR_HSI48ON;
-		while (not (RCC->CRRCR & RCC_CRRCR_HSI48RDY) and --waitCycles) ;
-		return waitCycles;
+		while (not (RCC->CRRCR & RCC_CRRCR_HSI48RDY) and --waitLoops) ;
+		return waitLoops;
 	}
 %#
 %% endif
 	static inline bool
-	enableHseClock(uint32_t waitCycles = 0x10000)
+	enableHseClock(uint32_t waitLoops = 0x10000)
 	{
 		RCC->CR |= RCC_CR_HSEBYP | RCC_CR_HSEON;
-		while (not (RCC->CR & RCC_CR_HSERDY) and --waitCycles) ;
-		return waitCycles;
+		while (not (RCC->CR & RCC_CR_HSERDY) and --waitLoops) ;
+		return waitLoops;
 	}
 
 	static inline bool
-	enableHseCrystal(uint32_t waitCycles = 0x10000)
+	enableHseCrystal(uint32_t waitLoops = 0x10000)
 	{
 		RCC->CR = (RCC->CR & ~RCC_CR_HSEBYP) | RCC_CR_HSEON;
-		while (not (RCC->CR & RCC_CR_HSERDY) and --waitCycles) ;
-		return waitCycles;
+		while (not (RCC->CR & RCC_CR_HSERDY) and --waitLoops) ;
+		return waitLoops;
 	}
 
 	enum class
@@ -126,19 +126,19 @@ public:
 		Div128 = RCC_CSR_LSIPREDIV,
 	};
 	static inline bool
-	enableLsiClock(LsiPrescaler div = LsiPrescaler::Div1, uint32_t waitCycles = 0x10000)
+	enableLsiClock(LsiPrescaler div = LsiPrescaler::Div1, uint32_t waitLoops = 0x10000)
 	{
 		RCC->CSR |= RCC_CSR_LSION | uint32_t(div);
-		while (not (RCC->CSR & RCC_CSR_LSIRDY) and --waitCycles) ;
-		return waitCycles;
+		while (not (RCC->CSR & RCC_CSR_LSIRDY) and --waitLoops) ;
+		return waitLoops;
 	}
 
 	static inline bool
-	enableLseClock(uint32_t waitCycles = 0x10000)
+	enableLseClock(uint32_t waitLoops = 0x10000)
 	{
 		RCC->BDCR |= RCC_BDCR_LSEBYP | RCC_BDCR_LSEON;
-		while (not (RCC->BDCR & RCC_BDCR_LSERDY) and --waitCycles) ;
-		return waitCycles;
+		while (not (RCC->BDCR & RCC_BDCR_LSERDY) and --waitLoops) ;
+		return waitLoops;
 	}
 
 	enum class
@@ -150,12 +150,12 @@ public:
 		High       = 0b11,
 	};
 	static inline bool
-	enableLseCrystal(LseDrive drive = LseDrive::Low, uint32_t waitCycles = 0x10000)
+	enableLseCrystal(LseDrive drive = LseDrive::Low, uint32_t waitLoops = 0x10000)
 	{
 		RCC->BDCR = (RCC->BDCR & ~(RCC_BDCR_LSEDRV | RCC_BDCR_LSEBYP)) |
 					(uint32_t(drive) << RCC_BDCR_LSEDRV_Pos) | RCC_BDCR_LSEON;
-		while (not (RCC->BDCR & RCC_BDCR_LSERDY) and --waitCycles) ;
-		return waitCycles;
+		while (not (RCC->BDCR & RCC_BDCR_LSERDY) and --waitLoops) ;
+		return waitLoops;
 	}
 
 	enum class
@@ -175,12 +175,12 @@ public:
 		MHz48  = 0b1011,
 	};
 	static inline bool
-	enableMsiClock(MsiFrequency frequency = MsiFrequency::MHz4, uint32_t waitCycles = 2048)
+	enableMsiClock(MsiFrequency frequency = MsiFrequency::MHz4, uint32_t waitLoops = 2048)
 	{
 		RCC->CR = (RCC->CR & ~RCC_CR_MSIRANGE) | RCC_CR_MSIRGSEL | RCC_CR_MSION |
 				  (uint32_t(frequency) << RCC_CR_MSIRANGE_Pos);
-		while (not (RCC->CR & RCC_CR_MSIRDY) and --waitCycles) ;
-		return waitCycles;
+		while (not (RCC->CR & RCC_CR_MSIRDY) and --waitLoops) ;
+		return waitLoops;
 	}
 
 
@@ -204,7 +204,7 @@ public:
 
 	/// Configure and enable PLL
 	static inline bool
-	enablePll(PllSource source, const PllConfig& cfg, uint32_t waitCycles = 0x10000)
+	enablePll(PllSource source, const PllConfig& cfg, uint32_t waitLoops = 0x10000)
 	{
 		if (cfg.R == 1 or cfg.Q == 1 or cfg.P == 1 or cfg.N < 4 or cfg.M == 0) return false;
 
@@ -235,18 +235,18 @@ public:
 		RCC->PLLCFGR = cfgr;
 		RCC->CR |= RCC_CR_PLLON;
 
-		while (not (RCC->CR & RCC_CR_PLLRDY) and --waitCycles) ;
-		return waitCycles;
+		while (not (RCC->CR & RCC_CR_PLLRDY) and --waitLoops) ;
+		return waitLoops;
 	}
 
 	/// Disable PLL.
 	static inline bool
-	disablePll(uint32_t waitCycles = 0x10000)
+	disablePll(uint32_t waitLoops = 0x10000)
 	{
 		RCC->CR &= ~RCC_CR_PLLON;
-		while ((RCC->CR & RCC_CR_PLLRDY) and --waitCycles) ;
+		while ((RCC->CR & RCC_CR_PLLRDY) and --waitLoops) ;
 		RCC->PLLCFGR = 0;
-		return waitCycles;
+		return waitLoops;
 	}
 
 	enum class
@@ -295,12 +295,12 @@ public:
 		Lse = 0b101,
 	};
 	static inline bool
-	enableSystemClock(SystemClockSource src, uint32_t waitCycles = 0x10000)
+	enableSystemClock(SystemClockSource src, uint32_t waitLoops = 0x10000)
 	{
 		RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_SW) | (uint32_t(src) << RCC_CFGR_SW_Pos);
 		// Wait till the main PLL is used as system clock source
-		while ((RCC->CFGR & RCC_CFGR_SWS) != (uint32_t(src) << RCC_CFGR_SWS_Pos) and --waitCycles) ;
-		return waitCycles;
+		while ((RCC->CFGR & RCC_CFGR_SWS) != (uint32_t(src) << RCC_CFGR_SWS_Pos) and --waitLoops) ;
+		return waitLoops;
 	}
 
 	enum class
@@ -311,11 +311,10 @@ public:
 		Lsi      = 0b10 << RCC_BDCR_RTCSEL_Pos,
 		HseDiv32 = 0b11 << RCC_BDCR_RTCSEL_Pos,
 	};
-	static inline bool
-	enableRealTimeClock(RealTimeClockSource src)
+	static inline void
+	setRealTimeClockSource(RealTimeClockSource src)
 	{
 		RCC->BDCR = (RCC->BDCR & ~RCC_BDCR_RTCSEL) | RCC_BDCR_RTCEN | uint32_t(src);
-		return true;
 	}
 
 	// CCIPR
@@ -462,15 +461,15 @@ public:
 		Range2 = 0b10 << PWR_CR1_VOS_Pos,
 	};
 	static inline bool
-	setVoltageScaling(VoltageScaling voltage, uint32_t waitCycles = 0x10000)
+	setVoltageScaling(VoltageScaling voltage, uint32_t waitLoops = 0x10000)
 	{
 		const auto currentSetting = PWR->CR1 & PWR_CR1_VOS;
 		if (voltage == static_cast<VoltageScaling>(currentSetting)) return true;
 
 		PWR->CR1 = (PWR->CR1 & ~PWR_CR1_VOS) | uint32_t(voltage);
 
-		while (not (PWR->SR2 & PWR_SR2_VOSF) and --waitCycles) ;
-		return waitCycles;
+		while (not (PWR->SR2 & PWR_SR2_VOSF) and --waitLoops) ;
+		return waitLoops;
 	}
 
 private:

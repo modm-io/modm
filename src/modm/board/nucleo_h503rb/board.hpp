@@ -30,6 +30,7 @@ using namespace modm::literals;
 struct SystemClock
 {
 	static constexpr uint32_t Hse = 24_MHz;
+	static constexpr uint32_t Lse = 32.768_kHz;
 
 	static constexpr Rcc::PllConfig pll1
 	{
@@ -90,6 +91,7 @@ struct SystemClock
 	static constexpr uint32_t Timer6 = Apb1Timer;
 	static constexpr uint32_t Timer7 = Apb1Timer;
 
+	static constexpr uint32_t Rtc = Lse;
 	static constexpr uint32_t Usb = Pll2Q;
 	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
 
@@ -114,6 +116,7 @@ struct SystemClock
 
 		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll1P);
 		Rcc::setUsbClockSource(Rcc::UsbClockSource::Pll2Q);
+		Rcc::setRealTimeClockSource(Rcc::RealTimeClockSource::Lse);
 
 		return true;
 	}

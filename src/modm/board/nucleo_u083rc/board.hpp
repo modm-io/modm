@@ -28,7 +28,7 @@ using namespace modm::literals;
 /// STM32U083RC running at 56MHz from PLL clock generated from internal HSI
 struct SystemClock
 {
-	static constexpr uint32_t Hsi = Rcc::HsiFrequency;
+	static constexpr uint32_t Lse = 32.768_kHz;
 
 	static constexpr Rcc::PllConfig pll
 	{
@@ -37,8 +37,8 @@ struct SystemClock
 		.Q = 7,  // 336 MHz /  7 =  48 MHz = F_usb
 		.R = 6,  // 336 MHz /  6 =  56 MHz = F_cpu
 	};
-	static constexpr uint32_t PllQ = Hsi / pll.M * pll.N / pll.Q;
-	static constexpr uint32_t PllR = Hsi / pll.M * pll.N / pll.R;
+	static constexpr uint32_t PllQ = Rcc::HsiFrequency / pll.M * pll.N / pll.Q;
+	static constexpr uint32_t PllR = Rcc::HsiFrequency / pll.M * pll.N / pll.R;
 	static_assert(PllR == Rcc::MaxFrequency);
 
 	static constexpr uint32_t SysClk = PllR;
@@ -94,6 +94,7 @@ struct SystemClock
 	static constexpr uint32_t Timer15 = ApbTimer;
 	static constexpr uint32_t Timer16 = ApbTimer;
 
+	static constexpr uint32_t Rtc = Lse;
 	static constexpr uint32_t Usb = PllQ;
 	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
 
@@ -101,7 +102,7 @@ struct SystemClock
 	enable()
 	{
 		Rcc::enableLseCrystal();
-		Rcc::enableHsi();
+		Rcc::enableHsiClock();
 
 		Rcc::setVoltageScaling(Rcc::VoltageScaling::Range1);
 		Rcc::setFlashLatency<Frequency>();
@@ -115,6 +116,7 @@ struct SystemClock
 
 		Rcc::enableSystemClock(Rcc::SystemClockSource::PllR);
 		Rcc::setClock48Source(Rcc::Clock48Source::PllQ);
+		Rcc::setRealTimeClockSource(Rcc::RealTimeClockSource::Lse);
 
 		return true;
 	}
