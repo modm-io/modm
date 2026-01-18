@@ -31,51 +31,50 @@ using namespace modm::literals;
 /// STM32F042K6 running at 48MHz generated from the internal 8MHz crystal
 struct SystemClock
 {
-	static constexpr uint32_t Frequency = 48_MHz;
-	static constexpr uint32_t Hsi = 8_MHz;
+	static constexpr Rcc::PllConfig pll{.Mul = 12, .Prediv = 2};
+	static constexpr uint32_t Pll = Rcc::HsiFrequency / 2 * pll.Mul / pll.Prediv;
+	static constexpr uint32_t Frequency = Pll;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb = Frequency;
 
-	static constexpr uint32_t Adc1   = Apb;
+	static constexpr uint32_t Adc1 = Apb;
 
-	static constexpr uint32_t Spi1   = Apb;
+	static constexpr uint32_t Can = Apb;
+
+	static constexpr uint32_t Spi1 = Apb;
+	static constexpr uint32_t Spi2 = Apb;
 
 	static constexpr uint32_t Usart1 = Apb;
 	static constexpr uint32_t Usart2 = Apb;
 
-	static constexpr uint32_t I2c1   = Hsi;
+	static constexpr uint32_t I2c1 = Rcc::HsiFrequency;
 
-	static constexpr uint32_t Timer1  = Apb;
-	static constexpr uint32_t Timer2  = Apb;
-	static constexpr uint32_t Timer3  = Apb;
+	static constexpr uint32_t Timer1 = Apb;
+	static constexpr uint32_t Timer2 = Apb;
+	static constexpr uint32_t Timer3 = Apb;
 	static constexpr uint32_t Timer14 = Apb;
 	static constexpr uint32_t Timer16 = Apb;
 	static constexpr uint32_t Timer17 = Apb;
+
+	static constexpr uint32_t Usb = 48_MHz;
 	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
 	static constexpr uint32_t Rtc = 32.768_kHz;
 
 	static bool inline
 	enable()
 	{
-		Rcc::enableLowSpeedExternalCrystal();
-		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::LowSpeedExternalCrystal);
+		Rcc::enableLseCrystal();
+		Rcc::enableHsiClock();
 
-		Rcc::enableInternalClock();	// 8MHz
-		// (internal clock / 2) * 12 = 48MHz
-		const Rcc::PllFactors pllFactors{
-			.pllMul = 12,
-			.pllPrediv = 2
-		};
-		Rcc::enablePll(Rcc::PllSource::InternalClock, pllFactors);
-		// set flash latency for 48MHz
 		Rcc::setFlashLatency<Frequency>();
-		// switch system clock to PLL output
+		Rcc::updateCoreFrequency<Frequency>();
+
+		Rcc::enablePll(Rcc::PllSource::HsiDiv2, pll);
 		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
 		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
 		Rcc::setApbPrescaler(Rcc::ApbPrescaler::Div1);
-		// update frequencies for busy-wait delay functions
-		Rcc::updateCoreFrequency<Frequency>();
 
+		Rcc::setRealTimeClockSource(Rcc::RealTimeClockSource::Lse);
 		return true;
 	}
 };

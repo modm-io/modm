@@ -32,11 +32,13 @@ using namespace modm::literals;
 struct SystemClock
 {
 	static constexpr uint32_t Hse = 8_MHz;
-	static constexpr uint32_t Frequency = 48_MHz;
+	static constexpr Rcc::PllConfig pll{.Mul = 6, .Prediv = 1};
+	static constexpr uint32_t Pll = Hse * pll.Mul / pll.Prediv;
+	static constexpr uint32_t Frequency = Pll;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb = Frequency;
 
-	static constexpr uint32_t Hsi = 8_MHz;
+	static constexpr uint32_t Hsi = Rcc::HsiFrequency;
 	static constexpr uint32_t Hsi14 = 14_MHz;
 
 	static constexpr uint32_t Adc1 = Hsi14;
@@ -45,44 +47,31 @@ struct SystemClock
 
 	static constexpr uint32_t Usart1 = Apb;
 
-	static constexpr uint32_t I2c1   = Hsi;
+	static constexpr uint32_t I2c1 = Hsi;
 
 	static constexpr uint32_t Timer1 = Apb;
 	static constexpr uint32_t Timer3 = Apb;
 	static constexpr uint32_t Timer14 = Apb;
 	static constexpr uint32_t Timer16 = Apb;
 	static constexpr uint32_t Timer17 = Apb;
+
 	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
 	static constexpr uint32_t Rtc = Hse / 32;
 
 	static bool inline
 	enable()
 	{
-		Rcc::enableExternalCrystal(); // 8MHz
-		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::ExternalClock);
+		Rcc::enableHseCrystal();
 
-		// external clock / 1 * 6 = 48MHz
-		const Rcc::PllFactors pllFactors{
-			.pllMul = 6,
-			.pllPrediv = 1
-		};
-		Rcc::enablePll(Rcc::PllSource::ExternalCrystal, pllFactors);
-
-		// set flash latency for 48MHz
 		Rcc::setFlashLatency<Frequency>();
-
-		// switch system clock to PLL output
-		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
-
-		// AHB has max 48MHz
-		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
-
-		// APB1 has max. 48MHz
-		Rcc::setApbPrescaler(Rcc::ApbPrescaler::Div1);
-
-		// update frequencies for busy-wait delay functions
 		Rcc::updateCoreFrequency<Frequency>();
 
+		Rcc::enablePll(Rcc::PllSource::Hse, pll);
+		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
+		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
+		Rcc::setApbPrescaler(Rcc::ApbPrescaler::Div1);
+
+		Rcc::setRealTimeClockSource(Rcc::RealTimeClockSource::Hse);
 		return true;
 	}
 };

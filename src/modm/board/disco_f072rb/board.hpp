@@ -34,7 +34,8 @@ using namespace modm::literals;
 /// STM32F072 running at 48MHz generated from the internal 48MHz clock
 struct SystemClock
 {
-	static constexpr uint32_t Frequency = 48_MHz;
+	static constexpr uint32_t Hsi48 = 48_MHz;
+	static constexpr uint32_t Frequency = Hsi48;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb = Frequency;
 
@@ -52,35 +53,31 @@ struct SystemClock
 	static constexpr uint32_t I2c1   = Apb;
 	static constexpr uint32_t I2c2   = Apb;
 
-	static constexpr uint32_t Timer1  = Apb;
-	static constexpr uint32_t Timer2  = Apb;
-	static constexpr uint32_t Timer3  = Apb;
-	static constexpr uint32_t Timer6  = Apb;
-	static constexpr uint32_t Timer7  = Apb;
+	static constexpr uint32_t Timer1 = Apb;
+	static constexpr uint32_t Timer2 = Apb;
+	static constexpr uint32_t Timer3 = Apb;
+	static constexpr uint32_t Timer6 = Apb;
+	static constexpr uint32_t Timer7 = Apb;
 	static constexpr uint32_t Timer14 = Apb;
 	static constexpr uint32_t Timer15 = Apb;
 	static constexpr uint32_t Timer16 = Apb;
 	static constexpr uint32_t Timer17 = Apb;
 
-	static constexpr uint32_t Usb = 48_MHz;
+	static constexpr uint32_t Usb = Hsi48;
 	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
 	static constexpr uint32_t Rtc = Rcc::LsiFrequency;
 
 	static bool inline
 	enable()
 	{
-		Rcc::enableLowSpeedInternalClock();
-		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::Lsi);
+		Rcc::enableLsiClock();
+		Rcc::enableHsi48Clock();
 
-		// Enable the internal 48MHz clock
-		Rcc::enableInternalClockMHz48();
-		// set flash latency for 48MHz
 		Rcc::setFlashLatency<Frequency>();
-		// Switch to the 48MHz clock
-		Rcc::enableSystemClock(Rcc::SystemClockSource::InternalClockMHz48);
-		// update frequencies for busy-wait delay functions
 		Rcc::updateCoreFrequency<Frequency>();
 
+		Rcc::enableSystemClock(Rcc::SystemClockSource::Hsi48);
+		Rcc::setRealTimeClockSource(Rcc::RealTimeClockSource::Lsi);
 		return true;
 	}
 };

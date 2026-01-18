@@ -30,23 +30,24 @@ using namespace modm::literals;
 /// STM32f072rb running at 48MHz generated from the internal 8MHz crystal
 struct SystemClock
 {
-	static constexpr uint32_t Frequency = 48_MHz;
+	static constexpr uint32_t Hsi48 = 48_MHz;
+	static constexpr uint32_t Frequency = Hsi48;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb = Frequency;
 
-	static constexpr uint32_t Adc   = Apb;
-	static constexpr uint32_t Can   = Apb;
+	static constexpr uint32_t Adc = Apb;
+	static constexpr uint32_t Can = Apb;
 
-	static constexpr uint32_t Spi1   = Apb;
-	static constexpr uint32_t Spi2   = Apb;
+	static constexpr uint32_t Spi1 = Apb;
+	static constexpr uint32_t Spi2 = Apb;
 
 	static constexpr uint32_t Usart1 = Apb;
 	static constexpr uint32_t Usart2 = Apb;
 	static constexpr uint32_t Usart3 = Apb;
 	static constexpr uint32_t Usart4 = Apb;
 
-	static constexpr uint32_t I2c1   = Apb;
-	static constexpr uint32_t I2c2   = Apb;
+	static constexpr uint32_t I2c1 = Apb;
+	static constexpr uint32_t I2c2 = Apb;
 
 	static constexpr uint32_t Timer1  = Apb;
 	static constexpr uint32_t Timer2  = Apb;
@@ -58,25 +59,21 @@ struct SystemClock
 	static constexpr uint32_t Timer16 = Apb;
 	static constexpr uint32_t Timer17 = Apb;
 
-	static constexpr uint32_t Usb = 48_MHz;
+	static constexpr uint32_t Usb = Hsi48;
 	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
 	static constexpr uint32_t Rtc = 32.768_kHz;
 
 	static bool inline
 	enable()
 	{
-		Rcc::enableLowSpeedExternalCrystal();
-		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::LowSpeedExternalCrystal);
+		Rcc::enableLseCrystal();
+		Rcc::enableHsi48Clock();
 
-		// Enable the internal 48MHz clock
-		Rcc::enableInternalClockMHz48();
-		// set flash latency for 48MHz
 		Rcc::setFlashLatency<Frequency>();
-		// Switch to the 48MHz clock
-		Rcc::enableSystemClock(Rcc::SystemClockSource::InternalClockMHz48);
-		// update frequencies for busy-wait delay functions
 		Rcc::updateCoreFrequency<Frequency>();
 
+		Rcc::enableSystemClock(Rcc::SystemClockSource::Hsi48);
+		Rcc::setRealTimeClockSource(Rcc::RealTimeClockSource::Lse);
 		return true;
 	}
 };

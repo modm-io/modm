@@ -50,7 +50,7 @@ modm::platform::Adc{{ id }}::initialize()
 	else {
 		ADC1->CFGR2 &= ~ADC_CFGR2_CKMODE; // Switch to async clock mode
 %% if target.family in ["f0"]
-		Rcc::enableInternalClockMHz14();
+		Rcc::enableHsi14Clock();
 		// There are no prescalers for the asynchronous clock
 		assertBaudrateInTolerance<MHz(14), frequency, tolerance >();
 %% else
