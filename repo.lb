@@ -80,7 +80,7 @@ class DevicesCache(dict):
             "stm32g0", "stm32g4",
             "stm32h5", "stm32h7",
             "stm32l0", "stm32l1", "stm32l4", "stm32l5",
-            "stm32u0", "stm32u5",
+            "stm32u0", "stm32u3", "stm32u5",
         )
         # Load and filter the device prefixes
         modm_db = json.loads((modm_devices / "db.json").read_text())

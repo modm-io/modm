@@ -146,7 +146,7 @@ def build(env):
                 ids += device.get_driver(driver)["instance"]
         return list(map(int, ids))
 
-    if t.family in ["h5", "u0", "g0"]:
+    if t.family in ["h5", "u0", "g0", "u3"]:
         p["uart_ids"] = instances("usart", "uart")
         p["lpuart_ids"] = instances("lpuart")
         p["spi_ids"] = instances("spi")
@@ -217,6 +217,8 @@ def build(env):
         if ("Usbotgfs" in all_peripherals or "Usbotghs" in all_peripherals) and per.startswith("USB"):
             per = per.replace("USB1", "USB").replace("USB2", "USB")
         if t.family == "l5" and per == "USBFS":
+            per = "Usb"
+        if t.family == "u3" and per == "USB1":
             per = "Usb"
         if per.capitalize() not in all_peripherals:
             continue

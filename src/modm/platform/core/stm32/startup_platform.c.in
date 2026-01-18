@@ -37,7 +37,7 @@ __modm_initialize_platform(void)
 	RCC->APB2ENR |= RCC_APB2ENR_AFIOEN; __DSB();
 %% elif target.family == "h7"
 	RCC->APB4ENR |= RCC_APB4ENR_SYSCFGEN; __DSB();
-%% elif target.family == "u5"
+%% elif target.family in ["u3", "u5"]
 	RCC->APB3ENR |= RCC_APB3ENR_SYSCFGEN; __DSB();
 %% elif target.family not in ["h5"]
 	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN; __DSB();
@@ -52,6 +52,8 @@ __modm_initialize_platform(void)
 	RCC->APBENR1 |= RCC_APBENR1_PWREN; __DSB();
 %% elif target.family in ["g4", "l4", "l5"]
 	RCC->APB1ENR1 |= RCC_APB1ENR1_PWREN; __DSB();
+%% elif target.family == "u3"
+	RCC->AHB1ENR2 |= RCC_AHB1ENR2_PWREN; __DSB();
 %% elif target.family == "u5"
 	RCC->AHB3ENR |= RCC_AHB3ENR_PWREN; __DSB();
 %% endif
@@ -62,7 +64,7 @@ __modm_initialize_platform(void)
 	PWR->CR1 |= PWR_CR1_DBP;
 %% elif target.family == "h5"
 	PWR->DBPCR |= PWR_DBPCR_DBP;
-%% elif target.family in ["u5", "wba"]
+%% elif target.family in ["u3", "u5", "wba"]
 	PWR->DBPR |= PWR_DBPR_DBP;
 %% endif
 
@@ -90,6 +92,14 @@ __modm_initialize_platform(void)
 	// Enable VDDIO2
 	PWR->CR2 |= PWR_CR2_IOSV;
 #endif
+%% elif target.family == "u3"
+%% if target.name[1] == "6"
+	// Enable power for USB
+	PWR->SVMCR |= PWR_SVMCR_ASV | PWR_SVMCR_USV;
+%% else
+	// Enable power for VDDIO2 and USB
+	PWR->SVMCR |= PWR_SVMCR_ASV | PWR_SVMCR_IO2SV | PWR_SVMCR_USV;
+%% endif
 %% elif target.family == "u5"
 	// Enable power for VDDIO2 and USB
 	PWR->SVMCR |= PWR_SVMCR_ASV | PWR_SVMCR_IO2SV | PWR_SVMCR_USV;
