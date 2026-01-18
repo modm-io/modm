@@ -30,6 +30,7 @@ using namespace modm::literals;
 /// STM32C011F6 running at 48MHz generated from the internal clock
 struct SystemClock
 {
+	static constexpr uint32_t Lse = 32.768_kHz;
 	static constexpr uint32_t Frequency = Rcc::HsiFrequency;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb = Frequency;
@@ -50,24 +51,22 @@ struct SystemClock
 	static constexpr uint32_t Timer16 = Apb;
 	static constexpr uint32_t Timer17 = Apb;
 	static constexpr uint32_t Iwdg    = Rcc::LsiFrequency;
-	static constexpr uint32_t Rtc = 32.768_kHz;
+	static constexpr uint32_t Rtc     = Lse;
 
 	static bool inline
 	enable()
 	{
-		Rcc::enableLowSpeedExternalCrystal();
-		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::LowSpeedExternalCrystal);
+		Rcc::enableLseCrystal();
+		Rcc::enableHsiClock(Rcc::HsiSysPrescaler::Div1);
 
-		// 48MHz generated from internal RC
-		Rcc::enableInternalClock();
-		Rcc::setHsiSysDivider(Rcc::HsiSysDivider::Div1);
-		// set flash latency for 48MHz
 		Rcc::setFlashLatency<Frequency>();
-		// switch system clock to PLL output
+		Rcc::updateCoreFrequency<Frequency>();
+
+		Rcc::enableSystemClock(Rcc::SystemClockSource::HsiSys);
 		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
 		Rcc::setApbPrescaler(Rcc::ApbPrescaler::Div1);
-		// update frequencies for busy-wait delay functions
-		Rcc::updateCoreFrequency<Frequency>();
+
+		Rcc::setRealTimeClockSource(Rcc::RealTimeClockSource::Lse);
 
 		return true;
 	}

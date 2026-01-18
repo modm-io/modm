@@ -27,10 +27,11 @@ namespace Board
 /// @{
 using namespace modm::literals;
 
-/// STM32C031C6 running at 48MHz generated from the internal clock
+/// STM32C031C6 running at 48MHz generated from the external HSE crystal
 struct SystemClock
 {
-	static constexpr uint32_t Frequency = Rcc::HsiFrequency;
+	static constexpr uint32_t Hse = 48_MHz;
+	static constexpr uint32_t Frequency = Hse;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb = Frequency;
 
@@ -50,24 +51,22 @@ struct SystemClock
 	static constexpr uint32_t Timer16 = Apb;
 	static constexpr uint32_t Timer17 = Apb;
 	static constexpr uint32_t Iwdg    = Rcc::LsiFrequency;
-	static constexpr uint32_t Rtc = Rcc::LsiFrequency;
+	static constexpr uint32_t Rtc     = Rcc::LsiFrequency;
 
 	static bool inline
 	enable()
 	{
-		Rcc::enableLowSpeedInternalClock();
-		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::Lsi);
+		Rcc::enableLseCrystal();
+		Rcc::enableHseCrystal();
 
-		// 48MHz generated from internal RC
-		Rcc::enableInternalClock();
-		Rcc::setHsiSysDivider(Rcc::HsiSysDivider::Div1);
-		// set flash latency for 48MHz
 		Rcc::setFlashLatency<Frequency>();
-		// switch system clock to PLL output
+		Rcc::updateCoreFrequency<Frequency>();
+
+		Rcc::enableSystemClock(Rcc::SystemClockSource::Hse);
 		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
 		Rcc::setApbPrescaler(Rcc::ApbPrescaler::Div1);
-		// update frequencies for busy-wait delay functions
-		Rcc::updateCoreFrequency<Frequency>();
+
+		Rcc::setRealTimeClockSource(Rcc::RealTimeClockSource::Lse);
 
 		return true;
 	}
@@ -76,7 +75,7 @@ struct SystemClock
 // Arduino Footprint
 #include "nucleo64_arduino.hpp"
 
-using Button = GpioInputC13;
+using Button = GpioInverted<GpioInputC13>;
 using LedD13 = D13;
 
 using Leds = SoftwareGpioPort< LedD13 >;
@@ -104,6 +103,8 @@ initialize()
 
 	stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>();
 	stlink::Uart::initialize<SystemClock, 115200_Bd>();
+
+	Button::setInput(Gpio::InputType::PullDown);
 }
 /// @}
 
