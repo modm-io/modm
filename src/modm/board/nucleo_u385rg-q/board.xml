@@ -1,0 +1,14 @@
+<library>
+  <repositories>
+    <repository>
+      <path>../../../../repo.lb</path>
+    </repository>
+  </repositories>
+
+  <options>
+    <option name="modm:target">stm32u385rgt6-q</option>
+  </options>
+  <modules>
+    <module>modm:board:nucleo-u385rg-q</module>
+  </modules>
+</library>

@@ -183,6 +183,10 @@ jobs:
         if: always()
         run: |
           (cd examples && ../tools/scripts/examples_compile.py nucleo_u083rc)
+      - name: Examples STM32U3 Series
+        if: always()
+        run: |
+          (cd examples && ../tools/scripts/examples_compile.py nucleo_u385rg-q)
       - name: Examples STM32U5 Series
         if: always()
         run: |
