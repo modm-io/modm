@@ -28,30 +28,36 @@ using namespace modm::literals;
 /// STM32L053R8 running at 32MHz generated from 16 MHz HSI16 clock
 struct SystemClock
 {
-	static constexpr uint32_t Frequency = 32_MHz;
+	static constexpr Rcc::PllConfig pll{.Mul = Rcc::PllMultiplier::Mul4, .Div = 2};
+	static constexpr uint32_t Pll = Rcc::HsiFrequency * Rcc::value(pll.Mul) / pll.Div;
+	static constexpr uint32_t Frequency = Pll;
+	static_assert(Frequency == Rcc::MaxFrequency);
+
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency;
 	static constexpr uint32_t Apb2 = Frequency;
 
-	static constexpr uint32_t Adc     = Apb2;
+	static constexpr uint32_t Crc  = Ahb;
+	static constexpr uint32_t Rng  = Ahb;
+	static constexpr uint32_t Tsc  = Ahb;
 
+	static constexpr uint32_t Adc    = Apb2;
+	static constexpr uint32_t Comp1  = Apb2;
+	static constexpr uint32_t Comp2  = Apb2;
+	static constexpr uint32_t Spi1   = Apb2;
+	static constexpr uint32_t Usart1 = Apb2;
+
+	static constexpr uint32_t Crs     = Apb1;
 	static constexpr uint32_t Dac     = Apb1;
-
-	static constexpr uint32_t Comp1   = Apb2;
-	static constexpr uint32_t Comp2   = Apb2;
-
-	static constexpr uint32_t Spi1    = Apb2;
-	static constexpr uint32_t Spi2    = Apb1;
-
-	static constexpr uint32_t Usart1  = Apb2;
-	static constexpr uint32_t Usart2  = Apb1;
-
-	static constexpr uint32_t Lpuart1 = Apb1;
-
 	static constexpr uint32_t I2c1    = Apb1;
 	static constexpr uint32_t I2c2    = Apb1;
-
+	static constexpr uint32_t Lcd     = Apb1;
+	static constexpr uint32_t Lptim1  = Apb1;
+	static constexpr uint32_t Lpuart1 = Apb1;
+	static constexpr uint32_t Spi2    = Apb1;
+	static constexpr uint32_t Usart2  = Apb1;
 	static constexpr uint32_t Usb     = Apb1;
+	static constexpr uint32_t Wwdg    = Apb1;
 
 	static constexpr uint32_t Apb1Timer = Apb1 * 1;
 	static constexpr uint32_t Apb2Timer = Apb2 * 1;
@@ -65,26 +71,18 @@ struct SystemClock
 	static bool inline
 	enable()
 	{
-		Rcc::enableLowSpeedExternalCrystal();
-		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::LowSpeedExternalCrystal);
+		Rcc::enableLseCrystal();
+		Rcc::setRealTimeClockSource(Rcc::RealTimeClockSource::Lse);
 
-		Rcc::enableInternalClock();	// 16MHz
-		// (internal clock / 1) * 4 / 2 = 32MHz
-		const Rcc::PllFactors pllFactors{
-			.pllMul = Rcc::PllMultiplier::Mul4,
-			.pllDiv = 2,
-			.enableHsiPrediv4 = false
-		};
-		Rcc::enablePll(Rcc::PllSource::Hsi16, pllFactors);
-		// set flash latency for 32MHz
+		Rcc::enableHsiClock();
 		Rcc::setFlashLatency<Frequency>();
-		// switch system clock to PLL output
+		Rcc::updateCoreFrequency<Frequency>();
+
+		Rcc::enablePll(Rcc::PllSource::Hsi, pll);
 		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
 		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
-		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div1);
-		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div1);
-		// update frequencies for busy-wait delay functions
-		Rcc::updateCoreFrequency<Frequency>();
+		Rcc::setApb1Prescaler(Rcc::ApbPrescaler::Div1);
+		Rcc::setApb2Prescaler(Rcc::ApbPrescaler::Div1);
 
 		return true;
 	}
