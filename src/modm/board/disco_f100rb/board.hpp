@@ -32,7 +32,12 @@ using namespace modm::literals;
 /// supplied by the on-board st-link
 struct SystemClock
 {
-	static constexpr uint32_t Frequency = 24_MHz;
+	static constexpr uint32_t Hse = 8_MHz;
+	static constexpr Rcc::PllConfig pll{.mul = 3};
+	static constexpr uint32_t Pll = Hse * pll.mul / pll.prediv1;
+	static constexpr uint32_t Frequency = Pll;
+	static_assert(Frequency == Rcc::MaxFrequency);
+
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency;
 	static constexpr uint32_t Apb2 = Frequency;
@@ -77,25 +82,19 @@ struct SystemClock
 	static bool inline
 	enable()
 	{
-		Rcc::enableLowSpeedExternalCrystal();
-		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::LowSpeedExternalCrystal);
+		Rcc::enableLseCrystal();
+		Rcc::enableHseClock();
 
-		Rcc::enableExternalCrystal();	// 8MHz
-		const Rcc::PllFactors pllFactors{
-			.pllMul = 3,
-			.pllPrediv = 1
-		};
-		Rcc::enablePll(Rcc::PllSource::ExternalCrystal, pllFactors);
-		// set flash latency for 24MHz
 		Rcc::setFlashLatency<Frequency>();
-		// switch system clock to PLL output
-		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
-		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
-		// APB1 has max. 24MHz
-		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div1);
-		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div1);
-		// update frequencies for busy-wait delay functions
 		Rcc::updateCoreFrequency<Frequency>();
+
+		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
+		Rcc::setApb1Prescaler(Rcc::ApbPrescaler::Div1);
+		Rcc::setApb2Prescaler(Rcc::ApbPrescaler::Div1);
+
+		Rcc::enablePll(Rcc::PllSource::Hse, pll);
+		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
+		Rcc::setRealTimeClockSource(Rcc::RealTimeClockSource::Lse);
 
 		return true;
 	}

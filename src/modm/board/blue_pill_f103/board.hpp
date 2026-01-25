@@ -31,7 +31,12 @@ using namespace modm::literals;
 /// STM32F103 running at 72MHz generated from the external 8MHz crystal
 struct SystemClock
 {
-	static constexpr uint32_t Frequency = 72_MHz;
+	static constexpr uint32_t Hse = 8_MHz;
+	static constexpr Rcc::PllConfig pll{.mul = 9, .usbdiv = Rcc::UsbPrescaler::Div1_5};
+	static constexpr uint32_t Pll = Hse * pll.mul;
+	static constexpr uint32_t Frequency = Pll;
+	static_assert(Frequency == Rcc::MaxFrequency);
+
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency / 2;
 	static constexpr uint32_t Apb2 = Frequency;
@@ -60,42 +65,26 @@ struct SystemClock
 	static constexpr uint32_t Timer3  = Apb1Timer;
 	static constexpr uint32_t Timer4  = Apb1Timer;
 
-	static constexpr uint32_t Usb = Ahb / 1.5;
+	static constexpr uint32_t Usb = Ahb * 2 / 3;
 	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
 	static constexpr uint32_t Rtc = 32.768_kHz;
 
 	static bool inline
 	enable()
 	{
-		Rcc::enableLowSpeedExternalCrystal();
-		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::LowSpeedExternalCrystal);
+		Rcc::enableLseCrystal();
+		Rcc::enableHseClock();
 
-		Rcc::enableExternalCrystal();
-
-		// external clock * 9 = 72MHz, => 72/1.5 = 48 => good for USB
-		const Rcc::PllFactors pllFactors{
-			.pllMul = 9,
-			.usbPrediv = Rcc::UsbPrescaler::Div1_5
-		};
-		Rcc::enablePll(Rcc::PllSource::ExternalCrystal, pllFactors);
-
-		// set flash latency for 72MHz
 		Rcc::setFlashLatency<Frequency>();
-
-		// switch system clock to PLL output
-		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
-
-		// AHB has max 72MHz
-		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
-
-		// APB1 has max. 36MHz
-		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div2);
-
-		// APB2 has max. 72MHz
-		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div1);
-
-		// update frequencies for busy-wait delay functions
 		Rcc::updateCoreFrequency<Frequency>();
+
+		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
+		Rcc::setApb1Prescaler(Rcc::ApbPrescaler::Div2);
+		Rcc::setApb2Prescaler(Rcc::ApbPrescaler::Div1);
+
+		Rcc::enablePll(Rcc::PllSource::Hse, pll);
+		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
+		Rcc::setRealTimeClockSource(Rcc::RealTimeClockSource::Lse);
 
 		return true;
 	}
