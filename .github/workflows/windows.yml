@@ -47,13 +47,14 @@ jobs:
       #     Invoke-WebRequest -OutFile gcc-win64.zip https://github.com/brechtsanders/winlibs_mingw/releases/download/14.2.0posix-19.1.7-12.0.0-msvcrt-r3/winlibs-x86_64-posix-seh-gcc-14.2.0-mingw-w64msvcrt-12.0.0-r3.zip
       #     [System.IO.Compression.ZipFile]::ExtractToDirectory("gcc-win64.zip", "C:\")
       #   }
+      # We had to cache the ARM GCC zip file in an unrelated release due to the download servers blocking us from time to time
       - name: Download and Unzip GCCs
         shell: powershell
         run: |
           $ProgressPreference = 'SilentlyContinue'
           Start-Job {
             Set-Location $using:PWD
-            Invoke-WebRequest -OutFile gcc-arm-none-eabi-win64-14.zip https://developer.arm.com/-/media/Files/downloads/gnu/14.2.rel1/binrel/arm-gnu-toolchain-14.2.rel1-mingw-w64-x86_64-arm-none-eabi.zip
+            Invoke-WebRequest -OutFile gcc-arm-none-eabi-win64-14.zip https://github.com/modm-io/avr-gcc/releases/download/v14.2.0/arm-gnu-toolchain-14.2.rel1-mingw-w64-x86_64-arm-none-eabi.zip
             New-Item -Path "C:\" -Name "arm-none-eabi-14" -ItemType "Directory"
             Expand-Archive -Path gcc-arm-none-eabi-win64-14.zip -DestinationPath C:\arm-none-eabi-14 -Force
             Remove-Item gcc-arm-none-eabi-win64-14.zip
