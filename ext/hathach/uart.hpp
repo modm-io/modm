@@ -35,12 +35,14 @@ public:
 	static inline void
 	flushWriteBuffer()
 	{
+		if (not tud_cdc_n_ready(ITF)) return;
 		tud_cdc_n_write_flush(ITF);
 	}
 
 	static inline bool
 	write(uint8_t c)
 	{
+		if (not tud_cdc_n_ready(ITF)) return false;
 		bool rc = tud_cdc_n_write_char(ITF, c);
 		tud_cdc_n_write_flush(ITF);
 		return rc;
@@ -49,6 +51,7 @@ public:
 	static inline std::size_t
 	write(const uint8_t *data, std::size_t length)
 	{
+		if (not tud_cdc_n_ready(ITF)) return false;
 		std::size_t rc = tud_cdc_n_write(ITF, data, length);
 		tud_cdc_n_write_flush(ITF);
 		return rc;
