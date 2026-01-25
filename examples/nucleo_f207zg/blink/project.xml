@@ -1,0 +1,9 @@
+<library>
+  <extends>modm:nucleo-f207zg</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_f207zg/blink</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

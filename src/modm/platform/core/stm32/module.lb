@@ -90,7 +90,7 @@ def build(env):
         "f0": (4,  4), # CM3  tested on F071 in RAM
         "f1": (4,  4), # CM3  tested on F103 in RAM
         "f4": (4,  4), # CM4  tested on F401, F411, F446 in RAM
-        "f2": (4,  4), # CM3  guessed based on documentation
+        "f2": (4,  4), # CM3  tested on F207 in RAM
     }[target.family]
 
     # us_shift is an optimization to limit error via fractional math

@@ -151,6 +151,10 @@ jobs:
         if: always()
         run: |
           (cd examples && ../tools/scripts/examples_compile.py stm32f1_discovery nucleo_f103rb olimexino_stm32 blue_pill_f103 black_pill_f103)
+      - name: Examples STM32F2 Series
+        if: always()
+        run: |
+          (cd examples && ../tools/scripts/examples_compile.py nucleo_f207zg)
       - name: Examples STM32F3 Series
         if: always()
         run: |
