@@ -67,17 +67,18 @@ git clone --recurse-submodules --jobs 8 https://github.com/modm-io/modm.git
 - Lightweight unit testing system (suitable for AVRs).
 - Hundreds of tests to ensure correct functionality.
 - Integration of useful third-party software:
-	- [FreeRTOS][] and [FreeRTOS+TCP][] operating system.
 	- [CMSIS][] and [CMSIS-DSP][] interfaces.
-	- [ETL][]: Embedded Template Library.
-	- [TinyUSB][]: USB Host/Device stack.
-	- [FatFS][]: FAT/exFAT filesystem.
-	- [ROSserial][]: Embedded ROS client.
 	- [CrashCatcher][]: Crash reports for HardFaults.
-	- [printf][]: Small printf implementation.
-	- [Nanopb][]: Embedded Protocol Buffers.
+	- [Eigen][]: Linear Algebra Library.
+	- [ETL][]: Embedded Template Library.
+	- [FatFS][]: FAT/exFAT filesystem.
+	- [FreeRTOS][] and [FreeRTOS+TCP][] operating system.
 	- [LVGL][]: Embedded Graphics Library.
+	- [Nanopb][]: Embedded Protocol Buffers.
+	- [printf][]: Small printf implementation.
+	- [ROSserial][]: Embedded ROS client.
 	- [RTT][]: Segger Real-Time Transport.
+	- [TinyUSB][]: USB Host/Device stack.
 
 
 ## Microcontrollers
@@ -1050,4 +1051,5 @@ and [many more contributors][contributors].
 [Nanopb]:          https://github.com/nanopb/nanopb
 [LVGL]:            https://lvgl.io
 [RTT]:             https://kb.segger.com/RTT
+[Eigen]:           https://libeigen.gitlab.io
 <!--/links-->
