@@ -1,0 +1,14 @@
+<library>
+  <repositories>
+    <repository>
+      <path>../../../../repo.lb</path>
+    </repository>
+  </repositories>
+
+  <options>
+    <option name="modm:target">stm32h523cet6</option>
+  </options>
+  <modules>
+    <module>modm:board:weact-h523ce</module>
+  </modules>
+</library>
