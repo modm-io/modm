@@ -93,10 +93,13 @@ public:
 	static void
 	disable();
 
-%% if with_calpm 
+%% if with_calpm
+	/// Set RTC calibration registers from PPB value.
+	/// range -487100 PPB — 488500 PPB with 954 PPB resolution.
 	static bool
 	setCalibration(int32_t ppb);
 
+	/// Get RTC calibration converted to PPB.
 	static int32_t
 	getCalibration();
 %%endif
