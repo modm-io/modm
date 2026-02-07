@@ -20,6 +20,7 @@
   <!-- <extends>modm:samd21-mini</extends> -->
   <!-- <extends>modm:weact-g0b1cb</extends> -->
   <!-- <extends>modm:weact-u585ci</extends> -->
+  <!-- <extends>modm:nucleo-u575zi-q</extends> -->
   <!-- <extends>modm:nucleo-h503rb</extends> -->
   <!-- <extends>modm:weact-h503cb</extends> -->
   <!-- <extends>modm:weact-h523ce</extends> -->
