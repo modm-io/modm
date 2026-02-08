@@ -35,7 +35,7 @@
 #define _PID_MAP(itf, n) ((CFG_TUD_##itf) << (n))
 #define USB_PID                                                      \
 	(0x4000 | _PID_MAP(CDC, 0) | _PID_MAP(MSC, 2) | _PID_MAP(HID, 3) | \
-	_PID_MAP(MIDI, 4) | _PID_MAP(AUDIO, 5) | _PID_MAP(VENDOR, 6))
+	_PID_MAP(MIDI, 4) | _PID_MAP(AUDIO, 5) | _PID_MAP(VENDOR, 6) | _PID_MAP(DFU_RUNTIME, 7))
 
 //--------------------------------------------------------------------+
 // Device Descriptors
