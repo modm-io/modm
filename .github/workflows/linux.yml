@@ -190,7 +190,7 @@ jobs:
       - name: Examples STM32U3 Series
         if: always()
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py nucleo_u385rg-q)
+          (cd examples && ../tools/scripts/examples_compile.py nucleo_u385rg-q weact_u585ci)
       - name: Examples STM32U5 Series
         if: always()
         run: |

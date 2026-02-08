@@ -1,0 +1,13 @@
+<library>
+  <extends>modm:weact-u585ci</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/weact_u585ci/blink</option>
+  </options>
+  <modules>
+    <module>modm:architecture:delay</module>
+    <module>modm:build:scons</module>
+  </modules>
+  <collectors>
+    <collect name="modm:build:openocd.source">interface/stlink.cfg</collect>
+  </collectors>
+</library>

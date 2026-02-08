@@ -1,0 +1,17 @@
+<library>
+  <extends>modm:weact-u585ci</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/weact_u585ci/usb</option>
+    <option name="modm:tinyusb:config">device.dfu_rt,device.cdc,device.msc</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:tinyusb</module>
+    <module>modm:processing:timer</module>
+    <module>modm:io</module>
+  </modules>
+  <collectors>
+    <collect name="modm:build:openocd.source">interface/stlink.cfg</collect>
+    <!-- <collect name="modm:build:cppdefines">CFG_TUSB_DEBUG=3</collect> -->
+  </collectors>
+</library>
