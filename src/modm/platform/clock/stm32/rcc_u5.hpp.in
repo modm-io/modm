@@ -763,7 +763,7 @@ public:
 		MsiK     = 0b1001,
 	};
 	static inline void
-	setMco1ClockSource(McoClockSource src, McoPrescaler div)
+	setMcoClockSource(McoClockSource src, McoPrescaler div)
 	{
 		RCC->CFGR1 = (RCC->CFGR1 & ~(RCC_CFGR1_MCOSEL | RCC_CFGR1_MCOPRE)) |
 					 (uint32_t(src) << RCC_CFGR1_MCOSEL_Pos) | (uint32_t(div) << RCC_CFGR1_MCOPRE_Pos);
