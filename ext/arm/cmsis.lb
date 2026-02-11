@@ -16,7 +16,7 @@ def init(module):
     module.description = FileReader("cmsis.md")
 
 def prepare(module, options):
-    return options[":target"].has_driver("core:cortex-m*")
+    return (options[":target"].has_driver("core:cortex-m*")) or (options[":target"].identifier.string == "hosted-linux")
 
 def build(env):
     pass

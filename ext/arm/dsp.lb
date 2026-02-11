@@ -95,8 +95,7 @@ def init(module):
     module.description = FileReader("dsp.md")
 
 def prepare(module, options):
-    device = options[":target"]
-    if not device.has_driver("core:cortex-m*"):
+    if not (options[":target"].has_driver("core:cortex-m*") or options[":target"].identifier.string == "hosted-linux"):
         return False
 
     module.add_option(
@@ -115,6 +114,9 @@ def build(env):
     env.collect(":build:path.include", "modm/ext/cmsis/dsp/")
     env.outbasepath = "modm/ext/cmsis/dsp"
 
+    if env[":target"].identifier.string == "hosted-linux":
+        env.collect(":build:cppdefines", "__GNUC_PYTHON__")
+
     for path in Path(localpath("cmsis-dsp/CMSIS-DSP/Include/")).iterdir():
         if path.is_file() and not ("_f16" in path.name and not env["with_f16"]):
             # We need to replace this file to include the <cmsis_dsp_local.h>
@@ -131,6 +133,7 @@ def build(env):
         "core": core,
         "includes": includes,
         "with_fpu": env.get(":platform:cortex-m:float-abi", "soft") != "soft",
+        "is_cortex_m": env[":target"].has_driver("core:cortex-m*")
     }
     env.template("arm_math.h.in")
     if env["with_f16"]: env.template("arm_math_f16.h.in")
