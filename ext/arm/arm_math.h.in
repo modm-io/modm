@@ -31,7 +31,9 @@ extern "C"
 {
 #endif
 
+%% if is_cortex_m
 #include <modm/platform/device.hpp>
+%% endif
 
 /* Local configuration file */
 #if __has_include(<arm_math_local.h>)
