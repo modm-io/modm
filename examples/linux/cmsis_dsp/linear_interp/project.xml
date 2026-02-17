@@ -1,0 +1,14 @@
+<library>
+  <options>
+    <option name="modm:target">hosted-linux</option>
+    <option name="modm:build:build.path">../../../../build/linux/cmsis_dsp/linear_interp</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:core</module>
+    <module>modm:debug</module>
+    <module>modm:build:make</module>
+    <module>modm:cmsis:dsp:fast_math</module>
+    <module>modm:cmsis:dsp:interpolation</module>
+  </modules>
+</library>

@@ -1,0 +1,12 @@
+<library>
+  <options>
+    <option name="modm:target">hosted-linux</option>
+    <option name="modm:build:build.path">../../../../build/linux/cmsis_dsp/fir</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:core</module>
+    <module>modm:debug</module>
+    <module>modm:cmsis:dsp:filtering</module>
+  </modules>
+</library>
