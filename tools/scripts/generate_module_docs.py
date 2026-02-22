@@ -89,7 +89,8 @@ def get_modules(builder, limit=None):
         modules["modm"].addSortKey(lambda mo: (mo.name, mo["filename"]))
         for init in imodules:
             if init.name.startswith("__"): continue
-            if init.name.isdigit(): continue;
+            # Keep numeric instance submodules (":...:1", ":...:2", ...),
+            # their options/collectors/queries are merged into the parent docs node later.
             m = modules[init.parent].addChild(init.fullname.split(":")[-1])
             modules[init.fullname] = m
             m.addSortKey(lambda mo: (mo.name, m["filename"], mo.get("value", ""), mo.get("option", "")))
@@ -228,6 +229,34 @@ def render_dependency_graphs(node):
     return svg
 
 
+def _is_instance_module(node):
+    return node.get("type", "") == "Module" and node.name.isdigit()
+
+def _merge_child_into(parent, child):
+    for existing in parent.children:
+        if existing == child:
+            existing.merge(child)
+            return
+    merged = child.copy(parent)
+    merged.parent = parent
+    parent.children.append(merged)
+
+def _merge_instance_members_into_parent(node):
+    # Collapse per-instance members into the parent module so availability
+    # reflects all families even though instance pages are hidden from docs.
+    instance_modules = [c for c in node.children if _is_instance_module(c)]
+    instance_option_names = set()
+    for inst in instance_modules:
+        for child in inst.children:
+            ctype = child.get("type", "")
+            if "Option" in ctype:
+                instance_option_names.add(child.name)
+            if ("Option" in ctype) or ("Collector" in ctype) or ("Query" in ctype):
+                _merge_child_into(node, child)
+    for key in node.sortKeys:
+        node.children.sort(key=key)
+    return instance_modules, instance_option_names
+
 def format_module(modules, node):
     fullname = node.name
     nname = node.parent
@@ -236,6 +265,8 @@ def format_module(modules, node):
         nname = nname.parent
 
     # ident = node.ids.string if (node.parent and node.parent.ids != node.ids) else ""
+
+    instance_modules, instance_option_names = _merge_instance_members_into_parent(node)
 
     title, descr = split_description(node["_description"])
     mprops = {
@@ -246,7 +277,7 @@ def format_module(modules, node):
         "is_limited": node.ids != all_targets,
         "url": url_name(fullname),
         "dependencies": {},
-        "options": [], "collectors": [], "queries": []
+        "options": [], "instance_options": [], "collectors": [], "queries": []
     }
 
     for child in node.children:
@@ -266,7 +297,10 @@ def format_module(modules, node):
             for name, targets in op["dependencies"].items():
                 name = name.split("-> ")[1]
                 mprops["dependencies"][name] = mprops["dependencies"].get(name, False)
-            mprops["options"].append(op)
+            if child.name in instance_option_names:
+                mprops.setdefault("instance_options", []).append(op)
+            else:
+                mprops["options"].append(op)
 
         elif "Collector" in ctype:
             op = {"name": child.name,
@@ -288,7 +322,8 @@ def format_module(modules, node):
 
     print(".", end ="", flush=True)
 
-    for child in [c for c in node.children if "filename" in c]:
+    # Merge instance options/collectors/queries into parent and omit instance pages.
+    for child in [c for c in node.children if "filename" in c and c not in instance_modules]:
         format_module(modules, child)
 
 def format_config(configs, node):

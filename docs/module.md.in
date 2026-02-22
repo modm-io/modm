@@ -33,6 +33,33 @@ Input Dependency: `{{dependency}}`{% if targets | length %} *{{targets}}*{% endi
 %% endfor
 %% endif
 
+%% if module.instance_options | length
+## Instance Options
+These options are available for each instance of this module.
+
+%% for o in module.instance_options
+#### {{o.name | replace(module.name + ":", "")}}
+
+{{o.description}}
+
+%% if o.targets | length
+*This option is only available for {{o.targets}}.*
+
+%% endif
+
+%% for value, targets in o.default.items() | sort
+Default: `{{value}}`{% if targets | length %} *{{targets}}*{% endif %}  
+%% endfor
+%% for input, targets in o.inputs.items() | sort
+Inputs: `[{{input}}]`{% if targets | length %} *{{targets}}*{% endif %}  
+%% endfor
+%% for dependency, targets in o.dependencies.items() | sort
+Input Dependency: `{{dependency}}`{% if targets | length %} *{{targets}}*{% endif %}  
+%% endfor
+
+%% endfor
+%% endif
+
 %% if module.collectors | length
 ## Collectors
 %% for c in module.collectors
