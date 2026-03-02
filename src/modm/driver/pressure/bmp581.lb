@@ -1,0 +1,52 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2026, Joel Schulz-Andres
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:bmp581"
+    module.description = """\
+# BMP581 Barometric Pressure Sensor
+
+The BMP581 is a high-performance barometric pressure sensor from Bosch Sensortec
+with excellent accuracy and low power consumption.
+
+Key features:
+- Absolute pressure range: 30 to 125 kPa
+- Pressure resolution: 1/64 Pa
+- Temperature resolution: 1/65536 C
+- I2C and SPI interfaces
+- 32-frame FIFO buffer
+- Interrupt support
+- Low power consumption
+
+Unlike older BMP sensors like the BMP085, the BMP581 outputs calibrated data directly, 
+which means no calibration coefficient compensation needs to be done in software.
+
+[Datasheet](https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bmp581-ds004.pdf)
+"""
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:gpio",
+        ":architecture:register",
+        ":architecture:spi.device",
+        ":architecture:i2c.device",
+        ":processing:fiber",
+        ":processing:timer")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/pressure"
+    env.copy("bmp581.hpp")
+    env.copy("bmp581_impl.hpp")
+    env.copy("bmp581_transport.hpp")
+    env.copy("bmp581_transport_impl.hpp")
