@@ -244,6 +244,136 @@ Bmp581<Transport>::isDataReady()
 	return status && (*status & IntStatus::DataReady);
 }
 
+// -----------------------------------------------------------------------------
+// FIFO Functions
+// -----------------------------------------------------------------------------
+
+template<Bmp581Transport Transport>
+bool
+Bmp581<Transport>::setFifoEnabled(bool enable)
+{
+	return updateRegister(Register::FifoConfig, uint8_t(FifoConfig::Mode),
+						  enable ? uint8_t(FifoConfig::Mode) : 0);
+}
+
+template<Bmp581Transport Transport>
+bool
+Bmp581<Transport>::setFifoThreshold(uint8_t threshold)
+{
+	if (threshold > 31) { return false; }
+	constexpr uint8_t thresholdMask =
+		uint8_t(FifoConfig::Threshold0) | uint8_t(FifoConfig::Threshold1) |
+		uint8_t(FifoConfig::Threshold2) | uint8_t(FifoConfig::Threshold3) |
+		uint8_t(FifoConfig::Threshold4);
+	return updateRegister(Register::FifoConfig, thresholdMask, threshold << 1);
+}
+
+template<Bmp581Transport Transport>
+bool
+Bmp581<Transport>::setFifoSelect(FifoFrameSelect frameSelect, FifoDecimation decimation)
+{
+	const auto odrConfig = readRegister(Register::OdrConfig);
+	if (!odrConfig) { return false; }
+
+	const uint8_t modeMask = uint8_t(OdrConfig::Mode0) | uint8_t(OdrConfig::Mode1);
+	const uint8_t oldMode = *odrConfig & modeMask;
+
+	// Datasheet: FIFO_SEL must be changed in STANDBY mode.
+	if (oldMode != uint8_t(PowerMode::Standby))
+	{
+		if (!writeRegister(Register::OdrConfig,
+						   (*odrConfig & ~modeMask) | uint8_t(PowerMode::Standby)))
+		{
+			return false;
+		}
+		modm::this_fiber::sleep_for(2500us);
+	}
+
+	// FIFO_SEL(0x18): frame select in bits [1:0], decimation in bits [4:2]
+	const uint8_t value =
+		static_cast<uint8_t>(frameSelect) | (static_cast<uint8_t>(decimation) << 2);
+	const bool selectOk = writeRegister(Register::FifoSel, value);
+	if (!selectOk) { return false; }
+
+	if (oldMode != uint8_t(PowerMode::Standby))
+	{
+		return writeRegister(Register::OdrConfig, (*odrConfig & ~modeMask) | oldMode);
+	}
+
+	return true;
+}
+
+template<Bmp581Transport Transport>
+std::optional<uint8_t>
+Bmp581<Transport>::getFifoCount()
+{
+	const auto value = readRegister(Register::FifoCount);
+	if (!value) { return std::nullopt; }
+	// FIFO_COUNT uses bits [5:0]
+	return *value & 0x3f;
+}
+
+template<Bmp581Transport Transport>
+bool
+Bmp581<Transport>::readFifoFrame(Data& data)
+{
+	const auto fifoSel = readRegister(Register::FifoSel);
+	if (!fifoSel) { return false; }
+
+	const auto frameSelect = static_cast<FifoFrameSelect>(*fifoSel & 0x03);
+	switch (frameSelect)
+	{
+		case FifoFrameSelect::PressureAndTemperature: {
+			uint8_t buffer[6];
+			if (!this->read(i(Register::FifoData), buffer, 6)) { return false; }
+			data.rawTemp[0] = buffer[0];
+			data.rawTemp[1] = buffer[1];
+			data.rawTemp[2] = buffer[2];
+			data.rawPress[0] = buffer[3];
+			data.rawPress[1] = buffer[4];
+			data.rawPress[2] = buffer[5];
+			return true;
+		}
+		case FifoFrameSelect::TemperatureOnly: {
+			if (!this->read(i(Register::FifoData), data.rawTemp.data(), 3)) { return false; }
+			data.rawPress = {0, 0, 0};
+			return true;
+		}
+		case FifoFrameSelect::PressureOnly: {
+			if (!this->read(i(Register::FifoData), data.rawPress.data(), 3)) { return false; }
+			data.rawTemp = {0, 0, 0};
+			return true;
+		}
+		case FifoFrameSelect::Disabled:
+		default:
+			return false;
+	}
+}
+
+template<Bmp581Transport Transport>
+uint8_t
+Bmp581<Transport>::readFifoFrames(Data* data, uint8_t count)
+{
+	const auto available = getFifoCount();
+	if (!available) { return 0; }
+
+	const uint8_t toRead = (*available < count) ? *available : count;
+	for (uint8_t i = 0; i < toRead; ++i)
+	{
+		if (!readFifoFrame(data[i])) { return i; }
+	}
+	return toRead;
+}
+
+template<Bmp581Transport Transport>
+bool
+Bmp581<Transport>::flushFifo()
+{
+	// Writing 0xB0 to CMD register flushes the FIFO
+	static constexpr uint8_t FifoFlushCommand = 0xB0;
+	return writeRegister(Register::Cmd, FifoFlushCommand);
+}
+
 template<Bmp581Transport Transport>
 std::optional<uint8_t>
 Bmp581<Transport>::readRegister(Register reg)

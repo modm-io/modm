@@ -77,6 +77,20 @@ initializeBaro()
 		return false;
 	}
 
+	/*
+	 * FIFO usage example:
+	 *
+	 * baro.setFifoSelect(Baro::FifoFrameSelect::PressureAndTemperature,
+	 *                    Baro::FifoDecimation::None);
+	 * baro.setFifoThreshold(8);
+	 * baro.setIntSource(Baro::IntSource::FifoThresholdEnable);
+	 * baro.setFifoEnabled(true);
+	 *
+	 * // On interrupt/main loop:
+	 * // const auto count = baro.getFifoCount();
+	 * // read up to `count` entries with readFifoFrames(...)
+	 */
+
 	// Set power mode to normal (continuous measurement)
 	if (!baro.setPowerMode(Baro::PowerMode::Normal))
 	{

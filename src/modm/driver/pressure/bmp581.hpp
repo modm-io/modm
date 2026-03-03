@@ -252,6 +252,43 @@ struct bmp581
 	typedef Configuration<DspIir_t, IirFilter, (Bit2 | Bit1 | Bit0), 0> TemperatureIir;
 	typedef Configuration<DspIir_t, IirFilter, (Bit2 | Bit1 | Bit0), 3> PressureIir;
 
+	/// FIFO configuration register (0x16) bit definitions
+	enum class FifoConfig : uint8_t
+	{
+		Mode = Bit0,        //< FIFO mode: 0=bypass, 1=stream
+		Threshold0 = Bit1,  //< FIFO threshold bit 0
+		Threshold1 = Bit2,  //< FIFO threshold bit 1
+		Threshold2 = Bit3,  //< FIFO threshold bit 2
+		Threshold3 = Bit4,  //< FIFO threshold bit 3
+		Threshold4 = Bit5,  //< FIFO threshold bit 4
+	};
+	MODM_FLAGS8(FifoConfig);
+
+	/// FIFO frame selection (what data to store in FIFO)
+	enum class FifoFrameSelect : uint8_t
+	{
+		Disabled = 0b00,               //< FIFO not enabled
+		TemperatureOnly = 0b01,        //< Temperature only (3 bytes per frame)
+		PressureOnly = 0b10,           //< Pressure only (3 bytes per frame)
+		PressureAndTemperature = 0b11  //< Pressure and temperature (6 bytes per frame)
+	};
+
+	/// FIFO decimation factor
+	enum class FifoDecimation : uint8_t
+	{
+		None = 0b000,   //< No decimation (store every sample)
+		By2 = 0b001,    //< Store every 2nd sample
+		By4 = 0b010,    //< Store every 4th sample
+		By8 = 0b011,    //< Store every 8th sample
+		By16 = 0b100,   //< Store every 16th sample
+		By32 = 0b101,   //< Store every 32nd sample
+		By64 = 0b110,   //< Store every 64th sample
+		By128 = 0b111,  //< Store every 128th sample
+	};
+
+	/// Maximum FIFO frame count
+	static constexpr uint8_t FifoMaxFrames = 32;
+
 	/// Measurement data container
 	struct Data
 	{
@@ -409,6 +446,52 @@ public:
 	/// @return true if data ready, false otherwise
 	bool
 	isDataReady();
+
+	// -------------------------------------------------------------------------
+	// FIFO Functions
+	// -------------------------------------------------------------------------
+
+	/// Enable or disable FIFO streaming mode
+	/// @param enable true to enable FIFO, false for bypass mode
+	/// @return true on success, false on error
+	bool
+	setFifoEnabled(bool enable);
+
+	/// Configure FIFO threshold for interrupt generation
+	/// @param threshold Number of frames (0-31) to trigger threshold interrupt
+	/// @return true on success, false on error
+	bool
+	setFifoThreshold(uint8_t threshold);
+
+	/// Configure FIFO frame selection and decimation
+	/// @param frameSelect What data to store in FIFO
+	/// @param decimation Decimation factor (store every Nth sample)
+	/// @return true on success, false on error
+	bool
+	setFifoSelect(FifoFrameSelect frameSelect, FifoDecimation decimation = FifoDecimation::None);
+
+	/// Get current FIFO frame count
+	/// @return Number of frames in FIFO, or std::nullopt on error
+	std::optional<uint8_t>
+	getFifoCount();
+
+	/// Read single frame from FIFO
+	/// @param data Reference to Data struct to fill
+	/// @return true on success, false on error
+	bool
+	readFifoFrame(Data& data);
+
+	/// Read multiple frames from FIFO
+	/// @param data Pointer to array of Data structs
+	/// @param count Number of frames to read
+	/// @return Number of frames actually read, or 0 on error
+	uint8_t
+	readFifoFrames(Data* data, uint8_t count);
+
+	/// Flush FIFO (clear all data)
+	/// @return true on success, false on error
+	bool
+	flushFifo();
 
 private:
 	std::optional<uint8_t>
