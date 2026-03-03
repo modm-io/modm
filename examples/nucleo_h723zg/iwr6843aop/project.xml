@@ -1,0 +1,12 @@
+<library>
+  <extends>modm:nucleo-h723zg</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_h723zg/iwr6843aop</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:uart:1</module>
+    <module>modm:platform:uart:4</module>
+    <module>modm:driver:iwr6843aop</module>
+  </modules>
+</library>
