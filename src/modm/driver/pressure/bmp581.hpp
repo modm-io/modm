@@ -13,10 +13,9 @@
 #define MODM_BMP581_HPP
 
 #include <array>
-#include <chrono>
 #include <cstdint>
 #include <modm/architecture/interface/register.hpp>
-#include <modm/processing/timer/timeout.hpp>
+#include <modm/processing/fiber.hpp>
 #include <optional>
 
 #include "bmp581_transport.hpp"
@@ -412,9 +411,6 @@ public:
 	isDataReady();
 
 private:
-	void
-	waitForCommandGap();
-
 	std::optional<uint8_t>
 	readRegister(Register reg);
 
@@ -423,8 +419,6 @@ private:
 
 	bool
 	updateRegister(Register reg, uint8_t mask, uint8_t value);
-
-	modm::PreciseTimeout timer_;
 };
 
 }  // namespace modm

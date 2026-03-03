@@ -13,20 +13,17 @@
 #error "Don't include this file directly, use 'bmp581.hpp' instead!"
 #endif
 
+#include <chrono>
+
 namespace modm
 {
+
+using namespace std::chrono_literals;
 
 template<Bmp581Transport Transport>
 template<typename... Args>
 Bmp581<Transport>::Bmp581(Args... transportArgs) : Transport{transportArgs...}
 {}
-
-template<Bmp581Transport Transport>
-void
-Bmp581<Transport>::waitForCommandGap()
-{
-	if (timer_.isArmed()) { timer_.wait(); }
-}
 
 template<Bmp581Transport Transport>
 bool
@@ -65,13 +62,10 @@ template<Bmp581Transport Transport>
 bool
 Bmp581<Transport>::reset()
 {
-	waitForCommandGap();
-
 	if (!writeRegister(Register::Cmd, ResetCommand)) { return false; }
 
-	// Wait for reset to complete (datasheet: 2ms typical)
-	timer_.restart(std::chrono::milliseconds{5});
-	timer_.wait();
+	// Wait for reset to complete (datasheet: 2ms typical, use 5ms for margin)
+	modm::this_fiber::sleep_for(5ms);
 
 	// Re-initialize transport (needed for SPI mode)
 	if (!Transport::initialize()) { return false; }
@@ -80,7 +74,6 @@ Bmp581<Transport>::reset()
 	// First SPI transaction after reset can be unreliable; discard result
 	(void)readRegister(Register::ChipId);
 
-	timer_.restart(std::chrono::microseconds{2});
 	return true;
 }
 
@@ -113,8 +106,6 @@ template<Bmp581Transport Transport>
 bool
 Bmp581<Transport>::setPowerMode(PowerMode mode)
 {
-	waitForCommandGap();
-
 	const uint8_t mask = uint8_t(OdrConfig::Mode0) | uint8_t(OdrConfig::Mode1);
 	const uint8_t targetMode = static_cast<uint8_t>(mode);
 	const uint8_t standbyMode = static_cast<uint8_t>(PowerMode::Standby);
@@ -122,13 +113,12 @@ Bmp581<Transport>::setPowerMode(PowerMode mode)
 	const auto current = readRegister(Register::OdrConfig);
 	if (!current) { return false; }
 
-	// Per datasheet, active mode transitions should go through STANDBY first.
+	// Per datasheet, active mode transitions should go through STANDBY first
 	if ((*current & mask) != standbyMode)
 	{
 		if (!updateRegister(Register::OdrConfig, mask, standbyMode)) { return false; }
-		// Maximum transition time to STANDBY.
-		timer_.restart(std::chrono::microseconds{2500});
-		timer_.wait();
+		// Maximum transition time to STANDBY (tstandby = 2.5ms)
+		modm::this_fiber::sleep_for(2500us);
 	}
 
 	if (targetMode != standbyMode)
@@ -136,7 +126,6 @@ Bmp581<Transport>::setPowerMode(PowerMode mode)
 		if (!updateRegister(Register::OdrConfig, mask, targetMode)) { return false; }
 	}
 
-	timer_.restart(std::chrono::microseconds{2});
 	return true;
 }
 
@@ -144,30 +133,22 @@ template<Bmp581Transport Transport>
 bool
 Bmp581<Transport>::setOdr(Odr odr)
 {
-	waitForCommandGap();
-
 	const uint8_t mask = uint8_t(OdrConfig::Odr0) | uint8_t(OdrConfig::Odr1) |
 						 uint8_t(OdrConfig::Odr2) | uint8_t(OdrConfig::Odr3) |
 						 uint8_t(OdrConfig::Odr4);
 	const uint8_t value = static_cast<uint8_t>(odr) << 2;
 
-	const bool ok = updateRegister(Register::OdrConfig, mask, value);
-	timer_.restart(std::chrono::microseconds{2});
-	return ok;
+	return updateRegister(Register::OdrConfig, mask, value);
 }
 
 template<Bmp581Transport Transport>
 bool
 Bmp581<Transport>::setOversampling(Osr pressOsr, Osr tempOsr, bool enablePressure)
 {
-	waitForCommandGap();
-
 	uint8_t value = (static_cast<uint8_t>(tempOsr) << 0) | (static_cast<uint8_t>(pressOsr) << 3);
 	if (enablePressure) { value |= uint8_t(OsrConfig::PressEn); }
 
-	const bool ok = writeRegister(Register::OsrConfig, value);
-	timer_.restart(std::chrono::microseconds{2});
-	return ok;
+	return writeRegister(Register::OsrConfig, value);
 }
 
 template<Bmp581Transport Transport>
@@ -187,8 +168,7 @@ Bmp581<Transport>::setIirFilter(IirFilter pressIir, IirFilter tempIir)
 	}
 
 	// Wait for STANDBY transition (tstandby = 2.5ms max per datasheet)
-	timer_.restart(std::chrono::microseconds{2500});
-	waitForCommandGap();
+	modm::this_fiber::sleep_for(2500us);
 
 	// Temperature IIR at [2:0], Pressure IIR at [5:3]
 	const uint8_t value =
@@ -199,7 +179,6 @@ Bmp581<Transport>::setIirFilter(IirFilter pressIir, IirFilter tempIir)
 	// Restore original power mode
 	const bool restoreOk = writeRegister(Register::OdrConfig, *odrConfig);
 
-	timer_.restart(std::chrono::microseconds{2});
 	return iirOk && restoreOk;
 }
 
@@ -207,25 +186,17 @@ template<Bmp581Transport Transport>
 bool
 Bmp581<Transport>::setIntConfig(IntConfig_t config)
 {
-	waitForCommandGap();
-
 	// Read-modify-write to preserve upper nibble (pad drive strength)
 	constexpr uint8_t intConfigMask = uint8_t(IntConfig::Mode) | uint8_t(IntConfig::Polarity) |
 									  uint8_t(IntConfig::OpenDrain) | uint8_t(IntConfig::Enable);
-	const bool ok = updateRegister(Register::IntConfig, intConfigMask, config.value);
-
-	timer_.restart(std::chrono::microseconds{2});
-	return ok;
+	return updateRegister(Register::IntConfig, intConfigMask, config.value);
 }
 
 template<Bmp581Transport Transport>
 bool
 Bmp581<Transport>::setIntSource(IntSource_t sources)
 {
-	waitForCommandGap();
-	const bool ok = writeRegister(Register::IntSource, sources.value);
-	timer_.restart(std::chrono::microseconds{2});
-	return ok;
+	return writeRegister(Register::IntSource, sources.value);
 }
 
 template<Bmp581Transport Transport>
