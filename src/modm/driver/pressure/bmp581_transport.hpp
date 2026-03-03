@@ -12,11 +12,11 @@
 #ifndef MODM_BMP581_TRANSPORT_HPP
 #define MODM_BMP581_TRANSPORT_HPP
 
-#include <cstdint>
 #include <concepts>
+#include <cstdint>
+#include <modm/architecture/interface/gpio.hpp>
 #include <modm/architecture/interface/i2c_device.hpp>
 #include <modm/architecture/interface/spi_device.hpp>
-#include <modm/architecture/interface/gpio.hpp>
 #include <modm/processing/fiber.hpp>
 
 namespace modm
@@ -31,14 +31,13 @@ namespace modm
  * A transport must provide methods for reading and writing registers.
  */
 template<typename T>
-concept Bmp581Transport = requires(T transport, uint8_t reg, uint8_t data,
-                                    uint8_t* buffer, std::size_t length)
-{
-	{ transport.initialize() } -> std::same_as<bool>;
-	{ transport.read(reg, buffer, length) } -> std::same_as<bool>;
-	{ transport.write(reg, data) } -> std::same_as<bool>;
-	{ transport.write(reg, buffer, length) } -> std::same_as<bool>;
-};
+concept Bmp581Transport =
+	requires(T transport, uint8_t reg, uint8_t data, uint8_t* buffer, std::size_t length) {
+		{ transport.initialize() } -> std::same_as<bool>;
+		{ transport.read(reg, buffer, length) } -> std::same_as<bool>;
+		{ transport.write(reg, data) } -> std::same_as<bool>;
+		{ transport.write(reg, buffer, length) } -> std::same_as<bool>;
+	};
 
 /**
  * BMP581 I2C Transport Layer
@@ -121,8 +120,8 @@ protected:
 
 /// @}
 
-} // namespace modm
+}  // namespace modm
 
 #include "bmp581_transport_impl.hpp"
 
-#endif // MODM_BMP581_TRANSPORT_HPP
+#endif  // MODM_BMP581_TRANSPORT_HPP

@@ -23,8 +23,7 @@ namespace modm
 template<typename I2cMaster>
 Bmp581I2cTransport<I2cMaster>::Bmp581I2cTransport(uint8_t address)
 	: I2cDevice<I2cMaster, 4>(address)
-{
-}
+{}
 
 template<typename I2cMaster>
 bool
@@ -54,13 +53,9 @@ template<typename I2cMaster>
 bool
 Bmp581I2cTransport<I2cMaster>::write(uint8_t reg, const uint8_t* data, std::size_t length)
 {
-	if (length > sizeof(buffer_) - 1) {
-		return false;
-	}
+	if (length > sizeof(buffer_) - 1) { return false; }
 	buffer_[0] = reg;
-	for (std::size_t i = 0; i < length; ++i) {
-		buffer_[i + 1] = data[i];
-	}
+	for (std::size_t i = 0; i < length; ++i) { buffer_[i + 1] = data[i]; }
 	return I2cDevice<I2cMaster, 4>::write(&buffer_[0], length + 1);
 }
 
@@ -70,8 +65,7 @@ Bmp581I2cTransport<I2cMaster>::write(uint8_t reg, const uint8_t* data, std::size
 
 template<typename SpiMaster, typename Cs>
 Bmp581SpiTransport<SpiMaster, Cs>::Bmp581SpiTransport()
-{
-}
+{}
 
 template<typename SpiMaster, typename Cs>
 bool
@@ -85,7 +79,7 @@ template<typename SpiMaster, typename Cs>
 bool
 Bmp581SpiTransport<SpiMaster, Cs>::read(uint8_t reg, uint8_t* data, std::size_t length)
 {
-	modm::this_fiber::poll([this]{ return this->acquireMaster(); });
+	modm::this_fiber::poll([this] { return this->acquireMaster(); });
 	Cs::reset();
 
 	// Send register address with read flag, then clock out data
@@ -93,9 +87,7 @@ Bmp581SpiTransport<SpiMaster, Cs>::read(uint8_t reg, uint8_t* data, std::size_t 
 	SpiMaster::transfer(&buffer_[0], nullptr, 1);
 	SpiMaster::transfer(nullptr, data, length);
 
-	if (this->releaseMaster()) {
-		Cs::set();
-	}
+	if (this->releaseMaster()) { Cs::set(); }
 
 	return true;
 }
@@ -104,16 +96,14 @@ template<typename SpiMaster, typename Cs>
 bool
 Bmp581SpiTransport<SpiMaster, Cs>::write(uint8_t reg, uint8_t data)
 {
-	modm::this_fiber::poll([this]{ return this->acquireMaster(); });
+	modm::this_fiber::poll([this] { return this->acquireMaster(); });
 	Cs::reset();
 
 	buffer_[0] = reg & ~ReadFlag;  // Clear read flag for write
 	buffer_[1] = data;
 	SpiMaster::transfer(&buffer_[0], nullptr, 2);
 
-	if (this->releaseMaster()) {
-		Cs::set();
-	}
+	if (this->releaseMaster()) { Cs::set(); }
 
 	return true;
 }
@@ -122,18 +112,16 @@ template<typename SpiMaster, typename Cs>
 bool
 Bmp581SpiTransport<SpiMaster, Cs>::write(uint8_t reg, const uint8_t* data, std::size_t length)
 {
-	modm::this_fiber::poll([this]{ return this->acquireMaster(); });
+	modm::this_fiber::poll([this] { return this->acquireMaster(); });
 	Cs::reset();
 
 	buffer_[0] = reg & ~ReadFlag;  // Clear read flag for write
 	SpiMaster::transfer(&buffer_[0], nullptr, 1);
 	SpiMaster::transfer(data, nullptr, length);
 
-	if (this->releaseMaster()) {
-		Cs::set();
-	}
+	if (this->releaseMaster()) { Cs::set(); }
 
 	return true;
 }
 
-} // namespace modm
+}  // namespace modm

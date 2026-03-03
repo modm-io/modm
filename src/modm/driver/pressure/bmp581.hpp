@@ -15,9 +15,10 @@
 #include <array>
 #include <chrono>
 #include <cstdint>
-#include <optional>
 #include <modm/architecture/interface/register.hpp>
 #include <modm/processing/timer/timeout.hpp>
+#include <optional>
+
 #include "bmp581_transport.hpp"
 
 namespace modm
@@ -39,163 +40,163 @@ struct bmp581
 	/// Register addresses
 	enum class Register : uint8_t
 	{
-		ChipId         = 0x01,
-		RevId          = 0x02,
-		ChipStatus     = 0x11,
-		DriveConfig    = 0x13,
-		IntConfig      = 0x14,
-		IntSource      = 0x15,
-		FifoConfig     = 0x16,
-		FifoCount      = 0x17,
-		FifoSel        = 0x18,
-		TempDataXlsb   = 0x1D,
-		TempDataLsb    = 0x1E,
-		TempDataMsb    = 0x1F,
-		PressDataXlsb  = 0x20,
-		PressDataLsb   = 0x21,
-		PressDataMsb   = 0x22,
-		IntStatus      = 0x27,
-		Status         = 0x28,
-		FifoData       = 0x29,
-		NvmAddr        = 0x2B,
-		NvmDataLsb     = 0x2C,
-		NvmDataMsb     = 0x2D,
-		DspConfig      = 0x30,
-		DspIir         = 0x31,
-		OorThrPLsb     = 0x32,
-		OorThrPMsb     = 0x33,
-		OorRange       = 0x34,
-		OorConfig      = 0x35,
-		OsrConfig      = 0x36,
-		OdrConfig      = 0x37,
-		OsrEff         = 0x38,
-		Cmd            = 0x7E,
+		ChipId = 0x01,
+		RevId = 0x02,
+		ChipStatus = 0x11,
+		DriveConfig = 0x13,
+		IntConfig = 0x14,
+		IntSource = 0x15,
+		FifoConfig = 0x16,
+		FifoCount = 0x17,
+		FifoSel = 0x18,
+		TempDataXlsb = 0x1D,
+		TempDataLsb = 0x1E,
+		TempDataMsb = 0x1F,
+		PressDataXlsb = 0x20,
+		PressDataLsb = 0x21,
+		PressDataMsb = 0x22,
+		IntStatus = 0x27,
+		Status = 0x28,
+		FifoData = 0x29,
+		NvmAddr = 0x2B,
+		NvmDataLsb = 0x2C,
+		NvmDataMsb = 0x2D,
+		DspConfig = 0x30,
+		DspIir = 0x31,
+		OorThrPLsb = 0x32,
+		OorThrPMsb = 0x33,
+		OorRange = 0x34,
+		OorConfig = 0x35,
+		OsrConfig = 0x36,
+		OdrConfig = 0x37,
+		OsrEff = 0x38,
+		Cmd = 0x7E,
 	};
 
 	/// Power modes
 	enum class PowerMode : uint8_t
 	{
-		Standby    = 0b00,  //< Standby mode (default after reset)
-		Normal     = 0b01,  //< Normal mode (continuous measurement)
-		Forced     = 0b10,  //< Forced mode (single measurement)
+		Standby = 0b00,     //< Standby mode (default after reset)
+		Normal = 0b01,      //< Normal mode (continuous measurement)
+		Forced = 0b10,      //< Forced mode (single measurement)
 		Continuous = 0b11,  //< Continuous mode
 	};
 
 	/// Output data rate configuration
 	enum class Odr : uint8_t
 	{
-		Hz240    = 0x00,
-		Hz218    = 0x01,
-		Hz199    = 0x02,
-		Hz179    = 0x03,
-		Hz160    = 0x04,
-		Hz149    = 0x05,
-		Hz140    = 0x06,
-		Hz129    = 0x07,
-		Hz120    = 0x08,
-		Hz110    = 0x09,
-		Hz100    = 0x0A,
-		Hz89     = 0x0B,
-		Hz80     = 0x0C,
-		Hz70     = 0x0D,
-		Hz60     = 0x0E,
-		Hz50     = 0x0F,
-		Hz45     = 0x10,
-		Hz40     = 0x11,
-		Hz35     = 0x12,
-		Hz30     = 0x13,
-		Hz25     = 0x14,
-		Hz20     = 0x15,
-		Hz15     = 0x16,
-		Hz10     = 0x17,
-		Hz5      = 0x18,
-		Hz4      = 0x19,
-		Hz3      = 0x1A,
-		Hz2      = 0x1B,
-		Hz1      = 0x1C,
-		Hz0_5    = 0x1D,
-		Hz0_25   = 0x1E,
-		Hz0_125  = 0x1F,
+		Hz240 = 0x00,
+		Hz218 = 0x01,
+		Hz199 = 0x02,
+		Hz179 = 0x03,
+		Hz160 = 0x04,
+		Hz149 = 0x05,
+		Hz140 = 0x06,
+		Hz129 = 0x07,
+		Hz120 = 0x08,
+		Hz110 = 0x09,
+		Hz100 = 0x0A,
+		Hz89 = 0x0B,
+		Hz80 = 0x0C,
+		Hz70 = 0x0D,
+		Hz60 = 0x0E,
+		Hz50 = 0x0F,
+		Hz45 = 0x10,
+		Hz40 = 0x11,
+		Hz35 = 0x12,
+		Hz30 = 0x13,
+		Hz25 = 0x14,
+		Hz20 = 0x15,
+		Hz15 = 0x16,
+		Hz10 = 0x17,
+		Hz5 = 0x18,
+		Hz4 = 0x19,
+		Hz3 = 0x1A,
+		Hz2 = 0x1B,
+		Hz1 = 0x1C,
+		Hz0_5 = 0x1D,
+		Hz0_25 = 0x1E,
+		Hz0_125 = 0x1F,
 	};
 
 	/// Oversampling rate configuration
 	enum class Osr : uint8_t
 	{
-		X1   = 0b000,  //< No oversampling
-		X2   = 0b001,  //< 2x oversampling
-		X4   = 0b010,  //< 4x oversampling
-		X8   = 0b011,  //< 8x oversampling
-		X16  = 0b100,  //< 16x oversampling
-		X32  = 0b101,  //< 32x oversampling
-		X64  = 0b110,  //< 64x oversampling
+		X1 = 0b000,    //< No oversampling
+		X2 = 0b001,    //< 2x oversampling
+		X4 = 0b010,    //< 4x oversampling
+		X8 = 0b011,    //< 8x oversampling
+		X16 = 0b100,   //< 16x oversampling
+		X32 = 0b101,   //< 32x oversampling
+		X64 = 0b110,   //< 64x oversampling
 		X128 = 0b111,  //< 128x oversampling
 	};
 
 	/// IIR filter coefficient
 	enum class IirFilter : uint8_t
 	{
-		Bypass = 0b000,  //< No filtering
-		Coef1  = 0b001,  //< Coefficient 1
-		Coef3  = 0b010,  //< Coefficient 3
-		Coef7  = 0b011,  //< Coefficient 7
-		Coef15 = 0b100,  //< Coefficient 15
-		Coef31 = 0b101,  //< Coefficient 31
-		Coef63 = 0b110,  //< Coefficient 63
-		Coef127 = 0b111, //< Coefficient 127
+		Bypass = 0b000,   //< No filtering
+		Coef1 = 0b001,    //< Coefficient 1
+		Coef3 = 0b010,    //< Coefficient 3
+		Coef7 = 0b011,    //< Coefficient 7
+		Coef15 = 0b100,   //< Coefficient 15
+		Coef31 = 0b101,   //< Coefficient 31
+		Coef63 = 0b110,   //< Coefficient 63
+		Coef127 = 0b111,  //< Coefficient 127
 	};
 
 	/// Status register (0x28) bit definitions
 	enum class Status : uint8_t
 	{
-		CoreReady          = Bit0,  //< Digital core domain accessible
-		NvmReady           = Bit1,  //< Ready for NVM operations
-		NvmError           = Bit2,  //< NVM error detected
-		NvmCmdError        = Bit3,  //< Boot command error
-		BootErrCorrected   = Bit4,  //< ECC error corrected during boot
-		CrackPass          = Bit7,  //< Crack check passed
+		CoreReady = Bit0,         //< Digital core domain accessible
+		NvmReady = Bit1,          //< Ready for NVM operations
+		NvmError = Bit2,          //< NVM error detected
+		NvmCmdError = Bit3,       //< Boot command error
+		BootErrCorrected = Bit4,  //< ECC error corrected during boot
+		CrackPass = Bit7,         //< Crack check passed
 	};
 	MODM_FLAGS8(Status);
 
 	/// Interrupt status register (0x27) bit definitions
 	enum class IntStatus : uint8_t
 	{
-		DataReady      = Bit0,  //< Data ready interrupt
-		FifoFull       = Bit1,  //< FIFO full interrupt
-		FifoThreshold  = Bit2,  //< FIFO threshold interrupt
-		OorPressure    = Bit3,  //< Out-of-range pressure interrupt
-		PowerOnReset   = Bit4,  //< Power-on reset detected
+		DataReady = Bit0,      //< Data ready interrupt
+		FifoFull = Bit1,       //< FIFO full interrupt
+		FifoThreshold = Bit2,  //< FIFO threshold interrupt
+		OorPressure = Bit3,    //< Out-of-range pressure interrupt
+		PowerOnReset = Bit4,   //< Power-on reset detected
 	};
 	MODM_FLAGS8(IntStatus);
 
 	/// Interrupt source enable register (0x15) bit definitions
 	enum class IntSource : uint8_t
 	{
-		DataReadyEnable     = Bit0,  //< Enable data ready interrupt
-		FifoFullEnable      = Bit1,  //< Enable FIFO full interrupt
+		DataReadyEnable = Bit0,      //< Enable data ready interrupt
+		FifoFullEnable = Bit1,       //< Enable FIFO full interrupt
 		FifoThresholdEnable = Bit2,  //< Enable FIFO threshold interrupt
-		OorPressureEnable   = Bit3,  //< Enable OOR pressure interrupt
+		OorPressureEnable = Bit3,    //< Enable OOR pressure interrupt
 	};
 	MODM_FLAGS8(IntSource);
 
 	/// Interrupt configuration register (0x14) bit definitions
 	enum class IntConfig : uint8_t
 	{
-		Mode        = Bit0,  //< 0: Pulsed, 1: Latched
-		Polarity    = Bit1,  //< 0: Active low, 1: Active high
-		OpenDrain   = Bit2,  //< 0: Push-pull, 1: Open-drain
-		Enable      = Bit3,  //< Enable interrupt output
+		Mode = Bit0,       //< 0: Pulsed, 1: Latched
+		Polarity = Bit1,   //< 0: Active low, 1: Active high
+		OpenDrain = Bit2,  //< 0: Push-pull, 1: Open-drain
+		Enable = Bit3,     //< Enable interrupt output
 	};
 	MODM_FLAGS8(IntConfig);
 
 	/// OSR configuration register (0x36) bit definitions
 	enum class OsrConfig : uint8_t
 	{
-		OsrT0   = Bit0,  //< Temperature OSR bit 0
-		OsrT1   = Bit1,  //< Temperature OSR bit 1
-		OsrT2   = Bit2,  //< Temperature OSR bit 2
-		OsrP0   = Bit3,  //< Pressure OSR bit 0
-		OsrP1   = Bit4,  //< Pressure OSR bit 1
-		OsrP2   = Bit5,  //< Pressure OSR bit 2
+		OsrT0 = Bit0,    //< Temperature OSR bit 0
+		OsrT1 = Bit1,    //< Temperature OSR bit 1
+		OsrT2 = Bit2,    //< Temperature OSR bit 2
+		OsrP0 = Bit3,    //< Pressure OSR bit 0
+		OsrP1 = Bit4,    //< Pressure OSR bit 1
+		OsrP2 = Bit5,    //< Pressure OSR bit 2
 		PressEn = Bit6,  //< Pressure measurement enable
 	};
 	MODM_FLAGS8(OsrConfig);
@@ -207,14 +208,14 @@ struct bmp581
 	/// ODR configuration register (0x37) bit definitions
 	enum class OdrConfig : uint8_t
 	{
-		Mode0    = Bit0,  //< Power mode bit 0
-		Mode1    = Bit1,  //< Power mode bit 1
-		Odr0     = Bit2,  //< ODR bit 0
-		Odr1     = Bit3,  //< ODR bit 1
-		Odr2     = Bit4,  //< ODR bit 2
-		Odr3     = Bit5,  //< ODR bit 3
-		Odr4     = Bit6,  //< ODR bit 4
-		DeepDis  = Bit7,  //< Disable deep standby
+		Mode0 = Bit0,    //< Power mode bit 0
+		Mode1 = Bit1,    //< Power mode bit 1
+		Odr0 = Bit2,     //< ODR bit 0
+		Odr1 = Bit3,     //< ODR bit 1
+		Odr2 = Bit4,     //< ODR bit 2
+		Odr3 = Bit5,     //< ODR bit 3
+		Odr4 = Bit6,     //< ODR bit 4
+		DeepDis = Bit7,  //< Disable deep standby
 	};
 	MODM_FLAGS8(OdrConfig);
 
@@ -225,14 +226,14 @@ struct bmp581
 	/// DSP configuration register (0x30) bit definitions
 	enum class DspConfig : uint8_t
 	{
-		CompPtEn        = Bit0,  //< Enable pressure/temperature compensation
-		CompPtSel       = Bit1,  //< Compensation source selection
-		IirFlushForced  = Bit2,  //< IIR flush forced enable
-		ShdwSelIir_T    = Bit3,  //< IIR temperature shadow selection
-		FifoSelIir_T    = Bit4,  //< IIR temperature FIFO selection
-		ShdwSelIir_P    = Bit5,  //< IIR pressure shadow selection
-		FifoSelIir_P    = Bit6,  //< IIR pressure FIFO selection
-		OorSelIir_P     = Bit7,  //< IIR pressure OOR selection
+		CompPtEn = Bit0,        //< Enable pressure/temperature compensation
+		CompPtSel = Bit1,       //< Compensation source selection
+		IirFlushForced = Bit2,  //< IIR flush forced enable
+		ShdwSelIir_T = Bit3,    //< IIR temperature shadow selection
+		FifoSelIir_T = Bit4,    //< IIR temperature FIFO selection
+		ShdwSelIir_P = Bit5,    //< IIR pressure shadow selection
+		FifoSelIir_P = Bit6,    //< IIR pressure FIFO selection
+		OorSelIir_P = Bit7,     //< IIR pressure OOR selection
 	};
 	MODM_FLAGS8(DspConfig);
 
@@ -260,12 +261,10 @@ struct bmp581
 		getTemperature() const
 		{
 			int32_t raw = (static_cast<int32_t>(rawTemp[2]) << 16) |
-			              (static_cast<int32_t>(rawTemp[1]) << 8) |
-			              (static_cast<int32_t>(rawTemp[0]));
+						  (static_cast<int32_t>(rawTemp[1]) << 8) |
+						  (static_cast<int32_t>(rawTemp[0]));
 			// Sign-extend 24-bit signed value to 32-bit
-			if (raw & 0x00800000) {
-				raw |= 0xFF000000;
-			}
+			if (raw & 0x00800000) { raw |= 0xFF000000; }
 			return static_cast<float>(raw) / 65536.0f;
 		}
 
@@ -274,8 +273,8 @@ struct bmp581
 		getPressure() const
 		{
 			uint32_t raw = (static_cast<uint32_t>(rawPress[2]) << 16) |
-			               (static_cast<uint32_t>(rawPress[1]) << 8) |
-			               (static_cast<uint32_t>(rawPress[0]));
+						   (static_cast<uint32_t>(rawPress[1]) << 8) |
+						   (static_cast<uint32_t>(rawPress[0]));
 			return static_cast<float>(raw) / 64.0f;
 		}
 
@@ -296,7 +295,10 @@ struct bmp581
 protected:
 	/// @cond
 	static constexpr uint8_t
-	i(Register reg) { return static_cast<uint8_t>(reg); }
+	i(Register reg)
+	{
+		return static_cast<uint8_t>(reg);
+	}
 	/// @endcond
 };
 
@@ -311,7 +313,7 @@ protected:
  * - FIFO buffer (32 frames)
  * - Interrupt support
  *
- * Unlike older BMP sensors like the BMP085, the BMP581 outputs calibrated data directly, 
+ * Unlike older BMP sensors like the BMP085, the BMP581 outputs calibrated data directly,
  * which means no calibration coefficient compensation needs to be done in software.
  *
  * @tparam Transport Transport layer (use @ref Bmp581I2cTransport or @ref Bmp581SpiTransport)
@@ -425,8 +427,8 @@ private:
 	modm::PreciseTimeout timer_;
 };
 
-} // namespace modm
+}  // namespace modm
 
 #include "bmp581_impl.hpp"
 
-#endif // MODM_BMP581_HPP
+#endif  // MODM_BMP581_HPP

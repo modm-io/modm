@@ -28,7 +28,7 @@ Key features:
 - Interrupt support
 - Low power consumption
 
-Unlike older BMP sensors like the BMP085, the BMP581 outputs calibrated data directly, 
+Unlike older BMP sensors like the BMP085, the BMP581 outputs calibrated data directly,
 which means no calibration coefficient compensation needs to be done in software.
 
 [Datasheet](https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bmp581-ds004.pdf)
