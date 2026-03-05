@@ -21,8 +21,7 @@ namespace modm
 // ----------------------------------------------------------------------------
 
 template<typename I2cMaster>
-Bmp581I2cTransport<I2cMaster>::Bmp581I2cTransport(uint8_t address)
-	: I2cDevice<I2cMaster>(address)
+Bmp581I2cTransport<I2cMaster>::Bmp581I2cTransport(uint8_t address) : I2cDevice<I2cMaster>(address)
 {}
 
 template<typename I2cMaster>
