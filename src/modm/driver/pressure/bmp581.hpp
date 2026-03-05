@@ -296,22 +296,20 @@ struct bmp581
 		float
 		getTemperature() const
 		{
-			int32_t raw = (static_cast<int32_t>(rawTemp[2]) << 16) |
-						  (static_cast<int32_t>(rawTemp[1]) << 8) |
-						  (static_cast<int32_t>(rawTemp[0]));
-			// Sign-extend 24-bit signed value to 32-bit
-			if (raw & 0x00800000) { raw |= 0xFF000000; }
-			return static_cast<float>(raw) / 65536.0f;
+			const uint32_t u = (static_cast<uint32_t>(rawTemp[2]) << 24) |
+							   (static_cast<uint32_t>(rawTemp[1]) << 16) |
+							   (static_cast<uint32_t>(rawTemp[0]) << 8);
+			return static_cast<float>(static_cast<int32_t>(u)) / (65536.0f * 256.0f);
 		}
 
 		/// Get pressure in Pascals
 		float
 		getPressure() const
 		{
-			uint32_t raw = (static_cast<uint32_t>(rawPress[2]) << 16) |
-						   (static_cast<uint32_t>(rawPress[1]) << 8) |
-						   (static_cast<uint32_t>(rawPress[0]));
-			return static_cast<float>(raw) / 64.0f;
+			const uint32_t u = (static_cast<uint32_t>(rawPress[2]) << 24) |
+							   (static_cast<uint32_t>(rawPress[1]) << 16) |
+							   (static_cast<uint32_t>(rawPress[0]) << 8);
+			return static_cast<float>(static_cast<int32_t>(u)) / (64.0f * 256.0f);
 		}
 
 		/// Get pressure in hectopascals (hPa) / millibars (mbar)

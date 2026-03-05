@@ -9,6 +9,7 @@
  */
 // ----------------------------------------------------------------------------
 
+#include <atomic>
 #include <modm/board.hpp>
 #include <modm/driver/pressure/bmp581.hpp>
 
@@ -29,7 +30,7 @@ using Baro = modm::Bmp581<Transport>;
 // BMP581 I2C address (0x46 with SDO to GND, 0x47 with SDO to VDDIO)
 constexpr uint8_t BaroAddress = 0x47;
 Baro baro{BaroAddress};
-volatile bool dataReady = false;
+std::atomic<bool> dataReady{false};
 
 bool
 initializeBaro()

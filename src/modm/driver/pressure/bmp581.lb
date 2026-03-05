@@ -40,7 +40,7 @@ def prepare(module, options):
         ":architecture:register",
         ":architecture:spi.device",
         ":architecture:i2c.device",
-        ":processing:fiber",
+        ":architecture:fiber",
         ":processing:timer")
     return True
 

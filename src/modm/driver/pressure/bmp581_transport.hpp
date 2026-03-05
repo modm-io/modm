@@ -47,7 +47,7 @@ concept Bmp581Transport =
  * @tparam I2cMaster I2C master peripheral
  */
 template<typename I2cMaster>
-class Bmp581I2cTransport : public modm::I2cDevice<I2cMaster, 4>
+class Bmp581I2cTransport : public modm::I2cDevice<I2cMaster>
 {
 public:
 	/**
@@ -114,8 +114,6 @@ public:
 protected:
 	/// SPI read flag (bit 7 set for read operations)
 	static constexpr uint8_t ReadFlag = 0x80;
-
-	uint8_t buffer_[8];
 };
 
 /// @}
