@@ -1,0 +1,12 @@
+<library>
+  <extends>modm:nucleo-h723zg</extends>
+  <options>
+   <option name="modm:build:build.path">../../../build/nucleo_h723zg/bmp581</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:exti</module>
+    <module>modm:platform:i2c:2</module>
+    <module>modm:driver:bmp581</module>
+  </modules>
+</library>
