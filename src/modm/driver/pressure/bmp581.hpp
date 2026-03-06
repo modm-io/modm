@@ -299,7 +299,7 @@ struct bmp581
 			const uint32_t u = (static_cast<uint32_t>(rawTemp[2]) << 24) |
 							   (static_cast<uint32_t>(rawTemp[1]) << 16) |
 							   (static_cast<uint32_t>(rawTemp[0]) << 8);
-			return static_cast<float>(static_cast<int32_t>(u) / 256) / (65536.0f);
+			return static_cast<float>(static_cast<int32_t>(u) / 256) / 65536.0f;
 		}
 
 		/// Get pressure in Pascals
@@ -309,7 +309,7 @@ struct bmp581
 			const uint32_t u = (static_cast<uint32_t>(rawPress[2]) << 24) |
 							   (static_cast<uint32_t>(rawPress[1]) << 16) |
 							   (static_cast<uint32_t>(rawPress[0]) << 8);
-			return static_cast<float>(static_cast<int32_t>(u)) / (64.0f * 256.0f);
+			return static_cast<float>(static_cast<int32_t>(u) / 256) / 64.0f;
 		}
 
 		/// Get pressure in hectopascals (hPa) / millibars (mbar)
