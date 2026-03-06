@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2026, Christopher Durand
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:bmi270"
+    module.description = """\
+# BMI270 Inertial Measurement Unit
+
+[Datasheet](https://www.bosch-sensortec.com/products/motion-sensors/imus/bmi270/)
+"""
+
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:accessor",
+        ":architecture:gpio",
+        ":architecture:register",
+        ":architecture:spi.device",
+        ":architecture:i2c.device",
+        ":architecture:fiber",
+        ":math:geometry",
+        ":processing:timer")
+    return True
+
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/inertial"
+    env.copy("bmi270_transport.hpp")
+    env.copy("bmi270_transport_impl.hpp")
+    env.copy("bmi270.hpp")
+    env.copy("bmi270_impl.hpp")
+    env.copy("bmi270_calibration_impl.hpp")
+    env.copy("bmi270.cpp")
