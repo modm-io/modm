@@ -34,7 +34,26 @@ using namespace modm::literals;
 /// STM32F469 running at 180MHz from the external 8MHz crystal
 struct SystemClock
 {
-	static constexpr uint32_t Frequency = 180_MHz;
+	static constexpr uint32_t Hse = 8_MHz;
+	static constexpr Rcc::PllConfig pll{
+		.M = 4,   //   8 MHz /   4 =   2 MHz shared with PLLSAI
+		.N = 180, //   2 MHz * 180 = 360 MHz
+		.P = 2,   // 360 MHz /   2 = 180 MHz = F_cpu
+		.Q = 8,   // 360 MHz /   8 =  45 MHz
+	};
+	static constexpr Rcc::PllSaiConfig pllSai{
+		.N = 192, //   2 MHz * 192 = 384 MHz
+		.Q = 15,  // 384 MHz /  15 = 25.6 MHz
+		.P = 8,   // 384 MHz /   8 = 48 MHz = F_usb
+		.R = 7,   // 384 MHz /   7 = 54.857 MHz = F_ltdc
+	};
+	static constexpr uint32_t PllP = Hse / pll.M * pll.N / pll.P;
+	static constexpr uint32_t PllSaiP = Hse / pll.M * pllSai.N / pllSai.P;
+	static constexpr uint32_t PllSaiR = Hse / pll.M * pllSai.N / pllSai.R;
+	static_assert(PllP == Rcc::MaxFrequency);
+	static_assert(PllSaiR == 54.857142_MHz);
+
+	static constexpr uint32_t Frequency = PllP;
 	static constexpr uint32_t Apb1 = Frequency / 4;
 	static constexpr uint32_t Apb2 = Frequency / 2;
 
@@ -80,46 +99,30 @@ struct SystemClock
 	static constexpr uint32_t Timer13 = Apb1Timer;
 	static constexpr uint32_t Timer14 = Apb1Timer;
 
-	static constexpr uint32_t Usb = 48_MHz;
+	static constexpr uint32_t Usb = PllSaiP;
 	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
 	static constexpr uint32_t Rtc = 32.768_kHz;
 
 	static bool inline
 	enable()
 	{
-		Rcc::enableLowSpeedExternalCrystal();
-		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::LowSpeedExternalCrystal);
+		Rcc::enableLseCrystal();
+		Rcc::enableHseCrystal();
 
-		Rcc::enableExternalCrystal(); // 8 MHz
-		const Rcc::PllFactors pllFactors{
-			.pllM = 8,		// 8MHz / M=8 -> 1MHz   !!! Must be 1 MHz for PLLSAI !!!
-			.pllN = 360,	// 1MHz * N=360 -> 360MHz
-			.pllP = 2,		// 360MHz / P=2 -> 180MHz = F_cpu
-		};
-		Rcc::enablePll(Rcc::PllSource::ExternalCrystal, pllFactors);
-		// Required for 180 MHz clock
-		Rcc::enableOverdriveMode();
 		Rcc::setFlashLatency<Frequency>();
-		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
-		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div4);
-		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div2);
 		Rcc::updateCoreFrequency<Frequency>();
 
-		{
-			// LCD clock configuration
-			// PLLSAI_VCO Input = HSE_VALUE/PLL_M = 1 Mhz
-			// PLLSAI_VCO Output = PLLSAI_VCO Input * PLLSAIN = 384 Mhz
-			// PLLLCDCLK = PLLSAI_VCO Output/PLLSAIR = 384 MHz / 7 = 54.857 MHz
-			// LTDC clock frequency = PLLLCDCLK / LTDC_PLLSAI_DIVR_2 = 54.857 MHz / 2 = 27.429 MHz
-			RCC->PLLSAICFGR = (7 << 28) | (15 << 24) | (3 << 16) | (384 << 6);
-			// Select PLLSAI clock for 48MHz clocks
-			RCC->DCKCFGR |= RCC_DCKCFGR_CK48MSEL;
-			// Enable PLLSAI
-			RCC->CR |= RCC_CR_PLLSAION;
-			for (int t = 1'024; not (RCC->CR & RCC_CR_PLLSAIRDY) and t; t--) {
-				modm::delay_ms(1);
-			}
-		}
+		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
+		Rcc::setApb1Prescaler(Rcc::ApbPrescaler::Div4);
+		Rcc::setApb2Prescaler(Rcc::ApbPrescaler::Div2);
+
+		Rcc::enableOverdriveMode();
+		Rcc::enablePll(Rcc::PllSource::Hse, pll);
+		Rcc::enablePllSai(pllSai);
+		Rcc::enableSystemClock(Rcc::SystemClockSource::PllP);
+
+		Rcc::setRealTimeClockSource(Rcc::RealTimeClockSource::Lse);
+		Rcc::setClk48Source(Rcc::Clk48Source::PllSaiP);
 
 		return true;
 	}
@@ -239,11 +242,7 @@ initialize()
 	stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>();
 	stlink::Uart::initialize<SystemClock, 115200_Bd>();
 
-	LedGreen::setOutput(modm::Gpio::Low);
-	LedRed::setOutput(modm::Gpio::Low);
-	LedBlue::setOutput(modm::Gpio::Low);
-	LedOrange::setOutput(modm::Gpio::Low);
-
+	Leds::setOutput(modm::Gpio::Low);
 	Button::setInput();
 }
 

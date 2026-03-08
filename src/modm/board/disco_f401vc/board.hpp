@@ -33,29 +33,55 @@ namespace Board
 /// @{
 using namespace modm::literals;
 
-/// STM32F401 running at 168MHz generated from the external 8MHz crystal
+/// STM32F401 running at 84MHz generated from the external 8MHz crystal
 struct SystemClock
 {
 	static constexpr uint32_t Hse = 8_MHz;
-	static constexpr uint32_t Frequency = 84_MHz;
+	static constexpr Rcc::PllConfig pll
+	{
+		.M = 4,   //   8 MHz /   4 =   2 MHz
+		.N = 168, //   2 MHz * 168 = 336 MHz
+		.P = 4,   // 336 MHz /   4 =  84 MHz = F_cpu
+		.Q = 7,   // 336 MHz /   7 =  48 MHz
+	};
+	static constexpr uint32_t PllP = Hse / pll.M * pll.N / pll.P;
+	static constexpr uint32_t PllQ = Hse / pll.M * pll.N / pll.Q;
+	static_assert(PllP == Rcc::MaxFrequency);
+
+	static constexpr uint32_t Frequency = PllP;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency / 4;
 	static constexpr uint32_t Apb2 = Frequency / 2;
+	static constexpr uint32_t Ahb1 = Ahb;
+
+	static constexpr uint32_t Crc = Ahb1;
+	static constexpr uint32_t Dma1 = Ahb1;
+	static constexpr uint32_t Dma2 = Ahb1;
+	static constexpr uint32_t Flash = Ahb1;
+
+	static constexpr uint32_t I2c1 = Apb1;
+	static constexpr uint32_t I2c2 = Apb1;
+	static constexpr uint32_t I2c3 = Apb1;
+	static constexpr uint32_t I2s2Ext = Apb1;
+	static constexpr uint32_t I2s3Ext = Apb1;
+	static constexpr uint32_t IwdgBus = Apb1;
+	static constexpr uint32_t Pwr = Apb1;
+	static constexpr uint32_t RtcBus = Apb1;
+	static constexpr uint32_t Spi2 = Apb1;
+	static constexpr uint32_t Spi3 = Apb1;
+	static constexpr uint32_t Usart2 = Apb1;
+	static constexpr uint32_t Wwdg = Apb1;
 
 	static constexpr uint32_t Adc = Apb2;
-
-	static constexpr uint32_t Spi1   = Apb2;
-	static constexpr uint32_t Spi2   = Apb1;
-	static constexpr uint32_t Spi3   = Apb1;
-	static constexpr uint32_t Spi4   = Apb2;
-
+	static constexpr uint32_t Adc1 = Apb2;
+	static constexpr uint32_t Adc1Common = Apb2;
+	static constexpr uint32_t Exti = Apb2;
+	static constexpr uint32_t Sdio = Apb2;
+	static constexpr uint32_t Spi1 = Apb2;
+	static constexpr uint32_t Spi4 = Apb2;
+	static constexpr uint32_t Syscfg = Apb2;
 	static constexpr uint32_t Usart1 = Apb2;
-	static constexpr uint32_t Usart2 = Apb1;
-	static constexpr uint32_t Usart6 = Apb1;
-
-	static constexpr uint32_t I2c1   = Apb1;
-	static constexpr uint32_t I2c2   = Apb1;
-	static constexpr uint32_t I2c3   = Apb1;
+	static constexpr uint32_t Usart6 = Apb2;
 
 	static constexpr uint32_t Apb1Timer = Apb1 * 2;
 	static constexpr uint32_t Apb2Timer = Apb2 * 2;
@@ -71,34 +97,25 @@ struct SystemClock
 	static constexpr uint32_t Timer10 = Apb2Timer;
 	static constexpr uint32_t Timer11 = Apb2Timer;
 
-	static constexpr uint32_t Usb = 48_MHz;
+	static constexpr uint32_t Usb = PllQ;
 	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
 	static constexpr uint32_t Rtc = Hse / 25;
 
 	static bool inline
 	enable()
 	{
-		Rcc::enableExternalCrystal();	// 8MHz
-		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::ExternalClock, 25);
+		Rcc::enableHseCrystal();
 
-		const Rcc::PllFactors pllFactors{
-			.pllM = 4,		// 8MHz / M=4 -> 2MHz
-			.pllN = 168,	// 2MHz * N=168 -> 336MHz
-			.pllP = 4,		// 336MHz / P=4 ->  84MHz = F_cpu
-			.pllQ = 7		// 336MHz / Q=7 ->  48MHz = F_usb
-		};
-		Rcc::enablePll(Rcc::PllSource::ExternalCrystal, pllFactors);
-		// set flash latency for 84MHz
 		Rcc::setFlashLatency<Frequency>();
-		// switch system clock to PLL output
-		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
-		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
-		// APB1 has max. 42MHz
-		// APB2 has max. 84MHz
-		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div4);
-		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div2);
-		// update frequencies for busy-wait delay functions
 		Rcc::updateCoreFrequency<Frequency>();
+
+		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
+		Rcc::setApb1Prescaler(Rcc::ApbPrescaler::Div4);
+		Rcc::setApb2Prescaler(Rcc::ApbPrescaler::Div2);
+
+		Rcc::enablePll(Rcc::PllSource::Hse, pll);
+		Rcc::enableSystemClock(Rcc::SystemClockSource::PllP);
+		Rcc::setRealTimeClockSource(Rcc::RealTimeClockSource::Hse, 25);
 
 		return true;
 	}

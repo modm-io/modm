@@ -2,7 +2,6 @@
  * Copyright (c) 2016-2018, Niklas Hauser
  * Copyright (c) 2017, Sascha Schade
  * Copyright (c) 2018, Antal Szabó
- * Copyright (c) 2019 Sebastian Birke
  *
  * This file is part of the modm project.
  *
@@ -12,102 +11,89 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_STM32_NUCLEO_F446RE_HPP
-#define MODM_STM32_NUCLEO_F446RE_HPP
+#ifndef MODM_STM32_NUCLEO_F411RE_HPP
+#define MODM_STM32_NUCLEO_F411RE_HPP
 
 #include <modm/platform.hpp>
 #include <modm/architecture/interface/clock.hpp>
 #include <modm/debug/logger.hpp>
-/// @ingroup modm_board_nucleo_f446re
+/// @ingroup modm_board_nucleo_f4{{target.name}}re
 #define MODM_BOARD_HAS_LOGGER
 
 using namespace modm::platform;
 
 namespace Board
 {
-/// @ingroup modm_board_nucleo_f446re
+/// @ingroup modm_board_nucleo_f4{{target.name}}re
 /// @{
 using namespace modm::literals;
 
-/// STM32F446RE running at 180MHz generated from the internal 16MHz crystal
+/// STM32F4{{target.name}}RE running at {% if target.name == "11" %}100{% else %}84{% endif %}MHz generated from the internal 16MHz crystal
 struct SystemClock
 {
 	static constexpr uint32_t Lse = 32.768_kHz;
 	static constexpr Rcc::PllConfig pll
 	{
 		.M = 8,   //  16 MHz /   8 =   2 MHz
-		.N = 180, //   2 MHz * 180 = 360 MHz
-		.P = 2,   // 360 MHz /   2 = 180 MHz = F_cpu
-		.Q = 8,   // 360 MHz /   8 =  45 MHz
+%% if target.name == "11"
+		.N = 200, //   2 MHz * 200 = 400 MHz
+		.P = 4,   // 400 MHz /   4 = 100 MHz = F_cpu
+		.Q = 8,   // 400 MHz /   8 =  50 MHz
+%% else
+		.N = 168, //   2 MHz * 168 = 336 MHz
+		.P = 4,   // 336 MHz /   4 =  84 MHz = F_cpu
+		.Q = 7,   // 336 MHz /   7 =  48 MHz
+%% endif
 	};
 	static constexpr uint32_t PllP = Rcc::HsiFrequency / pll.M * pll.N / pll.P;
 	static_assert(PllP == Rcc::MaxFrequency);
 
 	static constexpr uint32_t Frequency = PllP;
 	static constexpr uint32_t Ahb = Frequency;
-	static constexpr uint32_t Apb1 = Frequency / 4;
-	static constexpr uint32_t Apb2 = Frequency / 2;
+	static constexpr uint32_t Apb1 = Frequency / 2;
+	static constexpr uint32_t Apb2 = Frequency;
 	static constexpr uint32_t Ahb1 = Ahb;
-	static constexpr uint32_t Ahb2 = Ahb;
 
 	static constexpr uint32_t Crc = Ahb1;
 	static constexpr uint32_t Dma1 = Ahb1;
 	static constexpr uint32_t Dma2 = Ahb1;
 	static constexpr uint32_t Flash = Ahb1;
 
-	static constexpr uint32_t Dcmi = Ahb2;
-
-	static constexpr uint32_t Can1 = Apb1;
-	static constexpr uint32_t Can2 = Apb1;
-	static constexpr uint32_t Cec = Apb1;
-	static constexpr uint32_t Dac = Apb1;
-	static constexpr uint32_t Fmpi2c1 = Apb1;
 	static constexpr uint32_t I2c1 = Apb1;
 	static constexpr uint32_t I2c2 = Apb1;
 	static constexpr uint32_t I2c3 = Apb1;
+	static constexpr uint32_t I2s2Ext = Apb1;
+	static constexpr uint32_t I2s3Ext = Apb1;
 	static constexpr uint32_t IwdgBus = Apb1;
 	static constexpr uint32_t Pwr = Apb1;
 	static constexpr uint32_t RtcBus = Apb1;
-	static constexpr uint32_t SpdifRx = Apb1;
 	static constexpr uint32_t Spi2 = Apb1;
 	static constexpr uint32_t Spi3 = Apb1;
 	static constexpr uint32_t Usart2 = Apb1;
-	static constexpr uint32_t Usart3 = Apb1;
-	static constexpr uint32_t Uart4 = Apb1;
-	static constexpr uint32_t Uart5 = Apb1;
 	static constexpr uint32_t Wwdg = Apb1;
 
 	static constexpr uint32_t Adc = Apb2;
 	static constexpr uint32_t Adc1 = Apb2;
-	static constexpr uint32_t Adc2 = Apb2;
-	static constexpr uint32_t Adc3 = Apb2;
-	static constexpr uint32_t Adc123Common = Apb2;
+	static constexpr uint32_t Adc1Common = Apb2;
 	static constexpr uint32_t Exti = Apb2;
-	static constexpr uint32_t Sai1 = Apb2;
-	static constexpr uint32_t Sai2 = Apb2;
 	static constexpr uint32_t Sdio = Apb2;
 	static constexpr uint32_t Spi1 = Apb2;
 	static constexpr uint32_t Spi4 = Apb2;
+	static constexpr uint32_t Spi5 = Apb2;
 	static constexpr uint32_t Syscfg = Apb2;
 	static constexpr uint32_t Usart1 = Apb2;
 	static constexpr uint32_t Usart6 = Apb2;
 
 	static constexpr uint32_t Apb1Timer = Apb1 * 2;
-	static constexpr uint32_t Apb2Timer = Apb2 * 2;
+	static constexpr uint32_t Apb2Timer = Apb2;
 	static constexpr uint32_t Timer1  = Apb2Timer;
 	static constexpr uint32_t Timer2  = Apb1Timer;
 	static constexpr uint32_t Timer3  = Apb1Timer;
 	static constexpr uint32_t Timer4  = Apb1Timer;
 	static constexpr uint32_t Timer5  = Apb1Timer;
-	static constexpr uint32_t Timer6  = Apb1Timer;
-	static constexpr uint32_t Timer7  = Apb1Timer;
-	static constexpr uint32_t Timer8  = Apb2Timer;
 	static constexpr uint32_t Timer9  = Apb2Timer;
 	static constexpr uint32_t Timer10 = Apb2Timer;
 	static constexpr uint32_t Timer11 = Apb2Timer;
-	static constexpr uint32_t Timer12 = Apb1Timer;
-	static constexpr uint32_t Timer13 = Apb1Timer;
-	static constexpr uint32_t Timer14 = Apb1Timer;
 
 	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
 	static constexpr uint32_t Rtc = Lse;
@@ -122,11 +108,10 @@ struct SystemClock
 		Rcc::updateCoreFrequency<Frequency>();
 
 		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
-		Rcc::setApb1Prescaler(Rcc::ApbPrescaler::Div4);
-		Rcc::setApb2Prescaler(Rcc::ApbPrescaler::Div2);
+		Rcc::setApb1Prescaler(Rcc::ApbPrescaler::Div2);
+		Rcc::setApb2Prescaler(Rcc::ApbPrescaler::Div1);
 
 		Rcc::enablePll(Rcc::PllSource::Hsi, pll);
-		Rcc::enableOverdriveMode();
 		Rcc::enableSystemClock(Rcc::SystemClockSource::PllP);
 		Rcc::setRealTimeClockSource(Rcc::RealTimeClockSource::Lse);
 
@@ -145,7 +130,7 @@ using Leds = SoftwareGpioPort< LedD13 >;
 
 namespace stlink
 {
-/// @ingroup modm_board_nucleo_f446re
+/// @ingroup modm_board_nucleo_f4{{target.name}}re
 /// @{
 using Rx = GpioInputA3;
 using Tx = GpioOutputA2;
@@ -153,7 +138,7 @@ using Uart = BufferedUart<UsartHal2, UartTxBuffer<2048>>;
 /// @}
 }
 
-/// @ingroup modm_board_nucleo_f446re
+/// @ingroup modm_board_nucleo_f4{{target.name}}re
 /// @{
 using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
 
@@ -172,4 +157,4 @@ initialize()
 
 }
 
-#endif	// MODM_STM32_NUCLEO_F446RE_HPP
+#endif	// MODM_STM32_NUCLEO_F411RE_HPP

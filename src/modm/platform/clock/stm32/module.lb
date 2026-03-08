@@ -146,7 +146,7 @@ def build(env):
                 ids += device.get_driver(driver).get("instance", [])
         return list(map(int, ids))
 
-    if t.family in ["h5", "u0", "g0", "u3", "c0", "f0", "l0", "f1", "f2", "f3", "u5"]:
+    if t.family in ["h5", "u0", "g0", "u3", "c0", "f0", "l0", "f1", "f2", "f3", "u5", "f4"]:
         p["uart_ids"] = instances("usart", "uart")
         p["lpuart_ids"] = instances("lpuart")
         p["spi_ids"] = instances("spi")
