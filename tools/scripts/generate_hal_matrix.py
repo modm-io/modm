@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# Copyright (c) 2018, Niklas Hauser
+# Copyright (c) 2018-2026, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -96,17 +96,22 @@ def hal_get_modules():
                 "eth": "Ethernet",
                 "random": "Random Generator",
                 "id": "Unique ID",
+                "power": "Power",
+                "pwr": "Power",
                 "rcc": "System Clock",
                 "gclk": "System Clock",
+                "hfclk": "System Clock",
                 "clocks": "System Clock",
                 "clockgen": "System Clock",
                 "extint": "External Interrupt",
                 "exti": "External Interrupt",
                 "fsmc": "External Memory",
                 "flash": "Internal Flash",
+                "iwdg": "Watchdog",
                 "timer": "Timer",
                 "i2c": "I<sup>2</sup>C",
-                "usart": "UART"
+                "usart": "UART",
+                "uarte": "UART",
             }
             mname = remap.get(mname, mname.upper())
             modules.add(mname)
@@ -115,26 +120,34 @@ def hal_get_modules():
         # External interrupt is currently part of the GPIO module
         if target.platform in ["avr"] and "GPIO" in modules:
             modules.add("External Interrupt")
+        # EasyDMA is part of the peripherals, thus not queryable
+        if target.platform in ["nrf"]:
+            modules.add("DMA")
 
         # print(target, dict(modules))
         print(target, end=" ", flush=True)
         all_targets[target] = (drivers, modules)
 
     # Some information cannot be extracted from the module.lb files
-    mapping["ADC"].add("afec")
+    mapping["ADC"].update({"afec", "saadc", "sdadc"})
     mapping["DAC"].add("dacc")
     mapping["Ethernet"].add("gmac")
     mapping["Random Generator"].add("trng")
-    mapping["UART"].update({"usi", "sercom"})
-    mapping["Timer"].update({"tc", "tcc", "timer"})
-    mapping["SPI"].add("sercom")
-    mapping["I<sup>2</sup>C"].update({"sercom", "twihs"})
-    mapping["USB"].update({"usb", "usbhs"})
+    mapping["UART"].update({"usi", "sercom", "uarte", "lpuart"})
+    mapping["Timer"].update({"tc", "tcc", "timer", "tim", "lptim", "hrtim"})
+    mapping["SPI"].update({"sercom", "spim", "spis"})
+    mapping["I<sup>2</sup>C"].update({"sercom", "twihs", "twi", "twim", "twis", "fmpi2c", "i2c"})
+    mapping["USB"].update({"usb", "usbhs", "usbd", "usb_otg_fs", "usb_otg_hs", "udp", "uhp", "utmi", "usb_dpram"})
     mapping["CAN"].update({"fdcan", "mcan"})
-    mapping["DMA"].update({"dmac", "xdmac", "gpdma"})
-    mapping["Comparator"].update({"ac", "acc"})
-    mapping["Internal Flash"].update({"efc", "nvmctrl"})
-    mapping["External Memory"].update({"sdramc", "smc", "quadspi", "xip_ssi", "octospi"})
+    mapping["DMA"].update({"dmac", "xdmac", "gpdma", "bdma", "dma", "hpdma", "lpdma", "mdma", "mem2mem"})
+    mapping["Comparator"].update({"ac", "acc", "lpcomp"})
+    mapping["External Interrupt"].update({"gpiote", "eic"})
+    mapping["Internal Flash"].update({"efc", "nvmctrl", "nvmc", "flash"})
+    mapping["External Memory"].update({"sdramc", "smc", "quadspi", "xip_ssi", "octospi", "qspi", "fmc", "fsmc", "xspi", "hspi", "octospim", "xspim", "sdio", "sdmmc", "ebi", "hsmci", "qmi", "xip", "xip_aux", "ssi"})
+    mapping["System Clock"].update({"clock", "oscillators", "rcc", "mclk", "pm", "sysctrl", "oscctrl", "osc32kctrl", "clocks", "resets", "rosc"})
+    mapping["Power"].update({"power", "regulators", "usbregulator", "vmc", "vreqctrl", "pwr", "supc", "powman", "psm", "vreg_and_chip_reset"})
+    mapping["Watchdog"].update({"wdt", "iwdg", "wwdg", "rswdt", "watchdog"})
+    mapping["Unique ID"].update({"ficr", "uicr", "chipid", "sysinfo", "otp", "otp_data", "otp_data_raw"})
 
     print(); print()
     return (all_targets, mapping)
@@ -228,7 +241,7 @@ def hal_format_tables():
     # tables["stm32"] = hal_create_table(targets, ["stm32"])
     # tables["sam"] = hal_create_table(targets, ["sam"])
 
-    tables["all"] = hal_create_table(targets, ["avr", "stm32", "sam", "rp"])
+    tables["all"] = hal_create_table(targets, ["avr", "stm32", "sam", "rp", "nrf"])
 
     return tables
 

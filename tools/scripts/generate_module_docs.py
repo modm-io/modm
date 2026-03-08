@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# Copyright (c) 2018, Niklas Hauser
+# Copyright (c) 2018-2026, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -367,6 +367,11 @@ if __name__ == "__main__":
     for target in otarget.values:
         if target.startswith("stm32"):
             targets["STMicroelectronics STM32"][target[:7].upper()][target[:9].upper()].append(target)
+        elif target.startswith("nrf"):
+            base = target.split("@", 1)[0]
+            prefix = base.split("-", 1)[0].upper()
+            family = prefix[:5]
+            targets["Nordic Semiconductor nRF"]["nRF5x"][family].append(target)
         elif target.startswith("sam"):
             targets["Microchip SAM"][target[:4].upper()][target[:6].upper()].append(target)
         elif target.startswith("at90"):

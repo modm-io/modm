@@ -108,6 +108,7 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <th align="center" colspan="18">STM32</th>
 <th align="center" colspan="4">SAM</th>
 <th align="center" colspan="1">RP</th>
+<th align="center" colspan="3">NRF</th>
 <th align="center" colspan="3">AT</th>
 </tr><tr>
 <th align="left">Peripheral</th>
@@ -134,6 +135,9 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <th align="center">E7x<br/>S7x<br/>V7x</th>
 <th align="center">G5x</th>
 <th align="center">20</th>
+<th align="center">51</th>
+<th align="center">52</th>
+<th align="center">53</th>
 <th align="center">90</th>
 <th align="center">Mega</th>
 <th align="center">Tiny</th>
@@ -165,6 +169,9 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">○</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
+<td align="center">○</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
 </tr><tr>
 <td align="left">CAN</td>
 <td align="center">✅</td>
@@ -188,6 +195,9 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✕</td>
 <td align="center">○</td>
 <td align="center">✅</td>
+<td align="center">✕</td>
+<td align="center">✕</td>
+<td align="center">✕</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
 <td align="center">○</td>
@@ -221,6 +231,9 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">○</td>
 <td align="center">○</td>
 <td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
 </tr><tr>
 <td align="left">DAC</td>
 <td align="center">✕</td>
@@ -244,6 +257,9 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">○</td>
 <td align="center">○</td>
 <td align="center">✅</td>
+<td align="center">✕</td>
+<td align="center">✕</td>
+<td align="center">✕</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
@@ -272,7 +288,10 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">○</td>
 <td align="center">○</td>
 <td align="center">✅</td>
-<td align="center">✕</td>
+<td align="center">○</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
@@ -305,6 +324,9 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✕</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
+<td align="center">✕</td>
+<td align="center">✕</td>
+<td align="center">✕</td>
 </tr><tr>
 <td align="left">External Interrupt</td>
 <td align="center">✅</td>
@@ -330,6 +352,9 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">○</td>
 <td align="center">○</td>
 <td align="center">✅</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
@@ -339,7 +364,7 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✕</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
-<td align="center">✕</td>
+<td align="center">○</td>
 <td align="center">✅</td>
 <td align="center">○</td>
 <td align="center">✕</td>
@@ -354,15 +379,21 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">○</td>
 <td align="center">○</td>
 <td align="center">✕</td>
+<td align="center">○</td>
+<td align="center">○</td>
 <td align="center">✕</td>
 <td align="center">○</td>
 <td align="center">✕</td>
-<td align="center">✕</td>
+<td align="center">○</td>
+<td align="center">○</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
 </tr><tr>
 <td align="left">GPIO</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
@@ -414,6 +445,9 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✅</td>
 <td align="center">○</td>
 <td align="center">✅</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
@@ -442,34 +476,40 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">○</td>
 <td align="center">○</td>
 <td align="center">✕</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
 </tr><tr>
-<td align="left">IWDG</td>
-<td align="center">✅</td>
-<td align="center">✅</td>
-<td align="center">✅</td>
-<td align="center">✅</td>
-<td align="center">✅</td>
-<td align="center">✅</td>
-<td align="center">✅</td>
-<td align="center">✅</td>
-<td align="center">✅</td>
-<td align="center">✅</td>
-<td align="center">✅</td>
-<td align="center">✅</td>
-<td align="center">✅</td>
-<td align="center">✅</td>
-<td align="center">✅</td>
-<td align="center">✅</td>
-<td align="center">✅</td>
-<td align="center">✅</td>
+<td align="left">Power</td>
+<td align="center">○</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
+<td align="center">✕</td>
+<td align="center">✕</td>
+<td align="center">✕</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">✕</td>
+<td align="center">✕</td>
+<td align="center">✕</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">✕</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
@@ -498,6 +538,9 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">○</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
@@ -521,6 +564,9 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
 <td align="center">○</td>
 <td align="center">○</td>
 <td align="center">○</td>
@@ -554,6 +600,9 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
@@ -582,9 +631,12 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
-<td align="center">✕</td>
-<td align="center">✕</td>
-<td align="center">✕</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
 </tr><tr>
 <td align="left">Timer</td>
 <td align="center">✅</td>
@@ -613,8 +665,14 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">○</td>
 <td align="center">○</td>
 <td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
 </tr><tr>
 <td align="left">UART</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
@@ -663,9 +721,12 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✅</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
-<td align="center">✕</td>
-<td align="center">✕</td>
-<td align="center">✕</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
@@ -695,8 +756,42 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✕</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
+<td align="center">✕</td>
+</tr><tr>
+<td align="left">Watchdog</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
+<td align="center">○</td>
 </tr>
 </table>
 <!--/alltable-->
