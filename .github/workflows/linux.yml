@@ -320,7 +320,7 @@ jobs:
       - name: Quick compile HAL for Cortex-M Part 1
         if: always()
         run: |
-          (cd test/all && python3 run_all.py stm32 sam rp --quick --split 4 --part 0)
+          (cd test/all && python3 run_all.py stm32 sam rp nrf --quick --split 4 --part 0)
       - name: Upload log artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -345,7 +345,7 @@ jobs:
       - name: Quick compile HAL for Cortex-M Part 2
         if: always()
         run: |
-          (cd test/all && python3 run_all.py stm32 sam rp --quick --split 4 --part 1)
+          (cd test/all && python3 run_all.py stm32 sam rp nrf --quick --split 4 --part 1)
       - name: Upload log artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -370,7 +370,7 @@ jobs:
       - name: Quick compile HAL for Cortex-M Part 3
         if: always()
         run: |
-          (cd test/all && python3 run_all.py stm32 sam rp --quick --split 4 --part 2)
+          (cd test/all && python3 run_all.py stm32 sam rp nrf --quick --split 4 --part 2)
       - name: Upload log artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -395,7 +395,7 @@ jobs:
       - name: Quick compile HAL for Cortex-M Part 4
         if: always()
         run: |
-          (cd test/all && python3 run_all.py stm32 sam rp --quick --split 4 --part 3)
+          (cd test/all && python3 run_all.py stm32 sam rp nrf --quick --split 4 --part 3)
       - name: Upload log artifacts
         uses: actions/upload-artifact@v4
         with:
