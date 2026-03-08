@@ -1,0 +1,155 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2020, Hannes Ellinger
+# Copyright (c) 2026, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+from collections import defaultdict, OrderedDict
+
+def port_ranges(gpios):
+    ports = {p: (32, 0) for p in set(p["port"] for p in gpios)}
+    for gpio in gpios:
+        pin = int(gpio["pin"])
+        pmin, pmax = ports[gpio["port"]]
+        ports[gpio["port"]] = (min(pin, pmin), max(pin, pmax))
+
+    ports = [{"name": k.upper(), "start": v[0], "width": v[1] - v[0] + 1} for k,v in ports.items()]
+    ports.sort(key=lambda p: p["name"])
+    return ports
+
+
+def translate(s):
+    name = ""
+    for part in s.split("_"):
+        name += part.capitalize()
+    return name
+
+
+def normalize_instance_value(instance):
+    if isinstance(instance, dict):
+        return instance.get("value")
+    return instance
+
+
+# -----------------------------------------------------------------------------
+def init(module):
+    module.name = ":platform:gpio"
+    module.description = "General Purpose I/O (GPIO)"
+
+
+def prepare(module, options):
+    module.depends(":architecture:register", ":architecture:gpio", ":cmsis:device", ":math:utils")
+    return options[":target"].has_driver("gpio:nrf*")
+
+
+def build(env):
+    device = env[":target"]
+    driver = device.get_driver("gpio")
+
+    driver_instances = {}
+    for drv in device._properties["driver"]:
+        name = drv["name"]
+        if name in driver_instances:
+            continue
+        resolved = device.get_driver(name)
+        if resolved is None:
+            continue
+        instances = listify(resolved.get("instance", []))
+        driver_instances[name] = [str(i) for i in instances if i is not None]
+
+    def signal_peripherals(signal):
+        dname = signal["driver"]
+        instance = signal.get("instance")
+
+        if instance is not None:
+            return [translate(dname) + translate(str(instance))]
+
+        instances = driver_instances.get(dname, [])
+        if len(instances):
+            return [translate(dname) + translate(i) for i in instances]
+        return [translate(dname)]
+
+    excluded_flexible_drivers = {"qspi"}
+    flexible_signals = []
+    for drv in device._properties["driver"]:
+        name = drv["name"]
+        if name in ["gpio", "core"] or name in excluded_flexible_drivers:
+            continue
+
+        signals = listify(drv.get("signal", []))
+        if not signals:
+            continue
+
+        instances = driver_instances.get(name, [])
+        if not instances:
+            instances = [None]
+
+        for instance in instances:
+            peripheral = translate(name) + (translate(instance) if instance is not None else "")
+            for signal in signals:
+                signal_name = (signal["name"] if isinstance(signal, dict) else signal).lower()
+                flexible_signals.append((peripheral, translate(signal_name)))
+
+    ranges = port_ranges(driver["gpio"])
+    ranges = [{"name": "P" + p["name"], "start": p["start"], "width": p["width"]} for p in ranges]
+    ports = OrderedDict([(k, i) for i, k in enumerate([p["name"] for p in ranges])])
+
+    all_signals = set()
+    gpios = []
+    for gpio in driver["gpio"]:
+        signals = defaultdict(list)
+        for signal in gpio.get("signal", []):
+            name = translate(signal["name"].lower())
+            for driver_name in signal_peripherals(signal):
+                signals[name].append({
+                    "driver": driver_name,
+                    "name": name,
+                })
+
+        for driver_name, signal_name in flexible_signals:
+            existing = set(s["driver"] for s in signals[signal_name])
+            if driver_name in existing:
+                continue
+            signals[signal_name].append({
+                "driver": driver_name,
+                "name": signal_name,
+            })
+
+        all_signals.update(signals.keys())
+        gpios.append({
+            "gpio": gpio,
+            "signals": signals,
+        })
+
+    subs = device.properties
+    subs["target"] = device.identifier
+    subs["driver"] = driver
+    subs["gpios"] = gpios
+    subs["ranges"] = ranges
+    subs["ports"] = ports
+    subs["port_width"] = 32
+    subs["all_signals"] = sorted(list(all_signals))
+
+    env.substitutions = subs
+    env.outbasepath = "modm/src/modm/platform/gpio"
+
+    env.template("data.hpp.in")
+    env.template("static.hpp.in")
+    env.template("../common/pins.hpp.in", "pin.hpp")
+    env.template("../common/pins.hpp.in", "pins.hpp")
+    env.template("../common/unused.hpp.in", "unused.hpp")
+    env.copy("../common/inverted.hpp", "inverted.hpp")
+    env.template("base.hpp.in")
+    env.template("set.hpp.in")
+    env.template("port.hpp.in")
+    env.template("software_port.hpp.in")
+    env.template("../common/port_shim.hpp.in", "port_shim.hpp")
+    env.template("../common/connector.hpp.in", "connector.hpp",
+                 filters={"formatPeripheral": "", "printSignalMap": ""})

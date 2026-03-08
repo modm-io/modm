@@ -1,0 +1,248 @@
+/*
+ * Copyright (c) 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+namespace modm::platform
+{
+
+inline void
+{{ hal }}::enable()
+{
+	NRF_UARTE{{ id }}->ENABLE = UARTE_ENABLE_ENABLE_Enabled;
+	txBusy = false;
+	rxReady = false;
+	rxEnabled = false;
+	rxArmed = false;
+}
+
+inline void
+{{ hal }}::disable()
+{
+	NRF_UARTE{{ id }}->TASKS_STOPTX = 1;
+	NRF_UARTE{{ id }}->TASKS_STOPRX = 1;
+	NRF_UARTE{{ id }}->ENABLE = 0;
+	NRF_UARTE{{ id }}->PSEL.TXD = uint32_t(-1);
+	NRF_UARTE{{ id }}->PSEL.RXD = uint32_t(-1);
+	NRF_UARTE{{ id }}->PSEL.RTS = uint32_t(-1);
+	NRF_UARTE{{ id }}->PSEL.CTS = uint32_t(-1);
+}
+
+inline void
+{{ hal }}::enableOperation()
+{
+	setReceiverEnable(true);
+	setTransmitterEnable(true);
+}
+
+inline void
+{{ hal }}::disableOperation()
+{
+	setReceiverEnable(false);
+	setTransmitterEnable(false);
+}
+
+template< class SystemClock, baudrate_t baudrate, percent_t tolerance >
+inline void
+{{ hal }}::initialize(Parity parity, WordLength)
+{
+	constexpr uint32_t baudRegister = baudrateRegisterValue(SystemClock::{{ uart_peripheral }}, baudrate);
+	constexpr uint32_t achievedBaudrate = baudrateFromRegister(SystemClock::{{ uart_peripheral }}, baudRegister);
+	modm::PeripheralDriver::assertBaudrateInTolerance<achievedBaudrate, baudrate, tolerance>();
+
+	enable();
+	NRF_UARTE{{ id }}->BAUDRATE = baudRegister;
+	NRF_UARTE{{ id }}->CONFIG = (static_cast<uint32_t>(parity) << UARTE_CONFIG_PARITY_Pos);
+	acknowledgeInterruptFlags(InterruptFlag::OverrunError | InterruptFlag::FramingError | InterruptFlag::ParityError);
+}
+
+inline void
+{{ hal }}::connectPins(uint32_t tx, uint32_t rx, uint32_t rts, uint32_t cts)
+{
+	NRF_UARTE{{ id }}->PSEL.TXD = tx;
+	NRF_UARTE{{ id }}->PSEL.RXD = rx;
+	NRF_UARTE{{ id }}->PSEL.RTS = rts;
+	NRF_UARTE{{ id }}->PSEL.CTS = cts;
+}
+
+inline void
+{{ hal }}::write(uint16_t data)
+{
+	txByte = static_cast<uint8_t>(data);
+	(void)startWriteBuffer(reinterpret_cast<const uint8_t*>(&txByte), 1);
+}
+
+inline bool
+{{ hal }}::startWriteBuffer(const uint8_t *data, std::size_t length)
+{
+	if ((length == 0) or txBusy) {
+		return false;
+	}
+	txBusy = true;
+	NRF_UARTE{{ id }}->EVENTS_ENDTX = 0;
+	NRF_UARTE{{ id }}->TXD.PTR = reinterpret_cast<uint32_t>(data);
+	NRF_UARTE{{ id }}->TXD.MAXCNT = length;
+	NRF_UARTE{{ id }}->TASKS_STARTTX = 1;
+	return true;
+}
+
+inline bool
+{{ hal }}::completedWriteBuffer()
+{
+	if (txBusy and NRF_UARTE{{ id }}->EVENTS_ENDTX != 0) {
+		NRF_UARTE{{ id }}->EVENTS_ENDTX = 0;
+		txBusy = false;
+		return true;
+	}
+	return false;
+}
+
+inline void
+{{ hal }}::read(uint8_t &data)
+{
+	if (NRF_UARTE{{ id }}->EVENTS_ENDRX != 0) {
+		NRF_UARTE{{ id }}->EVENTS_ENDRX = 0;
+		rxArmed = false;
+		rxReady = true;
+	}
+	data = rxByte;
+	rxReady = false;
+	if (rxEnabled and not rxArmed) {
+		armRx();
+	}
+}
+
+inline void
+{{ hal }}::read(uint16_t &data)
+{
+	uint8_t value;
+	read(value);
+	data = value;
+}
+
+inline void
+{{ hal }}::setTransmitterEnable(bool enable)
+{
+	if (enable) NRF_UARTE{{ id }}->TASKS_STARTTX = 1;
+	else NRF_UARTE{{ id }}->TASKS_STOPTX = 1;
+}
+
+inline void
+{{ hal }}::setReceiverEnable(bool enable)
+{
+	rxEnabled = enable;
+	if (enable) {
+		armRx();
+	}
+	else {
+		rxArmed = false;
+		NRF_UARTE{{ id }}->TASKS_STOPRX = 1;
+	}
+}
+
+inline bool
+{{ hal }}::isReceiveRegisterNotEmpty()
+{
+	if (NRF_UARTE{{ id }}->EVENTS_ENDRX != 0) {
+		NRF_UARTE{{ id }}->EVENTS_ENDRX = 0;
+		rxArmed = false;
+		rxReady = true;
+	}
+	return rxReady;
+}
+
+inline bool
+{{ hal }}::isTransmitRegisterEmpty()
+{
+	if (txBusy and NRF_UARTE{{ id }}->EVENTS_ENDTX != 0) {
+		NRF_UARTE{{ id }}->EVENTS_ENDTX = 0;
+		txBusy = false;
+	}
+	return not txBusy;
+}
+
+inline bool
+{{ hal }}::isTransmissionComplete()
+{
+	return isTransmitRegisterEmpty();
+}
+
+inline void
+{{ hal }}::enableInterruptVector(bool enable, uint32_t priority)
+{
+	if (enable) {
+		setInterruptPriority(priority);
+%% if irq
+		NVIC_EnableIRQ({{ irq }}_IRQn);
+%% endif
+	}
+	else {
+%% if irq
+		NVIC_DisableIRQ({{ irq }}_IRQn);
+%% endif
+	}
+}
+
+inline void
+{{ hal }}::enableInterrupt(Interrupt_t interrupt)
+{
+	NRF_UARTE{{ id }}->INTENSET = interrupt.value;
+}
+
+inline void
+{{ hal }}::disableInterrupt(Interrupt_t interrupt)
+{
+	NRF_UARTE{{ id }}->INTENCLR = interrupt.value;
+}
+
+inline void
+{{ hal }}::setInterruptPriority(uint32_t priority)
+{
+%% if irq
+	NVIC_SetPriority({{ irq }}_IRQn, priority);
+%% else
+	(void) priority;
+%% endif
+}
+
+inline {{ hal }}::InterruptFlag_t
+{{ hal }}::getInterruptFlags()
+{
+	uint32_t flags = NRF_UARTE{{ id }}->ERRORSRC;
+	if (isReceiveRegisterNotEmpty()) {
+		flags |= static_cast<uint32_t>(InterruptFlag::RxNotEmpty);
+	}
+	if (isTransmitRegisterEmpty()) {
+		flags |= static_cast<uint32_t>(InterruptFlag::TxEmpty);
+	}
+	return InterruptFlag_t(flags);
+}
+
+inline void
+{{ hal }}::acknowledgeInterruptFlags(InterruptFlag_t flags)
+{
+	if (flags.any(InterruptFlag::OverrunError)) NRF_UARTE{{ id }}->ERRORSRC = static_cast<uint32_t>(InterruptFlag::OverrunError);
+	if (flags.any(InterruptFlag::FramingError)) NRF_UARTE{{ id }}->ERRORSRC = static_cast<uint32_t>(InterruptFlag::FramingError);
+	if (flags.any(InterruptFlag::ParityError)) NRF_UARTE{{ id }}->ERRORSRC = static_cast<uint32_t>(InterruptFlag::ParityError);
+}
+
+inline void
+{{ hal }}::armRx()
+{
+	if (rxArmed) {
+		return;
+	}
+	rxArmed = true;
+	NRF_UARTE{{ id }}->EVENTS_ENDRX = 0;
+	NRF_UARTE{{ id }}->RXD.PTR = reinterpret_cast<uint32_t>(&rxByte);
+	NRF_UARTE{{ id }}->RXD.MAXCNT = 1;
+	NRF_UARTE{{ id }}->TASKS_STARTRX = 1;
+}
+
+}

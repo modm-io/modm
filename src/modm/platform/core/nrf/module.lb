@@ -1,0 +1,89 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2020, Hannes Ellinger
+# Copyright (c) 2026, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+import math
+
+def init(module):
+    module.name = ":platform:core"
+    module.description = FileReader("module.md")
+
+def prepare(module, options):
+    if options[":target"].identifier.platform != "nrf":
+        return False
+
+    module.add_option(
+        BooleanOption(
+            name="enable_icache",
+            description=enable_icache_descr,
+            default=True))
+
+    module.depends(":platform:cortex-m")
+    return True
+
+
+def build(env):
+    target = env[":target"].identifier
+
+    reset_pin = None
+    if target.family == "52":
+        reset_pin = 18 if target.series in ("820", "833", "840") else 21
+
+    has_nvmc_icache = (
+        (target.family == "52" and target.series in ("832", "833", "840")) or
+        (target.family == "53" and target.core == "net")
+    )
+    has_cache_peripheral = (target.family == "53" and target.core == "app")
+
+    env.substitutions = {
+        "target": target,
+        "reset_pin": reset_pin,
+        "enable_icache": env.get("enable_icache", False),
+        "has_nvmc_icache": has_nvmc_icache,
+        "has_cache_peripheral": has_cache_peripheral,
+    }
+    env.outbasepath = "modm/src/modm/platform/core"
+    # startup helper code
+    env.template("startup_platform.c.in")
+
+    # us_shift is an optimization to limit error via fractional math
+    frequency = 64e6
+    us_shift = 32 - math.ceil(math.log2(frequency))
+
+    env.substitutions.update({
+        "with_cm0": env[":target"].has_driver("core:cortex-m0*"),
+        "with_cm7": env[":target"].has_driver("core:cortex-m7*"),
+        "loop": 4,
+        "shift": 4,
+        "us_shift": us_shift,
+        "with_assert": env.has_module(":architecture:assert")
+    })
+    env.template("../cortex/delay_ns.cpp.in", "delay_ns.cpp")
+    env.template("../cortex/delay_ns.hpp.in", "delay_ns.hpp")
+    env.template("../cortex/delay_impl.hpp.in", "delay_impl.hpp")
+
+
+def post_build(env):
+    env.substitutions = env.query("::cortex-m:linkerscript")
+    env.substitutions.update(env.query("::cortex-m:vector_table"))
+    env.outbasepath = "modm/link"
+    env.template("../cortex/ram.ld.in", "linkerscript.ld")
+
+
+enable_icache_descr = """
+Enable instruction cache during startup.
+
+This enables the cache that exists on the selected target:
+- nRF52 (selected variants): NVMC instruction cache.
+- nRF5340 network core: NVMC instruction cache.
+- nRF5340 application core: CACHE peripheral.
+"""

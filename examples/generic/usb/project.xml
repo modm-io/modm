@@ -27,6 +27,8 @@
   <!-- <extends>modm:weact-h523ce</extends> -->
   <!-- <extends>modm:weact-h562rg</extends> -->
   <!-- <extends>modm:nucleo-u385rg-q</extends> -->
+  <!-- <extends>modm:nrf5340-dk</extends> -->
+  <!-- <extends>modm:nrf52840-dk</extends> -->
   <options>
     <option name="modm:build:build.path">../../../build/generic/usb</option>
     <option name="modm:tinyusb:config">device.cdc,device.msc</option>

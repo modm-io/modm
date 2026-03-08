@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2023, Niklas Hauser
+# Copyright (c) 2023-2026, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -38,6 +38,7 @@ export MODM_JLINK_BINARY=/path/to/other/JLinkGDBServer
 import os
 import time
 import signal
+import tempfile
 import platform
 import subprocess
 
@@ -90,6 +91,28 @@ def call(device, blocking=True, silent=False, verbose=False):
     return subprocess.Popen(command_jlink, **kwargs)
 
 
+def _call_commander(device, commands, verbose=True):
+    binary = "JLinkExe"
+    if "Windows" in platform.platform():
+        binary += ".exe"
+    binary = os.environ.get("MODM_JLINK_COMMANDER_BINARY", binary)
+
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".jlink") as script:
+        script.write("\n".join(commands) + "\n")
+        script.flush()
+        command = [
+            binary,
+            "-device", device,
+            "-if", "swd",
+            "-speed", "4000",
+            "-nogui", "1",
+            "-ExitOnError", "1",
+            "-CommandFile", script.name,
+        ]
+        if verbose: print(" ".join(command))
+        return subprocess.call(command, cwd=os.getcwd())
+
+
 # -----------------------------------------------------------------------------
 def itm(device, baudrate=None):
     command_jlink = "JLinkSWOViewerCL -device {} -itmport 0".format(device)
@@ -105,13 +128,12 @@ def rtt(backend, channel=0):
 
 
 # -----------------------------------------------------------------------------
-_RESET_QUIT = ["monitor reset", "disconnect", "set confirm off", "quit"]
 def program(device, source):
-    gdb.call(JLinkBackend(device), source, commands=["load"] + _RESET_QUIT)
+    return _call_commander(device, ["reset", f"loadfile {source}", "reset", "exit"])
 
 
 def reset(device):
-    gdb.call(JLinkBackend(device), commands=_RESET_QUIT)
+    return _call_commander(device, ["reset", "exit"])
 
 
 # -----------------------------------------------------------------------------

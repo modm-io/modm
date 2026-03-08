@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2017, Fabian Greif
-# Copyright (c) 2017-2018, Niklas Hauser
+# Copyright (c) 2017-2026, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -81,6 +81,7 @@ class DevicesCache(dict):
             "stm32h5", "stm32h7",
             "stm32l0", "stm32l1", "stm32l4", "stm32l5",
             "stm32u0", "stm32u3", "stm32u5",
+            "nrf51", "nrf52", "nrf53",
         )
         # Load and filter the device prefixes
         modm_db = json.loads((modm_devices / "db.json").read_text())

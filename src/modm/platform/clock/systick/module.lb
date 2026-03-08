@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2016-2018, 2020, Niklas Hauser
+# Copyright (c) 2016-2026, Niklas Hauser
 # Copyright (c) 2017, Fabian Greif
 #
 # This file is part of the modm project.
@@ -74,6 +74,9 @@ def build(env):
         freq = 100
     elif target.platform == "sam" and target.family == "d5x/e5x":
         # Up to 120MHz, but no /8 prescaler available!
+        freq = 8
+    elif target.platform == "nrf" and target.family == "53":
+        # Up to 128MHz
         freq = 8
     elif target.platform == "sam" and target.family == "e7x/s7x/v7x":
         # Up to 300MHz

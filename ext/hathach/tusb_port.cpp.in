@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2020, Erik Henriksson
- * Copyright (c) 2020, 2024, Niklas Hauser
+ * Copyright (c) 2020-2026, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -22,6 +22,52 @@ MODM_ISR({{irq}})
 	tusb_int_handler({{port}}, true);
 }
 %% endfor
+
+%% if target.platform == "nrf"
+extern "C" void tusb_hal_nrf_power_event(uint32_t event);
+
+static inline void
+modm_tusb_nrf_power_events()
+{
+	// TinyUSB expects 0=Detected, 1=Removed, 2=Ready.
+%% if target.family == "52"
+	if (NRF_POWER->EVENTS_USBDETECTED) {
+		NRF_POWER->EVENTS_USBDETECTED = 0;
+		tusb_hal_nrf_power_event(0);
+	}
+	if (NRF_POWER->EVENTS_USBREMOVED) {
+		NRF_POWER->EVENTS_USBREMOVED = 0;
+		tusb_hal_nrf_power_event(1);
+	}
+	if (NRF_POWER->EVENTS_USBPWRRDY) {
+		NRF_POWER->EVENTS_USBPWRRDY = 0;
+		tusb_hal_nrf_power_event(2);
+	}
+
+%% elif target.family == "53"
+	if (NRF_USBREGULATOR->EVENTS_USBDETECTED) {
+		NRF_USBREGULATOR->EVENTS_USBDETECTED = 0;
+		tusb_hal_nrf_power_event(0);
+	}
+	if (NRF_USBREGULATOR->EVENTS_USBREMOVED) {
+		NRF_USBREGULATOR->EVENTS_USBREMOVED = 0;
+		tusb_hal_nrf_power_event(1);
+	}
+	if (NRF_USBREGULATOR->EVENTS_USBPWRRDY) {
+		NRF_USBREGULATOR->EVENTS_USBPWRRDY = 0;
+		tusb_hal_nrf_power_event(2);
+	}
+
+%% endif
+}
+
+%% for irq in power_irqs | sort
+MODM_ISR({{irq}})
+{
+	modm_tusb_nrf_power_events();
+}
+%% endfor
+%% endif
 
 %% if "samg55" in target.string
 
@@ -54,8 +100,7 @@ modm_ramcode void read_efc_uid(uint32_t *uid)
 extern "C" uint8_t
 tusb_get_device_serial(uint16_t *serial_str)
 {
-	constexpr uint8_t SERIAL_BYTE_LEN = 16;
-	uint8_t raw_id[SERIAL_BYTE_LEN];
+	uint8_t raw_id[16];
 
 %% if "samg55" in target.string
 	read_efc_uid((uint32_t*)raw_id);
@@ -66,6 +111,14 @@ tusb_get_device_serial(uint16_t *serial_str)
 	%% if target.platform in ["stm32"]
 		((uint32_t *) UID_BASE), ((uint32_t *) UID_BASE) + 1,
 		((uint32_t *) UID_BASE) + 2, ((uint32_t *) UID_BASE) + 3
+	%% elif target.platform in ["nrf"]
+		%% if target.family == "53"
+		((uint32_t *) NRF_FICR->INFO.DEVICEID), ((uint32_t *) NRF_FICR->INFO.DEVICEID) + 1,
+		((uint32_t *) NRF_FICR->INFO.DEVICEID) + 2, ((uint32_t *) NRF_FICR->INFO.DEVICEID) + 3,
+		%% else
+		((uint32_t *) NRF_FICR->DEVICEID), ((uint32_t *) NRF_FICR->DEVICEID) + 1,
+		((uint32_t *) &NRF_FICR->INFO.PART), ((uint32_t *) &NRF_FICR->INFO.VARIANT),
+		%% endif
 	%% elif target.platform in ["sam"]
 		%% if "samd51" in target.string or "same5" in target.string
 		(uint32_t *)0x008061FC, (uint32_t *)0x00806010,

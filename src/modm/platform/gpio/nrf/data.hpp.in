@@ -1,0 +1,78 @@
+/*
+ * Copyright (c) 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_NRF_GPIO_DATA_HPP
+#define MODM_NRF_GPIO_DATA_HPP
+
+#include "base.hpp"
+
+/// @cond
+namespace modm::platform::detail
+{
+
+template<class Signal, Peripheral p>
+struct SignalConnection;
+
+struct DataUnused {};
+%% for gpio in gpios
+%% set name = "P" ~ gpio.gpio.port | upper ~ "_" ~ gpio.gpio.pin
+%#
+struct Data{{ name }}
+{
+	static constexpr Gpio::Port port = Gpio::Port::P{{ gpio.gpio.port | upper }};
+	static constexpr uint8_t pin = {{ gpio.gpio.pin }};
+	struct BitBang {
+		using Data = Data{{ name }};
+		static constexpr Gpio::Signal Signal = Gpio::Signal::BitBang;
+		template<Peripheral peripheral>
+		inline static void connect() { static SignalConnection<BitBang, peripheral> check [[maybe_unused]]; }
+	};
+%% for signal_name in gpio.signals
+	struct {{ signal_name }} {
+		using Data = Data{{ name }};
+		static constexpr Gpio::Signal Signal = Gpio::Signal::{{ signal_name }};
+		template<Peripheral peripheral>
+		inline static void connect() { static SignalConnection<{{ signal_name }}, peripheral> check [[maybe_unused]]; }
+	};
+%% endfor
+};
+
+template<Peripheral p>
+struct SignalConnection<Data{{ name }}::BitBang, p>
+{
+	static_assert(p == Peripheral::BitBang,
+		"Gpio{{ name }}::BitBang only connects to software drivers!");
+};
+
+%% for signal_name, signal_group in gpio.signals.items()
+template<Peripheral p>
+struct SignalConnection<Data{{ name }}::{{ signal_name }}, p>
+{
+	static_assert((p == Peripheral::{{ signal_group | map(attribute="driver") | join(") or (p == Peripheral::") }}),
+		"Gpio{{ name }}::{{ signal_name }} only connects to {{ signal_group | map(attribute="driver") | join(" or ") }}!");
+};
+%% endfor
+
+template<>
+struct SignalConnection<Data{{ name }}::BitBang, Peripheral::BitBang> {};
+%% for signal_group in gpio.signals.values()
+	%% for signal in signal_group
+template<>
+struct SignalConnection<Data{{ name }}::{{ signal.name }}, Peripheral::{{ signal.driver }}> {};
+	%% endfor
+%% endfor
+
+%% endfor
+
+} // namespace modm::platform::detail
+/// @endcond
+
+#endif // MODM_NRF_GPIO_DATA_HPP

@@ -1,0 +1,95 @@
+/*
+ * Copyright (c) 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_NRF_{{ kind|upper }}HAL_{{ id }}_HPP
+#define MODM_NRF_{{ kind|upper }}HAL_{{ id }}_HPP
+
+#include <stdint.h>
+#include <cstddef>
+#include "../device.hpp"
+#include "uart_base.hpp"
+#include <modm/architecture/interface/peripheral.hpp>
+#include <modm/utils/inplace_function.hpp>
+
+namespace modm::platform
+{
+
+class {{ hal }} : public UartBase
+{
+public:
+	static const Peripheral UartPeripheral = Peripheral::{{ uart_peripheral }};
+	static inline modm::inplace_function<bool(bool)> InterruptCallback;
+
+	enum class
+	Interrupt : uint32_t
+	{
+		TxEmpty = UARTE_INTENSET_ENDTX_Msk,
+		RxNotEmpty = UARTE_INTENSET_ENDRX_Msk,
+		Error = UARTE_INTENSET_ERROR_Msk,
+	};
+	MODM_FLAGS32(Interrupt);
+
+	enum class
+	InterruptFlag : uint32_t
+	{
+		TxEmpty = UARTE_INTENSET_ENDTX_Msk,
+		RxNotEmpty = UARTE_INTENSET_ENDRX_Msk,
+		OverrunError = UARTE_ERRORSRC_OVERRUN_Msk,
+		FramingError = UARTE_ERRORSRC_FRAMING_Msk,
+		ParityError = UARTE_ERRORSRC_PARITY_Msk,
+	};
+	MODM_FLAGS32(InterruptFlag);
+
+	static inline void enable();
+	static inline void disable();
+	static inline void enableOperation();
+	static inline void disableOperation();
+
+	template< class SystemClock, baudrate_t baudrate, percent_t tolerance >
+	static inline void initialize(Parity parity, WordLength);
+
+	static inline void write(uint16_t data);
+	static inline void read(uint8_t &data);
+	static inline void read(uint16_t &data);
+	static inline bool startWriteBuffer(const uint8_t *data, std::size_t length);
+	static inline bool completedWriteBuffer();
+
+	static inline void setTransmitterEnable(bool enable);
+	static inline void setReceiverEnable(bool enable);
+	static inline void connectPins(uint32_t tx, uint32_t rx, uint32_t rts=0xfffffffful, uint32_t cts=0xfffffffful);
+
+	static inline bool isReceiveRegisterNotEmpty();
+	static inline bool isTransmitRegisterEmpty();
+	static inline bool isTransmissionComplete();
+
+	static inline void enableInterruptVector(bool enable, uint32_t priority);
+	static inline void enableInterrupt(Interrupt_t interrupt);
+	static inline void disableInterrupt(Interrupt_t interrupt);
+	static inline void setInterruptPriority(uint32_t priority);
+
+	static inline InterruptFlag_t getInterruptFlags();
+	static inline void acknowledgeInterruptFlags(InterruptFlag_t flags);
+
+private:
+	static inline uint8_t txByte;
+	static inline uint8_t rxByte;
+	static inline bool txBusy = false;
+	static inline bool rxReady = false;
+	static inline bool rxEnabled = false;
+	static inline bool rxArmed = false;
+	static inline void armRx();
+};
+
+} // namespace modm::platform
+
+#include "{{ kind }}_hal_{{ id }}_impl.hpp"
+
+#endif

@@ -1,0 +1,61 @@
+/*
+ * Copyright (c) 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <modm/platform/device.hpp>
+#include <modm/platform/gpio/base.hpp>
+
+namespace modm::platform
+{
+
+/// @ingroup modm_platform_usb
+class Usb
+{
+public:
+	template<class SystemClock>
+	static void
+	initialize(uint8_t priority=3)
+	{
+%% for irq in irqs | sort
+		NVIC_SetPriority({{ irq }}_IRQn, priority);
+%% endfor
+%% for irq in power_irqs | sort
+		NVIC_SetPriority({{ irq }}_IRQn, priority);
+		NVIC_EnableIRQ({{ irq }}_IRQn);
+%% endfor
+%#
+%% if target.family == "52"
+		NRF_POWER->EVENTS_USBDETECTED = 0;
+		NRF_POWER->EVENTS_USBPWRRDY = 0;
+		NRF_POWER->EVENTS_USBREMOVED = 0;
+		NRF_POWER->INTENSET = POWER_INTENSET_USBDETECTED_Msk |
+			POWER_INTENSET_USBPWRRDY_Msk |
+			POWER_INTENSET_USBREMOVED_Msk;
+%% elif target.family == "53"
+		NRF_USBREGULATOR->EVENTS_USBDETECTED = 0;
+		NRF_USBREGULATOR->EVENTS_USBPWRRDY = 0;
+		NRF_USBREGULATOR->EVENTS_USBREMOVED = 0;
+		NRF_USBREGULATOR->INTENSET = USBREG_INTENSET_USBDETECTED_Msk |
+			USBREG_INTENSET_USBPWRRDY_Msk |
+			USBREG_INTENSET_USBREMOVED_Msk;
+%% endif
+	}
+
+	template<class... Signals>
+	static void
+	connect()
+	{
+		(GpioStatic<typename Signals::Data>::disconnect(), ...);
+	}
+};
+
+} // namespace modm::platform

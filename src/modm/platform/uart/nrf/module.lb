@@ -1,0 +1,128 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2026, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+props = {}
+
+
+def _translate(name):
+    return name.replace("_", "").capitalize()
+
+
+def _instance_value(instance):
+    if isinstance(instance, dict):
+        return instance.get("value")
+    return instance
+
+
+def _find_irq(core_vectors, kind, instance):
+    instance = str(instance)
+    candidates = ["UART{}".format(instance), "SERIAL{}".format(instance)]
+
+    for vector in core_vectors:
+        vname = vector["name"].upper()
+        for candidate in candidates:
+            if candidate in vname:
+                return vector["name"]
+    return None
+
+
+class Instance(Module):
+    def __init__(self, kind, instance, irq):
+        self.kind = kind
+        self.instance = int(instance)
+        self.irq = irq
+
+    def init(self, module):
+        module.name = str(self.instance)
+        module.description = "{} instance {}".format(self.kind.upper(), self.instance)
+
+    def prepare(self, module, options):
+        return True
+
+    def build(self, env):
+        global props
+
+        kind_name = _translate(self.kind)
+        suffix = "Hal{}".format(self.instance)
+
+        local = dict(props)
+        local.update({
+            "kind": self.kind,
+            "id": self.instance,
+            "name": "{}{}".format(kind_name, self.instance),
+            "hal": "{}{}".format(kind_name, suffix),
+            "irq": self.irq,
+            "uart_peripheral": "{}{}".format(kind_name, self.instance),
+        })
+
+        env.substitutions = local
+        env.outbasepath = "modm/src/modm/platform/uart"
+
+        env.template("uart_hal.hpp.in", "{}_hal_{}.hpp".format(self.kind, self.instance))
+        env.template("uart_hal_impl.hpp.in", "{}_hal_{}_impl.hpp".format(self.kind, self.instance))
+        env.template("uart.cpp.in", "{}_{}.cpp".format(self.kind, self.instance))
+
+
+def init(module):
+    module.name = ":platform:uart"
+    module.description = "Universal Asynchronous Receiver Transmitter (UART)"
+
+
+def prepare(module, options):
+    device = options[":target"]
+    if not device.has_driver("uart:nrf*"):
+        return False
+
+    module.depends(
+        ":architecture:atomic",
+        ":architecture:interrupt",
+        ":architecture:register",
+        ":architecture:uart",
+        ":architecture:fiber",
+        ":math:algorithm",
+        ":cmsis:device",
+        ":platform:gpio",
+        ":utils")
+
+    global props
+    props = {
+        "target": device.identifier,
+    }
+
+    core_vectors = device.get_driver("core").get("vector", [])
+
+    uart_instances = [_instance_value(i) for i in listify(device.get_driver("uart").get("instance", []))]
+    uarte_instances = []
+    if device.has_driver("uarte:nrf*"):
+        uarte_instances = [_instance_value(i) for i in listify(device.get_driver("uarte").get("instance", []))]
+
+    uarte_set = {str(i) for i in uarte_instances if i is not None}
+    selected_instances = [i for i in uart_instances if (i is not None) and (str(i) not in uarte_set)]
+
+    if not selected_instances:
+        return False
+
+    for instance in selected_instances:
+        irq = _find_irq(core_vectors, "uart", instance)
+        module.add_submodule(Instance("uart", instance, irq))
+
+    return True
+
+
+def build(env):
+    env.substitutions = props
+    env.outbasepath = "modm/src/modm/platform/uart"
+    device = env[":target"]
+    if not device.has_driver("uarte:nrf*"):
+        env.template("uart_base.hpp.in")
+        env.copy("uart.hpp")
+        env.copy("uart_buffer.hpp")

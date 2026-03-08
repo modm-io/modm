@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2017, Fabian Greif
-# Copyright (c) 2018, Niklas Hauser
+# Copyright (c) 2018-2026, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -63,6 +63,12 @@ def get_targets(prefix=None, short=False):
 
             elif target.platform == "sam":
                 short_id.naming_schema = "{platform}{family}{series}"
+
+            elif target.platform == "nrf":
+                if "@" in short_id.naming_schema:
+                    short_id.naming_schema = "{platform}{family}{series}@{core}"
+                else:
+                    short_id.naming_schema = "{platform}{family}{series}"
         else:
             # Remove temperature key for stm32
             if target.platform == "stm32":

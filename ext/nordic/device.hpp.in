@@ -1,0 +1,39 @@
+/*
+ * Copyright (c) 2020, Hannes Ellinger
+ * Copyright (c) 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_DEVICE_HPP
+#define MODM_DEVICE_HPP
+
+#define DONT_USE_CMSIS_INIT 1
+%% for define in defines
+#define {{ define }} 1
+%% endfor
+
+#include <stdint.h>
+// Defines for example the modm_always_inline macro
+#include <modm/architecture/utils.hpp>
+
+// Include external device headers:
+%% for header in headers
+#include <{{ header }}>
+%% endfor
+
+%% if target.family == "53"
+// Allow nRF5x drivers to be used with the nRF53 without modification.
+%% for peripheral in peripheral_aliases
+#ifndef {{ peripheral }}
+#define {{ peripheral }} {{ peripheral }}_{{ peripheral_alias_suffix }}
+#endif
+%% endfor
+%% endif
+
+#endif  // MODM_DEVICE_HPP

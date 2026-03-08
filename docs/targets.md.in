@@ -42,6 +42,14 @@ Identifier format example for `STM32G071GBU6N/revY`:
 ```
 The revision is optional, however, the device variant often means significant
 differences in pinout or peripherals, so check your device's identifier twice!
+%% elif "nRF" in platform
+Identifier format example for `NRF5340-XXAA@net`:
+```
+    nrf      53     40      xx      aa      net
+{platform}{family}{name}-{code}{package}@{core}
+```
+The core suffix is optional and only required for multi-core devices.
+You can select `@app` or `@net` on nRF53 targets.
 %% elif "SAM" in platform
 Identifier format example for `SAMD21G18A-AU`:
 ```

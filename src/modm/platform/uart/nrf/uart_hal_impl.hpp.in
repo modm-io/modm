@@ -1,0 +1,240 @@
+/*
+ * Copyright (c) 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+namespace modm::platform
+{
+
+inline void
+{{ hal }}::enable()
+{
+	NRF_UART{{ id }}->ENABLE = UART_ENABLE_ENABLE_Enabled;
+	NRF_UART{{ id }}->EVENTS_TXDRDY = 1;
+	NRF_UART{{ id }}->EVENTS_RXDRDY = 0;
+	txBusy = false;
+	rxEnabled = false;
+	txBuffer = nullptr;
+	txLength = 0;
+	txIndex = 0;
+}
+
+inline void
+{{ hal }}::disable()
+{
+	NRF_UART{{ id }}->TASKS_STOPTX = 1;
+	NRF_UART{{ id }}->TASKS_STOPRX = 1;
+	NRF_UART{{ id }}->ENABLE = 0;
+	NRF_UART{{ id }}->PSELTXD = uint32_t(-1);
+	NRF_UART{{ id }}->PSELRXD = uint32_t(-1);
+	NRF_UART{{ id }}->PSELRTS = uint32_t(-1);
+	NRF_UART{{ id }}->PSELCTS = uint32_t(-1);
+	txBusy = false;
+	txBuffer = nullptr;
+	txLength = 0;
+	txIndex = 0;
+}
+
+inline void
+{{ hal }}::enableOperation()
+{
+	setReceiverEnable(true);
+	setTransmitterEnable(true);
+}
+
+inline void
+{{ hal }}::disableOperation()
+{
+	setReceiverEnable(false);
+	setTransmitterEnable(false);
+}
+
+template< class SystemClock, baudrate_t baudrate, percent_t tolerance >
+inline void
+{{ hal }}::initialize(Parity parity, WordLength)
+{
+	constexpr uint32_t baudRegister = baudrateRegisterValue(SystemClock::{{ uart_peripheral }}, baudrate);
+	constexpr uint32_t achievedBaudrate = baudrateFromRegister(SystemClock::{{ uart_peripheral }}, baudRegister);
+	modm::PeripheralDriver::assertBaudrateInTolerance<achievedBaudrate, baudrate, tolerance>();
+
+	enable();
+	NRF_UART{{ id }}->BAUDRATE = baudRegister;
+	NRF_UART{{ id }}->CONFIG = (static_cast<uint32_t>(parity) << UART_CONFIG_PARITY_Pos);
+	acknowledgeInterruptFlags(InterruptFlag::OverrunError | InterruptFlag::FramingError | InterruptFlag::ParityError);
+}
+
+inline void
+{{ hal }}::connectPins(uint32_t tx, uint32_t rx, uint32_t rts, uint32_t cts)
+{
+	NRF_UART{{ id }}->PSELTXD = tx;
+	NRF_UART{{ id }}->PSELRXD = rx;
+	NRF_UART{{ id }}->PSELRTS = rts;
+	NRF_UART{{ id }}->PSELCTS = cts;
+}
+
+inline void
+{{ hal }}::write(uint16_t data)
+{
+	if (txBusy) {
+		return;
+	}
+	txBusy = true;
+	NRF_UART{{ id }}->EVENTS_TXDRDY = 0;
+	NRF_UART{{ id }}->TXD = static_cast<uint8_t>(data);
+}
+
+inline bool
+{{ hal }}::startWriteBuffer(const uint8_t *data, std::size_t length)
+{
+	if ((length == 0) or txBusy or (data == nullptr)) {
+		return false;
+	}
+	txBuffer = data;
+	txLength = length;
+	txIndex = 1;
+	txBusy = true;
+	NRF_UART{{ id }}->EVENTS_TXDRDY = 0;
+	NRF_UART{{ id }}->TXD = txBuffer[0];
+	return true;
+}
+
+inline bool
+{{ hal }}::completedWriteBuffer()
+{
+	if (txBusy and NRF_UART{{ id }}->EVENTS_TXDRDY != 0) {
+		NRF_UART{{ id }}->EVENTS_TXDRDY = 0;
+		if (txIndex < txLength) {
+			NRF_UART{{ id }}->TXD = txBuffer[txIndex++];
+		}
+		else {
+			txBusy = false;
+			txBuffer = nullptr;
+			txLength = 0;
+			txIndex = 0;
+			return true;
+		}
+	}
+	return false;
+}
+
+inline void
+{{ hal }}::read(uint8_t &data)
+{
+	data = static_cast<uint8_t>(NRF_UART{{ id }}->RXD);
+	NRF_UART{{ id }}->EVENTS_RXDRDY = 0;
+}
+
+inline void
+{{ hal }}::read(uint16_t &data)
+{
+	uint8_t value;
+	read(value);
+	data = value;
+}
+
+inline void
+{{ hal }}::setTransmitterEnable(bool enable)
+{
+	if (enable) NRF_UART{{ id }}->TASKS_STARTTX = 1;
+	else NRF_UART{{ id }}->TASKS_STOPTX = 1;
+}
+
+inline void
+{{ hal }}::setReceiverEnable(bool enable)
+{
+	rxEnabled = enable;
+	if (enable) {
+		NRF_UART{{ id }}->TASKS_STARTRX = 1;
+	}
+	else {
+		NRF_UART{{ id }}->TASKS_STOPRX = 1;
+	}
+}
+
+inline bool
+{{ hal }}::isReceiveRegisterNotEmpty()
+{
+	return NRF_UART{{ id }}->EVENTS_RXDRDY != 0;
+}
+
+inline bool
+{{ hal }}::isTransmitRegisterEmpty()
+{
+	if (txBusy) {
+		(void)completedWriteBuffer();
+	}
+	return not txBusy;
+}
+
+inline bool
+{{ hal }}::isTransmissionComplete()
+{
+	return isTransmitRegisterEmpty();
+}
+
+inline void
+{{ hal }}::enableInterruptVector(bool enable, uint32_t priority)
+{
+	if (enable) {
+		setInterruptPriority(priority);
+%% if irq
+		NVIC_EnableIRQ({{ irq }}_IRQn);
+%% endif
+	}
+	else {
+%% if irq
+		NVIC_DisableIRQ({{ irq }}_IRQn);
+%% endif
+	}
+}
+
+inline void
+{{ hal }}::enableInterrupt(Interrupt_t interrupt)
+{
+	NRF_UART{{ id }}->INTENSET = interrupt.value;
+}
+
+inline void
+{{ hal }}::disableInterrupt(Interrupt_t interrupt)
+{
+	NRF_UART{{ id }}->INTENCLR = interrupt.value;
+}
+
+inline void
+{{ hal }}::setInterruptPriority(uint32_t priority)
+{
+%% if irq
+	NVIC_SetPriority({{ irq }}_IRQn, priority);
+%% else
+	(void) priority;
+%% endif
+}
+
+inline {{ hal }}::InterruptFlag_t
+{{ hal }}::getInterruptFlags()
+{
+	uint32_t flags = NRF_UART{{ id }}->ERRORSRC;
+	if (isReceiveRegisterNotEmpty()) {
+		flags |= static_cast<uint32_t>(InterruptFlag::RxNotEmpty);
+	}
+	if (isTransmitRegisterEmpty()) {
+		flags |= static_cast<uint32_t>(InterruptFlag::TxEmpty);
+	}
+	return InterruptFlag_t(flags);
+}
+
+inline void
+{{ hal }}::acknowledgeInterruptFlags(InterruptFlag_t flags)
+{
+	if (flags.any(InterruptFlag::OverrunError)) NRF_UART{{ id }}->ERRORSRC = static_cast<uint32_t>(InterruptFlag::OverrunError);
+	if (flags.any(InterruptFlag::FramingError)) NRF_UART{{ id }}->ERRORSRC = static_cast<uint32_t>(InterruptFlag::FramingError);
+	if (flags.any(InterruptFlag::ParityError)) NRF_UART{{ id }}->ERRORSRC = static_cast<uint32_t>(InterruptFlag::ParityError);
+}
+
+}

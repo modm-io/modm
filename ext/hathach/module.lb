@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2020, 2024, Niklas Hauser
+# Copyright (c) 2020-2026, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -25,6 +25,7 @@ def prepare(module, options):
     has_otg_hs = device.has_driver("usb_otg_hs")
     has_otg_fs = device.has_driver("usb_otg_fs")
     if not (device.has_driver("usb") or
+            device.has_driver("usbd") or
             has_otg_fs or
             has_otg_hs or
             device.has_driver("udp") or
@@ -126,6 +127,11 @@ def build(env):
             tusb_config["TUD_OPT_RP2040_USB_DEVICE_UFRAME_FIX"] = "0"
             env.copy("tinyusb/src/portable/raspberrypi/rp2040/", "portable/raspberrypi/rp2040/")
 
+    elif target.platform == "nrf":
+        tusb_config["CFG_TUSB_MCU"] = "OPT_MCU_NRF5X"
+        tusb_config["CFG_TUD_NRF_NRFX_VERSION"] = "2"
+        env.copy("tinyusb/src/portable/nordic/nrf5x/", "portable/nordic/nrf5x/")
+
     # TinyUSB has a OS abstraction layer for FreeRTOS, but it is causes problems with modm
     # if env.has_module(":freertos"):
     #    tusb_config["CFG_TUSB_OS"] = "OPT_OS_FREERTOS"
@@ -186,12 +192,18 @@ def build(env):
                 endpoint_counter += 1
             endpoints[itf_prefix + "_IN"] = hex(0x80 | endpoint_counter)
 
+    power_irqs = []
     if target.platform == "stm32":
         irqs = []
         for port, uirqs in env.query(":platform:usb:irqs")["port_irqs"].items():
             port = {"fs": 0, "hs": 1}[port]
             if port in ports:
                 irqs.extend([(irq, port, ports[port]) for irq in uirqs])
+    elif target.platform == "nrf":
+        irqs = []
+        irq_data = env.query(":platform:usb:irqs")
+        irqs.extend([(irq, 0, ports[0]) for irq in irq_data.get("irqs", [])])
+        power_irqs = list(irq_data.get("power_irqs", []))
     elif target.platform == "sam" and target.family in ["g5x"]:
         irqs = [("UDP", 0, "d")]
     elif target.platform == "sam" and target.family in ["d5x/e5x"]:
@@ -206,6 +218,7 @@ def build(env):
         "target": target,
         "config": tusb_config,
         "irqs": irqs,
+        "power_irqs": power_irqs,
         "ports": ports,
         "with_debug": env.has_module(":debug"),
         "with_cdc": env.has_module(":tinyusb:device:cdc"),

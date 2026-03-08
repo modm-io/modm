@@ -1,0 +1,12 @@
+<library>
+  <extends>modm:nrf52840-dk</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nrf52840-dk/adc</option>
+  </options>
+  <modules>
+    <module>modm:processing:timer</module>
+    <module>modm:platform:power</module>
+    <module>modm:platform:adc</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

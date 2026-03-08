@@ -1,0 +1,138 @@
+/*
+ * Copyright (c) 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <modm/platform.hpp>
+#include <modm/debug.hpp>
+
+using namespace modm::platform;
+
+/// @ingroup modm_board_nrf5340_dk
+#define MODM_BOARD_HAS_LOGGER
+
+namespace Board
+{
+/// @ingroup modm_board_nrf5340_dk
+/// @{
+using namespace modm::literals;
+
+struct SystemClock
+{
+%% if target.core == "app"
+	static constexpr uint32_t Frequency = 128_MHz;
+%% else
+	static constexpr uint32_t Frequency = 64_MHz;
+%% endif
+	static constexpr uint32_t Uarte0 = 16_MHz;
+	static constexpr uint32_t Uarte1 = 16_MHz;
+
+	static bool inline
+	enable()
+	{
+%% if target.core == "app"
+		Hfcc::setPrescaler(Hfcc::Prescaler::Div1);
+%% endif
+		Hfcc::updateCoreFrequency<Frequency>();
+		return true;
+	}
+};
+
+using Led1 = GpioInverted<GpioOutputP0_28>;
+using Led2 = GpioInverted<GpioOutputP0_29>;
+using Led3 = GpioInverted<GpioOutputP0_30>;
+using Led4 = GpioInverted<GpioOutputP0_31>;
+using Leds = SoftwareGpioPort<Led4, Led3, Led2, Led1>;
+
+using Button1 = GpioInverted<GpioInputP0_23>;
+using Button2 = GpioInverted<GpioInputP0_24>;
+using Button3 = GpioInverted<GpioInputP0_8>;
+using Button4 = GpioInverted<GpioInputP0_9>;
+using Buttons = SoftwareGpioPort<Button4, Button3, Button2, Button1>;
+/// @}
+
+namespace uart
+{
+/// @ingroup modm_board_nrf5340_dk
+/// @{
+%% if target.core == "app"
+using Txd = GpioP1_1;
+using Rxd = GpioP1_0;
+using Uart = BufferedUart<UarteHal1, UartTxBuffer<2048>, UartRxBuffer<128>>;
+%% else
+using Txd = GpioP0_20;
+using Rxd = GpioP0_22;
+using Uart = BufferedUart<UarteHal0, UartTxBuffer<2048>, UartRxBuffer<128>>;
+%% endif
+/// @}
+}
+
+%% if target.core == "app"
+namespace usb
+{
+/// @ingroup modm_board_nrf5340_dk
+/// @{
+using Dm = GpioP0_24;
+using Dp = GpioP0_25;
+
+using Device = Usb;
+/// @}
+}
+%% endif
+
+/// @ingroup modm_board_nrf5340_dk
+/// @{
+using LoggerDevice = modm::IODeviceWrapper<uart::Uart, modm::IOBuffer::BlockIfFull>;
+
+inline void
+initialize()
+{
+	SystemClock::enable();
+	SysTickTimer::initialize<SystemClock>();
+
+%% if target.core == "app"
+    GpioP0_20::delegateToNetworkCore();
+    GpioP0_22::delegateToNetworkCore();
+    Led3::delegateToNetworkCore();
+    Led4::delegateToNetworkCore();
+    Button3::delegateToNetworkCore();
+    Button4::delegateToNetworkCore();
+
+    Led1::setOutput(modm::Gpio::Low);
+    Led2::setOutput(modm::Gpio::Low);
+    Button1::setInput(Gpio::InputType::PullUp);
+    Button2::setInput(Gpio::InputType::PullUp);
+%% else
+	modm::delay_ms(100);
+    Led3::setOutput(modm::Gpio::Low);
+    Led4::setOutput(modm::Gpio::Low);
+    Button3::setInput(Gpio::InputType::PullUp);
+    Button4::setInput(Gpio::InputType::PullUp);
+%% endif
+
+	uart::Uart::connect<uart::Txd::Txd, uart::Rxd::Rxd>();
+	uart::Uart::initialize<SystemClock, 115200_Bd>();
+
+	// Leds::setOutput(modm::Gpio::Low);
+	// Buttons::setInput(Gpio::InputType::PullUp);
+}
+
+%% if target.core == "app"
+inline void
+initializeUsb(uint8_t priority=3)
+{
+	usb::Device::initialize<SystemClock>(priority);
+	usb::Device::connect<usb::Dm, usb::Dp>();
+}
+%% endif
+/// @}
+
+} // namespace Board

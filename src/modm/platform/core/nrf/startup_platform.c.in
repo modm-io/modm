@@ -1,0 +1,69 @@
+/*
+ * Copyright (c) 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#include "../device.hpp"
+
+/**
+ * This code should _only_ enable internal memories and nothing else.
+ * Since this is the first code executed after a reset, you do not
+ * have access to _any_ data stored in RAM, since it has not yet been
+ * initialized.
+ * In the worst case you won't even have access to the stack, if the
+ * memory containing the stack is not physically enabled yet.
+ * In that case, consider using inline assembly to manage stack access
+ * manually, until the memory is enabled.
+ */
+void
+__modm_initialize_platform(void)
+{
+%% if target.family == "52"
+%% if reset_pin
+	if (((NRF_UICR->PSELRESET[0] & UICR_PSELRESET_CONNECT_Msk) != (UICR_PSELRESET_CONNECT_Connected << UICR_PSELRESET_CONNECT_Pos)) ||
+		((NRF_UICR->PSELRESET[1] & UICR_PSELRESET_CONNECT_Msk) != (UICR_PSELRESET_CONNECT_Connected << UICR_PSELRESET_CONNECT_Pos)))
+	{
+		NRF_NVMC->CONFIG = NVMC_CONFIG_WEN_Wen << NVMC_CONFIG_WEN_Pos;
+		while (NRF_NVMC->READY == NVMC_READY_READY_Busy){}
+
+		NRF_UICR->PSELRESET[0] = {{reset_pin}}ul;
+		while (NRF_NVMC->READY == NVMC_READY_READY_Busy){}
+
+		NRF_UICR->PSELRESET[1] = {{reset_pin}}ul;
+		while (NRF_NVMC->READY == NVMC_READY_READY_Busy){}
+
+		NRF_NVMC->CONFIG = NVMC_CONFIG_WEN_Ren << NVMC_CONFIG_WEN_Pos;
+		while (NRF_NVMC->READY == NVMC_READY_READY_Busy){}
+
+		NVIC_SystemReset();
+	}
+%% endif
+
+	NRF_APPROTECT->DISABLE = APPROTECT_DISABLE_DISABLE_SwDisable;
+%% elif target.family == "53"
+	// Trimming of the device. Copy all the trimming values from FICR into the target addresses. Trim until one ADDR is not initialized.
+	for (uint32_t index = 0ul; index < 32ul && NRF_FICR->TRIMCNF[index].ADDR != 0xFFFFFFFFul; index++){
+		*((volatile uint32_t *)NRF_FICR->TRIMCNF[index].ADDR) = NRF_FICR->TRIMCNF[index].DATA;
+	}
+
+%% if target.core == "app"
+	NRF_CTRLAP->SECUREAPPROTECT.DISABLE = UICR_SECUREAPPROTECT_PALL_Unprotected;
+%% endif
+	NRF_CTRLAP->APPROTECT.DISABLE = UICR_APPROTECT_PALL_Unprotected;
+%% endif
+%#
+%% if enable_icache
+	// Enable instruction cache
+%% if has_nvmc_icache
+	NRF_NVMC->ICACHECNF = NVMC_ICACHECNF_CACHEEN_Msk;
+%% elif has_cache_peripheral
+	NRF_CACHE->ENABLE = CACHE_ENABLE_ENABLE_Msk;
+%% endif
+%% endif
+}

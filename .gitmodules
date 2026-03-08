@@ -58,3 +58,6 @@
 [submodule "ext/libeigen/eigen"]
 	path = ext/libeigen/eigen
 	url = https://github.com/modm-ext/eigen-partial.git
+[submodule "ext/nordic/nrfx"]
+	path = ext/nordic/nrfx
+	url = https://github.com/modm-ext/nrfx-partial.git

@@ -1,0 +1,221 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2020, Hannes Ellinger
+# Copyright (c) 2026, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+import re
+from pathlib import Path
+
+
+pp = {}
+
+
+def _translate(name):
+    return name.replace("_", "").capitalize()
+
+
+def _get_driver(signal):
+    name = None
+    if "driver" in signal:
+        name = _translate(signal["driver"])
+    if "instance" in signal:
+        name += _translate(signal["instance"])
+    return name
+
+
+def common_peripherals(env):
+    """
+    All peripherals translated to the modm naming convention.
+
+    :returns: a sorted list of all peripheral names.
+    """
+    device = env[":target"]
+
+    all_peripherals = set()
+
+    gpio_driver = device.get_driver("gpio")
+    # Collect all peripherals from GPIO signal definitions
+    all_peripherals.update(
+        _get_driver(s)
+        for gpio in gpio_driver["gpio"]
+        for s in gpio.get("signal", [])
+    )
+
+    # Collect all peripherals from drivers and their instances
+    all_drivers = (d for d in device._properties["driver"] if d["name"] not in ["gpio", "core"])
+    for d in all_drivers:
+        dname = _translate(d["name"])
+        if "instance" in d:
+            all_peripherals.update(dname + _translate(i) for i in d["instance"])
+        else:
+            all_peripherals.add(dname)
+
+    all_peripherals.discard(None)
+    all_peripherals = sorted(list(all_peripherals))
+    pp["all_peripherals"] = all_peripherals
+    return all_peripherals
+
+
+def _device_root_from_define(define):
+    if define.startswith("NRF5340_"):
+        if "NETWORK" in define:
+            return "nrf5340_network"
+        return "nrf5340_application"
+    if define.startswith("NRF51"):
+        return "nrf51"
+    if define.startswith("NRF52832_"):
+        # In Nordic MDK, nRF52832 uses nrf52.h/system_nrf52.h.
+        return "nrf52"
+
+    match = re.match(r"NRF(\d+)_", define)
+    if match:
+        return "nrf{}".format(match.group(1).lower())
+    return None
+
+
+def _extra_header_patterns(define):
+    if define.startswith("NRF51"):
+        return ["nrf51_deprecated.h"]
+    if define.startswith("NRF52805_"):
+        return ["nrf51_to_nrf52810.h", "nrf52_to_nrf52810.h", "nrf52810_to_nrf52811.h"]
+    if define.startswith("NRF52810_"):
+        return ["nrf51_to_nrf52810.h", "nrf52_to_nrf52810.h", "nrf52810_name_change.h"]
+    if define.startswith("NRF52811_"):
+        return ["nrf51_to_nrf52810.h", "nrf52_to_nrf52810.h", "nrf52810_to_nrf52811.h"]
+    if define.startswith("NRF52820_"):
+        return ["nrf51_to_nrf52.h", "nrf52_to_nrf52833.h", "nrf52833_to_nrf52820.h"]
+    if define.startswith("NRF52832_"):
+        return ["nrf51_to_nrf52.h", "nrf52_name_change.h"]
+    if define.startswith("NRF52833_"):
+        return ["nrf52_to_nrf52833.h", "nrf51_to_nrf52.h"]
+    if define.startswith("NRF52840_"):
+        return ["nrf51_to_nrf52840.h", "nrf52_to_nrf52840.h", "nrf52840_name_change.h"]
+    if define.startswith("NRF5340_") and "NETWORK" in define:
+        return ["nrf5340_network_name_change.h", "system_nrf53_approtect.h", "system_config_sau.h"]
+    if define.startswith("NRF5340_"):
+        return ["nrf5340_application_name_change.h", "system_nrf53_approtect.h", "system_config_sau.h"]
+    if define.startswith("NRF91") or define.startswith("NRF9120_") or define.startswith("NRF9160_"):
+        return ["nrf91_name_change.h", "system_nrf91_approtect.h"]
+    return []
+
+
+def _expand_existing_patterns(src_dir, patterns):
+    headers = []
+    seen = set()
+    for pattern in patterns:
+        for path in sorted(src_dir.glob(pattern)):
+            if not path.is_file():
+                continue
+            name = path.name
+            if name in seen:
+                continue
+            seen.add(name)
+            headers.append(name)
+    return headers
+
+
+def _headers_for_define(src_dir, define):
+    root = _device_root_from_define(define)
+    if root is None:
+        raise ValidateException("Unable to map nRF define '{}' to a device header root!".format(define))
+
+    patterns = [
+        "nrf.h",
+        "compiler_abstraction.h",
+        "{}.h".format(root),
+        "system_{}.h".format(root),
+        "{}_bitfields.h".format(root),
+        "nrf*_erratas.h",
+    ]
+    patterns.extend(_extra_header_patterns(define))
+
+    headers = _expand_existing_patterns(src_dir, patterns)
+    if "nrf.h" not in headers:
+        raise ValidateException("Missing required header 'nrf.h' for '{}'!".format(define))
+    return headers
+
+
+def _peripheral_aliases(src_dir, define):
+    if not define.startswith("NRF5340_"):
+        return [], None
+
+    alias_suffix = "NS" if "NETWORK" in define else "S"
+
+    root = _device_root_from_define(define)
+    header_path = src_dir / "{}.h".format(root)
+    if not header_path.is_file():
+        return [], alias_suffix
+
+    pattern = re.compile(r"^#define\s+(NRF_[A-Z0-9_]+)_(S|NS)\b")
+    aliases = set()
+    for line in header_path.read_text().splitlines():
+        match = pattern.match(line.strip())
+        if match and match.group(2) == alias_suffix:
+            aliases.add(match.group(1))
+    return sorted(aliases), alias_suffix
+
+# -----------------------------------------------------------------------------
+def init(module):
+    module.name = ":cmsis:device"
+
+
+def prepare(module, options):
+    module.add_query(EnvironmentQuery(name="peripherals", factory=common_peripherals))
+    module.depends(":cmsis:core")
+    return options[":target"].identifier.platform == "nrf"
+
+
+def validate(env):
+    device = env[":target"]
+    src_dir = Path(localpath("nrfx/bsp/stable/mdk"))
+    define = device.identifier.string.upper().replace("-", "_")
+    define = define.replace("@APP", "_APPLICATION").replace("@NET", "_NETWORK")
+
+    required_headers = _headers_for_define(src_dir, define)
+    peripheral_aliases, peripheral_alias_suffix = _peripheral_aliases(src_dir, define)
+    if not required_headers:
+        raise ValidateException("No required nRF headers found for '{}'!".format(device.partname))
+
+    family_folder = src_dir.relative_to(localpath("."))
+
+    global pp
+    pp = {
+        "define": define,
+        "folder": family_folder,
+        "headers": required_headers,
+        "peripheral_aliases": peripheral_aliases,
+        "peripheral_alias_suffix": peripheral_alias_suffix,
+    }
+
+
+def build(env):
+    global pp
+    env.query("peripherals")
+    env.collect(":build:path.include", "modm/ext/cmsis/device")
+
+    env.outbasepath = "modm/ext/cmsis/device"
+    for file in pp["headers"]:
+        env.copy(localpath(pp["folder"], file), file)
+    env.copy("nrfx_clock.h")
+
+    env.substitutions = {
+        "headers": ["nrf.h"],
+        "defines": [pp["define"]],
+        "all_peripherals": pp["all_peripherals"],
+        "peripheral_aliases": pp["peripheral_aliases"],
+        "peripheral_alias_suffix": pp["peripheral_alias_suffix"],
+        "target": env[":target"].identifier,
+    }
+    env.outbasepath = "modm/src/modm/platform"
+    env.template("device.hpp.in")
+
+    env.outbasepath = "modm/src/modm/platform/core"
+    env.template("peripherals.hpp.in")
