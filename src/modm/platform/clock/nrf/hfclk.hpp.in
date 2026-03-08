@@ -1,0 +1,54 @@
+/*
+ * Copyright (c) 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <stdint.h>
+#include "../device.hpp"
+#include <modm/architecture/interface/delay.hpp>
+
+namespace modm::platform
+{
+
+/**
+ * Clock management
+ *
+ * \ingroup modm_platform_hfclk
+ */
+class Hfcc
+{
+public:
+	static constexpr uint32_t BootFrequency = 64'000'000;
+
+%% if has_hfclk_prescaler
+	enum class
+	Prescaler : uint32_t
+	{
+		Div1 = CLOCK_HFCLKCTRL_HCLK_Div1,
+		Div2 = CLOCK_HFCLKCTRL_HCLK_Div2,
+	};
+
+	static inline void
+	setPrescaler(Prescaler prescaler)
+	{
+		NRF_CLOCK->HFCLKCTRL = (NRF_CLOCK->HFCLKCTRL & ~CLOCK_HFCLKCTRL_HCLK_Msk) |
+			((uint32_t(prescaler) << CLOCK_HFCLKCTRL_HCLK_Pos) & CLOCK_HFCLKCTRL_HCLK_Msk);
+	}
+%#
+%% endif
+	template< uint32_t Core_Hz >
+	static void
+	updateCoreFrequency();
+};
+
+}
+
+#include "hfclk_impl.hpp"
