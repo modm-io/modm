@@ -1,0 +1,63 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2026, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":platform:adc"
+    module.description = "Analog-to-Digital Converter (SAADC)"
+
+
+def prepare(module, options):
+    device = options[":target"]
+    if not device.has_driver("saadc:nrf*"):
+        return False
+
+    module.depends(
+        ":architecture:adc",
+        ":platform:gpio",
+        ":cmsis:device")
+
+    return True
+
+
+def build(env):
+    target = env[":target"].identifier
+    gpio = env[":target"].get_driver("gpio")
+
+    ain_channels = set()
+    for pin in listify(gpio.get("gpio", [])):
+        for signal in listify(pin.get("signal", [])):
+            if not isinstance(signal, dict):
+                continue
+            if signal.get("driver") != "saadc":
+                continue
+            name = str(signal.get("name", "")).lower()
+            if name.startswith("ain") and name[3:].isdigit():
+                ain_channels.add(int(name[3:]))
+
+    ain_channels = sorted(ain_channels)
+    default_channel = "Ain{}".format(ain_channels[0]) if ain_channels else "Vdd"
+
+    has_vddh_div5 = (
+        target.family == "53" or
+        (target.family == "52" and target.series == "840")
+    )
+
+    env.substitutions = {
+        "target": target,
+        "has_vddh_div5": has_vddh_div5,
+        "ain_channels": ain_channels,
+        "default_channel": default_channel,
+    }
+    env.outbasepath = "modm/src/modm/platform/adc"
+
+    env.template("adc.hpp.in")

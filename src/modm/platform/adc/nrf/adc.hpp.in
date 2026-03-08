@@ -1,0 +1,318 @@
+/*
+ * Copyright (c) 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <stdint.h>
+#include <modm/architecture/interface/adc.hpp>
+#include <modm/platform/device.hpp>
+#include <modm/platform/gpio/base.hpp>
+#include <modm/processing/fiber.hpp>
+
+namespace modm::platform
+{
+template<class GpioData>
+class GpioStatic;
+
+/**
+ * SAADC for nRF52/nRF53.
+ *
+ * Minimal synchronous implementation of the generic ADC interface.
+ *
+ * \ingroup\tmodm_platform_adc
+ */
+class Adc : public modm::Adc
+{
+public:
+	static constexpr uint8_t Resolution = 12;
+
+	enum class Channel : uint32_t
+	{
+%% for channel in ain_channels
+		Ain{{ channel }} = SAADC_CH_PSELP_PSELP_AnalogInput{{ channel }},
+%% endfor
+		Vdd = SAADC_CH_PSELP_PSELP_VDD,
+%% if has_vddh_div5
+		VddhDiv5 = SAADC_CH_PSELP_PSELP_VDDHDIV5,
+%% endif
+	};
+
+	enum class NegativeInput : uint32_t
+	{
+		Disabled = SAADC_CH_PSELN_PSELN_NC,
+%% for channel in ain_channels
+		Ain{{ channel }} = SAADC_CH_PSELN_PSELN_AnalogInput{{ channel }},
+%% endfor
+	};
+
+	enum class Resistor : uint32_t
+	{
+		Bypass = SAADC_CH_CONFIG_RESP_Bypass,
+		PullDown = SAADC_CH_CONFIG_RESP_Pulldown,
+		PullUp = SAADC_CH_CONFIG_RESP_Pullup,
+		Vdd1_2 = SAADC_CH_CONFIG_RESP_VDD1_2,
+	};
+
+	enum class Gain : uint32_t
+	{
+		Gain1_6 = SAADC_CH_CONFIG_GAIN_Gain1_6,
+		Gain1_5 = SAADC_CH_CONFIG_GAIN_Gain1_5,
+		Gain1_4 = SAADC_CH_CONFIG_GAIN_Gain1_4,
+		Gain1_3 = SAADC_CH_CONFIG_GAIN_Gain1_3,
+		Gain1_2 = SAADC_CH_CONFIG_GAIN_Gain1_2,
+		Gain1 = SAADC_CH_CONFIG_GAIN_Gain1,
+		Gain2 = SAADC_CH_CONFIG_GAIN_Gain2,
+		Gain4 = SAADC_CH_CONFIG_GAIN_Gain4,
+	};
+
+	enum class Reference : uint32_t
+	{
+		Internal = SAADC_CH_CONFIG_REFSEL_Internal,
+		Vdd1_4 = SAADC_CH_CONFIG_REFSEL_VDD1_4,
+	};
+
+	enum class AcquisitionTime : uint32_t
+	{
+		Us3 = SAADC_CH_CONFIG_TACQ_3us,
+		Us5 = SAADC_CH_CONFIG_TACQ_5us,
+		Us10 = SAADC_CH_CONFIG_TACQ_10us,
+		Us15 = SAADC_CH_CONFIG_TACQ_15us,
+		Us20 = SAADC_CH_CONFIG_TACQ_20us,
+		Us40 = SAADC_CH_CONFIG_TACQ_40us,
+	};
+
+	enum class Burst : uint32_t
+	{
+		Disabled = SAADC_CH_CONFIG_BURST_Disabled,
+		Enabled = SAADC_CH_CONFIG_BURST_Enabled,
+	};
+
+	enum class ResolutionSetting : uint32_t
+	{
+		Bit8 = SAADC_RESOLUTION_VAL_8bit,
+		Bit10 = SAADC_RESOLUTION_VAL_10bit,
+		Bit12 = SAADC_RESOLUTION_VAL_12bit,
+		Bit14 = SAADC_RESOLUTION_VAL_14bit,
+	};
+
+	enum class Oversampling : uint32_t
+	{
+		Bypass = SAADC_OVERSAMPLE_OVERSAMPLE_Bypass,
+		Over2x = SAADC_OVERSAMPLE_OVERSAMPLE_Over2x,
+		Over4x = SAADC_OVERSAMPLE_OVERSAMPLE_Over4x,
+		Over8x = SAADC_OVERSAMPLE_OVERSAMPLE_Over8x,
+		Over16x = SAADC_OVERSAMPLE_OVERSAMPLE_Over16x,
+		Over32x = SAADC_OVERSAMPLE_OVERSAMPLE_Over32x,
+		Over64x = SAADC_OVERSAMPLE_OVERSAMPLE_Over64x,
+		Over128x = SAADC_OVERSAMPLE_OVERSAMPLE_Over128x,
+		Over256x = SAADC_OVERSAMPLE_OVERSAMPLE_Over256x,
+	};
+
+	struct ChannelConfiguration
+	{
+		NegativeInput negativeInput = NegativeInput::Disabled;
+		Resistor resistorP = Resistor::Bypass;
+		Resistor resistorN = Resistor::Bypass;
+		Gain gain = Gain::Gain1_6;
+		Reference reference = Reference::Internal;
+		AcquisitionTime acquisitionTime = AcquisitionTime::Us10;
+		Burst burst = Burst::Disabled;
+	};
+
+public:
+	template<class T>
+	inline static constexpr bool AlwaysFalse = false;
+
+	template<class... Signals>
+	static inline void
+	connect()
+	{
+		if constexpr (sizeof...(Signals) > 0) {
+			(Adc::template disconnectSignal<Signals>(), ...);
+		}
+	}
+
+	template<class SystemClock, frequency_t frequency=200_kHz, percent_t tolerance=10_pct>
+	static inline void
+	initialize(
+		Oversampling oversampling = Oversampling::Bypass,
+		ResolutionSetting resolution = ResolutionSetting::Bit12)
+	{
+		(void)sizeof(SystemClock);
+		(void)frequency;
+		(void)tolerance;
+		currentOversampling = oversampling;
+
+		NRF_SAADC->ENABLE = SAADC_ENABLE_ENABLE_Enabled;
+		NRF_SAADC->RESOLUTION = static_cast<uint32_t>(resolution);
+		NRF_SAADC->OVERSAMPLE = static_cast<uint32_t>(oversampling);
+		NRF_SAADC->SAMPLERATE = 0;
+
+		NRF_SAADC->CH[0].CONFIG = 0;
+		NRF_SAADC->CH[0].PSELP = SAADC_CH_PSELP_PSELP_NC;
+
+		NRF_SAADC->RESULT.PTR = reinterpret_cast<uint32_t>(&sampleBuffer);
+		NRF_SAADC->RESULT.MAXCNT = 1;
+		NRF_SAADC->EVENTS_END = 0;
+		NRF_SAADC->EVENTS_STARTED = 0;
+		NRF_SAADC->EVENTS_STOPPED = 0;
+	}
+
+	static inline void
+	disable()
+	{
+		NRF_SAADC->CH[0].PSELP = SAADC_CH_PSELP_PSELP_NC;
+		NRF_SAADC->CH[0].PSELN = SAADC_CH_PSELN_PSELN_NC;
+		NRF_SAADC->ENABLE = SAADC_ENABLE_ENABLE_Disabled;
+	}
+
+	static inline void
+	startConversion()
+	{
+		NRF_SAADC->RESULT.PTR = reinterpret_cast<uint32_t>(&sampleBuffer);
+		NRF_SAADC->RESULT.MAXCNT = 1;
+		NRF_SAADC->EVENTS_END = 0;
+		NRF_SAADC->EVENTS_STARTED = 0;
+		NRF_SAADC->EVENTS_STOPPED = 0;
+		NRF_SAADC->TASKS_START = 1;
+		modm::this_fiber::poll([]{ return NRF_SAADC->EVENTS_STARTED != 0; });
+		NRF_SAADC->TASKS_SAMPLE = 1;
+	}
+
+	static inline bool
+	isConversionFinished()
+	{
+		return (NRF_SAADC->EVENTS_END != 0);
+	}
+
+	static inline uint16_t
+	getValue()
+	{
+		if (sampleBuffer < 0) {
+			return 0;
+		}
+		return static_cast<uint16_t>(sampleBuffer);
+	}
+
+	static inline uint16_t
+	readChannel(Channel channel)
+	{
+		return readChannel(channel, ChannelConfiguration{});
+	}
+
+	static inline uint16_t
+	readChannel(Channel channel, const ChannelConfiguration& config)
+	{
+		if (!setChannel(channel, config)) return 0;
+		startConversion();
+		modm::this_fiber::poll([]{ return isConversionFinished(); });
+		return getValue();
+	}
+
+	static inline bool
+	setChannel(Channel channel)
+	{
+		return setChannel(channel, ChannelConfiguration{});
+	}
+
+	static inline bool
+	setChannel(Channel channel, const ChannelConfiguration& config)
+	{
+		setChannelConfigRegisters(config);
+		NRF_SAADC->CH[0].PSELP = static_cast<uint32_t>(channel);
+		NRF_SAADC->CH[0].PSELN = static_cast<uint32_t>(config.negativeInput);
+		return true;
+	}
+
+	template<class Signal>
+	static inline bool
+	setPinChannel()
+	{
+		return setChannel(getPinChannel<Signal>(), ChannelConfiguration{});
+	}
+
+	template<class Signal>
+	static inline bool
+	setPinChannel(const ChannelConfiguration& config)
+	{
+		return setChannel(getPinChannel<Signal>(), config);
+	}
+
+	template<class Signal>
+	static inline constexpr Channel
+	getPinChannel()
+	{
+%% if ain_channels | length
+%% for channel in ain_channels
+%% if loop.first
+		if constexpr (Signal::Signal == Gpio::Signal::Ain{{ channel }}) {
+			return Channel::Ain{{ channel }};
+		}
+%% else
+		else if constexpr (Signal::Signal == Gpio::Signal::Ain{{ channel }}) {
+			return Channel::Ain{{ channel }};
+		}
+%% endif
+%% endfor
+		else {
+			static_assert(AlwaysFalse<Signal>, "Signal does not have an SAADC channel!");
+			return Channel::Vdd;
+		}
+%% else
+		static_assert(AlwaysFalse<Signal>, "Signal does not have an SAADC channel!");
+		return Channel::Vdd;
+%% endif
+	}
+
+	static inline Channel
+	getChannel()
+	{
+		return Channel(NRF_SAADC->CH[0].PSELP);
+	}
+
+private:
+	template<class Signal>
+	static inline void
+	disconnectSignal()
+	{
+		if constexpr (requires { Signal::disconnect(); }) {
+			Signal::disconnect();
+		}
+		else {
+			GpioStatic<typename Signal::Data>::disconnect();
+		}
+	}
+
+	static inline void
+	setChannelConfigRegisters(const ChannelConfiguration& config)
+	{
+		const uint32_t mode = (config.negativeInput == NegativeInput::Disabled)
+			? SAADC_CH_CONFIG_MODE_SE
+			: SAADC_CH_CONFIG_MODE_Diff;
+		const Burst burst = (currentOversampling == Oversampling::Bypass)
+			? config.burst
+			: Burst::Enabled;
+
+		NRF_SAADC->CH[0].CONFIG =
+			(static_cast<uint32_t>(config.resistorP) << SAADC_CH_CONFIG_RESP_Pos) |
+			(static_cast<uint32_t>(config.resistorN) << SAADC_CH_CONFIG_RESN_Pos) |
+			(static_cast<uint32_t>(config.gain) << SAADC_CH_CONFIG_GAIN_Pos) |
+			(static_cast<uint32_t>(config.reference) << SAADC_CH_CONFIG_REFSEL_Pos) |
+			(static_cast<uint32_t>(config.acquisitionTime) << SAADC_CH_CONFIG_TACQ_Pos) |
+			(mode << SAADC_CH_CONFIG_MODE_Pos) |
+			(static_cast<uint32_t>(burst) << SAADC_CH_CONFIG_BURST_Pos);
+		NRF_SAADC->CH[0].PSELN = static_cast<uint32_t>(config.negativeInput);
+	}
+
+	static inline Oversampling currentOversampling = Oversampling::Bypass;
+	static inline int16_t sampleBuffer{};
+};
+} // namespace modm::platform
