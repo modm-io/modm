@@ -136,3 +136,9 @@ jobs:
         shell: bash
         run: |
           (cd examples && ../tools/scripts/examples_compile.py avr arduino_nano arduino_uno srxe)
+
+      - name: Compile NRF Examples
+        if: always()
+        shell: bash
+        run: |
+          (cd examples && ../tools/scripts/examples_compile.py nrf51422-dk nrf52840-dk nrf5340-dk)

@@ -1,0 +1,10 @@
+<library>
+  <extends>modm:nrf5340-dk</extends>
+  <options>
+    <option name="modm:target">nrf5340-xxaa@net</option>
+    <option name="modm:build:build.path">../../../build/nrf5340-dk/uart_logging_net</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+  </modules>
+</library>
