@@ -1,0 +1,56 @@
+/*
+ * Copyright (c) 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_NRF_UART_BASE_HPP
+#define MODM_NRF_UART_BASE_HPP
+
+#include <stdint.h>
+#include "../device.hpp"
+#include <modm/architecture/interface/register.hpp>
+#include <modm/architecture/interface/interrupt.hpp>
+#include <modm/architecture/interface/peripheral.hpp>
+#include <modm/platform/gpio/connector.hpp>
+
+namespace modm::platform
+{
+
+class UartBase
+{
+public:
+	enum class
+	Parity : uint32_t
+	{
+		Disabled = 0,
+		Even = 7,
+		Odd = 14,
+	};
+
+	enum class
+	WordLength : uint32_t
+	{
+		Bit8 = 0,
+	};
+
+	static consteval uint32_t
+	baudrateRegisterValue(uint32_t peripheralClock, baudrate_t baudrate)
+	{
+		return uint32_t((uint64_t(baudrate) << 32) / peripheralClock);
+	}
+    static consteval uint32_t
+	baudrateFromRegister(uint32_t peripheralClock, uint32_t registerValue)
+    {
+        return uint32_t((uint64_t(registerValue) * peripheralClock) >> 32);
+    }
+};
+
+} // namespace modm::platform
+
+#endif // MODM_NRF_UART_BASE_HPP
