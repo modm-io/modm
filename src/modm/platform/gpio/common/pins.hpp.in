@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Niklas Hauser
+ * Copyright (c) 2021-2026, Niklas Hauser
  * Copyright (c) 2022, Andrey Kunitsyn
  *
  * This file is part of the modm project.
@@ -23,6 +23,8 @@ namespace modm::platform
 %% for gpio in gpios
 %% if target.platform in ["rp"]
 %% set name = gpio.gpio.name | capitalize
+%% elif target.platform in ["nrf"]
+%% set name = "P" ~ gpio.gpio.port | upper ~ "_" ~ gpio.gpio.pin
 %% else
 %% set name = gpio.gpio.port | upper ~ gpio.gpio.pin
 %% endif

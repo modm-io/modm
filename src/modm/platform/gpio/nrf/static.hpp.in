@@ -1,0 +1,193 @@
+/*
+ * Copyright (c) 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_NRF_GPIO_STATIC_HPP
+#define MODM_NRF_GPIO_STATIC_HPP
+
+#include <type_traits>
+
+#include "../device.hpp"
+#include "base.hpp"
+#include "set.hpp"
+#include <modm/architecture/interface/gpio.hpp>
+
+namespace modm::platform
+{
+
+/// @ingroup modm_platform_gpio
+template<class GpioData>
+class GpioStatic : public Gpio, public GpioData
+{
+	template<class... Gpios>
+	friend class GpioSet;
+	using PinSet = GpioSet<GpioStatic<GpioData>>;
+public:
+	using Direction = ::modm::Gpio::Direction;
+	using Type = GpioStatic<GpioData>;
+	using Output = Type;
+	using Input = Type;
+	using IO = Type;
+	using Data = GpioData;
+	using GpioData::port;
+	using GpioData::pin;
+	static constexpr Direction direction = Direction::InOut;
+	static constexpr bool isInverted = false;
+	static constexpr uint32_t mask = 1ul << pin;
+	static constexpr uint32_t number = (uint32_t(port) * 32u) + uint32_t(pin);
+
+	template<Peripheral peripheral, class Signal = typename GpioData::BitBang>
+	inline static void connect() { Signal::template connect<peripheral>(); }
+
+	template<Peripheral peripheral, Gpio::Signal signal>
+	inline static void connect()
+	{
+		if constexpr (signal == Gpio::Signal::BitBang) {
+			GpioData::BitBang::template connect<peripheral>();
+		}
+%% for signal in all_signals | sort
+		else if constexpr (signal == Gpio::Signal::{{ signal }}) {
+			if constexpr (requires { typename GpioData::{{ signal }}; }) {
+				GpioData::{{ signal }}::template connect<peripheral>();
+			}
+			else {
+				static_assert(signal != Gpio::Signal::{{ signal }}, "Requested signal is not available on this pin!");
+			}
+		}
+%% endfor
+	}
+
+protected:
+	static NRF_GPIO_Type* gport()
+	{
+%% for port in ports
+		if constexpr (port == Gpio::Port::{{port}}) return NRF_{{port}};
+%% endfor
+		return nullptr;
+	}
+
+	static constexpr uint32_t
+	defaultCnf(Gpio::Dir dir)
+	{
+		return (i(dir) << GPIO_PIN_CNF_DIR_Pos)
+			| (i(Gpio::Input::Connect) << GPIO_PIN_CNF_INPUT_Pos)
+			| (i(Gpio::Pull::Disabled) << GPIO_PIN_CNF_PULL_Pos)
+			| (i(Gpio::OutputType::PushPull) << GPIO_PIN_CNF_DRIVE_Pos)
+			| (i(Gpio::Sense::Disabled) << GPIO_PIN_CNF_SENSE_Pos);
+	}
+
+public:
+	inline static void
+	setOutput()
+	{
+		PinSet::setOutput();
+	}
+
+%% if target.family == "53" and target.core == "app"
+	inline static void
+	delegateToNetworkCore()
+	{
+		gport()->PIN_CNF[pin] = (gport()->PIN_CNF[pin] & ~GPIO_PIN_CNF_MCUSEL_Msk) |
+				(GPIO_PIN_CNF_MCUSEL_NetworkMCU << GPIO_PIN_CNF_MCUSEL_Pos);
+	}
+%% endif
+
+	inline static void
+	setOutput(bool status)
+	{
+		PinSet::setOutput(status);
+	}
+
+	inline static void
+	setOutput(OutputType type)
+	{
+		PinSet::setOutput(type);
+	}
+
+	inline static void
+	configure(OutputType type)
+	{
+		PinSet::configure(type);
+	}
+
+	inline static void
+	set()
+	{
+		PinSet::set();
+	}
+
+	inline static void
+	set(bool status)
+	{
+		PinSet::set(status);
+	}
+
+	inline static void
+	reset()
+	{
+		PinSet::reset();
+	}
+
+	inline static void
+	toggle()
+	{
+		PinSet::toggle();
+	}
+
+	inline static bool
+	isSet()
+	{
+		return (gport()->OUT & mask);
+	}
+
+	inline static void
+	setInput()
+	{
+		PinSet::setInput();
+	}
+
+	inline static void
+	setInput(InputType type)
+	{
+		PinSet::setInput(type);
+	}
+
+	inline static void
+	configure(InputType type)
+	{
+		PinSet::configure(type);
+	}
+
+	inline static bool
+	read()
+	{
+		return (gport()->IN & mask);
+	}
+
+	inline static Direction
+	getDirection()
+	{
+		return (gport()->DIR & mask) ? Direction::Out : Direction::In;
+	}
+
+	inline static void
+	disconnect()
+	{
+		gport()->PIN_CNF[pin] = (i(Dir::Input) << GPIO_PIN_CNF_DIR_Pos)
+			| (i(Gpio::Input::Disconnect) << GPIO_PIN_CNF_INPUT_Pos)
+			| (i(Gpio::Pull::Disabled) << GPIO_PIN_CNF_PULL_Pos)
+			| (i(Gpio::OutputType::PushPull) << GPIO_PIN_CNF_DRIVE_Pos)
+			| (i(Gpio::Sense::Disabled) << GPIO_PIN_CNF_SENSE_Pos);
+	}
+};
+
+} // namespace modm::platform
+
+#endif // MODM_NRF_GPIO_STATIC_HPP
