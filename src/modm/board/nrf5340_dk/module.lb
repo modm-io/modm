@@ -1,0 +1,48 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2026, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":board:nrf5340-dk"
+    module.description = FileReader("module.md")
+
+
+def prepare(module, options):
+    partname = options[":target"].partname
+    if not partname.startswith("nrf5340"):
+        return False
+
+    module.depends(
+        ":debug",
+        ":platform:core",
+        ":platform:clock",
+        ":platform:hfclk",
+        ":platform:gpio")
+
+    if options[":target"].identifier.core == "app":
+        module.depends(":platform:uarte:1", ":platform:usb")
+    else:
+        module.depends(":platform:uarte:0")
+
+    return True
+
+
+def build(env):
+    env.outbasepath = "modm/src/modm/board"
+    env.substitutions = {
+        "target": env[":target"].identifier,
+        "with_logger": True,
+        "with_assert": env.has_module(":architecture:assert")
+    }
+    env.template("../board.cpp.in", "board.cpp")
+    env.template("board.hpp.in", "board.hpp")
+    env.copy("board.xml")

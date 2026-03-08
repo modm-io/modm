@@ -1,0 +1,15 @@
+<library>
+  <repositories>
+    <repository>
+      <path>../../../../repo.lb</path>
+    </repository>
+  </repositories>
+
+  <options>
+    <option name="modm:target">nrf5340-xxaa@app</option>
+    <!-- <option name="modm:target">nrf5340-xxaa@net</option> -->
+  </options>
+  <modules>
+    <module>modm:board:nrf5340-dk</module>
+  </modules>
+</library>
