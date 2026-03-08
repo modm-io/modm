@@ -1,0 +1,57 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2026, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def common_usb_irqs(env):
+    target = env[":target"]
+    if target.identifier.family == "53":
+        power_irqs = ["USBREGULATOR"]
+    else:
+        core_vectors = [v["name"] for v in target.get_driver("core").get("vector", [])]
+        power_irqs = [i for i in core_vectors if "POWER" in i.upper()]
+
+    return {
+        "irqs": ["USBD"],
+        "power_irqs": power_irqs,
+    }
+
+
+def init(module):
+    module.name = ":platform:usb"
+    module.description = "Universal Serial Bus (USB)"
+
+
+def prepare(module, options):
+    device = options[":target"]
+    if not device.has_driver("usbd:nrf*"):
+        return False
+
+    module.depends(
+        ":architecture:interrupt",
+        ":cmsis:device",
+        ":platform:gpio")
+
+    module.add_query(EnvironmentQuery(name="irqs", factory=common_usb_irqs))
+
+    return True
+
+
+def build(env):
+    env.outbasepath = "modm/src/modm/platform/usb"
+    irq_data = env.query(":platform:usb:irqs")
+    env.substitutions = {
+        "target": env[":target"].identifier,
+        **irq_data
+    }
+    env.template("usb.hpp.in")
+
+    if env.has_module(":tinyusb:device:cdc"):
+        env.copy(repopath("ext/hathach/uart.hpp"), "uart.hpp")

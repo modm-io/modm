@@ -204,6 +204,7 @@ def build(env):
     env.outbasepath = "modm/ext/cmsis/device"
     for file in pp["headers"]:
         env.copy(localpath(pp["folder"], file), file)
+    env.copy("nrfx_clock.h")
 
     env.substitutions = {
         "headers": ["nrf.h"],
