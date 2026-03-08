@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2018, Niklas Hauser
+# Copyright (c) 2018-2026, Niklas Hauser
 #
 # This file is part of the modm project.
 #
@@ -98,6 +98,8 @@ def common_target(env):
     jlink_partname = device.partname
     if device.partname.startswith("stm32"):
         jlink_partname = device.partname[:11]
+    if device.partname.startswith("nrf"):
+        jlink_partname = device.partname.replace("-", "_").replace("@", "_")
     p = {
         "core": core,
         "mcu": mcu,

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2016-2021, Niklas Hauser
+# Copyright (c) 2016-2026, Niklas Hauser
 # Copyright (c) 2017, Fabian Greif
 #
 # This file is part of the modm project.
@@ -366,7 +366,7 @@ def build(env):
     core = env.substitutions["core"]
     enable_dcache = env.get("enable_dcache", False) and not (env.has_module(":platform:dma") or env.has_module(":platform:bdma"))
     env.substitutions.update({
-        "target": env[":target"].identifier,
+        "target": (target := env[":target"].identifier),
         "with_fault_storage": env.has_module(":platform:fault"),
         "with_memory_traits": env.has_module(":architecture:memory"),
         "with_assert": env.has_module(":architecture:assert"),
@@ -449,11 +449,14 @@ def build(env):
 
     # Compilation for FPU
     core = env[":target"].get_driver("core")
-    env.collect(":build:archflags", "-mcpu=" + core["type"], "-mthumb")
-
     single_precision = True
     if (fpu_spec := core.get("fpu")):
         env.collect(":build:archflags", "-mfloat-abi=" + env["float-abi"], "-mfpu=" + fpu_spec)
         single_precision = ("-sp-" in fpu_spec)
     if single_precision:
         env.collect(":build:ccflags", "-Wdouble-promotion")
+
+    cpu = core["type"]
+    # Cortex-M33 without FPU also has no DSP instructions
+    if "m33" in cpu and not fpu_spec: cpu += "+nodsp"
+    env.collect(":build:archflags", "-mcpu=" + cpu, "-mthumb")
