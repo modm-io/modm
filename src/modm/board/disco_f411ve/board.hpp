@@ -30,34 +30,55 @@ using namespace modm::literals;
 struct SystemClock
 {
 	static constexpr uint32_t Hse = 8_MHz;
-	static constexpr uint32_t Frequency = 96_MHz;
+	static constexpr Rcc::PllConfig pll
+	{
+		.M = 4,   //   8 MHz /   4 =   2 MHz
+		.N = 192, //   2 MHz * 192 = 384 MHz
+		.P = 4,   // 384 MHz /   4 =  96 MHz = F_cpu
+		.Q = 8,   // 384 MHz /   8 =  48 MHz = F_usb
+	};
+	static constexpr uint32_t PllP = Hse / pll.M * pll.N / pll.P;
+	static constexpr uint32_t PllQ = Hse / pll.M * pll.N / pll.Q;
+	static_assert(PllP <= Rcc::MaxFrequency);
+
+	static constexpr uint32_t Frequency = PllP;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency / 2;
 	static constexpr uint32_t Apb2 = Frequency;
+	static constexpr uint32_t Ahb1 = Ahb;
 
-	static constexpr uint32_t Adc = Apb2;
-
-	static constexpr uint32_t Spi1 = Apb2;
-	static constexpr uint32_t Spi2 = Apb1;
-	static constexpr uint32_t Spi3 = Apb1;
-	static constexpr uint32_t Spi4 = Apb2;
-	static constexpr uint32_t Spi5 = Apb2;
-
-	static constexpr uint32_t Usart1 = Apb2;
-	static constexpr uint32_t Usart2 = Apb1;
-	static constexpr uint32_t Usart3 = Apb1;
-	static constexpr uint32_t Uart4 = Apb1;
-	static constexpr uint32_t Uart5 = Apb1;
-	static constexpr uint32_t Usart6 = Apb2;
-	static constexpr uint32_t Uart7 = Apb1;
-	static constexpr uint32_t Uart8 = Apb1;
+	static constexpr uint32_t Crc = Ahb1;
+	static constexpr uint32_t Dma1 = Ahb1;
+	static constexpr uint32_t Dma2 = Ahb1;
+	static constexpr uint32_t Flash = Ahb1;
 
 	static constexpr uint32_t I2c1 = Apb1;
 	static constexpr uint32_t I2c2 = Apb1;
 	static constexpr uint32_t I2c3 = Apb1;
+	static constexpr uint32_t I2s2Ext = Apb1;
+	static constexpr uint32_t I2s3Ext = Apb1;
+	static constexpr uint32_t IwdgBus = Apb1;
+	static constexpr uint32_t Pwr = Apb1;
+	static constexpr uint32_t RtcBus = Apb1;
+	static constexpr uint32_t Spi2 = Apb1;
+	static constexpr uint32_t Spi3 = Apb1;
+	static constexpr uint32_t Usart2 = Apb1;
+	static constexpr uint32_t Wwdg = Apb1;
+
+	static constexpr uint32_t Adc = Apb2;
+	static constexpr uint32_t Adc1 = Apb2;
+	static constexpr uint32_t Adc1Common = Apb2;
+	static constexpr uint32_t Exti = Apb2;
+	static constexpr uint32_t Sdio = Apb2;
+	static constexpr uint32_t Spi1 = Apb2;
+	static constexpr uint32_t Spi4 = Apb2;
+	static constexpr uint32_t Spi5 = Apb2;
+	static constexpr uint32_t Syscfg = Apb2;
+	static constexpr uint32_t Usart1 = Apb2;
+	static constexpr uint32_t Usart6 = Apb2;
 
 	static constexpr uint32_t Apb1Timer = Apb1 * 2;
-	static constexpr uint32_t Apb2Timer = Apb2 * 2;
+	static constexpr uint32_t Apb2Timer = Apb2;
 	static constexpr uint32_t Timer1 = Apb2Timer;
 	static constexpr uint32_t Timer2 = Apb1Timer;
 	static constexpr uint32_t Timer3 = Apb1Timer;
@@ -67,34 +88,25 @@ struct SystemClock
 	static constexpr uint32_t Timer10 = Apb2Timer;
 	static constexpr uint32_t Timer11 = Apb2Timer;
 
-	static constexpr uint32_t Usb = 48_MHz;
+	static constexpr uint32_t Usb = PllQ;
 	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
 	static constexpr uint32_t Rtc = Hse / 25;
 
 	static bool inline
 	enable()
 	{
-		Rcc::enableExternalCrystal();  // 8MHz
-		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::ExternalClock, 25);
+		Rcc::enableHseCrystal();
 
-		const Rcc::PllFactors pllFactors{
-			.pllM = 7,    // 8MHz / M=7 -> ~1.14MHz
-			.pllN = 336,  // 1.14MHz * N=336 -> 384MHz
-			.pllP = 4,    // 384MHz / P=4 -> 96MHz = F_cpu
-			.pllQ = 8,    // 384MHz / P=8 -> 48MHz = F_usb
-		};
-		Rcc::enablePll(Rcc::PllSource::ExternalCrystal, pllFactors);
-		// set flash latency for 100MHz
 		Rcc::setFlashLatency<Frequency>();
-		// switch system clock to PLL output
-		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
-		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
-		// APB1 has max. 50MHz
-		// APB2 has max. 100MHz
-		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div2);
-		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div1);
-		// update frequencies for busy-wait delay functions
 		Rcc::updateCoreFrequency<Frequency>();
+
+		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
+		Rcc::setApb1Prescaler(Rcc::ApbPrescaler::Div2);
+		Rcc::setApb2Prescaler(Rcc::ApbPrescaler::Div1);
+
+		Rcc::enablePll(Rcc::PllSource::Hse, pll);
+		Rcc::enableSystemClock(Rcc::SystemClockSource::PllP);
+		Rcc::setRealTimeClockSource(Rcc::RealTimeClockSource::Hse, 25);
 
 		return true;
 	}

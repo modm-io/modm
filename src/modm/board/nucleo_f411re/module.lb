@@ -31,9 +31,10 @@ def build(env):
     env.outbasepath = "modm/src/modm/board"
     env.substitutions = {
         "with_logger": True,
-        "with_assert": env.has_module(":architecture:assert")
+        "with_assert": env.has_module(":architecture:assert"),
+        "target": env[":target"].identifier,
     }
     env.template("../board.cpp.in", "board.cpp")
-    env.copy('.')
+    env.template("board.hpp.in")
     env.copy("../nucleo64_arduino.hpp", "nucleo64_arduino.hpp")
     env.collect(":build:openocd.source", "board/st_nucleo_f4.cfg")
