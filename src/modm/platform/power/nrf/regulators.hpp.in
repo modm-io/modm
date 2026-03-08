@@ -1,0 +1,210 @@
+/*
+ * Copyright (c) 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <stdint.h>
+#include <modm/platform/device.hpp>
+
+namespace modm::platform
+{
+
+class Regulators
+{
+public:
+%% if target.family == "53" and target.core == "app"
+	enum class
+	MainSupplyStatus
+	{
+		NormalVoltageMode,
+		HighVoltageMode,
+	};
+
+	static inline MainSupplyStatus
+	mainSupplyStatus()
+	{
+		return (NRF_REGULATORS->MAINREGSTATUS & REGULATORS_MAINREGSTATUS_VREGH_Msk)
+			? MainSupplyStatus::HighVoltageMode
+			: MainSupplyStatus::NormalVoltageMode;
+	}
+
+	static inline bool
+	isVddhSupplyActive()
+	{
+		return mainSupplyStatus() == MainSupplyStatus::HighVoltageMode;
+	}
+
+	static inline void
+	setMainDcdcEnabled(bool enable = true)
+	{
+		NRF_REGULATORS->VREGMAIN.DCDCEN = enable
+			? REGULATORS_VREGMAIN_DCDCEN_DCDCEN_Enabled
+			: REGULATORS_VREGMAIN_DCDCEN_DCDCEN_Disabled;
+	}
+
+	static inline void
+	setRadioDcdcEnabled(bool enable = true)
+	{
+		NRF_REGULATORS->VREGRADIO.DCDCEN = enable
+			? REGULATORS_VREGRADIO_DCDCEN_DCDCEN_Enabled
+			: REGULATORS_VREGRADIO_DCDCEN_DCDCEN_Disabled;
+	}
+
+	static inline void
+	setVddhDcdcEnabled(bool enable = true)
+	{
+		NRF_REGULATORS->VREGH.DCDCEN = enable
+			? REGULATORS_VREGH_DCDCEN_DCDCEN_Enabled
+			: REGULATORS_VREGH_DCDCEN_DCDCEN_Disabled;
+	}
+
+	static inline void
+	setVddhExternalSilentEnabled(bool enable = true)
+	{
+		NRF_REGULATORS->VREGH.EXTSILENTEN = enable
+			? REGULATORS_VREGH_EXTSILENTEN_EXTSILENTEN_Enabled
+			: REGULATORS_VREGH_EXTSILENTEN_EXTSILENTEN_Disabled;
+	}
+
+	static inline bool
+	isUsbVbusPresent()
+	{
+		return (NRF_USBREGULATOR->USBREGSTATUS & USBREG_USBREGSTATUS_VBUSDETECT_Msk);
+	}
+
+	static inline bool
+	isUsbRegulatorOutputReady()
+	{
+		return (NRF_USBREGULATOR->USBREGSTATUS & USBREG_USBREGSTATUS_OUTPUTRDY_Msk);
+	}
+
+	enum class VddhOutputVoltage : uint32_t
+	{
+		V1_8 = UICR_VREGHVOUT_VREGHVOUT_1V8,
+		V2_1 = UICR_VREGHVOUT_VREGHVOUT_2V1,
+		V2_4 = UICR_VREGHVOUT_VREGHVOUT_2V4,
+		V2_7 = UICR_VREGHVOUT_VREGHVOUT_2V7,
+		V3_0 = UICR_VREGHVOUT_VREGHVOUT_3V0,
+		V3_3 = UICR_VREGHVOUT_VREGHVOUT_3V3,
+		Default = UICR_VREGHVOUT_VREGHVOUT_DEFAULT,
+	};
+	static inline VddhOutputVoltage
+	vddhOutputVoltage()
+	{
+		const auto raw = (NRF_UICR->VREGHVOUT & UICR_VREGHVOUT_VREGHVOUT_Msk) >> UICR_VREGHVOUT_VREGHVOUT_Pos;
+		return static_cast<VddhOutputVoltage>(raw);
+	}
+
+	enum class
+	VddhOutputVoltageWriteResult
+	{
+		Unchanged,
+		Programmed,
+		EraseRequired,
+	};
+	static inline VddhOutputVoltageWriteResult
+	setVddhOutputVoltage(VddhOutputVoltage voltage)
+	{
+		const uint32_t currentWord = NRF_UICR->VREGHVOUT;
+		const uint32_t current = (currentWord & UICR_VREGHVOUT_VREGHVOUT_Msk) >> UICR_VREGHVOUT_VREGHVOUT_Pos;
+		const uint32_t target = static_cast<uint32_t>(voltage);
+
+		if (current == target) return VddhOutputVoltageWriteResult::Unchanged;
+		if (target & ~current) return VddhOutputVoltageWriteResult::EraseRequired;
+
+		while (NRF_NVMC->READY == NVMC_READY_READY_Busy) ;
+		NRF_NVMC->CONFIG = NVMC_CONFIG_WEN_Wen << NVMC_CONFIG_WEN_Pos;
+		while (NRF_NVMC->READY == NVMC_READY_READY_Busy) ;
+
+		NRF_UICR->VREGHVOUT = (currentWord & ~UICR_VREGHVOUT_VREGHVOUT_Msk) |
+				((target << UICR_VREGHVOUT_VREGHVOUT_Pos) & UICR_VREGHVOUT_VREGHVOUT_Msk);
+		while (NRF_NVMC->READY == NVMC_READY_READY_Busy) ;
+
+		NRF_NVMC->CONFIG = NVMC_CONFIG_WEN_Ren << NVMC_CONFIG_WEN_Pos;
+		while (NRF_NVMC->READY == NVMC_READY_READY_Busy) ;
+
+		return VddhOutputVoltageWriteResult::Programmed;
+	}
+%% elif target.family in ("51", "52")
+%% if has_vdd_regout0
+	enum class VddOutputVoltage : uint32_t
+	{
+		V1_8 = UICR_REGOUT0_VOUT_1V8,
+		V2_1 = UICR_REGOUT0_VOUT_2V1,
+		V2_4 = UICR_REGOUT0_VOUT_2V4,
+		V2_7 = UICR_REGOUT0_VOUT_2V7,
+		V3_0 = UICR_REGOUT0_VOUT_3V0,
+		V3_3 = UICR_REGOUT0_VOUT_3V3,
+		Default = UICR_REGOUT0_VOUT_DEFAULT,
+	};
+
+	enum class VddOutputVoltageWriteResult : uint8_t
+	{
+		Unchanged,
+		Programmed,
+		EraseRequired,
+	};
+%% endif
+
+%% if has_vdd_regout0
+	static inline VddOutputVoltage
+	vddOutputVoltage()
+	{
+		const auto raw = (NRF_UICR->REGOUT0 & UICR_REGOUT0_VOUT_Msk) >> UICR_REGOUT0_VOUT_Pos;
+		return static_cast<VddOutputVoltage>(raw);
+	}
+
+	static inline VddOutputVoltageWriteResult
+	setVddOutputVoltage(VddOutputVoltage voltage)
+	{
+		const uint32_t currentWord = NRF_UICR->REGOUT0;
+		const uint32_t current = (currentWord & UICR_REGOUT0_VOUT_Msk) >> UICR_REGOUT0_VOUT_Pos;
+		const uint32_t target = static_cast<uint32_t>(voltage);
+
+		if (current == target) return VddOutputVoltageWriteResult::Unchanged;
+		if (target & ~current) return VddOutputVoltageWriteResult::EraseRequired;
+
+		while (NRF_NVMC->READY == NVMC_READY_READY_Busy) ;
+		NRF_NVMC->CONFIG = NVMC_CONFIG_WEN_Wen << NVMC_CONFIG_WEN_Pos;
+		while (NRF_NVMC->READY == NVMC_READY_READY_Busy) ;
+
+		NRF_UICR->REGOUT0 = (currentWord & ~UICR_REGOUT0_VOUT_Msk) |
+				((target << UICR_REGOUT0_VOUT_Pos) & UICR_REGOUT0_VOUT_Msk);
+		while (NRF_NVMC->READY == NVMC_READY_READY_Busy) ;
+
+		NRF_NVMC->CONFIG = NVMC_CONFIG_WEN_Ren << NVMC_CONFIG_WEN_Pos;
+		while (NRF_NVMC->READY == NVMC_READY_READY_Busy) ;
+
+		return VddOutputVoltageWriteResult::Programmed;
+	}
+%% endif
+
+	static inline void
+	setMainDcdcEnabled(bool enable = true)
+	{
+		NRF_POWER->DCDCEN = enable
+			? POWER_DCDCEN_DCDCEN_Enabled
+			: POWER_DCDCEN_DCDCEN_Disabled;
+	}
+
+%% if has_vddh_dcdc
+	static inline void
+	setVddhDcdcEnabled(bool enable = true)
+	{
+		NRF_POWER->DCDCEN0 = enable
+			? POWER_DCDCEN0_DCDCEN_Enabled
+			: POWER_DCDCEN0_DCDCEN_Disabled;
+	}
+%% endif
+%% endif
+};
+
+} // namespace modm::platform
