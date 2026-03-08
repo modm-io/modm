@@ -147,8 +147,9 @@ targets = set(get_lbuild(repopath(".")).find_option("modm:target").values)
 avr_count = len([t for t in targets if t.startswith("at")])
 stm_count = len([t for t in targets if t.startswith("stm32")])
 sam_count = len([t for t in targets if t.startswith("sam")])
+nrf_count = len([t for t in targets if t.startswith("nrf")])
 rpi_count = len([t for t in targets if t.startswith("rp")])
-all_count = avr_count + stm_count + sam_count + rpi_count
+all_count = avr_count + stm_count + sam_count + nrf_count + rpi_count
 
 # Get all the modules that are available for the STM32
 # Get all drivers, we assume they are available for all devices
@@ -163,6 +164,7 @@ readme = readme_path.read_text()
 readme = replace(readme, "avrcount", avr_count)
 readme = replace(readme, "samcount", sam_count)
 readme = replace(readme, "stmcount", stm_count)
+readme = replace(readme, "nrfcount", nrf_count)
 readme = replace(readme, "rpicount", rpi_count)
 readme = replace(readme, "allcount", all_count)
 readme = replace(readme, "bsptable", bsp_table)
