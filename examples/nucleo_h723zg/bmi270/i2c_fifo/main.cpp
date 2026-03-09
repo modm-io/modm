@@ -21,15 +21,15 @@ using I2c = I2cMaster1;
 using Scl = GpioB8;  // D15
 using Sda = GpioB9;  // D14
 
-using Int1 = GpioD15;  // D8
-using Int2 = GpioF3;   // D9
+using Int1 = GpioD15;  // D9
+using Int2 = GpioF3;   // D8
 
 using Transport = modm::Bmi270I2cTransport<I2c>;
 using Imu = modm::Bmi270<Transport>;
 
-Imu imu{static_cast<uint8_t>(0x68)};
+Imu imu{Transport::I2cAddress::SdoLow};
 
-constexpr uint16_t FifoWatermarkBytes = 1536;
+constexpr uint16_t FifoWatermarkBytes = 384;
 constexpr std::size_t FifoBufferSize = 2048;
 constexpr std::size_t FifoFrameSizeAccGyro = 12;
 constexpr std::size_t FifoGyroOffset = 0;
@@ -68,7 +68,7 @@ configureDriver()
 	Imu::InterruptIoControl int2{};
 	int2.level = Imu::InterruptOutputLevel::ActiveHigh;
 	int2.outputType = Imu::InterruptOutputType::PushPull;
-	int2.outputEnable = false;
+	int2.outputEnable = true;
 	int2.inputEnable = false;
 	ok &= imu.setInt2IoControl(int2);
 
@@ -76,6 +76,7 @@ configureDriver()
 
 	Imu::InterruptMapData intMap{};
 	intMap.int1FifoWatermark = true;
+	intMap.int2FifoWatermark = true;
 	ok &= imu.setInterruptMapData(intMap);
 
 	ok &= imu.setPowerControl(Imu::PowerControl::Accelerometer | Imu::PowerControl::Gyroscope |
@@ -121,7 +122,7 @@ main()
 {
 	Board::initialize();
 	Leds::setOutput();
-	I2c::connect<Scl::Scl, Sda::Sda>(I2c::PullUps::Internal);
+	I2c::connect<Scl::Scl, Sda::Sda>(I2c::PullUps::External);
 	I2c::initialize<Board::SystemClock, 1_MHz, 10_pct>();
 	Int1::setInput(Int1::InputType::PullDown);
 	Int2::setInput(Int2::InputType::PullDown);
@@ -130,13 +131,11 @@ main()
 
 	if (!configureDriver()) { MODM_LOG_ERROR << "Configuration failed!" << modm::endl; }
 
-	Exti::connect<Int1>(Exti::Trigger::RisingEdge, [](auto) { onFifoWatermarkInterrupt(); });
-
 	std::array<uint8_t, FifoBufferSize> fifoBuffer{};
 
 	while (true)
 	{
-		if (!fifoWatermarkInterrupt.exchange(false, std::memory_order_acq_rel))
+		if (!Int1::read())
 		{
 			modm::this_fiber::sleep_for(5ms);
 			continue;

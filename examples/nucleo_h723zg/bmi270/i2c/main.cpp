@@ -9,10 +9,10 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <atomic>
 #include <cstdint>
 #include <modm/board.hpp>
 #include <modm/driver/inertial/bmi270.hpp>
+#include <modm/processing/timer.hpp>
 
 using namespace Board;
 
@@ -26,71 +26,7 @@ using Int2 = GpioF3;   // D9
 using Transport = modm::Bmi270I2cTransport<I2c>;
 using Imu = modm::Bmi270<Transport>;
 
-Imu imu{static_cast<uint8_t>(0x68)};
-
-std::atomic<uint32_t> accInterruptCount{0};
-std::atomic<uint32_t> gyroInterruptCount{0};
-
-std::atomic<int32_t> accX{0};
-std::atomic<int32_t> accY{0};
-std::atomic<int32_t> accZ{0};
-
-std::atomic<int32_t> gyroX{0};
-std::atomic<int32_t> gyroY{0};
-std::atomic<int32_t> gyroZ{0};
-
-std::atomic_flag imuBusLock = ATOMIC_FLAG_INIT;
-
-bool
-tryLockImuBus()
-{
-	return !imuBusLock.test_and_set(std::memory_order_acquire);
-}
-
-void
-unlockImuBus()
-{
-	imuBusLock.clear(std::memory_order_release);
-}
-
-void
-onDataReadyInterrupt()
-{
-	if (!tryLockImuBus()) { return; }
-
-	const auto status = imu.getStatus();
-	if (!status)
-	{
-		unlockImuBus();
-		return;
-	}
-
-	if (status->accDataReady)
-	{
-		const auto data = imu.readAccData();
-		if (data)
-		{
-			accInterruptCount.fetch_add(1, std::memory_order_relaxed);
-			accX.store(data->raw[0], std::memory_order_relaxed);
-			accY.store(data->raw[1], std::memory_order_relaxed);
-			accZ.store(data->raw[2], std::memory_order_relaxed);
-		}
-	}
-
-	if (status->gyroDataReady)
-	{
-		const auto data = imu.readGyroData();
-		if (data)
-		{
-			gyroInterruptCount.fetch_add(1, std::memory_order_relaxed);
-			gyroX.store(data->raw[0], std::memory_order_relaxed);
-			gyroY.store(data->raw[1], std::memory_order_relaxed);
-			gyroZ.store(data->raw[2], std::memory_order_relaxed);
-		}
-	}
-
-	unlockImuBus();
-}
+Imu imu{Transport::I2cAddress::SdoLow};
 
 bool
 configureDriver()
@@ -117,7 +53,7 @@ configureDriver()
 	Imu::InterruptIoControl int2{};
 	int2.level = Imu::InterruptOutputLevel::ActiveHigh;
 	int2.outputType = Imu::InterruptOutputType::PushPull;
-	int2.outputEnable = false;
+	int2.outputEnable = true;
 	int2.inputEnable = false;
 	ok &= imu.setInt2IoControl(int2);
 
@@ -125,7 +61,7 @@ configureDriver()
 
 	Imu::InterruptMapData intMap{};
 	intMap.int1DataReady = true;
-	intMap.int2DataReady = false;
+	intMap.int2DataReady = true;
 	ok &= imu.setInterruptMapData(intMap);
 
 	ok &= imu.setPowerControl(Imu::PowerControl::Accelerometer | Imu::PowerControl::Gyroscope |
@@ -138,75 +74,99 @@ main()
 {
 	Board::initialize();
 	Leds::setOutput();
-	I2c::connect<Scl::Scl, Sda::Sda>(I2c::PullUps::Internal);
+	I2c::connect<Scl::Scl, Sda::Sda>(I2c::PullUps::External);
 	I2c::initialize<Board::SystemClock, 1_MHz, 10_pct>();
 	Int1::setInput(Int1::InputType::PullDown);
 	Int2::setInput(Int2::InputType::PullDown);
 
-	MODM_LOG_INFO << "BMI270 I2C interrupt example" << modm::endl;
+	MODM_LOG_INFO << "BMI270 I2C polling example" << modm::endl;
 
 	if (!configureDriver()) { MODM_LOG_ERROR << "Configuration failed!" << modm::endl; }
 
-	Exti::connect<Int1>(Exti::Trigger::RisingEdge, [](auto) { onDataReadyInterrupt(); });
+	uint32_t accSampleCount{0};
+	uint32_t gyroSampleCount{0};
+	modm::PeriodicTimer printTimer{1s};
+
+	Imu::AccData latestAccData{};
+	latestAccData.raw = modm::Vector3i(0, 0, 0);
+	latestAccData.range = Imu::AccRange::Range2g;
+
+	Imu::GyroData latestGyroData{};
+	latestGyroData.raw = modm::Vector3i(0, 0, 0);
+	latestGyroData.range = Imu::GyroRange::Range2000dps;
+
+	std::optional<Imu::SensorStatus> latestStatus;
 
 	while (true)
 	{
-		modm::this_fiber::sleep_for(1s);
-
-		const uint32_t accCount = accInterruptCount.exchange(0, std::memory_order_relaxed);
-		const uint32_t gyroCount = gyroInterruptCount.exchange(0, std::memory_order_relaxed);
-
-		Imu::AccData accData{};
-		accData.raw = modm::Vector3i(accX.load(std::memory_order_relaxed),
-									 accY.load(std::memory_order_relaxed),
-									 accZ.load(std::memory_order_relaxed));
-		accData.range = Imu::AccRange::Range2g;
-
-		Imu::GyroData gyroData{};
-		gyroData.raw = modm::Vector3i(gyroX.load(std::memory_order_relaxed),
-									  gyroY.load(std::memory_order_relaxed),
-									  gyroZ.load(std::memory_order_relaxed));
-		gyroData.range = Imu::GyroRange::Range2000dps;
-
-		const modm::Vector3f acc = accData.getFloat();
-		const modm::Vector3f gyro = gyroData.getFloat();
-
-		std::optional<Imu::Temperature> temperature;
-		std::optional<Imu::SensorStatus> status;
-		while (!tryLockImuBus()) { modm::this_fiber::sleep_for(50us); }
-		temperature = imu.getTemperature();
-		status = imu.getStatus();
-		unlockImuBus();
-
-		MODM_LOG_INFO << "Interrupts in last 1s: acc=" << accCount << " gyro=" << gyroCount
-					  << modm::endl;
-
-		MODM_LOG_INFO << "Latest Values Acc  [mg]    x: " << acc[0] << " y: " << acc[1]
-					  << " z: " << acc[2] << modm::endl;
-		MODM_LOG_INFO << "Latest Values Gyro [deg/s] x: " << gyro[0] << " y: " << gyro[1]
-					  << " z: " << gyro[2] << modm::endl;
-
-		if (temperature and temperature->valid)
+		if (Int1::read())
 		{
-			MODM_LOG_INFO << "Current Temperature [C]: " << temperature->celsius << modm::endl;
-		} else
-		{
-			MODM_LOG_INFO << "Temperature: invalid" << modm::endl;
+			if (const auto status = imu.getStatus())
+			{
+				latestStatus = status;
+
+				if (status->accDataReady)
+				{
+					if (const auto accData = imu.readAccData())
+					{
+						latestAccData = *accData;
+						++accSampleCount;
+					}
+				}
+
+				if (status->gyroDataReady)
+				{
+					if (const auto gyroData = imu.readGyroData())
+					{
+						latestGyroData = *gyroData;
+						++gyroSampleCount;
+					}
+				}
+			}
 		}
 
-		if (status)
+		if (printTimer.execute())
 		{
-			MODM_LOG_INFO << "Current Status: acc=" << status->accDataReady
-						  << " gyro=" << status->gyroDataReady << " aux=" << status->auxDataReady
-						  << " cmd=" << status->commandReady << " auxBusy=" << status->auxBusy
-						  << modm::endl;
-		} else
-		{
-			MODM_LOG_INFO << "Status: unavailable" << modm::endl;
-		}
-		MODM_LOG_INFO << modm::endl;
+			const modm::Vector3f acc = latestAccData.getFloat();
+			const modm::Vector3f gyro = latestGyroData.getFloat();
+			const std::optional<Imu::Temperature> temperature = imu.getTemperature();
 
-		Board::LedGreen::toggle();
+			MODM_LOG_INFO << "Data-ready events in last 1s: acc=" << accSampleCount
+						  << " gyro=" << gyroSampleCount << modm::endl;
+
+			accSampleCount = 0;
+			gyroSampleCount = 0;
+
+			MODM_LOG_INFO << "Latest Values Acc  [mg]    x: " << acc[0] << " y: " << acc[1]
+						  << " z: " << acc[2] << modm::endl;
+			MODM_LOG_INFO << "Latest Values Gyro [deg/s] x: " << gyro[0] << " y: " << gyro[1]
+						  << " z: " << gyro[2] << modm::endl;
+
+			if (temperature and temperature->valid)
+			{
+				MODM_LOG_INFO << "Current Temperature [C]: " << temperature->celsius << modm::endl;
+			} else
+			{
+				MODM_LOG_INFO << "Temperature: invalid" << modm::endl;
+			}
+
+			if (latestStatus)
+			{
+				MODM_LOG_INFO << "Current Status: acc=" << latestStatus->accDataReady
+							  << " gyro=" << latestStatus->gyroDataReady
+							  << " aux=" << latestStatus->auxDataReady
+							  << " cmd=" << latestStatus->commandReady
+							  << " auxBusy=" << latestStatus->auxBusy << modm::endl;
+			} else
+			{
+				MODM_LOG_INFO << "Status: unavailable" << modm::endl;
+			}
+			MODM_LOG_INFO << modm::endl;
+
+			Board::LedGreen::toggle();
+		}
+
+		modm::this_fiber::yield();
 	}
 
 	return 0;

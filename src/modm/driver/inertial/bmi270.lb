@@ -28,6 +28,7 @@ def prepare(module, options):
         ":architecture:spi.device",
         ":architecture:i2c.device",
         ":architecture:fiber",
+        ":driver:i2c.eeprom",
         ":math:geometry",
         ":processing:timer")
     return True

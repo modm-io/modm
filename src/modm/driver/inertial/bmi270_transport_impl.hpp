@@ -37,8 +37,8 @@ Bmi270SpiTransport<SpiMaster, Cs>::readRegisters(Register startReg, uint8_t coun
 
 	txBuffer_[0] = static_cast<uint8_t>(startReg) | ReadFlag;
 	txBuffer_[1] = 0;
-	std::fill_n(txBuffer_.begin() + 2, count, 0);
-	SpiMaster::transfer(txBuffer_.data(), rxBuffer_.data(), count + 2);
+	SpiMaster::transfer(txBuffer_.data(), nullptr, 2);
+	SpiMaster::transfer(nullptr, rxBuffer_.data(), count);
 
 	if (this->releaseMaster()) { Cs::set(); }
 
@@ -63,8 +63,8 @@ Bmi270SpiTransport<SpiMaster, Cs>::writeRegisters(Register startReg, std::span<c
 	Cs::reset();
 
 	txBuffer_[0] = static_cast<uint8_t>(startReg);
-	std::copy(data.begin(), data.end(), txBuffer_.begin() + 1);
-	SpiMaster::transfer(txBuffer_.data(), nullptr, data.size() + 1);
+	SpiMaster::transfer(txBuffer_.data(), nullptr, 1);
+	SpiMaster::transfer(data.data(), nullptr, data.size());
 
 	if (this->releaseMaster()) { Cs::set(); }
 
@@ -89,8 +89,7 @@ Bmi270SpiTransport<SpiMaster, Cs>::readFifoData(std::span<uint8_t> data)
 	while (offset < data.size())
 	{
 		const std::size_t chunk = std::min<std::size_t>(data.size() - offset, MaxRegisterSequence);
-		std::fill_n(txBuffer_.begin(), chunk, 0);
-		SpiMaster::transfer(txBuffer_.data(), data.data() + offset, chunk);
+		SpiMaster::transfer(nullptr, data.data() + offset, chunk);
 		offset += chunk;
 	}
 
@@ -102,7 +101,8 @@ Bmi270SpiTransport<SpiMaster, Cs>::readFifoData(std::span<uint8_t> data)
 // I2C transport -------------------------------------------------------------------------------
 
 template<typename I2cMaster>
-Bmi270I2cTransport<I2cMaster>::Bmi270I2cTransport(uint8_t address) : I2cDevice<I2cMaster>(address)
+Bmi270I2cTransport<I2cMaster>::Bmi270I2cTransport(I2cAddress address)
+	: I2cEeprom<I2cMaster, 1>(static_cast<uint8_t>(address))
 {}
 
 template<typename I2cMaster>
@@ -116,11 +116,8 @@ Bmi270I2cTransport<I2cMaster>::readRegisters(Register startReg, uint8_t count)
 {
 	if (count > MaxRegisterSequence) { return {}; }
 
-	uint8_t reg = static_cast<uint8_t>(startReg);
-	if (I2cDevice<I2cMaster>::writeRead(&reg, 1, &buffer_[0], count))
-	{
-		return std::span{&buffer_[0], count};
-	}
+	const uint8_t reg = static_cast<uint8_t>(startReg);
+	if (this->writeRead(&reg, 1, &buffer_[0], count)) { return std::span{&buffer_[0], count}; }
 
 	return {};
 }
@@ -129,8 +126,8 @@ template<typename I2cMaster>
 bool
 Bmi270I2cTransport<I2cMaster>::writeRegister(Register reg, uint8_t data)
 {
-	const std::array<uint8_t, 1> value{data};
-	return writeRegisters(reg, std::span{value});
+	const uint8_t reg_ = static_cast<uint8_t>(reg);
+	return I2cEeprom<I2cMaster, 1>::write(reg_, &data, 1);
 }
 
 template<typename I2cMaster>
@@ -138,10 +135,8 @@ bool
 Bmi270I2cTransport<I2cMaster>::writeRegisters(Register startReg, std::span<const uint8_t> data)
 {
 	if (data.size() > MaxRegisterSequence) { return false; }
-
-	buffer_[0] = static_cast<uint8_t>(startReg);
-	std::copy(data.begin(), data.end(), buffer_.begin() + 1);
-	return I2cDevice<I2cMaster>::write(buffer_.data(), data.size() + 1);
+	const uint8_t reg = static_cast<uint8_t>(startReg);
+	return I2cEeprom<I2cMaster, 1>::write(reg, data.data(), data.size());
 }
 
 template<typename I2cMaster>
@@ -150,8 +145,8 @@ Bmi270I2cTransport<I2cMaster>::readFifoData(std::span<uint8_t> data)
 {
 	if (data.empty()) { return true; }
 
-	uint8_t reg = static_cast<uint8_t>(Register::FifoData);
-	return I2cDevice<I2cMaster>::writeRead(&reg, 1, data.data(), data.size());
+	const uint8_t reg = static_cast<uint8_t>(Register::FifoData);
+	return this->writeRead(&reg, 1, data.data(), data.size());
 }
 
 }  // namespace modm

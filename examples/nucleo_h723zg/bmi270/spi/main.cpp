@@ -192,8 +192,7 @@ main()
 		if (temperature and temperature->valid)
 		{
 			MODM_LOG_INFO << "Current Temperature [C]: " << temperature->celsius << modm::endl;
-		}
-		else
+		} else
 		{
 			MODM_LOG_INFO << "Temperature: invalid" << modm::endl;
 		}
@@ -204,8 +203,7 @@ main()
 						  << " gyro=" << status->gyroDataReady << " aux=" << status->auxDataReady
 						  << " cmd=" << status->commandReady << " auxBusy=" << status->auxBusy
 						  << modm::endl;
-		}
-		else
+		} else
 		{
 			MODM_LOG_INFO << "Status: unavailable" << modm::endl;
 		}
