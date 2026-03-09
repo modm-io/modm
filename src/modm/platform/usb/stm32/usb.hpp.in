@@ -66,7 +66,7 @@ public:
 		using Connector = GpioConnector<Peripheral::{{ peripheral }}, Signals...>;
 		using Dp = typename Connector::template GetSignal< Gpio::Signal::Dp >;
 		using Dm = typename Connector::template GetSignal< Gpio::Signal::Dm >;
-%% if is_otg
+%% if has_id
 		using Id = typename Connector::template GetSignal< Gpio::Signal::Id >;
 %% endif
 		static constexpr bool all_usb =
@@ -90,7 +90,7 @@ public:
 %% endfor
 %#
 		static_assert((any_ulpi xor any_usb) and (all_ulpi or all_usb),
-			"{{ name }}::connect() requires at least Dp, Dm (+Id) signals OR 12 ULPI signals:\n"
+			"{{ name }}::connect() requires at least Dp, Dm{% if has_id %} (+Id){% endif %} signals OR 12 ULPI signals:\n"
 %% for signal in ulpi_signals
 			"    - {{ signal.replace("Ulpi", "") | upper }}{% if loop.last %}");{% else %}\n"{% endif %}
 %% endfor
@@ -111,7 +111,7 @@ public:
 %% set idt = ""
 %% endif
 		{{idt}}GpioSet<Dp, Dm>::configure(Gpio::OutputType::PushPull, Gpio::OutputSpeed::High);
-%% if is_otg
+%% if has_id
 		{{idt}}Id::configure(Gpio::OutputType::OpenDrain, Gpio::OutputSpeed::High);
 		{{idt}}Id::configure(Gpio::InputType::PullUp);
 %% endif

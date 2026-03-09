@@ -429,6 +429,37 @@ public:
 	}
 %% endfor
 %#
+%% if target.name in ["e4", "e5", "f4", "f5"]
+	enum class
+	UsbClockSource : uint32_t
+	{
+		Disabled = 0,
+		Pll1Q = 0b01 << RCC_CCIPR4_OTGFSSEL_Pos,
+		Pll{{pll_ids[-1]}}Q = 0b10 << RCC_CCIPR4_OTGFSSEL_Pos,
+		Hsi48 = 0b11 << RCC_CCIPR4_OTGFSSEL_Pos,
+	};
+	static inline void
+	setUsbClockSource(UsbClockSource src)
+	{
+		RCC->CCIPR4 = (RCC->CCIPR4 & ~RCC_CCIPR4_OTGFSSEL) | uint32_t(src);
+	}
+%#
+%% if target.name in ["e5", "f5"]
+	enum class
+	UsbHsClockSource : uint32_t
+	{
+		Disabled = 0,
+		Pll1Q = 0b01 << RCC_CCIPR4_OTGHSSEL_Pos,
+		Pll{{pll_ids[-1]}}Q = 0b10 << RCC_CCIPR4_OTGHSSEL_Pos,
+		Hsi48 = 0b11 << RCC_CCIPR4_OTGHSSEL_Pos,
+	};
+	static inline void
+	setUsbHsClockSource(UsbHsClockSource src)
+	{
+		RCC->CCIPR4 = (RCC->CCIPR4 & ~RCC_CCIPR4_OTGHSSEL) | uint32_t(src);
+	}
+%% endif
+%% else
 	enum class
 	UsbClockSource : uint32_t
 	{
@@ -442,7 +473,8 @@ public:
 	{
 		RCC->CCIPR4 = (RCC->CCIPR4 & ~RCC_CCIPR4_USBSEL) | uint32_t(src);
 	}
-
+%% endif
+%#
 	// CCIPR5
 	enum class
 	CanClockSource : uint32_t
