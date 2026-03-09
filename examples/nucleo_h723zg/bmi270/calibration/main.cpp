@@ -22,7 +22,7 @@ using Sda = GpioB9;  // D14
 using Transport = modm::Bmi270I2cTransport<I2c>;
 using Imu = modm::Bmi270<Transport>;
 
-Imu imu{static_cast<uint8_t>(0x68)};
+Imu imu{Transport::I2cAddress::SdoLow};
 
 namespace
 {
@@ -71,7 +71,7 @@ main()
 {
 	Board::initialize();
 	Leds::setOutput();
-	I2c::connect<Scl::Scl, Sda::Sda>(I2c::PullUps::Internal);
+	I2c::connect<Scl::Scl, Sda::Sda>(I2c::PullUps::External);
 	I2c::initialize<Board::SystemClock, 1_MHz, 10_pct>();
 
 	MODM_LOG_INFO << "BMI270 calibration example (CRT + gyro user gain restore)" << modm::endl;

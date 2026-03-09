@@ -18,6 +18,7 @@
 #include <modm/architecture/interface/i2c_device.hpp>
 #include <modm/architecture/interface/register.hpp>
 #include <modm/architecture/interface/spi_device.hpp>
+#include <modm/driver/storage/i2c_eeprom.hpp>
 #include <span>
 
 namespace modm
@@ -26,6 +27,12 @@ namespace modm
 /// @ingroup modm_driver_bmi270
 struct Bmi270TransportBase
 {
+	enum class I2cAddress : uint8_t
+	{
+		SdoLow = 0x68,
+		SdoHigh = 0x69
+	};
+
 	enum class Register : uint8_t
 	{
 		ChipId = 0x00,
@@ -125,7 +132,7 @@ public:
 private:
 	static constexpr uint8_t ReadFlag{0x80};
 	std::array<uint8_t, MaxRegisterSequence + 2> rxBuffer_{};
-	std::array<uint8_t, MaxRegisterSequence + 2> txBuffer_{};
+	std::array<uint8_t, 2> txBuffer_{};
 };
 
 /**
@@ -135,10 +142,10 @@ private:
  * @ingroup modm_driver_bmi270
  */
 template<typename I2cMaster>
-class Bmi270I2cTransport : public Bmi270TransportBase, public I2cDevice<I2cMaster>
+class Bmi270I2cTransport : public Bmi270TransportBase, public I2cEeprom<I2cMaster, 1>
 {
 public:
-	explicit Bmi270I2cTransport(uint8_t address = 0x68);
+	explicit Bmi270I2cTransport(I2cAddress = I2cAddress::SdoLow);
 
 	Bmi270I2cTransport(const Bmi270I2cTransport&) = delete;
 
