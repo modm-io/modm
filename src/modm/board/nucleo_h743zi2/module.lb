@@ -12,29 +12,13 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = ":board:nucleo-h743zi"
+    module.name = ":board:nucleo-h743zi2"
     module.description = """\
-# NUCLEO-H743ZI
+# NUCLEO-H743ZI2
 
-[Nucleo kit for STM32H743ZI](https://www.st.com/en/evaluation-tools/nucleo-h743zi.html)
+[Nucleo kit for STM32H743ZI2](https://www.st.com/en/evaluation-tools/nucleo-h743zi.html)
 
-Please note that this BSP uses the Y revision of the STM32H743, which limits the
-main clock frequency to ≤400MHz and applies an errata bug fix to the SysTick,
-whose reference clock cannot be divided by 8.
-
-See the [STM32H743 errata sheet](https://www.st.com/resource/en/errata_sheet/es0392-stm32h742xig-and-stm32h743xig-device-limitations-stmicroelectronics.pdf).
-
-In case you are using the new revision V of STM32H743, you can overwrite the
-target option in your `project.xml`:
-
-```xml
-<library>
-  <extends>modm:nucleo-h743zi</extends>
-  <options>
-    <option name="modm:target">stm32h743zit6/revV</option>
-  </options>
-</library>
-```
+Please note that this BSP uses the V revision of the STM32H743.
 """
 
 def prepare(module, options):
@@ -57,10 +41,10 @@ def build(env):
     env.substitutions = {
         "with_logger": True,
         "with_assert": env.has_module(":architecture:assert"),
-        "board" : "stm32h743zi"
+        "board" : "nucleo-h743zi2"
     }
 
     env.template("../board.cpp.in", "board.cpp")
-    env.template("board.hpp.in")
+    env.template("../nucleo_h743zi/board.hpp.in", "board.hpp")
     env.copy("../nucleo144_arduino.hpp", "nucleo144_arduino.hpp")
     env.collect(":build:openocd.source", "board/st_nucleo_h743zi.cfg")

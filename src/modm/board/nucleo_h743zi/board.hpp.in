@@ -30,9 +30,12 @@ using namespace modm::literals;
 struct SystemClock
 {
 	static constexpr uint32_t Hse = 8_MHz;
-
+	%% if board == "stm32h743zi"
 	// NOTE: revision Y at 400MHz, only revision V runs at 480Mhz!!!
 	static constexpr uint32_t SysClk = 400_MHz;
+	%% else
+	static constexpr uint32_t SysClk = 480_MHz;
+	%% endif
 	static constexpr uint32_t Pll2Q = 120_MHz;
 	// Max 400MHz or 480MHz
 	static constexpr uint32_t Hclk = SysClk / 1; // D1CPRE
@@ -113,7 +116,11 @@ struct SystemClock
 		const Rcc::PllFactors pllFactors1{
 			.range = Rcc::PllInputRange::MHz4_8,
 			.pllM = 2,		//   8MHz / M=   4MHz
+			%% if board == "stm32h743zi"
 			.pllN = 100,	//   4MHz * N= 400MHz
+			%% else
+			.pllN = 120,
+			%% endif
 			.pllP = 1,		// 400MHz / P= 400MHz = F_cpu
 			.pllQ = 10,		// 400MHz / Q=  40MHz
 			.pllR = 10,		// 400MHz / R=  40MHz
@@ -167,9 +174,14 @@ struct SystemClock
 using Button = GpioInputC13;
 
 using LedGreen = GpioOutputB0;
-using LedBlue = GpioOutputB7;
 using LedRed = GpioOutputB14;
+%% if board == "stm32h743zi"
+using LedBlue = GpioOutputB7;
 using Leds = SoftwareGpioPort< LedRed, LedBlue, LedGreen >;
+%% else
+using LedYellow = GpioOutputE1;
+using Leds = SoftwareGpioPort< LedRed, LedYellow, LedGreen >;
+%% endif
 /// @}
 
 namespace usb
@@ -182,8 +194,11 @@ using Dm = GpioA11;
 using Dp = GpioA12;
 
 using Overcurrent = GpioInputG7;	// OTG_FS_OverCurrent
+%% if board == "stm32h743zi"
 using Power = GpioOutputG6;			// OTG_FS_PowerSwitchOn
-
+%% else
+using Power = GpioOutputD10;		// OTG_FS_PowerSwitchOn
+%% endif
 using Device = UsbFs;
 /// @}
 }
@@ -212,9 +227,7 @@ initialize()
 	stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>();
 	stlink::Uart::initialize<SystemClock, 115200_Bd>();
 
-	LedGreen::setOutput(modm::Gpio::Low);
-	LedBlue::setOutput(modm::Gpio::Low);
-	LedRed::setOutput(modm::Gpio::Low);
+	Leds::setOutput(modm::Gpio::Low);
 
 	Button::setInput();
 }
