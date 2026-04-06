@@ -56,6 +56,7 @@ author_handles = {
     "Julia Gutheil": None,
     "Jörg Ebeling": "Apehaenger",
     "Jörg Hoffmann": "19joho66",
+    "Joël Schulz-Andres": "joelsa",
     "Kaelin Laundry": "WasabiFan",
     "Kevin Läufer": "ekiwi",
     "Klaus Schnass": "klsc-zeat",
