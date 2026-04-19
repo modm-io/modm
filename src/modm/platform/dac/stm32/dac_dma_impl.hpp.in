@@ -111,9 +111,9 @@ void
 						 DmaChannel::Priority priority)
 {
 %% if target.family in ["f2", "f4", "f7"]
-	using RequestMapping = typename DmaChannel::RequestMapping<Peripheral::Dac{{ id }}, DmaChannel::Signal::Dac{{ channel_id }}>;
+	using RequestMapping = typename DmaChannel::template RequestMapping<Peripheral::Dac{{ id }}, DmaChannel::Signal::Dac{{ channel_id }}>;
 %% else
-	using RequestMapping = typename DmaChannel::RequestMapping<Peripheral::Dac{{ id }}, DmaChannel::Signal::Ch{{ channel_id }}>;
+	using RequestMapping = typename DmaChannel::template RequestMapping<Peripheral::Dac{{ id }}, DmaChannel::Signal::Ch{{ channel_id }}>;
 %% endif
 	constexpr auto request = RequestMapping::Request;
 

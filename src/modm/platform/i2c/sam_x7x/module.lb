@@ -63,6 +63,7 @@ def prepare(module, options):
         ":architecture:interrupt",
         ":cmsis:device",
         ":container",
+        ":math:utils",
         ":platform:gpio")
 
     for instance in listify(device.get_driver("twihs")["instance"]):

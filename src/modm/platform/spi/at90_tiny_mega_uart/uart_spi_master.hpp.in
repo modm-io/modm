@@ -18,6 +18,7 @@
 #include <modm/platform/uart/uart_defines.h>
 #include <modm/architecture/interface/spi_lock.hpp>
 #include <modm/architecture/interface/spi_master.hpp>
+#include <modm/math/utils/cmath.hpp>
 #include <modm/platform/gpio/connector.hpp>
 #include <modm/processing/fiber.hpp>
 
@@ -92,8 +93,8 @@ public:
 		// calculate the fractional prescaler value
 		constexpr float pre_raw = static_cast<float>(SystemClock::UsartSpi) / ( 2 * baudrate );
 		// respect the prescaler range of 1 to 4096
-		constexpr uint32_t pre_ceil = std::ceil(pre_raw) > 4096 ? 4096 : std::ceil(pre_raw);
-		constexpr uint32_t pre_floor = std::floor(pre_raw) < 1 ? 1 : std::floor(pre_raw);
+		constexpr uint32_t pre_ceil = modm::ceil(pre_raw) > 4096 ? 4096 : modm::ceil(pre_raw);
+		constexpr uint32_t pre_floor = modm::floor(pre_raw) < 1 ? 1 : modm::floor(pre_raw);
 
 		// calculate the possible baudrates above and below the requested baudrate
 		constexpr uint32_t baud_lower = SystemClock::UsartSpi / ( 2 * pre_ceil );
