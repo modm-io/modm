@@ -17,6 +17,7 @@
 
 #include "i2c.hpp"
 #include <modm/architecture/interface/i2c_master.hpp>
+#include <modm/math/utils/cmath.hpp>
 #include <modm/platform/gpio/connector.hpp>
 #include <modm/platform/gpio/open_drain.hpp>
 #include <algorithm>
@@ -79,10 +80,10 @@ public:
 
 		// calculate the fractional prescaler value
 		constexpr float pre_part_raw = float(SystemClock::I2c) / ( 2 * baudrate );
-		constexpr float pre_raw = std::floor(pre_part_raw) < 8 ? 0 : (pre_part_raw - 8) / pre;
+		constexpr float pre_raw = modm::floor(pre_part_raw) < 8 ? 0 : (pre_part_raw - 8) / pre;
 		// respect the prescaler range of 0 to 255
-		constexpr uint32_t pre_ceil = std::min(uint32_t(std::ceil(pre_raw)), 255ul);
-		constexpr uint32_t pre_floor = std::floor(pre_raw);
+		constexpr uint32_t pre_ceil = std::min(uint32_t(modm::ceil(pre_raw)), 255ul);
+		constexpr uint32_t pre_floor = modm::floor(pre_raw);
 
 		// calculate the possible baudrates above and below the requested baudrate
 		constexpr uint32_t baud_lower = SystemClock::I2c / ( 16 + 2 * pre_ceil  * pre );

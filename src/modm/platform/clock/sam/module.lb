@@ -20,7 +20,7 @@ def prepare(module, options):
     if not options[":target"].has_driver("gclk:sam"):
         return False
 
-    module.depends(":cmsis:device", ":architecture:delay", ":platform:clock")
+    module.depends(":cmsis:device", ":architecture:delay", ":math:utils", ":platform:clock")
     return True
 
 def build(env):

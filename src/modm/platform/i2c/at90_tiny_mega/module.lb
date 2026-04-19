@@ -28,6 +28,7 @@ def prepare(module, options):
         ":architecture:accessor",
         ":architecture:i2c",
         ":architecture:interrupt",
+        ":math:utils",
         ":platform:gpio")
     return True
 
