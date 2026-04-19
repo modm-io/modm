@@ -64,6 +64,8 @@ def build(project):
     commands = []
     if ":build:scons" in project_cfg:
         commands.append( ("scons build --cache-show --random", "SCons") )
+        if ":build:compilation_db" in project_cfg:
+            commands.append( ("scons compilation_db", "CompilationDB (via SCons)") )
     if ":build:make" in project_cfg and not is_running_on_windows:
         commands.append( ("make build", "Make") )
     elif ":build:cmake" in project_cfg and not is_running_on_windows:
