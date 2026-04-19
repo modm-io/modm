@@ -150,10 +150,10 @@ template<typename T>
 using WideType = typename detail::WideType<T>::type;
 
 template<typename T>
-using SignedType = typename detail::MakeSigned<T>::type;
+using SignedType [[deprecated("use std::make_signed_t")]] = typename detail::MakeSigned<T>::type; // DEPRECATED: 2026q3
 
 template<typename T>
-using UnsignedType = typename detail::MakeUnsigned<T>::type;
+using UnsignedType [[deprecated("use std::make_unsigned_t")]] = typename detail::MakeUnsigned<T>::type; // DEPRECATED: 2026q3
 
 /**
  * Arithmetic Traits
@@ -177,7 +177,7 @@ using UnsignedType = typename detail::MakeUnsigned<T>::type;
  * @endcode
  */
 template<typename T>
-struct ArithmeticTraits
+struct [[deprecated("use std::numeric_limits instead")]] ArithmeticTraits // DEPRECATED: 2026q3
 {
 	static constexpr bool isInteger = std::is_integral_v<T>
 		&& !std::is_same_v<std::decay_t<T>, bool>;
