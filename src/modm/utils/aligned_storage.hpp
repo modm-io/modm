@@ -51,6 +51,9 @@ union aligned_storage_helper
 };
 } // namespace aligned_storage_impl
 
+template<std::size_t Cap>
+constexpr auto default_storage_alignment = alignof(aligned_storage_impl::aligned_storage_helper<Cap>);
+
 /**
  * Implementation of std::aligned_storage that avoids GCC bug #61458 which can
  * cause excessive size for types smaller than the maximum alignment.
@@ -59,15 +62,20 @@ union aligned_storage_helper
  * The implementation is derived from:
  * https://github.com/WG21-SG14/SG14/blob/master/SG14/inplace_function.h
  */
-template<size_t Cap, size_t Align = alignof(aligned_storage_impl::aligned_storage_helper<Cap>)>
-struct aligned_storage {
-    using type = std::aligned_storage_t<Cap, Align>;
+template<std::size_t Cap, std::size_t Align = default_storage_alignment<Cap>>
+struct [[deprecated("see C++ standards paper P1413R3")]] aligned_storage // DEPRECATED: 2026q3
+{
+    struct type
+    {
+        alignas(Align) unsigned char data[Cap];
+    };
 };
 /// @endcond
 
 /// @ingroup modm_utils
-template<size_t Cap, size_t Align = alignof(aligned_storage_impl::aligned_storage_helper<Cap>)>
-using aligned_storage_t = typename aligned_storage<Cap, Align>::type;
+template<std::size_t Cap, std::size_t Align = default_storage_alignment<Cap>>
+using aligned_storage_t [[deprecated("see C++ standards paper P1413R3")]] =
+	typename aligned_storage<Cap, Align>::type; // DEPRECATED: 2026q3
 
 static_assert(sizeof(aligned_storage_t<sizeof(void*)>) == sizeof(void*));
 static_assert(alignof(aligned_storage_t<sizeof(void*)>) == alignof(void*));
