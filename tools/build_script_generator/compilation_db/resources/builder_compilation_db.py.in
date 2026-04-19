@@ -13,7 +13,7 @@ from pathlib import Path
 env = defaultdict(list)
 
 env["CONFIG_PROJECT_NAME"] = "{{ options[":build:project.name"] }}"
-env["CONFIG_BUILD_BASE"] = "{{ build_path }}"
+env["CONFIG_BUILD_BASE"] = os.path.abspath("{{ build_path | modm.windowsify(escape_level=1)}}")
 env["CONFIG_BUILD_PROFILE"] = "debug" if "--debug" in sys.argv else "release"
 
 env["BUILDPATH"] = os.path.join(env["CONFIG_BUILD_BASE"], env["CONFIG_BUILD_PROFILE"])

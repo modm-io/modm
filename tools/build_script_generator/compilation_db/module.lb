@@ -26,8 +26,9 @@ def prepare(module, options):
 def build(env):
     def flag_format(flag):
         subs = {
-            "target_base": "\"${TARGET.base}\"",
-            "linkdir": "\"modm/link\""
+            "target_base": '"${TARGET.base}"',
+            "project_source_dir": 'env["BASEPATH"]',
+            "gccpath": 'env["GCC_PATH"]'
         }
         flag = '"{}"'.format(flag)
         vals = ["{}={}".format(t, r) for t, r in subs.items() if "{{{}}}".format(t) in flag]
@@ -52,7 +53,7 @@ def post_build(env):
         subs["memories"] = []
     # Add SCons specific data
     subs.update({
-        "build_path": env.relative_outpath(env[":build:build.path"]),
+        "build_path": env.relcwdoutpath(env[":build:build.path"]),
         "generated_paths": repositories,
         "common_source_flag_map": common_source_flag_map,
     })

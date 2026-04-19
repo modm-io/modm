@@ -6,7 +6,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-from os.path import join, abspath
+from os.path import join, abspath, realpath, dirname
 import sys, shutil
 
 profile = env["CONFIG_BUILD_PROFILE"]
@@ -19,7 +19,7 @@ env["COMPILERPREFIX"] = "arm-none-eabi-"
 %% else
 %% if family == "darwin"
 # Using homebrew gcc on macOS instead of clang
-env["COMPILERSUFFIX"] = next(c[3:] for c in ["gcc-9", "gcc-8", "gcc-7"] if shutil.which(c) is not None)
+env["COMPILERSUFFIX"] = next(c[3:] for c in ["gcc-15", "gcc-14"] if shutil.which(c) is not None)
 %% endif
 %% endif
 
@@ -47,6 +47,12 @@ env["OBJDUMP"] = prefix + "objdump"
 env["SIZE"] = prefix + "size"
 env["STRIP"] = prefix + "strip"
 env["LINK"] = env["CXX"]
+
+c_compiler_name = env["CC"]
+assert (c_compiler_path := shutil.which(c_compiler_name)), \
+        f'Selected compiler "{c_compiler_name}" not found on PATH. ' \
+        "Please add its installation directory to the PATH environment variable."
+env["GCC_PATH"] = dirname(dirname(realpath(c_compiler_path)))
 
 %% endif
 
