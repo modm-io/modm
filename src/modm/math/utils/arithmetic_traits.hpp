@@ -4,7 +4,7 @@
  * Copyright (c) 2012, 2014, Niklas Hauser
  * Copyright (c) 2013, 2015, Sascha Schade
  * Copyright (c) 2015, Kevin Läufer
- * Copyright (c) 2018, Christopher Durand
+ * Copyright (c) 2018, 2026, Christopher Durand
  * Copyright (c) 2022, Raphael Lehmann
  *
  * This file is part of the modm project.
@@ -18,10 +18,13 @@
 #ifndef MODM_ARITHMETIC_TRAITS_HPP
 #define MODM_ARITHMETIC_TRAITS_HPP
 
+#include <concepts>
 #include <cstdint>
 #include <limits>
 #include <type_traits>
 #include <cmath>
+
+#include <modm/math/utils/cmath.hpp>
 
 namespace modm
 {
@@ -97,13 +100,9 @@ namespace detail
 	struct WideType<unsigned long long>
 	{ using type = double; };
 
-	template<typename T, typename = std::enable_if_t<
-		std::is_integral_v<T> && !std::is_same_v<std::decay_t<T>, bool>
-	> >
-	using enable_if_int = T;
-
-	template<typename T>
-	struct WideType<enable_if_int<T>>
+	template<std::integral T>
+		requires (!std::is_same_v<std::remove_cv_t<T>, bool>)
+	struct WideType<T>
 	{
 		static constexpr bool isNextIntLarger =
 			std::numeric_limits<typename NextInt<T>::type>::max() > std::numeric_limits<T>::max();
@@ -123,8 +122,9 @@ namespace detail
 		using type = T;
 	};
 
-	template<typename T>
-	struct MakeSigned<enable_if_int<T>>
+	template<std::integral T>
+		requires (!std::is_same_v<std::remove_cv_t<T>, bool>)
+	struct MakeSigned<T>
 	{
 		using type = std::make_signed_t<T>;
 	};
@@ -135,8 +135,9 @@ namespace detail
 		using type = T;
 	};
 
-	template<typename T>
-	struct MakeUnsigned<enable_if_int<T>>
+	template<std::integral T>
+		requires (!std::is_same_v<std::remove_cv_t<T>, bool>)
+	struct MakeUnsigned<T>
 	{
 		using type = std::make_unsigned_t<T>;
 	};
@@ -181,8 +182,11 @@ struct ArithmeticTraits
 	static constexpr bool isInteger = std::is_integral_v<T>
 		&& !std::is_same_v<std::decay_t<T>, bool>;
 
+	// log10(2), not constexpr yet with clang
+	static constexpr auto log10_2 = 0.3010299956639812;
+
 	static constexpr unsigned char decimalDigits =
-		std::ceil(std::numeric_limits<T>::digits * log10(2)) + (std::is_signed_v<T> ? 1 : 0);
+		modm::ceil(std::numeric_limits<T>::digits * log10_2) + (std::is_signed_v<T> ? 1 : 0);
 };
 /// @}
 

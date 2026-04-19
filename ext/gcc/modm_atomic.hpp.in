@@ -153,6 +153,7 @@ __atomic_compare_exchange_{{len//8}}(volatile void *ptr, void *expected, {{len|u
 %% endmacro
 
 // ================================ lock free =================================
+#ifndef __clang__
 extern "C" [[gnu::always_inline]] inline bool
 __atomic_is_lock_free (unsigned int object_size, const volatile void *ptr)
 {
@@ -161,7 +162,7 @@ __atomic_is_lock_free (unsigned int object_size, const volatile void *ptr)
 		return ((uintptr_t)ptr & (object_size - 1)) == 0;
 	return false;
 }
-
+#endif // __clang__
 
 %% macro atomic_fetch(len)
 	%% for name, op in [("and", "&"), ("or", "|"), ("xor", "^"), ("nand", "&")]

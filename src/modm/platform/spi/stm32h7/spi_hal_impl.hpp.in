@@ -188,8 +188,9 @@ SpiHal{{ id }}::write16(uint16_t data)
 {
 	// Write with 16-bit access
 	// SPI{{ id }}->TXDR is of type "volatile uint32_t".
-	// [[gnu::may_alias]] is required to avoid undefined behaviour due to strict aliasing violations.
-	auto* const [[gnu::may_alias]] ptr = reinterpret_cast<__IO uint16_t*>(&SPI{{ id }}->TXDR);
+	// may_alias is required to avoid undefined behaviour due to strict aliasing violations.
+	using Reg16 = __IO uint16_t __attribute__((__may_alias__));
+	auto* const ptr = reinterpret_cast<Reg16*>(&SPI{{ id }}->TXDR);
 	*ptr = data;
 }
 
@@ -211,8 +212,9 @@ SpiHal{{ id }}::read16()
 {
 	// Read with 16-bit access
 	// SPI{{ id }}->RXDR is of type "const volatile uint32_t".
-	// [[gnu::may_alias]] is required to avoid undefined behaviour due to strict aliasing violations.
-	auto* const [[gnu::may_alias]] ptr = reinterpret_cast<const __IO uint16_t*>(&SPI{{ id }}->RXDR);
+	// may_alias is required to avoid undefined behaviour due to strict aliasing violations.
+	using Reg16 = const __IO uint16_t __attribute__((__may_alias__));
+	auto* const ptr = reinterpret_cast<Reg16*>(&SPI{{ id }}->RXDR);
 	return *ptr;
 }
 
