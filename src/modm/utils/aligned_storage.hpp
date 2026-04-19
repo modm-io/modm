@@ -47,6 +47,7 @@ union aligned_storage_helper
     maybe<double1> f;
     maybe<double4> g;
     maybe<long double> h;
+    maybe<short> i;
 };
 } // namespace aligned_storage_impl
 
