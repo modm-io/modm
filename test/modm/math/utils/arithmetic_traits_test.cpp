@@ -90,6 +90,9 @@ len([[maybe_unused]] const char (&arr) [N])
 
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
 template<typename T>
 constexpr size_t Digits_v = modm::ArithmeticTraits<T>::decimalDigits;
 
@@ -208,3 +211,5 @@ ArithmeticTraitsTest::testSignedUnsigned()
 	// dummy, test is compile time only
 	TEST_ASSERT_TRUE(true);
 }
+
+#pragma GCC diagnostic push

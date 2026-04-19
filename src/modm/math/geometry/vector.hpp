@@ -112,11 +112,11 @@ namespace modm
 
 	template< typename T, uint8_t N >
 	struct detail::MakeSigned< Vector<T, N> >
-	{ using type = Vector< SignedType<T>, N >; };
+	{ using type = Vector< std::make_signed_t<T>, N >; };
 
 	template< typename T, uint8_t N >
 	struct detail::MakeUnsigned< Vector<T, N> >
-	{ using type = Vector< UnsignedType<T>, N >; };
+	{ using type = Vector< std::make_unsigned_t<T>, N >; };
 
 	template< typename T, uint8_t N >
 	struct detail::WideType< Vector<T, N> >
