@@ -61,6 +61,15 @@ public:
 	constexpr Rgb565(const RgbT<U> &rgb) : Rgb565(rgb.red, rgb.green, rgb.blue)
 	{}
 
+	/**
+	 * Convertion Constructor for HSV Color
+	 *
+	 * @param hsv	HSV Color
+	 */
+	template<std::unsigned_integral U>
+	constexpr Rgb565(const HsvT<U> &hsv) : Rgb565(RgbCalcType(hsv))
+	{}
+
 	constexpr bool
 	operator==(const Rgb565 &other) const = default;
 
