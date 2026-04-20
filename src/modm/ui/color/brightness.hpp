@@ -73,8 +73,7 @@ public:
 	 *
 	 * @param rgb	RGB Color
 	 */
-	template<std::unsigned_integral U>
-	constexpr BrightnessT(RgbT<U> rgb)
+	constexpr BrightnessT(RgbT<T> rgb)
 		: value((0.2125f * float(rgb.red)) + (0.7154f * float(rgb.green)) +
 				(0.0721f * float(rgb.blue)))
 	{}
@@ -84,8 +83,7 @@ public:
 	 *
 	 * @param hsv	HSV Color
 	 */
-	template<std::unsigned_integral U>
-	constexpr BrightnessT(HsvT<U> hsv) : value(hsv.value)
+	constexpr BrightnessT(HsvT<T> hsv) : value(hsv.value)
 	{}
 
 	/**
@@ -97,6 +95,21 @@ public:
 
 	constexpr bool
 	operator==(const BrightnessT<T> &other) const = default;
+
+	constexpr operator RgbT<T>() const
+	{
+		return RgbT<T>{value, value, value};
+	}
+
+	constexpr operator HsvT<T>() const
+	{
+		return HsvT<T>{0, 0, value};
+	}
+
+	constexpr operator Rgb565() const
+	{
+		return Rgb565(RgbT<uint8_t>(*this));
+	}
 };
 
 /// @ingroup modm_ui_color

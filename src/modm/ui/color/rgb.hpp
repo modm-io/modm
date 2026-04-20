@@ -24,21 +24,8 @@
 #include <modm/math/utils/arithmetic_traits.hpp>
 #include <type_traits>
 
-#include "brightness.hpp"
-#include "hsv.hpp"
-#include "rgb565.hpp"
-
 namespace modm::color
 {
-
-// forward declarations for convertion constructors
-template<std::unsigned_integral T>
-class HsvT;
-
-template<std::unsigned_integral T>
-class BrightnessT;
-
-class Rgb565;
 
 /**
  * Color in HSV Colorspace
@@ -76,36 +63,6 @@ public:
 		requires std::is_same_v<T, uint8_t> && std::is_same_v<U, uint16_t>
 	constexpr RgbT(const RgbT<U> &rgb_other)
 		: red(rgb_other.red >> 8), green(rgb_other.green >> 8), blue(rgb_other.blue >> 8)
-	{}
-
-	/**
-	 * Convertion Constructor for HSV Color
-	 *
-	 * @param hsv	HSV Color
-	 */
-	template<std::unsigned_integral U>
-	constexpr RgbT(const HsvT<U>& hsv);
-
-	/**
-	 * Convertion Constructor for Brightness
-	 *
-	 * @param brightness	Brightness 'Color'-object
-	 */
-	// TODO Plump conversion, implement the right way
-	template<std::unsigned_integral U>
-	constexpr RgbT(const BrightnessT<U> brightness)
-		: red(brightness), green(brightness), blue(brightness)
-	{}
-
-	/**
-	 * Convertion Constructor for RGB565 Color
-	 *
-	 * @param rgb565	RGB565 Color
-	 */
-	constexpr RgbT(const Rgb565& rgb565)
-		: red((rgb565.color >> 8) & 0xF8),
-		  green((rgb565.color >> 3) & 0xFC),
-		  blue(rgb565.color << 3)
 	{}
 
 	constexpr bool
@@ -159,7 +116,5 @@ operator<<(IOStream& os, const color::RgbT<U>& color)
 #endif
 
 }  // namespace modm::color
-
-#include "rgb_impl.hpp"
 
 #endif  // MODM_COLOR_RGB_HPP
