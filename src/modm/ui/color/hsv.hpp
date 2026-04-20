@@ -19,21 +19,10 @@
 #include <stdint.h>
 #include <concepts>
 
-#include "brightness.hpp"
 #include "rgb.hpp"
-#include "rgb565.hpp"
 
 namespace modm::color
 {
-
-// forward declarations for convertion constructors
-template<std::unsigned_integral T>
-class RgbT;
-
-template<std::unsigned_integral T>
-class BrightnessT;
-
-class Rgb565;
 
 /**
  * @brief		Color in HSV Colorspace
@@ -76,27 +65,13 @@ public:
 	 *
 	 * @param rgb	RGB Color
 	 */
-	template<std::unsigned_integral U>
-	constexpr HsvT(const RgbT<U>& rgb);
-
-	/**
-	 * Convertion Constructor for Brightness
-	 *
-	 * @param brightness	Brightness 'Color'-object
-	 */
-	template<std::unsigned_integral U>
-	constexpr HsvT(const BrightnessT<U> gray) : hue(0), saturation(0), value(gray.value)
-	{}
-
-	/**
-	 * Convertion Constructor for RGB565 Color
-	 *
-	 * @param rgb565	RGB565 Color
-	 */
-	constexpr HsvT(const Rgb565& rgb565) : HsvT(RgbT<uint8_t>(rgb565)) {}
+	constexpr HsvT(const RgbT<T>& rgb);
 
 	constexpr bool
 	operator==(const HsvT<T>& other) const = default;
+
+	constexpr operator RgbT<T>() const
+		requires std::is_same_v<T, uint8_t>;
 
 private:
 	template<std::unsigned_integral U>
