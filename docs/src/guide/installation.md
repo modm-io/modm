@@ -8,7 +8,7 @@ with modm:
 - [Library Builder][lbuild].
 - AVR toolchain: [avr-gcc][] and [avrdude][].
 - ARM toolchain: [toolchain-arm-xpack][] and [OpenOCD][] (at least v0.12!).
-- Optional: [Doxypress][].
+- Optional: [Doxygen][].
 - Optional: [gdbgui][] for IDE-independent debugging.
 
 Note that the modm examples use the SCons build system by default, however,
@@ -54,17 +54,10 @@ pip3 install gdbgui
     export PATH="$HOME/.local/bin:$PATH"
     ```
 
-We use [Doxypress][doxypress_binaries] to generate the API documentation:
+We use Doxygen to generate the API documentation:
 
 ```sh
-sudo mkdir /opt/doxypress
-wget -O- https://github.com/copperspice/doxypress/releases/download/dp-2.0.0/doxypress-2.0.0-ubuntu24.04-x64.tar.bz2 | sudo tar xj -C /opt/doxypress
-```
-
-Add the directory to your `PATH` variable in `~/.bashrc`:
-
-```sh
-export PATH="/opt/doxypress:$PATH"
+sudo apt install doxygen
 ```
 
 
@@ -155,13 +148,6 @@ We recommend using a graphical frontend for GDB called [gdbgui][]:
 pip3 install gdbgui
 ```
 
-We use [Doxypress][] to generate the API documentation:
-
-```sh
-brew tap modm-ext/modm
-brew install doxypress
-```
-
 
 #### ARM Cortex-M
 
@@ -240,8 +226,8 @@ lbuild --version
 scons --version
 ```
 
-We use [Doxypress][] to generate the API documentation.
-Download and run the [Installer][doxypress_binaries].
+We use [Doxygen][] to generate the API documentation.
+Download and run the [Installer][doxygen_binaries].
 
 Please use the free and open-source [7-Zip file archiver][7_zip] to extract the
 files in the next steps.
@@ -394,6 +380,7 @@ picocom --baud 115200 --imap lfcrlf --echo /dev/ttyACM0
 [cmake]: https://www.cmake.org
 [openocd_binaries]: https://gnutoolchains.com/arm-eabi/openocd/
 [doxygen]: http://www.doxygen.nl
+[doxygen_binaries]: https://www.doxygen.nl/download.html
 [doxypress]: https://www.copperspice.com/documentation-doxypress.html
 [doxypress_binaries]: https://download.copperspice.com/doxypress/binary/
 [gdbgui]: https://www.gdbgui.com

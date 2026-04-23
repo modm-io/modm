@@ -36,10 +36,10 @@ scons program profile=debug
 scons debug profile=debug
 ```
 
-To generate your target specific Doxypress documentation:
+To generate your target specific Doxygen documentation:
 
 ```sh
-(cd modm/docs && doxypress doxypress.json)
+(cd modm/docs && doxygen doxyfile.cfg)
 # open modm/docs/html/index.html
 ```
 

@@ -159,7 +159,7 @@ which contains the full API documentation for all BSPs. Alternatively you can
 generate your own API docs locally:
 
 ```sh
-(cd modm/docs && doxypress doxypress.json)
+(cd modm/docs && doxygen doxyfile.cfg)
 # open modm/docs/html/index.html
 ```
 
@@ -212,7 +212,7 @@ Remember to include the `modm:docs` module, since you need to generate your own
 API docs from your specific configuration:
 
 ```sh
-(cd modm/docs && doxypress doxypress.json)
+(cd modm/docs && doxygen doxyfile.cfg)
 # open modm/docs/html/index.html
 ```
 
