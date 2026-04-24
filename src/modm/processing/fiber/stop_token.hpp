@@ -52,6 +52,13 @@ public:
 		return not requested.exchange(true, std::memory_order_relaxed);
 	}
 
+	/// @note This function can be called from an interrupt.
+	void inline
+	reset()
+	{
+		requested.store(false, std::memory_order_relaxed);
+	}
+
 	constexpr stop_source
 	get_source();
 
