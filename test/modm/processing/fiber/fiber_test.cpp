@@ -270,6 +270,11 @@ FiberTest::testStopToken()
 		TEST_ASSERT_EQUALS(state++, 6u);
 	});
 	modm::fiber::Scheduler::run();
+	// repeat the same test exactly the same
+	state = 0;
+	fiber1.start();
+	fiber2.start();
+	modm::fiber::Scheduler::run();
 }
 
 void
