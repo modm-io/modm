@@ -148,7 +148,7 @@ public:
 	static void
 	flushWriteBuffer() { while(not isWriteFinished()); }
 
-	bool
+	static bool
 	isWriteFinished() { return transmitBufferSize() == 0 and Hal::isTransmitRegisterEmpty(); }
 
 	static std::size_t

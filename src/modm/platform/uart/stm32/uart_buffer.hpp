@@ -173,7 +173,7 @@ public:
 	}
 
 	static bool
-	read(uint8_t &data)
+	read(uint8_t &data, uint32_t /*ignored*/)
 	{
 		if (rxBuffer.isEmpty()) return false;
 
