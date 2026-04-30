@@ -17,6 +17,7 @@ class Accessor(Module):
         module.description = "Memory Accessors"
 
     def prepare(self, module, options):
+        module.depends(":platform:core")
         return True
 
     def build(self, env):
