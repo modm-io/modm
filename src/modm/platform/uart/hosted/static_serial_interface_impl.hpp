@@ -84,7 +84,7 @@ modm::platform::StaticSerialInterface<N>::receiveBufferSize()
 
 template<int N>
 bool
-modm::platform::StaticSerialInterface<N>::read(uint8_t &data)
+modm::platform::StaticSerialInterface<N>::read(uint8_t &data, uint32_t /*ignored*/)
 {
 	char c;
 	if (backend->read(c)) {

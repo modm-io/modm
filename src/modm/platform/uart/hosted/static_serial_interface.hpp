@@ -87,7 +87,7 @@ namespace modm
 			receiveBufferSize();
 
 			static bool
-			read(uint8_t &data);
+			read(uint8_t &data, uint32_t /*ignored*/ = 0);
 
 			static std::size_t
 			read(uint8_t *buffer, std::size_t length);

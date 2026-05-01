@@ -95,6 +95,7 @@ table_zero(const uint32_t *const start, const uint32_t *const end)
 // Called by Reset_Handler in reset_handler.s
 void __modm_startup(void)
 {
+	__disable_irq();
 	// Copy and zero all internal memory
 	table_copy(__table_copy_intern_start, __table_copy_intern_end);
 	table_zero(__table_zero_intern_start, __table_zero_intern_end);
@@ -131,6 +132,8 @@ void __modm_startup(void)
 
 	// Call all constructors of static objects
 	table_call(__init_array_start, __init_array_end);
+
+	__enable_irq();
 
 	// Call the application's entry point
 	main();
