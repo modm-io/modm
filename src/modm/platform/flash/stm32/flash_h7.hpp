@@ -57,8 +57,8 @@ public:
 	static inline bool
 	isBusy(uint8_t bank)
 	{
-		if (bank == 1) { return FLASH->SR1 & FLASH_SR_QW; }
-		if (bank == 2) { return FLASH->SR2 & FLASH_SR_QW; }
+		if (bank == 1) { return FLASH->SR1 & (FLASH_SR_BSY | FLASH_SR_QW); }
+		if (bank == 2) { return FLASH->SR2 & (FLASH_SR_BSY | FLASH_SR_QW); }
 		return false;
 	}
 
