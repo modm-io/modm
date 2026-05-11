@@ -3,6 +3,7 @@
  * Copyright (c) 2009-2010, 2012, 2018, Fabian Greif
  * Copyright (c) 2012, 2014-2015, 2017, 2020, Niklas Hauser
  * Copyright (c) 2013, 2016, Sascha Schade
+ * Copyright (c) 2026, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -17,6 +18,7 @@
 #include <modm/processing/timer.hpp>
 #include <modm-test/mock/clock.hpp>
 #include <modm/debug.hpp>
+#include "../fiber/shared.hpp"
 
 using namespace std::chrono_literals;
 using test_clock = modm_test::chrono::milli_clock;
@@ -318,4 +320,36 @@ TimeoutTest::testRestart()
 
 	TEST_ASSERT_EQUALS(timeoutShort.remaining(), -40ms);
 	TEST_ASSERT_EQUALS(timeout.remaining(), -40ms);
+}
+
+void
+TimeoutTest::testWait()
+{
+	auto test = [](auto timer) {
+		test_clock::setTime(0);
+
+		// test wait doesn't block if timer is stopped
+		timer.wait();
+		timer.restart(100ms);
+
+		int step = 0;
+		modm::fiber::Task waiter(stack1, [&] {
+			timer.wait();
+			TEST_ASSERT_EQUALS(step, 10);
+		});
+		modm::fiber::Task test(stack2, [&] {
+			do {
+				++step;
+				test_clock::setTime(step * 10ms);
+				modm::this_fiber::yield();
+			} while (step < 12);
+		});
+		modm::fiber::Scheduler::run();
+
+		// test wait doesn't block if timer is expired
+		timer.wait();
+	};
+
+	test(modm::ShortTimeout{});
+	test(modm::Timeout{});
 }

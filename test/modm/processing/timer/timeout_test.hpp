@@ -37,4 +37,7 @@ public:
 
 	void
 	testRestart();
+
+	void
+	testWait();
 };
