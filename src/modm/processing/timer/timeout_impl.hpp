@@ -130,7 +130,7 @@ template< class Clock, class Duration >
 void
 modm::GenericTimeout<Clock, Duration>::wait()
 {
-	modm::this_fiber::poll([this]{ return execute(); });
+	modm::this_fiber::poll([this]{ return !isArmed(); });
 }
 
 // ----------------------------------------------------------------------------
