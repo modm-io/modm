@@ -31,6 +31,7 @@ struct SystemClock
 {
 	static constexpr uint32_t Frequency = 16_MHz;
 	static constexpr uint32_t Uart0 = 16_MHz;
+	static constexpr uint32_t Wdt = 32.768_kHz;
 
 	static bool inline
 	enable()

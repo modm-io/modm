@@ -1,0 +1,10 @@
+<library>
+  <extends>modm:nrf5340-dk</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nrf5340-dk/wdt</option>
+  </options>
+  <modules>
+    <module>modm:platform:wdt</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

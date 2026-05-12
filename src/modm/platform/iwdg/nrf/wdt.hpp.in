@@ -1,0 +1,64 @@
+/*
+ * Copyright (c) 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <algorithm>
+#include <modm/architecture/interface/peripheral.hpp>
+#include <modm/math/algorithm/prescaler.hpp>
+#include "../device.hpp"
+
+
+namespace modm::platform
+{
+
+/// @ingroup modm_platform_wdt
+class Wdt : public ::modm::PeripheralDriver
+{
+public:
+	static inline void
+	initialize(uint32_t reload)
+	{
+		{{ peripheral }}->CRV = reload;
+		{{ peripheral }}->RREN = WDT_RREN_RR0_Enabled;
+	}
+
+	template< class SystemClock, milliseconds_t timeout, percent_t tolerance=pct(1) >
+	static void
+	initialize()
+	{
+		constexpr auto result = modm::GenericPrescaler<double>::from_linear(
+				SystemClock::Wdt, 1000.0 / timeout.count(), 0xFul, 0xFFFFFFFFul);
+		assertDurationInTolerance< double(result.prescaler) / SystemClock::Wdt,
+				timeout.count() / 1000.0, tolerance >();
+		initialize(result.prescaler - 1);
+	}
+
+	static inline void
+	enable()
+	{
+		{{ peripheral }}->TASKS_START = 1ul;
+	}
+
+	static inline void
+	trigger()
+	{
+		{{ peripheral }}->RR[0] = WDT_RR_RR_Reload;
+	}
+
+	static inline bool
+	isRunning()
+	{
+		return {{ peripheral }}->RUNSTATUS;
+	}
+};
+
+}
