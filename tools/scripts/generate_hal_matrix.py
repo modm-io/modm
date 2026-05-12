@@ -108,6 +108,7 @@ def hal_get_modules():
                 "fsmc": "External Memory",
                 "flash": "Internal Flash",
                 "iwdg": "Watchdog",
+                "wdt": "Watchdog",
                 "timer": "Timer",
                 "i2c": "I<sup>2</sup>C",
                 "usart": "UART",
