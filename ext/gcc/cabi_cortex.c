@@ -13,16 +13,25 @@
 #include <modm/architecture/interface/assert.h>
 
 // ------------------------------------------------------------------------
+// _exit() and abort() are declared __noreturn__ in newlib's <stdlib.h>.
+// modm_assert(false, ...) typically halts via the modm_assert_report()
+// handler, but a user-installed handler is allowed to return; in that
+// case the function would otherwise fall through and GCC raises
+// `'noreturn' function does return` (-Wsuggest-attribute=noreturn).
+// The trailing for(;;){} loop pins the noreturn contract regardless of
+// what modm_assert_report does. See modm-io/modm#1298.
 modm_weak void _exit(int status)
 {
 	modm_assert(false, "libc.exit",
 			"The libc exit(status) function was called!", status);
+	for (;;) { }
 }
 
 modm_weak void abort(void)
 {
 	modm_assert(false, "libc.abort",
 			"The libc abort() function was called!");
+	for (;;) { }
 }
 
 modm_weak int atexit(void (*fn)(void))
