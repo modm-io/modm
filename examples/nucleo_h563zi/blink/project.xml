@@ -1,0 +1,9 @@
+<library>
+  <extends>modm:nucleo-h563zi</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_h563zi/blink</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

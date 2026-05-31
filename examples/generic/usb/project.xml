@@ -23,6 +23,7 @@
   <!-- <extends>modm:nucleo-u575zi-q</extends> -->
   <!-- <extends>modm:nucleo-h503rb</extends> -->
   <!-- <extends>modm:nucleo-h533re</extends> -->
+  <!-- <extends>modm:nucleo-h563zi</extends> -->
   <!-- <extends>modm:weact-h503cb</extends> -->
   <!-- <extends>modm:weact-h523ce</extends> -->
   <!-- <extends>modm:weact-h562rg</extends> -->
