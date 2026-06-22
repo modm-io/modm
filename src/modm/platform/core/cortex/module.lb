@@ -422,7 +422,7 @@ def build(env):
                 "-Wl,--no-warn-rwx-segment", "-L{project_source_dir}")
     # Linkerscript
     linkerscript = env["linkerscript.override"]
-    env.collect(":build:linkflags", "-T{}".format(env.relcwdoutpath(
+    env.collect(":build:linkflags", "-T{}".format(env.cwdoutpath(
             linkerscript if linkerscript else "modm/link/linkerscript.ld")))
 
     # Compilation for FPU
