@@ -124,6 +124,24 @@ public:
 		return result.frequency;
 	}
 
+	template< class SystemClock >
+	static baudrate_t
+	setBaudrate(baudrate_t baudrate)
+	{
+		// 16.6 fractional baudrate generator with 16x oversampling
+		constexpr uint32_t min = (1ul << 7);
+		constexpr uint32_t max = (1ul << 22) - 1ul;
+		auto result = Prescaler::from_linear(SystemClock::PeriFrequency*4, baudrate, min, max);
+		// Load PL011's baud divisor registers
+		uart{{ id }}_hw->ibrd = result.prescaler >> 6;
+		uart{{ id }}_hw->fbrd = result.prescaler & 0x3f;
+		// PL011 needs a (dummy) line control register write to latch in the
+		// divisors. We don't want to actually change LCR contents here.
+		hw_set_bits(&uart{{ id }}_hw->lcr_h, 0);
+
+		return result.frequency;
+	}
+
 	template< class SystemClock, baudrate_t baudrate, percent_t tolerance=pct(1) >
 	static void
 	initialize(Parity parity=Parity::Disabled, WordLength length=WordLength::Bit8, StopBits stop=StopBits::Bit1)
