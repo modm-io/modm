@@ -91,14 +91,14 @@ namespace ws2812
 	template <typename SystemClock,typename PIO,typename SM,typename DataGpio>
 	static constexpr void init(uint16_t offset) {
 		PIO::template connect<typename DataGpio::Pad>();
-		SM::template addOutput<DataGpio>();
+		SM::template setPinsDirection<DataGpio>(true);
 
-		SM::config(offset,program)
+		const auto config = modm::platform::pio::sm_config(offset,program)
 			.template setSidesetPins<DataGpio>()
 			.template setOutShift<false,true,24>()
 			.setFifoJoinTx()
-			.template setFrequency<SystemClock,1000000000/TimeScale>()
-			.init(offset+program.getOffset<bitloop>());
+			.template setFrequency<SystemClock,1000000000/TimeScale>();
+		SM::init(config, offset+program.getOffset<bitloop>());
 		SM::setEnabled(true);
 	}
 

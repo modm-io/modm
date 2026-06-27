@@ -61,6 +61,8 @@ namespace modm::platform
 
         template <typename Pio,size_t SM>
         friend class pio::implementation::StateMachine;
+        template <typename Pio,size_t SM,typename DataType>
+        friend class pio::implementation::FifoAdapter;
 
     public:
         static constexpr Peripheral peripherial = Peripheral::Pio{{ id }};
@@ -91,6 +93,11 @@ namespace modm::platform
             auto res = static_cast<size_t>(offset);
             addProgramAtOffset(res,prg);
             return res;
+        }
+
+        template< class Pin >
+        static void inputSyncBypass() {
+            hw_set_bits(&pio().input_sync_bypass,1u << Pin::pin);
         }
     };
 
