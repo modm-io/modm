@@ -67,7 +67,9 @@ git clone --recurse-submodules --jobs 8 https://github.com/modm-io/modm.git
 - Lightweight unit testing system (suitable for AVRs).
 - Hundreds of tests to ensure correct functionality.
 - Integration of useful third-party software:
-	- [CMSIS][] and [CMSIS-DSP][] interfaces.
+	- [CMSIS][] interfaces and headers.
+	- [CMSIS-DAP][]: USB to SWD/JTAG bridge.
+	- [CMSIS-DSP][]: Embedded compute library.
 	- [CrashCatcher][]: Crash reports for HardFaults.
 	- [Eigen][]: Linear Algebra Library.
 	- [ETL][]: Embedded Template Library.

@@ -1,0 +1,38 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2026, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+# =============================================================================
+def init(module):
+    module.name = ":cmsis:dap"
+    module.description = FileReader("dap.md")
+
+
+def prepare(module, options):
+    module.depends(":architecture:clock")
+    return options[":target"].has_driver("core:cortex-m*")
+
+
+def build(env):
+    env.outbasepath = "modm/ext/cmsis/"
+    env.copy("dap.hpp")
+
+    env.outbasepath = "modm/ext/cmsis/dap"
+    env.copy("cmsis-dap/Firmware/Include/DAP.h", "DAP.h")
+    env.copy("cmsis-dap/Firmware/Source/DAP.c", "DAP.c")
+    env.copy("cmsis-dap/Firmware/Source/SW_DP.c", "SW_DP.c")
+    env.copy("cmsis-dap/Firmware/Source/JTAG_DP.c", "JTAG_DP.c")
+
+    env.copy("dap_defaults.cpp")
+    env.substitutions = {
+        "core": env[":target"].get_driver("core")["type"],
+    }
+    env.template("DAP_config.h.in")

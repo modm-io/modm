@@ -1,0 +1,158 @@
+/*
+ * Copyright (c) 2013-2021 ARM Limited. All rights reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Licensed under the Apache License, Version 2.0 (the License); you may
+ * not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * ----------------------------------------------------------------------
+ *
+ * $Date:        16. June 2021
+ * $Revision:    V2.1.0
+ *
+ * Project:      CMSIS-DAP Configuration
+ * Title:        DAP_config.h CMSIS-DAP Configuration File (Template)
+ *
+ *---------------------------------------------------------------------------*/
+
+#ifndef __DAP_CONFIG_H__
+#define __DAP_CONFIG_H__
+
+//**************************************************************************************************
+
+#include <cmsis/dap.hpp>
+
+#if __has_include(<DAP_config_local.h>)
+#	include <DAP_config_local.h>
+#endif
+
+// See the template in the CMSIS-DAP repository for documentation of the configuration options.
+
+extern uint32_t SystemCoreClock;
+#define CPU_CLOCK               SystemCoreClock
+#define IO_PORT_WRITE_CYCLES    {% if "m0+" in core %}1U{% else %}2U{% endif %}
+
+#ifndef DAP_SWD
+#define DAP_SWD                 1
+#endif
+#ifndef DAP_JTAG
+#define DAP_JTAG                0
+#endif
+#ifndef DAP_DEFAULT_PORT
+#define DAP_DEFAULT_PORT        1U
+#endif
+#ifndef DAP_DEFAULT_SWJ_CLOCK
+#define DAP_DEFAULT_SWJ_CLOCK   1000000U
+#endif
+#ifndef DAP_PACKET_SIZE
+#define DAP_PACKET_SIZE         64U
+#endif
+#ifndef DAP_PACKET_COUNT
+#define DAP_PACKET_COUNT        1U
+#endif
+
+#ifndef TIMESTAMP_CLOCK
+#define TIMESTAMP_CLOCK         1000000U
+#endif
+#ifndef TIMESTAMP_GET
+#define TIMESTAMP_GET()         DAP_GetTimestamp()
+#endif
+
+#define SWO_UART                0
+#define SWO_MANCHESTER          0
+#define SWO_STREAM              0
+#define DAP_UART                0
+#define DAP_UART_USB_COM_PORT   0
+
+#ifndef PIN_SWCLK_TCK_IN
+#define PIN_SWCLK_TCK_IN()      (DAP_PinSwclkTck(DAP_PIN_READ) ? 1u : 0u)
+#endif
+#ifndef PIN_SWCLK_TCK_SET
+#define PIN_SWCLK_TCK_SET()     DAP_PinSwclkTck(DAP_PIN_SET_HIGH)
+#endif
+#ifndef PIN_SWCLK_TCK_CLR
+#define PIN_SWCLK_TCK_CLR()     DAP_PinSwclkTck(DAP_PIN_SET_LOW)
+#endif
+
+#ifndef PIN_SWDIO_TMS_IN
+#define PIN_SWDIO_TMS_IN()      (DAP_PinSwdioTms(DAP_PIN_READ) ? 1u : 0u)
+#endif
+#ifndef PIN_SWDIO_TMS_SET
+#define PIN_SWDIO_TMS_SET()     DAP_PinSwdioTms(DAP_PIN_SET_HIGH)
+#endif
+#ifndef PIN_SWDIO_TMS_CLR
+#define PIN_SWDIO_TMS_CLR()     DAP_PinSwdioTms(DAP_PIN_SET_LOW)
+#endif
+#ifndef PIN_SWDIO_IN
+#define PIN_SWDIO_IN()          (DAP_PinSwdioTms(DAP_PIN_READ) ? 1u : 0u) // Used in SW_DP.c
+#endif
+#ifndef PIN_SWDIO_OUT
+#define PIN_SWDIO_OUT(bit)      DAP_PinSwdioTms((bit) & 1u) // Used in SW_DP.c
+#endif
+#ifndef PIN_SWDIO_OUT_ENABLE
+#define PIN_SWDIO_OUT_ENABLE()  DAP_PinSwdioTms(DAP_PIN_DIR_OUT)
+#endif
+#ifndef PIN_SWDIO_OUT_DISABLE
+#define PIN_SWDIO_OUT_DISABLE() DAP_PinSwdioTms(DAP_PIN_DIR_IN)
+#endif
+
+#ifndef PIN_TDI_IN
+#define PIN_TDI_IN()            (DAP_PinTdi(DAP_PIN_READ) ? 1u : 0u)
+#endif
+#ifndef PIN_TDI_OUT
+#define PIN_TDI_OUT(bit)        DAP_PinTdi((bit) & 1u) // Used in SW_DP.c
+#endif
+
+#ifndef PIN_TDO_IN
+#define PIN_TDO_IN()            (DAP_PinTdo(DAP_PIN_READ) ? 1u : 0u)
+#endif
+
+#ifndef PIN_nTRST_IN
+#define PIN_nTRST_IN()          (DAP_PinnTrst(DAP_PIN_READ) ? 1u : 0u)
+#endif
+#ifndef PIN_nTRST_OUT
+#define PIN_nTRST_OUT(bit)      DAP_PinnTrst((bit) & 1u) // Used in SW_DP.c
+#endif
+
+#ifndef PIN_nRESET_IN
+#define PIN_nRESET_IN()         (DAP_PinnReset(DAP_PIN_READ) ? 1u : 0u)
+#endif
+#ifndef PIN_nRESET_OUT
+#define PIN_nRESET_OUT(bit)     DAP_PinnReset((bit) & 1u) // Used in SW_DP.c
+#endif
+
+#ifndef LED_CONNECTED_OUT
+#define LED_CONNECTED_OUT(bit)  DAP_LedConnectedOut((bit) & 1u) // Used in SW_DP.c
+#endif
+#ifndef LED_RUNNING_OUT
+#define LED_RUNNING_OUT(bit)    DAP_LedRunningOut((bit) & 1u) // Used in SW_DP.c
+#endif
+
+#ifndef PORT_JTAG_SETUP
+#define PORT_JTAG_SETUP()       DAP_Port(DAP_PORT_SETUP_JTAG)
+#endif
+#ifndef PORT_SWD_SETUP
+#define PORT_SWD_SETUP()        DAP_Port(DAP_PORT_SETUP_SWD)
+#endif
+#ifndef PORT_OFF
+#define PORT_OFF()              DAP_Port(DAP_PORT_OFF)
+#endif
+
+#ifndef DAP_SETUP
+#define DAP_SETUP()             // just do it after calling DAP_Setup()
+#endif
+#ifndef RESET_TARGET
+#define RESET_TARGET()          DAP_Reset()
+#endif
+
+#endif /* __DAP_CONFIG_H__ */

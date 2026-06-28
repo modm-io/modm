@@ -61,3 +61,6 @@
 [submodule "ext/nordic/nrfx"]
 	path = ext/nordic/nrfx
 	url = https://github.com/modm-ext/nrfx-partial.git
+[submodule "ext/arm/cmsis-dap"]
+	path = ext/arm/cmsis-dap
+	url = https://github.com/modm-ext/cmsis-dap-partial.git
