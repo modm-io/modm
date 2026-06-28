@@ -70,6 +70,7 @@ def human_readable_format(num, unit='B'):
 def format(source, device_memories):
     memories = defaultdict(list)
     for memory in device_memories:
+        if "alias" in memory: continue
         if "w" in memory["access"]:
             memories["ram"].append(memory)
         else:
