@@ -561,7 +561,7 @@ public:
 		Scale2 = 0b01 << PWR_VOSCR_VOS_Pos,
 		Scale3 = 0b00,
 	};
-	static inline bool
+	static inline bool modm_ramcode // Errata workaround for rev A and Z
 	setVoltageScaling(VoltageScaling voltage, uint32_t waitLoops = 0x10000)
 	{
 		const auto currentSetting = PWR->VOSCR & PWR_VOSCR_VOS;
