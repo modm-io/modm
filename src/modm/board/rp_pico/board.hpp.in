@@ -15,6 +15,11 @@
 
 #include <modm/architecture/interface/clock.hpp>
 #include <modm/platform.hpp>
+%% if with_logger
+#include <modm/debug/logger.hpp>
+#include <modm/io.hpp>
+#define MODM_BOARD_HAS_LOGGER
+%% endif
 
 using namespace modm::platform;
 
@@ -85,6 +90,10 @@ using Leds = SoftwareGpioPort<LedGreen>;
 
 using Button = GpioUnused;
 
+%% if with_logger
+using LoggerDevice = modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull >;
+%% endif
+
 inline void
 initialize()
 {
@@ -92,6 +101,13 @@ initialize()
 	SysTickTimer::initialize<SystemClock>();
 
 	LedGreen::setOutput();
+
+%% if with_logger
+	// initialize Uart0 for MODM_LOG_*
+	Uart0::connect<GpioOutput0::Tx>();
+	Uart0::initialize<Board::SystemClock, 115200_Bd>();
+%% endif
+
 }
 
 inline void

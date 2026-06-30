@@ -52,16 +52,6 @@ namespace modm::platform::pio::implementation
 		static inline bool txFifoEmpty() {
 			return (Pio::pio().fstat & (1u << (PIO_FSTAT_TXEMPTY_LSB + SM))) != 0;
 		}
-
-		static inline void writeBlocking(DataType val) {
-			while(txFifoFull()) {__NOP();}
-			writeUnsafe(val);
-		}
-		static inline void writeBlocking(const DataType* data,size_t length) {
-			for (size_t i=0;i<length;++i) {
-				writeBlocking(data[i]);
-			}
-		}
 		static void write(DataType val) {
 			while (txFifoFull()) modm::this_fiber::yield();
     		writeUnsafe(val);
@@ -75,10 +65,6 @@ namespace modm::platform::pio::implementation
 		}
 		static inline bool rxFifoEmpty() {
 			return (Pio::pio().fstat & (1u << (PIO_FSTAT_RXEMPTY_LSB + SM))) != 0;
-		}
-		static inline DataType readBlocking() {
-			while(rxFifoEmpty()) {__NOP();}
-			return readUnsafe();
 		}
 		static DataType read() {
 			while (rxFifoEmpty()) modm::this_fiber::yield();

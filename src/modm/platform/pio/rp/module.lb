@@ -60,4 +60,3 @@ def build(env):
     env.copy("pio_program.hpp")
     env.copy("pio_sm.hpp")
     env.copy("pio_sm_config.hpp")
-    pass
