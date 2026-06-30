@@ -43,32 +43,32 @@ main()
 		uint32_t clr = 0;
 		while (clr!=0xff0000) {
 			clr = clr + 0x010000;
-			HW::PIO_SM::writeBlocking(clr << 8);
+			HW::PIO_SM::write(clr << 8);
 			modm::delay(delay_val);
 		}
 		while (clr!=0x000000) {
 			clr = clr - 0x010000;
-			HW::PIO_SM::writeBlocking(clr << 8);
+			HW::PIO_SM::write(clr << 8);
 			modm::delay(delay_val);
 		}
 		while (clr!=0x00ff00) {
 			clr = clr + 0x000100;
-			HW::PIO_SM::writeBlocking(clr << 8);
+			HW::PIO_SM::write(clr << 8);
 			modm::delay(delay_val);
 		}
 		while (clr!=0x000000) {
 			clr = clr - 0x000100;
-			HW::PIO_SM::writeBlocking(clr << 8);
+			HW::PIO_SM::write(clr << 8);
 			modm::delay(delay_val);
 		}
 		while (clr!=0x0000ff) {
 			clr = clr + 0x000001;
-			HW::PIO_SM::writeBlocking(clr << 8);
+			HW::PIO_SM::write(clr << 8);
 			modm::delay(delay_val);
 		}
 		while (clr!=0x000000) {
 			clr = clr - 0x000001;
-			HW::PIO_SM::writeBlocking(clr << 8);
+			HW::PIO_SM::write(clr << 8);
 			modm::delay(delay_val);
 		}
 
