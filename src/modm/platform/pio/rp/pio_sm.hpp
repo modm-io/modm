@@ -53,7 +53,7 @@ namespace modm::platform::pio::implementation
 			return (Pio::pio().fstat & (1u << (PIO_FSTAT_TXEMPTY_LSB + SM))) != 0;
 		}
 		static void write(DataType val) {
-			while (txFifoFull()) modm::this_fiber::yield();
+			modm::this_fiber::poll([](){ return !txFifoFull(); });
     		writeUnsafe(val);
 		}
 		static inline void writeUnsafe(DataType val) {
@@ -67,7 +67,7 @@ namespace modm::platform::pio::implementation
 			return (Pio::pio().fstat & (1u << (PIO_FSTAT_RXEMPTY_LSB + SM))) != 0;
 		}
 		static DataType read() {
-			while (rxFifoEmpty()) modm::this_fiber::yield();
+			modm::this_fiber::poll([](){ return !rxFifoEmpty(); });
 		    return readUnsafe();
 		}
 		static inline DataType readUnsafe() {
@@ -178,7 +178,9 @@ namespace modm::platform::pio::implementation
 			Pio::pio().fdebug = STALL_MASK;
 		}
 		static void waitStall() {
-			while ((Pio::pio().fdebug & STALL_MASK)==0) {__NOP();}
+			modm::this_fiber::poll([](){
+				return (Pio::pio().fdebug & STALL_MASK)!=0;
+			});
 		}
 		template <class SystemClock>
 		static void setFrequency(frequency_t freq) {
