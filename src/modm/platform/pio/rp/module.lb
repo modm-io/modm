@@ -36,7 +36,7 @@ class Instance(Module):
 
 def init(module):
     module.name = ":platform:pio"
-    module.description = "Programmable IO block (PIO)"
+    module.description = FileReader("module.md")
 
 def prepare(module, options):
     device = options[":target"]
