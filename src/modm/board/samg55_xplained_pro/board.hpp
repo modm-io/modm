@@ -110,11 +110,6 @@ initializeUsb()
 	Usb::initialize<Board::SystemClock>();
 }
 
-// DEPRECATE: 2026q2
-[[deprecated("Use initializeUsb() instead!")]]
-inline void
-initializeUsbFs()
-{ initializeUsb(); }
 /// @}
 
 } // namespace Board

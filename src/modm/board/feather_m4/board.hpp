@@ -181,11 +181,6 @@ initializeUsb()
 	modm::platform::Usb::connect<GpioA24::Dm, GpioA25::Dp>();
 }
 
-// DEPRECATE: 2026q2
-[[deprecated("Use initializeUsb() instead!")]]
-inline void
-initializeUsbFs()
-{ initializeUsb(); }
 /// @}
 
 }  // namespace Board

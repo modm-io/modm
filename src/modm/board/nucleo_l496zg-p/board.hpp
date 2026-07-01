@@ -181,11 +181,6 @@ initializeUsb(uint8_t priority=3)
 	usb::Vbus::setInput();
 }
 
-// DEPRECATE: 2026q2
-[[deprecated("Use initializeUsb() instead!")]]
-inline void
-initializeUsbFs(uint8_t priority=3)
-{ initializeUsb(priority); }
 /// @}
 
 } // Board namespace

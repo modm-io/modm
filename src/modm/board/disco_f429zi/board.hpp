@@ -331,11 +331,6 @@ initializeUsb(uint8_t priority=3)
 	USB_OTG_HS->GCCFG |= USB_OTG_GCCFG_VBUSBSEN;
 }
 
-// DEPRECATE: 2026q2
-[[deprecated("Use initializeUsb() instead!")]]
-inline void
-initializeUsbFs(uint8_t priority=3)
-{ initializeUsb(priority); }
 /// @}
 
 }

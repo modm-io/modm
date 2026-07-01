@@ -250,17 +250,7 @@ initializeUsb(uint8_t priority=3)
 	USB_OTG_HS->GUSBCFG |= USB_OTG_GUSBCFG_FDMOD;
 }
 
-// DEPRECATE: 2026q2
-[[deprecated("Use initializeUsb() instead!")]]
-inline void
-initializeUsbFs(uint8_t priority=3)
-{ initializeUsb(priority); }
 
-// DEPRECATE: 2026q2
-[[deprecated("Use initializeUsb() instead!")]]
-inline void
-initializeUsbHs(uint8_t priority=3)
-{ initializeUsb(priority); }
 /// @}
 
 }

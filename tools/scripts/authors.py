@@ -65,6 +65,7 @@ author_handles = {
     "Luiz Gili": "lgili",
     "Lukas Güldenstein": "gueldenstone",
     "Marco Miralles": "minco3",
+    "Marin Dötterer": "marinauterion",
     "Marten Junga": "Maju-Ketchup",
     "Martin Esser": "Scabber",
     "Martin Rosekeit": "thundernail",
