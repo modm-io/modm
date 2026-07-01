@@ -30,7 +30,6 @@ class Instance(Module):
         env.outbasepath = "modm/src/modm/platform/pio"
 
         env.template("pio.hpp.in", "pio_{}.hpp".format(self.instance))
-        env.template("pio.cpp.in", "pio_{}.cpp".format(self.instance))
 
 
 

@@ -34,7 +34,7 @@ namespace modm::platform
     {
     	static inline pio_hw_t& pio() { return *pio{{ id }}_hw; }
 
-        static uint32_t used_instruction_space;
+        static inline uint32_t used_instruction_space = 0;
         static int findOffset(const PIOProgram& prg) {
             uint32_t program_mask = (1u << prg.length) - 1;
             if (prg.origin >= 0) {
