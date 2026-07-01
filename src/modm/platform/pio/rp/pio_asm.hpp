@@ -719,6 +719,5 @@ namespace modm::platform::pio
 	static constexpr auto Set = implementation::Set();
 	static constexpr auto Nop = implementation::Mov().y.y;
 
-	
 
 }

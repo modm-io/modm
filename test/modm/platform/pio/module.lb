@@ -25,9 +25,9 @@ def prepare(module, options):
     return True
 
 def build(env):
-   
+
     device = env[":target"]
     identifier = device.identifier
-   
+
     env.outbasepath = "modm-test/src/modm-test/platform/pio"
     env.copy("platform_pio_test_rp.cpp")

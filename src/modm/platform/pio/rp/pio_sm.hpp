@@ -112,7 +112,7 @@ namespace modm::platform::pio::implementation
 			sm().instr = instr.value;
 		}
 		static constexpr uint32_t STALL_MASK = 1u << (PIO_FDEBUG_TXSTALL_LSB + SM);
-		
+
 		template <typename>
 		struct ToBoolArg {
 			using type = bool;

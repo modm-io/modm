@@ -17,7 +17,6 @@ namespace modm::platform::pio
 
 	class StateMachineConfig {
 	public:
-	
 		uint32_t clkdiv{0};
 		uint32_t execctrl{0};
 		uint32_t shiftctrl{0};
