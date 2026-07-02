@@ -1,0 +1,10 @@
+<library>
+  <extends>modm:nucleo-h563zi</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_h563zi/fiber</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:processing:fiber</module>
+  </modules>
+</library>
