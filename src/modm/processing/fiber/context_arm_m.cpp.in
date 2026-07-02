@@ -188,14 +188,17 @@ modm_context_start(modm_context_t*)
 		"orr r1, r1, #2		\n\t"	// Set SPSEL
 %% endif
 		"msr control, r1	\n\t"
+		"isb				\t\n\t"
 %#
 %% if is_cm0
 		"ldr r1, [r0]		\n\t"
 		"mov sp,  r1		\n\t"	// Set PSP to ctx->sp
 %% elif with_psplim
 		"ldm r0, {r1-r2}	\n\t"
-		"msr psplim, r2		\n\t"	// Set PSPLIM to ctx->bottom
+		"mov r3, #0			\n\t"
+		"msr psplim, r3		\n\t"	// Disable PSPLIM
 		"mov sp, r1			\n\t"	// Set PSP to ctx->sp
+		"msr psplim, r2		\n\t"	// Set PSPLIM to ctx->bottom
 %% else
 		"ldr sp, [r0]		\n\t"	// Set PSP to ctx->sp
 %% endif
@@ -240,8 +243,10 @@ modm_context_jump(modm_context_t*, modm_context_t*)
 		"mov sp,  r2			\n\t"	// Restore SP from to->sp
 %% elif with_psplim
 		"ldm r1, {r1-r2}		\n\t"
+		"mov r3, #0				\n\t"
+		"msr psplim, r3			\n\t"	// Disable PSPLIM
+		"mov sp, r1				\n\t"	// Restore SP from to->sp
 		"msr psplim, r2			\n\t"	// Set PSPLIM to ctx->bottom
-		"mov sp, r1				\n\t"	// Set PSP to ctx->sp
 %% else
 		"ldr sp, [r1]			\n\t"	// Restore SP from to->sp
 %% endif
@@ -260,6 +265,12 @@ modm_context_end(uintptr_t)
 {
 	asm volatile
 	(
+%% if with_psplim
+		"mov r3, #0			\n\t"
+		"msr psplim, r3		\n\t"	// Disable PSPLIM
+%#
+%% endif
+
 		"mrs r1, control	\n\t"
 %% if is_cm0
 		"mov r2, #2			\n\t"
@@ -268,6 +279,7 @@ modm_context_end(uintptr_t)
 		"bic r1, r1, #2		\n\t"	// Unset SPSEL
 %% endif
 		"msr control, r1	\n\t"
+		"isb				\n\t"
 
 		MODM_POP_CONTEXT()
 	);
