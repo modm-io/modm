@@ -60,13 +60,6 @@ struct Gpio
 	};
 
 	enum class
-	OutputSpeed
-	{
-		Slow = 0,
-		Fast = 1,
-	};
-
-	enum class
 	DriveStrength
 	{
 		mA_2 = 0,

@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <extends>modm:rp-pico</extends>
+  <options>
+    <option name="modm:build:build.path">../../build/generated-unittest/rp-pico/</option>
+    <option name="modm:build:unittest.source">../../build/generated-unittest/rp-pico/modm-test</option>
+    <option name="modm:board:rp-pico:with_logger">true</option>
+    <option name="modm:tinyusb:config">device.cdc</option>
+  </options>
+  <modules>
+    <module>modm:platform:heap</module>
+    <module>modm-test:test:**</module>
+  </modules>
+</library>
