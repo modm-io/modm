@@ -62,12 +62,15 @@ def build(env):
         "loop": tuning[0],
         "shift": int(math.log2(tuning[1])),
         "us_shift": us_shift,
-        "with_assert": env.has_module(":architecture:assert")
+        "with_assert": env.has_module(":architecture:assert"),
+        "family": target.family
     })
     env.template("../cortex/delay_ns.cpp.in", "delay_ns.cpp")
     env.template("../cortex/delay_ns.hpp.in", "delay_ns.hpp")
     env.template("../cortex/delay_impl.hpp.in", "delay_impl.hpp")
     env.copy("resets.hpp")
+    if target.family == "20":
+        env.copy("rom.hpp")
 
     env.copy(repopath("ext/rp/pico-sdk/src/boot2_{}.cpp".format(env["boot2"])),"boot2.cpp")
 
