@@ -1,0 +1,55 @@
+<library>
+  <!-- <extends>modm:blue-pill-f103</extends> -->
+  <!-- <extends>modm:black-pill-f401</extends> -->
+  <!-- <extends>modm:black-pill-f411</extends> -->
+  <!-- <extends>modm:disco-f072rb</extends> -->
+  <!-- <extends>modm:disco-f303vc</extends> -->
+  <!-- <extends>modm:disco-f407vg</extends> -->
+  <!-- <extends>modm:disco-f411ve</extends> -->
+  <!-- <extends>modm:disco-f429zi</extends> -->
+  <!-- <extends>modm:disco-f469ni</extends> -->
+  <!-- <extends>modm:disco-f723ie</extends> -->
+  <!-- <extends>modm:disco-f746ng</extends> -->
+  <!-- <extends>modm:disco-l476vg</extends> -->
+  <!-- <extends>modm:feather-m0</extends> -->
+  <!-- <extends>modm:nucleo-f207zg</extends> -->
+  <!-- <extends>modm:nucleo-f429zi</extends> -->
+  <!-- <extends>modm:nucleo-h723zg</extends> -->
+  <!-- <extends>modm:nucleo-h743zi</extends> -->
+  <!-- <extends>modm:rp-pico</extends> -->
+  <!-- <extends>modm:samd21-mini</extends> -->
+  <!-- <extends>modm:weact-g0b1cb</extends> -->
+  <!-- <extends>modm:weact-u585ci</extends> -->
+  <!-- <extends>modm:nucleo-u575zi-q</extends> -->
+  <!-- <extends>modm:nucleo-h503rb</extends> -->
+  <!-- <extends>modm:nucleo-h533re</extends> -->
+  <extends>modm:nucleo-h563zi</extends>
+  <!-- <extends>modm:weact-h503cb</extends> -->
+  <!-- <extends>modm:weact-h523ce</extends> -->
+  <!-- <extends>modm:weact-h562rg</extends> -->
+  <!-- <extends>modm:nucleo-u385rg-q</extends> -->
+  <!-- <extends>modm:nrf5340-dk</extends> -->
+  <!-- <extends>modm:nrf52840-dk</extends> -->
+  <options>
+    <option name="modm:build:build.path">../../../build/generic/cmsis-dap</option>
+    <option name="modm:tinyusb:config">device.vendor</option>
+
+    <!-- Required for modm:disco-f429zi -->
+    <!-- <option name="modm:tinyusb:device:port">hs</option> -->
+
+    <!-- Required for modm:nucleo-h723zg, modm:disco-f429zi -->
+    <!-- <option name="modm:tinyusb:max-speed">full</option> -->
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:tinyusb</module>
+    <module>modm:cmsis:dap</module>
+    <module>modm:processing:timer</module>
+    <module>modm:io</module>
+  </modules>
+  <collectors>
+    <!-- <collect name="modm:build:cppdefines">CFG_TUSB_DEBUG=3</collect> -->
+    <!-- <collect name="modm:build:openocd.source">interface/stlink.cfg</collect> -->
+    <!-- <collect name="modm:build:openocd.source">interface/stlink-dap.cfg</collect> -->
+  </collectors>
+</library>
