@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:nucleo-h743zi</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_h743zi/flash</option>
+    <option name="modm:platform:cortex-m:linkerscript.flash_reserved">1024*128</option>
+  </options>
+  <modules>
+    <module>modm:platform:flash</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>
