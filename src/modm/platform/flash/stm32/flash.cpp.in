@@ -11,7 +11,16 @@
 
 #include "flash.hpp"
 
+%% if family == "h7" and not h7_ab
+static constexpr uint32_t FLASH_SR_ERR =
+    FLASH_SR_WRPERR | FLASH_SR_PGSERR | FLASH_SR_STRBERR |
+    FLASH_SR_INCERR | FLASH_SR_OPERR;
+%% elif family == "h7"
+static constexpr uint32_t FLASH_SR_ERR =
+    FLASH_SR_WRPERR | FLASH_SR_PGSERR | FLASH_SR_STRBERR | FLASH_SR_INCERR;
+%% else
 static constexpr uint32_t FLASH_SR_ERR = 0xfffe;
+%% endif
 
 namespace modm::platform
 {
@@ -20,19 +29,44 @@ bool
 Flash::unlock()
 {
 	Flash::enable();
+%% if family == "h7"
+	if (FLASH->CR1 & FLASH_CR_LOCK)
+	{
+		FLASH->KEYR1 = 0x45670123;
+		FLASH->KEYR1 = 0xCDEF89AB;
+	}
+%% if dual_bank
+	if (FLASH->CR2 & FLASH_CR_LOCK)
+	{
+		FLASH->KEYR2 = 0x45670123;
+		FLASH->KEYR2 = 0xCDEF89AB;
+	}
+%% endif
+	return not isLocked();
+%% else
 	if (isLocked())
 	{
 		FLASH->KEYR = 0x45670123;
 		FLASH->KEYR = 0xCDEF89AB;
 	}
 	return not isLocked();
+%% endif
 }
 
 uint8_t
 Flash::getPage(uintptr_t offset)
 {
+%% if family == "h7"
+	const uintptr_t addr = OriginAddr + offset;
+%% if dual_bank
+	if (addr >= Bank2Addr) {
+		return SectorsPerBank + ((addr - Bank2Addr) >> {{ shift }});
+	}
+%% endif
+	return (addr - Bank1Addr) >> {{ shift }};
+%% else
 	const uint8_t index = (offset >> {{ shift }});
-%% if has_sectors
+%% if has_sectors and family != "h7"
 	uint8_t small_index{0};
 	// 128kB Block 0 and 8 are subdivided into 4x16kB + 64kB
 	if (index == 0 or index == 8)
@@ -49,12 +83,21 @@ Flash::getPage(uintptr_t offset)
 %% else
 	return index;
 %% endif
+%% endif
 }
 
 uint32_t
 Flash::getOffset(uint8_t index)
 {
-%% if has_sectors
+%% if family == "h7"
+%% if dual_bank
+	if (index >= SectorsPerBank) {
+		return (Bank2Addr - OriginAddr) + (1ul << {{shift}}) * (index - SectorsPerBank);
+	}
+%% endif
+	return (Bank1Addr - OriginAddr) + (1ul << {{shift}}) * index;
+%% else
+%% if has_sectors and family != "h7"
 	switch(index) {
 		case 0: return (1ul << 14);
 		case 1: return (2ul << 14);
@@ -65,12 +108,13 @@ Flash::getOffset(uint8_t index)
 	}
 %% endif
 	return (1ul << {{shift}}) * index;
+%% endif
 }
 
 size_t
 Flash::getSize([[maybe_unused]] uint8_t index)
 {
-%% if has_sectors
+%% if has_sectors and family != "h7"
 	if (index < 4) return (1ul << 14);
 	if (index == 5) return (1ul << 16);
 %% endif
@@ -78,12 +122,38 @@ Flash::getSize([[maybe_unused]] uint8_t index)
 }
 
 modm_ramcode uint32_t
-%% if has_sectors
+%% if has_sectors and family != "h7"
 Flash::erase(uint8_t index, WordSize size)
 %% else
 Flash::erase(uint8_t index)
 %% endif
 {
+%% if family == "h7"
+%% if dual_bank
+	const bool bank2 = (index >= {{sectors_per_bank}});
+	const uint8_t local = bank2 ? (index - {{sectors_per_bank}}) : index;
+	volatile uint32_t *cr  = bank2 ? &FLASH->CR2  : &FLASH->CR1;
+	volatile uint32_t *sr  = bank2 ? &FLASH->SR2  : &FLASH->SR1;
+	volatile uint32_t *ccr = bank2 ? &FLASH->CCR2 : &FLASH->CCR1;
+	*ccr = FLASH_SR_ERR;
+	*cr = FLASH_CR_START | FLASH_CR_SER | {{h7_erase_psize}} |
+	      ((local << FLASH_CR_SNB_Pos) & FLASH_CR_SNB_Msk);
+	while (*sr & (FLASH_SR_BSY | FLASH_SR_QW)) ;
+	const uint32_t err = *sr & FLASH_SR_ERR;
+	*cr = 0;
+	SCB_InvalidateDCache_by_Addr(getAddr(index), SectorSize);
+	return err;
+%% else
+	FLASH->CCR1 = FLASH_SR_ERR;
+	FLASH->CR1 = FLASH_CR_START | FLASH_CR_SER | {{h7_erase_psize}} |
+	             ((index << FLASH_CR_SNB_Pos) & FLASH_CR_SNB_Msk);
+	while(isBusy()) ;
+	const uint32_t err = FLASH->SR1 & FLASH_SR_ERR;
+	FLASH->CR1 = 0;
+	SCB_InvalidateDCache_by_Addr(getAddr(index), SectorSize);
+	return err;
+%% endif
+%% else
 %% if family != "f1"
 	FLASH->SR = FLASH_SR_ERR;
 %% endif
@@ -122,15 +192,62 @@ Flash::erase(uint8_t index)
 	FLASH->CR = 0;
 	return FLASH->SR & FLASH_SR_ERR;
 %% endif
+%% endif
 }
 
 modm_ramcode uint32_t
-%% if has_sectors
+%% if family == "h7"
+Flash::program(uintptr_t addr, const MaxWordType &data)
+%% elif has_sectors
 Flash::program(uintptr_t addr, MaxWordType data, WordSize size)
 %% else
 Flash::program(uintptr_t addr, MaxWordType data)
 %% endif
 {
+%% if family == "h7"
+	if (addr & (FlashWordSize - 1)) return FLASH_SR_PGSERR;
+%% if dual_bank
+	const bool bank2 = (addr >= Bank2Addr);
+	volatile uint32_t *cr  = bank2 ? &FLASH->CR2  : &FLASH->CR1;
+	volatile uint32_t *sr  = bank2 ? &FLASH->SR2  : &FLASH->SR1;
+	volatile uint32_t *ccr = bank2 ? &FLASH->CCR2 : &FLASH->CCR1;
+	*ccr = FLASH_SR_ERR;
+	*cr = FLASH_CR_PG | {{h7_erase_psize}};
+	__ISB(); __DSB();
+	volatile uint32_t *dst = reinterpret_cast<volatile uint32_t *>(addr);
+	dst[0] = data.data[0];
+	__DSB();
+	while (not (*sr & FLASH_SR_WBNE)) ;
+	for (size_t ii = 1; ii < FlashWordWords; ++ii) {
+		dst[ii] = data.data[ii];
+	}
+	__DSB();
+	while (*sr & FLASH_SR_WBNE) ;
+	while (*sr & (FLASH_SR_BSY | FLASH_SR_QW)) ;
+	const uint32_t err = *sr & FLASH_SR_ERR;
+	*cr = 0;
+	SCB_InvalidateDCache_by_Addr(reinterpret_cast<void *>(addr & ~uintptr_t(0x1f)), FlashWordSize);
+	return err;
+%% else
+	FLASH->CCR1 = FLASH_SR_ERR;
+	FLASH->CR1 = FLASH_CR_PG | {{h7_erase_psize}};
+	__ISB(); __DSB();
+	volatile uint32_t *dst = reinterpret_cast<volatile uint32_t *>(addr);
+	dst[0] = data.data[0];
+	__DSB();
+	while (not (FLASH->SR1 & FLASH_SR_WBNE)) ;
+	for (size_t ii = 1; ii < FlashWordWords; ++ii) {
+		dst[ii] = data.data[ii];
+	}
+	__DSB();
+	while (FLASH->SR1 & FLASH_SR_WBNE) ;
+	while(isBusy()) ;
+	const uint32_t err = FLASH->SR1 & FLASH_SR_ERR;
+	FLASH->CR1 = 0;
+	SCB_InvalidateDCache_by_Addr(reinterpret_cast<void *>(addr & ~uintptr_t(0x1f)), FlashWordSize);
+	return err;
+%% endif
+%% else
 %% if family != "f1"
 	FLASH->SR = FLASH_SR_ERR;
 %% endif
@@ -169,6 +286,7 @@ Flash::program(uintptr_t addr, MaxWordType data)
 	FLASH->SR |= FLASH_SR_EOP;
 	FLASH->CR = 0;
 	return FLASH->SR & FLASH_SR_ERR;
+%% endif
 %% endif
 }
 
