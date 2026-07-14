@@ -87,27 +87,28 @@ def common_memories(env):
     memories = listify(device.get_driver("core")["memory"])
 
     # Convert from string to int and add offsets
-    flash_size = env.get(":platform:core:boot2_size", 0)
-    if flash_size:
+    if (flash_size := env.get(":platform:core:boot2_size", 0)):
         memories.append({
             "name": "flash",
             "access": "rx",
             "start": "0x10000000",
             "size": hex(flash_size)})
-    flash_offset = env.get(":platform:cortex-m:linkerscript.flash_offset", 0)
-    flash_reserved = env.get(":platform:cortex-m:linkerscript.flash_reserved", 0)
+    # sort by start address, so that we can find the "first" memory sections with a single pass
     for m in memories:
-        if m["name"] in ["flash", "flash1"]:
-            m["start"] = int(m["start"], 0) + flash_offset
-            m["size"] = int(m["size"], 0) - flash_offset
-        elif m["name"] in ["flash2", "flash"]:
-            m["start"] = int(m["start"], 0)
-            m["size"] = int(m["size"], 0) - flash_reserved
-        else:
-            m["start"] = int(m["start"], 0)
-            m["size"] = int(m["size"], 0)
-
+        m["start"] = int(m["start"], 0)
+        m["size"] = int(m["size"], 0)
     memories.sort(key=lambda m: m["start"])
+    physical_memories = list(m for m in memories if "alias" not in m)
+    # Flash offset is counted from the start of flash, which could be flash or flash1
+    if (flash_offset := env.get(":platform:cortex-m:linkerscript.flash_offset", 0)):
+        offset_flash = next(m for name in ["flash", "flash1", "flash2"] for m in memories if m["name"] == name)
+        offset_flash["start"] = offset_flash["start"] + flash_offset
+        offset_flash["size"] = offset_flash["size"] - flash_offset
+    # Reserved flash is counted from the end of flash, which could be flash2, flash1 or flash
+    if (flash_reserved := env.get(":platform:cortex-m:linkerscript.flash_reserved", 0)):
+        reserved_flash = next(m for name in ["flash2", "flash1", "flash"] for m in memories if m["name"] == name)
+        reserved_flash["size"] = reserved_flash["size"] - flash_reserved
+
     # Find all continuous memory sections
     cont = []
     index = 0
@@ -138,12 +139,13 @@ def common_memories(env):
         memories.append({
             "name": "flash_reserved",
             "access": "rx",
-            "start": next(m["start"] + m["size"] for m in memories if m["name"] in ["flash2", "flash1", "flash"]),
+            "start": reserved_flash["start"] + reserved_flash["size"],
             "size": flash_reserved})
         memories.sort(key=lambda m: m["start"])
 
     properties = {
         "memories": memories,
+        "physical_memories": physical_memories,
         "regions": [m["name"] for m in memories],
         "ram_regions": ram_regions,
         "cont_flash_regions": cont_flash_regions,

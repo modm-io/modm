@@ -24,13 +24,26 @@ public:
 	static constexpr uintptr_t OriginAddr{ 0x{{ "%0x" | format(start) }} };
 	static constexpr size_t Size{ 0x{{ "%0x" | format(size) }} };
 	static inline uint8_t *const Origin{(uint8_t*)OriginAddr};
-%% if family=="f1"
+%% if family=="h7"
+	static constexpr uintptr_t Bank1Addr{ 0x{{ "%0x" | format(bank1_start) }} };
+	static constexpr uintptr_t Bank2Addr{ 0x{{ "%0x" | format(bank2_start) }} };
+	static constexpr size_t SectorSize{ 1ul << {{shift}} };
+	static constexpr uint8_t SectorsPerBank{ {{sectors_per_bank}} };
+	static constexpr size_t FlashWordWords{ FLASH_NB_32BITWORD_IN_FLASHWORD };
+	static constexpr size_t FlashWordSize{ FlashWordWords * sizeof(uint32_t) };
+	struct alignas(4) MaxWordType
+	{
+		uint32_t data[FlashWordWords];
+	};
+	static_assert(sizeof(MaxWordType) == FlashWordSize);
+	static_assert(alignof(MaxWordType) == alignof(uint32_t));
+%% elif family=="f1"
 	using MaxWordType = uint16_t;
 %% else
 	using MaxWordType = uint{{ 32 if has_sectors else 64 }}_t;
 %% endif
 
-%% if has_sectors
+%% if has_sectors and family != "h7"
 	enum class
 	WordSize : uint32_t
 	{
@@ -59,11 +72,25 @@ public:
 
 	static bool
 	isLocked()
-	{ return FLASH->CR & FLASH_CR_LOCK; }
+	{
+%% if family == "h7" and dual_bank
+		return (FLASH->CR1 & FLASH_CR_LOCK) || (FLASH->CR2 & FLASH_CR_LOCK);
+%% elif family == "h7"
+		return FLASH->CR1 & FLASH_CR_LOCK;
+%% else
+		return FLASH->CR & FLASH_CR_LOCK;
+%% endif
+	}
 
 	static inline bool
 	isBusy()
-	{ return FLASH->SR & {{ busy_bit }}; }
+	{
+%% if family == "h7"
+		return FLASH->SR1 & {{ busy_bit }};
+%% else
+		return FLASH->SR & {{ busy_bit }};
+%% endif
+	}
 
 	static bool
 	unlock();
@@ -85,7 +112,16 @@ public:
 
 	static inline uint8_t*
 	getAddr(uint8_t {{ type }})
-	{ return Origin + getOffset({{ type }}); }
+	{
+%% if family=="h7" and dual_bank
+		const bool bank2 = ({{ type }} >= SectorsPerBank);
+		const uint8_t local = bank2 ? ({{ type }} - SectorsPerBank) : {{ type }};
+		const uintptr_t bank = bank2 ? Bank2Addr : Bank1Addr;
+		return reinterpret_cast<uint8_t*>(bank + uintptr_t(local) * SectorSize);
+%% else
+		return Origin + getOffset({{ type }});
+%% endif
+	}
 
 	static uint32_t
 	getOffset(uint8_t {{ type }});
@@ -94,13 +130,16 @@ public:
 	getSize(uint8_t {{ type }});
 
 	static uint32_t
-%% if has_sectors
+%% if has_sectors and family != "h7"
 	erase(uint8_t {{ type }}, WordSize size = WordSize::B32);
 %% else
 	erase(uint8_t {{ type }});
 %% endif
 
-%% if has_sectors
+%% if family == "h7"
+	static uint32_t
+	program(uintptr_t addr, const MaxWordType &data);
+%% elif has_sectors
 	static inline uint32_t
 	program(uintptr_t addr, uint8_t data)
 	{ return program(addr, data, WordSize::B8); }

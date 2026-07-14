@@ -15,25 +15,41 @@ def init(module):
     module.name = ":platform:flash"
     module.description = "Flash Memory"
 
+_H7RS = ["r3", "r7", "s3", "s7"]
+
 def prepare(module, options):
     device = options[":target"]
-    if device.identifier.family not in ["g0","g4", "f1", "f4"]:
+    if device.identifier.family not in ["g0","g4", "f1", "f4", "h7"]:
+        return False
+    # Exclude H745/H747/H755/H757 dual-core devices and H7RS with a different controller.
+    if device.identifier.family == "h7" and device.identifier.name in _H7RS:
         return False
     if not device.has_driver("flash:stm32*"):
         return False
 
     module.depends(":cmsis:device", ":platform:rcc",
+                   ":platform:cortex-m",
                    ":architecture:register")
     return True
 
 def build(env):
     target = env[":target"].identifier
-    flash = env.query(":platform:cortex-m:memories")["cont_flash"]
+    memory_properties = env.query(":platform:cortex-m:memories")
+    flash = memory_properties["cont_flash"]
+    physical_flash = [m for m in memory_properties["physical_memories"] if m["name"].startswith("flash")]
+    usable_flash = [m for m in memory_properties["memories"] if m["name"].startswith("flash")]
+    flash_start = flash["start"]
+    flash_size = flash["size"]
 
     dual_bank = False
+    h7_ab = False
     family = target.family
     busy_bit = "FLASH_SR_BSY"
     ftype = "page"
+    bank1_start = flash_start
+    bank2_start = flash_start
+    sectors_per_bank = 0
+    h7_erase_psize = "0"
     if target.family in ["f4"]:
         block_shift = 17
         ftype = "sector"
@@ -53,16 +69,54 @@ def build(env):
         if target.name[0] in ["7", "8"]:
             dual_bank = "FLASH_OPTR_DBANK"
             block_shift = "(FLASH->OPTR & FLASH_OPTR_DBANK ? 11 : 12)"
+    elif target.family in ["h7"]:
+        ftype = "sector"
+        busy_bit = "(FLASH_SR_BSY | FLASH_SR_QW)"
+        # H7A3/H7B0/H7B3: 8 KB sectors; all other H7: 128 KB sectors
+        h7_ab = target.name in ["a3", "b0", "b3"]
+        if h7_ab:
+            block_shift = 13
+        else:
+            block_shift = 17
+        # Dual-bank devices have separate CR1/SR1 and CR2/SR2 registers
+        if target.name in ["42", "43", "53", "a3", "b3"]:
+            dual_bank = True
+        flash1 = next((m for m in physical_flash if m["name"] != "flash2"), None)
+        flash2 = next((m for m in physical_flash if m["name"] == "flash2"), None)
+        if dual_bank:
+            if flash1 is None or flash2 is None:
+                raise RuntimeError("H7 dual-bank flash requires explicit flash1 and flash2 regions")
+            bank1_start = flash1["start"]
+            bank2_start = flash2["start"]
+            sectors_per_bank = (flash1["size"] >> block_shift)
+        else:
+            flash1 = flash1 or physical_flash[0]
+            bank2_start = bank1_start = flash1["start"]
+            sectors_per_bank = (flash1["size"] >> block_shift)
+
+        h7_flash_end = max(m["start"] + m["size"] for m in usable_flash)
+        flash_size = h7_flash_end - flash_start
+
+        if not h7_ab:
+            if target.name in ["42", "43", "50", "53"]:
+                h7_erase_psize = "FLASH_CR_PSIZE_1"
+            else:
+                h7_erase_psize = "FLASH_CR_PSIZE"
 
     env.substitutions = {
-        "start": flash["start"],
-        "size": flash["size"],
+        "start": flash_start,
+        "size": flash_size,
         "type": ftype,
         "shift": block_shift,
         "has_sectors": ftype == "sector",
         "busy_bit": busy_bit,
         "family": family,
-        "dual_bank": dual_bank
+        "dual_bank": dual_bank,
+        "bank1_start": bank1_start,
+        "bank2_start": bank2_start,
+        "sectors_per_bank": sectors_per_bank,
+        "h7_erase_psize": h7_erase_psize,
+        "h7_ab": h7_ab,
     }
     env.outbasepath = "modm/src/modm/platform/flash"
     env.template("flash.hpp.in")
