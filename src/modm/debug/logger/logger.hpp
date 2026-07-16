@@ -88,39 +88,39 @@ namespace modm
  */
 #define MODM_LOG_OFF \
 	if ( true ){}	\
-	else modm::log::debug
+	else ::modm::log::debug
 
 /**
  * \brief	Output stream for debug messages
  * \ingroup modm_debug
  */
 #define MODM_LOG_DEBUG \
-	if (MODM_LOG_LEVEL > modm::log::DEBUG){} \
-	else modm::log::debug
+	if (MODM_LOG_LEVEL > ::modm::log::DEBUG){} \
+	else ::modm::log::debug
 
 /**
  * \brief	Output stream for info messages
  * \ingroup modm_debug
  */
 #define MODM_LOG_INFO \
-	if (MODM_LOG_LEVEL > modm::log::INFO){}	\
-	else modm::log::info
+	if (MODM_LOG_LEVEL > ::modm::log::INFO){}	\
+	else ::modm::log::info
 
 /**
  * \brief	Output stream for warnings
  * \ingroup modm_debug
  */
 #define MODM_LOG_WARNING \
-	if (MODM_LOG_LEVEL > modm::log::WARNING){}	\
-	else modm::log::warning
+	if (MODM_LOG_LEVEL > ::modm::log::WARNING){}	\
+	else ::modm::log::warning
 
 /**
  * \brief	Output stream for error messages
  * \ingroup modm_debug
  */
 #define MODM_LOG_ERROR \
-	if (MODM_LOG_LEVEL > modm::log::ERROR){}	\
-	else modm::log::error
+	if (MODM_LOG_LEVEL > ::modm::log::ERROR){}	\
+	else ::modm::log::error
 
 #ifdef __DOXYGEN__
 

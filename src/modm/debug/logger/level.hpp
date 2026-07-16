@@ -55,7 +55,7 @@ namespace modm
 	 *
 	 * \ingroup modm_debug
 	 */
-	#define MODM_LOG_LEVEL modm::log::DEBUG
+	#define MODM_LOG_LEVEL ::modm::log::DEBUG
 #endif // MODM_LOG_LEVEL
 
 #endif // MODM_LOG_LEVEL_HPP
