@@ -6,6 +6,7 @@
 * Copyright (c) 2013, Kevin Läufer
 * Copyright (c) 2014, Sascha Schade
 * Copyright (c) 2023, Christopher Durand
+* Copyright (c) 2026, Hans-Jürgen Schmitz
 *
 * This file is part of the modm project.
 *
@@ -75,7 +76,9 @@ SpiMaster{{ id }}::finishTransfer()
 		Hal::StatusFlag::CrcError |
 		Hal::StatusFlag::TiFrameError |
 		Hal::StatusFlag::ModeFault |
+%% if target["family"] not in "h5"        
 		Hal::StatusFlag::Reload |
+%% endif        
 		Hal::StatusFlag::Suspension
 	);
 }

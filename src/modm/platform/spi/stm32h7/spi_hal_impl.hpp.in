@@ -4,6 +4,7 @@
 * Copyright (c) 2014, Daniel Krebs
 * Copyright (c) 2020, Mike Wolfram
 * Copyright (c) 2023, Christopher Durand
+* Copyright (c) 2026, Hans-Jürgen Schmitz
 *
 * This file is part of the modm project.
 *
@@ -49,7 +50,9 @@ SpiHal{{ id }}::initialize(Prescaler prescaler,
 		StatusFlag::CrcError |
 		StatusFlag::TiFrameError |
 		StatusFlag::ModeFault |
+%% if target["family"] not in ["h5"]
 		StatusFlag::Reload |
+%% endif        
 		StatusFlag::Suspension
 	);
 
@@ -140,8 +143,12 @@ SpiHal{{ id }}::setCrcInitialValue(CrcInit init)
 inline void
 SpiHal{{ id }}::setTransferSize(uint16_t size, uint16_t reload)
 {
+%% if target["family"] in "h5"
+    SPI{{ id }}->CR2 = size;
+%% else
 	static_assert(SPI_CR2_TSIZE_Pos == 0);
 	SPI{{ id }}->CR2 = (reload << SPI_CR2_TSER_Pos) | size;
+%% endif    
 }
 
 inline void
@@ -259,7 +266,9 @@ SpiHal{{ id }}::acknowledgeInterruptFlags(StatusFlag_t flags)
 		SPI_IFCR_CRCEC |
 		SPI_IFCR_TIFREC |
 		SPI_IFCR_MODFC |
+%% if target["family"] not in "h5"
 		SPI_IFCR_TSERFC |
+%% endif
 		SPI_IFCR_SUSPC;
 
 	SPI{{ id }}->IFCR = flags.value & mask;

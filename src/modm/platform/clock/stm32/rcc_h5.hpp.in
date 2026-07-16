@@ -296,7 +296,23 @@ public:
 		RCC->CFGR2 = (RCC->CFGR2 & ~RCC_CFGR2_PPRE{{id}}) | (uint32_t(prescaler) << RCC_CFGR2_PPRE{{id}}_Pos);
 	}
 %% endfor
+	
 %#
+	enum class
+	HsiPrescaler : uint8_t
+	{
+		Div1 = 0b00,
+		Div2 = 0b01,
+		Div4 = 0b10,
+		Div8 = 0b11
+	};
+	
+	static inline void
+	setHsiPrescaler(HsiPrescaler prescaler)
+	{
+		RCC->CR = (RCC->CR & ~RCC_CR_HSIDIVF) | (uint32_t(prescaler) << RCC_CR_HSIDIVF_Pos);
+	}
+
 	// clock sinks
 	enum class
 	SystemClockSource : uint32_t
@@ -403,7 +419,7 @@ public:
 		Csi   = 0b100,
 		Hse   = 0b101
 	};
-%% for id in spi_ids | sort if id in [1,2,3]
+%% for id in spi_ids | sort if id in [4,5,6]
 	static inline void
 	setSpi{{id}}ClockSource(Spi456ClockSource src)
 	{
@@ -417,7 +433,11 @@ public:
 	I2cClockSource : uint8_t
 	{
 		Bus   = 0b00,
+%% if target.name in ["03"]
 		Pll2R = 0b01,
+%% else
+		Pll3R = 0b01,
+%% endif		
 		Hsi   = 0b10,
 		Csi   = 0b11
 	};
@@ -518,6 +538,27 @@ public:
 	setAdcDacClockSource(AdcDacClockSource src)
 	{
 		RCC->CCIPR5 = (RCC->CCIPR5 & ~RCC_CCIPR5_ADCDACSEL) | uint32_t(src);
+	}
+
+	enum class
+	SaiClockSource : uint32_t
+	{
+		PLL1Q = 0,
+		PLL2P = 0b001,
+		Pll3P  = 0b010,
+		AUDIOCLK  = 0b011,
+		Hclk    = 0b100,
+	};
+	static inline void
+	setSai1ClockSource(SaiClockSource src)
+	{
+		RCC->CCIPR5 = (RCC->CCIPR5 & ~RCC_CCIPR5_SAI1SEL) | (uint32_t(src) << RCC_CCIPR5_SAI1SEL_Pos);
+	}
+
+	static inline void
+	setSai2ClockSource(SaiClockSource src)
+	{
+		RCC->CCIPR5 = (RCC->CCIPR5 & ~RCC_CCIPR5_SAI2SEL) | (uint32_t(src) << RCC_CCIPR5_SAI2SEL_Pos);
 	}
 
 public:

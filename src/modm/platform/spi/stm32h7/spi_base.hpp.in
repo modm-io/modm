@@ -4,6 +4,7 @@
  * Copyright (c) 2014, Daniel Krebs
  * Copyright (c) 2020, Mike Wolfram
  * Copyright (c) 2023, Christopher Durand
+ * Copyright (c) 2026, Hans-Jürgen Schmitz
  *
  * This file is part of the modm project.
  *
@@ -46,7 +47,9 @@ public:
 		CrcError 				= SPI_IER_CRCEIE,
 		TiFrameError			= SPI_IER_TIFREIE,
 		ModeFault				= SPI_IER_MODFIE,
+%% if target["family"] not in "h5"
 		Reload					= SPI_IER_TSERFIE
+%% endif        
 	};
 	MODM_FLAGS32(Interrupt);
 
@@ -63,7 +66,9 @@ public:
 		CrcError 				= SPI_SR_CRCE,
 		TiFrameError			= SPI_SR_TIFRE,
 		ModeFault				= SPI_SR_MODF,
+%% if target["family"] not in "h5"
 		Reload					= SPI_SR_TSERF,
+%% endif
 		Suspension				= SPI_SR_SUSP,
 		TxTransferComplete		= SPI_SR_TXC,
 		RxFifoLevel1			= SPI_SR_RXPLVL_1,

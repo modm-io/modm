@@ -4,6 +4,7 @@
 # Copyright (c) 2016-2018, Niklas Hauser
 # Copyright (c) 2017, Fabian Greif
 # Copyright (c) 2023, Christopher Durand
+# Copyright (c) 2026, Hans-Jürgen Schmitz
 #
 # This file is part of the modm project.
 #
@@ -11,7 +12,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
-
+   
 class Instance(Module):
     def __init__(self, driver, instance):
         self.instance = int(instance)
@@ -38,9 +39,16 @@ class Instance(Module):
             properties["max_crc_bits"] = properties["max_data_bits"]
             properties["max_transfer_size"] = 2**16 - 1  # is smaller for some instances on U5
             properties["i2s"] = self.instance in (1, 2, 3, 6)
+        elif device.identifier.family in ["h5"]:
+            properties["fifo_size"] = 16 if self.instance in (1, 2, 3) else 8
+            properties["max_data_bits"] = 32 if self.instance in (1, 2, 3) else 16
+            properties["max_crc_bits"] = properties["max_data_bits"]
+            properties["max_transfer_size"] = 2**16 - 1  # is smaller for some instances on U5
+            properties["i2s"] = self.instance in (1, 2, 3)
         else:
             raise NotImplementedError("Unsupported device")
 
+        properties["target"] = target = device.identifier
         env.substitutions = properties
         env.outbasepath = "modm/src/modm/platform/spi"
 
@@ -61,7 +69,7 @@ def prepare(module, options):
     device = options[":target"]
     if not device.has_driver("spi:stm32-extended"):
         return False
-    if device.identifier.family not in ["h7"]:
+    if device.identifier.family not in ["h7"] and device.identifier.family not in ["h5"]:
         # U5 is not supported yet
         return False
 
@@ -81,5 +89,10 @@ def prepare(module, options):
     return True
 
 def build(env):
+    properties = {
+        "target": env[":target"].identifier,
+        }
+    env.substitutions = properties
     env.outbasepath = "modm/src/modm/platform/spi"
-    env.copy("spi_base.hpp")
+    
+    env.template("spi_base.hpp.in")
