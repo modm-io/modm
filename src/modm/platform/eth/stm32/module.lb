@@ -20,8 +20,7 @@ def prepare(module, options):
 
     if not device.has_driver("eth:stm32*"):
         return False
-    # FIXME the driver is for F7 only right now
-    if device.identifier["family"] not in ["f7", "f4"]:
+    if device.identifier["family"] not in ["h7", "f7", "f4"]:
         return False
 
     module.depends(":architecture:delay",
@@ -35,9 +34,12 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.substitutions = {"target": env[":target"].identifier}
+    target = env[":target"].identifier
+    env.substitutions = {
+        "target": target,
+        "family": target.family
+    }
     env.outbasepath = "modm/src/modm/platform/eth"
 
-    env.copy("eth.hpp")
-    env.copy("eth_impl.hpp")
-
+    env.template("eth.hpp.in")
+    env.template("eth_impl.hpp.in")
