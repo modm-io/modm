@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2020, Mike Wolfram
+ * Copyright (c) 2026, Henrik Hose
  *
  * This file is part of the modm project.
  *
@@ -20,6 +21,18 @@ template <class PHY>
 void
 Eth<PHY>::start()
 {
+%% if family == "h7"
+	ETH->DMACTCR |= ETH_DMACTCR_ST;
+	ETH->DMACRCR |= ETH_DMACRCR_SR;
+	ETH->DMACSR |= ETH_DMACSR_TPS | ETH_DMACSR_RPS;
+	ETH->MTLTQOMR |= ETH_MTLTQOMR_FTQ;
+
+	uint32_t tmp = ETH->MACCR | ETH_MACCR_TE;
+	writeMACCR(tmp);
+
+	tmp = ETH->MACCR | ETH_MACCR_RE;
+	writeMACCR(tmp);
+%% elif family in ["f4", "f7"]
 	// transmission enable
 	uint32_t tmp = ETH->MACCR | ETH_MACCR_TE;
 	writeMACCR(tmp);
@@ -39,12 +52,25 @@ Eth<PHY>::start()
 	// DMA reception enable
 	tmp = ETH->DMAOMR | ETH_DMAOMR_SR;
 	writeDMAOMR(tmp);
+%% endif
 }
 
 template <class PHY>
 void
 Eth<PHY>::stop()
 {
+%% if family == "h7"
+	ETH->DMACTCR &= ~ETH_DMACTCR_ST;
+	ETH->DMACRCR &= ~ETH_DMACRCR_SR;
+
+	uint32_t tmp = ETH->MACCR & ~ETH_MACCR_RE;
+	writeMACCR(tmp);
+
+	ETH->MTLTQOMR |= ETH_MTLTQOMR_FTQ;
+
+	tmp = ETH->MACCR & ~ETH_MACCR_TE;
+	writeMACCR(tmp);
+%% elif family in ["f4", "f7"]
 	// DMA transmission disable
 	uint32_t tmp = ETH->DMAOMR & ~ETH_DMAOMR_ST;
 	writeDMAOMR(tmp);
@@ -64,12 +90,48 @@ Eth<PHY>::stop()
 	// transmission disable
 	tmp = ETH->MACCR & ~ETH_MACCR_TE;
 	writeMACCR(tmp);
+%% endif
 }
 
 template <class PHY>
 void
 Eth<PHY>::configureMacAddresses()
 {
+%% if family == "h7"
+	static constexpr MacAddress zeroMac { 0 };
+
+	for (std::size_t i = 0; i < macAddresses.size(); ++i) {
+		auto const &macAddress = macAddresses[i];
+		if (std::memcmp(zeroMac.data(), macAddress.data(), macAddress.size()) == 0)
+			continue;
+
+		const uint32_t high = ((uint32_t(macAddress[5]) << 8) | macAddress[4]) |
+				(i ? ETH_MACAHR_AE : 0);
+		const uint32_t low = (uint32_t(macAddress[3]) << 24) |
+				(uint32_t(macAddress[2]) << 16) |
+				(uint32_t(macAddress[1]) << 8) |
+				macAddress[0];
+
+		switch (i) {
+		case 0:
+			ETH->MACA0HR = high;
+			ETH->MACA0LR = low;
+			break;
+		case 1:
+			ETH->MACA1HR = high;
+			ETH->MACA1LR = low;
+			break;
+		case 2:
+			ETH->MACA2HR = high;
+			ETH->MACA2LR = low;
+			break;
+		case 3:
+			ETH->MACA3HR = high;
+			ETH->MACA3LR = low;
+			break;
+		}
+	}
+%% elif family in ["f4", "f7"]
 	static constexpr uint32_t ETH_MAC_ADDR_HBASE { ETH_MAC_BASE + 0x40 };  /* Ethernet MAC address high offset */
 	static constexpr uint32_t ETH_MAC_ADDR_LBASE { ETH_MAC_BASE + 0x44 };  /* Ethernet MAC address low offset */
 
@@ -85,12 +147,35 @@ Eth<PHY>::configureMacAddresses()
 		tmp_register = (macAddress[3] << 24) | (macAddress[2] << 16) | (macAddress[1] << 8) | macAddress[0];
 		*reinterpret_cast<__IO uint32_t *>(ETH_MAC_ADDR_LBASE + i * 0x08) = tmp_register;
 	}
+%% endif
 }
 
 template <class PHY>
 bool
 Eth<PHY>::readPhyRegister(uint16_t reg, uint32_t &value)
 {
+%% if family == "h7"
+	uint32_t tmp = ETH->MACMDIOAR & ~(
+			ETH_MACMDIOAR_PA |
+			ETH_MACMDIOAR_RDA |
+			ETH_MACMDIOAR_MOC |
+			ETH_MACMDIOAR_C45E |
+			ETH_MACMDIOAR_MB);
+	tmp |= ((PHY::Address << ETH_MACMDIOAR_PA_Pos) & ETH_MACMDIOAR_PA);
+	tmp |= ((reg << ETH_MACMDIOAR_RDA_Pos) & ETH_MACMDIOAR_RDA);
+	tmp |= ETH_MACMDIOAR_MOC_RD;
+	tmp |= ETH_MACMDIOAR_MB;
+
+	ETH->MACMDIOAR = tmp;
+
+	int timeout = PHY::ReadTimeout;
+	while (timeout-- > 0) {
+		if ((ETH->MACMDIOAR & ETH_MACMDIOAR_MB) == 0) {
+			value = ETH->MACMDIODR;
+			return true;
+		}
+	}
+%% elif family in ["f4", "f7"]
 	// get only CR bits from MACMIIAR
 	uint32_t tmp = ETH->MACMIIAR & ETH_MACMIIAR_CR_Msk;
 	tmp |= (PHY::Address << 11) & ETH_MACMIIAR_PA;
@@ -108,6 +193,7 @@ Eth<PHY>::readPhyRegister(uint16_t reg, uint32_t &value)
 			return true;
 		}
 	}
+%% endif
 
 	return false;
 }
@@ -116,6 +202,27 @@ template <class PHY>
 bool
 Eth<PHY>::writePhyRegister(uint16_t reg, uint32_t value)
 {
+%% if family == "h7"
+	uint32_t tmp = ETH->MACMDIOAR & ~(
+			ETH_MACMDIOAR_PA |
+			ETH_MACMDIOAR_RDA |
+			ETH_MACMDIOAR_MOC |
+			ETH_MACMDIOAR_C45E |
+			ETH_MACMDIOAR_MB);
+	tmp |= ((PHY::Address << ETH_MACMDIOAR_PA_Pos) & ETH_MACMDIOAR_PA);
+	tmp |= ((reg << ETH_MACMDIOAR_RDA_Pos) & ETH_MACMDIOAR_RDA);
+	tmp |= ETH_MACMDIOAR_MOC_WR;
+	tmp |= ETH_MACMDIOAR_MB;
+
+	ETH->MACMDIODR = value;
+	ETH->MACMDIOAR = tmp;
+
+	int timeout = PHY::WriteTimeout;
+	while (timeout-- > 0) {
+		if ((ETH->MACMDIOAR & ETH_MACMDIOAR_MB) == 0)
+			return true;
+	}
+%% elif family in ["f4", "f7"]
 	// get only CR bits from MACMIIAR
 	uint32_t tmp = ETH->MACMIIAR & ETH_MACMIIAR_CR_Msk;
 	tmp |= (PHY::Address << 11) & ETH_MACMIIAR_PA;
@@ -131,6 +238,7 @@ Eth<PHY>::writePhyRegister(uint16_t reg, uint32_t value)
 		if ((ETH->MACMIIAR & ETH_MACMIIAR_MB) == 0)
 			return true;
 	}
+%% endif
 
 	return false;
 }
