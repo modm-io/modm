@@ -31,8 +31,9 @@ crc8_ccitt_update(uint8_t crc, uint8_t data)
     data ^= crc;
     for (uint8_t ii = 0; ii < 8; ii++)
     {
+        const bool msb = (data & 0x80) != 0;
         data <<= 1;
-        if (data & 0x80) data ^= 0x07;
+        if (msb) data ^= 0x07;
     }
     return data;
 #endif
