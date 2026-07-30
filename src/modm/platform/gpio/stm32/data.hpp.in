@@ -26,9 +26,8 @@ AdcPolarity
 };
 %% endif
 template<class Signal, Peripheral p> struct SignalConnection;
-template<class Data, Peripheral p{% if target.family in ["h5", "h7"] %}, AdcPolarity ap{% endif %}> static constexpr int8_t AdcChannel = -1;
-template<class Data, Peripheral p> static constexpr int8_t DacChannel = -1;
-
+template<class Data, Peripheral p{% if target.family in ["h5", "h7"] %}, AdcPolarity ap{% endif %}> constexpr int8_t AdcChannel = -1;
+template<class Data, Peripheral p> constexpr int8_t DacChannel = -1;
 struct DataUnused {};
 %% for gpio in gpios
 %% set port = gpio.gpio.port | upper
@@ -63,10 +62,10 @@ template<> struct SignalConnection<Data{{ port ~ pin }}::{{ signal.name }}, Peri
 %% for signal_name, signal_group in gpio.signals.items()
 	%% for signal in signal_group
 		%% if signal.driver.startswith("Adc") and signal.name.startswith("In")
-template<> constexpr int8_t AdcChannel<Data{{ port ~ pin }}, Peripheral::{{ signal.driver }}{% if signal.name.startswith("Inn") %}, AdcPolarity::Negative{% endif %}{% if signal.name.startswith("Inp") %}, AdcPolarity::Positive{% endif %}> = {{ signal.name | to_adc_channel }};
+template<> constexpr inline int8_t AdcChannel<Data{{ port ~ pin }}, Peripheral::{{ signal.driver }}{% if signal.name.startswith("Inn") %}, AdcPolarity::Negative{% endif %}{% if signal.name.startswith("Inp") %}, AdcPolarity::Positive{% endif %}> = {{ signal.name | to_adc_channel }};
 		%% endif
 		%% if signal.driver.startswith("Dac") and signal.name.startswith("Out")
-template<> constexpr int8_t DacChannel<Data{{ port ~ pin }}, Peripheral::{{ signal.driver }}> = {{ signal.name | to_adc_channel }};
+template<> constexpr inline int8_t DacChannel<Data{{ port ~ pin }}, Peripheral::{{ signal.driver }}> = {{ signal.name | to_adc_channel }};
 		%% endif
 	%% endfor
 %% endfor
