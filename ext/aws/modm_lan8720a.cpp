@@ -24,7 +24,7 @@
 
 #include <cstring>
 
-using EMAC = modm::platform::Eth<modm::Lan8720a>;
+using EMAC = modm::platform::Eth<modm::Lan8720a<>>;
 
 namespace modm
 {
