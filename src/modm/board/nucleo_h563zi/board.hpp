@@ -194,6 +194,7 @@ namespace eth
 {
 /// @ingroup modm_board_nucleo_h563zi
 /// @{
+static constexpr uint32_t PhyAddress = 0;
 using RefClk = GpioA1;
 using Mdio = GpioA2;
 using Mdc = GpioC1;

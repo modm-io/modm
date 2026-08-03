@@ -80,6 +80,7 @@ struct SystemClock
 	static constexpr uint32_t Fdcan1 = Pll2Q;
 	static constexpr uint32_t Fdcan2 = Pll2Q;
 	static constexpr uint32_t Fdcan3 = Pll2Q;
+	static constexpr uint32_t Eth = Ahb1;
 
 	static constexpr uint32_t I2c1 = Apb1;
 	static constexpr uint32_t I2c2 = Apb1;
@@ -198,6 +199,24 @@ using Overcurrent = GpioInputG7;
 using Power = GpioOutputG6;
 
 using Device = UsbHs;
+/// @}
+}
+
+namespace eth
+{
+/// @ingroup modm_board_nucleo_h723zg
+/// @{
+/// On-board LAN8742A address selected by the PHYAD0 strap.
+static constexpr uint32_t PhyAddress = 0;
+using RefClk = GpioA1;
+using Mdio = GpioA2;
+using Mdc = GpioC1;
+using CrsDv = GpioA7;
+using Rxd0 = GpioC4;
+using Rxd1 = GpioC5;
+using TxEn = GpioG11;
+using Txd0 = GpioG13;
+using Txd1 = GpioB13;
 /// @}
 }
 
