@@ -1,0 +1,41 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2026, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:max14661"
+    module.description = """\
+# MAX14661 Beyond-the-Rails 16:2 Multiplexer
+
+The MAX14661 is a serially controlled, dual-channel analog multiplexer
+allowing any of the 16 AB pins to be connected to either common pin
+(COMA, COMB) simultaneously in any combination. The device features
+Beyond-the-Rails capability so that ±5.5V signals can be passed with any
+single supply between +1.6V and +5.5V.
+
+The serial control is selectable between I2C and SPI, both of which are
+implemented as separate transport layers so the same driver can be used
+with either bus.
+"""
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:register",
+        ":architecture:i2c.device",
+        ":architecture:spi.device",
+        ":architecture:fiber")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/mux"
+    env.copy("max14661.hpp")
+    env.copy("max14661_transport.hpp")
