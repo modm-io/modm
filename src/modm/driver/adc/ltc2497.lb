@@ -1,0 +1,35 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2026, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:ltc2497"
+    module.description = """
+# LTC2497 ADC
+
+The LTC2497 is a 16-channel (eight differential), 16-bit delta-sigma ADC with
+Easy Drive technology and a 2-wire, I2C interface.
+
+Note that the sampling time is very long (175ms per channel), so this ADC is
+not suitable for fast sampling. You should change the channel while reading the
+previous channel to not waste additional time.
+"""
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:i2c.device",
+        ":processing:timer")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/adc"
+    env.copy("ltc2497.hpp")
