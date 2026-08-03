@@ -100,7 +100,7 @@ Eth<PHY>::readPhyRegister(uint16_t reg, uint32_t &value)
 
 	ETH->MACMIIAR = tmp;
 
-	int timeout = PHY::ReadTimeout;
+	int timeout = PhyReadTimeout;
 	while (timeout-- > 0) {
 		if ((ETH->MACMIIAR & ETH_MACMIIAR_MB) == 0) {
 			// busy flag cleared, read data
@@ -126,7 +126,7 @@ Eth<PHY>::writePhyRegister(uint16_t reg, uint32_t value)
 	ETH->MACMIIDR = value;
 	ETH->MACMIIAR = tmp;
 
-	int timeout = PHY::WriteTimeout;
+	int timeout = PhyWriteTimeout;
 	while (timeout-- > 0) {
 		if ((ETH->MACMIIAR & ETH_MACMIIAR_MB) == 0)
 			return true;

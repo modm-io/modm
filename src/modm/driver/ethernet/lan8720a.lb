@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2020, Mike Wolfram
+# Copyright (c) 2026, Kaelin Laundry
 #
 # This file is part of the modm project.
 #
@@ -10,17 +11,12 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
-
 def init(module):
     module.name = ":driver:lan8720a"
-    module.description = """\
-# LAN8720A Ethernet Transceiver
-
-Microchip's LAN8720A/LAN8720Ai are high-performance, small-footprint,
-low-power 10BASE-T/100BASE-TX transceiver connected via an RMII interface.
-"""
+    module.description = "Microchip LAN8720A Ethernet PHY"
 
 def prepare(module, options):
+    module.depends(":driver:lan87xx")
     return True
 
 def build(env):

@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2020, Mike Wolfram
+ * Copyright (c) 2026, Kaelin Laundry
  *
  * This file is part of the modm project.
  *
@@ -11,47 +12,34 @@
 #ifndef MODM_LAN8720A_HPP
 #define MODM_LAN8720A_HPP
 
+#include "lan87xx.hpp"
+
 namespace modm
 {
 
-/// @ingroup modm_driver_lan8720a
-struct Lan8720a
+template <uint8_t PhyAddress = 0>
+struct Lan8720a : Lan87xx
 {
-	static constexpr uint32_t Address = 0x00;
+	static_assert(PhyAddress < 32, "Clause 22 PHY addresses are five bits wide");
+	static constexpr uint8_t Address = PhyAddress;
+	static constexpr uint16_t PhyIdentifier1 = 0x0007;
+	static constexpr uint16_t PhyIdentifier2 = 0xc0f0;
+	static constexpr uint16_t PhyIdentifier2Mask = 0xfff0;
 
-	struct Register
+	template <ethernet::Clause22Mdio Mdio>
+	static InitializationResult initialize()
 	{
-		static constexpr uint16_t BCR = 0x0000;
-		static constexpr uint16_t BSR = 0x0001;
-		static constexpr uint16_t AN  = 0x0004;
-		static constexpr uint16_t SR  = 0x001f;
-		static constexpr uint16_t ISFR      = 0x001d;
-		static constexpr uint16_t ISFR_INT4 = 0x000B;
-	};
+		return Lan87xx::initialize<Mdio, Address>(
+				PhyIdentifier1, PhyIdentifier2, PhyIdentifier2Mask);
+	}
 
-	static constexpr uint32_t ResetDelay = 0x000000FF;
-	static constexpr uint32_t ConfigDelay = 0x00000FFF;
-	static constexpr int ReadTimeout = 0xffff;
-	static constexpr int WriteTimeout = 0xffff;
-
-	// TODO: use modm::Register for these bits
-	static constexpr uint16_t Reset = 0x8000;
-	static constexpr uint16_t LoopBack = 0x4000;
-	static constexpr uint16_t FullDuplex100M = 0x2100;
-	static constexpr uint16_t HalfDuplex100M = 0x2000;
-	static constexpr uint16_t FullDuplex10M = 0x0100;
-	static constexpr uint16_t HalfDuplex10M = 0x0000;
-	static constexpr uint16_t AutoNegotiation = 0x1000;
-	static constexpr uint16_t RestartAutoNegotiation = 0x0200;
-
-	static constexpr uint16_t LinkedStatus = 0x0004;
-	static constexpr uint16_t DuplexStatus = 0x0010;
-	static constexpr uint16_t SpeedStatus = 0x0004;
-	static constexpr uint16_t AutoNegotiationComplete = 0x0020;
-	static constexpr uint16_t JabberDetection = 0x0002;
+	template <ethernet::Clause22Mdio Mdio>
+	static LinkStatusResult readLinkStatus()
+	{
+		return Lan87xx::readLinkStatus<Mdio, Address>();
+	}
 };
 
-}
+} // namespace modm
 
 #endif // MODM_LAN8720A_HPP
-
