@@ -4,6 +4,7 @@
  * Copyright (c) 2016-2017, 2019, 2024, Niklas Hauser
  * Copyright (c) 2021, Raphael Lehmann
  * Copyright (c) 2021, Christopher Durand
+ * Copyright (c) 2026, Kaelin Laundry
  *
  * This file is part of the modm project.
  *
@@ -83,6 +84,9 @@ __modm_initialize_platform(void)
 	// Enable all SRAMs
 	%% if target.name[0].isnumeric()
 	RCC->AHB2ENR |= RCC_AHB2ENR_SRAM1EN | RCC_AHB2ENR_SRAM2EN;
+#ifdef RCC_AHB2ENR_SRAM3EN
+	RCC->AHB2ENR |= RCC_AHB2ENR_SRAM3EN;
+#endif
 	%% else
 	RCC->AHB2ENR |= RCC_AHB2ENR_AHBSRAM1EN | RCC_AHB2ENR_AHBSRAM2EN;
 	%% endif
