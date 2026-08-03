@@ -1,0 +1,209 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2020, Mike Wolfram
+# Copyright (c) 2021, Niklas Hauser
+# Copyright (c) 2026, Kaelin Laundry
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+ETH_H7_CACHE_LINE_SIZE = 32
+# One untagged Ethernet header and the standard 1500-byte payload MTU; FCS is stripped.
+ETH_H7_MAX_FRAME_SIZE = 14 + 1500
+# A normal descriptor is four words. Isolate each descriptor on a Cortex-M7 cache line.
+ETH_H7_DESCRIPTOR_HARDWARE_SIZE = 16
+ETH_H7_DESCRIPTOR_COUNT_MIN = 4
+# DMACTXRLR/DMACRXRLR contain ten-bit ring lengths and encode count minus one.
+ETH_H7_DESCRIPTOR_COUNT_MAX = 1 << 10
+ETH_H7_RX_DESCRIPTOR_COUNT_DEFAULT = 8
+ETH_H7_TX_DESCRIPTOR_COUNT_DEFAULT = 4
+
+
+def align_up(value, alignment):
+    return (value + alignment - 1) // alignment * alignment
+
+
+ETH_H7_DESCRIPTOR_STORAGE_SIZE = align_up(
+    ETH_H7_DESCRIPTOR_HARDWARE_SIZE, ETH_H7_CACHE_LINE_SIZE)
+ETH_H7_FRAME_BUFFER_SIZE = align_up(
+    ETH_H7_MAX_FRAME_SIZE, ETH_H7_CACHE_LINE_SIZE)
+
+
+def memory_size(memory):
+    size = memory["size"]
+    return int(size, 0) if isinstance(size, str) else int(size)
+
+
+def eth_h7_dma_storage_size(rx_descriptors, tx_descriptors):
+    return (rx_descriptors + tx_descriptors) * (
+        ETH_H7_DESCRIPTOR_STORAGE_SIZE + ETH_H7_FRAME_BUFFER_SIZE)
+
+
+def eth_h7_dma_memories(device):
+    minimum_storage = eth_h7_dma_storage_size(
+        ETH_H7_DESCRIPTOR_COUNT_MIN, ETH_H7_DESCRIPTOR_COUNT_MIN)
+    # TODO: Use modm-devices DMA-domain accessibility metadata when available.
+    memories = [
+        memory
+        for memory in listify(device.get_driver("core")["memory"])
+        if "rw" in memory.get("access", "")
+        and memory_size(memory) >= minimum_storage
+    ]
+    return sorted(memories, key=memory_size, reverse=True)
+
+
+def init(module):
+    module.name = ":platform:eth"
+    module.description = """\
+# Ethernet
+
+STM32H7 Ethernet v3.0 MAC/DMA backend.
+
+This driver implements Ethernet MAC initialization, link status notifications,
+TX/RX DMA, and MDIO communication with an external PHY. It does not implement a
+specific PHY or a network stack. Use a separate PHY driver and, for higher level
+protocols, a stack such as lwIP or FreeRTOS+TCP.
+
+Packets can be sent and received through copying or zero copy APIs. The zero
+copy API exposes DMA buffers for the caller to populate directly.
+
+The normal copying API is:
+
+```cpp
+const auto result = EthernetMac::transmit(frame);
+modm_assert(result, "eth.tx", "Frame was not accepted");
+```
+
+For in-place construction, the lease owns the reservation until it is
+committed, cancelled, or destroyed:
+
+```cpp
+auto tx = EthernetMac::acquireTransmitBuffer(length);
+modm_assert(tx, "eth.tx.acquire", "Transmit ring is busy");
+fillFrame(tx.buffer());
+modm_assert(tx.commit(), "eth.tx.commit", "Frame was not accepted");
+```
+
+`examples/nucleo_h753zi/ethernet` exercises both paths.
+
+Descriptors and frame buffers must be placed in DMA accessible SRAM.
+Auto negotiation is assumed; forced link modes are not implemented.
+
+The application calls `notifyUpdatedLinkStatus()` with each observed PHY link
+update. Fatal bus errors and other failures reject traffic until the next
+successful `initialize()` call. Reinitialization and link transitions that stop
+the MAC require all frame leases to be released.
+
+Only untagged Ethernet is supported. VLAN filtering, multicast hashing,
+IEEE 802.3x flow control, and Energy Efficient Ethernet are not implemented.
+Each frame occupies one descriptor and is limited to the standard 1500-byte MTU.
+Jumbo frames are not supported.
+"""
+
+def prepare(module, options):
+    device = options[":target"]
+
+    if not device.has_driver("eth:stm32*"):
+        return False
+
+    family = device.identifier["family"]
+    driver_type = device.get_driver("eth")["type"]
+    if family != "h7" or driver_type != "stm32-v3.0":
+        return False
+
+    module.add_option(
+            NumericOption(
+                name="dma.rx_descriptors",
+                description=(
+                    "Number of STM32H7 Ethernet receive descriptors and frame buffers. "
+                    "The driver requires at least four; the 10-bit "
+                    "ring length field supports at most 1024."),
+                minimum=ETH_H7_DESCRIPTOR_COUNT_MIN,
+                maximum=ETH_H7_DESCRIPTOR_COUNT_MAX,
+                default=ETH_H7_RX_DESCRIPTOR_COUNT_DEFAULT))
+    module.add_option(
+            NumericOption(
+                name="dma.tx_descriptors",
+                description=(
+                    "Number of STM32H7 Ethernet transmit descriptors and frame buffers. "
+                    "The driver requires at least four; the 10-bit "
+                    "ring length field supports at most 1024."),
+                minimum=ETH_H7_DESCRIPTOR_COUNT_MIN,
+                maximum=ETH_H7_DESCRIPTOR_COUNT_MAX,
+                default=ETH_H7_TX_DESCRIPTOR_COUNT_DEFAULT))
+    memories = eth_h7_dma_memories(device)
+    if not memories:
+        raise ValidateException(
+            "STM32H7 Ethernet needs writable memory large enough for its DMA storage.")
+    sections = [".noinit_" + memory["name"] for memory in memories]
+    default_storage = eth_h7_dma_storage_size(
+        ETH_H7_RX_DESCRIPTOR_COUNT_DEFAULT, ETH_H7_TX_DESCRIPTOR_COUNT_DEFAULT)
+    default_section = next((
+        ".noinit_" + memory["name"] for memory in memories
+        if memory_size(memory) >= default_storage), None)
+    if default_section is None:
+        raise ValidateException(
+            "STM32H7 Ethernet needs internal SRAM large enough for its default DMA rings.")
+    module.add_option(
+            EnumerationOption(
+                name="dma.section",
+                description=(
+                    "No-init linker section for STM32H7 Ethernet DMA descriptors and "
+                    "frame buffers. Select memory accessible to the Ethernet DMA."),
+                enumeration=sections,
+                default=default_section))
+
+    module.depends(":architecture:atomic",
+                   ":architecture:clock",
+                   ":architecture:ethernet",
+                   ":architecture:interrupt",
+                   ":architecture:register",
+                   ":architecture:assert",
+                   ":cmsis:device",
+                   ":platform:gpio",
+                   ":platform:rcc",
+                   ":processing:fiber",
+                   ":math:utils")
+
+    return True
+
+
+def validate(env):
+    device = env[":target"]
+    family = device.identifier["family"]
+    driver_type = device.get_driver("eth")["type"] if device.has_driver("eth:stm32*") else None
+    if family != "h7" or driver_type != "stm32-v3.0":
+        return
+
+    required = eth_h7_dma_storage_size(env["dma.rx_descriptors"], env["dma.tx_descriptors"])
+    section = env["dma.section"]
+    memory_name = section.removeprefix(".noinit_")
+    memories = eth_h7_dma_memories(device)
+    memory = next((memory for memory in memories
+                   if memory["name"] == memory_name), None)
+    if memory is None or memory_size(memory) < required:
+        raise ValidateException(
+            "STM32H7 Ethernet DMA storage needs {} bytes of writable memory, "
+            "but {} cannot provide it."
+            .format(required, section))
+
+def build(env):
+    env.substitutions = {"target": env[":target"].identifier}
+    env.outbasepath = "modm/src/modm/platform/eth"
+
+    env.substitutions.update({
+        "eth_dma_section": env["dma.section"],
+        "eth_dma_buffer_size": ETH_H7_FRAME_BUFFER_SIZE,
+        "eth_descriptor_alignment": ETH_H7_CACHE_LINE_SIZE,
+        "eth_max_frame_size": ETH_H7_MAX_FRAME_SIZE,
+        "eth_rx_descriptor_count": env["dma.rx_descriptors"],
+        "eth_tx_descriptor_count": env["dma.tx_descriptors"],
+    })
+    env.template("eth.hpp.in", "eth.hpp")
+    env.copy("eth_impl.hpp")
+    env.template("eth.cpp.in", "eth.cpp")
