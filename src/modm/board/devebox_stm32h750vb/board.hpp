@@ -74,6 +74,7 @@ struct SystemClock
 
 	static constexpr uint32_t Can1 = Apb1;
 	static constexpr uint32_t Can2 = Apb1;
+	static constexpr uint32_t Eth = Ahb1;
 
 	static constexpr uint32_t I2c1 = Apb1;
 	static constexpr uint32_t I2c2 = Apb1;

@@ -80,6 +80,7 @@ struct SystemClock
 	static constexpr uint32_t Fdcan1 = Pll2Q;
 	static constexpr uint32_t Fdcan2 = Pll2Q;
 	static constexpr uint32_t Fdcan3 = Pll2Q;
+	static constexpr uint32_t Eth = Ahb1;
 
 	static constexpr uint32_t I2c1 = Apb1;
 	static constexpr uint32_t I2c2 = Apb1;
