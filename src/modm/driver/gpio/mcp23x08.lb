@@ -1,0 +1,47 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2026, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:mcp23x08"
+    module.description = """
+# MCP23x08 8-Bit I/O Expander
+
+The lower three address bits can be configured: `0100abc`.
+
+Notice that you can specify multiple pins at the same time for functions
+with argument type `Pins`, either by ORing the according pins, or
+converting a 8bit value using the `Pins(uint8_t)` converting constructor.
+
+Other functions with argument type `Pin` can only take one pin.
+If you want to operate on all 8bit, use the `get(Inputs|Outputs|Directions|Polarities)()`
+getters.
+"""
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:gpio.expander",
+        ":architecture:i2c.device",
+        ":architecture:register",
+        ":architecture:spi.device",
+        ":architecture:fiber")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/gpio"
+    env.copy("mcp23x08.hpp")
+    env.copy("mcp23x08_impl.hpp")
+    if not env.has_module(":driver:mcp23x17"):
+        env.copy("mcp23_transport.hpp")
+        env.copy("mcp23_transport_impl.hpp")
+
+
