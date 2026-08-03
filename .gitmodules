@@ -64,3 +64,6 @@
 [submodule "ext/arm/cmsis-dap"]
 	path = ext/arm/cmsis-dap
 	url = https://github.com/modm-ext/cmsis-dap-partial.git
+[submodule "ext/lwip/lwip"]
+	path = ext/lwip/lwip
+	url = https://github.com/modm-ext/lwip-partial.git
