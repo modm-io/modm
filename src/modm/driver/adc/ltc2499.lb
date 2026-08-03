@@ -1,0 +1,32 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2026, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:ltc2499"
+    module.description = """
+# LTC2499 ADC
+
+The LTC2499 is a 16-channel (eight differential), 24-bit delta-sigma ADC with
+Easy Drive technology, an integrated temperature sensor, and a 2-wire, I2C
+interface. It is the 24-bit, pin-compatible sibling of the LTC2497.
+"""
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:i2c.device",
+        ":processing:timer")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/adc"
+    env.copy("ltc2499.hpp")
