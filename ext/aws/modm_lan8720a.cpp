@@ -29,7 +29,7 @@ using EMAC = modm::platform::Eth<modm::Lan8720a>;
 namespace modm
 {
 
-struct ethernet
+struct EthernetDriver
 {
 	static constexpr BaseType_t MAX_PACKET_SIZE { 1536 };
 	static constexpr BaseType_t RX_BUFFER_SIZE { 1536 };
@@ -464,34 +464,34 @@ struct ethernet
 	}
 };
 
-ethernet::InitStatus ethernet::initStatus = ethernet::InitStatus::Init;
-SemaphoreHandle_t ethernet::txDescriptorSemaphore { nullptr };
-TaskHandle_t ethernet::emacTaskHandle { nullptr };
+EthernetDriver::InitStatus EthernetDriver::initStatus = EthernetDriver::InitStatus::Init;
+SemaphoreHandle_t EthernetDriver::txDescriptorSemaphore { nullptr };
+TaskHandle_t EthernetDriver::emacTaskHandle { nullptr };
 
-modm::platform::eth::Event_t ethernet::isrEvent { modm::platform::eth::Event::None };
+modm::platform::eth::Event_t EthernetDriver::isrEvent { modm::platform::eth::Event::None };
 
-TimeOut_t ethernet::phyLinkStatusTimer;
-modm::platform::eth::LinkStatus ethernet::lastPhyLinkStatus { modm::platform::eth::LinkStatus::Down };
-TickType_t ethernet::phyLinkStatusRemaining { 0 };
+TimeOut_t EthernetDriver::phyLinkStatusTimer;
+modm::platform::eth::LinkStatus EthernetDriver::lastPhyLinkStatus { modm::platform::eth::LinkStatus::Down };
+TickType_t EthernetDriver::phyLinkStatusRemaining { 0 };
 
-ethernet::DmaDescriptor_t  ethernet::DmaRxDescriptorTable[RX_BUFFER_NUMBER];
-ethernet::DmaDescriptor_t  ethernet::DmaTxDescriptorTable[TX_BUFFER_NUMBER];
-ethernet::DmaDescriptor_t *ethernet::RxDescriptor { nullptr };       /*!< Rx descriptor to Get        */
-ethernet::DmaDescriptor_t *ethernet::TxDescriptor { nullptr };       /*!< Tx descriptor to Set        */
-ethernet::DmaDescriptor_t *ethernet::DmaTxDescriptorToClear { nullptr };
+EthernetDriver::DmaDescriptor_t  EthernetDriver::DmaRxDescriptorTable[RX_BUFFER_NUMBER];
+EthernetDriver::DmaDescriptor_t  EthernetDriver::DmaTxDescriptorTable[TX_BUFFER_NUMBER];
+EthernetDriver::DmaDescriptor_t *EthernetDriver::RxDescriptor { nullptr };       /*!< Rx descriptor to Get        */
+EthernetDriver::DmaDescriptor_t *EthernetDriver::TxDescriptor { nullptr };       /*!< Tx descriptor to Set        */
+EthernetDriver::DmaDescriptor_t *EthernetDriver::DmaTxDescriptorToClear { nullptr };
 
 } // namespace modm
 
 extern "C" BaseType_t
 xNetworkInterfaceInitialise()
 {
-	using modm::ethernet;
+	using modm::EthernetDriver;
 
-	if (ethernet::initStatus == ethernet::InitStatus::Init) {
-		ethernet::txDescriptorSemaphore = xSemaphoreCreateCounting(UBaseType_t(ethernet::TX_BUFFER_NUMBER),
-				UBaseType_t(ethernet::TX_BUFFER_NUMBER ));
-		if (ethernet::txDescriptorSemaphore == NULL) {
-			ethernet::initStatus = ethernet::InitStatus::Failed;
+	if (EthernetDriver::initStatus == EthernetDriver::InitStatus::Init) {
+		EthernetDriver::txDescriptorSemaphore = xSemaphoreCreateCounting(UBaseType_t(EthernetDriver::TX_BUFFER_NUMBER),
+				UBaseType_t(EthernetDriver::TX_BUFFER_NUMBER ));
+		if (EthernetDriver::txDescriptorSemaphore == NULL) {
+			EthernetDriver::initStatus = EthernetDriver::InitStatus::Failed;
 			return pdFAIL;
 		}
 
@@ -504,29 +504,29 @@ xNetworkInterfaceInitialise()
 
 		(void) EMAC::initialize<modm::platform::eth::MediaInterface::RMII>();
 
-		ethernet::TxDescriptor = ethernet::DmaTxDescriptorTable;
-		ethernet::RxDescriptor = ethernet::DmaRxDescriptorTable;
+		EthernetDriver::TxDescriptor = EthernetDriver::DmaTxDescriptorTable;
+		EthernetDriver::RxDescriptor = EthernetDriver::DmaRxDescriptorTable;
 
-		std::memset(&ethernet::DmaTxDescriptorTable, 0, sizeof(ethernet::DmaTxDescriptorTable));
-		std::memset(&ethernet::DmaRxDescriptorTable, 0, sizeof(ethernet::DmaRxDescriptorTable));
+		std::memset(&EthernetDriver::DmaTxDescriptorTable, 0, sizeof(EthernetDriver::DmaTxDescriptorTable));
+		std::memset(&EthernetDriver::DmaRxDescriptorTable, 0, sizeof(EthernetDriver::DmaRxDescriptorTable));
 
-		ethernet::DmaTxDescriptorToClear = ethernet::DmaTxDescriptorTable;
+		EthernetDriver::DmaTxDescriptorToClear = EthernetDriver::DmaTxDescriptorTable;
 
-		ethernet::DMATxDescListInit();
-		ethernet::DMARxDescListInit();
+		EthernetDriver::DMATxDescListInit();
+		EthernetDriver::DMARxDescListInit();
 
-		ethernet::updateConfig(true);
+		EthernetDriver::updateConfig(true);
 
-		if (not xTaskCreate(ethernet::emacHandlerTask, "EMAC", ethernet::emacTaskStackDepth, NULL,
-				ethernet::emacTaskPriority, &ethernet::emacTaskHandle)) {
-			ethernet::initStatus = ethernet::InitStatus::Failed;
+		if (not xTaskCreate(EthernetDriver::emacHandlerTask, "EMAC", EthernetDriver::emacTaskStackDepth, NULL,
+				EthernetDriver::emacTaskPriority, &EthernetDriver::emacTaskHandle)) {
+			EthernetDriver::initStatus = EthernetDriver::InitStatus::Failed;
 			return pdFAIL;
 		}
 
-		ethernet::initStatus = ethernet::InitStatus::Pass;
+		EthernetDriver::initStatus = EthernetDriver::InitStatus::Pass;
 	}
 
-	if (ethernet::initStatus != ethernet::InitStatus::Pass)
+	if (EthernetDriver::initStatus != EthernetDriver::InitStatus::Pass)
 		return pdFAIL;
 
 	if (EMAC::getLinkStatus() == modm::platform::eth::LinkStatus::Up) {
@@ -557,20 +557,20 @@ xNetworkInterfaceInitialise()
 extern "C" BaseType_t
 xNetworkInterfaceOutput(NetworkBufferDescriptor_t * const descriptor, BaseType_t releaseAfterSend)
 {
-	using modm::ethernet;
+	using modm::EthernetDriver;
 
 	static constexpr TickType_t blockTimeTicks { pdMS_TO_TICKS(50) };
-	static constexpr ethernet::TDes0_t transmitStatus {
-		ethernet::CrcControl_t(ethernet::CrcControl::HardwareCalculated) |
-		ethernet::TDes0_t(ethernet::TDes0::InterruptOnCompletion |
-				ethernet::TDes0::LastSegment |
-				ethernet::TDes0::FirstSegment
+	static constexpr EthernetDriver::TDes0_t transmitStatus {
+		EthernetDriver::CrcControl_t(EthernetDriver::CrcControl::HardwareCalculated) |
+		EthernetDriver::TDes0_t(EthernetDriver::TDes0::InterruptOnCompletion |
+				EthernetDriver::TDes0::LastSegment |
+				EthernetDriver::TDes0::FirstSegment
 				)
 	};
 
 	BaseType_t result { pdFAIL };
 	uint32_t transmitSize { 0 };
-	__IO ethernet::DmaDescriptor_t *dmaTxDescriptor { nullptr };
+	__IO EthernetDriver::DmaDescriptor_t *dmaTxDescriptor { nullptr };
 
 	do {
 		ProtocolPacket_t *packet = reinterpret_cast<ProtocolPacket_t *>(descriptor->pucEthernetBuffer);
@@ -581,15 +581,15 @@ xNetworkInterfaceOutput(NetworkBufferDescriptor_t * const descriptor, BaseType_t
 			// no link, drop packet
 			break;
 
-		if (xSemaphoreTake(ethernet::txDescriptorSemaphore, blockTimeTicks) != pdPASS)
+		if (xSemaphoreTake(EthernetDriver::txDescriptorSemaphore, blockTimeTicks) != pdPASS)
 			break;
 
-		dmaTxDescriptor = ethernet::TxDescriptor;
-		configASSERT((dmaTxDescriptor->Status & uint32_t(ethernet::TDes0::DmaOwned)) == 0);
+		dmaTxDescriptor = EthernetDriver::TxDescriptor;
+		configASSERT((dmaTxDescriptor->Status & uint32_t(EthernetDriver::TDes0::DmaOwned)) == 0);
 
 		transmitSize = descriptor->xDataLength;
-		if (transmitSize > ethernet::TX_BUFFER_SIZE)
-			transmitSize = ethernet::TX_BUFFER_SIZE;
+		if (transmitSize > EthernetDriver::TX_BUFFER_SIZE)
+			transmitSize = EthernetDriver::TX_BUFFER_SIZE;
 
 		configASSERT(releaseAfterSend != 0);
 
@@ -598,10 +598,10 @@ xNetworkInterfaceOutput(NetworkBufferDescriptor_t * const descriptor, BaseType_t
 
 		dmaTxDescriptor->Status |= transmitStatus.value;
 
-		dmaTxDescriptor->ControlBufferSize = transmitSize & modm::ethernet::Buffer1SizeMask;
+		dmaTxDescriptor->ControlBufferSize = transmitSize & modm::EthernetDriver::Buffer1SizeMask;
 
-		dmaTxDescriptor->Status |= uint32_t(ethernet::TDes0::DmaOwned);
-		ethernet::TxDescriptor = reinterpret_cast<ethernet::DmaDescriptor_t *>(ethernet::TxDescriptor->Buffer2NextDescAddr);
+		dmaTxDescriptor->Status |= uint32_t(EthernetDriver::TDes0::DmaOwned);
+		EthernetDriver::TxDescriptor = reinterpret_cast<EthernetDriver::DmaDescriptor_t *>(EthernetDriver::TxDescriptor->Buffer2NextDescAddr);
 		__DSB();
 		ETH->DMATPDR = 0;
 		iptraceNETWORK_INTERFACE_TRANSMIT();
@@ -623,23 +623,23 @@ BaseType_t xGetPhyLinkStatus()
 MODM_ISR(ETH)
 {
 	using modm::platform::eth;
-	using modm::ethernet;
+	using modm::EthernetDriver;
 
 	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 	EMAC::InterruptFlags_t irq = EMAC::getInterruptFlags();
 	EMAC::acknowledgeInterrupt(irq);
 
 	if (irq & (eth::InterruptFlags::Receive | eth::InterruptFlags::ReceiveBufferUnavailable)) {
-		ethernet::isrEvent |= eth::Event::Receive;
-		if (ethernet::emacTaskHandle) {
-			vTaskNotifyGiveFromISR(ethernet::emacTaskHandle, &xHigherPriorityTaskWoken);
+		EthernetDriver::isrEvent |= eth::Event::Receive;
+		if (EthernetDriver::emacTaskHandle) {
+			vTaskNotifyGiveFromISR(EthernetDriver::emacTaskHandle, &xHigherPriorityTaskWoken);
 			portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 		}
 	}
 	if (irq & (eth::InterruptFlags::Transmit)) {
-		ethernet::isrEvent |= eth::Event::Transmit;
-		if (ethernet::emacTaskHandle) {
-			vTaskNotifyGiveFromISR(ethernet::emacTaskHandle, &xHigherPriorityTaskWoken);
+		EthernetDriver::isrEvent |= eth::Event::Transmit;
+		if (EthernetDriver::emacTaskHandle) {
+			vTaskNotifyGiveFromISR(EthernetDriver::emacTaskHandle, &xHigherPriorityTaskWoken);
 			portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 		}
 	}
