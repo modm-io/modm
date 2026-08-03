@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <options>
+    <option name="modm:build:build.path">../../build/generated-unittest/hosted-lwip/</option>
+    <option name="modm:build:unittest.source">../../build/generated-unittest/hosted-lwip/modm-test</option>
+  </options>
+  <modules>
+    <module>modm:platform:core</module>
+    <module>modm-test:test:lwip</module>
+  </modules>
+</library>
