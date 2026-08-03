@@ -154,6 +154,7 @@ We have hundreds of examples, here are some of our favorite ones:
 [DAC with DMA](https://github.com/modm-io/modm/tree/develop/examples/analog/dac_dma),
 [CAN](https://github.com/modm-io/modm/tree/develop/examples/can/can),
 [FDCAN](https://github.com/modm-io/modm/tree/develop/examples/can/fdcan),
+[Ethernet MAC/DMA](https://github.com/modm-io/modm/tree/develop/examples/communication/ethernet_raw),
 [UART](https://github.com/modm-io/modm/tree/develop/examples/logging/uart).
 - Displays and user interfaces:
 [Drawing on display](https://github.com/modm-io/modm/tree/develop/examples/ui/display_f4),
@@ -174,6 +175,7 @@ We have hundreds of examples, here are some of our favorite ones:
 [TinyUSB CDC and MSC](https://github.com/modm-io/modm/tree/develop/examples/ext/usb),
 [TinyUSB DFU](https://github.com/modm-io/modm/tree/develop/examples/ext/usb_dfu),
 [FreeRTOS](https://github.com/modm-io/modm/tree/develop/examples/ext/freertos),
+[lwIP Ping and UDP/TCP Echo](https://github.com/modm-io/modm/tree/develop/examples/ext/lwip),
 [ETL](https://github.com/modm-io/modm/tree/develop/examples/ext/etl).
 <!--/checkrepourls-->
 
