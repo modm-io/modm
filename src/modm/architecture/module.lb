@@ -153,6 +153,20 @@ class Clock(Module):
         env.copy("interface/clock.hpp")
 # -----------------------------------------------------------------------------
 
+class Ethernet(Module):
+    def init(self, module):
+        module.name = "ethernet"
+        module.description = "Common Ethernet MAC, PHY, link, and MDIO types"
+
+    def prepare(self, module, options):
+        module.depends(":stdc++")
+        return True
+
+    def build(self, env):
+        env.outbasepath = "modm/src/modm/architecture"
+        env.copy("interface/ethernet.hpp")
+# -----------------------------------------------------------------------------
+
 class Delay(Module):
     def init(self, module):
         module.name = "delay"
@@ -395,6 +409,7 @@ def prepare(module, options):
     module.add_submodule(BuildId())
     module.add_submodule(Can())
     module.add_submodule(Clock())
+    module.add_submodule(Ethernet())
     module.add_submodule(Delay())
     module.add_submodule(Fiber())
     module.add_submodule(Gpio())
