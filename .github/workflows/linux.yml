@@ -82,6 +82,7 @@ jobs:
           (cd test && make compile-nucleo-f767zi)
           (cd test && make compile-nucleo-g474re)
           (cd test && make compile-nucleo-h723zg)
+          (cd test && make compile-nucleo-h753zi-eth)
           (cd test && make compile-nucleo-l432kc)
           (cd test && make compile-nucleo-l496zg-p)
           (cd test && make compile-nucleo-l552ze-q)
@@ -210,7 +211,7 @@ jobs:
       - name: Examples STM32H7 Series
         if: always()
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py nucleo_h743zi nucleo_h723zg stm32h750vbt6_devebox)
+          (cd examples && ../tools/scripts/examples_compile.py nucleo_h743zi nucleo_h753zi nucleo_h723zg stm32h750vbt6_devebox)
 
   stm32f4-examples-1:
     runs-on: ubuntu-24.04
