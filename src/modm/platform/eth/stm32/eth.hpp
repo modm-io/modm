@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2020, Mike Wolfram
+ * Copyright (c) 2026, Kaelin Laundry
  *
  * This file is part of the modm project.
  *
@@ -428,9 +429,8 @@ public:
 		uint32_t phy_register { 0 };
 
 		/* Reset */
-		(void) readPhyRegister(PHY::Register::BasicControl, phy_register);
-		phy_register |= uint16_t(PHY::BasicControl::SoftReset);
-		if (not writePhyRegister(PHY::Register::BasicControl, phy_register)) {
+		if (not writePhyRegister(PHY::Register::BasicControl,
+				uint16_t(PHY::BasicControl::SoftReset))) {
 			configureMac(true);
 			configureDma();
 			return false;
