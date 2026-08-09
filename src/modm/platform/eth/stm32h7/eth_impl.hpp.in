@@ -90,10 +90,17 @@ EthernetMac::initialize(MediaInterface interface, uint32_t ethernetClock,
 inline void
 EthernetMac::selectMediaInterface(MediaInterface interface)
 {
+%% if target.family == "h5"
+	const uint32_t selection = interface == MediaInterface::RMII ?
+			SBS_PMCR_ETH_SEL_PHY_2 : 0;
+	SBS->PMCR = (SBS->PMCR & ~SBS_PMCR_ETH_SEL_PHY) | selection;
+	(void) SBS->PMCR;
+%% else
 	const uint32_t selection = interface == MediaInterface::RMII ?
 			SYSCFG_PMCR_EPIS_SEL_2 : 0;
 	SYSCFG->PMCR = (SYSCFG->PMCR & ~SYSCFG_PMCR_EPIS_SEL) | selection;
 	(void) SYSCFG->PMCR;
+%% endif
 }
 
 inline bool

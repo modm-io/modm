@@ -113,7 +113,7 @@ def prepare(module, options):
 
     family = device.identifier["family"]
     driver_type = device.get_driver("eth")["type"]
-    if family != "h7" or driver_type != "stm32-v3.0":
+    if family not in ["h5", "h7"] or driver_type != "stm32-v3.0":
         return False
 
     module.add_option(
@@ -177,7 +177,7 @@ def validate(env):
     device = env[":target"]
     family = device.identifier["family"]
     driver_type = device.get_driver("eth")["type"] if device.has_driver("eth:stm32*") else None
-    if family != "h7" or driver_type != "stm32-v3.0":
+    if family not in ["h5", "h7"] or driver_type != "stm32-v3.0":
         return
 
     required = eth_h7_dma_storage_size(env["dma.rx_descriptors"], env["dma.tx_descriptors"])
@@ -204,6 +204,6 @@ def build(env):
         "eth_rx_descriptor_count": env["dma.rx_descriptors"],
         "eth_tx_descriptor_count": env["dma.tx_descriptors"],
     })
-    env.template("eth.hpp.in", "eth.hpp")
-    env.copy("eth_impl.hpp")
-    env.template("eth.cpp.in", "eth.cpp")
+    env.template("eth.hpp.in")
+    env.template("eth_impl.hpp.in")
+    env.template("eth.cpp.in")
