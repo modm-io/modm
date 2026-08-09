@@ -24,8 +24,7 @@
  * @param rgb
  */
 template<std::unsigned_integral T>
-template<std::unsigned_integral U>
-constexpr modm::color::HsvT<T>::HsvT(const modm::color::RgbT<U> &rgb)
+constexpr modm::color::HsvT<T>::HsvT(const modm::color::RgbT<T> &rgb)
 {
 	using CalcType = float;
 	const CalcType maxValue = std::numeric_limits<T>::max();
@@ -68,4 +67,34 @@ constexpr modm::color::HsvT<T>::HsvT(const modm::color::RgbT<U> &rgb)
 		saturation = 0;
 	else
 		saturation = _diff / _max * maxValue;
+}
+
+template<std::unsigned_integral T>
+constexpr modm::color::HsvT<T>::operator RgbT<T>() const
+	requires std::is_same_v<T, uint8_t>
+{
+	uint16_t vs = value * saturation;
+	uint16_t h6 = 6 * hue;
+
+	T p = ((value << 8) - vs) >> 8;
+	T i = h6 >> 8;
+	uint16_t f = ((i | 1) << 8) - h6;
+	if (i & 1) { f = -f; }
+	T u = (((uint32_t)value << 16) - (uint32_t)vs * f) >> 16;
+
+	uint8_t red = 0;
+	uint8_t green = 0;
+	uint8_t blue = 0;
+
+	switch (i)
+	{
+		case 0: red = value; green = u; blue = p; break;
+		case 1: red = u; green = value; blue = p; break;
+		case 2: red = p; green = value; blue = u; break;
+		case 3: red = p; green = u; blue = value; break;
+		case 4: red = u; green = p; blue = value; break;
+		case 5: red = value; green = p; blue = u; break;
+	}
+
+	return RgbT<T>(red, green, blue);
 }

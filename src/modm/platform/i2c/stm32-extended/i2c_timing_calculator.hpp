@@ -17,6 +17,8 @@
 #include <array>
 #include <cmath>
 
+#include <modm/math/utils/cmath.hpp>
+
 namespace modm
 {
 
@@ -272,8 +274,8 @@ private:
 			((1.0f / params.peripheralClock) - SyncTime) / clockPeriod - 1
 		);
 
-		lowMinFloat  = std::ceil(lowMinFloat);
-		highMinFloat = std::ceil(highMinFloat);
+		lowMinFloat  = modm::ceil(lowMinFloat);
+		highMinFloat = modm::ceil(highMinFloat);
 
 		if(lowMinFloat > 255 || highMinFloat > 255) {
 			return {false, 255, 255};
@@ -307,7 +309,7 @@ private:
 		auto targetSclHighTime = targetSclTime - sclLowTime
 				- params.riseTime - params.fallTime;
 
-		auto targetSclHigh = std::round((targetSclHighTime - SyncTime) / clockPeriod - 1);
+		auto targetSclHigh = modm::round((targetSclHighTime - SyncTime) / clockPeriod - 1);
 
 		return (uint8_t) std::max<float>(min, std::min<float>(targetSclHigh, max));
 	}

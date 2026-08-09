@@ -129,11 +129,20 @@
 #	define MODM_ISR_CALL(vector) \
 		MODM_ISR_VALIDATE(#vector, vector); \
 		vector ## _IRQHandler()
+
+#ifdef MODM_COMPILER_CLANG
+#	define MODM_ISR(vector, ...) \
+		MODM_ISR_VALIDATE(#vector, vector); \
+		modm_extern_c void vector ## _IRQHandler(void) \
+			__attribute__((used)) __VA_ARGS__; \
+		void vector ## _IRQHandler(void)
+#else
 #	define MODM_ISR(vector, ...) \
 		MODM_ISR_VALIDATE(#vector, vector); \
 		modm_extern_c void vector ## _IRQHandler(void) \
 			__attribute__((externally_visible)) __VA_ARGS__; \
 		void vector ## _IRQHandler(void)
+#endif // MODM_COMPILER_CLANG
 
 #else
 

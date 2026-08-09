@@ -207,7 +207,7 @@ private:
     void move_from(inplace_any<S>&& other) noexcept;
 
 private:
-    modm::aligned_storage<Size>::type storage_;
+    alignas(default_storage_alignment<Size>) std::byte storage_[Size];
     inplace_any_impl::HandlerFunc handler_{nullptr};
 };
 

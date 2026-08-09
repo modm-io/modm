@@ -229,6 +229,7 @@ def prepare(module, options):
     module.depends(
         ":architecture:interrupt",
         ":cmsis:device",
+        ":math:utils",
         ":stdc++")
 
     module.add_option(

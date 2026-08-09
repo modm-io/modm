@@ -18,6 +18,7 @@
 #include <modm/platform/gpio/connector.hpp>
 #include <modm/architecture/interface/i2c_master.hpp>
 #include <modm/math/algorithm/prescaler.hpp>
+#include <modm/math/utils/cmath.hpp>
 
 namespace modm
 {
@@ -93,7 +94,7 @@ public:
 		//   => y = x * m + b, with m = -2.3333ns/kHz, b = 1'233.3333ns
 		constexpr float max_rise_time = -2.333333f * (float(baudrate) / 1'000.f) + 1'233.333333f;
 		// calculate trise
-		constexpr float trise_raw = max_rise_time < 0 ? 0 : std::floor(max_rise_time / (1'000.f / freq));
+		constexpr float trise_raw = max_rise_time < 0 ? 0 : modm::floor(max_rise_time / (1'000.f / freq));
 		constexpr uint8_t trise = trise_raw > 62 ? 63 : (trise_raw + 1);
 
 		initializeWithPrescaler(freq, trise, prescaler, isrPriority);

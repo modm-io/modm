@@ -13,22 +13,11 @@
 
 #include <algorithm>
 
-#include "brightness.hpp"
 #include "hsv.hpp"
 #include "rgb.hpp"
 
 namespace modm::color
 {
-
-// forward declarations for convertion constructors
-template<std::unsigned_integral T>
-class RgbT;
-
-template<std::unsigned_integral T>
-class HsvT;
-
-template<std::unsigned_integral T>
-class BrightnessT;
 
 /**
  * Color in RGB Colorspace, 16 bits: RRRR RGGG GGGB BBBB
@@ -81,17 +70,21 @@ public:
 	constexpr Rgb565(const HsvT<U> &hsv) : Rgb565(RgbCalcType(hsv))
 	{}
 
-	/**
-	 * Convertion Constructor for Brightness
-	 *
-	 * @param brightness	Brightness 'Color'-object
-	 */
-	template<std::unsigned_integral U>
-	constexpr Rgb565(const BrightnessT<U> brightness) : Rgb565(RgbCalcType(brightness))
-	{}
-
 	constexpr bool
 	operator==(const Rgb565 &other) const = default;
+
+	constexpr operator RgbCalcType() const
+	{
+		const uint8_t red = (color >> 8) & 0xF8;
+		const uint8_t green = (color >> 3) & 0xFC;
+		const uint8_t blue = (color << 3);
+		return RgbCalcType(red, green, blue);
+	}
+
+	constexpr operator Hsv() const
+	{
+		return Hsv(RgbT<uint8_t>(*this));
+	}
 
 	/// Saturated addition ⊕
 	Rgb565

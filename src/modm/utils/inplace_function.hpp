@@ -26,6 +26,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <type_traits>
 #include <utility>
 #include <functional>
@@ -118,7 +119,7 @@ struct is_valid_inplace_dst : std::true_type
 template<
     class Signature,
     size_t Capacity = inplace_function_detail::InplaceFunctionDefaultCapacity,
-    size_t Alignment = alignof(modm::aligned_storage_t<Capacity>)
+    size_t Alignment = default_storage_alignment<Capacity>
 >
 class inplace_function; // unspecified
 
@@ -140,7 +141,6 @@ template<
 >
 class inplace_function<R(Args...), Capacity, Alignment>
 {
-    using storage_t = modm::aligned_storage_t<Capacity, Alignment>;
     using vtable_t = inplace_function_detail::vtable<R, Args...>;
     using vtable_ptr_t = const vtable_t*;
 
@@ -275,7 +275,7 @@ public:
     {
         if (this == std::addressof(other)) return;
 
-        storage_t tmp;
+        alignas(Alignment) std::byte tmp[Capacity];
         vtable_ptr_->relocate_ptr(
             std::addressof(tmp),
             std::addressof(storage_)
@@ -301,7 +301,7 @@ public:
 
 private:
     vtable_ptr_t vtable_ptr_;
-    mutable storage_t storage_;
+    alignas(Alignment) mutable std::byte storage_[Capacity];
 
     inplace_function(
         vtable_ptr_t vtable_ptr,
