@@ -26,6 +26,7 @@ def prepare(module, options):
     return True
 
 ethernet_companion_clocks = {
+    "ETH": ["ETHRX", "ETHTX"],
     "ETHMAC": ["ETHMACRX", "ETHMACTX"],
     "ETH1MAC": ["ETH1RX", "ETH1TX"],
 }
