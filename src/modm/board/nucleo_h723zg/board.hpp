@@ -202,6 +202,24 @@ using Device = UsbHs;
 /// @}
 }
 
+namespace eth
+{
+/// @ingroup modm_board_nucleo_h723zg
+/// @{
+/// On-board LAN8742A address selected by the PHYAD0 strap.
+static constexpr uint32_t PhyAddress = 0;
+using RefClk = GpioA1;
+using Mdio = GpioA2;
+using Mdc = GpioC1;
+using CrsDv = GpioA7;
+using Rxd0 = GpioC4;
+using Rxd1 = GpioC5;
+using TxEn = GpioG11;
+using Txd0 = GpioG13;
+using Txd1 = GpioB13;
+/// @}
+}
+
 namespace stlink
 {
 /// @ingroup modm_board_nucleo_h723zg

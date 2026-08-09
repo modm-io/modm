@@ -215,7 +215,7 @@ using Uart = BufferedUart<UsartHal3, UartTxBuffer<2048>>;
 /// @}
 }
 
-%% if board == "nucleo-h753zi"
+%% if board in ["nucleo-h753zi", "stm32h743zi"]
 namespace eth
 {
 /// @ingroup modm_board_nucleo_h743zi
