@@ -36,17 +36,17 @@ constexpr std::array<uint8_t, 16> PayloadMarker{{
 	'm', 'o', 'd', 'm', '-', 's', 't', 'm', '3', '2', 'h', '7', '-', 'e', 't', 'h'
 }};
 
-void
+static void
 logMacAddress(const modm::ethernet::MacAddress& address)
 {
-	MODM_LOG_INFO << "MAC " << modm::hex;
+	MODM_LOG_INFO << "MAC ";
 	for (std::size_t index = 0; index < address.size(); ++index) {
-		MODM_LOG_INFO << address[index];
+		MODM_LOG_INFO << modm::hex << address[index] << modm::ascii;
 		if (index + 1 < address.size()) {
 			MODM_LOG_INFO << ':';
 		}
 	}
-	MODM_LOG_INFO << modm::ascii << modm::endl;
+	MODM_LOG_INFO << modm::endl;
 }
 
 void
