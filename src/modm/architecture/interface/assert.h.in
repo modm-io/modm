@@ -30,7 +30,7 @@
 #endif
 
 // C-type information struct
-typedef struct modm_packed
+typedef struct
 {
 	const char *name;
 #if MODM_ASSERTION_INFO_HAS_DESCRIPTION
