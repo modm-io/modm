@@ -19,7 +19,4 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "modm/src/modm/platform/id"
-    env.substitutions = {
-        "with_ethernet": env.has_module(":architecture:ethernet"),
-    }
-    env.template("id.hpp.in", "id.hpp")
+    env.copy("id.hpp")
