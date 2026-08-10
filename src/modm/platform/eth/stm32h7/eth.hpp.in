@@ -280,12 +280,6 @@ canCommitLinkUpState(EthH7MacState::DriverState state)
 }
 
 constexpr bool
-canFlushTransmitQueue(bool dmaInactive, bool mtlIdle, bool macIdle)
-{
-	return dmaInactive and mtlIdle and macIdle;
-}
-
-constexpr bool
 needsFullToHalfDuplexFlush(
 		ethernet::DuplexMode oldMode, ethernet::DuplexMode newMode)
 {
@@ -702,7 +696,6 @@ private:
 	static bool isTransmitPathIdle();
 	static bool waitForTransmitPathIdle();
 	static bool waitForMacIdle();
-	static void requestTransmitQueueFlush();
 	static bool waitForTransmitQueueFlush();
 
 	static TransmitResult commitTransmitLease(std::size_t index, std::size_t length);

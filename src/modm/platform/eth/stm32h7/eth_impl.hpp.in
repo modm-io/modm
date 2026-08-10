@@ -367,8 +367,8 @@ EthernetMac::stop()
 	}
 
 	// ES0392 Rev 15, sections 2.26.1, 2.26.3, and 2.26.5: with OSP enabled,
-	// stop producer-tail updates, wait for Suspend, clear ST, then issue FTQ
-	// only after the DMA, MTL, and MAC transmit paths are fully idle
+	// stop producer-tail updates, wait for Suspend, clear ST, then wait until
+	// the DMA, MTL, and MAC transmit paths are fully idle
 	if (not waitForTransmitDmaSuspend()) {
 		return stopTimeoutError();
 	}
@@ -386,10 +386,6 @@ EthernetMac::stop()
 		return stopTimeoutError();
 	}
 
-	requestTransmitQueueFlush();
-	if (not waitForTransmitQueueFlush()) {
-		return stopTimeoutError();
-	}
 	ETH->MACCR &= ~ETH_MACCR_TE;
 	ETH->DMACSR = ETH_DMACSR_TPS | ETH_DMACSR_RPS;
 	{
@@ -558,8 +554,8 @@ EthernetMac::isTransmitPathIdle()
 	const uint32_t dmaState = ETH->DMADSR & ETH_DMADSR_TPS;
 	const bool dmaInactive = dmaState == ETH_DMADSR_TPS_SUSPENDED or
 			dmaState == ETH_DMADSR_TPS_STOPPED;
-	return detail::canFlushTransmitQueue(
-			dmaInactive, ETH->MTLTQDR == 0, (ETH->MACDR & MacDebugStateMask) == 0);
+	return dmaInactive and ETH->MTLTQDR == 0 and
+			(ETH->MACDR & MacDebugStateMask) == 0;
 }
 
 inline bool
@@ -568,12 +564,6 @@ EthernetMac::waitForTransmitPathIdle()
 	return modm::this_fiber::poll_for(std::chrono::microseconds{MacStopTimeoutUs}, [] {
 		return isTransmitPathIdle();
 	});
-}
-
-inline void
-EthernetMac::requestTransmitQueueFlush()
-{
-	ETH->MTLTQOMR |= ETH_MTLTQOMR_FTQ;
 }
 
 inline bool
