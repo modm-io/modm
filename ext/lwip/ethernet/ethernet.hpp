@@ -8,8 +8,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef MODM_COMMUNICATION_LWIP_ETHERNET_HPP
-#define MODM_COMMUNICATION_LWIP_ETHERNET_HPP
+#ifndef MODM_LWIP_ETHERNET_HPP
+#define MODM_LWIP_ETHERNET_HPP
 
 #include <modm/architecture/interface/assert.hpp>
 #include <modm/architecture/interface/ethernet.hpp>
@@ -654,4 +654,4 @@ private:
 
 } // namespace modm::lwip
 
-#endif // MODM_COMMUNICATION_LWIP_ETHERNET_HPP
+#endif // MODM_LWIP_ETHERNET_HPP

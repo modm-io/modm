@@ -22,6 +22,10 @@ are not included.
 
 Applications must hold `modm::lwip::LwIPSingleThreadGuard` while calling lwIP APIs.
 
+When `modm:architecture:ethernet` is selected, `<modm_lwip/ethernet.hpp>`
+provides an adapter that connects a Clause 22 PHY and Ethernet MAC to an lwIP
+network interface.
+
 Hardware checksum offload cannot be combined with transmit-side IPv4
 fragmentation. lwIP invokes a netif's `linkoutput` callback once per fragment,
 where the MAC no longer sees the complete transport datagram. Receive
@@ -91,6 +95,8 @@ def build(env):
     env.copy("port/platform.cpp", "port/platform.cpp")
     env.copy("port/single_thread_guard.cpp", "port/single_thread_guard.cpp")
     env.copy("modm_lwip.hpp")
+    if env.has_module(":architecture:ethernet"):
+        env.copy("ethernet/ethernet.hpp", "modm_lwip/ethernet.hpp")
 
     for source in [
         "api/err.c", "core/def.c", "core/dns.c", "core/init.c",
