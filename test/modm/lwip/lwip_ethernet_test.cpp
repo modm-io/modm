@@ -12,8 +12,8 @@
 #include "lwip_ethernet_test.hpp"
 
 #include <modm-test/mock/clock.hpp>
-#include <modm/communication/lwip_ethernet/lwip_ethernet.hpp>
 #include <modm_lwip.hpp>
+#include <modm_lwip/ethernet.hpp>
 
 #include <lwip/stats.h>
 #include <lwip/timeouts.h>

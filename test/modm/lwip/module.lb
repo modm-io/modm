@@ -19,7 +19,7 @@ def prepare(module, options):
     if options[":target"].identifier.platform != "hosted":
         return False
 
-    module.depends(":communication:lwip_ethernet", ":mock:clock")
+    module.depends(":architecture:ethernet", ":lwip", ":mock:clock")
     return True
 
 
