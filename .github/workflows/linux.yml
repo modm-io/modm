@@ -66,6 +66,10 @@ jobs:
         if: always()
         run: |
           (cd test && make run-hosted-linux)
+      - name: Hosted lwIP Unittests
+        if: always()
+        run: |
+          (cd test && make run-hosted-lwip-linux)
       - name: Compile STM32 Unittests
         if: always()
         run: |
