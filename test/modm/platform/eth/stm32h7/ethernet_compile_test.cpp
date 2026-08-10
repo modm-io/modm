@@ -28,6 +28,7 @@ static_assert(requires {
 	{ Phy::readLinkStatus<Mac>() } -> std::same_as<Phy::LinkStatusResult>;
 });
 static_assert(Mac::LinkUpdateError::OutstandingLease != Mac::LinkUpdateError::None);
+static_assert(std::same_as<decltype(Mac::getDefaultMacAddress()), Mac::MacAddress>);
 
 constexpr bool
 isPhyMode(uint16_t hcd, Mac::Speed speed, Mac::DuplexMode duplex)
@@ -100,15 +101,6 @@ static_assert(modm::platform::detail::canCommitLinkUpState(DriverState::Running)
 static_assert(not modm::platform::detail::canCommitLinkUpState(DriverState::Stopping));
 static_assert(not modm::platform::detail::canCommitLinkUpState(DriverState::Faulted));
 
-static_assert(modm::platform::detail::canFlushTransmitQueue(true, true, true));
-static_assert(not modm::platform::detail::canFlushTransmitQueue(false, true, true));
-static_assert(not modm::platform::detail::canFlushTransmitQueue(true, false, true));
-static_assert(not modm::platform::detail::canFlushTransmitQueue(true, true, false));
-static_assert(not modm::platform::detail::canFlushTransmitQueue(false, false, true));
-static_assert(not modm::platform::detail::canFlushTransmitQueue(false, true, false));
-static_assert(not modm::platform::detail::canFlushTransmitQueue(true, false, false));
-static_assert(not modm::platform::detail::canFlushTransmitQueue(false, false, false));
-
 static_assert(modm::platform::detail::needsFullToHalfDuplexFlush(
 		Mac::DuplexMode::Full, Mac::DuplexMode::Half));
 static_assert(not modm::platform::detail::needsFullToHalfDuplexFlush(
@@ -122,7 +114,6 @@ static_assert(not modm::platform::detail::needsFullToHalfDuplexFlush(
 initializeMii()
 {
 	const Mac::Configuration configuration{
-		.macAddress = {0x02, 0, 0, 0, 0, 0},
 		.checksumMode = Mac::ChecksumMode::Software,
 	};
 	return Mac::initialize<Board::SystemClock, Mac::MediaInterface::MII>(configuration);
