@@ -1,4 +1,4 @@
-# STM32H753 lwIP Ethernet
+# STM32 lwIP Ethernet
 
 The default configuration uses STM32H7 hardware checksum offload:
 
@@ -13,7 +13,7 @@ directory using:
 
 ```sh
 lbuild -D modm:lwip:checksum=software \
-  -D modm:build:build.path=../../../build/nucleo_h753zi/ethernet_lwip_raw_software \
+  -D modm:build:build.path=../../../build/generic/ethernet_lwip_raw_software \
   build
 scons -Q build=release
 scons -Q build=release program
@@ -24,9 +24,9 @@ bits, no parity, and 1 stop bit. Run the repository host checks from this
 directory:
 
 ```sh
-python ../../host/ethernet_echo.py 10.66.0.42
-python ../../host/ethernet_echo.py 10.66.0.42 --stress
-python ../../host/ethernet_echo.py 10.66.0.42 --throughput
+python ethernet_echo.py 10.66.0.42
+python ethernet_echo.py 10.66.0.42 --stress
+python ethernet_echo.py 10.66.0.42 --throughput
 ```
 
 The base checks validate ping plus UDP and TCP echo integrity. Stress mode

@@ -22,7 +22,7 @@
  *   echo hello | ncat 10.66.0.42 5001
  *
  * Optionally run the complete host checks from this directory:
- *   python ../../host/ethernet_echo.py 10.66.0.42
+ *   python ethernet_echo.py 10.66.0.42
  * Add --stress for large, concurrent, reset, and reconnect tests.
  * Add --throughput for a validated 32 MiB TCP echo measurement.
  */
@@ -31,7 +31,7 @@
 #include <modm/driver/ethernet/lan8742a.hpp>
 #include <modm/processing.hpp>
 
-#include <modm/communication/lwip_ethernet/lwip_ethernet.hpp>
+#include <modm_lwip/ethernet.hpp>
 
 #include <lwip/tcp.h>
 #include <lwip/udp.h>

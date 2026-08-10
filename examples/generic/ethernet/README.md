@@ -1,10 +1,10 @@
-# STM32H7 Ethernet MAC
+# STM32 Ethernet MAC
 
-This example exercises the STM32H7 Ethernet MAC and LAN8742A PHY directly,
+This example exercises the STM32H5/H7 Ethernet MAC and LAN8742A PHY directly,
 without a network stack. It sends one broadcast Ethernet frame per second and
 alternates between the copied transmit API and the acquire/fill/commit API.
 The MAC configuration uses its default locally administered address derived
-from the STM32 unique identifier. The Nucleo lwIP example uses the same driver
+from the STM32 unique identifier. The lwIP example uses the same driver
 helper. The frames use
 `0x88b5`, which the
 [IEEE Registration Authority EtherType registry](https://standards-oui.ieee.org/ethertype/eth.txt)
@@ -28,7 +28,7 @@ scons -Q build=release
 scons -Q build=release program
 ```
 
-Connect the Nucleo Ethernet port to the capture interface and start the capture
+Connect the board Ethernet port to the capture interface and start the capture
 before running the `program` command. Monitor the ST-LINK virtual COM port at
 115200 baud, 8 data bits, no parity, and 1 stop bit. The serial log reports
 initialization, link transitions, the alternating transmit APIs used, and the

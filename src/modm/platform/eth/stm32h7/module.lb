@@ -89,7 +89,7 @@ fillFrame(tx.buffer());
 modm_assert(tx.commit(), "eth.tx.commit", "Frame was not accepted");
 ```
 
-`examples/nucleo_h753zi/ethernet` exercises both paths.
+`examples/generic/ethernet` exercises both paths.
 
 Descriptors and frame buffers must be placed in DMA accessible SRAM.
 Auto negotiation is assumed; forced link modes are not implemented.
