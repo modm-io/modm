@@ -16,9 +16,7 @@
 #include <modm/architecture/interface/clock.hpp>
 #include <utility>
 #include <type_traits>
-%% if not with_scheduler and core.startswith("cortex-m")
-#include <modm/platform/device.hpp>
-%% endif
+#include <modm/architecture/interface/interrupt.hpp>
 
 namespace modm::fiber
 {
@@ -67,10 +65,8 @@ yield()
 modm::fiber::id inline
 get_id()
 {
-%% if core.startswith("cortex-m")
 	// Ensure that calling this in an interrupt gives a different ID
-	if (const auto irq = __get_IPSR(); irq >= 16) return irq;
-%% endif
+	if (const auto irq = modm::activeExceptionNumber(); irq >= 16) return irq;
 	return 0;
 }
 %% endif
