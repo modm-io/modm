@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2020, Mike Wolfram
+ * Copyright (c) 2026, Kaelin Laundry
  *
  * This file is part of the modm project.
  *
@@ -428,21 +429,20 @@ public:
 		uint32_t phy_register { 0 };
 
 		/* Reset */
-		(void) readPhyRegister(PHY::Register::BCR, phy_register);
-		phy_register |= PHY::Reset;
-		if (not writePhyRegister(PHY::Register::BCR, phy_register)) {
+		if (not writePhyRegister(PHY::Register::BasicControl,
+				uint16_t(PHY::BasicControl::SoftReset))) {
 			configureMac(true);
 			configureDma();
 			return false;
 		}
 
 		// wait for reset done
-		modm::delay_us(PHY::ResetDelay);
+		modm::delay_us(PhyResetDelayMicroseconds);
 		timeout = 1'000;
 
 		do {
-			(void) readPhyRegister(PHY::Register::BCR, phy_register);
-			if ((phy_register & PHY::Reset) == 0)
+			(void) readPhyRegister(PHY::Register::BasicControl, phy_register);
+			if ((phy_register & uint16_t(PHY::BasicControl::SoftReset)) == 0)
 				break;
 			modm::delay_ms(1);
 		} while (timeout-- > 0);
@@ -459,7 +459,7 @@ public:
 				| 0x20 // 10
 				| 0x01 // 802.3
 				;
-		(void) writePhyRegister(PHY::Register::AN, phy_register);
+		(void) writePhyRegister(PHY::Register::AutoNegotiationAdvertisement, phy_register);
 
 		configureMac(true);
 		configureDma();
@@ -582,16 +582,16 @@ public:
 		uint32_t phy_register { 0 };
 
 		// enable auto-negotiation
-		(void) readPhyRegister(PHY::Register::BCR, phy_register);
-		phy_register |= PHY::RestartAutoNegotiation;
-		if (not writePhyRegister(PHY::Register::BCR, phy_register))
+		(void) readPhyRegister(PHY::Register::BasicControl, phy_register);
+		phy_register |= uint16_t(PHY::BasicControl::RestartAutoNegotiation);
+		if (not writePhyRegister(PHY::Register::BasicControl, phy_register))
 			return false;
 
 		// wait for auto-negotiation complete (5s)
 		int timeout = 5'000;
 		do {
-			(void) readPhyRegister(PHY::Register::BSR, phy_register);
-			if ((phy_register & PHY::AutoNegotiationComplete) == PHY::AutoNegotiationComplete)
+			(void) readPhyRegister(PHY::Register::BasicStatus, phy_register);
+			if ((phy_register & uint16_t(PHY::BasicStatus::AutoNegotiationComplete)) != 0)
 				break;
 			modm::delay_ms(1);
 		} while (timeout-- > 0);
@@ -599,15 +599,15 @@ public:
 			return false;
 
 		// read auto-negotiation result
-		if (not readPhyRegister(PHY::Register::SR, phy_register))
+		if (not readPhyRegister(PHY::Register::PhySpecialControlStatus, phy_register))
 			return false;
 
-		if ((phy_register & PHY::DuplexStatus) == PHY::DuplexStatus)
+		if ((phy_register & PhyDuplexStatus) != 0)
 			duplexMode = DuplexMode::Full;
 		else
 			duplexMode = DuplexMode::Half;
 
-		if ((phy_register & PHY::SpeedStatus) == PHY::SpeedStatus)
+		if ((phy_register & PhySpeedStatus) != 0)
 			speed = Speed::Speed10M;
 		else
 			speed = Speed::Speed100M;
@@ -620,8 +620,8 @@ public:
 	{
 		uint32_t phy_register { 0 };
 
-		(void) readPhyRegister(PHY::Register::BSR, phy_register);
-		if ((phy_register & PHY::LinkedStatus) == PHY::LinkedStatus)
+		(void) readPhyRegister(PHY::Register::BasicStatus, phy_register);
+		if ((phy_register & uint16_t(PHY::BasicStatus::LinkStatus)) != 0)
 			linkStatus = LinkStatus::Up;
 		else
 			linkStatus = LinkStatus::Down;
@@ -634,6 +634,12 @@ public:
 	}
 
 private:
+	static constexpr uint32_t PhyResetDelayMicroseconds = 0xff;
+	static constexpr uint16_t PhyDuplexStatus = modm::Bit4;
+	static constexpr uint16_t PhySpeedStatus = modm::Bit2;
+	static constexpr int PhyReadTimeout = 0xffff;
+	static constexpr int PhyWriteTimeout = 0xffff;
+
 	static void
 	writeMACCR(uint32_t value) {
 		ETH->MACCR = value;

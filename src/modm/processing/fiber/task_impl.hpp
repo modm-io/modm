@@ -12,6 +12,7 @@
 #pragma once
 
 #include "scheduler.hpp"
+#include <modm/architecture/interface/interrupt.hpp>
 #include <memory>
 
 /// @cond
@@ -82,7 +83,7 @@ bool inline
 Task::joinable() const
 {
 	if (not isRunning()) return false;
-	if (Scheduler::isInsideInterrupt()) return false;
+	if (modm::isInterruptContext()) return false;
 	return get_id() != Scheduler::instance().get_id();
 }
 

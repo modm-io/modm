@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2019, 2021, 2024, Niklas Hauser
+ * Copyright (c) 2026, Kaelin Laundry
  *
  * This file is part of the modm project.
  *
@@ -124,11 +125,17 @@ Rcc::enable()
 	%% for peripheral, (st_per, bus) in rcc_enable.items() | sort
 	if constexpr (peripheral == Peripheral::{{ peripheral }})
 		{% if peripheral in rcc_reset %}if (not Rcc::isEnabled<peripheral>()) {% endif %}{
-			RCC->{{bus}} |= RCC_{{bus}}_{{st_per}}EN;{% if peripheral in rcc_reset %} __DSB();
-			RCC->{{rcc_reset[peripheral][1]}} |= RCC_{{rcc_reset[peripheral][1]}}_{{rcc_reset[peripheral][0]}}RST; __DSB();
-			RCC->{{rcc_reset[peripheral][1]}} &= ~RCC_{{rcc_reset[peripheral][1]}}_{{rcc_reset[peripheral][0]}}RST;{% endif %}{% if peripheral == "Eth" %} __DSB();
-			RCC->{{bus}} |= RCC_{{bus}}_{{st_per}}RXEN; __DSB();
-			RCC->{{bus}} |= RCC_{{bus}}_{{st_per}}TXEN;{% endif %}
+			RCC->{{bus}} |= RCC_{{bus}}_{{st_per}}EN;
+			%% if peripheral in rcc_reset
+			__DSB();
+			RCC->{{rcc_reset[peripheral][1]}} |= RCC_{{rcc_reset[peripheral][1]}}_{{rcc_reset[peripheral][0]}}RST;
+			__DSB();
+			RCC->{{rcc_reset[peripheral][1]}} &= ~RCC_{{rcc_reset[peripheral][1]}}_{{rcc_reset[peripheral][0]}}RST;
+			%% endif
+			%% for st_extra_per, extra_bus in rcc_extra_enable.get(peripheral, [])
+			__DSB();
+			RCC->{{extra_bus}} |= RCC_{{extra_bus}}_{{st_extra_per}}EN;
+			%% endfor
 		}
 	%% endfor
 	__DSB();
@@ -144,9 +151,11 @@ Rcc::disable()
 	__DSB();
 	%% for peripheral, (st_per, bus) in rcc_enable.items() | sort
 	if constexpr (peripheral == Peripheral::{{ peripheral }}) {
-		RCC->{{bus}} &= ~RCC_{{bus}}_{{st_per}}EN;{% if peripheral == "Eth" %} __DSB();
-		RCC->{{bus}} &= ~RCC_{{bus}}_{{st_per}}RXEN; __DSB();
-		RCC->{{bus}} &= ~RCC_{{bus}}_{{st_per}}TXEN;{% endif %}
+		RCC->{{bus}} &= ~RCC_{{bus}}_{{st_per}}EN;
+		%% for st_extra_per, extra_bus in rcc_extra_enable.get(peripheral, [])
+		__DSB();
+		RCC->{{extra_bus}} &= ~RCC_{{extra_bus}}_{{st_extra_per}}EN;
+		%% endfor
 	}
 	%% endfor
 	__DSB();
@@ -161,7 +170,11 @@ Rcc::isEnabled()
 
 	%% for peripheral, (st_per, bus) in rcc_enable.items() | sort
 	if constexpr (peripheral == Peripheral::{{ peripheral }})
-		return RCC->{{bus}} & RCC_{{bus}}_{{st_per}}EN;
+		return (RCC->{{bus}} & RCC_{{bus}}_{{st_per}}EN)
+			%% for st_extra_per, extra_bus in rcc_extra_enable.get(peripheral, [])
+			and (RCC->{{extra_bus}} & RCC_{{extra_bus}}_{{st_extra_per}}EN)
+			%% endfor
+			;
 	%% endfor
 }
 

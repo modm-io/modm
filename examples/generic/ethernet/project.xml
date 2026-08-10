@@ -1,0 +1,14 @@
+<library>
+  <extends>modm:nucleo-h753zi</extends>
+  <!-- <extends>modm:nucleo-h563zi</extends> -->
+  <!-- <extends>modm:nucleo-h743zi</extends> -->
+  <!-- <extends>modm:nucleo-h723zg</extends> -->
+  <options>
+    <option name="modm:build:build.path">../../../build/generic/ethernet</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:eth</module>
+    <module>modm:driver:lan8742a</module>
+  </modules>
+</library>

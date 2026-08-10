@@ -1,0 +1,741 @@
+/*
+ * Copyright (c) 2026, Kaelin Laundry
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_ETH_HPP
+#define MODM_ETH_HPP
+
+#include <modm/platform/clock/rcc.hpp>
+#include <modm/platform/gpio/connector.hpp>
+#include <modm/architecture/interface.hpp>
+#include <modm/architecture/interface/atomic_lock.hpp>
+#include <modm/architecture/interface/ethernet.hpp>
+#include <modm/architecture/utils.hpp>
+#include <modm/math/utils/bit_constants.hpp>
+#include <modm/processing/fiber.hpp>
+#include <modm/platform/id/id.hpp>
+#include "../device.hpp"
+
+#include <array>
+#include <concepts>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <optional>
+#include <span>
+#include <type_traits>
+#include <utility>
+
+namespace modm
+{
+namespace platform
+{
+
+namespace detail
+{
+
+static constexpr std::size_t EthH7DmaBufferSize = {{ eth_dma_buffer_size }};
+static constexpr std::size_t EthH7MaxFrameSize = {{ eth_max_frame_size }};
+static constexpr std::size_t EthH7RxDescriptorCount = {{ eth_rx_descriptor_count }};
+static constexpr std::size_t EthH7TxDescriptorCount = {{ eth_tx_descriptor_count }};
+static constexpr uint32_t EthH7DescriptorAlignment = {{ eth_descriptor_alignment }};
+
+enum class EthH7TxDescriptor2 : uint32_t
+{
+	InterruptOnCompletion = modm::Bit31,
+};
+using EthH7TxDescriptor2_t = modm::Flags32<EthH7TxDescriptor2>;
+MODM_TYPE_FLAGS(EthH7TxDescriptor2_t);
+using EthH7TxBufferLength = modm::Value<EthH7TxDescriptor2_t, 14>;
+
+enum class EthH7TxDescriptor3 : uint32_t
+{
+	OwnedByDma = modm::Bit31,
+	FirstDescriptor = modm::Bit29,
+	LastDescriptor = modm::Bit28,
+};
+using EthH7TxDescriptor3_t = modm::Flags32<EthH7TxDescriptor3>;
+MODM_TYPE_FLAGS(EthH7TxDescriptor3_t);
+using EthH7TxPacketLength = modm::Value<EthH7TxDescriptor3_t, 15>;
+
+enum class EthH7TxChecksumInsertion : uint32_t
+{
+	Disabled = 0,
+	Full = 3,
+};
+using EthH7TxChecksumInsertion_t = modm::Configuration<
+		EthH7TxDescriptor3_t, EthH7TxChecksumInsertion, 0b11, 16>;
+
+struct alignas(EthH7DescriptorAlignment) EthH7TxDmaDescriptor
+{
+	__IO uint32_t word0;
+	__IO uint32_t word1;
+	__IO uint32_t word2;
+	__IO uint32_t word3;
+	uint32_t reserved[4];
+
+	void clear()
+	{
+		word0 = word1 = word2 = word3 = 0;
+	}
+
+	bool isOwnedByDma() const
+	{
+		return EthH7TxDescriptor3_t(word3).any(EthH7TxDescriptor3::OwnedByDma);
+	}
+
+	uint32_t writebackErrors() const
+	{
+		return word3 & 0x0000ff0c;
+	}
+
+	void prepare(uint32_t bufferAddress, std::size_t length, bool insertChecksum)
+	{
+		word0 = bufferAddress;
+		word1 = 0;
+		word2 = (EthH7TxDescriptor2::InterruptOnCompletion |
+				EthH7TxBufferLength(uint32_t(length))).value;
+		auto control = EthH7TxDescriptor3::FirstDescriptor |
+				EthH7TxDescriptor3::LastDescriptor |
+				EthH7TxPacketLength(uint32_t(length));
+		if (insertChecksum)
+			control |= EthH7TxChecksumInsertion_t(EthH7TxChecksumInsertion::Full);
+		word3 = control.value;
+	}
+
+	void releaseToDma()
+	{
+		word3 |= uint32_t(EthH7TxDescriptor3::OwnedByDma);
+	}
+};
+
+enum class EthH7RxDescriptor3 : uint32_t
+{
+	OwnedByDma = modm::Bit31,
+	ContextDescriptor = modm::Bit30,
+	InterruptOnCompletion = modm::Bit30,
+	FirstDescriptor = modm::Bit29,
+	LastDescriptor = modm::Bit28,
+	ReceiveStatus1Valid = modm::Bit26,
+	Buffer1Valid = modm::Bit24,
+	ErrorSummary = modm::Bit15,
+};
+using EthH7RxDescriptor3_t = modm::Flags32<EthH7RxDescriptor3>;
+MODM_TYPE_FLAGS(EthH7RxDescriptor3_t);
+using EthH7RxPacketLength = modm::Value<EthH7RxDescriptor3_t, 15>;
+
+struct alignas(EthH7DescriptorAlignment) EthH7RxDmaDescriptor
+{
+	__IO uint32_t word0;
+	__IO uint32_t word1;
+	__IO uint32_t word2;
+	__IO uint32_t word3;
+	uint32_t reserved[4];
+
+	void prepare(uint32_t bufferAddress)
+	{
+		word0 = bufferAddress;
+		word1 = 0;
+		word2 = 0;
+		word3 = (EthH7RxDescriptor3::Buffer1Valid |
+				EthH7RxDescriptor3::InterruptOnCompletion).value;
+	}
+
+	void releaseToDma()
+	{
+		word3 |= uint32_t(EthH7RxDescriptor3::OwnedByDma);
+	}
+
+	EthH7RxDescriptor3_t status() const
+	{
+		return EthH7RxDescriptor3_t(word3);
+	}
+
+	std::size_t packetLength() const
+	{
+		return EthH7RxPacketLength::get(status());
+	}
+};
+
+// Cache invalidations apply at line granularity so DMA buffers should be
+// aligned to line width.
+static_assert(sizeof(EthH7TxDmaDescriptor) == 32);
+static_assert(sizeof(EthH7RxDmaDescriptor) == 32);
+static_assert(alignof(EthH7TxDmaDescriptor) == EthH7DescriptorAlignment);
+static_assert(alignof(EthH7RxDmaDescriptor) == EthH7DescriptorAlignment);
+static_assert(std::is_standard_layout_v<EthH7TxDmaDescriptor>);
+static_assert(std::is_standard_layout_v<EthH7RxDmaDescriptor>);
+static_assert(std::is_trivially_copyable_v<EthH7TxDmaDescriptor>);
+static_assert(std::is_trivially_copyable_v<EthH7RxDmaDescriptor>);
+static_assert(offsetof(EthH7TxDmaDescriptor, word3) == 12);
+static_assert(offsetof(EthH7RxDmaDescriptor, word3) == 12);
+
+struct alignas(EthH7DescriptorAlignment) EthH7DmaStorage
+{
+	EthH7RxDmaDescriptor rxDescriptors[EthH7RxDescriptorCount];
+	EthH7TxDmaDescriptor txDescriptors[EthH7TxDescriptorCount];
+	uint8_t rxBuffers[EthH7RxDescriptorCount][EthH7DmaBufferSize];
+	uint8_t txBuffers[EthH7TxDescriptorCount][EthH7DmaBufferSize];
+};
+
+static_assert(alignof(EthH7DmaStorage) >= EthH7DescriptorAlignment);
+static_assert(EthH7DmaBufferSize % EthH7DescriptorAlignment == 0);
+static_assert(offsetof(EthH7DmaStorage, rxDescriptors) % EthH7DescriptorAlignment == 0);
+static_assert(offsetof(EthH7DmaStorage, txDescriptors) % EthH7DescriptorAlignment == 0);
+static_assert(offsetof(EthH7DmaStorage, rxBuffers) % EthH7DescriptorAlignment == 0);
+static_assert(offsetof(EthH7DmaStorage, txBuffers) % EthH7DescriptorAlignment == 0);
+
+extern EthH7DmaStorage ethH7DmaStorage;
+
+} // namespace detail
+
+namespace detail
+{
+
+constexpr bool
+needsRmii10MWorkaround(ethernet::MediaInterface interface, ethernet::Speed speed)
+{
+	return interface == ethernet::MediaInterface::RMII and
+			speed == ethernet::Speed::Speed10M;
+}
+
+constexpr bool
+isExactRmii10MDribbleCrcError(uint32_t status)
+{
+	constexpr uint32_t ErrorSummary = modm::Bit15;
+	constexpr uint32_t DribbleError = modm::Bit19;
+	constexpr uint32_t ReceiveError = modm::Bit20;
+	constexpr uint32_t OverflowError = modm::Bit21;
+	constexpr uint32_t ReceiveWatchdog = modm::Bit22;
+	constexpr uint32_t GiantPacket = modm::Bit23;
+	constexpr uint32_t CrcError = modm::Bit24;
+	constexpr uint32_t ErrorMask = DribbleError | ReceiveError | OverflowError |
+			ReceiveWatchdog | GiantPacket | CrcError;
+	return (status & (ErrorSummary | ErrorMask)) ==
+			(ErrorSummary | DribbleError | CrcError);
+}
+
+struct EthH7MacState
+{
+	enum class DriverState : uint8_t
+	{
+		Uninitialized,
+		Ready,
+		Running,
+		Stopping,
+		Faulted,
+	};
+
+	enum class DriverFailure : uint8_t
+	{
+		None,
+		MacStopTimeout,
+		FatalBusError,
+	};
+
+	volatile DriverState driverState = DriverState::Uninitialized;
+	DriverFailure driverFailure = DriverFailure::None;
+	ethernet::DuplexMode duplexMode = ethernet::DuplexMode::Full;
+	ethernet::Speed speed = ethernet::Speed::Speed100M;
+	ethernet::MediaInterface mediaInterface = ethernet::MediaInterface::MII;
+	uint8_t linkState = 0;
+	bool checksumOffloadEnabled = false;
+	ethernet::MacAddress macAddress{};
+
+	volatile std::size_t rxIndex = 0;
+	volatile std::size_t txIndex = 0;
+	volatile std::size_t rxTailIndex = 0;
+	bool txLeaseOutstanding = false;
+	bool rxLeaseOutstanding = false;
+	volatile uint32_t interruptEvents = 0;
+
+	uint32_t accumulatedRxMissedPackets = 0;
+	uint32_t accumulatedRxOverflowPackets = 0;
+	uint32_t accumulatedRxCrcErrors = 0;
+	uint32_t accumulatedRxAlignmentErrors = 0;
+	uint32_t txDescriptorErrors = 0;
+	uint32_t fatalBusErrors = 0;
+	uint32_t contextDescriptorErrors = 0;
+	uint32_t rxWatchdogTimeouts = 0;
+	uint32_t rxProcessStopped = 0;
+	uint32_t rxBufferUnavailable = 0;
+	uint32_t txProcessStopped = 0;
+	uint32_t txBufferUnavailable = 0;
+	uint32_t hardwareDmaErrorStatus = 0;
+	uint32_t hardwareTxDescriptorErrorStatus = 0;
+};
+
+constexpr bool
+canCommitLinkUpState(EthH7MacState::DriverState state)
+{
+	return state != EthH7MacState::DriverState::Stopping and
+			state != EthH7MacState::DriverState::Faulted;
+}
+
+constexpr bool
+needsFullToHalfDuplexFlush(
+		ethernet::DuplexMode oldMode, ethernet::DuplexMode newMode)
+{
+	return oldMode == ethernet::DuplexMode::Full and
+			newMode == ethernet::DuplexMode::Half;
+}
+
+// DMACSR interrupt bits the driver handles and acknowledges.
+inline constexpr uint32_t EthH7DmaHandledStatus =
+		ETH_DMACSR_NIS | ETH_DMACSR_AIS | ETH_DMACSR_CDE |
+		ETH_DMACSR_FBE | ETH_DMACSR_RWT | ETH_DMACSR_RPS |
+		ETH_DMACSR_RBU | ETH_DMACSR_RI | ETH_DMACSR_TBU |
+		ETH_DMACSR_TPS | ETH_DMACSR_TI;
+inline constexpr uint32_t EthH7DmaErrorStatus =
+		ETH_DMACSR_CDE | ETH_DMACSR_FBE | ETH_DMACSR_RWT |
+		ETH_DMACSR_RPS | ETH_DMACSR_RBU | ETH_DMACSR_TBU |
+		ETH_DMACSR_TPS;
+
+extern EthH7MacState ethH7MacState;
+void ethH7RecordDmaStatus(uint32_t status, bool running);
+uint32_t ethH7BuildWakeupEvents(uint32_t status, bool running);
+void ethH7HandleInterrupt();
+
+} // namespace detail
+
+/// @ingroup modm_platform_eth
+class EthernetMac
+{
+	using TxDmaDescriptor = detail::EthH7TxDmaDescriptor;
+	using RxDmaDescriptor = detail::EthH7RxDmaDescriptor;
+
+	static constexpr std::size_t DmaBufferSize = detail::EthH7DmaBufferSize;
+	static constexpr uint32_t DescriptorAlignment = detail::EthH7DescriptorAlignment;
+	static constexpr uint32_t Rdes1IpPayloadError = modm::Bit7;
+	static constexpr uint32_t Rdes1IpChecksumBypassed = modm::Bit6;
+	static constexpr uint32_t Rdes1Ipv6Header = modm::Bit5;
+	static constexpr uint32_t Rdes1Ipv4Header = modm::Bit4;
+	static constexpr uint32_t Rdes1IpHeaderError = modm::Bit3;
+	static constexpr uint32_t Rdes1PayloadTypeMask = 0x00000003;
+	// RM0433 Rev 8, Tables 709 and 713: normal descriptor status fields used by
+	// software. Context and timestamp descriptors are not supported by this API.
+	static constexpr uint32_t MacDebugStateMask = ETH_MACDR_TFCSTS |
+			ETH_MACDR_TPESTS | ETH_MACDR_RFCFCSTS | ETH_MACDR_RPESTS;
+	static constexpr uint32_t OperationalDmaInterrupts =
+			ETH_DMACIER_NIE | ETH_DMACIER_AIE | ETH_DMACIER_CDEE |
+			ETH_DMACIER_FBEE | ETH_DMACIER_RWTE | ETH_DMACIER_RSE |
+			ETH_DMACIER_RBUE | ETH_DMACIER_RIE | ETH_DMACIER_TXSE |
+			ETH_DMACIER_TIE;
+	static constexpr uint32_t MediaClockUnavailableDmaInterrupts =
+			ETH_DMACIER_AIE | ETH_DMACIER_FBEE;
+	static constexpr int MacResetTimeoutUs = 500'000; // Bound a reset with missing PHY clocks.
+	static constexpr int MacStopTimeoutUs = 100'000;
+	static constexpr int MdioTimeoutUs = 1'000; // Longer than one Clause 22 frame at 1 MHz.
+	static constexpr uint32_t MdioClockMinimum = 20'000'000;
+	static constexpr uint32_t MdioClockMaximum = 300'000'000;
+	static constexpr uint32_t MdioDiv16ClockLimit = 35'000'000;
+	static constexpr uint32_t MdioDiv26ClockLimit = 60'000'000;
+	static constexpr uint32_t MdioDiv42ClockLimit = 100'000'000;
+	static constexpr uint32_t MdioDiv62ClockLimit = 150'000'000;
+	static constexpr uint32_t MdioDiv102ClockLimit = 250'000'000;
+	static constexpr uint32_t MdioPhyAddressMaximum = 31;
+
+public:
+	using MediaInterface = ethernet::MediaInterface;
+	using Speed = ethernet::Speed;
+	using DuplexMode = ethernet::DuplexMode;
+	using LinkMode = ethernet::LinkMode;
+	using LinkState = ethernet::LinkState;
+	using LinkStatus = ethernet::LinkStatus;
+	using ChecksumMode = ethernet::ChecksumMode;
+	using MdioError = ethernet::MdioError;
+	using MacAddress = ethernet::MacAddress;
+
+	enum class WakeupEvent : uint32_t
+	{
+		None     = 0x00,
+		Receive  = 0x01,
+		Transmit = 0x02,
+		Error    = 0x04,
+	};
+	MODM_FLAGS32(WakeupEvent);
+
+	/// Maximum untagged Ethernet frame size without the FCS.
+	static constexpr std::size_t MaxFrameSize = detail::EthH7MaxFrameSize;
+	static constexpr std::size_t RxDescriptorCount = detail::EthH7RxDescriptorCount;
+	static constexpr std::size_t TxDescriptorCount = detail::EthH7TxDescriptorCount;
+	static_assert(RxDescriptorCount >= 4 and RxDescriptorCount <= 1024);
+	static_assert(TxDescriptorCount >= 4 and TxDescriptorCount <= 1024);
+
+	/**
+	 * Generate a stable, locally administered unicast MAC address from the
+	 * STM32 unique device identifier.
+	 */
+	static MacAddress getDefaultMacAddress();
+
+	struct Configuration
+	{
+		MacAddress macAddress = getDefaultMacAddress();
+		/// Select software checksums or MAC checksum insertion and validation.
+		ChecksumMode checksumMode = ChecksumMode::Software;
+	};
+
+	enum class InitializationError : uint8_t
+	{
+		None,
+		OutstandingLease,
+		UnsupportedMdioClock,
+		UnsupportedChecksumOffload,
+		MacResetTimeout,
+		MacStopTimeout, ///< Bounded OSP or duplex transition stop/flush failed.
+		FatalBusError, ///< DMA fault occurred while starting an already up link.
+	};
+
+	/// Result of MAC, DMA, and MDIO controller setup.
+	struct [[nodiscard]] InitializationResult
+	{
+		InitializationError error = InitializationError::None;
+		constexpr explicit operator bool() const noexcept { return error == InitializationError::None; }
+	};
+
+	/// Initialize or reinitialize the MAC, DMA, and MDIO controller.
+	template <class SystemClock, MediaInterface Interface = MediaInterface::RMII>
+	static InitializationResult
+	initialize(Configuration const& configuration, uint8_t priority = 5)
+	{
+		return initialize(Interface, SystemClock::Eth, configuration, priority);
+	}
+
+	enum class LinkUpdateError : uint8_t
+	{
+		None,
+		NotInitialized,
+		MacStopTimeout, ///< Bounded OSP or duplex transition stop/flush failed.
+		OutstandingLease, ///< Release the frame lease before retrying the transition.
+		FatalBusError,
+	};
+
+	/// MAC update result. Errors return the last effective status.
+	struct [[nodiscard]] LinkUpdateResult
+	{
+		LinkStatus status;
+		LinkUpdateError error = LinkUpdateError::None;
+		constexpr explicit operator bool() const noexcept { return error == LinkUpdateError::None; }
+	};
+
+	/// Notify MAC of latest link state from the PHY. Handles link-down, speed/mode changes, etc.
+	static LinkUpdateResult notifyUpdatedLinkStatus(LinkStatus status);
+
+	enum class TransmitError : uint8_t
+	{
+		None,
+		Busy,                    ///< Producer lease or descriptor is unavailable.
+		InvalidLength,           ///< Frame is empty or exceeds MaxFrameSize.
+		LinkDown,                ///< MAC/DMA is not running with an up link.
+		NotInitialized,          ///< initialize() has not completed successfully.
+		Faulted,                 ///< Fatal hardware/lifecycle failure; recover with initialize().
+		UnsupportedFragmentation,///< Hardware checksum mode cannot transmit IPv4 fragments.
+	};
+
+	struct [[nodiscard]] TransmitResult
+	{
+		TransmitError error = TransmitError::None;
+		constexpr explicit operator bool() const noexcept { return error == TransmitError::None; }
+	};
+
+	enum class ReceiveError : uint8_t
+	{
+		None,
+		NoFrameAvailable, ///< No completed descriptor, or another RX lease owns it.
+		NotInitialized, ///< initialize() has not completed successfully.
+		Faulted,        ///< Fatal hardware/lifecycle failure; recover with initialize().
+	};
+
+	enum class ReceiveChecksumStatus : uint8_t
+	{
+		/// Software mode, unavailable or bypassed status, fragmented or non-IP
+		/// frame, or a transport protocol other than UDP, TCP, or ICMP.
+		NotChecked,
+		Valid,
+		Invalid,
+	};
+
+	/// Owned handle for a transmit buffer in the DMA ring. Caller must reserve
+	/// space, use the lease to write their data, and commit.
+	class TransmitBufferLease
+	{
+	public:
+		TransmitBufferLease() = default;
+		TransmitBufferLease(TransmitBufferLease const &) = delete;
+		TransmitBufferLease &operator=(TransmitBufferLease const &) = delete;
+		TransmitBufferLease(TransmitBufferLease &&other) noexcept;
+		TransmitBufferLease &operator=(TransmitBufferLease &&other) noexcept;
+		~TransmitBufferLease() noexcept;
+
+		constexpr explicit operator bool() const noexcept { return error_ == TransmitError::None and active_; }
+		constexpr TransmitError error() const noexcept { return error_; }
+		std::span<uint8_t> buffer() noexcept;
+		TransmitResult commit() noexcept;
+		void cancel() noexcept;
+
+	private:
+		friend class EthernetMac;
+		TransmitBufferLease(TransmitError error) : error_(error) {}
+		TransmitBufferLease(std::size_t index, std::size_t length) :
+			index_(index), length_(length), error_(TransmitError::None), active_(true) {}
+
+		std::size_t index_ = 0;
+		std::size_t length_ = 0;
+		TransmitError error_ = TransmitError::Busy;
+		bool active_ = false;
+	};
+
+	/// Owned handle for a received frame in the DMA ring. Caller reads the frame
+	/// through the lease and releases it when finished.
+	class ReceiveBufferLease
+	{
+	public:
+		ReceiveBufferLease() = default;
+		ReceiveBufferLease(ReceiveBufferLease const &) = delete;
+		ReceiveBufferLease &operator=(ReceiveBufferLease const &) = delete;
+		ReceiveBufferLease(ReceiveBufferLease &&other) noexcept;
+		ReceiveBufferLease &operator=(ReceiveBufferLease &&other) noexcept;
+		~ReceiveBufferLease() noexcept;
+
+		constexpr explicit operator bool() const noexcept { return error_ == ReceiveError::None and active_; }
+		constexpr ReceiveError error() const noexcept { return error_; }
+		std::span<const uint8_t> buffer() const noexcept;
+		ReceiveChecksumStatus checksumStatus() const noexcept;
+		void release() noexcept;
+
+	private:
+		friend class EthernetMac;
+		ReceiveBufferLease(ReceiveError error) : error_(error) {}
+		ReceiveBufferLease(std::size_t index, std::size_t length,
+				ReceiveChecksumStatus checksumStatus) :
+			index_(index), length_(length), error_(ReceiveError::None),
+			checksumStatus_(checksumStatus), active_(true) {}
+
+		std::size_t index_ = 0;
+		std::size_t length_ = 0;
+		ReceiveError error_ = ReceiveError::NoFrameAvailable;
+		ReceiveChecksumStatus checksumStatus_ = ReceiveChecksumStatus::NotChecked;
+		bool active_ = false;
+	};
+
+	/// Snapshot of driver-owned software diagnostics and MAC/MTL counters.
+	struct ErrorCounters
+	{
+		uint32_t rxMissedPackets = 0;
+		uint32_t rxOverflowPackets = 0;
+		uint32_t rxCrcErrors = 0;
+		uint32_t rxAlignmentErrors = 0;
+		uint32_t txDescriptorErrors = 0;
+		uint32_t fatalBusErrors = 0;
+		uint32_t contextDescriptorErrors = 0;
+		uint32_t rxWatchdogTimeouts = 0;
+		uint32_t rxProcessStopped = 0;
+		uint32_t rxBufferUnavailable = 0;
+		uint32_t txProcessStopped = 0;
+		uint32_t txBufferUnavailable = 0;
+	};
+
+	/// Sticky raw hardware errors kept across initialization and separate from
+	/// cumulative event counters. Only resetHardwareErrorStatus() clears them.
+	struct HardwareErrorStatus
+	{
+		uint32_t dmaStatus = 0;
+		uint32_t txDescriptorStatus = 0;
+	};
+
+	template< class... Signals >
+	static void
+	connect()
+	{
+		(GpioStatic<typename Signals::Data>::configure(Gpio::OutputType::PushPull, Gpio::OutputSpeed::VeryHigh), ...);
+		GpioConnector<Peripheral::Eth, Signals...>::connect();
+	}
+
+	/// Return current value of cumulative error counters.
+	static ErrorCounters
+	getErrorCounters()
+	{
+		modm::atomic::Lock lock;
+		// Register is cleared by read, so accumulate its value each time we read it
+		const uint32_t mtlRxMissedOverflow = ETH->MTLRQMPOCR;
+		state().accumulatedRxMissedPackets +=
+				(mtlRxMissedOverflow & ETH_MTLRQMPOCR_MISPKTCNT) >> ETH_MTLRQMPOCR_MISPKTCNT_Pos;
+		state().accumulatedRxOverflowPackets +=
+				(mtlRxMissedOverflow & ETH_MTLRQMPOCR_OVFPKTCNT) >> ETH_MTLRQMPOCR_OVFPKTCNT_Pos;
+		return {
+			.rxMissedPackets = state().accumulatedRxMissedPackets,
+			.rxOverflowPackets = state().accumulatedRxOverflowPackets,
+			.rxCrcErrors = state().accumulatedRxCrcErrors + ETH->MMCRCRCEPR,
+			.rxAlignmentErrors =
+					state().accumulatedRxAlignmentErrors + ETH->MMCRAEPR,
+			.txDescriptorErrors = state().txDescriptorErrors,
+			.fatalBusErrors = state().fatalBusErrors,
+			.contextDescriptorErrors = state().contextDescriptorErrors,
+			.rxWatchdogTimeouts = state().rxWatchdogTimeouts,
+			.rxProcessStopped = state().rxProcessStopped,
+			.rxBufferUnavailable = state().rxBufferUnavailable,
+			.txProcessStopped = state().txProcessStopped,
+			.txBufferUnavailable = state().txBufferUnavailable,
+		};
+	}
+
+	/// Reset all software and hardware counters.
+	/// @warning Does not support being called from an ISR.
+	static void
+	resetErrorCounters()
+	{
+		modm::atomic::Lock lock;
+		state().accumulatedRxMissedPackets = 0;
+		state().accumulatedRxOverflowPackets = 0;
+		state().accumulatedRxCrcErrors = 0;
+		state().accumulatedRxAlignmentErrors = 0;
+		state().txDescriptorErrors = 0;
+		state().fatalBusErrors = 0;
+		state().contextDescriptorErrors = 0;
+		state().rxWatchdogTimeouts = 0;
+		state().rxProcessStopped = 0;
+		state().rxBufferUnavailable = 0;
+		state().txProcessStopped = 0;
+		state().txBufferUnavailable = 0;
+		(void) ETH->MTLRQMPOCR;
+		ETH->MMCCR |= ETH_MMCCR_CNTRST;
+	}
+
+	static HardwareErrorStatus
+	getHardwareErrorStatus()
+	{
+		modm::atomic::Lock lock;
+		return {
+			.dmaStatus = state().hardwareDmaErrorStatus,
+			.txDescriptorStatus =
+					state().hardwareTxDescriptorErrorStatus,
+		};
+	}
+
+	static void
+	resetHardwareErrorStatus()
+	{
+		modm::atomic::Lock lock;
+		state().hardwareDmaErrorStatus = 0;
+		state().hardwareTxDescriptorErrorStatus = 0;
+	}
+
+	/// Transmits the given data as an Ethernet frame. Supports at most one MTU size.
+	static TransmitResult transmit(std::span<const uint8_t> frame);
+	static TransmitBufferLease acquireTransmitBuffer(std::size_t length);
+	static ReceiveBufferLease tryAcquireReceiveBuffer();
+
+	static MdioError writePhyRegister(uint8_t phyAddress, uint8_t reg, uint16_t value);
+	static MdioError readPhyRegister(uint8_t phyAddress, uint8_t reg, uint16_t &value);
+
+	static LinkStatus
+	getLinkStatus() {
+		return currentLinkStatus();
+	}
+
+	/// Return and clear pending wakeup events from MAC interrupts.
+	static WakeupEvent_t
+	consumeWakeupEvents()
+	{
+		modm::atomic::Lock lock;
+		const auto events = state().interruptEvents;
+		state().interruptEvents = 0;
+		return WakeupEvent_t(events);
+	}
+
+	/// Test whether an interrupt has requested foreground servicing.
+	static bool
+	hasPendingWakeupEvents(WakeupEvent_t events = WakeupEvent::Receive |
+			WakeupEvent::Transmit | WakeupEvent::Error)
+	{
+		return (state().interruptEvents & events.value) != 0;
+	}
+
+private:
+	using DriverState = detail::EthH7MacState::DriverState;
+	using DriverFailure = detail::EthH7MacState::DriverFailure;
+
+	static detail::EthH7MacState& state() { return detail::ethH7MacState; }
+	static detail::EthH7DmaStorage& dmaStorage() { return detail::ethH7DmaStorage; }
+
+	static InitializationResult initialize(MediaInterface interface, uint32_t ethernetClock,
+			Configuration const& configuration, uint8_t priority);
+	static bool configureMdioClock(uint32_t ethernetClock);
+	static void selectMediaInterface(MediaInterface interface);
+	static void configureMac();
+	static void configureMacAddress();
+	static void configureDma();
+	static void configureReceiveErrorForwarding();
+	static void initializeDescriptors();
+	static void enableInterruptVector() { NVIC_EnableIRQ(ETH_IRQn); }
+
+	static LinkUpdateError updateLinkMode(bool requireReceiveQueueIdle = true);
+	static LinkUpdateError start();
+	static LinkUpdateError stop();
+	static LinkUpdateError stopWithoutMediaClock();
+	static LinkUpdateError resumeWithRestoredMediaClock(LinkMode mode);
+	static LinkUpdateError resetMacDma(LinkMode mode);
+
+	static void accumulateHardwareCounters();
+	static uint32_t captureLiveDmaStatus(bool running);
+	static bool latchPendingFatalBusError();
+	static LinkUpdateError faultError();
+	static LinkUpdateError stopTimeoutError();
+	static void setDriverFailure(DriverFailure failure);
+
+	static bool waitForTransmitDmaSuspend();
+	static bool waitForTransmitDmaInactive();
+	static bool waitForReceivePathIdle();
+	static bool isTransmitPathIdle();
+	static bool waitForTransmitPathIdle();
+	static bool waitForMacIdle();
+	static bool waitForTransmitQueueFlush();
+
+	static TransmitResult commitTransmitLease(std::size_t index, std::size_t length);
+	static void cancelTransmitLease(std::size_t index);
+	static bool hasUnsupportedHardwareChecksumFragment(std::span<const uint8_t> frame);
+	static bool releaseRxDescriptor(std::size_t index, bool resumeDma=true);
+	static bool releaseBadRxDescriptor();
+	static void resumeReceiveDma();
+	static void releaseReceiveLease(std::size_t index);
+	static bool isValidReceiveDescriptor(RxDmaDescriptor const &descriptor);
+	static ReceiveChecksumStatus classifyReceiveChecksum(RxDmaDescriptor const &descriptor);
+
+	static LinkStatus currentLinkStatus();
+	static DriverState driverState() { return state().driverState; }
+	static void setDriverState(DriverState value) { state().driverState = value; }
+
+	static uint32_t
+	dmaAddress(void const *ptr) {
+		static_assert(sizeof(std::uintptr_t) == sizeof(uint32_t));
+		return static_cast<uint32_t>(reinterpret_cast<std::uintptr_t>(ptr));
+	}
+
+	static std::uintptr_t
+	cacheLineStart(std::uintptr_t address) {
+		return address & ~(std::uintptr_t(DescriptorAlignment) - 1);
+	}
+
+	static std::uintptr_t
+	cacheLineEnd(std::uintptr_t address) {
+		return (address + DescriptorAlignment - 1) & ~(std::uintptr_t(DescriptorAlignment) - 1);
+	}
+
+	static void cleanDCache(void const *address, std::size_t length);
+	static void invalidateDCache(void const *address, std::size_t length);
+
+};
+
+}
+}
+
+#include "eth_impl.hpp"
+
+#endif // MODM_ETH_HPP

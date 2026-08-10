@@ -4,6 +4,7 @@
 # Copyright (c) 2016-2017, Niklas Hauser
 # Copyright (c) 2017-2018, Fabian Greif
 # Copyright (c) 2018, Christopher Durand
+# Copyright (c) 2026, Kaelin Laundry
 #
 # This file is part of the modm project.
 #
@@ -25,7 +26,8 @@ Refines the C language to make it easier to use on embedded targets.
 
 Additional compiler options:
 
-- `--specs=nano.specs`: use Newlib Nano (when not using exceptions).
+- `--specs=nano.specs`: use Newlib Nano according to the `newlib`
+  option.
 - `--specs=nosys.specs`: No additional C library features are implemented.
 """
 
@@ -35,7 +37,23 @@ def prepare(module, options):
     if core.startswith("avr") or core.startswith("cortex-m"):
         module.depends(":architecture:assert")
 
+    if core.startswith("cortex-m"):
+        module.add_option(
+            EnumerationOption(
+                name="newlib",
+                enumeration=["auto", "full", "nano"],
+                default="auto",
+                description=descr_newlib))
+
     return True
+
+def validate(env):
+    core = env[":target"].get_driver("core")["type"]
+    if not core.startswith("cortex-m"):
+        return
+
+    if env.get("newlib", "auto") == "nano" and env.get(":stdc++:exceptions", False):
+        raise ValidateException("Newlib Nano does not support C++ exceptions!")
 
 def build(env):
     core = env[":target"].get_driver("core")["type"]
@@ -46,6 +64,20 @@ def build(env):
 
         # Compiler options for targets
         env.collect(":build:linkflags", "--specs=nosys.specs")
-        if not env.get(":stdc++:exceptions", False):
-            # Newlib Nano does not support C++ exceptions at all
+        newlib = env.get("newlib", "auto")
+        if newlib == "nano" or (
+                newlib == "auto" and not env.get(":stdc++:exceptions", False)):
             env.collect(":build:linkflags", "--specs=nano.specs")
+
+
+descr_newlib = """# Newlib
+
+Select the C standard library variant on Cortex-M targets:
+
+- `auto`: use Newlib Nano unless C++ exceptions are enabled.
+- `nano`: force Newlib Nano. This is invalid with C++ exceptions.
+- `full`: force full Newlib.
+
+Newlib Nano optimizes for code size at the expense of performance. Use full
+Newlib when standard library performance (e.g. memcpy) matters.
+"""

@@ -76,6 +76,9 @@ supported development boards:
 [CMSIS DSP](https://github.com/modm-io/modm/tree/develop/examples/nucleo_f429zi/cmsis_dsp).
 - NUCLEO-F446RE:
 [Internal Flash Programming](https://github.com/modm-io/modm/blob/develop/examples/nucleo_f446re/flash/main.cpp).
+- NUCLEO-H753ZI:
+[Ethernet MAC/DMA and LAN8742A](https://github.com/modm-io/modm/tree/develop/examples/generic/ethernet),
+[lwIP Ping and UDP/TCP Echo](https://github.com/modm-io/modm/tree/develop/examples/generic/ethernet_lwip_raw).
 - STM32F072 Discovery:
 [Blinky](https://github.com/modm-io/modm/blob/develop/examples/stm32f072_discovery/blink/main.cpp),
 [CAN](https://github.com/modm-io/modm/blob/develop/examples/stm32f072_discovery/can/main.cpp),

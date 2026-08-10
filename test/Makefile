@@ -2,6 +2,7 @@
 #
 # Copyright (c) 2017, Fabian Greif
 # Copyright (c) 2018, Niklas Hauser
+# Copyright (c) 2026, Kaelin Laundry
 #
 # This file is part of the modm project.
 #
@@ -36,6 +37,11 @@ run-hosted-darwin-arm64:
 	$(call compile-test,hosted,run,-D":target=hosted-darwin-arm64")
 run-hosted-windows:
 	$(call compile-test,hosted,run,-D":target=hosted-windows")
+
+run-hosted-lwip-linux:
+	$(call compile-test,hosted-lwip,run,-D":target=hosted-linux")
+run-hosted-lwip-windows:
+	$(call compile-test,hosted-lwip,run,-D":target=hosted-windows")
 
 
 compile-nucleo-f091rc_A:
@@ -115,6 +121,10 @@ compile-nucleo-h723zg:
 run-nucleo-h723zg:
 	$(call run-test,nucleo-h723zg,size)
 
+compile-nucleo-h753zi-eth:
+	$(call compile-test,nucleo-h753zi-eth,size)
+run-nucleo-h753zi-eth:
+	$(call run-test,nucleo-h753zi-eth,size)
 
 compile-nucleo-l432kc:
 	$(call compile-test,nucleo-l432kc,size)

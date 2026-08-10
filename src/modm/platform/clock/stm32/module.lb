@@ -4,6 +4,7 @@
 # Copyright (c) 2016-2019, Niklas Hauser
 # Copyright (c) 2017, Fabian Greif
 # Copyright (c) 2021, Christopher Durand
+# Copyright (c) 2026, Kaelin Laundry
 #
 # This file is part of the modm project.
 #
@@ -23,6 +24,20 @@ def prepare(module, options):
 
     module.depends(":cmsis:device", ":utils", ":platform:clock", ":architecture:delay")
     return True
+
+ethernet_companion_clocks = {
+    "ETH": ["ETHRX", "ETHTX"],
+    "ETHMAC": ["ETHMACRX", "ETHMACTX"],
+    "ETH1MAC": ["ETH1RX", "ETH1TX"],
+}
+
+def rcc_ethernet_companion_clocks(rcc_map, mac_clock):
+    companions = []
+    for clock in ethernet_companion_clocks.get(mac_clock, []):
+        mode = rcc_map.get(clock)
+        if mode and "EN" in mode:
+            companions.append((clock, mode["EN"]))
+    return companions
 
 def build(env):
     device = env[":target"]
@@ -163,6 +178,7 @@ def build(env):
     all_peripherals = env.query(":cmsis:device:peripherals")
     rcc_map = env.query(":cmsis:device:rcc-map")
     rcc_enable = {}
+    rcc_extra_enable = {}
     rcc_reset = {}
 
     for per, mode in rcc_map.items():
@@ -204,7 +220,7 @@ def build(env):
         if "Dsihost" in all_peripherals and per == "DSI":
             per = "Dsihost"
             nper = "DSI"
-        if "Eth" in all_peripherals and per == "ETHMAC":
+        if "Eth" in all_peripherals and per in ethernet_companion_clocks:
             per = "Eth"
         if "Rtc" in all_peripherals and per == "RTCAPB":
             per = "RTC"
@@ -227,11 +243,14 @@ def build(env):
             kw = per.capitalize()
             if kw not in rcc_enable:
                 rcc_enable[kw] = (nper, mode["EN"])
+                if kw == "Eth":
+                    rcc_extra_enable[kw] = rcc_ethernet_companion_clocks(rcc_map, nper)
         if "RST" in mode:
             rcc_reset[per.capitalize()] = (nper, mode["RST"])
 
     env.substitutions.update({
         "rcc_enable": rcc_enable,
+        "rcc_extra_enable": rcc_extra_enable,
         "rcc_reset": rcc_reset,
     })
     env.template("rcc_impl.hpp.in")

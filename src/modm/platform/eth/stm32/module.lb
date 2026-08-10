@@ -13,14 +13,13 @@
 
 def init(module):
     module.name = ":platform:eth"
-    module.description = "Ethernet"
+    module.description = "STM32F4/F7 Ethernet MAC driver"
 
 def prepare(module, options):
     device = options[":target"]
 
     if not device.has_driver("eth:stm32*"):
         return False
-    # FIXME the driver is for F7 only right now
     if device.identifier["family"] not in ["f7", "f4"]:
         return False
 
@@ -40,4 +39,3 @@ def build(env):
 
     env.copy("eth.hpp")
     env.copy("eth_impl.hpp")
-

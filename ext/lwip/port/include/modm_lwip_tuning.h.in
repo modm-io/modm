@@ -1,0 +1,34 @@
+/*
+ * Copyright (c) 2026, Kaelin Laundry
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+#ifndef MODM_LWIP_TUNING_H
+#define MODM_LWIP_TUNING_H
+
+%% if lwip_tuning_header
+#include <{{lwip_tuning_header}}>
+%% endif
+
+#ifndef MEM_ALIGNMENT
+#define MEM_ALIGNMENT                   {{lwip_mem_alignment}}
+#endif
+#ifndef MEM_SIZE
+#define MEM_SIZE                        (32 * 1024)
+#endif
+#ifndef TCP_MSS
+#define TCP_MSS                         1460
+#endif
+#ifndef TCP_SND_BUF
+#define TCP_SND_BUF                     (4 * TCP_MSS)
+#endif
+#ifndef TCP_LISTEN_BACKLOG
+#define TCP_LISTEN_BACKLOG              1
+#endif
+
+#endif // MODM_LWIP_TUNING_H

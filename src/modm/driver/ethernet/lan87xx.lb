@@ -1,0 +1,23 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2026, Kaelin Laundry
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":driver:lan87xx"
+    module.description = "Common LAN87xx Ethernet PHY definitions and operations"
+
+def prepare(module, options):
+    module.depends(":architecture:ethernet", ":architecture:register", ":processing:fiber")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/ethernet"
+    env.copy("lan87xx.hpp")

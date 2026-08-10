@@ -66,6 +66,10 @@ jobs:
         if: always()
         run: |
           (cd test && make run-hosted-linux)
+      - name: Hosted lwIP Unittests
+        if: always()
+        run: |
+          (cd test && make run-hosted-lwip-linux)
       - name: Compile STM32 Unittests
         if: always()
         run: |
@@ -82,6 +86,7 @@ jobs:
           (cd test && make compile-nucleo-f767zi)
           (cd test && make compile-nucleo-g474re)
           (cd test && make compile-nucleo-h723zg)
+          (cd test && make compile-nucleo-h753zi-eth)
           (cd test && make compile-nucleo-l432kc)
           (cd test && make compile-nucleo-l496zg-p)
           (cd test && make compile-nucleo-l552ze-q)

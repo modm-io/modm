@@ -1,0 +1,114 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2026, Kaelin Laundry
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = "lwip"
+    module.description = """
+# lwIP Callback API
+
+lwIP 2.2.1 configured for `NO_SYS=1`. IPv4, Ethernet, ARP, ICMP, UDP, and TCP
+are enabled by default. Optional callback API protocols and resource sizes can
+be selected in an application tuning header. Sequential netconn and socket APIs
+are not included.
+
+Applications must hold `modm::lwip::LwIPSingleThreadGuard` while calling lwIP APIs.
+
+When `modm:architecture:ethernet` is selected, `<modm_lwip/ethernet.hpp>`
+provides an adapter that connects a Clause 22 PHY and Ethernet MAC to an lwIP
+network interface.
+
+Hardware checksum offload cannot be combined with transmit-side IPv4
+fragmentation. lwIP invokes a netif's `linkoutput` callback once per fragment,
+where the MAC no longer sees the complete transport datagram. Receive
+reassembly remains available and unchecked frames use software verification.
+"""
+
+def prepare(module, options):
+    module.add_option(
+        EnumerationOption(
+            name="debug",
+            description="lwIP debug logging: off, network diagnostics, or all compiled debug categories.",
+            enumeration=["off", "network", "all"],
+            default="off"))
+    module.add_option(
+        BooleanOption(
+            name="stats",
+            description="Enable lwIP runtime statistics for diagnostics.",
+            default=False))
+    module.add_option(
+        EnumerationOption(
+            name="checksum",
+            description="Checksum mode for lwIP Ethernet traffic.",
+            enumeration=["hardware", "software"],
+            default="software"))
+    module.add_option(
+        BooleanOption(
+            name="ip.fragmentation",
+            description="Enable outgoing IPv4 fragmentation.",
+            default=True))
+    module.add_option(
+        StringOption(
+            name="tuning.header",
+            description="Optional resource and protocol tuning header on the application include path.",
+            default=""))
+    module.depends(":architecture:clock", ":architecture:assert",
+                   ":architecture:interrupt", ":debug", ":stdc++")
+    return True
+
+def validate(env):
+    if env["checksum"] == "hardware" and env["ip.fragmentation"]:
+        raise ValidateException(
+            "Hardware checksum offload cannot be combined with outgoing IPv4 fragmentation.")
+
+def build(env):
+    target = env[":target"].identifier
+    env.substitutions = {
+        "lwip_debug": env["debug"],
+        "lwip_stats": env["stats"],
+        "lwip_checksum": env["checksum"],
+        "lwip_ip_fragmentation": env["ip.fragmentation"],
+        "lwip_tuning_header": env["tuning.header"],
+        # Required allocation alignment for the target ABI.
+        "lwip_mem_alignment": 8 if target.platform == "hosted" else 4,
+    }
+    env.outbasepath = "modm/ext/lwip"
+    env.collect(":build:path.include", "modm/ext/lwip")
+    env.collect(":build:path.include", "modm/ext/lwip/port/include")
+    env.collect(":build:path.include", "modm/ext/lwip/include")
+
+    env.copy("lwip/COPYING", "COPYING")
+    env.copy("lwip/README.md", "README.md")
+    env.copy("lwip/src/include", "include")
+    env.template("port/include/arch/cc.h.in", "port/include/arch/cc.h")
+    env.template("port/include/lwipopts.h.in", "port/include/lwipopts.h")
+    env.template("port/include/modm_lwip_tuning.h.in", "port/include/modm_lwip_tuning.h")
+    env.copy("port/sys_now.cpp", "port/sys_now.cpp")
+    env.copy("port/platform.cpp", "port/platform.cpp")
+    env.copy("port/single_thread_guard.cpp", "port/single_thread_guard.cpp")
+    env.copy("modm_lwip.hpp")
+    if env.has_module(":architecture:ethernet"):
+        env.copy("ethernet/ethernet.hpp", "modm_lwip/ethernet.hpp")
+
+    for source in [
+        "api/err.c", "core/def.c", "core/dns.c", "core/init.c",
+        "core/inet_chksum.c", "core/ip.c", "core/mem.c", "core/memp.c",
+        "core/netif.c", "core/pbuf.c", "core/raw.c", "core/stats.c",
+        "core/tcp.c", "core/tcp_in.c", "core/tcp_out.c", "core/timeouts.c",
+        "core/udp.c", "core/ipv4/acd.c", "core/ipv4/autoip.c",
+        "core/ipv4/dhcp.c", "core/ipv4/etharp.c", "core/ipv4/igmp.c",
+        "core/ipv4/icmp.c", "core/ipv4/ip4.c", "core/ipv4/ip4_addr.c",
+        "core/ipv4/ip4_frag.c", "core/ipv6/dhcp6.c", "core/ipv6/ethip6.c",
+        "core/ipv6/icmp6.c", "core/ipv6/inet6.c", "core/ipv6/ip6.c",
+        "core/ipv6/ip6_addr.c", "core/ipv6/ip6_frag.c", "core/ipv6/mld6.c",
+        "core/ipv6/nd6.c", "netif/ethernet.c",
+    ]:
+        env.copy("lwip/src/" + source, source)
