@@ -29,7 +29,6 @@
 
 #include <modm/board.hpp>
 #include <modm/driver/ethernet/lan8742a.hpp>
-#include <modm/platform/id/id.hpp>
 #include <modm/processing.hpp>
 
 #include <modm/communication/lwip_ethernet/lwip_ethernet.hpp>
@@ -430,7 +429,7 @@ main()
 		Board::eth::Rxd1::Rxd1>();
 
 	const modm::lwip::StaticIPv4Configuration config {
-		.macAddress = modm::platform::getUniqueMacAddress(),
+		.macAddress = modm::platform::EthernetMac::getDefaultMacAddress(),
 		.ipAddress = {{ 10, 66, 0, 42 }},
 		.netmask = {{ 255, 255, 255, 0 }},
 		.gateway = {{ 10, 66, 0, 1 }},

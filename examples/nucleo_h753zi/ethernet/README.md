@@ -3,8 +3,9 @@
 This example exercises the STM32H7 Ethernet MAC and LAN8742A PHY directly,
 without a network stack. It sends one broadcast Ethernet frame per second and
 alternates between the copied transmit API and the acquire/fill/commit API.
-The source address is locally administered and derived from the STM32 unique
-identifier using the same method as the Nucleo lwIP example. The frames use
+The MAC configuration uses its default locally administered address derived
+from the STM32 unique identifier. The Nucleo lwIP example uses the same driver
+helper. The frames use
 `0x88b5`, which the
 [IEEE Registration Authority EtherType registry](https://standards-oui.ieee.org/ethertype/eth.txt)
 assigns as Local Experimental EtherType 1 for public prototype and

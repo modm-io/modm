@@ -6,7 +6,6 @@
   <modules>
     <module>modm:build:scons</module>
     <module>modm:platform:eth</module>
-    <module>modm:platform:id</module>
     <module>modm:driver:lan8742a</module>
   </modules>
 </library>

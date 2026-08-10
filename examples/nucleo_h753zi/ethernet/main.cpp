@@ -13,7 +13,6 @@
 
 #include <modm/board.hpp>
 #include <modm/driver/ethernet/lan8742a.hpp>
-#include <modm/platform/id/id.hpp>
 
 #include <algorithm>
 #include <array>
@@ -124,11 +123,10 @@ main()
 		Board::eth::Rxd0::Rxd0,
 		Board::eth::Rxd1::Rxd1>();
 
-	const auto macAddress = modm::platform::getUniqueMacAddress();
 	const Mac::Configuration configuration{
-		.macAddress = macAddress,
 		.checksumMode = Mac::ChecksumMode::Software,
 	};
+	const auto macAddress = configuration.macAddress;
 	const auto initialized =
 			Mac::initialize<Board::SystemClock, Mac::MediaInterface::RMII>(configuration);
 	modm_assert(initialized, "eth.initialize", "Ethernet MAC initialization failed",

@@ -8,7 +8,6 @@
   <modules>
     <module>modm:build:scons</module>
     <module>modm:platform:eth</module>
-    <module>modm:platform:id</module>
     <module>modm:driver:lan8742a</module>
     <module>modm:communication:lwip_ethernet</module>
     <module>modm:processing:fiber</module>
