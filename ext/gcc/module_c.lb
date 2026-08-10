@@ -41,8 +41,8 @@ def prepare(module, options):
         module.add_option(
             EnumerationOption(
                 name="newlib.nano",
-                enumeration=["default", "false", "true"],
-                default="default",
+                enumeration=["auto", "full", "nano"],
+                default="auto",
                 description=descr_newlib_nano))
 
     return True
@@ -52,7 +52,7 @@ def validate(env):
     if not core.startswith("cortex-m"):
         return
 
-    if env.get("newlib.nano", "default") == "true" and env.get(":stdc++:exceptions", False):
+    if env.get("newlib.nano", "auto") == "nano" and env.get(":stdc++:exceptions", False):
         raise ValidateException("Newlib Nano does not support C++ exceptions!")
 
 def build(env):
@@ -64,9 +64,9 @@ def build(env):
 
         # Compiler options for targets
         env.collect(":build:linkflags", "--specs=nosys.specs")
-        newlib_nano = env.get("newlib.nano", "default")
-        if newlib_nano == "true" or (
-                newlib_nano == "default" and not env.get(":stdc++:exceptions", False)):
+        newlib_nano = env.get("newlib.nano", "auto")
+        if newlib_nano == "nano" or (
+                newlib_nano == "auto" and not env.get(":stdc++:exceptions", False)):
             env.collect(":build:linkflags", "--specs=nano.specs")
 
 
@@ -74,9 +74,9 @@ descr_newlib_nano = """# Newlib Nano
 
 Select the C standard library variant on Cortex-M targets:
 
-- `default`: use Newlib Nano unless C++ exceptions are enabled.
-- `true`: force Newlib Nano. This is invalid with C++ exceptions.
-- `false`: force full Newlib.
+- `auto`: use Newlib Nano unless C++ exceptions are enabled.
+- `nano`: force Newlib Nano. This is invalid with C++ exceptions.
+- `full`: force full Newlib.
 
 Newlib Nano optimizes for code size at the expense of performance. Use full
 Newlib when standard library performance (e.g. memcpy) matters.
