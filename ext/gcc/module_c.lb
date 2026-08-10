@@ -26,7 +26,7 @@ Refines the C language to make it easier to use on embedded targets.
 
 Additional compiler options:
 
-- `--specs=nano.specs`: use Newlib Nano according to the `newlib.nano`
+- `--specs=nano.specs`: use Newlib Nano according to the `newlib`
   option.
 - `--specs=nosys.specs`: No additional C library features are implemented.
 """
@@ -40,10 +40,10 @@ def prepare(module, options):
     if core.startswith("cortex-m"):
         module.add_option(
             EnumerationOption(
-                name="newlib.nano",
+                name="newlib",
                 enumeration=["auto", "full", "nano"],
                 default="auto",
-                description=descr_newlib_nano))
+                description=descr_newlib))
 
     return True
 
@@ -52,7 +52,7 @@ def validate(env):
     if not core.startswith("cortex-m"):
         return
 
-    if env.get("newlib.nano", "auto") == "nano" and env.get(":stdc++:exceptions", False):
+    if env.get("newlib", "auto") == "nano" and env.get(":stdc++:exceptions", False):
         raise ValidateException("Newlib Nano does not support C++ exceptions!")
 
 def build(env):
@@ -64,13 +64,13 @@ def build(env):
 
         # Compiler options for targets
         env.collect(":build:linkflags", "--specs=nosys.specs")
-        newlib_nano = env.get("newlib.nano", "auto")
-        if newlib_nano == "nano" or (
-                newlib_nano == "auto" and not env.get(":stdc++:exceptions", False)):
+        newlib = env.get("newlib", "auto")
+        if newlib == "nano" or (
+                newlib == "auto" and not env.get(":stdc++:exceptions", False)):
             env.collect(":build:linkflags", "--specs=nano.specs")
 
 
-descr_newlib_nano = """# Newlib Nano
+descr_newlib = """# Newlib
 
 Select the C standard library variant on Cortex-M targets:
 
