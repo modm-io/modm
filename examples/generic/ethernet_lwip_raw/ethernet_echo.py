@@ -11,9 +11,9 @@
 """Test the ethernet_lwip_raw firmware using ping and UDP/TCP echo.
 
 From the repository root:
-    python examples/host/ethernet_echo.py <device-ip>
-    python examples/host/ethernet_echo.py <device-ip> --stress
-    python examples/host/ethernet_echo.py <device-ip> --throughput
+    python examples/generic/ethernet_lwip_raw/ethernet_echo.py <device-ip>
+    python examples/generic/ethernet_lwip_raw/ethernet_echo.py <device-ip> --stress
+    python examples/generic/ethernet_lwip_raw/ethernet_echo.py <device-ip> --throughput
 
 Throughput is TCP echo goodput, i.e. framing and TCP retransmission overhead
 would deduct from the 100 Mbit/s maximum bandwidth.
