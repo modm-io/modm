@@ -57,7 +57,7 @@ def prepare(module, options):
             description="Optional resource and protocol tuning header on the application include path.",
             default=""))
     module.depends(":architecture:clock", ":architecture:assert",
-                   ":debug", ":stdc++")
+                   ":architecture:interrupt", ":debug", ":stdc++")
     return True
 
 def validate(env):
