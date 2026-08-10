@@ -17,13 +17,12 @@
 extern "C" void
 modm_lwip_diag(const char* format, ...)
 {
-	char buffer[160];
+	MODM_LOG_DEBUG << "[lwIP] ";
 	va_list args;
 	va_start(args, format);
-	std::vsnprintf(buffer, sizeof(buffer), format, args);
+	MODM_LOG_DEBUG.vprintf(format, args);
 	va_end(args);
-
-	MODM_LOG_DEBUG << "[lwIP] " << buffer << modm::endl;
+	MODM_LOG_DEBUG << modm::endl;
 }
 
 extern "C" void
