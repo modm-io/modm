@@ -166,6 +166,7 @@ def prepare(module, options):
                    ":architecture:assert",
                    ":cmsis:device",
                    ":platform:gpio",
+                   ":platform:id",
                    ":platform:rcc",
                    ":processing:fiber",
                    ":math:utils")

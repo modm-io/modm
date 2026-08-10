@@ -20,6 +20,7 @@
 #include <modm/architecture/utils.hpp>
 #include <modm/math/utils/bit_constants.hpp>
 #include <modm/processing/fiber.hpp>
+#include <modm/platform/id/id.hpp>
 #include "../device.hpp"
 
 #include <array>
@@ -374,9 +375,15 @@ public:
 	static_assert(RxDescriptorCount >= 4 and RxDescriptorCount <= 1024);
 	static_assert(TxDescriptorCount >= 4 and TxDescriptorCount <= 1024);
 
+	/**
+	 * Generate a stable, locally administered unicast MAC address from the
+	 * STM32 unique device identifier.
+	 */
+	static MacAddress getDefaultMacAddress();
+
 	struct Configuration
 	{
-		MacAddress macAddress{};
+		MacAddress macAddress = getDefaultMacAddress();
 		/// Select software checksums or MAC checksum insertion and validation.
 		ChecksumMode checksumMode = ChecksumMode::Software;
 	};
