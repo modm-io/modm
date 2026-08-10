@@ -151,4 +151,33 @@
 
 #endif // __DOXYGEN__
 
+#ifdef __cplusplus
+
+#ifdef MODM_CPU_CORTEX_M
+#	include <modm/platform/device.hpp>
+#endif
+
+namespace modm
+{
+
+/**
+ * Check whether execution is currently inside an interrupt context.
+ *
+ * This is implemented for Cortex-M and returns `false` on other
+ * architectures.
+ */
+inline bool
+isInterruptContext() noexcept
+{
+#ifdef MODM_CPU_CORTEX_M
+	return __get_IPSR() != 0;
+#else
+	return false;
+#endif
+}
+
+}
+
+#endif // __cplusplus
+
 #endif // MODM_INTERRUPT_HPP

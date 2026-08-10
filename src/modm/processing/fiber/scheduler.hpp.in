@@ -67,16 +67,6 @@ protected:
 		return reinterpret_cast<uintptr_t>(current);
 	}
 
-	static bool inline
-	isInsideInterrupt()
-	{
-%% if core.startswith("cortex-m")
-		return __get_IPSR();
-%% else
-		return false;
-%% endif
-	}
-
 	void inline
 	runNext(Task* task)
 	{
