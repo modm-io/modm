@@ -170,7 +170,7 @@ implementation of the `sbrk` function. A simple implementation for a
 
 ```cpp
 const uint8_t *heap_top{heap_begin};
-extern "C" void* _sbrk_r(struct _reent *,  ptrdiff_t size)
+extern "C" modm_used void* _sbrk_r(struct _reent *,  ptrdiff_t size)
 {
     const uint8_t *const heap = heap_top;
     heap_top += size;
@@ -217,22 +217,22 @@ linker by adding this to your project configuration:
 And then implement the following functions with your custom allocator:
 
 ```cpp
-extern "C" void *
+extern "C" modm_used void *
 __wrap__malloc_r(struct _reent *, size_t size)
 {
     return allocator.malloc(size);
 }
-extern "C" void *
+extern "C" modm_used void *
 __wrap__calloc_r(struct _reent *, size_t size)
 {
     return allocator.calloc(size);
 }
-extern "C" void *
+extern "C" modm_used void *
 __wrap__realloc_r(struct _reent *, void *ptr, size_t size)
 {
     return allocator.realloc(ptr, size);
 }
-extern "C" void 
+extern "C" modm_used void
 __wrap__free_r(struct _reent *, void *p)
 {
     allocator.free(p);
@@ -241,6 +241,11 @@ __wrap__free_r(struct _reent *, void *p)
 
 This is particularly recommended if you need a thread-safe malloc, which you
 implement here via the `_reent` struct. Consult newlib docs for details.
+
+!!! warning "Mark these functions as `modm_used`"
+    These functions and `_sbrk_r` are only called from the precompiled newlib,
+    so with the `modm:build:lto` option enabled, the optimizer removes them
+    unless they are marked `modm_used`.
 
 !!! tip "sbrk is not called anymore"
     When wrapping these malloc functions, `_sbrk_r` is not called anymore, and

@@ -55,7 +55,7 @@ void __modm_initialize_memory(void)
 extern void __malloc_lock(struct _reent *);
 extern void __malloc_unlock(struct _reent *);
 
-void* __wrap__malloc_r(struct _reent *r, size_t size)
+void* modm_used __wrap__malloc_r(struct _reent *r, size_t size)
 {
 	__malloc_lock(r);
 	void *ptr = allocator.allocate(size);
@@ -65,14 +65,14 @@ void* __wrap__malloc_r(struct _reent *r, size_t size)
 	return ptr;
 }
 
-void* __wrap__calloc_r(struct _reent *r, size_t size)
+void* modm_used __wrap__calloc_r(struct _reent *r, size_t size)
 {
 	void *ptr = __wrap__malloc_r(r, size);
 	if (ptr) memset(ptr, 0, size);
 	return ptr;
 }
 
-void* __wrap__realloc_r(struct _reent *r, void *p, size_t size)
+void* modm_used __wrap__realloc_r(struct _reent *r, void *p, size_t size)
 {
 	if (!p) return __wrap__malloc_r(r, size);
 	// NOT IMPLEMENTED!
@@ -80,7 +80,7 @@ void* __wrap__realloc_r(struct _reent *r, void *p, size_t size)
 	return NULL;
 }
 
-void __wrap__free_r(struct _reent *r, void *p)
+void modm_used __wrap__free_r(struct _reent *r, void *p)
 {
 	__malloc_lock(r);
 	allocator.free(p);

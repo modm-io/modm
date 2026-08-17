@@ -24,7 +24,7 @@ extern "C" void __modm_initialize_memory()
     // Initialize your specific allocator algorithm here
     memset(heap_begin, 0xaa, sizeof(heap_begin));
 }
-extern "C" void* _sbrk_r(struct _reent *,  ptrdiff_t size)
+extern "C" modm_used void* _sbrk_r(struct _reent *,  ptrdiff_t size)
 {
     const uint8_t *const heap = heap_top;
     heap_top += size;

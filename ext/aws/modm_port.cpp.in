@@ -26,13 +26,13 @@ void vApplicationStackOverflowHook(TaskHandle_t /*pxTask*/, char *pcTaskName)
 // Make the Newlib heap thread-safe with FreeRTOS
 
 extern "C" void __malloc_lock(struct _reent *);
-void __malloc_lock(struct _reent *)
+void modm_used __malloc_lock(struct _reent *)
 {
 	vTaskSuspendAll();
 }
 
 extern "C" void __malloc_unlock(struct _reent *);
-void __malloc_unlock(struct _reent *)
+void modm_used __malloc_unlock(struct _reent *)
 {
 	xTaskResumeAll();
 }

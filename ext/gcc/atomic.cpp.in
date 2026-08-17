@@ -22,7 +22,7 @@
  */
 
 // ============================ atomics for bools ============================
-extern "C" bool
+extern "C" modm_used bool
 __atomic_test_and_set(volatile void *ptr, int /*memorder*/)
 {
 	bool value{};
@@ -37,7 +37,7 @@ __atomic_test_and_set(volatile void *ptr, int /*memorder*/)
 }
 
 // ============================ atomics for arrays ============================
-extern "C" void
+extern "C" modm_used void
 __atomic_load(unsigned int size, const volatile void *src, void *dest, int /*memorder*/)
 {
 	__modm_atomic_pre_barrier(__ATOMIC_SEQ_CST);
@@ -48,7 +48,7 @@ __atomic_load(unsigned int size, const volatile void *src, void *dest, int /*mem
 	__modm_atomic_post_barrier(__ATOMIC_SEQ_CST);
 }
 
-extern "C" void
+extern "C" modm_used void
 __atomic_store(unsigned int size, volatile void *dest, void *src, int /*memorder*/)
 {
 	__modm_atomic_pre_barrier(__ATOMIC_SEQ_CST);
@@ -59,7 +59,7 @@ __atomic_store(unsigned int size, volatile void *dest, void *src, int /*memorder
 	__modm_atomic_post_barrier(__ATOMIC_SEQ_CST);
 }
 
-extern "C" void
+extern "C" modm_used void
 __atomic_exchange(unsigned int size, volatile void *ptr, void *val, void *ret, int /*memorder*/)
 {
 	__modm_atomic_pre_barrier(__ATOMIC_SEQ_CST);
@@ -71,7 +71,7 @@ __atomic_exchange(unsigned int size, volatile void *ptr, void *val, void *ret, i
 	__modm_atomic_post_barrier(__ATOMIC_SEQ_CST);
 }
 
-extern "C" bool
+extern "C" modm_used bool
 __atomic_compare_exchange(unsigned int len, volatile void *ptr, void *expected, void *desired,
 						  int /*success_memorder*/, int /*failure_memorder*/)
 {
@@ -92,7 +92,7 @@ __atomic_compare_exchange(unsigned int len, volatile void *ptr, void *expected, 
 
 %% macro atomic_fetch(len)
 	%% for name, op in [("add", "+"), ("sub", "-")]
-extern "C" {{len|u}}
+extern "C" modm_used {{len|u}}
 __atomic_fetch_{{name}}_{{len//8}}(volatile void *ptr, {{len|u}} value, int /*memorder*/)
 {
 	{{len|u}} previous{};

@@ -146,7 +146,7 @@
 	#define modm_deprecated(msg)	__attribute__((deprecated(msg)))
 	#define modm_likely(x)			__builtin_expect(!!(x), 1)
 	#define modm_unlikely(x)		__builtin_expect(!!(x), 0)
-	#define modm_section(s)			__attribute__((section(s)))
+	#define modm_section(s)			__attribute__((section(s), used))
 	#define modm_fallthrough		__attribute__((fallthrough))
 	#define modm_noreturn			__attribute__((noreturn))
 	#define modm_warn_unused_result	__attribute__((warn_unused_result))
@@ -159,7 +159,7 @@
 	 	//	- __attribute__ ((weak, alias ("__aliasedFunction"))) seems to work on Windows
 	#	define modm_weak
 	#else
- 	#	define modm_weak			__attribute__((weak))
+ 	#	define modm_weak			__attribute__((weak, used))
 	#endif
 
 	#if defined(MODM_OS_HOSTED) || defined(MODM_CPU_AVR)

@@ -126,21 +126,21 @@ try_again:
 	return NULL;
 }
 
-void *__wrap__malloc_r(struct _reent *, size_t size)
+void *modm_used __wrap__malloc_r(struct _reent *, size_t size)
 {
 	// default is accessible by S-Bus and DMA-able
 	return malloc_traits(size, uint32_t(modm::MemoryTrait::AccessSBus) |
 							   uint32_t(modm::MemoryTrait::AccessDMA));
 }
 
-void *__wrap__calloc_r(struct _reent *r, size_t size)
+void *modm_used __wrap__calloc_r(struct _reent *r, size_t size)
 {
 	void *ptr = __wrap__malloc_r(r, size);
 	if (ptr) memset(ptr, 0, size);
 	return ptr;
 }
 
-void *__wrap__realloc_r(struct _reent *r, void *p, size_t size)
+void *modm_used __wrap__realloc_r(struct _reent *r, void *p, size_t size)
 {
 	if (!p) return __wrap__malloc_r(r, size);
 
@@ -156,7 +156,7 @@ void *__wrap__realloc_r(struct _reent *r, void *p, size_t size)
 	return ptr;
 }
 
-void __wrap__free_r(struct _reent *r, void *p)
+void modm_used __wrap__free_r(struct _reent *r, void *p)
 {
 	// do nothing if NULL pointer
 	if (!p) return;
