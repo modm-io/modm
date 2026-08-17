@@ -253,7 +253,7 @@ modm_context_jump(modm_context_t*, modm_context_t*)
 %#
 		MODM_POP_CONTEXT()
 
-	"1:  b modm_context_end	\n\t"
+	"1:  bl modm_context_end	\n\t"
 %% if not with_psplim
 		:: "i" (StackWatermark)
 %% endif
