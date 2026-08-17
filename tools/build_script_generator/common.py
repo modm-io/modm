@@ -290,8 +290,12 @@ def common_compiler_flags(compiler, target):
         flags["cflags"].append("-g3")
         flags["cxxflags"].append("-g3")
     # flags for the linker
+    flags["linkflags"] = [
+        "-ffunction-sections",
+        "-fdata-sections",
+    ]
     if target.identifier["family"] != "darwin":
-        flags["linkflags"] = [
+        flags["linkflags"] += [
             "-Wl,--fatal-warnings",
             "-Wl,--gc-sections",
             "-Wl,--relax",

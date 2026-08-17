@@ -32,15 +32,14 @@ ASM := $(CC)
 
 ifeq ($(C_SUFFIX),)
 	AS := $(C_PREFIX)as
-	AR := $(C_PREFIX)ar
-	NM := $(C_PREFIX)nm
-	RANLIB := $(C_PREFIX)ranlib
 else
 	AS := $(CXX)
-	AR := $(C_PREFIX)gcc-ar$(C_SUFFIX)
-	NM := $(C_PREFIX)gcc-nm$(C_SUFFIX)
-	RANLIB := $(C_PREFIX)gcc-ranlib$(C_SUFFIX)
 endif
+
+_probe = $(if $(shell command -v $(1) 2>/dev/null),$(1),$(2))
+AR := $(call _probe,$(C_PREFIX)gcc-ar$(C_SUFFIX),$(C_PREFIX)ar)
+NM := $(call _probe,$(C_PREFIX)gcc-nm$(C_SUFFIX),$(C_PREFIX)nm)
+RANLIB := $(call _probe,$(C_PREFIX)gcc-ranlib$(C_SUFFIX),$(C_PREFIX)ranlib)
 
 OBJCOPY := $(C_PREFIX)objcopy
 OBJDUMP := $(C_PREFIX)objdump

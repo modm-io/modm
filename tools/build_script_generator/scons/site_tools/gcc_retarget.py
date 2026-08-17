@@ -50,15 +50,12 @@ def generate(env, **kw):
     env['CXX'] = prefix + 'g++' + suffix
     env['AR'] = prefix + 'ar'
     env['RANLIB'] = prefix + 'ranlib'
-    if suffix == '':
-        env['AS'] = prefix + 'as'
-        env['NM'] = prefix + 'nm'
-    else:
-        env['AS'] = prefix + 'gcc' + suffix
-        env['NM'] = prefix + 'gcc-nm' + suffix
-        if sys.platform != "darwin":
-            env['AR'] = prefix + 'gcc-ar' + suffix
-            env['RANLIB'] = prefix + 'gcc-ranlib' + suffix
+    env['AS'] = prefix + 'as' if suffix == '' else prefix + 'gcc' + suffix
+
+    env['NM'] = prefix + 'nm'
+    for var, wrapper in [('AR', 'gcc-ar'), ('RANLIB', 'gcc-ranlib'), ('NM', 'gcc-nm')]:
+        if shutil.which(prefix + wrapper + suffix) is not None:
+            env[var] = prefix + wrapper + suffix
 
     env['OBJCOPY'] = prefix + 'objcopy'
     env['OBJDUMP'] = prefix + 'objdump'
