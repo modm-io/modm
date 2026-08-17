@@ -34,7 +34,7 @@ class BufferedUart<Hal, UartTxBuffer<SIZE>, Buffers...>: public BufferedUart<Hal
 	static_assert(not Parent::TxBufferSize, "BufferedUart accepts at most one TxBuffer type");
 	static inline UartTxBuffer<SIZE> txBuffer;
 	static inline uint8_t dmaTxBuffer[SIZE];
-	static inline std::size_t dmaTxLength = 0;
+	static inline volatile std::size_t dmaTxLength = 0;
 
 	static inline void
 	serviceDmaTx()
