@@ -111,13 +111,17 @@ def build(env):
              ignore=env.ignore_files("*.txt", "*.readme", "portable", "include"))
     env.copy("freertos/FreeRTOS/Source/include", "freertos/inc/freertos")
     # Copy the port.c file
-    env.copy("{}/port.c".format(path), "freertos/port.c")
+    port_files = env.copy("{}/port.c".format(path), "freertos/port.c")
     # Copy the portmacro.h file
     env.copy("{}/portmacro.h".format(path), "freertos/inc/freertos/portmacro.h")
     # Copy the portasm.c/.h files for CM0 and CM33
     if "CM0" in path or "CM33" in path:
-        env.copy("{}/portasm.c".format(path), "freertos/portasm.c")
+        port_files |= env.copy("{}/portasm.c".format(path), "freertos/portasm.c")
         env.copy("{}/portasm.h".format(path), "freertos/inc/freertos/portasm.h")
+    if "CM0" in path:
+        # SVC_Handler uses `b vPortSVCHandler_C`, which only reaches PC±2kB on
+        # ARMv6-M. LTO moves the two functions too far apart.
+        env.collect(":build:ccflags", "-fno-lto", operations=port_files)
     if "CM33" in path:
         env.copy("{}/portmacrocommon.h".format(path), "freertos/inc/freertos/portmacrocommon.h")
 
