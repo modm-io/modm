@@ -260,7 +260,7 @@ modm_context_jump(modm_context_t*, modm_context_t*)
 	);
 }
 
-void modm_naked
+void modm_naked modm_used
 modm_context_end(uintptr_t)
 {
 	asm volatile

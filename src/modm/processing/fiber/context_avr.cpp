@@ -162,7 +162,7 @@ modm_context_start(modm_context_t *to)
 	return modm_context_jump_entry((modm_context_t*)&main_context_sp, to);
 }
 
-void
+void modm_used
 modm_context_end(uintptr_t retval)
 {
 	modm_context_jump_return(retval, (modm_context_t*)&main_context_sp);
