@@ -76,6 +76,15 @@ def format(source, device_memories):
         else:
             memories["rom"].append(memory)
 
+    for name, mems in list(memories.items()):
+        merged = []
+        for memory in sorted(mems, key=lambda m: m["start"]):
+            if merged and (merged[-1]["start"] + merged[-1]["size"] == memory["start"]):
+                merged[-1]["size"] += memory["size"]
+            else:
+                merged.append(dict(memory))
+        memories[name] = merged
+
     memory_sections = []
     with open(source, "rb") as src:
         elffile = ELFFile(src)
