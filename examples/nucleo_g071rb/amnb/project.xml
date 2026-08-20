@@ -1,6 +1,7 @@
 <library>
   <extends>modm:nucleo-g071rb</extends>
   <options>
+    <option name="modm:build:lto">yes</option>
     <option name="modm:build:build.path">../../../build/nucleo_g071rb/amnb</option>
     <option name="modm:communication:amnb:with_heap">no</option>
   </options>

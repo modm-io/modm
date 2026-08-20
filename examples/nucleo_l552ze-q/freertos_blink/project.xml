@@ -1,6 +1,7 @@
 <library>
   <extends>modm:nucleo-l552ze-q</extends>
   <options>
+    <option name="modm:build:lto">yes</option>
     <option name="modm:build:build.path">../../../build/nucleo_l552ze-q/freertos_blink</option>
   </options>
   <modules>
