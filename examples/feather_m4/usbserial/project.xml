@@ -2,6 +2,7 @@
   <extends>modm:feather-m4</extends>
   <options>
     <option name="modm:tinyusb:config">device.cdc</option>
+    <option name="modm:build:lto">yes</option>
     <option name="modm:build:build.path">../../../build/feather_m4/usbserial</option>
   </options>
   <modules>
