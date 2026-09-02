@@ -10,11 +10,19 @@
 // ----------------------------------------------------------------------------
 
 #include "flash.hpp"
+#include <modm/architecture/interface/interrupt.hpp>
 
 static constexpr uint32_t FLASH_SR_ERR = 0xfffe;
 
 namespace modm::platform
 {
+
+MODM_ISR(FLASH)
+{
+	Flash::interruptHandler();
+}
+
+volatile bool Flash::waitingForOpToFinish = false;
 
 bool
 Flash::unlock(uint8_t bank)
@@ -45,6 +53,7 @@ Flash::lock(uint8_t bank)
 	{
 		FLASH->CR2 |= FLASH_CR_LOCK;
 	}
+	Flash::disable();
 	return isLocked(bank);
 }
 
@@ -52,16 +61,15 @@ modm_ramcode void
 Flash::initiateErase(uint8_t index)
 {
 	uint8_t bank = getBank(index);
+	Flash::waitingForOpToFinish = true;
 	if(bank == 1)
 	{
-		FLASH->SR1 = FLASH_SR_ERR;
-		FLASH->CR1 = FLASH_CR_START | FLASH_CR_SER | (uint32_t)FLASH_CR_PSIZE_1 |
+		FLASH->CR1 = FLASH_CR_START | FLASH_CR_EOPIE | FLASH_CR_SER | (uint32_t)FLASH_CR_PSIZE_1 |
 				((index << FLASH_CR_SNB_Pos) & FLASH_CR_SNB_Msk);
 		
 	} else if(bank == 2)
 	{
-		FLASH->SR2 = FLASH_SR_ERR;
-		FLASH->CR2 = FLASH_CR_START | FLASH_CR_SER | (uint32_t)FLASH_CR_PSIZE_1 |
+		FLASH->CR2 = FLASH_CR_START | FLASH_CR_EOPIE | FLASH_CR_SER | (uint32_t)FLASH_CR_PSIZE_1 |
 				((index << FLASH_CR_SNB_Pos) & FLASH_CR_SNB_Msk);
 	}
 }
@@ -88,14 +96,12 @@ Flash::initiateProgram(uintptr_t addr, uintptr_t data)
 	uint8_t bank = getBank(addr);
 	if(1U == bank)
 	{
-		FLASH->SR1 = FLASH_SR_ERR;
-		FLASH->CR1 = FLASH_CR_PG;
+		FLASH->CR1 |= (FLASH_CR_PG | FLASH_CR_EOPIE);
 	} else if(2U == bank)
 	{
-		FLASH->SR2 = FLASH_SR_ERR;
-		FLASH->CR2 = FLASH_CR_PG;
+		FLASH->CR2 = (FLASH_CR_PG | FLASH_CR_EOPIE);
 	}
-	
+	Flash::waitingForOpToFinish = true;
 	for(size_t i = 0; i < FlashWord; i++)
 	{
 		*(uint32_t *) addr = *(uint32_t *)data;
@@ -109,13 +115,11 @@ Flash::finalizeProgram(uint8_t bank)
 {
 	if(1U == bank)
 	{
-		FLASH->SR1 |= FLASH_SR_EOP;
-		FLASH->CR1 &= ~FLASH_CR_PG;
+		FLASH->CR1 &= ~(FLASH_CR_PG | FLASH_CR_EOPIE);
 		return FLASH->SR1 & FLASH_SR_ERR;
 	} else if(2U == bank)
 	{
-		FLASH->SR2 |= FLASH_SR_EOP;
-		FLASH->CR2 &= ~FLASH_CR_PG;
+		FLASH->CR2 &= ~(FLASH_CR_PG | FLASH_CR_EOPIE);
 		return FLASH->SR2 & FLASH_SR_ERR;
 	}
 	return 0xFFFF'FFFF;

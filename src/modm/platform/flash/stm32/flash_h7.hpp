@@ -38,13 +38,33 @@ public:
 	};
 
 public:
+	modm_always_inline static void
+	interruptHandler()
+	{
+		if((FLASH->SR1 & FLASH_SR_EOP))
+		{
+			Flash::waitingForOpToFinish = FLASH->SR1 & (FLASH_SR_QW | FLASH_SR_BSY);
+			FLASH->CCR1 |= FLASH_CCR_CLR_EOP;
+		}
+		if(FLASH->SR2 & FLASH_SR_EOP)
+		{
+			Flash::waitingForOpToFinish = FLASH->SR2 & (FLASH_SR_QW | FLASH_SR_BSY);
+			FLASH->CCR2 |= FLASH_CCR_CLR_EOP;
+		}
+	}
+
 	inline static void
 	enable()
-	{}
+	{
+		NVIC_EnableIRQ(FLASH_IRQn);
+		NVIC_SetPriority(FLASH_IRQn, 5);
+	}
 
 	inline static void
 	disable()
-	{}
+	{
+		NVIC_DisableIRQ(FLASH_IRQn);
+	}
 
 	static bool
 	isLocked(uint8_t bank)
@@ -57,9 +77,7 @@ public:
 	static inline bool
 	isBusy(uint8_t bank)
 	{
-		if (bank == 1) { return FLASH->SR1 & (FLASH_SR_BSY | FLASH_SR_QW); }
-		if (bank == 2) { return FLASH->SR2 & (FLASH_SR_BSY | FLASH_SR_QW); }
-		return false;
+		return Flash::waitingForOpToFinish;
 	}
 
 	static bool
@@ -136,6 +154,9 @@ public:
 
 	static uint32_t
 	finalizeProgram(uint8_t bankId);
+
+private:
+	static volatile bool waitingForOpToFinish;
 };
 
 }  // namespace modm::platform
