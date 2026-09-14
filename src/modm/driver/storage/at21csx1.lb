@@ -1,0 +1,56 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2026, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:at21csx1"
+    module.description = """
+# AT21CS01/AT21CS11 Single-Wire Serial EEPROM
+
+1 Kbit (128 x 8) EEPROM with a 256-bit security register, whose lower two pages
+hold a factory-programmed, globally unique 64-bit serial number. The device is
+parasitically powered from the bus line, so SI/O and GND are its only
+connections.
+
+This is Atmel's Single-Wire Interface (SWI), *not* Dallas/Maxim 1-Wire: the bit
+encoding, timings and command set all differ, so `modm:platform:1-wire.bitbang`
+cannot talk to it. The protocol is an I2C transaction emulated on a single wire,
+with the 1010b device type identifier replaced by a 4-bit opcode. The driver
+bit-bangs it directly on a GPIO.
+
+The bus needs an external pull-up to Vcc, which also powers the device:
+2.7 V to 4.5 V and 0.4 kOhm to 5.4 kOhm for the AT21CS11, 1.7 V to 3.6 V and
+0.7 kOhm to 3.0 kOhm for the AT21CS01.
+
+!!! warning "Timing critical"
+    The device samples an input bit between 2us and 6us after the falling edge,
+    and a read strobe must land before 2us. Interrupts are disabled around the
+    critical part of every bit frame, but the bus may not idle longer than tBIT
+    (25us) between frames, so reads are validated and retried.
+
+[Data sheet](https://ww1.microchip.com/downloads/aemDocuments/documents/MPD/ProductDocuments/DataSheets/AT21CS01-AT21CS11-1-Kbit-Serial-EEPROM-Data-Sheet-DS20005857.pdf)
+"""
+
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:atomic",
+        ":architecture:delay",
+        ":architecture:gpio",
+        ":processing:fiber",
+        ":math:utils")
+    return True
+
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/storage"
+    env.copy("at21csx1.hpp")
