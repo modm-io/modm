@@ -1,0 +1,41 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2026, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:mc33xs2410"
+    module.description = """\
+# MC33XS2410 Power Switch
+
+MC33XS2410 quad 100 mOhm / dual 50 mOhm, 3.0 V to 60 V high-side switch.
+
+Four channel self-protected high-side switch with a 16-bit SPI interface for
+output control and diagnostics, and an embedded 12-bit ADC for per-channel
+current, voltage and temperature monitoring.
+
+[Datasheet](https://www.nxp.com/docs/en/data-sheet/MC33XS2410.pdf)
+"""
+
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:gpio",
+        ":architecture:register",
+        ":architecture:spi.device",
+        ":architecture:fiber")
+    return True
+
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/power"
+    env.copy("mc33xs2410.hpp")
+    env.copy("mc33xs2410_impl.hpp")
