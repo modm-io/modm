@@ -99,15 +99,22 @@ def common_memories(env):
         m["size"] = int(m["size"], 0)
     memories.sort(key=lambda m: m["start"])
     physical_memories = list(m for m in memories if "alias" not in m)
-    # Flash offset is counted from the start of flash, which could be flash or flash1
+    # The physical flash memories in ascending address order. Names are not
+    # always "flash{,1,2}": STM32H5 for example calls them "flash_ns"/"flash_s".
+    flash_memories = list(m for m in physical_memories if "flash" in m["name"])
+    def alias_memories(memory):
+        return list(m for m in memories if m.get("alias") == memory["name"])
+    # Flash offset is counted from the start of flash, which is the first flash memory
     if (flash_offset := env.get(":platform:cortex-m:linkerscript.flash_offset", 0)):
-        offset_flash = next(m for name in ["flash", "flash1", "flash2"] for m in memories if m["name"] == name)
-        offset_flash["start"] = offset_flash["start"] + flash_offset
-        offset_flash["size"] = offset_flash["size"] - flash_offset
-    # Reserved flash is counted from the end of flash, which could be flash2, flash1 or flash
+        offset_flash = flash_memories[0]
+        for m in [offset_flash] + alias_memories(offset_flash):
+            m["start"] = m["start"] + flash_offset
+            m["size"] = m["size"] - flash_offset
+    # Reserved flash is counted from the end of flash, which is the last flash memory
     if (flash_reserved := env.get(":platform:cortex-m:linkerscript.flash_reserved", 0)):
-        reserved_flash = next(m for name in ["flash2", "flash1", "flash"] for m in memories if m["name"] == name)
-        reserved_flash["size"] = reserved_flash["size"] - flash_reserved
+        reserved_flash = flash_memories[-1]
+        for m in [reserved_flash] + alias_memories(reserved_flash):
+            m["size"] = m["size"] - flash_reserved
 
     # Find all continuous memory sections
     cont = []
@@ -275,7 +282,8 @@ def prepare(module, options):
                 default=default_location))
 
     # Find the size of the flash memory
-    flash_size = next((int(x["size"]) for x in memories if x["name"] == "flash"), 16*1024*1024)
+    flash_size = sum(int(x["size"]) for x in memories
+                     if "flash" in x["name"] and "alias" not in x) or 16*1024*1024
     module.add_option(
         NumericOption(
             name="linkerscript.flash_offset",
@@ -350,7 +358,8 @@ def validate(env):
 
     device = env[":target"]
     memories = listify(device.get_driver("core")["memory"])
-    flash_size = next((int(x["size"]) for x in memories if x["name"] == "flash"), 16*1024*1024)
+    flash_size = sum(int(x["size"]) for x in memories
+                     if "flash" in x["name"] and "alias" not in x) or 16*1024*1024
     flash_reserved_option_name = "modm:platform:cortex-m:linkerscript.flash_reserved"
     flash_reserved = env[flash_reserved_option_name]
     if flash_reserved != 0:
