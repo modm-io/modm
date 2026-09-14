@@ -38,6 +38,22 @@ crc8_ccitt_update(uint8_t crc, uint8_t data)
 #endif
 }
 
+/// CRC-8/MAXIM, aka the Dallas/Maxim 1-Wire CRC: polynomial 0x31 reflected to
+/// 0x8C, initial value 0, no final xor. Used by the 1-Wire ROM code and by the
+/// AT21CS serial number.
+inline uint8_t
+crc8_maxim_update(uint8_t crc, uint8_t data)
+{
+#ifdef __AVR__
+    return _crc_ibutton_update(crc, data);
+#else
+    crc ^= data;
+    for (uint_fast8_t ii = 0; ii < 8; ii++)
+        crc = (crc >> 1) ^ (-int8_t(crc & 1) & 0x8C);
+    return crc;
+#endif
+}
+
 inline uint16_t
 crc16_ccitt_update(uint16_t crc, uint8_t data)
 {
@@ -62,6 +78,7 @@ crc32_update(uint32_t crc, uint8_t data)
 }
 
 static constexpr uint8_t crc8_ccitt_init{0xFFu};
+static constexpr uint8_t crc8_maxim_init{0x00u};
 static constexpr uint16_t crc16_ccitt_init{0xFFFFu};
 static constexpr uint32_t crc32_init{0xFFFFFFFFul};
 
@@ -70,6 +87,14 @@ crc8_ccitt(const uint8_t *data, size_t length)
 {
     uint8_t crc{crc8_ccitt_init};
     while (length--) crc = crc8_ccitt_update(crc, *data++);
+    return crc;
+}
+
+inline uint8_t
+crc8_maxim(const uint8_t *data, size_t length)
+{
+    uint8_t crc{crc8_maxim_init};
+    while (length--) crc = crc8_maxim_update(crc, *data++);
     return crc;
 }
 
