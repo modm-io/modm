@@ -1,0 +1,455 @@
+/*
+ * Copyright (c) 2026, LucaFeggi
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <cstddef>
+#include <cstdint>
+#include <type_traits>
+#include "../device.hpp"
+#include <modm/platform/clock/rcc.hpp>
+
+namespace modm::platform
+{
+
+/** STM32H562/563/573 general-purpose DMA definitions.
+ *
+ * GPDMA lengths are measured in bytes. The caller owns all transfer buffers and
+ * linked-list items until the channel has been stopped. A peripheral request
+ * must be selected before starting a peripheral transfer. Call configure()
+ * before setting other registers. Register configuration setters return false
+ * while the channel is enabled.
+ * @author LucaFeggi
+ * @ingroup modm_platform_dma
+ */
+class DmaBase
+{
+public:
+	enum class Signal : uint8_t { Rx, Tx };
+	enum class Request : uint8_t {
+		Adc1 = 0, Adc2 = 1,
+		Spi1Rx = 6, Spi1Tx = 7, Spi2Rx = 8, Spi2Tx = 9,
+		Spi3Rx = 10, Spi3Tx = 11,
+		Spi4Rx = 47, Spi4Tx = 48, Spi5Rx = 49, Spi5Tx = 50,
+		Spi6Rx = 51, Spi6Tx = 52,
+	};
+	enum class DataTransferDirection : uint8_t {
+		PeripheralToMemory, MemoryToPeripheral, MemoryToMemory
+	};
+	enum class MemoryDataSize : uint8_t { Byte = 0, HalfWord = 1, Word = 2 };
+	enum class PeripheralDataSize : uint8_t { Byte = 0, HalfWord = 1, Word = 2 };
+	enum class MemoryIncrementMode : uint8_t { Fixed, Increment };
+	enum class PeripheralIncrementMode : uint8_t { Fixed, Increment };
+	enum class Priority : uint8_t { Low = 0, Medium = 1, High = 2, VeryHigh = 3 };
+	enum class Port : uint8_t { Port0, Port1 };
+	enum class InterruptFlags : uint32_t {
+		TransferComplete = DMA_CSR_TCF,
+		HalfTransfer = DMA_CSR_HTF,
+		DataTransferError = DMA_CSR_DTEF,
+		LinkError = DMA_CSR_ULEF,
+		ConfigurationError = DMA_CSR_USEF,
+		Suspended = DMA_CSR_SUSPF,
+		TriggerOverrun = DMA_CSR_TOF,
+		Error = DMA_CSR_DTEF | DMA_CSR_ULEF | DMA_CSR_USEF | DMA_CSR_TOF,
+	};
+	static constexpr uint32_t ErrorMask = uint32_t(InterruptFlags::Error);
+	static constexpr uint32_t FlagMask = DMA_CSR_TCF | DMA_CSR_HTF | ErrorMask | DMA_CSR_SUSPF;
+	static constexpr uint32_t SoftwareStopTimeout = 0x80000000u;
+	static constexpr uint32_t SoftwareConfigurationError = 0x40000000u;
+	static constexpr uint32_t SoftwareTransferTimeout = 0x20000000u;
+
+	/** Complete linear linked-list node. Keep nodes in DMA-accessible SRAM. */
+	struct alignas(4) LinearNode
+	{
+		uint32_t transfer1;
+		uint32_t transfer2;
+		uint32_t block1;
+		uint32_t source;
+		uint32_t destination;
+		uint32_t link;
+	};
+	/** Complete 2D linked-list node for channel 6 or 7. */
+	struct alignas(4) RepeatedNode
+	{
+		uint32_t transfer1;
+		uint32_t transfer2;
+		uint32_t block1;
+		uint32_t source;
+		uint32_t destination;
+		uint32_t transfer3;
+		uint32_t block2;
+		uint32_t link;
+	};
+	static_assert(sizeof(LinearNode) == 6 * sizeof(uint32_t));
+	static_assert(sizeof(RepeatedNode) == 8 * sizeof(uint32_t));
+};
+
+template <uint8_t ControllerId>
+class DmaController : public DmaBase
+{
+	static_assert(ControllerId == 1 or ControllerId == 2);
+
+public:
+	static void
+	enable()
+	{
+		if constexpr (ControllerId == 1) Rcc::enable<Peripheral::Gpdma1>();
+		else Rcc::enable<Peripheral::Gpdma2>();
+	}
+
+	template <uint8_t ChannelId>
+	class Channel : public DmaBase
+	{
+		static_assert(ChannelId < 8);
+
+		static DMA_Channel_TypeDef *
+		registers()
+		{
+			if constexpr (ControllerId == 1) {
+				return reinterpret_cast<DMA_Channel_TypeDef *>(
+					reinterpret_cast<uintptr_t>(GPDMA1_Channel0) + ChannelId * 0x80u);
+			}
+			else {
+				return reinterpret_cast<DMA_Channel_TypeDef *>(
+					reinterpret_cast<uintptr_t>(GPDMA2_Channel0) + ChannelId * 0x80u);
+			}
+		}
+
+	public:
+		using Request = DmaBase::Request;
+		using Signal = DmaBase::Signal;
+		using InterruptFlags = DmaBase::InterruptFlags;
+		using InterruptHandler = void (*)(uint32_t flags);
+		static inline InterruptHandler handler = nullptr;
+
+		static constexpr std::size_t FifoSize = ChannelId < 4 ? 8 : 32;
+		static constexpr bool Supports2d = ChannelId >= 6;
+		static constexpr std::size_t MaxBlockSize = DMA_CBR1_BNDT_Msk;
+		static constexpr uint32_t LinearUpdateMask = DMA_CLLR_UT1 | DMA_CLLR_UT2 |
+			DMA_CLLR_UB1 | DMA_CLLR_USA | DMA_CLLR_UDA | DMA_CLLR_ULL;
+		static constexpr uint32_t RepeatedUpdateMask = LinearUpdateMask |
+			DMA_CLLR_UT3 | DMA_CLLR_UB2;
+		template <Peripheral>
+		static constexpr bool HasRequestMapping = false;
+
+		template <Peripheral peripheral, Signal signal = Signal::Rx>
+		struct RequestMapping
+		{
+			static constexpr DmaBase::Request Request = [] {
+%% for instance in adc_ids
+				if constexpr (peripheral == Peripheral::Adc{{ instance }}) return DmaBase::Request::Adc{{ instance }};
+%% endfor
+%% for instance in spi_ids
+				else if constexpr (peripheral == Peripheral::Spi{{ instance }})
+					return signal == Signal::Rx ? DmaBase::Request::Spi{{ instance }}Rx : DmaBase::Request::Spi{{ instance }}Tx;
+%% endfor
+				else static_assert(HasRequestMapping<peripheral>, "No H5 GPDMA request for this peripheral");
+			}();
+		};
+
+		/** Configure a linear transfer. The channel must be idle. */
+		static bool
+		configure(DataTransferDirection direction,
+				MemoryDataSize memoryWidth = MemoryDataSize::Byte,
+				PeripheralDataSize peripheralWidth = PeripheralDataSize::Byte,
+				MemoryIncrementMode memoryIncrement = MemoryIncrementMode::Increment,
+				PeripheralIncrementMode peripheralIncrement = PeripheralIncrementMode::Fixed,
+				Priority priority = Priority::Medium)
+		{
+			DmaController<ControllerId>::enable();
+			auto *channel = registers();
+			if (channel->CCR & DMA_CCR_EN) return false;
+			uint32_t transfer1 = 0;
+			if (direction == DataTransferDirection::PeripheralToMemory) {
+				transfer1 = (uint32_t(peripheralWidth) << DMA_CTR1_SDW_LOG2_Pos) |
+					(uint32_t(memoryWidth) << DMA_CTR1_DDW_LOG2_Pos);
+				if (peripheralIncrement == PeripheralIncrementMode::Increment) transfer1 |= DMA_CTR1_SINC;
+				if (memoryIncrement == MemoryIncrementMode::Increment) transfer1 |= DMA_CTR1_DINC;
+			}
+			else {
+				transfer1 = (uint32_t(memoryWidth) << DMA_CTR1_SDW_LOG2_Pos) |
+					(uint32_t(peripheralWidth) << DMA_CTR1_DDW_LOG2_Pos);
+				if (memoryIncrement == MemoryIncrementMode::Increment) transfer1 |= DMA_CTR1_SINC;
+				if (peripheralIncrement == PeripheralIncrementMode::Increment) transfer1 |= DMA_CTR1_DINC;
+			}
+			channel->CTR1 = transfer1;
+			channel->CTR2 = direction == DataTransferDirection::MemoryToPeripheral ? DMA_CTR2_DREQ :
+				(direction == DataTransferDirection::MemoryToMemory ? DMA_CTR2_SWREQ : 0u);
+			channel->CLLR = 0;
+			channel->CTR3 = 0;
+			channel->CBR1 = 0;
+			channel->CBR2 = 0;
+			channel->CCR = (uint32_t(priority) << DMA_CCR_PRIO_Pos);
+			return true;
+		}
+
+		/** Configuration registers may be changed only while the channel is disabled. */
+		static bool
+		setSourceAddress(uintptr_t address)
+		{
+			auto *channel = registers();
+			if (channel->CCR & DMA_CCR_EN) return false;
+			channel->CSAR = address;
+			return true;
+		}
+
+		static bool
+		setDestinationAddress(uintptr_t address)
+		{
+			auto *channel = registers();
+			if (channel->CCR & DMA_CCR_EN) return false;
+			channel->CDAR = address;
+			return true;
+		}
+
+		static bool
+		setMemoryAddress(uintptr_t address)
+		{
+			if (registers()->CTR2 & DMA_CTR2_DREQ) return setSourceAddress(address);
+			return setDestinationAddress(address);
+		}
+
+		static bool
+		setPeripheralAddress(uintptr_t address)
+		{
+			if (registers()->CTR2 & DMA_CTR2_DREQ) return setDestinationAddress(address);
+			return setSourceAddress(address);
+		}
+
+		static bool
+		setDataLength(std::size_t bytes)
+		{
+			auto *channel = registers();
+			if (bytes == 0 or bytes > MaxBlockSize or (channel->CCR & DMA_CCR_EN))
+				return false;
+			channel->CBR1 = (channel->CBR1 & ~DMA_CBR1_BNDT) | uint32_t(bytes);
+			return true;
+		}
+
+		template <Request request>
+		static bool
+		setPeripheralRequest()
+		{
+			return setPeripheralRequest(uint8_t(request));
+		}
+
+		/** Select any documented request number, including non-ADC/SPI peripherals. */
+		static bool
+		setPeripheralRequest(uint8_t request)
+		{
+			auto *channel = registers();
+			if (request > (DMA_CTR2_REQSEL >> DMA_CTR2_REQSEL_Pos) or
+				(channel->CCR & DMA_CCR_EN)) return false;
+			channel->CTR2 = (channel->CTR2 & ~DMA_CTR2_REQSEL) |
+				(uint32_t(request) << DMA_CTR2_REQSEL_Pos);
+			return true;
+		}
+
+		static bool
+		setPorts(Port source, Port destination)
+		{
+			auto *channel = registers();
+			if (channel->CCR & DMA_CCR_EN) return false;
+			channel->CTR1 = (channel->CTR1 & ~(DMA_CTR1_SAP | DMA_CTR1_DAP)) |
+				(source == Port::Port1 ? DMA_CTR1_SAP : 0u) |
+				(destination == Port::Port1 ? DMA_CTR1_DAP : 0u);
+			return true;
+		}
+
+		static bool
+		setBursts(uint8_t sourceLength, uint8_t destinationLength)
+		{
+			if (sourceLength < 1 or sourceLength > 64 or
+				destinationLength < 1 or destinationLength > 64) return false;
+			auto *channel = registers();
+			if (channel->CCR & DMA_CCR_EN) return false;
+			channel->CTR1 = (channel->CTR1 & ~(DMA_CTR1_SBL_1 | DMA_CTR1_DBL_1)) |
+				((uint32_t(sourceLength - 1) << DMA_CTR1_SBL_1_Pos) & DMA_CTR1_SBL_1) |
+				((uint32_t(destinationLength - 1) << DMA_CTR1_DBL_1_Pos) & DMA_CTR1_DBL_1);
+			return true;
+		}
+
+		static bool
+		setTrigger(uint8_t source, uint32_t modeAndPolarity)
+		{
+			auto *channel = registers();
+			if (source > (DMA_CTR2_TRIGSEL >> DMA_CTR2_TRIGSEL_Pos) or
+				(channel->CCR & DMA_CCR_EN)) return false;
+			channel->CTR2 = (channel->CTR2 & ~(DMA_CTR2_TRIGSEL | DMA_CTR2_TRIGM | DMA_CTR2_TRIGPOL)) |
+				((uint32_t(source) << DMA_CTR2_TRIGSEL_Pos) & DMA_CTR2_TRIGSEL) |
+				(modeAndPolarity & (DMA_CTR2_TRIGM | DMA_CTR2_TRIGPOL));
+			return true;
+		}
+
+		static bool
+		setRepeat(uint16_t repetitions, int16_t sourceOffset, int16_t destinationOffset)
+		{
+			static_assert(Supports2d, "This DMA channel has no 2D addressing");
+			if (repetitions == 0 or repetitions > 2048 or
+				sourceOffset == INT16_MIN or destinationOffset == INT16_MIN) return false;
+			auto *channel = registers();
+			if (channel->CCR & DMA_CCR_EN) return false;
+			channel->CBR1 = (channel->CBR1 & DMA_CBR1_BNDT) |
+				(uint32_t(repetitions - 1) << DMA_CBR1_BRC_Pos) |
+				(sourceOffset < 0 ? DMA_CBR1_BRSDEC : 0u) |
+				(destinationOffset < 0 ? DMA_CBR1_BRDDEC : 0u);
+			channel->CBR2 = (uint32_t(sourceOffset < 0 ? -sourceOffset : sourceOffset) & DMA_CBR2_BRSAO) |
+				(uint32_t(destinationOffset < 0 ? -destinationOffset : destinationOffset) << DMA_CBR2_BRDAO_Pos);
+			return true;
+		}
+
+		/** Capture the current linear channel setup into a complete node. */
+		static void
+		makeLinearNode(LinearNode &node)
+		{
+			auto *channel = registers();
+			node = {channel->CTR1, channel->CTR2, channel->CBR1,
+				channel->CSAR, channel->CDAR, 0};
+		}
+
+		/** Capture a two-dimensional setup on channel 6 or 7. */
+		static void
+		makeRepeatedNode(RepeatedNode &node)
+		{
+			static_assert(Supports2d, "This DMA channel has no 2D addressing");
+			auto *channel = registers();
+			node = {channel->CTR1, channel->CTR2, channel->CBR1,
+				channel->CSAR, channel->CDAR, channel->CTR3, channel->CBR2, 0};
+		}
+
+		/** Link a node to another in the same 64-Kbyte SRAM region. */
+		template <class Node>
+		static bool
+		linkNode(Node &node, const Node *next)
+		{
+			static_assert(std::is_same_v<Node, LinearNode> or std::is_same_v<Node, RepeatedNode>);
+			if (next == nullptr) { node.link = 0; return true; }
+			const auto address = reinterpret_cast<uintptr_t>(next);
+			if ((address & 3u) or
+				((address ^ reinterpret_cast<uintptr_t>(&node)) & 0xffff0000u)) return false;
+			if constexpr (sizeof(Node) == sizeof(LinearNode))
+				node.link = (address & DMA_CLLR_LA) | LinearUpdateMask;
+			else {
+				static_assert(Supports2d, "This DMA channel has no 2D addressing");
+				node.link = (address & DMA_CLLR_LA) | RepeatedUpdateMask;
+			}
+			return true;
+		}
+
+		/** Install a complete node. CLBAR supplies the upper address bits. */
+		template <class Node>
+		static bool
+		setLinkedList(const Node *first)
+		{
+			static_assert(std::is_same_v<Node, LinearNode> or std::is_same_v<Node, RepeatedNode>);
+			if (first == nullptr or (reinterpret_cast<uintptr_t>(first) & 3u)) return false;
+			if constexpr (sizeof(Node) != sizeof(LinearNode))
+				static_assert(Supports2d, "This DMA channel has no 2D addressing");
+			auto *channel = registers();
+			if (channel->CCR & DMA_CCR_EN) return false;
+			const auto address = reinterpret_cast<uintptr_t>(first);
+			channel->CLBAR = address & 0xffff0000u;
+			channel->CLLR = (address & DMA_CLLR_LA) |
+				(sizeof(Node) == sizeof(LinearNode) ? LinearUpdateMask : RepeatedUpdateMask);
+			return true;
+		}
+
+		/** Start a configured block or linked list. */
+		static bool
+		start()
+		{
+			auto *channel = registers();
+			if (channel->CCR & DMA_CCR_EN) return false;
+			if (channel->CLLR == 0 and
+				(not (channel->CBR1 & DMA_CBR1_BNDT) or
+				channel->CSAR == 0 or channel->CDAR == 0)) return false;
+			channel->CCR |= DMA_CCR_EN;
+			return true;
+		}
+		static void suspend() { registers()->CCR |= DMA_CCR_SUSP; }
+		/** Abort a transfer, waiting for suspend before resetting its FIFO. */
+		static bool
+		stop(uint32_t timeout = 100'000)
+		{
+			auto *channel = registers();
+			if (channel->CCR & DMA_CCR_EN) {
+				channel->CCR |= DMA_CCR_SUSP;
+				while (not (channel->CSR & DMA_CSR_SUSPF) and
+					(channel->CCR & DMA_CCR_EN)) {
+					if (timeout-- == 0) return false;
+				}
+				if ((channel->CCR & DMA_CCR_EN) and
+					not (channel->CSR & DMA_CSR_SUSPF)) return false;
+			}
+			channel->CCR |= DMA_CCR_RESET;
+			while (channel->CCR & (DMA_CCR_EN | DMA_CCR_SUSP)) {
+				if (timeout-- == 0) return false;
+			}
+			return true;
+		}
+		static bool isEnabled() { return registers()->CCR & DMA_CCR_EN; }
+		static uint32_t getInterruptFlags() { return registers()->CSR & FlagMask; }
+		static void acknowledgeInterruptFlags(uint32_t flags) { registers()->CFCR = flags & FlagMask; }
+		static void setInterruptHandler(InterruptHandler callback) { handler = callback; }
+		static bool setInterrupts(uint32_t mask)
+		{
+			auto *channel = registers();
+			if (channel->CCR & DMA_CCR_EN) return false;
+			channel->CCR = (channel->CCR & ~(DMA_CCR_TCIE | DMA_CCR_HTIE | DMA_CCR_DTEIE |
+				DMA_CCR_ULEIE | DMA_CCR_USEIE | DMA_CCR_SUSPIE | DMA_CCR_TOIE));
+			channel->CCR |= mask & (DMA_CCR_TCIE | DMA_CCR_HTIE | DMA_CCR_DTEIE |
+				DMA_CCR_ULEIE | DMA_CCR_USEIE | DMA_CCR_SUSPIE | DMA_CCR_TOIE);
+			return true;
+		}
+
+		static void
+		interruptHandler()
+		{
+			const uint32_t flags = getInterruptFlags();
+			acknowledgeInterruptFlags(flags);
+			if (handler != nullptr and flags != 0) handler(flags);
+		}
+
+		static void
+		enableInterruptVector()
+		{
+%% for instance in instances
+%% for channel in range(8)
+			if constexpr (ControllerId == {{ instance }} and ChannelId == {{ channel }})
+				NVIC_EnableIRQ(GPDMA{{ instance }}_Channel{{ channel }}_IRQn);
+%% endfor
+%% endfor
+		}
+
+		static void
+		disableInterruptVector()
+		{
+%% for instance in instances
+%% for channel in range(8)
+			if constexpr (ControllerId == {{ instance }} and ChannelId == {{ channel }})
+				NVIC_DisableIRQ(GPDMA{{ instance }}_Channel{{ channel }}_IRQn);
+%% endfor
+%% endfor
+		}
+	};
+};
+
+%% for instance in instances
+class Dma{{ instance }} : public DmaController<{{ instance }}>
+{
+public:
+%% for channel in range(8)
+	using Channel{{ channel }} = DmaController<{{ instance }}>::Channel<{{ channel }}>;
+%% endfor
+};
+%% endfor
+
+} // namespace modm::platform
