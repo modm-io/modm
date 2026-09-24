@@ -1,6 +1,7 @@
 <library>
   <extends>modm:nucleo-f303k8</extends>
   <options>
+    <option name="modm:build:lto">yes</option>
     <option name="modm:build:build.path">../../../build/nucleo_f303k8/rtos</option>
   </options>
   <modules>

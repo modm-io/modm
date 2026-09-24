@@ -74,6 +74,9 @@ def prepare(module, options):
     module.add_option(
         BooleanOption(name="info.build", default=False,
                       description=descr_info_build))
+    module.add_option(
+        BooleanOption(name="lto", default=False,
+                      description=descr_lto))
 
     if platform in ["avr"]:
         module.add_option(
@@ -185,6 +188,10 @@ def build(env):
     # Add compiler flags to metadata
     for flag, values in common_compiler_flags("gcc", env[":target"]).items():
         env.collect(flag, *values)
+
+    if env["lto"]:
+        env.collect(":build:ccflags", "-flto=auto")
+        env.collect(":build:linkflags", "-flto=auto")
 
     # Copy python tools folder
     platform = env[":target"].identifier["platform"]
@@ -300,6 +307,20 @@ descr_info_git = """# Generate git repository state information
 """
 
 descr_info_build = """# Generate build state information"""
+
+descr_lto = """# Enable Link-Time Optimization
+
+Compiles with `-flto=auto`, which defers code generation to link time so that
+the optimizer can inline and eliminate code across translation units. This
+typically shrinks the binary noticeably at the cost of a slower link step.
+
+!!! warning "LTO cannot see references from the linkerscript or inline assembly"
+    The optimizer decides what is reachable *before* the linkerscript is
+    applied, so `KEEP()` does not protect a symbol from being deleted. Anything
+    that is only referenced by the hardware (like the vector table), by the
+    linkerscript, or from an inline assembly string must be marked `modm_used`.
+    modm does this for its own symbols.
+"""
 
 descr_openocd_cfg = """# Path to a custom OpenOCD configuration file
 

@@ -1,6 +1,7 @@
 <library>
   <extends>modm:nucleo-f031k6</extends>
   <options>
+    <option name="modm:build:lto">yes</option>
     <option name="modm:build:build.path">../../../build/nucleo_f031k6/sk6812</option>
   </options>
   <modules>

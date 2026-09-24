@@ -85,9 +85,9 @@ private:
 	static void
 	handleDmaTransmitComplete();
 
-	static inline bool dmaError { false };
-	static inline bool dmaTransmitComplete { false };
-	static inline bool dmaReceiveComplete { false };
+	static inline volatile bool dmaError { false };
+	static inline volatile bool dmaTransmitComplete { false };
+	static inline volatile bool dmaReceiveComplete { false };
 
 	// needed for transfers where no RX or TX buffers are given
 	static inline uint8_t dmaDummy { 0 };
