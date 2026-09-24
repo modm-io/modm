@@ -4,6 +4,7 @@ This module provides these files for accessing the ARM Cortex-M CPU and
 peripherals:
 
 - `cmsis_gcc.h`: Contains the GCC-specific API.
+- `cmsis_clang.h`: Contains the Clang-specific API.
 - `core_cm{core}.h`: Contains the core-specific API.
 
 Please [see the API documentation][docs] for their content and how to use them.
