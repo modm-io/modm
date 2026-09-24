@@ -27,6 +27,8 @@ def build(env):
     env.copy("cmsis/CMSIS/Core/Include/cmsis_compiler.h", "cmsis_compiler.h")
     env.copy("cmsis/CMSIS/Core/Include/cmsis_gcc.h", "cmsis_gcc.h")
     env.copy("cmsis/CMSIS/Core/Include/m-profile/cmsis_gcc_m.h", "m-profile/cmsis_gcc_m.h")
+    env.copy("cmsis/CMSIS/Core/Include/cmsis_clang.h", "cmsis_clang.h")
+    env.copy("cmsis/CMSIS/Core/Include/m-profile/cmsis_clang_m.h", "m-profile/cmsis_clang_m.h")
     if "33" in core:
         env.copy("cmsis/CMSIS/Core/Include/m-profile/armv8m_mpu.h", "m-profile/armv8m_mpu.h")
     elif core != "0": # 0+ has MPU support though!
