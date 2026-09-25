@@ -1,0 +1,265 @@
+/*
+ * Copyright (c) 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <modm/platform.hpp>
+#include <modm/architecture/interface/clock.hpp>
+#include <modm/debug/logger.hpp>
+#include <modm/driver/display/st7735.hpp>
+#include <modm/driver/display/st7735/st7735_spi_interface.hpp>
+
+using namespace modm::platform;
+
+%#
+%% if with_logger
+/// @ingroup modm_board_weact_h723vg
+#define MODM_BOARD_HAS_LOGGER
+%#
+%% endif
+namespace Board
+{
+/// @ingroup modm_board_weact_h723vg
+/// @{
+using namespace modm::literals;
+
+/// STM32H723VGT6 running at 550MHz from the 25MHz HSE crystal.
+struct SystemClock
+{
+	static constexpr uint32_t Hse = 25_MHz;
+	static constexpr uint32_t Lse = 32.768_kHz;
+
+	static constexpr uint32_t SysClk = 550_MHz;
+	static constexpr uint32_t Pll1Q = SysClk / 4;
+	static constexpr uint32_t Pll2Q = 120_MHz;
+	static constexpr uint32_t Hclk = SysClk;
+	static constexpr uint32_t Frequency = Hclk;
+	static constexpr uint32_t Ahb = Hclk / 2;
+	static constexpr uint32_t Ahb1 = Ahb;
+	static constexpr uint32_t Ahb2 = Ahb;
+	static constexpr uint32_t Ahb3 = Ahb;
+	static constexpr uint32_t Ahb4 = Ahb;
+	static constexpr uint32_t Apb1 = Ahb / 2;
+	static constexpr uint32_t Apb2 = Ahb / 2;
+	static constexpr uint32_t Apb3 = Ahb / 2;
+	static constexpr uint32_t Apb4 = Ahb / 2;
+
+	static constexpr uint32_t Adc1 = Ahb1;
+	static constexpr uint32_t Adc2 = Ahb1;
+	static constexpr uint32_t Adc3 = Ahb4;
+	static constexpr uint32_t Dac1 = Apb1;
+
+	static constexpr uint32_t Spi1 = Pll1Q;
+	static constexpr uint32_t Spi2 = Pll1Q;
+	static constexpr uint32_t Spi3 = Pll1Q;
+	static constexpr uint32_t Spi4 = Apb2;
+	static constexpr uint32_t Spi5 = Apb2;
+	static constexpr uint32_t Spi6 = Apb4;
+
+	static constexpr uint32_t Usart1 = Apb2;
+	static constexpr uint32_t Usart2 = Apb1;
+	static constexpr uint32_t Usart3 = Apb1;
+	static constexpr uint32_t Uart4 = Apb1;
+	static constexpr uint32_t Uart5 = Apb1;
+	static constexpr uint32_t Usart6 = Apb2;
+	static constexpr uint32_t Uart7 = Apb1;
+	static constexpr uint32_t Uart8 = Apb1;
+	static constexpr uint32_t Uart9 = Apb2;
+	static constexpr uint32_t Usart10 = Apb2;
+	static constexpr uint32_t LpUart1 = Apb4;
+	static constexpr uint32_t Fdcan1 = Pll2Q;
+	static constexpr uint32_t Fdcan2 = Pll2Q;
+	static constexpr uint32_t Fdcan3 = Pll2Q;
+
+	static constexpr uint32_t I2c1 = Apb1;
+	static constexpr uint32_t I2c2 = Apb1;
+	static constexpr uint32_t I2c3 = Apb1;
+	static constexpr uint32_t I2c4 = Apb4;
+	static constexpr uint32_t I2c5 = Apb1;
+
+	static constexpr uint32_t Apb1Timer = Apb1 * 2;
+	static constexpr uint32_t Apb2Timer = Apb2 * 2;
+	static constexpr uint32_t Timer1 = Apb2Timer;
+	static constexpr uint32_t Timer2 = Apb1Timer;
+	static constexpr uint32_t Timer3 = Apb1Timer;
+	static constexpr uint32_t Timer4 = Apb1Timer;
+	static constexpr uint32_t Timer5 = Apb1Timer;
+	static constexpr uint32_t Timer6 = Apb1Timer;
+	static constexpr uint32_t Timer7 = Apb1Timer;
+	static constexpr uint32_t Timer8 = Apb2Timer;
+	static constexpr uint32_t Timer12 = Apb1Timer;
+	static constexpr uint32_t Timer13 = Apb1Timer;
+	static constexpr uint32_t Timer14 = Apb1Timer;
+	static constexpr uint32_t Timer15 = Apb2Timer;
+	static constexpr uint32_t Timer16 = Apb2Timer;
+	static constexpr uint32_t Timer17 = Apb2Timer;
+	static constexpr uint32_t Timer23 = Apb1Timer;
+	static constexpr uint32_t Timer24 = Apb1Timer;
+
+	static constexpr uint32_t Usb = 48_MHz;
+	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
+	static constexpr uint32_t Rtc = Lse;
+
+	static bool inline
+	enable()
+	{
+		Rcc::enableLowSpeedExternalCrystal();
+		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::LowSpeedExternalCrystal);
+		Rcc::enableExternalCrystal();
+		Rcc::setVoltageScaling(Rcc::VoltageScaling::Scale0);
+
+		const Rcc::PllFactors pllFactors1{
+			.range = Rcc::PllInputRange::MHz8_16,
+			.pllM = 2,   //  25 MHz /  2 = 12.5 MHz
+			.pllN = 44,  // 12.5 MHz * 44 =  550 MHz
+			.pllP = 1,   //  550 MHz /  1 =  550 MHz = F_cpu
+			.pllQ = 4,   //  550 MHz /  4 =  137.5 MHz
+			.pllR = 2,   //  550 MHz /  2 =  275 MHz
+	};
+	Rcc::enablePll1(Rcc::PllSource::ExternalClock, pllFactors1);
+
+	const Rcc::PllFactors pllFactors2{
+		.range = Rcc::PllInputRange::MHz4_8,
+		.pllM = 5,   // 25 MHz /  5 =   5 MHz
+		.pllN = 48,  //  5 MHz * 48 = 240 MHz
+		.pllP = 2,   // 240 MHz /  2 = 120 MHz
+		.pllQ = 2,   // 240 MHz /  2 = 120 MHz = F_fdcan
+		.pllR = 2,   // 240 MHz /  2 = 120 MHz
+	};
+	Rcc::enablePll2(Rcc::PllSource::ExternalClock, pllFactors2);
+	Rcc::setCanClockSource(Rcc::CanClockSource::Pll2Q);
+
+	const Rcc::PllFactors pllFactors3{
+			.range = Rcc::PllInputRange::MHz4_8,
+			.pllM = 5,   // 25 MHz /  5 =   5 MHz
+			.pllN = 48,  //  5 MHz * 48 = 240 MHz
+			.pllP = 5,   // 240 MHz /  5 =  48 MHz
+			.pllQ = 5,   // 240 MHz /  5 =  48 MHz = F_usb
+			.pllR = 5,   // 240 MHz /  5 =  48 MHz
+		};
+		Rcc::enablePll3(Rcc::PllSource::ExternalClock, pllFactors3);
+		Rcc::setFlashLatency<Ahb>();
+
+		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div2);
+		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div2);
+		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div2);
+		Rcc::setApb3Prescaler(Rcc::Apb3Prescaler::Div2);
+		Rcc::setApb4Prescaler(Rcc::Apb4Prescaler::Div2);
+
+		Rcc::updateCoreFrequency<Frequency>();
+		Rcc::enableUsbClockSource(Rcc::UsbClockSource::Pll3Q);
+		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll1P);
+
+		return true;
+	}
+};
+
+using Led = GpioOutputE3;
+using Leds = SoftwareGpioPort<Led>;
+using Button = GpioInputC13;
+
+namespace uart
+{
+using Tx = GpioOutputA9;
+using Rx = GpioInputA10;
+%% if with_logger == "UART"
+using Uart = BufferedUart<UsartHal1, UartTxBuffer<2048>>;
+%% endif
+}
+
+namespace usb
+{
+using Dm = GpioA11;
+using Dp = GpioA12;
+using Device = UsbHs;
+}
+
+namespace i2c
+{
+using Scl = GpioB8;
+using Sda = GpioB9;
+}
+
+namespace sdmmc
+{
+using Cmd = GpioD2;
+using Dat0 = GpioC8;
+using Dat1 = GpioC9;
+using Dat2 = GpioC10;
+using Dat3 = GpioC11;
+using Clk = GpioC12;
+}
+
+namespace lcd
+{
+using Sck = GpioE12;
+using Mosi = GpioE14;
+using Cs = GpioOutputE11;
+using Dc = GpioOutputE13;
+using Reset = GpioUnused;
+using Backlight = GpioInverted<GpioOutputE10>;
+using Spi = SpiMaster4;
+using Interface = modm::St7735SPIInterface<Spi, Cs, Reset, Dc>;
+inline constexpr auto Profile = modm::st7735::HannStar80x160;
+}
+
+using Display = modm::St7735<lcd::Interface>;
+extern Display display;
+
+%% if with_logger == "UART"
+using LoggerDevice = modm::IODeviceWrapper<uart::Uart, modm::IOBuffer::BlockIfFull>;
+%#
+%% elif with_logger == "RTT"
+using LoggerDevice = modm::IODeviceWrapper<Rtt<0>, modm::IOBuffer::DiscardIfFull>;
+%#
+%% endif
+inline void
+initialize()
+{
+	SystemClock::enable();
+	SysTickTimer::initialize<SystemClock>();
+
+%% if with_logger == "UART"
+%#
+	uart::Uart::connect<uart::Tx::Tx, uart::Rx::Rx>(Gpio::InputType::PullUp);
+	uart::Uart::initialize<SystemClock, 115200_Bd>();
+%% endif
+%#
+	Led::setOutput(modm::Gpio::Low);
+	Button::setInput(Gpio::InputType::PullDown);
+}
+
+inline void
+initializeDisplay()
+{
+	// The PE10 backlight switch is active-low. Keep it off until requested.
+	lcd::Backlight::setOutput(false);
+	lcd::Spi::connect<lcd::Sck::Sck, lcd::Mosi::Mosi>();
+	lcd::Spi::initialize<SystemClock, 8'593'750_Hz>();
+	lcd::Spi::setDataMode(lcd::Spi::DataMode::Mode0);
+	display.initialize();
+}
+
+inline void
+setDisplayBacklight(bool enabled)
+{
+	lcd::Backlight::set(enabled);
+}
+
+inline void
+initializeUsb(uint8_t priority = 3)
+{
+	usb::Device::initialize<SystemClock>(priority);
+	usb::Device::connect<usb::Dm::Dm, usb::Dp::Dp>();
+}
+/// @}
+
+}  // namespace Board
