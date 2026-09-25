@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Niklas Hauser
+ * Copyright (c) 2026, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -9,22 +9,27 @@
  */
 // ----------------------------------------------------------------------------
 
-#pragma once
-#include <modm/math/utils/cmath.hpp>
+#include <unittest/testsuite.hpp>
 
-/// @cond
-namespace modm::platform
+/// @ingroup modm_test_test_math
+class ConstevalCmathTest : public unittest::TestSuite
 {
+public:
+	void
+	testCeilFloat();
 
-void delay_ns(uint32_t ns);
+	void
+	testCeilDouble();
 
-constexpr uint16_t
-computeDelayNsPerLoop(uint32_t hz)
-{
-	return modm::round({{loop}}'000'000'000.0 / hz);
-}
+	void
+	testFloorFloat();
 
-}
-/// @endcond
+	void
+	testFloorDouble();
 
+	void
+	testRoundFloat();
 
+	void
+	testRoundDouble();
+};

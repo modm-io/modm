@@ -467,9 +467,6 @@ struct FlagsGroup<T> : public Register<typename T::UnderlyingType>
 	/// default constructor initializes `value` to zero
 	constexpr FlagsGroup() {};
 
-	/// copy constructor
-	constexpr FlagsGroup(FlagsGroup const &o)
-	:	Register<typename T::UnderlyingType>(o.value) {}
 	/// explicit underlying type constructor
 	explicit constexpr FlagsGroup(typename T::UnderlyingType value)
 	: 	Register<typename T::UnderlyingType>(value) {}

@@ -18,6 +18,8 @@
 #include <limits>
 #include <bit>
 
+#include <modm/math/utils/cmath.hpp>
+
 namespace modm::platform
 {
 extern "C" uint32_t SystemCoreClock;
@@ -97,7 +99,7 @@ GenericClockController::enableDfll48mClosedLoop(uint32_t waitCycles)
 {
 	static_assert(reference > 732_Hz, "DFLL48 reference frequency must be larger than 732 Hz");
 	static_assert(reference < 43_kHz, "DFLL48 reference frequency must be less than 33 kHz");
-	constexpr auto multiplier = uint16_t(std::round(48_MHz / double(reference)));
+	constexpr auto multiplier = uint16_t(modm::round(48_MHz / double(reference)));
 
 %% if target.family == "d1x/d2x/dax"
 	// Errata 1.2.1: Disable OnDemand mode
@@ -389,7 +391,7 @@ findDpllConfig(double inputClock, double target, bool fractional)
 	}
 	// f_pll = f_reference * (1 + N_int + N_frac/(2^frac_bits))
 	const auto idealMultiplier = (target / inputClock) - 1;
-	const uint32_t multplier = std::min<uint32_t>(maxMultiplier, std::round(idealMultiplier));
+	const uint32_t multplier = std::min<uint32_t>(maxMultiplier, modm::round(idealMultiplier));
 	if (fractional) {
 		const auto output = inputClock * (multplier + 1) / (1u << DpllConfig::MultiplierFractionalBits);
 		return DpllConfigCalculation {
