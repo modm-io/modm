@@ -318,7 +318,10 @@ public:
 	absolute()
 	// Should be std::abs but that's troubelous for avr-gcc
 	// @see: https://stackoverflow.com/questions/1374037/ambiguous-overload-call-to-absdouble
-	{ value = abs(value); }
+	{
+		if constexpr (std::is_signed_v<T>)
+			value = abs(value);
+	}
 
 	template<typename U>
 	requires std::integral<std::remove_reference_t<U>>

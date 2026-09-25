@@ -144,7 +144,13 @@ modm_context_end(uintptr_t retval)
 void
 modm_context_jump(modm_context_t *from, modm_context_t *to)
 {
-	register uintptr_t* sp asm("rsp");
+	uintptr_t* sp;
+	asm volatile
+	(
+		"mov %%rsp, %0"
+		: "=r"(sp)
+	);
+
 	if ((sp - StackWordsRegisters) < from->bottom or *from->bottom != StackWatermark)
 		modm_context_end((uintptr_t) from);
 	modm_context_jump_entry(from, to);

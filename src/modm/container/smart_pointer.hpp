@@ -119,7 +119,7 @@ namespace modm
 		}
 
 		bool
-		operator == (const SmartPointer& other);
+		operator == (const SmartPointer& other) const;
 
 		SmartPointer&
 		operator = (const SmartPointer& other);

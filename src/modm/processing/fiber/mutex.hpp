@@ -78,6 +78,11 @@ public:
 	}
 };
 
+#if defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wdeprecated-volatile"
+#endif
+
 /// Implements the `std::recursive_mutex` interface for fibers.
 /// @see https://en.cppreference.com/w/cpp/thread/recursive_mutex
 class recursive_mutex
@@ -131,6 +136,10 @@ public:
 		}
 	}
 };
+
+#if defined(__clang__)
+#  pragma clang diagnostic pop
+#endif
 
 /// Implements the `std::recursive_timed_mutex` interface for fibers.
 /// @see https://en.cppreference.com/w/cpp/thread/recursive_timed_mutex
