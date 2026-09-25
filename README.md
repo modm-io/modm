@@ -310,8 +310,8 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✅</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
-<td align="center">○</td>
-<td align="center">○</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
@@ -1000,6 +1000,7 @@ your specific needs.
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-l3gd20">L3GD20</a></td>
 </tr><tr>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-lan8720a">LAN8720A</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-lan8742a">LAN8742A</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-lawicel">LAWICEL</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-lis302dl">LIS302DL</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-lis3dsh">LIS3DSH</a></td>
@@ -1028,6 +1029,7 @@ your specific needs.
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-mcp7941x">MCP7941x</a></td>
 </tr><tr>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-mcp990x">MCP990X</a></td>
+</tr><tr>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-mmc5603">MMC5603</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-ms5611">MS5611</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-ms5837">MS5837</a></td>
@@ -1035,6 +1037,7 @@ your specific needs.
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-nrf24">NRF24</a></td>
 </tr><tr>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-parallel_tft_display">TFT-DISPLAY</a></td>
+</tr><tr>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-pat9125el">PAT9125EL</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-pca8574">PCA8574</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-pca9535">PCA9535</a></td>
@@ -1042,6 +1045,7 @@ your specific needs.
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-pca9685">PCA9685</a></td>
 </tr><tr>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-pcal6524">PCAL6524</a></td>
+</tr><tr>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-qmc5883l">QMC5883L</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-sh1106">SH1106</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-siemens_s65">SIEMENS-S65</a></td>
@@ -1049,6 +1053,7 @@ your specific needs.
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-sk6812">SK6812</a></td>
 </tr><tr>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-sk9822">SK9822</a></td>
+</tr><tr>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-ssd1306">SSD1306</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-st7586s">ST7586S</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-st7789">ST7789</a></td>
@@ -1056,6 +1061,7 @@ your specific needs.
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-stusb4500">STUSB4500</a></td>
 </tr><tr>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-sx1276">SX1276</a></td>
+</tr><tr>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-sx128x">SX128X</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-tcs3414">TCS3414</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-tcs3472">TCS3472</a></td>
@@ -1063,6 +1069,7 @@ your specific needs.
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-tmp102">TMP102</a></td>
 </tr><tr>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-tmp12x">TMP12x</a></td>
+</tr><tr>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-tmp175">TMP175</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-touch2046">TOUCH2046</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-vl53l0">VL53L0</a></td>
