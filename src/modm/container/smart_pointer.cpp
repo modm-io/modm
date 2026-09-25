@@ -49,7 +49,7 @@ modm::SmartPointer::~SmartPointer()
 
 // ----------------------------------------------------------------------------
 bool
-modm::SmartPointer::operator == (const SmartPointer& other)
+modm::SmartPointer::operator == (const SmartPointer& other) const
 {
 	return (this->ptr == other.ptr);
 }
