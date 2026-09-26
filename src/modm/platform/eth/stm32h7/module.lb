@@ -48,10 +48,12 @@ def eth_h7_dma_memories(device):
     minimum_storage = eth_h7_dma_storage_size(
         ETH_H7_DESCRIPTOR_COUNT_MIN, ETH_H7_DESCRIPTOR_COUNT_MIN)
     # TODO: Use modm-devices DMA-domain accessibility metadata when available.
+    # The Ethernet DMA cannot access the Cortex-M7 ITCM/DTCM (RM0433 §2.1).
     memories = [
         memory
         for memory in listify(device.get_driver("core")["memory"])
         if "rw" in memory.get("access", "")
+        and "tcm" not in memory["name"]
         and memory_size(memory) >= minimum_storage
     ]
     return sorted(memories, key=memory_size, reverse=True)
