@@ -62,7 +62,9 @@ if(NOT MODM_GCC_PATH AND NOT DEFINED ENV{GCC_PATH})
   get_filename_component(MODM_GCC_PATH ${MODM_GCC_PATH} REALPATH)
   get_filename_component(MODM_GCC_PATH ${MODM_GCC_PATH} DIRECTORY)
   get_filename_component(MODM_GCC_PATH ${MODM_GCC_PATH} DIRECTORY)
+%% if options.get(":build:compiler", "gcc") == "gcc"
   message(WARNING "Enviroment variable GCC_PATH not set.\nDefaults to: ${MODM_GCC_PATH}")
+%% endif
   set(MODM_GCC_PATH
     ${MODM_GCC_PATH}
     CACHE STRING "Path to gcc root directory" FORCE)
@@ -87,7 +89,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
              "MinSizeRel")
 endif()
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
   add_compile_options(-fdiagnostics-color=always)
 else()
   message(STATUS "No colored compiler diagnostic set for '${CMAKE_CXX_COMPILER_ID}' compiler.")

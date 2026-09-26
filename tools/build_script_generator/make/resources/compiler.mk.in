@@ -6,6 +6,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+%% set compiler = options.get(":build:compiler", "gcc")
 %% if core.startswith("cortex-m")
 C_PREFIX := arm-none-eabi-
 %% elif core.startswith("avr")
@@ -18,7 +19,9 @@ else
 %% if platform == "hosted"
 	UNAME_S := $(shell uname -s)
 	ifeq ($(UNAME_S),Darwin)
+%% if compiler == "gcc"
 		C_SUFFIX := -15
+%% endif
 		# Using homebrew include and lib paths on macOS
 		CPPDEFINES += -I/usr/local/include
 		LIBPATH += -L/usr/local/lib
@@ -26,8 +29,13 @@ else
 %% endif
 endif
 
+%% if compiler == "clang"
+CC := $(C_PREFIX)clang$(C_SUFFIX)
+CXX := $(C_PREFIX)clang++$(C_SUFFIX)
+%% else
 CC := $(C_PREFIX)gcc$(C_SUFFIX)
 CXX := $(C_PREFIX)g++$(C_SUFFIX)
+%% endif
 ASM := $(CC)
 
 ifeq ($(C_SUFFIX),)
@@ -37,9 +45,17 @@ else
 endif
 
 _probe = $(if $(shell command -v $(1) 2>/dev/null),$(1),$(2))
+%% if compiler == "clang"
+# Lookup matching llvm tools with clang command
+_llvm = $(call _probe,$(C_PREFIX)$(1)$(C_SUFFIX),$(shell $(CC) -print-prog-name=$(1) 2>/dev/null))
+AR := $(call _probe,$(call _llvm,llvm-ar),$(C_PREFIX)ar)
+NM := $(call _probe,$(call _llvm,llvm-nm),$(C_PREFIX)nm)
+RANLIB := $(call _probe,$(call _llvm,llvm-ranlib),$(C_PREFIX)ranlib)
+%% else
 AR := $(call _probe,$(C_PREFIX)gcc-ar$(C_SUFFIX),$(C_PREFIX)ar)
 NM := $(call _probe,$(C_PREFIX)gcc-nm$(C_SUFFIX),$(C_PREFIX)nm)
 RANLIB := $(call _probe,$(C_PREFIX)gcc-ranlib$(C_SUFFIX),$(C_PREFIX)ranlib)
+%% endif
 
 OBJCOPY := $(C_PREFIX)objcopy
 OBJDUMP := $(C_PREFIX)objdump

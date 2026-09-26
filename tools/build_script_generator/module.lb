@@ -97,6 +97,12 @@ def prepare(module, options):
             PathOption(name="openocd.cfg", default="", empty_ok=True, absolute=True,
                        description=descr_openocd_cfg))
 
+    if platform in ["hosted"]:
+        module.add_option(
+            EnumerationOption(name="compiler", default="gcc",
+                              enumeration=["gcc", "clang"],
+                              description="Compiler selection"))
+
     # Queries
     module.add_query(
         EnvironmentQuery(name="source_files", factory=common_source_files))
@@ -189,7 +195,8 @@ def build(env):
         env.collect(":build:path.openocd", "modm/openocd")
 
     # Add compiler flags to metadata
-    for flag, values in common_compiler_flags("gcc", env[":target"]).items():
+    compiler = env.get(":build:compiler", "gcc")
+    for flag, values in common_compiler_flags(compiler, env[":target"]).items():
         env.collect(flag, *values)
 
     if env["lto"]:

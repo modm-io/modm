@@ -7,7 +7,8 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from os.path import join, abspath, realpath, dirname
-import sys, shutil
+import sys, shutil, subprocess
+%% set compiler = options.get(":build:compiler", "gcc")
 
 profile = env["CONFIG_BUILD_PROFILE"]
 
@@ -17,7 +18,7 @@ env["COMPILERPREFIX"] = "avr-"
 %% elif core.startswith("cortex-m")
 env["COMPILERPREFIX"] = "arm-none-eabi-"
 %% else
-%% if family == "darwin"
+%% if family == "darwin" and compiler == "gcc"
 # Using homebrew gcc on macOS instead of clang
 env["COMPILERSUFFIX"] = next(c[3:] for c in ["gcc-15", "gcc-14"] if shutil.which(c) is not None)
 %% endif
@@ -29,8 +30,15 @@ suffix = env.get("COMPILERSUFFIX", "")
 if suffix != "" and not suffix.startswith("-"):
     suffix = "-" + suffix
 prefix = path + prefix
-env["CC"] = prefix + "gcc" + suffix
-env["CXX"] = prefix + "g++" + suffix
+compiler = "{{ compiler }}"
+if compiler == "gcc":
+    env["CC"] = prefix + "gcc" + suffix
+    env["CXX"] = prefix + "g++" + suffix
+elif compiler == "clang":
+    env["CC"] = prefix + "clang" + suffix
+    env["CXX"] = prefix + "clang++" + suffix
+else:
+    raise RuntimeError(f'Unsupported compiler: "{compiler}"')
 env["AR"] = prefix + "ar"
 env["RANLIB"] = prefix + "ranlib"
 if suffix == "":
@@ -42,6 +50,14 @@ else:
     if sys.platform != "darwin":
         env["AR"] = prefix + "gcc-ar" + suffix
         env["RANLIB"] = prefix + "gcc-ranlib" + suffix
+if compiler == "clang":
+    for var, wrapper in [("AR", "llvm-ar"), ("RANLIB", "llvm-ranlib"), ("NM", "llvm-nm")]:
+        tool = prefix + wrapper + suffix
+        if shutil.which(tool) is None and shutil.which(env["CC"]) is not None:
+            tool = subprocess.run([env["CC"], "-print-prog-name=" + wrapper],
+                                  capture_output=True, text=True).stdout.strip()
+        if shutil.which(tool) is not None:
+            env[var] = tool
 env["OBJCOPY"] = prefix + "objcopy"
 env["OBJDUMP"] = prefix + "objdump"
 env["SIZE"] = prefix + "size"
