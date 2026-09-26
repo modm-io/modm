@@ -42,7 +42,9 @@ namespace modm
 			using InputType = T::FirstType;
 			using OutputType = T::SecondType;
 
-			using OutputSignedType = std::make_signed_t<OutputType>;
+			// floating-point types are passed through unchanged
+			using OutputSignedType = typename std::conditional_t<std::is_integral_v<OutputType>,
+					std::make_signed<OutputType>, std::type_identity<OutputType>>::type;
 			using WideType = modm::WideType<OutputSignedType>;
 
 		public:
