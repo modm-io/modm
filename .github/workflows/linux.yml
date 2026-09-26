@@ -23,6 +23,17 @@ jobs:
       - name: Update lbuild
         run: |
           pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
+      - name: Install Clang 23
+        run: |
+          set -eux
+          wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc
+          . /etc/os-release
+          codename="${VERSION_CODENAME}"
+          echo "deb http://apt.llvm.org/${codename}/ llvm-toolchain-${codename}-23 main" | tee /etc/apt/sources.list.d/llvm.list
+          apt-get update
+          apt-get install -y clang-23
+          update-alternatives --install /usr/bin/clang   clang   /usr/bin/clang-23   100
+          update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-23 100
       - name: Check environment
         run: |
           env
@@ -34,6 +45,10 @@ jobs:
           scons --version
           which g++
           g++ --version
+          which clang
+          clang --version
+          which clang++
+          clang++ --version
           which arm-none-eabi-g++
           arm-none-eabi-g++ --version
           which lbuild
@@ -62,10 +77,14 @@ jobs:
         run: |
           git checkout .
           python3 tools/scripts/examples_check.py
-      - name: Hosted Unittests
+      - name: Hosted Unittests (GCC)
         if: always()
         run: |
           (cd test && make run-hosted-linux)
+      - name: Hosted Unittests (Clang)
+        if: always()
+        run: |
+          (cd test && make run-hosted-linux-clang)
       - name: Compile STM32 Unittests
         if: always()
         run: |
