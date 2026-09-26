@@ -27,6 +27,8 @@ env["COMPILERSUFFIX"] = env.Detect(["gcc-14", "gcc-15"])[3:]
 %% endif
 %% endif
 
+env["COMPILER"] = "{{ options[":build:compiler"] }}"
+
 %% if toolpaths
 # SCons tools
 env.Append(toolpath=[

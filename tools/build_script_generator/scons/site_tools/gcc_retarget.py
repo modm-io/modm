@@ -31,8 +31,13 @@ def list_symbols(env, source):
 
 
 def generate(env, **kw):
-    env.Tool('gcc')
-    env.Tool('g++')
+    compiler = env.get('COMPILER', 'gcc')
+    if compiler == 'gcc':
+        env.Tool('gcc')
+        env.Tool('g++')
+    elif compiler == 'clang':
+        env.Tool('clang')
+        env.Tool('clang++')
     env.Tool('gnulink')
     env.Tool('ar')
     env.Tool('as')
@@ -46,8 +51,15 @@ def generate(env, **kw):
         suffix = '-' + suffix
 
     prefix = path + prefix
-    env['CC'] = prefix + 'gcc' + suffix
-    env['CXX'] = prefix + 'g++' + suffix
+    if compiler == 'gcc':
+        env['CC'] = prefix + 'gcc' + suffix
+        env['CXX'] =  prefix + 'g++' + suffix
+    elif compiler == 'clang':
+        env['CC'] = prefix + 'clang' + suffix
+        env['CXX'] =  prefix + 'clang++' + suffix
+    else:
+        raise RuntimeError(f'Unsupported compiler: "{compiler}"')
+
     env['AR'] = prefix + 'ar'
     env['RANLIB'] = prefix + 'ranlib'
     if suffix == '':
