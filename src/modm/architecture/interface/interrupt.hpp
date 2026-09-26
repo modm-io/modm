@@ -108,7 +108,7 @@
 #	define MODM_ISR(vector, ...) \
 		ISR( vector ## _vect, ##__VA_ARGS__)
 
-#elif defined MODM_CPU_ARM
+#elif defined MODM_CPU_CORTEX_M
 
 
 #ifdef __cplusplus
