@@ -163,6 +163,7 @@ def prepare(module, options):
     module.depends(":architecture:atomic",
                    ":architecture:clock",
                    ":architecture:ethernet",
+                   ":architecture:fiber",
                    ":architecture:interrupt",
                    ":architecture:register",
                    ":architecture:assert",
@@ -170,7 +171,6 @@ def prepare(module, options):
                    ":platform:gpio",
                    ":platform:id",
                    ":platform:rcc",
-                   ":processing:fiber",
                    ":math:utils")
 
     return True
