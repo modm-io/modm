@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <options>
+    <option name="modm:build:build.path">../../build/generated-unittest/hosted-clang/</option>
+    <option name="modm:build:compiler">clang</option>
+    <option name="modm:build:unittest.source">../../build/generated-unittest/hosted-clang/modm-test</option>
+  </options>
+  <modules>
+    <module>modm:platform:core</module>
+    <module>modm:driver:terminal</module>
+    <module>modm-test:test:**</module>
+  </modules>
+</library>
