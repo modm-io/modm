@@ -22,6 +22,8 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 MODM_PATH := {{modm_path}}
+MAKEFLAGS += --no-builtin-rules
+.SUFFIXES:
 %% if is_unittest
 unittest_runner.cpp:
 	@$(PYTHON3) -m modm_tools.unit_test {{ unittest_source }}
