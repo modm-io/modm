@@ -22,7 +22,25 @@
 #define LWIP_NETIF_API                  0
 
 // Application overrides are included before optional protocol defaults.
-#include <modm_lwip_tuning.h>
+#if __has_include(<lwipopts_local.h>)
+#	include <lwipopts_local.h>
+#endif
+
+#ifndef MEM_ALIGNMENT
+#define MEM_ALIGNMENT                   {{lwip_mem_alignment}}
+#endif
+#ifndef MEM_SIZE
+#define MEM_SIZE                        (32 * 1024)
+#endif
+#ifndef TCP_MSS
+#define TCP_MSS                         1460
+#endif
+#ifndef TCP_SND_BUF
+#define TCP_SND_BUF                     (4 * TCP_MSS)
+#endif
+#ifndef TCP_LISTEN_BACKLOG
+#define TCP_LISTEN_BACKLOG              1
+#endif
 
 #ifndef LWIP_IPV6
 #define LWIP_IPV6                       0

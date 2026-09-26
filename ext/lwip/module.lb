@@ -16,9 +16,17 @@ def init(module):
 # lwIP Callback API
 
 lwIP 2.2.1 configured for `NO_SYS=1`. IPv4, Ethernet, ARP, ICMP, UDP, and TCP
-are enabled by default. Optional callback API protocols and resource sizes can
-be selected in an application tuning header. Sequential netconn and socket APIs
-are not included.
+are enabled by default. Sequential netconn and socket APIs are not included.
+
+Optional callback API protocols and resource sizes can be selected by defining
+a `<lwipopts_local.h>` file, which is included automatically if it is found on
+the application include path. For example:
+
+```c
+#define MEM_SIZE        (64 * 1024)
+#define TCP_SND_BUF     (8 * TCP_MSS)
+#define LWIP_DHCP       1
+```
 
 Applications must hold `modm::lwip::LwIPSingleThreadGuard` while calling lwIP APIs.
 
@@ -55,11 +63,6 @@ def prepare(module, options):
             name="ip.fragmentation",
             description="Enable outgoing IPv4 fragmentation.",
             default=True))
-    module.add_option(
-        StringOption(
-            name="tuning.header",
-            description="Optional resource and protocol tuning header on the application include path.",
-            default=""))
     module.depends(":architecture:clock", ":architecture:assert",
                    ":architecture:interrupt", ":debug", ":stdc++")
     return True
@@ -76,7 +79,6 @@ def build(env):
         "lwip_stats": env["stats"],
         "lwip_checksum": env["checksum"],
         "lwip_ip_fragmentation": env["ip.fragmentation"],
-        "lwip_tuning_header": env["tuning.header"],
         # Required allocation alignment for the target ABI.
         "lwip_mem_alignment": 8 if target.platform == "hosted" else 4,
     }
@@ -90,7 +92,6 @@ def build(env):
     env.copy("lwip/src/include", "include")
     env.template("port/include/arch/cc.h.in", "port/include/arch/cc.h")
     env.template("port/include/lwipopts.h.in", "port/include/lwipopts.h")
-    env.template("port/include/modm_lwip_tuning.h.in", "port/include/modm_lwip_tuning.h")
     env.copy("port/sys_now.cpp", "port/sys_now.cpp")
     env.copy("port/platform.cpp", "port/platform.cpp")
     env.copy("port/single_thread_guard.cpp", "port/single_thread_guard.cpp")
