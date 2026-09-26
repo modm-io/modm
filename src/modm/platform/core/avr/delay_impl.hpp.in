@@ -12,6 +12,7 @@
 #pragma once
 
 /// @cond
+#include <math.h>
 #include <util/delay.h>
 #include <modm/architecture/utils.hpp>
 
