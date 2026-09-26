@@ -12,6 +12,10 @@
 #include <cstdint>
 #include <bits/functexcept.h>
 
+#if __GNUC__ < 14
+#error "The AVR C++ standard library requires avr-gcc 14 or newer!"
+#endif
+
 %% if options["assert_on_exception"]
 #include <modm/architecture/interface/assert.hpp>
 
@@ -45,6 +49,14 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
 	{ __modm_stdcpp_failure("out_of_range"); }
 
 	void
+	__throw_out_of_range_fmt(const char* __s __attribute__((unused)), ...)
+	{ __modm_stdcpp_failure("out_of_range"); }
+
+	void
+	__throw_bad_array_new_length()
+	{ __modm_stdcpp_failure("bad_array_new_length"); }
+
+	void
 	__throw_runtime_error(const char* __s __attribute__((unused)))
 	{ __modm_stdcpp_failure("runtime_error"); }
 
@@ -61,20 +73,8 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
 	{ __modm_stdcpp_failure("underflow_error"); }
 
 	void
-	__throw_bad_optional_access()
-	{ __modm_stdcpp_failure("bad_optional"); }
-
-	void
-	__throw_bad_variant_access(const char* __s __attribute__((unused)))
-	{ __modm_stdcpp_failure("bad_variant"); }
-
-	void
 	__throw_bad_function_call()
 	{ __modm_stdcpp_failure("bad_function_call"); }
-
-	void
-	__throw_bad_any_cast()
-	{ __modm_stdcpp_failure("bad_any_cast"); }
 
 	void
 	__throw_system_error(int errc __attribute__((unused)))

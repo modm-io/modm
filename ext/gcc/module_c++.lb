@@ -35,8 +35,11 @@ The `std::atomic` interface is implemented for the AVR and Cortex-M devices.
 
 ## AVR
 
-A partial port of GCC libstdc++ is provided:
-See https://github.com/modm-io/avr-libstdcpp.
+The libstdc++ headers of GCC 15 are provided, adapted for avr-libc, which
+require avr-gcc 14 or 15. However, only a few sources of the compiled library
+are included. Therefore anything that requires the compiled library, like I/O
+streams, locales and `<format>`, will fail to link.
+See https://github.com/modm-io/avr-libstdcpp for details.
 """
 
 
@@ -112,8 +115,11 @@ def build(env):
     env.template("atomic.cpp.in", filters=filters)
 
     if is_avr:
+        # Only the header set for avr-gcc 14 and 15 is used, modm provides its
+        # own runtime (new/delete, C++ ABI and atomics).
         env.collect(":build:path.include", "modm/ext/gcc/libstdc++/include")
-        env.copy("libstdc++", ignore=env.ignore_files("*.lb", "*.md", "*.in", "examples"))
+        env.copy("libstdc++/gcc15/include", "libstdc++/include")
+        env.copy("libstdc++/gcc15/src", "libstdc++/src")
         env.template("assert.cpp.in", "assert.cpp")
 
     env.outbasepath = "modm/ext/gcc"
