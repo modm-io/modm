@@ -1,0 +1,292 @@
+/*
+ * Copyright (c) 2026, LucaFeggi
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_STM32H5_ADC_HPP
+#define MODM_STM32H5_ADC_HPP
+
+#include <cstddef>
+#include <cstdint>
+#include <span>
+#include "../device.hpp"
+#include <modm/architecture/interface/adc.hpp>
+#include <modm/architecture/interface/delay.hpp>
+#include <modm/platform/clock/rcc.hpp>
+#include <modm/platform/dma/dma.hpp>
+#include <modm/platform/gpio/connector.hpp>
+
+namespace modm::platform
+{
+
+/** ADC1/ADC2 on STM32H562/563/573. Clock mode is shared by both ADCs.
+ * The caller configures the RCC ADCDAC kernel clock before selecting an
+ * asynchronous mode and keeps DMA buffers in accessible SRAM.
+ * @author LucaFeggi
+ * @ingroup modm_platform_adc
+ */
+template <uint8_t Instance>
+class AdcH5 : public modm::Adc
+{
+	static_assert(Instance == 1 or Instance == 2);
+
+	static ADC_TypeDef *
+	registers()
+	{
+		if constexpr (Instance == 1) return ADC1;
+		else return ADC2;
+	}
+
+public:
+	static constexpr uint8_t Resolution = 12;
+	enum class ResolutionMode : uint32_t {
+		Bits12 = 0, Bits10 = ADC_CFGR_RES_0,
+		Bits8 = ADC_CFGR_RES_1, Bits6 = ADC_CFGR_RES,
+	};
+	enum class Channel : uint8_t {
+%% for channel in range(18)
+		Channel{{ channel }} = {{ channel }},
+%% endfor
+	};
+	// ADC1: channel 16 is temperature, 17 is Vrefint.
+	// ADC2: channel 16 is VBAT/4, 17 is VDDCORE.
+	enum class ClockSource : uint32_t {
+		Hclk = 0, SystemClock = RCC_CCIPR5_ADCDACSEL_0,
+		Pll2R = RCC_CCIPR5_ADCDACSEL_1,
+		Hse = RCC_CCIPR5_ADCDACSEL_1 | RCC_CCIPR5_ADCDACSEL_0,
+		Hsi = RCC_CCIPR5_ADCDACSEL_2,
+		Csi = RCC_CCIPR5_ADCDACSEL_2 | RCC_CCIPR5_ADCDACSEL_0,
+	};
+	enum class ClockMode : uint32_t {
+		Asynchronous = 0,
+		SynchronousDiv1 = ADC_CCR_CKMODE_0,
+		SynchronousDiv2 = ADC_CCR_CKMODE_1,
+		SynchronousDiv4 = ADC_CCR_CKMODE,
+	};
+	enum class Prescaler : uint8_t {
+		Div1 = 0, Div2 = 1, Div4 = 2, Div6 = 3,
+		Div8 = 4, Div10 = 5, Div12 = 6, Div16 = 7,
+		Div32 = 8, Div64 = 9, Div128 = 10, Div256 = 11,
+	};
+	enum class SampleTime : uint8_t {
+		Cycles2_5 = 0, Cycles6_5 = 1, Cycles12_5 = 2, Cycles24_5 = 3,
+		Cycles47_5 = 4, Cycles92_5 = 5, Cycles247_5 = 6, Cycles640_5 = 7,
+	};
+	enum class DmaMode : uint32_t {
+		Disabled = 0, OneShot = ADC_CFGR_DMAEN,
+		Circular = ADC_CFGR_DMAEN | ADC_CFGR_DMACFG,
+	};
+	enum class TriggerEdge : uint8_t {
+		Software = 0, Rising = 1, Falling = 2, Both = 3,
+	};
+	enum class OversamplingRatio : uint8_t {
+		X2 = 0, X4 = 1, X8 = 2, X16 = 3,
+		X32 = 4, X64 = 5, X128 = 6, X256 = 7,
+	};
+	enum class InterruptFlag : uint32_t {
+		Ready = ADC_ISR_ADRDY, EndOfConversion = ADC_ISR_EOC,
+		EndOfSequence = ADC_ISR_EOS, Overrun = ADC_ISR_OVR,
+		InjectedEndOfConversion = ADC_ISR_JEOC,
+		InjectedEndOfSequence = ADC_ISR_JEOS,
+		Watchdog1 = ADC_ISR_AWD1, Watchdog2 = ADC_ISR_AWD2,
+		Watchdog3 = ADC_ISR_AWD3,
+	};
+	using InterruptHandler = void (*)(uint32_t flags);
+	static inline InterruptHandler handler = nullptr;
+
+	template <class... Signals>
+	static void
+	connect();
+
+	template <class Gpio>
+	static constexpr Channel
+	getPinChannel();
+
+	template <class Gpio>
+	static bool
+	setPinChannel(SampleTime sampleTime = SampleTime::Cycles2_5);
+
+	/** Select one regular channel for the basic modm ADC interface. */
+	static bool
+	setChannel(Channel channel, SampleTime sampleTime = SampleTime::Cycles2_5);
+
+	static uint8_t
+	getChannel();
+
+	static uint16_t getValue() { return read(); }
+	static bool enableFreeRunningMode() { return setContinuous(true); }
+	static bool disableFreeRunningMode() { return setContinuous(false); }
+	static bool setLeftAdjustResult() { return setLeftAlignment(true); }
+	static bool setRightAdjustResult() { return setLeftAlignment(false); }
+
+	/** Read one channel with a polling budget. The ADC must use a software
+	 * trigger, with regular DMA and continuous mode disabled. A timeout leaves
+	 * the conversion armed; call disable() before reconfiguring it. The channel's
+	 * sample time is preserved; set it before calling this function.
+	 */
+	static bool
+	readChannel(Channel channel, uint16_t &value, uint32_t timeout = 100'000);
+
+	/** Basic modm API. Use the status-returning overload to detect failure. */
+	static uint16_t
+	readChannel(Channel channel);
+
+	/** Select the shared ADC/DAC kernel clock before enabling either ADC. */
+	static bool
+	setKernelClock(ClockSource source);
+
+	/** Enable the ADC regulator, calibrate both modes, and wait for ADRDY.
+	 * The selected common clock must be within the data sheet ADC limit.
+	 * This function leaves the shared ADC clock enabled for the other ADC.
+	 */
+	static bool
+	initialize(ClockMode clockMode, Prescaler prescaler = Prescaler::Div1,
+			uint32_t timeout = 100'000);
+
+	static bool
+	calibrate(bool differential = false, uint32_t timeout = 100'000);
+
+	static bool
+	disable(uint32_t timeout = 100'000);
+
+	static bool isReady() { return registers()->ISR & ADC_ISR_ADRDY; }
+	static bool
+	setResolution(ResolutionMode resolution);
+
+	static bool
+	setLeftAlignment(bool left);
+
+	/** Preserve the old sample when false; overwrite it when true. */
+	static bool
+	setOverrunOverwrite(bool overwrite);
+
+	/** Differential input mode is available on channels 1 through 15. */
+	static bool
+	setDifferential(Channel channel, bool enabled);
+	static uint32_t getInterruptFlags() { return registers()->ISR; }
+	static void acknowledgeInterruptFlags(uint32_t flags) { registers()->ISR = flags; }
+	static void enableInterrupts(uint32_t flags) { registers()->IER |= flags; }
+	static void disableInterrupts(uint32_t flags) { registers()->IER &= ~flags; }
+	static void enableInterruptVector() { NVIC_EnableIRQ(Instance == 1 ? ADC1_IRQn : ADC2_IRQn); }
+	static void disableInterruptVector() { NVIC_DisableIRQ(Instance == 1 ? ADC1_IRQn : ADC2_IRQn); }
+	static void setInterruptHandler(InterruptHandler callback) { handler = callback; }
+	static void interruptHandler()
+	{
+		const uint32_t flags = registers()->ISR & registers()->IER;
+		if (flags != 0) {
+			registers()->ISR = flags;
+			if (handler != nullptr) handler(flags);
+		}
+	}
+
+	/** Configure a regular channel while no conversion is running. */
+	static bool
+	setSampleTime(Channel channel, SampleTime sampleTime);
+
+	static bool
+	setSequence(std::span<const Channel> channels);
+
+	static bool
+	setInjectedSequence(std::span<const Channel> channels);
+
+	static bool
+	setInjectedTrigger(uint8_t selection, TriggerEdge edge);
+
+	static bool
+	startInjectedConversion();
+
+	static uint16_t
+	readInjected(uint8_t rank);
+
+	static bool
+	setDmaMode(DmaMode mode);
+
+	template <class DmaChannel>
+	static bool
+	configureDma(std::span<uint16_t> destination, DmaMode mode = DmaMode::OneShot);
+
+	/** Circular sampling requires a persistent node and buffer in DMA-accessible
+	 * SRAM. Stop the channel before either object leaves scope or is reused.
+	 */
+	template <class DmaChannel>
+	static bool
+	configureCircularDma(std::span<uint16_t> destination, DmaBase::LinearNode &node);
+
+	/** Arm DMA before starting or waiting for the selected conversion trigger. */
+	template <class DmaChannel>
+	static bool
+	startDmaConversion();
+
+	static bool
+	setTrigger(uint8_t selection, TriggerEdge edge);
+
+	static bool setContinuous(bool enable)
+	{
+		if (registers()->CR & ADC_CR_ADSTART) return false;
+		if (enable) registers()->CFGR |= ADC_CFGR_CONT;
+		else registers()->CFGR &= ~ADC_CFGR_CONT;
+		return true;
+	}
+
+	static bool
+	setOversampling(OversamplingRatio ratio, uint8_t shift);
+	static void disableOversampling() { registers()->CFGR2 &= ~ADC_CFGR2_ROVSE; }
+
+	static bool
+	setWatchdog1(uint16_t low, uint16_t high, Channel channel);
+
+	/** Watchdogs 2 and 3 compare the most significant eight result bits. */
+	static bool
+	setWatchdog(uint8_t unit, uint8_t low, uint8_t high, uint32_t channelMask);
+
+	/** Apply one of four signed offsets to a selected channel. */
+	static bool
+	setOffset(uint8_t slot, Channel channel, int16_t offset, bool saturate = false);
+
+	static void enableInternalReference(bool enable)
+	{
+		static_assert(Instance == 1, "Vrefint is connected to ADC1");
+		if (enable) {
+			ADC12_COMMON->CCR |= ADC_CCR_VREFEN;
+			modm::delay_us(12);
+		}
+		else ADC12_COMMON->CCR &= ~ADC_CCR_VREFEN;
+	}
+	static void enableTemperatureSensor(bool enable)
+	{
+		static_assert(Instance == 1, "Temperature sensor is connected to ADC1");
+		if (enable) {
+			ADC12_COMMON->CCR |= ADC_CCR_TSEN;
+			modm::delay_us(26);
+		}
+		else ADC12_COMMON->CCR &= ~ADC_CCR_TSEN;
+	}
+	static void enableBatteryMonitor(bool enable)
+	{
+		static_assert(Instance == 2, "VBAT/4 is connected to ADC2");
+		if (enable) ADC12_COMMON->CCR |= ADC_CCR_VBATEN;
+		else ADC12_COMMON->CCR &= ~ADC_CCR_VBATEN;
+	}
+
+	static bool
+	startConversion();
+	static bool isConversionFinished() { return registers()->ISR & ADC_ISR_EOC; }
+	static uint16_t read() { return uint16_t(registers()->DR); }
+	static uintptr_t dataRegisterAddress() { return reinterpret_cast<uintptr_t>(&registers()->DR); }
+};
+
+%% for instance in instances
+using Adc{{ instance }} = AdcH5<{{ instance }}>;
+%% endfor
+
+} // namespace modm::platform
+
+#include "adc_impl.hpp"
+
+#endif // MODM_STM32H5_ADC_HPP

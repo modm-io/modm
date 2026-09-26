@@ -403,7 +403,7 @@ public:
 		Csi   = 0b100,
 		Hse   = 0b101
 	};
-%% for id in spi_ids | sort if id in [1,2,3]
+%% for id in spi_ids | sort if id in [4,5,6]
 	static inline void
 	setSpi{{id}}ClockSource(Spi456ClockSource src)
 	{

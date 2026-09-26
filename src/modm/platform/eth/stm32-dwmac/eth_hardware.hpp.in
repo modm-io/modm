@@ -1,0 +1,138 @@
+/*
+ * Copyright (c) 2026, Luca Feggi
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <array>
+#include <cstddef>
+#include <cstdint>
+#include <modm/architecture/interface/ethernet.hpp>
+
+#include "../device.hpp"
+
+namespace modm::platform::stm32::dwmac
+{
+
+struct DmaMemoryRegion
+{
+	uintptr_t begin;
+	uintptr_t end;
+};
+
+class EthernetHardware
+{
+public:
+	static constexpr std::array<DmaMemoryRegion, {{ dma_memories | length }}> DmaMemoryRegions{{ "{" }}
+%% for memory in dma_memories
+		DmaMemoryRegion{0x{{ "%08x" | format(memory.start) }}u, 0x{{ "%08x" | format(memory.end) }}u}, // {{ memory.name }}
+%% endfor
+	{{ "}" }};
+
+	static bool
+	isDmaAccessible(const void* pointer, std::size_t size)
+	{
+		if (pointer == nullptr || size == 0) return false;
+		const auto begin = reinterpret_cast<uintptr_t>(pointer);
+		for (const auto& region : DmaMemoryRegions)
+		{
+			if (begin >= region.begin && begin < region.end && size <= region.end - begin)
+				return true;
+		}
+		return false;
+	}
+
+	static uint32_t
+	dmaAddress(const void* pointer)
+	{ return static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pointer)); }
+
+	template<ethernet::MediaInterface Interface>
+	static void
+	selectMediaInterface()
+	{
+%% if target.family == "h7"
+		RCC->APB4ENR |= RCC_APB4ENR_SYSCFGEN;
+		__DSB();
+		SYSCFG->PMCR = (SYSCFG->PMCR & ~SYSCFG_PMCR_EPIS_SEL) |
+			(Interface == ethernet::MediaInterface::Rmii ? SYSCFG_PMCR_EPIS_SEL_2 : 0u);
+		(void)SYSCFG->PMCR;
+%% elif target.family == "h5"
+		RCC->APB3ENR |= RCC_APB3ENR_SBSEN;
+		__DSB();
+		SBS->PMCR = (SBS->PMCR & ~SBS_PMCR_ETH_SEL_PHY) |
+			(Interface == ethernet::MediaInterface::Rmii ? SBS_PMCR_ETH_SEL_PHY_2 : 0u);
+		(void)SBS->PMCR;
+%% endif
+	}
+};
+
+/** Cache policy for application storage mapped as non-cacheable memory. */
+struct Stm32NonCacheablePolicy
+{
+	static void
+	clean(const void*, std::size_t)
+	{}
+	static void
+	invalidate(void*, std::size_t)
+	{}
+	static void
+	cleanInvalidate(void*, std::size_t)
+	{}
+	static void
+	dataMemoryBarrier()
+	{ __DMB(); }
+	static void
+	dataSyncBarrier()
+	{ __DSB(); }
+};
+
+%% if target.family == "h7" and target.core != "m4"
+/** Cortex-M7 write-back D-cache maintenance policy. */
+struct Stm32DCachePolicy
+{
+	static void
+	clean(const void* pointer, std::size_t size)
+	{
+		if (dataCacheEnabled())
+			SCB_CleanDCache_by_Addr(const_cast<void*>(pointer), static_cast<int32_t>(size));
+	}
+
+	static void
+	invalidate(void* pointer, std::size_t size)
+	{
+		if (dataCacheEnabled()) SCB_InvalidateDCache_by_Addr(pointer, static_cast<int32_t>(size));
+	}
+
+	static void
+	cleanInvalidate(void* pointer, std::size_t size)
+	{
+		if (dataCacheEnabled())
+			SCB_CleanInvalidateDCache_by_Addr(pointer, static_cast<int32_t>(size));
+	}
+
+	static void
+	dataMemoryBarrier()
+	{ __DMB(); }
+	static void
+	dataSyncBarrier()
+	{ __DSB(); }
+
+private:
+	static bool
+	dataCacheEnabled()
+	{ return (SCB->CCR & SCB_CCR_DC_Msk) != 0; }
+};
+
+using DefaultEthernetCachePolicy = Stm32DCachePolicy;
+%% else
+using DefaultEthernetCachePolicy = Stm32NonCacheablePolicy;
+%% endif
+
+}  // namespace modm::platform::stm32::dwmac
