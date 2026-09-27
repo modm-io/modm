@@ -30,20 +30,38 @@ jobs:
         run: |
           mkdocs --version
           pip3 show mkdocs-material
+      - name: Clone modm-ext/modm.dev repository
+        uses: actions/checkout@v4
+        with:
+          repository: modm-ext/modm.dev
+          ssh-key: ${{secrets.MODM_EXT_MODM_DEV_DEPLOY_KEY}}
+          path: docs/modm.dev
+      - name: Build Homepage
+        run: |
+          rm -rf docs/modm.dev/docs/*
+          python3 tools/scripts/synchronize_docs.py
+          python3 tools/scripts/generate_module_docs.py
+          (cd docs && mkdocs build)
+      - name: Push New Docs to Github
+        run: |
+          cd docs/modm.dev
+          git config user.email "bot@modm.io"
+          git config user.name "modm bot"
+          git add -A
+          git diff-index --quiet HEAD || git commit -m "Update"
+          git push origin master
+      # TODO: Remove once modm.io redirects to modm.dev
       - name: Clone modm-ext/modm.io repository
         uses: actions/checkout@v4
         with:
           repository: modm-ext/modm.io
           ssh-key: ${{secrets.MODM_EXT_MODM_IO_DEPLOY_KEY}}
           path: docs/modm.io
-      - name: Build Homepage
+      - name: Push New Docs to modm.io
         run: |
-          rm -rf docs/modm.io/docs/*
-          python3 tools/scripts/synchronize_docs.py
-          python3 tools/scripts/generate_module_docs.py
-          (cd docs && mkdocs build)
-      - name: Push New Docs to Github
-        run: |
+          rm -rf docs/modm.io/docs
+          cp -r docs/modm.dev/docs docs/modm.io/docs
+          echo "modm.io" > docs/modm.io/docs/CNAME
           cd docs/modm.io
           git config user.email "bot@modm.io"
           git config user.name "modm bot"

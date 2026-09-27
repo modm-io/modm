@@ -177,7 +177,7 @@ authors = extract(readme, "authors").replace("\\@", "@")
 # remove html comments
 readme = re.sub(r"((<!--webignore-->.*?<!--/webignore-->)|(<!--links-->.*?<!--/links-->))\n", "", readme, flags=re.DOTALL | re.MULTILINE)
 readme = re.sub(r"<!--.*?-->", "", readme)
-readme = readme.replace("https://modm.io", "")
+readme = readme.replace("https://modm.io", "").replace("https://modm.dev", "")
 
 index = Environment().from_string(index_in_path.read_text()).render({"content": readme, "links": links, "example_table": example_table})
 index_path.write_text(index)

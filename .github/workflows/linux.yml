@@ -462,7 +462,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-homepage-test
-          path: docs/modm.io
+          path: docs/modm.dev
       # FIXME: Allow localhost:port to work with Docker
       # - name: Check Homepage
       #   run: |
