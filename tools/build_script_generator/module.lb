@@ -99,11 +99,6 @@ def prepare(module, options):
             EnumerationOption(name="compiler", default="gcc",
                               enumeration=["gcc", "clang"],
                               description="Compiler selection"))
-    else:
-        module.add_option(
-            EnumerationOption(name="compiler", default="gcc",
-                              enumeration=["gcc"],
-                              description="Compiler selection"))
 
     # Queries
     module.add_query(
@@ -194,7 +189,7 @@ def build(env):
         env.collect(":build:path.openocd", "modm/openocd")
 
     # Add compiler flags to metadata
-    compiler = env.get("compiler", "gcc")
+    compiler = env.get(":build:compiler", "gcc")
     for flag, values in common_compiler_flags(compiler, env[":target"]).items():
         env.collect(flag, *values)
 

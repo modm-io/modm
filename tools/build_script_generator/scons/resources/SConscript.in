@@ -21,13 +21,13 @@ env["COMPILERPREFIX"] = "avr-"
 %% elif core.startswith("cortex-m")
 env["COMPILERPREFIX"] = "arm-none-eabi-"
 %% endif
-%% if family == "darwin" and options[":build:compiler"] == "gcc"
+%% if family == "darwin" and options.get(":build:compiler", "gcc") == "gcc"
 # Using homebrew gcc on macOS instead of clang
 env["COMPILERSUFFIX"] = env.Detect(["gcc-14", "gcc-15"])[3:]
 %% endif
 %% endif
 
-env["COMPILER"] = "{{ options[":build:compiler"] }}"
+env["COMPILER"] = "{{ options.get(":build:compiler", "gcc") }}"
 
 %% if toolpaths
 # SCons tools
