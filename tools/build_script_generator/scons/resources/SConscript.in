@@ -21,7 +21,7 @@ env["COMPILERPREFIX"] = "avr-"
 %% elif core.startswith("cortex-m")
 env["COMPILERPREFIX"] = "arm-none-eabi-"
 %% endif
-%% if family == "darwin"
+%% if family == "darwin" and options[":build:compiler"] == "gcc"
 # Using homebrew gcc on macOS instead of clang
 env["COMPILERSUFFIX"] = env.Detect(["gcc-14", "gcc-15"])[3:]
 %% endif
