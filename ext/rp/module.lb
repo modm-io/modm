@@ -40,7 +40,8 @@ def build(env):
 
     if env.has_module(":tinyusb"):
         env.substitutions = {
-            "with_debug": env.has_module(":debug")
+            "with_debug": env.has_module(":debug"),
+            "with_multicore": env.has_module(":platform:multicore"),
         }
         env.copy("pico.h")
         env.template("pico.cpp.in", "pico.cpp")
@@ -48,6 +49,7 @@ def build(env):
         env.copy("timer.h", "hardware/timer.h")
         env.copy("resets.h", "hardware/resets.h")
         env.copy("sync.h", "hardware/sync.h")
+        env.copy("critical_section.h", "pico/critical_section.h")
 
     env.substitutions = {
         "headers": headers,

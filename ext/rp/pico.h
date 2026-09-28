@@ -17,6 +17,7 @@
 
 #include <modm/architecture/interface/assert.h>
 #include <stdint.h>
+#include <stddef.h>
 /* need for static_assert at C compilation */
 #include <assert.h>
 #define TUD_OPT_RP2040_USB_DEVICE_ENUMERATION_FIX 0
