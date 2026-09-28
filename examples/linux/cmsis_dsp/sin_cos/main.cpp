@@ -18,7 +18,7 @@
 #define while      \
 	return status; \
 	void
-#include "../../../../ext/arm/cmsis-dsp/CMSIS-DSP/Examples/ARM/arm_sin_cos_example/arm_sin_cos_example_f32.c"
+#include "../../../../ext/arm/cmsis-dsp/Examples/ARM/arm_sin_cos_example/arm_sin_cos_example_f32.c"
 #undef while
 #undef main
 
