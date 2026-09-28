@@ -78,7 +78,7 @@ void my_touchpad_read(lv_indev_t*, lv_indev_data_t* data)
 void disp_flush(lv_display_t* disp, const lv_area_t* area, uint8_t* px_map)
 {
 	tftController.drawRaw(
-		{area->x1, area->y1},
+		{int16_t(area->x1), int16_t(area->y1)},
 		(area->x2 - area->x1 +1),
 		(area->y2 - area->y1 + 1),
 		(modm::color::Rgb565*)px_map);
