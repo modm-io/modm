@@ -317,6 +317,8 @@ Configuration options:
 
         classes = {(p.parent.name, p.name.replace("_host.c", ""))
                    for p in Path(localpath("tinyusb/src/class/")).glob("*/*_host.c")}
+        # vendor_host.c is unmaintained upstream and does not compile
+        classes.discard(("vendor", "vendor"))
         for parent, name in classes:
             module.add_submodule(TinyUsbClassModule(parent, name, "host"))
         module.depends(":architecture:clock")
@@ -379,8 +381,6 @@ class TinyUsbClassModule(Module):
         if self.mode == "device":
             if self.name == "cdc":
                 module.depends(":architecture:uart")
-            if self.name == "midi":
-                module.depends(":tinyusb:device:audio")
         module.depends(":tinyusb")
         return True
 
@@ -398,7 +398,8 @@ class TinyUsbClassModule(Module):
         global tusb_config
         cfg_name = f"CFG_TU{self.mode[0].upper()}_{self.name.upper()}"
         if "DFU_RT" in cfg_name: cfg_name = cfg_name.replace("_RT", "_RUNTIME")
-        tusb_config[cfg_name] = env[":tinyusb:config"].count(f"{self.mode}.{self.name}")
+        # Classes in the descriptor config are counted, otherwise enable one instance
+        tusb_config[cfg_name] = max(1, env[":tinyusb:config"].count(f"{self.mode}.{self.name}"))
         is_hs = env.get(":tinyusb:max-speed", "full") == "high"
 
         if self.mode == "device":
