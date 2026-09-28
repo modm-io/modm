@@ -17,12 +17,12 @@
 #include <stdint.h>
 #include "nrf.h"
 
-typedef uint32_t nrf_clock_hfclk_t;
+typedef uint32_t nrf_clock_domain_t;
 typedef uint32_t nrf_clock_event_t;
 typedef uint32_t nrf_clock_task_t;
 
-#ifndef NRF_CLOCK_HFCLK_HIGH_ACCURACY
-#define NRF_CLOCK_HFCLK_HIGH_ACCURACY 1u
+#ifndef NRF_CLOCK_DOMAIN_HFCLK
+#define NRF_CLOCK_DOMAIN_HFCLK 1u
 #endif
 
 #ifndef NRF_CLOCK_EVENT_HFCLKSTARTED
@@ -38,9 +38,9 @@ typedef uint32_t nrf_clock_task_t;
 #endif
 
 static inline bool
-nrf_clock_hf_is_running(NRF_CLOCK_Type const * p_reg, nrf_clock_hfclk_t source)
+nrf_clock_is_running(NRF_CLOCK_Type const * p_reg, nrf_clock_domain_t domain, void * p_clk_src)
 {
-	(void)source;
+	(void)domain; (void)p_clk_src;
 #if defined(CLOCK_HFCLKSTAT_STATE_Msk)
 	return (p_reg->HFCLKSTAT & CLOCK_HFCLKSTAT_STATE_Msk) != 0u;
 #elif defined(CLOCK_HFCLKSTAT_HFCLKRUN_Msk)
