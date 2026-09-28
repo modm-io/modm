@@ -103,7 +103,7 @@ which will be included at the very *beginning* of the modm-generated
 // Overwrite the modm default
 #define CFG_TUD_CDC_TX_BUFSIZE 1024
 // Overwrite the TinyUSB default
-#define CFG_TUD_CDC_EP_BUFSIZE 1024
+#define CFG_TUD_CDC_RX_EPSIZE 1024
 ```
 
 You can also replace the following weakly linked descriptor functions and
