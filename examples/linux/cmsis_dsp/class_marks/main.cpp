@@ -19,7 +19,7 @@
 #define while                \
 	return ARM_MATH_SUCCESS; \
 	void  // has no status variable
-#include "../../../../ext/arm/cmsis-dsp/CMSIS-DSP/Examples/ARM/arm_class_marks_example/arm_class_marks_example_f32.c"
+#include "../../../../ext/arm/cmsis-dsp/Examples/ARM/arm_class_marks_example/arm_class_marks_example_f32.c"
 #undef while
 #undef main
 #undef std

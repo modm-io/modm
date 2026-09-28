@@ -26,11 +26,6 @@
 #ifndef _ARM_MATH_H
 #define _ARM_MATH_H
 
-#ifdef   __cplusplus
-extern "C"
-{
-#endif
-
 %% if is_cortex_m
 #include <modm/platform/device.hpp>
 %% endif
@@ -49,9 +44,5 @@ extern "C"
 %% for include in includes | sort
 #include "dsp/{{include}}_functions.h"
 %% endfor
-
-#ifdef   __cplusplus
-}
-#endif
 
 #endif /* _ARM_MATH_H */

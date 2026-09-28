@@ -28,11 +28,6 @@
 
 #include "arm_math.h"
 
-#ifdef   __cplusplus
-extern "C"
-{
-#endif
-
 #include "arm_math_types_f16.h"
 
 #include "dsp/none.h"
@@ -41,10 +36,6 @@ extern "C"
 %% for include in includes | sort
 #include "dsp/{{include}}_functions_f16.h"
 %% endfor
-
-#ifdef   __cplusplus
-}
-#endif
 
 #endif /* _ARM_MATH_F16_H */
 

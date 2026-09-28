@@ -17,13 +17,13 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wsign-compare"
 #define main arm_cmsis_dsp_example
-#include "../../../../ext/arm/cmsis-dsp/CMSIS-DSP/Examples/ARM/arm_signal_converge_example/arm_signal_converge_data.c"
-#include "../../../../ext/arm/cmsis-dsp/CMSIS-DSP/Examples/ARM/arm_signal_converge_example/math_helper.c"
-#include "../../../../ext/arm/cmsis-dsp/CMSIS-DSP/Examples/ARM/arm_signal_converge_example/math_helper.h"
+#include "../../../../ext/arm/cmsis-dsp/Examples/ARM/arm_signal_converge_example/arm_signal_converge_data.c"
+#include "../../../../ext/arm/cmsis-dsp/Examples/ARM/arm_signal_converge_example/math_helper.c"
+#include "../../../../ext/arm/cmsis-dsp/Examples/ARM/arm_signal_converge_example/math_helper.h"
 #define while      \
 	return status; \
 	void
-#include "../../../../ext/arm/cmsis-dsp/CMSIS-DSP/Examples/ARM/arm_signal_converge_example/arm_signal_converge_example_f32.c"
+#include "../../../../ext/arm/cmsis-dsp/Examples/ARM/arm_signal_converge_example/arm_signal_converge_example_f32.c"
 #undef while
 #undef main
 #pragma GCC diagnostic pop
