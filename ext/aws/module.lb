@@ -114,10 +114,11 @@ def build(env):
     env.copy("{}/port.c".format(path), "freertos/port.c")
     # Copy the portmacro.h file
     env.copy("{}/portmacro.h".format(path), "freertos/inc/freertos/portmacro.h")
-    # Copy the portasm.c/.h files for CM33
-    if "CM33" in path:
+    # Copy the portasm.c/.h files for CM0 and CM33
+    if "CM0" in path or "CM33" in path:
         env.copy("{}/portasm.c".format(path), "freertos/portasm.c")
         env.copy("{}/portasm.h".format(path), "freertos/inc/freertos/portasm.h")
+    if "CM33" in path:
         env.copy("{}/portmacrocommon.h".format(path), "freertos/inc/freertos/portmacrocommon.h")
 
     # Generate the FreeRTOSConfig.h file

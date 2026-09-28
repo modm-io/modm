@@ -35,6 +35,14 @@
 #	include <FreeRTOSIPConfigLocal.h>
 #endif
 
+// Keep the single-interface IPv4 API of FreeRTOS-Plus-TCP v3
+#ifndef ipconfigIPv4_BACKWARD_COMPATIBLE
+#define ipconfigIPv4_BACKWARD_COMPATIBLE 1
+#endif
+#ifndef ipconfigUSE_IPv6
+#define ipconfigUSE_IPv6 0
+#endif
+
 #ifndef ipconfigIP_TASK_STACK_SIZE_WORDS
 #define ipconfigIP_TASK_STACK_SIZE_WORDS  (configMINIMAL_STACK_SIZE * 4)
 #endif
