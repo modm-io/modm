@@ -1,8 +1,12 @@
 #include "pico.h"
 #include "hardware/resets.h"
 #include "hardware/regs/sysinfo.h"
+#include "pico/critical_section.h"
 
 #include <modm/platform/core/resets.hpp>
+%% if with_multicore
+#include <modm/platform/core/multicore.hpp>
+%% endif
 %% if with_debug
 #include <modm/debug.hpp>
 %% endif
@@ -37,4 +41,23 @@ extern "C" uint8_t rp2040_chip_version(void)
 {
 	const uint32_t chip_id = *((const uint32_t*)(SYSINFO_BASE + SYSINFO_CHIP_ID_OFFSET));
 	return (chip_id & SYSINFO_CHIP_ID_REVISION_BITS) >> SYSINFO_CHIP_ID_REVISION_LSB;
+}
+
+extern "C" void critical_section_enter_blocking(critical_section_t *cs)
+{
+%% if with_multicore
+	cs->primask = modm::platform::multicore::SystemSpinLock::lock();
+%% else
+	cs->primask = __get_PRIMASK();
+	__disable_irq();
+%% endif
+}
+
+extern "C" void critical_section_exit(critical_section_t *cs)
+{
+%% if with_multicore
+	modm::platform::multicore::SystemSpinLock::unlock(cs->primask);
+%% else
+	__set_PRIMASK(cs->primask);
+%% endif
 }

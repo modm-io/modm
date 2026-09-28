@@ -126,6 +126,9 @@ def build(env):
             tusb_config["CFG_TUSB_MCU"] = "OPT_MCU_RP2040"
             tusb_config["TUD_OPT_RP2040_USB_DEVICE_UFRAME_FIX"] = "0"
             env.copy("tinyusb/src/portable/raspberrypi/rp2040/", "portable/raspberrypi/rp2040/")
+            # rp2040_usb.c includes both headers unconditionally
+            if not env.has_module(":tinyusb:device"): env.copy("tinyusb/src/device/dcd.h", "device/dcd.h")
+            if not env.has_module(":tinyusb:host"): env.copy("tinyusb/src/host/hcd.h", "host/hcd.h")
 
     elif target.platform == "nrf":
         tusb_config["CFG_TUSB_MCU"] = "OPT_MCU_NRF5X"
