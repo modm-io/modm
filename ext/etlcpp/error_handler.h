@@ -37,31 +37,36 @@ SOFTWARE.
 
 /* Undefine the error handlers */
 #undef ETL_ASSERT
-#undef ETL_ASSERT_AND_RETURN
-#undef ETL_ASSERT_AND_RETURN_VALUE
-#undef ETL_ALWAYS_ASSERT
-#undef ETL_ALWAYS_ASSERT_AND_RETURN
-#undef ETL_ALWAYS_ASSERT_AND_RETURN_VALUE
+#undef ETL_ASSERT_OR_RETURN
+#undef ETL_ASSERT_OR_RETURN_VALUE
+#undef ETL_ASSERT_FAIL
+#undef ETL_ASSERT_FAIL_AND_RETURN
+#undef ETL_ASSERT_FAIL_AND_RETURN_VALUE
 #undef ETL_ERROR
+#undef ETL_ERROR_WITH_VALUE
+#undef ETL_ERROR_GENERIC
 
 /* Define the error handlers to use modm_assert */
 #include <modm/architecture/interface/assert.h>
 
-#define ETL_ASSERT(b, e)                         {         modm_assert((b), "etl", (e)); }
-#define ETL_ASSERT_AND_RETURN(b, e)              { if (not modm_assert_continue_ignore((b), "etl", (e))) return; }
-#define ETL_ASSERT_AND_RETURN_VALUE(b, e, v)     { if (not modm_assert_continue_ignore((b), "etl", (e))) return (v); }
+#define ETL_ASSERT(b, e)                       do {         modm_assert((b), "etl", (e)); } while(0)
+#define ETL_ASSERT_OR_RETURN(b, e)             do { if (not modm_assert_continue_ignore((b), "etl", (e))) return; } while(0)
+#define ETL_ASSERT_OR_RETURN_VALUE(b, e, v)    do { if (not modm_assert_continue_ignore((b), "etl", (e))) return (v); } while(0)
 
-#define ETL_ALWAYS_ASSERT(e)                     ETL_ASSERT(false, e)
-#define ETL_ALWAYS_ASSERT_AND_RETURN(e)          ETL_ASSERT_AND_RETURN(false, e)
-#define ETL_ALWAYS_ASSERT_AND_RETURN_VALUE(e, v) ETL_ASSERT_AND_RETURN_VALUE(false, e, v)
+#define ETL_ASSERT_FAIL(e)                     ETL_ASSERT(false, e)
+#define ETL_ASSERT_FAIL_AND_RETURN(e)          ETL_ASSERT_OR_RETURN(false, e)
+#define ETL_ASSERT_FAIL_AND_RETURN_VALUE(e, v) ETL_ASSERT_OR_RETURN_VALUE(false, e, v)
 
 #include <modm/architecture/utils.hpp>
 
 #if defined(ETL_VERBOSE_ERRORS)
   #define ETL_ERROR(e) (__FILE__ ":" MODM_STRINGIFY(__LINE__) " -> \"" MODM_STRINGIFY(e) "\"")
+  #define ETL_ERROR_GENERIC(text) (__FILE__ ":" MODM_STRINGIFY(__LINE__) " -> \"" text "\"")
 #else
   #define ETL_ERROR(e) (MODM_STRINGIFY(__LINE__) " -> \"" MODM_STRINGIFY(e) "\"")
+  #define ETL_ERROR_GENERIC(text) (MODM_STRINGIFY(__LINE__) " -> \"" text "\"")
 #endif
+#define ETL_ERROR_WITH_VALUE(e, v) ETL_ERROR(e)
 
 #endif /* ETL_NO_CHECKS */
 
