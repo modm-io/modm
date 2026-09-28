@@ -28,6 +28,7 @@ friendly containers and algorithms.
 This module pre-configures ETL by adding these macros:
 
 - `ETL_TARGET_OS_FREERTOS`: if built together with the `modm:freertos` module.
+- `ETL_NO_CPP_NAN_SUPPORT`: on AVR, since avr-libc does not provide `fpclassify()`.
 
 To add your own configuration you can [create a `<etl_profile.h>` file][config]
 which will automatically be included by ETL.
@@ -68,7 +69,10 @@ def prepare(module, options):
 def build(env):
     env.collect(":build:path.include", "modm/ext/etl")
     env.outbasepath = "modm/ext/etl"
-    env.substitutions = {"with_freertos": env.has_module(":freertos")}
+    env.substitutions = {
+        "with_freertos": env.has_module(":freertos"),
+        "is_avr": env[":target"].identifier.platform == "avr",
+    }
 
     # Ignore the preconfigured profiles (but keep determine_ headers)
     env.copy("etl/include/etl/", dest="etl/", ignore=env.ignore_paths(

@@ -39,6 +39,10 @@ SOFTWARE.
 %% if with_freertos
 #define ETL_TARGET_OS_FREERTOS
 %% endif
+%% if is_avr
+// avr-libc does not provide fpclassify() and FP_* macros
+#define ETL_NO_CPP_NAN_SUPPORT
+%% endif
 
 // Fix gcc 10 incorrectly reporting max C++ version as 17
 #define ETL_CPP11_SUPPORTED 1
