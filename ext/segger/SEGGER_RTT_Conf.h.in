@@ -50,19 +50,13 @@
 // Non-standard useful functions
 unsigned SEGGER_RTT_GetBytesInDownBuffer(unsigned BufferIndex);
 
-// RTT lock configuration for GCC
-#if (defined(__ARM_ARCH_6M__) || defined(__ARM_ARCH_8M_BASE__))
-
-  #define SEGGER_RTT_LOCK()   { const unsigned int _SEGGER_RTT__LockState = __get_PRIMASK(); \
-                                __disable_irq();
-  #define SEGGER_RTT_UNLOCK()   __set_PRIMASK(_SEGGER_RTT__LockState); }
-
-#elif (defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) || defined(__ARM_ARCH_8M_MAIN__) || defined(__ARM_ARCH_8_1M_MAIN__))
+// RTT lock configuration for GCC: use BASEPRI_MAX so that we never lower the mask.
+// ARMv6-M and ARMv8-M Baseline use the PRIMASK lock from SEGGER_RTT_ConfDefaults.h.
+#if (defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) || defined(__ARM_ARCH_8M_MAIN__) || defined(__ARM_ARCH_8_1M_MAIN__))
 
   #define SEGGER_RTT_LOCK()   { const unsigned int _SEGGER_RTT__LockState = __get_BASEPRI(); \
                                 __set_BASEPRI_MAX(SEGGER_RTT_MAX_INTERRUPT_PRIORITY);
   #define SEGGER_RTT_UNLOCK()   __set_BASEPRI(_SEGGER_RTT__LockState); }
-  #define RTT_USE_ASM 1
 
 #endif
 
