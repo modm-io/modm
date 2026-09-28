@@ -21,6 +21,7 @@
 #include "FreeRTOS_DNS.h"
 #include "FreeRTOS_ARP.h"
 #include "NetworkBufferManagement.h"
+#include "NetworkInterface.h"
 
 #include <cstring>
 
@@ -49,6 +50,7 @@ struct ethernet
 	static InitStatus initStatus;
 	static SemaphoreHandle_t txDescriptorSemaphore;
 	static TaskHandle_t emacTaskHandle;
+	static NetworkInterface_t *interface;
 
 	static modm::platform::eth::Event_t isrEvent;
 
@@ -339,6 +341,8 @@ struct ethernet
 
 			if (accepted) {
 				currentDescriptor->xDataLength = receivedLength;
+				currentDescriptor->pxInterface = interface;
+				currentDescriptor->pxEndPoint = FreeRTOS_MatchingEndpoint(interface, buffer);
 				currentDescriptor->pxNextBuffer = 0;
 				if (not firstDescriptor)
 					firstDescriptor = currentDescriptor;
@@ -400,10 +404,8 @@ struct ethernet
 			eth::LinkStatus phyLinkStatus = EMAC::phyReadLinkStatus();
 			if (lastPhyLinkStatus != phyLinkStatus) {
 				lastPhyLinkStatus = phyLinkStatus;
-				if (phyLinkStatus == eth::LinkStatus::Down) {
-					IPStackEvent_t xRxEvent = { eNetworkDownEvent, NULL };
-					xSendEventStructToIPTask( &xRxEvent, 0 );
-				}
+				if (phyLinkStatus == eth::LinkStatus::Down)
+					FreeRTOS_NetworkDown(interface);
 				checkNeeded = true;
 			}
 
@@ -467,6 +469,7 @@ struct ethernet
 ethernet::InitStatus ethernet::initStatus = ethernet::InitStatus::Init;
 SemaphoreHandle_t ethernet::txDescriptorSemaphore { nullptr };
 TaskHandle_t ethernet::emacTaskHandle { nullptr };
+NetworkInterface_t *ethernet::interface { nullptr };
 
 modm::platform::eth::Event_t ethernet::isrEvent { modm::platform::eth::Event::None };
 
@@ -482,8 +485,8 @@ ethernet::DmaDescriptor_t *ethernet::DmaTxDescriptorToClear { nullptr };
 
 } // namespace modm
 
-extern "C" BaseType_t
-xNetworkInterfaceInitialise()
+static BaseType_t
+lan8720aInitialise(NetworkInterface_t *interface)
 {
 	using modm::ethernet;
 
@@ -495,7 +498,7 @@ xNetworkInterfaceInitialise()
 			return pdFAIL;
 		}
 
-		EMAC::setMacAddress(EMAC::MacAddressIndex::Index0, FreeRTOS_GetMACAddress());
+		EMAC::setMacAddress(EMAC::MacAddressIndex::Index0, FreeRTOS_FirstEndPoint(interface)->xMACAddress.ucBytes);
 #if (ipconfigUSE_LLMNR != 0)
 		/* Program the LLMNR address at index 1. */
 		EMAC::setMacAddress(EMAC::MacAddressIndex::Index1,
@@ -554,8 +557,8 @@ xNetworkInterfaceInitialise()
 	return pdFAIL;
 }
 
-extern "C" BaseType_t
-xNetworkInterfaceOutput(NetworkBufferDescriptor_t * const descriptor, BaseType_t releaseAfterSend)
+static BaseType_t
+lan8720aOutput(NetworkInterface_t *, NetworkBufferDescriptor_t * const descriptor, BaseType_t releaseAfterSend)
 {
 	using modm::ethernet;
 
@@ -614,10 +617,22 @@ xNetworkInterfaceOutput(NetworkBufferDescriptor_t * const descriptor, BaseType_t
 	return result;
 }
 
-extern "C"
-BaseType_t xGetPhyLinkStatus()
+static BaseType_t
+lan8720aGetPhyLinkStatus(NetworkInterface_t *)
 {
 	return EMAC::getLinkStatus() == modm::platform::eth::LinkStatus::Up ? pdTRUE : pdFALSE;
+}
+
+extern "C" NetworkInterface_t *
+pxFillInterfaceDescriptor(BaseType_t, NetworkInterface_t *interface)
+{
+	std::memset(interface, 0, sizeof(*interface));
+	interface->pcName = "LAN8720A";
+	interface->pfInitialise = lan8720aInitialise;
+	interface->pfOutput = lan8720aOutput;
+	interface->pfGetPhyLinkStatus = lan8720aGetPhyLinkStatus;
+	modm::ethernet::interface = interface;
+	return FreeRTOS_AddNetworkInterface(interface);
 }
 
 MODM_ISR(ETH)
