@@ -44,7 +44,7 @@
 #include <modm/platform/device.hpp>
 
 #ifndef SEGGER_RTT_MAX_INTERRUPT_PRIORITY
-#  define SEGGER_RTT_MAX_INTERRUPT_PRIORITY       ((1ul << __NVIC_PRIO_BITS) - 1ul)
+#  define SEGGER_RTT_MAX_INTERRUPT_PRIORITY       (((1ul << __NVIC_PRIO_BITS) - 1ul) << (8u - __NVIC_PRIO_BITS))
 #endif
 
 // Non-standard useful functions
