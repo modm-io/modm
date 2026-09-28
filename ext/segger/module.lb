@@ -47,5 +47,6 @@ def build(env):
 
     env.copy("rtt/RTT/SEGGER_RTT.h", dest="SEGGER_RTT.h")
     env.copy("rtt/RTT/SEGGER_RTT.c", dest="SEGGER_RTT.c")
+    env.copy("rtt/RTT/SEGGER_RTT_ConfDefaults.h", dest="SEGGER_RTT_ConfDefaults.h")
     if "m0" not in env[":target"].get_driver("core")["type"]:
         env.copy("rtt/RTT/SEGGER_RTT_ASM_ARMv7M.S", dest="SEGGER_RTT_ASM.S")
