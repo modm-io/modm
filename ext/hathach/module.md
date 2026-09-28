@@ -133,13 +133,19 @@ manually depend on the device classes you want to implement:
 <module>modm:tinyusb:device:ecm_rndis</module>
 <module>modm:tinyusb:device:hid</module>
 <module>modm:tinyusb:device:midi</module>
+<module>modm:tinyusb:device:midi2</module>
 <module>modm:tinyusb:device:msc</module>
+<module>modm:tinyusb:device:mtp</module>
 <module>modm:tinyusb:device:ncm</module>
+<module>modm:tinyusb:device:printer</module>
 <module>modm:tinyusb:device:usbtmc</module>
 <module>modm:tinyusb:device:vendor</module>
 <module>modm:tinyusb:device:video</module>
 ```
 
+Each class module that is not part of the `modm:tinyusb:config` option is
+enabled with one instance (e.g. `CFG_TUD_AUDIO=1`), which you can override in
+the `<tusb_config_local.h>` file.
 Some of these classes require a lot of configuration that you must provide via
 the `<tusb_config_local.h>` file. Please consult the TinyUSB documentation and
 examples for their purpose.
@@ -151,14 +157,16 @@ Host mode is available on devices with an OTG USB peripheral and on STM32
 devices with a dual-role FSDEV peripheral (STM32G0, STM32H5, STM32U3).
 
 To use the host classes you must depend on them manually as modm does not
-provide a configuration option for them:
+provide a configuration option for them. Each selected class is enabled with
+one instance (e.g. `CFG_TUH_MSC=1`), which you can override in the
+`<tusb_config_local.h>` file:
 
 ```xml
 <module>modm:tinyusb:host:cdc</module>
-<module>modm:tinyusb:host:cdc_rndis</module>
 <module>modm:tinyusb:host:hid</module>
+<module>modm:tinyusb:host:midi</module>
+<module>modm:tinyusb:host:midi2</module>
 <module>modm:tinyusb:host:msc</module>
-<module>modm:tinyusb:host:vendor</module>
 ```
 
 
