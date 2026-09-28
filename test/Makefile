@@ -203,6 +203,10 @@ compile-mega-2560-pro_C:
 	$(call compile-test,mega-2560-pro_C,size)
 run-mega-2560-pro_C:
 	$(call run-test,mega-2560-pro_C,size)
+compile-mega-2560-pro_D:
+	$(call compile-test,mega-2560-pro_D,size)
+run-mega-2560-pro_D:
+	$(call run-test,mega-2560-pro_D,size)
 
 
 compile-samv71-xplained-ultra:
