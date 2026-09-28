@@ -305,10 +305,14 @@ Configuration options:
 """
 
     def prepare(self, module, options):
-        # On STM32, only OTG has Host Mode
-        if not (options[":target"].has_driver("usb_otg_fs") or
-                options[":target"].has_driver("usb_otg_hs") or
-                options[":target"].has_driver("uhp:samg*")):
+        # On STM32, only OTG and FSDEV DRD (dual-role) have Host Mode
+        target = options[":target"]
+        # TODO: use modm-devices driver type for this
+        fsdev_drd = (target.identifier.platform == "stm32" and target.has_driver("usb") and
+                     target.identifier.family in ["g0", "h5", "u3"])
+        if not (target.has_driver("usb_otg_fs") or
+                target.has_driver("usb_otg_hs") or
+                target.has_driver("uhp:samg*") or fsdev_drd):
             return False
 
         classes = {(p.parent.name, p.name.replace("_host.c", ""))
