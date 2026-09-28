@@ -147,6 +147,9 @@ examples for their purpose.
 
 ## Host classes
 
+Host mode is available on devices with an OTG USB peripheral and on STM32
+devices with a dual-role FSDEV peripheral (STM32G0, STM32H5, STM32U3).
+
 To use the host classes you must depend on them manually as modm does not
 provide a configuration option for them:
 
