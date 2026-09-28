@@ -68,7 +68,8 @@ f2()
 void
 FiberGuardTest::testGuard()
 {
-#ifndef MODM_OS_HOSTED
+// AVR cannot detect interrupt context, so contended guards always assert
+#if not defined(MODM_OS_HOSTED) and not defined(MODM_CPU_AVR)
 	modm::fiber::Task fiber1(stack1, f1), fiber2(stack2, f2);
 	modm::fiber::Scheduler::run();
 #endif
