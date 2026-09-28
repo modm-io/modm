@@ -78,7 +78,6 @@ namespace
 
 	TestingObject testingObject;
 
-	// FIXME: Use FLASH_STORAGE
 	const modm::sab::Action actionList[] =
 	{
 		SAB_ACTION(0x01, testingObject, TestingObject::emptyFunction, 0),
@@ -97,7 +96,7 @@ SlaveTest::setUp()
 	testingObject.reset();
 
 	slave = new TestingSlave(0x3f,
-					modm::accessor::asFlash(actionList),
+					actionList,
 					sizeof(actionList) / sizeof(modm::sab::Action));
 }
 

@@ -79,7 +79,6 @@ InOut inOut;
 
 // ----------------------------------------------------------------------------
 // create a list of all possible actions
-// FIXME: Use FLASH_STORAGE(modm::sab::Action actionList[])
 const modm::sab::Action actionList[] =
 {
 	SAB_ACTION( 'A', analogDigital,	AnalogDigital::readChannel,	1 ),
@@ -96,8 +95,7 @@ int
 main()
 {
 	// initialize ABP interface, set baudrate etc.
-	Slave slave(0x02,
-			modm::accessor::asFlash(actionList),
+	Slave slave(0x02, actionList,
 			sizeof(actionList) / sizeof(modm::sab::Action));
 
 	// enable interrupts

@@ -16,7 +16,6 @@ def init(module):
 
 def prepare(module, options):
     module.depends(
-        ":architecture:accessor",
         ":debug",
         ":processing:timer")
     return True
