@@ -90,8 +90,8 @@ namespace unittest
 		modm::accessor::Flash<char> testName;
 		modm::accessor::Flash<char> testFunction;
 
-		int_fast16_t testsPassed;
-		int_fast16_t testsFailed;
+		int_fast32_t testsPassed;
+		int_fast32_t testsFailed;
 	};
 }
 
