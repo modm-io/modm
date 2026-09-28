@@ -13,6 +13,9 @@
 #include <modm/platform/device.hpp>
 #include <modm/architecture/interface/atomic_lock.hpp>
 #include <modm/architecture/interface/delay.hpp>
+%% if "h" in ports.values()
+#include <modm/architecture/interface/clock.hpp>
+%% endif
 #include <modm/architecture/interface/interrupt.hpp>
 #include "tusb.h"
 
@@ -158,6 +161,14 @@ tusb_time_delay_ms_api(uint32_t ms)
 {
 	modm::delay_ms(ms);
 }
+%% if "h" in ports.values()
+
+extern "C" uint32_t
+tusb_time_millis_api(void)
+{
+	return modm::Clock::now().time_since_epoch().count();
+}
+%% endif
 
 %% if with_debug
 #ifdef CFG_TUSB_DEBUG

@@ -239,8 +239,10 @@ def build(env):
     # Add support files outside of naming scheme
     if any(p == "net" for p, _ in classes): classes.update({("net", "ncm"), ("net", "net_device")})
     if ("dfu", "dfu_rt") in classes: classes.add(("dfu", "dfu"))
+    if ("midi", "midi2") in classes: classes.add(("midi", "midi"))
+    if any(p == "midi" for p, _ in classes): classes.add(("audio", "audio"))
     # Filter out classes without support files
-    classes = ((p, n) for p, n in classes if n not in ["bth", "dfu_rt", "vendor", "ecm_rndis", "ecm"])
+    classes = ((p, n) for p, n in classes if n not in ["bth", "dfu_rt", "vendor", "ecm_rndis", "ecm", "midi2"])
     # Now copy the shared support file
     for parent, name in classes:
         env.copy(f"tinyusb/src/class/{parent}/{name}.h", f"class/{parent}/{name}.h")
@@ -313,6 +315,7 @@ Configuration options:
                    for p in Path(localpath("tinyusb/src/class/")).glob("*/*_host.c")}
         for parent, name in classes:
             module.add_submodule(TinyUsbClassModule(parent, name, "host"))
+        module.depends(":architecture:clock")
         if self.ports == 2:
             module.add_option(
                     EnumerationOption(name="port", description="USB Port selection",
@@ -332,12 +335,14 @@ tu_config_descr = {"device": {
 - `CFG_TUD_BTH_ISO_ALT_COUNT` = [undef] modm default: 1
 """,
     "cdc": """
-- `CFG_TUD_CDC_EP_BUFSIZE` = 64/512 (fs/hs)
+- `CFG_TUD_CDC_RX_EPSIZE` = 64/512 (fs/hs)
+- `CFG_TUD_CDC_TX_EPSIZE` = 64/512 (fs/hs)
 - `CFG_TUD_CDC_RX_BUFSIZE` = [undef] modm default: 512
 - `CFG_TUD_CDC_TX_BUFSIZE` = [undef] modm default: 512
 """,
     "midi": """
-- `CFG_TUD_MIDI_EP_BUFSIZE` = 64/512 (fs/hs)
+- `CFG_TUD_MIDI_RX_EPSIZE` = 64/512 (fs/hs)
+- `CFG_TUD_MIDI_TX_EPSIZE` = 64/512 (fs/hs)
 - `CFG_TUD_MIDI_RX_BUFSIZE` = [undef] modm default: 64/512 (fs/hs)
 - `CFG_TUD_MIDI_TX_BUFSIZE` = [undef] modm default: 64/512 (fs/hs)
 """,
@@ -345,7 +350,8 @@ tu_config_descr = {"device": {
 - `CFG_TUD_MSC_EP_BUFSIZE` = [undef] modm default: 512
 """,
     "vendor": """
-- `CFG_TUD_VENDOR_EPSIZE` = 64
+- `CFG_TUD_VENDOR_RX_EPSIZE` = 64/512 (fs/hs)
+- `CFG_TUD_VENDOR_TX_EPSIZE` = 64/512 (fs/hs)
 - `CFG_TUD_VENDOR_RX_BUFSIZE` = [undef] modm default: 64/512 (fs/hs)
 - `CFG_TUD_VENDOR_TX_BUFSIZE` = [undef] modm default: 64/512 (fs/hs)
 """
@@ -382,6 +388,8 @@ class TinyUsbClassModule(Module):
                 continue
             file = f"class/{self.parent}/{self.name}_{self.mode}.{suffix}"
             env.copy(f"tinyusb/src/{file}", file)
+        if self.mode == "host" and self.name == "cdc":
+            env.copy("tinyusb/src/class/cdc/serial/", "class/cdc/serial/")
 
         global tusb_config
         cfg_name = f"CFG_TU{self.mode[0].upper()}_{self.name.upper()}"
@@ -391,7 +399,7 @@ class TinyUsbClassModule(Module):
 
         if self.mode == "device":
             # These are the defaults that don't crash TinyUSB.
-            if self.name in ["cdc", "midi", "vendor"]:
+            if self.name in ["cdc", "midi", "vendor", "printer"]:
                 tusb_config[cfg_name+"_RX_BUFSIZE"] = 512 if is_hs else 64
                 tusb_config[cfg_name+"_TX_BUFSIZE"] = 512 if is_hs else 64
             if self.name in ["msc"]:
