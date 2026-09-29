@@ -1162,6 +1162,7 @@ and [many more contributors][contributors].
 [FreeRTOS+TCP]:    https://www.freertos.org/FreeRTOS-Plus/FreeRTOS_Plus_TCP/index.html
 [CMSIS]:           https://www.keil.com/pack/doc/CMSIS/General/html/index.html
 [CMSIS-DSP]:       https://www.keil.com/pack/doc/CMSIS/DSP/html/index.html
+[CMSIS-DAP]:       https://arm-software.github.io/CMSIS-DAP/latest/
 [TinyUSB]:         https://github.com/hathach/tinyusb
 [ETL]:             https://www.etlcpp.com
 [FatFS]:           http://elm-chan.org/fsw/ff/00index_e.html
