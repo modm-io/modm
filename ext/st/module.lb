@@ -38,7 +38,7 @@ def common_rcc_map(env):
     features = re.findall(r"#define +__([MF]PU)_PRESENT +([01])", content)
     core_features = {f[0]:bool(int(f[1])) for f in features}
     # find all peripherals
-    mperipherals = re.findall(r"#define +(.*?) +\(\((.*?_Type(?:Def)?)", content)
+    mperipherals = re.findall(r"#define +(\w+) +\(\((\w*?_Type(?:Def)?)", content)
     # We only care about the absolute peripheral addresses
     peripherals = [(p[0],p[1]) for p in mperipherals]
     # filter out MPU and/or FPU if required
