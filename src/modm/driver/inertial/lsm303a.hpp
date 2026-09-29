@@ -382,13 +382,6 @@ public:
 	/// Constructor, requires a lsm303a::Data object.
 	Lsm303a(Data &data, uint8_t address = 0b0011001);
 
-	[[deprecated("Use configure() instead!")]] // DEPRECATE: 2026q3
-	bool inline
-	configureBlocking(Scale scale, MeasurementRate rate = MeasurementRate::Hz100)
-	{
-		return configure(scale, rate);
-	}
-
 	bool
 	configure(Scale scale, MeasurementRate rate = MeasurementRate::Hz100);
 

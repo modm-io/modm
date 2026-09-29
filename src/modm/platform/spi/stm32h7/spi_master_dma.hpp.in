@@ -89,21 +89,6 @@ public:
 		Hal::setDataSize(static_cast<SpiHal{{ id }}::DataSize>(size));
 	}
 
-	[[deprecated("Use transfer() instead!")]] // DEPRECATED: 2026q3
-	static uint8_t
-	transferBlocking(uint8_t data)
-	{
-		return transfer(data);
-	}
-
-	/// @pre At least one of tx or rx must not be nullptr
-	[[deprecated("Use transfer() instead!")]] // DEPRECATED: 2026q3
-	static void
-	transferBlocking(const uint8_t* tx, uint8_t* rx, std::size_t length)
-	{
-		transfer(tx, rx, length);
-	}
-
 	static uint8_t
 	transfer(uint8_t data);
 

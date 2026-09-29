@@ -335,13 +335,6 @@ public:
 	/// For I2c this also sets the address to 0b110101 (alternative: 0x1C).
 	L3gd20(Data &data, uint8_t address=0x35);
 
-	[[deprecated("Use configure() instead!")]] // DEPRECATE: 2026q3
-	bool inline
-	configureBlocking(Scale scale, MeasurementRate rate = MeasurementRate::Hz380)
-	{
-		return configure(scale, rate);
-	}
-
 	bool
 	configure(Scale scale, MeasurementRate rate = MeasurementRate::Hz380);
 

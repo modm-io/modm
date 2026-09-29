@@ -73,21 +73,6 @@ public:
 	release(void *ctx);
 
 
-	[[deprecated("Use transfer() instead!")]] // DEPRECATED: 2026q3
-	static uint8_t
-	transferBlocking(uint8_t data)
-	{
-		return transfer(data);
-	}
-
-	[[deprecated("Use transfer() instead!")]] // DEPRECATED: 2026q3
-	static void
-	transferBlocking(uint8_t *tx, uint8_t *rx, std::size_t length)
-	{
-		transfer(tx, rx, length);
-	}
-
-
 	static uint8_t
 	transfer(uint8_t data);
 

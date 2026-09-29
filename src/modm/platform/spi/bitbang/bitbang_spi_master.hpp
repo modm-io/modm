@@ -62,14 +62,6 @@ public:
 	static void
 	setDataOrder(DataOrder order);
 
-	[[deprecated("Use transfer() instead!")]] // DEPRECATED: 2026q3
-	static uint8_t
-	transferBlocking(uint8_t data);
-
-	[[deprecated("Use transfer() instead!")]] // DEPRECATED: 2026q3
-	static void
-	transferBlocking(const uint8_t *tx, uint8_t *rx, std::size_t length);
-
 	static uint8_t
 	transfer(uint8_t data);
 
