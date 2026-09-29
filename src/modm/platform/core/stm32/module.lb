@@ -113,6 +113,7 @@ def build(env):
 def post_build(env):
     env.substitutions = env.query("::cortex-m:linkerscript")
     env.substitutions.update(env.query("::cortex-m:vector_table"))
+    env.substitutions["target"] = env[":target"].identifier
     env.outbasepath = "modm/link"
 
     linkerscript = "../cortex/ram.ld.in"
