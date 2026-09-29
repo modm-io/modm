@@ -89,7 +89,7 @@ class DevicesCache(dict):
                    for prefix, values in modm_db.items()
                      for name, path in values.items()
                        if prefix in supported and not
-                         any(name.startswith(i) for i in ignored)}
+                         name.startswith(tuple(ignored))}
 
         # Add all the tools devices
         tools_db = json.loads((tools_devices / "db.json").read_text())
