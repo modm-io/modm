@@ -106,7 +106,7 @@ struct Pin
 	void (*setInput)();
 
 	template<typename Gpio>
-	static Pin from()
+	static constexpr Pin from()
 	{
 		return Pin{
 			.set = &Gpio::set,
