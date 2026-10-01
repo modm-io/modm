@@ -52,8 +52,9 @@ typedef struct modm_packed
 #if MODM_ASSERTION_INFO_HAS_DESCRIPTION
 	#define _modm_assert5(behavior, condition, name, description, context) \
 		({ \
-			const bool evaluated_condition = (bool) (condition); \
-			if (!evaluated_condition) { \
+			bool evaluated_condition = true; \
+			if (!(condition)) { \
+				evaluated_condition = false; \
 				_modm_assertion_info info = { \
 					_modm_assert_ifss(name), _modm_assert_ifss(description), \
 					 (uintptr_t)(context), (uint8_t)(behavior)}; \
@@ -65,8 +66,9 @@ typedef struct modm_packed
 #else
 	#define _modm_assert5(behavior, condition, name, description, context) \
 		({ \
-			const bool evaluated_condition = (bool) (condition); \
-			if (!evaluated_condition) { \
+			bool evaluated_condition = true; \
+			if (!(condition)) { \
+				evaluated_condition = false; \
 				_modm_assertion_info info = { \
 					_modm_assert_ifss(name), (uintptr_t)(context), (uint8_t)(behavior)}; \
 				modm_assert_report(&info); \
