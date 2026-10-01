@@ -36,11 +36,11 @@ static void dsi_write_command(uint32_t count, uint8_t const * const p)
 
 		while(counter < count)
 		{
-			DSI->GPDR = p[counter] |
-						(p[counter + 1] << 8) |
-						(p[counter + 2] << 16) |
-						(p[counter + 3] << 24);
-			counter += 4;
+			uint32_t word = 0;
+			for (uint8_t shift = 0; shift < 32 and counter < count; shift += 8) {
+				word |= p[counter++] << shift;
+			}
+			DSI->GPDR = word;
 
 			for (int t = 1'024; not (DSI->GPSR & DSI_GPSR_CMDFE) and t; t--) {
 				modm::delay_ms(1);
