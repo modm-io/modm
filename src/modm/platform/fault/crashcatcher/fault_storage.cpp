@@ -13,12 +13,12 @@
 #include <modm/architecture/utils.hpp>
 #include <modm/platform/core/hardware_init.hpp>
 
-typedef struct
+struct table_pool_t
 {
-	uint32_t const traits;
+	uint32_t traits;
 	uint8_t *const start;
 	uint8_t *const end;
-} modm_packed table_pool_t;
+} modm_packed;
 
 extern "C" const table_pool_t __table_heap_start[];
 extern "C" const table_pool_t __table_heap_end[];
@@ -28,12 +28,12 @@ static constexpr uint32_t magic_end = 0xC0FFEEEE;
 static modm_section(".noinit") uint32_t marker_start;
 static modm_section(".noinit") const uint8_t* marker_end_ptr;
 static const uint8_t* report_end{0};
-extern "C" uint8_t *g_crashCatcherStack;
+extern "C" uint32_t g_crashCatcherStack[];
 
 namespace modm::platform
 {
 
-const uint32_t *fault_storage_heap_start{nullptr};
+const uint8_t *fault_storage_heap_start{nullptr};
 
 size_t
 FaultStorage::openRead()
@@ -55,7 +55,7 @@ FaultStorage::openRead()
 					ptrdiff_t end = ptrdiff_t(marker_end_ptr + sizeof(magic_end));
 					// Align end pointer to nearest 32-bits
 					end = (end + 3) & ~3;
-					fault_storage_heap_start = reinterpret_cast<const uint32_t*>(end);
+					fault_storage_heap_start = reinterpret_cast<const uint8_t*>(end);
 					return size;
 				}
 				else break;
@@ -156,7 +156,7 @@ FaultStorage::Iterator&
 FaultStorage::Iterator::operator++()
 {
 	auto t = (const table_pool_t *)table;
-	if (pos >= t->end or (pos + 1) == g_crashCatcherStack) {
+	if (pos >= t->end or (pos + 1) == reinterpret_cast<const uint8_t*>(g_crashCatcherStack)) {
 		if (t < __table_heap_end) {
 			t++;
 			pos = t->start;
