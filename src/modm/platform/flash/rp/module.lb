@@ -19,7 +19,7 @@ def prepare(module, options):
     if device.identifier.platform != "rp" or device.identifier.family != "20":
         return False
 
-    module.depends(":cmsis:device", ":platform:core",
+    module.depends(":architecture:atomic", ":cmsis:device", ":platform:core",
                    ":architecture:register")
     return True
 

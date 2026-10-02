@@ -10,6 +10,7 @@
 // ----------------------------------------------------------------------------
 
 #include "flash.hpp"
+#include <modm/architecture/interface/atomic_lock.hpp>
 
 #include <hardware/regs/io_qspi.h>
 #include <hardware/regs/ssi.h>
@@ -92,6 +93,8 @@ Flash::eraseBlocks(size_t startBlock, size_t count)
 	auto flash_range_erase_func = ROM::flash_range_erase::get();
 	auto flash_flush_cache_func = ROM::flash_flush_cache::get();
 
+	// Interrupt handlers may be located in flash, which is not accessible here
+	modm::atomic::Lock lock;
 	flash_init_boot2_copyout();
 	flash_hardware_save_state_t state;
 	flash_save_hardware_state(&state);
@@ -116,6 +119,8 @@ Flash::eraseSectors(size_t startSertor, size_t count)
 	auto flash_range_erase_func = ROM::flash_range_erase::get();
 	auto flash_flush_cache_func = ROM::flash_flush_cache::get();
 
+	// Interrupt handlers may be located in flash, which is not accessible here
+	modm::atomic::Lock lock;
 	flash_init_boot2_copyout();
 	flash_hardware_save_state_t state;
 	flash_save_hardware_state(&state);
@@ -140,6 +145,8 @@ Flash::programPages(size_t startPage, const void *data, size_t count)
 	auto flash_range_program_func = ROM::flash_range_program::get();
 	auto flash_flush_cache_func = ROM::flash_flush_cache::get();
 
+	// Interrupt handlers may be located in flash, which is not accessible here
+	modm::atomic::Lock lock;
 	flash_init_boot2_copyout();
 	flash_hardware_save_state_t state;
 	flash_save_hardware_state(&state);
@@ -164,6 +171,8 @@ Flash::doCmd(const void *txData, void *rxData, size_t count)
 	auto flash_exit_xip_func = ROM::flash_exit_xip::get();
 	auto flash_flush_cache_func = ROM::flash_flush_cache::get();
 
+	// Interrupt handlers may be located in flash, which is not accessible here
+	modm::atomic::Lock lock;
 	flash_init_boot2_copyout();
 	flash_hardware_save_state_t state;
 	flash_save_hardware_state(&state);
