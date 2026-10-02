@@ -37,7 +37,8 @@ platform::delay_ns(uint32_t)
 		"nop.n"					"\n\t"	// folded into next bpl
 %% endif
 		"bpl.n	1b"				"\n\t"	// keep doing that while result is still positive:      2 cycles (when taken)
-		"bx lr"
+		"bx lr"					"\n\t"
+		".ltorg"						// naked function: emit the literal pool here, not after the next function
 	);
 }
 
