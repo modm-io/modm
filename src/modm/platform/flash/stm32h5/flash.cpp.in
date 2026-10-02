@@ -1,0 +1,185 @@
+/*
+ * Copyright (c) 2026, LucaFeggi
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#include "flash.hpp"
+
+namespace modm::platform
+{
+
+namespace
+{
+constexpr uint32_t FlashErrors = FLASH_SR_WRPERR | FLASH_SR_PGSERR |
+	FLASH_SR_STRBERR | FLASH_SR_INCERR | FLASH_SR_OBKERR |
+	FLASH_SR_OBKWERR | FLASH_SR_OPTCHANGEERR;
+constexpr uint32_t FlashBusy = FLASH_SR_BSY | FLASH_SR_WBNE | FLASH_SR_DBNE;
+
+enum class PendingKind : uint8_t { None, Erase, Program };
+struct PendingOperation
+{
+	PendingKind kind{PendingKind::None};
+	uint32_t oldLatency{0};
+	uint32_t status{0};
+	uintptr_t address{0};
+	uint32_t expected[Flash::FlashWordWords]{};
+	bool verify{false};
+	bool hardwareFinished{false};
+};
+PendingOperation pending;
+
+modm_ramcode uint32_t
+waitReady(uint32_t timeout)
+{
+	while (FLASH_NS->NSSR & FlashBusy) {
+		if (timeout-- == 0) return Flash::OperationTimeout;
+	}
+	const uint32_t status = FLASH_NS->NSSR;
+	if (status & (FlashErrors | FLASH_SR_EOP))
+		FLASH_NS->NSCCR = status & (FlashErrors | FLASH_SR_EOP);
+	return status & FlashErrors;
+}
+
+modm_ramcode bool
+invalidateInstructionCache(uint32_t timeout)
+{
+	if (not (ICACHE->CR & ICACHE_CR_EN)) return true;
+	while (ICACHE->SR & ICACHE_SR_BUSYF) {
+		if (timeout-- == 0) return false;
+	}
+	ICACHE->FCR = ICACHE_FCR_CBSYENDF | ICACHE_FCR_CERRF;
+	ICACHE->CR |= ICACHE_CR_CACHEINV;
+	while (not (ICACHE->SR & ICACHE_SR_BSYENDF)) {
+		if (timeout-- == 0) return false;
+	}
+	const bool complete = ICACHE->SR & ICACHE_SR_BSYENDF;
+	const bool error = ICACHE->SR & ICACHE_SR_ERRF;
+	ICACHE->FCR = ICACHE_FCR_CBSYENDF | ICACHE_FCR_CERRF;
+	__DSB(); __ISB();
+	return complete and not error;
+}
+}
+
+bool
+Flash::unlock()
+{
+	if (isLocked()) {
+		FLASH_NS->NSKEYR = 0x45670123u;
+		FLASH_NS->NSKEYR = 0xcdef89abu;
+	}
+	return not isLocked();
+}
+
+modm_ramcode bool
+Flash::lock()
+{
+	if (hasPendingOperation()) return false;
+	FLASH_NS->NSCR |= FLASH_CR_LOCK;
+	return isLocked();
+}
+
+modm_ramcode bool
+Flash::hasPendingOperation()
+{
+	return pending.kind != PendingKind::None;
+}
+
+modm_ramcode uint32_t
+Flash::finishPendingOperation(uint32_t timeout)
+{
+	if (pending.kind == PendingKind::None) return 0;
+	if (not pending.hardwareFinished) {
+		const uint32_t status = waitReady(timeout);
+		if (status == OperationTimeout) return status;
+		pending.status |= status;
+		if (pending.kind == PendingKind::Erase) FLASH_NS->NSCR &= ~FLASH_CR_SER;
+		else FLASH_NS->NSCR &= ~FLASH_CR_PG;
+		FLASH_NS->ACR = (FLASH_NS->ACR & ~FLASH_ACR_LATENCY) | pending.oldLatency;
+		pending.hardwareFinished = true;
+	}
+	if (not invalidateInstructionCache(timeout)) return pending.status | CacheTimeout;
+
+	uint32_t status = pending.status;
+	if (status == 0 and pending.verify) {
+		const volatile uint32_t *words =
+			reinterpret_cast<const volatile uint32_t *>(pending.address);
+		const std::size_t count = pending.kind == PendingKind::Erase ?
+			PageSize / sizeof(uint32_t) : FlashWordWords;
+		for (std::size_t i = 0; i < count; ++i) {
+			const uint32_t expected = pending.kind == PendingKind::Erase ?
+				0xffffffffu : pending.expected[i];
+			if (words[i] != expected) { status = VerifyError; break; }
+		}
+	}
+	pending.kind = PendingKind::None;
+	return status;
+}
+
+modm_ramcode uint32_t
+Flash::erase(uint16_t page, uint32_t timeout, bool verify)
+{
+	if (page >= PageCount) return FLASH_SR_PGSERR;
+	if (hasPendingOperation()) return OperationPending;
+	if (isLocked()) return FLASH_SR_WRPERR;
+	uint32_t status = waitReady(timeout);
+	if (status != 0) return status;
+	const bool upperAddress = page >= PagesPerBank;
+	const bool swapped = FLASH_NS->OPTSR_CUR & FLASH_OPTSR_SWAP_BANK;
+	const bool bank2 = upperAddress != swapped;
+	const uint32_t local = page % PagesPerBank;
+	// ES0565 2.2.9 requires additional read-while-write latency.
+	pending.oldLatency = FLASH_NS->ACR & FLASH_ACR_LATENCY;
+	FLASH_NS->ACR = (FLASH_NS->ACR & ~FLASH_ACR_LATENCY) | FLASH_ACR_LATENCY;
+	__DSB();
+	pending.address = reinterpret_cast<uintptr_t>(getAddr(page));
+	pending.status = 0;
+	pending.verify = verify;
+	pending.hardwareFinished = false;
+	pending.kind = PendingKind::Erase;
+	uint32_t control = FLASH_NS->NSCR;
+	control &= ~(FLASH_CR_SNB | FLASH_CR_BKSEL | FLASH_CR_SER | FLASH_CR_PG);
+	control |= FLASH_CR_SER | (local << FLASH_CR_SNB_Pos);
+	if (bank2) control |= FLASH_CR_BKSEL;
+	FLASH_NS->NSCR = control;
+	FLASH_NS->NSCR |= FLASH_CR_START;
+	return finishPendingOperation(timeout);
+}
+
+modm_ramcode uint32_t
+Flash::program(uintptr_t address, const MaxWordType &data, uint32_t timeout, bool verify)
+{
+	if (not contains(address) or (address & (FlashWordSize - 1)) or
+		address - OriginAddr > Size - FlashWordSize) return FLASH_SR_PGSERR;
+	if (hasPendingOperation()) return OperationPending;
+	if (isLocked()) return FLASH_SR_WRPERR;
+	uint32_t status = waitReady(timeout);
+	if (status != 0) return status;
+	volatile uint32_t *destination = reinterpret_cast<volatile uint32_t *>(address);
+	for (std::size_t i = 0; i < FlashWordWords; ++i)
+		if (destination[i] != 0xffffffffu) return FLASH_SR_PGSERR;
+	for (std::size_t i = 0; i < FlashWordWords; ++i)
+		pending.expected[i] = data.data[i];
+	pending.oldLatency = FLASH_NS->ACR & FLASH_ACR_LATENCY;
+	FLASH_NS->ACR = (FLASH_NS->ACR & ~FLASH_ACR_LATENCY) | FLASH_ACR_LATENCY;
+	__DSB();
+	pending.address = address;
+	pending.status = 0;
+	pending.verify = verify;
+	pending.hardwareFinished = false;
+	pending.kind = PendingKind::Program;
+	FLASH_NS->NSCR |= FLASH_CR_PG;
+	const uint32_t previousMask = __get_PRIMASK();
+	__disable_irq();
+	for (std::size_t i = 0; i < FlashWordWords; ++i)
+		destination[i] = pending.expected[i];
+	__set_PRIMASK(previousMask);
+	return finishPendingOperation(timeout);
+}
+
+} // namespace modm::platform

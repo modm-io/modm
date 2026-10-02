@@ -1,0 +1,101 @@
+/*
+ * Copyright (c) 2026, LucaFeggi
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <cstddef>
+#include <cstdint>
+#include "../device.hpp"
+#include <modm/architecture/interface/register.hpp>
+
+namespace modm::platform
+{
+
+/** Nonsecure internal flash of STM32H562/563/573.
+ * Erase and program return zero on success, FLASH_NSSR error/status bits,
+ * or the software error bits below. Timeout arguments are polling iterations.
+ * The caller must reserve pages outside the image and protect concurrent
+ * access. Option bytes, secure flash and mass erase are deliberately separate.
+ * A timed-out operation may still be running: call finishPendingOperation()
+ * until it completes before accessing the affected page or starting another
+ * flash operation. Critical interrupts must execute from SRAM during the
+ * first operation after power-on (ES0565, 2.2.33).
+ * @author LucaFeggi
+ * @ingroup modm_platform_flash
+ */
+class Flash
+{
+public:
+	static constexpr uintptr_t OriginAddr = 0x{{ "%0x" | format(start) }};
+	static constexpr size_t Size = 0x{{ "%0x" | format(size) }};
+	static constexpr size_t BankSize = Size / 2;
+	static constexpr size_t SectorSize = FLASH_SECTOR_SIZE;
+	static constexpr size_t PageSize = SectorSize;
+	static_assert(PageSize == 8192);
+	static constexpr size_t PagesPerBank = BankSize / PageSize;
+	static constexpr size_t SectorsPerBank = PagesPerBank;
+	static constexpr size_t PageCount = Size / PageSize;
+	static constexpr size_t FlashWordWords = 4;
+	static constexpr size_t FlashWordSize = 16;
+	static constexpr uint32_t VerifyError = 0x80000000u;
+	static constexpr uint32_t CacheTimeout = 0x40000000u;
+	static constexpr uint32_t OperationTimeout = 0x20000000u;
+	static constexpr uint32_t OperationPending = 0x10000000u;
+	static inline uint8_t *const Origin = reinterpret_cast<uint8_t *>(OriginAddr);
+	struct alignas(4) MaxWordType { uint32_t data[FlashWordWords]; };
+	static_assert(sizeof(MaxWordType) == FlashWordSize);
+
+	static void enable() {}
+	static void disable() {}
+	static bool isLocked() { return FLASH_NS->NSCR & FLASH_CR_LOCK; }
+	static bool isBusy()
+	{
+		return FLASH_NS->NSSR & (FLASH_SR_BSY | FLASH_SR_WBNE | FLASH_SR_DBNE);
+	}
+	static bool unlock();
+	static bool lock();
+	static bool hasPendingOperation();
+	/** Finish a timed-out operation, including cache invalidation and verification.
+	 * Return OperationTimeout if the flash controller is still busy.
+	 */
+	static uint32_t finishPendingOperation(uint32_t timeout = 100'000'000);
+	static uint32_t getStatus() { return FLASH_NS->NSSR; }
+
+	static constexpr bool contains(uintptr_t address)
+	{
+		return address >= OriginAddr and address - OriginAddr < Size;
+	}
+	static constexpr uint16_t getPage(uintptr_t offset) { return offset / PageSize; }
+	static uint16_t getPage(const uint8_t *address)
+	{
+		return (reinterpret_cast<uintptr_t>(address) - OriginAddr) / PageSize;
+	}
+	static constexpr uint16_t getSector(uintptr_t offset) { return getPage(offset); }
+	static uint16_t getSector(const uint8_t *address) { return getPage(address); }
+	static constexpr uintptr_t getOffset(uint16_t page) { return uintptr_t(page) * PageSize; }
+	static constexpr size_t getSize(uint16_t) { return PageSize; }
+	static uint8_t *getAddr(uint16_t page)
+	{
+		return reinterpret_cast<uint8_t *>(OriginAddr + getOffset(page));
+	}
+
+	/** Erase one 8-Kbyte page. Page numbers refer to the memory address map.
+	 * Flash-resident interrupts may stall during same-bank operations. Reserve
+	 * pages outside the firmware image and account for erase latency.
+	 */
+	static uint32_t erase(uint16_t page, uint32_t timeout = 100'000'000,
+		bool verify = true);
+	/** Program exactly one erased, 16-byte aligned quadword. */
+	static uint32_t program(uintptr_t address, const MaxWordType &data,
+		uint32_t timeout = 100'000'000, bool verify = true);
+};
+
+} // namespace modm::platform

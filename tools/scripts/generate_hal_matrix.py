@@ -47,10 +47,12 @@ def hal_get_modules():
         minimal_targets[short_id.string].append(target)
 
     targets = []
-    # Sort the targets by name in their category
-    # And choose the last one (assumed to be the "largest" devices)
+    # Prefer the unsuffixed STM32 variant, then choose the last target name
+    # (assumed to be the "largest" device in its category). Some suffixed
+    # variants omit peripherals available on the base device.
     for key, values in minimal_targets.items():
-        targets.append(sorted(values, key=lambda d: d.string)[-1])
+        targets.append(max(values, key=lambda d: (
+            d.platform == "stm32" and d.variant == "", d.string)))
     # print(targets)
 
     # Prime the repositories and get all module files

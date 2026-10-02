@@ -1,0 +1,38 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2026, LucaFeggi
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":platform:adc"
+    module.description = "STM32H5 Analog-to-Digital Converter (ADC)"
+
+
+def prepare(module, options):
+    device = options[":target"]
+    target = device.identifier
+    if target.family != "h5" or target.name not in ["62", "63", "73"]:
+        return False
+    if not device.has_driver("adc:stm32-h5"):
+        return False
+    module.depends(":architecture:adc", ":architecture:delay", ":cmsis:device",
+                   ":platform:dma", ":platform:gpio", ":platform:rcc")
+    return True
+
+
+def build(env):
+    device = env[":target"]
+    instances = sorted(int(instance) for instance in device.get_driver("adc")["instance"])
+    env.substitutions = {"instances": instances}
+    env.outbasepath = "modm/src/modm/platform/adc"
+    env.template("adc.hpp.in", "adc.hpp")
+    env.template("adc_impl.hpp.in", "adc_impl.hpp")
+    env.template("adc.cpp.in", "adc.cpp")

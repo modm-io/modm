@@ -116,6 +116,12 @@ run-nucleo-h723zg:
 	$(call run-test,nucleo-h723zg,size)
 
 
+compile-weact-h723vg:
+	$(call compile-test,weact-h723vg,size)
+run-weact-h723vg:
+	$(call run-test,weact-h723vg,size)
+
+
 compile-nucleo-l432kc:
 	$(call compile-test,nucleo-l432kc,size)
 run-nucleo-l432kc:

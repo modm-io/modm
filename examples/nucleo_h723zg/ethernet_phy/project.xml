@@ -1,0 +1,13 @@
+<library>
+  <extends>modm:nucleo-h723zg</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_h723zg/ethernet_phy</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:driver:lan8720a</module>
+    <module>modm:driver:lan8742a</module>
+    <module>modm:platform:eth</module>
+    <module>modm:processing:timer</module>
+  </modules>
+</library>
