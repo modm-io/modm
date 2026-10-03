@@ -44,12 +44,12 @@ def coredump_jlink(env):
 # -----------------------------------------------------------------------------
 def program_jlink(env, source):
 	def call_program_jlink(target, source, env):
-		jlink.program(_config(env)[0], str(source[0]))
+		return jlink.program(_config(env)[0], str(source[0]))
 	return env.AlwaysBuildAction(call_program_jlink, "$PROGRAM_JLINK_COMSTR", source)
 
 def reset_jlink(env):
 	def call_reset_jlink(target, source, env):
-		jlink.reset(_config(env)[0])
+		return jlink.reset(_config(env)[0])
 	return env.AlwaysBuildAction(call_reset_jlink, "$RESET_JLINK_COMSTR")
 
 def run_jlink(env):

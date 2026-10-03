@@ -42,12 +42,12 @@ def black_magic_probe_coredump(env):
 # -----------------------------------------------------------------------------
 def black_magic_probe_program(env, source):
 	def call_bmp_program(target, source, env):
-		bmp.program(ARGUMENTS.get("port", "auto"), source[0].abspath)
+		return bmp.program(ARGUMENTS.get("port", "auto"), source[0].abspath)
 	return env.AlwaysBuildAction(call_bmp_program, "$PROGRAM_BMP_COMSTR", source)
 
 def black_magic_probe_reset(env):
 	def call_bmp_reset(target, source, env):
-		bmp.reset(ARGUMENTS.get("port", "auto"))
+		return bmp.reset(ARGUMENTS.get("port", "auto"))
 	return env.AlwaysBuildAction(call_bmp_reset, "$RESET_BMP_COMSTR")
 
 # -----------------------------------------------------------------------------

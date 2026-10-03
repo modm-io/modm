@@ -51,12 +51,12 @@ class BlackMagicProbeBackend(DebugBackend):
 def program(port, source):
     backend = BlackMagicProbeBackend(port)
     commands = ["load", "compare-sections", "kill", "quit"]
-    gdb.call(backend, source=source, commands=commands)
+    return gdb.call(backend, source=source, commands=commands)
 
 
 def reset(port):
     backend = BlackMagicProbeBackend(port)
-    gdb.call(backend, commands=["kill", "quit"])
+    return gdb.call(backend, commands=["kill", "quit"])
 
 
 def add_subparser(subparser):
@@ -95,8 +95,8 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     if args.reset:
-        reset(args.port)
+        exit(reset(args.port))
     else:
-        program(args.port, os.path.abspath(args.source))
+        exit(program(args.port, os.path.abspath(args.source)))
 
 

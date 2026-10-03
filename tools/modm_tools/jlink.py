@@ -172,6 +172,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     if args.reset:
-        reset(args.device)
+        exit(reset(args.device))
     else:
-        program(args.device, os.path.abspath(args.source))
+        exit(program(args.device, os.path.abspath(args.source)))

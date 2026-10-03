@@ -67,7 +67,7 @@ def program(source, device, programmer, port=None, baudrate=None, fuses=None, op
 
     command = " ".join(command)
     # print(command)
-    subprocess.call(command, cwd=os.getcwd(), shell=True)
+    return subprocess.call(command, cwd=os.getcwd(), shell=True)
 
 
 # -----------------------------------------------------------------------------
@@ -101,5 +101,5 @@ if __name__ == "__main__":
             help="The fuses to write to the target.")
 
     args = parser.parse_args()
-    program(args.source, args.partno, args.programmer,
-            fuses=args.fuses, baudrate=args.baudrate, port=args.port)
+    exit(program(args.source, args.partno, args.programmer,
+                 fuses=args.fuses, baudrate=args.baudrate, port=args.port))

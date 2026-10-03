@@ -135,12 +135,12 @@ def rtt(backend, channel=0):
 # -----------------------------------------------------------------------------
 def program(source, config=None, search=None):
     commands = ["modm_program {{{}}}".format(source)]
-    call(commands=commands, config=config, search=search)
+    return call(commands=commands, config=config, search=search)
 
 
 def reset(config=None, search=None):
     commands = ["reset", "shutdown"]
-    call(commands=commands, config=config, search=search)
+    return call(commands=commands, config=config, search=search)
 
 
 # -----------------------------------------------------------------------------
@@ -195,7 +195,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     if args.reset:
-        reset(config=args.config, search=args.searchdirs)
+        exit(reset(config=args.config, search=args.searchdirs))
     else:
-        program(source=os.path.abspath(args.source),
-                config=args.config, search=args.searchdirs)
+        exit(program(source=os.path.abspath(args.source),
+                config=args.config, search=args.searchdirs))

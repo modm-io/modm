@@ -15,7 +15,7 @@ from SCons.Script import *
 from modm_tools import avrdude
 
 def call_avrdude(env, source, fuses=None):
-	avrdude.program(source=source,
+	return avrdude.program(source=source,
 					device=env["CONFIG_AVRDUDE_DEVICE"],
 					programmer=ARGUMENTS.get("programmer", env.get("CONFIG_AVRDUDE_PROGRAMMER")),
 					baudrate=ARGUMENTS.get("baudrate", env.get("CONFIG_AVRDUDE_BAUDRATE")),
@@ -26,12 +26,12 @@ def call_avrdude(env, source, fuses=None):
 # -----------------------------------------------------------------------------
 def avrdude_flash(env, source):
 	def call_program(target, source, env):
-		call_avrdude(env, source[0])
+		return call_avrdude(env, source[0])
 	return env.AlwaysBuildAction(call_program, "$PROGRAM_AVRDUDE_COMSTR", source)
 
 def avrdude_fuse(env, source):
 	def call_fuse(target, source, env):
-		call_avrdude(env, source[0], fuses=["hfuse", "lfuse", "efuse"])
+		return call_avrdude(env, source[0], fuses=["hfuse", "lfuse", "efuse"])
 	return env.AlwaysBuildAction(call_fuse, "$PROGRAM_AVRDUDE_COMSTR", source)
 
 # -----------------------------------------------------------------------------

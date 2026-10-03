@@ -22,7 +22,7 @@ def bossac_program(env, source):
 			raise ValueError("Refusing to overwrite bootloader!\n"
 			                 "  Hint: Set `:platform:cortex-m:linkerscript.flash_offset` to bootloader size!")
 		else:
-			bossac.program(source=source[0], offset=offset,
+			return bossac.program(source=source[0], offset=offset,
 						   port=ARGUMENTS.get("port", "auto"),
 						   options=env.get("MODM_BOSSAC_OPTIONS"))
 	return env.AlwaysBuildAction(call_program, "$PROGRAM_BOSSAC_COMSTR", source)

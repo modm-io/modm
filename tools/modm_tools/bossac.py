@@ -51,7 +51,7 @@ def program(source, offset=None, port=None, erase=False, options=None):
 
     command = " ".join(command)
     # print(command)
-    subprocess.call(command, cwd=os.getcwd(), shell=True)
+    return subprocess.call(command, cwd=os.getcwd(), shell=True)
 
 
 # -----------------------------------------------------------------------------
@@ -75,4 +75,4 @@ if __name__ == "__main__":
             default=False)
 
     args = parser.parse_args()
-    program(args.source, offset=args.offset, port=args.port, erase=args.erase)
+    exit(program(args.source, offset=args.offset, port=args.port, erase=args.erase))

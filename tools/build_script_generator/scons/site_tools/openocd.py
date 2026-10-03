@@ -51,13 +51,13 @@ def coredump_openocd(env):
 def program_openocd(env, source):
 	def call_program_openocd(target, source, env):
 		oconfig, osearch, *_ = _config(env)
-		openocd.program(source=str(source[0]), config=oconfig, search=osearch)
+		return openocd.program(source=str(source[0]), config=oconfig, search=osearch)
 	return env.AlwaysBuildAction(call_program_openocd, "$PROGRAM_OPENOCD_COMSTR", source)
 
 def reset_openocd(env):
 	def call_reset_openocd(target, source, env):
 		oconfig, osearch, *_ = _config(env)
-		openocd.reset(config=oconfig, search=osearch)
+		return openocd.reset(config=oconfig, search=osearch)
 	return env.AlwaysBuildAction(call_reset_openocd, "$RESET_OPENOCD_COMSTR")
 
 def run_openocd(env):
