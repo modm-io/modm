@@ -52,8 +52,8 @@ class FreeRTOS_TCP(Module):
         env.copy("freertos/FreeRTOS-Plus-TCP/source/portable/Compiler/GCC/pack_struct_start.h", "freertos_plus_tcp/include/pack_struct_start.h")
         env.copy("freertos/FreeRTOS-Plus-TCP/source/portable/Compiler/GCC/pack_struct_end.h", "freertos_plus_tcp/include/pack_struct_end.h")
 
-        env.collect(":build:path.include", "modm/ext/freertos_plus_tcp/include")
-        env.collect(":build:path.include", "modm/ext/freertos_plus_tcp/tcp_utilities/include")
+        env.collect(":build:path.include.system", "modm/ext/freertos_plus_tcp/include")
+        env.collect(":build:path.include.system", "modm/ext/freertos_plus_tcp/tcp_utilities/include")
         env.template("FreeRTOSIPConfig.h.in", "freertos_plus_tcp/include/FreeRTOSIPConfig.h")
 # -----------------------------------------------------------------------------
 
@@ -124,5 +124,5 @@ def build(env):
     # Generate the FreeRTOSConfig.h file
     env.template("FreeRTOSConfig.h.in", "freertos/inc/freertos/FreeRTOSConfig.h")
 
-    env.collect(":build:path.include", "modm/ext/freertos/inc/freertos")
-    env.collect(":build:path.include", "modm/ext/freertos/inc")
+    env.collect(":build:path.include.system", "modm/ext/freertos/inc/freertos")
+    env.collect(":build:path.include.system", "modm/ext/freertos/inc")

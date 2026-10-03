@@ -34,4 +34,4 @@ def build(env):
     if core == "7":
         env.copy("cmsis/CMSIS/Core/Include/m-profile/armv7m_cachel1.h", "m-profile/armv7m_cachel1.h")
 
-    env.collect(":build:path.include", "modm/ext/cmsis/core")
+    env.collect(":build:path.include.system", "modm/ext/cmsis/core")

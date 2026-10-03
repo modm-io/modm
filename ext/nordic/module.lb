@@ -117,7 +117,7 @@ def validate(env):
 def build(env):
     global pp
     env.query("peripherals")
-    env.collect(":build:path.include", "modm/ext/cmsis/device")
+    env.collect(":build:path.include.system", "modm/ext/cmsis/device")
 
     env.outbasepath = "modm/ext/cmsis/device"
     for file in pp["headers"]:

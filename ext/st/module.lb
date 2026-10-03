@@ -163,7 +163,7 @@ def validate(env):
 
 def build(env):
     env.collect(":build:path.include", "modm/ext")
-    env.collect(":build:path.include", "modm/ext/cmsis/device")
+    env.collect(":build:path.include.system", "modm/ext/cmsis/device")
     env.collect(":build:cppdefines", bprops["family_define"])
 
     env.outbasepath = "modm/ext/cmsis/device"

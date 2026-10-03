@@ -111,7 +111,7 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.collect(":build:path.include", "modm/ext/cmsis/dsp/")
+    env.collect(":build:path.include.system", "modm/ext/cmsis/dsp/")
     env.outbasepath = "modm/ext/cmsis/dsp"
 
     if env[":target"].identifier.string == "hosted-linux":

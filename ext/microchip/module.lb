@@ -105,7 +105,7 @@ def validate(env):
 def build(env):
     global pp
     env.collect(":build:path.include", "modm/ext")
-    env.collect(":build:path.include", "modm/ext/cmsis/device")
+    env.collect(":build:path.include.system", "modm/ext/cmsis/device")
 
     env.outbasepath = "modm/ext/cmsis/device"
     files = ["sam.h", "component-version.h", "pio", "instance", "component", pp["device_header"]]
