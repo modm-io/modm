@@ -80,7 +80,7 @@ namespace modm::platform::pio::implementation
 	class StateMachine : public FifoAdapter<Pio, SM, uint32_t> {
 	private:
 		static_assert(SM<NUM_PIO_STATE_MACHINES,"Invalid SM");
-		static inline pio_sm_hw& sm() {
+		static inline pio_sm_hw_t& sm() {
 			return Pio::pio().sm[SM];
 		}
 		struct Encoder {

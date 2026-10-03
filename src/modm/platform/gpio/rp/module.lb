@@ -56,7 +56,7 @@ def build(env):
         },
         "intreg_ctrl_names": {
             "Bank0": "irq_ctrl",
-            "Qspi": "qspi_ctrl"
+            "Qspi": "irq_ctrl"
         },
         "intreg_pin_access": {
             "Bank0": "[pin / 8]",

@@ -103,7 +103,7 @@ struct Gpio
 template <>
 struct Gpio::PortRegs<Gpio::Port::{{ port | capitalize }}>
 {
-	using status_ctrl_hw_t = io{{port | lower}}_status_ctrl_hw_t;
+	using status_ctrl_hw_t = io_{{port | lower}}_status_ctrl_hw_t;
 	static uint32_t sio_in() { return sio_hw->gpio{{sio_names[port]}}_in; }
 	static uint32_t sio_out() { return sio_hw->gpio{{sio_names[port]}}_out; }
 	static uint32_t sio_oe() { return sio_hw->gpio{{sio_names[port]}}_oe; }

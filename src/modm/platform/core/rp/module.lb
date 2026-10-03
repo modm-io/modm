@@ -72,7 +72,7 @@ def build(env):
     if target.family == "20":
         env.copy("rom.hpp")
 
-    env.copy(repopath("ext/rp/pico-sdk/src/boot2_{}.cpp".format(env["boot2"])),"boot2.cpp")
+    env.copy(repopath("ext/rp/pico-sdk/src/boot2_rp2040_{}.cpp".format(env["boot2"])),"boot2.cpp")
 
 
 def post_build(env):

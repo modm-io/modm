@@ -59,9 +59,9 @@ IntHandler::irqQspiHandler()
 	static_assert(0b1111u == static_cast<uint32_t>(Gpio::InputTrigger::All));
 
 %% if multicore_enabled
-	auto& proc_irq_ctrl = sio_hw->cpuid ? ioqspi_hw->proc1_qspi_ctrl : ioqspi_hw->proc0_qspi_ctrl;
+	auto& proc_irq_ctrl = sio_hw->cpuid ? ioqspi_hw->proc1_irq_ctrl : ioqspi_hw->proc0_irq_ctrl;
 %% else
-	auto& proc_irq_ctrl = ioqspi_hw->proc0_qspi_ctrl;
+	auto& proc_irq_ctrl = ioqspi_hw->proc0_irq_ctrl;
 %% endif
 
 	uint32_t int_status = proc_irq_ctrl.ints;
