@@ -107,6 +107,7 @@ def post_build(env):
             files.append( (f, repo_flags[f]) )
 
         include_paths = env.collector_values("::path.include", filterfunc=repo_filter)
+        system_include_paths = env.collector_values("::path.include.system", filterfunc=repo_filter)
         libary_paths = env.collector_values("::path.library", filterfunc=repo_filter)
         libaries = env.collector_values("::library", filterfunc=repo_filter)
         packages = env.collector_values("::pkg-config", filterfunc=repo_filter)
@@ -118,6 +119,7 @@ def post_build(env):
             "libraries": libaries,
             "library_paths": libary_paths,
             "include_paths": include_paths,
+            "system_include_paths": system_include_paths,
             "packages": packages,
             "is_modm": repo == "modm",
         })

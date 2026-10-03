@@ -111,6 +111,9 @@ def prepare(module, options):
         PathCollector(name="path.include",
                       description="Search path for header files"))
     module.add_collector(
+        PathCollector(name="path.include.system",
+                      description=descr_path_include_system))
+    module.add_collector(
         PathCollector(name="path.library",
                       description="Search path for static libraries"))
     def validate_library(library):
@@ -300,6 +303,13 @@ descr_info_git = """# Generate git repository state information
 """
 
 descr_info_build = """# Generate build state information"""
+
+descr_path_include_system = """# Search path for system header files
+
+Same as `path.include`, but the compiler does not emit any warnings for header
+files found in these paths. Use this for external code whose headers you cannot
+or do not want to fix.
+"""
 
 descr_openocd_cfg = """# Path to a custom OpenOCD configuration file
 

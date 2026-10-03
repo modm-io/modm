@@ -178,6 +178,7 @@ def post_build(env):
             files.append( (sfile, profiles) )
 
         include_paths = env.collector_values("::path.include", filterfunc=repo_filter)
+        include_paths += env.collector_values("::path.include.system", filterfunc=repo_filter)
         private_include_paths = env.collector_values(
             "::path.include", filterfunc=inv_repo_filter
         )

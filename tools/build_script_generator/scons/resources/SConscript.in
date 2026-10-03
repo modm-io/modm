@@ -154,10 +154,19 @@ env.AppendUnique(CPPFLAGS=[
 %% endif
 
 env.AppendUnique(CPPPATH=[
-%% for path in include_paths | sort
+%% for path in (include_paths + system_include_paths) | sort
     abspath("{{ path | relocate | modm.windowsify(escape_level=1) }}"),
 %% endfor
 ])
+%% if system_include_paths | length
+# The paths are also in CPPPATH so that SCons scans them for dependencies. The
+# compiler ignores -I for paths that are also passed as -isystem.
+env.AppendUnique(CPPFLAGS=[
+%% for path in system_include_paths | sort
+    "-isystem" + abspath("{{ path | relocate | modm.windowsify(escape_level=1) }}"),
+%% endfor
+])
+%% endif
 
 files = [
 %% for file, flags in sources if not flags | length

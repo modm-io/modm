@@ -52,6 +52,12 @@ CPPDEFINES += \
 	-I{{ path | relocate }}{% if not loop.last %} \{% endif %}
 %% endfor
 %% endif
+%% if system_include_paths | length
+CPPDEFINES += \
+%% for path in system_include_paths | sort
+	-isystem {{ path | relocate }}{% if not loop.last %} \{% endif %}
+%% endfor
+%% endif
 
 %% if sources | length
 

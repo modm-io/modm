@@ -72,7 +72,7 @@ def post_build(env):
         "with_freertos": env.has_module(":freertos"),
         "platform": core,
         "profiles": profiles,
-        "include_paths": env.collector_values("::path.include"),
+        "include_paths": env.collector_values("::path.include") + env.collector_values("::path.include.system"),
         "compiler_path": compiler_path,
         # FIXME: RTT block is searched for too early.
         # See https://github.com/Marus/cortex-debug/wiki/SEGGER-RTT-support#known-issues

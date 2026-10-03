@@ -78,6 +78,7 @@ def post_build(env):
             files.append( (f, repo_flags[f]) )
 
         include_paths = env.collector_values("::path.include", filterfunc=repo_filter)
+        include_paths += env.collector_values("::path.include.system", filterfunc=repo_filter)
         libary_paths = env.collector_values("::path.library", filterfunc=repo_filter)
         libaries = env.collector_values("::library", filterfunc=repo_filter)
 
