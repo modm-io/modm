@@ -6,6 +6,7 @@
  * Copyright (c) 2015, Kevin Läufer
  * Copyright (c) 2018, Christopher Durand
  * Copyright (c) 2022, Raphael Lehmann
+ * Copyright (c) 2026, Sid Prabhakaran
  *
  * This file is part of the modm project.
  *
@@ -97,13 +98,11 @@ namespace detail
 	struct WideType<unsigned long long>
 	{ using type = double; };
 
-	template<typename T, typename = std::enable_if_t<
-		std::is_integral_v<T> && !std::is_same_v<std::decay_t<T>, bool>
-	> >
-	using enable_if_int = T;
-
 	template<typename T>
-	struct WideType<enable_if_int<T>>
+	concept NonBoolIntegral = std::is_integral_v<T> && !std::is_same_v<std::decay_t<T>, bool>;
+
+	template<NonBoolIntegral T>
+	struct WideType<T>
 	{
 		static constexpr bool isNextIntLarger =
 			std::numeric_limits<typename NextInt<T>::type>::max() > std::numeric_limits<T>::max();
@@ -123,8 +122,8 @@ namespace detail
 		using type = T;
 	};
 
-	template<typename T>
-	struct MakeSigned<enable_if_int<T>>
+	template<NonBoolIntegral T>
+	struct MakeSigned<T>
 	{
 		using type = std::make_signed_t<T>;
 	};
@@ -135,8 +134,8 @@ namespace detail
 		using type = T;
 	};
 
-	template<typename T>
-	struct MakeUnsigned<enable_if_int<T>>
+	template<NonBoolIntegral T>
+	struct MakeUnsigned<T>
 	{
 		using type = std::make_unsigned_t<T>;
 	};
