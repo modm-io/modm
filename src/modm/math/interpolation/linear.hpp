@@ -14,7 +14,8 @@
 #ifndef	MODM_INTERPOLATION_LINEAR_HPP
 #define	MODM_INTERPOLATION_LINEAR_HPP
 
-#include <stdint.h>
+#include <cstdint>
+#include <type_traits>
 
 #include <modm/math/utils/arithmetic_traits.hpp>
 #include <modm/container/pair.hpp>
@@ -38,11 +39,13 @@ namespace modm
 		class Linear
 		{
 		public:
-			typedef typename T::FirstType InputType;
-			typedef typename T::SecondType OutputType;
+			using InputType = T::FirstType;
+			using OutputType = T::SecondType;
 
-			typedef modm::SignedType< OutputType > OutputSignedType;
-			typedef modm::WideType< OutputSignedType > WideType;
+			// floating-point types are passed through unchanged
+			using OutputSignedType = typename std::conditional_t<std::is_integral_v<OutputType>,
+					std::make_signed<OutputType>, std::type_identity<OutputType>>::type;
+			using WideType = modm::WideType<OutputSignedType>;
 
 		public:
 			/**

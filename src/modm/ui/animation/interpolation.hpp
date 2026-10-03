@@ -15,6 +15,7 @@
 
 #include <cstdint>
 #include <cmath>
+#include <type_traits>
 #include <modm/math/utils/arithmetic_traits.hpp>
 
 namespace modm
@@ -48,7 +49,9 @@ template< typename T = uint8_t >
 class FastRamp
 {
 private:
-	using UnsignedType = modm::UnsignedType<T>;
+	// floating-point types are passed through unchanged
+	using UnsignedType = typename std::conditional_t<std::is_integral_v<T>,
+			std::make_unsigned<T>, std::type_identity<T>>::type;
 public:
 	/// for 8bit value types, the steps are limited to 2^15 anyway,
 	/// so we do not need uint32_t for the steps, but we can use uint16_t

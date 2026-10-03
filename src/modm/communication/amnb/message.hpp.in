@@ -253,7 +253,7 @@ protected:
 private:
 	template< size_t >         friend class Interface;
 	template< size_t, size_t > friend class Node;
-	template< class, class >   friend class Result;
+	template< class, class >   friend struct Result;
 };
 static_assert(sizeof(Message) == 32, "modm::amnb::Message must be memory-packed!");
 

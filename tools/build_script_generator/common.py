@@ -210,14 +210,11 @@ def common_compiler_flags(compiler, target):
     flags["ccflags"] = [
         "-W",
         "-Wall",
-        "-Wduplicated-cond",
         "-Werror=format",
-        "-Werror=maybe-uninitialized",
         "-Werror=overflow",
         "-Werror=sign-compare",
         "-Werror=return-type",
         "-Wextra",
-        "-Wlogical-op",
         "-Wpointer-arith",
         "-Wundef",
         "-Wno-redundant-decls",
@@ -242,6 +239,9 @@ def common_compiler_flags(compiler, target):
         flags["ccflags"].append("-fshort-wchar")
     if compiler.startswith("gcc"):
         flags["ccflags"] += [
+            "-Wduplicated-cond",
+            "-Wlogical-op",
+            "-Werror=maybe-uninitialized",
             "-finline-limit=10000",
             "-funsigned-bitfields",
         ]
@@ -278,9 +278,14 @@ def common_compiler_flags(compiler, target):
         "-fstrict-enums",
         "-std=c++23",
         "-Wno-psabi",
-        "-Wno-volatile",  # volatile is deprecated in C++20 but lots of our external code uses it...
         # "-pedantic",
     ]
+
+    if compiler.startswith("gcc"):
+        flags["cxxflags"] += [
+            "-Wno-volatile",  # some operations on volatile are deprecated in C++20 but lots of our external code uses them...
+        ]
+
     # flags only for Assembly
     flags["asflags"] = [
         "-gdwarf-3",

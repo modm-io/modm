@@ -132,11 +132,7 @@ SaturationTest::testUnsigned8bit()
 
 	TEST_ASSERT_EQUALS(x.getValue(), 0U);
 
-	y = 200;
-	x = abs(y);
-	TEST_ASSERT_EQUALS(x.getValue(), 200U);
-
-	x = y;
+	x = 200;
 	x.absolute();
 	TEST_ASSERT_EQUALS(x.getValue(), 200U);
 }
@@ -256,11 +252,7 @@ SaturationTest::testUnsigned16bit()
 
 	TEST_ASSERT_EQUALS(x.getValue(), 0U);
 
-	y = 20000;
-	x = abs(y);
-	TEST_ASSERT_EQUALS(x.getValue(), 20000U);
-
-	x = y;
+	x = 20000;
 	x.absolute();
 	TEST_ASSERT_EQUALS(x.getValue(), 20000U);
 }

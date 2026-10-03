@@ -22,11 +22,13 @@ using guard_t = int32_t;
 using guard_t = int64_t;
 #endif
 
+#ifndef MODM_OS_HOSTED
 int __cxa_guard_acquire(guard_t*);
 void __cxa_guard_release(guard_t*);
 void __cxa_guard_abort(guard_t*);
 
 static guard_t guard{0};
+#endif
 
 }
 
@@ -37,6 +39,7 @@ FiberGuardTest::setUp()
 }
 
 // ================================== GUARD ===================================
+#ifndef MODM_OS_HOSTED
 static void
 f1()
 {
@@ -63,7 +66,7 @@ f2()
 	TEST_ASSERT_EQUALS(state++, 3u);
 	TEST_ASSERT_EQUALS(guard, guard_t(1));
 }
-
+#endif
 
 void
 FiberGuardTest::testGuard()

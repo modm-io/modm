@@ -21,6 +21,9 @@
  * same. Terrible design really.
  */
 
+// Clang does not allow (re)defining these builtins, so they are only available
+// for GCC. Clang is currently only supported for tooling (e.g. clang-tidy).
+#ifndef __clang__
 // ============================ atomics for bools ============================
 extern "C" bool
 __atomic_test_and_set(volatile void *ptr, int /*memorder*/)
@@ -89,6 +92,7 @@ __atomic_compare_exchange(unsigned int len, volatile void *ptr, void *expected, 
 	__modm_atomic_post_barrier(__ATOMIC_SEQ_CST);
 	return retval;
 }
+#endif // __clang__
 
 %% macro atomic_fetch(len)
 	%% for name, op in [("add", "+"), ("sub", "-")]

@@ -192,6 +192,15 @@ public:
 %% endif
 
 %% if core.startswith("cortex-m")
+#ifdef __clang__
+	// For ARM 'int32_t' is of type 'int'. Therefore there is no
+	// function here for the default type 'long'. As 'long' has the same
+	// width as 'int32_t' we just use a typedef here.
+	inline IOStream& operator << (const long& v)
+	{ writeIntegerMode(static_cast<int32_t>(v)); return *this; }
+	inline IOStream& operator << (const unsigned long& v)
+	{ writeIntegerMode(static_cast<uint32_t>(v)); return *this; }
+#else
 	// For ARM 'int32_t' is of type 'long'. Therefore there is no
 	// function here for the default type 'int'. As 'int' has the same
 	// width as 'int32_t' we just use a typedef here.
@@ -199,6 +208,7 @@ public:
 	{ writeIntegerMode(static_cast<int32_t>(v)); return *this; }
 	inline IOStream& operator << (const unsigned int& v)
 	{ writeIntegerMode(static_cast<uint32_t>(v)); return *this; }
+#endif
 %% endif
 
 %% if options.with_float

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Niklas Hauser
+ * Copyright (c) 2026, Christopher Durand
  *
  * This file is part of the modm project.
  *
@@ -9,22 +9,19 @@
  */
 // ----------------------------------------------------------------------------
 
-#pragma once
-#include <modm/math/utils/cmath.hpp>
+#include "inplace_function_test.hpp"
+#include <modm/utils/inplace_function.hpp>
 
-/// @cond
-namespace modm::platform
+void
+InplaceFunctionTest::testCall()
 {
+	int value = 0;
 
-void delay_ns(uint32_t ns);
+	modm::inplace_function<int(int), 8> func = [&value](int x) {
+		value = x;
+		return x * 2;
+	};
 
-constexpr uint16_t
-computeDelayNsPerLoop(uint32_t hz)
-{
-	return modm::round({{loop}}'000'000'000.0 / hz);
+	TEST_ASSERT_EQUALS(func(42), 84);
+	TEST_ASSERT_EQUALS(value, 42);
 }
-
-}
-/// @endcond
-
-

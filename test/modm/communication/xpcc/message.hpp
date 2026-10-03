@@ -25,7 +25,7 @@ struct Message
 	}
 
 	bool
-	operator == (const Message& other) {
+	operator == (const Message& other) const {
 		return ((header == other.header) && (payload == other.payload));
 	}
 

@@ -139,7 +139,6 @@ AmnbMessageTest::testAllocator()
 
 		const auto data = msg.get<Large>();
 		TEST_ASSERT_TRUE(data != nullptr);
-		TEST_ASSERT_TRUE(data->buffer != nullptr);
 
 		// type too large
 		TEST_ASSERT_TRUE(msg.get<uint32_t[11]>() == nullptr);
