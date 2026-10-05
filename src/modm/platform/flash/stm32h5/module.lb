@@ -1,0 +1,37 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2026, LucaFeggi
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":platform:flash"
+    module.description = "STM32H5 internal flash memory"
+
+
+def prepare(module, options):
+    device = options[":target"]
+    target = device.identifier
+    if target.family != "h5" or target.name not in ["62", "63", "73"]:
+        return False
+    if not device.has_driver("flash:stm32-v1.0"):
+        return False
+    module.depends(":cmsis:device", ":platform:cortex-m", ":architecture:register")
+    return True
+
+
+def build(env):
+    memory = env.query(":platform:cortex-m:memories")["cont_flash"]
+    assert memory["start"] == 0x08000000
+    assert memory["size"] in (0x100000, 0x200000)
+    env.substitutions = {"start": memory["start"], "size": memory["size"]}
+    env.outbasepath = "modm/src/modm/platform/flash"
+    env.template("flash.hpp.in", "flash.hpp")
+    env.template("flash.cpp.in", "flash.cpp")

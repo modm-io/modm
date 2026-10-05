@@ -1,0 +1,312 @@
+/*
+ * Copyright (c) 2020, Mike Wolfram
+ * Copyright (c) 2023, Christopher Durand
+ * Copyright (c) 2026, LucaFeggi
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_STM32H5_SPI_MASTER{{ id }}_DMA_HPP
+#	error "Don't include this file directly, use 'spi_master_{{ id }}_dma.hpp' instead!"
+#endif
+
+namespace modm::platform
+{
+
+template <class DmaChannelRx, class DmaChannelTx>
+template <class SystemClock, modm::baudrate_t baudrate, modm::percent_t tolerance>
+bool
+SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::initialize()
+{
+	using Rx = Dma::RxChannel;
+	using Tx = Dma::TxChannel;
+	initialized = false;
+	dmaWidth = 0;
+	byteDataSize = DataSize::Bit8;
+	lastErrorFlags = 0;
+	lastSpiErrorFlags = 0;
+
+	if (not Rx::configure(Rx::DataTransferDirection::PeripheralToMemory,
+			Rx::MemoryDataSize::Byte, Rx::PeripheralDataSize::Byte,
+			Rx::MemoryIncrementMode::Increment, Rx::PeripheralIncrementMode::Fixed,
+			Rx::Priority::Medium)) {
+		lastErrorFlags = DmaBase::SoftwareConfigurationError;
+		return false;
+	}
+	Rx::disableInterruptVector();
+	if (not Rx::setPeripheralAddress(reinterpret_cast<uintptr_t>(Hal::receiveRegister())) or
+		not Rx::template setPeripheralRequest<Dma::RxRequest>()) {
+		lastErrorFlags = DmaBase::SoftwareConfigurationError;
+		return false;
+	}
+
+	if (not Tx::configure(Tx::DataTransferDirection::MemoryToPeripheral,
+			Tx::MemoryDataSize::Byte, Tx::PeripheralDataSize::Byte,
+			Tx::MemoryIncrementMode::Increment, Tx::PeripheralIncrementMode::Fixed,
+			Tx::Priority::Medium)) {
+		lastErrorFlags = DmaBase::SoftwareConfigurationError;
+		return false;
+	}
+	Tx::disableInterruptVector();
+	if (not Tx::setPeripheralAddress(reinterpret_cast<uintptr_t>(Hal::transmitRegister())) or
+		not Tx::template setPeripheralRequest<Dma::TxRequest>()) {
+		lastErrorFlags = DmaBase::SoftwareConfigurationError;
+		return false;
+	}
+
+	constexpr auto result = modm::Prescaler::from_power(SystemClock::Spi{{ id }}, baudrate, 2, 256);
+	assertBaudrateInTolerance< result.frequency, baudrate, tolerance >();
+	lastClockPeriodNs = (1'000'000'000ull + result.frequency - 1) / result.frequency;
+
+	constexpr Hal::Prescaler prescaler{result.index << SPI_CFG1_MBR_Pos};
+	Hal::initialize(prescaler);
+	dmaWidth = 1;
+	initialized = true;
+	return true;
+}
+
+template <class DmaChannelRx, class DmaChannelTx>
+uint8_t
+SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(uint8_t data)
+{
+	if (not initialized) {
+		lastErrorFlags = DmaBase::SoftwareConfigurationError;
+		return 0;
+	}
+	lastErrorFlags = 0;
+	lastSpiErrorFlags = 0;
+	// DMA is not used for single byte transfers
+	Hal::setDataSize(byteDataSize);
+	Hal::setDuplexMode(Hal::DuplexMode::FullDuplex);
+	Hal::setTransferSize(1);
+	Hal::enableTransfer();
+	Hal::write(data);
+	Hal::startMasterTransfer();
+
+	uint32_t remaining = pollBudget;
+	while (not Hal::isTransferCompleted()) {
+		lastSpiErrorFlags |= Hal::status().value & SpiErrorMask;
+		if (lastSpiErrorFlags != 0) break;
+		if (remaining-- == 0) {
+			lastErrorFlags |= DmaBase::SoftwareTransferTimeout;
+			break;
+		}
+		modm::this_fiber::yield();
+	}
+
+	lastSpiErrorFlags |= Hal::status().value & SpiErrorMask;
+	if (lastErrorFlags == 0 and lastSpiErrorFlags == 0)
+		data = SpiHal{{ id }}::read();
+	finishTransfer();
+
+	return data;
+}
+
+template <class DmaChannelRx, class DmaChannelTx>
+bool
+SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::startDmaTransfer(
+		const void* tx, void* rx, std::size_t count, std::size_t itemBytes)
+{
+	Hal::setTransferSize(count);
+
+	if (tx and rx) {
+		Hal::setDuplexMode(Hal::DuplexMode::FullDuplex);
+	} else if (rx) {
+		Hal::setDuplexMode(Hal::DuplexMode::ReceiveOnly);
+	} else { // tx only
+		Hal::setDuplexMode(Hal::DuplexMode::TransmitOnly);
+	}
+
+	/*
+	 * Required order of operations according to the reference manual:
+	 * 1. Enable SPI RX DMA
+	 * 2. Enable DMA channels
+	 * 3. Enable SPI TX DMA
+	 * 4. Start transfer
+	 */
+	if (rx) {
+		Dma::RxChannel::acknowledgeInterruptFlags(DmaBase::FlagMask);
+		if (not Dma::RxChannel::setMemoryAddress(reinterpret_cast<uintptr_t>(rx)) or
+			not Dma::RxChannel::setDataLength(count * itemBytes)) return false;
+		Hal::setDmaMode(Hal::DmaMode::Rx);
+		if (not Dma::RxChannel::start()) return false;
+	}
+
+	if (tx) {
+		Dma::TxChannel::acknowledgeInterruptFlags(DmaBase::FlagMask);
+		if (not Dma::TxChannel::setMemoryAddress(reinterpret_cast<uintptr_t>(tx)) or
+			not Dma::TxChannel::setDataLength(count * itemBytes) or
+			not Dma::TxChannel::start()) return false;
+		if (rx) {
+			Hal::setDmaMode(Hal::DmaMode::Tx | Hal::DmaMode::Rx);
+		} else {
+			Hal::setDmaMode(Hal::DmaMode::Tx);
+		}
+	}
+
+	Hal::enableTransfer();
+	Hal::startMasterTransfer();
+	return true;
+}
+
+
+template <class DmaChannelRx, class DmaChannelTx>
+void
+SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(
+		const uint8_t* tx, uint8_t* rx, std::size_t length)
+{
+	transferWordsImpl(tx, rx, length, byteDataSize);
+}
+
+template <class DmaChannelRx, class DmaChannelTx>
+template <class Word>
+bool
+SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::configureDmaWidth()
+{
+	static_assert(std::is_same_v<Word, uint8_t> or std::is_same_v<Word, uint16_t> or
+		std::is_same_v<Word, uint32_t>);
+	if (dmaWidth == sizeof(Word)) return true;
+	dmaWidth = 0;
+	using Rx = Dma::RxChannel;
+	using Tx = Dma::TxChannel;
+	constexpr auto memoryWidth = sizeof(Word) == 1 ? DmaBase::MemoryDataSize::Byte :
+		sizeof(Word) == 2 ? DmaBase::MemoryDataSize::HalfWord : DmaBase::MemoryDataSize::Word;
+	constexpr auto peripheralWidth = sizeof(Word) == 1 ? DmaBase::PeripheralDataSize::Byte :
+		sizeof(Word) == 2 ? DmaBase::PeripheralDataSize::HalfWord : DmaBase::PeripheralDataSize::Word;
+	if (not Rx::configure(Rx::DataTransferDirection::PeripheralToMemory,
+			memoryWidth, peripheralWidth) or
+		not Tx::configure(Tx::DataTransferDirection::MemoryToPeripheral,
+			memoryWidth, peripheralWidth)) return false;
+	if (not Rx::setPeripheralAddress(reinterpret_cast<uintptr_t>(Hal::receiveRegister())) or
+		not Rx::template setPeripheralRequest<Dma::RxRequest>() or
+		not Tx::setPeripheralAddress(reinterpret_cast<uintptr_t>(Hal::transmitRegister())) or
+		not Tx::template setPeripheralRequest<Dma::TxRequest>()) return false;
+	dmaWidth = sizeof(Word);
+	return true;
+}
+
+template <class DmaChannelRx, class DmaChannelTx>
+template <class Word>
+bool
+SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transferWordsImpl(
+		const Word* tx, Word* rx, std::size_t length, DataSize dataSize)
+{
+	static_assert(std::is_same_v<Word, uint8_t> or std::is_same_v<Word, uint16_t> or
+		std::is_same_v<Word, uint32_t>);
+	if (length == 0) { lastErrorFlags = 0; lastSpiErrorFlags = 0; return true; }
+	if (not initialized or (tx == nullptr and rx == nullptr) or
+		length > std::size_t(-1) / sizeof(Word) or
+		dataSize > Hal::MaxDataBits or
+		(sizeof(Word) == 1 and (dataSize < DataSize::Bit4 or dataSize > DataSize::Bit8)) or
+		(sizeof(Word) == 2 and (dataSize < DataSize::Bit9 or dataSize > DataSize::Bit16)) or
+		(sizeof(Word) == 4 and (dataSize < DataSize::Bit17 or dataSize > DataSize::Bit32))) {
+		lastErrorFlags = DmaBase::SoftwareConfigurationError;
+		lastSpiErrorFlags = 0;
+		return false;
+	}
+	if (tx and rx) {
+		const uintptr_t source = reinterpret_cast<uintptr_t>(tx);
+		const uintptr_t destination = reinterpret_cast<uintptr_t>(rx);
+		if ((source < destination ? destination - source : source - destination) <
+			length * sizeof(Word)) {
+			lastErrorFlags = DmaBase::SoftwareConfigurationError;
+			lastSpiErrorFlags = 0;
+			return false;
+		}
+	}
+	if ((tx and (reinterpret_cast<uintptr_t>(tx) & (sizeof(Word) - 1))) or
+		(rx and (reinterpret_cast<uintptr_t>(rx) & (sizeof(Word) - 1)))) {
+		lastErrorFlags = DmaBase::SoftwareConfigurationError;
+		lastSpiErrorFlags = 0;
+		return false;
+	}
+	lastErrorFlags = 0;
+	lastSpiErrorFlags = 0;
+	if (not configureDmaWidth<Word>()) {
+		lastErrorFlags = DmaBase::SoftwareConfigurationError;
+		return false;
+	}
+	Hal::setDataSize(dataSize);
+	while (length != 0) {
+		const std::size_t count = std::min(length,
+			std::min(std::size_t(Hal::MaxTransferSize),
+				std::size_t(DmaChannelRx::MaxBlockSize / sizeof(Word))));
+		if (not startDmaTransfer(tx, rx, count, sizeof(Word))) {
+			lastErrorFlags |= DmaBase::SoftwareConfigurationError;
+			finishTransfer();
+			return false;
+		}
+
+		bool dmaRxFinished = (rx == nullptr);
+		uint32_t remaining = pollBudget;
+		while (not Hal::isTransferCompleted() or not dmaRxFinished) {
+			lastSpiErrorFlags |= Hal::status().value & SpiErrorMask;
+			if (rx) {
+				const uint32_t flags = DmaChannelRx::getInterruptFlags();
+				lastErrorFlags |= flags & DmaBase::ErrorMask;
+				dmaRxFinished |= flags & uint32_t(DmaBase::InterruptFlags::TransferComplete);
+			}
+			if (tx) {
+				const uint32_t flags = DmaChannelTx::getInterruptFlags();
+				lastErrorFlags |= flags & DmaBase::ErrorMask;
+			}
+			if (lastErrorFlags != 0 or lastSpiErrorFlags != 0) break;
+			if (remaining-- == 0) {
+				lastErrorFlags |= DmaBase::SoftwareTransferTimeout;
+				break;
+			}
+			modm::this_fiber::yield();
+		}
+		finishTransfer();
+		if (lastErrorFlags != 0 or lastSpiErrorFlags != 0) return false;
+		if (tx) tx += count;
+		if (rx) rx += count;
+		length -= count;
+	}
+	return true;
+}
+
+template <class DmaChannelRx, class DmaChannelTx>
+void
+SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::finishTransfer()
+{
+	if (lastErrorFlags == 0 and lastSpiErrorFlags == 0 and Hal::isTransferCompleted()) {
+		uint32_t remaining = pollBudget;
+		while (not Hal::isTxCompleted()) {
+			lastSpiErrorFlags |= Hal::status().value & SpiErrorMask;
+			if (lastSpiErrorFlags != 0) break;
+			if (remaining-- == 0) {
+				lastErrorFlags |= DmaBase::SoftwareTransferTimeout;
+				break;
+			}
+			modm::this_fiber::yield();
+		}
+		// ES0565 2.18.2: keep SCK driven beyond EOT at slow SPI rates.
+		if (lastErrorFlags == 0 and lastSpiErrorFlags == 0)
+			modm::delay_ns(lastClockPeriodNs);
+	}
+	Hal::disableTransfer();
+	Hal::setDmaMode(Hal::DmaMode::None);
+	const bool txStopped = DmaChannelTx::stop(pollBudget);
+	const bool rxStopped = DmaChannelRx::stop(pollBudget);
+	if (not txStopped or not rxStopped)
+		lastErrorFlags |= DmaBase::SoftwareStopTimeout;
+
+	Hal::acknowledgeInterruptFlags(
+		Hal::StatusFlag::EndOfTransfer |
+		Hal::StatusFlag::TxTransferFilled |
+		Hal::StatusFlag::Underrun |
+		Hal::StatusFlag::Overrun |
+		Hal::StatusFlag::CrcError |
+		Hal::StatusFlag::TiFrameError |
+		Hal::StatusFlag::ModeFault |
+		Hal::StatusFlag::Suspension
+	);
+}
+
+} // namespace modm::platform

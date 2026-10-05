@@ -1,0 +1,190 @@
+/*
+ * Copyright (c) 2020, Mike Wolfram
+ * Copyright (c) 2023, Christopher Durand
+ * Copyright (c) 2026, LucaFeggi
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_STM32H5_SPI_MASTER{{ id }}_DMA_HPP
+#define MODM_STM32H5_SPI_MASTER{{ id }}_DMA_HPP
+
+#include <algorithm>
+#include <type_traits>
+#include <modm/architecture/interface/delay.hpp>
+#include <modm/platform/dma/dma.hpp>
+#include "spi_master_{{ id }}.hpp"
+
+namespace modm::platform
+{
+
+/**
+ * Serial peripheral interface (SPI{{ id }}) with DMA support.
+ *
+ * This class uses the DMA controller for sending and receiving data, which
+ * greatly reduces the CPU load. Beside passing the DMA channels as template
+ * parameters the class can be used in the same way like the SpiMaster{{ id }}.
+ * Transfer buffers must remain in DMA-accessible SRAM until the channel has
+ * stopped. If getLastErrorFlags() reports SoftwareStopTimeout, the caller must
+ * keep those buffers alive until both DMA channels have been stopped.
+ * Byte-buffer transfers report errors through getLastErrorFlags() and
+ * getLastSpiErrorFlags(); transferWords() also returns success directly.
+ *
+ * @tparam DmaChannelRX DMA channel for receiving
+ * @tparam DmaChannelTX DMA channel for sending
+ *
+ * @author LucaFeggi
+ * @ingroup	modm_platform_spi modm_platform_spi_{{id}}
+ */
+template <class DmaChannelRx, class DmaChannelTx>
+class SpiMaster{{ id }}_Dma : public modm::SpiMaster,
+                              public SpiLock<SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>>
+{
+	static_assert(not std::is_same_v<DmaChannelRx, DmaChannelTx>,
+		"SPI RX and TX require distinct GPDMA channels");
+protected:
+	static inline uint32_t lastErrorFlags = 0;
+	static inline uint32_t lastSpiErrorFlags = 0;
+	static inline uint32_t lastClockPeriodNs = 0;
+	static inline bool initialized = false;
+	static inline uint8_t dmaWidth = 0;
+	static inline SpiHal{{ id }}::DataSize byteDataSize = SpiHal{{ id }}::DataSize::Bit8;
+	static inline uint32_t pollBudget = 10'000'000;
+	static constexpr uint32_t SpiErrorMask = SPI_SR_UDR | SPI_SR_OVR |
+		SPI_SR_CRCE | SPI_SR_TIFRE | SPI_SR_MODF;
+	struct Dma {
+		using RxChannel = DmaChannelRx;
+		using TxChannel = DmaChannelTx;
+		static constexpr DmaChannelRx::Request RxRequest = DmaChannelRx::template RequestMapping<
+				Peripheral::Spi{{ id }}, DmaChannelRx::Signal::Rx>::Request;
+		static constexpr DmaChannelTx::Request TxRequest = DmaChannelTx::template RequestMapping<
+				Peripheral::Spi{{ id }}, DmaChannelTx::Signal::Tx>::Request;
+	};
+
+public:
+	/** GPDMA flags or DmaBase software error bits from the most recent operation. */
+	static uint32_t getLastErrorFlags() { return lastErrorFlags; }
+	/** Raw SPI status error flags from the most recent transfer. */
+	static uint32_t getLastSpiErrorFlags() { return lastSpiErrorFlags; }
+	/** Limit no-progress polling for each transfer chunk and TX completion.
+	 * The budget counts fiber yields, not elapsed microseconds.
+	 */
+	static bool setPollBudget(uint32_t budget)
+	{
+		if (budget == 0) return false;
+		pollBudget = budget;
+		return true;
+	}
+	using Hal = SpiHal{{ id }};
+
+	using DataMode = Hal::DataMode;
+	using DataOrder = Hal::DataOrder;
+	using DataSize = Hal::DataSize;
+
+	template< class... Signals >
+	static void
+	connect()
+	{
+		using Connector = GpioConnector<Peripheral::Spi{{ id }}, Signals...>;
+		using Sck = typename Connector::template GetSignal<Gpio::Signal::Sck>;
+		using Mosi = typename Connector::template GetSignal<Gpio::Signal::Mosi>;
+		using Miso = typename Connector::template GetSignal<Gpio::Signal::Miso>;
+
+		Sck::setOutput(Gpio::OutputType::PushPull);
+		Mosi::setOutput(Gpio::OutputType::PushPull);
+		Miso::setInput(Gpio::InputType::Floating);
+		Connector::connect();
+	}
+
+	template< class SystemClock, baudrate_t baudrate, percent_t tolerance=pct(5) >
+	static bool
+	initialize();
+
+	static void
+	setDataMode(DataMode mode)
+	{
+		Hal::setDataMode(mode);
+	}
+
+	static void
+	setDataOrder(DataOrder order)
+	{
+		Hal::setDataOrder(order);
+	}
+
+	static bool
+	setDataSize(DataSize size)
+	{
+		// The byte-buffer interface supports 4 to 8-bit frames.
+		if (size < DataSize::Bit4 or size > DataSize::Bit8 or
+			Hal::isTransferEnabled()) return false;
+		byteDataSize = size;
+		Hal::setDataSize(size);
+		return true;
+	}
+
+	[[deprecated("Use transfer() instead!")]] // DEPRECATED: 2026q3
+	static uint8_t
+	transferBlocking(uint8_t data)
+	{
+		return transfer(data);
+	}
+
+	/// @pre At least one of tx or rx must not be nullptr; buffers must not overlap.
+	[[deprecated("Use transfer() instead!")]] // DEPRECATED: 2026q3
+	static void
+	transferBlocking(const uint8_t* tx, uint8_t* rx, std::size_t length)
+	{
+		transfer(tx, rx, length);
+	}
+
+	static uint8_t
+	transfer(uint8_t data);
+
+	/// @pre At least one of tx or rx must not be nullptr
+	static void
+	transfer(const uint8_t* tx, uint8_t* rx, std::size_t length);
+
+	/** Transfer 9 to 16-bit frames using halfword GPDMA accesses. */
+	static bool
+	transferWords(const uint16_t* tx, uint16_t* rx, std::size_t count,
+		DataSize dataSize = DataSize::Bit16)
+	{
+		return transferWordsImpl(tx, rx, count, dataSize);
+	}
+
+	/** Transfer 17 to 32-bit frames on SPI1, SPI2 or SPI3. */
+	static bool
+	transferWords(const uint32_t* tx, uint32_t* rx, std::size_t count,
+		DataSize dataSize = DataSize::Bit32)
+	{
+		return transferWordsImpl(tx, rx, count, dataSize);
+	}
+
+protected:
+	static void
+	finishTransfer();
+
+	static bool
+	startDmaTransfer(const void* tx, void* rx, std::size_t count,
+		std::size_t itemBytes);
+
+	template <class Word>
+	static bool
+	transferWordsImpl(const Word* tx, Word* rx, std::size_t count, DataSize dataSize);
+
+	template <class Word>
+	static bool
+	configureDmaWidth();
+};
+
+} // namespace modm::platform
+
+#include "spi_master_{{ id }}_dma_impl.hpp"
+
+#endif // MODM_STM32H5_SPI_MASTER{{ id }}_DMA_HPP

@@ -1,0 +1,148 @@
+/*
+ * Copyright (c) 2009-2011, Fabian Greif
+ * Copyright (c) 2010, Martin Rosekeit
+ * Copyright (c) 2011-2017, Niklas Hauser
+ * Copyright (c) 2012, Georgi Grinshpun
+ * Copyright (c) 2013, Kevin Läufer
+ * Copyright (c) 2014, Sascha Schade
+ * Copyright (c) 2022-2023, Christopher Durand
+ * Copyright (c) 2026, LucaFeggi
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_STM32H5_SPI_MASTER{{ id }}_HPP
+#define MODM_STM32H5_SPI_MASTER{{ id }}_HPP
+
+#include <modm/architecture/interface/spi_lock.hpp>
+#include <modm/architecture/interface/spi_master.hpp>
+#include <modm/architecture/interface/delay.hpp>
+#include <modm/platform/gpio/connector.hpp>
+#include <modm/math/algorithm/prescaler.hpp>
+#include <modm/processing/fiber.hpp>
+#include "spi_hal_{{ id }}.hpp"
+
+namespace modm::platform
+{
+
+/**
+ * Serial peripheral interface (SPI{{ id }}).
+ *
+ * @author LucaFeggi
+ * @ingroup	modm_platform_spi modm_platform_spi_{{id}}
+ */
+class SpiMaster{{ id }} : public modm::SpiMaster, public SpiLock<SpiMaster{{ id }}>
+{
+private:
+	static inline uint32_t clockPeriodNs = 0;
+	static inline uint32_t pollBudget = 10'000'000;
+	static inline uint32_t lastErrorFlags = 0;
+	static constexpr uint32_t SpiErrorMask = SPI_SR_UDR | SPI_SR_OVR |
+		SPI_SR_CRCE | SPI_SR_TIFRE | SPI_SR_MODF;
+public:
+	static constexpr uint32_t TimeoutError = 0x80000000u;
+	using Hal = SpiHal{{ id }};
+
+	using DataMode = Hal::DataMode;
+	using DataOrder = Hal::DataOrder;
+	using DataSize = Hal::DataSize;
+
+	/** Raw SPI status flags, or TimeoutError, from the last transfer. */
+	static uint32_t getLastErrorFlags() { return lastErrorFlags; }
+	/** Limit no-progress polling. The budget counts fiber yields. */
+	static bool setPollBudget(uint32_t budget)
+	{
+		if (budget == 0) return false;
+		pollBudget = budget;
+		return true;
+	}
+
+	template< class... Signals >
+	static void
+	connect()
+	{
+		using Connector = GpioConnector<Peripheral::Spi{{ id }}, Signals...>;
+		using Sck = typename Connector::template GetSignal<Gpio::Signal::Sck>;
+		using Mosi = typename Connector::template GetSignal<Gpio::Signal::Mosi>;
+		using Miso = typename Connector::template GetSignal<Gpio::Signal::Miso>;
+
+		Sck::setOutput(Gpio::OutputType::PushPull);
+		Mosi::setOutput(Gpio::OutputType::PushPull);
+		Miso::setInput(Gpio::InputType::Floating);
+		Connector::connect();
+	}
+
+	template< class SystemClock, baudrate_t baudrate, percent_t tolerance=pct(5) >
+	static void
+	initialize()
+	{
+		constexpr auto result = modm::Prescaler::from_power(SystemClock::Spi{{ id }}, baudrate, 2, 256);
+		assertBaudrateInTolerance< result.frequency, baudrate, tolerance >();
+		clockPeriodNs = (1'000'000'000ull + result.frequency - 1) / result.frequency;
+
+		// translate the prescaler into the bitmapping
+		constexpr Hal::Prescaler prescaler{result.index << SPI_CFG1_MBR_Pos};
+
+		Hal::initialize(prescaler);
+	}
+
+	static void
+	setDataMode(DataMode mode)
+	{
+		finishTransfer();
+		Hal::setDataMode(mode);
+	}
+
+	static void
+	setDataOrder(DataOrder order)
+	{
+		finishTransfer();
+		Hal::setDataOrder(order);
+	}
+
+	static bool
+	setDataSize(DataSize size)
+	{
+		if (size < DataSize::Bit4 or size > DataSize::Bit8) return false;
+		finishTransfer();
+		Hal::setDataSize(static_cast<SpiHal{{ id }}::DataSize>(size));
+		return true;
+	}
+
+	[[deprecated("Use transfer() instead!")]] // DEPRECATED: 2026q3
+	static uint8_t
+	transferBlocking(uint8_t data)
+	{
+		return transfer(data);
+	}
+
+	[[deprecated("Use transfer() instead!")]] // DEPRECATED: 2026q3
+	static void
+	transferBlocking(const uint8_t* tx, uint8_t* rx, std::size_t length)
+	{
+		transfer(tx, rx, length);
+	}
+
+
+	static uint8_t
+	transfer(uint8_t data);
+
+	static void
+	transfer(const uint8_t* tx, uint8_t* rx, std::size_t length);
+
+private:
+	static bool
+	waitFor(Hal::StatusFlag flag);
+
+	static void
+	finishTransfer();
+};
+
+} // namespace modm::platform
+
+#endif // MODM_STM32H5_SPI_MASTER{{ id }}_HPP
