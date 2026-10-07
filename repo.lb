@@ -185,6 +185,13 @@ def init(repo):
         config = {v.strip(): (module.parent / "board.xml") for v in versions}
         repo.add_configuration(Configuration(name, description, config, versions[0].strip()))
 
+    # Add the hosted targets as versions of one configuration, defaulting to this computer
+    config = {c.stem: c for c in Path(repopath("tools/devices/hosted/config")).glob("*.xml")}
+    arch = "arm64" if platform.machine().lower() in ["arm64", "aarch64"] else "x86_64"
+    host = f"{platform.system().lower()}-{arch}"
+    repo.add_configuration(Configuration("hosted", "Hosted target for Linux, macOS and Windows",
+                                         config, host if host in config else "windows"))
+
     # Add Jinja2 filters commonly used in this repository
     if 'Windows' in platform.platform():
         def windowsify(path, escape_level):

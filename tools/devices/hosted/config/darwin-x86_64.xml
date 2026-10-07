@@ -1,0 +1,11 @@
+<library>
+  <repositories>
+    <repository>
+      <path>../../../../repo.lb</path>
+    </repository>
+  </repositories>
+
+  <options>
+    <option name="modm:target">hosted-darwin</option>
+  </options>
+</library>

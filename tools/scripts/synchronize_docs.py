@@ -131,7 +131,7 @@ changelog_in_paths = repopath("docs/release").glob("20*.md")
 changelog_path = repopath("CHANGELOG.md")
 
 configs = get_lbuild(repopath(".")).configurations
-configs = sorted(c.fullname.replace("modm:", "") for c in configs)
+configs = sorted(c.fullname.replace("modm:", "") for c in configs if c.fullname != "modm:hosted")
 configs = [{"name": name(c), "url": config_url(c)} for c in configs]
 bsp_table = format_table(configs, 4)
 
