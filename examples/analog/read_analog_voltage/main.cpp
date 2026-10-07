@@ -32,7 +32,7 @@ main()
 		int sensorValue = Adc::readChannel(0);
 		// convert the analog reading (which goes from 0 - 1023) to a voltage (0 - 5V):
 		float voltage = sensorValue * (5.0 / 1023.0);
-		// print voltage
-		MODM_LOG_INFO << voltage << "V" << modm::endl;
+		// print analog readout and voltage
+		MODM_LOG_INFO << sensorValue << " = " << voltage << "V" << modm::endl;
 	}
 }
