@@ -9,6 +9,9 @@
  */
 // ----------------------------------------------------------------------------
 
+#if __has_include(<modm/board.hpp>)
+#include <modm/board.hpp>
+#endif
 #include <modm/debug.hpp>
 #include <modm/processing.hpp>
 
@@ -39,6 +42,9 @@ modm::fiber::Stack stack2;
 int
 main(void)
 {
+#if __has_include(<modm/board.hpp>)
+	Board::initialize();
+#endif
 	const char *arg = "World";
 	modm::fiber::Task fiber2(stack2, [=]() { test.world(arg); });
 
