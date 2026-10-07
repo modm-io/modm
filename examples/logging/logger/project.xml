@@ -1,8 +1,16 @@
 <library>
-  <extends>modm:rp-pico</extends>
+  <!-- CI: run -->
+  <extends>modm:nucleo-l476rg</extends>
+  <!-- <extends>modm:arduino-nano</extends> -->
+  <!-- <extends>modm:hosted</extends> -->
+  <!-- <extends>modm:nucleo-f103rb</extends> -->
+  <!-- <extends>modm:rp-pico</extends> -->
   <modules>
     <module>modm:debug</module>
-    <module>modm:platform:uart:0</module>
+    <module>modm:platform:core</module>
+    <module>modm:architecture:delay</module>
     <module>modm:build:scons</module>
+    <!-- Required for modm:rp-pico -->
+    <!-- <module>modm:platform:uart:0</module> -->
   </modules>
 </library>
