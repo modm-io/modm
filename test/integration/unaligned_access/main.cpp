@@ -10,6 +10,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
+#include "../integration_test.hpp"
 #include <modm/architecture/interface/unaligned.hpp>
 #include <modm/container/smart_pointer.hpp>
 
@@ -22,27 +23,18 @@ uint32_t output;
 
 void error()
 {
-	while (true)
-	{
-		LedUp::toggle();
-		modm::delay(100ms);
-	}
+	// an unaligned access was trapped or returned the wrong value
+	finishTest(false);
 }
 
 // ----------------------------------------------------------------------------
 int
 main()
 {
-	LedRight::setOutput(modm::Gpio::High);
-	LedLeft::setOutput();
-	LedUp::setOutput();
-	LedDown::setOutput();
+	Board::initialize();
 
-	uint8_t offset(0);
-
-	// if an unaligned access is trapped, the blue led will blink
-
-	while (true)
+	// try every alignment of a 32-bit value several times
+	for (uint8_t offset = 0; offset < 100; offset++)
 	{
 		{
 			// "smart" pointer is created on the heap
@@ -75,12 +67,7 @@ main()
 		}
 
 		input += 0x0125197;
-		offset += 1;
-
-		LedRight::toggle();
-		LedLeft::toggle();
-		modm::delay(Button::read() ? 250ms : 500ms);
 	}
 
-	return 0;
+	return finishTest(true);
 }
