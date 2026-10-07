@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2023, Christopher Durand
+ * Copyright (c) 2023, Luiz Carlos Gili
  *
  * This file is part of the modm project.
  *
@@ -64,7 +65,7 @@ int main()
 
 	while (true)
 	{
-		Led1::toggle();
+		Leds::toggle();
 		modm::delay(500ms);
 	}
 
