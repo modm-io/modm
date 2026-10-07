@@ -1,8 +1,0 @@
-<library>
-  <extends>modm:disco-f407vg</extends>
-  <modules>
-    <module>modm:platform:spi.bitbang</module>
-    <module>modm:platform:spi:2</module>
-    <module>modm:build:scons</module>
-  </modules>
-</library>
