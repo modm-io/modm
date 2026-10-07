@@ -1,6 +1,7 @@
 /*
- * Copyright (c) 2020, Sascha Schade
  * Copyright (c) 2018, Raphael Lehmann
+ * Copyright (c) 2020, Benjamin Carrick
+ * Copyright (c) 2026, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -11,110 +12,68 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
-
 #include <modm/driver/storage/block_device_spiflash.hpp>
 
-using namespace Board;
+#include "../block_device_test.hpp"
+#include "../integration_test.hpp"
 
-Board::w25q16::StorageDevice storageDevice;
+#ifdef ONBOARD_FLASH
+// The 16 MBit flash chip (W25Q16) on the board
+using StorageDevice = Board::w25q16::StorageDevice;
+constexpr uint32_t BlockSize = Board::w25q16::BlockSize;
 
-void printMemoryContent(const uint8_t* address, std::size_t size) {
-	for (std::size_t ii = 0; ii < size; ii++) {
-		MODM_LOG_INFO.printf("%x", address[ii]);
-	}
+static void
+initializeSpi()
+{
+	Board::initializeW25q16();
 }
+#else
+// A 64 MBit flash chip (SST26VF064B) connected to the Arduino header:
+//   Cs = A4 (CN7 pin 17), Mosi = B5 (D22), Miso = B4 (D25), Sck = B3 (D23)
+using SpiMaster = SpiMaster1;
+using Cs = GpioA4;
+using Mosi = GpioB5;
+using Miso = GpioB4;
+using Sck = GpioB3;
+constexpr uint32_t BlockSize = 256;
+constexpr uint32_t MemorySize = 8*1024*1024;
+using StorageDevice = modm::BdSpiFlash<SpiMaster, Cs, MemorySize>;
 
-uint8_t bufferA[Board::w25q16::BlockSize];
-uint8_t bufferB[Board::w25q16::BlockSize];
-uint8_t bufferC[Board::w25q16::BlockSize];
+static void
+initializeSpi()
+{
+	SpiMaster::connect<Mosi::Mosi, Miso::Miso, Sck::Sck>();
+	SpiMaster::initialize<Board::SystemClock, 11_MHz>();
+}
+#endif
 
 constexpr uint32_t TestMemorySize = 8*1024;
+StorageDevice storageDevice;
 
-void doMemoryTest()
-{
-	LedGreen::set();
-	MODM_LOG_INFO << "Starting memory test!" << modm::endl;
-
-	for (uint16_t iteration = 0; iteration < 4; iteration++) {
-		uint8_t* pattern = (iteration % 2 == 0) ? bufferA : bufferB;
-
-		if (not storageDevice.erase(0, TestMemorySize)) {
-			MODM_LOG_INFO << "Error: Unable to erase device.";
-			return;
-		}
-
-		for (uint32_t ii = 0; ii < TestMemorySize; ii += Board::w25q16::BlockSize) {
-			if (not storageDevice.program(pattern, ii, Board::w25q16::BlockSize)) {
-				MODM_LOG_INFO << "Error: Unable to write data.";
-				return;
-			}
-			MODM_LOG_INFO << ".";
-		}
-
-		for (uint32_t ii = 0; ii < TestMemorySize; ii += Board::w25q16::BlockSize) {
-			if (not storageDevice.read(bufferC, ii, Board::w25q16::BlockSize)) {
-				MODM_LOG_INFO << "Error: Unable to read data.";
-				return;
-			}
-			else if (std::memcmp(pattern, bufferC, Board::w25q16::BlockSize)) {
-				MODM_LOG_INFO << "ii=" << ii << modm::endl;
-				MODM_LOG_INFO << "Error: Read '";
-				printMemoryContent(bufferC, Board::w25q16::BlockSize);
-				MODM_LOG_INFO << "', expected: '";
-				printMemoryContent(pattern, Board::w25q16::BlockSize);
-				MODM_LOG_INFO << "'." << modm::endl;
-				return;
-			}
-		}
-		MODM_LOG_INFO << "." << modm::endl;
-	}
-
-	MODM_LOG_INFO << modm::endl << "Finished!" << modm::endl;
-	LedGreen::reset();
-}
-
+/**
+ * Writes alternating patterns into the first 8kB of a SPI flash chip using the
+ * `modm::BdSpiFlash` block device and compares what it reads back.
+ */
 int
 main()
 {
 	Board::initialize();
+	initializeSpi();
 
-	Board::initializeW25q16();
-
-	// Use the logging streams to print some messages.
-	// Change MODM_LOG_LEVEL above to enable or disable these messages
-	MODM_LOG_DEBUG   << "debug"   << modm::endl;
-	MODM_LOG_INFO    << "info"    << modm::endl;
-	MODM_LOG_WARNING << "warning" << modm::endl;
-	MODM_LOG_ERROR   << "error"   << modm::endl;
-
-	bool initializeSuccess = false;
-
-	MODM_LOG_INFO << "Erasing complete flash chip... (This may take a while)" << modm::endl;
-
-	if (not storageDevice.initialize()) {
-		MODM_LOG_INFO << "Error: Unable to initialize device.";
-	}
-	else if (not storageDevice.erase(0, Board::w25q16::MemorySize)) {
-		MODM_LOG_INFO << "Error: Unable to erase device.";
+	bool passed = storageDevice.initialize();
+	if (passed)
+	{
+		const auto id = storageDevice.readId();
+		MODM_LOG_INFO << "deviceId=" << id.deviceId << " manufacturerId=" << id.manufacturerId
+					  << " deviceType=" << id.deviceType << modm::endl;
+		// a missing chip reads as all ones or all zeros
+		passed = (id.manufacturerId != 0x00) and (id.manufacturerId != 0xff);
 	}
 	else {
-		auto id = storageDevice.readId();
-		MODM_LOG_INFO << "deviceId=" << id.deviceId << " manufacturerId=" << id.manufacturerId;
-		MODM_LOG_INFO << " deviceType=" << id.deviceType << modm::endl;
-
-		MODM_LOG_INFO << "status=" << static_cast<uint8_t>(storageDevice.readStatus()) << modm::endl;
-
-		MODM_LOG_INFO << "Press USER button to start the memory test." << modm::endl;
-		initializeSuccess = true;
+		MODM_LOG_ERROR << "Error: Unable to initialize device." << modm::endl;
 	}
 
-	while (true)
-	{
-		if (initializeSuccess and Button::read())
-		{
-			doMemoryTest();
-		}
-	}
+	passed = passed and testBlockDevice<BlockSize>(storageDevice, 0, TestMemorySize, 4);
 
-	return 0;
+	return finishTest(passed);
 }
