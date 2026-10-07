@@ -11,16 +11,14 @@
 
 #include <modm/board.hpp>
 
+// The comparator, its pins and its options differ between the devices
+#if defined STM32F3
 using Comparator = modm::platform::Comp2;
 
-int
-main()
+static void
+initializeComparator()
 {
-	Board::initialize();
-	Board::LedNorth::setOutput();
-
 	Comparator::connect<GpioA7::Inp, GpioA2::Out>();
-
 	Comparator::initialize(
 			Comparator::InvertingInput::Vref1Div2,
 			Comparator::NonInvertingInput::BitUnset, // GpioA7
@@ -29,12 +27,37 @@ main()
 			Comparator::Mode::HighSpeed,
 			Comparator::Polarity::NonInverted,
 			false);
+}
+#else
+using Comparator = modm::platform::Comp1;
+
+static void
+initializeComparator()
+{
+	Comparator::connect<GpioA0::Out, GpioA1::Inp>();
+	Comparator::initialize(
+			Comparator::InvertingInput::Vref1Div2,
+			Comparator::NonInvertingInput::GpioA1,
+			Comparator::Hysteresis::NoHysteresis,
+			Comparator::Mode::HighSpeed,
+			Comparator::Polarity::NonInverted,
+			false);
+}
+#endif
+
+int
+main()
+{
+	Board::initialize();
+	Board::Leds::setOutput();
+
+	initializeComparator();
 
 	while (true)
 	{
 		modm::delay(250ms);
 		MODM_LOG_INFO << "Comparator: " << Comparator::getOutput() << modm::endl;
-		Board::LedNorth::set(Comparator::getOutput());
+		Board::Leds::write(Comparator::getOutput());
 	}
 
 	return 0;
