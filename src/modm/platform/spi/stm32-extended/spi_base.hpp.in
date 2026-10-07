@@ -13,8 +13,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_STM32H7_SPI_BASE_HPP
-#define MODM_STM32H7_SPI_BASE_HPP
+#ifndef MODM_STM32_EXTENDED_SPI_BASE_HPP
+#define MODM_STM32_EXTENDED_SPI_BASE_HPP
 
 #include <cstdint>
 #include "../device.hpp"
@@ -46,7 +46,9 @@ public:
 		CrcError 				= SPI_IER_CRCEIE,
 		TiFrameError			= SPI_IER_TIFREIE,
 		ModeFault				= SPI_IER_MODFIE,
+%% if supports_transfer_reload
 		Reload					= SPI_IER_TSERFIE
+%% endif
 	};
 	MODM_FLAGS32(Interrupt);
 
@@ -63,7 +65,9 @@ public:
 		CrcError 				= SPI_SR_CRCE,
 		TiFrameError			= SPI_SR_TIFRE,
 		ModeFault				= SPI_SR_MODF,
+%% if supports_transfer_reload
 		Reload					= SPI_SR_TSERF,
+%% endif
 		Suspension				= SPI_SR_SUSP,
 		TxTransferComplete		= SPI_SR_TXC,
 		RxFifoLevel1			= SPI_SR_RXPLVL_1,
@@ -201,4 +205,4 @@ operator<=>(SpiBase::DataSize s0, SpiBase::DataSize s1)
 
 } // namespace modm::platform
 
-#endif // MODM_STM32H7_SPI_BASE_HPP
+#endif // MODM_STM32_EXTENDED_SPI_BASE_HPP

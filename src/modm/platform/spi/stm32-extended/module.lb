@@ -32,12 +32,16 @@ class Instance(Module):
         }
 
         device = env[":target"]
-        if device.identifier.family in ["h7"]:
+        if device.identifier.family in ["h5", "h7"]:
             properties["fifo_size"] = 16 if self.instance in (1, 2, 3) else 8
             properties["max_data_bits"] = 32 if self.instance in (1, 2, 3) else 16
             properties["max_crc_bits"] = properties["max_data_bits"]
-            properties["max_transfer_size"] = 2**16 - 1  # is smaller for some instances on U5
-            properties["i2s"] = self.instance in (1, 2, 3, 6)
+            properties["max_transfer_size"] = 2**16 - 1
+            # H7 alone exposes the transfer-reload register fields.  Keep
+            # this explicit at generation time so H5 never advertises them.
+            properties["supports_transfer_reload"] = device.identifier.family == "h7"
+            # ES0565 requires bounded polling and an SCK hold after EOT.
+            properties["requires_h5_errata_workarounds"] = device.identifier.family == "h5"
         else:
             raise NotImplementedError("Unsupported device")
 
@@ -49,8 +53,14 @@ class Instance(Module):
         env.template("spi_master.hpp.in", "spi_master_{}.hpp".format(self.instance))
         env.template("spi_master.cpp.in", "spi_master_{}.cpp".format(self.instance))
         if env.has_module(":platform:dma"):
-            env.template("spi_master_dma.hpp.in", "spi_master_{}_dma.hpp".format(self.instance))
-            env.template("spi_master_dma_impl.hpp.in", "spi_master_{}_dma_impl.hpp".format(self.instance))
+            if device.identifier.family == "h5":
+                # GPDMA has different request, descriptor, unit and recovery
+                # semantics than the H7 classic DMA controller.
+                env.template("gpdma/spi_master_dma.hpp.in", "spi_master_{}_dma.hpp".format(self.instance))
+                env.template("gpdma/spi_master_dma_impl.hpp.in", "spi_master_{}_dma_impl.hpp".format(self.instance))
+            else:
+                env.template("spi_master_dma.hpp.in", "spi_master_{}_dma.hpp".format(self.instance))
+                env.template("spi_master_dma_impl.hpp.in", "spi_master_{}_dma_impl.hpp".format(self.instance))
 
 
 def init(module):
@@ -61,8 +71,10 @@ def prepare(module, options):
     device = options[":target"]
     if not device.has_driver("spi:stm32-extended"):
         return False
-    if device.identifier.family not in ["h7"]:
-        # U5 is not supported yet
+    if device.identifier.family == "h5" and device.identifier.name not in ["62", "63", "73"]:
+        return False
+    if device.identifier.family not in ["h5", "h7"]:
+        # U5 is not supported yet.
         return False
 
     module.depends(
@@ -81,5 +93,9 @@ def prepare(module, options):
     return True
 
 def build(env):
+    device = env[":target"]
+    env.substitutions = {
+        "supports_transfer_reload": device.identifier.family == "h7",
+    }
     env.outbasepath = "modm/src/modm/platform/spi"
-    env.copy("spi_base.hpp")
+    env.template("spi_base.hpp.in", "spi_base.hpp")

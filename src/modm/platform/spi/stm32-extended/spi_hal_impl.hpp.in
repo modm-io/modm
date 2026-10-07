@@ -13,7 +13,7 @@
 */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_STM32H7_SPI_HAL{{ id }}_HPP
+#ifndef MODM_STM32_EXTENDED_SPI_HAL{{ id }}_HPP
 #	error 	"Don't include this file directly, use 'spi_hal{{ id }}.hpp' instead!"
 #endif
 #include <modm/platform/clock/rcc.hpp>
@@ -49,7 +49,9 @@ SpiHal{{ id }}::initialize(Prescaler prescaler,
 		StatusFlag::CrcError |
 		StatusFlag::TiFrameError |
 		StatusFlag::ModeFault |
+%% if supports_transfer_reload
 		StatusFlag::Reload |
+%% endif
 		StatusFlag::Suspension
 	);
 
@@ -138,10 +140,14 @@ SpiHal{{ id }}::setCrcInitialValue(CrcInit init)
 }
 
 inline void
-SpiHal{{ id }}::setTransferSize(uint16_t size, uint16_t reload)
+SpiHal{{ id }}::setTransferSize(uint16_t size{% if supports_transfer_reload %}, uint16_t reload{% endif %})
 {
 	static_assert(SPI_CR2_TSIZE_Pos == 0);
+%% if supports_transfer_reload
 	SPI{{ id }}->CR2 = (reload << SPI_CR2_TSER_Pos) | size;
+%% else
+	SPI{{ id }}->CR2 = size;
+%% endif
 }
 
 inline void
@@ -261,7 +267,9 @@ SpiHal{{ id }}::acknowledgeInterruptFlags(StatusFlag_t flags)
 		SPI_IFCR_CRCEC |
 		SPI_IFCR_TIFREC |
 		SPI_IFCR_MODFC |
+%% if supports_transfer_reload
 		SPI_IFCR_TSERFC |
+%% endif
 		SPI_IFCR_SUSPC;
 
 	SPI{{ id }}->IFCR = flags.value & mask;
