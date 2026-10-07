@@ -1,7 +1,0 @@
-<library>
-  <extends>modm:disco-f407vg</extends>
-  <modules>
-    <module>modm:platform:uart.spi:2</module>
-    <module>modm:build:scons</module>
-  </modules>
-</library>
