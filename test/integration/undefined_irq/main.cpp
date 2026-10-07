@@ -11,67 +11,54 @@
 
 #include <modm/board.hpp>
 #include <modm/architecture/interface/assert.hpp>
-#include <string>
+#include <cstring>
 
-using namespace Board;
-using namespace std::string_literals;
+#include "../integration_test.hpp"
 
-MODM_ISR(EXTI0)
-{ MODM_LOG_DEBUG << "EXTI0 called!" << modm::endl; }
-MODM_ISR(EXTI1)
-{ MODM_LOG_DEBUG << "EXTI1 called!" << modm::endl; }
-MODM_ISR(EXTI2)
-{ MODM_LOG_DEBUG << "EXTI2 called!" << modm::endl; }
-MODM_ISR(EXTI3)
-{ MODM_LOG_DEBUG << "EXTI3 called!" << modm::endl; }
+/**
+ * Tests that an interrupt without a handler fails the `nvic.undef` assertion
+ * with the number of the interrupt, while the defined handlers are called.
+ */
+
+static volatile uint8_t called{0};
+
+MODM_ISR(EXTI0) { called++; }
+MODM_ISR(EXTI1) { called++; }
+MODM_ISR(EXTI2) { called++; }
+MODM_ISR(EXTI3) { called++; }
 
 // But we forgot about EXTI4
-// MODM_ISR(EXTI4)
-// { MODM_LOG_DEBUG << "EXTI4 called!" << modm::endl; }
+// MODM_ISR(EXTI4) { called++; }
 
-[[maybe_unused]]
+static volatile uint8_t undefined{0};
+static volatile int8_t undefined_irq{-1};
+
 static modm::Abandonment
 core_assertion_handler(const modm::AssertionInfo &info)
 {
-	if (info.name == "nvic.undef"s) {
-		MODM_LOG_ERROR.printf("Ignoring undefined IRQ handler %d!\n", int8_t(info.context));
+	if (strcmp(info.name, "nvic.undef") == 0) {
+		undefined++;
+		undefined_irq = int8_t(info.context);
 		return modm::Abandonment::Ignore;
 	}
 	return modm::Abandonment::DontCare;
 }
-// Comment this line to abandon execution
 MODM_ASSERTION_HANDLER(core_assertion_handler);
-
 
 int main()
 {
 	Board::initialize();
-	// Enable the Interrupt handlers
-	NVIC_EnableIRQ(EXTI0_IRQn);
-	NVIC_EnableIRQ(EXTI1_IRQn);
-	NVIC_EnableIRQ(EXTI2_IRQn);
-	NVIC_EnableIRQ(EXTI3_IRQn);
-	NVIC_EnableIRQ(EXTI4_IRQn);
-	// Give them the highest priority
-	NVIC_SetPriority(EXTI0_IRQn, 0);
-	NVIC_SetPriority(EXTI1_IRQn, 0);
-	NVIC_SetPriority(EXTI2_IRQn, 0);
-	NVIC_SetPriority(EXTI3_IRQn, 0);
-	NVIC_SetPriority(EXTI4_IRQn, 0);
 
-	MODM_LOG_INFO << "Push the Button to trigger EXTI interrupts!" << modm::endl;
-	int ii{0};
-
-	while (true)
+	for (int ii = 0; ii < 5; ii++)
 	{
-		if(Button::read())
-		{
-			NVIC_SetPendingIRQ(IRQn_Type(int(EXTI0_IRQn) + ii));
-			ii = (ii + 1) % 5;
-			// wait for user reaction
-			modm::delay(500ms);
-		}
+		const auto irq = IRQn_Type(int(EXTI0_IRQn) + ii);
+		NVIC_SetPriority(irq, 0);
+		NVIC_EnableIRQ(irq);
+		NVIC_SetPendingIRQ(irq);
+		modm::delay(1ms);
 	}
+	MODM_LOG_INFO << called << " handlers called, " << undefined << " undefined: IRQ "
+				  << undefined_irq << modm::endl;
 
-	return 0;
+	return finishTest(called == 4 and undefined == 1 and undefined_irq == int8_t(EXTI4_IRQn));
 }
