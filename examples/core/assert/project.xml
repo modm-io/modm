@@ -1,8 +1,8 @@
 <library>
   <!-- CI: run fail -->
-  <options>
-    <option name="modm:target">hosted-linux</option>
-  </options>
+  <extends>modm:disco-f469ni</extends>
+  <!-- <extends>modm:arduino-nano</extends> -->
+  <!-- <extends>modm:hosted</extends> -->
   <modules>
     <module>modm:platform:core</module>
     <module>modm:architecture:assert</module>
