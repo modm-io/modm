@@ -1,8 +1,26 @@
 <library>
-  <extends>modm:nucleo-f429zi</extends>
+  <!-- Try and cover every main AVR and Cortex-M design-->
+  <!-- AVR -->
+  <!-- <extends>modm:mega-2560-pro</extends> -->
+  <!-- Cortex-M0 -->
+  <extends>modm:nucleo-f072rb</extends>
+  <!-- Cortex-M0+ -->
   <!-- <extends>modm:nucleo-g071rb</extends> -->
+  <!-- Cortex-M3 -->
+  <!-- <extends>modm:nucleo-f103rb</extends> -->
+  <!-- Cortex-M4 -->
+  <!-- <extends>modm:nucleo-f429zi</extends> -->
+  <!-- Cortex-M7 -->
+  <!-- <extends>modm:nucleo-f767zi</extends> -->
+  <!-- <extends>modm:nucleo-h743zi</extends> -->
+  <!-- Cortex-M33 -->
+  <!-- <extends>modm:nucleo-u575zi-q</extends> -->
+  <!-- <extends>modm:nucleo-l552ze-q</extends> -->
+  <!-- <extends>modm:nucleo-h563zi</extends> -->
   <options>
     <option name="modm:io:with_long_long">yes</option>
+    <!-- Required for modm:mega-2560-pro -->
+    <!-- <option name="modm:io:with_printf">yes</option> -->
   </options>
   <modules>
     <module>modm:build:scons</module>

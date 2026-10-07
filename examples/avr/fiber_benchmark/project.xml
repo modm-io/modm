@@ -1,9 +1,0 @@
-<library>
-  <extends>modm:mega-2560-pro</extends>
-  <!-- <extends>modm:arduino-nano</extends> -->
-  <modules>
-    <module>modm:build:scons</module>
-    <module>modm:processing:timer</module>
-    <module>modm:processing:fiber</module>
-  </modules>
-</library>
