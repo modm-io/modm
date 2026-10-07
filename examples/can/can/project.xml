@@ -1,8 +1,20 @@
 <library>
   <extends>modm:disco-f407vg</extends>
+  <!-- <extends>modm:blue-pill-f103</extends> -->
+  <!-- <extends>modm:disco-f072rb</extends> -->
+  <!-- <extends>modm:disco-f303vc</extends> -->
+  <!-- <extends>modm:disco-f469ni</extends> -->
   <modules>
+    <module>modm:processing:timer</module>
+    <module>modm:build:scons</module>
+    <!-- Required for modm:disco-f407vg, modm:disco-f469ni with two CAN peripherals -->
     <module>modm:platform:can:1</module>
     <module>modm:platform:can:2</module>
-    <module>modm:build:scons</module>
+    <!-- Required for modm:blue-pill-f103, modm:disco-f072rb, modm:disco-f303vc with one CAN peripheral -->
+    <!-- <module>modm:platform:can</module> -->
   </modules>
+  <collectors>
+    <!-- Required for modm:blue-pill-f103 -->
+    <!-- <collect name="modm:build:openocd.source">interface/stlink.cfg</collect> -->
+  </collectors>
 </library>

@@ -1,9 +1,0 @@
-<library>
-  <extends>modm:disco-f407vg</extends>
-  <modules>
-    <module>modm:platform:can:1</module>
-    <module>modm:platform:can:2</module>
-    <module>modm:processing:timer</module>
-    <module>modm:build:scons</module>
-  </modules>
-</library>

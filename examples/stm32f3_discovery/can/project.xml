@@ -1,8 +1,0 @@
-<library>
-  <extends>modm:disco-f303vc</extends>
-  <modules>
-    <module>modm:platform:can</module>
-    <module>modm:processing:timer</module>
-    <module>modm:build:scons</module>
-  </modules>
-</library>
