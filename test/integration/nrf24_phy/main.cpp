@@ -11,50 +11,47 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "../radio.hpp"
+#include "radio.hpp"
+
+#include "../integration_test.hpp"
+
+/**
+ * Tests the SPI communication with two nRF24L01+ modules by writing and
+ * reading back their address registers.
+ */
 
 template< class Phy >
-void
+bool
 test()
 {
-	Phy::setRxAddress(Phy::Pipe::PIPE_0, 0xdeadb33f05);
-	uint64_t addr = Phy::getRxAddress(Phy::Pipe::PIPE_0);
-	MODM_LOG_INFO.printf("Setting RX_P0 address to:  0xdeadb33f05\n");
-	MODM_LOG_INFO.printf("Reading RX_P0 address:     0x%" PRIx32 "%" PRIx32 "\n",
-	                     uint32_t((addr >> 32) & 0xffffffff),
-	                     uint32_t(addr & 0xffffffff));
+	constexpr uint64_t RxAddress = 0xdeadb33f05;
+	constexpr uint64_t TxAddress = 0xabcdef55ff;
 
-	Phy::setTxAddress(0xabcdef55ff);
-	addr = Phy::getTxAddress();
-	MODM_LOG_INFO.printf("Setting TX address to:     0xabcdef55ff\n");
-	MODM_LOG_INFO.printf("Reading TX address:        0x%" PRIx32 "%" PRIx32 "\n",
-	                     uint32_t((addr >> 32) & 0xffffffff),
-	                     uint32_t(addr & 0xffffffff));
+	Phy::setRxAddress(Phy::Pipe::PIPE_0, RxAddress);
+	const bool rx = (Phy::getRxAddress(Phy::Pipe::PIPE_0) == RxAddress);
+	MODM_LOG_INFO << "RX_P0 address " << (rx ? "matches" : "does not match!") << modm::endl;
 
-	uint8_t rf_ch = Phy::readRegister(Phy::NrfRegister::RF_CH);
-	MODM_LOG_INFO.printf("Expected output for RF_CH: 0x2\n");
-	MODM_LOG_INFO.printf("Reading RF_CH:             0x%" PRIx8 "\n\n", rf_ch);
+	Phy::setTxAddress(TxAddress);
+	const bool tx = (Phy::getTxAddress() == TxAddress);
+	MODM_LOG_INFO << "TX address " << (tx ? "matches" : "does not match!") << modm::endl;
+
+	// reset value of the RF channel
+	const uint8_t rf_ch = Phy::readRegister(Phy::NrfRegister::RF_CH);
+	MODM_LOG_INFO << "RF_CH is " << rf_ch << ", expected 2" << modm::endl;
+
+	return rx and tx and (rf_ch == 2);
 }
 
-// Test SPI communication by writing and reading out registers on the
-// nRF24L01+ module.
 int main()
 {
 	Board::initialize();
-	MODM_LOG_INFO << "Hello from nRF24-phy-test example" << modm::endl;
-
 	initializeSpi();
 
-	while (true)
-	{
-		MODM_LOG_INFO << "Testing PHY1" << modm::endl;
-		test<Nrf1Phy>();
+	MODM_LOG_INFO << "Testing PHY1" << modm::endl;
+	bool passed = test<Nrf1Phy>();
 
-		MODM_LOG_INFO << "Testing PHY2" << modm::endl;
-		test<Nrf2Phy>();
+	MODM_LOG_INFO << "Testing PHY2" << modm::endl;
+	passed &= test<Nrf2Phy>();
 
-		modm::delay(1s);
-	}
-
-	return 0;
+	return finishTest(passed);
 }
