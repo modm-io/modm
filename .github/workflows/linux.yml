@@ -85,69 +85,25 @@ jobs:
         if: always()
         run: |
           (cd test && make run-hosted-linux-clang)
+      # The remaining ones are compiled by the stm32-unittests job
       - name: Compile STM32 Unittests
         if: always()
         run: |
-          (cd test && make compile-nucleo-l432kc)
-          (cd test && make compile-nucleo-f091rc_A)
-          (cd test && make compile-nucleo-f091rc_B)
-          (cd test && make compile-nucleo-f103rb_A)
-          (cd test && make compile-nucleo-f103rb_B)
-          (cd test && make compile-nucleo-f401re)
-          (cd test && make compile-nucleo-f411re)
-          (cd test && make compile-nucleo-f429zi)
-          (cd test && make compile-nucleo-f446re)
-          (cd test && make compile-nucleo-f446ze)
-          (cd test && make compile-nucleo-f767zi)
-          (cd test && make compile-nucleo-g474re)
-          (cd test && make compile-nucleo-h723zg)
-          (cd test && make compile-nucleo-l432kc)
-          (cd test && make compile-nucleo-l496zg-p)
-          (cd test && make compile-nucleo-l552ze-q)
-      - name: Linux Examples
+          for target in f446re f446ze f767zi g474re; do
+            (cd test && make compile-nucleo-$target)
+          done
+      - name: Hosted Examples
         if: always()
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py linux)
-      - name: Generic Examples
-        if: always()
-        run: |
-          (cd examples && ../tools/scripts/examples_compile.py generic)
-      - name: Examples SAMD Devices
-        if: always()
-        run: |
-          (cd examples && ../tools/scripts/examples_compile.py feather_m4 samd samd21_xplained_pro)
-      - name: Examples SAMG Devices
-        if: always()
-        run: |
-          (cd examples && ../tools/scripts/examples_compile.py samg55_xplained_pro)
-      - name: Examples SAME5x Devices
-        if: always()
-        run: |
-          (cd examples && ../tools/scripts/examples_compile.py same54_xplained_pro)
-      - name: Examples SAME70 Devices
-        if: always()
-        run: |
-          (cd examples && ../tools/scripts/examples_compile.py same70_xplained)
-      - name: Examples SAMV Devices
-        if: always()
-        run: |
-          (cd examples && ../tools/scripts/examples_compile.py samv samv71_xplained_ultra)
-      - name: Examples RP20 Devices
-        if: always()
-        run: |
-          (cd examples && ../tools/scripts/examples_compile.py feather_rp2040 rp_pico thingplus_rp2040)
-      - name: Examples NRF5 Series
-        if: always()
-        run: |
-          (cd examples && ../tools/scripts/examples_compile.py nrf51422-dk nrf52840-dk nrf5340-dk)
+          (cd examples && ../tools/scripts/examples_compile.py . ../test/integration --target '^hosted')
       - name: Execute Python Scripts
         if: always()
         run: |
           python3 tools/scripts/authors.py --handles --count --shoutout --since 2017-01-01
-          python3 tools/xpcc_generator/builder/system_layout.py examples/xpcc/xml/communication.xml -o /tmp
+          python3 tools/xpcc_generator/builder/system_layout.py examples/communication/xpcc/xml/communication.xml -o /tmp
           python3 tools/font_creator/font_export.py tools/font_creator/fonts/all_caps_3x5.font /tmp/all_caps_converted
 
-  stm32-examples:
+  stm32-unittests:
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
@@ -162,99 +118,21 @@ jobs:
       - name: Update lbuild
         run: |
           pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
-      - name: Examples STM32C0 Series
-        if: always()
+      # The remaining ones are compiled by the unittests-linux-generic job
+      - name: Compile STM32 Unittests
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py nucleo_c031c6)
-      - name: Examples STM32F0 Series
-        if: always()
-        run: |
-          (cd examples && ../tools/scripts/examples_compile.py stm32f0_discovery stm32f072_discovery nucleo_f031k6 nucleo_f072rb nucleo_f091rc nucleo_f042k6 stm32f030f4p6_demo_board)
-      - name: Examples STM32F1 Series
-        if: always()
-        run: |
-          (cd examples && ../tools/scripts/examples_compile.py stm32f1_discovery nucleo_f103rb olimexino_stm32 blue_pill_f103 black_pill_f103)
-      - name: Examples STM32F2 Series
-        if: always()
-        run: |
-          (cd examples && ../tools/scripts/examples_compile.py nucleo_f207zg)
-      - name: Examples STM32F3 Series
-        if: always()
-        run: |
-          (cd examples && ../tools/scripts/examples_compile.py stm32f3_discovery nucleo_f303k8 nucleo_f303re nucleo_f334r8)
-      - name: Examples STM32F7 Series
-        if: always()
-        run: |
-          (cd examples && ../tools/scripts/examples_compile.py stm32f746g_discovery stm32f769i_discovery nucleo_f746zg nucleo_f767zi nucleo_f722ze)
-      - name: Examples STM32G0 Series
-        if: always()
-        run: |
-          (cd examples && ../tools/scripts/examples_compile.py nucleo_g070rb nucleo_g071rb weact_g0b1cb)
-      - name: Examples STM32L0 Series
-        if: always()
-        run: |
-          (cd examples && ../tools/scripts/examples_compile.py nucleo_l031k6 nucleo_l053r8)
-      - name: Examples STM32L1 Series
-        if: always()
-        run: |
-          (cd examples && ../tools/scripts/examples_compile.py nucleo_l152re stm32l1_discovery)
-      - name: Examples STM32L4 Series
-        if: always()
-        run: |
-          (cd examples && ../tools/scripts/examples_compile.py stm32l476_discovery nucleo_l476rg nucleo_l432kc nucleo_l452re nucleo_l496zg-p)
-      - name: Examples STM32L5 Series
-        if: always()
-        run: |
-          (cd examples && ../tools/scripts/examples_compile.py nucleo_l552ze-q)
-      - name: Examples STM32U0 Series
-        if: always()
-        run: |
-          (cd examples && ../tools/scripts/examples_compile.py nucleo_u083rc)
-      - name: Examples STM32U3 Series
-        if: always()
-        run: |
-          (cd examples && ../tools/scripts/examples_compile.py nucleo_u385rg-q weact_u585ci)
-      - name: Examples STM32U5 Series
-        if: always()
-        run: |
-          (cd examples && ../tools/scripts/examples_compile.py nucleo_u575zi-q)
-      - name: Examples STM32G4 Series
-        if: always()
-        run: |
-          (cd examples && ../tools/scripts/examples_compile.py nucleo_g474re nucleo_g431rb nucleo_g431kb)
-      - name: Examples STM32H5 Series
-        if: always()
-        run: |
-          (cd examples && ../tools/scripts/examples_compile.py nucleo_h503rb nucleo_h533re nucleo_h563zi weact_h503cb weact_h523ce weact_h562rg)
-      - name: Examples STM32H7 Series
-        if: always()
-        run: |
-          (cd examples && ../tools/scripts/examples_compile.py nucleo_h743zi nucleo_h723zg stm32h750vbt6_devebox)
+          for target in l432kc f091rc_A f091rc_B f103rb_A f103rb_B f401re f411re f429zi h723zg l496zg-p l552ze-q; do
+            (cd test && make compile-nucleo-$target)
+          done
 
-  stm32f4-examples-1:
+  cortex-m-examples:
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-        with:
-          submodules: 'recursive'
-      - name: Fix Git permission/ownership problem
-        run: |
-          git config --global --add safe.directory /__w/modm/modm
-      - name: Update lbuild
-        run: |
-          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
-      - name: Examples STM32F4 Only Discovery Board
-        if: always()
-        run: |
-          (cd examples && ../tools/scripts/examples_compile.py stm32f4_discovery stm32f429_discovery stm32f469_discovery stm32f401_discovery)
-
-  stm32f4-examples-2:
-    runs-on: ubuntu-24.04
-    container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
+    strategy:
+      fail-fast: false
+      matrix:
+        part: [0, 1, 2, 3, 4, 5, 6]
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -269,10 +147,9 @@ jobs:
       - name: Install protobuf==3.20.1 grpcio-tools (pip)
         run: |
           pip3 install --upgrade --upgrade-strategy=eager --break-system-packages protobuf grpcio-tools
-      - name: Examples STM32F4 Without Discovery Board
-        if: always()
+      - name: Examples Cortex-M Part ${{ matrix.part }}
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py nucleo_f401re nucleo_f411re nucleo_f429zi nucleo_f446re nucleo_f446ze nucleo_f439zi black_pill_f401 black_pill_f411 stm32f407vet6_devebox stm32_f4ve)
+          (cd examples && ../tools/scripts/examples_compile.py . ../test/integration --target '^(stm32|sam|rp|nrf)' --split 7 --part ${{ matrix.part }})
 
   avr-examples:
     runs-on: ubuntu-24.04
@@ -297,7 +174,7 @@ jobs:
       - name: Examples AVR Series
         if: always()
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py avr arduino_uno arduino_nano srxe)
+          (cd examples && ../tools/scripts/examples_compile.py . ../test/integration --target '^at')
       - name: Compile AVR Unittests AT90CAN
         if: always()
         run: |
@@ -325,10 +202,14 @@ jobs:
           name: hal-compile-quick-avr
           path: test/all/log
 
-  hal-compile-quick-1:
+  hal-compile-quick:
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
+    strategy:
+      fail-fast: false
+      matrix:
+        part: [0, 1, 2, 3, 4, 5, 6]
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -340,89 +221,14 @@ jobs:
       - name: Update lbuild
         run: |
           pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
-      - name: Quick compile HAL for Cortex-M Part 1
+      - name: Quick compile HAL for Cortex-M Part ${{ matrix.part }}
         if: always()
         run: |
-          (cd test/all && python3 run_all.py stm32 sam rp nrf --quick --split 4 --part 0)
+          (cd test/all && python3 run_all.py stm32 sam rp nrf --quick --split 7 --part ${{ matrix.part }})
       - name: Upload log artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: hal-compile-quick-1
-          path: test/all/log
-
-  hal-compile-quick-2:
-    runs-on: ubuntu-24.04
-    container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-        with:
-          submodules: 'recursive'
-      - name: Fix Git permission/ownership problem
-        run: |
-          git config --global --add safe.directory /__w/modm/modm
-      - name: Update lbuild
-        run: |
-          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
-      - name: Quick compile HAL for Cortex-M Part 2
-        if: always()
-        run: |
-          (cd test/all && python3 run_all.py stm32 sam rp nrf --quick --split 4 --part 1)
-      - name: Upload log artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: hal-compile-quick-2
-          path: test/all/log
-
-  hal-compile-quick-3:
-    runs-on: ubuntu-24.04
-    container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-        with:
-          submodules: 'recursive'
-      - name: Fix Git permission/ownership problem
-        run: |
-          git config --global --add safe.directory /__w/modm/modm
-      - name: Update lbuild
-        run: |
-          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
-      - name: Quick compile HAL for Cortex-M Part 3
-        if: always()
-        run: |
-          (cd test/all && python3 run_all.py stm32 sam rp nrf --quick --split 4 --part 2)
-      - name: Upload log artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: hal-compile-quick-3
-          path: test/all/log
-
-  hal-compile-quick-4:
-    runs-on: ubuntu-24.04
-    container:
-      image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-        with:
-          submodules: 'recursive'
-      - name: Fix Git permission/ownership problem
-        run: |
-          git config --global --add safe.directory /__w/modm/modm
-      - name: Update lbuild
-        run: |
-          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
-      - name: Quick compile HAL for Cortex-M Part 4
-        if: always()
-        run: |
-          (cd test/all && python3 run_all.py stm32 sam rp nrf --quick --split 4 --part 3)
-      - name: Upload log artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: hal-compile-quick-4
+          name: hal-compile-quick-${{ matrix.part }}
           path: test/all/log
 
   # Niklas: Running on the old container until I can figure out why the doc generator hangs

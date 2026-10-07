@@ -1,0 +1,9 @@
+<library>
+  <extends>modm:nrf5340-dk</extends>
+  <options>
+    <option name="modm:target">nrf5340-xxaa@net</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

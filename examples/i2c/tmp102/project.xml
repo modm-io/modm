@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:disco-f407vg</extends>
+  <!-- <extends>modm:disco-f072rb</extends> -->
+  <!-- <extends>modm:disco-f746ng</extends> -->
+  <modules>
+    <module>modm:driver:tmp102</module>
+    <module>modm:platform:i2c:1</module>
+    <module>modm:processing:fiber</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

@@ -1,0 +1,7 @@
+<library>
+  <extends>modm:samg55-xplained-pro</extends>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:adc</module>
+  </modules>
+</library>

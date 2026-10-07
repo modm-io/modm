@@ -93,7 +93,7 @@ jobs:
       - name: Install Python packages
         if: always()
         run: |
-          pip install --upgrade --upgrade-strategy=eager modm scons future
+          pip install --upgrade --upgrade-strategy=eager modm scons future protobuf grpcio-tools
 
       - name: Show Version Information
         if: always()
@@ -116,7 +116,7 @@ jobs:
         if: always()
         shell: bash
         run: |
-          (cd examples && python ../tools/scripts/examples_compile.py linux/assert linux/block_device/ram linux/build_info linux/git linux/logger linux/printf linux/etl linux/fiber)
+          (cd examples && python ../tools/scripts/examples_compile.py core/assert core/build_info logging/logger logging/printf core/fiber --target '^hosted')
 
       - name: Hosted Unittests
         if: always()
@@ -128,17 +128,16 @@ jobs:
         if: always()
         shell: bash
         run: |
-          (cd examples && python ../tools/scripts/examples_compile.py nucleo_f031k6 nucleo_f103rb nucleo_f303re nucleo_f411re nucleo_f746zg)
-          (cd examples && python ../tools/scripts/examples_compile.py nucleo_g071rb nucleo_l031k6 nucleo_l152re nucleo_l432kc nucleo_g474re)
+          (cd examples && python ../tools/scripts/examples_compile.py . --target '^stm32' --split 16 --part 0)
 
       - name: Compile AVR Examples
         if: always()
         shell: bash
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py avr arduino_nano arduino_uno srxe)
+          (cd examples && python ../tools/scripts/examples_compile.py . --target '^at' --split 4 --part 0)
 
       - name: Compile NRF Examples
         if: always()
         shell: bash
         run: |
-          (cd examples && ../tools/scripts/examples_compile.py nrf51422-dk nrf52840-dk nrf5340-dk)
+          (cd examples && python ../tools/scripts/examples_compile.py . --target '^nrf')

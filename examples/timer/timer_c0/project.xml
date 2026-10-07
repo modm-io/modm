@@ -1,0 +1,8 @@
+<library>
+  <extends>modm:nucleo-c031c6</extends>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:timer:14</module>
+    <module>modm:platform:timer:16</module>
+  </modules>
+</library>

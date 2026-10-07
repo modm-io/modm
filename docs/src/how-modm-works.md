@@ -348,7 +348,7 @@ so you get an idea of how much certain functionality costs you in resources.
 This is the size of the accelerometer example on the STM32F4 discovery board:
 
 ```
- $ cd examples/stm32f4_discovery/accelerometer
+ $ cd examples/i2c/accelerometer
  $ scons
 ...
 Memory usage··· build/stm32f4_discovery/accelerometer/project.elf
@@ -416,7 +416,7 @@ int main()
 ```
 
 
-[accel]: https://github.com/modm-io/modm/blob/develop/examples/stm32f4_discovery/accelerometer/main.cpp
+[accel]: https://github.com/modm-io/modm/blob/develop/examples/i2c/accelerometer/main.cpp
 [eurobot]: http://www.eurobot.org/
 [hal_drivers]: https://github.com/modm-io/modm/tree/develop/src/modm/platform
 [jinja2]: http://jinja.pocoo.org

@@ -1,0 +1,19 @@
+<library>
+  <!-- All STM32 boards with a Cortex-M0, which cannot relocate its vector table -->
+  <extends>modm:nucleo-f042k6</extends>
+  <!-- <extends>modm:disco-f051r8</extends> -->
+  <!-- <extends>modm:disco-f072rb</extends> -->
+  <!-- <extends>modm:nucleo-f031k6</extends> -->
+  <!-- <extends>modm:nucleo-f072rb</extends> -->
+  <!-- <extends>modm:nucleo-f091rc</extends> -->
+  <!-- <extends>modm:stm32f030_demo</extends> -->
+  <options>
+    <option name="modm:platform:core:vector_table_location">ram</option>
+    <!-- Required for modm:stm32f030_demo -->
+    <!-- <option name="modm:build:openocd.cfg">interface/stlink.cfg</option> -->
+  </options>
+  <modules>
+    <module>modm:architecture:delay</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

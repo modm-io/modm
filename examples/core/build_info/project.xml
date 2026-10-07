@@ -1,0 +1,14 @@
+<library>
+  <!-- CI: run -->
+  <extends>modm:hosted</extends>
+  <options>
+    <option name="modm:build:info.build">True</option>
+    <option name="modm:build:info.git">Info+Status</option>
+  </options>
+  <modules>
+    <module>modm:platform:core</module>
+    <module>modm:debug</module>
+    <module>modm:build:scons</module>
+    <module>modm:build:make</module>
+  </modules>
+</library>

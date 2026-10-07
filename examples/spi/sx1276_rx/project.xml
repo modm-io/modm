@@ -1,0 +1,8 @@
+<library>
+  <extends>modm:nucleo-f411re</extends>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:spi:1</module>
+    <module>modm:driver:sx1276</module>
+  </modules>
+</library>

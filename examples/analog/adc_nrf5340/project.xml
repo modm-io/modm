@@ -1,0 +1,9 @@
+<library>
+  <extends>modm:nrf5340-dk</extends>
+  <modules>
+    <module>modm:processing:timer</module>
+    <module>modm:platform:power</module>
+    <module>modm:platform:adc</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

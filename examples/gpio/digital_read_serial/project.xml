@@ -1,0 +1,10 @@
+<library>
+  <extends>modm:arduino-uno</extends>
+  <options>
+    <option name="modm:build:cmake:include_cmakelists">yes</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:build:cmake</module>
+  </modules>
+</library>

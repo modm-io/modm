@@ -1,0 +1,16 @@
+<library>
+  <options>
+    <option name="modm:target">atmega644-20au</option>
+    <option name="modm:platform:core:f_cpu">14.7456M</option>
+    <option name="modm:io:with_printf">True</option>
+  </options>
+  <modules>
+    <module>modm:driver:mcp2515</module>
+    <module>modm:platform:clock</module>
+    <module>modm:platform:core</module>
+    <module>modm:platform:gpio</module>
+    <module>modm:platform:spi</module>
+    <module>modm:platform:spi.bitbang</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

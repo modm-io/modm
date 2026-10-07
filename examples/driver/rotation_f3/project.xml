@@ -1,0 +1,8 @@
+<library>
+  <extends>modm:disco-f303vc</extends>
+  <modules>
+    <module>modm:math:filter</module>
+    <module>modm:processing:fiber</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

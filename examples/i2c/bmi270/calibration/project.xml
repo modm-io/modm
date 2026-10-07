@@ -1,0 +1,8 @@
+<library>
+  <extends>modm:nucleo-h723zg</extends>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:i2c:1</module>
+    <module>modm:driver:bmi270</module>
+  </modules>
+</library>

@@ -1,0 +1,7 @@
+<library>
+  <extends>modm:disco-f407vg</extends>
+  <modules>
+    <module>modm:platform:fsmc</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

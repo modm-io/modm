@@ -1,0 +1,14 @@
+<library>
+  <options>
+    <option name="modm:target">at90can128-16au</option>
+    <option name="modm:platform:core:f_cpu">16M</option>
+  </options>
+  <modules>
+    <module>modm:architecture:delay</module>
+    <module>modm:debug</module>
+    <module>modm:driver:ft245</module>
+    <module>modm:platform:core</module>
+    <module>modm:platform:gpio</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

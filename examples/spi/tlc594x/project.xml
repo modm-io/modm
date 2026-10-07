@@ -1,0 +1,11 @@
+<library>
+	<extends>modm:blue-pill-f103</extends>
+	<modules>
+		<module>modm:platform:spi:1</module>
+		<module>modm:driver:tlc594x</module>
+		<module>modm:build:scons</module>
+	</modules>
+  <collectors>
+    <collect name="modm:build:openocd.source">interface/stlink.cfg</collect>
+  </collectors>
+</library>

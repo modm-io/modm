@@ -1,0 +1,18 @@
+<library>
+  <extends>modm:nucleo-f429zi</extends>
+  <!-- <extends>modm:devebox-stm32f4xx</extends> -->
+  <options>
+    <!-- Required for modm:devebox-stm32f4xx -->
+    <!-- <option name="modm:build:openocd.cfg">interface/stlink.cfg</option> -->
+  </options>
+  <modules>
+    <module>modm:driver:block.device:spi.flash</module>
+    <module>modm:build:scons</module>
+    <!-- Required for modm:nucleo-f429zi -->
+    <module>modm:platform:spi:1</module>
+  </modules>
+  <collectors>
+    <!-- Required for modm:devebox-stm32f4xx with a flash chip on the board -->
+    <!-- <collect name="modm:build:cppdefines">ONBOARD_FLASH</collect> -->
+  </collectors>
+</library>

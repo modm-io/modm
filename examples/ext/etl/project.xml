@@ -1,0 +1,7 @@
+<library>
+  <extends>modm:nucleo-f439zi</extends>
+  <modules>
+    <module>modm:etl</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

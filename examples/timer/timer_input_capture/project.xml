@@ -1,0 +1,8 @@
+<library>
+  <extends>modm:nucleo-g474re</extends>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:timer:4</module>
+    <module>modm:platform:timer:20</module>
+  </modules>
+</library>

@@ -1,0 +1,8 @@
+<library>
+  <extends>modm:arduino-nano</extends>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:processing:timer</module>
+    <module>modm:driver:encoder_input.bitbang</module>
+  </modules>
+</library>

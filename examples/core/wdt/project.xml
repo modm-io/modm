@@ -1,0 +1,7 @@
+<library>
+  <extends>modm:nrf5340-dk</extends>
+  <modules>
+    <module>modm:platform:wdt</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

@@ -1,0 +1,7 @@
+<library>
+  <extends>modm:disco-f072rb</extends>
+  <modules>
+    <module>modm:math:filter</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

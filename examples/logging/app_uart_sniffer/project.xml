@@ -1,0 +1,9 @@
+<library>
+  <extends>modm:disco-f407vg</extends>
+  <modules>
+    <module>modm:platform:uart:1</module>
+    <module>modm:platform:uart:3</module>
+    <module>modm:processing:timer</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

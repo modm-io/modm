@@ -1,0 +1,26 @@
+<library>
+  <extends>modm:nucleo-h563zi</extends>
+  <!-- <extends>modm:nucleo-f207zg</extends> -->
+  <!-- <extends>modm:nucleo-f429zi</extends> -->
+  <!-- <extends>modm:nucleo-h723zg</extends> -->
+  <!-- <extends>modm:nucleo-h743zi</extends> -->
+  <!-- <extends>modm:nucleo-u575zi-q</extends> -->
+  <options>
+    <option name="modm:tinyusb:config">device.vendor</option>
+
+    <!-- Required for modm:nucleo-h723zg -->
+    <!-- <option name="modm:tinyusb:max-speed">full</option> -->
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:tinyusb</module>
+    <module>modm:cmsis:dap</module>
+    <module>modm:processing:timer</module>
+    <module>modm:io</module>
+  </modules>
+  <collectors>
+    <!-- <collect name="modm:build:cppdefines">CFG_TUSB_DEBUG=3</collect> -->
+    <!-- <collect name="modm:build:openocd.source">interface/stlink.cfg</collect> -->
+    <!-- <collect name="modm:build:openocd.source">interface/stlink-dap.cfg</collect> -->
+  </collectors>
+</library>

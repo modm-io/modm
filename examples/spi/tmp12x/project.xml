@@ -1,0 +1,9 @@
+<library>
+  <extends>modm:nucleo-f042k6</extends>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:driver:tmp12x</module>
+    <module>modm:platform:spi:1</module>
+    <module>modm:processing:timer</module>
+  </modules>
+</library>

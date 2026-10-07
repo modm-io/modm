@@ -1,0 +1,9 @@
+<library>
+  <extends>modm:hosted</extends>
+  <modules>
+    <module>modm:platform:core</module>
+    <module>modm:debug</module>
+    <module>modm:processing:rtos</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

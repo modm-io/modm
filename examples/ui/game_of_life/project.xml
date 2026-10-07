@@ -1,0 +1,9 @@
+<library>
+  <extends>modm:disco-f469ni</extends>
+  <modules>
+    <module>modm:architecture:memory</module>
+    <module>modm:processing:timer</module>
+    <module>modm:platform:random</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

@@ -1,0 +1,9 @@
+<library>
+  <extends>modm:nucleo-f401re</extends>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:timer:1</module>
+    <module>modm:platform:adc:1</module>
+    <module>modm:platform:dma</module>
+  </modules>
+</library>

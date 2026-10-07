@@ -1,0 +1,8 @@
+<library>
+  <extends>modm:samv71-xplained-ultra</extends>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:driver:mcp3008</module>
+    <module>modm:platform:spi:0</module>
+  </modules>
+</library>

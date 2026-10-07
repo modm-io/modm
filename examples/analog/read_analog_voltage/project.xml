@@ -1,0 +1,10 @@
+<library>
+  <extends>modm:arduino-uno</extends>
+  <options>
+    <option name="modm:io:with_float">True</option>
+  </options>
+  <modules>
+    <module>modm:platform:adc</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

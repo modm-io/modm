@@ -1,0 +1,14 @@
+<library>
+  <!-- CI: run -->
+  <extends>modm:hosted</extends>
+  <!-- <extends>modm:mega-2560-pro</extends> -->
+  <modules>
+    <module>modm:platform:core</module>
+    <module>modm:debug</module>
+    <module>modm:driver:block.device:heap</module>
+    <module>modm:driver:block.device:mirror</module>
+    <module>modm:build:scons</module>
+    <!-- Required for modm:hosted -->
+    <module>modm:driver:block.device:file</module>
+  </modules>
+</library>

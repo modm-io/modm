@@ -1,0 +1,5 @@
+<library>
+  <modules>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

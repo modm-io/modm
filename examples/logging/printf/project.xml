@@ -1,0 +1,18 @@
+<library>
+  <!-- CI: run -->
+  <extends>modm:disco-f469ni</extends>
+  <!-- <extends>modm:arduino-nano</extends> -->
+  <!-- <extends>modm:hosted</extends> -->
+  <options>
+    <option name="modm:io:with_long_long">yes</option>
+    <option name="modm:io:with_float">yes</option>
+    <option name="modm:io:with_printf">yes</option>
+  </options>
+  <modules>
+    <module>modm:io</module>
+    <module>modm:debug</module>
+    <module>modm:platform:core</module>
+    <module>modm:architecture:delay</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

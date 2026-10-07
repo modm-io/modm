@@ -7,11 +7,10 @@
 
 ### Examples
 
-We have a [huge number of examples][examples] which are always up-to-date and
-compilable as enforced by our CI.
+We have [{{example_count}} examples][examples] which are always up-to-date and
+compilable as enforced by our CI. Most of them run on several boards, have a look
+at [how to choose yours](guide/examples.md#choosing-your-board).
 
-<center>
 {{example_table}}
-</center>
 
 {{links}}

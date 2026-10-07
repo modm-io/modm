@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <extends>modm:nucleo-f411re</extends>
+  <modules>
+    <module>modm:driver:ws2812</module>
+    <module>modm:platform:spi:1</module>
+    <module>modm:ui:led</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

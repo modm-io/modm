@@ -1,0 +1,9 @@
+<library>
+  <extends>modm:nrf51422-dk</extends>
+  <options>
+    <option name="modm:build:lto">yes</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

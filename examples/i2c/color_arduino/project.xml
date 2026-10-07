@@ -1,0 +1,12 @@
+<library>
+  <extends>modm:arduino-nano</extends>
+  <options>
+    <option name="modm:build:lto">yes</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:processing:fiber</module>
+    <module>modm:platform:i2c</module>
+    <module>modm:driver:tcs3472</module>
+  </modules>
+</library>
