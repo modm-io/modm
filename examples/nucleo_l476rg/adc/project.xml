@@ -1,8 +1,0 @@
-<library>
-  <extends>modm:nucleo-l476rg</extends>
-  <modules>
-    <module>modm:platform:adc:1</module>
-    <module>modm:platform:clock</module>
-    <module>modm:build:scons</module>
-  </modules>
-</library>
