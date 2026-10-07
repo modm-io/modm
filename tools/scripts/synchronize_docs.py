@@ -135,12 +135,12 @@ configs = sorted(c.fullname.replace("modm:", "") for c in configs if c.fullname 
 configs = [{"name": name(c), "url": config_url(c)} for c in configs]
 bsp_table = format_table(configs, 4)
 
-# Get all the example directory paths
-examples = [e.relative_to(example_path) for e in example_path.glob('**/project.xml')]
-examples = [{"name": "{}: {}".format(name(str(e.parts[0])), e.parent.relative_to(e.parts[0])),
-             "url": github_url(Path("examples") / e.parent / "main.cpp")} for e in examples]
-examples.sort(key=lambda b: b["name"])
-example_table = format_table(examples, 2, "left")
+# Count the examples of every category described in the examples readme
+categories = re.findall(r"^\| `(\w+)` +\| (.*?) *\|$", examples_readme_in_path.read_text(), flags=re.M)
+example_counts = {c: len(list((example_path / c).glob("**/project.xml"))) for c, _ in categories}
+example_table = "| Folder | Examples | Content |\n|:--|--:|:--|\n" + "\n".join(
+    "| [{}]({}) | {} | {} |".format(c, github_url(Path("examples") / c), example_counts[c], description)
+    for c, description in categories)
 
 # Get all supported targets
 targets = set(get_lbuild(repopath(".")).find_option("modm:target").values)
@@ -179,7 +179,8 @@ readme = re.sub(r"((<!--webignore-->.*?<!--/webignore-->)|(<!--links-->.*?<!--/l
 readme = re.sub(r"<!--.*?-->", "", readme)
 readme = readme.replace("https://modm.io", "").replace("https://modm.dev", "")
 
-index = Environment().from_string(index_in_path.read_text()).render({"content": readme, "links": links, "example_table": example_table})
+index = Environment().from_string(index_in_path.read_text()).render({"content": readme, "links": links, "example_table": example_table,
+     "example_count": sum(example_counts.values())})
 index_path.write_text(index)
 
 whoweare = Environment().from_string(whoweare_in_path.read_text()).render({"authors": authors, "links": links})
