@@ -1,8 +1,0 @@
-<library>
-  <extends>modm:nucleo-f303re</extends>
-  <modules>
-    <module>modm:processing:rtos</module>
-    <module>modm:platform:heap</module>
-    <module>modm:build:scons</module>
-  </modules>
-</library>
