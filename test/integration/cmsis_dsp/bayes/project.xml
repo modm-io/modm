@@ -1,7 +1,11 @@
 <library>
+  <!-- CI: run -->
   <extends>modm:nucleo-f429zi</extends>
+  <!-- <extends>modm:hosted</extends> -->
   <modules>
     <module>modm:build:scons</module>
     <module>modm:cmsis:dsp:bayes</module>
+    <module>modm:platform:core</module>
+    <module>modm:debug</module>
   </modules>
 </library>

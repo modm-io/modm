@@ -1,9 +1,13 @@
 <library>
+  <!-- CI: run -->
   <extends>modm:nucleo-f429zi</extends>
+  <!-- <extends>modm:hosted</extends> -->
   <modules>
     <module>modm:build:scons</module>
     <module>modm:build:make</module>
     <module>modm:cmsis:dsp:transform</module>
     <module>modm:cmsis:dsp:basic_math</module>
+    <module>modm:platform:core</module>
+    <module>modm:debug</module>
   </modules>
 </library>

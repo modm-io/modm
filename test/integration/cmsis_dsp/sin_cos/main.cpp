@@ -9,7 +9,12 @@
  */
 // ----------------------------------------------------------------------------
 
+#if __has_include(<modm/board.hpp>)
 #include <modm/board.hpp>
+#else
+#include <modm/platform.hpp>
+#include <modm/debug/logger.hpp>
+#endif
 #include <arm_math.h>
 
 #define main arm_cmsis_dsp_example
