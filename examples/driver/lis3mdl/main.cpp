@@ -14,22 +14,16 @@
 using namespace Board;
 using namespace std::chrono_literals;
 
-using I2cSda	= GpioA10;
-using I2cScl	= GpioA9;
-
-// Create a sensor object with the adress of the sensor built onto the Pololu AltIMU-10 v5
-modm::Lis3mdl<I2cMaster1> sensor(0x1E);
+// Create a sensor object with the address of the sensor built onto the Pololu AltIMU-10 v5
+modm::Lis3mdl<Board::i2c::Controller> sensor(0x1E);
 
 int
 main()
 {
 	Board::initialize();
-	LedD13::setOutput();
+	Board::initializeI2c();
 
 	MODM_LOG_INFO << "LIS3MDL demo" << modm::endl;
-
-	I2cMaster1::connect<I2cSda::Sda, I2cScl::Scl>();
-	I2cMaster1::initialize<SystemClock, 400_kBd>();
 
 	// Turn on and configure the magnetometer
 	if(not sensor.configure(modm::lis3mdl::DataRate::Rate_5_Hz,
@@ -45,7 +39,6 @@ main()
 	}
 
 	modm::Vector3f magVector;
-
 	while (true)
 	{
 		//Read the sensor data and print it out
