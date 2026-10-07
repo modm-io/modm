@@ -1,7 +1,0 @@
-<library>
-  <extends>modm:nucleo-h723zg</extends>
-  <modules>
-    <module>modm:build:scons</module>
-    <module>modm:platform:adc:*</module>
-  </modules>
-</library>
