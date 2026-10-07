@@ -192,7 +192,8 @@ def post_build(env):
         })
     if has_nanopb:
         subs["nanopb_source"] = [env.relcwdoutpath(p) for p in env.get(":nanopb:sources", [])]
-        subs["nanopb_path"] = env.relcwdoutpath(env.get(":nanopb:path", "."))
+        # forward slashes, since a Windows path like generated\nanopb contains an escape sequence
+        subs["nanopb_path"] = env.relcwdoutpath(env.get(":nanopb:path", ".")).replace("\\", "/")
     if subs["platform"] == "avr":
         subs.update(env.query("::avrdude_options"))
     if subs["platform"] == "sam":
