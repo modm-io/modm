@@ -11,17 +11,35 @@
 
 #include <modm/board.hpp>
 #include <modm/driver/storage/at24mac402.hpp>
+#include <modm/driver/storage/i2c_eeprom.hpp>
 #include <array>
 
-using namespace Board;
-using namespace modm::literals;
+#include "../integration_test.hpp"
 
-// On board AT24MAC402 EEPROM driver example
+using namespace Board;
+
+/**
+ * Tests the generic I2C EEPROM driver and the AT24MAC402 driver with the
+ * 2 kBit AT24MAC402 EEPROM on the board: writes four bytes with one driver
+ * and reads them back with both.
+ */
+
+// retry until the device responds after finishing the previous write
+template< class Eeprom >
+static bool
+read(Eeprom &eeprom, std::array<uint8_t, 4> &buffer)
+{
+	for (uint8_t tries = 0; tries < 100; tries++)
+	{
+		if (eeprom.read(0x80, buffer.data(), buffer.size())) return true;
+		modm::delay(1ms);
+	}
+	return false;
+}
+
 int main()
 {
 	Board::initialize();
-
-	MODM_LOG_INFO << "AT24MAC402 Test" << modm::endl;
 
 	/* Defined in board support package:
 	 * using Sda = GpioA3;
@@ -34,46 +52,36 @@ int main()
 	// address 0x57 = 1 0 1 0 A0 A1 A2
 	// with A0 = A1 = A2 = 1 connected to 3.3V
 	modm::At24Mac402<I2c> eeprom{0x57};
+	// 8 bit address width
+	modm::I2cEeprom<I2c, 1> genericEeprom{0x57};
 
-	MODM_LOG_INFO << "EEPROM detected: " << eeprom.ping() << "\n\n";
-
-	std::array<uint8_t, 6> buffer{};
+	bool passed = eeprom.ping();
+	MODM_LOG_INFO << "EEPROM detected: " << passed << modm::endl;
 
 	// Read pre-programmed MAC address
-	bool readSuccess = eeprom.readMac(buffer);
-	if (readSuccess)
-	{
-		MODM_LOG_INFO.printf("MAC: %02x:%02x:%02x:%02x:%02x:%02x\n\n",
-							 buffer[0], buffer[1], buffer[2],
-							 buffer[3], buffer[4], buffer[5]);
+	std::array<uint8_t, 6> mac{};
+	const bool macSuccess = eeprom.readMac(mac);
+	MODM_LOG_INFO.printf("MAC: %02x:%02x:%02x:%02x:%02x:%02x\n",
+						 mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+	// an unprogrammed address reads as all ones
+	passed &= macSuccess and (mac != std::array<uint8_t, 6>{0xff, 0xff, 0xff, 0xff, 0xff, 0xff});
 
-	}
-	else
-	{
-		MODM_LOG_INFO << "Reading MAC address from EEPROM failed!\n";
-	}
+	// Alternate the data, so that we never read back what an earlier run wrote
+	std::array<uint8_t, 4> buffer{};
+	passed &= read(eeprom, buffer);
+	const std::array<uint8_t, 4> data = (buffer[0] == 0xAA)
+			? std::array<uint8_t, 4>{0x11, 0x22, 0x33, 0x44}
+			: std::array<uint8_t, 4>{0xAA, 0xBB, 0xCC, 0xDD};
 
 	// Write 4 data bytes to address 0x80
-	/*constexpr std::array<uint8_t, 4> data = {0xAA, 0xBB, 0xCC, 0xDD};
-	const bool writeSuccess = eeprom.write(0x80, data.data(), 4);
-	MODM_LOG_INFO << "write successful: " << writeSuccess << "\n\n";*/
+	passed &= eeprom.write(0x80, data.data(), data.size());
 
-	// Read 4 data bytes from address 0x80
-	// retry read until device responds after finishing previous write
-	readSuccess = false;
-	while (!readSuccess)
-	{
-		readSuccess = eeprom.read(0x80, buffer.data(), buffer.size());
-	}
-	MODM_LOG_INFO.printf("data: 0x%02x 0x%02x 0x%02x 0x%02x\n\n",
+	// Read them back with both drivers
+	passed &= read(eeprom, buffer) and (buffer == data);
+	buffer.fill(0);
+	passed &= read(genericEeprom, buffer) and (buffer == data);
+	MODM_LOG_INFO.printf("data: 0x%02x 0x%02x 0x%02x 0x%02x\n",
 						 buffer[0], buffer[1], buffer[2], buffer[3]);
 
-	while (true)
-	{
-		Led0::toggle();
-		Led1::toggle();
-		modm::delay(500ms);
-	}
-
-	return 0;
+	return finishTest(passed);
 }
