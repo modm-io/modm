@@ -11,6 +11,8 @@
 #include <modm/board.hpp>
 #include <modm/processing.hpp>
 
+#include "../integration_test.hpp"
+
 using namespace std::chrono_literals;
 
 // ----------------------------------------------------------------------------
@@ -20,6 +22,7 @@ main()
 	Board::initialize();
 
 	MODM_LOG_INFO << "\n\nReboot\n";
+	uint32_t errors{0};
 	if (not Flash::unlock()) {
 		MODM_LOG_INFO << "Flash unlock failed!" << modm::endl;
 	}
@@ -36,7 +39,7 @@ main()
 
 	{
 		uint32_t err{0};
-		const uint8_t sector_start = Flash::getSector(Flash::Size / 2);
+		const uint8_t sector_start = Flash::getSector(Flash::Size/2);
 		const uint8_t sector_end = Flash::getSector(Flash::Size);
 		MODM_LOG_INFO << "Erasing sectors [" << sector_start << ", " << sector_end << ")" << modm::endl;
 		MODM_LOG_INFO.flush();
@@ -44,12 +47,12 @@ main()
 
 		const modm::PreciseTimestamp start = modm::PreciseClock::now();
 
-		for (uint8_t sector{sector_start}; sector < sector_end; sector++){
+		for (uint8_t sector{sector_start}; sector < sector_end; sector++)
 			err |= Flash::erase(sector);
-		}
 
 		const auto diff = (modm::PreciseClock::now() - start);
 		MODM_LOG_INFO << "Erasing done in " << diff << " with errors: " << err << modm::endl;
+		errors += err;
 		MODM_LOG_INFO << "Erasing with " << (Flash::Size/2 / (diff.count() >> 10) ) << "kiB/s" << modm::endl;
 		MODM_LOG_INFO.flush();
 	}
@@ -66,6 +69,7 @@ main()
 
 		const auto diff = (modm::PreciseClock::now() - start);
 		MODM_LOG_INFO << "Programming done in " << diff << " with errors: " << err << modm::endl;
+		errors += err;
 		MODM_LOG_INFO << "Programming with " << (Flash::Size/2 / (diff.count() >> 10) ) << "kiB/s" << modm::endl;
 	}
 	{
@@ -88,9 +92,9 @@ main()
 		}
 		const auto diff = (modm::PreciseClock::now() - start);
 		MODM_LOG_INFO << "Verifying done in " << diff << " with errors: " << err << modm::endl;
+		errors += err;
 		MODM_LOG_INFO << "Verifying with " << (Flash::Size/2 / (diff.count() >> 10) ) << "kiB/s" << modm::endl;
 	}
 
-	while(1) ;
-	return 0;
+	return finishTest(errors == 0);
 }

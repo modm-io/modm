@@ -1,15 +1,12 @@
 <library>
-  <extends>modm:blue-pill-f103</extends>
-  <options>
-    <option name="modm:rtt:buffer.tx">3Ki</option>
-  </options>
+  <extends>modm:nucleo-f446re</extends>
+  <!-- <extends>modm:nucleo-g071rb</extends> -->
+  <!-- <extends>modm:nucleo-f103rb</extends> -->
+  <!-- <extends>modm:nucleo-g474re</extends> -->
+  <!-- <extends>modm:nucleo-g431rb</extends> -->
   <modules>
     <module>modm:platform:flash</module>
     <module>modm:processing:timer</module>
     <module>modm:build:scons</module>
-    <module>modm:build:compilation_db</module>
   </modules>
-  <collectors>
-    <collect name="modm:build:openocd.source">interface/stlink.cfg</collect>
-  </collectors>
 </library>
