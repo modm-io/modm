@@ -92,7 +92,7 @@ check_for_update()
 			{
 				if (is_valid(&fil, fno.fsize))
 				{
-					Board::Led::set();
+					Board::Leds::write(1);
 					// We first copy the file into the middle of the flash.
 					// It's not guaranteed that the file is stored in FatFs in *one*
 					// continuous chunk and we cannot access FatFs code in ram_apply!!!
