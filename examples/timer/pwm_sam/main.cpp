@@ -51,11 +51,12 @@ int main()
 	while (true)
 	{
 		Led0::toggle();
+		Leds::toggle();
 		modm::delay(500ms);
 
 		// Activate override mode to force outputs to low when button is pressed
 		const auto outputs = Pwm0::Outputs::Ch2PwmH | Pwm0::Outputs::Ch2PwmL;
-		if (ButtonSW0::read())
+		if (Button::read())
 			Pwm0::setOutputOverride(outputs, false);
 		else
 			Pwm0::clearOutputOverride(outputs, false);
