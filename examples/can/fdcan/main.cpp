@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2020, Raphael Lehmann
  * Copyright (c) 2022, Rasmus Kleist Hørlyck Sørensen
  *
  * This file is part of the modm project.

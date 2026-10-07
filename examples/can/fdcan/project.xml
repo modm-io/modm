@@ -1,11 +1,12 @@
 <library>
-	<extends>modm:nucleo-g474re</extends>
-	<options>
-		<option name="modm:architecture:can:message.buffer">64</option>
-	</options>
-	<modules>
-		<module>modm:platform:can:1</module>
-		<module>modm:platform:can:2</module>
-		<module>modm:build:scons</module>
-	</modules>
+  <extends>modm:nucleo-g474re</extends>
+  <!-- <extends>modm:nucleo-h723zg</extends> -->
+  <options>
+    <option name="modm:architecture:can:message.buffer">64</option>
+  </options>
+  <modules>
+    <module>modm:platform:can:1</module>
+    <module>modm:platform:can:2</module>
+    <module>modm:build:scons</module>
+  </modules>
 </library>
