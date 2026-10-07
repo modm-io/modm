@@ -11,10 +11,10 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import os
+import hashlib
 import sys
 import time
 import enum
-import math
 import shutil
 import lbuild
 import random
@@ -274,9 +274,10 @@ if __name__ == "__main__":
 
     # Choose the device split
     devices.sort()
+    # Stable pseudo-random order, so that all parts get a similar mix of device families
     if args.split > 1:
-        chunk_size = math.ceil(len(devices) / args.split)
-        devices = devices[chunk_size*args.part:min(chunk_size*(args.part+1), len(devices))]
+        devices.sort(key=lambda d: hashlib.md5(d.encode()).digest())
+        devices = devices[args.part::args.split]
 
     # Create cache dir config if necessary
     if args.no_cache:
