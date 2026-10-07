@@ -1,9 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <library>
   <extends>modm:nucleo-f303k8</extends>
-  <options>
-    <option name=":build:build.path">../../../build/generic/i2c_multiplex</option>
-  </options>
   <modules>
     <module>modm:driver:pca9548a</module>
     <module>modm:platform:i2c:1</module>
