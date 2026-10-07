@@ -10,6 +10,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
+#include "../integration_test.hpp"
 
 using namespace Board;
 
@@ -83,33 +84,34 @@ main()
 
 	PinGroup::setOutput(modm::Gpio::High); modm::delay(1s);
 
-	const auto fn_report = []
+	bool passed = true;
+	const auto check = [&passed](uint16_t value)
 	{
-		MODM_LOG_INFO << modm::bin << PinGroup::read() << modm::endl; modm::delay(200ms);
+		modm::delay(10ms);
+		const uint16_t read = PinGroup::read();
+		MODM_LOG_INFO << modm::bin << read << modm::endl;
+		// the unused pin always reads low
+		passed &= (read == (value & ~0b10));
 	};
 
-	while (true)
-	{
-		PinGroup::write(0b0000000); fn_report();
-		PinGroup::write(0b0000001); fn_report();
-		PinGroup::write(0b0000011); fn_report();
-		PinGroup::write(0b0000111); fn_report();
-		PinGroup::write(0b0001111); fn_report();
-		PinGroup::write(0b0011111); fn_report();
-		PinGroup::write(0b0111111); fn_report();
-		PinGroup::write(0b1111111); fn_report();
-		MODM_LOG_INFO << modm::endl;
+	// we must read back what we wrote
+	PinGroup::write(0b0000000); check(0b0000000);
+	PinGroup::write(0b0000001); check(0b0000001);
+	PinGroup::write(0b0000011); check(0b0000011);
+	PinGroup::write(0b0000111); check(0b0000111);
+	PinGroup::write(0b0001111); check(0b0001111);
+	PinGroup::write(0b0011111); check(0b0011111);
+	PinGroup::write(0b0111111); check(0b0111111);
+	PinGroup::write(0b1111111); check(0b1111111);
+	MODM_LOG_INFO << modm::endl;
 
-		PinGroup::reset();
-		Pin0::set(); fn_report();
-		Pin1::set(); fn_report();
-		Pin2::set(); fn_report();
-		Pin3::set(); fn_report();
-		Pin4::set(); fn_report();
-		Pin5::set(); fn_report();
-		MODM_LOG_INFO << modm::endl;
+	PinGroup::reset();
+	Pin0::set(); check(0b0000001);
+	Pin1::set(); check(0b0000101);
+	Pin2::set(); check(0b0001101);
+	Pin3::set(); check(0b0011101);
+	Pin4::set(); check(0b0111101);
+	Pin5::set(); check(0b1111101);
 
-		// while (true);
-	}
-	return 0;
+	return finishTest(passed);
 }
