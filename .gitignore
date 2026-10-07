@@ -38,6 +38,14 @@ examples/**/SConstruct
 examples/**/Makefile
 examples/**/generated
 examples/**/coredump.txt
+test/integration/**/modm
+test/integration/**/modm-test
+test/integration/**/artifacts
+test/integration/**/compile_commands.json
+test/integration/**/SConstruct
+test/integration/**/Makefile
+test/integration/**/generated
+test/integration/**/coredump.txt
 
 # repo.lb cache file
 ext/modm-devices.cache
