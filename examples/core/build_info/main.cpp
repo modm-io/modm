@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2015, Kevin Läufer
+ * Copyright (c) 2014, Kevin Läufer
  * Copyright (c) 2017, Niklas Hauser
  *
  * This file is part of the modm project.
@@ -12,13 +12,21 @@
 
 #include <modm/platform.hpp>
 #include <modm/debug/logger.hpp>
+#include <info_build.h>
 #include <info_git.h>
 
 
 int
 main()
 {
-	// Let's print some information that is provided in the modm_git_info.hpp
+	// Let's print some information that is provided in the modm_build_info.hpp
+	MODM_LOG_INFO << "Project:  " << MODM_BUILD_PROJECT_NAME << modm::endl;
+	MODM_LOG_INFO << "Machine:  " << MODM_BUILD_MACHINE      << modm::endl;
+	MODM_LOG_INFO << "User:     " << MODM_BUILD_USER         << modm::endl;
+	MODM_LOG_INFO << "Os:       " << MODM_BUILD_OS           << modm::endl;
+	MODM_LOG_INFO << "Compiler: " << MODM_BUILD_COMPILER     << modm::endl;
+
+	// And some information that is provided in the modm_git_info.hpp
 	MODM_LOG_INFO << "Local Git User:" << modm::endl;
 	MODM_LOG_INFO << "Name:  " << MODM_GIT_CONFIG_USER_NAME      << modm::endl;
 	MODM_LOG_INFO << "Email: " << MODM_GIT_CONFIG_USER_EMAIL     << modm::endl;

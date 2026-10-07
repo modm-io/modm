@@ -1,7 +1,8 @@
 <library>
   <!-- CI: run -->
+  <extends>modm:hosted</extends>
   <options>
-    <option name="modm:target">hosted-linux</option>
+    <option name="modm:build:info.build">True</option>
     <option name="modm:build:info.git">Info+Status</option>
   </options>
   <modules>
