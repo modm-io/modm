@@ -2,7 +2,6 @@
   <options>
     <option name="modm:target">atmega644-20au</option>
     <option name="modm:platform:core:f_cpu">16M</option>
-    <option name="modm:build:build.path">../../../../build/avr/display/siemens_s65</option>
   </options>
   <modules>
     <module>modm:driver:siemens_s65</module>

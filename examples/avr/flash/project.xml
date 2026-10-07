@@ -2,7 +2,6 @@
   <options>
     <option name="modm:target">atmega328p-au</option>
     <option name="modm:platform:core:f_cpu">1M</option>
-    <option name="modm:build:build.path">../../../build/avr/flash</option>
   </options>
   <modules>
     <module>modm:architecture:accessor</module>

@@ -2,7 +2,6 @@
   <extends>modm:nrf51422-dk</extends>
   <options>
     <option name="modm:build:lto">yes</option>
-    <option name="modm:build:build.path">../../../build/nrf51422-dk/uart_logging</option>
   </options>
   <modules>
     <module>modm:build:scons</module>

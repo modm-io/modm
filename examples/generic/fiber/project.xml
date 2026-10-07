@@ -2,7 +2,6 @@
   <extends>modm:nucleo-f429zi</extends>
   <!-- <extends>modm:nucleo-g071rb</extends> -->
   <options>
-    <option name="modm:build:build.path">../../../build/generic/fiber</option>
     <option name="modm:io:with_long_long">yes</option>
   </options>
   <modules>

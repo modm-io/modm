@@ -1,8 +1,5 @@
 <library>
   <extends>modm:nucleo-l476rg</extends>
-  <options>
-    <option name="modm:build:build.path">../../../../build/generic/ros/environment</option>
-  </options>
   <modules>
     <module>modm:driver:bme280</module>
     <module>modm:driver:ssd1306</module>

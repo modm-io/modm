@@ -1,8 +1,5 @@
 <library>
   <extends>modm:nucleo-l476rg</extends>
-  <options>
-    <option name="modm:build:build.path">../../../../build/generic/ros/sub_pub</option>
-  </options>
   <modules>
     <module>modm:communication:ros</module>
     <module>modm:driver</module>

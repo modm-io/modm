@@ -1,7 +1,6 @@
 <library>
   <extends>modm:weact-h523ce</extends>
   <options>
-    <option name="modm:build:build.path">../../../build/weact_h523ce/blink</option>
     <option name="modm:board:weact-h523ce:with_rtt">yes</option>
   </options>
   <modules>

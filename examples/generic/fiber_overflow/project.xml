@@ -4,9 +4,6 @@
   <!-- <extends>modm:nucleo-l476rg</extends> -->
   <!-- <extends>modm:mega-2560-pro</extends> -->
   <!-- <extends>modm:arduino-uno</extends> -->
-  <options>
-    <option name="modm:build:build.path">../../../build/generic/fiber_overflow</option>
-  </options>
   <modules>
     <module>modm:build:scons</module>
     <module>modm:processing:fiber</module>

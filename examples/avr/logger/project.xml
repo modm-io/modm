@@ -2,7 +2,6 @@
   <options>
     <option name="modm:target">atmega644-20au</option>
     <option name="modm:platform:core:f_cpu">14.7456M</option>
-    <option name="modm:build:build.path">../../../build/avr/logger</option>
   </options>
   <modules>
     <module>modm:debug</module>

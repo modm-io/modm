@@ -1,8 +1,5 @@
 <library>
   <extends>modm:nrf5340-dk</extends>
-  <options>
-    <option name="modm:build:build.path">../../../build/nrf5340-dk/adc</option>
-  </options>
   <modules>
     <module>modm:processing:timer</module>
     <module>modm:platform:power</module>

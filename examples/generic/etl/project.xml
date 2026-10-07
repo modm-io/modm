@@ -1,8 +1,5 @@
 <library>
   <extends>modm:nucleo-f439zi</extends>
-  <options>
-    <option name="modm:build:build.path">../../../build/generic/etl</option>
-  </options>
   <modules>
     <module>modm:etl</module>
     <module>modm:build:scons</module>

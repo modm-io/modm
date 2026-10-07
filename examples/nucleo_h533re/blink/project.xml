@@ -1,8 +1,5 @@
 <library>
   <extends>modm:nucleo-h533re</extends>
-  <options>
-    <option name="modm:build:build.path">../../../build/nucleo_h533re/blink</option>
-  </options>
   <modules>
     <module>modm:architecture:memory</module>
     <module>modm:build:scons</module>

@@ -1,8 +1,5 @@
 <library>
   <extends>modm:devebox-stm32f4xx</extends>
-  <options>
-    <option name="modm:build:build.path">../../../build/stm32f4xx_devebox/logger</option>
-  </options>
   <modules>
     <module>modm:build:scons</module>
   </modules>

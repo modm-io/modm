@@ -1,8 +1,5 @@
 <library>
   <extends>modm:nucleo-h723zg</extends>
-  <options>
-    <option name="modm:build:build.path">../../../build/nucleo_h723zg/can</option>
-  </options>
   <modules>
     <module>modm:platform:can:1</module>
     <module>modm:platform:can:2</module>

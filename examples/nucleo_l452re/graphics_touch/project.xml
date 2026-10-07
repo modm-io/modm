@@ -1,8 +1,5 @@
 <library>
   <extends>modm:nucleo-l452re</extends>
-  <options>
-    <option name="modm:build:build.path">../../../build/nucleo_l452re/graphics_touch</option>
-  </options>
   <modules>
     <module>modm:build:scons</module>
     <module>modm:driver:ili9341</module>

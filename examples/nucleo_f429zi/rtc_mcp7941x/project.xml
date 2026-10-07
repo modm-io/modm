@@ -1,8 +1,5 @@
 <library>
   <extends>modm:nucleo-f429zi</extends>
-  <options>
-    <option name="modm:build:build.path">../../../build/nucleo_f429zi/rtc_mcp7941x</option>
-  </options>
   <modules>
     <module>modm:driver:mcp7941x</module>
     <module>modm:io</module>

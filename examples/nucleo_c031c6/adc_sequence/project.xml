@@ -1,8 +1,5 @@
 <library>
   <extends>modm:nucleo-c031c6</extends>
-  <options>
-    <option name="modm:build:build.path">../../../build/nucleo_c031c6/adc_sequence</option>
-  </options>
   <modules>
     <module>modm:build:scons</module>
     <module>modm:platform:adc</module>

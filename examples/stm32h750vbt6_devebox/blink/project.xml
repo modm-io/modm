@@ -1,8 +1,5 @@
 <library>
   <extends>modm:devebox-stm32h750vb</extends>
-  <options>
-    <option name="modm:build:build.path">../../../build/stm32h750vbt6_devebox/blink</option>
-  </options>
   <modules>
     <module>modm:build:scons</module>
   </modules>

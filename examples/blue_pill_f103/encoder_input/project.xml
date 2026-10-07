@@ -1,8 +1,5 @@
 <library>
   <extends>modm:blue-pill-f103</extends>
-  <options>
-    <option name="modm:build:build.path">../../../build/blue_pill_f103/encoder_input</option>
-  </options>
   <modules>
 		<module>modm:processing:timer</module>
 		<module>modm:driver:encoder_input</module>

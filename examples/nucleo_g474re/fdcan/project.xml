@@ -1,7 +1,6 @@
 <library>
 	<extends>modm:nucleo-g474re</extends>
 	<options>
-		<option name="modm:build:build.path">../../../build/nucleo_g474re/fdcan</option>
 		<option name="modm:architecture:can:message.buffer">64</option>
 	</options>
 	<modules>

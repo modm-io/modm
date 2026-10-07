@@ -1,8 +1,5 @@
 <library>
   <extends>modm:disco-f407vg</extends>
-  <options>
-    <option name="modm:build:build.path">../../../../build/stm32f4_discovery/open407v-d/touchscreen</option>
-  </options>
   <modules>
     <module>modm:driver</module>
     <module>modm:driver:ads7843</module>

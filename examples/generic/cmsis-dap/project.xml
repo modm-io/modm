@@ -31,7 +31,6 @@
   <!-- <extends>modm:nrf5340-dk</extends> -->
   <!-- <extends>modm:nrf52840-dk</extends> -->
   <options>
-    <option name="modm:build:build.path">../../../build/generic/cmsis-dap</option>
     <option name="modm:tinyusb:config">device.vendor</option>
 
     <!-- Required for modm:disco-f429zi -->

@@ -1,8 +1,5 @@
 <library>
   <extends>modm:blue-pill-f103</extends>
-  <options>
-    <option name="modm:build:build.path">../../../../build/generic/ros/can_bridge</option>
-  </options>
   <modules>
     <module>modm:build:scons</module>
     <module>modm:communication:ros</module>

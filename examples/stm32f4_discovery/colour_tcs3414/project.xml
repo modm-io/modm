@@ -1,8 +1,5 @@
 <library>
   <extends>modm:disco-f407vg</extends>
-  <options>
-    <option name="modm:build:build.path">../../../build/stm32f4_discovery/colour_tcs3414</option>
-  </options>
   <modules>
     <module>modm:driver:tcs3414</module>
     <module>modm:io</module>

@@ -1,8 +1,5 @@
 <library>
   <extends>modm:samd21-xplained-pro</extends>
-  <options>
-    <option name="modm:build:build.path">../../../build/samd21_xplained_pro/blink</option>
-  </options>
   <modules>
     <module>modm:build:scons</module>
   </modules>
