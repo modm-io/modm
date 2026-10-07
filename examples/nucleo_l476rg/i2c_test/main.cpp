@@ -95,7 +95,7 @@ I2cTestDevice<I2cMaster>::writeRead(size_t write_len, size_t read_len)
 	return true;
 }
 
-I2cTestDevice< MyI2cMaster > i2c;
+I2cTestDevice< MyI2cMaster > device;
 
 // ----------------------------------------------------------------------------
 int
@@ -108,25 +108,25 @@ main()
 
 	LedGreen::set();
 
-	i2c.ping();
+	device.ping();
 	modm::delay(25us);
 
-	i2c.write(0);
+	device.write(0);
 	modm::delay(25us);
 
-	i2c.write(1);
+	device.write(1);
 	modm::delay(25us);
 
-	i2c.write(2);
+	device.write(2);
 	modm::delay(25us);
 
-	i2c.writeRead(0, 5);
+	device.writeRead(0, 5);
 	modm::delay(25us);
 
-	i2c.writeRead(1, 5);
+	device.writeRead(1, 5);
 	modm::delay(25us);
 
-	i2c.writeRead(2, 5);
+	device.writeRead(2, 5);
 	modm::delay(25us);
 
 	// Blink if run without hanging.

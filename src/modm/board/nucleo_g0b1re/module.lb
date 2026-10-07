@@ -23,6 +23,7 @@ def prepare(module, options):
         return False
 
     module.depends(":platform:core", ":platform:gpio", ":platform:clock", ":platform:uart:2",
+                   ":platform:i2c:1", ":platform:spi:1",
                    ":debug", ":architecture:clock")
     return True
 
