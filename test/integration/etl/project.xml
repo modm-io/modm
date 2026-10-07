@@ -1,12 +1,11 @@
 <library>
-  <!-- CI: run fail -->
-  <options>
-    <option name="modm:target">hosted-linux</option>
-  </options>
+  <!-- CI: run -->
+  <extends>modm:hosted</extends>
+  <!-- <extends>modm:nucleo-f439zi</extends> -->
   <modules>
-    <module>modm:etl</module>
-    <module>modm:debug</module>
     <module>modm:platform:core</module>
+    <module>modm:debug</module>
+    <module>modm:etl</module>
     <module>modm:build:scons</module>
   </modules>
 </library>
