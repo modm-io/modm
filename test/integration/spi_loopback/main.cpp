@@ -10,12 +10,13 @@
 
 #include <modm/board.hpp>
 
+#include "../integration_test.hpp"
+
 using namespace modm::platform;
 
 int main()
 {
-	// Test SPI send and receive in loopback mode. If we receive the expected
-	// characters back, flash slowly. Otherwise, flash fast.
+	// Test SPI send and receive in loopback mode: we must receive what we sent.
 	Board::initialize();
 
 	SpiMaster0::connect<GpioB0::Sck, GpioA9::Miso, GpioA10::Mosi>();
@@ -23,26 +24,10 @@ int main()
 
 	SpiMaster0::setLocalLoopback(true);
 
-	while (true)
-	{
-		uint32_t flash_time_ms;
-		uint8_t tx[] = {0xa5, 0x21};
-		uint8_t rx[2];
+	const uint8_t tx[] = {0xa5, 0x21};
+	uint8_t rx[2]{};
 
-		SpiMaster0::transfer(tx, rx, 2);
+	SpiMaster0::transfer(tx, rx, 2);
 
-		if(rx[0] == 0xa5 && rx[1] == 0x21) {
-			flash_time_ms = 500;
-		} else {
-			flash_time_ms = 100;
-		}
-
-		for(uint32_t i=0; i<5; i++)
-		{
-			Board::Led::set();
-			modm::delay_ms(flash_time_ms);
-			Board::Led::reset();
-			modm::delay_ms(flash_time_ms);
-		}
-	}
+	return finishTest(rx[0] == tx[0] and rx[1] == tx[1]);
 }
