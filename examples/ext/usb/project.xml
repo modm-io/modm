@@ -13,6 +13,7 @@
   <!-- <extends>modm:disco-l476vg</extends> -->
   <!-- <extends>modm:feather-m0</extends> -->
   <!-- <extends>modm:nucleo-f207zg</extends> -->
+  <!-- <extends>modm:feather-m4</extends> -->
   <!-- <extends>modm:nucleo-f429zi</extends> -->
   <!-- <extends>modm:nucleo-h723zg</extends> -->
   <!-- <extends>modm:nucleo-h743zi</extends> -->
@@ -30,7 +31,13 @@
   <!-- <extends>modm:nucleo-u385rg-q</extends> -->
   <!-- <extends>modm:nrf5340-dk</extends> -->
   <!-- <extends>modm:nrf52840-dk</extends> -->
+  <!-- <extends>modm:samd21-xplained-pro</extends> -->
+  <!-- <extends>modm:same54-xplained-pro</extends> -->
+  <!-- <extends>modm:samg55-xplained-pro</extends> -->
+  <!-- <extends>modm:nucleo-f446ze</extends> -->
   <options>
+    <!-- Required for modm:blue-pill-f103, modm:black-pill-f401, modm:black-pill-f411 -->
+    <!-- <option name="modm:build:openocd.cfg">interface/stlink.cfg</option> -->
     <option name="modm:tinyusb:config">device.cdc,device.msc</option>
     <!-- <option name="modm:board:weact-h562rg:logger">RTT</option> -->
     <!-- <option name="modm:board:weact-h503cb:with_rtt">yes</option> -->
@@ -49,6 +56,7 @@
     <module>modm:io</module>
   </modules>
   <collectors>
+    <!-- Optional for modm:disco-f746ng -->
     <!-- <collect name="modm:build:cppdefines">CFG_TUSB_DEBUG=3</collect> -->
     <!-- <collect name="modm:build:openocd.source">interface/stlink.cfg</collect> -->
     <!-- <collect name="modm:build:openocd.source">interface/stlink-dap.cfg</collect> -->
