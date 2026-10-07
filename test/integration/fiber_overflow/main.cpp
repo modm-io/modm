@@ -11,45 +11,58 @@
 
 #include <modm/board.hpp>
 #include <modm/processing.hpp>
+#include <modm/architecture/interface/assert.hpp>
+#include <string.h>
 
-using namespace Board;
+#include "../integration_test.hpp"
+
 using namespace std::chrono_literals;
 
+/**
+ * Tests that the scheduler detects a fiber that overflows its stack.
+ * The test passes when the `fbr.stkof` assertion fails.
+ */
 
-bool overflow{false};
+static modm::Abandonment
+overflow_handler(const modm::AssertionInfo &info)
+{
+#ifdef MODM_CPU_AVR
+	// The assertion names are located in Flash on AVRs!
+	if (strcmp_P("fbr.stkof", info.name) == 0)
+#else
+	if (strcmp(info.name, "fbr.stkof") == 0)
+#endif
+	{
+		finishTest(true);
+	}
+	return modm::Abandonment::DontCare;
+}
+MODM_ASSERTION_HANDLER(overflow_handler);
 
 modm::Fiber bad_fiber([]
 {
 	while(1)
 	{
-#ifdef __AVR__
-		if (overflow) asm volatile ("push r1");
+#ifdef MODM_CPU_AVR
+		asm volatile ("push r1");
 #else
-		if (overflow) asm volatile ("push {r0-r7}");
+		asm volatile ("push {r0-r7}");
 #endif
 		modm::this_fiber::yield();
 	}
 });
 
-modm::Fiber blinky([]
+modm::Fiber watchdog([]
 {
-	while(1)
-	{
-		Board::Leds::toggle();
-		modm::this_fiber::sleep_for(0.5s);
-		char c;
-		modm::log::info.get(c);
-		if (c == 'o') overflow = true;
-	}
+	// the overflow must have been detected long before
+	modm::this_fiber::sleep_for(2s);
+	finishTest(false);
 });
 
 int
 main()
 {
 	Board::initialize();
-	Board::Leds::setOutput();
-	MODM_LOG_INFO << "\nReboot!\nSend 'o' to overflow the stack!" << modm::endl;
-	modm::delay(1s);
 
 	modm::fiber::Scheduler::run();
 
