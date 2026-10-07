@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Raphael Lehmann
+ * Copyright (c) 2021-2022, Raphael Lehmann
  *
  * This file is part of the modm project.
  *
@@ -10,16 +10,41 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
+#include <modm/debug/logger.hpp>
 #include <modm/driver/rtc/mcp7941x.hpp>
 #include <modm/processing.hpp>
+#include <optional>
 
+
+// Set the log level
+#undef MODM_LOG_LEVEL
+#define MODM_LOG_LEVEL modm::log::INFO
+
+#ifndef MODM_BOARD_HAS_LOGGER
+// The Raspberry Pi Pico does not provide a logger, so we need to create our own:
+// Create an IODeviceWrapper around the Uart Peripheral we want to use
+modm::IODeviceWrapper<Uart0, modm::IOBuffer::BlockIfFull> loggerDevice;
+
+// Set all four logger streams to use the UART
+modm::log::Logger modm::log::debug(loggerDevice);
+modm::log::Logger modm::log::info(loggerDevice);
+modm::log::Logger modm::log::warning(loggerDevice);
+modm::log::Logger modm::log::error(loggerDevice);
+
+
+using MyI2cMaster	= modm::platform::I2cMaster0;
+using I2cScl 		= modm::platform::Gpio1;
+using I2cSda 		= modm::platform::Gpio0;
+#else
+// The Arduino header of the Nucleo-144 boards
 using MyI2cMaster	= modm::platform::I2cMaster1;
-using I2cScl 		= modm::platform::GpioB8;
-using I2cSda 		= modm::platform::GpioB9;
+using I2cScl 		= Board::D15;
+using I2cSda 		= Board::D14;
+#endif
 
 modm::Mcp7941x<MyI2cMaster> rtc{};
 
-modm::Fiber fiber_name([]
+modm::Fiber fiber_rtc([]
 {
 	if(rtc.oscillatorRunning()) {
 		MODM_LOG_ERROR << "RTC oscillator is running." << modm::endl;
@@ -75,17 +100,25 @@ modm::Fiber fiber_blink([]
 	}
 });
 
+modm::Mcp7941xEeprom<MyI2cMaster> eeprom{};
+
 int
 main()
 {
 	Board::initialize();
 
+#ifndef MODM_BOARD_HAS_LOGGER
+	// initialize Uart0 for MODM_LOG_*
+	Uart0::connect<GpioOutput16::Tx>();
+	Uart0::initialize<Board::SystemClock, 115200_Bd>();
+#endif
+
 	MyI2cMaster::connect<I2cScl::Scl, I2cSda::Sda>();
 	MyI2cMaster::initialize<Board::SystemClock, 100_kHz>();
 
-	MODM_LOG_INFO << "RTC MCP7941x Example on Nucleo-F429ZI" << modm::endl;
+	MODM_LOG_INFO << "RTC MCP7941x Example" << modm::endl;
 
-	modm::Mcp7941xEeprom<MyI2cMaster> eeprom{};
+
 	if (auto data = eeprom.getUniqueId()) {
 		MODM_LOG_INFO << "Unique ID (EUI-48/64): " << modm::hex;
 		MODM_LOG_INFO << (*data)[0] << ":";
@@ -101,7 +134,7 @@ main()
 		MODM_LOG_ERROR << "Unable to read unique ID from RTC." << modm::endl;
 	}
 	modm::delay(500ms);
-	modm::fiber::Scheduler::run();
 
+	modm::fiber::Scheduler::run();
 	return 0;
 }
