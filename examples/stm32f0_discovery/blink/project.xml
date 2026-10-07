@@ -1,7 +1,0 @@
-<library>
-  <extends>modm:disco-f051r8</extends>
-  <modules>
-    <module>modm:processing:timer</module>
-    <module>modm:build:scons</module>
-  </modules>
-</library>
