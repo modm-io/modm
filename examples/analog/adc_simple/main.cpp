@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2013, Kevin Läufer
- * Copyright (c) 2013-2014, Sascha Schade
  * Copyright (c) 2013-2017, Niklas Hauser
+ * Copyright (c) 2013-2014, Sascha Schade
+ * Copyright (c) 2013, Kevin Läufer
  *
  * This file is part of the modm project.
  *
@@ -13,25 +13,49 @@
 
 #include <modm/board.hpp>
 
-typedef GpioInputA7 AdcIn;
+// ----------------------------------------------------------------------------
 
+// The ADC, its analog input and its initialization differ between the devices
+#if defined STM32F3
+using MyAdc = Adc4;
+using AdcIn = GpioInputB12;
+
+static void
+initializeAdc()
+{
+	MyAdc::initialize(MyAdc::ClockMode::Asynchronous, MyAdc::Prescaler::Div256,
+					  MyAdc::CalibrationMode::SingleEndedInputsMode, true);
+	MyAdc::connect<AdcIn::In3>();
+	MyAdc::setPinChannel<AdcIn>(MyAdc::SampleTime::Cycles182);
+}
+#else
+using MyAdc = Adc2;
+using AdcIn = GpioInputA7;
+
+static void
+initializeAdc()
+{
+	MyAdc::connect<AdcIn::In7>();
+	MyAdc::initialize<Board::SystemClock>();
+	MyAdc::setPinChannel<AdcIn>();
+}
+#endif
+
+// ----------------------------------------------------------------------------
 int
 main()
 {
 	Board::initialize();
 
-	// initialize Adc2
-	Adc2::connect<AdcIn::In7>();
-	Adc2::initialize<Board::SystemClock>();
-	Adc2::setPinChannel<AdcIn>();
+	initializeAdc();
 
 	while (true)
 	{
-		Adc2::startConversion();
+		MyAdc::startConversion();
 		// wait for conversion to finish
-		while(!Adc2::isConversionFinished());
+		while(!MyAdc::isConversionFinished());
 		// print result
-		int adcValue = Adc2::getValue();
+		int adcValue = MyAdc::getValue();
 		MODM_LOG_INFO << "adcValue=" << adcValue;
 		float voltage = adcValue * 3.3 / 0xfff;
 		MODM_LOG_INFO << " voltage=" << voltage << modm::endl;
