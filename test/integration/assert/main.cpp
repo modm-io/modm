@@ -10,74 +10,94 @@
  */
 // ----------------------------------------------------------------------------
 
+#if __has_include(<modm/board.hpp>)
 #include <modm/board.hpp>
+#else
+#include <modm/platform.hpp>
+#include <modm/debug.hpp>
+#endif
 #include <modm/architecture/interface/assert.hpp>
-#include <string>
+#include <string.h>
+#include <stdlib.h>
 
-using namespace std::string_literals;
-using namespace Board;
+#include "../integration_test.hpp"
+
+/**
+ * Tests that assertions call their handlers, that handlers can ignore
+ * assertions and that the core reports its errors as assertions.
+ * The test passes when the last assertion abandons execution after every
+ * expected assertion was seen exactly once.
+ */
+
+static bool
+is(const char *name, const char *expected)
+{
+#ifdef MODM_CPU_AVR
+	// The assertion names are located in Flash on AVRs!
+	return strcmp_P(expected, name) == 0;
+#else
+	return strcmp(name, expected) == 0;
+#endif
+}
+
+static uint8_t seen_io, seen_uart, seen_core, seen_other;
 
 static modm::Abandonment
-test_assertion_handler(const modm::AssertionInfo &info)
+counting_handler(const modm::AssertionInfo &info)
 {
-	if (not strncmp(info.name, "io.", 3)) {
-		MODM_LOG_ERROR << "Ignoring all io.* assertions!" << modm::endl;
+	if (is(info.name, "io.tx")) { seen_io++; return modm::Abandonment::Ignore; }
+	if (is(info.name, "uart.init")) { seen_uart++; return modm::Abandonment::Ignore; }
+	if (is(info.name, "nvic.undef") or is(info.name, "new") or is(info.name, "malloc")) {
+		seen_core++;
 		return modm::Abandonment::Ignore;
 	}
+	if (is(info.name, "can.init"))
+	{
+#ifdef MODM_CPU_CORTEX_M
+		// undefined IRQ, malloc, new (nothrow) and new
+		constexpr uint8_t expected_core = 4;
+#else
+		constexpr uint8_t expected_core = 0;
+#endif
+		// does not return on microcontrollers
+		exit(finishTest(seen_io == 1 and seen_uart == 1 and seen_core == expected_core and seen_other == 0));
+	}
+	seen_other++;
 	return modm::Abandonment::DontCare;
 }
-MODM_ASSERTION_HANDLER(test_assertion_handler);
-
-static modm::Abandonment
-core_assertion_handler(const modm::AssertionInfo &info)
-{
-	if (info.name == "nvic.undef"s) {
-		MODM_LOG_ERROR.printf("Ignoring undefined IRQ handler %d!\n", info.context);
-		return modm::Abandonment::Ignore;
-	}
-	if ((info.name == "new"s) or (info.name == "malloc"s)) {
-		MODM_LOG_ERROR.printf("Ignoring '%s' of size 0x%x!\n", info.name, info.context);
-		return modm::Abandonment::Ignore;
-	}
-	return modm::Abandonment::DontCare;
-}
-MODM_ASSERTION_HANDLER(core_assertion_handler);
+MODM_ASSERTION_HANDLER(counting_handler);
 
 // ----------------------------------------------------------------------------
 int
 main()
 {
+#if __has_include(<modm/board.hpp>)
 	Board::initialize();
-	MODM_LOG_INFO << "\n=== RESTART ===\n" << modm::flush;
+#endif
 
+	// these fail, but are ignored by our handler
+	modm_assert_continue_fail(false, "io.tx", "IO transmit buffer is full!");
+	modm_assert_continue_fail(false, "uart.init", "UART init failed!");
+
+#ifdef MODM_CPU_CORTEX_M
 	// trigger an IRQ with undefined handler
-	NVIC_EnableIRQ(OTG_FS_WKUP_IRQn);
-	NVIC_SetPendingIRQ(OTG_FS_WKUP_IRQn);
+	NVIC_EnableIRQ(IRQn_Type(0));
+	NVIC_SetPendingIRQ(IRQn_Type(0));
 
-
-	// trigger an out of memory
-	// we definitely don't have 32MB RAM on this board
-	// returns NULL, asserts in debug mode
-	volatile void * ptr = malloc(1 << 25);
-	// returns NULL, asserts in debug mode
+	// trigger an out of memory: we definitely don't have 32MB RAM
+	volatile void *ptr = malloc(1 << 25);
 	ptr = new (std::nothrow) uint8_t[1 << 25];
-	// always asserts
 	ptr = new uint8_t[1 << 25];
 	(void) ptr;
+#endif
 
 	// does not fail, should not be optimized away
 	volatile bool true_condition = true;
-	modm_assert(true_condition, "can.init",
-	            "Can::init() function has timed out!");
+	modm_assert(true_condition, "can.init", "CAN init timed out!");
 
-	// only fails for debug builds, but is ignored anyways
-	modm_assert_continue_fail_debug(false, "io.tx",
-			"The IO transmit buffer is full!");
+	// always fails: our handler reports the result
+	modm_assert(false, "can.init", "CAN init timed out!");
 
-	MODM_LOG_ERROR << modm::flush;
-	// "accidentally" return from main, without even returning properly!
-	// This should be caught by the debug assert main.exit!
-	// while (true)
-	//     {};
-	// return 0;
+	// we should not get here
+	return finishTest(false);
 }
