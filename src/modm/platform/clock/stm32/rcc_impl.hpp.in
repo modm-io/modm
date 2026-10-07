@@ -127,8 +127,8 @@ Rcc::enable()
 			RCC->{{bus}} |= RCC_{{bus}}_{{st_per}}EN;{% if peripheral in rcc_reset %} __DSB();
 			RCC->{{rcc_reset[peripheral][1]}} |= RCC_{{rcc_reset[peripheral][1]}}_{{rcc_reset[peripheral][0]}}RST; __DSB();
 			RCC->{{rcc_reset[peripheral][1]}} &= ~RCC_{{rcc_reset[peripheral][1]}}_{{rcc_reset[peripheral][0]}}RST;{% endif %}{% if peripheral == "Eth" %} __DSB();
-			RCC->{{bus}} |= RCC_{{bus}}_{{st_per}}RXEN; __DSB();
-			RCC->{{bus}} |= RCC_{{bus}}_{{st_per}}TXEN;{% endif %}
+			RCC->{{bus}} |= RCC_{{bus}}_{{rcc_eth_txrx}}RXEN; __DSB();
+			RCC->{{bus}} |= RCC_{{bus}}_{{rcc_eth_txrx}}TXEN;{% endif %}
 		}
 	%% endfor
 	__DSB();
@@ -145,8 +145,8 @@ Rcc::disable()
 	%% for peripheral, (st_per, bus) in rcc_enable.items() | sort
 	if constexpr (peripheral == Peripheral::{{ peripheral }}) {
 		RCC->{{bus}} &= ~RCC_{{bus}}_{{st_per}}EN;{% if peripheral == "Eth" %} __DSB();
-		RCC->{{bus}} &= ~RCC_{{bus}}_{{st_per}}RXEN; __DSB();
-		RCC->{{bus}} &= ~RCC_{{bus}}_{{st_per}}TXEN;{% endif %}
+		RCC->{{bus}} &= ~RCC_{{bus}}_{{rcc_eth_txrx}}RXEN; __DSB();
+		RCC->{{bus}} &= ~RCC_{{bus}}_{{rcc_eth_txrx}}TXEN;{% endif %}
 	}
 	%% endfor
 	__DSB();
