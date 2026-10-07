@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2020, Mike Wolfram
+ * Copyright (c) 2021, Raphael Lehmann
  *
  * This file is part of the modm project.
  *
@@ -10,35 +11,49 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
+#include <cstring>
+
+#include "../integration_test.hpp"
+
+/**
+ * Tests SPI transfers via DMA in a loopback:
+ * connect Mosi (PB5) to Miso (PB4)!
+ */
 
 using Mosi = GpioOutputB5;
 using Miso = GpioInputB4;
 using Sck = GpioOutputB3;
-using DmaRx = Dma1::Channel2;
-using DmaTx = Dma1::Channel3;
+
+// The DMA controller and its channels for SPI1 differ between the devices
+#if defined STM32F4 or defined STM32F7
+using Dma = Dma2;
+using DmaRx = Dma::Channel0;
+using DmaTx = Dma::Channel3;
+#else
+using Dma = Dma1;
+using DmaRx = Dma::Channel2;
+using DmaTx = Dma::Channel3;
+#endif
 using Spi = SpiMaster1_Dma<DmaRx, DmaTx>;
+
+const uint8_t sendBuffer[13] {"data to send"};
+uint8_t receiveBuffer[13];
 
 int main()
 {
 	Board::initialize();
 
-	// Enable DMA1 controller
-    Dma1::enable();
-    // Enable SPI1
-    Spi::connect<Mosi::Mosi, Miso::Miso, Sck::Sck>();
-    Spi::initialize<Board::SystemClock, 10_MHz>();
+	Dma::enable();
+	Spi::connect<Mosi::Mosi, Miso::Miso, Sck::Sck>();
+	// the slowest SPI clock works on every device
+	Spi::initialize<Board::SystemClock, Board::SystemClock::Spi1 / 256>();
 
-	while (true)
-	{
-		uint8_t sendBuffer[13] { "data to send" };
-		uint8_t receiveBuffer[13];
+	// send out 12 bytes, don't care about response
+	Spi::transfer(sendBuffer, nullptr, 12);
 
-		// send out 12 bytes, don't care about response
-		Spi::transfer(sendBuffer, nullptr, 12);
+	// send out 12 bytes, read in 12 bytes
+	Spi::transfer(sendBuffer, receiveBuffer, 12);
+	MODM_LOG_INFO << "Received '" << reinterpret_cast<const char*>(receiveBuffer) << "'" << modm::endl;
 
-		// send out 12 bytes, read in 12 bytes
-		Spi::transfer(sendBuffer, receiveBuffer, 12);
-	}
-
-	return 0;
+	return finishTest(memcmp(sendBuffer, receiveBuffer, 12) == 0);
 }
