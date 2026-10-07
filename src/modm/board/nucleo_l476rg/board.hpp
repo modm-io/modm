@@ -53,6 +53,19 @@ struct SystemClock
 	static constexpr uint32_t Usart3 = Apb1;
 	static constexpr uint32_t Usart4 = Apb1;
 	static constexpr uint32_t Usart5 = Apb1;
+
+	static constexpr uint32_t Timer1  = Apb2;
+	static constexpr uint32_t Timer2  = Apb1;
+	static constexpr uint32_t Timer3  = Apb1;
+	static constexpr uint32_t Timer4  = Apb1;
+	static constexpr uint32_t Timer5  = Apb1;
+	static constexpr uint32_t Timer6  = Apb1;
+	static constexpr uint32_t Timer7  = Apb1;
+	static constexpr uint32_t Timer8  = Apb2;
+	static constexpr uint32_t Timer15 = Apb2;
+	static constexpr uint32_t Timer16 = Apb2;
+	static constexpr uint32_t Timer17 = Apb2;
+
 	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
 	static constexpr uint32_t Rtc = 32.768_kHz;
 

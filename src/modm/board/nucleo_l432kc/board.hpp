@@ -30,21 +30,48 @@ using namespace modm::literals;
 struct SystemClock
 {
 	static constexpr uint32_t Frequency = 80_MHz;
-	static constexpr uint32_t Ahb = Frequency;
+	static constexpr uint32_t Ahb  = Frequency;
+	static constexpr uint32_t Ahb2 = Frequency;
 	static constexpr uint32_t Apb1 = Frequency;
 	static constexpr uint32_t Apb2 = Frequency;
+
+	static constexpr uint32_t Adc1 = Ahb2;
+
+	static constexpr uint32_t Can1 = Apb1;
+
+	static constexpr uint32_t Comp1 = Apb2;
+	static constexpr uint32_t Comp2 = Apb2;
+
+	static constexpr uint32_t Dac1 = Apb1;
+
+	static constexpr uint32_t I2c1 = Apb1;
+	static constexpr uint32_t I2c2 = Apb1;
+	static constexpr uint32_t I2c3 = Apb1;
+	static constexpr uint32_t I2c4 = Apb1;
+
+	static constexpr uint32_t Spi1 = Apb2;
+
+	static constexpr uint32_t Spi2 = Apb1;
+	static constexpr uint32_t Spi3 = Apb1;
+
+	static constexpr uint32_t Timer1 = Apb2;
+
+	static constexpr uint32_t Timer2 = Apb1;
+	static constexpr uint32_t Timer6 = Apb1;
+
+	static constexpr uint32_t Timer15 = Apb2;
+	static constexpr uint32_t Timer16 = Apb2;
+
+	static constexpr uint32_t Uart4 = Apb1;
 
 	static constexpr uint32_t Usart1 = Apb2;
 
 	static constexpr uint32_t Usart2 = Apb1;
 	static constexpr uint32_t Usart3 = Apb1;
-	static constexpr uint32_t Usart4 = Apb1;
-	static constexpr uint32_t Usart5 = Apb1;
 
-	static constexpr uint32_t Spi1 = Apb2;
-	static constexpr uint32_t Spi2 = Apb2;
 	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
 	static constexpr uint32_t Rtc = 32.768_kHz;
+	static constexpr uint32_t Usb = Apb1;
 
 	static bool inline
 	enable()

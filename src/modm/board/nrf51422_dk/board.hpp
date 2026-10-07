@@ -52,6 +52,7 @@ using Button2 = GpioInverted<GpioInputP0_18>;
 using Button3 = GpioInverted<GpioInputP0_19>;
 using Button4 = GpioInverted<GpioInputP0_20>;
 using Buttons = SoftwareGpioPort<Button4, Button3, Button2, Button1>;
+using Button = Button1;
 
 namespace uart
 {
