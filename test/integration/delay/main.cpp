@@ -12,7 +12,16 @@
 #include <modm/board.hpp>
 #include <modm/driver/time/cycle_counter.hpp>
 
+#include "../integration_test.hpp"
+
 using namespace Board;
+
+/**
+ * Benchmarks `modm::delay_ns()` and `modm::delay_us()` with the cycle counter.
+ * A delay must never be more than 20% too short, and delays of 10us or more
+ * must not be more than 20% too long.
+ */
+static bool passed{true};
 
 #ifdef CFG_TUSB_MCU
 #include <modm/debug.hpp>
@@ -42,8 +51,10 @@ run_delay_ns(uint32_t ns)
 	const uint32_t cycles = counter.cycles();
 	const uint32_t expected = uint64_t(SystemCoreClock) * ns / 1'000'000'000ull;
 	const uint32_t real = counter.nanoseconds();
-	MODM_LOG_INFO.printf("%8lu | %7lu | %7lu | %8lu      %c\n", ns, expected, cycles, real,
-	    (cycles < expected*1.2f ? (cycles > expected*0.8f ? ' ' : '<') : '>')) << modm::flush;
+	const char verdict = (cycles < expected*1.2f ? (cycles > expected*0.8f ? ' ' : '<') : '>');
+	MODM_LOG_INFO.printf("%8lu | %7lu | %7lu | %8lu      %c\n", ns, expected, cycles, real, verdict) << modm::flush;
+	// very short delays are dominated by the call overhead and may be too long
+	if (verdict == '<' or (verdict == '>' and ns >= 10'000)) passed = false;
 #ifdef CFG_TUSB_MCU
 	tud_task();
 #endif
@@ -67,8 +78,9 @@ run_delay_us(uint32_t us)
 	const uint32_t cycles = counter.cycles();
 	const uint32_t expected = uint64_t(SystemCoreClock) * us / 1'000'000ull;
 	const uint32_t real = counter.microseconds();
-	MODM_LOG_INFO.printf("%8lu | %8lu | %8lu | %8lu      %c\n", us, expected, cycles, real,
-	    (cycles < expected*1.2f ? (cycles > expected*0.8f ? ' ' : '<') : '>')) << modm::flush;
+	const char verdict = (cycles < expected*1.2f ? (cycles > expected*0.8f ? ' ' : '<') : '>');
+	MODM_LOG_INFO.printf("%8lu | %8lu | %8lu | %8lu      %c\n", us, expected, cycles, real, verdict) << modm::flush;
+	if (verdict == '<' or (verdict == '>' and us >= 10)) passed = false;
 #ifdef CFG_TUSB_MCU
 	tud_task();
 #endif
@@ -141,8 +153,7 @@ int main()
 	run_test_ns();
 	run_test_us();
 
-	while(true) {}
-	return 0;
+	return finishTest(passed);
 }
 
 #elif defined CFG_TUSB_MCU
@@ -168,6 +179,8 @@ int main()
 			counter = 1'000'000;
 			run_test_ns();
 			run_test_us();
+			// the USB connection must keep running
+			printTestResult(passed);
 		}
 	}
 	return 0;
@@ -201,8 +214,7 @@ int main()
 	run_test_ns();
 	run_test_us();
 
-	while(true) {}
-	return 0;
+	return finishTest(passed);
 }
 
 #endif
