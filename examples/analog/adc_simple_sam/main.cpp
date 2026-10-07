@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2021, Jeff McBride
  * Copyright (c) 2022, Christopher Durand
+ * Copyright (c) 2023, Luiz Carlos Gili
  *
  * This file is part of the modm project.
  *
