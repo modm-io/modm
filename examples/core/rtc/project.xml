@@ -3,7 +3,6 @@
 
   <!-- <extends>modm:nucleo-g071rb</extends> -->
 
-  <!-- <extends>modm:stm32f030_demo</extends> -->
   <!-- <extends>modm:disco-f051r8</extends> -->
   <!-- <extends>modm:disco-f072rb</extends> -->
   <!-- <extends>modm:nucleo-f072rb</extends> -->
