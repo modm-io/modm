@@ -1,0 +1,6 @@
+<library>
+  <!-- Default lbuild configuration for all integration tests in this folder. -->
+  <repositories>
+    <repository><path>../../repo.lb</path></repository>
+  </repositories>
+</library>
