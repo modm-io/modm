@@ -18,7 +18,7 @@ namespace modm::this_fiber
 void inline
 yield()
 {
-	// do nothing and return
+	__asm__ volatile ("" ::: "memory");
 }
 
 modm::fiber::id inline
