@@ -172,7 +172,9 @@ class Fiber(Module):
         module.description = FileReader("interface/fiber.md")
 
     def prepare(self, module, options):
-        module.depends(":stdc++", ":architecture:clock", ":processing")
+        module.depends(":stdc++", ":architecture:atomic", ":architecture:clock", ":processing")
+        core = options[":target"].get_driver("core")["type"]
+        if core.startswith("cortex-m"): module.depends(":cmsis:device")
         return True
 
     def build(self, env):

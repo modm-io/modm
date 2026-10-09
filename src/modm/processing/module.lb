@@ -31,8 +31,16 @@ def build(env):
 
     if env.has_module(":architecture:fiber") and not env.has_module(":processing:fiber"):
         env.outbasepath = "modm/src/modm/processing/"
-        env.substitutions = {"with_task": False}
-        env.copy("fiber/no_yield.hpp")
+        env.substitutions = {
+            "with_task": False,
+            "core": env[":target"].get_driver("core")["type"],
+        }
+        env.template("fiber/no_yield.hpp.in")
+        # Only the synchronization primitives work without the scheduler,
+        # except for the barrier, which requires multiple fibers
+        env.copy("fiber", ignore=env.ignore_files(
+                "barrier.hpp", "context*", "scheduler*", "stack*", "task*",
+                "*.md", "*.in"))
         env.template("fiber.hpp.in")
 
     env.outbasepath = "modm/src/modm"
