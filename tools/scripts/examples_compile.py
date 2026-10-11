@@ -68,10 +68,10 @@ def build(project):
             commands.append( ("scons compilation_db", "CompilationDB (via SCons)") )
     if ":build:make" in project_cfg and not is_running_on_windows:
         commands.append( ("make build", "Make") )
-    elif ":build:cmake" in project_cfg and not is_running_on_windows:
+    elif ":build:cmake" in project_cfg:
         build_dir = re.search(r'name=".+?:build:build.path">(.*?)</option>', project_cfg)[1]
-        cmd = "cmake -E make_directory {}/cmake-build-release; ".format(build_dir)
-        cmd += '(cd {}/cmake-build-release && cmake -DCMAKE_BUILD_TYPE=MinSizeRel -G "Unix Makefiles" {}); '.format(build_dir, path.absolute())
+        generator = "MinGW Makefiles" if is_running_on_windows else "Unix Makefiles"
+        cmd = 'cmake -S . -B {}/cmake-build-release -DCMAKE_BUILD_TYPE=MinSizeRel -G "{}" && '.format(build_dir, generator)
         cmd += "cmake --build {}/cmake-build-release".format(build_dir)
         commands.append( (cmd, "CMake") )
 
