@@ -93,7 +93,7 @@ jobs:
       - name: Install Python packages
         if: always()
         run: |
-          pip install --upgrade --upgrade-strategy=eager modm scons future
+          pip install --upgrade --upgrade-strategy=eager modm scons future protobuf grpcio-tools
 
       - name: Show Version Information
         if: always()
@@ -101,6 +101,7 @@ jobs:
           gcc --version
           g++ --version
           make --version
+          cmake --version
           arm-none-eabi-g++ --version
           avr-g++ --version
           lbuild --version
@@ -115,6 +116,7 @@ jobs:
       - name: Hosted Examples
         if: always()
         shell: bash
+        # Compiled and run, build and git information is generated while building.
         run: |
           (cd examples && python ../tools/scripts/examples_compile.py linux/assert linux/block_device/ram linux/build_info linux/git linux/logger linux/printf linux/etl linux/fiber)
 
@@ -127,13 +129,25 @@ jobs:
       - name: Compile STM32 Examples
         if: always()
         shell: bash
+        # These examples are selected by what can break on Windows.
         run: |
-          (cd examples && python ../tools/scripts/examples_compile.py nucleo_f031k6 nucleo_f103rb nucleo_f303re nucleo_f411re nucleo_f746zg)
-          (cd examples && python ../tools/scripts/examples_compile.py nucleo_g071rb nucleo_l031k6 nucleo_l152re nucleo_l432kc nucleo_g474re)
+          # Preprocessed assembly, which SCons only recognizes as `.sx` there:
+          # RTT, CrashCatcher and LVGL without its Helium assembly. Fibers
+          # only use inline assembly.
+          (cd examples && python ../tools/scripts/examples_compile.py blue_pill_f103/flash stm32f469_discovery/hard_fault nucleo_h563zi/fiber nucleo_l452re/lvgl)
+          # Paths in generated build scripts, where a backslash is an escape
+          # character: Nanopb and image sources. See AVR for XPCC.
+          (cd examples && python ../tools/scripts/examples_compile.py nucleo_f429zi/nanopb stm32_f4ve/gui)
+          # Many object files: LVGL, CMSIS-DSP and Ethernet exceed the command
+          # line length of cmd.exe when archiving, FreeRTOS and TinyUSB do not.
+          (cd examples && python ../tools/scripts/examples_compile.py stm32f469_discovery/lvgl nucleo_f429zi/ethernet nucleo_f429zi/freertos_static nucleo_f429zi/usb_freertos)
+          # CMake and CompilationDB generators
+          (cd examples && python ../tools/scripts/examples_compile.py stm32f469_discovery/assert nucleo_f429zi/cmsis_dsp/convolution stm32_f4ve/flash)
 
       - name: Compile AVR Examples
         if: always()
         shell: bash
+        # Includes the XPCC generator, image sources and CMake.
         run: |
           (cd examples && ../tools/scripts/examples_compile.py avr arduino_nano arduino_uno srxe)
 
