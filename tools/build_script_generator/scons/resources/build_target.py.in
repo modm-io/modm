@@ -11,10 +11,15 @@
 # -----------------------------------------------------------------------------
 
 from os.path import join, abspath, relpath
+from SCons.Subst import quote_spaces
 
 def build_target(env, sources):
 	# Building application
-	program = env.Program(target=env["CONFIG_PROJECT_NAME"]+"{{ program_extension }}", source=sources)
+	# The linker reads a backslash in a response file as an escape character.
+	# SCons only provides the target and sources with forward slashes, but not
+	# the library paths, libraries and link flags, which are escaped instead.
+	program = env.Program(target=env["CONFIG_PROJECT_NAME"]+"{{ program_extension }}", source=sources,
+	                      TEMPFILEARGESCFUNC=lambda arg: quote_spaces(arg.replace("\\", "\\\\")))
 	chosen_program = env.ChooseFirmware(program)
 	# Clean additional artifacts
 	env.Clean(program, join(env["BUILDPATH"], env["CONFIG_PROJECT_NAME"]+".bin"))

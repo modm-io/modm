@@ -89,6 +89,8 @@ def generate(env, **kw):
     env['STRIP'] = prefix + 'strip'
 
     env['LINK'] = env['CXX']
+    # Many application object files exceed the command line length on Windows.
+    env['LINKCOM'] = "${TEMPFILE('$LINK -o $TARGET.posix $LINKFLAGS $__RPATH $SOURCES.posix $_LIBDIRFLAGS $_LIBFLAGS','$LINKCOMSTR')}"
 
     builder_hex = Builder(
         action=Action("$OBJCOPY -O ihex $SOURCE $TARGET",
