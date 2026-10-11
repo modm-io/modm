@@ -62,6 +62,9 @@ def generate(env, **kw):
         raise RuntimeError(f'Unsupported compiler: "{compiler}"')
 
     env['AR'] = prefix + 'ar'
+    # Many object files exceed the command line length on Windows. The response
+    # file needs forward slashes, since ar reads a backslash as an escape there.
+    env['ARCOM'] = "${TEMPFILE('$AR $ARFLAGS $TARGET.posix $SOURCES.posix','$ARCOMSTR')}"
     env['RANLIB'] = prefix + 'ranlib'
     env['AS'] = prefix + 'as' if suffix == '' else prefix + 'gcc' + suffix
 
