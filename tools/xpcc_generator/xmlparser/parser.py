@@ -22,6 +22,8 @@ from lxml import etree
 import os
 import sys
 import logging
+from urllib.parse import urlparse
+from urllib.request import url2pathname
 
 from .parser_exception import ParserException
 from . import utils
@@ -75,7 +77,8 @@ class DTDResolver(etree.Resolver):
 		self.dtdPath = dtdPath
 
 	def resolve(self, url, id, context):
-		if os.path.isfile(url):
+		# The DTD next to an absolute Windows path is passed as a file URL
+		if os.path.isfile(url) or os.path.isfile(url2pathname(urlparse(url).path)):
 			return None
 		else:
 			filename = os.path.basename(url)
