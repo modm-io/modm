@@ -169,10 +169,12 @@ function(modm_targets_create project_name)
   set_target_properties(${project_name}
     PROPERTIES SUFFIX ".elf")
 
+%% if platform != "hosted"
   add_custom_command(TARGET ${project_name}
     POST_BUILD
     COMMAND ${CMAKE_OBJCOPY} -Obinary ${project_name}.elf ${project_name}.bin
     COMMAND ${CMAKE_OBJCOPY} -Oihex ${project_name}.elf ${project_name}.hex)
+%% endif
 
 %% if core.startswith("cortex-m")
   add_custom_command(TARGET ${project_name}
