@@ -103,13 +103,13 @@ if profile == "{{ profile }}":
 
 env["CPPPATH"].extend([
 %% for path in include_paths | sort
-    abspath(r"{{ path | modm.windowsify(escape_level=0) }}"),
+    abspath(r"{{ path }}"),
 %% endfor
 ])
 
 env["FILES"].extend([
 %% for file, flags in sources if not flags | length
-    (r"{{ file | modm.windowsify(escape_level=0) }}", {}),
+    (r"{{ file }}", {}),
 %% endfor
 ])
 %% for file, flags in sources
@@ -120,14 +120,14 @@ flags = { {%- for key, profiles in flags.items() if "" in profiles %}"{{ key | u
 if profile == "{{profile}}": flags["{{ key | upper }}"].extend({{flags}});
         %% endfor
     %% endfor
-env["FILES"].append( (r"{{ file | modm.windowsify(escape_level=0) }}", flags) )
+env["FILES"].append( (r"{{ file }}", flags) )
     %% endif
 %% endfor
 
 env["STATIC_LIBS"].append(
     ("{{repo}}/lib{{repo}}.a", [
 %% for file, flags in sources
-        r"{{ file | modm.windowsify(escape_level=0) }}",
+        r"{{ file }}",
 %% endfor
     ])
 )
@@ -141,6 +141,6 @@ env["LIBS"].extend([
 env["LIBPATH"].extend([
     abspath(join(env["BUILDPATH"], "{{repo}}")),
 %% for library in library_paths | sort
-    abspath(r"{{ library | modm.windowsify(escape_level=0) }}"),
+    abspath(r"{{ library }}"),
 %% endfor
 ])

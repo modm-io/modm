@@ -193,19 +193,6 @@ def init(repo):
                                          config, host if host in config else "windows"))
 
     # Add Jinja2 filters commonly used in this repository
-    if 'Windows' in platform.platform():
-        def windowsify(path, escape_level):
-            escaped = "\\" * (2 ** escape_level)
-            return path.replace("\\", escaped)
-        def posixify(path):
-            return path.replace("\\", "/")
-    else:
-        def windowsify(path, escape_level):
-            return path
-        def posixify(path):
-            return path
-    repo.add_filter("modm.windowsify", windowsify)
-    repo.add_filter("modm.posixify", posixify)
     repo.add_filter("modm.ord", lambda letter: ord(letter[0].lower()) - ord("a"))
     repo.add_filter("modm.chr", lambda num: chr(num + ord("A")))
     repo.add_filter("modm.digsep", lambda num: f"{num:,}".replace(",", "'"))

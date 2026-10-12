@@ -5,7 +5,7 @@
             "name": "{{ platform }}GCC ({{ profile | capitalize }})",
             "includePath": [
     %% for path in include_paths | sort
-                "${workspaceFolder}/{{ path | modm.windowsify(escape_level=1) }}"{% if not loop.last%},{% endif %}
+                "${workspaceFolder}/{{ path }}"{% if not loop.last%},{% endif %}
     %% endfor
             ],
             "defines": [

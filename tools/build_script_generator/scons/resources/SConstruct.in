@@ -25,12 +25,12 @@ import os
 from os.path import join, abspath
 
 %% if cache_dir | length
-CacheDir(abspath("{{ cache_dir | modm.windowsify(escape_level=1)}}"))
+CacheDir(abspath("{{ cache_dir }}"))
 %% endif
 env = DefaultEnvironment(tools=[], ENV=os.environ)
 env["CONFIG_PROJECT_NAME"] = "{{ options[":build:project.name"] }}"
-env["CONFIG_BUILD_BASE"] = abspath("{{ build_path | modm.windowsify(escape_level=1)}}")
-env["CONFIG_ARTIFACT_PATH"] = abspath("{{ artifact_path | modm.windowsify(escape_level=1)}}")
+env["CONFIG_BUILD_BASE"] = abspath("{{ build_path }}")
+env["CONFIG_ARTIFACT_PATH"] = abspath("{{ artifact_path }}")
 generated_paths = {{ generated_paths }}
 
 # Building all libraries

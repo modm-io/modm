@@ -1,12 +1,12 @@
 %% for path in openocd_search_dirs | sort
-add_script_search_dir {{ path | modm.windowsify(escape_level=1) }}
+add_script_search_dir {{ path }}
 %% endfor
 %# Include the users config before the modm config
 %% if openocd_user_path is defined
-source [find {{ openocd_user_path | modm.windowsify(escape_level=1) }}]
+source [find {{ openocd_user_path }}]
 %% endif
 %% for file in openocd_sources | sort
-source [find {{ file | modm.windowsify(escape_level=1) }}]
+source [find {{ file }}]
 %% endfor
 
 proc modm_itm_log { OUTPUT F_CPU {BAUDRATE 2000000} } {

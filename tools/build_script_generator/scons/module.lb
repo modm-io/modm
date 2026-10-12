@@ -153,7 +153,7 @@ def post_build(env):
     has_nanopb = env.has_module(":nanopb")
     repositories = [p for p in env.buildlog.repositories if isdir(env.real_outpath(p, basepath="."))]
     repositories.sort(key=lambda name: "0" if name == "modm" else name)
-    generated_paths = [join(env.relcwdoutpath(""), r) for r in repositories]
+    generated_paths = [env.relcwdoutpath("") + "/" + r for r in repositories]
 
     subs = env.query("::device")
     cache_dir = env["cache_dir"]
@@ -192,8 +192,7 @@ def post_build(env):
         })
     if has_nanopb:
         subs["nanopb_source"] = [env.relcwdoutpath(p) for p in env.get(":nanopb:sources", [])]
-        # forward slashes, since a Windows path like generated\nanopb contains an escape sequence
-        subs["nanopb_path"] = env.relcwdoutpath(env.get(":nanopb:path", ".")).replace("\\", "/")
+        subs["nanopb_path"] = env.relcwdoutpath(env.get(":nanopb:path", "."))
     if subs["platform"] == "avr":
         subs.update(env.query("::avrdude_options"))
     if subs["platform"] == "sam":

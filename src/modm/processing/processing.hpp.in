@@ -15,7 +15,7 @@
 #define	MODM_PROCESSING_HPP
 
 %% for header in headers
-#include "{{ header | modm.posixify }}"
+#include "{{ header }}"
 %% endfor
 
 #endif	// MODM_PROCESSING_HPP
