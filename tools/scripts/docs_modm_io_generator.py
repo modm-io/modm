@@ -22,6 +22,7 @@ import datetime
 import platform
 import subprocess
 from multiprocessing.pool import ThreadPool
+from threading import Lock
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 from collections import defaultdict
@@ -146,16 +147,22 @@ def main():
         template_overview(output_dir, device_list, board_list, template_path)
         print(f"... for {len(device_list) + len(board_list)} devices, estimated memory footprint is {len(device_list)*70+2000} MB")
         # We can only pass one argument to pool.map
-        devices = [f'python3 {filepath} --target-job "{modm_path}|{tempdir}|{dev}||{args.deduplicate}|{args.compress}"' for dev in device_list]
-        devices += [f'python3 {filepath} --target-job "{modm_path}|{tempdir}|{dev}|{brd}|{args.deduplicate}|{args.compress}"' for (brd, dev) in board_list]
-        devices = list(set(devices))
-        # Run the first generation first so that the other jobs can already deduplicate properly
-        results = [subprocess.call(devices[0], shell=True)]
+        jobs = [(str(dev), f'python3 {filepath} --target-job "{modm_path}|{tempdir}|{dev}||{args.deduplicate}|{args.compress}"') for dev in device_list]
+        jobs += [(brd, f'python3 {filepath} --target-job "{modm_path}|{tempdir}|{dev}|{brd}|{args.deduplicate}|{args.compress}"') for (brd, dev) in board_list]
+        jobs = sorted(set(jobs))
+        # The targets are generated in parallel, but deduplicated one after the other,
+        # otherwise targets finishing at the same time cannot see each others files
+        hashdb = {}
+        hashdb_lock = Lock()
+        def run_job(job):
+            output_dir, command = job
+            if subprocess.call(command, shell=True) != 0:
+                return 1
+            with hashdb_lock:
+                move_target(tempdir, output_dir, hashdb)
+            return 0
         with ThreadPool(args.jobs) as pool:
-            results += pool.map(lambda d: subprocess.call(d, shell=True), devices[1:])
-        # remove all the hash files
-        for file in (output_dir / "develop/api").glob("*.hash"):
-            file.unlink()
+            results = pool.map(run_job, jobs)
         if args.compress:
             print("Zipping docs ...")
             # Zipping is *much* faster via command line than via python!
@@ -214,23 +221,12 @@ def create_target(argument):
         destdir = tempdir / "output/develop/api" / output_dir
 
         if deduplicate == "True":
-            print(f"Deduplicating files for {device}...", flush=True)
-            # Find and build the hash symlink database
-            hashdb = {}
-            for hashes in tempdir.glob("output/develop/api/*.hash"):
-                for line in hashes.read_text().splitlines():
-                    fhash, path = line.split(" ", 1)
-                    hashdb[fhash] = os.path.join(hashes.stem, path)
-            # Generate a list of files and replace them with symlinks
-            our_hashdb = {}
-            # symlinks = {}
-            dot_counter = 0
-            for file in srcdir.rglob("*"):
+            print(f"Hashing files for {device}...", flush=True)
+            # Only compress and hash the files here, the symlinks are created by move_target()
+            hashes = []
+            for file in sorted(srcdir.rglob("*")):
                 if file.is_dir():
-                    print(end="", flush=True)
                     continue
-                dot_counter += 1
-                if dot_counter % 30 == 0: print(".", end="")
                 file_bytes = file.read_bytes()
                 if compress == "True":
                     cfile = file.with_suffix(file.suffix + ".gz")
@@ -238,36 +234,32 @@ def create_target(argument):
                     cfile.write_bytes(file_bytes)
                     file.unlink()
                     file = cfile
-                relpath = file.relative_to(srcdir)
-                fhash = hashlib.md5(file_bytes).hexdigest()
-                if (rpath := hashdb.get(fhash)) is not None:
-                    # Previously seen file can be symlinked
-                    lpath = os.path.relpath(srcdir.parent, file.parent)
-                    sympath = os.path.join(lpath, rpath)
-                    # symlinks[relpath] = sympath
-                    file.unlink()
-                    file.symlink_to(sympath)
-                    # print(f"Symlinking {file.relative_to(srcdir)} to {sympath}")
-                else:
-                    # This is a new file, store it in our hashdb
-                    our_hashdb[fhash] = relpath
-
-            # Write the symlink file
-            # if symlinks:
-            #     lines = [f"{path} -> {sympath}" for path, sympath in symlinks.items()]
-            #     (srcdir / "symlinks.txt").write_text("\n".join(lines))
-            # Write out our hashdb
-            if our_hashdb:
-                lines = [f"{fhash} {relpath}" for fhash, relpath in our_hashdb.items()]
-                destdir.with_suffix(".hash").write_text("\n".join(lines))
-
-        # Only move folder *after* deduplication to prevent race condition with file.unlink()
-        print(f"\nMoving {srcdir.relative_to(tempdir)} -> {destdir.relative_to(tempdir)}", flush=True)
-        srcdir.rename(destdir)
+                hashes.append(f"{hashlib.md5(file_bytes).hexdigest()} {file.relative_to(srcdir)}")
+            (tempdir / f"{output_dir}.hash").write_text("\n".join(hashes))
         return True
     except Exception as e:
         print(f"Error generating documentation for device {output_dir}: {e}", flush=True)
         return False
+
+
+def move_target(tempdir, output_dir, hashdb):
+    srcdir = tempdir / output_dir / "modm/docs/html"
+    destdir = tempdir / "output/develop/api" / output_dir
+    hashfile = tempdir / f"{output_dir}.hash"
+    if hashfile.exists():
+        for line in hashfile.read_text().splitlines():
+            fhash, relpath = line.split(" ", 1)
+            if (rpath := hashdb.get(fhash)) is not None:
+                # Previously seen file can be symlinked
+                file = srcdir / relpath
+                file.unlink()
+                file.symlink_to(os.path.relpath(rpath, (Path(output_dir) / relpath).parent))
+            else:
+                # This is a new file
+                hashdb[fhash] = os.path.join(output_dir, relpath)
+        hashfile.unlink()
+    print(f"Moving {srcdir.relative_to(tempdir)} -> {destdir.relative_to(tempdir)}", flush=True)
+    srcdir.rename(destdir)
 
 
 def template_overview(output_dir, device_list, board_list, template_path):
