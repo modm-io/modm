@@ -14,7 +14,7 @@ jobs:
   build-upload-docs:
     runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/modm-ext/modm-build-base:2026-09-28
+      image: ghcr.io/modm-ext/modm-build-base:2026-10-13
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -69,7 +69,6 @@ jobs:
           git diff-index --quiet HEAD || git commit -m "Update"
           git push origin master
 
-  # Niklas: Running on the old container until I can figure out why the doc generator hangs
   api-docs-all:
     runs-on: ubuntu-latest
     steps:
@@ -95,10 +94,10 @@ jobs:
             -v ${{ github.workspace }}:/github/workspace \
             -w /github/workspace \
             -e DOCS_MODM_IO_UPLOAD="$DOCS_MODM_IO_UPLOAD" \
-            ghcr.io/modm-ext/modm-build-base:2022-09-27 \
+            ghcr.io/modm-ext/modm-build-base:2026-10-13 \
             /bin/bash -c "
               git config --global --add safe.directory /github/workspace && \
-              pip3 install --upgrade --upgrade-strategy=eager modm && \
+              pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm && \
               export TERM=xterm-256color && \
               export COLUMNS=120 && \
               python3 tools/scripts/docs_modm_io_generator.py -c -j4 -d && \
