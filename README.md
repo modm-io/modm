@@ -155,7 +155,7 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
-<td align="center">○</td>
+<td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">○</td>
 <td align="center">✅</td>
@@ -279,7 +279,7 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
-<td align="center">○</td>
+<td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
@@ -465,7 +465,7 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">○</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
-<td align="center">○</td>
+<td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">○</td>
 <td align="center">○</td>
@@ -589,7 +589,7 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
-<td align="center">○</td>
+<td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
@@ -925,7 +925,9 @@ We have out-of-box support for many development boards including documentation.
 </tr><tr>
 <td align="center"><a href="https://modm.io/reference/config/modm-weact-h523ce">WEACT-H523CE</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-weact-h562rg">WEACT-H562RG</a></td>
+<td align="center"><a href="https://modm.io/reference/config/modm-weact-h723vg">WEACT-H723VG</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-weact-u585ci">WEACT-U585CI</a></td>
+</tr><tr>
 </tr>
 </table>
 <!--/bsptable-->
@@ -1051,24 +1053,25 @@ your specific needs.
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-sk9822">SK9822</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-ssd1306">SSD1306</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-st7586s">ST7586S</a></td>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-st7735">ST7735</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-st7789">ST7789</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-stts22h">STTS22H</a></td>
-<td align="center"><a href="https://modm.io/reference/module/modm-driver-stusb4500">STUSB4500</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-stusb4500">STUSB4500</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-sx1276">SX1276</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-sx128x">SX128X</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-tcs3414">TCS3414</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-tcs3472">TCS3472</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-tlc594x">TLC594x</a></td>
-<td align="center"><a href="https://modm.io/reference/module/modm-driver-tmp102">TMP102</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-tmp102">TMP102</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-tmp12x">TMP12x</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-tmp175">TMP175</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-touch2046">TOUCH2046</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-vl53l0">VL53L0</a></td>
 <td align="center"><a href="https://modm.io/reference/module/modm-driver-vl6180">VL6180</a></td>
-<td align="center"><a href="https://modm.io/reference/module/modm-driver-ws2812">WS2812</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/module/modm-driver-ws2812">WS2812</a></td>
 </tr>
 </table>
 <!--/drivertable-->
