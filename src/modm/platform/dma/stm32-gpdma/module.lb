@@ -1,0 +1,47 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2026, LucaFeggi
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":platform:dma"
+    module.description = "STM32H5 general purpose DMA"
+
+
+def prepare(module, options):
+    device = options[":target"]
+    target = device.identifier
+    if target.family != "h5" or target.name not in ["62", "63", "73"]:
+        return False
+    if not device.has_driver("gpdma"):
+        return False
+    module.depends(":cmsis:device", ":platform:rcc")
+    return True
+
+
+def build(env):
+    device = env[":target"]
+    drivers = device.properties["driver"]
+    instances = sorted({int(instance)
+                        for driver in drivers if driver["name"] == "gpdma"
+                        for instance in driver.get("instance", [])})
+    assert instances == [1, 2]
+    spi_ids = sorted({int(instance)
+                      for driver in drivers if driver["name"] == "spi" and
+                      driver["type"] == "stm32-extended"
+                      for instance in driver.get("instance", [])})
+    adc_ids = sorted({int(instance)
+                      for driver in drivers if driver["name"] == "adc"
+                      for instance in driver.get("instance", [])})
+    env.substitutions = {"instances": instances, "spi_ids": spi_ids,
+                         "adc_ids": adc_ids}
+    env.outbasepath = "modm/src/modm/platform/dma"
+    env.template("dma.hpp.in")
+    env.template("dma.cpp.in")

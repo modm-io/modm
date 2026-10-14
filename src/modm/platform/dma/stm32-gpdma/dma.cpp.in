@@ -1,0 +1,22 @@
+/*
+ * Copyright (c) 2026, LucaFeggi
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#include "dma.hpp"
+#include <modm/architecture/interface/interrupt.hpp>
+
+%% for instance in instances
+%% for channel in range(8)
+MODM_ISR(GPDMA{{ instance }}_Channel{{ channel }})
+{
+	modm::platform::Dma{{ instance }}::Channel{{ channel }}::interruptHandler();
+}
+%% endfor
+%% endfor

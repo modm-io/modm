@@ -21,6 +21,7 @@ low-power 10BASE-T/100BASE-TX transceiver connected via an RMII interface.
 """
 
 def prepare(module, options):
+    module.depends(":driver:ethernet.phy")
     return True
 
 def build(env):

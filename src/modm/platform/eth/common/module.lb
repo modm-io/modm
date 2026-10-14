@@ -1,0 +1,28 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2026, Luca Feggi
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":platform:eth.common"
+    module.description = "Common Ethernet DMA descriptor and ring support"
+
+
+def prepare(module, options):
+    module.depends(":architecture:ethernet")
+    return True
+
+
+def build(env):
+    env.outbasepath = "modm/src/modm/platform/eth"
+    env.copy("eth_descriptor.hpp")
+    env.copy("eth_storage.hpp")
+    env.copy("eth_ring.hpp")

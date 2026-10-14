@@ -1,0 +1,415 @@
+/*
+ * Copyright (c) 2026, LucaFeggi
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#ifndef MODM_STM32H5_ADC_HPP
+#	error "Don't include this file directly, use 'adc.hpp' instead!"
+#endif
+
+namespace modm::platform
+{
+
+template <uint8_t Instance>
+template <class... Signals>
+void
+AdcH5<Instance>::connect()
+{
+	GpioConnector<Instance == 1 ? Peripheral::Adc1 : Peripheral::Adc2,
+		Signals...>::connect();
+}
+
+template <uint8_t Instance>
+template <class Gpio>
+constexpr typename AdcH5<Instance>::Channel
+AdcH5<Instance>::getPinChannel()
+{
+	constexpr int8_t channel = detail::AdcChannel<typename Gpio::Data,
+		Instance == 1 ? Peripheral::Adc1 : Peripheral::Adc2,
+		detail::AdcPolarity::Positive>;
+	static_assert(channel >= 0 and channel <= 17,
+		"This pin is not connected to the selected ADC");
+	return Channel(channel);
+}
+
+template <uint8_t Instance>
+template <class Gpio>
+bool
+AdcH5<Instance>::setPinChannel(SampleTime sampleTime)
+{
+	const Channel channel = getPinChannel<Gpio>();
+	return setChannel(channel, sampleTime);
+}
+
+template <uint8_t Instance>
+bool
+AdcH5<Instance>::setChannel(Channel channel, SampleTime sampleTime)
+{
+	return setSampleTime(channel, sampleTime) and
+		setSequence(std::span<const Channel>(&channel, 1));
+}
+
+template <uint8_t Instance>
+uint8_t
+AdcH5<Instance>::getChannel()
+{
+	return (registers()->SQR1 & ADC_SQR1_SQ1) >> ADC_SQR1_SQ1_Pos;
+}
+
+template <uint8_t Instance>
+bool
+AdcH5<Instance>::readChannel(Channel channel, uint16_t &value, uint32_t timeout)
+{
+	if (registers()->CFGR & (ADC_CFGR_EXTEN | ADC_CFGR_DMAEN | ADC_CFGR_CONT))
+		return false;
+	if (not setSequence(std::span<const Channel>(&channel, 1)) or
+		not startConversion()) return false;
+	while (not isConversionFinished()) {
+		if (timeout-- == 0) return false;
+	}
+	value = getValue();
+	return true;
+}
+
+template <uint8_t Instance>
+uint16_t
+AdcH5<Instance>::readChannel(Channel channel)
+{
+	uint16_t value = 0;
+	readChannel(channel, value);
+	return value;
+}
+
+template <uint8_t Instance>
+bool
+AdcH5<Instance>::setKernelClock(ClockSource source)
+{
+	Rcc::enable<Peripheral::Adc1>();
+	if ((ADC1->CR & ADC_CR_ADEN) or (ADC2->CR & ADC_CR_ADEN)) return false;
+	RCC->CCIPR5 = (RCC->CCIPR5 & ~RCC_CCIPR5_ADCDACSEL) | uint32_t(source);
+	return true;
+}
+
+template <uint8_t Instance>
+bool
+AdcH5<Instance>::initialize(ClockMode clockMode, Prescaler prescaler,
+		uint32_t timeout)
+{
+	Rcc::enable<Peripheral::Adc1>();
+	auto *adc = registers();
+	if (adc->CR & ADC_CR_ADEN) return false;
+	const uint32_t clock = uint32_t(clockMode) |
+		(uint32_t(prescaler) << ADC_CCR_PRESC_Pos);
+	const uint32_t mask = ADC_CCR_CKMODE | ADC_CCR_PRESC;
+	if ((ADC1->CR & ADC_CR_ADEN) or (ADC2->CR & ADC_CR_ADEN)) {
+		if ((ADC12_COMMON->CCR & mask) != clock) return false;
+	}
+	else ADC12_COMMON->CCR = (ADC12_COMMON->CCR & ~mask) | clock;
+	// ES0565 2.7.1/2: avoid the injected context queue errata.
+	adc->CFGR = (adc->CFGR & ~ADC_CFGR_JQM) | ADC_CFGR_JQDIS;
+
+	adc->CR &= ~ADC_CR_DEEPPWD;
+	adc->CR |= ADC_CR_ADVREGEN;
+	modm::delay_us(20);
+	if (not calibrate(false, timeout) or not calibrate(true, timeout)) return false;
+	adc->ISR = ADC_ISR_ADRDY;
+	adc->CR |= ADC_CR_ADEN;
+	while (not (adc->ISR & ADC_ISR_ADRDY) and timeout--)
+		adc->CR |= ADC_CR_ADEN;
+	return bool(adc->ISR & ADC_ISR_ADRDY);
+}
+
+template <uint8_t Instance>
+bool
+AdcH5<Instance>::calibrate(bool differential, uint32_t timeout)
+{
+	auto *adc = registers();
+	if (adc->CR & (ADC_CR_ADEN | ADC_CR_ADSTART | ADC_CR_ADCAL)) return false;
+	adc->CR = (adc->CR & ~ADC_CR_ADCALDIF) |
+		(differential ? ADC_CR_ADCALDIF : 0u) | ADC_CR_ADCAL;
+	while ((adc->CR & ADC_CR_ADCAL) and timeout--) ;
+	return not (adc->CR & ADC_CR_ADCAL);
+}
+
+template <uint8_t Instance>
+bool
+AdcH5<Instance>::disable(uint32_t timeout)
+{
+	auto *adc = registers();
+	if (adc->CR & ADC_CR_ADSTART) {
+		adc->CR |= ADC_CR_ADSTP;
+		while ((adc->CR & ADC_CR_ADSTP) and timeout--) ;
+		if (adc->CR & ADC_CR_ADSTP) return false;
+	}
+	if (adc->CR & ADC_CR_ADEN) {
+		adc->CR |= ADC_CR_ADDIS;
+		while ((adc->CR & ADC_CR_ADEN) and timeout--) ;
+	}
+	return not (adc->CR & ADC_CR_ADEN);
+}
+
+template <uint8_t Instance>
+bool
+AdcH5<Instance>::setResolution(ResolutionMode resolution)
+{
+	if (registers()->CR & (ADC_CR_ADSTART | ADC_CR_JADSTART)) return false;
+	registers()->CFGR = (registers()->CFGR & ~ADC_CFGR_RES) | uint32_t(resolution);
+	return true;
+}
+
+template <uint8_t Instance>
+bool
+AdcH5<Instance>::setLeftAlignment(bool left)
+{
+	if (registers()->CR & (ADC_CR_ADSTART | ADC_CR_JADSTART)) return false;
+	if (left) registers()->CFGR |= ADC_CFGR_ALIGN;
+	else registers()->CFGR &= ~ADC_CFGR_ALIGN;
+	return true;
+}
+
+template <uint8_t Instance>
+bool
+AdcH5<Instance>::setOverrunOverwrite(bool overwrite)
+{
+	if (registers()->CR & ADC_CR_ADSTART) return false;
+	if (overwrite) registers()->CFGR |= ADC_CFGR_OVRMOD;
+	else registers()->CFGR &= ~ADC_CFGR_OVRMOD;
+	return true;
+}
+
+template <uint8_t Instance>
+bool
+AdcH5<Instance>::setDifferential(Channel channel, bool enabled)
+{
+	const uint8_t number = uint8_t(channel);
+	if (number == 0 or number > 15 or (registers()->CR & ADC_CR_ADEN)) return false;
+	if (enabled) registers()->DIFSEL |= 1u << number;
+	else registers()->DIFSEL &= ~(1u << number);
+	return true;
+}
+
+template <uint8_t Instance>
+bool
+AdcH5<Instance>::setSampleTime(Channel channel, SampleTime sampleTime)
+{
+	const uint8_t number = uint8_t(channel);
+	if (number > 17 or (registers()->CR & ADC_CR_ADSTART)) return false;
+	const uint32_t shift = (number % 10) * 3u;
+	volatile uint32_t *smpr = number < 10 ? &registers()->SMPR1 : &registers()->SMPR2;
+	*smpr = (*smpr & ~(7u << shift)) | (uint32_t(sampleTime) << shift);
+	return true;
+}
+
+template <uint8_t Instance>
+bool
+AdcH5<Instance>::setSequence(std::span<const Channel> channels)
+{
+	if (channels.empty() or channels.size() > 16 or
+		(registers()->CR & ADC_CR_ADSTART)) return false;
+	uint32_t sqr[4] = {uint32_t(channels.size() - 1), 0, 0, 0};
+	for (std::size_t i = 0; i < channels.size(); ++i) {
+		if (uint8_t(channels[i]) > 17) return false;
+		const std::size_t rank = i + 1;
+		const std::size_t reg = rank <= 4 ? 0 : rank <= 9 ? 1 : rank <= 14 ? 2 : 3;
+		const uint32_t shift = reg == 0 ? uint32_t(rank * 6) :
+			uint32_t(((rank - (reg == 1 ? 5 : reg == 2 ? 10 : 15)) * 6));
+		sqr[reg] |= uint32_t(channels[i]) << shift;
+	}
+	auto *adc = registers();
+	adc->SQR1 = sqr[0]; adc->SQR2 = sqr[1];
+	adc->SQR3 = sqr[2]; adc->SQR4 = sqr[3];
+	return true;
+}
+
+template <uint8_t Instance>
+bool
+AdcH5<Instance>::setInjectedSequence(std::span<const Channel> channels)
+{
+	auto *adc = registers();
+	if (channels.empty() or channels.size() > 4 or
+		(adc->CR & ADC_CR_JADSTART) or not (adc->CFGR & ADC_CFGR_JQDIS)) return false;
+	uint32_t jsqr = (adc->JSQR & (ADC_JSQR_JEXTSEL | ADC_JSQR_JEXTEN)) |
+		uint32_t(channels.size() - 1);
+	for (std::size_t i = 0; i < channels.size(); ++i) {
+		if (uint8_t(channels[i]) > 17) return false;
+		jsqr |= uint32_t(channels[i]) << (ADC_JSQR_JSQ1_Pos + i * 6u);
+	}
+	adc->JSQR = jsqr;
+	return true;
+}
+
+template <uint8_t Instance>
+bool
+AdcH5<Instance>::setInjectedTrigger(uint8_t selection, TriggerEdge edge)
+{
+	auto *adc = registers();
+	if (selection > 31 or (adc->CR & ADC_CR_JADSTART) or
+		not (adc->CFGR & ADC_CFGR_JQDIS)) return false;
+	adc->JSQR = (adc->JSQR & ~(ADC_JSQR_JEXTSEL | ADC_JSQR_JEXTEN)) |
+		(uint32_t(selection) << ADC_JSQR_JEXTSEL_Pos) |
+		(uint32_t(edge) << ADC_JSQR_JEXTEN_Pos);
+	return true;
+}
+
+template <uint8_t Instance>
+bool
+AdcH5<Instance>::startInjectedConversion()
+{
+	if (not isReady() or (registers()->CR & ADC_CR_JADSTART)) return false;
+	registers()->ISR = ADC_ISR_JEOC | ADC_ISR_JEOS;
+	registers()->CR |= ADC_CR_JADSTART;
+	return true;
+}
+
+template <uint8_t Instance>
+uint16_t
+AdcH5<Instance>::readInjected(uint8_t rank)
+{
+	if (rank < 1 or rank > 4) return 0;
+	return uint16_t((&registers()->JDR1)[rank - 1]);
+}
+
+template <uint8_t Instance>
+bool
+AdcH5<Instance>::setDmaMode(DmaMode mode)
+{
+	if (registers()->CR & ADC_CR_ADSTART) return false;
+	registers()->CFGR = (registers()->CFGR & ~(ADC_CFGR_DMAEN | ADC_CFGR_DMACFG)) |
+		uint32_t(mode);
+	return true;
+}
+
+template <uint8_t Instance>
+template <class DmaChannel>
+bool
+AdcH5<Instance>::configureDma(std::span<uint16_t> destination, DmaMode mode)
+{
+	if (destination.empty() or mode != DmaMode::OneShot or
+		(registers()->CR & ADC_CR_ADSTART)) return false;
+	if (not DmaChannel::configure(DmaBase::DataTransferDirection::PeripheralToMemory,
+		DmaBase::MemoryDataSize::HalfWord, DmaBase::PeripheralDataSize::HalfWord)) return false;
+	if (not DmaChannel::setPeripheralAddress(reinterpret_cast<uintptr_t>(&registers()->DR)) or
+		not DmaChannel::setMemoryAddress(reinterpret_cast<uintptr_t>(destination.data())))
+		return false;
+	if (not DmaChannel::setDataLength(destination.size_bytes())) return false;
+	if constexpr (Instance == 1) {
+		if (not DmaChannel::template setPeripheralRequest<DmaBase::Request::Adc1>())
+			return false;
+	}
+	else {
+		if (not DmaChannel::template setPeripheralRequest<DmaBase::Request::Adc2>())
+			return false;
+	}
+	return setDmaMode(mode);
+}
+
+template <uint8_t Instance>
+template <class DmaChannel>
+bool
+AdcH5<Instance>::configureCircularDma(std::span<uint16_t> destination, DmaBase::LinearNode &node)
+{
+	if (not configureDma<DmaChannel>(destination)) return false;
+	DmaChannel::makeLinearNode(node);
+	if (not DmaChannel::linkNode(node, &node) or
+		not DmaChannel::setLinkedList(&node)) return false;
+	return setDmaMode(DmaMode::Circular);
+}
+
+template <uint8_t Instance>
+template <class DmaChannel>
+bool
+AdcH5<Instance>::startDmaConversion()
+{
+	if (not isReady() or DmaChannel::isEnabled()) return false;
+	DmaChannel::acknowledgeInterruptFlags(DmaBase::FlagMask);
+	if (not DmaChannel::start()) return false;
+	if (startConversion()) return true;
+	DmaChannel::stop();
+	return false;
+}
+
+template <uint8_t Instance>
+bool
+AdcH5<Instance>::setTrigger(uint8_t selection, TriggerEdge edge)
+{
+	if (selection > 31 or (registers()->CR & ADC_CR_ADSTART)) return false;
+	auto *adc = registers();
+	adc->CFGR = (adc->CFGR & ~(ADC_CFGR_EXTSEL | ADC_CFGR_EXTEN)) |
+		(uint32_t(selection) << ADC_CFGR_EXTSEL_Pos) |
+		(uint32_t(edge) << ADC_CFGR_EXTEN_Pos);
+	return true;
+}
+
+template <uint8_t Instance>
+bool
+AdcH5<Instance>::setOversampling(OversamplingRatio ratio, uint8_t shift)
+{
+	if (shift > 15 or (registers()->CR & ADC_CR_ADSTART)) return false;
+	registers()->CFGR2 = (registers()->CFGR2 &
+		~(ADC_CFGR2_ROVSE | ADC_CFGR2_OVSR | ADC_CFGR2_OVSS)) |
+		ADC_CFGR2_ROVSE | (uint32_t(ratio) << ADC_CFGR2_OVSR_Pos) |
+		(uint32_t(shift) << ADC_CFGR2_OVSS_Pos);
+	return true;
+}
+
+template <uint8_t Instance>
+bool
+AdcH5<Instance>::setWatchdog1(uint16_t low, uint16_t high, Channel channel)
+{
+	if (low > high or high > 4095 or uint8_t(channel) > 17 or
+		(registers()->CR & ADC_CR_ADSTART)) return false;
+	auto *adc = registers();
+	adc->TR1 = uint32_t(low) | (uint32_t(high) << ADC_TR1_HT1_Pos);
+	adc->CFGR = (adc->CFGR & ~ADC_CFGR_AWD1CH) |
+		(uint32_t(channel) << ADC_CFGR_AWD1CH_Pos) | ADC_CFGR_AWD1SGL | ADC_CFGR_AWD1EN;
+	return true;
+}
+
+template <uint8_t Instance>
+bool
+AdcH5<Instance>::setWatchdog(uint8_t unit, uint8_t low, uint8_t high, uint32_t channelMask)
+{
+	if ((unit != 2 and unit != 3) or low > high or
+		(channelMask & ~0x3ffffu) or (registers()->CR & ADC_CR_ADSTART)) return false;
+	if (unit == 2) {
+		registers()->TR2 = uint32_t(low) | (uint32_t(high) << ADC_TR2_HT2_Pos);
+		registers()->AWD2CR = channelMask;
+	}
+	else {
+		registers()->TR3 = uint32_t(low) | (uint32_t(high) << ADC_TR3_HT3_Pos);
+		registers()->AWD3CR = channelMask;
+	}
+	return true;
+}
+
+template <uint8_t Instance>
+bool
+AdcH5<Instance>::setOffset(uint8_t slot, Channel channel, int16_t offset, bool saturate)
+{
+	if (slot < 1 or slot > 4 or uint8_t(channel) > 17 or
+		offset < -4095 or offset > 4095 or (registers()->CR & ADC_CR_ADSTART)) return false;
+	(&registers()->OFR1)[slot - 1] =
+		uint32_t(offset < 0 ? -offset : offset) |
+		(offset > 0 ? ADC_OFR1_OFFSETPOS : 0u) |
+		(saturate ? ADC_OFR1_SATEN : 0u) |
+		(uint32_t(channel) << ADC_OFR1_OFFSET1_CH_Pos) | ADC_OFR1_OFFSET1_EN;
+	return true;
+}
+
+template <uint8_t Instance>
+bool
+AdcH5<Instance>::startConversion()
+{
+	if (not isReady() or (registers()->CR & ADC_CR_ADSTART)) return false;
+	registers()->ISR = ADC_ISR_EOC | ADC_ISR_EOS | ADC_ISR_OVR;
+	registers()->CR |= ADC_CR_ADSTART;
+	return true;
+}
+
+} // namespace modm::platform

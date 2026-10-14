@@ -1,0 +1,126 @@
+/*
+ * Copyright (c) 2009, Martin Rosekeit
+ * Copyright (c) 2009-2012, Fabian Greif
+ * Copyright (c) 2010, Georgi Grinshpun
+ * Copyright (c) 2012-2017, Niklas Hauser
+ * Copyright (c) 2013, Kevin Läufer
+ * Copyright (c) 2014, Sascha Schade
+ * Copyright (c) 2023, Christopher Durand
+ * Copyright (c) 2026, LucaFeggi
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#include "spi_master_{{id}}.hpp"
+
+namespace modm::platform
+{
+
+bool
+SpiMaster{{ id }}::waitFor(Hal::StatusFlag flag)
+{
+	uint32_t remaining = pollBudget;
+	while (true) {
+		const uint32_t status = Hal::status().value;
+		lastErrorFlags |= status & SpiErrorMask;
+		if (lastErrorFlags != 0) return false;
+		if (status & uint32_t(flag)) return true;
+		if (remaining-- == 0) {
+			lastErrorFlags |= TimeoutError;
+			return false;
+		}
+		modm::this_fiber::yield();
+	}
+}
+
+uint8_t
+SpiMaster{{ id }}::transfer(uint8_t data)
+{
+	lastErrorFlags = 0;
+	if (not Hal::isTransferEnabled()) {
+		Hal::enableTransfer();
+		Hal::startMasterTransfer();
+	}
+	if (not waitFor(Hal::StatusFlag::TxPacketSpaceAvailable)) {
+		finishTransfer();
+		return 0;
+	}
+	Hal::write(data);
+	if (not waitFor(Hal::StatusFlag::RxPacketAvailable)) {
+		finishTransfer();
+		return 0;
+	}
+	return Hal::read();
+}
+
+void
+SpiMaster{{ id }}::transfer(
+		const uint8_t* tx, uint8_t* rx, std::size_t length)
+{
+	lastErrorFlags = 0;
+	if (length == 0) return;
+	if (not Hal::isTransferEnabled()) {
+		Hal::enableTransfer();
+		Hal::startMasterTransfer();
+	}
+	std::size_t rxIndex = 0;
+	std::size_t txIndex = 0;
+	uint32_t remaining = pollBudget;
+
+	while (rxIndex < length) {
+		lastErrorFlags |= Hal::status().value & SpiErrorMask;
+		if (lastErrorFlags != 0) break;
+		const std::size_t previousRx = rxIndex;
+		const std::size_t previousTx = txIndex;
+		while ((txIndex < length) and not Hal::isTxFifoFull() and (txIndex - rxIndex) < Hal::FifoSize) {
+			Hal::write(tx ? tx[txIndex] : 0);
+			++txIndex;
+		}
+		while ((rxIndex < length) and Hal::isRxDataAvailable()) {
+			const uint8_t data = Hal::read();
+			if (rx) {
+				rx[rxIndex] = data;
+			}
+			++rxIndex;
+		}
+		if (rxIndex != previousRx or txIndex != previousTx) remaining = pollBudget;
+		else if (remaining-- == 0) {
+			lastErrorFlags |= TimeoutError;
+			break;
+		}
+		if (rxIndex < length and lastErrorFlags == 0) {
+			modm::this_fiber::yield();
+		}
+	}
+	if (lastErrorFlags != 0) finishTransfer();
+}
+
+void
+SpiMaster{{ id }}::finishTransfer()
+{
+	if (Hal::isTransferEnabled()) {
+		if (lastErrorFlags == 0 and waitFor(Hal::StatusFlag::TxTransferComplete)) {
+			// ES0565 2.18.2: preserve SCK for a full period before disabling SPI.
+			modm::delay_ns(clockPeriodNs);
+		}
+		Hal::disableTransfer();
+	}
+
+	Hal::acknowledgeInterruptFlags(
+		Hal::StatusFlag::EndOfTransfer |
+		Hal::StatusFlag::TxTransferFilled |
+		Hal::StatusFlag::Underrun |
+		Hal::StatusFlag::Overrun |
+		Hal::StatusFlag::CrcError |
+		Hal::StatusFlag::TiFrameError |
+		Hal::StatusFlag::ModeFault |
+		Hal::StatusFlag::Suspension
+	);
+}
+
+} // namespace modm::platform
