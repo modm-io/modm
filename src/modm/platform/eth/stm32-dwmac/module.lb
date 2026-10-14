@@ -1,0 +1,70 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2026, Luca Feggi
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":platform:eth"
+    module.description = FileReader("module.md")
+
+
+def prepare(module, options):
+    device = options[":target"]
+    target = device.identifier
+
+    # The v3.1 H7R/S and v3.2 H5E/F blocks have different register and clock
+    # integration and intentionally remain separate from this v3.0 backend.
+    if not device.has_driver("eth:stm32-v3.0"):
+        return False
+    if target.family == "h5" and target.name not in ["63", "73"]:
+        return False
+    if target.family not in ["h5", "h7"]:
+        return False
+
+    module.depends(
+        ":architecture:atomic",
+        ":architecture:delay",
+        ":architecture:interrupt",
+        ":cmsis:device",
+        ":platform:eth.common",
+        ":platform:gpio",
+        ":platform:rcc")
+    return True
+
+
+def build(env):
+    device = env[":target"]
+    target = device.identifier
+    memories = listify(device.get_driver("core")["memory"])
+
+    # Only advertise memory regions whose DMA reachability is documented by
+    # the target's bus matrix. In particular, H7 ITCM/DTCM are not included.
+    dma_memories = []
+    for memory in memories:
+        name = memory["name"]
+        if "rw" not in memory["access"] or "sram" not in name or "bkp" in name:
+            continue
+        start = int(memory["start"], 16)
+        dma_memories.append({
+            "name": name,
+            "start": start,
+            "end": start + int(memory["size"]),
+        })
+
+    env.substitutions = {
+        "target": target,
+        "dma_memories": dma_memories,
+    }
+    env.outbasepath = "modm/src/modm/platform/eth"
+    env.template("eth_hardware.hpp.in", "eth_hardware.hpp")
+    env.copy("eth.hpp")
+    env.copy("eth_impl.hpp")
+    env.copy("eth_interrupt.cpp")

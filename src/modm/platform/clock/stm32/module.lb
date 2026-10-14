@@ -204,7 +204,7 @@ def build(env):
         if "Dsihost" in all_peripherals and per == "DSI":
             per = "Dsihost"
             nper = "DSI"
-        if "Eth" in all_peripherals and per == "ETHMAC":
+        if "Eth" in all_peripherals and per in ["ETH", "ETHMAC", "ETH1MAC"]:
             per = "Eth"
         if "Rtc" in all_peripherals and per == "RTCAPB":
             per = "RTC"
@@ -233,5 +233,10 @@ def build(env):
     env.substitutions.update({
         "rcc_enable": rcc_enable,
         "rcc_reset": rcc_reset,
+        "rcc_eth_txrx": {
+            "ETH": "ETH",
+            "ETHMAC": "ETHMAC",
+            "ETH1MAC": "ETH1",
+        }.get(rcc_enable.get("Eth", (None, None))[0]),
     })
     env.template("rcc_impl.hpp.in")

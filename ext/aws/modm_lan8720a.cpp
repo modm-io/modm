@@ -30,7 +30,7 @@ using EMAC = modm::platform::Eth<modm::Lan8720a>;
 namespace modm
 {
 
-struct ethernet
+struct FreeRtosTcpEthernet
 {
 	static constexpr BaseType_t MAX_PACKET_SIZE { 1536 };
 	static constexpr BaseType_t RX_BUFFER_SIZE { 1536 };
@@ -466,35 +466,34 @@ struct ethernet
 	}
 };
 
-ethernet::InitStatus ethernet::initStatus = ethernet::InitStatus::Init;
-SemaphoreHandle_t ethernet::txDescriptorSemaphore { nullptr };
-TaskHandle_t ethernet::emacTaskHandle { nullptr };
-NetworkInterface_t *ethernet::interface { nullptr };
+FreeRtosTcpEthernet::InitStatus FreeRtosTcpEthernet::initStatus = FreeRtosTcpEthernet::InitStatus::Init;
+SemaphoreHandle_t FreeRtosTcpEthernet::txDescriptorSemaphore { nullptr };
+TaskHandle_t FreeRtosTcpEthernet::emacTaskHandle { nullptr };
+NetworkInterface_t *FreeRtosTcpEthernet::interface { nullptr };
 
-modm::platform::eth::Event_t ethernet::isrEvent { modm::platform::eth::Event::None };
+modm::platform::eth::Event_t FreeRtosTcpEthernet::isrEvent { modm::platform::eth::Event::None };
 
-TimeOut_t ethernet::phyLinkStatusTimer;
-modm::platform::eth::LinkStatus ethernet::lastPhyLinkStatus { modm::platform::eth::LinkStatus::Down };
-TickType_t ethernet::phyLinkStatusRemaining { 0 };
+TimeOut_t FreeRtosTcpEthernet::phyLinkStatusTimer;
+modm::platform::eth::LinkStatus FreeRtosTcpEthernet::lastPhyLinkStatus { modm::platform::eth::LinkStatus::Down };
+TickType_t FreeRtosTcpEthernet::phyLinkStatusRemaining { 0 };
 
-ethernet::DmaDescriptor_t  ethernet::DmaRxDescriptorTable[RX_BUFFER_NUMBER];
-ethernet::DmaDescriptor_t  ethernet::DmaTxDescriptorTable[TX_BUFFER_NUMBER];
-ethernet::DmaDescriptor_t *ethernet::RxDescriptor { nullptr };       /*!< Rx descriptor to Get        */
-ethernet::DmaDescriptor_t *ethernet::TxDescriptor { nullptr };       /*!< Tx descriptor to Set        */
-ethernet::DmaDescriptor_t *ethernet::DmaTxDescriptorToClear { nullptr };
+FreeRtosTcpEthernet::DmaDescriptor_t  FreeRtosTcpEthernet::DmaRxDescriptorTable[RX_BUFFER_NUMBER];
+FreeRtosTcpEthernet::DmaDescriptor_t  FreeRtosTcpEthernet::DmaTxDescriptorTable[TX_BUFFER_NUMBER];
+FreeRtosTcpEthernet::DmaDescriptor_t *FreeRtosTcpEthernet::RxDescriptor { nullptr };       /*!< Rx descriptor to Get        */
+FreeRtosTcpEthernet::DmaDescriptor_t *FreeRtosTcpEthernet::TxDescriptor { nullptr };       /*!< Tx descriptor to Set        */
+FreeRtosTcpEthernet::DmaDescriptor_t *FreeRtosTcpEthernet::DmaTxDescriptorToClear { nullptr };
 
 } // namespace modm
 
 static BaseType_t
 lan8720aInitialise(NetworkInterface_t *interface)
 {
-	using modm::ethernet;
 
-	if (ethernet::initStatus == ethernet::InitStatus::Init) {
-		ethernet::txDescriptorSemaphore = xSemaphoreCreateCounting(UBaseType_t(ethernet::TX_BUFFER_NUMBER),
-				UBaseType_t(ethernet::TX_BUFFER_NUMBER ));
-		if (ethernet::txDescriptorSemaphore == NULL) {
-			ethernet::initStatus = ethernet::InitStatus::Failed;
+	if (FreeRtosTcpEthernet::initStatus == FreeRtosTcpEthernet::InitStatus::Init) {
+		FreeRtosTcpEthernet::txDescriptorSemaphore = xSemaphoreCreateCounting(UBaseType_t(FreeRtosTcpEthernet::TX_BUFFER_NUMBER),
+				UBaseType_t(FreeRtosTcpEthernet::TX_BUFFER_NUMBER ));
+		if (FreeRtosTcpEthernet::txDescriptorSemaphore == NULL) {
+			FreeRtosTcpEthernet::initStatus = FreeRtosTcpEthernet::InitStatus::Failed;
 			return pdFAIL;
 		}
 
@@ -507,29 +506,29 @@ lan8720aInitialise(NetworkInterface_t *interface)
 
 		(void) EMAC::initialize<modm::platform::eth::MediaInterface::RMII>();
 
-		ethernet::TxDescriptor = ethernet::DmaTxDescriptorTable;
-		ethernet::RxDescriptor = ethernet::DmaRxDescriptorTable;
+		FreeRtosTcpEthernet::TxDescriptor = FreeRtosTcpEthernet::DmaTxDescriptorTable;
+		FreeRtosTcpEthernet::RxDescriptor = FreeRtosTcpEthernet::DmaRxDescriptorTable;
 
-		std::memset(&ethernet::DmaTxDescriptorTable, 0, sizeof(ethernet::DmaTxDescriptorTable));
-		std::memset(&ethernet::DmaRxDescriptorTable, 0, sizeof(ethernet::DmaRxDescriptorTable));
+		std::memset(&FreeRtosTcpEthernet::DmaTxDescriptorTable, 0, sizeof(FreeRtosTcpEthernet::DmaTxDescriptorTable));
+		std::memset(&FreeRtosTcpEthernet::DmaRxDescriptorTable, 0, sizeof(FreeRtosTcpEthernet::DmaRxDescriptorTable));
 
-		ethernet::DmaTxDescriptorToClear = ethernet::DmaTxDescriptorTable;
+		FreeRtosTcpEthernet::DmaTxDescriptorToClear = FreeRtosTcpEthernet::DmaTxDescriptorTable;
 
-		ethernet::DMATxDescListInit();
-		ethernet::DMARxDescListInit();
+		FreeRtosTcpEthernet::DMATxDescListInit();
+		FreeRtosTcpEthernet::DMARxDescListInit();
 
-		ethernet::updateConfig(true);
+		FreeRtosTcpEthernet::updateConfig(true);
 
-		if (not xTaskCreate(ethernet::emacHandlerTask, "EMAC", ethernet::emacTaskStackDepth, NULL,
-				ethernet::emacTaskPriority, &ethernet::emacTaskHandle)) {
-			ethernet::initStatus = ethernet::InitStatus::Failed;
+		if (not xTaskCreate(FreeRtosTcpEthernet::emacHandlerTask, "EMAC", FreeRtosTcpEthernet::emacTaskStackDepth, NULL,
+				FreeRtosTcpEthernet::emacTaskPriority, &FreeRtosTcpEthernet::emacTaskHandle)) {
+			FreeRtosTcpEthernet::initStatus = FreeRtosTcpEthernet::InitStatus::Failed;
 			return pdFAIL;
 		}
 
-		ethernet::initStatus = ethernet::InitStatus::Pass;
+		FreeRtosTcpEthernet::initStatus = FreeRtosTcpEthernet::InitStatus::Pass;
 	}
 
-	if (ethernet::initStatus != ethernet::InitStatus::Pass)
+	if (FreeRtosTcpEthernet::initStatus != FreeRtosTcpEthernet::InitStatus::Pass)
 		return pdFAIL;
 
 	if (EMAC::getLinkStatus() == modm::platform::eth::LinkStatus::Up) {
@@ -560,20 +559,19 @@ lan8720aInitialise(NetworkInterface_t *interface)
 static BaseType_t
 lan8720aOutput(NetworkInterface_t *, NetworkBufferDescriptor_t * const descriptor, BaseType_t releaseAfterSend)
 {
-	using modm::ethernet;
 
 	static constexpr TickType_t blockTimeTicks { pdMS_TO_TICKS(50) };
-	static constexpr ethernet::TDes0_t transmitStatus {
-		ethernet::CrcControl_t(ethernet::CrcControl::HardwareCalculated) |
-		ethernet::TDes0_t(ethernet::TDes0::InterruptOnCompletion |
-				ethernet::TDes0::LastSegment |
-				ethernet::TDes0::FirstSegment
+	static constexpr FreeRtosTcpEthernet::TDes0_t transmitStatus {
+		FreeRtosTcpEthernet::CrcControl_t(FreeRtosTcpEthernet::CrcControl::HardwareCalculated) |
+		FreeRtosTcpEthernet::TDes0_t(FreeRtosTcpEthernet::TDes0::InterruptOnCompletion |
+				FreeRtosTcpEthernet::TDes0::LastSegment |
+				FreeRtosTcpEthernet::TDes0::FirstSegment
 				)
 	};
 
 	BaseType_t result { pdFAIL };
 	uint32_t transmitSize { 0 };
-	__IO ethernet::DmaDescriptor_t *dmaTxDescriptor { nullptr };
+	__IO FreeRtosTcpEthernet::DmaDescriptor_t *dmaTxDescriptor { nullptr };
 
 	do {
 		ProtocolPacket_t *packet = reinterpret_cast<ProtocolPacket_t *>(descriptor->pucEthernetBuffer);
@@ -584,15 +582,15 @@ lan8720aOutput(NetworkInterface_t *, NetworkBufferDescriptor_t * const descripto
 			// no link, drop packet
 			break;
 
-		if (xSemaphoreTake(ethernet::txDescriptorSemaphore, blockTimeTicks) != pdPASS)
+		if (xSemaphoreTake(FreeRtosTcpEthernet::txDescriptorSemaphore, blockTimeTicks) != pdPASS)
 			break;
 
-		dmaTxDescriptor = ethernet::TxDescriptor;
-		configASSERT((dmaTxDescriptor->Status & uint32_t(ethernet::TDes0::DmaOwned)) == 0);
+		dmaTxDescriptor = FreeRtosTcpEthernet::TxDescriptor;
+		configASSERT((dmaTxDescriptor->Status & uint32_t(FreeRtosTcpEthernet::TDes0::DmaOwned)) == 0);
 
 		transmitSize = descriptor->xDataLength;
-		if (transmitSize > ethernet::TX_BUFFER_SIZE)
-			transmitSize = ethernet::TX_BUFFER_SIZE;
+		if (transmitSize > FreeRtosTcpEthernet::TX_BUFFER_SIZE)
+			transmitSize = FreeRtosTcpEthernet::TX_BUFFER_SIZE;
 
 		configASSERT(releaseAfterSend != 0);
 
@@ -601,10 +599,10 @@ lan8720aOutput(NetworkInterface_t *, NetworkBufferDescriptor_t * const descripto
 
 		dmaTxDescriptor->Status |= transmitStatus.value;
 
-		dmaTxDescriptor->ControlBufferSize = transmitSize & modm::ethernet::Buffer1SizeMask;
+		dmaTxDescriptor->ControlBufferSize = transmitSize & modm::FreeRtosTcpEthernet::Buffer1SizeMask;
 
-		dmaTxDescriptor->Status |= uint32_t(ethernet::TDes0::DmaOwned);
-		ethernet::TxDescriptor = reinterpret_cast<ethernet::DmaDescriptor_t *>(ethernet::TxDescriptor->Buffer2NextDescAddr);
+		dmaTxDescriptor->Status |= uint32_t(FreeRtosTcpEthernet::TDes0::DmaOwned);
+		FreeRtosTcpEthernet::TxDescriptor = reinterpret_cast<FreeRtosTcpEthernet::DmaDescriptor_t *>(FreeRtosTcpEthernet::TxDescriptor->Buffer2NextDescAddr);
 		__DSB();
 		ETH->DMATPDR = 0;
 		iptraceNETWORK_INTERFACE_TRANSMIT();
@@ -631,30 +629,29 @@ pxFillInterfaceDescriptor(BaseType_t, NetworkInterface_t *interface)
 	interface->pfInitialise = lan8720aInitialise;
 	interface->pfOutput = lan8720aOutput;
 	interface->pfGetPhyLinkStatus = lan8720aGetPhyLinkStatus;
-	modm::ethernet::interface = interface;
+	modm::FreeRtosTcpEthernet::interface = interface;
 	return FreeRTOS_AddNetworkInterface(interface);
 }
 
 MODM_ISR(ETH)
 {
 	using modm::platform::eth;
-	using modm::ethernet;
 
 	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 	EMAC::InterruptFlags_t irq = EMAC::getInterruptFlags();
 	EMAC::acknowledgeInterrupt(irq);
 
 	if (irq & (eth::InterruptFlags::Receive | eth::InterruptFlags::ReceiveBufferUnavailable)) {
-		ethernet::isrEvent |= eth::Event::Receive;
-		if (ethernet::emacTaskHandle) {
-			vTaskNotifyGiveFromISR(ethernet::emacTaskHandle, &xHigherPriorityTaskWoken);
+		FreeRtosTcpEthernet::isrEvent |= eth::Event::Receive;
+		if (FreeRtosTcpEthernet::emacTaskHandle) {
+			vTaskNotifyGiveFromISR(FreeRtosTcpEthernet::emacTaskHandle, &xHigherPriorityTaskWoken);
 			portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 		}
 	}
 	if (irq & (eth::InterruptFlags::Transmit)) {
-		ethernet::isrEvent |= eth::Event::Transmit;
-		if (ethernet::emacTaskHandle) {
-			vTaskNotifyGiveFromISR(ethernet::emacTaskHandle, &xHigherPriorityTaskWoken);
+		FreeRtosTcpEthernet::isrEvent |= eth::Event::Transmit;
+		if (FreeRtosTcpEthernet::emacTaskHandle) {
+			vTaskNotifyGiveFromISR(FreeRtosTcpEthernet::emacTaskHandle, &xHigherPriorityTaskWoken);
 			portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 		}
 	}
