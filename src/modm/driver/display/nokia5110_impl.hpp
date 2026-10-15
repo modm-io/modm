@@ -50,7 +50,7 @@ Nokia5110< Spi, Ce, Dc, Reset >::update()
 	Dc::set(); // high = data
 	for (uint8_t xx = 0; xx < this->getWidth(); ++xx) {
 		for (uint8_t yy = 0; yy < this->getHeight() / 8; ++yy) {
-			Spi::transfer(this->buffer[xx][yy]);
+			Spi::transfer(this->buffer[yy][xx]);
 		}
 	}
 	Ce::set();

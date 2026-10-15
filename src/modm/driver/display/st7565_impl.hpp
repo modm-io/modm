@@ -41,7 +41,7 @@ modm::St7565<SPI, CS, A0, Reset, Width, Height, TopView>::update()
 		// switch to data mode
 		a0.set();
 		for(uint8_t x = 0; x < Width; ++x) {
-			spi.transfer(this->buffer[x][y]);
+			spi.transfer(this->buffer[y][x]);
 		}
 	}
 	cs.set();

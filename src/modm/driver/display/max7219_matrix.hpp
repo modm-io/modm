@@ -105,7 +105,7 @@ modm::Max7219Matrix<SPI, CS, COLUMNS, ROWS>::update()
             // a group of eight pixels vertical
             for (uint8_t row = 0; row < ROWS; ++row)
             {
-                buf[idx] = this->buffer[col * 8 + ledCol][row];
+                buf[idx] = this->buffer[row][col * 8 + ledCol];
                 ++idx;
             }
         }
