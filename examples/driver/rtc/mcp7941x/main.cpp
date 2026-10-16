@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Raphael Lehmann
+ * Copyright (c) 2021-2022, Raphael Lehmann
  *
  * This file is part of the modm project.
  *
@@ -10,16 +10,21 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
+#include <modm/debug/logger.hpp>
 #include <modm/driver/rtc/mcp7941x.hpp>
 #include <modm/processing.hpp>
+#include <optional>
 
-using MyI2cMaster	= modm::platform::I2cMaster1;
-using I2cScl 		= modm::platform::GpioB8;
-using I2cSda 		= modm::platform::GpioB9;
+
+// Set the log level
+#undef MODM_LOG_LEVEL
+#define MODM_LOG_LEVEL modm::log::INFO
+
+using MyI2cMaster = Board::i2c::Controller;
 
 modm::Mcp7941x<MyI2cMaster> rtc{};
 
-modm::Fiber fiber_name([]
+modm::Fiber fiber_rtc([]
 {
 	if(rtc.oscillatorRunning()) {
 		MODM_LOG_ERROR << "RTC oscillator is running." << modm::endl;
@@ -67,25 +72,27 @@ modm::Fiber fiber_name([]
 
 modm::Fiber fiber_blink([]
 {
-	Board::LedGreen::setOutput();
+	Board::Leds::setOutput();
 	while(true)
 	{
-		Board::LedGreen::toggle();
+		Board::Leds::toggle();
 		modm::this_fiber::sleep_for(0.5s);
 	}
 });
+
+modm::Mcp7941xEeprom<MyI2cMaster> eeprom{};
 
 int
 main()
 {
 	Board::initialize();
 
-	MyI2cMaster::connect<I2cScl::Scl, I2cSda::Sda>();
-	MyI2cMaster::initialize<Board::SystemClock, 100_kHz>();
 
-	MODM_LOG_INFO << "RTC MCP7941x Example on Nucleo-F429ZI" << modm::endl;
+	Board::initializeI2c();
 
-	modm::Mcp7941xEeprom<MyI2cMaster> eeprom{};
+	MODM_LOG_INFO << "RTC MCP7941x Example" << modm::endl;
+
+
 	if (auto data = eeprom.getUniqueId()) {
 		MODM_LOG_INFO << "Unique ID (EUI-48/64): " << modm::hex;
 		MODM_LOG_INFO << (*data)[0] << ":";
@@ -101,7 +108,7 @@ main()
 		MODM_LOG_ERROR << "Unable to read unique ID from RTC." << modm::endl;
 	}
 	modm::delay(500ms);
-	modm::fiber::Scheduler::run();
 
+	modm::fiber::Scheduler::run();
 	return 0;
 }
