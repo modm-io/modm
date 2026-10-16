@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2021, Raphael Lehmann
  * Copyright (c) 2024, Frank Altheim
  *
  * This file is part of the modm project.
@@ -59,7 +60,6 @@ namespace touch
 	using Sck = modm::platform::GpioC10;
 	using Miso = modm::platform::GpioC11;
 	using Mosi = modm::platform::GpioC12;
-	using Interrupt = modm::platform::GpioC9;
 }
 
 modm::Touch2046<touch::Spi, touch::Cs> touchController;
@@ -109,7 +109,8 @@ main()
 		tft::Sck::Sck,
 		tft::Miso::Miso,
 		tft::Mosi::Mosi>();
-	tft::Spi::initialize<Board::SystemClock, 24_MHz>();
+	// The boards run at different clocks, so allow some deviation
+	tft::Spi::initialize<Board::SystemClock, 24_MHz, 20_pct>();
 	tftController.initialize();
 	tftController.enableBacklight(true);
 
@@ -117,7 +118,7 @@ main()
 		touch::Sck::Sck,
 		touch::Miso::Miso,
 		touch::Mosi::Mosi>();
-	touch::Spi::initialize<Board::SystemClock, 1.5_MHz>();
+	touch::Spi::initialize<Board::SystemClock, 1.5_MHz, 20_pct>();
 	modm::touch2046::Calibration cal{
 		.OffsetX = -11,
 		.OffsetY = 335,
@@ -129,7 +130,7 @@ main()
 	};
 	touchController.setCalibration(cal);
 
-	MODM_LOG_INFO << "reflow-display on nucleo-l476rg!\n\n";
+	MODM_LOG_INFO << "modm LVGL example with an ILI9341 display and a touchscreen!\n\n";
 
 	lv_display_t *disp = lv_display_create(240, 320);
 	lv_display_set_flush_cb(disp, disp_flush);
