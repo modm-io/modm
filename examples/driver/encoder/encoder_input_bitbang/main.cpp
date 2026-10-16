@@ -11,22 +11,29 @@
 
 #include <modm/board.hpp>
 #include <modm/processing/timer.hpp>
-#include <modm/math/algorithm/prescaler.hpp>
 #include <modm/driver/encoder/bitbang_encoder_input.hpp>
 
 using namespace modm::platform;
 
-// Connect the encoders outputs to D7 and D8 Pins (usually the outer pins)
+// Connect the outputs of the encoder to these pins (usually the outer pins).
 // The common third pin (usually in the middle) is connected to GND.
+#ifdef MODM_CPU_AVR
 modm::BitBangEncoderInput<Board::D11, Board::D12, 4> encoder;
+#else
+modm::BitBangEncoderInput<GpioInputB6, GpioInputB7, 4, int16_t> encoder;
+#endif
+
+// The encoder is sampled by a 1 kHz timer interrupt
+#ifdef MODM_CPU_AVR
+#include <modm/math/algorithm/prescaler.hpp>
 
 MODM_ISR(TIMER2_COMPA)
 {
 	encoder.update();
 }
 
-void
-init_Timer2()
+static void
+initPeriodicInterrupt()
 {
 	constexpr float f = 1_kHz;
 	constexpr auto prescaler =
@@ -39,28 +46,49 @@ init_Timer2()
 	OCR2A = ocr;
 	TIMSK2 |= (1 << OCIE2A);
 	TCCR2B |= prescaler.index;
+	enableInterrupts();
 }
+#else
+MODM_ISR(TIM2)
+{
+	Timer2::acknowledgeInterruptFlags(Timer2::InterruptFlag::Update);
+	encoder.update();
+}
+
+static void
+initPeriodicInterrupt()
+{
+	Timer2::enable();
+	Timer2::setMode(Timer2::Mode::UpCounter);
+	Timer2::setPeriod<Board::SystemClock>(1ms);
+	Timer2::enableInterruptVector(true, 10);
+	Timer2::enableInterrupt(Timer2::Interrupt::Update);
+	Timer2::applyAndReset();
+	Timer2::start();
+}
+#endif
 
 int
 main()
 {
 	Board::initialize();
-	LedD13::setOutput();
+	Board::Leds::setOutput();
 
 	encoder.initialize();
-	init_Timer2();
-	enableInterrupts();
+	initPeriodicInterrupt();
 
 	int value(0);
-
 	modm::ShortPeriodicTimer heartbeat(500ms);
 
 	while (true)
 	{
-		if (heartbeat.execute()) {
-			Board::LedD13::toggle();
-			value += encoder.getDelta();
-			MODM_LOG_INFO << "value: " << value << modm::endl;
+		if (heartbeat.execute())
+		{
+			Board::Leds::toggle();
+
+			const auto delta = encoder.getDelta();
+			value += delta;
+			MODM_LOG_INFO << "Delta: " << delta << ", absolute: " << value << modm::endl;
 		}
 	}
 }
