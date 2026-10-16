@@ -65,6 +65,7 @@ __cxa_guard_acquire(guard_type *guard)
 		if (value == INITIALIZED) return 0;
 		if (value == INITIALIZING)
 		{
+%% if with_fibers
 %% if is_cortex_m
 			const bool is_in_irq = __get_IPSR();
 %% else
@@ -74,9 +75,13 @@ __cxa_guard_acquire(guard_type *guard)
 			// We got called from inside an interrupt, but we cannot yield back
 			modm_assert(not is_in_irq, "stat.rec",
 					"Recursive initialization of a function static!", guard);
-%% if with_fibers
 			// we're not in an interrupt, try to yield back to the initializing fiber
 			modm::this_fiber::yield();
+%% else
+			// Without fibers nothing else can finish the initialization, so
+			// this is a recursion, both inside and outside of an interrupt
+			modm_assert(false, "stat.rec",
+					"Recursive initialization of a function static!", guard);
 %% endif
 		}
 		value = UNINITIALIZED;
