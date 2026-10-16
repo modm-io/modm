@@ -10,11 +10,33 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
+#include <modm/architecture/interface/assert.hpp>
+#include <cstring>
+
+#include "../integration_test.hpp"
+
+/**
+ * Tests the initialization of function statics:
+ * 1. A static is constructed exactly once.
+ * 2. A recursive initialization cannot be resolved without fibers and must
+ *    fail the `stat.rec` assertion instead of waiting forever.
+ */
+
+static uint8_t constructed{0};
+struct Counter
+{
+	Counter() { constructed++; }
+};
+
+static void
+constructCounter()
+{
+	static Counter counter;
+}
 
 void constructDummy();
-class Dummy
+struct Dummy
 {
-public:
 	Dummy()
 	{
 		MODM_LOG_INFO << "Dummy class constructed" << modm::endl;
@@ -26,23 +48,36 @@ void
 constructDummy()
 {
 	static Dummy dummy;
-	MODM_LOG_INFO << "constructDummy() called" << modm::endl;
 }
+
+static modm::Abandonment
+recursion_handler(const modm::AssertionInfo &info)
+{
+#ifdef MODM_CPU_AVR
+	// The assertion names are located in Flash on AVRs!
+	if (strcmp_P("stat.rec", info.name) == 0)
+#else
+	if (strcmp(info.name, "stat.rec") == 0)
+#endif
+	{
+		finishTest(constructed == 1);
+	}
+	return modm::Abandonment::DontCare;
+}
+MODM_ASSERTION_HANDLER(recursion_handler);
 
 int
 main()
 {
 	Board::initialize();
-	uint32_t counter(0);
 
-	while (true)
-	{
-		Board::LedGreen::toggle();
-		modm::delay(Board::Button::read() ? 125ms : 500ms);
+	constructCounter();
+	constructCounter();
+	constructCounter();
 
-		MODM_LOG_INFO << "loop: " << counter++ << modm::endl;
-		constructDummy();
-	}
+	// initialize the recursive static
+	constructDummy();
 
-	return 0;
+	// the assertion did not fail
+	return finishTest(false);
 }
