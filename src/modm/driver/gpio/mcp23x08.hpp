@@ -12,6 +12,7 @@
 #ifndef MODM_MCP23X08_HPP
 #define MODM_MCP23X08_HPP
 
+#include <bit>
 #include <modm/architecture/interface/gpio_expander.hpp>
 #include <modm/architecture/interface/register.hpp>
 #include "mcp23_transport.hpp"
@@ -94,7 +95,7 @@ public:
 	static constexpr uint8_t
 	indexFromPin(Pin pin)
 	{
-		return modm::leftmostBit(PortType(pin));
+		return std::bit_width(PortType(pin)) - 1;
 	}
 
 public:

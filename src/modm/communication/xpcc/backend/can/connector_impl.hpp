@@ -17,7 +17,7 @@
 	#error	"Don't include this file directly, use 'can_connector.hpp' instead!"
 #endif
 
-#include <modm/math/utils/bit_operation.hpp>
+#include <bit>
 #include <modm/architecture/interface/can_message.hpp>
 
 // ----------------------------------------------------------------------------
@@ -267,7 +267,7 @@ xpcc::CanConnector<Driver>::retrieveMessage()
 
 			// test if this was the last segment, otherwise we have to wait
 			// for more messages
-			if (modm::bitCount(packet->receivedFragments) == numberOfFragments)
+			if (std::popcount(packet->receivedFragments) == numberOfFragments)
 			{
 				this->receivedMessages.push_back(*packet);
 				this->pendingMessages.erase(packet);
