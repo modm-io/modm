@@ -1,7 +1,8 @@
 /*
- * Copyright (c) 2013, Kevin Läufer
+ * Copyright (c) 2013, 2016, Kevin Läufer
+ * Copyright (c) 2013-2014, 2017, Sascha Schade
  * Copyright (c) 2013-2018, Niklas Hauser
- * Copyright (c) 2014, Sascha Schade
+ * Copyright (c) 2018, Sebastian Birke
  *
  * This file is part of the modm project.
  *
@@ -12,8 +13,29 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
-#include <modm/board.hpp>
+#include <modm/processing/timer.hpp>
 
+/**
+ * Example of the CAN peripherals of STM32 devices with a bxCAN.
+ *
+ * Connect PB8 (Rx) / PB9 (Tx) to a CAN transceiver which is connected to a CAN bus.
+ * Devices with two CAN peripherals also use the second one on PB5 (Rx) and
+ * PB6 (Tx) or PB13 (Tx) on the STM32F469 Discovery.
+ */
+
+#ifdef CAN2
+// This device has two CAN peripherals, which share their filters.
+#define HAS_SECOND_CAN
+using FirstCan = Can1;
+using SecondCan = Can2;
+#ifdef STM32F469xx
+using SecondCanTx = GpioB13;
+#else
+using SecondCanTx = GpioB6;
+#endif
+#else
+using FirstCan = Can;
+#endif
 
 static void
 displayMessage(const modm::can::Message& message)
@@ -51,62 +73,69 @@ int
 main()
 {
 	Board::initialize();
+	Board::Leds::setOutput();
 
 	MODM_LOG_INFO << "CAN Test Program" << modm::endl;
 
+#ifdef HAS_SECOND_CAN
 	MODM_LOG_INFO << "Dividing filter bank..." << modm::endl;
+	// Split filter bank, otherwise the second CAN does not receive anything
 	CanFilter::setStartFilterBankForCan2(14);
+#endif
 
-	MODM_LOG_INFO << "Initializing Can1..." << modm::endl;
-	// Initialize Can1
-	Can1::connect<GpioB8::Rx, GpioB9::Tx>(Gpio::InputType::PullUp);
-	Can1::initialize<Board::SystemClock, 125_kbps>(9);
+	MODM_LOG_INFO << "Initializing first CAN..." << modm::endl;
+	FirstCan::connect<GpioB8::Rx, GpioB9::Tx>(Gpio::InputType::PullUp);
+	FirstCan::initialize<Board::SystemClock, 125_kbps>(9);
 
-	MODM_LOG_INFO << "Setting up Filter for Can1..." << modm::endl;
 	// Receive every message
 	CanFilter::setFilter(0, CanFilter::FIFO0,
 			CanFilter::ExtendedIdentifier(0),
 			CanFilter::ExtendedFilterMask(0));
 
-	MODM_LOG_INFO << "Initializing Can2..." << modm::endl;
-	// Initialize Can2
-	Can2::connect<GpioB5::Rx, GpioB6::Tx>(Gpio::InputType::PullUp);
-	Can2::initialize<Board::SystemClock, 125_kbps>(12);
+#ifdef HAS_SECOND_CAN
+	MODM_LOG_INFO << "Initializing second CAN..." << modm::endl;
+	SecondCan::connect<GpioB5::Rx, SecondCanTx::Tx>(Gpio::InputType::PullUp);
+	SecondCan::initialize<Board::SystemClock, 125_kbps>(12);
 
-	MODM_LOG_INFO << "Setting up Filter for Can2..." << modm::endl;
 	// Receive every message
 	CanFilter::setFilter(14, CanFilter::FIFO0,
 			CanFilter::ExtendedIdentifier(0),
 			CanFilter::ExtendedFilterMask(0));
+#endif
 
-	// Send a message
-	MODM_LOG_INFO << "Sending message on Can1..." << modm::endl;
-	modm::can::Message msg1(1, 1);
-	msg1.setExtended(true);
-	msg1.data[0] = 0x11;
-	Can1::sendMessage(msg1);
-
-	// Send a message
-	MODM_LOG_INFO << "Sending message on Can2..." << modm::endl;
-	msg1.data[0] = 0x22;
-	Can2::sendMessage(msg1);
-
+	modm::can::Message message(1, 1);
+	message.setExtended(true);
+	modm::ShortPeriodicTimer timer(1s);
 
 	while (true)
 	{
-		if (Can1::isMessageAvailable())
+		if (FirstCan::isMessageAvailable())
 		{
-			MODM_LOG_INFO << "Can1: Message is available..." << modm::endl;
-			modm::can::Message message;
-			Can1::getMessage(message);
-			displayMessage(message);
+			MODM_LOG_INFO << "First CAN: Message is available..." << modm::endl;
+			modm::can::Message received;
+			FirstCan::getMessage(received);
+			displayMessage(received);
 		}
-		if (Can2::isMessageAvailable())
+#ifdef HAS_SECOND_CAN
+		if (SecondCan::isMessageAvailable())
 		{
-			MODM_LOG_INFO << "Can2: Message is available..." << modm::endl;
-			modm::can::Message message;
-			Can2::getMessage(message);
-			displayMessage(message);
+			MODM_LOG_INFO << "Second CAN: Message is available..." << modm::endl;
+			modm::can::Message received;
+			SecondCan::getMessage(received);
+			displayMessage(received);
+		}
+#endif
+
+		if (timer.execute())
+		{
+			Board::Leds::toggle();
+
+			message.data[0] = 0x11;
+			FirstCan::sendMessage(message);
+#ifdef HAS_SECOND_CAN
+			message.data[0] = 0x22;
+			SecondCan::sendMessage(message);
+#endif
 		}
 	}
 
