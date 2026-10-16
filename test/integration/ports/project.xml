@@ -1,6 +1,12 @@
 <library>
   <extends>modm:disco-f469ni</extends>
+  <!-- <extends>modm:al-avreb-can</extends> -->
+  <options>
+    <!-- Required for modm:al-avreb-can -->
+    <!-- <option name="modm:build:avrdude.programmer">usbasp-clone</option> -->
+  </options>
   <modules>
+    <module>modm:architecture:delay</module>
     <module>modm:build:scons</module>
   </modules>
 </library>
