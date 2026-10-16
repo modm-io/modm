@@ -14,12 +14,24 @@
 #include <modm/board.hpp>
 #include <modm/math/filter.hpp>
 
-using namespace Board;
+// The LEDs pointing into the four directions of the board
+#ifdef STM32F303xC
+using LedNorth = Board::LedNorth;
+using LedEast = Board::LedEast;
+using LedSouth = Board::LedSouth;
+using LedWest = Board::LedWest;
+#else
+using LedNorth = Board::LedOrange;
+using LedEast = Board::LedRed;
+using LedSouth = Board::LedBlue;
+using LedWest = Board::LedGreen;
+#endif
 
 // create the data object
 Board::lsm3::Accelerometer::Data data;
 // and hand it to the sensor driver
 Board::lsm3::Accelerometer accelerometer(data);
+
 modm::filter::MovingAverage<float, 25> averageX;
 modm::filter::MovingAverage<float, 25> averageY;
 
@@ -28,9 +40,6 @@ main()
 {
 	Board::initialize();
 	Board::initializeLsm3();
-
-	Leds::set();
-	modm::delay(42ms);
 
 	// initialize with limited range of ±2g
 	accelerometer.configure(accelerometer.Scale::G2);
@@ -43,19 +52,11 @@ main()
 		averageX.update(accelerometer.getData().getX());
 		averageY.update(accelerometer.getData().getY());
 
-		{
-			bool xs = averageX.getValue() < -0.2f;
-			bool xn = averageX.getValue() >  0.2f;
-
-			bool xe = averageY.getValue() < -0.2f;
-			bool xw = averageY.getValue() >  0.2f;
-
-
-			LedBlue::set(xs); // South
-			LedGreen::set(xw); //West
-			LedOrange::set(xn); // North
-			LedRed::set(xe); // East
-		}
+		// light up the LEDs on the side the board is tilted towards
+		LedSouth::set(averageX.getValue() < -0.2f);
+		LedNorth::set(averageX.getValue() >  0.2f);
+		LedEast::set(averageY.getValue() < -0.2f);
+		LedWest::set(averageY.getValue() >  0.2f);
 
 		// repeat every 5 ms
 		modm::delay(5ms);
