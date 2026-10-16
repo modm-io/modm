@@ -14,7 +14,10 @@
 #include <modm/processing.hpp>
 #include <modm/driver/temperature/tmp102.hpp>
 
-typedef I2cMaster1 MyI2cMaster;
+// The I2C pins of the Arduino header
+using MyI2cMaster = I2cMaster1;
+using Sda = Board::D14;
+using Scl = Board::D15;
 modm::tmp102::Data temperatureData;
 modm::Tmp102<MyI2cMaster> temp(temperatureData, 0x48);
 
@@ -48,17 +51,7 @@ modm::Fiber fiber_sensor([]
 		if (result) MODM_LOG_INFO << "Heat me up!" << modm::endl;
 
 		modm::this_fiber::sleep_for(200ms);
-		Board::LedRed::toggle();
-	}
-});
-
-modm::Fiber fiber_blink([]
-{
-	Board::LedOrange::setOutput();
-	while(true)
-	{
-		Board::LedOrange::toggle();
-		modm::this_fiber::sleep_for(0.5s);
+		Board::Leds::toggle();
 	}
 });
 
@@ -68,7 +61,7 @@ main()
 {
 	Board::initialize();
 
-	MyI2cMaster::connect<GpioB7::Sda, GpioB8::Scl>(MyI2cMaster::PullUps::Internal);
+	MyI2cMaster::connect<Sda::Sda, Scl::Scl>(MyI2cMaster::PullUps::Internal);
 	MyI2cMaster::initialize<Board::SystemClock, 100_kHz>();
 
 	MODM_LOG_INFO << "\n\nRESTART\n\n";
