@@ -1,9 +1,0 @@
-<library>
-  <extends>modm:nucleo-f103rb</extends>
-  <modules>
-    <module>modm:platform:fault</module>
-    <module>modm:platform:heap</module>
-    <module>modm:build:scons</module>
-    <module>modm:build:make</module>
-  </modules>
-</library>

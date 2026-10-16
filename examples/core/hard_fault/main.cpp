@@ -9,6 +9,41 @@
  */
 // ----------------------------------------------------------------------------
 
+/*
+Make sure to compile and upload the *debug* version of the firmware:
+
+	scons program profile=debug
+
+Then you can start GDB in TUI mode by default:
+
+	scons debug profile=debug
+
+Alternatively if you installed gdbgui you can use:
+
+	scons debug profile=debug ui=gdbgui
+
+Useful GDB Commands:
+
+- info break (i b)           list all breakpoints
+- break (b)                  set breakpoint; e.g. "b main.cpp:120"
+- continue (c)               continue to next breakpoint
+- layout split               display C/C++ code as well as assembler instructions in window
+- layout regs                display registers in window
+- list (l)                   show
+- next (n)                   next line; do not step into
+- step (s)                   steps into function
+- nexti (ni)                 go to next machine instruction
+- stepi (si)                 step one machine instruction
+- print (p)                  print variable (i.e. p a, for reg0 p $r0, for reg2 in hex p/x $r0)
+- set (s)                    set variable (i.e. s a=10, s $reg2=16)
+- info registers (i r)       show registers and content
+- info registers XX (i r XX) replace XX by register name
+
+When the HardFault handler has stored a coredump, you can also debug the crash
+without the hardware by following the instructions printed on the logger.
+
+*/
+
 #include <modm/board.hpp>
 using namespace Board;
 
@@ -19,8 +54,6 @@ void function1(uint32_t bla)
 
 	if (Button::read()) {
 		// execute undefined instructed
-		// the hard fault handler will blink the blue LED
-		// or, if the debugger is connected, will trigger a breakpoint
 		asm volatile (".short 0xde00");
 	}
 }
@@ -46,10 +79,10 @@ int
 main()
 {
 	Board::initialize();
-	LedOrange::set();
+	Board::Leds::setOutput(modm::Gpio::High);
 
-	uint32_t *const ptr = new uint32_t[20*1024];
-	MODM_LOG_INFO << "Can I allocate 20kB? answer: " << ptr << modm::endl;
+	uint32_t *const ptr = new uint32_t[2*1024];
+	MODM_LOG_INFO << "Can I allocate 2kB? answer: " << ptr << modm::endl;
 
 	if (FaultReporter::hasReport())
 	{
@@ -60,10 +93,6 @@ main()
 #endif
 		MODM_LOG_ERROR << "firmware=" << modm::hex;
 		for (const auto data : FaultReporter::buildId()) MODM_LOG_ERROR << data;
-		MODM_LOG_ERROR << "\nor\n\tmake debug-coredump";
-#ifdef MODM_DEBUG_BUILD
-		MODM_LOG_ERROR << " profile=debug";
-#endif
 		MODM_LOG_ERROR << "\n\n";
 		for (const auto data : FaultReporter())
 			MODM_LOG_ERROR << modm::hex << data << modm::flush;
@@ -73,17 +102,17 @@ main()
 
 	MODM_LOG_INFO << "Hold Button to cause a Hardfault!" << modm::endl;
 
+#ifdef CoreDebug_DHCSR_C_DEBUGEN_Msk
 	if (CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) {
-		// if this LED is on, the debugger is connected
-		LedRed::set();
 		MODM_LOG_INFO << "Debugger connected!" << modm::endl;
 	}
+#endif
 
 	while (true)
 	{
-		LedGreen::toggle();
-		LedOrange::toggle();
+		Board::Leds::toggle();
 
+		// crashes if the button is pressed
 		function2(23, 43);
 
 		modm::delay(250ms);
