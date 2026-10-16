@@ -1,5 +1,9 @@
 <library>
-  <extends>modm:nucleo-l432kc</extends>
+  <extends>modm:nucleo-f042k6</extends>
+  <!-- <extends>modm:nucleo-f303re</extends> -->
+  <!-- <extends>modm:nucleo-f439zi</extends> -->
+  <!-- <extends>modm:nucleo-f767zi</extends> -->
+  <!-- <extends>modm:nucleo-l432kc</extends> -->
   <modules>
     <module>modm:platform:dma</module>
     <module>modm:platform:spi:1</module>
