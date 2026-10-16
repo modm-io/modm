@@ -92,7 +92,7 @@ def prepare(module, options):
 
     module.add_option(
             BooleanOption(name="with_logger", description="Enable logging on UART0",
-                          default=False, dependencies=lambda v: ":platform:uart:0" if v else None))
+                          default=False, dependencies=lambda v: [":platform:uart:0", ":debug"] if v else None))
     return True
 
 def build(env):
