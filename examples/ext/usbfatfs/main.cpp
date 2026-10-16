@@ -60,7 +60,7 @@ bool is_valid(FIL *fil, size_t size)
 	// Validate CRC32 of the entire image
 	uint32_t file_crc;
 	f_read(fil, &file_crc, 4, &read);
-	file_crc = modm::swap(file_crc);
+	file_crc = std::byteswap(file_crc);
 	f_rewind(fil);
 	uint32_t crc{modm::math::crc32_init};
 	for (FSIZE_t offset{0}; offset < size-4; offset++)
