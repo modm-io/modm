@@ -175,6 +175,16 @@ using Uart = BufferedUart<UsartHal3, UartTxBuffer<2048>>;
 /// @}
 }
 
+namespace i2c
+{
+/// @ingroup modm_board_nucleo_h503rb
+/// @{
+using Sda = D14;
+using Scl = D15;
+using Controller = I2cMaster1;
+/// @}
+}
+
 /// @ingroup modm_board_nucleo_h503rb
 /// @{
 using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
@@ -190,6 +200,13 @@ initialize()
 
 	Led::setOutput(modm::Gpio::Low);
 	Button::setInput();
+}
+
+inline void
+initializeI2c()
+{
+	i2c::Controller::connect<i2c::Sda::Sda, i2c::Scl::Scl>();
+	i2c::Controller::initialize<SystemClock, 400_kHz>();
 }
 
 inline void

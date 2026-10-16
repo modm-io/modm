@@ -27,6 +27,8 @@ def prepare(module, options):
         ":architecture:clock",
         ":platform:core",
         ":platform:gpio",
+        ":platform:i2c:1",
+        ":platform:spi:1",
         ":platform:clock",
         ":platform:uart:lpuart1",
         ":platform:usb:fs")

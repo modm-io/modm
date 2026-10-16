@@ -162,6 +162,18 @@ using Uart = BufferedUart<UsartHal2, UartTxBuffer<2048>>;
 /// @}
 }
 
+namespace spi
+{
+/// @ingroup modm_board_nucleo_u083rc
+/// @{
+using Cs = D10;
+using Sck = D13;
+using Sdi = D12;
+using Sdo = D11;
+using Controller = SpiMaster1;
+/// @}
+}
+
 /// @ingroup modm_board_nucleo_u083rc
 /// @{
 using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
@@ -177,6 +189,13 @@ initialize()
 
 	Led::setOutput(modm::Gpio::Low);
 	Button::setInput(Gpio::InputType::PullUp);
+}
+
+inline void
+initializeSpi()
+{
+	spi::Controller::connect<spi::Sck::Sck, spi::Sdo::Mosi, spi::Sdi::Miso>();
+	spi::Controller::initialize<SystemClock, 3.5_MHz>();
 }
 /// @}
 

@@ -183,6 +183,28 @@ using Uart = BufferedUart<UsartHal3, UartTxBuffer<2048>>;
 /// @}
 }
 
+namespace i2c
+{
+/// @ingroup modm_board_nucleo_f446ze
+/// @{
+using Sda = D14;
+using Scl = D15;
+using Controller = I2cMaster1;
+/// @}
+}
+
+namespace spi
+{
+/// @ingroup modm_board_nucleo_f446ze
+/// @{
+using Cs = D10;
+using Sck = D13;
+using Sdi = D12;
+using Sdo = D11;
+using Controller = SpiMaster1;
+/// @}
+}
+
 /// @ingroup modm_board_nucleo_f446ze
 /// @{
 using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
@@ -201,6 +223,20 @@ initialize()
 	LedRed::setOutput(modm::Gpio::Low);
 
 	Button::setInput();
+}
+
+inline void
+initializeI2c()
+{
+	i2c::Controller::connect<i2c::Sda::Sda, i2c::Scl::Scl>();
+	i2c::Controller::initialize<SystemClock, 360_kHz>();
+}
+
+inline void
+initializeSpi()
+{
+	spi::Controller::connect<spi::Sck::Sck, spi::Sdo::Mosi, spi::Sdi::Miso>();
+	spi::Controller::initialize<SystemClock, 2.8125_MHz>();
 }
 
 inline void
