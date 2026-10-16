@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <concepts>
 #include <cmath>
+#include <cstdlib>
 #include <limits>
 #include <type_traits>
 
@@ -316,11 +317,9 @@ public:
 
 	void
 	absolute()
-	// Should be std::abs but that's troubelous for avr-gcc
-	// @see: https://stackoverflow.com/questions/1374037/ambiguous-overload-call-to-absdouble
 	{
 		if constexpr (std::is_signed_v<T>)
-			value = abs(value);
+			value = std::abs(value);
 	}
 
 	template<typename U>
