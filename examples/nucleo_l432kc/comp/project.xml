@@ -1,7 +1,0 @@
-<library>
-  <extends>modm:nucleo-l432kc</extends>
-  <modules>
-    <module>modm:platform:comp:*</module>
-    <module>modm:build:scons</module>
-  </modules>
-</library>

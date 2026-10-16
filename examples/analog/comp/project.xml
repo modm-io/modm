@@ -1,7 +1,7 @@
 <library>
   <extends>modm:disco-f303vc</extends>
+  <!-- <extends>modm:nucleo-l432kc</extends> -->
   <modules>
-    <module>modm:platform:uart:2</module>
     <module>modm:platform:comp:*</module>
     <module>modm:build:scons</module>
   </modules>
