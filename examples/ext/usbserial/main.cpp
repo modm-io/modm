@@ -57,15 +57,6 @@ int main()
 	Board::initialize();
 	Board::initializeUsb();
 
-	// Output 500hz PWM on D12 so we can validate the GCLK0 clock speed.
-	PM->APBCMASK.reg |= PM_APBCMASK_TCC0;
-	TCC0->PER.bit.PER = SystemClock::Frequency / 1000;
-	TCC0->CC[3].bit.CC = SystemClock::Frequency / 2000;
-	TCC0->CTRLA.bit.ENABLE = true;
-	using Tcc = Peripherals::Tcc<0>;
-	D12::As<PeripheralPin::Wo>::Connector<Tcc, Tcc::Wo<3>>::connect();
-	GenericClockController::connect<ClockPeripheral::Tcc0>(ClockGenerator::System);
-
 	tusb_init();
 
 	while (true)
