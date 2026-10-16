@@ -1,7 +1,11 @@
 <library>
-  <extends>modm:disco-f407vg</extends>
+  <extends>modm:disco-f303vc</extends>
+  <!-- <extends>modm:disco-f407vg</extends> -->
   <modules>
-    <module>modm:platform:adc:2</module>
+    <!-- Required for modm:disco-f303vc -->
+    <module>modm:platform:adc:4</module>
+    <!-- Required for modm:disco-f407vg -->
+    <!-- <module>modm:platform:adc:2</module> -->
     <module>modm:build:scons</module>
   </modules>
 </library>
