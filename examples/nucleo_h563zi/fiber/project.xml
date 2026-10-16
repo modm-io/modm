@@ -1,7 +1,0 @@
-<library>
-  <extends>modm:nucleo-h563zi</extends>
-  <modules>
-    <module>modm:build:scons</module>
-    <module>modm:processing:fiber</module>
-  </modules>
-</library>

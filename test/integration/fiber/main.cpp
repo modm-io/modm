@@ -14,6 +14,8 @@
 #include <modm/processing.hpp>
 #include <modm/driver/time/cycle_counter.hpp>
 
+#include "../integration_test.hpp"
+
 using namespace Board;
 using namespace std::chrono_literals;
 
@@ -69,14 +71,18 @@ modm_faststack modm::Fiber fiber4([cyc=uint32_t(0)]() mutable
 // Restartable Fibers
 extern modm::Fiber<> fiber_pong;
 extern modm::Fiber<> fiber_ping;
+bool benchmark_passed{false};
+uint8_t restarts{0};
 modm_faststack modm::Fiber<> fiber_ping([]{
 	MODM_LOG_INFO << "ping = " << fiber_ping.stack_usage() << modm::endl;
-	modm::this_fiber::sleep_for(1s);
+	// fibers can restart each other several times
+	if (++restarts >= 3) finishTest(benchmark_passed);
+	modm::this_fiber::sleep_for(100ms);
 	fiber_pong.start();
 }, modm::fiber::Start::Later);
 modm_faststack modm::Fiber<> fiber_pong([]{
 	MODM_LOG_INFO << "pong = " << fiber_pong.stack_usage() << modm::endl;
-	modm::this_fiber::sleep_for(1s);
+	modm::this_fiber::sleep_for(100ms);
 	fiber_ping.start();
 }, modm::fiber::Start::Later);
 
@@ -123,9 +129,12 @@ main()
 	MODM_LOG_INFO << "F3 stack usage = " << fiber3.stack_usage() << modm::endl;
 	MODM_LOG_INFO << "F4 stack usage = " << fiber4.stack_usage() << modm::endl;
 
+	// every fiber yields until its counter reaches the number of cycles
+	benchmark_passed = (total_counter == 4 * (cycles - 1));
+
 	fiber_ping.start();
 	modm::fiber::Scheduler::run(modm::fiber::Scheduler::AutoWatermark);
 
-	while(1) ;
-	return 0;
+	// the restarting fibers never finished
+	return finishTest(false);
 }
