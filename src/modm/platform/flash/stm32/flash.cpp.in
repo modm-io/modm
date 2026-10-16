@@ -67,19 +67,14 @@ Flash::getPage(uintptr_t offset)
 %% else
 	const uint8_t index = (offset >> {{ shift }});
 %% if has_sectors and family != "h7"
-	uint8_t small_index{0};
-	// 128kB Block 0 and 8 are subdivided into 4x16kB + 64kB
-	if (index == 0 or index == 8)
-	{
-		if (index == 8) small_index += 4;
-		// Check upper 64kB first
-		if (offset & 0x1'0000ul) small_index += 4;
-		// Otherwise check lower 16kB
-		else small_index += ((offset & 0xC000) >> 14);
-	}
-	else small_index += 4;
-	// 128kB Blocks
-	return index + small_index;
+	// Every bank of 8x128kB blocks has 12 sectors: the first block is
+	// subdivided into 4x16kB + 64kB, followed by 7x128kB sectors.
+	const uint8_t bank_sector = (index / 8) * 12;
+	const uint8_t block = index % 8;
+	if (block) return bank_sector + block + 4;
+	// Check upper 64kB first, otherwise the lower 16kB
+	if (offset & 0x1'0000ul) return bank_sector + 4;
+	return bank_sector + ((offset & 0xC000) >> 14);
 %% else
 	return index;
 %% endif
@@ -98,16 +93,14 @@ Flash::getOffset(uint8_t index)
 	return (Bank1Addr - OriginAddr) + (1ul << {{shift}}) * index;
 %% else
 %% if has_sectors and family != "h7"
-	switch(index) {
-		case 0: return (1ul << 14);
-		case 1: return (2ul << 14);
-		case 2: return (3ul << 14);
-		case 3: return (4ul << 14);
-		case 4: return (1ul << 16);
-		default: index -= 4; break;
-	}
-%% endif
+	const uint32_t bank_offset = (index / 12) * (8ul << {{shift}});
+	const uint8_t sector = index % 12;
+	if (sector < 4) return bank_offset + (sector << 14);
+	if (sector == 4) return bank_offset + (1ul << 16);
+	return bank_offset + (1ul << {{shift}}) * (sector - 4);
+%% else
 	return (1ul << {{shift}}) * index;
+%% endif
 %% endif
 }
 
@@ -115,8 +108,8 @@ size_t
 Flash::getSize([[maybe_unused]] uint8_t index)
 {
 %% if has_sectors and family != "h7"
-	if (index < 4) return (1ul << 14);
-	if (index == 5) return (1ul << 16);
+	if (index % 12 < 4) return (1ul << 14);
+	if (index % 12 == 4) return (1ul << 16);
 %% endif
 	return (1ul	<< {{shift}});
 }
@@ -158,8 +151,10 @@ Flash::erase(uint8_t index)
 	FLASH->SR = FLASH_SR_ERR;
 %% endif
 %% if has_sectors
+	// The sectors of the second bank are numbered from 16 onwards
+	const uint32_t snb = (index >= 12) ? (index + 4) : index;
 	FLASH->CR = FLASH_CR_STRT | FLASH_CR_SER | uint32_t(size) |
-			((index << FLASH_CR_SNB_Pos) & FLASH_CR_SNB_Msk);
+			((snb << FLASH_CR_SNB_Pos) & FLASH_CR_SNB_Msk);
 %% else
 %% if family in ["g0", "g4"]
 %% if dual_bank
