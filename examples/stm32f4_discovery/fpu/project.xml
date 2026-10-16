@@ -1,7 +1,0 @@
-<library>
-  <extends>modm:disco-f407vg</extends>
-  <modules>
-    <module>modm:math:geometry</module>
-    <module>modm:build:scons</module>
-  </modules>
-</library>
