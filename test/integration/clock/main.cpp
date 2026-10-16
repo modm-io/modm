@@ -1,9 +1,8 @@
 /*
- * Copyright (c) 2011, Georgi Grinshpun
- * Copyright (c) 2011-2012, Fabian Greif
- * Copyright (c) 2012, 2014, Sascha Schade
+ * Copyright (c) 2011, Fabian Greif
  * Copyright (c) 2013, Kevin Läufer
- * Copyright (c) 2013, 2015-2017, Niklas Hauser
+ * Copyright (c) 2013-2017, Niklas Hauser
+ * Copyright (c) 2014, Sascha Schade
  *
  * This file is part of the modm project.
  *
@@ -14,26 +13,57 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
+#include <modm/processing.hpp>
 
-using namespace Board;
+#include "../integration_test.hpp"
+
+/**
+ * Tests that the millisecond and the microsecond clock never run backwards,
+ * agree with each other and that the software timers expire on time.
+ */
 
 // ----------------------------------------------------------------------------
 int
 main()
 {
-	initialize();
+	Board::initialize();
+	bool passed = true;
 
-	LedOrange::set();
-	LedRed::set();
+	modm::PrecisePeriodicTimer preciseTimer(500ms);
+	modm::PeriodicTimer timer(500ms);
+	uint8_t preciseExpired{0}, expired{0};
 
-	while (true)
+	const uint32_t ms_start = modm::Clock::now().time_since_epoch().count();
+	const uint32_t us_start = modm::PreciseClock::now().time_since_epoch().count();
+	uint32_t ms_last{ms_start}, us_last{us_start};
+
+	// run for a bit more than three seconds
+	while (ms_last - ms_start < 3250)
 	{
-		LedBlue::toggle();
-		LedGreen::toggle();
-		LedOrange::toggle();
-		LedRed::toggle();
-		modm::delay(Button::read() ? 250ms : 500ms);
+		const uint32_t ms = modm::Clock::now().time_since_epoch().count();
+		if (ms < ms_last) {
+			MODM_LOG_ERROR << ms << " < " << ms_last << modm::endl;
+			passed = false;
+		}
+		ms_last = ms;
+
+		const uint32_t us = modm::PreciseClock::now().time_since_epoch().count();
+		if (us < us_last) {
+			MODM_LOG_ERROR << us << " < " << us_last << modm::endl;
+			passed = false;
+		}
+		us_last = us;
+
+		if (preciseTimer.execute()) { preciseExpired++; Board::Leds::toggle(); }
+		if (timer.execute()) expired++;
 	}
 
-	return 0;
+	// both clocks must have measured the same time
+	const int32_t difference = int32_t((us_last - us_start) / 1000) - int32_t(ms_last - ms_start);
+	MODM_LOG_INFO << "Clocks differ by " << difference << "ms, timers expired " << expired
+				  << " and " << preciseExpired << " times" << modm::endl;
+	passed &= (-2 <= difference and difference <= 2);
+	passed &= (expired == 6) and (preciseExpired == 6);
+
+	return finishTest(passed);
 }

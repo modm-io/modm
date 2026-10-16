@@ -1,6 +1,17 @@
 <library>
-  <extends>modm:disco-f407vg</extends>
+  <extends>modm:disco-f469ni</extends>
+  <!-- <extends>modm:arduino-uno</extends> -->
+  <!-- <extends>modm:hosted</extends> -->
+  <!-- <extends>modm:nucleo-f042k6</extends> -->
+  <!-- <extends>modm:nucleo-u083rc</extends> -->
+  <!-- <extends>modm:nucleo-l152re</extends> -->
+  <!-- <extends>modm:samv71-xplained-ultra</extends> -->
+  <!-- <extends>modm:nucleo-l552ze-q</extends> -->
   <modules>
+    <module>modm:processing:timer</module>
     <module>modm:build:scons</module>
   </modules>
+  <collectors>
+    <collect name="modm:build:cppdefines">MODM_EXTI_HANDLER_STORAGE=12</collect>
+  </collectors>
 </library>
