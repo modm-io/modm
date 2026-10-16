@@ -9,6 +9,7 @@
     <module>modm:platform:core</module>
     <module>modm:platform:gpio</module>
     <module>modm:platform:spi.bitbang</module>
+    <module>modm:ui:display</module>
     <module>modm:build:scons</module>
   </modules>
 </library>
