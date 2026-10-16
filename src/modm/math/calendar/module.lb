@@ -16,8 +16,7 @@ def init(module):
 
 def prepare(module, options):
     module.depends(":stdc++")
-    # AVR libstdc++ has no support for calendar/time in <chrono>
-    return options[":target"].identifier.platform != "avr"
+    return True
 
 def build(env):
     env.outbasepath = "modm/src/modm/math/calendar"
