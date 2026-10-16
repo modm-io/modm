@@ -1,7 +1,11 @@
 <library>
   <extends>modm:nucleo-l432kc</extends>
+  <!-- <extends>modm:disco-f407vg</extends> -->
   <modules>
-    <module>modm:platform:uart.spi:1</module>
     <module>modm:build:scons</module>
+    <!-- Required for modm:nucleo-l432kc -->
+    <module>modm:platform:uart.spi:1</module>
+    <!-- Required for modm:disco-f407vg -->
+    <!-- <module>modm:platform:uart.spi:2</module> -->
   </modules>
 </library>
