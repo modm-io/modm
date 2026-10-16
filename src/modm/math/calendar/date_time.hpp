@@ -15,7 +15,10 @@
 #include <ctime>
 #include <string_view>
 #include <cstring>
+#if __has_include(<sys/time.h>)
 #include <sys/time.h>
+#define MODM_DATETIME_HAS_TIMEVAL 1
+#endif
 #include <charconv>
 
 namespace modm
@@ -53,7 +56,7 @@ public:
 
 	constexpr std::chrono::year
 	year() const
-	{ return std::chrono::year{epoch + data.year}; }
+	{ return std::chrono::year{int(epoch + data.year)}; }
 
 	constexpr std::chrono::month
 	month() const
@@ -136,12 +139,14 @@ public:
 				(data.hour * 60l + data.minute) * 60l + data.second);
 	}
 
+#ifdef MODM_DATETIME_HAS_TIMEVAL
 	/// @warning This function is inefficient since it always converts the datetime to microseconds.
 	constexpr struct timeval
 	timeval() const
 	{
 		return {time_t(), data.millisecond * 1000};
 	}
+#endif
 
 	/// @warning This function is inefficient since it always converts the datetime to milliseconds.
 	constexpr duration
@@ -184,7 +189,7 @@ private:
 	uint8_t _weekday{};
 
 	static constexpr uint16_t epoch{1970};
-	static constexpr uint32_t seconds_per_day{24*60*60};
+	static constexpr uint32_t seconds_per_day{24ul*60*60};
 	static constexpr uint64_t seconds_per_year{365*seconds_per_day};
 	// accumulated (non-leap) days per month, 1-indexed!
 	static constexpr uint16_t m2d[] = {0, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
@@ -209,12 +214,14 @@ public:
 		return DateTime(ymd, hms.hours(), hms.minutes(), hms.seconds(), subseconds);
 	}
 
+#ifdef MODM_DATETIME_HAS_TIMEVAL
 	/// Really expensive conversion!
 	static constexpr DateTime
 	from_timeval(const struct timeval& tv)
 	{
 		return from_time_t(std::time_t(tv.tv_sec), std::chrono::milliseconds(tv.tv_usec / 1000ul));
 	}
+#endif
 
 	static consteval DateTime
 	fromBuildTime()
@@ -255,7 +262,6 @@ public:
 } // namespace modm
 
 #if MODM_HAS_IOSTREAM
-#include <inttypes.h>
 #include <modm/io/iostream.hpp>
 
 namespace modm
@@ -266,11 +272,7 @@ inline modm::IOStream&
 operator << (modm::IOStream& s, const DateTime& dt)
 {
 	// ISO encoding: 2024-12-22 18:39:21.342
-	s.printf("%04" PRIu16 "-%02" PRIu8 "-%02" PRIu8 " %02" PRIu8 ":%02" PRIu8 ":%02" PRIu8 ".%03" PRIu16,
-			 uint16_t(int(dt.year())), uint8_t(unsigned(dt.month())), uint8_t(unsigned(dt.day())),
-			 uint8_t(dt.hours().count()), uint8_t(dt.minutes().count()), uint8_t(dt.seconds().count()),
-			 uint16_t(dt.subseconds().count()));
-	return s;
+	return s << dt.year_month_day() << ' ' << dt.hh_mm_ss();
 }
 
 } // modm namespace

@@ -45,7 +45,6 @@ def build(env):
     target = env[":target"].identifier
     env.substitutions = {
         "is_hosted": target.platform == "hosted",
-        "is_avr": target.platform == "avr",
         "with_fiber": env.has_module(":processing:fiber"),
         "family": target.family,
         "core": core,
