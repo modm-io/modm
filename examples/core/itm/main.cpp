@@ -15,6 +15,7 @@
 using namespace Board;
 
 modm::IODeviceWrapper<Itm, modm::IOBuffer::DiscardIfFull> itm_device;
+// Set all four logger streams to use ITM
 modm::IOStream stream(itm_device);
 
 int
@@ -22,14 +23,9 @@ main()
 {
 	Board::initialize();
 	Itm::initialize();
-	LedD13::setOutput();
+	Leds::setOutput();
 
 	stream << "Hello from the SWO." << modm::endl;
-	stream << "debug"   << modm::endl;
-	stream << "info"    << modm::endl;
-	stream << "warning" << modm::endl;
-	stream << "error"   << modm::endl;
-
 
 	while (true)
 	{
@@ -37,7 +33,7 @@ main()
 		if (tmr.execute())
 		{
 			tmr.restart(Button::read() ? 100ms : 500ms);
-			LedD13::toggle();
+			Leds::toggle();
 
 			static uint32_t counter{0};
 			stream << "loop: " << counter++ << modm::endl;
