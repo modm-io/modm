@@ -1,9 +1,0 @@
-<library>
-  <extends>modm:disco-f769ni</extends>
-  <modules>
-    <module>modm:platform:dac</module>
-    <module>modm:platform:dma</module>
-    <module>modm:platform:timer:4</module>
-    <module>modm:build:scons</module>
-  </modules>
-</library>
