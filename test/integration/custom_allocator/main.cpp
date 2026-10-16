@@ -10,6 +10,13 @@
 
 #include <modm/board.hpp>
 
+#include "../integration_test.hpp"
+
+/**
+ * Tests that a custom allocator replaces the one of modm: all memory must come
+ * from our own heap, until it is exhausted.
+ */
+
 using namespace Board;
 
 // Allocate giant array inside the SRAM1 noinit section
@@ -24,15 +31,18 @@ extern "C" void __modm_initialize_memory()
     // Initialize your specific allocator algorithm here
     memset(heap_begin, 0xaa, sizeof(heap_begin));
 }
+size_t allocations{0};
+
 extern "C" modm_used void* _sbrk_r(struct _reent *,  ptrdiff_t size)
 {
-    const uint8_t *const heap = heap_top;
-    heap_top += size;
-    if (heap_top >= heap_end) {
-    	MODM_LOG_ERROR << "Heap overflowed!" << modm::endl;
-    	while(1) ;
-    }
-    return (void*) heap;
+	const uint8_t *const heap = heap_top;
+	heap_top += size;
+	if (heap_top >= heap_end) {
+		MODM_LOG_INFO << "Heap overflowed after " << allocations << "kB!" << modm::endl;
+		// 30kB heap: the allocator has some overhead per allocation
+		finishTest(allocations >= 25 and allocations <= 30);
+	}
+	return (void*) heap;
 }
 extern "C" void operator_delete(void* ptr)
 {
@@ -43,7 +53,6 @@ extern "C" void operator_delete(void* ptr)
 int main()
 {
 	Board::initialize();
-	LedD13::setOutput();
 
 	for (const auto [traits, start, end, size] : modm::platform::HeapTable())
 	{
@@ -51,22 +60,15 @@ int main()
 							 traits.value, start, end, size);
 	}
 
-	uint8_t* ptr;
-	size_t counter{0};
-	while (true)
+	// leak memory until our heap is exhausted
+	while (allocations < 100)
 	{
-		LedD13::toggle();
-		modm::delay(200ms);
-
-		// leak memory until heap is exhausted
-		ptr = new uint8_t[1024];
-		if (ptr) {
-			ptr[0] = counter;
-			counter++;
-		}
-		MODM_LOG_INFO << "Allocated " << counter << "kb of heap!" << modm::endl;
-		// delete ptr;
+		const uint8_t *const ptr = new uint8_t[1024];
+		// all memory must be inside of our heap
+		if (ptr < heap_begin or ptr >= heap_end) break;
+		allocations++;
 	}
 
-	return 0;
+	// the heap never overflowed or returned foreign memory
+	return finishTest(false);
 }
