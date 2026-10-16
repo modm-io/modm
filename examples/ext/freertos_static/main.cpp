@@ -40,7 +40,7 @@ using namespace modm::platform;
 SemaphoreHandle_t semaphore = nullptr;
 StaticSemaphore_t semaphoreBuffer;
 
-template <typename Gpio, int SleepTime>
+template <int Led, int SleepTime>
 class P
 {
 	char c;
@@ -64,12 +64,11 @@ public:
 
 	void run()
 	{
-		Gpio::setOutput();
 		while (true)
 		{
 			vTaskDelay(SleepTime * (configTICK_RATE_HZ / 1000.0));
 
-			Gpio::toggle();
+			Board::Leds::write(Board::Leds::read() ^ (1ul << (Led % Board::Leds::width)));
 			{
 				xSemaphoreTake(semaphore, portMAX_DELAY);
 				MODM_LOG_INFO << char(i + c);
@@ -81,15 +80,16 @@ public:
 	}
 };
 
-P< Board::LedRed,   260      > p1('0');
-P< Board::LedGreen, 260 + 10 > p2('a');
-P< Board::LedBlue,  260 + 20 > p3('A');
+P< 0, 260      > p1('0');
+P< 1, 260 + 10 > p2('a');
+P< 2, 260 + 20 > p3('A');
 
 // ----------------------------------------------------------------------------
 int
 main()
 {
 	Board::initialize();
+	Board::Leds::setOutput();
 
 	semaphore = xSemaphoreCreateMutexStatic(&semaphoreBuffer);
 	vTaskStartScheduler();

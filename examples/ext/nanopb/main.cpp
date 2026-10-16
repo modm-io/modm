@@ -47,6 +47,7 @@ int main()
         modm_assert(status, "pb.enc", "Encoding SimpleMessage failed!");
         message_length = stream.bytes_written;
         modm_assert(message_length, "pb.len", "Empty SimpleMessage buffer!");
+        MODM_LOG_INFO << "SimpleMessage encoded into " << message_length << " bytes" << modm::endl;
     }
     {
         /* Now we could transmit the message over network, store it in a file or
@@ -65,6 +66,7 @@ int main()
         status = pb_decode(&stream, SimpleMessage_fields, &message);
         modm_assert(status, "pb.dec", "Decoding SimpleMessage failed!");
         modm_assert(message.lucky_number == 42, "lucky_number", "Incorrect SimpleMessage values!");
+        MODM_LOG_INFO << "SimpleMessage decoded: lucky_number=" << message.lucky_number << modm::endl;
     }
 
     {
@@ -91,6 +93,7 @@ int main()
         modm_assert(status, "pb.enc", "Encoding ComplexMessage failed!");
         message_length = stream.bytes_written;
         modm_assert(message_length, "pb.len", "Empty ComplexMessage buffer!");
+        MODM_LOG_INFO << "ComplexMessage encoded into " << message_length << " bytes" << modm::endl;
     }
     {
         /* Now we could transmit the message over network, store it in a file or
@@ -113,6 +116,9 @@ int main()
         modm_assert(message.unlucky_number == 13, "unlucky_number", "Incorrect ComplexMessage values!");
         modm_assert(message.toggle == true, "toggle", "Incorrect ComplexMessage values!");
         modm_assert(int(message.value) == 4, "value", "Incorrect ComplexMessage values!");
+        MODM_LOG_INFO << "ComplexMessage decoded: query=\"" << message.query << "\" unlucky_number="
+                      << message.unlucky_number << " toggle=" << message.toggle
+                      << " value=" << message.value << modm::endl;
     }
 
     while (true)

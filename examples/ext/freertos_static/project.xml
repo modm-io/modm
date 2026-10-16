@@ -1,5 +1,10 @@
 <library>
   <extends>modm:nucleo-f429zi</extends>
+  <!-- <extends>modm:nucleo-c031c6</extends> -->
+  <!-- <extends>modm:nucleo-g070rb</extends> -->
+  <!-- <extends>modm:nucleo-l152re</extends> -->
+  <!-- <extends>modm:nucleo-h723zg</extends> -->
+  <!-- <extends>modm:nucleo-h533re</extends> -->
   <modules>
     <module>modm:freertos</module>
     <module>modm:build:scons</module>

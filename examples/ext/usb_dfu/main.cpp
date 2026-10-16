@@ -32,6 +32,15 @@ void tud_resume_cb() { tmr.restart(1s); }
 modm_section(".noinit") uint64_t dfu_mode;
 constexpr uint64_t DFU_MAGIC{0xf318ea89313f2be8};
 
+// The address of the bootloader in SystemFlash differs between devices, see AN2606!
+#if defined STM32F3
+constexpr uintptr_t SystemFlash{0x1FFFD800};
+#elif defined STM32U5
+constexpr uintptr_t SystemFlash{0x0BF90000};
+#else
+#error "Please add the SystemFlash address of your device!"
+#endif
+
 /* 1. Do scons program once
  * 2. Power-cycle by disconnecting USB cable from ST-Link
  * 3. Force USB re-enumeration by connecting USB cable to UsbFs
@@ -47,13 +56,12 @@ int main()
 	{
 		dfu_mode = 0; __DSB();
 		// Jump to SystemFlash *before* initializing any peripherals!
+		const uint32_t *const vectors = reinterpret_cast<const uint32_t*>(SystemFlash);
 		asm volatile
 		(
-			// Address of SystemFlash differs between devices!!!
-			"ldr r0, =0x1FFFD800"	"\n\t"
-			"ldr sp,[r0, #0]"		"\n\t"
-			"ldr r0,[r0, #4]"		"\n\t"
-			"bx  r0"
+			"msr msp, %0"	"\n\t"
+			"bx  %1"
+			: : "r" (vectors[0]), "r" (vectors[1])
 		);
 	}
 	Board::initialize();
@@ -67,7 +75,7 @@ int main()
 		if (tmr.execute())
 		{
 			if (dfu_mode == DFU_MAGIC) NVIC_SystemReset();
-			LedNorth::toggle();
+			Leds::toggle();
 		}
 	}
 

@@ -1,5 +1,10 @@
 <library>
   <extends>modm:nucleo-f439zi</extends>
+  <!-- <extends>modm:nrf51422-dk</extends> -->
+  <!-- <extends>modm:nucleo-g070rb</extends> -->
+  <!-- <extends>modm:nucleo-f103rb</extends> -->
+  <!-- <extends>modm:nucleo-h743zi</extends> -->
+  <!-- <extends>modm:nucleo-u575zi-q</extends> -->
   <modules>
     <module>modm:etl</module>
     <module>modm:build:scons</module>

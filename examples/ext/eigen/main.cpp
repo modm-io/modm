@@ -19,7 +19,7 @@ int
 main()
 {
 	Board::initialize();
-	LedD13::setOutput();
+	Leds::setOutput();
 
 	while (1)
 	{
