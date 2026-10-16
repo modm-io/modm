@@ -1,7 +1,0 @@
-<library>
-  <extends>modm:olimexino-stm32</extends>
-  <modules>
-    <module>modm:platform:gpio</module>
-    <module>modm:build:scons</module>
-  </modules>
-</library>

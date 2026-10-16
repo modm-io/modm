@@ -1,6 +1,0 @@
-<library>
-  <extends>modm:disco-f401vc</extends>
-  <modules>
-    <module>modm:build:scons</module>
-  </modules>
-</library>

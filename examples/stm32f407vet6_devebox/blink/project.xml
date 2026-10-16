@@ -1,9 +1,0 @@
-<library>
-  <extends>modm:devebox-stm32f4xx</extends>
-  <modules>
-    <module>modm:build:scons</module>
-  </modules>
-  <collectors>
-    <collect name="modm:build:openocd.source">interface/stlink.cfg</collect>
-  </collectors>
-</library>

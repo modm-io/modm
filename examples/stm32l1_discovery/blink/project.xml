@@ -1,6 +1,0 @@
-<library>
-  <extends>modm:disco-l152rc</extends>
-  <modules>
-    <module>modm:build:scons</module>
-  </modules>
-</library>

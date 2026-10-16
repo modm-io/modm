@@ -1,6 +1,0 @@
-<library>
-  <extends>modm:samv71-xplained-ultra</extends>
-  <modules>
-    <module>modm:build:scons</module>
-  </modules>
-</library>
