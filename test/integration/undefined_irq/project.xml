@@ -1,5 +1,10 @@
 <library>
   <extends>modm:nucleo-f103rb</extends>
+  <!-- <extends>modm:nucleo-g474re</extends> -->
+  <!-- <extends>modm:nucleo-f767zi</extends> -->
+  <!-- <extends>modm:nucleo-h503rb</extends> -->
+  <!-- <extends>modm:nucleo-u083rc</extends> -->
+  <!-- <extends>modm:nucleo-c031c6</extends> -->
   <modules>
     <module>modm:build:scons</module>
     <module>modm:build:make</module>
