@@ -1,10 +1,12 @@
 <library>
-  <extends>modm:blue-pill-f103</extends>
+  <extends>modm:nucleo-g474re</extends>
+  <!-- <extends>modm:blue-pill-f103</extends> -->
   <modules>
-    <module>modm:build:scons</module>
     <module>modm:platform:timer:4</module>
+    <module>modm:build:scons</module>
   </modules>
   <collectors>
-    <collect name="modm:build:openocd.source">interface/stlink.cfg</collect>
+    <!-- Required for modm:blue-pill-f103 -->
+    <!-- <collect name="modm:build:openocd.source">interface/stlink.cfg</collect> -->
   </collectors>
 </library>
