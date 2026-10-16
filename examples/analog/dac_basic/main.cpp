@@ -29,15 +29,29 @@ constexpr auto computeSinTable()
 
 constexpr auto sinTable = computeSinTable();
 
-int
-main()
+// The DAC and its outputs differ between the devices
+#if defined STM32G4
+// Output ~8 kHz sine waveform on gpio A6
+static void
+initializeDac()
 {
-	Board::initialize();
-	LedBlue::setOutput();
+	Dac2::connect<GpioA6::Out1>();
+	Dac2::initialize<Board::SystemClock>();
 
-	MODM_LOG_INFO << "DAC Demo" << modm::endl;
+	Dac2::setMode(Dac2::Channel::Channel1, Dac2::Mode::ExternalWithBuffer);
+	Dac2::enableChannel(Dac2::Channel::Channel1);
+}
 
-	// Output ~8 kHz sine / cosine waveforms on gpio A4/A5
+static void
+setOutput(uint16_t sin, uint16_t)
+{
+	Dac2::setOutput1(sin);
+}
+#else
+// Output ~8 kHz sine / cosine waveforms on gpio A4/A5
+static void
+initializeDac()
+{
 	Dac::connect<GpioA4::Out1, GpioA5::Out2>();
 	Dac::initialize();
 
@@ -45,6 +59,25 @@ main()
 	Dac::enableChannel(Dac::Channel::Channel2);
 	Dac::enableOutputBuffer(Dac::Channel::Channel1, true);
 	Dac::enableOutputBuffer(Dac::Channel::Channel2, true);
+}
+
+static void
+setOutput(uint16_t sin, uint16_t cos)
+{
+	Dac::setOutput1(sin);
+	Dac::setOutput2(cos);
+}
+#endif
+
+int
+main()
+{
+	Board::initialize();
+	Board::Leds::setOutput();
+
+	MODM_LOG_INFO << "DAC Demo" << modm::endl;
+
+	initializeDac();
 
 	uint32_t counter = 0;
 	while (true)
@@ -54,10 +87,9 @@ main()
 		const auto cosIndex = (counter + (size/4)) % size;
 		counter++;
 
-		Dac::setOutput1(sinTable[sinIndex]);
-		Dac::setOutput2(sinTable[cosIndex]);
+		setOutput(sinTable[sinIndex], sinTable[cosIndex]);
 
-		LedBlue::toggle();
+		Board::Leds::toggle();
 		modm::delay_us(1);
 	}
 
