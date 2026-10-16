@@ -9,6 +9,9 @@
  */
 
 #include <modm/board.hpp>
+#include <cstring>
+
+#include "../integration_test.hpp"
 #include <modm/debug/logger.hpp>
 
 using namespace modm::literals;
@@ -37,38 +40,39 @@ main()
 
 	Mcan1::setMode(Mcan1::Mode::TestExternalLoopback);
 
+	static volatile bool error{false};
 	Mcan1::setErrorInterruptCallback([]{
-		Board::Led1::set();
+		error = true;
 	});
 
-	uint32_t counter{0};
-
-	while (true)
+	// In loopback mode we must receive every message that we send
+	bool passed = true;
+	for (uint32_t counter = 1; counter <= 10; counter++)
 	{
-		counter++;
-		MODM_LOG_INFO << "loop: " << counter << modm::endl;
-
 		modm::can::Message txMsg{counter, 64};
 		txMsg.setExtended(true);
 		for (size_t i = 0; i < txMsg.capacity; ++i) {
 			txMsg.data[i] = counter;
 		}
 		MODM_LOG_INFO << "Mcan1: Sending message... " << txMsg << modm::endl;
-		Mcan1::sendMessage(txMsg);
+		passed &= Mcan1::sendMessage(txMsg);
 
-		if (Mcan1::isMessageAvailable())
+		modm::delay(50ms);
+
+		modm::can::Message rxMsg;
+		if (Mcan1::isMessageAvailable() and Mcan1::getMessage(rxMsg))
 		{
-			MODM_LOG_INFO << "Mcan1: Message is available... ";
-			modm::can::Message rxMsg;
-			if (Mcan1::getMessage(rxMsg))
-				MODM_LOG_INFO << rxMsg << modm::endl;
-			else
-				MODM_LOG_INFO << " but getting message FAILED" << modm::endl;
+			MODM_LOG_INFO << "Mcan1: Received message... " << rxMsg << modm::endl;
+			passed &= (rxMsg.getIdentifier() == txMsg.getIdentifier()) and
+					  (rxMsg.getLength() == txMsg.getLength()) and
+					  (memcmp(rxMsg.data, txMsg.data, txMsg.getLength()) == 0);
 		}
-
-		Led0::toggle();
-		modm::delay(500ms);
+		else
+		{
+			MODM_LOG_ERROR << "Mcan1: No message received!" << modm::endl;
+			passed = false;
+		}
 	}
 
-	return 0;
+	return finishTest(passed and not error);
 }
