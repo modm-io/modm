@@ -1,11 +1,7 @@
 <library>
-  <options>
-    <option name="modm:target">atmega328p-au</option>
-    <option name="modm:platform:core:f_cpu">1M</option>
-  </options>
+  <extends>modm:arduino-uno</extends>
   <modules>
     <module>modm:architecture:accessor</module>
-    <module>modm:platform:core</module>
     <module>modm:build:scons</module>
   </modules>
 </library>

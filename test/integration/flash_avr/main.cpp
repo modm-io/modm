@@ -10,11 +10,15 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/platform.hpp>
+#include <modm/board.hpp>
 #include <modm/architecture/interface/accessor.hpp>
+#include <string.h>
 
-//extern const int a PROGMEM;
-//const int a = 12;
+#include "../integration_test.hpp"
+
+/**
+ * Tests reading data that is stored in the Flash of an AVR.
+ */
 
 FLASH_STORAGE(int foo) = 12;
 
@@ -22,31 +26,29 @@ FLASH_STORAGE_STRING(string) = "Hallo Welt!\n";
 
 FLASH_STORAGE(int32_t bla[4]) = {1,2,3,4};
 
-volatile uint8_t out;
-
-void
-function(modm::accessor::Flash<char> s)
+static bool
+equals(modm::accessor::Flash<char> s, const char *expected)
 {
 	char c;
 	while ((c = *s++)) {
-		out = c;
+		if (c != *expected++) return false;
 	}
+	return *expected == 0;
 }
 
 int
 main()
 {
+	Board::initialize();
+	bool passed = true;
+
 	modm::accessor::Flash<int> bar(&foo);
+	passed &= (*bar == 12);
 
-	out = *bar;
-
-	function(modm::accessor::asFlash(string));
+	passed &= equals(modm::accessor::asFlash(string), "Hallo Welt!\n");
 
 	modm::accessor::Flash<int32_t> blub(bla);
+	passed &= (blub[0] == 1) and (blub[2] == 3) and (blub[3] == 4);
 
-	out = blub[2];
-
-	while (true) {
-
-	}
+	return finishTest(passed);
 }
