@@ -1,7 +1,16 @@
 <library>
   <extends>modm:disco-f469ni</extends>
+  <!-- <extends>modm:nucleo-f042k6</extends> -->
+  <!-- <extends>modm:nucleo-g0b1re</extends> -->
+  <!-- <extends>modm:blue-pill-f103</extends> -->
+  <!-- <extends>modm:same70-xplained</extends> -->
+  <!-- <extends>modm:nucleo-h563zi</extends> -->
+  <options>
+    <option name="modm:platform:heap:allocator">tlsf</option>
+  </options>
   <modules>
     <module>modm:architecture:memory</module>
+    <module>modm:platform:heap</module>
     <module>modm:build:scons</module>
   </modules>
 </library>

@@ -12,6 +12,7 @@
 
 #include <modm/board.hpp>
 #include <modm/architecture/interface/memory.hpp>
+#include <new>
 #include <inttypes.h>
 
 int main()
@@ -20,7 +21,7 @@ int main()
 	Board::Leds::setOutput();
 
 	// 600 pointers to allocated memories
-	uint8_t *d[600];
+	static uint8_t *d[600];
 	int free_ii = 0;
 
 	for (int ii=0; ii < 600; ii++)
@@ -28,7 +29,8 @@ int main()
 		d[ii] = nullptr;
 		uint32_t size = rand() % (1024 * 100);
 
-		d[ii] = new (modm::MemoryFastData) uint8_t[size];
+		// returns a nullptr instead of failing an assertion if there is no memory left
+		d[ii] = new (modm::MemoryFastData, std::nothrow) uint8_t[size];
 
 		// print what size we requested and if it succeeded
 		MODM_LOG_INFO.printf(" malloc(%3" PRId32 "kB) = ", size/1024);
@@ -40,7 +42,7 @@ int main()
 			uint8_t *df;
 			while ((df = d[free_ii++]) == nullptr and free_ii <= ii) ;
 			MODM_LOG_INFO << "  ...freeing " << df;
-			delete df;
+			delete[] df;
 		}
 		MODM_LOG_INFO << modm::endl;
 	}

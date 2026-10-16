@@ -19,15 +19,6 @@
 #undef MODM_LOG_LEVEL
 #define MODM_LOG_LEVEL modm::log::INFO
 
-// Create an IODeviceWrapper around the Uart Peripheral we want to use
-modm::IODeviceWrapper<Uart0, modm::IOBuffer::BlockIfFull> loggerDevice;
-
-// Set all four logger streams to use the UART
-modm::log::Logger modm::log::debug(loggerDevice);
-modm::log::Logger modm::log::info(loggerDevice);
-modm::log::Logger modm::log::warning(loggerDevice);
-modm::log::Logger modm::log::error(loggerDevice);
-
 //
 #if 0
 // with simple case we can use directly SpinLockUnsafe
@@ -94,9 +85,6 @@ main()
 {
 	Board::initialize();
 
-	// initialize Uart0 for MODM_LOG_*
-	Uart0::connect<GpioOutput0::Tx>();
-	Uart0::initialize<Board::SystemClock, 115200_Bd>();
 
 	// Use the logging streams to print some messages.
 	// Change MODM_LOG_LEVEL above to enable or disable these messages

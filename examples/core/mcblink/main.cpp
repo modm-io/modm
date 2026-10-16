@@ -14,11 +14,6 @@
 #include <modm/processing.hpp>
 #include <mutex>
 
-// Create an IODeviceWrapper around the Uart Peripheral we want to use
-modm::IODeviceWrapper<Uart0, modm::IOBuffer::BlockIfFull> loggerDevice;
-modm::log::Logger modm::log::info(loggerDevice);
-modm::log::Logger modm::log::error(loggerDevice);
-
 multicore::Mutex log_mutex;
 uint32_t counter{};
 
@@ -53,9 +48,6 @@ main()
 {
 	Board::initialize();
 	Board::LedGreen::setOutput();
-	// initialize Uart0 for MODM_LOG_*
-	Uart0::connect<GpioOutput0::Tx>();
-	Uart0::initialize<Board::SystemClock, 115200_Bd>();
 
 	multicore::Core1::run(core1_main);
 

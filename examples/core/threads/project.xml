@@ -1,7 +1,11 @@
 <library>
-  <options>
-    <option name="modm:target">hosted-linux</option>
-  </options>
+  <extends>modm:hosted</extends>
+  <!-- <extends>modm:nucleo-c031c6</extends> -->
+  <!-- <extends>modm:nucleo-l031k6</extends> -->
+  <!-- <extends>modm:nucleo-l152re</extends> -->
+  <!-- <extends>modm:nucleo-l452re</extends> -->
+  <!-- <extends>modm:nucleo-f746zg</extends> -->
+  <!-- <extends>modm:nucleo-h533re</extends> -->
   <modules>
     <module>modm:platform:core</module>
     <module>modm:debug</module>

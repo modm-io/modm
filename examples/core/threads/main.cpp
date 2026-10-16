@@ -10,16 +10,12 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/platform.hpp>
+#include <modm/board.hpp>
 #include <modm/processing/rtos.hpp>
 #include <modm/debug/logger.hpp>
 
 // ----------------------------------------------------------------------------
 modm::rtos::BinarySemaphore event;
-
-// Set the log level
-#undef	XPCC_LOG_LEVEL
-#define	XPCC_LOG_LEVEL xpcc::log::INFO
 
 // ----------------------------------------------------------------------------
 class Thread1 : public modm::rtos::Thread
@@ -74,6 +70,8 @@ Thread2 thread2;
 int
 main()
 {
+	Board::initialize();
+
 	// start scheduler
 	modm::rtos::Scheduler::schedule();
 

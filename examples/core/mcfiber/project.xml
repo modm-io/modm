@@ -1,0 +1,13 @@
+<library>
+  <extends>modm:rp-pico</extends>
+  <options>
+    <option name="modm:board:rp-pico:with_logger">yes</option>
+  </options>
+  <modules>
+    <module>modm:debug</module>
+    <module>modm:platform:multicore</module>
+    <module>modm:build:scons</module>
+    <module>modm:processing:timer</module>
+    <module>modm:processing:fiber</module>
+  </modules>
+</library>
