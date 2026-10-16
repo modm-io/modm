@@ -1,7 +1,5 @@
 <library>
-  <options>
-    <option name="modm:target">hosted-linux</option>
-  </options>
+  <extends>modm:hosted</extends>
   <modules>
     <module>modm:platform:core</module>
     <module>modm:platform:uart</module>
