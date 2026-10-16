@@ -1,7 +1,9 @@
 <library>
-  <extends>modm:nucleo-f767zi</extends>
+  <extends>modm:nucleo-f429zi</extends>
+  <!-- <extends>modm:nucleo-f767zi</extends> -->
   <options>
-    <option name="modm:build:lto">yes</option>
+    <!-- Required for modm:nucleo-f767zi -->
+    <!-- <option name="modm:build:lto">yes</option> -->
   </options>
   <modules>
     <module>modm:build:scons</module>
