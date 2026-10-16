@@ -147,14 +147,14 @@ struct SystemClock
 
 using A0 = GpioA0;
 using A1 = GpioA1;
-using A2 = GpioA2;
+using A2 = GpioA4;
 using A3 = GpioB0;
 using A4 = GpioC1;
 using A5 = GpioC0;
 
-using D0  = GpioB15;
-using D1  = GpioB14;
-using D2  = GpioA10;
+using D0  = GpioA3;
+using D1  = GpioA2;
+using D2  = GpioC8;
 using D3  = GpioB3;
 using D4  = GpioB5;
 using D5  = GpioB4;

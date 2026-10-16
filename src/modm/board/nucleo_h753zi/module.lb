@@ -46,5 +46,6 @@ def build(env):
 
     env.template("../board.cpp.in", "board.cpp")
     env.template("../nucleo_h743zi/board.hpp.in", "board.hpp")
-    env.copy("../nucleo144_arduino.hpp", "nucleo144_arduino.hpp")
+    # The MB1364 boards have a different pinout than the other Nucleo-144
+    env.copy("../nucleo144_arduino_h7.hpp", "nucleo144_arduino.hpp")
     env.collect(":build:openocd.source", "board/st_nucleo_h743zi.cfg")
