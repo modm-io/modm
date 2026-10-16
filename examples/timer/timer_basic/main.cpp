@@ -19,12 +19,9 @@ main()
 	Board::initialize();
 	Board::LedNorth::set();
 
-
 	Timer1::enable();
-	//Timer1::setMode(Timer1::Mode::CenterAligned3);
 	Timer1::setMode(Timer1::Mode::UpCounter);
 	Timer1::setOverflow(0xff);
-	// Timer1::template setPeriod<Board::SystemClock>(4us);
 	Timer1::applyAndReset();
 	Timer1::start();
 
