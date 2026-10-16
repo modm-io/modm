@@ -1,8 +1,13 @@
 <library>
   <!-- CI: run fail -->
-  <options>
-    <option name="modm:target">hosted-linux</option>
-  </options>
+  <extends>modm:disco-f469ni</extends>
+  <!-- <extends>modm:hosted</extends> -->
+  <!-- <extends>modm:arduino-nano</extends> -->
+  <!-- <extends>modm:nucleo-f031k6</extends> -->
+  <!-- <extends>modm:nucleo-l031k6</extends> -->
+  <!-- <extends>modm:blue-pill-f103</extends> -->
+  <!-- <extends>modm:disco-f769ni</extends> -->
+  <!-- <extends>modm:nucleo-h503rb</extends> -->
   <modules>
     <module>modm:platform:core</module>
     <module>modm:architecture:assert</module>
