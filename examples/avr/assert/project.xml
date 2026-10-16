@@ -1,7 +1,6 @@
 <library>
   <extends>modm:arduino-nano</extends>
   <options>
-    <option name="modm:build:build.path">../../../build/avr/assert</option>
     <option name="modm:build:cmake:include_cmakelists">yes</option>
   </options>
   <modules>

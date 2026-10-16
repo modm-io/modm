@@ -1,8 +1,5 @@
 <library>
   <extends>modm:disco-f407vg</extends>
-  <options>
-    <option name="modm:build:build.path">../../../build/stm32f4_discovery/accelerometer</option>
-  </options>
   <modules>
     <module>modm:driver:lis302dl</module>
     <module>modm:math:filter</module>

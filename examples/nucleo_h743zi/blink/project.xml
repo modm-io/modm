@@ -1,8 +1,5 @@
 <library>
   <extends>modm:nucleo-h743zi</extends>
-  <options>
-    <option name="modm:build:build.path">../../../build/nucleo_h743zi/blink</option>
-  </options>
   <modules>
     <module>modm:architecture:memory</module>
     <module>modm:build:scons</module>

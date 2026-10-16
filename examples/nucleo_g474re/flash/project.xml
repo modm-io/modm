@@ -1,8 +1,5 @@
 <library>
   <extends>modm:nucleo-g474re</extends>
-  <options>
-    <option name="modm:build:build.path">../../../build/nucleo_g474re/flash</option>
-  </options>
   <modules>
     <module>modm:platform:flash</module>
     <module>modm:processing:timer</module>

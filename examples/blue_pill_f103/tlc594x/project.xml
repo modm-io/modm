@@ -1,8 +1,5 @@
 <library>
 	<extends>modm:blue-pill-f103</extends>
-	<options>
-		<option name="modm:build:build.path">../../../build/blue_pill_f103/tlc594x</option>
-	</options>
 	<modules>
 		<module>modm:platform:spi:1</module>
 		<module>modm:driver:tlc594x</module>

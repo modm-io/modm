@@ -1,8 +1,5 @@
 <library>
   <extends>modm:samg55-xplained-pro</extends>
-  <options>
-    <option name="modm:build:build.path">../../../build/samg55_xplained_pro/timer</option>
-  </options>
   <modules>
     <module>modm:build:scons</module>
     <module>modm:platform:timer:0</module>

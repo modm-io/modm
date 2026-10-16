@@ -2,7 +2,6 @@
   <extends>modm:samg55-xplained-pro</extends>
   <options>
     <option name="modm:build:project.name">samg-spi-demo</option>
-    <option name="modm:build:build.path">../../../build/samg55_xplained_pro/spi-loopback</option>
   </options>
   <modules>
     <module>modm:build:scons</module>

@@ -2,7 +2,6 @@
   <!-- CI: run fail -->
   <options>
     <option name="modm:target">hosted-linux</option>
-    <option name="modm:build:build.path">../../../build/linux/etl</option>
   </options>
   <modules>
     <module>modm:etl</module>

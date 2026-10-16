@@ -38,9 +38,6 @@
   <!-- <extends>modm:nucleo-h723zg</extends> -->
   <!-- <extends>modm:nucleo-h743zi</extends> -->
   <!-- <extends>modm:nucleo-u575zi-q</extends> -->
-  <options>
-    <option name="modm:build:build.path">../../../build/generic/rtc</option>
-  </options>
   <modules>
     <module>modm:platform:rtc</module>
     <module>modm:build:scons</module>

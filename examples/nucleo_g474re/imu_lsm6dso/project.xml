@@ -1,8 +1,5 @@
 <library>
   <extends>modm:nucleo-g474re</extends>
-  <options>
-    <option name="modm:build:build.path">../../../build/nucleo_g474re/imu_lsm6dso</option>
-  </options>
   <modules>
     <module>modm:build:scons</module>
     <module>modm:platform:spi:1</module>

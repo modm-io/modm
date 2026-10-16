@@ -2,7 +2,6 @@
   <extends>modm:nucleo-l452re</extends>
   <options>
     <option name="modm:build:lto">yes</option>
-    <option name="modm:build:build.path">../../../build/nucleo_l452re/lvgl</option>
     <option name="modm:platform:cortex-m:main_stack_size">5Ki</option>
   </options>
   <modules>

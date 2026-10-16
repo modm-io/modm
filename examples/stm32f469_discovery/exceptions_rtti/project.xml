@@ -1,7 +1,6 @@
 <library>
   <extends>modm:disco-f469ni</extends>
   <options>
-    <option name="modm:build:build.path">../../../build/stm32f469_discovery/exceptions_rtti</option>
     <option name="modm:stdc++:exceptions">true</option>
     <option name="modm:stdc++:rtti">true</option>
   </options>

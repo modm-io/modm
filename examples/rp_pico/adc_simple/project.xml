@@ -1,8 +1,5 @@
 <library>
   <extends>modm:rp-pico</extends>
-  <options>
-    <option name="modm:build:build.path">../../../build/rp_pico/adc_simple</option>
-  </options>
   <modules>
     <module>modm:io</module>
     <module>modm:platform:adc</module>

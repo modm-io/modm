@@ -1,7 +1,6 @@
 <library>
   <extends>modm:nucleo-f429zi</extends>
   <options>
-    <option name="modm:build:build.path">../../../build/nucleo_f429zi/usb_fatfs</option>
     <option name="modm:tinyusb:config">device.msc</option>
   </options>
   <modules>

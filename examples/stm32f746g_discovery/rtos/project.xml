@@ -1,8 +1,5 @@
 <library>
   <extends>modm:disco-f746ng</extends>
-  <options>
-    <option name="modm:build:build.path">../../../build/stm32f746g_discovery/rtos</option>
-  </options>
   <modules>
     <module>modm:processing:rtos</module>
     <module>modm:platform:heap</module>
