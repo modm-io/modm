@@ -13,314 +13,184 @@
 #include <modm/board.hpp>
 #include <modm/architecture/interface/interrupt.hpp>
 
+#include "../integration_test.hpp"
+
 /**
- * This is some testing of Timers 1 to 14 on a STM32 F4 Discovery Board.
+ * Tests that Timers 1 to 14 of a STM32F4 generate update interrupts with the
+ * right period and that every interrupt arrives at the right handler.
  *
- * The blue LED is blinked in the main loop with busy waiting.
- *
- * Red and green LEDs are blinked by interrupts from timers.
- * The red LED should blink three times, driven by Timer 1,
- * then the green one blinks three times driven by Timer 2,
- * and then the red one again by Timer 3, et cetera.
- *
- * After 14 * 3 blinks each timer TIM1 to TIM14 blinked an LED
- * from an interrupt.
- *
- * When the blue LED stops blinking, probably the processor was
- * caught in the default handler for unassigned interrupts.
- * This should not happen.
+ * Every timer runs with a period of 50ms for 525ms: this must result in
+ * exactly 10 interrupts.
  */
 
-// Advanced Timers
+static volatile uint8_t interrupts[15];
+
 template< typename TIMER >
-static void
-testTimerAdvancedStart()
+static bool
+testTimer(uint8_t number)
 {
+	interrupts[number] = 0;
+
 	TIMER::enable();
 	TIMER::setMode(TIMER::Mode::UpCounter);
-
-	TIMER::template setPeriod<Board::SystemClock>(250ms);
-	TIMER::enableInterruptVector(TIMER::Interrupt::Update, true, 10);
+	TIMER::template setPeriod<Board::SystemClock>(50ms);
+	// advanced timers have several interrupt vectors
+	if constexpr (requires { TIMER::enableInterruptVector(TIMER::Interrupt::Update, true, 10); }) {
+		TIMER::enableInterruptVector(TIMER::Interrupt::Update, true, 10);
+	} else {
+		TIMER::enableInterruptVector(true, 10);
+	}
 	TIMER::enableInterrupt(TIMER::Interrupt::Update);
-
 	TIMER::applyAndReset();
+	// applying the settings generates an update event
+	TIMER::acknowledgeInterruptFlags(TIMER::InterruptFlag::Update);
 	TIMER::start();
-}
 
-template< typename TIMER >
-static void
-testTimerStart()
-{
-	TIMER::enable();
-	TIMER::setMode(TIMER::Mode::UpCounter);
+	modm::delay(525ms);
 
-	TIMER::template setPeriod<Board::SystemClock>(250ms);
-	TIMER::enableInterruptVector(true, 10);
-	TIMER::enableInterrupt(TIMER::Interrupt::Update);
-
-	TIMER::applyAndReset();
-	TIMER::start();
-}
-
-template< typename TIMER >
-static void
-testTimerAdvancedStop()
-{
 	TIMER::pause();
 	TIMER::disableInterrupt(TIMER::Interrupt::Update);
-	TIMER::enableInterruptVector(TIMER::Interrupt::Update, false, 10);
+	if constexpr (requires { TIMER::enableInterruptVector(TIMER::Interrupt::Update, false, 10); }) {
+		TIMER::enableInterruptVector(TIMER::Interrupt::Update, false, 10);
+	} else {
+		TIMER::enableInterruptVector(false, 10);
+	}
 	TIMER::disable();
-}
 
-template< typename TIMER >
-static void
-testTimerStop()
-{
-	TIMER::pause();
-	TIMER::disableInterrupt(TIMER::Interrupt::Update);
-	TIMER::enableInterruptVector(false, 10);
-	TIMER::disable();
+	const uint8_t count = interrupts[number];
+	const bool passed = (count == 10);
+	MODM_LOG_INFO << "Timer" << number << ": " << count << " interrupts"
+				  << (passed ? "" : ", expected 10!") << modm::endl;
+	Board::Leds::toggle();
+	return passed;
 }
-
-using namespace Board;
 
 // ----------------------------------------------------------------------------
 int
 main()
 {
 	Board::initialize();
+	bool passed = true;
 
-	uint16_t state = 0;
-	bool restart = false;
+	passed &= testTimer<Timer1>(1);
+	passed &= testTimer<Timer2>(2);
+	passed &= testTimer<Timer3>(3);
+	passed &= testTimer<Timer4>(4);
+	passed &= testTimer<Timer5>(5);
+	passed &= testTimer<Timer6>(6);
+	passed &= testTimer<Timer7>(7);
+	passed &= testTimer<Timer8>(8);
+	passed &= testTimer<Timer9>(9);
+	passed &= testTimer<Timer10>(10);
+	passed &= testTimer<Timer11>(11);
+	passed &= testTimer<Timer12>(12);
+	passed &= testTimer<Timer13>(13);
+	passed &= testTimer<Timer14>(14);
 
-	while (true)
-	{
-		LedBlue::set();
-		modm::delay(20ms);
-		LedBlue::reset();
-		modm::delay(150ms);
-
-		if (restart) {
-			restart = false;
-			state = 0;
-		}
-
-		switch (state)
-		{
-		case 0:
-			testTimerAdvancedStart<Timer1>();
-			break;
-
-		case 10:
-			testTimerAdvancedStop<Timer1>();
-			break;
-
-
-		case 12:
-			testTimerStart<Timer2>();
-			break;
-
-		case 22:
-			testTimerStop<Timer2>();
-			break;
-
-
-		case 24:
-			testTimerStart<Timer3>();
-			break;
-
-		case 34:
-			testTimerStop<Timer3>();
-			break;
-
-
-		case 36:
-			testTimerStart<Timer4>();
-			break;
-
-		case 46:
-			testTimerStop<Timer4>();
-			break;
-
-
-		case 48:
-			testTimerStart<Timer5>();
-			break;
-
-		case 58:
-			testTimerStop<Timer5>();
-			break;
-
-
-		case 60:
-			testTimerStart<Timer6>();
-			break;
-
-		case 70:
-			testTimerStop<Timer6>();
-			break;
-
-
-		case 72:
-			testTimerStart<Timer7>();
-			break;
-
-		case 82:
-			testTimerStop<Timer7>();
-			break;
-
-
-		case 84:
-			testTimerAdvancedStart<Timer8>();
-			break;
-
-		case 94:
-			testTimerAdvancedStop<Timer8>();
-			break;
-
-
-		case 96:
-			testTimerStart<Timer9>();
-			break;
-
-		case 106:
-			testTimerStop<Timer9>();
-			break;
-
-
-		case 108:
-			testTimerStart<Timer10>();
-			break;
-
-		case 118:
-			testTimerStop<Timer10>();
-			break;
-
-
-		case 120:
-			testTimerStart<Timer11>();
-			break;
-
-		case 130:
-			testTimerStop<Timer11>();
-			break;
-
-
-		case 132:
-			testTimerStart<Timer12>();
-			break;
-
-		case 142:
-			testTimerStop<Timer12>();
-			break;
-
-
-		case 144:
-			testTimerStart<Timer13>();
-			break;
-
-		case 154:
-			testTimerStop<Timer13>();
-			break;
-
-
-		case 156:
-			testTimerStart<Timer14>();
-			break;
-
-		case 166:
-			testTimerStop<Timer14>();
-			break;
-
-		case 180:
-			restart = true;
-			break;
-
-
-		default:
-			break;
-		}
-
-		// Next state
-		++state;
-	}
-
-	return 0;
+	return finishTest(passed);
 }
 
+// Some timers share their interrupt
 MODM_ISR(TIM2)
 {
-	Timer2::acknowledgeInterruptFlags(Timer2::InterruptFlag::Update);
-	LedGreen::toggle();
+	if (Timer2::getInterruptFlags() & Timer2::InterruptFlag::Update) {
+		Timer2::acknowledgeInterruptFlags(Timer2::InterruptFlag::Update);
+		interrupts[2]++;
+	}
 }
 
 MODM_ISR(TIM3)
 {
-	Timer3::acknowledgeInterruptFlags(Timer3::InterruptFlag::Update);
-	LedRed::toggle();
+	if (Timer3::getInterruptFlags() & Timer3::InterruptFlag::Update) {
+		Timer3::acknowledgeInterruptFlags(Timer3::InterruptFlag::Update);
+		interrupts[3]++;
+	}
 }
 
 MODM_ISR(TIM4)
 {
-	Timer4::acknowledgeInterruptFlags(Timer4::InterruptFlag::Update);
-	LedGreen::toggle();
+	if (Timer4::getInterruptFlags() & Timer4::InterruptFlag::Update) {
+		Timer4::acknowledgeInterruptFlags(Timer4::InterruptFlag::Update);
+		interrupts[4]++;
+	}
 }
 
 MODM_ISR(TIM5)
 {
-	Timer5::acknowledgeInterruptFlags(Timer5::InterruptFlag::Update);
-	LedRed::toggle();
+	if (Timer5::getInterruptFlags() & Timer5::InterruptFlag::Update) {
+		Timer5::acknowledgeInterruptFlags(Timer5::InterruptFlag::Update);
+		interrupts[5]++;
+	}
 }
 
 MODM_ISR(TIM6_DAC)
 {
-	Timer6::acknowledgeInterruptFlags(Timer6::InterruptFlag::Update);
-	LedGreen::toggle();
+	if (Timer6::getInterruptFlags() & Timer6::InterruptFlag::Update) {
+		Timer6::acknowledgeInterruptFlags(Timer6::InterruptFlag::Update);
+		interrupts[6]++;
+	}
 }
 
 MODM_ISR(TIM7)
 {
-	Timer7::acknowledgeInterruptFlags(Timer7::InterruptFlag::Update);
-	LedRed::toggle();
+	if (Timer7::getInterruptFlags() & Timer7::InterruptFlag::Update) {
+		Timer7::acknowledgeInterruptFlags(Timer7::InterruptFlag::Update);
+		interrupts[7]++;
+	}
 }
-
-// For TIM8 See TIM13
 
 MODM_ISR(TIM1_BRK_TIM9)
 {
-	Timer9::acknowledgeInterruptFlags(Timer9::InterruptFlag::Update);
-	LedGreen::toggle();
+	if (Timer9::getInterruptFlags() & Timer9::InterruptFlag::Update) {
+		Timer9::acknowledgeInterruptFlags(Timer9::InterruptFlag::Update);
+		interrupts[9]++;
+	}
 }
 
-// Timer 1 and 10
 MODM_ISR(TIM1_UP_TIM10)
 {
-	Timer1::acknowledgeInterruptFlags(Timer1::InterruptFlag::Update);
-	Timer10::acknowledgeInterruptFlags(Timer10::InterruptFlag::Update);
-	LedRed::toggle();
+	if (Timer1::getInterruptFlags() & Timer1::InterruptFlag::Update) {
+		Timer1::acknowledgeInterruptFlags(Timer1::InterruptFlag::Update);
+		interrupts[1]++;
+	}
+	if (Timer10::getInterruptFlags() & Timer10::InterruptFlag::Update) {
+		Timer10::acknowledgeInterruptFlags(Timer10::InterruptFlag::Update);
+		interrupts[10]++;
+	}
 }
 
 MODM_ISR(TIM1_TRG_COM_TIM11)
 {
-	Timer11::acknowledgeInterruptFlags(Timer11::InterruptFlag::Update);
-	LedGreen::toggle();
+	if (Timer11::getInterruptFlags() & Timer11::InterruptFlag::Update) {
+		Timer11::acknowledgeInterruptFlags(Timer11::InterruptFlag::Update);
+		interrupts[11]++;
+	}
 }
 
 MODM_ISR(TIM8_BRK_TIM12)
 {
-	Timer12::acknowledgeInterruptFlags(Timer12::InterruptFlag::Update);
-	LedRed::toggle();
+	if (Timer12::getInterruptFlags() & Timer12::InterruptFlag::Update) {
+		Timer12::acknowledgeInterruptFlags(Timer12::InterruptFlag::Update);
+		interrupts[12]++;
+	}
 }
 
 MODM_ISR(TIM8_UP_TIM13)
 {
-	Timer8::acknowledgeInterruptFlags(Timer8::InterruptFlag::Update);
-	Timer13::acknowledgeInterruptFlags(Timer13::InterruptFlag::Update);
-	LedGreen::toggle();
+	if (Timer8::getInterruptFlags() & Timer8::InterruptFlag::Update) {
+		Timer8::acknowledgeInterruptFlags(Timer8::InterruptFlag::Update);
+		interrupts[8]++;
+	}
+	if (Timer13::getInterruptFlags() & Timer13::InterruptFlag::Update) {
+		Timer13::acknowledgeInterruptFlags(Timer13::InterruptFlag::Update);
+		interrupts[13]++;
+	}
 }
 
 MODM_ISR(TIM8_TRG_COM_TIM14)
 {
-	Timer14::acknowledgeInterruptFlags(Timer14::InterruptFlag::Update);
-	LedRed::toggle();
+	if (Timer14::getInterruptFlags() & Timer14::InterruptFlag::Update) {
+		Timer14::acknowledgeInterruptFlags(Timer14::InterruptFlag::Update);
+		interrupts[14]++;
+	}
 }
