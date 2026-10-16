@@ -1,7 +1,15 @@
 <library>
   <!-- CI: run -->
+  <extends>modm:hosted</extends>
+  <!-- <extends>modm:mega-2560-pro</extends> -->
+  <!-- <extends>modm:nucleo-f091rc</extends> -->
+  <!-- <extends>modm:nucleo-g0b1re</extends> -->
+  <!-- <extends>modm:nucleo-f207zg</extends> -->
+  <!-- <extends>modm:nucleo-l452re</extends> -->
+  <!-- <extends>modm:disco-f746ng</extends> -->
+  <!-- <extends>modm:nrf5340-dk</extends> -->
   <options>
-    <option name="modm:target">hosted-linux</option>
+    <option name="modm:build:info.build">True</option>
     <option name="modm:build:info.git">Info+Status</option>
   </options>
   <modules>
