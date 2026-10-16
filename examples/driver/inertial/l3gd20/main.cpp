@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2018, Niklas Hauser
- * Copyright (c) 2015, Kevin Läufer
+ * Copyright (c) 2015-2016, Kevin Läufer
  * Copyright (c) 2015, Martin Esser
  * Copyright (c) 2018, Christopher Durand
  * Copyright (c) 2024, Carl Treudler
@@ -16,18 +16,11 @@
 #include <modm/board.hpp>
 #include <modm/math/filter.hpp>
 
-// maps arbitrary gpios to a bit
-using LedRing = SoftwareGpioPort<
-	Board::LedOrange,	// 3
-	Board::LedRed,		// 2
-	Board::LedBlue,		// 1
-	Board::LedGreen		// 0
-	>;
-
 // create the data object
 Board::l3g::Gyroscope::Data data;
 // and hand it to the sensor driver
 Board::l3g::Gyroscope gyro(data);
+
 modm::filter::MovingAverage<float, 25> averageZ;
 
 int
@@ -47,14 +40,10 @@ main()
 		// update the moving average
 		averageZ.update(gyro.getData().getZ());
 
-		{
-			float value = averageZ.getValue();
-			// normalize rotation and scale by 5 leds
-			uint16_t leds = abs(value / 200 * 5);
-			leds = (1ul << leds) - 1;
-
-			LedRing::write(leds);
-		}
+		// show the rotation speed as a bar on all LEDs of the board
+		constexpr uint16_t width = Board::Leds::width;
+		const uint16_t leds = std::min<uint16_t>(std::abs(averageZ.getValue() / 200 * width), width);
+		Board::Leds::write((1ul << leds) - 1);
 
 		// repeat every 5 ms
 		modm::delay(5ms);
