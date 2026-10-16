@@ -6,6 +6,9 @@
   </repositories>
 
   <options>
-    <option name="modm:target">hosted-windows</option>
+    <option name="modm:target">hosted-darwin-arm64</option>
   </options>
+  <modules>
+    <module>modm:board:hosted</module>
+  </modules>
 </library>

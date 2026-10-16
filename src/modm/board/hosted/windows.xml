@@ -6,6 +6,9 @@
   </repositories>
 
   <options>
-    <option name="modm:target">hosted-darwin</option>
+    <option name="modm:target">hosted-windows</option>
   </options>
+  <modules>
+    <module>modm:board:hosted</module>
+  </modules>
 </library>

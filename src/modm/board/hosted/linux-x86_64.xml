@@ -6,6 +6,9 @@
   </repositories>
 
   <options>
-    <option name="modm:target">hosted-linux-arm64</option>
+    <option name="modm:target">hosted-linux</option>
   </options>
+  <modules>
+    <module>modm:board:hosted</module>
+  </modules>
 </library>
