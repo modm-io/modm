@@ -300,8 +300,10 @@ MODM_HARDWARE_INIT(modm_context_stkof_init);
 extern "C" void
 UsageFault_Handler()
 {
-	// check if the fault is a stack overflow *from the fiber stack*
-	if (SCB->CFSR & SCB_CFSR_STKOF_Msk and __get_PSP() == __get_PSPLIM())
+	// check if the fault is a stack overflow *from the fiber stack*: the limit
+	// is only set while a fiber runs. An instruction that would overflow the
+	// stack does not change the PSP, only the exception entry sets it to PSPLIM.
+	if (SCB->CFSR & SCB_CFSR_STKOF_Msk and __get_PSPLIM())
 	{
 		// lower the priority of the usage fault to allow the UART interrupts to work
 		NVIC_SetPriority(UsageFault_IRQn, (1ul << __NVIC_PRIO_BITS) - 1ul);

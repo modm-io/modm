@@ -119,7 +119,9 @@ protected:
 	void inline
 	yield()
 	{
-		if (current == nullptr) return;
+		// An interrupt cannot switch to another fiber, so it busy-waits instead,
+		// for example when a fault handler logs and flushes a buffered UART
+		if (current == nullptr or isInsideInterrupt()) return;
 		Task* next = current->next;
 		// If there's only one fiber running, we could just return here.
 		// However, we need to check the stack for overflow.
