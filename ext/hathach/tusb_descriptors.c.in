@@ -40,11 +40,17 @@
 //--------------------------------------------------------------------+
 // Device Descriptors
 //--------------------------------------------------------------------+
+%% set all_vendors = itfs | selectattr(0, "equalto", "VENDOR") | map(attribute=1) | list
 const tusb_desc_device_t desc_device =
 {
 	.bLength            = sizeof(tusb_desc_device_t),
 	.bDescriptorType    = TUSB_DESC_DEVICE,
+%% if all_vendors
+	// USB 2.1 is required for the host to request the BOS descriptor
+	.bcdUSB             = 0x0210,
+%% else
 	.bcdUSB             = 0x0200,
+%% endif
 
 %% if with_cdc
 	// Use Interface Association Descriptor (IAD) for CDC
@@ -195,6 +201,7 @@ tud_descriptor_other_speed_configuration_cb(uint8_t index)
 %% endif
 
 
+%% if all_vendors
 //--------------------------------------------------------------------+
 // BOS Descriptor
 //--------------------------------------------------------------------+
@@ -211,7 +218,7 @@ tud_descriptor_other_speed_configuration_cb(uint8_t index)
   (Section Microsoft OS compatibility descriptors)
 */
 
-%% set vendors = itfs | selectattr(0, "equalto", "VENDOR") | map(attribute=1) | list if itfs_enum | length > 1 else []
+%% set vendors = all_vendors if itfs_enum | length > 1 else []
 #define BOS_TOTAL_LEN (TUD_BOS_DESC_LEN + TUD_BOS_MICROSOFT_OS_DESC_LEN)
 #define MS_OS_20_FEATURE_LEN (0x14 + 0x84)
 %% if vendors
@@ -317,6 +324,7 @@ bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_requ
   return false;
 }
 
+%% endif
 //--------------------------------------------------------------------+
 // String Descriptors
 //--------------------------------------------------------------------+
