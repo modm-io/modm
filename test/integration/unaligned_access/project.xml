@@ -1,5 +1,10 @@
 <library>
   <extends>modm:disco-f072rb</extends>
+  <!-- <extends>modm:nucleo-g0b1re</extends> -->
+  <!-- <extends>modm:nucleo-f207zg</extends> -->
+  <!-- <extends>modm:disco-f411ve</extends> -->
+  <!-- <extends>modm:devebox-stm32h750vb</extends> -->
+  <!-- <extends>modm:nrf5340-dk</extends> -->
   <modules>
     <module>modm:architecture:unaligned</module>
     <module>modm:container</module>
