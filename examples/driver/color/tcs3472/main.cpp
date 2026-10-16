@@ -1,4 +1,6 @@
 /*
+ * Copyright (c) 2014, Sascha Schade
+ * Copyright (c) 2014-2018, 2021 Niklas Hauser
  * Copyright (c) 2021, Thomas Sommer
  *
  * This file is part of the modm project.
@@ -15,18 +17,24 @@
 
 using namespace modm::platform;
 
+#ifdef MODM_CPU_AVR
+using SensorI2c = I2cMaster;
+#else
+using SensorI2c = Board::i2c::Controller;
+#endif
+
 modm::Fiber fiber_blink([]
 {
-	LedD13::setOutput();
+	Board::LedD13::setOutput();
 	while (true)
 	{
-		LedD13::toggle();
+		Board::LedD13::toggle();
 		modm::this_fiber::sleep_for(0.5s);
 	}
 });
 
 modm::tcs3472::Data data;
-modm::Tcs3472<I2cMaster> sensor{data};
+modm::Tcs3472<SensorI2c> sensor{data};
 using TCS3472_INT = Board::D2;
 modm::Fiber fiber_sensor([]
 {
@@ -34,14 +42,7 @@ modm::Fiber fiber_sensor([]
 
 	MODM_LOG_INFO << "Ping TCS34725" << modm::endl;
 	// ping the device until it responds
-	while (true)
-	{
-		// we wait until the task started
-		if (sensor.ping()) break;
-		// otherwise, try again in 100ms
-		modm::this_fiber::sleep_for(100ms);
-	}
-
+	while (not sensor.ping()) modm::this_fiber::sleep_for(100ms);
 	MODM_LOG_INFO << "TCS34725 responded" << modm::endl;
 
 	sensor.initialize(sensor.Enable_InterruptMode_Waittime);
@@ -59,6 +60,7 @@ modm::Fiber fiber_sensor([]
 
 	while (true)
 	{
+		// wait until the interrupt pin signals a brighter color
 		sensor.reloadInterrupt();
 		modm::this_fiber::poll([]{ return not TCS3472_INT::read(); });
 		if (sensor.readColor())
@@ -73,7 +75,13 @@ int
 main()
 {
 	Board::initialize();
-	I2cMaster::initialize<Board::SystemClock, 100_kHz>();
+#ifdef MODM_CPU_AVR
+	SensorI2c::initialize<Board::SystemClock, 100_kHz>();
+#else
+	Board::initializeI2c();
+#endif
+
+	MODM_LOG_INFO << "Welcome to the TCS3472 demo!" << modm::endl;
 
 	modm::fiber::Scheduler::run();
 	return 0;
