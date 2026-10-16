@@ -9,6 +9,8 @@
  */
 
 #include <modm/board.hpp>
+
+#include "../integration_test.hpp"
 #include <modm/processing.hpp>
 #include <modm/architecture/interface/i2c_device.hpp>
 
@@ -24,7 +26,7 @@
  * sigrok-cli --driver fx2lafw --config samplerate=1m --samples 64k --channels D4=sda,D5=scl --triggers sda=f --wait-trigger -P i2c:sda=sda:scl=scl
  */
 
-using MyI2cMaster = modm::platform::I2cMaster1;
+using MyI2cMaster = Board::i2c::Controller;
 
 using namespace Board;
 
@@ -103,38 +105,31 @@ main()
 {
 	Board::initialize();
 
-	MyI2cMaster::connect<Board::D14::Sda, Board::D15::Scl>();
+	MyI2cMaster::connect<Board::i2c::Sda::Sda, Board::i2c::Scl::Scl>();
 	MyI2cMaster::initialize<Board::SystemClock, 100_kHz>();
 
-	LedGreen::set();
-
-	device.ping();
+	// A device must acknowledge its address and all data
+	bool passed = device.ping();
 	modm::delay(25us);
 
+	// transactions without data
 	device.write(0);
 	modm::delay(25us);
 
-	device.write(1);
+	passed &= device.write(1);
 	modm::delay(25us);
 
-	device.write(2);
+	passed &= device.write(2);
 	modm::delay(25us);
 
 	device.writeRead(0, 5);
 	modm::delay(25us);
 
-	device.writeRead(1, 5);
+	passed &= device.writeRead(1, 5);
 	modm::delay(25us);
 
-	device.writeRead(2, 5);
+	passed &= device.writeRead(2, 5);
 	modm::delay(25us);
 
-	// Blink if run without hanging.
-	while(true)
-	{
-		LedGreen::toggle();
-		modm::delay(500ms);
-	}
-
-	return 0;
+	return finishTest(passed);
 }
