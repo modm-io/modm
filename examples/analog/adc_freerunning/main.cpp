@@ -2,6 +2,7 @@
  * Copyright (c) 2016-2017, Niklas Hauser
  * Copyright (c) 2017, Nick Sarten
  * Copyright (c) 2018, Carl Treudler
+ * Copyright (c) 2019, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -14,40 +15,57 @@
 
 using namespace Board;
 
-typedef GpioInputA0 AdcIn1;
+// ----------------------------------------------------------------------------
+// The ADC, its analog input and its clock differ between the devices
+#if defined STM32G0
+using MyAdc = Adc1;
+using AdcInput = GpioB10;
+using AdcSignal = AdcInput::In11;
+constexpr auto AdcClockMode = MyAdc::ClockMode::Asynchronous;
+constexpr auto AdcFrequency = 1_MHz;
+constexpr auto AdcSampleTime = MyAdc::SampleTime::Cycles160_5;
+#else
+using MyAdc = Adc;
+using AdcInput = GpioA0;
+using AdcSignal = AdcInput::In0;
+constexpr auto AdcClockMode = MyAdc::ClockMode::Synchronous;
+constexpr auto AdcFrequency = 12_MHz;
+constexpr auto AdcSampleTime = MyAdc::SampleTime::Cycles239_5;
+#endif
 
 int
 main()
 {
 	Board::initialize();
-	LedD13::setOutput();
+	Board::Leds::setOutput();
+	MyAdc::connect<AdcSignal>();
 
-	Adc::connect<AdcIn1::In0>();
-	Adc::initialize<Board::SystemClock, Adc::ClockMode::Synchronous, 12_MHz>();
+	MyAdc::initialize<Board::SystemClock, AdcClockMode, AdcFrequency>();
 
-	uint16_t Vref = Adc::readInternalVoltageReference();
-	int16_t Temp = Adc::readTemperature(Vref);
+	uint16_t Vref = MyAdc::readInternalVoltageReference();
+	int16_t Temp = MyAdc::readTemperature(Vref);
 	MODM_LOG_INFO << "Vref=" << Vref << modm::endl;
 	MODM_LOG_INFO << "Temp=" << Temp << modm::endl;
 
-	MODM_LOG_INFO << "TS_CAL1=" << *Adc::TS_CAL1 << modm::endl;
-	MODM_LOG_INFO << "TS_CAL2=" << *Adc::TS_CAL2 << modm::endl;
-	MODM_LOG_INFO << "VREFINT_CAL=" << *Adc::VREFINT_CAL << modm::endl;
+	MODM_LOG_INFO << "TS_CAL1=" << *MyAdc::TS_CAL1 << modm::endl;
+	MODM_LOG_INFO << "VREFINT_CAL=" << *MyAdc::VREFINT_CAL << modm::endl;
 
-	Adc::setPinChannel<AdcIn1>();
-	Adc::setResolution(Adc::Resolution::Bits12);
-	Adc::setRightAdjustResult();
-	Adc::setSampleTime(Adc::SampleTime::Cycles239_5);
-	Adc::enableFreeRunningMode();
-	Adc::startConversion();
+	MyAdc::setPinChannel<AdcInput>();
+	MyAdc::setResolution(MyAdc::Resolution::Bits12);
+	MyAdc::setRightAdjustResult();
+	MyAdc::setSampleTime(AdcSampleTime);
+	MyAdc::enableFreeRunningMode();
+#ifdef STM32G0
+	MyAdc::enableOversampling(MyAdc::OversampleRatio::x256, MyAdc::OversampleShift::Div256);
+#endif
+	MyAdc::startConversion();
 
 	while (true)
 	{
-		LedD13::toggle();
+		Board::Leds::toggle();
 		modm::delay(100ms);
 
-		MODM_LOG_INFO << "mV=" << (Vref * Adc::getValue() / 4095ul) << modm::endl;
-
+		MODM_LOG_INFO << "mV=" << (Vref * MyAdc::getValue() / 4095ul) << modm::endl;
 	}
 
 	return 0;
