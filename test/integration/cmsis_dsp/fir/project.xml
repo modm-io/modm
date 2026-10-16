@@ -1,7 +1,12 @@
 <library>
+  <!-- CI: run -->
   <extends>modm:nucleo-f429zi</extends>
+  <!-- <extends>modm:hosted</extends> -->
+  <!-- <extends>modm:nucleo-l031k6</extends> -->
   <modules>
     <module>modm:build:scons</module>
     <module>modm:cmsis:dsp:filtering</module>
+    <module>modm:platform:core</module>
+    <module>modm:debug</module>
   </modules>
 </library>
