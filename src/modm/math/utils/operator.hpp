@@ -47,19 +47,19 @@ namespace modm
 		/**
 		 * \brief	unsigned 16bit x 16bit = 32bit multiplication
 		 *
-		 * \see		AVR201
 		 * \ingroup	modm_math_utils
 		 */
-		inline uint32_t
+		[[deprecated("use uint32_t(a) * b")]] // DEPRECATED: 2027q4
+		constexpr uint32_t
 		mul(uint16_t a, uint16_t b);
 
 		/**
 		 * \brief	signed 16bit x 16bit = 32bit multiplication
 		 *
-		 * \see		AVR201
 		 * \ingroup	modm_math_utils
 		 */
-		inline int32_t
+		[[deprecated("use int32_t(a) * b")]] // DEPRECATED: 2027q4
+		constexpr int32_t
 		mul(int16_t a, int16_t b);
 
 		/**
@@ -70,10 +70,10 @@ namespace modm
 		 * result += a * b;
 		 * \endcode
 		 *
-		 * \see		AVR201
 		 * \ingroup	modm_math_utils
 		 */
-		inline int32_t
+		[[deprecated("use result + int32_t(a) * b")]] // DEPRECATED: 2027q4
+		constexpr int32_t
 		mac(int32_t result, int16_t a, int16_t b);
 	}
 }

@@ -15,7 +15,6 @@
 #include <cmath>
 
 #include <modm/debug/logger.hpp>
-#include <modm/math/utils/operator.hpp>
 
 #ifndef MODM_BMP085_DATA_HPP
 #	error  "Don't include this file directly, use 'bmp180_data.hpp' instead!"
@@ -37,7 +36,7 @@ Data::calculateCalibratedTemperature()
 	uint16_t ut = (uint16_t(raw[0]) << 8) | raw[1];
 	MODM_LOG_DEBUG.printf("ut = %" PRId16 "\n", ut);
 
-	x1 = modm::math::mul( int16_t(ut - calibration.ac6), int16_t(calibration.ac5)) >> 15;
+	x1 = int32_t(int16_t(ut - calibration.ac6)) * int16_t(calibration.ac5) >> 15;
 	MODM_LOG_DEBUG.printf("x1 = %" PRId32 "\n", x1);
 
 	x2 = (int32_t(calibration.mc) << 11) / (x1 + calibration.md);
@@ -64,22 +63,22 @@ Data::calculateCalibratedPressure()
 
 	uint32_t up = ( (uint32_t(raw[2]) << 16) | (uint16_t(raw[3]) << 8) | raw[4] ) >> (8 - oss);
 	b6 = int16_t(b5 - 4'000);
-	x1 = modm::math::mul(calibration.b2, modm::math::mul(b6, b6) >> 12) >> 11;
-	x2 = modm::math::mul(calibration.ac2, b6) >> 11;
+	x1 = (calibration.b2 * int32_t(int16_t((b6 * int32_t(b6)) >> 12))) >> 11;
+	x2 = (calibration.ac2 * int32_t(b6)) >> 11;
 	x3 = x1 + x2;
-	b3 = (modm::math::mul(calibration.ac1, 4) + x3) << oss;
+	b3 = (int32_t(calibration.ac1) * 4 + x3) << oss;
 	b3 = (b3 + 2) >> 2;
-	x1 = modm::math::mul(calibration.ac3, b6) >> 13;
-	x2 = modm::math::mul(calibration.b1, modm::math::mul(b6, b6) >> 12) >> 16;
+	x1 = (calibration.ac3 * int32_t(b6)) >> 13;
+	x2 = (calibration.b1 * int32_t(int16_t((b6 * int32_t(b6)) >> 12))) >> 16;
 	x3 = ((x1 + x2) + 2) >> 2;
-	b4 = modm::math::mul(calibration.ac4, uint16_t(x3 + 32'768)) >> 15;
+	b4 = (calibration.ac4 * uint32_t(uint16_t(x3 + 32'768))) >> 15;
     b7 = (up - b3) * (50'000 >> oss);
 	if (b7 < 0x80000000)
 		p = (b7 << 1) / b4;
 	else
 		p = (b7 / b4) << 1;
 
-	x1 = modm::math::mul(uint16_t(p >> 8), uint16_t(p >> 8));
+	x1 = uint32_t(uint16_t(p >> 8)) * uint16_t(p >> 8);
 	x1 = (x1 * 3'038) >> 16;
 	x2 = (-7'357 * p) >> 16;
 	calibratedPressure = p + ((x1 + x2 + 3'791) >> 4);
