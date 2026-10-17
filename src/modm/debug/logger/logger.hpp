@@ -46,12 +46,11 @@ namespace modm
 		class Logger : public ::modm::IOStream
 		{
 			public:
-				inline Logger(::modm::IODevice& outputDevice) :
+				constexpr Logger(::modm::IODevice& outputDevice) :
 					IOStream(outputDevice)
 				{
 				}
 
-			private:
 				Logger(const Logger&) = delete;
 
 				Logger&
