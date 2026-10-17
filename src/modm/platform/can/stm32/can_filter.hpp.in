@@ -32,10 +32,10 @@ class CanFilter
 {
 	// internal constants
 	static const uint32_t MASK_MODE	= 0x00;
-	static const uint32_t LIST_MODE = 0x02;
+	static constexpr uint32_t LIST_MODE = 0x02;
 
-	static const uint32_t DUAL_MODE = 0x00;
-	static const uint32_t SINGLE_MODE = 0x04;
+	static constexpr uint32_t DUAL_MODE = 0x00;
+	static constexpr uint32_t SINGLE_MODE = 0x04;
 
 public:
 	enum Fifo

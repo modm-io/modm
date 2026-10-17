@@ -28,7 +28,7 @@ namespace modm::platform
 /// @ingroup modm_platform_adc
 class {{type | capitalize}}{{instance}} : modm::Adc
 {
-	static const modm::frequency_t MaxAdcFrequency = modm::MHz({{max_frequency}});
+	static constexpr modm::frequency_t MaxAdcFrequency = modm::MHz({{max_frequency}});
 
 	// Work around a name collision between 'struct modm::Adc' and 'struct Adc'
 	// defined in the CMSIS headers

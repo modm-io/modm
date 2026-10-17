@@ -28,7 +28,7 @@ namespace modm
 	template <typename T>
 	struct GeometricTraits
 	{
-		static const bool isValidType = false;
+		static constexpr bool isValidType = false;
 
 		/**
 		 * \brief	Round if converting from a floating point base to
@@ -47,7 +47,7 @@ namespace modm
 	template <>
 	struct GeometricTraits<int8_t>
 	{
-		static const bool isValidType = true;
+		static constexpr bool isValidType = true;
 
 		typedef float FloatType;
 		typedef int16_t WideType;
@@ -63,7 +63,7 @@ namespace modm
 	template <>
 	struct GeometricTraits<uint8_t>
 	{
-		static const bool isValidType = true;
+		static constexpr bool isValidType = true;
 
 		typedef float FloatType;
 		typedef int16_t WideType;
@@ -78,7 +78,7 @@ namespace modm
 	template <>
 	struct GeometricTraits<int16_t>
 	{
-		static const bool isValidType = true;
+		static constexpr bool isValidType = true;
 
 		typedef float FloatType;
 		typedef int32_t WideType;
@@ -93,7 +93,7 @@ namespace modm
 	template <>
 	struct GeometricTraits<int32_t>
 	{
-		static const bool isValidType = true;
+		static constexpr bool isValidType = true;
 
 		typedef float FloatType;
 
@@ -112,7 +112,7 @@ namespace modm
 	template <>
 	struct GeometricTraits<float>
 	{
-		static const bool isValidType = true;
+		static constexpr bool isValidType = true;
 
 		typedef float FloatType;
 		typedef float WideType;
@@ -127,7 +127,7 @@ namespace modm
 	template <>
 	struct GeometricTraits<double>
 	{
-		static const bool isValidType = true;
+		static constexpr bool isValidType = true;
 
 		typedef double FloatType;
 		typedef double WideType;

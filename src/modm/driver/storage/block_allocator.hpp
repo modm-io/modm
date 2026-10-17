@@ -76,7 +76,7 @@ private:
 	T *
 	alignPointer(void * ptr) const;
 
-	//static const int MAX_BLOCK_PARTS = 2048;
+	//static constexpr int MAX_BLOCK_PARTS = 2048;
 
 	T* start;
 	T* end;

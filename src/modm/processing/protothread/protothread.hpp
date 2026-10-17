@@ -116,7 +116,7 @@ namespace modm
 			typedef uint16_t PtState;
 
 			/// An invalid line number, used to mark the protothread has ended.
-			static const PtState Invalid = static_cast<PtState>(-1);
+			static constexpr PtState Invalid = static_cast<PtState>(-1);
 
 			/**
 			 * Stores the protothread's position (by storing the line number of

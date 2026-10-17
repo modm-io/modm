@@ -25,7 +25,7 @@ namespace modm::platform
 class {{ hal }} : public UartBase
 {
 public:
-	static const Peripheral UartPeripheral = Peripheral::{{ uart_peripheral }};
+	static constexpr Peripheral UartPeripheral = Peripheral::{{ uart_peripheral }};
 	static inline modm::inplace_function<bool(bool)> InterruptCallback;
 
 	enum class

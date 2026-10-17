@@ -34,7 +34,7 @@ struct hx711
 	{
 		using Sck = void; // required
 		using Data = void; // required
-		static const InputChannelAndGain mode = InputChannelAndGain::ChA_128;
+		static constexpr InputChannelAndGain mode = InputChannelAndGain::ChA_128;
 	};
 };
 

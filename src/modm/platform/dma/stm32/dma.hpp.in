@@ -315,23 +315,23 @@ public:
 		interruptHandler()
 		{
 %% if dmaType in ["stm32-channel-request", "stm32-channel", "stm32-mux"]
-			static const uint32_t HT_Flag {
+			static constexpr uint32_t HT_Flag {
 				uint32_t(InterruptFlags::HalfTransferComplete) << (uint32_t(ChannelID) * 4)
 			};
-			static const uint32_t TC_Flag {
+			static constexpr uint32_t TC_Flag {
 				uint32_t(InterruptFlags::TransferComplete) << (uint32_t(ChannelID) * 4)
 			};
-			static const uint32_t TE_Flag {
+			static constexpr uint32_t TE_Flag {
 				uint32_t(InterruptFlags::Error) << (uint32_t(ChannelID) * 4)
 			};
 %% elif dmaType in ["stm32-stream-channel", "stm32-mux-stream"]
-			static const uint64_t HT_Flag {
+			static constexpr uint64_t HT_Flag {
 				uint64_t(InterruptFlags::HalfTransferComplete) << FlagOffsetLut[uint32_t(ChannelID)]
 			};
-			static const uint64_t TC_Flag {
+			static constexpr uint64_t TC_Flag {
 				uint64_t(InterruptFlags::TransferComplete) << FlagOffsetLut[uint32_t(ChannelID)]
 			};
-			static const uint64_t TE_Flag {
+			static constexpr uint64_t TE_Flag {
 				uint64_t(InterruptFlags::Error) << FlagOffsetLut[uint32_t(ChannelID)]
 			};
 %% endif

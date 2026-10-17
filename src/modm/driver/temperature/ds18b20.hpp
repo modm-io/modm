@@ -126,12 +126,12 @@ namespace modm
 
 		uint8_t identifier[8];
 
-		static const uint8_t CONVERT_T = 0x44;
-		static const uint8_t WRITE_SCRATCHPAD = 0x4e;
-		static const uint8_t READ_SCRATCHPAD = 0xbe;
-		static const uint8_t COPY_SCRATCHPAD = 0x48;
+		static constexpr uint8_t CONVERT_T = 0x44;
+		static constexpr uint8_t WRITE_SCRATCHPAD = 0x4e;
+		static constexpr uint8_t READ_SCRATCHPAD = 0xbe;
+		static constexpr uint8_t COPY_SCRATCHPAD = 0x48;
 		static const uint8_t RECALL_E2 = 0xb8;
-		static const uint8_t READ_POWER_SUPPLY = 0xb4;
+		static constexpr uint8_t READ_POWER_SUPPLY = 0xb4;
 
 		static OneWire ow;
 	};
