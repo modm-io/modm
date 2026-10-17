@@ -96,6 +96,40 @@ including `modm:processing:fiber` or not. This compromise allows for a seamless
 transition between different devices and scheduling strategies.
 
 
+## Synchronization without Scheduler
+
+The synchronization primitives of the `modm:processing:fiber` module are also
+available without the scheduler, with the exception of `modm::fiber::barrier`,
+which requires multiple fibers. They can then be used to synchronize the main
+context with interrupts:
+
+```cpp
+#include <modm/processing/fiber/semaphore.hpp>
+
+modm::fiber::binary_semaphore data_ready{0};
+MODM_ISR(EXTI0)
+{
+    data_ready.release();
+}
+int main()
+{
+    while(true)
+    {
+        data_ready.acquire(); // waits in place for the interrupt
+        // process data
+    }
+}
+```
+
+!!! warning "Blocking calls wait in place"
+    Without the scheduler there is no other fiber that can make progress, so a
+    blocking call like `lock()`, `acquire()` or `wait()` only returns if an
+    interrupt unlocks, releases or notifies the primitive. Locking a
+    non-recursive mutex twice in the main context therefore waits forever.
+    Use the `try_*()` functions or the timed `try_*_for()` and `try_*_until()`
+    functions if you cannot guarantee this.
+
+
 ## Identifier
 
 You can check what fiber your code is executed in by calling the `get_id()`
@@ -109,6 +143,8 @@ auto id = modm::this_fiber::get_id();
 
 The returned ID is the address of the currently running fiber object. If called
 outside of a fiber, for example, in the main function before the scheduler is
-running, the function returns `0`. The implementation ensures that all returned
+running or if the scheduler is not included, the function returns `0`. On
+Cortex-M devices the function returns the interrupt number if called from
+inside an interrupt. The implementation ensures that all returned
 values are unique and thus allow the ID to be used for tracking ownership of
 various recursive locks, for example.

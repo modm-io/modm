@@ -85,6 +85,10 @@ jobs:
         if: always()
         run: |
           (cd test && make run-hosted-linux-clang)
+      - name: Hosted Unittests (without Fiber Scheduler)
+        if: always()
+        run: |
+          (cd test && make run-hosted-linux-no-fiber)
       - name: Compile STM32 Unittests
         if: always()
         run: |

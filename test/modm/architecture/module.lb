@@ -11,12 +11,27 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 
+class Fiber(Module):
+    def init(self, module):
+        module.name = "fiber"
+        module.description = "Tests for Fiber Synchronization outside of Fibers"
+
+    def prepare(self, module, options):
+        module.depends("modm:architecture:fiber")
+        return True
+
+    def build(self, env):
+        env.outbasepath = "modm-test/src/modm-test/architecture"
+        env.copy("fiber")
+
+
 def init(module):
     module.name = ":test:architecture"
     module.description = "Tests for Architecture Interfaces"
 
 
 def prepare(module, options):
+    module.add_submodule(Fiber())
     module.depends(
         ":mock:clock",
         "modm:architecture:accessor",
@@ -32,5 +47,5 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "modm-test/src/modm-test/architecture"
-    env.copy('.')
+    env.copy('.', ignore=env.ignore_paths("*fiber/*"))
 

@@ -11,6 +11,10 @@
 
 #pragma once
 
+%% if core.startswith("cortex-m")
+#include <modm/platform/device.hpp>
+%% endif
+
 /// @cond
 namespace modm::this_fiber
 {
@@ -18,12 +22,16 @@ namespace modm::this_fiber
 void inline
 yield()
 {
-	// do nothing and return
+	__asm__ volatile ("" ::: "memory");
 }
 
 modm::fiber::id inline
 get_id()
 {
+%% if core.startswith("cortex-m")
+	// Ensure that calling this in an interrupt gives a different ID
+	if (const auto irq = __get_IPSR(); irq >= 16) return irq;
+%% endif
 	return 0;
 }
 

@@ -30,6 +30,8 @@ run-hosted-linux:
 	$(call compile-test,hosted,run,-D":target=hosted-linux")
 run-hosted-linux-clang:
 	$(call compile-test,hosted-clang,run,-D":target=hosted-linux")
+run-hosted-linux-no-fiber:
+	$(call compile-test,hosted-no-fiber,run,-D":target=hosted-linux")
 run-hosted-linux-arm64:
 	$(call compile-test,hosted,run,-D":target=hosted-linux-arm64")
 run-hosted-darwin:
