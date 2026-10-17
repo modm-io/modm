@@ -47,11 +47,11 @@ modm_test::platform::SpiMaster::release(void *ctx)
 uint8_t
 modm_test::platform::SpiMaster::transfer(uint8_t data)
 {
-	txBuffer.append(data);
+	txBuffer.push_back(data);
 
-	if(!rxBuffer.isEmpty()) {
-		tmp = rxBuffer.getFront();
-		rxBuffer.removeFront();
+	if(!rxBuffer.empty()) {
+		tmp = rxBuffer.front();
+		rxBuffer.pop_front();
 	}
 	else {
 		tmp = 0;
@@ -66,25 +66,25 @@ modm_test::platform::SpiMaster::transfer(uint8_t * tx, uint8_t * rx, std::size_t
 		//if(tx != nullptr)
 		//	txVector.push_back(tx[i]);
 
-		//txBuffer.append(tx != nullptr ? tx[i] : 0);
+		//txBuffer.push_back(tx != nullptr ? tx[i] : 0);
 
 		if(tx != nullptr) {
-			txBuffer.append(tx[i]);
+			txBuffer.push_back(tx[i]);
 		}
 		else {
-			txBuffer.append(0);
+			txBuffer.push_back(0);
 		}
 
 		if(rx != nullptr) {
-			if(!rxBuffer.isEmpty()) {
-				rx[i] = rxBuffer.getFront();
+			if(!rxBuffer.empty()) {
+				rx[i] = rxBuffer.front();
 			}
 			else {
 				rx[i] = 0;
 			}
 		}
-		if(!rxBuffer.isEmpty()) {
-			rxBuffer.removeFront();
+		if(!rxBuffer.empty()) {
+			rxBuffer.pop_front();
 		}
 	}
 }

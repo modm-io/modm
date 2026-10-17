@@ -18,9 +18,9 @@
 
 // ----------------------------------------------------------------------------
 template <typename T>
-modm::PointSet2D<T>::PointSet2D(SizeType n) :
-	points(n)
+modm::PointSet2D<T>::PointSet2D(SizeType n)
 {
+	points.reserve(n);
 }
 
 template <typename T>
@@ -48,7 +48,7 @@ template <typename T>
 typename modm::PointSet2D<T>::SizeType
 modm::PointSet2D<T>::getNumberOfPoints() const
 {
-	return points.getSize();
+	return points.size();
 }
 
 // ----------------------------------------------------------------------------
@@ -56,7 +56,7 @@ template <typename T>
 void
 modm::PointSet2D<T>::append(const modm::PointSet2D<T>::PointType& point)
 {
-	points.append(point);
+	points.push_back(point);
 }
 
 // ----------------------------------------------------------------------------
@@ -79,7 +79,7 @@ template <typename T>
 void
 modm::PointSet2D<T>::removeAll()
 {
-	points.removeAll();
+	points.clear();
 }
 
 // ----------------------------------------------------------------------------

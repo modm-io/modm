@@ -22,7 +22,7 @@
 #include "abstract_menu.hpp"
 #include "scrollable_text.hpp"
 #include "menu_entry_callback.hpp"
-#include <modm/container/doubly_linked_list.hpp>
+#include <list>
 #include <modm/processing/timer.hpp>
 
 
@@ -140,7 +140,7 @@ namespace modm
 	protected:
 
 		template<typename T>
-		using EntryList = modm::DoublyLinkedList<MenuEntry<T> >;
+		using EntryList = std::list<MenuEntry<T> >;
 
 		EntryList<Allocator> entries;
 

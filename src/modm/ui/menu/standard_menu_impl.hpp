@@ -53,7 +53,7 @@ template<typename Allocator> void
 modm::StandardMenu<Allocator>::addEntry(const char* text, MenuEntryCallback<Allocator> func)
 {
 	modm::MenuEntry entry(text, (this->getViewStack()->getDisplay().getWidth()-16)/6, func);
-	this->entries.append(entry);
+	this->entries.push_back(entry);
 }
 
 template<typename Allocator> void
@@ -72,7 +72,7 @@ modm::StandardMenu<Allocator>::draw()
 	(*display) << this->title;
 	display->drawLine(0, 10, display->getWidth(), 10);
 
-	uint8_t i, count = this->entries.getSize();
+	uint8_t i, count = this->entries.size();
 	typename EntryList<Allocator>::iterator iter = this->entries.begin();
 
 	for(uint8_t j=0; j<this->homePosition; ++j)
@@ -128,7 +128,7 @@ modm::StandardMenu<Allocator>::shortButtonPress(modm::MenuButtons::Button button
 	{
 		case modm::MenuButtons::DOWN:
 		{
-			if (this->position + 1U < this->entries.getSize())
+			if (this->position + 1U < this->entries.size())
 			{
 				typename EntryList<Allocator>::iterator iter = this->entries.begin();
 

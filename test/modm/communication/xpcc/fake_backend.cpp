@@ -23,30 +23,30 @@ void
 FakeBackend::sendPacket(const xpcc::Header &header,
 		modm::SmartPointer payload)
 {
-	this->messagesSend.append(Message(header, payload));
+	this->messagesSend.push_back(Message(header, payload));
 }
 
 // ----------------------------------------------------------------------------
 bool
 FakeBackend::isPacketAvailable() const
 {
-	return !this->messagesToReceive.isEmpty();
+	return !this->messagesToReceive.empty();
 }
 
 const xpcc::Header&
 FakeBackend::getPacketHeader() const
 {
-	return this->messagesToReceive.getFront().header;
+	return this->messagesToReceive.front().header;
 }
 
 const modm::SmartPointer
 FakeBackend::getPacketPayload() const
 {
-	return this->messagesToReceive.getFront().payload;
+	return this->messagesToReceive.front().payload;
 }
 
 void
 FakeBackend::dropPacket()
 {
-	this->messagesToReceive.removeFront();
+	this->messagesToReceive.pop_front();
 }

@@ -37,21 +37,21 @@ template<typename Driver>
 bool
 xpcc::CanConnector<Driver>::isPacketAvailable() const
 {
-	return !this->receivedMessages.isEmpty();
+	return !this->receivedMessages.empty();
 }
 
 template<typename Driver>
 const xpcc::Header&
 xpcc::CanConnector<Driver>::getPacketHeader() const
 {
-	return this->receivedMessages.getFront().header;
+	return this->receivedMessages.front().header;
 }
 
 template<typename Driver>
 const modm::SmartPointer
 xpcc::CanConnector<Driver>::getPacketPayload() const
 {
-	return this->receivedMessages.getFront().payload;
+	return this->receivedMessages.front().payload;
 }
 
 // ----------------------------------------------------------------------------
@@ -73,7 +73,7 @@ xpcc::CanConnector<Driver>::sendPacket(const Header &header, modm::SmartPointer 
 	if (!successful)
 	{
 		// append the message to the list of waiting messages
-		this->sendList.append(SendListItem(identifier, payload));
+		this->sendList.push_back(SendListItem(identifier, payload));
 	}
 }
 
@@ -82,7 +82,7 @@ template<typename Driver>
 void
 xpcc::CanConnector<Driver>::dropPacket()
 {
-	this->receivedMessages.removeFront();
+	this->receivedMessages.pop_front();
 }
 
 // ----------------------------------------------------------------------------
@@ -117,19 +117,19 @@ template<typename Driver>
 void
 xpcc::CanConnector<Driver>::sendWaitingMessages()
 {
-	if (this->sendList.isEmpty()) {
+	if (this->sendList.empty()) {
 		// no message in the queue
 		return;
 	}
 	else if (canDriver->getBusState() != Driver::BusState::Connected) {
 		// No connection to the CAN bus, drop all messages which should be send
-		while (!sendList.isEmpty()) {
-			sendList.removeFront();
+		while (!sendList.empty()) {
+			sendList.pop_front();
 		}
 		return;
 	}
 
-	SendListItem& message = this->sendList.getFront();
+	SendListItem& message = this->sendList.front();
 
 	uint8_t messageSize = message.payload.getSize();
 	if (messageSize > 8)
@@ -160,7 +160,7 @@ xpcc::CanConnector<Driver>::sendWaitingMessages()
 			{
 				// message was the last fragment
 				// => remove it from the list
-				this->sendList.removeFront();
+				this->sendList.pop_front();
 				this->messageCounter += 0x10;
 			}
 		}
@@ -170,7 +170,7 @@ xpcc::CanConnector<Driver>::sendWaitingMessages()
 		if (this->sendMessage(message.identifier, message.payload.getPointer(),
 				messageSize))
 		{
-			this->sendList.removeFront();
+			this->sendList.pop_front();
 		}
 	}
 }
@@ -187,8 +187,8 @@ xpcc::CanConnector<Driver>::retrieveMessage()
 
 		if (!isFragment)
 		{
-			this->receivedMessages.append(ReceiveListItem(message.length, header));
-			std::memcpy(this->receivedMessages.getBack().payload.getPointer(),
+			this->receivedMessages.push_back(ReceiveListItem(message.length, header));
+			std::memcpy(this->receivedMessages.back().payload.getPointer(),
 					message.data,
 					message.length);
 		}
@@ -246,7 +246,7 @@ xpcc::CanConnector<Driver>::retrieveMessage()
 			if (packet == this->pendingMessages.end()) {
 				// message not found => first part of this message,
 				// prepend it to the list
-				this->pendingMessages.prepend(ReceiveListItem(messageSize, header, counter));
+				this->pendingMessages.push_front(ReceiveListItem(messageSize, header, counter));
 				packet = this->pendingMessages.begin();
 			}
 
@@ -269,8 +269,8 @@ xpcc::CanConnector<Driver>::retrieveMessage()
 			// for more messages
 			if (modm::bitCount(packet->receivedFragments) == numberOfFragments)
 			{
-				this->receivedMessages.append(*packet);
-				this->pendingMessages.remove(packet);
+				this->receivedMessages.push_back(*packet);
+				this->pendingMessages.erase(packet);
 			}
 		}
 

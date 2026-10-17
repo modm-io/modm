@@ -9,7 +9,7 @@ Example:
 ```cpp
 // Definition of the supporting points. The first type is the
 // input type, the second the output type
-using Point = modm::Pair<int8_t, int16_t>;
+using Point = std::pair<int8_t, int16_t>;
 
 // Create a array of supporting points describing the curve.
 const Point supportingPoints[6] =
@@ -33,7 +33,7 @@ Example with supporting points read from flash:
 
 ```cpp
 // Definition of a supporting point
-using Point = modm::Pair<int8_t, int16_t>;
+using Point = std::pair<int8_t, int16_t>;
 
 // Array of supporting points in flash
 FLASH_STORAGE(Point supportingPoints[6]) =
@@ -62,7 +62,7 @@ int16_t b = value.interpolate(a);
 Example:
 
 ```cpp
-using Point = modm::Pair<float, float>;
+using Point = std::pair<float, float>;
 
 // interpolate x^2 over the range of 1 <= x <= 3
 Point points[3] =
@@ -80,7 +80,7 @@ float output = value.interpolate(1.5f);
 ```
 
 !!!warning
-    Only floating points types are allowed as second type of `modm::Pair`,
+    Only floating points types are allowed as second type of `std::pair`,
     otherwise the calculation will deliver wrong results!
 
 See [Wikipedia](http://en.wikipedia.org/wiki/Lagrange_interpolation).

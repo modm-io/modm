@@ -15,10 +15,9 @@
 #define MODM_GUI_TYPES_HPP
 
 #include <modm/ui/display.hpp>
-#include <modm/container/dynamic_array.hpp>
-#include <modm/container/linked_list.hpp>
-#include <modm/container/queue.hpp>
-#include <modm/container/doubly_linked_list.hpp>
+#include <vector>
+#include <list>
+#include <queue>
 #include <modm/processing/timer.hpp>
 
 #include <modm/debug/logger.hpp>
@@ -41,7 +40,7 @@ class Widget;
 
 /// Container used in view to store widgets
 /// @ingroup modm_ui_gui
-typedef modm::DynamicArray<Widget*> WidgetContainer;
+typedef std::vector<Widget*> WidgetContainer;
 /// @ingroup modm_ui_gui
 typedef void (*genericCallback)(void*);
 
@@ -128,9 +127,9 @@ private:
 };
 
 /// @ingroup modm_ui_gui
-typedef modm::DoublyLinkedList<AsyncEvent*> AsyncEventList;
+typedef std::list<AsyncEvent*> AsyncEventList;
 /// @ingroup modm_ui_gui
-typedef modm::Queue<InputEvent*, modm::LinkedList<InputEvent*> > inputQueue;
+typedef std::queue<InputEvent*, std::list<InputEvent*> > inputQueue;
 
 /// Callback when an event happend
 /// @ingroup modm_ui_gui

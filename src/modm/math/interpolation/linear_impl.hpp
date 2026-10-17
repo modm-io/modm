@@ -32,8 +32,8 @@ modm::interpolation::Linear<T, Accessor>::interpolate(const InputType& value) co
 {
 	T current(this->supportingPoints[0]);
 
-	if (value <= current.getFirst()) {
-		return current.getSecond();
+	if (value <= current.first) {
+		return current.second;
 	}
 
 	T last(current);
@@ -42,13 +42,13 @@ modm::interpolation::Linear<T, Accessor>::interpolate(const InputType& value) co
 	{
 		current = this->supportingPoints[i];
 
-		if (value <= current.getFirst())
+		if (value <= current.first)
 		{
-			InputType x1_in = last.getFirst();
-			InputType x2_in = current.getFirst();
+			InputType x1_in = last.first;
+			InputType x2_in = current.first;
 
-			OutputType x1_out = last.getSecond();
-			OutputType x2_out = current.getSecond();
+			OutputType x1_out = last.second;
+			OutputType x2_out = current.second;
 
 			InputType a = value - x1_in;		// >0
 			WideType b = static_cast<OutputSignedType>(x2_out) -
@@ -61,5 +61,5 @@ modm::interpolation::Linear<T, Accessor>::interpolate(const InputType& value) co
 		last = current;
 	}
 
-	return current.getSecond();
+	return current.second;
 }

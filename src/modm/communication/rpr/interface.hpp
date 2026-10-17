@@ -16,7 +16,7 @@
 #include <stdint.h>
 
 #include <modm/architecture/utils.hpp>
-#include <modm/container/queue.hpp>
+#include <modm/container/deque.hpp>
 #include <modm/processing/timer.hpp>
 #include <memory>
 
@@ -95,7 +95,7 @@ namespace modm
 			update();
 
 		private:
-			typedef modm::BoundedQueue< Message, 10 > Queue;
+			typedef modm::BoundedDeque< Message, 10 > Queue;
 
 			static void
 			writeByteEscaped(uint8_t data);

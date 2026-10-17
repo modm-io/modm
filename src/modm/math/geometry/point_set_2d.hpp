@@ -14,7 +14,7 @@
 #ifndef MODM_POINT_SET_2D_HPP
 #define MODM_POINT_SET_2D_HPP
 
-#include <modm/container/dynamic_array.hpp>
+#include <vector>
 #include "vector.hpp"
 
 namespace modm
@@ -25,7 +25,7 @@ namespace modm
 	 * Collection of points, represented by their corresponding vectors.
 	 * Used for example to hold the result of a intersection-operation.
 	 *
-	 * Based on the modm::DynamicArray class, therefore grows automatically
+	 * Based on the std::vector class, therefore grows automatically
 	 * if more space than currently allocated is needed. But because this
 	 * is an expensive operation it should be avoid if possible.
 	 *
@@ -73,8 +73,8 @@ namespace modm
 		removeAll();
 
 	public:
-		typedef typename modm::DynamicArray< PointType >::iterator iterator;
-		typedef typename modm::DynamicArray< PointType >::const_iterator const_iterator;
+		typedef typename std::vector< PointType >::iterator iterator;
+		typedef typename std::vector< PointType >::const_iterator const_iterator;
 
 		inline iterator
 		begin();
@@ -89,7 +89,7 @@ namespace modm
 		end() const;
 
 	protected:
-		modm::DynamicArray< PointType > points;
+		std::vector< PointType > points;
 	};
 }
 

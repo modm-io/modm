@@ -34,7 +34,7 @@ modm::gui::GuiViewStack::~GuiViewStack()
 void
 modm::gui::GuiViewStack::pop()
 {
-	modm::gui::View *topElement = this->stack.get();
+	modm::gui::View *topElement = this->stack.top();
 	this->stack.pop();
 
 	delete topElement;

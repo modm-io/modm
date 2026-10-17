@@ -19,8 +19,8 @@
 #define MODM_VIEWSTACK_HPP
 
 #include <modm/ui/display/graphic_display.hpp>
-#include <modm/container/stack.hpp>
-#include <modm/container/linked_list.hpp>
+#include <stack>
+#include <list>
 #include "menu_buttons.hpp"
 #include "abstract_view.hpp"
 
@@ -59,7 +59,7 @@ namespace modm
 		inline modm::AbstractView<Allocator>*
 		get()
 		{
-			return this->stack.get();
+			return this->stack.top();
 		}
 
 		/**
@@ -96,7 +96,7 @@ namespace modm
 		void
 		pop()
 		{
-			modm::AbstractView<Allocator> *topElement = this->stack.get();
+			modm::AbstractView<Allocator> *topElement = this->stack.top();
 			this->stack.pop();
 
 			allocator.destroy(topElement);
@@ -149,7 +149,7 @@ namespace modm
 
 	protected:
 		modm::GraphicDisplay* display;
-		modm::Stack< modm::AbstractView<Allocator>* , modm::LinkedList< modm::AbstractView<Allocator>* > > stack;
+		std::stack< modm::AbstractView<Allocator>*, std::list< modm::AbstractView<Allocator>* > > stack;
 		Allocator allocator;
 	};
 }

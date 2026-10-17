@@ -17,7 +17,7 @@
 #include <stdint.h>
 
 #include <type_traits>
-#include <modm/container/pair.hpp>
+#include <utility>
 #include <modm/architecture/interface/accessor.hpp>
 
 namespace modm
@@ -26,10 +26,10 @@ namespace modm
 	{
 		/**
 		 * \warning	Only floating points types are allowed as second type of
-		 * 			modm::Pair, otherwise the calculation will deliver wrong
+		 * 			std::pair, otherwise the calculation will deliver wrong
 		 * 			results!
 		 *
-		 * \tparam	T	Any specialization of modm::Pair<> with a floating
+		 * \tparam	T	Any specialization of std::pair<> with a floating
 		 * 				point type as second template argument.
 		 * \tparam	Accessor	Accessor class. Can be modm::accessor::Ram,
 		 * 						modm::accessor::Flash or any self defined
@@ -43,20 +43,20 @@ namespace modm
 		class Lagrange
 		{
 		public:
-			typedef typename T::FirstType InputType;
-			typedef typename T::SecondType OutputType;
+			typedef typename T::first_type InputType;
+			typedef typename T::second_type OutputType;
 
 			// WARNING:
-			// Only floating point types are allowed as second type of modm::Pair
+			// Only floating point types are allowed as second type of std::pair
 			// because the calculation will deliver wrong results otherwise!
 			static_assert(std::is_floating_point_v<OutputType>,
-					"Only floating point types are allowed as second type of modm::Pair");
+					"Only floating point types are allowed as second type of std::pair");
 		public:
 			/**
 			 * \brief	Constructor
 			 *
 			 * \param	supportingPoints	Supporting points of the curve.
-			 * 								Needs to be an Array of modm::Pair<>.
+			 * 								Needs to be an Array of std::pair<>.
 			 * \param	numberOfPoints		length of \p supportingPoints
 			 */
 			Lagrange(Accessor<T> supportingPoints, uint8_t numberOfPoints);

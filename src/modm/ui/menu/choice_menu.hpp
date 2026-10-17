@@ -17,7 +17,7 @@
 #include "abstract_menu.hpp"
 #include "scrollable_text.hpp"
 #include "choice_menu_entry.hpp"
-#include <modm/container/doubly_linked_list.hpp>
+#include <list>
 #include <modm/processing/timer.hpp>
 
 namespace modm{
@@ -109,7 +109,7 @@ namespace modm{
 
 	protected:
 
-		typedef modm::DoublyLinkedList<ChoiceMenuEntry> EntryList;
+		typedef std::list<ChoiceMenuEntry> EntryList;
 		EntryList entries;
 	};
 }
