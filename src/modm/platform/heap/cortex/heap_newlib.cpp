@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <reent.h>
+#include <errno.h>
 #include <modm/architecture/interface/assert.h>
 #include <modm/platform/core/heap_table.hpp>
 
@@ -41,11 +42,18 @@ void __modm_initialize_memory(void)
  *         _reent structure as a parameter).
  */
 void * modm_used
-_sbrk_r(struct _reent *,  ptrdiff_t size)
+_sbrk_r(struct _reent *r, ptrdiff_t size)
 {
 	const uint8_t *const heap = heap_top;
+	if (size > heap_end - heap_top)
+	{
+		// newlib returns a nullptr from malloc
+		modm_assert_continue_fail_debug(0, "malloc",
+				"No memory left in heap!", size);
+		r->_errno = ENOMEM;
+		return (void*) -1;
+	}
 	heap_top += size;
-	modm_assert(heap_top < heap_end, "heap.sbrk", "Heap overflowed!", size);
 	return (void*) heap;
 }
 

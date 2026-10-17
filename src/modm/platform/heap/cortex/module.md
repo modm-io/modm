@@ -173,8 +173,9 @@ const uint8_t *heap_top{heap_begin};
 extern "C" modm_used void* _sbrk_r(struct _reent *,  ptrdiff_t size)
 {
     const uint8_t *const heap = heap_top;
+    // malloc returns a nullptr when sbrk fails
+    if (size > heap_end - heap_top) return (void*) -1;
     heap_top += size;
-    modm_assert(heap_top < heap_end, "heap.sbrk", "Heap overflowed!");
     return (void*) heap;
 }
 ```
