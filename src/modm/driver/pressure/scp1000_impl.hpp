@@ -16,25 +16,10 @@
 #endif
 
 template < typename Spi, typename Cs, typename Int >
-Spi modm::Scp1000<Spi, Cs, Int>::spi;
-
-template < typename Spi, typename Cs, typename Int >
-Cs modm::Scp1000<Spi, Cs, Int>::chipSelect;
-
-template < typename Spi, typename Cs, typename Int >
-Int modm::Scp1000<Spi, Cs, Int>::interruptPin;
-
-template < typename Spi, typename Cs, typename Int >
 bool modm::Scp1000<Spi, Cs, Int>::newTemperature(false);
 
 template < typename Spi, typename Cs, typename Int >
 bool modm::Scp1000<Spi, Cs, Int>::newPressure(false);
-
-template < typename Spi, typename Cs, typename Int >
-uint8_t modm::Scp1000<Spi, Cs, Int>::temperature[2];
-
-template < typename Spi, typename Cs, typename Int >
-uint8_t modm::Scp1000<Spi, Cs, Int>::pressure[3];
 
 // ----------------------------------------------------------------------------
 template < typename Spi, typename Cs, typename Int >

@@ -113,11 +113,11 @@ namespace modm
 				ERROR_PAYLOAD = 0x42,	///< Wrong payload size
 			};
 
-			static Interface interface;
+			static inline Interface interface;
 
-			static QueryStatus queryStatus;
-			static uint8_t expectedResponseLength;
-			static modm::ShortTimeout timer;
+			static inline QueryStatus queryStatus;
+			static inline uint8_t expectedResponseLength;
+			static inline modm::ShortTimeout timer;
 			/// timeout value in milliseconds
 			static constexpr std::chrono::milliseconds timeout{10};
 		};

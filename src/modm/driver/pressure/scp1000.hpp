@@ -214,14 +214,14 @@ Ultra Low Power :   ~1Hz  |  15bit   |   14bit
 		static void
 		read16BitRegister(scp1000::Register reg, uint8_t *buffer);
 
-		static Spi spi;
-		static Cs chipSelect;
-		static Int interruptPin;
+		static inline Spi spi;
+		static inline Cs chipSelect;
+		static inline Int interruptPin;
 
 		static bool newTemperature;
 		static bool newPressure;
-		static uint8_t temperature[2];
-		static uint8_t pressure[3];
+		static inline uint8_t temperature[2];
+		static inline uint8_t pressure[3];
 	};
 }
 

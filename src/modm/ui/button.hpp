@@ -44,7 +44,7 @@ namespace modm
 		update();
 
 	private:
-		static uint8_t state;
+		static inline uint8_t state;
 	};
 }
 

@@ -20,13 +20,6 @@
 %% endif
 
 // ----------------------------------------------------------------------------
-template <typename Pin> uint8_t modm::platform::BitBangOneWireMaster<Pin>::lastDiscrepancy;
-template <typename Pin> uint8_t modm::platform::BitBangOneWireMaster<Pin>::lastFamilyDiscrepancy;
-template <typename Pin> bool    modm::platform::BitBangOneWireMaster<Pin>::lastDeviceFlag;
-template <typename Pin> uint8_t modm::platform::BitBangOneWireMaster<Pin>::crc8;
-template <typename Pin> uint8_t modm::platform::BitBangOneWireMaster<Pin>::romBuffer[8];
-
-// ----------------------------------------------------------------------------
 template <typename Pin>
 bool
 modm::platform::BitBangOneWireMaster<Pin>::touchReset()

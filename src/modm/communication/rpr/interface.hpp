@@ -117,22 +117,22 @@ namespace modm
 			moveMessage(Queue &destination, Queue &source);
 
 		private:
-			static uint16_t _address;
-			static uint16_t _groupAddress;
+			static inline uint16_t _address = 0;
+			static inline uint16_t _groupAddress = 0x7fff;
 
-			static Queue messagesToSend;
-			static Queue receivedMessages;
+			static inline Queue messagesToSend;
+			static inline Queue receivedMessages;
 
 			static std::allocator<uint8_t> bufferAllocator;
 
-			static Message receiveBuffer;
-			static uint8_t rx_buffer[N+8];
+			static inline Message receiveBuffer;
+			static inline uint8_t rx_buffer[N+8];
 
-			static uint16_t crc;
-			static uint8_t length;
-			static bool nextEscaped;
+			static inline uint16_t crc = crcInitialValue;
+			static inline uint8_t length = 0;
+			static inline bool nextEscaped = false;
 
-			static uint8_t addressBuffer;
+			static inline uint8_t addressBuffer = 0;
 
 			enum Status
 			{
@@ -144,7 +144,7 @@ namespace modm
 				STATUS_SOURCE_RECOGNISED = 0x01,
 			};
 
-			static uint8_t status;
+			static inline uint8_t status = 0;
 		};
 	}
 }

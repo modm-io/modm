@@ -32,8 +32,6 @@ template <class Scl, class Sda>
 uint16_t modm::platform::BitBangI2cMaster<Scl, Sda>::delayTime(3);
 
 template <class Scl, class Sda>
-modm::I2c::Operation modm::platform::BitBangI2cMaster<Scl, Sda>::nextOperation;
-template <class Scl, class Sda>
 modm::I2cTransaction *modm::platform::BitBangI2cMaster<Scl, Sda>::transactionObject(nullptr);
 template <class Scl, class Sda>
 modm::I2cMaster::Error modm::platform::BitBangI2cMaster<Scl, Sda>::errorState(modm::I2cMaster::Error::NoError);

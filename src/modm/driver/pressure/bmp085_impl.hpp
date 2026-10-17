@@ -99,6 +99,3 @@ modm::Bmp085<I2cMaster>::readout()
 	return true;
 }
 
-template < typename I2cMaster >
-constexpr uint8_t
-modm::Bmp085< I2cMaster >::conversionDelay[];
