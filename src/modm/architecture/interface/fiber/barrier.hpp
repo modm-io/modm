@@ -12,16 +12,28 @@
 #pragma once
 
 #include <modm/architecture/interface/fiber.hpp>
+#include <cstddef>
+#include <cstdint>
 #include <limits>
+#include <utility>
 
 namespace modm::fiber
 {
+
+/// @cond
+// Every `decltype([]{})` is a distinct type, even within the same file, so the
+// default must be a named type to allow declaring `barrier<>` objects extern.
+struct barrier_empty_completion
+{
+	void operator()() const noexcept {}
+};
+/// @endcond
 
 /// Implements the `std::barrier` interface for fibers.
 /// @warning This implementation is not interrupt-safe!
 /// @see https://en.cppreference.com/w/cpp/thread/barrier
 /// @ingroup modm_architecture_fiber
-template< class CompletionFunction = decltype([]{}) >
+template< class CompletionFunction = barrier_empty_completion >
 class barrier
 {
 	barrier(const barrier&) = delete;

@@ -16,6 +16,7 @@
 #include <modm/architecture/interface/fiber/latch.hpp>
 #include <modm/architecture/interface/fiber/barrier.hpp>
 #include <modm/architecture/interface/fiber/condition_variable.hpp>
+#include <type_traits>
 
 void
 FiberSyncTest::testPolling()
@@ -88,9 +89,16 @@ FiberSyncTest::testLatch()
 	TEST_ASSERT_TRUE(ltc.try_wait());
 }
 
+// barrier<> must name the same type everywhere to be declared extern
+extern modm::fiber::barrier<> extern_barrier;
+modm::fiber::barrier<> extern_barrier{1};
+static_assert(std::is_same_v<modm::fiber::barrier<>, decltype(extern_barrier)>);
+
 void
 FiberSyncTest::testBarrier()
 {
+	extern_barrier.arrive_and_wait();
+
 	uint8_t completions{0};
 	modm::fiber::barrier bar{1, [&]{ completions++; }};
 	bar.arrive_and_wait();
