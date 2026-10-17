@@ -15,7 +15,7 @@
 #include <modm/architecture/interface/assert.hpp>
 #include <modm/platform/gpio/connector.hpp>
 #include <modm/math/algorithm/prescaler.hpp>
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 
 #include <hardware/structs/spi.h>
 

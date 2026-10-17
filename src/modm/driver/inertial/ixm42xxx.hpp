@@ -17,7 +17,7 @@
 #include "ixm42xxx_data.hpp"
 #include "ixm42xxx_definitions.hpp"
 #include "ixm42xxx_transport.hpp"
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 
 namespace modm
 {

@@ -27,12 +27,10 @@ def prepare(module, options):
 
 
 def build(env):
-    env.outbasepath = "modm/src/modm/processing/fiber"
-    env.substitutions = {
-        "with_task": True,
-    }
-    env.template("../fiber.hpp.in")
+    env.outbasepath = "modm/src/modm/processing"
+    env.copy("../fiber.hpp", "fiber.hpp")
 
+    env.outbasepath = "modm/src/modm/processing/fiber"
     core = env[":target"].get_driver("core")["type"]
     with_fpu = env.get(":platform:cortex-m:float-abi", "soft") != "soft"
     env.substitutions = {

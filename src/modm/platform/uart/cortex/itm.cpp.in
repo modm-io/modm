@@ -10,7 +10,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/platform/device.hpp>
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 #include "itm.hpp"
 
 %% if options["buffer.tx"]

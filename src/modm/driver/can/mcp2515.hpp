@@ -20,7 +20,7 @@
 #include <modm/architecture/driver/atomic.hpp>
 #include <modm/architecture/interface/can.hpp>
 #include <modm/architecture/interface/spi_device.hpp>
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 
 #include "mcp2515_definitions.hpp"
 #include "mcp2515_bit_timings.hpp"

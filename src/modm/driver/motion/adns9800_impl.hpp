@@ -20,7 +20,7 @@
 #endif
 
 #include <modm/debug/logger.hpp>
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 
 #include "adns9800.hpp"
 #include "adns9800_srom.hpp"

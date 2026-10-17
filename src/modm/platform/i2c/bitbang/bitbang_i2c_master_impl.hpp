@@ -18,7 +18,7 @@
 #ifndef MODM_SOFTWARE_BITBANG_I2C_HPP
 #	error	"Don't include this file directly, use 'bitbang_i2c_master.hpp' instead!"
 #endif
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 
 // debugging for serious dummies
 /*

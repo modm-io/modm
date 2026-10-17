@@ -15,7 +15,7 @@
 #include <optional>
 #include <span>
 #include <utility>
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 #include <modm/math/units.hpp>
 
 // LSM6DSO uses same I2C/SPI transport as the older LIS3 sensors

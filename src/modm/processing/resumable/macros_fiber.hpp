@@ -12,7 +12,7 @@
 #ifndef MODM_RF_MACROS_FIBER_HPP
 #define MODM_RF_MACROS_FIBER_HPP
 
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 #include <mutex>
 
 /// @ingroup modm_processing_resumable

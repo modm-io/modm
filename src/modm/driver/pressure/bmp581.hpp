@@ -15,7 +15,7 @@
 #include <array>
 #include <cstdint>
 #include <modm/architecture/interface/register.hpp>
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 #include <optional>
 
 #include "bmp581_transport.hpp"

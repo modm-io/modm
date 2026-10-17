@@ -21,7 +21,7 @@
 #include <modm/architecture/interface/uart.hpp>
 #include <modm/platform/gpio/connector.hpp>
 #include <modm/architecture/interface/atomic_lock.hpp>
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 #include "uart_base.hpp"
 
 namespace modm::platform

@@ -16,7 +16,7 @@
 	#error	"Don't include this file directly, use 'hd44780_base.hpp' instead!"
 #endif
 
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 
 // ----------------------------------------------------------------------------
 template <typename DATA, typename RW, typename RS, typename E>

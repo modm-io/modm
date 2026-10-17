@@ -17,7 +17,7 @@
 #include <modm/architecture/interface/register.hpp>
 #include <modm/architecture/interface/i2c_device.hpp>
 #include <modm/math/utils/endianness.hpp>
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 
 #include "lm75.hpp"
 

@@ -14,7 +14,7 @@
 
 #include <bit>
 #include <modm/platform.hpp>
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 #include <type_traits>
 
 namespace modm

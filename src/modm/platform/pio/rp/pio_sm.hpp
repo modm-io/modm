@@ -11,7 +11,7 @@
 #pragma once
 
 #include <modm/math/algorithm/prescaler.hpp>
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 #include <hardware/structs/pio.h>
 
 #include "pio_sm_config.hpp"

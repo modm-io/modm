@@ -11,7 +11,7 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/platform/clock/rcc.hpp>
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 
 // Fix the inconsistent naming in ST's register files
 #ifdef RTC_ICSR_INIT

@@ -15,7 +15,7 @@
 #include "i2c.hpp"
 #include "i2c_master.hpp"
 #include "i2c_transaction.hpp"
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 
 namespace modm
 {

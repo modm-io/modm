@@ -14,7 +14,7 @@
 #define MODM_BITBANG_MEMORY_INTERFACE_HPP
 
 #include <modm/architecture/utils.hpp>
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 
 namespace modm
 {

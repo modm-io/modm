@@ -19,7 +19,7 @@
 #include <modm/architecture/interface/spi_device.hpp>
 #include <modm/architecture/interface/register.hpp>
 #include <modm/architecture/interface/gpio.hpp>
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 #include <modm/processing/timer/timeout.hpp>
 
 namespace modm

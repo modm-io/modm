@@ -17,7 +17,7 @@
 
 #include <stdint.h>
 %% if with_fiber
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 %% endif
 %#
 #include "iodevice.hpp"

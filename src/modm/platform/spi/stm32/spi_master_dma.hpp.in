@@ -13,7 +13,7 @@
 #define MODM_STM32_SPI_MASTER{{ id }}_DMA_HPP
 
 #include <modm/platform/dma/dma.hpp>
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 #include "spi_master_{{ id }}.hpp"
 
 namespace modm

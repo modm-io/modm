@@ -17,7 +17,7 @@
 #include <cstdlib>
 
 #include <modm/architecture/interface/block_device.hpp>
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 
 namespace modm
 {

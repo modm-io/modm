@@ -9,7 +9,6 @@
  */
 
 #include <modm/board.hpp>
-#include <modm/processing.hpp>
 #include <modm/driver/display/is31fl3733.hpp>
 
 using namespace Board;

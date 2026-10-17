@@ -16,7 +16,7 @@
 #include <modm/architecture/interface/i2c_device.hpp>
 #include <modm/architecture/interface/spi_device.hpp>
 #include <modm/driver/storage/i2c_eeprom.hpp>
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 
 namespace modm
 {

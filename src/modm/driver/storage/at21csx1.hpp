@@ -20,7 +20,7 @@
 #include <modm/architecture/interface/delay.hpp>
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/math/utils/crc.hpp>
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 
 namespace modm
 {

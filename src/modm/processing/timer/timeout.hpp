@@ -19,7 +19,7 @@
 #include <modm/math/utils/arithmetic_traits.hpp>
 #include <modm/architecture/interface/clock.hpp>
 #include <modm/architecture/interface/assert.hpp>
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 
 namespace modm
 {

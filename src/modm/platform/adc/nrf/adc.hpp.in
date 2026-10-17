@@ -15,7 +15,7 @@
 #include <modm/architecture/interface/adc.hpp>
 #include <modm/platform/device.hpp>
 #include <modm/platform/gpio/base.hpp>
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 
 namespace modm::platform
 {

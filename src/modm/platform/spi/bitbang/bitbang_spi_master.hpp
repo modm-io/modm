@@ -21,7 +21,7 @@
 #include <modm/architecture/interface/spi_master.hpp>
 #include <modm/architecture/interface/delay.hpp>
 #include <modm/platform/gpio/connector.hpp>
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 
 namespace modm
 {

@@ -11,7 +11,7 @@
 
 #pragma once
 #include <modm/architecture/interface/uart.hpp>
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 #include <SEGGER_RTT.h>
 
 namespace modm::platform

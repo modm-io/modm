@@ -15,7 +15,7 @@
 #ifndef MODM_SIEMENS_S65_HPP
 #define MODM_SIEMENS_S65_HPP
 
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 #include <modm/ui/display/monochrome_graphic_display_vertical.hpp>
 
 // to enable this define add it to your ``project.cfg`` and

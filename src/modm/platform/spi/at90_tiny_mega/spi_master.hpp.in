@@ -20,7 +20,7 @@
 #include <modm/architecture/interface/spi_master.hpp>
 #include <modm/math/algorithm/prescaler.hpp>
 #include <modm/platform/gpio/connector.hpp>
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 
 %% set sck = "Sck"
 %% if target["type"] in ["u2"]

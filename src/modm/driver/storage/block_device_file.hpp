@@ -15,7 +15,7 @@
 
 #include <modm/architecture/interface/block_device.hpp>
 
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 
 #include <fstream>
 #include <string>

@@ -15,7 +15,7 @@
 #define MODM_TLC594X_HPP
 
 #include <cstdint>
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/architecture/interface/spi.hpp>
 

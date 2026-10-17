@@ -15,7 +15,7 @@
 #ifndef MODM_NOKIA6610_HPP
 #define MODM_NOKIA6610_HPP
 
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 #include <modm/ui/display/monochrome_graphic_display_vertical.hpp>
 
 namespace modm

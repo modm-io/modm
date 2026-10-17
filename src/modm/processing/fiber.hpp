@@ -10,7 +10,4 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/architecture/interface/fiber.hpp>
-%% if with_task
-// pulls in the fiber and scheduler implementation
 #include "fiber/task.hpp"
-%% endif

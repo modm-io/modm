@@ -12,7 +12,7 @@
 #ifndef MODM_CAT24AA_HPP
 #define MODM_CAT24AA_HPP
 
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 #include <modm/architecture/interface/i2c_device.hpp>
 
 namespace modm

@@ -13,7 +13,7 @@
 #ifndef MODM_DS1302_HPP
 #define MODM_DS1302_HPP
 
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 
 namespace modm
 {

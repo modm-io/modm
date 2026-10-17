@@ -14,7 +14,7 @@
 #define TFT_MEMORY_BUS_HPP_
 
 #include <modm/architecture/utils.hpp>
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 
 namespace modm
 {

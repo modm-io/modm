@@ -15,7 +15,7 @@
 #include <modm/platform/gpio/connector.hpp>
 #include <modm/math/algorithm/prescaler.hpp>
 #include <modm/platform/clock/clockgen.hpp>
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 
 namespace modm::platform {
 

@@ -13,7 +13,7 @@
 #include "{{ type }}_{{ id }}.hpp"
 
 #include <modm/architecture/driver/atomic/queue.hpp>
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 
 %% set name="{}{}".format(type.capitalize(), id)
 %% set reg=name.upper()

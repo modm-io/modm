@@ -14,7 +14,7 @@
 #define MODM_SCP1000_HPP
 
 #include <stdint.h>
-#include <modm/processing/fiber.hpp>
+#include <modm/architecture/interface/fiber.hpp>
 
 namespace modm
 {
