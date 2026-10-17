@@ -18,6 +18,7 @@
 #ifndef MODM_S_CURVE_CONTROLLER_HPP
 #define MODM_S_CURVE_CONTROLLER_HPP
 
+#include <algorithm>
 #include <cmath>
 
 namespace modm

@@ -20,7 +20,7 @@
 float
 modm::Angle::normalize(float angle)
 {
-	if (isPositive(angle))
+	if (not std::signbit(angle))
 	{
 		while (angle > std::numbers::pi_v<float>) {
 			angle -= 2 * std::numbers::pi_v<float>;
@@ -39,7 +39,7 @@ modm::Angle::normalize(float angle)
 float
 modm::Angle::reverse(float angle)
 {
-	if (isPositive(angle))
+	if (not std::signbit(angle))
 	{
 		angle -= std::numbers::pi_v<float>;
 	}
