@@ -39,7 +39,7 @@ public:
 	using Base::attachConfigurationHandler;
 
 	/// @param address i2c data base address (0b1010xxx)
-	At24Mac402(uint8_t address = 0x50);
+	constexpr At24Mac402(uint8_t address = 0x50);
 
 	/**
 	 * Set I2C data base address (0b1010xxx).

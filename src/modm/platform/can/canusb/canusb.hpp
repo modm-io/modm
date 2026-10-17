@@ -40,7 +40,7 @@ template <typename SerialPort>
 class CanUsb : public ::modm::Can
 {
 public:
-	CanUsb(SerialPort& serialPort);
+	constexpr CanUsb(SerialPort& serialPort);
 
 	~CanUsb();
 

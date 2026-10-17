@@ -31,7 +31,7 @@ namespace bme280data
 
 // Fixed point implementation
 
-Data::Data() :
+constexpr Data::Data() :
 	calibratedPressure(0),
 	t_fine(0)
 {

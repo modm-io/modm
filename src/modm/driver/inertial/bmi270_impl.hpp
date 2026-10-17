@@ -21,7 +21,7 @@ namespace modm
 
 template<Bmi270Transport Transport>
 template<typename... Args>
-Bmi270<Transport>::Bmi270(Args... transportArgs) : Transport{transportArgs...}
+constexpr Bmi270<Transport>::Bmi270(Args... transportArgs) : Transport{transportArgs...}
 {}
 
 template<Bmi270Transport Transport>

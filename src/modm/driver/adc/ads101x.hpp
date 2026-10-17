@@ -194,7 +194,7 @@ public:
      * @param data
      * @param address
      */
-    Ads101x(Data &data, uint8_t address = 0x49);
+    constexpr Ads101x(Data &data, uint8_t address = 0x49);
 
     /// Call this function before using the device
     bool

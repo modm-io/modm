@@ -57,7 +57,7 @@ namespace modm
 		 *
 		 * \param 	rom		8-byte unique ROM number of the device
 		 */
-		Ds18b20(const uint8_t *rom);
+		constexpr Ds18b20(const uint8_t *rom);
 
 		/**
 		 * \brief	Configure measurement resolution

@@ -28,7 +28,7 @@ namespace bme280data
 {
 // Double precision implementation
 
-DataDouble::DataDouble() :
+constexpr DataDouble::DataDouble() :
 	t_fine(0)
 {
 }

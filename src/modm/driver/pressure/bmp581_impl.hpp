@@ -22,7 +22,7 @@ using namespace std::chrono_literals;
 
 template<Bmp581Transport Transport>
 template<typename... Args>
-Bmp581<Transport>::Bmp581(Args... transportArgs) : Transport{transportArgs...}
+constexpr Bmp581<Transport>::Bmp581(Args... transportArgs) : Transport{transportArgs...}
 {}
 
 template<Bmp581Transport Transport>

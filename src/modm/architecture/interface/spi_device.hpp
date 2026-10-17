@@ -33,7 +33,7 @@ class SpiDevice
 	Spi::ConfigurationHandler configuration;
 
 public:
-	SpiDevice()
+	constexpr SpiDevice()
 	:	configuration(nullptr)
 	{
 	}

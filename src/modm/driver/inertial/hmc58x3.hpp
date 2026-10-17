@@ -189,7 +189,7 @@ class Hmc58x3 : public hmc58x3, public modm::I2cDevice< I2cMaster >
 {
 protected:
 	/// Constructor, requires a hmc58x3::Data object, sets address to default of 0x1e
-	Hmc58x3(Data &data, uint8_t address=0x1e);
+	constexpr Hmc58x3(Data &data, uint8_t address=0x1e);
 
 public:
 	bool inline

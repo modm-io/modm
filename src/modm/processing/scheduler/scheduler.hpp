@@ -73,7 +73,7 @@ namespace modm
 	private:
 		struct TaskListItem
 		{
-			TaskListItem(Task& task,
+			constexpr TaskListItem(Task& task,
 						 uint16_t period,
 						 Priority priority) :
 				nextTask(0), nextReady(0), task(task),

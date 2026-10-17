@@ -156,7 +156,7 @@ public:
 	 *
 	 * @param address I2C address
 	 */
-	Pca9685(uint8_t address);
+	constexpr Pca9685(uint8_t address);
 
 	/**
 	 * Initialize the device.

@@ -18,7 +18,7 @@
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 2>::Vector() :
+constexpr modm::Vector<T, 2>::Vector() :
 	x(),
 	y()
 {
@@ -26,7 +26,7 @@ modm::Vector<T, 2>::Vector() :
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 2>::Vector(const T& inX, const T& inY) :
+constexpr modm::Vector<T, 2>::Vector(const T& inX, const T& inY) :
 	x(inX),
 	y(inY)
 {
@@ -34,7 +34,7 @@ modm::Vector<T, 2>::Vector(const T& inX, const T& inY) :
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 2>::Vector(
+constexpr modm::Vector<T, 2>::Vector(
 		const modm::Vector<T, 1> &inX,
 		const modm::Vector<T, 1> &inY) :
 	x(inX.x),
@@ -44,7 +44,7 @@ modm::Vector<T, 2>::Vector(
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 2>::Vector(const T &inX, const modm::Vector<T, 1> &inY) :
+constexpr modm::Vector<T, 2>::Vector(const T &inX, const modm::Vector<T, 1> &inY) :
 	x(inX),
 	y(inY.x)
 {
@@ -52,7 +52,7 @@ modm::Vector<T, 2>::Vector(const T &inX, const modm::Vector<T, 1> &inY) :
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 2>::Vector(const modm::Vector<T, 1> &inX, const T &inY) :
+constexpr modm::Vector<T, 2>::Vector(const modm::Vector<T, 1> &inX, const T &inY) :
 	x(inX.x),
 	y(inY)
 {
@@ -60,7 +60,7 @@ modm::Vector<T, 2>::Vector(const modm::Vector<T, 1> &inX, const T &inY) :
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 2>::Vector(T inVal) :
+constexpr modm::Vector<T, 2>::Vector(T inVal) :
 	x(inVal),
 	y(inVal)
 {
@@ -68,7 +68,7 @@ modm::Vector<T, 2>::Vector(T inVal) :
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 2>::Vector(const modm::Matrix<T, 2, 1> &rhs) :
+constexpr modm::Vector<T, 2>::Vector(const modm::Matrix<T, 2, 1> &rhs) :
 	x(reinterpret_cast<const T*>(&rhs)[0]),
 	y(reinterpret_cast<const T*>(&rhs)[1])
 {

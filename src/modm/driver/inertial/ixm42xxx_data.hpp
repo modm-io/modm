@@ -34,7 +34,7 @@ Data
     template < class Transport >
     friend class ::modm::Ixm42xxx;
 
-    Data(std::span<uint8_t> fifoBuffer = std::span<uint8_t>()) :
+    constexpr Data(std::span<uint8_t> fifoBuffer = std::span<uint8_t>()) :
         fifoCount(0),
         fifoBuffer(fifoBuffer),
         accelScale(16.f),
@@ -120,7 +120,7 @@ private:
 struct
 FifoPacket
 {
-    FifoPacket() : header(0), accel(0), gyro(0), temp(0), timestamp(0), extension(0) {}
+    constexpr FifoPacket() : header(0), accel(0), gyro(0), temp(0), timestamp(0), extension(0) {}
 
     // DATA ACCESS
     ///@{
@@ -222,7 +222,7 @@ template <size_t FifoBufferSize>
 struct
 FifoData : public Data
 {
-    FifoData() : Data(std::span<uint8_t>{fifoBuffer}) {}
+    constexpr FifoData() : Data(std::span<uint8_t>{fifoBuffer}) {}
 
     struct iterator
     {

@@ -290,7 +290,7 @@ public:
 
 		static constexpr uint16_t InvalidDistance = 0x1FFE;
 
-		Data() { reset(); }
+		constexpr Data() { reset(); }
 
 		/// @return the distance in millimeters
 		inline uint16_t
@@ -341,7 +341,7 @@ class Vl53l0 : public vl53l0, public modm::I2cDevice< I2cMaster >
 {
 public:
 	/// Constructor, requires an vl53l0::Data object, sets address to default of 0x29
-	Vl53l0(Data &data, uint8_t address=0x29);
+	constexpr Vl53l0(Data &data, uint8_t address=0x29);
 
 	/// Ping the I2C device.
 	/// This overwrites the build-in ping method of I2cDevice with a read of the model number.

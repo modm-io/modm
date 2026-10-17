@@ -18,7 +18,7 @@ namespace modm
 
 template<typename Transport, typename IntPin>
 template<typename... TransportParams>
-Pat9125el<Transport, IntPin>::Pat9125el(TransportParams&&... params)
+constexpr Pat9125el<Transport, IntPin>::Pat9125el(TransportParams&&... params)
 	: Transport(std::forward<TransportParams>(params)...)
 {
 }

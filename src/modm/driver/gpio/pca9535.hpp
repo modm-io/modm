@@ -96,7 +96,7 @@ public:
 
 public:
 	/// Constructor, sets address to default of 0x20 (range 0x20 - 0x27)
-	Pca9535(uint8_t address=0x20);
+	constexpr Pca9535(uint8_t address=0x20);
 
 public:
 	bool
@@ -229,7 +229,7 @@ private:
 	struct modm_packed
 	Memory
 	{
-		Memory() :
+		constexpr Memory() :
 			commandInput(Command::InputPort0),
 			input(0),
 			commandOutput(Command::OutputPort0),

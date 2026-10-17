@@ -35,7 +35,7 @@ namespace modm{
 	{
 		public:
 
-			AbstractMenu(modm::ViewStack<Allocator>* stack, uint8_t identifier) :
+			constexpr AbstractMenu(modm::ViewStack<Allocator>* stack, uint8_t identifier) :
 				modm::AbstractView<Allocator>(stack, identifier)
 			{
 			}

@@ -19,7 +19,7 @@
 #include <cstring>		// for std::memcpy
 
 template <typename OneWire>
-modm::Ds18b20<OneWire>::Ds18b20(const uint8_t *rom)
+constexpr modm::Ds18b20<OneWire>::Ds18b20(const uint8_t *rom)
 {
 	std::memcpy(this->identifier, rom, 8);
 }

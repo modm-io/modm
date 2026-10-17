@@ -21,7 +21,7 @@ namespace modm
 {
 
 template < class Transport >
-Ixm42xxx< Transport >::Ixm42xxx(Data &data, uint8_t address) : Transport(address), data(data)
+constexpr Ixm42xxx< Transport >::Ixm42xxx(Data &data, uint8_t address) : Transport(address), data(data)
 {
 }
 

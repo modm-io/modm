@@ -20,7 +20,7 @@
 
 // ----------------------------------------------------------------------------
 template <typename I2cMaster, size_t AddressBytes>
-modm::I2cEeprom<I2cMaster, AddressBytes>::I2cEeprom(uint8_t address) :
+constexpr modm::I2cEeprom<I2cMaster, AddressBytes>::I2cEeprom(uint8_t address) :
 	I2cDevice<I2cMaster, 1, i2c_eeprom::detail::DataTransmissionAdapter<AddressBytes>>{address}
 {
 }
@@ -67,7 +67,7 @@ namespace modm::i2c_eeprom::detail
 {
 
 template<size_t AddressBytes>
-DataTransmissionAdapter<AddressBytes>::DataTransmissionAdapter(uint8_t address) :
+constexpr DataTransmissionAdapter<AddressBytes>::DataTransmissionAdapter(uint8_t address) :
 	I2cWriteReadTransaction(address), writeAddress(false)
 {}
 

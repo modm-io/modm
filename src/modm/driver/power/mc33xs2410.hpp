@@ -465,7 +465,7 @@ class Mc33xs2410 : public mc33xs2410, public modm::SpiDevice<SpiMaster>
 public:
 	/// @param	devices		Length of the daisy-chain, clamped to [1, MaxDevices]
 	explicit
-	Mc33xs2410(uint8_t devices = MaxDevices)
+	constexpr Mc33xs2410(uint8_t devices = MaxDevices)
 	:	devices_(devices ? (devices < MaxDevices ? devices : MaxDevices) : 1) {}
 
 	/// Length of the daisy-chain this instance drives

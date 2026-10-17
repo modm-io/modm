@@ -26,11 +26,11 @@ class Node
 {
 	static_assert(2 <= TxBufferSize, "TxBuffer must have at least two messages!");
 public:
-	Node(Device &device, uint8_t address): interface(device), address(address)
+	constexpr Node(Device &device, uint8_t address): interface(device), address(address)
 	{ setSeed(); }
 
 	template< size_t Actions >
-	Node(Device &device, uint8_t address, Action (&actions)[Actions])
+	constexpr Node(Device &device, uint8_t address, Action (&actions)[Actions])
 	:	interface(device), actionList(actions), actionCount(Actions), address(address)
 	{
 		static_assert(Actions <= 0xff, "Actions list must be smaller than 255!");
@@ -38,7 +38,7 @@ public:
 	}
 
 	template< size_t Listeners >
-	Node(Device &device, uint8_t address, Listener (&listeners)[Listeners])
+	constexpr Node(Device &device, uint8_t address, Listener (&listeners)[Listeners])
 	:	interface(device), listenerList(listeners), listenerCount(Listeners), address(address)
 	{
 		static_assert(Listeners <= 0xff, "Listeners list must be smaller than 255!");
@@ -46,7 +46,7 @@ public:
 	}
 
 	template< size_t Actions, size_t Listeners >
-	Node(Device &device, uint8_t address, Action (&actions)[Actions], Listener (&listeners)[Listeners])
+	constexpr Node(Device &device, uint8_t address, Action (&actions)[Actions], Listener (&listeners)[Listeners])
 	:	interface(device), actionList(actions), listenerList(listeners),
 		actionCount(Actions), listenerCount(Listeners), address(address)
 	{

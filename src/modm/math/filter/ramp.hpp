@@ -49,7 +49,7 @@ namespace modm
 			 * \warning	Both values for increment and decrement needs to
 			 * 			be positive!
 			 */
-			Ramp(const T& increment,
+			constexpr Ramp(const T& increment,
 				 const T& decrement,
 				 const T& initialValue = T());
 

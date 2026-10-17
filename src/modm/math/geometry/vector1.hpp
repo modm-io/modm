@@ -36,9 +36,9 @@ namespace modm
 	class Vector<T, 1>
 	{
 	public:
-		Vector();
-		Vector(T inX);
-		Vector(const Matrix<T, 1, 1> &rhs);
+		constexpr Vector();
+		constexpr Vector(T inX);
+		constexpr Vector(const Matrix<T, 1, 1> &rhs);
 
 		inline void
 		set(const T& x);

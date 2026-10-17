@@ -360,7 +360,7 @@ public:
 	/// @arg transportArgs Arguments to transport layer.
 	///                    Pass address for I2C, none for SPI.
 	template<typename... Args>
-	Bmp581(Args... transportArgs);
+	constexpr Bmp581(Args... transportArgs);
 
 	/// Initialize device. Call before any other member function.
 	/// @return true on success, false on error

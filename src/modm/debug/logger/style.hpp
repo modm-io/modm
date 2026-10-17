@@ -80,9 +80,9 @@ namespace modm
 		public:
 			using Type = STYLE;
 
-			Style( STYLE style );
+			constexpr Style( STYLE style );
 
-			Style( IODevice &device);
+			constexpr Style( IODevice &device);
 
 			virtual
 			~Style();

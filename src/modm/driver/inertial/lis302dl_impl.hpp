@@ -16,7 +16,7 @@
 // ----------------------------------------------------------------------------
 // MARK: LIS302 DRIVER
 template < class Transport >
-modm::Lis302dl<Transport>::Lis302dl(Data &data, uint8_t address)
+constexpr modm::Lis302dl<Transport>::Lis302dl(Data &data, uint8_t address)
 :	Transport(address), data(data), rawBuffer{0,0,0,0,0,0,0,0,0,0}
 {
 }

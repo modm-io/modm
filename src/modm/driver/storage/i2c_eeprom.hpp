@@ -32,7 +32,7 @@ class DataTransmissionAdapter : public I2cWriteReadTransaction
 public:
 	static_assert(AddressBytes == 1 || AddressBytes == 2, "Only 8 or 16 bit addresses are supported");
 
-	DataTransmissionAdapter(uint8_t address);
+	constexpr DataTransmissionAdapter(uint8_t address);
 
 	bool
 	configureWrite(uint16_t address, const uint8_t *buffer, std::size_t size);
@@ -70,7 +70,7 @@ template <typename I2cMaster, size_t AddressBytes = 2>
 class I2cEeprom : public I2cDevice<I2cMaster, 1, i2c_eeprom::detail::DataTransmissionAdapter<AddressBytes>>
 {
 public:
-	I2cEeprom(uint8_t address = 0x50);
+	constexpr I2cEeprom(uint8_t address = 0x50);
 
 	/**
 	 * Write byte

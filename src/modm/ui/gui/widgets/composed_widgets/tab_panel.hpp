@@ -30,7 +30,7 @@ namespace gui
 class TabPanel : public WidgetGroup
 {
 public:
-	TabPanel(Dimension d, float verticalRatio = 0.2) :
+	constexpr TabPanel(Dimension d, float verticalRatio = 0.2) :
 		WidgetGroup(d),
 		panelDimension(Dimension(d.width, d.height * (1 - verticalRatio))),
 		buttonDimension(Dimension(d.width / 3, d.height * verticalRatio))

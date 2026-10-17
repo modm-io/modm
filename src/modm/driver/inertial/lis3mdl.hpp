@@ -219,7 +219,7 @@ public:
 	 *
 	 * \param address The I2C device address of the sensor
 	 */
-	Lis3mdl(uint8_t address = 0x1C);
+	constexpr Lis3mdl(uint8_t address = 0x1C);
 
 	/**
 	 * \brief Configures the sensor

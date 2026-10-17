@@ -210,7 +210,7 @@ class Hmc6343 : public hmc6343, public modm::I2cDevice< I2cMaster >
 {
 public:
 	/// Constructor, requires a hmc6343::Data object, sets address to default of 0x19
-	Hmc6343(Data &data, uint8_t address=0x19);
+	constexpr Hmc6343(Data &data, uint8_t address=0x19);
 
 
 	// READING RAM

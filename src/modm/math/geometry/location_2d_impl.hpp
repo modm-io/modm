@@ -20,13 +20,13 @@
 
 // -----------------------------------------------------------------------------
 template <typename T>
-modm::Location2D<T>::Location2D() :
+constexpr modm::Location2D<T>::Location2D() :
 	position(), orientation()
 {
 }
 
 template <typename T>
-modm::Location2D<T>::Location2D(const Vector<T, 2>& position,
+constexpr modm::Location2D<T>::Location2D(const Vector<T, 2>& position,
 		const float& orientation) :
 	position(position),
 	orientation(orientation)
@@ -34,7 +34,7 @@ modm::Location2D<T>::Location2D(const Vector<T, 2>& position,
 }
 
 template <typename T>
-modm::Location2D<T>::Location2D(const T& x, const T& y, const float& orientation) :
+constexpr modm::Location2D<T>::Location2D(const T& x, const T& y, const float& orientation) :
 	position(x, y),
 	orientation(orientation)
 {

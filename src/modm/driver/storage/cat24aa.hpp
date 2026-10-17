@@ -24,7 +24,7 @@ struct cat24Aa
 	class DataTransmissionAdapter : public modm::I2cWriteReadTransaction
 	{
 	public:
-		DataTransmissionAdapter(uint8_t address = 0x50);
+		constexpr DataTransmissionAdapter(uint8_t address = 0x50);
 
 		bool
 		configureWrite(uint16_t address, const uint8_t *buffer, std::size_t size);
@@ -61,7 +61,7 @@ template <typename I2cMaster>
 class Cat24Aa : public modm::I2cDevice<I2cMaster, 1, cat24Aa::DataTransmissionAdapter>
 {
 public:
-	Cat24Aa();
+	constexpr Cat24Aa();
 
 	/**
 	 * Write byte

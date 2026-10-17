@@ -41,11 +41,11 @@ struct ltc2984
 		};
 		MODM_FLAGS8(Status);
 
-		Data() : data(0)
+		constexpr Data() : data(0)
 		{
 		}
 
-		Data(uint32_t data) : data(data)
+		constexpr Data(uint32_t data) : data(data)
 		{
 		}
 
@@ -348,7 +348,7 @@ public:
 	 *
 	 * Sets used pins as output. SPI must be initialized by the user!
 	 */
-	Ltc2984();
+	constexpr Ltc2984();
 
 	/**
 	 * \brief	Ping the LTC298x device.

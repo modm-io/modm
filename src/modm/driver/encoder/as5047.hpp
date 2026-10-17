@@ -99,7 +99,7 @@ public:
 	/**
 	 * @param data pointer to buffer of the internal data of type Data
 	 */
-	As5047(Data &data);
+	constexpr As5047(Data &data);
 
 	/// Read the raw data from the sensor
 	void

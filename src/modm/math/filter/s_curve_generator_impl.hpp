@@ -17,7 +17,7 @@
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::SCurveGenerator<T>::SCurveGenerator(const T& initialValue) :
+constexpr modm::SCurveGenerator<T>::SCurveGenerator(const T& initialValue) :
 	target(), value(initialValue), targetReached(false)
 {
 }

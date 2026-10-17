@@ -40,7 +40,7 @@ namespace xpcc
 		};
 
 	public:
-		Header() :
+		constexpr Header() :
 			type(Type::REQUEST),
 			isAcknowledge(false),
 			destination(0),
@@ -49,7 +49,7 @@ namespace xpcc
 		{
 		}
 
-		Header(Type type, bool ack,
+		constexpr Header(Type type, bool ack,
 				uint8_t dest, uint8_t src,
 				uint8_t id) :
 			type(type),

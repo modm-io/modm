@@ -19,7 +19,7 @@ namespace modm
 		class Median<T, 7>
 		{
 		public:
-			Median(const T& initialValue = 0);
+			constexpr Median(const T& initialValue = 0);
 
 			void
 			append(const T& input);
@@ -40,7 +40,7 @@ namespace modm
 
 // ----------------------------------------------------------------------------
 template <typename T>
-modm::filter::Median<T, 7>::Median(const T& initialValue) :
+constexpr modm::filter::Median<T, 7>::Median(const T& initialValue) :
 	index(0)
 {
 	for (uint_fast8_t i = 0; i < 7; ++i) {

@@ -300,7 +300,7 @@ class Usb3803 : public usb3803, public modm::I2cDevice<I2cMaster>
 {
 public:
 	/// @param	address	0x08 with I2C_ASEL[1:0] = 00, the LSB is I2C_ASEL0
-	Usb3803(uint8_t address=0x08) :
+	constexpr Usb3803(uint8_t address=0x08) :
 		modm::I2cDevice<I2cMaster>(address)
 	{}
 

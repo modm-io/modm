@@ -21,7 +21,7 @@
 #include "dw3110_phy.hpp"
 
 template<typename SpiMaster, typename Cs>
-modm::Dw3110Phy<SpiMaster, Cs>::Dw3110Phy()
+constexpr modm::Dw3110Phy<SpiMaster, Cs>::Dw3110Phy()
 {
 	this->attachConfigurationHandler([]
 	{

@@ -46,7 +46,7 @@ protected:								  // 7654 3210 7654 3210 7654 3210
 public:
 	static constexpr size_t size = LEDs;
 
-	Sk6812w()
+	constexpr Sk6812w()
 	{
 		clear();
 	}

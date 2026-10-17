@@ -37,11 +37,11 @@ namespace modm
 	class Location2D
 	{
 	public:
-		Location2D();
+		constexpr Location2D();
 
-		Location2D(const Vector<T, 2>& position, const float& orientation);
+		constexpr Location2D(const Vector<T, 2>& position, const float& orientation);
 
-		Location2D(const T& x, const T& y, const float& orientation);
+		constexpr Location2D(const T& x, const T& y, const float& orientation);
 
 		inline const Vector<T, 2>&
 		getPosition() const;

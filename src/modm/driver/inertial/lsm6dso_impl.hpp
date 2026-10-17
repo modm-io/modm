@@ -18,7 +18,7 @@ namespace modm
 {
 
 template<class Transport>
-Lsm6dso<Transport>::Lsm6dso(uint8_t address)
+constexpr Lsm6dso<Transport>::Lsm6dso(uint8_t address)
 :	Transport(address), buffer{}
 {
 }

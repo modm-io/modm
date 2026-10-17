@@ -31,7 +31,7 @@ template<typename T = int16_t>
 class NumberRocker : public WidgetGroup
 {
 public:
-	NumberRocker(T default_value, T step, Dimension d) :
+	constexpr NumberRocker(T default_value, T step, Dimension d) :
 		WidgetGroup(d),
 		value(default_value),
 		step(step),

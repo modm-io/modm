@@ -16,7 +16,7 @@
 // ============================================================================
 // MARK: I2C TRANSPORT
 template < class I2cMaster >
-modm::Lis3TransportI2c<I2cMaster>::Lis3TransportI2c(uint8_t address)
+constexpr modm::Lis3TransportI2c<I2cMaster>::Lis3TransportI2c(uint8_t address)
 :	I2cDevice<I2cMaster>(address)
 {
 }
@@ -44,7 +44,7 @@ modm::Lis3TransportI2c<I2cMaster>::read(uint8_t reg, uint8_t *buffer, uint8_t le
 // ============================================================================
 // MARK: SPI TRANSPORT
 template < class SpiMaster, class Cs >
-modm::Lis3TransportSpi<SpiMaster, Cs>::Lis3TransportSpi(uint8_t /*address*/)
+constexpr modm::Lis3TransportSpi<SpiMaster, Cs>::Lis3TransportSpi(uint8_t /*address*/)
 :	whoAmI(0)
 {
 	Cs::setOutput(modm::Gpio::High);

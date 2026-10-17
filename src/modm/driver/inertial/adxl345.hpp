@@ -165,7 +165,7 @@ namespace modm
 		 * \brief	Constructor
 		 * \param	address		address is 0x53 with SDO pin low else 0x1d
 		 */
-		Adxl345(uint8_t* data, uint8_t address=0x1d);
+		constexpr Adxl345(uint8_t* data, uint8_t address=0x1d);
 
 		/**
 		 * Configures the sensor to measurement mode with full resolution with

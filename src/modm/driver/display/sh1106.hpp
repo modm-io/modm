@@ -29,7 +29,7 @@ template<class I2cMaster, uint8_t Height = 64>
 class Sh1106 : public Ssd1306<I2cMaster, Height>
 {
 public:
-	Sh1106(uint8_t address = 0x3C) : Ssd1306<I2cMaster, Height>(address) {}
+	constexpr Sh1106(uint8_t address = 0x3C) : Ssd1306<I2cMaster, Height>(address) {}
 
 protected:
 	void

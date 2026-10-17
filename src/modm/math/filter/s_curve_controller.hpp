@@ -72,7 +72,7 @@ namespace modm
 		};
 
 	public:
-		SCurveController(const Parameter& parameter);
+		constexpr SCurveController(const Parameter& parameter);
 
 		/**
 		 * Reset the parameters of the controller.

@@ -133,7 +133,7 @@ class Lm75 : public lm75, public I2cDevice< I2cMaster >
 public:
 	/// Constructor, requires a lm75::Data object,
 	/// sets address to default of 0x48 (7 alternative addresses up to 0x4F possible).
-	Lm75(Data &data, uint8_t address=0x48);
+	constexpr Lm75(Data &data, uint8_t address=0x48);
 
 	bool
 	configureAlertMode(ThermostatMode mode, AlertPolarity polarity, FaultQueue faults);

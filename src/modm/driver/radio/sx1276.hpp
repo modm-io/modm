@@ -34,7 +34,7 @@ public:
 	/**
 	 * \brief Construct a new Sx1276 Driver
 	 */
-	Sx1276();
+	constexpr Sx1276();
 
 	/**
 	 * \brief Initialize the modem into Lora mode

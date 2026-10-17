@@ -17,7 +17,7 @@
 
 // ----------------------------------------------------------------------------
 template < class I2cMaster >
-modm::Lsm6ds33<I2cMaster>::Lsm6ds33( uint8_t address)
+constexpr modm::Lsm6ds33<I2cMaster>::Lsm6ds33( uint8_t address)
 :	Lis3TransportI2c<I2cMaster>(address)
 {
 	control1Shadow.value = 0x00;

@@ -42,7 +42,7 @@ class View;
 class Widget
 {
 public:
-	Widget(Dimension dimension, bool is_interactive) :
+	constexpr Widget(Dimension dimension, bool is_interactive) :
 		parent(nullptr),
 		dimension(dimension),
 		activated(false),
@@ -339,7 +339,7 @@ public:
 class WidgetGroup : public Widget
 {
 public:
-	WidgetGroup(Dimension d) :
+	constexpr WidgetGroup(Dimension d) :
 		Widget(d, true),
 		widgets()
 	{

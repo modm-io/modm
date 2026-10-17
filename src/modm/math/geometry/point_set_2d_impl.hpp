@@ -18,19 +18,19 @@
 
 // ----------------------------------------------------------------------------
 template <typename T>
-modm::PointSet2D<T>::PointSet2D(SizeType n)
+constexpr modm::PointSet2D<T>::PointSet2D(SizeType n)
 {
 	points.reserve(n);
 }
 
 template <typename T>
-modm::PointSet2D<T>::PointSet2D(std::initializer_list<modm::PointSet2D<T>::PointType> init) :
+constexpr modm::PointSet2D<T>::PointSet2D(std::initializer_list<modm::PointSet2D<T>::PointType> init) :
 	points(init)
 {
 }
 
 template <typename T>
-modm::PointSet2D<T>::PointSet2D(const PointSet2D<T>& other) :
+constexpr modm::PointSet2D<T>::PointSet2D(const PointSet2D<T>& other) :
 	points(other.points)
 {
 }

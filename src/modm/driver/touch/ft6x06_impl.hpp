@@ -15,7 +15,7 @@
 
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
-modm::Ft6x06<I2cMaster>::Ft6x06(Data &data, uint8_t address)
+constexpr modm::Ft6x06<I2cMaster>::Ft6x06(Data &data, uint8_t address)
 :	I2cDevice<I2cMaster>(address), data(data)
 {
 }

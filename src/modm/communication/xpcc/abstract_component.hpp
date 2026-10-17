@@ -58,7 +58,7 @@ namespace xpcc
 		 * 							within the network.
 		 * \param	communication	Communication class used to send messages
 		 */
-		AbstractComponent(const uint8_t ownIdentifier,
+		constexpr AbstractComponent(const uint8_t ownIdentifier,
 				Dispatcher &communication) :
 			communicator(ownIdentifier, communication)
 		{

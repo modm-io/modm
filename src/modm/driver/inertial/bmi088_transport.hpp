@@ -191,7 +191,7 @@ template<typename I2cMaster>
 class Bmi088I2cTransport : public Bmi088TransportBase, public I2cDevice<I2cMaster>
 {
 public:
-	Bmi088I2cTransport(uint8_t accAddress, uint8_t gyroAddress);
+	constexpr Bmi088I2cTransport(uint8_t accAddress, uint8_t gyroAddress);
 
 	Bmi088I2cTransport(const Bmi088I2cTransport&) = delete;
 

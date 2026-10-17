@@ -153,7 +153,7 @@ public:
 	/** AS5600 has hardwired address 0x36
 	 * AS4500L has default address 0x40 but supports programming a different one
 	 */
-	As5600(Data &data, uint8_t address = 0x36) : I2cDevice<I2cMaster>(address), data(data) {}
+	constexpr As5600(Data &data, uint8_t address = 0x36) : I2cDevice<I2cMaster>(address), data(data) {}
 
 	/** Reset to Power up state.
 	 * Useful for developement, not required in production.

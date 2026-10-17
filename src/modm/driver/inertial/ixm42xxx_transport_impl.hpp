@@ -18,7 +18,7 @@
 // ----------------------------------------------------------------------------
 
 template < class I2cMaster >
-modm::Ixm42xxxTransportI2c<I2cMaster>::Ixm42xxxTransportI2c(uint8_t address)
+constexpr modm::Ixm42xxxTransportI2c<I2cMaster>::Ixm42xxxTransportI2c(uint8_t address)
     : I2cDevice<I2cMaster>(address)
 {
 }
@@ -56,7 +56,7 @@ modm::Ixm42xxxTransportI2c<I2cMaster>::read(uint8_t reg, uint8_t *buffer, std::s
 // ----------------------------------------------------------------------------
 
 template < class SpiMaster, class Cs >
-modm::Ixm42xxxTransportSpi<SpiMaster, Cs>::Ixm42xxxTransportSpi(uint8_t /*address*/)
+constexpr modm::Ixm42xxxTransportSpi<SpiMaster, Cs>::Ixm42xxxTransportSpi(uint8_t /*address*/)
     : whoAmI(0)
 {
     Cs::setOutput(modm::Gpio::High);

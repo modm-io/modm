@@ -38,7 +38,7 @@ namespace modm
 	{
 	public:
 		/// Constructor
-		St7036();
+		constexpr St7036();
 
 		/**
 		 * \brief	Initialize the display

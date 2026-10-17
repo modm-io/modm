@@ -33,13 +33,13 @@ template<typename T>
 class Ram
 {
 public:
-	Ram(const T* addr = 0) :
+	constexpr Ram(const T* addr = 0) :
 		address(addr)
 	{
 	}
 
 	template <typename U>
-	explicit Ram(const Ram<U>& rhs) :
+	explicit constexpr Ram(const Ram<U>& rhs) :
 		address((T*) rhs.address)
 	{
 	}

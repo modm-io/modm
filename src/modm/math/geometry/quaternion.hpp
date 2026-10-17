@@ -39,14 +39,14 @@ namespace modm
 	class Quaternion
 	{
 	public:
-		Quaternion();
+		constexpr Quaternion();
 		template<typename U>
-		explicit Quaternion(const U *array);
-		Quaternion(T inW, T inX, T inY, T inZ);
-		Quaternion(const Vector<T, 3> &axis, T angle);
-		Quaternion(const Matrix<T, 4, 1> &rhs);
+		explicit constexpr Quaternion(const U *array);
+		constexpr Quaternion(T inW, T inX, T inY, T inZ);
+		constexpr Quaternion(const Vector<T, 3> &axis, T angle);
+		constexpr Quaternion(const Matrix<T, 4, 1> &rhs);
 
-		Quaternion(const Quaternion &rhs);
+		constexpr Quaternion(const Quaternion &rhs);
 
 		Quaternion& operator = (const Matrix<T, 4, 1> &rhs);
 		Quaternion& operator = (const Quaternion &rhs);

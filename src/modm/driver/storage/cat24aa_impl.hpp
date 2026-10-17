@@ -15,7 +15,7 @@
 
 // ----------------------------------------------------------------------------
 template <typename I2cMaster>
-modm::Cat24Aa<I2cMaster>::Cat24Aa() :
+constexpr modm::Cat24Aa<I2cMaster>::Cat24Aa() :
 	I2cDevice<I2cMaster, 1, cat24Aa::DataTransmissionAdapter>(0x50)
 {
 }

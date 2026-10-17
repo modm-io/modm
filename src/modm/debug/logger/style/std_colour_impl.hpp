@@ -17,13 +17,13 @@
 
 // ----------------------------------------------------------------------------
 template <modm::log::Colour TEXT, modm::log::Colour BACKGROUND, typename STYLE>
-modm::log::StdColour<TEXT, BACKGROUND, STYLE>::StdColour( STYLE style ) :
+constexpr modm::log::StdColour<TEXT, BACKGROUND, STYLE>::StdColour( STYLE style ) :
 	Style<STYLE> ( style )
 {
 }
 
 template <modm::log::Colour TEXT, modm::log::Colour BACKGROUND, typename STYLE>
-modm::log::StdColour<TEXT, BACKGROUND, STYLE>::StdColour(IODevice &device) :
+constexpr modm::log::StdColour<TEXT, BACKGROUND, STYLE>::StdColour(IODevice &device) :
 	Style<STYLE> ( device )
 {
 }

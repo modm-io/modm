@@ -68,7 +68,7 @@ public:
 
 public:
 	/// Constructor, sets address to default of 0x27
-	Pca8574(uint8_t address=0x27);
+	constexpr Pca8574(uint8_t address=0x27);
 
 public:
 	bool inline

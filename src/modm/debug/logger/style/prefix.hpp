@@ -39,9 +39,9 @@ namespace modm
 		class Prefix : public Style<STYLE>
 		{
 		public:
-			Prefix(const T& str, STYLE style);
+			constexpr Prefix(const T& str, STYLE style);
 
-			Prefix(const T& str, IODevice &device);
+			constexpr Prefix(const T& str, IODevice &device);
 
 			/// Write one char to the sink.
 			void

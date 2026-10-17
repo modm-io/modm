@@ -16,18 +16,18 @@
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-modm::Vector<T, N>::Vector()
+constexpr modm::Vector<T, N>::Vector()
 {
 }
 
 template<typename T, uint8_t N>
-modm::Vector<T, N>::Vector(const T *ptData)
+constexpr modm::Vector<T, N>::Vector(const T *ptData)
 {
 	memcpy(coords, ptData, sizeof(T) * N);
 }
 
 template<typename T, uint8_t N>
-modm::Vector<T, N>::Vector(const modm::Matrix<T, N, 1> &rhs)
+constexpr modm::Vector<T, N>::Vector(const modm::Matrix<T, N, 1> &rhs)
 {
 	memcpy(coords, &rhs, sizeof(T) * N);
 }

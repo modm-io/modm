@@ -18,19 +18,19 @@
 
 // ----------------------------------------------------------------------------
 template <typename T>
-modm::Polygon2D<T>::Polygon2D(SizeType n) :
+constexpr modm::Polygon2D<T>::Polygon2D(SizeType n) :
 	PointSet2D<T>(n)
 {
 }
 
 template <typename T>
-modm::Polygon2D<T>::Polygon2D(const Polygon2D<T>& other) :
+constexpr modm::Polygon2D<T>::Polygon2D(const Polygon2D<T>& other) :
 	PointSet2D<T>(other)
 {
 }
 
 template <typename T>
-modm::Polygon2D<T>::Polygon2D(std::initializer_list<modm::Polygon2D<T>::PointType> init) :
+constexpr modm::Polygon2D<T>::Polygon2D(std::initializer_list<modm::Polygon2D<T>::PointType> init) :
 	PointSet2D<T>(init)
 {
 }

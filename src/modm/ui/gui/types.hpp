@@ -62,14 +62,14 @@ public:
 		DOWN
 	};
 
-	InputEvent(modm::glcd::Point point, Type type, Direction direction) :
+	constexpr InputEvent(modm::glcd::Point point, Type type, Direction direction) :
 		type(type),
 		direction(direction),
 		coord(point)
 	{
 	}
 
-	InputEvent()
+	constexpr InputEvent()
 	{
 	}
 
@@ -91,7 +91,7 @@ public:
 class AsyncEvent
 {
 public:
-	AsyncEvent(uint16_t delayMilliseconds, genericCallback cb, void* cb_data) :
+	constexpr AsyncEvent(uint16_t delayMilliseconds, genericCallback cb, void* cb_data) :
 		cb(cb),
 		cb_data(cb_data),
 		timeout(std::chrono::milliseconds(delayMilliseconds)),
@@ -133,7 +133,7 @@ typedef void (*eventCallback)(const InputEvent&, Widget*, void*);
 /// @ingroup modm_ui_gui
 typedef struct Dimension
 {
-	Dimension(int16_t w, int16_t h) :
+	constexpr Dimension(int16_t w, int16_t h) :
 		width(w), height(h)
 	{
 	}

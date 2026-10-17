@@ -112,7 +112,7 @@ public:
 
 public:
 	/// Constructor, sets address to default of 0x20 (range 0x20 - 0x27)
-	Mcp23x17(uint8_t address=0x20);
+	constexpr Mcp23x17(uint8_t address=0x20);
 
 public:
 	bool
@@ -250,7 +250,7 @@ private:
 	struct modm_packed
 	Memory
 	{
-		Memory() :
+		constexpr Memory() :
 			direction(0xffff),
 			polarity(0),
 			interruptEnable(0),

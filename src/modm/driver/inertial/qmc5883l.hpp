@@ -154,7 +154,7 @@ class Qmc5883l : public Qmc5883lRegisters, public I2cDevice<I2cMaster>
 	}
 
 public:
-	Qmc5883l(Data &data, uint8_t address = 0x0d) : modm::I2cDevice<I2cMaster>(address), data(data)
+	constexpr Qmc5883l(Data &data, uint8_t address = 0x0d) : modm::I2cDevice<I2cMaster>(address), data(data)
 	{}
 
 	auto x() { return data.getWord<Register::DataX_Lsb>(); }

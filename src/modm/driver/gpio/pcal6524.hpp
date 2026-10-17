@@ -111,7 +111,7 @@ public:
 public:
 	/// Constructor.
 	/// @param	address	see `pcal6524::AddressPin`, default is ADDR tied to VSS.
-	Pcal6524(uint8_t address = uint8_t(AddressPin::Vss)) :
+	constexpr Pcal6524(uint8_t address = uint8_t(AddressPin::Vss)) :
 		modm::I2cDevice<I2cMaster>(address), memory()
 	{}
 
@@ -403,7 +403,7 @@ private:
 	struct modm_packed
 	Memory
 	{
-		Memory() :
+		constexpr Memory() :
 			direction(0xffffff),
 			polarity(0),
 			pullEnable(0),

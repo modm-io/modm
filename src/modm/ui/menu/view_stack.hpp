@@ -41,7 +41,7 @@ namespace modm
 	class ViewStack
 	{
 	public:
-		ViewStack(modm::GraphicDisplay* display, const Allocator allocator = Allocator()) :
+		constexpr ViewStack(modm::GraphicDisplay* display, const Allocator allocator = Allocator()) :
 			display(display),
 			allocator(allocator)
 		{

@@ -17,19 +17,19 @@
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 1>::Vector() :
+constexpr modm::Vector<T, 1>::Vector() :
 	x()
 {
 }
 
 template<typename T>
-modm::Vector<T, 1>::Vector(T inX) :
+constexpr modm::Vector<T, 1>::Vector(T inX) :
 	x(inX)
 {
 }
 
 template<typename T>
-modm::Vector<T, 1>::Vector(const modm::Matrix<T, 1, 1> &rhs) :
+constexpr modm::Vector<T, 1>::Vector(const modm::Matrix<T, 1, 1> &rhs) :
 	x(*reinterpret_cast<const T*>(&rhs))
 {
 }

@@ -39,33 +39,33 @@ namespace modm
 	class Vector<T, 3>
 	{
 	public:
-		Vector();
+		constexpr Vector();
 
 		template<typename U>
-		explicit Vector(const U *array);
+		explicit constexpr Vector(const U *array);
 
-		explicit Vector(T inVal);
-		Vector(T inX, T inY, T inZ);
+		explicit constexpr Vector(T inVal);
+		constexpr Vector(T inX, T inY, T inZ);
 
-		Vector(const Vector<T, 1> &inX, const T &inY, const T &inZ);
-		Vector(const T &inX, const Vector<T, 1> &inY, const T &inZ);
-		Vector(const T &inX, const T &inY, const Vector<T, 1> &inZ);
+		constexpr Vector(const Vector<T, 1> &inX, const T &inY, const T &inZ);
+		constexpr Vector(const T &inX, const Vector<T, 1> &inY, const T &inZ);
+		constexpr Vector(const T &inX, const T &inY, const Vector<T, 1> &inZ);
 
-		Vector(const Vector<T, 1> &inX, const T &inY, const Vector<T, 1> &inZ);
-		Vector(const Vector<T, 1> &inX, const Vector<T, 1> &inY, const T &inZ);
-		Vector(const T &inX, const Vector<T, 1> &inY, const Vector<T, 1> &inZ);
+		constexpr Vector(const Vector<T, 1> &inX, const T &inY, const Vector<T, 1> &inZ);
+		constexpr Vector(const Vector<T, 1> &inX, const Vector<T, 1> &inY, const T &inZ);
+		constexpr Vector(const T &inX, const Vector<T, 1> &inY, const Vector<T, 1> &inZ);
 
-		Vector(const Vector<T, 1> &inX, const Vector<T, 1> &inY, const Vector<T, 1> &inZ);
+		constexpr Vector(const Vector<T, 1> &inX, const Vector<T, 1> &inY, const Vector<T, 1> &inZ);
 
-		Vector(const Vector<T,2> &inXY, const T &inZ);
-		Vector(const T &inX, const Vector<T, 2> &inYZ);
+		constexpr Vector(const Vector<T,2> &inXY, const T &inZ);
+		constexpr Vector(const T &inX, const Vector<T, 2> &inYZ);
 
-		Vector(const Vector<T, 2> &inXY, const Vector<T, 1> &inZ);
-		Vector(const Vector<T, 1> &inX, const Vector<T, 2> &inYZ);
+		constexpr Vector(const Vector<T, 2> &inXY, const Vector<T, 1> &inZ);
+		constexpr Vector(const Vector<T, 1> &inX, const Vector<T, 2> &inYZ);
 
 		template<typename U>
-		Vector(const Vector<U, 3> &rhs);
-		Vector(const Matrix<T, 3, 1> &rhs);
+		constexpr Vector(const Vector<U, 3> &rhs);
+		constexpr Vector(const Matrix<T, 3, 1> &rhs);
 
 
 		inline void

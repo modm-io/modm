@@ -56,7 +56,7 @@ public:
 	 * @param	timeout		Button press period (number of update cycles) until begin of repeat
 	 * @param	interval	Button press period (number of update cycles) for follow up repeats
 	 */
-	ButtonGroup(T repeatmask, uint16_t timeout = 50, uint16_t interval = 20)
+	constexpr ButtonGroup(T repeatmask, uint16_t timeout = 50, uint16_t interval = 20)
 		: repeatmask(repeatmask), timeout(timeout), interval(interval), repeatCounter(timeout)
 	{}
 

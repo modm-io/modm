@@ -155,7 +155,7 @@ template <typename SpiMaster, typename Cs>
 class Ad7928 : public ad7928, public modm::SpiDevice<SpiMaster>
 {
 public:
-	Ad7928();
+	constexpr Ad7928();
 
 	/// Call this function once before using the device
 	void

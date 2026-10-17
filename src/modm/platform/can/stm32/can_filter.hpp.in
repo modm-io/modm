@@ -63,7 +63,7 @@ private:
 	{
 	protected:
 		inline
-		Identifier(uint32_t identifier) :
+		constexpr Identifier(uint32_t identifier) :
 			value(identifier)
 		{
 		}
@@ -85,7 +85,7 @@ public:
 	struct ExtendedIdentifier : public Identifier
 	{
 		inline
-		ExtendedIdentifier(uint32_t identifier, RemoteRequestStatus rtr = NO_RTR) :
+		constexpr ExtendedIdentifier(uint32_t identifier, RemoteRequestStatus rtr = NO_RTR) :
 			Identifier((identifier << 3) | 0x4 | ((rtr) ? 0x2 : 0))
 		{
 		}
@@ -97,7 +97,7 @@ public:
 	struct ExtendedFilterMask
 	{
 		inline
-		ExtendedFilterMask(uint32_t identifier, RemoteRequestFilter rtr = RTR_MATCH) :
+		constexpr ExtendedFilterMask(uint32_t identifier, RemoteRequestFilter rtr = RTR_MATCH) :
 			value((identifier << 3) | 0x4 | ((rtr) ? 0x2 : 0))
 		{
 		}
@@ -118,7 +118,7 @@ public:
 	struct StandardIdentifier : public Identifier
 	{
 		inline
-		StandardIdentifier(uint16_t identifier, RemoteRequestStatus rtr = NO_RTR) :
+		constexpr StandardIdentifier(uint16_t identifier, RemoteRequestStatus rtr = NO_RTR) :
 			Identifier((identifier << 21) | ((rtr) ? 0x2 : 0))
 		{
 		}
@@ -130,7 +130,7 @@ public:
 	struct StandardFilterMask
 	{
 		inline
-		StandardFilterMask(uint16_t identifier, RemoteRequestFilter rtr = RTR_MATCH) :
+		constexpr StandardFilterMask(uint16_t identifier, RemoteRequestFilter rtr = RTR_MATCH) :
 			value((identifier << 21) | ((rtr) ? 0x2 : 0))
 		{
 		}
@@ -151,7 +151,7 @@ private:
 	{
 	protected:
 		inline
-		IdentifierShort(uint16_t identifier) :
+		constexpr IdentifierShort(uint16_t identifier) :
 			value(identifier)
 		{
 		}
@@ -177,7 +177,7 @@ public:
 	struct ExtendedIdentifierShort : public IdentifierShort
 	{
 		inline
-		ExtendedIdentifierShort(uint32_t identifier, RemoteRequestStatus rtr = NO_RTR) :
+		constexpr ExtendedIdentifierShort(uint32_t identifier, RemoteRequestStatus rtr = NO_RTR) :
 			IdentifierShort(((identifier >> 13) & 0xffe0) |
 					((identifier >> 15) & 0x007f) |
 					0x08 |
@@ -195,7 +195,7 @@ public:
 	struct ExtendedFilterMaskShort
 	{
 		inline
-		ExtendedFilterMaskShort(uint32_t identifier, RemoteRequestFilter rtr = RTR_MATCH) :
+		constexpr ExtendedFilterMaskShort(uint32_t identifier, RemoteRequestFilter rtr = RTR_MATCH) :
 			value(((identifier >> 13) & 0xffe0) |
 					((identifier >> 15) & 0x007f) |
 					0x08 |
@@ -220,7 +220,7 @@ public:
 	struct StandardIdentifierShort : public IdentifierShort
 	{
 		inline
-		StandardIdentifierShort(uint16_t identifier, RemoteRequestStatus rtr = NO_RTR) :
+		constexpr StandardIdentifierShort(uint16_t identifier, RemoteRequestStatus rtr = NO_RTR) :
 			IdentifierShort(((identifier << 5) & 0xffe0) | ((rtr) ? 0x10 : 0))
 		{
 		}
@@ -229,7 +229,7 @@ public:
 	struct StandardFilterMaskShort
 	{
 		inline
-		StandardFilterMaskShort(uint16_t identifier, RemoteRequestFilter rtr = RTR_MATCH) :
+		constexpr StandardFilterMaskShort(uint16_t identifier, RemoteRequestFilter rtr = RTR_MATCH) :
 			value(((identifier << 5) & 0xffe0) | ((rtr) ? 0x10 : 0))
 		{
 		}

@@ -17,7 +17,7 @@
 
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
-modm::Hmc58x3<I2cMaster>::Hmc58x3(Data &data, uint8_t address)
+constexpr modm::Hmc58x3<I2cMaster>::Hmc58x3(Data &data, uint8_t address)
 :	I2cDevice<I2cMaster>(address), data(data),
 	rawBuffer{0x10, 0x20, 0x01, 0,0,0,0,0,0, 0x00}
 {

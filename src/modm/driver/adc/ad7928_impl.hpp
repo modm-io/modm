@@ -20,7 +20,7 @@ namespace modm
 {
 
 template <typename SpiMaster, typename Cs>
-Ad7928<SpiMaster, Cs>::Ad7928() : currentPowerMode{PowerMode::Normal}
+constexpr Ad7928<SpiMaster, Cs>::Ad7928() : currentPowerMode{PowerMode::Normal}
 {
 	config = ControlRegister::WriteControlReg | ControlRegister::VrefRange;
 	config |= ControlRegister::UnsignedOutput;

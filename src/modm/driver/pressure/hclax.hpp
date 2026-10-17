@@ -73,7 +73,7 @@ public:
 	 *      This means you cannot use two HCLA sensors on the same bus!
 	 *      You have to use a MUX or two seperate I2C busses.
 	 */
-	HclaX(Data &data)
+	constexpr HclaX(Data &data)
 	:	I2cDevice<I2cMaster>(0x78), data(data)
 	{}
 

@@ -29,7 +29,7 @@ namespace gui
 class Label : public Widget
 {
 public:
-	Label(const char* lbl, modm::color::Rgb565 color) :
+	constexpr Label(const char* lbl, modm::color::Rgb565 color) :
 		Widget(Dimension(0,0), false),
 		label(lbl),
 		color(color)

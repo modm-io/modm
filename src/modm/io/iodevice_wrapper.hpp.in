@@ -104,7 +104,7 @@ class IODeviceObjectWrapper : public IODevice
 %% endif
 	Device &device;
 public:
-	IODeviceObjectWrapper(Device& device) : device{device} {}
+	constexpr IODeviceObjectWrapper(Device& device) : device{device} {}
 	using IODevice::write;
 
 	void

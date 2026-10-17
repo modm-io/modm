@@ -17,13 +17,13 @@
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::LineSegment2D<T>::LineSegment2D() :
+constexpr modm::LineSegment2D<T>::LineSegment2D() :
 	startPoint(), endPoint()
 {
 }
 
 template<typename T>
-modm::LineSegment2D<T>::LineSegment2D(const Vector<T, 2>& start, const Vector<T, 2>& end) :
+constexpr modm::LineSegment2D<T>::LineSegment2D(const Vector<T, 2>& start, const Vector<T, 2>& end) :
 	startPoint(start), endPoint(end)
 {
 }

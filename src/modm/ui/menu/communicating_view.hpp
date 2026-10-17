@@ -29,7 +29,7 @@ namespace modm
 	class CommunicatingView : public xpcc::Communicatable
 	{
 	public:
-		CommunicatingView(modm::CommunicatingViewStack<Allocator>* /*stack*/)
+		constexpr CommunicatingView(modm::CommunicatingViewStack<Allocator>* /*stack*/)
 		{
 		}
 

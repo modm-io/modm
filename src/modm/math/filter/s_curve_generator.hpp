@@ -28,7 +28,7 @@ namespace modm
 	class SCurveGenerator
 	{
 	public:
-		SCurveGenerator(const T& initialValue = T());
+		constexpr SCurveGenerator(const T& initialValue = T());
 
 		inline void
 		setTarget(const T& target);

@@ -106,7 +106,7 @@ class Stts22h : public stts22h, public I2cDevice<I2cMaster>
 {
 public:
 	/// \param address I2C address, selectable on device between 0x38 and 0x3f
-	Stts22h(Data& data, uint8_t address = 0x3f);
+	constexpr Stts22h(Data& data, uint8_t address = 0x3f);
 
 	/// Initialize sensor
 	bool

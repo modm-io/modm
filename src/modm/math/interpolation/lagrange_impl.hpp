@@ -18,7 +18,7 @@
 // ----------------------------------------------------------------------------
 template <typename T,
 		  template <typename> class Accessor>
-modm::interpolation::Lagrange<T, Accessor>::Lagrange(
+constexpr modm::interpolation::Lagrange<T, Accessor>::Lagrange(
 		Accessor<T> supportingPoints, uint8_t numberOfPoints) :
 	supportingPoints(supportingPoints), numberOfPoints(numberOfPoints)
 {

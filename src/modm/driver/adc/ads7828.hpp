@@ -115,7 +115,7 @@ public:
      * @param address
      *      The adress is the i2c adress
      */
-    Ads7828(Data &data, uint8_t address = 0b1001000);
+    constexpr Ads7828(Data &data, uint8_t address = 0b1001000);
 
     /**
      * @brief Measures the voltage in a single channel

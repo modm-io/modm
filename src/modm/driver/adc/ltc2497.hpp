@@ -150,7 +150,7 @@ template <typename I2cMaster>
 class Ltc2497 : public ltc2497, public modm::I2cDevice<I2cMaster>
 {
 public:
-	inline Ltc2497(Data &data, uint8_t address = ltc2497::address()) :
+	constexpr Ltc2497(Data &data, uint8_t address = ltc2497::address()) :
 		modm::I2cDevice<I2cMaster>(address), data(data) {}
 
 	/// Selects the mux for the next conversion and starts it.

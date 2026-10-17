@@ -124,7 +124,7 @@ namespace xpcc
 	class CanConnector : protected CanConnectorBase, public BackendInterface
 	{
 	public:
-		CanConnector(Driver *driver);
+		constexpr CanConnector(Driver *driver);
 
 		virtual
 		~CanConnector();
@@ -174,7 +174,7 @@ namespace xpcc
 		class SendListItem
 		{
 		public:
-			SendListItem(const uint32_t & inIdentifier,
+			constexpr SendListItem(const uint32_t & inIdentifier,
 					const modm::SmartPointer& inPayload) :
 				identifier(inIdentifier),
 				payload(inPayload),
@@ -182,7 +182,7 @@ namespace xpcc
 			{
 			}
 
-			SendListItem(const SendListItem& other) :
+			constexpr SendListItem(const SendListItem& other) :
 				identifier(other.identifier),
 				payload(other.payload),
 				fragmentIndex(other.fragmentIndex)
@@ -202,7 +202,7 @@ namespace xpcc
 		class ReceiveListItem
 		{
 		public:
-			ReceiveListItem(uint8_t size, const Header& inHeader,
+			constexpr ReceiveListItem(uint8_t size, const Header& inHeader,
 					uint8_t messageCounter = 0) :
 				header(inHeader), payload(size),
 				receivedFragments(0),
@@ -210,7 +210,7 @@ namespace xpcc
 			{
 			}
 
-			ReceiveListItem(const ReceiveListItem& other) :
+			constexpr ReceiveListItem(const ReceiveListItem& other) :
 				header(other.header), payload(other.payload),
 				receivedFragments(other.receivedFragments),
 				counter(other.counter)

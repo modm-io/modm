@@ -191,7 +191,7 @@ namespace modm
 			 * \see		sab::modm::Action
 			 * \see		SAB_ACTION()
 			 */
-			Slave(uint8_t address, const Action *list, uint8_t count);
+			constexpr Slave(uint8_t address, const Action *list, uint8_t count);
 
 			/**
 			 * \brief	Receive and process messages

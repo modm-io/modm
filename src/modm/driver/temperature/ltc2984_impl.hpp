@@ -16,7 +16,7 @@
 
 // ----------------------------------------------------------------------------
 template < class SpiMaster, class Cs >
-modm::Ltc2984<SpiMaster, Cs>::Ltc2984()
+constexpr modm::Ltc2984<SpiMaster, Cs>::Ltc2984()
     : enabledChannels(0)
 {
 	Cs::setOutput(modm::Gpio::High);

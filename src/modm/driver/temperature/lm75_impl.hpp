@@ -17,7 +17,7 @@
 
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
-modm::Lm75<I2cMaster>::Lm75(Data &data, uint8_t address) :
+constexpr modm::Lm75<I2cMaster>::Lm75(Data &data, uint8_t address) :
 	I2cDevice<I2cMaster>(address),
 	data(data), config_msb(0)
 {

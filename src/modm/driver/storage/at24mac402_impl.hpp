@@ -16,7 +16,7 @@
 // ----------------------------------------------------------------------------
 
 template<typename I2cMaster>
-modm::At24Mac402<I2cMaster>::At24Mac402(uint8_t address)
+constexpr modm::At24Mac402<I2cMaster>::At24Mac402(uint8_t address)
 {
 	setAddress(address);
 }

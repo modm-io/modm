@@ -60,7 +60,7 @@ namespace modm
 			 * \param	initialValue	Value will be set for the complete
 			 * 							input buffer.
 			 */
-			Median(const T& initialValue = 0);
+			constexpr Median(const T& initialValue = 0);
 
 			/// Append new value
 			void

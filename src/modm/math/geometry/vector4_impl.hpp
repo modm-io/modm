@@ -16,7 +16,7 @@
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>::Vector()
+constexpr modm::Vector<T, 4>::Vector()
 :
 	x(),
 	y(),
@@ -27,7 +27,7 @@ modm::Vector<T, 4>::Vector()
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>::Vector(T inX, T inY, T inZ, T inW)
+constexpr modm::Vector<T, 4>::Vector(T inX, T inY, T inZ, T inW)
 :
 	x(inX),
 	y(inY),
@@ -38,7 +38,7 @@ modm::Vector<T, 4>::Vector(T inX, T inY, T inZ, T inW)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const modm::Vector<T, 1> &inY, const modm::Vector<T, 1> &inZ, const modm::Vector<T, 1> &inW)
+constexpr modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const modm::Vector<T, 1> &inY, const modm::Vector<T, 1> &inZ, const modm::Vector<T, 1> &inW)
 :
 	x(inX.x),
 	y(inY.x),
@@ -49,7 +49,7 @@ modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const modm::Vector<T, 
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const modm::Vector<T, 1> &inY, const modm::Vector<T, 1> &inZ, const T &inW)
+constexpr modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const modm::Vector<T, 1> &inY, const modm::Vector<T, 1> &inZ, const T &inW)
 :
 	x(inX.x),
 	y(inY.x),
@@ -61,7 +61,7 @@ modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const modm::Vector<T, 
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const modm::Vector<T, 1> &inY, const T &inZ, const T &inW)
+constexpr modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const modm::Vector<T, 1> &inY, const T &inZ, const T &inW)
 :
 	x(inX.x),
 	y(inY.x),
@@ -73,7 +73,7 @@ modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const modm::Vector<T, 
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const T &inY, const modm::Vector<T, 1> &inZ, const T &inW)
+constexpr modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const T &inY, const modm::Vector<T, 1> &inZ, const T &inW)
 :
 	x(inX.x),
 	y(inY),
@@ -85,7 +85,7 @@ modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const T &inY, const mo
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>::Vector(const T &inX, const modm::Vector<T, 1> &inY, const modm::Vector<T, 1> &inZ, const T &inW)
+constexpr modm::Vector<T, 4>::Vector(const T &inX, const modm::Vector<T, 1> &inY, const modm::Vector<T, 1> &inZ, const T &inW)
 :
 	x(inX),
 	y(inY.x),
@@ -97,7 +97,7 @@ modm::Vector<T, 4>::Vector(const T &inX, const modm::Vector<T, 1> &inY, const mo
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const T &inY, const T &inZ, const T &inW)
+constexpr modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const T &inY, const T &inZ, const T &inW)
 :
 	x(inX.x),
 	y(inY),
@@ -109,7 +109,7 @@ modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const T &inY, const T 
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>::Vector(const T &inX, const modm::Vector<T, 1> &inY, const T &inZ, const T &inW)
+constexpr modm::Vector<T, 4>::Vector(const T &inX, const modm::Vector<T, 1> &inY, const T &inZ, const T &inW)
 :
 	x(inX),
 	y(inY.x),
@@ -121,7 +121,7 @@ modm::Vector<T, 4>::Vector(const T &inX, const modm::Vector<T, 1> &inY, const T 
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const modm::Vector<T, 1> &inY, const T &inZ, const modm::Vector<T, 1> &inW)
+constexpr modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const modm::Vector<T, 1> &inY, const T &inZ, const modm::Vector<T, 1> &inW)
 :
 	x(inX.x),
 	y(inY.x),
@@ -133,7 +133,7 @@ modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const modm::Vector<T, 
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const T &inY, const T &inZ, const modm::Vector<T, 1> &inW)
+constexpr modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const T &inY, const T &inZ, const modm::Vector<T, 1> &inW)
 :
 	x(inX.x),
 	y(inY),
@@ -145,7 +145,7 @@ modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const T &inY, const T 
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>::Vector(const T &inX, const modm::Vector<T, 1> &inY, const T &inZ, const modm::Vector<T, 1> &inW)
+constexpr modm::Vector<T, 4>::Vector(const T &inX, const modm::Vector<T, 1> &inY, const T &inZ, const modm::Vector<T, 1> &inW)
 :
 	x(inX),
 	y(inY.x),
@@ -157,7 +157,7 @@ modm::Vector<T, 4>::Vector(const T &inX, const modm::Vector<T, 1> &inY, const T 
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>::Vector(const T &inX, const T &inY, const T &inZ, const modm::Vector<T, 1> &inW)
+constexpr modm::Vector<T, 4>::Vector(const T &inX, const T &inY, const T &inZ, const modm::Vector<T, 1> &inW)
 :
 	x(inX),
 	y(inY),
@@ -169,7 +169,7 @@ modm::Vector<T, 4>::Vector(const T &inX, const T &inY, const T &inZ, const modm:
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const T &inY, const modm::Vector<T, 1> &inZ, const modm::Vector<T, 1> &inW)
+constexpr modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const T &inY, const modm::Vector<T, 1> &inZ, const modm::Vector<T, 1> &inW)
 :
 	x(inX.x),
 	y(inY),
@@ -181,7 +181,7 @@ modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const T &inY, const mo
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>::Vector(const T &inX, const T &inY, const modm::Vector<T, 1> &inZ, const modm::Vector<T, 1> &inW)
+constexpr modm::Vector<T, 4>::Vector(const T &inX, const T &inY, const modm::Vector<T, 1> &inZ, const modm::Vector<T, 1> &inW)
 :
 	x(inX),
 	y(inY),
@@ -193,7 +193,7 @@ modm::Vector<T, 4>::Vector(const T &inX, const T &inY, const modm::Vector<T, 1> 
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>::Vector(const T &inX, const modm::Vector<T, 1> &inY, const modm::Vector<T, 1> &inZ, const modm::Vector<T, 1> &inW)
+constexpr modm::Vector<T, 4>::Vector(const T &inX, const modm::Vector<T, 1> &inY, const modm::Vector<T, 1> &inZ, const modm::Vector<T, 1> &inW)
 :
 	x(inX),
 	y(inY.x),
@@ -205,7 +205,7 @@ modm::Vector<T, 4>::Vector(const T &inX, const modm::Vector<T, 1> &inY, const mo
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>::Vector(const modm::Vector<T, 2> &inXY, const modm::Vector<T, 1> &inZ, const modm::Vector<T, 1> &inW)
+constexpr modm::Vector<T, 4>::Vector(const modm::Vector<T, 2> &inXY, const modm::Vector<T, 1> &inZ, const modm::Vector<T, 1> &inW)
 :
 	x(inXY.x),
 	y(inXY.y),
@@ -217,7 +217,7 @@ modm::Vector<T, 4>::Vector(const modm::Vector<T, 2> &inXY, const modm::Vector<T,
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>::Vector(const modm::Vector<T, 2> &inXY, const modm::Vector<T, 1> &inZ, const T &inW)
+constexpr modm::Vector<T, 4>::Vector(const modm::Vector<T, 2> &inXY, const modm::Vector<T, 1> &inZ, const T &inW)
 :
 	x(inXY.x),
 	y(inXY.y),
@@ -229,7 +229,7 @@ modm::Vector<T, 4>::Vector(const modm::Vector<T, 2> &inXY, const modm::Vector<T,
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>::Vector(const modm::Vector<T, 2> &inXY, const T &inZ, const T &inW)
+constexpr modm::Vector<T, 4>::Vector(const modm::Vector<T, 2> &inXY, const T &inZ, const T &inW)
 :
 	x(inXY.x),
 	y(inXY.y),
@@ -241,7 +241,7 @@ modm::Vector<T, 4>::Vector(const modm::Vector<T, 2> &inXY, const T &inZ, const T
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>::Vector(const modm::Vector<T, 2> &inXY, const T &inZ, const modm::Vector<T, 1> &inW)
+constexpr modm::Vector<T, 4>::Vector(const modm::Vector<T, 2> &inXY, const T &inZ, const modm::Vector<T, 1> &inW)
 :
 	x(inXY.x),
 	y(inXY.y),
@@ -253,7 +253,7 @@ modm::Vector<T, 4>::Vector(const modm::Vector<T, 2> &inXY, const T &inZ, const m
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const modm::Vector<T, 2> &inYZ, const modm::Vector<T, 1> &inW)
+constexpr modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const modm::Vector<T, 2> &inYZ, const modm::Vector<T, 1> &inW)
 :
 	x(inX.x),
 	y(inYZ.x),
@@ -265,7 +265,7 @@ modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const modm::Vector<T, 
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const modm::Vector<T, 2> &inYZ, const T &inW)
+constexpr modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const modm::Vector<T, 2> &inYZ, const T &inW)
 :
 	x(inX.x),
 	y(inYZ.x),
@@ -277,7 +277,7 @@ modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const modm::Vector<T, 
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>::Vector(const T &inX, const modm::Vector<T, 2> &inYZ, const T &inW)
+constexpr modm::Vector<T, 4>::Vector(const T &inX, const modm::Vector<T, 2> &inYZ, const T &inW)
 :
 	x(inX),
 	y(inYZ.x),
@@ -289,7 +289,7 @@ modm::Vector<T, 4>::Vector(const T &inX, const modm::Vector<T, 2> &inYZ, const T
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>::Vector(const T &inX, const modm::Vector<T, 2> &inYZ, const modm::Vector<T, 1> &inW)
+constexpr modm::Vector<T, 4>::Vector(const T &inX, const modm::Vector<T, 2> &inYZ, const modm::Vector<T, 1> &inW)
 :
 	x(inX),
 	y(inYZ.x),
@@ -301,7 +301,7 @@ modm::Vector<T, 4>::Vector(const T &inX, const modm::Vector<T, 2> &inYZ, const m
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const modm::Vector<T, 1> &inY, const modm::Vector<T, 2> &inZW)
+constexpr modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const modm::Vector<T, 1> &inY, const modm::Vector<T, 2> &inZW)
 :
 	x(inX.x),
 	y(inY.x),
@@ -313,7 +313,7 @@ modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const modm::Vector<T, 
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const T &inY, const modm::Vector<T, 2> &inZW)
+constexpr modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const T &inY, const modm::Vector<T, 2> &inZW)
 :
 	x(inX.x),
 	y(inY),
@@ -325,7 +325,7 @@ modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const T &inY, const mo
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>::Vector(const T &inX, const T &inY, const modm::Vector<T, 2> &inZW)
+constexpr modm::Vector<T, 4>::Vector(const T &inX, const T &inY, const modm::Vector<T, 2> &inZW)
 :
 	x(inX),
 	y(inY),
@@ -337,7 +337,7 @@ modm::Vector<T, 4>::Vector(const T &inX, const T &inY, const modm::Vector<T, 2> 
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>::Vector(const T &inX, const modm::Vector<T, 1> &inY, const modm::Vector<T, 2> &inZW)
+constexpr modm::Vector<T, 4>::Vector(const T &inX, const modm::Vector<T, 1> &inY, const modm::Vector<T, 2> &inZW)
 :
 	x(inX),
 	y(inY.x),
@@ -349,7 +349,7 @@ modm::Vector<T, 4>::Vector(const T &inX, const modm::Vector<T, 1> &inY, const mo
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>::Vector(const modm::Vector<T, 2> &inXY, const modm::Vector<T, 2> &inZW)
+constexpr modm::Vector<T, 4>::Vector(const modm::Vector<T, 2> &inXY, const modm::Vector<T, 2> &inZW)
 :
 	x(inXY.x),
 	y(inXY.y),
@@ -361,7 +361,7 @@ modm::Vector<T, 4>::Vector(const modm::Vector<T, 2> &inXY, const modm::Vector<T,
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>::Vector(const modm::Vector<T, 3> &inXYZ, const modm::Vector<T, 1> &inW)
+constexpr modm::Vector<T, 4>::Vector(const modm::Vector<T, 3> &inXYZ, const modm::Vector<T, 1> &inW)
 :
 	x(inXYZ.x),
 	y(inXYZ.y),
@@ -373,7 +373,7 @@ modm::Vector<T, 4>::Vector(const modm::Vector<T, 3> &inXYZ, const modm::Vector<T
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>::Vector(const modm::Vector<T, 3> &inXYZ, const T &inW)
+constexpr modm::Vector<T, 4>::Vector(const modm::Vector<T, 3> &inXYZ, const T &inW)
 :
 	x(inXYZ.x),
 	y(inXYZ.y),
@@ -385,7 +385,7 @@ modm::Vector<T, 4>::Vector(const modm::Vector<T, 3> &inXYZ, const T &inW)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const modm::Vector<T, 3> &inYZW)
+constexpr modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const modm::Vector<T, 3> &inYZW)
 :
 	x(inX.x),
 	y(inYZW.x),
@@ -397,7 +397,7 @@ modm::Vector<T, 4>::Vector(const modm::Vector<T, 1> &inX, const modm::Vector<T, 
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>::Vector(const T &inX, const modm::Vector<T, 3> &inYZW)
+constexpr modm::Vector<T, 4>::Vector(const T &inX, const modm::Vector<T, 3> &inYZW)
 :
 	x(inX),
 	y(inYZW.x),
@@ -409,7 +409,7 @@ modm::Vector<T, 4>::Vector(const T &inX, const modm::Vector<T, 3> &inYZW)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>::Vector(const modm::Matrix<T, 4, 1> &rhs)
+constexpr modm::Vector<T, 4>::Vector(const modm::Matrix<T, 4, 1> &rhs)
 :
 	x(reinterpret_cast<const T*>(&rhs)[0]),
 	y(reinterpret_cast<const T*>(&rhs)[1]),
@@ -420,7 +420,7 @@ modm::Vector<T, 4>::Vector(const modm::Matrix<T, 4, 1> &rhs)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>::Vector(T inVal)
+constexpr modm::Vector<T, 4>::Vector(T inVal)
 :
 	x(inVal),
 	y(inVal),

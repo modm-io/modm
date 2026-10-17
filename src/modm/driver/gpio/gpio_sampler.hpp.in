@@ -64,7 +64,7 @@ public:
 		const StartHandler start;
 		Channel data[channels];
 
-		Handle(size_t max_samples, StartHandler start, CleanupHandler cleanup);
+		constexpr Handle(size_t max_samples, StartHandler start, CleanupHandler cleanup);
 		void set_start_time(const Type *start);
 	public:
 		static constexpr size_t Channels = channels;

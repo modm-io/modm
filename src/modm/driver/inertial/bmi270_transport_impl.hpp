@@ -101,7 +101,7 @@ Bmi270SpiTransport<SpiMaster, Cs>::readFifoData(std::span<uint8_t> data)
 // I2C transport -------------------------------------------------------------------------------
 
 template<typename I2cMaster>
-Bmi270I2cTransport<I2cMaster>::Bmi270I2cTransport(I2cAddress address)
+constexpr Bmi270I2cTransport<I2cMaster>::Bmi270I2cTransport(I2cAddress address)
 	: I2cEeprom<I2cMaster, 1>(static_cast<uint8_t>(address))
 {}
 

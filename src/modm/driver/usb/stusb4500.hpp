@@ -50,7 +50,7 @@ template<class I2cMaster>
 class Stusb4500 : public stusb4500, public modm::I2cDevice< I2cMaster >
 {
 public:
-	Stusb4500(uint8_t address=0x28):
+	constexpr Stusb4500(uint8_t address=0x28):
 		modm::I2cDevice<I2cMaster>(address)
 	{};
 
@@ -128,7 +128,7 @@ public:
 	bool
 	updateRegister(Register reg, const uint8_t* data, size_t length)
 	{
-		if(length > (std::tuple_size<decltype(buffer)>::value - 1))
+		if(length > (std::tuple_size_v<decltype(buffer)> - 1))
 			return false;
 		buffer[0] = uint8_t(reg);
 		std::memcpy(&buffer[1], data, length);
