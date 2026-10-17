@@ -21,13 +21,6 @@
 #include <cstdlib>
 #include <utility>
 
-#include "font/fixed_width_5x8.hpp"
-
-// ----------------------------------------------------------------------------
-modm::GraphicDisplay::GraphicDisplay()
-	: IOStream(writer), writer(this), font(modm::accessor::asFlash(modm::font::FixedWidth5x8))
-{}
-
 // ----------------------------------------------------------------------------
 void
 modm::GraphicDisplay::drawLine(int16_t x1, int16_t y1, int16_t x2, int16_t y2)

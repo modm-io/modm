@@ -60,7 +60,12 @@ public:
 
 public:
 	/// Constructor
-	CharacterDisplay(uint8_t width, uint8_t height);
+	constexpr CharacterDisplay(uint8_t width, uint8_t height) :
+		IOStream(writer),
+		writer(this),
+		lineWidth(width), lineCount(height),
+		column(0), line(0)
+	{}
 
 	/// Initialize the display
 	void
@@ -114,7 +119,7 @@ protected:
 	class Writer : public IODevice
 	{
 	public:
-		Writer(CharacterDisplay *parent) :
+		constexpr Writer(CharacterDisplay *parent) :
 			parent(parent)
 		{
 		}

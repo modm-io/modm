@@ -67,13 +67,13 @@ template<typename T>
 class Flash
 {
 public:
-	explicit Flash(const T* addr = 0) :
+	explicit constexpr Flash(const T* addr = 0) :
 		address(addr)
 	{
 	}
 
 	template <typename U>
-	explicit Flash(const Flash<U>& rhs) :
+	explicit constexpr Flash(const Flash<U>& rhs) :
 		address((T*) rhs.address)
 	{
 	}
@@ -158,7 +158,7 @@ private:
 
 /// Convert a normal pointer to a accessor::Flash
 /// @ingroup modm_architecture_accessor
-template<typename T> ::modm::accessor::Flash<T>
+template<typename T> constexpr ::modm::accessor::Flash<T>
 asFlash(const T* ptr)
 {
 	return ::modm::accessor::Flash<T>(ptr);
