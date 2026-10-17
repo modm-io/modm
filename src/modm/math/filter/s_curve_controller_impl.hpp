@@ -36,7 +36,7 @@ modm::SCurveController<T>::Parameter::Parameter(
 // ----------------------------------------------------------------------------
 
 template<typename T>
-void
+constexpr void
 modm::SCurveController<T>::setParameter(const Parameter& parameter)
 {
 	this->parameter = parameter;
@@ -53,7 +53,7 @@ constexpr modm::SCurveController<T>::SCurveController(const Parameter& parameter
 
 // ----------------------------------------------------------------------------
 template<typename T>
-inline void
+constexpr void
 modm::SCurveController<T>::setSpeedMaximum( const T& speed )
 {
 	this->parameter.speedMaximum = speed;
@@ -61,7 +61,7 @@ modm::SCurveController<T>::setSpeedMaximum( const T& speed )
 
 // ----------------------------------------------------------------------------
 template<typename T>
-inline void
+constexpr void
 modm::SCurveController<T>::setSpeedMinimim( const T& speed )
 {
 	this->parameter.speedMinimum = speed;
@@ -69,7 +69,7 @@ modm::SCurveController<T>::setSpeedMinimim( const T& speed )
 
 // ----------------------------------------------------------------------------
 template<typename T>
-inline void
+constexpr void
 modm::SCurveController<T>::setSpeedTarget( const T& speed )
 {
 	this->parameter.speedTarget = speed;
@@ -78,7 +78,7 @@ modm::SCurveController<T>::setSpeedTarget( const T& speed )
 
 // ----------------------------------------------------------------------------
 template<typename T>
-bool
+constexpr bool
 modm::SCurveController<T>::isTargetReached() const
 {
 	return this->targetReached;
@@ -86,7 +86,7 @@ modm::SCurveController<T>::isTargetReached() const
 
 // ----------------------------------------------------------------------------
 template<typename T>
-void
+constexpr void
 modm::SCurveController<T>::update(T error, const T& speed)
 {
 	// adjust sign to be always positive
@@ -129,7 +129,7 @@ modm::SCurveController<T>::update(T error, const T& speed)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-inline const T&
+constexpr const T&
 modm::SCurveController<T>::getValue() const
 {
 	return this->output;

@@ -66,25 +66,25 @@ namespace modm
 		 * \todo	Currently a brute force approach is used here,
 		 * 			needs to be optimized
 		 */
-		bool
+		constexpr bool
 		intersects(const Polygon2D& other) const;
 
 		/// Check if a intersection exists
-		bool
+		constexpr bool
 		intersects(const Circle2D<T>& circle) const;
 
 		/// Check if a intersection exists
-		bool
+		constexpr bool
 		intersects(const LineSegment2D<T>& segment) const;
 
 		/// Check if a intersection exists
-		bool
+		constexpr bool
 		intersects(const Ray2D<T>& segment) const;
 
 		/**
 		 * \brief	Calculate the intersection point(s)
 		 */
-		bool
+		constexpr bool
 		getIntersections(const LineSegment2D<T>& segment,
 				PointSet2D<T>& intersectionPoints) const;
 
@@ -98,7 +98,7 @@ namespace modm
 		 * @return  `true` if point is contained in the area, `false` if
 		 *          it is outside.
 		 */
-		bool
+		constexpr bool
 		isInside(const PointType& point);
 	};
 }

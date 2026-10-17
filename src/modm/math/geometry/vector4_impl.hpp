@@ -431,7 +431,7 @@ constexpr modm::Vector<T, 4>::Vector(T inVal)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-void
+constexpr void
 modm::Vector<T, 4>::set(const T& x_, const T& y_, const T& z_, const T& w_)
 {
 	this->x = x_;
@@ -442,28 +442,28 @@ modm::Vector<T, 4>::set(const T& x_, const T& y_, const T& z_, const T& w_)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-void
+constexpr void
 modm::Vector<T, 4>::setX(const T& value)
 {
 	this->x = value;
 }
 
 template<typename T>
-void
+constexpr void
 modm::Vector<T, 4>::setY(const T& value)
 {
 	this->y = value;
 }
 
 template<typename T>
-void
+constexpr void
 modm::Vector<T, 4>::setZ(const T& value)
 {
 	this->z = value;
 }
 
 template<typename T>
-void
+constexpr void
 modm::Vector<T, 4>::setW(const T& value)
 {
 	this->w = value;
@@ -471,28 +471,28 @@ modm::Vector<T, 4>::setW(const T& value)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-const T&
+constexpr const T&
 modm::Vector<T, 4>::getX() const
 {
 	return this->x;
 }
 
 template<typename T>
-const T&
+constexpr const T&
 modm::Vector<T, 4>::getY() const
 {
 	return this->y;
 }
 
 template<typename T>
-const T&
+constexpr const T&
 modm::Vector<T, 4>::getZ() const
 {
 	return this->z;
 }
 
 template<typename T>
-const T&
+constexpr const T&
 modm::Vector<T, 4>::getW() const
 {
 	return this->w;
@@ -500,7 +500,7 @@ modm::Vector<T, 4>::getW() const
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>&
+constexpr modm::Vector<T, 4>&
 modm::Vector<T, 4>::operator = (const modm::Matrix<T, 4, 1> &rhs)
 {
 	x = reinterpret_cast<const T*>(&rhs)[0];
@@ -513,7 +513,7 @@ modm::Vector<T, 4>::operator = (const modm::Matrix<T, 4, 1> &rhs)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-bool
+constexpr bool
 modm::Vector<T, 4>::operator == (const modm::Vector<T, 4> &rhs) const
 {
 	return (rhs.x == x) && (rhs.y == y) && (rhs.z == z) && (rhs.w == w);
@@ -521,7 +521,7 @@ modm::Vector<T, 4>::operator == (const modm::Vector<T, 4> &rhs) const
 
 // ----------------------------------------------------------------------------
 template<typename T>
-bool
+constexpr bool
 modm::Vector<T, 4>::operator != (const modm::Vector<T, 4> &rhs) const
 {
 	return (rhs.x != x) || (rhs.y != y) || (rhs.z != z) || (rhs.w != w);
@@ -529,7 +529,7 @@ modm::Vector<T, 4>::operator != (const modm::Vector<T, 4> &rhs) const
 
 // ----------------------------------------------------------------------------
 template<typename T>
-bool
+constexpr bool
 modm::Vector<T, 4>::operator < (const modm::Vector<T, 4> &rhs) const
 {
 	return (x < rhs.x) || ((x == rhs.x) && ((y < rhs.y) || ((y == rhs.y) && ((z < rhs.z) || ((z == rhs.z) && (w < rhs.w))))));
@@ -537,7 +537,7 @@ modm::Vector<T, 4>::operator < (const modm::Vector<T, 4> &rhs) const
 
 // ----------------------------------------------------------------------------
 template<typename T>
-bool
+constexpr bool
 modm::Vector<T, 4>::operator <= (const modm::Vector<T, 4> &rhs) const
 {
 	return (x < rhs.x) || ((x == rhs.x) && ((y < rhs.y) || ((y == rhs.y) && ((z < rhs.z) || ((z == rhs.z) && (w <= rhs.w))))));
@@ -545,7 +545,7 @@ modm::Vector<T, 4>::operator <= (const modm::Vector<T, 4> &rhs) const
 
 // ----------------------------------------------------------------------------
 template<typename T>
-bool
+constexpr bool
 modm::Vector<T, 4>::operator > (const modm::Vector<T, 4> &rhs) const
 {
 	return (x > rhs.x) || ((x == rhs.x) && ((y > rhs.y) || ((y == rhs.y) && ((z > rhs.z) || ((z == rhs.z) && (w > rhs.w))))));
@@ -553,7 +553,7 @@ modm::Vector<T, 4>::operator > (const modm::Vector<T, 4> &rhs) const
 
 // ----------------------------------------------------------------------------
 template<typename T>
-bool
+constexpr bool
 modm::Vector<T, 4>::operator >= (const modm::Vector<T, 4> &rhs) const
 {
 	return (x > rhs.x) || ((x == rhs.x) && ((y > rhs.y) || ((y == rhs.y) && ((z > rhs.z) || ((z == rhs.z) && (w >= rhs.w))))));
@@ -561,7 +561,7 @@ modm::Vector<T, 4>::operator >= (const modm::Vector<T, 4> &rhs) const
 
 // ----------------------------------------------------------------------------
 template<typename T>
-const T&
+constexpr const T&
 modm::Vector<T, 4>::operator [] (uint8_t index) const
 {
 	return reinterpret_cast<const T*>(this)[index];
@@ -569,7 +569,7 @@ modm::Vector<T, 4>::operator [] (uint8_t index) const
 
 // ----------------------------------------------------------------------------
 template<typename T>
-T&
+constexpr T&
 modm::Vector<T, 4>::operator [] (uint8_t index)
 {
 	return reinterpret_cast<T*>(this)[index];
@@ -577,7 +577,7 @@ modm::Vector<T, 4>::operator [] (uint8_t index)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-T*
+constexpr T*
 modm::Vector<T, 4>::ptr()
 {
 	return reinterpret_cast<T*>(this);
@@ -585,7 +585,7 @@ modm::Vector<T, 4>::ptr()
 
 // ----------------------------------------------------------------------------
 template<typename T>
-const T*
+constexpr const T*
 modm::Vector<T, 4>::ptr() const
 {
 	return reinterpret_cast<const T*>(this);
@@ -593,7 +593,7 @@ modm::Vector<T, 4>::ptr() const
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>
+constexpr modm::Vector<T, 4>
 modm::Vector<T, 4>::operator + (const modm::Vector<T, 4> &rhs) const
 {
 	return modm::Vector<T, 4>(x+rhs.x, y+rhs.y, z+rhs.z, w+rhs.w);
@@ -601,7 +601,7 @@ modm::Vector<T, 4>::operator + (const modm::Vector<T, 4> &rhs) const
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>
+constexpr modm::Vector<T, 4>
 modm::Vector<T, 4>::operator - (const modm::Vector<T, 4> &rhs) const
 {
 	return modm::Vector<T, 4>(x-rhs.x, y-rhs.y, z-rhs.z, w-rhs.w);
@@ -609,7 +609,7 @@ modm::Vector<T, 4>::operator - (const modm::Vector<T, 4> &rhs) const
 
 // ----------------------------------------------------------------------------
 template<typename T>
-T
+constexpr T
 modm::Vector<T, 4>::operator * (const modm::Vector<T, 4> &rhs) const
 {
 	return x*rhs.x + y*rhs.y + z*rhs.z + w*rhs.w;
@@ -617,7 +617,7 @@ modm::Vector<T, 4>::operator * (const modm::Vector<T, 4> &rhs) const
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>
+constexpr modm::Vector<T, 4>
 modm::Vector<T, 4>::operator * (const T &rhs) const
 {
 	return modm::Vector<T, 4>(x*rhs, y*rhs, z*rhs, w*rhs);
@@ -625,7 +625,7 @@ modm::Vector<T, 4>::operator * (const T &rhs) const
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>
+constexpr modm::Vector<T, 4>
 modm::Vector<T, 4>::operator / (const T &rhs) const
 {
 	return modm::Vector<T, 4>(x/rhs, y/rhs, z/rhs, w/rhs);
@@ -633,7 +633,7 @@ modm::Vector<T, 4>::operator / (const T &rhs) const
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>&
+constexpr modm::Vector<T, 4>&
 modm::Vector<T, 4>::operator += (const modm::Vector<T, 4> &rhs)
 {
 	x += rhs.x;
@@ -646,7 +646,7 @@ modm::Vector<T, 4>::operator += (const modm::Vector<T, 4> &rhs)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>&
+constexpr modm::Vector<T, 4>&
 modm::Vector<T, 4>::operator -= (const modm::Vector<T, 4> &rhs)
 {
 	x -= rhs.x;
@@ -659,7 +659,7 @@ modm::Vector<T, 4>::operator -= (const modm::Vector<T, 4> &rhs)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>&
+constexpr modm::Vector<T, 4>&
 modm::Vector<T, 4>::operator *= (const T &rhs)
 {
 	x *= rhs;
@@ -672,7 +672,7 @@ modm::Vector<T, 4>::operator *= (const T &rhs)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>&
+constexpr modm::Vector<T, 4>&
 modm::Vector<T, 4>::operator /= (const T &rhs)
 {
 	x /= rhs;
@@ -685,7 +685,7 @@ modm::Vector<T, 4>::operator /= (const T &rhs)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>
+constexpr modm::Vector<T, 4>
 modm::Vector<T, 4>::operator - () const
 {
 	return modm::Vector<T, 4>(-x, -y, -z, -w);
@@ -693,7 +693,7 @@ modm::Vector<T, 4>::operator - () const
 
 // ----------------------------------------------------------------------------
 template<typename T>
-float
+constexpr float
 modm::Vector<T, 4>::getLength() const
 {
 	return std::sqrt(getLengthSquared());
@@ -701,7 +701,7 @@ modm::Vector<T, 4>::getLength() const
 
 // ----------------------------------------------------------------------------
 template<typename T>
-float
+constexpr float
 modm::Vector<T, 4>::getLengthSquared() const
 {
 	return x*x + y*y + z*z + w*w;
@@ -709,7 +709,7 @@ modm::Vector<T, 4>::getLengthSquared() const
 
 // ----------------------------------------------------------------------------
 template<typename T>
-void
+constexpr void
 modm::Vector<T, 4>::scale(float newLength)
 {
 	*this = scaled(newLength);
@@ -717,7 +717,7 @@ modm::Vector<T, 4>::scale(float newLength)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>
+constexpr modm::Vector<T, 4>
 modm::Vector<T, 4>::scaled(float newLength) const
 {
 	float scale = newLength / getLength();
@@ -726,7 +726,7 @@ modm::Vector<T, 4>::scaled(float newLength) const
 
 // ----------------------------------------------------------------------------
 template<typename T>
-void
+constexpr void
 modm::Vector<T, 4>::normalize()
 {
 	scale(1.0f);
@@ -734,7 +734,7 @@ modm::Vector<T, 4>::normalize()
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 4>
+constexpr modm::Vector<T, 4>
 modm::Vector<T, 4>::normalized() const
 {
 	return scaled(1.0);
@@ -742,14 +742,14 @@ modm::Vector<T, 4>::normalized() const
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Matrix<T, 4, 1>&
+constexpr modm::Matrix<T, 4, 1>&
 modm::Vector<T, 4>::asMatrix()
 {
 	return *(modm::Matrix<T, 4, 1>*)this;
 }
 
 template<typename T>
-const modm::Matrix<T, 4, 1>&
+constexpr const modm::Matrix<T, 4, 1>&
 modm::Vector<T, 4>::asMatrix() const
 {
 	return *(modm::Matrix<T, 4, 1>*)this;
@@ -757,7 +757,7 @@ modm::Vector<T, 4>::asMatrix() const
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Matrix<T, 1, 4>&
+constexpr modm::Matrix<T, 1, 4>&
 modm::Vector<T, 4>::asTransposedMatrix()
 {
 	return *(modm::Matrix<T, 1, 4>*)this;
@@ -765,7 +765,7 @@ modm::Vector<T, 4>::asTransposedMatrix()
 
 
 template<typename T>
-const modm::Matrix<T, 1, 4>&
+constexpr const modm::Matrix<T, 1, 4>&
 modm::Vector<T, 4>::asTransposedMatrix() const
 {
 	return *(modm::Matrix<T, 1, 4>*)this;
@@ -773,14 +773,14 @@ modm::Vector<T, 4>::asTransposedMatrix() const
 
 // ----------------------------------------------------------------------------
 template<typename T>
-static inline modm::Vector<T,4>
+constexpr static inline modm::Vector<T,4>
 operator * (const T &lhs, const modm::Vector<T,4> &rhs)
 {
 	return rhs * lhs;
 }
 
 template<class T, class U>
-static inline modm::Vector<U,4>
+constexpr static inline modm::Vector<U,4>
 operator * (const modm::Matrix<T, 4, 4> &lhs, const modm::Vector<U,4> &rhs)
 {
 	return lhs * rhs.asTMatrix();

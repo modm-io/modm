@@ -104,14 +104,14 @@ public:
 
 	/// @return `Busy` while an I2C operation is ongoing. Reinitialization
 	///			is not permitted during this phase.
-	TransactionState
+	constexpr TransactionState
 	getState() const
 	{
 		return state;
 	}
 
 	/// @return `true` while adapter is busy
-	bool
+	constexpr bool
 	isBusy() const
 	{
 		return (state == TransactionState::Busy);
@@ -247,7 +247,7 @@ public:
 	{
 	}
 
-	bool
+	constexpr bool
 	configurePing()
 	{
 		return configureWriteRead(nullptr, 0, nullptr, 0);
@@ -304,7 +304,7 @@ public:
 	 * @return  `true` if adapter was not in use,
 	 *          `false` otherwise
 	 */
-	bool
+	constexpr bool
 	configureWrite(const uint8_t *buffer, std::size_t size)
 	{
 		return configureWriteRead(buffer, size, nullptr, 0);
@@ -319,7 +319,7 @@ public:
 	 * @return  `true` if adapter was not in use,
 	 *          `false` otherwise
 	 */
-	bool
+	constexpr bool
 	configureRead(uint8_t *buffer, std::size_t size)
 	{
 		return configureWriteRead(nullptr, 0, buffer, size);
@@ -414,13 +414,13 @@ public:
 	{
 	}
 
-	bool
+	constexpr bool
 	configurePing()
 	{
 		return configureWrite(nullptr, 0);
 	}
 
-	bool
+	constexpr bool
 	configureWriteRead(const uint8_t *, std::size_t, uint8_t *, std::size_t)
 	{
 		return false;
@@ -438,7 +438,7 @@ public:
 		return false;
 	}
 
-	bool
+	constexpr bool
 	configureRead(uint8_t *, std::size_t)
 	{
 		return false;
@@ -489,19 +489,19 @@ public:
 	{
 	}
 
-	bool
+	constexpr bool
 	configurePing()
 	{
 		return configureRead(nullptr, 0);
 	}
 
-	bool
+	constexpr bool
 	configureWriteRead(const uint8_t *, std::size_t, uint8_t *, std::size_t)
 	{
 		return false;
 	}
 
-	bool
+	constexpr bool
 	configureWrite(uint8_t *, std::size_t)
 	{
 		return false;

@@ -47,7 +47,7 @@ constexpr modm::Pid<T, ScaleFactor>::Pid(
 }
 
 template<typename T, unsigned int ScaleFactor>
-void
+constexpr void
 modm::Pid<T, ScaleFactor>::reset()
 {
 	this->errorSum = 0;
@@ -56,14 +56,14 @@ modm::Pid<T, ScaleFactor>::reset()
 }
 
 template<typename T, unsigned int ScaleFactor>
-void
+constexpr void
 modm::Pid<T, ScaleFactor>::setParameter(const Parameter& parameter)
 {
 	this->parameter = parameter;
 }
 
 template<typename T, unsigned int ScaleFactor>
-void
+constexpr void
 modm::Pid<T, ScaleFactor>::update(const T& input, bool externalLimitation)
 {
 	bool limitation = externalLimitation;

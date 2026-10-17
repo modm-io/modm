@@ -224,14 +224,14 @@ public:
         );
     }
 
-    inplace_function& operator= (std::nullptr_t) noexcept
+    constexpr inplace_function& operator= (std::nullptr_t) noexcept
     {
         vtable_ptr_->destructor_ptr(std::addressof(storage_));
         vtable_ptr_ = std::addressof(inplace_function_detail::empty_vtable<R, Args...>);
         return *this;
     }
 
-    inplace_function& operator= (inplace_function other) noexcept
+    constexpr inplace_function& operator= (inplace_function other) noexcept
     {
         vtable_ptr_->destructor_ptr(std::addressof(storage_));
 
@@ -248,7 +248,7 @@ public:
         vtable_ptr_->destructor_ptr(std::addressof(storage_));
     }
 
-    R operator() (Args... args) const
+    constexpr R operator() (Args... args) const
     {
         return vtable_ptr_->invoke_ptr(
             std::addressof(storage_),
@@ -271,7 +271,7 @@ public:
         return vtable_ptr_ != std::addressof(inplace_function_detail::empty_vtable<R, Args...>);
     }
 
-    void swap(inplace_function& other) noexcept
+    constexpr void swap(inplace_function& other) noexcept
     {
         if (this == std::addressof(other)) return;
 
@@ -294,7 +294,7 @@ public:
         std::swap(vtable_ptr_, other.vtable_ptr_);
     }
 
-    friend void swap(inplace_function& lhs, inplace_function& rhs) noexcept
+    friend constexpr void swap(inplace_function& lhs, inplace_function& rhs) noexcept
     {
         lhs.swap(rhs);
     }

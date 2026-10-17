@@ -30,19 +30,19 @@ namespace modm
 	public:
 		constexpr SCurveGenerator(const T& initialValue = T());
 
-		inline void
+		constexpr void
 		setTarget(const T& target);
 
-		void
+		constexpr void
 		update();
 
-		inline const T&
+		constexpr const T&
 		getValue() const
 		{
 			return value;
 		}
 
-		inline bool
+		constexpr bool
 		isTargetReached() const;
 
 	private:

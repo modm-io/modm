@@ -28,7 +28,7 @@ constexpr modm::Ray2D<T>::Ray2D(const Vector<T, 2>& start, const Vector<T, 2>& d
 
 // ----------------------------------------------------------------------------
 template <typename T>
-inline void
+constexpr void
 modm::Ray2D<T>::setStartPoint(const Vector<T, 2>& point)
 {
 	this->basePoint = point;
@@ -42,7 +42,7 @@ modm::Ray2D<T>::getStartPoint() const
 }
 
 template <typename T>
-inline void
+constexpr void
 modm::Ray2D<T>::setDirectionVector(const Vector<T, 2>& direction)
 {
 	this->direction = direction;
@@ -50,7 +50,7 @@ modm::Ray2D<T>::setDirectionVector(const Vector<T, 2>& direction)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-const modm::Vector<T, 2>&
+constexpr const modm::Vector<T, 2>&
 modm::Ray2D<T>::getDirectionVector() const
 {
 	return direction;
@@ -141,7 +141,7 @@ modm::Ray2D<T>::getDirectionVector() const
 
 // ----------------------------------------------------------------------------
 template<typename T>
-bool
+constexpr bool
 modm::Ray2D<T>::intersects(const LineSegment2D<T>& line) const
 {
 	// vector from the base point of the line to the new point
@@ -267,7 +267,7 @@ modm::Ray2D<T>::intersects(const LineSegment2D<T>& line) const
 
 // ----------------------------------------------------------------------------
 template<typename T>
-bool
+constexpr bool
 modm::Ray2D<T>::ccw(const modm::Vector<T, 2>& point)
 {
 	// vector from the base point of the line to the new point
@@ -281,7 +281,7 @@ modm::Ray2D<T>::ccw(const modm::Vector<T, 2>& point)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-bool
+constexpr bool
 modm::Ray2D<T>::operator == (const Ray2D &other) const
 {
 	return ((this->basePoint == other.basePoint) &&
@@ -289,7 +289,7 @@ modm::Ray2D<T>::operator == (const Ray2D &other) const
 }
 
 template<typename T>
-bool
+constexpr bool
 modm::Ray2D<T>::operator != (const Ray2D &other) const
 {
 	return ((this->basePoint != other.basePoint) ||

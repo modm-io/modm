@@ -96,7 +96,7 @@ namespace modm
 		 * Creates an internal zero matrix and returns a reference to
 		 * that internal matrix.
 		 */
-		static const Matrix&
+		static constexpr const Matrix&
 		zeroMatrix();
 
 		/**
@@ -105,7 +105,7 @@ namespace modm
 		 * Creates an internal identity matrix and returns a reference to
 		 * that internal matrix.
 		 */
-		static const Matrix&
+		static constexpr const Matrix&
 		identityMatrix();
 
 		/**
@@ -113,54 +113,54 @@ namespace modm
 		 *
 		 */
 		template <uint8_t MR, uint8_t MC>
-		Matrix<T, MR, MC>
+		constexpr Matrix<T, MR, MC>
 		subMatrix(uint8_t row, uint8_t column) const;
 
-		bool operator == (const Matrix &m) const;
-		bool operator != (const Matrix &m) const;
+		constexpr bool operator == (const Matrix &m) const;
+		constexpr bool operator != (const Matrix &m) const;
 
-		const T*
+		constexpr const T*
 		operator [] (uint8_t row) const;
 
-		T*
+		constexpr T*
 		operator [] (uint8_t row);
 
-		inline uint8_t
+		constexpr uint8_t
 		getNumberOfRows() const;
 
-		inline uint8_t
+		constexpr uint8_t
 		getNumberOfColumns() const;
 
-		Matrix<T, 1, COLUMNS>
+		constexpr Matrix<T, 1, COLUMNS>
 		getRow(uint8_t index) const;
 
-		Matrix<T, ROWS, 1>
+		constexpr Matrix<T, ROWS, 1>
 		getColumn(uint8_t index) const;
 
 		// TODO remove these?
-		const T* ptr() const;
-		T* ptr();
+		constexpr const T* ptr() const;
+		constexpr T* ptr();
 
-		Matrix operator - ();
-		Matrix operator + (const Matrix &rhs) const;
-		Matrix operator - (const Matrix &rhs) const;
-		Matrix operator * (const T &rhs) const;		///< Scalar multiplication
-		Matrix operator / (const T &rhs) const;		///< Scalar division
+		constexpr Matrix operator - ();
+		constexpr Matrix operator + (const Matrix &rhs) const;
+		constexpr Matrix operator - (const Matrix &rhs) const;
+		constexpr Matrix operator * (const T &rhs) const;		///< Scalar multiplication
+		constexpr Matrix operator / (const T &rhs) const;		///< Scalar division
 
-		Matrix& operator += (const Matrix &rhs);
-		Matrix& operator -= (const Matrix &rhs);
-		Matrix& operator *= (const T &rhs);			///< Scalar multiplication
-		Matrix& operator /= (const T &rhs);			///< Scalar division
+		constexpr Matrix& operator += (const Matrix &rhs);
+		constexpr Matrix& operator -= (const Matrix &rhs);
+		constexpr Matrix& operator *= (const T &rhs);			///< Scalar multiplication
+		constexpr Matrix& operator /= (const T &rhs);			///< Scalar division
 
 		/// Matrix multiplication with matrices with the same size
-		Matrix operator *= (const Matrix &rhs);
+		constexpr Matrix operator *= (const Matrix &rhs);
 
 		/// Matrix multiplication with different size matrices
 		template<uint8_t RHSCOL>
-		Matrix<T, ROWS, RHSCOL>
+		constexpr Matrix<T, ROWS, RHSCOL>
 		operator * (const Matrix<T, COLUMNS, RHSCOL> &rhs) const;
 
-		Matrix<T, COLUMNS, ROWS>
+		constexpr Matrix<T, COLUMNS, ROWS>
 		asTransposed() const;
 
 		/**
@@ -168,7 +168,7 @@ namespace modm
 		 *
 		 * \warning	Will only work if the matrix is square!
 		 */
-		inline void
+		constexpr void
 		transpose();
 
 		/**
@@ -176,7 +176,7 @@ namespace modm
 		 *
 		 * Uses modm::determinant(*this);
 		 */
-		inline T
+		constexpr T
 		determinant() const;
 
 		// TODO Implement these
@@ -186,37 +186,37 @@ namespace modm
 		Matrix
 		asInversed() const;*/
 
-		bool hasNan() const;
-		bool hasInf() const;
+		constexpr bool hasNan() const;
+		constexpr bool hasInf() const;
 
 		/// Fill the matrix with the values in \p data
 		template<typename U>
-		Matrix&
+		constexpr Matrix&
 		replace(const U *data);
 
 		///
 		template<uint8_t MW, uint8_t MH>
-		Matrix&
+		constexpr Matrix&
 		replace(uint8_t row, uint8_t column, const Matrix<T, MW, MH> &m);
 
-		Matrix&
+		constexpr Matrix&
 		replaceRow(uint8_t index, const Matrix<T, 1, COLUMNS> &m);
 
-		Matrix&
+		constexpr Matrix&
 		replaceColumn(uint8_t index, const Matrix<T, ROWS, 1> &m);
 
 
-		Matrix<T, ROWS, COLUMNS+1>
+		constexpr Matrix<T, ROWS, COLUMNS+1>
 		addColumn(uint8_t index, const Matrix<T, ROWS, 1> &c) const;
 
-		Matrix<T, ROWS+1, COLUMNS>
+		constexpr Matrix<T, ROWS+1, COLUMNS>
 		addRow(uint8_t index, const Matrix<T, 1, COLUMNS> &r) const;
 
 
-		Matrix<T, ROWS, COLUMNS-1>
+		constexpr Matrix<T, ROWS, COLUMNS-1>
 		removeColumn(uint8_t index) const;
 
-		Matrix<T, ROWS-1, COLUMNS>
+		constexpr Matrix<T, ROWS-1, COLUMNS>
 		removeRow(uint8_t index) const;
 
 	public:
@@ -224,11 +224,11 @@ namespace modm
 
 	private:
 		/// Size of the Matrix in Bytes
-		inline size_t
+		constexpr size_t
 		getSize() const;
 
 		/// Number of elements in the Matrix (rows * columns)
-		inline uint8_t
+		constexpr uint8_t
 		getNumberOfElements() const;
 	};
 
@@ -244,11 +244,11 @@ namespace modm
 	// ------------------------------------------------------------------------
 	/// @cond
 	template<typename T>
-	T
+	constexpr T
 	determinant(const modm::Matrix<T, 1, 1> &m);
 
 	template<typename T>
-	T
+	constexpr T
 	determinant(const modm::Matrix<T, 2, 2> &m);
 	/// @endcond
 
@@ -259,7 +259,7 @@ namespace modm
 	 * \ingroup	modm_math_matrix
 	 */
 	template<typename T, uint8_t N>
-	T
+	constexpr T
 	determinant(const modm::Matrix<T, N, N> &m);
 	/// @}
 }

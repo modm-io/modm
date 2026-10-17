@@ -46,32 +46,32 @@ namespace modm
 			 *
 			 * \param	coeff	array containing the coefficients
 			 **/
-			void
+			constexpr void
 			setCoefficients(const float (&coeff)[N]);
 
 			/**
 			 * \brief	Resets the tap buffer
 			 */
-			void
+			constexpr void
 			reset();
 
 			/**
 			 * \brief	Appends new tap
 			 */
-			void
+			constexpr void
 			append(const T& input);
 
 			/**
 			 * \brief	Calculates g[0]
 			 *
 			 */
-			void
+			constexpr void
 			update();
 
 			/**
 			 * \brief	Returns g[0].
 			 */
-			inline const T&
+			constexpr const T&
 			getValue() const
 			{
 				return output;

@@ -28,7 +28,7 @@ constexpr modm::filter::Ramp<T>::Ramp(const T& increment, const T& decrement, co
 
 // ----------------------------------------------------------------------------
 template<typename T>
-void
+constexpr void
 modm::filter::Ramp<T>::setTarget(const T& target)
 {
 	this->target = target;
@@ -37,7 +37,7 @@ modm::filter::Ramp<T>::setTarget(const T& target)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-void
+constexpr void
 modm::filter::Ramp<T>::update()
 {
 	if (target > value)
@@ -66,7 +66,7 @@ modm::filter::Ramp<T>::update()
 
 // ----------------------------------------------------------------------------
 template<typename T>
-void
+constexpr void
 modm::filter::Ramp<T>::reset(const T& value)
 {
 	this->value = value;
@@ -74,7 +74,7 @@ modm::filter::Ramp<T>::reset(const T& value)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-const T&
+constexpr const T&
 modm::filter::Ramp<T>::getValue() const
 {
 	return this->value;
@@ -82,7 +82,7 @@ modm::filter::Ramp<T>::getValue() const
 
 // ----------------------------------------------------------------------------
 template<typename T>
-bool
+constexpr bool
 modm::filter::Ramp<T>::isTargetReached() const
 {
 	return targetReached;

@@ -31,7 +31,7 @@ namespace modm
 /// Fast check if a float variable is positive
 /// Checks only the sign bit for the AVR.
 [[deprecated("use not std::signbit(a)")]] // DEPRECATED: 2027q4
-inline bool
+constexpr bool
 isPositive(const float& a)
 {
 	return !std::signbit(a);
@@ -69,7 +69,7 @@ pow(uint32_t base, uint8_t exponent)
  */
 template<typename T>
 [[deprecated("use std::min")]] // DEPRECATED: 2027q4
-inline const T&
+constexpr const T&
 min(const T& a, const T& b)
 {
 	if (b < a)
@@ -91,7 +91,7 @@ min(const T& a, const T& b)
  */
 template<typename T>
 [[deprecated("use std::max")]] // DEPRECATED: 2027q4
-inline const T&
+constexpr const T&
 max(const T& a, const T& b)
 {
 	if (a < b)
@@ -134,7 +134,7 @@ max(const T a, const T b, const T c)
  */
 template<typename T, typename Compare>
 [[deprecated("use std::min")]] // DEPRECATED: 2027q4
-inline const T&
+constexpr const T&
 min(const T& a, const T& b, Compare compare)
 {
 	if (compare(b, a))
@@ -156,7 +156,7 @@ min(const T& a, const T& b, Compare compare)
  */
 template<typename T, typename Compare>
 [[deprecated("use std::max")]] // DEPRECATED: 2027q4
-inline const T&
+constexpr const T&
 max(const T& a, const T& b, Compare compare)
 {
 	if (compare(a, b))

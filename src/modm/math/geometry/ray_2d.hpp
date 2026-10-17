@@ -52,16 +52,16 @@ namespace modm
 		constexpr Ray2D(const Vector<T, 2>& start, const Vector<T, 2>& direction);
 
 		/// Set the starting point of the ray
-		inline void
+		constexpr void
 		setStartPoint(const Vector<T, 2>& point);
 
 		inline const Vector<T, 2>&
 		getStartPoint() const;
 
-		inline void
+		constexpr void
 		setDirectionVector(const Vector<T, 2>& direction);
 
-		inline const Vector<T, 2>&
+		constexpr const Vector<T, 2>&
 		getDirectionVector() const;
 
 		void
@@ -86,7 +86,7 @@ namespace modm
 		 *
 		 * Uses Ray2D::ccw() to check if any intersection exists.
 		 */
-		bool
+		constexpr bool
 		intersects(const LineSegment2D<T>& line) const;
 //
 //		/// Check if a intersection exists
@@ -113,13 +113,13 @@ namespace modm
 //		getIntersections(const Polygon2D<T>& polygon,
 //				PointSet2D<T>& intersectionPoints) const;
 
-		bool
+		constexpr bool
 		ccw(const modm::Vector<T, 2>& point);
 
-		bool
+		constexpr bool
 		operator == (const Ray2D &other) const;
 
-		bool
+		constexpr bool
 		operator != (const Ray2D &other) const;
 
 	protected:

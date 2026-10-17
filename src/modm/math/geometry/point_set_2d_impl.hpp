@@ -53,7 +53,7 @@ modm::PointSet2D<T>::getNumberOfPoints() const
 
 // ----------------------------------------------------------------------------
 template <typename T>
-void
+constexpr void
 modm::PointSet2D<T>::append(const modm::PointSet2D<T>::PointType& point)
 {
 	points.push_back(point);
@@ -76,7 +76,7 @@ modm::PointSet2D<T>::operator [](SizeType index) const
 
 // ----------------------------------------------------------------------------
 template <typename T>
-void
+constexpr void
 modm::PointSet2D<T>::removeAll()
 {
 	points.clear();

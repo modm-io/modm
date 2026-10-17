@@ -27,7 +27,7 @@ constexpr modm::filter::Debounce<T>::Debounce(const T& maxValue, const T& lowerB
 }
 
 template<typename T>
-void
+constexpr void
 modm::filter::Debounce<T>::update(bool input)
 {
 	if (input && (sum < maxValue)) {
@@ -46,14 +46,14 @@ modm::filter::Debounce<T>::update(bool input)
 }
 
 template<typename T>
-bool
+constexpr bool
 modm::filter::Debounce<T>::getValue() const
 {
 	return state;
 }
 
 template<typename T>
-void
+constexpr void
 modm::filter::Debounce<T>::reset(const bool state)
 {
 	if (state) {

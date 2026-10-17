@@ -38,21 +38,21 @@ modm::Circle2D<T>::getCenter() const
 }
 
 template <typename T>
-inline void
+constexpr void
 modm::Circle2D<T>::setCenter(const Vector<T, 2>& point)
 {
 	this->center = point;
 }
 
 template <typename T>
-inline T
+constexpr T
 modm::Circle2D<T>::getRadius() const
 {
 	return this->radius;
 }
 
 template <typename T>
-inline void
+constexpr void
 modm::Circle2D<T>::setRadius(T newRadius)
 {
 	this->radius = newRadius;
@@ -60,7 +60,7 @@ modm::Circle2D<T>::setRadius(T newRadius)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-bool
+constexpr bool
 modm::Circle2D<T>::intersects(const Polygon2D<T>& polygon) const
 {
 	return polygon.intersects(*this);
@@ -68,7 +68,7 @@ modm::Circle2D<T>::intersects(const Polygon2D<T>& polygon) const
 
 // ----------------------------------------------------------------------------
 template <typename T>
-bool
+constexpr bool
 modm::Circle2D<T>::getIntersections(const Circle2D& other,
 		PointSet2D<T>& intersections) const
 {
@@ -126,7 +126,7 @@ modm::Circle2D<T>::getIntersections(const Circle2D& other,
 
 // ----------------------------------------------------------------------------
 template <typename T>
-bool
+constexpr bool
 modm::Circle2D<T>::getIntersections(const Line2D<T>& line,
 		PointSet2D<T>& intersections) const
 {
@@ -135,7 +135,7 @@ modm::Circle2D<T>::getIntersections(const Line2D<T>& line,
 
 // ----------------------------------------------------------------------------
 template <typename T>
-bool
+constexpr bool
 modm::Circle2D<T>::getIntersections(const LineSegment2D<T>& line,
 		PointSet2D<T>& intersections) const
 {

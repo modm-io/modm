@@ -69,38 +69,38 @@ public:
 	constexpr Saturated(const Saturated<U>& other)
 	{ value = std::clamp< modm::fits_any_t<TP, U> >(other.value, min, max); }
 
-	TP
+	constexpr TP
 	getValue() const
 	{ return value; }
 
 	// Implicitely serve underlying type so you can f.e. pass Saturated to std::abs()
 	operator T&() { return value; }
-	operator T() const { return value; }
+	constexpr operator T() const { return value; }
 
 	// comparison operators
 	constexpr auto
 	operator<=>(const Saturated<T>&) const = default;
 
 	// operator=
-	void
+	constexpr void
 	operator=(const Saturated& other)
 	{ value = other.value; }
 
 	template<typename U>
 	requires std::integral<std::remove_reference_t<U>>
-	void
+	constexpr void
 	operator=(const Saturated<U>& other)
 	{ value = std::clamp< modm::fits_any_t<TP, U> >(other.value, min, max); }
 
 	// Post: operator++, operator--
-	Saturated&
+	constexpr Saturated&
 	operator++()
 	{
 		if (value < max) value++;
 		return *this;
 	}
 
-	Saturated&
+	constexpr Saturated&
 	operator--()
 	{
 		if (value > min) value--;
@@ -108,7 +108,7 @@ public:
 	}
 
 	// Pre: operator++(int), operator--(int)
-	Saturated
+	constexpr Saturated
 	operator++(int)
 	{
 		Saturated tmp(*this);
@@ -116,7 +116,7 @@ public:
 		return tmp;
 	}
 
-	Saturated
+	constexpr Saturated
 	operator--(int)
 	{
 		Saturated tmp(*this);
@@ -127,7 +127,7 @@ public:
 	// operator+=, operator-=, operator*=
 	template<typename U>
 	requires std::unsigned_integral<std::remove_reference_t<U>>
-	Saturated&
+	constexpr Saturated&
 	operator+=(const Saturated<U>& other)
 	{
 		if (__builtin_add_overflow(value, other.value, &value))
@@ -138,7 +138,7 @@ public:
 
 	template<typename U>
 	requires std::signed_integral<std::remove_reference_t<U>>
-	Saturated&
+	constexpr Saturated&
 	operator+=(const Saturated<U>& other)
 	{
 		if (other.value < 0) {
@@ -154,7 +154,7 @@ public:
 
 	template<typename U>
 	requires std::unsigned_integral<std::remove_reference_t<U>>
-	Saturated&
+	constexpr Saturated&
 	operator-=(const Saturated<U>& other)
 	{
 		if (__builtin_sub_overflow(value, other.value, &value))
@@ -165,7 +165,7 @@ public:
 
 	template<typename U>
 	requires std::signed_integral<std::remove_reference_t<U>>
-	Saturated&
+	constexpr Saturated&
 	operator-=(const Saturated<U>& other)
 	{
 		if (other.value < 0) {
@@ -181,7 +181,7 @@ public:
 
 	template<typename U>
 	requires std::unsigned_integral<std::remove_reference_t<U>>
-	Saturated&
+	constexpr Saturated&
 	operator*=(const Saturated<U>& other)
 	{
 		if (__builtin_mul_overflow(value, other.value, &value))
@@ -192,7 +192,7 @@ public:
 
 	template<typename U>
 	requires std::signed_integral<std::remove_reference_t<U>>
-	Saturated&
+	constexpr Saturated&
 	operator*=(const Saturated<U>& other)
 	{
 		if (other.value < 0) {
@@ -211,7 +211,7 @@ public:
 	// Overload plain types for now:
 	template<typename U>
 	requires std::unsigned_integral<std::remove_reference_t<U>>
-	Saturated&
+	constexpr Saturated&
 	operator*=(const U& v)
 	{
 		if (__builtin_mul_overflow(value, v, &value))
@@ -222,7 +222,7 @@ public:
 
 	template<typename U>
 	requires std::signed_integral<std::remove_reference_t<U>>
-	Saturated&
+	constexpr Saturated&
 	operator*=(const U& v)
 	{
 		if (v < 0) {
@@ -240,7 +240,7 @@ public:
 	// operator+, operator-, operator*
 	template<typename U>
 	requires std::unsigned_integral<std::remove_reference_t<U>>
-	TP
+	constexpr TP
 	operator+(const Saturated<U>& other)
 	{
 		Saturated<TP> tmp;
@@ -253,7 +253,7 @@ public:
 
 	template<typename U>
 	requires std::signed_integral<std::remove_reference_t<U>>
-	TP
+	constexpr TP
 	operator+(const Saturated<U>& other)
 	{
 		Saturated<TP> tmp;
@@ -271,7 +271,7 @@ public:
 
 	template<typename U>
 	requires std::unsigned_integral<std::remove_reference_t<U>>
-	TP
+	constexpr TP
 	operator-(const Saturated<U>& other)
 	{
 		Saturated<TP> tmp;
@@ -284,7 +284,7 @@ public:
 
 	template<typename U>
 	requires std::signed_integral<std::remove_reference_t<U>>
-	TP
+	constexpr TP
 	operator-(const Saturated<U>& other)
 	{
 		Saturated<TP> tmp;
@@ -300,7 +300,7 @@ public:
 		return tmp.value;
 	}
 
-	TP
+	constexpr TP
 	operator*(const Saturated<T>& other)
 	{
 		Saturated<TP> tmp;
@@ -311,11 +311,11 @@ public:
 		return tmp.value;
 	}
 
-	TS
+	constexpr TS
 	operator-()
  	{ return -TS(value); }
 
-	void
+	constexpr void
 	absolute()
 	{
 		if constexpr (std::is_signed_v<T>)

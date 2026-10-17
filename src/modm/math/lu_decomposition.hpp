@@ -40,20 +40,20 @@ namespace modm
 	{
 	public:
 		template <typename T, uint8_t N>
-		static bool
+		static constexpr bool
 		decompose(const Matrix<T, N, N> &matrix,
 				Matrix<T, N, N> *l,
 				Matrix<T, N, N> *u);
 
 		template <typename T, uint8_t N>
-		static bool
+		static constexpr bool
 		decompose(const Matrix<T, N, N> &matrix,
 				Matrix<T, N, N> *l,
 				Matrix<T, N, N> *u,
 				Matrix<T, N, N> *p);
 
 		template <typename T, uint8_t N>
-		static bool
+		static constexpr bool
 		decompose(const Matrix<T, N, N> &matrix,
 				Matrix<T, N, N> *l,
 				Matrix<T, N, N> *u,
@@ -61,13 +61,13 @@ namespace modm
 
 
 		template <typename T, uint8_t N, uint8_t BXWIDTH>
-		static bool
+		static constexpr bool
 		solve(const Matrix<T, N, N> &l,
 				const Matrix<T, N, N> &u,
 				Matrix<T, N, BXWIDTH> *xb);
 
 		template <typename T, uint8_t N, uint8_t BXWIDTH>
-		static bool
+		static constexpr bool
 		solve(const Matrix<T, N, N> &A,
 				Matrix<T, N, BXWIDTH> *xb);
 
@@ -77,32 +77,32 @@ namespace modm
 		class LUSubDecomposition
 		{
 		public:
-			static bool
+			static constexpr bool
 			decomposeRecur(T * u, T * l);
 
-			static bool
+			static constexpr bool
 			decompose(T * u, T * l);
 
-			static bool
+			static constexpr bool
 			decomposeRecur(T *u, T *l, int8_t *p);
 
-			static bool
+			static constexpr bool
 			decompose(T *u, T *l, int8_t *p);
 
 			template<uint8_t BXWIDTH>
-			static bool
+			static constexpr bool
 			solveLyEqualsB(
 					Matrix<T, HEIGHT, WIDTH> *l,
 					Matrix<T, HEIGHT, BXWIDTH> *bx);
 
 			template<uint8_t BXWIDTH>
-			static bool
+			static constexpr bool
 			solveUxEqualsY(
 					Matrix<T, HEIGHT, WIDTH> *u,
 					Matrix<T, HEIGHT, BXWIDTH> *bx);
 
 			template<uint8_t BXWIDTH>
-			static bool
+			static constexpr bool
 			solve(
 					const Matrix<T, HEIGHT, WIDTH> &l,
 					const Matrix<T, HEIGHT, WIDTH> &u,
@@ -113,17 +113,17 @@ namespace modm
 		class RowOperation
 		{
 		public:
-			static void
+			static constexpr void
 			multiply(T *intoRow, const T *row, const T &factor);
 
-			static void
+			static constexpr void
 			addRowTimesFactor(
 					T *intoRow,
 					const T *srcRow,
 					const T *addRow,
 					const T &timesFactor);
 
-			static void
+			static constexpr void
 			swap(T *row1, T *row2);
 		};
 
@@ -131,17 +131,17 @@ namespace modm
 		class RowOperation<T, 0>
 		{
 		public:
-			static void
+			static constexpr void
 			multiply(T *intoRow, const T *row, const T &factor);
 
-			static void
+			static constexpr void
 			addRowTimesFactor(
 					T *intoRow,
 					const T *srcRow,
 					const T *addRow,
 					const T &timesFactor);
 
-			static void
+			static constexpr void
 			swap(T *row1, T *row2);
 		};
 
@@ -149,20 +149,20 @@ namespace modm
 		class LUSubDecomposition<T, OFFSET, WIDTH, OFFSET>
 		{
 		public:
-			static bool
+			static constexpr bool
 			decomposeRecur(T *u, T *l, int8_t *p);
 
-			static bool
+			static constexpr bool
 			decomposeRecur(T *u, T *l);
 
 			template<uint8_t BXWIDTH>
-			static bool
+			static constexpr bool
 			solveUxEqualsY(
 					Matrix<T, WIDTH, OFFSET> *u,
 					Matrix<T, OFFSET, BXWIDTH> *bx);
 
 			template<uint8_t BXWIDTH>
-			static bool
+			static constexpr bool
 			solveLyEqualsB(
 					Matrix<T, WIDTH, OFFSET> *l,
 					Matrix<T, OFFSET, BXWIDTH> *bx);

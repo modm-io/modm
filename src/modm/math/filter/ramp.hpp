@@ -53,20 +53,20 @@ namespace modm
 				 const T& decrement,
 				 const T& initialValue = T());
 
-			inline void
+			constexpr void
 			setTarget(const T& target);
 
 			/// Calculate the next step
-			void
+			constexpr void
 			update();
 
-			inline void
+			constexpr void
 			reset(const T& value = T());
 
-			inline const T&
+			constexpr const T&
 			getValue() const;
 
-			inline bool
+			constexpr bool
 			isTargetReached() const;
 
 		private:

@@ -77,26 +77,26 @@ namespace modm
 		explicit constexpr Vector(T inVal);
 		constexpr Vector(const Matrix<T, 2, 1> &rhs);
 
-		inline void
+		constexpr void
 		setX(const T& value);
 
-		inline void
+		constexpr void
 		setY(const T& value);
 
-		inline void
+		constexpr void
 		set(const T& x, const T& y);
 
 
-		inline const T&
+		constexpr const T&
 		getX() const;
 
-		inline const T&
+		constexpr const T&
 		getY() const;
 
 		/**
 		 * \brief	Calculate length of the vector
 		 */
-		T
+		constexpr T
 		getLength() const;
 
 		/**
@@ -107,7 +107,7 @@ namespace modm
 		 *
 		 * \return	squared length (x*x + y*y)
 		 */
-		WideType
+		constexpr WideType
 		getLengthSquared() const;
 
 		/**
@@ -117,7 +117,7 @@ namespace modm
 		 * atan2(y, x)
 		 * \endcode
 		 */
-		float
+		constexpr float
 		getAngle() const;
 
 		/**
@@ -126,36 +126,36 @@ namespace modm
 		 * \warning	This method is only useful if T is a floating point type.
 		 * 			For integer types the result might be wrong!
 		 */
-		Vector&
+		constexpr Vector&
 		normalize();
 
-		Vector
+		constexpr Vector
 		normalized() const;
 
 		/**
 		 * \brief	Scale the vector to \p length
 		 */
-		Vector&
+		constexpr Vector&
 		scale(float length);
 
-		Vector
+		constexpr Vector
 		scaled(float length) const;
 
 
-		Vector&
+		constexpr Vector&
 		rotate(float phi);
 
 		/**
 		 * \brief	Move the point in x and y direction
 		 */
-		Vector&
+		constexpr Vector&
 		translate(const Vector& vector);
 
 
-		WideType
+		constexpr WideType
 		getDistanceTo(const Vector& other) const;
 
-		float
+		constexpr float
 		getAngleTo(const Vector& other) const;
 
 		/**
@@ -167,7 +167,7 @@ namespace modm
 		 * this.x * other.x + this.y * other.y
 		 * \endcode
 		 */
-		WideType
+		constexpr WideType
 		dot(const Vector& other) const;
 
 		/**
@@ -192,14 +192,14 @@ namespace modm
 		 * toOrthogonalVector() method, which returns a perpendicular copy
 		 * of the vector.
 		 */
-		WideType
+		constexpr WideType
 		cross(const Vector& other) const;
 
 		/**
 		 * \brief	Convert between Point-objects with different base-types
 		 */
 		template<typename U>
-		Vector<U, 2>
+		constexpr Vector<U, 2>
 		convert() const;
 
 		/**
@@ -207,11 +207,11 @@ namespace modm
 		 *
 		 * \return	(y, -x)
 		 */
-		Vector
+		constexpr Vector
 		toOrthogonalVector() const;
 
 		// TODO
-		Vector
+		constexpr Vector
 		perpendicular() const;
 
 		/**
@@ -227,52 +227,52 @@ namespace modm
 		 *
 		 * This definition is useful for inclusion or intersection testing.
 		 */
-		static int_fast8_t
+		static constexpr int_fast8_t
 		ccw(const Vector& a, const Vector& b, const Vector& c);
 
-		Vector& operator = (const Matrix<T, 2, 1> &rhs);
+		constexpr Vector& operator = (const Matrix<T, 2, 1> &rhs);
 
-		bool operator == (const Vector &rhs) const;
-		bool operator != (const Vector &rhs) const;
-		bool operator < (const Vector &rhs) const;
-		bool operator <= (const Vector &rhs) const;
-		bool operator > (const Vector &rhs) const;
-		bool operator >= (const Vector &rhs) const;
+		constexpr bool operator == (const Vector &rhs) const;
+		constexpr bool operator != (const Vector &rhs) const;
+		constexpr bool operator < (const Vector &rhs) const;
+		constexpr bool operator <= (const Vector &rhs) const;
+		constexpr bool operator > (const Vector &rhs) const;
+		constexpr bool operator >= (const Vector &rhs) const;
 
-		const T& operator [] (uint8_t index) const;
-		T& operator [] (uint8_t index);
+		constexpr const T& operator [] (uint8_t index) const;
+		constexpr T& operator [] (uint8_t index);
 
-		T* ptr();
-		const T* ptr() const;
+		constexpr T* ptr();
+		constexpr const T* ptr() const;
 
-		Vector operator - () const;
-		Vector operator - (const Vector &rhs) const;
-		Vector operator + (const Vector &rhs) const;
-		T operator * (const Vector &rhs) const;
-		T operator ^ (const Vector &rhs) const;
-		Vector operator * (float rhs) const;
-		Vector operator / (float rhs) const;
+		constexpr Vector operator - () const;
+		constexpr Vector operator - (const Vector &rhs) const;
+		constexpr Vector operator + (const Vector &rhs) const;
+		constexpr T operator * (const Vector &rhs) const;
+		constexpr T operator ^ (const Vector &rhs) const;
+		constexpr Vector operator * (float rhs) const;
+		constexpr Vector operator / (float rhs) const;
 
-		Vector& operator += (const Vector &rhs);
-		Vector& operator -= (const Vector &rhs);
-		Vector& operator *= (const T &rhs);
-		Vector& operator /= (const T &rhs);
-		Vector& operator ~ ();
+		constexpr Vector& operator += (const Vector &rhs);
+		constexpr Vector& operator -= (const Vector &rhs);
+		constexpr Vector& operator *= (const T &rhs);
+		constexpr Vector& operator /= (const T &rhs);
+		constexpr Vector& operator ~ ();
 
-		Matrix<T, 2, 1>&
+		constexpr Matrix<T, 2, 1>&
 		asMatrix();
 
-		const Matrix<T, 2, 1>&
+		constexpr const Matrix<T, 2, 1>&
 		asMatrix() const;
 
-		Matrix<T, 1, 2>&
+		constexpr Matrix<T, 1, 2>&
 		asTransposedMatrix();
 
-		const Matrix<T, 1, 2>&
+		constexpr const Matrix<T, 1, 2>&
 		asTransposedMatrix() const;
 
-		bool hasNan() const;
-		bool hasInf() const;
+		constexpr bool hasNan() const;
+		constexpr bool hasInf() const;
 
 	#ifndef __DOXYGEN__
 		IMPLEMENT_VECTOR_ACCESSOR2(x,x); IMPLEMENT_VECTOR_ACCESSOR2(x,y);
@@ -304,8 +304,8 @@ namespace modm
 		operator <<(IOStream& os, const Vector<U, 2>& c);
 
 		template<typename U>
-		friend Vector<U, 2>
-		operator * (float scale, const Vector<U, 2> &vector);
+		friend constexpr Vector<U, 2>
+		operator *(float scale, const Vector<U, 2> &vector);
 	};
 
 	using Vector2f = Vector<float, 2>;
@@ -328,7 +328,7 @@ namespace modm
 	 * \ingroup	modm_math_geometry
 	 */
 	template<typename U>
-	Vector<U, 2>
+	constexpr Vector<U, 2>
 	operator * (float scale, const Vector<U, 2> &vector);
 
 	/**
@@ -336,7 +336,7 @@ namespace modm
 	 * \ingroup	modm_math_geometry
 	 */
 	template<typename U>
-	Vector<U, 2>
+	constexpr Vector<U, 2>
 	operator / (float scale, const Vector<U, 2> &vector);
 
 	// ------------------------------------------------------------------------
@@ -365,14 +365,14 @@ namespace modm
 
 	// round for everything that's not float => double or double => float
 	template<> template<typename U>
-	Vector<U, 2>
+	constexpr Vector<U, 2>
 	Vector<float, 2>::convert() const
 	{
 		return Vector<U, 2>(round(this->x), round(this->y));
 	}
 
 	template<> template<typename U>
-	Vector<U, 2>
+	constexpr Vector<U, 2>
 	Vector<double, 2>::convert() const
 	{
 		return Vector<U, 2>(round(this->x), round(this->y));

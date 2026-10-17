@@ -41,13 +41,13 @@ namespace modm
 					 const T& lowerBound = 0,
 					 const T& upperBound = 0);
 
-			void
+			constexpr void
 			update(bool input);
 
-			bool
+			constexpr bool
 			getValue() const;
 
-			void
+			constexpr void
 			reset(const bool state);
 
 		private:
