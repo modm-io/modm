@@ -50,10 +50,10 @@ namespace modm
 			read(char&);
 
 		private :
-			StyleWrapper( const StyleWrapper& );
+			StyleWrapper( const StyleWrapper& ) = delete;
 
 			StyleWrapper&
-			operator=( const StyleWrapper& );
+			operator=( const StyleWrapper& ) = delete;
 
 			STYLE style;
 		};

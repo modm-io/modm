@@ -89,11 +89,11 @@ namespace modm
 
 		private:
 			// disable copy constructor
-			Semaphore(const Semaphore&);
+			Semaphore(const Semaphore&) = delete;
 
 			// disable assignment operator
 			Semaphore &
-			operator = (const Semaphore&);
+			operator = (const Semaphore&) = delete;
 
 			// The current semaphore count.
 			unsigned int count;
@@ -124,11 +124,11 @@ namespace modm
 
 		private:
 			// disable copy constructor
-			BinarySemaphore(const BinarySemaphore&);
+			BinarySemaphore(const BinarySemaphore&) = delete;
 
 			// disable assignment operator
 			BinarySemaphore &
-			operator = (const BinarySemaphore&);
+			operator = (const BinarySemaphore&) = delete;
 		};
 	}
 }

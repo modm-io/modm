@@ -150,10 +150,10 @@ namespace xpcc
 		update();
 
 	protected:
-		CanConnector(const CanConnector&);
+		CanConnector(const CanConnector&) = delete;
 
 		CanConnector&
-		operator = (const CanConnector&);
+		operator = (const CanConnector&) = delete;
 
 		/**
 		 * \brief	Try to send a CAN message via CAN Driver
@@ -196,7 +196,7 @@ namespace xpcc
 
 		private:
 			SendListItem&
-			operator = (const SendListItem& other);
+			operator = (const SendListItem& other) = delete;
 		};
 
 		class ReceiveListItem
@@ -225,7 +225,7 @@ namespace xpcc
 
 		private:
 			ReceiveListItem&
-			operator = (const ReceiveListItem& other);
+			operator = (const ReceiveListItem& other) = delete;
 		};
 
 		using SendList = std::list< SendListItem >;

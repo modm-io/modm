@@ -52,10 +52,10 @@ namespace modm
 				}
 
 			private:
-				Logger(const Logger&);
+				Logger(const Logger&) = delete;
 
 				Logger&
-				operator = (const Logger&);
+				operator = (const Logger&) = delete;
 		};
 
 		/**

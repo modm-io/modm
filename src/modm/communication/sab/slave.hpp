@@ -87,10 +87,10 @@ namespace modm
 		protected:
 			Response(Transmitter *parent);
 
-			Response(const Response&);
+			Response(const Response&) = delete;
 
 			Response&
-			operator = (const Response&);
+			operator = (const Response&) = delete;
 
 			Transmitter *transmitter;
 			bool triggered;				///< is used by abp::Slave to check that a response was send

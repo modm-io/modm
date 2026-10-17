@@ -214,11 +214,11 @@ namespace modm
 			wrapper(void *object);
 
 			// disable copy constructor
-			Thread(const Thread& other);
+			Thread(const Thread& other) = delete;
 
 			// disable assignment operator
 			Thread&
-			operator = (const Thread& other);
+			operator = (const Thread& other) = delete;
 
 			TaskHandle_t handle;
 		};
