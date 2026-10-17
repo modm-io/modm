@@ -16,7 +16,7 @@
 void
 modm::gui::ButtonWidget::render(View* view)
 {
-	if(view == NULL)
+	if(view == nullptr)
 		return;
 
 	// output device of view
@@ -70,7 +70,7 @@ modm::gui::ButtonWidget::render(View* view)
 void
 modm::gui::ArrowButton::render(View* view)
 {
-	if(view == NULL)
+	if(view == nullptr)
 		return;
 
 	// output device of view
@@ -123,7 +123,7 @@ modm::gui::ArrowButton::render(View* view)
 void
 modm::gui::FilledAreaButton::render(View* view)
 {
-	if(view == NULL)
+	if(view == nullptr)
 		return;
 
 	// output device of view

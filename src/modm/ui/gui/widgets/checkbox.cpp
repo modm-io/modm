@@ -17,7 +17,7 @@
 void
 modm::gui::CheckboxWidget::render(View* view)
 {
-	if(view == NULL)
+	if(view == nullptr)
 		return;
 
 	constexpr uint16_t padding = 5;

@@ -67,7 +67,7 @@ public:
 	const char*
 	getValue()
 	{
-		if(string_function == NULL)
+		if(string_function == nullptr)
 			return "";
 
 		return string_function(string_id);

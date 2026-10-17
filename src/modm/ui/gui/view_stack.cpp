@@ -46,7 +46,7 @@ modm::gui::GuiViewStack::update()
 {
 	modm::gui::View* top = this->get();
 
-	if(top == NULL)
+	if(top == nullptr)
 		return;
 
 	top->update();

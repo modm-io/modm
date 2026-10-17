@@ -15,7 +15,7 @@
 void
 modm::gui::TabPanel::packPanel(Widget* w)
 {
-	if(w == NULL)
+	if(w == nullptr)
 		return;
 
 	if(!(this->panelDimension == w->getDimension()))
@@ -27,7 +27,7 @@ modm::gui::TabPanel::packPanel(Widget* w)
 void
 modm::gui::TabPanel::packTabLeft(Widget* w)
 {
-	if(w == NULL)
+	if(w == nullptr)
 		return;
 
 	if(!(this->buttonDimension == w->getDimension()))
@@ -39,7 +39,7 @@ modm::gui::TabPanel::packTabLeft(Widget* w)
 void
 modm::gui::TabPanel::packTabMiddle(Widget* w)
 {
-	if(w == NULL)
+	if(w == nullptr)
 		return;
 
 	if(!(this->buttonDimension == w->getDimension()))
@@ -51,7 +51,7 @@ modm::gui::TabPanel::packTabMiddle(Widget* w)
 void
 modm::gui::TabPanel::packTabRight(Widget* w)
 {
-	if(w == NULL)
+	if(w == nullptr)
 		return;
 
 	if(!(this->buttonDimension == w->getDimension()))
