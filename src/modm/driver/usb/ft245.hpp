@@ -72,11 +72,11 @@ namespace modm
 		read(uint8_t *buffer, uint8_t nbyte);
 
 	protected:
-		static PORT port;
-		static RD   rd;
-		static WR   wr;
-		static RXF  rxf;
-		static TXE  txe;
+		static inline PORT port;
+		static inline RD rd;
+		static inline WR wr;
+		static inline RXF rxf;
+		static inline TXE txe;
 	};
 }
 

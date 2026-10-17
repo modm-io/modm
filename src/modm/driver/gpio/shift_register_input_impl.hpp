@@ -31,16 +31,6 @@
  */
 // ----------------------------------------------------------------------------
 template <typename Spi,	typename Load, size_t N>
-Spi modm::ShiftRegisterInput<Spi, Load, N>::spi;
-
-template <typename Spi,	typename Load, size_t N>
-Load modm::ShiftRegisterInput<Spi, Load, N>::load;
-
-template <typename Spi,	typename Load, size_t N>
-uint8_t modm::ShiftRegisterInput<Spi, Load, N>::value[N];
-
-// ----------------------------------------------------------------------------
-template <typename Spi,	typename Load, size_t N>
 void
 modm::ShiftRegisterInput<Spi, Load, N>::initialize()
 {

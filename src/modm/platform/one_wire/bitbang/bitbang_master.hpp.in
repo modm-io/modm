@@ -182,11 +182,11 @@ protected:
 	static constexpr std::chrono::microseconds J{410};
 
 	// state of the search
-	static uint8_t lastDiscrepancy;
-	static uint8_t lastFamilyDiscrepancy;
-	static bool lastDeviceFlag;
-	static uint8_t crc8;
-	static uint8_t romBuffer[8];
+	static inline uint8_t lastDiscrepancy;
+	static inline uint8_t lastFamilyDiscrepancy;
+	static inline bool lastDeviceFlag;
+	static inline uint8_t crc8;
+	static inline uint8_t romBuffer[8];
 };
 
 } // namespace platform

@@ -17,18 +17,6 @@
 // ----------------------------------------------------------------------------
 
 template <typename PORT, typename CS, typename CD, typename WR>
-PORT modm::BitbangMemoryInterface<PORT, CS, CD, WR>::port;
-
-template <typename PORT, typename CS, typename CD, typename WR>
-CS modm::BitbangMemoryInterface<PORT, CS, CD, WR>::cs;
-
-template <typename PORT, typename CS, typename CD, typename WR>
-CD modm::BitbangMemoryInterface<PORT, CS, CD, WR>::cd;
-
-template <typename PORT, typename CS, typename CD, typename WR>
-WR modm::BitbangMemoryInterface<PORT, CS, CD, WR>::wr;
-
-template <typename PORT, typename CS, typename CD, typename WR>
 void modm::BitbangMemoryInterface<PORT, CS, CD, WR>::initialize()
 {
 	cs.setOutput(true);

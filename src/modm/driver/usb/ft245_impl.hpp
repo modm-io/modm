@@ -15,21 +15,6 @@
 #	error	"Don't include this file directly, use 'ft245.hpp' instead!"
 #endif
 
-template <typename PORT, typename RD, typename WR, typename RXF, typename TXE>
-PORT modm::Ft245<PORT, RD, WR, RXF, TXE>::port;
-
-template <typename PORT, typename RD, typename WR, typename RXF, typename TXE>
-RD modm::Ft245<PORT, RD, WR, RXF, TXE>::rd;
-
-template <typename PORT, typename RD, typename WR, typename RXF, typename TXE>
-WR modm::Ft245<PORT, RD, WR, RXF, TXE>::wr;
-
-template <typename PORT, typename RD, typename WR, typename RXF, typename TXE>
-RXF modm::Ft245<PORT, RD, WR, RXF, TXE>::rxf;
-
-template <typename PORT, typename RD, typename WR, typename RXF, typename TXE>
-TXE modm::Ft245<PORT, RD, WR, RXF, TXE>::txe;
-
 // ----------------------------------------------------------------------------
 template <typename PORT, typename RD, typename WR, typename RXF, typename TXE>
 bool

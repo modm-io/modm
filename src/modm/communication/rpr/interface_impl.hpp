@@ -31,47 +31,6 @@
 
 // ----------------------------------------------------------------------------
 template <typename Device, std::size_t N>
-uint16_t modm::rpr::Interface<Device, N>::_address = 0;
-
-template <typename Device, std::size_t N>
-uint16_t modm::rpr::Interface<Device, N>::_groupAddress = 0x7fff;
-
-
-template <typename Device, std::size_t N>
-typename modm::rpr::Interface<Device, N>::Queue
-modm::rpr::Interface<Device, N>::messagesToSend;
-
-template <typename Device, std::size_t N>
-typename modm::rpr::Interface<Device, N>::Queue
-modm::rpr::Interface<Device, N>::receivedMessages;
-
-
-template <typename Device, std::size_t N>
-modm::rpr::Message
-modm::rpr::Interface<Device, N>::receiveBuffer;
-
-template <typename Device, std::size_t N>
-uint8_t modm::rpr::Interface<Device, N>::rx_buffer[N+8];
-
-
-template <typename Device, std::size_t N>
-uint16_t modm::rpr::Interface<Device, N>::crc = crcInitialValue;
-
-template <typename Device, std::size_t N>
-uint8_t modm::rpr::Interface<Device, N>::length = 0;
-
-template <typename Device, std::size_t N>
-bool modm::rpr::Interface<Device, N>::nextEscaped = false;
-
-
-template <typename Device, std::size_t N>
-uint8_t modm::rpr::Interface<Device, N>::addressBuffer = 0;
-
-template <typename Device, std::size_t N>
-uint8_t modm::rpr::Interface<Device, N>::status = 0;
-
-// ----------------------------------------------------------------------------
-template <typename Device, std::size_t N>
 void
 modm::rpr::Interface<Device, N>::initialize(uint16_t address, uint16_t groupAddress)
 {

@@ -17,10 +17,6 @@
 #include "static_serial_interface.hpp"
 
 template<int N>
-modm::platform::SerialInterface*
-modm::platform::StaticSerialInterface<N>::backend = 0;
-
-template<int N>
 template<modm::baudrate_t baudrate>
 bool
 modm::platform::StaticSerialInterface<N>::initialize(SerialInterface& interface)

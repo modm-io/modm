@@ -24,16 +24,6 @@
  */
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Store, size_t N>
-Spi modm::ShiftRegisterOutput<Spi, Store, N>::spi;
-
-template <typename Spi, typename Store, size_t N>
-Store modm::ShiftRegisterOutput<Spi, Store, N>::store;
-
-template <typename Spi, typename Store, size_t N>
-uint8_t modm::ShiftRegisterOutput<Spi, Store, N>::value[N];
-
-// ----------------------------------------------------------------------------
-template <typename Spi, typename Store, size_t N>
 void
 modm::ShiftRegisterOutput<Spi, Store, N>::initialize()
 {

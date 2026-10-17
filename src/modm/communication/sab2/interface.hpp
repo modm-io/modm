@@ -147,11 +147,11 @@ namespace modm
 			static void
 			writeByteEscaped(uint8_t data);
 
-			static uint8_t buffer[N + 4];
-			static uint16_t crc;
-			static Size length;
-			static Size lengthOfReceivedMessage;
-			static bool nextEscaped;
+			static inline uint8_t buffer[N + 4];
+			static inline uint16_t crc = crcInitialValue;
+			static inline Size length;
+			static inline Size lengthOfReceivedMessage = 0;
+			static inline bool nextEscaped = false;
 		};
 	}
 }

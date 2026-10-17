@@ -14,8 +14,6 @@
 	#error	"Don't include this file directly, use 'button.hpp' instead!"
 #endif
 
-template <typename T> uint8_t modm::Button<T>::state;
-
 template <typename T>
 void
 modm::Button<T>::update()

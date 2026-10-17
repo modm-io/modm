@@ -17,15 +17,6 @@
 
 #include <modm/architecture/interface/fiber.hpp>
 
-template <typename Spi, typename Cs, typename Hold>
-Spi modm::SpiRam<Spi, Cs, Hold>::spi;
-
-template <typename Spi, typename Cs, typename Hold>
-Cs modm::SpiRam<Spi, Cs, Hold>::cs;
-
-template <typename Spi, typename Cs, typename Hold>
-Hold modm::SpiRam<Spi, Cs, Hold>::hold;
-
 // ----------------------------------------------------------------------------
 template <typename Spi, typename Cs, typename Hold>
 bool

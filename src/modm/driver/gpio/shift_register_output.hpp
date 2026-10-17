@@ -74,10 +74,10 @@ namespace modm
 		update();
 
 	protected:
-		static Spi spi;
-		static Store store;
+		static inline Spi spi;
+		static inline Store store;
 
-		static uint8_t cache[N];
+		static inline uint8_t cache[N];
 	};
 }
 

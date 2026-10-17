@@ -23,17 +23,6 @@
 //#define MODM_LOG_LEVEL	modm::log::DEBUG
 
 // ----------------------------------------------------------------------------
-template <typename Device, std::size_t N> uint8_t modm::sab2::Interface<Device, N>::buffer[N + 4];
-template <typename Device, std::size_t N> uint16_t modm::sab2::Interface<Device, N>::crc = crcInitialValue;
-
-template <typename Device, std::size_t N> typename modm::sab2::Interface<Device, N>::Size \
-	modm::sab2::Interface<Device, N>::length;
-template <typename Device, std::size_t N> typename modm::sab2::Interface<Device, N>::Size \
-	modm::sab2::Interface<Device, N>::lengthOfReceivedMessage = 0;
-
-template <typename Device, std::size_t N> bool modm::sab2::Interface<Device, N>::nextEscaped = false;
-
-// ----------------------------------------------------------------------------
 
 template <typename Device, std::size_t N>
 void
