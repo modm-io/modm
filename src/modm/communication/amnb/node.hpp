@@ -69,18 +69,17 @@ public:
 	bool
 	broadcast(uint8_t command)
 	{
-		if (tx_queue.isFull()) return false;
-		return tx_queue.push(std::move(Message(address, command, Type::Broadcast)));
+		return tx_queue.append(Message(address, command, Type::Broadcast));
 	}
 	bool
 	broadcast(uint8_t command, const uint8_t *data, size_t length)
 	{
-		if (tx_queue.isFull()) return false;
+		if (tx_queue.full()) return false;
 		Message msg(address, command, length, Type::Broadcast);
 		uint8_t* t = msg.get<uint8_t>();
 		if (t == nullptr) return false;
 		std::memcpy(t, data, length);
-		return tx_queue.push(std::move(msg));
+		return tx_queue.append(std::move(msg));
 	}
 	template< typename T >
 	bool
@@ -128,11 +127,11 @@ public:
 	{
 		while(1)
 		{
-			if (not tx_queue.isEmpty())
+			if (not tx_queue.empty())
 			{
 				modm::this_fiber::poll([&]{ return not is_sending; });
-				send(tx_queue.get());
-				tx_queue.pop();
+				send(tx_queue.front());
+				tx_queue.pop_front();
 			}
 			modm::this_fiber::yield();
 		}
@@ -236,14 +235,14 @@ protected:
 								auto msg = action.call(rx_msg);
 								msg.setAddress(address);
 								msg.setCommand(action.command);
-								tx_queue.push(std::move(msg));
+								tx_queue.append(std::move(msg));
 							}
 							return true;
 						}
 					}
 					Message msg(address, rx_msg.command(), 1, Type::Error);
 					*msg.get<Error>() = Error::NoAction;
-					tx_queue.push(std::move(msg));
+					tx_queue.append(std::move(msg));
 				}
 				break;
 
@@ -288,7 +287,7 @@ protected:
 	modm::ShortPreciseTimeout tx_timer;
 	modm::ShortTimeout response_timer;
 
-	modm::BoundedQueue<Message, TxBufferSize> tx_queue;
+	modm::BoundedDeque<Message, TxBufferSize> tx_queue;
 	Message request_msg;
 	Message rx_msg;
 

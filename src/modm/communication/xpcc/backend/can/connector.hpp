@@ -17,7 +17,7 @@
 #ifndef	XPCC_CAN_CONNECTOR_HPP
 #define	XPCC_CAN_CONNECTOR_HPP
 
-#include <modm/container/linked_list.hpp>
+#include <list>
 #include "../backend_interface.hpp"
 
 // Filter
@@ -228,8 +228,8 @@ namespace xpcc
 			operator = (const ReceiveListItem& other);
 		};
 
-		typedef modm::LinkedList< SendListItem > SendList;
-		typedef modm::LinkedList< ReceiveListItem > ReceiveList;
+		typedef std::list< SendListItem > SendList;
+		typedef std::list< ReceiveListItem > ReceiveList;
 
 	protected:
 		SendList sendList;

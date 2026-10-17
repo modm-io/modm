@@ -41,17 +41,17 @@ modm::gui::View::update()
 
 	modm::gui::inputQueue* input_queue = this->stack->getInputQueue();
 
-	while(!input_queue->isEmpty()) {
+	while(!input_queue->empty()) {
 
 		// pop input event
-		ev = input_queue->get();
+		ev = input_queue->front();
 		input_queue->pop();
 
 		/* Start event handling, go through array in reverse order because
 		 * later added (higher index) widgets will be rendered on top of
 		 * the other widgets, so they will also catch the input event with
 		 * higher precedence. */
-		for(int16_t i = widgets.getSize()-1; i >= 0; i--) {
+		for(int16_t i = widgets.size()-1; i >= 0; i--) {
 			/*
 			 * TODO: implement efficient algorithm here (note: segment tree)
 			 */
@@ -84,7 +84,7 @@ modm::gui::View::pack(Widget *w, const modm::glcd::Point &coord)
 	w->setPosition(coord);
 //	w->setColorPalette(this->colorpalette);
 
-	this->widgets.append(w);
+	this->widgets.push_back(w);
 
 	/* Check if there are other widgets on top of this one, 'on top' means
 	 * that they were 'packed' later, so they are located at an higher index

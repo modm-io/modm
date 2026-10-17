@@ -147,7 +147,7 @@ modm::rpr::Interface<Device, N>::update()
 {
 	uint8_t data;
 
-	if (status & STATUS_END_DELIMITER_RECEIVED && !messagesToSend.isEmpty())
+	if (status & STATUS_END_DELIMITER_RECEIVED && !messagesToSend.empty())
 	{
 		writeMessage(getMessage(messagesToSend));
 		popMessage(messagesToSend);
@@ -440,7 +440,7 @@ template <typename Device, std::size_t N>
 bool
 modm::rpr::Interface<Device, N>::pushMessage(Queue &queue, Message *message)
 {
-	if (queue.isFull()) {
+	if (queue.full()) {
 		MODM_RPR_LOG("queue full");
 		return false;
 	}
@@ -456,7 +456,7 @@ modm::rpr::Interface<Device, N>::pushMessage(Queue &queue, Message *message)
 		// point the message payload pointer to the new buffer
 		message->payload = newBuffer;
 		// push it into the list, which will copy the rest
-		queue.push(*message);
+		queue.append(*message);
 		MODM_RPR_LOG("pushing");
 		return true;
 	}
@@ -467,14 +467,14 @@ template <typename Device, std::size_t N>
 void
 modm::rpr::Interface<Device, N>::popMessage(Queue &queue)
 {
-	if (!queue.isEmpty())
+	if (!queue.empty())
 	{
 		// deallocate the external buffer
-		Message message = queue.get();
+		Message message = queue.front();
 		MODM_RPR_LOG("deallocating");
 		bufferAllocator.deallocate(message.payload, message.length);
 		// then remove the rest
-		queue.pop();
+		queue.pop_front();
 	}
 }
 
@@ -482,10 +482,10 @@ template <typename Device, std::size_t N>
 modm::rpr::Message *
 modm::rpr::Interface<Device, N>::getMessage(Queue &queue)
 {
-	if (queue.isEmpty())
+	if (queue.empty())
 		return 0;
 
-	return &queue.get();
+	return &queue.front();
 }
 
 template <typename Device, std::size_t N>
@@ -494,11 +494,11 @@ modm::rpr::Interface<Device, N>::moveMessage(Queue &destination, Queue &source)
 {
 	// do not reallocate the payload buffer!
 	// just move what is essential
-	if (source.isEmpty())
+	if (source.empty())
 		return false;
 
 	MODM_RPR_LOG("moving");
-	destination.push(source.get());
-	source.pop();
+	destination.append(source.front());
+	source.pop_front();
 	return true;
 }

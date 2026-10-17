@@ -19,7 +19,7 @@
 #define	XPCC_DISPATCHER_HPP
 
 #include <modm/processing/timer.hpp>
-#include <modm/container/linked_list.hpp>
+#include <list>
 
 #include "backend/backend_interface.hpp"
 #include "postman/postman.hpp"
@@ -154,7 +154,7 @@ namespace xpcc
 		void
 		sendAcknowledge(const Header& header);
 
-		using EntryList = modm::LinkedList<Entry>;
+		using EntryList = std::list<Entry>;
 		using EntryIterator = EntryList::iterator;
 
 		EntryIterator

@@ -13,7 +13,7 @@
 #define MODM_TEST_MOCK_SPI_MASTER_HPP
 
 #include <modm/architecture/interface/spi_master.hpp>
-#include <modm/container/doubly_linked_list.hpp>
+#include <list>
 
 namespace modm_test
 {
@@ -39,7 +39,7 @@ private:
 	static inline DataOrder dataOrder{DataOrder::MsbFirst};
 
 public:
-	using ArrayContainer = modm::DoublyLinkedList<uint8_t>;
+	using ArrayContainer = std::list<uint8_t>;
 
 private:
 	static inline ArrayContainer rxBuffer;
@@ -81,7 +81,7 @@ public:
 
 public:
 	static std::size_t getTxBufferLength() {
-		return txBuffer.getSize();
+		return txBuffer.size();
 	}
 
 	static void popTxBuffer(uint8_t* buf)
@@ -90,25 +90,25 @@ public:
 		for(ArrayContainer::iterator i = txBuffer.begin(); i != txBuffer.end(); ++i) {
 			buf[j++] = (*i);
 		}
-		while(txBuffer.getSize() > 0) {
-			txBuffer.removeFront();
+		while(txBuffer.size() > 0) {
+			txBuffer.pop_front();
 		}
 	}
 
 	static void appendRxBuffer(uint8_t* data, std::size_t length)
 	{
 		for(std::size_t i = 0; i < length; ++i) {
-			rxBuffer.append(data[i]);
+			rxBuffer.push_back(data[i]);
 		}
 	}
 
 	static void clearBuffers()
 	{
-		while(txBuffer.getSize() > 0) {
-			txBuffer.removeFront();
+		while(txBuffer.size() > 0) {
+			txBuffer.pop_front();
 		}
-		while(rxBuffer.getSize() > 0) {
-			rxBuffer.removeFront();
+		while(rxBuffer.size() > 0) {
+			rxBuffer.pop_front();
 		}
 	}
 };

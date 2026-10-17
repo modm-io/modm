@@ -14,6 +14,8 @@
 
 #include "widget.hpp"
 
+#include <algorithm>
+
 bool
 modm::gui::WidgetGroup::pack(Widget* w, const modm::glcd::Point& coord)
 {
@@ -29,7 +31,7 @@ modm::gui::WidgetGroup::pack(Widget* w, const modm::glcd::Point& coord)
 	w->setPosition(coord);
 
 	/* Add widget to WidgetGroup's list of child widgets */
-	this->widgets.append(w);
+	this->widgets.push_back(w);
 
 	return true;
 }
@@ -75,10 +77,10 @@ void
 modm::gui::Widget::updateIntersections(WidgetContainer *widgets)
 {
 	/* clear list, but keep size. it won't shrink unless widgets will be removed */
-	this->intersecting_widgets.removeAll();
+	this->intersecting_widgets.clear();
 
 	/* check every widget if it intersects with this one */
-	for(auto iter = widgets->find(this); iter != widgets->end(); ++iter)
+	for(auto iter = std::find(widgets->begin(), widgets->end(), this); iter != widgets->end(); ++iter)
 	{
 		/* don't test against yourself */
 		if((*iter)->uid == this->uid)
@@ -87,7 +89,7 @@ modm::gui::Widget::updateIntersections(WidgetContainer *widgets)
 		if(this->checkIntersection((*iter)))
 		{
 			/* intersection found, so append to intersecting list */
-			this->intersecting_widgets.append((*iter));
+			this->intersecting_widgets.push_back((*iter));
 		}
 	}
 }
@@ -95,7 +97,7 @@ modm::gui::Widget::updateIntersections(WidgetContainer *widgets)
 bool
 modm::gui::Widget::hasIntersections()
 {
-	return !this->intersecting_widgets.isEmpty();
+	return !this->intersecting_widgets.empty();
 }
 
 bool

@@ -36,7 +36,7 @@ namespace
 		modm::I2c::ConfigurationHandler configuration;
 	};
 
-	static modm::BoundedQueue<ConfiguredTransaction, {{ options["buffer.transaction"] }}> queue;
+	static modm::BoundedDeque<ConfiguredTransaction, {{ options["buffer.transaction"] }}> queue;
 	static modm::I2c::ConfigurationHandler configuration{nullptr};
 
 	static modm::I2cTransaction* transaction{};
@@ -168,10 +168,10 @@ namespace
 	static inline void
 	callNextTransaction()
 	{
-		if (queue.isNotEmpty())
+		if (not queue.empty())
 		{
-			ConfiguredTransaction next = queue.get();
-			queue.pop();
+			ConfiguredTransaction next = queue.front();
+			queue.pop_front();
 			// configure the peripheral if necessary
 			if (next.configuration and (configuration != next.configuration)) {
 				configuration = next.configuration;
@@ -322,11 +322,11 @@ modm::platform::I2cMaster{{ id }}::reset()
 	if (transaction) transaction->detaching(DetachCause::ErrorCondition);
 	transaction = nullptr;
 	// remove all queued transactions
-	while (queue.isNotEmpty())
+	while (not queue.empty())
 	{
-		ConfiguredTransaction next = queue.get();
+		ConfiguredTransaction next = queue.front();
 		if (next.transaction) { next.transaction->detaching(DetachCause::ErrorCondition); }
-		queue.pop();
+		queue.pop_front();
 	}
 }
 
@@ -335,7 +335,7 @@ modm::platform::I2cMaster{{ id }}::start(I2cTransaction *transaction, Configurat
 {
 	modm::atomic::Lock lock;
 	// if we have a place in the queue and the transaction object is valid
-	if (queue.isNotFull() && transaction)
+	if (not queue.full() && transaction)
 	{
 		// if the transaction object wants to attach to the queue
 		if (transaction->attaching())
@@ -356,7 +356,7 @@ modm::platform::I2cMaster{{ id }}::start(I2cTransaction *transaction, Configurat
 			else
 			{
 				// queue the transaction for later execution
-				queue.push(ConfiguredTransaction(transaction, configuration));
+				queue.append(ConfiguredTransaction(transaction, configuration));
 			}
 			return true;
 		}

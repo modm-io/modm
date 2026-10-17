@@ -105,8 +105,8 @@ CanConnectorTest::testSendShortMessageDirect()
 	connector->sendPacket(xpccHeader, payload);
 
 	// short messages might be send directly without any call to update
-	TEST_ASSERT_EQUALS(driver->sendList.getSize(), 1U);
-	checkShortMessage(driver->sendList.getFront());
+	TEST_ASSERT_EQUALS(driver->sendList.size(), 1U);
+	checkShortMessage(driver->sendList.front());
 }
 
 void
@@ -115,13 +115,13 @@ CanConnectorTest::testSendShortMessage()
 	modm::SmartPointer payload(&shortPayload);
 	connector->sendPacket(xpccHeader, payload);
 
-	TEST_ASSERT_EQUALS(driver->sendList.getSize(), 0U);
+	TEST_ASSERT_EQUALS(driver->sendList.size(), 0U);
 
 	driver->sendSlots = 1;
 	connector->update();
 
-	TEST_ASSERT_EQUALS(driver->sendList.getSize(), 1U);
-	checkShortMessage(driver->sendList.getFront());
+	TEST_ASSERT_EQUALS(driver->sendList.size(), 1U);
+	checkShortMessage(driver->sendList.front());
 }
 
 void
@@ -134,27 +134,27 @@ CanConnectorTest::testSendFragmentedMessage()
 	connector->sendPacket(xpccHeader, payload);
 
 	// fragmented messages aren't send directly but queued immediately
-	TEST_ASSERT_EQUALS(driver->sendList.getSize(), 0U);
+	TEST_ASSERT_EQUALS(driver->sendList.size(), 0U);
 
 	// with two send slots two message should be send
 	connector->update();
-	TEST_ASSERT_EQUALS(driver->sendList.getSize(), 1U);
+	TEST_ASSERT_EQUALS(driver->sendList.size(), 1U);
 	connector->update();
-	TEST_ASSERT_EQUALS(driver->sendList.getSize(), 2U);
+	TEST_ASSERT_EQUALS(driver->sendList.size(), 2U);
 
-	checkFragmentedMessage(driver->sendList.getFront(), 0);
-	driver->sendList.removeFront();
+	checkFragmentedMessage(driver->sendList.front(), 0);
+	driver->sendList.pop_front();
 
-	checkFragmentedMessage(driver->sendList.getFront(), 1);
-	driver->sendList.removeFront();
+	checkFragmentedMessage(driver->sendList.front(), 1);
+	driver->sendList.pop_front();
 
 	driver->sendSlots = 1;
 	connector->update();
 	connector->update();
-	TEST_ASSERT_EQUALS(driver->sendList.getSize(), 1U);
+	TEST_ASSERT_EQUALS(driver->sendList.size(), 1U);
 
-	checkFragmentedMessage(driver->sendList.getFront(), 2);
-	driver->sendList.removeFront();
+	checkFragmentedMessage(driver->sendList.front(), 2);
+	driver->sendList.pop_front();
 
 	TEST_ASSERT_EQUALS(connector->messageCounter, 0x40);
 }
@@ -168,7 +168,7 @@ CanConnectorTest::testReceiveShortMessage()
 	modm::can::Message message(normalIdentifier, 8);
 	memcpy(&message.data, shortPayload, 8);
 
-	driver->receiveList.append(message);
+	driver->receiveList.push_back(message);
 
 	// let it be received by the connector
 	connector->update();
@@ -195,10 +195,10 @@ CanConnectorTest::testReceiveFragmentedMessage()
 	modm::can::Message message;
 
 	createMessage(message, 0);
-	driver->receiveList.append(message);
+	driver->receiveList.push_back(message);
 
 	createMessage(message, 1);
-	driver->receiveList.append(message);
+	driver->receiveList.push_back(message);
 
 	connector->update();
 	TEST_ASSERT_FALSE(connector->isPacketAvailable());
@@ -207,7 +207,7 @@ CanConnectorTest::testReceiveFragmentedMessage()
 	// This should be treated as a new message and not append to the peding one.
 	this->messageCounter = 0xf0;
 	createMessage(message, 2);
-	driver->receiveList.append(message);
+	driver->receiveList.push_back(message);
 
 	connector->update();
 	TEST_ASSERT_FALSE(connector->isPacketAvailable());
@@ -215,7 +215,7 @@ CanConnectorTest::testReceiveFragmentedMessage()
 	// Now the last fragment with the correct counter
 	this->messageCounter = 0x50;
 	createMessage(message, 2);
-	driver->receiveList.append(message);
+	driver->receiveList.push_back(message);
 
 	connector->update();
 	TEST_ASSERT_TRUE(connector->isPacketAvailable());
@@ -235,13 +235,13 @@ CanConnectorTest::testReceiveFragmentedMessage()
 	// message counter
 	this->messageCounter = 0xf0;
 	createMessage(message, 1);
-	driver->receiveList.append(message);
+	driver->receiveList.push_back(message);
 
 	connector->update();
 	TEST_ASSERT_FALSE(connector->isPacketAvailable());
 
 	createMessage(message, 0);
-	driver->receiveList.append(message);
+	driver->receiveList.push_back(message);
 
 	connector->update();
 	TEST_ASSERT_TRUE(connector->isPacketAvailable());

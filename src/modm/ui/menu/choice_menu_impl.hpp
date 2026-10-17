@@ -49,7 +49,7 @@ modm::ChoiceMenu<Allocator>::addEntry(const char* text,  bool *valuePtr, bool de
 {
 	static uint16_t availableSpace = (this->getViewStack()->getDisplay().getWidth()-16)/6-6;
 	modm::ChoiceMenuEntry entry(text, availableSpace, valuePtr, defaultValue);
-	this->entries.append(entry);
+	this->entries.push_back(entry);
 }
 
 template<typename Allocator> void
@@ -83,7 +83,7 @@ modm::ChoiceMenu<Allocator>::draw()
 	(*display) << this->title;
 	display->drawLine(0, 10, display->getWidth(), 10);
 
-	uint8_t i, count = this->entries.getSize();
+	uint8_t i, count = this->entries.size();
 	EntryList::iterator iter = this->entries.begin();
 
 	for(uint8_t j=0; j<this->homePosition; ++j)
@@ -142,7 +142,7 @@ modm::ChoiceMenu<Allocator>::shortButtonPress(modm::MenuButtons::Button button)
 	{
 		case modm::MenuButtons::DOWN:
 		{
-			if (this->position + 1U < this->entries.getSize())
+			if (this->position + 1U < this->entries.size())
 			{
 				EntryList::iterator iter = this->entries.begin();
 
