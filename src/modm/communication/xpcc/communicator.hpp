@@ -51,10 +51,10 @@ namespace xpcc
 		Communicator(const uint8_t ownIdentifier,
 				Dispatcher &dispatcher);
 
-		Communicator(const Communicator&);
+		Communicator(const Communicator&) = delete;
 
 		Communicator&
-		operator = (const Communicator&);
+		operator = (const Communicator&) = delete;
 
 	public:
 		inline uint8_t

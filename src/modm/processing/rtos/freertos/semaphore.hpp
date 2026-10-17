@@ -62,11 +62,11 @@ namespace modm
 
 		private:
 			// disable copy constructor
-			SemaphoreBase(const SemaphoreBase&);
+			SemaphoreBase(const SemaphoreBase&) = delete;
 
 			// disable assignment operator
 			SemaphoreBase &
-			operator = (const SemaphoreBase&);
+			operator = (const SemaphoreBase&) = delete;
 		};
 		/// @endcond
 
@@ -113,11 +113,11 @@ namespace modm
 
 		private:
 			// disable copy constructor
-			Semaphore(const Semaphore&);
+			Semaphore(const Semaphore&) = delete;
 
 			// disable assignment operator
 			Semaphore &
-			operator = (const Semaphore&);
+			operator = (const Semaphore&) = delete;
 		};
 
 		// --------------------------------------------------------------------
@@ -135,11 +135,11 @@ namespace modm
 
 		private:
 			// disable copy constructor
-			BinarySemaphore(const BinarySemaphore&);
+			BinarySemaphore(const BinarySemaphore&) = delete;
 
 			// disable assignment operator
 			BinarySemaphore &
-			operator = (const BinarySemaphore&);
+			operator = (const BinarySemaphore&) = delete;
 		};
 	}
 }

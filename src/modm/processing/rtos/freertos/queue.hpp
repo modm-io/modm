@@ -78,11 +78,11 @@ namespace modm
 
 		private:
 			// disable copy constructor
-			QueueBase(const QueueBase& other);
+			QueueBase(const QueueBase& other) = delete;
 
 			// disable assignment operator
 			QueueBase&
-			operator = (const QueueBase& other);
+			operator = (const QueueBase& other) = delete;
 		};
 		/// @endcond
 
@@ -147,11 +147,11 @@ namespace modm
 
 		private:
 			// disable copy constructor
-			Queue(const Queue& other);
+			Queue(const Queue& other) = delete;
 
 			// disable assignment operator
 			Queue&
-			operator = (const Queue& other);
+			operator = (const Queue& other) = delete;
 		};
 	}
 }
