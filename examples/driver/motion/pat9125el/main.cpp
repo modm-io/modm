@@ -10,7 +10,6 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/board.hpp>
-#include <modm/processing.hpp>
 #include <modm/driver/motion/pat9125el.hpp>
 
 using I2c = I2cMaster1;
