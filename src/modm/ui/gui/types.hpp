@@ -22,10 +22,6 @@
 
 #include <modm/debug/logger.hpp>
 
-/* Eclipse needs this to resolve NULL*/
-#ifndef NULL
-#define NULL 0
-#endif
 
 namespace modm
 {
@@ -107,7 +103,7 @@ public:
 	{
 		if(timeout.isExpired())
 		{
-			if(!already_run && ( cb != NULL ))
+			if(!already_run && ( cb != nullptr ))
 			{
 				already_run = true;
 				cb(cb_data);

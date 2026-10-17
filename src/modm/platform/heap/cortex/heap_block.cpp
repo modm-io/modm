@@ -77,7 +77,7 @@ void* modm_used __wrap__realloc_r(struct _reent *r, void *p, size_t size)
 	if (!p) return __wrap__malloc_r(r, size);
 	// NOT IMPLEMENTED!
 	modm_assert(0, "realloc", "Realloc is not implemented for Block heap!", size);
-	return NULL;
+	return nullptr;
 }
 
 void modm_used __wrap__free_r(struct _reent *r, void *p)

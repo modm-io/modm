@@ -108,7 +108,7 @@ namespace modm
 		{
 			modm::AbstractView<Allocator>* top = this->get();
 
-			if (top == NULL)
+			if (top == nullptr)
 				return;
 
 			top->update();
