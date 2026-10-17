@@ -90,8 +90,7 @@ modm::platform::StaticSerialInterface<N>::read(uint8_t *data, std::size_t length
 {
 	// Check how many bytes are available before reading to
 	// avoid a blocking access.
-	std::size_t available = backend->bytesAvailable();
-	if (available < length) {
+	if (std::size_t available = backend->bytesAvailable(); available < length) {
 		length = available;
 	}
 

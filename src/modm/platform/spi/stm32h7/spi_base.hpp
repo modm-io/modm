@@ -193,8 +193,7 @@ constexpr auto
 operator<=>(SpiBase::DataSize s0, SpiBase::DataSize s1)
 {
     const auto v0 = static_cast<uint32_t>(s0);
-    const auto v1 = static_cast<uint32_t>(s1);
-    if (v0 < v1) {
+    if (const auto v1 = static_cast<uint32_t>(s1); v0 < v1) {
         return std::strong_ordering::less;
     } else if (v0 > v1) {
         return std::strong_ordering::greater;

@@ -115,8 +115,7 @@ try_again:
 		goto try_again;
 	}
 	// set the SBus and try again
-	const uint32_t set_mask = uint32_t(modm::MemoryTrait::AccessSBus);
-	if (!(traits & set_mask)) {
+	if (const uint32_t set_mask = uint32_t(modm::MemoryTrait::AccessSBus); !(traits & set_mask)) {
 		traits |= set_mask;
 		goto try_again;
 	}

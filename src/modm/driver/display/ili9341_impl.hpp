@@ -331,8 +331,7 @@ Ili9341<Interface, Reset, Backlight, BufferSize>::drawImageRaw(glcd::Point upper
 	{
 		for (uint16_t w = 0; w < width; ++w)
 		{
-			uint8_t byte = data[(r / 8) * width + w];
-			if (byte & bit)
+			if (uint8_t byte = data[(r / 8) * width + w]; byte & bit)
 				this->writeData(setColor, 2);
 			else
 				this->writeData(clearColor, 2);

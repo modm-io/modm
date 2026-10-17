@@ -192,8 +192,7 @@ Iwr6843aop<ControlUart, DataUart, SyncPin, FrameQueueSize, MaxPointsPerFrame,
 	Timeout timeout{controlResponseTimeout_};
 	while (not timeout.isExpired())
 	{
-		uint8_t byte{0};
-		if (ControlUart::read(byte))
+		if (uint8_t byte{0}; ControlUart::read(byte))
 		{
 			timeout.restart(controlResponseTimeout_);
 			if (byte == '\n')
@@ -432,8 +431,7 @@ Iwr6843aop<ControlUart, DataUart, SyncPin, FrameQueueSize, MaxPointsPerFrame,
 
 		if (syncPosition == parserSize_)
 		{
-			const std::size_t keep = SyncPattern.size() - 1;
-			if (parserSize_ > keep)
+			if (const std::size_t keep = SyncPattern.size() - 1; parserSize_ > keep)
 			{
 				std::memmove(parserBuffer_.data(), parserBuffer_.data() + parserSize_ - keep, keep);
 				parserSize_ = keep;

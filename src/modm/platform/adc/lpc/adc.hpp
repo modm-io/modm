@@ -412,8 +412,7 @@ namespace modm
 			static inline bool
 			read(uint16_t & val, Channel channel)
 			{
-				uint32_t reg = getAdcRegister(channel);
-				if (reg & ADC_DR_DONE) {
+				if (uint32_t reg = getAdcRegister(channel); reg & ADC_DR_DONE) {
 					val = (reg & 0xffff) >> 6;
 					return true;
 				}

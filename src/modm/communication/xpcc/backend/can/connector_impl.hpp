@@ -131,8 +131,7 @@ xpcc::CanConnector<Driver>::sendWaitingMessages()
 
 	SendListItem& message = this->sendList.front();
 
-	uint8_t messageSize = message.payload.getSize();
-	if (messageSize > 8)
+	if (uint8_t messageSize = message.payload.getSize(); messageSize > 8)
 	{
 		// fragmented message
 		uint8_t data[8];

@@ -214,8 +214,7 @@ protected:
 			case Type::Broadcast:
 				for (size_t ii=0; ii<listenerCount; ii++)
 				{
-					auto& listener = listenerList[ii];
-					if (rx_msg.command() == listener.command) {
+					if (auto& listener = listenerList[ii]; rx_msg.command() == listener.command) {
 						if (complete) listener.call(rx_msg);
 						else return true;
 					}
@@ -227,8 +226,7 @@ protected:
 				{
 					for (size_t ii=0; ii<actionCount; ii++)
 					{
-						auto& action = actionList[ii];
-						if (rx_msg.command() == action.command)
+						if (auto& action = actionList[ii]; rx_msg.command() == action.command)
 						{
 							if (complete)
 							{

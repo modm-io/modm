@@ -123,8 +123,7 @@ allocateMemory(std::size_t requestedSize)
 	while (p < currentHeapEnd);
 
 	// allocate more memory from the heap
-	int8_t slots = *(p - 1);
-	if (slots < 0) {
+	if (int8_t slots = *(p - 1); slots < 0) {
 		p += slots * BLOCK_SIZE;
 	}
 	int16_t slotsAvailable = (heapEnd - p) / BLOCK_SIZE;

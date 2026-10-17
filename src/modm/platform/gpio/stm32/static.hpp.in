@@ -82,8 +82,7 @@ public:
 %% else
 	inline static void setAlternateFunction()
 	{
-		uint32_t cr = *gcr();
-		if (cr & (0b0011UL << (cr_pin * 4)))
+		if (uint32_t cr = *gcr(); cr & (0b0011UL << (cr_pin * 4)))
 			*gcr() = cr | (0b1000UL << (cr_pin * 4));
 	}
 %% endif

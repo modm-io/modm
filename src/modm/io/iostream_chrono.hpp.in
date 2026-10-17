@@ -62,8 +62,7 @@ inline modm::IOStream&
 operator << (modm::IOStream& s, const std::chrono::weekday_indexed wdi)
 {
 	s << wdi.weekday();
-	const auto index = wdi.index();
-	if (1 <= index and index <= 5) return s << '[' << index << ']';
+	if (const auto index = wdi.index(); 1 <= index and index <= 5) return s << '[' << index << ']';
 	return s << "[?]";
 }
 
