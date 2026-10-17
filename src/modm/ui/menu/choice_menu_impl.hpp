@@ -19,7 +19,7 @@
 #include "abstract_view.hpp"
 
 template<typename Allocator>
-modm::ChoiceMenu<Allocator>::ChoiceMenu(modm::ViewStack<Allocator>* stack, uint8_t identifier) :
+constexpr modm::ChoiceMenu<Allocator>::ChoiceMenu(modm::ViewStack<Allocator>* stack, uint8_t identifier) :
 	modm::AbstractMenu<Allocator>(stack, identifier),
 	display_update_time(500),
 	timer(display_update_time),
@@ -32,7 +32,7 @@ modm::ChoiceMenu<Allocator>::ChoiceMenu(modm::ViewStack<Allocator>* stack, uint8
 }
 
 template<typename Allocator>
-modm::ChoiceMenu<Allocator>::ChoiceMenu(modm::ViewStack<Allocator>* stack, uint8_t identifier, const char* title) :
+constexpr modm::ChoiceMenu<Allocator>::ChoiceMenu(modm::ViewStack<Allocator>* stack, uint8_t identifier, const char* title) :
 	modm::AbstractMenu<Allocator>(stack, identifier),
 	display_update_time(500),
 	timer(display_update_time),

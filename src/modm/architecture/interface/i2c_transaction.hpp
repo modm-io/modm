@@ -42,7 +42,7 @@ public:
 		 * @param	address	the slave address excluding read/write bit
 		 * @param	next	operation following the successful addressing of the slave
 		 */
-		Starting(uint8_t address, OperationAfterStart next)
+		constexpr Starting(uint8_t address, OperationAfterStart next)
 		:	address(address), next(next)
 		{
 		}
@@ -60,7 +60,7 @@ public:
 		 * @param	length	number of bytes to be written
 		 * @param	next	operation following the successful writing to the slave
 		 */
-		Writing(const uint8_t *buffer, std::size_t length, OperationAfterWrite next)
+		constexpr Writing(const uint8_t *buffer, std::size_t length, OperationAfterWrite next)
 		:	buffer(buffer), length(buffer ? length : 0), next(next)
 		{
 		}
@@ -79,7 +79,7 @@ public:
 		 * @param	length	number of bytes to be read
 		 * @param	next	operation following the successful reading from the slave
 		 */
-		Reading(uint8_t *buffer, std::size_t length, OperationAfterRead next)
+		constexpr Reading(uint8_t *buffer, std::size_t length, OperationAfterRead next)
 		:	buffer(buffer), length(buffer ? length : 0), next(next)
 		{
 		}
@@ -91,7 +91,7 @@ public:
 
 public:
 	///	@param	address	the slave address not yet shifted left (address < 128).
-	I2cTransaction(uint8_t address) :
+	constexpr I2cTransaction(uint8_t address) :
 		address(address << 1), state(TransactionState::Idle)
 	{}
 
@@ -241,7 +241,7 @@ protected:
 class I2cWriteReadTransaction : public I2cTransaction
 {
 public:
-	I2cWriteReadTransaction(uint8_t address) :
+	constexpr I2cWriteReadTransaction(uint8_t address) :
 		I2cTransaction(address), readSize(0), writeSize(0),
 		readBuffer(nullptr), writeBuffer(nullptr), isReading(false)
 	{
@@ -409,7 +409,7 @@ protected:
 class I2cWriteTransaction : public I2cTransaction
 {
 public:
-	I2cWriteTransaction(uint8_t address)
+	constexpr I2cWriteTransaction(uint8_t address)
 	:	I2cTransaction(address), size(0), buffer(nullptr)
 	{
 	}
@@ -484,7 +484,7 @@ protected:
 class I2cReadTransaction : public I2cTransaction
 {
 public:
-	I2cReadTransaction(uint8_t address)
+	constexpr I2cReadTransaction(uint8_t address)
 	:	I2cTransaction(address), size(0), buffer(nullptr)
 	{
 	}

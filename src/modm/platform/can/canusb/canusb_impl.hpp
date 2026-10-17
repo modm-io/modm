@@ -29,7 +29,7 @@
 #define MODM_LOG_LEVEL modm::log::INFO
 
 template <typename SerialPort>
-modm::platform::CanUsb<SerialPort>::CanUsb(SerialPort& serialPort)
+constexpr modm::platform::CanUsb<SerialPort>::CanUsb(SerialPort& serialPort)
 :	active(false), busState(BusState::Off), serialPort(serialPort)
 {
 }

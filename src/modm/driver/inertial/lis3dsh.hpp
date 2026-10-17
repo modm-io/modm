@@ -442,7 +442,7 @@ public:
 		template < class Transport >
 		friend class Lis3dsh;
 
-		Data()
+		constexpr Data()
 		:	data{0,0,0,0,0,0}, scale(2)
 		{}
 		// DATA ACCESS
@@ -515,7 +515,7 @@ class Lis3dsh : public lis3dsh, public Transport
 public:
 	/// Constructor, requires a lis3dsh::Data object.
 	/// For I2c this also sets the address to 0x1D (alternative: 0x1C).
-	Lis3dsh(Data &data, uint8_t address=0x1D);
+	constexpr Lis3dsh(Data &data, uint8_t address=0x1D);
 
 	bool
 	configure(Scale scale, MeasurementRate rate = MeasurementRate::Hz100);

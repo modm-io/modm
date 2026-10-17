@@ -41,7 +41,7 @@ modm::sab::Action::call(Response& response, const void *payload) const
 
 // ----------------------------------------------------------------------------
 template <typename Interface>
-modm::sab::Slave<Interface>::Slave(uint8_t address,
+constexpr modm::sab::Slave<Interface>::Slave(uint8_t address,
 		const Action *list,
 		uint8_t count) :
 	ownAddress(address), actionList(list), actionCount(count),

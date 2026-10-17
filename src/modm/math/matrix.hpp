@@ -77,7 +77,7 @@ namespace modm
 		 * modm::Matrix<int16_t, 3, 2> a(m);
 		 * \endcode
 		 */
-		Matrix(const T *data);
+		constexpr Matrix(const T *data);
 
 		/**
 		 * \brief	Create a matrix from an initializer list

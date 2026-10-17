@@ -315,7 +315,7 @@ public:
 		template< class I2cMaster >
 		friend class Vl6180;
 
-		Data()
+		constexpr Data()
 		:	data{255,0,0}, gain(6), time(100) {}
 
 		/// @return the distance in millimeters, 255 if error
@@ -356,7 +356,7 @@ class Vl6180 : public vl6180, public modm::I2cDevice< I2cMaster >
 {
 public:
 	/// Constructor, requires an vl6180::Data object, sets address to default of 0x29
-	Vl6180(Data &data, uint8_t address=0x29);
+	constexpr Vl6180(Data &data, uint8_t address=0x29);
 
 	/// Ping the I2C device.
 	/// This overwrites the build-in ping method of I2cDevice with a read of the model number.

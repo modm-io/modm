@@ -29,7 +29,7 @@ GpioSampler::Handle<channels>::~Handle()
 }
 
 template<size_t channels>
-GpioSampler::Handle<channels>::Handle(size_t max_samples, StartHandler start, CleanupHandler cleanup):
+constexpr GpioSampler::Handle<channels>::Handle(size_t max_samples, StartHandler start, CleanupHandler cleanup):
 	cleanup(cleanup), start(start)
 {
 	for (auto &ch : data) ch.allocate(max_samples);

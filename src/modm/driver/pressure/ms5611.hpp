@@ -85,7 +85,7 @@ public:
     /**
 	 * @param	data pointer to buffer of the internal data of type Data
 	 */
-    Ms5611(DataBase &data);
+    constexpr Ms5611(DataBase &data);
 
     /// Call this function before using the device to read the factory calibration
     /// @warning calls to this function resets the device

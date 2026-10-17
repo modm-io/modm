@@ -15,7 +15,7 @@
 
 // ----------------------------------------------------------------------------
 template < class Transport >
-modm::Mcp23x17<Transport>::Mcp23x17(uint8_t address) :
+constexpr modm::Mcp23x17<Transport>::Mcp23x17(uint8_t address) :
 	Transport(address), memory()
 {
 }

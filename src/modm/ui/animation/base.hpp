@@ -84,7 +84,7 @@ public:
 public:
 	/// @param	value		a reference to the value to be animated
 	/// @param	handler		this function will be called whenever the value has been changed
-	Animation(T &value, Handler handler=nullptr);
+	constexpr Animation(T &value, Handler handler=nullptr);
 
 	/// @param	handler		this function will be called whenever the value has been changed
 	void

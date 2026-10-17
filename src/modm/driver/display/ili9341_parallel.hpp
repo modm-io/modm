@@ -21,7 +21,7 @@ class Ili9341ParallelInterface: public ili9341
 {
 	INTERFACE& interface;
 public:
-	Ili9341ParallelInterface(INTERFACE& interface)
+	constexpr Ili9341ParallelInterface(INTERFACE& interface)
 	: interface(interface) {}
 
 	modm_noinline void
@@ -69,7 +69,7 @@ public:
 public:
 	struct BatchHandle
 	{
-		BatchHandle(Ili9341ParallelInterface&) {}
+		constexpr BatchHandle(Ili9341ParallelInterface&) {}
 		~BatchHandle() {}
 	};
 };

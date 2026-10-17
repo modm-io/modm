@@ -56,9 +56,9 @@ template < typename T >
 struct ResumableResult
 {
 	/// Return only the `state`. The `result` will be initialized by it's default constructor.
-	ResumableResult(uint_fast8_t state) : state(state) {}
+	constexpr ResumableResult(uint_fast8_t state) : state(state) {}
 	/// Return `state` and valid `result`.
-	ResumableResult(uint_fast8_t state, T result) : state(state), result(result) {}
+	constexpr ResumableResult(uint_fast8_t state, T result) : state(state), result(result) {}
 
 	inline uint_fast8_t
 	getState()
@@ -80,9 +80,9 @@ template <>
 struct ResumableResult<void>
 {
 	/// Return only the `state`. There is no result.
-	ResumableResult(uint_fast8_t state) : state(state) {}
+	constexpr ResumableResult(uint_fast8_t state) : state(state) {}
 	/// Constructor with dummy result needed by the `RF_CALL_BLOCKING` macro.
-	ResumableResult(uint_fast8_t state, uint_fast8_t /*dummy_result*/) : state(state) {}
+	constexpr ResumableResult(uint_fast8_t state, uint_fast8_t /*dummy_result*/) : state(state) {}
 
 	inline uint_fast8_t
 	getState()
@@ -109,7 +109,7 @@ class Resumable
 	static_assert(Functions > 0, "The number of resumable functions must be at least 1!");
 
 protected:
-	Resumable()
+	constexpr Resumable()
 	{
 		stopAllResumables();
 	}

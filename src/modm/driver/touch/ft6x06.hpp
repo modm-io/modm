@@ -171,7 +171,7 @@ class Ft6x06 : public ft6x06, public modm::I2cDevice< I2cMaster >
 {
 public:
 	/// Constructor, requires an ft6x06::Data object, sets address to default of 0x2A
-	Ft6x06(Data &data, uint8_t address=0x2A);
+	constexpr Ft6x06(Data &data, uint8_t address=0x2A);
 
 	bool
 	configure(InterruptMode mode, uint8_t activeRate = 60, uint8_t monitorRate = 25);

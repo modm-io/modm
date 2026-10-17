@@ -305,7 +305,7 @@ public:
 	 *
 	 * Sets used pins as output. SPI must be initialized by the user!
 	 */
-	Drv832xSpi();
+	constexpr Drv832xSpi();
 
 	void
 	readFaultStatus1();

@@ -37,7 +37,7 @@ namespace modm
 		using iterator = std::list<T>::iterator;
 		using Size = std::size_t;
 
-		DoublyLinkedList(const Allocator& allocator = Allocator())
+		constexpr DoublyLinkedList(const Allocator& allocator = Allocator())
 			: data_(allocator)
 		{}
 

@@ -46,7 +46,7 @@ modm::SCurveController<T>::setParameter(const Parameter& parameter)
 // ----------------------------------------------------------------------------
 
 template<typename T>
-modm::SCurveController<T>::SCurveController(const Parameter& parameter) :
+constexpr modm::SCurveController<T>::SCurveController(const Parameter& parameter) :
 	output(), targetReached(false), parameter(parameter)
 {
 }

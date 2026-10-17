@@ -205,7 +205,7 @@ public:
 	 * @param	data		pointer to buffer of the internal data of type Data
 	 * @param	address		address defaults to 0x76
 	 */
-	Bme280(Data &data, uint8_t address=0x76);
+	constexpr Bme280(Data &data, uint8_t address=0x76);
 
 	// MARK: - TASKS
 	/// Reads out and stores the calibration bytes

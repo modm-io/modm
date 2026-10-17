@@ -39,7 +39,7 @@ template < class I2cMaster >
 class Lis3TransportI2c : public modm::I2cDevice< I2cMaster >
 {
 public:
-	Lis3TransportI2c(uint8_t address);
+	constexpr Lis3TransportI2c(uint8_t address);
 
 protected:
 	// RAW REGISTER ACCESS
@@ -86,7 +86,7 @@ template < class SpiMaster, class Cs >
 class Lis3TransportSpi : public modm::SpiDevice< SpiMaster >
 {
 public:
-	Lis3TransportSpi(uint8_t /*address*/);
+	constexpr Lis3TransportSpi(uint8_t /*address*/);
 
 	/// pings the sensor
 	bool

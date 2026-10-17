@@ -17,7 +17,7 @@
 
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
-modm::Tmp102<I2cMaster>::Tmp102(Data &data, uint8_t address)
+constexpr modm::Tmp102<I2cMaster>::Tmp102(Data &data, uint8_t address)
 :	Lm75<I2cMaster>(reinterpret_cast<lm75::Data&>(data), address)
 {
 }

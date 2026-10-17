@@ -16,7 +16,7 @@
 
 // ----------------------------------------------------------------------------
 template<typename I2cMaster>
-modm::Pca9685<I2cMaster>::Pca9685(uint8_t address) :
+constexpr modm::Pca9685<I2cMaster>::Pca9685(uint8_t address) :
 	I2cDevice<I2cMaster>(address)
 {}
 

@@ -113,7 +113,7 @@ class Ds1631 :	public ds1631, public I2cDevice< I2cMaster >
 {
 public:
 	///
-	Ds1631(Data &data, uint8_t address=0x90);
+	constexpr Ds1631(Data &data, uint8_t address=0x90);
 
 	bool
 	update();

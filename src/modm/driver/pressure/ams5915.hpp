@@ -102,7 +102,7 @@ public:
 	/**
 	 * @param	data	a ams5915::Data object
 	 */
-	Ams5915(Data &data, uint8_t i2cAddress = 0x28)
+	constexpr Ams5915(Data &data, uint8_t i2cAddress = 0x28)
 	:	I2cDevice<I2cMaster>(i2cAddress), data(data)
 	{}
 

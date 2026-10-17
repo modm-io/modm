@@ -103,13 +103,13 @@ public:
 		uint8_t deviceType;
 		uint8_t deviceId;
 
-		JedecId() {
+		constexpr JedecId() {
 			manufacturerId = 0;
 			deviceType = 0;
 			deviceId = 0;
 		}
 
-		JedecId(uint8_t mi, uint8_t dt, uint8_t di) {
+		constexpr JedecId(uint8_t mi, uint8_t dt, uint8_t di) {
 			manufacturerId = mi;
 			deviceType = dt;
 			deviceId = di;

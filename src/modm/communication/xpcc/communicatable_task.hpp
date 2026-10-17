@@ -35,7 +35,7 @@ namespace xpcc
 class CommunicatableTask : public modm::Task, public Communicatable
 {
 public:
-	CommunicatableTask(Communicator *parent) :
+	constexpr CommunicatableTask(Communicator *parent) :
 		parent(parent)
 	{
 	}

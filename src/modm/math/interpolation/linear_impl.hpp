@@ -18,7 +18,7 @@
 // ----------------------------------------------------------------------------
 template <typename T,
 		  template <typename> class Accessor>
-modm::interpolation::Linear<T, Accessor>::Linear(
+constexpr modm::interpolation::Linear<T, Accessor>::Linear(
 		Accessor<T> supportingPoints, uint8_t numberOfPoints) :
 	supportingPoints(supportingPoints), numberOfPoints(numberOfPoints)
 {

@@ -55,7 +55,7 @@ namespace modm
 			 * 								Needs to be an Array of std::pair<>.
 			 * \param	numberOfPoints		length of \p supportingPoints
 			 */
-			Linear(Accessor<T> supportingPoints, uint8_t numberOfPoints);
+			constexpr Linear(Accessor<T> supportingPoints, uint8_t numberOfPoints);
 
 			/**
 			 * \brief	Perform a linear interpolation

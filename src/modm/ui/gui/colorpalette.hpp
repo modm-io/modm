@@ -56,12 +56,12 @@ Color {
 class ColorPalette
 {
 public:
-	ColorPalette(modm::color::Rgb565 colors[Color::PALETTE_SIZE]) :
+	constexpr ColorPalette(modm::color::Rgb565 colors[Color::PALETTE_SIZE]) :
 		colors(colors)
 	{
 	}
 
-	ColorPalette(ColorPalette &rhs = DefaultColorPalette) :
+	constexpr ColorPalette(ColorPalette &rhs = DefaultColorPalette) :
 		colors(rhs.colors)
 	{
 	}

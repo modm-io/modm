@@ -33,7 +33,7 @@ class NestedResumable
 
 protected:
 	/// Construct a new class with nested resumable functions
-	NestedResumable()
+	constexpr NestedResumable()
 	:	rfLevel(0)
 	{
 		for (rf::State &level : rfStateArray)
@@ -161,7 +161,7 @@ template <>
 class NestedResumable<1>
 {
 protected:
-	NestedResumable() :
+	constexpr NestedResumable() :
 		rfLevel(-1), rfState(rf::Stopped)
 	{
 	}

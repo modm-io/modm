@@ -346,7 +346,7 @@ public:
 	 *
 	 * \param address The I2C device address of the sensor
 	 */
-	Lsm6ds33(uint8_t address = 0x6A);
+	constexpr Lsm6ds33(uint8_t address = 0x6A);
 
 	/**
 	 * \brief Configures the acceleration sensor

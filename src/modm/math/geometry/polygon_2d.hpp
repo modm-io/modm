@@ -47,11 +47,11 @@ namespace modm
 		/**
 		 * \brief	Constructs a polygon capable of holding n points
 		 */
-		Polygon2D(SizeType n);
+		constexpr Polygon2D(SizeType n);
 
-		Polygon2D(std::initializer_list<PointType> init);
+		constexpr Polygon2D(std::initializer_list<PointType> init);
 
-		Polygon2D(const Polygon2D& other);
+		constexpr Polygon2D(const Polygon2D& other);
 
 		Polygon2D&
 		operator = (const Polygon2D& other);

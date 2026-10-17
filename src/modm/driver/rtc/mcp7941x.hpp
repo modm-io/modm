@@ -49,7 +49,7 @@ class Mcp7941x :	public mcp7941x,
 					public modm::I2cDevice<I2cMaster>
 {
 public:
-	Mcp7941x(uint8_t address = 0x6f);
+	constexpr Mcp7941x(uint8_t address = 0x6f);
 
 	std::optional<modm::mcp7941x::DateTime>
 	getDateTime();
@@ -96,7 +96,7 @@ template < class I2cMaster >
 class Mcp7941xEeprom :	public modm::I2cDevice<I2cMaster>
 {
 public:
-	Mcp7941xEeprom(uint8_t address = 0x57);
+	constexpr Mcp7941xEeprom(uint8_t address = 0x57);
 
 	std::optional<std::array<uint8_t, 8>>
 	getUniqueId();

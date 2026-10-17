@@ -17,7 +17,7 @@
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::filter::Ramp<T>::Ramp(const T& increment, const T& decrement, const T& initialValue) :
+constexpr modm::filter::Ramp<T>::Ramp(const T& increment, const T& decrement, const T& initialValue) :
 	target(initialValue),
 	value(initialValue),
 	targetReached(true),

@@ -16,7 +16,7 @@
 
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
-modm::Mcp7941x<I2cMaster>::Mcp7941x(uint8_t address)
+constexpr modm::Mcp7941x<I2cMaster>::Mcp7941x(uint8_t address)
 :	I2cDevice<I2cMaster>(address), dateTime{}
 {
 }
@@ -70,7 +70,7 @@ modm::Mcp7941x<I2cMaster>::oscillatorRunning()
 
 
 template < typename I2cMaster >
-modm::Mcp7941xEeprom<I2cMaster>::Mcp7941xEeprom(uint8_t address)
+constexpr modm::Mcp7941xEeprom<I2cMaster>::Mcp7941xEeprom(uint8_t address)
 :	I2cDevice<I2cMaster>(address)
 {
 }

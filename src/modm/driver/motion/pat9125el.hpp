@@ -87,7 +87,7 @@ public:
 	 * @see Pat9125elI2cTransport
 	 */
 	template<typename... TransportArgs>
-	Pat9125el(TransportArgs&&... args);
+	constexpr Pat9125el(TransportArgs&&... args);
 
 	/**
 	 * Configure sensor resolution

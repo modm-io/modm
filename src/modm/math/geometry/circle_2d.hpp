@@ -44,9 +44,9 @@ namespace modm
 		using FloatType = typename GeometricTraits<T>::FloatType;
 
 	public:
-		Circle2D();
+		constexpr Circle2D();
 
-		Circle2D(const Vector<T, 2>& center, T radius);
+		constexpr Circle2D(const Vector<T, 2>& center, T radius);
 
 		inline const Vector<T, 2>&
 		getCenter() const;

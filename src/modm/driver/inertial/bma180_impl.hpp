@@ -15,7 +15,7 @@
 
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
-modm::Bma180<I2cMaster>::Bma180(uint8_t* data, uint8_t address)
+constexpr modm::Bma180<I2cMaster>::Bma180(uint8_t* data, uint8_t address)
 :	I2cDevice<I2cMaster>(address), status(0), data(data)
 {
 }

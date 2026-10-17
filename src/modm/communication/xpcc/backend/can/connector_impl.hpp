@@ -22,7 +22,7 @@
 
 // ----------------------------------------------------------------------------
 template<typename Driver>
-xpcc::CanConnector<Driver>::CanConnector(Driver *driver) :
+constexpr xpcc::CanConnector<Driver>::CanConnector(Driver *driver) :
 	canDriver(driver)
 {
 }

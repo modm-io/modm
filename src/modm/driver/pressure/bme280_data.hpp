@@ -76,7 +76,7 @@ DataBase
 
 public:
 	inline
-	DataBase() :
+	constexpr DataBase() :
 		meta(0)
 	{
 	}
@@ -132,7 +132,7 @@ Data : public DataBase
 {
 public:
 	inline
-	Data();
+	constexpr Data();
 
 	/**
 	 * Get the calibrated temperature for the device in 0.01 degree Celsius
@@ -206,7 +206,7 @@ DataDouble : public DataBase
 {
 public:
 	inline
-	DataDouble();
+	constexpr DataDouble();
 
 	int32_t inline
 	getTemperature();

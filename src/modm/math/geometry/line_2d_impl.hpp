@@ -17,13 +17,13 @@
 
 // ----------------------------------------------------------------------------
 template <typename T>
-modm::Line2D<T>::Line2D() :
+constexpr modm::Line2D<T>::Line2D() :
 	point(), directionVector()
 {
 }
 
 template <typename T>
-modm::Line2D<T>::Line2D(const Vector<T, 2>& point, const Vector<T, 2>& direction) :
+constexpr modm::Line2D<T>::Line2D(const Vector<T, 2>& point, const Vector<T, 2>& direction) :
 	point(point), directionVector(direction)
 {
 }

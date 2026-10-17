@@ -21,7 +21,7 @@ namespace modm
 {
 
 template <typename SpiMaster, typename Cs>
-Ms5611<SpiMaster,Cs>::Ms5611(DataBase &data) : data(data)
+constexpr Ms5611<SpiMaster,Cs>::Ms5611(DataBase &data) : data(data)
 {
 }
 

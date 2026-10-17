@@ -105,7 +105,7 @@ class Mcp990x : public mcp990x, public I2cDevice<I2cMaster>
 {
 public:
 	/// \param address I2C address, MCP990xT-1: 0x4c, -2: 0x4d, -A: adjustable, see datasheet
-	Mcp990x(Data& data, uint8_t address = 0x4d);
+	constexpr Mcp990x(Data& data, uint8_t address = 0x4d);
 
 	/// Initialize sensor
 	bool

@@ -17,7 +17,7 @@
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::filter::Debounce<T>::Debounce(const T& maxValue, const T& lowerBound, const T& upperBound) :
+constexpr modm::filter::Debounce<T>::Debounce(const T& maxValue, const T& lowerBound, const T& upperBound) :
 	maxValue(maxValue),
 	sum(maxValue / 2),
 	lowerBound(lowerBound),

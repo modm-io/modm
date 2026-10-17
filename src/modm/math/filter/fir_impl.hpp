@@ -36,7 +36,7 @@
 
 
 template<typename T, int N, int BLOCK_SIZE, signed int ScaleFactor>
-modm::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::Fir(const float (&coeff)[N])
+constexpr modm::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::Fir(const float (&coeff)[N])
 {
 	setCoefficients(coeff);
 	reset();

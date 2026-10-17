@@ -26,7 +26,7 @@ namespace modm {
 // ----------------------------------------------------------------------------
 
 template <typename SPI, typename CS, typename RS, unsigned int Width, unsigned int Heigth>
-modm::St7036<SPI, CS, RS, Width, Heigth>::St7036() :
+constexpr modm::St7036<SPI, CS, RS, Width, Heigth>::St7036() :
 	CharacterDisplay(Width, Heigth)
 {
 }

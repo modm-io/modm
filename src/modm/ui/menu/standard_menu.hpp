@@ -44,7 +44,7 @@ namespace modm
 		 * @param space, available to display menu entry in number of letters
 		 * @param func  callback, which is called when entry is chosen
 		 */
-		MenuEntry(const char* text, uint16_t space, MenuEntryCallback<Allocator> func);
+		constexpr MenuEntry(const char* text, uint16_t space, MenuEntryCallback<Allocator> func);
 
 		ScrollableText text;
 		MenuEntryCallback<Allocator> callback;
@@ -68,11 +68,11 @@ namespace modm
 	{
 	public:
 
-		StandardMenu(modm::ViewStack<Allocator>* stack, uint8_t identifier);
+		constexpr StandardMenu(modm::ViewStack<Allocator>* stack, uint8_t identifier);
 
 		virtual ~StandardMenu() {}
 
-		StandardMenu(modm::ViewStack<Allocator>* stack, uint8_t identifier, const char* title);
+		constexpr StandardMenu(modm::ViewStack<Allocator>* stack, uint8_t identifier, const char* title);
 
 		/**
 		 * @brief addEntry adds a new option to the displayed list

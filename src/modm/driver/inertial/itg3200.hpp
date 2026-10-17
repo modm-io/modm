@@ -194,7 +194,7 @@ class Itg3200 : public itg3200, public modm::I2cDevice< I2cMaster >
 {
 public:
 	/// Constructor, requires an itg3200::Data object, sets address to default of 0x68 (AD0 low: 0x69)
-	Itg3200(Data &data, uint8_t address=0x68);
+	constexpr Itg3200(Data &data, uint8_t address=0x68);
 
 
 	bool

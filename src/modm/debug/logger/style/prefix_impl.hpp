@@ -17,7 +17,7 @@
 
 // ----------------------------------------------------------------------------
 template <typename T, typename STYLE>
-modm::log::Prefix<T, STYLE>::Prefix( const T& str, STYLE style ) :
+constexpr modm::log::Prefix<T, STYLE>::Prefix( const T& str, STYLE style ) :
 	Style<STYLE> ( style ),
 	flushed ( true )
 {
@@ -25,7 +25,7 @@ modm::log::Prefix<T, STYLE>::Prefix( const T& str, STYLE style ) :
 }
 
 template <typename T, typename STYLE>
-modm::log::Prefix<T, STYLE>::Prefix( const T& str, IODevice &device ) :
+constexpr modm::log::Prefix<T, STYLE>::Prefix( const T& str, IODevice &device ) :
 	Style<STYLE> ( device ),
 	flushed ( true )
 {

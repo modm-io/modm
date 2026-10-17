@@ -107,7 +107,7 @@ Bmi088SpiTransport<SpiMaster, AccCs, GyroCs>::writeRegister(uint8_t reg, uint8_t
 // ------------------------------------------------------------------------------------------------
 
 template<typename I2cMaster>
-Bmi088I2cTransport<I2cMaster>::Bmi088I2cTransport(uint8_t accAddress, uint8_t gyroAddress)
+constexpr Bmi088I2cTransport<I2cMaster>::Bmi088I2cTransport(uint8_t accAddress, uint8_t gyroAddress)
 	: I2cDevice<I2cMaster>{accAddress}, accAddress_{accAddress}, gyroAddress_{gyroAddress}
 {
 }

@@ -67,15 +67,15 @@ namespace modm
 		 *
 		 * Creates a Vector with coordinates (0, 0).
 		 */
-		Vector();
+		constexpr Vector();
 
-		Vector(const T& inX, const T& inY);
+		constexpr Vector(const T& inX, const T& inY);
 
-		Vector(const Vector<T, 1> &inX, const Vector<T, 1> &inY);
-		Vector(const T &inX, const Vector<T, 1> &inY);
-		Vector(const Vector<T, 1> &inX, const T &inY);
-		explicit Vector(T inVal);
-		Vector(const Matrix<T, 2, 1> &rhs);
+		constexpr Vector(const Vector<T, 1> &inX, const Vector<T, 1> &inY);
+		constexpr Vector(const T &inX, const Vector<T, 1> &inY);
+		constexpr Vector(const Vector<T, 1> &inX, const T &inY);
+		explicit constexpr Vector(T inVal);
+		constexpr Vector(const Matrix<T, 2, 1> &rhs);
 
 		inline void
 		setX(const T& value);

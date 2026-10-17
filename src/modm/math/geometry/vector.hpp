@@ -58,10 +58,10 @@ namespace modm
 	class Vector
 	{
 	public:
-		Vector();
-		Vector(const T *ptData);
+		constexpr Vector();
+		constexpr Vector(const T *ptData);
 
-		Vector(const Matrix<T, N, 1> &rhs);
+		constexpr Vector(const Matrix<T, N, 1> &rhs);
 		Vector& operator = (const Matrix<T, N, 1> &rhs);
 
 		bool operator == (const Vector &rhs) const;

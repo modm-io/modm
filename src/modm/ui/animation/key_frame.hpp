@@ -39,10 +39,10 @@ struct KeyFrameBase
 	T value[size] = {};
 
 	KeyFrameBase() = default;
-	KeyFrameBase(typename Animation<T>::TimeType length)
+	constexpr KeyFrameBase(typename Animation<T>::TimeType length)
 	:	length(length) {}
 
-	KeyFrameBase(typename Animation<T>::TimeType length, Args... values)
+	constexpr KeyFrameBase(typename Animation<T>::TimeType length, Args... values)
 	:	length(length), value{values...} {}
 } modm_packed;
 
@@ -92,12 +92,12 @@ class KeyFrameAnimationBase
 	static constexpr std::size_t size = sizeof...(Args);
 
 public:
-	KeyFrameAnimationBase(AnimationBase<Args>&... animator);
+	constexpr KeyFrameAnimationBase(AnimationBase<Args>&... animator);
 
 	template< uint16_t N >
-	KeyFrameAnimationBase(const KeyFrame<T, size> (&frames)[N], AnimationBase<Args>&... animator);
+	constexpr KeyFrameAnimationBase(const KeyFrame<T, size> (&frames)[N], AnimationBase<Args>&... animator);
 
-	KeyFrameAnimationBase(const KeyFrame<T, size> *frames, uint16_t length, AnimationBase<Args>&... animator);
+	constexpr KeyFrameAnimationBase(const KeyFrame<T, size> *frames, uint16_t length, AnimationBase<Args>&... animator);
 
 	bool
 	start(uint8_t repeat=0);

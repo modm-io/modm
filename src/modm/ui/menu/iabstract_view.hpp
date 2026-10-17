@@ -32,7 +32,7 @@ namespace modm
 		 * @param identifier can be used to determine which screen is the currently
 		 *        displayed on the graphicDisplay
 		 */
-		IAbstractView(uint8_t identifier) :
+		constexpr IAbstractView(uint8_t identifier) :
 			identifier(identifier), alive(true)
 		{
 		}

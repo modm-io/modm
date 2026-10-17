@@ -18,7 +18,7 @@
 // ----------------------------------------------------------------------------
 // MARK: LIS302 DRIVER
 template < class I2cMaster >
-modm::Lsm303a<I2cMaster>::Lsm303a(Data &data, uint8_t address)
+constexpr modm::Lsm303a<I2cMaster>::Lsm303a(Data &data, uint8_t address)
 :	Lis3TransportI2c<I2cMaster>(address), data(data), rawBuffer{7,0,0,0,0,0, 0,0, 0,0,0,0,0,0, 0,0}
 {
 }

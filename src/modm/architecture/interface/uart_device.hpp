@@ -30,7 +30,7 @@ template < class Uart >
 class UartDevice
 {
 public:
-	UartDevice() :
+	constexpr UartDevice() :
 		txTimeout(std::chrono::microseconds(1000)),
 		rxTimeout(std::chrono::microseconds(10000))
 	{

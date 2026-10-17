@@ -59,7 +59,7 @@ namespace modm
 			 * 								Needs to be an Array of std::pair<>.
 			 * \param	numberOfPoints		length of \p supportingPoints
 			 */
-			Lagrange(Accessor<T> supportingPoints, uint8_t numberOfPoints);
+			constexpr Lagrange(Accessor<T> supportingPoints, uint8_t numberOfPoints);
 
 			/**
 			 * \brief	Perform a Lagrange-interpolation

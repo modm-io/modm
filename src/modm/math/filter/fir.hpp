@@ -39,7 +39,7 @@ namespace modm
 			/**
 			 * \param	coeff	array containing the coefficients
 			 **/
-			Fir(const float (&coeff)[N]);
+			constexpr Fir(const float (&coeff)[N]);
 
 			/**
 			 * Reset the coefficients.

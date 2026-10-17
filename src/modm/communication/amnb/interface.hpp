@@ -103,7 +103,7 @@ template< size_t MaxHeapAllocation = 0 >
 class Interface
 {
 public:
-	Interface(Device &device)
+	constexpr Interface(Device &device)
 	:	device(device) {}
 
 	bool

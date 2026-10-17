@@ -17,14 +17,14 @@
 #endif
 
 template<typename Allocator>
-modm::MenuEntry<Allocator>::MenuEntry(const char* text, uint16_t space, MenuEntryCallback<Allocator> func):
+constexpr modm::MenuEntry<Allocator>::MenuEntry(const char* text, uint16_t space, MenuEntryCallback<Allocator> func):
 	text(text, space),
 	callback(func)
 {
 }
 
 template<typename Allocator>
-modm::StandardMenu<Allocator>::StandardMenu(modm::ViewStack<Allocator>* stack, uint8_t identifier) :
+constexpr modm::StandardMenu<Allocator>::StandardMenu(modm::ViewStack<Allocator>* stack, uint8_t identifier) :
 	modm::AbstractMenu<Allocator>(stack, identifier),
 	display_update_time(500),
 	timer(std::chrono::milliseconds(display_update_time)),
@@ -37,7 +37,7 @@ modm::StandardMenu<Allocator>::StandardMenu(modm::ViewStack<Allocator>* stack, u
 }
 
 template<typename Allocator>
-modm::StandardMenu<Allocator>::StandardMenu(modm::ViewStack<Allocator>* stack, uint8_t identifier, const char* title) :
+constexpr modm::StandardMenu<Allocator>::StandardMenu(modm::ViewStack<Allocator>* stack, uint8_t identifier, const char* title) :
 	modm::AbstractMenu<Allocator>(stack, identifier),
 	display_update_time(500),
 	timer(std::chrono::milliseconds(display_update_time)),

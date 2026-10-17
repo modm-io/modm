@@ -38,50 +38,50 @@ namespace modm
 	class Vector<T, 4>
 	{
 	public:
-		Vector();
+		constexpr Vector();
 
-		explicit Vector(T inVal);
-		Vector(T inX, T inY, T inZ, T inW);
+		explicit constexpr Vector(T inVal);
+		constexpr Vector(T inX, T inY, T inZ, T inW);
 
-		Vector(const Vector<T, 1> &inX, const Vector<T, 1> &inY, const Vector<T, 1> &inZ, const Vector<T, 1> &inW);
-		Vector(const Vector<T, 1> &inX, const Vector<T, 1> &inY, const Vector<T, 1> &inZ, const T &inW);
-		Vector(const Vector<T, 1> &inX, const Vector<T, 1> &inY, const T &inZ, const T &inW);
-		Vector(const Vector<T, 1> &inX, const T &inY, const Vector<T, 1> &inZ, const T &inW);
-		Vector(const T &inX, const Vector<T, 1> &inY, const Vector<T, 1> &inZ, const T &inW);
-		Vector(const Vector<T, 1> &inX, const T &inY, const T &inZ, const T &inW);
-		Vector(const T &inX, const Vector<T, 1> &inY, const T &inZ, const T &inW);
-		Vector(const Vector<T, 1> &inX, const Vector<T, 1> &inY, const T &inZ, const Vector<T, 1> &inW);
-		Vector(const Vector<T, 1> &inX, const T &inY, const T &inZ, const Vector<T, 1> &inW);
-		Vector(const T &inX, const Vector<T, 1> &inY, const T &inZ, const Vector<T, 1> &inW);
-		Vector(const T &inX, const T &inY, const T &inZ, const Vector<T, 1> &inW);
-		Vector(const Vector<T, 1> &inX, const T &inY, const Vector<T, 1> &inZ, const Vector<T, 1> &inW);
-		Vector(const T &inX, const T &inY, const Vector<T, 1> &inZ, const Vector<T, 1> &inW);
-		Vector(const T &inX, const Vector<T, 1> &inY, const Vector<T, 1> &inZ, const Vector<T, 1> &inW);
+		constexpr Vector(const Vector<T, 1> &inX, const Vector<T, 1> &inY, const Vector<T, 1> &inZ, const Vector<T, 1> &inW);
+		constexpr Vector(const Vector<T, 1> &inX, const Vector<T, 1> &inY, const Vector<T, 1> &inZ, const T &inW);
+		constexpr Vector(const Vector<T, 1> &inX, const Vector<T, 1> &inY, const T &inZ, const T &inW);
+		constexpr Vector(const Vector<T, 1> &inX, const T &inY, const Vector<T, 1> &inZ, const T &inW);
+		constexpr Vector(const T &inX, const Vector<T, 1> &inY, const Vector<T, 1> &inZ, const T &inW);
+		constexpr Vector(const Vector<T, 1> &inX, const T &inY, const T &inZ, const T &inW);
+		constexpr Vector(const T &inX, const Vector<T, 1> &inY, const T &inZ, const T &inW);
+		constexpr Vector(const Vector<T, 1> &inX, const Vector<T, 1> &inY, const T &inZ, const Vector<T, 1> &inW);
+		constexpr Vector(const Vector<T, 1> &inX, const T &inY, const T &inZ, const Vector<T, 1> &inW);
+		constexpr Vector(const T &inX, const Vector<T, 1> &inY, const T &inZ, const Vector<T, 1> &inW);
+		constexpr Vector(const T &inX, const T &inY, const T &inZ, const Vector<T, 1> &inW);
+		constexpr Vector(const Vector<T, 1> &inX, const T &inY, const Vector<T, 1> &inZ, const Vector<T, 1> &inW);
+		constexpr Vector(const T &inX, const T &inY, const Vector<T, 1> &inZ, const Vector<T, 1> &inW);
+		constexpr Vector(const T &inX, const Vector<T, 1> &inY, const Vector<T, 1> &inZ, const Vector<T, 1> &inW);
 
-		Vector(const Vector<T, 2> &inXY, const Vector<T, 1> &inZ, const Vector<T, 1> &inW);
-		Vector(const Vector<T, 2> &inXY, const Vector<T, 1> &inZ, const T &inW);
-		Vector(const Vector<T, 2> &inXY, const T &inZ, const T &inW);
-		Vector(const Vector<T, 2> &inXY, const T &inZ, const Vector<T, 1> &inW);
+		constexpr Vector(const Vector<T, 2> &inXY, const Vector<T, 1> &inZ, const Vector<T, 1> &inW);
+		constexpr Vector(const Vector<T, 2> &inXY, const Vector<T, 1> &inZ, const T &inW);
+		constexpr Vector(const Vector<T, 2> &inXY, const T &inZ, const T &inW);
+		constexpr Vector(const Vector<T, 2> &inXY, const T &inZ, const Vector<T, 1> &inW);
 
-		Vector(const Vector<T, 1> &inX, const Vector<T, 2> &inYZ, const Vector<T, 1> &inW);
-		Vector(const Vector<T, 1> &inX, const Vector<T, 2> &inYZ, const T &inW);
-		Vector(const T &inX, const Vector<T, 2> &inYZ, const T &inW);
-		Vector(const T &inX, const Vector<T, 2> &inYZ, const Vector<T, 1> &inW);
+		constexpr Vector(const Vector<T, 1> &inX, const Vector<T, 2> &inYZ, const Vector<T, 1> &inW);
+		constexpr Vector(const Vector<T, 1> &inX, const Vector<T, 2> &inYZ, const T &inW);
+		constexpr Vector(const T &inX, const Vector<T, 2> &inYZ, const T &inW);
+		constexpr Vector(const T &inX, const Vector<T, 2> &inYZ, const Vector<T, 1> &inW);
 
-		Vector(const Vector<T, 1> &inX, const Vector<T, 1> &inY, const Vector<T, 2> &inZW);
-		Vector(const Vector<T, 1> &inX, const T &inY, const Vector<T, 2> &inZW);
-		Vector(const T &inX, const T &inY, const Vector<T, 2> &inZW);
-		Vector(const T &inX, const Vector<T, 1> &inY, const Vector<T, 2> &inZW);
+		constexpr Vector(const Vector<T, 1> &inX, const Vector<T, 1> &inY, const Vector<T, 2> &inZW);
+		constexpr Vector(const Vector<T, 1> &inX, const T &inY, const Vector<T, 2> &inZW);
+		constexpr Vector(const T &inX, const T &inY, const Vector<T, 2> &inZW);
+		constexpr Vector(const T &inX, const Vector<T, 1> &inY, const Vector<T, 2> &inZW);
 
-		Vector(const Vector<T, 2> &inXY, const Vector<T, 2> &inZW);
+		constexpr Vector(const Vector<T, 2> &inXY, const Vector<T, 2> &inZW);
 
-		Vector(const Vector<T, 3> &inXYZ, const Vector<T, 1> &inW);
-		Vector(const Vector<T, 3> &inXYZ, const T &inW);
+		constexpr Vector(const Vector<T, 3> &inXYZ, const Vector<T, 1> &inW);
+		constexpr Vector(const Vector<T, 3> &inXYZ, const T &inW);
 
-		Vector(const Vector<T, 1> &inX, const Vector<T, 3> &inYZW);
-		Vector(const T &inX, const Vector<T, 3> &inYZW);
+		constexpr Vector(const Vector<T, 1> &inX, const Vector<T, 3> &inYZW);
+		constexpr Vector(const T &inX, const Vector<T, 3> &inYZW);
 
-		Vector(const Matrix<T, 4, 1> &rhs);
+		constexpr Vector(const Matrix<T, 4, 1> &rhs);
 
 
 		inline void

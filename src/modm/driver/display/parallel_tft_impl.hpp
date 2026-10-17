@@ -36,7 +36,7 @@
 #endif
 
 template <typename INTERFACE>
-modm::ParallelTft<INTERFACE>::ParallelTft(INTERFACE& interface) :
+constexpr modm::ParallelTft<INTERFACE>::ParallelTft(INTERFACE& interface) :
 	interface(interface)
 {
 }

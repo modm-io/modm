@@ -48,7 +48,7 @@ namespace modm
 		 * @param identifier can be used to determine which screen is the currently
 		 *        displayed on the graphicDisplay
 		 */
-		AbstractView(modm::ViewStack<Allocator>* stack, uint8_t identifier) :
+		constexpr AbstractView(modm::ViewStack<Allocator>* stack, uint8_t identifier) :
 			IAbstractView(identifier), stack(stack)
 		{
 		}

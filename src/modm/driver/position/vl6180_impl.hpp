@@ -15,7 +15,7 @@
 
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
-modm::Vl6180<I2cMaster>::Vl6180(Data &data, uint8_t address)
+constexpr modm::Vl6180<I2cMaster>::Vl6180(Data &data, uint8_t address)
 :	I2cDevice<I2cMaster>(address), data(data),
 	i2cBuffer{0,0,0,0}, logicBuffer{Register(0)}
 {

@@ -101,7 +101,7 @@ public:
 		DeviceConfig1::PowerSave	|
 		DeviceConfig1::LogScale;
 
-	Lp503x(uint8_t i2cAddress);
+	constexpr Lp503x(uint8_t i2cAddress);
 
 	/// Initialize device, call before using any other function
 	bool

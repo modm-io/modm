@@ -43,11 +43,11 @@ namespace modm
 		/**
 		 * \brief	Constructs a set capable of holding n points (default = 2)
 		 */
-		PointSet2D(SizeType n = 2);
+		constexpr PointSet2D(SizeType n = 2);
 
-		PointSet2D(std::initializer_list<PointType> init);
+		constexpr PointSet2D(std::initializer_list<PointType> init);
 
-		PointSet2D(const PointSet2D& other);
+		constexpr PointSet2D(const PointSet2D& other);
 
 		PointSet2D&
 		operator = (const PointSet2D& other);

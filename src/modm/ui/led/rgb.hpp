@@ -38,7 +38,7 @@ class RgbLed
 	::modm::color::Rgb absolute;
 
 public:
-	RgbLed(Led& red, Led& green, Led& blue):
+	constexpr RgbLed(Led& red, Led& green, Led& blue):
 		red(red), green(green), blue(blue) {}
 
 	inline void

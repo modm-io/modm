@@ -30,7 +30,7 @@ modm::rpr::Error::call(Transmitter& node, ErrorMessage *error)
 
 // ----------------------------------------------------------------------------
 template <typename Interface>
-modm::rpr::Node<Interface>::Node(modm::accessor::Flash<Listener> listenerCallbackList,
+constexpr modm::rpr::Node<Interface>::Node(modm::accessor::Flash<Listener> listenerCallbackList,
 								   uint8_t listenerCallbackCount,
 								   modm::accessor::Flash<Error> errorCallbackList,
 								   uint8_t errorCallbackCount) :
@@ -40,7 +40,7 @@ errorCallbackList(errorCallbackList), errorCallbackCount(errorCallbackCount)
 }
 
 template <typename Interface>
-modm::rpr::Node<Interface>::Node(modm::accessor::Flash<Listener> listenerCallbackList,
+constexpr modm::rpr::Node<Interface>::Node(modm::accessor::Flash<Listener> listenerCallbackList,
 								   uint8_t listenerCallbackCount) :
 listenerCallbackList(listenerCallbackList), listenerCallbackCount(listenerCallbackCount),
 errorCallbackCount(0)

@@ -15,7 +15,7 @@
 // ----------------------------------------------------------------------------
 
 template< typename T >
-modm::ui::Animation<T>::Animation(T &value, Handler handler)
+constexpr modm::ui::Animation<T>::Animation(T &value, Handler handler)
 :	handler(handler), currentValue(value)
 {
 }

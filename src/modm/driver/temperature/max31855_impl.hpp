@@ -19,7 +19,7 @@ namespace modm
 {
 
 template <typename SpiMaster, typename Cs>
-Max31855<SpiMaster, Cs>::Max31855(Data &data) : data(data)
+constexpr Max31855<SpiMaster, Cs>::Max31855(Data &data) : data(data)
 {
 }
 

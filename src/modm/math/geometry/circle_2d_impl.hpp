@@ -18,13 +18,13 @@
 
 // ----------------------------------------------------------------------------
 template <typename T>
-modm::Circle2D<T>::Circle2D() :
+constexpr modm::Circle2D<T>::Circle2D() :
 	center(), radius(0)
 {
 }
 
 template <typename T>
-modm::Circle2D<T>::Circle2D(const Vector<T, 2>& inCenter, T inRadius) :
+constexpr modm::Circle2D<T>::Circle2D(const Vector<T, 2>& inCenter, T inRadius) :
 	center(inCenter), radius(inRadius)
 {
 }

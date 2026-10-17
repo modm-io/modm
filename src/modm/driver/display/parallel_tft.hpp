@@ -32,7 +32,7 @@ template<typename INTERFACE>
 class ParallelTft : public ColorGraphicDisplay
 {
 public:
-	ParallelTft(INTERFACE& interface);
+	constexpr ParallelTft(INTERFACE& interface);
 
 	void
 	initialize();

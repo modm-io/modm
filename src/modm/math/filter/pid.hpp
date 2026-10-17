@@ -109,13 +109,13 @@ namespace modm
 		 * \param	maxErrorSum	integral will be limited to this value
 		 * \param	maxOutput	output will be limited to this value
 		 **/
-		Pid(const float& kp = 0, const float& ki = 0, const float& kd = 0,
+		constexpr Pid(const float& kp = 0, const float& ki = 0, const float& kd = 0,
 				const T& maxErrorSum = 0, const T& maxOutput = 0);
 
 		/**
 		 * \param	parameter	list of parameters to the controller
 		 **/
-		Pid(Parameter& parameter);
+		constexpr Pid(Parameter& parameter);
 
 		/**
 		 * Reset the parameters of the controller.

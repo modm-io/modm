@@ -31,7 +31,7 @@ template < typename I2cMaster >
 class Pca9548a : public modm::I2cDevice< I2cMaster >
 {
 public:
-	Pca9548a(uint8_t address=0b1110000);
+	constexpr Pca9548a(uint8_t address=0b1110000);
 
 	bool
 	setActiveChannel(uint8_t channel);

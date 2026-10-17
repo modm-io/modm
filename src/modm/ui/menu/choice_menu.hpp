@@ -43,9 +43,9 @@ namespace modm{
 	{
 	public:
 
-		ChoiceMenu(modm::ViewStack<Allocator>* stack, uint8_t identifier);
+		constexpr ChoiceMenu(modm::ViewStack<Allocator>* stack, uint8_t identifier);
 
-		ChoiceMenu(modm::ViewStack<Allocator>* stack, uint8_t identifier, const char* title);
+		constexpr ChoiceMenu(modm::ViewStack<Allocator>* stack, uint8_t identifier, const char* title);
 
 		/**
 		 * @brief addEntry a new entry to the ChoiceMenu

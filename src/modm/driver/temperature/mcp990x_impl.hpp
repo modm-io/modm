@@ -17,7 +17,7 @@ namespace modm
 {
 
 template < typename I2cMaster >
-Mcp990x<I2cMaster>::Mcp990x(Data &data, uint8_t address) :
+constexpr Mcp990x<I2cMaster>::Mcp990x(Data &data, uint8_t address) :
 	I2cDevice<I2cMaster>{address}, data_{data}
 {
 }

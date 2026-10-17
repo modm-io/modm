@@ -82,7 +82,7 @@ class Hmc5843 : public hmc5843, public Hmc58x3< I2cMaster >
 
 public:
 	/// Constructor, requires a hmc58x3::Data object, sets address to default of 0x1e
-	Hmc5843(Data &data, uint8_t address=0x1e)
+	constexpr Hmc5843(Data &data, uint8_t address=0x1e)
 	:	Hmc58x3<I2cMaster>(data, address)
 	{
 	}

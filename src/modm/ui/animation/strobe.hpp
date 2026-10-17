@@ -41,7 +41,7 @@ class Strobe
 {
 	using TimeType = typename Animation<T>::TimeType;
 public:
-	Strobe(Animation<T> &animator)
+	constexpr Strobe(Animation<T> &animator)
 	:	animator(animator), frames{
 			modm::ui::KeyFrame<T>(60, std::numeric_limits<T>::max()),
 			modm::ui::KeyFrame<T>(40, std::numeric_limits<T>::max()),

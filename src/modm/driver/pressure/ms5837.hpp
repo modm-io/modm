@@ -87,7 +87,7 @@ public:
 	/**
 	 * @param	data pointer to buffer of the internal data of type Data
 	 */
-	Ms5837(DataBase &data, uint8_t address=0x76);
+	constexpr Ms5837(DataBase &data, uint8_t address=0x76);
 
 	/// Call this function before using the device to read the factory calibration
 	/// @warning calls to this function resets the device

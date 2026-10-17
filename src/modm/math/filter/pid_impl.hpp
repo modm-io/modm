@@ -29,7 +29,7 @@ modm::Pid<T, ScaleFactor>::Parameter::Parameter(
 
 // -----------------------------------------------------------------------------
 template<typename T, unsigned int ScaleFactor>
-modm::Pid<T, ScaleFactor>::Pid(
+constexpr modm::Pid<T, ScaleFactor>::Pid(
 		const float& kp, const float& ki, const float& kd,
 		const T& maxErrorSum, const T& maxOutput) :
 	parameter(kp, ki, kd, maxErrorSum, maxOutput)
@@ -39,7 +39,7 @@ modm::Pid<T, ScaleFactor>::Pid(
 
 // -----------------------------------------------------------------------------
 template<typename T, unsigned int ScaleFactor>
-modm::Pid<T, ScaleFactor>::Pid(
+constexpr modm::Pid<T, ScaleFactor>::Pid(
 		Parameter& parameter) :
 	parameter(parameter)
 {

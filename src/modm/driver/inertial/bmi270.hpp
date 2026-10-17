@@ -362,7 +362,7 @@ class Bmi270 : public bmi270, public Transport
 public:
 	/// @arg transportArgs Arguments to transport layer.
 	template<typename... Args>
-	Bmi270(Args... transportArgs);
+	constexpr Bmi270(Args... transportArgs);
 
 	/// Initialize device. Call before any other member function.
 	/// @return true on success, false on error

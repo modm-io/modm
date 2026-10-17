@@ -40,7 +40,7 @@ template < class I2cMaster >
 class Max14661TransportI2c : public modm::I2cDevice< I2cMaster >
 {
 public:
-	Max14661TransportI2c(uint8_t address) :	I2cDevice<I2cMaster>(address) {}
+	constexpr Max14661TransportI2c(uint8_t address) :	I2cDevice<I2cMaster>(address) {}
 
 protected:
 	/// Write the 16-bit channel mask into the bank A shadow registers
@@ -104,7 +104,7 @@ template < class SpiMaster, class Cs >
 class Max14661TransportSpi : public modm::SpiDevice< SpiMaster >
 {
 public:
-	Max14661TransportSpi(uint8_t)
+	constexpr Max14661TransportSpi(uint8_t)
 	{
 		Cs::setOutput(modm::Gpio::High);
 	}

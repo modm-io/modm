@@ -29,7 +29,7 @@ namespace modm::pt
 class Protothread : public modm::Fiber< MODM_PROTOTHREAD_STACK_SIZE >
 {
 public:
-	Protothread(modm::fiber::Start start=modm::fiber::Start::Now)
+	constexpr Protothread(modm::fiber::Start start=modm::fiber::Start::Now)
 	:	Fiber([this](modm::fiber::stop_token stoken)
 			  { while(not stoken.stop_requested() and update()) modm::this_fiber::yield(); }, start)
 	{}

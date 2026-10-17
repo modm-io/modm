@@ -228,7 +228,7 @@ template <typename I2cMaster>
 class Ltc2499 : public ltc2499, public modm::I2cDevice<I2cMaster>
 {
 public:
-	inline Ltc2499(Data &data, uint8_t address = ltc2499::address()) :
+	constexpr Ltc2499(Data &data, uint8_t address = ltc2499::address()) :
 		modm::I2cDevice<I2cMaster>(address), data(data) {}
 
 	/// Selects the mux and the rejection/speed mode for the next conversion, and starts it.

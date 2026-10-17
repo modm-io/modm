@@ -54,7 +54,7 @@ namespace modm
 		// Must use a pointer to T here, otherwise the compiler can't distinguish
 		// between constructor and copy constructor!
 		template<typename T>
-		explicit SmartPointer(const T *data)
+		explicit constexpr SmartPointer(const T *data)
 		: ptr(new uint8_t[sizeof(T) + 4])
 		{
 			ptr[0] = 1;

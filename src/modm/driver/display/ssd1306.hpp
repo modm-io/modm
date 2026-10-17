@@ -102,7 +102,7 @@ class Ssd1306 : public ssd1306,
 	static_assert((Height == 64) or (Height == 32), "Display height must be either 32 or 64 pixel!");
 
 public:
-	Ssd1306(uint8_t address = 0x3C);
+	constexpr Ssd1306(uint8_t address = 0x3C);
 
 	/// Update the display with the content of the RAM buffer.
 	void

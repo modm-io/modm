@@ -88,7 +88,7 @@ DataBase
 
     public:
         inline
-        DataBase() : meta(0) {}
+        constexpr DataBase() : meta(0) {}
 
         inline Prom&
         getProm() { return prom; }

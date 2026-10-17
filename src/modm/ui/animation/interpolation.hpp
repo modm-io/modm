@@ -67,7 +67,7 @@ private:
 		float accumulatedValue;
 		float deltaValue;
 
-		Computations()
+		constexpr Computations()
 		:	accumulatedValue(0), deltaValue(0)
 		{
 		}
@@ -109,7 +109,7 @@ private:
 		uint_fast16_t accumulatedValue;
 		int_fast16_t deltaValue;
 
-		Computations()
+		constexpr Computations()
 		:	accumulatedValue(0), deltaValue(0)
 		{
 		}
@@ -157,7 +157,7 @@ private:
 		uint32_t accumulatedValue;
 		int32_t deltaValue;
 
-		Computations()
+		constexpr Computations()
 		:	accumulatedValue(0), deltaValue(0)
 		{
 		}
@@ -212,7 +212,7 @@ private:
 		uint64_t accumulatedValue;
 		int64_t deltaValue;
 
-		Computations()
+		constexpr Computations()
 		:	accumulatedValue(0), deltaValue(0)
 		{
 		}
@@ -252,7 +252,7 @@ private:
 	Computations<T, UnsignedType> computations;
 
 public:
-	FastRamp()
+	constexpr FastRamp()
 	:	computations()
 	{
 	}

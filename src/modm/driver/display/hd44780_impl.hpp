@@ -17,7 +17,7 @@
 
 // ----------------------------------------------------------------------------
 template <typename DATA, typename RW, typename RS, typename E>
-modm::Hd44780<DATA, RW, RS, E>::Hd44780(uint8_t width, uint8_t height) :
+constexpr modm::Hd44780<DATA, RW, RS, E>::Hd44780(uint8_t width, uint8_t height) :
 	CharacterDisplay(width, height)
 {
 }
@@ -87,7 +87,7 @@ modm::Hd44780<DATA, RW, RS, E>::clear()
 
 // ----------------------------------------------------------------------------
 template <typename DATA, typename RW, typename RS, typename E1, typename E2>
-modm::Hd44780Dual<DATA, RW, RS, E1, E2>::Hd44780Dual(uint8_t width, uint8_t height) :
+constexpr modm::Hd44780Dual<DATA, RW, RS, E1, E2>::Hd44780Dual(uint8_t width, uint8_t height) :
 	CharacterDisplay(width, height)
 {
 }

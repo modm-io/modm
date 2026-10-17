@@ -930,12 +930,12 @@ public:
         LoRa::PacketParams lora;
         Ranging::PacketParams ranging;
 
-        PacketParams() {}
-        PacketParams(Gfsk::PacketParams packetParams) : gfsk(packetParams) {}
-        PacketParams(Flrc::PacketParams packetParams) : flrc(packetParams) {}
-        PacketParams(Ble::PacketParams packetParams) : ble(packetParams) {}
-        PacketParams(LoRa::PacketParams packetParams) : lora(packetParams) {}
-        PacketParams(Ranging::PacketParams packetParams) : ranging(packetParams) {}
+        constexpr PacketParams() {}
+        constexpr PacketParams(Gfsk::PacketParams packetParams) : gfsk(packetParams) {}
+        constexpr PacketParams(Flrc::PacketParams packetParams) : flrc(packetParams) {}
+        constexpr PacketParams(Ble::PacketParams packetParams) : ble(packetParams) {}
+        constexpr PacketParams(LoRa::PacketParams packetParams) : lora(packetParams) {}
+        constexpr PacketParams(Ranging::PacketParams packetParams) : ranging(packetParams) {}
     };
 
     union PacketStatus
@@ -946,12 +946,12 @@ public:
         LoRa::PacketStatus lora;
         Ranging::PacketStatus ranging;
 
-        PacketStatus() {}
-        PacketStatus(Gfsk::PacketStatus packetStatus) : gfsk(packetStatus) {}
-        PacketStatus(Flrc::PacketStatus packetStatus) : flrc(packetStatus) {}
-        PacketStatus(Ble::PacketStatus packetStatus) : ble(packetStatus) {}
-        PacketStatus(LoRa::PacketStatus packetStatus) : lora(packetStatus) {}
-        PacketStatus(Ranging::PacketStatus packetStatus) : ranging(packetStatus) {}
+        constexpr PacketStatus() {}
+        constexpr PacketStatus(Gfsk::PacketStatus packetStatus) : gfsk(packetStatus) {}
+        constexpr PacketStatus(Flrc::PacketStatus packetStatus) : flrc(packetStatus) {}
+        constexpr PacketStatus(Ble::PacketStatus packetStatus) : ble(packetStatus) {}
+        constexpr PacketStatus(LoRa::PacketStatus packetStatus) : lora(packetStatus) {}
+        constexpr PacketStatus(Ranging::PacketStatus packetStatus) : ranging(packetStatus) {}
     };
 
     union ModulationParams
@@ -962,12 +962,12 @@ public:
         LoRa::ModulationParams lora;
         Ranging::ModulationParams ranging;
 
-        ModulationParams() {}
-        ModulationParams(Gfsk::ModulationParams modulationParams) : gfsk(modulationParams) {}
-        ModulationParams(Flrc::ModulationParams modulationParams) : flrc(modulationParams) {}
-        ModulationParams(Ble::ModulationParams modulationParams) : ble(modulationParams) {}
-        ModulationParams(LoRa::ModulationParams modulationParams) : lora(modulationParams) {}
-        ModulationParams(Ranging::ModulationParams modulationParams) : ranging(modulationParams) {}
+        constexpr ModulationParams() {}
+        constexpr ModulationParams(Gfsk::ModulationParams modulationParams) : gfsk(modulationParams) {}
+        constexpr ModulationParams(Flrc::ModulationParams modulationParams) : flrc(modulationParams) {}
+        constexpr ModulationParams(Ble::ModulationParams modulationParams) : ble(modulationParams) {}
+        constexpr ModulationParams(LoRa::ModulationParams modulationParams) : lora(modulationParams) {}
+        constexpr ModulationParams(Ranging::ModulationParams modulationParams) : ranging(modulationParams) {}
     };
 
 protected:

@@ -49,7 +49,7 @@ namespace modm
 			 * \brief	Construct a new protothread that will start from the
 			 * 			beginning of its run() function.
 			 */
-			Protothread() :
+			constexpr Protothread() :
 				ptState(0)
 			{
 			}

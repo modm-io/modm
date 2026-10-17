@@ -245,7 +245,7 @@ public:
 		template < class Transport >
 		friend class Lis302dl;
 
-		Data() :
+		constexpr Data() :
 			data{0,0,0}, meta(0)
 		{}
 		// DATA ACCESS
@@ -307,7 +307,7 @@ class Lis302dl : public lis302dl, public Transport
 public:
 	/// Constructor, requires a lis302dl::Data object.
 	/// For I2c this also sets the address to 0x1D (alternative: 0x1C).
-	Lis302dl(Data &data, uint8_t address=0x1D);
+	constexpr Lis302dl(Data &data, uint8_t address=0x1D);
 
 	bool
 	configure(Scale scale, MeasurementRate rate = MeasurementRate::Hz100);

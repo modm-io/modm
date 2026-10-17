@@ -46,7 +46,7 @@ protected:								  // 7654 3210 7654 3210 7654 3210
 public:
 	static constexpr size_t size = LEDs;
 
-	Ws2812b()
+	constexpr Ws2812b()
 	{
 		clear();
 	}

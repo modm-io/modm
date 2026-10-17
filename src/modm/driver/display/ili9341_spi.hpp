@@ -22,7 +22,7 @@ template<class SPI, class Cs, class Dc>
 class Ili9341SPIInterface: public ili9341, public modm::SpiDevice<SPI>
 {
 public:
-	Ili9341SPIInterface()
+	constexpr Ili9341SPIInterface()
 	{
 		this->attachConfigurationHandler([]
 		{
@@ -86,7 +86,7 @@ public:
 	struct BatchHandle
 	{
 		Ili9341SPIInterface& i;
-		BatchHandle(Ili9341SPIInterface& iface)
+		constexpr BatchHandle(Ili9341SPIInterface& iface)
 		: i(iface)
 		{
 			i.acquireMaster();
