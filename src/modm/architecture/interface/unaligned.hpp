@@ -67,10 +67,10 @@ protected:
  * @ingroup	modm_architecture_unaligned
  */
 template< typename T, typename U>
-unaligned_t< typename std::remove_pointer<T>::type >*
+unaligned_t< std::remove_pointer_t<T> >*
 asUnaligned(U* value)
 {
-	return reinterpret_cast< unaligned_t< typename std::remove_pointer<T>::type >* >(value);
+	return reinterpret_cast< unaligned_t< std::remove_pointer_t<T> >* >(value);
 }
 
 }	// namespace modm

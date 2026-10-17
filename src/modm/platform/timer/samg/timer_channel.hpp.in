@@ -89,15 +89,15 @@ public:
 		using TclkPin = GetPin_t<PeripheralPin::Tclk, Pins...>;
 		using Tc = Peripherals::Tc<{{ module | int }}>;
 
-		if constexpr (!std::is_void<TioaPin>::value) {
+		if constexpr (!std::is_void_v<TioaPin>) {
 			using TioaConnector = typename TioaPin::template Connector<Tc, Tc::Tioa<{{ channel }}>>;
 			TioaConnector::connect();
 		}
-		if constexpr (!std::is_void<TiobPin>::value) {
+		if constexpr (!std::is_void_v<TiobPin>) {
 			using TiobConnector = typename TiobPin::template Connector<Tc, Tc::Tiob<{{ channel }}>>;
 			TiobConnector::connect();
 		}
-		if constexpr (!std::is_void<TclkPin>::value) {
+		if constexpr (!std::is_void_v<TclkPin>) {
 			using TclkConnector = typename TclkPin::template Connector<Tc, Tc::Tclk<{{ channel }}>>;
 			TclkConnector::connect();
 		}

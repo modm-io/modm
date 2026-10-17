@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <limits>
 #include <type_traits>
 
@@ -38,15 +39,9 @@ using least_uint = typename modm::uint_t<Bits>::least;
 /// @cond
 namespace detail
 {
-	template<typename T>
+	template<typename... Ts>
 	constexpr int most_digits() {
-		return std::numeric_limits<T>::digits;
-	}
-
-	template<typename T, typename... Ts>
-	constexpr std::enable_if_t<sizeof...(Ts), int>
-	most_digits() {
-		return std::max(std::numeric_limits<T>::digits, most_digits<Ts...>());
+		return std::max({std::numeric_limits<Ts>::digits...});
 	}
 }
 /// @endcond
