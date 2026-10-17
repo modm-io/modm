@@ -405,7 +405,10 @@ private:
 	wrap(std::size_t index) { return (index >= N) ? index - N : index; }
 
 	struct Buffer { T data[N]; };
-	union { Buffer buffer; };
+	// The empty member is active by default, so that the container can be
+	// constant initialized for static storage without constructing any T
+	struct None {};
+	union { None none{}; Buffer buffer; };
 	size_type start{0};
 	size_type count{0};
 };
