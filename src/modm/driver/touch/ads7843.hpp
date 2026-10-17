@@ -57,10 +57,10 @@ namespace modm
 		}
 
 	private:
-		static const uint8_t CHX = 0x90;
-		static const uint8_t CHY = 0xd0;
+		static constexpr uint8_t CHX = 0x90;
+		static constexpr uint8_t CHY = 0xd0;
 
-		static const uint16_t threshold = 2;
+		static constexpr uint16_t threshold = 2;
 
 		static bool
 		getAverage(uint16_t * buffer, int16_t & value);

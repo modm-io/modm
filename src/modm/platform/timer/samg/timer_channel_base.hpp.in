@@ -86,26 +86,26 @@ public:
 	// waveform mode. However it seems that only the capture mode bit definitions
 	// made it into the CMSIS device header. Here, the missing waveform mode
 	// definitions are defined as needed.
-	static const uint32_t TC_CMR_EEVT_Pos = 10;
-	static const uint32_t TC_CMR_EEVT_Msk = (0x3) << TC_CMR_EEVT_Pos;
-	static const uint32_t TC_CMR_WAVSEL_Pos = 13;
-	static const uint32_t TC_CMR_WAVSEL_Msk = (0x3) << TC_CMR_WAVSEL_Pos;
-	static const uint32_t TC_CMR_ACPA_Pos = 16;
-	static const uint32_t TC_CMR_ACPA_Msk = (0x3) << TC_CMR_ACPA_Pos;
-	static const uint32_t TC_CMR_ACPC_Pos = 18;
-	static const uint32_t TC_CMR_ACPC_Msk = (0x3) << TC_CMR_ACPC_Pos;
-	static const uint32_t TC_CMR_AEEVT_Pos = 20;
-	static const uint32_t TC_CMR_AEEVT_Msk = (0x3) << TC_CMR_AEEVT_Pos;
-	static const uint32_t TC_CMR_ASWTRG_Pos = 22;
-	static const uint32_t TC_CMR_ASWTRG_Msk = (0x3) << TC_CMR_ASWTRG_Pos;
-	static const uint32_t TC_CMR_BCPB_Pos = 24;
-	static const uint32_t TC_CMR_BCPB_Msk = (0x3) << TC_CMR_BCPB_Pos;
-	static const uint32_t TC_CMR_BCPC_Pos = 26;
-	static const uint32_t TC_CMR_BCPC_Msk = (0x3) << TC_CMR_BCPC_Pos;
-	static const uint32_t TC_CMR_BEEVT_Pos = 28;
-	static const uint32_t TC_CMR_BEEVT_Msk = (0x3) << TC_CMR_BEEVT_Pos;
-	static const uint32_t TC_CMR_BSWTRG_Pos = 30;
-	static const uint32_t TC_CMR_BSWTRG_Msk = (0x3) << TC_CMR_BSWTRG_Pos;
+	static constexpr uint32_t TC_CMR_EEVT_Pos = 10;
+	static constexpr uint32_t TC_CMR_EEVT_Msk = (0x3) << TC_CMR_EEVT_Pos;
+	static constexpr uint32_t TC_CMR_WAVSEL_Pos = 13;
+	static constexpr uint32_t TC_CMR_WAVSEL_Msk = (0x3) << TC_CMR_WAVSEL_Pos;
+	static constexpr uint32_t TC_CMR_ACPA_Pos = 16;
+	static constexpr uint32_t TC_CMR_ACPA_Msk = (0x3) << TC_CMR_ACPA_Pos;
+	static constexpr uint32_t TC_CMR_ACPC_Pos = 18;
+	static constexpr uint32_t TC_CMR_ACPC_Msk = (0x3) << TC_CMR_ACPC_Pos;
+	static constexpr uint32_t TC_CMR_AEEVT_Pos = 20;
+	static constexpr uint32_t TC_CMR_AEEVT_Msk = (0x3) << TC_CMR_AEEVT_Pos;
+	static constexpr uint32_t TC_CMR_ASWTRG_Pos = 22;
+	static constexpr uint32_t TC_CMR_ASWTRG_Msk = (0x3) << TC_CMR_ASWTRG_Pos;
+	static constexpr uint32_t TC_CMR_BCPB_Pos = 24;
+	static constexpr uint32_t TC_CMR_BCPB_Msk = (0x3) << TC_CMR_BCPB_Pos;
+	static constexpr uint32_t TC_CMR_BCPC_Pos = 26;
+	static constexpr uint32_t TC_CMR_BCPC_Msk = (0x3) << TC_CMR_BCPC_Pos;
+	static constexpr uint32_t TC_CMR_BEEVT_Pos = 28;
+	static constexpr uint32_t TC_CMR_BEEVT_Msk = (0x3) << TC_CMR_BEEVT_Pos;
+	static constexpr uint32_t TC_CMR_BSWTRG_Pos = 30;
+	static constexpr uint32_t TC_CMR_BSWTRG_Msk = (0x3) << TC_CMR_BSWTRG_Pos;
 %% endif
 };
 
