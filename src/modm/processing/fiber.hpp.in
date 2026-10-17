@@ -13,7 +13,4 @@
 %% if with_task
 // pulls in the fiber and scheduler implementation
 #include "fiber/task.hpp"
-%% else
-// polyfill implementation of an empty yield
-#include "fiber/no_yield.hpp"
 %% endif

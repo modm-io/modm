@@ -31,7 +31,6 @@ def build(env):
     if env.has_module(":architecture:fiber") and not env.has_module(":processing:fiber"):
         env.outbasepath = "modm/src/modm/processing/"
         env.substitutions = {"with_task": False}
-        env.copy("fiber/no_yield.hpp")
         env.template("fiber.hpp.in")
 
     env.outbasepath = "modm/src/modm"

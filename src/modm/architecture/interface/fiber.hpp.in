@@ -16,6 +16,9 @@
 #include <modm/architecture/interface/clock.hpp>
 #include <utility>
 #include <type_traits>
+%% if not with_scheduler and core.startswith("cortex-m")
+#include <modm/platform/device.hpp>
+%% endif
 
 namespace modm::fiber
 {
@@ -46,12 +49,31 @@ namespace modm::this_fiber
  *          fibers, and you may starve other fibers of processing time.
  *          If you cannot guarantee correct timings, consider using an RTOS.
  */
+%% if with_scheduler
 void
 yield();
 
 /// Returns the id of the current fiber
 modm::fiber::id
 get_id();
+%% else
+void inline
+yield()
+{
+	__asm__ volatile ("" ::: "memory");
+}
+
+/// Returns the id of the current fiber
+modm::fiber::id inline
+get_id()
+{
+%% if core.startswith("cortex-m")
+	// Ensure that calling this in an interrupt gives a different ID
+	if (const auto irq = __get_IPSR(); irq >= 16) return irq;
+%% endif
+	return 0;
+}
+%% endif
 
 /// Yields the current fiber until `bool condition()` returns true.
 /// @warning If `bool condition()` is true on first call, no yield is performed!

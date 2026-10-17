@@ -172,14 +172,19 @@ class Fiber(Module):
         module.description = FileReader("interface/fiber.md")
 
     def prepare(self, module, options):
-        module.depends(":stdc++", ":architecture:clock", ":processing")
+        module.depends(":stdc++", ":architecture:atomic", ":architecture:clock", ":processing")
+        core = options[":target"].get_driver("core")["type"]
+        if core.startswith("cortex-m"): module.depends(":cmsis:device")
         return True
 
     def build(self, env):
         env.outbasepath = "modm/src/modm/architecture"
-        env.copy("interface/fiber.hpp")
-        if env.has_module(":processing:fiber"):
-            env.copy("interface/fiber")
+        env.substitutions = {
+            "with_scheduler": env.has_module(":processing:fiber"),
+            "core": env[":target"].get_driver("core")["type"],
+        }
+        env.template("interface/fiber.hpp.in")
+        env.copy("interface/fiber")
 # -----------------------------------------------------------------------------
 
 class Gpio(Module):
