@@ -11,6 +11,9 @@
  */
 // ----------------------------------------------------------------------------
 
+// Tests the deprecated containers until they are removed
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
 #include <modm/container/stack.hpp>
 
 #include "bounded_stack_test.hpp"

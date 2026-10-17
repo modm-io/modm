@@ -38,6 +38,8 @@ namespace modm
 	 * 		 std::forward_list does not save both front and back pointers.
 	 * 		 This would make operations in xpcc very inefficient.
 	 */
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 	template <typename T, typename Allocator = std::allocator<T>>
 	class [[deprecated("Use std::list instead")]] LinkedList : public DoublyLinkedList<T, Allocator> // DEPRECATED: 2027q4
 	{
@@ -59,5 +61,6 @@ namespace modm
 			}
 		}
 	};
+	#pragma GCC diagnostic pop
 }
 #endif	// MODM_LINKED_LIST_HPP
