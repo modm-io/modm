@@ -68,80 +68,79 @@ namespace modm
 		constexpr Vector(const Matrix<T, 3, 1> &rhs);
 
 
-		inline void
+		constexpr void
 		set(const T& x, const T& y, const T& z);
 
 
-		inline void
+		constexpr void
 		setX(const T& value);
 
-		inline void
+		constexpr void
 		setY(const T& value);
 
-		inline void
+		constexpr void
 		setZ(const T& value);
 
 
-		inline const T&
+		constexpr const T&
 		getX() const;
 
-		inline const T&
+		constexpr const T&
 		getY() const;
 
-		inline const T&
+		constexpr const T&
 		getZ() const;
 
 
-		Vector& operator = (const Matrix<T, 3, 1> &rhs);
+		constexpr Vector& operator = (const Matrix<T, 3, 1> &rhs);
 
-		bool operator == (const Vector &rhs) const;
-		bool operator != (const Vector &rhs) const;
-		bool operator < (const Vector &rhs) const;
-		bool operator <= (const Vector &rhs) const;
-		bool operator > (const Vector &rhs) const;
-		bool operator >= (const Vector &rhs) const;
+		constexpr bool operator == (const Vector &rhs) const = default;
+		constexpr bool operator < (const Vector &rhs) const;
+		constexpr bool operator <= (const Vector &rhs) const;
+		constexpr bool operator > (const Vector &rhs) const;
+		constexpr bool operator >= (const Vector &rhs) const;
 
-		const T& operator [] (uint8_t index) const;
-		T& operator [] (uint8_t index);
-		T* ptr();
-		const T* ptr() const;
+		constexpr const T& operator [] (uint8_t index) const;
+		constexpr T& operator [] (uint8_t index);
+		constexpr T* ptr();
+		constexpr const T* ptr() const;
 
-		Vector operator - () const;
-		Vector operator + (const Vector &rhs) const;
-		Vector operator - (const Vector &rhs) const;
-		T operator * (const Vector &rhs) const;
-		Vector operator ^ (const Vector &rhs) const;
-		Vector operator * (const T &rhs) const;
-		Vector operator / (const T &rhs) const;
+		constexpr Vector operator - () const;
+		constexpr Vector operator + (const Vector &rhs) const;
+		constexpr Vector operator - (const Vector &rhs) const;
+		constexpr T operator * (const Vector &rhs) const;
+		constexpr Vector operator ^ (const Vector &rhs) const;
+		constexpr Vector operator * (const T &rhs) const;
+		constexpr Vector operator / (const T &rhs) const;
 
-		Vector& operator += (const Vector &rhs);
-		Vector& operator -= (const Vector &rhs);
-		Vector& operator *= (const T &rhs);
-		Vector& operator /= (const T &rhs);
+		constexpr Vector& operator += (const Vector &rhs);
+		constexpr Vector& operator -= (const Vector &rhs);
+		constexpr Vector& operator *= (const T &rhs);
+		constexpr Vector& operator /= (const T &rhs);
 
-		float getLength() const;
-		float getLengthSquared() const;
+		constexpr float getLength() const;
+		constexpr float getLengthSquared() const;
 
-		Vector scaled(float newLength) const;
-		void scale(float newLength);
+		constexpr Vector scaled(float newLength) const;
+		constexpr void scale(float newLength);
 
-		Vector normalized() const;
-		void normalize();
+		constexpr Vector normalized() const;
+		constexpr void normalize();
 
-		Matrix<T, 3, 1>&
+		constexpr Matrix<T, 3, 1>&
 		asMatrix();
 
-		const Matrix<T, 3, 1>&
+		constexpr const Matrix<T, 3, 1>&
 		asMatrix() const;
 
-		Matrix<T, 1, 3>&
+		constexpr Matrix<T, 1, 3>&
 		asTransposedMatrix();
 
-		const Matrix<T, 1, 3>&
+		constexpr const Matrix<T, 1, 3>&
 		asTransposedMatrix() const;
 
-		bool hasNan() const;
-		bool hasInf() const;
+		constexpr bool hasNan() const;
+		constexpr bool hasInf() const;
 
 	#ifndef __DOXYGEN__
 		IMPLEMENT_VECTOR_ACCESSOR2(x,x); IMPLEMENT_VECTOR_ACCESSOR2(x,y); IMPLEMENT_VECTOR_ACCESSOR2(x,z);
@@ -196,13 +195,13 @@ namespace modm
 	};
 
 	template<typename U, typename T>
-	static inline Vector<T, 3> operator * (const U &lhs, const Vector<T, 3> &rhs)
+	constexpr static inline Vector<T, 3> operator * (const U &lhs, const Vector<T, 3> &rhs)
 	{
 		return rhs * lhs;
 	}
 
 	template<typename T, typename U>
-	static inline Vector<U, 3> operator * (const Matrix<T, 3, 3> &lhs, const Vector<U, 3> &rhs)
+	constexpr static inline Vector<U, 3> operator * (const Matrix<T, 3, 3> &lhs, const Vector<U, 3> &rhs)
 	{
 		return lhs * rhs.asMatrix();
 	}

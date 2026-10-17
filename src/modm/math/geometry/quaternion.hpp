@@ -48,55 +48,54 @@ namespace modm
 
 		constexpr Quaternion(const Quaternion &rhs);
 
-		Quaternion& operator = (const Matrix<T, 4, 1> &rhs);
-		Quaternion& operator = (const Quaternion &rhs);
+		constexpr Quaternion& operator = (const Matrix<T, 4, 1> &rhs);
+		constexpr Quaternion& operator = (const Quaternion &rhs);
 
-		bool operator == (const Quaternion &rhs) const;
-		bool operator != (const Quaternion &rhs) const;
-		bool operator < (const Quaternion &rhs) const;
-		bool operator <= (const Quaternion &rhs) const;
-		bool operator > (const Quaternion &rhs) const;
-		bool operator >= (const Quaternion &rhs) const;
-		const T& operator [] (int index) const;
+		constexpr bool operator == (const Quaternion &rhs) const = default;
+		constexpr bool operator < (const Quaternion &rhs) const;
+		constexpr bool operator <= (const Quaternion &rhs) const;
+		constexpr bool operator > (const Quaternion &rhs) const;
+		constexpr bool operator >= (const Quaternion &rhs) const;
+		constexpr const T& operator [] (int index) const;
 
-		T*
+		constexpr T*
 		ptr();
 
-		const T*
+		constexpr const T*
 		ptr() const;
 
-		Quaternion operator - ();
-		Quaternion operator + (const Quaternion &rhs) const;
-		Quaternion operator - (const Quaternion &rhs) const;
-		Quaternion operator * (const Quaternion &rhs) const;
+		constexpr Quaternion operator - ();
+		constexpr Quaternion operator + (const Quaternion &rhs) const;
+		constexpr Quaternion operator - (const Quaternion &rhs) const;
+		constexpr Quaternion operator * (const Quaternion &rhs) const;
 
-		Quaternion operator * (const T &rhs) const;
-		Quaternion operator / (const T &rhs) const;
-		Quaternion& operator += (const Quaternion &rhs);
-		Quaternion& operator -= (const Quaternion &rhs);
-		Quaternion& operator *= (const T &rhs);
-		Quaternion& operator /= (const T &rhs);
+		constexpr Quaternion operator * (const T &rhs) const;
+		constexpr Quaternion operator / (const T &rhs) const;
+		constexpr Quaternion& operator += (const Quaternion &rhs);
+		constexpr Quaternion& operator -= (const Quaternion &rhs);
+		constexpr Quaternion& operator *= (const T &rhs);
+		constexpr Quaternion& operator /= (const T &rhs);
 
-		float getLength() const;
-		float getLengthSquared() const;
+		constexpr float getLength() const;
+		constexpr float getLengthSquared() const;
 
-		Quaternion& scale(float newLength);
+		constexpr Quaternion& scale(float newLength);
 
 		/** Rescale to length = 1 */
-		Quaternion& normalize();
-		Quaternion& conjugate();
+		constexpr Quaternion& normalize();
+		constexpr Quaternion& conjugate();
 
-		Quaternion scaled(float newLength) const;
+		constexpr Quaternion scaled(float newLength) const;
 
 		/** Return a new quaternion with the same direction by the length 1 */
-		Quaternion normalized() const;
-		Quaternion conjugated() const;
+		constexpr Quaternion normalized() const;
+		constexpr Quaternion conjugated() const;
 
 		Quaternion unitInverse();	//	assumes we have a unit quaternion
-		Quaternion inverse();
+		constexpr Quaternion inverse();
 
-		void to4x4Matrix(Matrix<T, 4, 4> *outMatrix);
-		void to3x3Matrix(Matrix<T, 3, 3> *outMatrix);
+		constexpr void to4x4Matrix(Matrix<T, 4, 4> *outMatrix);
+		constexpr void to3x3Matrix(Matrix<T, 3, 3> *outMatrix);
 
 	public:
 		T w;
@@ -106,8 +105,8 @@ namespace modm
 	};
 
 	template<class T>
-	Quaternion<T>
-	operator * (const T &lhs, const Quaternion<T> &rhs);
+	constexpr Quaternion<T>
+	operator *(const T &lhs, const Quaternion<T> &rhs);
 }
 
 #include "quaternion_impl.hpp"

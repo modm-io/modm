@@ -37,7 +37,7 @@ namespace modm
 		 * For T = \c float and \c double this method is specialized to return
 		 * the result directly without any rounding.
 		 */
-		static inline T
+		static constexpr T
 		round(float value)
 		{
 			return ::round(value);
@@ -52,7 +52,7 @@ namespace modm
 		using FloatType = float;
 		using WideType = int16_t;
 
-		static inline int8_t
+		static constexpr int8_t
 		round(float value)
 		{
 			return ::round(value);
@@ -68,7 +68,7 @@ namespace modm
 		using FloatType = float;
 		using WideType = int16_t;
 
-		static inline uint8_t
+		static constexpr uint8_t
 		round(float value)
 		{
 			return ::round(value);
@@ -83,7 +83,7 @@ namespace modm
 		using FloatType = float;
 		using WideType = int32_t;
 
-		static inline int16_t
+		static constexpr int16_t
 		round(float value)
 		{
 			return ::round(value);
@@ -102,7 +102,7 @@ namespace modm
 		// 64-bit operations are very, very slow on an AVR.
 		using WideType = int32_t;
 
-		static inline int32_t
+		static constexpr int32_t
 		round(float value)
 		{
 			return ::round(value);
@@ -117,7 +117,7 @@ namespace modm
 		using FloatType = float;
 		using WideType = float;
 
-		static inline float
+		static constexpr float
 		round(float value)
 		{
 			return value;
@@ -132,7 +132,7 @@ namespace modm
 		using FloatType = double;
 		using WideType = double;
 
-		static inline double
+		static constexpr double
 		round(double value)
 		{
 			return value;

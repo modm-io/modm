@@ -78,26 +78,26 @@ public:
 	{
 	}
 
-	const T
+	constexpr const T
 	operator *() const
 	{
 		return FlashReader<T, sizeof(T)>::read(address);
 	}
 
-	const T
+	constexpr const T
 	operator [](size_t index) const
 	{
 		return FlashReader<T, sizeof(T)>::read(address + index);
 	}
 
-	Flash&
+	constexpr Flash&
 	operator++()
 	{
 		*this += 1;
 		return *this;
 	}
 
-	Flash
+	constexpr Flash
 	operator++(int)
 	{
 		Flash ret = *this;
@@ -105,14 +105,14 @@ public:
 		return ret;
 	}
 
-	Flash&
+	constexpr Flash&
 	operator--()
 	{
 		*this -= 1;
 		return *this;
 	}
 
-	Flash&
+	constexpr Flash&
 	operator--(int)
 	{
 		Flash ret = *this;
@@ -120,27 +120,27 @@ public:
 		return ret;
 	}
 
-	Flash&
+	constexpr Flash&
 	operator+=(size_t rhs)
 	{
 		address += rhs;
 		return *this;
 	}
 
-	Flash&
+	constexpr Flash&
 	operator-=(size_t rhs)
 	{
 		address -= rhs;
 		return *this;
 	}
 
-	bool
+	constexpr bool
 	isValid() const
 	{
 		return (address != 0);
 	}
 
-	const T*
+	constexpr const T*
 	getPointer() const
 	{
 		return address;

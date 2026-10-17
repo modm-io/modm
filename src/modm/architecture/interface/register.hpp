@@ -178,21 +178,21 @@ struct FlagsOperators : public ::modm::Register<T>
 	/// @{
 
 	/// bitwise **AND** with multiple bits
-	FlagsOperators& operator&=(FlagsOperators const &o) {  return (value &= o.value, *this); }
+	constexpr FlagsOperators& operator&=(FlagsOperators const &o) {  return (value &= o.value, *this); }
 	/// bitwise **OR** with multiple bits
-	FlagsOperators& operator|=(FlagsOperators const &o) { return (value |= o.value, *this); }
+	constexpr FlagsOperators& operator|=(FlagsOperators const &o) { return (value |= o.value, *this); }
 	/// bitwise **XOR** with multiple bits
-	FlagsOperators& operator^=(FlagsOperators const &o) { return (value ^= o.value, *this); }
+	constexpr FlagsOperators& operator^=(FlagsOperators const &o) { return (value ^= o.value, *this); }
 	/// @}
 
 	/// @{
 
 	/// bitwise **AND** with a single bit
-	FlagsOperators& operator&=(Enum const &flag) { return operator&=(FlagsOperators(flag)); }
+	constexpr FlagsOperators& operator&=(Enum const &flag) { return operator&=(FlagsOperators(flag)); }
 	/// bitwise **OR** with a single bit
-	FlagsOperators& operator|=(Enum const &flag) { return operator|=(FlagsOperators(flag)); }
+	constexpr FlagsOperators& operator|=(Enum const &flag) { return operator|=(FlagsOperators(flag)); }
 	/// bitwise **XOR** with a single bit
-	FlagsOperators& operator^=(Enum const &flag) { return operator^=(FlagsOperators(flag)); }
+	constexpr FlagsOperators& operator^=(Enum const &flag) { return operator^=(FlagsOperators(flag)); }
 	/// @}
 
 	/// @{
@@ -211,13 +211,9 @@ struct FlagsOperators : public ::modm::Register<T>
 	constexpr FlagsOperators operator^(Enum const &flag) const { return operator^(FlagsOperators(flag)); }
 
 	constexpr bool operator==(Enum const &flag) const { return value == T(flag); }
-	constexpr bool operator!=(Enum const &flag) const { return value != T(flag); }
 
 	friend constexpr bool operator==(Enum const &a, FlagsOperators const &b) { return b == a; }
-	friend constexpr bool operator!=(Enum const &a, FlagsOperators const &b) { return b != a; }
-
 	constexpr bool operator==(FlagsOperators const &o) const { return value == o.value; }
-	constexpr bool operator!=(FlagsOperators const &o) const { return value != o.value; }
 #else
 	/// @{
 
@@ -242,9 +238,7 @@ struct FlagsOperators : public ::modm::Register<T>
 	/// Compares if two flags are equal
 	/// @{
 	friend constexpr bool operator==(FlagsOperators const &a, Enum const &b);
-	friend constexpr bool operator!=(FlagsOperators const &a, Enum const &b);
 	friend constexpr bool operator==(Enum const &a, FlagsOperators const &b);
-	friend constexpr bool operator!=(Enum const &a, FlagsOperators const &b);
 	/// @}
 #endif
 } modm_packed;
@@ -329,34 +323,34 @@ struct Flags : public ::modm::FlagsOperators<Enum, T>
 	/// @{
 	// MARK: convenience methods
 	/// Sets a single bit.
-	inline void set(Enum const &flag)
+	constexpr void set(Enum const &flag)
 	{ *this |= flag; }
 	/// Sets multiple bits.
-	inline void set(Flags const &o)
+	constexpr void set(Flags const &o)
 	{ *this |= o; }
 
 	/// Clears a single bit.
-	inline void reset(Enum const &flag)
+	constexpr void reset(Enum const &flag)
 	{ *this &= ~flag; }
 	/// Clears multiple bits.
-	inline void reset(Flags const &o)
+	constexpr void reset(Flags const &o)
 	{ *this &= ~o; }
 
 	/// Toggles a single bit.
-	inline void toggle(Enum const &flag)
+	constexpr void toggle(Enum const &flag)
 	{ *this ^= flag; }
 	/// Toggles multiple bits.
-	inline void toggle(Flags const &o)
+	constexpr void toggle(Flags const &o)
 	{ *this ^= o; }
 
 	/// Sets a single bit, when `valueToCompare` is true, clears it otherwise
-	inline void update(Enum const &flag, bool valueToCompare)
+	constexpr void update(Enum const &flag, bool valueToCompare)
 	{
 		if (valueToCompare) *this |= flag;
 		else *this &= ~flag;
 	}
 	/// Sets multiple bits, when `valueToCompare` is true, clears them otherwise
-	inline void update(Flags const &o, bool valueToCompare)
+	constexpr void update(Flags const &o, bool valueToCompare)
 	{
 		if (valueToCompare) *this |= o;
 		else *this &= ~o;
@@ -580,11 +574,11 @@ public:
 	/// @{
 
 	/// clears and sets a new configuration in a Flags register
-	static inline void set(Parent &parent, Enum config)
+	static constexpr void set(Parent &parent, Enum config)
 	{	parent.value = (parent.value & ~(Mask << Position)) | (UType(config) << Position); }
 
 	/// clears the configuration in a Flags register
-	static inline void reset(Parent &parent)
+	static constexpr void reset(Parent &parent)
 	{	parent.value &= ~(Mask << Position); }
 
 	/// returns the configuration from a Flags register
@@ -645,11 +639,11 @@ public:
 	/// @{
 
 	/// clears and sets a new value in a Flags register
-	static inline void set(Parent &parent, UnderlyingType config)
+	static constexpr void set(Parent &parent, UnderlyingType config)
 	{	parent.value = (parent.value & ~Mask) | ((config << Position) & Mask); }
 
 	/// clears the value in a Flags register
-	static inline void reset(Parent &parent)
+	static constexpr void reset(Parent &parent)
 	{	parent.value &= ~Mask; }
 
 	/// returns the value from a Flags register

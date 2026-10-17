@@ -30,7 +30,7 @@ constexpr modm::Line2D<T>::Line2D(const Vector<T, 2>& point, const Vector<T, 2>&
 
 // ----------------------------------------------------------------------------
 template <typename T>
-inline void
+constexpr void
 modm::Line2D<T>::setPoint(const Vector<T, 2>& point)
 {
 	this->point = point;
@@ -44,7 +44,7 @@ modm::Line2D<T>::getPoint() const
 }
 
 template <typename T>
-inline void
+constexpr void
 modm::Line2D<T>::setDirectionVector(const Vector<T, 2>& vector)
 {
 	this->directionVector = vector;
@@ -58,7 +58,7 @@ modm::Line2D<T>::getDirectionVector() const
 }
 
 template <typename T>
-inline void
+constexpr void
 modm::Line2D<T>::set(const Vector<T, 2>& point, const Vector<T, 2>& direction)
 {
 	this->point = point;
@@ -67,7 +67,7 @@ modm::Line2D<T>::set(const Vector<T, 2>& point, const Vector<T, 2>& direction)
 
 // ----------------------------------------------------------------------------
 template <typename T>
-T
+constexpr T
 modm::Line2D<T>::getDistanceTo(const Vector<T, 2>& point) const
 {
 	// vector from the base point of the line to the new point
@@ -88,7 +88,7 @@ modm::Line2D<T>::getDistanceTo(const Vector<T, 2>& point) const
 
 // ----------------------------------------------------------------------------
 template <typename T>
-bool
+constexpr bool
 modm::Line2D<T>::getIntersections(const Line2D& other,
 		PointSet2D<T>& intersections) const
 {
@@ -108,7 +108,7 @@ modm::Line2D<T>::getIntersections(const Line2D& other,
 
 // ----------------------------------------------------------------------------
 template <typename T>
-bool
+constexpr bool
 modm::Line2D<T>::getIntersections(const Circle2D<T>& circle,
 		PointSet2D<T>& intersections) const
 {

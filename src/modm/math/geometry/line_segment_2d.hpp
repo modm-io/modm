@@ -48,40 +48,40 @@ namespace modm
 
 
 		/// Set the starting point of the line segment
-		inline void
+		constexpr void
 		setStartPoint(const Vector<T, 2>& point);
 
 		inline const Vector<T, 2>&
 		getStartPoint() const;
 
 		/// Set the end point of the line segment
-		inline void
+		constexpr void
 		setEndPoint(const Vector<T, 2>& point);
 
 		inline const Vector<T, 2>&
 		getEndPoint() const;
 
-		inline void
+		constexpr void
 		set(const Vector<T, 2>& start, const Vector<T, 2>& end);
 
-		void
+		constexpr void
 		translate(const Vector<T, 2>& vector);
 
 		/**
 		 * \brief	Length of the line segment
 		 */
-		T
+		constexpr T
 		getLength() const;
 
-		Vector<T, 2>
+		constexpr Vector<T, 2>
 		getDirectionVector() const;
 
 		/// Shortest distance to a point
-		const T
+		constexpr const T
 		getDistanceTo(const Vector<T, 2>& point) const;
 
 		/// Calculate the point on the line segment closes to the given point
-		const Vector<T, 2>
+		constexpr const Vector<T, 2>
 		getClosestPointTo(const Vector<T, 2>& point) const;
 
 		/**
@@ -89,17 +89,17 @@ namespace modm
 		 *
 		 * Uses Vector2D::ccw() to check if any intersection exists.
 		 */
-		bool
+		constexpr bool
 		intersects(const LineSegment2D& other) const;
 
 		/// Check if a intersection exists
-		bool
+		constexpr bool
 		intersects(const Polygon2D<T>& polygon) const;
 
 		/**
 		 * \brief	Calculate the intersection point
 		 */
-		bool
+		constexpr bool
 		getIntersections(const LineSegment2D& other,
 				PointSet2D<T>& intersectionPoints) const;
 
@@ -108,19 +108,16 @@ namespace modm
 		 *
 		 * \see		http://local.wasp.uwa.edu.au/~pbourke/geometry/sphereline/
 		 */
-		bool
+		constexpr bool
 		getIntersections(const Circle2D<T>& circle,
 				PointSet2D<T>& intersectionPoints) const;
 
-		bool
+		constexpr bool
 		getIntersections(const Polygon2D<T>& polygon,
 				PointSet2D<T>& intersectionPoints) const;
 
-		bool
-		operator == (const LineSegment2D &other) const;
-
-		bool
-		operator != (const LineSegment2D &other) const;
+		constexpr bool
+		operator == (const LineSegment2D &other) const = default;
 
 	protected:
 		modm::Vector<T, 2> startPoint;

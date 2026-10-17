@@ -22,7 +22,7 @@ namespace modm::math
 /// @ingroup modm_math_utils
 /// @{
 
-inline uint8_t
+constexpr uint8_t
 crc8_ccitt_update(uint8_t crc, uint8_t data)
 {
 #ifdef __AVR__
@@ -42,7 +42,7 @@ crc8_ccitt_update(uint8_t crc, uint8_t data)
 /// CRC-8/MAXIM, aka the Dallas/Maxim 1-Wire CRC: polynomial 0x31 reflected to
 /// 0x8C, initial value 0, no final xor. Used by the 1-Wire ROM code and by the
 /// AT21CS serial number.
-inline uint8_t
+constexpr uint8_t
 crc8_maxim_update(uint8_t crc, uint8_t data)
 {
 #ifdef __AVR__
@@ -55,7 +55,7 @@ crc8_maxim_update(uint8_t crc, uint8_t data)
 #endif
 }
 
-inline uint16_t
+constexpr uint16_t
 crc16_ccitt_update(uint16_t crc, uint8_t data)
 {
 #ifdef __AVR__
@@ -68,7 +68,7 @@ crc16_ccitt_update(uint16_t crc, uint8_t data)
 }
 
 /// @see https://github.com/stbrumme/crc32
-inline uint32_t
+constexpr uint32_t
 crc32_update(uint32_t crc, uint8_t data)
 {
     static constexpr uint32_t polynomial{0xEDB88320};
@@ -83,7 +83,7 @@ static constexpr uint8_t crc8_maxim_init{0x00u};
 static constexpr uint16_t crc16_ccitt_init{0xFFFFu};
 static constexpr uint32_t crc32_init{0xFFFFFFFFul};
 
-inline uint8_t
+constexpr uint8_t
 crc8_ccitt(const uint8_t *data, size_t length)
 {
     uint8_t crc{crc8_ccitt_init};
@@ -91,7 +91,7 @@ crc8_ccitt(const uint8_t *data, size_t length)
     return crc;
 }
 
-inline uint8_t
+constexpr uint8_t
 crc8_maxim(const uint8_t *data, size_t length)
 {
     uint8_t crc{crc8_maxim_init};
@@ -99,7 +99,7 @@ crc8_maxim(const uint8_t *data, size_t length)
     return crc;
 }
 
-inline uint16_t
+constexpr uint16_t
 crc16_ccitt(const uint8_t *data, size_t length)
 {
     uint16_t crc{crc16_ccitt_init};
@@ -108,7 +108,7 @@ crc16_ccitt(const uint8_t *data, size_t length)
 }
 
 /// Slow, but table-less computation of CRC32.
-inline uint32_t
+constexpr uint32_t
 crc32(const uint8_t *data, size_t length)
 {
     uint32_t crc{crc32_init};

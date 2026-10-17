@@ -191,26 +191,26 @@ struct usb3803
 		uint8_t cfgp;
 		uint8_t stcd;
 
-		bool selfPowered() const { return cfg1 & Cfg1SelfPowered; }
-		ChargerType chargerType() const { return ChargerType(battChg >> 5); }
-		bool chargerDetectionComplete() const { return battChg & BattChgComplete; }
-		bool chargerDetectionRunning() const { return battChg & BattChgStartBcDet; }
+		constexpr bool selfPowered() const { return cfg1 & Cfg1SelfPowered; }
+		constexpr ChargerType chargerType() const { return ChargerType(battChg >> 5); }
+		constexpr bool chargerDetectionComplete() const { return battChg & BattChgComplete; }
+		constexpr bool chargerDetectionRunning() const { return battChg & BattChgStartBcDet; }
 		/// A charger not masked by CHGDETMASK was detected
-		bool chargerDetected() const { return not (battChg & BattChgChgDetN); }
+		constexpr bool chargerDetected() const { return not (battChg & BattChgChgDetN); }
 		/// Runs the charger detection automatically before connecting
-		bool chargerDetectionEnabled() const { return bchgMode & BchgModeEnableChrgDet; }
+		constexpr bool chargerDetectionEnabled() const { return bchgMode & BchgModeEnableChrgDet; }
 		/// Tells a CDP apart from a DCP
-		bool chargerDetectionEnhanced() const { return bchgMode & BchgModeEnhancedChrgDet; }
+		constexpr bool chargerDetectionEnhanced() const { return bchgMode & BchgModeEnhancedChrgDet; }
 		/// Ports whose power the host enabled
-		Port_t portPower() const { return Port_t(prtPwr & PortMaskDownstream); }
-		bool configurationHeld() const { return spIlock & SpIlockConfigN; }
-		bool connectHeld() const { return spIlock & SpIlockConnectN; }
+		constexpr Port_t portPower() const { return Port_t(prtPwr & PortMaskDownstream); }
+		constexpr bool configurationHeld() const { return spIlock & SpIlockConfigN; }
+		constexpr bool connectHeld() const { return spIlock & SpIlockConnectN; }
 		/// INT_N is asserted
-		bool interruptAsserted() const { return intStatus & IntStatusInterrupt; }
-		Interrupt_t interrupts() const { return Interrupt_t(intStatus & InterruptMaskAll); }
+		constexpr bool interruptAsserted() const { return intStatus & IntStatusInterrupt; }
+		constexpr Interrupt_t interrupts() const { return Interrupt_t(intStatus & InterruptMaskAll); }
 		/// CFGP.CfgTout, the configuration time-out THUBCONFIG
-		uint8_t configurationTimeout() const { return (cfgp & CfgpCfgToutMask) >> 4; }
-		bool configurationProtected() const { return stcd & StcdConfigProtect; }
+		constexpr uint8_t configurationTimeout() const { return (cfgp & CfgpCfgToutMask) >> 4; }
+		constexpr bool configurationProtected() const { return stcd & StcdConfigProtect; }
 	};
 
 protected:

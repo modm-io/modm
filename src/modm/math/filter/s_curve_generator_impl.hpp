@@ -24,7 +24,7 @@ constexpr modm::SCurveGenerator<T>::SCurveGenerator(const T& initialValue) :
 
 // ----------------------------------------------------------------------------
 template<typename T>
-void
+constexpr void
 modm::SCurveGenerator<T>::setTarget(const T& target)
 {
 	this->target = target;
@@ -32,13 +32,13 @@ modm::SCurveGenerator<T>::setTarget(const T& target)
 }
 
 template<typename T>
-void
+constexpr void
 modm::SCurveGenerator<T>::update()
 {
 }
 
 template<typename T>
-bool
+constexpr bool
 modm::SCurveGenerator<T>::isTargetReached() const
 {
 	return targetReached;

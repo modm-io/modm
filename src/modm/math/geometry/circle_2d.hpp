@@ -51,17 +51,17 @@ namespace modm
 		inline const Vector<T, 2>&
 		getCenter() const;
 
-		inline void
+		constexpr void
 		setCenter(const Vector<T, 2>& point);
 
-		inline T
+		constexpr T
 		getRadius() const;
 
-		inline void
+		constexpr void
 		setRadius(T radius);
 
 		/// Check if a intersection exists
-		bool
+		constexpr bool
 		intersects(const Polygon2D<T>& polygon) const;
 
 		/**
@@ -72,7 +72,7 @@ namespace modm
 		 *
 		 * \see		http://local.wasp.uwa.edu.au/~pbourke/geometry/2circle/
 		 */
-		bool
+		constexpr bool
 		getIntersections(const Circle2D& other,
 				PointSet2D<T>& intersections) const;
 
@@ -84,11 +84,11 @@ namespace modm
 		 *
 		 * \see		Line2D::intersect()
 		 */
-		bool
+		constexpr bool
 		getIntersections(const Line2D<T>& line,
 				PointSet2D<T>& intersections) const;
 
-		bool
+		constexpr bool
 		getIntersections(const LineSegment2D<T>& line,
 				PointSet2D<T>& intersections) const;
 

@@ -62,49 +62,48 @@ namespace modm
 		constexpr Vector(const T *ptData);
 
 		constexpr Vector(const Matrix<T, N, 1> &rhs);
-		Vector& operator = (const Matrix<T, N, 1> &rhs);
+		constexpr Vector& operator = (const Matrix<T, N, 1> &rhs);
 
-		bool operator == (const Vector &rhs) const;
-		bool operator != (const Vector &rhs) const;
-		bool operator < (const Vector &rhs) const;
-		bool operator <= (const Vector &rhs) const;
-		bool operator > (const Vector &rhs) const;
-		bool operator >= (const Vector &rhs) const;
+		constexpr bool operator == (const Vector &rhs) const;
+		constexpr bool operator < (const Vector &rhs) const;
+		constexpr bool operator <= (const Vector &rhs) const;
+		constexpr bool operator > (const Vector &rhs) const;
+		constexpr bool operator >= (const Vector &rhs) const;
 
-		const T& operator [] (uint8_t index) const;
-		T& operator [] (uint8_t index);
+		constexpr const T& operator [] (uint8_t index) const;
+		constexpr T& operator [] (uint8_t index);
 
-		T* ptr();
-		const T* ptr() const;
+		constexpr T* ptr();
+		constexpr const T* ptr() const;
 
-		Vector operator + (const Vector &rhs) const;
-		Vector operator - (const Vector &rhs) const;
-		T operator * (const Vector &rhs) const;
-		Vector operator * (const T &rhs) const;
-		Vector operator / (const T &rhs) const;
-		Vector& operator += (const Vector &rhs);
-		Vector& operator -= (const Vector &rhs);
-		Vector& operator *= (const T &rhs);
-		Vector& operator /= (const T &rhs);
-		Vector& operator - ();		// FIXME
+		constexpr Vector operator + (const Vector &rhs) const;
+		constexpr Vector operator - (const Vector &rhs) const;
+		constexpr T operator * (const Vector &rhs) const;
+		constexpr Vector operator * (const T &rhs) const;
+		constexpr Vector operator / (const T &rhs) const;
+		constexpr Vector& operator += (const Vector &rhs);
+		constexpr Vector& operator -= (const Vector &rhs);
+		constexpr Vector& operator *= (const T &rhs);
+		constexpr Vector& operator /= (const T &rhs);
+		constexpr Vector& operator - ();		// FIXME
 
-		T getLength() const;
-		T getLengthSquared() const;
+		constexpr T getLength() const;
+		constexpr T getLengthSquared() const;
 
-		Matrix<T, N, 1>&
+		constexpr Matrix<T, N, 1>&
 		asMatrix();
 
-		const Matrix<T, N, 1>&
+		constexpr const Matrix<T, N, 1>&
 		asMatrix() const;
 
-		Matrix<T, 1, N>&
+		constexpr Matrix<T, 1, N>&
 		asTransposedMatrix();
 
-		const Matrix<T, 1, N>&
+		constexpr const Matrix<T, 1, N>&
 		asTransposedMatrix() const;
 
 	public:
-		static inline uint8_t
+		static constexpr uint8_t
 		getSize();
 
 		T coords[N];

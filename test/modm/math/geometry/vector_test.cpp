@@ -13,6 +13,11 @@
 #include <modm/math/geometry/vector.hpp>
 #include "vector_test.hpp"
 
+static_assert([]{
+	constexpr int16_t a[5] = {1, 2, 3, 4, 5};
+	return modm::Vector<int16_t, 5>(a) == modm::Vector<int16_t, 5>(a);
+}());
+
 void
 VectorTest::testConstructor()
 {

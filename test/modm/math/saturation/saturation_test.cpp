@@ -15,6 +15,9 @@
 #include <modm/math/saturation/saturated.hpp>
 
 #include "saturation_test.hpp"
+
+// The saturated arithmetic can be evaluated at compile time
+static_assert(modm::Saturated<int8_t>(100) + modm::Saturated<int8_t>(100) == 127);
 #include <cmath>
 
 void

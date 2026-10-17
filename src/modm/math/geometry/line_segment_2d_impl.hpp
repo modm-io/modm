@@ -30,7 +30,7 @@ constexpr modm::LineSegment2D<T>::LineSegment2D(const Vector<T, 2>& start, const
 
 // ----------------------------------------------------------------------------
 template <typename T>
-inline void
+constexpr void
 modm::LineSegment2D<T>::setStartPoint(const Vector<T, 2>& point)
 {
 	this->startPoint = point;
@@ -44,7 +44,7 @@ modm::LineSegment2D<T>::getStartPoint() const
 }
 
 template <typename T>
-inline void
+constexpr void
 modm::LineSegment2D<T>::setEndPoint(const Vector<T, 2>& point)
 {
 	this->endPoint = point;
@@ -58,7 +58,7 @@ modm::LineSegment2D<T>::getEndPoint() const
 }
 
 template <typename T>
-inline void
+constexpr void
 modm::LineSegment2D<T>::set(const Vector<T, 2>& start, const Vector<T, 2>& end)
 {
 	this->startPoint = start;
@@ -67,7 +67,7 @@ modm::LineSegment2D<T>::set(const Vector<T, 2>& start, const Vector<T, 2>& end)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-void
+constexpr void
 modm::LineSegment2D<T>::translate(const Vector<T, 2>& vector)
 {
 	this->startPoint.translate(vector);
@@ -76,7 +76,7 @@ modm::LineSegment2D<T>::translate(const Vector<T, 2>& vector)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-T
+constexpr T
 modm::LineSegment2D<T>::getLength() const
 {
 	Vector<T, 2> directionVector = this->endPoint - this->startPoint;
@@ -86,7 +86,7 @@ modm::LineSegment2D<T>::getLength() const
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::Vector<T, 2>
+constexpr modm::Vector<T, 2>
 modm::LineSegment2D<T>::getDirectionVector() const
 {
 	return endPoint - startPoint;
@@ -94,7 +94,7 @@ modm::LineSegment2D<T>::getDirectionVector() const
 
 // ----------------------------------------------------------------------------
 template<typename T>
-const T
+constexpr const T
 modm::LineSegment2D<T>::getDistanceTo(const Vector<T, 2>& point) const
 {
 	// vector from the base point of the line to the new point
@@ -129,7 +129,7 @@ modm::LineSegment2D<T>::getDistanceTo(const Vector<T, 2>& point) const
 
 // ----------------------------------------------------------------------------
 template<typename T>
-const modm::Vector<T, 2>
+constexpr const modm::Vector<T, 2>
 modm::LineSegment2D<T>::getClosestPointTo(const Vector<T, 2>& point) const
 {
 	// vector from the base point of the line to the new point
@@ -158,7 +158,7 @@ modm::LineSegment2D<T>::getClosestPointTo(const Vector<T, 2>& point) const
 
 // ----------------------------------------------------------------------------
 template<typename T>
-bool
+constexpr bool
 modm::LineSegment2D<T>::intersects(const LineSegment2D<T>& other) const
 {
 	return (((Vector<T, 2>::ccw(this->startPoint, this->endPoint, other.startPoint) *
@@ -169,7 +169,7 @@ modm::LineSegment2D<T>::intersects(const LineSegment2D<T>& other) const
 
 // ----------------------------------------------------------------------------
 template<typename T>
-bool
+constexpr bool
 modm::LineSegment2D<T>::intersects(const Polygon2D<T>& polygon) const
 {
 	return polygon.intersects(*this);
@@ -177,7 +177,7 @@ modm::LineSegment2D<T>::intersects(const Polygon2D<T>& polygon) const
 
 // ----------------------------------------------------------------------------
 template <typename T>
-bool
+constexpr bool
 modm::LineSegment2D<T>::getIntersections(const LineSegment2D& other,
 		PointSet2D<T>& intersectionPoints) const
 {
@@ -208,7 +208,7 @@ modm::LineSegment2D<T>::getIntersections(const LineSegment2D& other,
 
 // ----------------------------------------------------------------------------
 template <typename T>
-bool
+constexpr bool
 modm::LineSegment2D<T>::getIntersections(const Circle2D<T>& circle,
 		PointSet2D<T>& intersectionPoints) const
 {
@@ -259,27 +259,10 @@ modm::LineSegment2D<T>::getIntersections(const Circle2D<T>& circle,
 
 // ----------------------------------------------------------------------------
 template <typename T>
-bool
+constexpr bool
 modm::LineSegment2D<T>::getIntersections(const Polygon2D<T>& polygon,
 		PointSet2D<T>& intersectionPoints) const
 {
 	// invoke intersection method of the polygon
 	return polygon.getIntersections(*this, intersectionPoints);
-}
-
-// ----------------------------------------------------------------------------
-template<typename T>
-bool
-modm::LineSegment2D<T>::operator == (const LineSegment2D &other) const
-{
-	return ((this->startPoint == other.startPoint) &&
-			(this->endPoint == other.endPoint));
-}
-
-template<typename T>
-bool
-modm::LineSegment2D<T>::operator != (const LineSegment2D &other) const
-{
-	return ((this->startPoint != other.startPoint) ||
-			(this->endPoint != other.endPoint));
 }

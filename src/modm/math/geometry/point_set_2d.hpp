@@ -57,7 +57,7 @@ namespace modm
 		getNumberOfPoints() const;
 
 
-		inline void
+		constexpr void
 		append(const PointType& point);
 
 		inline PointType&
@@ -69,7 +69,7 @@ namespace modm
 		/**
 		 * \brief	Remove all points
 		 */
-		inline void
+		constexpr void
 		removeAll();
 
 	public:
