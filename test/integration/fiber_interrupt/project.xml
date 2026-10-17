@@ -1,0 +1,16 @@
+<library>
+  <!-- Cortex-M0 -->
+  <extends>modm:nucleo-f072rb</extends>
+  <!-- Cortex-M4 -->
+  <!-- <extends>modm:nucleo-f429zi</extends> -->
+  <options>
+    <!-- LTO inlines more aggressively, which made missing volatiles visible -->
+    <option name="modm:build:lto">yes</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:timer:2</module>
+    <!-- No modm:processing:fiber on purpose: tests the API without scheduler -->
+    <module>modm:architecture:fiber</module>
+  </modules>
+</library>
