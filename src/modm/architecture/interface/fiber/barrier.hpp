@@ -20,7 +20,7 @@ namespace modm::fiber
 /// Implements the `std::barrier` interface for fibers.
 /// @warning This implementation is not interrupt-safe!
 /// @see https://en.cppreference.com/w/cpp/thread/barrier
-/// @ingroup modm_processing_fiber
+/// @ingroup modm_architecture_fiber
 template< class CompletionFunction = decltype([]{}) >
 class barrier
 {

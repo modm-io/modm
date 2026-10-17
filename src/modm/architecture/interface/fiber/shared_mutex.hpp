@@ -18,7 +18,7 @@
 namespace modm::fiber
 {
 
-/// @ingroup modm_processing_fiber
+/// @ingroup modm_architecture_fiber
 /// @{
 
 /// Implements the `std::shared_mutex` interface for fibers.

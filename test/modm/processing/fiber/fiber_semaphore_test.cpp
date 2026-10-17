@@ -11,7 +11,7 @@
 
 #include "fiber_semaphore_test.hpp"
 #include "shared.hpp"
-#include <modm/processing/fiber/semaphore.hpp>
+#include <modm/architecture/interface/fiber/semaphore.hpp>
 
 void
 FiberSemaphoreTest::setUp()

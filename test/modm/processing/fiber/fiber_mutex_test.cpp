@@ -11,8 +11,8 @@
 
 #include "fiber_mutex_test.hpp"
 #include "shared.hpp"
-#include <modm/processing/fiber/mutex.hpp>
-#include <modm/processing/fiber/shared_mutex.hpp>
+#include <modm/architecture/interface/fiber/mutex.hpp>
+#include <modm/architecture/interface/fiber/shared_mutex.hpp>
 
 void
 FiberMutexTest::setUp()

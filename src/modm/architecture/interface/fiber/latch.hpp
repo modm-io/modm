@@ -20,7 +20,7 @@ namespace modm::fiber
 
 /// Implements the `std::latch` interface for fibers.
 /// @see https://en.cppreference.com/w/cpp/thread/latch
-/// @ingroup modm_processing_fiber
+/// @ingroup modm_architecture_fiber
 class latch
 {
 	latch(const latch&) = delete;

@@ -178,6 +178,8 @@ class Fiber(Module):
     def build(self, env):
         env.outbasepath = "modm/src/modm/architecture"
         env.copy("interface/fiber.hpp")
+        if env.has_module(":processing:fiber"):
+            env.copy("interface/fiber")
 # -----------------------------------------------------------------------------
 
 class Gpio(Module):

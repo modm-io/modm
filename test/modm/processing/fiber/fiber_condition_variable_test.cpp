@@ -11,7 +11,7 @@
 
 #include "fiber_condition_variable_test.hpp"
 #include "shared.hpp"
-#include <modm/processing/fiber/condition_variable.hpp>
+#include <modm/architecture/interface/fiber/condition_variable.hpp>
 
 static struct
 {

@@ -11,8 +11,8 @@
 
 #include "fiber_latch_barrier_test.hpp"
 #include "shared.hpp"
-#include <modm/processing/fiber/latch.hpp>
-#include <modm/processing/fiber/barrier.hpp>
+#include <modm/architecture/interface/fiber/latch.hpp>
+#include <modm/architecture/interface/fiber/barrier.hpp>
 
 void
 LatchBarrierTest::setUp()

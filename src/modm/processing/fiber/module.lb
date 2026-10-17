@@ -77,11 +77,3 @@ def build(env):
     env.copy("scheduler.cpp")
     env.copy("task.hpp")
     env.copy("task_impl.hpp")
-
-    env.copy("mutex.hpp")
-    env.copy("shared_mutex.hpp")
-    env.copy("semaphore.hpp")
-    env.copy("latch.hpp")
-    env.copy("barrier.hpp")
-    env.copy("stop_token.hpp")
-    env.copy("condition_variable.hpp")
