@@ -154,7 +154,7 @@ public:
 
 	/// SYSTEM_INTERRUPT_CONFIG_GPIO
 	enum class InterruptConfig {};
-	typedef modm::Flags8<InterruptConfig> InterruptConfig_t;
+	using InterruptConfig_t = modm::Flags8<InterruptConfig>;
 
 	enum class
 	InterruptSource : uint8_t
@@ -165,8 +165,8 @@ public:
 		OutOfWindow = 3,	///< (value < thresh_low  OR  value > thresh_high)
 		NewSampleReady = 4,
 	};
-	typedef modm::Configuration<InterruptConfig_t, InterruptSource, 0x7> RangeInterruptSource_t;
-	typedef modm::Configuration<InterruptConfig_t, InterruptSource, 0x7, 3> ALS_InterruptSource_t;
+	using RangeInterruptSource_t = modm::Configuration<InterruptConfig_t, InterruptSource, 0x7>;
+	using ALS_InterruptSource_t = modm::Configuration<InterruptConfig_t, InterruptSource, 0x7, 3>;
 
 	/// SYSTEM_INTERRUPT_CLEAR
 	enum class
@@ -258,7 +258,7 @@ public:
 		RangingAlgoUnderflow = 0xE0,
 		RangingAlgoOverflow = 0xF0,
 	};
-	typedef modm::Configuration<RangeStatus_t, RangeErrorCode, 0xF0> RangeErrorCode_t;
+	using RangeErrorCode_t = modm::Configuration<RangeStatus_t, RangeErrorCode, 0xF0>;
 
 	/// RESULT_ALS_STATUS
 	enum class
@@ -277,14 +277,14 @@ public:
 		OverflowError = 0x10,
 		UnderflowError = 0x20,
 	};
-	typedef modm::Configuration<ALS_Status_t, ALS_ErrorCode, 0xF0> ALS_ErrorCode_t;
+	using ALS_ErrorCode_t = modm::Configuration<ALS_Status_t, ALS_ErrorCode, 0xF0>;
 
 	/// RESULT_INTERRUPT_STATUS_GPIO
 	enum class InterruptStatus {};
-	typedef modm::Flags8<InterruptStatus> InterruptStatus_t;
+	using InterruptStatus_t = modm::Flags8<InterruptStatus>;
 
-	typedef modm::Configuration<InterruptStatus_t, InterruptSource, 0x7> RangeInterruptStatus_t;
-	typedef modm::Configuration<InterruptStatus_t, InterruptSource, 0x7, 3> ALS_InterruptStatus_t;
+	using RangeInterruptStatus_t = modm::Configuration<InterruptStatus_t, InterruptSource, 0x7>;
+	using ALS_InterruptStatus_t = modm::Configuration<InterruptStatus_t, InterruptSource, 0x7, 3>;
 
 	enum class
 	InterruptError : uint8_t
@@ -293,7 +293,7 @@ public:
 		LaserSafetyError = (1 << 6),	///< Run for your lives! (GET TO THE CHOPPER!)
 		PLL_Error = (2 << 6),			///< either PLL1 or PLL2
 	};
-	typedef modm::Configuration<InterruptStatus_t, InterruptError, (3 << 6)> InterruptError_t;
+	using InterruptError_t = modm::Configuration<InterruptStatus_t, InterruptError, (3 << 6)>;
 
 public:
 	using Control_t = modm::FlagsGroup<

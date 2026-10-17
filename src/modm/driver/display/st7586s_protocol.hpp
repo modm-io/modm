@@ -102,7 +102,7 @@ enum class NLineInversion : uint8_t {
 	 */
 	FrameIndependent = Bit7,
 };
-typedef modm::Flags8<NLineInversion> NLineInversion_t;
+using NLineInversion_t = modm::Flags8<NLineInversion>;
 MODM_TYPE_FLAGS(NLineInversion_t);
 
 enum class LineInversionType : uint8_t {
@@ -138,7 +138,7 @@ enum class LineInversionType : uint8_t {
 	Invert_31_line = 30,
 	Invert_32_line = 31,
 };
-typedef Configuration<NLineInversion_t, LineInversionType, 0b11111> LineInversionType_t;
+using LineInversionType_t = Configuration<NLineInversion_t, LineInversionType, 0b11111>;
 
 struct SetVop {
 	LittleEndian<uint16_t> vop;

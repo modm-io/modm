@@ -115,7 +115,7 @@ struct drv832xSpi
 		Lock		= 0b110,
 		Unlock		= 0b011,
 	};
-	typedef Configuration< GateDriveHS_t, Lock, 0b111, 8 >  Lock_t; // Bit 8..10
+	using Lock_t = Configuration< GateDriveHS_t, Lock, 0b111, 8 >; // Bit 8..10
 
 	enum class GateDriveLS : uint16_t
 	{
@@ -144,7 +144,7 @@ struct drv832xSpi
 		ns2000		= 0b10,
 		ns4000		= 0b11,
 	};
-	typedef Configuration< GateDriveLS_t, TDrive, 0b11, 8 >  TDrive_t; // Bit 8..9
+	using TDrive_t = Configuration< GateDriveLS_t, TDrive, 0b11, 8 >; // Bit 8..9
 
 	enum class IDriveN : uint16_t
 	{
@@ -165,8 +165,8 @@ struct drv832xSpi
 		mA1640		= 0b1110,
 		mA2000		= 0b1111,
 	};
-	typedef Configuration< GateDriveLS_t, IDriveN, 0b1111, 0 > LS_IDriveN_t; // Bit 0..3
-	typedef Configuration< GateDriveHS_t, IDriveN, 0b1111, 0 > HS_IDriveN_t; // Bit 0..3
+	using LS_IDriveN_t = Configuration< GateDriveLS_t, IDriveN, 0b1111, 0 >; // Bit 0..3
+	using HS_IDriveN_t = Configuration< GateDriveHS_t, IDriveN, 0b1111, 0 >; // Bit 0..3
 
 	enum class IDriveP : uint16_t
 	{
@@ -187,8 +187,8 @@ struct drv832xSpi
 		mA820		= 0b1110,
 		mA1000		= 0b1111,
 	};
-	typedef Configuration< GateDriveLS_t, IDriveP, 0b1111, 4 > LS_IDriveP_t; // Bit 4..7
-	typedef Configuration< GateDriveHS_t, IDriveP, 0b1111, 4 > HS_IDriveP_t; // Bit 4..7
+	using LS_IDriveP_t = Configuration< GateDriveLS_t, IDriveP, 0b1111, 4 >; // Bit 4..7
+	using HS_IDriveP_t = Configuration< GateDriveHS_t, IDriveP, 0b1111, 4 >; // Bit 4..7
 
 	enum class OcpControl : uint16_t
 	{
@@ -229,7 +229,7 @@ struct drv832xSpi
 		mV1700		= 0b1110,
 		mV1880		= 0b1111,
 	};
-	typedef Configuration< OcpControl_t, VdsLevel, 0b1111, 0 >  VdsLevel_t; // Bit 0..3
+	using VdsLevel_t = Configuration< OcpControl_t, VdsLevel, 0b1111, 0 >; // Bit 0..3
 
 	enum class OcpDeglitch : uint16_t
 	{
@@ -238,7 +238,7 @@ struct drv832xSpi
 		us6		= 0b10,
 		us8		= 0b11,
 	};
-	typedef Configuration< OcpControl_t, OcpDeglitch, 0b11, 4 >  OcpDeglitch_t; // Bit 4..5
+	using OcpDeglitch_t = Configuration< OcpControl_t, OcpDeglitch, 0b11, 4 >; // Bit 4..5
 
 	enum class OcpMode : uint16_t
 	{
@@ -247,7 +247,7 @@ struct drv832xSpi
 		OnlyReport		= 0b10,
 		NoOcp			= 0b11,
 	};
-	typedef Configuration< OcpControl_t, OcpMode, 0b11, 6 >  OcpMode_t; // Bit 6..7
+	using OcpMode_t = Configuration< OcpControl_t, OcpMode, 0b11, 6 >; // Bit 6..7
 
 	enum class CsaControl : uint16_t
 	{
@@ -280,7 +280,7 @@ struct drv832xSpi
 		SenseOcp0V75	= 0b10,
 		SenseOcp1V		= 0b11,
 	};
-	typedef Configuration< CsaControl_t, SenseOcpLevel, 0b11, 0 >  SenseOcpLevel_t; // Bit 0..1
+	using SenseOcpLevel_t = Configuration< CsaControl_t, SenseOcpLevel, 0b11, 0 >; // Bit 0..1
 
 	enum class CsaGain : uint16_t
 	{
@@ -289,7 +289,7 @@ struct drv832xSpi
 		Gain20		= 0b10,
 		Gain40		= 0b11,
 	};
-	typedef Configuration< CsaControl_t, CsaGain, 0b11, 6 >  CsaGain_t; // Bit 6..7
+	using CsaGain_t = Configuration< CsaControl_t, CsaGain, 0b11, 6 >; // Bit 6..7
 };
 
 /**

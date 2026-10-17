@@ -39,7 +39,7 @@ namespace modm
 	class [[deprecated("Use std::queue instead")]] Queue // DEPRECATED: 2027q4
 	{
 	public:
-		typedef typename Container::Size Size;
+		using Size = typename Container::Size;
 
 	public:
 		inline bool

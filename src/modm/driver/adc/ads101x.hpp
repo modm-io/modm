@@ -63,7 +63,7 @@ public:
         V0_512 = int(ConfigRegister::PGA2),
         V0_256 = int(ConfigRegister::PGA2) | int(ConfigRegister::PGA0),
     };
-    typedef Configuration<ConfigRegister_t, FullScaleRange, (Bit11 | Bit10 | Bit9)> FullScaleRange_t;
+    using FullScaleRange_t = Configuration<ConfigRegister_t, FullScaleRange, (Bit11 | Bit10 | Bit9)>;
 
     enum class
     DeviceOperatingMode : uint16_t
@@ -71,7 +71,7 @@ public:
         Continuous = 0,
         SingleShot = int(ConfigRegister::MODE), // default
     };
-    typedef Configuration<ConfigRegister_t, DeviceOperatingMode, Bit8> DeviceOperatingMode_t;
+    using DeviceOperatingMode_t = Configuration<ConfigRegister_t, DeviceOperatingMode, Bit8>;
 
     enum class
     InputMultiplexer : uint16_t
@@ -85,7 +85,7 @@ public:
         Input6 = int(ConfigRegister::MUX2) | int(ConfigRegister::MUX1),
         Input7 = int(ConfigRegister::MUX2) | int(ConfigRegister::MUX1) | int(ConfigRegister::MUX0),
     };
-    typedef Configuration<ConfigRegister_t, InputMultiplexer, (Bit14 | Bit13 | Bit12)> InputMultiplexer_t;
+    using InputMultiplexer_t = Configuration<ConfigRegister_t, InputMultiplexer, (Bit14 | Bit13 | Bit12)>;
 
     enum class
     DataRate : uint16_t
@@ -98,7 +98,7 @@ public:
         Sps2400 = int(ConfigRegister::DR2) | int(ConfigRegister::DR0),
         Sps3300 = int(ConfigRegister::DR2) | int(ConfigRegister::DR1)
     };
-    typedef Configuration<ConfigRegister_t, DataRate, (Bit7 | Bit6 | Bit5)> DataRate_t;
+    using DataRate_t = Configuration<ConfigRegister_t, DataRate, (Bit7 | Bit6 | Bit5)>;
 
     enum class
     ComparatorMode : uint16_t
@@ -106,7 +106,7 @@ public:
         Traditional = 0,
         Window = int(ConfigRegister::COMP_MODE),
     };
-    typedef Configuration<ConfigRegister_t, ComparatorMode, Bit4> ComparatorMode_t;
+    using ComparatorMode_t = Configuration<ConfigRegister_t, ComparatorMode, Bit4>;
 
     enum class
     ComparatorPolarity : uint16_t
@@ -114,7 +114,7 @@ public:
         ActiveLow = 0,
         ActiveHigh = int(ConfigRegister::COMP_POL),
     };
-    typedef Configuration<ConfigRegister_t, ComparatorPolarity, Bit3> ComparatorPolarity_t;
+    using ComparatorPolarity_t = Configuration<ConfigRegister_t, ComparatorPolarity, Bit3>;
 
     enum class
     ComparatorLatch : uint16_t
@@ -122,7 +122,7 @@ public:
         Nonlatching = 0,
         Latching = int(ConfigRegister::COMP_LAT),
     };
-    typedef Configuration<ConfigRegister_t, ComparatorLatch, Bit2> ComparatorLatch_t;
+    using ComparatorLatch_t = Configuration<ConfigRegister_t, ComparatorLatch, Bit2>;
 
     enum class
     ComparatorQueue : uint16_t
@@ -136,7 +136,7 @@ public:
         // Disable comparator queue and set the ALERT/RDY pin to a high-impedance state
         Disable = int(ConfigRegister::COMP_QUE1) | int(ConfigRegister::COMP_QUE0)
     };
-    typedef Configuration<ConfigRegister_t, ComparatorQueue, Bit4> ComparatorQueue_t;
+    using ComparatorQueue_t = Configuration<ConfigRegister_t, ComparatorQueue, Bit4>;
 
     struct modm_packed
     Data

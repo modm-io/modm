@@ -34,7 +34,7 @@ namespace modm
 		class Timer{{ id }}
 		{
 		public:
-			typedef uint16_t Value;
+			using Value = uint16_t;
 
 			static void
 			enable() {

@@ -44,7 +44,7 @@ protected:
 		ShutdownMode = Bit0,
 	};
 	MODM_FLAGS8(Config1);
-	typedef Value< Config1_t, 2, 5 > Resolution_t;
+	using Resolution_t = Value< Config1_t, 2, 5 >;
 
 	enum class
 	Config2 : uint8_t
@@ -63,7 +63,7 @@ protected:
 		Hz4 = Bit7,
 		Hz8 = Bit7 | Bit6,
 	};
-	typedef Configuration< Config2_t, ConversionRate, (Bit7 | Bit6) > ConversionRate_t;
+	using ConversionRate_t = Configuration< Config2_t, ConversionRate, (Bit7 | Bit6) >;
 	/// @endcond
 public:
 

@@ -219,7 +219,7 @@ public:
         Bank3 = 0b011,
         Bank4 = 0b100,
     };
-    typedef modm::Configuration<RegBankSel_t, BankSel, Bit2 | Bit1 | Bit0> BankSel_t;
+    using BankSel_t = modm::Configuration<RegBankSel_t, BankSel, Bit2 | Bit1 | Bit0>;
 
     // -------------------------------------------------------------------------------
 
@@ -240,7 +240,7 @@ public:
         Mode2 = int(DeviceConfig::SPI_MODE),
         Mode3 = 0,
     };
-    typedef modm::Configuration<DeviceConfig_t, DataMode, Bit4> DataMode_t;
+    using DataMode_t = modm::Configuration<DeviceConfig_t, DataMode, Bit4>;
 
     enum class
     SoftResetConfig : uint8_t
@@ -248,7 +248,7 @@ public:
         Normal = 0,
         Enable = int(DeviceConfig::SOFT_RESET_CONFIG),
     };
-    typedef modm::Configuration<DeviceConfig_t, SoftResetConfig, Bit0> SoftResetConfig_t;
+    using SoftResetConfig_t = modm::Configuration<DeviceConfig_t, SoftResetConfig, Bit0>;
 
     // -------------------------------------------------------------------------------
 
@@ -275,8 +275,8 @@ public:
         ns2ns6 = int(DriveConfig::SPI_SLEW_RATE2),
         ns2 = int(DriveConfig::SPI_SLEW_RATE2) | int(DriveConfig::SPI_SLEW_RATE0),
     };
-    typedef modm::Configuration<DriveConfig_t, SlewRate, Bit2 | Bit1 | Bit0, 3> I2cSlewRate_t;
-    typedef modm::Configuration<DriveConfig_t, SlewRate, Bit2 | Bit1 | Bit0, 0> SpiSlewRate_t;
+    using I2cSlewRate_t = modm::Configuration<DriveConfig_t, SlewRate, Bit2 | Bit1 | Bit0, 3>;
+    using SpiSlewRate_t = modm::Configuration<DriveConfig_t, SlewRate, Bit2 | Bit1 | Bit0, 0>;
 
     // -------------------------------------------------------------------------------
 
@@ -311,7 +311,7 @@ public:
         StreamToFifo = int(FifoConfig::FIFO_MODE0),
         StopOnFull = int(FifoConfig::FIFO_MODE1),
     };
-    typedef modm::Configuration<FifoConfig_t, FifoMode, Bit7 | Bit6> FifoMode_t;
+    using FifoMode_t = modm::Configuration<FifoConfig_t, FifoMode, Bit7 | Bit6>;
 
     // -------------------------------------------------------------------------------
 
@@ -391,7 +391,7 @@ public:
         DisableSpi = int(IntfConfig0::UI_SIFS_CFG1),
         DisableI2c = int(IntfConfig0::UI_SIFS_CFG1) | int(IntfConfig0::UI_SIFS_CFG0),
     };
-    typedef modm::Configuration<IntfConfig0_t, UiSifsCfg, Bit1 | Bit0> UiSifsCfg_t;
+    using UiSifsCfg_t = modm::Configuration<IntfConfig0_t, UiSifsCfg, Bit1 | Bit0>;
 
     // -------------------------------------------------------------------------------
 
@@ -413,7 +413,7 @@ public:
         Pll     = int(IntfConfig1::CLK_SEL0),
         Disable = int(IntfConfig1::CLK_SEL1) |  int(IntfConfig1::CLK_SEL0),
     };
-    typedef modm::Configuration<IntfConfig1_t, ClkSel, Bit1 | Bit0> ClkSel_t;
+    using ClkSel_t = modm::Configuration<IntfConfig1_t, ClkSel, Bit1 | Bit0>;
 
     // -------------------------------------------------------------------------------
 
@@ -437,7 +437,7 @@ public:
         Standby  = int(PwrMgmt0::GYRO_MODE0),
         LowNoise = int(PwrMgmt0::GYRO_MODE1) | int(PwrMgmt0::GYRO_MODE0),
     };
-    typedef modm::Configuration<PwrMgmt0_t, GyroMode, Bit3 | Bit2> GyroMode_t;
+    using GyroMode_t = modm::Configuration<PwrMgmt0_t, GyroMode, Bit3 | Bit2>;
 
     enum class
     AccelMode : uint8_t
@@ -446,7 +446,7 @@ public:
         LowPower = int(PwrMgmt0::ACCEL_MODE1),
         LowNoise = int(PwrMgmt0::ACCEL_MODE1) | int(PwrMgmt0::ACCEL_MODE0),
     };
-    typedef modm::Configuration<PwrMgmt0_t, AccelMode, Bit1 | Bit0> AccelMode_t;
+    using AccelMode_t = modm::Configuration<PwrMgmt0_t, AccelMode, Bit1 | Bit0>;
 
     // -------------------------------------------------------------------------------
 
@@ -476,7 +476,7 @@ public:
         dps31_25 = 0b110,
         dps15_625 = 0b111,
     };
-    typedef modm::Configuration<GyroConfig0_t, GyroFs, Bit2 | Bit1 | Bit0, 5> GyroFs_t;
+    using GyroFs_t = modm::Configuration<GyroConfig0_t, GyroFs, Bit2 | Bit1 | Bit0, 5>;
 
     enum class
     GyroOdr: uint8_t
@@ -494,7 +494,7 @@ public:
         Hz12_5 = 0b1011,
         Hz500 = 0b1111,
     };
-    typedef modm::Configuration<GyroConfig0_t, GyroOdr, Bit3 | Bit2 | Bit1 | Bit0> GyroOdr_t;
+    using GyroOdr_t = modm::Configuration<GyroConfig0_t, GyroOdr, Bit3 | Bit2 | Bit1 | Bit0>;
 
     // -------------------------------------------------------------------------------
 
@@ -520,7 +520,7 @@ public:
         g4 = 0b010,     ///< ±4g
         g2 = 0b011,     ///< ±2g
     };
-    typedef modm::Configuration<AccelConfig0_t, AccelFs, Bit2 | Bit1 | Bit0, 5> AccelFs_t;
+    using AccelFs_t = modm::Configuration<AccelConfig0_t, AccelFs, Bit2 | Bit1 | Bit0, 5>;
 
     enum class
     AccelOdr: uint8_t
@@ -541,7 +541,7 @@ public:
         Hz1_5625 = 0b1110,  ///< 1.5625 Hz (LP mode)
         Hz500 = 0b1111,     ///< 500 Hz (LN or LP mode)
     };
-    typedef modm::Configuration<AccelConfig0_t, AccelOdr, Bit3 | Bit2 | Bit1 | Bit0> AccelOdr_t;
+    using AccelOdr_t = modm::Configuration<AccelConfig0_t, AccelOdr, Bit3 | Bit2 | Bit1 | Bit0>;
 
     // -------------------------------------------------------------------------------
 
@@ -570,7 +570,7 @@ public:
         Hz10 = 0b101,
         Hz5 = 0b110,
     };
-    typedef modm::Configuration<GyroConfig1_t, TempFiltBw, Bit2 | Bit1 | Bit0, 5> TempFiltBw_t;
+    using TempFiltBw_t = modm::Configuration<GyroConfig1_t, TempFiltBw, Bit2 | Bit1 | Bit0, 5>;
 
     enum class
     GyroUiFiltOrd : uint8_t
@@ -579,14 +579,14 @@ public:
         Second = int(GyroConfig1::GYRO_UI_FILTER_ORD0),
         Third = int(GyroConfig1::GYRO_UI_FILTER_ORD1),
     };
-    typedef modm::Configuration<GyroConfig1_t, GyroUiFiltOrd, Bit3 | Bit2> GyroUiFiltOrd_t;
+    using GyroUiFiltOrd_t = modm::Configuration<GyroConfig1_t, GyroUiFiltOrd, Bit3 | Bit2>;
 
     enum class
     GyroDec2M2Ord : uint8_t
     {
         Third = int(GyroConfig1::GYRO_DEC2_M2_ORD1),
     };
-    typedef modm::Configuration<GyroConfig1_t, GyroDec2M2Ord, Bit1 | Bit0> GyroDec2M2Ord_t;
+    using GyroDec2M2Ord_t = modm::Configuration<GyroConfig1_t, GyroDec2M2Ord, Bit1 | Bit0>;
 
     // -------------------------------------------------------------------------------
 
@@ -624,8 +624,8 @@ public:
         Avg1  = 1,          ///< 1x AVG filter (default)
         Avg16 = 6,          ///< 16x AVG filter
     };
-    typedef modm::Configuration<GyroAccelCongfig0_t, UiFiltBw, Bit3 | Bit2 | Bit1 | Bit0, 4> AccelUiFiltBw_t;
-    typedef modm::Configuration<GyroAccelCongfig0_t, UiFiltBw, Bit3 | Bit2 | Bit1 | Bit0, 0> GyroUiFiltBw_t;
+    using AccelUiFiltBw_t = modm::Configuration<GyroAccelCongfig0_t, UiFiltBw, Bit3 | Bit2 | Bit1 | Bit0, 4>;
+    using GyroUiFiltBw_t = modm::Configuration<GyroAccelCongfig0_t, UiFiltBw, Bit3 | Bit2 | Bit1 | Bit0, 0>;
 
     // -------------------------------------------------------------------------------
 
@@ -647,14 +647,14 @@ public:
         Second = int(AccelConfig1::ACCEL_UI_FILTER_ORD0),
         Third = int(AccelConfig1::ACCEL_UI_FILTER_ORD1),
     };
-    typedef modm::Configuration<AccelConfig1_t, AccelUiFiltOrd, Bit3 | Bit2> AccelUiFiltOrd_t;
+    using AccelUiFiltOrd_t = modm::Configuration<AccelConfig1_t, AccelUiFiltOrd, Bit3 | Bit2>;
 
     enum class
     AccelDec2M2Ord : uint8_t
     {
         Third = int(AccelConfig1::ACCEL_DEC2_M2_ORD1),
     };
-    typedef modm::Configuration<AccelConfig1_t, AccelDec2M2Ord, Bit1 | Bit0> AccelDec2M2Ord_t;
+    using AccelDec2M2Ord_t = modm::Configuration<AccelConfig1_t, AccelDec2M2Ord, Bit1 | Bit0>;
 
     // -------------------------------------------------------------------------------
 
@@ -694,7 +694,7 @@ public:
         Hz50 = int(ApexConfig0::DMP_ODR1),
         Hz100 = int(ApexConfig0::DMP_ODR1) | int(ApexConfig0::DMP_ODR0),
     };
-    typedef modm::Configuration<ApexConfig0_t, DmpOdr, Bit1 | Bit0> DmpOdr_t;
+    using DmpOdr_t = modm::Configuration<ApexConfig0_t, DmpOdr, Bit1 | Bit0>;
 
     // -------------------------------------------------------------------------------
 
@@ -717,7 +717,7 @@ public:
         Short = int(SmdConfig::SMD_MODE1),
         Long = int(SmdConfig::SMD_MODE1) | int(SmdConfig::SMD_MODE0),
     };
-    typedef modm::Configuration<SmdConfig_t, SmdMode, Bit1 | Bit0> SmdMode_t;
+    using SmdMode_t = modm::Configuration<SmdConfig_t, SmdMode, Bit1 | Bit0>;
 
     // -------------------------------------------------------------------------------
 
@@ -761,7 +761,7 @@ public:
         AccelYout = 0b110,
         AccelZout = 0b111,
     };
-    typedef modm::Configuration<FsyncConfig_t, FsyncUiSel, Bit2 | Bit1 | Bit0, 4> FsyncUiSel_t;
+    using FsyncUiSel_t = modm::Configuration<FsyncConfig_t, FsyncUiSel, Bit2 | Bit1 | Bit0, 4>;
 
     // -------------------------------------------------------------------------------
 
@@ -785,7 +785,7 @@ public:
         SensorRegisterRead = int(IntConfig0::UI_DRDY_INT_CLEAR1),
         Both = int(IntConfig0::UI_DRDY_INT_CLEAR1) | int(IntConfig0::UI_DRDY_INT_CLEAR0),
     };
-    typedef modm::Configuration<IntConfig0_t, UiDrdyIntClear, Bit5 | Bit4> UiDrdyIntClear_t;
+    using UiDrdyIntClear_t = modm::Configuration<IntConfig0_t, UiDrdyIntClear, Bit5 | Bit4>;
 
     enum class
     FifoThsIntClear : uint8_t
@@ -794,7 +794,7 @@ public:
         FifoDataRead = int(IntConfig0::FIFO_THS_INT_CLEAR1),
         Both = int(IntConfig0::FIFO_THS_INT_CLEAR1) | int(IntConfig0::FIFO_THS_INT_CLEAR0),
     };
-    typedef modm::Configuration<IntConfig0_t, FifoThsIntClear, Bit3 | Bit2> FifoThsIntClear_t;
+    using FifoThsIntClear_t = modm::Configuration<IntConfig0_t, FifoThsIntClear, Bit3 | Bit2>;
 
     enum class
     FifoFullIntClear : uint8_t
@@ -803,7 +803,7 @@ public:
         FifoDataRead = int(IntConfig0::FIFO_FULL_INT_CLEAR1),
         Both = int(IntConfig0::FIFO_FULL_INT_CLEAR1) | int(IntConfig0::FIFO_FULL_INT_CLEAR0),
     };
-    typedef modm::Configuration<IntConfig0_t, FifoFullIntClear, Bit3 | Bit2> FifoFullIntClear_t;
+    using FifoFullIntClear_t = modm::Configuration<IntConfig0_t, FifoFullIntClear, Bit3 | Bit2>;
 
     // -------------------------------------------------------------------------------
 

@@ -38,7 +38,7 @@ public:
 		P6 = (1 << 6),
 		P7 = (1 << 7)
 	};
-	typedef modm::Flags8<Pin> Pins;
+	using Pins = modm::Flags8<Pin>;
 	MODM_INT_TYPE_FLAGS(Pins);
 }; // struct pca8574
 

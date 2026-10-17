@@ -236,10 +236,10 @@ namespace modm
 	IOStream&
 	operator << (IOStream&, const Matrix<T, WIDTH, HEIGHT>&);
 
-	typedef Matrix<float, 1, 1> Matrix1f;
-	typedef Matrix<float, 2, 2> Matrix2f;
-	typedef Matrix<float, 3, 3> Matrix3f;
-	typedef Matrix<float, 4, 4> Matrix4f;
+	using Matrix1f = Matrix<float, 1, 1>;
+	using Matrix2f = Matrix<float, 2, 2>;
+	using Matrix3f = Matrix<float, 3, 3>;
+	using Matrix4f = Matrix<float, 4, 4>;
 
 	// ------------------------------------------------------------------------
 	/// @cond

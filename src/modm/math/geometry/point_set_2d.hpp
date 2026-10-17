@@ -73,8 +73,8 @@ namespace modm
 		removeAll();
 
 	public:
-		typedef typename std::vector< PointType >::iterator iterator;
-		typedef typename std::vector< PointType >::const_iterator const_iterator;
+		using iterator = typename std::vector< PointType >::iterator;
+		using const_iterator = typename std::vector< PointType >::const_iterator;
 
 		inline iterator
 		begin();

@@ -228,8 +228,8 @@ namespace xpcc
 			operator = (const ReceiveListItem& other);
 		};
 
-		typedef std::list< SendListItem > SendList;
-		typedef std::list< ReceiveListItem > ReceiveList;
+		using SendList = std::list< SendListItem >;
+		using ReceiveList = std::list< ReceiveListItem >;
 
 	protected:
 		SendList sendList;

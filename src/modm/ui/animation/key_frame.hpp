@@ -49,13 +49,13 @@ struct KeyFrameBase
 template<typename T, int remaining, typename... Args>
 struct KeyFrameHelper
 {
-	typedef typename KeyFrameHelper<T, remaining - 1, T, Args...>::type type;
+	using type = typename KeyFrameHelper<T, remaining - 1, T, Args...>::type;
 };
 
 template<typename T, typename... Args>
 struct KeyFrameHelper<T, 0, Args...>
 {
-	typedef KeyFrameBase<T, Args...> type;
+	using type = KeyFrameBase<T, Args...>;
 };
 
 template<typename T = uint8_t, uint8_t N = 1>
@@ -157,13 +157,13 @@ private:
 template<typename T, int remaining, class... Args>
 struct KeyFrameAnimationHelper
 {
-	typedef typename KeyFrameAnimationHelper<T, remaining - 1, T, Args...>::type type;
+	using type = typename KeyFrameAnimationHelper<T, remaining - 1, T, Args...>::type;
 };
 
 template<typename T, class... Args>
 struct KeyFrameAnimationHelper<T, 0, Args...>
 {
-	typedef KeyFrameAnimationBase<T, Args...> type;
+	using type = KeyFrameAnimationBase<T, Args...>;
 };
 
 template<typename T = uint8_t, uint8_t N = 1>

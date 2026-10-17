@@ -49,8 +49,8 @@ namespace modm
 	{
 		static constexpr bool isValidType = true;
 
-		typedef float FloatType;
-		typedef int16_t WideType;
+		using FloatType = float;
+		using WideType = int16_t;
 
 		static inline int8_t
 		round(float value)
@@ -65,8 +65,8 @@ namespace modm
 	{
 		static constexpr bool isValidType = true;
 
-		typedef float FloatType;
-		typedef int16_t WideType;
+		using FloatType = float;
+		using WideType = int16_t;
 
 		static inline uint8_t
 		round(float value)
@@ -80,8 +80,8 @@ namespace modm
 	{
 		static constexpr bool isValidType = true;
 
-		typedef float FloatType;
-		typedef int32_t WideType;
+		using FloatType = float;
+		using WideType = int32_t;
 
 		static inline int16_t
 		round(float value)
@@ -95,12 +95,12 @@ namespace modm
 	{
 		static constexpr bool isValidType = true;
 
-		typedef float FloatType;
+		using FloatType = float;
 
 		// Usually the range of a int32_t is big enough so that no
 		// conversion to int64_t is required. This exception is made because
 		// 64-bit operations are very, very slow on an AVR.
-		typedef int32_t WideType;
+		using WideType = int32_t;
 
 		static inline int32_t
 		round(float value)
@@ -114,8 +114,8 @@ namespace modm
 	{
 		static constexpr bool isValidType = true;
 
-		typedef float FloatType;
-		typedef float WideType;
+		using FloatType = float;
+		using WideType = float;
 
 		static inline float
 		round(float value)
@@ -129,8 +129,8 @@ namespace modm
 	{
 		static constexpr bool isValidType = true;
 
-		typedef double FloatType;
-		typedef double WideType;
+		using FloatType = double;
+		using WideType = double;
 
 		static inline double
 		round(double value)

@@ -43,8 +43,8 @@ namespace modm
 		class Lagrange
 		{
 		public:
-			typedef typename T::first_type InputType;
-			typedef typename T::second_type OutputType;
+			using InputType = typename T::first_type;
+			using OutputType = typename T::second_type;
 
 			// WARNING:
 			// Only floating point types are allowed as second type of std::pair

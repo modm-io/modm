@@ -39,7 +39,7 @@ namespace ui
 template< typename T = uint8_t >
 class Strobe
 {
-	typedef typename Animation<T>::TimeType TimeType;
+	using TimeType = typename Animation<T>::TimeType;
 public:
 	Strobe(Animation<T> &animator)
 	:	animator(animator), frames{

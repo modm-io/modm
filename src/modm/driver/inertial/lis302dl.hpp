@@ -111,7 +111,7 @@ public:
 	};
 	MODM_FLAGS8(Control3);
 
-	typedef FlagsGroup<Control1_t, Control2_t, Control3_t> Control_t;
+	using Control_t = FlagsGroup<Control1_t, Control2_t, Control3_t>;
 
 	/// STATUS_REG default value is 0x00
 	enum class
@@ -195,11 +195,7 @@ public:
 	};
 	MODM_FLAGS8(ClickSource);
 
-	typedef FlagsGroup<
-			Control1_t, Control2_t, Control3_t, Status_t,
-			FreeFallConfig_t, FreeFallSource_t, FreeFallThreshold_t,
-			ClickConfig_t, ClickSource_t
-	> Register_t;
+	using Register_t = FlagsGroup< Control1_t, Control2_t, Control3_t, Status_t, FreeFallConfig_t, FreeFallSource_t, FreeFallThreshold_t, ClickConfig_t, ClickSource_t >;
 
 public:
 	enum class

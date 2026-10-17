@@ -74,8 +74,8 @@ namespace modm
 			clearWriteBuffer();
 
 		private:
-			typedef boost::mutex				Mutex;
-			typedef boost::mutex::scoped_lock	MutexGuard;
+			using Mutex = boost::mutex;
+			using MutexGuard = boost::mutex::scoped_lock;
 
 			bool shutdown;
 			std::string deviceName;

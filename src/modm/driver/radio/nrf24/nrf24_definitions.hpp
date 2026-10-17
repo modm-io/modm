@@ -280,11 +280,7 @@ struct Nrf24Register
 	};
 	MODM_FLAGS8(InterruptFlag);
 
-	typedef FlagsGroup<
-			Feature_t, DynPd_t, FifoStatus_t, Rpd_t, ObserveTx_t, Status_t,
-	        RfSetup_t, SetupRetr_t, SetupAw_t, EnRxAddr_t, EnAA_t, Config_t,
-	        InterruptFlag_t
-	> Flags_t;
+	using Flags_t = FlagsGroup< Feature_t, DynPd_t, FifoStatus_t, Rpd_t, ObserveTx_t, Status_t, RfSetup_t, SetupRetr_t, SetupAw_t, EnRxAddr_t, EnAA_t, Config_t, InterruptFlag_t >;
 };
 
 }   // namespace modm

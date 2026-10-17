@@ -62,7 +62,7 @@ public:
 	enum class
 	Pin : PortType;
 	/// Use type-safe flags container for the pins
-	typedef modm::Flags<Pin, PortType> Pins;
+	using Pins = modm::Flags<Pin, PortType>;
 
 	/// Returns the *index* of the pin as a constexpr function.
 	/// The mapping is implementation defined, however, as an implementation hint

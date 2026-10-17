@@ -40,7 +40,7 @@ namespace modm
 	class Scheduler
 	{
 	public:
-		typedef uint8_t Priority;
+		using Priority = uint8_t;
 
 		/**
 		 * \brief	Scheduler task

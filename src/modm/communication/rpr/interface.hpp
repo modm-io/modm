@@ -95,7 +95,7 @@ namespace modm
 			update();
 
 		private:
-			typedef modm::BoundedDeque< Message, 10 > Queue;
+			using Queue = modm::BoundedDeque< Message, 10 >;
 
 			static void
 			writeByteEscaped(uint8_t data);

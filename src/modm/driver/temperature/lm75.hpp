@@ -83,7 +83,7 @@ public:
 	};
 protected:
 	/// @cond
-	typedef Configuration< Config1_t, FaultQueue, (Bit4 | Bit3) > FaultQueue_t;
+	using FaultQueue_t = Configuration< Config1_t, FaultQueue, (Bit4 | Bit3) >;
 	/// @endcond
 
 public:

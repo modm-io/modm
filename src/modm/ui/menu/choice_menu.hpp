@@ -109,7 +109,7 @@ namespace modm{
 
 	protected:
 
-		typedef std::list<ChoiceMenuEntry> EntryList;
+		using EntryList = std::list<ChoiceMenuEntry>;
 		EntryList entries;
 	};
 }

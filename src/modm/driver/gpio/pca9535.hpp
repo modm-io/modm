@@ -63,7 +63,7 @@ public:
 		P1_6 = (1 << 14),
 		P1_7 = (1 << 15)
 	};
-	typedef modm::Flags16<Pin> Pins;
+	using Pins = modm::Flags16<Pin>;
 	MODM_INT_TYPE_FLAGS(Pins);
 }; // struct pca9535
 

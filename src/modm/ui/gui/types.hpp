@@ -36,7 +36,7 @@ class Widget;
 
 /// Container used in view to store widgets
 /// @ingroup modm_ui_gui
-typedef std::vector<Widget*> WidgetContainer;
+using WidgetContainer = std::vector<Widget*>;
 /// @ingroup modm_ui_gui
 typedef void (*genericCallback)(void*);
 
@@ -123,9 +123,9 @@ private:
 };
 
 /// @ingroup modm_ui_gui
-typedef std::list<AsyncEvent*> AsyncEventList;
+using AsyncEventList = std::list<AsyncEvent*>;
 /// @ingroup modm_ui_gui
-typedef std::queue<InputEvent*, std::list<InputEvent*> > inputQueue;
+using inputQueue = std::queue<InputEvent*, std::list<InputEvent*> >;
 
 /// Callback when an event happend
 /// @ingroup modm_ui_gui
@@ -146,7 +146,7 @@ typedef struct Dimension
 
 } Dimension;
 /// @ingroup modm_ui_gui
-typedef modm::glcd::Point Point;
+using Point = modm::glcd::Point;
 
 }	// namespace gui
 

@@ -78,7 +78,7 @@ namespace modm
 		class Style
 		{
 		public:
-			typedef STYLE Type;
+			using Type = STYLE;
 
 			Style( STYLE style );
 

@@ -58,8 +58,8 @@ namespace modm
 		friend class Location2D<T>;
 
 	public:
-		typedef typename GeometricTraits<T>::WideType WideType;
-		typedef typename GeometricTraits<T>::FloatType FloatType;
+		using WideType = typename GeometricTraits<T>::WideType;
+		using FloatType = typename GeometricTraits<T>::FloatType;
 
 	public:
 		/**
@@ -308,9 +308,9 @@ namespace modm
 		operator * (float scale, const Vector<U, 2> &vector);
 	};
 
-	typedef Vector<float, 2> 		Vector2f;
-	typedef Vector<int16_t, 2> 		Vector2i;
-	typedef Vector<uint16_t, 2> 	Vector2u;
+	using Vector2f = Vector<float, 2>;
+	using Vector2i = Vector<int16_t, 2>;
+	using Vector2u = Vector<uint16_t, 2>;
 
 	// ------------------------------------------------------------------------
 	// Global functions

@@ -24,7 +24,7 @@ template<typename UnderlyingType> template<typename T>
 inline void
 modm::color::RgbT<UnderlyingType>::toHsv(HsvT<T>* color) const
 {
-	typedef float CalcType;
+	using CalcType = float;
 	const CalcType maxValue = std::numeric_limits<T>::max();
 	const CalcType _red		= static_cast<CalcType>(red) / maxValue;
 	const CalcType _blue	= static_cast<CalcType>(blue) / maxValue;

@@ -42,7 +42,7 @@ ResultState
 
 /// Used to store a resumable function's position (what Dunkels calls a
 /// "local continuation").
-typedef uint8_t State;
+using State = uint8_t;
 /// We use 0 instead of -1 since it might be faster to check
 static constexpr State Stopped = State(0);
 /// @endcond

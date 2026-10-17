@@ -304,9 +304,7 @@ public:
 	};
 	MODM_FLAGS8(Sett);
 
-	typedef FlagsGroup<
-			SmControl_t, Control3_t, Control4_t, Control5_t, Control6_t
-	> Control_t;
+	using Control_t = FlagsGroup< SmControl_t, Control3_t, Control4_t, Control5_t, Control6_t >;
 
 public:
 

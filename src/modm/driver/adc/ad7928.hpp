@@ -70,7 +70,7 @@ public:
 		/// Enable continuous sequence mode, not supported
 		ContinuousSequence = Bit14 | Bit7
 	};
-	typedef modm::Configuration<ControlRegister_t, SequenceMode, Bit14 | Bit7> SequenceMode_t;
+	using SequenceMode_t = modm::Configuration<ControlRegister_t, SequenceMode, Bit14 | Bit7>;
 
 	/// ADC input channels
 	enum class
@@ -85,7 +85,7 @@ public:
 		Ch6 = Bit2 | Bit1,
 		Ch7 = Bit2 | Bit1 | Bit0
 	};
-	typedef modm::Configuration<ControlRegister_t, InputChannel, 0b111, 10> InputChannel_t;
+	using InputChannel_t = modm::Configuration<ControlRegister_t, InputChannel, 0b111, 10>;
 
 	/// Power mode
 	enum class
@@ -95,7 +95,7 @@ public:
 		FullShutdown = Bit1,
 		AutoShutdown = Bit0
 	};
-	typedef modm::Configuration<ControlRegister_t, PowerMode, 0b11, 8> PowerMode_t;
+	using PowerMode_t = modm::Configuration<ControlRegister_t, PowerMode, 0b11, 8>;
 
 	/// Shadow register, used for channel selection in sequence mode
 	enum class
@@ -118,8 +118,8 @@ public:
 	};
 	MODM_FLAGS8(SequenceChannels);
 
-	typedef modm::Configuration<ShadowRegister_t, SequenceChannels, 0xFF, 8> Sequence1Channels_t;
-	typedef modm::Configuration<ShadowRegister_t, SequenceChannels, 0xFF, 0> Sequence2Channels_t;
+	using Sequence1Channels_t = modm::Configuration<ShadowRegister_t, SequenceChannels, 0xFF, 8>;
+	using Sequence2Channels_t = modm::Configuration<ShadowRegister_t, SequenceChannels, 0xFF, 0>;
 
 	using Register_t = modm::FlagsGroup<ControlRegister_t, ShadowRegister_t>;
 

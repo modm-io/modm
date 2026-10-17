@@ -34,7 +34,7 @@ class AdcSampler
 #ifdef __DOXYGEN__
 public:
 	/// this type is chosen automatically, it may be uint8_t, uint16_t or uint32_t
-	typedef uint16_t DataType;
+	using DataType = uint16_t;
 #else
 	static_assert(Channels > 0, "There must be at least one Channel to be sampled!");
 	static_assert(Oversamples > 0, "Must sample each channel at least once (Oversamples must be > 0)!");

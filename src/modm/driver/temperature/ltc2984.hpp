@@ -296,7 +296,7 @@ struct ltc2984
 
 			// Rsense resistance value in Resistance_t has a width of 27 bits
 			// Unit: 1/1'024 ohms
-			typedef uint32_t Resistance_t;
+			using Resistance_t = uint32_t;
 		};
 
 		static constexpr uint32_t disabled() { return 0x00000000; }
