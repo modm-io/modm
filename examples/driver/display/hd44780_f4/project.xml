@@ -1,0 +1,10 @@
+<library>
+  <extends>modm:disco-f407vg</extends>
+  <modules>
+    <module>modm:driver:pca8574</module>
+    <module>modm:driver:hd44780</module>
+    <module>modm:platform:i2c:2</module>
+    <module>modm:processing:fiber</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

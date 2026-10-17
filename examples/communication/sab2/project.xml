@@ -1,0 +1,9 @@
+<library>
+  <extends>modm:disco-f407vg</extends>
+  <modules>
+    <module>modm:communication:sab2</module>
+    <module>modm:platform:uart:1</module>
+    <module>modm:platform:uart:4</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

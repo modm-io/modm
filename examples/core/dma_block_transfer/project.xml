@@ -1,0 +1,8 @@
+<library>
+  <extends>modm:samv71-xplained-ultra</extends>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:dac</module>
+    <module>modm:platform:dma</module>
+  </modules>
+</library>

@@ -1,0 +1,8 @@
+<library>
+  <extends>modm:nucleo-g474re</extends>
+  <modules>
+    <module>modm:driver:ms5611</module>
+    <module>modm:platform:spi:1</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

@@ -1,0 +1,10 @@
+<library>
+  <extends>modm:nucleo-h723zg</extends>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:exti</module>
+    <module>modm:platform:dma</module>
+    <module>modm:platform:spi:2</module>
+    <module>modm:driver:bmi270</module>
+  </modules>
+</library>

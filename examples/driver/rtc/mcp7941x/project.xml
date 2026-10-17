@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:nucleo-f429zi</extends>
+  <!-- <extends>modm:nucleo-g071rb</extends> -->
+  <modules>
+    <module>modm:debug</module>
+    <module>modm:driver:mcp7941x</module>
+    <module>modm:io</module>
+    <module>modm:processing:fiber</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

@@ -180,17 +180,18 @@ def init(repo):
             description = re.search(r'description += +(""".*?"""|".*?")',
                                     module_text, flags=re.S|re.M)
             description = description.group(1).strip('"\\') if description else None
-        versions = re.search(r"#+ +[Rr]evisions? += +\[(.*)\]", module_text)
-        versions = versions.group(1).split(",") if versions is not None else [""]
-        config = {v.strip(): (module.parent / "board.xml") for v in versions}
-        repo.add_configuration(Configuration(name, description, config, versions[0].strip()))
-
-    # Add the hosted targets as versions of one configuration, defaulting to this computer
-    config = {c.stem: c for c in Path(repopath("tools/devices/hosted/config")).glob("*.xml")}
-    arch = "arm64" if platform.machine().lower() in ["arm64", "aarch64"] else "x86_64"
-    host = f"{platform.system().lower()}-{arch}"
-    repo.add_configuration(Configuration("hosted", "Hosted target for Linux, macOS and Windows",
-                                         config, host if host in config else "windows"))
+        if name == "hosted":
+            # One version per operating system and architecture, defaulting to this computer
+            config = {c.stem: c for c in module.parent.glob("*.xml")}
+            arch = "arm64" if platform.machine().lower() in ["arm64", "aarch64"] else "x86_64"
+            host = f"{platform.system().lower()}-{arch}"
+            default = host if host in config else "windows"
+        else:
+            versions = re.search(r"#+ +[Rr]evisions? += +\[(.*)\]", module_text)
+            versions = versions.group(1).split(",") if versions is not None else [""]
+            config = {v.strip(): (module.parent / "board.xml") for v in versions}
+            default = versions[0].strip()
+        repo.add_configuration(Configuration(name, description, config, default))
 
     # Add Jinja2 filters commonly used in this repository
     repo.add_filter("modm.ord", lambda letter: ord(letter[0].lower()) - ord("a"))

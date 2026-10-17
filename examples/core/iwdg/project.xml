@@ -1,0 +1,7 @@
+<library>
+  <extends>modm:nucleo-f072rb</extends>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:iwdg</module>
+  </modules>
+</library>

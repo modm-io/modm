@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:disco-f469ni</extends>
+  <options>
+    <option name="modm:platform:cortex-m:main_stack_size">5Ki</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:processing:timer</module>
+    <module>modm:lvgl</module>
+  </modules>
+</library>

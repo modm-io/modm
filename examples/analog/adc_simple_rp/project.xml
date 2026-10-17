@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:rp-pico</extends>
+  <options>
+    <option name="modm:board:rp-pico:with_logger">yes</option>
+  </options>
+  <modules>
+    <module>modm:io</module>
+    <module>modm:platform:adc</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

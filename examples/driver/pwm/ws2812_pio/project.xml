@@ -1,0 +1,7 @@
+<library>
+  <extends>modm:rp-pico</extends>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:pio:0</module>
+  </modules>
+</library>

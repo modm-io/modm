@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:nucleo-u575zi-q</extends>
+  <!-- <extends>modm:nucleo-g071rb</extends> -->
+  <!-- <extends>modm:nucleo-l476rg</extends> -->
+  <!-- <extends>modm:mega-2560-pro</extends> -->
+  <!-- <extends>modm:arduino-uno</extends> -->
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:processing:fiber</module>
+  </modules>
+</library>

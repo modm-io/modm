@@ -1,0 +1,9 @@
+<library>
+  <extends>modm:nucleo-f103rb</extends>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:processing:timer</module>
+    <module>modm:platform:i2c:1</module>
+    <module>modm:driver:stts22h</module>
+  </modules>
+</library>

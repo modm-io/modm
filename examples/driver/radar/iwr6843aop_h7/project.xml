@@ -1,0 +1,9 @@
+<library>
+  <extends>modm:nucleo-h723zg</extends>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:uart:1</module>
+    <module>modm:platform:uart:4</module>
+    <module>modm:driver:iwr6843aop</module>
+  </modules>
+</library>

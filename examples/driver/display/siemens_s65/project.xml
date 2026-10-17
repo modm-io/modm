@@ -1,0 +1,15 @@
+<library>
+  <options>
+    <option name="modm:target">atmega644-20au</option>
+    <option name="modm:platform:core:f_cpu">16M</option>
+  </options>
+  <modules>
+    <module>modm:driver:siemens_s65</module>
+    <module>modm:platform:clock</module>
+    <module>modm:platform:core</module>
+    <module>modm:platform:gpio</module>
+    <module>modm:platform:spi.bitbang</module>
+    <module>modm:ui:button</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

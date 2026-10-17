@@ -1,0 +1,9 @@
+<library>
+    <extends>modm:nucleo-g070rb</extends>
+    <modules>
+        <module>modm:build:scons</module>
+        <module>modm:platform:timer:1</module>
+        <module>modm:platform:adc</module>
+        <module>modm:platform:dma</module>
+    </modules>
+</library>

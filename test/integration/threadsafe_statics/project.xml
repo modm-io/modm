@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:disco-f469ni</extends>
+  <!-- <extends>modm:nucleo-f207zg</extends> -->
+  <!-- <extends>modm:nucleo-h753zi</extends> -->
+  <!-- <extends>modm:nucleo-h563zi</extends> -->
+  <!-- <extends>modm:nucleo-c031c6</extends> -->
+  <!-- <extends>modm:nucleo-g070rb</extends> -->
+  <modules>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

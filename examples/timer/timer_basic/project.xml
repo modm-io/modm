@@ -1,0 +1,7 @@
+<library>
+  <extends>modm:disco-f303vc</extends>
+  <modules>
+    <module>modm:platform:timer:1</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

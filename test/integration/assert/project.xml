@@ -1,0 +1,20 @@
+<library>
+  <!-- CI: run -->
+  <extends>modm:hosted</extends>
+  <!-- <extends>modm:arduino-nano</extends> -->
+  <!-- <extends>modm:disco-f469ni</extends> -->
+  <!-- <extends>modm:nrf51422-dk</extends> -->
+  <!-- <extends>modm:nucleo-g071rb</extends> -->
+  <!-- <extends>modm:disco-f100rb</extends> -->
+  <!-- <extends>modm:devebox-stm32h750vb</extends> -->
+  <!-- <extends>modm:nucleo-h563zi</extends> -->
+  <modules>
+    <module>modm:platform:core</module>
+    <module>modm:architecture:assert</module>
+    <module>modm:debug</module>
+    <module>modm:build:scons</module>
+    <module>modm:build:make</module>
+    <!-- Required for modm:nrf51422-dk, modm:nucleo-g071rb, modm:disco-f100rb, modm:devebox-stm32h750vb, modm:nucleo-h563zi -->
+    <!-- <module>modm:platform:heap</module> -->
+  </modules>
+</library>

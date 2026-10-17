@@ -1,0 +1,10 @@
+<library>
+  <extends>modm:disco-f303vc</extends>
+  <modules>
+    <module>modm:platform:adc:1</module>
+    <module>modm:platform:adc:2</module>
+    <module>modm:platform:adc:3</module>
+    <module>modm:platform:adc:4</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

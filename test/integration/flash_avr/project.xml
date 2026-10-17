@@ -1,0 +1,7 @@
+<library>
+  <extends>modm:arduino-uno</extends>
+  <modules>
+    <module>modm:architecture:accessor</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

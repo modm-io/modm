@@ -1,0 +1,15 @@
+<library>
+  <extends>modm:hosted</extends>
+  <!-- <extends>modm:nucleo-c031c6</extends> -->
+  <!-- <extends>modm:nucleo-l031k6</extends> -->
+  <!-- <extends>modm:nucleo-l152re</extends> -->
+  <!-- <extends>modm:nucleo-l452re</extends> -->
+  <!-- <extends>modm:nucleo-f746zg</extends> -->
+  <!-- <extends>modm:nucleo-h533re</extends> -->
+  <modules>
+    <module>modm:platform:core</module>
+    <module>modm:debug</module>
+    <module>modm:processing:rtos</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

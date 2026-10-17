@@ -1,0 +1,8 @@
+<library>
+  <extends>modm:samv71-xplained-ultra</extends>
+  <!-- <extends>modm:same70-xplained</extends> -->
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:timer:*</module>
+  </modules>
+</library>

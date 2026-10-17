@@ -1,0 +1,14 @@
+<library>
+  <options>
+    <option name="modm:target">samv70n20b-aabt</option>
+    <option name="modm:build:openocd.cfg">openocd.cfg</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:core</module>
+    <module>modm:platform:clock</module>
+    <module>modm:platform:gpio</module>
+    <module>modm:architecture:delay</module>
+    <module>modm:platform:clockgen</module>
+  </modules>
+</library>

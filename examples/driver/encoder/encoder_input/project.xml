@@ -1,0 +1,15 @@
+<library>
+  <extends>modm:blue-pill-f103</extends>
+  <modules>
+		<module>modm:processing:timer</module>
+		<module>modm:driver:encoder_input</module>
+		<module>modm:platform:timer:1</module>
+		<module>modm:platform:timer:2</module>
+		<module>modm:platform:timer:3</module>
+		<module>modm:platform:timer:4</module>
+		<module>modm:build:scons</module>
+  </modules>
+  <collectors>
+    <collect name="modm:build:openocd.source">interface/stlink.cfg</collect>
+  </collectors>
+</library>

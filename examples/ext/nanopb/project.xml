@@ -1,0 +1,15 @@
+<library>
+  <extends>modm:nucleo-f429zi</extends>
+  <!-- <extends>modm:nucleo-f031k6</extends> -->
+  <!-- <extends>modm:nucleo-g071rb</extends> -->
+  <!-- <extends>modm:nucleo-f103rb</extends> -->
+  <!-- <extends>modm:samv71-xplained-ultra</extends> -->
+  <!-- <extends>modm:nucleo-u575zi-q</extends> -->
+  <options>
+    <option name="modm:nanopb:sources">protocol/simple.proto,protocol/complex.proto</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:nanopb</module>
+  </modules>
+</library>

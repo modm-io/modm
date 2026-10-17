@@ -1,0 +1,13 @@
+<library>
+  <extends>modm:blue-pill-f103</extends>
+  <modules>
+    <module>modm:driver:adns9800</module>
+    <module>modm:platform:spi:1</module>
+    <module>modm:processing:fiber</module>
+    <module>modm:processing:timer</module>
+    <module>modm:build:scons</module>
+  </modules>
+  <collectors>
+    <collect name="modm:build:openocd.source">interface/stlink.cfg</collect>
+  </collectors>
+</library>

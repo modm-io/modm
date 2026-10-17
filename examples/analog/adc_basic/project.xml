@@ -1,0 +1,10 @@
+<library>
+  <extends>modm:nucleo-l552ze-q</extends>
+  <!-- <extends>modm:nucleo-g474re</extends> -->
+  <!-- <extends>modm:nucleo-h723zg</extends> -->
+  <!-- <extends>modm:nucleo-l476rg</extends> -->
+  <modules>
+    <module>modm:platform:adc:1</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

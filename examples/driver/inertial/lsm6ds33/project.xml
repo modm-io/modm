@@ -1,0 +1,8 @@
+<library>
+  <extends>modm:nucleo-f042k6</extends>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:driver:lsm6ds33</module>
+    <module>modm:platform:i2c:1</module>
+  </modules>
+</library>

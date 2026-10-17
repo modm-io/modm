@@ -1,0 +1,16 @@
+<library>
+  <extends>modm:nucleo-l552ze-q</extends>
+  <!-- <extends>modm:nucleo-f446ze</extends> -->
+  <!-- <extends>modm:disco-f769ni</extends> -->
+  <!-- <extends>modm:nucleo-h723zg</extends> -->
+  <!-- <extends>modm:nucleo-l476rg</extends> -->
+  <modules>
+    <module>modm:platform:dma</module>
+    <module>modm:platform:timer:4</module>
+    <module>modm:build:scons</module>
+    <!-- Required for modm:nucleo-l552ze-q, modm:nucleo-h723zg, modm:nucleo-l476rg -->
+    <module>modm:platform:dac:1</module>
+    <!-- Required for modm:nucleo-f446ze, modm:disco-f769ni with only one DAC -->
+    <!-- <module>modm:platform:dac</module> -->
+  </modules>
+</library>

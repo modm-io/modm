@@ -1,0 +1,9 @@
+<library>
+  <extends>modm:black-pill-f401</extends>
+  <modules>
+    <module>modm:build:make</module>
+    <module>modm:build:scons</module>
+    <module>modm:platform:uart:1</module>
+    <module>modm:freertos</module>
+  </modules>
+</library>

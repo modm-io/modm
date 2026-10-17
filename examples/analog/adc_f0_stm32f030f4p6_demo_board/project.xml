@@ -1,0 +1,10 @@
+<library>
+  <extends>modm:stm32f030_demo</extends>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:adc</module>
+  </modules>
+  <collectors>
+    <collect name="modm:build:openocd.source">interface/stlink.cfg</collect>
+  </collectors>
+</library>

@@ -1,0 +1,15 @@
+<library>
+  <extends>modm:nucleo-f446re</extends>
+  <!-- <extends>modm:arduino-nano</extends> -->
+  <options>
+    <!-- Required for modm:arduino-nano -->
+    <!-- <option name="modm:build:lto">yes</option> -->
+  </options>
+  <modules>
+    <module>modm:driver:tcs3472</module>
+    <module>modm:processing:fiber</module>
+    <module>modm:build:scons</module>
+    <!-- Required for modm:arduino-nano -->
+    <!-- <module>modm:platform:i2c</module> -->
+  </modules>
+</library>

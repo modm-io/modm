@@ -1,0 +1,38 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2026, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":board:hosted"
+    module.description = """\
+# Hosted
+
+Board support for Linux, macOS and Windows, so that examples can use the same
+`Board` interface as on a microcontroller. `Board::initialize()` does nothing,
+the logger prints to the standard output, and the LEDs and the button are
+unused pins.
+"""
+
+def prepare(module, options):
+    if options[":target"].identifier.platform != "hosted":
+        return False
+
+    module.depends(
+        ":architecture:clock",
+        ":architecture:delay",
+        ":debug",
+        ":platform:core",
+        ":platform:gpio")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/board"
+    env.copy("board.hpp")

@@ -1,0 +1,16 @@
+<library>
+  <!-- CI: run -->
+  <extends>modm:hosted</extends>
+  <!-- <extends>modm:nucleo-f439zi</extends> -->
+  <!-- <extends>modm:nucleo-c031c6</extends> -->
+  <!-- <extends>modm:nucleo-g070rb</extends> -->
+  <!-- <extends>modm:nucleo-l152re</extends> -->
+  <!-- <extends>modm:nucleo-h743zi2</extends> -->
+  <!-- <extends>modm:nrf5340-dk</extends> -->
+  <modules>
+    <module>modm:platform:core</module>
+    <module>modm:debug</module>
+    <module>modm:etl</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

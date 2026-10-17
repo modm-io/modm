@@ -1,0 +1,9 @@
+<library>
+  <extends>modm:nucleo-l432kc</extends>
+  <modules>
+    <module>modm:driver:l3gd20</module>
+    <module>modm:math:filter</module>
+    <module>modm:platform:uart.spi:1</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

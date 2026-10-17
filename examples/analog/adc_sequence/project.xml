@@ -1,0 +1,7 @@
+<library>
+  <extends>modm:nucleo-c031c6</extends>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:adc</module>
+  </modules>
+</library>

@@ -1,0 +1,7 @@
+<library>
+  <extends>modm:nucleo-l432kc</extends>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:timer:1</module>
+  </modules>
+</library>

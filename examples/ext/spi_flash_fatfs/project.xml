@@ -1,0 +1,10 @@
+<library>
+  <extends>modm:nucleo-f429zi</extends>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:driver:block.device:spi.flash</module>
+    <module>modm:fatfs</module>
+    <module>modm:platform:spi:1</module>
+    <module>modm:processing:fiber</module>
+  </modules>
+</library>

@@ -1,0 +1,9 @@
+<library>
+  <extends>modm:samv71-xplained-ultra</extends>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:driver:at24mac402</module>
+    <module>modm:driver:i2c.eeprom</module>
+    <module>modm:platform:i2c:0</module>
+  </modules>
+</library>

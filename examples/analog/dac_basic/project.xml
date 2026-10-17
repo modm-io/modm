@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:nucleo-f446ze</extends>
+  <!-- <extends>modm:nucleo-g474re</extends> -->
+  <modules>
+    <module>modm:build:scons</module>
+    <!-- Required for modm:nucleo-f446ze -->
+    <module>modm:platform:dac</module>
+    <!-- Required for modm:nucleo-g474re -->
+    <!-- <module>modm:platform:dac:2</module> -->
+  </modules>
+</library>
