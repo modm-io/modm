@@ -315,13 +315,11 @@ modm::LUDecomposition::LUSubDecomposition<T, OFFSET, HEIGHT, WIDTH>::solve(
 
 	// start solving Ly = b
 
-	modm::Matrix<T, HEIGHT, WIDTH> lCopy(l);
-	if (!solveLyEqualsB(&lCopy, bx)) {
+	if (modm::Matrix<T, HEIGHT, WIDTH> lCopy(l); !solveLyEqualsB(&lCopy, bx)) {
 		return false;
 	}
 
-	modm::Matrix<T, HEIGHT, WIDTH> uCopy(u);
-	if (!solveUxEqualsY(&uCopy, bx)) {
+	if (modm::Matrix<T, HEIGHT, WIDTH> uCopy(u); !solveUxEqualsY(&uCopy, bx)) {
 		return false;
 	}
 

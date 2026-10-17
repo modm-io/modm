@@ -420,8 +420,7 @@ modm::Ad7280a<SpiMaster, Cs, Cnvst, N>::read(uint32_t *value)
 
 	//MODM_LOG_DEBUG << "read = " << modm::hex << *value << modm::ascii << modm::endl;
 
-	uint8_t crc = calculateCrc(*value >> 10);
-	if (crc == ((*value >> 2) & 0xff)) {
+	if (uint8_t crc = calculateCrc(*value >> 10); crc == ((*value >> 2) & 0xff)) {
 		return true;
 	}
 	else {

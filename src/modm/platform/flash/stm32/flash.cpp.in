@@ -70,8 +70,7 @@ Flash::getPage(uintptr_t offset)
 	// Every bank of 8x128kB blocks has 12 sectors: the first block is
 	// subdivided into 4x16kB + 64kB, followed by 7x128kB sectors.
 	const uint8_t bank_sector = (index / 8) * 12;
-	const uint8_t block = index % 8;
-	if (block) return bank_sector + block + 4;
+	if (const uint8_t block = index % 8; block) return bank_sector + block + 4;
 	// Check upper 64kB first, otherwise the lower 16kB
 	if (offset & 0x1'0000ul) return bank_sector + 4;
 	return bank_sector + ((offset & 0xC000) >> 14);

@@ -33,8 +33,7 @@ modm::delay_us(uint32_t us)
 	const uint32_t cycles = unshifted_cycles >> platform::delay_fcpu_MHz_shift;
 	while (true)
 	{
-		const uint32_t now = DWT->CYCCNT;
-		if (now - start >= cycles) break;
+		if (const uint32_t now = DWT->CYCCNT; now - start >= cycles) break;
 	}
 }
 

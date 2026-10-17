@@ -33,8 +33,7 @@ Bmp581<Transport>::initialize()
 
 	if (!reset()) { return false; }
 
-	const auto chipId = readChipId();
-	if (!chipId || *chipId != ChipId) { return false; }
+	if (const auto chipId = readChipId(); !chipId || *chipId != ChipId) { return false; }
 
 	const auto status = readStatus();
 	if (!status) { return false; }
@@ -292,8 +291,7 @@ Bmp581<Transport>::setFifoSelect(FifoFrameSelect frameSelect, FifoDecimation dec
 	// FIFO_SEL(0x18): frame select in bits [1:0], decimation in bits [4:2]
 	const uint8_t value =
 		static_cast<uint8_t>(frameSelect) | (static_cast<uint8_t>(decimation) << 2);
-	const bool selectOk = writeRegister(Register::FifoSel, value);
-	if (!selectOk) { return false; }
+	if (const bool selectOk = writeRegister(Register::FifoSel, value); !selectOk) { return false; }
 
 	if (oldMode != uint8_t(PowerMode::Standby))
 	{
