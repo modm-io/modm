@@ -30,6 +30,7 @@ namespace modm
 
 /// Fast check if a float variable is positive
 /// Checks only the sign bit for the AVR.
+[[deprecated("use not std::signbit(a)")]] // DEPRECATED: 2027q4
 inline bool
 isPositive(const float& a)
 {
@@ -67,6 +68,7 @@ pow(uint32_t base, uint8_t exponent)
  * preprocessor macro.
  */
 template<typename T>
+[[deprecated("use std::min")]] // DEPRECATED: 2027q4
 inline const T&
 min(const T& a, const T& b)
 {
@@ -88,6 +90,7 @@ min(const T& a, const T& b)
  * preprocessor macro.
  */
 template<typename T>
+[[deprecated("use std::max")]] // DEPRECATED: 2027q4
 inline const T&
 max(const T& a, const T& b)
 {
@@ -110,6 +113,7 @@ max(const T& a, const T& b)
  * preprocessor macro.
  */
 template<typename T>
+[[deprecated("use std::max({a, b, c})")]] // DEPRECATED: 2027q4
 constexpr T
 max(const T a, const T b, const T c)
 {
@@ -129,6 +133,7 @@ max(const T a, const T b, const T c)
  * once, unlike a preprocessor macro.
  */
 template<typename T, typename Compare>
+[[deprecated("use std::min")]] // DEPRECATED: 2027q4
 inline const T&
 min(const T& a, const T& b, Compare compare)
 {
@@ -150,6 +155,7 @@ min(const T& a, const T& b, Compare compare)
  * once, unlike a preprocessor macro.
  */
 template<typename T, typename Compare>
+[[deprecated("use std::max")]] // DEPRECATED: 2027q4
 inline const T&
 max(const T& a, const T& b, Compare compare)
 {
