@@ -60,7 +60,7 @@ namespace modm
 template< typename T >
 struct Register
 {
-	typedef T UnderlyingType;	///< The integer type internally used to represent the register
+	using UnderlyingType = T;	///< The integer type internally used to represent the register
 	UnderlyingType value;		///< The underlying integer value
 
 	/// Default constructor initializes `value` to zero.
@@ -124,11 +124,11 @@ template < typename Enum, typename T >
 struct FlagsOperators : public ::modm::Register<T>
 {
 	/// @cond
-	typedef T UnderlyingType;
+	using UnderlyingType = T;
 	using Register<T>::value;
 	/// @endcond
 
-	typedef Enum EnumType;	///< The enum type
+	using EnumType = Enum;	///< The enum type
 
 	// MARK: Constructors and assignments
 
@@ -289,11 +289,11 @@ template < typename Enum, typename T >
 struct Flags : public ::modm::FlagsOperators<Enum, T>
 {
 	/// @cond
-	typedef T UnderlyingType;
+	using UnderlyingType = T;
 	using FlagsOperators<Enum, T>::value;
 	/// @endcond
 
-	typedef Enum EnumType;	///< The enum type
+	using EnumType = Enum;	///< The enum type
 
 	// MARK: Constructors and assignments
 
@@ -560,9 +560,9 @@ template < typename Parent, typename Enum, typename Parent::UnderlyingType Mask,
 struct Configuration : public ::modm::FlagsOperators<typename Parent::EnumType, typename Parent::UnderlyingType>
 {
 private:
-	typedef typename Parent::UnderlyingType UnderlyingType;
-	typedef UnderlyingType UType;	// lazy
-	typedef typename Parent::EnumType EType;	// lazy
+	using UnderlyingType = typename Parent::UnderlyingType;
+	using UType = UnderlyingType;	// lazy
+	using EType = typename Parent::EnumType;	// lazy
 
 public:
 	/// explicit constructor for the underlying type
@@ -627,9 +627,9 @@ template < typename Parent, typename Parent::UnderlyingType Width, typename Pare
 struct Value : public ::modm::FlagsOperators<typename Parent::EnumType, typename Parent::UnderlyingType>
 {
 private:
-	typedef typename Parent::UnderlyingType UnderlyingType;
-	typedef UnderlyingType UType;	// lazy
-	typedef typename Parent::EnumType EType;	// lazy
+	using UnderlyingType = typename Parent::UnderlyingType;
+	using UType = UnderlyingType;	// lazy
+	using EType = typename Parent::EnumType;	// lazy
 
 	static constexpr UType Mask = ((1 << Width) - 1) << Position;
 public:

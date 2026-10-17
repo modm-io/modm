@@ -77,7 +77,7 @@ namespace modm
 	class Angle
 	{
 	public:
-		typedef float Type;
+		using Type = float;
 
 		/**
 		 * \brief	Normalize angle

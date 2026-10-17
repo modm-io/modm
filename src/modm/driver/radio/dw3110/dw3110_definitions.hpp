@@ -173,7 +173,7 @@ struct Dw3110
 		SPIERR = (1ll << 43),
 		CCA_FAIL = (1ll << 44),
 	};
-	typedef ::modm::Flags<SystemStatus, uint64_t> SystemStatus_t;
+	using SystemStatus_t = ::modm::Flags<SystemStatus, uint64_t>;
 	MODM_INT_TYPE_FLAGS(SystemStatus_t);
 
 	enum class FilterConfig : uint16_t

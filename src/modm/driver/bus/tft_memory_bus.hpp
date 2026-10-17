@@ -197,7 +197,7 @@ template <
 class TftMemoryBus8BitGpio
 {
 public:
-	typedef MemoryBus<PORT, CS, RD, WR> BUS;
+	using BUS = MemoryBus<PORT, CS, RD, WR>;
 
 	static void
 	initialize()

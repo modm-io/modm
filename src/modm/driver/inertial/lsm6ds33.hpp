@@ -115,7 +115,7 @@ public:
 		Rate_3332_Hz = 0x90,	///< 3332 Hz
 		Rate_6664_Hz = 0xA0,	///< 6664 Hz
 	};
-	typedef modm::Configuration<Control1_t, AccDataRate, Bit7 | Bit6 | Bit5 | Bit4> AccDataRate_t;
+	using AccDataRate_t = modm::Configuration<Control1_t, AccDataRate, Bit7 | Bit6 | Bit5 | Bit4>;
 
 	/// Full scale of the acceleration sensor data output
 	enum class
@@ -126,7 +126,7 @@ public:
 		Scale_8_G = 0x0C,		///< +- 8g
 		Scale_16_G = 0x04,		///< +- 16g
 	};
-	typedef modm::Configuration<Control1_t, AccScale, Bit3 | Bit2 > AccScale_t;
+	using AccScale_t = modm::Configuration<Control1_t, AccScale, Bit3 | Bit2 >;
 
 	/// Anti aliasing filter bandwith for the acceleration sensor (only used when Control Register 4, Bit 7 is 1)
 	enum class
@@ -137,7 +137,7 @@ public:
 		BW_100_Hz = 0x02,		///< 100 Hz
 		Bw_50_Hz = 0x03,		///< 50 Hz
 	};
-	typedef modm::Configuration<Control1_t, AccAABandwith, Bit3 | Bit2 > AccAABandwith_t;
+	using AccAABandwith_t = modm::Configuration<Control1_t, AccAABandwith, Bit3 | Bit2 >;
 
 // ----------------------------------------------------------------------------
 
@@ -170,7 +170,7 @@ public:
 		Rate_833_Hz = 0x70,		///< 833 Hz
 		Rate_1666_Hz = 0x80,	///< 1666 Hz
 	};
-	typedef modm::Configuration<Control2_t, GyroDataRate, Bit7 | Bit6 | Bit5 | Bit4> GyroDataRate_t;
+	using GyroDataRate_t = modm::Configuration<Control2_t, GyroDataRate, Bit7 | Bit6 | Bit5 | Bit4>;
 
 	/// Full scale of the gyroscope data output
 	enum class
@@ -182,7 +182,7 @@ public:
 		Scale_1000_dps = 0x08,	///< 1000 degrees per second
 		Scale_2000_dps = 0x0C,	///< 2000 degrees per secons
 	};
-	typedef modm::Configuration<Control2_t, GyroScale, Bit3 | Bit2 | Bit1 > GyroScale_t;
+	using GyroScale_t = modm::Configuration<Control2_t, GyroScale, Bit3 | Bit2 | Bit1 >;
 
 // ----------------------------------------------------------------------------
 
@@ -250,7 +250,7 @@ public:
 		Cutoff_2_07_Hz = 0x20,		///< 2.07 Hz
 		Cutoff_16_32_Hz = 0x30		///< 16.32 Hz
 	};
-	typedef modm::Configuration<Control7_t, GyroHPCutoff, Bit5 | Bit4 > GyroHPCutoff_t;
+	using GyroHPCutoff_t = modm::Configuration<Control7_t, GyroHPCutoff, Bit5 | Bit4 >;
 
 // ----------------------------------------------------------------------------
 
@@ -274,7 +274,7 @@ public:
 		Cutoff_DIV_9 = 0x20,		///< Acceleration Data Rate / 9
 		Cutoff_DIV_400 = 0x30		///< Acceleration Data Rate / 400
 	};
-	typedef modm::Configuration<Control8_t, AccHPCutoff, Bit5 | Bit4 > AccHPCutoff_t;
+	using AccHPCutoff_t = modm::Configuration<Control8_t, AccHPCutoff, Bit5 | Bit4 >;
 
 // ----------------------------------------------------------------------------
 	/// Control Register 9

@@ -70,7 +70,7 @@ public:
 		P6 = Bit6,
 		P7 = Bit7,
 	};
-	typedef modm::Flags8<Pin> Pins;
+	using Pins = modm::Flags8<Pin>;
 	MODM_INT_TYPE_FLAGS(Pins);
 }; // struct mcp23x08
 

@@ -186,7 +186,7 @@ struct mc33xs2410
 		ToSafe = 0b10,
 		Reset = 0b11,
 	};
-	typedef modm::Configuration<GlobalControl_t, TransitMode, 0b11, 6> TransitMode_t;
+	using TransitMode_t = modm::Configuration<GlobalControl_t, TransitMode, 0b11, 6>;
 
 
 	/// Output control register (OUT1_4_CTRL, 02h control bank)
@@ -372,7 +372,7 @@ struct mc33xs2410
 		Time8s = 0b110,
 		Time16s = 0b111,
 	};
-	typedef modm::Configuration<OverloadProtectionControl_t, OverloadTimeout, 0b111, 3> OverloadTimeout_t;
+	using OverloadTimeout_t = modm::Configuration<OverloadProtectionControl_t, OverloadTimeout, 0b111, 3>;
 
 
 	/// Encodes a control bank write command (16-bit SPI frame)

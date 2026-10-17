@@ -38,7 +38,7 @@ namespace modm
 	class [[deprecated("Use std::stack instead")]] Stack // DEPRECATED: 2027q4
 	{
 	public:
-		typedef typename Container::Size Size;
+		using Size = typename Container::Size;
 
 	public:
 		bool

@@ -36,10 +36,10 @@ public:
 	class iterator
 	{
 	public:
-		typedef std::forward_iterator_tag iterator_category;
-		typedef T value_type;
-		typedef T& reference;
-		typedef T* pointer;
+		using iterator_category = std::forward_iterator_tag;
+		using value_type = T;
+		using reference = T&;
+		using pointer = T*;
 
 		constexpr iterator(value_type value, T step, value_type boundary) :
 			value_{value}, step_{step}, boundary_{boundary}, positive_step_(step_ > 0)

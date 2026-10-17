@@ -52,7 +52,7 @@ struct ads868x
 	};
 	MODM_FLAGS32(DeviceIDRegister);
 
-	typedef modm::Value<DeviceIDRegister_t, 4, 16> DeviceID_t;
+	using DeviceID_t = modm::Value<DeviceIDRegister_t, 4, 16>;
 
 
 	// Reset and Power Control register
@@ -77,7 +77,7 @@ struct ads868x
 	};
 	MODM_FLAGS32(ResetPowerControlRegister);
 
-	typedef modm::Value<ResetPowerControlRegister_t, 8, 8> WriteKey_t;
+	using WriteKey_t = modm::Value<ResetPowerControlRegister_t, 8, 8>;
 
 	// SDI Data Input Control register
 	enum class
@@ -96,7 +96,7 @@ struct ads868x
 		Std_Pol1_Phase0 = 2,
 		Std_Pol1_Phase1 = 3
 	};
-	typedef modm::Configuration<SDIControlRegister_t, SDIMode, 0b11, 0> SDIMode_t;
+	using SDIMode_t = modm::Configuration<SDIControlRegister_t, SDIMode, 0b11, 0>;
 
 	// SDO Data Output Control Register
 	enum class
@@ -122,7 +122,7 @@ struct ads868x
 		Invalid = 0b10,
 		ADCMasterClk_SourcSync = 0b11
 	};
-	typedef modm::Configuration<SDOControlRegister_t, SDOMode, 0b11, 0> SDOMode_t;
+	using SDOMode_t = modm::Configuration<SDOControlRegister_t, SDOMode, 0b11, 0>;
 
 
 	enum class
@@ -131,7 +131,7 @@ struct ads868x
 		External = 0,
 		Internal = 1
 	};
-	typedef modm::Configuration<SDOControlRegister_t, SourceSyncClock, 0b1, 6> SourceSyncClock_t;
+	using SourceSyncClock_t = modm::Configuration<SDOControlRegister_t, SourceSyncClock, 0b1, 6>;
 
 	enum class
 	SDO1Config: uint8_t
@@ -141,7 +141,7 @@ struct ads868x
 		SDO1_GPO = 0b10,
 		SDO1_2BitsSDO = 0b11
 	};
-	typedef modm::Configuration<SDOControlRegister_t, SDO1Config, 0b1, 8> SDO1Config_t;
+	using SDO1Config_t = modm::Configuration<SDOControlRegister_t, SDO1Config, 0b1, 8>;
 
 
 	enum class
@@ -174,7 +174,7 @@ struct ads868x
 		Seq01 = 0b110,
 		Seq0011 = 0b111
 	};
-	typedef modm::Configuration<DataOutControlRegister_t, DataValue, 0b111, 0> DataValue_t;
+	using DataValue_t = modm::Configuration<DataOutControlRegister_t, DataValue, 0b111, 0>;
 
 
 	enum class
@@ -202,7 +202,7 @@ struct ads868x
 		Range_Unipolar_1_50_VRef = 0b1010,
 		Range_Unipolar_1_25_VRef = 0b1011
 	};
-	typedef modm::Configuration<RangeSelectionRegister_t, RangeSel, 0b1111, 0> RangeSel_t;
+	using RangeSel_t = modm::Configuration<RangeSelectionRegister_t, RangeSel, 0b1111, 0>;
 
 }; // struct ads868x
 

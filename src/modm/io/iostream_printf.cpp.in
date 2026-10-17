@@ -29,9 +29,9 @@
 extern "C"
 {
 #if PRINTF_SUPPORT_LONG_LONG
-typedef unsigned long long printf_unsigned_value_t;
+using printf_unsigned_value_t = unsigned long long;
 #else
-typedef unsigned long printf_unsigned_value_t;
+using printf_unsigned_value_t = unsigned long;
 #endif
 
 #define FLAGS_SPACE		(1U <<  3U)

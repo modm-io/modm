@@ -269,10 +269,7 @@ public:
 	MODM_FLAGS8(ClickSource);
 
 public:
-	typedef FlagsGroup<
-			Control1_t, Control2_t, Control3_t, Control4_t, Control5_t, Control6_t,
-			FifoControl_t, IntConfig_t, ClickConfig_t
-	> Control_t;
+	using Control_t = FlagsGroup< Control1_t, Control2_t, Control3_t, Control4_t, Control5_t, Control6_t, FifoControl_t, IntConfig_t, ClickConfig_t >;
 
 public:
 	enum class

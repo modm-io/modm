@@ -227,10 +227,10 @@ FifoData : public Data
     struct iterator
     {
     public:
-        typedef std::input_iterator_tag iterator_category;
-        typedef FifoPacket value_type;
-        typedef FifoPacket& reference;
-        typedef FifoPacket* pointer;
+        using iterator_category = std::input_iterator_tag;
+        using value_type = FifoPacket;
+        using reference = FifoPacket&;
+        using pointer = FifoPacket*;
 
         constexpr iterator(std::span<const uint8_t> data, uint16_t index) : fifoData(data), fifoIndex(index)
         {

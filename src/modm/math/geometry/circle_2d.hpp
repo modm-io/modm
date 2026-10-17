@@ -40,8 +40,8 @@ namespace modm
 	template <typename T>
 	class Circle2D
 	{
-		typedef typename GeometricTraits<T>::WideType WideType;
-		typedef typename GeometricTraits<T>::FloatType FloatType;
+		using WideType = typename GeometricTraits<T>::WideType;
+		using FloatType = typename GeometricTraits<T>::FloatType;
 
 	public:
 		Circle2D();

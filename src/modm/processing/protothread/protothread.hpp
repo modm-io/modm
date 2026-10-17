@@ -113,7 +113,7 @@ namespace modm
 			 * Used to store a protothread's position (what Dunkels calls a
 			 * "local continuation").
 			 */
-			typedef uint16_t PtState;
+			using PtState = uint16_t;
 
 			/// An invalid line number, used to mark the protothread has ended.
 			static constexpr PtState Invalid = static_cast<PtState>(-1);

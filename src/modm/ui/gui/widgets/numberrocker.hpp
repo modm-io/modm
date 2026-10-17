@@ -80,9 +80,9 @@ private:
 };
 
 /// @ingroup modm_ui_gui
-typedef NumberRocker<int16_t> IntegerRocker;
+using IntegerRocker = NumberRocker<int16_t>;
 /// @ingroup modm_ui_gui
-typedef NumberRocker<float> FloatRocker;
+using FloatRocker = NumberRocker<float>;
 
 
 }	// namespace gui

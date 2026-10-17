@@ -252,9 +252,9 @@ namespace modm
 		return lhs * rhs.asTMatrix();
 	}
 
-	typedef Vector<float, 4> 	Vector4f;
-	typedef Vector<int16_t, 4>	Vector4i;
-	typedef Vector<uint16_t, 4>	Vector4u;
+	using Vector4f = Vector<float, 4>;
+	using Vector4i = Vector<int16_t, 4>;
+	using Vector4u = Vector<uint16_t, 4>;
 }
 
 #include "vector4_impl.hpp"

@@ -104,8 +104,8 @@ namespace modm
 		return rhs * lhs;
 	}
 
-	typedef Vector<float, 1> 	Vector1f;
-	typedef Vector<int16_t, 1> 	Vector1i;
+	using Vector1f = Vector<float, 1>;
+	using Vector1i = Vector<int16_t, 1>;
 }
 
 #include "vector1_impl.hpp"

@@ -90,8 +90,8 @@ private:
 	update();
 
 private:
-	typedef std::mutex				Mutex;
-	typedef std::lock_guard<Mutex>	MutexGuard;
+	using Mutex = std::mutex;
+	using MutexGuard = std::lock_guard<Mutex>;
 
 	Mutex stateLock;
 	Mutex readBufferLock;

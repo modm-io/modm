@@ -81,7 +81,7 @@ public:
 		B6 = Bit14,
 		B7 = Bit15
 	};
-	typedef modm::Flags16<Pin> Pins;
+	using Pins = modm::Flags16<Pin>;
 	MODM_INT_TYPE_FLAGS(Pins);
 }; // struct mcp23x17
 

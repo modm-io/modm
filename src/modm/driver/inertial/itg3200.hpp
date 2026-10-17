@@ -83,7 +83,7 @@ public:
 protected:
 	/// @cond
 	MODM_FLAGS8(Filter);
-	typedef Configuration< Filter_t, LowPassFilter, (Bit2 | Bit1 | Bit0) > LowPassFilter_t;
+	using LowPassFilter_t = Configuration< Filter_t, LowPassFilter, (Bit2 | Bit1 | Bit0) >;
 	/// @endcond
 
 public:
@@ -137,7 +137,7 @@ public:
 		PllExternal32kHz = int(Power::CLK_SEL2),	///< PLL with external 32.768kHz reference
 		PllExternal19MHz = int(Power::CLK_SEL2) | int(Power::CLK_SEL0),	///< PLL with external 19.2MHz reference
 	};
-	typedef Configuration< Power_t, ClockSource, (Bit2 | Bit1 | Bit0) > ClockSource_t;
+	using ClockSource_t = Configuration< Power_t, ClockSource, (Bit2 | Bit1 | Bit0) >;
 
 public:
 	struct modm_packed

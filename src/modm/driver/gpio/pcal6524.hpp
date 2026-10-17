@@ -45,7 +45,7 @@ struct pcal6524
 		P2_0 = Bit16, P2_1 = Bit17, P2_2 = Bit18, P2_3 = Bit19,
 		P2_4 = Bit20, P2_5 = Bit21, P2_6 = Bit22, P2_7 = Bit23,
 	};
-	typedef modm::Flags32<Pin> Pins;
+	using Pins = modm::Flags32<Pin>;
 	MODM_INT_TYPE_FLAGS(Pins);
 
 protected:

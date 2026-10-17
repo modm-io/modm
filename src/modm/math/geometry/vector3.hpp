@@ -208,11 +208,11 @@ namespace modm
 	}
 
 
-	typedef Vector<float, 3> 	Vector3f;
-	typedef Vector<int16_t, 3>	Vector3i;
-	typedef Vector<uint16_t, 3>	Vector3u;
-	typedef Vector<int32_t, 3>	Vector3li;
-	typedef Vector<uint32_t, 3>	Vector3lu;
+	using Vector3f = Vector<float, 3>;
+	using Vector3i = Vector<int16_t, 3>;
+	using Vector3u = Vector<uint16_t, 3>;
+	using Vector3li = Vector<int32_t, 3>;
+	using Vector3lu = Vector<uint32_t, 3>;
 }
 
 #include "vector3_impl.hpp"

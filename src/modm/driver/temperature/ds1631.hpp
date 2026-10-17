@@ -92,11 +92,11 @@ public:
 	};
 protected:
 	/// @cond
-	typedef Configuration< Config_t, Resolution, (Bit1 | Bit0), 2 > Resolution_t;
+	using Resolution_t = Configuration< Config_t, Resolution, (Bit1 | Bit0), 2 >;
 	/// @endcond
 
 public:
-	typedef lm75::Data Data;
+	using Data = lm75::Data;
 };
 
 /**

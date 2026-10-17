@@ -55,10 +55,10 @@ namespace modm
 	template<typename T, unsigned int ScaleFactor = 1>
 	class Pid
 	{
-		typedef modm::WideType<T> WideType;
+		using WideType = modm::WideType<T>;
 
 	public:
-		typedef T ValueType;
+		using ValueType = T;
 
 		/**
 		 * \brief	Parameter for a PID calculation

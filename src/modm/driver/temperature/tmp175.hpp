@@ -55,7 +55,7 @@ public:
 	};
 protected:
 	/// @cond
-	typedef Configuration< Config1_t, Resolution, (Bit1 | Bit0), 5 > Resolution_t;
+	using Resolution_t = Configuration< Config1_t, Resolution, (Bit1 | Bit0), 5 >;
 	/// @endcond
 };
 

@@ -38,8 +38,8 @@ namespace modm
 	class LineSegment2D
 	{
 	public:
-		typedef typename GeometricTraits<T>::WideType WideType;
-		typedef typename GeometricTraits<T>::FloatType FloatType;
+		using WideType = typename GeometricTraits<T>::WideType;
+		using FloatType = typename GeometricTraits<T>::FloatType;
 
 	public:
 		LineSegment2D();

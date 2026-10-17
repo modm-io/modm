@@ -236,7 +236,7 @@ public:
 		RangingAlgoOverflow = 0xD,
 		RangeIgnoreThreshold = 0xE,
 	};
-	typedef modm::Configuration<RangeStatus_t, RangeErrorCode, 0x0F, 3> RangeErrorCode_t;
+	using RangeErrorCode_t = modm::Configuration<RangeStatus_t, RangeErrorCode, 0x0F, 3>;
 
 	/// MSRC__CONFIG_CONTROL
 	/// MSRC = "minimum signal rate check"

@@ -107,12 +107,12 @@ private:
 	};
 
 	/// packetIdentifier -> callback
-	typedef std::multimap<uint8_t, EventListener> EventMap;
+	using EventMap = std::multimap<uint8_t, EventListener>;
 
 	/// packetIdentifier -> callback
-	typedef std::map<uint8_t, ActionHandler > CallbackMap;
+	using CallbackMap = std::map<uint8_t, ActionHandler >;
 	///< destination -> callbackMap
-	typedef std::map<uint8_t, CallbackMap > ActionMap;
+	using ActionMap = std::map<uint8_t, CallbackMap >;
 
 private:
 	EventMap eventMap;
