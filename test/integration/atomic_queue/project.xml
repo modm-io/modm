@@ -1,0 +1,16 @@
+<library>
+  <!-- <extends>modm:mega-2560-pro</extends> -->
+  <!-- <extends>modm:nucleo-f072rb</extends> -->
+  <!-- <extends>modm:nucleo-f411re</extends> -->
+  <!-- <extends>modm:nucleo-h563zi</extends> -->
+  <options>
+    <!-- LTO inlines more aggressively, which makes missing barriers visible -->
+    <option name="modm:build:lto">yes</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:architecture:atomic</module>
+    <!-- Required for modm:nucleo-f072rb, modm:nucleo-f411re, modm:nucleo-h563zi -->
+    <!-- <module>modm:platform:timer:2</module> -->
+  </modules>
+</library>
