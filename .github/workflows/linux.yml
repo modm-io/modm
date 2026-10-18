@@ -187,10 +187,10 @@ jobs:
         if: always()
         run: |
           (cd test && make compile-arduino-uno)
-          # D, G, and I overflow FLASH
+          # B, C, D, G, and I overflow FLASH, the MEGA-2560-PRO tests cover them
           (cd test && make \
-              compile-arduino-nano_A compile-arduino-nano_B compile-arduino-nano_C \
-              compile-arduino-nano_E compile-arduino-nano_F compile-arduino-nano_H)
+              compile-arduino-nano_A compile-arduino-nano_E \
+              compile-arduino-nano_F compile-arduino-nano_H)
       - name: Compile AVR Unittests ATmega
         if: always()
         run: |
