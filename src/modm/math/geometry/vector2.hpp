@@ -18,6 +18,7 @@
 #include <cmath>
 #include <stdint.h>
 #include <modm/io/iostream.hpp>
+#include <modm/math/utils/operator.hpp>
 
 #include "geometric_traits.hpp"
 #include "angle.hpp"
@@ -341,17 +342,13 @@ namespace modm
 	// ------------------------------------------------------------------------
 	// Declaration of specialized methods
 	// ------------------------------------------------------------------------
+	/// Uses the fast integer square root
 	template<>
-	int16_t
-	Vector<int16_t, 2>::getLength() const;
-
-	template<>
-	int32_t
-	Vector<int16_t, 2>::getLengthSquared() const;
-
-	template<>
-	int32_t
-	Vector<int16_t, 2>::dot(const modm::Vector<int16_t, 2>& other) const;
+	constexpr int16_t
+	Vector<int16_t, 2>::getLength() const
+	{
+		return math::sqrt(getLengthSquared());
+	}
 
 
 	template<> template<>
