@@ -14,6 +14,11 @@
 def init(module):
     module.name = ":platform:can"
 
+def validate_buffer(size):
+    # The atomic::Queue must be able to store more than three elements
+    if 0 < size < 4:
+        raise ValueError("Input must be 0 to disable the buffer or larger than 3!")
+
 def prepare(module, options):
     if not options[":target"].has_driver("can:lpc"):
         return False
@@ -24,14 +29,16 @@ def prepare(module, options):
             description="Set to a value > 0 to enable software buffering of CAN messages.",
             minimum=0,
             maximum=256,	# FIXME
-            default=16))
+            default=16,
+            validate=validate_buffer))
     module.add_option(
         NumericOption(
             name="buffer.rx",
             description="Set to a value > 0 to enable software buffering of CAN messages.",
             minimum=0,
             maximum=256,	# FIXME
-            default=16))
+            default=16,
+            validate=validate_buffer))
 
     module.depends(":platform:core", ":debug", ":platform:clock.generic")
     return True

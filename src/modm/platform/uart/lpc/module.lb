@@ -20,6 +20,12 @@ def get_properties(env):
     return properties
 
 
+def validate_buffer(size):
+    # The atomic::Queue only stores the bytes exceeding the 16 byte hardware
+    # FIFO and must be able to store more than three elements
+    if 16 < size < 20:
+        raise ValueError("Input must be at most 16 or larger than 19!")
+
 class Instance(Module):
     def __init__(self, instance):
         self.instance = instance
@@ -36,13 +42,15 @@ class Instance(Module):
                 name="buffer.tx",
                 description="",
                 minimum=1, maximum="64Ki-2",
-                default=250))
+                default=250,
+                validate=validate_buffer))
         module.add_option(
             NumericOption(
                 name="buffer.rx",
                 description="",
                 minimum=1, maximum="64Ki-2",
-                default=16))
+                default=16,
+                validate=validate_buffer))
 
         return True
 

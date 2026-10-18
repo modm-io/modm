@@ -14,6 +14,11 @@ def init(module):
     module.name = ":platform:itm"
     module.description = FileReader("module.md")
 
+def validate_buffer(size):
+    # The atomic::Queue must be able to store more than three elements
+    if 0 < size < 4:
+        raise ValueError("Input must be 0 to disable the buffer or larger than 3!")
+
 def prepare(module, options):
     device = options[":target"]
     if not device.has_driver("core:cortex-m*"):
@@ -28,7 +33,8 @@ def prepare(module, options):
 
     module.add_option(
         NumericOption(name="buffer.tx", description=descr_buffer_tx,
-            minimum=0, maximum="64Ki-2", default=0))
+            minimum=0, maximum="64Ki-2", default=0,
+            validate=validate_buffer))
 
     return True
 

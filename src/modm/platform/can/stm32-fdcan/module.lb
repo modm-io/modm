@@ -34,19 +34,26 @@ message_ram_option_legacy_values = {
     "message_ram.tx_fifo_elements": 3,
 }
 
+def validate_buffer(size):
+    # The atomic::Queue must be able to store more than three elements
+    if 0 < size < 4:
+        raise ValueError("Input must be 0 to disable the buffer or larger than 3!")
+
 def load_options(module, options):
     module.add_option(
         NumericOption(
             name="buffer.tx",
             description="",
             minimum=0, maximum="64Ki-2",
-            default=32))
+            default=32,
+            validate=validate_buffer))
     module.add_option(
         NumericOption(
             name="buffer.rx",
             description="",
             minimum=0, maximum="64Ki-2",
-            default=32))
+            default=32,
+            validate=validate_buffer))
 
     module.add_option(
         EnumerationOption(
