@@ -14,7 +14,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/driver/atomic/queue.hpp>
+#include <modm/architecture/interface/atomic_queue.hpp>
 #include <modm/utils.hpp>
 #include <modm/architecture/interface/assert.hpp>
 #include <modm/architecture/interface/interrupt.hpp>

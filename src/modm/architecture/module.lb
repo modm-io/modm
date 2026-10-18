@@ -75,7 +75,7 @@ logging output, however, it may increase binary size considerably!
 class Atomic(Module):
     def init(self, module):
         module.name = "atomic"
-        module.description = "Atomic Operations and Containers"
+        module.description = "Atomic Locks and Queue"
 
     def prepare(self, module, options):
         return True
@@ -83,8 +83,7 @@ class Atomic(Module):
     def build(self, env):
         env.outbasepath = "modm/src/modm/architecture"
         env.copy("interface/atomic_lock.hpp")
-        env.copy("driver/atomic")
-        env.copy("driver/atomic.hpp")
+        env.copy("interface/atomic_queue.hpp")
 # -----------------------------------------------------------------------------
 
 class BlockDevice(Module):

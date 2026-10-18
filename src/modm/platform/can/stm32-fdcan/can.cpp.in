@@ -16,7 +16,7 @@
 #include <cstring>
 #include <optional>
 
-#include <modm/architecture/driver/atomic/queue.hpp>
+#include <modm/architecture/interface/atomic_queue.hpp>
 #include <modm/platform/clock/rcc.hpp>
 #include <modm/architecture/interface/delay.hpp>
 #include <modm/architecture/interface/assert.hpp>

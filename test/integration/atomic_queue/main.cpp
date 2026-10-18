@@ -17,7 +17,7 @@
 // atomic on AVR.
 
 #include <modm/board.hpp>
-#include <modm/architecture/driver/atomic/queue.hpp>
+#include <modm/architecture/interface/atomic_queue.hpp>
 #include <atomic>
 
 #include "../integration_test.hpp"

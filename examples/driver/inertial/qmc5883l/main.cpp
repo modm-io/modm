@@ -9,7 +9,7 @@
  */
 // ----------------------------------------------------------------------------
 
-#include <modm/architecture/driver/atomic/flag.hpp>
+#include <atomic>
 #include <modm/board.hpp>
 #include <modm/debug/logger.hpp>
 #include <modm/driver/inertial/qmc5883l.hpp>
@@ -20,11 +20,11 @@ using namespace std::chrono_literals;
 using Compass = modm::Qmc5883l<I2cMaster>;
 Compass::Data data;
 Compass compass(data);
-modm::atomic::Flag dataReady(true);
+std::atomic<bool> dataReady{true};
 
 MODM_ISR(INT2)
 {
-	dataReady.set();
+	dataReady = true;
 }
 
 int
@@ -44,7 +44,7 @@ main()
 
 	for (;;)
 	{
-		if (dataReady.testAndSet(false))
+		if (dataReady.exchange(false))
 		{
 			if (compass.readData())
 			{

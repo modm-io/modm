@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include <modm/architecture/driver/atomic/queue.hpp>
+#include <modm/architecture/interface/atomic_queue.hpp>
 #include <modm/architecture/interface/uart.hpp>
 #include "uart_base.hpp"
 

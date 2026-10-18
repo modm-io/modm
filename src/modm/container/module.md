@@ -39,19 +39,10 @@ Other:
 - `modm::SmartPointer`
 - `modm::Pair`
 
-Two special containers hiding in the `modm:architecture:atomic` module:
-
-- `modm::atomic::Queue`
-- `modm::atomic::Container`
-
-The first is a simple, interrupt-safe queue (but only for the AVRs).
-Whenever you need to exchange data between a interrupt routine and the normal
-program consider using this queue.
-
-The atomic container wraps objects and provides atomic access to
-them. This comes in handy when simple objects are accessed by an interrupt
-and the main program. The container provides secure access without much work
-in this case.
+The `modm:architecture:atomic` module also provides `modm::atomic::Queue`, a
+lock-free single-producer single-consumer queue for exchanging data between an
+interrupt and the main program. Use `std::atomic` to access single objects from
+both.
 
 ## Generic Interface
 

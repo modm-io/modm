@@ -13,7 +13,7 @@
 // ----------------------------------------------------------------------------
 
 #include "i2c_master_{{ id }}.hpp"
-#include <modm/architecture/driver/atomic/queue.hpp>
+#include <modm/architecture/interface/atomic_queue.hpp>
 #include <modm/architecture/interface/atomic_lock.hpp>
 #include <modm/architecture/interface/interrupt.hpp>
 #include <modm/container.hpp>
