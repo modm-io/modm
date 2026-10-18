@@ -126,9 +126,81 @@ import platform
 import subprocess
 
 from pathlib import Path
-from git import Repo
+from datetime import datetime, timezone, timedelta
+try:
+    import pygit2
+except ImportError:
+    # Fallback for environments without pygit2
+    pygit2 = None
+    from git import Repo
 
 TEMPLATE_SOURCE = Path(__file__).parent / "info.c.in"
+
+
+def _git_info_pygit2(info, directory, with_status):
+    repo = pygit2.Repository(pygit2.discover_repository(directory))
+    def date(signature):
+        return datetime.fromtimestamp(signature.time, timezone(timedelta(minutes=signature.offset)))
+    # Last Commit Values
+    commit = repo[repo.head.target]
+    info["MODM_GIT_SHA"]                      = str(commit.id)
+    info["MODM_GIT_SHA_ABBR"]                 = str(commit.id)[:10]
+    info["MODM_GIT_AUTHOR"]                   = str(commit.author.name)
+    info["MODM_GIT_AUTHOR_EMAIL"]             = str(commit.author.email)
+    info["MODM_GIT_AUTHOR_DATE"]              = str(date(commit.author))
+    info["MODM_GIT_AUTHOR_DATE_TIMESTAMP"]    = commit.author.time
+    info["MODM_GIT_COMMITTER"]                = str(commit.committer.name)
+    info["MODM_GIT_COMMITTER_EMAIL"]          = str(commit.committer.email)
+    info["MODM_GIT_COMMITTER_DATE"]           = str(date(commit.committer))
+    info["MODM_GIT_COMMITTER_DATE_TIMESTAMP"] = commit.committer.time
+    info["MODM_GIT_SUBJECT"]                  = commit.message.strip().split("\n")[0]
+    # Git Config
+    config = repo.config
+    info["MODM_GIT_CONFIG_USER_NAME"]  = config["user.name"] if "user.name" in config else "Unknown"
+    info["MODM_GIT_CONFIG_USER_EMAIL"] = config["user.email"] if "user.email" in config else "Unknown"
+    if with_status:
+        # File status of the working tree relative to the index
+        changes = [delta.status_char() for delta in repo.diff().deltas]
+        info["MODM_GIT_MODIFIED"]  = len(changes)
+        info["MODM_GIT_ADDED"]     = changes.count("A")
+        info["MODM_GIT_DELETED"]   = changes.count("D")
+        info["MODM_GIT_RENAMED"]   = changes.count("R")
+        info["MODM_GIT_COPIED"]    = changes.count("C")
+        info["MODM_GIT_UNTRACKED"] = sum(1 for flags in repo.status().values()
+                                         if flags & pygit2.enums.FileStatus.WT_NEW)
+
+
+def _git_info_gitpython(info, directory, with_status):
+    repo = Repo(directory, search_parent_directories=True)
+    # Last Commit Values
+    commit = repo.commit()
+    info["MODM_GIT_SHA"]                      = str(commit.hexsha)
+    info["MODM_GIT_SHA_ABBR"]                 = str(commit.hexsha[:10])
+    info["MODM_GIT_AUTHOR"]                   = str(commit.author.name)
+    info["MODM_GIT_AUTHOR_EMAIL"]             = str(commit.author.email)
+    info["MODM_GIT_AUTHOR_DATE"]              = str(commit.authored_datetime)
+    info["MODM_GIT_AUTHOR_DATE_TIMESTAMP"]    = commit.authored_date
+    info["MODM_GIT_COMMITTER"]                = str(commit.committer.name)
+    info["MODM_GIT_COMMITTER_EMAIL"]          = str(commit.committer.email)
+    info["MODM_GIT_COMMITTER_DATE"]           = str(commit.committed_datetime)
+    info["MODM_GIT_COMMITTER_DATE_TIMESTAMP"] = commit.committed_date
+    info["MODM_GIT_SUBJECT"]                  = str(commit.summary)
+    # Git Config
+    config = repo.config_reader()
+    info["MODM_GIT_CONFIG_USER_NAME"]  = str(config.get_value("user", "name", "Unknown"))
+    info["MODM_GIT_CONFIG_USER_EMAIL"] = str(config.get_value("user", "email", "Unknown"))
+    if with_status:
+        # File status
+        diff = repo.index.diff(None)
+        def default(change_type):
+            try: return len(list(diff.iter_change_type(change_type)));
+            except: return -1;
+        info["MODM_GIT_MODIFIED"]  = len(diff)
+        info["MODM_GIT_ADDED"]     = default("A")
+        info["MODM_GIT_DELETED"]   = default("D")
+        info["MODM_GIT_RENAMED"]   = default("R")
+        info["MODM_GIT_COPIED"]    = default("C")
+        info["MODM_GIT_UNTRACKED"] = len(repo.untracked_files)
 
 
 def git_info(directory, with_status=False):
@@ -157,36 +229,10 @@ def git_info(directory, with_status=False):
             "MODM_GIT_UNTRACKED": -1,
         })
     try:
-        repo = Repo(directory, search_parent_directories=True)
-        # Last Commit Values
-        commit = repo.commit()
-        info["MODM_GIT_SHA"]                      = str(commit.hexsha)
-        info["MODM_GIT_SHA_ABBR"]                 = str(commit.hexsha[:10])
-        info["MODM_GIT_AUTHOR"]                   = str(commit.author.name)
-        info["MODM_GIT_AUTHOR_EMAIL"]             = str(commit.author.email)
-        info["MODM_GIT_AUTHOR_DATE"]              = str(commit.authored_datetime)
-        info["MODM_GIT_AUTHOR_DATE_TIMESTAMP"]    = commit.authored_date
-        info["MODM_GIT_COMMITTER"]                = str(commit.committer.name)
-        info["MODM_GIT_COMMITTER_EMAIL"]          = str(commit.committer.email)
-        info["MODM_GIT_COMMITTER_DATE"]           = str(commit.committed_datetime)
-        info["MODM_GIT_COMMITTER_DATE_TIMESTAMP"] = commit.committed_date
-        info["MODM_GIT_SUBJECT"]                  = str(commit.summary)
-        # Git Config
-        config = repo.config_reader()
-        info["MODM_GIT_CONFIG_USER_NAME"]  = str(config.get_value("user", "name", "Unknown"))
-        info["MODM_GIT_CONFIG_USER_EMAIL"] = str(config.get_value("user", "email", "Unknown"))
-        if with_status:
-            # File status
-            diff = repo.index.diff(None)
-            def default(change_type):
-                try: return len(list(diff.iter_change_type(change_type)));
-                except: return -1;
-            info["MODM_GIT_MODIFIED"]  = len(diff)
-            info["MODM_GIT_ADDED"]     = default("A")
-            info["MODM_GIT_DELETED"]   = default("D")
-            info["MODM_GIT_RENAMED"]   = default("R")
-            info["MODM_GIT_COPIED"]    = default("C")
-            info["MODM_GIT_UNTRACKED"] = len(repo.untracked_files)
+        if pygit2 is not None:
+            _git_info_pygit2(info, directory, with_status)
+        else:
+            _git_info_gitpython(info, directory, with_status)
     except:
         pass
 

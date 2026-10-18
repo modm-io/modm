@@ -19,8 +19,13 @@ import hashlib
 import platform
 
 from pathlib import Path
-from git import Repo
 from os.path import normpath
+try:
+    import pygit2
+except ImportError:
+    # Fallback for environments without pygit2
+    pygit2 = None
+    from git import Repo
 
 def StrictVersion(v):
     return tuple(map(int, (v.split("."))))
@@ -35,15 +40,27 @@ if StrictVersion(getattr(lbuild, "__version__", "0.1.0")) < StrictVersion(min_lb
 
 # Check for submodule existance and their version
 def check_submodules():
-    repo = Repo(localpath("."))
-    has_error = True
-    if any(not sm.module_exists() for sm in repo.submodules):
+    if pygit2 is not None:
+        repo = pygit2.Repository(localpath("."))
+        def open_submodule(submodule):
+            try: return submodule.open()
+            except Exception: return None
+        submodules = {sm: open_submodule(sm) for sm in repo.submodules}
+        missing = any(subrepo is None for subrepo in submodules.values())
+        outdated = not missing and any(sm.head_id != subrepo.head.target
+                                       for sm, subrepo in submodules.items())
+    else:
+        repo = Repo(localpath("."))
+        missing = any(not sm.module_exists() for sm in repo.submodules)
+        outdated = not missing and any(sm.hexsha != sm.module().commit().hexsha
+                                       for sm in repo.submodules)
+    if missing:
         print("\n>> modm: One or more git submodules in `modm/ext/` is missing!\n"
               ">> modm: Please checkout the submodules:\n\n"
               "    cd modm\n"
               "    git submodule update --init\n")
         exit(1)
-    elif any(sm.hexsha != sm.module().commit().hexsha for sm in repo.submodules):
+    elif outdated:
         print("\n>> modm: One or more git submodules in `modm/ext/` is not up-to-date!\n"
               ">> modm: Please update the submodules:\n\n"
               "    cd modm\n"
