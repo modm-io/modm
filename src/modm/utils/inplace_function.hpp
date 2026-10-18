@@ -150,8 +150,8 @@ public:
     using capacity = std::integral_constant<size_t, Capacity>;
     using alignment = std::integral_constant<size_t, Alignment>;
 
-    inplace_function() noexcept :
-        vtable_ptr_{std::addressof(inplace_function_detail::empty_vtable<R, Args...>)}
+    constexpr inplace_function() noexcept :
+        vtable_ptr_{std::addressof(inplace_function_detail::empty_vtable<R, Args...>)}, storage_{}
     {}
 
     template<
@@ -202,8 +202,8 @@ public:
         other.vtable_ptr_ = std::addressof(inplace_function_detail::empty_vtable<R, Args...>);
     }
 
-    inplace_function(std::nullptr_t) noexcept :
-        vtable_ptr_{std::addressof(inplace_function_detail::empty_vtable<R, Args...>)}
+    constexpr inplace_function(std::nullptr_t) noexcept :
+        vtable_ptr_{std::addressof(inplace_function_detail::empty_vtable<R, Args...>)}, storage_{}
     {}
 
     inplace_function(const inplace_function& other) :
