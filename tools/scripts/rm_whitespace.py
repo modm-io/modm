@@ -31,6 +31,7 @@ ignored = [
 	"*.dot",
 	"*.pbm",
 	"*.font",
+	"*.patch",
 	"ext/arm/cmsis/CMSIS",
 	"ext/dlr/scons-build-tools",
 	"ext/fatfs*",
