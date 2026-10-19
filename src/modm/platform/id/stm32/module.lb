@@ -15,7 +15,11 @@ def init(module):
     module.description = "Unique ID"
 
 def prepare(module, options):
-    return options[":target"].identifier.platform == "stm32"
+    target = options[":target"].identifier
+    # The STM32F030 and STM32F070 do not have a unique ID (see RM0360)
+    if target.family == "f0" and target.name in ["30", "70"]:
+        return False
+    return target.platform == "stm32"
 
 def build(env):
     env.outbasepath = "modm/src/modm/platform/id"
