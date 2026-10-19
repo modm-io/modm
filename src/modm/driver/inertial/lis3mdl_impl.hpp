@@ -74,7 +74,7 @@ template < class I2cMaster >
 bool
 modm::Lis3mdl<I2cMaster>::readMagnetometerRaw(Vector3i& data)
 {
-	success = this->read(static_cast<uint8_t>(Register::OUT_X_L),reinterpret_cast<uint8_t*>(readBuffer),6);
+	success = this->read(static_cast<uint8_t>(Register::OUT_X_L) | Lis3TransportI2c<I2cMaster>::AddressIncrement,reinterpret_cast<uint8_t*>(readBuffer),6);
 	if(success)
 	{
 		data.x = readBuffer[0];
@@ -89,7 +89,7 @@ template < class I2cMaster >
 bool
 modm::Lis3mdl<I2cMaster>::readMagnetometer(Vector3f& data)
 {
-	success = this->read(static_cast<uint8_t>(Register::OUT_X_L),reinterpret_cast<uint8_t*>(readBuffer),6);
+	success = this->read(static_cast<uint8_t>(Register::OUT_X_L) | Lis3TransportI2c<I2cMaster>::AddressIncrement,reinterpret_cast<uint8_t*>(readBuffer),6);
 
 	if(success)
 	{
