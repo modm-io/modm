@@ -194,6 +194,19 @@ PeriodicTimerTest::testTimer()
 
 	TEST_ASSERT_EQUALS(timerShort.remaining(), 5ms);
 	TEST_ASSERT_EQUALS(timer.remaining(), 5ms);
+
+	// a long pause must skip all missed periods at once
+	test_clock::setTime(20163);
+	TEST_ASSERT_EQUALS(timerShort.execute(), 2000u);
+	TEST_ASSERT_EQUALS(timer.execute(), 2000u);
+	TEST_ASSERT_EQUALS(timerShort.remaining(), 7ms);
+	TEST_ASSERT_EQUALS(timer.remaining(), 7ms);
+
+	test_clock::setTime(20660);
+	TEST_ASSERT_EQUALS(timerShort.execute(), 49u);
+	TEST_ASSERT_EQUALS(timer.execute(), 49u);
+	TEST_ASSERT_EQUALS(timerShort.remaining(), 10ms);
+	TEST_ASSERT_EQUALS(timer.remaining(), 10ms);
 }
 
 void

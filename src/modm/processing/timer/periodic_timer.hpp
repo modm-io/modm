@@ -56,12 +56,15 @@ public:
 			if (this->_interval.count())
 			{
 				const auto now = this->now();
-				while(1)
+				this->_start += this->_interval;
+				const auto diff{now - this->_start};
+				count = 1;
+				// Skip all missed periods at once with a slow division only if necessary
+				if (diff >= this->_interval)
 				{
-					this->_start += this->_interval;
-					const auto diff{now - this->_start};
-					if (diff != this->_interval) count++;
-					if (diff < this->_interval) break;
+					const auto skipped{diff / this->_interval};
+					this->_start += skipped * this->_interval;
+					count = skipped + ((diff % this->_interval).count() ? 1 : 0);
 				}
 			}
 			else {
