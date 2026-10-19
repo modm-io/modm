@@ -925,7 +925,9 @@ We have out-of-box support for many development boards including documentation.
 </tr><tr>
 <td align="center"><a href="https://modm.io/reference/config/modm-weact-h523ce">WEACT-H523CE</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-weact-h562rg">WEACT-H562RG</a></td>
+<td align="center"><a href="https://modm.io/reference/config/modm-weact-h7r3z8">WEACT-H7R3Z8</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-weact-u585ci">WEACT-U585CI</a></td>
+</tr><tr>
 </tr>
 </table>
 <!--/bsptable-->

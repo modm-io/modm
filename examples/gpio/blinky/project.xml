@@ -82,6 +82,7 @@
   <!-- <extends>modm:weact-h503cb</extends> -->
   <!-- <extends>modm:weact-h523ce</extends> -->
   <!-- <extends>modm:weact-h562rg</extends> -->
+  <!-- <extends>modm:weact-h7r3z8</extends> -->
   <!-- <extends>modm:weact-u585ci</extends> -->
   <options>
     <!-- Required for modm:black-pill-f103, modm:blue-pill-f103, modm:stm32f030_demo,
@@ -99,7 +100,7 @@
     <module>modm:build:scons</module>
   </modules>
   <collectors>
-    <!-- Required for modm:weact-g0b1cb, modm:weact-u585ci -->
+    <!-- Required for modm:weact-g0b1cb, modm:weact-h7r3z8, modm:weact-u585ci -->
     <!-- <collect name="modm:build:openocd.source">interface/stlink.cfg</collect> -->
     <!-- Required for modm:weact-h503cb, modm:weact-h523ce, modm:weact-h562rg -->
     <!-- <collect name="modm:build:openocd.source">interface/stlink-dap.cfg</collect> -->

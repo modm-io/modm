@@ -1,0 +1,98 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2026, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":board:weact-h7r3z8"
+    module.description = """
+# WeAct Studio STM32H7R3Z8 Core Board
+
+[Documentation](https://github.com/WeActStudio/WeActStudio.STM32H7R3Zx_CoreBoard)
+
+Board with an STM32H7R3Z8J6 with 64 kB internal flash, 8 MB external XSPI
+flash, a 24 MHz HSE and 32.768 kHz LSE crystal, one LED and one user button.
+It has two USB-C ports: USB HS with the internal HS PHY (PM5/PM6) and USB FS
+(PM12/PM11).
+
+The core is clocked at 600 MHz, the bus matrix at 300 MHz.
+The power supply is configured as direct SMPS.
+
+
+## Programming
+
+Since the board has no programmer on the board, you can use DFU (Device
+Firmware Update via USB) to program the board. A DFU command is integrated into
+the `modm:build:scons` tool:
+
+```
+scons program-dfu
+```
+
+Note that the DFU bootloader is only available on the USB FS port (PM12/PM11).
+
+
+## Logging
+
+To log via RTT attach a debugger to the SWD port and select the RTT option:
+
+```xml
+<option name="modm:board:weact-h7r3z8:logger">RTT</option>
+```
+
+Then log using:
+
+```sh
+scons log-rtt
+```
+
+
+## USB
+
+Use `Board::initializeUsbFs()` or `Board::initializeUsbHs()` and select the
+TinyUSB port with `modm:tinyusb:device:port`. `Board::initializeUsb()`
+initializes both ports.
+"""
+
+def prepare(module, options):
+    if not options[":target"].partname.startswith("stm32h7r3z8j"):
+        return False
+
+    module.depends(
+        ":debug",
+        ":architecture:clock",
+        ":platform:core",
+        ":platform:gpio",
+        ":platform:clock",
+        ":platform:usb:fs",
+        ":platform:usb:hs")
+
+    values = {"Disabled": None, "RTT": ":platform:rtt"}
+    module.add_option(
+            EnumerationOption(name="logger", description="Logging mechanism",
+                              enumeration=list(values.keys()), default="Disabled",
+                              dependencies=lambda v: values[v]))
+
+    return True
+
+
+def build(env):
+    env.outbasepath = "modm/src/modm/board"
+    env.substitutions = {
+        "with_logger": False if env["logger"] == "Disabled" else env["logger"],
+        "with_assert": env.has_module(":architecture:assert"),
+    }
+    env.template("../board.cpp.in", "board.cpp")
+    env.template("board.hpp.in")
+
+    env.outbasepath = "modm/openocd/modm/board/"
+    env.template(repopath("tools/openocd/modm/stm32_swd.cfg.in"), "board.cfg",
+                 substitutions={"target": "stm32h7rsx"})
+    env.collect(":build:openocd.source", "modm/board/board.cfg")
