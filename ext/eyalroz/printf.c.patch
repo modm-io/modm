@@ -1,0 +1,69 @@
+diff --git a/printf.c b/printf.c
+--- a/printf.c
++++ b/printf.c
+@@ -37,11 +37,6 @@
+  * THE SOFTWARE.
+  */
+ 
+-// Define this globally (e.g. gcc -DPRINTF_INCLUDE_CONFIG_H=1 ...) to include the
+-// printf_config.h header file
+-#if PRINTF_INCLUDE_CONFIG_H
+-#include "printf_config.h"
+-#endif
+ 
+ #include <printf/printf.h>
+ 
+@@ -329,6 +324,11 @@ static inline int get_exp2(floating_point_with_bit_access x)
+ // behavior with -LONG_MIN or -LLONG_MIN
+ #define ABS_FOR_PRINTING(_x) ((printf_unsigned_value_t) ( (_x) > 0 ? (_x) : -((printf_signed_value_t)_x) ))
+ 
++__attribute__((weak)) void putchar_(char c)
++{
++  (void) c;
++}
++
+ // wrapper (used as buffer) for output function type
+ //
+ // One of the following must hold:
+@@ -552,7 +552,7 @@ static void print_integer_finalization(output_gadget_t* output, char* buf, print
+ }
+ 
+ // An internal itoa-like function
+-static void print_integer(output_gadget_t* output, printf_unsigned_value_t value, bool negative, numeric_base_t base, printf_size_t precision, printf_size_t width, printf_flags_t flags)
++void print_integer(output_gadget_t* output, printf_unsigned_value_t value, bool negative, numeric_base_t base, printf_size_t precision, printf_size_t width, printf_flags_t flags)
+ {
+   char buf[PRINTF_INTEGER_BUFFER_SIZE];
+   printf_size_t len = 0U;
+@@ -654,11 +654,6 @@ struct scaling_factor {
+ };
+ 
+ static floating_point_t apply_scaling(floating_point_t num, struct scaling_factor normalization)
+-{
+-  return normalization.multiply ? num * normalization.raw_factor : num / normalization.raw_factor;
+-}
+-
+-static floating_point_t unapply_scaling(floating_point_t normalized, struct scaling_factor normalization)
+ {
+ #ifdef __GNUC__
+ // accounting for a static analysis bug in GCC 6.x and earlier
+@@ -669,6 +664,11 @@ static floating_point_t unapply_scaling(floating_point_t normalized, struct scal
+ #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+ #endif
+ #endif
++  return normalization.multiply ? num * normalization.raw_factor : num / normalization.raw_factor;
++}
++
++static floating_point_t unapply_scaling(floating_point_t normalized, struct scaling_factor normalization)
++{
+   return normalization.multiply ? normalized / normalization.raw_factor : normalized * normalization.raw_factor;
+ #ifdef __GNUC__
+ #pragma GCC diagnostic pop
+@@ -1019,7 +1019,7 @@ static void print_exponential_number(output_gadget_t* output, floating_point_t n
+ }
+ #endif  // PRINTF_SUPPORT_EXPONENTIAL_SPECIFIERS
+ 
+-static void print_floating_point(output_gadget_t* output, floating_point_t value, printf_size_t precision, printf_size_t width, printf_flags_t flags, bool prefer_exponential)
++void print_floating_point(output_gadget_t* output, floating_point_t value, printf_size_t precision, printf_size_t width, printf_flags_t flags, bool prefer_exponential)
+ {
+   char buf[PRINTF_DECIMAL_BUFFER_SIZE];
+   printf_size_t len = 0U;

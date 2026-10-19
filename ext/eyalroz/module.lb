@@ -25,8 +25,8 @@ def build(env):
     env.collect(":build:path.include", "modm/ext")
     env.outbasepath = "modm/ext/printf"
 
-    env.copy("printf/src/printf/printf.h", "printf.h")
-    files = env.copy("printf/src/printf/printf.c", "printf.c")
+    env.copy("printf/src/printf/printf.h", "printf.h", patch="printf.h.patch")
+    files = env.copy("printf/src/printf/printf.c", "printf.c", patch="printf.c.patch")
     env.collect(":build:ccflags", "-Wno-overflow", operations=files)
 
     env.substitutions = {
