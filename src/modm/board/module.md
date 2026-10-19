@@ -170,8 +170,9 @@ allowed clock speeds (*).
 (*) exceptions: E.g. USB usually requires exactly 48 MHz.
 
 This settings are reflected in the constants `static constexpr uint32_t Frequency`,
-`Apb1` and `Apb2` as well as in `const Rcc::PllFactors pllFactors{...}` and the
-following lines. The `PllFactors` struct should be fairly self-explanatory.
+`Apb1` and `Apb2` as well as in `static constexpr Rcc::PllConfig pll{...}` and
+the `SystemClock::enable()` function. The `PllConfig` struct should be fairly
+self-explanatory.
 
 
 ### 2. Peripheral Mapping
