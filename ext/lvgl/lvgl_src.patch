@@ -1,0 +1,24 @@
+diff --git a/lvgl/src/core/lv_obj_draw.c b/lvgl/src/core/lv_obj_draw.c
+--- a/lvgl/src/core/lv_obj_draw.c
++++ b/lvgl/src/core/lv_obj_draw.c
+@@ -546,6 +546,7 @@ static void drop_shadow_init(const lv_obj_t * obj, lv_part_t part, lv_draw_dsc_b
+ 
+ static void set_ext_draw_size_event_cb(lv_event_t * e)
+ {
+-    int32_t size = (int32_t)(lv_uintptr_t)lv_event_get_user_data(e);
++    void * user_data = lv_event_get_user_data(e);
++    int32_t size = (int32_t)(lv_uintptr_t)user_data;
+     lv_event_set_ext_draw_size(e, size);
+ }
+diff --git a/lvgl/src/misc/lv_text.c b/lvgl/src/misc/lv_text.c
+--- a/lvgl/src/misc/lv_text.c
++++ b/lvgl/src/misc/lv_text.c
+@@ -177,7 +177,7 @@ bool lv_text_is_cmd(lv_text_cmd_state_t * state, uint32_t c)
+             ret = true;
+         }
+         /*Other start char in parameter is escaped cmd. char*/
+-        else if(*state == LV_TEXT_CMD_STATE_WAIT) {
++        else if(*state == LV_TEXT_CMD_STATE_PAR) {
+             *state = LV_TEXT_CMD_STATE_WAIT;
+         }
+         /*Command end*/

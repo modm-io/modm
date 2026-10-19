@@ -89,6 +89,6 @@ def build(env):
     env.copy("lvgl/include")
     env.template("lv_conf.h.in")
     # The Helium assembly is for Cortex-M55 only and not preprocessed on Windows
-    files = env.copy("lvgl/src", ignore=env.ignore_files("*.S"))
+    env.copy("lvgl/src", ignore=env.ignore_files("*.S"), patch="lvgl_src.patch")
     env.substitutions = {"has_debug": env.has_module(":debug")}
     env.template("lv_modm_port.cpp.in")
