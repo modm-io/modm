@@ -18,6 +18,10 @@ This works as follows:
 5. After the application clears the report and reboots, the heap will once
    again be fully available.
 
+If the heaps are too small to hold the entire report, it is truncated: the last
+word is dropped to make room for the end marker, so that the report can still be
+read back.
+
 
 ## Restrictions on HardFault Entry
 
