@@ -33,32 +33,85 @@ using namespace modm::literals;
 /// internal Multispeed oscillator
 struct SystemClock
 {
-	static constexpr uint32_t Frequency = 110_MHz;
-	static constexpr uint32_t Ahb  = Frequency;
+	static constexpr uint32_t Lse = 32.768_kHz;
+	static constexpr Rcc::PllConfig pll
+	{
+		.M = 1,  //   4 MHz /  1 =   4 MHz
+		.N = 55, //   4 MHz * 55 = 220 MHz
+		.R = 2,  // 220 MHz /  2 = 110 MHz = F_cpu
+		.Q = 2,  // 220 MHz /  2 = 110 MHz
+	};
+	static constexpr uint32_t PllR = Rcc::MsiFrequency / pll.M * pll.N / pll.R;
+	static_assert(PllR == Rcc::MaxFrequency);
+
+	static constexpr uint32_t Frequency = PllR;
+	static constexpr uint32_t Ahb = Frequency;
+	static constexpr uint32_t Ahb1 = Ahb;
+	static constexpr uint32_t Ahb2 = Ahb;
+	static constexpr uint32_t Ahb3 = Ahb;
 	static constexpr uint32_t Apb1 = Frequency;
 	static constexpr uint32_t Apb2 = Frequency;
-	static constexpr uint32_t Apb1Timer = Apb1;
-	static constexpr uint32_t Apb2Timer = Apb2;
+	static constexpr uint32_t Clk48 = 48_MHz;
 
-	static constexpr uint32_t Can1 = Apb1;
+	static constexpr uint32_t Crc = Ahb1;
+	static constexpr uint32_t Dma1 = Ahb1;
+	static constexpr uint32_t Dma2 = Ahb1;
+	static constexpr uint32_t Dmamux1 = Ahb1;
+	static constexpr uint32_t Exti = Ahb1;
+	static constexpr uint32_t Flash = Ahb1;
+	static constexpr uint32_t Icache = Ahb1;
+	static constexpr uint32_t Tsc = Ahb1;
 
-	static constexpr uint32_t Comp1 = Apb2;
-	static constexpr uint32_t Comp2 = Apb2;
+	static constexpr uint32_t Adc1 = Ahb2;
+	static constexpr uint32_t Adc2 = Ahb2;
+	static constexpr uint32_t Adc12Common = Ahb2;
+	static constexpr uint32_t Hash = Ahb2;
+	static constexpr uint32_t Rng = Clk48;
+	static constexpr uint32_t Sdmmc1 = Clk48;
 
+	static constexpr uint32_t Fmc = Ahb3;
+	static constexpr uint32_t Octospi1 = Ahb3;
+
+	static constexpr uint32_t Crs = Apb1;
+	static constexpr uint32_t Dac = Apb1;
 	static constexpr uint32_t Dac1 = Apb1;
-
+	static constexpr uint32_t Fdcan1 = Apb1;
+	static constexpr uint32_t FdcanConfig = Apb1;
 	static constexpr uint32_t I2c1 = Apb1;
 	static constexpr uint32_t I2c2 = Apb1;
 	static constexpr uint32_t I2c3 = Apb1;
 	static constexpr uint32_t I2c4 = Apb1;
-
-	static constexpr uint32_t Sai1 = Apb2;
-	static constexpr uint32_t Sai2 = Apb2;
-
-	static constexpr uint32_t Spi1 = Apb2;
+	static constexpr uint32_t IwdgBus = Apb1;
+	static constexpr uint32_t Lptim1 = Apb1;
+	static constexpr uint32_t Lptim2 = Apb1;
+	static constexpr uint32_t Lptim3 = Apb1;
+	static constexpr uint32_t Lpuart1 = Apb1;
+	static constexpr uint32_t Opamp = Apb1;
+	static constexpr uint32_t Pwr = Apb1;
+	static constexpr uint32_t RtcBus = Apb1;
 	static constexpr uint32_t Spi2 = Apb1;
 	static constexpr uint32_t Spi3 = Apb1;
+	static constexpr uint32_t Tamp = Apb1;
+	static constexpr uint32_t Uart4 = Apb1;
+	static constexpr uint32_t Uart5 = Apb1;
+	static constexpr uint32_t Ucpd1 = Apb1;
+	static constexpr uint32_t Usart2 = Apb1;
+	static constexpr uint32_t Usart3 = Apb1;
+	static constexpr uint32_t Usb = Clk48;
+	static constexpr uint32_t Wwdg = Apb1;
 
+	static constexpr uint32_t Comp1 = Apb2;
+	static constexpr uint32_t Comp2 = Apb2;
+	static constexpr uint32_t Dfsdm1 = Apb2;
+	static constexpr uint32_t Sai1 = Apb2;
+	static constexpr uint32_t Sai2 = Apb2;
+	static constexpr uint32_t Spi1 = Apb2;
+	static constexpr uint32_t Syscfg = Apb2;
+	static constexpr uint32_t Usart1 = Apb2;
+	static constexpr uint32_t Vrefbuf = Apb2;
+
+	static constexpr uint32_t Apb1Timer = Apb1;
+	static constexpr uint32_t Apb2Timer = Apb2;
 	static constexpr uint32_t Timer1  = Apb2Timer;
 	static constexpr uint32_t Timer2  = Apb1Timer;
 	static constexpr uint32_t Timer3  = Apb1Timer;
@@ -71,46 +124,28 @@ struct SystemClock
 	static constexpr uint32_t Timer16 = Apb2Timer;
 	static constexpr uint32_t Timer17 = Apb2Timer;
 
-	static constexpr uint32_t Usart1  = Apb2;
-	static constexpr uint32_t Usart2  = Apb1;
-	static constexpr uint32_t Usart3  = Apb1;
-	static constexpr uint32_t Uart4   = Apb1;
-	static constexpr uint32_t Uart5   = Apb1;
-
-	static constexpr uint32_t Lpuart1 = Frequency; // Clock mux default: 0b00 -> PCLK
-
-	static constexpr uint32_t Usb = 48_MHz;
-	static constexpr uint32_t Rng = 48_MHz;
-	static constexpr uint32_t Sdmmc = 48_MHz;
 	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
-	static constexpr uint32_t Rtc = 32.768_kHz;
+	static constexpr uint32_t Rtc = Lse;
 
 	static bool inline
 	enable()
 	{
-		Rcc::enableLowSpeedExternalCrystal();
-		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::LowSpeedExternalCrystal);
+		Rcc::enableLseCrystal();
+		Rcc::enableHsi48Clock();
 
 		Rcc::setVoltageScaling(Rcc::VoltageScaling::Range0);
-		Rcc::enableMultiSpeedInternalClock(Rcc::MsiFrequency::MHz4);
-		const Rcc::PllFactors pllFactors{
-			.pllM = 1,		//   4MHz /  M=1  ->   4MHz
-			.pllN = 55,		//   4MHz *  N=55 -> 220MHz
-			.pllR = 2,		// 220MHz /  R=2  -> 110MHz = F_cpu
-			.pllQ = 2,		// 220MHz /  Q=2  -> 110MHz
-		};
-		Rcc::enablePll(Rcc::PllSource::Msi, pllFactors);
 		Rcc::setFlashLatency<Frequency>();
-		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
-		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
-		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div1);
-		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div1);
-		// update clock frequencies
 		Rcc::updateCoreFrequency<Frequency>();
 
-		Rcc::enableInternalClockMHz48();
-		// Select Hsi48 as source for CLK48 MUX (USB, SDMMC, RNG)
-		Rcc::setClock48Source(Rcc::Clock48Source::Hsi48);
+		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
+		Rcc::setApb1Prescaler(Rcc::ApbPrescaler::Div1);
+		Rcc::setApb2Prescaler(Rcc::ApbPrescaler::Div1);
+
+		Rcc::enablePll(Rcc::PllSource::Msi, pll);
+		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
+
+		Rcc::setRealTimeClockSource(Rcc::RealTimeClockSource::Lse);
+		Rcc::setClk48Source(Rcc::Clk48Source::Hsi48);
 
 		return true;
 	}
