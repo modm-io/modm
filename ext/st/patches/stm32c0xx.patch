@@ -1,0 +1,22 @@
+diff --git a/stm32c011xx.h b/stm32c011xx.h
+--- a/stm32c011xx.h
++++ b/stm32c011xx.h
+@@ -626,7 +626,6 @@ typedef struct
+ 
+ #define DMAMUX1_ChannelStatus      ((DMAMUX_ChannelStatus_TypeDef *) DMAMUX1_ChannelStatus_BASE)
+ #define DMAMUX1_RequestGenStatus   ((DMAMUX_RequestGenStatus_TypeDef *) DMAMUX1_RequestGenStatus_BASE)
+-#define DMAMUX1_IdRegisters        ((DMAMUX_IdRegisters_TypeDef *) DMAMUX1_IdRegisters_BASE)
+ 
+ #define DBG              ((DBG_TypeDef *) DBG_BASE)
+ 
+diff --git a/stm32c031xx.h b/stm32c031xx.h
+--- a/stm32c031xx.h
++++ b/stm32c031xx.h
+@@ -630,7 +630,6 @@ typedef struct
+ 
+ #define DMAMUX1_ChannelStatus      ((DMAMUX_ChannelStatus_TypeDef *) DMAMUX1_ChannelStatus_BASE)
+ #define DMAMUX1_RequestGenStatus   ((DMAMUX_RequestGenStatus_TypeDef *) DMAMUX1_RequestGenStatus_BASE)
+-#define DMAMUX1_IdRegisters        ((DMAMUX_IdRegisters_TypeDef *) DMAMUX1_IdRegisters_BASE)
+ 
+ #define DBG              ((DBG_TypeDef *) DBG_BASE)
+ 

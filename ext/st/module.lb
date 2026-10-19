@@ -167,9 +167,10 @@ def build(env):
     env.collect(":build:cppdefines", bprops["family_define"])
 
     env.outbasepath = "modm/ext/cmsis/device"
-    env.copy(localpath(bprops["folder"], bprops["device_header"]), bprops["device_header"])
-    env.copy(localpath(bprops["folder"], bprops["system_header"]), bprops["system_header"])
-    env.copy(localpath(bprops["folder"], bprops["family_header"]), bprops["family_header"])
+    headers = [bprops["device_header"], bprops["system_header"], bprops["family_header"]]
+    patch = localpath("patches", Path(bprops["folder"]).parent.name + ".patch")
+    env.copy(localpath(bprops["folder"]), ".", patch=patch if Path(patch).exists() else None,
+             ignore=lambda path, files: [f for f in files if f not in headers])
 
     env.substitutions = bprops
     env.substitutions.update({
