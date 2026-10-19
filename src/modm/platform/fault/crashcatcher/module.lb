@@ -30,9 +30,13 @@ def prepare(module, options):
     return True
 
 def build(env):
+    device = env[":target"]
+
     env.outbasepath = "modm/src/modm/platform/fault"
+    env.substitutions["has_ram_ecc"] = device.has_driver("ramecc")
     env.template("crashcatcher_regions.c.in")
-    env.copy(".", ignore=env.ignore_files("*regions.c.in"))
+    env.template("fault_storage.cpp.in")
+    env.copy(".", ignore=env.ignore_files("*regions.c.in", "*fault_storage.cpp.in"))
 
 
 descr_report_level = """# Fault Report Level

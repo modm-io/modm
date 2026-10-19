@@ -12,6 +12,7 @@
 #include "fault_storage.hpp"
 #include <modm/architecture/utils.hpp>
 #include <modm/platform/core/hardware_init.hpp>
+#include <modm/platform/device.hpp>
 
 struct table_pool_t
 {
@@ -29,6 +30,31 @@ static modm_section(".noinit") uint32_t marker_start;
 static modm_section(".noinit") const uint8_t* marker_end_ptr;
 static const uint8_t* report_end{0};
 extern "C" uint32_t g_crashCatcherStack[];
+
+%% if has_ram_ecc
+// Writes back memory in aligned 64-bit words. The SRAM ECC controller caches
+// partial writes until the word is complete, and a reset discards this cache,
+// so the last incomplete word of the report would be lost.
+static void
+writeback(const void* begin, const void* end)
+{
+	auto pos = reinterpret_cast<volatile uint64_t*>(uintptr_t(begin) & ~7ul);
+	for (; pos < reinterpret_cast<const volatile uint64_t*>(end); pos++) *pos = *pos;
+}
+%% endif
+
+static void
+writeback_markers()
+{
+%% if has_ram_ecc
+	writeback(&marker_start, &marker_start + 1);
+	writeback(&marker_end_ptr, &marker_end_ptr + 1);
+%% endif
+#if defined(__DCACHE_PRESENT) && __DCACHE_PRESENT
+	// The report may still be in the D-Cache, which a reset discards
+	if (SCB->CCR & SCB_CCR_DC_Msk) SCB_CleanDCache();
+#endif
+}
 
 namespace modm::platform
 {
@@ -72,6 +98,7 @@ FaultStorage::closeRead()
 {
 	marker_start = 0;
 	marker_end_ptr = nullptr;
+	writeback_markers();
 }
 
 void
@@ -126,6 +153,19 @@ FaultStorage::closeWrite()
 {
 	marker_end_ptr = current.pos;
 	write(&magic_end, sizeof(magic_end));
+%% if has_ram_ecc
+	// Write back the report up to the CrashCatcher stack, which is in use
+	const auto stack = reinterpret_cast<const uint8_t*>(g_crashCatcherStack);
+	for (auto t = __table_heap_start; t < __table_heap_end; t++)
+	{
+		const bool last = t->start <= current.pos and current.pos <= t->end;
+		auto end = last ? current.pos : t->end;
+		if (t->start <= stack and stack < end) end = stack;
+		writeback(t->start, end);
+		if (last) break;
+	}
+%% endif
+	writeback_markers();
 }
 
 FaultStorage::Iterator
