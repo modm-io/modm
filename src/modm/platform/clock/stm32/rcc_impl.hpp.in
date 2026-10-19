@@ -85,6 +85,8 @@ Rcc::setFlashLatency()
 	acr |= FLASH_ACR_PRFTBE;
 %% endif
 	FLASH->ACR = acr;
+	// wait until the new latency is used before changing the clock
+	while ((FLASH->ACR & FLASH_ACR_LATENCY) != fl.latency) ;
 	__DSB(); __ISB();
 %% endif
 
