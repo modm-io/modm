@@ -1,16 +1,17 @@
 {
-    // See https://code.visualstudio.com/docs/editor/tasks
-    // for the documentation about the tasks.json format
     "version": "2.0.0",
     "tasks": [
 %% for config in configs
         {
             "type": "shell",
-            "label": "Build ({{ config.profile | capitalize }})",
+            "label": "Build ({{ config.label }})",
+            "detail": "{{ config.tool }} build profile={{ config.profile }}",
             "command": "{{ config.tool }} build profile={{ config.profile }}",
-            "group": "build",
+            "group": {"kind": "build", "isDefault": {{ "true" if loop.first else "false" }}},
             "presentation": {
                 "reveal": "silent",
+                "panel": "shared",
+                "clear": true,
                 "showReuseMessage": false
             },
             "problemMatcher": "$gcc"
@@ -19,14 +20,34 @@
 %% for config in configs
         {
             "type": "shell",
-            "label": "Upload ({{ config.profile | capitalize }})",
+            "label": "Upload ({{ config.label }})",
+            "detail": "{{ config.tool }} program profile={{ config.profile }}",
             "command": "{{ config.tool }} program profile={{ config.profile }}",
-            "group": "build",
+            "dependsOn": ["Build ({{ config.label }})"],
+            "dependsOrder": "sequence",
+            "group": "none",
             "presentation": {
                 "reveal": "silent",
+                "panel": "shared",
                 "showReuseMessage": false
             }
         },
+%% endfor
+%% for config in configs
+        {
+            "type": "shell",
+            "label": "Clean ({{ config.label }})",
+            "detail": "{{ config.tool }} {{ config.clean }} profile={{ config.profile }}",
+            "command": "{{ config.tool }} {{ config.clean }} profile={{ config.profile }}",
+            "group": "none",
+            "presentation": {
+                "reveal": "silent",
+                "panel": "shared",
+                "clear": true,
+                "showReuseMessage": false
+            },
+            "problemMatcher": "$gcc"
+        }{{ "," if not loop.last }}
 %% endfor
     ]
 }

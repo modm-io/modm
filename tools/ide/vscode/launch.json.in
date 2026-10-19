@@ -10,15 +10,21 @@
             "type": "cortex-debug",
             "servertype": "openocd",
             "device": "{{ partname }}",
-            "runToMain": true,
+            "runToEntryPoint": "main",
+    %% if configs
+            "preLaunchTask": "Build ({{ config.label }})",
+    %% endif
+    %% if arm_toolchain_path
+            "armToolchainPath": "{{ arm_toolchain_path }}",
+    %% endif
     %% if with_freertos
             "rtos": "FreeRTOS",
     %% endif
             "configFiles": [
     %% for cfg in openocd_cfg
-                "{{ cfg }}",
+                "{{ cfg }}"{{ "," if not loop.last }}
     %% endfor
-            ],
+            ]{{ "," if with_rtt }}
     %% if with_rtt
             "rttConfig": {
                 "enabled": true,
@@ -31,12 +37,12 @@
                     {
                         "port": {{id}},
                         "type": "console"
-                    },
+                    }{{ "," if not loop.last }}
         %% endfor
                 ]
-            },
+            }
     %% endif
-        },
+        }{{ "," if not loop.last }}
 %% endfor
     ]
 }

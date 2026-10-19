@@ -11,6 +11,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
+import os
 import subprocess
 import platform
 
@@ -41,6 +42,13 @@ def post_build(env):
                     "profile": profile,
                     "executable": "".join([build_path, "/", buildtool, "-", profile, "/", env[":build:project.name"], ".elf"]),
                 })
+    # Only distinguish the build tools if more than one is used
+    multiple_tools = len({config["tool"] for config in configs}) > 1
+    for config in configs:
+        config["label"] = config["profile"].capitalize()
+        if multiple_tools:
+            config["label"] += ", " + config["tool"].capitalize()
+        config["clean"] = "-c" if config["tool"] == "scons" else "clean"
 
     compiler = ""
     core = ""
@@ -74,6 +82,7 @@ def post_build(env):
         "profiles": profiles,
         "include_paths": env.collector_values("::path.include") + env.collector_values("::path.include.system"),
         "compiler_path": compiler_path,
+        "arm_toolchain_path": os.path.dirname(compiler_path) if os.sep in compiler_path else "",
         # FIXME: RTT block is searched for too early.
         # See https://github.com/Marus/cortex-debug/wiki/SEGGER-RTT-support#known-issues
         "with_rtt": False, # env.has_module(":platform:rtt"),
