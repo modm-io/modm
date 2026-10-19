@@ -38,13 +38,16 @@ HeapTable::begin()
 	{
 		for (auto t = __table_heap_start; t < __table_heap_end; t++)
 		{
-			if (t->start <= fault_storage_heap_start and fault_storage_heap_start < t->end)
+			// Skip heaps that are completely used by the fault report
+			if (fault_storage_heap_start < t->end)
 			{
 				auto it = Iterator(t);
-				it.offset = static_cast<size_t>(fault_storage_heap_start - t->start);
+				it.offset = (fault_storage_heap_start > t->start)
+						? static_cast<size_t>(fault_storage_heap_start - t->start) : 0;
 				return it;
 			}
 		}
+		return Iterator(__table_heap_end);
 	}
 %% endif
 	return Iterator(__table_heap_start);
@@ -75,6 +78,10 @@ HeapTable::Iterator&
 HeapTable::Iterator::operator++()
 {
 	table++;
+%% if with_fault_storage
+	// Only the heap containing the fault report starts after it
+	offset = 0;
+%% endif
 	return *this;
 }
 
