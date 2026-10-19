@@ -33,35 +33,77 @@ using namespace modm::literals;
 /// STM32F7 running at 216MHz from the external 25MHz clock
 struct SystemClock
 {
-	static constexpr uint32_t Frequency = 216_MHz;
+	static constexpr uint32_t Hse = 25_MHz;
+	static constexpr uint32_t Lse = 32.768_kHz;
+	static constexpr Rcc::PllConfig pll
+	{
+		.M = 25,  //  25 MHz /  25 =   1 MHz
+		.N = 432, //   1 MHz * 432 = 432 MHz
+		.P = 2,   // 432 MHz /   2 = 216 MHz = F_cpu
+		.Q = 9,   // 432 MHz /   9 =  48 MHz = F_usb
+	};
+	static constexpr uint32_t PllP = Hse / pll.M * pll.N / pll.P;
+	static constexpr uint32_t PllQ = Hse / pll.M * pll.N / pll.Q;
+	static_assert(PllP == Rcc::MaxFrequency);
+	static_assert(PllQ == 48_MHz);
+
+	static constexpr uint32_t Frequency = PllP;
+	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency / 4;
 	static constexpr uint32_t Apb2 = Frequency / 2;
+	static constexpr uint32_t Ahb1 = Ahb;
+	static constexpr uint32_t Ahb2 = Ahb;
 
-	static constexpr uint32_t Adc1 = Apb2;
-	static constexpr uint32_t Adc2 = Apb2;
-	static constexpr uint32_t Adc3 = Apb2;
+	static constexpr uint32_t Crc = Ahb1;
+	static constexpr uint32_t Dma1 = Ahb1;
+	static constexpr uint32_t Dma2 = Ahb1;
+	static constexpr uint32_t Dma2d = Ahb1;
+	static constexpr uint32_t Eth = Ahb1;
+	static constexpr uint32_t Flash = Ahb1;
 
-	static constexpr uint32_t Spi1 = Apb2;
-	static constexpr uint32_t Spi2 = Apb1;
-	static constexpr uint32_t Spi3 = Apb1;
-	static constexpr uint32_t Spi4 = Apb2;
-
-	static constexpr uint32_t Usart1 = Apb2;
-	static constexpr uint32_t Usart2 = Apb1;
-	static constexpr uint32_t Usart3 = Apb1;
-	static constexpr uint32_t Uart4  = Apb1;
-	static constexpr uint32_t Uart5  = Apb1;
-	static constexpr uint32_t Usart6 = Apb2;
-	static constexpr uint32_t Uart7  = Apb1;
-	static constexpr uint32_t Uart8  = Apb1;
+	static constexpr uint32_t Dcmi = Ahb2;
+	static constexpr uint32_t Rng = Ahb2;
 
 	static constexpr uint32_t Can1 = Apb1;
 	static constexpr uint32_t Can2 = Apb1;
-
+	static constexpr uint32_t Cec = Apb1;
+	static constexpr uint32_t Dac = Apb1;
 	static constexpr uint32_t I2c1 = Apb1;
 	static constexpr uint32_t I2c2 = Apb1;
 	static constexpr uint32_t I2c3 = Apb1;
 	static constexpr uint32_t I2c4 = Apb1;
+	static constexpr uint32_t IwdgBus = Apb1;
+	static constexpr uint32_t Lptim1 = Apb1;
+	static constexpr uint32_t Pwr = Apb1;
+	static constexpr uint32_t RtcBus = Apb1;
+	static constexpr uint32_t SpdifRx = Apb1;
+	static constexpr uint32_t Spi2 = Apb1;
+	static constexpr uint32_t Spi3 = Apb1;
+	static constexpr uint32_t Uart4 = Apb1;
+	static constexpr uint32_t Uart5 = Apb1;
+	static constexpr uint32_t Uart7 = Apb1;
+	static constexpr uint32_t Uart8 = Apb1;
+	static constexpr uint32_t Usart2 = Apb1;
+	static constexpr uint32_t Usart3 = Apb1;
+	static constexpr uint32_t Wwdg = Apb1;
+
+	static constexpr uint32_t Adc = Apb2;
+	static constexpr uint32_t Adc1 = Apb2;
+	static constexpr uint32_t Adc2 = Apb2;
+	static constexpr uint32_t Adc3 = Apb2;
+	static constexpr uint32_t Adc123Common = Apb2;
+	static constexpr uint32_t Exti = Apb2;
+	static constexpr uint32_t Ltdc = Apb2;
+	static constexpr uint32_t Sai1 = Apb2;
+	static constexpr uint32_t Sai2 = Apb2;
+	static constexpr uint32_t Sdmmc1 = Apb2;
+	static constexpr uint32_t Spi1 = Apb2;
+	static constexpr uint32_t Spi4 = Apb2;
+	static constexpr uint32_t Spi5 = Apb2;
+	static constexpr uint32_t Spi6 = Apb2;
+	static constexpr uint32_t Syscfg = Apb2;
+	static constexpr uint32_t Usart1 = Apb2;
+	static constexpr uint32_t Usart6 = Apb2;
 
 	static constexpr uint32_t Apb1Timer = Apb1 * 2;
 	static constexpr uint32_t Apb2Timer = Apb2 * 2;
@@ -73,40 +115,36 @@ struct SystemClock
 	static constexpr uint32_t Timer6  = Apb1Timer;
 	static constexpr uint32_t Timer7  = Apb1Timer;
 	static constexpr uint32_t Timer8  = Apb2Timer;
+	static constexpr uint32_t Timer9  = Apb2Timer;
 	static constexpr uint32_t Timer10 = Apb2Timer;
 	static constexpr uint32_t Timer11 = Apb2Timer;
 	static constexpr uint32_t Timer12 = Apb1Timer;
 	static constexpr uint32_t Timer13 = Apb1Timer;
 	static constexpr uint32_t Timer14 = Apb1Timer;
 
-	static constexpr uint32_t Usb = 48_MHz;
+	static constexpr uint32_t Usb = PllQ;
 	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
-	static constexpr uint32_t Rtc = 32.768_kHz;
+	static constexpr uint32_t Rtc = Lse;
 
 	static bool inline
 	enable()
 	{
-		Rcc::enableLowSpeedExternalCrystal();
-		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::LowSpeedExternalCrystal);
-
-		Rcc::enableExternalClock(); // 25 MHz
-		const Rcc::PllFactors pllFactors{
-			.pllM = 25,		// 25MHz / M=25 -> 1MHz
-			.pllN = 432,	// 1MHz * N=432 -> 432MHz
-			.pllP = 2,		// 432MHz / P=2 -> 216MHz = F_cpu
-			.pllQ = 9		// 432MHz / Q=9 -> 48MHz = F_usb
-		};
-		Rcc::enablePll(Rcc::PllSource::ExternalClock, pllFactors);
-		// Required for 216 MHz clock
-		Rcc::enableOverdriveMode();
+		Rcc::enableLseCrystal();
+		Rcc::enableHseClock();
 
 		Rcc::setFlashLatency<Frequency>();
-		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
-		// APB1 is running at 54MHz
-		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div4);
-		// APB2 is running at 108MHz
-		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div2);
 		Rcc::updateCoreFrequency<Frequency>();
+
+		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
+		Rcc::setApb1Prescaler(Rcc::ApbPrescaler::Div4);
+		Rcc::setApb2Prescaler(Rcc::ApbPrescaler::Div2);
+
+		Rcc::enablePll(Rcc::PllSource::Hse, pll);
+		// Required for 216 MHz operation
+		Rcc::enableOverdriveMode();
+		Rcc::enableSystemClock(Rcc::SystemClockSource::PllP);
+
+		Rcc::setRealTimeClockSource(Rcc::RealTimeClockSource::Lse);
 
 		return true;
 	}
