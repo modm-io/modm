@@ -28,29 +28,50 @@ using namespace modm::literals;
 /// STM32L152RE running at 32MHz generated from the external 8MHz ST-Link clock
 struct SystemClock
 {
-	static constexpr uint32_t Frequency = 32_MHz;
+	static constexpr uint32_t Hse = 8_MHz;
+	static constexpr uint32_t Lse = 32.768_kHz;
+	// VCO is 64 MHz, USB requires 96 MHz
+	static constexpr Rcc::PllConfig pll{.Mul = Rcc::PllMultiplier::Mul8, .Div = 2};
+	static constexpr uint32_t Pll = Hse * Rcc::value(pll.Mul) / pll.Div;
+	static_assert(Pll == Rcc::MaxFrequency);
+
+	static constexpr uint32_t Frequency = Pll;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb1 = Frequency;
 	static constexpr uint32_t Apb2 = Frequency;
 
-	static constexpr uint32_t Adc    = Apb2;
+	static constexpr uint32_t Crc = Ahb;
+	static constexpr uint32_t Dma1 = Ahb;
+	static constexpr uint32_t Dma2 = Ahb;
+	static constexpr uint32_t Flash = Ahb;
 
-	static constexpr uint32_t Spi1   = Apb2;
-	static constexpr uint32_t Spi2   = Apb1;
-	static constexpr uint32_t Spi3   = Apb1;
-
-	static constexpr uint32_t Usart1 = Apb2;
+	static constexpr uint32_t Comp = Apb1;
+	static constexpr uint32_t Dac = Apb1;
+	static constexpr uint32_t I2c1 = Apb1;
+	static constexpr uint32_t I2c2 = Apb1;
+	static constexpr uint32_t IwdgBus = Apb1;
+	static constexpr uint32_t Lcd = Apb1;
+	static constexpr uint32_t Opamp = Apb1;
+	static constexpr uint32_t Pwr = Apb1;
+	static constexpr uint32_t Ri = Apb1;
+	static constexpr uint32_t RtcBus = Apb1;
+	static constexpr uint32_t Spi2 = Apb1;
+	static constexpr uint32_t Spi3 = Apb1;
+	static constexpr uint32_t Uart4 = Apb1;
+	static constexpr uint32_t Uart5 = Apb1;
 	static constexpr uint32_t Usart2 = Apb1;
 	static constexpr uint32_t Usart3 = Apb1;
-	static constexpr uint32_t Usart4 = Apb1;
-	static constexpr uint32_t Usart5 = Apb1;
+	static constexpr uint32_t Wwdg = Apb1;
 
-	static constexpr uint32_t I2c1   = Apb1;
-	static constexpr uint32_t I2c2   = Apb1;
+	static constexpr uint32_t Adc = Apb2;
+	static constexpr uint32_t Adc1 = Apb2;
+	static constexpr uint32_t Exti = Apb2;
+	static constexpr uint32_t Spi1 = Apb2;
+	static constexpr uint32_t Syscfg = Apb2;
+	static constexpr uint32_t Usart1 = Apb2;
 
-	static constexpr uint32_t Apb1Timer = Apb1 * 1;
-	static constexpr uint32_t Apb2Timer = Apb2 * 1;
-	static constexpr uint32_t Timer1  = Apb2Timer;
+	static constexpr uint32_t Apb1Timer = Apb1;
+	static constexpr uint32_t Apb2Timer = Apb2;
 	static constexpr uint32_t Timer2  = Apb1Timer;
 	static constexpr uint32_t Timer3  = Apb1Timer;
 	static constexpr uint32_t Timer4  = Apb1Timer;
@@ -60,56 +81,31 @@ struct SystemClock
 	static constexpr uint32_t Timer9  = Apb2Timer;
 	static constexpr uint32_t Timer10 = Apb2Timer;
 	static constexpr uint32_t Timer11 = Apb2Timer;
+
 	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
-	static constexpr uint32_t Rtc = 32.768_kHz;
+	static constexpr uint32_t Rtc = Lse;
 
 	static bool inline
 	enable()
 	{
-		Rcc::enableLowSpeedExternalCrystal();
-		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::LowSpeedExternalCrystal);
+		Rcc::enableLseCrystal();
+		Rcc::enableHseClock();
 
-		// Enable power scaling for 1.8V
-		PWR->CR = (PWR->CR & ~PWR_CR_VOS) | PWR_CR_VOS_0;
-		while(PWR->CSR & PWR_CSR_VOSF) ;
-
-		/* From RM0038: 6.2.7 System clock (SYSCLK) selection (page ~135)
-		 *
-		 * The SYSCLK frequency change has to follow the rule that the final
-		 * frequency is less then 4 x initial frequency to limit the VCORE drop
-		 * due to a current consumption peak when the frequency increases. It
-		 * must also respect 5 μs delay between two changes.
-		 *
-		 * For example to switch from 2.1 MHz to 32 MHz, the user can switch
-		 * from 2.1 MHz to 8 MHz, wait 5 μs, then switch from 8 MHz to 32 MHz.
-		 */
-
-		// MCO from ST-Link
-		Rcc::enableExternalClock();	// 8MHz
-		// set flash latency
-		Rcc::setFlashLatency<8_MHz>();
-		// switch system clock to HSE output
-		Rcc::enableSystemClock(Rcc::SystemClockSource::Hse);
-		Rcc::updateCoreFrequency<8_MHz>();
-
-		// internal clock 8MHz * 8 / 2 = 32MHz => bad for USB
-		const Rcc::PllFactors pllFactors{
-			.pllMul = Rcc::PllMultiplier::Mul8,
-			.pllDiv = 2,
-		};
-		Rcc::enablePll(Rcc::PllSource::ExternalClock, pllFactors);
-		// set flash latency
+		Rcc::setVoltageScaling(Rcc::VoltageScaling::Range1);
 		Rcc::setFlashLatency<Frequency>();
-		modm::delay_us(5);
-		// switch system clock to PLL output
-		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
-		// update frequencies for busy-wait delay functions
 		Rcc::updateCoreFrequency<Frequency>();
 
-		// All busses max. 32MHz
 		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
-		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div1);
-		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div1);
+		Rcc::setApb1Prescaler(Rcc::ApbPrescaler::Div1);
+		Rcc::setApb2Prescaler(Rcc::ApbPrescaler::Div1);
+
+		// The SYSCLK may increase at most 4x per step with 5us in between (RM0038 6.2.7)
+		Rcc::enableSystemClock(Rcc::SystemClockSource::Hse);
+		modm::delay_us(5);
+		Rcc::enablePll(Rcc::PllSource::Hse, pll);
+		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
+
+		Rcc::setRealTimeClockSource(Rcc::RealTimeClockSource::Lse);
 
 		return true;
 	}

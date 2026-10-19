@@ -72,8 +72,8 @@ Rcc::setFlashLatency()
 %% elif target.family in ["l1"]
 	// enable 64-bit access, must be enabled *before* prefetch and latency!
 	FLASH->ACR |= FLASH_ACR_ACC64;
-	// enable flash prefetch
-	acr |= FLASH_ACR_PRFTEN;
+	// keep 64-bit access and enable flash prefetch
+	acr |= FLASH_ACR_ACC64 | FLASH_ACR_PRFTEN;
 %% elif target.family == "l0"
 	// enable flash prefetch and pre-read
 	acr |= FLASH_ACR_PRFTEN | FLASH_ACR_PRE_READ;
