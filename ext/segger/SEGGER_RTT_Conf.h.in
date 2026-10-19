@@ -37,6 +37,10 @@
 
 #define BUFFER_SIZE_UP                            ({{ options["buffer.tx"][0] }})
 #define BUFFER_SIZE_DOWN                          ({{ options["buffer.rx"][0] }})
+%% if with_dtcm
+#define SEGGER_RTT_SECTION                        ".bss_dtcm"
+#define SEGGER_RTT_BUFFER_SECTION                 ".bss_dtcm"
+%% endif
 
 
 #ifndef SEGGER_RTT_ASM

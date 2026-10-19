@@ -39,7 +39,10 @@ def build(env):
     env.substitutions = {
         "buffer_tx": env["buffer.tx"],
         "buffer_rx": env["buffer.rx"],
-        "with_printf": env.has_module(":printf")
+        "with_printf": env.has_module(":printf"),
+        # The D-Cache hides the control block from the debugger, DTCM is not cached
+        "with_dtcm": env.get(":platform:cortex-m:enable_dcache", False) and
+                     any(m["name"] == "dtcm" for m in env[":target"].get_driver("core")["memory"]),
     }
 
     env.template("SEGGER_RTT_Conf.h.in")
