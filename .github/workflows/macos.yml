@@ -30,9 +30,8 @@ jobs:
       - name: Setup environment - Python pip
         run: |
           # pygit2 depends on pycparser, which brew installed without a RECORD
-          # file, so pip cannot upgrade it and must install over it instead.
-          pip3 install --ignore-installed --break-system-packages pycparser
-          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm scons
+          # file, so pip cannot upgrade it eagerly. Upgrade lbuild explicitly.
+          pip3 install --upgrade --break-system-packages modm lbuild scons
           echo "/usr/local/bin" >> $GITHUB_PATH
 
       - name: Dump environment
