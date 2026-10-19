@@ -134,7 +134,8 @@ def build(env):
             kw = per.capitalize()
             if kw not in rcc_enable:
                 rcc_enable[kw] = (nper, mode["EN"])
-        if "RST" in mode:
+        # The RTC domain reset also stops the LSE and clears the RTC clock source
+        if "RST" in mode and not (per == "RTC" and nper == "RTC"):
             rcc_reset[per.capitalize()] = (nper, mode["RST"])
     # H7R/S: I2C1 shares its bits with I3C1 (RCC_APB1ENR1_I2C1_I3C1EN), which the rcc-map skips
     if t.family == "h7" and t.name[0] in ["r", "s"] and "I2c1" in all_peripherals:
