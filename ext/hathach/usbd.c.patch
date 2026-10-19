@@ -1,0 +1,79 @@
+diff --git a/device/usbd.c b/device/usbd.c
+--- a/device/usbd.c
++++ b/device/usbd.c
+@@ -1301,14 +1301,14 @@ static bool process_set_config(uint8_t rhport, uint8_t cfg_num) {
+ 
+ // return descriptor's buffer and update desc_len
+ static bool process_get_descriptor(uint8_t rhport, tusb_control_request_t const * p_request) {
+-  tusb_desc_type_t const desc_type = (tusb_desc_type_t) tu_u16_high(p_request->wValue);
++  tusb_desc_type_t const desc_type = (tusb_desc_type_t) TU_U16_HIGH(p_request->wValue);
+   uint8_t const desc_index = tu_u16_low( p_request->wValue );
+ 
+   switch(desc_type) { //-V2520
+     case TUSB_DESC_DEVICE: {
+       TU_LOG_USBD(" Device\r\n");
+ 
+-      void *desc_device = (void *)(uintptr_t)tud_descriptor_device_cb();
++      uint8_t const *desc_device = tud_descriptor_device_cb();
+       TU_ASSERT(desc_device);
+ 
+       // Only response with exactly 1 Packet if: not addressed and host requested more data than device descriptor has.
+@@ -1318,9 +1318,9 @@ static bool process_get_descriptor(uint8_t rhport, tusb_control_request_t const
+         // Hack here: we modify the request length to prevent usbd_control response with zlp
+         // since we are responding with 1 packet & less data than wLength.
+         ((tusb_control_request_t *)(uintptr_t)p_request)->wLength = CFG_TUD_ENDPOINT0_SIZE;
+-        return tud_control_xfer(rhport, p_request, desc_device, CFG_TUD_ENDPOINT0_SIZE);
++        return tud_control_xfer(rhport, p_request, (void *)(uintptr_t)desc_device, CFG_TUD_ENDPOINT0_SIZE);
+       } else {
+-        return tud_control_xfer(rhport, p_request, desc_device, sizeof(tusb_desc_device_t));
++        return tud_control_xfer(rhport, p_request, (void *)(uintptr_t)desc_device, sizeof(tusb_desc_device_t));
+       }
+     }
+     // break; // unreachable
+@@ -1329,35 +1329,35 @@ static bool process_get_descriptor(uint8_t rhport, tusb_control_request_t const
+       TU_LOG_USBD(" BOS\r\n");
+ 
+       // requested by host if USB > 2.0 ( i.e 2.1 or 3.x )
+-      uintptr_t desc_bos = (uintptr_t) tud_descriptor_bos_cb();
+-      TU_VERIFY(desc_bos != 0);
++      uint8_t const *desc_bos = tud_descriptor_bos_cb();
++      TU_VERIFY(desc_bos != NULL);
+ 
+       // Use offsetof to avoid pointer to the odd/misaligned address
+-      uint16_t const total_len = tu_le16toh( tu_unaligned_read16((const void*) (desc_bos + offsetof(tusb_desc_bos_t, wTotalLength))) );
++      uint16_t const total_len = tu_le16toh( tu_unaligned_read16(desc_bos + offsetof(tusb_desc_bos_t, wTotalLength)) );
+ 
+-      return tud_control_xfer(rhport, p_request, (void*) desc_bos, total_len);
++      return tud_control_xfer(rhport, p_request, (void*)(uintptr_t) desc_bos, total_len);
+     }
+     // break; // unreachable
+ 
+     case TUSB_DESC_CONFIGURATION:
+     case TUSB_DESC_OTHER_SPEED_CONFIG: {
+-      uintptr_t desc_config;
++      uint8_t const *desc_config;
+ 
+       if ( desc_type == TUSB_DESC_CONFIGURATION ) {
+         TU_LOG_USBD(" Configuration[%u]\r\n", desc_index);
+-        desc_config = (uintptr_t) tud_descriptor_configuration_cb(desc_index);
+-        TU_ASSERT(desc_config != 0);
++        desc_config = tud_descriptor_configuration_cb(desc_index);
++        TU_ASSERT(desc_config != NULL);
+       }else {
+         // Host only request this after getting Device Qualifier descriptor
+         TU_LOG_USBD(" Other Speed Configuration\r\n");
+-        desc_config = (uintptr_t) tud_descriptor_other_speed_configuration_cb(desc_index);
+-        TU_VERIFY(desc_config != 0);
++        desc_config = tud_descriptor_other_speed_configuration_cb(desc_index);
++        TU_VERIFY(desc_config != NULL);
+       }
+ 
+       // Use offsetof to avoid pointer to the odd/misaligned address
+-      uint16_t const total_len = tu_le16toh( tu_unaligned_read16((const void*) (desc_config + offsetof(tusb_desc_configuration_t, wTotalLength))) );
++      uint16_t const total_len = tu_le16toh( tu_unaligned_read16(desc_config + offsetof(tusb_desc_configuration_t, wTotalLength)) );
+ 
+-      return tud_control_xfer(rhport, p_request, (void*) desc_config, total_len);
++      return tud_control_xfer(rhport, p_request, (void*)(uintptr_t) desc_config, total_len);
+     }
+     // break; // unreachable
+ 

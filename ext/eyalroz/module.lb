@@ -27,7 +27,6 @@ def build(env):
 
     env.copy("printf/src/printf/printf.h", "printf.h", patch="printf.h.patch")
     files = env.copy("printf/src/printf/printf.c", "printf.c", patch="printf.c.patch")
-    env.collect(":build:ccflags", "-Wno-overflow", operations=files)
 
     env.substitutions = {
         "with_long_long": with_long_long,
