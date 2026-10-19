@@ -20,6 +20,9 @@ def prepare(module, options):
     identifier = target.identifier
     if identifier.platform != "stm32" or identifier.family != "h7":
         return False
+    # The STM32H7R/S has no BDMA
+    if not target.has_driver("bdma:stm32*"):
+        return False
 
     module.depends(":platform:bdma", ":platform:dma", ":platform:spi:6")
     return True

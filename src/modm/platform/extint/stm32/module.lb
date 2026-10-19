@@ -54,6 +54,7 @@ def build(env):
     exti_reg = "SYSCFG"
     if target.family in ["c0", "g0", "l5", "u5", "h5", "u0", "u3"]: exti_reg = "EXTI"
     if target.family in ["f1"]: exti_reg = "AFIO"
+    if target.family in ["h7"] and target.name[0] in ["r", "s"]: exti_reg = "SBS"
 
     global extimap
     lines = 1 + max(int(g["pin"]) for g in env[":target"].get_driver("gpio")["gpio"])

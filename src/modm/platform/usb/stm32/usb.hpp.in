@@ -37,13 +37,18 @@ public:
 		PWR->SVMCR |= PWR_SVMCR_UVMEN;
 %% elif target.family == "h5" and target.name != "03"
 		PWR->USBSCR |= PWR_USBSCR_USB33DEN | PWR_USBSCR_USB33SV;
+%% elif target.family == "h7" and target.name[0] in ["r", "s"]
+		PWR->CSR2 |= PWR_CSR2_USB33DEN{% if port == "hs" %} | PWR_CSR2_USBHSREGEN{% endif %};
+		for (uint32_t t = 0x10000; not (PWR->CSR2 & PWR_CSR2_USB33RDY) and t; t--) ;
 %% elif target.family in ["h7"]
 #ifdef PWR_CR3_USB33DEN
 		PWR->CR3 |= PWR_CR3_USB33DEN;
 #endif
 %% endif
 		Rcc::enable<Peripheral::{{ peripheral }}>();
-%% if is_phyc
+%% if is_phyc and target.family == "h7" and target.name[0] in ["r", "s"]
+		RCC->AHB1ENR |= RCC_AHB1ENR_USBPHYCEN; __DSB();
+%% elif is_phyc
 		Rcc::enable<Peripheral::Usbotghsulpi>();
 #ifdef RCC_APB2ENR_OTGPHYCEN
 		RCC->APB2ENR |= RCC_APB2ENR_OTGPHYCEN; __DSB();

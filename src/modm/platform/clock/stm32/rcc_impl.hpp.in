@@ -80,6 +80,9 @@ Rcc::setFlashLatency()
 %% elif target.family in ["u3", "u5"]
 	// enable flash prefetch
 	acr |= FLASH_ACR_PRFTEN;
+%% elif target.family == "h7" and target.name[0] in ["r", "s"]
+	// programming delay: 0-1 WS: 0, 2-3 WS: 1, 4-5 WS: 2, 6-7 WS: 3
+	acr = (acr & ~FLASH_ACR_WRHIGHFREQ) | ((fl.latency / 2) << FLASH_ACR_WRHIGHFREQ_Pos);
 %% elif target.family not in ["h7", "l5", "h5"]
 	// enable flash prefetch
 	acr |= FLASH_ACR_PRFTBE;

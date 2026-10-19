@@ -32,7 +32,13 @@ class Instance(Module):
         }
 
         device = env[":target"]
-        if device.identifier.family in ["h7"]:
+        if device.identifier.family in ["h7"] and device.identifier.name[0] in ["r", "s"]:
+            properties["fifo_size"] = 16 if self.instance in (1, 2, 3, 6) else 8
+            properties["max_data_bits"] = 32 if self.instance in (1, 2, 3, 6) else 16
+            properties["max_crc_bits"] = properties["max_data_bits"]
+            properties["max_transfer_size"] = 2**16 - 1
+            properties["i2s"] = self.instance in (1, 2, 3, 6)
+        elif device.identifier.family in ["h7"]:
             properties["fifo_size"] = 16 if self.instance in (1, 2, 3) else 8
             properties["max_data_bits"] = 32 if self.instance in (1, 2, 3) else 16
             properties["max_crc_bits"] = properties["max_data_bits"]

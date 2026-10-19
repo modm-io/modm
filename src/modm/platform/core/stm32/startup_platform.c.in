@@ -35,6 +35,8 @@ __modm_initialize_platform(void)
 	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGCOMPEN; __DSB();
 %% elif target.family == "f1"
 	RCC->APB2ENR |= RCC_APB2ENR_AFIOEN; __DSB();
+%% elif target.family == "h7" and target.name[0] in ["r", "s"]
+	RCC->APB4ENR |= RCC_APB4ENR_SBSEN; __DSB();
 %% elif target.family == "h7"
 	RCC->APB4ENR |= RCC_APB4ENR_SYSCFGEN; __DSB();
 %% elif target.family in ["u3", "u5"]
@@ -81,7 +83,7 @@ __modm_initialize_platform(void)
 	RCC->AHB1ENR |= RCC_AHB1ENR_DTCMRAMEN | RCC_AHB1ENR_BKPSRAMEN;
 %% elif target.family == "h7"
 	// Enable all SRAMs
-	%% if target.name[0].isnumeric()
+	%% if target.name[0].isnumeric() or target.name[0] in ["r", "s"]
 	RCC->AHB2ENR |= RCC_AHB2ENR_SRAM1EN | RCC_AHB2ENR_SRAM2EN;
 	%% else
 	RCC->AHB2ENR |= RCC_AHB2ENR_AHBSRAM1EN | RCC_AHB2ENR_AHBSRAM2EN;
@@ -121,6 +123,7 @@ __modm_initialize_platform(void)
 %% endif
 
 %% if enable_icache
+%% if target.family != "h7"
 	// We need to define the OTP as non-cachable otherwise the ICACHE access will cause a Hardfault
 	// 1. Define Attribute 0 as Non-Cacheable (0x44)
 	MPU->MAIR[1] = (0x44UL << 24);
@@ -133,6 +136,7 @@ __modm_initialize_platform(void)
 	// 4. Enable MPU with Background Map (to keep the rest of Flash/RAM working)
 	MPU->CTRL = MPU_CTRL_PRIVDEFENA_Msk | MPU_CTRL_ENABLE_Msk;
 	__DMB();
+%% endif
 	// Enable the Instruction Cache
 	ICACHE->CR |= ICACHE_CR_EN;
 	__DMB();

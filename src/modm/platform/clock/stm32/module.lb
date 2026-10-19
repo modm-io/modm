@@ -37,6 +37,12 @@ def build(env):
     for vcore in device.get_driver("flash")["latency"]:
         flash_latencies[int(vcore["vcore-min"])] = sorted([int(f["hclk-max"]) for f in vcore["wait-state"]])
 
+    if t.family == "h7" and t.name[0] in ["r", "s"]:
+        # The device file has the wrong table, RM0477 Table 29: AXI clock vs. VOS low/high
+        flash_latencies = {1150: [36_000_000, 72_000_000, 108_000_000, 144_000_000, 180_000_000, 216_000_000],
+                           1300: [40_000_000, 80_000_000, 120_000_000, 160_000_000, 200_000_000,
+                                  240_000_000, 280_000_000, 320_000_000]}
+        p["max_frequency"] = 600_000_000
     p["table"] = flash_latencies
     env.substitutions = p
     env.outbasepath = "modm/src/modm/platform/clock"
@@ -55,7 +61,10 @@ def build(env):
     p["tim_ids"] = instances("tim")
     p["lptim_ids"] = instances("lptim")
     p["adc_ids"] = instances("adc")
-    env.template(f"rcc_{t.family}.hpp.in", "rcc.hpp")
+    if t.family == "h7" and t.name[0] in ["r", "s"]:
+        env.template("rcc_h7rs.hpp.in", "rcc.hpp")
+    else:
+        env.template(f"rcc_{t.family}.hpp.in", "rcc.hpp")
     env.copy("rcc_defs.cpp")
 
     all_peripherals = env.query(":cmsis:device:peripherals")
@@ -127,6 +136,10 @@ def build(env):
                 rcc_enable[kw] = (nper, mode["EN"])
         if "RST" in mode:
             rcc_reset[per.capitalize()] = (nper, mode["RST"])
+    # H7R/S: I2C1 shares its bits with I3C1 (RCC_APB1ENR1_I2C1_I3C1EN), which the rcc-map skips
+    if t.family == "h7" and t.name[0] in ["r", "s"] and "I2c1" in all_peripherals:
+        rcc_enable["I2c1"] = ("I2C1_I3C1", "APB1ENR1")
+        rcc_reset["I2c1"] = ("I2C1_I3C1", "APB1RSTR1")
 
     env.substitutions.update({
         "rcc_enable": rcc_enable,

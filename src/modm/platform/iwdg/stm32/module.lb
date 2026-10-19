@@ -25,5 +25,7 @@ def prepare(module, options):
 def build(env):
     env.outbasepath = "modm/src/modm/platform/iwdg"
     # FIXME: Use IWDG2 for second core on STM32H7x5
-    env.substitutions = {"core": 1 if env[":target"].identifier.family in ["h7"] else ""}
+    target = env[":target"].identifier
+    # H7R/S has a single IWDG
+    env.substitutions = {"core": 1 if target.family == "h7" and target.name[0] not in ["r", "s"] else ""}
     env.template("iwdg.hpp.in")
