@@ -101,6 +101,7 @@ def prepare(module, options):
     module.depends(
         ":architecture:interrupt",
         ":cmsis:device",
+        ":math:units",
         ":platform:gpio",
         ":platform:rcc")
 

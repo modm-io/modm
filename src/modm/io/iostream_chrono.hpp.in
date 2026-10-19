@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include "iostream.hpp"
 #include <chrono>
 #include <ctime>
 %% if options.with_printf

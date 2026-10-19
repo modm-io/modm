@@ -14,6 +14,8 @@
 
 #include <modm/platform/device.hpp>
 #include <modm/platform/gpio/connector.hpp>
+#include <modm/platform/clock/rcc.hpp>
+#include <modm/math/units.hpp>
 
 %% set name = "Usb" ~ port | capitalize
 
@@ -28,6 +30,7 @@ public:
 	static void
 	initialize(uint8_t priority=3)
 	{
+		using namespace modm::literals;
 		static_assert(SystemClock::Usb == 48_MHz, "{{ name }} must have a 48MHz clock!");
 %% if target.family in ["g0", "l4", "l5"]
 #ifdef PWR_CR2_USV
