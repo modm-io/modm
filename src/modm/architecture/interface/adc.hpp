@@ -26,14 +26,14 @@ namespace modm
  *
  * This interface only allows for synchronous operation:
  * @code
- * // read channel 2
- * uint16_t value = Adc::readChannel(2);
+ * // read channel 2 (on AVR: Adc::readChannel(2))
+ * uint16_t value = Adc::readChannel(Adc::Channel::Channel2);
  * @endcode
  *
  * The above code is equivalent to this:
  * @code
  * // start a new conversion on channel 3
- * Adc::setChannel(3);
+ * Adc::setChannel(Adc::Channel::Channel3);
  * Adc::startConversion();
  *
  * while(!Adc::isConversionFinished())
@@ -52,8 +52,9 @@ class Adc : public ::modm::PeripheralDriver
 {
 #ifdef __DOXYGEN__
 public:
-	/// this type may also be an enum or enum class
-	typedef uint8_t Channel;
+	/// Platform specific channel type: an `enum class` on most platforms,
+	/// which does not convert from integers, but `uint8_t` on AVR.
+	enum class Channel;
 
 	/// describes the maximum resolution in bits
 	static constexpr uint8_t Resolution;
