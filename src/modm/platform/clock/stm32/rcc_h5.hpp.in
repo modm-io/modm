@@ -360,7 +360,7 @@ public:
 	LpUartClockSource : uint8_t
 	{
 		Bus   = 0b000,
-		Pll2P = 0b001,
+		Pll2Q = 0b001,
 %% if 3 in pll_ids
 		Pll3Q = 0b010,
 %% endif
@@ -380,10 +380,10 @@ public:
 		Pll1Q    = 0b000,
 		Pll2P    = 0b001,
 %% if 3 in pll_ids
-		Pll3Q    = 0b010,
+		Pll3P    = 0b010,
 %% endif
 		AudioClk = 0b011,
-		Bus      = 0b100
+		PerCk    = 0b100
 	};
 %% for id in spi_ids | sort if id in [1,2,3]
 	static inline void
@@ -403,7 +403,7 @@ public:
 		Csi   = 0b100,
 		Hse   = 0b101
 	};
-%% for id in spi_ids | sort if id in [1,2,3]
+%% for id in spi_ids | sort if id in [4,5,6]
 	static inline void
 	setSpi{{id}}ClockSource(Spi456ClockSource src)
 	{
