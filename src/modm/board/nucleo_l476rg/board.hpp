@@ -31,54 +31,98 @@ using namespace modm::literals;
 /// STM32L4 running at 48MHz generated from the internal Multispeed oscillator
 struct SystemClock
 {
-	static constexpr uint32_t Frequency = 48_MHz;
-	static constexpr uint32_t Ahb  = Frequency;
+	static constexpr uint32_t Lse = 32.768_kHz;
+	static constexpr uint32_t Msi = 48_MHz;
+	static constexpr uint32_t Frequency = Msi;
+	static constexpr uint32_t Ahb = Frequency;
+	static constexpr uint32_t Ahb1 = Ahb;
+	static constexpr uint32_t Ahb2 = Ahb;
+	static constexpr uint32_t Ahb3 = Ahb;
 	static constexpr uint32_t Apb1 = Frequency;
 	static constexpr uint32_t Apb2 = Frequency;
 
+	static constexpr uint32_t Crc = Ahb1;
+	static constexpr uint32_t Dma1 = Ahb1;
+	static constexpr uint32_t Dma2 = Ahb1;
+	static constexpr uint32_t Flash = Ahb1;
+	static constexpr uint32_t Tsc = Ahb1;
+
+	static constexpr uint32_t Adc1 = Ahb2;
+	static constexpr uint32_t Adc2 = Ahb2;
+	static constexpr uint32_t Adc3 = Ahb2;
+	static constexpr uint32_t Adc123Common = Ahb2;
+	static constexpr uint32_t Rng = Ahb2;
+	static constexpr uint32_t Usbotg = Ahb2;
+
+	static constexpr uint32_t Can1 = Apb1;
+	static constexpr uint32_t Dac = Apb1;
+	static constexpr uint32_t Dac1 = Apb1;
 	static constexpr uint32_t I2c1 = Apb1;
 	static constexpr uint32_t I2c2 = Apb1;
 	static constexpr uint32_t I2c3 = Apb1;
-
-	static constexpr uint32_t Spi1 = Apb2;
-
+	static constexpr uint32_t IwdgBus = Apb1;
+	static constexpr uint32_t Lcd = Apb1;
+	static constexpr uint32_t Lptim1 = Apb1;
+	static constexpr uint32_t Lptim2 = Apb1;
+	static constexpr uint32_t Lpuart1 = Apb1;
+	static constexpr uint32_t Opamp = Apb1;
+	static constexpr uint32_t Pwr = Apb1;
+	static constexpr uint32_t RtcBus = Apb1;
 	static constexpr uint32_t Spi2 = Apb1;
 	static constexpr uint32_t Spi3 = Apb1;
-
-	static constexpr uint32_t Can1 = Apb1;
-
-	static constexpr uint32_t Usart1 = Apb2;
-
+	static constexpr uint32_t Swpmi1 = Apb1;
+	static constexpr uint32_t Uart4 = Apb1;
+	static constexpr uint32_t Uart5 = Apb1;
 	static constexpr uint32_t Usart2 = Apb1;
 	static constexpr uint32_t Usart3 = Apb1;
-	static constexpr uint32_t Usart4 = Apb1;
-	static constexpr uint32_t Usart5 = Apb1;
+	static constexpr uint32_t Wwdg = Apb1;
 
-	static constexpr uint32_t Timer1  = Apb2;
-	static constexpr uint32_t Timer2  = Apb1;
-	static constexpr uint32_t Timer3  = Apb1;
-	static constexpr uint32_t Timer4  = Apb1;
-	static constexpr uint32_t Timer5  = Apb1;
-	static constexpr uint32_t Timer6  = Apb1;
-	static constexpr uint32_t Timer7  = Apb1;
-	static constexpr uint32_t Timer8  = Apb2;
-	static constexpr uint32_t Timer15 = Apb2;
-	static constexpr uint32_t Timer16 = Apb2;
-	static constexpr uint32_t Timer17 = Apb2;
+	static constexpr uint32_t Comp1 = Apb2;
+	static constexpr uint32_t Comp2 = Apb2;
+	static constexpr uint32_t Dfsdm1 = Apb2;
+	static constexpr uint32_t Exti = Apb2;
+	static constexpr uint32_t Firewall = Apb2;
+	static constexpr uint32_t Sai1 = Apb2;
+	static constexpr uint32_t Sai2 = Apb2;
+	static constexpr uint32_t Sdmmc1 = Apb2;
+	static constexpr uint32_t Spi1 = Apb2;
+	static constexpr uint32_t Syscfg = Apb2;
+	static constexpr uint32_t Usart1 = Apb2;
+	static constexpr uint32_t Vrefbuf = Apb2;
+
+	static constexpr uint32_t Apb1Timer = Apb1;
+	static constexpr uint32_t Apb2Timer = Apb2;
+	static constexpr uint32_t Timer1  = Apb2Timer;
+	static constexpr uint32_t Timer2  = Apb1Timer;
+	static constexpr uint32_t Timer3  = Apb1Timer;
+	static constexpr uint32_t Timer4  = Apb1Timer;
+	static constexpr uint32_t Timer5  = Apb1Timer;
+	static constexpr uint32_t Timer6  = Apb1Timer;
+	static constexpr uint32_t Timer7  = Apb1Timer;
+	static constexpr uint32_t Timer8  = Apb2Timer;
+	static constexpr uint32_t Timer15 = Apb2Timer;
+	static constexpr uint32_t Timer16 = Apb2Timer;
+	static constexpr uint32_t Timer17 = Apb2Timer;
 
 	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
-	static constexpr uint32_t Rtc = 32.768_kHz;
+	static constexpr uint32_t Rtc = Lse;
 
 	static bool inline
 	enable()
 	{
-		Rcc::enableLowSpeedExternalCrystal();
-		Rcc::enableRealTimeClock(Rcc::RealTimeClockSource::LowSpeedExternalCrystal);
+		Rcc::enableLseCrystal();
 
-		// set flash latency first because system already runs from MSI
 		Rcc::setFlashLatency<Frequency>();
-		Rcc::enableMultiSpeedInternalClock(Rcc::MsiFrequency::MHz48);
 		Rcc::updateCoreFrequency<Frequency>();
+
+		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
+		Rcc::setApb1Prescaler(Rcc::ApbPrescaler::Div1);
+		Rcc::setApb2Prescaler(Rcc::ApbPrescaler::Div1);
+
+		// The system already runs from the MSI
+		Rcc::enableMsiClock(Rcc::MsiRange::MHz48);
+
+		Rcc::setRealTimeClockSource(Rcc::RealTimeClockSource::Lse);
 
 		return true;
 	}
