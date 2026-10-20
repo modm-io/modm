@@ -11,22 +11,35 @@
 #ifndef MODM_LAN8720A_HPP
 #define MODM_LAN8720A_HPP
 
+#include "lan87xx.hpp"
+
 namespace modm
 {
 
 /// @ingroup modm_driver_lan8720a
 struct Lan8720a
 {
+	struct Traits
+	{
+		static constexpr uint16_t Identifier1 = 0x0007;
+		static constexpr uint16_t Identifier2 = 0xc0f0;
+		static constexpr uint16_t Identifier2Mask = 0xfff0;
+	};
+
+	template<ethernet::Clause22Mdio Mdio, uint8_t PhyAddress = 0>
+	using Driver = ethernet::Lan87xxPhy<Mdio, Traits, PhyAddress>;
+
+	// Legacy constants remain available for the STM32F4/F7 backend.
 	static constexpr uint32_t Address = 0x00;
 
 	struct Register
 	{
 		static constexpr uint16_t BCR = 0x0000;
 		static constexpr uint16_t BSR = 0x0001;
-		static constexpr uint16_t AN  = 0x0004;
-		static constexpr uint16_t SR  = 0x001f;
-		static constexpr uint16_t ISFR      = 0x001d;
-		static constexpr uint16_t ISFR_INT4 = 0x000B;
+		static constexpr uint16_t AN = 0x0004;
+		static constexpr uint16_t SR = 0x001f;
+		static constexpr uint16_t ISFR = 0x001d;
+		static constexpr uint16_t ISFR_INT4 = 0x0010;
 	};
 
 	static constexpr uint32_t ResetDelay = 0x000000FF;
@@ -51,7 +64,9 @@ struct Lan8720a
 	static constexpr uint16_t JabberDetection = 0x0002;
 };
 
-}
+template<ethernet::Clause22Mdio Mdio, uint8_t Address = 0>
+using Lan8720aPhy = Lan8720a::Driver<Mdio, Address>;
 
-#endif // MODM_LAN8720A_HPP
+}  // namespace modm
 
+#endif  // MODM_LAN8720A_HPP
