@@ -1,0 +1,14 @@
+<library>
+  <extends>modm:nucleo-h743zi</extends>
+  <!-- <extends>modm:nucleo-f042k6</extends> -->
+  <!-- <extends>modm:nucleo-f429zi</extends> -->
+  <!-- <extends>modm:nucleo-l152re</extends> -->
+  <!-- <extends>modm:rp-pico</extends> -->
+  <options>
+    <!-- Required for modm:rp-pico -->
+    <!-- <option name="modm:board:rp-pico:with_logger">yes</option> -->
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+  </modules>
+</library>
