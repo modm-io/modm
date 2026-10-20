@@ -46,7 +46,8 @@ def prepare(module, options):
         ":platform:gpio",
         ":platform:clockgen",
         ":architecture:interrupt",
-        ":architecture:fiber")
+        ":architecture:fiber",
+        ":math:algorithm")
 
     for instance in listify(device.get_driver("pio")["instance"]):
         module.add_submodule(Instance(instance))

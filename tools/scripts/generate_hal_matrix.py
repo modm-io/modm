@@ -80,7 +80,7 @@ def hal_get_modules():
         imodules = (m  for (repo, mfile) in mfiles  for m in lbuild.module.load_module_from_file(repo, mfile)
                     if m.available and m.fullname.startswith("modm:platform:") and
                     all(p not in m.fullname for p in not_interested) and
-                    m.fullname not in {"modm:platform:clock"})
+                    m.fullname not in {"modm:platform:clock", "modm:platform:clock.timer"})
         for module in imodules:
             # lookup the mapping of a module onto the hardware names
             if module.filename not in file_cache:

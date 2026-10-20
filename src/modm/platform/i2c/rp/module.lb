@@ -50,6 +50,7 @@ def prepare(module, options):
     module.depends(
         ":architecture:i2c",
         ":cmsis:device",
+        ":math:algorithm",
         ":platform:gpio")
 
     for instance in listify(device.get_driver("i2c")["instance"]):

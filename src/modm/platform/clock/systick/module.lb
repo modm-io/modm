@@ -88,6 +88,8 @@ def build(env):
         "systick_frequency": env.get(":freertos:frequency", freq),
         "has_freertos": env.has_module(":freertos"),
         "lock_free": "m7" in core,
+        # e.g. FreeRTOS on RP2040 still needs the tick hook, but not the clocks
+        "with_clocks": not env.has_module(":platform:clock.timer"),
         "ref_clk": div
     }
     env.outbasepath = "modm/src/modm/platform/clock"

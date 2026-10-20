@@ -63,6 +63,7 @@ modm::platform::SysTickTimer::disable()
 %% endif
 }
 
+%% if with_clocks
 // ----------------------------------------------------------------------------
 // Allow the ability to override the clock now functions
 #ifndef MODM_CHRONO_MILLI_CLOCK_NOW
@@ -137,3 +138,4 @@ MODM_CHRONO_MICRO_CLOCK_NOW() noexcept
 
 	return modm::chrono::micro_clock::time_point{modm::chrono::micro_clock::duration{us}};
 }
+%% endif

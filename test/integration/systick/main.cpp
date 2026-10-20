@@ -20,7 +20,6 @@
 #include "../integration_test.hpp"
 
 using namespace std::chrono_literals;
-using modm::platform::SysTickTimer;
 
 static uint32_t now_us() { return modm::chrono::micro_clock::now().time_since_epoch().count(); }
 static uint32_t now_ms() { return modm::chrono::milli_clock::now().time_since_epoch().count(); }
@@ -31,8 +30,14 @@ main()
 	Board::initialize();
 	bool passed = true;
 
+#if __has_include(<modm/platform/clock/systick_timer.hpp>)
+	using modm::platform::SysTickTimer;
 	const uint32_t period_us = (uint64_t(SysTick->LOAD + 1) * SysTickTimer::us_per_Ncycles) >> SysTickTimer::Ncycles;
-	MODM_LOG_INFO << "SysTick period " << period_us << "us" << modm::endl;
+#else
+	// The clock does not depend on an interrupt, so any period works
+	const uint32_t period_us = 10'000;
+#endif
+	MODM_LOG_INFO << "Clock period " << period_us << "us" << modm::endl;
 
 	// The clocks must not run backwards during the interrupt entry latency
 	{

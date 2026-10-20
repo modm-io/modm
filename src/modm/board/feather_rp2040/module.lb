@@ -28,7 +28,7 @@ def prepare(module, options):
         return False
 
     module.depends(
-        ":platform:clock",
+        ":platform:clock.timer",
         ":platform:core",
         ":platform:gpio",
         ":platform:usb",

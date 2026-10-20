@@ -86,7 +86,7 @@ inline void
 initialize()
 {
 	SystemClock::enable();
-	SysTickTimer::initialize<SystemClock>();
+	TimerClock::initialize<SystemClock>();
 
 	Led::setOutput();
 }
