@@ -13,20 +13,12 @@
 
 #include <modm/architecture/interface/atomic_lock.hpp>
 #include <modm/platform/device.hpp>
-%% if multicore
-#include <modm/platform/core/multicore.hpp>
-%% endif
 
 #include "systick_timer.hpp"
 
 static constexpr auto systick_step({{ 1000 // systick_frequency }});
 static volatile uint32_t milli_time{};
 static volatile uint32_t micro_time{};
-%% if multicore
-static volatile bool interrupts[{{cores}}]{};
-%% else
-static volatile bool interrupt{};
-%% endif
 %#
 extern "C" void
 %% if has_freertos
@@ -37,13 +29,6 @@ SysTick_Handler(void)
 {
 	milli_time += systick_step;
 	micro_time += systick_step * 1'000ul;
-%% if multicore
-%% for core in range(cores)
-	interrupts[{{core}}] = true;
-%% endfor
-%% else
-	interrupt = true;
-%% endif
 }
 
 // pick the lowest possible priority for the SysTick interrupt
@@ -87,24 +72,43 @@ modm::platform::SysTickTimer::disable()
 #	define MODM_CHRONO_MICRO_CLOCK_NOW modm::chrono::micro_clock::now
 #endif
 
+// Returns the time and the matching SysTick counter value. If the counter
+// reached zero, but the interrupt has not been executed yet, for example, due
+// to masked interrupts or a higher priority interrupt, the missing period is
+// added. The counter reloads on the clock after reaching zero.
+static modm_always_inline uint32_t
+read_time(const volatile uint32_t &time, uint32_t step, uint32_t &val)
+{
+%% if lock_free
+	// Writing PRIMASK is slow on Cortex-M7, retry if the interrupt executed instead
+	uint32_t now, before;
+	do
+	{
+		now = before = time;
+		val = SysTick->VAL;
+		if (SCB->ICSR & SCB_ICSR_PENDSTSET_Msk and (val = SysTick->VAL)) now += step;
+	}
+	while (before != time);
+%% else
+	// Only mask the interrupts of this core, since the counter is per core
+	const uint32_t primask = __get_PRIMASK();
+	__disable_irq();
+	uint32_t now = time;
+	val = SysTick->VAL;
+	if (SCB->ICSR & SCB_ICSR_PENDSTSET_Msk and (val = SysTick->VAL)) now += step;
+	__set_PRIMASK(primask);
+%% endif
+	return now;
+}
+
 modm::chrono::milli_clock::time_point modm_weak
 MODM_CHRONO_MILLI_CLOCK_NOW() noexcept
 {
 %% if systick_frequency == 1000
 	return modm::chrono::milli_clock::time_point{modm::chrono::milli_clock::duration{milli_time}};
 %% else
-	uint32_t val, ms;
-%% if multicore
-	volatile bool &interrupt = interrupts[modm::platform::multicore::Core::cpuId()];
-%% endif
-%#
-	do	// We cannot use an atomic lock here, the counter still overflows even
-	{	// if the interrupt hasn't happened yet.
-		interrupt = false;
-		val = SysTick->VAL;
-		ms = milli_time;
-	}
-	while(interrupt);
+	uint32_t val;
+	uint32_t ms = read_time(milli_time, systick_step, val);
 	const auto diff = SysTick->LOAD - val;
 	const auto ms_per_Ncycles = modm::platform::SysTickTimer::ms_per_Ncycles;
 	constexpr auto Ncycles = modm::platform::SysTickTimer::Ncycles;
@@ -117,18 +121,8 @@ MODM_CHRONO_MILLI_CLOCK_NOW() noexcept
 modm::chrono::micro_clock::time_point modm_weak
 MODM_CHRONO_MICRO_CLOCK_NOW() noexcept
 {
-	uint32_t val, us;
-%% if multicore
-	volatile bool &interrupt = interrupts[modm::platform::multicore::Core::cpuId()];
-%% endif
-%#
-	do	// We cannot use an atomic lock here, the counter still overflows even
-	{	// if the interrupt hasn't happened yet.
-		interrupt = false;
-		val = SysTick->VAL;
-		us = micro_time;
-	}
-	while(interrupt);
+	uint32_t val;
+	uint32_t us = read_time(micro_time, systick_step * 1'000ul, val);
 	const auto diff = SysTick->LOAD - val;
 	const auto us_per_Ncycles = modm::platform::SysTickTimer::us_per_Ncycles;
 	constexpr auto Ncycles = modm::platform::SysTickTimer::Ncycles;
