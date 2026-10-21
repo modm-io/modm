@@ -76,23 +76,24 @@ constexpr uint32_t ReceiveWatchdog = modm::Bit22;
 constexpr uint32_t GiantPacket = modm::Bit23;
 constexpr uint32_t CrcError = modm::Bit24;
 constexpr uint32_t FirstAndLastDescriptor = modm::Bit29 | modm::Bit28;
-static_assert(modm::platform::detail::isExactRmii10MDribbleCrcError(
+static_assert(modm::platform::detail::isRmii10MFakeDribbleError(
 		ErrorSummary | DribbleError | CrcError));
-static_assert(modm::platform::detail::isExactRmii10MDribbleCrcError(
+static_assert(modm::platform::detail::isRmii10MFakeDribbleError(
 		ErrorSummary | DribbleError | CrcError | FirstAndLastDescriptor));
-static_assert(not modm::platform::detail::isExactRmii10MDribbleCrcError(
+static_assert(not modm::platform::detail::isRmii10MFakeDribbleError(
 		DribbleError | CrcError));
-static_assert(not modm::platform::detail::isExactRmii10MDribbleCrcError(
+static_assert(not modm::platform::detail::isRmii10MFakeDribbleError(
 		ErrorSummary | CrcError));
-static_assert(not modm::platform::detail::isExactRmii10MDribbleCrcError(
+// Observed on STM32H723 rev Z in near-end PHY loopback: dribble without CRC error
+static_assert(modm::platform::detail::isRmii10MFakeDribbleError(
 		ErrorSummary | DribbleError));
-static_assert(not modm::platform::detail::isExactRmii10MDribbleCrcError(
+static_assert(not modm::platform::detail::isRmii10MFakeDribbleError(
 		ErrorSummary | DribbleError | CrcError | ReceiveError));
-static_assert(not modm::platform::detail::isExactRmii10MDribbleCrcError(
+static_assert(not modm::platform::detail::isRmii10MFakeDribbleError(
 		ErrorSummary | DribbleError | CrcError | OverflowError));
-static_assert(not modm::platform::detail::isExactRmii10MDribbleCrcError(
+static_assert(not modm::platform::detail::isRmii10MFakeDribbleError(
 		ErrorSummary | DribbleError | CrcError | ReceiveWatchdog));
-static_assert(not modm::platform::detail::isExactRmii10MDribbleCrcError(
+static_assert(not modm::platform::detail::isRmii10MFakeDribbleError(
 		ErrorSummary | DribbleError | CrcError | GiantPacket));
 
 static_assert(modm::platform::detail::canCommitLinkUpState(DriverState::Uninitialized));
