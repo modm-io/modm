@@ -988,8 +988,9 @@ EthernetMac::isValidReceiveDescriptor(RxDmaDescriptor const &descriptor)
 	const bool toleratedRmii10MError = detail::needsRmii10MWorkaround(
 			state().mediaInterface, state().speed) and
 			detail::isRmii10MFakeDribbleError(status.value);
+	const bool hasError = (status.value & detail::EthH7RxErrorMask) != 0;
 	return status.none(detail::EthH7RxDescriptor3::ContextDescriptor) and
-			(status.none(detail::EthH7RxDescriptor3::ErrorSummary) or toleratedRmii10MError) and
+			(not hasError or toleratedRmii10MError) and
 			status.all(detail::EthH7RxDescriptor3::FirstDescriptor |
 					detail::EthH7RxDescriptor3::LastDescriptor);
 }

@@ -206,24 +206,24 @@ needsRmii10MWorkaround(ethernet::MediaInterface interface, ethernet::Speed speed
 			speed == ethernet::Speed::Speed10M;
 }
 
+// RDES3 write-back error bits. RM0433 defines the error summary (ES) as their
+// logical OR, however, STM32H7 rev Y (MAC 4.10) also sets ES for IP checksum
+// errors, which are reported in RDES1 instead. Therefore ES is not used.
+inline constexpr uint32_t EthH7RxDribbleError = modm::Bit19;
+inline constexpr uint32_t EthH7RxCrcError = modm::Bit24;
+inline constexpr uint32_t EthH7RxErrorMask = EthH7RxDribbleError |
+		modm::Bit20 /* Receive Error */ | modm::Bit21 /* Overflow Error */ |
+		modm::Bit22 /* Watchdog Timeout */ | modm::Bit23 /* Giant Packet */ |
+		EthH7RxCrcError;
+
 // ES0392 Rev 15, section 2.26.20: RMII 10 Mbit/s can add a fake nibble to a
 // received frame, which is flagged as a dribble error, optionally together
 // with a CRC error. RMII only forwards complete bytes, so the data is intact.
 constexpr bool
 isRmii10MFakeDribbleError(uint32_t status)
 {
-	constexpr uint32_t ErrorSummary = modm::Bit15;
-	constexpr uint32_t DribbleError = modm::Bit19;
-	constexpr uint32_t ReceiveError = modm::Bit20;
-	constexpr uint32_t OverflowError = modm::Bit21;
-	constexpr uint32_t ReceiveWatchdog = modm::Bit22;
-	constexpr uint32_t GiantPacket = modm::Bit23;
-	constexpr uint32_t CrcError = modm::Bit24;
-	constexpr uint32_t ErrorMask = DribbleError | ReceiveError | OverflowError |
-			ReceiveWatchdog | GiantPacket | CrcError;
 	// Accept the dribble error with or without a CRC error, but nothing else
-	return (status & (ErrorSummary | (ErrorMask & ~CrcError))) ==
-			(ErrorSummary | DribbleError);
+	return (status & EthH7RxErrorMask & ~EthH7RxCrcError) == EthH7RxDribbleError;
 }
 
 struct EthH7MacState
