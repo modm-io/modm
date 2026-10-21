@@ -123,12 +123,34 @@ struct BootClock
 {
 	// STM32F0 needs /2
 	static constexpr float scalar = 1.0 / 1;
-	static constexpr uint32_t Usart1 = Rcc::BootFrequency * scalar;
-	static constexpr uint32_t Usart2 = Rcc::BootFrequency * scalar;
-	static constexpr uint32_t Usart3 = Rcc::BootFrequency * scalar;
-	static constexpr uint32_t Usart4 = Rcc::BootFrequency * scalar;
-	static constexpr uint32_t Usart5 = Rcc::BootFrequency * scalar;
+	static constexpr uint32_t Frequency = Rcc::BootFrequency * scalar;
+	static constexpr uint32_t Usart1 = Frequency;
+	static constexpr uint32_t Usart2 = Frequency;
+	static constexpr uint32_t Usart3 = Frequency;
+	static constexpr uint32_t Usart4 = Frequency;
+	static constexpr uint32_t Usart5 = Frequency;
+	static constexpr uint32_t Usart6 = Frequency;
+	static constexpr uint32_t Usart10 = Frequency;
+	static constexpr uint32_t Uart4 = Frequency;
+	static constexpr uint32_t Uart5 = Frequency;
+	static constexpr uint32_t Uart7 = Frequency;
+	static constexpr uint32_t Uart8 = Frequency;
+	static constexpr uint32_t Uart9 = Frequency;
+	static constexpr uint32_t Lpuart1 = Frequency;
 };
+
+// Boards that log via RTT have no stlink::Uart, which needs no clock setup.
+// Qualified lookup only uses the fallback if the board does not declare these.
+namespace rtt_fallback
+{
+struct Uart
+{
+	template< class... > static void connect() {}
+	template< class, auto... > static void initialize() {}
+};
+namespace Tx { using Tx = void; }
+}
+namespace Board::stlink { using namespace ::rtt_fallback; }
 #endif
 
 int main()

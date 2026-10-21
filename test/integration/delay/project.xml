@@ -1,6 +1,8 @@
 <library>
   <!-- <extends>modm:disco-f469ni</extends> -->
+  <!-- <extends>modm:disco-f723ie</extends> -->
   <!-- <extends>modm:disco-f746ng</extends> -->
+  <!-- <extends>modm:disco-l152rc</extends> -->
   <!-- <extends>modm:mega-2560-pro</extends> -->
   <!-- <extends>modm:nucleo-f072rb</extends> -->
   <!-- <extends>modm:nucleo-f091rc</extends> -->
