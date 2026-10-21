@@ -32,16 +32,14 @@ to the mounted virtual disk.
 
 ### OpenOCD
 
-Another option is to use Picoprobe and custom version of OpenOCD provided by RPi.
+Another option is to use the [Raspberry Pi Debug Probe](https://www.raspberrypi.com/products/debug-probe/) together with the [Raspberry Pi Picoprobe software](https://github.com/raspberrypi/debugprobe) and a custom version of OpenOCD provided by RPi.
 
 You would need to build and program one of the boards with the Picoprobe firmware,
 configure and build RPi OpenOCD, and connect the boards via SWD.
-The wiring diagram and detailed description is available in the
+The wiring diagram and detailed description are available in the
 [Pico Documentation](https://datasheets.raspberrypi.com/pico/getting-started-with-pico.pdf#Appendix%20A:%20Using%20Picoprobe).
 
-The how-to shows steps for building and installing the RPi OpenOCD into your
-system globally, however, if you still want to be able to work with other OpenOCD
-binaries, you should only install it locally:
+The how-to explains how to build and install the RPi OpenOCD globally, but if you want to keep using other OpenOCD binaries, you should install it only locally:
 
 ```sh
 sudo apt install automake autoconf build-essential texinfo libtool libftdi-dev libusb-1.0-0-dev
