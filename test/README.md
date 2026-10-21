@@ -65,10 +65,13 @@ lbuild as well. They are all submodules of `modm:test` and are all platform
 independent. We've written a small Makefile for the most commonly used commands.
 
 ```sh
-cd tests
+cd test
 # generates, compiles and executes the unit tests for hosted targets
 make run-hosted-linux
 make run-hosted-darwin
+# executes only the lwIP hosted tests on Linux or Windows
+make run-hosted-lwip-linux
+make run-hosted-lwip-windows
 # generates and compiles the unit tests for embedded targets
 make compile-nucleo-f411re
 make compile-nucleo-f103rb_A
@@ -81,8 +84,14 @@ make run-nucleo-f103rb_B
 make run-arduino-nano_A # to _H
 ```
 
+See [the STM32H7 Ethernet test documentation](modm/platform/eth/stm32h7/README.md)
+for compile targets, hardware setup, and coverage.
+
 The embedded test targets all use the `modm::Board` interface to initialize the
-targets and output unit tests results via the default serial connection.
+targets and output unit test results via the default serial connection. The
+`run-*` Make targets program the board but do not capture or interpret that
+serial output; the serial test summary determines whether a hardware suite
+passed.
 
 The unit test library we use is located in `modm/src/unittest` which corresponds
 to the `modm:unittest` modules. See the existing unit tests for examples on how

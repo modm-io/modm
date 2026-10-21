@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <extends>modm:nucleo-h753zi</extends>
+  <options>
+    <option name="modm:build:build.path">../../build/generated-unittest/nucleo-h753zi-eth/</option>
+    <option name="modm:build:unittest.source">../../build/generated-unittest/nucleo-h753zi-eth/modm-test</option>
+    <option name="modm:platform:exti:with_handlers">false</option>
+    <option name="modm:platform:cortex-m:main_stack_size">8Ki</option>
+    <option name="modm:platform:eth:dma.rx_descriptors">4</option>
+    <option name="modm:platform:eth:dma.tx_descriptors">4</option>
+  </options>
+  <modules>
+    <module>modm:platform:heap</module>
+    <module>modm-test:test:platform:eth.stm32h7</module>
+  </modules>
+</library>

@@ -28,7 +28,7 @@ namespace Ethernet
 	using RMII_Mdc = GpioOutputC1;
 	using RMII_Rx_D0 = GpioInputC4;
 	using RMII_Rx_D1 = GpioInputC5;
-	using Port = Eth<modm::Lan8720a>;
+	using Port = Eth<modm::Lan8720a<>>;
 }
 
 UBaseType_t ulNextRand;

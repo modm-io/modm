@@ -1,0 +1,107 @@
+/*
+ * Copyright (c) 2026, Kaelin Laundry
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#include "eth.hpp"
+
+namespace modm::platform::detail
+{
+
+// Cache invalidations apply at line granularity so DMA buffers should be aligned
+// to line width.
+modm_section("{{ eth_dma_section }}") modm_aligned(EthH7DescriptorAlignment)
+EthH7DmaStorage ethH7DmaStorage;
+
+EthH7MacState ethH7MacState{};
+
+void
+ethH7RecordDmaStatus(uint32_t status, bool running)
+{
+	ethH7MacState.hardwareDmaErrorStatus |= status & EthH7DmaErrorStatus;
+	if ((status & ETH_DMACSR_FBE) and
+			ethH7MacState.driverFailure != EthH7MacState::DriverFailure::FatalBusError)
+		++ethH7MacState.fatalBusErrors;
+	if (status & ETH_DMACSR_CDE) ++ethH7MacState.contextDescriptorErrors;
+	if (status & ETH_DMACSR_RWT) ++ethH7MacState.rxWatchdogTimeouts;
+	if (running and (status & ETH_DMACSR_RPS)) ++ethH7MacState.rxProcessStopped;
+	if (status & ETH_DMACSR_RBU) ++ethH7MacState.rxBufferUnavailable;
+	if (running and (status & ETH_DMACSR_TPS)) ++ethH7MacState.txProcessStopped;
+	if (status & ETH_DMACSR_TBU) ++ethH7MacState.txBufferUnavailable;
+}
+
+uint32_t
+ethH7BuildWakeupEvents(uint32_t status, bool running)
+{
+	uint32_t events = 0;
+	if (status & (ETH_DMACSR_RI | ETH_DMACSR_RBU | ETH_DMACSR_RPS | ETH_DMACSR_RWT))
+		events |= uint32_t(EthernetMac::WakeupEvent::Receive);
+	if (status & (ETH_DMACSR_TI | ETH_DMACSR_TPS | ETH_DMACSR_TBU))
+		events |= uint32_t(EthernetMac::WakeupEvent::Transmit);
+	if ((status & (ETH_DMACSR_CDE | ETH_DMACSR_FBE | ETH_DMACSR_RWT)) or
+			(running and (status & (ETH_DMACSR_RPS | ETH_DMACSR_TPS))))
+		events |= uint32_t(EthernetMac::WakeupEvent::Error);
+	return events;
+}
+
+namespace
+{
+
+void
+restartStoppedDma(uint32_t status)
+{
+	// Resume DMA channels stopped by recoverable ring starvation while the driver is
+	// still running. Fatal bus errors are handled separately.
+	if (status & ETH_DMACSR_RPS) {
+		ETH->DMACRCR |= ETH_DMACRCR_SR;
+		__DMB();
+		ETH->DMACRDTPR = uint32_t(reinterpret_cast<std::uintptr_t>(
+				&ethH7DmaStorage.rxDescriptors[ethH7MacState.rxTailIndex]));
+	}
+	if (status & ETH_DMACSR_TPS) {
+		ETH->DMACTCR |= ETH_DMACTCR_ST;
+		__DMB();
+		ETH->DMACTDTPR = uint32_t(reinterpret_cast<std::uintptr_t>(
+				&ethH7DmaStorage.txDescriptors[ethH7MacState.txIndex]));
+	}
+}
+
+} // namespace
+
+void
+ethH7HandleInterrupt()
+{
+	const uint32_t status = ETH->DMACSR;
+	const bool running =
+			ethH7MacState.driverState == EthH7MacState::DriverState::Running;
+	const bool fatalBusError = (status & ETH_DMACSR_FBE) != 0;
+
+	ethH7RecordDmaStatus(status, running);
+	ethH7MacState.interruptEvents |= ethH7BuildWakeupEvents(status, running);
+
+	if (fatalBusError) {
+		ethH7MacState.driverFailure = EthH7MacState::DriverFailure::FatalBusError;
+		ethH7MacState.driverState = EthH7MacState::DriverState::Faulted;
+		ETH->DMACIER = 0;
+	}
+
+	const uint32_t acknowledge = status & EthH7DmaHandledStatus;
+	if (acknowledge != 0)
+		ETH->DMACSR = acknowledge;
+
+	if (running and not fatalBusError)
+		restartStoppedDma(status);
+}
+
+}
+
+MODM_ISR(ETH)
+{
+	modm::platform::detail::ethH7HandleInterrupt();
+}

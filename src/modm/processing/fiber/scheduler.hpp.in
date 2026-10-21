@@ -16,11 +16,9 @@
 
 #include "task.hpp"
 #include <modm/architecture/interface/assert.hpp>
+#include <modm/architecture/interface/interrupt.hpp>
 %% if multicore
 #include <modm/platform/core/multicore.hpp>
-%% endif
-%% if core.startswith("cortex-m")
-#include <modm/platform/device.hpp>
 %% endif
 
 namespace modm::fiber
@@ -60,21 +58,9 @@ protected:
 	uintptr_t inline
 	get_id() const
 	{
-%% if core.startswith("cortex-m")
 		// Ensure that calling this in an interrupt gives a different ID
-		if (const auto irq = __get_IPSR(); irq >= 16) return irq;
-%% endif
+		if (const auto irq = modm::activeExceptionNumber(); irq >= 16) return irq;
 		return reinterpret_cast<uintptr_t>(current);
-	}
-
-	static bool inline
-	isInsideInterrupt()
-	{
-%% if core.startswith("cortex-m")
-		return __get_IPSR();
-%% else
-		return false;
-%% endif
 	}
 
 	void inline
@@ -121,7 +107,7 @@ protected:
 	{
 		// An interrupt cannot switch to another fiber, so it busy-waits instead,
 		// for example when a fault handler logs and flushes a buffered UART
-		if (current == nullptr or isInsideInterrupt()) return;
+		if (current == nullptr or modm::isInterruptContext()) return;
 		Task* next = current->next;
 		// If there's only one fiber running, we could just return here.
 		// However, we need to check the stack for overflow.

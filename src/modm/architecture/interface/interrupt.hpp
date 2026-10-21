@@ -108,7 +108,7 @@
 #	define MODM_ISR(vector, ...) \
 		ISR( vector ## _vect, ##__VA_ARGS__)
 
-#elif defined MODM_CPU_ARM
+#elif defined MODM_CPU_CORTEX_M
 
 
 #ifdef __cplusplus
@@ -159,5 +159,44 @@
 #endif
 
 #endif // __DOXYGEN__
+
+#ifdef __cplusplus
+
+namespace modm
+{
+
+/**
+ * Returns the exception number of the active interrupt from the IPSR register:
+ * 0 in thread mode, 1-15 for system exceptions, 16+ for device interrupts.
+ *
+ * This is implemented for Cortex-M and returns 0 on other architectures.
+ */
+inline uint32_t
+activeExceptionNumber() noexcept
+{
+#ifdef MODM_CPU_CORTEX_M
+	uint32_t ipsr;
+	__asm__ volatile ("mrs %0, ipsr" : "=r" (ipsr));
+	return ipsr;
+#else
+	return 0;
+#endif
+}
+
+/**
+ * Check whether execution is currently inside an interrupt context.
+ *
+ * This is implemented for Cortex-M and returns `false` on other
+ * architectures.
+ */
+inline bool
+isInterruptContext() noexcept
+{
+	return activeExceptionNumber() != 0;
+}
+
+}
+
+#endif // __cplusplus
 
 #endif // MODM_INTERRUPT_HPP

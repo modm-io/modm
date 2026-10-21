@@ -18,7 +18,8 @@ def init(module):
 
 def prepare(module, options):
     module.depends(":architecture:clock", ":architecture:atomic",
-                   ":architecture:assert", ":architecture:fiber", ":stdc++")
+                   ":architecture:assert", ":architecture:fiber",
+                   ":architecture:interrupt", ":stdc++")
 
     core = options[":target"].get_driver("core")["type"]
     if core.startswith("cortex-m"): module.depends(":cmsis:device")

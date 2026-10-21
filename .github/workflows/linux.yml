@@ -89,6 +89,10 @@ jobs:
         if: always()
         run: |
           (cd test && make run-hosted-linux-no-fiber)
+      - name: Hosted lwIP Unittests
+        if: always()
+        run: |
+          (cd test && make run-hosted-lwip-linux)
       # The remaining ones are compiled by the stm32-unittests job
       - name: Compile STM32 Unittests
         if: always()
@@ -125,7 +129,7 @@ jobs:
       # The remaining ones are compiled by the unittests-linux-generic job
       - name: Compile STM32 Unittests
         run: |
-          for target in l432kc f091rc_A f091rc_B f103rb_A f103rb_B f401re f411re f429zi h723zg l496zg-p l552ze-q; do
+          for target in l432kc f091rc_A f091rc_B f103rb_A f103rb_B f401re f411re f429zi h723zg h753zi-eth l496zg-p l552ze-q; do
             (cd test && make compile-nucleo-$target)
           done
 

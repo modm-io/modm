@@ -1,0 +1,1254 @@
+/*
+ * Copyright (c) 2026, Kaelin Laundry
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#include "ethernet_hardware_test.hpp"
+
+#include <modm/board.hpp>
+#include <modm/debug/logger.hpp>
+#include <modm/driver/ethernet/lan8742a.hpp>
+#include <modm/platform.hpp>
+
+#include <algorithm>
+#include <array>
+#include <cstddef>
+#include <cstdint>
+#include <span>
+#include <utility>
+
+using namespace modm::platform;
+
+namespace
+{
+
+constexpr uint8_t MissingPhyAddress = Board::eth::PhyAddress == 31 ? 30 : 31;
+using Eth = EthernetMac;
+using Port = EthernetMac;
+using Phy = modm::Lan8742a<Board::eth::PhyAddress>;
+using MissingPhy = modm::Lan8742a<MissingPhyAddress>;
+
+constexpr std::array<uint8_t, 6> MacAddress{ {0x02, 0, 0, 0, 0, 0} };
+constexpr std::array<uint8_t, 6> PeerAddress{ {0x02, 0, 0, 0, 0, 1} };
+constexpr uint16_t TestEtherType = 0x88b5;
+constexpr uint16_t EtherTypeIpv4 = 0x0800;
+constexpr uint16_t EtherTypeArp = 0x0806;
+constexpr uint16_t PhyIdentifier1 = Phy::PhyIdentifier1;
+constexpr uint16_t PhyIdentifier2 = Phy::PhyIdentifier2;
+constexpr uint16_t PhyIdentifier2Mask = Phy::PhyIdentifier2Mask;
+constexpr uint16_t PhyLoopback = uint16_t(Phy::BasicControl::Loopback);
+constexpr uint16_t PhySpeed100 = uint16_t(Phy::BasicControl::SpeedSelect);
+constexpr uint16_t PhyFullDuplex = uint16_t(Phy::BasicControl::DuplexMode);
+constexpr auto FrameTimeout = std::chrono::milliseconds{250};
+constexpr auto PhyModeTimeout = std::chrono::seconds{1};
+constexpr auto PhyResetTimeout = std::chrono::milliseconds{550};
+
+using Frame = std::array<uint8_t, Port::MaxFrameSize>;
+
+template <typename Register>
+Eth::MdioError
+readPhyRegister(Register reg, uint16_t& value)
+{
+	return Eth::readPhyRegister(Board::eth::PhyAddress, uint8_t(reg), value);
+}
+
+template <typename Register>
+Eth::MdioError
+writePhyRegister(Register reg, uint16_t value)
+{
+	return Eth::writePhyRegister(Board::eth::PhyAddress, uint8_t(reg), value);
+}
+
+struct LinkSynchronizationResult
+{
+	Port::LinkStatus status{};
+	Eth::MdioError mdioError{Eth::MdioError::None};
+	Port::LinkUpdateError macError{Port::LinkUpdateError::None};
+
+	explicit operator bool() const
+	{
+		return mdioError == Eth::MdioError::None and
+				macError == Port::LinkUpdateError::None;
+	}
+};
+
+LinkSynchronizationResult
+synchronizeLink()
+{
+	const auto observed = Phy::readLinkStatus<Eth>();
+	if (not observed)
+		return {Port::getLinkStatus(), observed.error, {}};
+	const auto updated = Port::notifyUpdatedLinkStatus(observed.status);
+	return {updated.status, {}, updated.error};
+}
+
+void
+write16(uint8_t* data, uint16_t value)
+{
+	data[0] = uint8_t(value >> 8);
+	data[1] = uint8_t(value);
+}
+
+void
+write32(uint8_t* data, uint32_t value)
+{
+	data[0] = uint8_t(value >> 24);
+	data[1] = uint8_t(value >> 16);
+	data[2] = uint8_t(value >> 8);
+	data[3] = uint8_t(value);
+}
+
+uint32_t
+checksumSum(std::span<const uint8_t> data, uint32_t sum = 0)
+{
+	std::size_t index = 0;
+	for (; index + 1 < data.size(); index += 2)
+		sum += (uint32_t(data[index]) << 8) | data[index + 1];
+	if (index < data.size())
+		sum += uint32_t(data[index]) << 8;
+	while (sum >> 16)
+		sum = (sum & 0xffff) + (sum >> 16);
+	return sum;
+}
+
+uint16_t
+checksum(std::span<const uint8_t> data, uint32_t sum = 0)
+{
+	return uint16_t(~checksumSum(data, sum));
+}
+
+uint32_t
+pseudoHeaderSum(const uint8_t* ip, uint8_t protocol, uint16_t length)
+{
+	uint32_t sum = checksumSum({ip + 12, 8});
+	sum += protocol;
+	sum += length;
+	return sum;
+}
+
+void
+fillEthernetHeader(Frame& frame, uint16_t etherType)
+{
+	std::copy(MacAddress.begin(), MacAddress.end(), frame.begin());
+	std::copy(PeerAddress.begin(), PeerAddress.end(), frame.begin() + 6);
+	write16(frame.data() + 12, etherType);
+}
+
+void
+fillTestFrame(Frame& frame, std::size_t length, uint32_t sequence)
+{
+	frame.fill(0);
+	fillEthernetHeader(frame, TestEtherType);
+	write32(frame.data() + 14, sequence);
+	write16(frame.data() + 18, uint16_t(length));
+	for (std::size_t index = 20; index < length; ++index)
+		frame[index] = uint8_t((index + sequence * 17) % 251);
+}
+
+void
+fillIpv4Header(Frame& frame, uint8_t protocol, uint16_t payloadLength, bool softwareChecksum)
+{
+	auto* ip = frame.data() + 14;
+	ip[0] = 0x45;
+	ip[1] = 0;
+	write16(ip + 2, uint16_t(20 + payloadLength));
+	write16(ip + 4, 0x1234);
+	write16(ip + 6, 0x4000);
+	ip[8] = 64;
+	ip[9] = protocol;
+	write16(ip + 10, 0);
+	ip[12] = 10; ip[13] = 0; ip[14] = 0; ip[15] = 1;
+	ip[16] = 10; ip[17] = 0; ip[18] = 0; ip[19] = 2;
+	if (softwareChecksum)
+		write16(ip + 10, checksum({ip, 20}));
+}
+
+std::size_t
+makeArp(Frame& frame)
+{
+	constexpr std::size_t length = 60;
+	frame.fill(0);
+	fillEthernetHeader(frame, EtherTypeArp);
+	auto* arp = frame.data() + 14;
+	write16(arp, 1);
+	write16(arp + 2, EtherTypeIpv4);
+	arp[4] = 6;
+	arp[5] = 4;
+	write16(arp + 6, 1);
+	std::copy(PeerAddress.begin(), PeerAddress.end(), arp + 8);
+	arp[14] = 10; arp[15] = 0; arp[16] = 0; arp[17] = 1;
+	std::copy(MacAddress.begin(), MacAddress.end(), arp + 18);
+	arp[24] = 10; arp[25] = 0; arp[26] = 0; arp[27] = 2;
+	return length;
+}
+
+std::size_t
+makeIcmp(Frame& frame)
+{
+	constexpr uint16_t icmpLength = 26;
+	constexpr std::size_t frameLength = 60;
+	frame.fill(0);
+	fillEthernetHeader(frame, EtherTypeIpv4);
+	fillIpv4Header(frame, 1, icmpLength, true);
+	auto* icmp = frame.data() + 34;
+	icmp[0] = 8;
+	icmp[1] = 0;
+	write16(icmp + 2, 0);
+	write16(icmp + 4, 0x1234);
+	write16(icmp + 6, 1);
+	for (std::size_t index = 8; index < icmpLength; ++index)
+		icmp[index] = uint8_t(index);
+	write16(icmp + 2, checksum({icmp, icmpLength}));
+	return frameLength;
+}
+
+std::size_t
+makeUdp(Frame& frame, bool softwareChecksum, bool malformed = false)
+{
+	constexpr uint16_t udpLength = 26;
+	constexpr std::size_t frameLength = 60;
+	frame.fill(0);
+	fillEthernetHeader(frame, EtherTypeIpv4);
+	fillIpv4Header(frame, 17, udpLength, softwareChecksum or malformed);
+	auto* ip = frame.data() + 14;
+	auto* udp = frame.data() + 34;
+	write16(udp, 5000);
+	write16(udp + 2, 5001);
+	write16(udp + 4, udpLength);
+	write16(udp + 6, 0);
+	for (std::size_t index = 8; index < udpLength; ++index)
+		udp[index] = uint8_t(index + 31);
+	if (softwareChecksum)
+		write16(udp + 6, checksum({udp, udpLength}, pseudoHeaderSum(ip, 17, udpLength)));
+	else if (malformed)
+		write16(udp + 6, 0x1234);
+	return frameLength;
+}
+
+void
+makeUdpFragments(Frame& first, Frame& second)
+{
+	constexpr uint16_t udpLength = 26;
+	constexpr uint16_t firstPayloadLength = 16;
+	constexpr uint16_t secondPayloadLength = udpLength - firstPayloadLength;
+	Frame datagram{};
+	(void) makeUdp(datagram, true);
+
+	first.fill(0);
+	fillEthernetHeader(first, EtherTypeIpv4);
+	fillIpv4Header(first, 17, firstPayloadLength, false);
+	auto* firstIp = first.data() + 14;
+	write16(firstIp + 6, 0x2000);
+	std::copy_n(datagram.begin() + 34, firstPayloadLength, first.begin() + 34);
+	write16(firstIp + 10, checksum({firstIp, 20}));
+
+	second.fill(0);
+	fillEthernetHeader(second, EtherTypeIpv4);
+	fillIpv4Header(second, 17, secondPayloadLength, false);
+	auto* secondIp = second.data() + 14;
+	write16(secondIp + 6, firstPayloadLength / 8);
+	std::copy_n(datagram.begin() + 34 + firstPayloadLength,
+			secondPayloadLength, second.begin() + 34);
+	write16(secondIp + 10, checksum({secondIp, 20}));
+}
+
+bool
+validFragmentedUdpChecksum(const Frame& first, const Frame& second)
+{
+	constexpr uint16_t udpLength = 26;
+	constexpr uint16_t firstPayloadLength = 16;
+	std::array<uint8_t, udpLength> udp{};
+	std::copy_n(first.begin() + 34, firstPayloadLength, udp.begin());
+	std::copy_n(second.begin() + 34, udpLength - firstPayloadLength,
+			udp.begin() + firstPayloadLength);
+	return checksum(udp, pseudoHeaderSum(first.data() + 14, 17, udpLength)) == 0;
+}
+
+std::size_t
+makeTcp(Frame& frame, bool softwareChecksum, bool malformed = false)
+{
+	constexpr uint16_t tcpLength = 26;
+	constexpr std::size_t frameLength = 60;
+	frame.fill(0);
+	fillEthernetHeader(frame, EtherTypeIpv4);
+	fillIpv4Header(frame, 6, tcpLength, softwareChecksum or malformed);
+	auto* ip = frame.data() + 14;
+	auto* tcp = frame.data() + 34;
+	write16(tcp, 5000);
+	write16(tcp + 2, 5001);
+	write32(tcp + 4, 0x12345678);
+	write32(tcp + 8, 0x01020304);
+	tcp[12] = 0x50;
+	tcp[13] = 0x18;
+	write16(tcp + 14, 4096);
+	write16(tcp + 16, 0);
+	write16(tcp + 18, 0);
+	for (std::size_t index = 20; index < tcpLength; ++index)
+		tcp[index] = uint8_t(index + 47);
+	if (softwareChecksum)
+		write16(tcp + 16, checksum({tcp, tcpLength}, pseudoHeaderSum(ip, 6, tcpLength)));
+	else if (malformed)
+		write16(tcp + 16, 0x1234);
+	return frameLength;
+}
+
+bool
+validIpv4Checksum(const Frame& frame)
+{
+	return checksum({frame.data() + 14, 20}) == 0;
+}
+
+bool
+validTransportChecksum(const Frame& frame, uint8_t protocol, uint16_t length)
+{
+	const auto* ip = frame.data() + 14;
+	return checksum({frame.data() + 34, length}, pseudoHeaderSum(ip, protocol, length)) == 0;
+}
+
+void
+connectPins()
+{
+	Port::connect<Board::eth::RefClk::Refclk,
+		Board::eth::Mdc::Mdc,
+		Board::eth::Mdio::Mdio,
+		Board::eth::CrsDv::Rcccrsdv,
+		Board::eth::TxEn::Txen,
+		Board::eth::Txd0::Txd0,
+		Board::eth::Txd1::Txd1,
+		Board::eth::Rxd0::Rxd0,
+		Board::eth::Rxd1::Rxd1>();
+}
+
+bool
+resetPhyAndWait()
+{
+	// LAN8742A DS00001989A section 3.8.6.2 specifies up to 500 ms for a
+	// software reset; the fixture adds 50 ms for polling and scheduling.
+	constexpr uint16_t Reset = uint16_t(Phy::BasicControl::SoftReset);
+	if (writePhyRegister(Phy::Register::BasicControl, Reset) != Eth::MdioError::None)
+		return false;
+
+	const auto start = modm::Clock::now();
+	while (modm::Clock::now() - start < PhyResetTimeout) {
+		uint16_t control = 0;
+		if (readPhyRegister(Phy::Register::BasicControl, control) != Eth::MdioError::None)
+			return false;
+		if ((control & Reset) == 0)
+			return true;
+		modm::delay_ms(1);
+	}
+	return false;
+}
+
+bool
+writeLoopbackMode(Port::Speed speed, Port::DuplexMode duplex)
+{
+	// LAN8742A DS00001989A sections 3.8.10.1 and 4.2.1: BMCR Loopback
+	// selects near-end loopback; forced speed and duplex select its test mode.
+	uint16_t control = PhyLoopback;
+	if (speed == Port::Speed::Speed100M)
+		control |= PhySpeed100;
+	if (duplex == Port::DuplexMode::Full)
+		control |= PhyFullDuplex;
+	return writePhyRegister(Phy::Register::BasicControl, control) ==
+			Eth::MdioError::None;
+}
+
+bool
+waitForLoopbackMode(Port::Speed speed, Port::DuplexMode duplex)
+{
+	const Port::LinkMode expected{speed, duplex};
+	const auto start = modm::Clock::now();
+	LinkSynchronizationResult last{};
+	while (modm::Clock::now() - start < PhyModeTimeout) {
+		last = synchronizeLink();
+		if (not last) {
+			MODM_LOG_ERROR << "Ethernet link service error="
+					<< ((uint32_t(last.mdioError) << 8) | uint32_t(last.macError))
+					<< " DMACSR=" << modm::hex
+					<< uint32_t(ETH->DMACSR) << " DMADSR=" << uint32_t(ETH->DMADSR)
+					<< " MTLTQDR=" << uint32_t(ETH->MTLTQDR)
+					<< " MTLRQDR=" << uint32_t(ETH->MTLRQDR)
+					<< " MACDR=" << uint32_t(ETH->MACDR) << modm::endl;
+			return false;
+		}
+		if (last.status.state == Port::LinkState::Up and last.status.mode == expected)
+			return true;
+		modm::delay_ms(1);
+	}
+	MODM_LOG_ERROR << "Ethernet PHY mode timeout state="
+			<< uint32_t(last.status.state) << " DMACSR=" << modm::hex
+			<< uint32_t(ETH->DMACSR) << " DMADSR=" << uint32_t(ETH->DMADSR)
+			<< " MTLTQDR=" << uint32_t(ETH->MTLTQDR)
+			<< " MTLRQDR=" << uint32_t(ETH->MTLRQDR)
+			<< " MACDR=" << uint32_t(ETH->MACDR) << modm::endl;
+	return false;
+}
+
+bool
+setLoopbackMode(Port::Speed speed, Port::DuplexMode duplex)
+{
+	const Port::LinkMode expected{speed, duplex};
+	const auto current = Port::getLinkStatus();
+	if (current.state == Port::LinkState::Up and current.mode == expected)
+		return true;
+	return writeLoopbackMode(speed, duplex) and
+			waitForLoopbackMode(speed, duplex);
+}
+
+bool
+disableLoopbackAndWaitForLinkDown()
+{
+	// LAN8742A DS00001989A section 4.2.1: clear Loopback and return BMCR to
+	// normal auto-negotiation. The RJ45 must be disconnected so BSR Link Status
+	// clears and the next link update performs the normal MAC/DMA stop transition.
+	constexpr uint16_t normalOperation =
+			uint16_t(Phy::BasicControl::AutoNegotiationEnable) |
+			uint16_t(Phy::BasicControl::RestartAutoNegotiation);
+	if (writePhyRegister(Phy::Register::BasicControl, normalOperation) !=
+			Eth::MdioError::None)
+		return false;
+
+	const auto start = modm::Clock::now();
+	while (modm::Clock::now() - start < PhyModeTimeout) {
+		const auto link = synchronizeLink();
+		if (not link)
+			return false;
+		if (link.status.state == Port::LinkState::Down)
+			return true;
+		modm::delay_ms(1);
+	}
+	return false;
+}
+
+bool
+initializeLoopback(bool checksumOffload)
+{
+	connectPins();
+	// LAN8742A DS00001989A section 3.4.1.2 and RM0433 Rev 8 section 58.6.3
+	// define the 50 MHz RMII interface used by this board and fixture.
+	const Port::Configuration configuration{
+		.macAddress = MacAddress,
+		.checksumMode = checksumOffload ?
+				Port::ChecksumMode::Hardware : Port::ChecksumMode::Software,
+	};
+	if (not Port::initialize<Board::SystemClock, Port::MediaInterface::RMII>(configuration))
+		return false;
+	if (not Phy::initialize<Eth>())
+		return false;
+	if (not setLoopbackMode(Port::Speed::Speed100M, Port::DuplexMode::Full))
+		return false;
+	Port::resetErrorCounters();
+	(void) Port::consumeWakeupEvents();
+	return true;
+}
+
+Port::ReceiveBufferLease
+waitForReceiveBuffer()
+{
+	const auto start = modm::Clock::now();
+	while (modm::Clock::now() - start < FrameTimeout) {
+		auto frame = Port::tryAcquireReceiveBuffer();
+		if (frame)
+			return frame;
+		if (frame.error() != Port::ReceiveError::NoFrameAvailable)
+			return frame;
+		modm::delay_us(50);
+	}
+	return {};
+}
+
+std::size_t
+receiveCopy(Frame& frame, Port::ReceiveChecksumStatus* checksumStatus = nullptr)
+{
+	auto packet = waitForReceiveBuffer();
+	if (not packet or packet.buffer().size() > frame.size())
+		return 0;
+	if (checksumStatus != nullptr)
+		*checksumStatus = packet.checksumStatus();
+	std::copy(packet.buffer().begin(), packet.buffer().end(), frame.begin());
+	const auto length = packet.buffer().size();
+	packet.release();
+	return length;
+}
+
+Port::TransmitResult
+transmitEventually(std::span<const uint8_t> frame)
+{
+	const auto start = modm::Clock::now();
+	while (modm::Clock::now() - start < FrameTimeout) {
+		const auto result = Port::transmit(frame);
+		if (result or result.error != Port::TransmitError::Busy)
+			return result;
+		modm::delay_us(50);
+	}
+	return {Port::TransmitError::Busy};
+}
+
+bool
+drainReceive()
+{
+	auto quietSince = modm::Clock::now();
+	const auto start = quietSince;
+	while (modm::Clock::now() - start < FrameTimeout) {
+		auto packet = Port::tryAcquireReceiveBuffer();
+		if (packet) {
+			packet.release();
+			quietSince = modm::Clock::now();
+		}
+		else if (packet.error() != Port::ReceiveError::NoFrameAvailable) {
+			return false;
+		}
+		else if (modm::Clock::now() - quietSince >= std::chrono::milliseconds{10}) {
+			return true;
+		}
+		modm::delay_us(50);
+	}
+	return false;
+}
+
+bool
+roundTrip(std::span<const uint8_t> expected, Frame& received)
+{
+	if (transmitEventually(expected).error != Port::TransmitError::None)
+		return false;
+	const auto length = receiveCopy(received);
+	return length == expected.size() and
+			std::equal(expected.begin(), expected.end(), received.begin());
+}
+
+} // namespace
+
+// ----------------------------------------------------------------------------
+// Initialization and PHY
+
+void
+EthernetHardwareTest::setUp()
+{
+	ready = initializeLoopback(false);
+	if (not ready)
+		TEST_FAIL("MAC, DMA, MDIO, or LAN8742A near-end loopback setup failed");
+}
+
+void
+EthernetHardwareTest::tearDown()
+{
+	if (not ready)
+		return;
+	if (not drainReceive()) {
+		TEST_FAIL("LAN8742A loopback receive drain failed");
+	}
+	const bool linkDown = disableLoopbackAndWaitForLinkDown();
+	if (not linkDown) {
+		TEST_FAIL("LAN8742A loopback-off LinkDown teardown failed");
+	}
+	else if (not resetPhyAndWait()) {
+		TEST_FAIL("LAN8742A software reset teardown failed");
+	}
+	ready = false;
+}
+
+void
+EthernetHardwareTest::testInitializationAndPhyIdentity()
+{
+	if (not ready) {
+		TEST_FAIL("MAC, DMA, MDIO, or PHY initialization failed");
+		return;
+	}
+	uint16_t identifier1 = 0;
+	uint16_t identifier2 = 0;
+	TEST_ASSERT_TRUE(readPhyRegister(Phy::Register::PhyIdentifier1, identifier1) ==
+			Eth::MdioError::None);
+	TEST_ASSERT_TRUE(readPhyRegister(Phy::Register::PhyIdentifier2, identifier2) ==
+			Eth::MdioError::None);
+	TEST_ASSERT_EQUALS(identifier1, PhyIdentifier1);
+	TEST_ASSERT_EQUALS(identifier2 & PhyIdentifier2Mask, PhyIdentifier2);
+	uint16_t invalidRegisterValue = 0;
+	TEST_ASSERT_TRUE(readPhyRegister(32, invalidRegisterValue) ==
+			Eth::MdioError::InvalidRegister);
+	TEST_ASSERT_TRUE(writePhyRegister(32, 0) == Eth::MdioError::InvalidRegister);
+	TEST_ASSERT_TRUE(Eth::readPhyRegister(32, uint8_t(Phy::Register::PhyIdentifier1),
+			invalidRegisterValue) == Eth::MdioError::InvalidPhyAddress);
+	TEST_ASSERT_TRUE(Eth::writePhyRegister(32, uint8_t(Phy::Register::BasicControl), 0) ==
+			Eth::MdioError::InvalidPhyAddress);
+	TEST_ASSERT_TRUE(readPhyRegister(Phy::Register::PhyIdentifier1, identifier1) ==
+			Eth::MdioError::None);
+	const auto link = synchronizeLink();
+	if (not link) {
+		TEST_FAIL("link service failed after initialization");
+		return;
+	}
+	TEST_ASSERT_TRUE(link.status.state == Port::LinkState::Up);
+	if (not link.status.mode) {
+		TEST_FAIL("initialized link has no resolved mode");
+		return;
+	}
+	TEST_ASSERT_TRUE(link.status.mode->speed == Port::Speed::Speed100M);
+	TEST_ASSERT_TRUE(link.status.mode->duplex == Port::DuplexMode::Full);
+	TEST_ASSERT_TRUE((ETH->MACHWF0R & (ETH_MACHWF0R_RXCOESEL | ETH_MACHWF0R_TXCOESEL)) ==
+			(ETH_MACHWF0R_RXCOESEL | ETH_MACHWF0R_TXCOESEL));
+}
+
+void
+EthernetHardwareTest::testInvalidPhyAddressRecovery()
+{
+	if (not ready) {
+		TEST_FAIL("loopback setup failed");
+		return;
+	}
+	if (not disableLoopbackAndWaitForLinkDown()) {
+		TEST_FAIL("LinkDown before invalid PHY address test failed");
+		return;
+	}
+	const auto missing = MissingPhy::initialize<Eth>();
+	TEST_ASSERT_FALSE(missing);
+	TEST_ASSERT_TRUE(missing.error == MissingPhy::InitializationError::NotFound);
+	if (not initializeLoopback(false)) {
+		TEST_FAIL("loopback recovery after invalid PHY address failed");
+		return;
+	}
+	Frame sent{};
+	Frame received{};
+	fillTestFrame(sent, 64, 1);
+	TEST_ASSERT_TRUE(roundTrip({sent.data(), 64}, received));
+}
+
+void
+EthernetHardwareTest::testPhyResetRecovery()
+{
+	if (not ready) {
+		TEST_FAIL("loopback setup failed");
+		return;
+	}
+	Frame sent{};
+	Frame received{};
+	fillTestFrame(sent, 64, 6);
+	TEST_ASSERT_TRUE(roundTrip({sent.data(), 64}, received));
+	if (not disableLoopbackAndWaitForLinkDown()) {
+		TEST_FAIL("LinkDown before PHY reset failed");
+		return;
+	}
+	if (not resetPhyAndWait()) {
+		TEST_FAIL("PHY reset failed");
+		return;
+	}
+	if (not initializeLoopback(false)) {
+		TEST_FAIL("loopback recovery after PHY reset failed");
+		return;
+	}
+	fillTestFrame(sent, 64, 7);
+	TEST_ASSERT_TRUE(roundTrip({sent.data(), 64}, received));
+}
+
+void
+EthernetHardwareTest::testFullDuplexPhyModes()
+{
+	if (not ready) {
+		TEST_FAIL("loopback setup failed");
+		return;
+	}
+	constexpr std::array<Port::LinkMode, 2> modes{ {
+		{Port::Speed::Speed10M, Port::DuplexMode::Full},
+		{Port::Speed::Speed100M, Port::DuplexMode::Full},
+	} };
+	Frame sent{};
+	Frame received{};
+	uint32_t sequence = 0x20;
+
+	fillTestFrame(sent, 128, sequence++);
+	if (not roundTrip({sent.data(), 128}, received)) {
+		TEST_FAIL("initial 100/full PHY mode round-trip failed");
+		return;
+	}
+
+	for (const auto mode : modes) {
+		if (not setLoopbackMode(mode.speed, mode.duplex)) {
+			TEST_FAIL("full-duplex PHY mode transition failed");
+			return;
+		}
+		const auto status = Port::getLinkStatus();
+		TEST_ASSERT_TRUE(status.state == Port::LinkState::Up);
+		TEST_ASSERT_TRUE(status.mode == mode);
+		TEST_ASSERT_TRUE(((ETH->MACCR & ETH_MACCR_FES) != 0) ==
+				(mode.speed == Port::Speed::Speed100M));
+		TEST_ASSERT_TRUE(((ETH->MACCR & ETH_MACCR_DM) != 0) ==
+				(mode.duplex == Port::DuplexMode::Full));
+		TEST_ASSERT_TRUE(((ETH->MTLRQOMR & ETH_MTLRQOMR_FEP) != 0) ==
+				(mode.speed == Port::Speed::Speed10M));
+		TEST_ASSERT_TRUE((ETH->MTLTQOMR & ETH_MTLTQOMR_FTQ) == 0);
+
+		fillTestFrame(sent, 128, sequence++);
+		if (not roundTrip({sent.data(), 128}, received)) {
+			TEST_FAIL("full-duplex PHY mode round-trip failed");
+			return;
+		}
+	}
+}
+
+void
+EthernetHardwareTest::testHalfDuplexPhyModeConfiguration()
+{
+	if (not ready) {
+		TEST_FAIL("loopback setup failed");
+		return;
+	}
+	// LAN8742A DS00001989A Table 2-1 excludes RMII receive loopback in 10BASE-T
+	// half duplex, while sections 3.2.4 and 3.8.7 make CRS depend on both
+	// transmit and receive activity in half duplex. Near-end loopback therefore
+	// cannot be a reliable half-duplex traffic oracle.
+	constexpr std::array<Port::Speed, 2> speeds{ {
+		Port::Speed::Speed100M,
+		Port::Speed::Speed10M,
+	} };
+	for (const auto speed : speeds) {
+		if (not setLoopbackMode(speed, Port::DuplexMode::Full)) {
+			TEST_FAIL("matching full-duplex PHY mode setup failed");
+			return;
+		}
+		if (not setLoopbackMode(speed, Port::DuplexMode::Half)) {
+			TEST_FAIL("half-duplex PHY mode configuration failed");
+			return;
+		}
+		const Port::LinkMode mode{speed, Port::DuplexMode::Half};
+		const auto status = Port::getLinkStatus();
+		TEST_ASSERT_TRUE(status.state == Port::LinkState::Up);
+		TEST_ASSERT_TRUE(status.mode == mode);
+		TEST_ASSERT_TRUE(((ETH->MACCR & ETH_MACCR_FES) != 0) ==
+				(speed == Port::Speed::Speed100M));
+		TEST_ASSERT_TRUE((ETH->MACCR & ETH_MACCR_DM) == 0);
+		TEST_ASSERT_TRUE(((ETH->MTLRQOMR & ETH_MTLRQOMR_FEP) != 0) ==
+				(speed == Port::Speed::Speed10M));
+		TEST_ASSERT_TRUE((ETH->MTLTQOMR & ETH_MTLTQOMR_FTQ) == 0);
+		if (not setLoopbackMode(speed, Port::DuplexMode::Full)) {
+			TEST_FAIL("matching full-duplex PHY mode restore failed");
+			return;
+		}
+	}
+}
+
+void
+EthernetHardwareTest::testLinkTransitionWithOutstandingReceiveLease()
+{
+	if (not ready) {
+		TEST_FAIL("loopback setup failed");
+		return;
+	}
+	Frame sent{};
+	Frame received{};
+	fillTestFrame(sent, 128, 0x40);
+	TEST_ASSERT_TRUE(transmitEventually({sent.data(), 128}).error ==
+			Port::TransmitError::None);
+	auto retained = waitForReceiveBuffer();
+	if (not retained) {
+		TEST_FAIL("receive lease acquisition failed");
+		return;
+	}
+	TEST_ASSERT_EQUALS(retained.buffer().size(), 128u);
+
+	const auto oldStatus = Port::getLinkStatus();
+	const uint32_t oldMacControl = ETH->MACCR;
+	const uint32_t oldTxDmaControl = ETH->DMACTCR;
+	const uint32_t oldRxDmaControl = ETH->DMACRCR;
+	TEST_ASSERT_TRUE(writePhyRegister(Phy::Register::BasicControl,
+			PhyLoopback | PhyFullDuplex) == Eth::MdioError::None);
+	const auto blocked = synchronizeLink();
+	TEST_ASSERT_FALSE(blocked);
+	TEST_ASSERT_TRUE(blocked.macError == Port::LinkUpdateError::OutstandingLease);
+	TEST_ASSERT_TRUE(blocked.status.state == oldStatus.state);
+	TEST_ASSERT_TRUE(blocked.status.mode == oldStatus.mode);
+	TEST_ASSERT_EQUALS(uint32_t(ETH->MACCR), oldMacControl);
+	TEST_ASSERT_EQUALS(uint32_t(ETH->DMACTCR), oldTxDmaControl);
+	TEST_ASSERT_EQUALS(uint32_t(ETH->DMACRCR), oldRxDmaControl);
+
+	retained.release();
+	if (not waitForLoopbackMode(Port::Speed::Speed10M, Port::DuplexMode::Full)) {
+		TEST_FAIL("10/full transition after receive lease release failed");
+		return;
+	}
+	fillTestFrame(sent, 129, 0x41);
+	TEST_ASSERT_TRUE(roundTrip({sent.data(), 129}, received));
+}
+
+// ----------------------------------------------------------------------------
+// Copied transmit and buffer leases
+
+void
+EthernetHardwareTest::testCopyAndLeaseApis()
+{
+	if (not ready) {
+		TEST_FAIL("loopback setup failed");
+		return;
+	}
+	Frame sent{};
+	Frame received{};
+	fillTestFrame(sent, 64, 2);
+	auto emptyRx = Port::tryAcquireReceiveBuffer();
+	TEST_ASSERT_FALSE(emptyRx);
+	TEST_ASSERT_TRUE(emptyRx.error() == Port::ReceiveError::NoFrameAvailable);
+	const auto invalidTransmit = Port::transmit({});
+	TEST_ASSERT_FALSE(invalidTransmit);
+	TEST_ASSERT_TRUE(invalidTransmit.error == Port::TransmitError::InvalidLength);
+	auto invalidTx = Port::acquireTransmitBuffer(0);
+	TEST_ASSERT_FALSE(invalidTx);
+	TEST_ASSERT_TRUE(invalidTx.error() == Port::TransmitError::InvalidLength);
+	TEST_ASSERT_TRUE(roundTrip({sent.data(), 64}, received));
+
+	fillTestFrame(sent, 65, 3);
+	auto tx = Port::acquireTransmitBuffer(65);
+	if (not tx) {
+		TEST_FAIL("transmit lease acquisition failed");
+		return;
+	}
+	TEST_ASSERT_EQUALS(tx.buffer().size(), 65u);
+	std::copy_n(sent.begin(), 65, tx.buffer().begin());
+	if (not tx.commit()) {
+		TEST_FAIL("transmit lease commit failed");
+		return;
+	}
+	auto rx = waitForReceiveBuffer();
+	if (not rx) {
+		TEST_FAIL("receive lease acquisition failed");
+		return;
+	}
+	TEST_ASSERT_EQUALS(rx.buffer().size(), 65u);
+	TEST_ASSERT_TRUE(std::equal(rx.buffer().begin(), rx.buffer().end(), sent.begin()));
+	rx.release();
+	TEST_ASSERT_FALSE(Port::tryAcquireReceiveBuffer());
+
+	fillTestFrame(sent, 64, 4);
+	TEST_ASSERT_TRUE(transmitEventually({sent.data(), 64}).error == Port::TransmitError::None);
+	rx = waitForReceiveBuffer();
+	if (not rx) {
+		TEST_FAIL("receive lease acquisition failed");
+		return;
+	}
+	std::array<uint8_t, 32> tooSmall{};
+	TEST_ASSERT_TRUE(rx.buffer().size() > tooSmall.size());
+	rx.release();
+	fillTestFrame(sent, 64, 5);
+	TEST_ASSERT_TRUE(roundTrip({sent.data(), 64}, received));
+
+	const auto events = Port::consumeWakeupEvents();
+	TEST_ASSERT_TRUE((events & Port::WakeupEvent::Receive) == Port::WakeupEvent::Receive);
+	TEST_ASSERT_TRUE((events & Port::WakeupEvent::Transmit) == Port::WakeupEvent::Transmit);
+	const auto errors = Port::getErrorCounters();
+	TEST_ASSERT_EQUALS(errors.fatalBusErrors, 0u);
+	TEST_ASSERT_EQUALS(errors.contextDescriptorErrors, 0u);
+	TEST_ASSERT_EQUALS(errors.txDescriptorErrors, 0u);
+}
+
+void
+EthernetHardwareTest::testTransmitLeaseStateTransitions()
+{
+	if (not ready) {
+		TEST_FAIL("loopback setup failed");
+		return;
+	}
+	Frame sent{};
+	Frame received{};
+	fillTestFrame(sent, 64, 8);
+
+	auto first = Port::acquireTransmitBuffer(64);
+	if (not first) {
+		TEST_FAIL("initial transmit lease acquisition failed");
+		return;
+	}
+	auto busy = Port::acquireTransmitBuffer(64);
+	TEST_ASSERT_FALSE(busy);
+	TEST_ASSERT_TRUE(busy.error() == Port::TransmitError::Busy);
+	first.cancel();
+
+	auto committed = Port::acquireTransmitBuffer(64);
+	if (not committed) {
+		TEST_FAIL("committed transmit lease acquisition failed");
+		return;
+	}
+	std::copy_n(sent.begin(), 64, committed.buffer().begin());
+	if (not committed.commit()) {
+		TEST_FAIL("transmit lease commit failed");
+		return;
+	}
+	TEST_ASSERT_EQUALS(receiveCopy(received), 64u);
+	TEST_ASSERT_TRUE(std::equal(sent.begin(), sent.begin() + 64, received.begin()));
+
+	{
+		auto abandoned = Port::acquireTransmitBuffer(64);
+		TEST_ASSERT_TRUE(static_cast<bool>(abandoned));
+	}
+	auto afterDestruction = Port::acquireTransmitBuffer(64);
+	if (not afterDestruction) {
+		TEST_FAIL("transmit lease recovery after destruction failed");
+		return;
+	}
+	auto moved = std::move(afterDestruction);
+	TEST_ASSERT_FALSE(afterDestruction);
+	if (not moved) {
+		TEST_FAIL("transmit lease move failed");
+		return;
+	}
+	moved.cancel();
+
+	fillTestFrame(sent, 64, 9);
+	TEST_ASSERT_TRUE(roundTrip({sent.data(), 64}, received));
+}
+
+void
+EthernetHardwareTest::testFrameSizeAndCacheBoundaries()
+{
+	if (not ready) {
+		TEST_FAIL("loopback setup failed");
+		return;
+	}
+	constexpr std::array<std::size_t, 12> sizes{ {
+		60, 61, 63, 64, 65, 127, 128, 129, 511, 512, 513, 1514
+	} };
+	Frame sent{};
+	Frame received{};
+	uint32_t sequence = 10;
+	for (const auto size : sizes) {
+		fillTestFrame(sent, size, sequence++);
+		if (not roundTrip({sent.data(), size}, received))
+			TEST_FAIL("frame boundary round-trip failed");
+	}
+	auto oversizedLease = Port::acquireTransmitBuffer(1515);
+	TEST_ASSERT_FALSE(oversizedLease);
+	TEST_ASSERT_TRUE(oversizedLease.error() == Port::TransmitError::InvalidLength);
+	std::array<uint8_t, 1515> oversizedFrame{};
+	const auto oversizedTransmit = Port::transmit(oversizedFrame);
+	TEST_ASSERT_FALSE(oversizedTransmit);
+	TEST_ASSERT_TRUE(oversizedTransmit.error == Port::TransmitError::InvalidLength);
+}
+
+// ----------------------------------------------------------------------------
+// Descriptor rings and recovery
+
+void
+EthernetHardwareTest::testDescriptorRingWraparound()
+{
+	if (not ready) {
+		TEST_FAIL("loopback setup failed");
+		return;
+	}
+	Frame sent{};
+	Frame received{};
+	constexpr std::size_t rounds = 4;
+	const auto count = rounds * (Port::RxDescriptorCount + Port::TxDescriptorCount);
+	for (std::size_t sequence = 0; sequence < count; ++sequence) {
+		const auto size = 60 + sequence % 257;
+		fillTestFrame(sent, size, uint32_t(sequence));
+		if ((sequence & 1) == 0) {
+			if (transmitEventually({sent.data(), size}).error != Port::TransmitError::None)
+				TEST_FAIL("descriptor ring copied transmit failed");
+		}
+		else {
+			auto tx = Port::acquireTransmitBuffer(size);
+			if (not tx) {
+				TEST_FAIL("descriptor ring transmit lease failed");
+				return;
+			}
+			std::copy_n(sent.begin(), size, tx.buffer().begin());
+			if (not tx.commit()) {
+				TEST_FAIL("descriptor ring transmit lease commit failed");
+				return;
+			}
+		}
+
+		auto rx = waitForReceiveBuffer();
+		if (not rx) {
+			TEST_FAIL("descriptor ring receive lease failed");
+			return;
+		}
+		auto moved = std::move(rx);
+		if (rx or moved.buffer().size() != size or
+				not std::equal(moved.buffer().begin(), moved.buffer().end(), sent.begin()))
+			TEST_FAIL("descriptor ring lease sequence mismatch");
+		moved.release();
+	}
+
+	const auto burst = std::min(Port::RxDescriptorCount, Port::TxDescriptorCount);
+	for (std::size_t sequence = 0; sequence < burst; ++sequence) {
+		fillTestFrame(sent, 128, uint32_t(0x100 + sequence));
+		if (transmitEventually({sent.data(), 128}).error != Port::TransmitError::None)
+			TEST_FAIL("ordered burst transmit failed");
+	}
+	for (std::size_t sequence = 0; sequence < burst; ++sequence) {
+		fillTestFrame(sent, 128, uint32_t(0x100 + sequence));
+		if (receiveCopy(received) != 128 or
+				not std::equal(sent.begin(), sent.begin() + 128, received.begin()))
+			TEST_FAIL("ordered burst receive mismatch");
+	}
+}
+
+void
+EthernetHardwareTest::testTransmitDescriptorExhaustionRecovery()
+{
+	if (not ready) {
+		TEST_FAIL("loopback setup failed");
+		return;
+	}
+	Port::resetErrorCounters();
+	ETH->DMACTCR &= ~ETH_DMACTCR_ST;
+	Frame sent{};
+	for (std::size_t sequence = 0; sequence < Port::TxDescriptorCount; ++sequence) {
+		fillTestFrame(sent, 64, uint32_t(0x200 + sequence));
+		TEST_ASSERT_TRUE(static_cast<bool>(Port::transmit({sent.data(), 64})));
+	}
+	auto unavailable = Port::acquireTransmitBuffer(64);
+	TEST_ASSERT_FALSE(unavailable);
+	TEST_ASSERT_TRUE(unavailable.error() == Port::TransmitError::Busy);
+
+	if (not initializeLoopback(false)) {
+		TEST_FAIL("loopback recovery after descriptor exhaustion failed");
+		return;
+	}
+	Frame received{};
+	fillTestFrame(sent, 64, 0x210);
+	TEST_ASSERT_TRUE(roundTrip({sent.data(), 64}, received));
+}
+
+void
+EthernetHardwareTest::testReceiveOwnershipPressureRecovery()
+{
+	if (not ready) {
+		TEST_FAIL("loopback setup failed");
+		return;
+	}
+	Frame sent{};
+	Frame received{};
+	fillTestFrame(sent, 1514, 0x300);
+	TEST_ASSERT_TRUE(transmitEventually(sent).error == Port::TransmitError::None);
+	auto retained = waitForReceiveBuffer();
+	if (not retained) {
+		TEST_FAIL("receive pressure lease acquisition failed");
+		return;
+	}
+	TEST_ASSERT_EQUALS(retained.buffer().size(), 1514u);
+
+	for (std::size_t sequence = 0; sequence < Port::RxDescriptorCount + 16; ++sequence) {
+		fillTestFrame(sent, 1514, uint32_t(0x301 + sequence));
+		if (transmitEventually(sent).error != Port::TransmitError::None)
+			TEST_FAIL("traffic generation failed during RX pressure");
+	}
+	modm::delay_ms(20);
+	TEST_ASSERT_EQUALS(retained.buffer().size(), 1514u);
+	const auto pressureErrors = Port::getErrorCounters();
+	TEST_ASSERT_TRUE(pressureErrors.rxMissedPackets + pressureErrors.rxOverflowPackets > 0);
+	TEST_ASSERT_TRUE(pressureErrors.rxBufferUnavailable > 0);
+	const auto pressureEvents = Port::consumeWakeupEvents();
+	TEST_ASSERT_TRUE((pressureEvents & Port::WakeupEvent::Receive) == Port::WakeupEvent::Receive);
+	retained.release();
+	TEST_ASSERT_TRUE(drainReceive());
+
+	fillTestFrame(sent, 64, 0x400);
+	TEST_ASSERT_TRUE(roundTrip({sent.data(), 64}, received));
+}
+
+// ----------------------------------------------------------------------------
+// Protocols and checksums
+
+void
+EthernetHardwareTest::testProtocolAndChecksumModes()
+{
+	if (not ready) {
+		TEST_FAIL("loopback setup failed");
+		return;
+	}
+	Frame sent{};
+	Frame received{};
+	auto length = makeArp(sent);
+	TEST_ASSERT_TRUE(roundTrip({sent.data(), length}, received));
+	length = makeIcmp(sent);
+	TEST_ASSERT_TRUE(roundTrip({sent.data(), length}, received));
+	TEST_ASSERT_TRUE(validIpv4Checksum(received));
+	TEST_ASSERT_TRUE(checksum({received.data() + 34, 26}) == 0);
+
+	if (not initializeLoopback(true)) {
+		TEST_FAIL("hardware-checksum loopback initialization failed");
+		return;
+	}
+	ETH->MACCR &= ~ETH_MACCR_IPC;
+	length = makeUdp(sent, false);
+	TEST_ASSERT_TRUE(transmitEventually({sent.data(), length}).error == Port::TransmitError::None);
+	TEST_ASSERT_EQUALS(receiveCopy(received), length);
+	TEST_ASSERT_TRUE(validIpv4Checksum(received));
+	TEST_ASSERT_TRUE(validTransportChecksum(received, 17, 26));
+	length = makeTcp(sent, false);
+	TEST_ASSERT_TRUE(transmitEventually({sent.data(), length}).error == Port::TransmitError::None);
+	TEST_ASSERT_EQUALS(receiveCopy(received), length);
+	TEST_ASSERT_TRUE(validIpv4Checksum(received));
+	TEST_ASSERT_TRUE(validTransportChecksum(received, 6, 26));
+
+	if (not initializeLoopback(false)) {
+		TEST_FAIL("software-checksum loopback initialization failed");
+		return;
+	}
+	length = makeUdp(sent, true);
+	TEST_ASSERT_TRUE(roundTrip({sent.data(), length}, received));
+	TEST_ASSERT_TRUE(validTransportChecksum(received, 17, 26));
+	length = makeTcp(sent, true);
+	TEST_ASSERT_TRUE(roundTrip({sent.data(), length}, received));
+	TEST_ASSERT_TRUE(validTransportChecksum(received, 6, 26));
+}
+
+void
+EthernetHardwareTest::testFragmentedUdpChecksumModes()
+{
+	if (not ready) {
+		TEST_FAIL("loopback setup failed");
+		return;
+	}
+	if (not initializeLoopback(true)) {
+		TEST_FAIL("fragmented hardware-checksum loopback initialization failed");
+		return;
+	}
+
+	Frame first{};
+	Frame second{};
+	Frame receivedFirst{};
+	Frame receivedSecond{};
+	makeUdpFragments(first, second);
+	const auto firstHardware = Port::transmit({first.data(), 60});
+	TEST_ASSERT_FALSE(firstHardware);
+	TEST_ASSERT_TRUE(firstHardware.error == Port::TransmitError::UnsupportedFragmentation);
+	const auto secondHardware = Port::transmit({second.data(), 60});
+	TEST_ASSERT_FALSE(secondHardware);
+	TEST_ASSERT_TRUE(secondHardware.error == Port::TransmitError::UnsupportedFragmentation);
+
+	if (not initializeLoopback(false)) {
+		TEST_FAIL("fragmented software-checksum loopback initialization failed");
+		return;
+	}
+	Port::ReceiveChecksumStatus firstStatus{};
+	Port::ReceiveChecksumStatus secondStatus{};
+	TEST_ASSERT_TRUE(transmitEventually({first.data(), 60}).error == Port::TransmitError::None);
+	TEST_ASSERT_EQUALS(receiveCopy(receivedFirst, &firstStatus), 60u);
+	TEST_ASSERT_TRUE(transmitEventually({second.data(), 60}).error == Port::TransmitError::None);
+	TEST_ASSERT_EQUALS(receiveCopy(receivedSecond, &secondStatus), 60u);
+	TEST_ASSERT_TRUE(firstStatus == Port::ReceiveChecksumStatus::NotChecked);
+	TEST_ASSERT_TRUE(secondStatus == Port::ReceiveChecksumStatus::NotChecked);
+	TEST_ASSERT_TRUE(validIpv4Checksum(receivedFirst));
+	TEST_ASSERT_TRUE(validIpv4Checksum(receivedSecond));
+	TEST_ASSERT_TRUE(validFragmentedUdpChecksum(receivedFirst, receivedSecond));
+}
+
+void
+EthernetHardwareTest::testMalformedChecksumRecovery()
+{
+	if (not ready) {
+		TEST_FAIL("loopback setup failed");
+		return;
+	}
+	if (not initializeLoopback(true)) {
+		TEST_FAIL("malformed-checksum loopback initialization failed");
+		return;
+	}
+	// Submit malformed checksums without TX insertion while MAC RX checksum
+	// classification remains enabled.
+	modm::platform::detail::ethH7MacState.checksumOffloadEnabled = false;
+	Frame sent{};
+	auto length = makeUdp(sent, false, true);
+	TEST_ASSERT_TRUE(transmitEventually({sent.data(), length}).error == Port::TransmitError::None);
+	modm::platform::detail::ethH7MacState.checksumOffloadEnabled = true;
+	auto received = waitForReceiveBuffer();
+	if (not received) {
+		TEST_FAIL("malformed UDP receive lease acquisition failed");
+		return;
+	}
+	TEST_ASSERT_TRUE(received.checksumStatus() == Port::ReceiveChecksumStatus::Invalid);
+	received.release();
+	length = makeTcp(sent, false, true);
+	modm::platform::detail::ethH7MacState.checksumOffloadEnabled = false;
+	TEST_ASSERT_TRUE(transmitEventually({sent.data(), length}).error == Port::TransmitError::None);
+	modm::platform::detail::ethH7MacState.checksumOffloadEnabled = true;
+	received = waitForReceiveBuffer();
+	if (not received) {
+		TEST_FAIL("malformed TCP receive lease acquisition failed");
+		return;
+	}
+	TEST_ASSERT_TRUE(received.checksumStatus() == Port::ReceiveChecksumStatus::Invalid);
+	received.release();
+
+	length = makeUdp(sent, true);
+	TEST_ASSERT_TRUE(transmitEventually({sent.data(), length}).error == Port::TransmitError::None);
+	received = waitForReceiveBuffer();
+	if (not received) {
+		TEST_FAIL("valid UDP receive lease acquisition failed");
+		return;
+	}
+	TEST_ASSERT_TRUE(received.checksumStatus() == Port::ReceiveChecksumStatus::Valid);
+	TEST_ASSERT_TRUE(checksum(received.buffer().subspan(34, 26),
+			pseudoHeaderSum(received.buffer().data() + 14, 17, 26)) == 0);
+	received.release();
+}
+
+// ----------------------------------------------------------------------------
+// MAC, DMA, and memory configuration
+
+void
+EthernetHardwareTest::testReinitializationRecovery()
+{
+	if (not ready) {
+		TEST_FAIL("loopback setup failed");
+		return;
+	}
+	Frame sent{};
+	Frame received{};
+	fillTestFrame(sent, 128, 0x500);
+	TEST_ASSERT_TRUE(roundTrip({sent.data(), 128}, received));
+	if (not initializeLoopback(false)) {
+		TEST_FAIL("loopback reinitialization failed");
+		return;
+	}
+	fillTestFrame(sent, 129, 0x501);
+	TEST_ASSERT_TRUE(roundTrip({sent.data(), 129}, received));
+	TEST_ASSERT_FALSE(Port::tryAcquireReceiveBuffer());
+}
+
+void
+EthernetHardwareTest::testHardwareErrorStatusReset()
+{
+	if (not ready) {
+		TEST_FAIL("loopback setup failed");
+		return;
+	}
+	Port::resetHardwareErrorStatus();
+	auto status = Port::getHardwareErrorStatus();
+	TEST_ASSERT_EQUALS(status.dmaStatus, 0u);
+	TEST_ASSERT_EQUALS(status.txDescriptorStatus, 0u);
+
+	detail::ethH7MacState.hardwareDmaErrorStatus |= ETH_DMACSR_RBU;
+	detail::ethH7MacState.hardwareTxDescriptorErrorStatus |= modm::Bit2;
+	status = Port::getHardwareErrorStatus();
+	TEST_ASSERT_EQUALS(status.dmaStatus, uint32_t(ETH_DMACSR_RBU));
+	TEST_ASSERT_EQUALS(status.txDescriptorStatus, uint32_t(modm::Bit2));
+
+	detail::ethH7MacState.hardwareDmaErrorStatus |= ETH_DMACSR_TBU;
+	status = Port::getHardwareErrorStatus();
+	TEST_ASSERT_EQUALS(status.dmaStatus, uint32_t(ETH_DMACSR_RBU | ETH_DMACSR_TBU));
+	TEST_ASSERT_EQUALS(status.txDescriptorStatus, uint32_t(modm::Bit2));
+
+	Port::resetHardwareErrorStatus();
+	status = Port::getHardwareErrorStatus();
+	TEST_ASSERT_EQUALS(status.dmaStatus, 0u);
+	TEST_ASSERT_EQUALS(status.txDescriptorStatus, 0u);
+}
+
+void
+EthernetHardwareTest::testDmaStoragePlacement()
+{
+	if (not ready) {
+		TEST_FAIL("loopback setup failed");
+		return;
+	}
+	const auto address = reinterpret_cast<std::uintptr_t>(&modm::platform::detail::ethH7DmaStorage);
+	TEST_ASSERT_EQUALS(address % 32, 0u);
+	TEST_ASSERT_EQUALS(Port::MaxFrameSize, 1514u);
+	TEST_ASSERT_EQUALS(Port::RxDescriptorCount, 4u);
+	TEST_ASSERT_EQUALS(Port::TxDescriptorCount, 4u);
+}

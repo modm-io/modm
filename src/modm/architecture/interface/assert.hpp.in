@@ -35,7 +35,7 @@ Abandonment : uint8_t
 using AbandonmentBehavior = Abandonment;
 
 /// Contains information about the failed assertion.
-struct modm_packed
+struct
 AssertionInfo
 {
 	const char *name;				///< Can be used to recognize the assertion in code
