@@ -247,7 +247,7 @@ EthernetMac::configureReceiveErrorForwarding()
 {
 	uint32_t receiveQueue = ETH->MTLRQOMR;
 	// ES0392 Rev 15, section 2.26.20: forward errors only in RMII
-	// 10 Mbit/s so software can accept the exact false dribble+CRC signature
+	// 10 Mbit/s so software can accept the fake dribble error
 	if (detail::needsRmii10MWorkaround(
 			state().mediaInterface, state().speed)) {
 		receiveQueue |= ETH_MTLRQOMR_FEP;
@@ -983,11 +983,11 @@ inline bool
 EthernetMac::isValidReceiveDescriptor(RxDmaDescriptor const &descriptor)
 {
 	const auto status = descriptor.status();
-	// ES0392 Rev 15, section 2.26.20: RMII 10 Mbit/s can falsely
-	// report the exact dribble+CRC signature. No other error is accepted.
+	// ES0392 Rev 15, section 2.26.20: RMII 10 Mbit/s can falsely report a
+	// dribble error with or without a CRC error. No other error is accepted.
 	const bool toleratedRmii10MError = detail::needsRmii10MWorkaround(
 			state().mediaInterface, state().speed) and
-			detail::isExactRmii10MDribbleCrcError(status.value);
+			detail::isRmii10MFakeDribbleError(status.value);
 	return status.none(detail::EthH7RxDescriptor3::ContextDescriptor) and
 			(status.none(detail::EthH7RxDescriptor3::ErrorSummary) or toleratedRmii10MError) and
 			status.all(detail::EthH7RxDescriptor3::FirstDescriptor |
