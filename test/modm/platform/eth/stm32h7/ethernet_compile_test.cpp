@@ -80,10 +80,12 @@ static_assert(modm::platform::detail::isRmii10MFakeDribbleError(
 		ErrorSummary | DribbleError | CrcError));
 static_assert(modm::platform::detail::isRmii10MFakeDribbleError(
 		ErrorSummary | DribbleError | CrcError | FirstAndLastDescriptor));
-static_assert(not modm::platform::detail::isRmii10MFakeDribbleError(
+// The error summary is ignored, since STM32H7 rev Y also sets it for checksum errors
+static_assert(modm::platform::detail::isRmii10MFakeDribbleError(
 		DribbleError | CrcError));
 static_assert(not modm::platform::detail::isRmii10MFakeDribbleError(
 		ErrorSummary | CrcError));
+static_assert(not modm::platform::detail::isRmii10MFakeDribbleError(ErrorSummary));
 // Observed on STM32H723 rev Z in near-end PHY loopback: dribble without CRC error
 static_assert(modm::platform::detail::isRmii10MFakeDribbleError(
 		ErrorSummary | DribbleError));
