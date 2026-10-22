@@ -29,10 +29,10 @@ jobs:
 
       - name: Setup environment - Python pip
         run: |
-          # pygit2 depends on pycparser, which brew installed without a RECORD
-          # file, so pip cannot upgrade it eagerly. Upgrade lbuild explicitly.
-          pip3 install --upgrade --break-system-packages modm lbuild scons
           echo "/usr/local/bin" >> $GITHUB_PATH
+          # The following steps run the python3 in /usr/local/bin, which is a different install
+          # than the brew pip3: the build tools (modm_tools, nanopb) need their packages there.
+          /usr/local/bin/python3 -m pip install --upgrade --break-system-packages modm lbuild scons protobuf grpcio-tools
 
       - name: Dump environment
         run: |
