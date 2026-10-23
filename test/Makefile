@@ -60,6 +60,10 @@ compile-nucleo-f103rb_B:
 	$(call compile-test,nucleo-f103rb_B,size)
 run-nucleo-f103rb_B:
 	$(call run-test,nucleo-f103rb_B,size)
+compile-nucleo-f103rb_C:
+	$(call compile-test,nucleo-f103rb_C,size)
+run-nucleo-f103rb_C:
+	$(call run-test,nucleo-f103rb_C,size)
 
 
 compile-nucleo-f401re:

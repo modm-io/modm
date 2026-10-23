@@ -17,6 +17,7 @@
 #include <modm/architecture/interface/atomic_lock.hpp>
 #include <modm/platform/device.hpp>
 #include <modm/platform/exti/exti.hpp>
+#include <utility>
 
 namespace modm
 {
@@ -58,69 +59,29 @@ GpioSampler::Handle<channels>::operator[](size_t channel) const
 	return data[(channel < channels) ? channel : (channels - 1)];
 }
 
-template< size_t channels, size_t pin_count, uint8_t pin, class Gpio, class... Gpios >
-void
-GpioSampler::sampleGpio(Channel *data, Type time)
-{
-	if constexpr (Gpio::pin == pin)
-	{
-		if ((pin_count == 1) or (platform::Exti::areFlagsSet<Gpio>()))
-		{
-			if (Gpio::read()) time |= 1;
-			constexpr size_t channel = channels - sizeof...(Gpios) - 1;
-			data[channel].add(time);
-			platform::Exti::acknowledgeFlags<Gpio>();
-		}
-	}
-	sampleGpio<channels, pin_count, pin, Gpios...>(data, time);
-}
-
 template< class... Gpios >
 auto
 GpioSampler::Create(size_t max_samples)
 {
-	// Count the pins per interrupt and
-	// only reset the vectors that contain at least one GPIO
-%% for vector, pos_map in extis.items()
-	constexpr size_t pin_count_{{vector | lower}} =
-%% for pos in pos_map
-		((Gpios::pin == {{pos}} ? 1 : 0) + ...){% if loop.last %};{% else %} +{% endif %}
-%% endfor
-	if constexpr (pin_count_{{vector | lower}}) reset(Interrupt::{{ vector | capitalize }});
-%% endfor
-
-	Handle<sizeof...(Gpios)> handle(max_samples,
-		[](Handle<sizeof...(Gpios)> &h) {
+	using H = Handle<sizeof...(Gpios)>;
+	H handle(max_samples,
+		[](H &h) {
 			// prime the data logger
 			const Type time = getTime();
 			const Type start[] = {(Gpios::read() ? (time | 1) : time)...};
 			h.set_start_time(start);
 		},
-		[] {
-			platform::Exti::disableInterrupts<Gpios...>();
-			// only reset the vectors that contain at least one GPIO
-%% for vector in extis
-			if constexpr (pin_count_{{vector | lower}}) reset(Interrupt::{{ vector | capitalize }});
-%% endfor
-		});
+		[] { (platform::Exti::disconnect<Gpios>(), ...); });
 	GpioSampler::context = reinterpret_cast<void*>(&handle);
-%% for vector, pos_map in extis.items()
-	// only reset the vectors that contain at least one GPIO
-	if constexpr (pin_count_{{vector | lower}}) {
-		setHandler(Interrupt::{{ vector | capitalize }}, []
+	// sample both edges of every GPIO into its channel with the highest priority
+	[]<size_t... channel>(std::index_sequence<channel...>)
+	{
+		(platform::Exti::connect<Gpios>(platform::Exti::Trigger::BothEdges, [](uint8_t)
 		{
 			const Type time = getTime();
-			auto *h = reinterpret_cast<Handle<sizeof...(Gpios)>*>(GpioSampler::context);
-	%% for pos in pos_map
-			sampleGpio< sizeof...(Gpios), pin_count_{{vector | lower}}, {{pos}}, Gpios... >(h->data, time);
-	%% endfor
-		});
-	}
-%% endfor
-	// trigger on both edges
-	platform::Exti::setTriggers<Gpios...>(platform::Exti::Trigger::BothEdges);
-	// enabled all GPIO interrupts
-	platform::Exti::enableInterrupts<Gpios...>();
+			reinterpret_cast<H*>(GpioSampler::context)->data[channel].add(Gpios::read() ? (time | 1) : time);
+		}, 0), ...);
+	}(std::index_sequence_for<Gpios...>{});
 	// prime the logger with initial measurement
 	handle.restart();
 	return handle;

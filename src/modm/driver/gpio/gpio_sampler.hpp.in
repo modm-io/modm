@@ -85,21 +85,6 @@ public:
 protected:
 	static void *context;
 
-	enum class
-	Interrupt : uint8_t
-	{
-%% for vector in extis
-		{{ vector | capitalize }} = {{ loop.index0 }},
-%% endfor
-	};
-
-	template< size_t channels, size_t pin_count, uint8_t pin, class Gpio, class... Gpios >
-	static void sampleGpio(Channel *data, Type time);
-	template< size_t channels, size_t pin_count, uint8_t pin >
-	static void sampleGpio(Channel *, Type) {}
-
-	static void reset(Interrupt vector);
-	static void setHandler(Interrupt vector, void(*handler)());
 	static inline Type getTime() {
 		return Type(DWT->CYCCNT & ~1);
 	}

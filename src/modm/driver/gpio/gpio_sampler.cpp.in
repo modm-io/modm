@@ -14,53 +14,11 @@
 #include <modm/platform.hpp>
 #include <modm/debug/logger.hpp>
 
-using IrqHandler = void(*)();
-%% if vectors_location == "rom"
-modm_fastdata
-IrqHandler exti_vectors[{{ extis | length }}] = {nullptr};
-
-%% for vector in extis
-MODM_ISR({{ vector }})
-{
-	exti_vectors[{{ loop.index0 }}]();
-}
-%% endfor
-%% endif
-
-const IRQn_Type
-irq_map[{{ extis | length }}] =
-{
-%% for vector in extis
-	{{ vector }}_IRQn,
-%% endfor
-};
-
 namespace modm
 {
 
 modm_fastdata
 void *GpioSampler::context{nullptr};
-
-void
-GpioSampler::reset(Interrupt vector)
-{
-	const size_t index = int(vector);
-	NVIC_DisableIRQ(irq_map[index]);
-	NVIC_SetPriority(irq_map[index], 0);
-}
-
-void
-GpioSampler::setHandler(Interrupt vector, IrqHandler handler)
-{
-	const size_t index = int(vector);
-	if (index >= {{ extis | length }}) return;
-%% if vectors_location == "ram"
-	NVIC_SetVector(irq_map[index], (uint32_t) handler);
-%% else
-	exti_vectors[index] = handler;
-%% endif
-	NVIC_EnableIRQ(irq_map[index]);
-}
 
 GpioSampler::Channel::Channel()
 {}
