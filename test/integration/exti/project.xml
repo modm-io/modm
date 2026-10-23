@@ -1,0 +1,20 @@
+<library>
+  <extends>modm:nucleo-h563zi</extends>
+  <!-- <extends>modm:nucleo-c031c6</extends> -->
+  <!-- <extends>modm:nucleo-f103rb</extends> -->
+  <!-- <extends>modm:nucleo-f401re</extends> -->
+  <!-- <extends>modm:nucleo-f429zi</extends> -->
+  <!-- <extends>modm:nucleo-g071rb</extends> -->
+  <!-- <extends>modm:nucleo-h723zg</extends> -->
+  <!-- <extends>modm:nucleo-l476rg</extends> -->
+  <!-- <extends>modm:nucleo-u083rc</extends> -->
+  <!-- <extends>modm:nucleo-u385rg-q</extends> -->
+  <!-- <extends>modm:nucleo-u575zi-q</extends> -->
+  <options>
+    <option name="modm:io:with_printf">true</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:exti</module>
+  </modules>
+</library>
