@@ -104,18 +104,18 @@ public:
 	setTriggerSource(uint8_t line, Gpio::Port port)
 	{
 		const uint8_t index   =  line >> 2;
-		const uint8_t bit_pos = (line & 0b0011) << 2;
-		const uint16_t syscfg_mask = 0xf << bit_pos;
-		const uint16_t syscfg_value = (uint8_t(port) & 0xf) << bit_pos;
+		const uint8_t bit_pos = (line & 0b0011) << {{ 3 if exti_reg == "EXTI" else 2 }};
+		const uint32_t syscfg_mask = 0x{{ "ff" if exti_reg == "EXTI" else "f" }}ul << bit_pos;
+		const uint32_t syscfg_value = uint32_t(port) << bit_pos;
 		{{exti_reg}}->EXTICR[index] = ({{exti_reg}}->EXTICR[index] & ~syscfg_mask) | syscfg_value;
 	}
 	template< class Pin >
 	static void setTriggerSource()
 	{
 		constexpr uint8_t index   =  Pin::pin >> 2;
-		constexpr uint8_t bit_pos = (Pin::pin & 0b0011) << 2;
-		constexpr uint16_t syscfg_mask = 0xf << bit_pos;
-		constexpr uint16_t syscfg_value = (uint8_t(Pin::port) & 0xf) << bit_pos;
+		constexpr uint8_t bit_pos = (Pin::pin & 0b0011) << {{ 3 if exti_reg == "EXTI" else 2 }};
+		constexpr uint32_t syscfg_mask = 0x{{ "ff" if exti_reg == "EXTI" else "f" }}ul << bit_pos;
+		constexpr uint32_t syscfg_value = uint32_t(Pin::port) << bit_pos;
 		{{exti_reg}}->EXTICR[index] = ({{exti_reg}}->EXTICR[index] & ~syscfg_mask) | syscfg_value;
 	}
 	template< class... Pins >
