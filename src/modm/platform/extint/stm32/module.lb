@@ -48,8 +48,16 @@ def build(env):
     target = env[":target"].identifier
 
     separate_flags = target.family in ["c0", "g0", "l5", "u5", "h5", "u0", "u3"]
-    extended = target.family in ["l4", "l5", "g4", "h7"]
-    if separate_flags: extended = target.name in ["b1", "c1"]
+    # The registers of lines 0-31 are called IMR1, PR1, etc.
+    pf = "1" if (separate_flags or target.family in ["l4", "g4", "h7"]) else ""
+    # Lines 32+ have IMR2 and EMR2 registers
+    extended = (target.family in ["l4", "l5", "g4", "h7", "h5", "u0"] or
+                (target.family == "f3" and target.name not in ["73", "78"]) or
+                (target.family == "g0" and target.name in ["71", "81", "b0", "b1", "c1"]) or
+                (target.family == "c0" and target.name in ["71"]))
+    # Lines 32+ also have RTSR2, FTSR2, SWIER2 and PR2 or RPR2/FPR2 registers
+    extended_lines = extended and not (target.family == "u0" or
+                                       (target.family == "g0" and target.name in ["71", "81", "b0"]))
 
     exti_reg = "SYSCFG"
     if target.family in ["c0", "g0", "l5", "u5", "h5", "u0", "u3"]: exti_reg = "EXTI"
@@ -60,6 +68,8 @@ def build(env):
     lines = 1 + max(int(g["pin"]) for g in env[":target"].get_driver("gpio")["gpio"])
     env.substitutions = {
         "extended": extended,
+        "extended_lines": extended_lines,
+        "pf": pf,
         "separate_flags": separate_flags,
         "exti_reg": exti_reg,
         "target": target,
