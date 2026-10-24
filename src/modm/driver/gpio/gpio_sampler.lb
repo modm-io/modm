@@ -19,8 +19,8 @@ def prepare(module, options):
         return False
 
     core = options[":target"].get_driver("core:cortex-m*")
-    # Cortex-M0 doesn't have the DWT->CYCCNT and Cortex-M7 support is broken
-    if not core or "m0" in core["type"] or "m7" in core["type"]:
+    # Cortex-M0 doesn't have the DWT->CYCCNT
+    if not core or "m0" in core["type"]:
         return False
 
     module.depends(
