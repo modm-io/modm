@@ -45,7 +45,7 @@ enum class Error : uint8_t
 struct Listener
 {
 	template <typename L, typename F = get_callable_signature_t<std::remove_cvref_t<L>>>
-	Listener(int command, L&& listener)
+	constexpr Listener(int command, L&& listener)
 	:	command(command), callback(std::in_place_type<function<F>>, std::forward<L>(listener)),
 		redirect(getRedirect(static_cast<F*>(nullptr)))
 	{}
@@ -90,11 +90,11 @@ protected:
 struct Response
 {
 	inline
-	Response()
+	constexpr Response()
 	:	msg(0, 0, Type::Response) {}
 
 	template<typename T>
-	Response(T retval)
+	constexpr Response(T retval)
 	:	msg(0, 0, sizeof(T), Type::Response)
 	{
 		if (T* arg = msg.get<T>(); arg) *arg = retval;
@@ -119,7 +119,7 @@ ErrorResponse(T error)
 struct Action
 {
 	template <typename A, typename F = get_callable_signature_t<std::remove_cvref_t<A>>>
-	Action(int command, A&& action)
+	constexpr Action(int command, A&& action)
 	:	command(command), callback(std::in_place_type<function<F>>, std::forward<A>(action)),
 		redirect(getRedirect(static_cast<F*>(nullptr)))
 	{}
@@ -238,7 +238,7 @@ struct Result
 	operator *() const { return *result(); }
 
 protected:
-	Result(Message &msg)
+	constexpr Result(Message &msg)
 	{
 		switch(msg.type())
 		{
@@ -296,7 +296,7 @@ struct Result<ReturnType, void>
 	operator *() const { return *result(); }
 
 protected:
-	Result(Message &msg)
+	constexpr Result(Message &msg)
 	{
 		switch(msg.type())
 		{
@@ -345,7 +345,7 @@ struct Result<void, void>
 	operator bool() const { return not hasError(); }
 
 protected:
-	Result(Message &msg)
+	constexpr Result(Message &msg)
 	{
 		switch(msg.type())
 		{

@@ -87,7 +87,7 @@ public:
 	}
 
 	/// Saturated addition ⊕
-	Rgb565
+	constexpr Rgb565
 	operator+(const Rgb565 other) const
 	{
 		const int8_t red_raw = (color >> 11) + (other.color >> 11);
@@ -103,7 +103,7 @@ public:
 	}
 
 	/// Saturated substraction ⊖
-	Rgb565
+	constexpr Rgb565
 	operator-(const Rgb565 other) const
 	{
 		const int8_t red_raw = (color >> 11) - (other.color >> 11);

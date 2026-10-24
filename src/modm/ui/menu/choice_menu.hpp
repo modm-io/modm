@@ -17,7 +17,7 @@
 #include "abstract_menu.hpp"
 #include "scrollable_text.hpp"
 #include "choice_menu_entry.hpp"
-#include <modm/container/doubly_linked_list.hpp>
+#include <list>
 #include <modm/processing/timer.hpp>
 
 namespace modm{
@@ -43,9 +43,9 @@ namespace modm{
 	{
 	public:
 
-		ChoiceMenu(modm::ViewStack<Allocator>* stack, uint8_t identifier);
+		constexpr ChoiceMenu(modm::ViewStack<Allocator>* stack, uint8_t identifier);
 
-		ChoiceMenu(modm::ViewStack<Allocator>* stack, uint8_t identifier, const char* title);
+		constexpr ChoiceMenu(modm::ViewStack<Allocator>* stack, uint8_t identifier, const char* title);
 
 		/**
 		 * @brief addEntry a new entry to the ChoiceMenu
@@ -109,7 +109,7 @@ namespace modm{
 
 	protected:
 
-		typedef modm::DoublyLinkedList<ChoiceMenuEntry> EntryList;
+		using EntryList = std::list<ChoiceMenuEntry>;
 		EntryList entries;
 	};
 }

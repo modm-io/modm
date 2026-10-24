@@ -33,37 +33,37 @@ template<typename T>
 class Ram
 {
 public:
-	Ram(const T* addr = 0) :
+	constexpr Ram(const T* addr = 0) :
 		address(addr)
 	{
 	}
 
 	template <typename U>
-	explicit Ram(const Ram<U>& rhs) :
+	explicit constexpr Ram(const Ram<U>& rhs) :
 		address((T*) rhs.address)
 	{
 	}
 
-	const T
+	constexpr const T
 	operator *() const
 	{
 		return *address;
 	}
 
-	const T
+	constexpr const T
 	operator [](std::size_t index) const
 	{
 		return *(address + index);
 	}
 
-	Ram&
+	constexpr Ram&
 	operator ++ ()
 	{
 		*this += 1;
 		return *this;
 	}
 
-	Ram
+	constexpr Ram
 	operator ++ (int)
 	{
 		Ram ret = *this;
@@ -71,14 +71,14 @@ public:
 		return ret;
 	}
 
-	Ram&
+	constexpr Ram&
 	operator -- ()
 	{
 		*this -= 1;
 		return *this;
 	}
 
-	Ram&
+	constexpr Ram&
 	operator -- (int)
 	{
 		Ram ret = *this;
@@ -86,21 +86,21 @@ public:
 		return ret;
 	}
 
-	Ram&
+	constexpr Ram&
 	operator += (std::size_t rhs)
 	{
 		address += rhs;
 		return *this;
 	}
 
-	Ram&
+	constexpr Ram&
 	operator -= (std::size_t rhs)
 	{
 		address -= rhs;
 		return *this;
 	}
 
-	const T*
+	constexpr const T*
 	getPointer() const
 	{
 		return address;

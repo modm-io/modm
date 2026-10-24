@@ -27,7 +27,7 @@ protected:
 public:
 	static constexpr size_t size = LEDs;
 
-	Apa102() : data{0,0,0,0}
+	constexpr Apa102() : data{0,0,0,0}
 	{
 		clear();
 		// using 0x00 as flushing bits makes this compatible with sk9822

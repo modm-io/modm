@@ -55,10 +55,10 @@ namespace modm
 	template<typename T, unsigned int ScaleFactor = 1>
 	class Pid
 	{
-		typedef modm::WideType<T> WideType;
+		using WideType = modm::WideType<T>;
 
 	public:
-		typedef T ValueType;
+		using ValueType = T;
 
 		/**
 		 * \brief	Parameter for a PID calculation
@@ -70,22 +70,22 @@ namespace modm
 			Parameter(const float& kp = 0, const float& ki = 0, const float& kd = 0,
 					  const T& maxErrorSum = 0, const T& maxOutput = 0);
 
-			inline void
+			constexpr void
 			setKp(float kp) {
 				this->kp = static_cast<T>(kp * ScaleFactor);
 			}
 
-			inline void
+			constexpr void
 			setKi(float ki) {
 				this->ki = static_cast<T>(ki * ScaleFactor);
 			}
 
-			inline void
+			constexpr void
 			setKd(float kd) {
 				this->kd = static_cast<T>(kd * ScaleFactor);
 			}
 
-			inline void
+			constexpr void
 			setMaxErrorSum(float maxErrorSum) {
 				this->maxErrorSum = static_cast<T>(maxErrorSum * ScaleFactor);
 			}
@@ -109,26 +109,26 @@ namespace modm
 		 * \param	maxErrorSum	integral will be limited to this value
 		 * \param	maxOutput	output will be limited to this value
 		 **/
-		Pid(const float& kp = 0, const float& ki = 0, const float& kd = 0,
+		constexpr Pid(const float& kp = 0, const float& ki = 0, const float& kd = 0,
 				const T& maxErrorSum = 0, const T& maxOutput = 0);
 
 		/**
 		 * \param	parameter	list of parameters to the controller
 		 **/
-		Pid(Parameter& parameter);
+		constexpr Pid(Parameter& parameter);
 
 		/**
 		 * Reset the parameters of the controller.
 		 *
 		 * \param	parameter	list of parameters to the controller
 		 **/
-		void
+		constexpr void
 		setParameter(const Parameter& parameter);
 
 		/**
 		 * \brief	Reset all values
 		 */
-		void
+		constexpr void
 		reset();
 
 		/**
@@ -138,13 +138,13 @@ namespace modm
 		 * \param	externalLimitation	If true an external limitation is applied,
 		 * 								this disables integral summation.
 		 */
-		void
+		constexpr void
 		update(const T& input, bool externalLimitation = false);
 
 		/**
 		 * \brief	Returns the calculated actuating variable.
 		 */
-		inline const T&
+		constexpr const T&
 		getValue() const
 		{
 			return output;
@@ -160,7 +160,7 @@ namespace modm
 		 * Kd * (input - this->lastError);
 		 * \endcode
 		 */
-		inline const T&
+		constexpr const T&
 		getLastError() const
 		{
 			return this->lastError;
@@ -171,7 +171,7 @@ namespace modm
 		 *
 		 * This function is provided for debugging purposes only.
 		 */
-		inline const T&
+		constexpr const T&
 		getErrorSum() const
 		{
 			return this->errorSum;

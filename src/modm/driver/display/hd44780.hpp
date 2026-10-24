@@ -45,7 +45,7 @@ class Hd44780 : public CharacterDisplay
 {
 public:
 	/// Constructor
-	Hd44780(uint8_t width, uint8_t height);
+	constexpr Hd44780(uint8_t width, uint8_t height);
 
 	/**
 	 * Initialize the display
@@ -105,7 +105,7 @@ class Hd44780Dual : public CharacterDisplay
 {
 public:
 	/// Constructor
-	Hd44780Dual(uint8_t width, uint8_t height);
+	constexpr Hd44780Dual(uint8_t width, uint8_t height);
 
 	/**
 	 * \brief	Initialize the display

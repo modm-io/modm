@@ -107,7 +107,7 @@ namespace modm
 		 */
 		class Thread
 		{
-			static const uint16_t minimalStackSize = 200;
+			static constexpr uint16_t minimalStackSize = 200;
 
 		public:
 			/**
@@ -214,11 +214,11 @@ namespace modm
 			wrapper(void *object);
 
 			// disable copy constructor
-			Thread(const Thread& other);
+			Thread(const Thread& other) = delete;
 
 			// disable assignment operator
 			Thread&
-			operator = (const Thread& other);
+			operator = (const Thread& other) = delete;
 
 			TaskHandle_t handle;
 		};

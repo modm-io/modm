@@ -23,7 +23,7 @@ namespace modm
 // ----------------------------------------------------------------------------
 
 template <typename SpiMaster, typename Cs>
-Sx1276<SpiMaster, Cs>::Sx1276()
+constexpr Sx1276<SpiMaster, Cs>::Sx1276()
 {
 	//init the config shadow registers with the default values
 	opModeShadow.value = 0x09;

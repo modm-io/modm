@@ -34,14 +34,14 @@ namespace modm
 	class Line2D
 	{
 	public:
-		typedef typename GeometricTraits<T>::WideType WideType;
-		typedef typename GeometricTraits<T>::FloatType FloatType;
+		using WideType = typename GeometricTraits<T>::WideType;
+		using FloatType = typename GeometricTraits<T>::FloatType;
 
 	public:
 		/**
 		 * \brief	Default-Constructor
 		 */
-		Line2D();
+		constexpr Line2D();
 
 		/**
 		 * \brief	Construct a line
@@ -49,26 +49,26 @@ namespace modm
 		 * \param	point			a point on the line
 		 * \param	directionVector	direction vector, the length doesn't matter
 		 */
-		Line2D(const Vector<T, 2>& point, const Vector<T, 2>& directionVector);
+		constexpr Line2D(const Vector<T, 2>& point, const Vector<T, 2>& directionVector);
 
 
-		inline void
+		constexpr void
 		setPoint(const Vector<T, 2>& point);
 
 		inline const Vector<T, 2>&
 		getPoint() const;
 
-		inline void
+		constexpr void
 		setDirectionVector(const Vector<T, 2>& vector);
 
 		inline const Vector<T, 2>&
 		getDirectionVector() const;
 
-		inline void
+		constexpr void
 		set(const Vector<T, 2>& point, const Vector<T, 2>& directionVector);
 
 		/// Shortest distance to a point
-		T
+		constexpr T
 		getDistanceTo(const Vector<T, 2>& point) const;
 
 		/**
@@ -77,7 +77,7 @@ namespace modm
 		 * \param[in]	other	Other line
 		 * \param[out]	intersections	Intersection point
 		 */
-		bool
+		constexpr bool
 		getIntersections(const Line2D& other,
 				PointSet2D<T>& intersections) const;
 
@@ -89,7 +89,7 @@ namespace modm
 		 *
 		 * \see		http://local.wasp.uwa.edu.au/~pbourke/geometry/sphereline/
 		 */
-		bool
+		constexpr bool
 		getIntersections(const Circle2D<T>& circle,
 				PointSet2D<T>& intersections) const;
 

@@ -196,10 +196,8 @@ call_once(once_flag& flag, Callable&& f, Args&&... args)
 /// @see https://en.cppreference.com/w/cpp/thread/lock_guard
 using ::std::lock_guard;
 
-#ifdef __cpp_lib_scoped_lock
 /// @see https://en.cppreference.com/w/cpp/thread/scoped_lock
 using ::std::scoped_lock;
-#endif
 /// @see https://en.cppreference.com/w/cpp/thread/unique_lock
 using ::std::unique_lock;
 

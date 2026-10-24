@@ -55,7 +55,7 @@ public:
 	};
 protected:
 	/// @cond
-	typedef Configuration< Config1_t, Resolution, (Bit1 | Bit0), 5 > Resolution_t;
+	using Resolution_t = Configuration< Config1_t, Resolution, (Bit1 | Bit0), 5 >;
 	/// @endcond
 };
 
@@ -71,7 +71,7 @@ class Tmp175 :	public tmp175, public Lm75< I2cMaster >
 public:
 	/// Constructor, requires a tmp175::Data object,
 	/// sets address to default of 0x48 (alternatives are 0x49, 0x4A and 0x4B).
-	Tmp175(Data &data, uint8_t address=0x48);
+	constexpr Tmp175(Data &data, uint8_t address=0x48);
 
 	bool
 	update();

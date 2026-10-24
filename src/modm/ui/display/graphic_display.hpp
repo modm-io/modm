@@ -28,6 +28,7 @@
 
 #include "orientation.hpp"
 #include "font.hpp"
+#include "font/fixed_width_5x8.hpp"
 
 namespace modm
 {
@@ -58,9 +59,11 @@ class GraphicDisplay : public IOStream
 public:
 	friend class VirtualGraphicDisplay;
 
-	GraphicDisplay();
+	constexpr GraphicDisplay()
+	:	IOStream(writer), writer(this), font(modm::accessor::asFlash(modm::font::FixedWidth5x8))
+	{}
 
-	virtual ~GraphicDisplay() {}
+	virtual ~GraphicDisplay() = default;
 
 	/**
 	 * Number of pixel in horizontal direction.
@@ -417,7 +420,7 @@ protected:
 	class Writer : public IODevice
 	{
 	public:
-		Writer(GraphicDisplay *parent) : parent(parent) {}
+		constexpr Writer(GraphicDisplay *parent) : parent(parent) {}
 
 		/// Draw a single character
 		virtual void

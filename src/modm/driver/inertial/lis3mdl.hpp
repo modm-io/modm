@@ -90,7 +90,7 @@ public:
 		Rate_569_Hz = 0x22,		///< 560 Hz
 		Rate_1000_Hz = 0x02,	///< 1000 Hz
 	};
-	typedef modm::Configuration<Control1_t, DataRate, Bit6 | Bit5 | Bit4 | Bit3 | Bit2 | Bit1> DataRate_t;
+	using DataRate_t = modm::Configuration<Control1_t, DataRate, Bit6 | Bit5 | Bit4 | Bit3 | Bit2 | Bit1>;
 
 	/// Operation mode to be used with high speed data rates (>80 Hz)
 	enum class
@@ -102,7 +102,7 @@ public:
 		UltraHighPerformance = 0x03 //< 115 Hz
 	};
 	//This is the definition of the Highspeed modes for the Y and X axes. Z axis is in register 4
-	typedef modm::Configuration<Control1_t, HighSpeedModes, Bit2 | Bit1, 4> HighSpeedModes_t;
+	using HighSpeedModes_t = modm::Configuration<Control1_t, HighSpeedModes, Bit2 | Bit1, 4>;
 
 // ----------------------------------------------------------------------------
 
@@ -126,7 +126,7 @@ public:
 		Scale_12_gauss = 0x80,	///< 12 gauss
 		Scale_16_gauss = 0xC0,	///< 16 gauss
 	};
-	typedef modm::Configuration<Control2_t, Scale, Bit6 | Bit5 > Scale_t;
+	using Scale_t = modm::Configuration<Control2_t, Scale, Bit6 | Bit5 >;
 
 // ----------------------------------------------------------------------------
 
@@ -148,7 +148,7 @@ public:
 		Continous = 0x00,	///< Continous conversion mode
 		Single = 0x01,		///< Single shot mode
 	};
-	typedef modm::Configuration<Control3_t, OperationMode, Bit1 | Bit0 > OperationMode_t;
+	using OperationMode_t = modm::Configuration<Control3_t, OperationMode, Bit1 | Bit0 >;
 
 // ----------------------------------------------------------------------------
 
@@ -162,7 +162,7 @@ public:
 	};
 	MODM_FLAGS8(Control4);
 	// The configuration for the high speed mode of the Z axis, see register 1 for Y and Z axes
-	typedef modm::Configuration<Control4_t, HighSpeedModes, Bit2 | Bit1, 2> HighSpeedModesZ_t;
+	using HighSpeedModesZ_t = modm::Configuration<Control4_t, HighSpeedModes, Bit2 | Bit1, 2>;
 
 // ----------------------------------------------------------------------------
 
@@ -219,7 +219,7 @@ public:
 	 *
 	 * \param address The I2C device address of the sensor
 	 */
-	Lis3mdl(uint8_t address = 0x1C);
+	constexpr Lis3mdl(uint8_t address = 0x1C);
 
 	/**
 	 * \brief Configures the sensor

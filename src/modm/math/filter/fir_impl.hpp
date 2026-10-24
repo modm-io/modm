@@ -36,7 +36,7 @@
 
 
 template<typename T, int N, int BLOCK_SIZE, signed int ScaleFactor>
-modm::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::Fir(const float (&coeff)[N])
+constexpr modm::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::Fir(const float (&coeff)[N])
 {
 	setCoefficients(coeff);
 	reset();
@@ -44,7 +44,7 @@ modm::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::Fir(const float (&coeff)[N])
 
 // -----------------------------------------------------------------------------
 template<typename T, int N, int BLOCK_SIZE, signed int ScaleFactor>
-void
+constexpr void
 modm::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::setCoefficients(const float (&coeff)[N])
 {
 	for(int i = 0; i < N; i++){
@@ -54,7 +54,7 @@ modm::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::setCoefficients(const float (&
 
 // -----------------------------------------------------------------------------
 template<typename T, int N, int BLOCK_SIZE, signed int ScaleFactor>
-void
+constexpr void
 modm::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::reset()
 {
 	// reset all to make debugging easier
@@ -66,7 +66,7 @@ modm::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::reset()
 
 // -----------------------------------------------------------------------------
 template<typename T, int N, int BLOCK_SIZE, signed int ScaleFactor>
-void
+constexpr void
 modm::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::append(const T& input)
 {
 #ifdef FIR_DEBUG_APPEND
@@ -98,7 +98,7 @@ modm::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::append(const T& input)
 
 // -----------------------------------------------------------------------------
 template<typename T, int N, int BLOCK_SIZE, signed int ScaleFactor>
-void
+constexpr void
 modm::filter::Fir<T, N, BLOCK_SIZE, ScaleFactor>::update()
 {
 #ifdef FIR_DEBUG_UPDATE

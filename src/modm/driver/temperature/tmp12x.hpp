@@ -105,7 +105,7 @@ class Tmp12x : public modm::SpiDevice<SpiMaster>
 public:
 	using Temperature = TemperatureT;
 
-	Tmp12x()
+	constexpr Tmp12x()
 	{
 		this->attachConfigurationHandler([]
 		{

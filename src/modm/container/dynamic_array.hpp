@@ -47,7 +47,7 @@ namespace modm
 	 * \ingroup	modm_container
 	 */
 	template <typename T, typename Allocator = std::allocator<T>>
-	class DynamicArray
+	class [[deprecated("Use std::vector instead")]] DynamicArray // DEPRECATED: 2027q4
 	{
 	public:
 		using SizeType = std::size_t;
@@ -61,7 +61,7 @@ namespace modm
 		 * Constructs an empty dynamic array, with no content and a
 		 * size of zero.
 		 */
-		DynamicArray(const Allocator& allocator = Allocator())
+		constexpr DynamicArray(const Allocator& allocator = Allocator())
 			: data_(allocator)
 		{}
 
@@ -71,7 +71,7 @@ namespace modm
 		 * Construct a dynamic array of given capacity. The array will still
 		 * be empty.
 		 */
-		DynamicArray(SizeType n, const Allocator& allocator = Allocator())
+		constexpr DynamicArray(SizeType n, const Allocator& allocator = Allocator())
 			: data_(allocator)
 		{
 			data_.reserve(n);
@@ -85,7 +85,7 @@ namespace modm
 		 * Initializes the dynamic array with its content set to a
 		 * repetition, n times, of copies of value.
 		 */
-		DynamicArray(SizeType n, const T& value, const Allocator& allocator = Allocator())
+		constexpr DynamicArray(SizeType n, const T& value, const Allocator& allocator = Allocator())
 			: data_(n, value, allocator)
 		{}
 
@@ -95,7 +95,7 @@ namespace modm
 		 * Construct a dynamic array that holds the values specified in the
 		 * initialize list
 		 */
-		DynamicArray(std::initializer_list<T> init, const Allocator& allocator = Allocator())
+		constexpr DynamicArray(std::initializer_list<T> init, const Allocator& allocator = Allocator())
 			: data_(init, allocator)
 		{}
 

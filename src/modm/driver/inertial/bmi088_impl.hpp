@@ -21,7 +21,7 @@ namespace modm
 
 template<Bmi088Transport Transport>
 template<typename... Args>
-Bmi088<Transport>::Bmi088(Args... transportArgs)
+constexpr Bmi088<Transport>::Bmi088(Args... transportArgs)
 	: Transport{transportArgs...}
 {
 }
@@ -224,8 +224,7 @@ template<Bmi088Transport Transport>
 std::optional<uint8_t>
 Bmi088<Transport>::readRegister(auto reg)
 {
-	const auto data = this->readRegisters(reg, 1);
-	if (data.empty()) {
+	if (const auto data = this->readRegisters(reg, 1); data.empty()) {
 		return std::nullopt;
 	} else {
 		return data[0];

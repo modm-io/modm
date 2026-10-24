@@ -40,15 +40,15 @@ template< typename T = void>
 class ActionResult
 {
 public:
-	ActionResult()
+	constexpr ActionResult()
 	:	response(Response::Negative)
 	{}
 
-	ActionResult(Response response)
+	constexpr ActionResult(Response response)
 	:	response(response)
 	{}
 
-	ActionResult(T data)
+	constexpr ActionResult(T data)
 	:	response(Response::Positive), data(data)
 	{}
 
@@ -60,11 +60,11 @@ template<>
 class ActionResult<void>
 {
 public:
-	ActionResult()
+	constexpr ActionResult()
 	:	response(Response::Negative)
 	{}
 
-	ActionResult(Response response)
+	constexpr ActionResult(Response response)
 	:	response(response)
 	{}
 

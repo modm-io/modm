@@ -36,10 +36,10 @@ namespace modm
 	 */
 	template<typename T,
 			 typename Container>
-	class Queue
+	class [[deprecated("Use std::queue instead")]] Queue // DEPRECATED: 2027q4
 	{
 	public:
-		typedef typename Container::Size Size;
+		using Size = typename Container::Size;
 
 	public:
 		inline bool
@@ -111,12 +111,16 @@ namespace modm
 	 * \brief	Bounded queue
 	 * \ingroup	modm_container
 	 */
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 	template<typename T,
 			 std::size_t N,
 			 typename Container = BoundedDeque<T, N> >
-	class BoundedQueue : public Queue<T, Container>
+	class [[deprecated("Use std::queue<T, modm::BoundedDeque<T, N>> instead")]] // DEPRECATED: 2027q4
+	BoundedQueue : public Queue<T, Container>
 	{
 	};
+	#pragma GCC diagnostic pop
 
 }
 

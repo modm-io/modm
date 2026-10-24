@@ -30,7 +30,7 @@ namespace gui
 class ButtonWidget : public Widget
 {
 public:
-	ButtonWidget(const char* lbl, Dimension d) :
+	constexpr ButtonWidget(const char* lbl, Dimension d) :
 		Widget(d, true),
 		label(lbl)
 	{
@@ -56,7 +56,7 @@ private:
 class ArrowButton : public Widget
 {
 public:
-	ArrowButton(bool orientation, Dimension d) :
+	constexpr ArrowButton(bool orientation, Dimension d) :
 		Widget(d, true),
 		orientation(orientation)
 	{
@@ -77,7 +77,7 @@ private:
 class FilledAreaButton : public Widget
 {
 public:
-	FilledAreaButton(modm::color::Rgb565 color, Dimension d) :
+	constexpr FilledAreaButton(modm::color::Rgb565 color, Dimension d) :
 		Widget(d, true),
 		color(color)
 	{

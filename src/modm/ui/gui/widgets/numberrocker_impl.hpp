@@ -22,7 +22,7 @@ modm::gui::NumberRocker<T>::increase()
 	this->num_field.setValue(this->value);
 	this->num_field.markDirty();
 
-	if(cb_activate != NULL)
+	if(cb_activate != nullptr)
 	{
 		cb_activate(InputEvent(), this, cbData);
 	}
@@ -36,7 +36,7 @@ modm::gui::NumberRocker<T>::decrease()
 	this->num_field.setValue(this->value);
 	this->num_field.markDirty();
 
-	if(cb_activate != NULL)
+	if(cb_activate != nullptr)
 	{
 		cb_activate(InputEvent(), this, cbData);
 	}

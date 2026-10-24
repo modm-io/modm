@@ -21,7 +21,7 @@
 void
 EndiannessTest::testToBigEndian()
 {
-	if (modm::isLittleEndian())
+	if ((std::endian::native == std::endian::little))
 	{
 		uint32_t val = 0xdeadbeef;
 		TEST_ASSERT_EQUALS(modm::toBigEndian(val), 0xefbeadde);
@@ -40,7 +40,7 @@ EndiannessTest::testToBigEndian()
 void
 EndiannessTest::testToLittleEndian()
 {
-	if (modm::isLittleEndian())
+	if ((std::endian::native == std::endian::little))
 	{
 		TEST_ASSERT_EQUALS(modm::toLittleEndian(static_cast<uint32_t>(0xdeadbeef)), static_cast<uint32_t>(0xdeadbeef));
 		TEST_ASSERT_EQUALS(modm::toLittleEndian(static_cast<uint16_t>(0xdead    )), static_cast<uint16_t>(0xdead    ));
@@ -52,7 +52,7 @@ EndiannessTest::testToLittleEndian()
 void
 EndiannessTest::testFromBigEndian()
 {
-	if (modm::isLittleEndian())
+	if ((std::endian::native == std::endian::little))
 	{
 		TEST_ASSERT_EQUALS(modm::fromBigEndian(static_cast<uint32_t>(0xdeadbeef)), static_cast<uint32_t>(0xefbeadde));
 		TEST_ASSERT_EQUALS(modm::fromBigEndian(static_cast<uint16_t>(0xdead    )), static_cast<uint16_t>(0xadde    ));
@@ -64,7 +64,7 @@ EndiannessTest::testFromBigEndian()
 void
 EndiannessTest::testFromLittleEndian()
 {
-	if (modm::isLittleEndian())
+	if ((std::endian::native == std::endian::little))
 	{
 		TEST_ASSERT_EQUALS(modm::fromLittleEndian(static_cast<uint32_t>(0xdeadbeef)), static_cast<uint32_t>(0xdeadbeef));
 		TEST_ASSERT_EQUALS(modm::fromLittleEndian(static_cast<uint16_t>(0xdead    )), static_cast<uint16_t>(0xdead    ));
@@ -84,8 +84,8 @@ EndiannessTest::testBigEndianStruct()
 	constexpr modm::BigEndian<uint16_t> be16 = val16;
 	constexpr modm::BigEndian<uint32_t> be32 = val32;
 
-	TEST_ASSERT_EQUALS(be16.raw, modm::isBigEndian() ? val16 : swap16);
-	TEST_ASSERT_EQUALS(be32.raw, modm::isBigEndian() ? val32 : swap32);
+	TEST_ASSERT_EQUALS(be16.raw, (std::endian::native == std::endian::big) ? val16 : swap16);
+	TEST_ASSERT_EQUALS(be32.raw, (std::endian::native == std::endian::big) ? val32 : swap32);
 	TEST_ASSERT_EQUALS(be16, val16);
 	TEST_ASSERT_EQUALS(be32, val32);
 }
@@ -101,8 +101,8 @@ EndiannessTest::testLittleEndianStruct()
 	constexpr modm::LittleEndian<uint16_t> le16 = val16;
 	constexpr modm::LittleEndian<uint32_t> le32 = val32;
 
-	TEST_ASSERT_EQUALS(le16.raw, modm::isLittleEndian() ? val16 : swap16);
-	TEST_ASSERT_EQUALS(le32.raw, modm::isLittleEndian() ? val32 : swap32);
+	TEST_ASSERT_EQUALS(le16.raw, (std::endian::native == std::endian::little) ? val16 : swap16);
+	TEST_ASSERT_EQUALS(le32.raw, (std::endian::native == std::endian::little) ? val32 : swap32);
 	TEST_ASSERT_EQUALS(le16, val16);
 	TEST_ASSERT_EQUALS(le32, val32);
 }
@@ -122,14 +122,14 @@ EndiannessTest::testBigEndianReinterpreted()
 	DataBE dataBE = {0x0203, 0x04050607};
 	DataRaw* dataRaw = reinterpret_cast<DataRaw*>(&dataBE);
 
-	TEST_ASSERT_EQUALS(dataRaw->raw16, modm::isBigEndian() ? 0x0203u : 0x0302u);
-	TEST_ASSERT_EQUALS(dataRaw->raw32, modm::isBigEndian() ? 0x04050607u : 0x07060504u);
+	TEST_ASSERT_EQUALS(dataRaw->raw16, (std::endian::native == std::endian::big) ? 0x0203u : 0x0302u);
+	TEST_ASSERT_EQUALS(dataRaw->raw32, (std::endian::native == std::endian::big) ? 0x04050607u : 0x07060504u);
 
 	dataRaw->raw16 = 0xA1A2;
 	dataRaw->raw32 = 0xB1B2B3B4;
 
-	TEST_ASSERT_EQUALS(dataBE.be16, modm::isBigEndian() ? 0xA1A2u : 0xA2A1u);
-	TEST_ASSERT_EQUALS(dataBE.be32, modm::isBigEndian() ? 0xB1B2B3B4u : 0xB4B3B2B1u);
+	TEST_ASSERT_EQUALS(dataBE.be16, (std::endian::native == std::endian::big) ? 0xA1A2u : 0xA2A1u);
+	TEST_ASSERT_EQUALS(dataBE.be32, (std::endian::native == std::endian::big) ? 0xB1B2B3B4u : 0xB4B3B2B1u);
 }
 
 void
@@ -147,12 +147,12 @@ EndiannessTest::testLittleEndianReinterpreted()
 	DataLE dataLE = {0x0203, 0x04050607};
 	DataRaw* dataRaw = reinterpret_cast<DataRaw*>(&dataLE);
 
-	TEST_ASSERT_EQUALS(dataRaw->raw16, modm::isLittleEndian() ? 0x0203u : 0x0302u);
-	TEST_ASSERT_EQUALS(dataRaw->raw32, modm::isLittleEndian() ? 0x04050607u : 0x07060504u);
+	TEST_ASSERT_EQUALS(dataRaw->raw16, (std::endian::native == std::endian::little) ? 0x0203u : 0x0302u);
+	TEST_ASSERT_EQUALS(dataRaw->raw32, (std::endian::native == std::endian::little) ? 0x04050607u : 0x07060504u);
 
 	dataRaw->raw16 = 0xA1A2;
 	dataRaw->raw32 = 0xB1B2B3B4;
 
-	TEST_ASSERT_EQUALS(dataLE.le16, modm::isLittleEndian() ? 0xA1A2u : 0xA2A1u);
-	TEST_ASSERT_EQUALS(dataLE.le32, modm::isLittleEndian() ? 0xB1B2B3B4u : 0xB4B3B2B1u);
+	TEST_ASSERT_EQUALS(dataLE.le16, (std::endian::native == std::endian::little) ? 0xA1A2u : 0xA2A1u);
+	TEST_ASSERT_EQUALS(dataLE.le32, (std::endian::native == std::endian::little) ? 0xB1B2B3B4u : 0xB4B3B2B1u);
 }

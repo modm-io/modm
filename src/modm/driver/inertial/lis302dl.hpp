@@ -111,7 +111,7 @@ public:
 	};
 	MODM_FLAGS8(Control3);
 
-	typedef FlagsGroup<Control1_t, Control2_t, Control3_t> Control_t;
+	using Control_t = FlagsGroup<Control1_t, Control2_t, Control3_t>;
 
 	/// STATUS_REG default value is 0x00
 	enum class
@@ -195,11 +195,7 @@ public:
 	};
 	MODM_FLAGS8(ClickSource);
 
-	typedef FlagsGroup<
-			Control1_t, Control2_t, Control3_t, Status_t,
-			FreeFallConfig_t, FreeFallSource_t, FreeFallThreshold_t,
-			ClickConfig_t, ClickSource_t
-	> Register_t;
+	using Register_t = FlagsGroup< Control1_t, Control2_t, Control3_t, Status_t, FreeFallConfig_t, FreeFallSource_t, FreeFallThreshold_t, ClickConfig_t, ClickSource_t >;
 
 public:
 	enum class
@@ -249,7 +245,7 @@ public:
 		template < class Transport >
 		friend class Lis302dl;
 
-		Data() :
+		constexpr Data() :
 			data{0,0,0}, meta(0)
 		{}
 		// DATA ACCESS
@@ -311,7 +307,7 @@ class Lis302dl : public lis302dl, public Transport
 public:
 	/// Constructor, requires a lis302dl::Data object.
 	/// For I2c this also sets the address to 0x1D (alternative: 0x1C).
-	Lis302dl(Data &data, uint8_t address=0x1D);
+	constexpr Lis302dl(Data &data, uint8_t address=0x1D);
 
 	bool
 	configure(Scale scale, MeasurementRate rate = MeasurementRate::Hz100);

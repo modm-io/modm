@@ -12,6 +12,7 @@
 #ifndef MODM_MCP23X08_HPP
 #define MODM_MCP23X08_HPP
 
+#include <bit>
 #include <modm/architecture/interface/gpio_expander.hpp>
 #include <modm/architecture/interface/register.hpp>
 #include "mcp23_transport.hpp"
@@ -69,7 +70,7 @@ public:
 		P6 = Bit6,
 		P7 = Bit7,
 	};
-	typedef modm::Flags8<Pin> Pins;
+	using Pins = modm::Flags8<Pin>;
 	MODM_INT_TYPE_FLAGS(Pins);
 }; // struct mcp23x08
 
@@ -94,12 +95,12 @@ public:
 	static constexpr uint8_t
 	indexFromPin(Pin pin)
 	{
-		return modm::leftmostBit(PortType(pin));
+		return std::bit_width(PortType(pin)) - 1;
 	}
 
 public:
 	/// Constructor, sets address to default of 0x20 (range 0x20 - 0x27)
-	Mcp23x08(uint8_t address=0x20);
+	constexpr Mcp23x08(uint8_t address=0x20);
 
 public:
 	bool
@@ -220,7 +221,7 @@ private:
 	struct modm_packed
 	Memory
 	{
-		Memory() :
+		constexpr Memory() :
 			direction(0xff),
 			polarity(0),
 			interruptEnable(0),

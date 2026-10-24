@@ -77,7 +77,7 @@ public:
     /**
      * @param data pointer to buffer of the internal data of type Data
      */
-    Max31855(Data &data);
+    constexpr Max31855(Data &data);
 
     /// Call this function once before using the device
     void

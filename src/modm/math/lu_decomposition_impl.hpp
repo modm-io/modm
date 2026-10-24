@@ -17,7 +17,7 @@
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t SIZE>
-bool
+constexpr bool
 modm::LUDecomposition::decompose(
 		const modm::Matrix<T, SIZE, SIZE> &matrix,
 		modm::Matrix<T, SIZE, SIZE> *l,
@@ -31,7 +31,7 @@ modm::LUDecomposition::decompose(
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t SIZE>
-bool
+constexpr bool
 modm::LUDecomposition::decompose(
 		const modm::Matrix<T, SIZE, SIZE> &matrix,
 		modm::Matrix<T, SIZE, SIZE> *l,
@@ -48,7 +48,7 @@ modm::LUDecomposition::decompose(
 }
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t SIZE>
-bool
+constexpr bool
 modm::LUDecomposition::decompose(
 		const modm::Matrix<T, SIZE, SIZE> &matrix,
 		modm::Matrix<T, SIZE, SIZE> *l,
@@ -66,7 +66,7 @@ modm::LUDecomposition::decompose(
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t SIZE, uint8_t BXWIDTH>
-bool
+constexpr bool
 modm::LUDecomposition::solve(
 		const modm::Matrix<T, SIZE, SIZE> &l,
 		const modm::Matrix<T, SIZE, SIZE> &u,
@@ -77,7 +77,7 @@ modm::LUDecomposition::solve(
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t SIZE, uint8_t BXWIDTH>
-bool
+constexpr bool
 modm::LUDecomposition::solve(
 		const modm::Matrix<T, SIZE, SIZE> &A,
 		modm::Matrix<T, SIZE, BXWIDTH> *xb)
@@ -100,7 +100,7 @@ modm::LUDecomposition::solve(
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t SIZE>
-void
+constexpr void
 modm::LUDecomposition::RowOperation<T, SIZE>::multiply(T *intoRow, const T *row, const T &factor)
 {
 	for (uint_fast8_t i = 0; i < SIZE; ++i)	{
@@ -110,7 +110,7 @@ modm::LUDecomposition::RowOperation<T, SIZE>::multiply(T *intoRow, const T *row,
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t SIZE>
-void
+constexpr void
 modm::LUDecomposition::RowOperation<T, SIZE>::addRowTimesFactor(T *intoRow, const T *srcRow, const T *addRow, const T &timesFactor)
 {
 	for (uint_fast8_t i = 0; i < SIZE; ++i)	{
@@ -120,7 +120,7 @@ modm::LUDecomposition::RowOperation<T, SIZE>::addRowTimesFactor(T *intoRow, cons
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t SIZE>
-void
+constexpr void
 modm::LUDecomposition::RowOperation<T, SIZE>::swap(T *row1, T *row2)
 {
 	T tmp[SIZE];
@@ -136,7 +136,7 @@ modm::LUDecomposition::RowOperation<T, SIZE>::swap(T *row1, T *row2)
 
 // ----------------------------------------------------------------------------
 template<typename T>
-void
+constexpr void
 modm::LUDecomposition::RowOperation<T, 0>::multiply(
 		T * /* intoRow */, const T * /* row */, const T & /* factor */)
 {
@@ -144,7 +144,7 @@ modm::LUDecomposition::RowOperation<T, 0>::multiply(
 
 // ----------------------------------------------------------------------------
 template<typename T>
-void
+constexpr void
 modm::LUDecomposition::RowOperation<T, 0>::addRowTimesFactor(
 		T * /* intoRow */, const T * /* srcRow */, const T * /* addRow */, const T & /* timesFactor */)
 {
@@ -152,7 +152,7 @@ modm::LUDecomposition::RowOperation<T, 0>::addRowTimesFactor(
 
 // ----------------------------------------------------------------------------
 template<typename T>
-void
+constexpr void
 modm::LUDecomposition::RowOperation<T, 0>::swap(T * /* row1 */, T * /* row2 */)
 {
 }
@@ -163,7 +163,7 @@ modm::LUDecomposition::RowOperation<T, 0>::swap(T * /* row1 */, T * /* row2 */)
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t OFFSET, uint8_t HEIGHT, uint8_t WIDTH>
-bool
+constexpr bool
 modm::LUDecomposition::LUSubDecomposition<T, OFFSET, HEIGHT, WIDTH>::decomposeRecur(T * u, T * l)
 {
 	if (!decompose(u, l))
@@ -174,7 +174,7 @@ modm::LUDecomposition::LUSubDecomposition<T, OFFSET, HEIGHT, WIDTH>::decomposeRe
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t OFFSET, uint8_t HEIGHT, uint8_t WIDTH>
-bool
+constexpr bool
 modm::LUDecomposition::LUSubDecomposition<T, OFFSET, HEIGHT, WIDTH>::decompose(T * u, T * l)
 {
 	const uint8_t width = WIDTH;
@@ -200,7 +200,7 @@ modm::LUDecomposition::LUSubDecomposition<T, OFFSET, HEIGHT, WIDTH>::decompose(T
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t OFFSET, uint8_t HEIGHT, uint8_t WIDTH>
-bool
+constexpr bool
 modm::LUDecomposition::LUSubDecomposition<T, OFFSET, HEIGHT, WIDTH>::decomposeRecur(T *u, T *l, int8_t *p)
 {
 	if (!decompose(u, l, p))
@@ -211,7 +211,7 @@ modm::LUDecomposition::LUSubDecomposition<T, OFFSET, HEIGHT, WIDTH>::decomposeRe
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t OFFSET, uint8_t HEIGHT, uint8_t WIDTH>
-bool
+constexpr bool
 modm::LUDecomposition::LUSubDecomposition<T, OFFSET, HEIGHT, WIDTH>::decompose(T *u, T *l, int8_t *p)
 {
 	const uint8_t width = WIDTH;
@@ -246,7 +246,7 @@ modm::LUDecomposition::LUSubDecomposition<T, OFFSET, HEIGHT, WIDTH>::decompose(T
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t OFFSET, uint8_t HEIGHT, uint8_t WIDTH> template<uint8_t BXWIDTH>
-bool
+constexpr bool
 modm::LUDecomposition::LUSubDecomposition<T, OFFSET, HEIGHT, WIDTH>::solveLyEqualsB(
 		modm::Matrix<T, HEIGHT, WIDTH> *l,
 		modm::Matrix<T, HEIGHT, BXWIDTH> *bx)
@@ -274,7 +274,7 @@ modm::LUDecomposition::LUSubDecomposition<T, OFFSET, HEIGHT, WIDTH>::solveLyEqua
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t OFFSET, uint8_t HEIGHT, uint8_t WIDTH> template<uint8_t BXWIDTH>
-bool
+constexpr bool
 modm::LUDecomposition::LUSubDecomposition<T, OFFSET, HEIGHT, WIDTH>::solveUxEqualsY(
 		modm::Matrix<T, HEIGHT, WIDTH> *u,
 		modm::Matrix<T, HEIGHT, BXWIDTH> *bx)
@@ -300,7 +300,7 @@ modm::LUDecomposition::LUSubDecomposition<T, OFFSET, HEIGHT, WIDTH>::solveUxEqua
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t OFFSET, uint8_t HEIGHT, uint8_t WIDTH> template<uint8_t BXWIDTH>
-bool
+constexpr bool
 modm::LUDecomposition::LUSubDecomposition<T, OFFSET, HEIGHT, WIDTH>::solve(
 		const modm::Matrix<T, HEIGHT, WIDTH> &l,
 		const modm::Matrix<T, HEIGHT, WIDTH> &u,
@@ -315,13 +315,11 @@ modm::LUDecomposition::LUSubDecomposition<T, OFFSET, HEIGHT, WIDTH>::solve(
 
 	// start solving Ly = b
 
-	modm::Matrix<T, HEIGHT, WIDTH> lCopy(l);
-	if (!solveLyEqualsB(&lCopy, bx)) {
+	if (modm::Matrix<T, HEIGHT, WIDTH> lCopy(l); !solveLyEqualsB(&lCopy, bx)) {
 		return false;
 	}
 
-	modm::Matrix<T, HEIGHT, WIDTH> uCopy(u);
-	if (!solveUxEqualsY(&uCopy, bx)) {
+	if (modm::Matrix<T, HEIGHT, WIDTH> uCopy(u); !solveUxEqualsY(&uCopy, bx)) {
 		return false;
 	}
 
@@ -330,7 +328,7 @@ modm::LUDecomposition::LUSubDecomposition<T, OFFSET, HEIGHT, WIDTH>::solve(
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t OFFSET, uint8_t WIDTH>
-bool
+constexpr bool
 modm::LUDecomposition::LUSubDecomposition<T, OFFSET, WIDTH, OFFSET>::decomposeRecur(T * /* u */, T * /* l */, int8_t * /* p */)
 {
 	return true;
@@ -338,7 +336,7 @@ modm::LUDecomposition::LUSubDecomposition<T, OFFSET, WIDTH, OFFSET>::decomposeRe
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t OFFSET, uint8_t WIDTH>
-bool
+constexpr bool
 modm::LUDecomposition::LUSubDecomposition<T, OFFSET, WIDTH, OFFSET>::decomposeRecur(T * /* u */, T * /* l */)
 {
 	return true;
@@ -346,7 +344,7 @@ modm::LUDecomposition::LUSubDecomposition<T, OFFSET, WIDTH, OFFSET>::decomposeRe
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t OFFSET, uint8_t WIDTH> template<uint8_t BXWIDTH>
-bool
+constexpr bool
 modm::LUDecomposition::LUSubDecomposition<T, OFFSET, WIDTH, OFFSET>::solveUxEqualsY(
 		modm::Matrix<T, WIDTH, OFFSET> * /* u */,
 		modm::Matrix<T, OFFSET, BXWIDTH> * /* bx */)
@@ -356,7 +354,7 @@ modm::LUDecomposition::LUSubDecomposition<T, OFFSET, WIDTH, OFFSET>::solveUxEqua
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t OFFSET, uint8_t WIDTH> template<uint8_t BXWIDTH>
-bool
+constexpr bool
 modm::LUDecomposition::LUSubDecomposition<T, OFFSET, WIDTH, OFFSET>::solveLyEqualsB(
 		modm::Matrix<T, WIDTH, OFFSET> * /* l */,
 		modm::Matrix<T, OFFSET, BXWIDTH> * /* bx */)

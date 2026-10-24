@@ -15,18 +15,13 @@
 #define MODM_GUI_TYPES_HPP
 
 #include <modm/ui/display.hpp>
-#include <modm/container/dynamic_array.hpp>
-#include <modm/container/linked_list.hpp>
-#include <modm/container/queue.hpp>
-#include <modm/container/doubly_linked_list.hpp>
+#include <vector>
+#include <list>
+#include <queue>
 #include <modm/processing/timer.hpp>
 
 #include <modm/debug/logger.hpp>
 
-/* Eclipse needs this to resolve NULL*/
-#ifndef NULL
-#define NULL 0
-#endif
 
 namespace modm
 {
@@ -41,7 +36,7 @@ class Widget;
 
 /// Container used in view to store widgets
 /// @ingroup modm_ui_gui
-typedef modm::DynamicArray<Widget*> WidgetContainer;
+using WidgetContainer = std::vector<Widget*>;
 /// @ingroup modm_ui_gui
 typedef void (*genericCallback)(void*);
 
@@ -67,14 +62,14 @@ public:
 		DOWN
 	};
 
-	InputEvent(modm::glcd::Point point, Type type, Direction direction) :
+	constexpr InputEvent(modm::glcd::Point point, Type type, Direction direction) :
 		type(type),
 		direction(direction),
 		coord(point)
 	{
 	}
 
-	InputEvent()
+	constexpr InputEvent()
 	{
 	}
 
@@ -96,7 +91,7 @@ public:
 class AsyncEvent
 {
 public:
-	AsyncEvent(uint16_t delayMilliseconds, genericCallback cb, void* cb_data) :
+	constexpr AsyncEvent(uint16_t delayMilliseconds, genericCallback cb, void* cb_data) :
 		cb(cb),
 		cb_data(cb_data),
 		timeout(std::chrono::milliseconds(delayMilliseconds)),
@@ -108,7 +103,7 @@ public:
 	{
 		if(timeout.isExpired())
 		{
-			if(!already_run && ( cb != NULL ))
+			if(!already_run && ( cb != nullptr ))
 			{
 				already_run = true;
 				cb(cb_data);
@@ -128,9 +123,9 @@ private:
 };
 
 /// @ingroup modm_ui_gui
-typedef modm::DoublyLinkedList<AsyncEvent*> AsyncEventList;
+using AsyncEventList = std::list<AsyncEvent*>;
 /// @ingroup modm_ui_gui
-typedef modm::Queue<InputEvent*, modm::LinkedList<InputEvent*> > inputQueue;
+using inputQueue = std::queue<InputEvent*, std::list<InputEvent*> >;
 
 /// Callback when an event happend
 /// @ingroup modm_ui_gui
@@ -138,7 +133,7 @@ typedef void (*eventCallback)(const InputEvent&, Widget*, void*);
 /// @ingroup modm_ui_gui
 typedef struct Dimension
 {
-	Dimension(int16_t w, int16_t h) :
+	constexpr Dimension(int16_t w, int16_t h) :
 		width(w), height(h)
 	{
 	}
@@ -151,7 +146,7 @@ typedef struct Dimension
 
 } Dimension;
 /// @ingroup modm_ui_gui
-typedef modm::glcd::Point Point;
+using Point = modm::glcd::Point;
 
 }	// namespace gui
 

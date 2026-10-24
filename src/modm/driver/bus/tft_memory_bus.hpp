@@ -25,7 +25,7 @@ namespace modm
 class TftMemoryBus16Bit
 {
 public:
-	TftMemoryBus16Bit(
+	constexpr TftMemoryBus16Bit(
 			volatile uint16_t * index,
 			volatile uint16_t * data) :
 		ptrIndex(index), ptrData(data)
@@ -73,7 +73,7 @@ private:
 class TftMemoryBus8Bit
 {
 public:
-	TftMemoryBus8Bit(
+	constexpr TftMemoryBus8Bit(
 			volatile uint8_t * index,
 			volatile uint8_t * data) :
 		ptrIndex(index), ptrData(data)
@@ -197,7 +197,7 @@ template <
 class TftMemoryBus8BitGpio
 {
 public:
-	typedef MemoryBus<PORT, CS, RD, WR> BUS;
+	using BUS = MemoryBus<PORT, CS, RD, WR>;
 
 	static void
 	initialize()

@@ -68,10 +68,10 @@ namespace modm
 		update();
 
 	protected:
-		static Spi spi;
-		static Load load;
+		static inline Spi spi;
+		static inline Load load;
 
-		static uint8_t cache[N];
+		static inline uint8_t cache[N];
 	};
 }
 

@@ -16,19 +16,6 @@
 
 // ----------------------------------------------------------------------------
 template <typename Interface>
-Interface modm::sab::Master<Interface>::interface;
-
-template <typename Interface>
-typename modm::sab::Master<Interface>::QueryStatus modm::sab::Master<Interface>::queryStatus;
-
-template <typename Interface>
-uint8_t modm::sab::Master<Interface>::expectedResponseLength;
-
-template <typename Interface>
-modm::ShortTimeout modm::sab::Master<Interface>::timer;
-
-// ----------------------------------------------------------------------------
-template <typename Interface>
 void
 modm::sab::Master<Interface>::initialize()
 {

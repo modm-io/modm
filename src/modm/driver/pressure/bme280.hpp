@@ -123,7 +123,7 @@ public:
 		Forced = int(CtrlMeas::Mode0),
 		Normal = int(CtrlMeas::Mode1) | int(CtrlMeas::Mode0),
 	};
-	typedef Configuration< CtrlMeas_t, Mode, (Bit1 | Bit0) >  Mode_t;
+	using Mode_t = Configuration< CtrlMeas_t, Mode, (Bit1 | Bit0) >;
 
 	// [4:2]
 	enum class
@@ -136,9 +136,9 @@ public:
 		Octupel    = (0b100),
 		Sexdecuple = (0b101),
 	};
-	typedef Configuration< CtrlMeas_t, Oversampling, (Bit2 | Bit1 | Bit0), 2 > Pressure;
-	typedef Configuration< CtrlMeas_t, Oversampling, (Bit2 | Bit1 | Bit0), 5 > Temperature;
-	typedef Configuration< CtrlHum_t,  Oversampling, (Bit2 | Bit1 | Bit0), 0 > Humidity;
+	using Pressure = Configuration< CtrlMeas_t, Oversampling, (Bit2 | Bit1 | Bit0), 2 >;
+	using Temperature = Configuration< CtrlMeas_t, Oversampling, (Bit2 | Bit1 | Bit0), 5 >;
+	using Humidity = Configuration< CtrlHum_t,  Oversampling, (Bit2 | Bit1 | Bit0), 0 >;
 
 	// Register 0xF5 "config"
 	enum class
@@ -166,7 +166,7 @@ public:
 		Ms10  = int(Config::T_SB_2) | int(Config::T_SB_1),
 		Ms20  = int(Config::T_SB_2) | int(Config::T_SB_1) | int(Config::T_SB_0),
 	};
-	typedef Configuration< Config_t, TimeStandby, (Bit7 | Bit6 | Bit5) >  TimeStandby_t;
+	using TimeStandby_t = Configuration< Config_t, TimeStandby, (Bit7 | Bit6 | Bit5) >;
 
 	enum class
 	FilterSettings : uint8_t
@@ -205,7 +205,7 @@ public:
 	 * @param	data		pointer to buffer of the internal data of type Data
 	 * @param	address		address defaults to 0x76
 	 */
-	Bme280(Data &data, uint8_t address=0x76);
+	constexpr Bme280(Data &data, uint8_t address=0x76);
 
 	// MARK: - TASKS
 	/// Reads out and stores the calibration bytes

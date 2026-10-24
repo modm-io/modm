@@ -30,7 +30,7 @@ template<typename T>
 class NumberField : public Widget
 {
 public:
-	NumberField(T default_value, Dimension d) :
+	constexpr NumberField(T default_value, Dimension d) :
 		Widget(d, false),
 		value(default_value)
 	{
@@ -59,7 +59,7 @@ private:
 };
 
 /// @ingroup modm_ui_gui
-typedef NumberField<int16_t> IntegerField;
+using IntegerField = NumberField<int16_t>;
 
 /// @ingroup modm_ui_gui
 class FloatField : public NumberField<float>

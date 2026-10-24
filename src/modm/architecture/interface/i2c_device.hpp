@@ -45,7 +45,7 @@ class I2cDevice
 {
 public:
 	///	@param	address	the slave address not yet shifted left (address < 128).
-	I2cDevice(uint8_t address)
+	constexpr I2cDevice(uint8_t address)
 	:	transaction(address), configuration(nullptr)
 	{
 	}

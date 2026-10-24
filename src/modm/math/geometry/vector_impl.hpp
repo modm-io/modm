@@ -16,25 +16,25 @@
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-modm::Vector<T, N>::Vector()
+constexpr modm::Vector<T, N>::Vector()
 {
 }
 
 template<typename T, uint8_t N>
-modm::Vector<T, N>::Vector(const T *ptData)
+constexpr modm::Vector<T, N>::Vector(const T *ptData)
 {
 	memcpy(coords, ptData, sizeof(T) * N);
 }
 
 template<typename T, uint8_t N>
-modm::Vector<T, N>::Vector(const modm::Matrix<T, N, 1> &rhs)
+constexpr modm::Vector<T, N>::Vector(const modm::Matrix<T, N, 1> &rhs)
 {
 	memcpy(coords, &rhs, sizeof(T) * N);
 }
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-uint8_t
+constexpr uint8_t
 modm::Vector<T, N>::getSize()
 {
 	return N;
@@ -42,7 +42,7 @@ modm::Vector<T, N>::getSize()
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-modm::Vector<T, N>&
+constexpr modm::Vector<T, N>&
 modm::Vector<T, N>::operator = (const modm::Matrix<T, N, 1> &rhs)
 {
 	memcpy(coords, &rhs, sizeof(T) * N);
@@ -51,7 +51,7 @@ modm::Vector<T, N>::operator = (const modm::Matrix<T, N, 1> &rhs)
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-bool
+constexpr bool
 modm::Vector<T, N>::operator == (const modm::Vector<T, N> &rhs) const
 {
 	return memcmp(coords, rhs.coords, sizeof(T)*N) == 0;
@@ -59,7 +59,7 @@ modm::Vector<T, N>::operator == (const modm::Vector<T, N> &rhs) const
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-bool
+constexpr bool
 modm::Vector<T, N>::operator != (const modm::Vector<T, N> &rhs) const
 {
 	return memcmp(coords, rhs.coords, sizeof(T)*N) != 0;
@@ -67,7 +67,7 @@ modm::Vector<T, N>::operator != (const modm::Vector<T, N> &rhs) const
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-bool
+constexpr bool
 modm::Vector<T, N>::operator < (const modm::Vector<T, N> &rhs) const
 {
 	for (uint_fast8_t i = 0; i < N; ++i)
@@ -84,7 +84,7 @@ modm::Vector<T, N>::operator < (const modm::Vector<T, N> &rhs) const
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-bool
+constexpr bool
 modm::Vector<T, N>::operator <= (const modm::Vector<T, N> &rhs) const
 {
 	for (uint_fast8_t i = 0; i < N; ++i)
@@ -101,7 +101,7 @@ modm::Vector<T, N>::operator <= (const modm::Vector<T, N> &rhs) const
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-bool
+constexpr bool
 modm::Vector<T, N>::operator > (const modm::Vector<T, N> &rhs) const
 {
 	for (uint_fast8_t i = 0; i < N; ++i)
@@ -118,7 +118,7 @@ modm::Vector<T, N>::operator > (const modm::Vector<T, N> &rhs) const
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-bool
+constexpr bool
 modm::Vector<T, N>::operator >= (const modm::Vector<T, N> &rhs) const
 {
 	for (uint_fast8_t i = 0; i < N; ++i)
@@ -135,7 +135,7 @@ modm::Vector<T, N>::operator >= (const modm::Vector<T, N> &rhs) const
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-const T&
+constexpr const T&
 modm::Vector<T, N>::operator [] (uint8_t index) const
 {
 	return coords[index];
@@ -143,7 +143,7 @@ modm::Vector<T, N>::operator [] (uint8_t index) const
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-T&
+constexpr T&
 modm::Vector<T, N>::operator [] (uint8_t index)
 {
 	return coords[index];
@@ -151,7 +151,7 @@ modm::Vector<T, N>::operator [] (uint8_t index)
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-T*
+constexpr T*
 modm::Vector<T, N>::ptr()
 {
 	return reinterpret_cast<T*>(this);
@@ -159,7 +159,7 @@ modm::Vector<T, N>::ptr()
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-const T*
+constexpr const T*
 modm::Vector<T, N>::ptr() const
 {
 	return reinterpret_cast<const T*>(this);
@@ -167,7 +167,7 @@ modm::Vector<T, N>::ptr() const
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-modm::Vector<T, N>
+constexpr modm::Vector<T, N>
 modm::Vector<T, N>::operator + (const modm::Vector<T, N> &rhs) const
 {
 	modm::Vector<T, N> pt;
@@ -179,7 +179,7 @@ modm::Vector<T, N>::operator + (const modm::Vector<T, N> &rhs) const
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-modm::Vector<T, N>
+constexpr modm::Vector<T, N>
 modm::Vector<T, N>::operator - (const modm::Vector<T, N> &rhs) const
 {
 	modm::Vector<T, N> pt;
@@ -191,14 +191,14 @@ modm::Vector<T, N>::operator - (const modm::Vector<T, N> &rhs) const
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-modm::Matrix<T, N, 1>&
+constexpr modm::Matrix<T, N, 1>&
 modm::Vector<T, N>::asMatrix()
 {
 	return *reinterpret_cast<modm::Matrix<T, N, 1>*>(this);
 }
 
 template<typename T, uint8_t N>
-const modm::Matrix<T, N, 1>&
+constexpr const modm::Matrix<T, N, 1>&
 modm::Vector<T, N>::asMatrix() const
 {
 	return *reinterpret_cast<const modm::Matrix<T, N, 1>*>(this);
@@ -206,14 +206,14 @@ modm::Vector<T, N>::asMatrix() const
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-const modm::Matrix<T, 1, N>&
+constexpr const modm::Matrix<T, 1, N>&
 modm::Vector<T, N>::asTransposedMatrix() const
 {
 	return *reinterpret_cast<const modm::Matrix<T, 1, N>*>(this);
 }
 
 template<typename T, uint8_t N>
-modm::Matrix<T, 1, N>&
+constexpr modm::Matrix<T, 1, N>&
 modm::Vector<T, N>::asTransposedMatrix()
 {
 	return *reinterpret_cast<modm::Matrix<T, 1, N>*>(this);
@@ -221,7 +221,7 @@ modm::Vector<T, N>::asTransposedMatrix()
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-T
+constexpr T
 modm::Vector<T, N>::operator * (const Vector &rhs) const
 {
 	T v = 0;
@@ -234,7 +234,7 @@ modm::Vector<T, N>::operator * (const Vector &rhs) const
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-modm::Vector<T, N>
+constexpr modm::Vector<T, N>
 modm::Vector<T, N>::operator * (const T &rhs) const
 {
 	modm::Vector<T, N> pt;
@@ -246,7 +246,7 @@ modm::Vector<T, N>::operator * (const T &rhs) const
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-modm::Vector<T, N>
+constexpr modm::Vector<T, N>
 modm::Vector<T, N>::operator / (const T &rhs) const
 {
 	modm::Vector<T, N> pt;
@@ -258,7 +258,7 @@ modm::Vector<T, N>::operator / (const T &rhs) const
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-modm::Vector<T, N>&
+constexpr modm::Vector<T, N>&
 modm::Vector<T, N>::operator += (const Vector &rhs)
 {
 	for (uint_fast8_t i = 0; i < N; ++i) {
@@ -269,7 +269,7 @@ modm::Vector<T, N>::operator += (const Vector &rhs)
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-modm::Vector<T, N>&
+constexpr modm::Vector<T, N>&
 modm::Vector<T, N>::operator -= (const Vector &rhs)
 {
 	for (uint_fast8_t i = 0; i < N; ++i) {
@@ -280,7 +280,7 @@ modm::Vector<T, N>::operator -= (const Vector &rhs)
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-modm::Vector<T, N>&
+constexpr modm::Vector<T, N>&
 modm::Vector<T, N>::operator *= (const T &rhs)
 {
 	for (uint_fast8_t i = 0; i < N; ++i) {
@@ -291,7 +291,7 @@ modm::Vector<T, N>::operator *= (const T &rhs)
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-modm::Vector<T, N>&
+constexpr modm::Vector<T, N>&
 modm::Vector<T, N>::operator /= (const T &rhs)
 {
 	for (uint_fast8_t i = 0; i < N; ++i) {
@@ -302,7 +302,7 @@ modm::Vector<T, N>::operator /= (const T &rhs)
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-modm::Vector<T, N>&
+constexpr modm::Vector<T, N>&
 modm::Vector<T, N>::operator - ()
 {
 	for (uint_fast8_t i = 0; i < N; ++i) {
@@ -313,7 +313,7 @@ modm::Vector<T, N>::operator - ()
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-T
+constexpr T
 modm::Vector<T, N>::getLength() const
 {
 	return std::sqrt(getLengthSquared());
@@ -321,7 +321,7 @@ modm::Vector<T, N>::getLength() const
 
 // ----------------------------------------------------------------------------
 template<typename T, uint8_t N>
-T
+constexpr T
 modm::Vector<T, N>::getLengthSquared() const
 {
 	T len2 = 0;

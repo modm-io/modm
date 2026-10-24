@@ -19,7 +19,7 @@
 #endif
 
 template<typename I2cMaster>
-modm::Tcs3472<I2cMaster>::Tcs3472(Data &data, uint8_t address)
+constexpr modm::Tcs3472<I2cMaster>::Tcs3472(Data &data, uint8_t address)
 	: I2cDevice<I2cMaster>(address), data(data)
 {}
 

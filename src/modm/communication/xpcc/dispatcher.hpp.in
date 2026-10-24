@@ -19,7 +19,7 @@
 #define	XPCC_DISPATCHER_HPP
 
 #include <modm/processing/timer.hpp>
-#include <modm/container/linked_list.hpp>
+#include <list>
 
 #include "backend/backend_interface.hpp"
 #include "postman/postman.hpp"
@@ -91,23 +91,23 @@ namespace xpcc
 			 * and never else changed. this->typeInfo replaces runtime
 			 * information needed by handling of messages.
 			 */
-			Entry(Type type, const Header& inHeader, modm::SmartPointer& inPayload) :
+			constexpr Entry(Type type, const Header& inHeader, modm::SmartPointer& inPayload) :
 				type(type),
 				header(inHeader), payload(inPayload)
 			{
 			}
 
-			Entry(const Header& inHeader, modm::SmartPointer& inPayload) :
+			constexpr Entry(const Header& inHeader, modm::SmartPointer& inPayload) :
 				header(inHeader), payload(inPayload)
 			{
 			}
 
-			Entry(const Header& inHeader) :
+			constexpr Entry(const Header& inHeader) :
 				header(inHeader)
 			{
 			}
 
-			Entry(const Header& inHeader,
+			constexpr Entry(const Header& inHeader,
 					modm::SmartPointer& inPayload, ResponseCallback& callback_) :
 				type(Type::Callback),
 				header(inHeader), payload(inPayload),
@@ -154,7 +154,7 @@ namespace xpcc
 		void
 		sendAcknowledge(const Header& header);
 
-		using EntryList = modm::LinkedList<Entry>;
+		using EntryList = std::list<Entry>;
 		using EntryIterator = EntryList::iterator;
 
 		EntryIterator

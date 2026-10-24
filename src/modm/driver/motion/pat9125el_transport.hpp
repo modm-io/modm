@@ -28,7 +28,7 @@ template<class I2cMaster>
 class Pat9125elI2cTransport : public I2cDevice<I2cMaster>
 {
 protected:
-	Pat9125elI2cTransport(uint8_t address);
+	constexpr Pat9125elI2cTransport(uint8_t address);
 
 	bool
 	write(uint8_t reg, uint8_t value);

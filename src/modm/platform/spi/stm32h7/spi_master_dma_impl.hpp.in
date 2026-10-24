@@ -134,8 +134,7 @@ SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(
 			}
 		}
 		if(tx) {
-			const auto flags = DmaChannelTx::getInterruptFlags();
-			if (flags & Flags::Error) {
+			if (const auto flags = DmaChannelTx::getInterruptFlags(); flags & Flags::Error) {
 				break;
 			}
 		}

@@ -217,10 +217,7 @@ public:
 	MODM_FLAGS8(IntSource);
 
 public:
-	typedef FlagsGroup<
-			Control1_t, Control2_t, Control3_t, Control4_t, Control5_t,
-			FifoControl_t, IntConfig_t
-	> Control_t;
+	using Control_t = FlagsGroup< Control1_t, Control2_t, Control3_t, Control4_t, Control5_t, FifoControl_t, IntConfig_t >;
 
 public:
 	enum class
@@ -258,7 +255,7 @@ public:
 		template < class Transport >
 		friend class L3gd20;
 
-		Data()
+		constexpr Data()
 		:	data{0,0,0,0,0,0}, temperature(0), scale(1)
 		{}
 		// DATA ACCESS
@@ -333,7 +330,7 @@ class L3gd20 : public l3gd20, public Transport
 public:
 	/// Constructor, requires a l3gd20::Data object.
 	/// For I2c this also sets the address to 0b110101 (alternative: 0x1C).
-	L3gd20(Data &data, uint8_t address=0x35);
+	constexpr L3gd20(Data &data, uint8_t address=0x35);
 
 	bool
 	configure(Scale scale, MeasurementRate rate = MeasurementRate::Hz380);

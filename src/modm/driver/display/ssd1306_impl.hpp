@@ -14,7 +14,7 @@
 #endif
 
 template<class I2cMaster, uint8_t Height>
-modm::Ssd1306<I2cMaster, Height>::Ssd1306(uint8_t address)
+constexpr modm::Ssd1306<I2cMaster, Height>::Ssd1306(uint8_t address)
 	: I2cDevice<I2cMaster, 3, ssd1306::Ssd1306_I2cWriteTransaction>(address)
 {}
 

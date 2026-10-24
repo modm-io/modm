@@ -92,11 +92,11 @@ public:
 	};
 protected:
 	/// @cond
-	typedef Configuration< Config_t, Resolution, (Bit1 | Bit0), 2 > Resolution_t;
+	using Resolution_t = Configuration< Config_t, Resolution, (Bit1 | Bit0), 2 >;
 	/// @endcond
 
 public:
-	typedef lm75::Data Data;
+	using Data = lm75::Data;
 };
 
 /**
@@ -113,7 +113,7 @@ class Ds1631 :	public ds1631, public I2cDevice< I2cMaster >
 {
 public:
 	///
-	Ds1631(Data &data, uint8_t address=0x90);
+	constexpr Ds1631(Data &data, uint8_t address=0x90);
 
 	bool
 	update();

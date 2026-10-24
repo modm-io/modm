@@ -40,10 +40,10 @@ namespace ui
 template< typename T = uint8_t >
 class Indicator
 {
-	typedef typename Animation<T>::TimeType TimeType;
+	using TimeType = typename Animation<T>::TimeType;
 public:
 	/// constructs an indicator with a period of 1s
-	Indicator(Animation<T> &animator)
+	constexpr Indicator(Animation<T> &animator)
 	:	animator(animator), frames{
 			modm::ui::KeyFrame<T>(75, std::numeric_limits<T>::max()),
 			modm::ui::KeyFrame<T>(375, std::numeric_limits<T>::max()),

@@ -153,7 +153,7 @@ public:
 	using DisplayMode = ili9341::DisplayMode;
 
 	template<typename... Args>
-	Ili9341(Args&&... args): Interface(std::forward<Args>(args)...)
+	constexpr Ili9341(Args&&... args): Interface(std::forward<Args>(args)...)
 	{
 		Reset::setOutput(modm::Gpio::High);
 		Backlight::setOutput(modm::Gpio::Low);

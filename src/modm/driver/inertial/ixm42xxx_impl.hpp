@@ -21,7 +21,7 @@ namespace modm
 {
 
 template < class Transport >
-Ixm42xxx< Transport >::Ixm42xxx(Data &data, uint8_t address) : Transport(address), data(data)
+constexpr Ixm42xxx< Transport >::Ixm42xxx(Data &data, uint8_t address) : Transport(address), data(data)
 {
 }
 
@@ -39,7 +39,7 @@ Ixm42xxx< Transport >::initialize()
     modm::this_fiber::sleep_for(1ms);
 
     /// Configure the device to use the endianess of the microcontroller
-    if (isBigEndian())
+    if constexpr (std::endian::native == std::endian::big)
     {
         writeRegister(Register::INTF_CONFIG0, 0x30);
     }

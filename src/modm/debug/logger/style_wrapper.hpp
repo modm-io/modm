@@ -32,7 +32,7 @@ namespace modm
 		class StyleWrapper : public IODevice
 		{
 		public :
-			StyleWrapper( STYLE inStyle );
+			constexpr StyleWrapper( STYLE inStyle );
 
 			virtual
 			~StyleWrapper();
@@ -49,11 +49,12 @@ namespace modm
 			virtual bool
 			read(char&);
 
-		private :
-			StyleWrapper( const StyleWrapper& );
+			StyleWrapper( const StyleWrapper& ) = delete;
 
 			StyleWrapper&
-			operator=( const StyleWrapper& );
+			operator=( const StyleWrapper& ) = delete;
+
+		private :
 
 			STYLE style;
 		};
@@ -63,7 +64,7 @@ namespace modm
 // -----------------------------------------------------------------------------
 
 template < typename STYLE >
-modm::log::StyleWrapper<STYLE>::StyleWrapper( STYLE inStyle ) :
+constexpr modm::log::StyleWrapper<STYLE>::StyleWrapper( STYLE inStyle ) :
 	style( inStyle )
 {
 }

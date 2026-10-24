@@ -30,7 +30,7 @@ namespace modm
 	class UnixTime
 	{
 	public:
-		UnixTime(uint32_t t) :
+		constexpr UnixTime(uint32_t t) :
 			time(t)
 		{
 		}

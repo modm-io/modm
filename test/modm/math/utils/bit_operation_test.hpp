@@ -18,9 +18,6 @@ class BitOperationTest : public unittest::TestSuite
 {
 public:
 	void
-	testSwap();
-
-	void
 	testReverse8bit();
 
 	void
@@ -29,12 +26,4 @@ public:
 	void
 	testReverse32bit();
 
-	void
-	testCount8bit();
-
-	void
-	testCount16bit();
-
-	void
-	testCount32bit();
 };

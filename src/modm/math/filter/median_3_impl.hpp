@@ -22,15 +22,15 @@ namespace modm
 		class Median<T, 3>
 		{
 		public:
-			Median(const T& initialValue = 0);
+			constexpr Median(const T& initialValue = 0);
 
-			void
+			constexpr void
 			append(const T& input);
 
-			void
+			constexpr void
 			update();
 
-			const T
+			constexpr const T
 			getValue() const;
 
 		private:
@@ -43,7 +43,7 @@ namespace modm
 
 // ----------------------------------------------------------------------------
 template <typename T>
-modm::filter::Median<T, 3>::Median(const T& initialValue) :
+constexpr modm::filter::Median<T, 3>::Median(const T& initialValue) :
 	index(0)
 {
 	for (uint_fast8_t i = 0; i < 3; ++i) {
@@ -53,7 +53,7 @@ modm::filter::Median<T, 3>::Median(const T& initialValue) :
 }
 
 template <typename T>
-void
+constexpr void
 modm::filter::Median<T, 3>::append(const T& input)
 {
 	this->buffer[index] = input;
@@ -63,7 +63,7 @@ modm::filter::Median<T, 3>::append(const T& input)
 }
 
 template <typename T>
-void
+constexpr void
 modm::filter::Median<T, 3>::update()
 {
 	// for small sample sizes it is the fastest way to just copy the
@@ -76,7 +76,7 @@ modm::filter::Median<T, 3>::update()
 }
 
 template <typename T>
-const T
+constexpr const T
 modm::filter::Median<T, 3>::getValue() const
 {
 	return sorted[1];

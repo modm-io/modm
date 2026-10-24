@@ -18,6 +18,7 @@
 #ifndef MODM_S_CURVE_CONTROLLER_HPP
 #define MODM_S_CURVE_CONTROLLER_HPP
 
+#include <algorithm>
 #include <cmath>
 
 namespace modm
@@ -71,33 +72,33 @@ namespace modm
 		};
 
 	public:
-		SCurveController(const Parameter& parameter);
+		constexpr SCurveController(const Parameter& parameter);
 
 		/**
 		 * Reset the parameters of the controller.
 		 *
 		 * \param	parameter list of the controller
 		 **/
-		void
+		constexpr void
 		setParameter(const Parameter& parameter);
 
-		inline void
+		constexpr void
 		setSpeedMaximum(const T& speed);
 
-		inline void
+		constexpr void
 		setSpeedMinimim(const T& speed);
 
-		inline void
+		constexpr void
 		setSpeedTarget(const T& speed);
 
-		inline bool
+		constexpr bool
 		isTargetReached() const;
 
-		void
+		constexpr void
 		update(T error, const T& speed);
 
 		/// setpoint output for the speed value
-		inline const T&
+		constexpr const T&
 		getValue() const;
 
 	private:

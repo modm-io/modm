@@ -35,10 +35,10 @@ namespace modm
 	 */
 	template<typename T,
 			 typename Container>
-	class Stack
+	class [[deprecated("Use std::stack instead")]] Stack // DEPRECATED: 2027q4
 	{
 	public:
-		typedef typename Container::Size Size;
+		using Size = typename Container::Size;
 
 	public:
 		bool
@@ -99,12 +99,16 @@ namespace modm
 	 *
 	 * \ingroup		modm_container
 	 */
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 	template<typename T,
 			 std::size_t N,
 			 typename Container = BoundedDeque<T, N> >
-	class BoundedStack : public Stack<T, Container>
+	class [[deprecated("Use std::stack<T, modm::BoundedDeque<T, N>> instead")]] // DEPRECATED: 2027q4
+	BoundedStack : public Stack<T, Container>
 	{
 	};
+	#pragma GCC diagnostic pop
 }
 
 #endif	// MODM_STACK_HPP

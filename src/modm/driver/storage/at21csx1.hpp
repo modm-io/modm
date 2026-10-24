@@ -134,7 +134,7 @@ public:
 
 	/// @param	address		The three preprogrammed client address bits (0 to 7)
 	explicit
-	At21csx1(uint8_t address = 0) : address_(address & 0b111) {}
+	constexpr At21csx1(uint8_t address = 0) : address_(address & 0b111) {}
 
 	/// Configures the pin as an open-drain output, released high
 	void

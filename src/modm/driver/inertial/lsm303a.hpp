@@ -269,10 +269,7 @@ public:
 	MODM_FLAGS8(ClickSource);
 
 public:
-	typedef FlagsGroup<
-			Control1_t, Control2_t, Control3_t, Control4_t, Control5_t, Control6_t,
-			FifoControl_t, IntConfig_t, ClickConfig_t
-	> Control_t;
+	using Control_t = FlagsGroup< Control1_t, Control2_t, Control3_t, Control4_t, Control5_t, Control6_t, FifoControl_t, IntConfig_t, ClickConfig_t >;
 
 public:
 	enum class
@@ -316,7 +313,7 @@ public:
 		template < class Transport >
 		friend class Lsm303a;
 
-		Data()
+		constexpr Data()
 		:	data{0,0,0,0,0,0}, scale(1)
 		{}
 		// DATA ACCESS
@@ -380,7 +377,7 @@ class Lsm303a : public lsm303a, public Lis3TransportI2c<I2cMaster>
 {
 public:
 	/// Constructor, requires a lsm303a::Data object.
-	Lsm303a(Data &data, uint8_t address = 0b0011001);
+	constexpr Lsm303a(Data &data, uint8_t address = 0b0011001);
 
 	bool
 	configure(Scale scale, MeasurementRate rate = MeasurementRate::Hz100);

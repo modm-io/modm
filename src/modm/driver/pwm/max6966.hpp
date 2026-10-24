@@ -23,8 +23,8 @@ namespace modm
 	/// @ingroup modm_driver_max6966
 	namespace max6966
 	{
-		static const uint8_t WRITE = 0x00;
-		static const uint8_t READ = 0x80;
+		static constexpr uint8_t WRITE = 0x00;
+		static constexpr uint8_t READ = 0x80;
 
 		enum Register
 		{

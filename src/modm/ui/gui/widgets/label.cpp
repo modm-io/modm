@@ -17,7 +17,7 @@
 void
 modm::gui::Label::render(View* view)
 {
-	if(view == NULL)
+	if(view == nullptr)
 		return;
 
 	// output device of view

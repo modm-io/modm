@@ -35,7 +35,7 @@ namespace modm
 		class PllSetup
 		{
 		private:
-			typedef Lpc11PllSettings<InputFrequency, OutputFrequency> p;
+			using p = Lpc11PllSettings<InputFrequency, OutputFrequency>;
 		public:
 			static StartupError
 			enable()

@@ -156,9 +156,9 @@ namespace modm
 			HOLD = (1 << 1),	///< 0 = enable hold pin, 1 = disable hold pin
 		};
 
-		static Spi spi;
-		static Cs cs;
-		static Hold hold;
+		static inline Spi spi;
+		static inline Cs cs;
+		static inline Hold hold;
 	};
 }
 

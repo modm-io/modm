@@ -96,7 +96,7 @@ namespace modm
 			discardTransmitBuffer();
 
 		private:
-			static SerialInterface* backend;
+			static inline SerialInterface* backend = 0;
 		};
 	}
 }

@@ -24,14 +24,14 @@ namespace modm
 
 		// config: left to right, right to left.
 		/// @cond
-		static const uint8_t segA  = (1 << 5);
-		static const uint8_t segB  = (1 << 7);
-		static const uint8_t segC  = (1 << 4);
-		static const uint8_t segD  = (1 << 2);
-		static const uint8_t segE  = (1 << 0);
-		static const uint8_t segF  = (1 << 3);
-		static const uint8_t segG  = (1 << 1);
-		static const uint8_t segDp = (1 << 6);
+		static constexpr uint8_t segA  = (1 << 5);
+		static constexpr uint8_t segB  = (1 << 7);
+		static constexpr uint8_t segC  = (1 << 4);
+		static constexpr uint8_t segD  = (1 << 2);
+		static constexpr uint8_t segE  = (1 << 0);
+		static constexpr uint8_t segF  = (1 << 3);
+		static constexpr uint8_t segG  = (1 << 1);
+		static constexpr uint8_t segDp = (1 << 6);
 
 		static const
 		uint8_t segmentLutHex[] =

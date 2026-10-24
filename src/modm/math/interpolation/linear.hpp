@@ -18,7 +18,7 @@
 #include <type_traits>
 
 #include <modm/math/utils/arithmetic_traits.hpp>
-#include <modm/container/pair.hpp>
+#include <utility>
 #include <modm/architecture/interface/accessor.hpp>
 
 namespace modm
@@ -26,7 +26,7 @@ namespace modm
 	namespace interpolation
 	{
 		/**
-		 * \tparam	T			Any specialization of modm::Pair<>
+		 * \tparam	T			Any specialization of std::pair<>
 		 * \tparam	Accessor	Accessor class. Can be modm::accessor::Ram,
 		 * 						modm::accessor::Flash or any self defined
 		 * 						accessor class.
@@ -39,8 +39,8 @@ namespace modm
 		class Linear
 		{
 		public:
-			using InputType = T::FirstType;
-			using OutputType = T::SecondType;
+			using InputType = T::first_type;
+			using OutputType = T::second_type;
 
 			// floating-point types are passed through unchanged
 			using OutputSignedType = typename std::conditional_t<std::is_integral_v<OutputType>,
@@ -52,10 +52,10 @@ namespace modm
 			 * \brief	Constructor
 			 *
 			 * \param	supportingPoints	Supporting points of the curve.
-			 * 								Needs to be an Array of modm::Pair<>.
+			 * 								Needs to be an Array of std::pair<>.
 			 * \param	numberOfPoints		length of \p supportingPoints
 			 */
-			Linear(Accessor<T> supportingPoints, uint8_t numberOfPoints);
+			constexpr Linear(Accessor<T> supportingPoints, uint8_t numberOfPoints);
 
 			/**
 			 * \brief	Perform a linear interpolation

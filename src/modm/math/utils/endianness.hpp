@@ -12,10 +12,8 @@
 #ifndef MODM_MATH_ENDIANNESS_HPP
 #define MODM_MATH_ENDIANNESS_HPP
 
+#include <bit>
 #include <stdint.h>
-#include "bit_operation.hpp"
-
-#include <modm/architecture/detect.hpp>
 
 namespace modm
 {
@@ -24,28 +22,27 @@ namespace modm
 /// @{
 
 /// checks if current architecture is big endian
+[[deprecated("use std::endian::native == std::endian::big")]] // DEPRECATED: 2027q4
 constexpr bool
 isBigEndian()
 {
-	return MODM_IS_BIG_ENDIAN;
+	return std::endian::native == std::endian::big;
 }
 
 /// checks if current architecture is little endian
+[[deprecated("use std::endian::native == std::endian::little")]] // DEPRECATED: 2027q4
 constexpr bool
 isLittleEndian()
 {
-	return MODM_IS_LITTLE_ENDIAN;
+	return std::endian::native == std::endian::little;
 }
 
 // MARK: - to host
 constexpr uint16_t
 fromLittleEndian(uint16_t value)
 {
-#if MODM_IS_LITTLE_ENDIAN
-	return value;
-#else
-	return swap(value);
-#endif
+	if constexpr (std::endian::native == std::endian::little) return value;
+	else return std::byteswap(value);
 }
 
 constexpr int16_t
@@ -57,11 +54,8 @@ fromLittleEndian(int16_t value)
 constexpr uint32_t
 fromLittleEndian(uint32_t value)
 {
-#if MODM_IS_LITTLE_ENDIAN
-	return value;
-#else
-	return swap(value);
-#endif
+	if constexpr (std::endian::native == std::endian::little) return value;
+	else return std::byteswap(value);
 }
 
 constexpr int32_t
@@ -73,11 +67,8 @@ fromLittleEndian(int32_t value)
 constexpr uint16_t
 fromBigEndian(uint16_t value)
 {
-#if MODM_IS_BIG_ENDIAN
-	return value;
-#else
-	return swap(value);
-#endif
+	if constexpr (std::endian::native == std::endian::big) return value;
+	else return std::byteswap(value);
 }
 
 constexpr int16_t
@@ -89,11 +80,8 @@ fromBigEndian(int16_t value)
 constexpr uint32_t
 fromBigEndian(uint32_t value)
 {
-#if MODM_IS_BIG_ENDIAN
-	return value;
-#else
-	return swap(value);
-#endif
+	if constexpr (std::endian::native == std::endian::big) return value;
+	else return std::byteswap(value);
 }
 
 constexpr int32_t
@@ -106,11 +94,8 @@ fromBigEndian(int32_t value)
 constexpr uint16_t
 toLittleEndian(uint16_t value)
 {
-#if MODM_IS_LITTLE_ENDIAN
-	return value;
-#else
-	return swap(value);
-#endif
+	if constexpr (std::endian::native == std::endian::little) return value;
+	else return std::byteswap(value);
 }
 
 constexpr int16_t
@@ -122,11 +107,8 @@ toLittleEndian(int16_t value)
 constexpr uint32_t
 toLittleEndian(uint32_t value)
 {
-#if MODM_IS_LITTLE_ENDIAN
-	return value;
-#else
-	return swap(value);
-#endif
+	if constexpr (std::endian::native == std::endian::little) return value;
+	else return std::byteswap(value);
 }
 
 constexpr int32_t
@@ -138,11 +120,8 @@ toLittleEndian(int32_t value)
 constexpr uint16_t
 toBigEndian(uint16_t value)
 {
-#if MODM_IS_BIG_ENDIAN
-	return value;
-#else
-	return swap(value);
-#endif
+	if constexpr (std::endian::native == std::endian::big) return value;
+	else return std::byteswap(value);
 }
 
 constexpr int16_t
@@ -154,11 +133,8 @@ toBigEndian(int16_t value)
 constexpr uint32_t
 toBigEndian(uint32_t value)
 {
-#if MODM_IS_BIG_ENDIAN
-	return value;
-#else
-	return swap(value);
-#endif
+	if constexpr (std::endian::native == std::endian::big) return value;
+	else return std::byteswap(value);
 }
 
 constexpr int32_t

@@ -108,7 +108,7 @@ public:
 	 * @param	data		pointer to buffer of the internal data of type Data
 	 * @param	address		address defaults to 0x77
 	 */
-	Bmp085(DataBase &data, uint8_t address=0x77);
+	constexpr Bmp085(DataBase &data, uint8_t address=0x77);
 
 	// MARK: - TASKS
 	/// Reads out and stores the calibration bytes

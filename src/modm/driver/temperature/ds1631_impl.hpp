@@ -18,7 +18,7 @@
 
 // ----------------------------------------------------------------------------
 template <typename I2cMaster>
-modm::Ds1631<I2cMaster>::Ds1631(Data &data, uint8_t address) :
+constexpr modm::Ds1631<I2cMaster>::Ds1631(Data &data, uint8_t address) :
 	I2cDevice<I2cMaster>(address), data(data)
 {
 }

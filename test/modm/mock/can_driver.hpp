@@ -16,7 +16,7 @@
 #define MODM_TEST_MOCK_CAN_DRIVER_HPP
 
 #include <modm/architecture/interface/can.hpp>
-#include <modm/container/linked_list.hpp>
+#include <list>
 
 namespace modm_test
 {
@@ -57,10 +57,10 @@ public:
 
 public:
 	/// Messages which should be received
-	modm::LinkedList<modm::can::Message> receiveList;
+	std::list<modm::can::Message> receiveList;
 
 	/// List of all messages send
-	modm::LinkedList<modm::can::Message> sendList;
+	std::list<modm::can::Message> sendList;
 
 	/// number of messages which could be send
 	uint8_t sendSlots;

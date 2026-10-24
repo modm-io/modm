@@ -17,7 +17,7 @@
 
 // ----------------------------------------------------------------------------
 template < class SpiMaster, class Cs >
-modm::Drv832xSpi<SpiMaster, Cs>::Drv832xSpi()
+constexpr modm::Drv832xSpi<SpiMaster, Cs>::Drv832xSpi()
 {
 	this->attachConfigurationHandler([]
 	{

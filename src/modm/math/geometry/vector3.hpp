@@ -39,109 +39,109 @@ namespace modm
 	class Vector<T, 3>
 	{
 	public:
-		Vector();
+		constexpr Vector();
 
 		template<typename U>
-		explicit Vector(const U *array);
+		explicit constexpr Vector(const U *array);
 
-		explicit Vector(T inVal);
-		Vector(T inX, T inY, T inZ);
+		explicit constexpr Vector(T inVal);
+		constexpr Vector(T inX, T inY, T inZ);
 
-		Vector(const Vector<T, 1> &inX, const T &inY, const T &inZ);
-		Vector(const T &inX, const Vector<T, 1> &inY, const T &inZ);
-		Vector(const T &inX, const T &inY, const Vector<T, 1> &inZ);
+		constexpr Vector(const Vector<T, 1> &inX, const T &inY, const T &inZ);
+		constexpr Vector(const T &inX, const Vector<T, 1> &inY, const T &inZ);
+		constexpr Vector(const T &inX, const T &inY, const Vector<T, 1> &inZ);
 
-		Vector(const Vector<T, 1> &inX, const T &inY, const Vector<T, 1> &inZ);
-		Vector(const Vector<T, 1> &inX, const Vector<T, 1> &inY, const T &inZ);
-		Vector(const T &inX, const Vector<T, 1> &inY, const Vector<T, 1> &inZ);
+		constexpr Vector(const Vector<T, 1> &inX, const T &inY, const Vector<T, 1> &inZ);
+		constexpr Vector(const Vector<T, 1> &inX, const Vector<T, 1> &inY, const T &inZ);
+		constexpr Vector(const T &inX, const Vector<T, 1> &inY, const Vector<T, 1> &inZ);
 
-		Vector(const Vector<T, 1> &inX, const Vector<T, 1> &inY, const Vector<T, 1> &inZ);
+		constexpr Vector(const Vector<T, 1> &inX, const Vector<T, 1> &inY, const Vector<T, 1> &inZ);
 
-		Vector(const Vector<T,2> &inXY, const T &inZ);
-		Vector(const T &inX, const Vector<T, 2> &inYZ);
+		constexpr Vector(const Vector<T,2> &inXY, const T &inZ);
+		constexpr Vector(const T &inX, const Vector<T, 2> &inYZ);
 
-		Vector(const Vector<T, 2> &inXY, const Vector<T, 1> &inZ);
-		Vector(const Vector<T, 1> &inX, const Vector<T, 2> &inYZ);
+		constexpr Vector(const Vector<T, 2> &inXY, const Vector<T, 1> &inZ);
+		constexpr Vector(const Vector<T, 1> &inX, const Vector<T, 2> &inYZ);
 
 		template<typename U>
-		Vector(const Vector<U, 3> &rhs);
-		Vector(const Matrix<T, 3, 1> &rhs);
+		constexpr Vector(const Vector<U, 3> &rhs);
+		constexpr Vector(const Matrix<T, 3, 1> &rhs);
 
 
-		inline void
+		constexpr void
 		set(const T& x, const T& y, const T& z);
 
 
-		inline void
+		constexpr void
 		setX(const T& value);
 
-		inline void
+		constexpr void
 		setY(const T& value);
 
-		inline void
+		constexpr void
 		setZ(const T& value);
 
 
-		inline const T&
+		constexpr const T&
 		getX() const;
 
-		inline const T&
+		constexpr const T&
 		getY() const;
 
-		inline const T&
+		constexpr const T&
 		getZ() const;
 
 
-		Vector& operator = (const Matrix<T, 3, 1> &rhs);
+		constexpr Vector& operator = (const Matrix<T, 3, 1> &rhs);
 
-		bool operator == (const Vector &rhs) const;
-		bool operator != (const Vector &rhs) const;
-		bool operator < (const Vector &rhs) const;
-		bool operator <= (const Vector &rhs) const;
-		bool operator > (const Vector &rhs) const;
-		bool operator >= (const Vector &rhs) const;
+		constexpr bool operator == (const Vector &rhs) const;
+		constexpr bool operator != (const Vector &rhs) const;
+		constexpr bool operator < (const Vector &rhs) const;
+		constexpr bool operator <= (const Vector &rhs) const;
+		constexpr bool operator > (const Vector &rhs) const;
+		constexpr bool operator >= (const Vector &rhs) const;
 
-		const T& operator [] (uint8_t index) const;
-		T& operator [] (uint8_t index);
-		T* ptr();
-		const T* ptr() const;
+		constexpr const T& operator [] (uint8_t index) const;
+		constexpr T& operator [] (uint8_t index);
+		constexpr T* ptr();
+		constexpr const T* ptr() const;
 
-		Vector operator - () const;
-		Vector operator + (const Vector &rhs) const;
-		Vector operator - (const Vector &rhs) const;
-		T operator * (const Vector &rhs) const;
-		Vector operator ^ (const Vector &rhs) const;
-		Vector operator * (const T &rhs) const;
-		Vector operator / (const T &rhs) const;
+		constexpr Vector operator - () const;
+		constexpr Vector operator + (const Vector &rhs) const;
+		constexpr Vector operator - (const Vector &rhs) const;
+		constexpr T operator * (const Vector &rhs) const;
+		constexpr Vector operator ^ (const Vector &rhs) const;
+		constexpr Vector operator * (const T &rhs) const;
+		constexpr Vector operator / (const T &rhs) const;
 
-		Vector& operator += (const Vector &rhs);
-		Vector& operator -= (const Vector &rhs);
-		Vector& operator *= (const T &rhs);
-		Vector& operator /= (const T &rhs);
+		constexpr Vector& operator += (const Vector &rhs);
+		constexpr Vector& operator -= (const Vector &rhs);
+		constexpr Vector& operator *= (const T &rhs);
+		constexpr Vector& operator /= (const T &rhs);
 
-		float getLength() const;
-		float getLengthSquared() const;
+		constexpr float getLength() const;
+		constexpr float getLengthSquared() const;
 
-		Vector scaled(float newLength) const;
-		void scale(float newLength);
+		constexpr Vector scaled(float newLength) const;
+		constexpr void scale(float newLength);
 
-		Vector normalized() const;
-		void normalize();
+		constexpr Vector normalized() const;
+		constexpr void normalize();
 
-		Matrix<T, 3, 1>&
+		constexpr Matrix<T, 3, 1>&
 		asMatrix();
 
-		const Matrix<T, 3, 1>&
+		constexpr const Matrix<T, 3, 1>&
 		asMatrix() const;
 
-		Matrix<T, 1, 3>&
+		constexpr Matrix<T, 1, 3>&
 		asTransposedMatrix();
 
-		const Matrix<T, 1, 3>&
+		constexpr const Matrix<T, 1, 3>&
 		asTransposedMatrix() const;
 
-		bool hasNan() const;
-		bool hasInf() const;
+		constexpr bool hasNan() const;
+		constexpr bool hasInf() const;
 
 	#ifndef __DOXYGEN__
 		IMPLEMENT_VECTOR_ACCESSOR2(x,x); IMPLEMENT_VECTOR_ACCESSOR2(x,y); IMPLEMENT_VECTOR_ACCESSOR2(x,z);
@@ -196,23 +196,23 @@ namespace modm
 	};
 
 	template<typename U, typename T>
-	static inline Vector<T, 3> operator * (const U &lhs, const Vector<T, 3> &rhs)
+	constexpr static inline Vector<T, 3> operator * (const U &lhs, const Vector<T, 3> &rhs)
 	{
 		return rhs * lhs;
 	}
 
 	template<typename T, typename U>
-	static inline Vector<U, 3> operator * (const Matrix<T, 3, 3> &lhs, const Vector<U, 3> &rhs)
+	constexpr static inline Vector<U, 3> operator * (const Matrix<T, 3, 3> &lhs, const Vector<U, 3> &rhs)
 	{
 		return lhs * rhs.asMatrix();
 	}
 
 
-	typedef Vector<float, 3> 	Vector3f;
-	typedef Vector<int16_t, 3>	Vector3i;
-	typedef Vector<uint16_t, 3>	Vector3u;
-	typedef Vector<int32_t, 3>	Vector3li;
-	typedef Vector<uint32_t, 3>	Vector3lu;
+	using Vector3f = Vector<float, 3>;
+	using Vector3i = Vector<int16_t, 3>;
+	using Vector3u = Vector<uint16_t, 3>;
+	using Vector3li = Vector<int32_t, 3>;
+	using Vector3lu = Vector<uint32_t, 3>;
 }
 
 #include "vector3_impl.hpp"

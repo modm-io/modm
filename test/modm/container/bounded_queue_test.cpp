@@ -11,6 +11,9 @@
  */
 // ----------------------------------------------------------------------------
 
+// Tests the deprecated containers until they are removed
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
 #include <modm/container/queue.hpp>
 
 #include "bounded_queue_test.hpp"

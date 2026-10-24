@@ -300,7 +300,7 @@ debounceTouch(modm::glcd::Point *out, modm::glcd::Point *old)
 			// schedule a reset for debounce lock, so that holding the finger fires repeated touch events
 			if(TOUCH_REPEAT_RATE)
 			{
-				async_events.append(new modm::gui::AsyncEvent(TOUCH_REPEAT_RATE, &resetTouchLock, NULL));
+				async_events.push_back(new modm::gui::AsyncEvent(TOUCH_REPEAT_RATE, &resetTouchLock, NULL));
 			}
 
 			return true;
@@ -347,7 +347,7 @@ gatherInput()
 
 		// create an asynchronous event with Direction::UP and 200ms delay
 		auto async_ev = new modm::gui::AsyncEvent(500, &touchUp, (void*)(ev_up));
-		async_events.append(async_ev);
+		async_events.push_back(async_ev);
 
 		MODM_LOG_DEBUG << "touch down x: " << point.x << modm::endl;
 		MODM_LOG_DEBUG << "touch down y: " << point.y << modm::endl;

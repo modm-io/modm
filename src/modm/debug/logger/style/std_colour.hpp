@@ -47,9 +47,9 @@ namespace modm
 		class StdColour : public Style<STYLE>
 		{
 		public:
-			StdColour(STYLE style);
+			constexpr StdColour(STYLE style);
 
-			StdColour(IODevice &device);
+			constexpr StdColour(IODevice &device);
 
 			inline void
 			parseArg( int argc, char * argv);

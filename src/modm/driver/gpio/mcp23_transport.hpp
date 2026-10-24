@@ -36,7 +36,7 @@ template < class I2cMaster >
 class Mcp23TransportI2c : public modm::I2cDevice< I2cMaster >
 {
 public:
-	Mcp23TransportI2c(uint8_t address);
+	constexpr Mcp23TransportI2c(uint8_t address);
 
 protected:
 	// RAW REGISTER ACCESS
@@ -81,7 +81,7 @@ template < class SpiMaster, class Cs >
 class Mcp23TransportSpi : public modm::SpiDevice< SpiMaster >
 {
 public:
-	Mcp23TransportSpi(uint8_t address);
+	constexpr Mcp23TransportSpi(uint8_t address);
 
 	/// pings the sensor
 	bool

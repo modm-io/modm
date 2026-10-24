@@ -65,7 +65,7 @@ public:
 	 *	IOStream stream( device );
 	 * @endcode
 	 */
-	inline IOStream(IODevice& odevice) :
+	constexpr IOStream(IODevice& odevice) :
 		device(&odevice)
 	{}
 
@@ -333,7 +333,7 @@ private:
 %% if options.with_printf
 	static void out_char(char c, void* arg)
 	{ if (c) reinterpret_cast<modm::IOStream*>(arg)->write(c); }
-	printf_output_gadget_t output_gadget{out_char, this, NULL, 0, INT_MAX};
+	printf_output_gadget_t output_gadget{out_char, this, nullptr, 0, INT_MAX};
 %% if options.with_float
 	size_t printf_precision{6};
 %% endif
@@ -432,7 +432,7 @@ public:
 		}
 	};
 
-	inline OSizeStream() : IOStream(buffer) {}
+	constexpr OSizeStream() : IOStream(buffer) {}
 
 	inline const Buffer&
 	str() const

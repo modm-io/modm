@@ -19,14 +19,7 @@
 #include "graphic_display.hpp"
 
 #include <cstdlib>
-#include <modm/math/utils/bit_operation.hpp>
-
-#include "font/fixed_width_5x8.hpp"
-
-// ----------------------------------------------------------------------------
-modm::GraphicDisplay::GraphicDisplay()
-	: IOStream(writer), writer(this), font(modm::accessor::asFlash(modm::font::FixedWidth5x8))
-{}
+#include <utility>
 
 // ----------------------------------------------------------------------------
 void
@@ -35,12 +28,12 @@ modm::GraphicDisplay::drawLine(int16_t x1, int16_t y1, int16_t x2, int16_t y2)
 	if (x1 == x2)
 	{
 		// x1|y1 must be the upper point
-		if (y1 > y2) { modm::swap(y1, y2); }
+		if (y1 > y2) { std::swap(y1, y2); }
 		this->drawVerticalLine(glcd::Point(x1, y1), y2 - y1 + 1);
 	} else if (y1 == y2)
 	{
 		// x1|y1 must be the left point
-		if (x1 > x2) { modm::swap(x1, x2); }
+		if (x1 > x2) { std::swap(x1, x2); }
 		this->drawHorizontalLine(glcd::Point(x1, y1), x2 - x1 + 1);
 	} else
 	{
@@ -48,14 +41,14 @@ modm::GraphicDisplay::drawLine(int16_t x1, int16_t y1, int16_t x2, int16_t y2)
 		bool steep = abs(y2 - y1) > abs(x2 - x1);
 		if (steep)
 		{
-			modm::swap(x1, y1);
-			modm::swap(x2, y2);
+			std::swap(x1, y1);
+			std::swap(x2, y2);
 		}
 
 		if (x1 > x2)
 		{
-			modm::swap(x1, x2);
-			modm::swap(y1, y2);
+			std::swap(x1, x2);
+			std::swap(y1, y2);
 		}
 
 		int16_t deltaX = x2 - x1;

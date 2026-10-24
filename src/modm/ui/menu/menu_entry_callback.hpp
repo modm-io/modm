@@ -30,7 +30,7 @@ namespace modm
 			typedef void (modm::AbstractMenu<Allocator>::*Function)();
 
 			template <typename M>
-			MenuEntryCallback(M *menu, void (M::*function)()) :
+			constexpr MenuEntryCallback(M *menu, void (M::*function)()) :
 				menu(reinterpret_cast<modm::AbstractMenu<Allocator> *>(menu)),
 				function(reinterpret_cast<Function>(function))
 			{

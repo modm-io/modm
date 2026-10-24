@@ -41,11 +41,11 @@ struct ltc2984
 		};
 		MODM_FLAGS8(Status);
 
-		Data() : data(0)
+		constexpr Data() : data(0)
 		{
 		}
 
-		Data(uint32_t data) : data(data)
+		constexpr Data(uint32_t data) : data(data)
 		{
 		}
 
@@ -296,7 +296,7 @@ struct ltc2984
 
 			// Rsense resistance value in Resistance_t has a width of 27 bits
 			// Unit: 1/1'024 ohms
-			typedef uint32_t Resistance_t;
+			using Resistance_t = uint32_t;
 		};
 
 		static constexpr uint32_t disabled() { return 0x00000000; }
@@ -348,7 +348,7 @@ public:
 	 *
 	 * Sets used pins as output. SPI must be initialized by the user!
 	 */
-	Ltc2984();
+	constexpr Ltc2984();
 
 	/**
 	 * \brief	Ping the LTC298x device.

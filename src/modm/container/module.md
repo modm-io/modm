@@ -1,74 +1,39 @@
 # Containers
 
-A container is a holder object that stores a collection other objects (its
-elements). They are implemented as class templates, which allows a great
-flexibility in the types supported as elements.
+modm uses the containers of the C++ standard library, which are available on
+all targets including AVRs. This module only provides containers that are
+missing from the standard library:
 
-Many containers have several member functions in common, and share
-functionalities. The decision of which type of container to use for a specific
-need does not generally depend only on the functionality offered by the
-container, but also on the efficiency of some of its members (complexity).
-This is especially true for sequence containers, which offer different
-trade-offs in complexity between inserting/removing elements and accessing
-them.
+- `modm::BoundedDeque`: A double ended queue with a fixed capacity, which is
+  organized as a ring buffer and does not use the heap. Its interface follows
+  `std::deque`, so it can also be used with `std::queue` and `std::stack`.
+- `modm::SmartPointer`: A reference counted buffer used by XPCC.
 
-`modm::Stack` and `modm::Queue` are implemented as container adapters. Container
-adapters are not full container classes, but classes that provide a specific
-interface relying on an object of one of the container classes (such as
-`modm::BoundedDeque` or `modm::LinkedList`) to handle the elements.
-The underlying container is encapsulated in such a way that its elements are
-accessed by the members of the container class independently of the underlying
-container class used.
+```cpp
+modm::BoundedDeque<uint8_t, 10> deque;
+deque.push_back(1);
+if (not deque.full()) deque.push_front(0);
+// or check and push in one step
+bool success = deque.append(2);
 
-Sequence containers:
+std::queue<uint8_t, modm::BoundedDeque<uint8_t, 10>> queue;
+std::stack<uint8_t, modm::BoundedDeque<uint8_t, 10>> stack;
+```
 
-- `modm::DynamicArray`
-- `modm::LinkedList`
-- `modm::DoublyLinkedList`
-- `modm::BoundedDeque`
+The following containers are deprecated and will be removed:
 
-Container adapters:
-
-- `modm::Queue`
-- `modm::Stack`
-- `modm::BoundedStack`
-- `modm::BoundedQueue`
-
-Other:
-
-- `modm::SmartPointer`
-- `modm::Pair`
+| Deprecated                | Replacement                                |
+|---------------------------|--------------------------------------------|
+| `modm::DynamicArray`      | `std::vector`                              |
+| `modm::LinkedList`        | `std::list`                                |
+| `modm::DoublyLinkedList`  | `std::list`                                |
+| `modm::Pair`              | `std::pair`                                |
+| `modm::Queue`             | `std::queue`                               |
+| `modm::Stack`             | `std::stack`                               |
+| `modm::BoundedQueue`      | `std::queue<T, modm::BoundedDeque<T, N>>`  |
+| `modm::BoundedStack`      | `std::stack<T, modm::BoundedDeque<T, N>>`  |
 
 The `modm:architecture:atomic` module also provides `modm::atomic::Queue`, a
 lock-free single-producer single-consumer queue for exchanging data between an
 interrupt and the main program. Use `std::atomic` to access single objects from
 both.
-
-## Generic Interface
-
-All implementation share a common set of function. Not every container implement
-every one of it, only a subset which is sufficient for the container.
-
-- append
-- prepend
-- (insert)
-- removeFront
-- removeBack
-- (remove)
-- getFront
-- getBack
-
-- push (only Stack and Queue)
-- pop (only Stack and Queue)
-- get (only Stack and Queue)
-
-- at
-- operator[]
-
-- clear
-
-- isEmpty
-- isFull
-- getSize
-- getMaxSize
-- getCapacity

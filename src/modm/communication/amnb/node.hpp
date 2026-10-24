@@ -26,11 +26,11 @@ class Node
 {
 	static_assert(2 <= TxBufferSize, "TxBuffer must have at least two messages!");
 public:
-	Node(Device &device, uint8_t address): interface(device), address(address)
+	constexpr Node(Device &device, uint8_t address): interface(device), address(address)
 	{ setSeed(); }
 
 	template< size_t Actions >
-	Node(Device &device, uint8_t address, Action (&actions)[Actions])
+	constexpr Node(Device &device, uint8_t address, Action (&actions)[Actions])
 	:	interface(device), actionList(actions), actionCount(Actions), address(address)
 	{
 		static_assert(Actions <= 0xff, "Actions list must be smaller than 255!");
@@ -38,7 +38,7 @@ public:
 	}
 
 	template< size_t Listeners >
-	Node(Device &device, uint8_t address, Listener (&listeners)[Listeners])
+	constexpr Node(Device &device, uint8_t address, Listener (&listeners)[Listeners])
 	:	interface(device), listenerList(listeners), listenerCount(Listeners), address(address)
 	{
 		static_assert(Listeners <= 0xff, "Listeners list must be smaller than 255!");
@@ -46,7 +46,7 @@ public:
 	}
 
 	template< size_t Actions, size_t Listeners >
-	Node(Device &device, uint8_t address, Action (&actions)[Actions], Listener (&listeners)[Listeners])
+	constexpr Node(Device &device, uint8_t address, Action (&actions)[Actions], Listener (&listeners)[Listeners])
 	:	interface(device), actionList(actions), listenerList(listeners),
 		actionCount(Actions), listenerCount(Listeners), address(address)
 	{
@@ -69,18 +69,17 @@ public:
 	bool
 	broadcast(uint8_t command)
 	{
-		if (tx_queue.isFull()) return false;
-		return tx_queue.push(std::move(Message(address, command, Type::Broadcast)));
+		return tx_queue.append(Message(address, command, Type::Broadcast));
 	}
 	bool
 	broadcast(uint8_t command, const uint8_t *data, size_t length)
 	{
-		if (tx_queue.isFull()) return false;
+		if (tx_queue.full()) return false;
 		Message msg(address, command, length, Type::Broadcast);
 		uint8_t* t = msg.get<uint8_t>();
 		if (t == nullptr) return false;
 		std::memcpy(t, data, length);
-		return tx_queue.push(std::move(msg));
+		return tx_queue.append(std::move(msg));
 	}
 	template< typename T >
 	bool
@@ -128,11 +127,11 @@ public:
 	{
 		while(1)
 		{
-			if (not tx_queue.isEmpty())
+			if (not tx_queue.empty())
 			{
 				modm::this_fiber::poll([&]{ return not is_sending; });
-				send(tx_queue.get());
-				tx_queue.pop();
+				send(tx_queue.front());
+				tx_queue.pop_front();
 			}
 			modm::this_fiber::yield();
 		}
@@ -215,8 +214,7 @@ protected:
 			case Type::Broadcast:
 				for (size_t ii=0; ii<listenerCount; ii++)
 				{
-					auto& listener = listenerList[ii];
-					if (rx_msg.command() == listener.command) {
+					if (auto& listener = listenerList[ii]; rx_msg.command() == listener.command) {
 						if (complete) listener.call(rx_msg);
 						else return true;
 					}
@@ -228,22 +226,21 @@ protected:
 				{
 					for (size_t ii=0; ii<actionCount; ii++)
 					{
-						auto& action = actionList[ii];
-						if (rx_msg.command() == action.command)
+						if (auto& action = actionList[ii]; rx_msg.command() == action.command)
 						{
 							if (complete)
 							{
 								auto msg = action.call(rx_msg);
 								msg.setAddress(address);
 								msg.setCommand(action.command);
-								tx_queue.push(std::move(msg));
+								tx_queue.append(std::move(msg));
 							}
 							return true;
 						}
 					}
 					Message msg(address, rx_msg.command(), 1, Type::Error);
 					*msg.get<Error>() = Error::NoAction;
-					tx_queue.push(std::move(msg));
+					tx_queue.append(std::move(msg));
 				}
 				break;
 
@@ -288,7 +285,7 @@ protected:
 	modm::ShortPreciseTimeout tx_timer;
 	modm::ShortTimeout response_timer;
 
-	modm::BoundedQueue<Message, TxBufferSize> tx_queue;
+	modm::BoundedDeque<Message, TxBufferSize> tx_queue;
 	Message request_msg;
 	Message rx_msg;
 

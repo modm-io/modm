@@ -29,8 +29,7 @@ delay_ns(uint32_t ns)
 		const uint32_t cycles = uint32_t(ceil(fabs((F_CPU * double(ns)) / 1e9)));
 		__builtin_avr_delay_cycles(cycles);
 	}) : ({
-		const uint16_t loops = ns >> {{ shift }};
-		if (loops) _delay_loop_2(loops);
+		if (const uint16_t loops = ns >> {{ shift }}; loops) _delay_loop_2(loops);
 	});
 }
 modm_always_inline void

@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include <bit>
 #include <modm/architecture/interface/gpio_expander.hpp>
 #include <modm/architecture/interface/i2c_device.hpp>
 #include <modm/architecture/interface/register.hpp>
@@ -44,7 +45,7 @@ struct pcal6524
 		P2_0 = Bit16, P2_1 = Bit17, P2_2 = Bit18, P2_3 = Bit19,
 		P2_4 = Bit20, P2_5 = Bit21, P2_6 = Bit22, P2_7 = Bit23,
 	};
-	typedef modm::Flags32<Pin> Pins;
+	using Pins = modm::Flags32<Pin>;
 	MODM_INT_TYPE_FLAGS(Pins);
 
 protected:
@@ -105,12 +106,12 @@ public:
 
 	static constexpr uint8_t
 	indexFromPin(Pin pin)
-	{ return modm::leftmostBit(PortType(pin)); }
+	{ return std::bit_width(PortType(pin)) - 1; }
 
 public:
 	/// Constructor.
 	/// @param	address	see `pcal6524::AddressPin`, default is ADDR tied to VSS.
-	Pcal6524(uint8_t address = uint8_t(AddressPin::Vss)) :
+	constexpr Pcal6524(uint8_t address = uint8_t(AddressPin::Vss)) :
 		modm::I2cDevice<I2cMaster>(address), memory()
 	{}
 
@@ -402,7 +403,7 @@ private:
 	struct modm_packed
 	Memory
 	{
-		Memory() :
+		constexpr Memory() :
 			direction(0xffffff),
 			polarity(0),
 			pullEnable(0),

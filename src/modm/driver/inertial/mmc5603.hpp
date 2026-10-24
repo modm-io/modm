@@ -271,7 +271,7 @@ class Mmc5603 : public mmc5603, public modm::I2cDevice< I2cMaster >
 {
 public:
 	/// Constructor, requires a mmc5603::Data object
-	Mmc5603(Data &data, uint8_t address=addr())
+	constexpr Mmc5603(Data &data, uint8_t address=addr())
 	:	I2cDevice<I2cMaster>(address), data(data)
 	{}
 

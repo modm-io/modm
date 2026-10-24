@@ -19,7 +19,7 @@
 
 // ----------------------------------------------------------------------------
 template < typename I2cMaster >
-modm::Bmp085<I2cMaster>::Bmp085(DataBase &data, uint8_t address) :
+constexpr modm::Bmp085<I2cMaster>::Bmp085(DataBase &data, uint8_t address) :
 	I2cDevice<I2cMaster>(address), data(data)
 {
 }
@@ -99,6 +99,3 @@ modm::Bmp085<I2cMaster>::readout()
 	return true;
 }
 
-template < typename I2cMaster >
-constexpr uint8_t
-modm::Bmp085< I2cMaster >::conversionDelay[];

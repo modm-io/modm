@@ -80,7 +80,7 @@ public:
 	/// Constructor.
 	/// @param	address	I2C slave address (7bit, unshifted), default is A1=A0=0.
 	///					Ignored when used with `Max14661TransportSpi`.
-	Max14661(uint8_t address = max14661::address())
+	constexpr Max14661(uint8_t address = max14661::address())
 	: Transport(address) {}
 
 	/// Connect the given channels to COMA, disconnecting all others on

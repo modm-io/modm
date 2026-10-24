@@ -31,7 +31,7 @@ template<typename T = int16_t>
 class NumberRocker : public WidgetGroup
 {
 public:
-	NumberRocker(T default_value, T step, Dimension d) :
+	constexpr NumberRocker(T default_value, T step, Dimension d) :
 		WidgetGroup(d),
 		value(default_value),
 		step(step),
@@ -80,9 +80,9 @@ private:
 };
 
 /// @ingroup modm_ui_gui
-typedef NumberRocker<int16_t> IntegerRocker;
+using IntegerRocker = NumberRocker<int16_t>;
 /// @ingroup modm_ui_gui
-typedef NumberRocker<float> FloatRocker;
+using FloatRocker = NumberRocker<float>;
 
 
 }	// namespace gui

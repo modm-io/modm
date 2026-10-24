@@ -399,7 +399,7 @@ namespace modm
 		 * \brief	Constructor
 		 * \param	address		address is 0x40 with SDO pin low else 0x41
 		 */
-		Bma180(uint8_t* data, uint8_t address=0x40);
+		constexpr Bma180(uint8_t* data, uint8_t address=0x40);
 
 		/**
 		 * Configures the sensor to full scale resolution with specified range,

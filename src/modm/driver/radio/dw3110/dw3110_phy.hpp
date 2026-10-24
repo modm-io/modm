@@ -69,7 +69,7 @@ public:
 		PayloadTooLarge
 	};
 
-	Dw3110Phy();
+	constexpr Dw3110Phy();
 
 	/// Set the UWB channel used
 	void

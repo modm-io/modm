@@ -53,20 +53,20 @@ DispatcherTest::testReceiveRequest()
 	Message message(xpcc::Header(xpcc::Header::Type::REQUEST, false, 1, 10, 0x10),
 			modm::SmartPointer());
 
-	backend->messagesToReceive.append(message);
+	backend->messagesToReceive.push_back(message);
 
 	dispatcher->update();
 
 	// message was delivered
-	TEST_ASSERT_EQUALS(postman->messagesToDeliver.getSize(), 1U);
-	TEST_ASSERT_TRUE(postman->messagesToDeliver.getFront() == message);
+	TEST_ASSERT_EQUALS(postman->messagesToDeliver.size(), 1U);
+	TEST_ASSERT_TRUE(postman->messagesToDeliver.front() == message);
 
 	// ACK has been send
-	TEST_ASSERT_EQUALS(backend->messagesSend.getSize(), 1U);
-	TEST_ASSERT_EQUALS(backend->messagesSend.getFront().payload.getSize(), 0U);
+	TEST_ASSERT_EQUALS(backend->messagesSend.size(), 1U);
+	TEST_ASSERT_EQUALS(backend->messagesSend.front().payload.getSize(), 0U);
 
 	xpcc::Header ackHeader(xpcc::Header::Type::REQUEST, true, 10, 1, 0x10);
-	TEST_ASSERT_EQUALS(backend->messagesSend.getFront().header, ackHeader);
+	TEST_ASSERT_EQUALS(backend->messagesSend.front().header, ackHeader);
 }
 
 void
@@ -75,15 +75,15 @@ DispatcherTest::testReceiveRequestNoComponent()
 	Message message(xpcc::Header(xpcc::Header::Type::REQUEST, false, 11, 10, 0x10),
 			modm::SmartPointer());
 
-	backend->messagesToReceive.append(message);
+	backend->messagesToReceive.push_back(message);
 
 	dispatcher->update();
 
 	// message was delivered
-	TEST_ASSERT_EQUALS(postman->messagesToDeliver.getSize(), 1U);
-	TEST_ASSERT_TRUE(postman->messagesToDeliver.getFront() == message);
+	TEST_ASSERT_EQUALS(postman->messagesToDeliver.size(), 1U);
+	TEST_ASSERT_TRUE(postman->messagesToDeliver.front() == message);
 
-	TEST_ASSERT_EQUALS(backend->messagesSend.getSize(), 0U);
+	TEST_ASSERT_EQUALS(backend->messagesSend.size(), 0U);
 }
 
 // ----------------------------------------------------------------------------
@@ -93,18 +93,18 @@ DispatcherTest::testReceiveResponse()
 	Message message(xpcc::Header(xpcc::Header::Type::RESPONSE, false, 1, 10, 0x10),
 			modm::SmartPointer());
 
-	backend->messagesToReceive.append(message);
+	backend->messagesToReceive.push_back(message);
 
 	dispatcher->update();
 
-	TEST_ASSERT_EQUALS(postman->messagesToDeliver.getSize(), 0U);
+	TEST_ASSERT_EQUALS(postman->messagesToDeliver.size(), 0U);
 
 	// ACK has been send
-	TEST_ASSERT_EQUALS(backend->messagesSend.getSize(), 1U);
-	TEST_ASSERT_EQUALS(backend->messagesSend.getFront().payload.getSize(), 0U);
+	TEST_ASSERT_EQUALS(backend->messagesSend.size(), 1U);
+	TEST_ASSERT_EQUALS(backend->messagesSend.front().payload.getSize(), 0U);
 
 	xpcc::Header ackHeader(xpcc::Header::Type::RESPONSE, true, 10, 1, 0x10);
-	TEST_ASSERT_EQUALS(backend->messagesSend.getFront().header, ackHeader);
+	TEST_ASSERT_EQUALS(backend->messagesSend.front().header, ackHeader);
 }
 
 void
@@ -113,12 +113,12 @@ DispatcherTest::testReceiveResponseNoComponent()
 	Message message(xpcc::Header(xpcc::Header::Type::RESPONSE, false, 11, 10, 0x10),
 			modm::SmartPointer());
 
-	backend->messagesToReceive.append(message);
+	backend->messagesToReceive.push_back(message);
 
 	dispatcher->update();
 
-	TEST_ASSERT_EQUALS(postman->messagesToDeliver.getSize(), 0U);
-	TEST_ASSERT_EQUALS(backend->messagesSend.getSize(), 0U);
+	TEST_ASSERT_EQUALS(postman->messagesToDeliver.size(), 0U);
+	TEST_ASSERT_EQUALS(backend->messagesSend.size(), 0U);
 }
 
 // ----------------------------------------------------------------------------
@@ -128,15 +128,15 @@ DispatcherTest::testEventReception()
 	Message message(xpcc::Header(xpcc::Header::Type::REQUEST, false, 0, 10, 0x20),
 			modm::SmartPointer());
 
-	backend->messagesToReceive.append(message);
+	backend->messagesToReceive.push_back(message);
 
 	dispatcher->update();
 
 	// message was delivered
-	TEST_ASSERT_EQUALS(postman->messagesToDeliver.getSize(), 1U);
-	TEST_ASSERT_TRUE(postman->messagesToDeliver.getFront() == message);
+	TEST_ASSERT_EQUALS(postman->messagesToDeliver.size(), 1U);
+	TEST_ASSERT_TRUE(postman->messagesToDeliver.front() == message);
 
-	TEST_ASSERT_EQUALS(timeline->events.getSize(), 2U);
+	TEST_ASSERT_EQUALS(timeline->events.size(), 2U);
 }
 
 void
@@ -148,21 +148,21 @@ DispatcherTest::testEventTransmission()
 	dispatcher->update();
 
 	// Event was delivered to the internal component
-	TEST_ASSERT_EQUALS(timeline->events.getSize(), 1U);
-	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::Type::Event);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().id, 0x21);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().source, 2);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().payload.getSize(), 4U);
+	TEST_ASSERT_EQUALS(timeline->events.size(), 1U);
+	TEST_ASSERT_TRUE(timeline->events.front().type == Timeline::Type::Event);
+	TEST_ASSERT_EQUALS(timeline->events.front().id, 0x21);
+	TEST_ASSERT_EQUALS(timeline->events.front().source, 2);
+	TEST_ASSERT_EQUALS(timeline->events.front().payload.getSize(), 4U);
 
 	// Event was also send to the backend (broadcast)
-	TEST_ASSERT_EQUALS(backend->messagesSend.getSize(), 1U);
-	TEST_ASSERT_EQUALS(backend->messagesSend.getFront().payload.getSize(), 4U);
+	TEST_ASSERT_EQUALS(backend->messagesSend.size(), 1U);
+	TEST_ASSERT_EQUALS(backend->messagesSend.front().payload.getSize(), 4U);
 	TEST_ASSERT_EQUALS(
-			backend->messagesSend.getFront().payload.get<uint32_t>(),
+			backend->messagesSend.front().payload.get<uint32_t>(),
 			0x12345678U);
 
 	xpcc::Header header(xpcc::Header::Type::REQUEST, false, 0, 2, 0x21);
-	TEST_ASSERT_EQUALS(backend->messagesSend.getFront().header, header);
+	TEST_ASSERT_EQUALS(backend->messagesSend.front().header, header);
 }
 
 void
@@ -172,15 +172,15 @@ DispatcherTest::testInternalActionCallNoParameter()
 
 	dispatcher->update();
 
-	TEST_ASSERT_EQUALS(timeline->events.getSize(), 1U);
-	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::Type::Action);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().id, 0x10);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().component, 1);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().source, 2);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().payload.getSize(), 0U);
+	TEST_ASSERT_EQUALS(timeline->events.size(), 1U);
+	TEST_ASSERT_TRUE(timeline->events.front().type == Timeline::Type::Action);
+	TEST_ASSERT_EQUALS(timeline->events.front().id, 0x10);
+	TEST_ASSERT_EQUALS(timeline->events.front().component, 1);
+	TEST_ASSERT_EQUALS(timeline->events.front().source, 2);
+	TEST_ASSERT_EQUALS(timeline->events.front().payload.getSize(), 0U);
 
 	// TODO should it be possible to disable this behavior
-	TEST_ASSERT_EQUALS(backend->messagesSend.getSize(), 1U);
+	TEST_ASSERT_EQUALS(backend->messagesSend.size(), 1U);
 }
 
 void
@@ -191,18 +191,18 @@ DispatcherTest::testInternalActionCallUnit16()
 
 	dispatcher->update();
 
-	TEST_ASSERT_EQUALS(timeline->events.getSize(), 1U);
-	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::Type::Action);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().id, 0x11);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().component, 1);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().source, 2);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().payload.getSize(), 2U);
+	TEST_ASSERT_EQUALS(timeline->events.size(), 1U);
+	TEST_ASSERT_TRUE(timeline->events.front().type == Timeline::Type::Action);
+	TEST_ASSERT_EQUALS(timeline->events.front().id, 0x11);
+	TEST_ASSERT_EQUALS(timeline->events.front().component, 1);
+	TEST_ASSERT_EQUALS(timeline->events.front().source, 2);
+	TEST_ASSERT_EQUALS(timeline->events.front().payload.getSize(), 2U);
 	TEST_ASSERT_EQUALS(
-			timeline->events.getFront().payload.get<uint16_t>(),
+			timeline->events.front().payload.get<uint16_t>(),
 			0x1234U);
 
 	// TODO should it be possible to disable this behavior
-	TEST_ASSERT_EQUALS(backend->messagesSend.getSize(), 1U);
+	TEST_ASSERT_EQUALS(backend->messagesSend.size(), 1U);
 }
 
 void
@@ -214,23 +214,23 @@ DispatcherTest::testInternalActionCallDirectResponse()
 	dispatcher->update();
 	dispatcher->update();
 
-	TEST_ASSERT_EQUALS(timeline->events.getSize(), 2U);
+	TEST_ASSERT_EQUALS(timeline->events.size(), 2U);
 
-	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::Type::Action);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().id, 0x12);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().component, 1);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().source, 2);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().payload.getSize(), 0U);
+	TEST_ASSERT_TRUE(timeline->events.front().type == Timeline::Type::Action);
+	TEST_ASSERT_EQUALS(timeline->events.front().id, 0x12);
+	TEST_ASSERT_EQUALS(timeline->events.front().component, 1);
+	TEST_ASSERT_EQUALS(timeline->events.front().source, 2);
+	TEST_ASSERT_EQUALS(timeline->events.front().payload.getSize(), 0U);
 
-	timeline->events.removeFront();
-	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::Type::Response);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().id, 0x30);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().component, 2);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().source, 1);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().payload.getSize(), 0U);
+	timeline->events.pop_front();
+	TEST_ASSERT_TRUE(timeline->events.front().type == Timeline::Type::Response);
+	TEST_ASSERT_EQUALS(timeline->events.front().id, 0x30);
+	TEST_ASSERT_EQUALS(timeline->events.front().component, 2);
+	TEST_ASSERT_EQUALS(timeline->events.front().source, 1);
+	TEST_ASSERT_EQUALS(timeline->events.front().payload.getSize(), 0U);
 
 	// TODO should it be possible to disable this behavior
-	TEST_ASSERT_EQUALS(backend->messagesSend.getSize(), 2U);
+	TEST_ASSERT_EQUALS(backend->messagesSend.size(), 2U);
 }
 
 void
@@ -242,30 +242,30 @@ DispatcherTest::testInternalActionCallDelayedResponse()
 	dispatcher->update();
 	dispatcher->update();
 
-	TEST_ASSERT_EQUALS(timeline->events.getSize(), 1U);
+	TEST_ASSERT_EQUALS(timeline->events.size(), 1U);
 
-	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::Type::Action);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().id, 0x13);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().component, 1);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().source, 2);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().payload.getSize(), 0U);
+	TEST_ASSERT_TRUE(timeline->events.front().type == Timeline::Type::Action);
+	TEST_ASSERT_EQUALS(timeline->events.front().id, 0x13);
+	TEST_ASSERT_EQUALS(timeline->events.front().component, 1);
+	TEST_ASSERT_EQUALS(timeline->events.front().source, 2);
+	TEST_ASSERT_EQUALS(timeline->events.front().payload.getSize(), 0U);
 
-	timeline->events.removeFront();
+	timeline->events.pop_front();
 
 	// trigger the transmission of the response
 	component1->update();
 	dispatcher->update();
 
-	TEST_ASSERT_EQUALS(timeline->events.getSize(), 1U);
+	TEST_ASSERT_EQUALS(timeline->events.size(), 1U);
 
-	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::Type::Response);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().id, 0x30);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().component, 2);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().source, 1);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().payload.getSize(), 0U);
+	TEST_ASSERT_TRUE(timeline->events.front().type == Timeline::Type::Response);
+	TEST_ASSERT_EQUALS(timeline->events.front().id, 0x30);
+	TEST_ASSERT_EQUALS(timeline->events.front().component, 2);
+	TEST_ASSERT_EQUALS(timeline->events.front().source, 1);
+	TEST_ASSERT_EQUALS(timeline->events.front().payload.getSize(), 0U);
 
 	// TODO should it be possible to disable this behavior
-	TEST_ASSERT_EQUALS(backend->messagesSend.getSize(), 2U);
+	TEST_ASSERT_EQUALS(backend->messagesSend.size(), 2U);
 }
 
 void
@@ -277,29 +277,29 @@ DispatcherTest::testInternalActionCallWithRecall()
 	dispatcher->update();
 	dispatcher->update();
 
-	TEST_ASSERT_EQUALS(timeline->events.getSize(), 2U);
+	TEST_ASSERT_EQUALS(timeline->events.size(), 2U);
 
-	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::Type::Action);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().id, 0x14);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().component, 1);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().source, 2);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().payload.getSize(), 2U);
+	TEST_ASSERT_TRUE(timeline->events.front().type == Timeline::Type::Action);
+	TEST_ASSERT_EQUALS(timeline->events.front().id, 0x14);
+	TEST_ASSERT_EQUALS(timeline->events.front().component, 1);
+	TEST_ASSERT_EQUALS(timeline->events.front().source, 2);
+	TEST_ASSERT_EQUALS(timeline->events.front().payload.getSize(), 2U);
 	TEST_ASSERT_EQUALS(
-			timeline->events.getFront().payload.get<uint16_t>(),
+			timeline->events.front().payload.get<uint16_t>(),
 			0x4321U);
 
-	timeline->events.removeFront();
-	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::Type::Action);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().id, 0x11);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().component, 2);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().source, 1);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().payload.getSize(), 2U);
+	timeline->events.pop_front();
+	TEST_ASSERT_TRUE(timeline->events.front().type == Timeline::Type::Action);
+	TEST_ASSERT_EQUALS(timeline->events.front().id, 0x11);
+	TEST_ASSERT_EQUALS(timeline->events.front().component, 2);
+	TEST_ASSERT_EQUALS(timeline->events.front().source, 1);
+	TEST_ASSERT_EQUALS(timeline->events.front().payload.getSize(), 2U);
 	TEST_ASSERT_EQUALS(
-			timeline->events.getFront().payload.get<uint16_t>(),
+			timeline->events.front().payload.get<uint16_t>(),
 			0x4321U);
 
 	// TODO should it be possible to disable this behavior
-	TEST_ASSERT_EQUALS(backend->messagesSend.getSize(), 2U);
+	TEST_ASSERT_EQUALS(backend->messagesSend.size(), 2U);
 }
 
 void
@@ -317,71 +317,71 @@ DispatcherTest::testInternalActionBackAndForth()
 		dispatcher->update();
 	}
 
-	TEST_ASSERT_EQUALS(timeline->events.getSize(), 7U);
+	TEST_ASSERT_EQUALS(timeline->events.size(), 7U);
 
 	// 1
-	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::Type::Action);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().id, 0x12);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().component, 1);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().source, 2);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().payload.getSize(), 0U);
+	TEST_ASSERT_TRUE(timeline->events.front().type == Timeline::Type::Action);
+	TEST_ASSERT_EQUALS(timeline->events.front().id, 0x12);
+	TEST_ASSERT_EQUALS(timeline->events.front().component, 1);
+	TEST_ASSERT_EQUALS(timeline->events.front().source, 2);
+	TEST_ASSERT_EQUALS(timeline->events.front().payload.getSize(), 0U);
 
 	// 2
-	timeline->events.removeFront();
-	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::Type::Action);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().id, 0x14);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().component, 1);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().source, 2);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().payload.getSize(), 2U);
+	timeline->events.pop_front();
+	TEST_ASSERT_TRUE(timeline->events.front().type == Timeline::Type::Action);
+	TEST_ASSERT_EQUALS(timeline->events.front().id, 0x14);
+	TEST_ASSERT_EQUALS(timeline->events.front().component, 1);
+	TEST_ASSERT_EQUALS(timeline->events.front().source, 2);
+	TEST_ASSERT_EQUALS(timeline->events.front().payload.getSize(), 2U);
 	TEST_ASSERT_EQUALS(
-			timeline->events.getFront().payload.get<uint16_t>(),
+			timeline->events.front().payload.get<uint16_t>(),
 			0x4321U);
 
 	// 3
-	timeline->events.removeFront();
-	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::Type::Action);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().id, 0x10);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().component, 2);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().source, 1);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().payload.getSize(), 0U);
+	timeline->events.pop_front();
+	TEST_ASSERT_TRUE(timeline->events.front().type == Timeline::Type::Action);
+	TEST_ASSERT_EQUALS(timeline->events.front().id, 0x10);
+	TEST_ASSERT_EQUALS(timeline->events.front().component, 2);
+	TEST_ASSERT_EQUALS(timeline->events.front().source, 1);
+	TEST_ASSERT_EQUALS(timeline->events.front().payload.getSize(), 0U);
 
 	// 4
-	timeline->events.removeFront();
-	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::Type::Action);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().id, 0x11);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().component, 2);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().source, 1);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().payload.getSize(), 2U);
+	timeline->events.pop_front();
+	TEST_ASSERT_TRUE(timeline->events.front().type == Timeline::Type::Action);
+	TEST_ASSERT_EQUALS(timeline->events.front().id, 0x11);
+	TEST_ASSERT_EQUALS(timeline->events.front().component, 2);
+	TEST_ASSERT_EQUALS(timeline->events.front().source, 1);
+	TEST_ASSERT_EQUALS(timeline->events.front().payload.getSize(), 2U);
 	TEST_ASSERT_EQUALS(
-			timeline->events.getFront().payload.get<uint16_t>(),
+			timeline->events.front().payload.get<uint16_t>(),
 			0x4321U);
 
 	// 5
-	timeline->events.removeFront();
-	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::Type::Response);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().id, 0x32);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().component, 2);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().source, 1);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().payload.getSize(), 0U);
+	timeline->events.pop_front();
+	TEST_ASSERT_TRUE(timeline->events.front().type == Timeline::Type::Response);
+	TEST_ASSERT_EQUALS(timeline->events.front().id, 0x32);
+	TEST_ASSERT_EQUALS(timeline->events.front().component, 2);
+	TEST_ASSERT_EQUALS(timeline->events.front().source, 1);
+	TEST_ASSERT_EQUALS(timeline->events.front().payload.getSize(), 0U);
 
 	// 6
-	timeline->events.removeFront();
-	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::Type::Action);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().id, 0x12);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().component, 1);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().source, 2);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().payload.getSize(), 0U);
+	timeline->events.pop_front();
+	TEST_ASSERT_TRUE(timeline->events.front().type == Timeline::Type::Action);
+	TEST_ASSERT_EQUALS(timeline->events.front().id, 0x12);
+	TEST_ASSERT_EQUALS(timeline->events.front().component, 1);
+	TEST_ASSERT_EQUALS(timeline->events.front().source, 2);
+	TEST_ASSERT_EQUALS(timeline->events.front().payload.getSize(), 0U);
 
 	// 7
-	timeline->events.removeFront();
-	TEST_ASSERT_TRUE(timeline->events.getFront().type == Timeline::Type::Response);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().id, 0x30);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().component, 2);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().source, 1);
-	TEST_ASSERT_EQUALS(timeline->events.getFront().payload.getSize(), 0U);
+	timeline->events.pop_front();
+	TEST_ASSERT_TRUE(timeline->events.front().type == Timeline::Type::Response);
+	TEST_ASSERT_EQUALS(timeline->events.front().id, 0x30);
+	TEST_ASSERT_EQUALS(timeline->events.front().component, 2);
+	TEST_ASSERT_EQUALS(timeline->events.front().source, 1);
+	TEST_ASSERT_EQUALS(timeline->events.front().payload.getSize(), 0U);
 
 	// TODO should it be possible to disable this behavior
-	TEST_ASSERT_EQUALS(backend->messagesSend.getSize(), 7U);
+	TEST_ASSERT_EQUALS(backend->messagesSend.size(), 7U);
 }
 
 // ----------------------------------------------------------------------------
@@ -394,12 +394,12 @@ DispatcherTest::testActionRetransmissionWithAbort()
 
 	for (uint8_t i = 0; i < 3; i++)
 	{
-		TEST_ASSERT_EQUALS(backend->messagesSend.getSize(), 1U);
-		TEST_ASSERT_EQUALS(backend->messagesSend.getFront().payload.getSize(), 0U);
-		TEST_ASSERT_EQUALS(backend->messagesSend.getFront().header,
+		TEST_ASSERT_EQUALS(backend->messagesSend.size(), 1U);
+		TEST_ASSERT_EQUALS(backend->messagesSend.front().payload.getSize(), 0U);
+		TEST_ASSERT_EQUALS(backend->messagesSend.front().header,
 				xpcc::Header(xpcc::Header::Type::REQUEST, false, 10, 1, 0xf3));
 
-		backend->messagesSend.removeAll();
+		backend->messagesSend.clear();
 
 		// reset time so that the timeout is expired
 		test_clock::increment(500);
@@ -408,7 +408,7 @@ DispatcherTest::testActionRetransmissionWithAbort()
 	}
 
 	// transmission should be aborted by now
-	TEST_ASSERT_EQUALS(backend->messagesSend.getSize(), 0U);
+	TEST_ASSERT_EQUALS(backend->messagesSend.size(), 0U);
 }
 
 // ----------------------------------------------------------------------------
@@ -421,12 +421,12 @@ DispatcherTest::testActionRetransmission()
 
 	for (uint8_t i = 0; i < 2; i++)
 	{
-		TEST_ASSERT_EQUALS(backend->messagesSend.getSize(), 1U);
-		TEST_ASSERT_EQUALS(backend->messagesSend.getFront().payload.getSize(), 0U);
-		TEST_ASSERT_EQUALS(backend->messagesSend.getFront().header,
+		TEST_ASSERT_EQUALS(backend->messagesSend.size(), 1U);
+		TEST_ASSERT_EQUALS(backend->messagesSend.front().payload.getSize(), 0U);
+		TEST_ASSERT_EQUALS(backend->messagesSend.front().header,
 				xpcc::Header(xpcc::Header::Type::REQUEST, false, 10, 1, 0xf3));
 
-		backend->messagesSend.removeAll();
+		backend->messagesSend.clear();
 
 		if (i == 0) {
 			// reset time so that the timeout is expired
@@ -437,7 +437,7 @@ DispatcherTest::testActionRetransmission()
 	}
 
 	// send requested ACK
-	backend->messagesToReceive.append(
+	backend->messagesToReceive.push_back(
 			Message(xpcc::Header(xpcc::Header::Type::REQUEST, true, 1, 10, 0xf3),
 					modm::SmartPointer()));
 
@@ -446,38 +446,38 @@ DispatcherTest::testActionRetransmission()
 
 	dispatcher->update();
 
-	TEST_ASSERT_EQUALS(backend->messagesSend.getSize(), 0U);
+	TEST_ASSERT_EQUALS(backend->messagesSend.size(), 0U);
 }
 
 void
 DispatcherTest::testResponseRetransmissionWithAbort()
 {
-	backend->messagesToReceive.append(
+	backend->messagesToReceive.push_back(
 			Message(xpcc::Header(xpcc::Header::Type::REQUEST, false, 1, 10, 0x12),
 					modm::SmartPointer()));
 
 	dispatcher->update();
 
 	// message was delivered and processed
-	TEST_ASSERT_EQUALS(timeline->events.getSize(), 1U);
+	TEST_ASSERT_EQUALS(timeline->events.size(), 1U);
 
 	// ACK was send + Response was send
-	TEST_ASSERT_EQUALS(backend->messagesSend.getSize(), 2U);
+	TEST_ASSERT_EQUALS(backend->messagesSend.size(), 2U);
 
 	// ACK
-	TEST_ASSERT_EQUALS(backend->messagesSend.getFront().header,
+	TEST_ASSERT_EQUALS(backend->messagesSend.front().header,
 			xpcc::Header(xpcc::Header::Type::REQUEST, true, 10, 1, 0x12));
-	TEST_ASSERT_EQUALS(backend->messagesSend.getFront().payload.getSize(), 0U);
-	backend->messagesSend.removeFront();
+	TEST_ASSERT_EQUALS(backend->messagesSend.front().payload.getSize(), 0U);
+	backend->messagesSend.pop_front();
 
 	for (uint8_t i = 0; i < 3; i++)
 	{
-		TEST_ASSERT_EQUALS(backend->messagesSend.getSize(), 1U);
-		TEST_ASSERT_EQUALS(backend->messagesSend.getFront().payload.getSize(), 0U);
-		TEST_ASSERT_EQUALS(backend->messagesSend.getFront().header,
+		TEST_ASSERT_EQUALS(backend->messagesSend.size(), 1U);
+		TEST_ASSERT_EQUALS(backend->messagesSend.front().payload.getSize(), 0U);
+		TEST_ASSERT_EQUALS(backend->messagesSend.front().header,
 				xpcc::Header(xpcc::Header::Type::RESPONSE, false, 10, 1, 0x12));
 
-		backend->messagesSend.removeFront();
+		backend->messagesSend.pop_front();
 
 		// reset time so that the timeout is expired
 		test_clock::increment(500);
@@ -486,29 +486,29 @@ DispatcherTest::testResponseRetransmissionWithAbort()
 	}
 
 	// transmission should be aborted by now
-	TEST_ASSERT_EQUALS(backend->messagesSend.getSize(), 0U);
+	TEST_ASSERT_EQUALS(backend->messagesSend.size(), 0U);
 }
 
 void
 DispatcherTest::testResponseRetransmission()
 {
-	backend->messagesToReceive.append(
+	backend->messagesToReceive.push_back(
 			Message(xpcc::Header(xpcc::Header::Type::REQUEST, false, 1, 10, 0x12),
 					modm::SmartPointer()));
 
 	dispatcher->update();
 
 	// Remove ACK
-	backend->messagesSend.removeFront();
+	backend->messagesSend.pop_front();
 
 	for (uint8_t i = 0; i < 2; i++)
 	{
-		TEST_ASSERT_EQUALS(backend->messagesSend.getSize(), 1U);
-		TEST_ASSERT_EQUALS(backend->messagesSend.getFront().payload.getSize(), 0U);
-		TEST_ASSERT_EQUALS(backend->messagesSend.getFront().header,
+		TEST_ASSERT_EQUALS(backend->messagesSend.size(), 1U);
+		TEST_ASSERT_EQUALS(backend->messagesSend.front().payload.getSize(), 0U);
+		TEST_ASSERT_EQUALS(backend->messagesSend.front().header,
 				xpcc::Header(xpcc::Header::Type::RESPONSE, false, 10, 1, 0x12));
 
-		backend->messagesSend.removeFront();
+		backend->messagesSend.pop_front();
 
 		if (i == 0) {
 			// reset time so that the timeout is expired
@@ -519,7 +519,7 @@ DispatcherTest::testResponseRetransmission()
 	}
 
 	// send requested ACK
-	backend->messagesToReceive.append(
+	backend->messagesToReceive.push_back(
 			Message(xpcc::Header(xpcc::Header::Type::RESPONSE, true, 1, 10, 0x12),
 					modm::SmartPointer()));
 
@@ -528,5 +528,5 @@ DispatcherTest::testResponseRetransmission()
 
 	dispatcher->update();
 
-	TEST_ASSERT_EQUALS(backend->messagesSend.getSize(), 0U);
+	TEST_ASSERT_EQUALS(backend->messagesSend.size(), 0U);
 }

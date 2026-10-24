@@ -34,7 +34,7 @@ Data
     template < class Transport >
     friend class ::modm::Ixm42xxx;
 
-    Data(std::span<uint8_t> fifoBuffer = std::span<uint8_t>()) :
+    constexpr Data(std::span<uint8_t> fifoBuffer = std::span<uint8_t>()) :
         fifoCount(0),
         fifoBuffer(fifoBuffer),
         accelScale(16.f),
@@ -120,7 +120,7 @@ private:
 struct
 FifoPacket
 {
-    FifoPacket() : header(0), accel(0), gyro(0), temp(0), timestamp(0), extension(0) {}
+    constexpr FifoPacket() : header(0), accel(0), gyro(0), temp(0), timestamp(0), extension(0) {}
 
     // DATA ACCESS
     ///@{
@@ -222,15 +222,15 @@ template <size_t FifoBufferSize>
 struct
 FifoData : public Data
 {
-    FifoData() : Data(std::span<uint8_t>{fifoBuffer}) {}
+    constexpr FifoData() : Data(std::span<uint8_t>{fifoBuffer}) {}
 
     struct iterator
     {
     public:
-        typedef std::input_iterator_tag iterator_category;
-        typedef FifoPacket value_type;
-        typedef FifoPacket& reference;
-        typedef FifoPacket* pointer;
+        using iterator_category = std::input_iterator_tag;
+        using value_type = FifoPacket;
+        using reference = FifoPacket&;
+        using pointer = FifoPacket*;
 
         constexpr iterator(std::span<const uint8_t> data, uint16_t index) : fifoData(data), fifoIndex(index)
         {

@@ -25,7 +25,7 @@ modm::gui::StringRocker::next()
 
 	this->string_field.setValue(this->getValue());
 
-	if(cb_activate != NULL)
+	if(cb_activate != nullptr)
 	{
 		cb_activate(InputEvent(), this, cbData);
 	}
@@ -45,7 +45,7 @@ modm::gui::StringRocker::previous()
 
 	this->string_field.setValue(this->getValue());
 
-	if(cb_activate != NULL)
+	if(cb_activate != nullptr)
 	{
 		cb_activate(InputEvent(), this, cbData);
 	}

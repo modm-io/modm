@@ -49,7 +49,7 @@ namespace modm
 			 * \brief	Construct a new protothread that will start from the
 			 * 			beginning of its run() function.
 			 */
-			Protothread() :
+			constexpr Protothread() :
 				ptState(0)
 			{
 			}
@@ -113,10 +113,10 @@ namespace modm
 			 * Used to store a protothread's position (what Dunkels calls a
 			 * "local continuation").
 			 */
-			typedef uint16_t PtState;
+			using PtState = uint16_t;
 
 			/// An invalid line number, used to mark the protothread has ended.
-			static const PtState Invalid = static_cast<PtState>(-1);
+			static constexpr PtState Invalid = static_cast<PtState>(-1);
 
 			/**
 			 * Stores the protothread's position (by storing the line number of

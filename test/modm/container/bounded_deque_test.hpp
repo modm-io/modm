@@ -46,4 +46,13 @@ public:
 
 	void
 	testElementAccess();
+
+	void
+	testIterator();
+
+	void
+	testAdapter();
+
+	void
+	testNonTrivial();
 };

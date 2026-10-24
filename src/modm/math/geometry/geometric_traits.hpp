@@ -28,7 +28,7 @@ namespace modm
 	template <typename T>
 	struct GeometricTraits
 	{
-		static const bool isValidType = false;
+		static constexpr bool isValidType = false;
 
 		/**
 		 * \brief	Round if converting from a floating point base to
@@ -37,7 +37,7 @@ namespace modm
 		 * For T = \c float and \c double this method is specialized to return
 		 * the result directly without any rounding.
 		 */
-		static inline T
+		static constexpr T
 		round(float value)
 		{
 			return ::round(value);
@@ -47,12 +47,12 @@ namespace modm
 	template <>
 	struct GeometricTraits<int8_t>
 	{
-		static const bool isValidType = true;
+		static constexpr bool isValidType = true;
 
-		typedef float FloatType;
-		typedef int16_t WideType;
+		using FloatType = float;
+		using WideType = int16_t;
 
-		static inline int8_t
+		static constexpr int8_t
 		round(float value)
 		{
 			return ::round(value);
@@ -63,12 +63,12 @@ namespace modm
 	template <>
 	struct GeometricTraits<uint8_t>
 	{
-		static const bool isValidType = true;
+		static constexpr bool isValidType = true;
 
-		typedef float FloatType;
-		typedef int16_t WideType;
+		using FloatType = float;
+		using WideType = int16_t;
 
-		static inline uint8_t
+		static constexpr uint8_t
 		round(float value)
 		{
 			return ::round(value);
@@ -78,12 +78,12 @@ namespace modm
 	template <>
 	struct GeometricTraits<int16_t>
 	{
-		static const bool isValidType = true;
+		static constexpr bool isValidType = true;
 
-		typedef float FloatType;
-		typedef int32_t WideType;
+		using FloatType = float;
+		using WideType = int32_t;
 
-		static inline int16_t
+		static constexpr int16_t
 		round(float value)
 		{
 			return ::round(value);
@@ -93,16 +93,16 @@ namespace modm
 	template <>
 	struct GeometricTraits<int32_t>
 	{
-		static const bool isValidType = true;
+		static constexpr bool isValidType = true;
 
-		typedef float FloatType;
+		using FloatType = float;
 
 		// Usually the range of a int32_t is big enough so that no
 		// conversion to int64_t is required. This exception is made because
 		// 64-bit operations are very, very slow on an AVR.
-		typedef int32_t WideType;
+		using WideType = int32_t;
 
-		static inline int32_t
+		static constexpr int32_t
 		round(float value)
 		{
 			return ::round(value);
@@ -112,12 +112,12 @@ namespace modm
 	template <>
 	struct GeometricTraits<float>
 	{
-		static const bool isValidType = true;
+		static constexpr bool isValidType = true;
 
-		typedef float FloatType;
-		typedef float WideType;
+		using FloatType = float;
+		using WideType = float;
 
-		static inline float
+		static constexpr float
 		round(float value)
 		{
 			return value;
@@ -127,12 +127,12 @@ namespace modm
 	template <>
 	struct GeometricTraits<double>
 	{
-		static const bool isValidType = true;
+		static constexpr bool isValidType = true;
 
-		typedef double FloatType;
-		typedef double WideType;
+		using FloatType = double;
+		using WideType = double;
 
-		static inline double
+		static constexpr double
 		round(double value)
 		{
 			return value;

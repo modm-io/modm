@@ -201,8 +201,8 @@ struct bmp581
 	MODM_FLAGS8(OsrConfig);
 
 	/// Configuration types for OSR settings
-	typedef Configuration<OsrConfig_t, Osr, (Bit2 | Bit1 | Bit0), 0> TemperatureOsr;
-	typedef Configuration<OsrConfig_t, Osr, (Bit2 | Bit1 | Bit0), 3> PressureOsr;
+	using TemperatureOsr = Configuration<OsrConfig_t, Osr, (Bit2 | Bit1 | Bit0), 0>;
+	using PressureOsr = Configuration<OsrConfig_t, Osr, (Bit2 | Bit1 | Bit0), 3>;
 
 	/// ODR configuration register (0x37) bit definitions
 	enum class OdrConfig : uint8_t
@@ -219,8 +219,8 @@ struct bmp581
 	MODM_FLAGS8(OdrConfig);
 
 	/// Configuration types for ODR settings
-	typedef Configuration<OdrConfig_t, PowerMode, (Bit1 | Bit0), 0> PowerMode_t;
-	typedef Configuration<OdrConfig_t, Odr, (Bit6 | Bit5 | Bit4 | Bit3 | Bit2), 2> Odr_t;
+	using PowerMode_t = Configuration<OdrConfig_t, PowerMode, (Bit1 | Bit0), 0>;
+	using Odr_t = Configuration<OdrConfig_t, Odr, (Bit6 | Bit5 | Bit4 | Bit3 | Bit2), 2>;
 
 	/// DSP configuration register (0x30) bit definitions
 	enum class DspConfig : uint8_t
@@ -249,8 +249,8 @@ struct bmp581
 	MODM_FLAGS8(DspIir);
 
 	/// Configuration types for IIR filter settings
-	typedef Configuration<DspIir_t, IirFilter, (Bit2 | Bit1 | Bit0), 0> TemperatureIir;
-	typedef Configuration<DspIir_t, IirFilter, (Bit2 | Bit1 | Bit0), 3> PressureIir;
+	using TemperatureIir = Configuration<DspIir_t, IirFilter, (Bit2 | Bit1 | Bit0), 0>;
+	using PressureIir = Configuration<DspIir_t, IirFilter, (Bit2 | Bit1 | Bit0), 3>;
 
 	/// FIFO configuration register (0x16) bit definitions
 	enum class FifoConfig : uint8_t
@@ -360,7 +360,7 @@ public:
 	/// @arg transportArgs Arguments to transport layer.
 	///                    Pass address for I2C, none for SPI.
 	template<typename... Args>
-	Bmp581(Args... transportArgs);
+	constexpr Bmp581(Args... transportArgs);
 
 	/// Initialize device. Call before any other member function.
 	/// @return true on success, false on error

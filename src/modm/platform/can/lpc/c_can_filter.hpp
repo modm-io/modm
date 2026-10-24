@@ -72,7 +72,7 @@ namespace modm
 			{
 			protected:
 				inline
-				Identifier(uint32_t identifier) :
+				constexpr Identifier(uint32_t identifier) :
 					value(identifier)
 				{
 				}
@@ -97,7 +97,7 @@ namespace modm
 			struct ExtendedIdentifier : public Identifier
 			{
 				inline
-				ExtendedIdentifier(uint32_t identifier, RemoteRequestStatus rtr = NO_RTR) :
+				constexpr ExtendedIdentifier(uint32_t identifier, RemoteRequestStatus rtr = NO_RTR) :
 					Identifier(identifier | (CAN_IFn_ARB2_MSGVAL << 16) | (CAN_IFn_ARB2_XTD << 16) | ((rtr) ? (CAN_IFn_ARB2_DIR << 16) : 0))
 				{
 				}
@@ -106,7 +106,7 @@ namespace modm
 			struct ExtendedFilterMask
 			{
 				inline
-				ExtendedFilterMask(uint32_t identifier, RemoteRequestFilter rtr = RTR_MATCH) :
+				constexpr ExtendedFilterMask(uint32_t identifier, RemoteRequestFilter rtr = RTR_MATCH) :
 					value(identifier | (CAN_IFn_MSK2_MXTD << 16) | ((rtr) ? (CAN_IFn_MSK2_MDIR << 16) : 0))
 				{
 				}

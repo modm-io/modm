@@ -17,10 +17,6 @@
 #include "static_serial_interface.hpp"
 
 template<int N>
-modm::platform::SerialInterface*
-modm::platform::StaticSerialInterface<N>::backend = 0;
-
-template<int N>
 template<modm::baudrate_t baudrate>
 bool
 modm::platform::StaticSerialInterface<N>::initialize(SerialInterface& interface)
@@ -94,8 +90,7 @@ modm::platform::StaticSerialInterface<N>::read(uint8_t *data, std::size_t length
 {
 	// Check how many bytes are available before reading to
 	// avoid a blocking access.
-	std::size_t available = backend->bytesAvailable();
-	if (available < length) {
+	if (std::size_t available = backend->bytesAvailable(); available < length) {
 		length = available;
 	}
 

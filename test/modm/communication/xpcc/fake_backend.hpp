@@ -16,7 +16,7 @@
 #define FAKE_BACKEND_HPP
 
 #include <modm/communication/xpcc/backend/backend_interface.hpp>
-#include <modm/container/linked_list.hpp>
+#include <list>
 
 #include "message.hpp"
 
@@ -46,11 +46,11 @@ public:
 
 public:
 	/// Messages send by the dispatcher via sendPacket
-	modm::LinkedList<Message> messagesSend;
+	std::list<Message> messagesSend;
 
 	/// Messages which should be received. isPacketAvailable(), getPacketHeader(),
 	/// getPacketPayload() and dropPacket() operate on this list.
-	modm::LinkedList<Message> messagesToReceive;
+	std::list<Message> messagesToReceive;
 };
 
 #endif

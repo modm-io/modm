@@ -30,14 +30,14 @@ namespace modm
 	 * \ingroup	modm_container
 	 */
 	template <typename T, typename Allocator = std::allocator<T>>
-	class DoublyLinkedList
+	class [[deprecated("Use std::list instead")]] DoublyLinkedList // DEPRECATED: 2027q4
 	{
 	public:
 		using const_iterator = std::list<T>::const_iterator;
 		using iterator = std::list<T>::iterator;
 		using Size = std::size_t;
 
-		DoublyLinkedList(const Allocator& allocator = Allocator())
+		constexpr DoublyLinkedList(const Allocator& allocator = Allocator())
 			: data_(allocator)
 		{}
 

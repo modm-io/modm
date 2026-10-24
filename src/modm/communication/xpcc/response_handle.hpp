@@ -30,12 +30,12 @@ namespace xpcc
 		friend class Communicator;
 
 	public:
-		ResponseHandle() :
+		constexpr ResponseHandle() :
 			destination(0)
 		{
 		}
 
-		explicit ResponseHandle(const Header& header) :
+		explicit constexpr ResponseHandle(const Header& header) :
 			destination(header.source),
 			packetIdentifier(header.packetIdentifier)
 		{

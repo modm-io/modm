@@ -42,13 +42,13 @@ class View;
 class Widget
 {
 public:
-	Widget(Dimension dimension, bool is_interactive) :
-		parent(NULL),
+	constexpr Widget(Dimension dimension, bool is_interactive) :
+		parent(nullptr),
 		dimension(dimension),
 		activated(false),
-		cbData(NULL),
-		cb_activate(NULL),
-		cb_deactivate(NULL),
+		cbData(nullptr),
+		cb_activate(nullptr),
+		cb_deactivate(nullptr),
 		position(modm::glcd::Point(-10,-10)),
 		relative_position(modm::glcd::Point(-10,-10)),
 		dirty(true),
@@ -123,7 +123,7 @@ public:
 		this->dirty = true;
 
 		// call callback when set
-		if(cb_activate != NULL)
+		if(cb_activate != nullptr)
 			this->cb_activate(ev, this, data);
 	}
 
@@ -135,7 +135,7 @@ public:
 		this->dirty = true;
 
 		// call callback when set
-		if(cb_deactivate != NULL)
+		if(cb_deactivate != nullptr)
 			this->cb_deactivate(ev, this, data);
 	}
 
@@ -205,7 +205,7 @@ public:
 
 		Widget* w = this;
 
-		while(w->parent != NULL)
+		while(w->parent != nullptr)
 		{
 			this->position += w->parent->getRelativePosition();
 			w = w->parent;
@@ -339,7 +339,7 @@ public:
 class WidgetGroup : public Widget
 {
 public:
-	WidgetGroup(Dimension d) :
+	constexpr WidgetGroup(Dimension d) :
 		Widget(d, true),
 		widgets()
 	{
@@ -397,7 +397,7 @@ public:
 
 		Widget* w = this;
 
-		while(w->parent != NULL)
+		while(w->parent != nullptr)
 		{
 			this->position += w->parent->getRelativePosition();
 			w = w->parent;

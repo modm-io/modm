@@ -53,10 +53,10 @@ namespace ui
 class Led
 {
 public:
-	inline Led(): Led(nullptr) {}
+	constexpr Led(): Led(nullptr) {}
 
 	/// Requires a handler function pointer for value updates.
-	inline Led(Animation<uint8_t>::Handler handler):
+	constexpr Led(Animation<uint8_t>::Handler handler):
 		animation(brightness, handler), brightness(0) {}
 
 	/// @param	brightness

@@ -49,11 +49,11 @@ namespace modm
 
 		private:
 			// disable copy constructor
-			Mutex(const Mutex& other);
+			Mutex(const Mutex& other) = delete;
 
 			// disable assignment operator
 			Mutex&
-			operator = (const Mutex& other);
+			operator = (const Mutex& other) = delete;
 
 			SemaphoreHandle_t handle;
 		};

@@ -13,6 +13,7 @@
 #ifndef MODM_PCA8574_HPP
 #define MODM_PCA8574_HPP
 
+#include <bit>
 #include <modm/architecture/interface/i2c_device.hpp>
 #include <modm/architecture/interface/register.hpp>
 #include <modm/architecture/interface/gpio_expander.hpp>
@@ -37,7 +38,7 @@ public:
 		P6 = (1 << 6),
 		P7 = (1 << 7)
 	};
-	typedef modm::Flags8<Pin> Pins;
+	using Pins = modm::Flags8<Pin>;
 	MODM_INT_TYPE_FLAGS(Pins);
 }; // struct pca8574
 
@@ -62,12 +63,12 @@ public:
 	static constexpr uint8_t
 	indexFromPin(Pin pin)
 	{
-		return modm::leftmostBit(PortType(pin));
+		return std::bit_width(PortType(pin)) - 1;
 	}
 
 public:
 	/// Constructor, sets address to default of 0x27
-	Pca8574(uint8_t address=0x27);
+	constexpr Pca8574(uint8_t address=0x27);
 
 public:
 	bool inline

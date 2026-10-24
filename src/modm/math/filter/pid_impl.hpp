@@ -29,7 +29,7 @@ modm::Pid<T, ScaleFactor>::Parameter::Parameter(
 
 // -----------------------------------------------------------------------------
 template<typename T, unsigned int ScaleFactor>
-modm::Pid<T, ScaleFactor>::Pid(
+constexpr modm::Pid<T, ScaleFactor>::Pid(
 		const float& kp, const float& ki, const float& kd,
 		const T& maxErrorSum, const T& maxOutput) :
 	parameter(kp, ki, kd, maxErrorSum, maxOutput)
@@ -39,7 +39,7 @@ modm::Pid<T, ScaleFactor>::Pid(
 
 // -----------------------------------------------------------------------------
 template<typename T, unsigned int ScaleFactor>
-modm::Pid<T, ScaleFactor>::Pid(
+constexpr modm::Pid<T, ScaleFactor>::Pid(
 		Parameter& parameter) :
 	parameter(parameter)
 {
@@ -47,7 +47,7 @@ modm::Pid<T, ScaleFactor>::Pid(
 }
 
 template<typename T, unsigned int ScaleFactor>
-void
+constexpr void
 modm::Pid<T, ScaleFactor>::reset()
 {
 	this->errorSum = 0;
@@ -56,14 +56,14 @@ modm::Pid<T, ScaleFactor>::reset()
 }
 
 template<typename T, unsigned int ScaleFactor>
-void
+constexpr void
 modm::Pid<T, ScaleFactor>::setParameter(const Parameter& parameter)
 {
 	this->parameter = parameter;
 }
 
 template<typename T, unsigned int ScaleFactor>
-void
+constexpr void
 modm::Pid<T, ScaleFactor>::update(const T& input, bool externalLimitation)
 {
 	bool limitation = externalLimitation;

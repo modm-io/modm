@@ -16,7 +16,7 @@
 // ============================================================================
 // MARK: I2C TRANSPORT
 template < class I2cMaster >
-modm::Mcp23TransportI2c<I2cMaster>::Mcp23TransportI2c(uint8_t address)
+constexpr modm::Mcp23TransportI2c<I2cMaster>::Mcp23TransportI2c(uint8_t address)
 :	I2cDevice<I2cMaster>(address)
 {
 }
@@ -54,7 +54,7 @@ modm::Mcp23TransportI2c<I2cMaster>::read(uint8_t reg, uint8_t *buffer, uint8_t l
 // ============================================================================
 // MARK: SPI TRANSPORT
 template < class SpiMaster, class Cs >
-modm::Mcp23TransportSpi<SpiMaster, Cs>::Mcp23TransportSpi(uint8_t address)
+constexpr modm::Mcp23TransportSpi<SpiMaster, Cs>::Mcp23TransportSpi(uint8_t address)
 :	address(address << 1)
 {
 	Cs::setOutput(modm::Gpio::High);

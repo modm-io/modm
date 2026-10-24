@@ -67,37 +67,37 @@ template<typename T>
 class Flash
 {
 public:
-	explicit Flash(const T* addr = 0) :
+	explicit constexpr Flash(const T* addr = 0) :
 		address(addr)
 	{
 	}
 
 	template <typename U>
-	explicit Flash(const Flash<U>& rhs) :
+	explicit constexpr Flash(const Flash<U>& rhs) :
 		address((T*) rhs.address)
 	{
 	}
 
-	const T
+	constexpr const T
 	operator *() const
 	{
 		return FlashReader<T, sizeof(T)>::read(address);
 	}
 
-	const T
+	constexpr const T
 	operator [](size_t index) const
 	{
 		return FlashReader<T, sizeof(T)>::read(address + index);
 	}
 
-	Flash&
+	constexpr Flash&
 	operator++()
 	{
 		*this += 1;
 		return *this;
 	}
 
-	Flash
+	constexpr Flash
 	operator++(int)
 	{
 		Flash ret = *this;
@@ -105,14 +105,14 @@ public:
 		return ret;
 	}
 
-	Flash&
+	constexpr Flash&
 	operator--()
 	{
 		*this -= 1;
 		return *this;
 	}
 
-	Flash&
+	constexpr Flash&
 	operator--(int)
 	{
 		Flash ret = *this;
@@ -120,27 +120,27 @@ public:
 		return ret;
 	}
 
-	Flash&
+	constexpr Flash&
 	operator+=(size_t rhs)
 	{
 		address += rhs;
 		return *this;
 	}
 
-	Flash&
+	constexpr Flash&
 	operator-=(size_t rhs)
 	{
 		address -= rhs;
 		return *this;
 	}
 
-	bool
+	constexpr bool
 	isValid() const
 	{
 		return (address != 0);
 	}
 
-	const T*
+	constexpr const T*
 	getPointer() const
 	{
 		return address;
@@ -158,7 +158,7 @@ private:
 
 /// Convert a normal pointer to a accessor::Flash
 /// @ingroup modm_architecture_accessor
-template<typename T> ::modm::accessor::Flash<T>
+template<typename T> constexpr ::modm::accessor::Flash<T>
 asFlash(const T* ptr)
 {
 	return ::modm::accessor::Flash<T>(ptr);

@@ -103,7 +103,7 @@ public:
 		RXSINGLE = 0b110,       ///< Single Receive Mode
 		CAD =   0b111,          ///< Channel Activity Detection
 	};
-	typedef modm::Configuration<OpModeRegister_t, ModemMode, Bit0 | Bit1 | Bit2> ModemMode_t;
+	using ModemMode_t = modm::Configuration<OpModeRegister_t, ModemMode, Bit0 | Bit1 | Bit2>;
 
 	/// Available interrupts with their positions in the flag and mask register
 	enum class
@@ -147,7 +147,7 @@ public:
 		BW_8 = 0x80,  ///< 250 kHz
 		BW_9 = 0x90,  ///< 500 kHz
 	};
-	typedef modm::Configuration<ModemConfig1_t, Bandwidth, Bit7 | Bit6 | Bit5 | Bit4> Bandwidth_t;
+	using Bandwidth_t = modm::Configuration<ModemConfig1_t, Bandwidth, Bit7 | Bit6 | Bit5 | Bit4>;
 
 	///LoRa Coding Rate
 	enum class
@@ -158,7 +158,7 @@ public:
 		CR_4_7  = 0b0110,  ///< Error Coding Rate 4/7
 		CR_4_8  = 0b1000,  ///< Error Coding Rate 4/8
 	};
-	typedef modm::Configuration<ModemConfig1_t, CodingRate, Bit3 | Bit2 | Bit1 >CodingRate_t;
+	using CodingRate_t = modm::Configuration<ModemConfig1_t, CodingRate, Bit3 | Bit2 | Bit1 >;
 
 	// Flag definitions for configuration registers
 	enum class
@@ -192,7 +192,7 @@ public:
 		SF_12 = 0xC0,   ///< 4096 chips/symbol
 
 	};
-	typedef modm::Configuration<ModemConfig2_t, SpreadingFactor, Bit7 | Bit6 | Bit5 | Bit4 >SpreadingFactor_t;
+	using SpreadingFactor_t = modm::Configuration<ModemConfig2_t, SpreadingFactor, Bit7 | Bit6 | Bit5 | Bit4 >;
 
 	static constexpr int16_t rssiOffsetLF = -164;
 

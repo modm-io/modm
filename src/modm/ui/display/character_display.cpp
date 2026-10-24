@@ -12,14 +12,6 @@
 
 #include "character_display.hpp"
 
-modm::CharacterDisplay::CharacterDisplay(uint8_t width, uint8_t height) :
-	IOStream(writer),
-	writer(this),
-	lineWidth(width), lineCount(height),
-	column(0), line(0)
-{
-}
-
 void
 modm::CharacterDisplay::write(char c)
 {

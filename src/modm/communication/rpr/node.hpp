@@ -115,7 +115,7 @@ namespace modm
 			 * \see		RPR_LISTEN()
 			 * \see		RPR_ERROR()
 			 */
-			Node(modm::accessor::Flash<Listener> listenerCallbackList,
+			constexpr Node(modm::accessor::Flash<Listener> listenerCallbackList,
 				 uint8_t listenerCallbackCount,
 				 modm::accessor::Flash<Error> errorCallbackList,
 				 uint8_t errorCallbackCount);
@@ -123,7 +123,7 @@ namespace modm
 			/**
 			 * \brief	Initialize the node without error handlers
 			 */
-			Node(modm::accessor::Flash<Listener> listenerCallbackList,
+			constexpr Node(modm::accessor::Flash<Listener> listenerCallbackList,
 				 uint8_t listenerCallbackCount);
 
 

@@ -71,7 +71,7 @@ namespace platform
 class Adc : public modm::Adc
 {
 public:
-	typedef uint8_t Channel;
+	using Channel = uint8_t;
 	static constexpr uint8_t Resolution = {{ resolution }};
 
 %% if not vadc

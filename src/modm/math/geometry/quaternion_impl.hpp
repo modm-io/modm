@@ -19,7 +19,7 @@
 
 // ----------------------------------------------------------------------------
 template<class T>
-modm::Quaternion<T>::Quaternion()
+constexpr modm::Quaternion<T>::Quaternion()
 :
 	w(),
 	x(),
@@ -30,7 +30,7 @@ modm::Quaternion<T>::Quaternion()
 
 template<typename T>
 template<typename U>
-modm::Quaternion<T>::Quaternion(const U *array) :
+constexpr modm::Quaternion<T>::Quaternion(const U *array) :
 	w(array[0]),
 	x(array[1]),
 	y(array[2]),
@@ -40,7 +40,7 @@ modm::Quaternion<T>::Quaternion(const U *array) :
 
 // ----------------------------------------------------------------------------
 template<class T>
-modm::Quaternion<T>::Quaternion(T inW, T inX, T inY, T inZ)
+constexpr modm::Quaternion<T>::Quaternion(T inW, T inX, T inY, T inZ)
 :
 	w(inW),
 	x(inX),
@@ -51,7 +51,7 @@ modm::Quaternion<T>::Quaternion(T inW, T inX, T inY, T inZ)
 
 // ----------------------------------------------------------------------------
 template<class T>
-modm::Quaternion<T>::Quaternion(const Vector<T, 3> &axis, T angle)
+constexpr modm::Quaternion<T>::Quaternion(const Vector<T, 3> &axis, T angle)
 :
 	w(),
 	x(),
@@ -68,7 +68,7 @@ modm::Quaternion<T>::Quaternion(const Vector<T, 3> &axis, T angle)
 
 // ----------------------------------------------------------------------------
 template<class T>
-modm::Quaternion<T>::Quaternion(const Matrix<T, 4, 1> &rhs)
+constexpr modm::Quaternion<T>::Quaternion(const Matrix<T, 4, 1> &rhs)
 :
 	w(reinterpret_cast<const T*>(&rhs)[0]),
 	x(reinterpret_cast<const T*>(&rhs)[1]),
@@ -79,7 +79,7 @@ modm::Quaternion<T>::Quaternion(const Matrix<T, 4, 1> &rhs)
 
 // ----------------------------------------------------------------------------
 template<class T>
-modm::Quaternion<T>::Quaternion(const Quaternion<T> &rhs)
+constexpr modm::Quaternion<T>::Quaternion(const Quaternion<T> &rhs)
 :
 	w(rhs.w),
 	x(rhs.x),
@@ -90,7 +90,7 @@ modm::Quaternion<T>::Quaternion(const Quaternion<T> &rhs)
 
 // ----------------------------------------------------------------------------
 template<class T>
-modm::Quaternion<T>& modm::Quaternion<T>::operator = (const Matrix<T, 4, 1> &rhs)
+constexpr modm::Quaternion<T>& modm::Quaternion<T>::operator = (const Matrix<T, 4, 1> &rhs)
 {
 	w = reinterpret_cast<const T*>(&rhs)[0];
 	x = reinterpret_cast<const T*>(&rhs)[1];
@@ -101,7 +101,7 @@ modm::Quaternion<T>& modm::Quaternion<T>::operator = (const Matrix<T, 4, 1> &rhs
 
 // ----------------------------------------------------------------------------
 template<class T>
-modm::Quaternion<T>& modm::Quaternion<T>::operator = (const Quaternion<T> &rhs)
+constexpr modm::Quaternion<T>& modm::Quaternion<T>::operator = (const Quaternion<T> &rhs)
 {
 	w = rhs.w;
 	x = rhs.x;
@@ -113,7 +113,7 @@ modm::Quaternion<T>& modm::Quaternion<T>::operator = (const Quaternion<T> &rhs)
 
 // ----------------------------------------------------------------------------
 template<class T>
-bool
+constexpr bool
 modm::Quaternion<T>::operator == (const Quaternion<T> &rhs) const
 {
 	return (rhs.w == w) && (rhs.x == x) && (rhs.y == y) && (rhs.z == z);
@@ -121,7 +121,7 @@ modm::Quaternion<T>::operator == (const Quaternion<T> &rhs) const
 
 // ----------------------------------------------------------------------------
 template<class T>
-bool
+constexpr bool
 modm::Quaternion<T>::operator != (const Quaternion<T> &rhs) const
 {
 	return (rhs.w != w) || (rhs.x != x) || (rhs.y != y) || (rhs.z != z);
@@ -129,7 +129,7 @@ modm::Quaternion<T>::operator != (const Quaternion<T> &rhs) const
 
 // ----------------------------------------------------------------------------
 template<class T>
-bool
+constexpr bool
 modm::Quaternion<T>::operator < (const Quaternion<T> &rhs) const
 {
 	return (w < rhs.w) || ((w == rhs.w) && ((x < rhs.x) || ((x == rhs.x) && ((y < rhs.y) || ((y == rhs.y) && (z < rhs.z))))));
@@ -137,7 +137,7 @@ modm::Quaternion<T>::operator < (const Quaternion<T> &rhs) const
 
 // ----------------------------------------------------------------------------
 template<class T>
-bool
+constexpr bool
 modm::Quaternion<T>::operator <= (const Quaternion<T> &rhs) const
 {
 	return (w < rhs.w) || ((w == rhs.w) && ((x < rhs.x) || ((x == rhs.x) && ((y < rhs.y) || ((y == rhs.y) && (z <= rhs.z))))));
@@ -145,7 +145,7 @@ modm::Quaternion<T>::operator <= (const Quaternion<T> &rhs) const
 
 // ----------------------------------------------------------------------------
 template<class T>
-bool
+constexpr bool
 modm::Quaternion<T>::operator > (const Quaternion<T> &rhs) const
 {
 	return (w > rhs.w) || ((w == rhs.w) && ((x > rhs.x) || ((x == rhs.x) && ((y > rhs.y) || ((y == rhs.y) && (z > rhs.z))))));
@@ -153,7 +153,7 @@ modm::Quaternion<T>::operator > (const Quaternion<T> &rhs) const
 
 // ----------------------------------------------------------------------------
 template<class T>
-bool
+constexpr bool
 modm::Quaternion<T>::operator >= (const Quaternion<T> &rhs) const
 {
 	return (w > rhs.w) || ((w == rhs.w) && ((x > rhs.x) || ((x == rhs.x) && ((y > rhs.y) || ((y == rhs.y) && (z >= rhs.z))))));
@@ -161,7 +161,7 @@ modm::Quaternion<T>::operator >= (const Quaternion<T> &rhs) const
 
 // ----------------------------------------------------------------------------
 template<class T>
-const T&
+constexpr const T&
 modm::Quaternion<T>::operator [] (int index) const
 {
 	return reinterpret_cast<const T*>(this)[index];
@@ -169,7 +169,7 @@ modm::Quaternion<T>::operator [] (int index) const
 
 // ----------------------------------------------------------------------------
 template<class T>
-T*
+constexpr T*
 modm::Quaternion<T>::ptr()
 {
 	return reinterpret_cast<T*>(this);
@@ -177,7 +177,7 @@ modm::Quaternion<T>::ptr()
 
 // ----------------------------------------------------------------------------
 template<class T>
-const T*
+constexpr const T*
 modm::Quaternion<T>::ptr() const
 {
 	return reinterpret_cast<const T*>(this);
@@ -185,7 +185,7 @@ modm::Quaternion<T>::ptr() const
 
 // ----------------------------------------------------------------------------
 template<class T>
-modm::Quaternion<T>
+constexpr modm::Quaternion<T>
 modm::Quaternion<T>::operator + (const Quaternion<T> &rhs) const
 {
 	return Quaternion(w+rhs.w, x+rhs.x, y+rhs.y, z+rhs.z);
@@ -193,7 +193,7 @@ modm::Quaternion<T>::operator + (const Quaternion<T> &rhs) const
 
 // ----------------------------------------------------------------------------
 template<class T>
-modm::Quaternion<T>
+constexpr modm::Quaternion<T>
 modm::Quaternion<T>::operator - (const Quaternion<T> &rhs) const
 {
 	return Quaternion(w-rhs.w, x-rhs.x, y-rhs.y, z-rhs.z);
@@ -201,7 +201,7 @@ modm::Quaternion<T>::operator - (const Quaternion<T> &rhs) const
 
 // ----------------------------------------------------------------------------
 template<class T>
-modm::Quaternion<T>
+constexpr modm::Quaternion<T>
 modm::Quaternion<T>::operator * (const Quaternion<T> &rhs) const
 {
 	return Quaternion(
@@ -214,7 +214,7 @@ modm::Quaternion<T>::operator * (const Quaternion<T> &rhs) const
 
 // ----------------------------------------------------------------------------
 template<class T>
-modm::Quaternion<T>
+constexpr modm::Quaternion<T>
 modm::Quaternion<T>::operator * (const T &rhs) const
 {
 	return Quaternion(w*rhs, x*rhs, y*rhs, z*rhs);
@@ -222,7 +222,7 @@ modm::Quaternion<T>::operator * (const T &rhs) const
 
 // ----------------------------------------------------------------------------
 template<class T>
-modm::Quaternion<T>
+constexpr modm::Quaternion<T>
 modm::Quaternion<T>::operator / (const T &rhs) const
 {
 	return Quaternion(w/rhs, x/rhs, y/rhs, z/rhs);
@@ -230,7 +230,7 @@ modm::Quaternion<T>::operator / (const T &rhs) const
 
 // ----------------------------------------------------------------------------
 template<class T>
-modm::Quaternion<T>&
+constexpr modm::Quaternion<T>&
 modm::Quaternion<T>::operator += (const Quaternion<T> &rhs)
 {
 	w+= rhs.w; x += rhs.x; y += rhs.y; z += rhs.z;
@@ -239,7 +239,7 @@ modm::Quaternion<T>::operator += (const Quaternion<T> &rhs)
 
 // ----------------------------------------------------------------------------
 template<class T>
-modm::Quaternion<T>&
+constexpr modm::Quaternion<T>&
 modm::Quaternion<T>::operator -= (const Quaternion<T> &rhs)
 {
 	w -= rhs.w; x -= rhs.x; y -= rhs.y; z -= rhs.z;
@@ -248,7 +248,7 @@ modm::Quaternion<T>::operator -= (const Quaternion<T> &rhs)
 
 // ----------------------------------------------------------------------------
 template<class T>
-modm::Quaternion<T>&
+constexpr modm::Quaternion<T>&
 modm::Quaternion<T>::operator *= (const T &rhs)
 {
 	*this = *this * rhs;
@@ -258,7 +258,7 @@ modm::Quaternion<T>::operator *= (const T &rhs)
 
 // ----------------------------------------------------------------------------
 template<class T>
-modm::Quaternion<T>&
+constexpr modm::Quaternion<T>&
 modm::Quaternion<T>::operator /= (const T &rhs)
 {
 	w /= rhs; x /= rhs; y /= rhs; z /= rhs;
@@ -267,7 +267,7 @@ modm::Quaternion<T>::operator /= (const T &rhs)
 
 // ----------------------------------------------------------------------------
 template<class T>
-modm::Quaternion<T>
+constexpr modm::Quaternion<T>
 modm::Quaternion<T>::operator - ()
 {
 	return Quaternion(-w, -x, -y, -z);
@@ -275,7 +275,7 @@ modm::Quaternion<T>::operator - ()
 
 // ----------------------------------------------------------------------------
 template<class T>
-float
+constexpr float
 modm::Quaternion<T>::getLength() const
 {
 	return std::sqrt(getLengthSquared());
@@ -283,7 +283,7 @@ modm::Quaternion<T>::getLength() const
 
 // ----------------------------------------------------------------------------
 template<class T>
-float
+constexpr float
 modm::Quaternion<T>::getLengthSquared() const
 {
 	return w*w + x*x + y*y + z*z;
@@ -291,7 +291,7 @@ modm::Quaternion<T>::getLengthSquared() const
 
 // ----------------------------------------------------------------------------
 template<class T>
-modm::Quaternion<T>&
+constexpr modm::Quaternion<T>&
 modm::Quaternion<T>::scale(float newLength)
 {
 	float s = newLength / getLength();
@@ -305,7 +305,7 @@ modm::Quaternion<T>::scale(float newLength)
 
 // ----------------------------------------------------------------------------
 template<class T>
-modm::Quaternion<T>&
+constexpr modm::Quaternion<T>&
 modm::Quaternion<T>::normalize()
 {
 	return scale(1.0f);
@@ -313,7 +313,7 @@ modm::Quaternion<T>::normalize()
 
 // ----------------------------------------------------------------------------
 template<class T>
-modm::Quaternion<T>&
+constexpr modm::Quaternion<T>&
 modm::Quaternion<T>::conjugate()
 {
 	x = -x;
@@ -325,7 +325,7 @@ modm::Quaternion<T>::conjugate()
 
 // ----------------------------------------------------------------------------
 template<class T>
-modm::Quaternion<T>
+constexpr modm::Quaternion<T>
 modm::Quaternion<T>::scaled(float newLength) const
 {
 	float s = newLength / getLength();
@@ -334,7 +334,7 @@ modm::Quaternion<T>::scaled(float newLength) const
 
 // ----------------------------------------------------------------------------
 template<class T>
-modm::Quaternion<T>
+constexpr modm::Quaternion<T>
 modm::Quaternion<T>::normalized() const
 {
 	return scaled(1.0f);
@@ -342,7 +342,7 @@ modm::Quaternion<T>::normalized() const
 
 // ----------------------------------------------------------------------------
 template<class T>
-modm::Quaternion<T>
+constexpr modm::Quaternion<T>
 modm::Quaternion<T>::conjugated() const
 {
 	return Quaternion(w, -x, -y, -z);
@@ -358,7 +358,7 @@ modm::Quaternion<T>::unitInverse()	//	assumes we have a unit quaternion
 
 // ----------------------------------------------------------------------------
 template<class T>
-modm::Quaternion<T>
+constexpr modm::Quaternion<T>
 modm::Quaternion<T>::inverse()
 {
 	return conjugate() / getLengthSquared();
@@ -366,7 +366,7 @@ modm::Quaternion<T>::inverse()
 
 // ----------------------------------------------------------------------------
 template<class T>
-void
+constexpr void
 modm::Quaternion<T>::to4x4Matrix(Matrix<T, 4, 4> *outMatrix)
 {
 	// avoid depending on Matrix.h
@@ -388,7 +388,7 @@ modm::Quaternion<T>::to4x4Matrix(Matrix<T, 4, 4> *outMatrix)
 
 // ----------------------------------------------------------------------------
 template<class T>
-void
+constexpr void
 modm::Quaternion<T>::to3x3Matrix(Matrix<T, 3, 3> *outMatrix)
 {
 	// avoid depending on Matrix.h
@@ -409,7 +409,7 @@ modm::Quaternion<T>::to3x3Matrix(Matrix<T, 3, 3> *outMatrix)
 
 // ----------------------------------------------------------------------------
 template<class T>
-modm::Quaternion<T>
+constexpr modm::Quaternion<T>
 modm::operator * (const T &lhs, const modm::Quaternion<T> &rhs)
 {
 	return rhs * lhs;

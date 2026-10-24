@@ -18,19 +18,19 @@
 
 // ----------------------------------------------------------------------------
 template <typename T>
-modm::PointSet2D<T>::PointSet2D(SizeType n) :
-	points(n)
+constexpr modm::PointSet2D<T>::PointSet2D(SizeType n)
 {
+	points.reserve(n);
 }
 
 template <typename T>
-modm::PointSet2D<T>::PointSet2D(std::initializer_list<modm::PointSet2D<T>::PointType> init) :
+constexpr modm::PointSet2D<T>::PointSet2D(std::initializer_list<modm::PointSet2D<T>::PointType> init) :
 	points(init)
 {
 }
 
 template <typename T>
-modm::PointSet2D<T>::PointSet2D(const PointSet2D<T>& other) :
+constexpr modm::PointSet2D<T>::PointSet2D(const PointSet2D<T>& other) :
 	points(other.points)
 {
 }
@@ -48,15 +48,15 @@ template <typename T>
 typename modm::PointSet2D<T>::SizeType
 modm::PointSet2D<T>::getNumberOfPoints() const
 {
-	return points.getSize();
+	return points.size();
 }
 
 // ----------------------------------------------------------------------------
 template <typename T>
-void
+constexpr void
 modm::PointSet2D<T>::append(const modm::PointSet2D<T>::PointType& point)
 {
-	points.append(point);
+	points.push_back(point);
 }
 
 // ----------------------------------------------------------------------------
@@ -76,10 +76,10 @@ modm::PointSet2D<T>::operator [](SizeType index) const
 
 // ----------------------------------------------------------------------------
 template <typename T>
-void
+constexpr void
 modm::PointSet2D<T>::removeAll()
 {
-	points.removeAll();
+	points.clear();
 }
 
 // ----------------------------------------------------------------------------

@@ -21,7 +21,7 @@
 // -----------------------------------------------------------------------------
 
 template < typename STYLE >
-modm::log::Style<STYLE>::Style( STYLE style ) :
+constexpr modm::log::Style<STYLE>::Style( STYLE style ) :
 	style( style ),
 	device ( 0 )
 {
@@ -30,7 +30,7 @@ modm::log::Style<STYLE>::Style( STYLE style ) :
 // -----------------------------------------------------------------------------
 
 template < typename STYLE >
-modm::log::Style<STYLE>::Style( IODevice &outputDevice) :
+constexpr modm::log::Style<STYLE>::Style( IODevice &outputDevice) :
 	device ( &outputDevice )
 {
 }

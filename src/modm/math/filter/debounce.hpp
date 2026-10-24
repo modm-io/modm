@@ -37,17 +37,17 @@ namespace modm
 			 * \param	upperBound	upper bound for the schmitt-trigger. If
 			 * 						set to zero, the value of maxValue is used.
 			 */
-			Debounce(const T& maxValue,
+			constexpr Debounce(const T& maxValue,
 					 const T& lowerBound = 0,
 					 const T& upperBound = 0);
 
-			void
+			constexpr void
 			update(bool input);
 
-			bool
+			constexpr bool
 			getValue() const;
 
-			void
+			constexpr void
 			reset(const bool state);
 
 		private:

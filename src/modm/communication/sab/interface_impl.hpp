@@ -26,16 +26,6 @@
 #define MODM_LOG_LEVEL	modm::log::DEBUG*/
 
 // ----------------------------------------------------------------------------
-template <typename Device> typename modm::sab::Interface<Device>::State \
-	modm::sab::Interface<Device>::state = SYNC;
-
-template <typename Device> uint8_t modm::sab::Interface<Device>::buffer[maxPayloadLength + 3];
-template <typename Device> uint8_t modm::sab::Interface<Device>::crc;
-template <typename Device> uint8_t modm::sab::Interface<Device>::position;
-template <typename Device> uint8_t modm::sab::Interface<Device>::length;
-template <typename Device> uint8_t modm::sab::Interface<Device>::lengthOfReceivedMessage = 0;
-
-// ----------------------------------------------------------------------------
 
 template <typename Device>
 void

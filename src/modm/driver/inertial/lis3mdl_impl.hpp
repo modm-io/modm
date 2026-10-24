@@ -17,7 +17,7 @@
 
 // ----------------------------------------------------------------------------
 template < class I2cMaster >
-modm::Lis3mdl<I2cMaster>::Lis3mdl( uint8_t address)
+constexpr modm::Lis3mdl<I2cMaster>::Lis3mdl( uint8_t address)
 :	Lis3TransportI2c<I2cMaster>(address)
 {
 	control1Shadow.value = 0x10;

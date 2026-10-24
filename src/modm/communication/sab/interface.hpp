@@ -146,13 +146,13 @@ namespace modm
 				DATA
 			};
 
-			static uint8_t buffer[maxPayloadLength + 3];
-			static uint8_t crc;
-			static uint8_t position;
-			static uint8_t length;
-			static uint8_t lengthOfReceivedMessage;
+			static inline uint8_t buffer[maxPayloadLength + 3];
+			static inline uint8_t crc;
+			static inline uint8_t position;
+			static inline uint8_t length;
+			static inline uint8_t lengthOfReceivedMessage = 0;
 
-			static State state;
+			static inline State state = SYNC;
 		};
 	}
 }

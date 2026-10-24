@@ -19,7 +19,7 @@
 void
 LagrangeInterpolationTest::testCreation()
 {
-	typedef modm::Pair<uint8_t, float> Point;
+	typedef std::pair<uint8_t, float> Point;
 
 	Point points[3] =
 	{
@@ -34,7 +34,7 @@ LagrangeInterpolationTest::testCreation()
 void
 LagrangeInterpolationTest::testInterpolation()
 {
-	typedef modm::Pair<float, float> Point;
+	typedef std::pair<float, float> Point;
 
 	// interpolate x^2 over the range of 1 <= x <= 3
 	Point points[3] =

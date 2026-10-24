@@ -185,7 +185,7 @@ template<typename I2cMaster>
 class Tcs3472 : public tcs3472, public modm::I2cDevice<I2cMaster>
 {
 public:
-	Tcs3472(Data &data, uint8_t address = addr());
+	constexpr Tcs3472(Data &data, uint8_t address = addr());
 
 	// Typical Runmodes
 	static constexpr Enable_t Enable_PollingMode = Enable::POWER_ON | Enable::ADC_ENABLE;

@@ -145,7 +145,7 @@ template<typename I2cMaster>
 class Bmi270I2cTransport : public Bmi270TransportBase, public I2cEeprom<I2cMaster, 1>
 {
 public:
-	explicit Bmi270I2cTransport(I2cAddress = I2cAddress::SdoLow);
+	explicit constexpr Bmi270I2cTransport(I2cAddress = I2cAddress::SdoLow);
 
 	Bmi270I2cTransport(const Bmi270I2cTransport&) = delete;
 

@@ -11,6 +11,9 @@
  */
 // ----------------------------------------------------------------------------
 
+// Tests the deprecated containers until they are removed
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
 #include <unittest/type/count_type.hpp>
 #include <modm/container/dynamic_array.hpp>
 

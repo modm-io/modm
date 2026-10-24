@@ -18,6 +18,7 @@
 #include <modm/architecture/interface/i2c_device.hpp>
 #include <modm/math/utils/endianness.hpp>
 #include <modm/architecture/interface/fiber.hpp>
+#include <modm/processing/timer.hpp>
 
 #include "lm75.hpp"
 
@@ -44,7 +45,7 @@ protected:
 		ShutdownMode = Bit0,
 	};
 	MODM_FLAGS8(Config1);
-	typedef Value< Config1_t, 2, 5 > Resolution_t;
+	using Resolution_t = Value< Config1_t, 2, 5 >;
 
 	enum class
 	Config2 : uint8_t
@@ -63,7 +64,7 @@ protected:
 		Hz4 = Bit7,
 		Hz8 = Bit7 | Bit6,
 	};
-	typedef Configuration< Config2_t, ConversionRate, (Bit7 | Bit6) > ConversionRate_t;
+	using ConversionRate_t = Configuration< Config2_t, ConversionRate, (Bit7 | Bit6) >;
 	/// @endcond
 public:
 
@@ -115,7 +116,7 @@ class Tmp102 :	public tmp102, public Lm75< I2cMaster >
 public:
 	/// Constructor, requires a tmp102::Data object,
 	/// sets address to default of 0x48 (alternatives are 0x49, 0x4A and 0x4B).
-	Tmp102(Data &data, uint8_t address=0x48);
+	constexpr Tmp102(Data &data, uint8_t address=0x48);
 
 	bool
 	update();

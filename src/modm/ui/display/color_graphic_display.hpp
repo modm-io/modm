@@ -12,7 +12,7 @@ namespace modm
 class ColorGraphicDisplay : public GraphicDisplay
 {
 public:
-	ColorGraphicDisplay()
+	constexpr ColorGraphicDisplay()
 		: foregroundColor(color::html::White), backgroundColor(color::html::Black)
 	{}
 

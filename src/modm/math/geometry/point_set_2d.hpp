@@ -14,7 +14,7 @@
 #ifndef MODM_POINT_SET_2D_HPP
 #define MODM_POINT_SET_2D_HPP
 
-#include <modm/container/dynamic_array.hpp>
+#include <vector>
 #include "vector.hpp"
 
 namespace modm
@@ -25,7 +25,7 @@ namespace modm
 	 * Collection of points, represented by their corresponding vectors.
 	 * Used for example to hold the result of a intersection-operation.
 	 *
-	 * Based on the modm::DynamicArray class, therefore grows automatically
+	 * Based on the std::vector class, therefore grows automatically
 	 * if more space than currently allocated is needed. But because this
 	 * is an expensive operation it should be avoid if possible.
 	 *
@@ -43,11 +43,11 @@ namespace modm
 		/**
 		 * \brief	Constructs a set capable of holding n points (default = 2)
 		 */
-		PointSet2D(SizeType n = 2);
+		constexpr PointSet2D(SizeType n = 2);
 
-		PointSet2D(std::initializer_list<PointType> init);
+		constexpr PointSet2D(std::initializer_list<PointType> init);
 
-		PointSet2D(const PointSet2D& other);
+		constexpr PointSet2D(const PointSet2D& other);
 
 		PointSet2D&
 		operator = (const PointSet2D& other);
@@ -57,7 +57,7 @@ namespace modm
 		getNumberOfPoints() const;
 
 
-		inline void
+		constexpr void
 		append(const PointType& point);
 
 		inline PointType&
@@ -69,12 +69,12 @@ namespace modm
 		/**
 		 * \brief	Remove all points
 		 */
-		inline void
+		constexpr void
 		removeAll();
 
 	public:
-		typedef typename modm::DynamicArray< PointType >::iterator iterator;
-		typedef typename modm::DynamicArray< PointType >::const_iterator const_iterator;
+		using iterator = typename std::vector< PointType >::iterator;
+		using const_iterator = typename std::vector< PointType >::const_iterator;
 
 		inline iterator
 		begin();
@@ -89,7 +89,7 @@ namespace modm
 		end() const;
 
 	protected:
-		modm::DynamicArray< PointType > points;
+		std::vector< PointType > points;
 	};
 }
 

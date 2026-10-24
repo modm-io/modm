@@ -19,7 +19,7 @@ namespace modm::platform
 /// @ingroup modm_platform_gpio
 /// @{
 
-typedef uint32_t Instance;
+using Instance = uint32_t;
 
 enum class PinFunction
 {

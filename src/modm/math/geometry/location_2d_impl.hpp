@@ -20,13 +20,13 @@
 
 // -----------------------------------------------------------------------------
 template <typename T>
-modm::Location2D<T>::Location2D() :
+constexpr modm::Location2D<T>::Location2D() :
 	position(), orientation()
 {
 }
 
 template <typename T>
-modm::Location2D<T>::Location2D(const Vector<T, 2>& position,
+constexpr modm::Location2D<T>::Location2D(const Vector<T, 2>& position,
 		const float& orientation) :
 	position(position),
 	orientation(orientation)
@@ -34,7 +34,7 @@ modm::Location2D<T>::Location2D(const Vector<T, 2>& position,
 }
 
 template <typename T>
-modm::Location2D<T>::Location2D(const T& x, const T& y, const float& orientation) :
+constexpr modm::Location2D<T>::Location2D(const T& x, const T& y, const float& orientation) :
 	position(x, y),
 	orientation(orientation)
 {
@@ -49,42 +49,42 @@ modm::Location2D<T>::getPosition() const
 }
 
 template <typename T>
-inline const T&
+constexpr const T&
 modm::Location2D<T>::getX() const
 {
 	return this->position.x;
 }
 
 template <typename T>
-inline const T&
+constexpr const T&
 modm::Location2D<T>::getY() const
 {
 	return this->position.y;
 }
 
 template <typename T>
-void
+constexpr void
 modm::Location2D<T>::setPosition(const Vector<T, 2>& point)
 {
 	this->position = point;
 }
 
 template <typename T>
-void
+constexpr void
 modm::Location2D<T>::setPosition(const T& x, const T& y)
 {
 	this->position.set(x, y);
 }
 
 template <typename T>
-float
+constexpr float
 modm::Location2D<T>::getOrientation() const
 {
 	return this->orientation;
 }
 
 template <typename T>
-void
+constexpr void
 modm::Location2D<T>::setOrientation(const float& orientation)
 {
 	this->orientation = orientation;
@@ -92,7 +92,7 @@ modm::Location2D<T>::setOrientation(const float& orientation)
 
 // -----------------------------------------------------------------------------
 template <typename T>
-void
+constexpr void
 modm::Location2D<T>::move(const Location2D<T>& diff)
 {
 	Vector<T, 2> movement = diff.position;
@@ -103,7 +103,7 @@ modm::Location2D<T>::move(const Location2D<T>& diff)
 }
 
 template <typename T>
-void
+constexpr void
 modm::Location2D<T>::move(const Vector<T, 2>& diff)
 {
 	Vector<T, 2> movement(diff);
@@ -113,7 +113,7 @@ modm::Location2D<T>::move(const Vector<T, 2>& diff)
 }
 
 template <typename T>
-void
+constexpr void
 modm::Location2D<T>::move(T x, float phi)
 {
 	Vector<T, 2> vector(GeometricTraits<T>::round(x * std::cos(this->orientation)),
@@ -137,7 +137,7 @@ modm::Location2D<T>::translated(const Vector<T, 2>& vector) const
 
 // ----------------------------------------------------------------------------
 template<typename T> template<typename U>
-modm::Location2D<U>
+constexpr modm::Location2D<U>
 modm::Location2D<T>::convert() const
 {
 	return Location2D<U>(this->position.template convert<U>(), this->orientation);
@@ -145,7 +145,7 @@ modm::Location2D<T>::convert() const
 
 // ----------------------------------------------------------------------------
 template<typename T>
-bool
+constexpr bool
 modm::Location2D<T>::operator == (const Location2D &other) const
 {
 	return ((this->position == other.position) &&
@@ -153,7 +153,7 @@ modm::Location2D<T>::operator == (const Location2D &other) const
 }
 
 template<typename T>
-bool
+constexpr bool
 modm::Location2D<T>::operator != (const Location2D &other) const
 {
 	return ((this->position != other.position) ||

@@ -16,19 +16,19 @@
 	#error	"Don't include this file directly, use 'operator.hpp' instead!"
 #endif
 
-inline uint32_t
+constexpr uint32_t
 modm::math::mul(uint16_t a, uint16_t b)
 {
 	return static_cast<uint32_t>(a) * static_cast<uint32_t>(b);
 }
 
-inline int32_t
+constexpr int32_t
 modm::math::mul(int16_t a, int16_t b)
 {
 	return static_cast<int32_t>(a) * static_cast<int32_t>(b);
 }
 
-inline int32_t
+constexpr int32_t
 modm::math::mac(int32_t result, int16_t a, int16_t b)
 {
 	return result + static_cast<int32_t>(a) * static_cast<int32_t>(b);

@@ -61,7 +61,7 @@ public:
         Ch6 = int(CommandByte::SD) | int(CommandByte::C1) | int(CommandByte::C0),
         Ch7 = int(CommandByte::SD) | int(CommandByte::C2) | int(CommandByte::C1) | int(CommandByte::C0),
     };
-    typedef Configuration<CommandByte_t, InputChannel, Bit7 | Bit6 | Bit5 | Bit4> InputChannel_t;
+    using InputChannel_t = Configuration<CommandByte_t, InputChannel, Bit7 | Bit6 | Bit5 | Bit4>;
 
     enum class
     PowerDown : uint8_t
@@ -71,7 +71,7 @@ public:
         InternalReferenceOffAdcConverterOn  = int(CommandByte::PD0),
         InternalReferenceOnAdcConverterOn   = int(CommandByte::PD1) | int(CommandByte::PD0),
     };
-    typedef Configuration<CommandByte_t, PowerDown, Bit3 | Bit2> PowerDown_t;
+    using PowerDown_t = Configuration<CommandByte_t, PowerDown, Bit3 | Bit2>;
 
     struct modm_packed
     Data
@@ -115,7 +115,7 @@ public:
      * @param address
      *      The adress is the i2c adress
      */
-    Ads7828(Data &data, uint8_t address = 0b1001000);
+    constexpr Ads7828(Data &data, uint8_t address = 0b1001000);
 
     /**
      * @brief Measures the voltage in a single channel

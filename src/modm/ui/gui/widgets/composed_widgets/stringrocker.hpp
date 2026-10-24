@@ -32,7 +32,7 @@ class StringRocker : public WidgetGroup
 	typedef const char* (*toString)(uint32_t);
 
 public:
-	StringRocker(uint32_t string_id, uint32_t start, uint32_t end, toString string_function, Dimension d) :
+	constexpr StringRocker(uint32_t string_id, uint32_t start, uint32_t end, toString string_function, Dimension d) :
 		WidgetGroup(d),
 		string_id(string_id),
 		start(start),
@@ -67,7 +67,7 @@ public:
 	const char*
 	getValue()
 	{
-		if(string_function == NULL)
+		if(string_function == nullptr)
 			return "";
 
 		return string_function(string_id);

@@ -181,7 +181,7 @@ class Fiber : public fiber::Task
 	fiber::Stack<StackSize> stack;
 public:
 	template<class T>
-	Fiber(T&& task, fiber::Start start=fiber::Start::Now)
+	constexpr Fiber(T&& task, fiber::Start start=fiber::Start::Now)
 	: Task(stack, std::forward<T>(task), start)
 	{}
 };

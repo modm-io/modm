@@ -40,9 +40,9 @@ namespace ui
 template< typename T = uint8_t >
 class Pulse
 {
-	typedef typename Animation<T>::TimeType TimeType;
+	using TimeType = typename Animation<T>::TimeType;
 public:
-	Pulse(Animation<T> &animator)
+	constexpr Pulse(Animation<T> &animator)
 	:	animator(animator), frames{
 			modm::ui::KeyFrame<T>(500, std::numeric_limits<T>::max()),
 			modm::ui::KeyFrame<T>(500, std::numeric_limits<T>::min())

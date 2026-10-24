@@ -21,7 +21,7 @@ modm_test::platform::CanDriver::CanDriver() :
 bool
 modm_test::platform::CanDriver::isMessageAvailable()
 {
-	return (not receiveList.isEmpty());
+	return (not receiveList.empty());
 }
 
 bool
@@ -29,8 +29,8 @@ modm_test::platform::CanDriver::getMessage(modm::can::Message& message)
 {
 	if (isMessageAvailable())
 	{
-		message = receiveList.getFront();
-		receiveList.removeFront();
+		message = receiveList.front();
+		receiveList.pop_front();
 
 		return true;
 	}
@@ -50,7 +50,7 @@ modm_test::platform::CanDriver::sendMessage(const modm::can::Message& message)
 {
 	if (this->isReadyToSend())
 	{
-		this->sendList.append(message);
+		this->sendList.push_back(message);
 		this->sendSlots--;
 		return true;
 	}

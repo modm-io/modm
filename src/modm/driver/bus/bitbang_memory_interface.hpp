@@ -59,10 +59,10 @@ namespace modm
 		writeData(const uint16_t data);
 
 	protected:
-		static PORT port;
-		static CS cs;
-		static CD cd;
-		static WR wr;
+		static inline PORT port;
+		static inline CS cs;
+		static inline CD cd;
+		static inline WR wr;
 	};
 
 }

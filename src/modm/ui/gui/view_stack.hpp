@@ -19,8 +19,8 @@
 #define MODM_GUI_VIEWSTACK_HPP
 
 #include <modm/ui/display/color_graphic_display.hpp>
-#include <modm/container/stack.hpp>
-#include <modm/container/linked_list.hpp>
+#include <stack>
+#include <list>
 #include "view.hpp"
 #include "types.hpp"
 
@@ -53,7 +53,7 @@ public:
 	inline modm::gui::View*
 	get()
 	{
-		return this->stack.get();
+		return this->stack.top();
 	}
 
 	/// Push new view on top of stack the new view
@@ -94,7 +94,7 @@ public:
 
 private:
 	modm::ColorGraphicDisplay *display;
-	modm::Stack< modm::gui::View* , modm::LinkedList< modm::gui::View* > > stack;
+	std::stack< modm::gui::View*, std::list< modm::gui::View* > > stack;
 	modm::gui::inputQueue *input_queue;
 };
 

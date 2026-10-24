@@ -53,7 +53,7 @@ class Adc : public ::modm::PeripheralDriver
 #ifdef __DOXYGEN__
 public:
 	/// this type may also be an enum or enum class
-	typedef uint8_t Channel;
+	using Channel = uint8_t;
 
 	/// describes the maximum resolution in bits
 	static constexpr uint8_t Resolution;

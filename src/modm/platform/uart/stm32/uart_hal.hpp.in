@@ -45,7 +45,7 @@ class {{ hal }} : public UartBase
 {
 public:
 	static constexpr bool isExtended = {{ extended_driver | lower }};
-	static const Peripheral UartPeripheral = Peripheral::{{name}};
+	static constexpr Peripheral UartPeripheral = Peripheral::{{name}};
 	static inline modm::inplace_function<bool(bool)> InterruptCallback;
 
 	/// Enables the clock, resets the hardware

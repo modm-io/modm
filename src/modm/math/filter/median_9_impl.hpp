@@ -19,15 +19,15 @@ namespace modm
 		class Median<T, 9>
 		{
 		public:
-			Median(const T& initialValue = 0);
+			constexpr Median(const T& initialValue = 0);
 
-			void
+			constexpr void
 			append(const T& input);
 
-			void
+			constexpr void
 			update();
 
-			const T
+			constexpr const T
 			getValue() const;
 
 		private:
@@ -40,7 +40,7 @@ namespace modm
 
 // ----------------------------------------------------------------------------
 template <typename T>
-modm::filter::Median<T, 9>::Median(const T& initialValue) :
+constexpr modm::filter::Median<T, 9>::Median(const T& initialValue) :
 	index(0)
 {
 	for (uint_fast8_t i = 0; i < 9; ++i) {
@@ -50,7 +50,7 @@ modm::filter::Median<T, 9>::Median(const T& initialValue) :
 }
 
 template <typename T>
-void
+constexpr void
 modm::filter::Median<T, 9>::append(const T& input)
 {
 	// Remove the old value from the sorted set and replace it with the
@@ -70,7 +70,7 @@ modm::filter::Median<T, 9>::append(const T& input)
 }
 
 template <typename T>
-void
+constexpr void
 modm::filter::Median<T, 9>::update()
 {
 	MODM_MEDIAN_SORT(sorted[1], sorted[2]);
@@ -95,7 +95,7 @@ modm::filter::Median<T, 9>::update()
 }
 
 template <typename T>
-const T
+constexpr const T
 modm::filter::Median<T, 9>::getValue() const
 {
 	return sorted[4];

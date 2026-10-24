@@ -36,56 +36,56 @@ namespace modm
 	class Vector<T, 1>
 	{
 	public:
-		Vector();
-		Vector(T inX);
-		Vector(const Matrix<T, 1, 1> &rhs);
+		constexpr Vector();
+		constexpr Vector(T inX);
+		constexpr Vector(const Matrix<T, 1, 1> &rhs);
 
-		inline void
+		constexpr void
 		set(const T& x);
 
-		inline void
+		constexpr void
 		setX(const T& value);
 
-		inline const T&
+		constexpr const T&
 		getX() const;
 
-		Vector& operator = (const Matrix<T, 1, 1> &rhs);
+		constexpr Vector& operator = (const Matrix<T, 1, 1> &rhs);
 
-		bool operator == (const Vector &rhs) const;
-		bool operator != (const Vector &rhs) const;
-		bool operator < (const Vector &rhs) const;
-		bool operator <= (const Vector &rhs) const;
-		bool operator > (const Vector &rhs) const;
-		bool operator >= (const Vector &rhs) const;
+		constexpr bool operator == (const Vector &rhs) const;
+		constexpr bool operator != (const Vector &rhs) const;
+		constexpr bool operator < (const Vector &rhs) const;
+		constexpr bool operator <= (const Vector &rhs) const;
+		constexpr bool operator > (const Vector &rhs) const;
+		constexpr bool operator >= (const Vector &rhs) const;
 
-		const T& operator [] (uint8_t index) const;
-		T& operator [] (uint8_t index);
-		T* ptr();
-		const T* ptr() const;
+		constexpr const T& operator [] (uint8_t index) const;
+		constexpr T& operator [] (uint8_t index);
+		constexpr T* ptr();
+		constexpr const T* ptr() const;
 
-		Vector operator - () const;
-		Vector operator + (const Vector &rhs) const;
-		Vector operator - (const Vector &rhs) const;
-		T operator * (const Vector &rhs) const;
-		Vector operator * (const T &rhs) const;
-		Vector operator / (const T &rhs) const;
+		constexpr Vector operator - () const;
+		constexpr Vector operator + (const Vector &rhs) const;
+		constexpr Vector operator - (const Vector &rhs) const;
+		constexpr T operator * (const Vector &rhs) const;
+		constexpr Vector operator * (const T &rhs) const;
+		constexpr Vector operator / (const T &rhs) const;
 
-		Vector& operator += (const Vector &rhs);
-		Vector& operator -= (const Vector &rhs);
-		Vector& operator *= (const T &rhs);
-		Vector& operator /= (const T &rhs);
+		constexpr Vector& operator += (const Vector &rhs);
+		constexpr Vector& operator -= (const Vector &rhs);
+		constexpr Vector& operator *= (const T &rhs);
+		constexpr Vector& operator /= (const T &rhs);
 
-		T getLength() const;
-		T getLengthSquared() const;
+		constexpr T getLength() const;
+		constexpr T getLengthSquared() const;
 
-		Matrix<T, 1, 1>&
+		constexpr Matrix<T, 1, 1>&
 		asMatrix();
 
-		const Matrix<T, 1, 1>&
+		constexpr const Matrix<T, 1, 1>&
 		asMatrix() const;
 
-		bool hasNan() const;
-		bool hasInf() const;
+		constexpr bool hasNan() const;
+		constexpr bool hasInf() const;
 
 	public:
 		T x;
@@ -99,13 +99,13 @@ namespace modm
 	};
 
 	template<typename U, typename T>
-	static inline Vector<T, 1> operator * (const U &lhs, const Vector<T, 1> &rhs)
+	constexpr static inline Vector<T, 1> operator * (const U &lhs, const Vector<T, 1> &rhs)
 	{
 		return rhs * lhs;
 	}
 
-	typedef Vector<float, 1> 	Vector1f;
-	typedef Vector<int16_t, 1> 	Vector1i;
+	using Vector1f = Vector<float, 1>;
+	using Vector1i = Vector<int16_t, 1>;
 }
 
 #include "vector1_impl.hpp"
