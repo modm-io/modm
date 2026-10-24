@@ -664,16 +664,20 @@ public:
 %% endif
 	};
 	/// Must be called exactly once early on start-up
+	/// @return whether the supply configuration is active and reads back
 	/// @note This is always inlined, so that a caller which must not access
 	/// the stack, like modm_initialize_platform(), stays a leaf function.
 	static modm_always_inline bool
 	configurePowerSource(PowerSource source, uint32_t waitLoops = 0x10000)
 	{
+		// The supply configuration is write-once after reset, so all of its bits
+		// must be written at once, including SCUEN on the parts without SMPS.
 		constexpr uint32_t mask = PWR_CR3_LDOEN | PWR_CR3_BYPASS{% if has_smps %} |
-				PWR_CR3_SMPSLEVEL | PWR_CR3_SMPSEXTHP | PWR_CR3_SMPSEN{% endif %};
+				PWR_CR3_SMPSLEVEL | PWR_CR3_SMPSEXTHP | PWR_CR3_SMPSEN{% else %} |
+				PWR_CR3_SCUEN{% endif %};
 		PWR->CR3 = (PWR->CR3 & ~mask) | uint32_t(source);
 		while (not (PWR->CSR1 & PWR_CSR1_ACTVOSRDY) and --waitLoops) ;
-		return waitLoops;
+		return waitLoops and (PWR->CR3 & mask) == uint32_t(source);
 	}
 
 	enum class
