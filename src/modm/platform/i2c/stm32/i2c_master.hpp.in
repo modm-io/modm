@@ -59,7 +59,7 @@ public:
 		Sda::configure(input);
 		Scl::setOutput(Gpio::OutputType::OpenDrain);
 		Sda::setOutput(Gpio::OutputType::OpenDrain);
-		if (reset != ResetDevices::NoReset) resetDevices<Scl>(uint32_t(reset));
+		if (reset != ResetDevices::NoReset) resetDevices<Scl, Sda>(uint32_t(reset));
 		Connector::connect();
 	}
 

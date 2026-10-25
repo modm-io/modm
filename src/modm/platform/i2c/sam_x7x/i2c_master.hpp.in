@@ -134,7 +134,7 @@ public:
 
 		Scl::configure(input);
 		Sda::configure(input);
-		if (reset != ResetDevices::NoReset) resetDevices<Scl>(uint32_t(reset));
+		if (reset != ResetDevices::NoReset) resetDevices<Scl, Sda>(uint32_t(reset));
 		SclConnector::connect();
 		SdaConnector::connect();
 	}

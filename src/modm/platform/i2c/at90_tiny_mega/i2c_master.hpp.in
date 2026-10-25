@@ -60,7 +60,7 @@ public:
 		SDA::configure(input);
 		SCL::setOutput();
 		SDA::setOutput();
-		if (reset != ResetDevices::NoReset) resetDevices<SCL>(uint32_t(reset));
+		if (reset != ResetDevices::NoReset) resetDevices<SCL, SDA>(uint32_t(reset));
 		Connector::connect();
 	}
 

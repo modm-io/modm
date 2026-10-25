@@ -49,7 +49,7 @@ public:
 		Scl::setSlewRate(Gpio::SlewRate::Slow);
 		Sda::configure(input);
 		Sda::setSlewRate(Gpio::SlewRate::Slow);
-		if (reset != ResetDevices::NoReset) resetDevices<Scl>(uint32_t(reset));
+		if (reset != ResetDevices::NoReset) resetDevices<Scl, Sda>(uint32_t(reset));
 		Connector::connect();
 	}
 

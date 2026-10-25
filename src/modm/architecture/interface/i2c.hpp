@@ -108,22 +108,42 @@ struct I2c
 	 *
 	 * @see	Application Note AN572 by Microchip
 	 *
-	 * @warning	Must be called **before** connecting SDA and SCL to I2cMaster!
+	 * This clears the bus as described in the I2C specification (UM10204 3.1.16):
+	 * Only if SCL or SDA is held low, it clocks SCL until SDA is released, at
+	 * most nine times, and then generates a stop condition. Otherwise a device
+	 * may take the clock pulses as a data byte and write it to a register.
+	 *
+	 * @warning	Must be called **before** connecting SDA and SCL to I2cMaster,
+	 *			with both pins configured as open-drain outputs!
 	 *
 	 * @tparam	Scl		The clock pin of the bus to be reset.
+	 * @tparam	Sda		The data pin of the bus to be reset.
  	 */
-	template< class Scl >
+	template< class Scl, class Sda >
 	static void
 	resetDevices(uint32_t baudrate = 100'000)
 	{
 		const std::chrono::microseconds delay{500'000ul / baudrate};
+		Scl::set();
+		Sda::set();
+		modm::this_fiber::sleep_for(delay);
+		if (Scl::read() and Sda::read()) return;
 
-		for (uint_fast8_t ii = 0; ii < 9; ++ii) {
+		for (uint_fast8_t ii = 0; ii < 9 and not Sda::read(); ++ii) {
 			Scl::reset();
 			modm::this_fiber::sleep_for(delay);
 			Scl::set();
 			modm::this_fiber::sleep_for(delay);
 		}
+		// stop condition: SDA rises while SCL is high
+		Scl::reset();
+		modm::this_fiber::sleep_for(delay);
+		Sda::reset();
+		modm::this_fiber::sleep_for(delay);
+		Scl::set();
+		modm::this_fiber::sleep_for(delay);
+		Sda::set();
+		modm::this_fiber::sleep_for(delay);
 	}
 
 };
