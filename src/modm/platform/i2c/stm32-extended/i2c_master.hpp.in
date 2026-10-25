@@ -89,6 +89,9 @@ public:
 		Sda::setOutput(Gpio::OutputType::OpenDrain);
 		if (reset != ResetDevices::NoReset) resetDevices<Scl, Sda>(uint32_t(reset));
 		Connector::connect();
+		// reset() clears the bus with the same signals
+		busReset = reset;
+		recoverBus = (reset != ResetDevices::NoReset) ? &clearBus<Signals...> : nullptr;
 	}
 
 	/**
@@ -113,10 +116,32 @@ public:
 	static Error
 	getErrorState();
 
+	/// Detaches all transactions, resets the peripheral and clears the bus if a
+	/// device holds SDA low, unless connect() was called with `ResetDevices::NoReset`.
+	/// @warning Must not be called from an interrupt.
 	static void
 	reset();
 
 private:
+	/// Clears the bus if a device holds SDA or SCL low, see resetDevices().
+	template<class... Signals>
+	static void
+	clearBus()
+	{
+		using Connector = GpioConnector<Peripheral::I2c{{ id }}, Signals...>;
+		using Scl = typename Connector::template GetSignal<Gpio::Signal::Scl>;
+		using Sda = typename Connector::template GetSignal<Gpio::Signal::Sda>;
+		if (Scl::read() and Sda::read()) return;
+		Connector::disconnect();
+		Scl::setOutput(Gpio::OutputType::OpenDrain);
+		Sda::setOutput(Gpio::OutputType::OpenDrain);
+		resetDevices<Scl, Sda>(uint32_t(busReset));
+		Connector::connect();
+	}
+
+	static inline ResetDevices busReset{ResetDevices::NoReset};
+	static inline void (*recoverBus)(){nullptr};
+
 	static void
 	initializeWithPrescaler(uint32_t timingRegisterValue, uint8_t isrPriority = 10u);
 

@@ -217,7 +217,7 @@ namespace
 
 	// helper functions
 	static inline void
-	resetPeripheral()
+	resetPeripheral(bool enable = true)
 	{
 		// Reset the peripheral to release a stuck bus, but keep the configuration
 		const uint16_t cr2 = I2C{{ id }}->CR2 & I2C_CR2_FREQ;
@@ -234,7 +234,7 @@ namespace
 #ifdef I2C_FLTR_ANOFF_Msk
 		I2C{{ id }}->FLTR = fltr;
 #endif
-		I2C{{ id }}->CR1 = I2C_CR1_PE;
+		if (enable) I2C{{ id }}->CR1 = I2C_CR1_PE;
 	}
 
 	static inline void
@@ -677,21 +677,29 @@ modm::platform::I2cMaster{{ id }}::initializeWithPrescaler(uint8_t peripheralFre
 void
 modm::platform::I2cMaster{{ id }}::reset()
 {
-	modm::atomic::Lock lock;
-	reading.length = 0;
-	writing.length = 0;
-	error = Error::SoftwareReset;
-	if (transaction) transaction->detaching(DetachCause::ErrorCondition);
-	transaction = nullptr;
-	// remove all queued transactions
-	while(!queue.isEmpty())
 	{
-		ConfiguredTransaction next = queue.get();
-		if (next.transaction) next.transaction->detaching(DetachCause::ErrorCondition);
-		queue.pop();
-	}
+		modm::atomic::Lock lock;
+		reading.length = 0;
+		writing.length = 0;
+		error = Error::SoftwareReset;
+		if (transaction) transaction->detaching(DetachCause::ErrorCondition);
+		transaction = nullptr;
+		// remove all queued transactions
+		while(!queue.isEmpty())
+		{
+			ConfiguredTransaction next = queue.get();
+			if (next.transaction) next.transaction->detaching(DetachCause::ErrorCondition);
+			queue.pop();
+		}
 
-	stalledEvents = 0;
+		stalledEvents = 0;
+		I2C{{ id }}->CR1 &= ~I2C_CR1_PE;
+	}
+	// Clock out devices that hold SDA low, which needs the system clock and
+	// therefore runs outside of the lock. The peripheral is reset afterwards,
+	// since it may see the clock pulses as bus traffic.
+	if (recoverBus) recoverBus();
+	modm::atomic::Lock lock;
 	resetPeripheral();
 }
 

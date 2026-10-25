@@ -357,6 +357,9 @@ MODM_ISR(I2C{{ id }}_EV)
 
 	I2C{{ id }}->ICR = I2C_ICR_STOPCF;
 
+	// The error interrupt or reset() detached the transaction while this event was pending
+	if (transaction == nullptr) return;
+
 #if SERIAL_DEBUGGING
 	if (isr & I2C_ISR_BUSY)  { DEBUG_STREAM_N("BUSY " ); } else { DEBUG_STREAM_N("busy " ); }
 	if (isr & I2C_ISR_ARLO)  { DEBUG_STREAM_N("ARLO " ); } else { DEBUG_STREAM_N("arlo " ); }
@@ -580,18 +583,32 @@ modm::platform::I2cMaster{{ id }}::initializeWithPrescaler(uint32_t timingRegist
 void
 modm::platform::I2cMaster{{ id }}::reset()
 {
-	reading.length = 0;
-	writing.length = 0;
-	error = Error::SoftwareReset;
-	if (transaction) transaction->detaching(DetachCause::ErrorCondition);
-	transaction = nullptr;
-	// remove all queued transactions
-	while (queue.isNotEmpty())
 	{
-		ConfiguredTransaction next = queue.get();
-		if (next.transaction) { next.transaction->detaching(DetachCause::ErrorCondition); }
-		queue.pop();
+		modm::atomic::Lock lock;
+		reading.length = 0;
+		writing.length = 0;
+		error = Error::SoftwareReset;
+		if (transaction) transaction->detaching(DetachCause::ErrorCondition);
+		transaction = nullptr;
+		// remove all queued transactions
+		while (queue.isNotEmpty())
+		{
+			ConfiguredTransaction next = queue.get();
+			if (next.transaction) { next.transaction->detaching(DetachCause::ErrorCondition); }
+			queue.pop();
+		}
+
+		I2C{{ id }}->CR1 = 0;
 	}
+	// Clock out devices that hold SDA low, which needs the system clock and
+	// therefore runs outside of the lock. The peripheral is reset afterwards,
+	// since it may see the clock pulses as bus traffic.
+	if (recoverBus) recoverBus();
+	// Clearing PE resets the state machine but keeps the configuration.
+	// PE must stay low for three APB clock cycles, the reads ensure that.
+	I2C{{ id }}->CR1 = 0;
+	for (uint8_t ii = 0; ii < 3; ii++) (void) I2C{{ id }}->CR1;
+	I2C{{ id }}->CR1 = I2C_CR1_PE;
 }
 
 bool
