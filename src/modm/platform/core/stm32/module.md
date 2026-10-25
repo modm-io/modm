@@ -9,6 +9,10 @@ STM32-specific startup code and linkerscripts.
 The `__modm_initialize_platform()` callback enables the clock to `SYSCFG` or
 `AFIO` and the clock to all internal SRAMs.
 
+It must not access the RAM: On STM32H7 for example, write accesses to RAM are
+forbidden until the supply configuration is written. The H7 boards do this in
+`modm_initialize_platform()`, which is called directly afterwards.
+
 
 ## Linkerscript
 

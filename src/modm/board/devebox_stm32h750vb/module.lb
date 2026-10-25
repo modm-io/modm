@@ -60,6 +60,7 @@ def build(env):
     }
     env.template("../board.cpp.in", "board.cpp")
     env.copy('.')
+    env.copy("../init_ldo.cpp", "init_ldo.cpp")
 
     env.outbasepath = "modm/openocd/modm/board/"
     env.template(repopath("tools/openocd/modm/stm32_swd.cfg.in"), "board.cfg",

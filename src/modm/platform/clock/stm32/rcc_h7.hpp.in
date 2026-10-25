@@ -664,7 +664,9 @@ public:
 %% endif
 	};
 	/// Must be called exactly once early on start-up
-	static inline bool
+	/// @note This is always inlined, so that a caller which must not access
+	/// the stack, like modm_initialize_platform(), stays a leaf function.
+	static modm_always_inline bool
 	configurePowerSource(PowerSource source, uint32_t waitLoops = 0x10000)
 	{
 		constexpr uint32_t mask = PWR_CR3_LDOEN | PWR_CR3_BYPASS{% if has_smps %} |

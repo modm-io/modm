@@ -13,6 +13,8 @@
 
 using namespace modm::platform;
 
+// Called from the Reset_Handler before any RAM is accessed, so this must only
+// touch registers and must not use the stack, see modm:platform:core.
 extern "C" void
 modm_initialize_platform(void)
 {
