@@ -1,0 +1,28 @@
+<library>
+  <extends>modm:disco-f469ni</extends>
+  <!-- <extends>modm:disco-f407vg</extends> -->
+  <!-- <extends>modm:disco-f429zi</extends> -->
+  <!-- <extends>modm:disco-f303vc</extends> -->
+  <!-- <extends>modm:disco-f723ie</extends> -->
+  <!-- <extends>modm:disco-f746ng</extends> -->
+  <!-- <extends>modm:disco-l476vg</extends> -->
+  <!-- Boards without I2C device, see main.cpp -->
+  <!-- <extends>modm:nucleo-g0b1re</extends> -->
+  <!-- <extends>modm:nucleo-g071rb</extends> -->
+  <!-- <extends>modm:nucleo-f072rb</extends> -->
+  <!-- <extends>modm:nucleo-l152re</extends> -->
+  <options>
+    <option name="modm:io:with_printf">true</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:architecture:i2c.device</module>
+    <module>modm:processing:fiber</module>
+    <module>modm:platform:i2c.bitbang</module>
+    <module>modm:platform:timer:7</module>
+    <!-- Required for modm:disco-f469ni, modm:disco-f407vg, modm:disco-f303vc, modm:disco-l476vg and the boards without I2C device -->
+    <module>modm:platform:i2c:1</module>
+    <!-- Required for modm:disco-f429zi, modm:disco-f723ie, modm:disco-f746ng -->
+    <!-- <module>modm:platform:i2c:3</module> -->
+  </modules>
+</library>

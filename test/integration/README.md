@@ -42,3 +42,4 @@ Some tests need more than the board:
 | `uart_spi`         | A wire from Tx to Rx, see `main.cpp`.                        |
 | `spi_flash`        | SST26VF064B flash chip on the NUCLEO-F429ZI, see `main.cpp`. |
 | `spi_stack_flash`  | W25M512VJ flash chip on the NUCLEO-F429ZI, see `main.cpp`.   |
+| `i2c_stress`       | The I2C device on the DISCO board, see `main.cpp`.           |
