@@ -16,6 +16,7 @@
 #ifndef MODM_SOFTWARE_BITBANG_I2C_HPP
 #define MODM_SOFTWARE_BITBANG_I2C_HPP
 
+#include <chrono>
 #include <modm/architecture/interface/delay.hpp>
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/architecture/interface/i2c_master.hpp>
@@ -67,10 +68,21 @@ public:
 	getErrorState()
 	{ return errorState; }
 
+	/// Aborts the transaction and clears the bus if a device holds SDA or SCL low
 	static inline void
 	reset();
 
+	/// Sets how long a device may stretch the clock, by default 100 ms.
+	static void
+	setStretchTimeout(std::chrono::milliseconds timeout)
+	{ stretchTimeout = timeout; }
+
 private:
+	/// Clears the bus with resetDevices() if enabled in connect()
+	/// @return	`true` if both lines are high afterwards
+	static inline bool
+	clearBus();
+
 	// error handling
 	/// releases bus lines, sets error state and detaches the TO
 	static inline void
@@ -87,7 +99,8 @@ private:
 	static inline bool
 	stopCondition();
 
-	/// release the clock and wait for any slaves to release it too
+	/// release the clock and wait for any slaves to release it too, first
+	/// busy waiting for about 1 ms, then yielding until the stretch timeout
 	/// @return	`true` if success, `false` if slave stretched the clock for too long
 	static inline bool
 	sclSetAndWait();
@@ -141,6 +154,8 @@ private:
 	static modm::I2cTransaction *transactionObject;
 	static Error errorState;
 	static modm::I2c::ConfigurationHandler configuration;
+	static inline ResetDevices busReset{ResetDevices::NoReset};
+	static inline std::chrono::milliseconds stretchTimeout{100};
 
 	static modm::I2cTransaction::Starting starting;
 	static modm::I2cTransaction::Writing writing;
