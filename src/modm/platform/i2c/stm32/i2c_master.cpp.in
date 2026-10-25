@@ -211,7 +211,32 @@ namespace
 	static modm::I2cTransaction::Writing writing(nullptr, 0, modm::I2c::OperationAfterWrite::Stop);
 	static modm::I2cTransaction::Reading reading(nullptr, 0, modm::I2c::OperationAfterRead::Stop);
 
+	// event interrupts without progress, see I2C_EV
+	static uint32_t stalledEvents{0};
+	static uint32_t stalledEventLimit{10'000};
+
 	// helper functions
+	static inline void
+	resetPeripheral()
+	{
+		// Reset the peripheral to release a stuck bus, but keep the configuration
+		const uint16_t cr2 = I2C{{ id }}->CR2 & I2C_CR2_FREQ;
+		const uint16_t ccr = I2C{{ id }}->CCR;
+		const uint16_t trise = I2C{{ id }}->TRISE;
+#ifdef I2C_FLTR_ANOFF_Msk
+		const uint16_t fltr = I2C{{ id }}->FLTR;
+#endif
+		I2C{{ id }}->CR1 = I2C_CR1_SWRST;
+		I2C{{ id }}->CR1 = 0;
+		I2C{{ id }}->CR2 = cr2;
+		I2C{{ id }}->CCR = ccr;
+		I2C{{ id }}->TRISE = trise;
+#ifdef I2C_FLTR_ANOFF_Msk
+		I2C{{ id }}->FLTR = fltr;
+#endif
+		I2C{{ id }}->CR1 = I2C_CR1_PE;
+	}
+
 	static inline void
 	callStarting()
 	{
@@ -287,7 +312,37 @@ MODM_ISR(I2C{{ id }}_EV)
 {
 	DEBUG_STREAM("\n--- interrupt ---");
 
+	if (transaction == nullptr)
+	{
+		// The error interrupt detached the transaction while this event was pending
+		I2C{{ id }}->CR2 &= ~(I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN);
+		return;
+	}
+
 	uint16_t sr1 = I2C{{ id }}->SR1;
+
+	// Without a start, address, data or a running write the bus is stuck, for
+	// example when a repeated start waits for a device to release SDA. Then
+	// the interrupt fires again forever, so abort the transaction instead.
+	if ((sr1 & (I2C_SR1_SB | I2C_SR1_ADDR | I2C_SR1_RXNE)) or
+		((sr1 & I2C_SR1_TXE) and (I2C{{ id }}->CR2 & I2C_CR2_ITBUFEN)))
+	{
+		stalledEvents = 0;
+	}
+	else if (++stalledEvents > stalledEventLimit)
+	{
+		DEBUG_STREAM("STALLED");
+		stalledEvents = 0;
+		error = modm::I2cMaster::Error::BusCondition;
+		transaction->detaching(modm::I2c::DetachCause::ErrorCondition);
+		transaction = nullptr;
+		writing.length = 0;
+		reading.length = 0;
+		checkNextOperation = CheckNextOperation::NO;
+		resetPeripheral();
+		callNextTransaction();
+		return;
+	}
 
 	if (sr1 & I2C_SR1_SB)
 	{
@@ -604,6 +659,12 @@ modm::platform::I2cMaster{{ id }}::initializeWithPrescaler(uint8_t peripheralFre
 
 	I2C{{ id }}->CR2 = peripheralFrequency;
 	I2C{{ id }}->CCR = prescaler;
+	// A stalled bus makes the event interrupt fire back to back at about one
+	// interrupt per 50 cycles, so 200 interrupts per MHz abort after roughly
+	// 10 ms. Never abort before 1000 interrupts, so that a device that
+	// stretches the clock is not cut off too early.
+	stalledEventLimit = (uint32_t(peripheralFrequency) > 5)
+			? uint32_t(peripheralFrequency) * 200 : 1000;
 	I2C{{ id }}->TRISE = riseTime;
 #ifdef I2C_FLTR_ANOFF_Msk
 	// analog filter on, digital filter = 2
@@ -616,6 +677,7 @@ modm::platform::I2cMaster{{ id }}::initializeWithPrescaler(uint8_t peripheralFre
 void
 modm::platform::I2cMaster{{ id }}::reset()
 {
+	modm::atomic::Lock lock;
 	reading.length = 0;
 	writing.length = 0;
 	error = Error::SoftwareReset;
@@ -628,6 +690,9 @@ modm::platform::I2cMaster{{ id }}::reset()
 		if (next.transaction) next.transaction->detaching(DetachCause::ErrorCondition);
 		queue.pop();
 	}
+
+	stalledEvents = 0;
+	resetPeripheral();
 }
 
 // MARK: - ownership
