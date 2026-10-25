@@ -301,7 +301,7 @@ auto any_cast(const inplace_any<Size>& any) noexcept
         return *reinterpret_cast<const Type*>(&any.storage_);
     } else {
         modm_assert(0, "bad_any_cast", "can't cast modm::inplace_any to type", &any);
-        __builtin_unreachable();
+        std::unreachable();
     }
 }
 
@@ -314,7 +314,7 @@ auto any_cast(inplace_any<Size>& any) noexcept
         return *reinterpret_cast<Type*>(&any.storage_);
     } else {
         modm_assert(0, "bad_any_cast", "can't cast modm::inplace_any to type", &any);
-        __builtin_unreachable();
+        std::unreachable();
     }
 }
 

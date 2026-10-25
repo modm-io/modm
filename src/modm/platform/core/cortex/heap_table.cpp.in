@@ -99,12 +99,6 @@ HeapTable::Iterator::operator==(const Iterator& other) const
 	return table == other.table;
 }
 
-bool
-HeapTable::Iterator::operator!=(const Iterator& other) const
-{
-	return table != other.table;
-}
-
 // Finds the largest heap with declared traits
 bool
 HeapTable::find_largest(const uint8_t **const start,

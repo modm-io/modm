@@ -123,7 +123,7 @@ public:
 	 * @retval `true` adapter configured successfully,
 	 * @retval `false` adapter busy
 	 */
-	bool
+	[[nodiscard]] bool
 	configurePing();
 
 	/**
@@ -137,7 +137,7 @@ public:
 	 * @retval `true` adapter configured successfully,
 	 * @retval `false` adapter busy
 	 */
-	bool
+	[[nodiscard]] bool
 	configureWriteRead(const uint8_t *writeBuffer, std::size_t writeSize,
 							 uint8_t *readBuffer,  std::size_t readSize);
 
@@ -150,7 +150,7 @@ public:
 	 * @retval `true` adapter configured successfully,
 	 * @retval `false` adapter busy
 	 */
-	bool
+	[[nodiscard]] bool
 	configureWrite(uint8_t *buffer, std::size_t size);
 
 	/**
@@ -162,7 +162,7 @@ public:
 	 * @retval `true` adapter configured successfully,
 	 * @retval `false` adapter busy
 	 */
-	bool
+	[[nodiscard]] bool
 	configureRead(uint8_t *buffer, std::size_t size);
 
 public:
@@ -247,13 +247,13 @@ public:
 	{
 	}
 
-	constexpr bool
+	[[nodiscard]] constexpr bool
 	configurePing()
 	{
 		return configureWriteRead(nullptr, 0, nullptr, 0);
 	}
 
-	bool inline
+	[[nodiscard]] bool inline
 	configureWriteRead(const uint8_t *writeBuffer, std::size_t writeSize,
 			uint8_t *readBuffer, std::size_t readSize)
 	{
@@ -304,7 +304,7 @@ public:
 	 * @return  `true` if adapter was not in use,
 	 *          `false` otherwise
 	 */
-	constexpr bool
+	[[nodiscard]] constexpr bool
 	configureWrite(const uint8_t *buffer, std::size_t size)
 	{
 		return configureWriteRead(buffer, size, nullptr, 0);
@@ -319,7 +319,7 @@ public:
 	 * @return  `true` if adapter was not in use,
 	 *          `false` otherwise
 	 */
-	constexpr bool
+	[[nodiscard]] constexpr bool
 	configureRead(uint8_t *buffer, std::size_t size)
 	{
 		return configureWriteRead(nullptr, 0, buffer, size);
@@ -414,19 +414,19 @@ public:
 	{
 	}
 
-	constexpr bool
+	[[nodiscard]] constexpr bool
 	configurePing()
 	{
 		return configureWrite(nullptr, 0);
 	}
 
-	constexpr bool
+	[[nodiscard]] constexpr bool
 	configureWriteRead(const uint8_t *, std::size_t, uint8_t *, std::size_t)
 	{
 		return false;
 	}
 
-	bool inline
+	[[nodiscard]] bool inline
 	configureWrite(const uint8_t *buffer, std::size_t size)
 	{
 		if (state != TransactionState::Busy)
@@ -438,7 +438,7 @@ public:
 		return false;
 	}
 
-	constexpr bool
+	[[nodiscard]] constexpr bool
 	configureRead(uint8_t *, std::size_t)
 	{
 		return false;
@@ -489,25 +489,25 @@ public:
 	{
 	}
 
-	constexpr bool
+	[[nodiscard]] constexpr bool
 	configurePing()
 	{
 		return configureRead(nullptr, 0);
 	}
 
-	constexpr bool
+	[[nodiscard]] constexpr bool
 	configureWriteRead(const uint8_t *, std::size_t, uint8_t *, std::size_t)
 	{
 		return false;
 	}
 
-	constexpr bool
+	[[nodiscard]] constexpr bool
 	configureWrite(uint8_t *, std::size_t)
 	{
 		return false;
 	}
 
-	bool inline
+	[[nodiscard]] bool inline
 	configureRead(uint8_t *buffer, std::size_t size)
 	{
 		if (state != TransactionState::Busy)

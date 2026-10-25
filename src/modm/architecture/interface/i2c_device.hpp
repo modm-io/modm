@@ -81,7 +81,7 @@ public:
 
 	/// @retval true	device responds to address
 	/// @retval false	no device with address found
-	bool
+	[[nodiscard]] bool
 	ping()
 	{
 		modm::this_fiber::poll([&]{ return transaction.configurePing(); });
@@ -89,7 +89,7 @@ public:
 	}
 
 	/// Starts a write-read transaction and waits until finished.
-	bool
+	[[nodiscard]] bool
 	writeRead(const uint8_t *writeBuffer, std::size_t writeSize,
 			  uint8_t *readBuffer, std::size_t readSize)
 	{
@@ -98,7 +98,7 @@ public:
 	}
 
 	/// Starts a write transaction and waits until finished.
-	bool
+	[[nodiscard]] bool
 	write(const uint8_t *buffer, std::size_t size)
 	{
 		modm::this_fiber::poll([&]{ return transaction.configureWrite(buffer, size); });
@@ -106,7 +106,7 @@ public:
 	}
 
 	/// Starts a write transaction and waits until finished.
-	bool
+	[[nodiscard]] bool
 	read(uint8_t *buffer, std::size_t size)
 	{
 		modm::this_fiber::poll([&]{ return transaction.configureRead(buffer, size); });

@@ -15,6 +15,7 @@
 #define MODM_FIBER_SCHEDULER_HPP
 
 #include "task.hpp"
+#include <utility>
 #include <modm/architecture/interface/assert.hpp>
 %% if multicore
 #include <modm/platform/core/multicore.hpp>
@@ -143,7 +144,7 @@ protected:
 			modm_context_end(0);
 		}
 		jump(next);
-		__builtin_unreachable();
+		std::unreachable();
 	}
 
 	void inline

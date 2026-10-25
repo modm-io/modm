@@ -246,12 +246,6 @@ FaultStorage::Iterator::operator==(const Iterator& other) const
 	return pos == other.pos;
 }
 
-bool
-FaultStorage::Iterator::operator!=(const Iterator& other) const
-{
-	return pos != other.pos;
-}
-
 }
 
 MODM_HARDWARE_INIT_NAME(fault_open_read, modm::platform::FaultStorage::openRead);

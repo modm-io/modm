@@ -57,7 +57,7 @@ public:
 	 *  @param size		Size to read in bytes (multiple of read block size)
 	 *  @return			True on success
 	 */
-	bool
+	[[nodiscard]] bool
 	read(uint8_t* buffer, bd_address_t address, bd_size_t size);
 
 	/** Program blocks with data
@@ -69,7 +69,7 @@ public:
 	 *  @param size		Size to write in bytes (multiple of read block size)
 	 *  @return			True on success
 	 */
-	bool
+	[[nodiscard]] bool
 	program(const uint8_t* buffer, bd_address_t address, bd_size_t size);
 
 	/** Erase blocks
@@ -80,7 +80,7 @@ public:
 	 *  @param size		Size to erase in bytes (multiple of read block size)
 	 *  @return			True on success
 	 */
-	bool
+	[[nodiscard]] bool
 	erase(bd_address_t address, bd_size_t size);
 
 	/** Writes data to one or more blocks after erasing them

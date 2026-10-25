@@ -11,6 +11,7 @@
 // ----------------------------------------------------------------------------
 
 #include "context.h"
+#include <utility>
 #include <modm/architecture/detect.hpp>
 
 /* Stack layout (growing downwards):
@@ -131,7 +132,7 @@ void
 modm_context_end(uintptr_t retval)
 {
 	modm_context_jump_return(retval, &main_context);
-	__builtin_unreachable();
+	std::unreachable();
 }
 
 void

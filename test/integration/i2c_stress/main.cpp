@@ -306,7 +306,7 @@ run(const char *name)
 
 #if defined(STM32F469xx) || defined(STM32F723xx)
 	// The FT6x36 misses the first repeated start after reset and then hangs
-	const auto warmup = [&]{ device.write(reg, 1); };
+	const auto warmup = [&]{ (void) device.write(reg, 1); };
 #else
 	const auto warmup = []{};
 #endif
@@ -347,7 +347,7 @@ run(const char *name)
 		if (timed([&]{ return nobody.ping(); })) stats->nacks_bad++; else stats->nacks_ok++;
 
 		// Abort a running transaction with reset() after a varying delay
-		raw.configureWriteRead(reg, sizeof(reg), big, sizeof(big));
+		(void) raw.configureWriteRead(reg, sizeof(reg), big, sizeof(big));
 		if (Master::start(&raw))
 		{
 			modm::this_fiber::sleep_for(std::chrono::microseconds(random() % 300));

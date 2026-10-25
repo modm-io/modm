@@ -10,6 +10,7 @@
 // ----------------------------------------------------------------------------
 
 #include "multicore.hpp"
+#include <iterator>
 #include "../device.hpp"
 
 using namespace modm::platform::multicore;
@@ -74,7 +75,7 @@ runCore1(void (*entry)(), uint32_t *stack_bottom, uint32_t stack_size)
 		// Move to next state on correct response (echo-d value) otherwise start over
 		seq = cmd == response ? seq + 1 : 0;
 	}
-	while (seq < sizeof(cmd_sequence) / sizeof(cmd_sequence[0]));
+	while (seq < std::size(cmd_sequence));
 
 	if (enabled) NVIC_EnableIRQ(SIO_IRQ_PROC0_IRQn);
 	else NVIC_DisableIRQ(SIO_IRQ_PROC0_IRQn);
