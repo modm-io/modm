@@ -107,8 +107,28 @@ public:
 		constexpr std::optional<uint32_t> timingRegisterValue = calculateTimings<SystemClock, baudrate, tolerance>();
 		static_assert(bool(timingRegisterValue), "Could not find a valid clock configuration for the requested baudrate");
 
+%% if smbus
+		// The SMBus timer counts 2048 I2CCLK cycles per tick, so this is the number of
+		// ticks per millisecond in Q16, computed at compile time.
+		constexpr uint32_t ticksPerMsQ16 = (uint64_t(SystemClock::I2c{{ id }}) << 16) / 2'048'000ull;
+		ticksPerMs = ticksPerMsQ16;
+%% endif
 		initializeWithPrescaler(timingRegisterValue.value(), isrPriority);
 	}
+
+%% if smbus
+	/**
+	 * Sets the bus timeout of the next transaction, which is forwarded by
+	 * I2cDevice::setTimeout().
+	 *
+	 * The timeout is only enabled if the hardware timer can cover the whole
+	 * time: `t = (TIMEOUTA + 1) * 2048 * t_I2CCLK`, so at most
+	 * `4096 * 2048 / f_I2CCLK` (131 ms at 64 MHz, 42 ms at 200 MHz).
+	 * A longer timeout is left to the software timeout of I2cDevice.
+	 */
+	static void
+	setTransactionTimeout(std::chrono::milliseconds timeout);
+%% endif
 
 	static bool
 	start(I2cTransaction *transaction, ConfigurationHandler handler = nullptr);
@@ -141,6 +161,11 @@ private:
 
 	static inline ResetDevices busReset{ResetDevices::NoReset};
 	static inline void (*recoverBus)(){nullptr};
+
+%% if smbus
+	/// SMBus timer ticks per millisecond in Q16, set by initialize()
+	static inline uint32_t ticksPerMs{0};
+%% endif
 
 	static void
 	initializeWithPrescaler(uint32_t timingRegisterValue, uint8_t isrPriority = 10u);
