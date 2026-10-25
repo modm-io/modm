@@ -16,6 +16,7 @@
 #include "i2c.hpp"
 #include "i2c_transaction.hpp"
 #include "peripheral.hpp"
+#include <chrono>
 
 namespace modm
 {
@@ -134,6 +135,25 @@ public:
 	static Error
 	getErrorState();
 #endif
+
+	/**
+	 * Sets the timeout of the next transaction, which is forwarded by
+	 * I2cDevice::setTimeout().
+	 *
+	 * The default implementation does nothing, drivers with a bus timeout
+	 * override this method to program it.
+	 */
+	static void
+	setTransactionTimeout(std::chrono::milliseconds) {}
+
+	/**
+	 * Performs a software reset of the driver in case of an error.
+	 *
+	 * The default implementation does nothing, since not every master can
+	 * reset itself or clear the bus.
+	 */
+	static void
+	reset() {}
 };
 
 }	// namespace modm

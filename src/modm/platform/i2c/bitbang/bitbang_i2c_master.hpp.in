@@ -77,6 +77,14 @@ public:
 	setStretchTimeout(std::chrono::milliseconds timeout)
 	{ stretchTimeout = timeout; }
 
+	/// Sets the timeout of the next transaction, forwarded by I2cDevice.
+	/// A device may stretch the clock for half of the transaction timeout.
+	static void
+	setTransactionTimeout(std::chrono::milliseconds timeout)
+	{
+		if (timeout.count()) stretchTimeout = timeout / 2;
+	}
+
 private:
 	/// Clears the bus with resetDevices() if enabled in connect()
 	/// @return	`true` if both lines are high afterwards

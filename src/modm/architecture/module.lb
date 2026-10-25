@@ -235,7 +235,7 @@ class I2cDevice(Module):
         module.description = "I²C Devices"
 
     def prepare(self, module, options):
-        module.depends(":architecture:i2c", ":architecture:fiber")
+        module.depends(":architecture:i2c", ":architecture:fiber", ":architecture:clock")
         return True
 
     def build(self, env):
