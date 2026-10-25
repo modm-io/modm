@@ -166,6 +166,7 @@
 #include "i2c_master_{{ id }}.hpp"
 #include <modm/architecture/interface/accessor.hpp>
 #include <modm/architecture/interface/atomic_lock.hpp>
+#include <modm/architecture/interface/delay.hpp>
 #include <modm/architecture/interface/interrupt.hpp>
 #include <modm/container.hpp>
 #include <modm/platform/clock/rcc.hpp>
@@ -323,25 +324,51 @@ MODM_ISR(I2C{{ id }}_EV)
 
 	// Without a start, address, data or a running write the bus is stuck, for
 	// example when a repeated start waits for a device to release SDA. Then
-	// the interrupt fires again forever, so abort the transaction instead.
+	// the interrupt fires again and again, so abort the transaction after a
+	// while instead.
 	if ((sr1 & (I2C_SR1_SB | I2C_SR1_ADDR | I2C_SR1_RXNE)) or
 		((sr1 & I2C_SR1_TXE) and (I2C{{ id }}->CR2 & I2C_CR2_ITBUFEN)))
 	{
 		stalledEvents = 0;
 	}
-	else if (++stalledEvents > stalledEventLimit)
+	else
 	{
-		DEBUG_STREAM("STALLED");
-		stalledEvents = 0;
-		error = modm::I2cMaster::Error::BusCondition;
-		transaction->detaching(modm::I2c::DetachCause::ErrorCondition);
-		transaction = nullptr;
-		writing.length = 0;
-		reading.length = 0;
-		checkNextOperation = CheckNextOperation::NO;
-		resetPeripheral();
-		callNextTransaction();
-		return;
+		// A requested start cannot be generated while a device stretches SCL or
+		// holds SDA low. BTF stays set until the start is generated, because it
+		// is only cleared by a data register access or by the start condition
+		// itself, and the event interrupt is level triggered. Without clearing
+		// it, the interrupt fires back to back and takes all the CPU time.
+		if (((I2C{{ id }}->SR1 & (I2C_SR1_BTF | I2C_SR1_RXNE)) == I2C_SR1_BTF) and
+			(I2C{{ id }}->CR1 & I2C_CR1_START))
+		{
+			// Give the device a moment to release the bus, so that a short
+			// glitch does not need another interrupt. Waiting longer than this
+			// inside the interrupt would block other code.
+			modm::delay_us(10);
+			// Reading DR clears BTF; no received data is lost because RXNE is
+			// not set. The start stays pending and sets SB once the bus is
+			// free, which interrupts again instead of blocking the CPU here.
+			if (not (I2C{{ id }}->SR1 & I2C_SR1_SB))
+			{
+				DEBUG_STREAM("clear BTF while the start is pending");
+				(void) I2C{{ id }}->DR;
+			}
+		}
+
+		if (++stalledEvents > stalledEventLimit)
+		{
+			DEBUG_STREAM("STALLED");
+			stalledEvents = 0;
+			error = modm::I2cMaster::Error::BusCondition;
+			transaction->detaching(modm::I2c::DetachCause::ErrorCondition);
+			transaction = nullptr;
+			writing.length = 0;
+			reading.length = 0;
+			checkNextOperation = CheckNextOperation::NO;
+			resetPeripheral();
+			callNextTransaction();
+			return;
+		}
 	}
 
 	if (sr1 & I2C_SR1_SB)
