@@ -1,0 +1,292 @@
+/*
+ * Copyright (c) 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#include "logic_analyzer.hpp"
+#include <modm/platform/clock/rcc.hpp>
+#include <modm/platform/dma/dma.hpp>
+#include <modm/architecture/interface/assert.hpp>
+#include <cstddef>
+
+using namespace modm::platform;
+
+#define TIMER TIM{{ timer }}
+
+namespace
+{
+
+static uint32_t buffers[modm::LogicAnalyzer::MaxPorts][modm::LogicAnalyzer::Samples];
+static bool clocksEnabled = false;
+
+%% for entry in ch
+using LogicDma{{ loop.index0 }} = DmaController<{{ entry.dma }}>::Channel<DmaBase::Channel::Channel{{ entry.channel }}>;
+%% endfor
+
+%% for entry in ch
+static volatile uint32_t *const ndtr{{ loop.index0 }} = {{ entry.ndtr }};
+static volatile uint32_t *const fcr{{ loop.index0 }} = {{ entry.fcr }};
+%% endfor
+
+/**
+ * Configures a DMA channel to copy the input data register of the port into
+ * the buffer on every request of the timer.
+ */
+template<class Dma, DmaBase::Request Request>
+static void
+configure(uint32_t port, uint32_t *buffer, bool circular, volatile uint32_t *fcr)
+{
+	Dma::stop();
+	// Always use direct mode with an empty FIFO.
+	if (fcr) *fcr = 0;
+	Dma::clearInterruptFlags();
+	Dma::configure(
+			DmaBase::DataTransferDirection::PeripheralToMemory,
+			DmaBase::MemoryDataSize::Word,
+			DmaBase::PeripheralDataSize::Word,
+			DmaBase::MemoryIncrementMode::Increment,
+			DmaBase::PeripheralIncrementMode::Fixed,
+			DmaBase::Priority::VeryHigh,
+			circular ? DmaBase::CircularMode::Enabled : DmaBase::CircularMode::Disabled);
+	Dma::setPeripheralAddress(port + offsetof(GPIO_TypeDef, IDR));
+	Dma::setMemoryAddress(reinterpret_cast<uintptr_t>(buffer));
+	Dma::template setPeripheralRequest<Request>();
+	Dma::setDataLength(modm::LogicAnalyzer::Samples);
+}
+
+static bool
+transferComplete(uint8_t channel)
+{
+	switch (channel)
+	{
+%% for entry in ch
+		case {{ loop.index0 }}:
+			return bool(LogicDma{{ loop.index0 }}::getInterruptFlags() &
+						DmaBase::InterruptFlags::TransferComplete);
+%% endfor
+		default:
+			return false;
+	}
+}
+
+static bool
+transferError(uint8_t channel)
+{
+	switch (channel)
+	{
+%% for entry in ch
+		case {{ loop.index0 }}:
+			return bool(LogicDma{{ loop.index0 }}::getInterruptFlags() &
+						DmaBase::InterruptFlags::Error);
+%% endfor
+		default:
+			return false;
+	}
+}
+
+}	// anonymous namespace
+
+extern "C"
+{
+modm_logic_analyzer_t modm_logic_analyzer =
+{
+	.magic = 0x4C4F4741,
+	.version = 3,
+	.rate = 0,
+	.samples = modm::LogicAnalyzer::Samples,
+	.ports = 0,
+	.timer = {{ timer }},
+	.port = {0, 0, 0, 0},
+	.base = {0, 0, 0, 0},
+	.buffer = {
+%% for ii in range(4)
+%% if ii < ch|length
+		buffers[{{ ii }}],
+%% else
+		nullptr,
+%% endif
+%% endfor
+	},
+	.ndtr = {
+%% for ii in range(4)
+%% if ii < ch|length
+		ndtr{{ ii }},
+%% else
+		nullptr,
+%% endif
+%% endfor
+	},
+	.circular = 0,
+	.running = 0,
+	.count = {0, 0, 0, 0},
+	.head = {0, 0, 0, 0},
+};
+}
+
+uint32_t
+modm::LogicAnalyzer::startImpl(const std::array<uint32_t, MaxPorts> &port,
+							   const std::array<uint8_t, MaxPorts> &index,
+							   uint8_t ports,
+							   uint32_t prescaler, uint32_t period, uint32_t rate,
+							   bool circular)
+{
+	stop();
+
+%% for entry in ch
+	DmaController<{{ entry.dma }}>::enable();
+%% endfor
+	Rcc::enable<Peripheral::Tim{{ timer }}>();
+	clocksEnabled = true;
+
+	TIMER->CR1 = 0;
+	TIMER->DIER = 0;
+	TIMER->PSC = prescaler - 1;
+	TIMER->ARR = period - 1;
+	TIMER->CCMR1 = 0;
+%% if ch|length >= 3
+	TIMER->CCMR2 = 0;
+%% endif
+	TIMER->CCER = 0;
+	// All compare events must happen on the same counter value.
+%% for ii in range(ch|length)
+	TIMER->CCR{{ ii + 1 }} = period / 2;
+%% endfor
+	// Reload PSC and ARR, reset the counter and clear the flags.
+	TIMER->EGR = TIM_EGR_UG;
+	TIMER->SR = 0;
+
+	modm_logic_analyzer.rate = rate;
+	modm_logic_analyzer.ports = ports;
+	for (uint8_t ii = 0; ii < 4; ii++)
+	{
+		modm_logic_analyzer.port[ii] = 0;
+		modm_logic_analyzer.base[ii] = 0;
+		modm_logic_analyzer.count[ii] = 0;
+		modm_logic_analyzer.head[ii] = 0;
+	}
+	for (uint8_t ii = 0; ii < ports; ii++)
+	{
+		modm_logic_analyzer.port[ii] = index[ii];
+		modm_logic_analyzer.base[ii] = port[ii];
+	}
+	modm_logic_analyzer.circular = circular;
+	modm_logic_analyzer.running = 1;
+
+%% for entry in ch
+	if (ports > {{ loop.index0 }})
+		configure<LogicDma{{ loop.index0 }}, DmaBase::Request::{{ entry.request }}>(
+			port[{{ loop.index0 }}], buffers[{{ loop.index0 }}], circular, fcr{{ loop.index0 }});
+%% endfor
+
+%% for entry in ch
+	if (ports > {{ loop.index0 }})
+		LogicDma{{ loop.index0 }}::start();
+%% endfor
+
+	uint32_t dier = 0;
+%% for ii in range(ch|length)
+	if (ports > {{ ii }}) dier |= TIM_DIER_CC{{ ii + 1 }}DE;
+%% endfor
+	TIMER->CNT = 0;
+	TIMER->DIER = dier;
+	TIMER->CR1 = TIM_CR1_CEN;
+
+	return rate;
+}
+
+void
+modm::LogicAnalyzer::stop()
+{
+	if (not clocksEnabled)
+	{
+		modm_logic_analyzer.running = 0;
+		return;
+	}
+
+	TIMER->CR1 = 0;
+	TIMER->DIER = 0;
+%% for entry in ch
+	LogicDma{{ loop.index0 }}::stop();
+%% endfor
+
+	if (not modm_logic_analyzer.running)
+		return;
+
+	const bool circular = modm_logic_analyzer.circular;
+	for (uint8_t channel = 0; channel < modm_logic_analyzer.ports; channel++)
+	{
+		const uint32_t remaining = *modm_logic_analyzer.ndtr[channel];
+		const uint32_t written = (remaining <= Samples) ? (Samples - remaining) : 0;
+		if (circular and transferComplete(channel))
+		{
+			modm_logic_analyzer.count[channel] = Samples;
+			modm_logic_analyzer.head[channel] = written % Samples;
+		}
+		else
+		{
+			modm_logic_analyzer.count[channel] = written;
+			modm_logic_analyzer.head[channel] = 0;
+		}
+	}
+	modm_logic_analyzer.running = 0;
+}
+
+bool
+modm::LogicAnalyzer::isRunning()
+{
+	if (not clocksEnabled or not modm_logic_analyzer.running)
+		return false;
+	if (not (TIMER->CR1 & TIM_CR1_CEN))
+		return false;
+	for (uint8_t channel = 0; channel < modm_logic_analyzer.ports; channel++)
+		if (transferError(channel))
+			return false;
+	if (modm_logic_analyzer.circular)
+		return true;
+	for (uint8_t channel = 0; channel < modm_logic_analyzer.ports; channel++)
+		if (*modm_logic_analyzer.ndtr[channel] != 0)
+			return true;
+	return false;
+}
+
+uint32_t
+modm::LogicAnalyzer::rate()
+{
+	return modm_logic_analyzer.rate;
+}
+
+size_t
+modm::LogicAnalyzer::count(uint8_t channel)
+{
+	return (channel < modm_logic_analyzer.ports) ? modm_logic_analyzer.count[channel] : 0;
+}
+
+uint8_t
+modm::LogicAnalyzer::ports()
+{
+	return modm_logic_analyzer.ports;
+}
+
+uint8_t
+modm::LogicAnalyzer::port(uint8_t channel)
+{
+	return (channel < modm_logic_analyzer.ports) ? modm_logic_analyzer.port[channel] : 0xff;
+}
+
+uint32_t
+modm::LogicAnalyzer::head(uint8_t channel)
+{
+	return (channel < modm_logic_analyzer.ports) ? modm_logic_analyzer.head[channel] : 0;
+}
+
+const uint32_t *
+modm::LogicAnalyzer::data(uint8_t channel)
+{
+	return (channel < modm_logic_analyzer.ports) ? modm_logic_analyzer.buffer[channel] : nullptr;
+}
