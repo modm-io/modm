@@ -1,0 +1,18 @@
+<library>
+  <extends>modm:nucleo-h743zi</extends>
+  <!-- <extends>modm:nucleo-f429zi</extends> -->
+  <!-- <extends>modm:nucleo-f722ze</extends> -->
+  <!-- <extends>modm:disco-f746ng</extends> -->
+  <!-- <extends>modm:nucleo-l476rg</extends> -->
+  <!-- <extends>modm:nucleo-f103rb</extends> -->
+  <!-- <extends>modm:nucleo-f091rc</extends> -->
+  <!-- <extends>modm:nucleo-l152re</extends> -->
+  <options>
+    <option name="modm:driver:logic_analyzer:channels">4</option>
+    <option name="modm:driver:logic_analyzer:samples">256</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:driver:logic_analyzer</module>
+  </modules>
+</library>
