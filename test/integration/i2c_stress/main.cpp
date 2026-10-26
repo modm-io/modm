@@ -406,7 +406,7 @@ test()
 {
 #if __has_include(<modm/driver/logic_analyzer.hpp>)
 	// Keeps the first error of both runs
-	modm::LogicAnalyzer::start<Board::SystemClock, dev::Scl, dev::Sda>(500'000, true); // 32 ms
+	modm::LogicAnalyzer::start<Board::SystemClock, 500'000, dev::Scl, dev::Sda>(true); // 32 ms
 #endif
 	// The noise has a higher priority than the I2C interrupts
 	Timer7::enable();
