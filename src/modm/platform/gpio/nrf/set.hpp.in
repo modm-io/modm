@@ -42,36 +42,30 @@ protected:
 	}
 
 	static constexpr uint32_t
-	inputConfig(InputType type)
+	pullConfig(InputType type)
 	{
 		const Pull pull =
 			(type == InputType::PullUp) ? Pull::Pullup :
 			(type == InputType::PullDown) ? Pull::Pulldown :
 			Pull::Disabled;
-		return (i(Dir::Input) << GPIO_PIN_CNF_DIR_Pos)
-			| (i(Input::Connect) << GPIO_PIN_CNF_INPUT_Pos)
-			| (i(pull) << GPIO_PIN_CNF_PULL_Pos)
-			| (i(OutputType::PushPull) << GPIO_PIN_CNF_DRIVE_Pos)
-			| (i(Sense::Disabled) << GPIO_PIN_CNF_SENSE_Pos);
+		return (i(Input::Connect) << GPIO_PIN_CNF_INPUT_Pos)
+			| (i(pull) << GPIO_PIN_CNF_PULL_Pos);
 	}
 
 	static constexpr uint32_t
-	outputConfig(OutputType drive)
+	driveConfig(OutputType drive)
 	{
-		return (i(Dir::Output) << GPIO_PIN_CNF_DIR_Pos)
-			| (i(Input::Connect) << GPIO_PIN_CNF_INPUT_Pos)
-			| (i(Pull::Disabled) << GPIO_PIN_CNF_PULL_Pos)
-			| (i(drive) << GPIO_PIN_CNF_DRIVE_Pos)
-			| (i(Sense::Disabled) << GPIO_PIN_CNF_SENSE_Pos);
+		return (i(Input::Connect) << GPIO_PIN_CNF_INPUT_Pos)
+			| (i(drive) << GPIO_PIN_CNF_DRIVE_Pos);
 	}
 
 	template<typename PortT>
 	static void
-	configurePins(PortT *port, uint32_t m, uint32_t cnf)
+	configurePins(PortT *port, uint32_t m, uint32_t clear, uint32_t cnf)
 	{
 		for (uint8_t pin{0}; pin < 32; ++pin)
 			if (m & (1ul << pin))
-				port->PIN_CNF[pin] = cnf;
+				port->PIN_CNF[pin] = (port->PIN_CNF[pin] & ~clear) | cnf;
 	}
 
 public:
@@ -105,7 +99,8 @@ public:
 	configure(OutputType type)
 	{
 %% for port, id in ports.items()
-		if constexpr (mask({{id}})) configurePins(NRF_{{port}}, mask({{id}}), outputConfig(type));
+		if constexpr (mask({{id}})) configurePins(NRF_{{port}}, mask({{id}}),
+				GPIO_PIN_CNF_INPUT_Msk | GPIO_PIN_CNF_DRIVE_Msk, driveConfig(type));
 %% endfor
 	}
 
@@ -128,7 +123,8 @@ public:
 	configure(InputType type)
 	{
 %% for port, id in ports.items()
-		if constexpr (mask({{id}})) configurePins(NRF_{{port}}, mask({{id}}), inputConfig(type));
+		if constexpr (mask({{id}})) configurePins(NRF_{{port}}, mask({{id}}),
+				GPIO_PIN_CNF_INPUT_Msk | GPIO_PIN_CNF_PULL_Msk, pullConfig(type));
 %% endfor
 	}
 
