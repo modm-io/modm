@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2026, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":driver:usb3803"
+    module.description = """\
+# USB3803 USB 2.0 Hub
+
+The Microchip USB3803 is a high-speed USB 2.0 hub with three downstream ports
+and a bypass switch for mobile devices.
+See https://www.microchip.com/en-us/product/usb3803
+
+Its I2C slave port is only available from the time RESET_N is released until
+the hub connects to the upstream host, and only while REFCLK is running.
+By default, the hub completes its configuration stage autonomously after 400ms,
+so the configuration must be held first with `setInterlock()` to access the
+registers without this deadline and then released again for the hub to
+connect.
+
+The driver configures the USB descriptors and strings, the power reporting,
+the port disabling, remapping and DP/DM swapping, the upstream charger
+detection and downstream battery charging, the interrupts, and the PHY squelch
+and drive strength of every port.
+"""
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:i2c.device",
+        ":architecture:register")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/driver/usb"
+    env.copy("usb3803.hpp")
