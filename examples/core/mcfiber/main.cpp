@@ -55,10 +55,8 @@ modm_fastdata_core1 CoreData d1;
 modm_faststack_core0 modm::Fiber<256> fiber01([]{fiber_function1(d0);});
 modm_faststack_core0 modm::Fiber<256> fiber02([]{fiber_function2(d0);});
 // Do not autostart these fibers, otherwise they run on the Core0 scheduler!
-modm_faststack_core1
-modm::Fiber<256> fiber11([]{fiber_function1(d1);}, modm::fiber::Start::Later);
-modm_faststack_core1
-modm::Fiber<256> fiber12([]{fiber_function2(d1);}, modm::fiber::Start::Later);
+modm_faststack_core1 modm::Fiber<256> fiber11;
+modm_faststack_core1 modm::Fiber<256> fiber12;
 
 template<typename TimeDiff>
 static void
@@ -78,8 +76,8 @@ void
 core1_main()
 {
 	// Start the fibers on the Core1 scheduler
-	fiber11.start();
-	fiber12.start();
+	(void) fiber11.start([]{fiber_function1(d1);});
+	(void) fiber12.start([]{fiber_function2(d1);});
 	const modm::PreciseTimestamp start = modm::PreciseClock::now();
 	modm::fiber::Scheduler::run();
 	const auto diff = (modm::PreciseClock::now() - start);

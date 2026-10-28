@@ -62,29 +62,31 @@ struct Test
 modm_faststack modm::Fiber fiber_y1([]{ modm::this_fiber::yield();  counter.stop(); });
 modm_faststack modm::Fiber fiber_y2([]{ counter.start(); modm::this_fiber::yield(); });
 
-modm_faststack modm::Fiber fiber1(fiber_function1, modm::fiber::Start::Later);
-modm_faststack modm::Fiber fiber2([]{ fiber_function2(cycles); }, modm::fiber::Start::Later);
-modm_faststack modm::Fiber fiber3([]{ test.fiber_function3(); }, modm::fiber::Start::Later);
-modm_faststack modm::Fiber fiber4([cyc=uint32_t(0)]() mutable
-{ cyc = cycles; test.fiber_function4(cyc); }, modm::fiber::Start::Later);
+modm_faststack modm::Fiber fiber1;
+modm_faststack modm::Fiber fiber2;
+modm_faststack modm::Fiber fiber3;
+modm_faststack modm::Fiber fiber4;
 
 // Restartable Fibers
-extern modm::Fiber<> fiber_pong;
-extern modm::Fiber<> fiber_ping;
+modm_faststack modm::Fiber<> fiber_ping;
+modm_faststack modm::Fiber<> fiber_pong;
 bool benchmark_passed{false};
 uint8_t restarts{0};
-modm_faststack modm::Fiber<> fiber_ping([]{
+void pong();
+void ping()
+{
 	MODM_LOG_INFO << "ping = " << fiber_ping.stack_usage() << modm::endl;
 	// fibers can restart each other several times
 	if (++restarts >= 3) finishTest(benchmark_passed);
 	modm::this_fiber::sleep_for(100ms);
-	fiber_pong.start();
-}, modm::fiber::Start::Later);
-modm_faststack modm::Fiber<> fiber_pong([]{
+	(void) fiber_pong.start(pong);
+}
+void pong()
+{
 	MODM_LOG_INFO << "pong = " << fiber_pong.stack_usage() << modm::endl;
 	modm::this_fiber::sleep_for(100ms);
-	fiber_ping.start();
-}, modm::fiber::Start::Later);
+	(void) fiber_ping.start(ping);
+}
 
 // Blue pill (M3 72MHz): Executed 1000000 in 1098591us (910256.88 yields per second)
 // Feather M0 (M0+ 48MHz): Executed 1000000 in 1944692us (514220.25 yields per second)
@@ -107,10 +109,11 @@ main()
 	MODM_LOG_INFO.flush();
 
 	// the rest is manually started
-	fiber1.start(); fiber1.stack_watermark();
-	fiber2.start(); fiber2.stack_watermark();
-	fiber3.start(); fiber3.stack_watermark();
-	fiber4.start(); fiber4.stack_watermark();
+	(void) fiber1.start(fiber_function1); fiber1.stack_watermark();
+	(void) fiber2.start([]{ fiber_function2(cycles); }); fiber2.stack_watermark();
+	(void) fiber3.start([]{ test.fiber_function3(); }); fiber3.stack_watermark();
+	(void) fiber4.start([cyc=uint32_t(0)]() mutable
+	{ cyc = cycles; test.fiber_function4(cyc); }); fiber4.stack_watermark();
 	const modm::PreciseTimestamp start = modm::PreciseClock::now();
 	modm::fiber::Scheduler::run();
 	const auto diff = (modm::PreciseClock::now() - start);
@@ -132,7 +135,7 @@ main()
 	// every fiber yields until its counter reaches the number of cycles
 	benchmark_passed = (total_counter == 4 * (cycles - 1));
 
-	fiber_ping.start();
+	(void) fiber_ping.start(ping);
 	modm::fiber::Scheduler::run(modm::fiber::Scheduler::AutoWatermark);
 
 	// the restarting fibers never finished

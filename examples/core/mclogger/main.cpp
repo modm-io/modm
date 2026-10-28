@@ -40,7 +40,14 @@ class Thread : public modm::Fiber<>
 	static constexpr auto delay = 10ms + 1ms * Instance;
 
 public:
-	Thread() : Fiber([this]{ run(); }, Core == 0 ? modm::fiber::Start::Now : modm::fiber::Start::Later) {}
+	// Only start the Core0 threads here, otherwise they run on the Core0 scheduler!
+	Thread() { if constexpr (Core == 0) start(); }
+
+	bool
+	start()
+	{
+		return Fiber::start([this]{ run(); });
+	}
 
 	void
 	run()

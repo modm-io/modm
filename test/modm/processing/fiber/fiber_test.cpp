@@ -92,7 +92,6 @@ struct Live
 	Live(const Live&) { count++; }
 	~Live() { count--; }
 };
-modm::Fiber<> fiber_args([]{}, modm::fiber::Start::Later);
 }
 
 void
@@ -114,19 +113,22 @@ FiberTest::testFiberArguments()
 		TEST_ASSERT_EQUALS(sum, 6002u);
 	}
 	{
-		// With a stop token and delayed start
-		modm::fiber::Task stoppable(stack1, [&](modm::fiber::stop_token stoken, int value)
-		{
-			while (not stoken.stop_requested()) modm::this_fiber::yield();
-			sum = value;
-		}, modm::fiber::Start::Later, 42);
+		// Without a closure the task cannot be started
+		modm::fiber::Task stoppable(stack1);
 		TEST_ASSERT_FALSE(stoppable.isRunning());
+		TEST_ASSERT_FALSE(stoppable.start());
+		TEST_ASSERT_FALSE(stoppable.isRunning());
+		// With a stop token and a delayed start
 		modm::fiber::Task stopper(stack2, [&]
 		{
 			modm::this_fiber::yield();
 			stoppable.request_stop();
 		});
-		TEST_ASSERT_TRUE(stoppable.start());
+		TEST_ASSERT_TRUE(stoppable.start([&](modm::fiber::stop_token stoken, int value)
+		{
+			while (not stoken.stop_requested()) modm::this_fiber::yield();
+			sum = value;
+		}, 42));
 		modm::fiber::Scheduler::run();
 		TEST_ASSERT_EQUALS(sum, 42u);
 	}
@@ -139,7 +141,9 @@ FiberTest::testFiberArguments()
 	}
 	TEST_ASSERT_EQUALS(Live::count, 0);
 
-	// Replace the closure and arguments
+	// Start the empty task with a closure and arguments
+	modm::fiber::Task fiber_args(stack2);
+	TEST_ASSERT_FALSE(fiber_args.start());
 	TEST_ASSERT_TRUE(fiber_args.start([&, live=Live{}](uint8_t a)
 	{
 		modm::this_fiber::yield();

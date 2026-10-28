@@ -18,16 +18,30 @@
 namespace modm::fiber
 {
 
+template<size_t Size>
+Task::Task(Stack<Size>& stack)
+: ctx{nullptr, stack.memory, stack.memory + stack.words}, end{stack.memory + stack.words}
+{}
+
 template<size_t Size, class T, class... Args>
-Task::Task(Stack<Size>& stack, T&& closure, Start start, Args&&... args)
+Task::Task(Stack<Size>& stack, T&& closure, Args&&... args)
+: Task(stack)
 {
-	emplace(stack, std::forward<T>(closure), std::forward<Args>(args)...);
+	emplace<Size>(std::forward<T>(closure), std::forward<Args>(args)...);
+	start();
+}
+
+template<size_t Size, class T>
+Task::Task(Stack<Size>& stack, T&& closure, Start start)
+: Task(stack)
+{
+	emplace<Size>(std::forward<T>(closure));
 	if (start == Start::Now) this->start();
 }
 
 template<size_t Size, class T, class... Args>
 void
-Task::emplace(Stack<Size>& stack, T&& closure, Args&&... args)
+Task::emplace(T&& closure, Args&&... args)
 {
 	if constexpr (sizeof...(Args))
 	{
@@ -37,7 +51,7 @@ Task::emplace(Stack<Size>& stack, T&& closure, Args&&... args)
 				stop_token, std::decay_t<Args>&...>;
 		static_assert(with_stop_token or std::is_invocable_v<std::decay_t<T>&, std::decay_t<Args>&...>,
 				"Closure must be callable with the arguments as lvalues!");
-		emplace(stack, [closure = std::forward<T>(closure), ...args = std::forward<Args>(args)]
+		emplace<Size>([closure = std::forward<T>(closure), ...args = std::forward<Args>(args)]
 					   (stop_token stoken) mutable
 		{
 			if constexpr (with_stop_token) closure(stoken, args...);
@@ -66,8 +80,8 @@ Task::emplace(Stack<Size>& stack, T&& closure, Args&&... args)
 				} else fn();
 				fiber::Scheduler::instance().unschedule();
 			};
-			modm_context_init(&ctx, stack.memory, stack.memory + stack.words,
-							  caller, (uintptr_t) static_cast<Callable>(closure));
+			modm_context_init(&ctx, ctx.bottom, end, caller,
+							  (uintptr_t) static_cast<Callable>(closure));
 		}
 		else
 		{
@@ -75,10 +89,15 @@ Task::emplace(Stack<Size>& stack, T&& closure, Args&&... args)
 			// lambda functions with a closure must be allocated on the stack ALIGNED!
 			constexpr size_t align_mask = std::max(StackAlignment, alignof(Closure)) - 1u;
 			constexpr size_t closure_size = (sizeof(Closure) + align_mask) & ~align_mask;
-			static_assert(Size >= closure_size + StackSizeMinimum,
-					"Stack size must be larger than minimum stack size + aligned sizeof(closure))!");
+			if constexpr (Size) {
+				static_assert(Size >= closure_size + StackSizeMinimum,
+						"Stack size must be larger than minimum stack size + aligned sizeof(closure))!");
+			} else {
+				modm_assert(uintptr_t(end) - uintptr_t(ctx.bottom) >= closure_size + StackSizeMinimum,
+						"fbr.size", "Stack size must be larger than minimum stack size + aligned sizeof(closure))!");
+			}
 			// Find a suitable aligned area at the top of stack to allocate the closure
-			const uintptr_t ptr = uintptr_t(stack.memory + stack.words) - closure_size;
+			const uintptr_t ptr = uintptr_t(end) - closure_size;
 			// construct closure in place
 			::new ((void*)ptr) Closure{std::forward<T>(closure)};
 			if constexpr (not std::is_trivially_destructible_v<Closure>)
@@ -92,7 +111,7 @@ Task::emplace(Stack<Size>& stack, T&& closure, Args&&... args)
 				fiber::Scheduler::instance().unschedule();
 			};
 			// initialize the stack below the allocated closure
-			modm_context_init(&ctx, stack.memory, (uintptr_t*)ptr, caller, ptr);
+			modm_context_init(&ctx, ctx.bottom, (uintptr_t*)ptr, caller, ptr);
 		}
 	}
 }
@@ -100,11 +119,21 @@ Task::emplace(Stack<Size>& stack, T&& closure, Args&&... args)
 bool inline
 Task::start()
 {
-	if (isRunning()) return false;
+	// Tasks without closure have never been initialized
+	if (isRunning() or not ctx.sp) return false;
 	modm_context_reset(&ctx);
 	stop.reset();
 	Scheduler::instance().add(this);
 	return true;
+}
+
+template<class T, class... Args>
+bool
+Task::start(T&& closure, Args&&... args)
+{
+	if (isRunning()) return false;
+	emplace<0>(std::forward<T>(closure), std::forward<Args>(args)...);
+	return start();
 }
 
 constexpr unsigned int

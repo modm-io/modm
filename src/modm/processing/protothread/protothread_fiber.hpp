@@ -29,12 +29,17 @@ namespace modm::pt
 class Protothread : public modm::Fiber< MODM_PROTOTHREAD_STACK_SIZE >
 {
 public:
-	Protothread(modm::fiber::Start start=modm::fiber::Start::Now)
-	:	Fiber([this](modm::fiber::stop_token stoken)
-			  { while(not stoken.stop_requested() and update()) modm::this_fiber::yield(); }, start)
-	{}
+	Protothread() { restart(); }
 
-	void restart() { this->start(); }
+	[[deprecated("Construct without argument and call restart() instead!")]]
+	Protothread(modm::fiber::Start start) // DEPRECATED: 2027q4
+	{ if (start == modm::fiber::Start::Now) restart(); }
+
+	void restart()
+	{
+		(void) this->start([this](modm::fiber::stop_token stoken)
+			{ while(not stoken.stop_requested() and update()) modm::this_fiber::yield(); });
+	}
 	void stop() { this->request_stop(); }
 	// isRunning() is implemented in fiber::Task
 
