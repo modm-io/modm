@@ -33,6 +33,9 @@ public:
 	testYieldFromSubroutine();
 
 	void
+	testFiberArguments();
+
+	void
 	testPollFor();
 
 	void

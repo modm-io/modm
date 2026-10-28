@@ -64,19 +64,37 @@ class Task
 	Task* next;
 	Scheduler *scheduler{nullptr};
 	stop_state stop{};
+	// Destroys the closure at the top of the stack, nullptr if trivial
+	void (*destroy)(uintptr_t*){nullptr};
+
+protected:
+	/// Destroys the previous closure and constructs the new one with the
+	/// arguments bound to it on the stack. The task must not be running!
+	template<size_t Size, class Callable, class... Args>
+	void
+	emplace(Stack<Size>& stack, Callable&& closure, Args&&... args);
 
 public:
 	/// @param stack	A stack object that is *NOT* shared with other tasks.
-	/// @param closure	A callable object of signature `void()`.
+	/// @param closure	A callable object of signature `void(args...)`.
 	/// @param start	When to start this task.
-	template<size_t Size, class Callable>
-	Task(Stack<Size>& stack, Callable&& closure, Start start=Start::Now);
+	/// @param args		Arguments that are copied into the stack and passed to
+	/// 				the closure every time the task is started.
+	template<size_t Size, class Callable, class... Args>
+	Task(Stack<Size>& stack, Callable&& closure, Start start, Args&&... args);
+
+	/// Starts the task immediately.
+	template<size_t Size, class Callable, class... Args>
+	Task(Stack<Size>& stack, Callable&& closure, Args&&... args)
+	: Task(stack, std::forward<Callable>(closure), Start::Now, std::forward<Args>(args)...)
+	{}
 
 	inline
 	~Task()
 	{
 		request_stop();
 		join();
+		if (destroy and not isRunning()) destroy(ctx.top);
 	}
 
 	/// Returns the number of concurrent threads supported by the implementation.
@@ -180,10 +198,24 @@ class Fiber : public fiber::Task
 {
 	fiber::Stack<StackSize> stack;
 public:
-	template<class T>
-	Fiber(T&& task, fiber::Start start=fiber::Start::Now)
-	: Task(stack, std::forward<T>(task), start)
+	template<class Callable, class... Args>
+	Fiber(Callable&& closure, Args&&... args)
+	: Task(stack, std::forward<Callable>(closure), std::forward<Args>(args)...)
 	{}
+
+	using Task::start;
+
+	/// Replaces the closure and its arguments and adds the fiber to the
+	/// currently active scheduler, if it is not already running.
+	/// @returns if the fiber has been scheduled.
+	template<class Callable, class... Args>
+	[[nodiscard]] bool
+	start(Callable&& closure, Args&&... args)
+	{
+		if (isRunning()) return false;
+		emplace(stack, std::forward<Callable>(closure), std::forward<Args>(args)...);
+		return Task::start();
+	}
 };
 
 }	// namespace modm

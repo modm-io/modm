@@ -82,6 +82,82 @@ FiberTest::testTwoFibers()
 	modm::fiber::Scheduler::run();
 }
 
+namespace
+{
+// counts the live copies to check that closures are destructed
+struct Live
+{
+	static inline int8_t count{0};
+	Live() { count++; }
+	Live(const Live&) { count++; }
+	~Live() { count--; }
+};
+modm::Fiber<> fiber_args([]{}, modm::fiber::Start::Later);
+}
+
+void
+FiberTest::testFiberArguments()
+{
+	uint32_t sum{0};
+	{
+		modm::fiber::Task fiber(stack1, [&](uint8_t a, uint32_t b)
+		{
+			sum += a * b;
+			modm::this_fiber::yield();
+			sum += 1;
+		}, 3, 1000);
+		modm::fiber::Scheduler::run();
+		TEST_ASSERT_EQUALS(sum, 3001u);
+		// Restarting reuses the same arguments
+		TEST_ASSERT_TRUE(fiber.start());
+		modm::fiber::Scheduler::run();
+		TEST_ASSERT_EQUALS(sum, 6002u);
+	}
+	{
+		// With a stop token and delayed start
+		modm::fiber::Task stoppable(stack1, [&](modm::fiber::stop_token stoken, int value)
+		{
+			while (not stoken.stop_requested()) modm::this_fiber::yield();
+			sum = value;
+		}, modm::fiber::Start::Later, 42);
+		TEST_ASSERT_FALSE(stoppable.isRunning());
+		modm::fiber::Task stopper(stack2, [&]
+		{
+			modm::this_fiber::yield();
+			stoppable.request_stop();
+		});
+		TEST_ASSERT_TRUE(stoppable.start());
+		modm::fiber::Scheduler::run();
+		TEST_ASSERT_EQUALS(sum, 42u);
+	}
+	{
+		// Closures and arguments are destructed with the task
+		modm::fiber::Task fiber(stack1, [live=Live{}](Live) {}, Live{});
+		TEST_ASSERT_EQUALS(Live::count, 2);
+		modm::fiber::Scheduler::run();
+		TEST_ASSERT_EQUALS(Live::count, 2);
+	}
+	TEST_ASSERT_EQUALS(Live::count, 0);
+
+	// Replace the closure and arguments
+	TEST_ASSERT_TRUE(fiber_args.start([&, live=Live{}](uint8_t a)
+	{
+		modm::this_fiber::yield();
+		sum = a;
+	}, 7));
+	TEST_ASSERT_EQUALS(Live::count, 1);
+	// Already running: neither restarted nor replaced
+	TEST_ASSERT_FALSE(fiber_args.start([&](uint8_t a) { sum = a; }, 5));
+	TEST_ASSERT_EQUALS(Live::count, 1);
+	modm::fiber::Scheduler::run();
+	TEST_ASSERT_EQUALS(sum, 7u);
+
+	TEST_ASSERT_TRUE(fiber_args.start([&](uint16_t a, uint32_t b) { sum = a + b; }, 1000, 2000));
+	TEST_ASSERT_EQUALS(Live::count, 0);
+	modm::fiber::Scheduler::run();
+	TEST_ASSERT_EQUALS(sum, 3000u);
+}
+
 static __attribute__((noinline)) void
 subroutine()
 {

@@ -43,7 +43,8 @@ struct modm_context_t
 /**
  * Initializes the context with the function pointer and argument stored at the
  * top. The `ctx->sp` is set to two `uintptr_t` below the top.
- * Must be called only once to initialize the stack.
+ * Must be called before `modm_context_reset()` and may be called again to
+ * change the function and argument, but *NOT* while the fiber is running!
  *
  * @param fn function pointer to a `void(*)(uintptr_t)` function.
  */

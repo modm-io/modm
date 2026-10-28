@@ -111,8 +111,10 @@ Fibers can end by returning from their wrapper, after which they will be removed
 from the scheduler. A fiber can then be restarted again by calling `start()`,
 which will call the closure again from the beginning. Note, that the lambda
 capture is not destructed and reconstructed, but remains unchanged between
-restarts. If you need a fiber that is only callable once, you can implement this
-behavior manually with a boolean in the capture:
+restarts. The closure is only destructed when the fiber is started with a new
+function or when the fiber object is destructed. If you need a fiber that is
+only callable once, you can implement this behavior manually with a boolean
+in the capture:
 
 ```cpp
 modm::Fiber fiber([ran=false]
@@ -121,6 +123,35 @@ modm::Fiber fiber([ran=false]
 	ran = true;
 	// only called once.
 });
+```
+
+
+## Arguments
+
+Similar to `std::thread`, the fiber function can take arguments, which are
+copied into the fiber stack next to the lambda capture. A
+`modm::fiber::stop_token` can still be the first parameter:
+
+```cpp
+modm::Fiber fiber([](modm::fiber::stop_token stoken, uint8_t position)
+{
+	test(position);
+}, 2);
+// With a delayed start
+modm::Fiber<1024> fiber2(function, modm::fiber::Start::Later, 2, 4);
+```
+
+The arguments are passed to the function as lvalues so that they remain valid
+when the fiber is restarted. Use a reference parameter for move-only types.
+
+A `modm::Fiber` can also be started with a new function and arguments, which
+destructs the old ones and constructs the new ones on the stack. Like `start()`,
+this returns `false` without changing anything while the fiber is running:
+
+```cpp
+modm::Fiber fiber(function, modm::fiber::Start::Later);
+// later, once fiber.isRunning() is false
+bool started = fiber.start([](uint8_t position) { test(position); }, 4);
 ```
 
 
