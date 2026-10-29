@@ -21,7 +21,6 @@ template < typename I2cMaster >
 constexpr modm::Adxl345<I2cMaster>::Adxl345(uint8_t* data, uint8_t address)
 :	I2cDevice<I2cMaster>(address), status(0), data(data)
 {
-	configureWriteRead(buffer, 0, data, 0);
 }
 
 template < typename I2cMaster >
@@ -72,8 +71,8 @@ modm::Adxl345<I2cMaster>::update()
 	if (status & READ_ACCELEROMETER_PENDING)
 	{
 		buffer[0] = adxl345::REGISTER_DATA_X0;
-		if (I2cDevice<I2cMaster>::writeRead(buffer, 1, data, 6);) {
-			status &= ~READ_ACCELEROMETER_PENDING;
+		if (I2cDevice<I2cMaster>::writeRead(buffer, 1, data, 6)) {
+			status = (status & ~READ_ACCELEROMETER_PENDING) | NEW_ACCELEROMETER_DATA;
 		}
 	}
 }
@@ -85,7 +84,7 @@ modm::Adxl345<I2cMaster>::writeRegister(adxl345::Register reg, uint8_t value)
 {
 	buffer[0] = reg;
 	buffer[1] = value;
-	return I2cDevice<I2cMaster>::writeRead(buffer, 2, data, 0);
+	return I2cDevice<I2cMaster>::write(buffer, 2);
 }
 
 template < typename I2cMaster >
