@@ -77,12 +77,6 @@ private:
 		bool step_ok = (step != 0);
 		bool order_ok = not ((start > stop and step > 0) or (start < stop and step < 0));
 
-		// TODO: Use std::is_constant_evaluated() to make modm_assert redirect to static_assert!
-		// throw std::invalid_argument("Range step argument must not be zero");
-		// modm_assert_debug(step_ok, "algorithm", "range", "step");
-		// throw std::invalid_argument("Range arguments must result in termination");
-		// modm_assert_debug(order_ok, "algorithm", "range", "termination");
-
 		return step_ok and order_ok;
 	}
 
