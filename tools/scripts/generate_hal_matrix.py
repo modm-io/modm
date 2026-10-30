@@ -147,6 +147,8 @@ def hal_get_modules():
     mapping["Internal Flash"].update({"efc", "nvmctrl", "nvmc", "flash"})
     mapping["External Memory"].update({"sdramc", "smc", "quadspi", "xip_ssi", "octospi", "qspi", "fmc", "fsmc", "xspi", "hspi", "octospim", "xspim", "sdio", "sdmmc", "ebi", "hsmci", "qmi", "xip", "xip_aux", "ssi"})
     mapping["System Clock"].update({"clock", "oscillators", "rcc", "mclk", "pm", "sysctrl", "oscctrl", "osc32kctrl", "clocks", "resets", "rosc"})
+    # The STM32 RCC module only reads the flash latency table, flash is no clock peripheral
+    mapping["System Clock"].discard("flash")
     mapping["Power"].update({"power", "regulators", "usbregulator", "vmc", "vreqctrl", "pwr", "supc", "powman", "psm", "vreg_and_chip_reset"})
     mapping["Watchdog"].update({"wdt", "iwdg", "wwdg", "rswdt", "watchdog"})
     mapping["Unique ID"].update({"ficr", "uicr", "chipid", "sysinfo", "otp", "otp_data", "otp_data_raw"})
