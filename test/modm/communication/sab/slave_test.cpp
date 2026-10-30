@@ -17,7 +17,7 @@ namespace
 	class TestingObject : public modm::sab::Callable
 	{
 	public:
-		TestingObject() :
+		constexpr TestingObject() :
 			calledFunction(NONE), returnValue(0x12345678), receivedParameter(0)
 		{
 		}

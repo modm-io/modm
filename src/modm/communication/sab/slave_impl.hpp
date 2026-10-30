@@ -29,7 +29,7 @@ inline void
 modm::sab::Action::call(Response& response, const void *payload) const
 {
 	// redirect call to the actual object
-	(object->*function)(response, payload);
+	function(object, response, payload);
 }
 
 // Disable warnings for Visual Studio about using 'this' in a base member

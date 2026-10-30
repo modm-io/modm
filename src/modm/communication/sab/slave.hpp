@@ -135,7 +135,15 @@ namespace modm
 		 */
 		struct Action
 		{
-			typedef void (Callable::*Callback)(Response& response, const void *payload);
+			using Callback = void (*)(Callable *object, Response& response, const void *payload);
+
+			/// Calls `Function` on `object`, casted back to its own class
+			template<auto Function>
+			static void
+			invoke(Callable *object, Response& response, const void *payload)
+			{
+				call(Function, object, response, payload);
+			}
 
 			inline void
 			call(Response& response, const void *payload) const;
@@ -144,6 +152,21 @@ namespace modm
 			Callback function;			//!< Method callActionback
 			uint16_t payloadLength;		//!< Payload length in bytes
 			uint8_t command;
+
+		private:
+			template<typename C>
+			static void
+			call(void (C::*function)(Response&), Callable *object, Response& response, const void *)
+			{
+				(static_cast<C *>(object)->*function)(response);
+			}
+
+			template<typename C, typename P>
+			static void
+			call(void (C::*function)(Response&, const P *), Callable *object, Response& response, const void *payload)
+			{
+				(static_cast<C *>(object)->*function)(response, static_cast<const P *>(payload));
+			}
 		};
 
 		/**
@@ -269,7 +292,7 @@ namespace modm
 #else
 	#define	SAB_ACTION(command, object, function, length)		\
 		{	static_cast<modm::sab::Callable *>(&object), \
-			reinterpret_cast<modm::sab::Action::Callback>(&function), \
+			&modm::sab::Action::invoke<&function>, \
 			length, \
 			command }
 #endif	// __DOXYGEN__
