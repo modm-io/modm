@@ -17,6 +17,8 @@
 static_assert(modm::Vector2i(1, 2) + modm::Vector2i(3, 4) == modm::Vector2i(4, 6));
 static_assert(modm::Vector2f(3, 4).getLengthSquared() == 25.f);
 static_assert(modm::Vector2i(100, 100).getLength() == 141);
+static_assert(modm::Vector2i(1, 2).yx() == modm::Vector2i(2, 1));
+static_assert(modm::Vector3i(1, 2, 3).zyx() == modm::Vector3i(3, 2, 1));
 
 void
 Vector2Test::testConstructor()

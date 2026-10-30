@@ -17,6 +17,18 @@ static_assert([]{
 	constexpr int16_t a[5] = {1, 2, 3, 4, 5};
 	return modm::Vector<int16_t, 5>(a) == modm::Vector<int16_t, 5>(a);
 }());
+static_assert([]{
+	constexpr int16_t a[5] = {1, 2, 3, 4, 5};
+	modm::Vector<int16_t, 5> v(a);
+	v *= 2;
+	return v[4] == 10 and (-v)[0] == -2;
+}());
+static_assert(modm::Vector3i(modm::Vector2i(1, 2), 3) == modm::Vector3i(1, 2, 3));
+static_assert(modm::Vector4i(1, modm::Vector2i(2, 3), 4).wzyx() == modm::Vector4i(4, 3, 2, 1));
+static_assert(modm::Vector3i(1, 2, 3)[2] == 3);
+static_assert(modm::Vector3i(1, 2, 3) >= modm::Vector3i(1, 2, 3));
+static_assert((modm::Vector3i(1, 0, 0) ^ modm::Vector3i(0, 1, 0)) == modm::Vector3i(0, 0, 1));
+static_assert(2 * modm::Vector3i(1, 2, 3) == modm::Vector3i(2, 4, 6));
 
 void
 VectorTest::testConstructor()
