@@ -28,7 +28,7 @@ constexpr modm::interpolation::Lagrange<T, Accessor>::Lagrange(
 
 template <typename T,
 		  template <typename> class Accessor>
-typename modm::interpolation::Lagrange<T, Accessor>::OutputType
+constexpr typename modm::interpolation::Lagrange<T, Accessor>::OutputType
 modm::interpolation::Lagrange<T, Accessor>::interpolate(const InputType& value) const
 {
 	OutputType ret = 0;

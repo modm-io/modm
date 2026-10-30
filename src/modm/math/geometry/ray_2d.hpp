@@ -55,7 +55,7 @@ namespace modm
 		constexpr void
 		setStartPoint(const Vector<T, 2>& point);
 
-		inline const Vector<T, 2>&
+		constexpr const Vector<T, 2>&
 		getStartPoint() const;
 
 		constexpr void

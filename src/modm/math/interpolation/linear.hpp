@@ -63,7 +63,7 @@ namespace modm
 			 * \param 	value	input value
 			 * \return	interpolated value
 			 */
-			OutputType
+			constexpr OutputType
 			interpolate(const InputType& value) const;
 
 		private:

@@ -16,6 +16,11 @@
 
 #include "linear_interpolation_test.hpp"
 
+static_assert([]{
+	std::pair<int16_t, uint16_t> points[2] = {{-10, 50}, {50, 10}};
+	return modm::interpolation::Linear<std::pair<int16_t, uint16_t>>(points, 2).interpolate(20);
+}() == 30);
+
 void
 LinearInterpolationTest::testInterpolationRam()
 {

@@ -15,6 +15,8 @@
 
 #include "s_curve_controller_test.hpp"
 
+constexpr modm::SCurveController<int16_t>::Parameter sCurveParameter(10, 2, 3, 1, 100, 10, 0);
+
 void
 SCurveControllerTest::testConstructor()
 {

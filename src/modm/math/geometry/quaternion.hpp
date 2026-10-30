@@ -91,7 +91,7 @@ namespace modm
 		constexpr Quaternion normalized() const;
 		constexpr Quaternion conjugated() const;
 
-		Quaternion unitInverse();	//	assumes we have a unit quaternion
+		constexpr Quaternion unitInverse();	//	assumes we have a unit quaternion
 		constexpr Quaternion inverse();
 
 		constexpr void to4x4Matrix(Matrix<T, 4, 4> *outMatrix);

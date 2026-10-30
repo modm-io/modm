@@ -37,7 +37,7 @@ modm::LineSegment2D<T>::setStartPoint(const Vector<T, 2>& point)
 }
 
 template <typename T>
-inline const modm::Vector<T, 2>&
+constexpr const modm::Vector<T, 2>&
 modm::LineSegment2D<T>::getStartPoint() const
 {
 	return this->startPoint;
@@ -51,7 +51,7 @@ modm::LineSegment2D<T>::setEndPoint(const Vector<T, 2>& point)
 }
 
 template <typename T>
-inline const modm::Vector<T, 2>&
+constexpr const modm::Vector<T, 2>&
 modm::LineSegment2D<T>::getEndPoint() const
 {
 	return this->endPoint;

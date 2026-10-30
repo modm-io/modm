@@ -31,7 +31,7 @@ constexpr modm::Circle2D<T>::Circle2D(const Vector<T, 2>& inCenter, T inRadius) 
 
 // ----------------------------------------------------------------------------
 template <typename T>
-inline const modm::Vector<T, 2>&
+constexpr const modm::Vector<T, 2>&
 modm::Circle2D<T>::getCenter() const
 {
 	return this->center;

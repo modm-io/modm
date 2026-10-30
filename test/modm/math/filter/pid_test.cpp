@@ -16,6 +16,8 @@
 
 #include "pid_test.hpp"
 
+constexpr modm::Pid<int16_t, 10>::Parameter pidParameter(1.f, 0.5f, 0.f, 100, 200);
+
 void
 PidTest::testCreation()
 {

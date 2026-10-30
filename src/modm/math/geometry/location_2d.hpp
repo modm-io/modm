@@ -43,7 +43,7 @@ namespace modm
 
 		constexpr Location2D(const T& x, const T& y, const float& orientation);
 
-		inline const Vector<T, 2>&
+		constexpr const Vector<T, 2>&
 		getPosition() const;
 
 		constexpr const T&
@@ -94,7 +94,7 @@ namespace modm
 		move(T x, float phi);
 
 		/// TODO
-		Vector<T, 2>
+		constexpr Vector<T, 2>
 		translated(const Vector<T, 2>& vector) const;
 
 		/// Convert between Location-objects with different base-types

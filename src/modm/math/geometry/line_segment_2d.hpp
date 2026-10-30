@@ -51,14 +51,14 @@ namespace modm
 		constexpr void
 		setStartPoint(const Vector<T, 2>& point);
 
-		inline const Vector<T, 2>&
+		constexpr const Vector<T, 2>&
 		getStartPoint() const;
 
 		/// Set the end point of the line segment
 		constexpr void
 		setEndPoint(const Vector<T, 2>& point);
 
-		inline const Vector<T, 2>&
+		constexpr const Vector<T, 2>&
 		getEndPoint() const;
 
 		constexpr void

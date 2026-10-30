@@ -24,7 +24,7 @@
 
 // ----------------------------------------------------------------------------
 template<typename T>
-modm::SCurveController<T>::Parameter::Parameter(
+constexpr modm::SCurveController<T>::Parameter::Parameter(
 		const T& targetArea, const T& increment, const T& decreaseFactor, const T& kp,
 		const T& speedMaximum, const T& speedMinimum, const T& speedTarget) :
 	targetArea(targetArea), increment(increment), decreaseFactor(decreaseFactor), kp(kp),

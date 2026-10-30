@@ -55,13 +55,13 @@ namespace modm
 		constexpr void
 		setPoint(const Vector<T, 2>& point);
 
-		inline const Vector<T, 2>&
+		constexpr const Vector<T, 2>&
 		getPoint() const;
 
 		constexpr void
 		setDirectionVector(const Vector<T, 2>& vector);
 
-		inline const Vector<T, 2>&
+		constexpr const Vector<T, 2>&
 		getDirectionVector() const;
 
 		constexpr void

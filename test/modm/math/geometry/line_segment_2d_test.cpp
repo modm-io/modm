@@ -16,6 +16,8 @@
 
 #include "line_segment_2d_test.hpp"
 
+static_assert(modm::LineSegment2D<int16_t>({1, 2}, {3, 4}).getEndPoint() == modm::Vector2i(3, 4));
+
 void
 LineSegment2DTest::testDefaultConstructor()
 {

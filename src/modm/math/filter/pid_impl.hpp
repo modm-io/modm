@@ -16,7 +16,7 @@
 #define MODM_PID_IMPL_HPP
 
 template<typename T, unsigned int ScaleFactor>
-modm::Pid<T, ScaleFactor>::Parameter::Parameter(
+constexpr modm::Pid<T, ScaleFactor>::Parameter::Parameter(
 		const float& kp, const float& ki, const float& kd,
 		const T& maxErrorSum, const T& maxOutput) :
 	kp(static_cast<T>(kp * ScaleFactor)),

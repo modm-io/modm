@@ -85,8 +85,22 @@ namespace modm
 		 * Normalize the given angle to [-Pi,Pi] by repeatedly
 		 * adding/subtracting 2*Pi.
 		 */
-		static float
-		normalize(float angle);
+		static constexpr float
+		normalize(float angle)
+		{
+			if (not std::signbit(angle))
+			{
+				while (angle > std::numbers::pi_v<float>) {
+					angle -= 2 * std::numbers::pi_v<float>;
+				}
+			}
+			else {
+				while (angle < -std::numbers::pi_v<float>) {
+					angle += 2 * std::numbers::pi_v<float>;
+				}
+			}
+			return angle;
+		}
 
 		/**
 		 * \brief	Reverse the angle
@@ -98,8 +112,12 @@ namespace modm
 		 * float angle = modm::Angle::normalize(angle + M_PI);
 		 * \endcode
 		 */
-		static float
-		reverse(float angle);
+		static constexpr float
+		reverse(float angle)
+		{
+			if (not std::signbit(angle)) return angle - std::numbers::pi_v<float>;
+			return angle + std::numbers::pi_v<float>;
+		}
 
 		/**
 		 * \brief	Find a perpendicular angle
@@ -108,9 +126,11 @@ namespace modm
 		 * \param	cw	If cw is true the angle is rotated clockwise.
 		 * 				Ohterwise the angle is rotated anti clockwise.
 		 */
-
-		static float
-		perpendicular(float angle, const bool cw);
+		static constexpr float
+		perpendicular(float angle, const bool cw)
+		{
+			return normalize(angle + (cw ? -1 : 1) * std::numbers::pi_v<float> / 2);
+		}
 
 		static constexpr float
 		toRadian(float angle)

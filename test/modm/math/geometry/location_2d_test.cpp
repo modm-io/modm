@@ -16,6 +16,8 @@
 
 #include "location_2d_test.hpp"
 
+static_assert(modm::Location2D<int16_t>(1, 2, 0).getPosition() == modm::Vector2i(1, 2));
+
 void
 Location2DTest::testDefaultConstructor()
 {

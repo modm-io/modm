@@ -16,6 +16,10 @@
 
 #include "angle_test.hpp"
 
+static_assert(modm::Angle::reverse(0.f) == -std::numbers::pi_v<float>);
+static_assert(modm::Angle::perpendicular(0.f, false) == std::numbers::pi_v<float> / 2);
+static_assert(modm::Angle::normalize(3 * std::numbers::pi_v<float>) <= std::numbers::pi_v<float>);
+
 void
 AngleTest::testNormalize()
 {

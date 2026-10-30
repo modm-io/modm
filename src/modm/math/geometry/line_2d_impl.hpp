@@ -37,7 +37,7 @@ modm::Line2D<T>::setPoint(const Vector<T, 2>& point)
 }
 
 template <typename T>
-inline const modm::Vector<T, 2>&
+constexpr const modm::Vector<T, 2>&
 modm::Line2D<T>::getPoint() const
 {
 	return this->point;
@@ -51,7 +51,7 @@ modm::Line2D<T>::setDirectionVector(const Vector<T, 2>& vector)
 }
 
 template <typename T>
-inline const modm::Vector<T, 2>&
+constexpr const modm::Vector<T, 2>&
 modm::Line2D<T>::getDirectionVector() const
 {
 	return this->directionVector;

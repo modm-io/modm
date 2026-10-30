@@ -334,7 +334,7 @@ modm::Quaternion<T>::conjugated() const
 
 // ----------------------------------------------------------------------------
 template<class T>
-modm::Quaternion<T>
+constexpr modm::Quaternion<T>
 modm::Quaternion<T>::unitInverse()	//	assumes we have a unit quaternion
 {
 	return conjugate();

@@ -27,7 +27,7 @@ constexpr modm::interpolation::Linear<T, Accessor>::Linear(
 // ----------------------------------------------------------------------------
 template <typename T,
 		  template <typename> class Accessor>
-typename modm::interpolation::Linear<T, Accessor>::OutputType
+constexpr typename modm::interpolation::Linear<T, Accessor>::OutputType
 modm::interpolation::Linear<T, Accessor>::interpolate(const InputType& value) const
 {
 	T current(this->supportingPoints[0]);

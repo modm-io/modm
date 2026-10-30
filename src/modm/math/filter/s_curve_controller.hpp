@@ -54,7 +54,7 @@ namespace modm
 		 */
 		struct Parameter
 		{
-			Parameter(const T& targetArea = T(),
+			constexpr Parameter(const T& targetArea = T(),
 					const T& increment = T(),
 					const T& decreaseFactor = T(),
 					const T& kp = T(),

@@ -42,7 +42,7 @@ constexpr modm::Location2D<T>::Location2D(const T& x, const T& y, const float& o
 
 // ----------------------------------------------------------------------------
 template <typename T>
-const modm::Vector<T, 2>&
+constexpr const modm::Vector<T, 2>&
 modm::Location2D<T>::getPosition() const
 {
 	return this->position;
@@ -125,7 +125,7 @@ modm::Location2D<T>::move(T x, float phi)
 
 // ----------------------------------------------------------------------------
 template <typename T>
-modm::Vector<T, 2>
+constexpr modm::Vector<T, 2>
 modm::Location2D<T>::translated(const Vector<T, 2>& vector) const
 {
 	Vector<T, 2> result(vector);

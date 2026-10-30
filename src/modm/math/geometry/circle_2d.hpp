@@ -48,7 +48,7 @@ namespace modm
 
 		constexpr Circle2D(const Vector<T, 2>& center, T radius);
 
-		inline const Vector<T, 2>&
+		constexpr const Vector<T, 2>&
 		getCenter() const;
 
 		constexpr void

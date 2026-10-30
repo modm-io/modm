@@ -67,7 +67,7 @@ namespace modm
 		{
 			/// \todo	description why we use float here!
 			/// \todo	calculate maxErrorSum from the parameters
-			Parameter(const float& kp = 0, const float& ki = 0, const float& kd = 0,
+			constexpr Parameter(const float& kp = 0, const float& ki = 0, const float& kd = 0,
 					  const T& maxErrorSum = 0, const T& maxOutput = 0);
 
 			constexpr void
