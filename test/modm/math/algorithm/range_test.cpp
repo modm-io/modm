@@ -12,6 +12,17 @@
 #include <modm/math/algorithm/range.hpp>
 #include "range_test.hpp"
 
+static_assert(std::ranges::random_access_range<decltype(modm::range(10))>);
+static_assert(std::ranges::size(modm::range(0, 10, 3)) == 4);
+static_assert(std::ranges::size(modm::range(10, 0, -3)) == 4);
+// steps that would overflow the type end the range correctly
+static_assert(std::ranges::size(modm::range<uint8_t>(0, 255, 100)) == 3);
+static_assert(modm::range<uint8_t>(0, 255, 100)[2] == 200);
+static_assert(std::ranges::size(modm::range<int8_t>(100, 127, 20)) == 2);
+static_assert(std::ranges::size(modm::range<int8_t>(-128, 127, 127)) == 3);
+static_assert(modm::range<int8_t>(127, -128, -100)[2] == -73);
+static_assert(std::ranges::size(modm::range(0.f, 1.f, 0.25f)) == 4);
+
 void
 RangeTest::testRange()
 {
