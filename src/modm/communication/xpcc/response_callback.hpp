@@ -18,7 +18,7 @@
 #ifndef	XPCC_RESPONSE_CALLBACK_HPP
 #define	XPCC_RESPONSE_CALLBACK_HPP
 
-#include <modm/container/smart_pointer.hpp>
+#include <modm/communication/xpcc/smart_pointer.hpp>
 
 #include "backend/backend_interface.hpp"
 #include "communicatable.hpp"
@@ -80,7 +80,7 @@ namespace xpcc
 
 		/// \todo check packet size?
 		inline void
-		call(const Header& header, const modm::SmartPointer &payload) const
+		call(const Header& header, const xpcc::SmartPointer &payload) const
 		{
 			if (isCallable()) {
 				(component->*function)(header, payload.getPointer());

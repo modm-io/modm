@@ -50,7 +50,7 @@ namespace xpcc
 		~Postman();
 
 		virtual DeliverInfo
-		deliverPacket(const Header& header, const modm::SmartPointer& payload) = 0;
+		deliverPacket(const Header& header, const xpcc::SmartPointer& payload) = 0;
 
 		/**
 		 * \brief	Check if a component is available on this board

@@ -25,7 +25,7 @@ class Postman : public xpcc::Postman
 {
 public:
 	xpcc::Postman::DeliverInfo
-	deliverPacket(const xpcc::Header& header, const modm::SmartPointer& payload);
+	deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& payload);
 
 	bool
 	isComponentAvailable(uint8_t component) const;
@@ -62,14 +62,14 @@ private:
 		PayloadBuffer()
 		{}
 
-		PayloadBuffer(const modm::SmartPointer& payload)
+		PayloadBuffer(const xpcc::SmartPointer& payload)
 		:	payload(payload) {}
 
 		void
 		remove()
-		{ payload = modm::SmartPointer(); }
+		{ payload = xpcc::SmartPointer(); }
 
-		modm::SmartPointer payload;
+		xpcc::SmartPointer payload;
 	};	// 2B (AVR), 4B (ARM) + 3B HEAP
 
 	static constexpr uint8_t resumablePayloads = {{ resumablePayloads }};

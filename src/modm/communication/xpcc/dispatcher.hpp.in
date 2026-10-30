@@ -57,7 +57,7 @@ namespace xpcc
 	private:
 		/// Does not handle requests which are not acknowledge.
 		bool
-		handlePacket(const Header& header, const modm::SmartPointer& payload);
+		handlePacket(const Header& header, const xpcc::SmartPointer& payload);
 
 		/// Sends messages which are waiting in the list.
 		void
@@ -94,13 +94,13 @@ namespace xpcc
 			 * and never else changed. this->typeInfo replaces runtime
 			 * information needed by handling of messages.
 			 */
-			constexpr Entry(Type type, const Header& inHeader, modm::SmartPointer& inPayload) :
+			constexpr Entry(Type type, const Header& inHeader, xpcc::SmartPointer& inPayload) :
 				type(type),
 				header(inHeader), payload(inPayload)
 			{
 			}
 
-			constexpr Entry(const Header& inHeader, modm::SmartPointer& inPayload) :
+			constexpr Entry(const Header& inHeader, xpcc::SmartPointer& inPayload) :
 				header(inHeader), payload(inPayload)
 			{
 			}
@@ -111,7 +111,7 @@ namespace xpcc
 			}
 
 			constexpr Entry(const Header& inHeader,
-					modm::SmartPointer& inPayload, ResponseCallback& callback_) :
+					xpcc::SmartPointer& inPayload, ResponseCallback& callback_) :
 				type(Type::Callback),
 				header(inHeader), payload(inPayload),
 				callback(callback_)
@@ -126,14 +126,14 @@ namespace xpcc
 			headerFits(const Header& header) const;
 
 			inline void
-			callbackResponse(const Header& header, const modm::SmartPointer &payload) const
+			callbackResponse(const Header& header, const xpcc::SmartPointer &payload) const
 			{
 				this->callback.call(header, payload);
 			}
 
 			const Type type = Type::Default;
 			const Header header;
-			const modm::SmartPointer payload;
+			const xpcc::SmartPointer payload;
 			State state = State::TransmissionPending;
 			modm::ShortTimeout time;
 			uint8_t tries = 0;
@@ -142,17 +142,17 @@ namespace xpcc
 		};
 
 		void
-		addMessage(const Header& header, modm::SmartPointer& smartPayload);
+		addMessage(const Header& header, xpcc::SmartPointer& smartPayload);
 
 		void
-		addMessage(const Header& header, modm::SmartPointer& smartPayload,
+		addMessage(const Header& header, xpcc::SmartPointer& smartPayload,
 				ResponseCallback& responseCallback);
 
 		void
-		addResponse(const Header& header, modm::SmartPointer& smartPayload);
+		addResponse(const Header& header, xpcc::SmartPointer& smartPayload);
 
 		inline void
-		handleActionCall(const Header& header, const modm::SmartPointer& payload);
+		handleActionCall(const Header& header, const xpcc::SmartPointer& payload);
 
 		void
 		sendAcknowledge(const Header& header);

@@ -16,7 +16,7 @@
 
 #include <modm/communication/xpcc.hpp>
 #include <list>
-#include <modm/container/smart_pointer.hpp>
+#include <modm/communication/xpcc/smart_pointer.hpp>
 
 /// @ingroup modm_test_test_communication_xpcc
 class Timeline
@@ -44,7 +44,7 @@ public:
 		uint8_t id;
 		uint8_t source;
 
-		modm::SmartPointer payload;
+		xpcc::SmartPointer payload;
 
 	private:
 		Event&

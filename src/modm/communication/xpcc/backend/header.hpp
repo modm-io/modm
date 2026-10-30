@@ -17,7 +17,7 @@
 
 #include <stdint.h>
 
-#include <modm/container/smart_pointer.hpp>
+#include <modm/communication/xpcc/smart_pointer.hpp>
 
 namespace xpcc
 {

@@ -51,7 +51,7 @@ void
 DispatcherTest::testReceiveRequest()
 {
 	Message message(xpcc::Header(xpcc::Header::Type::REQUEST, false, 1, 10, 0x10),
-			modm::SmartPointer());
+			xpcc::SmartPointer());
 
 	backend->messagesToReceive.push_back(message);
 
@@ -73,7 +73,7 @@ void
 DispatcherTest::testReceiveRequestNoComponent()
 {
 	Message message(xpcc::Header(xpcc::Header::Type::REQUEST, false, 11, 10, 0x10),
-			modm::SmartPointer());
+			xpcc::SmartPointer());
 
 	backend->messagesToReceive.push_back(message);
 
@@ -91,7 +91,7 @@ void
 DispatcherTest::testReceiveResponse()
 {
 	Message message(xpcc::Header(xpcc::Header::Type::RESPONSE, false, 1, 10, 0x10),
-			modm::SmartPointer());
+			xpcc::SmartPointer());
 
 	backend->messagesToReceive.push_back(message);
 
@@ -111,7 +111,7 @@ void
 DispatcherTest::testReceiveResponseNoComponent()
 {
 	Message message(xpcc::Header(xpcc::Header::Type::RESPONSE, false, 11, 10, 0x10),
-			modm::SmartPointer());
+			xpcc::SmartPointer());
 
 	backend->messagesToReceive.push_back(message);
 
@@ -126,7 +126,7 @@ void
 DispatcherTest::testEventReception()
 {
 	Message message(xpcc::Header(xpcc::Header::Type::REQUEST, false, 0, 10, 0x20),
-			modm::SmartPointer());
+			xpcc::SmartPointer());
 
 	backend->messagesToReceive.push_back(message);
 
@@ -439,7 +439,7 @@ DispatcherTest::testActionRetransmission()
 	// send requested ACK
 	backend->messagesToReceive.push_back(
 			Message(xpcc::Header(xpcc::Header::Type::REQUEST, true, 1, 10, 0xf3),
-					modm::SmartPointer()));
+					xpcc::SmartPointer()));
 
 	// reset time so that the timeout is expired
 	test_clock::increment(500);
@@ -454,7 +454,7 @@ DispatcherTest::testResponseRetransmissionWithAbort()
 {
 	backend->messagesToReceive.push_back(
 			Message(xpcc::Header(xpcc::Header::Type::REQUEST, false, 1, 10, 0x12),
-					modm::SmartPointer()));
+					xpcc::SmartPointer()));
 
 	dispatcher->update();
 
@@ -494,7 +494,7 @@ DispatcherTest::testResponseRetransmission()
 {
 	backend->messagesToReceive.push_back(
 			Message(xpcc::Header(xpcc::Header::Type::REQUEST, false, 1, 10, 0x12),
-					modm::SmartPointer()));
+					xpcc::SmartPointer()));
 
 	dispatcher->update();
 
@@ -521,7 +521,7 @@ DispatcherTest::testResponseRetransmission()
 	// send requested ACK
 	backend->messagesToReceive.push_back(
 			Message(xpcc::Header(xpcc::Header::Type::RESPONSE, true, 1, 10, 0x12),
-					modm::SmartPointer()));
+					xpcc::SmartPointer()));
 
 	// reset time so that the timeout is expired if still active
 	test_clock::increment(100);

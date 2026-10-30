@@ -19,7 +19,7 @@
 /// @ingroup modm_test_test_communication_xpcc
 struct Message
 {
-	Message(const xpcc::Header& header, const modm::SmartPointer& payload) :
+	Message(const xpcc::Header& header, const xpcc::SmartPointer& payload) :
 		header(header), payload(payload)
 	{
 	}
@@ -30,7 +30,7 @@ struct Message
 	}
 
 	xpcc::Header header;
-	modm::SmartPointer payload;
+	xpcc::SmartPointer payload;
 };
 
 #endif

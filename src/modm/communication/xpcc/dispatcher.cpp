@@ -45,7 +45,7 @@ xpcc::Dispatcher::updateOnceRx()
 	if (this->backend->isPacketAvailable())
 	{
 		const Header& header = this->backend->getPacketHeader();
-		const modm::SmartPointer& payload = this->backend->getPacketPayload();
+		const xpcc::SmartPointer& payload = this->backend->getPacketPayload();
 
 		if (header.type == Header::Type::REQUEST && !header.isAcknowledge)
 		{
@@ -65,7 +65,7 @@ xpcc::Dispatcher::updateOnceRx()
 
 void
 xpcc::Dispatcher::handleActionCall(const Header& header,
-		const modm::SmartPointer& payload)
+		const xpcc::SmartPointer& payload)
 {
 	xpcc::Postman::DeliverInfo result = postman->deliverPacket(header, payload);
 
@@ -102,7 +102,7 @@ xpcc::Dispatcher::Entry::headerFits(const Header& inHeader) const
 
 bool
 xpcc::Dispatcher::handlePacket(const Header& header,
-		const modm::SmartPointer& payload)
+		const xpcc::SmartPointer& payload)
 {
 	bool ack = false;
 	auto entry = this->entries.begin();
@@ -284,21 +284,21 @@ xpcc::Dispatcher::handleWaitingMessages()
 // ----------------------------------------------------------------------------
 void
 xpcc::Dispatcher::addMessage(const Header& header,
-		modm::SmartPointer& smartPayload)
+		xpcc::SmartPointer& smartPayload)
 {
 	this->entries.push_back(Entry(header, smartPayload));
 }
 
 void
 xpcc::Dispatcher::addMessage(const Header& header,
-		modm::SmartPointer& smartPayload, ResponseCallback& responseCallback)
+		xpcc::SmartPointer& smartPayload, ResponseCallback& responseCallback)
 {
 	this->entries.push_back(Entry(header, smartPayload, responseCallback));
 }
 
 void
 xpcc::Dispatcher::addResponse(const Header& header,
-		modm::SmartPointer& smartPayload)
+		xpcc::SmartPointer& smartPayload)
 {
 	// it makes response more important, than requests
 	// it prevents intern loops. Since it is possible to give a response while

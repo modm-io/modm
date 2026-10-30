@@ -31,7 +31,7 @@ namespace component
 
 // ----------------------------------------------------------------------------
 xpcc::Postman::DeliverInfo
-Postman::deliverPacket(const xpcc::Header& header, const modm::SmartPointer& payload)
+Postman::deliverPacket(const xpcc::Header& header, const xpcc::SmartPointer& payload)
 {
 	xpcc::ResponseHandle response(header);
 

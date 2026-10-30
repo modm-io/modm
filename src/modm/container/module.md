@@ -7,7 +7,6 @@ missing from the standard library:
 - `modm::BoundedDeque`: A double ended queue with a fixed capacity, which is
   organized as a ring buffer and does not use the heap. Its interface follows
   `std::deque`, so it can also be used with `std::queue` and `std::stack`.
-- `modm::SmartPointer`: A reference counted buffer used by XPCC.
 
 ```cpp
 modm::BoundedDeque<uint8_t, 10> deque;

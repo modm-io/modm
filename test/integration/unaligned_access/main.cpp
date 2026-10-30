@@ -12,7 +12,6 @@
 #include <modm/board.hpp>
 #include "../integration_test.hpp"
 #include <modm/architecture/interface/unaligned.hpp>
-#include <modm/container/smart_pointer.hpp>
 
 using namespace Board;
 
@@ -36,19 +35,6 @@ main()
 	// try every alignment of a 32-bit value several times
 	for (uint8_t offset = 0; offset < 100; offset++)
 	{
-		{
-			// "smart" pointer is created on the heap
-			modm::SmartPointer p(&input);
-
-			// manually interpreting the pointer
-			output = *reinterpret_cast<uint32_t*>(p.getPointer());
-			if (output != input) error();
-
-			// letting the class interpret it
-			output = p.get<uint32_t>();
-			if (output != input) error();
-		}
-
 		{
 			// `u32` is a pointer to a modm::unaligned_t<uint32_t*> !
 			auto *u32 = modm::asUnaligned<uint32_t*>(buffer + offset);

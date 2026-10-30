@@ -29,7 +29,7 @@ public:
 
 	virtual void
 	sendPacket(const xpcc::Header &header,
-			modm::SmartPointer payload = modm::SmartPointer());
+			xpcc::SmartPointer payload = xpcc::SmartPointer());
 
 
 	virtual bool
@@ -38,7 +38,7 @@ public:
 	virtual const xpcc::Header&
 	getPacketHeader() const;
 
-	virtual const modm::SmartPointer
+	virtual const xpcc::SmartPointer
 	getPacketPayload() const;
 
 	virtual void

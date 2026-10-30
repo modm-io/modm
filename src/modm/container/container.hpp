@@ -20,6 +20,5 @@
 #include "container/dynamic_array.hpp"
 
 #include "container/pair.hpp"
-#include "container/smart_pointer.hpp"
 
 

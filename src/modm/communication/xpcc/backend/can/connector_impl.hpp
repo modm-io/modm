@@ -48,7 +48,7 @@ xpcc::CanConnector<Driver>::getPacketHeader() const
 }
 
 template<typename Driver>
-const modm::SmartPointer
+const xpcc::SmartPointer
 xpcc::CanConnector<Driver>::getPacketPayload() const
 {
 	return this->receivedMessages.front().payload;
@@ -57,7 +57,7 @@ xpcc::CanConnector<Driver>::getPacketPayload() const
 // ----------------------------------------------------------------------------
 template<typename Driver>
 void
-xpcc::CanConnector<Driver>::sendPacket(const Header &header, modm::SmartPointer payload)
+xpcc::CanConnector<Driver>::sendPacket(const Header &header, xpcc::SmartPointer payload)
 {
 	bool successful = false;
 	bool fragmented = (payload.getSize() > 8);

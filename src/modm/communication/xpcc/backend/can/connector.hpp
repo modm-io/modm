@@ -130,7 +130,7 @@ namespace xpcc
 		~CanConnector();
 
 		virtual void
-		sendPacket(const Header &header, modm::SmartPointer payload);
+		sendPacket(const Header &header, xpcc::SmartPointer payload);
 
 
 		virtual bool
@@ -139,7 +139,7 @@ namespace xpcc
 		virtual const Header&
 		getPacketHeader() const;
 
-		virtual const modm::SmartPointer
+		virtual const xpcc::SmartPointer
 		getPacketPayload() const;
 
 		virtual void
@@ -175,7 +175,7 @@ namespace xpcc
 		{
 		public:
 			constexpr SendListItem(const uint32_t & inIdentifier,
-					const modm::SmartPointer& inPayload) :
+					const xpcc::SmartPointer& inPayload) :
 				identifier(inIdentifier),
 				payload(inPayload),
 				fragmentIndex(0)
@@ -190,7 +190,7 @@ namespace xpcc
 			}
 
 			uint32_t identifier;
-			modm::SmartPointer payload;
+			xpcc::SmartPointer payload;
 
 			uint8_t fragmentIndex;
 
@@ -218,7 +218,7 @@ namespace xpcc
 			}
 
 			Header header;
-			modm::SmartPointer payload;
+			xpcc::SmartPointer payload;
 
 			uint8_t receivedFragments;
 			const uint8_t counter;

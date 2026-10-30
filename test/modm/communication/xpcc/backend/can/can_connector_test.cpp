@@ -101,7 +101,7 @@ CanConnectorTest::testSendShortMessageDirect()
 {
 	driver->sendSlots = 1;
 
-	modm::SmartPointer payload(&shortPayload);
+	xpcc::SmartPointer payload(&shortPayload);
 	connector->sendPacket(xpccHeader, payload);
 
 	// short messages might be send directly without any call to update
@@ -112,7 +112,7 @@ CanConnectorTest::testSendShortMessageDirect()
 void
 CanConnectorTest::testSendShortMessage()
 {
-	modm::SmartPointer payload(&shortPayload);
+	xpcc::SmartPointer payload(&shortPayload);
 	connector->sendPacket(xpccHeader, payload);
 
 	TEST_ASSERT_EQUALS(driver->sendList.size(), 0U);
@@ -130,7 +130,7 @@ CanConnectorTest::testSendFragmentedMessage()
 	driver->sendSlots = 2;
 	this->messageCounter = connector->messageCounter = 0x30;
 
-	modm::SmartPointer payload(&fragmentedPayload);
+	xpcc::SmartPointer payload(&fragmentedPayload);
 	connector->sendPacket(xpccHeader, payload);
 
 	// fragmented messages aren't send directly but queued immediately

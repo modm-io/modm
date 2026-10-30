@@ -35,7 +35,7 @@ public:
 
 	virtual DeliverInfo
 	deliverPacket(const xpcc::Header& header,
-			const modm::SmartPointer& payload);
+			const xpcc::SmartPointer& payload);
 
 	virtual bool
 	isComponentAvailable(uint8_t component) const;
