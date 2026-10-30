@@ -16,19 +16,6 @@
 #include "spi_device.hpp"
 
 // ----------------------------------------------------------------------------
-modm_test::SpiDevice::SpiDevice() :
-	transmissions(0),
-	transmissionCount(0),
-	currentTransmission(0),
-	bytesWritten(0),
-	selected(false),
-	complete(true),
-	error(NO_ERROR),
-	reportErrors(true),
-	rxBuffer(0)
-{
-}
-
 modm_test::SpiDevice::~SpiDevice()
 {
 	delete[] rxBuffer;

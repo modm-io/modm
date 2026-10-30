@@ -15,14 +15,6 @@
 #include "communicator.hpp"
 
 // ----------------------------------------------------------------------------
-xpcc::Communicator::Communicator(
-		const uint8_t ownIdentifier,
-		Dispatcher &inDispatcher) :
-	ownIdentifier(ownIdentifier), dispatcher(inDispatcher)
-{
-}
-
-// ----------------------------------------------------------------------------
 void
 xpcc::Communicator::callAction(uint8_t receiver, uint8_t actionIdentifier)
 {

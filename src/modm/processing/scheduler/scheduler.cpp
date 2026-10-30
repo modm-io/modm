@@ -13,12 +13,6 @@
 #include "scheduler.hpp"
 
 // ----------------------------------------------------------------------------
-modm::Scheduler::Scheduler() :
-	taskList(0), readyList(0), currentPriority(0)
-{
-}
-
-// ----------------------------------------------------------------------------
 void
 modm::Scheduler::scheduleTask(Task& task,
 		uint16_t period,

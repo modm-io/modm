@@ -53,7 +53,7 @@ namespace modm
 		};
 
 	public:
-		Scheduler();
+		constexpr Scheduler() = default;
 
 		void
 		scheduleTask(Task& task,
@@ -98,10 +98,10 @@ namespace modm
 			/// @endcond
 		};
 
-		TaskListItem *taskList;
-		TaskListItem *readyList;
+		TaskListItem *taskList{nullptr};
+		TaskListItem *readyList{nullptr};
 
-		Priority currentPriority;
+		Priority currentPriority{0};
 	};
 }
 

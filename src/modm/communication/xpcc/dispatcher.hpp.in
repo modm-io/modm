@@ -43,7 +43,10 @@ namespace xpcc
 		static constexpr std::chrono::milliseconds responseTimeout{ {{ options["timeout.response"] }} };
 
 	public:
-		Dispatcher(BackendInterface *backend, Postman* postman);
+		constexpr Dispatcher(BackendInterface *backend, Postman* postman) :
+			backend(backend), postman(postman)
+		{
+		}
 
 		void
 		update();

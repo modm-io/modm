@@ -25,7 +25,7 @@ namespace modm_test::platform
 class IODevice : public modm::IODevice
 {
 public:
-	inline IODevice() :
+	constexpr IODevice() :
 		bytesWritten(0) {}
 
 	/// Write a single char to the buffer.
@@ -60,7 +60,7 @@ public:
 	}
 
 	static constexpr std::size_t buffer_length = 100;
-	char buffer[buffer_length];
+	char buffer[buffer_length]{};
 	size_t bytesWritten;
 };
 

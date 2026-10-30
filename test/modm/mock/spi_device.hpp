@@ -62,7 +62,12 @@ namespace modm_test
 	class SpiDevice
 	{
 	public:
-		SpiDevice();
+		constexpr SpiDevice() :
+			transmissions(nullptr), transmissionCount(0), currentTransmission(0),
+			bytesWritten(0), selected(false), complete(true), error(NO_ERROR),
+			reportErrors(true), rxBuffer(nullptr)
+		{
+		}
 
 		~SpiDevice();
 
@@ -126,7 +131,7 @@ namespace modm_test
 		};
 		uint8_t error;
 
-		std::size_t lineNumber;
+		std::size_t lineNumber{0};
 		bool reportErrors;
 		uint8_t *rxBuffer;
 	};

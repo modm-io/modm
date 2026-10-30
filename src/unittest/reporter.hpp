@@ -39,7 +39,10 @@ namespace unittest
 		 *
 		 * \param	device	IODevice used for printing
 		 */
-		Reporter(modm::IODevice& device);
+		constexpr Reporter(modm::IODevice& device) :
+			outputStream(device)
+		{
+		}
 
 		/**
 		 * \brief	Switch to the next test suite
@@ -90,8 +93,8 @@ namespace unittest
 		modm::accessor::Flash<char> testName;
 		modm::accessor::Flash<char> testFunction;
 
-		int_fast32_t testsPassed;
-		int_fast32_t testsFailed;
+		int_fast32_t testsPassed{0};
+		int_fast32_t testsFailed{0};
 	};
 }
 

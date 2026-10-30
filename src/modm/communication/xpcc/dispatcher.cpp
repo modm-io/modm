@@ -21,11 +21,6 @@
 #undef  MODM_LOG_LEVEL
 #define MODM_LOG_LEVEL modm::log::INFO
 
-xpcc::Dispatcher::Dispatcher(BackendInterface *backend_, Postman* postman_) :
-	backend(backend_), postman(postman_)
-{
-}
-
 // ----------------------------------------------------------------------------
 void
 xpcc::Dispatcher::update()

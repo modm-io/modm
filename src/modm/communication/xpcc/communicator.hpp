@@ -48,8 +48,11 @@ namespace xpcc
 		 * 							within the network.
 		 * \param	dispatcher		Communication class use to send messages
 		 */
-		Communicator(const uint8_t ownIdentifier,
-				Dispatcher &dispatcher);
+		constexpr Communicator(const uint8_t ownIdentifier,
+				Dispatcher &dispatcher) :
+			ownIdentifier(ownIdentifier), dispatcher(dispatcher)
+		{
+		}
 
 		Communicator(const Communicator&) = delete;
 

@@ -51,7 +51,7 @@ modm_test::platform::SpiMaster::transfer(uint8_t data)
 
 	if(!rxBuffer.empty()) {
 		tmp = rxBuffer.front();
-		rxBuffer.pop_front();
+		rxBuffer.erase(rxBuffer.begin());
 	}
 	else {
 		tmp = 0;
@@ -84,7 +84,7 @@ modm_test::platform::SpiMaster::transfer(uint8_t * tx, uint8_t * rx, std::size_t
 			}
 		}
 		if(!rxBuffer.empty()) {
-			rxBuffer.pop_front();
+			rxBuffer.erase(rxBuffer.begin());
 		}
 	}
 }

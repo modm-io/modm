@@ -79,7 +79,7 @@ Drv832xSpiTest::testSpi()
 	TEST_ASSERT_EQUALS(SpiMaster::getTxBufferLength(), 0u);
 	gateDriver.commit();
 	TEST_ASSERT_EQUALS(SpiMaster::getTxBufferLength(), 2u);
-	uint8_t txBuffer[2];
+	uint8_t txBuffer[2]{};
 	SpiMaster::popTxBuffer(txBuffer);
 	uint8_t txBufferCompare[] = {(0x2 << 3), (0b11 << 5)};
 	TEST_ASSERT_EQUALS_ARRAY(txBuffer, txBufferCompare, 2u);

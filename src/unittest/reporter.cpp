@@ -17,7 +17,6 @@
 
 namespace
 {
-	FLASH_STORAGE_STRING(invalidName) = "invalid";
 	FLASH_STORAGE_STRING(suiteHeader) = ">>> ";
 	FLASH_STORAGE_STRING(functionHeader) = "    - ";
 
@@ -30,13 +29,6 @@ namespace
 	FLASH_STORAGE_STRING(reportTests) = " tests\n";
 	FLASH_STORAGE_STRING(reportOk) = "OK!\n";
 	FLASH_STORAGE_STRING(reportFail) = "FAIL!\n";
-}
-
-unittest::Reporter::Reporter(modm::IODevice& device) :
-	outputStream(device), testName(modm::accessor::asFlash(invalidName)),
-	testFunction(modm::accessor::asFlash(invalidName)), testsPassed(0),
-	testsFailed(0)
-{
 }
 
 void
@@ -69,7 +61,7 @@ unittest::Reporter::reportFailure(unsigned int lineNumber)
 				 << testName
 				 << ':'
 				 << lineNumber;
-	if (testFunction.getPointer() != invalidName)
+	if (testFunction.getPointer())
 		outputStream << ':' << testFunction;
 	outputStream << modm::accessor::asFlash(failColon);
 	return outputStream;

@@ -13,7 +13,8 @@
 #define MODM_TEST_MOCK_SPI_MASTER_HPP
 
 #include <modm/architecture/interface/spi_master.hpp>
-#include <list>
+#include <algorithm>
+#include <vector>
 
 namespace modm_test
 {
@@ -39,7 +40,7 @@ private:
 	static inline DataOrder dataOrder{DataOrder::MsbFirst};
 
 public:
-	using ArrayContainer = std::list<uint8_t>;
+	using ArrayContainer = std::vector<uint8_t>;
 
 private:
 	static inline ArrayContainer rxBuffer;
@@ -86,13 +87,8 @@ public:
 
 	static void popTxBuffer(uint8_t* buf)
 	{
-		std::size_t j = 0;
-		for(ArrayContainer::iterator i = txBuffer.begin(); i != txBuffer.end(); ++i) {
-			buf[j++] = (*i);
-		}
-		while(txBuffer.size() > 0) {
-			txBuffer.pop_front();
-		}
+		std::ranges::copy(txBuffer, buf);
+		txBuffer.clear();
 	}
 
 	static void appendRxBuffer(uint8_t* data, std::size_t length)
@@ -104,12 +100,8 @@ public:
 
 	static void clearBuffers()
 	{
-		while(txBuffer.size() > 0) {
-			txBuffer.pop_front();
-		}
-		while(rxBuffer.size() > 0) {
-			rxBuffer.pop_front();
-		}
+		txBuffer.clear();
+		rxBuffer.clear();
 	}
 };
 
