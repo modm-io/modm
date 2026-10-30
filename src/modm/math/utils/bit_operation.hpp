@@ -96,68 +96,75 @@ namespace modm
 	 *
 	 * 15 clock cycles on an AVR, without call + return.
 	 */
-	inline uint8_t
+	constexpr uint8_t
 	bitReverse(uint8_t n)
 	{
 #if defined(MODM_CPU_ARM) && !defined(MODM_CPU_CORTEX_M0)
-		asm volatile(
-			"rbit %0,%0"	"\n\t"
-			"rev %0,%0"		"\n\t"
-			 : "=r" (n)
-			 : "0" (n)
-		);
-		return n;
-#else
+		if !consteval
+		{
+			asm volatile(
+				"rbit %0,%0"	"\n\t"
+				"rev %0,%0"		"\n\t"
+				 : "=r" (n)
+				 : "0" (n)
+			);
+			return n;
+		}
+#endif
 		n = ((uint8_t) (n >> 1) & 0x55) | ((uint8_t) (n << 1) & 0xaa);
 		n = ((uint8_t) (n >> 2) & 0x33) | ((uint8_t) (n << 2) & 0xcc);
 
 		return std::rotl(n, 4);
-#endif
 	}
 
 	/// Reverse the bits in a 16-bit integer
-	inline uint16_t
+	constexpr uint16_t
 	bitReverse(uint16_t n)
 	{
 #if defined(MODM_CPU_ARM) && !defined(MODM_CPU_CORTEX_M0)
-		asm volatile(
-			"rbit %0,%0"	"\n\t"
-			"rev16 %0,%0"	"\n\t"
-			"rev %0,%0"		"\n\t"
-			 : "=r" (n)
-			 : "0" (n)
-		);
-		return n;
-#else
+		if !consteval
+		{
+			asm volatile(
+				"rbit %0,%0"	"\n\t"
+				"rev16 %0,%0"	"\n\t"
+				"rev %0,%0"		"\n\t"
+				 : "=r" (n)
+				 : "0" (n)
+			);
+			return n;
+		}
+#endif
 		n = ((n >>  1) & 0x5555) | ((n <<  1) & 0xaaaa);
 		n = ((n >>  2) & 0x3333) | ((n <<  2) & 0xcccc);
 		n = ((n >>  4) & 0x0f0f) | ((n <<  4) & 0xf0f0);
 
 		return std::byteswap(n);
-#endif
 	}
 
 	/// Reverse the bits in a 32-bit integer
-	inline uint32_t
+	constexpr uint32_t
 	bitReverse(uint32_t n)
 	{
+		if !consteval
+		{
 #if defined(MODM_CPU_ARM) && !defined(MODM_CPU_CORTEX_M0) && !defined(__aarch64__)
-		asm volatile(
-			"rbit %0,%0"	"\n\t"
-			 : "=r" (n)
-			 : "0" (n)
-		);
-		return n;
+			asm volatile(
+				"rbit %0,%0"	"\n\t"
+				 : "=r" (n)
+				 : "0" (n)
+			);
+			return n;
 #elif defined(__aarch64__)
-		asm volatile(
-			"rbit %0,%0"	"\n\t"
-			"rev32 %0,%0"	"\n\t"
-			"rev %0,%0"		"\n\t"
-			 : "=r" (n)
-			 : "0" (n)
-		);
-		return n;
-#else
+			asm volatile(
+				"rbit %0,%0"	"\n\t"
+				"rev32 %0,%0"	"\n\t"
+				"rev %0,%0"		"\n\t"
+				 : "=r" (n)
+				 : "0" (n)
+			);
+			return n;
+#endif
+		}
 		n = ((n >>  1) & 0x55555555) | ((n <<  1) & 0xaaaaaaaa);
 		n = ((n >>  2) & 0x33333333) | ((n <<  2) & 0xcccccccc);
 		n = ((n >>  4) & 0x0f0f0f0f) | ((n <<  4) & 0xf0f0f0f0);
@@ -165,7 +172,6 @@ namespace modm
 		n = ((n >> 16) & 0x0000ffff) | ((n << 16) & 0xffff0000);
 
 		return n;
-#endif
 	}
 
 	/// Returns position of leftmost bit.

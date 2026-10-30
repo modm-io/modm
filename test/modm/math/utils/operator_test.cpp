@@ -11,8 +11,14 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/math/utils/operator.hpp>
+#include <cmath>
 
 #include "operator_test.hpp"
+
+static_assert(modm::math::sqrt(0) == 0);
+static_assert(modm::math::sqrt(452613) == 673);
+static_assert(modm::math::sqrt(4294800000UL) == 65535);
+static_assert(modm::math::sqrt(0xffffffffUL) == 65535);
 
 void
 OperatorTest::testSqrt()
@@ -30,4 +36,12 @@ OperatorTest::testSqrt()
 	TEST_ASSERT_EQUALS(modm::math::sqrt(10000000), 3162U);
 	TEST_ASSERT_EQUALS(modm::math::sqrt(4000000000UL), 63246U);
 	TEST_ASSERT_EQUALS(modm::math::sqrt(4294800000UL), 65535U);
+
+#ifndef MODM_CPU_AVR
+	// rounds to nearest like the floating point square root
+	for (uint32_t x = 0; x < 0xfffe0000; x += (x < 70000) ? 1 : 0x10001)
+	{
+		TEST_ASSERT_EQUALS(modm::math::sqrt(x), uint16_t(std::lround(std::sqrt(double(x)))));
+	}
+#endif
 }

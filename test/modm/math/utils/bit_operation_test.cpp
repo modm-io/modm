@@ -14,6 +14,10 @@
 
 #include "bit_operation_test.hpp"
 
+static_assert(modm::bitReverse(uint8_t(0xa3)) == 0xc5);
+static_assert(modm::bitReverse(uint16_t(0xa302)) == 0x40c5);
+static_assert(modm::bitReverse(uint32_t(0xa3010ff0)) == 0x0ff080c5);
+
 void
 BitOperationTest::testReverse8bit()
 {

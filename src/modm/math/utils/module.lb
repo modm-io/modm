@@ -22,9 +22,7 @@ def build(env):
     env.outbasepath = "modm/src/modm/math/utils"
 
     ignore = []
-    if "avr" in env[":target"].identifier["platform"]:
-        ignore.append("*pc*")
-    else:
+    if "avr" not in env[":target"].identifier["platform"]:
         ignore.append("*avr*")
 
     env.copy('.', ignore=env.ignore_paths(*ignore))

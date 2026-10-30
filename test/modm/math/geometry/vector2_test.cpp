@@ -16,6 +16,7 @@
 // The vector operations can be evaluated at compile time
 static_assert(modm::Vector2i(1, 2) + modm::Vector2i(3, 4) == modm::Vector2i(4, 6));
 static_assert(modm::Vector2f(3, 4).getLengthSquared() == 25.f);
+static_assert(modm::Vector2i(100, 100).getLength() == 141);
 
 void
 Vector2Test::testConstructor()
