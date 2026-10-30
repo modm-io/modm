@@ -15,10 +15,46 @@
 
 #include <cmath>
 #include <stdint.h>
+#include <type_traits>
 #include <modm/architecture/utils.hpp>
 
 namespace modm
 {
+	/// @cond
+	namespace detail
+	{
+		/// Floating point type for geometric calculations: `float` for integers
+		template<typename T>
+		using GeometricFloatType = std::conditional_t<std::is_floating_point_v<T>, T, float>;
+
+		/**
+		 * Signed type for products of coordinates.
+		 *
+		 * 8-bit and 16-bit integers are widened, larger integers are not,
+		 * since 64-bit operations are very, very slow on an AVR.
+		 */
+		template<typename T, bool = std::is_integral_v<T>>
+		struct GeometricWideType
+		{ using type = T; };
+
+		template<typename T>
+		struct GeometricWideType<T, true>
+		{
+			using type = std::conditional_t<sizeof(T) == 1, int16_t,
+						 std::conditional_t<sizeof(T) == 2, int32_t, std::make_signed_t<T>>>;
+		};
+
+		/// Rounds when converting to an integer
+		template<typename T, typename F>
+		constexpr T
+		geometricRound(F value)
+		{
+			if constexpr (std::is_integral_v<T>) return T(std::round(value));
+			else return T(value);
+		}
+	}
+	/// @endcond
+
 	/**
 	 * \brief	Traits for all geometric classes
 	 *
@@ -26,116 +62,22 @@ namespace modm
 	 * \author	Fabian Greif
 	 */
 	template <typename T>
-	struct GeometricTraits
+	struct [[deprecated("Use the WideType and FloatType of the geometric classes instead")]]
+	GeometricTraits // DEPRECATED: 2027q4
 	{
-		static constexpr bool isValidType = false;
+		static constexpr bool isValidType = std::is_arithmetic_v<T>;
+
+		using FloatType = detail::GeometricFloatType<T>;
+		using WideType = typename detail::GeometricWideType<T>::type;
 
 		/**
 		 * \brief	Round if converting from a floating point base to
 		 * 			a integer base.
-		 *
-		 * For T = \c float and \c double this method is specialized to return
-		 * the result directly without any rounding.
 		 */
 		static constexpr T
-		round(float value)
+		round(FloatType value)
 		{
-			return ::round(value);
-		}
-	};
-
-	template <>
-	struct GeometricTraits<int8_t>
-	{
-		static constexpr bool isValidType = true;
-
-		using FloatType = float;
-		using WideType = int16_t;
-
-		static constexpr int8_t
-		round(float value)
-		{
-			return ::round(value);
-		}
-	};
-
-	// TODO is this useful?
-	template <>
-	struct GeometricTraits<uint8_t>
-	{
-		static constexpr bool isValidType = true;
-
-		using FloatType = float;
-		using WideType = int16_t;
-
-		static constexpr uint8_t
-		round(float value)
-		{
-			return ::round(value);
-		}
-	};
-
-	template <>
-	struct GeometricTraits<int16_t>
-	{
-		static constexpr bool isValidType = true;
-
-		using FloatType = float;
-		using WideType = int32_t;
-
-		static constexpr int16_t
-		round(float value)
-		{
-			return ::round(value);
-		}
-	};
-
-	template <>
-	struct GeometricTraits<int32_t>
-	{
-		static constexpr bool isValidType = true;
-
-		using FloatType = float;
-
-		// Usually the range of a int32_t is big enough so that no
-		// conversion to int64_t is required. This exception is made because
-		// 64-bit operations are very, very slow on an AVR.
-		using WideType = int32_t;
-
-		static constexpr int32_t
-		round(float value)
-		{
-			return ::round(value);
-		}
-	};
-
-	template <>
-	struct GeometricTraits<float>
-	{
-		static constexpr bool isValidType = true;
-
-		using FloatType = float;
-		using WideType = float;
-
-		static constexpr float
-		round(float value)
-		{
-			return value;
-		}
-	};
-
-	template <>
-	struct GeometricTraits<double>
-	{
-		static constexpr bool isValidType = true;
-
-		using FloatType = double;
-		using WideType = double;
-
-		static constexpr double
-		round(double value)
-		{
-			return value;
+			return detail::geometricRound<T>(value);
 		}
 	};
 }

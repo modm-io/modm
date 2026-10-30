@@ -116,8 +116,8 @@ template <typename T>
 constexpr void
 modm::Location2D<T>::move(T x, float phi)
 {
-	Vector<T, 2> vector(GeometricTraits<T>::round(x * std::cos(this->orientation)),
-					   GeometricTraits<T>::round(x * std::sin(this->orientation)));
+	Vector<T, 2> vector(detail::geometricRound<T>(x * std::cos(this->orientation)),
+					   detail::geometricRound<T>(x * std::sin(this->orientation)));
 	position.translate(vector);
 
 	this->orientation = Angle::normalize(this->orientation + phi);

@@ -58,8 +58,8 @@ namespace modm
 		{
 			T x;
 			T y;
-			using WideType = typename GeometricTraits<T>::WideType;
-			using FloatType = typename GeometricTraits<T>::FloatType;
+			using WideType = typename detail::GeometricWideType<T>::type;
+			using FloatType = detail::GeometricFloatType<T>;
 			constexpr bool operator==(const VectorStorage&) const = default;
 		};
 
@@ -308,12 +308,12 @@ namespace modm
 		/// Scales and rounds to the nearest integer
 		constexpr Vector
 		operator * (float scale) const requires (N == 2)
-		{ return map([&](const T& a) { return GeometricTraits<T>::round(a * scale); }); }
+		{ return map([&](const T& a) { return detail::geometricRound<T>(a * scale); }); }
 
 		/// Scales and rounds to the nearest integer
 		constexpr Vector
 		operator / (float scale) const requires (N == 2)
-		{ return map([&](const T& a) { return GeometricTraits<T>::round(a / scale); }); }
+		{ return map([&](const T& a) { return detail::geometricRound<T>(a / scale); }); }
 
 		/// Cross product of the 2D vectors, which is the z component of the 3D cross product
 		constexpr T
@@ -376,7 +376,7 @@ namespace modm
 				{
 					float tx = this->x;
 					float ty = this->y;
-					return GeometricTraits<T>::round(std::sqrt(tx*tx + ty*ty));
+					return detail::geometricRound<T>(std::sqrt(tx*tx + ty*ty));
 				}
 			}
 			else if constexpr (N <= 4) return float(std::sqrt(getLengthSquared()));
@@ -452,8 +452,8 @@ namespace modm
 			const float c = std::cos(phi);
 			const float s = std::sin(phi);
 			// without rounding the result might be false for T = integer
-			const T tx = GeometricTraits<T>::round(c * this->x - s * this->y);
-			this->y = GeometricTraits<T>::round(s * this->x + c * this->y);
+			const T tx = detail::geometricRound<T>(c * this->x - s * this->y);
+			this->y = detail::geometricRound<T>(s * this->x + c * this->y);
 			this->x = tx;
 			return *this;
 		}

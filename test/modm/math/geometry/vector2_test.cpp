@@ -19,6 +19,14 @@ static_assert(modm::Vector2f(3, 4).getLengthSquared() == 25.f);
 static_assert(modm::Vector2i(100, 100).getLength() == 141);
 static_assert(modm::Vector2i(1, 2).yx() == modm::Vector2i(2, 1));
 static_assert(modm::Vector3i(1, 2, 3).zyx() == modm::Vector3i(3, 2, 1));
+static_assert(modm::Vector2u(3, 4).getLengthSquared() == 25);
+static_assert(modm::Vector2u(1, 2).cross(modm::Vector2u(3, 4)) == -2);
+static_assert(modm::Vector<int, 2>(1, 2).dot(modm::Vector<int, 2>(3, 4)) == 11);
+static_assert(modm::Vector<uint32_t, 2>(3, 4).getLengthSquared() == 25);
+static_assert(std::is_same_v<modm::Vector<int8_t, 2>::WideType, int16_t>);
+static_assert(std::is_same_v<modm::Vector<uint16_t, 2>::WideType, int32_t>);
+static_assert(std::is_same_v<modm::Vector<int32_t, 2>::WideType, int32_t>);
+static_assert(std::is_same_v<modm::Vector<double, 2>::FloatType, double>);
 
 void
 Vector2Test::testConstructor()
