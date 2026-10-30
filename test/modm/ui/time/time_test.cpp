@@ -10,6 +10,9 @@
  */
 // ----------------------------------------------------------------------------
 
+// Tests the deprecated classes until they are removed
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
 #include <modm/ui/time/time.hpp>
 
 #include "time_test.hpp"
