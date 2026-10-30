@@ -14,13 +14,14 @@
 #include <modm/architecture/interface/spi_master.hpp>
 #include <modm/architecture/interface/unaligned.hpp>
 #include <modm/ui/color.hpp>
+#include <modm/processing/resumable.hpp>
 
 namespace modm
 {
 
 /// @ingroup modm_driver_ws2812
 template< class SpiMaster, class Output, size_t LEDs >
-class Ws2812b
+class Ws2812b : protected modm::NestedResumable<3>
 {
 protected:								  // 7654 3210 7654 3210 7654 3210
 	static constexpr uint32_t base_mask  = 0b0010'0100'1001'0010'0100'1001;
@@ -100,14 +101,26 @@ public:
 		return {color[1], color[0], color[2]};
 	}
 
-	void
+	modm::ResumableResult<void>
+	write()
+	requires (SpiMaster::usesDma())
+	{
+		RF_BEGIN();
+		RF_CALL(SpiMaster::transfer(data, nullptr, length+1));
+		RF_END_RETURN();
+	}
+
+	modm::ResumableResult<void>
 	write()
 	{
+		RF_BEGIN();
 		for (const auto value : data) {
 			while (not SpiMaster::Hal::isTransmitRegisterEmpty()) ;
 			SpiMaster::Hal::write(value);
 		}
+		RF_END_RETURN();
 	}
+
 };
 
 }	// namespace modm
