@@ -223,6 +223,8 @@ def build(env):
             tools.update({"bossac"})
     elif platform in ["avr"]:
         tools.update({"avrdude"})
+    if env.has_module(":driver:logic_analyzer"):
+        tools.add("logic_analyzer")
 
     env.outbasepath = "modm/"
     env.substitutions = {"tools": tools}

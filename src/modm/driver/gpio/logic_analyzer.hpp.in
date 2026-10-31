@@ -1,0 +1,289 @@
+/*
+ * Copyright (c) 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <modm/platform/device.hpp>
+#include <array>
+#include <cstddef>
+#include <cstdint>
+
+/// Descriptor read by the host tool via SWD, see `modm_tools/logic_analyzer.py`.
+///
+/// All members are 32 bit wide, so that the layout is identical on the target
+/// and in the Python `struct` used by the host tool. Version 3 supports up to
+/// four ports. The arrays always have four entries and only the first `ports`
+/// entries are valid.
+struct modm_logic_analyzer_t
+{
+	uint32_t magic;              ///< 0x4C4F4741 "LOGA"
+	uint32_t version;            ///< 3
+	uint32_t rate;               ///< actual samples per second and port
+	uint32_t samples;            ///< capacity of each buffer
+	uint32_t ports;              ///< number of sampled ports (1 to 4)
+	uint32_t timer;              ///< timer instance used for sampling
+	uint32_t port[4];            ///< GPIO port index (0 = A)
+	uint32_t base[4];            ///< GPIO base address
+	uint32_t *buffer[4];         ///< sampled input data registers (lower 16 bits used)
+	volatile uint32_t *ndtr[4];  ///< remaining transfers of the DMA channels
+	uint32_t circular;           ///< 1 if the buffers are ring buffers
+	uint32_t running;            ///< 1 between start() and stop()
+	uint32_t count[4];           ///< valid samples per port, set by stop()
+	uint32_t head[4];            ///< index of the oldest sample, set by stop()
+};
+extern "C" modm_logic_analyzer_t modm_logic_analyzer;
+
+static_assert(sizeof(modm_logic_analyzer_t) == 32 * sizeof(uint32_t),
+			  "The logic analyzer descriptor must be 128 bytes long!");
+static_assert(offsetof(modm_logic_analyzer_t, count) == 24 * sizeof(uint32_t),
+			  "The logic analyzer descriptor layout changed!");
+
+namespace modm
+{
+
+namespace logic_analyzer_detail
+{
+
+template<class>
+inline constexpr bool always_false_v = false;
+
+/// Port indices must be unique, since one buffer is used per port.
+template<size_t N>
+constexpr uint8_t
+uniquePorts(const std::array<uint8_t, N> &ports)
+{
+	uint8_t unique = 0;
+	for (size_t ii = 0; ii < N; ii++)
+	{
+		bool duplicate = false;
+		for (size_t jj = 0; jj < ii; jj++)
+			duplicate = duplicate or (ports[jj] == ports[ii]);
+		unique += duplicate ? 0 : 1;
+	}
+	return unique;
+}
+
+/// The timer input clock is provided by the board's `SystemClock`.
+template<class SystemClock>
+constexpr uint32_t
+timerClock()
+{
+	if constexpr (requires { SystemClock::Timer{{ timer }}; })
+		return SystemClock::Timer{{ timer }};
+	else if constexpr (requires { SystemClock::Tim{{ timer }}; })
+		return SystemClock::Tim{{ timer }};
+	else
+	{
+		static_assert(always_false_v<SystemClock>,
+					  "The SystemClock must define `Timer{{ timer }}` (or `Tim{{ timer }}`) "
+					  "for the timer used by the logic analyzer!");
+		return 0;
+	}
+}
+
+}	// namespace logic_analyzer_detail
+
+/**
+ * Samples one to four GPIO ports with DMA.
+ *
+ * The timer compare channels 1 to N are configured with the same compare
+ * value, so all ports are sampled on the same timer event. The N DMA channels
+ * then copy the input data registers into separate buffers with 32 bit
+ * transfers; only the lower 16 bits contain the port pins.
+ *
+ * The number of ports is set with the `modm:driver:logic_analyzer:channels`
+ * option (1 to 4, default 2); unused ports cost neither RAM nor DMA channels.
+ *
+ * @author	Niklas Hauser
+ * @ingroup	modm_driver_logic_analyzer
+ */
+class LogicAnalyzer
+{
+public:
+	/// Capacity of each port buffer in samples.
+	static constexpr size_t Samples = {{ options.samples }};
+	/// Maximum number of different ports that can be sampled at once.
+	static constexpr uint8_t MaxPorts = {{ options.channels }};
+	/// Alias for MaxPorts, the number of configured capture channels.
+	static constexpr uint8_t Channels = MaxPorts;
+	/// Timer instance used for sampling this target.
+	static constexpr uint8_t Timer = {{ timer }};
+
+	/**
+	 * Samples the ports of the Gpios at the compile-time rate in Hz.
+	 *
+	 * The timer division and the unique port map are computed by the compiler,
+	 * so Rate must be a compile-time constant. If several rates are needed,
+	 * switch over the requested value and call this overload for each case.
+	 *
+	 * The ports are sampled until the buffers are full, or until stop() is
+	 * called in circular mode. At most MaxPorts different ports may be given;
+	 * all Gpios of the same port only select that port.
+	 *
+	 * @tparam Rate
+	 * 		Requested samples per second and port.
+	 * @param[in]	circular
+	 * 		Keep sampling and overwrite the buffers after they are full.
+	 * @return	The actual sample rate. It can be lower than the requested rate
+	 * 			if the timer clock cannot be divided far enough.
+	 *
+	 * @note	Call stop() after a one-shot capture to disable the timer and
+	 * 			record how many samples are valid.
+	 */
+	template< class SystemClock, uint32_t Rate, class... Gpios >
+	static uint32_t
+	start(bool circular = false)
+	{
+		static_assert(Rate > 0, "LogicAnalyzer sample rate must not be zero!");
+		constexpr Timing timing = calculateTiming<SystemClock, Rate>();
+		return startWithTiming<Gpios...>(timing.prescaler, timing.period, timing.rate, circular);
+	}
+
+	/// Stops sampling and records how many samples are valid.
+	static void
+	stop();
+
+	/// @return `true` while the DMA is still sampling.
+	static bool
+	isRunning();
+
+	/// Actual sample rate of the last capture in samples per second and port.
+	static uint32_t
+	rate();
+
+	/// Number of valid samples of the last capture for the given port channel.
+	static size_t
+	count(uint8_t channel = 0);
+
+	/// Number of sampled ports of the last capture (1 to MaxPorts).
+	static uint8_t
+	ports();
+
+	/// GPIO port index (0 = A) sampled on the given port channel.
+	static uint8_t
+	port(uint8_t channel = 0);
+
+	/// Index of the oldest sample in the raw buffer of the given port channel.
+	static uint32_t
+	head(uint8_t channel = 0);
+
+	/// Raw buffer of the given port channel. Use head() and count() with it.
+	static const uint32_t *
+	data(uint8_t channel = 0);
+
+	/// Sample `index` of the given port channel, starting at the oldest sample.
+	static uint16_t
+	sample(uint8_t channel, size_t index)
+	{
+		if (channel >= modm_logic_analyzer.ports or
+			index >= modm_logic_analyzer.count[channel])
+			return 0;
+		return uint16_t(modm_logic_analyzer.buffer[channel][
+			(modm_logic_analyzer.head[channel] + index) % modm_logic_analyzer.samples] & 0xffffu);
+	}
+
+private:
+	/// GPIO base address of a port index (0 = A).
+	static constexpr uint32_t
+	base(uint8_t port)
+	{
+		switch (port)
+		{
+%% for port in ports
+			case {{ port | modm.ord }}: return GPIO{{ port }}_BASE;
+%% endfor
+			default: return 0;
+		}
+	}
+
+	struct Timing
+	{
+		uint32_t prescaler;
+		uint32_t period;
+		uint32_t rate;
+	};
+
+	template< class SystemClock, uint32_t Rate >
+	static constexpr Timing
+	calculateTiming()
+	{
+		constexpr uint32_t clock = logic_analyzer_detail::timerClock<SystemClock>();
+		static_assert(clock > 0, "The logic analyzer timer clock must not be zero!");
+		static_assert(Rate > 0, "LogicAnalyzer sample rate must not be zero!");
+
+		// Round to the nearest number of timer ticks and keep the period within
+		// the 16 bit ARR range of the smallest supported timer.
+		uint64_t ticks = (uint64_t(clock) + Rate / 2) / Rate;
+		if (ticks < 2) ticks = 2;
+		uint32_t prescaler = uint32_t((ticks + 65535) / 65536);
+		if (prescaler == 0) prescaler = 1;
+		if (prescaler > 65535) prescaler = 65535;
+		uint32_t period = uint32_t((ticks + prescaler / 2) / prescaler);
+		if (period < 2) period = 2;
+		if (period > 65536) period = 65536;
+
+		const uint32_t actual = uint32_t(uint64_t(clock) / (uint64_t(prescaler) * period));
+		return {prescaler, period, actual};
+	}
+
+	struct PortMap
+	{
+		std::array<uint32_t, MaxPorts> bases{};
+		std::array<uint8_t, MaxPorts> indexes{};
+	};
+
+	/// Builds the unique port base addresses and port indices at compile time.
+	template< size_t N >
+	static constexpr PortMap
+	mapPorts(const std::array<uint8_t, N> &indexes)
+	{
+		PortMap map{};
+		uint8_t count = 0;
+		for (uint8_t ii : indexes)
+		{
+			const uint32_t address = base(ii);
+			bool duplicate = false;
+			for (uint8_t jj = 0; jj < count; jj++)
+				duplicate = duplicate or (map.bases[jj] == address);
+			if (duplicate) continue;
+			if (count < MaxPorts)
+			{
+				map.bases[count] = address;
+				map.indexes[count] = ii;
+			}
+			count++;
+		}
+		return map;
+	}
+
+	template< class... Gpios >
+	static uint32_t
+	startWithTiming(uint32_t prescaler, uint32_t period, uint32_t actual, bool circular)
+	{
+		static_assert(sizeof...(Gpios) > 0, "LogicAnalyzer needs at least one GPIO!");
+		constexpr std::array<uint8_t, sizeof...(Gpios)> indexes = {uint8_t(Gpios::port)...};
+		static_assert(((base(uint8_t(Gpios::port)) != 0) and ...),
+					  "LogicAnalyzer requires valid GPIO ports!");
+		constexpr uint8_t portCount = logic_analyzer_detail::uniquePorts(indexes);
+		static_assert(portCount <= MaxPorts,
+					  "LogicAnalyzer samples at most MaxPorts different GPIO ports!");
+		constexpr PortMap map = mapPorts(indexes);
+		return startImpl(map.bases, map.indexes, portCount, prescaler, period, actual, circular);
+	}
+
+	static uint32_t
+	startImpl(const std::array<uint32_t, MaxPorts> &port,
+			  const std::array<uint8_t, MaxPorts> &index,
+			  uint8_t ports,
+			  uint32_t prescaler, uint32_t period, uint32_t rate, bool circular);
+};
+
+}	// namespace modm

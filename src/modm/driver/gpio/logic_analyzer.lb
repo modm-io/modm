@@ -1,0 +1,364 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2026, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+from collections import defaultdict
+import itertools
+
+# DMA controllers types of the STM32 platform driver that the analyzer supports.
+SUPPORTED_DMA_TYPES = [
+    "stm32-channel",
+    "stm32-channel-request",
+    "stm32-stream-channel",
+    "stm32-mux",
+    "stm32-mux-stream",
+]
+
+# Prefer uncomplicated general purpose timers over the advanced control timers,
+# since the latter are more likely to be used by the application.
+PREFERRED_TIMERS = [2, 3, 4, 5, 1, 8, 15, 16, 17, 20, 9, 10, 11, 12, 13, 14,
+                    21, 22, 23, 24, 6, 7]
+
+MAX_CHANNELS = 4
+
+
+def init(module):
+    module.name = ":driver:logic_analyzer"
+    module.description = FileReader("logic_analyzer.md")
+
+
+def _sram_size(device):
+    """Size of the writable internal RAM in bytes."""
+    size = 0
+    for memory in device.get_driver("core")["memory"]:
+        if "w" in memory["access"] and memory["name"] not in ["backup"]:
+            size += int(memory["size"])
+    return size
+
+
+def _timer_dma_signals(device):
+    """Returns the DMA type and a mapping of timer -> signal -> DMA resource.
+
+    The DMA resource dictionaries contain the controller, the channel/stream and
+    the request/channel selection of the device data.
+    """
+    dma = device.get_driver("dma")
+    dma_type = dma["type"]
+    table = {}
+
+    def signals_of(node):
+        # All peripheral signals that share this DMA request line. If two timer
+        # signals are on the same request line, the DMA controller acknowledges
+        # the request for both and one of them is lost.
+        return frozenset((signal.get("driver"), str(signal.get("instance", "")),
+                          signal.get("name", "")) for signal in node["signal"])
+
+    def add(timer, signal, info):
+        table.setdefault(int(timer), {}).setdefault(signal, []).append(info)
+
+    if dma_type == "stm32-stream-channel":
+        for controller in dma["streams"]:
+            for stream in controller["stream"]:
+                for channel in stream["channel"]:
+                    group = signals_of(channel)
+                    for signal in channel["signal"]:
+                        if signal.get("driver") != "tim":
+                            continue
+                        add(signal["instance"], signal.get("name", ""), {
+                            "dma": int(controller["instance"]),
+                            "channel": int(stream["position"]),
+                            "request": int(channel["position"]),
+                            "kind": "stream",
+                            "group": group,
+                        })
+    elif dma_type == "stm32-channel":
+        for controller in dma["channels"]:
+            for channel in controller["channel"]:
+                group = signals_of(channel)
+                for signal in channel["signal"]:
+                    if signal.get("driver") != "tim":
+                        continue
+                    add(signal["instance"], signal.get("name", ""), {
+                        "dma": int(controller["instance"]),
+                        "channel": int(channel["position"]),
+                        "kind": "channel",
+                        "group": group,
+                    })
+    elif dma_type == "stm32-channel-request":
+        for controller in dma["channels"]:
+            for channel in controller["channel"]:
+                for request in channel["request"]:
+                    group = signals_of(request)
+                    for signal in request["signal"]:
+                        if signal.get("driver") != "tim":
+                            continue
+                        add(signal["instance"], signal.get("name", ""), {
+                            "dma": int(controller["instance"]),
+                            "channel": int(channel["position"]),
+                            "request": int(request["position"]),
+                            "kind": "channel-request",
+                            "group": group,
+                        })
+    elif dma_type in ["stm32-mux", "stm32-mux-stream"]:
+        for requests in dma["requests"]:
+            for request in requests["request"]:
+                group = signals_of(request)
+                for signal in request["signal"]:
+                    if signal.get("driver") != "tim":
+                        continue
+                    add(signal["instance"], signal.get("name", ""), {
+                        "request": int(request["position"]),
+                        "kind": "mux",
+                        "group": group,
+                    })
+    else:
+        raise ValueError("Unsupported DMA type '{}'".format(dma_type))
+
+    return dma_type, table
+
+
+def _same_resource(a, b):
+    if "channel" in a and "channel" in b:
+        return a["dma"] == b["dma"] and a["channel"] == b["channel"]
+    return a["request"] == b["request"]
+
+
+def _resource(info):
+    if "channel" in info:
+        return ("dma", info["dma"], info["channel"])
+    return ("mux", info["request"])
+
+
+def _timer_signal(timer, channel):
+    return ("tim", str(timer), "ch{}".format(channel))
+
+
+def _tuple_key(combo):
+    return (sum(len(info.get("group", ())) for info in combo),
+            [info.get("dma", 0) for info in combo],
+            [info.get("channel", info.get("request", 0)) for info in combo])
+
+
+def _valid_tuple(timer, combo, dma_type):
+    count = len(combo)
+    if len({_resource(info) for info in combo}) != count:
+        return False
+    # DMA1 of F2/F4/F7 is not connected to the AHB peripheral bus matrix and
+    # cannot read the GPIO input data registers.
+    if dma_type == "stm32-stream-channel" and any(info["dma"] != 2 for info in combo):
+        return False
+    # A request line shared between two compare channels would be acknowledged
+    # by only one of the DMA channels, so both cannot be used together.
+    for ii, info in enumerate(combo):
+        group = info.get("group", set())
+        for jj in range(count):
+            if ii != jj and _timer_signal(timer, jj + 1) in group:
+                return False
+    return True
+
+
+def _timer_tuples(timer, signals, dma_type, count):
+    """The best combinations of `count` compare channels for one timer."""
+    lists = [signals.get("ch{}".format(ii), []) for ii in range(1, count + 1)]
+    if any(not entries for entries in lists):
+        return []
+    tuples = [combo for combo in itertools.product(*lists)
+              if _valid_tuple(timer, combo, dma_type)]
+    tuples.sort(key=_tuple_key)
+    return tuples
+
+
+def _mux_dma_channels(dma, count):
+    """`count` high-numbered DMA channels of the first DMA controller with DMAMUX."""
+    groups = defaultdict(list)
+    for mux in dma["mux-channels"]:
+        for channel in mux["mux-channel"]:
+            groups[int(channel["dma-instance"])].append(int(channel["dma-channel"]))
+    for instance in sorted(groups):
+        if len(groups[instance]) >= count:
+            return instance, sorted(groups[instance])[-count:]
+    return None
+
+
+def _request_expression(dma_type, info):
+    if dma_type == "stm32-stream-channel":
+        return "Channel{}".format(info["request"])
+    if dma_type in ["stm32-channel-request", "stm32-mux", "stm32-mux-stream"]:
+        return "Request{}".format(info["request"])
+    return "Any"
+
+
+def _ndtr_expression(dma_type, dma, channel):
+    if dma_type in ["stm32-stream-channel", "stm32-mux-stream"]:
+        return "&DMA{}_Stream{}->NDTR".format(dma, channel)
+    return "&DMA{}_Channel{}->CNDTR".format(dma, channel)
+
+
+def _fcr_expression(dma_type, dma, channel):
+    if dma_type in ["stm32-stream-channel", "stm32-mux-stream"]:
+        return "&DMA{}_Stream{}->FCR".format(dma, channel)
+    return "nullptr"
+
+
+def _timer_sort_key(timer, combo):
+    controllers = [info.get("dma", 1) for info in combo]
+    return (max(controllers), PREFERRED_TIMERS.index(timer)
+            if timer in PREFERRED_TIMERS else 1000, timer)
+
+
+def _wiring(device, channels=2, timer=None):
+    """Computes the timer and DMA wiring for `channels` ports.
+
+    Returns `None` if the target cannot sample that many ports.
+    """
+    if channels < 1 or channels > MAX_CHANNELS:
+        return None
+    if not device.has_driver("dma:stm32*"):
+        return None
+    dma_type = device.get_driver("dma")["type"]
+    if dma_type not in SUPPORTED_DMA_TYPES:
+        return None
+    # The platform DMA driver does not support the STM32U0 DMA controller.
+    if device.identifier.family == "u0":
+        return None
+    # On C0/G0/L0 the GPIO registers are on the IOPORT bus, which is not
+    # reachable from the DMA controller (the transfer raises a bus error).
+    if device.identifier.family in ["c0", "g0", "l0"]:
+        return None
+
+    dma_type, signals = _timer_dma_signals(device)
+    candidates = {t: _timer_tuples(t, sigs, dma_type, channels)
+                  for t, sigs in signals.items()}
+    candidates = {t: tuples for t, tuples in candidates.items() if tuples}
+    if not candidates:
+        return None
+
+    timers = sorted(candidates, key=lambda t: _timer_sort_key(t, candidates[t][0]))
+    if timer is None:
+        timer = timers[0]
+    if timer not in candidates:
+        return None
+
+    combo = candidates[timer][0]
+    if dma_type in ["stm32-mux", "stm32-mux-stream"]:
+        allocation = _mux_dma_channels(device.get_driver("dma"), channels)
+        if allocation is None:
+            return None
+        dma, dma_channels = allocation
+        combo = tuple(dict(info, dma=dma, channel=dma_channels[index])
+                      for index, info in enumerate(combo))
+
+    entries = []
+    for info in combo:
+        entries.append({
+            "dma": info["dma"],
+            "channel": info["channel"],
+            "request": _request_expression(dma_type, info),
+            "ndtr": _ndtr_expression(dma_type, info["dma"], info["channel"]),
+            "fcr": _fcr_expression(dma_type, info["dma"], info["channel"]),
+        })
+
+    return {
+        "timer": timer,
+        "timers": timers,
+        "dma_type": dma_type,
+        "channels": entries,
+    }
+
+
+def _max_channels(device):
+    for count in range(MAX_CHANNELS, 0, -1):
+        if _wiring(device, count) is not None:
+            return count
+    return 0
+
+
+def _ports(device):
+    return sorted(set(gpio["port"].upper() for gpio in device.get_driver("gpio")["gpio"]))
+
+
+def _timer_option(value):
+    return None if value == "auto" else int(value)
+
+
+def prepare(module, options):
+    target = options[":target"]
+    if target.identifier["platform"] != "stm32":
+        return False
+
+    max_channels = _max_channels(target)
+    if max_channels == 0:
+        return False
+    wiring = _wiring(target, 1)
+    default_channels = min(2, max_channels)
+    default_samples = min(16384, max(256, _sram_size(target) // (16 * max_channels)))
+
+    module.add_option(
+        NumericOption(
+            name="channels",
+            description="Maximum number of GPIO ports to sample (1 to 4)",
+            minimum=1, maximum=MAX_CHANNELS, default=default_channels))
+    module.add_option(
+        NumericOption(
+            name="samples",
+            description="Number of samples per port",
+            minimum=16, maximum=65535, default=default_samples))
+    module.add_option(
+        EnumerationOption(
+            name="timer",
+            description="Timer instance used for sampling, or auto",
+            enumeration=["auto"] + [str(t) for t in wiring["timers"]],
+            default="auto"))
+
+    module.depends(
+        ":architecture:register",
+        ":cmsis:device",
+        ":platform:dma",
+        ":platform:gpio",
+        ":platform:rcc")
+    return True
+
+
+def validate(env):
+    target = env[":target"]
+    channels = int(env["channels"])
+    timer = _timer_option(env["timer"])
+    wiring = _wiring(target, channels, timer)
+    if wiring is None:
+        if timer is not None:
+            raise ValidateException(
+                "Timer {} cannot sample {} ports on this target! "
+                "Select another timer with `modm:driver:logic_analyzer:timer`."
+                .format(timer, channels))
+        raise ValidateException(
+            "This target cannot sample {} GPIO ports! Reduce "
+            "`modm:driver:logic_analyzer:channels`.".format(channels))
+    selected = wiring["timer"]
+    if env.has_module(":platform:timer:{}".format(selected)):
+        env.log.warning(
+            "`:driver:logic_analyzer` uses timer {} which is also enabled via "
+            "`modm:platform:timer:{}`. Select another timer with the "
+            "`modm:driver:logic_analyzer:timer` option!".format(selected, selected))
+
+def build(env):
+    channels = int(env["channels"])
+    wiring = _wiring(env[":target"], channels, _timer_option(env["timer"]))
+    if wiring is None:
+        raise ValidateException(
+            "This target cannot sample {} GPIO ports!".format(channels))
+    env.substitutions = {
+        "timer": wiring["timer"],
+        "channels": channels,
+        "ch": wiring["channels"],
+        "ports": _ports(env[":target"]),
+    }
+    env.outbasepath = "modm/src/modm/driver"
+    env.template("logic_analyzer.hpp.in")
+    env.template("logic_analyzer.cpp.in")

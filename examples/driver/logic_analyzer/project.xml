@@ -1,0 +1,7 @@
+<library>
+  <extends>modm:nucleo-f429zi</extends>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:driver:logic_analyzer</module>
+  </modules>
+</library>

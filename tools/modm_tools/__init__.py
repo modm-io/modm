@@ -9,6 +9,7 @@ from . import find_files
 from . import gdb
 from . import info
 from . import itm
+from . import logic_analyzer
 from . import openocd
 from . import rtt
 from . import size
