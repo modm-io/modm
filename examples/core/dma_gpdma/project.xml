@@ -1,0 +1,12 @@
+<library>
+  <extends>modm:nucleo-h563zi</extends>
+  <!-- <extends>modm:weact-h7r3z8</extends> -->
+  <options>
+    <option name="modm:build:build.path">../../../build/core/dma_gpdma</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:dma</module>
+    <module>modm:platform:spi:1</module>
+  </modules>
+</library>
