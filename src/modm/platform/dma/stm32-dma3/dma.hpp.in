@@ -1,0 +1,365 @@
+/*
+ * Copyright (c) 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <array>
+#include <modm/architecture/interface/assert.hpp>
+#include <modm/platform/clock/rcc.hpp>
+#include "dma_base.hpp"
+
+namespace modm::platform
+{
+
+/// @cond
+namespace dma
+{
+	template <DmaBase::Kind kind, Peripheral peripheral, DmaBase::Signal signal>
+	struct RequestMap;
+}
+/// @endcond
+
+/**
+ * Linked-list DMA controller (GPDMA, HPDMA, LPDMA)
+ *
+ * Implements the same channel interface as the other STM32 DMA drivers. The
+ * advanced features (linked lists, 2D addressing, bursts, triggers) are not
+ * used, except for one linked-list item per channel for the circular mode.
+ *
+ * The DMA cannot access all memories, for example, the DTCM of the STM32H7R/S.
+ * On devices with data cache the buffers must be cleaned or invalidated, or be
+ * placed in non-cacheable memory.
+ *
+ * @author	Niklas Hauser
+ * @ingroup	modm_platform_dma
+ */
+template <DmaBase::Controller C>
+class DmaController : public DmaBase
+{
+	static constexpr DmaBase::Kind ControllerKind = []
+	{
+%% for controller in controllers
+		if constexpr (C == Controller::{{ controller.name }}) return Kind::{{ controller.kind }};
+%% endfor
+	}();
+
+	static constexpr uint8_t ChannelCount = []
+	{
+%% for controller in controllers
+		if constexpr (C == Controller::{{ controller.name }}) return {{ controller.channels }};
+%% endfor
+	}();
+
+public:
+	static void
+	enable()
+	{
+%% for controller in controllers
+		if constexpr (C == Controller::{{ controller.name }}) Rcc::enable<Peripheral::{{ controller.name }}>();
+%% endfor
+	}
+
+	static void
+	disable()
+	{
+%% for controller in controllers
+		if constexpr (C == Controller::{{ controller.name }}) Rcc::disable<Peripheral::{{ controller.name }}>();
+%% endfor
+	}
+
+	template <DmaBase::Channel ChannelID>
+	class Channel : public DmaBase
+	{
+		static_assert(uint8_t(ChannelID) < ChannelCount, "invalid Channel ID for that DMA controller");
+
+		static DMA_Channel_TypeDef*
+		reg()
+		{
+%% for controller in controllers
+			if constexpr (C == Controller::{{ controller.name }}) return {{ controller.name | upper }}_Channel0 + uint8_t(ChannelID);
+%% endfor
+		}
+
+		static constexpr IRQn_Type Irq = []
+		{
+%% for controller in controllers
+			if constexpr (C == Controller::{{ controller.name }}) return std::array{
+				%% for channel in range(controller.channels)
+				{{ controller.name | upper }}_Channel{{ channel }}_IRQn,
+				%% endfor
+			}[uint8_t(ChannelID)];
+%% endfor
+		}();
+
+		static constexpr uint32_t Updates = DMA_CLLR_UB1 | DMA_CLLR_USA | DMA_CLLR_UDA | DMA_CLLR_ULL;
+		/// The registers loaded by the linked-list item, in the order of the CLLR update bits
+		struct alignas(4) Node { uint32_t CBR1, CSAR, CDAR, CLLR; };
+
+	public:
+		/**
+		 * Configure the DMA channel
+		 *
+		 * Stops the DMA channel and writes the new transfer configuration.
+		 * The peripheral request and the interrupt enables are kept.
+		 */
+		static void
+		configure(DataTransferDirection direction, MemoryDataSize memoryDataSize,
+				PeripheralDataSize peripheralDataSize,
+				MemoryIncrementMode memoryIncrement,
+				PeripheralIncrementMode peripheralIncrement,
+				Priority priority = Priority::Medium,
+				CircularMode circularMode = CircularMode::Disabled)
+		{
+			stop();
+			const uint32_t memory = (uint32_t(memoryDataSize) << DMA_CTR1_DDW_LOG2_Pos) |
+					(memoryIncrement == MemoryIncrementMode::Increment ? DMA_CTR1_DINC : 0);
+			const uint32_t peripheral = (uint32_t(peripheralDataSize) << DMA_CTR1_SDW_LOG2_Pos) |
+					(peripheralIncrement == PeripheralIncrementMode::Increment ? DMA_CTR1_SINC : 0);
+			uint32_t ctr2 = reg()->CTR2 & DMA_CTR2_REQSEL_Msk;
+			if (direction == DataTransferDirection::MemoryToPeripheral)
+			{
+				// The source is the memory: move the fields from the destination to the source position
+				reg()->CTR1 = (memory >> DMA_CTR1_DDW_LOG2_Pos) | (peripheral << DMA_CTR1_DDW_LOG2_Pos);
+				ctr2 |= DMA_CTR2_DREQ;
+			}
+			else
+			{
+				reg()->CTR1 = memory | peripheral;
+				if (direction == DataTransferDirection::MemoryToMemory) ctr2 |= DMA_CTR2_SWREQ;
+			}
+			reg()->CTR2 = ctr2;
+			reg()->CCR = (reg()->CCR & InterruptMask) | uint32_t(priority);
+			circular = (circularMode == CircularMode::Enabled);
+		}
+
+		/// Start the transfer of the DMA channel and clear all interrupt flags.
+		static void
+		start()
+		{
+			reg()->CFCR = uint32_t(InterruptFlags::All);
+			if (circular)
+			{
+				node = {reg()->CBR1, reg()->CSAR, reg()->CDAR, Updates | (uint32_t(&node) & 0xfffc)};
+				reg()->CLBAR = uint32_t(&node) & 0xffff'0000;
+				reg()->CLLR = node.CLLR;
+			}
+			else reg()->CLLR = 0;
+			reg()->CCR |= DMA_CCR_EN;
+		}
+
+		/// Stop a DMA channel transfer and reset the channel.
+		static void
+		stop()
+		{
+			if (reg()->CCR & DMA_CCR_EN)
+			{
+				reg()->CCR |= DMA_CCR_SUSP;
+				while (not (reg()->CSR & (DMA_CSR_SUSPF | DMA_CSR_IDLEF))) ;
+			}
+			reg()->CCR = (reg()->CCR & ~(DMA_CCR_EN | DMA_CCR_SUSP)) | DMA_CCR_RESET;
+		}
+
+		static DataTransferDirection
+		getDataTransferDirection()
+		{
+			const uint32_t ctr2 = reg()->CTR2;
+			if (ctr2 & DMA_CTR2_SWREQ) return DataTransferDirection::MemoryToMemory;
+			if (ctr2 & DMA_CTR2_DREQ) return DataTransferDirection::MemoryToPeripheral;
+			return DataTransferDirection::PeripheralToMemory;
+		}
+
+		/**
+		 * Set the memory address of the DMA channel
+		 *
+		 * @note In Mem2Mem mode use this method to set the memory destination address.
+		 */
+		static void
+		setMemoryAddress(uintptr_t address)
+		{
+			if (memoryIsSource()) reg()->CSAR = address;
+			else reg()->CDAR = address;
+		}
+
+		/**
+		 * Set the peripheral address of the DMA channel
+		 *
+		 * @note In Mem2Mem mode use this method to set the memory source address.
+		 */
+		static void
+		setPeripheralAddress(uintptr_t address)
+		{
+			if (memoryIsSource()) reg()->CDAR = address;
+			else reg()->CSAR = address;
+		}
+
+		static void
+		setMemoryIncrementMode(bool increment)
+		{
+			const uint32_t bit = memoryIsSource() ? DMA_CTR1_SINC : DMA_CTR1_DINC;
+			reg()->CTR1 = increment ? (reg()->CTR1 | bit) : (reg()->CTR1 & ~bit);
+		}
+
+		static void
+		setPeripheralIncrementMode(bool increment)
+		{
+			const uint32_t bit = memoryIsSource() ? DMA_CTR1_DINC : DMA_CTR1_SINC;
+			reg()->CTR1 = increment ? (reg()->CTR1 | bit) : (reg()->CTR1 & ~bit);
+		}
+
+		/// Set the number of data items to transfer in units of the source data size
+		static void
+		setDataLength(std::size_t length)
+		{
+			const uint32_t width = (reg()->CTR1 & DMA_CTR1_SDW_LOG2_Msk) >> DMA_CTR1_SDW_LOG2_Pos;
+			modm_assert_continue_ignore_debug((length << width) <= DMA_CBR1_BNDT_Msk,
+					"dma.len", "DMA transfer is longer than 65535 bytes!", length);
+			reg()->CBR1 = length << width;
+		}
+
+		/// Called by the channel IRQ handler when an error occured, the channel is stopped before.
+		static void
+		setTransferErrorIrqHandler(IrqHandler irqHandler)
+		{
+			transferError = irqHandler;
+		}
+
+		/// Called by the channel IRQ handler when the transfer is half complete.
+		static void
+		setHalfTransferCompleteIrqHandler(IrqHandler irqHandler)
+		{
+			halfTransferComplete = irqHandler;
+		}
+
+		/// Called by the channel IRQ handler when the transfer is complete.
+		static void
+		setTransferCompleteIrqHandler(IrqHandler irqHandler)
+		{
+			transferComplete = irqHandler;
+		}
+
+		/// Set the peripheral that operates the channel
+		template <DmaBase::Request dmaRequest>
+		static void
+		setPeripheralRequest()
+		{
+			reg()->CTR2 = (reg()->CTR2 & ~DMA_CTR2_REQSEL_Msk) | uint32_t(dmaRequest);
+		}
+
+		/// IRQ handler of the DMA channel, stops the channel on errors.
+		modm_always_inline static void
+		interruptHandler()
+		{
+			const uint32_t flags = reg()->CSR & uint32_t(InterruptFlags::All);
+			reg()->CFCR = flags;
+			if (flags & uint32_t(InterruptFlags::Error))
+			{
+				stop();
+				if (transferError) transferError();
+			}
+			if (halfTransferComplete and (flags & DMA_CSR_HTF)) halfTransferComplete();
+			if (transferComplete and (flags & DMA_CSR_TCF)) transferComplete();
+		}
+
+		/**
+		 * Read channel status flags when channel interrupts are disabled.
+		 *
+		 * @warning Flags are automatically cleared in the ISR if the channel
+		 * 			interrupt is enabled or when start() is called.
+		 */
+		static InterruptFlags_t
+		getInterruptFlags()
+		{
+			return InterruptFlags_t(reg()->CSR & uint32_t(InterruptFlags::All));
+		}
+
+		/// Clear channel interrupt flags, use only when the channel interrupt is disabled.
+		static void
+		clearInterruptFlags(InterruptFlags_t flags = InterruptFlags::All)
+		{
+			reg()->CFCR = flags.value;
+		}
+
+		static void
+		enableInterruptVector(uint32_t priority = 1)
+		{
+			NVIC_SetPriority(Irq, priority);
+			NVIC_EnableIRQ(Irq);
+		}
+
+		static void
+		disableInterruptVector()
+		{
+			NVIC_DisableIRQ(Irq);
+		}
+
+		static void
+		enableInterrupt(InterruptEnable_t irq)
+		{
+			reg()->CCR |= irq.value;
+		}
+
+		static void
+		disableInterrupt(InterruptEnable_t irq)
+		{
+			reg()->CCR &= ~irq.value;
+		}
+
+		/// Provides the Request of a peripheral signal for setPeripheralRequest().
+		template <Peripheral peripheral, Signal signal = Signal::NoSignal>
+		struct RequestMapping
+		{
+			using Channel = DmaController::Channel<ChannelID>;
+			static constexpr DmaBase::Request Request = dma::RequestMap<ControllerKind, peripheral, signal>::Request;
+		};
+
+	private:
+		static constexpr uint32_t InterruptMask = DMA_CCR_TCIE | DMA_CCR_HTIE | DMA_CCR_DTEIE |
+				DMA_CCR_ULEIE | DMA_CCR_USEIE | DMA_CCR_SUSPIE | DMA_CCR_TOIE;
+
+		static bool
+		memoryIsSource()
+		{
+			return reg()->CTR2 & DMA_CTR2_DREQ;
+		}
+
+		static inline bool circular{false};
+		static inline Node node{};
+		static inline DmaBase::IrqHandler transferError { nullptr };
+		static inline DmaBase::IrqHandler halfTransferComplete { nullptr };
+		static inline DmaBase::IrqHandler transferComplete { nullptr };
+	};
+};
+
+/// @ingroup	modm_platform_dma
+/// @{
+%% for controller in controllers
+class {{ controller.name }} : public DmaController<DmaBase::Controller::{{ controller.name }}>
+{
+public:
+	%% for channel in range(controller.channels)
+	using Channel{{ channel }} = DmaController<DmaBase::Controller::{{ controller.name }}>::Channel<DmaBase::Channel::Channel{{ channel }}>;
+	%% endfor
+};
+
+%% endfor
+/// @}
+
+/// @cond
+namespace dma
+{
+%% for kind, peripheral, signal, request in mappings
+template <> struct RequestMap<DmaBase::Kind::{{ kind }}, Peripheral::{{ peripheral }}, DmaBase::Signal::{{ signal }}>
+{ static constexpr DmaBase::Request Request = DmaBase::Request::Request{{ request }}; };
+%% endfor
+}
+/// @endcond
+
+}	// namespace modm::platform

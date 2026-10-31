@@ -1,0 +1,168 @@
+/*
+ * Copyright (c) 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <stdint.h>
+#include <cstddef>
+#include "../device.hpp"
+#include <modm/architecture/interface/register.hpp>
+
+namespace modm::platform
+{
+
+/**
+ * Definitions shared by all linked-list DMA controllers (GPDMA, HPDMA, LPDMA)
+ *
+ * The enums are compatible with the other STM32 DMA drivers, so that the
+ * peripheral drivers can use any DMA implementation.
+ *
+ * @ingroup	modm_platform_dma
+ */
+class DmaBase
+{
+public:
+	enum class
+	Controller : uint8_t
+	{
+%% for controller in controllers
+		{{ controller.name }},
+%% endfor
+	};
+
+	/// The controller types, each type has its own request map
+	enum class
+	Kind : uint8_t
+	{
+%% for kind in kinds
+		{{ kind }},
+%% endfor
+	};
+
+	enum class
+	Channel : uint8_t
+	{
+%% for channel in range(max_channels)
+		Channel{{ channel }},
+%% endfor
+	};
+
+	/// The hardware request of the peripheral, memory-to-memory transfers need none
+	enum class
+	Request : uint8_t
+	{
+%% for request in range(max_request + 1)
+		Request{{ request }},
+%% endfor
+	};
+
+	enum class
+	Priority : uint32_t
+	{
+		Low 		= 0,
+		Medium  	= 1u << DMA_CCR_PRIO_Pos,
+		High 		= 2u << DMA_CCR_PRIO_Pos,
+		VeryHigh 	= 3u << DMA_CCR_PRIO_Pos,
+	};
+
+	/// The values are log2 of the data width in bytes
+	enum class
+	MemoryDataSize : uint8_t
+	{
+		Byte 		= 0,
+		Bit8 		= Byte,
+		HalfWord 	= 1,
+		Bit16 		= HalfWord,
+		Word 		= 2,
+		Bit32 		= Word,
+	};
+
+	/// The values are log2 of the data width in bytes
+	enum class
+	PeripheralDataSize : uint8_t
+	{
+		Byte 		= 0,
+		Bit8 		= Byte,
+		HalfWord 	= 1,
+		Bit16 		= HalfWord,
+		Word 		= 2,
+		Bit32 		= Word,
+	};
+
+	enum class
+	MemoryIncrementMode : uint8_t
+	{
+		Fixed 		= 0,
+		Increment 	= 1, ///< incremented according to MemoryDataSize
+	};
+
+	enum class
+	PeripheralIncrementMode : uint8_t
+	{
+		Fixed 		= 0,
+		Increment 	= 1, ///< incremented according to PeripheralDataSize
+	};
+
+	enum class
+	CircularMode : uint8_t
+	{
+		Disabled 	= 0,
+		Enabled 	= 1, ///< reloads the transfer with a linked-list item after completion
+	};
+
+	enum class
+	DataTransferDirection : uint8_t
+	{
+		/// Source: peripheral address; Sink: memory address
+		PeripheralToMemory,
+		/// Source: memory address; Sink: peripheral address
+		MemoryToPeripheral,
+		/// Source: peripheral address; Sink: memory address
+		MemoryToMemory,
+	};
+
+	enum class
+	Signal : uint8_t
+	{
+		NoSignal,
+%% for signal in signals
+		{{ signal }},
+%% endfor
+	};
+
+	enum class
+	InterruptEnable : uint32_t
+	{
+		TransferComplete	= DMA_CCR_TCIE,
+		HalfTransfer		= DMA_CCR_HTIE,
+		TransferError		= DMA_CCR_DTEIE | DMA_CCR_ULEIE | DMA_CCR_USEIE,
+	};
+	MODM_FLAGS32(InterruptEnable);
+
+	/// The bit positions of the channel status and flag clear register
+	enum class
+	InterruptFlags : uint32_t
+	{
+		TransferComplete		= DMA_CSR_TCF,
+		HalfTransferComplete	= DMA_CSR_HTF,
+		/// Data transfer, link transfer or configuration error
+		Error					= DMA_CSR_DTEF | DMA_CSR_ULEF | DMA_CSR_USEF,
+		Suspended				= DMA_CSR_SUSPF,
+		TriggerOverrun			= DMA_CSR_TOF,
+		All						= TransferComplete | HalfTransferComplete | Error | Suspended | TriggerOverrun,
+		Global					= All,
+	};
+	MODM_FLAGS32(InterruptFlags);
+
+	using IrqHandler = void (*)(void);
+};
+
+}	// namespace modm::platform

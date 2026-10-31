@@ -1,0 +1,70 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2026, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+import re
+
+KINDS = ["gpdma", "hpdma", "lpdma"]
+
+
+def init(module):
+    module.name = ":platform:dma"
+    module.description = FileReader("module.md")
+
+
+def prepare(module, options):
+    device = options[":target"]
+    if not any(device.has_driver(f"{kind}:stm32") for kind in KINDS):
+        return False
+    module.depends(
+        ":architecture:assert",
+        ":architecture:interrupt",
+        ":architecture:register",
+        ":cmsis:device",
+        ":platform:rcc")
+    return True
+
+
+def build(env):
+    device = env[":target"]
+    vectors = [v["name"] for v in device.get_driver("core")["vector"]]
+
+    controllers = []
+    requests = {}
+    mappings = {}
+    for kind in KINDS:
+        for driver in device.get_all_drivers(f"{kind}:stm32"):
+            requests[kind] = driver["requests"][0]["request"]
+            for request in requests[kind]:
+                for signal in request["signal"]:
+                    peripheral = signal["driver"].capitalize() + signal.get("instance", "")
+                    name = signal.get("name", "NoSignal").capitalize()
+                    # The first request wins if a signal is listed more than once
+                    mappings.setdefault((kind.capitalize(), peripheral, name), int(request["position"]))
+            for instance in driver["instance"]:
+                name = f"{kind.capitalize()}{instance}"
+                channels = sorted(int(m.group(1)) for v in vectors
+                                  if (m := re.fullmatch(rf"{name.upper()}_Channel(\d+)", v)))
+                assert channels == list(range(len(channels))), f"{name} has missing channel IRQs"
+                controllers.append({"name": name, "kind": kind.capitalize(), "channels": len(channels)})
+
+    env.substitutions = {
+        "controllers": controllers,
+        "kinds": [kind.capitalize() for kind in requests],
+        "mappings": [(*key, request) for key, request in sorted(mappings.items())],
+        "max_channels": max(c["channels"] for c in controllers),
+        "max_request": max(mappings.values()),
+        "signals": sorted({name for _, _, name in mappings} - {"NoSignal"}),
+    }
+    env.outbasepath = "modm/src/modm/platform/dma"
+    env.template("dma_base.hpp.in")
+    env.template("dma.hpp.in")
+    env.template("dma.cpp.in")
