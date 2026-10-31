@@ -40,8 +40,10 @@ struct SystemClock
 		.M = 4,   //   8 MHz /   4 =   2 MHz
 		.N = 250, //   2 MHz * 120 = 500 MHz
 		.P = 2,   // 500 MHz /   2 = 250 MHz = F_cpu
+		.Q = 4,   // 500 MHz /   4 = 125 MHz = F_spi123
 	};
 	static constexpr uint32_t Pll1P = Hse / pll1.M * pll1.N / pll1.P;
+	static constexpr uint32_t Pll1Q = Hse / pll1.M * pll1.N / pll1.Q;
 	static_assert(Pll1P == Rcc::MaxFrequency);
 
 	static constexpr Rcc::PllConfig pll3
@@ -69,13 +71,15 @@ struct SystemClock
 	static constexpr uint32_t Adc1 = Hclk;
 	static constexpr uint32_t Dac1 = Hclk;
 
+	// SPI1-3 use PLL1Q after reset
+	static constexpr uint32_t Spi1 = Pll1Q;
+	static constexpr uint32_t Spi2 = Pll1Q;
+	static constexpr uint32_t Spi3 = Pll1Q;
+
 	// Peripherals on APB2
-	static constexpr uint32_t Spi1 = Apb2;
 	static constexpr uint32_t Usart1 = Apb2;
 
 	// Peripherals on APB1
-	static constexpr uint32_t Spi2 = Apb1;
-	static constexpr uint32_t Spi3 = Apb1;
 	static constexpr uint32_t Usart2 = Apb1;
 	static constexpr uint32_t Usart3 = Apb1;
 	static constexpr uint32_t Fdcan1 = Apb1;
