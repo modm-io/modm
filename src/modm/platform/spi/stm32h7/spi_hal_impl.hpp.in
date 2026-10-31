@@ -49,7 +49,9 @@ SpiHal{{ id }}::initialize(Prescaler prescaler,
 		StatusFlag::CrcError |
 		StatusFlag::TiFrameError |
 		StatusFlag::ModeFault |
+%% if target.family != "h5"
 		StatusFlag::Reload |
+%% endif
 		StatusFlag::Suspension
 	);
 

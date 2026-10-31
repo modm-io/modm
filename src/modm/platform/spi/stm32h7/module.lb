@@ -38,6 +38,12 @@ class Instance(Module):
             properties["max_crc_bits"] = properties["max_data_bits"]
             properties["max_transfer_size"] = 2**16 - 1
             properties["i2s"] = self.instance in (1, 2, 3, 6)
+        elif device.identifier.family in ["h5"]:
+            properties["fifo_size"] = 16 if self.instance in (1, 2, 3) else 8
+            properties["max_data_bits"] = 32 if self.instance in (1, 2, 3) else 16
+            properties["max_crc_bits"] = properties["max_data_bits"]
+            properties["max_transfer_size"] = 2**16 - 1
+            properties["i2s"] = self.instance in (1, 2, 3)
         elif device.identifier.family in ["h7"]:
             properties["fifo_size"] = 16 if self.instance in (1, 2, 3) else 8
             properties["max_data_bits"] = 32 if self.instance in (1, 2, 3) else 16
@@ -67,7 +73,7 @@ def prepare(module, options):
     device = options[":target"]
     if not device.has_driver("spi:stm32-extended"):
         return False
-    if device.identifier.family not in ["h7"]:
+    if device.identifier.family not in ["h5", "h7"]:
         # U5 is not supported yet
         return False
 
