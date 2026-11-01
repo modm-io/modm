@@ -21,10 +21,19 @@ def repopath(path):
 def relpath(path):
     return os.path.relpath(path, str(repopath(".")))
 
-sys.path.append(str(repopath("ext/modm-devices/tools/generator")))
 sys.path.append(str(repopath("ext/modm-devices")))
-from dfg.device_tree import DeviceTree
 from modm_devices.device_identifier import *
+import modm_devices.device_identifier
+
+# The dfg package requires modm-data, so only load its tree with the modm-devices identifiers
+import types, importlib.util
+sys.modules["dfg"] = types.ModuleType("dfg")
+sys.modules["dfg"].__path__ = []
+sys.modules["dfg.identifier"] = modm_devices.device_identifier
+_spec = importlib.util.spec_from_file_location("dfg.tree", repopath("ext/modm-devices/tools/generator/dfg/tree.py"))
+_tree = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_tree)
+DeviceTree = _tree.DeviceTree
 
 # sys.path.insert(0, str(repopath("../lbuild")))
 import lbuild
