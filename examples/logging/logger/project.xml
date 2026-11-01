@@ -13,7 +13,7 @@
     <!-- Required for modm:rp-pico -->
     <!-- <option name="modm:board:rp-pico:with_logger">yes</option> -->
     <!-- The network core of modm:nrf5340-dk -->
-    <!-- <option name="modm:target">nrf5340-xxaa@net</option> -->
+    <!-- <option name="modm:target">nrf5340-qkaa@net</option> -->
   </options>
   <modules>
     <module>modm:debug</module>

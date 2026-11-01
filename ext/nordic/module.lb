@@ -92,7 +92,9 @@ def prepare(module, options):
 
 def validate(env):
     device = env[":target"]
-    define = device.identifier.string.upper().replace("-", "_")
+    # The CMSIS defines ignore the package, e.g. nrf52840-qiaa is NRF52840_XXAA
+    define = device.identifier.string.replace("-" + device.identifier.package, "-xx", 1)
+    define = define.upper().replace("-", "_")
     define = define.replace("@APP", "_APPLICATION").replace("@NET", "_NETWORK")
 
     # nrf.h includes the device headers relative to itself, so keep the folder structure

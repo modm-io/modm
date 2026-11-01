@@ -6,7 +6,7 @@
   </repositories>
 
   <options>
-    <option name="modm:target">nrf52840-xxaa</option>
+    <option name="modm:target">nrf52840-qiaa</option>
   </options>
   <modules>
     <module>modm:board:nrf52840-dk</module>

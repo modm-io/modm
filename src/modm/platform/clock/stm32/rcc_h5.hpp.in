@@ -194,7 +194,7 @@ public:
 		PllVcoRange vcoRange = PllVcoRange::Wide;
 	};
 %#
-%% set pll_ids = ([1,2] if target.name == "03" else [1,2,3])
+%% set pll_ids = ([1,2] if target.name in ["03", "43", "53"] else [1,2,3])
 %% for id in pll_ids
 	/// Configure and enable PLL{{id}}
 	static inline bool

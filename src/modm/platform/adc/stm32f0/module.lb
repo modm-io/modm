@@ -22,6 +22,9 @@ def prepare(module, options):
             device.has_driver("adc:stm32-f0") or
             device.has_driver("adc:stm32-g0")):
         return False
+    # The U0 ADC has the G0 type since modm-devices uses modm-data, but is not supported yet
+    if device.identifier.family in ["u0"]:
+        return False
     module.depends(
         ":architecture:delay",
         ":architecture:adc",

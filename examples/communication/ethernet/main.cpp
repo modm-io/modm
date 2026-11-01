@@ -191,7 +191,7 @@ main()
 	Ethernet::Port::connect<Ethernet::RMII_Ref_Clk::Refclk,
 		Ethernet::RMII_Mdc::Mdc,
 		Ethernet::RMII_Mdio::Mdio,
-		Ethernet::RMII_Crs_Dv::Rcccrsdv,
+		Ethernet::RMII_Crs_Dv::Crsdv,
 		Ethernet::RMII_Tx_En::Txen,
 		Ethernet::RMII_Tx_D0::Txd0,
 		Ethernet::RMII_Tx_D1::Txd1,
