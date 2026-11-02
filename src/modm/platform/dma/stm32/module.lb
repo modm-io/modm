@@ -25,7 +25,8 @@ def init(module):
 def prepare(module, options):
     device = options[":target"]
 
-    module.depends(":cmsis:device", ":platform:rcc")
+    module.depends(":architecture:assert", ":architecture:interrupt", ":architecture:register",
+                   ":cmsis:device", ":platform:rcc")
 
     if (not device.has_driver("dma")) or device.get_driver("dma")["type"] not in \
             [
@@ -36,7 +37,7 @@ def prepare(module, options):
             "stm32-stream-channel",
     ]:
         return False
-    return device.identifier.family not in ["u0"]
+    return True
 
 
 def get_irq_list(device):

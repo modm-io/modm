@@ -73,7 +73,7 @@ public:
 %% endif
 		}
 %% endif
-%% if dmaType in ["stm32-mux"] and target.family not in ["c0", "g0"]:
+%% if dmaType in ["stm32-mux"] and target.family not in ["c0", "g0", "u0"]:
 		Rcc::enable<Peripheral::Dmamux1>();
 %% endif
 	}
