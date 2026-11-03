@@ -484,8 +484,24 @@ public:
 
 	/// Transitions the device between normal and safe operation mode
 	void
-	setMode(TransitMode mode, uint8_t device = 0)
-	{ writeRegister(device, Register::GLB_CTRL, GlobalControl_t(TransitMode_t(mode)).value); }
+	setMode(TransitMode mode, uint8_t device = 0);
+
+	/// Connects OUT1+OUT2 (for Output1 or Output2) or OUT3+OUT4 (for Output3
+	/// or Output4) in parallel, which halves Rdson and doubles the current
+	/// capability. The two outputs must be connected together on the board.
+	///
+	/// In parallel mode only the lower output of the pair (Output1 or
+	/// Output3) is used: its control bits switch both outputs, the control
+	/// bits of the upper output have no effect. Each output sees half of the
+	/// total current, so the current thresholds and measurements of the
+	/// lower output apply to half of the load current, see datasheet
+	/// section 8.3.3.
+	void
+	setParallelMode(Output output, bool enable, uint8_t device = 0);
+
+	/// Whether the output pair of \c output is in parallel mode
+	bool
+	getParallelMode(Output output, uint8_t device = 0);
 
 	/// Configures switching slew rate and on/off state for all four outputs at once
 	void

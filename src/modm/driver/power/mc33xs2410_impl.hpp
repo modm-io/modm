@@ -28,6 +28,42 @@ Mc33xs2410<SpiMaster, Cs, MaxDevices>::initialize()
 
 template <class SpiMaster, class Cs, size_t MaxDevices>
 void
+Mc33xs2410<SpiMaster, Cs, MaxDevices>::setMode(TransitMode mode, uint8_t device)
+{
+	GlobalControl_t control(readRegister(device, Register::GLB_CTRL));
+	TransitMode_t::set(control, mode);
+	writeRegister(device, Register::GLB_CTRL, control.value);
+}
+
+
+template <class SpiMaster, class Cs, size_t MaxDevices>
+void
+Mc33xs2410<SpiMaster, Cs, MaxDevices>::setParallelMode(Output output, bool enable, uint8_t device)
+{
+	const auto bit = uint8_t(output) < uint8_t(Output::Output3) ?
+			GlobalControl::ParallelOut12 : GlobalControl::ParallelOut34;
+
+	GlobalControl_t control(readRegister(device, Register::GLB_CTRL));
+	// The transit bits are not retained, so writing back what was read must
+	// not request a transition, least of all 11b, which resets the device.
+	TransitMode_t::set(control, TransitMode::None);
+	control.update(bit, enable);
+	writeRegister(device, Register::GLB_CTRL, control.value);
+}
+
+
+template <class SpiMaster, class Cs, size_t MaxDevices>
+bool
+Mc33xs2410<SpiMaster, Cs, MaxDevices>::getParallelMode(Output output, uint8_t device)
+{
+	const auto bit = uint8_t(output) < uint8_t(Output::Output3) ?
+			GlobalControl::ParallelOut12 : GlobalControl::ParallelOut34;
+	return GlobalControl_t(readRegister(device, Register::GLB_CTRL)).any(bit);
+}
+
+
+template <class SpiMaster, class Cs, size_t MaxDevices>
+void
 Mc33xs2410<SpiMaster, Cs, MaxDevices>::setOutput(Output output, bool enable, uint8_t device)
 {
 	const auto bit = OutputControl(uint8_t(OutputControl::Output1) << uint8_t(output));
