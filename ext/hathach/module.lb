@@ -179,14 +179,18 @@ def build(env):
     for devclass, devitfs in config_enum.items():
         prefix = devclass.upper()
         for itf in devitfs:
-            endpoint_counter += 1
             itf_prefix = prefix + str(itf)
             itfs.append( (prefix, itf_prefix) )
+            if devclass in ["dfu_rt"]:
+                # DFU runtime only uses the control endpoint
+                itf_enum.append(itf_prefix)
+                continue
+            endpoint_counter += 1
             if devclass in ["cdc"]:
                 itf_enum.extend([itf_prefix, itf_prefix + "_DATA"])
                 endpoints[itf_prefix + "_NOTIF"] = hex(0x80 | endpoint_counter)
                 endpoint_counter += 1
-            elif devclass in ["msc", "midi", "vendor", "dfu_rt"]:
+            elif devclass in ["msc", "midi", "vendor"]:
                 itf_enum.append(itf_prefix)
             else:
                 raise ValidateException(f"Unknown ITF device class '{devclass}'!")
