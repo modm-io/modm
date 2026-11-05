@@ -44,6 +44,7 @@ import signal
 import tempfile
 import platform
 import subprocess
+from pathlib import Path
 
 from . import gdb
 from .backend import DebugBackend
@@ -75,7 +76,10 @@ def call(device, blocking=True, silent=False, verbose=False, serial=None):
         binary += ".exe"
     binary = os.environ.get("MODM_JLINK_BINARY", binary)
 
-    command_jlink = f"{binary} -device {device} -if swd -noreset -nogui -nohalt"
+    # JLinkGDBServer has no option for command strings, so set SetSkipDebugDeInit
+    # (see _call_commander) from a J-Link script, which keeps the device scripts.
+    script = Path(__file__).with_name("jlink.JLinkScript")
+    command_jlink = f"{binary} -device {device} -if swd -noreset -nogui -nohalt -jlinkscriptfile \"{script}\""
     if serial:
         command_jlink += f" -select USB={serial}"
     if silent:
@@ -103,6 +107,9 @@ def _call_commander(device, commands, verbose=True, serial=None):
         binary += ".exe"
     binary = os.environ.get("MODM_JLINK_COMMANDER_BINARY", binary)
 
+    # By default J-Link clears DEMCR.TRCENA when closing the session, which stops
+    # the DWT cycle counter that modm::delay_us() uses, so delays never finish.
+    commands = ["exec SetSkipDebugDeInit = 1"] + commands
     with tempfile.NamedTemporaryFile(mode="w", suffix=".jlink") as script:
         script.write("\n".join(commands) + "\n")
         script.flush()

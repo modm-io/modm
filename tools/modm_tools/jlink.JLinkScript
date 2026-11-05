@@ -1,0 +1,6 @@
+// By default J-Link clears DEMCR.TRCENA when closing the session, which stops
+// the DWT cycle counter that modm::delay_us() uses, so delays never finish.
+int OnDisconnectTarget(void) {
+  JLINK_ExecCommand("SetSkipDebugDeInit = 1");
+  return 0;
+}

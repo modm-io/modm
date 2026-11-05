@@ -231,6 +231,8 @@ def build(env):
         env.copy(localpath("..", tool), tool)
         if "info" in tool:
             env.copy(localpath("../modm_tools/info.c.in"), "modm_tools/info.c.in")
+        if "jlink" in tool:
+            env.copy(localpath("../modm_tools/jlink.JLinkScript"), "modm_tools/jlink.JLinkScript")
 
     env.outbasepath = "modm/"
     env.template("probe_gdbinit.in", "gdbinit_openocd", substitutions={"probe": "openocd"})
