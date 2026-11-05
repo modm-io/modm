@@ -290,12 +290,14 @@ connect to JLink (`host=":2331"`) or Black Magic Probe (`host="/dev/tty.usbseria
 #### scons program-jlink
 
 ```
-scons program-jlink profile={debug|release} [firmware={hash or file}]
+scons program-jlink profile={debug|release} [firmware={hash or file}] [serial={J-Link serial number}]
 ```
 
 Writes the executable onto your target via JLink.
 This is a convenience wrapper around the programming options and methods
 defined in the `modm:build` module.
+With several J-Links connected, `serial` selects the one with this serial
+number, which is printed on the probe and shown by `JLinkExe` as `S/N`.
 (\* *only ARM Cortex-M targets*)
 
 Example for a STM32 target:
@@ -351,7 +353,7 @@ Starts an OpenOCD process to attach a remote debugger to (e.g. with
 #### scons jlink
 
 ```
-scons jlink
+scons jlink [serial={J-Link serial number}]
 ```
 
 Starts a JLinkGDBServer process to attach a remote debugger to (e.g. with
@@ -415,7 +417,7 @@ Launches GDB to debug via Black Magic Probe.
 #### scons debug-jlink
 
 ```
-scons debug-jlink profile={debug|release} ui={tui|gdbgui} [firmware={hash or file}]
+scons debug-jlink profile={debug|release} ui={tui|gdbgui} [firmware={hash or file}] [serial={J-Link serial number}]
 ```
 
 Launches GDB to debug via JLink.
@@ -469,7 +471,7 @@ Creates a coredump via Black Magic Probe.
 #### scons coredump-jlink
 
 ```
-scons coredump-jlink
+scons coredump-jlink [serial={J-Link serial number}]
 ```
 
 Creates a coredump via JLink.
@@ -499,7 +501,7 @@ Resets the executable via Black Magic Probe.
 #### scons reset-jlink
 
 ```
-scons reset-jlink
+scons reset-jlink [serial={J-Link serial number}]
 ```
 
 Resets the executable via JLink.
@@ -586,7 +588,7 @@ See the `modm:platform:rtt` module for details how to use RTT for data transfer.
 #### scons log-rtt-jlink
 
 ```
-scons log-rtt-jlink [channel={int}]
+scons log-rtt-jlink [channel={int}] [serial={J-Link serial number}]
 ```
 
 Configures JLink in RTT mode to output the chosen channel (default 0) via

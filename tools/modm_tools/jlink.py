@@ -25,6 +25,9 @@ You can also reset the target:
 python3 -m modm_tools.jlink -device STM32F469NI --reset
 ```
 
+With several J-Links connected, select one by its serial number with
+`-serial 001050033691`.
+
 You can set the `MODM_JLINK_BINARY` environment variable to point this script to
 a specific `JLinkGDBServer` binary:
 
@@ -47,13 +50,14 @@ from .backend import DebugBackend
 
 # -----------------------------------------------------------------------------
 class JLinkBackend(DebugBackend):
-    def __init__(self, device):
+    def __init__(self, device, serial=None):
         super().__init__(":2331")
         self.device = device
+        self.serial = serial
         self.process = None
 
     def start(self):
-        self.process = call(self.device, blocking=False, silent=True)
+        self.process = call(self.device, blocking=False, silent=True, serial=self.serial)
 
     def stop(self):
         if self.process is not None:
@@ -65,13 +69,15 @@ class JLinkBackend(DebugBackend):
             self.process = None
 
 
-def call(device, blocking=True, silent=False, verbose=False):
+def call(device, blocking=True, silent=False, verbose=False, serial=None):
     binary = "JLinkGDBServerCL"
     if "Windows" in platform.platform():
         binary += ".exe"
     binary = os.environ.get("MODM_JLINK_BINARY", binary)
 
     command_jlink = f"{binary} -device {device} -if swd -noreset -nogui -nohalt"
+    if serial:
+        command_jlink += f" -select USB={serial}"
     if silent:
         command_jlink += " -silent"
 
@@ -91,7 +97,7 @@ def call(device, blocking=True, silent=False, verbose=False):
     return subprocess.Popen(command_jlink, **kwargs)
 
 
-def _call_commander(device, commands, verbose=True):
+def _call_commander(device, commands, verbose=True, serial=None):
     binary = "JLinkExe"
     if "Windows" in platform.platform():
         binary += ".exe"
@@ -109,6 +115,8 @@ def _call_commander(device, commands, verbose=True):
             "-ExitOnError", "1",
             "-CommandFile", script.name,
         ]
+        if serial:
+            command[1:1] = ["-USB", serial]
         if verbose: print(" ".join(command))
         return subprocess.call(command, cwd=os.getcwd())
 
@@ -128,12 +136,12 @@ def rtt(backend, channel=0):
 
 
 # -----------------------------------------------------------------------------
-def program(device, source):
-    return _call_commander(device, ["reset", f"loadfile {source}", "reset", "exit"])
+def program(device, source, serial=None):
+    return _call_commander(device, ["reset", f"loadfile {source}", "reset", "exit"], serial=serial)
 
 
-def reset(device):
-    return _call_commander(device, ["reset", "exit"])
+def reset(device, serial=None):
+    return _call_commander(device, ["reset", "exit"], serial=serial)
 
 
 # -----------------------------------------------------------------------------
@@ -144,7 +152,11 @@ def add_subparser(subparser):
             dest="device",
             required=True,
             help="Connect to this device.")
-    parser.set_defaults(backend=lambda args: JLinkBackend(args.device))
+    parser.add_argument(
+            "-serial",
+            dest="serial",
+            help="Use the J-Link with this serial number.")
+    parser.set_defaults(backend=lambda args: JLinkBackend(args.device, args.serial))
     return parser
 
 
@@ -169,9 +181,13 @@ if __name__ == "__main__":
             default=False,
             action="store_true",
             help="Reset device.")
+    parser.add_argument(
+            "-serial",
+            dest="serial",
+            help="Use the J-Link with this serial number.")
 
     args = parser.parse_args()
     if args.reset:
-        exit(reset(args.device))
+        exit(reset(args.device, args.serial))
     else:
-        exit(program(args.device, os.path.abspath(args.source)))
+        exit(program(args.device, os.path.abspath(args.source), args.serial))

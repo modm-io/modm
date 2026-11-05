@@ -28,7 +28,7 @@ def _config(env):
 def debug_jlink(env, source):
 	def call_debug_jlink(target, source, env):
 		device, gconfig, gcmds = _config(env)
-		backend = JLinkBackend(device)
+		backend = JLinkBackend(device, ARGUMENTS.get("serial"))
 		gdb.call(backend, source=source[0], config=gconfig,
 				 commands=gcmds, ui=ARGUMENTS.get("ui", "tui"))
 	return env.AlwaysBuildAction(call_debug_jlink, "$DEBUG_JLINK_COMSTR", source)
@@ -36,7 +36,7 @@ def debug_jlink(env, source):
 def coredump_jlink(env):
 	def call_coredump_jlink(target, source, env):
 		device, gconfig, gcmds = _config(env)
-		backend = JLinkBackend(device)
+		backend = JLinkBackend(device, ARGUMENTS.get("serial"))
 		gcmds += ["modm_coredump", "modm_build_id", "quit"]
 		gdb.call(backend, config=gconfig, commands=gcmds)
 	return env.AlwaysBuildAction(call_coredump_jlink, "$COREDUMP_JLINK_COMSTR")
@@ -44,17 +44,17 @@ def coredump_jlink(env):
 # -----------------------------------------------------------------------------
 def program_jlink(env, source):
 	def call_program_jlink(target, source, env):
-		return jlink.program(_config(env)[0], str(source[0]))
+		return jlink.program(_config(env)[0], str(source[0]), ARGUMENTS.get("serial"))
 	return env.AlwaysBuildAction(call_program_jlink, "$PROGRAM_JLINK_COMSTR", source)
 
 def reset_jlink(env):
 	def call_reset_jlink(target, source, env):
-		return jlink.reset(_config(env)[0])
+		return jlink.reset(_config(env)[0], ARGUMENTS.get("serial"))
 	return env.AlwaysBuildAction(call_reset_jlink, "$RESET_JLINK_COMSTR")
 
 def run_jlink(env):
 	def call_run_jlink(target, source, env):
-		jlink.call(_config(env)[0], verbose=True)
+		jlink.call(_config(env)[0], verbose=True, serial=ARGUMENTS.get("serial"))
 	return env.AlwaysBuildAction(call_run_jlink, "$RUN_JLINK_COMSTR")
 
 # -----------------------------------------------------------------------------
@@ -66,7 +66,7 @@ def log_jlink_itm(env):
 
 def log_jlink_rtt(env):
 	def run_jlink_rtt(target, source, env):
-		backend = jlink.JLinkBackend(_config(env)[0])
+		backend = jlink.JLinkBackend(_config(env)[0], ARGUMENTS.get("serial"))
 		jlink.rtt(backend, int(ARGUMENTS.get("channel", 0)))
 	return env.AlwaysBuildAction(run_jlink_rtt, "$RTT_JLINK_COMSTR")
 
