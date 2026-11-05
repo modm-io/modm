@@ -137,7 +137,7 @@ struct SystemClock
 // Arduino Footprint
 #include "nucleo64_arduino.hpp"
 
-using Button = GpioInverted<GpioInputC13>;
+using Button = GpioInputC13;
 using LedD13 = D13;
 
 using Leds = SoftwareGpioPort< LedD13 >;
