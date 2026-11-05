@@ -36,7 +36,7 @@ main()
 
 	for (uintptr_t offset{0}, sector{255}; offset < Flash::Size; offset += 1)
 	{
-		const uint8_t nsector = Flash::getSector(offset);
+		const uint16_t nsector = Flash::getSector(offset);
 		if (sector != nsector) {
 			MODM_LOG_INFO << "Sector " << nsector << " found at boundary " <<
 					(Flash::Origin + offset) << modm::endl;
@@ -46,15 +46,15 @@ main()
 
 	{
 		uint32_t err{0};
-		const uint8_t sector_start = Flash::getSector(Flash::Size/2);
-		const uint8_t sector_end = Flash::getSector(Flash::Size);
+		const uint16_t sector_start = Flash::getSector(Flash::Size/2);
+		const uint16_t sector_end = Flash::getSector(Flash::Size);
 		MODM_LOG_INFO << "Erasing sectors [" << sector_start << ", " << sector_end << ")" << modm::endl;
 		MODM_LOG_INFO.flush();
 		modm::delay(1s);
 
 		const modm::PreciseTimestamp start = modm::PreciseClock::now();
 
-		for (uint8_t sector{sector_start}; sector < sector_end; sector++)
+		for (uint16_t sector{sector_start}; sector < sector_end; sector++)
 			err |= Flash::erase(sector);
 
 		const auto diff = (modm::PreciseClock::now() - start);
