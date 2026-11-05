@@ -99,7 +99,8 @@ def common_target(env):
     if device.partname.startswith("stm32"):
         jlink_partname = device.partname[:11]
     if device.partname.startswith("nrf"):
-        jlink_partname = device.partname.replace("-", "_").replace("@", "_")
+        # J-Link names the nRF devices without the package: nrf5340-qkaa@app is nRF5340_xxAA_APP
+        jlink_partname = re.sub(r"-..(..)", r"_xx\1", device.partname).replace("@", "_")
     p = {
         "core": core,
         "mcu": mcu,
