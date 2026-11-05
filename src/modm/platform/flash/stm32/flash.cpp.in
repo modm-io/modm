@@ -53,7 +53,7 @@ Flash::unlock()
 %% endif
 }
 
-uint8_t
+uint16_t
 Flash::getPage(uintptr_t offset)
 {
 %% if family == "h7"
@@ -65,7 +65,7 @@ Flash::getPage(uintptr_t offset)
 %% endif
 	return (addr - Bank1Addr) >> {{ shift }};
 %% else
-	const uint8_t index = (offset >> {{ shift }});
+	const uint16_t index = (offset >> {{ shift }});
 %% if has_sectors and family != "h7"
 	// Every bank of 8x128kB blocks has 12 sectors: the first block is
 	// subdivided into 4x16kB + 64kB, followed by 7x128kB sectors.
@@ -81,7 +81,7 @@ Flash::getPage(uintptr_t offset)
 }
 
 uint32_t
-Flash::getOffset(uint8_t index)
+Flash::getOffset(uint16_t index)
 {
 %% if family == "h7"
 %% if dual_bank
@@ -104,7 +104,7 @@ Flash::getOffset(uint8_t index)
 }
 
 size_t
-Flash::getSize([[maybe_unused]] uint8_t index)
+Flash::getSize([[maybe_unused]] uint16_t index)
 {
 %% if has_sectors and family != "h7"
 	if (index % 12 < 4) return (1ul << 14);
@@ -115,15 +115,15 @@ Flash::getSize([[maybe_unused]] uint8_t index)
 
 modm_ramcode uint32_t
 %% if has_sectors and family != "h7"
-Flash::erase(uint8_t index, WordSize size)
+Flash::erase(uint16_t index, WordSize size)
 %% else
-Flash::erase(uint8_t index)
+Flash::erase(uint16_t index)
 %% endif
 {
 %% if family == "h7"
 %% if dual_bank
 	const bool bank2 = (index >= {{sectors_per_bank}});
-	const uint8_t local = bank2 ? (index - {{sectors_per_bank}}) : index;
+	const uint16_t local = bank2 ? (index - {{sectors_per_bank}}) : index;
 	volatile uint32_t *cr  = bank2 ? &FLASH->CR2  : &FLASH->CR1;
 	volatile uint32_t *sr  = bank2 ? &FLASH->SR2  : &FLASH->SR1;
 	volatile uint32_t *ccr = bank2 ? &FLASH->CCR2 : &FLASH->CCR1;

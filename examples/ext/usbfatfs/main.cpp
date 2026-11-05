@@ -36,7 +36,7 @@ Otherwise just copy the file as is and `#define WITH_SANITY_CHECK 0`
 
 // ----------------------------------------------------------------------------
 modm_ramcode
-void ram_apply(uint8_t pages, const uint8_t *image, uint32_t length)
+void ram_apply(uint16_t pages, const uint8_t *image, uint32_t length)
 {
 	modm::atomic::Lock l;
 	// ONLY RAMCODE FROM HERE ON!!!
