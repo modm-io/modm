@@ -420,6 +420,10 @@ MODM_ISR(I2C{{ id }}_EV)
 			DEBUG_STREAM("ACK FAIL");
 			// may also be ADDRESS_NACK
 			error = starting.address ? modm::I2cMaster::Error::AddressNack : modm::I2cMaster::Error::DataNack;
+			// Discard the remaining byte counts of the aborted transfer, otherwise the
+			// next transaction's TCR handler continues with this stale read/write.
+			writing.length = 0;
+			reading.length = 0;
 			if (transaction) {
 				transaction->detaching(modm::I2c::DetachCause::ErrorCondition);
 				transaction = nullptr;
@@ -619,18 +623,18 @@ modm::platform::I2cMaster{{ id }}::reset()
 {
 	{
 		modm::atomic::Lock lock;
-		reading.length = 0;
-		writing.length = 0;
-		error = Error::SoftwareReset;
-		if (transaction) transaction->detaching(DetachCause::ErrorCondition);
-		transaction = nullptr;
-		// remove all queued transactions
+	reading.length = 0;
+	writing.length = 0;
+	error = Error::SoftwareReset;
+	if (transaction) transaction->detaching(DetachCause::ErrorCondition);
+	transaction = nullptr;
+	// remove all queued transactions
 		while (not queue.empty())
-		{
+	{
 			ConfiguredTransaction next = queue.front();
-			if (next.transaction) { next.transaction->detaching(DetachCause::ErrorCondition); }
+		if (next.transaction) { next.transaction->detaching(DetachCause::ErrorCondition); }
 			queue.pop_front();
-		}
+	}
 
 		I2C{{ id }}->CR1 = 0;
 	}
