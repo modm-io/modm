@@ -43,6 +43,7 @@ def prepare(module, options):
         ":architecture:spi",
         ":architecture:unaligned",
         ":math:units",
+        ":processing:resumable",
         ":ui:color")
     return options[":target"].identifier.platform == "stm32"
 
