@@ -317,7 +317,7 @@ Resetting target
 #### make debug
 
 ```
-make debug profile={debug|release} ui={tui|gdbgui}
+make debug profile={debug|release} ui={tui|gdbgui} [gdb_port={int}]
 ```
 
 Launches OpenOCD in the background, then launches GDB in foreground with the
@@ -476,7 +476,7 @@ CPU frequency.
 #### make log-rtt
 
 ```
-make log-rtt [channel={int}]
+make log-rtt [channel={int}] [rtt_port={int}]
 ```
 
 Configures OpenOCD in RTT mode to output the chosen channel (default 0) via

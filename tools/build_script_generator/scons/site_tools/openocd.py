@@ -31,10 +31,14 @@ def _config(env):
 	return (oconfig, osearch, gconfig, gcmds)
 
 # -----------------------------------------------------------------------------
+def _gdb_port():
+	port = ARGUMENTS.get("gdb_port")
+	return int(port) if port else None
+
 def debug_openocd(env, source):
 	def call_debug_openocd(target, source, env):
 		oconfig, osearch, gconfig, gcmds = _config(env)
-		backend = openocd.OpenOcdBackend(config=oconfig, search=osearch)
+		backend = openocd.OpenOcdBackend(config=oconfig, search=osearch, port=_gdb_port())
 		gdb.call(backend, source=source[0], config=gconfig,
 				 commands=gcmds, ui=ARGUMENTS.get("ui", "tui"))
 	return env.AlwaysBuildAction(call_debug_openocd, "$DEBUG_OPENOCD_COMSTR", source)
@@ -42,7 +46,7 @@ def debug_openocd(env, source):
 def coredump_openocd(env):
 	def call_coredump_openocd(target, source, env):
 		oconfig, osearch, gconfig, gcmds = _config(env)
-		backend = openocd.OpenOcdBackend(config=oconfig, search=osearch)
+		backend = openocd.OpenOcdBackend(config=oconfig, search=osearch, port=_gdb_port())
 		gcmds += ["modm_coredump", "modm_build_id", "quit"]
 		gdb.call(backend, config=gconfig, commands=gcmds)
 	return env.AlwaysBuildAction(call_coredump_openocd, "$COREDUMP_OPENOCD_COMSTR")
@@ -75,15 +79,16 @@ def log_openocd_itm(env):
 			return -1
 		baudrate = ARGUMENTS.get("baudrate", None)
 		oconfig, osearch, *_ = _config(env)
-		backend = openocd.OpenOcdBackend(config=oconfig, search=osearch)
+		backend = openocd.OpenOcdBackend(config=oconfig, search=osearch, port=_gdb_port())
 		openocd.itm(backend, fcpu, baudrate)
 	return env.AlwaysBuildAction(run_openocd_itm, "$ITM_OPENOCD_COMSTR")
 
 def log_openocd_rtt(env):
 	def run_openocd_rtt(target, source, env):
 		oconfig, osearch, *_ = _config(env)
-		backend = openocd.OpenOcdBackend(config=oconfig, search=osearch)
-		openocd.rtt(backend, int(ARGUMENTS.get("channel", 0)))
+		backend = openocd.OpenOcdBackend(config=oconfig, search=osearch, port=_gdb_port())
+		port = ARGUMENTS.get("rtt_port")
+		openocd.rtt(backend, int(ARGUMENTS.get("channel", 0)), int(port) if port else None)
 	return env.AlwaysBuildAction(run_openocd_rtt, "$RTT_OPENOCD_COMSTR")
 
 # -----------------------------------------------------------------------------

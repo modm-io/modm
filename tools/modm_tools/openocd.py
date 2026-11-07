@@ -49,8 +49,9 @@ from .backend import DebugBackend
 
 # -----------------------------------------------------------------------------
 class OpenOcdBackend(DebugBackend):
-    def __init__(self, commands=None, config=None, search=None):
-        super().__init__(":3333")
+    def __init__(self, commands=None, config=None, search=None, port=None):
+        super().__init__(":{}".format(port or 3333))
+        self.gdb_port = port
         self.commands = utils.listify(commands)
         self.config = utils.listify(config)
         self.search = utils.listify(search)
@@ -58,7 +59,7 @@ class OpenOcdBackend(DebugBackend):
 
     def start(self):
         self.process = call(self.commands, self.config, self.search,
-                            blocking=False, silent=True)
+                            blocking=False, silent=True, gdb_port=self.gdb_port)
 
     def stop(self):
         if self.process is not None:
@@ -70,7 +71,7 @@ class OpenOcdBackend(DebugBackend):
             self.process = None
 
 
-def call(commands=None, config=None, search=None, blocking=True, silent=False, verbose=False):
+def call(commands=None, config=None, search=None, blocking=True, silent=False, verbose=False, gdb_port=None):
     commands = utils.listify(commands)
     config = utils.listify(config)
     search = utils.listify(search)
@@ -84,8 +85,13 @@ def call(commands=None, config=None, search=None, blocking=True, silent=False, v
 
     binary = os.environ.get("MODM_OPENOCD_BINARY", "openocd")
 
-    command_openocd = "{} {} {} {}".format(
+    # The config files call init, so the ports must be set before them
+    ports = ""
+    if gdb_port:
+        ports = '-c "gdb_port {}; telnet_port {}; tcl_port {}"'.format(gdb_port, gdb_port + 1, gdb_port + 2)
+    command_openocd = "{} {} {} {} {}".format(
         binary,
+        ports,
         " ".join(map('-s "{}"'.format, search)),
         " ".join(map('-f "{}"'.format, config)),
         " ".join(map('-c "{}"'.format, commands))
@@ -124,12 +130,16 @@ def itm(backend, fcpu, baudrate=None):
             except KeyboardInterrupt:
                 pass
 
-def rtt(backend, channel=0):
-    # Start OpenOCD in the background
-    backend.commands.append("modm_rtt")
+def rtt(backend, channel=0, port=None):
+    # Start OpenOCD in the background, the servers of channel N listen on port + N
+    if port is None:
+        port = 9090
+        backend.commands.append("modm_rtt")
+    else:
+        backend.commands.append(f'modm_rtt 1 {channel + 1} {{SEGGER RTT}} {port}')
     with backend.scope():
         time.sleep(0.5)
-        subprocess.call(f"stty -icanon -echo; nc localhost {9090 + channel}; stty sane", shell=True)
+        subprocess.call(f"stty -icanon -echo; nc localhost {port + channel}; stty sane", shell=True)
 
 
 # -----------------------------------------------------------------------------
@@ -161,8 +171,13 @@ def add_subparser(subparser):
             dest="ocommands",
             action="append",
             help="Extra OpenOCD commands.")
+    parser.add_argument(
+            "--gdb-port",
+            dest="gdb_port",
+            type=int,
+            help="Serve GDB on this port instead of 3333, telnet on +1 and Tcl on +2.")
     parser.set_defaults(backend=lambda args:
-            OpenOcdBackend(args.ocommands, args.oconfig, args.osearch))
+            OpenOcdBackend(args.ocommands, args.oconfig, args.osearch, args.gdb_port))
     return parser
 
 

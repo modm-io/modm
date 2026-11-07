@@ -24,7 +24,7 @@ proc modm_program { SOURCE } {
 }
 
 %% if has_rtt
-proc modm_rtt { {POLLING 1} {CHANNELS {{rtt_channels}}} {IDENTIFIER "SEGGER RTT"} } {
+proc modm_rtt { {POLLING 1} {CHANNELS {{rtt_channels}}} {IDENTIFIER "SEGGER RTT"} {PORT 9090} } {
 	set vtor [mrw 0xE000ED08]
 	set ctrl [mrw [expr {$vtor + 0x20}]]
 	if {$ctrl & 0x2} {
@@ -39,7 +39,7 @@ proc modm_rtt { {POLLING 1} {CHANNELS {{rtt_channels}}} {IDENTIFIER "SEGGER RTT"
 	rtt polling_interval $POLLING
 	puts [rtt channels]
 	for {set i 0} {$i < $CHANNELS} {incr i} {
-		rtt server start [expr {9090 + $i}] $i
+		rtt server start [expr {$PORT + $i}] $i
 	}
 }
 %% endif

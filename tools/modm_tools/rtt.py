@@ -42,6 +42,11 @@ if __name__ == "__main__":
             type=int,
             default=0,
             help="The RTT channel to display.")
+    parser.add_argument(
+            "--port",
+            dest="port",
+            type=int,
+            help="OpenOCD serves channel N on port + N, default 9090.")
 
     # Add backends
     subparsers = parser.add_subparsers(title="Backend", dest="backend")
@@ -52,6 +57,6 @@ if __name__ == "__main__":
     backend = args.backend(args)
 
     if isinstance(backend, openocd.OpenOcdBackend):
-        openocd.rtt(backend, args.channel)
+        openocd.rtt(backend, args.channel, args.port)
     elif isinstance(backend, jlink.JLinkBackend):
         jlink.rtt(backend, args.channel)

@@ -370,7 +370,7 @@ Compiles and executes your program on your computer.
 #### scons debug
 
 ```
-scons debug profile={debug|release} ui={tui|gdbgui} [firmware={hash or file}]
+scons debug profile={debug|release} ui={tui|gdbgui} [firmware={hash or file}] [gdb_port={int}]
 ```
 
 Launches OpenOCD in the background, then launches GDB in foreground with the
@@ -381,6 +381,10 @@ exits, it stops the OpenOCD process.
 This is just a convenience wrapper for the debug functionality defined in the
 `modm:build` module. To use GDBGUI you must have it installed via
 `pip install gdbgui`.
+
+With `gdb_port={int}`, OpenOCD serves GDB on this port instead of 3333, telnet
+on port + 1 and Tcl on port + 2, so that several boards can be debugged at the
+same time. `log-rtt` and `log-itm` take it too.
 
 !!! tip "Choose the correct profile"
     When debugging, make sure to select the correct compilation profile. The
@@ -562,11 +566,13 @@ CPU frequency.
 #### scons log-rtt
 
 ```
-scons log-rtt [channel={int}]
+scons log-rtt [channel={int}] [rtt_port={int}] [gdb_port={int}]
 ```
 
 Configures OpenOCD in RTT mode to output the chosen channel (default 0) via
-netcat. Stop listening with Ctrl+C.
+netcat. Stop listening with Ctrl+C. With `rtt_port={int}`, OpenOCD serves
+channel N on this port + N instead of 9090 + N, so that several boards can log
+at the same time.
 (\* *only ARM Cortex-M targets*)
 
 ```

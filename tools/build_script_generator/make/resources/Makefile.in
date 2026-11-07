@@ -150,7 +150,7 @@ ui?=tui
 debug: build
 	@$(PYTHON3) -m modm_tools.gdb $(MODM_GDB_COMMANDS) \
 			$(MODM_GDB_COMMANDS_OPENOCD) --elf $(ELF_FILE) --ui=$(ui) \
-			openocd $(addprefix -f ,$(MODM_OPENOCD_CONFIGFILES))
+			openocd $(addprefix -f ,$(MODM_OPENOCD_CONFIGFILES)) $(if $(gdb_port),--gdb-port $(gdb_port))
 
 .PHONY: debug-bmp
 debug-bmp: build
@@ -201,7 +201,7 @@ log-itm-jlink:
 channel?=0
 .PHONY: log-rtt
 log-rtt:
-	@$(PYTHON3) -m modm_tools.rtt --channel $(channel) openocd -f $(MODM_PATH)/openocd.cfg
+	@$(PYTHON3) -m modm_tools.rtt --channel $(channel) $(if $(rtt_port),--port $(rtt_port)) openocd -f $(MODM_PATH)/openocd.cfg
 
 .PHONY: log-rtt-jlink
 log-rtt-jlink:
