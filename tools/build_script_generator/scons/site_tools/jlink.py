@@ -24,11 +24,15 @@ def _config(env):
 	gcmds = env.SubstList("MODM_GDB_COMMANDS")
 	return (device, gconfig, gcmds)
 
+def _port(name):
+	port = ARGUMENTS.get(name)
+	return int(port) if port else None
+
 # -----------------------------------------------------------------------------
 def debug_jlink(env, source):
 	def call_debug_jlink(target, source, env):
 		device, gconfig, gcmds = _config(env)
-		backend = JLinkBackend(device, ARGUMENTS.get("serial"))
+		backend = JLinkBackend(device, ARGUMENTS.get("serial"), _port("gdb_port"))
 		gdb.call(backend, source=source[0], config=gconfig,
 				 commands=gcmds, ui=ARGUMENTS.get("ui", "tui"))
 	return env.AlwaysBuildAction(call_debug_jlink, "$DEBUG_JLINK_COMSTR", source)
@@ -36,7 +40,7 @@ def debug_jlink(env, source):
 def coredump_jlink(env):
 	def call_coredump_jlink(target, source, env):
 		device, gconfig, gcmds = _config(env)
-		backend = JLinkBackend(device, ARGUMENTS.get("serial"))
+		backend = JLinkBackend(device, ARGUMENTS.get("serial"), _port("gdb_port"))
 		gcmds += ["modm_coredump", "modm_build_id", "quit"]
 		gdb.call(backend, config=gconfig, commands=gcmds)
 	return env.AlwaysBuildAction(call_coredump_jlink, "$COREDUMP_JLINK_COMSTR")
@@ -66,8 +70,8 @@ def log_jlink_itm(env):
 
 def log_jlink_rtt(env):
 	def run_jlink_rtt(target, source, env):
-		backend = jlink.JLinkBackend(_config(env)[0], ARGUMENTS.get("serial"))
-		jlink.rtt(backend, int(ARGUMENTS.get("channel", 0)))
+		backend = jlink.JLinkBackend(_config(env)[0], ARGUMENTS.get("serial"), _port("gdb_port"))
+		jlink.rtt(backend, int(ARGUMENTS.get("channel", 0)), _port("rtt_port"))
 	return env.AlwaysBuildAction(run_jlink_rtt, "$RTT_JLINK_COMSTR")
 
 # -----------------------------------------------------------------------------

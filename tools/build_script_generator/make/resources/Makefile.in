@@ -160,7 +160,7 @@ debug-bmp: build
 debug-jlink: build
 	@$(PYTHON3) -m modm_tools.gdb $(MODM_GDB_COMMANDS) \
 			$(MODM_GDB_COMMANDS_JLINK) --elf $(ELF_FILE) --ui=$(ui) \
-			jlink -device $(MODM_JLINK_DEVICE)
+			jlink -device $(MODM_JLINK_DEVICE) $(if $(gdb_port),--gdb-port $(gdb_port))
 
 .PHONY: debug-coredump
 debug-coredump: build
@@ -200,5 +200,5 @@ log-rtt:
 
 .PHONY: log-rtt-jlink
 log-rtt-jlink:
-	@$(PYTHON3) -m modm_tools.rtt $(if $(channel),--channel $(channel)) jlink -device $(MODM_JLINK_DEVICE)
+	@$(PYTHON3) -m modm_tools.rtt $(if $(channel),--channel $(channel)) $(if $(rtt_port),--port $(rtt_port)) jlink -device $(MODM_JLINK_DEVICE) $(if $(gdb_port),--gdb-port $(gdb_port))
 %% endif

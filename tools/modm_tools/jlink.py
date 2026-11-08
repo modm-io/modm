@@ -51,14 +51,17 @@ from .backend import DebugBackend
 
 # -----------------------------------------------------------------------------
 class JLinkBackend(DebugBackend):
-    def __init__(self, device, serial=None):
-        super().__init__(":2331")
+    def __init__(self, device, serial=None, port=None, rtt_port=None):
+        super().__init__(":{}".format(port or 2331))
         self.device = device
         self.serial = serial
+        self.gdb_port = port
+        self.rtt_port = rtt_port
         self.process = None
 
     def start(self):
-        self.process = call(self.device, blocking=False, silent=True, serial=self.serial)
+        self.process = call(self.device, blocking=False, silent=True, serial=self.serial,
+                            gdb_port=self.gdb_port, rtt_port=self.rtt_port)
 
     def stop(self):
         if self.process is not None:
@@ -70,7 +73,7 @@ class JLinkBackend(DebugBackend):
             self.process = None
 
 
-def call(device, blocking=True, silent=False, verbose=False, serial=None):
+def call(device, blocking=True, silent=False, verbose=False, serial=None, gdb_port=None, rtt_port=None):
     binary = "JLinkGDBServerCL"
     if "Windows" in platform.platform():
         binary += ".exe"
@@ -82,6 +85,10 @@ def call(device, blocking=True, silent=False, verbose=False, serial=None):
     command_jlink = f"{binary} -device {device} -if swd -noreset -nogui -nohalt -jlinkscriptfile \"{script}\""
     if serial:
         command_jlink += f" -select USB={serial}"
+    if gdb_port:
+        command_jlink += f" -port {gdb_port} -swoport {gdb_port + 1} -telnetport {gdb_port + 2}"
+    if rtt_port:
+        command_jlink += f" -rtttelnetport {rtt_port}"
     if silent:
         command_jlink += " -silent"
 
@@ -135,11 +142,14 @@ def itm(device, baudrate=None):
     return subprocess.call(command_jlink, shell=True)
 
 
-def rtt(backend, channel=0):
-    # Start JLinkGDBServer in the background
+def rtt(backend, channel=0, port=None):
+    # Start JLinkGDBServer in the background, which serves RTT on port + channel
+    if port is not None:
+        backend.rtt_port = port
+    port = backend.rtt_port or 19021
     with backend.scope():
         time.sleep(0.5)
-        subprocess.call(f"stty -icanon -echo; nc localhost {19021 + channel}; stty sane", shell=True)
+        subprocess.call(f"stty -icanon -echo; nc localhost {port + channel}; stty sane", shell=True)
 
 
 # -----------------------------------------------------------------------------
@@ -163,7 +173,12 @@ def add_subparser(subparser):
             "-serial",
             dest="serial",
             help="Use the J-Link with this serial number.")
-    parser.set_defaults(backend=lambda args: JLinkBackend(args.device, args.serial))
+    parser.add_argument(
+            "--gdb-port",
+            dest="gdb_port",
+            type=int,
+            help="Serve GDB on this port instead of 2331, SWO on +1 and telnet on +2.")
+    parser.set_defaults(backend=lambda args: JLinkBackend(args.device, args.serial, args.gdb_port))
     return parser
 
 

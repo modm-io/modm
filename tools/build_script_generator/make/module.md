@@ -352,7 +352,7 @@ Launches GDB to debug via Black Magic Probe.
 #### make debug-jlink
 
 ```
-make debug-jlink profile={debug|release} ui={tui|gdbgui}
+make debug-jlink profile={debug|release} ui={tui|gdbgui} [gdb_port={int}]
 ```
 
 Launches GDB to debug via JLink.
@@ -500,7 +500,7 @@ See the `modm:platform:rtt` module for details how to use RTT for data transfer.
 #### make log-rtt-jlink
 
 ```
-make log-rtt-jlink [channel={int}]
+make log-rtt-jlink [channel={int}] [rtt_port={int}] [gdb_port={int}]
 ```
 
 Configures JLink in RTT mode to output the chosen channel (default 0) via
