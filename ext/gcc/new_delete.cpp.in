@@ -15,6 +15,9 @@
 
 #include <new>
 #include <stdlib.h> // for prototypes of malloc() and free()
+%% if not is_avr
+#include <malloc.h> // for memalign()
+%% endif
 %% if with_memory_traits
 #include <modm/architecture/interface/memory.hpp>
 %% endif
@@ -88,10 +91,39 @@ void* operator new  (std::size_t size, const std::nothrow_t&) noexcept { return 
 modm_weak
 void* operator new[](std::size_t size, const std::nothrow_t&) noexcept { return malloc(size); }
 
+%% if is_avr
 modm_weak
 void* operator new  (std::size_t size, std::align_val_t) { return new_assert<false>(size); }
 modm_weak
 void* operator new[](std::size_t size, std::align_val_t) { return new_assert<false>(size); }
+%% else
+static inline void*
+new_aligned(std::size_t size, std::align_val_t align)
+{
+	void *ptr;
+	while (not (ptr = memalign(std::size_t(align), size)))
+	{
+		if (std::get_new_handler()) std::get_new_handler()();
+		else break;
+	}
+	if (ptr == nullptr) {
+%% if options.get("with_exceptions", False)
+		throw std::bad_alloc();
+%% else
+		modm_assert(0, "new", "C++ new() operator failed to allocate!", size);
+%% endif
+	}
+	return ptr;
+}
+modm_weak
+void* operator new  (std::size_t size, std::align_val_t align) { return new_aligned(size, align); }
+modm_weak
+void* operator new[](std::size_t size, std::align_val_t align) { return new_aligned(size, align); }
+modm_weak
+void* operator new  (std::size_t size, std::align_val_t align, const std::nothrow_t&) noexcept { return memalign(std::size_t(align), size); }
+modm_weak
+void* operator new[](std::size_t size, std::align_val_t align, const std::nothrow_t&) noexcept { return memalign(std::size_t(align), size); }
+%% endif
 
 %% if with_memory_traits
 modm_weak
@@ -132,6 +164,10 @@ void operator delete  (void* ptr, const std::nothrow_t&) noexcept { operator_del
 modm_weak
 void operator delete[](void* ptr, const std::nothrow_t&) noexcept { operator_delete(ptr); }
 
+modm_weak
+void operator delete  (void* ptr, std::align_val_t) noexcept { operator_delete(ptr); }
+modm_weak
+void operator delete[](void* ptr, std::align_val_t) noexcept { operator_delete(ptr); }
 modm_weak
 void operator delete  (void* ptr, std::size_t, std::align_val_t) noexcept { operator_delete(ptr); }
 modm_weak
