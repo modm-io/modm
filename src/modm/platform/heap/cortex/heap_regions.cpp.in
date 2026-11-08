@@ -1,0 +1,194 @@
+/*
+ * Copyright (c) 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+// One allocator instance per HeapTable region: the traits select the region,
+// free() and realloc() find the region by address.
+
+#include <stdlib.h>
+#include <stdint.h>
+#include <string.h>
+#include <reent.h>
+#include <errno.h>
+#include <modm/architecture/interface/assert.h>
+#include <modm/architecture/interface/memory.hpp>
+#include <modm/platform/core/heap_table.hpp>
+
+// internal memories of the device plus a few external ones from the board
+#ifndef MODM_HEAP_MAX_REGIONS
+#define MODM_HEAP_MAX_REGIONS {{ max_regions }}
+#endif
+
+%% if allocator == "o1heap"
+#include <o1heap/o1heap.h>
+using handle_t = O1HeapInstance*;
+static handle_t h_init(uint8_t *start, size_t size)
+{
+	uint8_t *s = (uint8_t*)((uintptr_t(start) + O1HEAP_ALIGNMENT - 1) & ~(O1HEAP_ALIGNMENT - 1));
+	if (size < size_t(s - start) + 512) return nullptr;
+	return o1heapInit(s, size - (s - start));
+}
+static void* h_malloc(handle_t h, size_t size) { return o1heapAllocate(h, size); }
+static void h_free(handle_t h, void *p) { o1heapFree(h, p); }
+static void* h_realloc(handle_t h, void *p, size_t size) { return o1heapReallocate(h, p, size); }
+// o1heap only aligns to 2 pointers, larger alignments are not supported
+static void* h_memalign(handle_t, size_t, size_t) { return nullptr; }
+%% elif allocator == "zephyr"
+#include <zephyr-heap/sys_heap.h>
+using handle_t = sys_heap*;
+static sys_heap zheaps[MODM_HEAP_MAX_REGIONS];
+static size_t zcount{0};
+static handle_t h_init(uint8_t *start, size_t size)
+{
+	if (zcount >= MODM_HEAP_MAX_REGIONS or size < 256) return nullptr;
+	sys_heap_init(&zheaps[zcount], start, size);
+	return &zheaps[zcount++];
+}
+// small heaps (< 256kB) only align to 4 bytes by default
+static void* h_malloc(handle_t h, size_t size) { return sys_heap_aligned_alloc(h, 8, size); }
+static void h_free(handle_t h, void *p) { sys_heap_free(h, p); }
+static void* h_realloc(handle_t h, void *p, size_t size) { return sys_heap_aligned_realloc(h, p, 8, size); }
+static void* h_memalign(handle_t h, size_t align, size_t size) { return sys_heap_aligned_alloc(h, align, size); }
+%% endif
+
+
+namespace
+{
+struct region_t
+{
+	uint16_t traits;
+	const uint8_t *start;
+	const uint8_t *end;
+	handle_t handle;
+};
+region_t regions[MODM_HEAP_MAX_REGIONS];
+size_t region_count{0};
+
+region_t*
+find_region(const void *p)
+{
+	for (size_t ii = 0; ii < region_count; ii++)
+		if (regions[ii].start <= (const uint8_t*)p and (const uint8_t*)p < regions[ii].end)
+			return &regions[ii];
+	return nullptr;
+}
+}
+
+extern "C"
+{
+
+void
+__modm_initialize_memory(void)
+{
+	for (const auto [traits, start, end, size] : modm::platform::HeapTable())
+	{
+		if (region_count >= MODM_HEAP_MAX_REGIONS) break;
+		if (handle_t h = h_init((uint8_t*)start, size); h)
+			regions[region_count++] = {traits.value, start, end, h};
+	}
+}
+
+extern void __malloc_lock(struct _reent *);
+extern void __malloc_unlock(struct _reent *);
+
+void *
+malloc_traits(size_t size, uint32_t traits)
+{
+	// no region is larger than 2GB, this also protects the allocators from size overflows
+	if (size > PTRDIFF_MAX) return nullptr;
+	while (true)
+	{
+		for (size_t ii = 0; ii < region_count; ii++)
+		{
+			if ((regions[ii].traits & traits) == traits)
+			{
+				__malloc_lock(_REENT);
+				void *p = h_malloc(regions[ii].handle, size);
+				__malloc_unlock(_REENT);
+				if (p) return p;
+			}
+		}
+		// clear the types core coupled and external, but not non-volatile
+		const uint32_t clear_mask = (modm::MemoryTrait::TypeExternal |
+									 modm::MemoryTrait::TypeCoreCoupled).value;
+		if (traits & clear_mask) { traits &= ~clear_mask; continue; }
+		// set the SBus and try again
+		if (const uint32_t set_mask = uint32_t(modm::MemoryTrait::AccessSBus); not (traits & set_mask)) {
+			traits |= set_mask; continue;
+		}
+		break;
+	}
+	modm_assert_continue_fail_debug(0, "malloc", "No memory left!", size);
+	return nullptr;
+}
+
+void *modm_used
+__wrap__malloc_r(struct _reent *, size_t size)
+{
+	// default is accessible by S-Bus and DMA-able
+	return malloc_traits(size, modm::MemoryDefault.value);
+}
+
+void *modm_used
+__wrap__calloc_r(struct _reent *r, size_t n, size_t size)
+{
+	size_t total;
+	if (__builtin_mul_overflow(n, size, &total)) { r->_errno = ENOMEM; return nullptr; }
+	void *ptr = __wrap__malloc_r(r, total);
+	if (ptr) memset(ptr, 0, total);
+	return ptr;
+}
+
+void modm_used
+__wrap__free_r(struct _reent *r, void *p)
+{
+	if (not p) return;
+	region_t *region = find_region(p);
+	modm_assert_continue_fail_debug(region, "free", "Pointer is not in any heap region!", p);
+	if (not region) return;
+	__malloc_lock(r);
+	h_free(region->handle, p);
+	__malloc_unlock(r);
+}
+
+void *modm_used
+__wrap__realloc_r(struct _reent *r, void *p, size_t size)
+{
+	if (not p) return __wrap__malloc_r(r, size);
+	if (not size) { __wrap__free_r(r, p); return nullptr; }
+	region_t *region = find_region(p);
+	if (not region or size > PTRDIFF_MAX) return nullptr;
+	__malloc_lock(r);
+	void *ptr = h_realloc(region->handle, p, size);
+	__malloc_unlock(r);
+	return ptr;
+}
+
+void *modm_used
+__wrap__memalign_r(struct _reent *r, size_t align, size_t size)
+{
+	if (align & (align - 1)) { r->_errno = EINVAL; return nullptr; }
+	if (align <= 8) return __wrap__malloc_r(r, size);
+	if (size > PTRDIFF_MAX) return nullptr;
+	for (size_t ii = 0; ii < region_count; ii++)
+	{
+		if ((regions[ii].traits & modm::MemoryDefault.value) == modm::MemoryDefault.value)
+		{
+			__malloc_lock(r);
+			void *p = h_memalign(regions[ii].handle, align, size);
+			__malloc_unlock(r);
+			if (p) return p;
+		}
+	}
+	r->_errno = ENOMEM;
+	return nullptr;
+}
+
+} // extern "C"

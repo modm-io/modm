@@ -5,9 +5,6 @@
   <!-- <extends>modm:blue-pill-f103</extends> -->
   <!-- <extends>modm:same70-xplained</extends> -->
   <!-- <extends>modm:nucleo-h563zi</extends> -->
-  <options>
-    <option name="modm:platform:heap:allocator">tlsf</option>
-  </options>
   <modules>
     <module>modm:architecture:memory</module>
     <module>modm:platform:heap</module>

@@ -28,6 +28,11 @@ def continuous_ram_sizes(target):
     return [p[1] - p[0] for p in pools]
 
 
+# Allocators with one instance per HeapTable region (heap_regions.cpp.in)
+REGION_ALLOCATORS = {"o1heap": ":o1heap", "zephyr": ":zephyr-heap"}
+# Removed allocators and their replacement
+DEPRECATED_ALLOCATORS = {"tlsf": "zephyr", "block": "newlib"} # DEPRECATED: 2027q4
+
 def init(module):
     module.name = ":platform:heap"
     module.description = FileReader("module.md")
@@ -36,34 +41,45 @@ def prepare(module, options):
     if not options[":target"].has_driver("core:cortex-m*"):
         return False
 
+    # newlib is fast and memory efficient but only uses one continuous region
     ram_sizes = continuous_ram_sizes(options[":target"])
-    default_allocator = "newlib"
-    if len(ram_sizes) > 1:
-        default_allocator = "tlsf"
-    elif ram_sizes[0] <= 4096:
-        default_allocator = "block"
+    default_allocator = "zephyr" if len(ram_sizes) > 1 else "newlib"
 
     module.add_option(
         EnumerationOption(
             name="allocator",
             description="Heap allocator algorithms",
-            enumeration=["newlib", "block", "tlsf"],
+            enumeration=["newlib", "zephyr", "o1heap", "tlsf", "block"],
             default=default_allocator,
-            dependencies=lambda v: {"newlib": None,
-                                    "block": ":driver:block.allocator",
-                                    "tlsf": ":tlsf"}[v]))
+            dependencies=lambda v: REGION_ALLOCATORS.get(DEPRECATED_ALLOCATORS.get(v, v))))
 
     module.depends(":architecture:assert", ":architecture:memory")
     return True
 
 def build(env):
+    alloc = env["allocator"]
+    if alloc in DEPRECATED_ALLOCATORS:
+        replacement = DEPRECATED_ALLOCATORS[alloc]
+        env.log.warning(f"The '{alloc}' heap allocator has been removed, using '{replacement}' instead! "
+                        f"Please set 'modm:platform:heap:allocator={replacement}' to remove this warning.")
+        alloc = replacement
     env.outbasepath = "modm/src/modm/platform/heap"
-    env.copy("heap_{}.cpp".format(env["allocator"]))
+    if alloc in REGION_ALLOCATORS:
+        env.substitutions = {
+            "allocator": alloc,
+            # internal memories of the device plus a few external ones from the board
+            "max_regions": len([m for m in listify(env[":target"].get_driver("core")["memory"])
+                                if "rw" in m["access"]]) + 2,
+        }
+        env.template("heap_regions.cpp.in", "heap_regions.cpp")
+    else:
+        env.copy("heap_{}.cpp".format(alloc))
 
-    if env["allocator"] != "newlib":
+    if alloc != "newlib":
         env.collect(":build:linkflags", "-Wl,-wrap,_malloc_r",
                                         "-Wl,-wrap,_calloc_r",
                                         "-Wl,-wrap,_realloc_r",
+                                        "-Wl,-wrap,_memalign_r",
                                         "-Wl,-wrap,_free_r")
 
     # Note: no_heap.c.in is used by :platform:cortex-m

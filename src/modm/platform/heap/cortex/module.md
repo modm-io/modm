@@ -44,60 +44,66 @@ desirable for your application. If this occurs you have three choices. You can:
 There are several trade-offs to each allocator, however, as a rule of thumb,
 choose:
 
-- `newlib` for devices with one large continuous RAM region.
-- `block` for devices with one very small RAM region.
-- `tlsf` for devices with multiple, different discontinuous RAM regions.
+- `newlib` (default for one continuous RAM region) for small and simple devices.
+- `zephyr` (default for several RAM regions) to use all memories with their
+  traits and with bounded execution time.
+- `o1heap` for hard real-time code that needs the fastest constant-time
+  allocator and can afford up to twice the memory.
+
+The `tlsf` and `block` allocators have been removed and are replaced by
+`zephyr` and `newlib` respectively with a warning. The options will be
+removed in 2027q4.
+
+These were chosen by stress testing them on hardware with the
+`test/integration/heap` integration test. On an STM32H723 at 550 MHz a `malloc()` takes
+on average ~400 cycles with `newlib` (but up to ~3000 cycles in a fragmented
+heap), ~600 cycles with `zephyr` (at most ~1200) and ~220 cycles with `o1heap`
+(at most ~300).
 
 !!! warning "Multi-SRAM regions"
     For devices which contain separate memories laid out in a continuous way
-    (often called SRAM1, SRAM2, SRAM3, etc.) the `newlib` and `block` strategies
-    choose the largest continuous memory region, *even though* unaligned
+    (often called SRAM1, SRAM2, SRAM3, etc.) the `newlib` strategy
+    chooses the largest continuous memory region, *even though* unaligned
     accesses across memory regions may not be supported in hardware and lead to
-    a bus fault! Consider using the TLSF implementation, which does not suffer
-    from this issue.
+    a bus fault! The `zephyr` and `o1heap` allocators treat each memory as a
+    separate region and do not suffer from this issue.
 
 !!! warning "Allocators are not interrupt- or thread-safe"
-    No locking is implemented by default, if you need this feature, consider
-    implementing your own custom allocator algorithm!
+    All allocators call `__malloc_lock()` and `__malloc_unlock()`, which do
+    nothing by default. Fibers are safe since they never switch inside the
+    allocator. If you allocate from interrupts or from several cores, implement
+    these two functions, for example by disabling interrupts.
 
 
 ### Newlib
 
-The newlib-nano allocator is a simple linked list, its overhead is therefore
-low, but the access time may not be good.
-Due to the limitations of the `sbrk` mechanism only the largest memory region is
-used as heap! Depending on the device memory architecture this can leave large
-memory regions unused.
-
-Consider using the TLSF allocator for devices with multiple discontinuous
-memories.
+The newlib-nano allocator is a first-fit linked list. It is fast on average and
+uses memory efficiently, but its execution time grows with the number of free
+blocks. Due to the limitations of the `sbrk` mechanism only the largest memory
+region is used as heap! Depending on the device memory architecture this can
+leave large memory regions unused, or put the entire heap into slow external
+memory.
 
 
-### Block
+### Zephyr
 
-For devices with very small memories, we recommend using the block allocator
-strategy, which uses a very light-weight and simple algorithm. This also only
-operates on one continuous memory region as heap.
+The `sys_heap` allocator of the Zephyr RTOS (see `modm:zephyr-heap`) manages
+memory in 8 byte chunks with power-of-two size buckets and searches only a
+bounded number of free blocks, so its execution time is bounded, while its
+fragmentation is close to newlib. Every memory region gets its own small heap
+instance, which allows allocating memory by traits, see the
+`modm:architecture:memory` module. It also supports `aligned_alloc()` and
+aligned `new` natively.
 
-!!! bug "The Block allocator does not implement realloc!"
-    This is a bug in `modm:driver:block.allocator` and currently a `modm_assert`
-    will fail.
 
+### O(1) Heap
 
-### TLSF
-
-To use all non-statically allocated memory for heap, use the TLSF strategy,
-which natively supports multiple memory regions. This implementation treats
-all internal memories as separate regions, so unaligned access across memory
-boundaries is not an issue. To request heap memory of different traits, see
-the `modm:architecture:memory` module.
-
-!!! note "TLSF has static overhead"
-    The TLSF implementation has a static overhead of about 1kB per memory trait
-    group, however, these can then contain multiple discontinuous regions. The
-    upside of this large static allocation is very fast allocation times of
-    O(1), but we recommend using TLSF only for devices with multiple large
-    memory regions.
+The o1heap allocator (see `modm:o1heap`) has the lowest and flattest execution
+time of all allocators, since it rounds every block up to the next power of
+two. This wastes up to half of the memory and limits the largest block to the
+largest power of two that fits into a region. Every memory region gets its own
+heap instance, so allocation by traits works like with `zephyr`. Alignments
+larger than 8 bytes are not supported and return `nullptr`.
 
 
 ## Custom Allocator
@@ -210,6 +216,7 @@ linker by adding this to your project configuration:
     <collect name=":build:linkflags">-Wl,-wrap,_malloc_r</collect>
     <collect name=":build:linkflags">-Wl,-wrap,_calloc_r</collect>
     <collect name=":build:linkflags">-Wl,-wrap,_realloc_r</collect>
+    <collect name=":build:linkflags">-Wl,-wrap,_memalign_r</collect>
     <collect name=":build:linkflags">-Wl,-wrap,_free_r</collect>
   </collectors>
 </library>
@@ -224,14 +231,19 @@ __wrap__malloc_r(struct _reent *, size_t size)
     return allocator.malloc(size);
 }
 extern "C" modm_used void *
-__wrap__calloc_r(struct _reent *, size_t size)
+__wrap__calloc_r(struct _reent *, size_t n, size_t size)
 {
-    return allocator.calloc(size);
+    return allocator.calloc(n, size);
 }
 extern "C" modm_used void *
 __wrap__realloc_r(struct _reent *, void *ptr, size_t size)
 {
     return allocator.realloc(ptr, size);
+}
+extern "C" modm_used void *
+__wrap__memalign_r(struct _reent *, size_t align, size_t size)
+{
+    return allocator.memalign(align, size);
 }
 extern "C" modm_used void
 __wrap__free_r(struct _reent *, void *p)

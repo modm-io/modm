@@ -7,8 +7,6 @@
 
   <options>
     <option name="modm:target">stm32f469nih6</option>
-    <option name="modm:platform:heap:allocator">tlsf</option>
-    <option name="modm:tlsf:minimum_pool_size">16Mi</option>
   </options>
   <modules>
     <module>modm:board:disco-f469ni</module>
