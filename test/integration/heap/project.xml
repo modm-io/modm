@@ -1,0 +1,21 @@
+<library>
+  <!-- <extends>modm:nucleo-c031c6</extends> -->
+  <!-- <extends>modm:nucleo-f091rc</extends> -->
+  <!-- <extends>modm:nucleo-g474re</extends> -->
+  <!-- <extends>modm:nucleo-l476rg</extends> -->
+  <!-- <extends>modm:nucleo-h723zg</extends> -->
+  <!-- <extends>modm:nucleo-u575zi-q</extends> -->
+  <!-- <extends>modm:disco-f469ni</extends> -->
+  <!-- CI: limit 300 -->
+  <options>
+    <option name="modm:io:with_printf">true</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:debug</module>
+    <module>modm:driver:cycle_counter</module>
+    <module>modm:architecture:memory</module>
+    <module>modm:architecture:atomic</module>
+    <module>modm:platform:heap</module>
+  </modules>
+</library>
