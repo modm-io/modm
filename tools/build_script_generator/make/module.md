@@ -439,7 +439,7 @@ Resets the executable via JLink.
 #### make log-itm
 
 ```
-make log-itm fcpu={HCLK in Hz}
+make log-itm fcpu={HCLK in Hz} [baudrate={int}]
 ```
 
 Configures OpenOCD in tracing mode to output ITM channel 0 on SWO pin and

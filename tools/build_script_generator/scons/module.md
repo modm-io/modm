@@ -527,7 +527,7 @@ or Black Magic Probe (`host="/dev/tty.usbserial"`).
 #### scons log-itm
 
 ```
-scons log-itm fcpu={HCLK in Hz}
+scons log-itm fcpu={HCLK in Hz} [baudrate={int}] [gdb_port={int}]
 ```
 
 Configures OpenOCD in tracing mode to output ITM channel 0 on SWO pin and
