@@ -77,10 +77,12 @@ git clone --recurse-submodules --jobs 8 https://github.com/modm-io/modm.git
 	- [FreeRTOS][] and [FreeRTOS+TCP][] operating system.
 	- [LVGL][]: Embedded Graphics Library.
 	- [Nanopb][]: Embedded Protocol Buffers.
+	- [o1heap][]: Constant-time memory allocator.
 	- [printf][]: Small printf implementation.
 	- [ROSserial][]: Embedded ROS client.
 	- [RTT][]: Segger Real-Time Transport.
 	- [TinyUSB][]: USB Host/Device stack.
+	- [Zephyr heap][]: Memory allocator for multiple memory regions.
 
 
 ## Microcontrollers
@@ -1177,4 +1179,6 @@ and [many more contributors][contributors].
 [LVGL]:            https://lvgl.io
 [RTT]:             https://kb.segger.com/RTT
 [Eigen]:           https://libeigen.gitlab.io
+[o1heap]:          https://github.com/pavel-kirienko/o1heap
+[Zephyr heap]:     https://docs.zephyrproject.org/latest/kernel/memory_management/heap.html
 <!--/links-->

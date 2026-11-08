@@ -64,3 +64,9 @@
 [submodule "ext/arm/cmsis-dap"]
 	path = ext/arm/cmsis-dap
 	url = https://github.com/modm-ext/cmsis-dap-partial.git
+[submodule "ext/pavel-kirienko/o1heap"]
+	path = ext/pavel-kirienko/o1heap
+	url = https://github.com/modm-ext/o1heap-partial.git
+[submodule "ext/zephyrproject-rtos/heap"]
+	path = ext/zephyrproject-rtos/heap
+	url = https://github.com/modm-ext/zephyr-heap-partial.git

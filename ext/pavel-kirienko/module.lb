@@ -1,0 +1,28 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2026, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":o1heap"
+    module.description = FileReader("module.md")
+
+def prepare(module, options):
+    module.depends(":architecture:assert")
+    return options[":target"].has_driver("core:cortex-m*")
+
+def build(env):
+    env.collect(":build:path.include", "modm/ext")
+    env.outbasepath = "modm/ext/o1heap"
+    env.copy("o1heap/LICENSE", "LICENSE")
+    env.copy("o1heap/o1heap/o1heap.h", "o1heap.h")
+    # compiled through o1heap.c, which maps the assertions to modm
+    env.copy("o1heap/o1heap/o1heap.c", "o1heap.c.inc")
+    env.copy("o1heap.c")
