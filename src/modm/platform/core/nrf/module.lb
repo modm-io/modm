@@ -63,9 +63,10 @@ def build(env):
         "with_cm0": env[":target"].has_driver("core:cortex-m0*"),
         "with_cm7": env[":target"].has_driver("core:cortex-m7*"),
         # (loop cycles, overhead loops): CM33 tested on nRF5340 app core in RAM,
-        # nRF51 and nRF52 are not tuned yet
-        "loop": 3 if target.family == "53" else 4,
-        "shift": 2 if target.family == "53" else 4,
+        # CM4 tested on nRF52840 in RAM (6 cycles: fetching from RAM is slow),
+        # nRF51 is not tuned yet
+        "loop": {"52": 6, "53": 3}.get(target.family, 4),
+        "shift": {"52": 1, "53": 2}.get(target.family, 4),
         "us_shift": us_shift,
         "with_assert": env.has_module(":architecture:assert")
     })
