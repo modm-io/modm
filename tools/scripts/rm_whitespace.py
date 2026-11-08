@@ -42,7 +42,6 @@ ignored = [
 	"ext/nxp*",
 	"ext/ros/ros-lib",
 	"ext/st/stm32*",
-	"ext/tlsf*",
 ]
 
 all_files = run(repopath("."), "git ls-files")[1].splitlines()

@@ -29,7 +29,6 @@ def prepare(module, options):
         "modm:driver:drv832x_spi",
         "modm:driver:ea_dog",
         "modm:driver:mcp2515",
-        "modm:driver:block.allocator",
         "modm:driver:tmp12x",
         "modm:platform:gpio",
         ":mock:spi.device",

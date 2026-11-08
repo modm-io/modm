@@ -93,7 +93,6 @@ Cleans the build artifacts.
 ```
  $ scons -c
 Removed {debug|release}/main.o
-Removed {debug|release}/modm/ext/tlsf/tlsf.o
     ...
 Removed {debug|release}/modm/src/modm/ui/display/virtual_graphic_display.o
 Removed {debug|release}/modm/src/modm/utils/dummy.o

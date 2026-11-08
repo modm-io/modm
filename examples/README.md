@@ -146,7 +146,7 @@ We have hundreds of examples, here are some of our favorite ones:
 [Hard Fault with CrashCatcher and GDB](https://github.com/modm-io/modm/tree/develop/examples/core/hard_fault),
 [Internal Flash Programming](https://github.com/modm-io/modm/tree/develop/examples/core/flash),
 [Vector table in RAM](https://github.com/modm-io/modm/tree/develop/examples/core/vector_table_ram),
-[Multi-heap with external 16MB memory](https://github.com/modm-io/modm/tree/develop/examples/core/tlsf-allocator),
+[Multi-heap with external 16MB memory](https://github.com/modm-io/modm/tree/develop/examples/core/heap),
 [Logging via ITM](https://github.com/modm-io/modm/tree/develop/examples/core/itm),
 [Logging via RTT](https://github.com/modm-io/modm/tree/develop/examples/core/rtt).
 - Peripherals:
