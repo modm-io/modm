@@ -82,7 +82,7 @@ def build(env):
         "l4": (4,  4), # CM4  tested on L432 in SRAM1
         "l5": (3,  4), # CM33 tested on L552 in RAM
         "u3": (3,  4), # CM33 tested on U386 in RAM
-        "u5": (3,  4), # CM33 tested on U575 in RAM
+        "u5": (3,  2), # CM33 tested on U575 in RAM
         "f3": (3,  4), # CM4  tested on F334, F303 in CCM RAM
 
         # Defaults of (4, 4) for these families:
