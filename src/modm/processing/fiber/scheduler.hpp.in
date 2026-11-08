@@ -179,6 +179,9 @@ protected:
 		modm_context_start(&current->ctx);
 %% else
 		const auto overflow = (Task *) modm_context_start(&current->ctx);
+		// The assertion runs on the main stack, where yielding (e.g. by a full
+		// UART buffer in the assertion handler) must not switch to a fiber
+		if (overflow) current = nullptr;
 		modm_assert(not overflow, "fbr.stkof", "Fiber stack overflow", overflow);
 %% endif
 		this->options = Options(0);
