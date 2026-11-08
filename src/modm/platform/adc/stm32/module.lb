@@ -36,7 +36,7 @@ class Instance(Module):
         properties["temperature_available"] = (target["family"] in ["f2", "f4", "f7"] or
                                               (target["family"] == "f1" and self.instance == 1))
         properties["resolution"] = 12
-        properties["max_frequency"] = 36000000 if target["family"] in ["f4", "f7"] else 14000000
+        properties["max_frequency"] = {"f4": 36000000, "f7": 36000000, "l1": 16000000}.get(target["family"], 14000000)
 
         channels = [0,1,2,3,4,5,6,7,8,10,11,12,13]
         if target["family"] in ["f2", "f4", "f7"]:

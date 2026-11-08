@@ -95,10 +95,16 @@ private:
 	enum class
 	Prescaler : uint8_t
 	{
+%% if target["family"] == "l1"
+		Div1 = 0b00,	///< HSI16 divided by 1
+		Div2 = 0b01,	///< HSI16 divided by 2
+		Div4 = 0b10,	///< HSI16 divided by 4
+%% else
 		Div2 = 0b00,	///< PCLK2 divided by 2
 		Div4 = 0b01,	///< PCLK2 divided by 4
 		Div6 = 0b10,	///< PCLK2 divided by 6
 		Div8 = 0b11		///< PCLK2 divided by 8
+%% endif
 	};
 
 public:
@@ -485,7 +491,11 @@ private:
 	 * 		will be divided.
 	 */
 	static inline void
+%% if target["family"] == "l1"
+	setPrescaler(const Prescaler prescaler = Prescaler::Div4);
+%% else
 	setPrescaler(const Prescaler prescaler = Prescaler::Div8);
+%% endif
 };
 
 } // namespace platform

@@ -22,10 +22,18 @@ template< class SystemClock, modm::frequency_t frequency, modm::percent_t tolera
 void
 modm::platform::Adc{{ id }}::initialize()
 {
+%% if target["family"] == "l1"
+	// The STM32L1 ADC is always clocked by the HSI16 (RM0038 ADC clock)
+	constexpr auto result = modm::Prescaler::from_list(Rcc::HsiFrequency, frequency, {1,2,4});
+%% else
 	constexpr auto result = modm::Prescaler::from_list(SystemClock::Adc, frequency, {2,4,6,8});
+%% endif
 	static_assert(result.frequency <= {{ max_frequency }}, "Generated ADC frequency is above maximum frequency!");
 	assertBaudrateInTolerance<result.frequency, frequency, tolerance >();
 
+%% if target["family"] == "l1"
+	Rcc::enableHsiClock();
+%% endif
 	Rcc::enable<Peripheral::Adc{{id}}>();
 	enable();  // switch on ADC
 
