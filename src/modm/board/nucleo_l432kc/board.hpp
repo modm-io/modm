@@ -108,6 +108,7 @@ struct SystemClock
 		Rcc::setApb1Prescaler(Rcc::ApbPrescaler::Div1);
 		Rcc::setApb2Prescaler(Rcc::ApbPrescaler::Div1);
 
+		Rcc::enableMsiPllMode(); // trim MSI with the LSE
 		Rcc::enablePll(Rcc::PllSource::Msi, pll);
 		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll);
 

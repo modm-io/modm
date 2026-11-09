@@ -81,7 +81,7 @@ struct SystemClock
 	static constexpr uint32_t Opamp1 = Apb1;
 	static constexpr uint32_t Opamp2 = Apb1;
 	static constexpr uint32_t LpTimer2 = Apb1;
-	static constexpr uint32_t FdCan1 = Apb1;
+	static constexpr uint32_t FdCan1 = SysClk;
 
 	// APB2 Peripherals
 	static constexpr uint32_t Tim1 = Apb2;
@@ -120,6 +120,7 @@ struct SystemClock
 		Rcc::setFlashLatency<Frequency>();
 
 		Rcc::enableMsiSystemClock(Rcc::MsiFrequency::MHz96);
+		Rcc::enableMsiPllMode(0); // lock MSIRC0 to the LSE
 		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
 		Rcc::setApb1Prescaler(Rcc::ApbPrescaler::Div1);
 		Rcc::setApb2Prescaler(Rcc::ApbPrescaler::Div1);

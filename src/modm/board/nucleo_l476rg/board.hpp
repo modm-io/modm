@@ -121,6 +121,7 @@ struct SystemClock
 
 		// The system already runs from the MSI
 		Rcc::enableMsiClock(Rcc::MsiRange::MHz48);
+		Rcc::enableMsiPllMode(); // trim MSI with the LSE
 
 		Rcc::setRealTimeClockSource(Rcc::RealTimeClockSource::Lse);
 
