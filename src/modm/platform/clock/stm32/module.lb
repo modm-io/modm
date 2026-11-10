@@ -21,7 +21,7 @@ def prepare(module, options):
     if not options[":target"].has_driver("rcc:stm32*"):
         return False
 
-    module.depends(":cmsis:device", ":utils", ":platform:clock", ":architecture:delay")
+    module.depends(":cmsis:device", ":utils", ":platform:clock", ":architecture:delay", ":platform:gpio")
     return True
 
 def build(env):
@@ -50,9 +50,10 @@ def build(env):
     def instances(*drivers):
         ids = []
         for driver in drivers:
-            if device.has_driver(driver):
-                ids += device.get_driver(driver).get("instance", [])
-        return list(map(int, ids))
+            # several drivers can share a name (advanced, general purpose and basic "tim")
+            for d in device.get_all_drivers(driver):
+                ids += d.get("instance", [])
+        return sorted(set(map(int, ids)))
 
     p["uart_ids"] = instances("usart", "uart")
     p["lpuart_ids"] = instances("lpuart")
@@ -107,6 +108,10 @@ def build(env):
         if "Adc1" in all_peripherals and per == "ADC":
             per = "ADC1"
             nper = "ADC"
+        # STM32L1: single ADC instance, but the enable bit is ADC1EN
+        if "Adc" in all_peripherals and "Adc1" not in all_peripherals and per == "ADC1":
+            per = "ADC"
+            nper = "ADC1"
         # Fix DSIHOST vs DSI
         if "Dsihost" in all_peripherals and per == "DSI":
             per = "Dsihost"

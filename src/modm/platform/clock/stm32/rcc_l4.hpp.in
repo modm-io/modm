@@ -232,6 +232,9 @@ public:
 		if (cfg.P) cfgr |= RCC_PLLCFGR_PLLPEN | (cfg.P == 17 ? RCC_PLLCFGR_PLLP : 0);
 %% endif
 		RCC->PLLCFGR = cfgr;
+		// PLLSRC and PLLM are shared with the PLLSAIs and stay unchanged while those run
+		if ((RCC->PLLCFGR & (RCC_PLLCFGR_PLLSRC | RCC_PLLCFGR_PLLM)) != (cfgr & (RCC_PLLCFGR_PLLSRC | RCC_PLLCFGR_PLLM)))
+			return false;
 
 		RCC->CR |= RCC_CR_PLLON;
 		while (not (RCC->CR & RCC_CR_PLLRDY) and --waitLoops) ;

@@ -222,14 +222,27 @@ public:
 	enablePll{{id}}(PllSource source, const PllConfig& cfg, uint32_t waitLoops = 0x10000)
 	{
 	%% if id == 1
+%% if cd
+		// RM0455: DIVN1 8..420, DIVP1 even only
+		if ((cfg.P & 1) or cfg.N < 8 or cfg.N > 420 or cfg.M == 0) return false;
+%% elif dual
+		// RM0433: DIVP1 odd division factors are not allowed
+		if ((cfg.P & 1) or cfg.N < 4 or cfg.M == 0) return false;
+%% else
+		// RM0468: DIVP1 odd division factors are not allowed, except for 1
 		if ((cfg.P > 1 and cfg.P & 1) or cfg.N < 4 or cfg.M == 0) return false;
+%% endif
 	%% else
 		if (cfg.N < 4 or cfg.M == 0) return false;
 	%% endif
 %#
+		// PLLSRC is shared by all PLLs and can only be changed while all of them are off (RM0433 8.7.11)
 		setPllSource(source);
+		if ((RCC->PLLCKSELR & RCC_PLLCKSELR_PLLSRC) != (uint32_t(source) << RCC_PLLCKSELR_PLLSRC_Pos)) return false;
 		RCC->PLLCKSELR = (RCC->PLLCKSELR & ~RCC_PLLCKSELR_DIVM{{id}}) |
 				((uint32_t(cfg.M) << RCC_PLLCKSELR_DIVM{{id}}_Pos) & RCC_PLLCKSELR_DIVM{{id}});
+		if ((RCC->PLLCKSELR & RCC_PLLCKSELR_DIVM{{id}}) != ((uint32_t(cfg.M) << RCC_PLLCKSELR_DIVM{{id}}_Pos) & RCC_PLLCKSELR_DIVM{{id}}))
+			return false;
 
 		uint32_t cfgr = RCC->PLLCFGR & ~(RCC_PLLCFGR_PLL{{id}}RGE | RCC_PLLCFGR_PLL{{id}}VCOSEL |
 				RCC_PLLCFGR_PLL{{id}}FRACEN | RCC_PLLCFGR_DIVP{{id}}EN | RCC_PLLCFGR_DIVQ{{id}}EN | RCC_PLLCFGR_DIVR{{id}}EN);

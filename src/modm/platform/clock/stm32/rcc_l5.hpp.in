@@ -162,6 +162,9 @@ public:
 	{
 		RCC->BDCR |= RCC_BDCR_LSEBYP | RCC_BDCR_LSEON;
 		while (not (RCC->BDCR & RCC_BDCR_LSERDY) and --waitLoops) ;
+		// Distribute the LSE to the peripherals and MCO/LSCO/MSI PLL mode, not only to the RTC
+		RCC->BDCR |= RCC_BDCR_LSESYSEN;
+		while (not (RCC->BDCR & RCC_BDCR_LSESYSRDY) and --waitLoops) ;
 		return waitLoops;
 	}
 
@@ -179,6 +182,9 @@ public:
 		RCC->BDCR = (RCC->BDCR & ~(RCC_BDCR_LSEDRV | RCC_BDCR_LSEBYP)) |
 					(uint32_t(drive) << RCC_BDCR_LSEDRV_Pos) | RCC_BDCR_LSEON;
 		while (not (RCC->BDCR & RCC_BDCR_LSERDY) and --waitLoops) ;
+		// Distribute the LSE to the peripherals and MCO/LSCO/MSI PLL mode, not only to the RTC
+		RCC->BDCR |= RCC_BDCR_LSESYSEN;
+		while (not (RCC->BDCR & RCC_BDCR_LSESYSRDY) and --waitLoops) ;
 		return waitLoops;
 	}
 
@@ -211,6 +217,9 @@ public:
 		if (cfg.Q) cfgr |= RCC_PLLCFGR_PLLQEN | ((uint32_t(cfg.Q / 2u - 1u) << RCC_PLLCFGR_PLLQ_Pos) & RCC_PLLCFGR_PLLQ);
 		if (cfg.P) cfgr |= RCC_PLLCFGR_PLLPEN | ((uint32_t(cfg.P) << RCC_PLLCFGR_PLLPDIV_Pos) & RCC_PLLCFGR_PLLPDIV);
 		RCC->PLLCFGR = cfgr;
+		// PLLSRC and PLLM are shared with the PLLSAIs and stay unchanged while those run
+		if ((RCC->PLLCFGR & (RCC_PLLCFGR_PLLSRC | RCC_PLLCFGR_PLLM)) != (cfgr & (RCC_PLLCFGR_PLLSRC | RCC_PLLCFGR_PLLM)))
+			return false;
 
 		RCC->CR |= RCC_CR_PLLON;
 		while (not (RCC->CR & RCC_CR_PLLRDY) and --waitLoops) ;

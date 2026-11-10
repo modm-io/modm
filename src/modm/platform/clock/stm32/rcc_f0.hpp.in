@@ -148,8 +148,8 @@ public:
 	LseDrive : uint8_t
 	{
 		Low        = 0b00,
-		MediumLow  = 0b01,
-		MediumHigh = 0b10,
+		MediumHigh = 0b01,
+		MediumLow  = 0b10,
 		High       = 0b11,
 	};
 	static inline bool
@@ -165,10 +165,16 @@ public:
 	enum class
 	PllSource : uint8_t
 	{
-		HsiDiv2 = 0b00, ///< HSI divided by 2
-		Hse     = 0b01, ///< HSE divided by PREDIV
+%% if target.name in ["42", "48", "70", "71", "72", "78", "91", "98"]
+		HsiDiv2   = 0b00, ///< HSI divided by 2, PREDIV is ignored
+		HsiPrediv = 0b01, ///< HSI divided by PREDIV
+		Hse       = 0b10, ///< HSE divided by PREDIV
 %% if with_hsi48
-		Hsi48   = 0b11, ///< HSI48 divided by PREDIV
+		Hsi48     = 0b11, ///< HSI48 divided by PREDIV
+%% endif
+%% else
+		HsiDiv2 = 0b0, ///< HSI divided by 2
+		Hse     = 0b1, ///< HSE divided by PREDIV
 %% endif
 	};
 
@@ -322,7 +328,7 @@ public:
 		SysClk       = 0b0100 << RCC_CFGR_MCO_Pos,
 		Hsi          = 0b0101 << RCC_CFGR_MCO_Pos,
 		Hse          = 0b0110 << RCC_CFGR_MCO_Pos,
-%% set with_pllnodiv = not ((target.name in ("51", "58") or (target.name >= "30" and target.size == "8")))
+%% set with_pllnodiv = not ((target.name in ("51", "58") or (target.name == "30" and target.size == "8")))
 %% if with_pllnodiv
 		Pll          = (0b0111 << RCC_CFGR_MCO_Pos) | RCC_CFGR_PLLNODIV,
 		PllDiv2      = (0b0111 << RCC_CFGR_MCO_Pos),

@@ -153,10 +153,15 @@ public:
 %% endif
 	};
 	/// VCO output must be in the range 100 MHz to 432 MHz,
+	static constexpr uint32_t PllConfigMask = RCC_PLLCFGR_PLLSRC | RCC_PLLCFGR_PLLM | RCC_PLLCFGR_PLLN |
+%% if has_pllr
+			RCC_PLLCFGR_PLLR |
+%% endif
+			RCC_PLLCFGR_PLLP | RCC_PLLCFGR_PLLQ;
 	static inline bool
 	enablePll(PllSource src, const PllConfig& cfg, uint32_t waitLoops = 0x10000)
 	{
-		RCC->PLLCFGR =
+		const uint32_t cfgr =
 			(uint32_t(src) << RCC_PLLCFGR_PLLSRC_Pos) |
 			((uint32_t(cfg.M) << RCC_PLLCFGR_PLLM_Pos) & RCC_PLLCFGR_PLLM) |
 			((uint32_t(cfg.N) << RCC_PLLCFGR_PLLN_Pos) & RCC_PLLCFGR_PLLN) |
@@ -165,6 +170,9 @@ public:
 			((uint32_t(cfg.R) << RCC_PLLCFGR_PLLR_Pos) & RCC_PLLCFGR_PLLR) |
 %% endif
 			((uint32_t(cfg.Q) << RCC_PLLCFGR_PLLQ_Pos) & RCC_PLLCFGR_PLLQ);
+		RCC->PLLCFGR = (RCC->PLLCFGR & ~PllConfigMask) | cfgr;
+		// PLLSRC and PLLM are shared with PLLI2S/PLLSAI and stay unchanged while those run
+		if ((RCC->PLLCFGR & PllConfigMask) != cfgr) return false;
 
 		RCC->CR |= RCC_CR_PLLON;
 		while (not (RCC->CR & RCC_CR_PLLRDY) and --waitLoops) ;

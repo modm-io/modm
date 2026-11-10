@@ -339,12 +339,29 @@ public:
 		RCC->CCIPR = (RCC->CCIPR & ~RCC_CCIPR_I2C{{id}}SEL) | (uint32_t(src) << RCC_CCIPR_I2C{{id}}SEL_Pos);
 	}
 %% endfor
-%% if 2 in i2c_ids and target.name < "b0"
+%#
+	enum class
+	I2sClockSource : uint8_t
+	{
+		SysClk   = 0b00,
+		PllP     = 0b01,
+		Hsi16    = 0b10,
+		External = 0b11, ///< I2S_CKIN
+	};
+%% if target.name < "b0"
 	static inline void
-	setI2c2ClockSource(I2cClockSource src)
+	setI2s1ClockSource(I2sClockSource src)
 	{
 		RCC->CCIPR = (RCC->CCIPR & ~RCC_CCIPR_I2S1SEL) | (uint32_t(src) << RCC_CCIPR_I2S1SEL_Pos);
 	}
+%% else
+	%% for id in [1, 2]
+	static inline void
+	setI2s{{id}}ClockSource(I2sClockSource src)
+	{
+		RCC->CCIPR2 = (RCC->CCIPR2 & ~RCC_CCIPR2_I2S{{id}}SEL) | (uint32_t(src) << RCC_CCIPR2_I2S{{id}}SEL_Pos);
+	}
+	%% endfor
 %% endif
 %#
 	enum class
@@ -379,12 +396,14 @@ public:
 %% endfor
 %% endif
 %#
-%% if target.name >= "b1"
-	// USB clock source (only on G0B1/G0C1)
+%% if target.name >= "b0"
+	// USB clock source (only on G0B0/G0B1/G0C1)
 	enum class
 	UsbClockSource : uint32_t
 	{
+%% if target.name >= "b1"
 		Hsi48 = 0b00 << RCC_CCIPR2_USBSEL_Pos,
+%% endif
 		Hse   = 0b01 << RCC_CCIPR2_USBSEL_Pos,
 		PllQ  = 0b10 << RCC_CCIPR2_USBSEL_Pos,
 	};
@@ -438,7 +457,12 @@ public:
 		Lsi       = 0b0110,
 		Lse       = 0b0111,
 %% if target.name >= "b1"
-		Hsi48     = 0b1000,
+		// RM0444 5.4.3: only on G0B1/G0C1
+		Hsi48     = 0b0010,
+		PllP      = 0b1000,
+		PllQ      = 0b1001,
+		Rtc       = 0b1010,
+		RtcWakeup = 0b1011,
 %% endif
 	};
 	static inline void

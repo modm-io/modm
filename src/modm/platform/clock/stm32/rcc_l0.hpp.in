@@ -422,6 +422,23 @@ public:
 					uint32_t(src) | (uint32_t(prescaler) << RCC_CFGR_MCOPRE_Pos);
 	}
 
+	enum class
+	VoltageScaling : uint32_t
+	{
+		Range1 = 0b01, ///< 1.8 V, up to 32 MHz
+		Range2 = 0b10, ///< 1.5 V, up to 16 MHz (reset value)
+		Range3 = 0b11, ///< 1.2 V, up to 4.2 MHz
+	};
+	static inline bool
+	setVoltageScaling(VoltageScaling voltage, uint32_t waitLoops = 0x10000)
+	{
+		while ((PWR->CSR & PWR_CSR_VOSF) and --waitLoops) ;
+		if (not waitLoops) return false;
+		PWR->CR = (PWR->CR & ~PWR_CR_VOS) | (uint32_t(voltage) << PWR_CR_VOS_Pos);
+		while ((PWR->CSR & PWR_CSR_VOSF) and --waitLoops) ;
+		return waitLoops;
+	}
+
 private:
 	struct flash_latency
 	{

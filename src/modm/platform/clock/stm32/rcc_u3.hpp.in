@@ -136,6 +136,9 @@ public:
 	{
 		RCC->BDCR |= RCC_BDCR_LSEBYP | RCC_BDCR_LSEON;
 		while (not (RCC->BDCR & RCC_BDCR_LSERDY) and --waitLoops) ;
+		// Distribute the LSE to the peripherals and MCO/LSCO/MSI PLL mode, not only to the RTC
+		RCC->BDCR |= RCC_BDCR_LSESYSEN;
+		while (not (RCC->BDCR & RCC_BDCR_LSESYSRDY) and --waitLoops) ;
 		return waitLoops;
 	}
 
@@ -153,6 +156,9 @@ public:
 		RCC->BDCR = (RCC->BDCR & ~(RCC_BDCR_LSEDRV | RCC_BDCR_LSEBYP)) |
 					(uint32_t(drive) << RCC_BDCR_LSEDRV_Pos) | RCC_BDCR_LSEON;
 		while (not (RCC->BDCR & RCC_BDCR_LSERDY) and --waitLoops) ;
+		// Distribute the LSE to the peripherals and MCO/LSCO/MSI PLL mode, not only to the RTC
+		RCC->BDCR |= RCC_BDCR_LSESYSEN;
+		while (not (RCC->BDCR & RCC_BDCR_LSESYSRDY) and --waitLoops) ;
 		return waitLoops;
 	}
 
@@ -306,10 +312,10 @@ public:
 	enum class
 	LpUartClockSource : uint8_t
 	{
-		Bus    = 0b00,
-		SysClk = 0b01,
-		Hsi16  = 0b10,
-		Lse    = 0b11,
+		Bus   = 0b00,
+		Hsi16 = 0b01,
+		Lse   = 0b10,
+		Msik  = 0b11,
 	};
 %% for id in lpuart_ids | sort if id in [1]
 	static inline void
@@ -319,9 +325,15 @@ public:
 	}
 %% endfor
 %#
-%% for id in i2c_ids | sort if id in [1]
+	enum class
+	I2cClockSource : uint8_t
+	{
+		Bus  = 0b0,
+		Msik = 0b1,
+	};
+%% for id in i2c_ids | sort if id in [1, 2]
 	static inline void
-	setI2c{{id}}ClockSource(PeripheralClockSource src)
+	setI2c{{id}}ClockSource(I2cClockSource src)
 	{
 		RCC->CCIPR1 = (RCC->CCIPR1 & ~RCC_CCIPR1_I2C{{id}}SEL) | (uint32_t(src) << RCC_CCIPR1_I2C{{id}}SEL_Pos);
 	}
@@ -364,8 +376,24 @@ public:
 		Hsi16 = 0b10,
 		Lse   = 0b11,
 	};
-%% for id in lptim_ids | sort if id in [1,2]
-	%% set r = 3 if id == 1 else 1
+	/// LPTIM1, LPTIM3 and LPTIM4 select MSIK with 0b00 instead of the bus clock
+	enum class
+	LpTimerClockSourceMsiK : uint8_t
+	{
+		MsiK  = 0b00,
+		Lsi   = 0b01,
+		Hsi16 = 0b10,
+		Lse   = 0b11,
+	};
+%% if 1 in lptim_ids
+	static inline void
+	setLpTimer1ClockSource(LpTimerClockSourceMsiK src)
+	{
+		RCC->CCIPR3 = (RCC->CCIPR3 & ~RCC_CCIPR3_LPTIM1SEL) | (uint32_t(src) << RCC_CCIPR3_LPTIM1SEL_Pos);
+	}
+%% endif
+%% for id in lptim_ids | sort if id in [2]
+	%% set r = 1
 	static inline void
 	setLpTimer{{id}}ClockSource(LpTimerClockSource src)
 	{
@@ -375,7 +403,7 @@ public:
 %% for id in lptim_ids | sort if id in [3,4]
 	// LPTIM3 and LPTIM4 share the same clock selection
 	static inline void
-	setLpTimer{{id}}ClockSource(LpTimerClockSource src)
+	setLpTimer{{id}}ClockSource(LpTimerClockSourceMsiK src)
 	{
 		RCC->CCIPR3 = (RCC->CCIPR3 & ~RCC_CCIPR3_LPTIM34SEL) | (uint32_t(src) << RCC_CCIPR3_LPTIM34SEL_Pos);
 	}
@@ -384,11 +412,12 @@ public:
 	enum class
 	TimIcClockSource : uint8_t
 	{
-		Disabled = 0b000,
-		Hsi16    = 0b001,
-		MsiS     = 0b010,
-		MsiK     = 0b011,
-		Hse      = 0b101,
+		// HSI/256 is always generated when enabled, the value selects the MSI dividers
+		Disabled     = 0b000,
+		MsiSDiv1024_MsiSDiv4 = 0b100,
+		MsiSDiv1024_MsiKDiv4 = 0b101,
+		MsiKDiv1024_MsiSDiv4 = 0b110,
+		MsiKDiv1024_MsiKDiv4 = 0b111,
 	};
 	static inline void
 	setTimIcClockSource(TimIcClockSource src)
@@ -455,6 +484,9 @@ public:
 		Div4    = 0b010,
 		Div8    = 0b011,
 		Div16   = 0b100,
+		Div32   = 0b101,
+		Div64   = 0b110,
+		Div128  = 0b111,
 	};
 	enum class
 	McoClockSource : uint8_t
@@ -464,11 +496,10 @@ public:
 		MsiS      = 0b0010,
 		Hsi16     = 0b0011,
 		Hse       = 0b0100,
-		MsiK      = 0b0101,
-		Lsi       = 0b0110,
-		Lse       = 0b0111,
-		Hsi48     = 0b1000,
-		Iclk      = 0b1001,
+		Lsi       = 0b0101,
+		Lse       = 0b0110,
+		Hsi48     = 0b0111,
+		MsiK      = 0b1000,
 	};
 	static inline void
 	setMco1ClockSource(McoClockSource src, McoPrescaler div)

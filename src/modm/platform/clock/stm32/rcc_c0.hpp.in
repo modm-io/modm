@@ -293,8 +293,9 @@ public:
 	I2sClockSource : uint8_t
 	{
 		SysClk  = 0b00,
-		HsiKer  = 0b01,
-		ExtClk  = 0b10,
+		// RM0490 6.4.20: 01 is reserved
+		HsiKer  = 0b10,
+		ExtClk  = 0b11, ///< I2S_CKIN
 	};
 	static inline void
 	setI2s1ClockSource(I2sClockSource src)

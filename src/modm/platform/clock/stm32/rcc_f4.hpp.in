@@ -153,10 +153,15 @@ public:
 %% endif
 	};
 	/// VCO output must be in the range 100 MHz to 432 MHz,
+	static constexpr uint32_t PllConfigMask = RCC_PLLCFGR_PLLSRC | RCC_PLLCFGR_PLLM | RCC_PLLCFGR_PLLN |
+%% if has_pllr
+			RCC_PLLCFGR_PLLR |
+%% endif
+			RCC_PLLCFGR_PLLP | RCC_PLLCFGR_PLLQ;
 	static inline bool
 	enablePll(PllSource src, const PllConfig& cfg, uint32_t waitLoops = 0x10000)
 	{
-		RCC->PLLCFGR =
+		const uint32_t cfgr =
 			(uint32_t(src) << RCC_PLLCFGR_PLLSRC_Pos) |
 			((uint32_t(cfg.M) << RCC_PLLCFGR_PLLM_Pos) & RCC_PLLCFGR_PLLM) |
 			((uint32_t(cfg.N) << RCC_PLLCFGR_PLLN_Pos) & RCC_PLLCFGR_PLLN) |
@@ -165,6 +170,9 @@ public:
 			((uint32_t(cfg.R) << RCC_PLLCFGR_PLLR_Pos) & RCC_PLLCFGR_PLLR) |
 %% endif
 			((uint32_t(cfg.Q) << RCC_PLLCFGR_PLLQ_Pos) & RCC_PLLCFGR_PLLQ);
+		RCC->PLLCFGR = (RCC->PLLCFGR & ~PllConfigMask) | cfgr;
+		// PLLSRC and PLLM are shared with PLLI2S/PLLSAI and stay unchanged while those run
+		if ((RCC->PLLCFGR & PllConfigMask) != cfgr) return false;
 
 		RCC->CR |= RCC_CR_PLLON;
 		while (not (RCC->CR & RCC_CR_PLLRDY) and --waitLoops) ;
@@ -226,9 +234,7 @@ public:
 %% if has_plli2sp
 			((uint32_t(cfg.P / 2u - 1u) << RCC_PLLI2SCFGR_PLLI2SP_Pos) & RCC_PLLI2SCFGR_PLLI2SP) |
 %% endif
-%% if has_pllr
 			((uint32_t(cfg.R) << RCC_PLLI2SCFGR_PLLI2SR_Pos) & RCC_PLLI2SCFGR_PLLI2SR) |
-%% endif
 			((uint32_t(cfg.N) << RCC_PLLI2SCFGR_PLLI2SN_Pos) & RCC_PLLI2SCFGR_PLLI2SN);
 
 		RCC->CR |= RCC_CR_PLLI2SON;
@@ -337,7 +343,9 @@ public:
 		Hsi = 0b00,
 		Hse = 0b01,
 		PllP = 0b10,
+%% if target.name in ["10", "12", "13", "23", "46"]
 		PllR = 0b11,
+%% endif
 	};
 	static inline bool
 	enableSystemClock(SystemClockSource src, uint32_t waitLoops = 0x10000)
@@ -544,7 +552,7 @@ public:
 		PllSai = 0u,
 		PllI2s = RCC_DCKCFGR_SAI1SRC_0,
 		PllR = RCC_DCKCFGR_SAI1SRC_1,
-		MainPll = RCC_DCKCFGR_SAI1SRC,
+		External = RCC_DCKCFGR_SAI1SRC, ///< I2S_CKIN
 	};
 	static inline void
 	setSai1ClockSource(Sai1ClockSource src)
@@ -782,8 +790,29 @@ public:
 					(uint32_t(src) << RCC_CFGR_MCO2_Pos) | (uint32_t(prescaler) << RCC_CFGR_MCO2PRE_Pos);
 	}
 
+	enum class
+	VoltageScaling : uint32_t
+	{
+%% if target.name in ["05", "07", "15", "17"]
+		Scale1 = PWR_CR_VOS, ///< up to 168 MHz
+		Scale2 = 0,          ///< up to 144 MHz
+%% else
+		Scale1 = PWR_CR_VOS,   ///< highest frequency
+		Scale2 = PWR_CR_VOS_1,
+		Scale3 = PWR_CR_VOS_0,
+%% endif
+	};
+	/// Must be called while the PLL is disabled, takes effect when the PLL is enabled.
+	/// F410/F411/F412/F413/F423 reset to Scale 2 (max. 84 MHz).
+	static inline void
+	setVoltageScaling(VoltageScaling voltage)
+	{
+		PWR->CR = (PWR->CR & ~PWR_CR_VOS) | uint32_t(voltage);
+	}
+
 %% if target.name >= "27"
 	// TODO: move to Pwr module
+	/// Call after enablePll() and before switching the system clock to the PLL.
 	static inline bool
 	enableOverdriveMode(uint32_t waitLoops = 2048)
 	{

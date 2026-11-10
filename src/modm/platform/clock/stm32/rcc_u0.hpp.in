@@ -138,6 +138,9 @@ public:
 	{
 		RCC->BDCR |= RCC_BDCR_LSEBYP | RCC_BDCR_LSEON;
 		while (not (RCC->BDCR & RCC_BDCR_LSERDY) and --waitLoops) ;
+		// Distribute the LSE to the peripherals and MCO/LSCO/MSI PLL mode, not only to the RTC
+		RCC->BDCR |= RCC_BDCR_LSESYSEN;
+		while (not (RCC->BDCR & RCC_BDCR_LSESYSRDY) and --waitLoops) ;
 		return waitLoops;
 	}
 
@@ -155,6 +158,9 @@ public:
 		RCC->BDCR = (RCC->BDCR & ~(RCC_BDCR_LSEDRV | RCC_BDCR_LSEBYP)) |
 					(uint32_t(drive) << RCC_BDCR_LSEDRV_Pos) | RCC_BDCR_LSEON;
 		while (not (RCC->BDCR & RCC_BDCR_LSERDY) and --waitLoops) ;
+		// Distribute the LSE to the peripherals and MCO/LSCO/MSI PLL mode, not only to the RTC
+		RCC->BDCR |= RCC_BDCR_LSESYSEN;
+		while (not (RCC->BDCR & RCC_BDCR_LSESYSRDY) and --waitLoops) ;
 		return waitLoops;
 	}
 
@@ -357,9 +363,17 @@ public:
 	}
 %% endfor
 %#
+	enum class
+	LpTimerClockSource : uint8_t
+	{
+		Bus   = 0b00,
+		Lsi   = 0b01,
+		Hsi16 = 0b10,
+		Lse   = 0b11,
+	};
 %% for id in lptim_ids | sort if id in [1,2,3]
 	static inline void
-	setLpTimer{{id}}ClockSource(PeripheralClockSource src)
+	setLpTimer{{id}}ClockSource(LpTimerClockSource src)
 	{
 		RCC->CCIPR = (RCC->CCIPR & ~RCC_CCIPR_LPTIM{{id}}SEL) | (uint32_t(src) << RCC_CCIPR_LPTIM{{id}}SEL_Pos);
 	}
@@ -444,7 +458,7 @@ public:
 	};
 %% for id in [1,2]
 	static inline void
-	set{{id}}ClockSource(McoClockSource src, McoPrescaler div)
+	setMco{{id}}ClockSource(McoClockSource src, McoPrescaler div)
 	{
 		RCC->CFGR = (RCC->CFGR & ~(RCC_CFGR_MCO{{id}}SEL | RCC_CFGR_MCO{{id}}PRE)) |
 					(uint32_t(src) << RCC_CFGR_MCO{{id}}SEL_Pos) |

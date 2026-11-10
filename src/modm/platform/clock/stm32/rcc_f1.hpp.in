@@ -210,11 +210,14 @@ public:
 %% endif
 					(uint32_t(src) & (RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE));
 %% if with_connectivity
+		// PLLXTPRE is PREDIV1[0], so HseDiv2 doubles the PREDIV1 factor instead
 		RCC->CFGR2 = (RCC->CFGR2 & ~(RCC_CFGR2_PREDIV1 | RCC_CFGR2_PREDIV1SRC)) |
-					(uint32_t(cfg.prediv1 - 1) & RCC_CFGR2_PREDIV1_Msk) |
+					(uint32_t(cfg.prediv1 * (src == PllSource::HseDiv2 ? 2 : 1) - 1) & RCC_CFGR2_PREDIV1_Msk) |
 					((src == PllSource::Pll2) ? RCC_CFGR2_PREDIV1SRC : 0);
 %% elif with_prediv1
-		RCC->CFGR2 = (RCC->CFGR2 & ~RCC_CFGR2_PREDIV1) | (uint32_t(cfg.prediv1 - 1) & RCC_CFGR2_PREDIV1_Msk);
+		// PLLXTPRE is PREDIV1[0], so HseDiv2 doubles the PREDIV1 factor instead
+		RCC->CFGR2 = (RCC->CFGR2 & ~RCC_CFGR2_PREDIV1) |
+					(uint32_t(cfg.prediv1 * (src == PllSource::HseDiv2 ? 2 : 1) - 1) & RCC_CFGR2_PREDIV1_Msk);
 %% endif
 %#
 		RCC->CR |= RCC_CR_PLLON;

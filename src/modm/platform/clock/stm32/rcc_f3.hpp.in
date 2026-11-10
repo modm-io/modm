@@ -136,8 +136,14 @@ public:
     enum class
     PllSource : uint32_t
     {
-        HsiDiv2 = 0,
-        HsePrediv = 1,
+%% if (target.name in ["02", "03"] and target.size in ["d", "e"]) or target.name == "98"
+        HsiDiv2 = 0b00,   ///< HSI divided by 2, PREDIV is ignored
+        HsiPrediv = 0b01, ///< HSI divided by PREDIV
+        HsePrediv = 0b10, ///< HSE divided by PREDIV
+%% else
+        HsiDiv2 = 0b0,
+        HsePrediv = 0b1,
+%% endif
     };
     struct PllConfig
     {
@@ -233,7 +239,7 @@ public:
         RCC->BDCR = (RCC->BDCR & ~RCC_BDCR_RTCSEL) | RCC_BDCR_RTCEN | (uint32_t(src) << RCC_BDCR_RTCSEL_Pos);
     }
 
-%% if target.name in ["02", "73"] or (target.name == "03" and target.size in ["c", "e"])
+%% if target.name in ["02", "73"] or (target.name == "03" and target.size in ["b", "c", "d", "e"])
     enum class
     UsbPrescaler
     {
@@ -250,7 +256,7 @@ public:
     }
 %% endif
 
-%% if target.name in ["01", "02", "18", "58", "98"] or (target.name == "03" and target.size in ["c", "e"])
+%% if target.name in ["01", "02", "18", "58", "98"] or (target.name == "03" and target.size in ["b", "c", "d", "e"])
     enum class
     I2sClockSource
     {
@@ -392,7 +398,7 @@ public:
         Lse = 0b10,
         Hsi = 0b11,
     };
-%% set with_usart23 = target.name >= "58" or (target.name in ["02", "03"] and target.size in ["c", "e"])
+%% set with_usart23 = target.name >= "58" or (target.name in ["02", "03"] and target.size in ["b", "c", "d", "e"])
 %% for id in uart_ids | sort if id in ([1, 2, 3] if with_usart23 else [1])
     static inline void
     setUsart{{id}}ClockSource(UartClockSource src)
@@ -433,6 +439,7 @@ public:
     };
 %% for id in tim_ids | sort if id in [1, 2, 3, 8, 15, 16, 17, 20]
 	%% set id = 34 if id == 3 else id
+#ifdef RCC_CFGR3_TIM{{id}}SW	// only some devices can clock TIM1/2/3/8/15/16/17/20 from the PLL
     static inline void
     setTim{{id}}ClockSource(TimClockSource src)
     {
@@ -441,6 +448,7 @@ public:
         else
             RCC->CFGR3 &= ~RCC_CFGR3_TIM{{id}}SW;
     }
+#endif
 %% endfor
 
 %% if target.name in ["73", "78"]
@@ -470,7 +478,7 @@ public:
         Hsi = RCC_CFGR_MCO_HSI,
         Hse = RCC_CFGR_MCO_HSE,
         PllDiv2 = RCC_CFGR_MCO_PLL,
-%% set has_mcpre = target.name in ["01", "18", "28", "34", "98"] or (target.name in ["02", "03"] and target.size in ["8", "e"])
+%% set has_mcpre = target.name in ["01", "18", "28", "34", "98"] or (target.name in ["02", "03"] and target.size in ["6", "8", "d", "e"])
 %% if has_mcpre
         Pll = RCC_CFGR_MCO_PLL | RCC_CFGR_PLLNODIV,
 %% endif

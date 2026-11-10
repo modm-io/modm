@@ -37,7 +37,7 @@ public:
 	static constexpr uint32_t CsiFrequency = 4'000'000;
 	static constexpr uint32_t LsiFrequency = 32'000;
 	static constexpr uint32_t HsiFrequency = 64'000'000;
-	static constexpr uint32_t BootFrequency = HsiFrequency;
+	static constexpr uint32_t BootFrequency = HsiFrequency / 2;
 	static constexpr uint32_t MaxFrequency = {{ max_frequency | modm.digsep }};
 
 	/// Connect GPIO signals like MCO to the clock tree
@@ -91,6 +91,24 @@ public:
 	{
 		RCC->CR |= RCC_CR_HSION;
 		while (not (RCC->CR & RCC_CR_HSIRDY) and --waitLoops) ;
+		return waitLoops;
+	}
+
+	/// HSI divider for hsi_ck and hsi_ker_ck, the reset value is Div2 (32 MHz).
+	/// Cannot be changed while a PLL using the HSI is enabled.
+	enum class
+	HsiDivider : uint32_t
+	{
+		Div1 = 0b00 << RCC_CR_HSIDIV_Pos, ///< 64 MHz
+		Div2 = 0b01 << RCC_CR_HSIDIV_Pos, ///< 32 MHz
+		Div4 = 0b10 << RCC_CR_HSIDIV_Pos, ///< 16 MHz
+		Div8 = 0b11 << RCC_CR_HSIDIV_Pos, ///<  8 MHz
+	};
+	static inline bool
+	setHsiDivider(HsiDivider divider, uint32_t waitLoops = 0x10000)
+	{
+		RCC->CR = (RCC->CR & ~RCC_CR_HSIDIV) | uint32_t(divider);
+		while (not (RCC->CR & RCC_CR_HSIDIVF) and --waitLoops) ;
 		return waitLoops;
 	}
 
@@ -417,7 +435,7 @@ public:
 	I2cClockSource : uint8_t
 	{
 		Bus   = 0b00,
-		Pll2R = 0b01,
+		Pll{{pll_ids[-1]}}R = 0b01,
 		Hsi   = 0b10,
 		Csi   = 0b11
 	};

@@ -136,6 +136,9 @@ public:
 	{
 		RCC->BDCR |= RCC_BDCR_LSEBYP | RCC_BDCR_LSEON;
 		while (not (RCC->BDCR & RCC_BDCR_LSERDY) and --waitLoops) ;
+		// Distribute the LSE to the peripherals and MCO/LSCO/MSI PLL mode, not only to the RTC
+		RCC->BDCR |= RCC_BDCR_LSESYSEN;
+		while (not (RCC->BDCR & RCC_BDCR_LSESYSRDY) and --waitLoops) ;
 		return waitLoops;
 	}
 
@@ -153,6 +156,9 @@ public:
 		RCC->BDCR = (RCC->BDCR & ~(RCC_BDCR_LSEDRV | RCC_BDCR_LSEBYP)) | RCC_BDCR_LSEON |
 					(uint32_t(drive) << RCC_BDCR_LSEDRV_Pos);
 		while (not (RCC->BDCR & RCC_BDCR_LSERDY) and --waitLoops) ;
+		// Distribute the LSE to the peripherals and MCO/LSCO/MSI PLL mode, not only to the RTC
+		RCC->BDCR |= RCC_BDCR_LSESYSEN;
+		while (not (RCC->BDCR & RCC_BDCR_LSESYSRDY) and --waitLoops) ;
 		return waitLoops;
 	}
 
@@ -216,7 +222,7 @@ public:
 	PllInputRange : uint8_t
 	{
 		MHz4_8  = 0,
-		MHz8_16 = 1,
+		MHz8_16 = 0b11,
 	};
 	enum class
 	Pll1MBoost : uint8_t
@@ -249,7 +255,12 @@ public:
 	static inline bool
 	enablePll{{id}}(PllSource source, const PllConfig& cfg, uint32_t waitLoops = 0x10000)
 	{
+	%% if id == 1
+		// PLL1R only allows division by one or by an even factor
+		if (cfg.N < 4 or (cfg.R > 1 and cfg.R & 1)) return false;
+	%% else
 		if (cfg.N < 4) return false;
+	%% endif
 
 		uint32_t cfgr{uint32_t(source) & RCC_PLL{{id}}CFGR_PLL{{id}}SRC};
 		cfgr |= ((uint32_t(cfg.M - 1u) << RCC_PLL{{id}}CFGR_PLL{{id}}M_Pos) & RCC_PLL{{id}}CFGR_PLL{{id}}M);
