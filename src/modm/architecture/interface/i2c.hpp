@@ -109,9 +109,9 @@ struct I2c
 	 * @see	Application Note AN572 by Microchip
 	 *
 	 * This clears the bus as described in the I2C specification (UM10204 3.1.16):
-	 * Only if SCL or SDA is held low, it clocks SCL until SDA is released, at
-	 * most nine times, and then generates a stop condition. Otherwise a device
-	 * may take the clock pulses as a data byte and write it to a register.
+	 * Only while SDA is held low, it clocks SCL until SDA is released, at most nine
+	 * times, since a device may take more clock pulses as a data byte and write it to
+	 * a register. Then it generates a start and a stop condition.
 	 *
 	 * @warning	Must be called **before** connecting SDA and SCL to I2cMaster,
 	 *			with both pins configured as open-drain outputs!
@@ -124,26 +124,37 @@ struct I2c
 	resetDevices(uint32_t baudrate = 100'000)
 	{
 		const std::chrono::microseconds delay{500'000ul / baudrate};
-		Scl::set();
-		Sda::set();
-		modm::this_fiber::sleep_for(delay);
-		if (Scl::read() and Sda::read()) return;
+		clearBus<Scl, Sda>([&] { modm::this_fiber::sleep_for(delay); });
+	}
 
-		for (uint_fast8_t ii = 0; ii < 9 and not Sda::read(); ++ii) {
-			Scl::reset();
-			modm::this_fiber::sleep_for(delay);
-			Scl::set();
-			modm::this_fiber::sleep_for(delay);
-		}
-		// stop condition: SDA rises while SCL is high
-		Scl::reset();
-		modm::this_fiber::sleep_for(delay);
-		Sda::reset();
-		modm::this_fiber::sleep_for(delay);
+	/// The sequence of resetDevices() with `wait()` for each half clock period, so that
+	/// drivers can run it with a busy wait, for example from an interrupt.
+	/// @param	finishRead	clock all nine pulses, even while SDA is high: a device cut off
+	///			while it sends a byte releases SDA on its 1 bits only and needs the NACK
+	///			of the ninth pulse to stop (measured with a CS43L22, which does not reset on
+	///			START in the middle of a byte). Only after a read, since a device that
+	///			receives would take the pulses as a data byte.
+	template< class Scl, class Sda, class Wait >
+	static void
+	clearBus(Wait&& wait, bool finishRead = false)
+	{
 		Scl::set();
-		modm::this_fiber::sleep_for(delay);
 		Sda::set();
-		modm::this_fiber::sleep_for(delay);
+		wait();
+		for (uint_fast8_t ii = 0; ii < 9 and (finishRead or not Sda::read()); ++ii) {
+			Scl::reset();
+			wait();
+			Scl::set();
+			wait();
+		}
+		// START and STOP while SCL is high and SDA released. A device still sending a
+		// byte drives its next bit after SCL falls, so a STOP prepared with SCL low fails
+		// whenever that bit is 0 (SDA stays low, the next START loses arbitration).
+		// A START is detected at any time and resets the device's byte state.
+		Sda::reset();
+		wait();
+		Sda::set();
+		wait();
 	}
 
 };
