@@ -83,6 +83,17 @@ Rcc::setFlashLatency()
 %% elif target.family == "h7" and target.name[0] in ["r", "s"]
 	// programming delay: 0-1 WS: 0, 2-3 WS: 1, 4-5 WS: 2, 6-7 WS: 3
 	acr = (acr & ~FLASH_ACR_WRHIGHFREQ) | ((fl.latency / 2) << FLASH_ACR_WRHIGHFREQ_Pos);
+%% elif target.family == "h7" and target.name >= "a3"
+	// programming delay: 0-1 WS: 0, 2-3 WS: 1, 4-5 WS: 2, 6 WS: 3 (RM0455 Table 16)
+	acr = (acr & ~FLASH_ACR_WRHIGHFREQ) | ((fl.latency / 2) << FLASH_ACR_WRHIGHFREQ_Pos);
+%% elif target.family == "h7" and target.name in ["42", "43", "45", "47", "50", "53", "55", "57"]
+	// programming delay: 0 WS: 0, 1 WS: 1, 2 WS: 1 up to 185 MHz else 2, 3-4 WS: 2 (RM0433/RM0399 Table 17/16)
+	constexpr uint32_t wrhighfreq = (fl.latency == 0) ? 0 : (fl.latency == 1) ? 1 :
+									(fl.latency == 2) ? (Core_Hz <= 185'000'000 ? 1 : 2) : 2;
+	acr = (acr & ~FLASH_ACR_WRHIGHFREQ) | (wrhighfreq << FLASH_ACR_WRHIGHFREQ_Pos);
+%% elif target.family == "h7"
+	// programming delay equals the number of wait states (RM0468 Table 16)
+	acr = (acr & ~FLASH_ACR_WRHIGHFREQ) | (fl.latency << FLASH_ACR_WRHIGHFREQ_Pos);
 %% elif target.family == "h5"
 	// programming delay: 0-1 WS: 0, 2-3 WS: 1, 4-5 WS: 2 (RM0481 Table 48)
 	acr = (acr & ~FLASH_ACR_WRHIGHFREQ) | ((fl.latency / 2) << FLASH_ACR_WRHIGHFREQ_Pos);

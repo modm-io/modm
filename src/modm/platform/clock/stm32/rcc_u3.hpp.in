@@ -200,6 +200,19 @@ public:
 		return waitLoops;
 	}
 
+	/// Locks MSIRC0 (96 MHz, rc = 0) or MSIRC1 (24 MHz, rc = 1) to the LSE, which must be ready.
+	/// MSIS or MSIK must already run from that MSIRC.
+	static inline bool
+	enableMsiPllMode(uint8_t rc = 0, uint32_t waitLoops = 0x10000)
+	{
+		const uint32_t en  = rc ? RCC_CR_MSIPLL1EN  : RCC_CR_MSIPLL0EN;
+		const uint32_t rdy = rc ? RCC_CR_MSIPLL1RDY : RCC_CR_MSIPLL0RDY;
+		RCC->ICSCR1 &= ~(rc ? RCC_ICSCR1_MSIPLL1SEL : RCC_ICSCR1_MSIPLL0SEL);  // LSE reference
+		RCC->CR |= en;
+		while (not (RCC->CR & rdy) and --waitLoops) ;
+		return waitLoops;
+	}
+
 	/// Enable MSIK (Multi Speed Internal Kernel) oscillator for peripheral clocks
 	static inline bool
 	enableMsiKernelClock(MsiFrequency frequency = MsiFrequency::MHz12, uint32_t waitLoops = 0x10000)
@@ -473,6 +486,131 @@ public:
 		RCC->CCIPR2 = (RCC->CCIPR2 & ~(RCC_CCIPR2_ADCDACSEL | RCC_CCIPR2_ADCDACPRE)) |
 					  (uint32_t(src) << RCC_CCIPR2_ADCDACSEL_Pos) | (uint32_t(div) << RCC_CCIPR2_ADCDACPRE_Pos);
 	}
+
+	// RM0487 10.5.42 RCC_CCIPR1 and 10.5.43 RCC_CCIPR2: the U3B5/3C5 only fields are guarded
+%% if target.name >= "b5"
+	static inline void
+	setUsart2ClockSource(PeripheralClockSource src)
+	{
+		RCC->CCIPR2 = (RCC->CCIPR2 & ~RCC_CCIPR2_USART2SEL) | (uint32_t(src) << RCC_CCIPR2_USART2SEL_Pos);
+	}
+%% endif
+%% if target.name >= "b5"
+	static inline void
+	setI2c4ClockSource(I2cClockSource src)
+	{
+		RCC->CCIPR2 = (RCC->CCIPR2 & ~RCC_CCIPR2_I2C4SEL) | (uint32_t(src) << RCC_CCIPR2_I2C4SEL_Pos);
+	}
+%% endif
+%% if target.name >= "b5"
+	static inline void
+	setSpi4ClockSource(SpiClockSource src)
+	{
+		RCC->CCIPR2 = (RCC->CCIPR2 & ~RCC_CCIPR2_SPI4SEL) | (uint32_t(src) << RCC_CCIPR2_SPI4SEL_Pos);
+	}
+%% endif
+	/// I3C1 and I3C2 run from PCLK1/PCLK2 or MSIK
+	using I3cClockSource = I2cClockSource;
+	static inline void
+	setI3c1ClockSource(I3cClockSource src)
+	{
+		RCC->CCIPR1 = (RCC->CCIPR1 & ~RCC_CCIPR1_I3C1SEL) | (uint32_t(src) << RCC_CCIPR1_I3C1SEL_Pos);
+	}
+%% if target.name >= "75"
+	static inline void
+	setI3c2ClockSource(I3cClockSource src)
+	{
+		RCC->CCIPR1 = (RCC->CCIPR1 & ~RCC_CCIPR1_I3C2SEL) | (uint32_t(src) << RCC_CCIPR1_I3C2SEL_Pos);
+	}
+%% endif
+%% if target.name not in ("56", "66")
+	enum class
+	FdcanClockSource : uint8_t
+	{
+		SysClk = 0b0,
+		Msik   = 0b1,
+	};
+	static inline void
+	setFdcanClockSource(FdcanClockSource src)
+	{
+		RCC->CCIPR1 = (RCC->CCIPR1 & ~RCC_CCIPR1_FDCANSEL) | (uint32_t(src) << RCC_CCIPR1_FDCANSEL_Pos);
+	}
+%% endif
+	enum class
+	SysTickClockSource : uint8_t
+	{
+		HclkDiv8 = 0b00,
+		Lsi      = 0b01,
+		Lse      = 0b10,
+	};
+	/// HCLK must be at least four times faster than LSI/LSE
+	static inline void
+	setSysTickClockSource(SysTickClockSource src)
+	{
+		RCC->CCIPR1 = (RCC->CCIPR1 & ~RCC_CCIPR1_SYSTICKSEL) | (uint32_t(src) << RCC_CCIPR1_SYSTICKSEL_Pos);
+	}
+	enum class
+	OctospiClockSource : uint8_t
+	{
+		SysClk = 0b0,
+		Msik   = 0b1,
+	};
+	static inline void
+	setOctospiClockSource(OctospiClockSource src)
+	{
+		RCC->CCIPR2 = (RCC->CCIPR2 & ~RCC_CCIPR2_OCTOSPISEL) | (uint32_t(src) << RCC_CCIPR2_OCTOSPISEL_Pos);
+	}
+	enum class
+	DacSampleHoldClockSource : uint8_t
+	{
+		Lse = 0b0,
+		Lsi = 0b1,
+	};
+	static inline void
+	setDacSampleHoldClockSource(DacSampleHoldClockSource src)
+	{
+		RCC->CCIPR2 = (RCC->CCIPR2 & ~RCC_CCIPR2_DAC1SHSEL) | (uint32_t(src) << RCC_CCIPR2_DAC1SHSEL_Pos);
+	}
+	enum class
+	RngClockSource : uint8_t
+	{
+		Hsi48 = 0b0,
+		Msik  = 0b1,
+	};
+	static inline void
+	setRngClockSource(RngClockSource src)
+	{
+		RCC->CCIPR2 = (RCC->CCIPR2 & ~RCC_CCIPR2_RNGSEL) | (uint32_t(src) << RCC_CCIPR2_RNGSEL_Pos);
+	}
+%% if target.name >= "75"
+	enum class
+	SaiClockSource : uint8_t
+	{
+		Msik     = 0b00,
+		AudioClk = 0b01,
+		Hse      = 0b10,
+	};
+	static inline void
+	setSai1ClockSource(SaiClockSource src)
+	{
+		RCC->CCIPR2 = (RCC->CCIPR2 & ~RCC_CCIPR2_SAI1SEL) | (uint32_t(src) << RCC_CCIPR2_SAI1SEL_Pos);
+	}
+%% endif
+%% if target.name not in ("56", "66")
+	enum class
+	Adf1ClockSource : uint8_t
+	{
+		Hclk     = 0b00,
+		AudioClk = 0b01,
+		Msik     = 0b10,
+		Sai1     = 0b11,
+	};
+	static inline void
+	setAdf1ClockSource(Adf1ClockSource src)
+	{
+		RCC->CCIPR2 = (RCC->CCIPR2 & ~RCC_CCIPR2_ADF1SEL) | (uint32_t(src) << RCC_CCIPR2_ADF1SEL_Pos);
+	}
+%% endif
 
 public:
 	// outputs

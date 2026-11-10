@@ -304,11 +304,29 @@ public:
 		RCC->CFGR3 = (RCC->CFGR3 & ~RCC_CFGR3_I2C1SW) | (uint32_t(src) << RCC_CFGR3_I2C1SW_Pos);
 	}
 
+%% if target.name not in ("30", "31", "38", "70")
+	enum class
+	CecClockSource : uint8_t
+	{
+		HsiDiv244 = 0b0,
+		Lse       = 0b1,
+	};
+	static inline void
+	setCecClockSource(CecClockSource src)
+	{
+		RCC->CFGR3 = (RCC->CFGR3 & ~RCC_CFGR3_CECSW) | (uint32_t(src) << RCC_CFGR3_CECSW_Pos);
+	}
+%% endif
+
 %% if target.name in ("42", "48", "70", "72", "78")
 	enum class
 	UsbClockSource : uint8_t
 	{
+%% if target.name == "70"
+		Disabled = 0b0, ///< STM32F070 has no HSI48
+%% else
 		Hsi48 = 0b0,
+%% endif
 		Pll = 0b1,
 	};
 	static inline void
@@ -340,12 +358,29 @@ public:
 %% endif
 	};
 
+%% if with_pllnodiv
+	enum class
+	McoPrescaler : uint32_t
+	{
+		Div1   = 0b000 << RCC_CFGR_MCOPRE_Pos,
+		Div2   = 0b001 << RCC_CFGR_MCOPRE_Pos,
+		Div4   = 0b010 << RCC_CFGR_MCOPRE_Pos,
+		Div8   = 0b011 << RCC_CFGR_MCOPRE_Pos,
+		Div16  = 0b100 << RCC_CFGR_MCOPRE_Pos,
+		Div32  = 0b101 << RCC_CFGR_MCOPRE_Pos,
+		Div64  = 0b110 << RCC_CFGR_MCOPRE_Pos,
+		Div128 = 0b111 << RCC_CFGR_MCOPRE_Pos,
+	};
+%% endif
 	static inline void
+%% if with_pllnodiv
+	setMcoClockSource(McoClockSource src, McoPrescaler prescaler = McoPrescaler::Div1)
+	{
+		RCC->CFGR =	(RCC->CFGR & ~(RCC_CFGR_MCO | RCC_CFGR_PLLNODIV | RCC_CFGR_MCOPRE)) |
+					uint32_t(src) | uint32_t(prescaler);
+%% else
 	setMcoClockSource(McoClockSource src)
 	{
-%% if with_pllnodiv
-		RCC->CFGR =	(RCC->CFGR & ~(RCC_CFGR_MCO | RCC_CFGR_PLLNODIV)) | uint32_t(src);
-%% else
 		RCC->CFGR =	(RCC->CFGR & ~RCC_CFGR_MCO) | uint32_t(src);
 %% endif
 	}

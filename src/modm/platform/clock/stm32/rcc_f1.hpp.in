@@ -421,6 +421,12 @@ public:
 		Hsi      = 0b101,
 		Hse      = 0b110,
 		PllDiv2  = 0b111,
+%% if target.name in ["05", "07"]
+		Pll2     = 0b1000,
+		Pll3Div2 = 0b1001,
+		Xt1      = 0b1010, ///< external 3-25 MHz oscillator for Ethernet
+		Pll3     = 0b1011, ///< for Ethernet
+%% endif
 	};
 	static inline void
 	setMcoClockSource(McoClockSource src)

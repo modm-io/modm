@@ -520,6 +520,22 @@ public:
 %% endif
 %% if lplus
 %#
+	// RM0432 6.4.32 RCC_CCIPR2.ADFSDMSEL
+	enum class
+	DfsdmAudioClockSource : uint8_t
+	{
+		Sai1 = 0b00,
+		Hsi  = 0b01,
+		Msi  = 0b10,
+	};
+	static inline void
+	setDfsdm1AudioClockSource(DfsdmAudioClockSource src)
+	{
+		RCC->CCIPR2 = (RCC->CCIPR2 & ~RCC_CCIPR2_ADFSDM1SEL) | (uint32_t(src) << RCC_CCIPR2_ADFSDM1SEL_Pos);
+	}
+%% endif
+%% if lplus
+%#
 	enum class
 	SdmmcClockSource : uint8_t
 	{

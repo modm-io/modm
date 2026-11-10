@@ -447,6 +447,29 @@ public:
 	}
 %% endfor
 %#
+%% if lptim_ids
+	// CCIPR2, RM0481 11.8.41: LPTIM2 is on PCLK1, all others on PCLK3.
+	// pll2_p_ck (0b001) is not offered: LPTIMx then gets no kernel clock (ES0565 2.11.5, all revisions).
+	enum class
+	LpTimerClockSource : uint8_t
+	{
+		Bus   = 0b000,
+%% if 3 in pll_ids
+		Pll3R = 0b010,
+%% endif
+		Lse   = 0b011,
+		Lsi   = 0b100,
+		PerCk = 0b101,
+	};
+%% for id in lptim_ids | sort
+	static inline void
+	setLpTimer{{id}}ClockSource(LpTimerClockSource src)
+	{
+		RCC->CCIPR2 = (RCC->CCIPR2 & ~RCC_CCIPR2_LPTIM{{id}}SEL) | (uint32_t(src) << RCC_CCIPR2_LPTIM{{id}}SEL_Pos);
+	}
+%% endfor
+%% endif
+%#
 %% if target.name in ["e4", "e5", "f4", "f5"]
 	enum class
 	UsbClockSource : uint32_t
@@ -537,6 +560,143 @@ public:
 	{
 		RCC->CCIPR5 = (RCC->CCIPR5 & ~RCC_CCIPR5_ADCDACSEL) | uint32_t(src);
 	}
+
+	/// DAC sample and hold clock
+	enum class
+	DacClockSource : uint32_t
+	{
+		Lse = 0,
+		Lsi = 1,
+	};
+	static inline void
+	setDacClockSource(DacClockSource src)
+	{
+		RCC->CCIPR5 = (RCC->CCIPR5 & ~RCC_CCIPR5_DACSEL) | (uint32_t(src) << RCC_CCIPR5_DACSEL_Pos);
+	}
+
+	// RM0481 11.8.44 RCC_CCIPR5
+	enum class
+	PerClockSource : uint32_t
+	{
+		Hsi = 0b00,
+		Csi = 0b01,
+		Hse = 0b10,
+	};
+	static inline void
+	setPerClockSource(PerClockSource src)
+	{
+		// the CMSIS headers spell it CKERPSEL
+		RCC->CCIPR5 = (RCC->CCIPR5 & ~RCC_CCIPR5_CKERPSEL) | (uint32_t(src) << RCC_CCIPR5_CKERPSEL_Pos);
+	}
+
+%% if target.name != "03"
+	enum class
+	CecClockSource : uint32_t
+	{
+		Lse       = 0b00,
+		Lsi       = 0b01,
+		CsiDiv122 = 0b10,
+	};
+	static inline void
+	setCecClockSource(CecClockSource src)
+	{
+		RCC->CCIPR5 = (RCC->CCIPR5 & ~RCC_CCIPR5_CECSEL) | (uint32_t(src) << RCC_CCIPR5_CECSEL_Pos);
+	}
+%% endif
+
+%% if target.name >= "62"
+	enum class
+	SaiClockSource : uint32_t
+	{
+		Pll1Q    = 0b000,
+		Pll2P    = 0b001,
+		Pll3P    = 0b010,
+		AudioClk = 0b011,
+		PerCk    = 0b100,
+	};
+	static inline void
+	setSai1ClockSource(SaiClockSource src)
+	{
+		RCC->CCIPR5 = (RCC->CCIPR5 & ~RCC_CCIPR5_SAI1SEL) | (uint32_t(src) << RCC_CCIPR5_SAI1SEL_Pos);
+	}
+	static inline void
+	setSai2ClockSource(SaiClockSource src)
+	{
+		RCC->CCIPR5 = (RCC->CCIPR5 & ~RCC_CCIPR5_SAI2SEL) | (uint32_t(src) << RCC_CCIPR5_SAI2SEL_Pos);
+	}
+%% endif
+
+	// RM0481 11.8.43 RCC_CCIPR4
+	enum class
+	SysTickClockSource : uint32_t
+	{
+		HclkDiv8 = 0b00,
+		Lsi      = 0b01,
+		Lse      = 0b10,
+	};
+	/// HCLK must be at least four times faster than LSI/LSE
+	static inline void
+	setSysTickClockSource(SysTickClockSource src)
+	{
+		RCC->CCIPR4 = (RCC->CCIPR4 & ~RCC_CCIPR4_SYSTICKSEL) | (uint32_t(src) << RCC_CCIPR4_SYSTICKSEL_Pos);
+	}
+
+%% if target.name != "03"
+	enum class
+	SdmmcClockSource : uint32_t
+	{
+		Pll1Q = 0b0,
+		Pll2R = 0b1,
+	};
+	static inline void
+	setSdmmc1ClockSource(SdmmcClockSource src)
+	{
+		RCC->CCIPR4 = (RCC->CCIPR4 & ~RCC_CCIPR4_SDMMC1SEL) | (uint32_t(src) << RCC_CCIPR4_SDMMC1SEL_Pos);
+	}
+%% if target.name >= "63"
+	static inline void
+	setSdmmc2ClockSource(SdmmcClockSource src)
+	{
+		RCC->CCIPR4 = (RCC->CCIPR4 & ~RCC_CCIPR4_SDMMC2SEL) | (uint32_t(src) << RCC_CCIPR4_SDMMC2SEL_Pos);
+	}
+%% endif
+%% endif
+
+%% if target.name != "03"
+	enum class
+	OctospiClockSource : uint32_t
+	{
+		Hclk  = 0b00,
+		Pll1Q = 0b01,
+		Pll2R = 0b10,
+		PerCk = 0b11,
+	};
+	static inline void
+	setOctospi1ClockSource(OctospiClockSource src)
+	{
+		RCC->CCIPR4 = (RCC->CCIPR4 & ~RCC_CCIPR4_OCTOSPISEL) | (uint32_t(src) << RCC_CCIPR4_OCTOSPISEL_Pos);
+	}
+%% endif
+
+	enum class
+	I3cClockSource : uint32_t
+	{
+		Bus = 0b00,
+		Pll{{pll_ids[-1]}}R = 0b01,
+		Hsi = 0b10,
+	};
+	static inline void
+	setI3c1ClockSource(I3cClockSource src)
+	{
+		RCC->CCIPR4 = (RCC->CCIPR4 & ~RCC_CCIPR4_I3C1SEL) | (uint32_t(src) << RCC_CCIPR4_I3C1SEL_Pos);
+	}
+%% if target.name not in ("62", "63", "73")
+	static inline void
+	setI3c2ClockSource(I3cClockSource src)
+	{
+		RCC->CCIPR4 = (RCC->CCIPR4 & ~RCC_CCIPR4_I3C2SEL) | (uint32_t(src) << RCC_CCIPR4_I3C2SEL_Pos);
+	}
+%% endif
 
 public:
 	// outputs

@@ -124,10 +124,21 @@ public:
         return waitLoops;
     }
 
-    static inline bool
-    enableLseCrystal(uint32_t waitLoops = 0x10000)
+    // RM0316 9.4.9: 01 is medium high, 10 is medium low
+    enum class
+    LseDrive : uint8_t
     {
-        RCC->BDCR = (RCC->BDCR & ~RCC_BDCR_LSEBYP) | RCC_BDCR_LSEON;
+        Low        = 0b00,
+        MediumHigh = 0b01,
+        MediumLow  = 0b10,
+        High       = 0b11,
+    };
+    /// The drive defaults to the reset value (High)
+    static inline bool
+    enableLseCrystal(LseDrive drive = LseDrive::High, uint32_t waitLoops = 0x10000)
+    {
+        RCC->BDCR = (RCC->BDCR & ~(RCC_BDCR_LSEDRV | RCC_BDCR_LSEBYP)) |
+                    (uint32_t(drive) << RCC_BDCR_LSEDRV_Pos) | RCC_BDCR_LSEON;
         while (not (RCC->BDCR & RCC_BDCR_LSERDY) and --waitLoops) ;
         return waitLoops;
     }

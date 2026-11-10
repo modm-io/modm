@@ -172,7 +172,7 @@ public:
 	enum class
 	PllVcoRange : uint8_t
 	{
-		High = 0, ///< 384 to 1672 MHz, input 2 to 16 MHz
+		High = 0, ///< 192 to 836 MHz, input 2 to 16 MHz
 		Low = 1,  ///< 150 to 420 MHz, input 1 to 2 MHz
 	};
 	struct PllConfig
@@ -201,9 +201,12 @@ public:
 	enablePll{{id}}(PllSource source, const PllConfig& cfg, uint32_t waitLoops = 0x10000)
 	{
 		if ((cfg.P > 1 and cfg.P & 1) or cfg.N < 8 or cfg.M == 0) return false;
+		// PLLSRC is shared by all PLLs and can only be changed while all of them are off
 		setPllSource(source);
+		if ((RCC->PLLCKSELR & RCC_PLLCKSELR_PLLSRC) != uint32_t(source)) return false;
 		RCC->PLLCKSELR = (RCC->PLLCKSELR & ~RCC_PLLCKSELR_DIVM{{id}}) |
 						 (uint32_t(cfg.M) << RCC_PLLCKSELR_DIVM{{id}}_Pos);
+		if (((RCC->PLLCKSELR & RCC_PLLCKSELR_DIVM{{id}}) >> RCC_PLLCKSELR_DIVM{{id}}_Pos) != cfg.M) return false;
 
 		uint32_t cfgr = RCC->PLLCFGR & ~(0x7ffu << {{p}});
 		cfgr |= uint32_t(cfg.range) << RCC_PLLCFGR_PLL{{id}}RGE_Pos;
@@ -442,6 +445,232 @@ public:
 		static_assert(sel, "USB HS PHY reference clock must be 16, 19.2, 20, 24, 26 or 32 MHz!");
 		RCC->CCIPR1 = (RCC->CCIPR1 & ~(RCC_CCIPR1_USBPHYCSEL | RCC_CCIPR1_USBREFCKSEL)) |
 					  (uint32_t(src) << RCC_CCIPR1_USBPHYCSEL_Pos) | (sel << RCC_CCIPR1_USBREFCKSEL_Pos);
+	}
+
+	// RM0477 7.8.24 RCC_CCIPR1
+	enum class
+	FmcClockSource : uint32_t
+	{
+		Hclk  = 0b00,
+		Pll1Q = 0b01,
+		Pll2R = 0b10,
+		Hsi   = 0b11,
+	};
+	static inline void
+	setFmcClockSource(FmcClockSource src)
+	{
+		RCC->CCIPR1 = (RCC->CCIPR1 & ~RCC_CCIPR1_FMCSEL) | (uint32_t(src) << RCC_CCIPR1_FMCSEL_Pos);
+	}
+
+	enum class
+	SdmmcClockSource : uint32_t
+	{
+		Pll2S = 0b0,
+		Pll2T = 0b1,
+	};
+	/// SDMMC1 and SDMMC2
+	static inline void
+	setSdmmc12ClockSource(SdmmcClockSource src)
+	{
+		RCC->CCIPR1 = (RCC->CCIPR1 & ~RCC_CCIPR1_SDMMC12SEL) | (uint32_t(src) << RCC_CCIPR1_SDMMC12SEL_Pos);
+	}
+
+	enum class
+	XspiClockSource : uint32_t
+	{
+		Hclk  = 0b00,
+		Pll2S = 0b01,
+		Pll2T = 0b10,
+	};
+	static inline void
+	setXspi1ClockSource(XspiClockSource src)
+	{
+		RCC->CCIPR1 = (RCC->CCIPR1 & ~RCC_CCIPR1_XSPI1SEL) | (uint32_t(src) << RCC_CCIPR1_XSPI1SEL_Pos);
+	}
+	static inline void
+	setXspi2ClockSource(XspiClockSource src)
+	{
+		RCC->CCIPR1 = (RCC->CCIPR1 & ~RCC_CCIPR1_XSPI2SEL) | (uint32_t(src) << RCC_CCIPR1_XSPI2SEL_Pos);
+	}
+
+	enum class
+	EthRefClockSource : uint32_t
+	{
+		RmiiRefClk = 0b00,
+		Hse        = 0b01,
+		EthClkFb   = 0b10,
+	};
+	static inline void
+	setEthRefClockSource(EthRefClockSource src)
+	{
+		RCC->CCIPR1 = (RCC->CCIPR1 & ~RCC_CCIPR1_ETH1REFCKSEL) | (uint32_t(src) << RCC_CCIPR1_ETH1REFCKSEL_Pos);
+	}
+	enum class
+	EthPhyClockSource : uint32_t
+	{
+		Hse   = 0b0,
+		Pll3S = 0b1,
+	};
+	static inline void
+	setEthPhyClockSource(EthPhyClockSource src)
+	{
+		RCC->CCIPR1 = (RCC->CCIPR1 & ~RCC_CCIPR1_ETH1PHYCKSEL) | (uint32_t(src) << RCC_CCIPR1_ETH1PHYCKSEL_Pos);
+	}
+
+	enum class
+	Adf1ClockSource : uint32_t
+	{
+		Hclk    = 0b000,
+		Pll2P   = 0b001,
+		Pll3P   = 0b010,
+		I2sCkIn = 0b011,
+		Csi     = 0b100,
+		Hsi     = 0b101,
+	};
+	static inline void
+	setAdf1ClockSource(Adf1ClockSource src)
+	{
+		RCC->CCIPR1 = (RCC->CCIPR1 & ~RCC_CCIPR1_ADF1SEL) | (uint32_t(src) << RCC_CCIPR1_ADF1SEL_Pos);
+	}
+
+	enum class
+	AdcClockSource : uint32_t
+	{
+		Pll2P = 0b00,
+		Pll3R = 0b01,
+		PerCk = 0b10,
+	};
+	static inline void
+	setAdcClockSource(AdcClockSource src)
+	{
+		RCC->CCIPR1 = (RCC->CCIPR1 & ~RCC_CCIPR1_ADCSEL) | (uint32_t(src) << RCC_CCIPR1_ADCSEL_Pos);
+	}
+
+	enum class
+	PssiClockSource : uint32_t
+	{
+		Pll3R = 0b0,
+		PerCk = 0b1,
+	};
+	static inline void
+	setPssiClockSource(PssiClockSource src)
+	{
+		RCC->CCIPR1 = (RCC->CCIPR1 & ~RCC_CCIPR1_PSSISEL) | (uint32_t(src) << RCC_CCIPR1_PSSISEL_Pos);
+	}
+
+	// RM0477 7.8.25 RCC_CCIPR2
+	enum class
+	I2cClockSource : uint32_t
+	{
+		Pclk  = 0b00,
+		Pll3R = 0b01,
+		Hsi   = 0b10,
+		Csi   = 0b11,
+	};
+	/// I2C1 or I3C1
+	static inline void
+	setI2c1ClockSource(I2cClockSource src)
+	{
+		RCC->CCIPR2 = (RCC->CCIPR2 & ~RCC_CCIPR2_I2C1_I3C1SEL) | (uint32_t(src) << RCC_CCIPR2_I2C1_I3C1SEL_Pos);
+	}
+	static inline void
+	setI3c1ClockSource(I2cClockSource src) { setI2c1ClockSource(src); }
+	/// I2C2 and I2C3
+	static inline void
+	setI2c23ClockSource(I2cClockSource src)
+	{
+		RCC->CCIPR2 = (RCC->CCIPR2 & ~RCC_CCIPR2_I2C23SEL) | (uint32_t(src) << RCC_CCIPR2_I2C23SEL_Pos);
+	}
+
+	enum class
+	LpTimerClockSource : uint32_t
+	{
+		Pclk  = 0b000,
+		Pll2P = 0b001,
+		Pll3R = 0b010,
+		Lse   = 0b011,
+		Lsi   = 0b100,
+		PerCk = 0b101,
+	};
+	static inline void
+	setLpTimer1ClockSource(LpTimerClockSource src)
+	{
+		RCC->CCIPR2 = (RCC->CCIPR2 & ~RCC_CCIPR2_LPTIM1SEL) | (uint32_t(src) << RCC_CCIPR2_LPTIM1SEL_Pos);
+	}
+	/// LPTIM2 and LPTIM3
+	static inline void
+	setLpTimer23ClockSource(LpTimerClockSource src)
+	{
+		RCC->CCIPR4 = (RCC->CCIPR4 & ~RCC_CCIPR4_LPTIM23SEL) | (uint32_t(src) << RCC_CCIPR4_LPTIM23SEL_Pos);
+	}
+	/// LPTIM4 and LPTIM5
+	static inline void
+	setLpTimer45ClockSource(LpTimerClockSource src)
+	{
+		RCC->CCIPR4 = (RCC->CCIPR4 & ~RCC_CCIPR4_LPTIM45SEL) | (uint32_t(src) << RCC_CCIPR4_LPTIM45SEL_Pos);
+	}
+
+	enum class
+	FdcanClockSource : uint32_t
+	{
+		Hse   = 0b00,
+		Pll1Q = 0b01,
+		Pll2P = 0b10,
+	};
+	static inline void
+	setFdcanClockSource(FdcanClockSource src)
+	{
+		RCC->CCIPR2 = (RCC->CCIPR2 & ~RCC_CCIPR2_FDCANSEL) | (uint32_t(src) << RCC_CCIPR2_FDCANSEL_Pos);
+	}
+
+	enum class
+	SpdifClockSource : uint32_t
+	{
+		Pll1Q = 0b00,
+		Pll2R = 0b01,
+		Pll3R = 0b10,
+		Hsi   = 0b11,
+	};
+	static inline void
+	setSpdifClockSource(SpdifClockSource src)
+	{
+		RCC->CCIPR2 = (RCC->CCIPR2 & ~RCC_CCIPR2_SPDIFRXSEL) | (uint32_t(src) << RCC_CCIPR2_SPDIFRXSEL_Pos);
+	}
+
+	enum class
+	CecClockSource : uint32_t
+	{
+		Lse       = 0b00,
+		Lsi       = 0b01,
+		CsiDiv122 = 0b10,
+	};
+	static inline void
+	setCecClockSource(CecClockSource src)
+	{
+		RCC->CCIPR2 = (RCC->CCIPR2 & ~RCC_CCIPR2_CECSEL) | (uint32_t(src) << RCC_CCIPR2_CECSEL_Pos);
+	}
+
+	// RM0477 7.8.26 RCC_CCIPR3
+	enum class
+	SaiClockSource : uint32_t
+	{
+		Pll1Q    = 0b000,
+		Pll2P    = 0b001,
+		Pll3P    = 0b010,
+		I2sCkIn  = 0b011,
+		PerCk    = 0b100,
+		/// SAI2 only
+		SpdifSymbol = 0b101,
+	};
+	static inline void
+	setSai1ClockSource(SaiClockSource src)
+	{
+		RCC->CCIPR3 = (RCC->CCIPR3 & ~RCC_CCIPR3_SAI1SEL) | (uint32_t(src) << RCC_CCIPR3_SAI1SEL_Pos);
+	}
+	static inline void
+	setSai2ClockSource(SaiClockSource src)
+	{
+		RCC->CCIPR3 = (RCC->CCIPR3 & ~RCC_CCIPR3_SAI2SEL) | (uint32_t(src) << RCC_CCIPR3_SAI2SEL_Pos);
 	}
 
 public:

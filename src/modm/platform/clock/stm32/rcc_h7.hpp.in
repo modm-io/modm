@@ -192,7 +192,7 @@ public:
 %% if cd
 		Wide = 0,   ///< 128 to 560 MHz
 %% elif dual
-		Wide = 0,   ///< 192 to 960 MHz
+		Wide = 0,   ///< 192 to 960 MHz (revision V), 192 to 836 MHz (revision Y)
 %% else
 		Wide = 0,   ///< 192 to 836 MHz
 %% endif
@@ -226,8 +226,8 @@ public:
 		// RM0455: DIVN1 8..420, DIVP1 even only
 		if ((cfg.P & 1) or cfg.N < 8 or cfg.N > 420 or cfg.M == 0) return false;
 %% elif dual
-		// RM0433: DIVP1 odd division factors are not allowed
-		if ((cfg.P & 1) or cfg.N < 4 or cfg.M == 0) return false;
+		// RM0433 8.7.13: DIVP1 odd division factors and DIVR1 /1 are not allowed
+		if ((cfg.P & 1) or cfg.R == 1 or cfg.N < 4 or cfg.M == 0) return false;
 %% else
 		// RM0468: DIVP1 odd division factors are not allowed, except for 1
 		if ((cfg.P > 1 and cfg.P & 1) or cfg.N < 4 or cfg.M == 0) return false;
@@ -482,6 +482,108 @@ public:
 		RCC->{{ccip1r}} = (RCC->{{ccip1r}} & ~RCC_{{ccip1r}}_FDCANSEL) | (uint32_t(src) << RCC_{{ccip1r}}_FDCANSEL_Pos);
 	}
 
+	enum class
+	SaiClockSource : uint32_t
+	{
+		Pll1Q    = 0b000,
+		Pll2P    = 0b001,
+		Pll3P    = 0b010,
+		AudioClk = 0b011,
+		PerCk    = 0b100,
+		/// SAI2A/B (H7A3/B0/B3) and SAI4A/B (H72x/73x) only
+		SpdifSymbol = 0b101,
+	};
+	/// SAI1 and the DFSDM1 audio clock
+	static inline void
+	setSai1ClockSource(SaiClockSource src)
+	{
+		RCC->{{ccip1r}} = (RCC->{{ccip1r}} & ~RCC_{{ccip1r}}_SAI1SEL) | (uint32_t(src) << RCC_{{ccip1r}}_SAI1SEL_Pos);
+	}
+%% if dual
+	/// SAI2 and SAI3
+	static inline void
+	setSai23ClockSource(SaiClockSource src)
+	{
+		RCC->{{ccip1r}} = (RCC->{{ccip1r}} & ~RCC_{{ccip1r}}_SAI23SEL) | (uint32_t(src) << RCC_{{ccip1r}}_SAI23SEL_Pos);
+	}
+%% endif
+%% for blk in (["2A", "2B"] if cd else [])
+	static inline void
+	setSai{{blk}}ClockSource(SaiClockSource src)
+	{
+		RCC->{{ccip1r}} = (RCC->{{ccip1r}} & ~RCC_{{ccip1r}}_SAI{{blk}}SEL) | (uint32_t(src) << RCC_{{ccip1r}}_SAI{{blk}}SEL_Pos);
+	}
+%% endfor
+%% for blk in ([] if cd else ["4A", "4B"])
+	static inline void
+	setSai{{blk}}ClockSource(SaiClockSource src)
+	{
+		RCC->{{ccipr3}} = (RCC->{{ccipr3}} & ~RCC_{{ccipr3}}_SAI{{blk}}SEL) | (uint32_t(src) << RCC_{{ccipr3}}_SAI{{blk}}SEL_Pos);
+	}
+%% endfor
+
+	enum class
+	SpdifClockSource : uint32_t
+	{
+		Pll1Q = 0b00,
+		Pll2R = 0b01,
+		Pll3R = 0b10,
+		Hsi   = 0b11,
+	};
+	static inline void
+	setSpdifClockSource(SpdifClockSource src)
+	{
+		RCC->{{ccip1r}} = (RCC->{{ccip1r}} & ~RCC_{{ccip1r}}_SPDIFSEL) | (uint32_t(src) << RCC_{{ccip1r}}_SPDIFSEL_Pos);
+	}
+
+	enum class
+	DfsdmClockSource : uint32_t
+	{
+		Pclk   = 0,
+		SysClk = 1,
+	};
+	/// DFSDM1 kernel clock, the audio clock comes from SAI1SEL
+	static inline void
+	setDfsdm1ClockSource(DfsdmClockSource src)
+	{
+		RCC->{{ccip1r}} = (RCC->{{ccip1r}} & ~RCC_{{ccip1r}}_DFSDM1SEL) | (uint32_t(src) << RCC_{{ccip1r}}_DFSDM1SEL_Pos);
+	}
+%% if cd
+	static inline void
+	setDfsdm2ClockSource(DfsdmClockSource src)
+	{
+		RCC->SRDCCIPR = (RCC->SRDCCIPR & ~RCC_SRDCCIPR_DFSDM2SEL) | (uint32_t(src) << RCC_SRDCCIPR_DFSDM2SEL_Pos);
+	}
+%% endif
+
+	enum class
+	SwpmiClockSource : uint32_t
+	{
+		Pclk = 0,
+		Hsi  = 1,
+	};
+	static inline void
+	setSwpmi1ClockSource(SwpmiClockSource src)
+	{
+		RCC->{{ccip1r}} = (RCC->{{ccip1r}} & ~RCC_{{ccip1r}}_SWPSEL) | (uint32_t(src) << RCC_{{ccip1r}}_SWPSEL_Pos);
+	}
+
+%% if dual
+	enum class
+	HrtimClockSource : uint32_t
+	{
+		/// APB2 timer clock
+		Timer = 0,
+		/// CPU clock
+		Cpu   = 1,
+	};
+	static inline void
+	setHrtimClockSource(HrtimClockSource src)
+	{
+		RCC->CFGR = (RCC->CFGR & ~RCC_CFGR_HRTIMSEL) | (uint32_t(src) << RCC_CFGR_HRTIMSEL_Pos);
+	}
+%% endif
+
 	// {{ccip2r}}
 	enum class
 	UartClockSource : uint32_t
@@ -611,6 +713,19 @@ public:
 	setRngClockSource(RngClockSource src)
 	{
 		RCC->{{ccip2r}} = (RCC->{{ccip2r}} & ~RCC_{{ccip2r}}_RNGSEL) | (uint32_t(src) << RCC_{{ccip2r}}_RNGSEL_Pos);
+	}
+
+	enum class
+	CecClockSource : uint32_t
+	{
+		Lse       = 0b00,
+		Lsi       = 0b01,
+		CsiDiv122 = 0b10,
+	};
+	static inline void
+	setCecClockSource(CecClockSource src)
+	{
+		RCC->{{ccip2r}} = (RCC->{{ccip2r}} & ~RCC_{{ccip2r}}_CECSEL) | (uint32_t(src) << RCC_{{ccip2r}}_CECSEL_Pos);
 	}
 
 	// {{ccipr3}}

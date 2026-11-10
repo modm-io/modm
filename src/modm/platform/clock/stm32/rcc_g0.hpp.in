@@ -179,16 +179,16 @@ public:
 		uint8_t N; ///< Mul 8-86, frequency after mul must be in [96, 344]MHz
 		uint8_t P = 0; ///< Div 2-32, frequency ≤ 122MHz
 %% if target.name not in ("30", "50", "70")
-		uint8_t Q = 0; ///< Div 2-8, frequency ≤ 56MHz
+		uint8_t Q = 0; ///< Div 2-8, frequency ≤ 128MHz
 %% endif
-		uint8_t R = 0; ///< Div 2-8, frequency ≤ 56MHz
+		uint8_t R = 0; ///< Div 2-8, frequency ≤ 64MHz (16MHz in Range 2)
 	};
 
 	/// Configure and enable PLL
 	static inline bool
 	enablePll(PllSource source, const PllConfig& cfg, uint32_t waitLoops = 0x10000)
 	{
-		if (cfg.R == 1{% if target.name not in ("30", "50", "70") %} or cfg.Q == 1{% endif %} or cfg.P == 1 or cfg.N < 4 or cfg.M == 0) return false;
+		if (cfg.R == 1{% if target.name not in ("30", "50", "70") %} or cfg.Q == 1{% endif %} or cfg.P == 1 or cfg.N < 8 or cfg.N > 86 or cfg.M == 0) return false;
 
 		// Select clock source
 		uint32_t cfgr{uint32_t(source) & RCC_PLLCFGR_PLLSRC};
@@ -396,6 +396,21 @@ public:
 %% endfor
 %% endif
 %#
+%% if target.name >= "b1"
+	enum class
+	FdCanClockSource : uint32_t
+	{
+		Bus  = 0b00 << RCC_CCIPR2_FDCANSEL_Pos,
+		PllQ = 0b01 << RCC_CCIPR2_FDCANSEL_Pos,
+		Hse  = 0b10 << RCC_CCIPR2_FDCANSEL_Pos,
+	};
+	static inline void
+	setFdCanClockSource(FdCanClockSource src)
+	{
+		RCC->CCIPR2 = (RCC->CCIPR2 & ~RCC_CCIPR2_FDCANSEL) | uint32_t(src);
+	}
+%#
+%% endif
 %% if target.name >= "b0"
 	// USB clock source (only on G0B0/G0B1/G0C1)
 	enum class
@@ -426,6 +441,45 @@ public:
 	{
 		RCC->CCIPR = (RCC->CCIPR & ~RCC_CCIPR_ADCSEL) | uint32_t(src);
 	}
+
+	// RM0444 5.4.21 RCC_CCIPR
+%% if target.name in ("71", "81", "b1", "c1")
+	enum class
+	CecClockSource : uint32_t
+	{
+		HsiDiv488 = 0,
+		Lse       = 1,
+	};
+	static inline void
+	setCecClockSource(CecClockSource src)
+	{
+		RCC->CCIPR = (RCC->CCIPR & ~RCC_CCIPR_CECSEL) | (uint32_t(src) << RCC_CCIPR_CECSEL_Pos);
+	}
+%% endif
+%% if target.name in ("41", "61", "81", "c1")
+	enum class
+	RngClockSource : uint32_t
+	{
+		Disabled = 0b00,
+		Hsi16    = 0b01,
+		SysClk   = 0b10,
+		PllQ     = 0b11,
+	};
+	enum class
+	RngPrescaler : uint32_t
+	{
+		Div1 = 0b00,
+		Div2 = 0b01,
+		Div4 = 0b10,
+		Div8 = 0b11,
+	};
+	static inline void
+	setRngClockSource(RngClockSource src, RngPrescaler div = RngPrescaler::Div1)
+	{
+		RCC->CCIPR = (RCC->CCIPR & ~(RCC_CCIPR_RNGSEL | RCC_CCIPR_RNGDIV)) |
+				(uint32_t(src) << RCC_CCIPR_RNGSEL_Pos) | (uint32_t(div) << RCC_CCIPR_RNGDIV_Pos);
+	}
+%% endif
 
 public:
 	// MCO outputs

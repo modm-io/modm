@@ -408,7 +408,9 @@ public:
 	{
 		PllR = 0u,
 		External = RCC_DCKCFGR_I2SSRC_0,
-		MainPll = RCC_DCKCFGR_I2SSRC_1,
+		/// HSI or HSE, the input of the main PLL (PLLSRC)
+		PllInput = RCC_DCKCFGR_I2SSRC_1,
+		MainPll [[deprecated("this is the PLL input (HSI/HSE), use PllInput")]] = RCC_DCKCFGR_I2SSRC_1, // DEPRECATED: 2027q4
 	};
 	static inline void
 	setI2sApbClockSource(I2sApbClockSource src)
@@ -424,9 +426,9 @@ public:
 		PllI2s = 0,
 		External = 1,
 		PllR = 2,
-%% if target.name in ["12", "13", "23", "46"]
-		MainPll = 3,
-%% endif
+		/// HSI or HSE, the input of the main PLL (PLLSRC)
+		PllInput = 3,
+		MainPll [[deprecated("this is the PLL input (HSI/HSE), use PllInput")]] = 3, // DEPRECATED: 2027q4
 	};
 	static inline void
 	setI2s1ClockSource(I2sClockSource src)
@@ -495,7 +497,9 @@ public:
 		PllI2sR = 0u,
 		External = RCC_DCKCFGR_SAI1ASRC_0,
 		PllR = RCC_DCKCFGR_SAI1ASRC_1,
-		MainPll = RCC_DCKCFGR_SAI1ASRC,
+		/// HSI or HSE, the input of the main PLL (PLLSRC)
+		PllInput = RCC_DCKCFGR_SAI1ASRC,
+		MainPll [[deprecated("this is the PLL input (HSI/HSE), use PllInput")]] = RCC_DCKCFGR_SAI1ASRC, // DEPRECATED: 2027q4
 	};
 	static inline void
 	setSai1BlockAClockSource(Sai1BlockAClockSource src)
@@ -509,7 +513,9 @@ public:
 		PllI2sR = 0u,
 		External = RCC_DCKCFGR_SAI1BSRC_0,
 		PllR = RCC_DCKCFGR_SAI1BSRC_1,
-		MainPll = RCC_DCKCFGR_SAI1BSRC,
+		/// HSI or HSE, the input of the main PLL (PLLSRC)
+		PllInput = RCC_DCKCFGR_SAI1BSRC,
+		MainPll [[deprecated("this is the PLL input (HSI/HSE), use PllInput")]] = RCC_DCKCFGR_SAI1BSRC, // DEPRECATED: 2027q4
 	};
 	static inline void
 	setSai1BlockBClockSource(Sai1BlockBClockSource src)
@@ -566,7 +572,9 @@ public:
 		PllSai = 0u,
 		PllI2s = RCC_DCKCFGR_SAI2SRC_0,
 		PllR = RCC_DCKCFGR_SAI2SRC_1,
-		MainPll = RCC_DCKCFGR_SAI2SRC,
+		/// HSI or HSE, the input of the main PLL (PLLSRC)
+		PllInput = RCC_DCKCFGR_SAI2SRC,
+		MainPll [[deprecated("this is the PLL input (HSI/HSE), use PllInput")]] = RCC_DCKCFGR_SAI2SRC, // DEPRECATED: 2027q4
 	};
 	static inline void
 	setSai2ClockSource(Sai2ClockSource src)
@@ -602,6 +610,21 @@ public:
 %#
 %% endif
 %% if target.name in ["13", "23"]
+	/// SAI1 clock from PLL R divided by 1..31 (reset value 0 is invalid, RM0430 RCC_DCKCFGR)
+	static inline void
+	setPllDivR(uint8_t divider)
+	{
+		RCC->DCKCFGR = (RCC->DCKCFGR & ~RCC_DCKCFGR_PLLDIVR) |
+			((uint32_t(divider) << RCC_DCKCFGR_PLLDIVR_Pos) & RCC_DCKCFGR_PLLDIVR);
+	}
+	/// SAI1 clock from PLLI2S R divided by 1..31 (reset value 0 is invalid, RM0430 RCC_DCKCFGR)
+	static inline void
+	setPllI2sDivR(uint8_t divider)
+	{
+		RCC->DCKCFGR = (RCC->DCKCFGR & ~RCC_DCKCFGR_PLLI2SDIVR) |
+			((uint32_t(divider) << RCC_DCKCFGR_PLLI2SDIVR_Pos) & RCC_DCKCFGR_PLLI2SDIVR);
+	}
+%#
 	enum class
 	Dfsdm2KernelClock : uint32_t
 	{

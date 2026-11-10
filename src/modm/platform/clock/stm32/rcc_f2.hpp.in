@@ -149,7 +149,8 @@ public:
 	static inline bool
 	enablePll(PllSource src, PllConfig cfg, uint32_t waitLoops = 0x10000)
 	{
-		if (cfg.Q < 2u or cfg.M < 2u or cfg.N < 192u or 432u < cfg.N or (cfg.P & 1u))
+		if (cfg.Q < 2u or cfg.Q > 15u or cfg.M < 2u or cfg.M > 63u or cfg.N < 192u or 432u < cfg.N or
+			cfg.P < 2u or cfg.P > 8u or (cfg.P & 1u))
 			return false;
 		RCC->PLLCFGR = (uint32_t(src) << RCC_PLLCFGR_PLLSRC_Pos) |
 					((uint32_t(cfg.M) << RCC_PLLCFGR_PLLM_Pos) & RCC_PLLCFGR_PLLM) |

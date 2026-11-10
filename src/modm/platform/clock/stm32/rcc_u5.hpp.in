@@ -171,7 +171,8 @@ public:
 		MHz12   = 3,
 		MHz4    = 4,
 		MHz2    = 5,
-		MHz1_5  = 6,
+		MHz1_33 = 6,
+		MHz1_5 [[deprecated("MSI range 6 is 1.33 MHz, use MHz1_33")]] = 6, // DEPRECATED: 2027q4
 		MHz1    = 7,
 		MHz3_072 = 8,
 		MHz1_536 = 9,
@@ -179,7 +180,8 @@ public:
 		kHz768 = 11,
 		kHz400 = 12,
 		kHz200 = 13,
-		kHz150 = 14,
+		kHz133 = 14,
+		kHz150 [[deprecated("MSI range 14 is 133 kHz, use kHz133")]] = 14, // DEPRECATED: 2027q4
 		kHz100 = 15,
 	};
 
@@ -194,6 +196,15 @@ public:
 		RCC->CR |= RCC_CR_MSISON;
 		while (not (RCC->CR & RCC_CR_MSISRDY) and --waitLoops) ;
 		return waitLoops;
+	}
+
+	/// Trims MSIS (system = true) or MSIK with the LSE, which must be ready.
+	/// If MSIS and MSIK use the same MSIRC, both are trimmed.
+	static inline void
+	enableMsiPllMode(bool system = true)
+	{
+		RCC->CR = (RCC->CR & ~RCC_CR_MSIPLLSEL) | (system ? RCC_CR_MSIPLLSEL : 0);
+		RCC->CR |= RCC_CR_MSIPLLEN;
 	}
 
 	/// Enable MSIK (Multi Speed Internal Kernel) oscillator for peripheral clocks
