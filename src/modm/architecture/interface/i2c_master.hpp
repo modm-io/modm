@@ -108,6 +108,11 @@ public:
 	/**
 	 * Requests transaction attachment.
 	 *
+	 * The transaction is attached only while the bus is free: then its `attaching()` is
+	 * called right before the transfer starts, and may still refuse. While another
+	 * transaction uses the bus, start() returns `false` without calling the transaction,
+	 * and the caller tries again later (with fibers, the scheduler decides the order).
+	 *
 	 * @param	transaction
 	 *		object that inherits from the I2cTransaction class.
 	 * @param	configuration

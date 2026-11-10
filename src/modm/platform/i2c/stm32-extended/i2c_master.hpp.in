@@ -1,7 +1,7 @@
 // coding: utf-8
 /*
  * Copyright (c) 2017, Sascha Schade
- * Copyright (c) 2017-2018, Niklas Hauser
+ * Copyright (c) 2017-2018, 2026, Niklas Hauser
  * Copyright (c) 2018, 2023, Christopher Durand
  *
  * This file is part of the modm project.
@@ -12,20 +12,16 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_STM32_I2C_{{ id }}_HPP
-#define MODM_STM32_I2C_{{ id }}_HPP
+#pragma once
 
-#include <modm/architecture/interface/interrupt.hpp>
 #include <modm/architecture/interface/i2c_master.hpp>
-#include <modm/architecture/interface/clock.hpp>
 #include <modm/platform/gpio/connector.hpp>
-
+#include <modm/architecture/interface/delay.hpp>
+#include <modm/platform/clock/rcc.hpp>
+#include "i2c_master_base.hpp"
 #include "i2c_timing_calculator.hpp"
 
-namespace modm
-{
-
-namespace platform
+namespace modm::platform
 {
 
 /**
@@ -33,15 +29,13 @@ namespace platform
  *
  * Interrupts must be enabled.
  *
- * @author		Georgi Grinshpun
- * @author		Niklas Hauser
- * @author		Sascha Schade (strongly-typed)
  * @ingroup		modm_platform_i2c modm_platform_i2c_{{id}}
  */
 class I2cMaster{{ id }} : public ::modm::I2cMaster
 {
 public:
-	static constexpr size_t TransactionBufferSize = {{ options["buffer.transaction"] }};
+	/// The driver object of this instance
+	static inline constinit I2cMasterBase instance{I2C{{ id }}_BASE};
 
 private:
 	template<class SystemClock, baudrate_t baudrate, percent_t tolerance>
@@ -57,15 +51,10 @@ private:
 			.riseTime = 0,
 			.fallTime = 0
 		};
-
 		auto calculator = I2cTimingCalculator{parameters};
-
 		std::optional<I2cMasterTimings> timings = calculator.calculateTimings();
-		if(timings) {
-			return I2cTimingCalculator::timingsToRegisterValue(timings.value());
-		} else {
-			return std::nullopt;
-		}
+		if (timings) return I2cTimingCalculator::timingsToRegisterValue(timings.value());
+		return std::nullopt;
 	}
 
 public:
@@ -91,29 +80,34 @@ public:
 		Connector::connect();
 		// reset() clears the bus with the same signals
 		busReset = reset;
-		recoverBus = (reset != ResetDevices::NoReset) ? &clearBus<Signals...> : nullptr;
+		instance.recoverBus = (reset != ResetDevices::NoReset) ? &clearBus<Signals...> : nullptr;
 	}
 
-	/**
-	 * Set up the I2C module for master operation.
-	 *
-	 * @param	rate
-	 *		`Standard` or `Fast`, `High` datarate is not supported
-	 */
+	/// Sets up the peripheral for controller operation at `baudrate`.
 	template<class SystemClock, baudrate_t baudrate=kBd(100), percent_t tolerance=pct(5)>
 	static void
 	initialize(uint8_t isrPriority = 10u)
 	{
-		constexpr std::optional<uint32_t> timingRegisterValue = calculateTimings<SystemClock, baudrate, tolerance>();
-		static_assert(bool(timingRegisterValue), "Could not find a valid clock configuration for the requested baudrate");
-
+		constexpr std::optional<uint32_t> timing = calculateTimings<SystemClock, baudrate, tolerance>();
+		static_assert(bool(timing), "Could not find a valid clock configuration for the requested baudrate");
 %% if smbus
-		// The SMBus timer counts 2048 I2CCLK cycles per tick, so this is the number of
-		// ticks per millisecond in Q16, computed at compile time.
-		constexpr uint32_t ticksPerMsQ16 = (uint64_t(SystemClock::I2c{{ id }}) << 16) / 2'048'000ull;
-		ticksPerMs = ticksPerMsQ16;
+		// The SMBus timer counts 2048 I2CCLK cycles per tick: ticks per millisecond in Q16
+		ticksPerMs = (uint64_t(SystemClock::I2c{{ id }}) << 16) / 2'048'000ull;
 %% endif
-		initializeWithPrescaler(timingRegisterValue.value(), isrPriority);
+		Rcc::enable<Peripheral::I2c{{ id }}>();
+		instance.configure(timing.value() & 0xF0FF'FFFF);
+%% if shared_irq
+		NVIC_SetPriority({{ shared_irq }}_IRQn, isrPriority);
+		NVIC_EnableIRQ({{ shared_irq }}_IRQn);
+%% elif single_interrupt
+		NVIC_SetPriority(I2C{{ id }}_IRQn, isrPriority);
+		NVIC_EnableIRQ(I2C{{ id }}_IRQn);
+%% else
+		NVIC_SetPriority(I2C{{ id }}_ER_IRQn, isrPriority);
+		NVIC_EnableIRQ(I2C{{ id }}_ER_IRQn);
+		NVIC_SetPriority(I2C{{ id }}_EV_IRQn, isrPriority);
+		NVIC_EnableIRQ(I2C{{ id }}_EV_IRQn);
+%% endif
 	}
 
 %% if smbus
@@ -127,60 +121,59 @@ public:
 	 * A longer timeout is left to the software timeout of I2cDevice.
 	 */
 	static void
-	setTransactionTimeout(std::chrono::milliseconds timeout);
+	setTransactionTimeout(std::chrono::milliseconds timeout)
+	{
+		// rounded up; 0 disables the timer: wait forever, or the timer cannot cover it
+		const uint32_t ticks = uint32_t(((uint64_t(timeout.count()) * ticksPerMs) + 0xFFFFull) >> 16);
+		instance.setTimeout((timeout.count() <= 0 or ticks > 4096) ? 0 : ticks);
+	}
 %% endif
 
 	static bool
-	start(I2cTransaction *transaction, ConfigurationHandler handler = nullptr);
+	start(I2cTransaction *transaction, ConfigurationHandler handler = nullptr)
+	{ return instance.start(transaction, handler); }
 
 	static Error
-	getErrorState();
+	getErrorState()
+	{ return instance.getErrorState(); }
 
 	/// Detaches all transactions, resets the peripheral and clears the bus if a
 	/// device holds SDA low, unless connect() was called with `ResetDevices::NoReset`.
 	/// @warning Must not be called from an interrupt.
 	static void
-	reset();
+	reset()
+	{ instance.reset(); }
+
+	/// The interrupt handler, called by the vector(s) of this instance.
+	static void
+	irq()
+	{ instance.isr(); }
 
 private:
-	/// Clears the bus if a device holds SDA or SCL low, see resetDevices().
+	/// Clears the bus, see resetDevices(). Busy waits: the driver also calls it from
+	/// the interrupt when the bus is still busy at a START after a peripheral reset.
 	template<class... Signals>
 	static void
-	clearBus()
+	clearBus(bool afterRead)
 	{
 		using Connector = GpioConnector<Peripheral::I2c{{ id }}, Signals...>;
 		using Scl = typename Connector::template GetSignal<Gpio::Signal::Scl>;
 		using Sda = typename Connector::template GetSignal<Gpio::Signal::Sda>;
-		if (Scl::read() and Sda::read()) return;
-		Connector::disconnect();
+		// GPIO open-drain outputs, released first: Connector::disconnect() would also
+		// remove the internal pull-ups of connect(PullUps::Internal), and the bus floats low
+		Scl::set();
+		Sda::set();
 		Scl::setOutput(Gpio::OutputType::OpenDrain);
 		Sda::setOutput(Gpio::OutputType::OpenDrain);
-		resetDevices<Scl, Sda>(uint32_t(busReset));
+		const uint32_t us = 500'000ul / uint32_t(busReset);
+		I2c::clearBus<Scl, Sda>([us] { modm::delay_us(us); }, afterRead);
 		Connector::connect();
 	}
 
 	static inline ResetDevices busReset{ResetDevices::NoReset};
-	static inline void (*recoverBus)(){nullptr};
-
 %% if smbus
-	/// SMBus timer ticks per millisecond in Q16, set by initialize()
-	static inline uint32_t ticksPerMs{0};
-%% endif
-
-	static void
-	initializeWithPrescaler(uint32_t timingRegisterValue, uint8_t isrPriority = 10u);
-
-%% if shared_irq
-	friend void ::{{ shared_irq }}_IRQHandler();
-
-	static void
-	irq();
+	static inline uint32_t ticksPerMs{0};	///< SMBus timer ticks per millisecond in Q16
 %% endif
 };
 
-
-} // namespace platform
-
-} // namespace modm
-
-#endif // MODM_STM32_I2C_{{ id }}_HPP
+} // namespace modm::platform

@@ -1,7 +1,7 @@
+// coding: utf-8
 /*
- * Copyright (c) 2013, Kevin Läufer
- * Copyright (c) 2013-2017, Niklas Hauser
  * Copyright (c) 2017, Sascha Schade
+ * Copyright (c) 2017-2018, 2026, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -11,19 +11,17 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_STM32_I2C_{{ id }}_HPP
-#define MODM_STM32_I2C_{{ id }}_HPP
+#pragma once
 
-#include "../device.hpp"
-#include <modm/platform/gpio/connector.hpp>
 #include <modm/architecture/interface/i2c_master.hpp>
+#include <modm/platform/gpio/connector.hpp>
+#include <modm/architecture/interface/delay.hpp>
+#include <modm/platform/clock/rcc.hpp>
+#include "i2c_master_base.hpp"
 #include <modm/math/algorithm/prescaler.hpp>
 #include <modm/math/utils/cmath.hpp>
 
-namespace modm
-{
-
-namespace platform
+namespace modm::platform
 {
 
 /**
@@ -31,14 +29,13 @@ namespace platform
  *
  * Interrupts must be enabled.
  *
- * @author		Georgi Grinshpun
- * @author		Niklas Hauser
  * @ingroup		modm_platform_i2c modm_platform_i2c_{{id}}
  */
 class I2cMaster{{ id }} : public ::modm::I2cMaster
 {
 public:
-	static constexpr size_t TransactionBufferSize = {{ options["buffer.transaction"] }};
+	/// The driver object of this instance
+	static inline constinit I2cMasterBase instance{I2C{{ id }}_BASE};
 
 public:
 	template<class... Signals>
@@ -63,15 +60,10 @@ public:
 		Connector::connect();
 		// reset() clears the bus with the same signals
 		busReset = reset;
-		recoverBus = (reset != ResetDevices::NoReset) ? &clearBus<Signals...> : nullptr;
+		instance.recoverBus = (reset != ResetDevices::NoReset) ? &clearBus<Signals...> : nullptr;
 	}
 
-	/**
-	 * Set up the I2C module for master operation.
-	 *
-	 * @param	rate
-	 *		`Standard` or `Fast`, `High` datarate is not supported
-	 */
+	/// Sets up the peripheral for controller operation at `baudrate` (standard or fast mode).
 	template<class SystemClock, baudrate_t baudrate=kBd(100), percent_t tolerance=pct(5)>
 	static void
 	initialize(uint8_t isrPriority = 10u)
@@ -100,47 +92,56 @@ public:
 		constexpr float trise_raw = max_rise_time < 0 ? 0 : modm::floor(max_rise_time / (1'000.f / freq));
 		constexpr uint8_t trise = trise_raw > 62 ? 63 : (trise_raw + 1);
 
-		initializeWithPrescaler(freq, trise, prescaler, isrPriority);
+		Rcc::enable<Peripheral::I2c{{ id }}>();
+		instance.configure(freq, trise, prescaler);
+		NVIC_SetPriority(I2C{{ id }}_ER_IRQn, isrPriority);
+		NVIC_EnableIRQ(I2C{{ id }}_ER_IRQn);
+		NVIC_SetPriority(I2C{{ id }}_EV_IRQn, isrPriority);
+		NVIC_EnableIRQ(I2C{{ id }}_EV_IRQn);
 	}
 
 	static bool
-	start(I2cTransaction *transaction, ConfigurationHandler handler = nullptr);
+	start(I2cTransaction *transaction, ConfigurationHandler handler = nullptr)
+	{ return instance.start(transaction, handler); }
 
 	static Error
-	getErrorState();
+	getErrorState()
+	{ return instance.getErrorState(); }
 
 	/// Detaches all transactions, resets the peripheral and clears the bus if a
 	/// device holds SDA low, unless connect() was called with `ResetDevices::NoReset`.
 	/// @warning Must not be called from an interrupt.
 	static void
-	reset();
+	reset()
+	{ instance.reset(); }
+
+	/// The interrupt handler, called by the vector(s) of this instance.
+	static void
+	irq()
+	{ instance.isr(); }
 
 private:
-	/// Clears the bus if a device holds SDA or SCL low, see resetDevices().
+	/// Clears the bus, see resetDevices(). Busy waits: the driver also calls it from
+	/// the interrupt when the bus is still busy at a START after a peripheral reset.
 	template<class... Signals>
 	static void
-	clearBus()
+	clearBus(bool afterRead)
 	{
 		using Connector = GpioConnector<Peripheral::I2c{{ id }}, Signals...>;
 		using Scl = typename Connector::template GetSignal<Gpio::Signal::Scl>;
 		using Sda = typename Connector::template GetSignal<Gpio::Signal::Sda>;
-		if (Scl::read() and Sda::read()) return;
-		Connector::disconnect();
+		// GPIO open-drain outputs, released first: Connector::disconnect() would also
+		// remove the internal pull-ups of connect(PullUps::Internal), and the bus floats low
+		Scl::set();
+		Sda::set();
 		Scl::setOutput(Gpio::OutputType::OpenDrain);
 		Sda::setOutput(Gpio::OutputType::OpenDrain);
-		resetDevices<Scl, Sda>(uint32_t(busReset));
+		const uint32_t us = 500'000ul / uint32_t(busReset);
+		I2c::clearBus<Scl, Sda>([us] { modm::delay_us(us); }, afterRead);
 		Connector::connect();
 	}
 
 	static inline ResetDevices busReset{ResetDevices::NoReset};
-	static inline void (*recoverBus)(){nullptr};
-
-	static void
-	initializeWithPrescaler(uint8_t peripheralFrequency, uint8_t riseTime, uint16_t prescaler, uint8_t isrPriority);
 };
 
-} // namespace platform
-
-} // namespace modm
-
-#endif // MODM_STM32_I2C_{{ id }}_HPP
+} // namespace modm::platform

@@ -18,6 +18,32 @@
 #include <modm/architecture/detect.hpp>
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/architecture/interface/fiber.hpp>
+#include <cstdint>
+
+#ifdef MODM_I2C_TRACE
+/**
+ * Called by the I2C controller drivers that support it (STM32 I2cMasterN,
+ * BitBangI2cMaster) for every step of their transfers, off by default. Name a function
+ * with `modm:build:cppdefines` as `MODM_I2C_TRACE=my_trace` and define
+ * `void my_trace(uintptr_t instance, uint8_t before, uint8_t flag, uint8_t action,
+ * uint8_t after)`, for example to record the steps; see the example `communication/i2c_trace`.
+ *
+ * - `instance` tells the controllers apart: the address of the peripheral's registers
+ *   (`I2C1_BASE`, ...), or BitBangI2cMaster<Scl, Sda>::traceInstance().
+ * - `before` and `after` are the driver's states, `flag` the event that ended the step
+ *   (a flag of the peripheral, or a pseudo flag for software steps), `action` what the
+ *   driver did. The driver class names them with stateName(), flagName() and actionName()
+ *   (for the STM32 drivers: modm::platform::I2cMasterBase).
+ * - The flag `modm::I2c::TraceFailure` marks the end of a transfer with an error other
+ *   than an address or data NACK, or a reset(): `action` is the I2cMaster::Error then,
+ *   `before` and `after` are 0xff.
+ *
+ * The STM32 drivers call it from their interrupt or with the interrupts disabled,
+ * BitBangI2cMaster from the fiber in start(). The calls of one controller never interrupt
+ * each other, but those of another controller may: keep the state of each instance apart.
+ */
+void MODM_I2C_TRACE(uintptr_t instance, uint8_t before, uint8_t flag, uint8_t action, uint8_t after);
+#endif
 
 namespace modm
 {
@@ -25,6 +51,9 @@ namespace modm
 /// @ingroup modm_architecture_i2c
 struct I2c
 {
+	/// The flag of the step that marks a failure in MODM_I2C_TRACE, the same in every driver.
+	static constexpr uint8_t TraceFailure = 20;
+
 	static constexpr uint8_t Write = 0x00;	///< Add the Write bit to the slave address
 	static constexpr uint8_t Read  = 0x01;	///< Add the Read bit to the slave address
 

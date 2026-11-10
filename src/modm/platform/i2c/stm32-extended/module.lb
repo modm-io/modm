@@ -38,13 +38,6 @@ class Instance(Module):
 
     def prepare(self, module, options):
         module.depends(":platform:i2c")
-        module.add_option(
-            NumericOption(
-                name="buffer.transaction",
-                description="",
-                minimum=1,
-                maximum="64Ki-2",
-                default=8))
 
         return True
 
@@ -90,6 +83,7 @@ def prepare(module, options):
         ":architecture:accessor",
         ":architecture:atomic",
         ":architecture:clock",
+        ":architecture:delay",
         ":architecture:i2c",
         ":architecture:interrupt",
         ":cmsis:device",
@@ -109,5 +103,9 @@ def build(env):
     env.outbasepath = "modm/src/modm/platform/i2c"
 
     env.copy("i2c_timing_calculator.hpp")
+    env.copy("../stm32-common/i2c_master_common.hpp", "i2c_master_common.hpp")
+    env.copy("../stm32-common/i2c_master_common.cpp", "i2c_master_common.cpp")
+    env.copy("i2c_master_base.hpp")
+    env.copy("i2c_master_base.cpp")
     if len(global_properties["shared_irqs"]) > 0:
         env.template("i2c_shared_irqs.cpp.in")
