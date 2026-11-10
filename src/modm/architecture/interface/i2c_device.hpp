@@ -71,7 +71,7 @@ public:
 		configuration = handler;
 	}
 
-	/// Sets the time a transaction may take including the wait for the bus,
+	/// Sets the time a transaction may take once it owns the bus,
 	/// zero waits forever. Devices that stretch the clock may need longer.
 	void inline
 	setTimeout(std::chrono::milliseconds timeout)
@@ -148,12 +148,12 @@ protected:
 	{
 		// let the master time the bus access out as well
 		I2cMaster::setTransactionTimeout(timeout);
+		// the bus owner times out its own transaction, a reset here would abort it
+		modm::this_fiber::poll([&]{ return startTransaction(); });
 		const auto start = modm::Clock::now();
 		const auto expired = [&] { return timeout.count() and modm::Clock::now() - start > timeout; };
-		bool started{false};
-		modm::this_fiber::poll([&]{ return (started = startTransaction()) or expired(); });
-		if (started) modm::this_fiber::poll([&]{ return not isTransactionRunning() or expired(); });
-		if (not started or isTransactionRunning())
+		modm::this_fiber::poll([&]{ return not isTransactionRunning() or expired(); });
+		if (isTransactionRunning())
 		{
 			// The bus is stuck: detach all transactions and reset the master
 			I2cMaster::reset();
