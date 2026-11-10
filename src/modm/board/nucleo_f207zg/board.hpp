@@ -33,10 +33,10 @@ struct SystemClock
 	static constexpr uint32_t Hse = 8_MHz;
 	static constexpr Rcc::PllConfig pll
 	{
-		.M = 4,   //   8 MHz /   4 =   2 MHz
-		.N = 240, //   2 MHz * 240 = 480 MHz
-		.P = 4,   // 480 MHz /   4 = 120 MHz = F_cpu
-		.Q = 10,  // 480 MHz /  10 =  48 MHz = F_usb
+		.M = 8,   //   8 MHz /   8 =   1 MHz
+		.N = 240, //   1 MHz * 240 = 240 MHz (VCO max. 432 MHz)
+		.P = 2,   // 240 MHz /   2 = 120 MHz = F_cpu
+		.Q = 5,   // 240 MHz /   5 =  48 MHz = F_usb
 	};
 	static constexpr uint32_t PllP = Hse / pll.M * pll.N / pll.P;
 	static constexpr uint32_t PllQ = Hse / pll.M * pll.N / pll.Q;

@@ -61,8 +61,8 @@ struct SystemClock
 	static constexpr uint32_t Usart3 = Apb1;
 	static constexpr uint32_t Wwdg = Apb1;
 
-	static constexpr uint32_t Adc = Apb2;
-	static constexpr uint32_t Adc1 = Apb2;
+	static constexpr uint32_t Adc = Rcc::HsiFrequency; // ADC is clocked by the HSI16
+	static constexpr uint32_t Adc1 = Rcc::HsiFrequency;
 	static constexpr uint32_t Exti = Apb2;
 	static constexpr uint32_t Spi1 = Apb2;
 	static constexpr uint32_t Syscfg = Apb2;

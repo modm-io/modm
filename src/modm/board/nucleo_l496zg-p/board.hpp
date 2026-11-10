@@ -38,7 +38,6 @@ struct SystemClock
 		.M = 2,  //  16 MHz /  2 =   8 MHz
 		.N = 40, //   8 MHz * 40 = 320 MHz
 		.R = 4,  // 320 MHz /  4 =  80 MHz = F_cpu
-		.Q = 2,  // 320 MHz /  2 = 160 MHz
 	};
 	static constexpr uint32_t PllR = Msi / pll.M * pll.N / pll.R;
 	static_assert(PllR == Rcc::MaxFrequency);

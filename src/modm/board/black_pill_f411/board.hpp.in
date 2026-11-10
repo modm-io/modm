@@ -80,7 +80,7 @@ struct SystemClock
 	static constexpr uint32_t Usart6 = Apb2;
 
 	static constexpr uint32_t Apb1Timer = Apb1 * 2;
-	static constexpr uint32_t Apb2Timer = Apb2 * 2;
+	static constexpr uint32_t Apb2Timer = Apb2; // APB2 prescaler is /1
 	static constexpr uint32_t Timer1  = Apb2Timer;
 	static constexpr uint32_t Timer2  = Apb1Timer;
 	static constexpr uint32_t Timer3  = Apb1Timer;
@@ -99,6 +99,10 @@ struct SystemClock
 	{
 		Rcc::enableLseCrystal();
 		Rcc::enableHseCrystal();
+%% if target.name == "11"
+		// VOS resets to Scale 2 (max. 84 MHz), must be set while the PLL is off
+		Rcc::setVoltageScaling(Rcc::VoltageScaling::Scale1);
+%% endif
 
 		Rcc::setFlashLatency<Frequency>();
 		Rcc::updateCoreFrequency<Frequency>();

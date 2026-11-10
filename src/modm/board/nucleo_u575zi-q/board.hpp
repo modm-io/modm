@@ -36,13 +36,21 @@ struct SystemClock
 	static constexpr Rcc::PllConfig pll1{
 		.range = Rcc::PllInputRange::MHz8_16,
 		.M = 2,  //  16 MHz /  2 = 8 MHz
-		.N = 60, //   8 MHz * 60 = 480 MHz
-		.Q = 10, // 480 MHz / 10 =  48 MHz = F_usb
-		.R = 3,  // 480 MHz /  3 = 160 MHz = F_cpu
+		.N = 40, //   8 MHz * 40 = 320 MHz
+		.Q = 4,  // 320 MHz /  4 =  80 MHz = F_fdcan
+		.R = 2,  // 320 MHz /  2 = 160 MHz = F_cpu (PLL1R: only /1 or even)
 	};
 	static constexpr uint32_t Pll1R = Rcc::HsiFrequency / pll1.M * pll1.N / pll1.R;
-	static constexpr uint32_t Pll1Q = Rcc::HsiFrequency / pll1.M * pll1.N / pll1.Q;
 	static_assert(Pll1R == Rcc::MaxFrequency);
+	static constexpr uint32_t Pll1Q = Rcc::HsiFrequency / pll1.M * pll1.N / pll1.Q;
+
+	static constexpr Rcc::PllConfig pll2{
+		.range = Rcc::PllInputRange::MHz8_16,
+		.M = 2,  //  16 MHz /  2 = 8 MHz
+		.N = 48, //   8 MHz * 48 = 384 MHz
+		.Q = 8,  // 384 MHz /  8 =  48 MHz = F_usb
+	};
+	static constexpr uint32_t Pll2Q = Rcc::HsiFrequency / pll2.M * pll2.N / pll2.Q;
 
 	static constexpr uint32_t Frequency = Pll1R;
 	static constexpr uint32_t Ahb  = Frequency;
@@ -135,7 +143,7 @@ struct SystemClock
 	static constexpr uint32_t I2c4    = Apb1;
 	static constexpr uint32_t Crs     = Apb1;
 	static constexpr uint32_t Lptim2  = Apb1;
-	static constexpr uint32_t Fdcan1  = Apb1;
+	static constexpr uint32_t Fdcan1  = Pll1Q;
 	static constexpr uint32_t FdcanConfig = Apb1;
 	static constexpr uint32_t SramCan = Apb1;
 	static constexpr uint32_t Ucpd1   = Apb1;
@@ -168,7 +176,7 @@ struct SystemClock
 	static constexpr uint32_t RtcBus  = Apb3;
 	static constexpr uint32_t Tamp    = Apb3;
 
-	static constexpr uint32_t Usb = Pll1Q;
+	static constexpr uint32_t Usb = Pll2Q;
 	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
 	static constexpr uint32_t Rtc = Lse;
 
@@ -188,10 +196,12 @@ struct SystemClock
 		Rcc::setApb3Prescaler(Rcc::ApbPrescaler::Div1);
 
 		Rcc::enablePll1(Rcc::PllSource::Hsi, pll1);
+		Rcc::enablePll2(Rcc::PllSource::Hsi, pll2);
 		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll1R);
 
 		Rcc::setRealTimeClockSource(Rcc::RealTimeClockSource::Lse);
-		Rcc::setUsbClockSource(Rcc::UsbClockSource::Pll1Q);
+		Rcc::setUsbClockSource(Rcc::UsbClockSource::Pll2Q);
+		Rcc::setFdCanClockSource(Rcc::FdCanClockSource::Pll1Q);
 
 		return true;
 	}

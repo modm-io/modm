@@ -39,9 +39,10 @@ struct SystemClock
 		.M = 1,  //   4 MHz /  1 =   4 MHz
 		.N = 55, //   4 MHz * 55 = 220 MHz
 		.R = 2,  // 220 MHz /  2 = 110 MHz = F_cpu
-		.Q = 2,  // 220 MHz /  2 = 110 MHz
+		.Q = 2,  // 220 MHz /  2 = 110 MHz = F_fdcan
 	};
 	static constexpr uint32_t PllR = Rcc::MsiFrequency / pll.M * pll.N / pll.R;
+	static constexpr uint32_t PllQ = Rcc::MsiFrequency / pll.M * pll.N / pll.Q;
 	static_assert(PllR == Rcc::MaxFrequency);
 
 	static constexpr uint32_t Frequency = PllR;
@@ -75,7 +76,7 @@ struct SystemClock
 	static constexpr uint32_t Crs = Apb1;
 	static constexpr uint32_t Dac = Apb1;
 	static constexpr uint32_t Dac1 = Apb1;
-	static constexpr uint32_t Fdcan1 = Apb1;
+	static constexpr uint32_t Fdcan1 = PllQ;
 	static constexpr uint32_t FdcanConfig = Apb1;
 	static constexpr uint32_t I2c1 = Apb1;
 	static constexpr uint32_t I2c2 = Apb1;
@@ -146,6 +147,7 @@ struct SystemClock
 
 		Rcc::setRealTimeClockSource(Rcc::RealTimeClockSource::Lse);
 		Rcc::setClk48Source(Rcc::Clk48Source::Hsi48);
+		Rcc::setCanClockSource(Rcc::CanClockSource::PllQ);
 
 		return true;
 	}

@@ -103,6 +103,10 @@ struct SystemClock
 	{
 		Rcc::enableLseCrystal();
 		Rcc::enableHsiClock();
+%% if target.name == "11"
+		// VOS resets to Scale 2 (max. 84 MHz), must be set while the PLL is off
+		Rcc::setVoltageScaling(Rcc::VoltageScaling::Scale1);
+%% endif
 
 		Rcc::setFlashLatency<Frequency>();
 		Rcc::updateCoreFrequency<Frequency>();

@@ -68,9 +68,9 @@ struct SystemClock
 	static constexpr uint32_t Uart7  = Apb1;
 	static constexpr uint32_t Uart8  = Apb1;
 
-	static constexpr uint32_t I2c1   = Apb1;
-	static constexpr uint32_t I2c2   = Apb1;
-	static constexpr uint32_t I2c3   = Apb1;
+	static constexpr uint32_t I2c1   = Rcc::HsiFrequency;
+	static constexpr uint32_t I2c2   = Rcc::HsiFrequency;
+	static constexpr uint32_t I2c3   = Rcc::HsiFrequency;
 
 	static constexpr uint32_t Apb1Timer = Apb1 * 2;
 	static constexpr uint32_t Apb2Timer = Apb2 * 1;

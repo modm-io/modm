@@ -31,14 +31,22 @@ struct SystemClock
 	static constexpr Rcc::PllConfig pll1{
 		.range = Rcc::PllInputRange::MHz4_8,
 		.M = 5,  //  25 MHz /  5 =   5 MHz
-		.N = 96, //   5 MHz * 96 = 480 MHz
-		.Q = 10, // 480 MHz / 10 =  48 MHz = F_usb
-		.R = 3,  // 480 MHz /  3 = 160 MHz = F_cpu
+		.N = 64, //   5 MHz * 64 = 320 MHz
+		.Q = 4,  // 320 MHz /  4 =  80 MHz = F_fdcan
+		.R = 2,  // 320 MHz /  2 = 160 MHz = F_cpu (PLL1R: only /1 or even)
 		.MBoost = Rcc::Pll1MBoost::Div2, // 25 MHz / 2 = 12.5 MHz
 	};
 	static constexpr uint32_t Pll1R = Hse / pll1.M * pll1.N / pll1.R;
-	static constexpr uint32_t Pll1Q = Hse / pll1.M * pll1.N / pll1.Q;
 	static_assert(Pll1R == Rcc::MaxFrequency);
+	static constexpr uint32_t Pll1Q = Hse / pll1.M * pll1.N / pll1.Q;
+
+	static constexpr Rcc::PllConfig pll2{
+		.range = Rcc::PllInputRange::MHz4_8,
+		.M = 5,  //  25 MHz /  5 =   5 MHz
+		.N = 96, //   5 MHz * 96 = 480 MHz
+		.Q = 10, // 480 MHz / 10 =  48 MHz = F_usb
+	};
+	static constexpr uint32_t Pll2Q = Hse / pll2.M * pll2.N / pll2.Q;
 
 	static constexpr uint32_t Frequency = Pll1R;
 	static constexpr uint32_t Ahb1 = Frequency;
@@ -49,9 +57,10 @@ struct SystemClock
 	static constexpr uint32_t Apb2 = Frequency / 1;
 	static constexpr uint32_t Apb3 = Frequency / 1;
 
-	static constexpr uint32_t Apb1Timer = Apb1 * 2;
-	static constexpr uint32_t Apb2Timer = Apb2 * 2;
-	static constexpr uint32_t Apb3Timer = Apb3 * 2;
+	// APB prescalers are /1, so the timers run at the APB clock
+	static constexpr uint32_t Apb1Timer = Apb1;
+	static constexpr uint32_t Apb2Timer = Apb2;
+	static constexpr uint32_t Apb3Timer = Apb3;
 
 	// AHB1 Peripherals
 	static constexpr uint32_t Gpdma1 = Ahb1;
@@ -131,7 +140,7 @@ struct SystemClock
 	static constexpr uint32_t I2c4    = Apb1;
 	static constexpr uint32_t Crs     = Apb1;
 	static constexpr uint32_t Lptim2  = Apb1;
-	static constexpr uint32_t Fdcan1  = Apb1;
+	static constexpr uint32_t Fdcan1  = Pll1Q;
 	static constexpr uint32_t FdcanConfig = Apb1;
 	static constexpr uint32_t SramCan = Apb1;
 	static constexpr uint32_t Ucpd1   = Apb1;
@@ -164,7 +173,7 @@ struct SystemClock
 	static constexpr uint32_t RtcBus  = Apb3;
 	static constexpr uint32_t Tamp    = Apb3;
 
-	static constexpr uint32_t Usb = Pll1Q;
+	static constexpr uint32_t Usb = Pll2Q;
 	static constexpr uint32_t Iwdg = Rcc::LsiFrequency;
 	static constexpr uint32_t Rtc = Lse;
 
@@ -184,10 +193,12 @@ struct SystemClock
 		Rcc::setApb3Prescaler(Rcc::ApbPrescaler::Div1);
 
 		Rcc::enablePll1(Rcc::PllSource::Hse, pll1);
+		Rcc::enablePll2(Rcc::PllSource::Hse, pll2);
 		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll1R);
 
 		Rcc::setRealTimeClockSource(Rcc::RealTimeClockSource::Lse);
-		Rcc::setUsbClockSource(Rcc::UsbClockSource::Pll1Q);
+		Rcc::setUsbClockSource(Rcc::UsbClockSource::Pll2Q);
+		Rcc::setFdCanClockSource(Rcc::FdCanClockSource::Pll1Q);
 
 		return true;
 	}

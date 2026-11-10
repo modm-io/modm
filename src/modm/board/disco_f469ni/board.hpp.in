@@ -116,8 +116,8 @@ struct SystemClock
 		Rcc::setApb1Prescaler(Rcc::ApbPrescaler::Div4);
 		Rcc::setApb2Prescaler(Rcc::ApbPrescaler::Div2);
 
-		Rcc::enableOverdriveMode();
 		Rcc::enablePll(Rcc::PllSource::Hse, pll);
+		Rcc::enableOverdriveMode(); // after PLLON, before switching (RM0090)
 		Rcc::enablePllSai(pllSai);
 		Rcc::enableSystemClock(Rcc::SystemClockSource::PllP);
 

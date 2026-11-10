@@ -125,7 +125,6 @@ struct SystemClock
 	enable()
 	{
 		Rcc::enableHseCrystal();
-		Rcc::enableOverdriveMode();
 
 		Rcc::setFlashLatency<Frequency>();
 		Rcc::updateCoreFrequency<Frequency>();

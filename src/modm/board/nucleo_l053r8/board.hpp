@@ -75,6 +75,8 @@ struct SystemClock
 		Rcc::setRealTimeClockSource(Rcc::RealTimeClockSource::Lse);
 
 		Rcc::enableHsiClock();
+		// VOS resets to Range 2 (max. 16 MHz)
+		Rcc::setVoltageScaling(Rcc::VoltageScaling::Range1);
 		Rcc::setFlashLatency<Frequency>();
 		Rcc::updateCoreFrequency<Frequency>();
 

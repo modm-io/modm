@@ -47,7 +47,7 @@ struct SystemClock
 	static constexpr uint32_t Spi1   = Apb2;
 
 	// USART1 is on APB2 bus, but default clock is PCLK1
-	static constexpr uint32_t Usart1 = Apb1;
+	static constexpr uint32_t Usart1 = Apb2;
 	static constexpr uint32_t Usart2 = Apb1;
 	static constexpr uint32_t Usart3 = Apb1;
 

@@ -96,6 +96,8 @@ struct SystemClock
 	enable()
 	{
 		Rcc::enableHseCrystal();
+		// VOS resets to Scale 2 (max. 84 MHz), must be set while the PLL is off
+		Rcc::setVoltageScaling(Rcc::VoltageScaling::Scale1);
 
 		Rcc::setFlashLatency<Frequency>();
 		Rcc::updateCoreFrequency<Frequency>();

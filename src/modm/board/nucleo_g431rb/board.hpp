@@ -78,7 +78,7 @@ struct SystemClock
 	static constexpr uint32_t Ucpd1 = Apb1;
 	static constexpr uint32_t Usart2 = Apb1;
 	static constexpr uint32_t Usart3 = Apb1;
-	static constexpr uint32_t Usb = Apb1;
+	static constexpr uint32_t Usb = 48_MHz; // HSI48, needs Rcc::enableHsi48Clock()
 	static constexpr uint32_t Wwdg = Apb1;
 
 	static constexpr uint32_t Comp1 = Apb2;

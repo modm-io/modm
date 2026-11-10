@@ -31,8 +31,9 @@ using namespace modm::literals;
 /// STM32F042K6 running at 48MHz generated from the internal 8MHz crystal
 struct SystemClock
 {
-	static constexpr Rcc::PllConfig pll{.Mul = 12, .Prediv = 2};
-	static constexpr uint32_t Pll = Rcc::HsiFrequency / 2 * pll.Mul / pll.Prediv;
+	// HSI/2 ignores PREDIV on STM32F04x (RM0091 RCC_CFGR.PLLSRC)
+	static constexpr Rcc::PllConfig pll{.Mul = 12};
+	static constexpr uint32_t Pll = Rcc::HsiFrequency / 2 * pll.Mul;
 	static constexpr uint32_t Frequency = Pll;
 	static constexpr uint32_t Ahb = Frequency;
 	static constexpr uint32_t Apb = Frequency;

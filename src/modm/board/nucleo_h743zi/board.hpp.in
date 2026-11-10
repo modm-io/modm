@@ -36,15 +36,15 @@ struct SystemClock
 		.range = Rcc::PllInputRange::MHz4_8,
 		.M = 2,   //   8 MHz /   2 =   4 MHz
 	%% if board == "stm32h743zi"
-		.N = 100, //   4 MHz * 100 = 400 MHz
-		.P = 1,   // 400 MHz /   1 = 400 MHz = F_cpu
-		.Q = 10,  // 400 MHz /  10 =  40 MHz
-		.R = 10,  // 400 MHz /  10 =  40 MHz
+		.N = 200, //   4 MHz * 200 = 800 MHz
+		.P = 2,   // 800 MHz /   2 = 400 MHz = F_cpu (DIVP1: even only)
+		.Q = 20,  // 800 MHz /  20 =  40 MHz
+		.R = 20,  // 800 MHz /  20 =  40 MHz
 	%% else
-		.N = 120, //   4 MHz * 120 = 480 MHz
-		.P = 1,   // 480 MHz /   1 = 480 MHz = F_cpu
-		.Q = 10,  // 480 MHz /  10 =  48 MHz
-		.R = 10,  // 480 MHz /  10 =  48 MHz
+		.N = 240, //   4 MHz * 240 = 960 MHz
+		.P = 2,   // 960 MHz /   2 = 480 MHz = F_cpu (DIVP1: even only)
+		.Q = 20,  // 960 MHz /  20 =  48 MHz
+		.R = 20,  // 960 MHz /  20 =  48 MHz
 	%% endif
 	};
 	static constexpr Rcc::PllConfig pll2

@@ -82,7 +82,7 @@ struct SystemClock
 	static constexpr uint32_t I2c2 = Apb1;
 	static constexpr uint32_t Usart2 = Apb1;
 	static constexpr uint32_t Usart3 = Apb1;
-	static constexpr uint32_t Fdcan1 = Apb1;
+	static constexpr uint32_t Fdcan1 = Hse;
 
 	// Peripherals on APB3
 	static constexpr uint32_t LpUart1 = Apb3;
