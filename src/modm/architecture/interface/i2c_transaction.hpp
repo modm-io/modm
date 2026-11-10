@@ -217,6 +217,9 @@ public:
 	virtual void
 	detaching(DetachCause cause)
 	{
+		// attaching() refused because the transaction is already attached, for example
+		// started twice: it still runs, its state belongs to that run
+		if (cause == DetachCause::FailedToAttach and state == TransactionState::Busy) return;
 		state = (cause == DetachCause::NormalStop) ? TransactionState::Idle : TransactionState::Error;
 	}
 
@@ -326,6 +329,15 @@ public:
 	}
 
 protected:
+	bool
+	attaching() override
+	{
+		if (not I2cTransaction::attaching()) return false;
+		// writing() leaves `isReading` set: a reused transaction starts with the write again
+		isReading = (writeSize == 0);
+		return true;
+	}
+
 	Starting
 	starting() override
 	{
@@ -502,7 +514,7 @@ public:
 	}
 
 	[[nodiscard]] constexpr bool
-	configureWrite(uint8_t *, std::size_t)
+	configureWrite(const uint8_t *, std::size_t)
 	{
 		return false;
 	}

@@ -21,6 +21,42 @@
 namespace modm
 {
 
+namespace detail
+{
+/// The transaction of an I2cDevice, which knows when it owns the bus: from its first
+/// starting() on. The master's own timeout is set only then, so that a device waiting
+/// for the bus does not change the timeout of the transaction that has it.
+template< class I2cMaster, class Transaction >
+class I2cDeviceTransaction : public Transaction
+{
+public:
+	using Transaction::Transaction;
+
+	std::chrono::milliseconds timeout{100};
+	volatile bool owning{false};
+
+protected:
+	bool
+	attaching() override
+	{
+		if (not Transaction::attaching()) return false;
+		owning = false;
+		return true;
+	}
+
+	I2cTransaction::Starting
+	starting() override
+	{
+		if (not owning)
+		{
+			owning = true;
+			I2cMaster::setTransactionTimeout(timeout);
+		}
+		return Transaction::starting();
+	}
+};
+}	// namespace detail
+
 /**
  * Base class of an I2C Device.
  *
@@ -33,9 +69,11 @@ namespace modm
  * You can choose to use your own custom I2c Transaction Adapter, by providing a class subclassed from
  * an existing I2cAdapter or which implements the I2cTransaction interface manually.
  *
- * A transaction that does not finish within the timeout, for example because a
- * device holds the bus, fails and resets the I2C master with `I2cMaster::reset()`.
- * This also detaches the transactions of the other devices on the same bus.
+ * A transaction that does not finish within the timeout after it got the bus, for
+ * example because a device holds the bus, fails and resets the I2C master with
+ * `I2cMaster::reset()`. This also detaches the transactions of the other devices on
+ * the same bus. Waiting for the bus is not timed: the device that has it times out its
+ * own transaction.
  *
  * @tparam	I2cMaster		an I2cMaster conforming to the I2cMaster interface.
  * @tparam	NestingLevels	number of nesting levels required for your driver
@@ -71,8 +109,8 @@ public:
 		configuration = handler;
 	}
 
-	/// Sets the time a transaction may take including the wait for the bus,
-	/// zero waits forever. Devices that stretch the clock may need longer.
+	/// Sets the time a transaction may take once it has the bus, zero waits forever.
+	/// Devices that stretch the clock may need longer.
 	void inline
 	setTimeout(std::chrono::milliseconds timeout)
 	{
@@ -105,7 +143,7 @@ public:
 		return runTransaction();
 	}
 
-	/// Starts a write transaction and waits until finished.
+	/// Starts a read transaction and waits until finished.
 	[[nodiscard]] bool
 	read(uint8_t *buffer, std::size_t size)
 	{
@@ -146,14 +184,16 @@ protected:
 	bool
 	runTransaction()
 	{
-		// let the master time the bus access out as well
-		I2cMaster::setTransactionTimeout(timeout);
+		// the master times the bus access out as well, from when the transaction has the bus
+		transaction.timeout = timeout;
+		// Waiting for the bus is not timed: a reset here would abort the transaction of
+		// another device that has the bus or waits before us in the queue.
+		modm::this_fiber::poll([&]{ return startTransaction(); });
+		modm::this_fiber::poll([&]{ return transaction.owning or not isTransactionRunning(); });
 		const auto start = modm::Clock::now();
 		const auto expired = [&] { return timeout.count() and modm::Clock::now() - start > timeout; };
-		bool started{false};
-		modm::this_fiber::poll([&]{ return (started = startTransaction()) or expired(); });
-		if (started) modm::this_fiber::poll([&]{ return not isTransactionRunning() or expired(); });
-		if (not started or isTransactionRunning())
+		modm::this_fiber::poll([&]{ return not isTransactionRunning() or expired(); });
+		if (isTransactionRunning())
 		{
 			// The bus is stuck: detach all transactions and reset the master
 			I2cMaster::reset();
@@ -163,7 +203,7 @@ protected:
 	}
 
 protected:
-	Transaction transaction;
+	detail::I2cDeviceTransaction<I2cMaster, Transaction> transaction;
 private:
 	I2c::ConfigurationHandler configuration;
 	std::chrono::milliseconds timeout{100};
