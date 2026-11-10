@@ -85,14 +85,88 @@ public:
 		if (timeout.count()) stretchTimeout = timeout / 2;
 	}
 
+public:
+	// The steps of a transfer for MODM_I2C_TRACE, one per byte
+	enum class
+	State : uint8_t { Idle, Address, Write, Read };
+	/// The bus event that ended a step, or a pseudo flag of a software step (the same
+	/// values as the STM32 drivers)
+	enum
+	Flag : uint8_t
+	{
+		ACKED = 0,		///< the byte was acknowledged (by the target, or by us in a read)
+		NACKED = 1,		///< the byte was not acknowledged
+		LOST = 2,		///< another controller drove a bit to 0: lost arbitration
+		STRETCH = 3,	///< a target stretched the clock for longer than the timeout
+		GLITCH = 4,		///< SDA changed or SCL fell while SCL was high
+		END = 5,		///< the transfer ends here, no bus event
+		START = 16, DEADLINE = 18, BUSY_AT_START = 19, FAILURE = modm::I2c::TraceFailure
+	};
+	enum class
+	Action : uint8_t { Start, Restart, Address, Write, Read, Stop, Refuse, Abort };
+
+	/// The instance argument of MODM_I2C_TRACE for this controller.
+	static uintptr_t
+	traceInstance()
+	{ return reinterpret_cast<uintptr_t>(&transactionObject); }
+
+	/// The names of the states, flags and actions, for example to print a trace.
+	static constexpr const char *
+	stateName(uint8_t state)
+	{
+		constexpr const char *names[] = {"Idle", "Address", "Write", "Read"};
+		return (state < sizeof(names) / sizeof(names[0])) ? names[state] : "?";
+	}
+	static constexpr const char *
+	flagName(uint8_t flag)
+	{
+		switch (flag)
+		{
+			case ACKED: return "ACK";
+			case NACKED: return "NACK";
+			case LOST: return "LOST";
+			case STRETCH: return "STRETCH";
+			case GLITCH: return "GLITCH";
+			case END: return "END";
+			case START: return "START";
+			case DEADLINE: return "DEADLINE";
+			case BUSY_AT_START: return "BUSY_AT_START";
+			case FAILURE: return "FAILURE";
+			default: return "?";
+		}
+	}
+	static constexpr const char *
+	actionName(uint8_t action)
+	{
+		constexpr const char *names[] = {"Start", "Restart", "Address", "Write", "Read", "Stop", "Refuse", "Abort"};
+		return (action < sizeof(names) / sizeof(names[0])) ? names[action] : "?";
+	}
+
 private:
+	/// One step for MODM_I2C_TRACE
+	static void
+	step([[maybe_unused]] uint8_t flag, [[maybe_unused]] Action action, State after)
+	{
+#ifdef MODM_I2C_TRACE
+		::MODM_I2C_TRACE(traceInstance(), uint8_t(state), flag, uint8_t(action), uint8_t(after));
+#endif
+		state = after;
+	}
+
 	/// Clears the bus with resetDevices() if enabled in connect()
 	/// @return	`true` if both lines are high afterwards
 	static inline bool
 	clearBus();
 
-	// error handling
-	/// releases bus lines, sets error state and detaches the TO
+	/// runs the attached transaction until its STOP or an error
+	static inline void
+	run();
+
+	/// detaches the transaction, after the bus was released
+	static inline void
+	finish(Error error);
+
+	/// releases the bus with a STOP if possible, then finishes with the error
 	static inline void
 	error(Error error);
 
@@ -117,7 +191,7 @@ private:
 	/// write one byte to the bus
 	/// @return	`true` if success, `false` if arbitation, too much clock stretching or NACK received
 	static inline bool
-	write(uint8_t data);
+	write(uint8_t data, State next = State::Write);
 
 	/// read one byte from the bus
 	/// @param	ack	acknowledge bit of read operation, `ACK` or `NACK`
@@ -126,14 +200,16 @@ private:
 	read(uint8_t &data, bool ack);
 
 	/// write one bit to the bus
-	/// @return	`true` if success, `false` if slave stretched the clock for too long
-	static inline bool
+	/// @return	ArbitrationLost if another controller drives a 0, BusCondition if a target
+	///			stretches the clock for too long
+	static inline Error
 	writeBit(bool bit);
 
 	// bit operations
 	/// read one bit from the bus
-	/// @return	`true` if success, `false` if slave stretched the clock for too long
-	static inline bool
+	/// @return	BusCondition if SDA changed while SCL was high, or a target stretches the
+	///			clock for too long
+	static inline Error
 	readBit(uint8_t &data);
 
 	// timings
@@ -158,7 +234,24 @@ private:
 	// requested I2C frequency
 	static uint16_t delayTime;
 
-	static inline modm::I2c::Operation nextOperation;
+	/// a fiber runs a transaction in start(), even while it waits for clock stretching
+	static inline bool running{false};
+	/// reset() ended the running transaction: its fiber leaves the bus alone
+	static inline bool aborted{false};
+	/// a NACK now is an address NACK
+	static inline bool addressPhase{false};
+	static inline State state{State::Idle};
+	static inline uint8_t bitFlag{GLITCH};	///< what ended the last failed bit, for the trace
+
+	/// A FAILURE step for MODM_I2C_TRACE, unless the error is a NACK
+	static void
+	failure([[maybe_unused]] Error error)
+	{
+#ifdef MODM_I2C_TRACE
+		if (error != Error::NoError and error != Error::AddressNack and error != Error::DataNack)
+			::MODM_I2C_TRACE(traceInstance(), 0xff, FAILURE, uint8_t(error), 0xff);
+#endif
+	}
 	static modm::I2cTransaction *transactionObject;
 	static Error errorState;
 	static modm::I2c::ConfigurationHandler configuration;

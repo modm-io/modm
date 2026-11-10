@@ -20,14 +20,6 @@
 #endif
 #include <modm/architecture/interface/fiber.hpp>
 
-// debugging for serious dummies
-/*
-#include "../../uart/stm32/usart_2.hpp"
-#define DEBUG_SW_I2C(x) modm::platform::Usart2::write(x)
-/*/
-#define DEBUG_SW_I2C(x)
-//*/
-
 template <class Scl, class Sda>
 uint16_t modm::platform::BitBangI2cMaster<Scl, Sda>::delayTime(3);
 
@@ -83,94 +75,105 @@ template <class Scl, class Sda>
 bool
 modm::platform::BitBangI2cMaster<Scl, Sda>::start(modm::I2cTransaction *transaction, ConfigurationHandler handler)
 {
-	if ((not transactionObject) and transaction)
+	// only one transaction at a time: start() runs it to the end, also from another fiber
+	// that calls start() while this one waits for clock stretching
+	if (running or not transaction) return false;
+	if (not transaction->attaching())
 	{
-		if (not transaction->attaching())
-		{
-			transaction->detaching(modm::I2c::DetachCause::FailedToAttach);
-			// return false; // done at the end of the function
-		}
-		else
-		{
-			// reset error state
-			errorState = Error::NoError;
-			// call the configuration function
-			if (handler and configuration != handler) {
-				configuration = handler;
-				configuration();
-			}
-			// save the transaction object
-			transactionObject = transaction;
-
-			while (true)
-			{
-				// generate (Re-)Start condition
-				if (not startCondition()) return true;
-
-				// ask the transaction object about address and next operation.
-				starting = transactionObject->starting();
-				uint8_t address = (starting.address & 0xfe);
-
-				// set the correct addressing bit
-				DEBUG_SW_I2C((starting.next == modm::I2c::OperationAfterStart::Read) ? 'r': 'w');
-				if (starting.next == modm::I2c::OperationAfterStart::Read)
-					address |= modm::I2c::Read;
-
-				// write address
-				if (not write(address)) return true;
-				// we use address=0 as a hint for error management that write errors are now *data* NACKs
-				starting.address = 0;
-
-				// if the inner loop required a restart, we arrive here again
-				if (nextOperation == modm::I2c::Operation::Restart) {DEBUG_SW_I2C('R');}
-				// what is the first operation after (re-)start?
-				nextOperation = static_cast<modm::I2c::Operation>(starting.next);
-
-				do
-				{
-					switch (nextOperation)
-					{
-						case modm::I2c::Operation::Read:
-							// ask TO about reading
-							reading = transactionObject->reading();
-							while (reading.length > 1)
-							{
-								// continue reading, by sending ACKs
-								if (not read(*reading.buffer++, ACK)) return true;
-								reading.length--;
-							}
-							// read last byte, conclude with NACK
-							if (not read(*reading.buffer, NACK)) return true;
-							// what next?
-							nextOperation = static_cast<modm::I2c::Operation>(reading.next);
-							break;
-
-						case modm::I2c::Operation::Write:
-							// ask TO about writing
-							writing = transactionObject->writing();
-							while (writing.length > 0)
-							{
-								// write the entire buffer
-								if (not write(*writing.buffer++)) return true;
-								writing.length--;
-							}
-							// what next?
-							nextOperation = static_cast<modm::I2c::Operation>(writing.next);
-							break;
-
-						default:
-						case modm::I2c::Operation::Stop:
-							transactionObject->detaching(modm::I2c::DetachCause::NormalStop);
-							transactionObject = nullptr;
-							stopCondition();
-							return true;
-					}
-				} // continue doing this inner loop, until a restart is required
-				while (nextOperation != modm::I2c::Operation::Restart);
-			}
-		}
+		transaction->detaching(modm::I2c::DetachCause::FailedToAttach);
+		return false;
 	}
-	return false;
+	errorState = Error::NoError;
+	if (handler and configuration != handler) {
+		configuration = handler;
+		configuration();
+	}
+	transactionObject = transaction;
+	running = true;
+	run();
+	// reset() from another fiber ended the transaction while this one waited
+	if (aborted) { aborted = false; running = false; }
+	return true;
+}
+
+template <class Scl, class Sda>
+void
+modm::platform::BitBangI2cMaster<Scl, Sda>::run()
+{
+	bool restart = false;
+	while (true)
+	{
+		// every buffer is fetched before its START, so that a refused read ends with a STOP
+		starting = transactionObject->starting();
+		if (aborted) return;
+		const bool isRead = starting.next == modm::I2c::OperationAfterStart::Read;
+		if (isRead)
+		{
+			reading = transactionObject->reading();
+			if (aborted) return;
+			// a read of length 0 cannot NACK its last byte
+			if (reading.length == 0)
+			{
+				step(END, Action::Refuse, State::Idle);
+				if (restart and not stopCondition() and not aborted) clearBus();
+				return finish(Error::Unknown);
+			}
+		}
+		if (not startCondition())
+		{
+			step(BUSY_AT_START, Action::Start, State::Idle);
+			return finish(Error::BusBusy);
+		}
+		step(START, restart ? Action::Restart : Action::Start, State::Address);
+
+		addressPhase = true;
+		if (not write((starting.address & 0xfe) | (isRead ? modm::I2c::Read : 0),
+					  isRead ? State::Read : State::Write)) return;
+		addressPhase = false;
+
+		auto next = static_cast<modm::I2c::Operation>(starting.next);
+		if (isRead)
+		{
+			for (; reading.length > 1; reading.length--)
+				if (not read(*reading.buffer++, ACK)) return;
+			if (not read(*reading.buffer, NACK)) return;
+			next = static_cast<modm::I2c::Operation>(reading.next);
+		}
+		// writes in several buffers without a repeated START
+		while (next == modm::I2c::Operation::Write)
+		{
+			writing = transactionObject->writing();
+			if (aborted) return;
+			for (; writing.length; writing.length--)
+				if (not write(*writing.buffer++)) return;
+			next = static_cast<modm::I2c::Operation>(writing.next);
+		}
+		if (next != modm::I2c::Operation::Restart) break;
+		restart = true;
+	}
+	step(END, Action::Stop, State::Idle);
+	if (not stopCondition())
+	{
+		if (not aborted) clearBus();
+		return finish(Error::BusCondition);
+	}
+	finish(Error::NoError);
+}
+
+template <class Scl, class Sda>
+void
+modm::platform::BitBangI2cMaster<Scl, Sda>::finish(Error error)
+{
+	// reset() has already detached the transaction
+	if (aborted) return;
+	errorState = error;
+	failure(error);
+	modm::I2cTransaction *transaction = transactionObject;
+	transactionObject = nullptr;
+	running = false;
+	// may call start() again
+	transaction->detaching((error == Error::NoError) ?
+			modm::I2c::DetachCause::NormalStop : modm::I2c::DetachCause::ErrorCondition);
 }
 
 // ----------------------------------------------------------------------------
@@ -178,13 +181,19 @@ template <class Scl, class Sda>
 void
 modm::platform::BitBangI2cMaster<Scl, Sda>::reset()
 {
-	DEBUG_SW_I2C('E');
-	DEBUG_SW_I2C('0' + static_cast<uint8_t>(Error::SoftwareReset));
+	// the fiber that runs the transaction stops at its next step and leaves the bus alone
+	if (running) aborted = true;
 	errorState = Error::SoftwareReset;
-	if (transactionObject) transactionObject->detaching(DetachCause::ErrorCondition);
-	transactionObject = nullptr;
-	SCL::set();
+	step(DEADLINE, Action::Abort, State::Idle);
+	failure(Error::SoftwareReset);
+	if (modm::I2cTransaction *transaction = transactionObject)
+	{
+		transactionObject = nullptr;
+		transaction->detaching(DetachCause::ErrorCondition);
+	}
 	SDA::set();
+	// a device may still stretch the clock, the bus clear needs SCL high
+	sclSetAndWait();
 	clearBus();
 }
 
@@ -202,29 +211,17 @@ template <class Scl, class Sda>
 void
 modm::platform::BitBangI2cMaster<Scl, Sda>::error(Error error)
 {
-	DEBUG_SW_I2C('E');
-	DEBUG_SW_I2C('0' + static_cast<uint8_t>(error));
+	// reset() has already detached the transaction and owns the bus
+	if (aborted) return;
 	delay2();
 	SCL::reset();
 	SDA::reset();
 	delay2();
 	// attempt a stop condition, if it fails a device holds the bus
-	if (not stopCondition()) {
-		SCL::set();
-		SDA::set();
-		clearBus();
-		errorState = error;
-		return;
-	}
-
-	// release both lines
+	if (not stopCondition() and not aborted) clearBus();
 	SCL::set();
 	SDA::set();
-	// save error state
-	errorState = error;
-
-	if (transactionObject) transactionObject->detaching(DetachCause::ErrorCondition);
-	transactionObject = nullptr;
+	finish(error);
 }
 
 // ----------------------------------------------------------------------------
@@ -233,29 +230,15 @@ template <class Scl, class Sda>
 bool
 modm::platform::BitBangI2cMaster<Scl, Sda>::startCondition()
 {
-	DEBUG_SW_I2C('\n');
-	DEBUG_SW_I2C('s');
 	// release data line
 	SDA::set();
 	delay4();
-	if(SDA::read() == modm::Gpio::Low)
+	// a device may still hold the data line, or the clock line
+	if (SDA::read() == modm::Gpio::Low or not sclSetAndWait())
 	{
-		// could not release data line, a device may still hold it
+		if (aborted) return false;
 		SCL::set();
 		clearBus();
-		errorState = Error::BusBusy;
-		if (transactionObject) transactionObject->detaching(DetachCause::ErrorCondition);
-		transactionObject = nullptr;
-		return false;
-	}
-	// release the clock line
-	if (not sclSetAndWait())
-	{
-		// could not release clock line
-		clearBus();
-		errorState = Error::BusBusy;
-		if (transactionObject) transactionObject->detaching(DetachCause::ErrorCondition);
-		transactionObject = nullptr;
 		return false;
 	}
 	// now both pins are High, ready for start
@@ -275,34 +258,18 @@ template <class Scl, class Sda>
 bool
 modm::platform::BitBangI2cMaster<Scl, Sda>::stopCondition()
 {
-	DEBUG_SW_I2C('S');
 	// pull down both lines
 	SCL::reset();
 	SDA::reset();
 
 	// first release clock line
-	if (not sclSetAndWait())
-	{
-		// could not release clock line
-		errorState = Error::BusCondition;
-		if (transactionObject) transactionObject->detaching(DetachCause::ErrorCondition);
-		transactionObject = nullptr;
-		return false;
-	}
+	if (not sclSetAndWait()) return false;
 	delay2();
 	// release data line
 	SDA::set();
 	delay4();
 
-	if (SDA::read() == modm::Gpio::Low)
-	{
-		// could not release data line
-		errorState = Error::BusCondition;
-		if (transactionObject) transactionObject->detaching(DetachCause::ErrorCondition);
-		transactionObject = nullptr;
-		return false;
-	}
-	return true;
+	return SDA::read() == modm::Gpio::High;
 }
 
 template <class Scl, class Sda>
@@ -320,25 +287,27 @@ modm::platform::BitBangI2cMaster<Scl, Sda>::sclSetAndWait()
 		delay4();
 	}
 	// long clock stretching yields until the timeout
-	return modm::this_fiber::poll_for(stretchTimeout, []{ return SCL::read() == modm::Gpio::High; });
+	const bool released = modm::this_fiber::poll_for(stretchTimeout, []{ return SCL::read() == modm::Gpio::High; });
+	return released and not (running and aborted);
 }
 
 // ----------------------------------------------------------------------------
 // MARK: - byte operations
 template <class Scl, class Sda>
 bool
-modm::platform::BitBangI2cMaster<Scl, Sda>::write(uint8_t data)
+modm::platform::BitBangI2cMaster<Scl, Sda>::write(uint8_t data, State next)
 {
 	modm::this_fiber::yield();
+	if (aborted) return false;
+	const Action action = addressPhase ? Action::Address : Action::Write;
 
-	DEBUG_SW_I2C('W');
 	// shift through all 8 bits
 	for(uint_fast8_t i = 0; i < 8; ++i)
 	{
-		if (not writeBit(data & 0x80))
+		if (const Error e = writeBit(data & 0x80); e != Error::NoError)
 		{
-			// arbitration error
-			error(Error::ArbitrationLost);
+			step(bitFlag, action, State::Idle);
+			error(e);
 			return false;
 		}
 		data <<= 1;
@@ -352,22 +321,22 @@ modm::platform::BitBangI2cMaster<Scl, Sda>::write(uint8_t data)
 	if (not sclSetAndWait())
 	{
 		// the slave is allowed to stretch the clock, but not unreasonably long!
+		step(STRETCH, action, State::Idle);
 		error(Error::BusCondition);
 		return false;
 	}
 	// sample the data line for acknowledge bit
 	if(SDA::read() == modm::Gpio::High)
 	{
-		DEBUG_SW_I2C('n');
 		// we have not received an ACK
-		// depending on context, this could be AddressNack or DataNack
-		error(starting.address ? Error::AddressNack : Error::DataNack);
+		step(NACKED, action, State::Idle);
+		error(addressPhase ? Error::AddressNack : Error::DataNack);
 		return false;
 	}
-	DEBUG_SW_I2C('a');
 	delay2();
 	// falling clock edge
 	SCL::reset();
+	step(ACKED, action, next);
 
 	return true;
 }
@@ -377,8 +346,8 @@ bool
 modm::platform::BitBangI2cMaster<Scl, Sda>::read(uint8_t &data, bool ack)
 {
 	modm::this_fiber::yield();
+	if (aborted) return false;
 
-	DEBUG_SW_I2C('R');
 	// release data line
 	SDA::set();
 
@@ -387,72 +356,67 @@ modm::platform::BitBangI2cMaster<Scl, Sda>::read(uint8_t &data, bool ack)
 	for(uint_fast8_t i = 0; i < 8; ++i)
 	{
 		data <<= 1;
-		if (not readBit(data))
+		if (const Error e = readBit(data); e != Error::NoError)
 		{
-			// slaves don't stretch the clock here, so SDA changed while SCL was high
-			error(Error::BusCondition);
+			step(bitFlag, Action::Read, State::Idle);
+			error(e);
 			return false;
 		}
 	}
 
-	DEBUG_SW_I2C(ack ? 'A' : 'N');
 	// generate acknowledge bit
-	if (not writeBit(not ack))
+	if (const Error e = writeBit(not ack); e != Error::NoError)
 	{
-		// arbitration too
-		error(Error::ArbitrationLost);
+		step(bitFlag, Action::Read, State::Idle);
+		error(e);
 		return false;
 	}
 	// release data line
 	SDA::set();
+	step(ack ? ACKED : NACKED, Action::Read, State::Read);
 	return true;
 }
 
 // ----------------------------------------------------------------------------
 // MARK: - bit operations
 template <class Scl, class Sda>
-bool
+modm::I2cMaster::Error
 modm::platform::BitBangI2cMaster<Scl, Sda>::writeBit(bool bit)
 {
 	// set the data pin
 	SDA::set(bit);
 	delay2();
-
-	// rising clock edge, the slave samples the data line now
-	if ((SDA::read() == bit) && sclSetAndWait())
-	{
-		delay2();
-		// another master or a glitch changed a line while SCL was high
-		const bool stable = (SDA::read() == bit) and SCL::read();
-		// falling clock edge
-		SCL::reset();
-		return stable;
-	}
-	// too much clock stretching
-	return false;
+	// another controller drives a 0
+	if (SDA::read() != bit) { bitFlag = LOST; return Error::ArbitrationLost; }
+	// rising clock edge, the target samples the data line now
+	if (not sclSetAndWait()) { bitFlag = STRETCH; return Error::BusCondition; }
+	delay2();
+	// another controller or a glitch changed a line while SCL was high
+	const bool sdaStable = SDA::read() == bit;
+	const bool stable = sdaStable and SCL::read();
+	// falling clock edge
+	SCL::reset();
+	if (not stable) bitFlag = sdaStable ? GLITCH : LOST;
+	return stable ? Error::NoError : Error::ArbitrationLost;
 }
 
 template <class Scl, class Sda>
-bool
+modm::I2cMaster::Error
 modm::platform::BitBangI2cMaster<Scl, Sda>::readBit(uint8_t &data)
 {
-	// slave sets data line
+	// target sets data line
 	delay2();
-	// rising clock edge, the master samples the data line now
-	if (sclSetAndWait())
-	{
-		// copy bit into data
-		const bool bit = SDA::read();
-		if (bit) data |= 0x01;
-
-		delay2();
-		// a change while SCL is high is a misplaced start or stop condition,
-		// a low SCL a glitch that clocked the device
-		const bool stable = (SDA::read() == bit) and SCL::read();
-		// falling clock edge
-		SCL::reset();
-		return stable;
-	}
-	// too much clock stretching
-	return false;
+	// rising clock edge, the controller samples the data line now
+	if (not sclSetAndWait()) { bitFlag = STRETCH; return Error::BusCondition; }
+	// copy bit into data
+	const bool bit = SDA::read();
+	if (bit) data |= 0x01;
+	delay2();
+	// a change while SCL is high is a misplaced start or stop condition,
+	// a low SCL a glitch that clocked the device
+	const bool stable = (SDA::read() == bit) and SCL::read();
+	// falling clock edge
+	SCL::reset();
+	if (not stable) bitFlag = GLITCH;
+	return stable ? Error::NoError : Error::BusCondition;
 }
