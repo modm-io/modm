@@ -14,6 +14,7 @@
 #include "shared.hpp"
 
 #include <modm/processing/timer.hpp>
+#include <modm/io/iodevice_wrapper.hpp>
 #include <modm-test/mock/clock.hpp>
 
 using namespace std::chrono_literals;
@@ -431,6 +432,47 @@ FiberTest::testPeriodicTimerWait()
 		TEST_ASSERT_EQUALS(state++, 10u);
 	});
 	modm::fiber::Scheduler::run();
+}
+
+struct BufferDevice
+{
+	static inline char buffer[32];
+	static inline uint8_t size, space;
+	static bool write(uint8_t c) { if (not space) return false; space--; buffer[size++] = c; return true; }
+	static bool isWriteFinished() { return true; }
+	static bool read(uint8_t&) { return false; }
+};
+
+void
+FiberTest::testIODeviceLine()
+{
+	modm::IODeviceWrapper<BufferDevice, modm::IOBuffer::BlockIfFull> device;
+	BufferDevice::size = 0;
+	BufferDevice::space = 1;
+	modm::fiber::Task fiber1(stack1, [&]
+	{
+		device.write('a');
+		device.write('b'); // blocks on the full device and keeps the line
+		device.write('\n');
+		device.write('c');
+		modm::this_fiber::yield(); // gives up the line
+		device.write('d');
+		device.write('\n');
+		device.write('e'); // returns in the middle of the line
+	});
+	modm::fiber::Task fiber2(stack2, [&]
+	{
+		BufferDevice::space = sizeof(BufferDevice::buffer) - 1;
+		device.write('x'); // waits for "ab\n", ends "c" with a newline
+		device.write('\n');
+		device.write('y');
+		device.flush(); // in the middle of its own line
+		device.write('\n');
+	});
+	modm::fiber::Scheduler::run();
+	device.write('z'); // ends "e" with a newline
+	TEST_ASSERT_EQUALS(BufferDevice::size, 14u);
+	TEST_ASSERT_EQUALS_ARRAY(BufferDevice::buffer, "ab\nc\nx\ny\nd\ne\nz", 14);
 }
 
 void

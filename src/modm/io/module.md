@@ -51,7 +51,10 @@ deadlock when called inside an interrupt!
 
 If compiled with the `modm:processing:fiber` module, the blocking behavior
 allows the fiber to yield while waiting for the device. To prevent interlaced
-output from different fibers, the `write(char)` function is protected by a
-mutex that releases when a newline character `\n` is written. The `flush()`
-function is also mutex protected to allow one fiber to reliably flush the
-stream without having other fibers push data into the device.
+output from different fibers, a line belongs to the fiber that writes it until
+the newline character `\n`, and other fibers wait while this fiber waits for
+the device. If the fiber yields for another reason in the middle of its line,
+for example it sleeps or returns, the next fiber that writes first ends this
+line with a newline. The `flush()` function also waits for a fiber that waits
+for the device, and allows one fiber to reliably flush the stream without
+having other fibers push data into the device.

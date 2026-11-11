@@ -35,6 +35,55 @@ IOBuffer
 	BlockIfFull
 };
 
+%% if with_fiber
+/// @cond
+namespace detail
+{
+/// Keeps the lines of fibers apart without buffering them: the fiber that
+/// writes a line owns it until its newline, but only blocks other fibers while
+/// it waits for the full device. If it yields anywhere else in the middle of
+/// its line (it sleeps, waits, or returned), the next fiber ends that line with
+/// a newline and writes its own.
+struct IODeviceLine
+{
+	fiber::id owner{fiber::invalid_id};
+	bool busy{};
+
+	void
+	put(char c, auto &&write)
+	{
+		busy = true;
+		this_fiber::poll([&]{ return write(uint8_t(c)); });
+		busy = false;
+	}
+
+	void
+	write(char c, auto &&write)
+	{
+		if (const auto me = this_fiber::get_id(); owner != me)
+		{
+			this_fiber::poll([&]{ return not busy; });
+			const bool cut = (owner != fiber::invalid_id and c != '\n');
+			owner = me;
+			if (cut) put('\n', write);
+		}
+		put(c, write);
+		if (c == '\n') owner = fiber::invalid_id;
+	}
+
+	void
+	flush(auto &&finished)
+	{
+		this_fiber::poll([&]{ return not busy; });
+		busy = true;
+		this_fiber::poll(finished);
+		busy = false;
+	}
+};
+}
+/// @endcond
+
+%% endif
 /**
  * @ingroup		modm_io
  * @tparam		Device		Peripheral which should be wrapped
@@ -44,7 +93,7 @@ template< class Device, IOBuffer behavior >
 class IODeviceWrapper : public IODevice
 {
 %% if with_fiber
-	static inline fiber::id id{fiber::invalid_id};
+	static inline detail::IODeviceLine line;
 %% endif
 public:
 	IODeviceWrapper() = default;
@@ -55,16 +104,7 @@ public:
 	{
 		if constexpr (behavior == IOBuffer::BlockIfFull)
 %% if with_fiber
-		{
-			// lock this device to one fiber until a newline is received
-			const auto me = this_fiber::get_id();
-			this_fiber::poll([&]{ return id == fiber::invalid_id or id == me; });
-			id = me;
-
-			this_fiber::poll([&]{ return Device::write(uint8_t(c)); });
-
-			if (c == '\n') id = fiber::invalid_id;
-		}
+			line.write(c, [](uint8_t byte) { return Device::write(byte); });
 %% else
 			while (not Device::write(uint8_t(c))) ;
 %% endif
@@ -75,13 +115,7 @@ public:
 	flush() override
 	{
 %% if with_fiber
-		const auto me = this_fiber::get_id();
-		this_fiber::poll([&]{ return id == fiber::invalid_id; });
-		id = me;
-
-		this_fiber::poll([&]{ return Device::isWriteFinished(); });
-
-		id = fiber::invalid_id;
+		line.flush([&]{ return Device::isWriteFinished(); });
 %% else
 		Device::flushWriteBuffer();
 %% endif
@@ -102,7 +136,7 @@ template< class Device, IOBuffer behavior >
 class IODeviceObjectWrapper : public IODevice
 {
 %% if with_fiber
-	fiber::id id{fiber::invalid_id};
+	detail::IODeviceLine line;
 %% endif
 	Device &device;
 public:
@@ -114,16 +148,7 @@ public:
 	{
 		if constexpr (behavior == IOBuffer::BlockIfFull)
 %% if with_fiber
-		{
-			// lock this device to one fiber until a newline is received
-			const auto me = this_fiber::get_id();
-			this_fiber::poll([&]{ return id == fiber::invalid_id or id == me; });
-			id = me;
-
-			this_fiber::poll([&]{ return device.write(uint8_t(c)); });
-
-			if (c == '\n') id = fiber::invalid_id;
-		}
+			line.write(c, [&](uint8_t byte) { return device.write(byte); });
 %% else
 			while (not device.write(uint8_t(c))) ;
 %% endif
@@ -134,13 +159,7 @@ public:
 	flush() override
 	{
 %% if with_fiber
-		const auto me = this_fiber::get_id();
-		this_fiber::poll([&]{ return id == fiber::invalid_id; });
-		id = me;
-
-		this_fiber::poll([&]{ return device.isWriteFinished(); });
-
-		id = fiber::invalid_id;
+		line.flush([&]{ return device.isWriteFinished(); });
 %% else
 		device.flushWriteBuffer();
 %% endif

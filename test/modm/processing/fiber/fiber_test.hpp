@@ -57,5 +57,8 @@ public:
 	testPeriodicTimerWait();
 
 	void
+	testIODeviceLine();
+
+	void
 	testStackUsage();
 };

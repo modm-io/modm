@@ -19,6 +19,7 @@ def init(module):
 def prepare(module, options):
     module.depends(
         "modm:architecture",
+        "modm:io",
         "modm:math:utils",
         "modm:math:filter",
         "modm:processing:fiber",
