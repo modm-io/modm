@@ -123,7 +123,7 @@ def build(env):
             nper = "RTCAPB"
         # Fix USBOTG OTG
         if t.family == "u5" and per == "OTG":
-            per = "Usbotgfs"
+            per = "Usbotghs" if "Usbotghs" in all_peripherals else "Usbotgfs"
         if ("Usbotgfs" in all_peripherals or "Usbotghs" in all_peripherals) and per.startswith("OTG"):
             if per == "OTGH": per = "OTGHS"
             per = "USB"+per

@@ -38,6 +38,10 @@ public:
 #endif
 %% elif target.family == "u3"
 		PWR->SVMCR |= PWR_SVMCR_UVMEN;
+%% elif target.family == "u5" and is_phyc
+		// VDDUSB is enabled at startup, the OTG_HS also needs its own supply and booster
+		PWR->VOSR |= PWR_VOSR_USBPWREN | PWR_VOSR_USBBOOSTEN;
+		for (uint32_t t = 0x10000; not (PWR->VOSR & PWR_VOSR_USBBOOSTRDY) and t; t--) ;
 %% elif target.family == "h5" and target.name != "03"
 		PWR->USBSCR |= PWR_USBSCR_USB33DEN | PWR_USBSCR_USB33SV;
 %% elif target.family == "h7" and target.name[0] in ["r", "s"]
@@ -52,12 +56,33 @@ public:
 %% if is_phyc and target.family == "h7" and target.name[0] in ["r", "s"]
 		RCC->AHB1ENR |= RCC_AHB1ENR_USBPHYCEN; __DSB();
 %% elif is_phyc
+%% if target.family != "u5"
 		Rcc::enable<Peripheral::Usbotghsulpi>();
+%% endif
 #ifdef RCC_APB2ENR_OTGPHYCEN
 		RCC->APB2ENR |= RCC_APB2ENR_OTGPHYCEN; __DSB();
 #elif defined RCC_AHB2ENR1_USBPHYCEN
 		RCC->AHB2ENR1 |= RCC_AHB2ENR1_USBPHYCEN; __DSB();
 #endif
+%% if target.family == "u5"
+		// The PHY needs to know the frequency of its reference clock
+		constexpr uint32_t clksel = []
+		{
+			switch (SystemClock::UsbPhy)
+			{
+				case 16_MHz: return 0b0011;
+				case 19'200'000: return 0b1000;
+				case 20_MHz: return 0b1001;
+				case 24_MHz: return 0b1010;
+				case 26_MHz: return 0b1110;
+				case 32_MHz: return 0b1011;
+				default: return 0;
+			}
+		}();
+		static_assert(clksel, "{{ name }} PHY reference clock must be 16, 19.2, 20, 24, 26 or 32 MHz!");
+		RCC->APB3ENR |= RCC_APB3ENR_SYSCFGEN; __DSB();
+		SYSCFG->OTGHSPHYCR = (clksel << SYSCFG_OTGHSPHYCR_CLKSEL_Pos) | SYSCFG_OTGHSPHYCR_EN;
+%% endif
 %% endif
 %% if is_remap
 		SYSCFG->CFGR1 |= SYSCFG_CFGR1_USB_IT_RMP;
