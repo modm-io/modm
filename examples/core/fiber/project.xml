@@ -10,6 +10,7 @@
   <!-- <extends>modm:nucleo-h743zi</extends> -->
   <!-- <extends>modm:nucleo-l552ze-q</extends> -->
   <!-- <extends>modm:nucleo-u575zi-q</extends> -->
+  <!-- <extends>modm:nucleo-u5a5zj-q</extends> -->
   <!-- <extends>modm:samv71-xplained-ultra</extends> -->
   <!-- <extends>modm:hosted</extends> -->
   <modules>

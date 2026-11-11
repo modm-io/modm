@@ -5,6 +5,7 @@
   <!-- <extends>modm:nucleo-f103rb</extends> -->
   <!-- <extends>modm:samv71-xplained-ultra</extends> -->
   <!-- <extends>modm:nucleo-u575zi-q</extends> -->
+  <!-- <extends>modm:nucleo-u5a5zj-q</extends> -->
   <options>
     <option name="modm:nanopb:sources">protocol/simple.proto,protocol/complex.proto</option>
   </options>

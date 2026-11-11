@@ -69,6 +69,7 @@
   <!-- <extends>modm:nucleo-u083rc</extends> -->
   <!-- <extends>modm:nucleo-u385rg-q</extends> -->
   <!-- <extends>modm:nucleo-u575zi-q</extends> -->
+  <!-- <extends>modm:nucleo-u5a5zj-q</extends> -->
   <!-- <extends>modm:olimexino-stm32</extends> -->
   <!-- <extends>modm:rp-pico</extends> -->
   <!-- <extends>modm:samd21-xplained-pro</extends> -->

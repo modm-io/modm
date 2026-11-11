@@ -1,5 +1,6 @@
 <library>
   <extends>modm:nucleo-u575zi-q</extends>
+  <!-- <extends>modm:nucleo-u5a5zj-q</extends> -->
   <!-- <extends>modm:nucleo-g071rb</extends> -->
   <!-- <extends>modm:nucleo-l476rg</extends> -->
   <!-- <extends>modm:nucleo-l4r5zi</extends> -->

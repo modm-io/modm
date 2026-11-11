@@ -24,6 +24,7 @@
   <!-- <extends>modm:nucleo-h563zi</extends> -->
   <!-- <extends>modm:nucleo-u385rg-q</extends> -->
   <!-- <extends>modm:nucleo-u575zi-q</extends> -->
+  <!-- <extends>modm:nucleo-u5a5zj-q</extends> -->
   <!-- <extends>modm:nucleo-u083rc</extends> -->
   <options>
     <option name="modm:driver:logic_analyzer:channels">2</option>

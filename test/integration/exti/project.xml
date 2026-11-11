@@ -11,6 +11,7 @@
   <!-- <extends>modm:nucleo-u083rc</extends> -->
   <!-- <extends>modm:nucleo-u385rg-q</extends> -->
   <!-- <extends>modm:nucleo-u575zi-q</extends> -->
+  <!-- <extends>modm:nucleo-u5a5zj-q</extends> -->
   <options>
     <option name="modm:io:with_printf">true</option>
   </options>

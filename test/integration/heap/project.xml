@@ -6,6 +6,7 @@
   <!-- <extends>modm:nucleo-l4r5zi</extends> -->
   <!-- <extends>modm:nucleo-h723zg</extends> -->
   <!-- <extends>modm:nucleo-u575zi-q</extends> -->
+  <!-- <extends>modm:nucleo-u5a5zj-q</extends> -->
   <!-- <extends>modm:disco-f469ni</extends> -->
   <!-- CI: limit 300 -->
   <options>

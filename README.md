@@ -907,29 +907,30 @@ We have out-of-box support for many development boards including documentation.
 </tr><tr>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-u385rg-q">NUCLEO-U385RG-Q</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-u575zi-q">NUCLEO-U575ZI-Q</a></td>
+<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-u5a5zj-q">NUCLEO-U5A5ZJ-Q</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-olimexino-stm32">OLIMEXINO-STM32</a></td>
-<td align="center"><a href="https://modm.io/reference/config/modm-rp-pico">Raspberry Pi Pico</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/config/modm-rp-pico">Raspberry Pi Pico</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-samd21-mini">SAMD21-MINI</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-samd21-xplained-pro">SAMD21-XPLAINED-PRO</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-same54-xplained-pro">SAME54-XPLAINED-PRO</a></td>
-<td align="center"><a href="https://modm.io/reference/config/modm-same70-xplained">SAME70-XPLAINED</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/config/modm-same70-xplained">SAME70-XPLAINED</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-samg55-xplained-pro">SAMG55-XPLAINED-PRO</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-samv71-xplained-ultra">SAMV71-XPLAINED-ULTRA</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-srxe">Smart Response XE</a></td>
-<td align="center"><a href="https://modm.io/reference/config/modm-stm32_f4ve">STM32-F4VE</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/config/modm-stm32_f4ve">STM32-F4VE</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-stm32f030_demo">STM32F030-DEMO</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-thingplus-rp2040">THINGPLUS-RP2040</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-weact-c011f6">WEACT-C011F6</a></td>
-<td align="center"><a href="https://modm.io/reference/config/modm-weact-g0b1cb">WEACT-G0B1CB</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/config/modm-weact-g0b1cb">WEACT-G0B1CB</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-weact-h503cb">WEACT-H503CB</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-weact-h523ce">WEACT-H523CE</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-weact-h562rg">WEACT-H562RG</a></td>
-<td align="center"><a href="https://modm.io/reference/config/modm-weact-h7r3z8">WEACT-H7R3Z8</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/config/modm-weact-h7r3z8">WEACT-H7R3Z8</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-weact-u585ci">WEACT-U585CI</a></td>
 </tr>
 </table>
