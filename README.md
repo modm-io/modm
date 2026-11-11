@@ -927,14 +927,15 @@ We have out-of-box support for many development boards including documentation.
 </tr><tr>
 <td align="center"><a href="https://modm.io/reference/config/modm-thingplus-rp2040">THINGPLUS-RP2040</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-weact-c011f6">WEACT-C011F6</a></td>
+<td align="center"><a href="https://modm.io/reference/config/modm-weact-g030f6">WEACT-G030F6</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-weact-g0b1cb">WEACT-G0B1CB</a></td>
-<td align="center"><a href="https://modm.io/reference/config/modm-weact-h503cb">WEACT-H503CB</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/config/modm-weact-h503cb">WEACT-H503CB</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-weact-h523ce">WEACT-H523CE</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-weact-h562rg">WEACT-H562RG</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-weact-h7r3z8">WEACT-H7R3Z8</a></td>
-<td align="center"><a href="https://modm.io/reference/config/modm-weact-u585ci">WEACT-U585CI</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/config/modm-weact-u585ci">WEACT-U585CI</a></td>
 </tr>
 </table>
 <!--/bsptable-->

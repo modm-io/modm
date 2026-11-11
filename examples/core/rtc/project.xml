@@ -16,6 +16,7 @@
   <extends>modm:nucleo-l432kc</extends>
   <!-- <extends>modm:nucleo-l4r5zi</extends> -->
   <!-- <extends>modm:weact-c011f6</extends> -->
+  <!-- <extends>modm:weact-g030f6</extends> -->
 
   <!-- <extends>modm:disco-f303vc</extends> -->
   <!-- <extends>modm:nucleo-f303k8</extends> -->

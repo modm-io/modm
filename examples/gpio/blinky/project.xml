@@ -82,6 +82,7 @@
   <!-- <extends>modm:srxe</extends> -->
   <!-- <extends>modm:stm32f030_demo</extends> -->
   <!-- <extends>modm:thingplus-rp2040</extends> -->
+  <!-- <extends>modm:weact-g030f6</extends> -->
   <!-- <extends>modm:weact-g0b1cb</extends> -->
   <!-- <extends>modm:weact-h503cb</extends> -->
   <!-- <extends>modm:weact-h523ce</extends> -->
@@ -104,7 +105,7 @@
     <module>modm:build:scons</module>
   </modules>
   <collectors>
-    <!-- Required for modm:weact-g0b1cb, modm:weact-h7r3z8, modm:weact-u585ci -->
+    <!-- Required for modm:weact-g030f6, modm:weact-g0b1cb, modm:weact-h7r3z8, modm:weact-u585ci -->
     <!-- <collect name="modm:build:openocd.source">interface/stlink.cfg</collect> -->
     <!-- Required for modm:weact-h503cb, modm:weact-h523ce, modm:weact-h562rg -->
     <!-- <collect name="modm:build:openocd.source">interface/stlink-dap.cfg</collect> -->
