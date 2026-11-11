@@ -3,6 +3,7 @@
   <!-- <extends>modm:nucleo-f042k6</extends> -->
   <!-- <extends>modm:nucleo-f429zi</extends> -->
   <!-- <extends>modm:nucleo-h7a3zi-q</extends> -->
+  <!-- <extends>modm:nucleo-h7s3l8</extends> -->
   <!-- <extends>modm:nucleo-l152re</extends> -->
   <!-- <extends>modm:rp-pico</extends> -->
   <options>

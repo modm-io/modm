@@ -1,5 +1,6 @@
 <library>
   <extends>modm:nucleo-h563zi</extends>
+  <!-- <extends>modm:nucleo-h7s3l8</extends> -->
   <!-- <extends>modm:weact-h7r3z8</extends> -->
   <options>
     <option name="modm:build:build.path">../../../build/core/dma_gpdma</option>

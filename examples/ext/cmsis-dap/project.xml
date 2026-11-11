@@ -5,6 +5,7 @@
   <!-- <extends>modm:nucleo-h723zg</extends> -->
   <!-- <extends>modm:nucleo-h743zi</extends> -->
   <!-- <extends>modm:nucleo-h7a3zi-q</extends> -->
+  <!-- <extends>modm:nucleo-h7s3l8</extends> -->
   <!-- <extends>modm:nucleo-u575zi-q</extends> -->
   <!-- <extends>modm:nucleo-u5a5zj-q</extends> -->
   <options>
@@ -12,6 +13,8 @@
 
     <!-- Required for modm:nucleo-h723zg, modm:nucleo-h7a3zi-q -->
     <!-- <option name="modm:tinyusb:max-speed">full</option> -->
+    <!-- Required for modm:nucleo-h7s3l8 -->
+    <!-- <option name="modm:tinyusb:device:port">hs</option> -->
   </options>
   <modules>
     <module>modm:build:scons</module>

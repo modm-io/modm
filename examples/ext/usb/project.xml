@@ -32,6 +32,7 @@
   <!-- <extends>modm:weact-h523ce</extends> -->
   <!-- <extends>modm:weact-h562rg</extends> -->
   <!-- <extends>modm:weact-h7r3z8</extends> -->
+  <!-- <extends>modm:nucleo-h7s3l8</extends> -->
   <!-- <extends>modm:nucleo-u385rg-q</extends> -->
   <!-- <extends>modm:nrf5340-dk</extends> -->
   <!-- <extends>modm:nrf52840-dk</extends> -->
@@ -47,7 +48,7 @@
     <!-- <option name="modm:board:weact-h503cb:with_rtt">yes</option> -->
     <!-- <option name="modm:tinyusb:config">device.cdc,device.midi</option> -->
 
-    <!-- Required for modm:disco-f429zi, optional for modm:weact-h7r3z8 (HS connector) -->
+    <!-- Required for modm:disco-f429zi, modm:nucleo-h7s3l8, optional for modm:weact-h7r3z8 (HS connector) -->
     <!-- <option name="modm:tinyusb:device:port">hs</option> -->
 
     <!-- Required for modm:nucleo-h723zg, modm:nucleo-h7a3zi-q, modm:disco-f429zi -->
