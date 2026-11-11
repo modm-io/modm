@@ -48,5 +48,7 @@ main(void)
 	modm::fiber::Scheduler::run();
 	MODM_LOG_INFO << "End" << modm::endl;
 
+	// returning from main() reboots before the UART buffer is sent
+	MODM_LOG_INFO.flush();
 	return 0;
 }
