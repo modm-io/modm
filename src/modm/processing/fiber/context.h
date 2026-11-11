@@ -93,7 +93,8 @@ modm_context_stack_watermark(modm_context_t *ctx);
 
 /**
  * Returns the stack usage by searching from the bottom of the stack for the
- * watermark level. You may call this function at any point after calling
+ * watermark level, comparing only every 8th word until the first used one.
+ * You may call this function at any point after calling
  * `modm_context_stack_watermark()`.
  */
 size_t

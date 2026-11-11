@@ -329,7 +329,9 @@ size_t used = fiber.stack_usage();
 ```
 
 Note that stack usage measurement through watermarking can be inaccurate if the
-registers contain the watermark value.
+registers contain the watermark value. To be fast, the search compares only
+every 8th word from the bottom, so it can miss used stack that is narrower than
+8 words and lies between two unused areas.
 
 
 ## Stack Overflow

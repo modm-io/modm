@@ -432,3 +432,35 @@ FiberTest::testPeriodicTimerWait()
 	});
 	modm::fiber::Scheduler::run();
 }
+
+void
+FiberTest::testStackUsage()
+{
+	constexpr size_t words = 128;
+	alignas(modm::fiber::StackAlignment) static uintptr_t stack[words];
+	const auto usage = [&](size_t word) { return (words - word) * sizeof(uintptr_t); };
+	modm_context_t ctx;
+	modm_context_init(&ctx, stack, stack + words, 0, 0);
+	modm_context_stack_watermark(&ctx);
+	const uintptr_t watermark = stack[0];
+	// only the register file is used
+	const size_t registers = modm_context_stack_usage(&ctx);
+	TEST_ASSERT_TRUE(0 < registers and registers < usage(words / 2));
+
+	for (size_t word = 50; word < words; word++) stack[word] = 1;
+	TEST_ASSERT_EQUALS(modm_context_stack_usage(&ctx), usage(50));
+
+	// a binary search lands on one of these unused words
+	for (size_t word = 20; word < words; word++)
+		stack[word] = (word % 32) ? 1 : watermark;
+	TEST_ASSERT_EQUALS(modm_context_stack_usage(&ctx), usage(20));
+
+	// or in this unused buffer above a few used words
+	for (size_t word = 10; word < 100; word++)
+		stack[word] = (30 <= word and word < 34) ? 1 : watermark;
+	TEST_ASSERT_EQUALS(modm_context_stack_usage(&ctx), usage(30));
+
+	// the bottom word is also the stack overflow check
+	stack[0] = 1;
+	TEST_ASSERT_EQUALS(modm_context_stack_usage(&ctx), usage(0));
+}

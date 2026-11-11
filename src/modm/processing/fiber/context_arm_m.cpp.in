@@ -133,9 +133,19 @@ modm_context_stack_watermark(modm_context_t *ctx)
 size_t
 modm_context_stack_usage(const modm_context_t *ctx)
 {
-	for (auto *word = ctx->bottom; word < ctx->top; word++)
+	// Only every 8th word is compared from the bottom up, then every word from
+	// the last unused 8th word on. The used stack contains words that were never
+	// written (alignment padding, unused locals and buffers), so a binary search
+	// would often stop too high. This misses only used stack that is narrower
+	// than 8 words and lies between two compared words.
+	constexpr size_t Stride{8};
+	auto *const bottom = ctx->bottom, *const top = ctx->top;
+	auto *word = bottom;
+	while (size_t(top - word) > Stride and StackWatermark == *word) word += Stride;
+	if (word != bottom) word -= Stride - 1;
+	for (; word < top; word++)
 		if (StackWatermark != *word)
-			return (ctx->top - word) * StackSizeWord;
+			return (top - word) * StackSizeWord;
 	return 0;
 }
 

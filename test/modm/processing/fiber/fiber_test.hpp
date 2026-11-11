@@ -55,4 +55,7 @@ public:
 
 	void
 	testPeriodicTimerWait();
+
+	void
+	testStackUsage();
 };
