@@ -1,5 +1,6 @@
 <library>
   <extends>modm:nucleo-l476rg</extends>
+  <!-- <extends>modm:nucleo-l4r5zi</extends> -->
   <!-- <extends>modm:hosted</extends> -->
   <!-- <extends>modm:arduino-nano</extends> -->
   <!-- <extends>modm:nrf51422-dk</extends> -->

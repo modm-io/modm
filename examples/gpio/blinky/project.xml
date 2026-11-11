@@ -64,6 +64,7 @@
   <!-- <extends>modm:nucleo-l432kc</extends> -->
   <!-- <extends>modm:nucleo-l452re</extends> -->
   <!-- <extends>modm:nucleo-l496zg-p</extends> -->
+  <!-- <extends>modm:nucleo-l4r5zi</extends> -->
   <!-- <extends>modm:nucleo-l552ze-q</extends> -->
   <!-- <extends>modm:nucleo-u083rc</extends> -->
   <!-- <extends>modm:nucleo-u385rg-q</extends> -->

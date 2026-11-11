@@ -19,6 +19,7 @@
   <!-- <extends>modm:nucleo-l432kc</extends> -->
   <!-- <extends>modm:nucleo-l476rg</extends> -->
   <!-- <extends>modm:disco-l476vg</extends> -->
+  <!-- <extends>modm:nucleo-l4r5zi</extends> -->
   <!-- <extends>modm:nucleo-l552ze-q</extends> -->
   <!-- <extends>modm:nucleo-h563zi</extends> -->
   <!-- <extends>modm:nucleo-u385rg-q</extends> -->

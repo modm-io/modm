@@ -3,6 +3,7 @@
   <!-- <extends>modm:nucleo-f091rc</extends> -->
   <!-- <extends>modm:nucleo-g474re</extends> -->
   <!-- <extends>modm:nucleo-l476rg</extends> -->
+  <!-- <extends>modm:nucleo-l4r5zi</extends> -->
   <!-- <extends>modm:nucleo-h723zg</extends> -->
   <!-- <extends>modm:nucleo-u575zi-q</extends> -->
   <!-- <extends>modm:disco-f469ni</extends> -->

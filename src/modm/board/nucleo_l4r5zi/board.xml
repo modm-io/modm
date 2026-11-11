@@ -1,0 +1,15 @@
+<library>
+  <repositories>
+    <repository>
+      <path>../../../../repo.lb</path>
+    </repository>
+  </repositories>
+
+  <options>
+    <option name="modm:target">stm32l4r5zit6</option>
+  </options>
+
+  <modules>
+    <module>modm:board:nucleo-l4r5zi</module>
+  </modules>
+</library>

@@ -19,6 +19,7 @@
   <!-- <extends>modm:nucleo-l152re</extends> -->
   <!-- <extends>modm:nucleo-l432kc</extends> -->
   <!-- <extends>modm:nucleo-l476rg</extends> -->
+  <!-- <extends>modm:nucleo-l4r5zi</extends> -->
   <!-- <extends>modm:rp-pico</extends> -->
   <!-- <extends>modm:feather-m0</extends> -->
   <options>
