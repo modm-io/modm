@@ -10,6 +10,7 @@
   <!-- Cortex-M7 -->
   <!-- <extends>modm:nucleo-f767zi</extends> -->
   <!-- <extends>modm:nucleo-h743zi</extends> -->
+  <!-- <extends>modm:nucleo-h7a3zi-q</extends> -->
   <!-- Cortex-M33 -->
   <!-- <extends>modm:nucleo-u575zi-q</extends> -->
   <!-- <extends>modm:nucleo-u5a5zj-q</extends> -->

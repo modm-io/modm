@@ -6,6 +6,7 @@
   <!-- <extends>modm:nucleo-f429zi</extends> -->
   <!-- <extends>modm:nucleo-g071rb</extends> -->
   <!-- <extends>modm:nucleo-h723zg</extends> -->
+  <!-- <extends>modm:nucleo-h7a3zi-q</extends> -->
   <!-- <extends>modm:nucleo-l476rg</extends> -->
   <!-- <extends>modm:nucleo-l4r5zi</extends> -->
   <!-- <extends>modm:nucleo-u083rc</extends> -->

@@ -1,6 +1,7 @@
 <library>
   <extends>modm:nucleo-h743zi</extends>
   <!-- <extends>modm:nucleo-h723zg</extends> -->
+  <!-- <extends>modm:nucleo-h7a3zi-q</extends> -->
   <!-- <extends>modm:nucleo-f429zi</extends> -->
   <!-- <extends>modm:nucleo-f722ze</extends> -->
   <!-- <extends>modm:nucleo-f207zg</extends> -->

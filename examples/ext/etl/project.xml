@@ -4,6 +4,7 @@
   <!-- <extends>modm:nucleo-g070rb</extends> -->
   <!-- <extends>modm:nucleo-f103rb</extends> -->
   <!-- <extends>modm:nucleo-h743zi</extends> -->
+  <!-- <extends>modm:nucleo-h7a3zi-q</extends> -->
   <!-- <extends>modm:nucleo-u575zi-q</extends> -->
   <!-- <extends>modm:nucleo-u5a5zj-q</extends> -->
   <modules>

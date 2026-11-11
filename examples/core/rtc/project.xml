@@ -37,6 +37,7 @@
   <!-- <extends>modm:disco-f746ng</extends> -->
   <!-- <extends>modm:nucleo-h723zg</extends> -->
   <!-- <extends>modm:nucleo-h743zi</extends> -->
+  <!-- <extends>modm:nucleo-h7a3zi-q</extends> -->
   <!-- <extends>modm:nucleo-u575zi-q</extends> -->
   <!-- <extends>modm:nucleo-u5a5zj-q</extends> -->
   <modules>

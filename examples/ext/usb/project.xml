@@ -18,6 +18,7 @@
   <!-- <extends>modm:nucleo-f429zi</extends> -->
   <!-- <extends>modm:nucleo-h723zg</extends> -->
   <!-- <extends>modm:nucleo-h743zi</extends> -->
+  <!-- <extends>modm:nucleo-h7a3zi-q</extends> -->
   <!-- <extends>modm:rp-pico</extends> -->
   <!-- <extends>modm:samd21-mini</extends> -->
   <!-- <extends>modm:weact-g0b1cb</extends> -->
@@ -49,7 +50,7 @@
     <!-- Required for modm:disco-f429zi, optional for modm:weact-h7r3z8 (HS connector) -->
     <!-- <option name="modm:tinyusb:device:port">hs</option> -->
 
-    <!-- Required for modm:nucleo-h723zg, modm:disco-f429zi -->
+    <!-- Required for modm:nucleo-h723zg, modm:nucleo-h7a3zi-q, modm:disco-f429zi -->
     <!-- <option name="modm:tinyusb:max-speed">full</option> -->
   </options>
   <modules>
