@@ -1,0 +1,10 @@
+<library>
+  <extends>modm:nucleo-g474re</extends>
+  <!-- CI: limit 60 -->
+  <modules>
+    <module>modm:platform:flash</module>
+    <module>modm:platform:iwdg</module>
+    <module>modm:zephyr-zms</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>
