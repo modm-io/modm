@@ -38,10 +38,39 @@ class condition_variable_any
 
 	std::atomic<uint16_t> sequence{};
 
+	// Must be called before unlocking, otherwise a notification between
+	// unlocking and calling this function is lost.
 	const auto inline wait_on_sequence()
 	{
 		return [this, poll_sequence = sequence.load(std::memory_order_acquire)]
 		{ return poll_sequence != sequence.load(std::memory_order_acquire); };
+	}
+
+	// Waits until the predicate is true after a notification or a stop
+	// request, or until poll() gives up. The sequence is read before every
+	// evaluation of the predicate, so that a notification right after it,
+	// e.g. from an interrupt that cannot hold the lock, is not lost.
+	template< class Lock, class Predicate, class Poll >
+	bool
+	wait_predicate(Lock& lock, Predicate&& pred, stop_token stoken, Poll&& poll)
+	{
+		uint16_t seen = sequence.load(std::memory_order_acquire);
+		if (pred()) return true;
+		if (stoken.stop_requested()) return false;
+		bool locked{false};
+		lock.unlock();
+		(void) poll([&]
+		{
+			if (seen == sequence.load(std::memory_order_acquire) and
+				not stoken.stop_requested()) return false;
+			lock.lock();
+			seen = sequence.load(std::memory_order_acquire);
+			if (pred() or stoken.stop_requested()) return locked = true;
+			lock.unlock();
+			return false;
+		});
+		if (not locked) lock.lock();
+		return pred();
 	}
 public:
 	constexpr condition_variable_any() = default;
@@ -55,7 +84,14 @@ public:
 
 	/// @note This function can be called from an interrupt.
 	void inline
-	notify_any()
+	notify_all()
+	{
+		notify_one();
+	}
+
+	[[deprecated("Use notify_all() instead!")]]
+	void inline
+	notify_any() // DEPRECATED: 2027q4
 	{
 		notify_one();
 	}
@@ -65,8 +101,9 @@ public:
 	void
 	wait(Lock& lock)
 	{
+		const auto notified = wait_on_sequence();
 		lock.unlock();
-		this_fiber::poll(wait_on_sequence());
+		this_fiber::poll(notified);
 		lock.lock();
 	}
 
@@ -75,7 +112,7 @@ public:
 	void
 	wait(Lock& lock, Predicate&& pred)
 	{
-		while (not std::forward<Predicate>(pred)()) wait(lock);
+		(void) wait_predicate(lock, pred, {}, [](auto&& c) { this_fiber::poll(c); return true; });
 	}
 
 	template< class Lock, class Predicate >
@@ -83,12 +120,7 @@ public:
 	bool
 	wait(Lock& lock, stop_token stoken, Predicate&& pred)
 	{
-		while (not stoken.stop_requested())
-		{
-			if (std::forward<Predicate>(pred)()) return true;
-			wait(lock);
-		}
-		return std::forward<Predicate>(pred)();
+		return wait_predicate(lock, pred, stoken, [](auto&& c) { this_fiber::poll(c); return true; });
 	}
 
 
@@ -96,8 +128,9 @@ public:
 	cv_status
 	wait_for(Lock& lock, std::chrono::duration<Rep, Period> rel_time)
 	{
+		const auto notified = wait_on_sequence();
 		lock.unlock();
-		const bool result = this_fiber::poll_for(rel_time, wait_on_sequence());
+		const bool result = this_fiber::poll_for(rel_time, notified);
 		lock.lock();
 		return result ? cv_status::no_timeout : cv_status::timeout;
 	}
@@ -107,12 +140,8 @@ public:
 	bool
 	wait_for(Lock& lock, std::chrono::duration<Rep, Period> rel_time, Predicate&& pred)
 	{
-		while (not std::forward<Predicate>(pred)())
-		{
-			if (wait_for(lock, rel_time) == cv_status::timeout)
-				return std::forward<Predicate>(pred)();
-		}
-		return true;
+		return wait_predicate(lock, pred, {},
+				[&](auto&& c) { return this_fiber::poll_for(rel_time, c); });
 	}
 
 	template< class Lock, class Rep, class Period, class Predicate >
@@ -121,13 +150,8 @@ public:
 	wait_for(Lock& lock, stop_token stoken,
 			 std::chrono::duration<Rep, Period> rel_time, Predicate&& pred)
 	{
-		while (not stoken.stop_requested())
-		{
-			if (std::forward<Predicate>(pred)()) return true;
-			if (wait_for(lock, rel_time) == cv_status::timeout)
-				return std::forward<Predicate>(pred)();
-		}
-		return std::forward<Predicate>(pred)();
+		return wait_predicate(lock, pred, stoken,
+				[&](auto&& c) { return this_fiber::poll_for(rel_time, c); });
 	}
 
 
@@ -135,8 +159,9 @@ public:
 	cv_status
 	wait_until(Lock& lock, std::chrono::time_point<Clock, Duration> abs_time)
 	{
+		const auto notified = wait_on_sequence();
 		lock.unlock();
-		const bool result = this_fiber::poll_until(abs_time, wait_on_sequence());
+		const bool result = this_fiber::poll_until(abs_time, notified);
 		lock.lock();
 		return result ? cv_status::no_timeout : cv_status::timeout;
 	}
@@ -146,12 +171,8 @@ public:
 	bool
 	wait_until(Lock& lock, std::chrono::time_point<Clock, Duration> abs_time, Predicate&& pred)
 	{
-		while (not std::forward<Predicate>(pred)())
-		{
-			if (wait_until(lock, abs_time) == cv_status::timeout)
-				return std::forward<Predicate>(pred)();
-		}
-		return true;
+		return wait_predicate(lock, pred, {},
+				[&](auto&& c) { return this_fiber::poll_until(abs_time, c); });
 	}
 
 	template< class Lock, class Clock, class Duration, class Predicate >
@@ -160,13 +181,8 @@ public:
 	wait_until(Lock& lock, stop_token stoken,
 			   std::chrono::time_point<Clock, Duration> abs_time, Predicate&& pred)
 	{
-		while (not stoken.stop_requested())
-		{
-			if (std::forward<Predicate>(pred)()) return true;
-			if (wait_until(lock, abs_time) == cv_status::timeout)
-				return std::forward<Predicate>(pred)();
-		}
-		return std::forward<Predicate>(pred)();
+		return wait_predicate(lock, pred, stoken,
+				[&](auto&& c) { return this_fiber::poll_until(abs_time, c); });
 	}
 };
 

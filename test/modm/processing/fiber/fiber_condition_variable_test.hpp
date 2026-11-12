@@ -28,4 +28,16 @@ public:
 
 	void
 	testConditionVariableWaitStopTokenPredicate();
+
+	void
+	testConditionVariableNotifyOnUnlock();
+
+	void
+	testConditionVariableNotifyAfterPredicate();
+
+	void
+	testConditionVariableStopWakes();
+
+	void
+	testConditionVariableWaitForTotal();
 };

@@ -12,6 +12,8 @@
 #include "fiber_condition_variable_test.hpp"
 #include "shared.hpp"
 #include <modm/architecture/interface/fiber/condition_variable.hpp>
+#include <modm/architecture/interface/fiber/mutex.hpp>
+#include <modm-test/mock/clock.hpp>
 
 static struct
 {
@@ -97,7 +99,7 @@ f4()
 	TEST_ASSERT_EQUALS(state++, 2u);
 	cv.notify_one();
 	modm::this_fiber::yield();
-	cv.notify_any();
+	cv.notify_all();
 	modm::this_fiber::yield();
 	cv.notify_one();
 	modm::this_fiber::yield();
@@ -145,7 +147,7 @@ f6()
 	TEST_ASSERT_EQUALS(state++, 2u);
 	cv.notify_one();
 	modm::this_fiber::yield();
-	cv.notify_any();
+	cv.notify_all();
 	modm::this_fiber::yield();
 	cv.notify_one();
 	modm::this_fiber::yield();
@@ -163,4 +165,98 @@ ConditionVariableTest::testConditionVariableWaitStopTokenPredicate()
 {
 	modm::fiber::Task fiber1(stack1, f5), fiber2(stack2, f6);
 	modm::fiber::Scheduler::run();
+}
+
+// ========================= CONDITION VARIABLE NOTIFY =========================
+static struct
+{
+	// e.g. an interrupt notifies right after unlocking
+	void inline lock() {}
+	void inline unlock() { cv.notify_one(); }
+} nlock;
+
+void
+ConditionVariableTest::testConditionVariableNotifyOnUnlock()
+{
+	using namespace std::chrono_literals;
+	TEST_ASSERT_TRUE(cv.wait_for(nlock, 0ms) == modm::fiber::cv_status::no_timeout);
+	TEST_ASSERT_TRUE(cv.wait_until(nlock, modm::chrono::milli_clock::now()) == modm::fiber::cv_status::no_timeout);
+}
+
+// A fiber that only notifies when the waiting fiber did not return in time
+template< class Function >
+static void
+run_with_fallback(Function &&wait, modm::fiber::stop_state *stop = nullptr)
+{
+	bool done{false};
+	modm::fiber::Task fiber1(stack1, [&]{ wait(); done = true; });
+	modm::fiber::Task fiber2(stack2, [&]
+	{
+		modm::this_fiber::yield();
+		if (stop) stop->request_stop(); // without notification
+		for (uint8_t ii = 0; ii < 10; ii++) modm::this_fiber::yield();
+		TEST_ASSERT_TRUE(done);
+		while (not done) { cv.notify_one(); modm::this_fiber::yield(); }
+	});
+	modm::fiber::Scheduler::run();
+}
+
+void
+ConditionVariableTest::testConditionVariableNotifyAfterPredicate()
+{
+	// e.g. an interrupt changes the state and notifies right after the
+	// predicate was evaluated, the interrupt cannot hold the lock
+	modm::fiber::mutex mtx;
+	run_with_fallback([&]
+	{
+		uint8_t calls{0};
+		mtx.lock();
+		cv.wait(mtx, [&]{ if (calls++) return true; cv.notify_one(); return false; });
+		mtx.unlock();
+	});
+}
+
+void
+ConditionVariableTest::testConditionVariableStopWakes()
+{
+	modm::fiber::mutex mtx;
+	modm::fiber::stop_state stop_wait;
+	run_with_fallback([&]
+	{
+		mtx.lock();
+		TEST_ASSERT_FALSE(cv.wait(mtx, stop_wait.get_token(), []{ return false; }));
+		mtx.unlock();
+	}, &stop_wait);
+}
+
+void
+ConditionVariableTest::testConditionVariableWaitForTotal()
+{
+	using namespace std::chrono_literals;
+	using test_clock_ms = modm_test::chrono::milli_clock;
+	test_clock_ms::enable();
+	modm::fiber::mutex mtx;
+	bool done{false};
+	uint8_t notifications{0};
+	modm::fiber::Task fiber1(stack1, [&]
+	{
+		mtx.lock();
+		// the timeout is not restarted by notifications
+		TEST_ASSERT_FALSE(cv.wait_for(mtx, 10ms, []{ return false; }));
+		mtx.unlock();
+		done = true;
+	});
+	modm::fiber::Task fiber2(stack2, [&]
+	{
+		for (; notifications < 100 and not done; notifications++)
+		{
+			cv.notify_one();
+			test_clock_ms::increment(1);
+			modm::this_fiber::yield();
+		}
+		while (not done) { test_clock_ms::increment(1); modm::this_fiber::yield(); }
+	});
+	modm::fiber::Scheduler::run();
+	test_clock_ms::disable();
+	TEST_ASSERT_TRUE(notifications <= 12);
 }
