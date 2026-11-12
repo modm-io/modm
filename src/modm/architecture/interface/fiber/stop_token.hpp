@@ -42,14 +42,14 @@ public:
 	bool inline
 	stop_requested() const
 	{
-		return requested.load(std::memory_order_relaxed);
+		return requested.load(std::memory_order_acquire);
 	}
 
 	/// @note This function can be called from an interrupt.
 	bool inline
 	request_stop()
 	{
-		return not requested.exchange(true, std::memory_order_relaxed);
+		return not requested.exchange(true, std::memory_order_acq_rel);
 	}
 
 	/// @note This function can be called from an interrupt.
@@ -156,7 +156,7 @@ public:
 	stop_token inline
 	get_token() const
 	{
-		return state->get_token();
+		return stop_possible() ? state->get_token() : stop_token{};
 	}
 
 	void inline

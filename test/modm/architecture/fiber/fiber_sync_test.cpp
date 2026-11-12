@@ -126,4 +126,7 @@ FiberSyncTest::testConditionVariable()
 	TEST_ASSERT_FALSE(cv.wait(mtx, stop.get_token(), []{ return false; }));
 	TEST_ASSERT_FALSE(mtx.try_lock());
 	mtx.unlock();
+
+	modm::fiber::stop_source no_state;
+	TEST_ASSERT_FALSE(no_state.get_token().stop_possible());
 }

@@ -46,7 +46,7 @@ public:
 		count_t value = count.load(std::memory_order_relaxed);
 		do if (value == 0) return;
 		while (not count.compare_exchange_weak(value, value >= n ? value - n : 0,
-					std::memory_order_acquire, std::memory_order_relaxed));
+					std::memory_order_release, std::memory_order_relaxed));
 	}
 
 	/// @note This function can be called from an interrupt.
@@ -54,7 +54,7 @@ public:
 	bool inline
 	try_wait() const
 	{
-		return count.load(std::memory_order_relaxed) == 0;
+		return count.load(std::memory_order_acquire) == 0;
 	}
 
 	void inline
