@@ -153,6 +153,13 @@ LatchBarrierTest::testBarrier()
 
 	TEST_ASSERT_EQUALS(bar.arrive(), 6u);
 	TEST_ASSERT_EQUALS(state, 7u);
+
+	// the waiting fibers continue only after the completion returned
+	bool completed{false};
+	modm::fiber::barrier yield_bar{2, [&]{ modm::this_fiber::yield(); completed = true; }};
+	modm::fiber::Task fiber1(stack1, [&]{ yield_bar.arrive_and_wait(); TEST_ASSERT_TRUE(completed); });
+	modm::fiber::Task fiber2(stack2, [&]{ yield_bar.arrive_and_wait(); TEST_ASSERT_TRUE(completed); });
+	modm::fiber::Scheduler::run();
 }
 
 

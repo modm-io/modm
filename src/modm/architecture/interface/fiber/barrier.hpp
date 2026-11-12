@@ -64,9 +64,10 @@ public:
 		if (n < count) count -= n;
 		else
 		{
+			// the waiting fibers continue only after the completion returned
+			completion();
 			count = expected;
 			sequence++;
-			completion();
 		}
 		return last_arrival;
 	}
