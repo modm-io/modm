@@ -14,5 +14,5 @@
 #include <modm/processing/fiber.hpp>
 
 // shared objects to reduce memory consumption
-[[maybe_unused]] static inline modm::fiber::Stack<> stack1, stack2;
-[[maybe_unused]] static inline uint8_t state;
+inline modm::fiber::Stack<> stack1, stack2;
+inline uint8_t state;
