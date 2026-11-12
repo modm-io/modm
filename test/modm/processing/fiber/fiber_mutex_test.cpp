@@ -303,4 +303,19 @@ FiberMutexTest::testCallOnce()
 	});
 	TEST_ASSERT_EQUALS(ii, 10u);
 	TEST_ASSERT_EQUALS(state, 1u);
+
+	// other fibers wait until the active call returned
+	modm::fiber::once_flag yield_flag;
+	bool done{false};
+	modm::fiber::Task fiber1(stack1, [&]
+	{
+		modm::fiber::call_once(yield_flag, [&]{ modm::this_fiber::yield(); done = true; });
+	});
+	modm::fiber::Task fiber2(stack2, [&]
+	{
+		modm::fiber::call_once(yield_flag, []{ state++; });
+		TEST_ASSERT_TRUE(done);
+	});
+	modm::fiber::Scheduler::run();
+	TEST_ASSERT_EQUALS(state, 1u);
 }

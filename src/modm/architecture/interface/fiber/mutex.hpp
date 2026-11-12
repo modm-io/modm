@@ -174,20 +174,28 @@ class once_flag
 	once_flag(const once_flag&) = delete;
 	once_flag& operator=(const once_flag&) = delete;
 
-	std::atomic_flag state{};
-	inline bool try_call() { return not state.test_and_set(std::memory_order_acquire); }
+	enum State : uint8_t { Ready, Active, Done };
+	std::atomic<uint8_t> state{Ready};
 
 public:
 	constexpr once_flag() = default;
 };
 
 /// Implements the `std::call_once` interface for fibers.
+/// Other callers wait until the active call returned.
 /// @see https://en.cppreference.com/w/cpp/thread/call_once
 template<typename Callable, typename... Args>
 void
 call_once(once_flag& flag, Callable&& f, Args&&... args)
 {
-	if (flag.try_call()) std::forward<Callable>(f)(std::forward<Args>(args)...);
+	uint8_t expected{once_flag::Ready};
+	if (flag.state.compare_exchange_strong(expected, once_flag::Active,
+			std::memory_order_acquire, std::memory_order_acquire))
+	{
+		std::forward<Callable>(f)(std::forward<Args>(args)...);
+		flag.state.store(once_flag::Done, std::memory_order_release);
+	}
+	else this_fiber::poll([&]{ return flag.state.load(std::memory_order_acquire) == once_flag::Done; });
 }
 
 // Reuse the stdlibc++ implementation for the rest

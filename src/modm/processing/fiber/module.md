@@ -288,7 +288,9 @@ Implemented using interrupt-safe atomics.
 
 - `once_flag` and `call_once`.
 
-Implemented using interrupt-safe atomic flag.
+Implemented using an interrupt-safe atomic state. Other callers wait until the
+active call returned, so do not call it from an interrupt while a fiber may be
+inside the call.
 
 
 ### Condition Variables
