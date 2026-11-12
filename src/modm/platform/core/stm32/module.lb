@@ -92,6 +92,9 @@ def build(env):
         "f4": (4,  4), # CM4  tested on F401, F411, F446 in RAM
         "f2": (4,  4), # CM3  tested on F207 in RAM
     }[target.family]
+    # The L4+ needs 6 cycles per loop, tested on L4R5 in SRAM1
+    if target.family == "l4" and target.name[0] in "pqrs":
+        tuning = (6, 2)
 
     # us_shift is an optimization to limit error via fractional math
     frequency = int(env[":target"].get_driver("rcc")["max-frequency"][0])
