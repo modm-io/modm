@@ -49,10 +49,12 @@ public:
 	static inline void
 	initialize(Prescaler prescaler, uint16_t reload)
 	{
+		writeKey(enableCommand);
 		writeKey(writeCommand);
 		IWDG{{core}}->PR = uint32_t(prescaler);
 		IWDG{{core}}->RLR = reload;
-		writeKey(0); // disable access to PR and RLR registers
+		while (IWDG{{core}}->SR & (IWDG_SR_PVU | IWDG_SR_RVU)) ;
+		writeKey(reloadCommand);
 	}
 
 	template< class SystemClock, milliseconds_t timeout, percent_t tolerance=pct(1) >
@@ -67,11 +69,9 @@ public:
 		initialize(Prescaler(6 - result.index), result.counter - 1);
 	}
 
+	[[deprecated("initialize() starts the watchdog now!")]]
 	static inline void
-	enable()
-	{
-		writeKey(enableCommand);
-	}
+	enable() {} // DEPRECATED: 2027q4
 
 	static inline void
 	trigger()

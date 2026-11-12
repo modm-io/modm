@@ -25,8 +25,6 @@ main()
 {
 	Board::initialize();
 	LedD13::setOutput();
-	// set the watchdog timeout to 4 seconds
-	Iwdg::initialize<SystemClock, 4s>();
 
 	// Use the logging streams to print some messages.
 	// Change MODM_LOG_LEVEL above to enable or disable these messages
@@ -44,7 +42,8 @@ main()
 		MODM_LOG_INFO << "loop: " << counter++ << modm::endl;
 	}
 
-	Iwdg::enable();
+	// start the watchdog with a timeout of 4 seconds
+	Iwdg::initialize<SystemClock, 4s>();
 
 	while (1)
 	{
