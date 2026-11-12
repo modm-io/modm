@@ -27,6 +27,10 @@ namespace modm::fiber
 /// @ingroup modm_architecture_fiber
 using id = uintptr_t;
 
+/// An id that no fiber, context or interrupt ever has.
+/// @ingroup modm_architecture_fiber
+inline constexpr id invalid_id{id(-1)};
+
 } // namespace modm::fiber
 
 namespace modm::this_fiber

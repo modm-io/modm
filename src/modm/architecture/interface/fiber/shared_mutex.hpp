@@ -28,9 +28,8 @@ class shared_mutex
 	shared_mutex(const shared_mutex&) = delete;
 	shared_mutex& operator=(const shared_mutex&) = delete;
 
-	static constexpr fiber::id NoOwner{fiber::id(-1)};
 	static constexpr fiber::id SharedOwner{fiber::id(-2)};
-	std::atomic<fiber::id> owner{NoOwner};
+	std::atomic<fiber::id> owner{fiber::invalid_id};
 public:
 	constexpr shared_mutex() = default;
 
@@ -40,7 +39,7 @@ public:
 	try_lock()
 	{
 		const fiber::id new_owner = modm::this_fiber::get_id();
-		fiber::id expected{NoOwner};
+		fiber::id expected{fiber::invalid_id};
 		return owner.compare_exchange_strong(expected, new_owner,
 				std::memory_order_acquire, std::memory_order_relaxed);
 	}
@@ -55,7 +54,7 @@ public:
 	void inline
 	unlock()
 	{
-		owner.store(NoOwner, std::memory_order_release);
+		owner.store(fiber::invalid_id, std::memory_order_release);
 	}
 
 	/// @note This function can be called from an interrupt.
@@ -80,7 +79,7 @@ public:
 	void inline
 	unlock_shared()
 	{
-		owner.store(NoOwner, std::memory_order_release);
+		owner.store(fiber::invalid_id, std::memory_order_release);
 	}
 };
 

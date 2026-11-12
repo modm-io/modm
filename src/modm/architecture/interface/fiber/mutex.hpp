@@ -91,8 +91,7 @@ class recursive_mutex
 	recursive_mutex& operator=(const recursive_mutex&) = delete;
 	using count_t = uint16_t;
 
-	static constexpr fiber::id NoOwner{fiber::id(-1)};
-	volatile fiber::id owner{NoOwner};
+	volatile fiber::id owner{fiber::invalid_id};
 	static constexpr count_t countMax{count_t(-1)};
 	volatile count_t count{1};
 
@@ -106,7 +105,7 @@ public:
 	{
 		const auto id = modm::this_fiber::get_id();
 		modm::atomic::Lock _;
-		if (owner == NoOwner) {
+		if (owner == fiber::invalid_id) {
 			owner = id;
 			// count = 1; is implicit
 			return true;
@@ -132,7 +131,7 @@ public:
 		if (count > 1) count--;
 		else {
 			// count = 1; is implicit
-			owner = NoOwner;
+			owner = fiber::invalid_id;
 		}
 	}
 };

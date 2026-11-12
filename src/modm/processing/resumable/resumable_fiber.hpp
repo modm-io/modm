@@ -30,19 +30,18 @@ struct ResumableMutex
 struct ResumableRecursiveMutex
 {
 	using count_t = uint16_t;
-	static constexpr fiber::id NoOwner{fiber::id(-1)};
-	fiber::id owner{NoOwner};
+	fiber::id owner{fiber::invalid_id};
 	static constexpr count_t countMax{count_t(-1)};
 	count_t count{1};
 	bool inline try_lock()
 	{
 		const auto id = modm::this_fiber::get_id();
-		if (owner == NoOwner) { owner = id; return true; }
+		if (owner == fiber::invalid_id) { owner = id; return true; }
 		if (owner == id and count < countMax) { count++; return true; }
 		return false;
 	}
 	void inline lock() { while(not try_lock()) modm::this_fiber::yield(); }
-	void inline unlock() { if (count > 1) count--; else owner = NoOwner; }
+	void inline unlock() { if (count > 1) count--; else owner = fiber::invalid_id; }
 };
 /// @endcond
 
@@ -112,7 +111,7 @@ class NestedResumable
 public:
 	bool isResumableRunning() const
 	{
-		return rfState.owner != rfState.NoOwner;
+		return rfState.owner != fiber::invalid_id;
 	}
 	int8_t getResumableDepth() const
 	{
