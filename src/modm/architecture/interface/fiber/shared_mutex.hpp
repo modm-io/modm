@@ -28,7 +28,11 @@ class shared_mutex
 	shared_mutex(const shared_mutex&) = delete;
 	shared_mutex& operator=(const shared_mutex&) = delete;
 
-	static constexpr fiber::id SharedOwner{fiber::id(-2)};
+	// Each reader counts the owner down from fiber::invalid_id, so the largest
+	// values are shared owners. Fiber ids are addresses, 0 or interrupt numbers,
+	// which are all far below these values.
+	static constexpr fiber::id MaxSharedOwners{127};
+	static constexpr fiber::id SharedOwnerLimit{fiber::invalid_id - MaxSharedOwners};
 	std::atomic<fiber::id> owner{fiber::invalid_id};
 public:
 	constexpr shared_mutex() = default;
@@ -63,8 +67,9 @@ public:
 	try_lock_shared()
 	{
 		fiber::id current = owner.load(std::memory_order_relaxed);
-		do if (current < SharedOwner) return false;
-		while(not owner.compare_exchange_weak(current, SharedOwner,
+		// owned by a fiber or by too many readers
+		do if (current <= SharedOwnerLimit) return false;
+		while(not owner.compare_exchange_weak(current, current - 1,
 				std::memory_order_acquire, std::memory_order_relaxed));
 		return true;
 	}
@@ -79,7 +84,7 @@ public:
 	void inline
 	unlock_shared()
 	{
-		owner.store(fiber::invalid_id, std::memory_order_release);
+		owner.fetch_add(1, std::memory_order_release);
 	}
 };
 

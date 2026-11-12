@@ -213,6 +213,7 @@ f5()
 	modm::this_fiber::yield();
 	// still locked
 	sh_mtx.unlock_shared();
+	sh_mtx.unlock_shared();
 	modm::this_fiber::yield(); // goto 7
 
 	TEST_ASSERT_EQUALS(state++, 9u);
@@ -234,7 +235,9 @@ f6()
 	// can get shared lock
 	sh_mtx.lock_shared();
 	sh_mtx.lock_shared();
-	// cannot get exclusive lock
+	sh_mtx.unlock_shared();
+	sh_mtx.unlock_shared();
+	// cannot get exclusive lock while f5 still reads
 	sh_mtx.lock(); // goto 6
 
 	TEST_ASSERT_EQUALS(state++, 7u);
@@ -260,6 +263,16 @@ FiberMutexTest::testSharedMutex()
 	sh_mtx.unlock();
 	// more unlocks should be fine
 	sh_mtx.unlock();
+	sh_mtx.unlock();
+
+	// a writer waits for all readers
+	TEST_ASSERT_TRUE(sh_mtx.try_lock_shared());
+	TEST_ASSERT_TRUE(sh_mtx.try_lock_shared());
+	sh_mtx.unlock_shared();
+	TEST_ASSERT_FALSE(sh_mtx.try_lock());
+	sh_mtx.unlock_shared();
+	TEST_ASSERT_TRUE(sh_mtx.try_lock());
+	TEST_ASSERT_FALSE(sh_mtx.try_lock_shared());
 	sh_mtx.unlock();
 
 

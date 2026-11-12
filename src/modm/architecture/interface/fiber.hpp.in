@@ -23,7 +23,10 @@
 namespace modm::fiber
 {
 
-/// Identifier of a fiber task.
+/// Identifier of a fiber task: the address of the task, or 0 for the main
+/// context. On Cortex-M, interrupts return their exception number (16 up to
+/// about 512), so these small values are reserved. The synchronization
+/// primitives reserve the largest values, starting with `invalid_id`.
 /// @ingroup modm_architecture_fiber
 using id = uintptr_t;
 

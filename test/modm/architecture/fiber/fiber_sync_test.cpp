@@ -55,6 +55,8 @@ FiberSyncTest::testMutex()
 	TEST_ASSERT_TRUE(sh_mtx.try_lock_shared());
 	TEST_ASSERT_FALSE(sh_mtx.try_lock());
 	sh_mtx.unlock_shared();
+	TEST_ASSERT_FALSE(sh_mtx.try_lock());
+	sh_mtx.unlock_shared();
 	sh_mtx.lock();
 	TEST_ASSERT_FALSE(sh_mtx.try_lock_shared());
 	sh_mtx.unlock();
