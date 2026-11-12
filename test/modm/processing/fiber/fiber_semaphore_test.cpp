@@ -88,5 +88,20 @@ FiberSemaphoreTest::testCountingSemaphore()
 
 	modm::fiber::Task fiber1(stack1, f1), fiber2(stack2, f2);
 	modm::fiber::Scheduler::run();
+
+	// release saturates at max() instead of overflowing
+	modm::fiber::binary_semaphore bin{0};
+	TEST_ASSERT_EQUALS(bin.max(), 1);
+	bin.release();
+	bin.release();
+	TEST_ASSERT_TRUE(bin.try_acquire());
+	TEST_ASSERT_FALSE(bin.try_acquire());
+
+	modm::fiber::counting_semaphore<255> full{255};
+	full.release();
+	TEST_ASSERT_TRUE(full.try_acquire());
+	full.release(10);
+	for (int ii = 0; ii < 255; ii++) TEST_ASSERT_TRUE(full.try_acquire());
+	TEST_ASSERT_FALSE(full.try_acquire());
 }
 

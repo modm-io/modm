@@ -40,7 +40,7 @@ public:
 
 	[[nodiscard]]
 	static constexpr std::ptrdiff_t
-	max() { return std::numeric_limits<count_t>::max(); }
+	max() { return LeastMaxValue; }
 
 	/// @note This function can be called from an interrupt.
 	[[nodiscard]]
@@ -60,11 +60,17 @@ public:
 		while(not try_acquire()) modm::this_fiber::yield();
 	}
 
+	/// Saturates at `max()`, so a `binary_semaphore` released several times
+	/// from an interrupt is only acquired once.
 	/// @note This function can be called from an interrupt.
 	void inline
-	release()
+	release(std::ptrdiff_t update = 1)
 	{
-		count.fetch_add(1, std::memory_order_release);
+		count_t current = count.load(std::memory_order_relaxed);
+		count_t desired;
+		do desired = (update < max() - current) ? count_t(current + update) : count_t(max());
+		while(not count.compare_exchange_weak(current, desired,
+						std::memory_order_release, std::memory_order_relaxed));
 	}
 
 	template< typename Rep, typename Period >
