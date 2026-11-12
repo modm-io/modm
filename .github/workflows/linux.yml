@@ -9,6 +9,7 @@ concurrency:
 jobs:
   unittests-linux-generic:
     runs-on: ubuntu-24.04
+    timeout-minutes: 60
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
 
@@ -109,6 +110,7 @@ jobs:
 
   stm32-unittests:
     runs-on: ubuntu-24.04
+    timeout-minutes: 60
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
     steps:
@@ -131,6 +133,7 @@ jobs:
 
   cortex-m-examples:
     runs-on: ubuntu-24.04
+    timeout-minutes: 60
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
     strategy:
@@ -157,6 +160,7 @@ jobs:
 
   avr-examples:
     runs-on: ubuntu-24.04
+    timeout-minutes: 60
     container:
       image: ghcr.io/modm-ext/modm-build-avr:2026-09-28
     steps:
@@ -208,6 +212,7 @@ jobs:
 
   hal-compile-quick:
     runs-on: ubuntu-24.04
+    timeout-minutes: 60
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
     strategy:

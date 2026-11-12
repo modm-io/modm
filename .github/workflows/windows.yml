@@ -9,6 +9,7 @@ concurrency:
 jobs:
   windows_testing:
     runs-on: windows-2022
+    timeout-minutes: 60
     env:
       PYTHONIOENCODING: "utf-8"
 
