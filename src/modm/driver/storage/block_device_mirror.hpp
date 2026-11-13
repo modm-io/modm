@@ -69,7 +69,7 @@ public:
 
 	/** Erase blocks
 	 *
-	 *  The state of an erased block is undefined until it has been programmed
+	 *  Every byte of an erased block reads as `ErasedValue`
 	 *
 	 *  @param address	Address of block to begin erasing
 	 *  @param size		Size to erase in bytes (multiple of read block size)
@@ -95,6 +95,10 @@ public:
 	static constexpr bd_size_t BlockSizeWrite = std::max(BlockDeviceA::BlockSizeWrite, BlockDeviceB::BlockSizeWrite);
 	static constexpr bd_size_t BlockSizeErase = std::max(BlockDeviceA::BlockSizeErase, BlockDeviceB::BlockSizeErase);
 	static constexpr bd_size_t DeviceSize = std::min(BlockDeviceA::DeviceSize, BlockDeviceB::DeviceSize);
+	static constexpr uint8_t ErasedValue = BlockDeviceA::ErasedValue;
+	static constexpr bool ProgramOnce = BlockDeviceA::ProgramOnce or BlockDeviceB::ProgramOnce;
+	static_assert(BlockDeviceA::ErasedValue == BlockDeviceB::ErasedValue,
+				  "Both block devices must have the same erased value!");
 
 public:
 	/** Direct access to the BlockDeviceA

@@ -74,7 +74,7 @@ public:
 
 	/** Erase blocks
 	 *
-	 *  The state of an erased block is undefined until it has been programmed
+	 *  Every byte of an erased block reads as `ErasedValue`
 	 *
 	 *  @param address	Address of block to begin erasing
 	 *  @param size		Size to erase in bytes (multiple of read block size)
