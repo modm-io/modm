@@ -13,6 +13,12 @@
 
 #include <modm/platform.hpp>
 #include <modm/architecture/interface/clock.hpp>
+%% if with_logger
+#include <modm/debug.hpp>
+
+/// @ingroup modm_board_black_pill_f4{{target.name}}
+#define MODM_BOARD_HAS_LOGGER
+%% endif
 
 using namespace modm::platform;
 
@@ -132,8 +138,24 @@ using Device = UsbFs;
 /// @}
 }
 
+namespace flash
+{
 /// @ingroup modm_board_black_pill_f4{{target.name}}
 /// @{
+// Footprint of a W25QxxJV SPI flash on the back, on SPI1 (not populated)
+using Cs = GpioOutputA4;
+using Sck = GpioOutputA5;
+using Miso = GpioInputA6;
+using Mosi = GpioOutputA7;
+/// @}
+}
+
+/// @ingroup modm_board_black_pill_f4{{target.name}}
+/// @{
+%% if with_logger
+using LoggerDevice = modm::IODeviceWrapper< Rtt<0>, modm::IOBuffer::DiscardIfFull >;
+
+%% endif
 using Led = GpioInverted< GpioOutputC13 >;
 using Leds = SoftwareGpioPort< Led >;
 
