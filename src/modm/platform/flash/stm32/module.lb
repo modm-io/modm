@@ -46,7 +46,8 @@ def prepare(module, options):
         return False
 
     module.depends(":cmsis:device", ":platform:cortex-m",
-                   ":architecture:register", ":architecture:fiber", ":architecture:atomic")
+                   ":architecture:register", ":architecture:fiber", ":architecture:atomic",
+                   ":architecture:block.device")
     module.add_query(EnvironmentQuery(name="write_size", factory=write_size))
     return True
 
@@ -171,3 +172,4 @@ def build(env):
     env.outbasepath = "modm/src/modm/platform/flash"
     env.template(f"flash_{name}.hpp.in", "flash.hpp")
     env.template(f"flash_{name}.cpp.in", "flash.cpp")
+    env.template("block_device.hpp.in")
