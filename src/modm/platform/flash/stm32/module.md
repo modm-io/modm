@@ -99,3 +99,24 @@ Bank swapping is not supported: the bank swap option must be cleared.
 The single-bank mode of the STM32C5 with half of the largest flash size
 (SINGLE_BANK option bit) is not supported: `Flash::erase()` returns an error.
 On the STM32WB the second core must not access the flash during operations.
+
+## Block Device
+
+`modm::platform::BdFlash<Offset, Size>` makes a range of the flash a
+`modm::BlockDevice`, so that storage libraries and other block device code
+work on the internal flash the same way as on external flash. The range must
+start and end on a page or sector boundary:
+
+```cpp
+#include <modm/platform/flash/block_device.hpp>
+
+// The last 16 kB of the flash
+modm::platform::BdFlash<Flash::Size - 16*1024> storage;
+if (not storage.initialize()) { /* not aligned to the pages */ }
+```
+
+A write block is `Flash::WriteSize` bytes and can only be programmed once
+after an erase (`ProgramOnce`). `getEraseBlock(address)` returns the page or
+sector of an address, `BlockSizeErase` is the largest one. `read()` fails on
+words with a double ECC error, `modm::readMarked()` reads them as
+`~ErasedValue`.
